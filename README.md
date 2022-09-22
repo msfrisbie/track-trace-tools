@@ -4,7 +4,7 @@
 
 ## What's Track & Trace Tools?
 
-Track & Trace Tools is an open source browser extension that adds extra features to the [Metrc](https://www.metrc.com). It is not affiliated with Metrc.
+Track & Trace Tools is an open source browser extension that adds extra features to [Metrc](https://www.metrc.com). It is not affiliated with Metrc.
 
 ## Liability
 
