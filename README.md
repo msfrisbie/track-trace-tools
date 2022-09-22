@@ -26,6 +26,12 @@ This software is released under the MIT license. [Read a quick overview of this 
 
 3. Once the build has finished, the `dist/` directory into your browser.
 
+## Testing
+
+To run tests:
+
+    $ npm run test:unit
+
 ## License
 
 Track & Trace Tools is released under the [MIT License](https://opensource.org/licenses/MIT).
