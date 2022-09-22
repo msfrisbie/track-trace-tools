@@ -1,0 +1,20 @@
+/* Metrc bootstrap CSS bleeds through, this overrides the bleed */
+.ttt-modal {
+  background-color: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  margin-left: 0 !important;
+}
+
+.ttt-content {
+  max-height: 92vh !important;
+}
+
+.ttt-dialog {
+  max-width: 90vw !important;
+}
+
+.ttt-search-modal-body {
+  height: 80vh;
+  max-height: 80vh;
+}

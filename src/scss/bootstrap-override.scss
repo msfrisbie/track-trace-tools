@@ -1,0 +1,9 @@
+// Arrow is interfered with by metrc bootstrap, just remove
+.popover .arrow {
+    display: none !important;
+}
+
+.popover {
+    max-width: 320px;
+    opacity: 10%;
+}

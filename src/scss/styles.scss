@@ -1,0 +1,61 @@
+// CORS blocks this by default, not a lot can be done there
+//
+// https://stackoverflow.com/questions/33649761/how-do-i-load-font-awesome-using-scss-sass-in-webpack-using-relative-paths
+// $fa-font-path: "~@fortawesome/fontawesome-free/webfonts";
+// $fa-font-path: "https://pro.fontawesome.com/releases/v5.10.0/webfonts";
+// @import "node_modules/@fortawesome/fontawesome-free/scss/fontawesome";
+// @import "node_modules/@fortawesome/fontawesome-free/scss/solid";
+// @import "node_modules/@fortawesome/fontawesome-free/scss/regular";
+
+.ttt-wrapper {
+  @import "node_modules/bootstrap-vue/dist/bootstrap-vue";
+  @import "node_modules/bootstrap/dist/css/bootstrap";
+  @import "node_modules/tailwindcss/dist/base";
+  @import "node_modules/tailwindcss/dist/components";
+  @import "node_modules/tailwindcss/dist/utilities";
+
+  font-family: "Roboto", sans-serif;
+
+  @import "@/scss/bootstrap-override";
+}
+
+#footer {
+  height: 400px;
+}
+
+.ttt-wrapper.absolute {
+  /* Force higher in page stacking context to cover modals */
+  z-index: 100000;
+  position: absolute;
+}
+
+.ttt-wrapper > * {
+  z-index: 100000;
+}
+
+// This causes weird overlap issues with logout dropdown
+// .facilities-dropdown {
+//     z-index: 10000 !important;
+// }
+
+// Don't let the scroll reach the metrc toolkit button
+.facilities-dropdown .dropdown-menu {
+  max-height: calc(100vh - 200px) !important;
+}
+
+// Override bootstrap rule for span margins
+.ttt-wrapper [class*="span"] {
+  margin-left: initial;
+}
+
+.borderless-input {
+  padding: 0 !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+@import "@/scss/page-overlay";
+@import "@/scss/modal";
+@import "@/scss/inline";
+@import "@/scss/misc";
+@import "@/scss/fonts";

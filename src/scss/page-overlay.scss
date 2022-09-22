@@ -1,0 +1,63 @@
+// Only enable when taking screenshot
+.screenshot button.shadow {
+  box-shadow: none !important;
+}
+
+body.ttt-expanded {
+  width: calc(100% - 400px);
+
+  .navbar {
+    right: 400px;
+  }
+
+  .facilities-dropdown,
+  .installation-title {
+    display: none;
+  }
+
+  .k-grid {
+    overflow-x: scroll;
+  }
+}
+
+body.quick-action-hidden .quick-action-button {
+  display: none;
+}
+
+body.suppress-animation-container .k-animation-container {
+  visibility: hidden !important;
+}
+
+body.demo-mode {
+  .nav.pull-right,
+  .facilities-dropdown,
+  #user-alerts,
+  .installation-title {
+    display: none;
+  }
+
+  td,
+  div.k-pager-wrap,
+  .demo-blur {
+    color: transparent;
+    text-shadow: 0 0 8px rgba(0, 0, 0, 0.4);
+  }
+
+  div#footer {
+    display: none;
+  }
+
+  .metrc-tag {
+    visibility: hidden;
+    position: relative;
+    // position: absolute;
+  }
+
+  .metrc-tag:before {
+    visibility: visible;
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    content: "DEMO00000000000000001234";
+  }
+}

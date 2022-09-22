@@ -1,0 +1,7 @@
+// This was very fucking annoying to get working, the path imports are fragile
+// THe font directory contains a clone of fontface-roboto
+
+// https://github.com/bencodezen/vue-enterprise-boilerplate/issues/125#issuecomment-455389098
+// $roboto-font-path: "~@/assets/fonts/roboto-fontface/fonts";
+
+// @import "@/assets/fonts/roboto-fontface/css/roboto/sass/roboto-fontface";

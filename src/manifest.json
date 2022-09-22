@@ -1,0 +1,41 @@
+{
+  "manifest_version": 3,
+  "name": "Track & Trace Tools",
+  "description": "Supercharge your Metrc workflow",
+  "default_locale": "en",
+  "host_permissions": ["https://*.metrc.com/*", "http://localhost:5000/*"],
+  "icons": {
+    "16": "icons/logo/logo-square-16.png",
+    "48": "icons/logo/logo-square-48.png",
+    "128": "icons/logo/logo-square-128.png"
+  },
+  "background": {
+    "service_worker": "js/background.js"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "__MSG_extName__",
+    "default_icon": {
+      "16": "icons/logo/logo-square-16.png",
+      "48": "icons/logo/logo-square-48.png",
+      "128": "icons/logo/logo-square-128.png"
+    }
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://*.metrc.com/*", "http://localhost:5000/*"],
+      "run_at": "document_end",
+      "js": ["js/content-script.js"],
+      "css": ["css/content-script.css"]
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": ["img/*", "fonts/*"],
+      "matches": ["<all_urls>"]
+    }
+  ],
+  "content_security_policy": {
+    "extension_pages": "default-src 'self'; style-src 'self' 'unsafe-inline'; connect-src https://api.amplitude.com/"
+  }
+}

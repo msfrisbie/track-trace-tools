@@ -1,0 +1,37 @@
+@import "@/scss/palette";
+
+.search-anchor {
+  position: relative;
+}
+
+.search-bar {
+  position: absolute;
+  max-width: 1200px;
+  width: 100%;
+  // Metrc navbar is 1003
+  z-index: 1000;
+  height: 75vh;
+  box-shadow: 0px 5px 5px rgba(0, 0, 0, 0.5);
+}
+
+.search-bar-container {
+  max-width: 1200px;
+}
+
+.search-icon {
+  background-color: $ttt-purple !important;
+  color: white !important;
+}
+
+.plant-search,
+.package-search,
+.transfer-search,
+.tag-search {
+  position: -webkit-sticky; /* Safari */
+  position: sticky;
+  top: 48px;
+  // Metrc navbar is 1003
+  z-index: 1000;
+  // Prevent overlap with metrc dropdowns
+  max-width: calc(100% - 400px);
+}
