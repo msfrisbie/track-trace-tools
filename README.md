@@ -1,5 +1,7 @@
 # Welcome to Track & Trace Tools
 
+[![CircleCI](https://dl.circleci.com/status-badge/img/gh/msfrisbie/track-trace-tools/tree/master.svg?style=svg)](https://dl.circleci.com/status-badge/redirect/gh/msfrisbie/track-trace-tools/tree/master)
+
 ## What's Track & Trace Tools?
 
 Track & Trace Tools is an open source browser extension that adds extra features to the [Metrc](https://www.metrc.com). It is not affiliated with Metrc.
