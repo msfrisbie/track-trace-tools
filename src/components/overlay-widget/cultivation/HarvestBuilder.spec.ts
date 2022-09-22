@@ -1,5 +1,16 @@
 import { enableFetchMocks} from 'jest-fetch-mock';
+import { chrome } from "jest-chrome";
+
+// Stub before remaining imports
 enableFetchMocks();
+
+const manifest: chrome.runtime.Manifest = {
+  name: "my chrome extension",
+  manifest_version: 3,
+  version: "1.0.0",
+};
+
+chrome.runtime.getManifest.mockImplementation(() => manifest);
 
 import { mockDataManager } from '@/modules/mock-data-manager.module';
 import { mockVuex } from '@/test/utils/mocks';
@@ -10,7 +21,7 @@ import HarvestBuilder from './HarvestBuilder.vue';
 
 let localVue = mockVuex();
 
-describe('HarvestBuilder.vue', () => {
+describe("HarvestBuilder.vue", () => {
   let wrapper: Wrapper<any>;
   let store: Store<any>;
 
@@ -20,61 +31,60 @@ describe('HarvestBuilder.vue', () => {
 
     store = new Vuex.Store({
       // actions
-    })
-  })
+    });
+  });
 
-  it('Renders harvest builder', () => {
+  it("Renders harvest builder", () => {
     expect(wrapper.exists()).toEqual(true);
   });
 
-  it('Initializes harvest builder data', () => {
+  it("Initializes harvest builder data", () => {
     expect(wrapper.vm.$data).toEqual({
-      "activeStepIndex": 0,
-      "builderType": "HARVEST_PLANTS",
-      "dryingLocation": null,
-      "harvestIsodate": todayIsodate(),
-      "harvestName": "",
-      "harvestedWeights": [],
-      "patientLicenseNumber": "",
-      "previousHarvestDataKey": null,
-      "selectedPlants": [],
-      "showHiddenDetailFields": false,
-      "steps": [
+      activeStepIndex: 0,
+      builderType: "HARVEST_PLANTS",
+      dryingLocation: null,
+      harvestIsodate: todayIsodate(),
+      harvestName: "",
+      harvestedWeights: [],
+      patientLicenseNumber: "",
+      previousHarvestDataKey: null,
+      selectedPlants: [],
+      showHiddenDetailFields: false,
+      steps: [
         {
-          "stepText": "Select plants to harvest",
+          stepText: "Select plants to harvest",
         },
         {
-          "stepText": "Harvest details",
+          stepText: "Harvest details",
         },
         {
-          "stepText": "Submit",
+          stepText: "Submit",
         },
       ],
-      "unitOfWeight": null,
+      unitOfWeight: null,
     });
-  })
+  });
 
-
-  it('Re-initializes the harvest weights with new plants', () => {
+  it("Re-initializes the harvest weights with new plants", () => {
     const previousWeights = [1, 2, 3];
     const newPlants = mockDataManager.mockPlants({ filter: {} }).slice(0, 5);
 
     wrapper.setData({
       ...wrapper.vm.$data,
-      harvestedWeights: previousWeights
+      harvestedWeights: previousWeights,
     });
 
     expect(wrapper.vm.$data.harvestedWeights).toEqual(previousWeights);
 
     wrapper.setData({
       ...wrapper.vm.$data,
-      selectedPlants: newPlants
+      selectedPlants: newPlants,
     });
 
     wrapper.vm.$nextTick(() => {
       expect(wrapper.vm.$data.harvestedWeights).toEqual(Array(5).fill(0));
     });
-  })
+  });
 
   //   expect(wrapper.text()).toEqual('');
 
@@ -101,5 +111,4 @@ describe('HarvestBuilder.vue', () => {
   //   // // assert the error has gone away
   //   // expect(wrapper.find('.error').exists()).toBe(false)
   // })
-
-})
+});

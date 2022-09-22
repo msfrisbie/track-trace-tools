@@ -1,1 +1,3 @@
-describe("access-control.ts", () => {});
+describe("access-control.ts", () => {
+  it("does nothing", () => {});
+});

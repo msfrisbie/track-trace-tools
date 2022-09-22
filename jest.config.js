@@ -7,18 +7,17 @@ module.exports = {
     "ts",
     "json",
     // tell Jest to handle `*.vue` files
-    "vue"
+    "vue",
   ],
   transform: {
     // process `*.vue` files with `vue-jest`
     ".*\\.(vue)$": "vue-jest",
-    "^.+\\.tsx?$": "ts-jest"
+    "^.+\\.tsx?$": "ts-jest",
   },
   testURL: "http://localhost/",
   moduleNameMapper: {
-    "^@/(.*)$": "<rootDir>/src/$1"
+    "^@/(.*)$": "<rootDir>/src/$1",
   },
-  setupFiles: [
-    '<rootDir>/jest/envVars.js'
-  ],
-}
+  setupFiles: ["<rootDir>/jest/envVars.js"],
+  setupFilesAfterEnv: ["<rootDir>/jest/jest.setup.js"],
+};
