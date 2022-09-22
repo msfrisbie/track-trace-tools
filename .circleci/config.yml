@@ -5,7 +5,6 @@ version: 2.1
 # See: https://circleci.com/docs/2.0/orb-intro/
 orbs:
   node: circleci/node@4.7
-  slack: circleci/slack@4.5.1
 
 jobs:
   build:
@@ -15,14 +14,6 @@ jobs:
       - checkout
       - run: npm install
       - run: npm run build
-      - slack/notify:
-          channel: circleci
-          event: fail
-          template: basic_fail_1
-      - slack/notify:
-          channel: circleci
-          event: pass
-          template: basic_success_1
   test:
     docker:
       - image: cimg/node:16.10
@@ -30,14 +21,6 @@ jobs:
       - checkout
       - run: npm install
       - run: npm run test:unit
-      - slack/notify:
-          channel: circleci
-          event: fail
-          template: basic_fail_1
-      - slack/notify:
-          channel: circleci
-          event: pass
-          template: basic_success_1
 
 # Invoke jobs via workflows
 # See: https://circleci.com/docs/2.0/configuration-reference/#workflows
@@ -50,4 +33,3 @@ workflows:
       # - test:
       #     requires:
       #       - build
-
