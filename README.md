@@ -26,7 +26,7 @@ This software is released under the MIT license. [Read a quick overview of this 
 
         $ npm run build
 
-3. Once the build has finished, the `dist/` directory into your browser.
+3. Once the build has finished, load the `dist/` directory into your browser.
 
 ## Testing
 
