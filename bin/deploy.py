@@ -95,17 +95,6 @@ Check that requestAF / getCS dom shim is in place in Firefox
         wait_for_enter()
 
 
-# class RemoveLocalRefsFromProductionAssets(object):
-#     def run(self, context):
-#         print('''
-# Replace in manifest.json:
-
-#     - Remove *.sellout.local everywhere it appears
-
-# ''')
-#         wait_for_enter()
-
-
 class BuildRelease(object):
     def run(self, context):
         print('''
