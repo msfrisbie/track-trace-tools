@@ -6,7 +6,7 @@ import {
   IExtractedITagOrderData,
   IExtractedRepeaterData,
   ITagOrderModalData,
-  MetrcTagType
+  MetrcTagType,
 } from "@/interfaces";
 import { extractIContactInfoFromITagOrderModalData } from "./address";
 import { debugLogFactory } from "./debug";
@@ -35,7 +35,7 @@ export enum ExtractionType {
   TAG_ORDER_DATA = "TAG_ORDER_DATA",
   CONTACT_DATA = "CONTACT_DATA",
   API_KEY_DATA = "API_KEY_DATA",
-  REPEATER_DATA = "REPEATER_DATA"
+  REPEATER_DATA = "REPEATER_DATA",
 }
 
 function checkITagOrderModalData(data: ITagOrderModalData) {
@@ -61,7 +61,7 @@ function extractMaxTagOrderSize(data: ITagOrderModalData, tagType: MetrcTagType)
 
 function decodeData(data: string): string {
   // Taken from https://stackoverflow.com/questions/31715030/javascript-hex-escape-character-decoding
-  return data.replace(/\\x([0-9A-F]{2})/gi, function() {
+  return data.replace(/\\x([0-9A-F]{2})/gi, function () {
     return String.fromCharCode(parseInt(arguments[1], 16));
   });
 }
@@ -72,10 +72,10 @@ function decodeData(data: string): string {
 //     ) as any;
 
 //     for (let script of scripts) {
-//         const match = script.innerText.match(AJAX_SETUP_REGEX);
+//         const match = script.textContent.match(AJAX_SETUP_REGEX);
 
 //         if (match && match[1]) {
-//             return script.innerText;
+//             return script.textContent;
 //         }
 //     }
 
@@ -92,10 +92,10 @@ function decodeData(data: string): string {
 //     ) as any;
 
 //     for (let script of scripts) {
-//         const match = script.innerText.match(AJAX_SETUP_REGEX);
+//         const match = script.textContent.match(AJAX_SETUP_REGEX);
 
 //         if (match && match[1]) {
-//             return script.innerText;
+//             return script.textContent;
 //         }
 //     }
 
@@ -109,8 +109,8 @@ function decodeData(data: string): string {
 //         const href = (anchor as any).getAttribute("href");
 //         const match = href.match(IDENTIY_HREF_REGEX);
 
-//         if (match && (anchor as any).innerText.includes("@")) {
-//             return anchor.innerText;
+//         if (match && (anchor as any).textContent.includes("@")) {
+//             return anchor.textContent;
 //         }
 //     }
 
@@ -158,10 +158,10 @@ function extractAuthData(html: string) {
   let authDataScriptText = null;
 
   for (let script of scripts) {
-    const match = script.innerText.match(AJAX_SETUP_REGEX);
+    const match = script.textContent.match(AJAX_SETUP_REGEX);
 
     if (match && match[1]) {
-      authDataScriptText = script.innerText;
+      authDataScriptText = script.textContent;
       break;
     }
   }
@@ -208,7 +208,7 @@ function extractAuthData(html: string) {
     authData = {
       license: extractedAuthDataDict.headers["X-Metrc-LicenseNumber"],
       apiVerificationToken: extractedAuthDataDict.headers["ApiVerificationToken"],
-      identity: extractedIdentityArray[0]
+      identity: extractedIdentityArray[0],
     };
 
     // Sanity check
@@ -241,8 +241,8 @@ function extractTagOrderData(html: string) {
         tagOrderData: {
           maxPlantOrderSize: extractMaxTagOrderSize(tagOrderData, "CannabisPlant"),
           maxPackageOrderSize: extractMaxTagOrderSize(tagOrderData, "CannabisPackage"),
-          contactInfo: extractIContactInfoFromITagOrderModalData(tagOrderData)
-        } as IExtractedITagOrderData
+          contactInfo: extractIContactInfoFromITagOrderModalData(tagOrderData),
+        } as IExtractedITagOrderData,
       };
     } catch (e) {
       console.error("Error extracting max tags");
@@ -267,8 +267,8 @@ function extractContactData(html: string) {
   return {
     contactData: {
       email,
-      phoneNumber
-    }
+      phoneNumber,
+    },
   };
 }
 
@@ -284,8 +284,8 @@ function extractApiKeyData(html: string) {
 
   return {
     apiKeyData: {
-      apiKey
-    }
+      apiKey,
+    },
   };
 }
 
@@ -303,8 +303,8 @@ function extractDataImportApiKey(html: string) {
       if (match && match[1]) {
         return {
           dataimportApiVerificationTokenData: {
-            apiVerificationToken: match[1]
-          }
+            apiVerificationToken: match[1],
+          },
         };
       }
     }
@@ -330,8 +330,8 @@ function extractRepeaterData(html: string) {
 
     return {
       repeaterData: {
-        parsedRepeaterData
-      }
+        parsedRepeaterData,
+      },
     };
   }
 
