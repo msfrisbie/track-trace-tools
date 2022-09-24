@@ -465,7 +465,7 @@ class PageManager implements IAtomicService {
         await this.managePlantTabs();
         this.acquirePlantFilterElements();
 
-        this.addPlantModalButtonToPlantsPage();
+        // this.addPlantModalButtonToPlantsPage();
       }
 
       if (window.location.pathname.match(REPORTS_TAB_REGEX)) {
