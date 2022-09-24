@@ -67,9 +67,9 @@ export function isIdentityEligibleForTransferTools({
     return false;
   }
 
-  if (regExpMatchOrNull({ value: identity, regExps: DENY_TRANSFER_TOOL_ACCESS_REGEXPS })) {
-    return false;
-  }
+  // if (regExpMatchOrNull({ value: identity, regExps: DENY_TRANSFER_TOOL_ACCESS_REGEXPS })) {
+  //   return false;
+  // }
 
   return true;
 }
