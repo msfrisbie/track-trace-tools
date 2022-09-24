@@ -8,10 +8,6 @@
 
     <b-button-group style="box-shadow: 0px 5px 5px rgba(0, 0, 0, 0.5)">
       <template v-if="pluginAuth.authState">
-        <!-- <template v-if="isIdentityEligibleForListingsImpl && !settings.hideListingsButton">
-          <listings-button />
-        </template> -->
-
         <builder-button />
       </template>
 
@@ -32,7 +28,6 @@ import { mapState } from "vuex";
 import { authManager } from "@/modules/auth-manager.module";
 import { getUrl } from "@/utils/assets";
 import { MutationType } from "@/mutation-types";
-import { isIdentityEligibleForListings } from "@/utils/access-control";
 
 export default Vue.extend({
   name: "FloatingButtonContainer",
@@ -49,13 +44,7 @@ export default Vue.extend({
     return {};
   },
   computed: {
-    ...mapState(["pluginAuth", "trackedInteractions", "settings", "debugMode"]),
-    isIdentityEligibleForListingsImpl(): boolean {
-      return isIdentityEligibleForListings({
-        identity: this.pluginAuth?.authState?.identity,
-        hostname: window.location.hostname
-      });
-    }
+    ...mapState(["pluginAuth", "trackedInteractions", "settings", "debugMode"])
   },
   methods: {}
 });

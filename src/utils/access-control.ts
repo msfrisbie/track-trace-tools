@@ -1,39 +1,5 @@
 const ALLOW_TRANSFER_TOOL_ACCESS_HOSTNAMES: string[] = ["ca.metrc.com", "mi.metrc.com"];
-
-const ALLOW_PACKAGE_SPLIT_TOOL_ACCESS_HOSTNAMES: string[] = ["ca.metrc.com"];
-const ALLOW_LISTING_ACCESS_HOSTNAMES: string[] = ["ca.metrc.com"];
-const ALLOW_ITEM_TEMPLATE_ACCESS_LICENSES: string[] = [
-  "CDPH-10002837",
-  "C11-0001002-LIC",
-  "C12-0000020-LIC",
-];
-
-const DENY_TRANSFER_TOOL_ACCESS_REGEXPS: RegExp[] = [].map(hostnameToRegExp);
-
-const DENY_TTT_ACCESS_EMAIL_HOSTNAME_REGEXPS: RegExp[] = [
-  "365cannabis.com",
-  "backboneiq.com",
-  "canix.com",
-  "cultivera.com",
-  "distru.com",
-  "entrc.co",
-  "fishbowlinventory.com",
-  "flourishsoftware.com",
-  "flowhub.com",
-  "getgrowflow.com",
-  "metrc.com",
-  "mjplatform.com",
-  "roshi.me",
-  "trellisgrows.com",
-  "trym.io",
-  "surgeforward.com",
-].map(hostnameToRegExp);
-
-const DENY_TTT_ACCESS_WEBSITE_HOSTNAME_REGEXPS: RegExp[] = ["testing-[a-z]+.metrc.com"].map(
-  (x) => new RegExp(x)
-);
-
-const DENY_REPORTS_ACCESS_HOSTNAMES: string[] = ["mi.metrc.com"];
+const DENY_TRANSFER_TOOL_ACCESS_REGEXPS: RegExp[] = [];
 
 // Adds coverage to any possible subdomain
 function hostnameToRegExp(hostname: string): RegExp {
@@ -74,24 +40,6 @@ function regExpMatchOrNull({
   return null;
 }
 
-export function isIdentityEligibleForReports({
-  identity,
-  hostname,
-}: {
-  identity: string | null;
-  hostname: string;
-}): boolean {
-  if (!identity) {
-    return false;
-  }
-
-  if (DENY_REPORTS_ACCESS_HOSTNAMES.includes(hostname)) {
-    return false;
-  }
-
-  return true;
-}
-
 export function isLicenseEligibleForItemTemplateTools({
   license,
 }: {
@@ -101,11 +49,7 @@ export function isLicenseEligibleForItemTemplateTools({
     return false;
   }
 
-  if (!ALLOW_ITEM_TEMPLATE_ACCESS_LICENSES.includes(license)) {
-    return false;
-  }
-
-  return true;
+  return false;
 }
 
 export function isIdentityEligibleForTransferTools({
@@ -123,9 +67,9 @@ export function isIdentityEligibleForTransferTools({
     return false;
   }
 
-  // if (regExpMatchOrNull({ value: identity, regExps: DENY_TRANSFER_TOOL_ACCESS_REGEXPS })) {
-  //     return false;
-  // }
+  if (regExpMatchOrNull({ value: identity, regExps: DENY_TRANSFER_TOOL_ACCESS_REGEXPS })) {
+    return false;
+  }
 
   return true;
 }
@@ -155,31 +99,5 @@ export function isIdentityAllowedToUseTtt({
     return false;
   }
 
-  if (regExpMatchOrNull({ value: hostname, regExps: DENY_TTT_ACCESS_WEBSITE_HOSTNAME_REGEXPS })) {
-    return false;
-  }
-
-  if (regExpMatchOrNull({ value: identity, regExps: DENY_TTT_ACCESS_EMAIL_HOSTNAME_REGEXPS })) {
-    return false;
-  }
-
   return true;
-}
-
-export function isIdentityEligibleForListings({
-  identity,
-  hostname,
-}: {
-  identity: string | null;
-  hostname: string;
-}): boolean {
-  if (!identity) {
-    return false;
-  }
-
-  if (ALLOW_LISTING_ACCESS_HOSTNAMES.includes(hostname)) {
-    return true;
-  }
-
-  return false;
 }
