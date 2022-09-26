@@ -2473,7 +2473,6 @@ class PageManager implements IAtomicService {
 
     let tabKey = null;
     try {
-      console.log(window.location.hash.slice(1));
       tabKey = JSON.parse(decodeURI(window.location.hash).slice(1)).tabKey;
     } catch (e) {
       console.error(e);
@@ -2537,6 +2536,28 @@ class PageManager implements IAtomicService {
       return;
     }
 
+    let tabKey = null;
+    try {
+      tabKey = JSON.parse(decodeURI(window.location.hash).slice(1)).tabKey;
+    } catch (e) {
+      console.error(e);
+    }
+
+    switch (tabKey) {
+      case TabKey.PACKAGES_ACTIVE:
+        await this.clickTabStartingWith(this.plantsTabs, "Active");
+        return;
+      case TabKey.PACKAGES_ONHOLD:
+        await this.clickTabStartingWith(this.plantsTabs, "On Hold");
+        return;
+      case TabKey.PACKAGES_INACTIVE:
+        await this.clickTabStartingWith(this.plantsTabs, "Inactive");
+        return;
+      case TabKey.PACKAGES_INTRANSIT:
+        await this.clickTabStartingWith(this.plantsTabs, "In Transit");
+        return;
+    }
+
     if (store.state.settings.autoOpenActivePackages) {
       await this.clickTabStartingWith(this.packageTabs, "Active");
     }
@@ -2557,6 +2578,25 @@ class PageManager implements IAtomicService {
 
       this.selectedTransferTab = activeTab;
       return;
+    }
+
+    let tabKey = null;
+    try {
+      tabKey = JSON.parse(decodeURI(window.location.hash).slice(1)).tabKey;
+    } catch (e) {
+      console.error(e);
+    }
+
+    switch (tabKey) {
+      case TabKey.TRANSFERS_INCOMING:
+        await this.clickTabStartingWith(this.plantsTabs, "Incoming");
+        return;
+      case TabKey.TRANSFERS_OUTGOING:
+        await this.clickTabStartingWith(this.plantsTabs, "Outgoing");
+        return;
+      case TabKey.TRANSFERS_REJECTED:
+        await this.clickTabStartingWith(this.plantsTabs, "Rejected");
+        return;
     }
 
     if (store.state.settings.autoOpenIncomingTransfers) {
@@ -2589,6 +2629,25 @@ class PageManager implements IAtomicService {
 
       this.selectedTagTab = activeTab;
       return;
+    }
+
+    let tabKey = null;
+    try {
+      tabKey = JSON.parse(decodeURI(window.location.hash).slice(1)).tabKey;
+    } catch (e) {
+      console.error(e);
+    }
+
+    switch (tabKey) {
+      case TabKey.TAGS_AVAILABLE:
+        await this.clickTabStartingWith(this.plantsTabs, "Available");
+        return;
+      case TabKey.TAGS_USED:
+        await this.clickTabStartingWith(this.plantsTabs, "Used");
+        return;
+      case TabKey.TAGS_VOIDED:
+        await this.clickTabStartingWith(this.plantsTabs, "Voided");
+        return;
     }
 
     if (store.state.settings.autoOpenAvailableTags) {

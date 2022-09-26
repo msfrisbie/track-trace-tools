@@ -1,10 +1,10 @@
 @import "@/scss/palette";
 
-$dark-blue: #5698ca;
-$light-blue: rgb(193, 219, 252);
-$light-gray: rgb(147, 147, 153);
-
 .ttt-purple {
+  color: $ttt-purple;
+}
+
+.ttt-purple-bg {
   color: $ttt-purple;
 }
 
@@ -28,15 +28,15 @@ $light-gray: rgb(147, 147, 153);
 .toolkit-scroll,
 .vbt-autcomplete-list {
   scrollbar-width: thin;
-  scrollbar-color: $light-blue $light-gray;
+  scrollbar-color: $light-purple $light-gray;
 }
 .toolkit-scroll::-webkit-scrollbar-track,
 .vbt-autcomplete-list::-webkit-scrollbar-track {
-  background: $light-blue;
+  background: $light-purple;
 }
 .toolkit-scroll::-webkit-scrollbar-thumb,
 .vbt-autcomplete-list::-webkit-scrollbar-thumb {
-  background-color: $dark-blue;
+  background-color: $dark-purple;
   border-radius: 6px;
 }
 

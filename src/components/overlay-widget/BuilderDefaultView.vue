@@ -1,48 +1,52 @@
 <template>
-  <div class="flex flex-col space-y-20">
-    <div class="w-full grid gap-12 grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 place-items-center">
+  <div class="grid gap-4 grid-cols-2" style="grid-template-columns: auto 1fr">
+    <div class="flex gap-2 flex-col">
       <div
         v-for="option of options"
         v-bind:key="option.text"
-        class="flex flex-col items-center justify-center space-y-4 max-w-sm"
+        class="flex flex-col items-center justify-center space-y-4"
         style="min-width: 300px"
         v-bind:style="{
           opacity: option.enabled ? 'inherit' : '0.4',
           display: option.visible ? 'flex' : 'none',
         }"
       >
-        <font-awesome-icon size="3x" class="text-gray-500" :icon="option.icon" />
+        <!-- <font-awesome-icon size="3x" class="text-gray-500" :icon="option.icon" /> -->
 
         <b-button
-          class="w-full flex flex-row items-center justify-center space-x-4 text-white opacity-70 hover:opacity-100"
+          class="w-full flex flex-row items-center justify-between space-x-4 text-white opacity-70 hover:opacity-100 ttt-purple-bg"
           v-bind:style="{
-            'background-color': option.backgroundColor,
+            // 'background-color': option.backgroundColor,
           }"
+          variant="ttt"
           :disabled="!option.enabled"
           @click.stop.prevent="open(option)"
         >
+          <font-awesome-icon :icon="option.icon" />
           <span>{{ option.text }}</span>
-          <template v-if="option.enabled">
-            <template v-if="option.isBeta">
-              <!-- flex struggles to vertical align the badge for some reason -->
-              <b-badge
-                style="padding-top: 0.3rem; margin-top: 0.1rem; line-height: initial"
-                variant="light"
-                >BETA</b-badge
+          <div style="width: 0rem">
+            <template v-if="option.enabled">
+              <template v-if="option.isBeta">
+                <!-- flex struggles to vertical align the badge for some reason -->
+                <b-badge
+                  style="padding-top: 0.3rem; margin-top: 0.1rem; line-height: initial"
+                  variant="light"
+                  >BETA</b-badge
+                ></template
+              >
+              <template v-if="option.isNew">
+                <!-- flex struggles to vertical align the badge for some reason -->
+                <b-badge
+                  style="padding-top: 0.3rem; margin-top: 0.1rem; line-height: initial"
+                  variant="light"
+                  >NEW!</b-badge
+                ></template
               ></template
             >
-            <template v-if="option.isNew">
-              <!-- flex struggles to vertical align the badge for some reason -->
-              <b-badge
-                style="padding-top: 0.3rem; margin-top: 0.1rem; line-height: initial"
-                variant="light"
-                >NEW!</b-badge
-              ></template
-            ></template
-          ></b-button
-        >
+          </div>
+        </b-button>
 
-        <div class="text-center" style="height: 1rem; margin-top: 1rem">
+        <!-- <div class="text-center" style="height: 1rem; margin-top: 1rem">
           <template v-if="option.enabled">
             <template v-if="option.helpRoute">
               <b-button
@@ -61,9 +65,10 @@
               >
             </span>
           </template>
-        </div>
+        </div> -->
       </div>
     </div>
+    <div>Jake</div>
   </div>
 </template>
 

@@ -8,8 +8,8 @@
 // @import "node_modules/@fortawesome/fontawesome-free/scss/regular";
 
 .ttt-wrapper {
-  @import "node_modules/bootstrap-vue/dist/bootstrap-vue";
-  @import "node_modules/bootstrap/dist/css/bootstrap";
+  @import "@/scss/bootstrap-theme";
+  
   @import "node_modules/tailwindcss/dist/base";
   @import "node_modules/tailwindcss/dist/components";
   @import "node_modules/tailwindcss/dist/utilities";
