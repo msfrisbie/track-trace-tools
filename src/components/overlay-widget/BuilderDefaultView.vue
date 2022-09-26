@@ -14,11 +14,11 @@
         <!-- <font-awesome-icon size="3x" class="text-gray-500" :icon="option.icon" /> -->
 
         <b-button
-          class="w-full flex flex-row items-center justify-between space-x-4 text-white opacity-70 hover:opacity-100 ttt-purple-bg"
+          class="w-full flex flex-row items-center justify-between space-x-4 opacity-70 hover:opacity-100"
           v-bind:style="{
             // 'background-color': option.backgroundColor,
           }"
-          variant="ttt"
+          variant="outline-ttt"
           :disabled="!option.enabled"
           @click.stop.prevent="open(option)"
         >
@@ -68,11 +68,12 @@
         </div> -->
       </div>
     </div>
-    <div>Jake</div>
+    <builder-dashboard></builder-dashboard>
   </div>
 </template>
 
 <script lang="ts">
+import BuilderDashboard from "@/components/overlay-widget/BuilderDashboard.vue";
 import { MessageType } from "@/consts";
 import { analyticsManager } from "@/modules/analytics-manager.module";
 import router from "@/router/index";
@@ -99,7 +100,9 @@ export default Vue.extend({
   name: "BuilderDefaultView",
   router,
   store,
-  components: {},
+  components: {
+    BuilderDashboard,
+  },
   data() {
     return {
       notAvailableMessage: notAvailableMessage(),

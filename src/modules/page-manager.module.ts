@@ -29,7 +29,6 @@ import { isIdentityEligibleForTransferTools } from "@/utils/access-control";
 import { getUrl } from "@/utils/assets";
 import { debugLogFactory } from "@/utils/debug";
 import { getLicenseFromNameOrError } from "@/utils/facility";
-// import { addRobotoToHead } from "@/utils/styles";
 import { timer } from "rxjs";
 import { analyticsManager } from "./analytics-manager.module";
 import { authManager } from "./auth-manager.module";

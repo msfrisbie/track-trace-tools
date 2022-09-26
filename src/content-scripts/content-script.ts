@@ -67,6 +67,11 @@ async function initializeTooklit() {
 
   Vue.config.productionTip = isDevelopment();
 
+  const link = document.createElement("link");
+  link.setAttribute("rel", "stylesheet");
+  link.setAttribute("href", chrome.runtime.getURL("fonts/roboto.css"));
+  document.head.appendChild(link);
+
   /* eslint-disable no-new */
   new Vue({
     el: TRACK_TRACE_TOOLS_ROOT_ELEMENT_SELECTOR,
