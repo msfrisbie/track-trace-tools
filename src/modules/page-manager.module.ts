@@ -7,6 +7,7 @@ import {
   ModalType,
   PackageFilterIdentifiers,
   PlantFilterIdentifiers,
+  TabKey,
   TagFilterIdentifiers,
   TransferFilterIdentifiers,
 } from "@/consts";
@@ -1445,23 +1446,43 @@ class PageManager implements IAtomicService {
   public async clickTabStartingWith(
     tabList: NodeList,
     tabText: string,
-    previousTabText: string | null = null
+    previousTabText: string | null = null,
+    /**
+     * Positive integer
+     *
+     * 1 means it must be the previously seen node
+     * 2 means it was seen two nodes ago
+     */
+    previousTabTextOffset: number | null = null
   ) {
-    let lastSeenTabText = null;
+    if (typeof previousTabTextOffset === "number" && !previousTabText) {
+      throw new Error("Must provide previousTabText");
+    }
+
+    if (typeof previousTabTextOffset === "number" && previousTabTextOffset < 1) {
+      throw new Error("previousTabTextOffset must be a positive integer");
+    }
+
+    let seenTabs: string[] = [];
     for (let i = 0; i < tabList.length; ++i) {
       const tab = tabList[i] as HTMLElement;
 
       if (
         tab &&
+        // Check current match
         tab.innerText.startsWith(tabText) &&
-        (!previousTabText || lastSeenTabText?.startsWith(previousTabText))
+        // Check if text was previously seen
+        (!previousTabText || seenTabs.includes(previousTabText)) &&
+        // Check that offset matches
+        (!previousTabTextOffset ||
+          seenTabs[seenTabs.length - previousTabTextOffset] === previousTabText)
       ) {
         tab.click();
         await this.clickSettleDelay();
         return;
       }
 
-      lastSeenTabText = tab.innerText;
+      seenTabs.push(tab.innerText);
     }
 
     await pageManager.refresh;
@@ -2448,6 +2469,50 @@ class PageManager implements IAtomicService {
 
       this.selectedPlantTab = activeTab;
       return;
+    }
+
+    let tabKey = null;
+    try {
+      console.log(window.location.hash.slice(1));
+      tabKey = JSON.parse(decodeURI(window.location.hash).slice(1)).tabKey;
+    } catch (e) {
+      console.error(e);
+    }
+
+    switch (tabKey) {
+      case TabKey.PLANTS_PLANTBATCHES_ACTIVE:
+        await this.clickTabStartingWith(this.plantsTabs, "Immature");
+        return;
+      case TabKey.PLANTS_PLANTBATCHES_INACTIVE:
+        await this.clickTabStartingWith(this.plantsTabs, "Inactive", "Immature");
+        return;
+      case TabKey.PlANTS_PLANTS_VEGETATIVE:
+        await this.clickTabStartingWith(this.plantsTabs, "Vegetative");
+        return;
+      case TabKey.PlANTS_PLANTS_FLOWERING:
+        await this.clickTabStartingWith(this.plantsTabs, "Flowering");
+        return;
+      case TabKey.PlANTS_PLANTS_ONHOLD:
+        await this.clickTabStartingWith(this.plantsTabs, "On Hold", "Flowering");
+        return;
+      case TabKey.PlANTS_PLANTS_INACTIVE:
+        await this.clickTabStartingWith(this.plantsTabs, "Inactive", "Flowering");
+        return;
+      case TabKey.PlANTS_PLANTS_ADDITIVE:
+        await this.clickTabStartingWith(this.plantsTabs, "Additive");
+        return;
+      case TabKey.PlANTS_PLANTS_WASTE:
+        await this.clickTabStartingWith(this.plantsTabs, "Waste");
+        return;
+      case TabKey.PlANTS_HARVESTED_ACTIVE:
+        await this.clickTabStartingWith(this.plantsTabs, "Harvested");
+        return;
+      case TabKey.PlANTS_HARVESTED_ONHOLD:
+        await this.clickTabStartingWith(this.plantsTabs, "On Hold", "Harvested");
+        return;
+      case TabKey.PlANTS_HARVESTED_INACTIVE:
+        await this.clickTabStartingWith(this.plantsTabs, "Inactive", "Harvested");
+        return;
     }
 
     if (store.state.settings.autoOpenFloweringPlants) {

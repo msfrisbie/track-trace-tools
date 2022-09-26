@@ -359,3 +359,17 @@ export const STRAIN_TESTING_STATUS_OPTIONS: { text: string; value: string }[] = 
     value: "ThirdParty",
   },
 ];
+
+export enum TabKey {
+  PLANTS_PLANTBATCHES_ACTIVE = "plants_plantbatches_active",
+  PLANTS_PLANTBATCHES_INACTIVE = "plants_plantbatches_inactive",
+  PlANTS_PLANTS_VEGETATIVE = "plants_plants_vegetative",
+  PlANTS_PLANTS_FLOWERING = "plants_plants_flowering",
+  PlANTS_PLANTS_ONHOLD = "plants_plants_onhold",
+  PlANTS_PLANTS_INACTIVE = "plants_plants_inactive",
+  PlANTS_PLANTS_ADDITIVE = "plants_plants_additives",
+  PlANTS_PLANTS_WASTE = "plants_plants_waste",
+  PlANTS_HARVESTED_ACTIVE = "plants_harvested_active",
+  PlANTS_HARVESTED_ONHOLD = "plants_harvested_onhold",
+  PlANTS_HARVESTED_INACTIVE = "plants_harvested_inactive",
+}
