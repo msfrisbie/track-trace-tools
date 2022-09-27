@@ -1,9 +1,7 @@
 @import "@/scss/palette";
 
-$purple: $ttt-purple;
-
 $theme-colors: (
-  "ttt": $purple,
+  "primary": $ttt-purple,
 );
 
 @import "node_modules/bootstrap/scss/bootstrap.scss";

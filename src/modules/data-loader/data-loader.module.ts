@@ -227,6 +227,11 @@ export class DataLoader implements IAtomicService {
       this.metrcRequestManagerOrError.getInactivePackages(this._countPayload)
     );
   }
+  async intransitPackageCount(): Promise<number | null> {
+    return this.extractTotalOrNull(
+      this.metrcRequestManagerOrError.getInTransitPackages(this._countPayload)
+    );
+  }
 
   async incomingTransferCount(): Promise<number | null> {
     return this.extractTotalOrNull(
@@ -275,6 +280,11 @@ export class DataLoader implements IAtomicService {
   async floweringPlantCount(): Promise<number | null> {
     return this.extractTotalOrNull(
       this.metrcRequestManagerOrError.getFloweringPlants(this._countPayload)
+    );
+  }
+  async inactivePlantCount(): Promise<number | null> {
+    return this.extractTotalOrNull(
+      this.metrcRequestManagerOrError.getInactivePlants(this._countPayload)
     );
   }
 

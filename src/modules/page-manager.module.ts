@@ -29,6 +29,7 @@ import { isIdentityEligibleForTransferTools } from "@/utils/access-control";
 import { getUrl } from "@/utils/assets";
 import { debugLogFactory } from "@/utils/debug";
 import { getLicenseFromNameOrError } from "@/utils/facility";
+import { hashObjectValueOrNull } from "@/utils/url";
 import { timer } from "rxjs";
 import { analyticsManager } from "./analytics-manager.module";
 import { authManager } from "./auth-manager.module";
@@ -1471,7 +1472,7 @@ class PageManager implements IAtomicService {
         // Check current match
         tab.innerText.startsWith(tabText) &&
         // Check if text was previously seen
-        (!previousTabText || seenTabs.includes(previousTabText)) &&
+        (!previousTabText || seenTabs.find((x: string) => x.includes(previousTabText))) &&
         // Check that offset matches
         (!previousTabTextOffset ||
           seenTabs[seenTabs.length - previousTabTextOffset] === previousTabText)
@@ -2470,12 +2471,7 @@ class PageManager implements IAtomicService {
       return;
     }
 
-    let tabKey = null;
-    try {
-      tabKey = JSON.parse(decodeURI(window.location.hash).slice(1)).tabKey;
-    } catch (e) {
-      console.error(e);
-    }
+    let tabKey = hashObjectValueOrNull("tabKey");
 
     switch (tabKey) {
       case TabKey.PLANTS_PLANTBATCHES_ACTIVE:
@@ -2535,25 +2531,20 @@ class PageManager implements IAtomicService {
       return;
     }
 
-    let tabKey = null;
-    try {
-      tabKey = JSON.parse(decodeURI(window.location.hash).slice(1)).tabKey;
-    } catch (e) {
-      console.error(e);
-    }
+    let tabKey = hashObjectValueOrNull("tabKey");
 
     switch (tabKey) {
       case TabKey.PACKAGES_ACTIVE:
-        await this.clickTabStartingWith(this.plantsTabs, "Active");
+        await this.clickTabStartingWith(this.packageTabs, "Active");
         return;
       case TabKey.PACKAGES_ONHOLD:
-        await this.clickTabStartingWith(this.plantsTabs, "On Hold");
+        await this.clickTabStartingWith(this.packageTabs, "On Hold");
         return;
       case TabKey.PACKAGES_INACTIVE:
-        await this.clickTabStartingWith(this.plantsTabs, "Inactive");
+        await this.clickTabStartingWith(this.packageTabs, "Inactive");
         return;
       case TabKey.PACKAGES_INTRANSIT:
-        await this.clickTabStartingWith(this.plantsTabs, "In Transit");
+        await this.clickTabStartingWith(this.packageTabs, "In Transit");
         return;
     }
 
@@ -2579,22 +2570,17 @@ class PageManager implements IAtomicService {
       return;
     }
 
-    let tabKey = null;
-    try {
-      tabKey = JSON.parse(decodeURI(window.location.hash).slice(1)).tabKey;
-    } catch (e) {
-      console.error(e);
-    }
+    let tabKey = hashObjectValueOrNull("tabKey");
 
     switch (tabKey) {
       case TabKey.TRANSFERS_INCOMING:
-        await this.clickTabStartingWith(this.plantsTabs, "Incoming");
+        await this.clickTabStartingWith(this.transferTabs, "Incoming");
         return;
       case TabKey.TRANSFERS_OUTGOING:
-        await this.clickTabStartingWith(this.plantsTabs, "Outgoing");
+        await this.clickTabStartingWith(this.transferTabs, "Outgoing");
         return;
       case TabKey.TRANSFERS_REJECTED:
-        await this.clickTabStartingWith(this.plantsTabs, "Rejected");
+        await this.clickTabStartingWith(this.transferTabs, "Rejected");
         return;
     }
 
@@ -2630,22 +2616,17 @@ class PageManager implements IAtomicService {
       return;
     }
 
-    let tabKey = null;
-    try {
-      tabKey = JSON.parse(decodeURI(window.location.hash).slice(1)).tabKey;
-    } catch (e) {
-      console.error(e);
-    }
+    let tabKey = hashObjectValueOrNull("tabKey");
 
     switch (tabKey) {
       case TabKey.TAGS_AVAILABLE:
-        await this.clickTabStartingWith(this.plantsTabs, "Available");
+        await this.clickTabStartingWith(this.tagTabs, "Available");
         return;
       case TabKey.TAGS_USED:
-        await this.clickTabStartingWith(this.plantsTabs, "Used");
+        await this.clickTabStartingWith(this.tagTabs, "Used");
         return;
       case TabKey.TAGS_VOIDED:
-        await this.clickTabStartingWith(this.plantsTabs, "Voided");
+        await this.clickTabStartingWith(this.tagTabs, "Voided");
         return;
     }
 
