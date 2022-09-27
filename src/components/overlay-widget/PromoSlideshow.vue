@@ -3,7 +3,7 @@
     <b-carousel
       v-model="slide"
       no-hover-pause
-      :interval="10000"
+      :interval="30000"
       img-width="640"
       img-height="40"
       background="transparent"
@@ -12,9 +12,14 @@
       class="promo-carousel"
       style="margin-bottom: 0 !important"
       ref="myCarousel"
-      @click="next()"
     >
-      <b-carousel-slide v-for="(slide, index) of slides" :key="index" html="foobar" img-blank>
+      <b-carousel-slide
+        v-for="(slide, index) of slides"
+        :key="index"
+        html="foobar"
+        img-blank
+        @click.native="next()"
+      >
         <template v-if="slide === 'review'">
           <div class="text-gray-700 flex flex-col justify-around gap-2">
             <div class="font-semibold ttt-purple">Enjoying Track & Trace Tools?</div>
@@ -23,6 +28,7 @@
                 class="text-purple-500 underline"
                 href="https://chrome.google.com/webstore/detail/track-trace-tools/dfljickgkbfaoiifheibjpejloipegcb"
                 target="_blank"
+                @click.stop
                 >Leave a review!</a
               >
               It only takes 5 seconds.
@@ -51,6 +57,7 @@
                 class="text-purple-500 hover:text-purple-500 underline"
                 href="https://track-trace-tools.talkyard.net/latest"
                 target="_blank"
+                @click.stop
                 >Track & Trace Tools Forum</a
               >
             </div>
@@ -65,6 +72,7 @@
                 class="text-purple-500 hover:text-purple-500 underline"
                 href="mailto:tracktracetools@gmail.com"
                 target="_blank"
+                @click.stop
                 >tracktracetools@gmail.com</a
               >
             </div>
@@ -79,9 +87,34 @@
                 class="text-purple-500 hover:text-purple-500 underline"
                 href="https://github.com/msfrisbie/track-trace-tools"
                 target="_blank"
+                @click.stop
                 >here</a
               >
             </div>
+          </div>
+        </template>
+        <template v-if="slide === 'harvest'">
+          <div class="text-gray-700 flex flex-col justify-around gap-2">
+            <div class="font-semibold ttt-purple">Harvest and manicure in bulk!</div>
+            <div>Use TTT to harvest thousands of plants by just the total weight.</div>
+          </div>
+        </template>
+        <template v-if="slide === 'logout'">
+          <div class="text-gray-700 flex flex-col justify-around gap-2">
+            <div class="font-semibold ttt-purple">Stop logging in over and over!</div>
+            <div>Track & Trace Tools stops Metrc's auto-logout.</div>
+          </div>
+        </template>
+        <template v-if="slide === 'buttons'">
+          <div class="text-gray-700 flex flex-col justify-around gap-2">
+            <div class="font-semibold ttt-purple">Stop clicking buttons!</div>
+            <div>Track & Trace Tools can void tags and finalize sales in bulk.</div>
+          </div>
+        </template>
+        <template v-if="slide === 'snowflakes'">
+          <div class="text-gray-700 flex flex-col justify-around gap-2">
+            <div class="font-semibold ttt-purple">Snowflakes? How about noflakes!</div>
+            <div>Track & Trace Tools removes the Metrc snowflakes.</div>
           </div>
         </template>
         <template v-if="slide === 'share'">
@@ -95,6 +128,7 @@
                 class="text-purple-500 hover:text-purple-500 underline"
                 :href="twitterShareUrl"
                 target="_blank"
+                @click.stop
               >
                 <font-awesome-icon :icon="['fab', 'twitter']" />
               </a>
@@ -104,6 +138,7 @@
                 class="text-purple-500 hover:text-purple-500 underline"
                 :href="facebookShareUrl"
                 target="_blank"
+                @click.stop
               >
                 <font-awesome-icon :icon="['fab', 'facebook']" />
               </a>
@@ -113,6 +148,7 @@
                 class="text-purple-500 hover:text-purple-500 underline"
                 :href="redditShareUrl"
                 target="_blank"
+                @click.stop
               >
                 <font-awesome-icon :icon="['fab', 'reddit']" />
               </a>
@@ -122,6 +158,7 @@
                 class="text-purple-500 hover:text-purple-500 underline"
                 :href="linkedinShareUrl"
                 target="_blank"
+                @click.stop
               >
                 <font-awesome-icon :icon="['fab', 'linkedin']" />
               </a>
@@ -131,6 +168,7 @@
                 class="text-purple-500 hover:text-purple-500 underline"
                 :href="emailShareUrl"
                 target="_blank"
+                @click.stop
               >
                 <font-awesome-icon icon="envelope" />
               </a>
@@ -139,6 +177,7 @@
                 class="text-purple-500 hover:text-purple-500 underline"
                 :href="shareUrl"
                 target="_blank"
+                @click.stop
               >
                 <font-awesome-icon icon="link" />
               </a>
@@ -180,11 +219,23 @@ export default Vue.extend({
       facebookShareUrl: `https://www.facebook.com/sharer/sharer.php?u=${shareUrl}`,
       slide: 0,
       sliding: null,
-      slides: _.shuffle(["review", "shortcuts", "forum", "solutions", "opensource", "share"]),
+      slides: _.shuffle([
+        "review",
+        "buttons",
+        "shortcuts",
+        "forum",
+        "solutions",
+        "opensource",
+        "snowflakes",
+        "harvest",
+        "logout",
+        "share",
+      ]),
     };
   },
   methods: {
     next() {
+      console.log("next");
       // @ts-ignore
       this.$refs.myCarousel.next();
     },
