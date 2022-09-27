@@ -46,6 +46,7 @@ import { updateManager } from "@/modules/update-manager.module";
 import { upsertManager } from "@/modules/upsert-manager.module";
 import store from "@/store/page-overlay/index";
 import { library } from "@fortawesome/fontawesome-svg-core";
+import * as fontawesomeBrands from "@fortawesome/free-brands-svg-icons";
 import * as fontawesomeRegular from "@fortawesome/free-regular-svg-icons";
 import * as fontawesomeSolid from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
@@ -100,88 +101,96 @@ Vue.use(BootstrapVue);
 Vue.component("vue-typeahead-bootstrap", VueTypeaheadBootstrap);
 Vue.component("font-awesome-icon", FontAwesomeIcon);
 
-library.add(fontawesomeRegular.faCircle);
-library.add(fontawesomeRegular.faCopy);
-library.add(fontawesomeSolid.faArchive);
-library.add(fontawesomeSolid.faArrowLeft);
-library.add(fontawesomeSolid.faArrowRight);
-library.add(fontawesomeSolid.faBackspace);
-library.add(fontawesomeSolid.faBarcode);
-library.add(fontawesomeSolid.faBolt);
-library.add(fontawesomeSolid.faBox);
-library.add(fontawesomeSolid.faBoxOpen);
-library.add(fontawesomeSolid.faBoxes);
-library.add(fontawesomeSolid.faCalendar);
-library.add(fontawesomeSolid.faCamera);
-library.add(fontawesomeSolid.faCannabis);
-library.add(fontawesomeSolid.faCapsules);
-library.add(fontawesomeSolid.faCaretDown);
-library.add(fontawesomeSolid.faCaretRight);
-library.add(fontawesomeSolid.faCheck);
-library.add(fontawesomeSolid.faCheckSquare);
-library.add(fontawesomeSolid.faChevronDown);
-library.add(fontawesomeSolid.faChevronLeft);
-library.add(fontawesomeSolid.faChevronRight);
-library.add(fontawesomeSolid.faClipboardCheck);
-library.add(fontawesomeSolid.faClock);
-library.add(fontawesomeSolid.faCog);
-library.add(fontawesomeSolid.faCogs);
-library.add(fontawesomeSolid.faCompressArrowsAlt);
-library.add(fontawesomeSolid.faCookieBite);
-library.add(fontawesomeSolid.faCopy);
-library.add(fontawesomeSolid.faCut);
-library.add(fontawesomeSolid.faDollarSign);
-library.add(fontawesomeSolid.faEdit);
-library.add(fontawesomeSolid.faSlidersH);
-library.add(fontawesomeSolid.faEllipsisV);
-library.add(fontawesomeSolid.faExchangeAlt);
-library.add(fontawesomeSolid.faExchangeAlt);
-library.add(fontawesomeSolid.faExclamationTriangle);
-library.add(fontawesomeSolid.faExpandAlt);
-library.add(fontawesomeSolid.faExternalLinkAlt);
-library.add(fontawesomeSolid.faEye);
-library.add(fontawesomeSolid.faEyeDropper);
-library.add(fontawesomeSolid.faFile);
-library.add(fontawesomeSolid.faFileAlt);
-library.add(fontawesomeSolid.faFileCsv);
-library.add(fontawesomeSolid.faFileDownload);
-library.add(fontawesomeSolid.faFilter);
-library.add(fontawesomeSolid.faFlask);
-library.add(fontawesomeSolid.faHistory);
-library.add(fontawesomeSolid.faHome);
-library.add(fontawesomeSolid.faInfo);
-library.add(fontawesomeSolid.faJoint);
-library.add(fontawesomeSolid.faLeaf);
-library.add(fontawesomeSolid.faLevelUpAlt);
-library.add(fontawesomeSolid.faLink);
-library.add(fontawesomeSolid.faMapMarkerAlt);
-library.add(fontawesomeSolid.faNotesMedical);
-library.add(fontawesomeSolid.faPlus);
-library.add(fontawesomeSolid.faPlusCircle);
-library.add(fontawesomeSolid.faPhone);
-library.add(fontawesomeSolid.faPrint);
-library.add(fontawesomeSolid.faPumpMedical);
-library.add(fontawesomeSolid.faQuestionCircle);
-library.add(fontawesomeSolid.faSave);
-library.add(fontawesomeSolid.faSearch);
-library.add(fontawesomeSolid.faSeedling);
-library.add(fontawesomeSolid.faShieldAlt);
-library.add(fontawesomeSolid.faSync);
-library.add(fontawesomeSolid.faTachometerAlt);
-library.add(fontawesomeSolid.faTag);
-library.add(fontawesomeSolid.faTags);
-library.add(fontawesomeSolid.faTasks);
-library.add(fontawesomeSolid.faTimes);
-library.add(fontawesomeSolid.faTint);
-library.add(fontawesomeSolid.faTools);
-library.add(fontawesomeSolid.faTrashAlt);
-library.add(fontawesomeSolid.faTrashAlt);
-library.add(fontawesomeSolid.faTruck);
-library.add(fontawesomeSolid.faTruckLoading);
-library.add(fontawesomeSolid.faUndo);
-library.add(fontawesomeSolid.faUser);
-library.add(fontawesomeSolid.faVial);
-library.add(fontawesomeSolid.faWeight);
+library.add(
+  fontawesomeBrands.faFacebook,
+  fontawesomeBrands.faLinkedin,
+  fontawesomeBrands.faTwitter,
+  fontawesomeBrands.faReddit,
+  fontawesomeSolid.faEnvelope,
+  fontawesomeSolid.faLink,
+  fontawesomeRegular.faCircle,
+  fontawesomeRegular.faCopy,
+  fontawesomeSolid.faArchive,
+  fontawesomeSolid.faArrowLeft,
+  fontawesomeSolid.faArrowRight,
+  fontawesomeSolid.faBackspace,
+  fontawesomeSolid.faBarcode,
+  fontawesomeSolid.faBolt,
+  fontawesomeSolid.faBox,
+  fontawesomeSolid.faBoxOpen,
+  fontawesomeSolid.faBoxes,
+  fontawesomeSolid.faCalendar,
+  fontawesomeSolid.faCamera,
+  fontawesomeSolid.faCannabis,
+  fontawesomeSolid.faCapsules,
+  fontawesomeSolid.faCaretDown,
+  fontawesomeSolid.faCaretRight,
+  fontawesomeSolid.faCheck,
+  fontawesomeSolid.faCheckSquare,
+  fontawesomeSolid.faChevronDown,
+  fontawesomeSolid.faChevronLeft,
+  fontawesomeSolid.faChevronRight,
+  fontawesomeSolid.faClipboardCheck,
+  fontawesomeSolid.faClock,
+  fontawesomeSolid.faCog,
+  fontawesomeSolid.faCogs,
+  fontawesomeSolid.faCompressArrowsAlt,
+  fontawesomeSolid.faCookieBite,
+  fontawesomeSolid.faCopy,
+  fontawesomeSolid.faCut,
+  fontawesomeSolid.faDollarSign,
+  fontawesomeSolid.faEdit,
+  fontawesomeSolid.faSlidersH,
+  fontawesomeSolid.faEllipsisV,
+  fontawesomeSolid.faExchangeAlt,
+  fontawesomeSolid.faExchangeAlt,
+  fontawesomeSolid.faExclamationTriangle,
+  fontawesomeSolid.faExpandAlt,
+  fontawesomeSolid.faExternalLinkAlt,
+  fontawesomeSolid.faEye,
+  fontawesomeSolid.faEyeDropper,
+  fontawesomeSolid.faFile,
+  fontawesomeSolid.faFileAlt,
+  fontawesomeSolid.faFileCsv,
+  fontawesomeSolid.faFileDownload,
+  fontawesomeSolid.faFilter,
+  fontawesomeSolid.faFlask,
+  fontawesomeSolid.faHistory,
+  fontawesomeSolid.faHome,
+  fontawesomeSolid.faInfo,
+  fontawesomeSolid.faJoint,
+  fontawesomeSolid.faLeaf,
+  fontawesomeSolid.faLevelUpAlt,
+  fontawesomeSolid.faLink,
+  fontawesomeSolid.faMapMarkerAlt,
+  fontawesomeSolid.faNotesMedical,
+  fontawesomeSolid.faPlus,
+  fontawesomeSolid.faPlusCircle,
+  fontawesomeSolid.faPhone,
+  fontawesomeSolid.faPrint,
+  fontawesomeSolid.faPumpMedical,
+  fontawesomeSolid.faQuestionCircle,
+  fontawesomeSolid.faSave,
+  fontawesomeSolid.faSearch,
+  fontawesomeSolid.faSeedling,
+  fontawesomeSolid.faShieldAlt,
+  fontawesomeSolid.faSync,
+  fontawesomeSolid.faTachometerAlt,
+  fontawesomeSolid.faTag,
+  fontawesomeSolid.faTags,
+  fontawesomeSolid.faTasks,
+  fontawesomeSolid.faTimes,
+  fontawesomeSolid.faTint,
+  fontawesomeSolid.faTools,
+  fontawesomeSolid.faTrashAlt,
+  fontawesomeSolid.faTrashAlt,
+  fontawesomeSolid.faTruck,
+  fontawesomeSolid.faTruckLoading,
+  fontawesomeSolid.faUndo,
+  fontawesomeSolid.faUser,
+  fontawesomeSolid.faVial,
+  fontawesomeSolid.faWeight
+);
 
 /**
  * This is the top-level component rendered on the page

@@ -11,6 +11,7 @@
     centered
     hide-header
     ok-only
+    ref="debug"
   >
     <debug-form />
   </b-modal>
@@ -29,6 +30,13 @@ export default Vue.extend({
   methods: {
     show() {
       this.$bvModal.show("debug-modal");
+    },
+    hide() {
+      this.$bvModal.hide("debug-modal");
+    },
+    toggle() {
+      // @ts-ignore
+      this.$refs["debug"].toggle();
     },
   },
   async mounted() {},

@@ -1,14 +1,16 @@
 <template>
   <b-button
-    variant="light"
+    variant="primary"
     @click="openBuilder($event)"
     title="Toolbox"
     id="builder-popover-target"
+    style="padding: 0"
   >
     <!-- class="bg-gray-50 hover:bg-gray-200 rounded-full shadow-2xl border border-gray-400 h-16 w-16 flex items-center justify-center cursor-pointer" -->
 
     <template v-if="!activeProject">
-      <font-awesome-icon icon="tools" size="2x" v-bind:style="{ color: '#49276a' }" />
+      <!-- <font-awesome-icon icon="tools" size="2x" v-bind:style="{ color: '#49276a' }" /> -->
+      <track-trace-tools-logo fill="#49276a" :inverted="true" style="height: 52px; width: 52px" />
     </template>
 
     <template v-if="activeProject && pendingOrInflightRowCount > 0">

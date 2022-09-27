@@ -1,22 +1,150 @@
 <template>
-  <div>
+  <div style="height: 40px; overflow: hidden">
     <b-carousel
-      id="carousel-1"
       v-model="slide"
-      :interval="5000"
-      img-width="540"
+      no-hover-pause
+      :interval="10000"
+      img-width="640"
       img-height="40"
       background="transparent"
       @sliding-start="onSlideStart"
       @sliding-end="onSlideEnd"
-      class="promo-carousel text-red-600"
+      class="promo-carousel"
       style="margin-bottom: 0 !important"
+      ref="myCarousel"
+      @click="next()"
     >
-      <b-carousel-slide img-blank>
-        <div class="text-red-500">Foo</div>
-      </b-carousel-slide>
-      <b-carousel-slide img-blank>
-        <div class="text-red-500">Bar</div>
+      <b-carousel-slide v-for="(slide, index) of slides" :key="index" html="foobar" img-blank>
+        <template v-if="slide === 'review'">
+          <div class="text-gray-700 flex flex-col justify-around gap-2">
+            <div class="font-semibold ttt-purple">Enjoying Track & Trace Tools?</div>
+            <div>
+              <a
+                class="text-purple-500 underline"
+                href="https://chrome.google.com/webstore/detail/track-trace-tools/dfljickgkbfaoiifheibjpejloipegcb"
+                target="_blank"
+                >Leave a review!</a
+              >
+              It only takes 5 seconds.
+            </div>
+          </div>
+        </template>
+        <template v-if="slide === 'shortcuts'">
+          <div class="text-gray-700 flex flex-col justify-around gap-2">
+            <div class="font-semibold ttt-purple">Quickly open TTT with keyboard shortcuts</div>
+            <div>
+              Use
+              <b-badge variant="light" class="font-mono" style="text-shadow: none">Alt</b-badge> +
+              <b-badge variant="light" class="font-mono" style="text-shadow: none">t</b-badge> or
+              <b-badge variant="light" class="font-mono" style="text-shadow: none">⌥</b-badge> +
+              <b-badge variant="light" class="font-mono" style="text-shadow: none">t</b-badge> to
+              open/close TTT
+            </div>
+          </div>
+        </template>
+        <template v-if="slide === 'forum'">
+          <div class="text-gray-700 flex flex-col justify-around gap-2">
+            <div class="font-semibold ttt-purple">Questions? Bugs? Feature ideas?</div>
+            <div>
+              Post in the
+              <a
+                class="text-purple-500 hover:text-purple-500 underline"
+                href="https://track-trace-tools.talkyard.net/latest"
+                target="_blank"
+                >Track & Trace Tools Forum</a
+              >
+            </div>
+          </div>
+        </template>
+        <template v-if="slide === 'solutions'">
+          <div class="text-gray-700 flex flex-col justify-around gap-2">
+            <div class="font-semibold ttt-purple">Need custom features for your company?</div>
+            <div>
+              Reach out to
+              <a
+                class="text-purple-500 hover:text-purple-500 underline"
+                href="mailto:tracktracetools@gmail.com"
+                target="_blank"
+                >tracktracetools@gmail.com</a
+              >
+            </div>
+          </div>
+        </template>
+        <template v-if="slide === 'opensource'">
+          <div class="text-gray-700 flex flex-col justify-around gap-2">
+            <div class="font-semibold ttt-purple">Track & Trace Tools is open source!</div>
+            <div>
+              Source code can be found
+              <a
+                class="text-purple-500 hover:text-purple-500 underline"
+                href="https://github.com/msfrisbie/track-trace-tools"
+                target="_blank"
+                >here</a
+              >
+            </div>
+          </div>
+        </template>
+        <template v-if="slide === 'share'">
+          <div class="text-gray-700 flex flex-col justify-around gap-2">
+            <div class="font-semibold ttt-purple">
+              Spread the word about open source cannabis software!
+            </div>
+            <div class="flex flex-row justify-center items-center gap-2">
+              <!-- Twitter (url, text, @mention) -->
+              <a
+                class="text-purple-500 hover:text-purple-500 underline"
+                :href="twitterShareUrl"
+                target="_blank"
+              >
+                <font-awesome-icon :icon="['fab', 'twitter']" />
+              </a>
+
+              <!-- Facebook (url) -->
+              <a
+                class="text-purple-500 hover:text-purple-500 underline"
+                :href="facebookShareUrl"
+                target="_blank"
+              >
+                <font-awesome-icon :icon="['fab', 'facebook']" />
+              </a>
+
+              <!-- Reddit (url, title) -->
+              <a
+                class="text-purple-500 hover:text-purple-500 underline"
+                :href="redditShareUrl"
+                target="_blank"
+              >
+                <font-awesome-icon :icon="['fab', 'reddit']" />
+              </a>
+
+              <!-- LinkedIn (url, title, summary, source url) -->
+              <a
+                class="text-purple-500 hover:text-purple-500 underline"
+                :href="linkedinShareUrl"
+                target="_blank"
+              >
+                <font-awesome-icon :icon="['fab', 'linkedin']" />
+              </a>
+
+              <!-- Email (subject, body) -->
+              <a
+                class="text-purple-500 hover:text-purple-500 underline"
+                :href="emailShareUrl"
+                target="_blank"
+              >
+                <font-awesome-icon icon="envelope" />
+              </a>
+
+              <a
+                class="text-purple-500 hover:text-purple-500 underline"
+                :href="shareUrl"
+                target="_blank"
+              >
+                <font-awesome-icon icon="link" />
+              </a>
+            </div>
+          </div>
+        </template>
       </b-carousel-slide>
     </b-carousel>
   </div>
@@ -25,8 +153,13 @@
 <script lang="ts">
 import router from "@/router/index";
 import store from "@/store/page-overlay/index";
+import _ from "lodash";
 import Vue from "vue";
 import { mapState } from "vuex";
+
+const shareUrl = `https://www.trackandtrace.tools?utm_source=ttt`;
+const shareTitle = `Track and Trace Tools`;
+const shareSummary = `Supercharge your Metrc workflow`;
 
 export default Vue.extend({
   name: "PromoSlideshow",
@@ -39,11 +172,22 @@ export default Vue.extend({
   },
   data() {
     return {
+      shareUrl,
+      redditShareUrl: `https://reddit.com/submit?url=${shareUrl}&title=${shareTitle}`,
+      twitterShareUrl: `https://twitter.com/share?url=${shareUrl}&text=${shareTitle}&via=tracktracetools`,
+      linkedinShareUrl: `https://www.linkedin.com/shareArticle?url=${shareUrl}&title=${shareTitle}&summary=${shareSummary}`,
+      emailShareUrl: `mailto:?subject=${shareTitle}&body=${shareUrl}`,
+      facebookShareUrl: `https://www.facebook.com/sharer/sharer.php?u=${shareUrl}`,
       slide: 0,
       sliding: null,
+      slides: _.shuffle(["review", "shortcuts", "forum", "solutions", "opensource", "share"]),
     };
   },
   methods: {
+    next() {
+      // @ts-ignore
+      this.$refs.myCarousel.next();
+    },
     onSlideStart(slide: any) {
       this.$data.sliding = true;
     },

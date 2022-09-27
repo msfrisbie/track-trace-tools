@@ -6,8 +6,12 @@
 
     <!-- <ttt-permissions-button /> -->
 
-    <b-button variant="outline-dark" @click="openStandalone()" style="opacity: 0.5"
-      >TTT GUIDE</b-button
+    <b-button variant="outline-primary" @click="openStandalone()" style="opacity: 0.5"
+      >LICENSE</b-button
+    >
+
+    <b-button variant="outline-primary" style="opacity: 0.5"
+      >LICENSE</b-button
     >
 
     <div class="text-center text-gray-500">v{{ version }}</div>

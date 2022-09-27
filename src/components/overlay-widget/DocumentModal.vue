@@ -11,6 +11,7 @@
     no-fade
     centered
     hide-header
+    ref="document"
     @hidden="handleClose()"
   >
     <template #modal-footer>
@@ -134,6 +135,13 @@ export default Vue.extend({
       // PDF is rendered, everything after here can error without UX consequence
 
       const apiKeyState = await apiKeyManager.apiKeyStateOrNull();
+    },
+    hide() {
+      this.$bvModal.hide("document-modal");
+    },
+    toggle() {
+      // @ts-ignore
+      this.$refs["document"].toggle();
     },
     async show({ documentUrls, print = false }: { documentUrls: string[]; print?: boolean }) {
       this.resetLoadHandler();

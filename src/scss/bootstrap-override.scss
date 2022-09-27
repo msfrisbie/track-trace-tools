@@ -13,10 +13,21 @@
 }
 
 .promo-carousel {
+  height: 100% !important;
+  width: 100% !important;
+
+  .carousel-inner {
+    height: 100% !important;
+    width: 100% !important;
+  }
+
   .carousel-caption {
-    padding: 0;
-    bottom: 0;
-    height: 100%;
+    padding: 0 !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    height: 100% !important;
+    width: 100% !important;
     background: transparent;
   }
 

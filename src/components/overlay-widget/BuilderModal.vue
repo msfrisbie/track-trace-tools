@@ -12,6 +12,7 @@
     :static="true"
     no-fade
     centered
+    ref="builder"
     @show="handleOpen()"
     @hidden="handleClose()"
   >
@@ -135,6 +136,10 @@ export default Vue.extend({
     },
     async hide() {
       this.$bvModal.hide("builder-modal");
+    },
+    toggle() {
+      // @ts-ignore
+      this.$refs["builder"].toggle();
     },
     handleOpen() {
       analyticsManager.track(MessageType.OPENED_BUILDER);

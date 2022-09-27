@@ -254,24 +254,60 @@ export default Vue.extend({
   async mounted() {
     await authManager.authStateOrError();
 
-    this.$data.activePlantBatchCount = (await primaryDataLoader.activePlantBatchCount()) || 0;
-    this.$data.inactivePlantBatchCount = (await primaryDataLoader.inactivePlantBatchCount()) || 0;
-    this.$data.vegetativePlantCount = (await primaryDataLoader.vegetativePlantCount()) || 0;
-    this.$data.floweringPlantCount = (await primaryDataLoader.floweringPlantCount()) || 0;
-    this.$data.inactivePlantCount = (await primaryDataLoader.inactivePlantCount()) || 0;
-    this.$data.activeHarvestCount = (await primaryDataLoader.activeHarvestCount()) || 0;
-    this.$data.inactiveHarvestCount = (await primaryDataLoader.inactiveHarvestCount()) || 0;
-    this.$data.activePackageCount = (await primaryDataLoader.activePackageCount()) || 0;
-    this.$data.inactivePackageCount = (await primaryDataLoader.inactivePackageCount()) || 0;
-    this.$data.intransitPackageCount = (await primaryDataLoader.intransitPackageCount()) || 0;
-    this.$data.incomingTransferCount = (await primaryDataLoader.incomingTransferCount()) || 0;
-    this.$data.outgoingTransferCount = (await primaryDataLoader.outgoingTransferCount()) || 0;
-    this.$data.rejectedTransferCount = (await primaryDataLoader.rejectedTransferCount()) || 0;
-    this.$data.availableTagCount = (await primaryDataLoader.availableTagCount()) || 0;
-    this.$data.usedTagCount = (await primaryDataLoader.usedTagCount()) || 0;
-    this.$data.voidedTagCount = (await primaryDataLoader.voidedTagCount()) || 0;
-    this.$data.activeSalesCount = (await primaryDataLoader.activeSalesCount()) || 0;
-    this.$data.inactiveSalesCount = (await primaryDataLoader.inactiveSalesCount()) || 0;
+    primaryDataLoader.activePlantBatchCount().then((count: number | null) => {
+      this.$data.activePlantBatchCount = count || 0;
+    });
+    primaryDataLoader.inactivePlantBatchCount().then((count: number | null) => {
+      this.$data.inactivePlantBatchCount = count || 0;
+    });
+    primaryDataLoader.vegetativePlantCount().then((count: number | null) => {
+      this.$data.vegetativePlantCount = count || 0;
+    });
+    primaryDataLoader.floweringPlantCount().then((count: number | null) => {
+      this.$data.floweringPlantCount = count || 0;
+    });
+    primaryDataLoader.inactivePlantCount().then((count: number | null) => {
+      this.$data.inactivePlantCount = count || 0;
+    });
+    primaryDataLoader.activeHarvestCount().then((count: number | null) => {
+      this.$data.activeHarvestCount = count || 0;
+    });
+    primaryDataLoader.inactiveHarvestCount().then((count: number | null) => {
+      this.$data.inactiveHarvestCount = count || 0;
+    });
+    primaryDataLoader.activePackageCount().then((count: number | null) => {
+      this.$data.activePackageCount = count || 0;
+    });
+    primaryDataLoader.inactivePackageCount().then((count: number | null) => {
+      this.$data.inactivePackageCount = count || 0;
+    });
+    primaryDataLoader.intransitPackageCount().then((count: number | null) => {
+      this.$data.intransitPackageCount = count || 0;
+    });
+    primaryDataLoader.incomingTransferCount().then((count: number | null) => {
+      this.$data.incomingTransferCount = count || 0;
+    });
+    primaryDataLoader.outgoingTransferCount().then((count: number | null) => {
+      this.$data.outgoingTransferCount = count || 0;
+    });
+    primaryDataLoader.rejectedTransferCount().then((count: number | null) => {
+      this.$data.rejectedTransferCount = count || 0;
+    });
+    primaryDataLoader.availableTagCount().then((count: number | null) => {
+      this.$data.availableTagCount = count || 0;
+    });
+    primaryDataLoader.usedTagCount().then((count: number | null) => {
+      this.$data.usedTagCount = count || 0;
+    });
+    primaryDataLoader.voidedTagCount().then((count: number | null) => {
+      this.$data.voidedTagCount = count || 0;
+    });
+    primaryDataLoader.activeSalesCount().then((count: number | null) => {
+      this.$data.activeSalesCount = count || 0;
+    });
+    primaryDataLoader.inactiveSalesCount().then((count: number | null) => {
+      this.$data.inactiveSalesCount = count || 0;
+    });
   },
 });
 </script>
