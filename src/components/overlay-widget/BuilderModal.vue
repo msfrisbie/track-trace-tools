@@ -73,7 +73,9 @@
           <span class="sans-serif font-extralight tracking-widest text-3xl">TTT</span>
         </div>
 
-        <div class="col-span-3"></div>
+        <div class="col-span-3">
+          <promo-slideshow></promo-slideshow>
+        </div>
 
         <span class="opacity-30" style="place-self: center end">v{{ currentVersion }}</span>
       </div>
@@ -88,6 +90,7 @@
 </template>
 
 <script lang="ts">
+import PromoSlideshow from "@/components/overlay-widget/PromoSlideshow.vue";
 import TrackTraceToolsLogo from "@/components/shared/TrackTraceToolsLogo.vue";
 import { BuilderType, MessageType, ToolkitView } from "@/consts";
 import { analyticsManager } from "@/modules/analytics-manager.module";
@@ -108,6 +111,7 @@ export default Vue.extend({
   router,
   components: {
     TrackTraceToolsLogo,
+    PromoSlideshow,
   },
   methods: {
     async show(modalEventOptions: { builderType: BuilderType; initialRoute: string }) {
