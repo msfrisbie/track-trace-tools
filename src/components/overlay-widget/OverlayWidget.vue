@@ -36,6 +36,7 @@
       <debug-modal ref="debug" />
       <builder-modal ref="builder" />
       <document-modal ref="document" />
+      <promo-modal ref="promo" />
     </div>
   </div>
 </template>
@@ -45,6 +46,7 @@ import BuilderModal from "@/components/overlay-widget/BuilderModal.vue";
 import ContextMenu from "@/components/overlay-widget/ContextMenu.vue";
 import DebugModal from "@/components/overlay-widget/debug/DebugModal.vue";
 import DocumentModal from "@/components/overlay-widget/DocumentModal.vue";
+import PromoModal from "@/components/overlay-widget/PromoModal.vue";
 import DualColorTag from "@/components/overlay-widget/shared/DualColorTag.vue";
 import { ModalAction, ModalType } from "@/consts";
 import { IContextMenuEvent, IModalEvent, modalManager } from "@/modules/modal-manager.module";
@@ -72,6 +74,7 @@ export default Vue.extend({
     DocumentModal,
     ContextMenu,
     DualColorTag,
+    PromoModal,
   },
   data() {
     return {
@@ -87,6 +90,7 @@ export default Vue.extend({
       // ß is the macOS alt value
       if (e.altKey && (e.key === "ß" || e.key === "s")) {
         (this.$refs.document as any)?.hide();
+        (this.$refs.promo as any)?.hide();
         (this.$refs.builder as any)?.hide();
         (this.$refs.debug as any)?.toggle();
       }
@@ -95,6 +99,7 @@ export default Vue.extend({
       else if (e.altKey && (e.key === "†" || e.key === "t")) {
         (this.$refs.document as any)?.hide();
         (this.$refs.debug as any)?.hide();
+        (this.$refs.promo as any)?.hide();
         (this.$refs.builder as any)?.toggle();
       }
     });
@@ -146,6 +151,9 @@ export default Vue.extend({
             break;
           case ModalType.DOCUMENT:
             modal = this.$refs.document;
+            break;
+          case ModalType.PROMO:
+            modal = this.$refs.promo;
             break;
           default:
             throw new Error("Invalid modal type");

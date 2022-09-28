@@ -3,7 +3,7 @@
     <b-carousel
       v-model="slide"
       no-hover-pause
-      :interval="30000"
+      :interval="interval"
       img-width="640"
       img-height="40"
       background="transparent"
@@ -204,7 +204,12 @@ export default Vue.extend({
   name: "PromoSlideshow",
   store,
   router,
-  props: {},
+  props: {
+    interval: {
+      type: Number,
+      default: 30000,
+    },
+  },
   components: {},
   computed: {
     ...mapState([]),

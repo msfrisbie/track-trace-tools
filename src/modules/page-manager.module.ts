@@ -30,6 +30,7 @@ import { getUrl } from "@/utils/assets";
 import { debugLogFactory } from "@/utils/debug";
 import { getLicenseFromNameOrError } from "@/utils/facility";
 import { hashObjectValueOrNull } from "@/utils/url";
+import _ from "lodash";
 import { timer } from "rxjs";
 import { analyticsManager } from "./analytics-manager.module";
 import { authManager } from "./auth-manager.module";
@@ -232,6 +233,12 @@ class PageManager implements IAtomicService {
 
     // Eagerly modify
     timer(0, 1000).subscribe(() => this.modifyPageAtInterval());
+
+    const debouncedHandler = _.debounce(() => this.modifyPageOnDomChange(), 100);
+
+    const observer = new MutationObserver(() => debouncedHandler());
+
+    observer.observe(document.body, { subtree: true, childList: true });
   }
 
   public pauseFor(pauseMs: number) {
@@ -371,6 +378,7 @@ class PageManager implements IAtomicService {
     this.paused = true;
 
     try {
+      // TODO much of this can be moved into observer handler
       if (!this.extendButton) {
         this.extendButton = document.querySelector("#extend_session") as HTMLElement | null;
       }
@@ -488,6 +496,10 @@ class PageManager implements IAtomicService {
 
       this.cycleRefreshPromise();
     }
+  }
+
+  private async modifyPageOnDomChange() {
+    this.updatePromoModal();
   }
 
   private isTabActive(tab: any) {
@@ -2658,6 +2670,14 @@ class PageManager implements IAtomicService {
         }
       } catch (e) {}
     });
+  }
+
+  updatePromoModal() {
+    if (document.querySelector("#spinnerBackground")) {
+      modalManager.dispatchModalEvent(ModalType.PROMO, ModalAction.OPEN, {});
+    } else {
+      modalManager.dispatchModalEvent(ModalType.PROMO, ModalAction.CLOSE, {});
+    }
   }
 
   // Moved to facilityManager

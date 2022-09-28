@@ -223,6 +223,7 @@ export enum ModalType {
   BUILDER = "BUILDER",
   DEBUG = "DEBUG",
   DOCUMENT = "DOCUMENT",
+  PROMO = "PROMO",
 }
 
 export enum ModalAction {

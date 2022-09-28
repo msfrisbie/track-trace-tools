@@ -25,8 +25,6 @@
             Disable snowflake animation
           </b-form-checkbox>
 
-          <b-button @click="toggleDebugMode()">TOGGLE DEBUG MODE</b-button>
-
           <!-- <b-form-group label-cols="4" content-cols="8" label="After I log in:">
         <b-form-select
           v-model="settings.landingPage"
@@ -138,6 +136,8 @@
           >
             Use default Metrc facility picker
           </b-form-checkbox>
+
+          <b-button variant="light" @click="toggleDebugMode()">TOGGLE DEBUG MODE</b-button>
 
           <!-- <b-form-checkbox
             id="checkbox-disableListingsButton"
