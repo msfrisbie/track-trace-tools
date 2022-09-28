@@ -4,16 +4,7 @@
     style="height: 100%; grid-template-rows: auto 1fr"
   >
     <template v-if="plantQueryString.length > 0">
-      <div
-        class="
-          col-span-6
-          flex flex-row
-          items-center
-          space-x-2
-          p-4
-          border-blue-300 border-b
-        "
-      >
+      <div class="col-span-6 flex flex-row items-center space-x-2 p-4 border-purple-300 border-b">
         <!-- <template v-if="filtersApplied">
           <b-button-group v-if="plantSearchFilters.locationName">
             <b-button variant="outline-dark" disabled
@@ -56,10 +47,10 @@
     </template>
 
     <template v-if="plantQueryString.length > 0">
-      <div class="flex flex-col overflow-y-auto bg-blue-50 col-span-3">
+      <div class="flex flex-col overflow-y-auto bg-purple-50 col-span-3">
         <plant-result-groups :plants="filteredPlants" />
 
-        <div class="flex-grow bg-blue-50"></div>
+        <div class="flex-grow bg-purple-50"></div>
       </div>
 
       <div class="flex flex-col overflow-y-auto col-span-3">
@@ -80,25 +71,15 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import store from "@/store/page-overlay/index";
-import { MutationType } from "@/mutation-types";
-import { IIndexedPlantData, IPlantData, IPluginState } from "@/interfaces";
-import { MessageType, PlantFilterIdentifiers, PlantState } from "@/consts";
-import { analyticsManager } from "@/modules/analytics-manager.module";
-import { pageManager } from "@/modules/page-manager.module";
-import { toastManager } from "@/modules/toast-manager.module";
-import { copyToClipboard } from "@/utils/dom";
-import PlantSearchResultDetail from "@/components/plant-search-widget/PlantSearchResultDetail.vue";
-import PlantResultGroups from "@/components/plant-search-widget/PlantResultGroups.vue";
 // import PlantManifestCartBuilder from "@/components/plant-search-widget/PlantManifestCartBuilder.vue";
 import PlantHistoryList from "@/components/plant-search-widget/PlantHistoryList.vue";
-import { searchManager } from "@/modules/search-manager.module";
-import { Subject } from "rxjs";
-import { takeUntil } from "rxjs/operators";
-import { mapActions, mapGetters, mapState } from "vuex";
-import { TransferBuilderGetters } from "@/store/page-overlay/modules/transfer-builder/consts";
+import PlantResultGroups from "@/components/plant-search-widget/PlantResultGroups.vue";
+import PlantSearchResultDetail from "@/components/plant-search-widget/PlantSearchResultDetail.vue";
+import { IIndexedPlantData, IPlantData } from "@/interfaces";
+import store from "@/store/page-overlay/index";
 import { PlantSearchActions } from "@/store/page-overlay/modules/plant-search/consts";
+import Vue from "vue";
+import { mapActions, mapGetters, mapState } from "vuex";
 
 export default Vue.extend({
   name: "PlantSearchResults",
@@ -107,14 +88,14 @@ export default Vue.extend({
     PlantSearchResultDetail,
     PlantResultGroups,
     // PlantManifestCartBuilder,
-    PlantHistoryList
+    PlantHistoryList,
   },
   data() {
     return {};
   },
   props: {
     plants: Array as () => IIndexedPlantData[],
-    inflight: Boolean
+    inflight: Boolean,
   },
   watch: {
     plants: {
@@ -126,20 +107,20 @@ export default Vue.extend({
         // ) {
         //   searchManager.selectedPlant.next(newValue[0]);
         // }
-      }
-    }
+      },
+    },
   },
   methods: {
     ...mapActions({
       partialUpdatePlantSearchFilters: `plantSearch/${PlantSearchActions.PARTIAL_UPDATE_PLANT_SEARCH_FILTERS}`,
-      setPlantSearchFilters: `plantSearch/${PlantSearchActions.SET_PLANT_SEARCH_FILTERS}`
-    })
+      setPlantSearchFilters: `plantSearch/${PlantSearchActions.SET_PLANT_SEARCH_FILTERS}`,
+    }),
   },
   computed: {
     ...mapState({
       authState: (state: any) => state.pluginAuth.authState,
       plantQueryString: (state: any) => state.plantSearch?.plantQueryString,
-      plantSearchFilters: (state: any) => state.plantSearch?.plantSearchFilters
+      plantSearchFilters: (state: any) => state.plantSearch?.plantSearchFilters,
     }),
     ...mapGetters({}),
     filteredPlants() {
@@ -159,9 +140,9 @@ export default Vue.extend({
       });
     },
     filtersApplied() {
-      return Object.values(this.plantSearchFilters || {}).filter(x => !!x).length > 0;
-    }
-  }
+      return Object.values(this.plantSearchFilters || {}).filter((x) => !!x).length > 0;
+    },
+  },
 });
 </script>
 

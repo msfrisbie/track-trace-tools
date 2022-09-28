@@ -1,5 +1,5 @@
 <template>
-  <div class="w-full bg-blue-200 grid grid-cols-2 h-full">
+  <div class="w-full bg-purple-200 grid grid-cols-2 h-full">
     <!-- <div class="bg-red-200">
       <div v-for="r of range" v-bind:key="r">Full body scroll</div>
     </div> -->
@@ -14,7 +14,7 @@
 
     <div class="bg-red-200 h-full">Col 2</div>
 
-    <div class="bg-blue-200 grid grid-cols-2">
+    <div class="bg-purple-200 grid grid-cols-2">
       <div>Col 1</div>
       <div>Col 2</div>
     </div>
@@ -22,10 +22,10 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import { mapState } from "vuex";
 import router from "@/router/index";
 import store from "@/store/page-overlay/index";
+import Vue from "vue";
+import { mapState } from "vuex";
 
 export default Vue.extend({
   name: "LayoutSandbox",
@@ -36,15 +36,15 @@ export default Vue.extend({
   computed: {
     ...mapState([]),
     range() {
-      return new Array(200).map(x => 0);
-    }
+      return new Array(200).map((x) => 0);
+    },
   },
   data() {
     return {};
   },
   methods: {},
   async created() {},
-  async mounted() {}
+  async mounted() {},
 });
 </script>
 

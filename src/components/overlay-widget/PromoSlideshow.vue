@@ -129,6 +129,12 @@
             <div>Control and configure how TTT interacts with Metrc in Settings.</div>
           </div>
         </template>
+        <template v-if="slide === 'csv'">
+          <div class="text-gray-700 flex flex-col justify-around gap-2">
+            <div class="font-semibold ttt-purple">Generate CSVs</div>
+            <div>TTT can generate Metrc CSVs. Click "Download CSV" in the "Submit" step.</div>
+          </div>
+        </template>
         <template v-if="slide === 'share'">
           <div class="text-gray-700 flex flex-col justify-around gap-2">
             <div class="font-semibold ttt-purple">
@@ -246,6 +252,7 @@ export default Vue.extend({
         "solutions",
         "opensource",
         "snowflakes",
+        "csv",
         "harvest",
         "logout",
         "share",

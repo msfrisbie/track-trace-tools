@@ -1,8 +1,8 @@
 <template>
-  <div @click="setTagLabelFilter" class="cursor-pointer hover:bg-blue-50 px-2 p-4">
+  <div @click="setTagLabelFilter" class="cursor-pointer hover:bg-purple-50 px-2 p-4">
     <div class="flex flex-row justify-between items-center mb-2">
       <div class="flex flex-row items-center space-x-2">
-        <span class="metrc-tag text-lg font-bold text-blue-500 mr-2">
+        <span class="metrc-tag text-lg font-bold text-purple-500 mr-2">
           {{ tag.Label }}
         </span>
 

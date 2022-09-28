@@ -1,12 +1,10 @@
 <template>
-  <div v-if="transfers.length > 0" class="border-blue-300 border-b">
-    <div class="p-4 flex flex-row items-center border-blue-300">
+  <div v-if="transfers.length > 0" class="border-purple-300 border-b">
+    <div class="p-4 flex flex-row items-center border-purple-300">
       <div class="flex flex-row items-center space-x-4">
         <font-awesome-icon :icon="groupIcon" class="text-3xl text-gray-400" />
 
-        <div class="text-xl text-gray-500">
-          {{ transfers.length }}&nbsp;{{ sectionName }}s:
-        </div>
+        <div class="text-xl text-gray-500">{{ transfers.length }}&nbsp;{{ sectionName }}s:</div>
       </div>
 
       <div class="flex-grow"></div>
@@ -27,30 +25,24 @@
 
     <div
       v-if="!showAll && !expanded && transfers.length > previewLength"
-      class="cursor-pointer flex flex-row justify-center items-center hover:bg-blue-100"
+      class="cursor-pointer flex flex-row justify-center items-center hover:bg-purple-100"
       @click.stop.prevent="showAll = true"
     >
-      <span class="text-gray-500 p-2"
-        >{{ transfers.length - previewLength }}&nbsp;MORE</span
-      >
+      <span class="text-gray-500 p-2">{{ transfers.length - previewLength }}&nbsp;MORE</span>
     </div>
   </div>
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import store from "@/store/page-overlay/index";
-import { pageManager } from "@/modules/page-manager.module";
 import TransferSearchResultPreview from "@/components/transfer-search-widget/TransferSearchResultPreview.vue";
 import { TransferFilterIdentifiers } from "@/consts";
 import { IIndexedTransferData } from "@/interfaces";
-import { mapState } from "vuex";
-import {
-  searchManager,
-  ISelectedTransferMetadata,
-} from "@/modules/search-manager.module";
+import { ISelectedTransferMetadata, searchManager } from "@/modules/search-manager.module";
+import store from "@/store/page-overlay/index";
 import { Subject } from "rxjs";
 import { take, takeUntil } from "rxjs/operators";
+import Vue from "vue";
+import { mapState } from "vuex";
 
 export default Vue.extend({
   name: "TransferSearchResultsGroup",
@@ -85,9 +77,7 @@ export default Vue.extend({
           .subscribe((transferMetadata) => {
             if (
               newValue.length > 0 &&
-              !newValue.find(
-                (x: any) => x.Id === transferMetadata?.transferData.Id
-              )
+              !newValue.find((x: any) => x.Id === transferMetadata?.transferData.Id)
             ) {
               searchManager.maybeInitializeSelectedTransfer(
                 newValue[0],

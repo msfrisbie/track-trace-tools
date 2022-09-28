@@ -1,6 +1,6 @@
 <template>
-  <div v-if="packages.length > 0" class="border-blue-300 border-b">
-    <div class="p-4 flex flex-row items-center border-blue-300">
+  <div v-if="packages.length > 0" class="border-purple-300 border-b">
+    <div class="p-4 flex flex-row items-center border-purple-300">
       <div class="flex flex-row items-center space-x-4">
         <font-awesome-icon :icon="groupIcon" class="text-3xl text-gray-400" />
 
@@ -35,8 +35,8 @@
       :sectionName="sectionName"
       :selected="
         !!selectedPackageMetadata &&
-          pkg.Id === selectedPackageMetadata.packageData.Id &&
-          sectionName === selectedPackageMetadata.sectionName
+        pkg.Id === selectedPackageMetadata.packageData.Id &&
+        sectionName === selectedPackageMetadata.sectionName
       "
       :idx="index"
       v-on:selected-package="showPackageDetail($event)"
@@ -44,13 +44,7 @@
 
     <div
       v-if="!showAll && !expanded && packages.length > previewLength"
-      class="
-        cursor-pointer
-        flex flex-row
-        justify-center
-        items-center
-        hover:bg-blue-100
-      "
+      class="cursor-pointer flex flex-row justify-center items-center hover:bg-purple-100"
       @click.stop.prevent="showAll = true"
     >
       <span class="text-gray-500 p-2">{{ packages.length - previewLength }}&nbsp;MORE</span>
@@ -59,17 +53,16 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import store from "@/store/page-overlay/index";
-import { PACKAGE_TAB_REGEX, pageManager } from "@/modules/page-manager.module";
 import PackageSearchResultPreview from "@/components/package-search-widget/PackageSearchResultPreview.vue";
-import { PackageFilterIdentifiers } from "@/consts";
 import { IIndexedPackageData } from "@/interfaces";
-import { mapState } from "vuex";
-import { searchManager, ISelectedPackageMetadata } from "@/modules/search-manager.module";
+import { PACKAGE_TAB_REGEX } from "@/modules/page-manager.module";
+import { ISelectedPackageMetadata, searchManager } from "@/modules/search-manager.module";
+import store from "@/store/page-overlay/index";
+import { PackageSearchActions } from "@/store/page-overlay/modules/package-search/consts";
 import { Subject } from "rxjs";
 import { take, takeUntil } from "rxjs/operators";
-import { PackageSearchActions } from "@/store/page-overlay/modules/package-search/consts";
+import Vue from "vue";
+import { mapState } from "vuex";
 
 export default Vue.extend({
   name: "PackageSearchResultsGroup",
@@ -83,7 +76,7 @@ export default Vue.extend({
     return {
       destroyed$: new Subject(),
       selectedPackageMetadata: null,
-      showAll: false
+      showAll: false,
     };
   },
   props: {
@@ -92,7 +85,7 @@ export default Vue.extend({
     packageFilterIdentifier: String,
     sectionPriority: Number,
     expanded: Boolean,
-    previewLength: Number
+    previewLength: Number,
   },
   watch: {
     packages: {
@@ -101,7 +94,7 @@ export default Vue.extend({
         searchManager.selectedPackage
           .asObservable()
           .pipe(take(1))
-          .subscribe(packageMetadata => {
+          .subscribe((packageMetadata) => {
             if (
               newValue.length > 0 &&
               !newValue.find((x: any) => x.Id === packageMetadata?.packageData.Id)
@@ -113,8 +106,8 @@ export default Vue.extend({
               );
             }
           });
-      }
-    }
+      },
+    },
   },
   computed: {
     isOnPackagesPage() {
@@ -146,8 +139,8 @@ export default Vue.extend({
       return !this.packageFilterIdentifier || this.packageFilterIdentifier === "label";
     },
     ...mapState({
-      packageQueryString: (state: any) => state.packageSearch?.packageQueryString
-    })
+      packageQueryString: (state: any) => state.packageSearch?.packageQueryString,
+    }),
   },
   methods: {
     showPackageDetail(packageData: IIndexedPackageData) {
@@ -155,7 +148,7 @@ export default Vue.extend({
       searchManager.selectedPackage.next({
         packageData,
         sectionName: this.sectionName,
-        priority: this.sectionPriority
+        priority: this.sectionPriority,
       });
     },
     applyFilter() {
@@ -167,24 +160,24 @@ export default Vue.extend({
         `packageSearch/${PackageSearchActions.PARTIAL_UPDATE_PACKAGE_SEARCH_FILTERS}`,
         {
           packageSearchFilters: {
-            [this.packageFilterIdentifier]: this.packageQueryString
-          }
+            [this.packageFilterIdentifier]: this.packageQueryString,
+          },
         }
       );
 
       searchManager.setPackageSearchVisibility({ showPackageSearchResults: false });
-    }
+    },
   },
   created() {
     searchManager.selectedPackage
       .asObservable()
       .pipe(takeUntil(this.$data.destroyed$))
       .subscribe(
-        selectedPackageMetadata => (this.$data.selectedPackageMetadata = selectedPackageMetadata)
+        (selectedPackageMetadata) => (this.$data.selectedPackageMetadata = selectedPackageMetadata)
       );
   },
   beforeDestroy() {
     this.$data.destroyed$.next(null);
-  }
+  },
 });
 </script>

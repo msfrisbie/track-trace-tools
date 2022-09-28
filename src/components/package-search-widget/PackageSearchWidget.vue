@@ -39,7 +39,7 @@
               </div>
 
               <div
-                class="flex flex-row items-center space-x-1 p-1 text-xs text-gray-500 border-blue-300 border-t"
+                class="flex flex-row items-center space-x-1 p-1 text-xs text-gray-500 border-purple-300 border-t"
               >
                 <span>Press</span>
                 <b-badge variant="light">esc</b-badge>

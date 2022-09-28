@@ -20,11 +20,11 @@
         @click.stop.prevent="setPackageLabelFilter(pkg)"
         class="flex flex-row items-center justify-center cursor-pointer h-full"
       >
-        <font-awesome-icon icon="chevron-right" class="text-2xl text-blue-500" />
+        <font-awesome-icon icon="chevron-right" class="text-2xl text-purple-500" />
       </div>
     </div>
 
-    <div class="text-2xl text-blue-800 text-center demo-blur">
+    <div class="text-2xl text-purple-800 text-center demo-blur">
       {{ pkg.Item.Name }}
     </div>
 
@@ -102,7 +102,7 @@
     </div>
 
     <table class="text-lg">
-      <tr class="cursor-pointer hover:bg-blue-50" @click.stop.prevent="copyToClipboard(pkg)">
+      <tr class="cursor-pointer hover:bg-purple-50" @click.stop.prevent="copyToClipboard(pkg)">
         <td class="text-right p-2 text-gray-400 text-2xl">
           <font-awesome-icon icon="tag" />
         </td>

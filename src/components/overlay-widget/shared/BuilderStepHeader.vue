@@ -3,23 +3,14 @@
     class="flex flex-row items-center justify-center space-x-2 text-lg cursor-pointer px-4"
     v-bind:class="{
       'opacity-100': active,
-      'opacity-50': !active
+      'opacity-50': !active,
     }"
   >
     <span
-      class="
-        step-number
-        rounded-full
-        h-8
-        w-8
-        flex
-        items-center
-        justify-center
-        text-white
-      "
+      class="step-number rounded-full h-8 w-8 flex items-center justify-center text-white"
       v-bind:class="{
-        'bg-blue-400': active,
-        'bg-gray-400': !active
+        'bg-purple-400': active,
+        'bg-gray-400': !active,
       }"
       >{{ stepNumber }}</span
     >
@@ -28,9 +19,8 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
 import store from "@/store/page-overlay/index";
-import { mapState } from "vuex";
+import Vue from "vue";
 
 export default Vue.extend({
   name: "BuilderStepHeader",
@@ -38,8 +28,8 @@ export default Vue.extend({
   props: {
     stepNumber: Number,
     stepText: String,
-    active: Boolean
-  }
+    active: Boolean,
+  },
 });
 </script>
 

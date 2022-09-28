@@ -2,7 +2,7 @@
   <div>
     <!-- <div
       v-if="filtersApplied || expandLabelGroup"
-      class="p-4 border-blue-300 border-b"
+      class="p-4 border-purple-300 border-b"
     >
       <b-button
         style="opacity: 0.6"
@@ -105,25 +105,19 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import { MutationType } from "@/mutation-types";
+import PackageSearchResultsGroup from "@/components/package-search-widget/PackageSearchResultsGroup.vue";
+import { MessageType } from "@/consts";
 import { IIndexedPackageData } from "@/interfaces";
-import { MessageType, PackageFilterIdentifiers, PackageState } from "@/consts";
 import { analyticsManager } from "@/modules/analytics-manager.module";
 import { pageManager } from "@/modules/page-manager.module";
-import { toastManager } from "@/modules/toast-manager.module";
-import { copyToClipboard } from "@/utils/dom";
-import { mapActions, mapState } from "vuex";
-import PackageSearchResultsGroup from "@/components/package-search-widget/PackageSearchResultsGroup.vue";
-import PackageSearchFiltersVue from "./PackageSearchFilters.vue";
-import { searchManager } from "@/modules/search-manager.module";
 import { PackageSearchActions } from "@/store/page-overlay/modules/package-search/consts";
-import { timer } from "rxjs";
+import Vue from "vue";
+import { mapActions, mapState } from "vuex";
 
 export default Vue.extend({
   name: "PackageResultGroups",
   props: {
-    packages: Array as () => IIndexedPackageData[]
+    packages: Array as () => IIndexedPackageData[],
   },
   components: { PackageSearchResultsGroup },
   data(): {} {
@@ -132,7 +126,7 @@ export default Vue.extend({
   computed: {
     ...mapState({
       packageQueryString: (state: any) => state.packageSearch?.packageQueryString,
-      packageSearchFilters: (state: any) => state.packageSearch?.packageSearchFilters
+      packageSearchFilters: (state: any) => state.packageSearch?.packageSearchFilters,
     }),
     filtersApplied() {
       return false;
@@ -215,14 +209,14 @@ export default Vue.extend({
       return 3;
     },
     labelPackages(): IIndexedPackageData[] {
-      const packages = this.packages.filter(packageData =>
+      const packages = this.packages.filter((packageData) =>
         packageData.Label.includes(this.packageQueryString)
       );
 
       return packages;
     },
     sourceHarvestNamePackages(): IIndexedPackageData[] {
-      const packages = this.packages.filter(packageData =>
+      const packages = this.packages.filter((packageData) =>
         packageData.SourceHarvestNames?.toUpperCase().includes(
           this.packageQueryString.toUpperCase()
         )
@@ -231,7 +225,7 @@ export default Vue.extend({
       return packages;
     },
     sourcePackageLabelPackages(): IIndexedPackageData[] {
-      const packages = this.packages.filter(packageData =>
+      const packages = this.packages.filter((packageData) =>
         packageData.SourcePackageLabels?.toUpperCase().includes(
           this.packageQueryString.toUpperCase()
         )
@@ -240,39 +234,39 @@ export default Vue.extend({
       return packages;
     },
     itemNamePackages(): IIndexedPackageData[] {
-      const packages = this.packages.filter(packageData =>
+      const packages = this.packages.filter((packageData) =>
         packageData.Item?.Name?.toUpperCase().includes(this.packageQueryString.toUpperCase())
       );
 
       return packages;
     },
     itemStrainNamePackages(): IIndexedPackageData[] {
-      const packages = this.packages.filter(packageData =>
+      const packages = this.packages.filter((packageData) =>
         packageData.Item.StrainName?.toUpperCase().includes(this.packageQueryString.toUpperCase())
       );
 
       return packages;
     },
     locationNamePackages(): IIndexedPackageData[] {
-      const packages = this.packages.filter(packageData =>
+      const packages = this.packages.filter((packageData) =>
         packageData.LocationName?.toUpperCase().includes(this.packageQueryString.toUpperCase())
       );
 
       return packages;
     },
     itemProductCategoryNamePackages(): IIndexedPackageData[] {
-      const packages = this.packages.filter(packageData =>
+      const packages = this.packages.filter((packageData) =>
         packageData.Item.ProductCategoryName?.toUpperCase().includes(
           this.packageQueryString.toUpperCase()
         )
       );
 
       return packages;
-    }
+    },
   },
   methods: {
     ...mapActions({
-      setShowPackageSearchResults: `packageSearch/${PackageSearchActions.SET_SHOW_PACKAGE_SEARCH_RESULTS}`
+      setShowPackageSearchResults: `packageSearch/${PackageSearchActions.SET_SHOW_PACKAGE_SEARCH_RESULTS}`,
     }),
     resetFilters() {
       pageManager.resetMetrcPackageFilters();
@@ -285,13 +279,13 @@ export default Vue.extend({
         {
           packageState: pkg.PackageState,
           packageSearchFilters: {
-            label: pkg.Label
-          }
+            label: pkg.Label,
+          },
         }
       );
 
       (this as any).setShowPackageSearchResults({ showPackageSearchResults: false });
-    }
-  }
+    },
+  },
 });
 </script>

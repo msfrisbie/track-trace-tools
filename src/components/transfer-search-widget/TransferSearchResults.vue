@@ -1,16 +1,7 @@
 <template>
   <div class="hide-scrollbar grid grid-cols-2" style="height: 100%; grid-template-rows: auto 1fr">
     <template v-if="transferQueryString.length > 0">
-      <div
-        class="
-          col-span-2
-          flex flex-row
-          items-center
-          space-x-2
-          p-4
-          border-blue-300 border-b
-        "
-      >
+      <div class="col-span-2 flex flex-row items-center space-x-2 p-4 border-purple-300 border-b">
         <p class="text-lg text-gray-600">
           <span class="font-bold text-gray-900">{{ transferQueryString }}</span>
           matches {{ transfers.length }} transfers
@@ -25,10 +16,10 @@
     </template>
 
     <template v-if="transferQueryString.length > 0">
-      <div class="flex flex-col overflow-y-auto bg-blue-50">
+      <div class="flex flex-col overflow-y-auto bg-purple-50">
         <transfer-result-groups :transfers="transfers" />
 
-        <div class="flex-grow border-blue-300"></div>
+        <div class="flex-grow border-purple-300"></div>
       </div>
 
       <div class="flex flex-col overflow-y-auto">
@@ -45,21 +36,12 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import store from "@/store/page-overlay/index";
-import { MutationType } from "@/mutation-types";
-import { IIndexedTransferData } from "@/interfaces";
-import { MessageType, TransferFilterIdentifiers, TransferState } from "@/consts";
-import { analyticsManager } from "@/modules/analytics-manager.module";
-import { pageManager } from "@/modules/page-manager.module";
-import { toastManager } from "@/modules/toast-manager.module";
-import { copyToClipboard } from "@/utils/dom";
-import TransferSearchResultDetail from "@/components/transfer-search-widget/TransferSearchResultDetail.vue";
-import TransferResultGroups from "@/components/transfer-search-widget/TransferResultGroups.vue";
 import TransferHistoryList from "@/components/transfer-search-widget/TransferHistoryList.vue";
-import { searchManager } from "@/modules/search-manager.module";
-import { Subject } from "rxjs";
-import { takeUntil } from "rxjs/operators";
+import TransferResultGroups from "@/components/transfer-search-widget/TransferResultGroups.vue";
+import TransferSearchResultDetail from "@/components/transfer-search-widget/TransferSearchResultDetail.vue";
+import { IIndexedTransferData } from "@/interfaces";
+import store from "@/store/page-overlay/index";
+import Vue from "vue";
 import { mapState } from "vuex";
 
 export default Vue.extend({
@@ -68,22 +50,22 @@ export default Vue.extend({
   components: {
     TransferSearchResultDetail,
     TransferResultGroups,
-    TransferHistoryList
+    TransferHistoryList,
   },
   props: {
     transfers: Array as () => IIndexedTransferData[],
-    inflight: Boolean
+    inflight: Boolean,
   },
   watch: {
     transfers: {
       immediate: true,
-      handler(newValue, oldValue) {}
-    }
+      handler(newValue, oldValue) {},
+    },
   },
   methods: {},
   computed: {
-    ...mapState(["transferQueryString"])
-  }
+    ...mapState(["transferQueryString"]),
+  },
 });
 </script>
 

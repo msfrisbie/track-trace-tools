@@ -1,6 +1,6 @@
 <template>
   <div
-    class="border-blue-300"
+    class="border-purple-300"
     v-bind:class="{
       'bg-white': selected,
     }"
@@ -12,7 +12,7 @@
         class="flex flex-column-shim flex-col space-y-2"
         v-bind:class="{ 'font-bold': selected }"
       >
-        <div class="text-xl text-blue-700">
+        <div class="text-xl text-purple-700">
           {{ transferDescriptor }}
         </div>
         <div class="text-gray-700 text-lg">
@@ -24,24 +24,13 @@
   </div>
 </template>
 
-
 <script lang="ts">
-import Vue from "vue";
-import { MutationType } from "@/mutation-types";
+import { MessageType, TransferFilterIdentifiers, TransferState } from "@/consts";
 import { IIndexedTransferData } from "@/interfaces";
-import {
-  MessageType,
-  TransferFilterIdentifiers,
-  TransferState,
-} from "@/consts";
 import { analyticsManager } from "@/modules/analytics-manager.module";
 import { pageManager } from "@/modules/page-manager.module";
-import { toastManager } from "@/modules/toast-manager.module";
-import { copyToClipboard } from "@/utils/dom";
-import TransferIcon from "@/components/transfer-search-widget/TransferIcon.vue";
-import { mapState } from "vuex";
-import { searchManager } from "@/modules/search-manager.module";
-import { v4 } from "uuid";
+import { MutationType } from "@/mutation-types";
+import Vue from "vue";
 
 export default Vue.extend({
   name: "TransferSearchResultPreview",
@@ -82,22 +71,13 @@ export default Vue.extend({
 
       switch (this.$props.transfer.TransferState as TransferState) {
         case TransferState.INCOMING:
-          await pageManager.clickTabStartingWith(
-            pageManager.transferTabs,
-            "Incoming"
-          );
+          await pageManager.clickTabStartingWith(pageManager.transferTabs, "Incoming");
           break;
         case TransferState.OUTGOING:
-          await pageManager.clickTabStartingWith(
-            pageManager.transferTabs,
-            "Outgoing"
-          );
+          await pageManager.clickTabStartingWith(pageManager.transferTabs, "Outgoing");
           break;
         case TransferState.REJECTED:
-          await pageManager.clickTabStartingWith(
-            pageManager.transferTabs,
-            "Rejected"
-          );
+          await pageManager.clickTabStartingWith(pageManager.transferTabs, "Rejected");
           break;
         default:
           return null;

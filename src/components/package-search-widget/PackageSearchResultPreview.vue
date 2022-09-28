@@ -1,8 +1,8 @@
 <template>
   <div
-    class="border-blue-300"
+    class="border-purple-300"
     v-bind:class="{
-      'bg-white': selected
+      'bg-white': selected,
     }"
     @mouseenter="selectPackage(pkg)"
     @click.stop.prevent="setPackageLabelFilter(pkg)"
@@ -12,7 +12,7 @@
         class="flex flex-column-shim flex-col space-y-2"
         v-bind:class="{ 'font-bold': selected }"
       >
-        <div class="text-xl text-blue-700 demo-blur">
+        <div class="text-xl text-purple-700 demo-blur">
           {{ pkg.Quantity }}{{ pkg.UnitOfMeasureAbbreviation }}
           {{ pkg.Item.Name }}
         </div>
@@ -23,20 +23,12 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import { MutationType } from "@/mutation-types";
+import { MessageType } from "@/consts";
 import { IIndexedPackageData } from "@/interfaces";
-import { MessageType, PackageFilterIdentifiers, PackageState } from "@/consts";
 import { analyticsManager } from "@/modules/analytics-manager.module";
-import { pageManager } from "@/modules/page-manager.module";
-import { toastManager } from "@/modules/toast-manager.module";
-import { copyToClipboard } from "@/utils/dom";
-import PackageIcon from "@/components/package-search-widget/PackageIcon.vue";
-import { mapActions, mapState } from "vuex";
-import { searchManager } from "@/modules/search-manager.module";
-import { v4 } from "uuid";
-import { timer } from "rxjs";
 import { PackageSearchActions } from "@/store/page-overlay/modules/package-search/consts";
+import Vue from "vue";
+import { mapActions } from "vuex";
 
 export default Vue.extend({
   name: "PackageSearchResultPreview",
@@ -44,13 +36,13 @@ export default Vue.extend({
     sectionName: String,
     pkg: Object as () => IIndexedPackageData,
     selected: Boolean,
-    idx: Number
+    idx: Number,
   },
   methods: {
     ...mapActions({
       setShowPackageSearchResults: `packageSearch/${PackageSearchActions.SET_SHOW_PACKAGE_SEARCH_RESULTS}`,
       partialUpdatePackageSearchFilters: `packageSearch/${PackageSearchActions.PARTIAL_UPDATE_PACKAGE_SEARCH_FILTERS}`,
-      setPackageSearchFilters: `packageSearch/${PackageSearchActions.SET_PACKAGE_SEARCH_FILTERS}`
+      setPackageSearchFilters: `packageSearch/${PackageSearchActions.SET_PACKAGE_SEARCH_FILTERS}`,
     }),
     selectPackage(pkg: IIndexedPackageData) {
       this.$emit("selected-package", pkg);
@@ -63,13 +55,13 @@ export default Vue.extend({
         {
           packageState: pkg.PackageState,
           packageSearchFilters: {
-            label: pkg.Label
-          }
+            label: pkg.Label,
+          },
         }
       );
 
       (this as any).setShowPackageSearchResults({ showPackageSearchResults: false });
-    }
-  }
+    },
+  },
 });
 </script>

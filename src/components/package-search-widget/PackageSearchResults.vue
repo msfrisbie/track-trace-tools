@@ -4,16 +4,7 @@
     style="height: 100%; grid-template-rows: auto 1fr"
   >
     <template v-if="packageQueryString.length > 0">
-      <div
-        class="
-          col-span-6
-          flex flex-row
-          items-center
-          space-x-2
-          p-4
-          border-blue-300 border-b
-        "
-      >
+      <div class="col-span-6 flex flex-row items-center space-x-2 p-4 border-purple-300 border-b">
         <!-- <template v-if="filtersApplied">
           <b-button-group v-if="packageSearchFilters.sourceHarvestName">
             <b-button variant="outline-dark" disabled
@@ -121,10 +112,10 @@
     </template>
 
     <template v-if="packageQueryString.length > 0">
-      <div class="flex flex-col overflow-y-auto bg-blue-50 col-span-3">
+      <div class="flex flex-col overflow-y-auto bg-purple-50 col-span-3">
         <package-result-groups :packages="filteredPackages" />
 
-        <div class="flex-grow bg-blue-50"></div>
+        <div class="flex-grow bg-purple-50"></div>
       </div>
 
       <div class="flex flex-col overflow-y-auto col-span-3">
@@ -145,25 +136,16 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import store from "@/store/page-overlay/index";
-import { MutationType } from "@/mutation-types";
-import { IIndexedPackageData, IPackageData, IPluginState } from "@/interfaces";
-import { MessageType, PackageFilterIdentifiers, PackageState } from "@/consts";
-import { analyticsManager } from "@/modules/analytics-manager.module";
-import { pageManager } from "@/modules/page-manager.module";
-import { toastManager } from "@/modules/toast-manager.module";
-import { copyToClipboard } from "@/utils/dom";
-import PackageSearchResultDetail from "@/components/package-search-widget/PackageSearchResultDetail.vue";
-import PackageResultGroups from "@/components/package-search-widget/PackageResultGroups.vue";
 // import PackageManifestCartBuilder from "@/components/package-search-widget/PackageManifestCartBuilder.vue";
 import PackageHistoryList from "@/components/package-search-widget/PackageHistoryList.vue";
-import { searchManager } from "@/modules/search-manager.module";
-import { Subject } from "rxjs";
-import { takeUntil } from "rxjs/operators";
-import { mapActions, mapGetters, mapState } from "vuex";
-import { TransferBuilderGetters } from "@/store/page-overlay/modules/transfer-builder/consts";
+import PackageResultGroups from "@/components/package-search-widget/PackageResultGroups.vue";
+import PackageSearchResultDetail from "@/components/package-search-widget/PackageSearchResultDetail.vue";
+import { IIndexedPackageData, IPackageData } from "@/interfaces";
+import store from "@/store/page-overlay/index";
 import { PackageSearchActions } from "@/store/page-overlay/modules/package-search/consts";
+import { TransferBuilderGetters } from "@/store/page-overlay/modules/transfer-builder/consts";
+import Vue from "vue";
+import { mapActions, mapGetters, mapState } from "vuex";
 
 export default Vue.extend({
   name: "PackageSearchResults",
@@ -172,14 +154,14 @@ export default Vue.extend({
     PackageSearchResultDetail,
     PackageResultGroups,
     // PackageManifestCartBuilder,
-    PackageHistoryList
+    PackageHistoryList,
   },
   data() {
     return {};
   },
   props: {
     packages: Array as () => IIndexedPackageData[],
-    inflight: Boolean
+    inflight: Boolean,
   },
   watch: {
     packages: {
@@ -191,23 +173,23 @@ export default Vue.extend({
         // ) {
         //   searchManager.selectedPackage.next(newValue[0]);
         // }
-      }
-    }
+      },
+    },
   },
   methods: {
     ...mapActions({
       partialUpdatePackageSearchFilters: `packageSearch/${PackageSearchActions.PARTIAL_UPDATE_PACKAGE_SEARCH_FILTERS}`,
-      setPackageSearchFilters: `packageSearch/${PackageSearchActions.SET_PACKAGE_SEARCH_FILTERS}`
-    })
+      setPackageSearchFilters: `packageSearch/${PackageSearchActions.SET_PACKAGE_SEARCH_FILTERS}`,
+    }),
   },
   computed: {
     ...mapState({
       authState: (state: any) => state.pluginAuth.authState,
       packageQueryString: (state: any) => state.packageSearch?.packageQueryString,
-      packageSearchFilters: (state: any) => state.packageSearch?.packageSearchFilters
+      packageSearchFilters: (state: any) => state.packageSearch?.packageSearchFilters,
     }),
     ...mapGetters({
-      transferPackageList: `transferBuilder/${TransferBuilderGetters.ACTIVE_PACKAGE_LIST}`
+      transferPackageList: `transferBuilder/${TransferBuilderGetters.ACTIVE_PACKAGE_LIST}`,
     }),
     filteredPackages() {
       return this.packages.filter((x: IPackageData) => {
@@ -254,9 +236,9 @@ export default Vue.extend({
       });
     },
     filtersApplied() {
-      return Object.values(this.packageSearchFilters || {}).filter(x => !!x).length > 0;
-    }
-  }
+      return Object.values(this.packageSearchFilters || {}).filter((x) => !!x).length > 0;
+    },
+  },
 });
 </script>
 

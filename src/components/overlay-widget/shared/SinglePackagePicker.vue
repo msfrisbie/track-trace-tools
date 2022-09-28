@@ -2,7 +2,7 @@
   <div class="grid grid-cols-2 grid-rows-2 gap-8" style="grid-template-rows: 1fr auto">
     <!-- Package filter -->
     <div class="flex flex-col row-span-2 items-center">
-      <div class="w-full flex flex-col space-y-4" style="max-width:480px">
+      <div class="w-full flex flex-col space-y-4" style="max-width: 480px">
         <div class="flex flex-row items-stretch justify-center">
           <b-form-group
             label="SELECT PACKAGES"
@@ -14,7 +14,7 @@
               v-model="query"
               :data="filteredSourcePackages"
               :serializer="
-                pkg =>
+                (pkg) =>
                   `${pkg.Label} ${pkg.Quantity} ${pkg.Item.UnitOfMeasureName} ${pkg.Item.Name} ${pkg.Item.StrainName}`
               "
               :minMatchingChars="0"
@@ -28,25 +28,15 @@
               ref="typeahead"
             >
               <template slot="suggestion" slot-scope="{ htmlText, data }">
-                <div
-                  class="
-                    w-full
-                    flex flex-row
-                    items-center
-                    justify-start
-                    space-x-4
-                  "
-                >
+                <div class="w-full flex flex-row items-center justify-start space-x-4">
                   <picker-icon
                     icon="box"
                     style="width: 5rem"
                     class="flex-shrink-0"
                     :textClass="data.Quantity === 0 ? 'text-red-500' : ''"
-                    :text="
-                      `${data.Quantity} ${unitOfMeasureNameToAbbreviation(
-                        data.Item.UnitOfMeasureName
-                      )}`
-                    "
+                    :text="`${data.Quantity} ${unitOfMeasureNameToAbbreviation(
+                      data.Item.UnitOfMeasureName
+                    )}`"
                   />
 
                   <picker-card class="flex-grow" :title="`${data.Item.Name}`" :label="data.Label" />
@@ -101,13 +91,7 @@
             <template v-for="pkg in selectedPackages">
               <b-list-group-item
                 :key="pkg.Label"
-                class="
-                  flex flex-row
-                  items-center
-                  justify-start
-                  space-x-4
-                  flex-nowrap
-                "
+                class="flex flex-row items-center justify-start space-x-4 flex-nowrap"
               >
                 <!-- grid-column-start:1 is to fix some rendering weirdness when items enter/leave -->
                 <picker-icon
@@ -115,9 +99,9 @@
                   style="width: 5rem"
                   class="flex-shrink-0"
                   :textClass="pkg.Quantity === 0 ? 'text-red-500' : ''"
-                  :text="
-                    `${pkg.Quantity} ${unitOfMeasureNameToAbbreviation(pkg.Item.UnitOfMeasureName)}`
-                  "
+                  :text="`${pkg.Quantity} ${unitOfMeasureNameToAbbreviation(
+                    pkg.Item.UnitOfMeasureName
+                  )}`"
                 />
 
                 <picker-card class="flex-grow" :title="`${pkg.Item.Name}`" :label="pkg.Label" />
@@ -144,7 +128,9 @@
         >
 
         <template v-if="selectedPackages.length > 0">
-          <span class="text-center text-blue-500 underline cursor-pointer" @click="resetPackages()"
+          <span
+            class="text-center text-purple-500 underline cursor-pointer"
+            @click="resetPackages()"
             >CLEAR</span
           >
         </template>
@@ -154,20 +140,19 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import store from "@/store/page-overlay/index";
+import AnimatedNumber from "@/components/overlay-widget/shared/AnimatedNumber.vue";
+import ErrorReadout from "@/components/overlay-widget/shared/ErrorReadout.vue";
+import PasteTags from "@/components/overlay-widget/shared/PasteTags.vue";
 import PickerCard from "@/components/overlay-widget/shared/PickerCard.vue";
 import PickerIcon from "@/components/overlay-widget/shared/PickerIcon.vue";
-import AnimatedNumber from "@/components/overlay-widget/shared/AnimatedNumber.vue";
-import PasteTags from "@/components/overlay-widget/shared/PasteTags.vue";
 import { IPackageData } from "@/interfaces";
 import { authManager } from "@/modules/auth-manager.module";
 import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
-import { timer } from "rxjs";
-import ErrorReadout from "@/components/overlay-widget/shared/ErrorReadout.vue";
+import store from "@/store/page-overlay/index";
 import { unitOfMeasureNameToAbbreviation } from "@/utils/units";
-import { searchManager } from "@/modules/search-manager.module";
 import _ from "lodash";
+import { timer } from "rxjs";
+import Vue from "vue";
 
 export default Vue.extend({
   name: "SinglePackagePicker",
@@ -177,19 +162,19 @@ export default Vue.extend({
     PickerCard,
     PickerIcon,
     AnimatedNumber,
-    PasteTags
+    PasteTags,
   },
   props: {
     enablePaste: {
       type: Boolean,
-      default: false
+      default: false,
     },
     selectedPackages: Array as () => IPackageData[],
     builderType: String,
     reopenPickerAfterSelect: {
       type: Boolean,
-      default: true
-    }
+      default: true,
+    },
   },
   methods: {
     unitOfMeasureNameToAbbreviation,
@@ -255,7 +240,7 @@ export default Vue.extend({
       // @ts-ignore
       this.updateSourcePackagesImpl();
     },
-    updateSourcePackagesImpl: _.debounce(async function() {
+    updateSourcePackagesImpl: _.debounce(async function () {
       // @ts-ignore
       const _this: any = this;
 
@@ -266,9 +251,9 @@ export default Vue.extend({
       }
 
       _this.$data.sourcePackages = await primaryDataLoader.onDemandActivePackageSearch({
-        queryString
+        queryString,
       });
-    }, 500)
+    }, 500),
   },
   computed: {
     filteredSourcePackages() {
@@ -282,7 +267,7 @@ export default Vue.extend({
           // @ts-ignore
           !this.$props.selectedPackages.find((x: IPackageData) => x.Label === y.Label)
       );
-    }
+    },
   },
   data() {
     return {
@@ -291,13 +276,13 @@ export default Vue.extend({
       inflight: false,
       error: null,
       pastedTags: [],
-      activePackages: []
+      activePackages: [],
     };
   },
   watch: {
     pastedTags: {
       immediate: true,
-      handler: async function(newValue, oldValue) {
+      handler: async function (newValue, oldValue) {
         if (!newValue.length) {
           return;
         }
@@ -315,14 +300,14 @@ export default Vue.extend({
         }
 
         this.$data.pastedTags = [];
-      }
+      },
     },
     query: {
       immediate: true,
       handler(newValue, oldValue) {
         this.updateSourcePackages();
-      }
-    }
+      },
+    },
     // selectedPackagesMirror: {
     //   immediate: true,
     //   handler(newValue, oldValue) {
@@ -349,7 +334,7 @@ export default Vue.extend({
     // @ts-ignore
     // this.setSourcePackages(await primaryDataLoader.activePackages(true));
   },
-  async created() {}
+  async created() {},
 });
 </script>
 

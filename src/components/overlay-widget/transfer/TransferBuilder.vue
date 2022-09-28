@@ -81,7 +81,7 @@
                 class="h-full grid grid-cols-3 grid-rows-3 gap-8"
                 style="grid-template-columns: auto 1fr 1fr; grid-template-rows: auto auto 1fr"
               >
-                <start-finish-icons :ellipsisCount="6" class="row-span-2 text-blue-500" />
+                <start-finish-icons :ellipsisCount="6" class="row-span-2 text-purple-500" />
 
                 <b-form-group
                   label="ORIGIN"

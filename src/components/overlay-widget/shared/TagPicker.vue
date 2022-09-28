@@ -28,29 +28,14 @@
       <template v-if="selectedMenuItem === selectedMenuState.SELECTION">
         <div
           style="width: 420px"
-          class="
-              toolkit-scroll
-              flex flex-col
-              items-center
-              h-4/6
-              overflow-y-auto
-              p-1
-            "
+          class="toolkit-scroll flex flex-col items-center h-4/6 overflow-y-auto p-1"
         >
           <div
             class="w-full flex flex-col flex-grow items-center space-y-2"
             style="max-height: 25vh"
           >
             <div
-              class="
-                  w-full
-                  hover-reveal-target
-                  flex flex-row
-                  items-center
-                  justify-between
-                  space-x-8
-                  text-lg
-                "
+              class="w-full hover-reveal-target flex flex-row items-center justify-between space-x-8 text-lg"
               v-for="(tag, index) in tagsPage"
               :key="tag.Label"
             >
@@ -76,7 +61,7 @@
                 </template>
 
                 <b-form-checkbox
-                  class="hover:bg-blue-50 "
+                  class="hover:bg-purple-50"
                   size="md"
                   v-model="selectedTagsMirror"
                   :value="tag"
@@ -173,7 +158,7 @@
           >Last tag: {{ selectedTags[selectedTags.length - 1].Label }}</span
         >
       </div>
-      <span class="text-blue-500 underline cursor-pointer" @click="clear()">CLEAR</span>
+      <span class="text-purple-500 underline cursor-pointer" @click="clear()">CLEAR</span>
     </template>
 
     <!-- <template v-if="isTagsExcluded">
@@ -194,41 +179,24 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import store from "@/store/page-overlay/index";
-import LocationPicker from "@/components/overlay-widget/shared/LocationPicker.vue";
-import StrainPicker from "@/components/overlay-widget/shared/StrainPicker.vue";
-import PickerCard from "@/components/overlay-widget/shared/PickerCard.vue";
 import AnimatedNumber from "@/components/overlay-widget/shared/AnimatedNumber.vue";
-import PasteTags from "./PasteTags.vue";
-import { MessageType, DATA_LOAD_MAX_COUNT } from "@/consts";
-import {
-  ILocationData,
-  IPlantData,
-  IMetrcMovePlantsPayload,
-  IPlantFilter,
-  IStrainData,
-  ITagFilter,
-  ITagData
-} from "@/interfaces";
-import { analyticsManager } from "@/modules/analytics-manager.module";
-import { authManager } from "@/modules/auth-manager.module";
-import { builderManager } from "@/modules/builder-manager.module";
-import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
-import { submitDateFromIsodate } from "@/utils/date";
-import { Subject, combineLatest } from "rxjs";
-import { debounceTime, distinctUntilChanged, startWith, tap, filter } from "rxjs/operators";
-import { buildCsvDataOrError, buildNamedCsvFileData } from "@/utils/csv";
 import ErrorReadout from "@/components/overlay-widget/shared/ErrorReadout.vue";
-import { v4 } from "uuid";
+import PickerCard from "@/components/overlay-widget/shared/PickerCard.vue";
+import { DATA_LOAD_MAX_COUNT } from "@/consts";
+import { ITagData } from "@/interfaces";
+import { authManager } from "@/modules/auth-manager.module";
+import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
 import { isValidTag } from "@/utils/tags";
 import _ from "lodash";
+import { v4 } from "uuid";
+import Vue from "vue";
+import PasteTags from "./PasteTags.vue";
 
 const PAGE_SIZE = 25;
 
 export enum SelectedMenuState {
   SELECTION = "Select Tags",
-  PASTED_TAGS = "Paste Tags"
+  PASTED_TAGS = "Paste Tags",
 }
 
 export default Vue.extend({
@@ -237,12 +205,12 @@ export default Vue.extend({
     PickerCard,
     ErrorReadout,
     AnimatedNumber,
-    PasteTags
+    PasteTags,
   },
   props: {
     tagTypeName: String as () => "CannabisPlant" | "CannabisPackage",
     tagCount: Number,
-    selectedTags: Array as () => ITagData[]
+    selectedTags: Array as () => ITagData[],
   },
   methods: {
     min(...a: number[]) {
@@ -260,7 +228,7 @@ export default Vue.extend({
       this.removeBefore(index);
       this.$data.selectedTagsMirror = [
         ...this.$data.sourceTags.slice(0, index),
-        ...this.$data.selectedTagsMirror
+        ...this.$data.selectedTagsMirror,
       ];
     },
     removeBefore(index: number) {
@@ -272,7 +240,7 @@ export default Vue.extend({
       this.removeAfter(index);
       this.$data.selectedTagsMirror = [
         ...this.$data.selectedTagsMirror,
-        ...this.$data.sourceTags.slice(index + 1)
+        ...this.$data.sourceTags.slice(index + 1),
       ];
     },
     removeAfter(index: number) {
@@ -297,7 +265,7 @@ export default Vue.extend({
         this.$data.lockUuid = lock;
 
         const tags = (await primaryDataLoader.availableTags({ useCache: false })).filter(
-          tag => tag.TagTypeName === this.$props.tagTypeName
+          (tag) => tag.TagTypeName === this.$props.tagTypeName
         );
 
         // If there was a subsequent load, don't overwrite
@@ -318,7 +286,7 @@ export default Vue.extend({
       }
 
       this.$data.inflight = false;
-    }
+    },
   },
   computed: {
     startTagInvalid(): boolean {
@@ -352,7 +320,7 @@ export default Vue.extend({
     },
     isPastedTags() {
       return this.$data.pastedTags.length > 0;
-    }
+    },
   },
   data() {
     return {
@@ -366,7 +334,7 @@ export default Vue.extend({
       lockUuid: null,
       pastedTags: [],
       selectedMenuState: SelectedMenuState,
-      selectedMenuItem: SelectedMenuState.SELECTION
+      selectedMenuItem: SelectedMenuState.SELECTION,
     };
   },
   watch: {
@@ -374,27 +342,27 @@ export default Vue.extend({
       immediate: true,
       handler() {
         this.$data.selectedTagsMirror = [...this.$data.sourceTags].slice(0, this.tagCount);
-      }
+      },
     },
     selectedTagsMirror: {
       immediate: true,
       handler(newValue, oldValue) {
         this.$emit("update:selectedTags", _.orderBy(newValue, "Label", "asc"));
-      }
+      },
     },
     pastedTags: {
       immediate: true,
       handler(newValue, oldValue) {
         this.filterSelectedByPastedTags();
-      }
-    }
+      },
+    },
   },
   async mounted() {},
   async created() {
     await authManager.authStateOrError();
 
     this.loadTags();
-  }
+  },
 });
 </script>
 

@@ -21,14 +21,14 @@
         <div class="flex flex-row justify-start">
           <template v-if="$route.path !== '/' && !activeProject">
             <span
-              class="text-lg font-bold cursor-pointer hover:bg-blue-50 p-4 rounded-lg"
+              class="text-lg font-bold cursor-pointer hover:bg-purple-50 p-4 rounded-lg"
               @click="exit()"
               style="color: #49276a"
               ><font-awesome-icon icon="chevron-left" />
             </span>
 
             <span
-              class="text-lg font-bold cursor-pointer hover:bg-blue-50 p-4 rounded-lg"
+              class="text-lg font-bold cursor-pointer hover:bg-purple-50 p-4 rounded-lg"
               @click="goHome()"
               style="color: #49276a"
               ><font-awesome-icon icon="home" />
@@ -54,7 +54,7 @@
 
         <div class="flex flex-row justify-end">
           <span
-            class="text-lg font-bold cursor-pointer hover:bg-blue-50 p-4 rounded-lg"
+            class="text-lg font-bold cursor-pointer hover:bg-purple-50 p-4 rounded-lg"
             @click="hide()"
             style="color: #777777"
             ><font-awesome-icon icon="times"

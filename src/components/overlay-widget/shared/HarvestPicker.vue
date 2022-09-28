@@ -18,7 +18,7 @@
     <template v-if="!error && harvestName.length > 0">
       <template v-if="harvestNameMatchesActiveHarvest">
         <template v-if="!harvestNameIsExpired && !harvestTypeMismatch">
-          <div class="text-center text-blue-700">
+          <div class="text-center text-purple-700">
             Adds to existing harvest
             <span class="font-bold">{{ harvestName }}</span
             >.
@@ -69,12 +69,12 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import store from "@/store/page-overlay/index";
+import ErrorReadout from "@/components/overlay-widget/shared/ErrorReadout.vue";
 import { IHarvestData } from "@/interfaces";
 import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
-import ErrorReadout from "@/components/overlay-widget/shared/ErrorReadout.vue";
 import { primaryMetrcRequestManager } from "@/modules/metrc-request-manager.module";
+import store from "@/store/page-overlay/index";
+import Vue from "vue";
 
 function msAgo(isodate: string): number {
   const now: number = Date.now();
@@ -91,7 +91,7 @@ export default Vue.extend({
   name: "HarvestPicker",
   store,
   components: {
-    ErrorReadout
+    ErrorReadout,
   },
   async mounted() {
     // @ts-ignore
@@ -99,7 +99,7 @@ export default Vue.extend({
   },
   props: {
     harvestName: String,
-    filterWholePlant: Boolean
+    filterWholePlant: Boolean,
   },
   data() {
     return {
@@ -110,7 +110,7 @@ export default Vue.extend({
       harvestNameMatchesActiveHarvest: false,
       harvestNameCheckInflight: false,
       harvestNameIsExpired: false,
-      harvestTypeMismatch: false
+      harvestTypeMismatch: false,
     };
   },
   watch: {
@@ -122,27 +122,27 @@ export default Vue.extend({
 
         // @ts-ignore
         this.checkForHarvestEligibility();
-      }
+      },
     },
     activeHarvests: {
       immediate: true,
       handler(newValue, oldValue) {
         // @ts-ignore
         this.checkForHarvestEligibility();
-      }
+      },
     },
     harvestNameQuery: {
       immediate: true,
       handler(newValue, oldValue) {
         // @ts-ignore
         this.$emit("update:harvestName", newValue);
-      }
-    }
+      },
+    },
   },
   computed: {
     harvestOptions() {
       return this.$data.activeHarvests.map((harvest: IHarvestData) => harvest.Name);
-    }
+    },
     // harvestNameMatchesActiveHarvest() {
     //   return (
     //     this.$data.activeHarvests.filter(
@@ -158,12 +158,11 @@ export default Vue.extend({
 
       try {
         this.$data.inflight = true;
-        this.$data.activeHarvests = (
-          await primaryDataLoader.activeHarvests()
-        ).filter((harvestData: IHarvestData) =>
-          this.$props.filterWholePlant
-            ? harvestData.HarvestType === "WholePlant"
-            : harvestData.HarvestType !== "WholePlant"
+        this.$data.activeHarvests = (await primaryDataLoader.activeHarvests()).filter(
+          (harvestData: IHarvestData) =>
+            this.$props.filterWholePlant
+              ? harvestData.HarvestType === "WholePlant"
+              : harvestData.HarvestType !== "WholePlant"
         );
       } catch (e) {
         this.$data.error = e;
@@ -227,7 +226,7 @@ export default Vue.extend({
           this.$data.harvestNameCheckInflight = false;
         }
       }
-    }
-  }
+    },
+  },
 });
 </script>

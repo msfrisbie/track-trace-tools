@@ -16,9 +16,7 @@
         </template>
 
         <template v-if="selectedPlantBatches.length >= maxPlantBatchCount">
-          <div class="font-bold text-red-700 text-center">
-            Plant Batch Maximum Reached
-          </div>
+          <div class="font-bold text-red-700 text-center">Plant Batch Maximum Reached</div>
           <div class="text-red-700 text-center">
             Can't load any more plant batches. Submit this chunk before loading the next chunk.
           </div>
@@ -46,7 +44,7 @@
     <div class="flex flex-col items-center space-y-4 p-4">
       <template v-if="sourcePlantBatches.length > 0">
         <b-dropdown
-          style="width:420px"
+          style="width: 420px"
           :text="selectedMenuItem.toUpperCase()"
           variant="outline-primary"
           class="w-full"
@@ -72,27 +70,11 @@
         <template v-if="selectedMenuItem === selectedMenuState.SELECTION">
           <div
             style="width: 420px"
-            class="
-              toolkit-scroll
-              flex flex-col
-              items-center
-              h-4/6
-              overflow-y-auto
-              p-1
-            "
+            class="toolkit-scroll flex flex-col items-center h-4/6 overflow-y-auto p-1"
           >
             <div class="w-full flex flex-col flex-grow items-center space-y-2">
               <div
-                class="
-                  w-full
-                  hover-reveal-target
-                  flex flex-row
-                  items-center
-                  justify-between
-                  space-x-8
-                  text-lg
-                  plantBatch-list-item
-                "
+                class="w-full hover-reveal-target flex flex-row items-center justify-between space-x-8 text-lg plantBatch-list-item"
                 v-for="(plantBatch, index) in plantBatchesPage"
                 :key="plantBatch.Label"
               >
@@ -108,7 +90,7 @@
                   </template>
 
                   <b-form-checkbox
-                    class="hover:bg-blue-50"
+                    class="hover:bg-purple-50"
                     size="md"
                     v-model="selectedPlantBatchesMirror"
                     :value="plantBatch"
@@ -173,7 +155,7 @@
         >
 
         <template v-if="selectedPlantBatches.length > 0">
-          <span class="text-blue-500 underline cursor-pointer" @click="clear()">CLEAR</span>
+          <span class="text-purple-500 underline cursor-pointer" @click="clear()">CLEAR</span>
         </template>
       </div>
 
@@ -185,31 +167,27 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import store from "@/store/page-overlay/index";
-import LocationPicker from "@/components/overlay-widget/shared/LocationPicker.vue";
-import StrainPicker from "@/components/overlay-widget/shared/StrainPicker.vue";
-import PickerCard from "@/components/overlay-widget/shared/PickerCard.vue";
 import AnimatedNumber from "@/components/overlay-widget/shared/AnimatedNumber.vue";
-import PasteTags from "./PasteTags.vue";
-import { MessageType, DATA_LOAD_MAX_COUNT, BuilderType } from "@/consts";
-import { ILocationData, IPlantBatchData, IPlantBatchFilter, IStrainData } from "@/interfaces";
-import { analyticsManager } from "@/modules/analytics-manager.module";
-import { authManager } from "@/modules/auth-manager.module";
-import { builderManager } from "@/modules/builder-manager.module";
-import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
-import { submitDateFromIsodate } from "@/utils/date";
-import { Subject, combineLatest } from "rxjs";
-import { debounceTime, distinctUntilChanged, startWith, tap, filter } from "rxjs/operators";
-import { buildCsvDataOrError, buildNamedCsvFileData } from "@/utils/csv";
 import ErrorReadout from "@/components/overlay-widget/shared/ErrorReadout.vue";
+import LocationPicker from "@/components/overlay-widget/shared/LocationPicker.vue";
+import PickerCard from "@/components/overlay-widget/shared/PickerCard.vue";
+import StrainPicker from "@/components/overlay-widget/shared/StrainPicker.vue";
+import { DATA_LOAD_MAX_COUNT } from "@/consts";
+import { ILocationData, IPlantBatchData, IPlantBatchFilter, IStrainData } from "@/interfaces";
+import { authManager } from "@/modules/auth-manager.module";
+import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
+import store from "@/store/page-overlay/index";
+import { combineLatest, Subject } from "rxjs";
+import { debounceTime, distinctUntilChanged, filter, startWith, tap } from "rxjs/operators";
 import { v4 } from "uuid";
+import Vue from "vue";
+import PasteTags from "./PasteTags.vue";
 
 const PAGE_SIZE = 100;
 
 export enum SelectedMenuState {
   SELECTION = "Select Plant Batches",
-  PASTED_TAGS = "Paste Plant Batch Tags"
+  PASTED_TAGS = "Paste Plant Batch Tags",
 }
 
 export default Vue.extend({
@@ -221,11 +199,11 @@ export default Vue.extend({
     ErrorReadout,
     PickerCard,
     AnimatedNumber,
-    PasteTags
+    PasteTags,
   },
   props: {
     builderType: String,
-    selectedPlantBatches: Array as () => IPlantBatchData[]
+    selectedPlantBatches: Array as () => IPlantBatchData[],
   },
   methods: {
     clear() {
@@ -284,7 +262,7 @@ export default Vue.extend({
 
         const plantBatches = await primaryDataLoader.plantBatches({
           filter,
-          maxCount: DATA_LOAD_MAX_COUNT
+          maxCount: DATA_LOAD_MAX_COUNT,
         });
 
         // If there was a subsequent load, don't overwrite
@@ -305,7 +283,7 @@ export default Vue.extend({
       }
 
       this.$data.inflight = false;
-    }
+    },
   },
   computed: {
     plantBatchesPage() {
@@ -335,7 +313,7 @@ export default Vue.extend({
     },
     isPastedTags() {
       return this.$data.pastedTags.length > 0;
-    }
+    },
   },
   data() {
     return {
@@ -353,7 +331,7 @@ export default Vue.extend({
       lockUuid: null,
       pastedTags: [],
       selectedMenuState: SelectedMenuState,
-      selectedMenuItem: SelectedMenuState.SELECTION
+      selectedMenuItem: SelectedMenuState.SELECTION,
     };
   },
   watch: {
@@ -361,26 +339,26 @@ export default Vue.extend({
       immediate: true,
       handler(newValue, oldValue) {
         this.$data.location$.next(newValue);
-      }
+      },
     },
     strain: {
       immediate: true,
       handler(newValue, oldValue) {
         this.$data.strain$.next(newValue);
-      }
+      },
     },
     selectedPlantBatchesMirror: {
       immediate: true,
       handler(newValue, oldValue) {
         this.$emit("update:selectedPlantBatches", newValue);
-      }
+      },
     },
     pastedTags: {
       immediate: true,
       handler(newValue, oldValue) {
         this.filterSelected();
-      }
-    }
+      },
+    },
   },
   async mounted() {},
   async created() {
@@ -388,7 +366,7 @@ export default Vue.extend({
 
     combineLatest([
       this.$data.location$.pipe(debounceTime(500), distinctUntilChanged(), startWith(null)),
-      this.$data.strain$.pipe(debounceTime(500), distinctUntilChanged(), startWith(null))
+      this.$data.strain$.pipe(debounceTime(500), distinctUntilChanged(), startWith(null)),
     ])
       .pipe(
         tap((_: any) => {
@@ -410,7 +388,7 @@ export default Vue.extend({
 
         this.loadPlantBatches();
       });
-  }
+  },
 });
 </script>
 

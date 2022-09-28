@@ -2,15 +2,7 @@
   <div class="flex flex-col">
     <div
       @click="setSearch(query)"
-      class="
-        flex flex-row
-        items-center
-        space-x-4
-        py-2 px-3
-        cursor-pointer
-        hover:bg-blue-200
-        text-lg
-      "
+      class="flex flex-row items-center space-x-4 py-2 px-3 cursor-pointer hover:bg-purple-200 text-lg"
       v-for="query in plantQueryStringHistory"
       :key="query"
     >
@@ -26,11 +18,11 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import store from "@/store/page-overlay/index";
 import { MessageType } from "@/consts";
 import { analyticsManager } from "@/modules/analytics-manager.module";
 import { searchManager } from "@/modules/search-manager.module";
+import store from "@/store/page-overlay/index";
+import Vue from "vue";
 import { mapState } from "vuex";
 export default Vue.extend({
   name: "PlantHistoryList",
@@ -40,14 +32,14 @@ export default Vue.extend({
       // @ts-ignore
       searchManager.plantQueryString.next(queryString);
       analyticsManager.track(MessageType.CLICKED_RECENT_PLANT_QUERY, {
-        queryString
+        queryString,
       });
-    }
+    },
   },
   computed: {
     ...mapState({
-      plantQueryStringHistory: (state: any) => state.plantSearch.plantQueryStringHistory
-    })
-  }
+      plantQueryStringHistory: (state: any) => state.plantSearch.plantQueryStringHistory,
+    }),
+  },
 });
 </script>

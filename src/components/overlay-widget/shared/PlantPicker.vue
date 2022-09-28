@@ -35,15 +35,13 @@
             <b-form-datepicker label-no-date-selected="" size="md" v-model="filterDate" />
           </b-form-group>
 
-          <span class="text-center text-blue-500 underline cursor-pointer" @click="clear()"
+          <span class="text-center text-purple-500 underline cursor-pointer" @click="clear()"
             >RESET</span
           >
         </template>
 
         <template v-if="selectedPlants.length >= maxPlantCount">
-          <div class="font-bold text-red-700 text-center">
-            Plant Maximum Reached
-          </div>
+          <div class="font-bold text-red-700 text-center">Plant Maximum Reached</div>
           <div class="text-red-700 text-center">
             Can't load any more plants. Submit this chunk before loading the next chunk.
           </div>
@@ -71,7 +69,7 @@
     <div class="flex flex-col items-center space-y-4 p-4">
       <template v-if="sourcePlants.length > 0">
         <b-dropdown
-          style="width:420px"
+          style="width: 420px"
           :text="selectedMenuItem.toUpperCase()"
           variant="outline-primary"
           class="w-full"
@@ -97,27 +95,11 @@
         <template v-if="selectedMenuItem === selectedMenuState.SELECTION">
           <div
             style="width: 420px"
-            class="
-              toolkit-scroll
-              flex flex-col
-              items-center
-              h-4/6
-              overflow-y-auto
-              p-1
-            "
+            class="toolkit-scroll flex flex-col items-center h-4/6 overflow-y-auto p-1"
           >
             <div class="w-full flex flex-col flex-grow items-center space-y-2">
               <div
-                class="
-                  w-full
-                  hover-reveal-target
-                  flex flex-row
-                  items-center
-                  justify-between
-                  space-x-8
-                  text-lg
-                  plant-list-item
-                "
+                class="w-full hover-reveal-target flex flex-row items-center justify-between space-x-8 text-lg plant-list-item"
                 v-for="(plant, index) in plantsPage"
                 :key="plant.Label"
               >
@@ -133,7 +115,7 @@
                   </template>
 
                   <b-form-checkbox
-                    class="hover:bg-blue-50"
+                    class="hover:bg-purple-50"
                     size="md"
                     v-model="selectedPlantsMirror"
                     :value="plant"
@@ -189,7 +171,7 @@
         >
 
         <template v-if="selectedPlants.length > 0">
-          <span class="text-blue-500 underline cursor-pointer" @click="clear()">CLEAR</span>
+          <span class="text-purple-500 underline cursor-pointer" @click="clear()">CLEAR</span>
         </template>
       </div>
 
@@ -201,37 +183,27 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import store from "@/store/page-overlay/index";
-import LocationPicker from "@/components/overlay-widget/shared/LocationPicker.vue";
-import StrainPicker from "@/components/overlay-widget/shared/StrainPicker.vue";
-import PickerCard from "@/components/overlay-widget/shared/PickerCard.vue";
 import AnimatedNumber from "@/components/overlay-widget/shared/AnimatedNumber.vue";
-import { MessageType, DATA_LOAD_MAX_COUNT } from "@/consts";
-import {
-  ILocationData,
-  IPlantData,
-  IMetrcMovePlantsPayload,
-  IPlantFilter,
-  IStrainData
-} from "@/interfaces";
-import { analyticsManager } from "@/modules/analytics-manager.module";
-import { authManager } from "@/modules/auth-manager.module";
-import { builderManager } from "@/modules/builder-manager.module";
-import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
-import { submitDateFromIsodate } from "@/utils/date";
-import { Subject, combineLatest } from "rxjs";
-import { debounceTime, distinctUntilChanged, startWith, tap, filter } from "rxjs/operators";
-import { buildCsvDataOrError, buildNamedCsvFileData } from "@/utils/csv";
 import ErrorReadout from "@/components/overlay-widget/shared/ErrorReadout.vue";
+import LocationPicker from "@/components/overlay-widget/shared/LocationPicker.vue";
+import PickerCard from "@/components/overlay-widget/shared/PickerCard.vue";
+import StrainPicker from "@/components/overlay-widget/shared/StrainPicker.vue";
+import { DATA_LOAD_MAX_COUNT } from "@/consts";
+import { ILocationData, IPlantData, IPlantFilter, IStrainData } from "@/interfaces";
+import { authManager } from "@/modules/auth-manager.module";
+import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
+import store from "@/store/page-overlay/index";
+import { combineLatest, Subject } from "rxjs";
+import { debounceTime, distinctUntilChanged, filter, startWith, tap } from "rxjs/operators";
 import { v4 } from "uuid";
+import Vue from "vue";
 import PasteTags from "./PasteTags.vue";
 
 const PAGE_SIZE = 100;
 
 export enum SelectedMenuState {
   SELECTION = "Select Plants",
-  PASTED_TAGS = "Paste Plant Tags"
+  PASTED_TAGS = "Paste Plant Tags",
 }
 
 export default Vue.extend({
@@ -243,11 +215,11 @@ export default Vue.extend({
     ErrorReadout,
     PickerCard,
     AnimatedNumber,
-    PasteTags
+    PasteTags,
   },
   props: {
     builderType: String,
-    selectedPlants: Array as () => IPlantData[]
+    selectedPlants: Array as () => IPlantData[],
   },
   methods: {
     clear() {
@@ -343,7 +315,7 @@ export default Vue.extend({
 
         const plants = await primaryDataLoader.floweringPlants({
           filter,
-          maxCount: DATA_LOAD_MAX_COUNT
+          maxCount: DATA_LOAD_MAX_COUNT,
         });
 
         // If there was a subsequent load, don't overwrite
@@ -364,7 +336,7 @@ export default Vue.extend({
       }
 
       this.$data.inflight = false;
-    }
+    },
   },
   computed: {
     plantsPage() {
@@ -392,7 +364,7 @@ export default Vue.extend({
     },
     isPastedTags() {
       return this.$data.pastedTags.length > 0;
-    }
+    },
   },
   data() {
     return {
@@ -415,17 +387,17 @@ export default Vue.extend({
       filterDateMatchOptions: [
         { value: "lt", text: "is before" },
         { value: "eq", text: "is on" },
-        { value: "gt", text: "is after" }
+        { value: "gt", text: "is after" },
       ],
       filterDateFieldOptions: [
         { value: null, text: "" },
         { value: "PlantedDate", text: "Planted date" },
-        { value: "FloweringDate", text: "Flowering date" }
+        { value: "FloweringDate", text: "Flowering date" },
       ],
       copyPasteTags: false,
       pastedTags: [],
       selectedMenuState: SelectedMenuState,
-      selectedMenuItem: SelectedMenuState.SELECTION
+      selectedMenuItem: SelectedMenuState.SELECTION,
     };
   },
   watch: {
@@ -433,13 +405,13 @@ export default Vue.extend({
       immediate: true,
       handler(newValue, oldValue) {
         this.$data.location$.next(newValue);
-      }
+      },
     },
     strain: {
       immediate: true,
       handler(newValue, oldValue) {
         this.$data.strain$.next(newValue);
-      }
+      },
     },
     filterDateField: {
       immediate: true,
@@ -447,9 +419,9 @@ export default Vue.extend({
         this.$data.dateFilterData$.next([
           this.$data.filterDateField,
           this.$data.filterDateMatch,
-          this.$data.filterDate
+          this.$data.filterDate,
         ]);
-      }
+      },
     },
     filterDateMatch: {
       immediate: true,
@@ -457,9 +429,9 @@ export default Vue.extend({
         this.$data.dateFilterData$.next([
           this.$data.filterDateField,
           this.$data.filterDateMatch,
-          this.$data.filterDate
+          this.$data.filterDate,
         ]);
-      }
+      },
     },
     filterDate: {
       immediate: true,
@@ -467,22 +439,22 @@ export default Vue.extend({
         this.$data.dateFilterData$.next([
           this.$data.filterDateField,
           this.$data.filterDateMatch,
-          this.$data.filterDate
+          this.$data.filterDate,
         ]);
-      }
+      },
     },
     selectedPlantsMirror: {
       immediate: true,
       handler(newValue, oldValue) {
         this.$emit("update:selectedPlants", newValue);
-      }
+      },
     },
     pastedTags: {
       immediate: true,
       handler(newValue, oldValue) {
         this.filterSelected();
-      }
-    }
+      },
+    },
   },
   async mounted() {},
   async created() {
@@ -495,7 +467,7 @@ export default Vue.extend({
         debounceTime(500),
         distinctUntilChanged(),
         startWith([null, null, null])
-      )
+      ),
     ])
       .pipe(
         tap((_: any) => {
@@ -526,7 +498,7 @@ export default Vue.extend({
           this.loadPlants();
         }
       );
-  }
+  },
 });
 </script>
 

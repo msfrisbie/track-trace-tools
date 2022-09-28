@@ -35,9 +35,7 @@
         </template>
 
         <template v-if="selectedPackages.length >= maxPackageCount">
-          <div class="font-bold text-red-700 text-center">
-            Package Maximum Reached
-          </div>
+          <div class="font-bold text-red-700 text-center">Package Maximum Reached</div>
           <div class="text-red-700 text-center">
             Can't load any more packages. Submit this chunk before loading the next chunk.
           </div>
@@ -91,27 +89,11 @@
         <template v-if="selectedMenuItem === selectedMenuState.SELECTION">
           <div
             style="width: 420px"
-            class="
-              toolkit-scroll
-              flex flex-col
-              items-center
-              h-4/6
-              overflow-y-auto
-              p-1
-            "
+            class="toolkit-scroll flex flex-col items-center h-4/6 overflow-y-auto p-1"
           >
             <div class="w-full flex flex-col flex-grow items-center space-y-2">
               <div
-                class="
-                  w-full
-                  hover-reveal-target
-                  flex flex-row
-                  items-center
-                  justify-between
-                  space-x-8
-                  text-lg
-                  package-list-item
-                "
+                class="w-full hover-reveal-target flex flex-row items-center justify-between space-x-8 text-lg package-list-item"
                 v-for="(pkg, index) in packagesPage"
                 :key="pkg.Label"
               >
@@ -127,7 +109,7 @@
                   </template>
 
                   <b-form-checkbox
-                    class="hover:bg-blue-50"
+                    class="hover:bg-purple-50"
                     size="md"
                     v-model="selectedPackagesMirror"
                     :value="pkg"
@@ -192,7 +174,7 @@
         >
 
         <template v-if="selectedPackages.length > 0">
-          <span class="text-blue-500 underline cursor-pointer" @click="clear()">CLEAR</span>
+          <span class="text-purple-500 underline cursor-pointer" @click="clear()">CLEAR</span>
         </template>
       </div>
 
@@ -204,40 +186,35 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import store from "@/store/page-overlay/index";
-import ItemPicker from "@/components/overlay-widget/shared/ItemPicker.vue";
-import PickerCard from "@/components/overlay-widget/shared/PickerCard.vue";
 import AnimatedNumber from "@/components/overlay-widget/shared/AnimatedNumber.vue";
+import ErrorReadout from "@/components/overlay-widget/shared/ErrorReadout.vue";
+import ItemPicker from "@/components/overlay-widget/shared/ItemPicker.vue";
+import LocationPicker from "@/components/overlay-widget/shared/LocationPicker.vue";
 import PasteTags from "@/components/overlay-widget/shared/PasteTags.vue";
-import { MessageType, DATA_LOAD_MAX_COUNT } from "@/consts";
+import PickerCard from "@/components/overlay-widget/shared/PickerCard.vue";
+import { DATA_LOAD_MAX_COUNT } from "@/consts";
 import {
-  IItemData,
-  IPackageData,
   IClientItemFilters,
   IClientLocationFilters,
   IClientPackagePickerFilters,
-  ILocationData
+  IItemData,
+  ILocationData,
+  IPackageData,
 } from "@/interfaces";
-import { analyticsManager } from "@/modules/analytics-manager.module";
 import { authManager } from "@/modules/auth-manager.module";
-import { builderManager } from "@/modules/builder-manager.module";
 import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
-import { submitDateFromIsodate } from "@/utils/date";
-import { Subject, combineLatest } from "rxjs";
-import { debounceTime, distinctUntilChanged, startWith, tap, filter } from "rxjs/operators";
-import { buildCsvDataOrError, buildNamedCsvFileData } from "@/utils/csv";
-import ErrorReadout from "@/components/overlay-widget/shared/ErrorReadout.vue";
-import { v4 } from "uuid";
+import store from "@/store/page-overlay/index";
 import { itemMatchesFilters } from "@/utils/filters";
-import LocationPicker from "@/components/overlay-widget/shared/LocationPicker.vue";
-import { searchManager } from "@/modules/search-manager.module";
+import { combineLatest, Subject } from "rxjs";
+import { debounceTime, distinctUntilChanged, filter, startWith, tap } from "rxjs/operators";
+import { v4 } from "uuid";
+import Vue from "vue";
 
 const PAGE_SIZE = 100;
 
 export enum SelectedMenuState {
   SELECTION = "Select Packages",
-  PASTED_TAGS = "Paste Package Tags"
+  PASTED_TAGS = "Paste Package Tags",
 }
 
 export default Vue.extend({
@@ -249,34 +226,34 @@ export default Vue.extend({
     PickerCard,
     AnimatedNumber,
     LocationPicker,
-    PasteTags
+    PasteTags,
   },
   props: {
     selectedPackages: Array as () => IPackageData[],
     packageFilters: {
       type: Object as () => IClientPackagePickerFilters,
       default: (): IClientPackagePickerFilters => ({}),
-      required: false
+      required: false,
     },
     itemFilters: {
       type: Object as () => IClientItemFilters,
-      default: (): IClientItemFilters => ({} as IClientItemFilters)
+      default: (): IClientItemFilters => ({} as IClientItemFilters),
     },
     locationFilters: {
       type: Object as () => IClientLocationFilters,
-      default: (): IClientLocationFilters => ({} as IClientLocationFilters)
+      default: (): IClientLocationFilters => ({} as IClientLocationFilters),
     },
     showItemPicker: {
       type: Boolean,
-      default: true
+      default: true,
     },
     showLocationPicker: {
       type: Boolean,
-      default: false
+      default: false,
     },
     eagerLoad: Boolean,
     itemFilterZeroResultsErrorSuggestionMessage: String,
-    locationFilterZeroResultsErrorSuggestionMessage: String
+    locationFilterZeroResultsErrorSuggestionMessage: String,
   },
   methods: {
     clear() {
@@ -327,7 +304,7 @@ export default Vue.extend({
         let allPackages = await primaryDataLoader.onDemandPackageFilter({
           itemName: this.$data.item?.Name || null,
           locationName: this.$data.location?.Name || null,
-          isEmpty: this.$props.packageFilters.isEmpty
+          isEmpty: this.$props.packageFilters.isEmpty,
         });
 
         // let allPackages = await primaryDataLoader.activePackages();
@@ -384,7 +361,7 @@ export default Vue.extend({
       }
 
       this.$data.inflight = false;
-    }
+    },
   },
   computed: {
     packagesPage() {
@@ -412,7 +389,7 @@ export default Vue.extend({
     },
     isPastedTags() {
       return this.$data.pastedTags.length > 0;
-    }
+    },
   },
   data() {
     return {
@@ -431,7 +408,7 @@ export default Vue.extend({
       copyPasteTags: false,
       pastedTags: [],
       selectedMenuState: SelectedMenuState,
-      selectedMenuItem: SelectedMenuState.SELECTION
+      selectedMenuItem: SelectedMenuState.SELECTION,
     };
   },
   watch: {
@@ -439,26 +416,26 @@ export default Vue.extend({
       immediate: true,
       handler(newValue, oldValue) {
         this.$data.item$.next(newValue);
-      }
+      },
     },
     location: {
       immediate: true,
       handler(newValue, oldValue) {
         this.$data.location$.next(newValue);
-      }
+      },
     },
     selectedPackagesMirror: {
       immediate: true,
       handler(newValue, oldValue) {
         this.$emit("update:selectedPackages", newValue);
-      }
+      },
     },
     pastedTags: {
       immediate: true,
       handler(newValue, oldValue) {
         this.filterSelected();
-      }
-    }
+      },
+    },
   },
   async created() {
     // Single time per pageload
@@ -470,7 +447,7 @@ export default Vue.extend({
 
     combineLatest([
       this.$data.item$.pipe(debounceTime(500), distinctUntilChanged(), startWith(null)),
-      this.$data.location$.pipe(debounceTime(500), distinctUntilChanged(), startWith(null))
+      this.$data.location$.pipe(debounceTime(500), distinctUntilChanged(), startWith(null)),
     ])
       .pipe(
         tap((_: any) => {
@@ -490,7 +467,7 @@ export default Vue.extend({
 
         this.loadPackages();
       });
-  }
+  },
 });
 </script>
 

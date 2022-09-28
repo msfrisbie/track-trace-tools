@@ -3,7 +3,7 @@
     <div class="grid grid-cols-2 gap-4" style="grid-template-columns: auto 1fr">
       <start-finish-icons
         :ellipsisCount="isSameSiteTransfer ? 6 : 13"
-        class="row-span-3 text-blue-500"
+        class="row-span-3 text-purple-500"
       />
 
       <template v-if="originFacility">
@@ -15,11 +15,7 @@
 
       <div class="py-8 flex flex-col space-y-0">
         <template v-if="!isSameSiteTransfer">
-          <b-form-group
-            label="DEPART"
-            label-class="text-gray-400"
-            label-size="sm"
-          >
+          <b-form-group label="DEPART" label-class="text-gray-400" label-size="sm">
             <b-input-group>
               <b-form-timepicker
                 v-model="departureIsotime"
@@ -40,11 +36,7 @@
             </b-input-group>
           </b-form-group>
 
-          <b-form-group
-            label="ARRIVE"
-            label-class="text-gray-400"
-            label-size="sm"
-          >
+          <b-form-group label="ARRIVE" label-class="text-gray-400" label-size="sm">
             <b-input-group>
               <b-form-timepicker
                 v-model="arrivalIsotime"
@@ -75,25 +67,22 @@
       </template>
     </div>
 
-    <div
-      class="row-span-2 flex flex-col items-center justify-center text-blue-500"
-    ></div>
+    <div class="row-span-2 flex flex-col items-center justify-center text-purple-500"></div>
   </div>
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import { mapState } from "vuex";
+import FacilitySummary from "@/components/overlay-widget/shared/FacilitySummary.vue";
+import StartFinishIcons from "@/components/overlay-widget/shared/StartFinishIcons.vue";
+import { BuilderType, MessageType } from "@/consts";
+import { analyticsManager } from "@/modules/analytics-manager.module";
 import router from "@/router/index";
 import store from "@/store/page-overlay/index";
-import { isotimeToNaiveTime, naiveTimeToIsotime } from "@/utils/time";
 import { TransferBuilderActions } from "@/store/page-overlay/modules/transfer-builder/consts";
-import { nowIsotime, todayIsodate, submitDateFromIsodate } from "@/utils/date";
-import StartFinishIcons from "@/components/overlay-widget/shared/StartFinishIcons.vue";
-import FacilitySummary from "@/components/overlay-widget/shared/FacilitySummary.vue";
-import _ from "lodash";
-import { analyticsManager } from "@/modules/analytics-manager.module";
-import { BuilderType, MessageType } from "@/consts";
+import { todayIsodate } from "@/utils/date";
+import { isotimeToNaiveTime, naiveTimeToIsotime } from "@/utils/time";
+import Vue from "vue";
+import { mapState } from "vuex";
 
 export default Vue.extend({
   name: "DepartureArrivalPicker",
@@ -106,35 +95,29 @@ export default Vue.extend({
   computed: {
     ...mapState({
       originFacility: (state: any) => state.transferBuilder.originFacility,
-      destinationFacility: (state: any) =>
-        state.transferBuilder.destinationFacility,
-      isSameSiteTransfer: (state: any) =>
-        state.transferBuilder.isSameSiteTransfer,
+      destinationFacility: (state: any) => state.transferBuilder.destinationFacility,
+      isSameSiteTransfer: (state: any) => state.transferBuilder.isSameSiteTransfer,
     }),
     departureIsodate: {
       get() {
         return this.$store.state.transferBuilder.departureIsodate;
       },
       set(departureIsodate) {
-        this.$store.dispatch(
-          `transferBuilder/${TransferBuilderActions.UPDATE_TRANSFER_DATA}`,
-          { departureIsodate }
-        );
+        this.$store.dispatch(`transferBuilder/${TransferBuilderActions.UPDATE_TRANSFER_DATA}`, {
+          departureIsodate,
+        });
       },
     },
     departureIsotime: {
       get() {
-        return isotimeToNaiveTime(
-          this.$store.state.transferBuilder.departureIsotime
-        );
+        return isotimeToNaiveTime(this.$store.state.transferBuilder.departureIsotime);
       },
       set(naiveDepartureTime: string) {
         const departureIsotime = naiveTimeToIsotime(naiveDepartureTime);
 
-        this.$store.dispatch(
-          `transferBuilder/${TransferBuilderActions.UPDATE_TRANSFER_DATA}`,
-          { departureIsotime }
-        );
+        this.$store.dispatch(`transferBuilder/${TransferBuilderActions.UPDATE_TRANSFER_DATA}`, {
+          departureIsotime,
+        });
       },
     },
     arrivalIsodate: {
@@ -142,25 +125,21 @@ export default Vue.extend({
         return this.$store.state.transferBuilder.arrivalIsodate;
       },
       set(arrivalIsodate) {
-        this.$store.dispatch(
-          `transferBuilder/${TransferBuilderActions.UPDATE_TRANSFER_DATA}`,
-          { arrivalIsodate }
-        );
+        this.$store.dispatch(`transferBuilder/${TransferBuilderActions.UPDATE_TRANSFER_DATA}`, {
+          arrivalIsodate,
+        });
       },
     },
     arrivalIsotime: {
       get() {
-        return isotimeToNaiveTime(
-          this.$store.state.transferBuilder.arrivalIsotime
-        );
+        return isotimeToNaiveTime(this.$store.state.transferBuilder.arrivalIsotime);
       },
       set(naiveArrivalTime: string) {
         const arrivalIsotime = naiveTimeToIsotime(naiveArrivalTime);
 
-        this.$store.dispatch(
-          `transferBuilder/${TransferBuilderActions.UPDATE_TRANSFER_DATA}`,
-          { arrivalIsotime }
-        );
+        this.$store.dispatch(`transferBuilder/${TransferBuilderActions.UPDATE_TRANSFER_DATA}`, {
+          arrivalIsotime,
+        });
       },
     },
   },

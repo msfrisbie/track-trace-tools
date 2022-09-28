@@ -26,14 +26,7 @@
 
     <template v-else>
       <div
-        class="
-          flex flex-col
-          items-center
-          text-lg
-          overflow-y-auto
-          toolkit-scroll
-          p-4
-        "
+        class="flex flex-col items-center text-lg overflow-y-auto toolkit-scroll p-4"
         style="max-height: 25vh"
       >
         <div class="grid grid-cols-2 gap-8" style="grid-template-columns: auto auto">
@@ -53,7 +46,9 @@
 
       <div class="text-center text-lg font-bold">{{ tags.length }} tags selected</div>
 
-      <span class="text-center text-blue-500 underline cursor-pointer" @click="clear()">CLEAR</span>
+      <span class="text-center text-purple-500 underline cursor-pointer" @click="clear()"
+        >CLEAR</span
+      >
     </template>
 
     <error-readout
@@ -70,27 +65,26 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import store from "@/store/page-overlay/index";
-import { ILocationData, ITagData } from "@/interfaces";
-import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
 import ErrorReadout from "@/components/overlay-widget/shared/ErrorReadout.vue";
 import PickerCard from "@/components/overlay-widget/shared/PickerCard.vue";
-import { DataLoadError, DataLoadErrorType } from "@/modules/data-loader/data-loader-error";
-import { isValidTag, generateTagRangeOrError, getTagFromOffset } from "@/utils/tags";
+import { ITagData } from "@/interfaces";
 import { authManager } from "@/modules/auth-manager.module";
+import { DataLoadError, DataLoadErrorType } from "@/modules/data-loader/data-loader-error";
+import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
+import { generateTagRangeOrError, getTagFromOffset, isValidTag } from "@/utils/tags";
 import _ from "lodash";
+import Vue from "vue";
 
 export default Vue.extend({
   name: "DeprecatedTagPicker",
   components: {
     PickerCard,
-    ErrorReadout
+    ErrorReadout,
   },
   props: {
     tagTypeName: String as () => "CannabisPlant" | "CannabisPackage",
     tagCount: Number,
-    tags: Array as () => ITagData[]
+    tags: Array as () => ITagData[],
   },
   computed: {
     startTagInvalid(): boolean {
@@ -98,7 +92,7 @@ export default Vue.extend({
     },
     tagTitle() {
       return this.tagTypeName === "CannabisPlant" ? "UNUSED PLANT TAG" : "UNUSED PACKAGE TAG";
-    }
+    },
   },
   data() {
     return {
@@ -107,7 +101,7 @@ export default Vue.extend({
       error: null,
       readout: null,
       availableTags: [],
-      selectedTags: []
+      selectedTags: [],
     };
   },
   methods: {
@@ -118,8 +112,8 @@ export default Vue.extend({
       try {
         this.$data.inflight = true;
         this.$data.availableTags = (await primaryDataLoader.availableTags({}))
-          .filter(tag => tag.TagTypeName === this.$props.tagTypeName)
-          .map(tag => tag.Label);
+          .filter((tag) => tag.TagTypeName === this.$props.tagTypeName)
+          .map((tag) => tag.Label);
       } catch (e) {
         this.$data.error = e;
         return;
@@ -144,7 +138,7 @@ export default Vue.extend({
       // @ts-ignore
       return this.generateTagRangeImpl(newValue);
     },
-    generateTagRangeImpl: _.debounce(async function(newValue: string | null) {
+    generateTagRangeImpl: _.debounce(async function (newValue: string | null) {
       // This is a sucky way of binding to this
       // @ts-ignore
       const _this: any = this;
@@ -171,7 +165,7 @@ export default Vue.extend({
         // Small number of
         if (tagRange.length < 100) {
           const tags: ITagData[] = (
-            await Promise.all(tagRange.map(tag => primaryDataLoader.availableTag(tag)))
+            await Promise.all(tagRange.map((tag) => primaryDataLoader.availableTag(tag)))
           ).filter((tagData: ITagData) => tagData.TagTypeName === _this.$props.tagTypeName);
 
           _this.$data.selectedTags = tags;
@@ -199,7 +193,7 @@ export default Vue.extend({
         _this.$data.inflight = false;
         _this.$data.readout = null;
       }
-    }, 500)
+    }, 500),
   },
   watch: {
     tagQuery: {
@@ -209,19 +203,19 @@ export default Vue.extend({
         // This is not operating correctly, creates a new fn instance each run
         // _.debounce(this.generateTagRange, 500)(newValue);
         this.generateTagRange(newValue);
-      }
+      },
     },
     selectedTags: {
       immediate: true,
       handler(newValue: any) {
         this.$emit("update:selectedTags", newValue);
-      }
-    }
+      },
+    },
   },
   async mounted() {
     await authManager.authStateOrError();
 
     this.loadTags();
-  }
+  },
 });
 </script>
