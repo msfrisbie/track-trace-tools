@@ -4,7 +4,7 @@
     id="promo-modal"
     modal-class="ttt-modal"
     dialog-class="flex flex-col justify-end"
-    size="xl"
+    size="md"
     :static="true"
     no-fade
     no-close-on-esc
