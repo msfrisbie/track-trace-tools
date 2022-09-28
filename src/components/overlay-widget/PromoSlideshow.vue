@@ -105,16 +105,28 @@
             <div>Track & Trace Tools stops Metrc's auto-logout.</div>
           </div>
         </template>
-        <template v-if="slide === 'buttons'">
+        <template v-if="slide === 'finalize'">
           <div class="text-gray-700 flex flex-col justify-around gap-2">
-            <div class="font-semibold ttt-purple">Stop clicking buttons!</div>
-            <div>Track & Trace Tools can void tags and finalize sales in bulk.</div>
+            <div class="font-semibold ttt-purple">Finalize sales in bulk!</div>
+            <div>TTT can auto-finalize all sales before a specific date.</div>
+          </div>
+        </template>
+        <template v-if="slide === 'tagvoid'">
+          <div class="text-gray-700 flex flex-col justify-around gap-2">
+            <div class="font-semibold ttt-purple">Void tags in bulk!</div>
+            <div>Track & Trace Tools can auto-void ranges of tags.</div>
           </div>
         </template>
         <template v-if="slide === 'snowflakes'">
           <div class="text-gray-700 flex flex-col justify-around gap-2">
             <div class="font-semibold ttt-purple">Snowflakes? How about noflakes!</div>
             <div>Track & Trace Tools removes the Metrc snowflakes.</div>
+          </div>
+        </template>
+        <template v-if="slide === 'settings'">
+          <div class="text-gray-700 flex flex-col justify-around gap-2">
+            <div class="font-semibold ttt-purple">Customize Track &amp; Trace Tools</div>
+            <div>Control and configure how TTT interacts with Metrc in Settings.</div>
           </div>
         </template>
         <template v-if="slide === 'share'">
@@ -226,8 +238,10 @@ export default Vue.extend({
       sliding: null,
       slides: _.shuffle([
         "review",
-        "buttons",
+        "finalize",
+        "tagvoid",
         "shortcuts",
+        "settings",
         "forum",
         "solutions",
         "opensource",
@@ -240,7 +254,6 @@ export default Vue.extend({
   },
   methods: {
     next() {
-      console.log("next");
       // @ts-ignore
       this.$refs.myCarousel.next();
     },
