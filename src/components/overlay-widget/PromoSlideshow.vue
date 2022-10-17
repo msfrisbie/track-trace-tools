@@ -26,7 +26,7 @@
             <div>
               <a
                 class="text-purple-500 underline"
-                href="https://chrome.google.com/webstore/detail/track-trace-tools/dfljickgkbfaoiifheibjpejloipegcb"
+                href="https://chrome.google.com/webstore/detail/track-trace-tools/dfljickgkbfaoiifheibjpejloipegcb/reviews"
                 target="_blank"
                 @click.stop
                 >Leave a review!</a
