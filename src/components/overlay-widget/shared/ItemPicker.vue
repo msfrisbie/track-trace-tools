@@ -9,7 +9,7 @@
             size="md"
             variant="primary"
             class="overflow-x-hidden"
-            style="max-width:400px"
+            style="max-width: 400px"
             disabled
             >{{ item.Name }}</b-button
           >
@@ -29,7 +29,7 @@
         <vue-typeahead-bootstrap
           v-model="itemQuery"
           :data="items"
-          :serializer="item => item.Name"
+          :serializer="(item) => item.Name"
           :minMatchingChars="0"
           :showOnFocus="true"
           :maxMatches="100"
@@ -59,20 +59,20 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import store from "@/store/page-overlay/index";
-import { IItemData, IClientItemFilters, IIndexedPackageData } from "@/interfaces";
-import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
 import ErrorReadout from "@/components/overlay-widget/shared/ErrorReadout.vue";
-import { itemMatchesFilters } from "@/utils/filters";
+import { IClientItemFilters, IIndexedPackageData, IItemData } from "@/interfaces";
 import { DataLoadError, DataLoadErrorType } from "@/modules/data-loader/data-loader-error";
+import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
+import store from "@/store/page-overlay/index";
+import { itemMatchesFilters } from "@/utils/filters";
 import _ from "lodash";
+import Vue from "vue";
 
 export default Vue.extend({
   name: "ItemPicker",
   store,
   components: {
-    ErrorReadout
+    ErrorReadout,
   },
   async mounted() {
     // @ts-ignore
@@ -83,26 +83,26 @@ export default Vue.extend({
     item: Object as () => IItemData,
     itemFilters: {
       type: Object as () => IClientItemFilters,
-      default: (): IClientItemFilters => ({} as IClientItemFilters)
+      default: (): IClientItemFilters => ({} as IClientItemFilters),
     },
     zeroResultsErrorSuggestionMessage: String,
-    selectOwnedItems: Boolean
+    selectOwnedItems: Boolean,
   },
   data() {
     return {
       itemQuery: "",
       inflight: false,
       error: null,
-      items: []
+      items: [],
     };
   },
   computed: {
     itemOptions() {
       return this.$data.items.map((item: IItemData) => ({
         text: item.Name,
-        value: item
+        value: item,
       }));
-    }
+    },
   },
   watch: {
     itemQuery: {
@@ -110,15 +110,15 @@ export default Vue.extend({
       handler(newValue, oldValue) {
         // @ts-ignore
         this.updateSourceItems();
-      }
+      },
     },
     item: {
       immediate: true,
       handler(newValue, oldValue) {
         // @ts-ignore
         this.$data.itemQuery = newValue?.Name || "";
-      }
-    }
+      },
+    },
   },
   methods: {
     async loadItems() {
@@ -137,7 +137,7 @@ export default Vue.extend({
 
         let items: IItemData[];
 
-        if (this.$data.selectOwnedItems) {
+        if (this.$props.selectOwnedItems) {
           items = await primaryDataLoader.items();
         } else {
           items = (
@@ -172,12 +172,12 @@ export default Vue.extend({
       // @ts-ignore
       this.updateSourceItemsImpl();
     },
-    updateSourceItemsImpl: _.debounce(async function() {
+    updateSourceItemsImpl: _.debounce(async function () {
       // @ts-ignore
       const _this: any = this;
 
       _this.loadItems();
-    }, 500)
-  }
+    }, 500),
+  },
 });
 </script>

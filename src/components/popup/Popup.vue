@@ -10,9 +10,9 @@
       >LICENSE</b-button
     >
 
-    <b-button variant="outline-primary" style="opacity: 0.5"
+    <!-- <b-button variant="outline-primary" style="opacity: 0.5"
       >LICENSE</b-button
-    >
+    > -->
 
     <div class="text-center text-gray-500">v{{ version }}</div>
   </div>
