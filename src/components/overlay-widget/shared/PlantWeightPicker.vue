@@ -33,8 +33,7 @@
 
       <div class="grid grid-cols-2 place-items-center">
         <b-form-group label="" label-size="sm">
-          <b-form-checkbox 
-            v-model="randomize"> Randomize weights </b-form-checkbox></b-form-group
+          <b-form-checkbox v-model="randomize"> Randomize weights </b-form-checkbox></b-form-group
         >
 
         <b-form-group label="Decimal places" label-size="sm">
@@ -105,7 +104,7 @@
 import { IPlantData } from "@/interfaces";
 import { dynamicConstsManager } from "@/modules/dynamic-consts-manager.module";
 import store from "@/store/page-overlay/index";
-import { normalDistribution } from "@/utils/math";
+import { evenDistribution, normalDistribution } from "@/utils/math";
 import Vue from "vue";
 
 const PAGE_SIZE = 100;
@@ -137,22 +136,22 @@ export default Vue.extend({
     },
     updatePlantWeights() {
       // Default to even split
-      let weights = Array(this.selectedPlants.length).fill(
-        
+      let weights = evenDistribution(
+        this.$data.totalWeight,
+        this.selectedPlants.length,
+        this.$data.precision
       );
 
       if (this.$data.randomize) {
         weights = normalDistribution(
-            this.$data.totalWeight,
-            this.selectedPlants.length,
-            this.$data.precision
-          )
-      }
-      this.$emit(
-          "update:plantWeights",
-          weights
+          this.$data.totalWeight,
+          this.selectedPlants.length,
+          this.$data.precision
         );
-    }
+      }
+
+      this.$emit("update:plantWeights", weights);
+    },
   },
   computed: {
     plantWeightsPage(): number[] {

@@ -35,6 +35,6 @@ describe("math.ts", () => {
 
   it("evenDistribution allocates values correctly", () => {
     expect(evenDistribution(100, 5, 3)).toEqual([20, 20, 20, 20, 20]);
-    expect(evenDistribution(50, 7, 2)).toEqual([7.16, 7.14, 7.14, 7.14, 7.14, 7.14]);
+    expect(evenDistribution(50, 7, 2)).toEqual([7.16, 7.14, 7.14, 7.14, 7.14, 7.14, 7.14]);
   });
 });
