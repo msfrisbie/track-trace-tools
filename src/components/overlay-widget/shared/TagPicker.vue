@@ -47,7 +47,7 @@
                       class="hover-reveal"
                       size="sm"
                       @click="addBefore(pageOffset + index)"
-                      >&#129045; CHECK {{ pageOffset + index }} BEFORE</b-button
+                      >CHECK {{ pageOffset + index }} BEFORE</b-button
                     >
 
                     <b-button
@@ -55,7 +55,7 @@
                       class="hover-reveal"
                       size="sm"
                       @click="removeBefore(pageOffset + index)"
-                      >&#129045; UNCHECK {{ pageOffset + index }} BEFORE</b-button
+                      >UNCHECK {{ pageOffset + index }} BEFORE</b-button
                     >
                   </div>
                 </template>
@@ -81,7 +81,7 @@
                       size="sm"
                       @click="addAfter(pageOffset + index)"
                     >
-                      &#129047; CHECK
+                      CHECK
                       {{ sourceTags.length - (pageOffset + index) - 1 }}
                       AFTER</b-button
                     >
@@ -92,7 +92,7 @@
                       size="sm"
                       @click="removeAfter(pageOffset + index)"
                     >
-                      &#129047; UNCHECK
+                      UNCHECK
                       {{ sourceTags.length - (pageOffset + index) - 1 }}
                       AFTER</b-button
                     >

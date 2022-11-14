@@ -85,7 +85,7 @@
                       class="hover-reveal"
                       size="sm"
                       @click="removeBefore(pageOffset + index)"
-                      >&#129045; UNCHECK {{ pageOffset + index }} BEFORE</b-button
+                      >UNCHECK {{ pageOffset + index }} BEFORE</b-button
                     >
                   </template>
 
@@ -108,7 +108,7 @@
                       size="sm"
                       @click="removeAfter(pageOffset + index)"
                     >
-                      &#129047; UNCHECK
+                      UNCHECK
                       {{ sourcePlantBatches.length - (pageOffset + index) - 1 }}
                       AFTER</b-button
                     >

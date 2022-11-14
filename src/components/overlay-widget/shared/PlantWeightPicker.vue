@@ -31,13 +31,19 @@
         </b-input-group>
       </b-form-group>
 
-      <b-form-group label="Decimal places" label-size="sm">
-        <b-form-select
-          size="sm"
-          v-model="precision"
-          :options="[1, 2, 3, 4].map(x => ({ text: x, value: x }))"
-        ></b-form-select
-      ></b-form-group>
+      <div class="grid grid-cols-2 place-items-center">
+        <b-form-group label="" label-size="sm">
+          <b-form-checkbox> Randomize weights </b-form-checkbox></b-form-group
+        >
+
+        <b-form-group label="Decimal places" label-size="sm">
+          <b-form-select
+            size="sm"
+            v-model="precision"
+            :options="[1, 2, 3, 4].map((x) => ({ text: x, value: x }))"
+          ></b-form-select
+        ></b-form-group>
+      </div>
 
       <p class="text-gray-500">
         Per plant weight is randomized. Sum of individual plant weights will equal this amount.
@@ -95,17 +101,17 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import store from "@/store/page-overlay/index";
 import { IPlantData } from "@/interfaces";
-import { normalDistribution } from "@/utils/math";
 import { dynamicConstsManager } from "@/modules/dynamic-consts-manager.module";
+import store from "@/store/page-overlay/index";
+import { normalDistribution } from "@/utils/math";
+import Vue from "vue";
 
 const PAGE_SIZE = 100;
 
 enum WeightMode {
   BULK = "BULK",
-  INDIVIDUAL = "INDIVIDUAL"
+  INDIVIDUAL = "INDIVIDUAL",
 }
 
 export default Vue.extend({
@@ -114,20 +120,20 @@ export default Vue.extend({
   props: {
     selectedPlants: {
       type: Array as () => IPlantData[],
-      default: []
+      default: [],
     },
     plantWeights: {
       type: Array as () => Number[],
-      default: []
+      default: [],
     },
-    unitOfWeight: Object
+    unitOfWeight: Object,
   },
   methods: {
     changePage(offset: number) {
       this.$data.plantWeightsPageIndex += offset;
       // @ts-ignore
       this.$refs.page.scrollTop = 0;
-    }
+    },
   },
   computed: {
     plantWeightsPage(): number[] {
@@ -155,7 +161,7 @@ export default Vue.extend({
     weightOptions(): Object[] {
       return this.$data.unitsOfWeight.map((unitOfWeight: any) => ({
         text: unitOfWeight.Name,
-        value: unitOfWeight
+        value: unitOfWeight,
       }));
     },
     bulkModeEnabled(): boolean {
@@ -163,7 +169,7 @@ export default Vue.extend({
     },
     individualModeEnabled(): boolean {
       return this.$data.mode === WeightMode.INDIVIDUAL;
-    }
+    },
   },
   data() {
     return {
@@ -174,7 +180,7 @@ export default Vue.extend({
       plantWeightsPageSize: PAGE_SIZE,
       error: null,
       unitsOfWeight: [],
-      precision: 2
+      precision: 2,
     };
   },
   watch: {
@@ -182,13 +188,13 @@ export default Vue.extend({
       immediate: true,
       handler(newValue, oldValue) {
         this.$emit("update:plantWeights", newValue);
-      }
+      },
     },
     unitOfWeight: {
       immediate: true,
       handler(newValue, oldValue) {
         this.$emit("update:unitOfWeight", newValue);
-      }
+      },
     },
     totalWeight: {
       immediate: true,
@@ -205,7 +211,7 @@ export default Vue.extend({
             this.$data.precision
           )
         );
-      }
+      },
     },
     precision: {
       immediate: true,
@@ -222,12 +228,12 @@ export default Vue.extend({
             this.$data.precision
           )
         );
-      }
-    }
+      },
+    },
   },
   async mounted() {
     this.$data.unitsOfWeight = await dynamicConstsManager.unitsOfWeight();
-  }
+  },
 });
 </script>
 

@@ -4,41 +4,29 @@
     <div class="flex flex-col items-center p-4">
       <div class="w-full flex flex-col space-y-4" style="width: 420px">
         <div class="flex flex-row items-center justify-center">
-          <span class="text-lg font-bold">Select plants by location:</span>
+          <span class="text-lg font-bold">Select one or more plant filters:</span>
         </div>
 
-        <location-picker :location.sync="location" />
+        <b-form-group label="Filter location:" label-class="text-gray-400" label-size="sm">
+          <location-picker :location.sync="location" />
+        </b-form-group>
 
-        <template v-if="location">
-          <b-form-group
-            label="Filter strain: (optional)"
-            label-class="text-gray-400"
-            label-size="sm"
-          >
-            <strain-picker :strain.sync="strain" />
-          </b-form-group>
+        <b-form-group label="Filter strain:" label-class="text-gray-400" label-size="sm">
+          <strain-picker :strain.sync="strain" />
+        </b-form-group>
 
-          <b-form-group label="Date filter: (optional)" label-class="text-gray-400" label-size="sm">
-            <b-input-group>
-              <b-form-select
-                size="md"
-                v-model="filterDateField"
-                :options="filterDateFieldOptions"
-              />
-              <b-form-select
-                size="md"
-                v-model="filterDateMatch"
-                :options="filterDateMatchOptions"
-              />
-            </b-input-group>
+        <b-form-group label="Filter date:" label-class="text-gray-400" label-size="sm">
+          <b-input-group>
+            <b-form-select size="md" v-model="filterDateField" :options="filterDateFieldOptions" />
+            <b-form-select size="md" v-model="filterDateMatch" :options="filterDateMatchOptions" />
+          </b-input-group>
 
-            <b-form-datepicker label-no-date-selected="" size="md" v-model="filterDate" />
-          </b-form-group>
+          <b-form-datepicker label-no-date-selected="" size="md" v-model="filterDate" />
+        </b-form-group>
 
-          <span class="text-center text-purple-500 underline cursor-pointer" @click="clear()"
-            >RESET</span
-          >
-        </template>
+        <span class="text-center text-purple-500 underline cursor-pointer" @click="clear()"
+          >RESET</span
+        >
 
         <template v-if="selectedPlants.length >= maxPlantCount">
           <div class="font-bold text-red-700 text-center">Plant Maximum Reached</div>
@@ -58,7 +46,9 @@
             v-on:retry="loadPlants()"
           />
 
-          <template v-if="!inflight && !sourcePlants.length && !!location">
+          <template
+            v-if="!inflight && !sourcePlants.length && (!location || !strain || filterDate)"
+          >
             <span>0 matching plants.</span>
           </template>
         </div>
@@ -110,7 +100,7 @@
                       class="hover-reveal"
                       size="sm"
                       @click="removeBefore(pageOffset + index)"
-                      >&#129045; UNCHECK {{ pageOffset + index }} BEFORE</b-button
+                      >UNCHECK {{ pageOffset + index }} BEFORE</b-button
                     >
                   </template>
 
@@ -130,7 +120,7 @@
                       size="sm"
                       @click="removeAfter(pageOffset + index)"
                     >
-                      &#129047; UNCHECK
+                      UNCHECK
                       {{ sourcePlants.length - (pageOffset + index) - 1 }}
                       AFTER</b-button
                     >
@@ -473,8 +463,8 @@ export default Vue.extend({
         tap((_: any) => {
           this.$data.plantsPageIndex = 0;
         }),
-        filter(([location, strain]) => {
-          return !!location;
+        filter(([location, strain, [filterDateField, filterDateMatch, filterDate]]) => {
+          return !!location || !!strain || !!filterDate;
         })
       )
       .subscribe(
