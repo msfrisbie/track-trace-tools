@@ -46,7 +46,8 @@
       </div>
 
       <p class="text-gray-500">
-        Per plant weight is randomized. Sum of individual plant weights will equal this amount.
+        <template v-if="randomize">Per plant weight is randomized. </template>
+        Sum of individual plant weights will equal this amount.
       </p>
     </template>
 
