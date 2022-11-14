@@ -47,7 +47,19 @@ export function normalDistribution(total: number, count: number, precision: numb
   return values;
 }
 
-export function evenDistribution(total: number, count: number): number[] {
+export function evenDistribution(total: number, count: number, precision: number): number[] {
+  const average = _.round(total / count, precision);
+
+  const values: number[] = Array(count).fill(average);
+
+  const offset = _.round(total - values.reduce((a, b) => a + b, 0), precision);
+
+  values[0] = _.round(values[0] + offset, precision);
+
+  return values;
+}
+
+export function evenIntegerDistribution(total: number, count: number): number[] {
   const values: number[] = [];
 
   const roundedAverage = Math.floor(total / count);

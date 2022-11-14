@@ -33,7 +33,8 @@
 
       <div class="grid grid-cols-2 place-items-center">
         <b-form-group label="" label-size="sm">
-          <b-form-checkbox> Randomize weights </b-form-checkbox></b-form-group
+          <b-form-checkbox 
+            v-model="randomize"> Randomize weights </b-form-checkbox></b-form-group
         >
 
         <b-form-group label="Decimal places" label-size="sm">
@@ -134,6 +135,24 @@ export default Vue.extend({
       // @ts-ignore
       this.$refs.page.scrollTop = 0;
     },
+    updatePlantWeights() {
+      // Default to even split
+      let weights = Array(this.selectedPlants.length).fill(
+        
+      );
+
+      if (this.$data.randomize) {
+        weights = normalDistribution(
+            this.$data.totalWeight,
+            this.selectedPlants.length,
+            this.$data.precision
+          )
+      }
+      this.$emit(
+          "update:plantWeights",
+          weights
+        );
+    }
   },
   computed: {
     plantWeightsPage(): number[] {
@@ -181,6 +200,7 @@ export default Vue.extend({
       error: null,
       unitsOfWeight: [],
       precision: 2,
+      randomize: false,
     };
   },
   watch: {
@@ -203,14 +223,7 @@ export default Vue.extend({
           return;
         }
 
-        this.$emit(
-          "update:plantWeights",
-          normalDistribution(
-            this.$data.totalWeight,
-            this.selectedPlants.length,
-            this.$data.precision
-          )
-        );
+        this.updatePlantWeights();
       },
     },
     precision: {
@@ -220,14 +233,17 @@ export default Vue.extend({
           return;
         }
 
-        this.$emit(
-          "update:plantWeights",
-          normalDistribution(
-            this.$data.totalWeight,
-            this.selectedPlants.length,
-            this.$data.precision
-          )
-        );
+        this.updatePlantWeights();
+      },
+    },
+    randomize: {
+      immediate: true,
+      handler(newValue, oldValue) {
+        if (!newValue) {
+          return;
+        }
+
+        this.updatePlantWeights();
       },
     },
   },

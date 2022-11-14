@@ -1,4 +1,4 @@
-import { evenDistribution, fStrip } from "./math";
+import { evenDistribution, evenIntegerDistribution, fStrip } from "./math";
 
 describe("math.ts", () => {
   it("fStrip correctly rounds 0.1 + 0.2", () => {
@@ -21,15 +21,20 @@ describe("math.ts", () => {
     expect(fStrip(-0.00000000000000001)).toEqual(0);
   });
 
+  it("evenIntegerDistribution allocates values correctly", () => {
+    expect(evenIntegerDistribution(100, 5)).toEqual([20, 20, 20, 20, 20]);
+    expect(evenIntegerDistribution(3, 5)).toEqual([1, 1, 1, 0, 0]);
+    expect(evenIntegerDistribution(0, 5)).toEqual([0, 0, 0, 0, 0]);
+    expect(evenIntegerDistribution(100, 1)).toEqual([100]);
+    expect(evenIntegerDistribution(99, 2)).toEqual([50, 49]);
+    expect(evenIntegerDistribution(101, 2)).toEqual([51, 50]);
+    expect(evenIntegerDistribution(99, 4)).toEqual([25, 25, 25, 24]);
+    expect(evenIntegerDistribution(101, 4)).toEqual([26, 25, 25, 25]);
+    expect(evenIntegerDistribution(102, 4)).toEqual([26, 26, 25, 25]);
+  });
+
   it("evenDistribution allocates values correctly", () => {
-    expect(evenDistribution(100, 5)).toEqual([20, 20, 20, 20, 20]);
-    expect(evenDistribution(3, 5)).toEqual([1, 1, 1, 0, 0]);
-    expect(evenDistribution(0, 5)).toEqual([0, 0, 0, 0, 0]);
-    expect(evenDistribution(100, 1)).toEqual([100]);
-    expect(evenDistribution(99, 2)).toEqual([50, 49]);
-    expect(evenDistribution(101, 2)).toEqual([51, 50]);
-    expect(evenDistribution(99, 4)).toEqual([25, 25, 25, 24]);
-    expect(evenDistribution(101, 4)).toEqual([26, 25, 25, 25]);
-    expect(evenDistribution(102, 4)).toEqual([26, 26, 25, 25]);
+    expect(evenDistribution(100, 5, 3)).toEqual([20, 20, 20, 20, 20]);
+    expect(evenDistribution(50, 7, 2)).toEqual([7.16, 7.14, 7.14, 7.14, 7.14, 7.14]);
   });
 });

@@ -16,10 +16,10 @@ import {
   IPlantOptions,
   IStrainData,
   ITagData,
-  IUnitOfMeasure
+  IUnitOfMeasure,
 } from "@/interfaces";
 import store from "@/store/page-overlay/index";
-import { evenDistribution } from "@/utils/math";
+import { evenIntegerDistribution } from "@/utils/math";
 import { generateTagRangeOrError, getTagFromOffset } from "@/utils/tags";
 import { sum } from "lodash";
 /**
@@ -45,7 +45,7 @@ const DO_SI_DOS_STRAIN: IStrainData = {
   Name: "Do-si-Dos",
   SativaPercentage: 0,
   TestingStatus: "None",
-  ThcLevel: null
+  ThcLevel: null,
 };
 const ICE_CREAM_CAKE_STRAIN: IStrainData = {
   CbdLevel: null,
@@ -56,7 +56,7 @@ const ICE_CREAM_CAKE_STRAIN: IStrainData = {
   Name: "Ice Cream Cake",
   SativaPercentage: 0,
   TestingStatus: "None",
-  ThcLevel: null
+  ThcLevel: null,
 };
 
 const VAPE_CARTRIDGE_ITEM: IItemData = {
@@ -101,7 +101,7 @@ const VAPE_CARTRIDGE_ITEM: IItemData = {
   UnitVolume: 1,
   UnitVolumeUnitOfMeasureAbbreviation: "ml",
   UnitWeight: null,
-  UnitWeightUnitOfMeasureAbbreviation: null
+  UnitWeightUnitOfMeasureAbbreviation: null,
 };
 
 const HARVESTED_FLOWER_ITEM: IItemData = {
@@ -146,7 +146,7 @@ const HARVESTED_FLOWER_ITEM: IItemData = {
   UnitVolume: null,
   UnitVolumeUnitOfMeasureAbbreviation: null,
   UnitWeight: null,
-  UnitWeightUnitOfMeasureAbbreviation: null
+  UnitWeightUnitOfMeasureAbbreviation: null,
 };
 
 const CLONE_ITEM: IItemData = {
@@ -191,7 +191,7 @@ const CLONE_ITEM: IItemData = {
   UnitVolume: null,
   UnitVolumeUnitOfMeasureAbbreviation: null,
   UnitWeight: null,
-  UnitWeightUnitOfMeasureAbbreviation: null
+  UnitWeightUnitOfMeasureAbbreviation: null,
 };
 
 const TEMPLATE_ITEMS: IItemData[] = [
@@ -237,7 +237,7 @@ const TEMPLATE_ITEMS: IItemData[] = [
     UnitVolume: null,
     UnitVolumeUnitOfMeasureAbbreviation: null,
     UnitWeight: null,
-    UnitWeightUnitOfMeasureAbbreviation: null
+    UnitWeightUnitOfMeasureAbbreviation: null,
   },
   {
     AdministrationMethod: "",
@@ -281,8 +281,8 @@ const TEMPLATE_ITEMS: IItemData[] = [
     UnitVolume: null,
     UnitVolumeUnitOfMeasureAbbreviation: null,
     UnitWeight: null,
-    UnitWeightUnitOfMeasureAbbreviation: null
-  }
+    UnitWeightUnitOfMeasureAbbreviation: null,
+  },
 ];
 
 const ROW_01_LOCATION: ILocationData = {
@@ -294,7 +294,7 @@ const ROW_01_LOCATION: ILocationData = {
   IsArchived: false,
   LocationTypeId: 1,
   LocationTypeName: "Default Location Type",
-  Name: "Row 01"
+  Name: "Row 01",
 };
 const FROZEN_STORAGE_LOCATION: ILocationData = {
   ForHarvests: true,
@@ -305,7 +305,7 @@ const FROZEN_STORAGE_LOCATION: ILocationData = {
   IsArchived: false,
   LocationTypeId: 1,
   LocationTypeName: "Default Location Type",
-  Name: "Frozen Storage"
+  Name: "Frozen Storage",
 };
 
 const NEW_HARVEST: IHarvestData = {
@@ -338,7 +338,7 @@ const NEW_HARVEST: IHarvestData = {
   TotalWasteWeight: 0,
   TotalWetWeight: 120.5,
   UnitOfWeightAbbreviation: "lb",
-  UnitOfWeightId: 3
+  UnitOfWeightId: 3,
 };
 
 const OLD_HARVEST: IHarvestData = {
@@ -371,21 +371,21 @@ const OLD_HARVEST: IHarvestData = {
   TotalWasteWeight: 0,
   TotalWetWeight: 120.5,
   UnitOfWeightAbbreviation: "lb",
-  UnitOfWeightId: 3
+  UnitOfWeightId: 3,
 };
 
 const NEW_MANICURE: IHarvestData = {
   ...NEW_HARVEST,
   HarvestType: "Manicure",
   Name: "New Manicure",
-  Id: 30000003
+  Id: 30000003,
 };
 
 const OLD_MANICURE: IHarvestData = {
   ...OLD_HARVEST,
   HarvestType: "Manicure",
   Name: "Old Manicure",
-  Id: 30000004
+  Id: 30000004,
 };
 
 class MockDataManager implements IAtomicService {
@@ -431,7 +431,7 @@ class MockDataManager implements IAtomicService {
         PlantedDate: OLD_DATE,
         StateName: "",
         StrainName: options.filter?.strainName || DO_SI_DOS_STRAIN.Name,
-        VegetativeDate: null
+        VegetativeDate: null,
       });
     }
 
@@ -440,8 +440,8 @@ class MockDataManager implements IAtomicService {
 
   mockPlantBatches(options: IPlantBatchOptions): IPlantBatchData[] {
     const mockPlantBatches: IPlantBatchData[] = [];
-    const plantBatchCount = store.state.flags?.mockedFlags.mockPlantBatches.behavior
-      .plantBatchCount!;
+    const plantBatchCount =
+      store.state.flags?.mockedFlags.mockPlantBatches.behavior.plantBatchCount!;
 
     const firstTag = "AB0000000000000000000001";
     const lastTag = getTagFromOffset(firstTag, plantBatchCount - 1);
@@ -466,7 +466,7 @@ class MockDataManager implements IAtomicService {
         StrainName: options.filter?.strainName || DO_SI_DOS_STRAIN.Name,
         TrackedCount: 0,
         TypeName: "",
-        UntrackedCount: 72
+        UntrackedCount: 72,
       });
     }
 
@@ -492,7 +492,7 @@ class MockDataManager implements IAtomicService {
     const packageSum: number = sum(
       Object.values(store.state.flags?.mockedFlags.mockPackages.behavior!).map(Number)
     );
-    const packageDistribution: number[] = evenDistribution(packageSum, 4);
+    const packageDistribution: number[] = evenIntegerDistribution(packageSum, 4);
 
     if (this._mockPackages.length > 0) {
       return this._mockPackages;
@@ -564,7 +564,7 @@ class MockDataManager implements IAtomicService {
           TransferPackageStateName: null,
           UnitOfMeasureAbbreviation: "lb",
           UnitOfMeasureId: 3,
-          UnitOfMeasureQuantityType: "WeightBased"
+          UnitOfMeasureQuantityType: "WeightBased",
         });
         continue;
       }
@@ -629,7 +629,7 @@ class MockDataManager implements IAtomicService {
           TransferPackageStateName: null,
           UnitOfMeasureAbbreviation: "ea",
           UnitOfMeasureId: 1,
-          UnitOfMeasureQuantityType: "CountBased"
+          UnitOfMeasureQuantityType: "CountBased",
         });
         continue;
       }
@@ -694,7 +694,7 @@ class MockDataManager implements IAtomicService {
           TransferPackageStateName: null,
           UnitOfMeasureAbbreviation: "ea",
           UnitOfMeasureId: 1,
-          UnitOfMeasureQuantityType: "CountBased"
+          UnitOfMeasureQuantityType: "CountBased",
         });
         continue;
       }
@@ -759,7 +759,7 @@ class MockDataManager implements IAtomicService {
           TransferPackageStateName: null,
           UnitOfMeasureAbbreviation: "lb",
           UnitOfMeasureId: 3,
-          UnitOfMeasureQuantityType: "WeightBased"
+          UnitOfMeasureQuantityType: "WeightBased",
         });
         continue;
       }
@@ -825,7 +825,7 @@ class MockDataManager implements IAtomicService {
           TagTypeName: "CannabisPlant",
           UsedDateTime: "",
           CommissionedDateTime: OLD_DATETIME,
-          DetachedDateTime: ""
+          DetachedDateTime: "",
         });
         continue;
       }
@@ -840,7 +840,7 @@ class MockDataManager implements IAtomicService {
           TagTypeName: "CannabisPackage",
           UsedDateTime: "",
           CommissionedDateTime: OLD_DATETIME,
-          DetachedDateTime: ""
+          DetachedDateTime: "",
         });
         continue;
       }
@@ -855,16 +855,16 @@ class MockDataManager implements IAtomicService {
     return [
       {
         Id: 5001,
-        Name: "Each"
+        Name: "Each",
       },
       {
         Id: 5004,
-        Name: "Grams"
+        Name: "Grams",
       },
       {
         Id: 5002,
-        Name: "Pounds"
-      }
+        Name: "Pounds",
+      },
     ];
   }
 
@@ -884,14 +884,14 @@ class MockDataManager implements IAtomicService {
         Name: "Clone",
         Id: 0,
         CanBeCloned: true,
-        LastModified: ""
+        LastModified: "",
       },
       {
         Name: "Seed",
         Id: 1,
         CanBeCloned: true,
-        LastModified: ""
-      }
+        LastModified: "",
+      },
     ];
   }
 
@@ -934,10 +934,10 @@ class MockDataManager implements IAtomicService {
           PostalCode: "94704",
           Country: "",
           AssessorParcelNumber: "",
-          IsArchived: false
+          IsArchived: false,
         },
         MainPhoneNumber: "(123) 456-7890",
-        MobilePhoneNumber: "(123) 456-7890"
+        MobilePhoneNumber: "(123) 456-7890",
       },
       {
         Id: 104,
@@ -960,11 +960,11 @@ class MockDataManager implements IAtomicService {
           PostalCode: "94704",
           Country: "",
           AssessorParcelNumber: "",
-          IsArchived: false
+          IsArchived: false,
         },
         MainPhoneNumber: "(123) 456-7890",
-        MobilePhoneNumber: "(123) 456-7890"
-      }
+        MobilePhoneNumber: "(123) 456-7890",
+      },
     ];
   }
 
@@ -991,10 +991,10 @@ class MockDataManager implements IAtomicService {
           PostalCode: "94709",
           Country: "",
           AssessorParcelNumber: "",
-          IsArchived: false
+          IsArchived: false,
         },
         MainPhoneNumber: "(123) 456-7890",
-        MobilePhoneNumber: "(123) 456-7890"
+        MobilePhoneNumber: "(123) 456-7890",
       },
       {
         Id: 102,
@@ -1017,11 +1017,11 @@ class MockDataManager implements IAtomicService {
           PostalCode: "94709",
           Country: "",
           AssessorParcelNumber: "",
-          IsArchived: false
+          IsArchived: false,
         },
         MainPhoneNumber: "(123) 456-7890",
-        MobilePhoneNumber: "(123) 456-7890"
-      }
+        MobilePhoneNumber: "(123) 456-7890",
+      },
     ];
   }
 
@@ -1051,9 +1051,9 @@ class MockDataManager implements IAtomicService {
         FacilityTypes: [
           {
             FacilityTypeId: 209,
-            FacilityTypeName: "Cannabis - Microbusiness License"
-          }
-        ]
+            FacilityTypeName: "Cannabis - Microbusiness License",
+          },
+        ],
       },
       {
         Id: 116,
@@ -1079,9 +1079,9 @@ class MockDataManager implements IAtomicService {
         FacilityTypes: [
           {
             FacilityTypeId: 209,
-            FacilityTypeName: "Cannabis - Microbusiness License"
-          }
-        ]
+            FacilityTypeName: "Cannabis - Microbusiness License",
+          },
+        ],
       },
       {
         Id: 1,
@@ -1107,9 +1107,9 @@ class MockDataManager implements IAtomicService {
         FacilityTypes: [
           {
             FacilityTypeId: 209,
-            FacilityTypeName: "Cannabis - Microbusiness License"
-          }
-        ]
+            FacilityTypeName: "Cannabis - Microbusiness License",
+          },
+        ],
       },
       {
         Id: 111,
@@ -1135,10 +1135,10 @@ class MockDataManager implements IAtomicService {
         FacilityTypes: [
           {
             FacilityTypeId: 209,
-            FacilityTypeName: "Cannabis - Microbusiness License"
-          }
-        ]
-      }
+            FacilityTypeName: "Cannabis - Microbusiness License",
+          },
+        ],
+      },
     ];
   }
 
@@ -1147,18 +1147,18 @@ class MockDataManager implements IAtomicService {
       {
         DriverName: "Driver One",
         DriverOccupationalLicenseNumber: "Driver1",
-        DriverVehicleLicenseNumber: "DRV00001"
+        DriverVehicleLicenseNumber: "DRV00001",
       },
       {
         DriverName: "Driver Two",
         DriverOccupationalLicenseNumber: "Driver2",
-        DriverVehicleLicenseNumber: "DRV00002"
+        DriverVehicleLicenseNumber: "DRV00002",
       },
       {
         DriverName: "Driver Three",
         DriverOccupationalLicenseNumber: "Driver3",
-        DriverVehicleLicenseNumber: "DRV00003"
-      }
+        DriverVehicleLicenseNumber: "DRV00003",
+      },
     ];
   }
 
@@ -1167,18 +1167,18 @@ class MockDataManager implements IAtomicService {
       {
         VehicleMake: "Ford",
         VehicleModel: "F-150",
-        VehicleLicensePlateNumber: "1111111"
+        VehicleLicensePlateNumber: "1111111",
       },
       {
         VehicleMake: "Ford",
         VehicleModel: "F-250",
-        VehicleLicensePlateNumber: "2222222"
+        VehicleLicensePlateNumber: "2222222",
       },
       {
         VehicleMake: "Ford",
         VehicleModel: "F-350",
-        VehicleLicensePlateNumber: "3333333"
-      }
+        VehicleLicensePlateNumber: "3333333",
+      },
     ];
   }
 }

@@ -116,7 +116,7 @@ import DualColorTag from "@/components/overlay-widget/shared/DualColorTag.vue";
 import { IPlantBatchData, IPlantBatchType, IPlantData } from "@/interfaces";
 import store from "@/store/page-overlay/index";
 import { splitMax } from "@/utils/array";
-import { evenDistribution } from "@/utils/math";
+import { evenIntegerDistribution } from "@/utils/math";
 import { sum } from "lodash";
 import Vue from "vue";
 
@@ -225,7 +225,7 @@ export default Vue.extend({
     maximumPerBatch: {
       immediate: true,
       handler(newValue, oldValue) {
-        const matrix: number[][] = evenDistribution(
+        const matrix: number[][] = evenIntegerDistribution(
           this.$data.totalCount,
           this.selectedMothers.length
         ).map((x) => splitMax(x, newValue));
@@ -246,9 +246,10 @@ export default Vue.extend({
           return;
         }
 
-        const matrix: number[][] = evenDistribution(newValue, this.selectedMothers.length).map(
-          (x) => splitMax(x, this.$data.maximumPerBatch)
-        );
+        const matrix: number[][] = evenIntegerDistribution(
+          newValue,
+          this.selectedMothers.length
+        ).map((x) => splitMax(x, this.$data.maximumPerBatch));
 
         this.updateChildMatrix(matrix);
       },
