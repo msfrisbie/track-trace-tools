@@ -199,7 +199,7 @@ export default Vue.extend({
       error: null,
       unitsOfWeight: [],
       precision: 2,
-      randomize: false,
+      randomize: localStorage.getItem("plantWeightPickerRandomize") === "true",
     };
   },
   watch: {
@@ -238,9 +238,8 @@ export default Vue.extend({
     randomize: {
       immediate: true,
       handler(newValue, oldValue) {
-        if (!newValue) {
-          return;
-        }
+        console.log(newValue);
+        localStorage.setItem("plantWeightPickerRandomize", newValue);
 
         this.updatePlantWeights();
       },

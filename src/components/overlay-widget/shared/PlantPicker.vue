@@ -19,9 +19,13 @@
           <b-input-group>
             <b-form-select size="md" v-model="filterDateField" :options="filterDateFieldOptions" />
             <b-form-select size="md" v-model="filterDateMatch" :options="filterDateMatchOptions" />
+            <b-form-datepicker
+              button-only
+              label-no-date-selected=""
+              size="md"
+              v-model="filterDate"
+            />
           </b-input-group>
-
-          <b-form-datepicker label-no-date-selected="" size="md" v-model="filterDate" />
         </b-form-group>
 
         <span class="text-center text-purple-500 underline cursor-pointer" @click="clear()"
