@@ -179,11 +179,33 @@ export default Vue.extend({
     pluralRowDescriptor() {
       switch (this.$data.activeProject.builderType) {
         case BuilderType.UNPACK_IMMATURE_PLANTS:
-          return "plantings";
+        case BuilderType.CREATE_IMMATURE_PLANTS_FROM_MOTHER:
+        case BuilderType.PROMOTE_IMMATURE_PLANTS:
+        case BuilderType.UNPACK_IMMATURE_PLANTS:
+          return "plant batches";
         case BuilderType.CREATE_ITEMS:
           return "items";
-        default:
+        case BuilderType.ADJUST_PACKAGE:
+        case BuilderType.CREATE_HARVEST_PACKAGE:
+        case BuilderType.CREATE_IMMATURE_PLANT_PACKAGES_FROM_MOTHER_PLANT:
+        case BuilderType.CREATE_IMMATURE_PLANT_PACKAGES_FROM_MOTHER_PLANT_BATCH:
+        case BuilderType.FINISH_PACKAGES:
+        case BuilderType.MERGE_PACKAGES:
+        case BuilderType.REMEDIATE_PACKAGE:
+        case BuilderType.SPLIT_PACKAGE:
+        case BuilderType.PACK_IMMATURE_PLANTS:
+        case BuilderType.MOVE_PACKAGES:
+          return "packages";
+        case BuilderType.CREATE_TRANSFER:
+        case BuilderType.CREATE_TRANSFER_TEMPLATE:
+          return "transfers";
+        case BuilderType.DESTROY_PLANTS:
+        case BuilderType.HARVEST_PLANTS:
+        case BuilderType.MANICURE_PLANTS:
+        case BuilderType.MOVE_PLANTS:
           return "plants";
+        default:
+          return "entries";
       }
     },
     isHarvestProject() {
