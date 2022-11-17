@@ -7,7 +7,7 @@
     <!-- <ttt-permissions-button /> -->
 
     <b-button variant="outline-primary" @click="openStandalone()" style="opacity: 0.5"
-      >LICENSE</b-button
+      >GUIDE</b-button
     >
 
     <!-- <b-button variant="outline-primary" style="opacity: 0.5"
@@ -48,14 +48,23 @@ export default Vue.extend({
 </script>
 
 <style type="text/scss" lang="scss">
-@import "node_modules/bootstrap-vue/dist/bootstrap-vue";
-@import "node_modules/bootstrap/dist/css/bootstrap";
+@import "@/scss/bootstrap-theme";
+
 @import "node_modules/tailwindcss/dist/base";
 @import "node_modules/tailwindcss/dist/components";
 @import "node_modules/tailwindcss/dist/utilities";
 
+@import "@/scss/bootstrap-override";
+
+@import "@/scss/misc";
+@import "@/scss/fonts";
+
 html {
   /* Firefox doesnt seem to collapse, this allows for cross-browser compat */
   min-width: 300px;
+}
+
+body {
+  font-family: "Roboto", sans-serif;
 }
 </style>

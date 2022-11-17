@@ -222,3 +222,37 @@ browser.permissions.onAdded.addListener((permissions: any) => {
     options: {},
   });
 });
+
+try {
+  // Fired when:
+  // - the extension is first installed
+  // - the extension is updated to a new version
+  // - the browser is updated to a new version.
+  chrome.runtime.onInstalled.addListener((details) => {
+    if (details.reason === chrome.runtime.OnInstalledReason.UPDATE) {
+      logEvent(`UPDATED_VERSION`, {}, {});
+    }
+    if (details.reason === chrome.runtime.OnInstalledReason.INSTALL) {
+      logEvent(`NEW_INSTALL`, {}, {});
+
+      // Acquire the welcome page URL
+      let url = chrome.runtime.getURL("index.html");
+
+      // // Open the welcome page in a new tab .
+      chrome.tabs.create({ url });
+    }
+
+    // TODO
+    chrome.runtime.setUninstallURL("");
+  });
+} catch (e) {
+  console.error(e);
+}
+
+chrome.action.onClicked.addListener(() => {
+  // Acquire the welcome page URL
+  let url = chrome.runtime.getURL("index.html");
+
+  // // Open the welcome page in a new tab .
+  chrome.tabs.create({ url });
+});

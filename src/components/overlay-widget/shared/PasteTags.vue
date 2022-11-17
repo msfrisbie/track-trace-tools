@@ -6,7 +6,7 @@
       :value="tagsText"
       @input="updateTags($event)"
       placeholder="EXAMPLE00000000000001234, EXAMPLE00000000000005678"
-      rows="8"
+      rows="3"
       :state="invalidTags"
     ></b-form-textarea>
 
@@ -17,10 +17,9 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
 import store from "@/store/page-overlay/index";
-import _ from "lodash";
 import { isValidTag } from "@/utils/tags";
+import Vue from "vue";
 
 export default Vue.extend({
   name: "PlantPicker",
@@ -35,11 +34,11 @@ export default Vue.extend({
       return this.$data.tagsText.split(/[\n ]+/).filter((x: string) => x.length > 0);
     },
     validTags(): string[] {
-      return this.potentialTags().filter(x => isValidTag(x));
+      return this.potentialTags().filter((x) => isValidTag(x));
     },
     clearForm() {
       this.$data.tagsText = "";
-    }
+    },
   },
   computed: {
     invalidTags(): boolean | null {
@@ -48,16 +47,16 @@ export default Vue.extend({
       }
 
       return this.potentialTags().length === this.validTags().length;
-    }
+    },
   },
   data() {
     return {
-      tagsText: ""
+      tagsText: "",
     };
   },
   watch: {},
   async mounted() {},
-  async created() {}
+  async created() {},
 });
 </script>
 

@@ -13,7 +13,6 @@
     "service_worker": "js/background.js"
   },
   "action": {
-    "default_popup": "popup.html",
     "default_title": "__MSG_extName__",
     "default_icon": {
       "16": "icons/logo/logo-square-16.png",

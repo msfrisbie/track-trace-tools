@@ -3,12 +3,12 @@
 </template>
 
 <script lang="ts">
+import { MessageType } from "@/consts";
+import { analyticsManager } from "@/modules/analytics-manager.module";
+import { messageBus } from "@/modules/message-bus.module";
+import { BootstrapVue } from "bootstrap-vue";
 import Vue from "vue";
 import VueRouter from "vue-router";
-import { BootstrapVue } from "bootstrap-vue";
-import { analyticsManager } from "@/modules/analytics-manager.module";
-import { MessageType } from "@/consts";
-import { messageBus } from "@/modules/message-bus.module";
 import router from "./router";
 
 Vue.use(VueRouter);
@@ -22,20 +22,23 @@ export default Vue.extend({
     messageBus.init();
     analyticsManager.track(MessageType.VIEWED_STANDALONE_PAGE);
   },
-  methods: {}
+  methods: {},
 });
 </script>
 
 <style type="text/scss" lang="scss">
-@import "node_modules/bootstrap-vue/dist/bootstrap-vue";
-@import "node_modules/bootstrap/dist/css/bootstrap";
+@import "@/scss/bootstrap-theme";
+
 @import "node_modules/tailwindcss/dist/base";
 @import "node_modules/tailwindcss/dist/components";
 @import "node_modules/tailwindcss/dist/utilities";
 
-body {
-}
+@import "@/scss/bootstrap-override";
 
-html {
+@import "@/scss/misc";
+@import "@/scss/fonts";
+
+body {
+  font-family: "Roboto", sans-serif;
 }
 </style>
