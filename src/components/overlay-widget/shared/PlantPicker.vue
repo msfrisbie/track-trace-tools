@@ -99,13 +99,23 @@
               >
                 <div class="flex flex-col flex-grow space-y-2">
                   <template v-if="pageOffset + index > 0">
-                    <b-button
-                      variant="warning"
-                      class="hover-reveal"
-                      size="sm"
-                      @click="removeBefore(pageOffset + index)"
-                      >UNCHECK {{ pageOffset + index }} BEFORE</b-button
-                    >
+                    <div class="grid grid-cols-2 gap-2 mb-2">
+                      <b-button
+                        variant="outline-success"
+                        class="hover-reveal"
+                        size="sm"
+                        @click="addBefore(pageOffset + index)"
+                        >CHECK {{ pageOffset + index }} BEFORE</b-button
+                      >
+
+                      <b-button
+                        variant="outline-danger"
+                        class="hover-reveal"
+                        size="sm"
+                        @click="removeBefore(pageOffset + index)"
+                        >UNCHECK {{ pageOffset + index }} BEFORE</b-button
+                      >
+                    </div>
                   </template>
 
                   <b-form-checkbox
@@ -118,16 +128,29 @@
                   </b-form-checkbox>
 
                   <template v-if="sourcePlants.length - (pageOffset + index) - 1 > 0">
-                    <b-button
-                      variant="warning"
-                      class="hover-reveal"
-                      size="sm"
-                      @click="removeAfter(pageOffset + index)"
-                    >
-                      UNCHECK
-                      {{ sourcePlants.length - (pageOffset + index) - 1 }}
-                      AFTER</b-button
-                    >
+                    <div class="grid grid-cols-2 gap-2 mt-2">
+                      <b-button
+                        variant="outline-success"
+                        class="hover-reveal"
+                        size="sm"
+                        @click="addAfter(pageOffset + index)"
+                      >
+                        CHECK
+                        {{ sourcePlants.length - (pageOffset + index) - 1 }}
+                        AFTER</b-button
+                      >
+
+                      <b-button
+                        variant="outline-danger"
+                        class="hover-reveal"
+                        size="sm"
+                        @click="removeAfter(pageOffset + index)"
+                      >
+                        UNCHECK
+                        {{ sourcePlants.length - (pageOffset + index) - 1 }}
+                        AFTER</b-button
+                      >
+                    </div>
                   </template>
                 </div>
               </div>
@@ -230,10 +253,24 @@ export default Vue.extend({
       // @ts-ignore
       this.$refs.pasteTags.clearForm();
     },
+    addBefore(index: number) {
+      this.removeBefore(index);
+      this.$data.selectedPlantsMirror = [
+        ...this.$data.sourcePlants.slice(0, index),
+        ...this.$data.selectedPlantsMirror,
+      ];
+    },
     removeBefore(index: number) {
       this.$data.selectedPlantsMirror = this.$data.sourcePlants
         .slice(index)
         .filter((x: IPlantData) => this.$props.selectedPlants.includes(x));
+    },
+    addAfter(index: number) {
+      this.removeAfter(index);
+      this.$data.selectedPlantsMirror = [
+        ...this.$data.selectedPlantsMirror,
+        ...this.$data.sourcePlants.slice(index + 1),
+      ];
     },
     removeAfter(index: number) {
       this.$data.selectedPlantsMirror = this.$data.sourcePlants
