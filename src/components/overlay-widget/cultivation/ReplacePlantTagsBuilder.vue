@@ -67,7 +67,7 @@
 
     <template v-if="activeStepIndex === 2">
       <div class="flex-grow" style="height: 35vh">
-        <template v-if="allDetailsProvided">
+        <template v-if="allDetailsProvided && tagsSelected">
           <div class="flex flex-col items-center">
             <div class="flex flex-col space-y-4 text-xl" style="width: 600px">
               <div>
@@ -228,7 +228,10 @@ export default Vue.extend({
   },
   computed: {
     allDetailsProvided() {
-      return this.$data.selectedPlants.length > 0 && !!this.$data.actualIsodate;
+      return (
+        this.$data.selectedPlants.length > 0 &&
+        !!this.$data.actualIsodate
+      );
     },
     tagsSelected() {
       return (

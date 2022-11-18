@@ -150,7 +150,7 @@ export default Vue.extend({
           icon: "tags",
           backgroundColor: "#48b867",
           enabled: isCurrentHostAllowed([HOST_WILDCARD]),
-          isBeta: false,
+          isBeta: true,
         },
         {
           route: "/cultivator/retag-plant-batches",
@@ -158,7 +158,7 @@ export default Vue.extend({
           icon: "tags",
           backgroundColor: "#48b867",
           enabled: isCurrentHostAllowed([HOST_WILDCARD]),
-          isBeta: false,
+          isBeta: true,
         },
         // {
         //   route: "/cultivator/create-harvest-package",
