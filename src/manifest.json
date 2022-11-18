@@ -20,6 +20,10 @@
       "128": "icons/logo/logo-square-128.png"
     }
   },
+  "options_ui": {
+    "page": "index.html",
+    "open_in_tab": true
+  },
   "content_scripts": [
     {
       "matches": ["https://*.metrc.com/*", "http://localhost:5000/*"],
