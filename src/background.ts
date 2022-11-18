@@ -242,8 +242,7 @@ try {
       chrome.tabs.create({ url });
     }
 
-    // TODO
-    chrome.runtime.setUninstallURL("");
+    chrome.runtime.setUninstallURL("https://trackandtrace.tools/uninstall");
   });
 } catch (e) {
   console.error(e);

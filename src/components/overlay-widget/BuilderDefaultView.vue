@@ -190,6 +190,16 @@ export default Vue.extend({
           isNew: false,
         },
         {
+          backgroundColor: "gray",
+          text: "COMMUNITY",
+          icon: "users",
+          visible: true,
+          enabled: true,
+          isBeta: false,
+          isNew: false,
+          url: "https://track-trace-tools.talkyard.net/",
+        },
+        {
           backgroundColor: "black",
           text: "ADMIN",
           route: "/admin",
