@@ -2,6 +2,12 @@
   <b-tab title="Changelog"
     ><b-card-text class="flex flex-col gap-4 items-center">
       <div class="max-w-lg flex flex-col gap-4">
+        <p class="text-2xl ttt-purple">v0.5.1</p>
+
+        <ul class="list-disc">
+          <li>Fix timezone handling of date selection</li>
+        </ul>
+
         <p class="text-2xl ttt-purple">v0.5.0</p>
 
         <ul class="list-disc">
