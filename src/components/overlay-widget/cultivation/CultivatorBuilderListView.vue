@@ -144,6 +144,22 @@ export default Vue.extend({
           enabled: isCurrentHostAllowed([HOST_WILDCARD]),
           isBeta: false,
         },
+        {
+          route: "/cultivator/retag-plants",
+          text: "RETAG PLANTS",
+          icon: "tags",
+          backgroundColor: "#48b867",
+          enabled: isCurrentHostAllowed([HOST_WILDCARD]),
+          isBeta: false,
+        },
+        {
+          route: "/cultivator/retag-plant-batches",
+          text: "RETAG PLANT BATCHES",
+          icon: "tags",
+          backgroundColor: "#48b867",
+          enabled: isCurrentHostAllowed([HOST_WILDCARD]),
+          isBeta: false,
+        },
         // {
         //   route: "/cultivator/create-harvest-package",
         //   text: "CREATE HARVEST PACKAGE",
