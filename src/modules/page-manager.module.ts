@@ -232,7 +232,7 @@ class PageManager implements IAtomicService {
     this.plantsTabs = document.querySelectorAll("#plants_tabstrip li.k-item") as NodeList;
 
     // Eagerly modify
-    timer(0, 1000).subscribe(() => this.modifyPageAtInterval());
+    timer(0, 2500).subscribe(() => this.modifyPageAtInterval());
 
     const debouncedHandler = _.debounce(() => this.modifyPageOnDomChange(), 100);
 
@@ -499,6 +499,8 @@ class PageManager implements IAtomicService {
   }
 
   private async modifyPageOnDomChange() {
+    this.modifyPageAtInterval();
+
     this.updatePromoModal();
   }
 
