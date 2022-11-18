@@ -14,6 +14,8 @@ import {
   IMetrcMovePackagesPayload,
   IMetrcMovePlantsPayload,
   IMetrcPromoteImmaturePlantsPayload,
+  IMetrcReplacePlantBatchTagsPayload,
+  IMetrcReplacePlantTagsPayload,
   IMetrcUnpackImmaturePlantsPayload,
 } from "@/interfaces";
 import { primaryMetrcRequestManager } from "@/modules/metrc-request-manager.module";
@@ -109,7 +111,9 @@ class BuilderManager implements IAtomicService {
       | IMetrcCreatePlantBatchPackagesFromMotherPlantBatchPayload[]
       | IMetrcCreateTransferPayload[]
       | IMetrcCreateStateAuthorizedTransferPayload[]
-      | IMetrcCreateItemsPayload[],
+      | IMetrcCreateItemsPayload[]
+      | IMetrcReplacePlantBatchTagsPayload[]
+      | IMetrcReplacePlantTagsPayload[],
     builderType: BuilderType,
     summary: Object,
     csvFiles: ICsvFile[],
@@ -140,7 +144,9 @@ class BuilderManager implements IAtomicService {
       | IMetrcCreatePlantBatchPackagesFromMotherPlantBatchPayload[]
       | IMetrcCreateTransferPayload[]
       | IMetrcCreateStateAuthorizedTransferPayload[]
-      | IMetrcCreateItemsPayload[],
+      | IMetrcCreateItemsPayload[]
+      | IMetrcReplacePlantBatchTagsPayload[]
+      | IMetrcReplacePlantTagsPayload[],
     builderType: BuilderType,
     summary: Object,
     csvFiles: ICsvFile[],
@@ -357,6 +363,12 @@ class BuilderManager implements IAtomicService {
         break;
       case BuilderType.CREATE_ITEMS:
         response = await primaryMetrcRequestManager.createItems(JSON.stringify(rows));
+        break;
+      case BuilderType.REPLACE_PLANT_TAGS:
+        response = await primaryMetrcRequestManager.replacePlantTags(JSON.stringify(rows));
+        break;
+      case BuilderType.REPLACE_PLANT_BATCH_TAGS:
+        response = await primaryMetrcRequestManager.replacePlantBatchTags(JSON.stringify(rows));
         break;
       default:
         throw new Error("Bad builder type: " + builderType);

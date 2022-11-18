@@ -1004,6 +1004,18 @@ export interface IMetrcManicurePlantsPayload {
   UnitOfWeightId: string;
 }
 
+export interface IMetrcReplacePlantTagsPayload {
+  ActualDate: string;
+  Id: string;
+  TagId: string;
+}
+
+export interface IMetrcReplacePlantBatchTagsPayload {
+  ActualDate: string;
+  Id: string;
+  TagId: string;
+}
+
 // Quantity will be positive, so "3" means "decreased by 3"
 export interface IPackageIngredient {
   FinishDate: string;
