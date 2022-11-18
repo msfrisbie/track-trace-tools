@@ -2,6 +2,13 @@
   <b-tab title="Changelog"
     ><b-card-text class="flex flex-col gap-4 items-center">
       <div class="max-w-lg flex flex-col gap-4">
+        <p class="text-2xl ttt-purple">v0.5.0</p>
+
+        <ul class="list-disc">
+          <li>Unify tag picker interface</li>
+          <li>Add replace tags tools for plants and plant batches</li>
+        </ul>
+
         <p class="text-2xl ttt-purple">v0.4.0</p>
 
         <ul class="list-disc">
