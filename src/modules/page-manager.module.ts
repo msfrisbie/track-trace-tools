@@ -10,14 +10,19 @@ import {
   TabKey,
   TagFilterIdentifiers,
   TransferFilterIdentifiers,
+  TTT_DARK_MODE,
+  TTT_LIGHT_MODE,
+  TTT_SNOWFLAKES,
 } from "@/consts";
 import {
+  DarkModeState,
   IAtomicService,
   IAuthState,
   IPackageSearchFilters,
   IPageMetrcFacilityData,
   ITagSearchFilters,
   ITransferSearchFilters,
+  SnowflakeState,
 } from "@/interfaces";
 import { toastManager } from "@/modules/toast-manager.module";
 import { MutationType } from "@/mutation-types";
@@ -416,7 +421,8 @@ class PageManager implements IAtomicService {
       }
 
       this.controlLogoutBar(store.state.settings.preventLogout);
-      this.controlSnowflakeAnimation(store.state.settings.disableSnowAnimation);
+      this.controlSnowflakeAnimation(store.state.settings.snowflakeState);
+      this.controlDarkMode(store.state.settings.darkModeState);
       this.togglePageVisibilityClasses();
 
       if (window.location.pathname.match(PACKAGE_TAB_REGEX)) {
@@ -2424,9 +2430,42 @@ class PageManager implements IAtomicService {
     }
   }
 
-  private controlSnowflakeAnimation(hide: boolean) {
+  private controlSnowflakeAnimation(state: SnowflakeState) {
     if (this.snowflakeCanvas) {
-      this.snowflakeCanvas.style.display = hide ? "none" : "block";
+      this.snowflakeCanvas.style.display = "block";
+    }
+
+    document.body.classList.remove(TTT_SNOWFLAKES);
+
+    switch (state) {
+      case SnowflakeState.ENABLED:
+        break;
+      case SnowflakeState.CSS:
+        if (this.snowflakeCanvas) {
+          this.snowflakeCanvas.style.display = "none";
+        }
+        document.body.classList.add(TTT_SNOWFLAKES);
+        break;
+      case SnowflakeState.DISABLED:
+      default:
+        if (this.snowflakeCanvas) {
+          this.snowflakeCanvas.style.display = "none";
+        }
+        break;
+    }
+  }
+
+  private controlDarkMode(state: DarkModeState) {
+    document.body.classList.remove(TTT_DARK_MODE, TTT_LIGHT_MODE);
+
+    switch (state) {
+      case DarkModeState.ENABLED:
+        document.body.classList.add(TTT_DARK_MODE);
+        break;
+      case DarkModeState.DISABLED:
+      default:
+        document.body.classList.add(TTT_LIGHT_MODE);
+        break;
     }
   }
 

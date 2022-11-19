@@ -29,12 +29,24 @@ export interface IAtomicService {
   init: () => Promise<void>;
 }
 
+export enum DarkModeState {
+  ENABLED = "ENABLED",
+  DISABLED = "DISABLED",
+}
+
+export enum SnowflakeState {
+  ENABLED = "ENABLED",
+  CSS = "CSS",
+  DISABLED = "DISABLED",
+}
+
 export interface ISettings {
   autoOpenActivePackages: boolean;
   autoOpenActiveSales: boolean;
   autoOpenAvailableTags: boolean;
   autoOpenFloweringPlants: boolean;
   autoOpenIncomingTransfers: boolean;
+  darkModeState: DarkModeState;
   disablePopups: boolean;
   disableSnowAnimation: boolean;
   hideFacilityPicker: boolean;
@@ -49,6 +61,8 @@ export interface ISettings {
   plantDefaultPageSize: number;
   preventLogout: boolean;
   salesDefaultPageSize: number;
+  snowflakeState: SnowflakeState;
+  snowflakeCharacter: string;
   tagDefaultPageSize: number;
   transferDefaultPageSize: number;
   useLegacyScreenshot: boolean;

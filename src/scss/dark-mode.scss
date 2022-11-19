@@ -1,0 +1,66 @@
+// Artifically increase specificity
+html body {
+}
+
+html body.ttt-light-mode {
+}
+
+$dark-gray: rgb(50, 50, 50);
+$light-gray: rgb(100, 100, 100);
+
+html body.ttt-dark-mode {
+  & {
+    background-image: none;
+    background-color: $dark-gray;
+  }
+
+  .row-fluid,
+  .k-widget {
+    div.well,
+    div.k-header,
+    div.k-content,
+    div.k-widget,
+    div.k-content,
+    div.report-block,
+    div.form-actions,
+    div.form-horizontal,
+    div.k-grid-norecords,
+    tr:not(.k-state-selected),
+    th,
+    legend,
+    span.k-link {
+      color: white;
+      background-color: $light-gray;
+    }
+
+    button,
+    span.k-dropdown-wrap,
+    span.add-on,
+    tr.k-alt:not(.k-state-selected) {
+      color: white;
+      background-color: $dark-gray;
+    }
+
+    button {
+      background-image: none;
+      text-shadow: none;
+    }
+
+    span,
+    a.k-link {
+      color: white;
+    }
+
+    .k-window-titlebar {
+      background-color: black;
+      color: white;
+    }
+  }
+
+  .k-window {
+    td {
+      color: white;
+      background-color: $light-gray !important;
+    }
+  }
+}

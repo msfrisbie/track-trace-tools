@@ -1,6 +1,10 @@
 // export const AMPLITUDE_API_KEY = "d8942f92e0928f9d52d13846c97d353d";
 export const AMPLITUDE_API_KEY = "13b63639e3682c360d938c2ebb900252";
 
+export const TTT_LIGHT_MODE = 'ttt-light-mode';
+export const TTT_DARK_MODE = 'ttt-dark-mode';
+export const TTT_SNOWFLAKES = 'ttt-snowflakes';
+
 export enum ToolkitView {
   ADD_PACKAGE_NOTE = "ADD_PACKAGE_NOTE",
   CREATE_CSV = "CREATE_CSV",

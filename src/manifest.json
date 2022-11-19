@@ -30,6 +30,12 @@
       "run_at": "document_end",
       "js": ["js/content-script.js"],
       "css": ["css/content-script.css"]
+    },
+    {
+      "matches": ["https://*.metrc.com/*", "http://localhost:5000/*"],
+      "run_at": "document_start",
+      "js": [],
+      "css": []
     }
   ],
   "web_accessible_resources": [

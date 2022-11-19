@@ -15,7 +15,43 @@
             Prevent Metrc from logging me out
           </b-form-checkbox>
 
-          <b-form-checkbox
+          <!-- <b-form-checkbox
+            id="checkbox-darkModeState"
+            class="mb-2"
+            v-model="settings.darkModeState"
+            name="checkbox-darkModeState"
+            @change="onChange()"
+          >
+            Dark mode
+          </b-form-checkbox> -->
+
+          <b-form-group label="Dark mode (beta)">
+            <b-form-select
+              :options="darkModeStateOptions"
+              @change="onChange()"
+              v-model="settings.darkModeState"
+            ></b-form-select>
+          </b-form-group>
+
+          <b-form-group label="Snowflakes">
+            <b-input-group>
+              <b-form-select
+                style="flex-basis: 75%"
+                :options="snowflakeStateOptions"
+                @change="onChange()"
+                v-model="settings.snowflakeState"
+              ></b-form-select>
+
+              <b-form-select
+                v-if="settings.snowflakeState === 'CSS'"
+                :options="snowflakeIconOptions"
+                @change="onChange()"
+                v-model="settings.snowflakeCharacter"
+              ></b-form-select>
+            </b-input-group>
+          </b-form-group>
+
+          <!-- <b-form-checkbox
             id="checkbox-disableSnowAnimation"
             class="mb-2"
             v-model="settings.disableSnowAnimation"
@@ -23,7 +59,7 @@
             @change="onChange()"
           >
             Disable snowflake animation
-          </b-form-checkbox>
+          </b-form-checkbox> -->
 
           <!-- <b-form-group label-cols="4" content-cols="8" label="After I log in:">
         <b-form-select
@@ -278,6 +314,7 @@
 
 <script lang="ts">
 import { LandingPage, MessageType } from "@/consts";
+import { DarkModeState, SnowflakeState } from "@/interfaces";
 import { analyticsManager } from "@/modules/analytics-manager.module";
 import { pageManager } from "@/modules/page-manager.module";
 import { toastManager } from "@/modules/toast-manager.module";
@@ -290,6 +327,33 @@ export default Vue.extend({
   store,
   data() {
     return {
+      darkModeStateOptions: [
+        { value: DarkModeState.DISABLED, text: "Disabled" },
+        { value: DarkModeState.ENABLED, text: "Enabled" },
+      ],
+      snowflakeStateOptions: [
+        { value: SnowflakeState.DISABLED, text: "Disable all" },
+        { value: SnowflakeState.CSS, text: "Enable CPU-friendly snowflakes" },
+        { value: SnowflakeState.ENABLED, text: "Enabled (Metrc default)" },
+      ],
+      snowflakeIconOptions: [
+        "❆",
+        "❅",
+        "❄️",
+        "😀",
+        "💵",
+        "🖕🏼",
+        "☠️",
+        "👽",
+        "👾",
+        "💩",
+        "🥐",
+        "🍆",
+        "🍃",
+        "💨",
+        "🍁",
+        "🌿",
+      ],
       pageSizeOptions: [5, 10, 20, 50, 100, 500].map((x) => ({
         value: x,
         text: x,

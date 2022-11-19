@@ -4,9 +4,10 @@ import {
   LandingPage,
   SearchModalView,
   ToolkitView,
-  VUEX_KEY
+  VUEX_KEY,
 } from "@/consts";
 import {
+  DarkModeState,
   IAccountSettings,
   IContactData,
   IMetrcStatusData,
@@ -14,7 +15,8 @@ import {
   ISettings,
   ITagSearchFilters,
   ITrackedInteractions,
-  ITransferSearchFilters
+  ITransferSearchFilters,
+  SnowflakeState,
 } from "@/interfaces";
 import { isDevelopment } from "@/modules/environment.module";
 import { MutationType } from "@/mutation-types";
@@ -30,19 +32,19 @@ import { plantSearchModule, plantSearchReducer } from "./modules/plant-search";
 import { pluginAuthModule, pluginAuthReducer } from "./modules/plugin-auth/index";
 import {
   promoteImmaturePlantsBuilderModule,
-  promoteImmaturePlantsBuilderReducer
+  promoteImmaturePlantsBuilderReducer,
 } from "./modules/promote-immature-plants-builder";
 import { searchModule, searchReducer } from "./modules/search";
 import {
   splitPackageBuilderModule,
-  splitPackageBuilderReducer
+  splitPackageBuilderReducer,
 } from "./modules/split-package-builder";
 import { transferBuilderModule, transferBuilderReducer } from "./modules/transfer-builder/index";
 
 // Taken from https://gist.github.com/Myeris/3f13b42f6764ded6640cef693d9d1987
 const vuexLocal = {
   key: VUEX_KEY,
-  storage: window.localStorage
+  storage: window.localStorage,
 };
 
 // Firefox doesn't like this
@@ -75,9 +77,9 @@ const vuexShared = {
         state.promoteImmaturePlantsBuilder
       ),
       // @ts-ignore
-      listing: listingReducer(state.listing)
+      listing: listingReducer(state.listing),
     };
-  }
+  },
 };
 
 const vuexPersistence = new VuexPersistence({ ...vuexLocal, ...vuexShared });
@@ -87,7 +89,7 @@ Vue.use(Vuex);
 const defaultState: IPluginState = {
   accountEnabled: false,
   accountSettings: {
-    backupBuilderSubmits: true
+    backupBuilderSubmits: true,
   },
   contactData: null,
   currentVersion: null,
@@ -117,12 +119,12 @@ const defaultState: IPluginState = {
   transferQueryString: "",
   transferQueryStringHistory: [],
   transferSearchFilters: {
-    manifestNumber: null
+    manifestNumber: null,
   },
   tagQueryString: "",
   tagQueryStringHistory: [],
   tagSearchFilters: {
-    label: null
+    label: null,
   },
   settings: {
     autoOpenActivePackages: true,
@@ -130,6 +132,7 @@ const defaultState: IPluginState = {
     autoOpenAvailableTags: true,
     autoOpenFloweringPlants: true,
     autoOpenIncomingTransfers: true,
+    darkModeState: DarkModeState.DISABLED,
     disablePopups: false,
     disableSnowAnimation: false,
     hideFacilityPicker: false,
@@ -144,13 +147,15 @@ const defaultState: IPluginState = {
     plantDefaultPageSize: 20,
     preventLogout: true,
     salesDefaultPageSize: 20,
+    snowflakeState: SnowflakeState.DISABLED,
+    snowflakeCharacter: "❅",
     tagDefaultPageSize: 20,
     transferDefaultPageSize: 20,
     useLegacyScreenshot: false,
     enableManifestDocumentViewer: false,
     hideListingsButton: false,
     preventActiveProjectPageLeave: true,
-    enableSearchOverMetrcModal: true
+    enableSearchOverMetrcModal: true,
   },
   trackedInteractions: {
     dismissedScreenshotPopover: false,
@@ -159,7 +164,7 @@ const defaultState: IPluginState = {
     dismissedToolboxPopover: false,
     dismissedReportsPopover: false,
     dismissedFacilityPopover: false,
-    dismissedSearchPopover: false
+    dismissedSearchPopover: false,
   },
   backgroundTasks: {
     finalizeSalesReceiptsState: BackgroundTaskState.IDLE,
@@ -175,8 +180,8 @@ const defaultState: IPluginState = {
     voidTagsLastAttemptedTag: null,
     voidTagsReadout: null,
     voidTagsRunningTotal: 0,
-    voidTagsConsecutiveErrorTotal: 0
-  }
+    voidTagsConsecutiveErrorTotal: 0,
+  },
 };
 
 export default new Vuex.Store({
@@ -199,7 +204,7 @@ export default new Vuex.Store({
     },
     [MutationType.SET_CONTACT_DATA](state: IPluginState, contactData: IContactData) {
       state.contactData = {
-        ...contactData
+        ...contactData,
       };
     },
     [MutationType.SET_HOME_LICENSE](state: IPluginState, homeLicense: [string, string]) {
@@ -207,12 +212,12 @@ export default new Vuex.Store({
     },
     [MutationType.UPDATE_SETTINGS](state: IPluginState, settings: ISettings) {
       state.settings = {
-        ...settings
+        ...settings,
       };
     },
     [MutationType.UPDATE_ACCOUNT_SETTINGS](state: IPluginState, accountSettings: IAccountSettings) {
       state.accountSettings = {
-        ...accountSettings
+        ...accountSettings,
       };
     },
     [MutationType.UPDATE_TRACKED_INTERACTIONS](
@@ -220,7 +225,7 @@ export default new Vuex.Store({
       trackedInteractions: ITrackedInteractions
     ) {
       state.trackedInteractions = {
-        ...trackedInteractions
+        ...trackedInteractions,
       };
     },
     [MutationType.RESET_TRACKED_INTERACTIONS](state: IPluginState) {
@@ -231,7 +236,7 @@ export default new Vuex.Store({
       transferSearchFilters: ITransferSearchFilters
     ) {
       state.transferSearchFilters = {
-        ...transferSearchFilters
+        ...transferSearchFilters,
       };
     },
     [MutationType.SET_TAG_SEARCH_FILTERS](
@@ -239,7 +244,7 @@ export default new Vuex.Store({
       tagSearchFilters: ITagSearchFilters
     ) {
       state.tagSearchFilters = {
-        ...tagSearchFilters
+        ...tagSearchFilters,
       };
     },
     // [MutationType.ENQUEUE_TASK](state: IPluginState, taskData: Task) {
@@ -374,7 +379,8 @@ export default new Vuex.Store({
       state: IPluginState,
       finalizeSalesReceiptsConsecutiveErrorTotal: number
     ) {
-      state.backgroundTasks.finalizeSalesReceiptsConsecutiveErrorTotal = finalizeSalesReceiptsConsecutiveErrorTotal;
+      state.backgroundTasks.finalizeSalesReceiptsConsecutiveErrorTotal =
+        finalizeSalesReceiptsConsecutiveErrorTotal;
     },
     [MutationType.SET_VOID_TAGS_STATE](state: IPluginState, voidTagsState: BackgroundTaskState) {
       state.backgroundTasks.voidTagsState = voidTagsState;
@@ -387,7 +393,7 @@ export default new Vuex.Store({
       {
         startTag = null,
         endTag = null,
-        lastAttemptedTag = null
+        lastAttemptedTag = null,
       }: { startTag: string | null; endTag: string | null; lastAttemptedTag: null }
     ) {
       state.backgroundTasks.voidTagsStartTag = startTag;
@@ -417,53 +423,53 @@ export default new Vuex.Store({
     },
     [MutationType.UPDATE_CREDENTIALS](state: IPluginState, credentials: string | null) {
       state.credentials = credentials;
-    }
+    },
   },
   getters: {
-    authState: state => state.pluginAuth?.authState || null,
-    packagesUrl: state =>
+    authState: (state) => state.pluginAuth?.authState || null,
+    packagesUrl: (state) =>
       state.pluginAuth?.authState?.license
         ? `/industry/${state.pluginAuth?.authState?.license}/packages`
-        : null
+        : null,
   },
   actions: {},
   modules: {
     transferBuilder: {
       namespaced: true,
-      ...transferBuilderModule
+      ...transferBuilderModule,
     },
     pluginAuth: {
       namespaced: true,
-      ...pluginAuthModule
+      ...pluginAuthModule,
     },
     packageSearch: {
       namespaced: true,
-      ...packageSearchModule
+      ...packageSearchModule,
     },
     plantSearch: {
       namespaced: true,
-      ...plantSearchModule
+      ...plantSearchModule,
     },
     flags: {
       namespaced: true,
-      ...flagsModule
+      ...flagsModule,
     },
     splitPackageBuilder: {
       namespaced: true,
-      ...splitPackageBuilderModule
+      ...splitPackageBuilderModule,
     },
     promoteImmaturePlantsBuilder: {
       namespaced: true,
-      ...promoteImmaturePlantsBuilderModule
+      ...promoteImmaturePlantsBuilderModule,
     },
     listing: {
       namespaced: true,
-      ...listingModule
+      ...listingModule,
     },
     search: {
       namespaced: true,
-      ...searchModule
-    }
+      ...searchModule,
+    },
   },
-  plugins: [vuexPersistence.plugin]
+  plugins: [vuexPersistence.plugin],
 });

@@ -10,12 +10,14 @@
         <floating-button-container />
       </div>
     </template>
+    <snowflakes></snowflakes>
   </div>
 </template>
 
 <script lang="ts">
 import FloatingButtonContainer from "@/components/page-overlay/FloatingButtonContainer.vue";
 import PageOverlayContainer from "@/components/page-overlay/PageOverlayContainer.vue";
+import Snowflakes from "@/components/page-overlay/Snowflakes.vue";
 import { MessageType } from "@/consts";
 // import { queueWrapper } from "@/modules/queue-wrapper.module";
 import { IAuthState } from "@/interfaces";
@@ -199,7 +201,11 @@ library.add(
 export default Vue.extend({
   name: "TrackTraceToolsPageOverlay",
   store,
-  // router,
+  components: {
+    PageOverlayContainer,
+    FloatingButtonContainer,
+    Snowflakes,
+  },
   computed: {
     ...mapState(["expanded", "settings"]),
   },
@@ -260,10 +266,6 @@ export default Vue.extend({
   },
   mounted() {
     pageManager.setExpandedClass();
-  },
-  components: {
-    PageOverlayContainer,
-    FloatingButtonContainer,
   },
 });
 </script>

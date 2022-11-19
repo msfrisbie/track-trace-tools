@@ -38,7 +38,11 @@ module.exports = {
       manifestTransformer: (manifest) => {
         if (process.env.NODE_ENV === "development") {
           manifest.content_scripts[0].css.pop();
+          manifest.content_scripts.pop();
+        } else {
+          manifest.content_scripts[1].css.push("css/content-script.css");
         }
+
         return manifest;
       },
       componentOptions: {
