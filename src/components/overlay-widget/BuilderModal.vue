@@ -71,14 +71,63 @@
         >
           <track-trace-tools-logo fill="#49276a" :inverted="true" />
 
-          <span class="sans-serif font-extralight tracking-widest text-3xl">TTT</span>
+          <div class="flex flex-col items-center">
+            <span class="sans-serif font-extralight tracking-widest text-md">TTT</span>
+
+            <span class="sans-serif font-extralight text-xs">v{{ currentVersion }}</span>
+          </div>
         </div>
 
         <div class="col-span-3">
           <promo-slideshow></promo-slideshow>
         </div>
 
-        <span class="opacity-30" style="place-self: center end">v{{ currentVersion }}</span>
+        <div class="w-full flex flex-row items-center justify-end">
+          <b-button
+            id="quick-action-popover-target"
+            title="Quick Actions"
+            class="flex flex-row items-center justify-center"
+            style="width: 40px; height: 40px"
+            :variant="quickAction.quickActionVisible ? 'outline-warning' : 'outline-info'"
+            @click="toggleQuickActionVisible({})"
+          >
+            <font-awesome-icon
+              :icon="quickAction.quickActionVisible ? 'minus' : 'bolt'"
+            ></font-awesome-icon>
+          </b-button>
+
+          <div id="quick-action-popover-container"></div>
+
+          <b-popover
+            target="quick-action-popover-target"
+            triggers="hover"
+            placement="bottom"
+            variant="light"
+            ref="quick-action-popover"
+            :disabled="trackedInteractions.dismissedQuickActionPopover"
+            container="quick-action-popover-container"
+          >
+            <template #title>
+              <div class="flex flex-row items-center space-x-2">
+                <track-trace-tools-logo class="h-6" fill="#49276a" :inverted="true" />
+                <span class="text-base font-bold">QUICK ACTIONS</span>
+              </div>
+            </template>
+
+            <div style="min-width: 200px" class="flex flex-col space-y-2 text-base">
+              <p>Rapidly create items and strains without exiting TTT tools.</p>
+
+              <b-button
+                size="sm"
+                variant="outline-primary"
+                class="mb-2"
+                @click="dismissQuickActionPopover()"
+                >GOT IT</b-button
+              >
+            </div>
+          </b-popover>
+        </div>
+        <!-- <span class="opacity-30" style="place-self: center end">v{{ currentVersion }}</span> -->
       </div>
     </template>
 
@@ -87,11 +136,14 @@
 
     <!-- Child views should expand to fill the modal -->
     <router-view class="flex flex-col items-center"></router-view>
+
+    <quick-action></quick-action>
   </b-modal>
 </template>
 
 <script lang="ts">
 import PromoSlideshow from "@/components/overlay-widget/PromoSlideshow.vue";
+import QuickAction from "@/components/overlay-widget/QuickAction.vue";
 import TrackTraceToolsLogo from "@/components/shared/TrackTraceToolsLogo.vue";
 import { BuilderType, MessageType, ToolkitView } from "@/consts";
 import { analyticsManager } from "@/modules/analytics-manager.module";
@@ -101,8 +153,9 @@ import { pageManager } from "@/modules/page-manager.module";
 import { MutationType } from "@/mutation-types";
 import router from "@/router/index";
 import store from "@/store/page-overlay/index";
+import { QuickActionActions } from "@/store/page-overlay/modules/quickAction/consts";
 import Vue from "vue";
-import { mapState } from "vuex";
+import { mapActions, mapState } from "vuex";
 
 const activeProjectPath = "/active-project";
 
@@ -113,8 +166,24 @@ export default Vue.extend({
   components: {
     TrackTraceToolsLogo,
     PromoSlideshow,
+    QuickAction,
   },
   methods: {
+    ...mapActions({
+      toggleQuickActionVisible: `quickAction/${QuickActionActions.TOGGLE_QUICK_ACTION_VISIBLE}`,
+    }),
+    dismissQuickActionPopover() {
+      const trackedInteractions = JSON.parse(JSON.stringify(this.$store.state.trackedInteractions));
+
+      trackedInteractions.dismissedQuickActionPopover = true;
+
+      // @ts-ignore
+      this.$refs["quick-action-popover"].$emit("close");
+      // @ts-ignore
+      this.$refs["quick-action-popover"].$emit("disable");
+
+      this.$store.commit(MutationType.UPDATE_TRACKED_INTERACTIONS, trackedInteractions);
+    },
     async show(modalEventOptions: { builderType: BuilderType; initialRoute: string }) {
       // if (!this.$data.builderType && !this.$data.activeProject) {
       //   this.$data.builderType = modalEventOptions?.builderType;
@@ -204,7 +273,13 @@ export default Vue.extend({
         return "";
       }
     },
-    ...mapState(["trackedInteractions", "settings", "accountEnabled", "currentVersion"]),
+    ...mapState([
+      "trackedInteractions",
+      "settings",
+      "accountEnabled",
+      "currentVersion",
+      "quickAction",
+    ]),
   },
 });
 </script>

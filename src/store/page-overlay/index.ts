@@ -34,6 +34,7 @@ import {
   promoteImmaturePlantsBuilderModule,
   promoteImmaturePlantsBuilderReducer,
 } from "./modules/promote-immature-plants-builder";
+import { quickActionModule, quickActionReducer } from "./modules/quickAction";
 import { searchModule, searchReducer } from "./modules/search";
 import {
   splitPackageBuilderModule,
@@ -78,6 +79,8 @@ const vuexShared = {
       ),
       // @ts-ignore
       listing: listingReducer(state.listing),
+      // @ts-ignore
+      quickAction: quickActionReducer(state.quickAction),
     };
   },
 };
@@ -164,6 +167,7 @@ const defaultState: IPluginState = {
     dismissedToolboxPopover: false,
     dismissedReportsPopover: false,
     dismissedFacilityPopover: false,
+    dismissedQuickActionPopover: false,
     dismissedSearchPopover: false,
   },
   backgroundTasks: {
@@ -469,6 +473,10 @@ export default new Vuex.Store({
     search: {
       namespaced: true,
       ...searchModule,
+    },
+    quickAction: {
+      namespaced: true,
+      ...quickActionModule,
     },
   },
   plugins: [vuexPersistence.plugin],

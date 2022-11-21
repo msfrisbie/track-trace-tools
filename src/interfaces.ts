@@ -83,6 +83,7 @@ export interface ITrackedInteractions {
   dismissedToolboxPopover: boolean;
   dismissedReportsPopover: boolean;
   dismissedFacilityPopover: boolean;
+  dismissedQuickActionPopover: boolean;
   dismissedSearchPopover: boolean;
 }
 

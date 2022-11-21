@@ -164,6 +164,7 @@ library.add(
   fontawesomeSolid.faLevelUpAlt,
   fontawesomeSolid.faLink,
   fontawesomeSolid.faMapMarkerAlt,
+  fontawesomeSolid.faMinus,
   fontawesomeSolid.faNotesMedical,
   fontawesomeSolid.faPhone,
   fontawesomeSolid.faPlus,
