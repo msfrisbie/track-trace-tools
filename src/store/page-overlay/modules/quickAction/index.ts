@@ -1,4 +1,6 @@
+import { MessageType } from "@/consts";
 import { IPluginState } from "@/interfaces";
+import { analyticsManager } from "@/modules/analytics-manager.module";
 import { ActionContext } from "vuex";
 import { QuickActionActions, QuickActionMutations } from "./consts";
 import { IQuickActionState } from "./interfaces";
@@ -22,6 +24,10 @@ export const quickActionModule = {
       { quickActionVisible }: { quickActionVisible: boolean }
     ) {
       state.quickActionVisible = quickActionVisible;
+
+      if (quickActionVisible) {
+        analyticsManager.track(MessageType.QUICK_ACTION_OPEN, {});
+      }
     },
   },
   getters: {},

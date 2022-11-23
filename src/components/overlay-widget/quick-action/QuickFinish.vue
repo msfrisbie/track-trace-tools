@@ -9,7 +9,7 @@ import Vue from "vue";
 import { mapState } from "vuex";
 
 export default Vue.extend({
-  name: "QuickStrain",
+  name: "QuickFinish",
   store,
   router,
   props: {},

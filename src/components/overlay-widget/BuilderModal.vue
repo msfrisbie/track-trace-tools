@@ -143,7 +143,7 @@
 
 <script lang="ts">
 import PromoSlideshow from "@/components/overlay-widget/PromoSlideshow.vue";
-import QuickAction from "@/components/overlay-widget/QuickAction.vue";
+import QuickAction from "@/components/overlay-widget/quick-action/QuickAction.vue";
 import TrackTraceToolsLogo from "@/components/shared/TrackTraceToolsLogo.vue";
 import { BuilderType, MessageType, ToolkitView } from "@/consts";
 import { analyticsManager } from "@/modules/analytics-manager.module";

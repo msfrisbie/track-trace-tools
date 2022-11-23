@@ -50,7 +50,7 @@ import { buildBody, streamFactory } from "@/utils/data-loader";
 import { debugLogFactory } from "@/utils/debug";
 import { extract, ExtractedData, ExtractionType } from "@/utils/html";
 import { get } from "idb-keyval";
-import { Subject, timer } from "rxjs";
+import { Observable, Subject, timer } from "rxjs";
 import { map, take } from "rxjs/operators";
 import { IPackageFilter } from "../../interfaces";
 import { DataLoadError, DataLoadErrorType } from "./data-loader-error";
@@ -74,6 +74,8 @@ export class DataLoader implements IAtomicService {
   private _activeHarvests: Promise<IHarvestData[]> | null = null;
 
   private _countPayload: string = buildBody({ page: 0, pageSize: 5 });
+
+  private _strainsUpdated: Subject<any> = new Subject();
 
   private _metrcRequestManager: MetrcRequestManager | null = null;
 
@@ -149,6 +151,14 @@ export class DataLoader implements IAtomicService {
 
     //     pageManager.enableQuickTransferTemplateButton();
     //   }
+  }
+
+  strainsUpdated$(): Observable<any> {
+    return this._strainsUpdated.asObservable();
+  }
+
+  dispatchStrainUpdatedEvent() {
+    return this._strainsUpdated.next({});
   }
 
   get metrcRequestManagerOrError() {
