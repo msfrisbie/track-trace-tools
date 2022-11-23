@@ -1285,9 +1285,64 @@ export interface IMetrcStatusData {
   };
 }
 
+export interface IFacilityType {
+  FacilityTypeId: number;
+  FacilityTypeName: string;
+}
+
 export interface IItemCategory {
   Id: number;
   Name: string;
+  ProductCategoryType:
+    | "Concentrate"
+    | "InfusedNonEdible"
+    | "Other"
+    | "Plants"
+    | "InfusedEdible"
+    | "Buds"
+    | "ShakeTrim";
+  ProductCategoryTypeName:
+    | "Concentrate"
+    | "InfusedNonEdible"
+    | "Other"
+    | "Plants"
+    | "InfusedEdible"
+    | "Buds"
+    | "ShakeTrim";
+  QuantityType: "CountBased" | "WeightBased" | "VolumeBased";
+  QuantityTypeName: "CountBased" | "WeightBased" | "VolumeBased";
+  DefaultLabTestingStateName: "NotSubmitted" | "NotRequired";
+  PatientPurchaseAmountMultiplier: 1;
+  RequiresApproval: boolean;
+  RequiresStrain: boolean;
+  RequiresItemBrand: boolean;
+  RequiresAdministrationMethod: boolean;
+  RequiresUnitCbdPercent: boolean;
+  RequiresUnitCbdContent: boolean;
+  RequiresUnitCbdContentDose: boolean;
+  RequiresUnitThcPercent: boolean;
+  RequiresUnitThcContent: boolean;
+  RequiresUnitThcContentDose: boolean;
+  RequiresUnitVolume: boolean;
+  RequiresUnitWeight: boolean;
+  RequiresServingSize: boolean;
+  RequiresSupplyDurationDays: boolean;
+  RequiresNumberOfDoses: boolean;
+  CalculateUnitQuantity: boolean;
+  UnitQuantityMultiplier: null;
+  UnitQuantityUnitOfMeasureAbbreviation: null;
+  RequiresPublicIngredients: boolean;
+  RequiresDescription: boolean;
+  RequiresProductPhotos: 0;
+  RequiresLabelPhotos: 0;
+  RequiresPackagingPhotos: 0;
+  CanContainSeeds: boolean;
+  CanBeRemediated: boolean;
+  CanBeDestroyed: boolean;
+  UseItemWeightAsPatientFlowerPurchased: boolean;
+  UseItemWeightAsPatientConcentratePurchased: boolean;
+  UseItemWeightAsPatientInfusedPurchased: boolean;
+  FacilityTypes: IFacilityType[];
 }
 
 export interface IUnitOfMeasure {

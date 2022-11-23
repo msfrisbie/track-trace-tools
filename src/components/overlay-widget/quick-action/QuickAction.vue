@@ -26,7 +26,7 @@
         <b-tab title="ADD ITEM"
           ><b-card-text><quick-item></quick-item></b-card-text
         ></b-tab>
-        <b-tab title="FINISH PACKAGES"
+        <b-tab title="FINISH PACKAGES" v-if="false"
           ><b-card-text><quick-finish></quick-finish></b-card-text
         ></b-tab>
       </b-tabs>
@@ -35,8 +35,6 @@
 </template>
 
 <script lang="ts">
-import { MessageType } from "@/consts";
-import { analyticsManager } from "@/modules/analytics-manager.module";
 import router from "@/router/index";
 import store from "@/store/page-overlay/index";
 import { QuickActionActions } from "@/store/page-overlay/modules/quickAction/consts";
@@ -70,8 +68,7 @@ export default Vue.extend({
     }),
   },
   async created() {},
-  async mounted() {
-  },
+  async mounted() {},
 });
 </script>
 

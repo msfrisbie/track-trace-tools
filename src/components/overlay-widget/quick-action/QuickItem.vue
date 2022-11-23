@@ -3,6 +3,7 @@
 </template>
 
 <script lang="ts">
+import { dynamicConstsManager } from "@/modules/dynamic-consts-manager.module";
 import router from "@/router/index";
 import store from "@/store/page-overlay/index";
 import Vue from "vue";
@@ -22,7 +23,9 @@ export default Vue.extend({
   },
   methods: {},
   async created() {},
-  async mounted() {},
+  async mounted() {
+    console.log(JSON.stringify(await dynamicConstsManager.itemCategories()));
+  },
 });
 </script>
 
