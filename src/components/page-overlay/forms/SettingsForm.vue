@@ -34,22 +34,59 @@
           </b-form-group>
 
           <b-form-group label="Snowflakes">
+            <!-- style="flex-basis: 75%" -->
+            <b-form-select
+              :options="snowflakeStateOptions"
+              @change="onChange()"
+              v-model="settings.snowflakeState"
+            ></b-form-select>
+          </b-form-group>
+
+          <b-form-group label="Snowflake appearance" v-if="settings.snowflakeState === 'CSS'">
             <b-input-group>
               <b-form-select
-                style="flex-basis: 75%"
-                :options="snowflakeStateOptions"
-                @change="onChange()"
-                v-model="settings.snowflakeState"
-              ></b-form-select>
-
-              <b-form-select
-                v-if="settings.snowflakeState === 'CSS'"
                 :options="snowflakeIconOptions"
                 @change="onChange()"
                 v-model="settings.snowflakeCharacter"
               ></b-form-select>
+              <b-form-select
+                :options="snowflakeSizeOptions"
+                @change="onChange()"
+                v-model="settings.snowflakeSize"
+              ></b-form-select>
             </b-input-group>
           </b-form-group>
+          <template v-if="settings.snowflakeState === 'CSS'">
+            <b-form-group
+              label="Custom snowflake text"
+              v-if="settings.snowflakeCharacter === 'TEXT'"
+            >
+              <b-form-textarea
+                rows="3"
+                v-model="settings.snowflakeText"
+                @input="onChange()"
+              ></b-form-textarea>
+            </b-form-group>
+
+            <template v-if="settings.snowflakeCharacter === 'IMAGE'">
+              <b-form-group label="Custom snowflake image">
+                <b-form-file v-model="image" accept="image/*"></b-form-file>
+              </b-form-group>
+
+              <template v-if="settings.snowflakeImage">
+                <div class="grid grid-cols-2 gap-2">
+                  <img :src="settings.snowflakeImage" />
+                  <b-form-group label="Crop">
+                    <b-form-select
+                      :options="snowflakeImageCropOptions"
+                      @change="onChange()"
+                      v-model="settings.snowflakeImageCrop"
+                    ></b-form-select>
+                  </b-form-group>
+                </div>
+              </template>
+            </template>
+          </template>
 
           <!-- <b-form-checkbox
             id="checkbox-disableSnowAnimation"
@@ -320,6 +357,7 @@ import { pageManager } from "@/modules/page-manager.module";
 import { toastManager } from "@/modules/toast-manager.module";
 import { MutationType } from "@/mutation-types";
 import store from "@/store/page-overlay/index";
+import { generateThumbnail } from "@/utils/file";
 import Vue from "vue";
 
 export default Vue.extend({
@@ -327,6 +365,7 @@ export default Vue.extend({
   store,
   data() {
     return {
+      image: null,
       darkModeStateOptions: [
         { value: DarkModeState.DISABLED, text: "Disabled" },
         { value: DarkModeState.ENABLED, text: "Enabled" },
@@ -353,7 +392,25 @@ export default Vue.extend({
         "💨",
         "🍁",
         "🌿",
+        "TEXT",
+        "IMAGE",
       ],
+      snowflakeSizeOptions: [
+        "xs",
+        "sm",
+        "md",
+        "lg",
+        "xl",
+        "2xl",
+        "3xl",
+        "4xl",
+        "5xl",
+        "6xl",
+        "7xl",
+        "8xl",
+        "9xl",
+      ],
+      snowflakeImageCropOptions: ["none", "square", "rounded", "circle"],
       pageSizeOptions: [5, 10, 20, 50, 100, 500].map((x) => ({
         value: x,
         text: x,
@@ -388,6 +445,7 @@ export default Vue.extend({
       window.location.hash = "";
       this.$store.commit(MutationType.SET_DEBUG_MODE, !this.$store.state.debugMode);
     },
+    onImageChange() {},
     onChange() {
       pageManager.pauseFor(3000);
 
@@ -408,6 +466,22 @@ export default Vue.extend({
           solid: true,
         }
       );
+    },
+  },
+  watch: {
+    image: {
+      immediate: true,
+      handler(newValue, oldValue) {
+        if (!newValue) {
+          return;
+        }
+
+        generateThumbnail(newValue).then((b64image: string) => {
+          this.$data.settings.snowflakeImage = b64image;
+
+          this.onChange();
+        });
+      },
     },
   },
 });
