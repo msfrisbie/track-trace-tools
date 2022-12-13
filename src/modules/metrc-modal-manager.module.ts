@@ -22,6 +22,17 @@ class MetrcModalManager implements IAtomicService {
           '[ng-repeat="destination in line.Destinations"]'
         );
 
+        const readFile = (event: Event) => {
+          const reader = new FileReader();
+          reader.onload = () => {
+            // document.getElementById("out").innerHTML = reader.result;
+            console.log(reader.result);
+          };
+          // start reading the file. When it is done, calls the onload event defined above.
+          // @ts-ignore
+          reader.readAsBinaryString(event.target.files[0]);
+        };
+
         for (const destination of destinations) {
           console.log(destination);
 
@@ -30,6 +41,17 @@ class MetrcModalManager implements IAtomicService {
           const packages = destination.querySelectorAll(
             '[ng-repeat="package in destination.Packages"]'
           );
+
+          const csvInput = destination.querySelector('input[data-role="upload"]');
+          console.log(csvInput);
+
+          if (csvInput) {
+            // @ts-ignore
+            csvInput.parentElement.style.backgroundColor = "purple";
+            // @ts-ignore
+            csvInput.parentElement.style.color = "white";
+            csvInput.addEventListener("change", readFile);
+          }
 
           for (const pkg of packages) {
             console.log(pkg);
@@ -40,9 +62,6 @@ class MetrcModalManager implements IAtomicService {
             console.log(pkg.querySelector('input[ng-model="package.GrossWeight"]'));
             console.log(pkg.querySelector('select[ng-model="package.GrossUnitOfWeightId"]'));
             console.log(pkg.querySelector('input[ng-model="package.WholesalePrice"]'));
-
-            // console.log(pkg.querySelector())
-            // console.log(pkg.querySelector())
           }
         }
 
