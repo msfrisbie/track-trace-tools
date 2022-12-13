@@ -41,6 +41,7 @@ import { analyticsManager } from "./analytics-manager.module";
 import { authManager } from "./auth-manager.module";
 import { primaryDataLoader } from "./data-loader/data-loader.module";
 import { facilityManager } from "./facility-manager.module";
+import { metrcModalManager } from "./metrc-modal-manager.module";
 import { modalManager } from "./modal-manager.module";
 
 export const PLANTS_TAB_REGEX = /.*\/plants$/;
@@ -508,6 +509,8 @@ class PageManager implements IAtomicService {
     this.modifyPageAtInterval();
 
     this.updatePromoModal();
+
+    metrcModalManager.updateModalState();
   }
 
   private isTabActive(tab: any) {

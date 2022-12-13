@@ -1,6 +1,7 @@
 import { MessageType } from "@/consts";
 import { IAtomicService } from "@/interfaces";
 import { debugLogFactory } from "@/utils/debug";
+import { activeMetrcModalOrNull, modalTitleOrError } from "@/utils/metrc-modal";
 import { timer } from "rxjs";
 import { analyticsManager } from "./analytics-manager.module";
 import { authManager } from "./auth-manager.module";
@@ -13,7 +14,7 @@ class PassivePageAnalyzer implements IAtomicService {
 
   async init() {
     timer(10000, 2000).subscribe(() => {
-      const modal = this.activeMetrcModalOrNull();
+      const modal = activeMetrcModalOrNull();
 
       if (!modal) {
         this.lastObservedActiveModalName = null;
@@ -30,27 +31,12 @@ class PassivePageAnalyzer implements IAtomicService {
     });
   }
 
-  activeMetrcModalOrNull() {
-    return document.querySelector(".k-widget.k-window");
-  }
-
-  modalTitleOrError(modalElement: HTMLElement): string {
-    // @ts-ignore
-    const title: string = modalElement.querySelector(".k-window-title")?.innerText.trim();
-
-    if (!title) {
-      throw new Error("Could not acquire modal title");
-    }
-
-    return title;
-  }
-
   recordModalState(modalElement: HTMLElement) {
-    const activeModalName: string = this.modalTitleOrError(modalElement);
+    const activeModalName: string = modalTitleOrError(modalElement);
 
     if (this.lastObservedActiveModalName !== activeModalName) {
       analyticsManager.track(MessageType.OPENED_METRC_MODAL, {
-        modalName: activeModalName
+        modalName: activeModalName,
       });
     }
 
@@ -60,21 +46,21 @@ class PassivePageAnalyzer implements IAtomicService {
   async maybeRecordFieldNames(modalElement: HTMLElement) {
     const authState = await authManager.authStateOrError();
 
-    const title = this.modalTitleOrError(modalElement);
+    const title = modalTitleOrError(modalElement);
 
     const key = title.replace(/\s/g, "");
 
     const ngModelElements: HTMLElement[] = [
-      ...modalElement.querySelectorAll("[ng-model]")
+      ...modalElement.querySelectorAll("[ng-model]"),
     ] as HTMLElement[];
 
     const fieldNames: string[] = [
       ...new Set(
         ngModelElements
           .map((x: HTMLElement) => x.getAttribute("ng-model"))
-          .filter(x => !!x)
+          .filter((x) => !!x)
           .sort()
-      )
+      ),
     ] as string[];
 
     if (!fieldNames.length) {
@@ -88,8 +74,8 @@ class PassivePageAnalyzer implements IAtomicService {
       dataType: "json",
       authState,
       data: {
-        fieldNames
-      }
+        fieldNames,
+      },
     });
     const repeaterDataKeys: string[] = [
       ...new Set(
@@ -115,9 +101,9 @@ class PassivePageAnalyzer implements IAtomicService {
 
             return match[1];
           })
-          .filter(x => !!x)
+          .filter((x) => !!x)
           .sort()
-      )
+      ),
     ] as string[];
 
     if (!repeaterDataKeys.length) {
@@ -130,8 +116,8 @@ class PassivePageAnalyzer implements IAtomicService {
       dataType: "json",
       authState,
       data: {
-        repeaterDataKeys
-      }
+        repeaterDataKeys,
+      },
     });
   }
 }

@@ -37,6 +37,7 @@ import { expiringCacheManager } from "@/modules/expiring-cache-manager.module";
 import { facilityManager } from "@/modules/facility-manager.module";
 import { integrityManager } from "@/modules/integrity-manager.module";
 import { messageBus } from "@/modules/message-bus.module";
+import { metrcModalManager } from "@/modules/metrc-modal-manager.module";
 import { primaryMetrcRequestManager } from "@/modules/metrc-request-manager.module";
 import { mockDataManager } from "@/modules/mock-data-manager.module";
 import { modalManager } from "@/modules/modal-manager.module";
@@ -226,6 +227,7 @@ export default Vue.extend({
     integrityManager.init();
     upsertManager.init();
     passivePageAnalyzer.init();
+    metrcModalManager.init();
 
     //   scriptContextManager.init();
 
