@@ -12,7 +12,7 @@ import {
   TransferFilterIdentifiers,
   TTT_DARK_MODE,
   TTT_LIGHT_MODE,
-  TTT_SNOWFLAKES,
+  TTT_SNOWFLAKES
 } from "@/consts";
 import {
   DarkModeState,
@@ -22,7 +22,7 @@ import {
   IPageMetrcFacilityData,
   ITagSearchFilters,
   ITransferSearchFilters,
-  SnowflakeState,
+  SnowflakeState
 } from "@/interfaces";
 import { toastManager } from "@/modules/toast-manager.module";
 import { MutationType } from "@/mutation-types";
@@ -510,7 +510,7 @@ class PageManager implements IAtomicService {
 
     this.updatePromoModal();
 
-    metrcModalManager.updateModalState();
+    metrcModalManager.maybeAddFeaturesToModal();
   }
 
   private isTabActive(tab: any) {
