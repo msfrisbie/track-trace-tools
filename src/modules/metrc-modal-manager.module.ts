@@ -1,6 +1,8 @@
 import { IAtomicService } from "@/interfaces";
 import { debugLogFactory } from "@/utils/debug";
 import { activeMetrcModalOrNull, modalTitleOrError } from "@/utils/metrc-modal";
+// @ts-ignore
+import * as Papa from "papaparse";
 
 const debugLog = debugLogFactory("modules/metrc-modal-analyzer.module.ts");
 
@@ -23,14 +25,27 @@ class MetrcModalManager implements IAtomicService {
         );
 
         const readFile = (event: Event) => {
-          const reader = new FileReader();
-          reader.onload = () => {
-            // document.getElementById("out").innerHTML = reader.result;
-            console.log(reader.result);
-          };
-          // start reading the file. When it is done, calls the onload event defined above.
           // @ts-ignore
-          reader.readAsBinaryString(event.target.files[0]);
+          Papa.parse(event.target.files[0], {
+            header: false,
+            complete: function (results: any) {
+              // read the data from results
+              const { data } = results;
+              //print the data in the console
+              console.log({ data });
+            },
+          });
+
+          //   const reader = new FileReader();
+          //   reader.onload = () => {
+          //     // document.getElementById("out").innerHTML = reader.result;
+          //     console.log(reader.result);
+          //     // @ts-ignore
+          //     console.log(reader.result.split("\n").map((x) => x.split(",")));
+          //   };
+          //   // start reading the file. When it is done, calls the onload event defined above.
+          //   // @ts-ignore
+          //   reader.readAsBinaryString(event.target.files[0]);
         };
 
         for (const destination of destinations) {
