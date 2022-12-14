@@ -45,6 +45,7 @@ tr.k-master-row {
   // border-color: transparent !important;
   border-color: #49276a !important;
 }
+
 .ttt-btn:hover {
   // background-color: #49276a !important;
   // background-image: none !important;
@@ -56,4 +57,22 @@ tr.k-master-row {
   -moz-transform: rotate(-45deg);
   -o-transform: rotate(-45deg);
   transform: rotate(-45deg);
+}
+
+.ttt-modal-container {
+  padding: 0.8rem;
+  flex-direction: row;
+  justify-content: start;
+}
+
+.ttt-modal-container > * {
+  margin-right: 0.8rem;
+}
+
+.ttt-modal-btn {
+  background-color: #49276a !important;
+  background-image: none !important;
+  border-color: #49276a !important;
+  color: white !important;
+  text-shadow: none !important;
 }

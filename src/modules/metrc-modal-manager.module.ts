@@ -1,6 +1,7 @@
 import { IAtomicService } from "@/interfaces";
 import { debugLogFactory } from "@/utils/debug";
 import { activeMetrcModalOrNull, modalTitleOrError } from "@/utils/metrc-modal";
+import CryptoJS from "crypto-js";
 import * as Papa from "papaparse";
 
 const debugLog = debugLogFactory("modules/metrc-modal-analyzer.module.ts");
@@ -10,6 +11,8 @@ const NEW_TRANSFER_TITLE: string = "New Transfer";
 // const FILEDATA_ATTRIBUTE: string = "ttt-filedata";
 const CSV_APPLY_BUTTON_ATTRIBUTE: string = "ttt-apply-csv";
 const TTT_TOUCHED_ATTRIBUTE: string = "ttt-touched";
+const INTERMEDIATE_CSV_ATTRIBUTE: string = "ttt-intermediate-csv";
+const TTT_CONTAINER: string = "ttt-container";
 
 const DESTINATION_SELECTOR: string = '[ng-repeat="destination in line.Destinations"]';
 const ADD_LINE_BUTTON_SELECTOR: string = 'button[ng-click*="addLine("]';
@@ -23,7 +26,18 @@ const PACKAGE_GROSS_UNIT_OF_WEIGHT_ID_SELECT_SELECTOR: string =
 const PACKAGE_WHOLESALE_PRICE_INPUT_SELECTOR: string = 'input[ng-model="package.WholesalePrice"]';
 
 class MetrcModalManager implements IAtomicService {
-  async init() {}
+  async init() {
+    var data = [{ id: 1 }, { id: 2 }];
+
+    // Encrypt
+    var ciphertext = CryptoJS.AES.encrypt(JSON.stringify(data), "secret key 123").toString();
+
+    // Decrypt
+    var bytes = CryptoJS.AES.decrypt(ciphertext, "secret key 123");
+    var decryptedData = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
+
+    console.log(decryptedData); // [{id: 1}, {id: 2}]
+  }
 
   // Idempotent method that manages the contents of the modal
   // each time the DOM changes
@@ -47,18 +61,21 @@ class MetrcModalManager implements IAtomicService {
         ] as HTMLElement[];
 
         for (const destination of destinations) {
-          // console.log(destination);
-
-          // console.log(destination.querySelector(ADD_LINE_BUTTON_SELECTOR));
-
-          const packages = destination.querySelectorAll(PACKAGE_ROW_SELECTOR);
-
           const csvInputContainer: HTMLElement | null = destination.querySelector(
             CSV_INPUT_CONTAINER_SELECTOR
           );
 
           if (!csvInputContainer) {
             throw new Error("Unable to match CSV input container");
+          }
+
+          let tttContainer = csvInputContainer.querySelector(`[${TTT_CONTAINER}]`);
+
+          if (!tttContainer) {
+            tttContainer = document.createElement("div");
+            tttContainer.setAttribute(TTT_CONTAINER, "true");
+            tttContainer.classList.add("ttt-modal-container");
+            csvInputContainer.appendChild(tttContainer);
           }
 
           const csvInput: HTMLInputElement | null =
@@ -68,35 +85,47 @@ class MetrcModalManager implements IAtomicService {
             throw new Error("Unable to match CSV input");
           }
 
-          const parent = csvInput.parentElement as HTMLElement;
-          parent.style.backgroundColor = "#49276a";
-          parent.style.color = "white";
-          parent.style.backgroundImage = "none";
+          let intermediateCsvInput: HTMLInputElement | null = csvInputContainer.querySelector(
+            `input[${INTERMEDIATE_CSV_ATTRIBUTE}]`
+          );
+
+          if (!intermediateCsvInput) {
+            intermediateCsvInput = document.createElement("input");
+            intermediateCsvInput.setAttribute(INTERMEDIATE_CSV_ATTRIBUTE, "true");
+            intermediateCsvInput.setAttribute("type", "file");
+            intermediateCsvInput.setAttribute("accept", ".txt,.csv,text/plain,text/csv");
+            intermediateCsvInput.setAttribute("multiple", "multiple");
+            intermediateCsvInput.style.display = "none";
+            intermediateCsvInput.addEventListener("change", () => this.propagateCsv(destination));
+
+            const label = document.createElement("label");
+            label.innerText = "SELECT CSVs";
+            label.classList.add("btn", "btn-default", "ttt-modal-btn");
+
+            label.appendChild(intermediateCsvInput);
+
+            tttContainer.appendChild(label);
+          }
 
           let applyBtn: HTMLButtonElement | null = csvInputContainer.querySelector(
             `button[${CSV_APPLY_BUTTON_ATTRIBUTE}]`
           );
 
-          // Only add button if it does not exist
           if (!applyBtn) {
             applyBtn = document.createElement("button");
-            applyBtn.setAttribute("type", "button");
-            applyBtn.classList.add("k-button");
             applyBtn.setAttribute(CSV_APPLY_BUTTON_ATTRIBUTE, "true");
-            applyBtn.style.backgroundColor = "#49276a";
-            applyBtn.style.color = "white";
-            applyBtn.style.backgroundImage = "none";
+            applyBtn.setAttribute("type", "button");
+            applyBtn.classList.add("btn", "btn-default", "ttt-modal-btn");
             applyBtn.innerText = "FILL CSV DATA";
             applyBtn.addEventListener("click", (e) => this.applyTransferCsvData(destination));
 
-            // @ts-ignore
-            parent.parentElement.appendChild(applyBtn);
+            tttContainer.appendChild(applyBtn);
           }
 
           applyBtn.style.display = "none";
 
           if (csvInput.files?.length) {
-            applyBtn.style.display = "inline-block";
+            applyBtn.style.removeProperty("display");
           }
         }
 
@@ -106,110 +135,19 @@ class MetrcModalManager implements IAtomicService {
     }
   }
 
-  // handleFileInputChange(container: HTMLElement) {
-  //   const input = container.querySelector(UPLOAD_CSV_INPUT_SELECTOR) as HTMLInputElement | null;
-
-  //   if (!input || input.files === null) {
-  //     throw new Error("Bad target");
-  //   }
-
-  //   for (let f of target.files) {
-  //     Papa.parse(f, {
-  //       header: false,
-  //       complete: (results) => {
-  //         // {
-  //         //   data: [["1A4050100000900000196590"], ["1A4050100000900000211022"]],
-  //         //   errors: [
-  //         //     {
-  //         //       type: "Delimiter",
-  //         //       code: "UndetectableDelimiter",
-  //         //       message: "Unable to auto-detect delimiting character; defaulted to ','",
-  //         //     },
-  //         //   ],
-  //         //   meta: {
-  //         //     delimiter: ",",
-  //         //     linebreak: "\r\n",
-  //         //     aborted: false,
-  //         //     truncated: false,
-  //         //     cursor: 50,
-  //         //   },
-  //         // };
-
-  //         const rows = results.data;
-
-  //         resolve(rows);
-
-  //         // @ts-ignore
-  //         const parent: HTMLElement | null = event.target.parentElement;
-
-  //         if (parent) {
-  //           let fileContainer: HTMLElement | null = parent.querySelector(
-  //             `div[${FILEDATA_ATTRIBUTE}="${f.name}"]`
-  //           );
-
-  //           if (!fileContainer) {
-  //             fileContainer = document.createElement("div");
-  //             parent.appendChild(fileContainer);
-  //             fileContainer.setAttribute(FILEDATA_ATTRIBUTE, f.name);
-  //             fileContainer.style.display = "none";
-  //           }
-
-  //           fileContainer.innerText = JSON.stringify(results.data);
-  //         } else {
-  //           throw new Error("Could not locate input parent");
-  //         }
-
-  //         applyButton.style.display = "inline-block";
-  //       },
-  //     });
-  //   }
-  // }
-
-  async applyTransferCsvData(destination: HTMLElement) {
-    console.log("applyTransferCsvData");
-    const mergedRows: string[][] = [];
-    const input: HTMLInputElement | null = destination.querySelector(UPLOAD_CSV_INPUT_SELECTOR);
-
-    if (!input || !input.files) {
-      throw new Error("Bad input");
+  async getMergedCsvDataOrError(input: HTMLInputElement): Promise<string[][]> {
+    if (!input.files) {
+      throw new Error("Bad files");
     }
 
-    // const applyButton: HTMLElement | null = destination.querySelector(
-    //   `[${CSV_APPLY_BUTTON_ATTRIBUTE}]`
-    // );
-
-    // if (!applyButton) {
-    //   throw new Error("Could not locate apply button");
-    // }
-
-    // applyButton.style.display = "none";
+    const mergedRows: string[][] = [];
 
     for (let f of input.files) {
       const rows: string[][] = await new Promise((resolve, reject) => {
         Papa.parse(f, {
           header: false,
-          complete: (results) => {
-            // {
-            //   data: [["1A4050100000900000196590"], ["1A4050100000900000211022"]],
-            //   errors: [
-            //     {
-            //       type: "Delimiter",
-            //       code: "UndetectableDelimiter",
-            //       message: "Unable to auto-detect delimiting character; defaulted to ','",
-            //     },
-            //   ],
-            //   meta: {
-            //     delimiter: ",",
-            //     linebreak: "\r\n",
-            //     aborted: false,
-            //     truncated: false,
-            //     cursor: 50,
-            //   },
-            // };
-
-            // applyButton.style.display = "inline-block";
-
-            const rows: string[][] = results.data as string[][];
+          complete: (results: Papa.ParseResult<string[]>) => {
+            const rows: string[][] = results.data;
 
             resolve(rows);
           },
@@ -219,12 +157,51 @@ class MetrcModalManager implements IAtomicService {
         });
       });
 
-      console.log(rows);
-
       rows.map((row) => mergedRows.push(row));
     }
 
-    console.log(mergedRows);
+    return mergedRows;
+  }
+
+  async propagateCsv(destination: HTMLElement) {
+    const intermediateCsvInput: HTMLInputElement | null = destination.querySelector(
+      `input[${INTERMEDIATE_CSV_ATTRIBUTE}]`
+    );
+
+    if (!intermediateCsvInput || !intermediateCsvInput.files) {
+      throw new Error("Cannot find intermediate input");
+    }
+
+    const csvInput: HTMLInputElement | null = destination.querySelector(UPLOAD_CSV_INPUT_SELECTOR);
+
+    if (!csvInput) {
+      throw new Error("Unable to match CSV input");
+    }
+
+    const mergedRows: string[][] = await this.getMergedCsvDataOrError(intermediateCsvInput);
+
+    const blob = new Blob([mergedRows.map((row) => row[0]).join("\n")], {
+      type: "text/csv",
+    });
+
+    const dT = new DataTransfer();
+    dT.items.add(new File([blob], "output.csv"));
+
+    csvInput.files = dT.files;
+
+    csvInput.dispatchEvent(new Event("change"));
+  }
+
+  async applyTransferCsvData(destination: HTMLElement) {
+    const input: HTMLInputElement | null = destination.querySelector(
+      `input[${INTERMEDIATE_CSV_ATTRIBUTE}]`
+    );
+
+    if (!input || !input.files) {
+      throw new Error("Bad input");
+    }
+
+    const mergedRows: string[][] = await this.getMergedCsvDataOrError(input);
 
     const packages = [...destination.querySelectorAll(PACKAGE_ROW_SELECTOR)];
 
@@ -236,8 +213,6 @@ class MetrcModalManager implements IAtomicService {
       if (!packageTagInput) {
         throw new Error("Could not locate package tag input");
       }
-
-      console.log(packageTagInput.value);
 
       if (!packageTagInput.value) {
         continue;
@@ -289,8 +264,8 @@ class MetrcModalManager implements IAtomicService {
         PACKAGE_WHOLESALE_PRICE_INPUT_SELECTOR
       );
 
-      if (wholesalePriceInput) {
-        wholesalePriceInput.value = matchingRow[3];
+      if (wholesalePriceInput && typeof matchingRow[3] !== undefined) {
+        wholesalePriceInput.value = matchingRow[3].replace("$", "").replace(",", "");
       }
     }
   }
