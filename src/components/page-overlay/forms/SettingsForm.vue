@@ -3,6 +3,54 @@
     <b-form class="grid grid-cols-2 gap-8">
       <div class="flex flex-col justify-start">
         <b-form-group>
+          <div class="mb-2 text-gray-400 text-lg">License Key</div>
+
+          <b-input-group v-if="!!settings.licenseKey" class="items-start">
+            <b-form-input
+              id="input-licenseKey"
+              class="mb-2"
+              v-model="settings.licenseKey"
+              name="input-licenseKey"
+              disabled="disabled"
+            >
+            </b-form-input>
+
+            <b-input-group-append>
+              <b-button size="md" @click="clearLicenseKey()" variant="outline-danger"
+                >CLEAR</b-button
+              >
+            </b-input-group-append>
+          </b-input-group>
+
+          <b-input-group v-if="!settings.licenseKey" class="items-start">
+            <b-form-input
+              id="input-licenseKey"
+              placeholder="Paste your license key here"
+              class="mb-2"
+              v-model="unsavedLicenseKey"
+              name="input-licenseKey"
+            >
+            </b-form-input>
+            <b-input-group-append>
+              <b-button
+                :disabled="!unsavedLicenseKey"
+                size="md"
+                @click="saveLicenseKey()"
+                variant="outline-success"
+                >SAVE</b-button
+              >
+            </b-input-group-append>
+          </b-input-group>
+
+          <a
+            class="text-purple-600 underline"
+            href="https://www.trackandtrace.tools/solutions"
+            target="_blank"
+            >What is this?</a
+          >
+        </b-form-group>
+
+        <b-form-group>
           <div class="mb-2 text-gray-400 text-lg">Appearance &amp; Behavior</div>
 
           <b-form-checkbox
@@ -437,6 +485,7 @@ export default Vue.extend({
           text: "Go to Plants",
         },
       ],
+      unsavedLicenseKey: "",
       settings: JSON.parse(JSON.stringify(this.$store.state.settings)),
     };
   },
@@ -444,6 +493,18 @@ export default Vue.extend({
     async toggleDebugMode() {
       window.location.hash = "";
       this.$store.commit(MutationType.SET_DEBUG_MODE, !this.$store.state.debugMode);
+    },
+    saveLicenseKey() {
+      this.$data.settings.licenseKey = this.$data.unsavedLicenseKey;
+      this.$data.unsavedLicenseKey = "";
+      this.onChange();
+    },
+    clearLicenseKey() {
+      if (!window.confirm("Are you sure you want to remove your license key?")) {
+        return;
+      }
+      this.$data.settings.licenseKey = "";
+      this.onChange();
     },
     onImageChange() {},
     onChange() {

@@ -56,6 +56,7 @@ export interface ISettings {
   hideScreenshotButton: boolean;
   hideTransferSearch: boolean;
   landingPage: LandingPage;
+  licenseKey: string;
   homeLicenses: { [key: string]: string | null };
   packageDefaultPageSize: number;
   plantDefaultPageSize: number;
@@ -1448,4 +1449,11 @@ export interface IClientConfig {
   overrides?: {
     transferTemplateHtmlUrl?: string;
   };
+  selectors?: {
+    [key: string]: string;
+  };
+}
+
+export interface IEncryptedClientData {
+  
 }

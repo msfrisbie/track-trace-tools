@@ -142,6 +142,7 @@ const defaultState: IPluginState = {
     hideScreenshotButton: false,
     hideTransferSearch: false,
     landingPage: LandingPage.PACKAGES,
+    licenseKey: "",
     homeLicenses: {},
     packageDefaultPageSize: 20,
     plantDefaultPageSize: 20,
