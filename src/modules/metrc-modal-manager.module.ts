@@ -146,7 +146,7 @@ class MetrcModalManager implements IAtomicService {
         Papa.parse(f, {
           header: false,
           complete: (results: Papa.ParseResult<string[]>) => {
-            const rows: string[][] = results.data;
+            const rows: string[][] = results.data.map((x) => x.map((y) => y.trim()));
 
             resolve(rows);
           },
@@ -293,7 +293,11 @@ class MetrcModalManager implements IAtomicService {
         }
         formattingErrorCount++;
       } else {
-        if (!["Pounds", "Grams", "Kilograms", "Ounces"].includes(row[2])) {
+        if (
+          !["Pounds", "Grams", "Kilograms", "Ounces"]
+            .map((x) => x.toLocaleLowerCase())
+            .includes(row[2].toLocaleLowerCase())
+        ) {
           if (formattingErrorCount < 5) {
             toastManager.openToast(
               `Row ${idx} does not have a valid weight
@@ -390,7 +394,30 @@ class MetrcModalManager implements IAtomicService {
 
     const packages = [...destination.querySelectorAll(values.PACKAGE_ROW_SELECTOR)];
 
+    if (packages.length !== mergedRows.length) {
+      toastManager.openToast(
+        `Mismatch detected: 
+        
+        ${packages.length} packages, 
+        ${mergedRows.length} CSV rows.
+      
+        This can occur when a package tag in the CSV is not eligible for transfer`,
+        {
+          title: "CSV Row Count Error",
+          autoHideDelay: 5000,
+          variant: "warning",
+          appendToast: true,
+          toaster: "ttt-toaster",
+          solid: true,
+        }
+      );
+    }
+
+    let successRowCount = 0;
+
     for (const pkg of packages) {
+      let autofillSuccess = true;
+
       const packageTagInput: HTMLInputElement | null = pkg.querySelector(
         values.PACKAGE_TAG_INPUT_SELECTOR
       );
@@ -404,6 +431,8 @@ class MetrcModalManager implements IAtomicService {
           toaster: "ttt-toaster",
           solid: true,
         });
+        autofillSuccess = false;
+
         throw new Error("Could not locate package tag input");
       }
 
@@ -428,6 +457,7 @@ class MetrcModalManager implements IAtomicService {
           toaster: "ttt-toaster",
           solid: true,
         });
+        autofillSuccess = false;
         console.error(`Could not match row for ${packageTagInput.value}`);
         continue;
       }
@@ -436,10 +466,10 @@ class MetrcModalManager implements IAtomicService {
         values.PACKAGE_GROSS_WEIGHT_INPUT_SELECTOR
       );
 
-      if (grossWeightInput) {
+      if (grossWeightInput && typeof matchingRow[1] === "string") {
         grossWeightInput.value = matchingRow[1].replace(",", "");
       } else {
-        toastManager.openToast(`Could not autofill gross weight input ${matchingRow[1]}`, {
+        toastManager.openToast(`Could not autofill gross weight input: ${matchingRow[1]}`, {
           title: "CSV Autofill Error",
           autoHideDelay: 5000,
           variant: "danger",
@@ -447,6 +477,7 @@ class MetrcModalManager implements IAtomicService {
           toaster: "ttt-toaster",
           solid: true,
         });
+        autofillSuccess = false;
       }
 
       const grossUnitOfWeightSelect: HTMLSelectElement | null = pkg.querySelector(
@@ -457,15 +488,21 @@ class MetrcModalManager implements IAtomicService {
         const options = [...grossUnitOfWeightSelect.querySelectorAll("option")];
         let matchingOption = null;
         for (const option of options) {
-          if (option.getAttribute("label") === matchingRow[2]) {
+          if (!matchingRow[2]) {
+            break;
+          }
+          if (
+            option.getAttribute("label")?.toLocaleLowerCase() === matchingRow[2].toLocaleLowerCase()
+          ) {
             matchingOption = option;
             grossUnitOfWeightSelect.value = option.value;
+            grossUnitOfWeightSelect.dispatchEvent(new Event("change"));
             break;
           }
         }
 
         if (!matchingOption) {
-          toastManager.openToast(`Could not autofill unit of measure ${matchingRow[2]}`, {
+          toastManager.openToast(`Could not autofill unit of measure: ${matchingRow[2]}`, {
             title: "CSV Autofill Error",
             autoHideDelay: 5000,
             variant: "danger",
@@ -473,6 +510,7 @@ class MetrcModalManager implements IAtomicService {
             toaster: "ttt-toaster",
             solid: true,
           });
+          autofillSuccess = false;
           console.error("Unable to match");
         }
       }
@@ -481,10 +519,10 @@ class MetrcModalManager implements IAtomicService {
         values.PACKAGE_WHOLESALE_PRICE_INPUT_SELECTOR
       );
 
-      if (wholesalePriceInput && typeof matchingRow[3] !== undefined) {
+      if (wholesalePriceInput && typeof matchingRow[3] === "string") {
         wholesalePriceInput.value = matchingRow[3].replace("$", "").replace(",", "");
       } else {
-        toastManager.openToast(`Could not autofill wholesale value ${matchingRow[3]}`, {
+        toastManager.openToast(`Could not autofill wholesale value: ${matchingRow[3]}`, {
           title: "CSV Autofill Error",
           autoHideDelay: 5000,
           variant: "danger",
@@ -492,7 +530,38 @@ class MetrcModalManager implements IAtomicService {
           toaster: "ttt-toaster",
           solid: true,
         });
+        autofillSuccess = false;
       }
+
+      if (autofillSuccess) {
+        successRowCount++;
+      }
+    }
+
+    if (successRowCount === mergedRows.length) {
+      toastManager.openToast(
+        `Successfully autofilled ${successRowCount} of ${mergedRows.length} rows`,
+        {
+          title: "CSV Autofill Finished",
+          autoHideDelay: 5000,
+          variant: "success",
+          appendToast: true,
+          toaster: "ttt-toaster",
+          solid: true,
+        }
+      );
+    } else if (successRowCount > 0) {
+      toastManager.openToast(
+        `Partially autofilled ${successRowCount} of ${mergedRows.length} rows`,
+        {
+          title: "CSV Autofill Finished",
+          autoHideDelay: 5000,
+          variant: "warning",
+          appendToast: true,
+          toaster: "ttt-toaster",
+          solid: true,
+        }
+      );
     }
   }
 }
