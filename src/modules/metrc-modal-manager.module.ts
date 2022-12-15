@@ -1,7 +1,6 @@
 import { IAtomicService } from "@/interfaces";
 import { debugLogFactory } from "@/utils/debug";
 import { activeMetrcModalOrNull, modalTitleOrError } from "@/utils/metrc-modal";
-import CryptoJS from "crypto-js";
 import * as Papa from "papaparse";
 
 const debugLog = debugLogFactory("modules/metrc-modal-analyzer.module.ts");
@@ -27,16 +26,6 @@ const PACKAGE_WHOLESALE_PRICE_INPUT_SELECTOR: string = 'input[ng-model="package.
 
 class MetrcModalManager implements IAtomicService {
   async init() {
-    var data = [{ id: 1 }, { id: 2 }];
-
-    // Encrypt
-    var ciphertext = CryptoJS.AES.encrypt(JSON.stringify(data), "secret key 123").toString();
-
-    // Decrypt
-    var bytes = CryptoJS.AES.decrypt(ciphertext, "secret key 123");
-    var decryptedData = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
-
-    console.log(decryptedData); // [{id: 1}, {id: 2}]
   }
 
   // Idempotent method that manages the contents of the modal
