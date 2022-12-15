@@ -1,0 +1,1 @@
+export const encryptedData: string = "U2FsdGVkX197SfI1yiQ8a5kf+Z/TIe6JC2B0ZeV68t4=" }

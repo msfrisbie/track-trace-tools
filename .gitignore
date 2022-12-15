@@ -30,3 +30,5 @@ artifacts
 secrets
 
 .parcel-cache
+
+decrypted-data/
