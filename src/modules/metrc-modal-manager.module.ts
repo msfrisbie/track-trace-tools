@@ -1,20 +1,18 @@
-import { IAtomicService } from "@/interfaces";
+import { IAtomicService, IClientConfig } from "@/interfaces";
 import { debugLogFactory } from "@/utils/debug";
 import { activeMetrcModalOrNull, modalTitleOrError } from "@/utils/metrc-modal";
 import * as Papa from "papaparse";
+import { clientBuildManager } from "./client-build-manager.module";
 
 const debugLog = debugLogFactory("modules/metrc-modal-analyzer.module.ts");
 
 const NEW_TRANSFER_TITLE: string = "New Transfer";
 
-// const FILEDATA_ATTRIBUTE: string = "ttt-filedata";
 const CSV_APPLY_BUTTON_ATTRIBUTE: string = "ttt-apply-csv";
-const TTT_TOUCHED_ATTRIBUTE: string = "ttt-touched";
 const INTERMEDIATE_CSV_ATTRIBUTE: string = "ttt-intermediate-csv";
 const TTT_CONTAINER: string = "ttt-container";
 
 const DESTINATION_SELECTOR: string = '[ng-repeat="destination in line.Destinations"]';
-const ADD_LINE_BUTTON_SELECTOR: string = 'button[ng-click*="addLine("]';
 const PACKAGE_ROW_SELECTOR: string = '[ng-repeat="package in destination.Packages"]';
 const UPLOAD_CSV_INPUT_SELECTOR: string = 'input[data-role="upload"]';
 const CSV_INPUT_CONTAINER_SELECTOR: string = ".k-upload.k-header";
@@ -25,6 +23,8 @@ const PACKAGE_GROSS_UNIT_OF_WEIGHT_ID_SELECT_SELECTOR: string =
 const PACKAGE_WHOLESALE_PRICE_INPUT_SELECTOR: string = 'input[ng-model="package.WholesalePrice"]';
 
 class MetrcModalManager implements IAtomicService {
+  clientData: IClientConfig = clientBuildManager.clientConfig();
+
   async init() {
   }
 
