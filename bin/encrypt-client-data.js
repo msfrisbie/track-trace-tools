@@ -9,10 +9,10 @@ for (let i = 1; ; ++i) {
   let data, clientName, licenseKey;
 
   try {
-    const rawData = require(`../src/client/decrypted-data/data-${id}.json`);
-    const clientInfo = require(`../src/client/secrets/client-keys/client-${id}.json`);
+    const { clientConfig } = require(`../src/client/decrypted-data/data-${id}.js`);
+    const { clientInfo } = require(`../src/client/secrets/client-keys/client-${id}.js`);
 
-    data = rawData;
+    data = clientConfig;
     clientName = clientInfo.clientName.trim();
     licenseKey = clientInfo.licenseKey.trim();
   } catch (e) {

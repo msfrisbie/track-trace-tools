@@ -5,42 +5,56 @@
         <b-form-group>
           <div class="mb-2 text-gray-400 text-lg">License Key</div>
 
-          <b-input-group v-if="!!settings.licenseKey" class="items-start">
-            <b-form-input
-              id="input-licenseKey"
-              class="mb-2"
-              v-model="settings.licenseKey"
-              name="input-licenseKey"
-              disabled="disabled"
-            >
-            </b-form-input>
+          <template v-if="!!settings.licenseKey">
+            <template v-if="decryptedClientData">
+              <div class="font-bold text-xl text-purple-800">
+                Client: {{ decryptedClientData.clientName }}
+              </div>
+            </template>
+            <template v-else>
+              <div class="font-bold text-red-500">Error: no matching client data</div>
+            </template>
 
-            <b-input-group-append>
-              <b-button size="md" @click="clearLicenseKey()" variant="outline-danger"
-                >CLEAR</b-button
+            <b-input-group class="items-start">
+              <b-form-input
+                id="input-licenseKey"
+                class="mb-2"
+                v-model="settings.licenseKey"
+                name="input-licenseKey"
+                disabled="disabled"
               >
-            </b-input-group-append>
-          </b-input-group>
+              </b-form-input>
 
-          <b-input-group v-if="!settings.licenseKey" class="items-start">
-            <b-form-input
-              id="input-licenseKey"
-              placeholder="Paste your license key here"
-              class="mb-2"
-              v-model="unsavedLicenseKey"
-              name="input-licenseKey"
-            >
-            </b-form-input>
-            <b-input-group-append>
-              <b-button
-                :disabled="!unsavedLicenseKey"
-                size="md"
-                @click="saveLicenseKey()"
-                variant="outline-success"
-                >SAVE</b-button
+              <b-input-group-append>
+                <b-button size="md" @click="clearLicenseKey()" variant="outline-danger"
+                  >CLEAR</b-button
+                >
+              </b-input-group-append>
+            </b-input-group>
+          </template>
+
+          <template v-else>
+            <b-input-group class="items-start">
+              <b-form-input
+                id="input-licenseKey"
+                placeholder="Paste your license key here"
+                class="mb-2"
+                v-model="unsavedLicenseKey"
+                :state="validKey"
+                name="input-licenseKey"
               >
-            </b-input-group-append>
-          </b-input-group>
+              </b-form-input>
+              <b-input-group-append>
+                <b-button
+                  :disabled="!unsavedLicenseKey"
+                  size="md"
+                  @click="saveLicenseKey()"
+                  variant="outline-success"
+                  >SAVE</b-button
+                >
+              </b-input-group-append>
+            </b-input-group>
+          </template>
 
           <a
             class="text-purple-600 underline"
@@ -401,10 +415,12 @@
 import { LandingPage, MessageType } from "@/consts";
 import { DarkModeState, SnowflakeState } from "@/interfaces";
 import { analyticsManager } from "@/modules/analytics-manager.module";
+import { clientBuildManager } from "@/modules/client-build-manager.module";
 import { pageManager } from "@/modules/page-manager.module";
 import { toastManager } from "@/modules/toast-manager.module";
 import { MutationType } from "@/mutation-types";
 import store from "@/store/page-overlay/index";
+import { getMatchingDecryptedDataOrNull } from "@/utils/encryption";
 import { generateThumbnail } from "@/utils/file";
 import Vue from "vue";
 
@@ -489,6 +505,18 @@ export default Vue.extend({
       settings: JSON.parse(JSON.stringify(this.$store.state.settings)),
     };
   },
+  computed: {
+    validKey() {
+      if (!this.$data.unsavedLicenseKey) {
+        return null;
+      }
+
+      return !!getMatchingDecryptedDataOrNull(this.$data.unsavedLicenseKey);
+    },
+    decryptedClientData() {
+      return getMatchingDecryptedDataOrNull(this.$store.state.settings.licenseKey);
+    },
+  },
   methods: {
     async toggleDebugMode() {
       window.location.hash = "";
@@ -498,6 +526,7 @@ export default Vue.extend({
       this.$data.settings.licenseKey = this.$data.unsavedLicenseKey;
       this.$data.unsavedLicenseKey = "";
       this.onChange();
+      clientBuildManager.loadClientConfig();
     },
     clearLicenseKey() {
       if (!window.confirm("Are you sure you want to remove your license key?")) {
@@ -505,6 +534,7 @@ export default Vue.extend({
       }
       this.$data.settings.licenseKey = "";
       this.onChange();
+      clientBuildManager.loadClientConfig();
     },
     onImageChange() {},
     onChange() {

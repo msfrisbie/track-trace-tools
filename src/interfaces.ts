@@ -1446,14 +1446,16 @@ export interface IBuilderComponentError {
 
 export interface IClientConfig {
   clientName: string;
+  values?: {
+    [key: string]: string;
+  };
+  // Deprecated
   overrides?: {
     transferTemplateHtmlUrl?: string;
   };
-  selectors?: {
-    [key: string]: string;
-  };
 }
 
-export interface IEncryptedClientData {
-  
+export interface IClientInfo {
+  clientName: string;
+  licenseKey: string;
 }
