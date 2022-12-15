@@ -28,7 +28,18 @@ class ClientBuildManager implements IAtomicService {
     }
     return true;
   }
+
+  validateAndGetValuesOrError(keys: string[]): { [key: string]: string } {
+    if (!clientBuildManager.clientConfig?.values) {
+      throw new Error("Missing values");
+    }
+
+    if (!this.assertValues(keys)) {
+      throw new Error("Missing keys");
+    }
+
+    return clientBuildManager.clientConfig.values;
+  }
 }
 
 export let clientBuildManager = new ClientBuildManager();
-
