@@ -9,6 +9,8 @@ import { toastManager } from "./toast-manager.module";
 const debugLog = debugLogFactory("modules/metrc-modal-analyzer.module.ts");
 
 const NEW_TRANSFER_TITLE: string = "New Transfer";
+const NEW_LICENSED_TRANSFER_TITLE: string = "New Licensed Transfer";
+const EDIT_LICENSED_TRANSFER_TITLE: string = "Edit Licensed Transfer";
 
 const clientKeys: string[] = [
   "CSV_APPLY_BUTTON_ATTRIBUTE",
@@ -54,6 +56,8 @@ class MetrcModalManager implements IAtomicService {
 
     switch (modalTitle) {
       case NEW_TRANSFER_TITLE:
+      case NEW_LICENSED_TRANSFER_TITLE:
+      case EDIT_LICENSED_TRANSFER_TITLE:
         const destinations: HTMLElement[] = [
           ...modal.querySelectorAll(values.DESTINATION_SELECTOR),
         ] as HTMLElement[];
