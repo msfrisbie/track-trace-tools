@@ -1,8 +1,10 @@
+import { DOLLAR_NUMBER_REGEX, METRC_TAG_REGEX, WEIGHT_NUMBER_REGEX } from "@/consts";
 import { IAtomicService } from "@/interfaces";
 import { debugLogFactory } from "@/utils/debug";
 import { activeMetrcModalOrNull, modalTitleOrError } from "@/utils/metrc-modal";
 import * as Papa from "papaparse";
 import { clientBuildManager } from "./client-build-manager.module";
+import { toastManager } from "./toast-manager.module";
 
 const debugLog = debugLogFactory("modules/metrc-modal-analyzer.module.ts");
 
@@ -34,7 +36,13 @@ class MetrcModalManager implements IAtomicService {
       return;
     }
 
-    const values = clientBuildManager.validateAndGetValuesOrError(clientKeys);
+    let values;
+
+    try {
+      values = clientBuildManager.validateAndGetValuesOrError(clientKeys);
+    } catch (e) {
+      return;
+    }
 
     const modal = activeMetrcModalOrNull();
 
@@ -175,6 +183,186 @@ class MetrcModalManager implements IAtomicService {
 
     const mergedRows: string[][] = await this.getMergedCsvDataOrError(intermediateCsvInput);
 
+    if (!mergedRows.length) {
+      toastManager.openToast(`The CSVs you added are empty.`, {
+        title: "CSV Formatting Error",
+        autoHideDelay: 5000,
+        variant: "danger",
+        appendToast: true,
+        toaster: "ttt-toaster",
+        solid: true,
+      });
+
+      return;
+    }
+
+    let formattingErrorCount = 0;
+
+    for (const [idx, row] of mergedRows.entries()) {
+      if (!row[0]) {
+        if (formattingErrorCount < 5) {
+          toastManager.openToast(
+            `Row ${idx} is missing a tag value
+          
+          ${JSON.stringify(row)}`,
+            {
+              title: "CSV Formatting Error",
+              autoHideDelay: 5000,
+              variant: "warning",
+              appendToast: true,
+              toaster: "ttt-toaster",
+              solid: true,
+            }
+          );
+        }
+        formattingErrorCount++;
+      } else {
+        if (!row[0].match(METRC_TAG_REGEX)) {
+          if (formattingErrorCount < 5) {
+            toastManager.openToast(
+              `Row ${idx} does not have a valid tag
+          
+          ${JSON.stringify(row)}`,
+              {
+                title: "CSV Formatting Error",
+                autoHideDelay: 5000,
+                variant: "danger",
+                appendToast: true,
+                toaster: "ttt-toaster",
+                solid: true,
+              }
+            );
+          }
+          formattingErrorCount++;
+        }
+      }
+
+      if (!row[1]) {
+        if (formattingErrorCount < 5) {
+          toastManager.openToast(
+            `Row ${idx} is missing a weight value
+          
+          ${JSON.stringify(row)}`,
+            {
+              title: "CSV Formatting Error",
+              autoHideDelay: 5000,
+              variant: "warning",
+              appendToast: true,
+              toaster: "ttt-toaster",
+              solid: true,
+            }
+          );
+        }
+        formattingErrorCount++;
+      } else {
+        if (!row[1].match(WEIGHT_NUMBER_REGEX)) {
+          if (formattingErrorCount < 5) {
+            toastManager.openToast(
+              `Row ${idx} does not have a valid weight
+          
+          ${JSON.stringify(row)}`,
+              {
+                title: "CSV Formatting Error",
+                autoHideDelay: 5000,
+                variant: "warning",
+                appendToast: true,
+                toaster: "ttt-toaster",
+                solid: true,
+              }
+            );
+          }
+          formattingErrorCount++;
+        }
+      }
+
+      if (!row[2]) {
+        if (formattingErrorCount < 5) {
+          toastManager.openToast(
+            `Row ${idx} is missing a unit of measure
+          
+          ${JSON.stringify(row)}`,
+            {
+              title: "CSV Formatting Error",
+              autoHideDelay: 5000,
+              variant: "warning",
+              appendToast: true,
+              toaster: "ttt-toaster",
+              solid: true,
+            }
+          );
+        }
+        formattingErrorCount++;
+      } else {
+        if (!["Pounds", "Grams", "Kilograms", "Ounces"].includes(row[2])) {
+          if (formattingErrorCount < 5) {
+            toastManager.openToast(
+              `Row ${idx} does not have a valid weight
+          
+          ${JSON.stringify(row)}`,
+              {
+                title: "CSV Formatting Error",
+                autoHideDelay: 5000,
+                variant: "warning",
+                appendToast: true,
+                toaster: "ttt-toaster",
+                solid: true,
+              }
+            );
+          }
+          formattingErrorCount++;
+        }
+      }
+
+      if (!row[3]) {
+        if (formattingErrorCount < 5) {
+          toastManager.openToast(
+            `Row ${idx} is missing a wholesale value
+          
+          ${JSON.stringify(row)}`,
+            {
+              title: "CSV Formatting Error",
+              autoHideDelay: 5000,
+              variant: "warning",
+              appendToast: true,
+              toaster: "ttt-toaster",
+              solid: true,
+            }
+          );
+        }
+        formattingErrorCount++;
+      } else {
+        if (!row[3].match(DOLLAR_NUMBER_REGEX)) {
+          if (formattingErrorCount < 5) {
+            toastManager.openToast(
+              `Row ${idx} does not have a valid wholesale dollar amount
+          
+          ${JSON.stringify(row)}`,
+              {
+                title: "CSV Formatting Error",
+                autoHideDelay: 5000,
+                variant: "warning",
+                appendToast: true,
+                toaster: "ttt-toaster",
+                solid: true,
+              }
+            );
+          }
+          formattingErrorCount++;
+        }
+      }
+    }
+
+    if (formattingErrorCount > 0) {
+      toastManager.openToast(`Detected ${formattingErrorCount} CSV formatting errors`, {
+        title: "CSV Formatting Error",
+        autoHideDelay: 5000,
+        variant: "warning",
+        appendToast: true,
+        toaster: "ttt-toaster",
+        solid: true,
+      });
+    }
+
     const blob = new Blob([mergedRows.map((row) => row[0]).join("\n")], {
       type: "text/csv",
     });
@@ -208,6 +396,14 @@ class MetrcModalManager implements IAtomicService {
       );
 
       if (!packageTagInput) {
+        toastManager.openToast(`Unable to autofill package tag input`, {
+          title: "CSV Autofill Error",
+          autoHideDelay: 5000,
+          variant: "danger",
+          appendToast: true,
+          toaster: "ttt-toaster",
+          solid: true,
+        });
         throw new Error("Could not locate package tag input");
       }
 
@@ -224,18 +420,33 @@ class MetrcModalManager implements IAtomicService {
       }
 
       if (!matchingRow) {
+        toastManager.openToast(`Could not match row for ${packageTagInput.value}`, {
+          title: "CSV Autofill Error",
+          autoHideDelay: 5000,
+          variant: "danger",
+          appendToast: true,
+          toaster: "ttt-toaster",
+          solid: true,
+        });
         console.error(`Could not match row for ${packageTagInput.value}`);
         continue;
       }
-
-      console.log(packageTagInput);
 
       const grossWeightInput: HTMLInputElement | null = pkg.querySelector(
         values.PACKAGE_GROSS_WEIGHT_INPUT_SELECTOR
       );
 
       if (grossWeightInput) {
-        grossWeightInput.value = matchingRow[1];
+        grossWeightInput.value = matchingRow[1].replace(",", "");
+      } else {
+        toastManager.openToast(`Could not autofill gross weight input ${matchingRow[1]}`, {
+          title: "CSV Autofill Error",
+          autoHideDelay: 5000,
+          variant: "danger",
+          appendToast: true,
+          toaster: "ttt-toaster",
+          solid: true,
+        });
       }
 
       const grossUnitOfWeightSelect: HTMLSelectElement | null = pkg.querySelector(
@@ -244,15 +455,24 @@ class MetrcModalManager implements IAtomicService {
 
       if (grossUnitOfWeightSelect) {
         const options = [...grossUnitOfWeightSelect.querySelectorAll("option")];
-        const matchingOption = null;
+        let matchingOption = null;
         for (const option of options) {
           if (option.getAttribute("label") === matchingRow[2]) {
+            matchingOption = option;
             grossUnitOfWeightSelect.value = option.value;
             break;
           }
         }
 
         if (!matchingOption) {
+          toastManager.openToast(`Could not autofill unit of measure ${matchingRow[2]}`, {
+            title: "CSV Autofill Error",
+            autoHideDelay: 5000,
+            variant: "danger",
+            appendToast: true,
+            toaster: "ttt-toaster",
+            solid: true,
+          });
           console.error("Unable to match");
         }
       }
@@ -263,6 +483,15 @@ class MetrcModalManager implements IAtomicService {
 
       if (wholesalePriceInput && typeof matchingRow[3] !== undefined) {
         wholesalePriceInput.value = matchingRow[3].replace("$", "").replace(",", "");
+      } else {
+        toastManager.openToast(`Could not autofill wholesale value ${matchingRow[3]}`, {
+          title: "CSV Autofill Error",
+          autoHideDelay: 5000,
+          variant: "danger",
+          appendToast: true,
+          toaster: "ttt-toaster",
+          solid: true,
+        });
       }
     }
   }
