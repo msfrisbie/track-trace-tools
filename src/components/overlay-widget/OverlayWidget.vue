@@ -52,8 +52,6 @@ import { ModalAction, ModalType } from "@/consts";
 import { IContextMenuEvent, IModalEvent, modalManager } from "@/modules/modal-manager.module";
 import { toastManager } from "@/modules/toast-manager.module";
 import store from "@/store/page-overlay/index";
-import { library } from "@fortawesome/fontawesome-svg-core";
-import { faClock } from "@fortawesome/free-regular-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import { BootstrapVue } from "bootstrap-vue";
 import { debounceTime } from "rxjs/operators";
@@ -63,7 +61,6 @@ import VueTypeaheadBootstrap from "vue-typeahead-bootstrap";
 Vue.use(BootstrapVue);
 Vue.component("vue-typeahead-bootstrap", VueTypeaheadBootstrap);
 Vue.component("font-awesome-icon", FontAwesomeIcon);
-library.add(faClock);
 
 export default Vue.extend({
   name: "OverlayWidget",

@@ -105,6 +105,7 @@ Vue.component("vue-typeahead-bootstrap", VueTypeaheadBootstrap);
 Vue.component("font-awesome-icon", FontAwesomeIcon);
 
 library.add(
+  // @ts-ignore
   fontawesomeBrands.faFacebook,
   fontawesomeBrands.faLinkedin,
   fontawesomeBrands.faTwitter,

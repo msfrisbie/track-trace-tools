@@ -340,7 +340,7 @@ export const OKLAHOMA_METRC_HOSTNAME = "ok.metrc.com";
 export const OREGON_METRC_HOSTNAME = "or.metrc.com";
 export const WEST_VIRGINIA_METRC_HOSTNAME = "wv.metrc.com";
 
-export const METRC_HOSTNAMES_LACKING_LAB_PDFS = [];
+export const METRC_HOSTNAMES_LACKING_LAB_PDFS: string[] = [];
 
 export const VUEX_KEY = "vuex";
 

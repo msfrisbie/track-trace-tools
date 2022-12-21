@@ -55,15 +55,15 @@ export default Vue.extend({
   },
   methods: {
     async takeScreenshot() {
-      if (!(await accountManager.accountEnabled())) {
-        // if (navigator.userAgent.toLowerCase().indexOf("firefox") > -1) {
-        //   // Do Firefox-related activities
-        //   modalManager.dispatchModalEvent(ModalType.PERMISSIONS);
-        // } else {
-        //   messageBus.sendMessageToBackground(MessageType.OPEN_CONNECT_STANDALONE, {});
-        // }
-        return;
-      }
+      // if (!(await accountManager.accountEnabled())) {
+      //   // if (navigator.userAgent.toLowerCase().indexOf("firefox") > -1) {
+      //   //   // Do Firefox-related activities
+      //   //   modalManager.dispatchModalEvent(ModalType.PERMISSIONS);
+      //   // } else {
+      //   //   messageBus.sendMessageToBackground(MessageType.OPEN_CONNECT_STANDALONE, {});
+      //   // }
+      //   return;
+      // }
 
       await timer(this.$data.delayMs).toPromise();
 

@@ -41,7 +41,6 @@
 </template>
 
 <script lang="ts">
-import { accountManager } from "@/modules/account-manager.module";
 import { screenshotManager } from "@/modules/screenshot-manager.module";
 import { MutationType } from "@/mutation-types";
 import store from "@/store/page-overlay/index";
@@ -69,15 +68,15 @@ export default Vue.extend({
       this.$store.commit(MutationType.UPDATE_TRACKED_INTERACTIONS, trackedInteractions);
     },
     async takeScreenshot() {
-      if (!(await accountManager.accountEnabled())) {
-        // if (navigator.userAgent.toLowerCase().indexOf("firefox") > -1) {
-        //   // Do Firefox-related activities
-        //   modalManager.dispatchModalEvent(ModalType.PERMISSIONS);
-        // } else {
-        //   messageBus.sendMessageToBackground(MessageType.OPEN_CONNECT_STANDALONE, {});
-        // }
-        return;
-      }
+      // if (!(await accountManager.accountEnabled())) {
+      //   // if (navigator.userAgent.toLowerCase().indexOf("firefox") > -1) {
+      //   //   // Do Firefox-related activities
+      //   //   modalManager.dispatchModalEvent(ModalType.PERMISSIONS);
+      //   // } else {
+      //   //   messageBus.sendMessageToBackground(MessageType.OPEN_CONNECT_STANDALONE, {});
+      //   // }
+      //   return;
+      // }
 
       screenshotManager.takeScreenshot({
         downloadFile: false,

@@ -12,27 +12,27 @@ This software is released under the MIT license. [Read a quick overview of this 
 
 ## Getting Started
 
-1. After downloading the repository, install the required packages:
+1.  After downloading the repository, install the required packages:
 
-        $ npm install
+        $ yarn install --ignore-engines
 
-2. Build the extension:
+2.  Build the extension:
 
     To build for local development:
 
-        $ npm run serve
+        $ yarn serve
 
     To build for production:
 
-        $ npm run build
+        $ yarn build
 
-3. Once the build has finished, load the `dist/` directory into your browser.
+3.  Once the build has finished, load the `dist/` directory into your browser.
 
 ## Testing
 
 To run tests:
 
-    $ npm run test:unit
+    $ yarn test:unit
 
 ## License
 

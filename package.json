@@ -3,8 +3,8 @@
   "version": "0.8.0",
   "private": true,
   "scripts": {
-    "serve": "vue-cli-service build --mode development --watch --openssl-legacy-provider",
-    "build": " vue-cli-service build --prod --openssl-legacy-provider",
+    "serve": "NODE_OPTIONS=--openssl-legacy-provider; vue-cli-service build --mode development --watch",
+    "build": "NODE_OPTIONS=--openssl-legacy-provider; vue-cli-service build --prod",
     "test:unit": "vue-cli-service test:unit",
     "lint": "vue-cli-service lint"
   },
