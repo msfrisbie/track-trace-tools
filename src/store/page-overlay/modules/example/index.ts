@@ -15,7 +15,9 @@ const defaultState: IExampleState = {
 export const flagsModule = {
   state: () => defaultState,
   mutations: {
-    [ExampleMutations.EXAMPLE_MUTATION](state: IExampleState, data: any) {},
+    [ExampleMutations.EXAMPLE_MUTATION](state: IExampleState, data: any) {
+      // state.data = data;
+    },
   },
   getters: {
     [ExampleGetters.EXAMPLE_GETTER]: (
@@ -23,10 +25,15 @@ export const flagsModule = {
       getters: any,
       rootState: any,
       rootGetters: any
-    ) => {},
+    ) => {
+      // return state.data
+    },
   },
   actions: {
-    [ExampleActions.EXAMPLE_ACTION](ctx: ActionContext<IExampleState, IPluginState>, data: any) {
+    [ExampleActions.EXAMPLE_ACTION]: async (
+      ctx: ActionContext<IExampleState, IPluginState>,
+      data: any
+    ) => {
       ctx.commit(ExampleMutations.EXAMPLE_MUTATION, data);
     },
   },
