@@ -421,9 +421,11 @@ class PageManager implements IAtomicService {
         await this.clickLogoutDismiss();
       }
 
-      this.controlLogoutBar(store.state.settings?.preventLogout);
-      this.controlSnowflakeAnimation(store.state.settings?.snowflakeState);
-      this.controlDarkMode(store.state.settings?.darkModeState);
+      if (store.state.settings) {
+        this.controlLogoutBar(store.state.settings.preventLogout);
+        this.controlSnowflakeAnimation(store.state.settings.snowflakeState);
+        this.controlDarkMode(store.state.settings.darkModeState);
+      }
       this.togglePageVisibilityClasses();
 
       if (window.location.pathname.match(PACKAGE_TAB_REGEX)) {
@@ -641,7 +643,7 @@ class PageManager implements IAtomicService {
         let license: string | null = authState.license;
 
         let homeLicense: string | null;
-        if (!!(homeLicense = store.state.settings?.homeLicenses[authState.identity])) {
+        if (!!(homeLicense = store.state.settings?.homeLicenses[authState.identity] || null)) {
           const availableLicenses = await facilityManager.ownedFacilitiesOrError();
 
           debugLog(async () => ["Home license matched:", homeLicense]);
@@ -2373,16 +2375,18 @@ class PageManager implements IAtomicService {
 
     let expectedPagination: number | null = null;
 
-    if (window.location.pathname.match(PACKAGE_TAB_REGEX)) {
-      expectedPagination = store.state.settings?.packageDefaultPageSize;
-    } else if (window.location.pathname.match(TRANSFER_TAB_REGEX)) {
-      expectedPagination = store.state.settings?.transferDefaultPageSize;
-    } else if (window.location.pathname.match(SALES_TAB_REGEX)) {
-      expectedPagination = store.state.settings?.salesDefaultPageSize;
-    } else if (window.location.pathname.match(TAG_TAB_REGEX)) {
-      expectedPagination = store.state.settings?.tagDefaultPageSize;
-    } else if (window.location.pathname.match(PLANTS_TAB_REGEX)) {
-      expectedPagination = store.state.settings?.plantDefaultPageSize;
+    if (store.state.settings) {
+      if (window.location.pathname.match(PACKAGE_TAB_REGEX)) {
+        expectedPagination = store.state.settings.packageDefaultPageSize;
+      } else if (window.location.pathname.match(TRANSFER_TAB_REGEX)) {
+        expectedPagination = store.state.settings.transferDefaultPageSize;
+      } else if (window.location.pathname.match(SALES_TAB_REGEX)) {
+        expectedPagination = store.state.settings.salesDefaultPageSize;
+      } else if (window.location.pathname.match(TAG_TAB_REGEX)) {
+        expectedPagination = store.state.settings.tagDefaultPageSize;
+      } else if (window.location.pathname.match(PLANTS_TAB_REGEX)) {
+        expectedPagination = store.state.settings.plantDefaultPageSize;
+      }
     }
 
     if (!expectedPagination) {

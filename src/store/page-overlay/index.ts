@@ -1,22 +1,18 @@
 import {
   BackgroundTaskState,
   DEBUG_ATTRIBUTE,
-  LandingPage,
   SearchModalView,
   ToolkitView,
   VUEX_KEY,
 } from "@/consts";
 import {
-  DarkModeState,
   IAccountSettings,
   IContactData,
   IMetrcStatusData,
   IPluginState,
-  ISettingsState,
   ITagSearchFilters,
   ITrackedInteractions,
   ITransferSearchFilters,
-  SnowflakeState,
 } from "@/interfaces";
 import { isDevelopment } from "@/modules/environment.module";
 import { MutationType } from "@/mutation-types";
