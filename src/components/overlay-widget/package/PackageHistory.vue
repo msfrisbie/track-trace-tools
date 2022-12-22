@@ -11,7 +11,6 @@
 
 <script lang="ts">
 import SinglePackagePicker from "@/components/overlay-widget/shared/SinglePackagePicker.vue";
-import { IPackageData } from "@/interfaces";
 import router from "@/router/index";
 import store from "@/store/page-overlay/index";
 import Vue from "vue";
@@ -34,9 +33,10 @@ export default Vue.extend({
     return {};
   },
   methods: {
-    ...mapActions({
-      setPackage: `packageHistory/${PackageHistoryActions.SET_SOURCE_PACKAGE}`,
-    }),
+    setPackage() {},
+    // ...mapActions({
+    //   setPackage: `packageHistory/${PackageHistoryActions.SET_SOURCE_PACKAGE}`,
+    // }),
   },
   async created() {},
   async mounted() {},
