@@ -117,6 +117,7 @@
             <div>Track & Trace Tools can auto-void ranges of tags.</div>
           </div>
         </template>
+
         <template v-if="slide === 'snowflakes'">
           <div class="text-gray-700 flex flex-col justify-around gap-2">
             <div class="font-semibold ttt-purple">Snowflakes? How about noflakes!</div>
@@ -133,6 +134,21 @@
           <div class="text-gray-700 flex flex-col justify-around gap-2">
             <div class="font-semibold ttt-purple">Generate CSVs</div>
             <div>TTT can generate Metrc CSVs. Click "Download CSV" in the "Submit" step.</div>
+          </div>
+        </template>
+        <template v-if="slide === 'donate'">
+          <div class="text-gray-700 flex flex-col justify-around gap-2">
+            <div class="font-semibold ttt-purple">Support Track &amp; Trace Tools!</div>
+            <div>
+              Donate to the open source cannabis project
+              <a
+                class="text-purple-500 hover:text-purple-500 underline"
+                :href="donateUrl"
+                target="_blank"
+                @click.stop
+                >here</a
+              >
+            </div>
           </div>
         </template>
         <template v-if="slide === 'share'">
@@ -240,6 +256,7 @@ export default Vue.extend({
       linkedinShareUrl: `https://www.linkedin.com/shareArticle?url=${shareUrl}&title=${shareTitle}&summary=${shareSummary}`,
       emailShareUrl: `mailto:?subject=${shareTitle}&body=${shareUrl}`,
       facebookShareUrl: `https://www.facebook.com/sharer/sharer.php?u=${shareUrl}`,
+      donateUrl: `https://buy.stripe.com/fZe9BB7Ua56yaHefYY`,
       slide: 0,
       sliding: null,
       slides: _.shuffle([
@@ -256,6 +273,7 @@ export default Vue.extend({
         "harvest",
         "logout",
         "share",
+        "donate",
       ]),
     };
   },
