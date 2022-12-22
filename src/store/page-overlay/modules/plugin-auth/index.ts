@@ -110,6 +110,24 @@ export const pluginAuthModule = {
       // If the token exists and has not yet expired, assume authentiated
       return true;
     },
+    [PluginAuthGetters.AUTH_STATE]: (
+      state: IPluginAuthState,
+      getters: any,
+      rootState: any,
+      rootGetters: any
+    ) => {
+      return state.authState || null;
+    },
+    [PluginAuthGetters.PACKAGES_URL]: (
+      state: IPluginAuthState,
+      getters: any,
+      rootState: any,
+      rootGetters: any
+    ) => {
+      return state.authState?.license
+      ? `/industry/${state.authState?.license}/packages`
+      : null;
+    },
   },
   actions: {
     [PluginAuthActions.SET_AUTH](

@@ -12,7 +12,9 @@ import {
   TransferState,
 } from "@/consts";
 import { IFlagsState } from "./store/page-overlay/modules/flags/interfaces";
+import { IListingState } from "./store/page-overlay/modules/listing/interfaces";
 import { IPackageSearchState } from "./store/page-overlay/modules/package-search/interfaces";
+import { IPlantSearchState } from "./store/page-overlay/modules/plant-search/interfaces";
 import { IPluginAuthState } from "./store/page-overlay/modules/plugin-auth/interfaces";
 import { IPromoteImmaturePlantsBuilderState } from "./store/page-overlay/modules/promote-immature-plants-builder/interfaces";
 import { ISearchState } from "./store/page-overlay/modules/search/interfaces";
@@ -134,7 +136,7 @@ export interface IBackgroundTasksState {
   voidTagsConsecutiveErrorTotal: number;
 }
 
-export interface IPluginState {
+export interface IRootState {
   // authState: IAuthState | null;
   accountEnabled: boolean;
   accountSettings: IAccountSettings;
@@ -169,15 +171,20 @@ export interface IPluginState {
   transferSearchFilters: ITransferSearchFilters;
   backgroundTasks: IBackgroundTasksState;
   metrcStatusData: IMetrcStatusData | null;
+}
+
+export interface IPluginState extends IRootState {
   // Modules
-  pluginAuth?: IPluginAuthState;
-  transferBuilder?: ITransferBuilderState;
-  packageSearch?: IPackageSearchState;
-  splitPackageBuilder?: ISplitPackageBuilderState;
-  promoteImmaturePlantsBuilder?: IPromoteImmaturePlantsBuilderState;
-  search?: ISearchState;
-  settings?: ISettingsState;
-  flags?: IFlagsState;
+  pluginAuth: IPluginAuthState;
+  transferBuilder: ITransferBuilderState;
+  packageSearch: IPackageSearchState;
+  plantSearch: IPlantSearchState;
+  splitPackageBuilder: ISplitPackageBuilderState;
+  promoteImmaturePlantsBuilder: IPromoteImmaturePlantsBuilderState;
+  search: ISearchState;
+  settings: ISettingsState;
+  listing: IListingState;
+  flags: IFlagsState;
 }
 
 export type MetrcTagType = "CannabisPlant" | "CannabisPackage";

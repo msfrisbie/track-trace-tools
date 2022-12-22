@@ -8,6 +8,8 @@ export enum PluginAuthMutations {
 
 export enum PluginAuthGetters {
   IS_AUTHENTICATED = "IS_AUTHENTICATED",
+  AUTH_STATE = "AUTH_STATE",
+  PACKAGES_URL = "PACKAGES_URL",
 }
 
 export enum PluginAuthActions {

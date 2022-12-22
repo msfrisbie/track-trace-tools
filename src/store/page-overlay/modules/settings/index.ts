@@ -64,7 +64,7 @@ export const settingsModule = {
   actions: {},
 };
 
-export const flagsReducer = (state: ISettingsState): ISettingsState => {
+export const settingsReducer = (state: ISettingsState): ISettingsState => {
   return {
     ...state,
     ...inMemoryState,
