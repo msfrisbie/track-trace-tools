@@ -11,10 +11,12 @@
 
 <script lang="ts">
 import SinglePackagePicker from "@/components/overlay-widget/shared/SinglePackagePicker.vue";
+import { IPluginState } from "@/interfaces";
 import router from "@/router/index";
 import store from "@/store/page-overlay/index";
+import { PackageHistoryActions } from "@/store/page-overlay/modules/package-history/consts";
 import Vue from "vue";
-import { mapState } from "vuex";
+import { mapActions, mapState } from "vuex";
 
 export default Vue.extend({
   name: "PackageHistory",
@@ -25,18 +27,17 @@ export default Vue.extend({
     SinglePackagePicker,
   },
   computed: {
-    ...mapState({
-      sourcePackage: (state: any) => state.packgeHistory.sourcePackage,
+    ...mapState<IPluginState>({
+      sourcePackage: (state: IPluginState) => state.packageHistory.sourcePackage,
     }),
   },
   data() {
     return {};
   },
   methods: {
-    setPackage() {},
-    // ...mapActions({
-    //   setPackage: `packageHistory/${PackageHistoryActions.SET_SOURCE_PACKAGE}`,
-    // }),
+    ...mapActions({
+      setPackage: `packageHistory/${PackageHistoryActions.SET_SOURCE_PACKAGE}`,
+    }),
   },
   async created() {},
   async mounted() {},

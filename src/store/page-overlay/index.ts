@@ -24,6 +24,7 @@ import Vuex from "vuex";
 import VuexPersistence from "vuex-persist";
 import { flagsModule, flagsReducer } from "./modules/flags/index";
 import { listingModule, listingReducer } from "./modules/listing";
+import { packageHistoryModule, packageHistoryReducer } from "./modules/package-history";
 import { packageSearchModule, packageSearchReducer } from "./modules/package-search";
 import { plantSearchModule, plantSearchReducer } from "./modules/plant-search";
 import { pluginAuthModule, pluginAuthReducer } from "./modules/plugin-auth/index";
@@ -68,6 +69,7 @@ const vuexShared = {
       ),
       listing: listingReducer(state.listing),
       settings: settingsReducer(state.settings),
+      packageHistory: packageHistoryReducer(state.packageHistory),
     };
   },
 };
@@ -394,6 +396,10 @@ export default new Vuex.Store<IPluginState>({
     packageSearch: {
       namespaced: true,
       ...packageSearchModule,
+    },
+    packageHistory: {
+      namespaced: true,
+      ...packageHistoryModule,
     },
     plantSearch: {
       namespaced: true,

@@ -13,6 +13,7 @@ import {
 } from "@/consts";
 import { IFlagsState } from "./store/page-overlay/modules/flags/interfaces";
 import { IListingState } from "./store/page-overlay/modules/listing/interfaces";
+import { IPackageHistoryState } from "./store/page-overlay/modules/package-history/interfaces";
 import { IPackageSearchState } from "./store/page-overlay/modules/package-search/interfaces";
 import { IPlantSearchState } from "./store/page-overlay/modules/plant-search/interfaces";
 import { IPluginAuthState } from "./store/page-overlay/modules/plugin-auth/interfaces";
@@ -185,6 +186,7 @@ export interface IPluginState extends IRootState {
   settings: ISettingsState;
   listing: IListingState;
   flags: IFlagsState;
+  packageHistory: IPackageHistoryState;
 }
 
 export type MetrcTagType = "CannabisPlant" | "CannabisPackage";

@@ -12,7 +12,7 @@ const defaultState: IExampleState = {
   ...persistedState,
 };
 
-export const flagsModule = {
+export const exampleModule = {
   state: () => defaultState,
   mutations: {
     [ExampleMutations.EXAMPLE_MUTATION](state: IExampleState, data: any) {
