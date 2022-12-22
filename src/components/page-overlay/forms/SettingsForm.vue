@@ -420,6 +420,7 @@ import { pageManager } from "@/modules/page-manager.module";
 import { toastManager } from "@/modules/toast-manager.module";
 import { MutationType } from "@/mutation-types";
 import store from "@/store/page-overlay/index";
+import { SettingsMutations } from "@/store/page-overlay/modules/settings/consts";
 import { getMatchingDecryptedDataOrNull } from "@/utils/encryption";
 import { generateThumbnail } from "@/utils/file";
 import Vue from "vue";
@@ -514,7 +515,7 @@ export default Vue.extend({
       return !!getMatchingDecryptedDataOrNull(this.$data.unsavedLicenseKey);
     },
     decryptedClientData() {
-      return getMatchingDecryptedDataOrNull(this.$store.state.settings.licenseKey);
+      return getMatchingDecryptedDataOrNull(this.$store.state.settings?.licenseKey);
     },
   },
   methods: {
@@ -544,7 +545,7 @@ export default Vue.extend({
         settings: JSON.parse(JSON.stringify(this.settings)),
       });
 
-      this.$store.commit(MutationType.UPDATE_SETTINGS, this.settings);
+      this.$store.commit(`settings/${SettingsMutations.SET_SETTINGS}`, this.settings);
 
       toastManager.openToast(
         `TTT settings successfully updated. Refresh the page to apply changes.`,

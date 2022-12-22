@@ -19,7 +19,7 @@ export class ToastManager implements IAtomicService {
     }
 
     openToast(text: string, options: any) {
-        if (store.state.settings.disablePopups) {
+        if (store.state.settings?.disablePopups) {
             return;
         }
         

@@ -91,8 +91,8 @@ import { analyticsManager } from "@/modules/analytics-manager.module";
 import { authManager } from "@/modules/auth-manager.module";
 import { facilityManager } from "@/modules/facility-manager.module";
 import { toastManager } from "@/modules/toast-manager.module";
-import { MutationType } from "@/mutation-types";
 import store from "@/store/page-overlay/index";
+import { SettingsMutations } from "@/store/page-overlay/modules/settings/consts";
 import { copyToClipboard } from "@/utils/dom";
 import { getLicenseFromNameOrError } from "@/utils/facility";
 import { timer } from "rxjs";
@@ -152,7 +152,7 @@ export default Vue.extend({
           a.name < b.name ? -1 : a.name > b.name ? 1 : 0
         );
 
-      const homeLicense: string = this.$store.state.settings.homeLicenses[authState.identity];
+      const homeLicense: string = this.$store.state.settings?.homeLicenses[authState.identity];
 
       this.$data.facilities = [
         ...facilities.filter((x) => x.name.endsWith(homeLicense)),
@@ -208,7 +208,10 @@ export default Vue.extend({
     async setHomeLicense({ name }: { name: string }) {
       const license = getLicenseFromNameOrError(name);
 
-      this.$store.commit(MutationType.SET_HOME_LICENSE, [this.$data.identity, license]);
+      this.$store.commit(`settings/${SettingsMutations.SET_HOME_LICENSE}`, [
+        this.$data.identity,
+        license,
+      ]);
 
       this.updateFacilityList();
 
@@ -227,7 +230,10 @@ export default Vue.extend({
       });
     },
     async unsetHomeLicense() {
-      this.$store.commit(MutationType.SET_HOME_LICENSE, [this.$data.identity, null]);
+      this.$store.commit(`settings/${SettingsMutations.SET_HOME_LICENSE}`, [
+        this.$data.identity,
+        null,
+      ]);
 
       this.updateFacilityList();
 

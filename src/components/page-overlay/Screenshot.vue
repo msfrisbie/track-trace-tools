@@ -21,7 +21,6 @@
 
 <script lang="ts">
 import { ModalAction, ModalType } from "@/consts";
-import { accountManager } from "@/modules/account-manager.module";
 import { modalManager } from "@/modules/modal-manager.module";
 import { pageManager } from "@/modules/page-manager.module";
 import { screenshotManager } from "@/modules/screenshot-manager.module";
@@ -76,7 +75,7 @@ export default Vue.extend({
       await screenshotManager.takeScreenshot({
         downloadFile: false,
         useBackground: true,
-        useLegacyScreenshot: this.$store.state.settings.useLegacyScreenshot,
+        useLegacyScreenshot: this.$store.state.settings?.useLegacyScreenshot,
       });
     },
   },

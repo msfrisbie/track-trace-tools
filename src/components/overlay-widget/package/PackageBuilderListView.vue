@@ -60,7 +60,6 @@ import { MessageType } from "@/consts";
 import { analyticsManager } from "@/modules/analytics-manager.module";
 import { dynamicConstsManager } from "@/modules/dynamic-consts-manager.module";
 import store from "@/store/page-overlay/index";
-import { isLicenseEligibleForItemTemplateTools } from "@/utils/access-control";
 import { HOST_WILDCARD, isCurrentHostAllowed } from "@/utils/builder";
 import { notAvailableMessage } from "@/utils/text";
 import Vue from "vue";
@@ -156,7 +155,18 @@ export default Vue.extend({
           // isBeta: true,
           isNew: false,
           enabled: isCurrentHostAllowed([HOST_WILDCARD]),
-          visible: isLicenseEligibleForItemTemplateTools({ license: this.authState?.license }),
+          visible: true,
+          showDisabledMessage: true,
+        },
+        {
+          route: "/package/history",
+          text: "PACKAGE HISTORY",
+          icon: "sitemap",
+          backgroundColor: "#2774ae",
+          // isBeta: true,
+          isNew: false,
+          enabled: isCurrentHostAllowed([HOST_WILDCARD]),
+          visible: true,
           showDisabledMessage: true,
         },
       ];

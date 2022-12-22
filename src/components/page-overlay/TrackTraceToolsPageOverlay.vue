@@ -177,6 +177,7 @@ library.add(
   fontawesomeSolid.faSearch,
   fontawesomeSolid.faSeedling,
   fontawesomeSolid.faShieldAlt,
+  fontawesomeSolid.faSitemap,
   fontawesomeSolid.faSlidersH,
   fontawesomeSolid.faSync,
   fontawesomeSolid.faTachometerAlt,

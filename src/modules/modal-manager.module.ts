@@ -36,7 +36,7 @@ export class ModalManager implements IAtomicService {
   ) {
     // This could be problematic
     //
-    // if (store.state.settings.disablePopups) {
+    // if (store.state.settings?.disablePopups) {
     //     return;
     // }
 

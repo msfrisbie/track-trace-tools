@@ -23,6 +23,7 @@ import ItemTemplateBuilder from "@/components/overlay-widget/package/ItemTemplat
 import MergePackagesBuilder from "@/components/overlay-widget/package/MergePackagesBuilder.vue";
 import MovePackagesBuilder from "@/components/overlay-widget/package/MovePackagesBuilder.vue";
 import PackageBuilderListView from "@/components/overlay-widget/package/PackageBuilderListView.vue";
+import PackageHistory from "@/components/overlay-widget/package/PackageHistory.vue";
 import PackageToolsHelp from "@/components/overlay-widget/package/PackageToolsHelp.vue";
 import SplitPackageBuilder from "@/components/overlay-widget/package/SplitPackageBuilder.vue";
 import TransferBuilder from "@/components/overlay-widget/transfer/TransferBuilder.vue";
@@ -95,6 +96,11 @@ const routes: Array<RouteConfig> = [
     path: "/package/add-item-group",
     name: "Add Item Group",
     component: ItemTemplateBuilder,
+  },
+  {
+    path: "/package/history",
+    name: "Package History",
+    component: PackageHistory,
   },
   {
     path: "/package/split-package",

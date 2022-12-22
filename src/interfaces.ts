@@ -1,6 +1,5 @@
 import {
   BackgroundTaskState,
-  LandingPage,
   Level,
   MessageType,
   MetrcStatus,
@@ -17,6 +16,7 @@ import { IPackageSearchState } from "./store/page-overlay/modules/package-search
 import { IPluginAuthState } from "./store/page-overlay/modules/plugin-auth/interfaces";
 import { IPromoteImmaturePlantsBuilderState } from "./store/page-overlay/modules/promote-immature-plants-builder/interfaces";
 import { ISearchState } from "./store/page-overlay/modules/search/interfaces";
+import { ISettingsState } from "./store/page-overlay/modules/settings/interfaces";
 import { ISplitPackageBuilderState } from "./store/page-overlay/modules/split-package-builder/interfaces";
 import { ITransferBuilderState } from "./store/page-overlay/modules/transfer-builder/interfaces";
 import { CsvUpload, CsvUploadStatus } from "./types";
@@ -38,43 +38,6 @@ export enum SnowflakeState {
   ENABLED = "ENABLED",
   CSS = "CSS",
   DISABLED = "DISABLED",
-}
-
-export interface ISettings {
-  autoOpenActivePackages: boolean;
-  autoOpenActiveSales: boolean;
-  autoOpenAvailableTags: boolean;
-  autoOpenFloweringPlants: boolean;
-  autoOpenIncomingTransfers: boolean;
-  darkModeState: DarkModeState;
-  disablePopups: boolean;
-  disableSnowAnimation: boolean;
-  hideFacilityPicker: boolean;
-  hideInlineTransferButtons: boolean;
-  hidePackageSearch: boolean;
-  hideQuickActionButtons: boolean;
-  hideScreenshotButton: boolean;
-  hideTransferSearch: boolean;
-  landingPage: LandingPage;
-  licenseKey: string;
-  homeLicenses: { [key: string]: string | null };
-  packageDefaultPageSize: number;
-  plantDefaultPageSize: number;
-  preventLogout: boolean;
-  salesDefaultPageSize: number;
-  snowflakeState: SnowflakeState;
-  snowflakeCharacter: string;
-  snowflakeSize: string;
-  snowflakeImage: string;
-  snowflakeImageCrop: "none" | "square" | "circle" | "rounded";
-  snowflakeText: string;
-  tagDefaultPageSize: number;
-  transferDefaultPageSize: number;
-  useLegacyScreenshot: boolean;
-  enableManifestDocumentViewer: boolean;
-  hideListingsButton: boolean;
-  preventActiveProjectPageLeave: boolean;
-  enableSearchOverMetrcModal: boolean;
 }
 
 export interface IAccountSettings {
@@ -194,7 +157,6 @@ export interface IPluginState {
   omniQueryString: string;
   omniQueryStringHistory: string[];
   searchModalView: SearchModalView | null;
-  settings: ISettings;
   showTransferSearchResults: boolean;
   tagQueryString: string;
   tagQueryStringHistory: string[];
@@ -214,6 +176,7 @@ export interface IPluginState {
   splitPackageBuilder?: ISplitPackageBuilderState;
   promoteImmaturePlantsBuilder?: IPromoteImmaturePlantsBuilderState;
   search?: ISearchState;
+  settings?: ISettingsState;
   flags?: IFlagsState;
 }
 

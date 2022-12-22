@@ -1,22 +1,22 @@
 import { BuilderType, MessageType } from "@/consts";
 import {
-  IAtomicService,
-  ICsvFile,
-  IMetrcCreateItemsPayload,
-  IMetrcCreatePackagesFromPackagesPayload,
-  IMetrcCreatePlantBatchPackagesFromMotherPlantBatchPayload,
-  IMetrcCreatePlantBatchPackagesFromMotherPlantPayload,
-  IMetrcCreateStateAuthorizedTransferPayload,
-  IMetrcDestroyPlantsPayload,
-  IMetrcFinishPackagesPayload,
-  IMetrcHarvestPlantsPayload,
-  IMetrcManicurePlantsPayload,
-  IMetrcMovePackagesPayload,
-  IMetrcMovePlantsPayload,
-  IMetrcPromoteImmaturePlantsPayload,
-  IMetrcReplacePlantBatchTagsPayload,
-  IMetrcReplacePlantTagsPayload,
-  IMetrcUnpackImmaturePlantsPayload,
+    IAtomicService,
+    ICsvFile,
+    IMetrcCreateItemsPayload,
+    IMetrcCreatePackagesFromPackagesPayload,
+    IMetrcCreatePlantBatchPackagesFromMotherPlantBatchPayload,
+    IMetrcCreatePlantBatchPackagesFromMotherPlantPayload,
+    IMetrcCreateStateAuthorizedTransferPayload,
+    IMetrcDestroyPlantsPayload,
+    IMetrcFinishPackagesPayload,
+    IMetrcHarvestPlantsPayload,
+    IMetrcManicurePlantsPayload,
+    IMetrcMovePackagesPayload,
+    IMetrcMovePlantsPayload,
+    IMetrcPromoteImmaturePlantsPayload,
+    IMetrcReplacePlantBatchTagsPayload,
+    IMetrcReplacePlantTagsPayload,
+    IMetrcUnpackImmaturePlantsPayload
 } from "@/interfaces";
 import { primaryMetrcRequestManager } from "@/modules/metrc-request-manager.module";
 import store from "@/store/page-overlay/index";
@@ -82,7 +82,7 @@ class BuilderManager implements IAtomicService {
     this.activeBuilderProjectUpdate.next();
 
     if (
-      store.state.settings.preventActiveProjectPageLeave &&
+      store.state.settings?.preventActiveProjectPageLeave &&
       project &&
       (project?.pendingRows.length > 0 ||
         project?.inflightRows.length > 0 ||

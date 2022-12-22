@@ -12,7 +12,7 @@ import {
   IContactData,
   IMetrcStatusData,
   IPluginState,
-  ISettings,
+  ISettingsState,
   ITagSearchFilters,
   ITrackedInteractions,
   ITransferSearchFilters,
@@ -35,6 +35,7 @@ import {
   promoteImmaturePlantsBuilderReducer,
 } from "./modules/promote-immature-plants-builder";
 import { searchModule, searchReducer } from "./modules/search";
+import { settingsModule } from "./modules/settings";
 import {
   splitPackageBuilderModule,
   splitPackageBuilderReducer,
@@ -126,42 +127,6 @@ const defaultState: IPluginState = {
   tagSearchFilters: {
     label: null,
   },
-  settings: {
-    autoOpenActivePackages: true,
-    autoOpenActiveSales: true,
-    autoOpenAvailableTags: true,
-    autoOpenFloweringPlants: true,
-    autoOpenIncomingTransfers: true,
-    darkModeState: DarkModeState.DISABLED,
-    disablePopups: false,
-    disableSnowAnimation: false,
-    hideFacilityPicker: false,
-    hideInlineTransferButtons: false,
-    hidePackageSearch: false,
-    hideQuickActionButtons: false,
-    hideScreenshotButton: false,
-    hideTransferSearch: false,
-    landingPage: LandingPage.PACKAGES,
-    licenseKey: "",
-    homeLicenses: {},
-    packageDefaultPageSize: 20,
-    plantDefaultPageSize: 20,
-    preventLogout: true,
-    salesDefaultPageSize: 20,
-    snowflakeState: SnowflakeState.DISABLED,
-    snowflakeCharacter: "❅",
-    snowflakeImageCrop: "none",
-    snowflakeSize: "md",
-    snowflakeImage: "",
-    snowflakeText: "LET IT SNOW",
-    tagDefaultPageSize: 20,
-    transferDefaultPageSize: 20,
-    useLegacyScreenshot: false,
-    enableManifestDocumentViewer: false,
-    hideListingsButton: false,
-    preventActiveProjectPageLeave: true,
-    enableSearchOverMetrcModal: true,
-  },
   trackedInteractions: {
     dismissedScreenshotPopover: false,
     dismissedCsvBuilderPopover: false,
@@ -210,14 +175,6 @@ export default new Vuex.Store({
     [MutationType.SET_CONTACT_DATA](state: IPluginState, contactData: IContactData) {
       state.contactData = {
         ...contactData,
-      };
-    },
-    [MutationType.SET_HOME_LICENSE](state: IPluginState, homeLicense: [string, string]) {
-      state.settings.homeLicenses[homeLicense[0]] = homeLicense[1];
-    },
-    [MutationType.UPDATE_SETTINGS](state: IPluginState, settings: ISettings) {
-      state.settings = {
-        ...settings,
       };
     },
     [MutationType.UPDATE_ACCOUNT_SETTINGS](state: IPluginState, accountSettings: IAccountSettings) {
@@ -474,6 +431,10 @@ export default new Vuex.Store({
     search: {
       namespaced: true,
       ...searchModule,
+    },
+    settings: {
+      namespaced: true,
+      ...settingsModule,
     },
   },
   plugins: [vuexPersistence.plugin],

@@ -81,7 +81,7 @@ export default Vue.extend({
       screenshotManager.takeScreenshot({
         downloadFile: false,
         useBackground: true,
-        useLegacyScreenshot: this.$store.state.settings.useLegacyScreenshot,
+        useLegacyScreenshot: this.$store.state.settings?.useLegacyScreenshot,
       });
     },
   },

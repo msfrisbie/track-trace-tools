@@ -417,13 +417,13 @@ class PageManager implements IAtomicService {
       this.activeModal = document.querySelector("div.k-widget.k-window");
 
       // TODO the methods should read the store directly
-      if (store.state.settings.preventLogout) {
+      if (store.state.settings?.preventLogout) {
         await this.clickLogoutDismiss();
       }
 
-      this.controlLogoutBar(store.state.settings.preventLogout);
-      this.controlSnowflakeAnimation(store.state.settings.snowflakeState);
-      this.controlDarkMode(store.state.settings.darkModeState);
+      this.controlLogoutBar(store.state.settings?.preventLogout);
+      this.controlSnowflakeAnimation(store.state.settings?.snowflakeState);
+      this.controlDarkMode(store.state.settings?.darkModeState);
       this.togglePageVisibilityClasses();
 
       if (window.location.pathname.match(PACKAGE_TAB_REGEX)) {
@@ -616,7 +616,7 @@ class PageManager implements IAtomicService {
 
         const match = currentPathname.match(METRC_INDUSTRY_LICENSE_PATH_REGEX);
 
-        switch (store.state.settings.landingPage) {
+        switch (store.state.settings?.landingPage) {
           case LandingPage.TRANSFERS:
             subpath = `/transfers/licensed`;
             break;
@@ -641,7 +641,7 @@ class PageManager implements IAtomicService {
         let license: string | null = authState.license;
 
         let homeLicense: string | null;
-        if (!!(homeLicense = store.state.settings.homeLicenses[authState.identity])) {
+        if (!!(homeLicense = store.state.settings?.homeLicenses[authState.identity])) {
           const availableLicenses = await facilityManager.ownedFacilitiesOrError();
 
           debugLog(async () => ["Home license matched:", homeLicense]);
@@ -1206,7 +1206,7 @@ class PageManager implements IAtomicService {
   }
 
   private async interceptViewManifestButton() {
-    if (!store.state.settings.enableManifestDocumentViewer) {
+    if (!store.state.settings?.enableManifestDocumentViewer) {
       return;
     }
 
@@ -2374,15 +2374,15 @@ class PageManager implements IAtomicService {
     let expectedPagination: number | null = null;
 
     if (window.location.pathname.match(PACKAGE_TAB_REGEX)) {
-      expectedPagination = store.state.settings.packageDefaultPageSize;
+      expectedPagination = store.state.settings?.packageDefaultPageSize;
     } else if (window.location.pathname.match(TRANSFER_TAB_REGEX)) {
-      expectedPagination = store.state.settings.transferDefaultPageSize;
+      expectedPagination = store.state.settings?.transferDefaultPageSize;
     } else if (window.location.pathname.match(SALES_TAB_REGEX)) {
-      expectedPagination = store.state.settings.salesDefaultPageSize;
+      expectedPagination = store.state.settings?.salesDefaultPageSize;
     } else if (window.location.pathname.match(TAG_TAB_REGEX)) {
-      expectedPagination = store.state.settings.tagDefaultPageSize;
+      expectedPagination = store.state.settings?.tagDefaultPageSize;
     } else if (window.location.pathname.match(PLANTS_TAB_REGEX)) {
-      expectedPagination = store.state.settings.plantDefaultPageSize;
+      expectedPagination = store.state.settings?.plantDefaultPageSize;
     }
 
     if (!expectedPagination) {
@@ -2473,25 +2473,25 @@ class PageManager implements IAtomicService {
   }
 
   private togglePageVisibilityClasses() {
-    // if (store.state.settings.hideQuickActionButtons) {
+    // if (store.state.settings?.hideQuickActionButtons) {
     //     document.body.classList.add('quick-action-hidden');
     // } else {
     //     document.body.classList.remove('quick-action-hidden');
     // }
 
-    if (store.state.settings.hidePackageSearch) {
+    if (store.state.settings?.hidePackageSearch) {
       document.body.classList.add("package-search-hidden");
     } else {
       document.body.classList.remove("package-search-hidden");
     }
 
-    if (store.state.settings.hideTransferSearch) {
+    if (store.state.settings?.hideTransferSearch) {
       document.body.classList.add("transfer-search-hidden");
     } else {
       document.body.classList.remove("transfer-search-hidden");
     }
 
-    if (store.state.settings.hideInlineTransferButtons) {
+    if (store.state.settings?.hideInlineTransferButtons) {
       document.body.classList.add("transfer-buttons-hidden");
     } else {
       document.body.classList.remove("transfer-buttons-hidden");
@@ -2565,7 +2565,7 @@ class PageManager implements IAtomicService {
         return;
     }
 
-    if (store.state.settings.autoOpenFloweringPlants) {
+    if (store.state.settings?.autoOpenFloweringPlants) {
       await this.clickTabStartingWith(this.plantsTabs, "Flowering");
     }
   }
@@ -2604,7 +2604,7 @@ class PageManager implements IAtomicService {
         return;
     }
 
-    if (store.state.settings.autoOpenActivePackages) {
+    if (store.state.settings?.autoOpenActivePackages) {
       await this.clickTabStartingWith(this.packageTabs, "Active");
     }
   }
@@ -2640,7 +2640,7 @@ class PageManager implements IAtomicService {
         return;
     }
 
-    if (store.state.settings.autoOpenIncomingTransfers) {
+    if (store.state.settings?.autoOpenIncomingTransfers) {
       await this.clickTabStartingWith(this.transferTabs, "Incoming");
     }
   }
@@ -2650,7 +2650,7 @@ class PageManager implements IAtomicService {
       return;
     }
 
-    if (store.state.settings.autoOpenActiveSales) {
+    if (store.state.settings?.autoOpenActiveSales) {
       await this.clickTabStartingWith(this.salesTabs, "Active");
     }
   }
@@ -2686,7 +2686,7 @@ class PageManager implements IAtomicService {
         return;
     }
 
-    if (store.state.settings.autoOpenAvailableTags) {
+    if (store.state.settings?.autoOpenAvailableTags) {
       await this.clickTabStartingWith(this.tagTabs, "Available");
     }
   }
