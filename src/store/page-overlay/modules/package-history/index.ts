@@ -19,7 +19,7 @@ export const packageHistoryModule = {
   mutations: {
     [PackageHistoryMutations.SET_SOURCE_PACKAGE](
       state: IPackageHistoryState,
-      pkg: IPackageData | null
+      { pkg }: { pkg: IPackageData | null }
     ) {
       state.sourcePackage = pkg;
     },
@@ -28,9 +28,9 @@ export const packageHistoryModule = {
   actions: {
     [PackageHistoryActions.SET_SOURCE_PACKAGE]: async (
       ctx: ActionContext<IPackageHistoryState, IPluginState>,
-      pkg: IPackageData | null
+      { pkg }: { pkg: IPackageData | null }
     ) => {
-      ctx.commit(PackageHistoryMutations.SET_SOURCE_PACKAGE, pkg);
+      ctx.commit(PackageHistoryMutations.SET_SOURCE_PACKAGE, { pkg });
     },
   },
 };

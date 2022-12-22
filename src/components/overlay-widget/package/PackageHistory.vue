@@ -1,7 +1,7 @@
 <template>
-  <div>
-    <div>PackageHistory</div>
+  <div class="flex flex-col items-stretch w-full h-full">
     <single-package-picker
+      class=""
       :selectedPackages="sourcePackage ? [sourcePackage] : []"
       v-on:removePackage="setPackage({ pkg: null })"
       v-on:addPackage="setPackage({ pkg: $event })"

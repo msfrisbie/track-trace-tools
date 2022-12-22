@@ -154,7 +154,7 @@ export default Vue.extend({
           backgroundColor: "#2774ae",
           // isBeta: true,
           isNew: false,
-          enabled: isCurrentHostAllowed([HOST_WILDCARD]),
+          enabled: false, //isCurrentHostAllowed([HOST_WILDCARD]),
           visible: true,
           showDisabledMessage: true,
         },
