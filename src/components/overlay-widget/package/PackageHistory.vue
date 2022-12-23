@@ -1,11 +1,16 @@
 <template>
   <div class="flex flex-col items-stretch w-full h-full">
-    <single-package-picker
-      class=""
-      :selectedPackages="sourcePackage ? [sourcePackage] : []"
-      v-on:removePackage="setPackage({ pkg: null })"
-      v-on:addPackage="setPackage({ pkg: $event })"
-    ></single-package-picker>
+    <template v-if="!sourcePackage">
+      <single-package-picker
+        class=""
+        :selectedPackages="sourcePackage ? [sourcePackage] : []"
+        v-on:removePackage="setPackage({ pkg: null })"
+        v-on:addPackage="setPackage({ pkg: $event })"
+      ></single-package-picker>
+    </template>
+    <template v-else>
+      {{ sourcePackage }}
+    </template>
   </div>
 </template>
 

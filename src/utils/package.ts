@@ -3,6 +3,7 @@ import { IPackageData } from "@/interfaces";
 import { authManager } from "@/modules/auth-manager.module";
 import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
 import { toastManager } from "@/modules/toast-manager.module";
+import { Subject } from "rxjs";
 import { downloadFileFromUrl } from "./dom";
 
 export async function getLabTestUrlsFromPackage({
@@ -116,4 +117,14 @@ export function packageFieldMatch(
   packageFilterIdentifier: PackageFilterIdentifiers
 ): string[] | null {
   return null;
+}
+
+export async function buildPackageHistory(
+  pkg: IPackageData,
+  subject: Subject<{ ancestors: IPackageData[][]; children: IPackageData[][] }>
+) {
+  subject.next({
+    ancestors: [],
+    children: [],
+  });
 }

@@ -507,11 +507,11 @@ export interface IPackageData extends ITaggedIResponseObjectData {
   ReceivedFromFacilityName: string | null;
   ReceivedFromManifestNumber: string | null;
   RemediationDate: string | null;
-  SourceHarvestNames: string;
+  SourceHarvestNames: string;  // "HARVEST 1, HARVEST 2, "
   SourcePackageIsDonation: boolean;
   SourcePackageIsTradeSample: boolean;
-  SourcePackageLabels: string;
-  SourceProductionBatchNumbers: string;
+  SourcePackageLabels: string;  // "1A4000000000000000000528, 1A4000000000000000000529, "
+  SourceProductionBatchNumbers: string;  // "BATCH 1, BATCH 2, "
   TradeSampleFacilityName: string | null;
   TradeSampleFacilityLicenseNumber: string | null;
   TransferManifestNumber: string;
