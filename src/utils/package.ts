@@ -3,7 +3,6 @@ import { IPackageData } from "@/interfaces";
 import { authManager } from "@/modules/auth-manager.module";
 import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
 import { toastManager } from "@/modules/toast-manager.module";
-import { Subject } from "rxjs";
 import { downloadFileFromUrl } from "./dom";
 
 export async function getLabTestUrlsFromPackage({
@@ -119,12 +118,42 @@ export function packageFieldMatch(
   return null;
 }
 
-export async function buildPackageHistory(
-  pkg: IPackageData,
-  subject: Subject<{ ancestors: IPackageData[][]; children: IPackageData[][] }>
-) {
-  subject.next({
-    ancestors: [],
-    children: [],
-  });
+export async function getParentPackages(pkg: IPackageData): Promise<IPackageData[]> {
+  const parentPackageLabels = pkg.SourcePackageLabels.split(",").map((x) => x.trim());
+
+  const matches = [];
+
+  for (const label of parentPackageLabels) {
+    try {
+      matches.push(await primaryDataLoader.activePackage(label));
+    } catch (e) {}
+    try {
+      matches.push(await primaryDataLoader.inactivePackage(label));
+    } catch (e) {}
+    try {
+      matches.push(await primaryDataLoader.inTransitPackage(label));
+    } catch (e) {}
+  }
+
+  return matches;
+}
+
+export async function getChildPackages(pkg: IPackageData): Promise<IPackageData[]> {
+  const matches = [];
+
+  for (const x of await primaryDataLoader.onDemandActivePackageSearch({ queryString: pkg.Label })) {
+    matches.push(x);
+  }
+  for (const x of await primaryDataLoader.onDemandInactivePackageSearch({
+    queryString: pkg.Label,
+  })) {
+    matches.push(x);
+  }
+  for (const x of await primaryDataLoader.onDemandInTransitPackageSearch({
+    queryString: pkg.Label,
+  })) {
+    matches.push(x);
+  }
+
+  return matches.filter((x) => pkg.SourcePackageLabels.includes(pkg.Label));
 }

@@ -1,10 +1,13 @@
 import { IPackageData, IPluginState } from "@/interfaces";
+import { getChildPackages, getParentPackages } from "@/utils/package";
 import { ActionContext } from "vuex";
 import { PackageHistoryActions, PackageHistoryMutations } from "../package-history/consts";
 import { IPackageHistoryState } from "../package-history/interfaces";
 
 const inMemoryState = {
   sourcePackage: null,
+  ancestors: [],
+  children: [],
 };
 
 const persistedState = {};
@@ -23,6 +26,18 @@ export const packageHistoryModule = {
     ) {
       state.sourcePackage = pkg;
     },
+    [PackageHistoryMutations.SET_ANCESTORS](
+      state: IPackageHistoryState,
+      { packages }: { packages: IPackageData[][] }
+    ) {
+      state.ancestors = packages;
+    },
+    [PackageHistoryMutations.SET_CHILDREN](
+      state: IPackageHistoryState,
+      { packages }: { packages: IPackageData[][] }
+    ) {
+      state.children = packages;
+    },
   },
   getters: {},
   actions: {
@@ -31,6 +46,18 @@ export const packageHistoryModule = {
       { pkg }: { pkg: IPackageData | null }
     ) => {
       ctx.commit(PackageHistoryMutations.SET_SOURCE_PACKAGE, { pkg });
+
+      if (pkg) {
+        ctx.commit(PackageHistoryMutations.SET_ANCESTORS, {
+          packages: [await getParentPackages(pkg)],
+        });
+        ctx.commit(PackageHistoryMutations.SET_CHILDREN, {
+          packages: [await getChildPackages(pkg)],
+        });
+      } else {
+        ctx.commit(PackageHistoryMutations.SET_ANCESTORS, { packages: [] });
+        ctx.commit(PackageHistoryMutations.SET_CHILDREN, { packages: [] });
+      }
     },
   },
 };

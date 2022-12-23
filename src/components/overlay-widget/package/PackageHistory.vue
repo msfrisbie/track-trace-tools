@@ -6,15 +6,38 @@
         :selectedPackages="sourcePackage ? [sourcePackage] : []"
         v-on:removePackage="setPackage({ pkg: null })"
         v-on:addPackage="setPackage({ pkg: $event })"
+        :selectAllPackageTypes="true"
       ></single-package-picker>
     </template>
     <template v-else>
-      {{ sourcePackage }}
+      <div class="grid grid-cols-2">
+        <div class="col-span-2">
+          {{ sourcePackage.Label }}
+          <button @click="setPackage({ pkg: null })">RESET</button>
+        </div>
+        <div>
+          <div>Ancestors</div>
+          <package-history-tile
+            v-for="ancestor of ancestors[0]"
+            v-bind:key="ancestor.Label"
+            :pkg="ancestor"
+          ></package-history-tile>
+        </div>
+        <div>
+          <div>Children</div>
+          <package-history-tile
+            v-for="child of children[0]"
+            v-bind:key="child.Label"
+            :pkg="child"
+          ></package-history-tile>
+        </div>
+      </div>
     </template>
   </div>
 </template>
 
 <script lang="ts">
+import PackageHistoryTile from "@/components/overlay-widget/shared/PackageHistoryTile.vue";
 import SinglePackagePicker from "@/components/overlay-widget/shared/SinglePackagePicker.vue";
 import { IPluginState } from "@/interfaces";
 import router from "@/router/index";
@@ -30,10 +53,13 @@ export default Vue.extend({
   props: {},
   components: {
     SinglePackagePicker,
+    PackageHistoryTile,
   },
   computed: {
     ...mapState<IPluginState>({
       sourcePackage: (state: IPluginState) => state.packageHistory.sourcePackage,
+      ancestors: (state: IPluginState) => state.packageHistory.ancestors,
+      children: (state: IPluginState) => state.packageHistory.children,
     }),
   },
   data() {
@@ -46,6 +72,7 @@ export default Vue.extend({
   },
   async created() {},
   async mounted() {},
+  async destroyed() {},
 });
 </script>
 

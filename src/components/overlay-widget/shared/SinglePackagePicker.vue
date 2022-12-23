@@ -175,6 +175,10 @@ export default Vue.extend({
       type: Boolean,
       default: true,
     },
+    selectAllPackageTypes: {
+      type: Boolean,
+      default: false,
+    },
   },
   methods: {
     unitOfMeasureNameToAbbreviation,
@@ -253,6 +257,17 @@ export default Vue.extend({
       _this.$data.sourcePackages = await primaryDataLoader.onDemandActivePackageSearch({
         queryString,
       });
+      if (_this.selectAllPackageTypes) {
+        _this.$data.sourcePackages = [
+          ..._this.$data.sourcePackages,
+          ...(await primaryDataLoader.onDemandInactivePackageSearch({
+            queryString,
+          })),
+          ...(await primaryDataLoader.onDemandInTransitPackageSearch({
+            queryString,
+          })),
+        ];
+      }
     }, 500),
   },
   computed: {
@@ -289,7 +304,17 @@ export default Vue.extend({
 
         for (const tag of newValue) {
           try {
-            const matchingPkg = await primaryDataLoader.activePackage(tag);
+            let matchingPkg = await primaryDataLoader.activePackage(tag);
+
+            if (this.selectAllPackageTypes) {
+              if (!matchingPkg) {
+                matchingPkg = await primaryDataLoader.inactivePackage(tag);
+              }
+
+              if (!matchingPkg) {
+                matchingPkg = await primaryDataLoader.inTransitPackage(tag);
+              }
+            }
 
             if (matchingPkg) {
               this.$emit("addPackage", matchingPkg);
