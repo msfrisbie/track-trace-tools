@@ -4,6 +4,7 @@ import {
   ICollectionRequest,
   ICollectionResponse,
   IDataLoadOptions,
+  IHarvestFilter,
   IPaginationOptions,
   IPlantBatchFilter,
   IPlantBatchSort,
@@ -12,7 +13,7 @@ import {
   ISalesReceiptSort,
   ISort,
   ITagFilter,
-  ITransferFilter
+  ITransferFilter,
 } from "@/interfaces";
 import { DataLoadError, DataLoadErrorType } from "@/modules/data-loader/data-loader-error";
 import { debugLogFactory } from "@/utils/debug";
@@ -108,17 +109,19 @@ export function buildBodyFilter(
     plantBatchFilter?: IPlantBatchFilter;
     packageFilter?: IPackageFilter;
     transferFilter?: ITransferFilter;
+    harvestFilter?: IHarvestFilter;
   } | null
 ): ICollectionFilters | null {
   if (!filterOptions) {
     return null;
   }
 
-  const { transferFilter, plantFilter, tagFilter, plantBatchFilter, packageFilter } = filterOptions;
+  const { transferFilter, plantFilter, tagFilter, plantBatchFilter, packageFilter, harvestFilter } =
+    filterOptions;
 
   const filterSet: ICollectionFilters = {
     logic: "and",
-    filters: []
+    filters: [],
   };
 
   if (plantFilter?.locationName) {
@@ -128,8 +131,8 @@ export function buildBodyFilter(
         field: "LocationName",
         // Searching Row 2 should not match Row 20
         operator: "eq",
-        value: plantFilter.locationName
-      }
+        value: plantFilter.locationName,
+      },
     ];
   }
 
@@ -139,8 +142,8 @@ export function buildBodyFilter(
       {
         field: "StrainName",
         operator: "eq",
-        value: plantFilter.strainName
-      }
+        value: plantFilter.strainName,
+      },
     ];
   }
 
@@ -150,8 +153,8 @@ export function buildBodyFilter(
       {
         field: "FloweringDate",
         operator: "gt",
-        value: plantFilter.floweringDateGt
-      }
+        value: plantFilter.floweringDateGt,
+      },
     ];
   }
 
@@ -161,8 +164,8 @@ export function buildBodyFilter(
       {
         field: "FloweringDate",
         operator: "eq",
-        value: plantFilter.floweringDateEq
-      }
+        value: plantFilter.floweringDateEq,
+      },
     ];
   }
 
@@ -172,8 +175,8 @@ export function buildBodyFilter(
       {
         field: "FloweringDate",
         operator: "lt",
-        value: plantFilter.floweringDateLt
-      }
+        value: plantFilter.floweringDateLt,
+      },
     ];
   }
 
@@ -183,8 +186,8 @@ export function buildBodyFilter(
       {
         field: "PlantedDate",
         operator: "gt",
-        value: plantFilter.plantedDateGt
-      }
+        value: plantFilter.plantedDateGt,
+      },
     ];
   }
 
@@ -194,8 +197,8 @@ export function buildBodyFilter(
       {
         field: "PlantedDate",
         operator: "eq",
-        value: plantFilter.plantedDateEq
-      }
+        value: plantFilter.plantedDateEq,
+      },
     ];
   }
 
@@ -205,8 +208,8 @@ export function buildBodyFilter(
       {
         field: "PlantedDate",
         operator: "lt",
-        value: plantFilter.plantedDateLt
-      }
+        value: plantFilter.plantedDateLt,
+      },
     ];
   }
 
@@ -217,8 +220,8 @@ export function buildBodyFilter(
         field: "LocationName",
         // Searching Row 2 should not match Row 20
         operator: "eq",
-        value: plantBatchFilter.locationName
-      }
+        value: plantBatchFilter.locationName,
+      },
     ];
   }
 
@@ -228,8 +231,8 @@ export function buildBodyFilter(
       {
         field: "StrainName",
         operator: "eq",
-        value: plantBatchFilter.strainName
-      }
+        value: plantBatchFilter.strainName,
+      },
     ];
   }
 
@@ -239,8 +242,8 @@ export function buildBodyFilter(
       {
         field: "Label",
         operator: "endswith",
-        value: plantFilter.label
-      }
+        value: plantFilter.label,
+      },
     ];
   }
 
@@ -250,8 +253,8 @@ export function buildBodyFilter(
       {
         field: "Label",
         operator: "eq",
-        value: tagFilter.label
-      }
+        value: tagFilter.label,
+      },
     ];
   }
 
@@ -261,8 +264,8 @@ export function buildBodyFilter(
       {
         field: "Label",
         operator: "eq",
-        value: packageFilter.label
-      }
+        value: packageFilter.label,
+      },
     ];
   }
 
@@ -272,8 +275,19 @@ export function buildBodyFilter(
       {
         field: "ManifestNumber",
         operator: "contains",
-        value: transferFilter.manifestNumber
-      }
+        value: transferFilter.manifestNumber,
+      },
+    ];
+  }
+
+  if (harvestFilter?.harvestName) {
+    filterSet.filters = [
+      ...filterSet.filters,
+      {
+        field: "Name",
+        operator: "eq",
+        value: harvestFilter.harvestName,
+      },
     ];
   }
 
@@ -304,8 +318,8 @@ export function buildBodySort(
       ...sortSet,
       {
         field: "RecordedDateTime",
-        dir: "asc"
-      }
+        dir: "asc",
+      },
     ];
   }
 
@@ -314,8 +328,8 @@ export function buildBodySort(
       ...sortSet,
       {
         field: "Label",
-        dir: "asc"
-      }
+        dir: "asc",
+      },
     ];
   }
 
@@ -324,8 +338,8 @@ export function buildBodySort(
       ...sortSet,
       {
         field: "Name",
-        dir: "asc"
-      }
+        dir: "asc",
+      },
     ];
   }
 
@@ -351,6 +365,7 @@ export function buildBody(
     plantBatchFilter?: IPlantBatchFilter;
     packageFilter?: IPackageFilter;
     transferFilter?: ITransferFilter;
+    harvestFilter?: IHarvestFilter;
   } | null = null,
   sortOptions: {
     salesReceiptSort?: ISalesReceiptSort;
@@ -364,8 +379,8 @@ export function buildBody(
       skip: page * pageSize,
       page: page + 1,
       pageSize,
-      group: []
-    }
+      group: [],
+    },
   };
 
   const filter = buildBodyFilter(filterOptions);

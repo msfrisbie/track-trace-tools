@@ -1,13 +1,15 @@
+import { HarvestState, PackageState, TagState } from "@/consts";
 import {
   IAtomicService,
-  IHarvestData,
+  IIndexedHarvestData,
+  IIndexedPackageData,
+  IIndexedTagData,
   IItemData,
   ILocationData,
   IMetrcDriverData,
   IMetrcFacilityData,
   IMetrcTransferTypeData,
   IMetrcVehicleData,
-  IPackageData,
   IPlantBatchData,
   IPlantBatchGrowthPhase,
   IPlantBatchOptions,
@@ -15,7 +17,6 @@ import {
   IPlantData,
   IPlantOptions,
   IStrainData,
-  ITagData,
   IUnitOfMeasure,
 } from "@/interfaces";
 import store from "@/store/page-overlay/index";
@@ -308,7 +309,9 @@ const FROZEN_STORAGE_LOCATION: ILocationData = {
   Name: "Frozen Storage",
 };
 
-const NEW_HARVEST: IHarvestData = {
+const NEW_HARVEST: IIndexedHarvestData = {
+  HarvestState: HarvestState.ACTIVE,
+  TagMatcher: "",
   ArchivedDate: null,
   CurrentWeight: 0,
   DryingLocationName: "Frozen Storage",
@@ -341,7 +344,9 @@ const NEW_HARVEST: IHarvestData = {
   UnitOfWeightId: 3,
 };
 
-const OLD_HARVEST: IHarvestData = {
+const OLD_HARVEST: IIndexedHarvestData = {
+  HarvestState: HarvestState.ACTIVE,
+  TagMatcher: "",
   ArchivedDate: null,
   CurrentWeight: 0,
   DryingLocationName: "Frozen Storage",
@@ -374,14 +379,14 @@ const OLD_HARVEST: IHarvestData = {
   UnitOfWeightId: 3,
 };
 
-const NEW_MANICURE: IHarvestData = {
+const NEW_MANICURE: IIndexedHarvestData = {
   ...NEW_HARVEST,
   HarvestType: "Manicure",
   Name: "New Manicure",
   Id: 30000003,
 };
 
-const OLD_MANICURE: IHarvestData = {
+const OLD_MANICURE: IIndexedHarvestData = {
   ...OLD_HARVEST,
   HarvestType: "Manicure",
   Name: "Old Manicure",
@@ -394,9 +399,9 @@ class MockDataManager implements IAtomicService {
   private _mockLocations: ILocationData[] = [];
   private _mockStrains: IStrainData[] = [];
   private _mockItems: IItemData[] = [];
-  private _mockHarvests: IHarvestData[] = [];
-  private _mockPackages: IPackageData[] = [];
-  private _mockTags: ITagData[] = [];
+  private _mockHarvests: IIndexedHarvestData[] = [];
+  private _mockPackages: IIndexedPackageData[] = [];
+  private _mockTags: IIndexedTagData[] = [];
 
   async init() {}
 
@@ -474,7 +479,7 @@ class MockDataManager implements IAtomicService {
   }
 
   // These are filtered post-load, so generate a few of each kind every time
-  mockHarvests(): IHarvestData[] {
+  mockHarvests(): IIndexedHarvestData[] {
     if (this._mockHarvests.length > 0) {
       return this._mockHarvests;
     }
@@ -488,7 +493,7 @@ class MockDataManager implements IAtomicService {
   }
 
   // These are filtered post-load, so generate a few of each kind every time
-  mockPackages(): IPackageData[] {
+  mockPackages(): IIndexedPackageData[] {
     const packageSum: number = sum(
       Object.values(store.state.flags?.mockedFlags.mockPackages.behavior!).map(Number)
     );
@@ -507,6 +512,8 @@ class MockDataManager implements IAtomicService {
     for (const [i, label] of labels.entries()) {
       if (i < packageDistribution[0]) {
         this._mockPackages.push({
+          PackageState: PackageState.ACTIVE,
+          TagMatcher: "",
           ArchivedDate: null,
           ContainsRemediatedProduct: false,
           DonationFacilityLicenseNumber: null,
@@ -572,6 +579,8 @@ class MockDataManager implements IAtomicService {
       // Plant batch packages
       if (i < packageDistribution[1]) {
         this._mockPackages.push({
+          PackageState: PackageState.ACTIVE,
+          TagMatcher: "",
           ArchivedDate: null,
           ContainsRemediatedProduct: false,
           DonationFacilityLicenseNumber: null,
@@ -637,6 +646,8 @@ class MockDataManager implements IAtomicService {
       // Processed packages
       if (i < packageDistribution[2]) {
         this._mockPackages.push({
+          PackageState: PackageState.ACTIVE,
+          TagMatcher: "",
           ArchivedDate: null,
           ContainsRemediatedProduct: false,
           DonationFacilityLicenseNumber: null,
@@ -702,6 +713,8 @@ class MockDataManager implements IAtomicService {
       // Empty packages
       if (i < packageDistribution[3]) {
         this._mockPackages.push({
+          PackageState: PackageState.ACTIVE,
+          TagMatcher: "",
           ArchivedDate: null,
           ContainsRemediatedProduct: false,
           DonationFacilityLicenseNumber: null,
@@ -803,7 +816,7 @@ class MockDataManager implements IAtomicService {
     return this._mockStrains;
   }
 
-  mockTags(): ITagData[] {
+  mockTags(): IIndexedTagData[] {
     if (this._mockTags.length > 0) {
       return this._mockTags;
     }
@@ -816,6 +829,8 @@ class MockDataManager implements IAtomicService {
     for (const [i, label] of labels.entries()) {
       if (i < 250) {
         this._mockTags.push({
+          TagState: TagState.AVAILABLE,
+          TagMatcher: "",
           Label: label,
           Id: 20000000 + i,
           IsArchived: false,
@@ -831,6 +846,8 @@ class MockDataManager implements IAtomicService {
       }
       if (i < 500) {
         this._mockTags.push({
+          TagState: TagState.AVAILABLE,
+          TagMatcher: "",
           Label: label,
           Id: 20000000 + i,
           IsArchived: false,

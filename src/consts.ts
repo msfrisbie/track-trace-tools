@@ -181,6 +181,12 @@ export enum TagState {
   VOIDED = "VOIDED",
 }
 
+export enum HarvestState {
+  ACTIVE = "ACTIVE",
+  ONHOLD = "ONHOLD",
+  INACTIVE = "INACTIVE",
+}
+
 export enum TransferState {
   INCOMING = "INCOMING",
   OUTGOING = "OUTGOING",

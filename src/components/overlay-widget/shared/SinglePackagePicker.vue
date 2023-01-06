@@ -205,16 +205,16 @@ export default Vue.extend({
     },
     focus() {
       // @ts-ignore
-      this.$refs.typeahead.$el.querySelector("input").focus();
+      this.$refs.typeahead?.$el.querySelector("input").focus();
     },
     blur() {
       // @ts-ignore
-      this.$refs.typeahead.$el.querySelector("input").blur();
+      this.$refs.typeahead?.$el.querySelector("input").blur();
     },
     clear() {
       this.$data.query = "";
       // @ts-ignore
-      this.$refs.typeahead.$el.querySelector("input").value = "";
+      this.$refs.typeahead?.$el.querySelector("input").value = "";
 
       // @ts-ignore
       this.blur();

@@ -10,10 +10,16 @@
       ></single-package-picker>
     </template>
     <template v-else>
-      <div class="grid grid-cols-2">
-        <div class="col-span-2">
-          {{ sourcePackage.Label }}
+      <div class="grid grid-cols-3">
+        <div class="col-span-3 flex flex-col gap-4">
+          <div>{{ sourcePackage.Label }}</div>
+          <div>{{ status }}</div>
           <button @click="setPackage({ pkg: null })">RESET</button>
+        </div>
+        <div class="flex flex-col items-stretch gap-2">
+          <div v-for="entry of log" v-bind:key="entry">
+            {{ entry }}
+          </div>
         </div>
         <div>
           <div>Ancestors</div>
@@ -60,6 +66,8 @@ export default Vue.extend({
       sourcePackage: (state: IPluginState) => state.packageHistory.sourcePackage,
       ancestors: (state: IPluginState) => state.packageHistory.ancestors,
       children: (state: IPluginState) => state.packageHistory.children,
+      status: (state: IPluginState) => state.packageHistory.status,
+      log: (state: IPluginState) => state.packageHistory.log,
     }),
   },
   data() {

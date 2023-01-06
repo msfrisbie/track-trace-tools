@@ -1,8 +1,10 @@
 import { PackageFilterIdentifiers } from "@/consts";
-import { IPackageData } from "@/interfaces";
+import { IIndexedHarvestData, IIndexedPackageData, IPackageData } from "@/interfaces";
 import { authManager } from "@/modules/auth-manager.module";
 import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
 import { toastManager } from "@/modules/toast-manager.module";
+import store from "@/store/page-overlay/index";
+import { PackageHistoryActions } from "@/store/page-overlay/modules/package-history/consts";
 import { downloadFileFromUrl } from "./dom";
 
 export async function getLabTestUrlsFromPackage({
@@ -118,27 +120,84 @@ export function packageFieldMatch(
   return null;
 }
 
-export async function getParentPackages(pkg: IPackageData): Promise<IPackageData[]> {
-  const parentPackageLabels = pkg.SourcePackageLabels.split(",").map((x) => x.trim());
+export async function getParentPackages(pkg: IPackageData): Promise<IIndexedPackageData[]> {
+  store.dispatch(`packageHistory/${PackageHistoryActions.LOG_EVENT}`, {
+    event: `Finding parent packages for ${pkg.Label}`,
+  });
 
-  const matches = [];
+  const parentPackageLabels = pkg.SourcePackageLabels.split(",")
+    .map((x) => x.trim())
+    .filter((x) => !!x);
 
-  for (const label of parentPackageLabels) {
-    try {
-      matches.push(await primaryDataLoader.activePackage(label));
-    } catch (e) {}
-    try {
-      matches.push(await primaryDataLoader.inactivePackage(label));
-    } catch (e) {}
-    try {
-      matches.push(await primaryDataLoader.inTransitPackage(label));
-    } catch (e) {}
+  const matches: IIndexedPackageData[] = [];
+
+  if (!parentPackageLabels) {
+    store.dispatch(`packageHistory/${PackageHistoryActions.LOG_EVENT}`, {
+      event: `${pkg.Label} has no parent packages`,
+    });
+  } else {
+    store.dispatch(`packageHistory/${PackageHistoryActions.LOG_EVENT}`, {
+      event: `Source package labels: ${parentPackageLabels.join(",")}`,
+    });
+
+    for (const label of parentPackageLabels) {
+      try {
+        matches.push(await primaryDataLoader.activePackage(label));
+      } catch (e) {}
+      try {
+        matches.push(await primaryDataLoader.inactivePackage(label));
+      } catch (e) {}
+      try {
+        matches.push(await primaryDataLoader.inTransitPackage(label));
+      } catch (e) {}
+    }
   }
+
+  store.dispatch(`packageHistory/${PackageHistoryActions.LOG_EVENT}`, {
+    event: `Matched ${matches.length} parent packages`,
+  });
 
   return matches;
 }
 
-export async function getChildPackages(pkg: IPackageData): Promise<IPackageData[]> {
+export async function getParentHarvests(pkg: IPackageData): Promise<IIndexedHarvestData[]> {
+  store.dispatch(`packageHistory/${PackageHistoryActions.LOG_EVENT}`, {
+    event: `Finding parent harvests for ${pkg.Label}`,
+  });
+
+  const parentHarvestNames = pkg.SourceHarvestNames.split(",")
+    .map((x) => x.trim())
+    .filter((x) => !!x);
+
+  const matches: IIndexedHarvestData[] = [];
+
+  if (!parentHarvestNames) {
+    store.dispatch(`packageHistory/${PackageHistoryActions.LOG_EVENT}`, {
+      event: `${pkg.Label} has no parent harvests`,
+    });
+  } else {
+    store.dispatch(`packageHistory/${PackageHistoryActions.LOG_EVENT}`, {
+      event: `Source harvest names: ${parentHarvestNames.join(",")}`,
+    });
+
+    for (const harvestName of parentHarvestNames) {
+      try {
+        matches.push(await primaryDataLoader.activeHarvestByName(harvestName));
+      } catch (e) {}
+      try {
+        matches.push(await primaryDataLoader.inactiveHarvestByName(harvestName));
+      } catch (e) {}
+    }
+  }
+
+  store.dispatch(`packageHistory/${PackageHistoryActions.LOG_EVENT}`, {
+    event: `Matched ${matches.length} parent harvests`,
+  });
+
+  return matches;
+}
+
+export async function getChildPackages(pkg: IPackageData): Promise<IIndexedPackageData[]> {
   const matches = [];
 
   for (const x of await primaryDataLoader.onDemandActivePackageSearch({ queryString: pkg.Label })) {

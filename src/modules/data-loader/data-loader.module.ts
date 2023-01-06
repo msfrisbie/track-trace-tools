@@ -1,11 +1,12 @@
 import {
   DATA_LOAD_FETCH_TIMEOUT_MS,
   DATA_LOAD_PAGE_SIZE,
+  HarvestState,
   IdbKeyPiece,
   PackageState,
   PlantState,
   TagState,
-  TransferState
+  TransferState,
 } from "@/consts";
 import {
   IAtomicService,
@@ -15,8 +16,12 @@ import {
   IDataLoadOptions,
   IExtractedITagOrderData,
   IHarvestData,
+  IHarvestFilter,
+  IIndexedHarvestData,
   IIndexedPackageData,
   IIndexedPlantData,
+  IIndexedTagData,
+  IIndexedTransferData,
   IItemData,
   ILocationData,
   IPackageData,
@@ -34,13 +39,13 @@ import {
   ITestResultData,
   ITransferData,
   ITransferFilter,
-  ITransferHistoryData
+  ITransferHistoryData,
 } from "@/interfaces";
 import { authManager } from "@/modules/auth-manager.module";
 import { databaseInterface } from "@/modules/database-interface.module";
 import {
   MetrcRequestManager,
-  primaryMetrcRequestManager
+  primaryMetrcRequestManager,
 } from "@/modules/metrc-request-manager.module";
 import { mockDataManager } from "@/modules/mock-data-manager.module";
 import { MutationType } from "@/mutation-types";
@@ -58,20 +63,20 @@ import { DataLoadError, DataLoadErrorType } from "./data-loader-error";
 const debugLog = debugLogFactory("data-loader.module.ts");
 
 export class DataLoader implements IAtomicService {
-  private _availableTags: Promise<ITagData[]> | null = null;
-  private _usedTags: Promise<ITagData[]> | null = null;
-  private _voidedTags: Promise<ITagData[]> | null = null;
-  private _activePackages: Promise<IPackageData[]> | null = null;
-  private _inactivePackages: Promise<IPackageData[]> | null = null;
-  private _inTransitPackages: Promise<IPackageData[]> | null = null;
+  private _availableTags: Promise<IIndexedTagData[]> | null = null;
+  private _usedTags: Promise<IIndexedTagData[]> | null = null;
+  private _voidedTags: Promise<IIndexedTagData[]> | null = null;
+  private _activePackages: Promise<IIndexedPackageData[]> | null = null;
+  private _inactivePackages: Promise<IIndexedPackageData[]> | null = null;
+  private _inTransitPackages: Promise<IIndexedPackageData[]> | null = null;
   private _previousTagOrders: Promise<ITagOrderData[]> | null = null;
-  private _incomingTransfers: Promise<ITransferData[]> | null = null;
-  private _outgoingTransfers: Promise<ITransferData[]> | null = null;
-  private _rejectedTransfers: Promise<ITransferData[]> | null = null;
+  private _incomingTransfers: Promise<IIndexedTransferData[]> | null = null;
+  private _outgoingTransfers: Promise<IIndexedTransferData[]> | null = null;
+  private _rejectedTransfers: Promise<IIndexedTransferData[]> | null = null;
   private _locations: Promise<ILocationData[]> | null = null;
   private _strains: Promise<IStrainData[]> | null = null;
   private _items: Promise<IItemData[]> | null = null;
-  private _activeHarvests: Promise<IHarvestData[]> | null = null;
+  private _activeHarvests: Promise<IIndexedHarvestData[]> | null = null;
 
   private _countPayload: string = buildBody({ page: 0, pageSize: 5 });
 
@@ -491,7 +496,7 @@ export class DataLoader implements IAtomicService {
   async onDemandPackageFilter({
     itemName = null,
     locationName = null,
-    isEmpty = null
+    isEmpty = null,
   }: {
     itemName?: string | null;
     locationName?: string | null;
@@ -503,10 +508,10 @@ export class DataLoader implements IAtomicService {
     }
 
     if (store.state.mockDataMode && store.state.flags?.mockedFlags.mockPackages.enabled) {
-      return mockDataManager.mockPackages().map(x => ({
+      return mockDataManager.mockPackages().map((x) => ({
         ...x,
         TagMatcher: "",
-        PackageState: PackageState.ACTIVE
+        PackageState: PackageState.ACTIVE,
       }));
     }
 
@@ -532,10 +537,10 @@ export class DataLoader implements IAtomicService {
         pageSize: 500,
         filter: {
           logic: "and",
-          filters
+          filters,
         },
-        group: []
-      }
+        group: [],
+      },
     });
 
     const activePackagesResponse = await primaryMetrcRequestManager.getActivePackages(body);
@@ -543,10 +548,10 @@ export class DataLoader implements IAtomicService {
     if (activePackagesResponse.status === 200) {
       const responseData: ICollectionResponse<IPackageData> = await activePackagesResponse.json();
 
-      const activePackages: IIndexedPackageData[] = responseData["Data"].map(x => ({
+      const activePackages: IIndexedPackageData[] = responseData["Data"].map((x) => ({
         ...x,
         PackageState: PackageState.ACTIVE,
-        TagMatcher: ""
+        TagMatcher: "",
       }));
 
       return activePackages;
@@ -567,25 +572,25 @@ export class DataLoader implements IAtomicService {
           filters: [
             { field: "Label", operator: "contains", value: queryString },
             { field: "LocationName", operator: "contains", value: queryString },
-            { field: "StrainName", operator: "contains", value: queryString }
-          ]
+            { field: "StrainName", operator: "contains", value: queryString },
+          ],
         },
-        group: []
-      }
+        group: [],
+      },
     });
   }
 
   async onDemandFloweringPlantSearch({
-    queryString
+    queryString,
   }: {
     queryString: string;
   }): Promise<IIndexedPlantData[]> {
     if (store.state.mockDataMode && store.state.flags?.mockedFlags.mockPackages.enabled) {
       // @ts-ignore
-      return mockDataManager.mockPlants({ filters: {} }).map(x => ({
+      return mockDataManager.mockPlants({ filters: {} }).map((x) => ({
         ...x,
         TagMatcher: "",
-        PlantState: PlantState.FLOWERING
+        PlantState: PlantState.FLOWERING,
       }));
     }
 
@@ -598,10 +603,10 @@ export class DataLoader implements IAtomicService {
     if (floweringPlantsResponse.status === 200) {
       const responseData: ICollectionResponse<IPlantData> = await floweringPlantsResponse.json();
 
-      const floweringPlants: IIndexedPlantData[] = responseData["Data"].map(x => ({
+      const floweringPlants: IIndexedPlantData[] = responseData["Data"].map((x) => ({
         ...x,
         PlantState: PlantState.FLOWERING,
-        TagMatcher: ""
+        TagMatcher: "",
       }));
 
       plants = [...plants, ...floweringPlants];
@@ -613,7 +618,7 @@ export class DataLoader implements IAtomicService {
   }
 
   async onDemandVegetativePlantSearch({
-    queryString
+    queryString,
   }: {
     queryString: string;
   }): Promise<IIndexedPlantData[]> {
@@ -630,10 +635,10 @@ export class DataLoader implements IAtomicService {
     if (vegetativePlantsResponse.status === 200) {
       const responseData: ICollectionResponse<IPlantData> = await vegetativePlantsResponse.json();
 
-      const vegetativePlants: IIndexedPlantData[] = responseData["Data"].map(x => ({
+      const vegetativePlants: IIndexedPlantData[] = responseData["Data"].map((x) => ({
         ...x,
         PlantState: PlantState.VEGETATIVE,
-        TagMatcher: ""
+        TagMatcher: "",
       }));
 
       plants = [...plants, ...vegetativePlants];
@@ -644,7 +649,7 @@ export class DataLoader implements IAtomicService {
   }
 
   async onDemandInactivePlantSearch({
-    queryString
+    queryString,
   }: {
     queryString: string;
   }): Promise<IIndexedPlantData[]> {
@@ -661,10 +666,10 @@ export class DataLoader implements IAtomicService {
     if (inactivePlantsResponse.status === 200) {
       const responseData: ICollectionResponse<IPlantData> = await inactivePlantsResponse.json();
 
-      const inactivePlants: IIndexedPlantData[] = responseData["Data"].map(x => ({
+      const inactivePlants: IIndexedPlantData[] = responseData["Data"].map((x) => ({
         ...x,
         PlantState: PlantState.INACTIVE,
-        TagMatcher: ""
+        TagMatcher: "",
       }));
 
       plants = [...plants, ...inactivePlants];
@@ -676,15 +681,15 @@ export class DataLoader implements IAtomicService {
   }
 
   async onDemandPackageItemSearch({
-    queryString
+    queryString,
   }: {
     queryString: string;
   }): Promise<IIndexedPackageData[]> {
     if (store.state.mockDataMode && store.state.flags?.mockedFlags.mockPackages.enabled) {
-      return mockDataManager.mockPackages().map(x => ({
+      return mockDataManager.mockPackages().map((x) => ({
         ...x,
         TagMatcher: "",
-        PackageState: PackageState.ACTIVE
+        PackageState: PackageState.ACTIVE,
       }));
     }
 
@@ -700,11 +705,11 @@ export class DataLoader implements IAtomicService {
           logic: "or",
           filters: [
             { field: "Item.StrainName", operator: "contains", value: queryString },
-            { field: "Item.Name", operator: "contains", value: queryString }
-          ]
+            { field: "Item.Name", operator: "contains", value: queryString },
+          ],
         },
-        group: []
-      }
+        group: [],
+      },
     });
 
     const activePackagesResponse = await primaryMetrcRequestManager.getActivePackages(body);
@@ -712,10 +717,10 @@ export class DataLoader implements IAtomicService {
     if (activePackagesResponse.status === 200) {
       const responseData: ICollectionResponse<IPackageData> = await activePackagesResponse.json();
 
-      const activePackages: IIndexedPackageData[] = responseData["Data"].map(x => ({
+      const activePackages: IIndexedPackageData[] = responseData["Data"].map((x) => ({
         ...x,
         PackageState: PackageState.ACTIVE,
-        TagMatcher: ""
+        TagMatcher: "",
       }));
 
       packages = [...packages, ...activePackages];
@@ -742,24 +747,24 @@ export class DataLoader implements IAtomicService {
             { field: "SourcePackageLabels", operator: "contains", value: queryString },
             { field: "SourceHarvestNames", operator: "contains", value: queryString },
             { field: "Item.StrainName", operator: "contains", value: queryString },
-            { field: "Item.Name", operator: "contains", value: queryString }
-          ]
+            { field: "Item.Name", operator: "contains", value: queryString },
+          ],
         },
-        group: []
-      }
+        group: [],
+      },
     });
   }
 
   async onDemandActivePackageSearch({
-    queryString
+    queryString,
   }: {
     queryString: string;
   }): Promise<IIndexedPackageData[]> {
     if (store.state.mockDataMode && store.state.flags?.mockedFlags.mockPackages.enabled) {
-      return mockDataManager.mockPackages().map(x => ({
+      return mockDataManager.mockPackages().map((x) => ({
         ...x,
         TagMatcher: "",
-        PackageState: PackageState.ACTIVE
+        PackageState: PackageState.ACTIVE,
       }));
     }
 
@@ -772,10 +777,10 @@ export class DataLoader implements IAtomicService {
     if (activePackagesResponse.status === 200) {
       const responseData: ICollectionResponse<IPackageData> = await activePackagesResponse.json();
 
-      const activePackages: IIndexedPackageData[] = responseData["Data"].map(x => ({
+      const activePackages: IIndexedPackageData[] = responseData["Data"].map((x) => ({
         ...x,
         PackageState: PackageState.ACTIVE,
-        TagMatcher: ""
+        TagMatcher: "",
       }));
 
       packages = [...packages, ...activePackages];
@@ -787,7 +792,7 @@ export class DataLoader implements IAtomicService {
   }
 
   async onDemandInactivePackageSearch({
-    queryString
+    queryString,
   }: {
     queryString: string;
   }): Promise<IIndexedPackageData[]> {
@@ -804,10 +809,10 @@ export class DataLoader implements IAtomicService {
     if (inactivePackagesResponse.status === 200) {
       const responseData: ICollectionResponse<IPackageData> = await inactivePackagesResponse.json();
 
-      const activePackages: IIndexedPackageData[] = responseData["Data"].map(x => ({
+      const activePackages: IIndexedPackageData[] = responseData["Data"].map((x) => ({
         ...x,
         PackageState: PackageState.INACTIVE,
-        TagMatcher: ""
+        TagMatcher: "",
       }));
 
       packages = [...packages, ...activePackages];
@@ -819,7 +824,7 @@ export class DataLoader implements IAtomicService {
   }
 
   async onDemandInTransitPackageSearch({
-    queryString
+    queryString,
   }: {
     queryString: string;
   }): Promise<IIndexedPackageData[]> {
@@ -834,12 +839,13 @@ export class DataLoader implements IAtomicService {
     const inTransitPackagesResponse = await primaryMetrcRequestManager.getInTransitPackages(body);
 
     if (inTransitPackagesResponse.status === 200) {
-      const responseData: ICollectionResponse<IPackageData> = await inTransitPackagesResponse.json();
+      const responseData: ICollectionResponse<IPackageData> =
+        await inTransitPackagesResponse.json();
 
-      const activePackages: IIndexedPackageData[] = responseData["Data"].map(x => ({
+      const activePackages: IIndexedPackageData[] = responseData["Data"].map((x) => ({
         ...x,
         PackageState: PackageState.IN_TRANSIT,
-        TagMatcher: ""
+        TagMatcher: "",
       }));
 
       packages = [...packages, ...activePackages];
@@ -850,7 +856,7 @@ export class DataLoader implements IAtomicService {
     return packages;
   }
 
-  async activePackages(resetCache: boolean = false): Promise<IPackageData[]> {
+  async activePackages(resetCache: boolean = false): Promise<IIndexedPackageData[]> {
     if (store.state.mockDataMode && store.state.flags?.mockedFlags.mockPackages.enabled) {
       return mockDataManager.mockPackages();
     }
@@ -866,7 +872,11 @@ export class DataLoader implements IAtomicService {
         );
 
         try {
-          const activePackages = await this.loadActivePackages();
+          const activePackages = (await this.loadActivePackages()).map((pkg) => ({
+            ...pkg,
+            PackageState: PackageState.ACTIVE,
+            TagMatcher: "",
+          }));
 
           databaseInterface.indexPackages(activePackages, PackageState.ACTIVE);
 
@@ -883,14 +893,18 @@ export class DataLoader implements IAtomicService {
     return this._activePackages;
   }
 
-  async activePackage(label: string): Promise<IPackageData> {
+  async activePackage(label: string): Promise<IIndexedPackageData> {
     return new Promise(async (resolve, reject) => {
       const subscription = timer(DATA_LOAD_FETCH_TIMEOUT_MS).subscribe(() =>
         reject("Active package fetch timed out")
       );
 
       try {
-        const packageData: IPackageData = await this.loadActivePackage(label);
+        const packageData: IIndexedPackageData = {
+          ...(await this.loadActivePackage(label)),
+          PackageState: PackageState.ACTIVE,
+          TagMatcher: "",
+        };
 
         subscription.unsubscribe();
         resolve(packageData);
@@ -901,7 +915,7 @@ export class DataLoader implements IAtomicService {
     });
   }
 
-  async inactivePackages(resetCache: boolean = false): Promise<IPackageData[]> {
+  async inactivePackages(resetCache: boolean = false): Promise<IIndexedPackageData[]> {
     if (resetCache) {
       this._inactivePackages = null;
     }
@@ -913,7 +927,13 @@ export class DataLoader implements IAtomicService {
         );
 
         try {
-          const inactivePackages = await this.loadInactivePackages();
+          const inactivePackages: IIndexedPackageData[] = (await this.loadInactivePackages()).map(
+            (pkg) => ({
+              ...pkg,
+              PackageState: PackageState.INACTIVE,
+              TagMatcher: "",
+            })
+          );
 
           databaseInterface.indexPackages(inactivePackages, PackageState.INACTIVE);
 
@@ -930,14 +950,18 @@ export class DataLoader implements IAtomicService {
     return this._inactivePackages;
   }
 
-  async inactivePackage(label: string): Promise<IPackageData> {
+  async inactivePackage(label: string): Promise<IIndexedPackageData> {
     return new Promise(async (resolve, reject) => {
       const subscription = timer(DATA_LOAD_FETCH_TIMEOUT_MS).subscribe(() =>
         reject("Inactive package fetch timed out")
       );
 
       try {
-        const packageData: IPackageData = await this.loadInactivePackage(label);
+        const packageData: IIndexedPackageData = {
+          ...(await this.loadInactivePackage(label)),
+          PackageState: PackageState.INACTIVE,
+          TagMatcher: "",
+        };
 
         subscription.unsubscribe();
         resolve(packageData);
@@ -948,7 +972,7 @@ export class DataLoader implements IAtomicService {
     });
   }
 
-  async inTransitPackages(resetCache: boolean = false): Promise<IPackageData[]> {
+  async inTransitPackages(resetCache: boolean = false): Promise<IIndexedPackageData[]> {
     if (resetCache) {
       this._inTransitPackages = null;
     }
@@ -960,7 +984,13 @@ export class DataLoader implements IAtomicService {
         );
 
         try {
-          const inTransitPackages = await this.loadInTransitPackages();
+          const inTransitPackages: IIndexedPackageData[] = (await this.loadInTransitPackages()).map(
+            (pkg) => ({
+              ...pkg,
+              PackageState: PackageState.IN_TRANSIT,
+              TagMatcher: "",
+            })
+          );
 
           databaseInterface.indexPackages(inTransitPackages, PackageState.IN_TRANSIT);
 
@@ -977,14 +1007,18 @@ export class DataLoader implements IAtomicService {
     return this._inTransitPackages;
   }
 
-  async inTransitPackage(label: string): Promise<IPackageData> {
+  async inTransitPackage(label: string): Promise<IIndexedPackageData> {
     return new Promise(async (resolve, reject) => {
       const subscription = timer(DATA_LOAD_FETCH_TIMEOUT_MS).subscribe(() =>
         reject("In Transit package fetch timed out")
       );
 
       try {
-        const packageData: IPackageData = await this.loadInTransitPackage(label);
+        const packageData: IIndexedPackageData = {
+          ...(await this.loadInTransitPackage(label)),
+          PackageState: PackageState.IN_TRANSIT,
+          TagMatcher: "",
+        };
 
         subscription.unsubscribe();
         resolve(packageData);
@@ -995,7 +1029,7 @@ export class DataLoader implements IAtomicService {
     });
   }
 
-  async incomingTransfers(resetCache: boolean = false): Promise<ITransferData[]> {
+  async incomingTransfers(resetCache: boolean = false): Promise<IIndexedTransferData[]> {
     if (resetCache) {
       this._incomingTransfers = null;
     }
@@ -1007,7 +1041,13 @@ export class DataLoader implements IAtomicService {
         );
 
         try {
-          const incomingTransfers = await this.loadIncomingTransfers();
+          const incomingTransfers: IIndexedTransferData[] = (
+            await this.loadIncomingTransfers()
+          ).map((transfer) => ({
+            ...transfer,
+            TransferState: TransferState.INCOMING,
+            TagMatcher: "",
+          }));
 
           databaseInterface.indexTransfers(incomingTransfers, TransferState.INCOMING);
 
@@ -1024,14 +1064,18 @@ export class DataLoader implements IAtomicService {
     return this._incomingTransfers;
   }
 
-  async incomingTransfer(manifestNumber: string): Promise<ITransferData> {
+  async incomingTransfer(manifestNumber: string): Promise<IIndexedTransferData> {
     return new Promise(async (resolve, reject) => {
       const subscription = timer(DATA_LOAD_FETCH_TIMEOUT_MS).subscribe(() =>
         reject("Transfer fetch timed out")
       );
 
       try {
-        const transferData: ITransferData = await this.loadIncomingTransfer(manifestNumber);
+        const transferData: IIndexedTransferData = {
+          ...(await this.loadIncomingTransfer(manifestNumber)),
+          TransferState: TransferState.INCOMING,
+          TagMatcher: "",
+        };
 
         subscription.unsubscribe();
         resolve(transferData);
@@ -1042,7 +1086,7 @@ export class DataLoader implements IAtomicService {
     });
   }
 
-  async outgoingTransfers(resetCache: boolean = false): Promise<ITransferData[]> {
+  async outgoingTransfers(resetCache: boolean = false): Promise<IIndexedTransferData[]> {
     if (resetCache) {
       this._outgoingTransfers = null;
     }
@@ -1054,7 +1098,13 @@ export class DataLoader implements IAtomicService {
         );
 
         try {
-          const outgoingTransfers = await this.loadOutgoingTransfers();
+          const outgoingTransfers: IIndexedTransferData[] = (
+            await this.loadOutgoingTransfers()
+          ).map((transfer) => ({
+            ...transfer,
+            TransferState: TransferState.OUTGOING,
+            TagMatcher: "",
+          }));
 
           databaseInterface.indexTransfers(outgoingTransfers, TransferState.OUTGOING);
 
@@ -1071,14 +1121,18 @@ export class DataLoader implements IAtomicService {
     return this._outgoingTransfers;
   }
 
-  async outgoingTransfer(manifestNumber: string): Promise<ITransferData> {
+  async outgoingTransfer(manifestNumber: string): Promise<IIndexedTransferData> {
     return new Promise(async (resolve, reject) => {
       const subscription = timer(DATA_LOAD_FETCH_TIMEOUT_MS).subscribe(() =>
         reject("Transfer fetch timed out")
       );
 
       try {
-        const transferData: ITransferData = await this.loadOutgoingTransfer(manifestNumber);
+        const transferData: IIndexedTransferData = {
+          ...(await this.loadOutgoingTransfer(manifestNumber)),
+          TransferState: TransferState.OUTGOING,
+          TagMatcher: "",
+        };
 
         subscription.unsubscribe();
         resolve(transferData);
@@ -1089,7 +1143,7 @@ export class DataLoader implements IAtomicService {
     });
   }
 
-  async rejectedTransfers(resetCache: boolean = false): Promise<ITransferData[]> {
+  async rejectedTransfers(resetCache: boolean = false): Promise<IIndexedTransferData[]> {
     if (resetCache) {
       this._rejectedTransfers = null;
     }
@@ -1101,7 +1155,13 @@ export class DataLoader implements IAtomicService {
         );
 
         try {
-          const rejectedTransfers = await this.loadRejectedTransfers();
+          const rejectedTransfers: IIndexedTransferData[] = (
+            await this.loadRejectedTransfers()
+          ).map((transfer) => ({
+            ...transfer,
+            TransferState: TransferState.REJECTED,
+            TagMatcher: "",
+          }));
 
           databaseInterface.indexTransfers(rejectedTransfers, TransferState.REJECTED);
 
@@ -1118,14 +1178,18 @@ export class DataLoader implements IAtomicService {
     return this._rejectedTransfers;
   }
 
-  async rejectedTransfer(manifestNumber: string): Promise<ITransferData> {
+  async rejectedTransfer(manifestNumber: string): Promise<IIndexedTransferData> {
     return new Promise(async (resolve, reject) => {
       const subscription = timer(DATA_LOAD_FETCH_TIMEOUT_MS).subscribe(() =>
         reject("Transfer fetch timed out")
       );
 
       try {
-        const transferData: ITransferData = await this.loadRejectedTransfer(manifestNumber);
+        const transferData: IIndexedTransferData = {
+          ...(await this.loadRejectedTransfer(manifestNumber)),
+          TransferState: TransferState.REJECTED,
+          TagMatcher: "",
+        };
 
         subscription.unsubscribe();
         resolve(transferData);
@@ -1221,7 +1285,51 @@ export class DataLoader implements IAtomicService {
     return this._items;
   }
 
-  async activeHarvests(): Promise<IHarvestData[]> {
+  async activeHarvestByName(name: string): Promise<IIndexedHarvestData> {
+    return new Promise(async (resolve, reject) => {
+      const subscription = timer(DATA_LOAD_FETCH_TIMEOUT_MS).subscribe(() =>
+        reject("Active harvest fetch timed out")
+      );
+
+      try {
+        const harvestData: IIndexedHarvestData = {
+          ...(await this.loadActiveHarvestByName(name)),
+          HarvestState: HarvestState.ACTIVE,
+          TagMatcher: "",
+        };
+
+        subscription.unsubscribe();
+        resolve(harvestData);
+      } catch (e) {
+        subscription.unsubscribe();
+        reject(e);
+      }
+    });
+  }
+
+  async inactiveHarvestByName(name: string): Promise<IIndexedHarvestData> {
+    return new Promise(async (resolve, reject) => {
+      const subscription = timer(DATA_LOAD_FETCH_TIMEOUT_MS).subscribe(() =>
+        reject("Active harvest fetch timed out")
+      );
+
+      try {
+        const harvestData: IIndexedHarvestData = {
+          ...(await this.loadInactiveHarvestByName(name)),
+          HarvestState: HarvestState.INACTIVE,
+          TagMatcher: "",
+        };
+
+        subscription.unsubscribe();
+        resolve(harvestData);
+      } catch (e) {
+        subscription.unsubscribe();
+        reject(e);
+      }
+    });
+  }
+
+  async activeHarvests(): Promise<IIndexedHarvestData[]> {
     if (store.state.mockDataMode && store.state.flags?.mockedFlags.mockHarvests.enabled) {
       return mockDataManager.mockHarvests();
     }
@@ -1233,7 +1341,13 @@ export class DataLoader implements IAtomicService {
         );
 
         try {
-          const harvests = await this.loadActiveHarvests();
+          const harvests: IIndexedHarvestData[] = (await this.loadActiveHarvests()).map(
+            (harvest) => ({
+              ...harvest,
+              HarvestState: HarvestState.ACTIVE,
+              TagMatcher: "",
+            })
+          );
 
           subscription.unsubscribe();
           resolve(harvests);
@@ -1344,9 +1458,9 @@ export class DataLoader implements IAtomicService {
             address2: "",
             city: "",
             state: "",
-            zip: ""
-          }
-        }
+            zip: "",
+          },
+        },
       };
     }
 
@@ -1520,7 +1634,7 @@ export class DataLoader implements IAtomicService {
   ): Subject<ICollectionResponse<ISalesReceiptData>> {
     const responseFactory = (paginationOptions: IPaginationOptions): Promise<Response> => {
       const body = buildBody(paginationOptions, null, {
-        salesReceiptSort: { RecordedDateTime: "asc" }
+        salesReceiptSort: { RecordedDateTime: "asc" },
       });
 
       return this.metrcRequestManagerOrError.getActiveSalesReceipts(body);
@@ -1546,7 +1660,7 @@ export class DataLoader implements IAtomicService {
     const page = 0;
 
     const transferFilter: ITransferFilter = {
-      manifestNumber
+      manifestNumber,
     };
 
     const body = buildBody({ page, pageSize: 1 }, { transferFilter });
@@ -1584,7 +1698,7 @@ export class DataLoader implements IAtomicService {
     const page = 0;
 
     const transferFilter: ITransferFilter = {
-      manifestNumber
+      manifestNumber,
     };
 
     const body = buildBody({ page, pageSize: 1 }, { transferFilter });
@@ -1622,7 +1736,7 @@ export class DataLoader implements IAtomicService {
     const page = 0;
 
     const transferFilter: ITransferFilter = {
-      manifestNumber
+      manifestNumber,
     };
 
     const body = buildBody({ page, pageSize: 1 }, { transferFilter });
@@ -1649,6 +1763,78 @@ export class DataLoader implements IAtomicService {
     return responseData.Data[0];
   }
 
+  private async loadActiveHarvestByName(harvestName: string): Promise<IHarvestData> {
+    if (store.state.mockDataMode) {
+    }
+
+    await authManager.authStateOrError();
+
+    const page = 0;
+
+    const harvestFilter: IHarvestFilter = {
+      harvestName,
+    };
+
+    const body = buildBody({ page, pageSize: 1 }, { harvestFilter });
+
+    const response = await this.metrcRequestManagerOrError.getActiveHarvests(body);
+
+    if (response.status !== 200) {
+      throw new Error("Request failed");
+    }
+
+    const responseData: ICollectionResponse<IHarvestData> = await response.json();
+
+    if (responseData.Data.length !== 1) {
+      if (responseData.Data.length === 0) {
+        throw new DataLoadError(
+          DataLoadErrorType.ZERO_RESULTS,
+          `Metrc indicated ${harvestName} is not available`
+        );
+      } else {
+        throw new Error("Returned multiple harvests");
+      }
+    }
+
+    return responseData.Data[0];
+  }
+
+  private async loadInactiveHarvestByName(harvestName: string): Promise<IHarvestData> {
+    if (store.state.mockDataMode) {
+    }
+
+    await authManager.authStateOrError();
+
+    const page = 0;
+
+    const harvestFilter: IHarvestFilter = {
+      harvestName,
+    };
+
+    const body = buildBody({ page, pageSize: 1 }, { harvestFilter });
+
+    const response = await this.metrcRequestManagerOrError.getInactiveHarvests(body);
+
+    if (response.status !== 200) {
+      throw new Error("Request failed");
+    }
+
+    const responseData: ICollectionResponse<IHarvestData> = await response.json();
+
+    if (responseData.Data.length !== 1) {
+      if (responseData.Data.length === 0) {
+        throw new DataLoadError(
+          DataLoadErrorType.ZERO_RESULTS,
+          `Metrc indicated ${harvestName} is not available`
+        );
+      } else {
+        throw new Error("Returned multiple harvests");
+      }
+    }
+
+    return responseData.Data[0];
+  }
+
   private async loadActivePackage(label: string): Promise<IPackageData> {
     if (store.state.mockDataMode) {
       // TODO
@@ -1660,7 +1846,7 @@ export class DataLoader implements IAtomicService {
     const page = 0;
 
     const packageFilter: IPackageFilter = {
-      label
+      label,
     };
 
     const body = buildBody({ page, pageSize: 1 }, { packageFilter });
@@ -1716,7 +1902,7 @@ export class DataLoader implements IAtomicService {
     const page = 0;
 
     const packageFilter: IPackageFilter = {
-      label
+      label,
     };
 
     const body = buildBody({ page, pageSize: 1 }, { packageFilter });
@@ -1772,7 +1958,7 @@ export class DataLoader implements IAtomicService {
     const page = 0;
 
     const packageFilter: IPackageFilter = {
-      label
+      label,
     };
 
     const body = buildBody({ page, pageSize: 1 }, { packageFilter });
@@ -2032,7 +2218,7 @@ export class DataLoader implements IAtomicService {
     await this.activeSalesReceiptsStream()
       .pipe(
         take(1),
-        map(next => (salesReceipts = next.Data))
+        map((next) => (salesReceipts = next.Data))
       )
       .toPromise();
 
@@ -2045,7 +2231,7 @@ export class DataLoader implements IAtomicService {
 
   private async loadAvailableTag(label: string): Promise<ITagData> {
     if (store.state.mockDataMode && store.state.flags?.mockedFlags.mockTags.enabled) {
-      return mockDataManager.mockTags().filter(tagData => tagData.Label === label)[0];
+      return mockDataManager.mockTags().filter((tagData) => tagData.Label === label)[0];
     }
 
     await authManager.authStateOrError();
@@ -2053,7 +2239,7 @@ export class DataLoader implements IAtomicService {
     const page = 0;
 
     const tagFilter: ITagFilter = {
-      label
+      label,
     };
 
     const body = buildBody({ page, pageSize: 1 }, { tagFilter });

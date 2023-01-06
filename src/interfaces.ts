@@ -400,6 +400,10 @@ export interface IPackageFilter {
   label?: string | null;
 }
 
+export interface IHarvestFilter {
+  harvestName?: string | null;
+}
+
 export interface ITransferFilter {
   manifestNumber?: string | null;
 }
@@ -507,11 +511,11 @@ export interface IPackageData extends ITaggedIResponseObjectData {
   ReceivedFromFacilityName: string | null;
   ReceivedFromManifestNumber: string | null;
   RemediationDate: string | null;
-  SourceHarvestNames: string;  // "HARVEST 1, HARVEST 2, "
+  SourceHarvestNames: string; // "HARVEST 1, HARVEST 2, "
   SourcePackageIsDonation: boolean;
   SourcePackageIsTradeSample: boolean;
-  SourcePackageLabels: string;  // "1A4000000000000000000528, 1A4000000000000000000529, "
-  SourceProductionBatchNumbers: string;  // "BATCH 1, BATCH 2, "
+  SourcePackageLabels: string; // "1A4000000000000000000528, 1A4000000000000000000529, "
+  SourceProductionBatchNumbers: string; // "BATCH 1, BATCH 2, "
   TradeSampleFacilityName: string | null;
   TradeSampleFacilityLicenseNumber: string | null;
   TransferManifestNumber: string;
@@ -640,6 +644,11 @@ export interface IDriverData {
   Name: string;
   EmployeeId: string;
   DriversLicenseNumber: string;
+}
+
+export interface IIndexedHarvestData extends IHarvestData {
+  HarvestState: HarvestState;
+  TagMatcher: string;
 }
 
 export interface IIndexedTransferData extends ITransferData {
