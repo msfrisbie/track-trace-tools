@@ -17,7 +17,10 @@ import {
 import { facilityManager } from "@/modules/facility-manager.module";
 import { toastManager } from "@/modules/toast-manager.module";
 import store from "@/store/page-overlay/index";
-import { PackageHistoryActions } from "@/store/page-overlay/modules/package-history/consts";
+import {
+  PackageHistoryActions,
+  PackageHistoryStatus,
+} from "@/store/page-overlay/modules/package-history/consts";
 import { downloadFileFromUrl } from "./dom";
 import {
   extractChildPackageLabelsFromHistory,
@@ -144,12 +147,18 @@ export async function getParentPackageHistoryTree({
   label: string;
   license: string;
 }): Promise<IPackageAncestorTreeNode> {
+  if (store.state.packageHistory.status === PackageHistoryStatus.ERROR) {
+    throw new Error("Error status, exiting");
+  }
+
   const ownedLicenses: string[] = (await facilityManager.ownedFacilitiesOrError()).map(
     (facility) => facility.licenseNumber
   );
-  console.log(ownedLicenses, license);
 
   if (!ownedLicenses.includes(license)) {
+    store.dispatch(`packageHistory/${PackageHistoryActions.LOG_EVENT}`, {
+      event: `User does not have access to license ${license}, ${label} is a terminal node`,
+    });
     // This license is not owned by the current user, exit with terminal node
     return {
       label,
@@ -168,33 +177,59 @@ export async function getParentPackageHistoryTree({
   try {
     pkg = await dataLoader.activePackage(label);
   } catch (e) {}
-  try {
-    pkg = await dataLoader.inactivePackage(label);
-  } catch (e) {}
-  try {
-    pkg = await dataLoader.inTransitPackage(label);
-  } catch (e) {}
+  if (!pkg) {
+    try {
+      pkg = await dataLoader.inactivePackage(label);
+    } catch (e) {}
+  }
+  if (!pkg) {
+    try {
+      pkg = await dataLoader.inTransitPackage(label);
+    } catch (e) {}
+  }
 
   if (!pkg) {
-    throw new Error("Could not find package");
+    store.dispatch(`packageHistory/${PackageHistoryActions.LOG_EVENT}`, {
+      event: `User does not have access to ${label}, is a terminal node`,
+    });
+    return {
+      label,
+      license,
+      ancestors: [],
+    };
   }
+
+  store.dispatch(`packageHistory/${PackageHistoryActions.LOG_EVENT}`, {
+    event: `Found ${pkg.Label} (${pkg.PackageState})`,
+  });
 
   const history: IPackageHistoryData[] = await dataLoader.packageHistoryByPackageId(pkg.Id);
 
   // TODO: this license may not be correct
   // and must update when a transfer occurs
-  const ancestors = await Promise.all(
-    extractParentPackageLabelsFromHistory(history).map((parentLabel) =>
-      getParentPackageHistoryTree({ label: parentLabel, license })
-    )
-  );
+  const parentPackageLabels = extractParentPackageLabelsFromHistory(history);
+
+  const parents = [];
+
+  for (const parentPackageLabel of parentPackageLabels) {
+    // @ts-ignore
+    if (store.state.packageHistory.status === PackageHistoryStatus.ERROR) {
+      throw new Error("Error status, exiting");
+    }
+
+    parents.push(await getParentPackageHistoryTree({ label: parentPackageLabel, license }));
+  }
+
+  store.dispatch(`packageHistory/${PackageHistoryActions.LOG_EVENT}`, {
+    event: `${pkg.Label} has ${parents.length} parents`,
+  });
 
   return {
     label,
     license,
     pkg,
     history,
-    ancestors,
+    ancestors: parents,
   };
 }
 
@@ -205,12 +240,18 @@ export async function getChildPackageHistoryTree({
   label: string;
   license: string;
 }): Promise<IPackageChildTreeNode> {
+  if (store.state.packageHistory.status === PackageHistoryStatus.ERROR) {
+    throw new Error("Error status, exiting");
+  }
+
   const ownedLicenses: string[] = (await facilityManager.ownedFacilitiesOrError()).map(
     (facility) => facility.licenseNumber
   );
-  console.log(ownedLicenses, license);
 
   if (!ownedLicenses.includes(license)) {
+    store.dispatch(`packageHistory/${PackageHistoryActions.LOG_EVENT}`, {
+      event: `User does not have access to license ${license}, ${label} is a terminal node`,
+    });
     // This license is not owned by the current user, exit with terminal node
     return {
       label,
@@ -229,26 +270,53 @@ export async function getChildPackageHistoryTree({
   try {
     pkg = await dataLoader.activePackage(label);
   } catch (e) {}
-  try {
-    pkg = await dataLoader.inactivePackage(label);
-  } catch (e) {}
-  try {
-    pkg = await dataLoader.inTransitPackage(label);
-  } catch (e) {}
+  if (!pkg) {
+    try {
+      pkg = await dataLoader.inactivePackage(label);
+    } catch (e) {}
+  }
+  if (!pkg) {
+    try {
+      pkg = await dataLoader.inTransitPackage(label);
+    } catch (e) {}
+  }
 
   if (!pkg) {
-    throw new Error("Could not find package");
+    store.dispatch(`packageHistory/${PackageHistoryActions.LOG_EVENT}`, {
+      event: `User does not have access to ${label}, is a terminal node`,
+    });
+    return {
+      label,
+      license,
+      children: [],
+    };
   }
+
+  store.dispatch(`packageHistory/${PackageHistoryActions.LOG_EVENT}`, {
+    event: `Found ${pkg.Label} (${pkg.PackageState})`,
+  });
 
   const history: IPackageHistoryData[] = await dataLoader.packageHistoryByPackageId(pkg.Id);
 
   // TODO: this license may not be correct
   // and must update when a transfer occurs
-  const children = await Promise.all(
-    extractChildPackageLabelsFromHistory(history).map((childLabel) =>
-      getChildPackageHistoryTree({ label: childLabel, license })
-    )
-  );
+
+  const childPackageLabels = extractChildPackageLabelsFromHistory(history);
+
+  const children = [];
+
+  for (const childPackageLabel of childPackageLabels) {
+    // @ts-ignore
+    if (store.state.packageHistory.status === PackageHistoryStatus.ERROR) {
+      throw new Error("Error status, exiting");
+    }
+
+    children.push(await getChildPackageHistoryTree({ label: childPackageLabel, license }));
+  }
+
+  store.dispatch(`packageHistory/${PackageHistoryActions.LOG_EVENT}`, {
+    event: `${pkg.Label} has ${children.length} children`,
+  });
 
   return {
     label,
@@ -267,6 +335,10 @@ export async function getParentHarvests(label: string): Promise<IHarvestHistoryD
   const history: IHarvestHistoryData[] = await primaryDataLoader.packageHarvestHistoryByPackageId(
     pkg.Id
   );
+
+  store.dispatch(`packageHistory/${PackageHistoryActions.LOG_EVENT}`, {
+    event: `Retrieved ${history.length} source harvests`,
+  });
 
   return history;
 }

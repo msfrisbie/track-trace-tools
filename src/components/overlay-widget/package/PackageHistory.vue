@@ -10,34 +10,24 @@
       ></single-package-picker>
     </template>
     <template v-else>
-      <div class="grid grid-cols-3">
+      <div class="flex flex-col">
         <div class="col-span-3 flex flex-col gap-4">
           <div>{{ sourcePackage.Label }}</div>
           <div>{{ status }}</div>
           <button @click="setPackage({ pkg: null })">RESET</button>
         </div>
+        <div class="overflow-x-scroll">
+          <div>Ancestors</div>
+          <package-history-tile :ancestorTree="ancestorTree"></package-history-tile>
+        </div>
+        <div class="overflow-x-scroll">
+          <div>Children</div>
+          <package-history-tile :childTree="childTree"></package-history-tile>
+        </div>
         <div class="flex flex-col items-stretch gap-2">
           <div v-for="entry of log" v-bind:key="entry">
             {{ entry }}
           </div>
-        </div>
-        <div>
-          <div>Ancestors</div>
-          {{ JSON.stringify(ancestorTree, null, 2) }}
-          <package-history-tile
-            v-for="ancestor of []"
-            v-bind:key="ancestor.Label"
-            :pkg="ancestor"
-          ></package-history-tile>
-        </div>
-        <div>
-          <div>Children</div>
-          {{ JSON.stringify(childTree, null, 2) }}
-          <!-- <package-history-tile
-            v-for="child of children[0]"
-            v-bind:key="child.Label"
-            :pkg="child"
-          ></package-history-tile> -->
         </div>
       </div>
     </template>

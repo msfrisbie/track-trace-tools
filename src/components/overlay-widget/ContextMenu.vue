@@ -77,6 +77,17 @@
             </b-button>
           </template>
 
+          <b-button variant="outline-primary" class="" @click.stop.prevent="setPackageHistorySourcePackage({ pkg }) && openPackageHistoryBuilder()"
+              ><div
+                class="grid grid-cols-2 place-items-center"
+                style="grid-template-columns: auto 1fr auto"
+              >
+                <span>PACKAGE HISTORY</span>
+                <div></div>
+                <div class=""><font-awesome-icon icon="sitemap" /></div>
+              </div>
+            </b-button>
+
           <template v-if="isIdentityEligibleForSplitToolsImpl && isPackageEligibleForSplit">
             <b-button variant="outline-primary" class="" @click.stop.prevent="splitPackage()"
               ><div
@@ -283,6 +294,7 @@ import { pageManager } from "@/modules/page-manager.module";
 import { PackageSearchActions } from "@/store/page-overlay/modules/package-search/consts";
 import { IPackageSearchFilters } from "@/interfaces";
 import { SearchActions } from "@/store/page-overlay/modules/search/consts";
+import { PackageHistoryActions } from "@/store/page-overlay/modules/package-history/consts";
 
 // const packageLabTestPdfEligible = !METRC_HOSTNAMES_LACKING_LAB_PDFS.includes(window.location.hostname);
 
@@ -337,8 +349,15 @@ export default Vue.extend({
       removePackageFromTransferList: `transferBuilder/${TransferBuilderActions.REMOVE_PACKAGE}`,
       setSplitSourcePackage: `splitPackageBuilder/${SplitPackageBuilderActions.SET_SOURCE_PACKAGE}`,
       partialUpdatePackageSearchFilters: `packageSearch/${PackageSearchActions.PARTIAL_UPDATE_PACKAGE_SEARCH_FILTERS}`,
-      setSearchType: `search/${SearchActions.SET_SEARCH_TYPE}`
+      setSearchType: `search/${SearchActions.SET_SEARCH_TYPE}`,
+      setPackageHistorySourcePackage: `packageHistory/${PackageHistoryActions.SET_SOURCE_PACKAGE}`,
     }),
+    openPackageHistoryBuilder() {
+      analyticsManager.track(MessageType.OPENED_PACKAGE_HISTORY_FROM_TOOLKIT_SEARCH, {});
+      modalManager.dispatchModalEvent(ModalType.BUILDER, ModalAction.OPEN, {
+        initialRoute: "/package/history",
+      });
+    },
     dismiss() {
       modalManager.dispatchContextMenuEvent(null);
     },

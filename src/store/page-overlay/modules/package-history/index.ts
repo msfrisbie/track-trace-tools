@@ -125,6 +125,12 @@ export const packageHistoryModule = {
             status: PackageHistoryStatus.SUCCESS,
           });
         } catch (e) {
+          console.error(e);
+          ctx.commit(PackageHistoryMutations.LOG_EVENT, {
+            payload: {
+              event: e.toString(),
+            },
+          });
           ctx.commit(PackageHistoryMutations.SET_STATUS, {
             status: PackageHistoryStatus.ERROR,
           });
