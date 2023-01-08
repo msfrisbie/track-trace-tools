@@ -147,8 +147,33 @@ export async function getParentPackageHistoryTree({
   label: string;
   license: string;
 }): Promise<IPackageAncestorTreeNode> {
+  const cache: Map<string, IPackageAncestorTreeNode> = new Map();
+
+  return getParentPackageHistoryTreeImpl({
+    label,
+    license,
+    cache,
+  });
+}
+
+export async function getParentPackageHistoryTreeImpl({
+  label,
+  license,
+  cache,
+}: {
+  label: string;
+  license: string;
+  cache: Map<string, IPackageAncestorTreeNode>;
+}): Promise<IPackageAncestorTreeNode> {
   if (store.state.packageHistory.status === PackageHistoryStatus.ERROR) {
     throw new Error("Error status, exiting");
+  }
+
+  if (cache.has(`${license}::${label}`)) {
+    store.dispatch(`packageHistory/${PackageHistoryActions.LOG_EVENT}`, {
+      event: `Cache hit for ${license}::${label}`,
+    });
+    return cache.get(`${license}::${label}`) as IPackageAncestorTreeNode;
   }
 
   const ownedLicenses: string[] = (await facilityManager.ownedFacilitiesOrError()).map(
@@ -159,12 +184,15 @@ export async function getParentPackageHistoryTree({
     store.dispatch(`packageHistory/${PackageHistoryActions.LOG_EVENT}`, {
       event: `User does not have access to license ${license}, ${label} is a terminal node`,
     });
-    // This license is not owned by the current user, exit with terminal node
-    return {
+    const terminalNode = {
       label,
       license,
       ancestors: [],
     };
+
+    cache.set(`${license}::${label}`, terminalNode);
+    // This license is not owned by the current user, exit with terminal node
+    return terminalNode;
   }
 
   const authState = { ...(await authManager.authStateOrError()), license };
@@ -192,11 +220,13 @@ export async function getParentPackageHistoryTree({
     store.dispatch(`packageHistory/${PackageHistoryActions.LOG_EVENT}`, {
       event: `User does not have access to ${label}, is a terminal node`,
     });
-    return {
+    const terminalNode = {
       label,
       license,
       ancestors: [],
     };
+    cache.set(`${license}::${label}`, terminalNode);
+    return terminalNode;
   }
 
   store.dispatch(`packageHistory/${PackageHistoryActions.LOG_EVENT}`, {
@@ -217,20 +247,32 @@ export async function getParentPackageHistoryTree({
       throw new Error("Error status, exiting");
     }
 
-    parents.push(await getParentPackageHistoryTree({ label: parentPackageLabel, license }));
+    const node = await getParentPackageHistoryTreeImpl({
+      label: parentPackageLabel,
+      license,
+      cache,
+    });
+
+    parents.push(node);
+
+    cache.set(`${license}::${label}`, node);
   }
 
   store.dispatch(`packageHistory/${PackageHistoryActions.LOG_EVENT}`, {
     event: `${pkg.Label} has ${parents.length} parents`,
   });
 
-  return {
+  const node = {
     label,
     license,
     pkg,
     history,
     ancestors: parents,
   };
+
+  cache.set(`${license}::${label}`, node);
+
+  return node;
 }
 
 export async function getChildPackageHistoryTree({

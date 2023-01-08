@@ -100,6 +100,10 @@ export const packageHistoryModule = {
     ) => {
       ctx.commit(PackageHistoryMutations.SET_SOURCE_PACKAGE, { pkg });
 
+      ctx.commit(PackageHistoryMutations.SET_STATUS, {
+        status: PackageHistoryStatus.INITIAL,
+      });
+
       if (pkg) {
         ctx.commit(PackageHistoryMutations.SET_STATUS, {
           status: PackageHistoryStatus.INFLIGHT,
@@ -135,10 +139,6 @@ export const packageHistoryModule = {
             status: PackageHistoryStatus.ERROR,
           });
         }
-      } else {
-        ctx.commit(PackageHistoryMutations.SET_STATUS, {
-          status: PackageHistoryStatus.INITIAL,
-        });
       }
     },
     [PackageHistoryActions.LOG_EVENT]: async (

@@ -16,11 +16,11 @@
           <div>{{ status }}</div>
           <button @click="setPackage({ pkg: null })">RESET</button>
         </div>
-        <div class="overflow-x-scroll">
+        <div class="flex flex-col items-start overflow-x-scroll">
           <div>Ancestors</div>
           <package-history-tile :ancestorTree="ancestorTree"></package-history-tile>
         </div>
-        <div class="overflow-x-scroll">
+        <div class="flex flex-col items-start overflow-x-scroll">
           <div>Children</div>
           <package-history-tile :childTree="childTree"></package-history-tile>
         </div>
