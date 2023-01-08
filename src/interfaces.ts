@@ -591,6 +591,7 @@ export interface IIndexedPlantData extends IPlantData {
 
 export interface IIndexedPackageData extends IPackageData {
   PackageState: PackageState;
+  LicenseNumber: string;
   TagMatcher: string;
 }
 
@@ -1453,4 +1454,24 @@ export interface IClientConfig {
 export interface IClientInfo {
   clientName: string;
   licenseKey: string;
+}
+
+export interface IHistoryTreeNode {
+  packageData?: {
+    label: string;
+    license: string;
+  };
+  transferData?: {
+    manifestNumber: string;
+    sourceLicense: string;
+    destinationLicense: string;
+  };
+}
+
+export interface IPackageAncestorTreeNode extends IHistoryTreeNode {
+  ancestors: IPackageAncestorTreeNode[];
+}
+
+export interface IPackageChildTreeNode extends IHistoryTreeNode {
+  children: IPackageChildTreeNode[];
 }

@@ -64,6 +64,24 @@ import { DataLoadError, DataLoadErrorType } from "./data-loader-error";
 
 const debugLog = debugLogFactory("data-loader.module.ts");
 
+export const dataLoaderCache: Map<string, DataLoader> = new Map();
+
+export async function getDataLoader(
+  spoofedAuthState: IAuthState | null = null
+): Promise<DataLoader> {
+  if (spoofedAuthState?.license && dataLoaderCache.has(spoofedAuthState.license)) {
+    return dataLoaderCache.get(spoofedAuthState.license) as DataLoader;
+  } else {
+    const dataLoader = new DataLoader();
+    const authState: IAuthState = spoofedAuthState || (await authManager.authStateOrError());
+    dataLoader.init(authState);
+
+    dataLoaderCache.set(authState.license, dataLoader);
+
+    return dataLoader;
+  }
+}
+
 export class DataLoader implements IAtomicService {
   private _availableTags: Promise<IIndexedTagData[]> | null = null;
   private _usedTags: Promise<IIndexedTagData[]> | null = null;
@@ -95,6 +113,8 @@ export class DataLoader implements IAtomicService {
     } else {
       this._metrcRequestManager = primaryMetrcRequestManager;
     }
+
+    dataLoaderCache.set((spoofedAuthState || (await authManager.authStateOrError())).license, this);
 
     // await authManager.authStateOrError();
 
@@ -526,11 +546,7 @@ export class DataLoader implements IAtomicService {
     }
 
     if (store.state.mockDataMode && store.state.flags?.mockedFlags.mockPackages.enabled) {
-      return mockDataManager.mockPackages().map((x) => ({
-        ...x,
-        TagMatcher: "",
-        PackageState: PackageState.ACTIVE,
-      }));
+      return mockDataManager.mockPackages();
     }
 
     const filters = [];
@@ -570,6 +586,7 @@ export class DataLoader implements IAtomicService {
         ...x,
         PackageState: PackageState.ACTIVE,
         TagMatcher: "",
+        LicenseNumber: primaryMetrcRequestManager.authStateOrError.license,
       }));
 
       return activePackages;
@@ -704,11 +721,7 @@ export class DataLoader implements IAtomicService {
     queryString: string;
   }): Promise<IIndexedPackageData[]> {
     if (store.state.mockDataMode && store.state.flags?.mockedFlags.mockPackages.enabled) {
-      return mockDataManager.mockPackages().map((x) => ({
-        ...x,
-        TagMatcher: "",
-        PackageState: PackageState.ACTIVE,
-      }));
+      return mockDataManager.mockPackages();
     }
 
     let packages: IIndexedPackageData[] = [];
@@ -739,6 +752,7 @@ export class DataLoader implements IAtomicService {
         ...x,
         PackageState: PackageState.ACTIVE,
         TagMatcher: "",
+        LicenseNumber: primaryMetrcRequestManager.authStateOrError.license,
       }));
 
       packages = [...packages, ...activePackages];
@@ -779,11 +793,7 @@ export class DataLoader implements IAtomicService {
     queryString: string;
   }): Promise<IIndexedPackageData[]> {
     if (store.state.mockDataMode && store.state.flags?.mockedFlags.mockPackages.enabled) {
-      return mockDataManager.mockPackages().map((x) => ({
-        ...x,
-        TagMatcher: "",
-        PackageState: PackageState.ACTIVE,
-      }));
+      return mockDataManager.mockPackages();
     }
 
     let packages: IIndexedPackageData[] = [];
@@ -799,6 +809,7 @@ export class DataLoader implements IAtomicService {
         ...x,
         PackageState: PackageState.ACTIVE,
         TagMatcher: "",
+        LicenseNumber: primaryMetrcRequestManager.authStateOrError.license,
       }));
 
       packages = [...packages, ...activePackages];
@@ -831,6 +842,7 @@ export class DataLoader implements IAtomicService {
         ...x,
         PackageState: PackageState.INACTIVE,
         TagMatcher: "",
+        LicenseNumber: primaryMetrcRequestManager.authStateOrError.license,
       }));
 
       packages = [...packages, ...activePackages];
@@ -864,6 +876,7 @@ export class DataLoader implements IAtomicService {
         ...x,
         PackageState: PackageState.IN_TRANSIT,
         TagMatcher: "",
+        LicenseNumber: primaryMetrcRequestManager.authStateOrError.license,
       }));
 
       packages = [...packages, ...activePackages];
@@ -894,6 +907,7 @@ export class DataLoader implements IAtomicService {
             ...pkg,
             PackageState: PackageState.ACTIVE,
             TagMatcher: "",
+            LicenseNumber: primaryMetrcRequestManager.authStateOrError.license,
           }));
 
           databaseInterface.indexPackages(activePackages, PackageState.ACTIVE);
@@ -922,6 +936,7 @@ export class DataLoader implements IAtomicService {
           ...(await this.loadActivePackage(label)),
           PackageState: PackageState.ACTIVE,
           TagMatcher: "",
+          LicenseNumber: primaryMetrcRequestManager.authStateOrError.license,
         };
 
         subscription.unsubscribe();
@@ -950,6 +965,7 @@ export class DataLoader implements IAtomicService {
               ...pkg,
               PackageState: PackageState.INACTIVE,
               TagMatcher: "",
+              LicenseNumber: primaryMetrcRequestManager.authStateOrError.license,
             })
           );
 
@@ -979,6 +995,7 @@ export class DataLoader implements IAtomicService {
           ...(await this.loadInactivePackage(label)),
           PackageState: PackageState.INACTIVE,
           TagMatcher: "",
+          LicenseNumber: primaryMetrcRequestManager.authStateOrError.license,
         };
 
         subscription.unsubscribe();
@@ -1007,6 +1024,7 @@ export class DataLoader implements IAtomicService {
               ...pkg,
               PackageState: PackageState.IN_TRANSIT,
               TagMatcher: "",
+              LicenseNumber: primaryMetrcRequestManager.authStateOrError.license,
             })
           );
 
@@ -1036,6 +1054,7 @@ export class DataLoader implements IAtomicService {
           ...(await this.loadInTransitPackage(label)),
           PackageState: PackageState.IN_TRANSIT,
           TagMatcher: "",
+          LicenseNumber: primaryMetrcRequestManager.authStateOrError.license,
         };
 
         subscription.unsubscribe();

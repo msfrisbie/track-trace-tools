@@ -513,6 +513,7 @@ class MockDataManager implements IAtomicService {
       if (i < packageDistribution[0]) {
         this._mockPackages.push({
           PackageState: PackageState.ACTIVE,
+          LicenseNumber: "XYZ-00001",
           TagMatcher: "",
           ArchivedDate: null,
           ContainsRemediatedProduct: false,
@@ -580,6 +581,7 @@ class MockDataManager implements IAtomicService {
       if (i < packageDistribution[1]) {
         this._mockPackages.push({
           PackageState: PackageState.ACTIVE,
+          LicenseNumber: "XYZ-00001",
           TagMatcher: "",
           ArchivedDate: null,
           ContainsRemediatedProduct: false,
@@ -647,6 +649,7 @@ class MockDataManager implements IAtomicService {
       if (i < packageDistribution[2]) {
         this._mockPackages.push({
           PackageState: PackageState.ACTIVE,
+          LicenseNumber: "XYZ-00001",
           TagMatcher: "",
           ArchivedDate: null,
           ContainsRemediatedProduct: false,
@@ -714,6 +717,7 @@ class MockDataManager implements IAtomicService {
       if (i < packageDistribution[3]) {
         this._mockPackages.push({
           PackageState: PackageState.ACTIVE,
+          LicenseNumber: "XYZ-00001",
           TagMatcher: "",
           ArchivedDate: null,
           ContainsRemediatedProduct: false,

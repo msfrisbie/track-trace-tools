@@ -1,7 +1,19 @@
 import { PackageFilterIdentifiers } from "@/consts";
-import { IIndexedHarvestData, IIndexedPackageData, IPackageData } from "@/interfaces";
+import {
+  IHarvestHistoryData,
+  IIndexedHarvestData,
+  IIndexedPackageData,
+  IPackageAncestorTreeNode,
+  IPackageData,
+  IPackageHistoryData,
+} from "@/interfaces";
 import { authManager } from "@/modules/auth-manager.module";
-import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
+import {
+  DataLoader,
+  getDataLoader,
+  primaryDataLoader,
+} from "@/modules/data-loader/data-loader.module";
+import { facilityManager } from "@/modules/facility-manager.module";
 import { toastManager } from "@/modules/toast-manager.module";
 import store from "@/store/page-overlay/index";
 import { PackageHistoryActions } from "@/store/page-overlay/modules/package-history/consts";
@@ -120,7 +132,91 @@ export function packageFieldMatch(
   return null;
 }
 
-export async function getParentPackages(pkg: IPackageData): Promise<IIndexedPackageData[]> {
+export async function getParentPackageHistoryTree({
+  label,
+  license: string
+}: {
+  label: string;
+  license: string
+}): Promise<IPackageAncestorTreeNode> {
+  const ownedLicenses: string[] = (await facilityManager.ownedFacilitiesOrError()).map(
+    (facility) => facility.licenseNumber
+  );
+
+  let pkg: IIndexedPackageData | null = null;
+  for (const ownedLicense of ownedLicenses) {
+    const authState = await authManager.authStateOrError();
+    // if (license) {
+    //   authState.license = license;
+    // }
+
+    let dataLoader: DataLoader = await getDataLoader(authState);
+
+    // TODO search every available facility
+    // TODO search active, inactive
+    const pkg = await dataLoader.activePackage(label);
+
+    if (pkg) {
+      break;
+    }
+  }
+
+  if (!pkg) {
+    return {
+      packageData: {
+        label: pkg.Label,
+        license: pkg.FacilityLicenseNumber as string,
+      },
+      ancestors: [],
+    };
+  }
+
+  const history: IPackageHistoryData[] = await dataLoader.packageHistoryByPackageId(pkg.Id);
+
+  return {
+    packageData: {
+      label: pkg.Label,
+      license: pkg.FacilityLicenseNumber as string,
+    },
+    ancestors: [],
+  };
+}
+
+export async function getChildPackageHistoryTree({
+  label,
+  license,
+}: {
+  label: string;
+  license?: string;
+}): Promise<IPackageChildTreeNode> {
+  // TODO search every available facility
+  // TODO search active, inactive
+  const pkg = await primaryDataLoader.activePackage(label);
+
+  const history: IPackageHistoryData[] = await primaryDataLoader.packageHistoryByPackageId(pkg.Id);
+
+  return {
+    label: pkg.Label,
+    license: pkg.FacilityLicenseNumber as string,
+    children: [],
+  };
+}
+
+export async function getParentHarvests(label: string): Promise<IHarvestHistoryData[]> {
+  // TODO search every available facility
+  // TODO search active, inactive
+  const pkg = await primaryDataLoader.activePackage(label);
+
+  const history: IHarvestHistoryData[] = await primaryDataLoader.packageHarvestHistoryByPackageId(
+    pkg.Id
+  );
+
+  return history;
+}
+
+export async function getParentPackagesDeprecated(
+  pkg: IPackageData
+): Promise<IIndexedPackageData[]> {
   store.dispatch(`packageHistory/${PackageHistoryActions.LOG_EVENT}`, {
     event: `Finding parent packages for ${pkg.Label}`,
   });
@@ -160,7 +256,9 @@ export async function getParentPackages(pkg: IPackageData): Promise<IIndexedPack
   return matches;
 }
 
-export async function getParentHarvests(pkg: IPackageData): Promise<IIndexedHarvestData[]> {
+export async function getParentHarvestsDeprecated(
+  pkg: IPackageData
+): Promise<IIndexedHarvestData[]> {
   store.dispatch(`packageHistory/${PackageHistoryActions.LOG_EVENT}`, {
     event: `Finding parent harvests for ${pkg.Label}`,
   });
@@ -197,7 +295,9 @@ export async function getParentHarvests(pkg: IPackageData): Promise<IIndexedHarv
   return matches;
 }
 
-export async function getChildPackages(pkg: IPackageData): Promise<IIndexedPackageData[]> {
+export async function getChildPackagesDeprecated(
+  pkg: IPackageData
+): Promise<IIndexedPackageData[]> {
   const matches = [];
 
   for (const x of await primaryDataLoader.onDemandActivePackageSearch({ queryString: pkg.Label })) {

@@ -5,7 +5,7 @@ import {
   IPackageData,
   IPluginState,
 } from "@/interfaces";
-import { getChildPackages, getParentHarvests, getParentPackages } from "@/utils/package";
+import { getParentHarvests, getParentPackages } from "@/utils/package";
 import { ActionContext } from "vuex";
 import {
   PackageHistoryActions,
@@ -120,12 +120,12 @@ export const packageHistoryModule = {
 
         try {
           ctx.commit(PackageHistoryMutations.SET_ANCESTORS, {
-            packages: [await getParentPackages(pkg)],
-            harvests: [await getParentHarvests(pkg)],
+            packages: [await getParentPackages({ label: pkg.Label })],
+            harvests: [await getParentHarvests(pkg.Label)],
             depth: 0,
           });
           ctx.commit(PackageHistoryMutations.SET_CHILDREN, {
-            packages: [await getChildPackages(pkg)],
+            // packages: [await getChildPackagesDeprecated(pkg)],
             depth: 0,
           });
           ctx.commit(PackageHistoryMutations.SET_STATUS, {
