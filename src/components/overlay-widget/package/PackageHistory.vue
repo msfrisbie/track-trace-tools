@@ -23,19 +23,21 @@
         </div>
         <div>
           <div>Ancestors</div>
+          {{ JSON.stringify(ancestorTree, null, 2) }}
           <package-history-tile
-            v-for="ancestor of ancestors[0]"
+            v-for="ancestor of []"
             v-bind:key="ancestor.Label"
             :pkg="ancestor"
           ></package-history-tile>
         </div>
         <div>
           <div>Children</div>
-          <package-history-tile
+          {{ JSON.stringify(childTree, null, 2) }}
+          <!-- <package-history-tile
             v-for="child of children[0]"
             v-bind:key="child.Label"
             :pkg="child"
-          ></package-history-tile>
+          ></package-history-tile> -->
         </div>
       </div>
     </template>
@@ -64,8 +66,9 @@ export default Vue.extend({
   computed: {
     ...mapState<IPluginState>({
       sourcePackage: (state: IPluginState) => state.packageHistory.sourcePackage,
-      ancestors: (state: IPluginState) => state.packageHistory.ancestors,
-      children: (state: IPluginState) => state.packageHistory.children,
+      ancestorTree: (state: IPluginState) => state.packageHistory.ancestorTree,
+      childTree: (state: IPluginState) => state.packageHistory.childTree,
+      sourceHarvests: (state: IPluginState) => state.packageHistory.sourceHarvests,
       status: (state: IPluginState) => state.packageHistory.status,
       log: (state: IPluginState) => state.packageHistory.log,
     }),

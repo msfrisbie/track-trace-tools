@@ -1457,15 +1457,10 @@ export interface IClientInfo {
 }
 
 export interface IHistoryTreeNode {
-  packageData?: {
-    label: string;
-    license: string;
-  };
-  transferData?: {
-    manifestNumber: string;
-    sourceLicense: string;
-    destinationLicense: string;
-  };
+  label: string;
+  license: string;
+  pkg?: IIndexedPackageData
+  history?: IPackageHistoryData[]
 }
 
 export interface IPackageAncestorTreeNode extends IHistoryTreeNode {

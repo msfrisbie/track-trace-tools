@@ -4,6 +4,7 @@ import {
   IIndexedHarvestData,
   IIndexedPackageData,
   IPackageAncestorTreeNode,
+  IPackageChildTreeNode,
   IPackageData,
   IPackageHistoryData,
 } from "@/interfaces";
@@ -18,6 +19,10 @@ import { toastManager } from "@/modules/toast-manager.module";
 import store from "@/store/page-overlay/index";
 import { PackageHistoryActions } from "@/store/page-overlay/modules/package-history/consts";
 import { downloadFileFromUrl } from "./dom";
+import {
+  extractChildPackageLabelsFromHistory,
+  extractParentPackageLabelsFromHistory,
+} from "./history";
 
 export async function getLabTestUrlsFromPackage({
   pkg,
@@ -134,51 +139,62 @@ export function packageFieldMatch(
 
 export async function getParentPackageHistoryTree({
   label,
-  license: string
+  license,
 }: {
   label: string;
-  license: string
+  license: string;
 }): Promise<IPackageAncestorTreeNode> {
   const ownedLicenses: string[] = (await facilityManager.ownedFacilitiesOrError()).map(
     (facility) => facility.licenseNumber
   );
+  console.log(ownedLicenses, license);
 
-  let pkg: IIndexedPackageData | null = null;
-  for (const ownedLicense of ownedLicenses) {
-    const authState = await authManager.authStateOrError();
-    // if (license) {
-    //   authState.license = license;
-    // }
-
-    let dataLoader: DataLoader = await getDataLoader(authState);
-
-    // TODO search every available facility
-    // TODO search active, inactive
-    const pkg = await dataLoader.activePackage(label);
-
-    if (pkg) {
-      break;
-    }
-  }
-
-  if (!pkg) {
+  if (!ownedLicenses.includes(license)) {
+    // This license is not owned by the current user, exit with terminal node
     return {
-      packageData: {
-        label: pkg.Label,
-        license: pkg.FacilityLicenseNumber as string,
-      },
+      label,
+      license,
       ancestors: [],
     };
   }
 
+  const authState = { ...(await authManager.authStateOrError()), license };
+
+  let dataLoader: DataLoader = await getDataLoader(authState);
+
+  // TODO search every available facility
+  // TODO search active, inactive
+  let pkg: IIndexedPackageData | null = null;
+  try {
+    pkg = await dataLoader.activePackage(label);
+  } catch (e) {}
+  try {
+    pkg = await dataLoader.inactivePackage(label);
+  } catch (e) {}
+  try {
+    pkg = await dataLoader.inTransitPackage(label);
+  } catch (e) {}
+
+  if (!pkg) {
+    throw new Error("Could not find package");
+  }
+
   const history: IPackageHistoryData[] = await dataLoader.packageHistoryByPackageId(pkg.Id);
 
+  // TODO: this license may not be correct
+  // and must update when a transfer occurs
+  const ancestors = await Promise.all(
+    extractParentPackageLabelsFromHistory(history).map((parentLabel) =>
+      getParentPackageHistoryTree({ label: parentLabel, license })
+    )
+  );
+
   return {
-    packageData: {
-      label: pkg.Label,
-      license: pkg.FacilityLicenseNumber as string,
-    },
-    ancestors: [],
+    label,
+    license,
+    pkg,
+    history,
+    ancestors,
   };
 }
 
@@ -187,18 +203,59 @@ export async function getChildPackageHistoryTree({
   license,
 }: {
   label: string;
-  license?: string;
+  license: string;
 }): Promise<IPackageChildTreeNode> {
+  const ownedLicenses: string[] = (await facilityManager.ownedFacilitiesOrError()).map(
+    (facility) => facility.licenseNumber
+  );
+  console.log(ownedLicenses, license);
+
+  if (!ownedLicenses.includes(license)) {
+    // This license is not owned by the current user, exit with terminal node
+    return {
+      label,
+      license,
+      children: [],
+    };
+  }
+
+  const authState = { ...(await authManager.authStateOrError()), license };
+
+  let dataLoader: DataLoader = await getDataLoader(authState);
+
   // TODO search every available facility
   // TODO search active, inactive
-  const pkg = await primaryDataLoader.activePackage(label);
+  let pkg: IIndexedPackageData | null = null;
+  try {
+    pkg = await dataLoader.activePackage(label);
+  } catch (e) {}
+  try {
+    pkg = await dataLoader.inactivePackage(label);
+  } catch (e) {}
+  try {
+    pkg = await dataLoader.inTransitPackage(label);
+  } catch (e) {}
 
-  const history: IPackageHistoryData[] = await primaryDataLoader.packageHistoryByPackageId(pkg.Id);
+  if (!pkg) {
+    throw new Error("Could not find package");
+  }
+
+  const history: IPackageHistoryData[] = await dataLoader.packageHistoryByPackageId(pkg.Id);
+
+  // TODO: this license may not be correct
+  // and must update when a transfer occurs
+  const children = await Promise.all(
+    extractChildPackageLabelsFromHistory(history).map((childLabel) =>
+      getChildPackageHistoryTree({ label: childLabel, license })
+    )
+  );
 
   return {
-    label: pkg.Label,
-    license: pkg.FacilityLicenseNumber as string,
-    children: [],
+    label,
+    license,
+    pkg,
+    history,
+    children,
   };
 }
 

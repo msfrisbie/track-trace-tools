@@ -1,11 +1,16 @@
 import {
-  IIndexedHarvestData,
+  IHarvestHistoryData,
   IIndexedPackageData,
-  IIndexedTransferData,
+  IPackageAncestorTreeNode,
+  IPackageChildTreeNode,
   IPackageData,
   IPluginState,
 } from "@/interfaces";
-import { getParentHarvests, getParentPackages } from "@/utils/package";
+import {
+  getChildPackageHistoryTree,
+  getParentHarvests,
+  getParentPackageHistoryTree,
+} from "@/utils/package";
 import { ActionContext } from "vuex";
 import {
   PackageHistoryActions,
@@ -18,8 +23,9 @@ const inMemoryState = {
   sourcePackage: null,
   status: PackageHistoryStatus.INITIAL,
   log: [],
-  ancestors: [],
-  children: [],
+  ancestorTree: null,
+  childTree: null,
+  sourceHarvests: [],
 };
 
 const persistedState = {};
@@ -43,55 +49,35 @@ export const packageHistoryModule = {
       console.log(timestampedEvent);
       state.log = [...state.log, timestampedEvent];
     },
+    [PackageHistoryMutations.SET_SOURCE_HARVESTS](
+      state: IPackageHistoryState,
+      {
+        sourceHarvests,
+      }: {
+        sourceHarvests: IHarvestHistoryData[];
+      }
+    ) {
+      state.sourceHarvests = sourceHarvests;
+    },
     [PackageHistoryMutations.SET_ANCESTORS](
       state: IPackageHistoryState,
       {
-        packages = [],
-        harvests = [],
-        transfers = [],
-        depth,
+        ancestorTree,
       }: {
-        depth: number;
-        packages?: IIndexedPackageData[];
-        harvests?: IIndexedHarvestData[];
-        transfers?: IIndexedTransferData[];
+        ancestorTree: IPackageAncestorTreeNode;
       }
     ) {
-      state.ancestors[depth] = [
-        ...(state.ancestors[depth] || []),
-        ...packages.map((pkg) => ({ pkg })),
-        ...harvests.map((harvest) => ({
-          harvest,
-        })),
-        ...transfers.map((transfer) => ({
-          transfer,
-        })),
-      ];
+      state.ancestorTree = ancestorTree;
     },
     [PackageHistoryMutations.SET_CHILDREN](
       state: IPackageHistoryState,
       {
-        packages = [],
-        harvests = [],
-        transfers = [],
-        depth,
+        childTree,
       }: {
-        depth: number;
-        packages?: IIndexedPackageData[];
-        harvests?: IIndexedHarvestData[];
-        transfers?: IIndexedTransferData[];
+        childTree: IPackageChildTreeNode;
       }
     ) {
-      state.children[depth] = [
-        ...(state.children[depth] || []),
-        ...packages.map((pkg) => ({ pkg })),
-        ...harvests.map((harvest) => ({
-          harvest,
-        })),
-        ...transfers.map((transfer) => ({
-          transfer,
-        })),
-      ];
+      state.childTree = childTree;
     },
     [PackageHistoryMutations.SET_STATUS](
       state: IPackageHistoryState,
@@ -100,8 +86,9 @@ export const packageHistoryModule = {
       state.status = status;
       if (status === PackageHistoryStatus.INITIAL) {
         state.log = [];
-        state.ancestors = [];
-        state.children = [];
+        state.ancestorTree = null;
+        state.childTree = null;
+        state.sourceHarvests = [];
       }
     },
   },
@@ -109,7 +96,7 @@ export const packageHistoryModule = {
   actions: {
     [PackageHistoryActions.SET_SOURCE_PACKAGE]: async (
       ctx: ActionContext<IPackageHistoryState, IPluginState>,
-      { pkg }: { pkg: IPackageData | null }
+      { pkg }: { pkg: IIndexedPackageData | null }
     ) => {
       ctx.commit(PackageHistoryMutations.SET_SOURCE_PACKAGE, { pkg });
 
@@ -119,14 +106,20 @@ export const packageHistoryModule = {
         });
 
         try {
+          ctx.commit(PackageHistoryMutations.SET_SOURCE_HARVESTS, {
+            sourceHarvests: getParentHarvests(pkg.Label),
+          });
           ctx.commit(PackageHistoryMutations.SET_ANCESTORS, {
-            packages: [await getParentPackages({ label: pkg.Label })],
-            harvests: [await getParentHarvests(pkg.Label)],
-            depth: 0,
+            ancestorTree: await getParentPackageHistoryTree({
+              label: pkg.Label,
+              license: pkg.LicenseNumber,
+            }),
           });
           ctx.commit(PackageHistoryMutations.SET_CHILDREN, {
-            // packages: [await getChildPackagesDeprecated(pkg)],
-            depth: 0,
+            childTree: await getChildPackageHistoryTree({
+              label: pkg.Label,
+              license: pkg.LicenseNumber,
+            }),
           });
           ctx.commit(PackageHistoryMutations.SET_STATUS, {
             status: PackageHistoryStatus.SUCCESS,
