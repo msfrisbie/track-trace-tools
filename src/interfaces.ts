@@ -1,5 +1,6 @@
 import {
   BackgroundTaskState,
+  HarvestState,
   Level,
   MessageType,
   MetrcStatus,
@@ -543,6 +544,19 @@ export interface ITransferHistoryData {
   InputSourcesNames: string;
   RecordedDateTime: string;
   UserName: string;
+}
+
+export interface IPackageHistoryData extends ITransferHistoryData {}
+
+export interface IHarvestHistoryData {
+  HarvestStartDate: string; // "2022-09-22"
+  HarvestTypeName: string; // "Manicure Batch";
+  HarvestedByFacilityLicenseNumber: string; // "EX-000002";
+  HarvestedByFacilityName: string; // "Example, LLC";
+  IsOnHold: false;
+  LabTestingStateDate: null;
+  LabTestingStateName: "NotSubmitted";
+  Name: string; // "Birthday Cake 10.21"
 }
 
 export interface ITestResultData {

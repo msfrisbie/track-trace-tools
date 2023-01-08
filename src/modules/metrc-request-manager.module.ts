@@ -79,17 +79,17 @@ const DATAIMPORT_MOVE_PLANTS_URL = origin() + "/api/dataimport/plants/change/loc
 
 const DEFAULT_FETCH_POST_OPTIONS = {
   method: "POST",
-  ...retryDefaults
+  ...retryDefaults,
 };
 
 const DEFAULT_FETCH_GET_OPTIONS = {
   method: "GET",
-  ...retryDefaults
+  ...retryDefaults,
 };
 
 const JSON_HEADERS = {
   "Content-Type": "application/json",
-  Accept: "application/json, text/javascript, */*; q=0.01"
+  Accept: "application/json, text/javascript, */*; q=0.01",
 };
 
 enum UrlType {
@@ -101,6 +101,8 @@ enum UrlType {
   USER_PROFILE,
   LAB_RESULTS_BY_PACKAGE_ID,
   TRANSFER_HISTORY_BY_TRANSFER_ID,
+  PACKAGE_HARVEST_HISTORY_BY_PACKAGE_ID,
+  PACKAGE_HISTORY_BY_PACKAGE_ID,
   API_KEYS,
   DATAIMPORT,
   DATAIMPORT_HISTORY,
@@ -112,7 +114,7 @@ enum UrlType {
   ADJUST_PACKAGE,
   REMEDIATE_PACKAGE,
   CREATE_PLANTINGS_FROM_PACKAGE,
-  CHANGE_PLANT_BATCH_GROWTH_PHASE
+  CHANGE_PLANT_BATCH_GROWTH_PHASE,
 }
 
 // function persistedAuthStateOrError(): IAuthState {
@@ -229,6 +231,21 @@ async function buildDynamicUrl(
         origin({ divertToNullOrigin: false }) +
         `/api/packages/labresults/byid?id=${options.packageId}`
       );
+    case UrlType.PACKAGE_HISTORY_BY_PACKAGE_ID:
+      if (!options || !options.packageId) {
+        throw new Error("Missing required URL options");
+      }
+      return (
+        origin({ divertToNullOrigin: false }) + `/api/packages/history?id=${options.packageId}`
+      );
+    case UrlType.PACKAGE_HARVEST_HISTORY_BY_PACKAGE_ID:
+      if (!options || !options.packageId) {
+        throw new Error("Missing required URL options");
+      }
+      return (
+        origin({ divertToNullOrigin: false }) +
+        `/api/packages/harvestHistory?id=${options.packageId}`
+      );
     case UrlType.TRANSFER_HISTORY_BY_TRANSFER_ID:
       if (!options || !options.manifestNumber) {
         throw new Error("Missing required URL options");
@@ -255,7 +272,7 @@ async function buildAuthenticationHeaders(authState: IAuthState) {
 
   const headers = {
     ApiVerificationToken: authState.apiVerificationToken,
-    "X-Metrc-LicenseNumber": authState.license
+    "X-Metrc-LicenseNumber": authState.license,
   };
 
   // if (includeXRequestedWith) {
@@ -287,7 +304,7 @@ export class MetrcRequestManager implements IAtomicService {
 
   async getLoginPage() {
     return customFetch(LOGIN_URL, {
-      ...DEFAULT_FETCH_GET_OPTIONS
+      ...DEFAULT_FETCH_GET_OPTIONS,
     });
   }
 
@@ -297,9 +314,9 @@ export class MetrcRequestManager implements IAtomicService {
       // @ts-ignore
       headers: {
         ...(await buildAuthenticationHeaders(this.authStateOrError)),
-        ...JSON_HEADERS
+        ...JSON_HEADERS,
       },
-      body
+      body,
     });
   }
 
@@ -309,9 +326,9 @@ export class MetrcRequestManager implements IAtomicService {
       // @ts-ignore
       headers: {
         ...(await buildAuthenticationHeaders(this.authStateOrError)),
-        ...JSON_HEADERS
+        ...JSON_HEADERS,
       },
-      body
+      body,
     });
   }
 
@@ -321,9 +338,9 @@ export class MetrcRequestManager implements IAtomicService {
       // @ts-ignore
       headers: {
         ...(await buildAuthenticationHeaders(this.authStateOrError)),
-        ...JSON_HEADERS
+        ...JSON_HEADERS,
       },
-      body
+      body,
     });
   }
 
@@ -333,9 +350,9 @@ export class MetrcRequestManager implements IAtomicService {
       // @ts-ignore
       headers: {
         ...(await buildAuthenticationHeaders(this.authStateOrError)),
-        ...JSON_HEADERS
+        ...JSON_HEADERS,
       },
-      body
+      body,
     });
   }
 
@@ -345,9 +362,9 @@ export class MetrcRequestManager implements IAtomicService {
       // @ts-ignore
       headers: {
         ...(await buildAuthenticationHeaders(this.authStateOrError)),
-        ...JSON_HEADERS
+        ...JSON_HEADERS,
       },
-      body
+      body,
     });
   }
 
@@ -357,9 +374,9 @@ export class MetrcRequestManager implements IAtomicService {
       // @ts-ignore
       headers: {
         ...(await buildAuthenticationHeaders(this.authStateOrError)),
-        ...JSON_HEADERS
+        ...JSON_HEADERS,
       },
-      body
+      body,
     });
   }
 
@@ -369,9 +386,9 @@ export class MetrcRequestManager implements IAtomicService {
       // @ts-ignore
       headers: {
         ...(await buildAuthenticationHeaders(this.authStateOrError)),
-        ...JSON_HEADERS
+        ...JSON_HEADERS,
       },
-      body
+      body,
     });
   }
 
@@ -381,25 +398,25 @@ export class MetrcRequestManager implements IAtomicService {
       // @ts-ignore
       headers: {
         ...(await buildAuthenticationHeaders(this.authStateOrError)),
-        ...JSON_HEADERS
+        ...JSON_HEADERS,
       },
-      body
+      body,
     });
   }
 
   async getHarvestHistory(body: string, harvestId: number) {
     return customFetch(
       await buildDynamicUrl(this.authStateOrError, UrlType.HARVEST_HISTORY_BY_HARVEST_ID, {
-        harvestId
+        harvestId,
       }),
       {
         ...DEFAULT_FETCH_POST_OPTIONS,
         // @ts-ignore
         headers: {
           ...(await buildAuthenticationHeaders(this.authStateOrError)),
-          ...JSON_HEADERS
+          ...JSON_HEADERS,
         },
-        body
+        body,
       }
     );
   }
@@ -418,10 +435,10 @@ export class MetrcRequestManager implements IAtomicService {
       // @ts-ignore
       headers: {
         ...(await buildAuthenticationHeaders(this.authStateOrError)),
-        ...JSON_HEADERS
+        ...JSON_HEADERS,
       },
       body,
-      signal
+      signal,
     });
   }
 
@@ -439,10 +456,10 @@ export class MetrcRequestManager implements IAtomicService {
       // @ts-ignore
       headers: {
         ...(await buildAuthenticationHeaders(this.authStateOrError)),
-        ...JSON_HEADERS
+        ...JSON_HEADERS,
       },
       body,
-      signal
+      signal,
     });
   }
 
@@ -460,10 +477,10 @@ export class MetrcRequestManager implements IAtomicService {
       // @ts-ignore
       headers: {
         ...(await buildAuthenticationHeaders(this.authStateOrError)),
-        ...JSON_HEADERS
+        ...JSON_HEADERS,
       },
       body,
-      signal
+      signal,
     });
   }
 
@@ -473,9 +490,9 @@ export class MetrcRequestManager implements IAtomicService {
       // @ts-ignore
       headers: {
         ...(await buildAuthenticationHeaders(this.authStateOrError)),
-        ...JSON_HEADERS
+        ...JSON_HEADERS,
       },
-      body
+      body,
     });
   }
 
@@ -485,9 +502,9 @@ export class MetrcRequestManager implements IAtomicService {
       // @ts-ignore
       headers: {
         ...(await buildAuthenticationHeaders(this.authStateOrError)),
-        ...JSON_HEADERS
+        ...JSON_HEADERS,
       },
-      body
+      body,
     });
   }
 
@@ -507,10 +524,10 @@ export class MetrcRequestManager implements IAtomicService {
       // @ts-ignore
       headers: {
         ...(await buildAuthenticationHeaders(this.authStateOrError)),
-        ...JSON_HEADERS
+        ...JSON_HEADERS,
       },
       body,
-      signal
+      signal,
     });
   }
 
@@ -520,9 +537,9 @@ export class MetrcRequestManager implements IAtomicService {
       // @ts-ignore
       headers: {
         ...(await buildAuthenticationHeaders(this.authStateOrError)),
-        ...JSON_HEADERS
+        ...JSON_HEADERS,
       },
-      body
+      body,
     });
   }
 
@@ -532,9 +549,9 @@ export class MetrcRequestManager implements IAtomicService {
       // @ts-ignore
       headers: {
         ...(await buildAuthenticationHeaders(this.authStateOrError)),
-        ...JSON_HEADERS
+        ...JSON_HEADERS,
       },
-      body
+      body,
     });
   }
 
@@ -554,10 +571,10 @@ export class MetrcRequestManager implements IAtomicService {
       // @ts-ignore
       headers: {
         ...(await buildAuthenticationHeaders(this.authStateOrError)),
-        ...JSON_HEADERS
+        ...JSON_HEADERS,
       },
       body,
-      signal
+      signal,
     });
   }
 
@@ -567,9 +584,9 @@ export class MetrcRequestManager implements IAtomicService {
       // @ts-ignore
       headers: {
         ...(await buildAuthenticationHeaders(this.authStateOrError)),
-        ...JSON_HEADERS
+        ...JSON_HEADERS,
       },
-      body
+      body,
     });
   }
 
@@ -579,9 +596,9 @@ export class MetrcRequestManager implements IAtomicService {
       // @ts-ignore
       headers: {
         ...(await buildAuthenticationHeaders(this.authStateOrError)),
-        ...JSON_HEADERS
+        ...JSON_HEADERS,
       },
-      body
+      body,
     });
   }
 
@@ -591,9 +608,9 @@ export class MetrcRequestManager implements IAtomicService {
       // @ts-ignore
       headers: {
         ...(await buildAuthenticationHeaders(this.authStateOrError)),
-        ...JSON_HEADERS
+        ...JSON_HEADERS,
       },
-      body
+      body,
     });
   }
 
@@ -603,9 +620,9 @@ export class MetrcRequestManager implements IAtomicService {
       // @ts-ignore
       headers: {
         ...(await buildAuthenticationHeaders(this.authStateOrError)),
-        ...JSON_HEADERS
+        ...JSON_HEADERS,
       },
-      body
+      body,
     });
   }
 
@@ -615,25 +632,71 @@ export class MetrcRequestManager implements IAtomicService {
       // @ts-ignore
       headers: {
         ...(await buildAuthenticationHeaders(this.authStateOrError)),
-        ...JSON_HEADERS
+        ...JSON_HEADERS,
       },
-      body
+      body,
     });
   }
 
   async getTestResults(body: string, packageId: number) {
     return customFetch(
       await buildDynamicUrl(this.authStateOrError, UrlType.LAB_RESULTS_BY_PACKAGE_ID, {
-        packageId
+        packageId,
       }),
       {
         ...DEFAULT_FETCH_POST_OPTIONS,
         // @ts-ignore
         headers: {
           ...(await buildAuthenticationHeaders(this.authStateOrError)),
-          ...JSON_HEADERS
+          ...JSON_HEADERS,
         },
-        body
+        body,
+      }
+    );
+  }
+
+  async getPackageHistory(body: string, packageId: number, abortTimeout: number = 30000) {
+    const controller = new AbortController();
+    const signal = controller.signal;
+
+    setTimeout(() => controller.abort(), abortTimeout);
+
+    return customFetch(
+      await buildDynamicUrl(this.authStateOrError, UrlType.PACKAGE_HISTORY_BY_PACKAGE_ID, {
+        packageId,
+      }),
+      {
+        ...DEFAULT_FETCH_POST_OPTIONS,
+        // @ts-ignore
+        headers: {
+          ...(await buildAuthenticationHeaders(this.authStateOrError)),
+          ...JSON_HEADERS,
+        },
+        body,
+        signal,
+      }
+    );
+  }
+
+  async getPackageHarvestHistory(body: string, packageId: number, abortTimeout: number = 30000) {
+    const controller = new AbortController();
+    const signal = controller.signal;
+
+    setTimeout(() => controller.abort(), abortTimeout);
+
+    return customFetch(
+      await buildDynamicUrl(this.authStateOrError, UrlType.PACKAGE_HARVEST_HISTORY_BY_PACKAGE_ID, {
+        packageId,
+      }),
+      {
+        ...DEFAULT_FETCH_POST_OPTIONS,
+        // @ts-ignore
+        headers: {
+          ...(await buildAuthenticationHeaders(this.authStateOrError)),
+          ...JSON_HEADERS,
+        },
+        body,
+        signal,
       }
     );
   }
@@ -646,17 +709,17 @@ export class MetrcRequestManager implements IAtomicService {
 
     return customFetch(
       await buildDynamicUrl(this.authStateOrError, UrlType.TRANSFER_HISTORY_BY_TRANSFER_ID, {
-        manifestNumber
+        manifestNumber,
       }),
       {
         ...DEFAULT_FETCH_POST_OPTIONS,
         // @ts-ignore
         headers: {
           ...(await buildAuthenticationHeaders(this.authStateOrError)),
-          ...JSON_HEADERS
+          ...JSON_HEADERS,
         },
         body,
-        signal
+        signal,
       }
     );
   }
@@ -667,9 +730,9 @@ export class MetrcRequestManager implements IAtomicService {
       // @ts-ignore
       headers: {
         ...(await buildAuthenticationHeaders(this.authStateOrError)),
-        ...JSON_HEADERS
+        ...JSON_HEADERS,
       },
-      body
+      body,
     });
   }
 
@@ -681,9 +744,9 @@ export class MetrcRequestManager implements IAtomicService {
         // @ts-ignore
         headers: {
           ...(await buildAuthenticationHeaders(this.authStateOrError)),
-          ...JSON_HEADERS
+          ...JSON_HEADERS,
         },
-        body
+        body,
       }
     );
   }
@@ -694,8 +757,8 @@ export class MetrcRequestManager implements IAtomicService {
       // @ts-ignore
       headers: {
         ...(await buildAuthenticationHeaders(this.authStateOrError)),
-        Accept: "text/html, */*; q=0.01"
-      }
+        Accept: "text/html, */*; q=0.01",
+      },
     });
   }
 
@@ -705,8 +768,8 @@ export class MetrcRequestManager implements IAtomicService {
       // @ts-ignore
       headers: {
         ...(await buildAuthenticationHeaders(this.authStateOrError)),
-        Accept: "text/html, */*; q=0.01"
-      }
+        Accept: "text/html, */*; q=0.01",
+      },
     });
   }
 
@@ -716,8 +779,8 @@ export class MetrcRequestManager implements IAtomicService {
       // @ts-ignore
       headers: {
         ...(await buildAuthenticationHeaders(this.authStateOrError)),
-        Accept: "text/html, */*; q=0.01"
-      }
+        Accept: "text/html, */*; q=0.01",
+      },
     });
   }
 
@@ -727,8 +790,8 @@ export class MetrcRequestManager implements IAtomicService {
       // @ts-ignore
       headers: {
         ...(await buildAuthenticationHeaders(this.authStateOrError)),
-        Accept: "text/html, */*; q=0.01"
-      }
+        Accept: "text/html, */*; q=0.01",
+      },
     });
   }
 
@@ -738,8 +801,8 @@ export class MetrcRequestManager implements IAtomicService {
       // @ts-ignore
       headers: {
         ...(await buildAuthenticationHeaders(this.authStateOrError)),
-        Accept: "*/*"
-      }
+        Accept: "*/*",
+      },
     });
   }
 
@@ -749,9 +812,9 @@ export class MetrcRequestManager implements IAtomicService {
       // @ts-ignore
       headers: {
         ...(await buildAuthenticationHeaders(this.authStateOrError)),
-        ...JSON_HEADERS
+        ...JSON_HEADERS,
       },
-      body
+      body,
     });
   }
 
@@ -762,9 +825,9 @@ export class MetrcRequestManager implements IAtomicService {
       headers: {
         ...(await buildAuthenticationHeaders(this.authStateOrError)),
         "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
-        Accept: "*/*"
+        Accept: "*/*",
       },
-      body
+      body,
     });
   }
 
@@ -791,9 +854,9 @@ export class MetrcRequestManager implements IAtomicService {
       // @ts-ignore
       headers: {
         ...(await buildAuthenticationHeaders(this.authStateOrError)),
-        ...JSON_HEADERS
+        ...JSON_HEADERS,
       },
-      body
+      body,
     });
   }
 
@@ -803,9 +866,9 @@ export class MetrcRequestManager implements IAtomicService {
       // @ts-ignore
       headers: {
         ...(await buildAuthenticationHeaders(this.authStateOrError)),
-        ...JSON_HEADERS
+        ...JSON_HEADERS,
       },
-      body
+      body,
     });
   }
 
@@ -815,9 +878,9 @@ export class MetrcRequestManager implements IAtomicService {
       // @ts-ignore
       headers: {
         ...(await buildAuthenticationHeaders(this.authStateOrError)),
-        ...JSON_HEADERS
+        ...JSON_HEADERS,
       },
-      body
+      body,
     });
   }
 
@@ -827,9 +890,9 @@ export class MetrcRequestManager implements IAtomicService {
       // @ts-ignore
       headers: {
         ...(await buildAuthenticationHeaders(this.authStateOrError)),
-        ...JSON_HEADERS
+        ...JSON_HEADERS,
       },
-      body
+      body,
     });
   }
 
@@ -839,9 +902,9 @@ export class MetrcRequestManager implements IAtomicService {
       // @ts-ignore
       headers: {
         ...(await buildAuthenticationHeaders(this.authStateOrError)),
-        ...JSON_HEADERS
+        ...JSON_HEADERS,
       },
-      body
+      body,
     });
   }
 
@@ -851,9 +914,9 @@ export class MetrcRequestManager implements IAtomicService {
       // @ts-ignore
       headers: {
         ...(await buildAuthenticationHeaders(this.authStateOrError)),
-        ...JSON_HEADERS
+        ...JSON_HEADERS,
       },
-      body
+      body,
     });
   }
 
@@ -863,9 +926,9 @@ export class MetrcRequestManager implements IAtomicService {
       // @ts-ignore
       headers: {
         ...(await buildAuthenticationHeaders(this.authStateOrError)),
-        ...JSON_HEADERS
+        ...JSON_HEADERS,
       },
-      body
+      body,
     });
   }
 
@@ -875,9 +938,9 @@ export class MetrcRequestManager implements IAtomicService {
       // @ts-ignore
       headers: {
         ...(await buildAuthenticationHeaders(this.authStateOrError)),
-        ...JSON_HEADERS
+        ...JSON_HEADERS,
       },
-      body
+      body,
     });
   }
 
@@ -887,9 +950,9 @@ export class MetrcRequestManager implements IAtomicService {
       // @ts-ignore
       headers: {
         ...(await buildAuthenticationHeaders(this.authStateOrError)),
-        ...JSON_HEADERS
+        ...JSON_HEADERS,
       },
-      body
+      body,
     });
   }
 
@@ -899,9 +962,9 @@ export class MetrcRequestManager implements IAtomicService {
       // @ts-ignore
       headers: {
         ...(await buildAuthenticationHeaders(this.authStateOrError)),
-        ...JSON_HEADERS
+        ...JSON_HEADERS,
       },
-      body
+      body,
     });
   }
 
@@ -911,9 +974,9 @@ export class MetrcRequestManager implements IAtomicService {
       // @ts-ignore
       headers: {
         ...(await buildAuthenticationHeaders(this.authStateOrError)),
-        ...JSON_HEADERS
+        ...JSON_HEADERS,
       },
-      body
+      body,
     });
   }
 
@@ -923,9 +986,9 @@ export class MetrcRequestManager implements IAtomicService {
       // @ts-ignore
       headers: {
         ...(await buildAuthenticationHeaders(this.authStateOrError)),
-        ...JSON_HEADERS
+        ...JSON_HEADERS,
       },
-      body
+      body,
     });
   }
 
@@ -935,9 +998,9 @@ export class MetrcRequestManager implements IAtomicService {
       // @ts-ignore
       headers: {
         ...(await buildAuthenticationHeaders(this.authStateOrError)),
-        ...JSON_HEADERS
+        ...JSON_HEADERS,
       },
-      body
+      body,
     });
   }
 
@@ -947,9 +1010,9 @@ export class MetrcRequestManager implements IAtomicService {
       // @ts-ignore
       headers: {
         ...(await buildAuthenticationHeaders(this.authStateOrError)),
-        ...JSON_HEADERS
+        ...JSON_HEADERS,
       },
-      body
+      body,
     });
   }
 
@@ -959,9 +1022,9 @@ export class MetrcRequestManager implements IAtomicService {
       // @ts-ignore
       headers: {
         ...(await buildAuthenticationHeaders(this.authStateOrError)),
-        ...JSON_HEADERS
+        ...JSON_HEADERS,
       },
-      body
+      body,
     });
   }
 
@@ -971,9 +1034,9 @@ export class MetrcRequestManager implements IAtomicService {
       // @ts-ignore
       headers: {
         ...(await buildAuthenticationHeaders(this.authStateOrError)),
-        ...JSON_HEADERS
+        ...JSON_HEADERS,
       },
-      body
+      body,
     });
   }
 
@@ -983,9 +1046,9 @@ export class MetrcRequestManager implements IAtomicService {
       // @ts-ignore
       headers: {
         ...(await buildAuthenticationHeaders(this.authStateOrError)),
-        ...JSON_HEADERS
+        ...JSON_HEADERS,
       },
-      body
+      body,
     });
   }
 
@@ -995,8 +1058,8 @@ export class MetrcRequestManager implements IAtomicService {
       // @ts-ignore
       headers: {
         ...(await buildAuthenticationHeaders(this.authStateOrError)),
-        ...JSON_HEADERS
-      }
+        ...JSON_HEADERS,
+      },
     });
   }
   async finalizeSalesReceipts(body: string) {
@@ -1005,9 +1068,9 @@ export class MetrcRequestManager implements IAtomicService {
       // @ts-ignore
       headers: {
         ...(await buildAuthenticationHeaders(this.authStateOrError)),
-        ...JSON_HEADERS
+        ...JSON_HEADERS,
       },
-      body
+      body,
     });
   }
 
@@ -1017,8 +1080,8 @@ export class MetrcRequestManager implements IAtomicService {
       // @ts-ignore
       headers: {
         ...(await buildAuthenticationHeaders(this.authStateOrError)),
-        Accept: "text/html, */*; q=0.01"
-      }
+        Accept: "text/html, */*; q=0.01",
+      },
     });
   }
 
@@ -1028,8 +1091,8 @@ export class MetrcRequestManager implements IAtomicService {
       // @ts-ignore
       headers: {
         ...(await buildAuthenticationHeaders(this.authStateOrError)),
-        Accept: "text/html, */*; q=0.01"
-      }
+        Accept: "text/html, */*; q=0.01",
+      },
     });
   }
 
@@ -1039,8 +1102,8 @@ export class MetrcRequestManager implements IAtomicService {
       // @ts-ignore
       headers: {
         ...(await buildAuthenticationHeaders(this.authStateOrError)),
-        Accept: "text/html, */*; q=0.01"
-      }
+        Accept: "text/html, */*; q=0.01",
+      },
     });
   }
 
@@ -1050,8 +1113,8 @@ export class MetrcRequestManager implements IAtomicService {
       // @ts-ignore
       headers: {
         ...(await buildAuthenticationHeaders(this.authStateOrError)),
-        Accept: "text/html, */*; q=0.01"
-      }
+        Accept: "text/html, */*; q=0.01",
+      },
     });
   }
 
@@ -1061,8 +1124,8 @@ export class MetrcRequestManager implements IAtomicService {
       // @ts-ignore
       headers: {
         ...(await buildAuthenticationHeaders(this.authStateOrError)),
-        Accept: "text/html, */*; q=0.01"
-      }
+        Accept: "text/html, */*; q=0.01",
+      },
     });
   }
 
@@ -1072,8 +1135,8 @@ export class MetrcRequestManager implements IAtomicService {
       // @ts-ignore
       headers: {
         ...(await buildAuthenticationHeaders(this.authStateOrError)),
-        Accept: "text/html, */*; q=0.01"
-      }
+        Accept: "text/html, */*; q=0.01",
+      },
     });
   }
 
@@ -1083,8 +1146,8 @@ export class MetrcRequestManager implements IAtomicService {
       // @ts-ignore
       headers: {
         ...(await buildAuthenticationHeaders(this.authStateOrError)),
-        Accept: "text/html, */*; q=0.01"
-      }
+        Accept: "text/html, */*; q=0.01",
+      },
     });
   }
 
@@ -1094,8 +1157,8 @@ export class MetrcRequestManager implements IAtomicService {
       // @ts-ignore
       headers: {
         ...(await buildAuthenticationHeaders(this.authStateOrError)),
-        Accept: "text/html, */*; q=0.01"
-      }
+        Accept: "text/html, */*; q=0.01",
+      },
     });
   }
 
@@ -1107,8 +1170,8 @@ export class MetrcRequestManager implements IAtomicService {
         // @ts-ignore
         headers: {
           ...(await buildAuthenticationHeaders(this.authStateOrError)),
-          Accept: "text/html, */*; q=0.01"
-        }
+          Accept: "text/html, */*; q=0.01",
+        },
       }
     );
   }
@@ -1121,8 +1184,8 @@ export class MetrcRequestManager implements IAtomicService {
         // @ts-ignore
         headers: {
           ...(await buildAuthenticationHeaders(this.authStateOrError)),
-          Accept: "text/html, */*; q=0.01"
-        }
+          Accept: "text/html, */*; q=0.01",
+        },
       }
     );
   }
@@ -1133,8 +1196,8 @@ export class MetrcRequestManager implements IAtomicService {
       // @ts-ignore
       headers: {
         ...(await buildAuthenticationHeaders(this.authStateOrError)),
-        Accept: "text/html, */*; q=0.01"
-      }
+        Accept: "text/html, */*; q=0.01",
+      },
     });
   }
 
@@ -1146,8 +1209,8 @@ export class MetrcRequestManager implements IAtomicService {
         // @ts-ignore
         headers: {
           ...(await buildAuthenticationHeaders(this.authStateOrError)),
-          Accept: "text/html, */*; q=0.01"
-        }
+          Accept: "text/html, */*; q=0.01",
+        },
       }
     );
   }

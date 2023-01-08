@@ -29,11 +29,20 @@
     </div>
 
     <div class="flex flex-col items-stretch space-y-2">
+      <b-button
+        class="w-full flex flex-row items-center justify-between space-x-4"
+        variant="outline-primary"
+        @click.stop.prevent="setPackageHistorySourcePackage({ pkg }) && openPackageHistoryBuilder()"
+      >
+        <span>PACKAGE HISTORY</span>
+        <font-awesome-icon icon="sitemap" />
+      </b-button>
+
       <template v-if="isIdentityEligibleForTransferToolsImpl">
         <template v-if="isPackageEligibleForTransfer">
           <b-button
             class="w-full flex flex-row items-center justify-between space-x-4"
-            variant="outline-success"
+            variant="outline-primary"
             @click.stop.prevent="addPackageToTransferList({ pkg }) && openNewTransferBuilder()"
           >
             <span>CREATE TRANSFER</span>
@@ -148,6 +157,7 @@ import { PACKAGE_TAB_REGEX } from "@/modules/page-manager.module";
 import { searchManager } from "@/modules/search-manager.module";
 import { toastManager } from "@/modules/toast-manager.module";
 import store from "@/store/page-overlay/index";
+import { PackageHistoryActions } from "@/store/page-overlay/modules/package-history/consts";
 import { PackageSearchActions } from "@/store/page-overlay/modules/package-search/consts";
 import { SplitPackageBuilderActions } from "@/store/page-overlay/modules/split-package-builder/consts";
 import {
@@ -235,7 +245,14 @@ export default Vue.extend({
       setShowPackageSearchResults: `packageSearch/${PackageSearchActions.SET_SHOW_PACKAGE_SEARCH_RESULTS}`,
       partialUpdatePackageSearchFilters: `packageSearch/${PackageSearchActions.PARTIAL_UPDATE_PACKAGE_SEARCH_FILTERS}`,
       setPackageSearchFilters: `packageSearch/${PackageSearchActions.SET_PACKAGE_SEARCH_FILTERS}`,
+      setPackageHistorySourcePackage: `packageHistory/${PackageHistoryActions.SET_SOURCE_PACKAGE}`,
     }),
+    openPackageHistoryBuilder() {
+      analyticsManager.track(MessageType.OPENED_PACKAGE_HISTORY_FROM_TOOLKIT_SEARCH, {});
+      modalManager.dispatchModalEvent(ModalType.BUILDER, ModalAction.OPEN, {
+        initialRoute: "/package/history",
+      });
+    },
     openNewTransferBuilder() {
       analyticsManager.track(MessageType.STARTED_TRANSFER_FROM_TOOLKIT_SEARCH, {});
       modalManager.dispatchModalEvent(ModalType.BUILDER, ModalAction.OPEN, {

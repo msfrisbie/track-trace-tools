@@ -17,6 +17,7 @@ import {
   IExtractedITagOrderData,
   IHarvestData,
   IHarvestFilter,
+  IHarvestHistoryData,
   IIndexedHarvestData,
   IIndexedPackageData,
   IIndexedPlantData,
@@ -25,6 +26,7 @@ import {
   IItemData,
   ILocationData,
   IPackageData,
+  IPackageHistoryData,
   IPackageOptions,
   IPaginationOptions,
   IPlantBatchData,
@@ -321,7 +323,7 @@ export class DataLoader implements IAtomicService {
    *
    */
 
-  async availableTags({ useCache = true }: { useCache?: boolean }): Promise<ITagData[]> {
+  async availableTags({ useCache = true }: { useCache?: boolean }): Promise<IIndexedTagData[]> {
     if (store.state.mockDataMode && store.state.flags?.mockedFlags.mockTags.enabled) {
       return mockDataManager.mockTags();
     }
@@ -333,7 +335,11 @@ export class DataLoader implements IAtomicService {
         );
 
         try {
-          const tags = await this.loadAvailableTags();
+          const tags: IIndexedTagData[] = (await this.loadAvailableTags()).map((tag) => ({
+            ...tag,
+            TagState: TagState.AVAILABLE,
+            TagMatcher: "",
+          }));
 
           databaseInterface.indexTags(tags, TagState.AVAILABLE);
 
@@ -350,7 +356,7 @@ export class DataLoader implements IAtomicService {
     return this._availableTags;
   }
 
-  async availableTag(tag: string): Promise<ITagData> {
+  async availableTag(tag: string): Promise<IIndexedTagData> {
     if (store.state.mockDataMode) {
       // TODO
     }
@@ -361,7 +367,11 @@ export class DataLoader implements IAtomicService {
       );
 
       try {
-        const tagData: ITagData = await this.loadAvailableTag(tag);
+        const tagData: IIndexedTagData = {
+          ...(await this.loadAvailableTag(tag)),
+          TagState: TagState.AVAILABLE,
+          TagMatcher: "",
+        };
 
         subscription.unsubscribe();
         resolve(tagData);
@@ -372,7 +382,7 @@ export class DataLoader implements IAtomicService {
     });
   }
 
-  async usedTags(): Promise<ITagData[]> {
+  async usedTags(): Promise<IIndexedTagData[]> {
     if (!this._usedTags) {
       this._usedTags = new Promise(async (resolve, reject) => {
         const subscription = timer(DATA_LOAD_FETCH_TIMEOUT_MS).subscribe(() =>
@@ -380,7 +390,11 @@ export class DataLoader implements IAtomicService {
         );
 
         try {
-          const tags = await this.loadUsedTags();
+          const tags: IIndexedTagData[] = (await this.loadUsedTags()).map((tag) => ({
+            ...tag,
+            TagState: TagState.USED,
+            TagMatcher: "",
+          }));
 
           databaseInterface.indexTags(tags, TagState.USED);
 
@@ -397,7 +411,7 @@ export class DataLoader implements IAtomicService {
     return this._usedTags;
   }
 
-  async voidedTags(): Promise<ITagData[]> {
+  async voidedTags(): Promise<IIndexedTagData[]> {
     if (!this._voidedTags) {
       this._voidedTags = new Promise(async (resolve, reject) => {
         const subscription = timer(DATA_LOAD_FETCH_TIMEOUT_MS).subscribe(() =>
@@ -405,7 +419,11 @@ export class DataLoader implements IAtomicService {
         );
 
         try {
-          const tags = await this.loadVoidedTags();
+          const tags: IIndexedTagData[] = (await this.loadVoidedTags()).map((tag) => ({
+            ...tag,
+            TagState: TagState.VOIDED,
+            TagMatcher: "",
+          }));
 
           databaseInterface.indexTags(tags, TagState.VOIDED);
 
@@ -2320,6 +2338,36 @@ export class DataLoader implements IAtomicService {
     store.commit(MutationType.SET_LOADING_MESSAGE, null);
 
     return voidedTags;
+  }
+
+  async packageHarvestHistoryByPackageId(packageId: number): Promise<IHarvestHistoryData[]> {
+    const page = 0;
+    const body = buildBody({ page, pageSize: DATA_LOAD_PAGE_SIZE });
+
+    const response = await this.metrcRequestManagerOrError.getPackageHistory(body, packageId, 3000);
+
+    if (response.status !== 200) {
+      throw new Error("Request failed");
+    }
+
+    const responseData: ICollectionResponse<IHarvestHistoryData> = await response.json();
+
+    return responseData.Data;
+  }
+
+  async packageHistoryByPackageId(packageId: number): Promise<IPackageHistoryData[]> {
+    const page = 0;
+    const body = buildBody({ page, pageSize: DATA_LOAD_PAGE_SIZE });
+
+    const response = await this.metrcRequestManagerOrError.getPackageHistory(body, packageId, 3000);
+
+    if (response.status !== 200) {
+      throw new Error("Request failed");
+    }
+
+    const responseData: ICollectionResponse<IPackageHistoryData> = await response.json();
+
+    return responseData.Data;
   }
 
   async transferHistoryByOutGoingTransferId(
