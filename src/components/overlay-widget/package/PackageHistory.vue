@@ -11,78 +11,137 @@
     </template>
     <template v-else>
       <div class="flex flex-col">
-        <div class="col-span-3 flex flex-col gap-4 items-center">
-          <b-card>
-            <div class="w-full flex flex-row items-center justify-start space-x-4">
-              <picker-icon
-                icon="box"
-                style="width: 5rem"
-                class="flex-shrink-0"
-                :textClass="sourcePackage.Quantity === 0 ? 'text-red-500' : ''"
-                :text="`${sourcePackage.Quantity} ${unitOfMeasureNameToAbbreviation(
-                  sourcePackage.Item.UnitOfMeasureName
-                )}`"
-              />
+        <div class="col-span-3 flex flex-col gap-4 items-center mb-4">
+          <div class="flex flex-row gap-8">
+            <b-card>
+              <div class="w-full flex flex-row items-center justify-start space-x-4">
+                <picker-icon
+                  icon="box"
+                  style="width: 5rem"
+                  class="flex-shrink-0"
+                  :textClass="sourcePackage.Quantity === 0 ? 'text-red-500' : ''"
+                  :text="`${sourcePackage.Quantity} ${unitOfMeasureNameToAbbreviation(
+                    sourcePackage.Item.UnitOfMeasureName
+                  )}`"
+                />
 
-              <picker-card
-                class="flex-grow"
-                :title="`${sourcePackage.Item.Name}`"
-                :label="sourcePackage.Label"
-              />
+                <picker-card
+                  class="flex-grow"
+                  :title="`${sourcePackage.Item.Name}`"
+                  :label="sourcePackage.Label"
+                />
+              </div>
+            </b-card>
+
+            <div class="flex flex-col items-center gap-4">
+              <div v-if="status === 'INFLIGHT'" class="flex flex-row items-center gap-2">
+                <b-spinner small></b-spinner>
+                <span>Building history...</span>
+              </div>
+              <div v-if="status === 'ERROR'" class="text-red-500">
+                <span>Something went wrong while generating the history. See log for detail.</span>
+              </div>
+
+              <template v-if="status === 'SUCCESS' || status === 'ERROR'">
+                <b-button @click="setPackage({ pkg: null })" variant="outline-primary">
+                  RESET
+                </b-button>
+
+                <b-form-group label="Visible tree depth">
+                  <b-input-group>
+                    <b-input v-model="maxDepth" type="number" min="1" max="20" step="1"></b-input>
+                    <b-input-group-append>
+                      <b-button variant="outline-primary" @click="maxDepth = maxDepth - 1"
+                        >-</b-button
+                      >
+                      <b-button variant="outline-primary" @click="maxDepth = maxDepth + 1"
+                        >+</b-button
+                      >
+                      <b-button variant="outline-primary" @click="maxDepth = 20">MAX</b-button>
+                      <b-button variant="outline-primary" @click="maxDepth = 1">MIN</b-button>
+                    </b-input-group-append>
+                  </b-input-group>
+                </b-form-group>
+              </template>
             </div>
-          </b-card>
-
-          <div v-if="status === 'INFLIGHT'" class="flex flex-row items-center gap-2">
-            <b-spinner small></b-spinner>
-            <span>Building history...</span>
           </div>
-          <div v-if="status === 'ERROR'" class="text-red-500">
-            <span>Something went wrong while generating the history. See log for detail.</span>
-          </div>
-
-          <b-button
-            v-if="status === 'SUCCESS' || status === 'ERROR'"
-            @click="setPackage({ pkg: null })"
-            variant="primary"
-          >
-            RESET
-          </b-button>
         </div>
-        <b-tabs pills align="center">
+        <b-tabs pills align="center" content-class="mt-4">
           <b-tab title="Package History Tree" active>
             <div class="flex flex-col items-start overflow-auto toolkit-scroll">
-              <package-history-tile :ancestorTree="ancestorTree"></package-history-tile>
+              <package-history-tile
+                :ancestorTree="ancestorTree"
+                :depth="0"
+                :maxDepth="maxDepth"
+              ></package-history-tile>
             </div>
           </b-tab>
           <b-tab title="Package History List">
             <div class="flex flex-col items-start overflow-auto toolkit-scroll">
-              <div v-for="label of ancestorList.map((x) => x.label)" v-bind:key="label">
-                {{ label }}
-              </div>
+              <b-table
+                striped
+                hover
+                :items="ancestorList"
+                :fields="[
+                  'label',
+                  'license',
+                  'pkg.PackageState',
+                  'pkg.Item.Name',
+                  'pkg.Quantity',
+                  'pkg.UnitOfMeasureAbbreviation',
+                ]"
+              ></b-table>
             </div>
           </b-tab>
           <b-tab title="Child Package Tree"
             ><div class="flex flex-col items-start overflow-auto toolkit-scroll">
-              <package-history-tile :childTree="childTree"></package-history-tile>
+              <package-history-tile
+                :childTree="childTree"
+                :depth="0"
+                :maxDepth="maxDepth"
+              ></package-history-tile>
             </div>
           </b-tab>
           <b-tab title="Child Package List"
             ><div class="flex flex-col items-start overflow-auto toolkit-scroll">
-              <div v-for="label of childList.map((x) => x.label)" v-bind:key="label">
-                {{ label }}
-              </div>
+              <b-table
+                striped
+                hover
+                :items="childList"
+                :fields="[
+                  'label',
+                  'license',
+                  'pkg.PackageState',
+                  'pkg.Item.Name',
+                  'pkg.Quantity',
+                  'pkg.UnitOfMeasureAbbreviation',
+                ]"
+              ></b-table>
             </div>
           </b-tab>
           <b-tab title="Source Harvests">
-            <pre class="flex flex-col items-start overflow-auto toolkit-scroll">{{
-              JSON.stringify(sourceHarvests, null, 2)
-            }}</pre>
+            <div class="flex flex-col items-stretch overflow-auto toolkit-scroll">
+              <b-table
+                striped
+                hover
+                :items="sourceHarvests"
+                :fields="[
+                  'Name',
+                  'HarvestTypeName',
+                  'HarvestedByFacilityLicenseNumber',
+                  'HarvestStartDate',
+                ]"
+              ></b-table>
+            </div>
           </b-tab>
           <b-tab title="Log"
             ><div class="flex flex-col items-stretch gap-2">
-              <div v-for="entry of log" v-bind:key="entry">
-                {{ entry }}
-              </div>
+              <b-table
+                striped
+                hover
+                :items="log.map((log) => ({ log }))"
+                :fields="['log']"
+              ></b-table>
             </div>
           </b-tab>
         </b-tabs>
@@ -133,7 +192,9 @@ export default Vue.extend({
     }),
   },
   data() {
-    return {};
+    return {
+      maxDepth: 20,
+    };
   },
   methods: {
     ...mapActions({
@@ -147,4 +208,8 @@ export default Vue.extend({
 });
 </script>
 
-<style type="text/scss" lang="scss" scoped></style>
+<style type="text/scss" lang="scss" scoped>
+td {
+  padding: 0.2rem;
+}
+</style>

@@ -1,23 +1,27 @@
 <template>
   <div class="flex flex-col items-center">
     <template v-if="ancestorTree">
-      <div class="flex flex-row no-wrap gap-1">
-        <package-history-tile
-          v-for="subtree of ancestorTree.ancestors"
-          v-bind:key="subtree.label"
-          :ancestorTree="subtree"
-        ></package-history-tile>
-      </div>
-      <div
-        v-if="ancestorTree.ancestors.length > 0"
-        class="w-full flex flex-row justify-center"
-        :class="{
-          'one-parent': ancestorTree.ancestors.length === 1,
-          'multi-parent': ancestorTree.ancestors.length > 1,
-        }"
-      >
-        <div style="border-right: 1px solid black" class="h-6"></div>
-      </div>
+      <template v-if="depth < maxDepth">
+        <div class="flex flex-row no-wrap gap-1">
+          <package-history-tile
+            v-for="subtree of ancestorTree.ancestors"
+            v-bind:key="subtree.label"
+            :ancestorTree="subtree"
+            :depth="depth + 1"
+            :maxDepth="maxDepth"
+          ></package-history-tile>
+        </div>
+        <div
+          v-if="ancestorTree.ancestors.length > 0"
+          class="w-full flex flex-row justify-center"
+          :class="{
+            'one-parent': ancestorTree.ancestors.length === 1,
+            'multi-parent': ancestorTree.ancestors.length > 1,
+          }"
+        >
+          <div style="border-right: 1px solid black" class="h-6"></div>
+        </div>
+      </template>
       <b-card>
         <div>{{ ancestorTree.license }}</div>
         <div>{{ ancestorTree.label }}</div>
@@ -35,24 +39,29 @@
           <div>{{ childTree.pkg.PackageState }}</div>
         </template>
       </b-card>
-      <div
-        v-if="childTree.children.length > 0"
-        class="w-full flex flex-row justify-center"
-        :class="{
-          'one-child': childTree.children.length === 1,
-          'multi-child': childTree.children.length > 1,
-        }"
-        style="border-bottom: 1px solid black"
-      >
-        <div style="border-right: 1px solid black" class="h-6"></div>
-      </div>
-      <div class="flex flex-row no-wrap gap-1">
-        <package-history-tile
-          v-for="subtree of childTree.children"
-          v-bind:key="subtree.label"
-          :childTree="subtree"
-        ></package-history-tile>
-      </div>
+
+      <template v-if="depth < maxDepth">
+        <div
+          v-if="childTree.children.length > 0"
+          class="w-full flex flex-row justify-center"
+          :class="{
+            'one-child': childTree.children.length === 1,
+            'multi-child': childTree.children.length > 1,
+          }"
+          style="border-bottom: 1px solid black"
+        >
+          <div style="border-right: 1px solid black" class="h-6"></div>
+        </div>
+        <div class="flex flex-row no-wrap gap-1">
+          <package-history-tile
+            v-for="subtree of childTree.children"
+            v-bind:key="subtree.label"
+            :childTree="subtree"
+            :depth="depth + 1"
+            :maxDepth="maxDepth"
+          ></package-history-tile>
+        </div>
+      </template>
     </template>
   </div>
 </template>
@@ -69,6 +78,8 @@ export default Vue.extend({
   store,
   router,
   props: {
+    depth: Number,
+    maxDepth: Number,
     childTree: {
       type: Object as () => IPackageChildTreeNode,
       required: false,
