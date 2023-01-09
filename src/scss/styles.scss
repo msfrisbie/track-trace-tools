@@ -19,6 +19,10 @@
   font-family: "Roboto", sans-serif;
 
   @import "@/scss/bootstrap-override";
+
+  .vue-slider-rail {
+    border-top: 1px solid gray !important;
+  }
 }
 
 #footer {

@@ -58,6 +58,8 @@ import * as Integrations from "@sentry/integrations";
 import { BootstrapVue } from "bootstrap-vue";
 import Vue from "vue";
 import VueRouter from "vue-router";
+import VueSlider from "vue-slider-component";
+import "vue-slider-component/theme/default.css";
 import VueTypeaheadBootstrap from "vue-typeahead-bootstrap";
 import { mapState } from "vuex";
 
@@ -101,6 +103,8 @@ setTimeout(() => {
 
 Vue.use(VueRouter);
 Vue.use(BootstrapVue);
+
+Vue.component("VueSlider", VueSlider);
 Vue.component("vue-typeahead-bootstrap", VueTypeaheadBootstrap);
 Vue.component("font-awesome-icon", FontAwesomeIcon);
 

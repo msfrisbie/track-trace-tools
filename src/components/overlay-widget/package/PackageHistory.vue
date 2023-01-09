@@ -14,7 +14,7 @@
         <div class="col-span-3 flex flex-col gap-4 items-center mb-4">
           <div class="flex flex-row gap-8">
             <b-card>
-              <div class="w-full flex flex-row items-center justify-start space-x-4">
+              <div class="w-full flex flex-row items-center justify-start space-x-4 text-sm">
                 <picker-icon
                   icon="box"
                   style="width: 5rem"
@@ -33,7 +33,7 @@
               </div>
             </b-card>
 
-            <div class="flex flex-col items-center gap-4">
+            <div class="flex flex-col items-stretch gap-4">
               <div v-if="status === 'INFLIGHT'" class="flex flex-row items-center gap-2">
                 <b-spinner small></b-spinner>
                 <span>Building history...</span>
@@ -48,19 +48,11 @@
                 </b-button>
 
                 <b-form-group label="Visible tree depth">
-                  <b-input-group>
-                    <b-input v-model="maxDepth" type="number" min="1" max="20" step="1"></b-input>
-                    <b-input-group-append>
-                      <b-button variant="outline-primary" @click="maxDepth = maxDepth - 1"
-                        >-</b-button
-                      >
-                      <b-button variant="outline-primary" @click="maxDepth = maxDepth + 1"
-                        >+</b-button
-                      >
-                      <b-button variant="outline-primary" @click="maxDepth = 20">MAX</b-button>
-                      <b-button variant="outline-primary" @click="maxDepth = 1">MIN</b-button>
-                    </b-input-group-append>
-                  </b-input-group>
+                  <vue-slider v-model="maxDepth" :min="1" :max="20" :interval="1"></vue-slider>
+                </b-form-group>
+
+                <b-form-group label="Tree zoom">
+                  <vue-slider v-model="zoom" :min="0.1" :max="1" :interval="0.05"></vue-slider>
                 </b-form-group>
               </template>
             </div>
@@ -73,6 +65,9 @@
                 :ancestorTree="ancestorTree"
                 :depth="0"
                 :maxDepth="maxDepth"
+                v-bind:style="{
+                  transform: `scale(${zoom})`,
+                }"
               ></package-history-tile>
             </div>
           </b-tab>
@@ -99,6 +94,9 @@
                 :childTree="childTree"
                 :depth="0"
                 :maxDepth="maxDepth"
+                v-bind:style="{
+                  transform: `scale(${zoom})`,
+                }"
               ></package-history-tile>
             </div>
           </b-tab>
@@ -194,6 +192,7 @@ export default Vue.extend({
   data() {
     return {
       maxDepth: 20,
+      zoom: 1,
     };
   },
   methods: {
