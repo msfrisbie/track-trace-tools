@@ -48,7 +48,7 @@ export const packageHistoryModule = {
     [PackageHistoryMutations.LOG_EVENT](state: IPackageHistoryState, { event }: { event: string }) {
       const timestampedEvent = `${Date.now()}: ${event}`;
       console.log(timestampedEvent);
-      state.log = [...state.log, timestampedEvent];
+      state.log = [timestampedEvent, ...state.log];
     },
     [PackageHistoryMutations.SET_SOURCE_HARVESTS](
       state: IPackageHistoryState,
@@ -123,8 +123,6 @@ export const packageHistoryModule = {
         );
       }
 
-      console.log({ packageMap });
-
       return [...packageMap.values()];
     },
     [PackageHistoryGetters.CHILD_LIST]: (
@@ -155,8 +153,6 @@ export const packageHistoryModule = {
           })
         );
       }
-
-      console.log({ packageMap });
 
       return [...packageMap.values()];
     },

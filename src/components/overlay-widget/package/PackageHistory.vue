@@ -65,6 +65,7 @@
                 :ancestorTree="ancestorTree"
                 :depth="0"
                 :maxDepth="maxDepth"
+                style="transform-origin: 0% 0% 0px"
                 v-bind:style="{
                   transform: `scale(${zoom})`,
                 }"
@@ -94,6 +95,7 @@
                 :childTree="childTree"
                 :depth="0"
                 :maxDepth="maxDepth"
+                style="transform-origin: 0% 0% 0px"
                 v-bind:style="{
                   transform: `scale(${zoom})`,
                 }"
