@@ -55,6 +55,12 @@
         <div class="flex flex-row justify-end">
           <span
             class="text-lg font-bold cursor-pointer hover:bg-purple-50 p-4 rounded-lg"
+            @click="toggleFullscreen()"
+            style="color: #777777"
+            ><font-awesome-icon :icon="isFullscreen ? 'compress-arrows-alt' : 'expand-alt'"
+          /></span>
+          <span
+            class="text-lg font-bold cursor-pointer hover:bg-purple-50 p-4 rounded-lg"
             @click="hide()"
             style="color: #777777"
             ><font-awesome-icon icon="times"
@@ -141,6 +147,13 @@ export default Vue.extend({
       // @ts-ignore
       this.$refs["builder"].toggle();
     },
+    toggleFullscreen() {
+      if (this.$data.isFullscreen) {
+        document.exitFullscreen();
+      } else {
+        document.querySelector("#builder-modal .modal-content")?.requestFullscreen();
+      }
+    },
     handleOpen() {
       analyticsManager.track(MessageType.OPENED_BUILDER);
     },
@@ -172,9 +185,15 @@ export default Vue.extend({
   data() {
     return {
       activeProject: null,
+      isFullscreen: false,
     };
   },
-  async mounted() {},
+  async mounted() {
+    document.addEventListener("fullscreenchange", () => {
+      console.log("fullscreenchange event");
+      this.$data.isFullscreen = !this.$data.isFullscreen;
+    });
+  },
   async created() {
     this.$data.activeProject = builderManager.activeBuilderProject;
 

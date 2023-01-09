@@ -70,6 +70,9 @@ export default Vue.extend({
     ...mapActions({
       setPackage: `packageHistory/${PackageHistoryActions.SET_SOURCE_PACKAGE}`,
     }),
+    openFullscreen() {
+      
+    }
   },
   async created() {},
   async mounted() {},
