@@ -2363,7 +2363,11 @@ export class DataLoader implements IAtomicService {
     const page = 0;
     const body = buildBody({ page, pageSize: DATA_LOAD_PAGE_SIZE });
 
-    const response = await this.metrcRequestManagerOrError.getPackageHistory(body, packageId, 3000);
+    const response = await this.metrcRequestManagerOrError.getPackageHarvestHistory(
+      body,
+      packageId,
+      3000
+    );
 
     if (response.status !== 200) {
       throw new Error("Request failed");

@@ -377,7 +377,8 @@ export default new Vuex.Store<IPluginState>({
     },
   },
   getters: {
-    // authState: (state) => state.pluginAuth?.authState || null,
+    // Used in transfer builder TODO fix
+    authState: (state) => state.pluginAuth?.authState || null,
     // packagesUrl: (state) =>
     //   state.pluginAuth?.authState?.license
     //     ? `/industry/${state.pluginAuth?.authState?.license}/packages`

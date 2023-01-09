@@ -190,7 +190,6 @@ export default Vue.extend({
   },
   async mounted() {
     document.addEventListener("fullscreenchange", () => {
-      console.log("fullscreenchange event");
       this.$data.isFullscreen = !this.$data.isFullscreen;
     });
   },

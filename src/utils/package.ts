@@ -165,8 +165,8 @@ export async function getParentPackageHistoryTreeImpl({
   license: string;
   cache: Map<string, IPackageAncestorTreeNode>;
 }): Promise<IPackageAncestorTreeNode> {
-  if (store.state.packageHistory.status === PackageHistoryStatus.ERROR) {
-    throw new Error("Error status, exiting");
+  if (store.state.packageHistory.status !== PackageHistoryStatus.INFLIGHT) {
+    throw new Error(`Status: ${store.state.packageHistory.status}, exiting`);
   }
 
   if (cache.has(`${license}::${label}`)) {
@@ -242,9 +242,8 @@ export async function getParentPackageHistoryTreeImpl({
   const parents = [];
 
   for (const parentPackageLabel of parentPackageLabels) {
-    // @ts-ignore
-    if (store.state.packageHistory.status === PackageHistoryStatus.ERROR) {
-      throw new Error("Error status, exiting");
+    if (store.state.packageHistory.status !== PackageHistoryStatus.INFLIGHT) {
+      throw new Error(`Status: ${store.state.packageHistory.status}, exiting`);
     }
 
     const node = await getParentPackageHistoryTreeImpl({
@@ -282,8 +281,8 @@ export async function getChildPackageHistoryTree({
   label: string;
   license: string;
 }): Promise<IPackageChildTreeNode> {
-  if (store.state.packageHistory.status === PackageHistoryStatus.ERROR) {
-    throw new Error("Error status, exiting");
+  if (store.state.packageHistory.status !== PackageHistoryStatus.INFLIGHT) {
+    throw new Error(`Status: ${store.state.packageHistory.status}, exiting`);
   }
 
   const ownedLicenses: string[] = (await facilityManager.ownedFacilitiesOrError()).map(
@@ -348,9 +347,8 @@ export async function getChildPackageHistoryTree({
   const children = [];
 
   for (const childPackageLabel of childPackageLabels) {
-    // @ts-ignore
-    if (store.state.packageHistory.status === PackageHistoryStatus.ERROR) {
-      throw new Error("Error status, exiting");
+    if (store.state.packageHistory.status !== PackageHistoryStatus.INFLIGHT) {
+      throw new Error(`Status: ${store.state.packageHistory.status}, exiting`);
     }
 
     children.push(await getChildPackageHistoryTree({ label: childPackageLabel, license }));

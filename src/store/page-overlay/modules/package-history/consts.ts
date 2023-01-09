@@ -8,7 +8,8 @@ export enum PackageHistoryMutations {
 }
 
 export enum PackageHistoryGetters {
-  EXAMPLE_GETTER = "EXAMPLE_GETTER",
+  ANCESTOR_LIST = "ANCESTOR_LIST",
+  CHILD_LIST = "CHILD_LIST"
 }
 
 export enum PackageHistoryActions {

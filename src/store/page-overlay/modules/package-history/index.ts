@@ -14,6 +14,7 @@ import {
 import { ActionContext } from "vuex";
 import {
   PackageHistoryActions,
+  PackageHistoryGetters,
   PackageHistoryMutations,
   PackageHistoryStatus,
 } from "../package-history/consts";
@@ -92,7 +93,74 @@ export const packageHistoryModule = {
       }
     },
   },
-  getters: {},
+  getters: {
+    [PackageHistoryGetters.ANCESTOR_LIST]: (
+      state: IPackageHistoryState,
+      getters: any,
+      rootState: any,
+      rootGetters: any
+    ): IPackageAncestorTreeNode[] => {
+      if (!state.ancestorTree) {
+        return [];
+      }
+
+      const packageMap: Map<string, IPackageAncestorTreeNode> = new Map();
+
+      const stack = [state.ancestorTree];
+
+      while (stack.length > 0) {
+        const node = stack.pop() as IPackageAncestorTreeNode;
+
+        if (!packageMap.has(node.label)) {
+          packageMap.set(node.label, node);
+        }
+
+        node.ancestors.map((ancestor) =>
+          stack.push({
+            ...ancestor,
+            ancestors: [],
+          })
+        );
+      }
+
+      console.log({ packageMap });
+
+      return [...packageMap.values()];
+    },
+    [PackageHistoryGetters.CHILD_LIST]: (
+      state: IPackageHistoryState,
+      getters: any,
+      rootState: any,
+      rootGetters: any
+    ): IPackageChildTreeNode[] => {
+      if (!state.childTree) {
+        return [];
+      }
+
+      const packageMap: Map<string, IPackageChildTreeNode> = new Map();
+
+      const stack = [state.childTree];
+
+      while (stack.length > 0) {
+        const node = stack.pop() as IPackageChildTreeNode;
+
+        if (!packageMap.has(node.label)) {
+          packageMap.set(node.label, node);
+        }
+
+        node.children.map((child) =>
+          stack.push({
+            ...child,
+            children: [],
+          })
+        );
+      }
+
+      console.log({ packageMap });
+
+      return [...packageMap.values()];
+    },
+  },
   actions: {
     [PackageHistoryActions.SET_SOURCE_PACKAGE]: async (
       ctx: ActionContext<IPackageHistoryState, IPluginState>,
@@ -110,9 +178,13 @@ export const packageHistoryModule = {
         });
 
         try {
-          ctx.commit(PackageHistoryMutations.SET_SOURCE_HARVESTS, {
-            sourceHarvests: getParentHarvests(pkg.Label),
-          });
+          try {
+            ctx.commit(PackageHistoryMutations.SET_SOURCE_HARVESTS, {
+              sourceHarvests: await getParentHarvests(pkg.Label),
+            });
+          } catch (e) {
+            console.error("Cannot load source harvests", e);
+          }
           ctx.commit(PackageHistoryMutations.SET_ANCESTORS, {
             ancestorTree: await getParentPackageHistoryTree({
               label: pkg.Label,
