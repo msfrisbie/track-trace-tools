@@ -244,7 +244,7 @@ async function buildDynamicUrl(
       }
       return (
         origin({ divertToNullOrigin: false }) +
-        `/api/packages/harvestHistory?id=${options.packageId}`
+        `/api/packages/sourceHarvest?id=${options.packageId}`
       );
     case UrlType.TRANSFER_HISTORY_BY_TRANSFER_ID:
       if (!options || !options.manifestNumber) {
