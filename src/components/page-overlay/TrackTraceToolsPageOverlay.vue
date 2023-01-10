@@ -139,6 +139,7 @@ library.add(
   fontawesomeSolid.faChevronLeft,
   fontawesomeSolid.faChevronRight,
   fontawesomeSolid.faClipboardCheck,
+  fontawesomeRegular.faClock,
   fontawesomeSolid.faClock,
   fontawesomeSolid.faCog,
   fontawesomeSolid.faCogs,

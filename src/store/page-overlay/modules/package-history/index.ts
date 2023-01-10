@@ -6,6 +6,7 @@ import {
   IPackageData,
   IPluginState,
 } from "@/interfaces";
+import { clientBuildManager } from "@/modules/client-build-manager.module";
 import {
   getChildPackageHistoryTree,
   getParentHarvests,
@@ -239,6 +240,10 @@ export const packageHistoryModule = {
       ctx: ActionContext<IPackageHistoryState, IPluginState>,
       { pkg }: { pkg: IIndexedPackageData | null }
     ) => {
+      if (!clientBuildManager.assertValues(["ENABLE_PACKAGE_HISTORY"])) {
+        return;
+      }
+
       ctx.commit(PackageHistoryMutations.SET_SOURCE_PACKAGE, { pkg });
 
       ctx.commit(PackageHistoryMutations.SET_STATUS, {
