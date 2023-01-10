@@ -177,19 +177,22 @@ export async function getParentPackageHistoryTree({
   return getParentPackageHistoryTreeImpl({
     label,
     rootContext,
+    depth: 0,
   });
 }
 
 export async function getParentPackageHistoryTreeImpl({
   label,
   rootContext,
+  depth,
 }: {
   label: string;
   rootContext: IRootAncestorHistoryContext;
+  depth: number;
 }): Promise<IPackageAncestorTreeNode> {
-  if (store.state.packageHistory.status !== PackageHistoryStatus.INFLIGHT) {
-    throw new Error(`Status: ${store.state.packageHistory.status}, exiting`);
-  }
+  // if (store.state.packageHistory.status !== PackageHistoryStatus.INFLIGHT) {
+  //   throw new Error(`Status: ${store.state.packageHistory.status}, exiting`);
+  // }
 
   if (rootContext.treeNodeCache.has(label)) {
     store.dispatch(`packageHistory/${PackageHistoryActions.LOG_EVENT}`, {
@@ -270,24 +273,37 @@ export async function getParentPackageHistoryTreeImpl({
 
   const parents: IPackageAncestorTreeNode[] = [];
 
-  for (const parentPackageLabel of parentPackageLabels) {
-    if (store.state.packageHistory.status !== PackageHistoryStatus.INFLIGHT) {
-      throw new Error(`Status: ${store.state.packageHistory.status}, exiting`);
+  if (
+    store.state.packageHistory.maxLookupDepth === null ||
+    depth <= store.state.packageHistory.maxLookupDepth
+  ) {
+    for (const parentPackageLabel of parentPackageLabels) {
+      if (store.state.packageHistory.status !== PackageHistoryStatus.INFLIGHT) {
+        store.dispatch(`packageHistory/${PackageHistoryActions.LOG_EVENT}`, {
+          event: `Status: ${store.state.packageHistory.status}, exiting`,
+        });
+        break;
+      }
+
+      const node = await getParentPackageHistoryTreeImpl({
+        label: parentPackageLabel,
+        rootContext,
+        depth: depth + 1,
+      });
+
+      parents.push(node);
+
+      rootContext.treeNodeCache.set(label, node);
     }
 
-    const node = await getParentPackageHistoryTreeImpl({
-      label: parentPackageLabel,
-      rootContext,
+    store.dispatch(`packageHistory/${PackageHistoryActions.LOG_EVENT}`, {
+      event: `${pkg.Label} has ${parents.length} parents`,
     });
-
-    parents.push(node);
-
-    rootContext.treeNodeCache.set(label, node);
+  } else {
+    store.dispatch(`packageHistory/${PackageHistoryActions.LOG_EVENT}`, {
+      event: `${label} is at max lookup depth (${store.state.packageHistory.maxLookupDepth})`,
+    });
   }
-
-  store.dispatch(`packageHistory/${PackageHistoryActions.LOG_EVENT}`, {
-    event: `${pkg.Label} has ${parents.length} parents`,
-  });
 
   const node: IPackageAncestorTreeNode = {
     type: HistoryTreeNodeType.OWNED_PACKAGE,
@@ -338,19 +354,22 @@ export async function getChildPackageHistoryTree({
   return getChildPackageHistoryTreeImpl({
     label,
     rootContext,
+    depth: 0,
   });
 }
 
 export async function getChildPackageHistoryTreeImpl({
   label,
   rootContext,
+  depth,
 }: {
   label: string;
   rootContext: IRootChildPackageHistoryContext;
+  depth: number;
 }): Promise<IPackageChildTreeNode> {
-  if (store.state.packageHistory.status !== PackageHistoryStatus.INFLIGHT) {
-    throw new Error(`Status: ${store.state.packageHistory.status}, exiting`);
-  }
+  // if (store.state.packageHistory.status !== PackageHistoryStatus.INFLIGHT) {
+  //   throw new Error(`Status: ${store.state.packageHistory.status}, exiting`);
+  // }
 
   if (rootContext.treeNodeCache.has(label)) {
     store.dispatch(`packageHistory/${PackageHistoryActions.LOG_EVENT}`, {
@@ -426,24 +445,37 @@ export async function getChildPackageHistoryTreeImpl({
 
   const children: IPackageChildTreeNode[] = [];
 
-  for (const childPackageLabel of childPackageLabels) {
-    if (store.state.packageHistory.status !== PackageHistoryStatus.INFLIGHT) {
-      throw new Error(`Status: ${store.state.packageHistory.status}, exiting`);
+  if (
+    store.state.packageHistory.maxLookupDepth === null ||
+    depth <= store.state.packageHistory.maxLookupDepth
+  ) {
+    for (const childPackageLabel of childPackageLabels) {
+      if (store.state.packageHistory.status !== PackageHistoryStatus.INFLIGHT) {
+        store.dispatch(`packageHistory/${PackageHistoryActions.LOG_EVENT}`, {
+          event: `Status: ${store.state.packageHistory.status}, exiting`,
+        });
+        break;
+      }
+
+      const node = await getChildPackageHistoryTreeImpl({
+        label: childPackageLabel,
+        rootContext,
+        depth: depth + 1,
+      });
+
+      children.push();
+
+      rootContext.treeNodeCache.set(label, node);
     }
 
-    const node = await getChildPackageHistoryTreeImpl({
-      label: childPackageLabel,
-      rootContext,
+    store.dispatch(`packageHistory/${PackageHistoryActions.LOG_EVENT}`, {
+      event: `${pkg.Label} has ${children.length} children`,
     });
-
-    children.push();
-
-    rootContext.treeNodeCache.set(label, node);
+  } else {
+    store.dispatch(`packageHistory/${PackageHistoryActions.LOG_EVENT}`, {
+      event: `${label} is at max lookup depth (${store.state.packageHistory.maxLookupDepth})`,
+    });
   }
-
-  store.dispatch(`packageHistory/${PackageHistoryActions.LOG_EVENT}`, {
-    event: `${pkg.Label} has ${children.length} children`,
-  });
 
   return {
     type: HistoryTreeNodeType.OWNED_PACKAGE,

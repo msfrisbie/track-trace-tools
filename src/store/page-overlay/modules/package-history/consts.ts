@@ -5,6 +5,7 @@ export enum PackageHistoryMutations {
   SET_SOURCE_HARVESTS = "SET_SOURCE_HARVESTS",
   SET_STATUS = "SET_STATUS",
   LOG_EVENT = "LOG_EVENT",
+  SET_MAX_LOOKUP_DEPTH = "SET_MAX_LOOKUP_DEPTH",
 }
 
 export enum PackageHistoryGetters {
@@ -17,6 +18,8 @@ export enum PackageHistoryGetters {
 export enum PackageHistoryActions {
   SET_SOURCE_PACKAGE = "SET_SOURCE_PACKAGE",
   LOG_EVENT = "LOG_EVENT",
+  SET_MAX_LOOKUP_DEPTH = "SET_MAX_LOOKUP_DEPTH",
+  HALT = "HALT",
 }
 
 export enum PackageHistoryStatus {
@@ -24,4 +27,5 @@ export enum PackageHistoryStatus {
   INFLIGHT = "INFLIGHT",
   ERROR = "ERROR",
   SUCCESS = "SUCCESS",
+  HALTED = "HALTED",
 }

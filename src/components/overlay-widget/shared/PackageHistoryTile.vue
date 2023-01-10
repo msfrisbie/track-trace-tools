@@ -122,7 +122,7 @@ export default Vue.extend({
   router,
   props: {
     depth: Number,
-    maxDepth: Number,
+    maxDepth: { type: Number, required: false, default: 20 },
     isOrigin: {
       type: Boolean,
       required: false,

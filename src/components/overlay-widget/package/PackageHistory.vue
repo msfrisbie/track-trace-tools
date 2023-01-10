@@ -10,9 +10,9 @@
       ></single-package-picker>
     </template>
     <template v-else>
-      <div class="flex flex-col">
-        <div class="col-span-3 flex flex-col gap-4 items-center mb-4">
-          <div class="flex flex-row gap-8">
+      <div class="flex flex-col gap-4">
+        <div class="flex flex-col gap-4 items-center">
+          <div class="flex flex-row items-center gap-8">
             <b-card>
               <div
                 class="w-full flex flex-row items-center justify-start space-x-4 text-sm whitespace-nowrap"
@@ -35,21 +35,40 @@
               </div>
             </b-card>
 
-            <div class="flex flex-col items-stretch gap-4 w-48">
-              <div
-                v-if="status === PackageHistoryStatus.INFLIGHT"
-                class="flex flex-row items-center gap-2"
-              >
-                <b-spinner small></b-spinner>
-                <span>Building history, this can take a minute...</span>
-              </div>
-              <div v-if="status === PackageHistoryStatus.ERROR" class="text-red-500">
-                <span>Something went wrong while generating the history. See log for detail.</span>
-              </div>
+            <div class="flex flex-col items-stretch gap-4 w-60">
+              <template v-if="status === PackageHistoryStatus.INFLIGHT">
+                <div class="flex flex-row items-center gap-2">
+                  <b-spinner small></b-spinner>
+                  <span>Building history, this can take a minute...</span>
+                </div>
+                <b-button @click="halt({})" variant="outline-primary"> STOP </b-button>
+                <b-form-group>
+                  <b-form-input
+                    v-model="maxLookupDepth"
+                    @change="maybeSetMaxVisibleDepth($event)"
+                    placeholder="Generation limit"
+                    type="number"
+                    step="1"
+                    min="0"
+                  ></b-form-input>
+                  <div class="text-xs text-gray-300">
+                    How many generations to look up? A smaller number will finish faster.
+                  </div>
+                </b-form-group>
+              </template>
+              <template v-if="status === PackageHistoryStatus.ERROR">
+                <div class="text-red-500">
+                  <span
+                    >Something went wrong while generating the history. See log for detail.</span
+                  >
+                </div>
+              </template>
 
               <template
                 v-if="
-                  status === PackageHistoryStatus.SUCCESS || status === PackageHistoryStatus.ERROR
+                  status === PackageHistoryStatus.SUCCESS ||
+                  status === PackageHistoryStatus.ERROR ||
+                  status === PackageHistoryStatus.HALTED
                 "
               >
                 <b-button @click="setPackage({ pkg: null })" variant="outline-primary">
@@ -59,142 +78,167 @@
             </div>
           </div>
         </div>
+        <div v-if="maxLookupDepth !== null" class="text-red-500 text-center">
+          You have set a generation limit of {{ maxLookupDepth }}. The displayed results may not be
+          complete.
+        </div>
+        <div v-if="status === PackageHistoryStatus.HALTED" class="text-red-500 text-center">
+          You stopped the lookup process. The displayed results may not be complete.
+        </div>
         <b-tabs pills align="center" content-class="my-8">
-          <b-tab title="Package History Tree" active>
-            <div class="p-2 flex flex-row justify-center gap-4">
-              <b-form-group label="Visible tree depth" class="w-36">
-                <vue-slider v-model="maxDepth" :min="1" :max="20" :interval="1"></vue-slider>
-              </b-form-group>
+          <b-tab title="Parents" active>
+            <b-tabs pills align="center" content-class="my-8">
+              <b-tab title="Parent Package Tree" active>
+                <div class="p-2 flex flex-row justify-center gap-4">
+                  <b-form-group label="Visible tree depth" class="w-36">
+                    <vue-slider
+                      v-model="maxVisibleDepth"
+                      :min="1"
+                      :max="20"
+                      :interval="1"
+                    ></vue-slider>
+                  </b-form-group>
 
-              <b-form-group label="Tree zoom" class="w-36">
-                <vue-slider v-model="zoom" :min="0.1" :max="1" :interval="0.05"></vue-slider>
-              </b-form-group>
-            </div>
-            <div class="flex flex-col items-start overflow-auto toolkit-scroll">
-              <package-history-tile
-                :ancestorTree="ancestorTree"
-                :depth="0"
-                :maxDepth="maxDepth"
-                :isOrigin="true"
-                style="transform-origin: 0% 0% 0px"
-                v-bind:style="{
-                  transform: `scale(${zoom})`,
-                }"
-              ></package-history-tile>
-            </div>
-          </b-tab>
-          <b-tab title="Package History Generations">
-            <div class="flex flex-col gap-8">
-              <div
-                v-for="(generation, i) of ancestorGenerations"
-                v-bind:key="i"
-                class="flex flex-row gap-8"
-              >
-                <div class="w-16 text-center text-xl">{{ i }}</div>
-                <div class="grid grid-cols-3 gap-2">
+                  <b-form-group label="Tree zoom" class="w-36">
+                    <vue-slider v-model="zoom" :min="0.1" :max="1" :interval="0.05"></vue-slider>
+                  </b-form-group>
+                </div>
+                <div class="flex flex-col items-start overflow-auto toolkit-scroll">
                   <package-history-tile
-                    v-for="node of generation"
-                    v-bind:key="node.label"
-                    :ancestorTree="node"
+                    :ancestorTree="ancestorTree"
                     :depth="0"
-                    :maxDepth="0"
-                    :isOrigin="node.label === sourcePackage.Label"
+                    :maxDepth="mergedMaxVisibleDepth"
+                    :isOrigin="true"
+                    style="transform-origin: 0% 0% 0px"
+                    v-bind:style="{
+                      transform: `scale(${zoom})`,
+                    }"
                   ></package-history-tile>
                 </div>
-              </div>
-            </div>
+              </b-tab>
+              <b-tab title="Parent Package Generations">
+                <div class="flex flex-col gap-8">
+                  <div
+                    v-for="(generation, i) of ancestorGenerations"
+                    v-bind:key="i"
+                    class="flex flex-row gap-8"
+                  >
+                    <div class="w-16 text-center text-xl">{{ i }}</div>
+                    <div class="grid grid-cols-3 gap-2">
+                      <package-history-tile
+                        v-for="node of generation"
+                        v-bind:key="node.label"
+                        :ancestorTree="node"
+                        :depth="0"
+                        :maxDepth="0"
+                        :isOrigin="node.label === sourcePackage.Label"
+                      ></package-history-tile>
+                    </div>
+                  </div>
+                </div>
+              </b-tab>
+              <b-tab title="Parent Package List">
+                <div>
+                  <b-button
+                    variant="outline-primary"
+                    @click="downloadCsv(ancestorList, `${sourcePackage.Label}_parents.csv`)"
+                    >DOWNLOAD CSV</b-button
+                  >
+                </div>
+                <div class="flex flex-col items-start overflow-auto toolkit-scroll">
+                  <b-table
+                    striped
+                    hover
+                    :items="ancestorList"
+                    :fields="[
+                      'label',
+                      'pkg.LicenseNumber',
+                      'pkg.PackageState',
+                      'pkg.Item.Name',
+                      'pkg.Quantity',
+                      'pkg.UnitOfMeasureAbbreviation',
+                    ]"
+                  ></b-table>
+                </div>
+              </b-tab>
+            </b-tabs>
           </b-tab>
-          <b-tab title="Package History List">
-            <div>
-              <b-button
-                variant="outline-primary"
-                @click="downloadCsv(ancestorList, `${sourcePackage.Label}_parents.csv`)"
-                >DOWNLOAD CSV</b-button
-              >
-            </div>
-            <div class="flex flex-col items-start overflow-auto toolkit-scroll">
-              <b-table
-                striped
-                hover
-                :items="ancestorList"
-                :fields="[
-                  'label',
-                  'pkg.LicenseNumber',
-                  'pkg.PackageState',
-                  'pkg.Item.Name',
-                  'pkg.Quantity',
-                  'pkg.UnitOfMeasureAbbreviation',
-                ]"
-              ></b-table>
-            </div>
-          </b-tab>
-          <b-tab title="Child Package Tree">
-            <div class="p-2 flex flex-row justify-center gap-4">
-              <b-form-group label="Visible tree depth" class="w-36">
-                <vue-slider v-model="maxDepth" :min="1" :max="20" :interval="1"></vue-slider>
-              </b-form-group>
+          <b-tab title="Children">
+            <b-tabs pills align="center" content-class="my-8">
+              <b-tab title="Child Package Tree">
+                <div class="p-2 flex flex-row justify-center gap-4">
+                  <b-form-group label="Visible tree depth" class="w-36">
+                    <vue-slider
+                      v-model="maxVisibleDepth"
+                      :min="1"
+                      :max="20"
+                      :interval="1"
+                    ></vue-slider>
+                  </b-form-group>
 
-              <b-form-group label="Tree zoom" class="w-36">
-                <vue-slider v-model="zoom" :min="0.1" :max="1" :interval="0.05"></vue-slider>
-              </b-form-group>
-            </div>
-            <div class="flex flex-col items-start overflow-auto toolkit-scroll">
-              <package-history-tile
-                :childTree="childTree"
-                :depth="0"
-                :maxDepth="maxDepth"
-                :isOrigin="true"
-                style="transform-origin: 0% 0% 0px"
-                v-bind:style="{
-                  transform: `scale(${zoom})`,
-                }"
-              ></package-history-tile>
-            </div>
-          </b-tab>
-          <b-tab title="Child Package Generations">
-            <div class="flex flex-col gap-8">
-              <div
-                v-for="(generation, i) of childGenerations"
-                v-bind:key="i"
-                class="flex flex-row gap-8"
-              >
-                <div class="w-16 text-center text-xl">{{ i }}</div>
-                <div class="grid grid-cols-3 gap-2">
+                  <b-form-group label="Tree zoom" class="w-36">
+                    <vue-slider v-model="zoom" :min="0.1" :max="1" :interval="0.05"></vue-slider>
+                  </b-form-group>
+                </div>
+                <div class="flex flex-col items-start overflow-auto toolkit-scroll">
                   <package-history-tile
-                    v-for="node of generation"
-                    v-bind:key="node.label"
-                    :childTree="node"
+                    :childTree="childTree"
                     :depth="0"
-                    :maxDepth="0"
-                    :isOrigin="node.label === sourcePackage.Label"
+                    :maxDepth="mergedMaxVisibleDepth"
+                    :isOrigin="true"
+                    style="transform-origin: 0% 0% 0px"
+                    v-bind:style="{
+                      transform: `scale(${zoom})`,
+                    }"
                   ></package-history-tile>
                 </div>
-              </div>
-            </div>
-          </b-tab>
-          <b-tab title="Child Package List">
-            <div>
-              <b-button
-                variant="outline-primary"
-                @click="downloadCsv(childList, `${sourcePackage.Label}_children.csv`)"
-                >DOWNLOAD CSV</b-button
-              >
-            </div>
-            <div class="flex flex-col items-start overflow-auto toolkit-scroll">
-              <b-table
-                striped
-                hover
-                :items="childList"
-                :fields="[
-                  'label',
-                  'pkg.LicenseNumber',
-                  'pkg.PackageState',
-                  'pkg.Item.Name',
-                  'pkg.Quantity',
-                  'pkg.UnitOfMeasureAbbreviation',
-                ]"
-              ></b-table>
-            </div>
+              </b-tab>
+              <b-tab title="Child Package Generations">
+                <div class="flex flex-col gap-8">
+                  <div
+                    v-for="(generation, i) of childGenerations"
+                    v-bind:key="i"
+                    class="flex flex-row gap-8"
+                  >
+                    <div class="w-16 text-center text-xl">{{ i }}</div>
+                    <div class="grid grid-cols-3 gap-2">
+                      <package-history-tile
+                        v-for="node of generation"
+                        v-bind:key="node.label"
+                        :childTree="node"
+                        :depth="0"
+                        :maxDepth="0"
+                        :isOrigin="node.label === sourcePackage.Label"
+                      ></package-history-tile>
+                    </div>
+                  </div>
+                </div>
+              </b-tab>
+              <b-tab title="Child Package List">
+                <div>
+                  <b-button
+                    variant="outline-primary"
+                    @click="downloadCsv(childList, `${sourcePackage.Label}_children.csv`)"
+                    >DOWNLOAD CSV</b-button
+                  >
+                </div>
+                <div class="flex flex-col items-start overflow-auto toolkit-scroll">
+                  <b-table
+                    striped
+                    hover
+                    :items="childList"
+                    :fields="[
+                      'label',
+                      'pkg.LicenseNumber',
+                      'pkg.PackageState',
+                      'pkg.Item.Name',
+                      'pkg.Quantity',
+                      'pkg.UnitOfMeasureAbbreviation',
+                    ]"
+                  ></b-table>
+                </div>
+              </b-tab>
+            </b-tabs>
           </b-tab>
           <b-tab title="Source Harvests">
             <div class="flex flex-col items-stretch overflow-auto toolkit-scroll">
@@ -264,6 +308,7 @@ export default Vue.extend({
       sourceHarvests: (state: IPluginState) => state.packageHistory.sourceHarvests,
       status: (state: IPluginState) => state.packageHistory.status,
       log: (state: IPluginState) => state.packageHistory.log,
+      maxLookupDepth: (state: IPluginState) => state.packageHistory.maxLookupDepth,
     }),
     ...mapGetters({
       ancestorList: `packageHistory/${PackageHistoryGetters.ANCESTOR_LIST}`,
@@ -271,10 +316,30 @@ export default Vue.extend({
       childList: `packageHistory/${PackageHistoryGetters.CHILD_LIST}`,
       childGenerations: `packageHistory/${PackageHistoryGetters.CHILD_GENERATIONS}`,
     }),
+    mergedMaxVisibleDepth(): number {
+      return this.$data.maxVisibleDepth;
+
+      // if (!this.maxLookupDepth) {
+      //   return this.$data.maxVisibleDepth;
+      // } else {
+      //   return Math.min(this.maxLookupDepth as number, this.$data.maxVisibleDepth);
+      // }
+    },
+    maxLookupDepth: {
+      get(): number | null {
+        return this.$store.state.packageHistory.maxLookupDepth;
+      },
+      set(maxLookupDepth: any) {
+        maxLookupDepth = parseInt(maxLookupDepth as string, 10);
+        this.$store.dispatch(`packageHistory/${PackageHistoryActions.SET_MAX_LOOKUP_DEPTH}`, {
+          maxLookupDepth: typeof maxLookupDepth === "number" ? maxLookupDepth : null,
+        });
+      },
+    },
   },
   data() {
     return {
-      maxDepth: 20,
+      maxVisibleDepth: 20,
       zoom: 1,
       PackageHistoryStatus,
     };
@@ -282,7 +347,14 @@ export default Vue.extend({
   methods: {
     ...mapActions({
       setPackage: `packageHistory/${PackageHistoryActions.SET_SOURCE_PACKAGE}`,
+      halt: `packageHistory/${PackageHistoryActions.HALT}`,
     }),
+    maybeSetMaxVisibleDepth(e: any) {
+      const maxLookupDepth = parseInt(e as string, 10);
+      if (typeof maxLookupDepth === "number") {
+        this.$data.maxVisibleDepth = maxLookupDepth;
+      }
+    },
     downloadCsv(historyList: IHistoryTreeNode[], filename: string) {
       const csvFile: ICsvFile = {
         filename,

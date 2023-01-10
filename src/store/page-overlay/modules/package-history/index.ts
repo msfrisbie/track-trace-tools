@@ -28,6 +28,7 @@ const inMemoryState = {
   ancestorTree: null,
   childTree: null,
   sourceHarvests: [],
+  maxLookupDepth: null,
 };
 
 const persistedState = {};
@@ -45,6 +46,12 @@ export const packageHistoryModule = {
       { pkg }: { pkg: IPackageData | null }
     ) {
       state.sourcePackage = pkg;
+    },
+    [PackageHistoryMutations.SET_MAX_LOOKUP_DEPTH](
+      state: IPackageHistoryState,
+      { maxLookupDepth }: { maxLookupDepth: number | null }
+    ) {
+      state.maxLookupDepth = maxLookupDepth;
     },
     [PackageHistoryMutations.LOG_EVENT](state: IPackageHistoryState, { event }: { event: string }) {
       const timestampedEvent = `${Date.now()}: ${event}`;
@@ -106,20 +113,20 @@ export const packageHistoryModule = {
 
       const packageMap: Map<string, IPackageAncestorTreeNode> = new Map();
 
-      const stack = [state.ancestorTree];
+      const stack: [IPackageAncestorTreeNode, number][] = [[state.ancestorTree, 0]];
 
       while (stack.length > 0) {
-        const node = stack.pop() as IPackageAncestorTreeNode;
+        const [node, depth] = stack.pop() as [IPackageAncestorTreeNode, number];
+
+        if (state.maxLookupDepth !== null && depth > state.maxLookupDepth) {
+          continue;
+        }
 
         if (!packageMap.has(node.label)) {
           packageMap.set(node.label, node);
         }
 
-        node.ancestors.map((ancestor) =>
-          stack.push({
-            ...ancestor,
-          })
-        );
+        node.ancestors.map((ancestor) => stack.push([ancestor, depth + 1]));
       }
 
       return _.orderBy([...packageMap.values()], ["pkg.LicenseNumber", "label"], ["asc", "asc"]);
@@ -140,6 +147,10 @@ export const packageHistoryModule = {
 
       while (stack.length > 0) {
         const [node, depth] = stack.pop() as [IPackageAncestorTreeNode, number];
+
+        if (state.maxLookupDepth !== null && depth > state.maxLookupDepth) {
+          continue;
+        }
 
         if (typeof generations[depth] !== "object") {
           generations[depth] = [];
@@ -168,20 +179,20 @@ export const packageHistoryModule = {
 
       const packageMap: Map<string, IPackageChildTreeNode> = new Map();
 
-      const stack = [state.childTree];
+      const stack: [IPackageChildTreeNode, number][] = [[state.childTree, 0]];
 
       while (stack.length > 0) {
-        const node = stack.pop() as IPackageChildTreeNode;
+        const [node, depth] = stack.pop() as [IPackageChildTreeNode, number];
+
+        if (state.maxLookupDepth !== null && depth > state.maxLookupDepth) {
+          continue;
+        }
 
         if (!packageMap.has(node.label)) {
           packageMap.set(node.label, node);
         }
 
-        node.children.map((child) =>
-          stack.push({
-            ...child,
-          })
-        );
+        node.children.map((child) => stack.push([child, depth + 1]));
       }
 
       return _.orderBy([...packageMap.values()], ["pkg.LicenseNumber", "label"], ["asc", "asc"]);
@@ -202,6 +213,10 @@ export const packageHistoryModule = {
 
       while (stack.length > 0) {
         const [node, depth] = stack.pop() as [IPackageChildTreeNode, number];
+
+        if (state.maxLookupDepth !== null && depth > state.maxLookupDepth) {
+          continue;
+        }
 
         if (typeof generations[depth] !== "object") {
           generations[depth] = [];
@@ -230,6 +245,8 @@ export const packageHistoryModule = {
         status: PackageHistoryStatus.INITIAL,
       });
 
+      ctx.commit(PackageHistoryMutations.SET_MAX_LOOKUP_DEPTH, { maxLookupDepth: null });
+
       if (pkg) {
         ctx.commit(PackageHistoryMutations.SET_STATUS, {
           status: PackageHistoryStatus.INFLIGHT,
@@ -253,15 +270,15 @@ export const packageHistoryModule = {
               label: pkg.Label,
             }),
           });
-          ctx.commit(PackageHistoryMutations.SET_STATUS, {
-            status: PackageHistoryStatus.SUCCESS,
-          });
+          if (ctx.state.status !== PackageHistoryStatus.HALTED) {
+            ctx.commit(PackageHistoryMutations.SET_STATUS, {
+              status: PackageHistoryStatus.SUCCESS,
+            });
+          }
         } catch (e) {
           console.error(e);
           ctx.commit(PackageHistoryMutations.LOG_EVENT, {
-            payload: {
-              event: e.toString(),
-            },
+            event: e.toString(),
           });
           ctx.commit(PackageHistoryMutations.SET_STATUS, {
             status: PackageHistoryStatus.ERROR,
@@ -269,11 +286,25 @@ export const packageHistoryModule = {
         }
       }
     },
+    [PackageHistoryActions.SET_MAX_LOOKUP_DEPTH]: async (
+      ctx: ActionContext<IPackageHistoryState, IPluginState>,
+      { maxLookupDepth }: { maxLookupDepth: number | null }
+    ) => {
+      ctx.commit(PackageHistoryMutations.SET_MAX_LOOKUP_DEPTH, { maxLookupDepth });
+    },
     [PackageHistoryActions.LOG_EVENT]: async (
       ctx: ActionContext<IPackageHistoryState, IPluginState>,
       { event }: { event: string }
     ) => {
       ctx.commit(PackageHistoryMutations.LOG_EVENT, { event });
+    },
+    [PackageHistoryActions.HALT]: async (
+      ctx: ActionContext<IPackageHistoryState, IPluginState>,
+      {}
+    ) => {
+      ctx.commit(PackageHistoryMutations.SET_STATUS, {
+        status: PackageHistoryStatus.HALTED,
+      });
     },
   },
 };
