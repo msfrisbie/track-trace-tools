@@ -107,9 +107,12 @@ export const packageHistoryModule = {
       const packageMap: Map<string, IPackageAncestorTreeNode> = new Map();
 
       const stack = [state.ancestorTree];
+      console.log("Computing parentList");
 
       while (stack.length > 0) {
         const node = stack.pop() as IPackageAncestorTreeNode;
+
+        console.log("Pop");
 
         if (!packageMap.has(node.label)) {
           packageMap.set(node.label, node);
@@ -118,7 +121,7 @@ export const packageHistoryModule = {
         node.ancestors.map((ancestor) =>
           stack.push({
             ...ancestor,
-            ancestors: [],
+            // ancestors: [],
           })
         );
       }
@@ -138,9 +141,12 @@ export const packageHistoryModule = {
       const packageMap: Map<string, IPackageChildTreeNode> = new Map();
 
       const stack = [state.childTree];
+      console.log("Computing childlist");
 
       while (stack.length > 0) {
         const node = stack.pop() as IPackageChildTreeNode;
+
+        console.log("Pop");
 
         if (!packageMap.has(node.label)) {
           packageMap.set(node.label, node);
@@ -149,7 +155,7 @@ export const packageHistoryModule = {
         node.children.map((child) =>
           stack.push({
             ...child,
-            children: [],
+            // children: [],
           })
         );
       }
