@@ -1,4 +1,4 @@
-import { HistoryTreeNodeType, PackageFilterIdentifiers } from "@/consts";
+import { HistoryTreeNodeType, PackageFilterIdentifiers, PackageState } from "@/consts";
 import {
   IHarvestHistoryData,
   IIndexedHarvestData,
@@ -141,6 +141,12 @@ export function packageFieldMatch(
   return null;
 }
 
+interface IRootAncestorHistoryContext {
+  treeNodeCache: Map<string, IPackageAncestorTreeNode>;
+  licenseCache: LRU<string>;
+  packageStateCache: LRU<PackageState>;
+}
+
 export async function getParentPackageHistoryTree({
   label,
 }: {
@@ -151,39 +157,51 @@ export async function getParentPackageHistoryTree({
     (facility) => facility.licenseNumber
   );
   const licenseCache: LRU<string> = new LRU(ownedLicenses);
+  const packageStateCache: LRU<PackageState> = new LRU([
+    PackageState.ACTIVE,
+    PackageState.INACTIVE,
+    PackageState.IN_TRANSIT,
+  ]);
   licenseCache.touch((await authManager.authStateOrError()).license);
+
+  store.dispatch(`packageHistory/${PackageHistoryActions.LOG_EVENT}`, {
+    event: `License cache: ${licenseCache.elements.join(",\n")}`,
+  });
+
+  const rootContext: IRootAncestorHistoryContext = {
+    treeNodeCache,
+    licenseCache,
+    packageStateCache,
+  };
 
   return getParentPackageHistoryTreeImpl({
     label,
-    treeNodeCache,
-    licenseCache,
+    rootContext,
   });
 }
 
 export async function getParentPackageHistoryTreeImpl({
   label,
-  treeNodeCache,
-  licenseCache,
+  rootContext,
 }: {
   label: string;
-  treeNodeCache: Map<string, IPackageAncestorTreeNode>;
-  licenseCache: LRU<string>;
+  rootContext: IRootAncestorHistoryContext;
 }): Promise<IPackageAncestorTreeNode> {
   if (store.state.packageHistory.status !== PackageHistoryStatus.INFLIGHT) {
     throw new Error(`Status: ${store.state.packageHistory.status}, exiting`);
   }
 
-  if (treeNodeCache.has(label)) {
+  if (rootContext.treeNodeCache.has(label)) {
     store.dispatch(`packageHistory/${PackageHistoryActions.LOG_EVENT}`, {
       event: `Cache hit for ${label}`,
     });
-    return treeNodeCache.get(label) as IPackageAncestorTreeNode;
+    return rootContext.treeNodeCache.get(label) as IPackageAncestorTreeNode;
   }
 
   let pkg: IIndexedPackageData | null = null;
   let dataLoader: DataLoader | null = null;
 
-  for (const license of licenseCache.elements) {
+  for (const license of rootContext.licenseCache.elements) {
     const authState = {
       ...(await authManager.authStateOrError()),
       license,
@@ -191,22 +209,34 @@ export async function getParentPackageHistoryTreeImpl({
 
     dataLoader = await getDataLoader(authState);
 
-    try {
-      pkg = await dataLoader.activePackage(label);
-    } catch (e) {}
-    if (!pkg) {
-      try {
-        pkg = await dataLoader.inactivePackage(label);
-      } catch (e) {}
-    }
-    if (!pkg) {
-      try {
-        pkg = await dataLoader.inTransitPackage(label);
-      } catch (e) {}
+    for (const packageState of rootContext.packageStateCache.elements) {
+      switch (packageState) {
+        case PackageState.ACTIVE:
+          try {
+            pkg = await dataLoader.activePackage(label);
+          } catch (e) {}
+          break;
+        case PackageState.INACTIVE:
+          try {
+            pkg = await dataLoader.inactivePackage(label);
+          } catch (e) {}
+          break;
+        case PackageState.IN_TRANSIT:
+          try {
+            pkg = await dataLoader.inTransitPackage(label);
+          } catch (e) {}
+          break;
+        default:
+          throw new Error("Invalid package state: " + packageState);
+      }
+
+      if (pkg) {
+        rootContext.packageStateCache.touch(pkg.PackageState);
+      }
     }
 
     if (pkg) {
-      licenseCache.touch(pkg.LicenseNumber);
+      rootContext.licenseCache.touch(pkg.LicenseNumber);
       break;
     }
   }
@@ -226,7 +256,7 @@ export async function getParentPackageHistoryTreeImpl({
       history: [],
       ancestors: [],
     };
-    treeNodeCache.set(label, node);
+    rootContext.treeNodeCache.set(label, node);
     return node;
   }
 
@@ -247,13 +277,12 @@ export async function getParentPackageHistoryTreeImpl({
 
     const node = await getParentPackageHistoryTreeImpl({
       label: parentPackageLabel,
-      treeNodeCache,
-      licenseCache,
+      rootContext,
     });
 
     parents.push(node);
 
-    treeNodeCache.set(label, node);
+    rootContext.treeNodeCache.set(label, node);
   }
 
   store.dispatch(`packageHistory/${PackageHistoryActions.LOG_EVENT}`, {
@@ -268,9 +297,15 @@ export async function getParentPackageHistoryTreeImpl({
     ancestors: parents,
   };
 
-  treeNodeCache.set(label, node);
+  rootContext.treeNodeCache.set(label, node);
 
   return node;
+}
+
+interface IRootChildPackageHistoryContext {
+  treeNodeCache: Map<string, IPackageChildTreeNode>;
+  licenseCache: LRU<string>;
+  packageStateCache: LRU<PackageState>;
 }
 
 export async function getChildPackageHistoryTree({
@@ -283,39 +318,51 @@ export async function getChildPackageHistoryTree({
     (facility) => facility.licenseNumber
   );
   const licenseCache: LRU<string> = new LRU(ownedLicenses);
+  const packageStateCache: LRU<PackageState> = new LRU([
+    PackageState.ACTIVE,
+    PackageState.INACTIVE,
+    PackageState.IN_TRANSIT,
+  ]);
   licenseCache.touch((await authManager.authStateOrError()).license);
+
+  store.dispatch(`packageHistory/${PackageHistoryActions.LOG_EVENT}`, {
+    event: `License cache: ${licenseCache.elements.join(",\n")}`,
+  });
+
+  const rootContext: IRootChildPackageHistoryContext = {
+    treeNodeCache,
+    licenseCache,
+    packageStateCache,
+  };
 
   return getChildPackageHistoryTreeImpl({
     label,
-    treeNodeCache,
-    licenseCache,
+    rootContext,
   });
 }
 
 export async function getChildPackageHistoryTreeImpl({
   label,
-  treeNodeCache,
-  licenseCache,
+  rootContext,
 }: {
   label: string;
-  treeNodeCache: Map<string, IPackageChildTreeNode>;
-  licenseCache: LRU<string>;
+  rootContext: IRootChildPackageHistoryContext;
 }): Promise<IPackageChildTreeNode> {
   if (store.state.packageHistory.status !== PackageHistoryStatus.INFLIGHT) {
     throw new Error(`Status: ${store.state.packageHistory.status}, exiting`);
   }
 
-  if (treeNodeCache.has(label)) {
+  if (rootContext.treeNodeCache.has(label)) {
     store.dispatch(`packageHistory/${PackageHistoryActions.LOG_EVENT}`, {
       event: `Cache hit for ${label}`,
     });
-    return treeNodeCache.get(label) as IPackageChildTreeNode;
+    return rootContext.treeNodeCache.get(label) as IPackageChildTreeNode;
   }
 
   let pkg: IIndexedPackageData | null = null;
   let dataLoader: DataLoader | null = null;
 
-  for (const license of licenseCache.elements) {
+  for (const license of rootContext.licenseCache.elements) {
     const authState = {
       ...(await authManager.authStateOrError()),
       license,
@@ -323,23 +370,30 @@ export async function getChildPackageHistoryTreeImpl({
 
     dataLoader = await getDataLoader(authState);
 
-    try {
-      pkg = await dataLoader.activePackage(label);
-    } catch (e) {}
-    if (!pkg) {
-      try {
-        pkg = await dataLoader.inactivePackage(label);
-      } catch (e) {}
-    }
-    if (!pkg) {
-      try {
-        pkg = await dataLoader.inTransitPackage(label);
-      } catch (e) {}
-    }
+    for (const packageState of rootContext.packageStateCache.elements) {
+      switch (packageState) {
+        case PackageState.ACTIVE:
+          try {
+            pkg = await dataLoader.activePackage(label);
+          } catch (e) {}
+          break;
+        case PackageState.INACTIVE:
+          try {
+            pkg = await dataLoader.inactivePackage(label);
+          } catch (e) {}
+          break;
+        case PackageState.IN_TRANSIT:
+          try {
+            pkg = await dataLoader.inTransitPackage(label);
+          } catch (e) {}
+          break;
+        default:
+          throw new Error("Invalid package state: " + packageState);
+      }
 
-    if (pkg) {
-      licenseCache.touch(pkg.LicenseNumber);
-      break;
+      if (pkg) {
+        rootContext.packageStateCache.touch(pkg.PackageState);
+      }
     }
   }
 
@@ -358,7 +412,7 @@ export async function getChildPackageHistoryTreeImpl({
       history: [],
       children: [],
     };
-    treeNodeCache.set(label, node);
+    rootContext.treeNodeCache.set(label, node);
     return node;
   }
 
@@ -379,13 +433,12 @@ export async function getChildPackageHistoryTreeImpl({
 
     const node = await getChildPackageHistoryTreeImpl({
       label: childPackageLabel,
-      treeNodeCache,
-      licenseCache
+      rootContext,
     });
 
     children.push();
 
-    treeNodeCache.set(label, node);
+    rootContext.treeNodeCache.set(label, node);
   }
 
   store.dispatch(`packageHistory/${PackageHistoryActions.LOG_EVENT}`, {
@@ -402,8 +455,6 @@ export async function getChildPackageHistoryTreeImpl({
 }
 
 export async function getParentHarvests(label: string): Promise<IHarvestHistoryData[]> {
-  // TODO search every available facility
-  // TODO search active, inactive
   const pkg = await primaryDataLoader.activePackage(label);
 
   const history: IHarvestHistoryData[] = await primaryDataLoader.packageHarvestHistoryByPackageId(

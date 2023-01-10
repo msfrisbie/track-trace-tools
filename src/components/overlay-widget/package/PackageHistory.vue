@@ -36,15 +36,15 @@
             </b-card>
 
             <div class="flex flex-col items-stretch gap-4 w-48">
-              <div v-if="status === 'INFLIGHT'" class="flex flex-row items-center gap-2">
+              <div v-if="status === PackageHistoryStatus.INFLIGHT" class="flex flex-row items-center gap-2">
                 <b-spinner small></b-spinner>
                 <span>Building history, this can take a minute...</span>
               </div>
-              <div v-if="status === 'ERROR'" class="text-red-500">
+              <div v-if="status === PackageHistoryStatus.ERROR" class="text-red-500">
                 <span>Something went wrong while generating the history. See log for detail.</span>
               </div>
 
-              <template v-if="status === 'SUCCESS' || status === 'ERROR'">
+              <template v-if="status === PackageHistoryStatus.SUCCESS || status === PackageHistoryStatus.ERROR">
                 <b-button @click="setPackage({ pkg: null })" variant="outline-primary">
                   RESET
                 </b-button>
@@ -189,6 +189,7 @@ import store from "@/store/page-overlay/index";
 import {
   PackageHistoryActions,
   PackageHistoryGetters,
+  PackageHistoryStatus,
 } from "@/store/page-overlay/modules/package-history/consts";
 import { downloadCsvFile } from "@/utils/csv";
 import { unitOfMeasureNameToAbbreviation } from "@/utils/units";
@@ -224,6 +225,7 @@ export default Vue.extend({
     return {
       maxDepth: 20,
       zoom: 1,
+      PackageHistoryStatus
     };
   },
   methods: {
