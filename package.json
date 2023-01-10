@@ -6,7 +6,8 @@
     "serve": "NODE_OPTIONS=--openssl-legacy-provider; vue-cli-service build --mode development --watch",
     "build": "NODE_OPTIONS=--openssl-legacy-provider; vue-cli-service build --prod",
     "test:unit": "vue-cli-service test:unit",
-    "lint": "vue-cli-service lint"
+    "lint": "vue-cli-service lint",
+    "clientupdate": "node bin/encrypt-client-data.js"
   },
   "dependencies": {
     "@fortawesome/fontawesome-free": "^5.15.3",
