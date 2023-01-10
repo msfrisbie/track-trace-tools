@@ -87,9 +87,9 @@
             <span>Building history, this can take a minute...</span>
           </div>
         </template>
-        <b-tabs pills align="center" content-class="my-8">
+        <b-tabs pills align="center" content-class="my-1">
           <b-tab title="Parent Packages" active>
-            <b-tabs pills align="center" content-class="my-8">
+            <b-tabs pills align="center" content-class="my-4">
               <b-tab title="Tree" active>
                 <div class="p-2 flex flex-row justify-center gap-4">
                   <b-form-group label="Visible tree depth" class="w-36">
@@ -105,7 +105,7 @@
                     <vue-slider v-model="zoom" :min="0.1" :max="1" :interval="0.05"></vue-slider>
                   </b-form-group>
                 </div>
-                <div class="flex flex-col items-start overflow-auto toolkit-scroll">
+                <div class="flex flex-col items-start overflow-auto toolkit-scroll pb-4">
                   <package-history-tile
                     :ancestorTree="ancestorTree"
                     :depth="0"
@@ -159,7 +159,7 @@
                     >DOWNLOAD CSV</b-button
                   >
                 </div>
-                <div class="flex flex-col items-start overflow-auto toolkit-scroll">
+                <div class="flex flex-col items-start overflow-auto toolkit-scroll pb-4">
                   <b-table
                     striped
                     hover
@@ -194,7 +194,7 @@
                     <vue-slider v-model="zoom" :min="0.1" :max="1" :interval="0.05"></vue-slider>
                   </b-form-group>
                 </div>
-                <div class="flex flex-col items-start overflow-auto toolkit-scroll">
+                <div class="flex flex-col items-start overflow-auto toolkit-scroll pb-4">
                   <package-history-tile
                     :childTree="childTree"
                     :depth="0"
@@ -248,7 +248,7 @@
                     >DOWNLOAD CSV</b-button
                   >
                 </div>
-                <div class="flex flex-col items-start overflow-auto toolkit-scroll">
+                <div class="flex flex-col items-start overflow-auto toolkit-scroll pb-4">
                   <b-table
                     striped
                     hover
@@ -267,7 +267,7 @@
             </b-tabs>
           </b-tab>
           <b-tab title="Source Harvests">
-            <div class="flex flex-col items-stretch overflow-auto toolkit-scroll">
+            <div class="flex flex-col items-stretch overflow-auto toolkit-scroll pb-4">
               <b-table
                 striped
                 hover
