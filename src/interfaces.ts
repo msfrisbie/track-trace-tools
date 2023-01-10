@@ -1458,9 +1458,8 @@ export interface IClientInfo {
 
 export interface IHistoryTreeNode {
   label: string;
-  license: string;
-  pkg?: IIndexedPackageData
-  history?: IPackageHistoryData[]
+  pkg: IIndexedPackageData;
+  history: IPackageHistoryData[];
 }
 
 export interface IPackageAncestorTreeNode extends IHistoryTreeNode {

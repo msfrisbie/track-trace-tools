@@ -33,7 +33,7 @@
               </div>
             </b-card>
 
-            <div class="flex flex-col items-stretch gap-4">
+            <div class="flex flex-col items-stretch gap-4 w-48">
               <div v-if="status === 'INFLIGHT'" class="flex flex-row items-center gap-2">
                 <b-spinner small></b-spinner>
                 <span>Building history...</span>
@@ -58,7 +58,7 @@
             </div>
           </div>
         </div>
-        <b-tabs pills align="center" content-class="mt-4">
+        <b-tabs pills align="center" content-class="my-8">
           <b-tab title="Package History Tree" active>
             <div class="flex flex-col items-start overflow-auto toolkit-scroll">
               <package-history-tile

@@ -7,9 +7,9 @@ import {
   IPluginState,
 } from "@/interfaces";
 import {
-  getChildPackageHistoryTree,
+  getChildPackageHistoryTreeOrNull,
   getParentHarvests,
-  getParentPackageHistoryTree,
+  getParentPackageHistoryTreeOrNull,
 } from "@/utils/package";
 import { ActionContext } from "vuex";
 import {
@@ -182,15 +182,13 @@ export const packageHistoryModule = {
             console.error("Cannot load source harvests", e);
           }
           ctx.commit(PackageHistoryMutations.SET_ANCESTORS, {
-            ancestorTree: await getParentPackageHistoryTree({
+            ancestorTree: await getParentPackageHistoryTreeOrNull({
               label: pkg.Label,
-              license: pkg.LicenseNumber,
             }),
           });
           ctx.commit(PackageHistoryMutations.SET_CHILDREN, {
-            childTree: await getChildPackageHistoryTree({
+            childTree: await getChildPackageHistoryTreeOrNull({
               label: pkg.Label,
-              license: pkg.LicenseNumber,
             }),
           });
           ctx.commit(PackageHistoryMutations.SET_STATUS, {

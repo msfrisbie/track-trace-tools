@@ -153,6 +153,7 @@ library.add(
   fontawesomeSolid.faExchangeAlt,
   fontawesomeSolid.faExclamationTriangle,
   fontawesomeSolid.faExpandAlt,
+  fontawesomeSolid.faExpandArrowsAlt,
   fontawesomeSolid.faExternalLinkAlt,
   fontawesomeSolid.faEye,
   fontawesomeSolid.faEyeDropper,

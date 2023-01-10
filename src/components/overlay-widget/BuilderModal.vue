@@ -57,7 +57,7 @@
             class="text-lg font-bold cursor-pointer hover:bg-purple-50 p-4 rounded-lg"
             @click="toggleFullscreen()"
             style="color: #777777"
-            ><font-awesome-icon :icon="isFullscreen ? 'compress-arrows-alt' : 'expand-alt'"
+            ><font-awesome-icon :icon="isFullscreen ? 'compress-arrows-alt' : 'expand-arrows-alt'"
           /></span>
           <span
             class="text-lg font-bold cursor-pointer hover:bg-purple-50 p-4 rounded-lg"
