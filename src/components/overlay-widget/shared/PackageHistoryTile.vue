@@ -38,6 +38,26 @@
           </div>
           <div class="font-bold">{{ ancestorTree.label }}</div>
         </div>
+        <template v-if="isOrigin">
+          <hr />
+          <div
+            class="p-2 flex flex-row items-center justify-start space-x-4 text-sm whitespace-nowrap"
+          >
+            <picker-icon
+              icon="box"
+              style="width: 5rem"
+              class="flex-shrink-0"
+              :textClass="ancestorTree.pkg.Quantity === 0 ? 'text-red-500' : ''"
+              :text="`${ancestorTree.pkg.Quantity} ${ancestorTree.pkg.UnitOfMeasureAbbreviation}`"
+            />
+
+            <picker-card
+              class="flex-grow"
+              :title="`${ancestorTree.pkg.Item.Name}`"
+              :label="ancestorTree.pkg.Label"
+            />
+          </div>
+        </template>
         <template v-if="ancestorTree.type === HistoryTreeNodeType.OWNED_PACKAGE">
           <hr />
           <div class="p-2">
@@ -69,6 +89,26 @@
           </div>
           <div class="font-bold">{{ childTree.label }}</div>
         </div>
+        <template v-if="isOrigin">
+          <hr />
+          <div
+            class="p-2 flex flex-row items-center justify-start space-x-4 text-sm whitespace-nowrap"
+          >
+            <picker-icon
+              icon="box"
+              style="width: 5rem"
+              class="flex-shrink-0"
+              :textClass="childTree.pkg.Quantity === 0 ? 'text-red-500' : ''"
+              :text="`${childTree.pkg.Quantity} ${childTree.pkg.UnitOfMeasureAbbreviation}`"
+            />
+
+            <picker-card
+              class="flex-grow"
+              :title="`${childTree.pkg.Item.Name}`"
+              :label="childTree.pkg.Label"
+            />
+          </div>
+        </template>
         <template v-if="childTree.type === HistoryTreeNodeType.OWNED_PACKAGE">
           <hr />
           <div class="p-2">
@@ -109,10 +149,13 @@
 </template>
 
 <script lang="ts">
+import PickerCard from "@/components/overlay-widget/shared/PickerCard.vue";
+import PickerIcon from "@/components/overlay-widget/shared/PickerIcon.vue";
 import { HistoryTreeNodeType, PackageState } from "@/consts";
 import { IPackageAncestorTreeNode, IPackageChildTreeNode } from "@/interfaces";
 import router from "@/router/index";
 import store from "@/store/page-overlay/index";
+import { unitOfMeasureNameToAbbreviation } from "@/utils/units";
 import Vue from "vue";
 import { mapState } from "vuex";
 
@@ -137,7 +180,10 @@ export default Vue.extend({
       required: false,
     },
   },
-  components: {},
+  components: {
+    PickerCard,
+    PickerIcon,
+  },
   computed: {
     ...mapState([]),
   },
@@ -147,6 +193,7 @@ export default Vue.extend({
     };
   },
   methods: {
+    unitOfMeasureNameToAbbreviation,
     getBadgeVariant(packageState: PackageState): string {
       switch (packageState) {
         case PackageState.ACTIVE:
