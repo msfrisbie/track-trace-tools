@@ -77,6 +77,13 @@
             </div>
           </b-tab>
           <b-tab title="Package History List">
+            <div>
+              <b-button
+                variant="outline-primary"
+                @click="downloadCsv(ancestorList, `${sourcePackage.Label}_parents.csv`)"
+                >DOWNLOAD CSV</b-button
+              >
+            </div>
             <div class="flex flex-col items-start overflow-auto toolkit-scroll">
               <b-table
                 striped
@@ -116,8 +123,15 @@
               ></package-history-tile>
             </div>
           </b-tab>
-          <b-tab title="Child Package List"
-            ><div class="flex flex-col items-start overflow-auto toolkit-scroll">
+          <b-tab title="Child Package List">
+            <div>
+              <b-button
+                variant="outline-primary"
+                @click="downloadCsv(childList, `${sourcePackage.Label}_children.csv`)"
+                >DOWNLOAD CSV</b-button
+              >
+            </div>
+            <div class="flex flex-col items-start overflow-auto toolkit-scroll">
               <b-table
                 striped
                 hover
@@ -169,13 +183,14 @@ import PackageHistoryTile from "@/components/overlay-widget/shared/PackageHistor
 import PickerCard from "@/components/overlay-widget/shared/PickerCard.vue";
 import PickerIcon from "@/components/overlay-widget/shared/PickerIcon.vue";
 import SinglePackagePicker from "@/components/overlay-widget/shared/SinglePackagePicker.vue";
-import { IPluginState } from "@/interfaces";
+import { ICsvFile, IHistoryTreeNode, IPluginState } from "@/interfaces";
 import router from "@/router/index";
 import store from "@/store/page-overlay/index";
 import {
   PackageHistoryActions,
   PackageHistoryGetters,
 } from "@/store/page-overlay/modules/package-history/consts";
+import { downloadCsvFile } from "@/utils/csv";
 import { unitOfMeasureNameToAbbreviation } from "@/utils/units";
 import Vue from "vue";
 import { mapActions, mapGetters, mapState } from "vuex";
@@ -215,6 +230,21 @@ export default Vue.extend({
     ...mapActions({
       setPackage: `packageHistory/${PackageHistoryActions.SET_SOURCE_PACKAGE}`,
     }),
+    downloadCsv(historyList: IHistoryTreeNode[], filename: string) {
+      const csvFile: ICsvFile = {
+        filename,
+        data: historyList.map((x) => [
+          x.label,
+          x.pkg?.LicenseNumber,
+          x.pkg?.PackageState,
+          x.pkg?.Item?.Name,
+          x.pkg?.Quantity,
+          x.pkg?.UnitOfMeasureAbbreviation,
+        ]),
+      };
+
+      downloadCsvFile({ csvFile });
+    },
     unitOfMeasureNameToAbbreviation,
   },
   async created() {},

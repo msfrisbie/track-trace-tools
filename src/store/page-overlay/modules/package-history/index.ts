@@ -48,7 +48,6 @@ export const packageHistoryModule = {
     },
     [PackageHistoryMutations.LOG_EVENT](state: IPackageHistoryState, { event }: { event: string }) {
       const timestampedEvent = `${Date.now()}: ${event}`;
-      console.log(timestampedEvent);
       state.log = [timestampedEvent, ...state.log];
     },
     [PackageHistoryMutations.SET_SOURCE_HARVESTS](
