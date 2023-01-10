@@ -14,7 +14,9 @@
         <div class="col-span-3 flex flex-col gap-4 items-center mb-4">
           <div class="flex flex-row gap-8">
             <b-card>
-              <div class="w-full flex flex-row items-center justify-start space-x-4 text-sm">
+              <div
+                class="w-full flex flex-row items-center justify-start space-x-4 text-sm whitespace-nowrap"
+              >
                 <picker-icon
                   icon="box"
                   style="width: 5rem"
@@ -46,20 +48,21 @@
                 <b-button @click="setPackage({ pkg: null })" variant="outline-primary">
                   RESET
                 </b-button>
-
-                <b-form-group label="Visible tree depth">
-                  <vue-slider v-model="maxDepth" :min="1" :max="20" :interval="1"></vue-slider>
-                </b-form-group>
-
-                <b-form-group label="Tree zoom">
-                  <vue-slider v-model="zoom" :min="0.1" :max="1" :interval="0.05"></vue-slider>
-                </b-form-group>
               </template>
             </div>
           </div>
         </div>
         <b-tabs pills align="center" content-class="my-8">
           <b-tab title="Package History Tree" active>
+            <div class="p-2 flex flex-row justify-center gap-4">
+              <b-form-group label="Visible tree depth" class="w-36">
+                <vue-slider v-model="maxDepth" :min="1" :max="20" :interval="1"></vue-slider>
+              </b-form-group>
+
+              <b-form-group label="Tree zoom" class="w-36">
+                <vue-slider v-model="zoom" :min="0.1" :max="1" :interval="0.05"></vue-slider>
+              </b-form-group>
+            </div>
             <div class="flex flex-col items-start overflow-auto toolkit-scroll">
               <package-history-tile
                 :ancestorTree="ancestorTree"
@@ -89,8 +92,17 @@
               ></b-table>
             </div>
           </b-tab>
-          <b-tab title="Child Package Tree"
-            ><div class="flex flex-col items-start overflow-auto toolkit-scroll">
+          <b-tab title="Child Package Tree">
+            <div class="p-2 flex flex-row justify-center gap-4">
+              <b-form-group label="Visible tree depth" class="w-36">
+                <vue-slider v-model="maxDepth" :min="1" :max="20" :interval="1"></vue-slider>
+              </b-form-group>
+
+              <b-form-group label="Tree zoom" class="w-36">
+                <vue-slider v-model="zoom" :min="0.1" :max="1" :interval="0.05"></vue-slider>
+              </b-form-group>
+            </div>
+            <div class="flex flex-col items-start overflow-auto toolkit-scroll">
               <package-history-tile
                 :childTree="childTree"
                 :depth="0"
@@ -134,7 +146,7 @@
               ></b-table>
             </div>
           </b-tab>
-          <b-tab title="Log"
+          <b-tab :title="`Log (${log.length})`"
             ><div class="flex flex-col items-stretch gap-2">
               <b-table
                 striped

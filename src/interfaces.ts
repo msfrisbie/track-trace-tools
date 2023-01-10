@@ -1,6 +1,7 @@
 import {
   BackgroundTaskState,
   HarvestState,
+  HistoryTreeNodeType,
   Level,
   MessageType,
   MetrcStatus,
@@ -1457,6 +1458,7 @@ export interface IClientInfo {
 }
 
 export interface IHistoryTreeNode {
+  type: HistoryTreeNodeType;
   label: string;
   pkg: IIndexedPackageData;
   history: IPackageHistoryData[];

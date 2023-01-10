@@ -403,3 +403,8 @@ export enum TabKey {
   TAGS_USED = "tags_used",
   TAGS_VOIDED = "tags_voided",
 }
+
+export enum HistoryTreeNodeType {
+  OWNED_PACKAGE = "OWNED_PACKAGE",
+  UNOWNED_PACKAGE = "UNOWNED_PACKAGE",
+}

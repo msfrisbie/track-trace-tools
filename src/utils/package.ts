@@ -1,4 +1,4 @@
-import { PackageFilterIdentifiers } from "@/consts";
+import { HistoryTreeNodeType, PackageFilterIdentifiers } from "@/consts";
 import {
   IHarvestHistoryData,
   IIndexedHarvestData,
@@ -144,7 +144,7 @@ export async function getParentPackageHistoryTreeOrNull({
   label,
 }: {
   label: string;
-}): Promise<IPackageAncestorTreeNode | null> {
+}): Promise<IPackageAncestorTreeNode> {
   const cache: Map<string, IPackageAncestorTreeNode> = new Map();
 
   return getParentPackageHistoryTreeOrNullImpl({
@@ -158,8 +158,8 @@ export async function getParentPackageHistoryTreeOrNullImpl({
   cache,
 }: {
   label: string;
-  cache: Map<string, IPackageAncestorTreeNode | null>;
-}): Promise<IPackageAncestorTreeNode | null> {
+  cache: Map<string, IPackageAncestorTreeNode>;
+}): Promise<IPackageAncestorTreeNode> {
   if (store.state.packageHistory.status !== PackageHistoryStatus.INFLIGHT) {
     throw new Error(`Status: ${store.state.packageHistory.status}, exiting`);
   }
@@ -218,8 +218,15 @@ export async function getParentPackageHistoryTreeOrNullImpl({
     store.dispatch(`packageHistory/${PackageHistoryActions.LOG_EVENT}`, {
       event: `User does not have access to ${label}, is a terminal node`,
     });
-    cache.set(label, null);
-    return null;
+    const node: IPackageAncestorTreeNode = {
+      type: HistoryTreeNodeType.UNOWNED_PACKAGE,
+      label,
+      pkg: { Label: "STUB_PACKAGE" } as IIndexedPackageData,
+      history: [],
+      ancestors: [],
+    };
+    cache.set(label, node);
+    return node;
   }
 
   store.dispatch(`packageHistory/${PackageHistoryActions.LOG_EVENT}`, {
@@ -257,6 +264,7 @@ export async function getParentPackageHistoryTreeOrNullImpl({
   });
 
   const node: IPackageAncestorTreeNode = {
+    type: HistoryTreeNodeType.OWNED_PACKAGE,
     label,
     pkg,
     history,
@@ -272,7 +280,7 @@ export async function getChildPackageHistoryTreeOrNull({
   label,
 }: {
   label: string;
-}): Promise<IPackageChildTreeNode | null> {
+}): Promise<IPackageChildTreeNode> {
   const cache: Map<string, IPackageChildTreeNode> = new Map();
 
   return getChildPackageHistoryTreeOrNullImpl({
@@ -286,8 +294,8 @@ export async function getChildPackageHistoryTreeOrNullImpl({
   cache,
 }: {
   label: string;
-  cache: Map<string, IPackageChildTreeNode | null>;
-}): Promise<IPackageChildTreeNode | null> {
+  cache: Map<string, IPackageChildTreeNode>;
+}): Promise<IPackageChildTreeNode> {
   if (store.state.packageHistory.status !== PackageHistoryStatus.INFLIGHT) {
     throw new Error(`Status: ${store.state.packageHistory.status}, exiting`);
   }
@@ -335,8 +343,15 @@ export async function getChildPackageHistoryTreeOrNullImpl({
     store.dispatch(`packageHistory/${PackageHistoryActions.LOG_EVENT}`, {
       event: `User does not have access to ${label}, is a terminal node`,
     });
-    cache.set(label, null);
-    return null;
+    const node: IPackageChildTreeNode = {
+      type: HistoryTreeNodeType.UNOWNED_PACKAGE,
+      label,
+      pkg: { Label: "STUB_PACKAGE" } as IIndexedPackageData,
+      history: [],
+      children: [],
+    };
+    cache.set(label, node);
+    return node;
   }
 
   store.dispatch(`packageHistory/${PackageHistoryActions.LOG_EVENT}`, {
@@ -371,6 +386,7 @@ export async function getChildPackageHistoryTreeOrNullImpl({
   });
 
   return {
+    type: HistoryTreeNodeType.OWNED_PACKAGE,
     label,
     pkg,
     history,

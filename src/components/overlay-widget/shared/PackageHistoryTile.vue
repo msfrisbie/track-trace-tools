@@ -22,22 +22,54 @@
           <div style="border-right: 1px solid black" class="h-6"></div>
         </div>
       </template>
-      <b-card>
-        <div>{{ ancestorTree.license }}</div>
-        <div>{{ ancestorTree.label }}</div>
-        <template v-if="ancestorTree.pkg?.PackageState">
-          <div>{{ ancestorTree.pkg.PackageState }}</div>
-        </template>
+      <b-card no-body>
+        <div class="flex flex-col items-stretch gap-1 p-2 bg-gray-200">
+          <div class="flex flex-row items-center justify-between gap-2">
+            <span>
+              <div>{{ ancestorTree.pkg.LicenseNumber }}</div>
+            </span>
+
+            <b-badge :variant="getBadgeVariant(ancestorTree.pkg.PackageState)">{{
+              ancestorTree.pkg.PackageState
+            }}</b-badge>
+          </div>
+          <div class="font-bold">{{ ancestorTree.label }}</div>
+        </div>
+        <hr />
+        <div class="p-2">
+          <div v-if="ancestorTree.pkg.PackagedByFacilityLicenseNumber">
+            Packaged by {{ ancestorTree.pkg.PackagedByFacilityLicenseNumber }}
+          </div>
+          <div v-if="ancestorTree.pkg.ReceivedFromFacilityLicenseNumber">
+            Recieved from {{ ancestorTree.pkg.ReceivedFromFacilityLicenseNumber }}
+          </div>
+        </div>
       </b-card>
     </template>
 
     <template v-if="childTree">
-      <b-card>
-        <div>{{ childTree.license }}</div>
-        <div>{{ childTree.label }}</div>
-        <template v-if="childTree.pkg?.PackageState">
-          <div>{{ childTree.pkg.PackageState }}</div>
-        </template>
+      <b-card no-body>
+        <div class="flex flex-col items-stretch gap-1 p-2 bg-gray-200">
+          <div class="flex flex-row items-center justify-between gap-2">
+            <span>
+              <div>{{ childTree.pkg.LicenseNumber }}</div>
+            </span>
+
+            <b-badge :variant="getBadgeVariant(childTree.pkg.PackageState)">{{
+              childTree.pkg.PackageState
+            }}</b-badge>
+          </div>
+          <div class="font-bold">{{ childTree.label }}</div>
+        </div>
+        <hr />
+        <div class="p-2">
+          <div v-if="childTree.pkg.PackagedByFacilityLicenseNumber">
+            Packaged by {{ childTree.pkg.PackagedByFacilityLicenseNumber }}
+          </div>
+          <div v-if="childTree.pkg.ReceivedFromFacilityLicenseNumber">
+            Recieved from {{ childTree.pkg.ReceivedFromFacilityLicenseNumber }}
+          </div>
+        </div>
       </b-card>
 
       <template v-if="depth < maxDepth">
@@ -67,6 +99,7 @@
 </template>
 
 <script lang="ts">
+import { PackageState } from "@/consts";
 import { IPackageAncestorTreeNode, IPackageChildTreeNode } from "@/interfaces";
 import router from "@/router/index";
 import store from "@/store/page-overlay/index";
@@ -96,7 +129,20 @@ export default Vue.extend({
   data() {
     return {};
   },
-  methods: {},
+  methods: {
+    getBadgeVariant(packageState: PackageState): string {
+      switch (packageState) {
+        case PackageState.ACTIVE:
+          return "success";
+        case PackageState.INACTIVE:
+          return "danger";
+        case PackageState.IN_TRANSIT:
+          return "dark";
+        default:
+          return "light";
+      }
+    },
+  },
   async created() {},
   async mounted() {},
 });
