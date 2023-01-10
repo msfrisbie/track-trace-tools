@@ -12,7 +12,7 @@
     <template v-else>
       <div class="flex flex-col gap-4">
         <div class="flex flex-col gap-4 items-center">
-          <div class="flex flex-row items-center gap-8">
+          <div class="flex flex-row items-start gap-8">
             <b-card>
               <div
                 class="w-full flex flex-row items-center justify-start space-x-4 text-sm whitespace-nowrap"
@@ -37,10 +37,6 @@
 
             <div class="flex flex-col items-stretch gap-4 w-60">
               <template v-if="status === PackageHistoryStatus.INFLIGHT">
-                <div class="flex flex-row items-center gap-2">
-                  <b-spinner small></b-spinner>
-                  <span>Building history, this can take a minute...</span>
-                </div>
                 <b-button @click="halt({})" variant="outline-primary"> STOP </b-button>
                 <b-form-group>
                   <b-form-input
@@ -85,10 +81,16 @@
         <div v-if="status === PackageHistoryStatus.HALTED" class="text-red-500 text-center">
           You stopped the lookup process. The displayed results may not be complete.
         </div>
+        <template v-if="status == PackageHistoryStatus.INFLIGHT">
+          <div class="flex flex-row justify-center items-center gap-2">
+            <b-spinner small></b-spinner>
+            <span>Building history, this can take a minute...</span>
+          </div>
+        </template>
         <b-tabs pills align="center" content-class="my-8">
-          <b-tab title="Parents" active>
+          <b-tab title="Parent Packages" active>
             <b-tabs pills align="center" content-class="my-8">
-              <b-tab title="Parent Package Tree" active>
+              <b-tab title="Tree" active>
                 <div class="p-2 flex flex-row justify-center gap-4">
                   <b-form-group label="Visible tree depth" class="w-36">
                     <vue-slider
@@ -116,7 +118,19 @@
                   ></package-history-tile>
                 </div>
               </b-tab>
-              <b-tab title="Parent Package Generations">
+              <b-tab title="Generations">
+                <div class="p-8">
+                  <b-button
+                    variant="outline-primary"
+                    @click="
+                      downloadGenerationCsv(
+                        ancestorGenerations,
+                        `${sourcePackage.Label}_parent_generations.csv`
+                      )
+                    "
+                    >DOWNLOAD CSV</b-button
+                  >
+                </div>
                 <div class="flex flex-col gap-8">
                   <div
                     v-for="(generation, i) of ancestorGenerations"
@@ -137,11 +151,11 @@
                   </div>
                 </div>
               </b-tab>
-              <b-tab title="Parent Package List">
-                <div>
+              <b-tab title="List">
+                <div class="p-8">
                   <b-button
                     variant="outline-primary"
-                    @click="downloadCsv(ancestorList, `${sourcePackage.Label}_parents.csv`)"
+                    @click="downloadListCsv(ancestorList, `${sourcePackage.Label}_parent_list.csv`)"
                     >DOWNLOAD CSV</b-button
                   >
                 </div>
@@ -163,9 +177,9 @@
               </b-tab>
             </b-tabs>
           </b-tab>
-          <b-tab title="Children">
+          <b-tab title="Child Packages">
             <b-tabs pills align="center" content-class="my-8">
-              <b-tab title="Child Package Tree">
+              <b-tab title="Tree">
                 <div class="p-2 flex flex-row justify-center gap-4">
                   <b-form-group label="Visible tree depth" class="w-36">
                     <vue-slider
@@ -193,7 +207,19 @@
                   ></package-history-tile>
                 </div>
               </b-tab>
-              <b-tab title="Child Package Generations">
+              <b-tab title="Generations">
+                <div class="p-8">
+                  <b-button
+                    variant="outline-primary"
+                    @click="
+                      downloadGenerationCsv(
+                        childGenerations,
+                        `${sourcePackage.Label}_children_generations.csv`
+                      )
+                    "
+                    >DOWNLOAD CSV</b-button
+                  >
+                </div>
                 <div class="flex flex-col gap-8">
                   <div
                     v-for="(generation, i) of childGenerations"
@@ -214,11 +240,11 @@
                   </div>
                 </div>
               </b-tab>
-              <b-tab title="Child Package List">
-                <div>
+              <b-tab title="List">
+                <div class="p-8">
                   <b-button
                     variant="outline-primary"
-                    @click="downloadCsv(childList, `${sourcePackage.Label}_children.csv`)"
+                    @click="downloadListCsv(childList, `${sourcePackage.Label}_children_list.csv`)"
                     >DOWNLOAD CSV</b-button
                   >
                 </div>
@@ -355,7 +381,7 @@ export default Vue.extend({
         this.$data.maxVisibleDepth = maxLookupDepth;
       }
     },
-    downloadCsv(historyList: IHistoryTreeNode[], filename: string) {
+    downloadListCsv(historyList: IHistoryTreeNode[], filename: string) {
       const csvFile: ICsvFile = {
         filename,
         data: historyList.map((x) => [
@@ -366,6 +392,26 @@ export default Vue.extend({
           x.pkg?.Quantity,
           x.pkg?.UnitOfMeasureAbbreviation,
         ]),
+      };
+
+      downloadCsvFile({ csvFile });
+    },
+    downloadGenerationCsv(historyGenerations: IHistoryTreeNode[][], filename: string) {
+      const csvFile: ICsvFile = {
+        filename,
+        data: historyGenerations
+          .map((generation, i) =>
+            generation.map((x) => [
+              `gen_${i}`,
+              x.label,
+              x.pkg?.LicenseNumber,
+              x.pkg?.PackageState,
+              x.pkg?.Item?.Name,
+              x.pkg?.Quantity,
+              x.pkg?.UnitOfMeasureAbbreviation,
+            ])
+          )
+          .flat(),
       };
 
       downloadCsvFile({ csvFile });
