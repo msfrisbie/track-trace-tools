@@ -23,7 +23,10 @@
         </div>
       </template>
       <b-card no-body>
-        <div class="flex flex-col items-stretch gap-1 p-2 bg-gray-200">
+        <div
+          class="flex flex-col items-stretch gap-1 p-2"
+          v-bind:class="{ 'bg-gray-200': !isOrigin, 'bg-purple-100': isOrigin }"
+        >
           <div class="flex flex-row items-center justify-between gap-2">
             <span>
               <div>{{ ancestorTree.pkg.LicenseNumber }}</div>
@@ -35,21 +38,26 @@
           </div>
           <div class="font-bold">{{ ancestorTree.label }}</div>
         </div>
-        <hr />
-        <div class="p-2">
-          <div v-if="ancestorTree.pkg.PackagedByFacilityLicenseNumber">
-            Packaged by {{ ancestorTree.pkg.PackagedByFacilityLicenseNumber }}
+        <template v-if="ancestorTree.type === HistoryTreeNodeType.OWNED_PACKAGE">
+          <hr />
+          <div class="p-2">
+            <div v-if="ancestorTree.pkg.PackagedByFacilityLicenseNumber">
+              Packaged by {{ ancestorTree.pkg.PackagedByFacilityLicenseNumber }}
+            </div>
+            <div v-if="ancestorTree.pkg.ReceivedFromFacilityLicenseNumber">
+              Recieved from {{ ancestorTree.pkg.ReceivedFromFacilityLicenseNumber }}
+            </div>
           </div>
-          <div v-if="ancestorTree.pkg.ReceivedFromFacilityLicenseNumber">
-            Recieved from {{ ancestorTree.pkg.ReceivedFromFacilityLicenseNumber }}
-          </div>
-        </div>
+        </template>
       </b-card>
     </template>
 
     <template v-if="childTree">
       <b-card no-body>
-        <div class="flex flex-col items-stretch gap-1 p-2 bg-gray-200">
+        <div
+          class="flex flex-col items-stretch gap-1 p-2"
+          v-bind:class="{ 'bg-gray-200': !isOrigin, 'bg-purple-100': isOrigin }"
+        >
           <div class="flex flex-row items-center justify-between gap-2">
             <span>
               <div>{{ childTree.pkg.LicenseNumber }}</div>
@@ -61,15 +69,17 @@
           </div>
           <div class="font-bold">{{ childTree.label }}</div>
         </div>
-        <hr />
-        <div class="p-2">
-          <div v-if="childTree.pkg.PackagedByFacilityLicenseNumber">
-            Packaged by {{ childTree.pkg.PackagedByFacilityLicenseNumber }}
+        <template v-if="childTree.type === HistoryTreeNodeType.OWNED_PACKAGE">
+          <hr />
+          <div class="p-2">
+            <div v-if="childTree.pkg.PackagedByFacilityLicenseNumber">
+              Packaged by {{ childTree.pkg.PackagedByFacilityLicenseNumber }}
+            </div>
+            <div v-if="childTree.pkg.ReceivedFromFacilityLicenseNumber">
+              Recieved from {{ childTree.pkg.ReceivedFromFacilityLicenseNumber }}
+            </div>
           </div>
-          <div v-if="childTree.pkg.ReceivedFromFacilityLicenseNumber">
-            Recieved from {{ childTree.pkg.ReceivedFromFacilityLicenseNumber }}
-          </div>
-        </div>
+        </template>
       </b-card>
 
       <template v-if="depth < maxDepth">
@@ -99,7 +109,7 @@
 </template>
 
 <script lang="ts">
-import { PackageState } from "@/consts";
+import { HistoryTreeNodeType, PackageState } from "@/consts";
 import { IPackageAncestorTreeNode, IPackageChildTreeNode } from "@/interfaces";
 import router from "@/router/index";
 import store from "@/store/page-overlay/index";
@@ -113,6 +123,11 @@ export default Vue.extend({
   props: {
     depth: Number,
     maxDepth: Number,
+    isOrigin: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
     childTree: {
       type: Object as () => IPackageChildTreeNode,
       required: false,
@@ -127,7 +142,9 @@ export default Vue.extend({
     ...mapState([]),
   },
   data() {
-    return {};
+    return {
+      HistoryTreeNodeType,
+    };
   },
   methods: {
     getBadgeVariant(packageState: PackageState): string {
@@ -165,5 +182,10 @@ export default Vue.extend({
 .multi-parent {
   border-top: 1px solid black;
   margin-top: 0.5rem;
+}
+
+.origin {
+  border-width: 2px;
+  border-style: solid;
 }
 </style>

@@ -38,7 +38,7 @@
             <div class="flex flex-col items-stretch gap-4 w-48">
               <div v-if="status === 'INFLIGHT'" class="flex flex-row items-center gap-2">
                 <b-spinner small></b-spinner>
-                <span>Building history...</span>
+                <span>Building history, this can take a minute...</span>
               </div>
               <div v-if="status === 'ERROR'" class="text-red-500">
                 <span>Something went wrong while generating the history. See log for detail.</span>
@@ -68,6 +68,7 @@
                 :ancestorTree="ancestorTree"
                 :depth="0"
                 :maxDepth="maxDepth"
+                :isOrigin="true"
                 style="transform-origin: 0% 0% 0px"
                 v-bind:style="{
                   transform: `scale(${zoom})`,
@@ -107,6 +108,7 @@
                 :childTree="childTree"
                 :depth="0"
                 :maxDepth="maxDepth"
+                :isOrigin="true"
                 style="transform-origin: 0% 0% 0px"
                 v-bind:style="{
                   transform: `scale(${zoom})`,
