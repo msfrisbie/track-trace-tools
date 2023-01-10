@@ -36,7 +36,10 @@
             </b-card>
 
             <div class="flex flex-col items-stretch gap-4 w-48">
-              <div v-if="status === PackageHistoryStatus.INFLIGHT" class="flex flex-row items-center gap-2">
+              <div
+                v-if="status === PackageHistoryStatus.INFLIGHT"
+                class="flex flex-row items-center gap-2"
+              >
                 <b-spinner small></b-spinner>
                 <span>Building history, this can take a minute...</span>
               </div>
@@ -44,7 +47,11 @@
                 <span>Something went wrong while generating the history. See log for detail.</span>
               </div>
 
-              <template v-if="status === PackageHistoryStatus.SUCCESS || status === PackageHistoryStatus.ERROR">
+              <template
+                v-if="
+                  status === PackageHistoryStatus.SUCCESS || status === PackageHistoryStatus.ERROR
+                "
+              >
                 <b-button @click="setPackage({ pkg: null })" variant="outline-primary">
                   RESET
                 </b-button>
@@ -74,6 +81,27 @@
                   transform: `scale(${zoom})`,
                 }"
               ></package-history-tile>
+            </div>
+          </b-tab>
+          <b-tab title="Package History Generations">
+            <div class="flex flex-col gap-8">
+              <div
+                v-for="(generation, i) of ancestorGenerations"
+                v-bind:key="i"
+                class="flex flex-row gap-8"
+              >
+                <div class="w-16 text-center text-xl">{{ i }}</div>
+                <div class="grid grid-cols-3 gap-2">
+                  <package-history-tile
+                    v-for="node of generation"
+                    v-bind:key="node.label"
+                    :ancestorTree="node"
+                    :depth="0"
+                    :maxDepth="0"
+                    :isOrigin="node.label === sourcePackage.Label"
+                  ></package-history-tile>
+                </div>
+              </div>
             </div>
           </b-tab>
           <b-tab title="Package History List">
@@ -121,6 +149,27 @@
                   transform: `scale(${zoom})`,
                 }"
               ></package-history-tile>
+            </div>
+          </b-tab>
+          <b-tab title="Child Package Generations">
+            <div class="flex flex-col gap-8">
+              <div
+                v-for="(generation, i) of childGenerations"
+                v-bind:key="i"
+                class="flex flex-row gap-8"
+              >
+                <div class="w-16 text-center text-xl">{{ i }}</div>
+                <div class="grid grid-cols-3 gap-2">
+                  <package-history-tile
+                    v-for="node of generation"
+                    v-bind:key="node.label"
+                    :childTree="node"
+                    :depth="0"
+                    :maxDepth="0"
+                    :isOrigin="node.label === sourcePackage.Label"
+                  ></package-history-tile>
+                </div>
+              </div>
             </div>
           </b-tab>
           <b-tab title="Child Package List">
@@ -218,14 +267,16 @@ export default Vue.extend({
     }),
     ...mapGetters({
       ancestorList: `packageHistory/${PackageHistoryGetters.ANCESTOR_LIST}`,
+      ancestorGenerations: `packageHistory/${PackageHistoryGetters.ANCESTOR_GENERATIONS}`,
       childList: `packageHistory/${PackageHistoryGetters.CHILD_LIST}`,
+      childGenerations: `packageHistory/${PackageHistoryGetters.CHILD_GENERATIONS}`,
     }),
   },
   data() {
     return {
       maxDepth: 20,
       zoom: 1,
-      PackageHistoryStatus
+      PackageHistoryStatus,
     };
   },
   methods: {

@@ -124,6 +124,38 @@ export const packageHistoryModule = {
 
       return _.orderBy([...packageMap.values()], ["pkg.LicenseNumber", "label"], ["asc", "asc"]);
     },
+    [PackageHistoryGetters.ANCESTOR_GENERATIONS]: (
+      state: IPackageHistoryState,
+      getters: any,
+      rootState: any,
+      rootGetters: any
+    ): IPackageAncestorTreeNode[][] => {
+      const generations: IPackageAncestorTreeNode[][] = [];
+
+      if (!state.ancestorTree) {
+        return [];
+      }
+
+      const stack: [IPackageAncestorTreeNode, number][] = [[state.ancestorTree, 0]];
+
+      while (stack.length > 0) {
+        const [node, depth] = stack.pop() as [IPackageAncestorTreeNode, number];
+
+        if (typeof generations[depth] !== "object") {
+          generations[depth] = [];
+        }
+
+        if (!generations[depth].includes(node)) {
+          generations[depth].push(node);
+        }
+
+        for (const ancestor of node.ancestors) {
+          stack.push([ancestor, depth + 1]);
+        }
+      }
+
+      return generations;
+    },
     [PackageHistoryGetters.CHILD_LIST]: (
       state: IPackageHistoryState,
       getters: any,
@@ -153,6 +185,38 @@ export const packageHistoryModule = {
       }
 
       return _.orderBy([...packageMap.values()], ["pkg.LicenseNumber", "label"], ["asc", "asc"]);
+    },
+    [PackageHistoryGetters.CHILD_GENERATIONS]: (
+      state: IPackageHistoryState,
+      getters: any,
+      rootState: any,
+      rootGetters: any
+    ): IPackageChildTreeNode[][] => {
+      const generations: IPackageChildTreeNode[][] = [];
+
+      if (!state.childTree) {
+        return [];
+      }
+
+      const stack: [IPackageChildTreeNode, number][] = [[state.childTree, 0]];
+
+      while (stack.length > 0) {
+        const [node, depth] = stack.pop() as [IPackageChildTreeNode, number];
+
+        if (typeof generations[depth] !== "object") {
+          generations[depth] = [];
+        }
+
+        if (!generations[depth].includes(node)) {
+          generations[depth].push(node);
+        }
+
+        for (const child of node.children) {
+          stack.push([child, depth + 1]);
+        }
+      }
+
+      return generations;
     },
   },
   actions: {

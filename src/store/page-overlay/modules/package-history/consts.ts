@@ -9,7 +9,9 @@ export enum PackageHistoryMutations {
 
 export enum PackageHistoryGetters {
   ANCESTOR_LIST = "ANCESTOR_LIST",
-  CHILD_LIST = "CHILD_LIST"
+  ANCESTOR_GENERATIONS = "ANCESTOR_GENERATIONS",
+  CHILD_LIST = "CHILD_LIST",
+  CHILD_GENERATIONS = "CHILD_GENERATIONS",
 }
 
 export enum PackageHistoryActions {
