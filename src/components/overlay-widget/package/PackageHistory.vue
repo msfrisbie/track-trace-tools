@@ -84,7 +84,7 @@
                 :items="ancestorList"
                 :fields="[
                   'label',
-                  'license',
+                  'pkg.LicenseNumber',
                   'pkg.PackageState',
                   'pkg.Item.Name',
                   'pkg.Quantity',
@@ -124,7 +124,7 @@
                 :items="childList"
                 :fields="[
                   'label',
-                  'license',
+                  'pkg.LicenseNumber',
                   'pkg.PackageState',
                   'pkg.Item.Name',
                   'pkg.Quantity',

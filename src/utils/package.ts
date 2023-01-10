@@ -21,6 +21,7 @@ import {
   PackageHistoryActions,
   PackageHistoryStatus,
 } from "@/store/page-overlay/modules/package-history/consts";
+import { LRU } from "./cache";
 import { downloadFileFromUrl } from "./dom";
 import {
   extractChildPackageLabelsFromHistory,
@@ -140,78 +141,78 @@ export function packageFieldMatch(
   return null;
 }
 
-export async function getParentPackageHistoryTreeOrNull({
+export async function getParentPackageHistoryTree({
   label,
 }: {
   label: string;
 }): Promise<IPackageAncestorTreeNode> {
-  const cache: Map<string, IPackageAncestorTreeNode> = new Map();
+  const treeNodeCache: Map<string, IPackageAncestorTreeNode> = new Map();
+  const ownedLicenses: string[] = (await facilityManager.ownedFacilitiesOrError()).map(
+    (facility) => facility.licenseNumber
+  );
+  const licenseCache: LRU<string> = new LRU(ownedLicenses);
+  licenseCache.touch((await authManager.authStateOrError()).license);
 
-  return getParentPackageHistoryTreeOrNullImpl({
+  return getParentPackageHistoryTreeImpl({
     label,
-    cache,
+    treeNodeCache,
+    licenseCache,
   });
 }
 
-export async function getParentPackageHistoryTreeOrNullImpl({
+export async function getParentPackageHistoryTreeImpl({
   label,
-  cache,
+  treeNodeCache,
+  licenseCache,
 }: {
   label: string;
-  cache: Map<string, IPackageAncestorTreeNode>;
+  treeNodeCache: Map<string, IPackageAncestorTreeNode>;
+  licenseCache: LRU<string>;
 }): Promise<IPackageAncestorTreeNode> {
   if (store.state.packageHistory.status !== PackageHistoryStatus.INFLIGHT) {
     throw new Error(`Status: ${store.state.packageHistory.status}, exiting`);
   }
 
-  if (cache.has(label)) {
+  if (treeNodeCache.has(label)) {
     store.dispatch(`packageHistory/${PackageHistoryActions.LOG_EVENT}`, {
       event: `Cache hit for ${label}`,
     });
-    return cache.get(label) as IPackageAncestorTreeNode;
+    return treeNodeCache.get(label) as IPackageAncestorTreeNode;
   }
 
-  const ownedLicenses: string[] = (await facilityManager.ownedFacilitiesOrError()).map(
-    (facility) => facility.licenseNumber
-  );
-
-  // if (!ownedLicenses.includes(license)) {
-  //   store.dispatch(`packageHistory/${PackageHistoryActions.LOG_EVENT}`, {
-  //     event: `User does not have access to license ${license}, ${label} is a terminal node`,
-  //   });
-  //   const terminalNode = {
-  //     label,
-  //     license,
-  //     ancestors: [],
-  //   };
-
-  //   cache.set(`${license}::${label}`, terminalNode);
-  //   // This license is not owned by the current user, exit with terminal node
-  //   return terminalNode;
-  // }
-
-  const authState = {
-    ...(await authManager.authStateOrError()),
-    // license
-  };
-
-  let dataLoader: DataLoader = await getDataLoader(authState);
-
-  // TODO search every available facility
-  // TODO search active, inactive
   let pkg: IIndexedPackageData | null = null;
-  try {
-    pkg = await dataLoader.activePackage(label);
-  } catch (e) {}
-  if (!pkg) {
+  let dataLoader: DataLoader | null = null;
+
+  for (const license of licenseCache.elements) {
+    const authState = {
+      ...(await authManager.authStateOrError()),
+      license,
+    };
+
+    dataLoader = await getDataLoader(authState);
+
     try {
-      pkg = await dataLoader.inactivePackage(label);
+      pkg = await dataLoader.activePackage(label);
     } catch (e) {}
+    if (!pkg) {
+      try {
+        pkg = await dataLoader.inactivePackage(label);
+      } catch (e) {}
+    }
+    if (!pkg) {
+      try {
+        pkg = await dataLoader.inTransitPackage(label);
+      } catch (e) {}
+    }
+
+    if (pkg) {
+      licenseCache.touch(pkg.LicenseNumber);
+      break;
+    }
   }
-  if (!pkg) {
-    try {
-      pkg = await dataLoader.inTransitPackage(label);
-    } catch (e) {}
+
+  if (!dataLoader) {
+    throw new Error("Data loader not assigned, exiting");
   }
 
   if (!pkg) {
@@ -225,7 +226,7 @@ export async function getParentPackageHistoryTreeOrNullImpl({
       history: [],
       ancestors: [],
     };
-    cache.set(label, node);
+    treeNodeCache.set(label, node);
     return node;
   }
 
@@ -235,8 +236,6 @@ export async function getParentPackageHistoryTreeOrNullImpl({
 
   const history: IPackageHistoryData[] = await dataLoader.packageHistoryByPackageId(pkg.Id);
 
-  // TODO: this license may not be correct
-  // and must update when a transfer occurs
   const parentPackageLabels = extractParentPackageLabelsFromHistory(history);
 
   const parents: IPackageAncestorTreeNode[] = [];
@@ -246,17 +245,15 @@ export async function getParentPackageHistoryTreeOrNullImpl({
       throw new Error(`Status: ${store.state.packageHistory.status}, exiting`);
     }
 
-    const node = await getParentPackageHistoryTreeOrNullImpl({
+    const node = await getParentPackageHistoryTreeImpl({
       label: parentPackageLabel,
-      cache,
+      treeNodeCache,
+      licenseCache,
     });
 
-    // Don't push a null result
-    if (node) {
-      parents.push(node);
-    }
+    parents.push(node);
 
-    cache.set(label, node);
+    treeNodeCache.set(label, node);
   }
 
   store.dispatch(`packageHistory/${PackageHistoryActions.LOG_EVENT}`, {
@@ -271,72 +268,83 @@ export async function getParentPackageHistoryTreeOrNullImpl({
     ancestors: parents,
   };
 
-  cache.set(label, node);
+  treeNodeCache.set(label, node);
 
   return node;
 }
 
-export async function getChildPackageHistoryTreeOrNull({
+export async function getChildPackageHistoryTree({
   label,
 }: {
   label: string;
 }): Promise<IPackageChildTreeNode> {
-  const cache: Map<string, IPackageChildTreeNode> = new Map();
+  const treeNodeCache: Map<string, IPackageChildTreeNode> = new Map();
+  const ownedLicenses: string[] = (await facilityManager.ownedFacilitiesOrError()).map(
+    (facility) => facility.licenseNumber
+  );
+  const licenseCache: LRU<string> = new LRU(ownedLicenses);
+  licenseCache.touch((await authManager.authStateOrError()).license);
 
-  return getChildPackageHistoryTreeOrNullImpl({
+  return getChildPackageHistoryTreeImpl({
     label,
-    cache,
+    treeNodeCache,
+    licenseCache,
   });
 }
 
-export async function getChildPackageHistoryTreeOrNullImpl({
+export async function getChildPackageHistoryTreeImpl({
   label,
-  cache,
+  treeNodeCache,
+  licenseCache,
 }: {
   label: string;
-  cache: Map<string, IPackageChildTreeNode>;
+  treeNodeCache: Map<string, IPackageChildTreeNode>;
+  licenseCache: LRU<string>;
 }): Promise<IPackageChildTreeNode> {
   if (store.state.packageHistory.status !== PackageHistoryStatus.INFLIGHT) {
     throw new Error(`Status: ${store.state.packageHistory.status}, exiting`);
   }
 
-  const ownedLicenses: string[] = (await facilityManager.ownedFacilitiesOrError()).map(
-    (facility) => facility.licenseNumber
-  );
-
-  // if (!ownedLicenses.includes(license)) {
-  //   store.dispatch(`packageHistory/${PackageHistoryActions.LOG_EVENT}`, {
-  //     event: `User does not have access to license ${license}, ${label} is a terminal node`,
-  //   });
-  //   // This license is not owned by the current user, exit with terminal node
-  //   return {
-  //     label,
-  //     children: [],
-  //   };
-  // }
-
-  const authState = {
-    ...(await authManager.authStateOrError()),
-    // license
-  };
-
-  let dataLoader: DataLoader = await getDataLoader(authState);
-
-  // TODO search every available facility
-  // TODO search active, inactive
-  let pkg: IIndexedPackageData | null = null;
-  try {
-    pkg = await dataLoader.activePackage(label);
-  } catch (e) {}
-  if (!pkg) {
-    try {
-      pkg = await dataLoader.inactivePackage(label);
-    } catch (e) {}
+  if (treeNodeCache.has(label)) {
+    store.dispatch(`packageHistory/${PackageHistoryActions.LOG_EVENT}`, {
+      event: `Cache hit for ${label}`,
+    });
+    return treeNodeCache.get(label) as IPackageChildTreeNode;
   }
-  if (!pkg) {
+
+  let pkg: IIndexedPackageData | null = null;
+  let dataLoader: DataLoader | null = null;
+
+  for (const license of licenseCache.elements) {
+    const authState = {
+      ...(await authManager.authStateOrError()),
+      license,
+    };
+
+    dataLoader = await getDataLoader(authState);
+
     try {
-      pkg = await dataLoader.inTransitPackage(label);
+      pkg = await dataLoader.activePackage(label);
     } catch (e) {}
+    if (!pkg) {
+      try {
+        pkg = await dataLoader.inactivePackage(label);
+      } catch (e) {}
+    }
+    if (!pkg) {
+      try {
+        pkg = await dataLoader.inTransitPackage(label);
+      } catch (e) {}
+    }
+
+    if (pkg) {
+      licenseCache.touch(pkg.LicenseNumber);
+      break;
+    }
+  }
+
+  if (!dataLoader) {
+    throw new Error("Data loader not assigned, exiting");
   }
 
   if (!pkg) {
@@ -350,7 +358,7 @@ export async function getChildPackageHistoryTreeOrNullImpl({
       history: [],
       children: [],
     };
-    cache.set(label, node);
+    treeNodeCache.set(label, node);
     return node;
   }
 
@@ -359,9 +367,6 @@ export async function getChildPackageHistoryTreeOrNullImpl({
   });
 
   const history: IPackageHistoryData[] = await dataLoader.packageHistoryByPackageId(pkg.Id);
-
-  // TODO: this license may not be correct
-  // and must update when a transfer occurs
 
   const childPackageLabels = extractChildPackageLabelsFromHistory(history);
 
@@ -372,13 +377,15 @@ export async function getChildPackageHistoryTreeOrNullImpl({
       throw new Error(`Status: ${store.state.packageHistory.status}, exiting`);
     }
 
-    const node = await getChildPackageHistoryTreeOrNullImpl({ label: childPackageLabel, cache });
+    const node = await getChildPackageHistoryTreeImpl({
+      label: childPackageLabel,
+      treeNodeCache,
+      licenseCache
+    });
 
-    if (node) {
-      children.push();
-    }
+    children.push();
 
-    cache.set(label, node);
+    treeNodeCache.set(label, node);
   }
 
   store.dispatch(`packageHistory/${PackageHistoryActions.LOG_EVENT}`, {
