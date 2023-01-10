@@ -1,8 +1,9 @@
-import { DOLLAR_NUMBER_REGEX, METRC_TAG_REGEX, WEIGHT_NUMBER_REGEX } from "@/consts";
+import { DOLLAR_NUMBER_REGEX, MessageType, METRC_TAG_REGEX, WEIGHT_NUMBER_REGEX } from "@/consts";
 import { IAtomicService } from "@/interfaces";
 import { debugLogFactory } from "@/utils/debug";
 import { activeMetrcModalOrNull, modalTitleOrError } from "@/utils/metrc-modal";
 import * as Papa from "papaparse";
+import { analyticsManager } from "./analytics-manager.module";
 import { clientBuildManager } from "./client-build-manager.module";
 import { toastManager } from "./toast-manager.module";
 
@@ -167,6 +168,8 @@ class MetrcModalManager implements IAtomicService {
   }
 
   async propagateCsv(destination: HTMLElement) {
+    analyticsManager.track(MessageType.CSV_AUTOFILL_UPLOAD);
+
     const values = clientBuildManager.validateAndGetValuesOrError(clientKeys);
 
     const intermediateCsvInput: HTMLInputElement | null = destination.querySelector(
@@ -384,6 +387,7 @@ class MetrcModalManager implements IAtomicService {
   }
 
   async applyTransferCsvData(destination: HTMLElement) {
+    analyticsManager.track(MessageType.CSV_AUTOFILL_FILL);
     const values = clientBuildManager.validateAndGetValuesOrError(clientKeys);
 
     const input: HTMLInputElement | null = destination.querySelector(

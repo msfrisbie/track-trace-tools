@@ -1,3 +1,4 @@
+import { MessageType } from "@/consts";
 import {
   IHarvestHistoryData,
   IIndexedPackageData,
@@ -6,6 +7,7 @@ import {
   IPackageData,
   IPluginState,
 } from "@/interfaces";
+import { analyticsManager } from "@/modules/analytics-manager.module";
 import { clientBuildManager } from "@/modules/client-build-manager.module";
 import {
   getChildPackageHistoryTree,
@@ -240,6 +242,8 @@ export const packageHistoryModule = {
       ctx: ActionContext<IPackageHistoryState, IPluginState>,
       { pkg }: { pkg: IIndexedPackageData | null }
     ) => {
+      analyticsManager.track(MessageType.GENERATE_PACKAGE_HISTORY, { pkg });
+
       if (!clientBuildManager.assertValues(["ENABLE_PACKAGE_HISTORY"])) {
         return;
       }
@@ -280,8 +284,10 @@ export const packageHistoryModule = {
               status: PackageHistoryStatus.SUCCESS,
             });
           }
+          analyticsManager.track(MessageType.GENERATE_PACKAGE_HISTORY_SUCCESS);
         } catch (e) {
           console.error(e);
+          analyticsManager.track(MessageType.GENERATE_PACKAGE_HISTORY_ERROR, { e });
           ctx.commit(PackageHistoryMutations.LOG_EVENT, {
             event: e.toString(),
           });
