@@ -190,10 +190,6 @@ export async function getParentPackageHistoryTreeImpl({
   rootContext: IRootAncestorHistoryContext;
   depth: number;
 }): Promise<IPackageAncestorTreeNode> {
-  // if (store.state.packageHistory.status !== PackageHistoryStatus.INFLIGHT) {
-  //   throw new Error(`Status: ${store.state.packageHistory.status}, exiting`);
-  // }
-
   if (rootContext.treeNodeCache.has(label)) {
     store.dispatch(`packageHistory/${PackageHistoryActions.LOG_EVENT}`, {
       event: `Cache hit for ${label}`,
@@ -358,6 +354,17 @@ export async function getChildPackageHistoryTree({
   });
 }
 
+// async function getPackageHistoryTreeImpl<T>({
+//   label,
+//   rootContext,
+//   depth,
+// }: {
+//   label: string;
+//   rootContext: IRootChildPackageHistoryContext;
+//   depth: number;
+// }): Promise<T> {
+// }
+
 export async function getChildPackageHistoryTreeImpl({
   label,
   rootContext,
@@ -367,10 +374,6 @@ export async function getChildPackageHistoryTreeImpl({
   rootContext: IRootChildPackageHistoryContext;
   depth: number;
 }): Promise<IPackageChildTreeNode> {
-  // if (store.state.packageHistory.status !== PackageHistoryStatus.INFLIGHT) {
-  //   throw new Error(`Status: ${store.state.packageHistory.status}, exiting`);
-  // }
-
   if (rootContext.treeNodeCache.has(label)) {
     store.dispatch(`packageHistory/${PackageHistoryActions.LOG_EVENT}`, {
       event: `Cache hit for ${label}`,
