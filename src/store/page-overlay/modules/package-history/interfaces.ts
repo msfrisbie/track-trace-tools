@@ -9,8 +9,8 @@ import { PackageHistoryStatus } from "./consts";
 export interface IPackageHistoryState {
   status: PackageHistoryStatus;
   sourcePackage: IPackageData | null;
-  ancestorTree: IPackageAncestorTreeNode | null;
-  childTree: IPackageChildTreeNode | null;
+  ancestorTree: { [key: string]: IPackageAncestorTreeNode } | null;
+  childTree: { [key: string]: IPackageChildTreeNode } | null;
   sourceHarvests: IHarvestHistoryData[];
   maxLookupDepth: number | null;
   log: string[];

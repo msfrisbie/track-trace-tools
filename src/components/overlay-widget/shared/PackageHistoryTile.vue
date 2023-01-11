@@ -5,7 +5,7 @@
         <div class="flex flex-row no-wrap gap-1">
           <package-history-tile
             v-for="subtree of ancestorTree.ancestors"
-            v-bind:key="subtree.label"
+            v-bind:key="nodeId + '_' + subtree.label"
             :ancestorTree="subtree"
             :depth="depth + 1"
             :maxDepth="maxDepth"
@@ -137,7 +137,7 @@
         <div class="flex flex-row no-wrap gap-1">
           <package-history-tile
             v-for="subtree of childTree.children"
-            v-bind:key="subtree.label"
+            v-bind:key="nodeId + '_' + subtree.label"
             :childTree="subtree"
             :depth="depth + 1"
             :maxDepth="maxDepth"
@@ -158,6 +158,7 @@ import store from "@/store/page-overlay/index";
 import { unitOfMeasureNameToAbbreviation } from "@/utils/units";
 import Vue from "vue";
 import { mapState } from "vuex";
+import { v4 as uuidv4} from "uuid";
 
 export default Vue.extend({
   name: "PackageHistoryTile",
@@ -189,6 +190,7 @@ export default Vue.extend({
   },
   data() {
     return {
+      nodeId: uuidv4(),
       HistoryTreeNodeType,
     };
   },

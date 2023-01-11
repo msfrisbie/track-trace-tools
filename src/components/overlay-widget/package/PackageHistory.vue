@@ -17,6 +17,12 @@
               <div class="flex flex-col items-stretch gap-4 w-60">
                 <template v-if="status === PackageHistoryStatus.INFLIGHT">
                   <b-button @click="halt({})" variant="outline-primary"> STOP </b-button>
+                </template>
+                <template
+                  v-if="
+                    [PackageHistoryStatus.INFLIGHT, PackageHistoryStatus.INITIAL].includes(status)
+                  "
+                >
                   <b-form-group>
                     <b-form-input
                       v-model="maxLookupDepth"
@@ -41,9 +47,11 @@
 
                 <template
                   v-if="
-                    status === PackageHistoryStatus.SUCCESS ||
-                    status === PackageHistoryStatus.ERROR ||
-                    status === PackageHistoryStatus.HALTED
+                    [
+                      PackageHistoryStatus.SUCCESS,
+                      PackageHistoryStatus.ERROR,
+                      PackageHistoryStatus.HALTED,
+                    ].includes(status)
                   "
                 >
                   <b-button @click="setPackage({ pkg: null })" variant="outline-primary">
@@ -54,7 +62,7 @@
             </div>
           </div>
 
-          <div v-if="maxLookupDepth !== null" class="text-red-500 text-center">
+          <div v-if="typeof maxLookupDepth === 'number'" class="text-red-500 text-center">
             You have set a generation limit of {{ maxLookupDepth }}. The displayed results may not
             be complete.
           </div>

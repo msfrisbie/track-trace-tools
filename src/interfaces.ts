@@ -1465,9 +1465,9 @@ export interface IHistoryTreeNode {
 }
 
 export interface IPackageAncestorTreeNode extends IHistoryTreeNode {
-  ancestors: IPackageAncestorTreeNode[];
+  ancestors: string[]
 }
 
 export interface IPackageChildTreeNode extends IHistoryTreeNode {
-  children: IPackageChildTreeNode[];
+  children: string[];
 }

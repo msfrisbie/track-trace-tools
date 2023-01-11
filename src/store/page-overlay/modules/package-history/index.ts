@@ -114,9 +114,15 @@ export const packageHistoryModule = {
         return [];
       }
 
+      if (!state.sourcePackage) {
+        return [];
+      }
+
       const packageMap: Map<string, IPackageAncestorTreeNode> = new Map();
 
-      const stack: [IPackageAncestorTreeNode, number][] = [[state.ancestorTree, 0]];
+      const stack: [IPackageAncestorTreeNode, number][] = [
+        [state.ancestorTree[state.sourcePackage.Label], 0],
+      ];
 
       while (stack.length > 0) {
         const [node, depth] = stack.pop() as [IPackageAncestorTreeNode, number];
@@ -129,7 +135,13 @@ export const packageHistoryModule = {
           packageMap.set(node.label, node);
         }
 
-        node.ancestors.map((ancestor) => stack.push([ancestor, depth + 1]));
+        node.ancestors.map((ancestor) =>
+          stack.push([
+            // @ts-ignore
+            state.ancestorTree[ancestor],
+            depth + 1,
+          ])
+        );
       }
 
       return _.orderBy([...packageMap.values()], ["pkg.LicenseNumber", "label"], ["asc", "asc"]);
@@ -146,7 +158,13 @@ export const packageHistoryModule = {
         return [];
       }
 
-      const stack: [IPackageAncestorTreeNode, number][] = [[state.ancestorTree, 0]];
+      if (!state.sourcePackage) {
+        return [];
+      }
+
+      const stack: [IPackageAncestorTreeNode, number][] = [
+        [state.ancestorTree[state.sourcePackage.Label], 0],
+      ];
 
       while (stack.length > 0) {
         const [node, depth] = stack.pop() as [IPackageAncestorTreeNode, number];
@@ -164,7 +182,7 @@ export const packageHistoryModule = {
         }
 
         for (const ancestor of node.ancestors) {
-          stack.push([ancestor, depth + 1]);
+          stack.push([state.ancestorTree[ancestor], depth + 1]);
         }
       }
 
@@ -180,9 +198,15 @@ export const packageHistoryModule = {
         return [];
       }
 
+      if (!state.sourcePackage) {
+        return [];
+      }
+
       const packageMap: Map<string, IPackageChildTreeNode> = new Map();
 
-      const stack: [IPackageChildTreeNode, number][] = [[state.childTree, 0]];
+      const stack: [IPackageChildTreeNode, number][] = [
+        [state.childTree[state.sourcePackage.Label], 0],
+      ];
 
       while (stack.length > 0) {
         const [node, depth] = stack.pop() as [IPackageChildTreeNode, number];
@@ -195,7 +219,13 @@ export const packageHistoryModule = {
           packageMap.set(node.label, node);
         }
 
-        node.children.map((child) => stack.push([child, depth + 1]));
+        node.children.map((child) =>
+          stack.push([
+            // @ts-ignore
+            state.childTree[child],
+            depth + 1,
+          ])
+        );
       }
 
       return _.orderBy([...packageMap.values()], ["pkg.LicenseNumber", "label"], ["asc", "asc"]);
@@ -212,7 +242,13 @@ export const packageHistoryModule = {
         return [];
       }
 
-      const stack: [IPackageChildTreeNode, number][] = [[state.childTree, 0]];
+      if (!state.sourcePackage) {
+        return [];
+      }
+
+      const stack: [IPackageChildTreeNode, number][] = [
+        [state.childTree[state.sourcePackage.Label], 0],
+      ];
 
       while (stack.length > 0) {
         const [node, depth] = stack.pop() as [IPackageChildTreeNode, number];
@@ -230,7 +266,7 @@ export const packageHistoryModule = {
         }
 
         for (const child of node.children) {
-          stack.push([child, depth + 1]);
+          stack.push([state.childTree[child], depth + 1]);
         }
       }
 
@@ -269,11 +305,24 @@ export const packageHistoryModule = {
           } catch (e) {
             console.error("Cannot load source harvests", e);
           }
-          ctx.commit(PackageHistoryMutations.SET_ANCESTORS, {
-            ancestorTree: await getParentPackageHistoryTree({
-              label: pkg.Label,
-            }),
+
+          const parentCallback = _.debounce(
+            (node) => {
+              console.log("setting ancestors");
+              ctx.commit(PackageHistoryMutations.SET_ANCESTORS, {
+                ancestorTree: _.cloneDeep(node),
+              });
+            },
+            2000,
+            { maxWait: 5000 }
+          );
+          const rootParentNode = await getParentPackageHistoryTree({
+            label: pkg.Label,
+            // callback: parentCallback,
           });
+          // parentCallback(rootParentNode);
+          // console.log(JSON.stringify(rootParentNode, null, 2));
+
           ctx.commit(PackageHistoryMutations.SET_CHILDREN, {
             childTree: await getChildPackageHistoryTree({
               label: pkg.Label,
