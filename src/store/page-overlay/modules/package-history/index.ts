@@ -11,9 +11,12 @@ import {
 } from "@/interfaces";
 import { analyticsManager } from "@/modules/analytics-manager.module";
 import { clientBuildManager } from "@/modules/client-build-manager.module";
-import { getParentHarvests, getParentPackageHistoryTree } from "@/utils/package";
+import {
+  getChildPackageHistoryTree,
+  getParentHarvests,
+  getParentPackageHistoryTree,
+} from "@/utils/package";
 import _ from "lodash";
-import { v4 as uuidv4 } from "uuid";
 import { ActionContext } from "vuex";
 import {
   PackageHistoryActions,
@@ -132,34 +135,6 @@ export const packageHistoryModule = {
       }) as IParentPackageTreeNode[];
 
       return _.orderBy(nodes, ["pkg.LicenseNumber", "label"], ["asc", "asc"]);
-
-      // const packageMap: Map<string, IParentPackageTreeNode> = new Map();
-
-      // const stack: [IParentPackageTreeNode, number][] = [
-      //   [state.parentTree[state.sourcePackage.Label], 0],
-      // ];
-
-      // while (stack.length > 0) {
-      //   const [node, depth] = stack.pop() as [IParentPackageTreeNode, number];
-
-      //   if (state.maxLookupDepth !== null && depth > state.maxLookupDepth) {
-      //     continue;
-      //   }
-
-      //   if (!packageMap.has(node.label)) {
-      //     packageMap.set(node.label, node);
-      //   }
-
-      //   node.parents.map((parent) =>
-      //     stack.push([
-      //       // @ts-ignore
-      //       state.parentTree[parent],
-      //       depth + 1,
-      //     ])
-      //   );
-      // }
-
-      // return _.orderBy([...packageMap.values()], ["pkg.LicenseNumber", "label"], ["asc", "asc"]);
     },
     [PackageHistoryGetters.PARENT_GENERATIONS]: (
       state: IPackageHistoryState,
@@ -229,7 +204,6 @@ export const packageHistoryModule = {
         return [];
       }
 
-      // TODO map null values to stub
       const nodes: IChildPackageTreeNode[] = Object.entries(state.childTree).map(([k, v]) => {
         if (v) {
           return v;
@@ -245,34 +219,6 @@ export const packageHistoryModule = {
       }) as IChildPackageTreeNode[];
 
       return _.orderBy(nodes, ["pkg.LicenseNumber", "label"], ["asc", "asc"]);
-
-      // const packageMap: Map<string, IChildPackageTreeNode> = new Map();
-
-      // const stack: [IChildPackageTreeNode, number][] = [
-      //   [state.childTree[state.sourcePackage.Label], 0],
-      // ];
-
-      // while (stack.length > 0) {
-      //   const [node, depth] = stack.pop() as [IChildPackageTreeNode, number];
-
-      //   if (state.maxLookupDepth !== null && depth > state.maxLookupDepth) {
-      //     continue;
-      //   }
-
-      //   if (!packageMap.has(node.label)) {
-      //     packageMap.set(node.label, node);
-      //   }
-
-      //   node.children.map((child) =>
-      //     stack.push([
-      //       // @ts-ignore
-      //       state.childTree[child],
-      //       depth + 1,
-      //     ])
-      //   );
-      // }
-
-      // return _.orderBy([...packageMap.values()], ["pkg.LicenseNumber", "label"], ["asc", "asc"]);
     },
     [PackageHistoryGetters.CHILD_GENERATIONS]: (
       state: IPackageHistoryState,
@@ -309,16 +255,18 @@ export const packageHistoryModule = {
           generations[depth] = [];
         }
 
-        if (!generations[depth].includes(node)) {
+        if (!generations[depth].find((x) => x.label === node.label)) {
           generations[depth].push(node);
         }
 
         for (const childLabel of node.childLabels) {
-          const childNode = state.childTree[childLabel];
-
-          if (!childNode) {
-            throw new Error("Unmatched child node");
-          }
+          const childNode: IChildPackageTreeNode = state.childTree[childLabel] || {
+            label: childLabel,
+            type: HistoryTreeNodeType.UNOWNED_PACKAGE,
+            childLabels: [],
+            history: [],
+            pkg: {} as IIndexedPackageData,
+          };
 
           stack.push([childNode, depth + 1]);
         }
@@ -362,7 +310,6 @@ export const packageHistoryModule = {
 
           const parentCallback = _.debounce(
             (parentTree) => {
-              console.log("setting parents");
               ctx.commit(PackageHistoryMutations.SET_PARENTS, {
                 parentTree: _.cloneDeep(parentTree),
               });
@@ -370,20 +317,25 @@ export const packageHistoryModule = {
             100,
             { maxWait: 500 }
           );
-          console.log(
-            await getParentPackageHistoryTree({
-              label: pkg.Label,
-              callback: parentCallback,
-            })
-          );
-          // parentCallback(rootParentNode);
-          // console.log(JSON.stringify(rootParentNode, null, 2));
+          await getParentPackageHistoryTree({
+            label: pkg.Label,
+            callback: parentCallback,
+          });
 
-          // ctx.commit(PackageHistoryMutations.SET_CHILDREN, {
-          //   childTree: await getChildPackageHistoryTree({
-          //     label: pkg.Label,
-          //   }),
-          // });
+          const childCallback = _.debounce(
+            (childTree) => {
+              ctx.commit(PackageHistoryMutations.SET_CHILDREN, {
+                childTree: _.cloneDeep(childTree),
+              });
+            },
+            100,
+            { maxWait: 500 }
+          );
+          await getChildPackageHistoryTree({
+            label: pkg.Label,
+            callback: childCallback,
+          });
+
           if (ctx.state.status !== PackageHistoryStatus.HALTED) {
             ctx.commit(PackageHistoryMutations.SET_STATUS, {
               status: PackageHistoryStatus.SUCCESS,
