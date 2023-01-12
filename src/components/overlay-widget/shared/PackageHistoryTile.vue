@@ -1,22 +1,22 @@
 <template>
   <div class="flex flex-col items-center">
-    <template v-if="ancestorTree">
+    <template v-if="parentTree">
       <template v-if="depth < maxDepth">
         <div class="flex flex-row no-wrap gap-1">
           <package-history-tile
-            v-for="subtree of ancestorTree.ancestors"
+            v-for="subtree of parentTree.parents"
             v-bind:key="nodeId + '_' + subtree.label"
-            :ancestorTree="subtree"
+            :parentTree="subtree"
             :depth="depth + 1"
             :maxDepth="maxDepth"
           ></package-history-tile>
         </div>
         <div
-          v-if="ancestorTree.ancestors.length > 0"
+          v-if="parentTree.parents.length > 0"
           class="w-full flex flex-row justify-center"
           :class="{
-            'one-parent': ancestorTree.ancestors.length === 1,
-            'multi-parent': ancestorTree.ancestors.length > 1,
+            'one-parent': parentTree.parents.length === 1,
+            'multi-parent': parentTree.parents.length > 1,
           }"
         >
           <div style="border-right: 1px solid black" class="h-6"></div>
@@ -29,14 +29,14 @@
         >
           <div class="flex flex-row items-center justify-between gap-2">
             <span>
-              <div>{{ ancestorTree.pkg.LicenseNumber }}</div>
+              <div>{{ parentTree.pkg.LicenseNumber }}</div>
             </span>
 
-            <b-badge :variant="getBadgeVariant(ancestorTree.pkg.PackageState)">{{
-              ancestorTree.pkg.PackageState
+            <b-badge :variant="getBadgeVariant(parentTree.pkg.PackageState)">{{
+              parentTree.pkg.PackageState
             }}</b-badge>
           </div>
-          <div class="font-bold">{{ ancestorTree.label }}</div>
+          <div class="font-bold">{{ parentTree.label }}</div>
         </div>
         <template v-if="isOrigin">
           <hr />
@@ -47,25 +47,25 @@
               icon="box"
               style="width: 5rem"
               class="flex-shrink-0"
-              :textClass="ancestorTree.pkg.Quantity === 0 ? 'text-red-500' : ''"
-              :text="`${ancestorTree.pkg.Quantity} ${ancestorTree.pkg.UnitOfMeasureAbbreviation}`"
+              :textClass="parentTree.pkg.Quantity === 0 ? 'text-red-500' : ''"
+              :text="`${parentTree.pkg.Quantity} ${parentTree.pkg.UnitOfMeasureAbbreviation}`"
             />
 
             <picker-card
               class="flex-grow"
-              :title="`${ancestorTree.pkg.Item.Name}`"
-              :label="ancestorTree.pkg.Label"
+              :title="`${parentTree.pkg.Item.Name}`"
+              :label="parentTree.pkg.Label"
             />
           </div>
         </template>
-        <template v-if="ancestorTree.type === HistoryTreeNodeType.OWNED_PACKAGE">
+        <template v-if="parentTree.type === HistoryTreeNodeType.OWNED_PACKAGE">
           <hr />
           <div class="p-2">
-            <div v-if="ancestorTree.pkg.PackagedByFacilityLicenseNumber">
-              Packaged by {{ ancestorTree.pkg.PackagedByFacilityLicenseNumber }}
+            <div v-if="parentTree.pkg.PackagedByFacilityLicenseNumber">
+              Packaged by {{ parentTree.pkg.PackagedByFacilityLicenseNumber }}
             </div>
-            <div v-if="ancestorTree.pkg.ReceivedFromFacilityLicenseNumber">
-              Recieved from {{ ancestorTree.pkg.ReceivedFromFacilityLicenseNumber }}
+            <div v-if="parentTree.pkg.ReceivedFromFacilityLicenseNumber">
+              Recieved from {{ parentTree.pkg.ReceivedFromFacilityLicenseNumber }}
             </div>
           </div>
         </template>
@@ -152,13 +152,13 @@
 import PickerCard from "@/components/overlay-widget/shared/PickerCard.vue";
 import PickerIcon from "@/components/overlay-widget/shared/PickerIcon.vue";
 import { HistoryTreeNodeType, PackageState } from "@/consts";
-import { IPackageAncestorTreeNode, IPackageChildTreeNode } from "@/interfaces";
+import { IPackageChildTreeNode, IPackageParentTreeNode } from "@/interfaces";
 import router from "@/router/index";
 import store from "@/store/page-overlay/index";
 import { unitOfMeasureNameToAbbreviation } from "@/utils/units";
+import { v4 as uuidv4 } from "uuid";
 import Vue from "vue";
 import { mapState } from "vuex";
-import { v4 as uuidv4} from "uuid";
 
 export default Vue.extend({
   name: "PackageHistoryTile",
@@ -176,8 +176,8 @@ export default Vue.extend({
       type: Object as () => IPackageChildTreeNode,
       required: false,
     },
-    ancestorTree: {
-      type: Object as () => IPackageAncestorTreeNode,
+    parentTree: {
+      type: Object as () => IPackageParentTreeNode,
       required: false,
     },
   },

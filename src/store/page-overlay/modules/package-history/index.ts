@@ -2,9 +2,11 @@ import { MessageType } from "@/consts";
 import {
   IHarvestHistoryData,
   IIndexedPackageData,
-  IPackageAncestorTreeNode,
+  IPackageChildTree,
   IPackageChildTreeNode,
   IPackageData,
+  IPackageParentTree,
+  IPackageParentTreeNode,
   IPluginState,
 } from "@/interfaces";
 import { analyticsManager } from "@/modules/analytics-manager.module";
@@ -28,7 +30,7 @@ const inMemoryState = {
   sourcePackage: null,
   status: PackageHistoryStatus.INITIAL,
   log: [],
-  ancestorTree: null,
+  parentTree: null,
   childTree: null,
   sourceHarvests: [],
   maxLookupDepth: null,
@@ -70,22 +72,22 @@ export const packageHistoryModule = {
     ) {
       state.sourceHarvests = sourceHarvests;
     },
-    [PackageHistoryMutations.SET_ANCESTORS](
+    [PackageHistoryMutations.SET_PARENTS](
       state: IPackageHistoryState,
       {
-        ancestorTree,
+        parentTree,
       }: {
-        ancestorTree: IPackageAncestorTreeNode;
+        parentTree: IPackageParentTree;
       }
     ) {
-      state.ancestorTree = ancestorTree;
+      state.parentTree = parentTree;
     },
     [PackageHistoryMutations.SET_CHILDREN](
       state: IPackageHistoryState,
       {
         childTree,
       }: {
-        childTree: IPackageChildTreeNode;
+        childTree: IPackageChildTree;
       }
     ) {
       state.childTree = childTree;
@@ -97,7 +99,7 @@ export const packageHistoryModule = {
       state.status = status;
       if (status === PackageHistoryStatus.INITIAL) {
         state.log = [];
-        state.ancestorTree = null;
+        state.parentTree = null;
         state.childTree = null;
         state.sourceHarvests = [];
       }
@@ -109,8 +111,8 @@ export const packageHistoryModule = {
       getters: any,
       rootState: any,
       rootGetters: any
-    ): IPackageAncestorTreeNode[] => {
-      if (!state.ancestorTree) {
+    ): IPackageParentTreeNode[] => {
+      if (!state.parentTree) {
         return [];
       }
 
@@ -118,14 +120,14 @@ export const packageHistoryModule = {
         return [];
       }
 
-      const packageMap: Map<string, IPackageAncestorTreeNode> = new Map();
+      const packageMap: Map<string, IPackageParentTreeNode> = new Map();
 
-      const stack: [IPackageAncestorTreeNode, number][] = [
-        [state.ancestorTree[state.sourcePackage.Label], 0],
+      const stack: [IPackageParentTreeNode, number][] = [
+        [state.parentTree[state.sourcePackage.Label], 0],
       ];
 
       while (stack.length > 0) {
-        const [node, depth] = stack.pop() as [IPackageAncestorTreeNode, number];
+        const [node, depth] = stack.pop() as [IPackageParentTreeNode, number];
 
         if (state.maxLookupDepth !== null && depth > state.maxLookupDepth) {
           continue;
@@ -135,10 +137,10 @@ export const packageHistoryModule = {
           packageMap.set(node.label, node);
         }
 
-        node.ancestors.map((ancestor) =>
+        node.parents.map((parent) =>
           stack.push([
             // @ts-ignore
-            state.ancestorTree[ancestor],
+            state.parentTree[parent],
             depth + 1,
           ])
         );
@@ -151,10 +153,10 @@ export const packageHistoryModule = {
       getters: any,
       rootState: any,
       rootGetters: any
-    ): IPackageAncestorTreeNode[][] => {
-      const generations: IPackageAncestorTreeNode[][] = [];
+    ): IPackageParentTreeNode[][] => {
+      const generations: IPackageParentTreeNode[][] = [];
 
-      if (!state.ancestorTree) {
+      if (!state.parentTree) {
         return [];
       }
 
@@ -162,12 +164,12 @@ export const packageHistoryModule = {
         return [];
       }
 
-      const stack: [IPackageAncestorTreeNode, number][] = [
-        [state.ancestorTree[state.sourcePackage.Label], 0],
+      const stack: [IPackageParentTreeNode, number][] = [
+        [state.parentTree[state.sourcePackage.Label], 0],
       ];
 
       while (stack.length > 0) {
-        const [node, depth] = stack.pop() as [IPackageAncestorTreeNode, number];
+        const [node, depth] = stack.pop() as [IPackageParentTreeNode, number];
 
         if (state.maxLookupDepth !== null && depth > state.maxLookupDepth) {
           continue;
@@ -181,8 +183,8 @@ export const packageHistoryModule = {
           generations[depth].push(node);
         }
 
-        for (const ancestor of node.ancestors) {
-          stack.push([state.ancestorTree[ancestor], depth + 1]);
+        for (const parent of node.parents) {
+          stack.push([state.parentTree[parent], depth + 1]);
         }
       }
 
@@ -308,9 +310,9 @@ export const packageHistoryModule = {
 
           const parentCallback = _.debounce(
             (node) => {
-              console.log("setting ancestors");
-              ctx.commit(PackageHistoryMutations.SET_ANCESTORS, {
-                ancestorTree: _.cloneDeep(node),
+              console.log("setting parents");
+              ctx.commit(PackageHistoryMutations.SET_PARENTS, {
+                parentTree: _.cloneDeep(node),
               });
             },
             2000,

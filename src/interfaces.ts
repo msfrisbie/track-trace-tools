@@ -1464,10 +1464,18 @@ export interface IHistoryTreeNode {
   history: IPackageHistoryData[];
 }
 
-export interface IPackageAncestorTreeNode extends IHistoryTreeNode {
-  ancestors: string[]
+export interface IPackageParentTreeNode extends IHistoryTreeNode {
+  parents: string[];
 }
 
 export interface IPackageChildTreeNode extends IHistoryTreeNode {
   children: string[];
+}
+
+export interface IPackageParentTree {
+  [key: string]: IPackageParentTreeNode;
+}
+
+export interface IPackageChildTree {
+  [key: string]: IPackageChildTreeNode;
 }

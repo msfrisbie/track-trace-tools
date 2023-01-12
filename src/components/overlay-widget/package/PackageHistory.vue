@@ -105,7 +105,7 @@
                   </div>
                   <div class="flex flex-col items-start overflow-auto toolkit-scroll pb-4">
                     <package-history-tile
-                      :ancestorTree="ancestorTree"
+                      :parentTree="parentTree"
                       :depth="0"
                       :maxDepth="mergedMaxVisibleDepth"
                       :isOrigin="true"
@@ -122,7 +122,7 @@
                       variant="outline-primary"
                       @click="
                         downloadGenerationCsv(
-                          ancestorGenerations,
+                          parentGenerations,
                           `${sourcePackage.Label}_parent_generations.csv`
                         )
                       "
@@ -131,7 +131,7 @@
                   </div>
                   <div class="flex flex-col gap-8">
                     <div
-                      v-for="(generation, i) of ancestorGenerations"
+                      v-for="(generation, i) of parentGenerations"
                       v-bind:key="i"
                       class="flex flex-row gap-8"
                     >
@@ -140,7 +140,7 @@
                         <package-history-tile
                           v-for="node of generation"
                           v-bind:key="node.label"
-                          :ancestorTree="node"
+                          :parentTree="node"
                           :depth="0"
                           :maxDepth="0"
                           :isOrigin="node.label === sourcePackage.Label"
@@ -154,9 +154,7 @@
                   <div class="p-8">
                     <b-button
                       variant="outline-primary"
-                      @click="
-                        downloadListCsv(ancestorList, `${sourcePackage.Label}_parent_list.csv`)
-                      "
+                      @click="downloadListCsv(parentList, `${sourcePackage.Label}_parent_list.csv`)"
                       >DOWNLOAD CSV</b-button
                     >
                   </div>
@@ -164,7 +162,7 @@
                     <b-table
                       striped
                       hover
-                      :items="ancestorList"
+                      :items="parentList"
                       :fields="[
                         'label',
                         'pkg.LicenseNumber',
@@ -413,7 +411,7 @@ export default Vue.extend({
   computed: {
     ...mapState<IPluginState>({
       sourcePackage: (state: IPluginState) => state.packageHistory.sourcePackage,
-      ancestorTree: (state: IPluginState) => state.packageHistory.ancestorTree,
+      parentTree: (state: IPluginState) => state.packageHistory.parentTree,
       childTree: (state: IPluginState) => state.packageHistory.childTree,
       sourceHarvests: (state: IPluginState) => state.packageHistory.sourceHarvests,
       status: (state: IPluginState) => state.packageHistory.status,
@@ -421,8 +419,8 @@ export default Vue.extend({
       maxLookupDepth: (state: IPluginState) => state.packageHistory.maxLookupDepth,
     }),
     ...mapGetters({
-      ancestorList: `packageHistory/${PackageHistoryGetters.ANCESTOR_LIST}`,
-      ancestorGenerations: `packageHistory/${PackageHistoryGetters.ANCESTOR_GENERATIONS}`,
+      parentList: `packageHistory/${PackageHistoryGetters.ANCESTOR_LIST}`,
+      parentGenerations: `packageHistory/${PackageHistoryGetters.ANCESTOR_GENERATIONS}`,
       childList: `packageHistory/${PackageHistoryGetters.CHILD_LIST}`,
       childGenerations: `packageHistory/${PackageHistoryGetters.CHILD_GENERATIONS}`,
     }),

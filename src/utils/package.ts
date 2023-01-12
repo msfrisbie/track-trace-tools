@@ -1,12 +1,11 @@
 import { HistoryTreeNodeType, PackageFilterIdentifiers, PackageState } from "@/consts";
 import {
   IHarvestHistoryData,
-  IIndexedHarvestData,
   IIndexedPackageData,
-  IPackageAncestorTreeNode,
   IPackageChildTreeNode,
   IPackageData,
   IPackageHistoryData,
+  IPackageParentTreeNode,
 } from "@/interfaces";
 import { authManager } from "@/modules/auth-manager.module";
 import {
@@ -23,10 +22,7 @@ import {
 } from "@/store/page-overlay/modules/package-history/consts";
 import { LRU } from "./cache";
 import { downloadFileFromUrl } from "./dom";
-import {
-  extractChildPackageLabelsFromHistory,
-  extractParentPackageLabelsFromHistory,
-} from "./history";
+import { extractParentPackageLabelsFromHistory } from "./history";
 
 export async function getLabTestUrlsFromPackage({
   pkg,
@@ -141,8 +137,8 @@ export function packageFieldMatch(
   return null;
 }
 
-interface IRootAncestorHistoryContext {
-  treeNodeCache: Map<string, IPackageAncestorTreeNode>;
+interface IRootParentHistoryContext {
+  treeNodeCache: Map<string, IPackageParentTreeNode>;
   licenseCache: LRU<string>;
   packageStateCache: LRU<PackageState>;
 }
@@ -152,9 +148,9 @@ export async function getParentPackageHistoryTree({
   callback,
 }: {
   label: string;
-  callback?: (node: IPackageAncestorTreeNode) => void;
-}): Promise<IPackageAncestorTreeNode> {
-  const treeNodeCache: Map<string, IPackageAncestorTreeNode> = new Map();
+  callback?: (node: IPackageParentTreeNode) => void;
+}): Promise<IPackageParentTreeNode> {
+  const treeNodeCache: Map<string, IPackageParentTreeNode> = new Map();
   const ownedLicenses: string[] = (await facilityManager.ownedFacilitiesOrError()).map(
     (facility) => facility.licenseNumber
   );
@@ -170,15 +166,15 @@ export async function getParentPackageHistoryTree({
     event: `License cache: ${licenseCache.elements.join(",\n")}`,
   });
 
-  const rootContext: IRootAncestorHistoryContext = {
+  const rootContext: IRootParentHistoryContext = {
     treeNodeCache,
     licenseCache,
     packageStateCache,
   };
 
-  const rootNode: IPackageAncestorTreeNode = await getPackageAncestorTreeNode(label, rootContext);
+  const rootNode: IPackageParentTreeNode = await getPackageParentTreeNode(label, rootContext);
 
-  const stack: [IPackageAncestorTreeNode, number][] = [[rootNode, 0]];
+  const stack: [IPackageParentTreeNode, number][] = [[rootNode, 0]];
   let loopCount = 0;
 
   while (stack.length > 0) {
@@ -192,13 +188,13 @@ export async function getParentPackageHistoryTree({
       continue;
     }
 
-    const [currentNode, depth] = stack.pop() as [IPackageAncestorTreeNode, number];
+    const [currentNode, depth] = stack.pop() as [IPackageParentTreeNode, number];
 
     if (
       store.state.packageHistory.maxLookupDepth === null ||
       depth <= store.state.packageHistory.maxLookupDepth
     ) {
-      for (const parentPackageLabel of currentNode.ancestors) {
+      for (const parentPackageLabel of currentNode.parents) {
         if (store.state.packageHistory.status !== PackageHistoryStatus.INFLIGHT) {
           store.dispatch(`packageHistory/${PackageHistoryActions.LOG_EVENT}`, {
             event: `Status: ${store.state.packageHistory.status}, exiting`,
@@ -210,7 +206,7 @@ export async function getParentPackageHistoryTree({
           continue;
         }
 
-        getPackageAncestorTreeNode(parentPackageLabel, rootContext).then((node) => {
+        getPackageParentTreeNode(parentPackageLabel, rootContext).then((node) => {
           stack.push([node, depth + 1]);
 
           callback && callback(rootNode);
@@ -226,15 +222,15 @@ export async function getParentPackageHistoryTree({
   return rootNode;
 }
 
-export async function getPackageAncestorTreeNode(
+export async function getPackageParentTreeNode(
   label: string,
-  rootContext: IRootAncestorHistoryContext
-): Promise<IPackageAncestorTreeNode> {
+  rootContext: IRootParentHistoryContext
+): Promise<IPackageParentTreeNode> {
   if (rootContext.treeNodeCache.has(label)) {
     store.dispatch(`packageHistory/${PackageHistoryActions.LOG_EVENT}`, {
       event: `Cache hit for ${label}`,
     });
-    return rootContext.treeNodeCache.get(label) as IPackageAncestorTreeNode;
+    return rootContext.treeNodeCache.get(label) as IPackageParentTreeNode;
   }
 
   let pkg: IIndexedPackageData | null = null;
@@ -288,12 +284,12 @@ export async function getPackageAncestorTreeNode(
     store.dispatch(`packageHistory/${PackageHistoryActions.LOG_EVENT}`, {
       event: `User does not have access to ${label}, is a terminal node`,
     });
-    const node: IPackageAncestorTreeNode = {
+    const node: IPackageParentTreeNode = {
       type: HistoryTreeNodeType.UNOWNED_PACKAGE,
       label,
       pkg: { Label: "STUB_PACKAGE" } as IIndexedPackageData,
       history: [],
-      ancestors: [],
+      parents: [],
     };
     rootContext.treeNodeCache.set(label, node);
     return node;
@@ -305,18 +301,18 @@ export async function getPackageAncestorTreeNode(
 
   const history: IPackageHistoryData[] = await dataLoader.packageHistoryByPackageId(pkg.Id);
 
-  const ancestors = extractParentPackageLabelsFromHistory(history);
+  const parents = extractParentPackageLabelsFromHistory(history);
 
   store.dispatch(`packageHistory/${PackageHistoryActions.LOG_EVENT}`, {
-    event: `${pkg.Label} has ${ancestors.length} parents`,
+    event: `${pkg.Label} has ${parents.length} parents`,
   });
 
-  const node: IPackageAncestorTreeNode = {
+  const node: IPackageParentTreeNode = {
     type: HistoryTreeNodeType.OWNED_PACKAGE,
     label,
     pkg,
     history,
-    ancestors,
+    parents,
   };
 
   rootContext.treeNodeCache.set(label, node);
@@ -330,14 +326,14 @@ export async function getPackageAncestorTreeNode(
 //   depth,
 // }: {
 //   label: string;
-//   rootContext: IRootAncestorHistoryContext;
+//   rootContext: IRootParentHistoryContext;
 //   depth: number;
-// }): Promise<IPackageAncestorTreeNode> {
+// }): Promise<IPackageParentTreeNode> {
 //   if (rootContext.treeNodeCache.has(label)) {
 //     store.dispatch(`packageHistory/${PackageHistoryActions.LOG_EVENT}`, {
 //       event: `Cache hit for ${label}`,
 //     });
-//     return rootContext.treeNodeCache.get(label) as IPackageAncestorTreeNode;
+//     return rootContext.treeNodeCache.get(label) as IPackageParentTreeNode;
 //   }
 
 //   let pkg: IIndexedPackageData | null = null;
@@ -391,12 +387,12 @@ export async function getPackageAncestorTreeNode(
 //     store.dispatch(`packageHistory/${PackageHistoryActions.LOG_EVENT}`, {
 //       event: `User does not have access to ${label}, is a terminal node`,
 //     });
-//     const node: IPackageAncestorTreeNode = {
+//     const node: IPackageParentTreeNode = {
 //       type: HistoryTreeNodeType.UNOWNED_PACKAGE,
 //       label,
 //       pkg: { Label: "STUB_PACKAGE" } as IIndexedPackageData,
 //       history: [],
-//       ancestors: [],
+//       parents: [],
 //     };
 //     rootContext.treeNodeCache.set(label, node);
 //     return node;
@@ -410,7 +406,7 @@ export async function getPackageAncestorTreeNode(
 
 //   const parentPackageLabels = extractParentPackageLabelsFromHistory(history);
 
-//   const parents: IPackageAncestorTreeNode[] = [];
+//   const parents: IPackageParentTreeNode[] = [];
 
 //   if (
 //     store.state.packageHistory.maxLookupDepth === null ||
@@ -444,12 +440,12 @@ export async function getPackageAncestorTreeNode(
 //     });
 //   }
 
-//   const node: IPackageAncestorTreeNode = {
+//   const node: IPackageParentTreeNode = {
 //     type: HistoryTreeNodeType.OWNED_PACKAGE,
 //     label,
 //     pkg,
 //     history,
-//     ancestors: parents,
+//     parents: parents,
 //   };
 
 //   rootContext.treeNodeCache.set(label, node);
