@@ -5,7 +5,7 @@
         <div class="flex flex-row no-wrap gap-1">
           <package-history-tile
             v-for="parentLabel of parentNode.parentLabels"
-            v-bind:key="nodeId + '_' + parentLabel"
+            v-bind:key="renderId + '_' + parentLabel"
             :parentLabel="parentLabel"
             :depth="depth + 1"
             :maxDepth="maxDepth"
@@ -133,7 +133,7 @@
         <div class="flex flex-row no-wrap gap-1">
           <package-history-tile
             v-for="childLabel of childNode.childLabels"
-            v-bind:key="nodeId + '_' + childLabel"
+            v-bind:key="renderId + '_' + childLabel"
             :childLabel="childLabel"
             :depth="depth + 1"
             :maxDepth="maxDepth"
@@ -166,7 +166,6 @@ import { IChildPackageTreeNode, IParentPackageTreeNode, IPluginState } from "@/i
 import router from "@/router/index";
 import store from "@/store/page-overlay/index";
 import { unitOfMeasureNameToAbbreviation } from "@/utils/units";
-import { v4 as uuidv4 } from "uuid";
 import Vue from "vue";
 import { mapState } from "vuex";
 
@@ -203,6 +202,7 @@ export default Vue.extend({
     ...mapState<IPluginState>({
       parentTree: (state: IPluginState) => state.packageHistory.parentTree,
       childNode: (state: IPluginState) => state.packageHistory.childTree,
+      renderId: (state: IPluginState) => state.packageHistory.renderId,
     }),
     parentNode(): IParentPackageTreeNode | null {
       if (!this.$store.state.packageHistory.parentTree) {
@@ -219,7 +219,6 @@ export default Vue.extend({
   },
   data() {
     return {
-      nodeId: uuidv4(),
       HistoryTreeNodeType,
     };
   },

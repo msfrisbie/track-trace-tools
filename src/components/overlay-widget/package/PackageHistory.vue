@@ -140,7 +140,7 @@
                       <div class="grid grid-cols-3 gap-2">
                         <package-history-tile
                           v-for="node of generation"
-                          v-bind:key="node.label"
+                          v-bind:key="renderId + '_' + node.label"
                           :parentLabel="node.label"
                           :depth="0"
                           :maxDepth="0"
@@ -236,7 +236,7 @@
                       <div class="grid grid-cols-3 gap-2">
                         <package-history-tile
                           v-for="node of generation"
-                          v-bind:key="node.label"
+                          v-bind:key="renderId + '_' + node.label"
                           :childLabel="node.label"
                           :depth="0"
                           :maxDepth="0"
@@ -396,6 +396,7 @@ import {
 import { getUrl } from "@/utils/assets";
 import { downloadCsvFile } from "@/utils/csv";
 import { unitOfMeasureNameToAbbreviation } from "@/utils/units";
+import { v4 as uuidv4 } from "uuid";
 import Vue from "vue";
 import { mapActions, mapGetters, mapState } from "vuex";
 
@@ -419,6 +420,7 @@ export default Vue.extend({
       status: (state: IPluginState) => state.packageHistory.status,
       log: (state: IPluginState) => state.packageHistory.log,
       maxLookupDepth: (state: IPluginState) => state.packageHistory.maxLookupDepth,
+      renderId: (state: IPluginState) => state.packageHistory.renderId,
     }),
     ...mapGetters({
       parentList: `packageHistory/${PackageHistoryGetters.PARENT_LIST}`,

@@ -223,7 +223,7 @@ export async function getParentPackageHistoryTree({
       }
 
       inflightCount++;
-      getParentPackageTreeNodeOrNull(parentPackageLabel, rootContext)
+      await getParentPackageTreeNodeOrNull(parentPackageLabel, rootContext)
         .then((node) => {
           if (node !== null) {
             stack.push([node, depth + 1]);

@@ -13,6 +13,7 @@ import { analyticsManager } from "@/modules/analytics-manager.module";
 import { clientBuildManager } from "@/modules/client-build-manager.module";
 import { getParentHarvests, getParentPackageHistoryTree } from "@/utils/package";
 import _ from "lodash";
+import { v4 as uuidv4 } from "uuid";
 import { ActionContext } from "vuex";
 import {
   PackageHistoryActions,
@@ -30,6 +31,7 @@ const inMemoryState = {
   childTree: null,
   sourceHarvests: [],
   maxLookupDepth: null,
+  renderId: uuidv4(),
 };
 
 const persistedState = {};
@@ -76,6 +78,7 @@ export const packageHistoryModule = {
         parentTree: IParentPackageTree;
       }
     ) {
+      state.renderId = uuidv4();
       state.parentTree = parentTree;
     },
     [PackageHistoryMutations.SET_CHILDREN](
@@ -195,7 +198,7 @@ export const packageHistoryModule = {
           generations[depth] = [];
         }
 
-        if (!generations[depth].includes(node)) {
+        if (!generations[depth].find((x) => x.label === node.label)) {
           generations[depth].push(node);
         }
 

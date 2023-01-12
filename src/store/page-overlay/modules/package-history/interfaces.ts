@@ -14,4 +14,5 @@ export interface IPackageHistoryState {
   sourceHarvests: IHarvestHistoryData[];
   maxLookupDepth: number | null;
   log: string[];
+  renderId: string;
 }
