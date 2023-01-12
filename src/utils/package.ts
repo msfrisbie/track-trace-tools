@@ -194,12 +194,6 @@ export async function getParentPackageHistoryTree({
       throw new Error("Detected infinite loop");
     }
 
-    if (!stack.length) {
-      console.log("Empty stack, waiting 100ms");
-      await new Promise((resolve) => setTimeout(resolve, 100));
-      continue;
-    }
-
     const [currentNode, depth] = stack.shift() as [IParentPackageTreeNode, number];
 
     if (
@@ -229,10 +223,12 @@ export async function getParentPackageHistoryTree({
           stack.push([node, depth + 1]);
         }
 
-        callback && callback(rootContext.tree);
+        callback(rootContext.tree);
       });
     }
   }
+
+  callback(rootContext.tree);
 
   return rootContext.tree;
 }
@@ -380,12 +376,6 @@ export async function getChildPackageHistoryTree({
       throw new Error("Detected infinite loop");
     }
 
-    if (!stack.length) {
-      console.log("Empty stack, waiting 100ms");
-      await new Promise((resolve) => setTimeout(resolve, 100));
-      continue;
-    }
-
     const [currentNode, depth] = stack.shift() as [IChildPackageTreeNode, number];
 
     if (
@@ -415,10 +405,12 @@ export async function getChildPackageHistoryTree({
           stack.push([node, depth + 1]);
         }
 
-        callback && callback(rootContext.tree);
+        callback(rootContext.tree);
       });
     }
   }
+
+  callback(rootContext.tree);
 
   return rootContext.tree;
 }
@@ -515,7 +507,20 @@ export async function getChildPackageTreeNodeOrNull(
 }
 
 export async function getParentHarvests(label: string): Promise<IHarvestHistoryData[]> {
-  const pkg = await primaryDataLoader.activePackage(label);
+  let pkg: IIndexedPackageData | null = null;
+  try {
+    pkg = await primaryDataLoader.activePackage(label);
+  } catch {}
+  try {
+    pkg = await primaryDataLoader.inactivePackage(label);
+  } catch {}
+  try {
+    pkg = await primaryDataLoader.inTransitPackage(label);
+  } catch {}
+
+  if (!pkg) {
+    throw new Error("Package not found");
+  }
 
   const history: IHarvestHistoryData[] = await primaryDataLoader.packageHarvestHistoryByPackageId(
     pkg.Id

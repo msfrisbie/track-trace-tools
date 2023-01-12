@@ -22,7 +22,7 @@
           <div style="border-right: 1px solid black" class="h-6"></div>
         </div>
       </template>
-      <b-card no-body>
+      <b-card no-body :id="nodeId">
         <div
           class="flex flex-col items-stretch gap-1 p-2"
           v-bind:class="{ 'bg-gray-200': !isOrigin, 'bg-purple-100': isOrigin }"
@@ -71,7 +71,7 @@
     </template>
 
     <template v-if="childNode">
-      <b-card no-body>
+      <b-card no-body :id="nodeId">
         <div
           class="flex flex-col items-stretch gap-1 p-2"
           v-bind:class="{ 'bg-gray-200': !isOrigin, 'bg-purple-100': isOrigin }"
@@ -126,7 +126,6 @@
             'one-child': childNode.childLabels.length === 1,
             'multi-child': childNode.childLabels.length > 1,
           }"
-          style="border-bottom: 1px solid black"
         >
           <div style="border-right: 1px solid black" class="h-6"></div>
         </div>
@@ -214,6 +213,21 @@ export default Vue.extend({
         return null;
       }
       return this.$store.state.packageHistory.childTree[this.childLabel];
+    },
+    nodeId(): string {
+      if (this.parentLabel) {
+        if (this.isOrigin) {
+          return "parent-origin";
+        }
+      }
+
+      if (this.parentLabel) {
+        if (this.isOrigin) {
+          return "child-origin";
+        }
+      }
+
+      return "";
     },
   },
   data() {

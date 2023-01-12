@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-col items-stretch w-full h-full">
+  <div class="flex flex-col items-stretch w-full h-full max-h-full overflow-auto">
     <template v-if="validClient()">
       <div class="flex flex-col gap-4">
         <template v-if="!sourcePackage">
@@ -10,73 +10,6 @@
             v-on:addPackage="setPackage({ pkg: $event })"
             :selectAllPackageTypes="true"
           ></single-package-picker>
-        </template>
-        <template v-else>
-          <div class="flex flex-col gap-4 items-center">
-            <div class="flex flex-row items-start gap-8">
-              <div class="flex flex-col items-stretch gap-4 w-60">
-                <template v-if="status === PackageHistoryStatus.INFLIGHT">
-                  <b-button @click="halt({})" variant="outline-primary"> STOP </b-button>
-                </template>
-                <template
-                  v-if="
-                    [PackageHistoryStatus.INFLIGHT, PackageHistoryStatus.INITIAL].includes(status)
-                  "
-                >
-                  <b-form-group>
-                    <b-form-input
-                      v-model="maxLookupDepth"
-                      @change="maybeSetMaxVisibleDepth($event)"
-                      placeholder="Generation limit"
-                      type="number"
-                      step="1"
-                      min="0"
-                    ></b-form-input>
-                    <div class="text-xs text-gray-300">
-                      How many generations to look up? A smaller number will finish faster.
-                    </div>
-                  </b-form-group>
-                </template>
-                <template v-if="status === PackageHistoryStatus.ERROR">
-                  <div class="text-red-500">
-                    <span
-                      >Something went wrong while generating the history. See log for detail.</span
-                    >
-                  </div>
-                </template>
-
-                <template
-                  v-if="
-                    [
-                      PackageHistoryStatus.SUCCESS,
-                      PackageHistoryStatus.ERROR,
-                      PackageHistoryStatus.HALTED,
-                    ].includes(status)
-                  "
-                >
-                  <b-button @click="setPackage({ pkg: null })" variant="outline-primary">
-                    RESET
-                  </b-button>
-                </template>
-              </div>
-            </div>
-          </div>
-
-          <div v-if="typeof maxLookupDepth === 'number'" class="text-red-500 text-center">
-            You have set a generation limit of {{ maxLookupDepth }}. The displayed results may not
-            be complete.
-          </div>
-
-          <div v-if="status === PackageHistoryStatus.HALTED" class="text-red-500 text-center">
-            You stopped the lookup process. The displayed results may not be complete.
-          </div>
-
-          <template v-if="status == PackageHistoryStatus.INFLIGHT">
-            <div class="flex flex-row justify-center items-center gap-2">
-              <b-spinner small></b-spinner>
-              <span>Building history, this can take a minute...</span>
-            </div>
-          </template>
         </template>
 
         <b-card no-body>
@@ -89,10 +22,10 @@
                 nav-wrapper-class="bg-purple-100 py-2"
               >
                 <b-tab no-body title="Tree" active>
-                  <div class="p-2 flex flex-row justify-center gap-4">
+                  <div class="p-2 flex flex-row justify-center items-center gap-4">
                     <b-form-group label="Visible generations" class="w-36">
                       <vue-slider
-                        v-model="maxVisibleDepth"
+                        v-model="parentMaxVisibleDepth"
                         :min="1"
                         :max="20"
                         :interval="1"
@@ -100,19 +33,34 @@
                     </b-form-group>
 
                     <b-form-group label="Tree zoom" class="w-36">
-                      <vue-slider v-model="zoom" :min="0.1" :max="1" :interval="0.05"></vue-slider>
+                      <vue-slider
+                        v-model="parentZoom"
+                        :min="0.01"
+                        :max="1"
+                        :interval="0.01"
+                      ></vue-slider>
                     </b-form-group>
+
+                    <b-form-checkbox v-model="parentAutoZoom"> Auto zoom </b-form-checkbox>
+
+                    <b-button variant="outline-primary" @click="scrollToRootParent()"
+                      >SCROLL TO ROOT</b-button
+                    >
                   </div>
-                  <div class="flex flex-col items-start overflow-auto toolkit-scroll pb-4">
+                  <div
+                    id="parent-container"
+                    class="flex flex-col items-start overflow-auto toolkit-scroll pb-4"
+                  >
                     <package-history-tile
+                      id="parent-tree"
                       v-if="parentTree"
                       :parentLabel="sourcePackage.Label"
                       :depth="0"
-                      :maxDepth="mergedMaxVisibleDepth"
+                      :maxDepth="parentMaxVisibleDepth"
                       :isOrigin="true"
                       style="transform-origin: 0% 0% 0px"
                       v-bind:style="{
-                        transform: `scale(${zoom})`,
+                        transform: `scale(${parentZoom})`,
                       }"
                     ></package-history-tile>
                   </div>
@@ -185,10 +133,10 @@
                 nav-wrapper-class="bg-purple-100 py-2"
               >
                 <b-tab no-body title="Tree">
-                  <div class="p-2 flex flex-row justify-center gap-4">
+                  <div class="p-2 flex flex-row items-center justify-center gap-4">
                     <b-form-group label="Visible generations" class="w-36">
                       <vue-slider
-                        v-model="maxVisibleDepth"
+                        v-model="childMaxVisibleDepth"
                         :min="1"
                         :max="20"
                         :interval="1"
@@ -196,19 +144,34 @@
                     </b-form-group>
 
                     <b-form-group label="Tree zoom" class="w-36">
-                      <vue-slider v-model="zoom" :min="0.1" :max="1" :interval="0.05"></vue-slider>
+                      <vue-slider
+                        v-model="childZoom"
+                        :min="0.01"
+                        :max="1"
+                        :interval="0.01"
+                      ></vue-slider>
                     </b-form-group>
+
+                    <b-form-checkbox v-model="childAutoZoom"> Auto zoom </b-form-checkbox>
+
+                    <b-button variant="outline-primary" @click="scrollToRootChild()"
+                      >SCROLL TO ROOT</b-button
+                    >
                   </div>
-                  <div class="flex flex-col items-start overflow-auto toolkit-scroll pb-4">
+                  <div
+                    id="child-container"
+                    class="flex flex-col items-start overflow-auto toolkit-scroll pb-4"
+                  >
                     <package-history-tile
+                      id="child-tree"
                       v-if="childTree"
                       :childLabel="sourcePackage.Label"
                       :depth="0"
-                      :maxDepth="mergedMaxVisibleDepth"
+                      :maxDepth="childMaxVisibleDepth"
                       :isOrigin="true"
                       style="transform-origin: 0% 0% 0px"
                       v-bind:style="{
-                        transform: `scale(${zoom})`,
+                        transform: `scale(${childZoom})`,
                       }"
                     ></package-history-tile>
                   </div>
@@ -359,6 +322,79 @@
               </div>
             </b-tab>
           </b-tabs>
+          <b-card-footer class="bg-white sticky bottom-0" v-if="sourcePackage">
+            <template>
+              <div class="flex flex-col gap-4 items-center">
+                <div class="flex flex-row items-start gap-8">
+                  <div class="flex flex-row justify-center items-center gap-4">
+                    <template
+                      v-if="
+                        [
+                          PackageHistoryStatus.SUCCESS,
+                          PackageHistoryStatus.ERROR,
+                          PackageHistoryStatus.HALTED,
+                        ].includes(status)
+                      "
+                    >
+                      <b-button @click="setPackage({ pkg: null })" variant="outline-primary">
+                        RESET
+                      </b-button>
+                    </template>
+                    <template v-if="status === PackageHistoryStatus.INFLIGHT">
+                      <b-button @click="halt({})" variant="outline-primary"> STOP </b-button>
+                    </template>
+                    <template
+                      v-if="
+                        [PackageHistoryStatus.INFLIGHT, PackageHistoryStatus.INITIAL].includes(
+                          status
+                        )
+                      "
+                    >
+                      <b-form-group>
+                        <b-form-input
+                          v-model="maxLookupDepth"
+                          @change="maybeSetMaxVisibleDepth($event)"
+                          placeholder="Generation limit"
+                          type="number"
+                          step="1"
+                          min="0"
+                        ></b-form-input>
+                        <div class="text-xs text-gray-300">
+                          How many generations to look up? A smaller number will finish faster.
+                        </div>
+                      </b-form-group>
+                    </template>
+                  </div>
+                  <div clas="flex flex-col gap-4 items-center">
+                    <template v-if="status === PackageHistoryStatus.ERROR">
+                      <div class="text-red-500">
+                        <span
+                          >Something went wrong while generating the history. See log for
+                          detail.</span
+                        >
+                      </div>
+                    </template>
+                  </div>
+                </div>
+              </div>
+
+              <div v-if="typeof maxLookupDepth === 'number'" class="text-red-500 text-center">
+                You have set a generation limit of {{ maxLookupDepth }}. The displayed results may
+                not be complete.
+              </div>
+
+              <div v-if="status === PackageHistoryStatus.HALTED" class="text-red-500 text-center">
+                You stopped the lookup process. The displayed results may not be complete.
+              </div>
+
+              <template v-if="status == PackageHistoryStatus.INFLIGHT">
+                <div class="flex flex-row justify-center items-center gap-2">
+                  <b-spinner small></b-spinner>
+                  <span>Building history, this can take a minute...</span>
+                </div>
+              </template>
+            </template>
+          </b-card-footer>
         </b-card>
       </div>
       <!-- </template> -->
@@ -396,7 +432,6 @@ import {
 import { getUrl } from "@/utils/assets";
 import { downloadCsvFile } from "@/utils/csv";
 import { unitOfMeasureNameToAbbreviation } from "@/utils/units";
-import { v4 as uuidv4 } from "uuid";
 import Vue from "vue";
 import { mapActions, mapGetters, mapState } from "vuex";
 
@@ -427,15 +462,6 @@ export default Vue.extend({
       childList: `packageHistory/${PackageHistoryGetters.CHILD_LIST}`,
       childGenerations: `packageHistory/${PackageHistoryGetters.CHILD_GENERATIONS}`,
     }),
-    mergedMaxVisibleDepth(): number {
-      return this.$data.maxVisibleDepth;
-
-      // if (!this.maxLookupDepth) {
-      //   return this.$data.maxVisibleDepth;
-      // } else {
-      //   return Math.min(this.maxLookupDepth as number, this.$data.maxVisibleDepth);
-      // }
-    },
     maxLookupDepth: {
       get(): number | null {
         return this.$store.state.packageHistory.maxLookupDepth;
@@ -450,8 +476,12 @@ export default Vue.extend({
   },
   data() {
     return {
-      maxVisibleDepth: 20,
-      zoom: 1,
+      childMaxVisibleDepth: 20,
+      parentMaxVisibleDepth: 20,
+      parentZoom: 1,
+      childZoom: 1,
+      parentAutoZoom: true,
+      childAutoZoom: true,
       PackageHistoryStatus,
       demoImageUrl: "",
     };
@@ -464,7 +494,8 @@ export default Vue.extend({
     maybeSetMaxVisibleDepth(e: any) {
       const maxLookupDepth = parseInt(e as string, 10);
       if (typeof maxLookupDepth === "number") {
-        this.$data.maxVisibleDepth = maxLookupDepth;
+        this.$data.childMaxVisibleDepth = maxLookupDepth;
+        this.$data.parentMaxVisibleDepth = maxLookupDepth;
       }
     },
     downloadListCsv(historyList: IHistoryTreeNode[], filename: string) {
@@ -505,6 +536,76 @@ export default Vue.extend({
     unitOfMeasureNameToAbbreviation,
     validClient(): boolean {
       return clientBuildManager.assertValues(["ENABLE_PACKAGE_HISTORY"]);
+    },
+    scrollToRootParent() {
+      const container: HTMLElement | null = document.querySelector("#parent-container");
+      const node: HTMLElement | null = document.querySelector("#parent-origin");
+
+      if (!container || !node) {
+        return;
+      }
+
+      this.$data.parentZoom = 1;
+      container.scrollTo(node.offsetLeft, node.offsetTop);
+    },
+    scrollToRootChild() {
+      const container: HTMLElement | null = document.querySelector("#child-container");
+      const node: HTMLElement | null = document.querySelector("#child-origin");
+
+      if (!container || !node) {
+        return;
+      }
+
+      this.$data.childZoom = 1;
+      container.scrollTo(node.offsetLeft, node.offsetTop);
+    },
+  },
+  watch: {
+    parentTree: {
+      immediate: true,
+      handler(newValue, oldValue) {
+        setTimeout(() => {
+          if (!this.$data.parentAutoZoom) {
+            return;
+          }
+
+          const container = document.querySelector("#parent-container");
+          const content = document.querySelector("#parent-tree");
+
+          if (!container || !content) {
+            return;
+          }
+
+          const ratio = content.clientWidth / container.clientWidth;
+
+          if (ratio > 1) {
+            this.$data.parentZoom = Math.round((1 / ratio) * 100) / 100;
+          }
+        }, 100);
+      },
+    },
+    childTree: {
+      immediate: true,
+      handler(newValue, oldValue) {
+        setTimeout(() => {
+          if (!this.$data.childAutoZoom) {
+            return;
+          }
+
+          const container = document.querySelector("#child-container");
+          const content = document.querySelector("#child-tree");
+
+          if (!container || !content) {
+            return;
+          }
+
+          const ratio = content.clientWidth / container.clientWidth;
+
+          if (ratio > 1) {
+            this.$data.childZoom = Math.round((1 / ratio) * 100) / 100;
+          }
+        }, 100);
+      },
     },
   },
   async created() {},
