@@ -105,7 +105,7 @@
                   </div>
                   <div class="flex flex-col items-start overflow-auto toolkit-scroll pb-4">
                     <package-history-tile
-                      :parentTree="parentTree"
+                      :parentLabel="sourcePackage.Label"
                       :depth="0"
                       :maxDepth="mergedMaxVisibleDepth"
                       :isOrigin="true"
@@ -140,7 +140,7 @@
                         <package-history-tile
                           v-for="node of generation"
                           v-bind:key="node.label"
-                          :parentTree="node"
+                          :parentLabel="node.label"
                           :depth="0"
                           :maxDepth="0"
                           :isOrigin="node.label === sourcePackage.Label"
@@ -200,7 +200,7 @@
                   </div>
                   <div class="flex flex-col items-start overflow-auto toolkit-scroll pb-4">
                     <package-history-tile
-                      :childTree="childTree"
+                      :childLabel="sourcePackage.Label"
                       :depth="0"
                       :maxDepth="mergedMaxVisibleDepth"
                       :isOrigin="true"
@@ -235,7 +235,7 @@
                         <package-history-tile
                           v-for="node of generation"
                           v-bind:key="node.label"
-                          :childTree="node"
+                          :childLabel="node.label"
                           :depth="0"
                           :maxDepth="0"
                           :isOrigin="node.label === sourcePackage.Label"
@@ -419,8 +419,8 @@ export default Vue.extend({
       maxLookupDepth: (state: IPluginState) => state.packageHistory.maxLookupDepth,
     }),
     ...mapGetters({
-      parentList: `packageHistory/${PackageHistoryGetters.ANCESTOR_LIST}`,
-      parentGenerations: `packageHistory/${PackageHistoryGetters.ANCESTOR_GENERATIONS}`,
+      parentList: `packageHistory/${PackageHistoryGetters.PARENT_LIST}`,
+      parentGenerations: `packageHistory/${PackageHistoryGetters.PARENT_GENERATIONS}`,
       childList: `packageHistory/${PackageHistoryGetters.CHILD_LIST}`,
       childGenerations: `packageHistory/${PackageHistoryGetters.CHILD_GENERATIONS}`,
     }),

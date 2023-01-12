@@ -1,22 +1,22 @@
 <template>
   <div class="flex flex-col items-center">
-    <template v-if="parentTree">
+    <template v-if="parentNode">
       <template v-if="depth < maxDepth">
         <div class="flex flex-row no-wrap gap-1">
           <package-history-tile
-            v-for="subtree of parentTree.parents"
-            v-bind:key="nodeId + '_' + subtree.label"
-            :parentTree="subtree"
+            v-for="parentLabel of parentNode.parentLabels"
+            v-bind:key="nodeId + '_' + parentLabel"
+            :parentLabel="parentLabel"
             :depth="depth + 1"
             :maxDepth="maxDepth"
           ></package-history-tile>
         </div>
         <div
-          v-if="parentTree.parents.length > 0"
+          v-if="parentNode.parentLabels.length > 0"
           class="w-full flex flex-row justify-center"
           :class="{
-            'one-parent': parentTree.parents.length === 1,
-            'multi-parent': parentTree.parents.length > 1,
+            'one-parent': parentNode.parentLabels.length === 1,
+            'multi-parent': parentNode.parentLabels.length > 1,
           }"
         >
           <div style="border-right: 1px solid black" class="h-6"></div>
@@ -29,14 +29,14 @@
         >
           <div class="flex flex-row items-center justify-between gap-2">
             <span>
-              <div>{{ parentTree.pkg.LicenseNumber }}</div>
+              <div>{{ parentNode.pkg.LicenseNumber }}</div>
             </span>
 
-            <b-badge :variant="getBadgeVariant(parentTree.pkg.PackageState)">{{
-              parentTree.pkg.PackageState
+            <b-badge :variant="getBadgeVariant(parentNode.pkg.PackageState)">{{
+              parentNode.pkg.PackageState
             }}</b-badge>
           </div>
-          <div class="font-bold">{{ parentTree.label }}</div>
+          <div class="font-bold">{{ parentNode.label }}</div>
         </div>
         <template v-if="isOrigin">
           <hr />
@@ -47,32 +47,30 @@
               icon="box"
               style="width: 5rem"
               class="flex-shrink-0"
-              :textClass="parentTree.pkg.Quantity === 0 ? 'text-red-500' : ''"
-              :text="`${parentTree.pkg.Quantity} ${parentTree.pkg.UnitOfMeasureAbbreviation}`"
+              :textClass="parentNode.pkg.Quantity === 0 ? 'text-red-500' : ''"
+              :text="`${parentNode.pkg.Quantity} ${parentNode.pkg.UnitOfMeasureAbbreviation}`"
             />
 
             <picker-card
               class="flex-grow"
-              :title="`${parentTree.pkg.Item.Name}`"
-              :label="parentTree.pkg.Label"
+              :title="`${parentNode.pkg.Item.Name}`"
+              :label="parentNode.pkg.Label"
             />
           </div>
         </template>
-        <template v-if="parentTree.type === HistoryTreeNodeType.OWNED_PACKAGE">
-          <hr />
-          <div class="p-2">
-            <div v-if="parentTree.pkg.PackagedByFacilityLicenseNumber">
-              Packaged by {{ parentTree.pkg.PackagedByFacilityLicenseNumber }}
-            </div>
-            <div v-if="parentTree.pkg.ReceivedFromFacilityLicenseNumber">
-              Recieved from {{ parentTree.pkg.ReceivedFromFacilityLicenseNumber }}
-            </div>
+        <hr />
+        <div class="p-2">
+          <div v-if="parentNode.pkg.PackagedByFacilityLicenseNumber">
+            Packaged by {{ parentNode.pkg.PackagedByFacilityLicenseNumber }}
           </div>
-        </template>
+          <div v-if="parentNode.pkg.ReceivedFromFacilityLicenseNumber">
+            Recieved from {{ parentNode.pkg.ReceivedFromFacilityLicenseNumber }}
+          </div>
+        </div>
       </b-card>
     </template>
 
-    <template v-if="childTree">
+    <template v-if="childNode">
       <b-card no-body>
         <div
           class="flex flex-col items-stretch gap-1 p-2"
@@ -80,14 +78,14 @@
         >
           <div class="flex flex-row items-center justify-between gap-2">
             <span>
-              <div>{{ childTree.pkg.LicenseNumber }}</div>
+              <div>{{ childNode.pkg.LicenseNumber }}</div>
             </span>
 
-            <b-badge :variant="getBadgeVariant(childTree.pkg.PackageState)">{{
-              childTree.pkg.PackageState
+            <b-badge :variant="getBadgeVariant(childNode.pkg.PackageState)">{{
+              childNode.pkg.PackageState
             }}</b-badge>
           </div>
-          <div class="font-bold">{{ childTree.label }}</div>
+          <div class="font-bold">{{ childLabel }}</div>
         </div>
         <template v-if="isOrigin">
           <hr />
@@ -98,37 +96,35 @@
               icon="box"
               style="width: 5rem"
               class="flex-shrink-0"
-              :textClass="childTree.pkg.Quantity === 0 ? 'text-red-500' : ''"
-              :text="`${childTree.pkg.Quantity} ${childTree.pkg.UnitOfMeasureAbbreviation}`"
+              :textClass="childNode.pkg.Quantity === 0 ? 'text-red-500' : ''"
+              :text="`${childNode.pkg.Quantity} ${childNode.pkg.UnitOfMeasureAbbreviation}`"
             />
 
             <picker-card
               class="flex-grow"
-              :title="`${childTree.pkg.Item.Name}`"
-              :label="childTree.pkg.Label"
+              :title="`${childNode.pkg.Item.Name}`"
+              :label="childNode.pkg.Label"
             />
           </div>
         </template>
-        <template v-if="childTree.type === HistoryTreeNodeType.OWNED_PACKAGE">
-          <hr />
-          <div class="p-2">
-            <div v-if="childTree.pkg.PackagedByFacilityLicenseNumber">
-              Packaged by {{ childTree.pkg.PackagedByFacilityLicenseNumber }}
-            </div>
-            <div v-if="childTree.pkg.ReceivedFromFacilityLicenseNumber">
-              Recieved from {{ childTree.pkg.ReceivedFromFacilityLicenseNumber }}
-            </div>
+        <hr />
+        <div class="p-2">
+          <div v-if="childNode.pkg.PackagedByFacilityLicenseNumber">
+            Packaged by {{ childNode.pkg.PackagedByFacilityLicenseNumber }}
           </div>
-        </template>
+          <div v-if="childNode.pkg.ReceivedFromFacilityLicenseNumber">
+            Recieved from {{ childNode.pkg.ReceivedFromFacilityLicenseNumber }}
+          </div>
+        </div>
       </b-card>
 
       <template v-if="depth < maxDepth">
         <div
-          v-if="childTree.children.length > 0"
+          v-if="childNode.childLabels.length > 0"
           class="w-full flex flex-row justify-center"
           :class="{
-            'one-child': childTree.children.length === 1,
-            'multi-child': childTree.children.length > 1,
+            'one-child': childNode.childLabels.length === 1,
+            'multi-child': childNode.childLabels.length > 1,
           }"
           style="border-bottom: 1px solid black"
         >
@@ -136,14 +132,25 @@
         </div>
         <div class="flex flex-row no-wrap gap-1">
           <package-history-tile
-            v-for="subtree of childTree.children"
-            v-bind:key="nodeId + '_' + subtree.label"
-            :childTree="subtree"
+            v-for="childLabel of childNode.childLabels"
+            v-bind:key="nodeId + '_' + childLabel"
+            :childLabel="childLabel"
             :depth="depth + 1"
             :maxDepth="maxDepth"
           ></package-history-tile>
         </div>
       </template>
+    </template>
+
+    <template v-if="!parentNode && !childNode">
+      <b-card no-body>
+        <div
+          class="flex flex-col items-stretch gap-1 p-2"
+          v-bind:class="{ 'bg-gray-200': !isOrigin, 'bg-purple-100': isOrigin }"
+        >
+          <div class="font-bold">{{ childLabel }}</div>
+        </div>
+      </b-card>
     </template>
   </div>
 </template>
@@ -152,7 +159,7 @@
 import PickerCard from "@/components/overlay-widget/shared/PickerCard.vue";
 import PickerIcon from "@/components/overlay-widget/shared/PickerIcon.vue";
 import { HistoryTreeNodeType, PackageState } from "@/consts";
-import { IPackageChildTreeNode, IPackageParentTreeNode } from "@/interfaces";
+import { IChildPackageTreeNode, IParentPackageTreeNode, IPluginState } from "@/interfaces";
 import router from "@/router/index";
 import store from "@/store/page-overlay/index";
 import { unitOfMeasureNameToAbbreviation } from "@/utils/units";
@@ -166,18 +173,22 @@ export default Vue.extend({
   router,
   props: {
     depth: Number,
-    maxDepth: { type: Number, required: false, default: 20 },
+    maxDepth: {
+      type: Number,
+      required: false,
+      default: 20,
+    },
     isOrigin: {
       type: Boolean,
       required: false,
       default: false,
     },
-    childTree: {
-      type: Object as () => IPackageChildTreeNode,
+    childLabel: {
+      type: String,
       required: false,
     },
-    parentTree: {
-      type: Object as () => IPackageParentTreeNode,
+    parentLabel: {
+      type: String,
       required: false,
     },
   },
@@ -186,7 +197,16 @@ export default Vue.extend({
     PickerIcon,
   },
   computed: {
-    ...mapState([]),
+    ...mapState<IPluginState>({
+      parentTree: (state: IPluginState) => state.packageHistory.parentTree,
+      childNode: (state: IPluginState) => state.packageHistory.childTree,
+    }),
+    parentNode(): IParentPackageTreeNode | null {
+      return this.$store.state.packageHistory.parentTree[this.parentLabel];
+    },
+    childNode(): IChildPackageTreeNode | null {
+      return this.$store.state.packageHistory.childTree[this.childLabel];
+    },
   },
   data() {
     return {

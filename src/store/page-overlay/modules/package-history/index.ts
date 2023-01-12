@@ -1,12 +1,12 @@
 import { MessageType } from "@/consts";
 import {
+  IChildPackageTree,
+  IChildPackageTreeNode,
   IHarvestHistoryData,
   IIndexedPackageData,
-  IPackageChildTree,
-  IPackageChildTreeNode,
   IPackageData,
-  IPackageParentTree,
-  IPackageParentTreeNode,
+  IParentPackageTree,
+  IParentPackageTreeNode,
   IPluginState,
 } from "@/interfaces";
 import { analyticsManager } from "@/modules/analytics-manager.module";
@@ -77,7 +77,7 @@ export const packageHistoryModule = {
       {
         parentTree,
       }: {
-        parentTree: IPackageParentTree;
+        parentTree: IParentPackageTree;
       }
     ) {
       state.parentTree = parentTree;
@@ -87,7 +87,7 @@ export const packageHistoryModule = {
       {
         childTree,
       }: {
-        childTree: IPackageChildTree;
+        childTree: IChildPackageTree;
       }
     ) {
       state.childTree = childTree;
@@ -106,12 +106,12 @@ export const packageHistoryModule = {
     },
   },
   getters: {
-    [PackageHistoryGetters.ANCESTOR_LIST]: (
+    [PackageHistoryGetters.PARENT_LIST]: (
       state: IPackageHistoryState,
       getters: any,
       rootState: any,
       rootGetters: any
-    ): IPackageParentTreeNode[] => {
+    ): IParentPackageTreeNode[] => {
       if (!state.parentTree) {
         return [];
       }
@@ -120,41 +120,47 @@ export const packageHistoryModule = {
         return [];
       }
 
-      const packageMap: Map<string, IPackageParentTreeNode> = new Map();
+      const nodes: IParentPackageTreeNode[] = Object.values(state.parentTree).filter(
+        (x) => x !== null
+      ) as IParentPackageTreeNode[];
 
-      const stack: [IPackageParentTreeNode, number][] = [
-        [state.parentTree[state.sourcePackage.Label], 0],
-      ];
+      return _.orderBy(nodes, ["pkg.LicenseNumber", "label"], ["asc", "asc"]);
 
-      while (stack.length > 0) {
-        const [node, depth] = stack.pop() as [IPackageParentTreeNode, number];
+      // const packageMap: Map<string, IParentPackageTreeNode> = new Map();
 
-        if (state.maxLookupDepth !== null && depth > state.maxLookupDepth) {
-          continue;
-        }
+      // const stack: [IParentPackageTreeNode, number][] = [
+      //   [state.parentTree[state.sourcePackage.Label], 0],
+      // ];
 
-        if (!packageMap.has(node.label)) {
-          packageMap.set(node.label, node);
-        }
+      // while (stack.length > 0) {
+      //   const [node, depth] = stack.pop() as [IParentPackageTreeNode, number];
 
-        node.parents.map((parent) =>
-          stack.push([
-            // @ts-ignore
-            state.parentTree[parent],
-            depth + 1,
-          ])
-        );
-      }
+      //   if (state.maxLookupDepth !== null && depth > state.maxLookupDepth) {
+      //     continue;
+      //   }
 
-      return _.orderBy([...packageMap.values()], ["pkg.LicenseNumber", "label"], ["asc", "asc"]);
+      //   if (!packageMap.has(node.label)) {
+      //     packageMap.set(node.label, node);
+      //   }
+
+      //   node.parents.map((parent) =>
+      //     stack.push([
+      //       // @ts-ignore
+      //       state.parentTree[parent],
+      //       depth + 1,
+      //     ])
+      //   );
+      // }
+
+      // return _.orderBy([...packageMap.values()], ["pkg.LicenseNumber", "label"], ["asc", "asc"]);
     },
-    [PackageHistoryGetters.ANCESTOR_GENERATIONS]: (
+    [PackageHistoryGetters.PARENT_GENERATIONS]: (
       state: IPackageHistoryState,
       getters: any,
       rootState: any,
       rootGetters: any
-    ): IPackageParentTreeNode[][] => {
-      const generations: IPackageParentTreeNode[][] = [];
+    ): IParentPackageTreeNode[][] => {
+      const generations: IParentPackageTreeNode[][] = [];
 
       if (!state.parentTree) {
         return [];
@@ -164,12 +170,16 @@ export const packageHistoryModule = {
         return [];
       }
 
-      const stack: [IPackageParentTreeNode, number][] = [
-        [state.parentTree[state.sourcePackage.Label], 0],
-      ];
+      const rootNode = state.parentTree[state.sourcePackage.Label];
+
+      if (!rootNode) {
+        return [];
+      }
+
+      const stack: [IParentPackageTreeNode, number][] = [[rootNode, 0]];
 
       while (stack.length > 0) {
-        const [node, depth] = stack.pop() as [IPackageParentTreeNode, number];
+        const [node, depth] = stack.pop() as [IParentPackageTreeNode, number];
 
         if (state.maxLookupDepth !== null && depth > state.maxLookupDepth) {
           continue;
@@ -183,8 +193,14 @@ export const packageHistoryModule = {
           generations[depth].push(node);
         }
 
-        for (const parent of node.parents) {
-          stack.push([state.parentTree[parent], depth + 1]);
+        for (const parent of node.parentLabels) {
+          const parentNode = state.parentTree[parent];
+
+          if (!parentNode) {
+            throw new Error("Unmatched parent node");
+          }
+
+          stack.push([parentNode, depth + 1]);
         }
       }
 
@@ -195,7 +211,7 @@ export const packageHistoryModule = {
       getters: any,
       rootState: any,
       rootGetters: any
-    ): IPackageChildTreeNode[] => {
+    ): IChildPackageTreeNode[] => {
       if (!state.childTree) {
         return [];
       }
@@ -204,41 +220,47 @@ export const packageHistoryModule = {
         return [];
       }
 
-      const packageMap: Map<string, IPackageChildTreeNode> = new Map();
+      const nodes: IChildPackageTreeNode[] = Object.values(state.childTree).filter(
+        (x) => x !== null
+      ) as IChildPackageTreeNode[];
 
-      const stack: [IPackageChildTreeNode, number][] = [
-        [state.childTree[state.sourcePackage.Label], 0],
-      ];
+      return _.orderBy(nodes, ["pkg.LicenseNumber", "label"], ["asc", "asc"]);
 
-      while (stack.length > 0) {
-        const [node, depth] = stack.pop() as [IPackageChildTreeNode, number];
+      // const packageMap: Map<string, IChildPackageTreeNode> = new Map();
 
-        if (state.maxLookupDepth !== null && depth > state.maxLookupDepth) {
-          continue;
-        }
+      // const stack: [IChildPackageTreeNode, number][] = [
+      //   [state.childTree[state.sourcePackage.Label], 0],
+      // ];
 
-        if (!packageMap.has(node.label)) {
-          packageMap.set(node.label, node);
-        }
+      // while (stack.length > 0) {
+      //   const [node, depth] = stack.pop() as [IChildPackageTreeNode, number];
 
-        node.children.map((child) =>
-          stack.push([
-            // @ts-ignore
-            state.childTree[child],
-            depth + 1,
-          ])
-        );
-      }
+      //   if (state.maxLookupDepth !== null && depth > state.maxLookupDepth) {
+      //     continue;
+      //   }
 
-      return _.orderBy([...packageMap.values()], ["pkg.LicenseNumber", "label"], ["asc", "asc"]);
+      //   if (!packageMap.has(node.label)) {
+      //     packageMap.set(node.label, node);
+      //   }
+
+      //   node.children.map((child) =>
+      //     stack.push([
+      //       // @ts-ignore
+      //       state.childTree[child],
+      //       depth + 1,
+      //     ])
+      //   );
+      // }
+
+      // return _.orderBy([...packageMap.values()], ["pkg.LicenseNumber", "label"], ["asc", "asc"]);
     },
     [PackageHistoryGetters.CHILD_GENERATIONS]: (
       state: IPackageHistoryState,
       getters: any,
       rootState: any,
       rootGetters: any
-    ): IPackageChildTreeNode[][] => {
-      const generations: IPackageChildTreeNode[][] = [];
+    ): IChildPackageTreeNode[][] => {
+      const generations: IChildPackageTreeNode[][] = [];
 
       if (!state.childTree) {
         return [];
@@ -248,12 +270,16 @@ export const packageHistoryModule = {
         return [];
       }
 
-      const stack: [IPackageChildTreeNode, number][] = [
-        [state.childTree[state.sourcePackage.Label], 0],
-      ];
+      const rootNode = state.childTree[state.sourcePackage.Label];
+
+      if (!rootNode) {
+        return [];
+      }
+
+      const stack: [IChildPackageTreeNode, number][] = [[rootNode, 0]];
 
       while (stack.length > 0) {
-        const [node, depth] = stack.pop() as [IPackageChildTreeNode, number];
+        const [node, depth] = stack.pop() as [IChildPackageTreeNode, number];
 
         if (state.maxLookupDepth !== null && depth > state.maxLookupDepth) {
           continue;
@@ -267,8 +293,14 @@ export const packageHistoryModule = {
           generations[depth].push(node);
         }
 
-        for (const child of node.children) {
-          stack.push([state.childTree[child], depth + 1]);
+        for (const childLabel of node.childLabels) {
+          const childNode = state.childTree[childLabel];
+
+          if (!childNode) {
+            throw new Error("Unmatched child node");
+          }
+
+          stack.push([childNode, depth + 1]);
         }
       }
 
