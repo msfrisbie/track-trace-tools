@@ -105,6 +105,7 @@
                   </div>
                   <div class="flex flex-col items-start overflow-auto toolkit-scroll pb-4">
                     <package-history-tile
+                      v-if="parentTree"
                       :parentLabel="sourcePackage.Label"
                       :depth="0"
                       :maxDepth="mergedMaxVisibleDepth"
@@ -200,6 +201,7 @@
                   </div>
                   <div class="flex flex-col items-start overflow-auto toolkit-scroll pb-4">
                     <package-history-tile
+                      v-if="childTree"
                       :childLabel="sourcePackage.Label"
                       :depth="0"
                       :maxDepth="mergedMaxVisibleDepth"

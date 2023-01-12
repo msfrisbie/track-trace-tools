@@ -148,7 +148,10 @@
           class="flex flex-col items-stretch gap-1 p-2"
           v-bind:class="{ 'bg-gray-200': !isOrigin, 'bg-purple-100': isOrigin }"
         >
-          <div class="font-bold">{{ childLabel }}</div>
+          <div class="font-bold">
+            <template v-if="childLabel">{{ childLabel }}</template>
+            <template v-if="parentLabel">{{ parentLabel }}</template>
+          </div>
         </div>
       </b-card>
     </template>
@@ -202,9 +205,15 @@ export default Vue.extend({
       childNode: (state: IPluginState) => state.packageHistory.childTree,
     }),
     parentNode(): IParentPackageTreeNode | null {
+      if (!this.$store.state.packageHistory.parentTree) {
+        return null;
+      }
       return this.$store.state.packageHistory.parentTree[this.parentLabel];
     },
     childNode(): IChildPackageTreeNode | null {
+      if (!this.$store.state.packageHistory.childTree) {
+        return null;
+      }
       return this.$store.state.packageHistory.childTree[this.childLabel];
     },
   },

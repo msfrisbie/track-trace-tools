@@ -1,10 +1,12 @@
 import { HistoryTreeNodeType, PackageFilterIdentifiers, PackageState } from "@/consts";
 import {
+  IChildPackageTree,
   IChildPackageTreeNode,
   IHarvestHistoryData,
   IIndexedPackageData,
   IPackageData,
   IPackageHistoryData,
+  IParentPackageTree,
   IParentPackageTreeNode,
 } from "@/interfaces";
 import { authManager } from "@/modules/auth-manager.module";
@@ -138,7 +140,7 @@ export function packageFieldMatch(
 }
 
 interface IRootParentHistoryContext {
-  treeNodeCache: Map<string, IParentPackageTreeNode | null>;
+  tree: IParentPackageTree;
   licenseCache: LRU<string>;
   packageStateCache: LRU<PackageState>;
 }
@@ -148,9 +150,9 @@ export async function getParentPackageHistoryTree({
   callback,
 }: {
   label: string;
-  callback?: (node: IParentPackageTreeNode) => void;
+  callback: (node: IParentPackageTree) => void;
 }): Promise<IParentPackageTreeNode> {
-  const treeNodeCache: Map<string, IParentPackageTreeNode> = new Map();
+  const tree: IParentPackageTree = {};
   const ownedLicenses: string[] = (await facilityManager.ownedFacilitiesOrError()).map(
     (facility) => facility.licenseNumber
   );
@@ -167,7 +169,7 @@ export async function getParentPackageHistoryTree({
   });
 
   const rootContext: IRootParentHistoryContext = {
-    treeNodeCache,
+    tree,
     licenseCache,
     packageStateCache,
   };
@@ -215,7 +217,7 @@ export async function getParentPackageHistoryTree({
         break;
       }
 
-      if (rootContext.treeNodeCache.has(parentPackageLabel)) {
+      if (rootContext.tree.hasOwnProperty(parentPackageLabel)) {
         continue;
       }
 
@@ -224,7 +226,7 @@ export async function getParentPackageHistoryTree({
           stack.push([node, depth + 1]);
         }
 
-        callback && callback(rootNode);
+        callback && callback(rootContext.tree);
       });
     }
   }
@@ -236,11 +238,11 @@ export async function getParentPackageTreeNodeOrNull(
   label: string,
   rootContext: IRootParentHistoryContext
 ): Promise<IParentPackageTreeNode | null> {
-  if (rootContext.treeNodeCache.has(label)) {
+  if (rootContext.tree.hasOwnProperty(label)) {
     store.dispatch(`packageHistory/${PackageHistoryActions.LOG_EVENT}`, {
       event: `Cache hit for ${label}`,
     });
-    return rootContext.treeNodeCache.get(label) as IParentPackageTreeNode;
+    return rootContext.tree[label] as IParentPackageTreeNode;
   }
 
   let pkg: IIndexedPackageData | null = null;
@@ -294,7 +296,7 @@ export async function getParentPackageTreeNodeOrNull(
     store.dispatch(`packageHistory/${PackageHistoryActions.LOG_EVENT}`, {
       event: `User does not have access to ${label}, is a terminal node`,
     });
-    rootContext.treeNodeCache.set(label, null);
+    rootContext.tree[label] = null;
     return null;
   }
 
@@ -318,7 +320,7 @@ export async function getParentPackageTreeNodeOrNull(
     parentLabels,
   };
 
-  rootContext.treeNodeCache.set(label, node);
+  rootContext.tree[label] = node;
 
   return node;
 }
@@ -332,11 +334,11 @@ export async function getParentPackageTreeNodeOrNull(
 //   rootContext: IRootParentHistoryContext;
 //   depth: number;
 // }): Promise<IParentPackageTreeNode> {
-//   if (rootContext.treeNodeCache.has(label)) {
+//   if (rootContext.tree.has(label)) {
 //     store.dispatch(`packageHistory/${PackageHistoryActions.LOG_EVENT}`, {
 //       event: `Cache hit for ${label}`,
 //     });
-//     return rootContext.treeNodeCache.get(label) as IParentPackageTreeNode;
+//     return rootContext.tree.get(label) as IParentPackageTreeNode;
 //   }
 
 //   let pkg: IIndexedPackageData | null = null;
@@ -397,7 +399,7 @@ export async function getParentPackageTreeNodeOrNull(
 //       history: [],
 //       parents: [],
 //     };
-//     rootContext.treeNodeCache.set(label, node);
+//     rootContext.tree.set(label, node);
 //     return node;
 //   }
 
@@ -431,7 +433,7 @@ export async function getParentPackageTreeNodeOrNull(
 
 //       parents.push(node);
 
-//       rootContext.treeNodeCache.set(label, node);
+//       rootContext.tree.set(label, node);
 //     }
 
 //     store.dispatch(`packageHistory/${PackageHistoryActions.LOG_EVENT}`, {
@@ -451,13 +453,13 @@ export async function getParentPackageTreeNodeOrNull(
 //     parents: parents,
 //   };
 
-//   rootContext.treeNodeCache.set(label, node);
+//   rootContext.tree.set(label, node);
 
 //   return node;
 // }
 
 interface IRootChildPackageHistoryContext {
-  treeNodeCache: Map<string, IChildPackageTreeNode>;
+  tree: IChildPackageTree;
   licenseCache: LRU<string>;
   packageStateCache: LRU<PackageState>;
 }
@@ -467,7 +469,7 @@ export async function getChildPackageHistoryTree({
 }: {
   label: string;
 }): Promise<IChildPackageTreeNode> {
-  const treeNodeCache: Map<string, IChildPackageTreeNode> = new Map();
+  const tree: IChildPackageTree = {};
   const ownedLicenses: string[] = (await facilityManager.ownedFacilitiesOrError()).map(
     (facility) => facility.licenseNumber
   );
@@ -484,7 +486,7 @@ export async function getChildPackageHistoryTree({
   });
 
   const rootContext: IRootChildPackageHistoryContext = {
-    treeNodeCache,
+    tree,
     licenseCache,
     packageStateCache,
   };
@@ -507,11 +509,11 @@ export async function getChildPackageHistoryTree({
 //   rootContext: IRootChildPackageHistoryContext;
 //   depth: number;
 // }): Promise<IChildPackageTreeNode> {
-//   if (rootContext.treeNodeCache.has(label)) {
+//   if (rootContext.tree.has(label)) {
 //     store.dispatch(`packageHistory/${PackageHistoryActions.LOG_EVENT}`, {
 //       event: `Cache hit for ${label}`,
 //     });
-//     return rootContext.treeNodeCache.get(label) as IChildPackageTreeNode;
+//     return rootContext.tree.get(label) as IChildPackageTreeNode;
 //   }
 
 //   let pkg: IIndexedPackageData | null = null;
@@ -567,7 +569,7 @@ export async function getChildPackageHistoryTree({
 //       history: [],
 //       children: [],
 //     };
-//     rootContext.treeNodeCache.set(label, node);
+//     rootContext.tree.set(label, node);
 //     return node;
 //   }
 
@@ -601,7 +603,7 @@ export async function getChildPackageHistoryTree({
 
 //       children.push();
 
-//       rootContext.treeNodeCache.set(label, node);
+//       rootContext.tree.set(label, node);
 //     }
 
 //     store.dispatch(`packageHistory/${PackageHistoryActions.LOG_EVENT}`, {

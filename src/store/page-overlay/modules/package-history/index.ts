@@ -1,4 +1,4 @@
-import { MessageType } from "@/consts";
+import { HistoryTreeNodeType, MessageType } from "@/consts";
 import {
   IChildPackageTree,
   IChildPackageTreeNode,
@@ -11,11 +11,7 @@ import {
 } from "@/interfaces";
 import { analyticsManager } from "@/modules/analytics-manager.module";
 import { clientBuildManager } from "@/modules/client-build-manager.module";
-import {
-  getChildPackageHistoryTree,
-  getParentHarvests,
-  getParentPackageHistoryTree,
-} from "@/utils/package";
+import { getParentHarvests, getParentPackageHistoryTree } from "@/utils/package";
 import _ from "lodash";
 import { ActionContext } from "vuex";
 import {
@@ -193,12 +189,14 @@ export const packageHistoryModule = {
           generations[depth].push(node);
         }
 
-        for (const parent of node.parentLabels) {
-          const parentNode = state.parentTree[parent];
-
-          if (!parentNode) {
-            throw new Error("Unmatched parent node");
-          }
+        for (const parentLabel of node.parentLabels) {
+          const parentNode: IParentPackageTreeNode = state.parentTree[parentLabel] || {
+            label: parentLabel,
+            type: HistoryTreeNodeType.UNOWNED_PACKAGE,
+            parentLabels: [],
+            history: [],
+            pkg: {} as IIndexedPackageData,
+          };
 
           stack.push([parentNode, depth + 1]);
         }
@@ -220,6 +218,7 @@ export const packageHistoryModule = {
         return [];
       }
 
+      // TODO map null values to stub
       const nodes: IChildPackageTreeNode[] = Object.values(state.childTree).filter(
         (x) => x !== null
       ) as IChildPackageTreeNode[];
@@ -341,27 +340,27 @@ export const packageHistoryModule = {
           }
 
           const parentCallback = _.debounce(
-            (node) => {
+            (parentTree) => {
               console.log("setting parents");
               ctx.commit(PackageHistoryMutations.SET_PARENTS, {
-                parentTree: _.cloneDeep(node),
+                parentTree: _.cloneDeep(parentTree),
               });
             },
-            2000,
-            { maxWait: 5000 }
+            250,
+            { maxWait: 1000 }
           );
-          const rootParentNode = await getParentPackageHistoryTree({
+          await getParentPackageHistoryTree({
             label: pkg.Label,
-            // callback: parentCallback,
+            callback: parentCallback,
           });
           // parentCallback(rootParentNode);
           // console.log(JSON.stringify(rootParentNode, null, 2));
 
-          ctx.commit(PackageHistoryMutations.SET_CHILDREN, {
-            childTree: await getChildPackageHistoryTree({
-              label: pkg.Label,
-            }),
-          });
+          // ctx.commit(PackageHistoryMutations.SET_CHILDREN, {
+          //   childTree: await getChildPackageHistoryTree({
+          //     label: pkg.Label,
+          //   }),
+          // });
           if (ctx.state.status !== PackageHistoryStatus.HALTED) {
             ctx.commit(PackageHistoryMutations.SET_STATUS, {
               status: PackageHistoryStatus.SUCCESS,
