@@ -31,7 +31,6 @@ const inMemoryState = {
   childTree: null,
   sourceHarvests: [],
   maxLookupDepth: null,
-  renderId: uuidv4(),
 };
 
 const persistedState = {};
@@ -78,7 +77,6 @@ export const packageHistoryModule = {
         parentTree: IParentPackageTree;
       }
     ) {
-      state.renderId = uuidv4();
       state.parentTree = parentTree;
     },
     [PackageHistoryMutations.SET_CHILDREN](

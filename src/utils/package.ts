@@ -185,9 +185,8 @@ export async function getParentPackageHistoryTree({
 
   const stack: [IParentPackageTreeNode, number][] = [[rootNode, 0]];
   let loopCount = 0;
-  let inflightCount = 0;
 
-  while (stack.length > 0 || inflightCount > 0) {
+  while (stack.length > 0) {
     if (loopCount++ > 5000) {
       throw new Error("Detected infinite loop");
     }
@@ -222,16 +221,13 @@ export async function getParentPackageHistoryTree({
         continue;
       }
 
-      inflightCount++;
-      await getParentPackageTreeNodeOrNull(parentPackageLabel, rootContext)
-        .then((node) => {
-          if (node !== null) {
-            stack.push([node, depth + 1]);
-          }
+      await getParentPackageTreeNodeOrNull(parentPackageLabel, rootContext).then((node) => {
+        if (node !== null) {
+          stack.push([node, depth + 1]);
+        }
 
-          callback && callback(rootContext.tree);
-        })
-        .finally(() => inflightCount--);
+        callback && callback(rootContext.tree);
+      });
     }
   }
 

@@ -5,7 +5,7 @@
         <div class="flex flex-row no-wrap gap-1">
           <package-history-tile
             v-for="parentLabel of parentNode.parentLabels"
-            v-bind:key="renderId + '_' + parentLabel"
+            v-bind:key="parentLabel"
             :parentLabel="parentLabel"
             :depth="depth + 1"
             :maxDepth="maxDepth"
@@ -133,7 +133,7 @@
         <div class="flex flex-row no-wrap gap-1">
           <package-history-tile
             v-for="childLabel of childNode.childLabels"
-            v-bind:key="renderId + '_' + childLabel"
+            v-bind:key="childLabel"
             :childLabel="childLabel"
             :depth="depth + 1"
             :maxDepth="maxDepth"
@@ -202,7 +202,6 @@ export default Vue.extend({
     ...mapState<IPluginState>({
       parentTree: (state: IPluginState) => state.packageHistory.parentTree,
       childNode: (state: IPluginState) => state.packageHistory.childTree,
-      renderId: (state: IPluginState) => state.packageHistory.renderId,
     }),
     parentNode(): IParentPackageTreeNode | null {
       if (!this.$store.state.packageHistory.parentTree) {
