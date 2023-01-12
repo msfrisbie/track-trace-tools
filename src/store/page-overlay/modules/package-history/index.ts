@@ -116,9 +116,19 @@ export const packageHistoryModule = {
         return [];
       }
 
-      const nodes: IParentPackageTreeNode[] = Object.values(state.parentTree).filter(
-        (x) => x !== null
-      ) as IParentPackageTreeNode[];
+      const nodes: IParentPackageTreeNode[] = Object.entries(state.parentTree).map(([k, v]) => {
+        if (v) {
+          return v;
+        } else {
+          return {
+            label: k,
+            type: HistoryTreeNodeType.UNOWNED_PACKAGE,
+            parentLabels: [],
+            history: [],
+            pkg: {} as IIndexedPackageData,
+          };
+        }
+      }) as IParentPackageTreeNode[];
 
       return _.orderBy(nodes, ["pkg.LicenseNumber", "label"], ["asc", "asc"]);
 
@@ -219,9 +229,19 @@ export const packageHistoryModule = {
       }
 
       // TODO map null values to stub
-      const nodes: IChildPackageTreeNode[] = Object.values(state.childTree).filter(
-        (x) => x !== null
-      ) as IChildPackageTreeNode[];
+      const nodes: IChildPackageTreeNode[] = Object.entries(state.childTree).map(([k, v]) => {
+        if (v) {
+          return v;
+        } else {
+          return {
+            label: k,
+            type: HistoryTreeNodeType.UNOWNED_PACKAGE,
+            childLabels: [],
+            history: [],
+            pkg: {} as IIndexedPackageData,
+          };
+        }
+      }) as IChildPackageTreeNode[];
 
       return _.orderBy(nodes, ["pkg.LicenseNumber", "label"], ["asc", "asc"]);
 
@@ -346,13 +366,15 @@ export const packageHistoryModule = {
                 parentTree: _.cloneDeep(parentTree),
               });
             },
-            250,
-            { maxWait: 1000 }
+            100,
+            { maxWait: 500 }
           );
-          await getParentPackageHistoryTree({
-            label: pkg.Label,
-            callback: parentCallback,
-          });
+          console.log(
+            await getParentPackageHistoryTree({
+              label: pkg.Label,
+              callback: parentCallback,
+            })
+          );
           // parentCallback(rootParentNode);
           // console.log(JSON.stringify(rootParentNode, null, 2));
 

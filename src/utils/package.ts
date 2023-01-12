@@ -151,7 +151,7 @@ export async function getParentPackageHistoryTree({
 }: {
   label: string;
   callback: (node: IParentPackageTree) => void;
-}): Promise<IParentPackageTreeNode> {
+}): Promise<IParentPackageTree> {
   const tree: IParentPackageTree = {};
   const ownedLicenses: string[] = (await facilityManager.ownedFacilitiesOrError()).map(
     (facility) => facility.licenseNumber
@@ -185,8 +185,9 @@ export async function getParentPackageHistoryTree({
 
   const stack: [IParentPackageTreeNode, number][] = [[rootNode, 0]];
   let loopCount = 0;
+  let inflightCount = 0;
 
-  while (stack.length > 0) {
+  while (stack.length > 0 || inflightCount > 0) {
     if (loopCount++ > 5000) {
       throw new Error("Detected infinite loop");
     }
@@ -197,7 +198,7 @@ export async function getParentPackageHistoryTree({
       continue;
     }
 
-    const [currentNode, depth] = stack.pop() as [IParentPackageTreeNode, number];
+    const [currentNode, depth] = stack.shift() as [IParentPackageTreeNode, number];
 
     if (
       store.state.packageHistory.maxLookupDepth !== null &&
@@ -221,17 +222,20 @@ export async function getParentPackageHistoryTree({
         continue;
       }
 
-      getParentPackageTreeNodeOrNull(parentPackageLabel, rootContext).then((node) => {
-        if (node !== null) {
-          stack.push([node, depth + 1]);
-        }
+      inflightCount++;
+      getParentPackageTreeNodeOrNull(parentPackageLabel, rootContext)
+        .then((node) => {
+          if (node !== null) {
+            stack.push([node, depth + 1]);
+          }
 
-        callback && callback(rootContext.tree);
-      });
+          callback && callback(rootContext.tree);
+        })
+        .finally(() => inflightCount--);
     }
   }
 
-  return rootNode;
+  return rootContext.tree;
 }
 
 export async function getParentPackageTreeNodeOrNull(
