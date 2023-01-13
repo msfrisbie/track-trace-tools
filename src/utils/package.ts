@@ -279,9 +279,11 @@ export async function getParentPackageTreeNodeOrNull(
 
     console.log({ dataLoader });
 
-    await new Promise((resolve) => setTimeout(resolve, 10));
+    // await new Promise((resolve) => setTimeout(resolve, 10));
 
     for (const packageState of rootContext.packageStateCache.elements) {
+      console.log({ packageState });
+
       switch (packageState) {
         case PackageState.ACTIVE:
           try {
@@ -290,7 +292,9 @@ export async function getParentPackageTreeNodeOrNull(
           break;
         case PackageState.INACTIVE:
           try {
-            pkg = await dataLoader.inactivePackage(label);
+            if (!label.includes("204337")) {
+              pkg = await dataLoader.inactivePackage(label);
+            }
           } catch (e) {}
           break;
         case PackageState.IN_TRANSIT:
@@ -335,6 +339,8 @@ export async function getParentPackageTreeNodeOrNull(
   });
 
   const history: IPackageHistoryData[] = await dataLoader.packageHistoryByPackageId(pkg.Id);
+
+  console.log({ history });
 
   const parentLabels = extractParentPackageLabelsFromHistory(history);
 

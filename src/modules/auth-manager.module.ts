@@ -109,13 +109,29 @@ class AuthManager implements IAtomicService {
 
   async authStateOrNull(): Promise<IAuthState | null> {
     try {
+      if (store.state.pluginAuth.authState) {
+        return store.state.pluginAuth.authState;
+      }
+
       return await this._authStatePromise;
     } catch (e) {
       return null;
     }
   }
 
+  syncAuthStateOrError(errorMessage: string = "Missing auth state") {
+    if (store.state.pluginAuth.authState) {
+      return store.state.pluginAuth.authState;
+    }
+
+    throw new Error(errorMessage);
+  }
+
   async authStateOrError(errorMessage: string = "Missing auth state"): Promise<IAuthState> {
+    if (store.state.pluginAuth.authState) {
+      return store.state.pluginAuth.authState;
+    }
+
     const authState = await this.authStateOrNull();
 
     if (!authState) {

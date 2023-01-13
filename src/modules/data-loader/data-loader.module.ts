@@ -124,7 +124,7 @@ export class DataLoader implements IAtomicService {
       dataLoaderCache[store.state.pluginAuth.authState.license] = this;
     }
 
-    // await authManager.authStateOrError();
+    // authManager.syncAuthStateOrError();
 
     //   await scriptContextManager.metrc();
 
@@ -195,7 +195,7 @@ export class DataLoader implements IAtomicService {
   }
 
   async licenseKey(key: IdbKeyPiece) {
-    const authState = await authManager.authStateOrError();
+    const authState = authManager.syncAuthStateOrError();
 
     return `${key}_${authState.license}`;
   }
@@ -1700,7 +1700,7 @@ export class DataLoader implements IAtomicService {
       // return mockDataManager.mockTags().filter(tagData => tagData.Label === label)[0];
     }
 
-    await authManager.authStateOrError();
+    authManager.syncAuthStateOrError();
 
     const page = 0;
 
@@ -1738,7 +1738,7 @@ export class DataLoader implements IAtomicService {
       // return mockDataManager.mockTags().filter(tagData => tagData.Label === label)[0];
     }
 
-    await authManager.authStateOrError();
+    authManager.syncAuthStateOrError();
 
     const page = 0;
 
@@ -1776,7 +1776,7 @@ export class DataLoader implements IAtomicService {
       // return mockDataManager.mockTags().filter(tagData => tagData.Label === label)[0];
     }
 
-    await authManager.authStateOrError();
+    authManager.syncAuthStateOrError();
 
     const page = 0;
 
@@ -1812,7 +1812,7 @@ export class DataLoader implements IAtomicService {
     if (store.state.mockDataMode) {
     }
 
-    await authManager.authStateOrError();
+    authManager.syncAuthStateOrError();
 
     const page = 0;
 
@@ -1848,7 +1848,7 @@ export class DataLoader implements IAtomicService {
     if (store.state.mockDataMode) {
     }
 
-    await authManager.authStateOrError();
+    authManager.syncAuthStateOrError();
 
     const page = 0;
 
@@ -1886,7 +1886,11 @@ export class DataLoader implements IAtomicService {
       // return mockDataManager.mockTags().filter(tagData => tagData.Label === label)[0];
     }
 
-    await authManager.authStateOrError();
+    console.log("getting auth state");
+
+    authManager.syncAuthStateOrError();
+
+    console.log("got auth state");
 
     const page = 0;
 
@@ -1919,7 +1923,7 @@ export class DataLoader implements IAtomicService {
   }
 
   private async loadActivePackages(): Promise<IPackageData[]> {
-    await authManager.authStateOrError();
+    authManager.syncAuthStateOrError();
 
     store.commit(MutationType.SET_LOADING_MESSAGE, "Loading active packages...");
 
@@ -1942,7 +1946,7 @@ export class DataLoader implements IAtomicService {
       // return mockDataManager.mockTags().filter(tagData => tagData.Label === label)[0];
     }
 
-    await authManager.authStateOrError();
+    authManager.syncAuthStateOrError();
 
     const page = 0;
 
@@ -1975,7 +1979,7 @@ export class DataLoader implements IAtomicService {
   }
 
   private async loadInactivePackages(): Promise<IPackageData[]> {
-    await authManager.authStateOrError();
+    authManager.syncAuthStateOrError();
 
     store.commit(MutationType.SET_LOADING_MESSAGE, "Loading inactive packages...");
 
@@ -1998,7 +2002,7 @@ export class DataLoader implements IAtomicService {
       // return mockDataManager.mockTags().filter(tagData => tagData.Label === label)[0];
     }
 
-    await authManager.authStateOrError();
+    authManager.syncAuthStateOrError();
 
     const page = 0;
 
@@ -2031,7 +2035,7 @@ export class DataLoader implements IAtomicService {
   }
 
   private async loadInTransitPackages(): Promise<IPackageData[]> {
-    await authManager.authStateOrError();
+    authManager.syncAuthStateOrError();
 
     store.commit(MutationType.SET_LOADING_MESSAGE, "Loading in transit packages...");
 
@@ -2049,7 +2053,7 @@ export class DataLoader implements IAtomicService {
   }
 
   private async loadIncomingTransfers(): Promise<ITransferData[]> {
-    await authManager.authStateOrError();
+    authManager.syncAuthStateOrError();
 
     store.commit(MutationType.SET_LOADING_MESSAGE, "Loading incoming transfers...");
 
@@ -2067,7 +2071,7 @@ export class DataLoader implements IAtomicService {
   }
 
   private async loadOutgoingTransfers(): Promise<ITransferData[]> {
-    await authManager.authStateOrError();
+    authManager.syncAuthStateOrError();
 
     store.commit(MutationType.SET_LOADING_MESSAGE, "Loading outgoing transfers...");
 
@@ -2085,7 +2089,7 @@ export class DataLoader implements IAtomicService {
   }
 
   private async loadRejectedTransfers(): Promise<ITransferData[]> {
-    await authManager.authStateOrError();
+    authManager.syncAuthStateOrError();
 
     store.commit(MutationType.SET_LOADING_MESSAGE, "Loading rejected transfers...");
 
@@ -2103,7 +2107,7 @@ export class DataLoader implements IAtomicService {
   }
 
   private async loadActiveHarvests(): Promise<IHarvestData[]> {
-    await authManager.authStateOrError();
+    authManager.syncAuthStateOrError();
 
     store.commit(MutationType.SET_LOADING_MESSAGE, "Loading harvests...");
 
@@ -2121,7 +2125,7 @@ export class DataLoader implements IAtomicService {
   }
 
   private async loadLocations(): Promise<ILocationData[]> {
-    await authManager.authStateOrError();
+    authManager.syncAuthStateOrError();
 
     store.commit(MutationType.SET_LOADING_MESSAGE, "Loading locations...");
 
@@ -2147,7 +2151,7 @@ export class DataLoader implements IAtomicService {
   }
 
   private async loadItems(): Promise<IItemData[]> {
-    await authManager.authStateOrError();
+    authManager.syncAuthStateOrError();
 
     store.commit(MutationType.SET_LOADING_MESSAGE, "Loading items...");
 
@@ -2173,7 +2177,7 @@ export class DataLoader implements IAtomicService {
   }
 
   private async loadStrains(): Promise<IStrainData[]> {
-    await authManager.authStateOrError();
+    authManager.syncAuthStateOrError();
 
     store.commit(MutationType.SET_LOADING_MESSAGE, "Loading strains...");
 
@@ -2199,7 +2203,7 @@ export class DataLoader implements IAtomicService {
   }
 
   private async loadFloweringPlants(options: IPlantOptions): Promise<IPlantData[]> {
-    await authManager.authStateOrError();
+    authManager.syncAuthStateOrError();
 
     store.commit(MutationType.SET_LOADING_MESSAGE, "Loading flowering plants...");
 
@@ -2217,7 +2221,7 @@ export class DataLoader implements IAtomicService {
   }
 
   private async loadInactivePlants(options: IPlantOptions): Promise<IPlantData[]> {
-    await authManager.authStateOrError();
+    authManager.syncAuthStateOrError();
 
     store.commit(MutationType.SET_LOADING_MESSAGE, "Loading inactive plants...");
 
@@ -2235,7 +2239,7 @@ export class DataLoader implements IAtomicService {
   }
 
   private async loadPlantBatches(options: IPlantBatchOptions): Promise<IPlantBatchData[]> {
-    await authManager.authStateOrError();
+    authManager.syncAuthStateOrError();
 
     store.commit(MutationType.SET_LOADING_MESSAGE, "Loading plant batches...");
 
@@ -2254,7 +2258,7 @@ export class DataLoader implements IAtomicService {
 
   // Only loads single page of receipts
   async loadActiveSalesReceipts(): Promise<ISalesReceiptData[]> {
-    await authManager.authStateOrError();
+    authManager.syncAuthStateOrError();
 
     store.commit(MutationType.SET_LOADING_MESSAGE, "Loading sales receipts...");
 
@@ -2279,7 +2283,7 @@ export class DataLoader implements IAtomicService {
       return mockDataManager.mockTags().filter((tagData) => tagData.Label === label)[0];
     }
 
-    await authManager.authStateOrError();
+    authManager.syncAuthStateOrError();
 
     const page = 0;
 
@@ -2312,7 +2316,7 @@ export class DataLoader implements IAtomicService {
   }
 
   private async loadAvailableTags(dataLoadOptions: IDataLoadOptions = {}): Promise<ITagData[]> {
-    await authManager.authStateOrError();
+    authManager.syncAuthStateOrError();
 
     store.commit(MutationType.SET_LOADING_MESSAGE, "Loading tags...");
 
@@ -2332,7 +2336,7 @@ export class DataLoader implements IAtomicService {
   }
 
   private async loadUsedTags(dataLoadOptions: IDataLoadOptions = {}): Promise<ITagData[]> {
-    await authManager.authStateOrError();
+    authManager.syncAuthStateOrError();
 
     store.commit(MutationType.SET_LOADING_MESSAGE, "Loading tags...");
 
@@ -2350,7 +2354,7 @@ export class DataLoader implements IAtomicService {
   }
 
   private async loadVoidedTags(dataLoadOptions: IDataLoadOptions = {}): Promise<ITagData[]> {
-    await authManager.authStateOrError();
+    authManager.syncAuthStateOrError();
 
     store.commit(MutationType.SET_LOADING_MESSAGE, "Loading tags...");
 
@@ -2429,7 +2433,7 @@ export class DataLoader implements IAtomicService {
    */
 
   private async loadAllPreviousTagOrders(): Promise<ITagOrderData[]> {
-    await authManager.authStateOrError();
+    authManager.syncAuthStateOrError();
 
     store.commit(MutationType.SET_LOADING_MESSAGE, "Loading tag orders...");
 
@@ -2455,7 +2459,7 @@ export class DataLoader implements IAtomicService {
   }
 
   async loadAllCsvUploads(csvUpload: CsvUpload): Promise<ICsvUploadResult[]> {
-    await authManager.authStateOrError();
+    authManager.syncAuthStateOrError();
 
     store.commit(MutationType.SET_LOADING_MESSAGE, "Loading csv uploads...");
 
