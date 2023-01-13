@@ -286,6 +286,11 @@ export const packageHistoryModule = {
         return;
       }
 
+      if (ctx.state.status === PackageHistoryStatus.INFLIGHT) {
+        console.error("Cannot set pkg, inflight");
+        return;
+      }
+
       ctx.commit(PackageHistoryMutations.SET_SOURCE_PACKAGE, { pkg });
 
       ctx.commit(PackageHistoryMutations.SET_STATUS, {
@@ -308,18 +313,27 @@ export const packageHistoryModule = {
             console.error("Cannot load source harvests", e);
           }
 
-          const parentCallback = _.debounce(
-            (parentTree) => {
+          // const parentCallback = _.debounce(
+          //   (parentTree) => {
+          //     console.log(Object.keys(parentTree));
+          //     debugger;
+          //     ctx.commit(PackageHistoryMutations.SET_PARENTS, {
+          //       parentTree: _.cloneDeep(parentTree),
+          //     });
+          //     debugger;
+          //   },
+          //   100,
+          //   { maxWait: 500 }
+          // );
+          await getParentPackageHistoryTree({
+            label: pkg.Label,
+            callback: (parentTree) => {
+              console.log(Object.keys(parentTree));
               ctx.commit(PackageHistoryMutations.SET_PARENTS, {
                 parentTree: _.cloneDeep(parentTree),
               });
+              console.log(Object.keys(parentTree));
             },
-            100,
-            { maxWait: 500 }
-          );
-          await getParentPackageHistoryTree({
-            label: pkg.Label,
-            callback: parentCallback,
           });
 
           const childCallback = _.debounce(

@@ -64,19 +64,23 @@ import { DataLoadError, DataLoadErrorType } from "./data-loader-error";
 
 const debugLog = debugLogFactory("data-loader.module.ts");
 
-export const dataLoaderCache: Map<string, DataLoader> = new Map();
+export const dataLoaderCache: { [key: string]: DataLoader } = {};
 
-export async function getDataLoader(
-  spoofedAuthState: IAuthState | null = null
-): Promise<DataLoader> {
-  if (spoofedAuthState?.license && dataLoaderCache.has(spoofedAuthState.license)) {
-    return dataLoaderCache.get(spoofedAuthState.license) as DataLoader;
+export function getDataLoader(spoofedAuthState: IAuthState | null = null): DataLoader {
+  console.log({ dataLoaderCache });
+  if (spoofedAuthState?.license && dataLoaderCache.hasOwnProperty(spoofedAuthState.license)) {
+    return dataLoaderCache[spoofedAuthState.license] as DataLoader;
   } else {
     const dataLoader = new DataLoader();
-    const authState: IAuthState = spoofedAuthState || (await authManager.authStateOrError());
+    const authState: IAuthState | null = spoofedAuthState || store.state.pluginAuth.authState;
+
+    if (!authState) {
+      throw new Error("Bad authState");
+    }
+
     dataLoader.init(authState);
 
-    dataLoaderCache.set(authState.license, dataLoader);
+    dataLoaderCache[authState.license] = dataLoader;
 
     return dataLoader;
   }
@@ -114,7 +118,11 @@ export class DataLoader implements IAtomicService {
       this._metrcRequestManager = primaryMetrcRequestManager;
     }
 
-    dataLoaderCache.set((spoofedAuthState || (await authManager.authStateOrError())).license, this);
+    if (spoofedAuthState) {
+      dataLoaderCache[spoofedAuthState.license] = this;
+    } else if (store.state.pluginAuth.authState) {
+      dataLoaderCache[store.state.pluginAuth.authState.license] = this;
+    }
 
     // await authManager.authStateOrError();
 
