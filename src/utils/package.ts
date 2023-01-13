@@ -190,10 +190,6 @@ export async function getParentPackageHistoryTreeImpl({
   rootContext: IRootAncestorHistoryContext;
   depth: number;
 }): Promise<IPackageAncestorTreeNode> {
-  // if (store.state.packageHistory.status !== PackageHistoryStatus.INFLIGHT) {
-  //   throw new Error(`Status: ${store.state.packageHistory.status}, exiting`);
-  // }
-
   if (rootContext.treeNodeCache.has(label)) {
     store.dispatch(`packageHistory/${PackageHistoryActions.LOG_EVENT}`, {
       event: `Cache hit for ${label}`,
