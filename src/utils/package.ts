@@ -231,6 +231,7 @@ export async function getParentPackageHistoryTreeImpl({
 
       if (pkg) {
         rootContext.packageStateCache.touch(pkg.PackageState);
+        break;
       }
     }
 
@@ -408,7 +409,13 @@ export async function getChildPackageHistoryTreeImpl({
 
       if (pkg) {
         rootContext.packageStateCache.touch(pkg.PackageState);
+        break;
       }
+    }
+
+    if (pkg) {
+      rootContext.licenseCache.touch(pkg.LicenseNumber);
+      break;
     }
   }
 
