@@ -24,7 +24,7 @@
             >
               <b-tab no-body title="Tree" active>
                 <b-dropdown
-                  v-if="parentTree"
+                  v-if="ancestorTree"
                   class="pb-2"
                   toggle-class="flex flex-row items-center gap-2"
                   variant="outline-primary"
@@ -84,8 +84,10 @@
                     v-bind:key="i"
                     class="flex flex-row gap-8"
                   >
-                    <div class="w-16 text-center text-xl">{{ i }}</div>
-                    <div class="grid grid-cols-3 gap-2">
+                    <div class="w-48 text-right text-xl whitespace-nowrap">
+                      {{ i === 0 ? "Source Package" : `Generation #${i}` }}
+                    </div>
+                    <div class="grid grid-cols-2 gap-2">
                       <package-history-tile
                         v-for="node of generation"
                         v-bind:key="node.label"
@@ -93,7 +95,7 @@
                         :depth="0"
                         :maxDepth="0"
                         :isOrigin="node.label === sourcePackage.Label"
-                        v-bind:class="{ 'col-span-3': node.label === sourcePackage.Label }"
+                        v-bind:class="{ 'col-span-2': node.label === sourcePackage.Label }"
                       ></package-history-tile>
                     </div>
                   </div>
@@ -197,8 +199,10 @@
                     v-bind:key="i"
                     class="flex flex-row gap-8"
                   >
-                    <div class="w-16 text-center text-xl">{{ i }}</div>
-                    <div class="grid grid-cols-3 gap-2">
+                    <div class="w-48 text-right text-xl whitespace-nowrap">
+                      {{ i === 0 ? "Source Package" : `Generation #${i}` }}
+                    </div>
+                    <div class="grid grid-cols-2 gap-2">
                       <package-history-tile
                         v-for="node of generation"
                         v-bind:key="node.label"
@@ -206,7 +210,7 @@
                         :depth="0"
                         :maxDepth="0"
                         :isOrigin="node.label === sourcePackage.Label"
-                        v-bind:class="{ 'col-span-3': node.label === sourcePackage.Label }"
+                        v-bind:class="{ 'col-span-2': node.label === sourcePackage.Label }"
                       ></package-history-tile>
                     </div>
                   </div>
