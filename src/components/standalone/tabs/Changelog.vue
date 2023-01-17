@@ -2,6 +2,31 @@
   <b-tab title="Changelog"
     ><b-card-text class="flex flex-col gap-4 items-center">
       <div class="max-w-lg flex flex-col gap-4">
+        <p class="text-2xl ttt-purple">v0.12.0</p>
+
+        <ul class="list-disc">
+          <li>Added support for vegetative plants in tools</li>
+        </ul>
+
+        <p class="text-2xl ttt-purple">v0.11.0</p>
+
+        <ul class="list-disc">
+          <li>Added support for auto-opening any tab</li>
+          <li>Added Quick Scripts</li>
+        </ul>
+
+        <p class="text-2xl ttt-purple">v0.10.0</p>
+
+        <ul class="list-disc">
+          <li>Private feature updates</li>
+        </ul>
+
+        <p class="text-2xl ttt-purple">v0.9.0</p>
+
+        <ul class="list-disc">
+          <li>Private feature updates</li>
+        </ul>
+
         <p class="text-2xl ttt-purple">v0.8.0</p>
 
         <ul class="list-disc">
