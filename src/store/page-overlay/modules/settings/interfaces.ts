@@ -1,13 +1,24 @@
-import { LandingPage, PackageTabLabel } from "@/consts";
+import {
+  LandingPage,
+  PackageTabLabel,
+  PlantsTabLabel,
+  SalesTabLabel,
+  TagsTabLabel,
+  TransfersTabLabel,
+} from "@/consts";
 import { DarkModeState, SnowflakeState } from "@/interfaces";
 
 export interface ISettingsState {
   autoOpenActivePackages: boolean;
   autoOpenPackageTab: PackageTabLabel;
   autoOpenActiveSales: boolean;
+  autoOpenSalesTab: SalesTabLabel;
   autoOpenAvailableTags: boolean;
+  autoOpenTagsTab: TagsTabLabel;
   autoOpenFloweringPlants: boolean;
+  autoOpenPlantsTab: PlantsTabLabel;
   autoOpenIncomingTransfers: boolean;
+  autoOpenTransfersTab: TransfersTabLabel;
   darkModeState: DarkModeState;
   disablePopups: boolean;
   disableSnowAnimation: boolean;

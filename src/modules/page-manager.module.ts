@@ -8,9 +8,12 @@ import {
   PackageFilterIdentifiers,
   PackageTabLabel,
   PlantFilterIdentifiers,
+  PlantsTabLabel,
   TabKey,
   TagFilterIdentifiers,
+  TagsTabLabel,
   TransferFilterIdentifiers,
+  TransfersTabLabel,
   TTT_DARK_MODE,
   TTT_LIGHT_MODE,
   TTT_SNOWFLAKES,
@@ -2536,42 +2539,62 @@ class PageManager implements IAtomicService {
 
     switch (tabKey) {
       case TabKey.PLANTS_PLANTBATCHES_ACTIVE:
-        await this.clickTabStartingWith(this.plantsTabs, "Immature");
+        await this.clickTabStartingWith(this.plantsTabs, PlantsTabLabel.IMMATURE);
         return;
       case TabKey.PLANTS_PLANTBATCHES_INACTIVE:
-        await this.clickTabStartingWith(this.plantsTabs, "Inactive", "Immature");
+        await this.clickTabStartingWith(
+          this.plantsTabs,
+          PlantsTabLabel.INACTIVE,
+          PlantsTabLabel.IMMATURE
+        );
         return;
       case TabKey.PlANTS_PLANTS_VEGETATIVE:
-        await this.clickTabStartingWith(this.plantsTabs, "Vegetative");
+        await this.clickTabStartingWith(this.plantsTabs, PlantsTabLabel.VEGETATIVE);
         return;
       case TabKey.PlANTS_PLANTS_FLOWERING:
-        await this.clickTabStartingWith(this.plantsTabs, "Flowering");
+        await this.clickTabStartingWith(this.plantsTabs, PlantsTabLabel.FLOWERING);
         return;
       case TabKey.PlANTS_PLANTS_ONHOLD:
-        await this.clickTabStartingWith(this.plantsTabs, "On Hold", "Flowering");
+        await this.clickTabStartingWith(
+          this.plantsTabs,
+          PlantsTabLabel.ON_HOLD,
+          PlantsTabLabel.FLOWERING
+        );
         return;
       case TabKey.PlANTS_PLANTS_INACTIVE:
-        await this.clickTabStartingWith(this.plantsTabs, "Inactive", "Flowering");
+        await this.clickTabStartingWith(
+          this.plantsTabs,
+          PlantsTabLabel.INACTIVE,
+          PlantsTabLabel.FLOWERING
+        );
         return;
       case TabKey.PlANTS_PLANTS_ADDITIVE:
-        await this.clickTabStartingWith(this.plantsTabs, "Additive");
+        await this.clickTabStartingWith(this.plantsTabs, PlantsTabLabel.ADDITIVE);
         return;
       case TabKey.PlANTS_PLANTS_WASTE:
-        await this.clickTabStartingWith(this.plantsTabs, "Waste");
+        await this.clickTabStartingWith(this.plantsTabs, PlantsTabLabel.WASTE);
         return;
       case TabKey.PlANTS_HARVESTED_ACTIVE:
-        await this.clickTabStartingWith(this.plantsTabs, "Harvested");
+        await this.clickTabStartingWith(this.plantsTabs, PlantsTabLabel.HARVESTED);
         return;
       case TabKey.PlANTS_HARVESTED_ONHOLD:
-        await this.clickTabStartingWith(this.plantsTabs, "On Hold", "Harvested");
+        await this.clickTabStartingWith(
+          this.plantsTabs,
+          PlantsTabLabel.ON_HOLD,
+          PlantsTabLabel.HARVESTED
+        );
         return;
       case TabKey.PlANTS_HARVESTED_INACTIVE:
-        await this.clickTabStartingWith(this.plantsTabs, "Inactive", "Harvested");
+        await this.clickTabStartingWith(
+          this.plantsTabs,
+          PlantsTabLabel.INACTIVE,
+          PlantsTabLabel.HARVESTED
+        );
         return;
     }
 
     if (store.state.settings?.autoOpenFloweringPlants) {
-      await this.clickTabStartingWith(this.plantsTabs, "Flowering");
+      await this.clickTabStartingWith(this.plantsTabs, store.state.settings?.autoOpenPlantsTab);
     }
   }
 
@@ -2635,18 +2658,18 @@ class PageManager implements IAtomicService {
 
     switch (tabKey) {
       case TabKey.TRANSFERS_INCOMING:
-        await this.clickTabStartingWith(this.transferTabs, "Incoming");
+        await this.clickTabStartingWith(this.transferTabs, TransfersTabLabel.INCOMING);
         return;
       case TabKey.TRANSFERS_OUTGOING:
-        await this.clickTabStartingWith(this.transferTabs, "Outgoing");
+        await this.clickTabStartingWith(this.transferTabs, TransfersTabLabel.OUTGOING);
         return;
       case TabKey.TRANSFERS_REJECTED:
-        await this.clickTabStartingWith(this.transferTabs, "Rejected");
+        await this.clickTabStartingWith(this.transferTabs, TransfersTabLabel.REJECTED);
         return;
     }
 
     if (store.state.settings?.autoOpenIncomingTransfers) {
-      await this.clickTabStartingWith(this.transferTabs, "Incoming");
+      await this.clickTabStartingWith(this.transferTabs, store.state.settings?.autoOpenSalesTab);
     }
   }
 
@@ -2656,7 +2679,7 @@ class PageManager implements IAtomicService {
     }
 
     if (store.state.settings?.autoOpenActiveSales) {
-      await this.clickTabStartingWith(this.salesTabs, "Active");
+      await this.clickTabStartingWith(this.salesTabs, store.state.settings?.autoOpenSalesTab);
     }
   }
 
@@ -2681,18 +2704,18 @@ class PageManager implements IAtomicService {
 
     switch (tabKey) {
       case TabKey.TAGS_AVAILABLE:
-        await this.clickTabStartingWith(this.tagTabs, "Available");
+        await this.clickTabStartingWith(this.tagTabs, TagsTabLabel.AVAILABLE);
         return;
       case TabKey.TAGS_USED:
-        await this.clickTabStartingWith(this.tagTabs, "Used");
+        await this.clickTabStartingWith(this.tagTabs, TagsTabLabel.USED);
         return;
       case TabKey.TAGS_VOIDED:
-        await this.clickTabStartingWith(this.tagTabs, "Voided");
+        await this.clickTabStartingWith(this.tagTabs, TagsTabLabel.VOIDED);
         return;
     }
 
     if (store.state.settings?.autoOpenAvailableTags) {
-      await this.clickTabStartingWith(this.tagTabs, "Available");
+      await this.clickTabStartingWith(this.tagTabs, store.state.settings?.autoOpenTagsTab);
     }
   }
 

@@ -1,4 +1,11 @@
-import { LandingPage, PackageTabLabel } from "@/consts";
+import {
+  LandingPage,
+  PackageTabLabel,
+  PlantsTabLabel,
+  SalesTabLabel,
+  TagsTabLabel,
+  TransfersTabLabel,
+} from "@/consts";
 import { DarkModeState, SnowflakeState } from "@/interfaces";
 import { SettingsMutations } from "./consts";
 import { ISettingsState } from "./interfaces";
@@ -9,9 +16,13 @@ const persistedState: ISettingsState = {
   autoOpenActivePackages: true,
   autoOpenPackageTab: PackageTabLabel.ACTIVE,
   autoOpenActiveSales: true,
+  autoOpenSalesTab: SalesTabLabel.ACTIVE,
   autoOpenAvailableTags: true,
+  autoOpenTagsTab: TagsTabLabel.AVAILABLE,
   autoOpenFloweringPlants: true,
+  autoOpenPlantsTab: PlantsTabLabel.FLOWERING,
   autoOpenIncomingTransfers: true,
+  autoOpenTransfersTab: TransfersTabLabel.OUTGOING,
   darkModeState: DarkModeState.DISABLED,
   disablePopups: false,
   disableSnowAnimation: false,

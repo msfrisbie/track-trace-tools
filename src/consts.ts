@@ -421,3 +421,32 @@ export enum PackageTabLabel {
   INACTIVE = "Inactive",
   IN_TRANSIT = "In Transit",
 }
+
+export enum SalesTabLabel {
+  ACTIVE = "Active",
+  INACTIVE = "Inactive",
+}
+
+export enum TagsTabLabel {
+  AVAILABLE = "Available",
+  USED = "Used",
+  VOIDED = "Voided",
+}
+
+export enum PlantsTabLabel {
+  IMMATURE = "Immature",
+  ON_HOLD = "On Hold",
+  VEGETATIVE = "Vegetative",
+  FLOWERING = "Flowering",
+  HARVESTED = "Harvested",
+  INACTIVE = "Inactive",
+  ADDITIVE = "Additive",
+  WASTE = "Waste",
+}
+
+export enum TransfersTabLabel {
+  INCOMING = "Incoming",
+  OUTGOING = "Outgoing",
+  REJECTED = "Rejected",
+  INACTIVE = "Inactive",
+}
