@@ -40,6 +40,8 @@
 </template>
 
 <script lang="ts">
+import { MessageType } from "@/consts";
+import { analyticsManager } from "@/modules/analytics-manager.module";
 import { toastManager } from "@/modules/toast-manager.module";
 import store from "@/store/page-overlay/index";
 import Vue from "vue";
@@ -77,6 +79,8 @@ export default Vue.extend({
   destroyed() {},
   methods: {
     runScript(scriptId: string) {
+      analyticsManager.track(MessageType.RAN_QUICK_SCRIPT, { scriptId });
+
       switch (scriptId) {
         case "SUM_PACKAGE_QUANTITIES":
           const packageSets: HTMLElement[] = [
