@@ -46,5 +46,10 @@
   ],
   "content_security_policy": {
     "extension_pages": "default-src 'self'; style-src 'self' 'unsafe-inline'; connect-src https://api.amplitude.com/"
+  },
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "tracktracetools@gmail.com"
+    }
   }
 }
