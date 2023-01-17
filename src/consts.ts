@@ -414,3 +414,10 @@ export enum HistoryTreeNodeType {
   OWNED_PACKAGE = "OWNED_PACKAGE",
   UNOWNED_PACKAGE = "UNOWNED_PACKAGE",
 }
+
+export enum PackageTabLabel {
+  ACTIVE = "Active",
+  ON_HOLD = "On Hold",
+  INACTIVE = "Inactive",
+  IN_TRANSIT = "In Transit",
+}

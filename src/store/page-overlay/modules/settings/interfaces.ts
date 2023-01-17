@@ -1,8 +1,9 @@
-import { LandingPage } from "@/consts";
+import { LandingPage, PackageTabLabel } from "@/consts";
 import { DarkModeState, SnowflakeState } from "@/interfaces";
 
 export interface ISettingsState {
   autoOpenActivePackages: boolean;
+  autoOpenPackageTab: PackageTabLabel;
   autoOpenActiveSales: boolean;
   autoOpenAvailableTags: boolean;
   autoOpenFloweringPlants: boolean;

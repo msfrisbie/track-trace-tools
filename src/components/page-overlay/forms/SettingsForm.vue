@@ -290,15 +290,39 @@
         <b-form-group>
           <div class="mb-2 text-gray-400 text-lg">Packages</div>
 
-          <b-form-checkbox
-            id="checkbox-autoOpenActivePackages"
-            class="mb-2"
-            v-model="settings.autoOpenActivePackages"
-            name="checkbox-autoOpenActivePackages"
+          <div class="mb-2 lex flex-row items-center gap-2">
+            <b-form-checkbox
+              id="checkbox-autoOpenActivePackages"
+              v-model="settings.autoOpenActivePackages"
+              name="checkbox-autoOpenActivePackages"
+              @change="onChange()"
+            >
+            </b-form-checkbox>
+
+            <span>Auto-open Packages tab</span>
+
+            <b-form-select
+              class="w-40"
+              v-model="settings.autoOpenPackageTab"
+              :options="packageTabOptions"
+              @change="onChange()"
+              v-if="settings.autoOpenActivePackages"
+            ></b-form-select>
+          </div>
+
+          <!-- <b-form-group
+            v-if="settings.autoOpenActivePackages"
+            label-cols="6"
+            content-cols="6"
+            label="Auto Open Package Tab:"
             @change="onChange()"
           >
-            Auto-open Active Packages tab
-          </b-form-checkbox>
+            <b-form-select
+              v-model="settings.autoOpenPackageTab"
+              :options="packageTabOptions"
+              @change="onChange()"
+            ></b-form-select>
+          </b-form-group> -->
 
           <b-form-group label-cols="6" content-cols="6" label="Viewing # Packages:">
             <b-form-select
@@ -412,7 +436,7 @@
 </template>
 
 <script lang="ts">
-import { LandingPage, MessageType } from "@/consts";
+import { LandingPage, MessageType, PackageTabLabel } from "@/consts";
 import { DarkModeState, SnowflakeState } from "@/interfaces";
 import { analyticsManager } from "@/modules/analytics-manager.module";
 import { clientBuildManager } from "@/modules/client-build-manager.module";
@@ -480,6 +504,12 @@ export default Vue.extend({
         value: x,
         text: x,
       })),
+      packageTabOptions: [
+        PackageTabLabel.ACTIVE,
+        PackageTabLabel.ON_HOLD,
+        PackageTabLabel.INACTIVE,
+        PackageTabLabel.IN_TRANSIT,
+      ],
       landingPageOptions: [
         {
           value: LandingPage.DEFAULT,

@@ -1,4 +1,4 @@
-import { LandingPage } from "@/consts";
+import { LandingPage, PackageTabLabel } from "@/consts";
 import { DarkModeState, SnowflakeState } from "@/interfaces";
 import { SettingsMutations } from "./consts";
 import { ISettingsState } from "./interfaces";
@@ -7,6 +7,7 @@ const inMemoryState = {};
 
 const persistedState: ISettingsState = {
   autoOpenActivePackages: true,
+  autoOpenPackageTab: PackageTabLabel.ACTIVE,
   autoOpenActiveSales: true,
   autoOpenAvailableTags: true,
   autoOpenFloweringPlants: true,

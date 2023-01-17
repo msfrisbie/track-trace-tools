@@ -6,6 +6,7 @@ import {
   ModalAction,
   ModalType,
   PackageFilterIdentifiers,
+  PackageTabLabel,
   PlantFilterIdentifiers,
   TabKey,
   TagFilterIdentifiers,
@@ -2595,21 +2596,21 @@ class PageManager implements IAtomicService {
 
     switch (tabKey) {
       case TabKey.PACKAGES_ACTIVE:
-        await this.clickTabStartingWith(this.packageTabs, "Active");
+        await this.clickTabStartingWith(this.packageTabs, PackageTabLabel.ACTIVE);
         return;
       case TabKey.PACKAGES_ONHOLD:
-        await this.clickTabStartingWith(this.packageTabs, "On Hold");
+        await this.clickTabStartingWith(this.packageTabs, PackageTabLabel.ON_HOLD);
         return;
       case TabKey.PACKAGES_INACTIVE:
-        await this.clickTabStartingWith(this.packageTabs, "Inactive");
+        await this.clickTabStartingWith(this.packageTabs, PackageTabLabel.INACTIVE);
         return;
       case TabKey.PACKAGES_INTRANSIT:
-        await this.clickTabStartingWith(this.packageTabs, "In Transit");
+        await this.clickTabStartingWith(this.packageTabs, PackageTabLabel.IN_TRANSIT);
         return;
     }
 
     if (store.state.settings?.autoOpenActivePackages) {
-      await this.clickTabStartingWith(this.packageTabs, "Active");
+      await this.clickTabStartingWith(this.packageTabs, store.state.settings?.autoOpenPackageTab);
     }
   }
 
