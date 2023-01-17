@@ -3,7 +3,13 @@
   "name": "Track & Trace Tools",
   "description": "Supercharge your Metrc workflow",
   "default_locale": "en",
-  "host_permissions": ["https://*.metrc.com/*", "http://localhost:5000/*"],
+  "host_permissions": [
+    "https://*.metrc.com/*",
+    "http://localhost:5000/*",
+    "https://accounts.google.com/*",
+    "https://www.googleapis.com/*"
+  ],
+  "permissions": ["identity", "identity.email"],
   "icons": {
     "16": "icons/logo/logo-square-16.png",
     "48": "icons/logo/logo-square-48.png",
@@ -45,11 +51,20 @@
     }
   ],
   "content_security_policy": {
-    "extension_pages": "default-src 'self'; style-src 'self' 'unsafe-inline'; connect-src https://api.amplitude.com/"
+    "extension_pages": "default-src 'self'; style-src 'self' 'unsafe-inline'; connect-src *"
   },
   "browser_specific_settings": {
     "gecko": {
       "id": "tracktracetools@gmail.com"
     }
-  }
+  },
+  "oauth2": {
+    "client_id": "555065854761-ssc4dm7apif1e1ac4app1tru9h3graef.apps.googleusercontent.com",
+    "scopes": [
+      "https://www.googleapis.com/auth/userinfo.email",
+      "https://www.googleapis.com/auth/userinfo.profile",
+      "https://www.googleapis.com/auth/spreadsheets"
+    ]
+  },
+  "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAr9KaRylpIPDvsKosswLE49R60P556+p61l8r6JxPVtTISgUZYuYoHeNYM5QmbMRP+b6fLV0t2PlwghizUmWW7EnEziwwRKMxlwHFNVtce6aoudNq6iGVOX3qjdz+Cn9lynzkjbQ1faTXmHGVKFHmA7TKVk/zWty/r5fnS1D0NTGwMlLlXMz1IIBDJWfcBufFLF8pcdpcp30NuNpQClJJB993hKjXlf50KlIfVK2ZBpC5riO/lP0a0GydYkRqH0E5IuftaffPdurpKZr9b4btKcASEOi5O9BhTn5vxY8MlyyacjdXws9xGUJQzUN97EU4htkh+Bg0uYquEJLvAI9E+wIDAQAB"
 }

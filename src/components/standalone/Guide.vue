@@ -17,6 +17,8 @@
 
           <changelog></changelog>
 
+          <auth></auth>
+
           <license></license>
         </b-tabs>
       </b-card>
@@ -29,6 +31,7 @@ import TitleBanner from "@/components/shared/TitleBanner.vue";
 import { version } from "@/modules/version";
 import Vue from "vue";
 import router from "./router";
+import Auth from "./tabs/Auth.vue";
 import Changelog from "./tabs/Changelog.vue";
 import CustomFeatures from "./tabs/CustomFeatures.vue";
 import Faq from "./tabs/Faq.vue";
@@ -46,6 +49,7 @@ export default Vue.extend({
     License,
     Changelog,
     Welcome,
+    Auth,
   },
   computed: {},
   data() {
