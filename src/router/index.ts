@@ -34,6 +34,7 @@ import FinalizeSalesReceiptsForm from "@/components/page-overlay/forms/FinalizeS
 import SettingsForm from "@/components/page-overlay/forms/SettingsForm.vue";
 import VoidTagForm from "@/components/page-overlay/forms/VoidTagForm.vue";
 import ManageAccount from "@/components/page-overlay/ManageAccount.vue";
+import QuickScripts from "@/components/page-overlay/QuickScripts.vue";
 import Screenshot from "@/components/page-overlay/Screenshot.vue";
 import VueRouter, { RouteConfig } from "vue-router";
 
@@ -81,6 +82,11 @@ const routes: Array<RouteConfig> = [
     redirect: "/transfer/create-transfer",
     // name: "Transfer Tools",
     // component: TransferBuilderListView
+  },
+  {
+    path: "/quick-scripts",
+    name: "Quick Scripts",
+    component: QuickScripts,
   },
   {
     path: "/package/move-packages",

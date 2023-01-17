@@ -125,6 +125,16 @@ export default Vue.extend({
       return [
         {
           backgroundColor: "#48b867",
+          text: "QUICK SCRIPTS",
+          route: "/quick-scripts",
+          icon: "bolt",
+          visible: true,
+          enabled: true,
+          isBeta: false,
+          isNew: false,
+        },
+        {
+          backgroundColor: "#48b867",
           text: "CULTIVATION TOOLS",
           route: "/cultivator",
           icon: "leaf",
