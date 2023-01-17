@@ -7,6 +7,8 @@
         <button class="btn btn-info" @click="getProfileInfo()">PROFILE INFO</button>
 
         <button class="btn btn-danger" @click="logout()">LOGOUT</button>
+
+        <button class="btn btn-primary" @click="write()">WRITE</button>
       </div>
 
       <div v-if="!isAuthenticated">
@@ -94,6 +96,39 @@ export default Vue.extend({
 
     logoutImpl() {
       this.$data.identityData = null;
+    },
+
+    async write() {
+      const spreadsheetId = "1U6iMT4sVqNDw6kduMqtkayjVFC3-ZRLIRpSjeqJ57cI";
+
+      const authToken: string = await new Promise((resolve) => {
+        chrome.identity.getAuthToken({}, (token) => {
+          console.log({ token });
+          resolve(token);
+        });
+      });
+
+      fetch(
+        `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/Sheet1!A1:D5?valueInputOption=USER_ENTERED`,
+        {
+          method: "PUT",
+          headers: {
+            Authorization: `Bearer ${authToken}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            range: "Sheet1!A1:D5",
+            majorDimension: "ROWS",
+            values: [
+              ["Item", "Cost", "Stocked", "Ship Date"],
+              ["Wheel", "$20.50", "4", "3/1/2016"],
+              ["Door", "$15", "2", "3/15/2016"],
+              ["Engine", "$100", "1", "3/20/2016"],
+              ["Totals", "=SUM(B2:B4)", "=SUM(C2:C4)", "=MAX(D2:D4)"],
+            ],
+          }),
+        }
+      );
     },
   },
   async created() {},
