@@ -460,6 +460,29 @@ export class DataLoader implements IAtomicService {
     return this._voidedTags;
   }
 
+  async vegetativePlants(options: IPlantOptions): Promise<IPlantData[]> {
+    if (store.state.mockDataMode && store.state.flags?.mockedFlags.mockPlants.enabled) {
+      return mockDataManager.mockPlants(options);
+    }
+
+    // This does NOT cache the result
+    return new Promise(async (resolve, reject) => {
+      const subscription = timer(DATA_LOAD_FETCH_TIMEOUT_MS).subscribe(() =>
+        reject("Vegetative plant fetch timed out")
+      );
+
+      try {
+        const plants = await this.loadVegetativePlants(options);
+
+        subscription.unsubscribe();
+        resolve(plants);
+      } catch (e) {
+        subscription.unsubscribe();
+        reject(e);
+      }
+    });
+  }
+
   async floweringPlants(options: IPlantOptions): Promise<IPlantData[]> {
     if (store.state.mockDataMode && store.state.flags?.mockedFlags.mockPlants.enabled) {
       return mockDataManager.mockPlants(options);
@@ -1544,6 +1567,20 @@ export class DataLoader implements IAtomicService {
     return streamFactory<IPackageData>(options, responseFactory);
   }
 
+  vegetativePlantsStream(options: IPlantOptions): Subject<ICollectionResponse<IPlantData>> {
+    const responseFactory = (paginationOptions: IPaginationOptions): Promise<Response> => {
+      const body = buildBody(
+        paginationOptions,
+        { plantFilter: options.filter },
+        { plantSort: { Label: "asc" } }
+      );
+
+      return this.metrcRequestManagerOrError.getVegetativePlants(body);
+    };
+
+    return streamFactory<IPlantData>(options, responseFactory);
+  }
+
   floweringPlantsStream(options: IPlantOptions): Subject<ICollectionResponse<IPlantData>> {
     const responseFactory = (paginationOptions: IPaginationOptions): Promise<Response> => {
       const body = buildBody(
@@ -2188,6 +2225,24 @@ export class DataLoader implements IAtomicService {
     store.commit(MutationType.SET_LOADING_MESSAGE, null);
 
     return strains;
+  }
+
+  private async loadVegetativePlants(options: IPlantOptions): Promise<IPlantData[]> {
+    await authManager.authStateOrError();
+
+    store.commit(MutationType.SET_LOADING_MESSAGE, "Loading vegetative plants...");
+
+    let plants: IPlantData[] = [];
+
+    await this.vegetativePlantsStream(options).forEach((next: ICollectionResponse<IPlantData>) => {
+      plants = [...plants, ...next.Data];
+    });
+
+    console.log(`Loaded ${plants.length} vegetative plants`);
+
+    store.commit(MutationType.SET_LOADING_MESSAGE, null);
+
+    return plants;
   }
 
   private async loadFloweringPlants(options: IPlantOptions): Promise<IPlantData[]> {

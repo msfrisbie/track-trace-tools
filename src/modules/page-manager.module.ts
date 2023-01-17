@@ -463,6 +463,9 @@ class PageManager implements IAtomicService {
         this.interceptViewManifestButton();
 
         this.addButtonsToTransferTable();
+
+        // Transfer subtable for packages should get these too
+        this.addButtonsToPackageTable();
       }
 
       if (window.location.pathname.match(TRANSFER_HUB_REGEX)) {

@@ -16,6 +16,7 @@
         class="col-span-2"
         :builderType="builderType"
         :selectedPlants.sync="selectedPlants"
+        :enableVegetative="true"
       />
 
       <template v-if="selectedPlants.length > 0">

@@ -147,6 +147,39 @@ export function buildBodyFilter(
     ];
   }
 
+  if (plantFilter?.vegetativeDateGt) {
+    filterSet.filters = [
+      ...filterSet.filters,
+      {
+        field: "VegetativeDate",
+        operator: "gt",
+        value: plantFilter.vegetativeDateGt,
+      },
+    ];
+  }
+
+  if (plantFilter?.vegetativeDateEq) {
+    filterSet.filters = [
+      ...filterSet.filters,
+      {
+        field: "VegetativeDate",
+        operator: "eq",
+        value: plantFilter.vegetativeDateEq,
+      },
+    ];
+  }
+
+  if (plantFilter?.vegetativeDateLt) {
+    filterSet.filters = [
+      ...filterSet.filters,
+      {
+        field: "VegetativeDate",
+        operator: "lt",
+        value: plantFilter.vegetativeDateLt,
+      },
+    ];
+  }
+
   if (plantFilter?.floweringDateGt) {
     filterSet.filters = [
       ...filterSet.filters,

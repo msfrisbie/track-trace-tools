@@ -7,6 +7,12 @@
           <span class="text-lg font-bold">Select one or more plant filters:</span>
         </div>
 
+        <template v-if="enableVegetative">
+          <b-form-group label="Growth phase:" label-class="text-gray-400" label-size="sm">
+            <b-form-select v-model="growthPhase" :options="growthPhaseOptions"></b-form-select>
+          </b-form-group>
+        </template>
+
         <b-form-group label="Filter location:" label-class="text-gray-400" label-size="sm">
           <location-picker :location.sync="location" />
         </b-form-group>
@@ -237,6 +243,11 @@ export default Vue.extend({
   props: {
     builderType: String,
     selectedPlants: Array as () => IPlantData[],
+    enableVegetative: {
+      type: Boolean,
+      default: false,
+      required: false,
+    },
   },
   methods: {
     clear() {
@@ -321,6 +332,20 @@ export default Vue.extend({
           }
         }
 
+        if (this.$data.filterDateField === "VegetativeDate") {
+          switch (this.$data.filterDateMatch) {
+            case "lt":
+              filter.vegetativeDateLt = isoDatetime;
+              break;
+            case "eq":
+              filter.vegetativeDateEq = isoDatetime;
+              break;
+            case "gt":
+              filter.vegetativeDateGt = isoDatetime;
+              break;
+          }
+        }
+
         if (this.$data.filterDateField === "FloweringDate") {
           switch (this.$data.filterDateMatch) {
             case "lt":
@@ -344,10 +369,16 @@ export default Vue.extend({
         const lock = v4();
         this.$data.lockUuid = lock;
 
-        const plants = await primaryDataLoader.floweringPlants({
-          filter,
-          maxCount: DATA_LOAD_MAX_COUNT,
-        });
+        const plants =
+          this.$data.growthPhase === "Vegetative"
+            ? await primaryDataLoader.vegetativePlants({
+                filter,
+                maxCount: DATA_LOAD_MAX_COUNT,
+              })
+            : await primaryDataLoader.floweringPlants({
+                filter,
+                maxCount: DATA_LOAD_MAX_COUNT,
+              });
 
         // If there was a subsequent load, don't overwrite
         if (this.$data.lockUuid === lock) {
@@ -403,6 +434,7 @@ export default Vue.extend({
       location$: new Subject<ILocationData>(),
       strain: null,
       strain$: new Subject<IStrainData>(),
+      growthPhase$: new Subject<IStrainData>(),
       dateFilterData$: new Subject<[string, string, string]>(),
       sourcePlants: [],
       selectedPlantsMirror: [],
@@ -423,8 +455,11 @@ export default Vue.extend({
       filterDateFieldOptions: [
         { value: null, text: "" },
         { value: "PlantedDate", text: "Planted date" },
+        { value: "VegetativeDate", text: "Vegetative date" },
         { value: "FloweringDate", text: "Flowering date" },
       ],
+      growthPhase: "Flowering",
+      growthPhaseOptions: ["Vegetative", "Flowering"],
       copyPasteTags: false,
       pastedTags: [],
       selectedMenuState: SelectedMenuState,
@@ -432,6 +467,12 @@ export default Vue.extend({
     };
   },
   watch: {
+    growthPhase: {
+      immediate: true,
+      handler(newValue, oldValue) {
+        this.$data.growthPhase$.next(newValue);
+      },
+    },
     location: {
       immediate: true,
       handler(newValue, oldValue) {
@@ -499,26 +540,35 @@ export default Vue.extend({
         distinctUntilChanged(),
         startWith([null, null, null])
       ),
+      this.$data.growthPhase$.pipe(
+        debounceTime(500),
+        distinctUntilChanged(),
+        startWith(this.$data.growthPhase)
+      ),
     ])
       .pipe(
         tap((_: any) => {
           this.$data.plantsPageIndex = 0;
         }),
-        filter(([location, strain, [filterDateField, filterDateMatch, filterDate]]) => {
-          return !!location || !!strain || !!filterDate;
-        })
+        filter(
+          ([location, strain, [filterDateField, filterDateMatch, filterDate], growthPhase]) => {
+            return !!location || !!strain || !!filterDate;
+          }
+        )
       )
       .subscribe(
-        async ([location, strain, [filterDateField, filterDateMatch, filterDate]]: [
+        async ([location, strain, [filterDateField, filterDateMatch, filterDate], growthPhase]: [
           ILocationData,
           IStrainData,
-          [string, string, string]
+          [string, string, string],
+          string
         ]) => {
           this.$data.location = location;
           this.$data.strain = strain;
           this.$data.filterDateField = filterDateField;
           this.$data.filterDateMatch = filterDateMatch;
           this.$data.filterDate = filterDate;
+          this.$data.growthPhase = growthPhase;
 
           // Allow parent component to use selected location
           this.$emit("selectLocation", location);

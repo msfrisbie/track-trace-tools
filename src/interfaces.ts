@@ -381,6 +381,9 @@ export interface IPlantFilter {
   locationName?: string | null;
   strainName?: string | null;
   label?: string | null;
+  vegetativeDateGt?: string | null;
+  vegetativeDateEq?: string | null;
+  vegetativeDateLt?: string | null;
   floweringDateGt?: string | null;
   floweringDateEq?: string | null;
   floweringDateLt?: string | null;

@@ -10,7 +10,7 @@
     >
       <!-- TODO not all of these work properly yet -->
       <b-tab lazy title="Plant Picker">
-        <plant-picker :selectedPlants.sync="many" />
+        <plant-picker :enableVegetative="true" :selectedPlants.sync="many" />
       </b-tab>
       <b-tab lazy title="Package Picker">
         <package-picker :selectedPackages.sync="many" />
@@ -40,18 +40,18 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import { mapState } from "vuex";
-import router from "@/router/index";
-import store from "@/store/page-overlay/index";
-import PlantPicker from "@/components/overlay-widget/shared/PlantPicker.vue";
+import HarvestPicker from "@/components/overlay-widget/shared/HarvestPicker.vue";
+import ItemPicker from "@/components/overlay-widget/shared/ItemPicker.vue";
+import LocationPicker from "@/components/overlay-widget/shared/LocationPicker.vue";
 import PackagePicker from "@/components/overlay-widget/shared/PackagePicker.vue";
 import PlantBatchPicker from "@/components/overlay-widget/shared/PlantBatchPicker.vue";
-import LocationPicker from "@/components/overlay-widget/shared/LocationPicker.vue";
-import ItemPicker from "@/components/overlay-widget/shared/ItemPicker.vue";
+import PlantPicker from "@/components/overlay-widget/shared/PlantPicker.vue";
 import StrainPicker from "@/components/overlay-widget/shared/StrainPicker.vue";
 import TagPicker from "@/components/overlay-widget/shared/TagPicker.vue";
-import HarvestPicker from "@/components/overlay-widget/shared/HarvestPicker.vue";
+import router from "@/router/index";
+import store from "@/store/page-overlay/index";
+import Vue from "vue";
+import { mapState } from "vuex";
 
 export default Vue.extend({
   name: "PickerSandbox",
@@ -66,20 +66,20 @@ export default Vue.extend({
     ItemPicker,
     StrainPicker,
     TagPicker,
-    HarvestPicker
+    HarvestPicker,
   },
   computed: {
-    ...mapState([])
+    ...mapState([]),
   },
   data() {
     return {
       many: [],
-      one: null
+      one: null,
     };
   },
   methods: {},
   async created() {},
-  async mounted() {}
+  async mounted() {},
 });
 </script>
 

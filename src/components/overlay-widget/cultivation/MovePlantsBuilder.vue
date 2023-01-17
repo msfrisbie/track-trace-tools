@@ -13,7 +13,7 @@
 
     <template v-if="activeStepIndex === 0">
       <div class="w-full flex flex-col space-y-4">
-        <plant-picker :builderType="builderType" :selectedPlants.sync="selectedPlants" />
+        <plant-picker :enableVegetative="true" :builderType="builderType" :selectedPlants.sync="selectedPlants" />
 
         <template v-if="selectedPlants.length > 0">
           <div class="flex flex-row justify-end">
