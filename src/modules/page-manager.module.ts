@@ -3,6 +3,7 @@ import {
   LandingPage,
   MessageType,
   METRC_INDUSTRY_LICENSE_PATH_REGEX,
+  METRC_TAG_REGEX,
   ModalAction,
   ModalType,
   PackageFilterIdentifiers,
@@ -91,7 +92,7 @@ function noScrollEventFactory(eventName = "click"): Event {
 }
 
 const t0 = performance.now();
-const INLINE_TABLE_BUTTON_RENDER_DELAY = 3000;
+const INLINE_TABLE_BUTTON_RENDER_DELAY = 500;
 
 class PageManager implements IAtomicService {
   textBuffer: string = "";
@@ -465,6 +466,7 @@ class PageManager implements IAtomicService {
         this.addButtonsToTransferTable();
 
         // Transfer subtable for packages should get these too
+        // This MUST occur after the transfer buttons are added
         this.addButtonsToPackageTable();
       }
 
@@ -1004,9 +1006,7 @@ class PageManager implements IAtomicService {
 
     // const rows = document.querySelectorAll('.k-master-row')[0].children[1].innerText.trim()
     // This selector is horrific
-    const rows = document.querySelectorAll(
-      '.k-content > * > * > * >.k-master-row:not([mesinline="1"])'
-    );
+    const rows = document.querySelectorAll('.k-content .k-master-row:not([mesinline="1"])');
 
     if (rows.length === 0) {
       return;
@@ -1028,7 +1028,7 @@ class PageManager implements IAtomicService {
       // @ts-ignore
       const packageTag = targetCell.innerText.trim();
 
-      if (!packageTag) {
+      if (!packageTag || !packageTag.match(METRC_TAG_REGEX)) {
         console.error("bad packageTag");
         continue;
       }
