@@ -2669,7 +2669,10 @@ class PageManager implements IAtomicService {
     }
 
     if (store.state.settings?.autoOpenIncomingTransfers) {
-      await this.clickTabStartingWith(this.transferTabs, store.state.settings?.autoOpenSalesTab);
+      await this.clickTabStartingWith(
+        this.transferTabs,
+        store.state.settings?.autoOpenTransfersTab
+      );
     }
   }
 

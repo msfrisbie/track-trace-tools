@@ -290,7 +290,7 @@
         <b-form-group>
           <div class="mb-2 text-gray-400 text-lg">Packages</div>
 
-          <div class="mb-2 lex flex-row items-center gap-2">
+          <div class="mb-2 flex flex-row items-center gap-2">
             <b-form-checkbox
               id="checkbox-autoOpenActivePackages"
               v-model="settings.autoOpenActivePackages"
@@ -309,20 +309,6 @@
               v-if="settings.autoOpenActivePackages"
             ></b-form-select>
           </div>
-
-          <!-- <b-form-group
-            v-if="settings.autoOpenActivePackages"
-            label-cols="6"
-            content-cols="6"
-            label="Auto Open Package Tab:"
-            @change="onChange()"
-          >
-            <b-form-select
-              v-model="settings.autoOpenPackageTab"
-              :options="packageTabOptions"
-              @change="onChange()"
-            ></b-form-select>
-          </b-form-group> -->
 
           <b-form-group label-cols="6" content-cols="6" label="Viewing # Packages:">
             <b-form-select
@@ -346,15 +332,25 @@
             Always use TTT PDF viewer for manifests
           </b-form-checkbox>
 
-          <b-form-checkbox
-            id="checkbox-autoOpenIncomingTransfers"
-            class="mb-2"
-            v-model="settings.autoOpenIncomingTransfers"
-            name="checkbox-autoOpenIncomingTransfers"
-            @change="onChange()"
-          >
-            Auto-open Incoming Transfers tab
-          </b-form-checkbox>
+          <div class="mb-2 flex flex-row items-center gap-2">
+            <b-form-checkbox
+              id="checkbox-autoOpenIncomingTransfers"
+              v-model="settings.autoOpenIncomingTransfers"
+              name="checkbox-autoOpenIncomingTransfers"
+              @change="onChange()"
+            >
+            </b-form-checkbox>
+
+            <span>Auto-open Transfers tab</span>
+
+            <b-form-select
+              class="w-40"
+              v-model="settings.autoOpenTransfersTab"
+              :options="transfersTabOptions"
+              @change="onChange()"
+              v-if="settings.autoOpenIncomingTransfers"
+            ></b-form-select>
+          </div>
 
           <b-form-group label-cols="6" content-cols="6" label="Viewing # Transfers:">
             <b-form-select
@@ -368,15 +364,25 @@
         <b-form-group>
           <div class="mt-4 mb-2 text-gray-400 text-lg">Sales</div>
 
-          <b-form-checkbox
-            id="checkbox-autoOpenActiveSales"
-            class="mb-2"
-            v-model="settings.autoOpenActiveSales"
-            name="checkbox-autoOpenActiveSales"
-            @change="onChange()"
-          >
-            Auto-open Active Sales tab
-          </b-form-checkbox>
+          <div class="mb-2 flex flex-row items-center gap-2">
+            <b-form-checkbox
+              id="checkbox-autoOpenActiveSales"
+              v-model="settings.autoOpenActiveSales"
+              name="checkbox-autoOpenActiveSales"
+              @change="onChange()"
+            >
+            </b-form-checkbox>
+
+            <span>Auto-open Sales tab</span>
+
+            <b-form-select
+              class="w-40"
+              v-model="settings.autoOpenSalesTab"
+              :options="salesTabOptions"
+              @change="onChange()"
+              v-if="settings.autoOpenActiveSales"
+            ></b-form-select>
+          </div>
 
           <b-form-group label-cols="6" content-cols="6" label="Viewing # Sales:">
             <b-form-select
@@ -390,15 +396,25 @@
         <b-form-group>
           <div class="mt-4 mb-2 text-gray-400 text-lg">Tags</div>
 
-          <b-form-checkbox
-            id="checkbox-autoOpenAvailableTags"
-            class="mb-2"
-            v-model="settings.autoOpenAvailableTags"
-            name="checkbox-autoOpenAvailableTags"
-            @change="onChange()"
-          >
-            Auto-open Available Tags tab
-          </b-form-checkbox>
+          <div class="mb-2 flex flex-row items-center gap-2">
+            <b-form-checkbox
+              id="checkbox-autoOpenAvailableTags"
+              v-model="settings.autoOpenAvailableTags"
+              name="checkbox-autoOpenAvailableTags"
+              @change="onChange()"
+            >
+            </b-form-checkbox>
+
+            <span>Auto-open Tags tab</span>
+
+            <b-form-select
+              class="w-40"
+              v-model="settings.autoOpenTagsTab"
+              :options="tagsTabOptions"
+              @change="onChange()"
+              v-if="settings.autoOpenAvailableTags"
+            ></b-form-select>
+          </div>
 
           <b-form-group label-cols="6" content-cols="6" label="Viewing # Tags:">
             <b-form-select
@@ -412,15 +428,25 @@
         <b-form-group>
           <div class="mt-4 mb-2 text-gray-400 text-lg">Plants</div>
 
-          <b-form-checkbox
-            id="checkbox-autoOpenFloweringPlants"
-            class="mb-2"
-            v-model="settings.autoOpenFloweringPlants"
-            name="checkbox-autoOpenFloweringPlants"
-            @change="onChange()"
-          >
-            Auto-open Flowering Plants tab
-          </b-form-checkbox>
+          <div class="mb-2 flex flex-row items-center gap-2">
+            <b-form-checkbox
+              id="checkbox-autoOpenFloweringPlants"
+              v-model="settings.autoOpenFloweringPlants"
+              name="checkbox-autoOpenFloweringPlants"
+              @change="onChange()"
+            >
+            </b-form-checkbox>
+
+            <span>Auto-open Plants tab</span>
+
+            <b-form-select
+              class="w-40"
+              v-model="settings.autoOpenPlantsTab"
+              :options="plantsTabOptions"
+              @change="onChange()"
+              v-if="settings.autoOpenFloweringPlants"
+            ></b-form-select>
+          </div>
 
           <b-form-group label-cols="6" content-cols="6" label="Viewing # Plants:">
             <b-form-select
@@ -436,7 +462,15 @@
 </template>
 
 <script lang="ts">
-import { LandingPage, MessageType, PackageTabLabel } from "@/consts";
+import {
+  LandingPage,
+  MessageType,
+  PackageTabLabel,
+  PlantsTabLabel,
+  SalesTabLabel,
+  TagsTabLabel,
+  TransfersTabLabel,
+} from "@/consts";
 import { DarkModeState, SnowflakeState } from "@/interfaces";
 import { analyticsManager } from "@/modules/analytics-manager.module";
 import { clientBuildManager } from "@/modules/client-build-manager.module";
@@ -506,10 +540,22 @@ export default Vue.extend({
       })),
       packageTabOptions: [
         PackageTabLabel.ACTIVE,
-        PackageTabLabel.ON_HOLD,
         PackageTabLabel.INACTIVE,
         PackageTabLabel.IN_TRANSIT,
       ],
+      plantsTabOptions: [
+        PlantsTabLabel.IMMATURE,
+        PlantsTabLabel.VEGETATIVE,
+        PlantsTabLabel.FLOWERING,
+        PlantsTabLabel.HARVESTED,
+      ],
+      transfersTabOptions: [
+        TransfersTabLabel.INCOMING,
+        TransfersTabLabel.OUTGOING,
+        TransfersTabLabel.REJECTED,
+      ],
+      tagsTabOptions: [TagsTabLabel.AVAILABLE, TagsTabLabel.USED, TagsTabLabel.VOIDED],
+      salesTabOptions: [SalesTabLabel.ACTIVE, SalesTabLabel.INACTIVE],
       landingPageOptions: [
         {
           value: LandingPage.DEFAULT,
