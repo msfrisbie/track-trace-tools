@@ -9,6 +9,7 @@
         <button class="btn btn-danger" @click="logout()">LOGOUT</button>
 
         <button class="btn btn-primary" @click="write()">WRITE</button>
+        <button class="btn btn-primary" @click="getSheetData()">READ</button>
       </div>
 
       <div v-if="!isAuthenticated">
@@ -21,6 +22,7 @@
 <script lang="ts">
 import router from "@/router/index";
 import store from "@/store/page-overlay/index";
+import { expireAuthToken, getAuthTokenOrError, getProfileUserInfoOrError } from "@/utils/oauth";
 import Vue from "vue";
 import { mapState } from "vuex";
 
@@ -33,6 +35,7 @@ export default Vue.extend({
   computed: {
     ...mapState([]),
     isAuthenticated() {
+      // @ts-ignore
       return !!this.$data.identityData;
     },
   },
@@ -42,78 +45,46 @@ export default Vue.extend({
     };
   },
   methods: {
-    login() {
-      chrome.identity.getAuthToken(
-        {
-          interactive: true,
-        },
-        (token) => {
-          if (token) {
-            // @ts-ignore
-            chrome.identity.getProfileUserInfo({ accountStatus: "ANY" }, console.log);
-            this.loginImpl(token);
-          }
-        }
-      );
-    },
-
-    getProfileInfo() {
-      // @ts-ignore
-      chrome.identity.getProfileUserInfo({ accountStatus: "ANY" }, console.log);
+    async login() {
+      this.$data.identityData = await getProfileUserInfoOrError();
     },
 
     logout() {
-      chrome.identity.getAuthToken(
-        {
-          interactive: false,
-        },
-        (token) => {
-          fetch(`https://accounts.google.com/o/oauth2/revoke?token=${token}`);
+      expireAuthToken();
 
-          chrome.identity.removeCachedAuthToken({ token: token }, () => {});
-
-          this.logoutImpl();
-        }
-      );
-    },
-
-    loginImpl(token: string) {
-      fetch(`https://www.googleapis.com/oauth2/v2/userinfo?access_token="${token}`, {
-        method: "GET",
-        // @ts-ignore
-        async: true,
-        headers: {
-          Authorization: "Bearer " + token,
-          "Content-Type": "application/json",
-        },
-        contentType: "json",
-      })
-        .then((response) => response.json())
-        .then((data) => {
-          this.$data.identityData = data;
-        });
-    },
-
-    logoutImpl() {
       this.$data.identityData = null;
+    },
+
+    async getSheetData() {
+      const spreadsheetId = "1U6iMT4sVqNDw6kduMqtkayjVFC3-ZRLIRpSjeqJ57cI";
+
+      const token = await getAuthTokenOrError();
+
+      const result = await fetch(
+        `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}?&fields=sheets.properties`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      ).then((response) => response.json());
+
+      console.log(result);
     },
 
     async write() {
       const spreadsheetId = "1U6iMT4sVqNDw6kduMqtkayjVFC3-ZRLIRpSjeqJ57cI";
 
-      const authToken: string = await new Promise((resolve) => {
-        chrome.identity.getAuthToken({}, (token) => {
-          console.log({ token });
-          resolve(token);
-        });
-      });
+      const token = await getAuthTokenOrError();
 
       fetch(
         `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/Sheet1!A1:D5?valueInputOption=USER_ENTERED`,
         {
           method: "PUT",
           headers: {
-            Authorization: `Bearer ${authToken}`,
+            Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
@@ -133,14 +104,7 @@ export default Vue.extend({
   },
   async created() {},
   async mounted() {
-    chrome.identity.getAuthToken({ interactive: false }, (token) => {
-      if (!token) {
-        this.logout();
-      } else {
-        console.log(token);
-        this.loginImpl(token);
-      }
-    });
+    await getAuthTokenOrError();
   },
 });
 </script>
