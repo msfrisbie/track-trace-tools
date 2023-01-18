@@ -11,9 +11,12 @@
       class="relative flex flex-row gap-4"
     > -->
     <template v-if="pluginAuth.authState">
-      <quick-script-button class="hover-reveal-target"></quick-script-button>
+      <quick-script-button
+        style="box-shadow: 0px 5px 5px rgba(0, 0, 0, 0.5)"
+        class="hover-reveal-target"
+      ></quick-script-button>
 
-      <builder-button />
+      <builder-button style="box-shadow: 0px 5px 5px rgba(0, 0, 0, 0.5)" />
     </template>
 
     <!-- <primary-toolkit-button /> -->

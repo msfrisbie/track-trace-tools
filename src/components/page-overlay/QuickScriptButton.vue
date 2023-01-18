@@ -14,12 +14,13 @@
       </div>
     </template>
 
-    <b-dropdown-item
-      v-for="quickScript of quickScripts"
-      v-bind:key="quickScript.id"
-      @click="runQuickScript(quickScript)"
-      >{{ quickScript.name }}</b-dropdown-item
-    >
+    <div v-for="quickScript of quickScripts" v-bind:key="quickScript.id">
+      <b-dropdown-item @click="runQuickScript(quickScript)">{{ quickScript.name }}</b-dropdown-item>
+      <!-- <b-dropdown-text class="max-w-sm text-xs text-gray-400">
+        Some example text that's free-flowing within the dropdown menu.
+      </b-dropdown-text>
+      <b-dropdown-divider></b-dropdown-divider> -->
+    </div>
     <b-popover
       target="quick-script-popover-target"
       triggers="hover"
