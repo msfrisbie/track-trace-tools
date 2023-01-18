@@ -3,18 +3,17 @@ import { analyticsManager } from "@/modules/analytics-manager.module";
 import { toastManager } from "@/modules/toast-manager.module";
 
 export interface IQuickScript {
-    id: string;
-    name: string;
-    description: string;
-    contextLink: string;
-    quickScriptFunction: () => void;
-  }
+  id: string;
+  name: string;
+  description: string;
+  contextLink: string;
+  quickScriptFunction: () => void;
+}
 
 export async function runQuickScript(quickScript: IQuickScript) {
-    analyticsManager.track(MessageType.RAN_QUICK_SCRIPT, { scriptId: quickScript.id });
+  analyticsManager.track(MessageType.RAN_QUICK_SCRIPT, { scriptId: quickScript.id });
 
-    quickScript.quickScriptFunction();
-    
+  quickScript.quickScriptFunction();
 }
 
 export const QUICK_SCRIPTS: IQuickScript[] = [
@@ -79,7 +78,7 @@ export async function sumPackageQuantities() {
     output.value = inputs
       .map((input) => parseFloat(input.value))
       .filter((x) => !isNaN(x))
-      .reduce((a, b) => a + b)
+      .reduce((a, b) => a + b, 0)
       .toString();
   }
 
