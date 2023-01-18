@@ -17,7 +17,7 @@
 
           <changelog></changelog>
 
-          <auth></auth>
+          <google-sheets :enabled="false"></google-sheets>
 
           <license></license>
         </b-tabs>
@@ -31,10 +31,10 @@ import TitleBanner from "@/components/shared/TitleBanner.vue";
 import { version } from "@/modules/version";
 import Vue from "vue";
 import router from "./router";
-import Auth from "./tabs/Auth.vue";
 import Changelog from "./tabs/Changelog.vue";
 import CustomFeatures from "./tabs/CustomFeatures.vue";
 import Faq from "./tabs/Faq.vue";
+import GoogleSheets from "./tabs/GoogleSheets.vue";
 import License from "./tabs/License.vue";
 import Welcome from "./tabs/Welcome.vue";
 
@@ -49,7 +49,7 @@ export default Vue.extend({
     License,
     Changelog,
     Welcome,
-    Auth,
+    GoogleSheets,
   },
   computed: {},
   data() {

@@ -1,18 +1,22 @@
 <template>
-  <b-tab title="Google Account"
+  <b-tab title="Google Sheets"
     ><b-card-text class="flex flex-col gap-4">
-      <div v-if="isAuthenticated">
-        <pre>{{ profileUserInfo }}</pre>
-        <pre>{{ oauthUserInfo }}</pre>
+      <template v-if="enabled">
+        <div v-if="isAuthenticated">
+          <pre>{{ oauthUserInfo }}</pre>
 
-        <button class="btn btn-danger" @click="logout()">LOGOUT</button>
-        <button class="btn btn-primary" @click="write()">WRITE</button>
-        <button class="btn btn-primary" @click="getSheetData()">READ</button>
-      </div>
+          <button class="btn btn-danger" @click="logout()">LOGOUT</button>
+          <button class="btn btn-primary" @click="write()">WRITE</button>
+          <button class="btn btn-primary" @click="getSheetData()">READ</button>
+        </div>
 
-      <div v-if="!isAuthenticated">
-        <button class="btn btn-primary" @click="login()">LOGIN</button>
-      </div>
+        <div v-if="!isAuthenticated">
+          <button class="btn btn-primary" @click="login()">LOGIN</button>
+        </div>
+      </template>
+      <template v-if="!enabled">
+        Google Sheets integration is under construction! Check back soon.
+      </template>
     </b-card-text></b-tab
   >
 </template>
@@ -20,23 +24,20 @@
 <script lang="ts">
 import router from "@/router/index";
 import store from "@/store/page-overlay/index";
-import {
-  expireAuthToken,
-  getAuthTokenOrError,
-  getOAuthUserInfoOrError,
-  getProfileUserInfoOrError,
-} from "@/utils/oauth";
+import { expireAuthToken, getAuthTokenOrError, getOAuthUserInfoOrError } from "@/utils/oauth";
 import Vue from "vue";
 import { mapState } from "vuex";
 
 export default Vue.extend({
-  name: "Auth",
+  name: "GoogleSheets",
   store,
   router,
-  props: {},
+  props: {
+    enabled: Boolean,
+  },
   components: {},
   computed: {
-    ...mapState([]),
+    ...mapState(["debugMode"]),
     isAuthenticated() {
       // @ts-ignore
       return !!this.$data.oauthUserInfo;

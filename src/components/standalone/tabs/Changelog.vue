@@ -2,6 +2,19 @@
   <b-tab title="Changelog"
     ><b-card-text class="flex flex-col gap-4 items-center">
       <div class="max-w-lg flex flex-col gap-4">
+        <p class="text-2xl ttt-purple">v0.14.0</p>
+
+        <ul class="list-disc">
+          <li>Infrastructure for Google Sheets integration</li>
+          <li>Updates to quick scripts</li>
+        </ul>
+
+        <p class="text-2xl ttt-purple">v0.13.0</p>
+
+        <ul class="list-disc">
+          <li>Updates to quick scripts</li>
+        </ul>
+
         <p class="text-2xl ttt-purple">v0.12.0</p>
 
         <ul class="list-disc">
