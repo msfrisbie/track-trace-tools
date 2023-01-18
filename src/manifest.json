@@ -3,13 +3,8 @@
   "name": "Track & Trace Tools",
   "description": "Supercharge your Metrc workflow",
   "default_locale": "en",
-  "host_permissions": [
-    "https://*.metrc.com/*",
-    "http://localhost:5000/*",
-    "https://accounts.google.com/*",
-    "https://www.googleapis.com/*"
-  ],
-  "permissions": ["identity", "identity.email"],
+  "host_permissions": ["https://*.metrc.com/*", "http://localhost:5000/*"],
+  "permissions": ["identity"],
   "icons": {
     "16": "icons/logo/logo-square-16.png",
     "48": "icons/logo/logo-square-48.png",

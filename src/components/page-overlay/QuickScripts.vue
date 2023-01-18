@@ -22,7 +22,7 @@
           v-for="quickScript of quickScripts"
           class="flex flex-col items-center gap-4"
         >
-          <b-button variant="outline-primary" @click="runScript(quickScript.id)">{{
+          <b-button variant="outline-primary" @click="runQuickScript(quickScript)">{{
             quickScript.name
           }}</b-button>
           <div class="text-gray-600 text-sm">{{ quickScript.description }}</div>
@@ -40,10 +40,8 @@
 </template>
 
 <script lang="ts">
-import { MessageType } from "@/consts";
-import { analyticsManager } from "@/modules/analytics-manager.module";
-import { toastManager } from "@/modules/toast-manager.module";
 import store from "@/store/page-overlay/index";
+import { QUICK_SCRIPTS, runQuickScript } from "@/utils/quick-scripts";
 import Vue from "vue";
 import { mapState } from "vuex";
 
@@ -52,24 +50,7 @@ export default Vue.extend({
   store,
   data() {
     return {
-      quickScripts: [
-        {
-          id: "SUM_PACKAGE_QUANTITIES",
-          name: "Autosum Package Quantities",
-          description:
-            "Automatically totals all the source package quantities in the New Packages window and enters it into the new package Quantity input",
-          contextLink:
-            "https://track-trace-tools.talkyard.net/-27/would-it-be-possible-to-add-a-sum-all-button-for-creating-new-packages",
-        },
-        {
-          id: "CHECK_ALL_PLANTS_FOR_HARVEST_RESTORE",
-          name: "Check All Plants For Harvest Restore",
-          description:
-            "Automatically checks all the plant checkboxes in the Restore Harvested Plants window",
-          contextLink:
-            "https://track-trace-tools.talkyard.net/-28/auto-click-checkboxes-for-restore-harvest",
-        },
-      ],
+      quickScripts: QUICK_SCRIPTS,
     };
   },
   mounted() {},
@@ -78,67 +59,7 @@ export default Vue.extend({
   },
   destroyed() {},
   methods: {
-    runScript(scriptId: string) {
-      analyticsManager.track(MessageType.RAN_QUICK_SCRIPT, { scriptId });
-
-      switch (scriptId) {
-        case "SUM_PACKAGE_QUANTITIES":
-          const packageSets: HTMLElement[] = [
-            ...document.querySelectorAll(`[ng-repeat="line in repeaterLines"]`),
-          ] as HTMLElement[];
-
-          for (const packageSet of packageSets) {
-            const [output, ...inputs] = [
-              ...packageSet.querySelectorAll(`input[name*="[Quantity]"]`),
-            ] as HTMLInputElement[];
-
-            if (!inputs.length) {
-              toastManager.openToast(`0 source packages were found for a package`, {
-                title: "Quick Script error",
-                autoHideDelay: 5000,
-                variant: "danger",
-                appendToast: true,
-                toaster: "ttt-toaster",
-                solid: true,
-              });
-              continue;
-            }
-
-            output.value = inputs
-              .map((input) => parseFloat(input.value))
-              .filter((x) => !isNaN(x))
-              .reduce((a, b) => a + b)
-              .toString();
-          }
-
-          toastManager.openToast(`Totaled ${packageSets.length} packages`, {
-            title: "Quick Script Success",
-            autoHideDelay: 5000,
-            variant: "success",
-            appendToast: true,
-            toaster: "ttt-toaster",
-            solid: true,
-          });
-          break;
-        case "CHECK_ALL_PLANTS_FOR_HARVEST_RESTORE":
-          const restoreHarvestCheckboxes: HTMLElement[] = [
-            ...document.querySelectorAll('#restoreplants-harvest_form input[type="checkbox"]'),
-          ] as HTMLElement[];
-
-          restoreHarvestCheckboxes.map((input) => input.click());
-          toastManager.openToast(`Checked ${restoreHarvestCheckboxes.length} boxes`, {
-            title: "Quick Script Success",
-            autoHideDelay: 5000,
-            variant: "success",
-            appendToast: true,
-            toaster: "ttt-toaster",
-            solid: true,
-          });
-          break;
-        default:
-          console.error("Bad scriptName");
-      }
-    },
+    runQuickScript,
   },
 });
 </script>

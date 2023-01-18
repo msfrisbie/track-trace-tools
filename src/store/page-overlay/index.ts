@@ -126,6 +126,7 @@ const defaultState: IRootState = {
     dismissedReportsPopover: false,
     dismissedFacilityPopover: false,
     dismissedSearchPopover: false,
+    dismissedQuickScriptsPopover: false,
   },
   backgroundTasks: {
     finalizeSalesReceiptsState: BackgroundTaskState.IDLE,

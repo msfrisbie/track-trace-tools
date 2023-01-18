@@ -2,12 +2,10 @@
   <b-tab title="Google Account"
     ><b-card-text class="flex flex-col gap-4">
       <div v-if="isAuthenticated">
-        <pre>{{ identityData }}</pre>
-
-        <button class="btn btn-info" @click="getProfileInfo()">PROFILE INFO</button>
+        <pre>{{ profileUserInfo }}</pre>
+        <pre>{{ oauthUserInfo }}</pre>
 
         <button class="btn btn-danger" @click="logout()">LOGOUT</button>
-
         <button class="btn btn-primary" @click="write()">WRITE</button>
         <button class="btn btn-primary" @click="getSheetData()">READ</button>
       </div>
@@ -22,7 +20,12 @@
 <script lang="ts">
 import router from "@/router/index";
 import store from "@/store/page-overlay/index";
-import { expireAuthToken, getAuthTokenOrError, getProfileUserInfoOrError } from "@/utils/oauth";
+import {
+  expireAuthToken,
+  getAuthTokenOrError,
+  getOAuthUserInfoOrError,
+  getProfileUserInfoOrError,
+} from "@/utils/oauth";
 import Vue from "vue";
 import { mapState } from "vuex";
 
@@ -36,23 +39,23 @@ export default Vue.extend({
     ...mapState([]),
     isAuthenticated() {
       // @ts-ignore
-      return !!this.$data.identityData;
+      return !!this.$data.oauthUserInfo;
     },
   },
   data() {
     return {
-      identityData: null,
+      oauthUserInfo: null,
     };
   },
   methods: {
     async login() {
-      this.$data.identityData = await getProfileUserInfoOrError();
+      this.$data.oauthUserInfo = await getOAuthUserInfoOrError();
     },
 
     logout() {
       expireAuthToken();
 
-      this.$data.identityData = null;
+      this.$data.oauthUserInfo = null;
     },
 
     async getSheetData() {

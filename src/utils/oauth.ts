@@ -15,6 +15,7 @@ export async function getAuthTokenOrError(interactive: boolean = true): Promise<
   });
 }
 
+// This returns empty strings without the identity.email permission
 export async function getProfileUserInfoOrError(): Promise<chrome.identity.UserInfo> {
   return new Promise((resolve, reject) => {
     // @ts-ignore
@@ -42,7 +43,7 @@ export async function expireAuthToken() {
   }
 }
 
-interface GoogleOAuthIdentityData {
+interface GoogleOAuthOAuthUserInfo {
   id: string;
   email: string;
   verified_email: boolean;
@@ -53,7 +54,7 @@ interface GoogleOAuthIdentityData {
   locale: string; //"en"
 }
 
-export async function getIdentityDataOrError(): Promise<GoogleOAuthIdentityData> {
+export async function getOAuthUserInfoOrError(): Promise<GoogleOAuthOAuthUserInfo> {
   const token: string = await getAuthTokenOrError(false);
 
   return new Promise(async (resolve, reject) => {
