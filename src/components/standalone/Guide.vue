@@ -17,7 +17,7 @@
 
           <changelog></changelog>
 
-          <google-sheets :enabled="false"></google-sheets>
+          <google-sheets :enabled="true"></google-sheets>
 
           <license></license>
         </b-tabs>

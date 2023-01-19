@@ -25,6 +25,7 @@
 import router from "@/router/index";
 import store from "@/store/page-overlay/index";
 import { expireAuthToken, getAuthTokenOrError, getOAuthUserInfoOrError } from "@/utils/oauth";
+import { getSheetProperties, writeValues } from "@/utils/sheets";
 import Vue from "vue";
 import { mapState } from "vuex";
 
@@ -62,48 +63,25 @@ export default Vue.extend({
     async getSheetData() {
       const spreadsheetId = "1U6iMT4sVqNDw6kduMqtkayjVFC3-ZRLIRpSjeqJ57cI";
 
-      const token = await getAuthTokenOrError();
-
-      const result = await fetch(
-        `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}?&fields=sheets.properties`,
-        {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        }
-      ).then((response) => response.json());
-
-      console.log(result);
+      console.log(await getSheetProperties({ spreadsheetId }));
     },
 
     async write() {
       const spreadsheetId = "1U6iMT4sVqNDw6kduMqtkayjVFC3-ZRLIRpSjeqJ57cI";
+      const range = "Sheet1!A1:D5";
+      const values = [
+        ["Item", "Cost", "Stocked", "Ship Date"],
+        ["Wheel", "$20.50", "4", "3/1/2016"],
+        ["Door", "$15", "2", "3/15/2016"],
+        ["Engine", "$100", "1", "3/20/2016"],
+        ["Totals", "=SUM(B2:B4)", "=SUM(C2:C4)", "=MAX(D2:D4)"],
+      ];
 
-      const token = await getAuthTokenOrError();
-
-      fetch(
-        `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/Sheet1!A1:D5?valueInputOption=USER_ENTERED`,
-        {
-          method: "PUT",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            range: "Sheet1!A1:D5",
-            majorDimension: "ROWS",
-            values: [
-              ["Item", "Cost", "Stocked", "Ship Date"],
-              ["Wheel", "$20.50", "4", "3/1/2016"],
-              ["Door", "$15", "2", "3/15/2016"],
-              ["Engine", "$100", "1", "3/20/2016"],
-              ["Totals", "=SUM(B2:B4)", "=SUM(C2:C4)", "=MAX(D2:D4)"],
-            ],
-          }),
-        }
-      );
+      writeValues({
+        spreadsheetId,
+        range,
+        values,
+      });
     },
   },
   async created() {},
