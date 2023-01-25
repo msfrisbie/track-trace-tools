@@ -25,6 +25,7 @@
     "@types/amplitude-js": "^8.16.2",
     "@types/chrome": "^0.0.197",
     "@types/crypto-js": "^4.1.1",
+    "@types/google-spreadsheet": "^3.3.0",
     "amplitude-js": "^8.21.0",
     "autoprefixer": "^9.8.6",
     "bootstrap": "^4.5.3",

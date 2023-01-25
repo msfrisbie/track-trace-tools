@@ -68,8 +68,13 @@ export default Vue.extend({
 
     async write() {
       const spreadsheetId = "1U6iMT4sVqNDw6kduMqtkayjVFC3-ZRLIRpSjeqJ57cI";
-      const range = "Sheet1!A1:D5";
+      const range = "Sheet1!A1:D10";
       const values = [
+        ["Item", "Cost", "Stocked", "Ship Date"],
+        ["Wheel", "$20.50", "4", "3/1/2016"],
+        ["Door", "$15", "2", "3/15/2016"],
+        ["Engine", "$100", "1", "3/20/2016"],
+        ["Totals", "=SUM(B2:B4)", "=SUM(C2:C4)", "=MAX(D2:D4)"],
         ["Item", "Cost", "Stocked", "Ship Date"],
         ["Wheel", "$20.50", "4", "3/1/2016"],
         ["Door", "$15", "2", "3/15/2016"],
