@@ -25,7 +25,7 @@ interface IValueRange {
   values: string[][];
 }
 
-export function sheetsApi(path: string, params?: { [key: string]: string }): string {
+export function sheetsAPI(path: string, params?: { [key: string]: string }): string {
   if (path[0] != "/") {
     throw new Error("Must prepend slash to path");
   }
@@ -44,16 +44,13 @@ export async function getSheetProperties({ spreadsheetId }: { spreadsheetId: str
 }> {
   const token = await getAuthTokenOrError();
 
-  return fetch(
-    `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}?&fields=sheets.properties`,
-    {
-      method: "GET",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-    }
-  ).then((response) => response.json());
+  return fetch(sheetsAPI(`/${spreadsheetId}`, { fields: "sheets.properties" }), {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+  }).then((response) => response.json());
 }
 
 export async function writeValues({
@@ -74,7 +71,9 @@ export async function writeValues({
   };
 
   fetch(
-    `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/${range}?valueInputOption=USER_ENTERED`,
+    sheetsAPI(`/${spreadsheetId}/values/${range}`, {
+      valueInputOption: "USER_ENTERED",
+    }),
     {
       method: "PUT",
       headers: {
@@ -106,7 +105,9 @@ export async function batchUpdateValues({
   const token = await getAuthTokenOrError();
 
   fetch(
-    `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values:batchUpdate?valueInputOption=USER_ENTERED`,
+    sheetsAPI(`/${spreadsheetId}/values:batchUpdate`, {
+      valueInputOption: "USER_ENTERED",
+    }),
     {
       method: "POST",
       headers: {
