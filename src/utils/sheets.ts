@@ -25,6 +25,16 @@ interface IValueRange {
   values: string[][];
 }
 
+export function extractSheetIdOrError(sheetUrl: string): string {
+  const match = sheetUrl.match(/spreadsheets\/d\/([a-zA-Z0-9-_]+)/);
+
+  if (match && match[1] && match[1].length) {
+    return match[1];
+  }
+
+  throw new Error('Unmatched sheet ID')
+}
+
 export function sheetsAPI(path: string, params?: { [key: string]: string }): string {
   if (path[0] != "/") {
     throw new Error("Must prepend slash to path");
