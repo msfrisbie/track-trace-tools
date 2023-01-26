@@ -4,25 +4,43 @@
 
 // https://github.com/theoephraim/node-google-spreadsheet
 
+import { customFetch } from "@/modules/fetch-manager.module";
 import { getAuthTokenOrError } from "./oauth";
 
 interface ISheet {
   properties: {
-    sheetId: 0;
-    title: "Sheet1";
-    index: 0;
-    sheetType: "GRID";
+    sheetId: number; // 0
+    title: string; // Sheet1
+    index: number; // 0
+    sheetType: string; // GRID
     gridProperties: {
-      rowCount: 1000;
-      columnCount: 26;
+      rowCount: number; // 1000
+      columnCount: number; // 26
+      frozenRowCount: number; // 1
+    };
+    tabColor: {
+      red: number; // 1.0
+      green: number; // 0.3
+      blue: number; // 0.4
     };
   };
 }
 
+type ISheetValues = string[][];
+
 interface IValueRange {
   range: string;
   majorDimension: "ROWS";
-  values: string[][];
+  values: ISheetValues;
+}
+
+async function headersFactory() {
+  const token = await getAuthTokenOrError();
+
+  return {
+    Authorization: `Bearer ${token}`,
+    "Content-Type": "application/json",
+  };
 }
 
 export function extractSheetIdOrError(sheetUrl: string): string {
@@ -32,10 +50,10 @@ export function extractSheetIdOrError(sheetUrl: string): string {
     return match[1];
   }
 
-  throw new Error('Unmatched sheet ID')
+  throw new Error("Unmatched sheet ID");
 }
 
-export function sheetsAPI(path: string, params?: { [key: string]: string }): string {
+function buildSheetsApiURL(path: string, params?: { [key: string]: string }): string {
   if (path[0] != "/") {
     throw new Error("Must prepend slash to path");
   }
@@ -52,14 +70,15 @@ export function sheetsAPI(path: string, params?: { [key: string]: string }): str
 export async function getSheetProperties({ spreadsheetId }: { spreadsheetId: string }): Promise<{
   sheets: ISheet[];
 }> {
-  const token = await getAuthTokenOrError();
+  const url = buildSheetsApiURL(`/${spreadsheetId}`, { fields: "sheets.properties" });
 
-  return fetch(sheetsAPI(`/${spreadsheetId}`, { fields: "sheets.properties" }), {
+  const headers = await headersFactory();
+
+  // GET /v4/spreadsheets/spreadsheetId?fields=sheets.properties(sheetId,title,sheetType,gridProperties)
+
+  return customFetch(url, {
     method: "GET",
-    headers: {
-      Authorization: `Bearer ${token}`,
-      "Content-Type": "application/json",
-    },
+    headers,
   }).then((response) => response.json());
 }
 
@@ -70,9 +89,13 @@ export async function writeValues({
 }: {
   spreadsheetId: string;
   range: string;
-  values: string[][];
+  values: ISheetValues;
 }) {
-  const token = await getAuthTokenOrError();
+  const url = buildSheetsApiURL(`/${spreadsheetId}/values/${range}`, {
+    valueInputOption: "USER_ENTERED",
+  });
+
+  const headers = await headersFactory();
 
   const payload: IValueRange = {
     range,
@@ -80,22 +103,43 @@ export async function writeValues({
     values,
   };
 
-  fetch(
-    sheetsAPI(`/${spreadsheetId}/values/${range}`, {
-      valueInputOption: "USER_ENTERED",
-    }),
-    {
-      method: "PUT",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(payload),
-    }
-  );
+  customFetch(url, {
+    method: "PUT",
+    headers,
+    body: JSON.stringify(payload),
+  });
 }
 
 export async function addSheets() {}
+
+export async function appendValues({
+  spreadsheetId,
+  range,
+  values,
+}: {
+  spreadsheetId: string;
+  range: string;
+  values: ISheetValues;
+}) {
+  // https://developers.google.com/sheets/api/reference/rest/v4/spreadsheets.values/append
+  const url = buildSheetsApiURL(`/${spreadsheetId}/values/${range}:append`, {
+    valueInputOption: "USER_ENTERED",
+  });
+
+  const headers = await headersFactory();
+
+  const payload: IValueRange = {
+    range,
+    majorDimension: "ROWS",
+    values,
+  };
+
+  customFetch(url, {
+    method: "POST",
+    headers,
+    body: JSON.stringify(payload),
+  });
+}
 
 export async function batchUpdateSpreadsheet({}) {
   // https://developers.google.com/sheets/api/reference/rest/v4/spreadsheets/batchUpdate
@@ -103,30 +147,23 @@ export async function batchUpdateSpreadsheet({}) {
 
 export async function batchUpdateValues({
   spreadsheetId,
-  range,
-  values,
+  data,
 }: {
   spreadsheetId: string;
-  range: string;
-  values: string[][];
+  data: IValueRange[];
 }) {
   // https://sheets.googleapis.com/v4/spreadsheets/{spreadsheetId}/values:batchUpdate
+  const url = buildSheetsApiURL(`/${spreadsheetId}/values:batchUpdate`, {
+    valueInputOption: "USER_ENTERED",
+  });
 
-  const token = await getAuthTokenOrError();
+  const headers = await headersFactory();
 
-  fetch(
-    sheetsAPI(`/${spreadsheetId}/values:batchUpdate`, {
-      valueInputOption: "USER_ENTERED",
+  customFetch(url, {
+    method: "POST",
+    headers,
+    body: JSON.stringify({
+      data,
     }),
-    {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        data: [],
-      }),
-    }
-  );
+  });
 }

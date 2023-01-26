@@ -5,6 +5,8 @@
         <div v-if="isAuthenticated">
           <pre>{{ oauthUserInfo }}</pre>
 
+          <b-form-input v-model="spreadsheetUrl"></b-form-input>
+
           <button class="btn btn-danger" @click="logout()">LOGOUT</button>
           <button class="btn btn-primary" @click="write()">WRITE</button>
           <button class="btn btn-primary" @click="getSheetData()">READ</button>
@@ -25,7 +27,7 @@
 import router from "@/router/index";
 import store from "@/store/page-overlay/index";
 import { expireAuthToken, getAuthTokenOrError, getOAuthUserInfoOrError } from "@/utils/oauth";
-import { getSheetProperties, writeValues } from "@/utils/sheets";
+import { appendValues, getSheetProperties, writeValues } from "@/utils/sheets";
 import Vue from "vue";
 import { mapState } from "vuex";
 
@@ -47,6 +49,7 @@ export default Vue.extend({
   data() {
     return {
       oauthUserInfo: null,
+      spreadsheetUrl: null,
     };
   },
   methods: {
@@ -74,15 +77,9 @@ export default Vue.extend({
         ["Wheel", "$20.50", "4", "3/1/2016"],
         ["Door", "$15", "2", "3/15/2016"],
         ["Engine", "$100", "1", "3/20/2016"],
-        ["Totals", "=SUM(B2:B4)", "=SUM(C2:C4)", "=MAX(D2:D4)"],
-        ["Item", "Cost", "Stocked", "Ship Date"],
-        ["Wheel", "$20.50", "4", "3/1/2016"],
-        ["Door", "$15", "2", "3/15/2016"],
-        ["Engine", "$100", "1", "3/20/2016"],
-        ["Totals", "=SUM(B2:B4)", "=SUM(C2:C4)", "=MAX(D2:D4)"],
       ];
 
-      writeValues({
+      appendValues({
         spreadsheetId,
         range,
         values,
