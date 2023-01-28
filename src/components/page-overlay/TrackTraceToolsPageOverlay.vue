@@ -186,6 +186,7 @@ library.add(
   fontawesomeSolid.faSitemap,
   fontawesomeSolid.faSlidersH,
   fontawesomeSolid.faSync,
+  fontawesomeSolid.faTable,
   fontawesomeSolid.faTachometerAlt,
   fontawesomeSolid.faTag,
   fontawesomeSolid.faTags,

@@ -1,9 +1,9 @@
 <template>
-  <b-tab title="License"
-    ><b-card-text class="flex flex-col gap-4"
-      ><p>MIT License</p>
+  <div class="flex flex-col gap-4 items-center">
+    <div class="max-w-lg flex flex-col gap-4">
+      <p>MIT License</p>
 
-      <p>Copyright (c) 2022 Matt Frisbie</p>
+      <p>Copyright (c) 2023 Class V LLC</p>
 
       <p>
         Permission is hereby granted, free of charge, to any person obtaining a copy of this
@@ -26,8 +26,8 @@
         OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
         DEALINGS IN THE SOFTWARE.
       </p>
-    </b-card-text></b-tab
-  >
+    </div>
+  </div>
 </template>
 
 <script lang="ts">

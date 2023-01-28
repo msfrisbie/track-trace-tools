@@ -1,34 +1,32 @@
 <template>
-  <b-tab title="Welcome"
-    ><b-card-text class="flex flex-col items-center text-center gap-8"
-      ><p class="text-2xl ttt-purple">Thanks for installing Track &amp; Trace Tools!</p>
+  <div class="flex flex-col items-center text-center gap-8">
+    <p class="text-2xl ttt-purple">Thanks for installing Track &amp; Trace Tools!</p>
 
-      <p>
-        You're all set! Track &amp; Trace Tools will automatically be added to metrc.com next time
-        you use it.
-      </p>
+    <p>
+      You're all set! Track &amp; Trace Tools will automatically be added to metrc.com next time you
+      use it.
+    </p>
 
-      <div class="flex flex-col items-center gap-2">
-        <div
-          class="fake-metrc-container flex flex-row justify-end items-end border-b border-r border-gray-500"
-          style="height: 250px; width: 500px"
-        >
-          <b-button variant="primary" title="Toolbox" style="padding: 0">
-            <track-trace-tools-logo
-              fill="#49276a"
-              :inverted="true"
-              style="height: 52px; width: 52px"
-            />
-          </b-button>
-        </div>
-
-        <div class="text-sm text-gray-600 text-center">
-          The Toolbox button will appear in the bottom right. <br />
-          Click it to access tools and change your settings.
-        </div>
+    <div class="flex flex-col items-center gap-2">
+      <div
+        class="fake-metrc-container flex flex-row justify-end items-end border-b border-r border-gray-500"
+        style="height: 250px; width: 500px"
+      >
+        <b-button variant="primary" title="Toolbox" style="padding: 0">
+          <track-trace-tools-logo
+            fill="#49276a"
+            :inverted="true"
+            style="height: 52px; width: 52px"
+          />
+        </b-button>
       </div>
-    </b-card-text>
-  </b-tab>
+
+      <div class="text-sm text-gray-600 text-center">
+        The Toolbox button will appear in the bottom right. <br />
+        Click it to access tools and change your settings.
+      </div>
+    </div>
+  </div>
 </template>
 
 <script lang="ts">

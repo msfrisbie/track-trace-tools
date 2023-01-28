@@ -33,6 +33,7 @@ import UnavailablePage from "@/components/overlay-widget/UnavailablePage.vue";
 import FinalizeSalesReceiptsForm from "@/components/page-overlay/forms/FinalizeSalesReceiptsForm.vue";
 import SettingsForm from "@/components/page-overlay/forms/SettingsForm.vue";
 import VoidTagForm from "@/components/page-overlay/forms/VoidTagForm.vue";
+import GoogleSheetsExport from "@/components/page-overlay/GoogleSheetsExport.vue";
 import ManageAccount from "@/components/page-overlay/ManageAccount.vue";
 import QuickScripts from "@/components/page-overlay/QuickScripts.vue";
 import Screenshot from "@/components/page-overlay/Screenshot.vue";
@@ -212,6 +213,11 @@ const routes: Array<RouteConfig> = [
     path: "/tags/void-tags",
     name: "Void Tags",
     component: VoidTagForm,
+  },
+  {
+    path: "/google-sheets-export",
+    name: "Google Sheets Export",
+    component: GoogleSheetsExport,
   },
   {
     path: "/sales/finalize-sales",

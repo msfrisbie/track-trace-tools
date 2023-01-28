@@ -1,8 +1,26 @@
 <template>
-  <router-view class="w-full flex flex-col items-stretch"></router-view>
+  <div class="w-full flex flex-col gap-8 items-stretch h-full overflow-y-auto">
+    <b-navbar type="light" class="bg-white">
+      <b-navbar-brand href="#/">
+        <title-banner />
+      </b-navbar-brand>
+
+      <b-collapse id="nav-collapse" is-nav>
+        <b-navbar-nav>
+          <b-nav-item href="#/">Welcome</b-nav-item>
+          <b-nav-item href="#/custom-features">Custom Features</b-nav-item>
+          <b-nav-item href="#/faq">FAQ</b-nav-item>
+          <b-nav-item href="#/changelog">Changelog</b-nav-item>
+          <b-nav-item href="#/license">License</b-nav-item>
+        </b-navbar-nav>
+      </b-collapse>
+    </b-navbar>
+    <router-view></router-view>
+  </div>
 </template>
 
 <script lang="ts">
+import TitleBanner from "@/components/shared/TitleBanner.vue";
 import { MessageType } from "@/consts";
 import { analyticsManager } from "@/modules/analytics-manager.module";
 import { messageBus } from "@/modules/message-bus.module";
@@ -17,7 +35,9 @@ Vue.use(BootstrapVue);
 export default Vue.extend({
   name: "Standalone",
   router,
-  components: {},
+  components: {
+    TitleBanner,
+  },
   async mounted() {
     messageBus.init();
     analyticsManager.track(MessageType.VIEWED_STANDALONE_PAGE);

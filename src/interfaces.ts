@@ -1475,3 +1475,14 @@ export interface IPackageAncestorTreeNode extends IHistoryTreeNode {
 export interface IPackageChildTreeNode extends IHistoryTreeNode {
   children: IPackageChildTreeNode[];
 }
+
+export interface IGoogleOAuthOAuthUserInfo {
+  id: string;
+  email: string;
+  verified_email: boolean;
+  name: string; // Full Name
+  given_name: string; // First Name
+  family_name: string; // Last Name
+  picture: string; // "https://lh3.googleusercontent.com/a/..."
+  locale: string; //"en"
+}

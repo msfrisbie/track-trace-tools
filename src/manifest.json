@@ -4,7 +4,7 @@
   "description": "Supercharge your Metrc workflow",
   "default_locale": "en",
   "host_permissions": ["https://*.metrc.com/*", "http://localhost:5000/*"],
-  "permissions": ["identity"],
+  "permissions": ["identity", "storage"],
   "icons": {
     "16": "icons/logo/logo-square-16.png",
     "48": "icons/logo/logo-square-48.png",
@@ -15,6 +15,7 @@
   },
   "action": {
     "default_title": "__MSG_extName__",
+    "default_popup": "popup.html",
     "default_icon": {
       "16": "icons/logo/logo-square-16.png",
       "48": "icons/logo/logo-square-48.png",
@@ -47,11 +48,6 @@
   ],
   "content_security_policy": {
     "extension_pages": "default-src 'self'; style-src 'self' 'unsafe-inline'; connect-src *"
-  },
-  "browser_specific_settings": {
-    "gecko": {
-      "id": "tracktracetools@gmail.com"
-    }
   },
   "oauth2": {
     "client_id": "555065854761-ssc4dm7apif1e1ac4app1tru9h3graef.apps.googleusercontent.com",

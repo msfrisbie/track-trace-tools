@@ -134,6 +134,16 @@ export default Vue.extend({
           isNew: false,
         },
         {
+          backgroundColor: "#c14747",
+          text: "GOOGLE SHEETS",
+          route: "/google-sheets-export",
+          icon: "table",
+          visible: true,
+          enabled: true,
+          isBeta: false,
+          isNew: false,
+        },
+        {
           backgroundColor: "#48b867",
           text: "CULTIVATION TOOLS",
           route: "/cultivator",

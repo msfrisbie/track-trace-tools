@@ -1,33 +1,32 @@
 <template>
-  <b-tab title="Google Sheets"
-    ><b-card-text class="flex flex-col gap-4">
-      <template v-if="enabled">
-        <div v-if="isAuthenticated">
-          <pre>{{ oauthUserInfo }}</pre>
+  <div class="flex flex-col gap-4">
+    <template v-if="enabled">
+      <div v-if="isAuthenticated">
+        <pre>{{ oauthUserInfo }}</pre>
 
-          <b-form-input v-model="spreadsheetUrl"></b-form-input>
+        <b-form-input v-model="spreadsheetUrl"></b-form-input>
 
-          <button class="btn btn-danger" @click="logout()">LOGOUT</button>
-          <button class="btn btn-primary" @click="write()">WRITE</button>
-          <button class="btn btn-primary" @click="getSheetData()">READ</button>
-        </div>
+        <button class="btn btn-danger" @click="logout()">LOGOUT</button>
+        <button class="btn btn-primary" @click="write()">WRITE</button>
+        <button class="btn btn-primary" @click="getSheetData()">READ</button>
+        <button class="btn btn-primary" @click="create()">CREATE</button>
+      </div>
 
-        <div v-if="!isAuthenticated">
-          <button class="btn btn-primary" @click="login()">LOGIN</button>
-        </div>
-      </template>
-      <template v-if="!enabled">
-        Google Sheets integration is under construction! Check back soon.
-      </template>
-    </b-card-text></b-tab
-  >
+      <div v-if="!isAuthenticated">
+        <button class="btn btn-primary" @click="login()">LOGIN</button>
+      </div>
+    </template>
+    <template v-if="!enabled">
+      Google Sheets integration is under construction! Check back soon.
+    </template>
+  </div>
 </template>
 
 <script lang="ts">
 import router from "@/router/index";
 import store from "@/store/page-overlay/index";
 import { expireAuthToken, getAuthTokenOrError, getOAuthUserInfoOrError } from "@/utils/oauth";
-import { appendValues, getSheetProperties, writeValues } from "@/utils/sheets";
+import { appendValues, createSpreadsheet, getSheetProperties } from "@/utils/sheets";
 import Vue from "vue";
 import { mapState } from "vuex";
 
@@ -84,6 +83,10 @@ export default Vue.extend({
         range,
         values,
       });
+    },
+
+    async create() {
+      console.log(await createSpreadsheet());
     },
   },
   async created() {},

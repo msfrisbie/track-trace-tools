@@ -1,4 +1,11 @@
-export async function getAuthTokenOrError(interactive: boolean = true): Promise<string> {
+import { ChromeStorageKeys } from "@/consts";
+import { IGoogleOAuthOAuthUserInfo } from "@/interfaces";
+
+export async function getAuthTokenOrError({
+  interactive = false,
+}: {
+  interactive?: boolean;
+} = {}): Promise<string> {
   return new Promise((resolve, reject) => {
     chrome.identity.getAuthToken(
       {
@@ -32,30 +39,25 @@ export async function getProfileUserInfoOrError(): Promise<chrome.identity.UserI
 export async function expireAuthToken() {
   // If no auth token is found, silently exit
   try {
-    const token: string = await getAuthTokenOrError(false);
+    const token: string = await getAuthTokenOrError();
 
     await fetch(`https://accounts.google.com/o/oauth2/revoke?token=${token}`);
 
     chrome.identity.removeCachedAuthToken({ token }, () => {});
+
+    chrome.storage.local.remove(ChromeStorageKeys.OAUTH_USER_DATA);
   } catch (e) {
     console.error(e);
     return;
   }
 }
 
-interface GoogleOAuthOAuthUserInfo {
-  id: string;
-  email: string;
-  verified_email: boolean;
-  name: string; // Full Name
-  given_name: string; // First Name
-  family_name: string; // Last Name
-  picture: string; // "https://lh3.googleusercontent.com/a/..."
-  locale: string; //"en"
-}
-
-export async function getOAuthUserInfoOrError(): Promise<GoogleOAuthOAuthUserInfo> {
-  const token: string = await getAuthTokenOrError(false);
+export async function getOAuthUserInfoOrError({
+  interactive = false,
+}: {
+  interactive?: boolean;
+} = {}): Promise<IGoogleOAuthOAuthUserInfo> {
+  const token: string = await getAuthTokenOrError({ interactive });
 
   return new Promise(async (resolve, reject) => {
     try {
@@ -72,6 +74,8 @@ export async function getOAuthUserInfoOrError(): Promise<GoogleOAuthOAuthUserInf
           contentType: "json",
         }
       ).then((response) => response.json());
+
+      chrome.storage.local.set({ [ChromeStorageKeys.OAUTH_USER_DATA]: result });
 
       resolve(result);
     } catch (e) {

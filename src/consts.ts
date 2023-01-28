@@ -5,6 +5,10 @@ export const TTT_LIGHT_MODE = "ttt-light-mode";
 export const TTT_DARK_MODE = "ttt-dark-mode";
 export const TTT_SNOWFLAKES = "ttt-snowflakes";
 
+export enum ChromeStorageKeys {
+  OAUTH_USER_DATA = "OAUTH_USER_DATA",
+}
+
 export enum ToolkitView {
   ADD_PACKAGE_NOTE = "ADD_PACKAGE_NOTE",
   CREATE_CSV = "CREATE_CSV",
@@ -159,7 +163,7 @@ export enum MessageType {
   GENERATE_PACKAGE_HISTORY = "GENERATE_PACKAGE_HISTORY",
   GENERATE_PACKAGE_HISTORY_SUCCESS = "GENERATE_PACKAGE_HISTORY_SUCCESS",
   GENERATE_PACKAGE_HISTORY_ERROR = "GENERATE_PACKAGE_HISTORY_ERROR",
-  RAN_QUICK_SCRIPT = "RAN_QUICK_SCRIPT"
+  RAN_QUICK_SCRIPT = "RAN_QUICK_SCRIPT",
 }
 
 export const DEXIE_DB_NAME: string = "track-trace-tools";

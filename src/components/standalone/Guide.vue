@@ -1,5 +1,6 @@
 <template>
   <div style="height: 100vh">
+
     <div class="flex flex-col p-4 space-y-6" style="height: 100%; overflow-y: auto">
       <div class="flex flex-row justify-between items-center">
         <title-banner />
@@ -17,8 +18,6 @@
 
           <changelog></changelog>
 
-          <google-sheets :enabled="true"></google-sheets>
-
           <license></license>
         </b-tabs>
       </b-card>
@@ -34,7 +33,6 @@ import router from "./router";
 import Changelog from "./tabs/Changelog.vue";
 import CustomFeatures from "./tabs/CustomFeatures.vue";
 import Faq from "./tabs/Faq.vue";
-import GoogleSheets from "./tabs/GoogleSheets.vue";
 import License from "./tabs/License.vue";
 import Welcome from "./tabs/Welcome.vue";
 
@@ -49,7 +47,6 @@ export default Vue.extend({
     License,
     Changelog,
     Welcome,
-    GoogleSheets,
   },
   computed: {},
   data() {

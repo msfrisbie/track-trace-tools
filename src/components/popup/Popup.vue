@@ -1,14 +1,19 @@
 <template>
-  <div class="flex flex-col items-stretch p-4 space-y-6" style="min-width: 400px">
+  <div class="flex flex-col items-stretch p-4 space-y-6 w-96">
     <div class="flex flex-row justify-center items-center">
       <title-banner />
     </div>
 
     <!-- <ttt-permissions-button /> -->
+    <o-auth-login></o-auth-login>
 
-    <b-button variant="outline-primary" @click="openStandalone()" style="opacity: 0.5"
-      >GUIDE</b-button
+    <b-button
+      variant="outline-primary"
+      @click="openStandalone()"
+      class="flex flex-row gap-2 justify-center items-center"
     >
+      <font-awesome-icon icon="info-circle"></font-awesome-icon><span>ABOUT</span>
+    </b-button>
 
     <!-- <b-button variant="outline-primary" style="opacity: 0.5"
       >LICENSE</b-button
@@ -19,18 +24,30 @@
 </template>
 
 <script lang="ts">
+import OAuthLogin from "@/components/shared/OAuthLogin.vue";
 import TitleBanner from "@/components/shared/TitleBanner.vue";
 import { TRACK_TRACE_TOOLS_STANDALONE_PAGE } from "@/consts";
 import { version } from "@/modules/version";
+import { library } from "@fortawesome/fontawesome-svg-core";
+import * as fontawesomeSolid from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import { BootstrapVue } from "bootstrap-vue";
 import Vue from "vue";
 
 Vue.use(BootstrapVue);
 
+Vue.component("font-awesome-icon", FontAwesomeIcon);
+library.add(
+  // @ts-ignore
+  fontawesomeSolid.faInfoCircle,
+  fontawesomeSolid.faSignOutAlt
+);
+
 export default Vue.extend({
   name: "Popup",
   components: {
     TitleBanner,
+    OAuthLogin,
   },
   data() {
     return {
