@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-row gap-2 hover-reveal-container" id="popover-container">
+  <div class="flex flex-row gap-2 floating-hover-reveal-container" id="popover-container">
     <scroll-button />
 
     <template v-if="debugMode">
@@ -13,7 +13,7 @@
     <template v-if="pluginAuth.authState">
       <quick-script-button
         style="box-shadow: 0px 5px 5px rgba(0, 0, 0, 0.5)"
-        class="hover-reveal-target"
+        class="floating-hover-reveal-target"
       ></quick-script-button>
 
       <builder-button style="box-shadow: 0px 5px 5px rgba(0, 0, 0, 0.5)" />
@@ -55,7 +55,7 @@ export default Vue.extend({
 });
 </script>
 
-<style type="text/scss" lang="scss">
+<style type="text/scss" lang="scss" scoped>
 // Override metrc bootstrap
 #popover-container {
   .btn-group {
@@ -64,14 +64,14 @@ export default Vue.extend({
   }
 }
 
-.hover-reveal-target {
+.floating-hover-reveal-target {
   margin-right: -60px;
   transition: margin-right 0.1s ease-in-out;
   z-index: -1;
   transition-delay: 1.5s;
 }
 
-.hover-reveal-container:hover .hover-reveal-target {
+.floating-hover-reveal-container:hover .floating-hover-reveal-target {
   margin-right: 0px;
   z-index: 0;
   transition-delay: 0s;
