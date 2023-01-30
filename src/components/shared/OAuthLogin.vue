@@ -26,6 +26,11 @@
         >
       </template>
     </template>
+    <template v-else>
+      <div class="flex flex-row items-center justify-center p-4">
+        <b-spinner></b-spinner>
+      </div>
+    </template>
   </div>
 </template>
 
@@ -72,7 +77,7 @@ export default Vue.extend({
   async mounted() {
     try {
       // @ts-ignore
-      this.login();
+      await this.login();
     } finally {
       this.$data.initial = false;
     }
