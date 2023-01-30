@@ -10,6 +10,21 @@ const debugLog = debugLogFactory("message-bus.module.ts");
 class MessageBus implements IAtomicService {
   port: any;
   handlers: Map<string, Function> = new Map();
+  // @ts-ignore
+  connected: Promise<void>;
+  // @ts-ignore
+  private resolveConnected: () => void;
+
+  private resetConnected() {
+    this.connected = new Promise((resolve, reject) => {
+      const timeout = setTimeout(() => reject("Connect timeout"), 5000);
+
+      this.resolveConnected = () => {
+        clearTimeout(timeout);
+        resolve();
+      };
+    });
+  }
 
   async init() {
     this.connect();
@@ -24,17 +39,21 @@ class MessageBus implements IAtomicService {
   async connect() {
     console.log("Connecting port...");
 
+    this.resetConnected();
+
     // @ts-ignore
     this.port = browser.runtime.connect();
 
     this.port.onMessage.addListener((event: IBusEvent) => {
       this.handleMessageFromBackground(event);
     });
+
+    this.resolveConnected();
   }
 
   async sendMessageToBackground<T>(
     type: MessageType,
-    data: any,
+    data: any = [],
     options: IBusMessageOptions = {},
     transferables: any[] = []
   ): Promise<any> {
@@ -42,6 +61,8 @@ class MessageBus implements IAtomicService {
     options.muteAnalytics = store.state.muteAnalytics;
 
     try {
+      await this.connected;
+
       const uuid = v4();
 
       const responsePromise = new Promise((resolve, reject) => {

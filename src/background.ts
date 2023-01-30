@@ -2,6 +2,7 @@ import { AMPLITUDE_API_KEY, MessageType } from "@/consts";
 import { IBusEvent, IBusMessage, IBusMessageOptions } from "@/interfaces";
 import { database } from "@/modules/indexeddb.module";
 import amplitude from "amplitude-js";
+import { expireAuthToken, getOAuthUserInfoOrError } from "./utils/oauth";
 
 console.log(`These events are collected only to help us make the plugin more useful for you.`);
 
@@ -18,6 +19,7 @@ function sendMessageToContentScript(message: IBusMessage) {
 }
 
 function respondToContentScript(inboundEvent: IBusEvent, outboundData: any) {
+  console.log({ inboundEvent, outboundData });
   portFromCS.postMessage({
     uuid: inboundEvent.uuid,
     message: { data: outboundData },
@@ -182,6 +184,34 @@ function connected(p: any) {
         //   respondToContentScript(inboundEvent, await CustomAsyncStorage.removeItem(inboundEvent.message.data.key));
 
         //   break;
+        case MessageType.GET_OAUTH_USER_INFO_OR_ERROR:
+          console.log("GET_OAUTH_USER_INFO_OR_ERROR");
+          try {
+            respondToContentScript(inboundEvent, {
+              success: true,
+              result: await getOAuthUserInfoOrError(inboundEvent.message.data),
+            });
+          } catch (error) {
+            respondToContentScript(inboundEvent, {
+              success: false,
+            });
+            console.error("Event error in background", inboundEvent, error);
+          }
+          break;
+        case MessageType.EXPIRE_AUTH_TOKEN:
+          try {
+            await expireAuthToken();
+
+            respondToContentScript(inboundEvent, {
+              success: true,
+            });
+          } catch (error) {
+            respondToContentScript(inboundEvent, {
+              success: false,
+            });
+            console.error("Event error in background", inboundEvent, error);
+          }
+          break;
 
         default:
           try {

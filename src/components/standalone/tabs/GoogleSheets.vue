@@ -23,9 +23,10 @@
 </template>
 
 <script lang="ts">
+import { MessageType } from "@/consts";
+import { messageBus } from "@/modules/message-bus.module";
 import router from "@/router/index";
 import store from "@/store/page-overlay/index";
-import { expireAuthToken, getAuthTokenOrError, getOAuthUserInfoOrError } from "@/utils/oauth";
 import { appendValues, createSpreadsheet, getSheetProperties } from "@/utils/sheets";
 import Vue from "vue";
 import { mapState } from "vuex";
@@ -53,11 +54,13 @@ export default Vue.extend({
   },
   methods: {
     async login() {
-      this.$data.oauthUserInfo = await getOAuthUserInfoOrError();
+      this.$data.oauthUserInfo = await messageBus.sendMessageToBackground(
+        MessageType.GET_OAUTH_USER_INFO_OR_ERROR
+      );
     },
 
-    logout() {
-      expireAuthToken();
+    async logout() {
+      await messageBus.sendMessageToBackground(MessageType.EXPIRE_AUTH_TOKEN);
 
       this.$data.oauthUserInfo = null;
     },
@@ -90,9 +93,7 @@ export default Vue.extend({
     },
   },
   async created() {},
-  async mounted() {
-    await getAuthTokenOrError();
-  },
+  async mounted() {},
 });
 </script>
 

@@ -1,7 +1,12 @@
 import { ChromeStorageKeys } from "@/consts";
 import { IGoogleOAuthOAuthUserInfo } from "@/interfaces";
+import { isBackgroundExecutionContext } from "./context";
 
-export async function getAuthTokenOrError({
+if (!isBackgroundExecutionContext) {
+  throw new Error("This should only be used in the background!");
+}
+
+async function getAuthTokenOrError({
   interactive = false,
 }: {
   interactive?: boolean;

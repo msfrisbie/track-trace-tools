@@ -27,6 +27,7 @@
 import OAuthLogin from "@/components/shared/OAuthLogin.vue";
 import TitleBanner from "@/components/shared/TitleBanner.vue";
 import { TRACK_TRACE_TOOLS_STANDALONE_PAGE } from "@/consts";
+import { messageBus } from "@/modules/message-bus.module";
 import { version } from "@/modules/version";
 import { library } from "@fortawesome/fontawesome-svg-core";
 import * as fontawesomeSolid from "@fortawesome/free-solid-svg-icons";
@@ -54,7 +55,9 @@ export default Vue.extend({
       version,
     };
   },
-  async mounted() {},
+  async mounted() {
+    messageBus.init();
+  },
   methods: {
     async enableAccountPermissions() {},
     async openStandalone() {

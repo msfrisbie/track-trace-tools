@@ -35,9 +35,10 @@
 </template>
 
 <script lang="ts">
+import { MessageType } from "@/consts";
+import { messageBus } from "@/modules/message-bus.module";
 import router from "@/router/index";
 import store from "@/store/page-overlay/index";
-import { expireAuthToken, getOAuthUserInfoOrError } from "@/utils/oauth";
 import Vue from "vue";
 import { mapState } from "vuex";
 
@@ -64,20 +65,28 @@ export default Vue.extend({
   },
   methods: {
     async login({ interactive = false }: { interactive?: boolean } = {}) {
-      this.$data.oauthUserInfo = await getOAuthUserInfoOrError({ interactive });
+      const response = await messageBus.sendMessageToBackground(
+        MessageType.GET_OAUTH_USER_INFO_OR_ERROR,
+        { interactive }
+      );
+      console.log({ response });
+      this.$data.oauthUserInfo = response.data.result;
     },
 
     async logout() {
-      await expireAuthToken();
+      await messageBus.sendMessageToBackground(MessageType.EXPIRE_AUTH_TOKEN);
 
       this.$data.oauthUserInfo = null;
     },
   },
   async created() {},
   async mounted() {
+    console.log("MOUNTED OAUTH LOGIN");
     try {
       // @ts-ignore
       await this.login();
+    } catch (e) {
+      console.error(e);
     } finally {
       this.$data.initial = false;
     }
