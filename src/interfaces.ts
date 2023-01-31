@@ -1486,3 +1486,39 @@ export interface IGoogleOAuthOAuthUserInfo {
   picture: string; // "https://lh3.googleusercontent.com/a/..."
   locale: string; //"en"
 }
+
+export interface ISpreadsheet {
+  spreadsheetId: string;
+  spreadsheetUrl: string;
+  properties: {
+    title: string;
+  };
+  sheets: ISheet[];
+}
+
+export interface ISheet {
+  properties: {
+    sheetId: number; // 0
+    title: string; // Sheet1
+    index: number; // 0
+    sheetType: string; // GRID
+    gridProperties: {
+      rowCount: number; // 1000
+      columnCount: number; // 26
+      frozenRowCount: number; // 1
+    };
+    tabColor: {
+      red: number; // 1.0
+      green: number; // 0.3
+      blue: number; // 0.4
+    };
+  };
+}
+
+export type ISheetValues = string[][];
+
+export interface IValueRange {
+  range: string;
+  majorDimension: "ROWS";
+  values: ISheetValues;
+}

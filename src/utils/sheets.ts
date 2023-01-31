@@ -4,35 +4,9 @@
 
 // https://github.com/theoephraim/node-google-spreadsheet
 
+import { ISheet, ISheetValues, ISpreadsheet, IValueRange } from "@/interfaces";
 import { customFetch } from "@/modules/fetch-manager.module";
 import { getAuthTokenOrError } from "./oauth";
-
-interface ISheet {
-  properties: {
-    sheetId: number; // 0
-    title: string; // Sheet1
-    index: number; // 0
-    sheetType: string; // GRID
-    gridProperties: {
-      rowCount: number; // 1000
-      columnCount: number; // 26
-      frozenRowCount: number; // 1
-    };
-    tabColor: {
-      red: number; // 1.0
-      green: number; // 0.3
-      blue: number; // 0.4
-    };
-  };
-}
-
-type ISheetValues = string[][];
-
-interface IValueRange {
-  range: string;
-  majorDimension: "ROWS";
-  values: ISheetValues;
-}
 
 async function headersFactory() {
   const token = await getAuthTokenOrError();
@@ -67,28 +41,34 @@ function buildSheetsApiURL(path: string, params?: { [key: string]: string }): st
   return url.toString();
 }
 
-export async function createSpreadsheet() {
+export async function createSpreadsheet({
+  title,
+  sheetTitles,
+}: {
+  title: string;
+  sheetTitles: string[];
+}): Promise<ISpreadsheet> {
   const url = buildSheetsApiURL(`/`);
 
   const headers = await headersFactory();
 
   const payload = {
     properties: {
-      title: "My new spreadsheet",
+      title,
     },
-    sheets: [
+    sheets: sheetTitles.map((sheetTitle) => [
       {
         properties: {
           sheetType: "GRID",
-          sheetId: 0,
-          title: "Sheet1",
-          gridProperties: {
-            rowCount: 20,
-            columnCount: 12,
-          },
+          // sheetId: 0,
+          title: sheetTitle,
+          // gridProperties: {
+          //   rowCount: 20,
+          //   columnCount: 12,
+          // },
         },
       },
-    ],
+    ]),
   };
 
   return customFetch(url, {

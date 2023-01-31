@@ -6,7 +6,7 @@ if (!isBackgroundExecutionContext) {
   throw new Error("This should only be used in the background!");
 }
 
-async function getAuthTokenOrError({
+export async function getAuthTokenOrError({
   interactive = false,
 }: {
   interactive?: boolean;

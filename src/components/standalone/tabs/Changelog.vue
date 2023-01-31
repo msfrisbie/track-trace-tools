@@ -1,6 +1,12 @@
 <template>
   <div class="flex flex-col gap-4 items-center">
     <div class="max-w-lg flex flex-col gap-4">
+      <p class="text-2xl ttt-purple">v0.14.1</p>
+
+      <ul class="list-disc">
+        <li>Fix for plant picker</li>
+      </ul>
+
       <p class="text-2xl ttt-purple">v0.14.0</p>
 
       <ul class="list-disc">

@@ -3,6 +3,7 @@ import { IBusEvent, IBusMessage, IBusMessageOptions } from "@/interfaces";
 import { database } from "@/modules/indexeddb.module";
 import amplitude from "amplitude-js";
 import { expireAuthToken, getOAuthUserInfoOrError } from "./utils/oauth";
+import { createSpreadsheet } from "./utils/sheets";
 
 console.log(`These events are collected only to help us make the plugin more useful for you.`);
 
@@ -212,6 +213,21 @@ function connected(p: any) {
             console.error("Event error in background", inboundEvent, error);
           }
           break;
+        case MessageType.CREATE_SPREADSHEET:
+          try {
+            const result = await createSpreadsheet(inboundEvent.message.data);
+
+            respondToContentScript(inboundEvent, {
+              success: true,
+              result
+            });
+          } catch (error) {
+            respondToContentScript(inboundEvent, {
+              success: false,
+            });
+            console.error("Event error in background", inboundEvent, error);
+          }
+          break;
 
         default:
           try {
@@ -237,7 +253,7 @@ function connected(p: any) {
 
   portFromCS.onDisconnect.addListener(() => {
     portFromCS = null;
-    console.error("Disconnected");
+    console.log("Disconnected");
   });
 }
 

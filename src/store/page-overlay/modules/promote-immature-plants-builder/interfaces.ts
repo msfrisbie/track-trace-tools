@@ -3,7 +3,7 @@ import {
   ILocationData,
   IPlantBatchData,
   IPlantBatchGrowthPhase,
-  ITagData
+  ITagData,
 } from "@/interfaces";
 
 export interface IPromoteImmaturePlantsBuilderState {
