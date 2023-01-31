@@ -27,7 +27,7 @@ export function extractSheetIdOrError(sheetUrl: string): string {
   throw new Error("Unmatched sheet ID");
 }
 
-function buildSheetsApiURL(path: string, params?: { [key: string]: string }): string {
+export function buildSheetsApiURL(path: string, params?: { [key: string]: string }): string {
   if (path[0] != "/") {
     throw new Error("Must prepend slash to path");
   }
