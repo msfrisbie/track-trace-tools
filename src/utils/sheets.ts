@@ -62,10 +62,10 @@ export async function createSpreadsheet({
           sheetType: "GRID",
           // sheetId: 0,
           title: sheetTitle,
-          // gridProperties: {
-          //   rowCount: 20,
-          //   columnCount: 12,
-          // },
+          gridProperties: {
+            rowCount: 2,
+            columnCount: 12,
+          },
         },
       },
     ]),
@@ -221,8 +221,6 @@ export async function writeValues({
   });
 }
 
-export async function addSheets() {}
-
 export async function appendValues({
   spreadsheetId,
   range,
@@ -252,10 +250,6 @@ export async function appendValues({
   });
 }
 
-export async function batchUpdateSpreadsheet({}) {
-  // https://developers.google.com/sheets/api/reference/rest/v4/spreadsheets/batchUpdate
-}
-
 export async function batchUpdateValues({
   spreadsheetId,
   data,
@@ -263,6 +257,7 @@ export async function batchUpdateValues({
   spreadsheetId: string;
   data: IValueRange[];
 }) {
+  // https://developers.google.com/sheets/api/reference/rest/v4/spreadsheets.values/batchUpdate
   // https://sheets.googleapis.com/v4/spreadsheets/{spreadsheetId}/values:batchUpdate
   const url = buildSheetsApiURL(`/${spreadsheetId}/values:batchUpdate`, {
     valueInputOption: "USER_ENTERED",
@@ -275,6 +270,30 @@ export async function batchUpdateValues({
     headers,
     body: JSON.stringify({
       data,
+    }),
+  });
+}
+
+export async function batchUpdate({
+  spreadsheetId,
+  requests,
+}: {
+  spreadsheetId: string;
+  requests: any[];
+}) {
+  // https://developers.google.com/sheets/api/reference/rest/v4/spreadsheets/batchUpdate
+  // https://sheets.googleapis.com/v4/spreadsheets/{spreadsheetId}:batchUpdate
+  const url = buildSheetsApiURL(`/${spreadsheetId}:batchUpdate`, {
+    valueInputOption: "USER_ENTERED",
+  });
+
+  const headers = await headersFactory();
+
+  customFetch(url, {
+    method: "POST",
+    headers,
+    body: JSON.stringify({
+      requests,
     }),
   });
 }
