@@ -11,7 +11,7 @@
 
 <script lang="ts">
 import { MessageType } from "@/consts";
-import { ISpreadsheet } from "@/interfaces";
+import { IGoogleOAuthOAuthUserInfo, ISpreadsheet } from "@/interfaces";
 import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
 import { messageBus } from "@/modules/message-bus.module";
 import router from "@/router/index";
@@ -34,9 +34,24 @@ export default Vue.extend({
   data() {
     return {
       spreadsheetData: null,
+      oAuthData: null,
     };
   },
   methods: {
+    async getOAuthData() {
+      const response: {
+        data: {
+          success: boolean;
+          result: IGoogleOAuthOAuthUserInfo;
+        };
+      } = await messageBus.sendMessageToBackground(MessageType.GET_OAUTH_USER_INFO_OR_ERROR);
+
+      if (response.data.success) {
+        this.$data.oAuthData = response.data.result;
+      } else {
+        this.$data.oAuthData = null;
+      }
+    },
     async createSpreadsheet() {
       const sheetTitles = ["Overview", "Packages"];
 
@@ -165,6 +180,18 @@ export default Vue.extend({
         nextPageRowIdx += nextPage.length;
       }
 
+      await messageBus.sendMessageToBackground(MessageType.WRITE_SPREADSHEET_VALUES, {
+        spreadsheetId: response.data.result.spreadsheetId,
+        range: "Overview",
+        values: [
+          [`Generated with Track & Trace Tools at ${Date().toString()}`],
+          [],
+          [null, "License", this.authState.license],
+          [],
+          [null, "Active Packages", `=COUNTIF(Packages!B2:B, "ACTIVE")`],
+        ],
+      });
+
       await messageBus.sendMessageToBackground(MessageType.BATCH_UPDATE_SPREADSHEET, {
         spreadsheetId: response.data.result.spreadsheetId,
         requests: [
@@ -173,9 +200,19 @@ export default Vue.extend({
             autoResizeDimensions: {
               dimensions: {
                 dimension: "COLUMNS",
+                sheetId: sheetTitles.indexOf("Overview"),
+                startIndex: 1,
+                endIndex: 12,
+              },
+            },
+          },
+          {
+            autoResizeDimensions: {
+              dimensions: {
+                dimension: "COLUMNS",
                 sheetId: sheetTitles.indexOf("Packages"),
                 startIndex: 0,
-                endIndex: 30,
+                endIndex: 12,
               },
             },
           },
@@ -188,7 +225,9 @@ export default Vue.extend({
     },
   },
   async created() {},
-  async mounted() {},
+  async mounted() {
+    this.getOAuthData();
+  },
 });
 </script>
 

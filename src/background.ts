@@ -192,7 +192,6 @@ function connected(p: any) {
 
         //   break;
         case MessageType.GET_OAUTH_USER_INFO_OR_ERROR:
-          console.log("GET_OAUTH_USER_INFO_OR_ERROR");
           try {
             respondToContentScript(inboundEvent, {
               success: true,

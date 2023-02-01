@@ -295,15 +295,3 @@ export async function batchUpdateValues({
     }),
   });
 }
-
-// export async function addRows({
-//   spreadsheetId,
-//   sheetName,
-//   rowCount
-// }: {
-//   spreadsheetId: string;
-//   sheetName: string;
-//   rowCount: number
-// }) {
-//   batchUpdate()
-// }
