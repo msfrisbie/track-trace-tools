@@ -358,6 +358,7 @@ export interface IItemData extends IResponseObjectData {
   UnitVolumeUnitOfMeasureAbbreviation: string | null;
   UnitWeight: number | null;
   UnitWeightUnitOfMeasureAbbreviation: string | null;
+  UnitWeightUnitOfMeasureId: number | null;
 }
 
 // Values that are defined per-request

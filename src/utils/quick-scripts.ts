@@ -103,16 +103,20 @@ export async function fillTransferWeights() {
     try {
       const packageData = await primaryDataLoader.activePackage(packageLabel);
 
-      if (
-        !unitOfMeasureSelect.querySelector(`option[value="number:${packageData.UnitOfMeasureId}"]`)
-      ) {
-        skippedCount++;
-        continue;
+      if (packageData.UnitOfMeasureQuantityType === "CountBased") {
+        if (packageData.Item?.UnitWeight && packageData.Item?.UnitWeightUnitOfMeasureId) {
+          grossWeightInput.value = (packageData.Quantity * packageData.Item.UnitWeight).toString();
+
+          unitOfMeasureSelect.value = `number:${packageData.Item?.UnitWeightUnitOfMeasureId}`;
+        } else {
+          skippedCount++;
+          continue;
+        }
+      } else {
+        grossWeightInput.value = packageData.Quantity.toString();
+
+        unitOfMeasureSelect.value = `number:${packageData.UnitOfMeasureId}`;
       }
-
-      grossWeightInput.value = packageData.Quantity.toString();
-
-      unitOfMeasureSelect.value = `number:${packageData.UnitOfMeasureId}`;
 
       successCount++;
     } catch (e) {
