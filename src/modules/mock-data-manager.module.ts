@@ -103,6 +103,7 @@ const VAPE_CARTRIDGE_ITEM: IItemData = {
   UnitVolumeUnitOfMeasureAbbreviation: "ml",
   UnitWeight: null,
   UnitWeightUnitOfMeasureAbbreviation: null,
+  UnitWeightUnitOfMeasureId: null,
 };
 
 const HARVESTED_FLOWER_ITEM: IItemData = {
@@ -148,6 +149,7 @@ const HARVESTED_FLOWER_ITEM: IItemData = {
   UnitVolumeUnitOfMeasureAbbreviation: null,
   UnitWeight: null,
   UnitWeightUnitOfMeasureAbbreviation: null,
+  UnitWeightUnitOfMeasureId: null,
 };
 
 const CLONE_ITEM: IItemData = {
@@ -193,6 +195,7 @@ const CLONE_ITEM: IItemData = {
   UnitVolumeUnitOfMeasureAbbreviation: null,
   UnitWeight: null,
   UnitWeightUnitOfMeasureAbbreviation: null,
+  UnitWeightUnitOfMeasureId: null,
 };
 
 const TEMPLATE_ITEMS: IItemData[] = [
@@ -239,6 +242,7 @@ const TEMPLATE_ITEMS: IItemData[] = [
     UnitVolumeUnitOfMeasureAbbreviation: null,
     UnitWeight: null,
     UnitWeightUnitOfMeasureAbbreviation: null,
+    UnitWeightUnitOfMeasureId: null,
   },
   {
     AdministrationMethod: "",
@@ -283,6 +287,7 @@ const TEMPLATE_ITEMS: IItemData[] = [
     UnitVolumeUnitOfMeasureAbbreviation: null,
     UnitWeight: null,
     UnitWeightUnitOfMeasureAbbreviation: null,
+    UnitWeightUnitOfMeasureId: null,
   },
 ];
 
