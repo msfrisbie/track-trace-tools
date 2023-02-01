@@ -56,14 +56,14 @@ export async function createSpreadsheet({
     properties: {
       title,
     },
-    sheets: sheetTitles.map((sheetTitle) => [
+    sheets: sheetTitles.map((sheetTitle, idx) => [
       {
         properties: {
           sheetType: "GRID",
-          // sheetId: 0,
+          sheetId: idx,
           title: sheetTitle,
           gridProperties: {
-            rowCount: 2,
+            rowCount: 1,
             columnCount: 12,
           },
         },
@@ -214,7 +214,7 @@ export async function writeValues({
     values,
   };
 
-  customFetch(url, {
+  return customFetch(url, {
     method: "PUT",
     headers,
     body: JSON.stringify(payload),
@@ -243,34 +243,10 @@ export async function appendValues({
     values,
   };
 
-  customFetch(url, {
+  return customFetch(url, {
     method: "POST",
     headers,
     body: JSON.stringify(payload),
-  });
-}
-
-export async function batchUpdateValues({
-  spreadsheetId,
-  data,
-}: {
-  spreadsheetId: string;
-  data: IValueRange[];
-}) {
-  // https://developers.google.com/sheets/api/reference/rest/v4/spreadsheets.values/batchUpdate
-  // https://sheets.googleapis.com/v4/spreadsheets/{spreadsheetId}/values:batchUpdate
-  const url = buildSheetsApiURL(`/${spreadsheetId}/values:batchUpdate`, {
-    valueInputOption: "USER_ENTERED",
-  });
-
-  const headers = await headersFactory();
-
-  customFetch(url, {
-    method: "POST",
-    headers,
-    body: JSON.stringify({
-      data,
-    }),
   });
 }
 
@@ -283,17 +259,51 @@ export async function batchUpdate({
 }) {
   // https://developers.google.com/sheets/api/reference/rest/v4/spreadsheets/batchUpdate
   // https://sheets.googleapis.com/v4/spreadsheets/{spreadsheetId}:batchUpdate
-  const url = buildSheetsApiURL(`/${spreadsheetId}:batchUpdate`, {
-    valueInputOption: "USER_ENTERED",
-  });
+  const url = buildSheetsApiURL(`/${spreadsheetId}:batchUpdate`);
 
   const headers = await headersFactory();
 
-  customFetch(url, {
+  return customFetch(url, {
     method: "POST",
     headers,
     body: JSON.stringify({
       requests,
+      // valueInputOption: "USER_ENTERED",
     }),
   });
 }
+
+export async function batchUpdateValues({
+  spreadsheetId,
+  data,
+}: {
+  spreadsheetId: string;
+  data: IValueRange[];
+}) {
+  // https://developers.google.com/sheets/api/reference/rest/v4/spreadsheets.values/batchUpdate
+  // https://sheets.googleapis.com/v4/spreadsheets/{spreadsheetId}/values:batchUpdate
+  const url = buildSheetsApiURL(`/${spreadsheetId}/values:batchUpdate`);
+
+  const headers = await headersFactory();
+
+  return customFetch(url, {
+    method: "POST",
+    headers,
+    body: JSON.stringify({
+      data,
+      valueInputOption: "USER_ENTERED",
+    }),
+  });
+}
+
+// export async function addRows({
+//   spreadsheetId,
+//   sheetName,
+//   rowCount
+// }: {
+//   spreadsheetId: string;
+//   sheetName: string;
+//   rowCount: number
+// }) {
+//   batchUpdate()
+// }

@@ -3,7 +3,13 @@ import { IBusEvent, IBusMessage, IBusMessageOptions } from "@/interfaces";
 import { database } from "@/modules/indexeddb.module";
 import amplitude from "amplitude-js";
 import { expireAuthToken, getOAuthUserInfoOrError } from "./utils/oauth";
-import { appendValues, batchUpdateValues, createSpreadsheet } from "./utils/sheets";
+import {
+  appendValues,
+  batchUpdate,
+  batchUpdateValues,
+  createSpreadsheet,
+  writeValues,
+} from "./utils/sheets";
 
 console.log(`These events are collected only to help us make the plugin more useful for you.`);
 
@@ -229,9 +235,41 @@ function connected(p: any) {
           }
           break;
 
-        case MessageType.UPDATE_SPREADSHEET_VALUES:
+        case MessageType.BATCH_UPDATE_SPREADSHEET:
+          try {
+            const result = await batchUpdate(inboundEvent.message.data);
+
+            respondToContentScript(inboundEvent, {
+              success: true,
+              result,
+            });
+          } catch (error) {
+            respondToContentScript(inboundEvent, {
+              success: false,
+            });
+            console.error("Event error in background", inboundEvent, error);
+          }
+          break;
+
+        case MessageType.BATCH_UPDATE_SPREADSHEET_VALUES:
           try {
             const result = await batchUpdateValues(inboundEvent.message.data);
+
+            respondToContentScript(inboundEvent, {
+              success: true,
+              result,
+            });
+          } catch (error) {
+            respondToContentScript(inboundEvent, {
+              success: false,
+            });
+            console.error("Event error in background", inboundEvent, error);
+          }
+          break;
+
+        case MessageType.WRITE_SPREADSHEET_VALUES:
+          try {
+            const result = await writeValues(inboundEvent.message.data);
 
             respondToContentScript(inboundEvent, {
               success: true,

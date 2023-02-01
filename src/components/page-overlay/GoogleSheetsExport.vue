@@ -12,6 +12,7 @@
 <script lang="ts">
 import { MessageType } from "@/consts";
 import { ISpreadsheet } from "@/interfaces";
+import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
 import { messageBus } from "@/modules/message-bus.module";
 import router from "@/router/index";
 import store from "@/store/page-overlay/index";
@@ -37,6 +38,8 @@ export default Vue.extend({
   },
   methods: {
     async createSpreadsheet() {
+      const sheetTitles = ["Overview", "Packages"];
+
       const response: {
         data: {
           success: boolean;
@@ -44,86 +47,144 @@ export default Vue.extend({
         };
       } = await messageBus.sendMessageToBackground(MessageType.CREATE_SPREADSHEET, {
         title: `${this.authState.license} Metrc Export - ${todayIsodate()}`,
-        sheetTitles: ["Overview", "Active Packages"],
+        sheetTitles,
+      });
+
+      const packageProperties = [
+        "LicenseNumber",
+        "PackageState",
+        "Label",
+        "Item.Name",
+        "Quantity",
+        "UnitOfMeasureAbbreviation",
+        "PackagedDate",
+        "LocationName",
+        "PackagedByFacilityLicenseNumber",
+        "LabTestingStateName",
+        "ProductionBatchNumber",
+      ];
+
+      const activePackages = await primaryDataLoader.activePackages();
+
+      await messageBus.sendMessageToBackground(MessageType.BATCH_UPDATE_SPREADSHEET, {
+        spreadsheetId: response.data.result.spreadsheetId,
+        requests: [
+          // Add more rows
+          {
+            appendDimension: {
+              dimension: "ROWS",
+              length: 19,
+              sheetId: sheetTitles.indexOf("Overview"),
+            },
+          },
+          // Add more rows
+          {
+            appendDimension: {
+              dimension: "ROWS",
+              length: activePackages.length,
+              sheetId: sheetTitles.indexOf("Packages"),
+            },
+          },
+          // Style top row - black bg, white text
+          {
+            repeatCell: {
+              range: {
+                sheetId: sheetTitles.indexOf("Packages"),
+                startRowIndex: 0,
+                endRowIndex: 1,
+              },
+              cell: {
+                userEnteredFormat: {
+                  backgroundColor: {
+                    red: 0.0,
+                    green: 0.0,
+                    blue: 0.0,
+                  },
+                  horizontalAlignment: "CENTER",
+                  textFormat: {
+                    foregroundColor: {
+                      red: 1.0,
+                      green: 1.0,
+                      blue: 1.0,
+                    },
+                    fontSize: 10,
+                    bold: true,
+                  },
+                },
+              },
+              fields: "userEnteredFormat(backgroundColor,textFormat,horizontalAlignment)",
+            },
+          },
+          // Freeze top row
+          {
+            updateSheetProperties: {
+              properties: {
+                sheetId: sheetTitles.indexOf("Packages"),
+                gridProperties: {
+                  frozenRowCount: 1,
+                },
+              },
+              fields: "gridProperties.frozenRowCount",
+            },
+          },
+        ],
+      });
+
+      await messageBus.sendMessageToBackground(MessageType.WRITE_SPREADSHEET_VALUES, {
+        spreadsheetId: response.data.result.spreadsheetId,
+        range: "Packages!1:1",
+        values: [packageProperties],
+      });
+
+      let nextPageStartIdx = 0;
+      let nextPageRowIdx = 2;
+      const pageSize = 2000;
+
+      while (true) {
+        const nextPage = activePackages.slice(nextPageStartIdx, nextPageStartIdx + pageSize);
+        if (nextPage.length === 0) {
+          break;
+        }
+
+        await messageBus.sendMessageToBackground(MessageType.WRITE_SPREADSHEET_VALUES, {
+          spreadsheetId: response.data.result.spreadsheetId,
+          range: `Packages!${nextPageRowIdx}:${nextPageRowIdx + nextPage.length}`,
+          values: nextPage.map((pkg) =>
+            packageProperties.map((property) => {
+              let value = pkg;
+              for (const subProperty of property.split(".")) {
+                // @ts-ignore
+                value = value[subProperty];
+              }
+              return value;
+            })
+          ),
+        });
+
+        nextPageStartIdx += nextPage.length;
+        nextPageRowIdx += nextPage.length;
+      }
+
+      await messageBus.sendMessageToBackground(MessageType.BATCH_UPDATE_SPREADSHEET, {
+        spreadsheetId: response.data.result.spreadsheetId,
+        requests: [
+          // Auto resize to fit added data
+          {
+            autoResizeDimensions: {
+              dimensions: {
+                dimension: "COLUMNS",
+                sheetId: sheetTitles.indexOf("Packages"),
+                startIndex: 0,
+                endIndex: 30,
+              },
+            },
+          },
+        ],
       });
 
       if (response.data.success) {
         this.$data.spreadsheetData = response.data.result;
       }
-
-      for (let i = 0; i < 5; ++i) {
-        await messageBus.sendMessageToBackground(MessageType.APPEND_SPREADSHEET_VALUES, {
-          spreadsheetId: response.data.result.spreadsheetId,
-          range: "Overview",
-          values: [
-            ["foo", "bar"],
-            ["baz", "qux"],
-            ["baz", "qux"],
-            ["baz", "qux"],
-            ["baz", "qux"],
-          ],
-        });
-      }
-
-      //   const data: IValueRange[] = [
-      //     {
-      //       range: "Overview",
-      //       majorDimension: "ROWS",
-      //       values: [
-      //         ["foo", "bar"],
-      //         ["baz", "qux"],
-      //         ["baz", "qux"],
-      //         ["baz", "qux"],
-      //         ["baz", "qux"],
-      //       ],
-      //     },
-      //     {
-      //       range: "Active Packages",
-      //       majorDimension: "ROWS",
-      //       values: [
-      //         ["1", "2"],
-      //         ["3", "4"],
-      //         ["3", "4"],
-      //         ["3", "4"],
-      //         ["3", "4"],
-      //       ],
-      //     },
-      //   ];
-
-      //   messageBus.sendMessageToBackground(MessageType.UPDATE_SPREADSHEET_VALUES, {
-      //     spreadsheetId: response.data.result.spreadsheetId,
-      //     data,
-      //   });
-
-      //   const data2: IValueRange[] = [
-      //     {
-      //       range: "Overview!6:10",
-      //       majorDimension: "ROWS",
-      //       values: [
-      //         ["foo", "bar"],
-      //         ["baz", "qux"],
-      //         ["baz", "qux"],
-      //         ["baz", "qux"],
-      //         ["baz", "qux"],
-      //       ],
-      //     },
-      //     {
-      //       range: "Active Packages!6:10",
-      //       majorDimension: "ROWS",
-      //       values: [
-      //         ["1", "2"],
-      //         ["3", "4"],
-      //         ["3", "4"],
-      //         ["3", "4"],
-      //         ["3", "4"],
-      //       ],
-      //     },
-      //   ];
-
-      //   messageBus.sendMessageToBackground(MessageType.UPDATE_SPREADSHEET_VALUES, {
-      //     spreadsheetId: response.data.result.spreadsheetId,
-      //     data: data2,
-      //   });
     },
   },
   async created() {},
