@@ -1,5 +1,6 @@
 import { MessageType } from "@/consts";
 import { analyticsManager } from "@/modules/analytics-manager.module";
+import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
 import { toastManager } from "@/modules/toast-manager.module";
 
 export interface IQuickScript {
@@ -17,6 +18,15 @@ export async function runQuickScript(quickScript: IQuickScript) {
 }
 
 export const QUICK_SCRIPTS: IQuickScript[] = [
+  {
+    id: "AUTOFILL_TRANSFER_GROSS_WEIGHTS",
+    name: "Autofill Transfer Gross Weight",
+    description:
+      "Automatically fills the Gross Weight and unit of measure fields for the current transfer",
+    contextLink:
+      "https://track-trace-tools.talkyard.net/-33/feature-request-auto-populate-gross-weights-in-a-transfer-template",
+    quickScriptFunction: fillTransferWeights,
+  },
   {
     id: "SUM_PACKAGE_QUANTITIES",
     name: "Autosum Package Quantities",
@@ -43,6 +53,7 @@ export async function checkAllPlantsForHarvestRestore() {
   ] as HTMLElement[];
 
   restoreHarvestCheckboxes.map((input) => input.click());
+
   toastManager.openToast(`Checked ${restoreHarvestCheckboxes.length} boxes`, {
     title: "Quick Script Success",
     autoHideDelay: 5000,
@@ -51,6 +62,86 @@ export async function checkAllPlantsForHarvestRestore() {
     toaster: "ttt-toaster",
     solid: true,
   });
+}
+
+export async function fillTransferWeights() {
+  const packageRows = [
+    ...document.querySelectorAll(`tr[ng-repeat="package in destination.Packages"]`),
+  ];
+
+  let successCount = 0;
+  let skippedCount = 0;
+
+  for (const packageRow of packageRows) {
+    const packageInput = packageRow.querySelector(
+      `input[ng-model="package.Id"]`
+    ) as HTMLInputElement | null;
+    const grossWeightInput = packageRow.querySelector(
+      `input[ng-model="package.GrossWeight"]`
+    ) as HTMLInputElement | null;
+    const unitOfMeasureSelect = packageRow.querySelector(
+      `select[ng-model="package.GrossUnitOfWeightId"]`
+    ) as HTMLSelectElement | null;
+
+    if (!packageInput) {
+      skippedCount++;
+      continue;
+    }
+
+    if (!grossWeightInput || !unitOfMeasureSelect) {
+      skippedCount++;
+      continue;
+    }
+
+    const packageLabel = packageInput.value;
+
+    if (!packageLabel) {
+      skippedCount++;
+      continue;
+    }
+
+    try {
+      const packageData = await primaryDataLoader.activePackage(packageLabel);
+
+      if (
+        !unitOfMeasureSelect.querySelector(`option[value="number:${packageData.UnitOfMeasureId}"]`)
+      ) {
+        skippedCount++;
+        continue;
+      }
+
+      grossWeightInput.value = packageData.Quantity.toString();
+
+      unitOfMeasureSelect.value = `number:${packageData.UnitOfMeasureId}`;
+
+      successCount++;
+    } catch (e) {
+      skippedCount++;
+    }
+  }
+
+  toastManager.openToast(`Autofilled ${successCount} packages`, {
+    title: "Quick Script Success",
+    autoHideDelay: 5000,
+    variant: "success",
+    appendToast: true,
+    toaster: "ttt-toaster",
+    solid: true,
+  });
+
+  if (skippedCount > 0) {
+    toastManager.openToast(
+      `Skipped filling ${skippedCount} packages. This usually happens if a package input is empty, or the selected package does not have a weight unit of measure.`,
+      {
+        title: "Quick Script Warning",
+        autoHideDelay: 5000,
+        variant: "warning",
+        appendToast: true,
+        toaster: "ttt-toaster",
+        solid: true,
+      }
+    );
+  }
 }
 
 export async function sumPackageQuantities() {
