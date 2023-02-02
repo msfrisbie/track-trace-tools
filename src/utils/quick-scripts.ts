@@ -118,6 +118,8 @@ export async function fillTransferWeights() {
         unitOfMeasureSelect.value = `number:${packageData.UnitOfMeasureId}`;
       }
 
+      unitOfMeasureSelect.dispatchEvent(new Event("change"));
+
       successCount++;
     } catch (e) {
       skippedCount++;
