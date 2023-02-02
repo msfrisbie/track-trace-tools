@@ -59,7 +59,6 @@ export default Vue.extend({
     messageBus.init();
   },
   methods: {
-    async enableAccountPermissions() {},
     async openOptions() {
       window.open(await browser.runtime.getURL(TRACK_TRACE_TOOLS_STANDALONE_PAGE), "_blank");
     },

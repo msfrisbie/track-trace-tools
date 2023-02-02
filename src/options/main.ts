@@ -8,6 +8,7 @@ Vue.config.productionTip = false;
 (async () => {
   const initialOptionsPath = await chrome.storage.local.get(ChromeStorageKeys.INITIAL_OPTIONS_PATH);
   if (initialOptionsPath) {
+    console.log({ initialOptionsPath });
     window.location.hash = `#${initialOptionsPath}`;
     await chrome.storage.local.remove(ChromeStorageKeys.INITIAL_OPTIONS_PATH);
   }

@@ -11,6 +11,7 @@
           <b-nav-item href="#/custom-features">Custom Features</b-nav-item>
           <b-nav-item href="#/faq">FAQ</b-nav-item>
           <b-nav-item href="#/changelog">Changelog</b-nav-item>
+          <b-nav-item href="#/google-sheets">Google Sheets</b-nav-item>
           <b-nav-item href="#/license">License</b-nav-item>
         </b-navbar-nav>
       </b-collapse>
@@ -21,9 +22,12 @@
 
 <script lang="ts">
 import TitleBanner from "@/components/shared/TitleBanner.vue";
-import { ChromeStorageKeys, MessageType } from "@/consts";
+import { MessageType } from "@/consts";
 import { analyticsManager } from "@/modules/analytics-manager.module";
 import { messageBus } from "@/modules/message-bus.module";
+import { library } from "@fortawesome/fontawesome-svg-core";
+import * as fontawesomeSolid from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import { BootstrapVue } from "bootstrap-vue";
 import Vue from "vue";
 import VueRouter from "vue-router";
@@ -31,6 +35,12 @@ import router from "./router";
 
 Vue.use(VueRouter);
 Vue.use(BootstrapVue);
+
+Vue.component("font-awesome-icon", FontAwesomeIcon);
+library.add(
+  // @ts-ignore
+  fontawesomeSolid.faSignOutAlt
+);
 
 export default Vue.extend({
   name: "Options",

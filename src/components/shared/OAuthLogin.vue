@@ -69,7 +69,6 @@ export default Vue.extend({
         MessageType.GET_OAUTH_USER_INFO_OR_ERROR,
         { interactive }
       );
-      console.log({ response });
       this.$data.oauthUserInfo = response.data.result;
     },
 
@@ -81,7 +80,6 @@ export default Vue.extend({
   },
   async created() {},
   async mounted() {
-    console.log("MOUNTED OAUTH LOGIN");
     try {
       // @ts-ignore
       await this.login();
@@ -90,6 +88,13 @@ export default Vue.extend({
     } finally {
       this.$data.initial = false;
     }
+
+    document.addEventListener("visibilitychange", () => {
+      if (document.visibilityState === "visible") {
+        // @ts-ignore
+        this.login();
+      }
+    });
   },
 });
 </script>
