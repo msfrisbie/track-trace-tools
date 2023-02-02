@@ -21,7 +21,7 @@
 
 <script lang="ts">
 import TitleBanner from "@/components/shared/TitleBanner.vue";
-import { MessageType } from "@/consts";
+import { ChromeStorageKeys, MessageType } from "@/consts";
 import { analyticsManager } from "@/modules/analytics-manager.module";
 import { messageBus } from "@/modules/message-bus.module";
 import { BootstrapVue } from "bootstrap-vue";
@@ -33,14 +33,17 @@ Vue.use(VueRouter);
 Vue.use(BootstrapVue);
 
 export default Vue.extend({
-  name: "Standalone",
+  name: "Options",
   router,
   components: {
     TitleBanner,
   },
   async mounted() {
     messageBus.init();
-    analyticsManager.track(MessageType.VIEWED_STANDALONE_PAGE);
+
+    analyticsManager.track(MessageType.VIEWED_STANDALONE_PAGE, {
+      url: window.location.href,
+    });
   },
   methods: {},
 });

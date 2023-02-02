@@ -1,4 +1,4 @@
-import { AMPLITUDE_API_KEY, MessageType } from "@/consts";
+import { AMPLITUDE_API_KEY, ChromeStorageKeys, MessageType } from "@/consts";
 import { IBusEvent, IBusMessage, IBusMessageOptions } from "@/interfaces";
 import { database } from "@/modules/indexeddb.module";
 import amplitude from "amplitude-js";
@@ -59,6 +59,14 @@ function connected(p: any) {
     if (inboundEvent.message) {
       switch (inboundEvent.message.type) {
         case MessageType.KEEPALIVE:
+          break;
+        case MessageType.OPEN_OPTIONS_PAGE:
+          if (inboundEvent.message.data.path) {
+            await chrome.storage.local.set({
+              [ChromeStorageKeys.INITIAL_OPTIONS_PATH]: inboundEvent.message.data.path,
+            });
+          }
+          chrome.runtime.openOptionsPage();
           break;
         case MessageType.SET_USER_ID:
           amplitudeInstance.setUserId(inboundEvent.message.data.identity);

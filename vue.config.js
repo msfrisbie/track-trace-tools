@@ -23,7 +23,7 @@ module.exports = {
     // },
     standalone: {
       template: "public/browser-extension.html",
-      entry: "./src/standalone/main.ts",
+      entry: "./src/options/main.ts",
       title: "Track and Trace Tools",
       filename: "index.html",
     },

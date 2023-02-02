@@ -9,7 +9,7 @@
 
     <b-button
       variant="outline-primary"
-      @click="openStandalone()"
+      @click="openOptions()"
       class="flex flex-row gap-2 justify-center items-center"
     >
       <font-awesome-icon icon="info-circle"></font-awesome-icon><span>ABOUT</span>
@@ -60,7 +60,7 @@ export default Vue.extend({
   },
   methods: {
     async enableAccountPermissions() {},
-    async openStandalone() {
+    async openOptions() {
       window.open(await browser.runtime.getURL(TRACK_TRACE_TOOLS_STANDALONE_PAGE), "_blank");
     },
   },

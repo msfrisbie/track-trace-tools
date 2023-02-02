@@ -1,11 +1,16 @@
 <template>
   <div>
-    <div>GoogleSheetsExport</div>
-    <button @click="createSpreadsheet()">CREATE</button>
-    <a v-if="spreadsheetData" :href="spreadsheetData.spreadsheetUrl" target="_blank"
-      >OPEN SPREADSHEET</a
-    >
-    <pre>{{ spreadsheetData }}</pre>
+    <template v-if="oAuthData">
+      <button @click="createSpreadsheet()">CREATE</button>
+      <a v-if="spreadsheetData" :href="spreadsheetData.spreadsheetUrl" target="_blank"
+        >OPEN SPREADSHEET</a
+      >
+      <pre>{{ spreadsheetData }}</pre>
+    </template>
+    <template v-else>
+      <div>Need to sign in</div>
+      <button @click="openOAuthPage()">OPEN</button>
+    </template>
   </div>
 </template>
 
@@ -38,6 +43,9 @@ export default Vue.extend({
     };
   },
   methods: {
+    async openOAuthPage() {
+      messageBus.sendMessageToBackground(MessageType.OPEN_OPTIONS_PAGE)
+    },
     async getOAuthData() {
       const response: {
         data: {
@@ -66,9 +74,9 @@ export default Vue.extend({
       });
 
       const packageProperties = [
+        "Label",
         "LicenseNumber",
         "PackageState",
-        "Label",
         "Item.Name",
         "Quantity",
         "UnitOfMeasureAbbreviation",
