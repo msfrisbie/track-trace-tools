@@ -26,6 +26,8 @@ class ApiKeyManager implements IAtomicService {
   private _apiKeyState: Promise<IApiKeyState | null> | null = null;
 
   public async init() {
+    throw new Error("This module is causing bugs, do not use");
+
     await authManager.authStateOrError();
 
     if (!this._apiKeyState) {
