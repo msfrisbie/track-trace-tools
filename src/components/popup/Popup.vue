@@ -7,13 +7,15 @@
     <!-- <ttt-permissions-button /> -->
     <o-auth-login></o-auth-login>
 
-    <b-button
-      variant="outline-primary"
-      @click="openOptions()"
-      class="flex flex-row gap-2 justify-center items-center"
-    >
-      <font-awesome-icon icon="info-circle"></font-awesome-icon><span>ABOUT</span>
-    </b-button>
+    <div class="p-2 flex flex-col items-stretch">
+      <b-button
+        variant="outline-primary"
+        @click="openOptions()"
+        class="flex flex-row gap-2 justify-center items-center"
+      >
+        <font-awesome-icon icon="info-circle"></font-awesome-icon><span>ABOUT</span>
+      </b-button>
+    </div>
 
     <!-- <b-button variant="outline-primary" style="opacity: 0.5"
       >LICENSE</b-button

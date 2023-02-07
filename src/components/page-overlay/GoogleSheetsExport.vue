@@ -44,7 +44,9 @@ export default Vue.extend({
   },
   methods: {
     async openOAuthPage() {
-      messageBus.sendMessageToBackground(MessageType.OPEN_OPTIONS_PAGE)
+      messageBus.sendMessageToBackground(MessageType.OPEN_OPTIONS_PAGE, {
+        path: "/google-sheets",
+      });
     },
     async getOAuthData() {
       const response: {
@@ -235,6 +237,12 @@ export default Vue.extend({
   async created() {},
   async mounted() {
     this.getOAuthData();
+
+    document.addEventListener("visibilitychange", () => {
+      if (document.visibilityState === "visible") {
+        this.getOAuthData();
+      }
+    });
   },
 });
 </script>

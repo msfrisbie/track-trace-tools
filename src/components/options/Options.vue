@@ -22,7 +22,7 @@
 
 <script lang="ts">
 import TitleBanner from "@/components/shared/TitleBanner.vue";
-import { MessageType } from "@/consts";
+import { ChromeStorageKeys, MessageType } from "@/consts";
 import { analyticsManager } from "@/modules/analytics-manager.module";
 import { messageBus } from "@/modules/message-bus.module";
 import { library } from "@fortawesome/fontawesome-svg-core";
@@ -54,6 +54,25 @@ export default Vue.extend({
     analyticsManager.track(MessageType.VIEWED_STANDALONE_PAGE, {
       url: window.location.href,
     });
+
+    const maybeNavigate = async () => {
+      const result = await chrome.storage.local.get(ChromeStorageKeys.INITIAL_OPTIONS_PATH);
+
+      const initialOptionsPath = result[ChromeStorageKeys.INITIAL_OPTIONS_PATH];
+
+      if (initialOptionsPath) {
+        window.location.hash = `#${initialOptionsPath}`;
+        await chrome.storage.local.remove(ChromeStorageKeys.INITIAL_OPTIONS_PATH);
+      }
+    };
+
+    document.addEventListener("visibilitychange", () => {
+      if (document.visibilityState === "visible") {
+        maybeNavigate();
+      }
+    });
+
+    maybeNavigate();
   },
   methods: {},
 });

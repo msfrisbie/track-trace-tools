@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-col items-stretch gap-4 text-center">
+  <div class="flex flex-col items-stretch gap-4 text-center p-2">
     <template v-if="!initial">
       <template v-if="isAuthenticated">
         <!-- <pre>{{ oauthUserInfo }}</pre> -->
@@ -65,6 +65,7 @@ export default Vue.extend({
   },
   methods: {
     async login({ interactive = false }: { interactive?: boolean } = {}) {
+      console.log("attempting login");
       const response = await messageBus.sendMessageToBackground(
         MessageType.GET_OAUTH_USER_INFO_OR_ERROR,
         { interactive }
