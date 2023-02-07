@@ -49,6 +49,7 @@ export default Vue.extend({
       });
     },
     async getOAuthData() {
+      console.log("getOAuthData");
       const response: {
         data: {
           success: boolean;
