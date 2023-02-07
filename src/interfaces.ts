@@ -750,7 +750,7 @@ export interface IPluginUserData {
   metrcId: string;
   licenseNumber: string;
   state: string;
-  apiKey: string;
+  // apiKey: string;
 }
 
 export interface IPluginCsvData extends IPluginUserData {

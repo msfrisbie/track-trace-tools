@@ -35,13 +35,13 @@ class AccountManager implements IAtomicService {
   async pluginUserDataOrError(): Promise<IPluginUserData> {
     const authState = await authManager.authStateOrError();
 
-    const { metrcApiKey } = await apiKeyManager.apiKeyStateOrError();
+    // const { metrcApiKey } = await apiKeyManager.apiKeyStateOrError();
 
     const pluginUserData: IPluginUserData = {
       metrcId: authState.identity,
       licenseNumber: authState.license,
       state: window.location.hostname,
-      apiKey: metrcApiKey,
+      // apiKey: metrcApiKey,
     };
 
     return pluginUserData;

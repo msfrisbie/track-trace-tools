@@ -23,7 +23,6 @@ import { MessageType } from "@/consts";
 import { IAuthState } from "@/interfaces";
 import { accountManager } from "@/modules/account-manager.module";
 import { analyticsManager } from "@/modules/analytics-manager.module";
-import { apiKeyManager } from "@/modules/api-key-manager.module";
 import { authManager } from "@/modules/auth-manager.module";
 import { backgroundTaskManager } from "@/modules/background-task-manager.module";
 import { builderManager } from "@/modules/builder-manager.module";
@@ -256,7 +255,7 @@ export default Vue.extend({
       primaryDataLoader.init();
       contactDataManager.init();
       builderManager.init();
-      apiKeyManager.init();
+      // apiKeyManager.init();
       backgroundTaskManager.init();
       accountManager.init();
       dynamicConstsManager.init();

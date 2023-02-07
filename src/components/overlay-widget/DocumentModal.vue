@@ -58,7 +58,6 @@
 import TrackTraceToolsLogo from "@/components/shared/TrackTraceToolsLogo.vue";
 import { MessageType } from "@/consts";
 import { analyticsManager } from "@/modules/analytics-manager.module";
-import { apiKeyManager } from "@/modules/api-key-manager.module";
 import { toastManager } from "@/modules/toast-manager.module";
 import { debugLogFactory } from "@/utils/debug";
 import Vue from "vue";
@@ -134,7 +133,7 @@ export default Vue.extend({
 
       // PDF is rendered, everything after here can error without UX consequence
 
-      const apiKeyState = await apiKeyManager.apiKeyStateOrNull();
+      // const apiKeyState = await apiKeyManager.apiKeyStateOrNull();
     },
     hide() {
       this.$bvModal.hide("document-modal");
