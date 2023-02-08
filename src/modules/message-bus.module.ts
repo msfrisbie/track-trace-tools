@@ -11,24 +11,23 @@ class MessageBus implements IAtomicService {
   port: any;
   handlers: Map<string, Function> = new Map();
   // @ts-ignore
-  connected: Promise<void>;
+  // connected: Promise<void>;
   // @ts-ignore
-  private resolveConnected: () => void;
+  // private resolveConnected: () => void;
 
-  private resetConnected() {
-    this.connected = new Promise((resolve, reject) => {
-      const timeout = setTimeout(() => reject("Connect timeout"), 5000);
+  // private resetConnected() {
+  //   this.connected = new Promise((resolve, reject) => {
+  //     const timeout = setTimeout(() => reject("Connect timeout"), 5000);
 
-      this.resolveConnected = () => {
-        clearTimeout(timeout);
-        resolve();
-      };
-    });
-  }
+  //     this.resolveConnected = () => {
+  //       clearTimeout(timeout);
+  //       resolve();
+  //     };
+  //   });
+  // }
 
   async init() {
-    this.connect();
-
+    // this.connect();
     // timer(0, 100).subscribe(() => {
     //   if (this.port) {
     //     this.sendMessageToBackground(MessageType.KEEPALIVE, {});
@@ -36,32 +35,36 @@ class MessageBus implements IAtomicService {
     // });
   }
 
-  async connect() {
-    console.log("Connecting port...");
+  // async connect() {
+  // console.log("Connecting port...");
 
-    this.resetConnected();
+  // this.resetConnected();
 
-    // @ts-ignore
-    this.port = browser.runtime.connect();
+  // @ts-ignore
+  // this.port = browser.runtime.connect();
 
-    this.port.onMessage.addListener((event: IBusEvent) => {
-      this.handleMessageFromBackground(event);
-    });
+  // chrome.runtime.onMessage.addListener((event: IBusEvent) => {
+  //   this.handleMessageFromBackground(event);
+  // });
 
-    this.resolveConnected();
-  }
+  // this.port.onMessage.addListener((event: IBusEvent) => {
+  //   this.handleMessageFromBackground(event);
+  // });
+
+  // this.resolveConnected();
+  // }
 
   async sendMessageToBackground<T>(
     type: MessageType,
     data: any = [],
-    options: IBusMessageOptions = {},
-    transferables: any[] = []
+    options: IBusMessageOptions = {}
+    // transferables: any[] = []
   ): Promise<any> {
     // Options are collected here for *all* message types
     options.muteAnalytics = store.state.muteAnalytics;
 
     try {
-      await this.connected;
+      // await this.connected;
 
       const uuid = v4();
 
@@ -80,7 +83,7 @@ class MessageBus implements IAtomicService {
         .catch((e) => {
           console.error("Failed to send message to background (reject)", type);
 
-          this.connect();
+          // this.connect();
 
           Sentry.captureException(e, { tags: { type } });
         })
@@ -95,14 +98,17 @@ class MessageBus implements IAtomicService {
         },
       };
 
-      this.port.postMessage(event, transferables);
+      // this.port.postMessage(event, transferables);
+      chrome.runtime.sendMessage(event, (response: IBusEvent) => {
+        this.handleMessageFromBackground(response);
+      });
 
       return responsePromise;
     } catch (e) {
       // This is usually triggered in development when reloading the extension between page refreshes.
       console.error("Failed to send message to background (catch)", type);
 
-      this.connect();
+      // this.connect();
 
       Sentry.captureException(e, { tags: { type } });
     }
