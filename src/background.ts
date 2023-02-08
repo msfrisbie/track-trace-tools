@@ -2,7 +2,7 @@ import { AMPLITUDE_API_KEY, ChromeStorageKeys, MessageType } from "@/consts";
 import { IBusEvent, IBusMessageOptions } from "@/interfaces";
 import { database } from "@/modules/indexeddb.module";
 import amplitude from "amplitude-js";
-import { expireAuthToken, getOAuthUserInfoOrError } from "./utils/oauth";
+import { expireAuthToken, getAuthTokenOrError, getOAuthUserInfoOrError } from "./utils/oauth";
 import {
   appendValues,
   batchUpdate,
@@ -194,6 +194,21 @@ chrome.runtime.onMessage.addListener(async (inboundEvent, sender, sendResponse) 
       //   respondToContentScript(sendResponse, inboundEvent, await CustomAsyncStorage.removeItem(inboundEvent.message.data.key));
 
       //   break;
+      case MessageType.CHECK_OAUTH:
+        try {
+          await getAuthTokenOrError({ interactive: false });
+
+          respondToContentScript(sendResponse, inboundEvent, {
+            success: true,
+            isAuthenticated: true,
+          });
+        } catch (error) {
+          respondToContentScript(sendResponse, inboundEvent, {
+            success: false,
+          });
+          console.error("Event error in background", inboundEvent, error);
+        }
+        break;
       case MessageType.GET_OAUTH_USER_INFO_OR_ERROR:
         try {
           respondToContentScript(sendResponse, inboundEvent, {
