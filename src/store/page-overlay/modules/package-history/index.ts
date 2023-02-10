@@ -357,12 +357,22 @@ export const packageHistoryModule = {
       { maxParentLookupDepth }: { maxParentLookupDepth: number | null }
     ) => {
       ctx.commit(PackageHistoryMutations.SET_MAX_PARENT_LOOKUP_DEPTH, { maxParentLookupDepth });
+      if (typeof maxParentLookupDepth === "number") {
+        ctx.commit(PackageHistoryMutations.SET_MAX_PARENT_VISIBLE_DEPTH, {
+          maxParentVisibleDepth: maxParentLookupDepth,
+        });
+      }
     },
     [PackageHistoryActions.SET_MAX_CHILD_LOOKUP_DEPTH]: async (
       ctx: ActionContext<IPackageHistoryState, IPluginState>,
       { maxChildLookupDepth }: { maxChildLookupDepth: number | null }
     ) => {
       ctx.commit(PackageHistoryMutations.SET_MAX_CHILD_LOOKUP_DEPTH, { maxChildLookupDepth });
+      if (typeof maxChildLookupDepth === "number") {
+        ctx.commit(PackageHistoryMutations.SET_MAX_CHILD_VISIBLE_DEPTH, {
+          maxChildVisibleDepth: maxChildLookupDepth,
+        });
+      }
     },
 
     [PackageHistoryActions.SET_MAX_PARENT_VISIBLE_DEPTH]: async (

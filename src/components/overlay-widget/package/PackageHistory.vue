@@ -401,26 +401,22 @@
 
       <div class="sticky bg-white py-2" style="bottom: -1.5rem">
         <div class="flex flex-col gap-4 items-center">
-          <div v-if="maxParentLookupDepth !== null" class="text-red-500 text-center">
-            You have set a parent generation limit of {{ maxParentLookupDepth }}.
-          </div>
+          <div class="flex flex-col items-center">
+            <div v-if="maxParentLookupDepth !== null" class="text-red-500 text-center">
+              You have set a parent generation limit of {{ maxParentLookupDepth }}.
+            </div>
 
-          <div v-if="maxChildLookupDepth !== null" class="text-red-500 text-center">
-            You have set a child generation limit of {{ maxChildLookupDepth }}.
-          </div>
+            <div v-if="maxChildLookupDepth !== null" class="text-red-500 text-center">
+              You have set a child generation limit of {{ maxChildLookupDepth }}.
+            </div>
 
-          <div
-            v-if="maxParentLookupDepth === null && maxParentVisibleDepth < 20"
-            class="text-red-500 text-center"
-          >
-            Only showing {{ maxParentVisibleDepth }} parent generations.
-          </div>
+            <div v-if="maxParentVisibleDepth < 20" class="text-red-500 text-center">
+              Only showing {{ maxParentVisibleDepth }} parent generations.
+            </div>
 
-          <div
-            v-if="maxChildLookupDepth === null && maxChildVisibleDepth < 20"
-            class="text-red-500 text-center"
-          >
-            Only showing {{ maxChildVisibleDepth }} child generations.
+            <div v-if="maxChildVisibleDepth < 20" class="text-red-500 text-center">
+              Only showing {{ maxChildVisibleDepth }} child generations.
+            </div>
           </div>
 
           <template v-if="sourcePackage">
@@ -441,7 +437,6 @@
                   <b-form-input
                     class="w-48"
                     v-model="maxParentLookupDepth"
-                    @change="maybeSetMaxParentVisibleDepth($event)"
                     placeholder="Parent generation limit"
                     type="number"
                     step="1"
@@ -450,7 +445,6 @@
                   <b-form-input
                     class="w-48"
                     v-model="maxChildLookupDepth"
-                    @change="maybeSetMaxChildVisibleDepth($event)"
                     placeholder="Child generation limit"
                     type="number"
                     step="1"
@@ -544,12 +538,6 @@ export default Vue.extend({
       sourceHarvests: (state: IPluginState) => state.packageHistory.sourceHarvests,
       status: (state: IPluginState) => state.packageHistory.status,
       log: (state: IPluginState) => state.packageHistory.log,
-      // maxParentLookupDepth: (state: IPluginState) => state.packageHistory.maxParentLookupDepth,
-      // maxChildLookupDepth: (state: IPluginState) => state.packageHistory.maxChildLookupDepth,
-      // maxParentVisibleDepth: (state: IPluginState) => state.packageHistory.maxParentVisibleDepth,
-      // maxChildVisibleDepth: (state: IPluginState) => state.packageHistory.maxChildVisibleDepth,
-      // parentZoom: (state: IPluginState) => state.packageHistory.parentZoom,
-      // childZoom: (state: IPluginState) => state.packageHistory.childZoom,
     }),
     ...mapGetters({
       ancestorList: `packageHistory/${PackageHistoryGetters.ANCESTOR_LIST}`,
@@ -643,18 +631,18 @@ export default Vue.extend({
       setMaxChildVisibleDepth: `packageHistory/${PackageHistoryActions.SET_MAX_CHILD_VISIBLE_DEPTH}`,
       halt: `packageHistory/${PackageHistoryActions.HALT}`,
     }),
-    maybeSetMaxParentVisibleDepth(e: any) {
-      const maxParentLookupDepth = parseInt(e as string, 10);
-      if (typeof maxParentLookupDepth === "number") {
-        this.setMaxParentVisibleDepth(maxParentLookupDepth);
-      }
-    },
-    maybeSetMaxChildVisibleDepth(e: any) {
-      const maxChildLookupDepth = parseInt(e as string, 10);
-      if (typeof maxChildLookupDepth === "number") {
-        this.setMaxChildVisibleDepth(maxChildLookupDepth);
-      }
-    },
+    // maybeSetMaxParentVisibleDepth(e: any) {
+    //   const maxParentLookupDepth = parseInt(e as string, 10);
+    //   if (typeof maxParentLookupDepth === "number") {
+    //     this.setMaxParentVisibleDepth(maxParentLookupDepth);
+    //   }
+    // },
+    // maybeSetMaxChildVisibleDepth(e: any) {
+    //   const maxChildLookupDepth = parseInt(e as string, 10);
+    //   if (typeof maxChildLookupDepth === "number") {
+    //     this.setMaxChildVisibleDepth(maxChildLookupDepth);
+    //   }
+    // },
     downloadListCsv(historyList: IHistoryTreeNode[], filename: string) {
       const csvFile: ICsvFile = {
         filename,
