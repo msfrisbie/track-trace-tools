@@ -22,9 +22,7 @@
 
           <div class="col-start-2 flex flex-col items-stretch">
             <template v-if="!pageOneErrorMessage">
-              <b-button variant="success" size="md" @click="activeStepIndex = 1">
-                NEXT
-              </b-button>
+              <b-button variant="success" size="md" @click="activeStepIndex = 1"> NEXT </b-button>
             </template>
 
             <template v-else>
@@ -38,14 +36,7 @@
         <div class="grid grid-cols-2 grid-rows-2 gap-8 h-full" style="grid-template-rows: 1fr auto">
           <div class="flex flex-col items-stretch space-y-8">
             <div class="grid grid-cols-2 gap-8" style="grid-template-columns: auto 1fr">
-              <div
-                class="
-                  flex flex-col
-                  items-center
-                  border-r-2 border-blue-500
-                  px-4
-                "
-              >
+              <div class="flex flex-col items-center border-r-2 border-blue-500 px-4">
                 <span class="text-lg font-bold">NEW PACKAGES</span>
               </div>
 
@@ -66,10 +57,7 @@
                 </div>
 
                 <template v-if="outputItem">
-                  <div
-                    class="w-full
-                    grid grid-cols-12"
-                  >
+                  <div class="w-full grid grid-cols-12">
                     <b-input-group :append="outputUnitAbbreviation" class="col-span-5">
                       <b-form-input
                         v-model.number="perPackageQuantity"
@@ -100,9 +88,9 @@
                 <template
                   v-if="
                     facilityUsesLocationForPackages &&
-                      outputItem &&
-                      perPackageQuantity &&
-                      newPackageCount
+                    outputItem &&
+                    perPackageQuantity &&
+                    newPackageCount
                   "
                 >
                   <location-picker
@@ -117,32 +105,17 @@
               <template
                 v-if="
                   outputItem &&
-                    perPackageQuantity &&
-                    newPackageCount &&
-                    (!facilityUsesLocationForPackages || location)
+                  perPackageQuantity &&
+                  newPackageCount &&
+                  (!facilityUsesLocationForPackages || location)
                 "
               >
-                <div
-                  class="
-                    flex flex-col
-                    items-center
-                    border-r-2 border-blue-500
-                    px-4
-                  "
-                >
+                <div class="flex flex-col items-center border-r-2 border-blue-500 px-4">
                   <span class="text-lg font-bold">SOURCE PACKAGE</span>
                 </div>
 
                 <div class="flex flex-col items-stretch space-y-6">
-                  <div
-                    class="
-                      flex flex-row
-                      text-lg
-                      items-center
-                      space-x-4
-                      whitespace-nowrap
-                    "
-                  >
+                  <div class="flex flex-row text-lg items-center space-x-4 whitespace-nowrap">
                     <b-input-group prepend="Subtract" :append="sourceUnitAbbreviation">
                       <b-form-input
                         v-model.number="sourcePackageAdjustQuantity"
@@ -177,10 +150,10 @@
               <template
                 v-if="
                   outputItem &&
-                    newPackageCount &&
-                    perPackageQuantity &&
-                    sourcePackageAdjustQuantity &&
-                    (!facilityUsesLocationForPackages || location)
+                  newPackageCount &&
+                  perPackageQuantity &&
+                  sourcePackageAdjustQuantity &&
+                  (!facilityUsesLocationForPackages || location)
                 "
               >
                 <template v-if="showHiddenDetailFields">
@@ -232,14 +205,14 @@
             <template
               v-if="
                 outputItem &&
-                  (!facilityUsesLocationForPackages || location) &&
-                  newPackageCount &&
-                  perPackageQuantity &&
-                  sourcePackageAdjustQuantity
+                (!facilityUsesLocationForPackages || location) &&
+                newPackageCount &&
+                perPackageQuantity &&
+                sourcePackageAdjustQuantity
               "
             >
               <tag-picker
-                tagTypeName="CannabisPackage"
+                :tagTypeNames="['CannabisPackage', 'MedicalPackage']"
                 :tagCount="quantityList.length"
                 :selectedTags="packageTags"
                 v-on:update:selectedTags="updateSplitPackageData({ packageTags: $event })"
@@ -249,9 +222,7 @@
 
           <div class="col-start-2 flex flex-col items-stretch">
             <template v-if="!pageTwoErrorMessage">
-              <b-button variant="success" size="md" @click="activeStepIndex = 2">
-                NEXT
-              </b-button>
+              <b-button variant="success" size="md" @click="activeStepIndex = 2"> NEXT </b-button>
             </template>
 
             <template v-else>
@@ -323,53 +294,37 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import store from "@/store/page-overlay/index";
-import { mapActions, mapState } from "vuex";
 import BuilderStepHeader from "@/components/overlay-widget/shared/BuilderStepHeader.vue";
-import { isValidTag, generateTagRangeOrError, getTagFromOffset } from "@/utils/tags";
-import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
-import { combineLatest, from, Subject, timer } from "rxjs";
-import { debounceTime, distinctUntilChanged, filter, startWith, tap } from "rxjs/operators";
+import ItemPicker from "@/components/overlay-widget/shared/ItemPicker.vue";
+import LocationPicker from "@/components/overlay-widget/shared/LocationPicker.vue";
+import SinglePackagePicker from "@/components/overlay-widget/shared/SinglePackagePicker.vue";
+import TagPicker from "@/components/overlay-widget/shared/TagPicker.vue";
+import { BuilderType, MessageType } from "@/consts";
 import {
-  IPackageData,
-  IPlantFilter,
+  IBuilderComponentError,
   ICsvFile,
-  ILocationData,
-  IMetrcUnpackImmaturePlantsPayload,
-  ITagData,
-  IMetrcCreatePackagesFromPackagesPayload,
   IIntermediateCreatePackageFromPackagesData,
   IItemData,
-  IBuilderComponentError
+  ILocationData,
+  IMetrcCreatePackagesFromPackagesPayload,
+  IPackageData,
+  ITagData,
 } from "@/interfaces";
-import { downloadCsvFile, buildCsvDataOrError, buildNamedCsvFileData } from "@/utils/csv";
-import { todayIsodate, submitDateFromIsodate } from "@/utils/date";
-import { primaryMetrcRequestManager } from "@/modules/metrc-request-manager.module";
-import { authManager } from "@/modules/auth-manager.module";
-import {
-  BuilderType,
-  MessageType,
-  PLANTABLE_ITEM_CATEGORY_NAMES,
-  PLANT_BATCH_TYPES
-} from "@/consts";
 import { analyticsManager } from "@/modules/analytics-manager.module";
 import { builderManager } from "@/modules/builder-manager.module";
-import PackagePicker from "@/components/overlay-widget/shared/PackagePicker.vue";
-import LocationPicker from "@/components/overlay-widget/shared/LocationPicker.vue";
-import StrainPicker from "@/components/overlay-widget/shared/StrainPicker.vue";
-import TagPicker from "@/components/overlay-widget/shared/TagPicker.vue";
-import ItemPicker from "@/components/overlay-widget/shared/ItemPicker.vue";
-import PickerCard from "@/components/overlay-widget/shared/PickerCard.vue";
-import PickerIcon from "@/components/overlay-widget/shared/PickerIcon.vue";
-import { allocatePackageQuantities } from "@/utils/misc";
+import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
 import { dynamicConstsManager } from "@/modules/dynamic-consts-manager.module";
-import { safeZip } from "@/utils/array";
-import SinglePackagePicker from "@/components/overlay-widget/shared/SinglePackagePicker.vue";
+import store from "@/store/page-overlay/index";
 import { SplitPackageBuilderActions } from "@/store/page-overlay/modules/split-package-builder/consts";
-import { unitOfMeasureNameToAbbreviation } from "@/utils/units";
+import { safeZip } from "@/utils/array";
+import { buildCsvDataOrError, buildNamedCsvFileData } from "@/utils/csv";
+import { submitDateFromIsodate } from "@/utils/date";
 import { round } from "@/utils/math";
+import { unitOfMeasureNameToAbbreviation } from "@/utils/units";
 import _ from "lodash";
+import { timer } from "rxjs";
+import Vue from "vue";
+import { mapActions, mapState } from "vuex";
 
 async function defaultRemediatePackageMethod(): Promise<string> {
   // Metrc form seems to default to "0"
@@ -381,7 +336,7 @@ async function defaultRemediatePackageMethod(): Promise<string> {
 
     console.log(methods);
 
-    const filteredMethods = methods.filter(x => x.Id.toString() === "0");
+    const filteredMethods = methods.filter((x) => x.Id.toString() === "0");
 
     if (filteredMethods.length === 0) {
       return methods[0].Id.toString();
@@ -403,19 +358,19 @@ export default Vue.extend({
     ItemPicker,
     // PickerIcon,
     // PickerCard,
-    LocationPicker
+    LocationPicker,
   },
   methods: {
     ...mapActions({
       setPackage: `splitPackageBuilder/${SplitPackageBuilderActions.SET_SOURCE_PACKAGE}`,
-      updateSplitPackageData: `splitPackageBuilder/${SplitPackageBuilderActions.UPDATE_SPLIT_PACKAGE_DATA}`
+      updateSplitPackageData: `splitPackageBuilder/${SplitPackageBuilderActions.UPDATE_SPLIT_PACKAGE_DATA}`,
     }),
     setActiveStepIndex(index: number) {
       this.$data.activeStepIndex = index;
 
       analyticsManager.track(MessageType.BUILDER_ENGAGEMENT, {
         builder: this.$data.builderType,
-        action: `Set active step to ${index}`
+        action: `Set active step to ${index}`,
       });
     },
     unitOfMeasureNameToAbbreviation,
@@ -445,8 +400,8 @@ export default Vue.extend({
               Quantity: (
                 (this.sourcePackageAdjustQuantity as number) / this.quantityList.length
               ).toString(),
-              UnitOfMeasureId: sourcePackage.Item.UnitOfMeasureId.toString()
-            }
+              UnitOfMeasureId: sourcePackage.Item.UnitOfMeasureId.toString(),
+            },
           ],
           ItemId: newPackageItem.Id.toString(),
           Note: this.note as string,
@@ -461,9 +416,9 @@ export default Vue.extend({
           ...(this.isTradeSample ? { IsTradeSample: "true" } : {}),
           ...(this.$data.facilityUsesLocationForPackages
             ? {
-                LocationId: (this.location as ILocationData).Id.toString()
+                LocationId: (this.location as ILocationData).Id.toString(),
               }
-            : {})
+            : {}),
           // UseSameItem: "false", // default to false and just provide the item id anyway
         };
 
@@ -475,7 +430,7 @@ export default Vue.extend({
         _.cloneDeep(rows),
         this.$data.builderType,
         {
-          packageTotal: this.quantityList.length
+          packageTotal: this.quantityList.length,
         },
         // @ts-ignore
         this.buildCsvFiles(),
@@ -513,7 +468,7 @@ export default Vue.extend({
             (this.sourcePackageAdjustQuantity as number) / this.quantityList.length,
           sourceUnitOfMeasure: this.sourcePackage.Item.UnitOfMeasureName,
           destinationLabel: tagData.Label,
-          destinationAdjustmentAmount: quantity
+          destinationAdjustmentAmount: quantity,
         });
       }
 
@@ -521,40 +476,40 @@ export default Vue.extend({
         const csvData = buildCsvDataOrError([
           {
             isVector: true,
-            data: flattened.map(f => f.sourceLabel)
+            data: flattened.map((f) => f.sourceLabel),
           },
           {
             isVector: true,
-            data: flattened.map(f => f.sourceItem)
+            data: flattened.map((f) => f.sourceItem),
           },
           {
             isVector: true,
-            data: flattened.map(f => f.sourceAdjustmentAmount)
+            data: flattened.map((f) => f.sourceAdjustmentAmount),
           },
           {
             isVector: true,
-            data: flattened.map(f => f.sourceUnitOfMeasure)
+            data: flattened.map((f) => f.sourceUnitOfMeasure),
           },
           {
             isVector: true,
-            data: flattened.map(f => f.destinationLabel)
+            data: flattened.map((f) => f.destinationLabel),
           },
           {
             isVector: false,
-            data: this.sourcePackage.Item.Name
+            data: this.sourcePackage.Item.Name,
           },
           {
             isVector: true,
-            data: flattened.map(f => f.destinationAdjustmentAmount)
+            data: flattened.map((f) => f.destinationAdjustmentAmount),
           },
           {
             isVector: false,
-            data: this.sourcePackage.Item.UnitOfMeasureName
+            data: this.sourcePackage.Item.UnitOfMeasureName,
           },
           {
             isVector: false,
-            data: this.packageIsodate
-          }
+            data: this.packageIsodate,
+          },
         ]);
 
         return buildNamedCsvFileData(
@@ -576,56 +531,56 @@ export default Vue.extend({
       if ((this as any).sourcePackage?.Quantity === 0) {
         errors.push({
           tags: ["page1"],
-          message: "The source package is empty"
+          message: "The source package is empty",
         });
       }
 
       if ((this as any).quantityList.length === 0) {
         errors.push({
           tags: ["page2"],
-          message: "Specity one or more new packages to create"
+          message: "Specity one or more new packages to create",
         });
       }
 
       if (!(this as any).perPackageQuantity) {
         errors.push({
           tags: ["page2", "perPackageQuantity"],
-          message: "Enter a per package quantity"
+          message: "Enter a per package quantity",
         });
       }
 
       if ((this as any).perPackageQuantity < 0) {
         errors.push({
           tags: ["page2", "perPackageQuantity"],
-          message: "Per package quantity must be greater than 0"
+          message: "Per package quantity must be greater than 0",
         });
       }
 
       if (!(this as any).newPackageCount) {
         errors.push({
           tags: ["page2", "newPackageCount"],
-          message: "Enter a new package count"
+          message: "Enter a new package count",
         });
       }
 
       if ((this as any).newPackageCount < 0) {
         errors.push({
           tags: ["page2", "newPackageCount"],
-          message: "New package count must be greater than 0"
+          message: "New package count must be greater than 0",
         });
       }
 
       if (!(this as any).sourcePackageAdjustQuantity) {
         errors.push({
           tags: ["page2", "sourcePackageAdjustQuantity"],
-          message: "Enter a source package quantity used"
+          message: "Enter a source package quantity used",
         });
       }
 
       if ((this as any).sourcePackageAdjustQuantity < 0) {
         errors.push({
           tags: ["page2", "sourcePackageAdjustQuantity"],
-          message: "Source package quantity used must be greater than 0"
+          message: "Source package quantity used must be greater than 0",
         });
       }
 
@@ -635,35 +590,35 @@ export default Vue.extend({
       ) {
         errors.push({
           tags: ["page2", "sourcePackageAdjustQuantity"],
-          message: "Source package quantity used cannot exceed the package quantity"
+          message: "Source package quantity used cannot exceed the package quantity",
         });
       }
 
       if (!(this as any).outputItem) {
         errors.push({
           tags: ["page2"],
-          message: "Select an item for newly created packages"
+          message: "Select an item for newly created packages",
         });
       }
 
       if (!(this as any).location && this.$data.facilityUsesLocationForPackages) {
         errors.push({
           tags: ["page2"],
-          message: "Select a location for newly created packages"
+          message: "Select a location for newly created packages",
         });
       }
 
       if ((this as any).packageTags.length === 0) {
         errors.push({
           tags: ["page2"],
-          message: "Select package tags for your new packages"
+          message: "Select package tags for your new packages",
         });
       }
 
       if ((this as any).packageTags.length !== (this as any).quantityList.length) {
         errors.push({
           tags: ["page2"],
-          message: "You must select one package tag for each new package"
+          message: "You must select one package tag for each new package",
         });
       }
 
@@ -685,16 +640,16 @@ export default Vue.extend({
 
       // @ts-ignore
       this.updateSplitPackageData({
-        quantityList
+        quantityList,
       });
-    }
+    },
   },
   computed: {
     ...mapState({
       authState: (state: any) => state.pluginAuth.authState,
       sourcePackage: (state: any) => state.splitPackageBuilder.sourcePackage,
       packageTags: (state: any) => state.splitPackageBuilder.packageTags,
-      quantityList: (state: any) => state.splitPackageBuilder.quantityList
+      quantityList: (state: any) => state.splitPackageBuilder.quantityList,
     }),
     sourceUnitAbbreviation(): string {
       return unitOfMeasureNameToAbbreviation(
@@ -770,7 +725,7 @@ export default Vue.extend({
           `splitPackageBuilder/${SplitPackageBuilderActions.UPDATE_SPLIT_PACKAGE_DATA}`,
           { outputItem }
         );
-      }
+      },
     },
     location: {
       get(): ILocationData | null {
@@ -781,7 +736,7 @@ export default Vue.extend({
           `splitPackageBuilder/${SplitPackageBuilderActions.UPDATE_SPLIT_PACKAGE_DATA}`,
           { location }
         );
-      }
+      },
     },
     note: {
       get(): string {
@@ -792,7 +747,7 @@ export default Vue.extend({
           `splitPackageBuilder/${SplitPackageBuilderActions.UPDATE_SPLIT_PACKAGE_DATA}`,
           { note }
         );
-      }
+      },
     },
     productionBatchNumber: {
       get(): string {
@@ -803,7 +758,7 @@ export default Vue.extend({
           `splitPackageBuilder/${SplitPackageBuilderActions.UPDATE_SPLIT_PACKAGE_DATA}`,
           { productionBatchNumber }
         );
-      }
+      },
     },
     remediationDate: {
       get(): string {
@@ -814,7 +769,7 @@ export default Vue.extend({
           `splitPackageBuilder/${SplitPackageBuilderActions.UPDATE_SPLIT_PACKAGE_DATA}`,
           { remediationDate }
         );
-      }
+      },
     },
     remediationMethodId: {
       get(): string {
@@ -825,7 +780,7 @@ export default Vue.extend({
           `splitPackageBuilder/${SplitPackageBuilderActions.UPDATE_SPLIT_PACKAGE_DATA}`,
           { remediationMethodId }
         );
-      }
+      },
     },
     remediationSteps: {
       get(): string {
@@ -836,7 +791,7 @@ export default Vue.extend({
           `splitPackageBuilder/${SplitPackageBuilderActions.UPDATE_SPLIT_PACKAGE_DATA}`,
           { remediationSteps }
         );
-      }
+      },
     },
     useSameItem: {
       get(): boolean {
@@ -847,7 +802,7 @@ export default Vue.extend({
           `splitPackageBuilder/${SplitPackageBuilderActions.UPDATE_SPLIT_PACKAGE_DATA}`,
           { useSameItem }
         );
-      }
+      },
     },
     isDonation: {
       get(): boolean {
@@ -858,7 +813,7 @@ export default Vue.extend({
           `splitPackageBuilder/${SplitPackageBuilderActions.UPDATE_SPLIT_PACKAGE_DATA}`,
           { isDonation }
         );
-      }
+      },
     },
     isTradeSample: {
       get(): boolean {
@@ -869,7 +824,7 @@ export default Vue.extend({
           `splitPackageBuilder/${SplitPackageBuilderActions.UPDATE_SPLIT_PACKAGE_DATA}`,
           { isTradeSample }
         );
-      }
+      },
     },
     packageIsodate: {
       get(): string {
@@ -880,7 +835,7 @@ export default Vue.extend({
           `splitPackageBuilder/${SplitPackageBuilderActions.UPDATE_SPLIT_PACKAGE_DATA}`,
           { packageIsodate }
         );
-      }
+      },
     },
     sourcePackageAdjustQuantity: {
       get(): number {
@@ -891,7 +846,7 @@ export default Vue.extend({
           `splitPackageBuilder/${SplitPackageBuilderActions.UPDATE_SPLIT_PACKAGE_DATA}`,
           { sourcePackageAdjustQuantity }
         );
-      }
+      },
     },
     allDetailsProvided() {
       return (
@@ -905,7 +860,7 @@ export default Vue.extend({
     csvFiles(): ICsvFile[] {
       // @ts-ignore
       return this.buildCsvFiles();
-    }
+    },
   },
   watch: {
     sourcePackage: {
@@ -914,7 +869,7 @@ export default Vue.extend({
         if (!this.outputItem && this.sourcePackage) {
           this.outputItem = this.sourcePackage.Item;
         }
-      }
+      },
     },
     // useSameItem: {
     //   immediate: true,
@@ -929,15 +884,15 @@ export default Vue.extend({
       handler(newValue, oldValue) {
         // @ts-ignore
         this.updateQuantities();
-      }
+      },
     },
     newPackageCount: {
       immediate: true,
       handler(newValue, oldValue) {
         // @ts-ignore
         this.updateQuantities();
-      }
-    }
+      },
+    },
   },
   data() {
     return {
@@ -950,15 +905,15 @@ export default Vue.extend({
       facilityUsesLocationForPackages: false,
       steps: [
         {
-          stepText: "Select source package"
+          stepText: "Select source package",
         },
         {
-          stepText: "New package details"
+          stepText: "New package details",
         },
         {
-          stepText: "Submit"
-        }
-      ]
+          stepText: "Submit",
+        },
+      ],
     };
   },
   async created() {
@@ -966,11 +921,12 @@ export default Vue.extend({
     timer(1000).subscribe(() => primaryDataLoader.availableTags({}));
     timer(1000).subscribe(() => dynamicConstsManager.remediatePackageMethods());
 
-    this.$data.facilityUsesLocationForPackages = await dynamicConstsManager.facilityUsesLocationForPackages();
+    this.$data.facilityUsesLocationForPackages =
+      await dynamicConstsManager.facilityUsesLocationForPackages();
   },
   destroyed() {
     // Looks like modal is not actually destroyed
-  }
+  },
 });
 </script>
 

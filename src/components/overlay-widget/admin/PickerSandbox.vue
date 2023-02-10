@@ -25,7 +25,7 @@
         <strain-picker :strain.sync="one" :enableHotStrainCreate="true" />
       </b-tab>
       <b-tab lazy title="Tag Picker">
-        <tag-picker :selectedTags.sync="many" tagTypeName="CannabisPlant" :tagCount="125" />
+        <tag-picker :selectedTags.sync="many" :tagTypeNames="['CannabisPlant', 'MedicalPlant']" :tagCount="125" />
       </b-tab>
       <b-tab lazy title="Harvest Picker">
         <harvest-picker :harvest.sync="one" />

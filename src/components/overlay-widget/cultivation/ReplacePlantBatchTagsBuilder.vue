@@ -50,7 +50,7 @@
 
             <b-form-group class="w-full">
               <tag-picker
-                tagTypeName="CannabisPlant"
+                :tagTypeNames="['CannabisPlant', 'MedicalPlant']"
                 :tagCount="selectedPlantBatches.length"
                 :selectedTags.sync="plantBatchTags"
               />

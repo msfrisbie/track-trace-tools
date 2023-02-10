@@ -7,12 +7,12 @@
           <div class="text-center text-xl">Plant Tags</div>
           <tag-picker
             :selectedTags.sync="selectedPackageTags"
-            tagTypeName="CannabisPackage"
+            :tagTypeNames="['CannabisPackage', 'MedicalPackage']"
             :tagCount="0"
           />
           <tag-picker
             :selectedTags.sync="selectedPlantTags"
-            tagTypeName="CannabisPlant"
+            :tagTypeNames="['CannabisPlant', 'MedicalPlant']"
             :tagCount="0"
           />
         </div>
@@ -43,23 +43,23 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import store from "@/store/page-overlay/index";
-import { mapState } from "vuex";
-import { authManager } from "@/modules/auth-manager.module";
 import TagPicker from "@/components/overlay-widget/shared/TagPicker.vue";
-import { timer } from "rxjs";
-import { ITagData } from "@/interfaces";
 import { MessageType } from "@/consts";
+import { ITagData } from "@/interfaces";
 import { analyticsManager } from "@/modules/analytics-manager.module";
+import { authManager } from "@/modules/auth-manager.module";
 import { primaryMetrcRequestManager } from "@/modules/metrc-request-manager.module";
+import store from "@/store/page-overlay/index";
 import { getVoidTagBody } from "@/utils/tags";
+import { timer } from "rxjs";
+import Vue from "vue";
+import { mapState } from "vuex";
 
 export default Vue.extend({
   name: "VoidTagForm",
   store,
   components: {
-    TagPicker
+    TagPicker,
   },
   data() {
     return {
@@ -68,11 +68,11 @@ export default Vue.extend({
       runningSuccessTotal: 0,
       runningErrorTotal: 0,
       selectedPlantTags: [],
-      selectedPackageTags: []
+      selectedPackageTags: [],
     };
   },
   computed: {
-    ...mapState([])
+    ...mapState([]),
   },
   methods: {
     async reset() {
@@ -118,7 +118,7 @@ export default Vue.extend({
           this.$data.runningErrorTotal += 1;
 
           analyticsManager.track(MessageType.VOID_TAGS_ERROR, {
-            error: `Returned response status ${response.status}`
+            error: `Returned response status ${response.status}`,
           });
         } else {
           this.$data.runningSuccessTotal += 1;
@@ -130,10 +130,10 @@ export default Vue.extend({
 
         await timer(3000).toPromise();
       }
-    }
+    },
   },
   async mounted() {
     await authManager.authStateOrError();
-  }
+  },
 });
 </script>

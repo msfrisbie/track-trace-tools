@@ -192,7 +192,7 @@ export interface IPluginState extends IRootState {
   packageHistory: IPackageHistoryState;
 }
 
-export type MetrcTagType = "CannabisPlant" | "CannabisPackage";
+export type MetrcTagType = "CannabisPlant" | "CannabisPackage" | "MedicalPlant" | "MedicalPackage";
 
 export interface IAddress {
   address1: string;
@@ -311,7 +311,7 @@ export interface ITagData extends ITaggedIResponseObjectData {
   IsUsed: boolean;
   LastModified: string;
   StatusName: "Received" | "Used" | "Voided";
-  TagTypeName: "CannabisPlant" | "CannabisPackage";
+  TagTypeName: MetrcTagType;
   UsedDateTime: string;
   CommissionedDateTime: string;
   DetachedDateTime: string;

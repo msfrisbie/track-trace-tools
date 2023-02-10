@@ -20,9 +20,7 @@
 
           <div class="col-start-2 flex flex-col items-stretch">
             <template v-if="!pageOneErrorMessage">
-              <b-button variant="success" size="md" @click="activeStepIndex = 1">
-                NEXT
-              </b-button>
+              <b-button variant="success" size="md" @click="activeStepIndex = 1"> NEXT </b-button>
             </template>
 
             <template v-else>
@@ -140,24 +138,20 @@
 
           <template v-if="showTagPicker">
             <div class="flex flex-col space-y-8 items-center">
-              <b-button variant="light" size="md" @click="showTagPicker = false">
-                BACK
-              </b-button>
+              <b-button variant="light" size="md" @click="showTagPicker = false"> BACK </b-button>
 
               <div class="text-lg font-bold">{{ newPackageCount }} tags required.</div>
             </div>
 
             <tag-picker
-              tagTypeName="CannabisPackage"
+              :tagTypeNames="['CannabisPackage', 'MedicalPackage']"
               :tagCount="newPackageCount"
               :selectedTags.sync="packageTags"
             />
 
             <div class="col-start-2 flex flex-col items-stretch">
               <template v-if="!pageTwoErrorMessage">
-                <b-button variant="success" size="md" @click="activeStepIndex = 2">
-                  NEXT
-                </b-button>
+                <b-button variant="success" size="md" @click="activeStepIndex = 2"> NEXT </b-button>
               </template>
 
               <template v-else>
@@ -225,50 +219,33 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import store from "@/store/page-overlay/index";
-import { mapState } from "vuex";
 import BuilderStepHeader from "@/components/overlay-widget/shared/BuilderStepHeader.vue";
-import { isValidTag, generateTagRangeOrError, getTagFromOffset } from "@/utils/tags";
-import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
-import { combineLatest, from, Subject, timer } from "rxjs";
-import { debounceTime, distinctUntilChanged, filter, startWith, tap } from "rxjs/operators";
-import {
-  IPackageData,
-  IPlantFilter,
-  ICsvFile,
-  ILocationData,
-  ITagData,
-  IIntermediateCreatePackageFromMotherPlantBatchData,
-  IMetrcCreatePlantBatchPackagesFromMotherPlantBatchPayload,
-  IBuilderComponentError,
-  IPlantBatchType
-} from "@/interfaces";
-import { downloadCsvFile, buildCsvDataOrError, buildNamedCsvFileData } from "@/utils/csv";
-import { todayIsodate, submitDateFromIsodate } from "@/utils/date";
-import { primaryMetrcRequestManager } from "@/modules/metrc-request-manager.module";
-import { authManager } from "@/modules/auth-manager.module";
-import {
-  BuilderType,
-  MessageType,
-  PLANTABLE_ITEM_CATEGORY_NAMES,
-  PLANT_BATCH_TYPES
-} from "@/consts";
-import { analyticsManager } from "@/modules/analytics-manager.module";
-import { builderManager } from "@/modules/builder-manager.module";
+import CsvBreakout from "@/components/overlay-widget/shared/CsvBreakout.vue";
+import ItemPicker from "@/components/overlay-widget/shared/ItemPicker.vue";
+import LocationPicker from "@/components/overlay-widget/shared/LocationPicker.vue";
 import MotherPlantPicker from "@/components/overlay-widget/shared/MotherPlantPicker.vue";
 import PlantBatchPicker from "@/components/overlay-widget/shared/PlantBatchPicker.vue";
-import LocationPicker from "@/components/overlay-widget/shared/LocationPicker.vue";
-import StrainPicker from "@/components/overlay-widget/shared/StrainPicker.vue";
 import TagPicker from "@/components/overlay-widget/shared/TagPicker.vue";
-import ItemPicker from "@/components/overlay-widget/shared/ItemPicker.vue";
-import PickerCard from "@/components/overlay-widget/shared/PickerCard.vue";
-import { allocateImmaturePlantCounts } from "@/utils/misc";
-import { arrayIsValid } from "@/utils/array";
-import { sum } from "lodash";
-import { safeZip } from "@/utils/array";
+import { BuilderType, MessageType, PLANTABLE_ITEM_CATEGORY_NAMES } from "@/consts";
+import {
+  IBuilderComponentError,
+  ICsvFile,
+  IIntermediateCreatePackageFromMotherPlantBatchData,
+  IMetrcCreatePlantBatchPackagesFromMotherPlantBatchPayload,
+  IPlantBatchType,
+  ITagData,
+} from "@/interfaces";
+import { analyticsManager } from "@/modules/analytics-manager.module";
+import { builderManager } from "@/modules/builder-manager.module";
+import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
 import { dynamicConstsManager } from "@/modules/dynamic-consts-manager.module";
-import CsvBreakout from "@/components/overlay-widget/shared/CsvBreakout.vue";
+import store from "@/store/page-overlay/index";
+import { arrayIsValid, safeZip } from "@/utils/array";
+import { buildCsvDataOrError, buildNamedCsvFileData, downloadCsvFile } from "@/utils/csv";
+import { submitDateFromIsodate, todayIsodate } from "@/utils/date";
+import { sum } from "lodash";
+import { timer } from "rxjs";
+import Vue from "vue";
 
 export default Vue.extend({
   name: "MotherPlantPackageBuilder",
@@ -280,7 +257,7 @@ export default Vue.extend({
     ItemPicker,
     TagPicker,
     LocationPicker,
-    CsvBreakout
+    CsvBreakout,
   },
   methods: {
     setActiveStepIndex(index: number) {
@@ -288,7 +265,7 @@ export default Vue.extend({
 
       analyticsManager.track(MessageType.BUILDER_ENGAGEMENT, {
         builder: this.$data.builderType,
-        action: `Set active step to ${index}`
+        action: `Set active step to ${index}`,
       });
     },
     submit() {
@@ -325,9 +302,9 @@ export default Vue.extend({
           TagId: tag.Id.toString(),
           ...(this.$data.facilityUsesLocationForPackages
             ? {
-                LocationId: this.$data.location.Id.toString()
+                LocationId: this.$data.location.Id.toString(),
               }
-            : {})
+            : {}),
         };
 
         rows.push(row);
@@ -341,7 +318,7 @@ export default Vue.extend({
           packageCount: this.$data.packageTags.length,
           childCount: this.totalChildCountImpl(),
           itemName: this.$data.item.Name,
-          actualIsodate: this.$data.actualIsodate
+          actualIsodate: this.$data.actualIsodate,
         },
         this.buildCsvFiles(),
         5
@@ -359,8 +336,8 @@ export default Vue.extend({
           packageCount: this.$data.packageTags.length,
           childCount: this.totalChildCountImpl(),
           itemName: this.$data.item.Name,
-          actualIsodate: this.$data.actualIsodate
-        }
+          actualIsodate: this.$data.actualIsodate,
+        },
       });
     },
     buildCsvFiles(): ICsvFile[] {
@@ -392,50 +369,51 @@ export default Vue.extend({
         const csvData = buildCsvDataOrError([
           {
             isVector: true,
-            data: flattenedPlantBatchLabels
+            data: flattenedPlantBatchLabels,
           },
           {
             isVector: false,
-            data: this.$data.item.Name
+            data: this.$data.item.Name,
           },
           {
             isVector: true,
-            data: this.$data.packageTags.map((x: ITagData) => x.Label)
+            data: this.$data.packageTags.map((x: ITagData) => x.Label),
           },
           {
             isVector: false,
-            data: this.$data.patientLicenseNumber
+            data: this.$data.patientLicenseNumber,
           },
           {
             isVector: false,
-            data: this.$data.note
+            data: this.$data.note,
           },
           {
             isVector: false,
-            data: this.$data.isTradeSample
+            data: this.$data.isTradeSample,
           },
           {
             isVector: false,
-            data: this.$data.isDonation
+            data: this.$data.isDonation,
           },
           {
             isVector: true,
-            data: flattenedPlantCounts
+            data: flattenedPlantCounts,
           },
           {
             isVector: false,
-            data: this.$data.facilityUsesLocationForPackages ? this.$data.location.Name : ""
+            data: this.$data.facilityUsesLocationForPackages ? this.$data.location.Name : "",
           },
           {
             isVector: false,
-            data: this.$data.actualIsodate
-          }
+            data: this.$data.actualIsodate,
+          },
         ]);
 
         return buildNamedCsvFileData(
           csvData,
-          `Taking ${this.totalChildCountImpl()} ${this.$data.plantBatchType.Name.toLocaleLowerCase() +
-            "s"} from ${this.$data.selectedPlantBatches.length} mothers`
+          `Taking ${this.totalChildCountImpl()} ${
+            this.$data.plantBatchType.Name.toLocaleLowerCase() + "s"
+          } from ${this.$data.selectedPlantBatches.length} mothers`
         );
       } catch (e) {
         console.error(e);
@@ -449,9 +427,9 @@ export default Vue.extend({
             fn: (rows: any[]): boolean => {
               return rows.length === this.$data.selectedPlantBatches.length;
             },
-            message: "Collection must be same size as plants"
-          }
-        ]
+            message: "Collection must be same size as plants",
+          },
+        ],
       });
 
       if (!result.valid) {
@@ -465,8 +443,8 @@ export default Vue.extend({
               fn: (x: any): boolean => {
                 return Number.isInteger(x) && x > 0;
               },
-              message: "All values must be an integer greater than 0"
-            }
+              message: "All values must be an integer greater than 0",
+            },
           ],
           collectionValidators: [
             {
@@ -477,9 +455,9 @@ export default Vue.extend({
                   return false;
                 }
               },
-              message: "Collection must sum to a positive number"
-            }
-          ]
+              message: "Collection must sum to a positive number",
+            },
+          ],
         });
 
         if (!result.valid) {
@@ -502,7 +480,7 @@ export default Vue.extend({
           sum(x.counts)
         )
       );
-    }
+    },
   },
   computed: {
     totalChildCount() {
@@ -560,28 +538,28 @@ export default Vue.extend({
       if ((this as any).selectedPlantBatches.length === 0) {
         errors.push({
           tags: ["page1"],
-          message: "Select one or more mother plants"
+          message: "Select one or more mother plants",
         });
       }
 
       if ((this as any).$data.childPackageData.length === 0) {
         errors.push({
           tags: ["page1"],
-          message: "Create at least one child package"
+          message: "Create at least one child package",
         });
       }
 
       if (!(this as any).item) {
         errors.push({
           tags: ["page2"],
-          message: "Select the new package item"
+          message: "Select the new package item",
         });
       }
 
       if (!(this as any).location && this.$data.facilityUsesLocationForPackages) {
         errors.push({
           tags: ["page2"],
-          message: "Select the new package location"
+          message: "Select the new package location",
         });
       }
 
@@ -603,7 +581,7 @@ export default Vue.extend({
       if (emptyChildLists === this.childMatrix.length) {
         errors.push({
           tags: ["page2"],
-          message: "Enter a take count"
+          message: "Enter a take count",
         });
       }
 
@@ -612,7 +590,7 @@ export default Vue.extend({
           errors.push({
             tags: ["page2"],
             message:
-              "Each mother plant must have a take count of at least 1. Try selecting fewer mother plants."
+              "Each mother plant must have a take count of at least 1. Try selecting fewer mother plants.",
           });
         }
       }
@@ -620,7 +598,7 @@ export default Vue.extend({
       if ((this as any).$data.packageTags.length === 0) {
         errors.push({
           tags: ["page2", "tagging"],
-          message: "Select package tags for your new packages"
+          message: "Select package tags for your new packages",
         });
       }
 
@@ -632,7 +610,7 @@ export default Vue.extend({
       ) {
         errors.push({
           tags: ["page2", "tagging"],
-          message: "You must select one package tag for each new package"
+          message: "You must select one package tag for each new package",
         });
       }
 
@@ -643,7 +621,7 @@ export default Vue.extend({
       if (!(this as any).item) {
         errors.push({
           tags: ["page2"],
-          message: "Specify an item for new child packages"
+          message: "Specify an item for new child packages",
         });
       }
 
@@ -663,7 +641,7 @@ export default Vue.extend({
     csvFiles(): ICsvFile[] {
       // @ts-ignore
       return this.buildCsvFiles();
-    }
+    },
   },
   watch: {
     selectedPlantBatches: {
@@ -672,7 +650,7 @@ export default Vue.extend({
         const matrix = newValue.map(() => [null]);
         // Initialize childMatrix with empty arrays
         this.$data.childMatrix = matrix;
-      }
+      },
     },
     childMatrix: {
       immediate: true,
@@ -691,11 +669,11 @@ export default Vue.extend({
           this.$data.childPackageData.push({
             plantBatch,
             counts,
-            plantBatchType: this.$data.plantBatchType
+            plantBatchType: this.$data.plantBatchType,
           });
         }
-      }
-    }
+      },
+    },
   },
   data() {
     return {
@@ -719,37 +697,38 @@ export default Vue.extend({
       showTagPicker: false,
       steps: [
         {
-          stepText: "Select mother plant batches"
+          stepText: "Select mother plant batches",
         },
         {
-          stepText: "Package details"
+          stepText: "Package details",
         },
         {
-          stepText: "Submit"
-        }
+          stepText: "Submit",
+        },
       ],
       plantBatchType: null,
       plantBatchTypeOptions: [],
       itemFilters: {
         // 'Seeds' is weight based, which we can't handle here
-        itemCategory: PLANTABLE_ITEM_CATEGORY_NAMES.filter(x => x !== "Seeds")
-      }
+        itemCategory: PLANTABLE_ITEM_CATEGORY_NAMES.filter((x) => x !== "Seeds"),
+      },
     };
   },
   async created() {
     // Eagerly load the tags
     timer(1000).subscribe(() => primaryDataLoader.availableTags({}));
 
-    this.$data.facilityUsesLocationForPackages = await dynamicConstsManager.facilityUsesLocationForPackages();
+    this.$data.facilityUsesLocationForPackages =
+      await dynamicConstsManager.facilityUsesLocationForPackages();
 
-    this.$data.plantBatchTypeOptions = (
-      await dynamicConstsManager.plantBatchTypes()
-    ).map((x: IPlantBatchType) => ({ text: x.Name + "s", value: x }));
+    this.$data.plantBatchTypeOptions = (await dynamicConstsManager.plantBatchTypes()).map(
+      (x: IPlantBatchType) => ({ text: x.Name + "s", value: x })
+    );
     this.$data.plantBatchType = this.$data.plantBatchTypeOptions[0].value;
   },
   destroyed() {
     // Looks like modal is not actually destroyed
-  }
+  },
 });
 </script>
 
