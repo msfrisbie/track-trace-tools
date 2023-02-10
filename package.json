@@ -1,6 +1,6 @@
 {
   "name": "track-trace-tools",
-  "version": "0.16.2",
+  "version": "0.17.0",
   "private": true,
   "scripts": {
     "serve": "NODE_OPTIONS=--openssl-legacy-provider; vue-cli-service build --mode development --watch",
