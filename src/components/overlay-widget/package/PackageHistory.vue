@@ -45,7 +45,7 @@
                     <b-dropdown-text>
                       <b-form-group label="Tree zoom" class="w-36">
                         <vue-slider
-                          v-model="zoom"
+                          v-model="parentZoom"
                           :min="0.1"
                           :max="1"
                           :interval="0.05"
@@ -60,7 +60,7 @@
                       :isOrigin="true"
                       style="transform-origin: 0% 0% 0px"
                       v-bind:style="{
-                        transform: `scale(${zoom})`,
+                        transform: `scale(${parentZoom})`,
                       }"
                     ></package-history-tile>
                   </div>
@@ -190,7 +190,7 @@
                     <b-dropdown-text>
                       <b-form-group label="Tree zoom" class="w-36">
                         <vue-slider
-                          v-model="zoom"
+                          v-model="childZoom"
                           :min="0.1"
                           :max="1"
                           :interval="0.05"
@@ -206,7 +206,7 @@
                       :isOrigin="true"
                       style="transform-origin: 0% 0% 0px"
                       v-bind:style="{
-                        transform: `scale(${zoom})`,
+                        transform: `scale(${childZoom})`,
                       }"
                     ></package-history-tile>
                   </div>
@@ -409,6 +409,20 @@
             You have set a child generation limit of {{ maxChildLookupDepth }}.
           </div>
 
+          <div
+            v-if="maxParentLookupDepth === null && maxParentVisibleDepth < 20"
+            class="text-red-500 text-center"
+          >
+            Only showing {{ maxParentVisibleDepth }} parent generations.
+          </div>
+
+          <div
+            v-if="maxChildLookupDepth === null && maxChildVisibleDepth < 20"
+            class="text-red-500 text-center"
+          >
+            Only showing {{ maxChildVisibleDepth }} child generations.
+          </div>
+
           <template v-if="sourcePackage">
             <div v-if="status === PackageHistoryStatus.HALTED" class="text-red-500 text-center">
               You stopped the lookup process. The displayed results may not be complete.
@@ -466,7 +480,7 @@
                   status === PackageHistoryStatus.HALTED
                 "
               >
-                <b-button @click="setPackage({ pkg: null })" variant="outline-primary">
+                <b-button @click="setPackage({ pkg: null })" variant="outline-danger">
                   RESET
                 </b-button>
               </template>
@@ -530,12 +544,12 @@ export default Vue.extend({
       sourceHarvests: (state: IPluginState) => state.packageHistory.sourceHarvests,
       status: (state: IPluginState) => state.packageHistory.status,
       log: (state: IPluginState) => state.packageHistory.log,
-      maxParentLookupDepth: (state: IPluginState) => state.packageHistory.maxParentLookupDepth,
-      maxChildLookupDepth: (state: IPluginState) => state.packageHistory.maxChildLookupDepth,
-      maxParentVisibleDepth: (state: IPluginState) => state.packageHistory.maxParentVisibleDepth,
-      maxChildVisibleDepth: (state: IPluginState) => state.packageHistory.maxChildVisibleDepth,
-      parentZoom: (state: IPluginState) => state.packageHistory.parentZoom,
-      childZoom: (state: IPluginState) => state.packageHistory.childZoom,
+      // maxParentLookupDepth: (state: IPluginState) => state.packageHistory.maxParentLookupDepth,
+      // maxChildLookupDepth: (state: IPluginState) => state.packageHistory.maxChildLookupDepth,
+      // maxParentVisibleDepth: (state: IPluginState) => state.packageHistory.maxParentVisibleDepth,
+      // maxChildVisibleDepth: (state: IPluginState) => state.packageHistory.maxChildVisibleDepth,
+      // parentZoom: (state: IPluginState) => state.packageHistory.parentZoom,
+      // childZoom: (state: IPluginState) => state.packageHistory.childZoom,
     }),
     ...mapGetters({
       ancestorList: `packageHistory/${PackageHistoryGetters.ANCESTOR_LIST}`,
@@ -565,8 +579,7 @@ export default Vue.extend({
       set(maxChildLookupDepth: any) {
         maxChildLookupDepth = parseInt(maxChildLookupDepth as string, 10);
         this.$store.dispatch(`packageHistory/${PackageHistoryActions.SET_MAX_CHILD_LOOKUP_DEPTH}`, {
-          maxParentLookupDepth:
-            typeof maxChildLookupDepth === "number" ? maxChildLookupDepth : null,
+          maxChildLookupDepth: typeof maxChildLookupDepth === "number" ? maxChildLookupDepth : null,
         });
       },
     },
@@ -576,7 +589,7 @@ export default Vue.extend({
       },
       set(maxParentVisibleDepth: number) {
         this.$store.dispatch(
-          `packageHistory/${PackageHistoryActions.SET_MAX_PARENT_LOOKUP_DEPTH}`,
+          `packageHistory/${PackageHistoryActions.SET_MAX_PARENT_VISIBLE_DEPTH}`,
           {
             maxParentVisibleDepth,
           }
@@ -588,9 +601,12 @@ export default Vue.extend({
         return this.$store.state.packageHistory.maxChildVisibleDepth;
       },
       set(maxChildVisibleDepth: number) {
-        this.$store.dispatch(`packageHistory/${PackageHistoryActions.SET_MAX_CHILD_LOOKUP_DEPTH}`, {
-          maxChildVisibleDepth,
-        });
+        this.$store.dispatch(
+          `packageHistory/${PackageHistoryActions.SET_MAX_CHILD_VISIBLE_DEPTH}`,
+          {
+            maxChildVisibleDepth,
+          }
+        );
       },
     },
     parentZoom: {
@@ -623,18 +639,20 @@ export default Vue.extend({
   methods: {
     ...mapActions({
       setPackage: `packageHistory/${PackageHistoryActions.SET_SOURCE_PACKAGE}`,
+      setMaxParentVisibleDepth: `packageHistory/${PackageHistoryActions.SET_MAX_PARENT_VISIBLE_DEPTH}`,
+      setMaxChildVisibleDepth: `packageHistory/${PackageHistoryActions.SET_MAX_CHILD_VISIBLE_DEPTH}`,
       halt: `packageHistory/${PackageHistoryActions.HALT}`,
     }),
     maybeSetMaxParentVisibleDepth(e: any) {
       const maxParentLookupDepth = parseInt(e as string, 10);
       if (typeof maxParentLookupDepth === "number") {
-        this.$data.maxParentVisibleDepth = maxParentLookupDepth;
+        this.setMaxParentVisibleDepth(maxParentLookupDepth);
       }
     },
     maybeSetMaxChildVisibleDepth(e: any) {
       const maxChildLookupDepth = parseInt(e as string, 10);
       if (typeof maxChildLookupDepth === "number") {
-        this.$data.maxChildVisibleDepth = maxChildLookupDepth;
+        this.setMaxChildVisibleDepth(maxChildLookupDepth);
       }
     },
     downloadListCsv(historyList: IHistoryTreeNode[], filename: string) {

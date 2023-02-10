@@ -222,7 +222,7 @@ export const packageHistoryModule = {
       while (stack.length > 0) {
         const [node, depth] = stack.pop() as [IPackageChildTreeNode, number];
 
-        if (state.maxParentLookupDepth !== null && depth > state.maxParentLookupDepth) {
+        if (state.maxChildLookupDepth !== null && depth > state.maxChildLookupDepth) {
           continue;
         }
 
@@ -252,7 +252,7 @@ export const packageHistoryModule = {
       while (stack.length > 0) {
         const [node, depth] = stack.pop() as [IPackageChildTreeNode, number];
 
-        if (state.maxParentLookupDepth !== null && depth > state.maxParentLookupDepth) {
+        if (state.maxChildLookupDepth !== null && depth > state.maxChildLookupDepth) {
           continue;
         }
 
