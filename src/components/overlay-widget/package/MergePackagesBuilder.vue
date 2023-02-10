@@ -43,7 +43,7 @@
                 :item.sync="outputItem"
                 :selectOwnedItems="true"
                 :itemFilters="{
-                  quantityType: [inputItem.QuantityTypeName]
+                  quantityType: [inputItem.QuantityTypeName],
                 }"
               />
             </b-form-group>
@@ -129,9 +129,7 @@
           </template>
 
           <template v-if="showTagPicker">
-            <b-button variant="light" size="md" @click="showTagPicker = false">
-              BACK
-            </b-button>
+            <b-button variant="light" size="md" @click="showTagPicker = false"> BACK </b-button>
 
             <template v-if="!tagsSelected">
               <div class="text-lg font-bold">
@@ -141,7 +139,7 @@
 
             <b-form-group class="w-full">
               <tag-picker
-                tagTypeName="CannabisPackage"
+                :tagTypeNames="['CannabisPackage', 'MedicalPackage']"
                 :tagCount="newPackageData.length"
                 :selectedTags.sync="packageTags"
               />
@@ -218,45 +216,30 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import store from "@/store/page-overlay/index";
-import { mapState } from "vuex";
 import BuilderStepHeader from "@/components/overlay-widget/shared/BuilderStepHeader.vue";
-import { isValidTag, generateTagRangeOrError, getTagFromOffset } from "@/utils/tags";
-import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
-import { combineLatest, from, Subject, timer } from "rxjs";
-import { debounceTime, distinctUntilChanged, filter, startWith, tap } from "rxjs/operators";
+import ItemPicker from "@/components/overlay-widget/shared/ItemPicker.vue";
+import LocationPicker from "@/components/overlay-widget/shared/LocationPicker.vue";
+import PackagePicker from "@/components/overlay-widget/shared/PackagePicker.vue";
+import TagPicker from "@/components/overlay-widget/shared/TagPicker.vue";
+import { BuilderType, MessageType } from "@/consts";
 import {
-  IPackageData,
-  IPlantFilter,
   ICsvFile,
-  ILocationData,
-  IMetrcUnpackImmaturePlantsPayload,
-  ITagData,
+  IIntermediateCreatePackageFromPackagesData,
   IMetrcCreatePackagesFromPackagesPayload,
-  IIntermediateCreatePackageFromPackagesData
+  IPackageData,
+  ITagData,
 } from "@/interfaces";
-import { downloadCsvFile, buildCsvDataOrError, buildNamedCsvFileData } from "@/utils/csv";
-import { todayIsodate, submitDateFromIsodate } from "@/utils/date";
-import { primaryMetrcRequestManager } from "@/modules/metrc-request-manager.module";
-import { authManager } from "@/modules/auth-manager.module";
-import {
-  BuilderType,
-  MessageType,
-  PLANTABLE_ITEM_CATEGORY_NAMES,
-  PLANT_BATCH_TYPES
-} from "@/consts";
 import { analyticsManager } from "@/modules/analytics-manager.module";
 import { builderManager } from "@/modules/builder-manager.module";
-import PackagePicker from "@/components/overlay-widget/shared/PackagePicker.vue";
-import LocationPicker from "@/components/overlay-widget/shared/LocationPicker.vue";
-import StrainPicker from "@/components/overlay-widget/shared/StrainPicker.vue";
-import TagPicker from "@/components/overlay-widget/shared/TagPicker.vue";
-import ItemPicker from "@/components/overlay-widget/shared/ItemPicker.vue";
-import PickerCard from "@/components/overlay-widget/shared/PickerCard.vue";
-import { allocatePackageQuantities } from "@/utils/misc";
+import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
 import { dynamicConstsManager } from "@/modules/dynamic-consts-manager.module";
+import store from "@/store/page-overlay/index";
 import { safeZip } from "@/utils/array";
+import { buildCsvDataOrError, buildNamedCsvFileData } from "@/utils/csv";
+import { submitDateFromIsodate, todayIsodate } from "@/utils/date";
+import { allocatePackageQuantities } from "@/utils/misc";
+import { timer } from "rxjs";
+import Vue from "vue";
 
 function totalPackageQuantityAvailableOrNull(packages: IPackageData[]): number | null {
   if (!packages.length) {
@@ -276,7 +259,7 @@ async function defaultRemediatePackageMethod(): Promise<string> {
   try {
     const methods = await dynamicConstsManager.remediatePackageMethods();
 
-    const filteredMethods = methods.filter(x => x.Id.toString() === "0");
+    const filteredMethods = methods.filter((x) => x.Id.toString() === "0");
 
     if (filteredMethods.length === 0) {
       return methods[0].Id.toString();
@@ -296,7 +279,7 @@ export default Vue.extend({
     PackagePicker,
     TagPicker,
     ItemPicker,
-    LocationPicker
+    LocationPicker,
   },
   methods: {
     setActiveStepIndex(index: number) {
@@ -304,7 +287,7 @@ export default Vue.extend({
 
       analyticsManager.track(MessageType.BUILDER_ENGAGEMENT, {
         builder: this.$data.builderType,
-        action: `Set active step to ${index}`
+        action: `Set active step to ${index}`,
       });
     },
     async submit() {
@@ -321,11 +304,11 @@ export default Vue.extend({
 
         const row: IMetrcCreatePackagesFromPackagesPayload = {
           ActualDate: submitDateFromIsodate(this.$data.packageIsodate),
-          Ingredients: newPackageData.ingredients.map(ingredient => ({
+          Ingredients: newPackageData.ingredients.map((ingredient) => ({
             FinishDate: "", // Default to do not finish
             PackageId: ingredient.pkg.Id.toString(),
             Quantity: ingredient.quantity.toString(),
-            UnitOfMeasureId: ingredient.pkg.Item.UnitOfMeasureId.toString()
+            UnitOfMeasureId: ingredient.pkg.Item.UnitOfMeasureId.toString(),
           })),
           ItemId: this.$data.outputItem.Id.toString(),
           Note: this.$data.note,
@@ -338,9 +321,9 @@ export default Vue.extend({
           RemediationSteps: "",
           ...(this.$data.facilityUsesLocationForPackages
             ? {
-                LocationId: this.$data.location.Id.toString()
+                LocationId: this.$data.location.Id.toString(),
               }
-            : {})
+            : {}),
           // UseSameItem: "false", // default to false and just provide the item id anyway
         };
 
@@ -353,7 +336,7 @@ export default Vue.extend({
         {
           packageTotal: this.$data.selectedPackages.length,
           quantity: this.$data.totalPackageQuantity,
-          unitOfMeasure: this.$data.outputItem.UnitOfMeasureName
+          unitOfMeasure: this.$data.outputItem.UnitOfMeasureName,
         },
         this.buildCsvFiles(),
         5
@@ -395,7 +378,7 @@ export default Vue.extend({
             sourceAdjustmentAmount: ingredient.quantity,
             sourceUnitOfMeasure: ingredient.pkg.Item.UnitOfMeasureName,
             destinationLabel: tagData.Label,
-            destinationAdjustmentAmount: newPackageData.quantity
+            destinationAdjustmentAmount: newPackageData.quantity,
           });
         }
       }
@@ -404,40 +387,40 @@ export default Vue.extend({
         const csvData = buildCsvDataOrError([
           {
             isVector: true,
-            data: flattened.map(f => f.sourceLabel)
+            data: flattened.map((f) => f.sourceLabel),
           },
           {
             isVector: true,
-            data: flattened.map(f => f.sourceItem)
+            data: flattened.map((f) => f.sourceItem),
           },
           {
             isVector: true,
-            data: flattened.map(f => f.sourceAdjustmentAmount)
+            data: flattened.map((f) => f.sourceAdjustmentAmount),
           },
           {
             isVector: true,
-            data: flattened.map(f => f.sourceUnitOfMeasure)
+            data: flattened.map((f) => f.sourceUnitOfMeasure),
           },
           {
             isVector: true,
-            data: flattened.map(f => f.destinationLabel)
+            data: flattened.map((f) => f.destinationLabel),
           },
           {
             isVector: false,
-            data: this.$data.outputItem.Name
+            data: this.$data.outputItem.Name,
           },
           {
             isVector: true,
-            data: flattened.map(f => f.destinationAdjustmentAmount)
+            data: flattened.map((f) => f.destinationAdjustmentAmount),
           },
           {
             isVector: false,
-            data: this.$data.outputItem.UnitOfMeasureName
+            data: this.$data.outputItem.UnitOfMeasureName,
           },
           {
             isVector: false,
-            data: this.$data.packageIsodate
-          }
+            data: this.$data.packageIsodate,
+          },
         ]);
 
         return buildNamedCsvFileData(
@@ -448,7 +431,7 @@ export default Vue.extend({
         console.error(e);
         return [];
       }
-    }
+    },
   },
   computed: {
     allDetailsProvided() {
@@ -472,7 +455,7 @@ export default Vue.extend({
     },
     maximumTotalPackageQuantity() {
       return totalPackageQuantityAvailableOrNull(this.$data.selectedPackages);
-    }
+    },
   },
   watch: {
     totalPackageQuantity: {
@@ -487,8 +470,8 @@ export default Vue.extend({
           [newValue],
           this.$data.selectedPackages
         );
-      }
-    }
+      },
+    },
   },
   data() {
     return {
@@ -509,15 +492,15 @@ export default Vue.extend({
       facilityUsesLocationForPackages: false,
       steps: [
         {
-          stepText: "Select packages to merge"
+          stepText: "Select packages to merge",
         },
         {
-          stepText: "Merge details"
+          stepText: "Merge details",
         },
         {
-          stepText: "Submit"
-        }
-      ]
+          stepText: "Submit",
+        },
+      ],
     };
   },
   async created() {
@@ -525,11 +508,12 @@ export default Vue.extend({
     timer(1000).subscribe(() => primaryDataLoader.availableTags({}));
     timer(1000).subscribe(() => dynamicConstsManager.remediatePackageMethods());
 
-    this.$data.facilityUsesLocationForPackages = await dynamicConstsManager.facilityUsesLocationForPackages();
+    this.$data.facilityUsesLocationForPackages =
+      await dynamicConstsManager.facilityUsesLocationForPackages();
   },
   destroyed() {
     // Looks like modal is not actually destroyed
-  }
+  },
 });
 </script>
 

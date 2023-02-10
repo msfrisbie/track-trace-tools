@@ -31,7 +31,12 @@ const inMemoryState = {
   ancestorTree: null,
   childTree: null,
   sourceHarvests: [],
-  maxLookupDepth: null,
+  maxParentLookupDepth: null,
+  maxChildLookupDepth: null,
+  maxParentVisibleDepth: 20,
+  maxChildVisibleDepth: 20,
+  parentZoom: 1,
+  childZoom: 1,
 };
 
 const persistedState = {};
@@ -50,11 +55,41 @@ export const packageHistoryModule = {
     ) {
       state.sourcePackage = pkg;
     },
-    [PackageHistoryMutations.SET_MAX_LOOKUP_DEPTH](
+    [PackageHistoryMutations.SET_MAX_PARENT_LOOKUP_DEPTH](
       state: IPackageHistoryState,
-      { maxLookupDepth }: { maxLookupDepth: number | null }
+      { maxParentLookupDepth }: { maxParentLookupDepth: number | null }
     ) {
-      state.maxLookupDepth = maxLookupDepth;
+      state.maxParentLookupDepth = maxParentLookupDepth;
+    },
+    [PackageHistoryMutations.SET_MAX_CHILD_LOOKUP_DEPTH](
+      state: IPackageHistoryState,
+      { maxChildLookupDepth }: { maxChildLookupDepth: number | null }
+    ) {
+      state.maxChildLookupDepth = maxChildLookupDepth;
+    },
+    [PackageHistoryMutations.SET_MAX_PARENT_VISIBLE_DEPTH](
+      state: IPackageHistoryState,
+      { maxParentVisibleDepth }: { maxParentVisibleDepth: number }
+    ) {
+      state.maxParentVisibleDepth = maxParentVisibleDepth;
+    },
+    [PackageHistoryMutations.SET_MAX_CHILD_VISIBLE_DEPTH](
+      state: IPackageHistoryState,
+      { maxChildVisibleDepth }: { maxChildVisibleDepth: number }
+    ) {
+      state.maxChildVisibleDepth = maxChildVisibleDepth;
+    },
+    [PackageHistoryMutations.SET_PARENT_ZOOM](
+      state: IPackageHistoryState,
+      { parentZoom }: { parentZoom: number }
+    ) {
+      state.parentZoom = parentZoom;
+    },
+    [PackageHistoryMutations.SET_CHILD_ZOOM](
+      state: IPackageHistoryState,
+      { childZoom }: { childZoom: number }
+    ) {
+      state.childZoom = childZoom;
     },
     [PackageHistoryMutations.LOG_EVENT](state: IPackageHistoryState, { event }: { event: string }) {
       const timestampedEvent = `${Date.now()}: ${event}`;
@@ -121,7 +156,7 @@ export const packageHistoryModule = {
       while (stack.length > 0) {
         const [node, depth] = stack.pop() as [IPackageAncestorTreeNode, number];
 
-        if (state.maxLookupDepth !== null && depth > state.maxLookupDepth) {
+        if (state.maxParentLookupDepth !== null && depth > state.maxParentLookupDepth) {
           continue;
         }
 
@@ -151,7 +186,7 @@ export const packageHistoryModule = {
       while (stack.length > 0) {
         const [node, depth] = stack.pop() as [IPackageAncestorTreeNode, number];
 
-        if (state.maxLookupDepth !== null && depth > state.maxLookupDepth) {
+        if (state.maxParentLookupDepth !== null && depth > state.maxParentLookupDepth) {
           continue;
         }
 
@@ -187,7 +222,7 @@ export const packageHistoryModule = {
       while (stack.length > 0) {
         const [node, depth] = stack.pop() as [IPackageChildTreeNode, number];
 
-        if (state.maxLookupDepth !== null && depth > state.maxLookupDepth) {
+        if (state.maxChildLookupDepth !== null && depth > state.maxChildLookupDepth) {
           continue;
         }
 
@@ -217,7 +252,7 @@ export const packageHistoryModule = {
       while (stack.length > 0) {
         const [node, depth] = stack.pop() as [IPackageChildTreeNode, number];
 
-        if (state.maxLookupDepth !== null && depth > state.maxLookupDepth) {
+        if (state.maxChildLookupDepth !== null && depth > state.maxChildLookupDepth) {
           continue;
         }
 
@@ -254,7 +289,27 @@ export const packageHistoryModule = {
         status: PackageHistoryStatus.INITIAL,
       });
 
-      ctx.commit(PackageHistoryMutations.SET_MAX_LOOKUP_DEPTH, { maxLookupDepth: null });
+      ctx.commit(PackageHistoryMutations.SET_MAX_PARENT_LOOKUP_DEPTH, {
+        maxParentLookupDepth: null,
+      });
+
+      ctx.commit(PackageHistoryMutations.SET_MAX_CHILD_LOOKUP_DEPTH, {
+        maxChildLookupDepth: null,
+      });
+      ctx.commit(PackageHistoryMutations.SET_MAX_PARENT_VISIBLE_DEPTH, {
+        maxParentVisibleDepth: 20,
+      });
+
+      ctx.commit(PackageHistoryMutations.SET_MAX_CHILD_VISIBLE_DEPTH, {
+        maxChildVisibleDepth: 20,
+      });
+      ctx.commit(PackageHistoryMutations.SET_PARENT_ZOOM, {
+        parentZoom: 1,
+      });
+
+      ctx.commit(PackageHistoryMutations.SET_CHILD_ZOOM, {
+        childZoom: 1,
+      });
 
       if (pkg) {
         ctx.commit(PackageHistoryMutations.SET_STATUS, {
@@ -297,11 +352,52 @@ export const packageHistoryModule = {
         }
       }
     },
-    [PackageHistoryActions.SET_MAX_LOOKUP_DEPTH]: async (
+    [PackageHistoryActions.SET_MAX_PARENT_LOOKUP_DEPTH]: async (
       ctx: ActionContext<IPackageHistoryState, IPluginState>,
-      { maxLookupDepth }: { maxLookupDepth: number | null }
+      { maxParentLookupDepth }: { maxParentLookupDepth: number | null }
     ) => {
-      ctx.commit(PackageHistoryMutations.SET_MAX_LOOKUP_DEPTH, { maxLookupDepth });
+      ctx.commit(PackageHistoryMutations.SET_MAX_PARENT_LOOKUP_DEPTH, { maxParentLookupDepth });
+      if (typeof maxParentLookupDepth === "number") {
+        ctx.commit(PackageHistoryMutations.SET_MAX_PARENT_VISIBLE_DEPTH, {
+          maxParentVisibleDepth: maxParentLookupDepth,
+        });
+      }
+    },
+    [PackageHistoryActions.SET_MAX_CHILD_LOOKUP_DEPTH]: async (
+      ctx: ActionContext<IPackageHistoryState, IPluginState>,
+      { maxChildLookupDepth }: { maxChildLookupDepth: number | null }
+    ) => {
+      ctx.commit(PackageHistoryMutations.SET_MAX_CHILD_LOOKUP_DEPTH, { maxChildLookupDepth });
+      if (typeof maxChildLookupDepth === "number") {
+        ctx.commit(PackageHistoryMutations.SET_MAX_CHILD_VISIBLE_DEPTH, {
+          maxChildVisibleDepth: maxChildLookupDepth,
+        });
+      }
+    },
+
+    [PackageHistoryActions.SET_MAX_PARENT_VISIBLE_DEPTH]: async (
+      ctx: ActionContext<IPackageHistoryState, IPluginState>,
+      { maxParentVisibleDepth }: { maxParentVisibleDepth: number }
+    ) => {
+      ctx.commit(PackageHistoryMutations.SET_MAX_PARENT_VISIBLE_DEPTH, { maxParentVisibleDepth });
+    },
+    [PackageHistoryActions.SET_MAX_CHILD_VISIBLE_DEPTH]: async (
+      ctx: ActionContext<IPackageHistoryState, IPluginState>,
+      { maxChildVisibleDepth }: { maxChildVisibleDepth: number }
+    ) => {
+      ctx.commit(PackageHistoryMutations.SET_MAX_CHILD_VISIBLE_DEPTH, { maxChildVisibleDepth });
+    },
+    [PackageHistoryActions.SET_PARENT_ZOOM]: async (
+      ctx: ActionContext<IPackageHistoryState, IPluginState>,
+      { parentZoom }: { parentZoom: number }
+    ) => {
+      ctx.commit(PackageHistoryMutations.SET_PARENT_ZOOM, { parentZoom });
+    },
+    [PackageHistoryActions.SET_CHILD_ZOOM]: async (
+      ctx: ActionContext<IPackageHistoryState, IPluginState>,
+      { childZoom }: { childZoom: number }
+    ) => {
+      ctx.commit(PackageHistoryMutations.SET_CHILD_ZOOM, { childZoom });
     },
     [PackageHistoryActions.LOG_EVENT]: async (
       ctx: ActionContext<IPackageHistoryState, IPluginState>,

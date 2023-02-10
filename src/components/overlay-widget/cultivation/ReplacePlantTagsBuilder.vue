@@ -49,7 +49,7 @@
 
             <b-form-group class="w-full">
               <tag-picker
-                tagTypeName="CannabisPlant"
+                :tagTypeNames="['CannabisPlant', 'MedicalPlant']"
                 :tagCount="selectedPlants.length"
                 :selectedTags.sync="plantTags"
               />
@@ -229,10 +229,7 @@ export default Vue.extend({
   },
   computed: {
     allDetailsProvided() {
-      return (
-        this.$data.selectedPlants.length > 0 &&
-        !!this.$data.actualIsodate
-      );
+      return this.$data.selectedPlants.length > 0 && !!this.$data.actualIsodate;
     },
     tagsSelected() {
       return (

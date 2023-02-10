@@ -322,6 +322,7 @@ export const DATA_LOAD_FETCH_TIMEOUT_MS: number = 3 * 60 * 1000;
 
 export const PLANTABLE_ITEM_CATEGORY_NAMES = [
   "Immature Plant",
+  "Immature Plants",
   "Clone - Cutting",
   "Clone - Tissue Culture",
   "Seeds",

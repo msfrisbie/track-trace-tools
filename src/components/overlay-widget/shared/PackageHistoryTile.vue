@@ -130,7 +130,6 @@
             'one-child': childTree.children.length === 1,
             'multi-child': childTree.children.length > 1,
           }"
-          style="border-bottom: 1px solid black"
         >
           <div style="border-right: 1px solid black" class="h-6"></div>
         </div>

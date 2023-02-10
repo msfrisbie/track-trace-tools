@@ -183,7 +183,7 @@ import AnimatedNumber from "@/components/overlay-widget/shared/AnimatedNumber.vu
 import ErrorReadout from "@/components/overlay-widget/shared/ErrorReadout.vue";
 import PickerCard from "@/components/overlay-widget/shared/PickerCard.vue";
 import { DATA_LOAD_MAX_COUNT } from "@/consts";
-import { ITagData } from "@/interfaces";
+import { ITagData, MetrcTagType } from "@/interfaces";
 import { authManager } from "@/modules/auth-manager.module";
 import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
 import { isValidTag } from "@/utils/tags";
@@ -208,7 +208,7 @@ export default Vue.extend({
     PasteTags,
   },
   props: {
-    tagTypeName: String as () => "CannabisPlant" | "CannabisPackage",
+    tagTypeNames: Array as () => MetrcTagType[],
     tagCount: Number,
     selectedTags: Array as () => ITagData[],
   },
@@ -264,8 +264,8 @@ export default Vue.extend({
         const lock = v4();
         this.$data.lockUuid = lock;
 
-        const tags = (await primaryDataLoader.availableTags({ useCache: false })).filter(
-          (tag) => tag.TagTypeName === this.$props.tagTypeName
+        const tags = (await primaryDataLoader.availableTags({ useCache: false })).filter((tag) =>
+          this.$props.tagTypeNames.includes(tag.TagTypeName)
         );
 
         // If there was a subsequent load, don't overwrite
@@ -291,9 +291,6 @@ export default Vue.extend({
   computed: {
     startTagInvalid(): boolean {
       return this.$data.tagQuery.length > 0 && !isValidTag(this.$data.tagQuery);
-    },
-    tagTitle() {
-      return this.tagTypeName === "CannabisPlant" ? "UNUSED PLANT TAG" : "UNUSED PACKAGE TAG";
     },
     tagsPage() {
       const startIdx = PAGE_SIZE * this.$data.tagsPageIndex;

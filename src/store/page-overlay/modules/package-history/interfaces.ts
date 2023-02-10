@@ -12,6 +12,11 @@ export interface IPackageHistoryState {
   ancestorTree: IPackageAncestorTreeNode | null;
   childTree: IPackageChildTreeNode | null;
   sourceHarvests: IHarvestHistoryData[];
-  maxLookupDepth: number | null;
+  maxParentLookupDepth: number | null;
+  maxChildLookupDepth: number | null;
+  maxParentVisibleDepth: number;
+  maxChildVisibleDepth: number;
+  parentZoom: number;
+  childZoom: number;
   log: string[];
 }
