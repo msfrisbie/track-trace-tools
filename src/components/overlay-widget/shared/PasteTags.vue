@@ -7,18 +7,28 @@
       @input="updateTags()"
       placeholder="EXAMPLE00000000000001234, EXAMPLE00000000000005678"
       rows="3"
-      :state="invalidTags"
+      :state="validTagsState"
     ></b-form-textarea>
 
-    <div class="text-red-500" v-if="invalidTags === false">
-      Something pasted is not a valid Metrc tag
-    </div>
+    <template v-if="validTagsState === false">
+      <template v-if="tagSetHasInvalidTags">
+        <div class="text-red-500">Something pasted is not a valid Metrc tag</div>
+      </template>
+      <template v-else>
+        <template v-if="tagSetHasNonmatchingTags">
+          <div class="text-red-500">
+            One or more of these tags cannot be used in this tool. Ensure you have pasted the
+            correct type of tag.
+          </div>
+        </template>
+      </template>
+    </template>
 
     <b-form-group
       label="Autofill a range of tags:"
       :valid-feedback="validFeedback"
       :invalid-feedback="invalidFeedback"
-      :state="state"
+      :state="autofillState"
     >
       <b-input-group>
         <b-form-input placeholder="Start tag" v-model="startTag"></b-form-input>
@@ -45,34 +55,54 @@ export default Vue.extend({
   name: "PlantPicker",
   store,
   components: {},
-  props: {},
+  props: {
+    sourceLabels: Array as () => string[],
+  },
   methods: {
     updateTags() {
+      // @ts-ignore
       this.$emit("update:tags", this.validTags());
     },
     setTags() {
-      this.$data.tagsText = this.tagRange.join("\n");
+      // @ts-ignore
+      this.$data.tagsText = this.tagRangeImpl().join("\n");
       this.$data.startTag = "";
       this.$data.endTag = "";
+      // @ts-ignore
       this.updateTags();
     },
     potentialTags(): string[] {
       return this.$data.tagsText.split(/[\n ]+/).filter((x: string) => x.length > 0);
     },
     validTags(): string[] {
-      return this.potentialTags().filter((x) => isValidTag(x));
+      // @ts-ignore
+      return this.potentialTags().filter((x: string) => isValidTag(x));
+    },
+    matchingTags(): string[] {
+      // @ts-ignore
+      return this.potentialTags().filter((x: string) => this.$props.sourceLabels.includes(x));
+    },
+    tagRangeImpl(): string[] {
+      try {
+        // @ts-ignore
+        return generateTagRangeOrError(this.$data.startTag, this.$data.endTag);
+      } catch (e) {
+        return [];
+      }
     },
     clearForm() {
       this.$data.tagsText = "";
     },
   },
   computed: {
-    state() {
+    autofillState() {
+      // @ts-ignore
       if (!this.$data.startTag && !this.$data.endTag) {
         return null;
       }
 
       try {
+        // @ts-ignore
         validTagPairOrError(this.$data.startTag, this.$data.endTag);
         return true;
       } catch (e) {
@@ -81,6 +111,7 @@ export default Vue.extend({
     },
     validFeedback(): string {
       try {
+        // @ts-ignore
         return `${numTagsInRange(this.$data.startTag, this.$data.endTag)} tags in this range`;
       } catch (e) {
         return "";
@@ -88,6 +119,7 @@ export default Vue.extend({
     },
     invalidFeedback(): string {
       try {
+        // @ts-ignore
         validTagPairOrError(this.$data.startTag, this.$data.endTag);
         return "";
       } catch (e) {
@@ -95,18 +127,34 @@ export default Vue.extend({
       }
     },
     tagRange(): string[] {
-      try {
-        return generateTagRangeOrError(this.$data.startTag, this.$data.endTag);
-      } catch (e) {
-        return [];
-      }
+      // @ts-ignore
+      return this.tagRangeImpl();
     },
-    invalidTags(): boolean | null {
+    tagSetHasInvalidTags(): boolean {
+      // @ts-ignore
+      return this.potentialTags().length !== this.validTags().length;
+    },
+    tagSetHasNonmatchingTags(): boolean {
+      // @ts-ignore
+      return this.potentialTags().length !== this.matchingTags().length;
+    },
+    validTagsState(): boolean | null {
+      // @ts-ignore
       if (this.$data.tagsText.length === 0) {
         return null;
       }
 
-      return this.potentialTags().length === this.validTags().length;
+      // @ts-ignore
+      if (this.potentialTags().length !== this.validTags().length) {
+        return false;
+      }
+
+      // @ts-ignore
+      if (this.potentialTags().length !== this.matchingTags().length) {
+        return false;
+      }
+
+      return true;
     },
   },
   data() {

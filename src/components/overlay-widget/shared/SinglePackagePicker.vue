@@ -61,7 +61,11 @@
             label-class="text-gray-400"
             class="w-full"
           >
-            <paste-tags :tags.sync="pastedTags" ref="pasteTags"></paste-tags>
+            <paste-tags
+              :tags.sync="pastedTags"
+              :sourceLabels="sourcePackages.map((x) => x.Label)"
+              ref="pasteTags"
+            ></paste-tags>
           </b-form-group>
         </template>
 
