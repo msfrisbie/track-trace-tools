@@ -17,10 +17,52 @@
       <template v-else>
         <template v-if="tagSetHasNonmatchingTags">
           <div class="text-red-500">
-            One or more of these tags cannot be used in this tool. Ensure you have pasted the
-            correct type of tag.
+            <p>One or more of these tags cannot be used. Check the following:</p>
+            <ol class="list-decimal">
+              <li>All the tags are for the current license</li>
+              <li>All tags are unused</li>
+              <li>All the tags are of the correct type (package vs plant)</li>
+            </ol>
           </div>
         </template>
+        <template v-if="tagSetHasDuplicateTags">
+          <div class="text-red-500">
+            <p>One or more tags is a duplicate</p>
+          </div>
+        </template>
+      </template>
+
+      <b-button size="sm" @click="showBadTags = !showBadTags"> TOGGLE BAD TAGS LIST </b-button>
+
+      <template v-if="showBadTags">
+        <b-card>
+          <template v-if="tagSetHasInvalidTags">
+            <p class="font-bold">These do not appear to be valid Metrc tags:</p>
+            <ul class="list-disc">
+              <li v-for="invalidTag of invalidTags" v-bind:key="invalidTag">
+                {{ invalidTag }}
+              </li>
+            </ul>
+          </template>
+          <template v-if="tagSetHasNonmatchingTags">
+            <p class="font-bold">
+              These look like they are correct Metrc tags, but cannot be used for this tool:
+            </p>
+            <ul class="list-disc">
+              <li v-for="nonmatchingTag of nonmatchingTags" v-bind:key="nonmatchingTag">
+                {{ nonmatchingTag }}
+              </li>
+            </ul>
+          </template>
+          <template v-if="tagSetHasDuplicateTags">
+            <p class="font-bold">These are duplicate tags:</p>
+            <ul class="list-disc">
+              <li v-for="duplicateTag of duplicateTags" v-bind:key="duplicateTag">
+                {{ duplicateTag }}
+              </li>
+            </ul>
+          </template>
+        </b-card>
       </template>
     </template>
 
@@ -45,6 +87,7 @@
 import store from "@/store/page-overlay/index";
 import {
   generateTagRangeOrError,
+  getDuplicates,
   isValidTag,
   numTagsInRange,
   validTagPairOrError,
@@ -61,7 +104,7 @@ export default Vue.extend({
   methods: {
     updateTags() {
       // @ts-ignore
-      this.$emit("update:tags", this.validTags());
+      this.$emit("update:tags", this.validTagsImpl());
     },
     setTags() {
       // @ts-ignore
@@ -71,16 +114,28 @@ export default Vue.extend({
       // @ts-ignore
       this.updateTags();
     },
-    potentialTags(): string[] {
+    potentialTagsImpl(): string[] {
       return this.$data.tagsText.split(/[\n ]+/).filter((x: string) => x.length > 0);
     },
-    validTags(): string[] {
+    validTagsImpl(): string[] {
       // @ts-ignore
-      return this.potentialTags().filter((x: string) => isValidTag(x));
+      return this.potentialTagsImpl().filter((x: string) => isValidTag(x));
     },
-    matchingTags(): string[] {
+    invalidTagsImpl(): string[] {
       // @ts-ignore
-      return this.potentialTags().filter((x: string) => this.$props.sourceLabels.includes(x));
+      return this.potentialTagsImpl().filter((x: string) => !isValidTag(x));
+    },
+    duplicateTagsImpl(): string[] {
+      return getDuplicates(this.potentialTagsImpl().filter((x) => isValidTag(x)));
+    },
+    matchingTagsImpl(): string[] {
+      // @ts-ignore
+      return this.potentialTagsImpl().filter((x: string) => this.$props.sourceLabels.includes(x));
+    },
+    nonmatchingTagsImpl(): string[] {
+      return this.potentialTagsImpl().filter(
+        (x: string) => isValidTag(x) && !this.$props.sourceLabels.includes(x)
+      );
     },
     tagRangeImpl(): string[] {
       try {
@@ -126,17 +181,30 @@ export default Vue.extend({
         return (e as Error).toString();
       }
     },
+    invalidTags(): string[] {
+      return this.invalidTagsImpl();
+    },
+    nonmatchingTags(): string[] {
+      return this.nonmatchingTagsImpl();
+    },
+    duplicateTags(): string[] {
+      return this.duplicateTagsImpl();
+    },
     tagRange(): string[] {
       // @ts-ignore
       return this.tagRangeImpl();
     },
     tagSetHasInvalidTags(): boolean {
       // @ts-ignore
-      return this.potentialTags().length !== this.validTags().length;
+      return this.invalidTagsImpl().length > 0;
     },
     tagSetHasNonmatchingTags(): boolean {
       // @ts-ignore
-      return this.potentialTags().length !== this.matchingTags().length;
+      return this.nonmatchingTagsImpl().length > 0;
+    },
+    tagSetHasDuplicateTags(): boolean {
+      // @ts-ignore
+      return this.duplicateTagsImpl().length > 0;
     },
     validTagsState(): boolean | null {
       // @ts-ignore
@@ -145,12 +213,17 @@ export default Vue.extend({
       }
 
       // @ts-ignore
-      if (this.potentialTags().length !== this.validTags().length) {
+      if (this.invalidTagsImpl().length > 0) {
         return false;
       }
 
       // @ts-ignore
-      if (this.potentialTags().length !== this.matchingTags().length) {
+      if (this.nonmatchingTagsImpl().length > 0) {
+        return false;
+      }
+
+      // @ts-ignore
+      if (this.duplicateTagsImpl().length > 0) {
         return false;
       }
 
@@ -162,6 +235,7 @@ export default Vue.extend({
       startTag: "",
       endTag: "",
       tagsText: "",
+      showBadTags: false,
     };
   },
   watch: {},

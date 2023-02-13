@@ -109,7 +109,7 @@ export function numTagsInRange(startTag: string, endTag: string) {
 export function isTagInsidePair({
   startTag,
   endTag,
-  targetTag
+  targetTag,
 }: {
   targetTag: string;
   startTag: string;
@@ -143,7 +143,7 @@ export function isTagInsidePair({
 // 1 means it is the next tag
 export function getOffsetFromTag({
   referenceTag,
-  newTag
+  newTag,
 }: {
   referenceTag: string;
   newTag: string;
@@ -158,4 +158,18 @@ export function getOffsetFromTag({
 
 export function getVoidTagBody(tagId: number): string {
   return `=${tagId}`;
+}
+
+export function getDuplicates(tags: string[]) {
+  const uniques: Set<string> = new Set();
+  const duplicates: Set<string> = new Set();
+
+  tags.map((x) => {
+    if (uniques.has(x)) {
+      duplicates.add(x);
+    }
+    uniques.add(x);
+  });
+
+  return [...duplicates].sort();
 }
