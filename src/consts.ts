@@ -7,7 +7,7 @@ export const TTT_SNOWFLAKES = "ttt-snowflakes";
 
 export enum ChromeStorageKeys {
   OAUTH_USER_DATA = "OAUTH_USER_DATA",
-  INITIAL_OPTIONS_PATH = "INITIAL_OPTIONS_PATH"
+  INITIAL_OPTIONS_PATH = "INITIAL_OPTIONS_PATH",
 }
 
 export enum ToolkitView {
@@ -321,6 +321,8 @@ export const DATA_LOAD_MAX_ITERATION_FAILSAFE: number = 100;
 export const DATA_LOAD_FETCH_TIMEOUT_MS: number = 3 * 60 * 1000;
 
 export const PLANTABLE_ITEM_CATEGORY_NAMES = [
+  // Note: this was to match an inconsistency in the plural.
+  // There's no apparent penalty for having both.
   "Immature Plant",
   "Immature Plants",
   "Clone - Cutting",
@@ -369,6 +371,7 @@ export const OHIO_METRC_HOSTNAME = "oh.metrc.com";
 export const OKLAHOMA_METRC_HOSTNAME = "ok.metrc.com";
 export const OREGON_METRC_HOSTNAME = "or.metrc.com";
 export const WEST_VIRGINIA_METRC_HOSTNAME = "wv.metrc.com";
+export const TESTING_AZ_METRC_HOSTNAME = "testing-az.metrc.com";
 
 export const METRC_HOSTNAMES_LACKING_LAB_PDFS: string[] = [];
 

@@ -48,7 +48,7 @@
 </template>
 
 <script lang="ts">
-import { CALIFORNIA_METRC_HOSTNAME, MessageType } from "@/consts";
+import { CALIFORNIA_METRC_HOSTNAME, MessageType, TESTING_AZ_METRC_HOSTNAME } from "@/consts";
 import { analyticsManager } from "@/modules/analytics-manager.module";
 import store from "@/store/page-overlay/index";
 import { HOST_WILDCARD, isCurrentHostAllowed } from "@/utils/builder";
@@ -124,7 +124,7 @@ export default Vue.extend({
           text: "UNPACK IMMATURE PLANTS",
           icon: "box-open",
           backgroundColor: "#48b867",
-          enabled: isCurrentHostAllowed([CALIFORNIA_METRC_HOSTNAME]),
+          enabled: isCurrentHostAllowed([CALIFORNIA_METRC_HOSTNAME, TESTING_AZ_METRC_HOSTNAME]),
           isBeta: false,
         },
         {

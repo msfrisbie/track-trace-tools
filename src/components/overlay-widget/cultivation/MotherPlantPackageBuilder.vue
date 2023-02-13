@@ -59,8 +59,8 @@
                   <b-form-datepicker
                     initial-date
                     size="md"
-                    v-model="cloneIsodate"
-                    :value="cloneIsodate"
+                    v-model="actualIsodate"
+                    :value="actualIsodate"
                   />
                 </b-form-group>
 
@@ -685,7 +685,6 @@ export default Vue.extend({
       builderType: BuilderType.CREATE_IMMATURE_PLANT_PACKAGES_FROM_MOTHER_PLANT,
       activeStepIndex: 0,
       selectedPlants: [],
-      cloneIsodate: todayIsodate(),
       actualIsodate: todayIsodate(),
       childMatrix: [],
       // This must be flattened
