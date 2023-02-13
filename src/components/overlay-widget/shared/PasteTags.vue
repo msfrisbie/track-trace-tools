@@ -115,27 +115,27 @@ export default Vue.extend({
       this.updateTags();
     },
     potentialTagsImpl(): string[] {
-      return this.$data.tagsText.split(/[\n ]+/).filter((x: string) => x.length > 0);
+      return this.$data.tagsText.split(/[\n\s,]+/).filter((x: string) => x.length > 0);
     },
     validTagsImpl(): string[] {
       // @ts-ignore
-      return this.potentialTagsImpl().filter((x: string) => isValidTag(x));
+      return this.potentialTagsImpl().filter((x: string) => isValidTag(x)).sort();
     },
     invalidTagsImpl(): string[] {
       // @ts-ignore
-      return this.potentialTagsImpl().filter((x: string) => !isValidTag(x));
+      return this.potentialTagsImpl().filter((x: string) => !isValidTag(x)).sort();
     },
     duplicateTagsImpl(): string[] {
-      return getDuplicates(this.potentialTagsImpl().filter((x) => isValidTag(x)));
+      return getDuplicates(this.potentialTagsImpl().filter((x) => isValidTag(x))).sort();
     },
     matchingTagsImpl(): string[] {
       // @ts-ignore
-      return this.potentialTagsImpl().filter((x: string) => this.$props.sourceLabels.includes(x));
+      return this.potentialTagsImpl().filter((x: string) => this.$props.sourceLabels.includes(x)).sort();
     },
     nonmatchingTagsImpl(): string[] {
       return this.potentialTagsImpl().filter(
         (x: string) => isValidTag(x) && !this.$props.sourceLabels.includes(x)
-      );
+      ).sort();
     },
     tagRangeImpl(): string[] {
       try {
