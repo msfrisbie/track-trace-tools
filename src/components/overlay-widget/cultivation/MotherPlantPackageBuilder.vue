@@ -686,7 +686,6 @@ export default Vue.extend({
       activeStepIndex: 0,
       selectedPlants: [],
       actualIsodate: todayIsodate(),
-      actualIsodate: todayIsodate(),
       childMatrix: [],
       // This must be flattened
       childPackageData: [],
