@@ -2,6 +2,11 @@
   <b-tab title="Changelog"
     ><b-card-text class="flex flex-col gap-4 items-center">
       <div class="max-w-lg flex flex-col gap-4">
+        <p class="text-2xl ttt-purple">v0.19.0</p>
+
+        <ul class="list-disc">
+          <li>Added bulk package content quick script</li>
+        </ul>
         <p class="text-2xl ttt-purple">v0.18.0</p>
 
         <ul class="list-disc">

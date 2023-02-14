@@ -1,20 +1,22 @@
 import { MessageType } from "@/consts";
 import { analyticsManager } from "@/modules/analytics-manager.module";
 import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
+import { pageManager } from "@/modules/page-manager.module";
 import { toastManager } from "@/modules/toast-manager.module";
 
 export interface IQuickScript {
   id: string;
   name: string;
   description: string;
-  contextLink: string;
-  quickScriptFunction: () => void;
+  contextLink?: string;
+  childOptions?: any[];
+  quickScriptFunction: (childOption: any) => void;
 }
 
-export async function runQuickScript(quickScript: IQuickScript) {
+export async function runQuickScript(quickScript: IQuickScript, childOption?: any) {
   analyticsManager.track(MessageType.RAN_QUICK_SCRIPT, { scriptId: quickScript.id });
 
-  quickScript.quickScriptFunction();
+  quickScript.quickScriptFunction(childOption);
 }
 
 export const QUICK_SCRIPTS: IQuickScript[] = [
@@ -45,7 +47,38 @@ export const QUICK_SCRIPTS: IQuickScript[] = [
       "https://track-trace-tools.talkyard.net/-28/auto-click-checkboxes-for-restore-harvest",
     quickScriptFunction: checkAllPlantsForHarvestRestore,
   },
+  {
+    id: "ADD_PACKAGE_CONTENTS",
+    name: "Add Package Contents Fields",
+    description: "Bulk add package content fields in the New Package window",
+    childOptions: [5, 10, 15, 20, 25],
+    quickScriptFunction: addPackageContents,
+  },
 ];
+
+export async function addPackageContents(count: number) {
+  let clicks = 0;
+
+  for (let i = 0; i < count; ++i) {
+    const button = pageManager.activeModal?.querySelector(
+      `[ng-click*="addLine(null, line.Ingredients)"]`
+    ) as HTMLButtonElement | null;
+
+    if (button) {
+      button.click();
+      ++clicks;
+    }
+  }
+
+  toastManager.openToast(`Added ${clicks} package fields`, {
+    title: "Quick Script Success",
+    autoHideDelay: 5000,
+    variant: "success",
+    appendToast: true,
+    toaster: "ttt-toaster",
+    solid: true,
+  });
+}
 
 export async function checkAllPlantsForHarvestRestore() {
   const restoreHarvestCheckboxes: HTMLElement[] = [

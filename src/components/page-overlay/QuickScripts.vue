@@ -22,9 +22,26 @@
           v-for="quickScript of quickScripts"
           class="flex flex-col items-center gap-4"
         >
-          <b-button variant="outline-primary" @click="runQuickScript(quickScript)">{{
-            quickScript.name
-          }}</b-button>
+          <b-button
+            :disabled="!!quickScript.childOptions"
+            variant="outline-primary"
+            @click="runQuickScript(quickScript)"
+            >{{ quickScript.name }}</b-button
+          >
+
+          <div v-if="quickScript.childOptions" class="flex flex-col items-stretch gap-2">
+            <div class="grid grid-flow-col auto-cols-max gap-2">
+              <b-button
+                size="sm"
+                variant="outline-dark"
+                v-for="childOption of quickScript.childOptions"
+                v-bind:key="childOption"
+                @click="runQuickScript(quickScript, childOption)"
+                >{{ childOption }}</b-button
+              >
+            </div>
+          </div>
+
           <div class="text-gray-600 text-sm">{{ quickScript.description }}</div>
           <a
             v-if="quickScript.contextLink"

@@ -18,12 +18,30 @@
 
     <b-dd-divider></b-dd-divider>
 
-    <b-dd-item
-      v-for="quickScript of quickScripts"
-      v-bind:key="quickScript.id"
-      @click="runQuickScript(quickScript)"
-      >{{ quickScript.name }}</b-dd-item
-    >
+    <template v-for="quickScript of quickScripts">
+      <b-dd-item
+        v-if="!quickScript.childOptions"
+        v-bind:key="quickScript.id"
+        @click="runQuickScript(quickScript)"
+        >{{ quickScript.name }}</b-dd-item
+      >
+
+      <b-dd-item v-if="!!quickScript.childOptions" v-bind:key="quickScript.id">
+        <div class="flex flex-col items-stretch gap-2">
+          <div>{{ quickScript.name }}</div>
+          <div class="grid grid-flow-col auto-cols-max gap-2">
+            <b-button
+              size="sm"
+              variant="outline-dark"
+              v-for="childOption of quickScript.childOptions"
+              v-bind:key="childOption"
+              @click="runQuickScript(quickScript, childOption)"
+              >{{ childOption }}</b-button
+            >
+          </div>
+        </div>
+      </b-dd-item>
+    </template>
 
     <b-popover
       target="quick-script-popover-target"
