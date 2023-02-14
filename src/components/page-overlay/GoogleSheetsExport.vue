@@ -19,7 +19,12 @@
 
 <script lang="ts">
 import { MessageType } from "@/consts";
-import { IIndexedPackageData, ISpreadsheet } from "@/interfaces";
+import {
+  IIndexedPackageData,
+  IIndexedRichTransferData,
+  IRichDestinationData,
+  ISpreadsheet,
+} from "@/interfaces";
 import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
 import { messageBus } from "@/modules/message-bus.module";
 import router from "@/router/index";
@@ -61,7 +66,7 @@ export default Vue.extend({
       spreadsheetData: null,
       oAuthState: OAuthState.INITIAL,
       exportActivePackages: true,
-      exportOutgoingTransfers: true,
+      exportDepartedTransferPackages: true,
     };
   },
   methods: {
@@ -91,10 +96,27 @@ export default Vue.extend({
         this.$data.exportStateMessage = "Loading packages...";
         let exportData: {
           activePackages?: IIndexedPackageData[];
+          richOutgoingInactiveTransfers?: IIndexedRichTransferData[];
         } = {};
 
         if (this.$data.exportActivePackages) {
           exportData.activePackages = await primaryDataLoader.activePackages();
+        }
+
+        if (this.$data.exportDepartedTransferPackages) {
+          exportData.richOutgoingInactiveTransfers =
+            await primaryDataLoader.outgoingInactiveTransfers();
+
+          for (const transfer of exportData.richOutgoingInactiveTransfers) {
+            const destinations: IRichDestinationData[] = (
+              await primaryDataLoader.transferDestinations(transfer.Id)
+            ).map((x) => ({ ...x, packages: [] }));
+
+            for (const destination of destinations) {
+              destination.packages = await primaryDataLoader.destinationPackages(destination.Id);
+            }
+            transfer.outgoingDestinations = destinations;
+          }
         }
 
         this.$data.exportStateMessage = "Generating spreadsheet...";

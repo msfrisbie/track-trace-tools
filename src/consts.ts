@@ -187,6 +187,7 @@ export const DEXIE_TRANSFER_SCHEMA: string = "&Id, License, TagMatcher";
 export const DEXIE_TAG_SCHEMA: string = "&Id, License, Label, TagMatcher";
 
 export enum PackageState {
+  DEPARTED_FACILITY = "DEPARTED_FACILITY",
   ACTIVE = "ACTIVE",
   INACTIVE = "INACTIVE",
   IN_TRANSIT = "IN_TRANSIT",
@@ -212,7 +213,9 @@ export enum HarvestState {
 
 export enum TransferState {
   INCOMING = "INCOMING",
+  INCOMING_INACTIVE = "INCOMING_INACTIVE",
   OUTGOING = "OUTGOING",
+  OUTGOING_INACTIVE = "OUTGOING_INACTIVE",
   REJECTED = "REJECTED",
 }
 

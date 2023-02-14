@@ -14,6 +14,7 @@ import {
   ICollectionResponse,
   ICsvUploadResult,
   IDataLoadOptions,
+  IDestinationData,
   IExtractedITagOrderData,
   IHarvestData,
   IHarvestFilter,
@@ -933,7 +934,7 @@ export class DataLoader implements IAtomicService {
             LicenseNumber: primaryMetrcRequestManager.authStateOrError.license,
           }));
 
-          databaseInterface.indexPackages(activePackages, PackageState.ACTIVE);
+          // databaseInterface.indexPackages(activePackages, PackageState.ACTIVE);
 
           subscription.unsubscribe();
           resolve(activePackages);
@@ -992,7 +993,7 @@ export class DataLoader implements IAtomicService {
             })
           );
 
-          databaseInterface.indexPackages(inactivePackages, PackageState.INACTIVE);
+          // databaseInterface.indexPackages(inactivePackages, PackageState.INACTIVE);
 
           subscription.unsubscribe();
           resolve(inactivePackages);
@@ -1005,6 +1006,51 @@ export class DataLoader implements IAtomicService {
     }
 
     return this._inactivePackages;
+  }
+
+  async transferDestinations(transferId: number): Promise<IDestinationData[]> {
+    return new Promise(async (resolve, reject) => {
+      const subscription = timer(DATA_LOAD_FETCH_TIMEOUT_MS).subscribe(() =>
+        reject("Departed packages fetch timed out")
+      );
+
+      try {
+        const transferDestinations: IDestinationData[] = await this.loadTransferDestinations(
+          transferId
+        );
+
+        subscription.unsubscribe();
+        resolve(transferDestinations);
+      } catch (e) {
+        subscription.unsubscribe();
+        reject(e);
+      }
+    });
+  }
+
+  async destinationPackages(destinationId: number): Promise<IIndexedPackageData[]> {
+    return new Promise(async (resolve, reject) => {
+      const subscription = timer(DATA_LOAD_FETCH_TIMEOUT_MS).subscribe(() =>
+        reject("Departed packages fetch timed out")
+      );
+
+      try {
+        const destinationPackages: IIndexedPackageData[] = (
+          await this.loadDestinationPackages(destinationId)
+        ).map((pkg) => ({
+          ...pkg,
+          PackageState: PackageState.DEPARTED_FACILITY,
+          TagMatcher: "",
+          LicenseNumber: "",
+        }));
+
+        subscription.unsubscribe();
+        resolve(destinationPackages);
+      } catch (e) {
+        subscription.unsubscribe();
+        reject(e);
+      }
+    });
   }
 
   async inactivePackage(label: string): Promise<IIndexedPackageData> {
@@ -1051,7 +1097,7 @@ export class DataLoader implements IAtomicService {
             })
           );
 
-          databaseInterface.indexPackages(inTransitPackages, PackageState.IN_TRANSIT);
+          // databaseInterface.indexPackages(inTransitPackages, PackageState.IN_TRANSIT);
 
           subscription.unsubscribe();
           resolve(inTransitPackages);
@@ -1124,6 +1170,41 @@ export class DataLoader implements IAtomicService {
     return this._incomingTransfers;
   }
 
+  async incomingInactiveTransfers(resetCache: boolean = false): Promise<IIndexedTransferData[]> {
+    if (resetCache) {
+      this._incomingTransfers = null;
+    }
+
+    if (!this._incomingTransfers) {
+      this._incomingTransfers = new Promise(async (resolve, reject) => {
+        const subscription = timer(DATA_LOAD_FETCH_TIMEOUT_MS).subscribe(() =>
+          reject("Incoming transfer fetch timed out")
+        );
+
+        try {
+          const incomingTransfers: IIndexedTransferData[] = (
+            await this.loadIncomingTransfers()
+          ).map((transfer) => ({
+            ...transfer,
+            TransferState: TransferState.INCOMING_INACTIVE,
+            TagMatcher: "",
+          }));
+
+          databaseInterface.indexTransfers(incomingTransfers, TransferState.INCOMING);
+
+          subscription.unsubscribe();
+          resolve(incomingTransfers);
+        } catch (e) {
+          subscription.unsubscribe();
+          reject(e);
+          this._incomingTransfers = null;
+        }
+      });
+    }
+
+    return this._incomingTransfers;
+  }
+
   async incomingTransfer(manifestNumber: string): Promise<IIndexedTransferData> {
     return new Promise(async (resolve, reject) => {
       const subscription = timer(DATA_LOAD_FETCH_TIMEOUT_MS).subscribe(() =>
@@ -1163,6 +1244,41 @@ export class DataLoader implements IAtomicService {
           ).map((transfer) => ({
             ...transfer,
             TransferState: TransferState.OUTGOING,
+            TagMatcher: "",
+          }));
+
+          databaseInterface.indexTransfers(outgoingTransfers, TransferState.OUTGOING);
+
+          subscription.unsubscribe();
+          resolve(outgoingTransfers);
+        } catch (e) {
+          subscription.unsubscribe();
+          reject(e);
+          this._outgoingTransfers = null;
+        }
+      });
+    }
+
+    return this._outgoingTransfers;
+  }
+
+  async outgoingInactiveTransfers(resetCache: boolean = false): Promise<IIndexedTransferData[]> {
+    if (resetCache) {
+      this._outgoingTransfers = null;
+    }
+
+    if (!this._outgoingTransfers) {
+      this._outgoingTransfers = new Promise(async (resolve, reject) => {
+        const subscription = timer(DATA_LOAD_FETCH_TIMEOUT_MS).subscribe(() =>
+          reject("Outgoing transfer fetch timed out")
+        );
+
+        try {
+          const outgoingTransfers: IIndexedTransferData[] = (
+            await this.loadOutgoingTransfers()
+          ).map((transfer) => ({
+            ...transfer,
+            TransferState: TransferState.OUTGOING_INACTIVE,
             TagMatcher: "",
           }));
 
@@ -1533,6 +1649,32 @@ export class DataLoader implements IAtomicService {
    *
    */
 
+  transferDestinationStream(
+    dataLoadOptions: IDataLoadOptions = {},
+    transferId: number
+  ): Subject<ICollectionResponse<IDestinationData>> {
+    const responseFactory = (paginationOptions: IPaginationOptions): Promise<Response> => {
+      const body = buildBody(paginationOptions);
+
+      return this.metrcRequestManagerOrError.getTransferDestinations(body, transferId);
+    };
+
+    return streamFactory<IDestinationData>(dataLoadOptions, responseFactory);
+  }
+
+  destinationPackagesStream(
+    dataLoadOptions: IDataLoadOptions = {},
+    destinationId: number
+  ): Subject<ICollectionResponse<IPackageData>> {
+    const responseFactory = (paginationOptions: IPaginationOptions): Promise<Response> => {
+      const body = buildBody(paginationOptions);
+
+      return this.metrcRequestManagerOrError.getDestinationPackages(body, destinationId);
+    };
+
+    return streamFactory<IPackageData>(dataLoadOptions, responseFactory);
+  }
+
   activePackagesStream(options: IPackageOptions = {}): Subject<ICollectionResponse<IPackageData>> {
     const responseFactory = (paginationOptions: IPaginationOptions): Promise<Response> => {
       const body = buildBody(paginationOptions);
@@ -1645,6 +1787,18 @@ export class DataLoader implements IAtomicService {
     return streamFactory<ITransferData>(dataLoadOptions, responseFactory);
   }
 
+  outgoingInactiveTransfersStream(
+    dataLoadOptions: IDataLoadOptions = {}
+  ): Subject<ICollectionResponse<ITransferData>> {
+    const responseFactory = (paginationOptions: IPaginationOptions): Promise<Response> => {
+      const body = buildBody(paginationOptions);
+
+      return this.metrcRequestManagerOrError.getOutgoingInactiveTransfers(body);
+    };
+
+    return streamFactory<ITransferData>(dataLoadOptions, responseFactory);
+  }
+
   rejectedTransfersStream(
     dataLoadOptions: IDataLoadOptions = {}
   ): Subject<ICollectionResponse<ITransferData>> {
@@ -1722,6 +1876,46 @@ export class DataLoader implements IAtomicService {
    *
    * These are used
    */
+
+  private async loadTransferDestinations(transferId: number): Promise<IDestinationData[]> {
+    await authManager.authStateOrError();
+
+    store.commit(MutationType.SET_LOADING_MESSAGE, "Loading transfer destinations...");
+
+    let transferDestinations: IDestinationData[] = [];
+
+    await this.transferDestinationStream({}, transferId).forEach(
+      (next: ICollectionResponse<IDestinationData>) => {
+        transferDestinations = [...transferDestinations, ...next.Data];
+      }
+    );
+
+    console.log(`Loaded ${transferDestinations.length} transferDestinations`);
+
+    store.commit(MutationType.SET_LOADING_MESSAGE, null);
+
+    return transferDestinations;
+  }
+
+  private async loadDestinationPackages(destinationId: number): Promise<IPackageData[]> {
+    await authManager.authStateOrError();
+
+    store.commit(MutationType.SET_LOADING_MESSAGE, "Loading destination packages...");
+
+    let destinationPackages: IPackageData[] = [];
+
+    await this.destinationPackagesStream({}, destinationId).forEach(
+      (next: ICollectionResponse<IPackageData>) => {
+        destinationPackages = [...destinationPackages, ...next.Data];
+      }
+    );
+
+    console.log(`Loaded ${destinationPackages.length} destinationPackages`);
+
+    store.commit(MutationType.SET_LOADING_MESSAGE, null);
+
+    return destinationPackages;
+  }
 
   private async loadIncomingTransfer(manifestNumber: string): Promise<ITransferData> {
     if (store.state.mockDataMode) {
@@ -2107,6 +2301,26 @@ export class DataLoader implements IAtomicService {
     });
 
     console.log(`Loaded ${outgoingTransfers.length} outgoingTransfers`);
+
+    store.commit(MutationType.SET_LOADING_MESSAGE, null);
+
+    return outgoingTransfers;
+  }
+
+  private async loadOutgoingInactiveTransfers(): Promise<ITransferData[]> {
+    await authManager.authStateOrError();
+
+    store.commit(MutationType.SET_LOADING_MESSAGE, "Loading outgoing inactive transfers...");
+
+    let outgoingTransfers: ITransferData[] = [];
+
+    await this.outgoingInactiveTransfersStream().forEach(
+      (next: ICollectionResponse<ITransferData>) => {
+        outgoingTransfers = [...outgoingTransfers, ...next.Data];
+      }
+    );
+
+    console.log(`Loaded ${outgoingTransfers.length} outgoingInactiveTransfers`);
 
     store.commit(MutationType.SET_LOADING_MESSAGE, null);
 

@@ -677,6 +677,61 @@ export interface IIndexedTransferData extends ITransferData {
   TagMatcher: string;
 }
 
+export interface ITransporterData {
+  AcceptedDateTime: null;
+  ActualArrivalDateTime: null;
+  ActualDepartureDateTime: null;
+  DriverLayoverLeg: null;
+  DriverName: string;
+  DriverOccupationalLicenseNumber: string;
+  DriverVehicleLicenseNumber: string;
+  EstimatedArrivalDateTime: null;
+  EstimatedDepartureDateTime: null;
+  IsLayover: boolean;
+  TransporterDirectionName: "Outbound";
+  TransporterFacilityLicenseNumber: string;
+  TransporterFacilityName: string;
+  VehicleLicensePlateNumber: string;
+  VehicleMake: string;
+  VehicleModel: string;
+}
+
+export interface IDestinationData {
+  ActualArrivalDateTime: null;
+  ActualDepartureDateTime: null;
+  ActualReturnArrivalDateTime: null;
+  ActualReturnDepartureDateTime: null;
+  DeliveryPackageCount: number;
+  DeliveryReceivedPackageCount: number;
+  EstimatedArrivalDateTime: string;
+  EstimatedDepartureDateTime: string;
+  EstimatedReturnArrivalDateTime: null;
+  EstimatedReturnDepartureDateTime: null;
+  GrossUnitOfWeightAbbreviation: null;
+  GrossUnitOfWeightId: null;
+  GrossWeight: null;
+  Id: number;
+  PlannedRoute: string;
+  ReceivedByName: null;
+  ReceivedDateTime: null;
+  RecipientFacilityId: number;
+  RecipientFacilityLicenseNumber: string;
+  RecipientFacilityName: string;
+  RejectedPackagesReturned: boolean;
+  ShipmentTransactionTypeName: string;
+  ShipmentTypeName: "Transfer";
+}
+
+export interface IRichDestinationData extends IDestinationData {
+  packages: IPackageData[];
+}
+
+export interface IIndexedRichTransferData extends IIndexedTransferData {
+  incomingTransporters?: ITransporterData[];
+  incomingPackages?: IPackageData[];
+  outgoingDestinations?: IRichDestinationData[];
+}
+
 export interface IIndexedTagData extends ITagData {
   TagState: TagState;
   TagMatcher: string;

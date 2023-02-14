@@ -31,10 +31,19 @@ const INACTIVE_PLANT_BATCHES_URL =
   origin({ divertToNullOrigin: false }) + "/api/plantbatches/inactive";
 
 const INCOMING_TRANSFERS_URL =
-  origin({ divertToNullOrigin: false }) + "/api/transfers/incoming?slt=Licensed";
+  origin({ divertToNullOrigin: false }) + "/api/transfers/incoming?slt=Licensed&active=True";
+const INCOMING_INACTIVE_TRANSFERS_URL =
+  origin({ divertToNullOrigin: false }) + "/api/transfers/incoming?slt=Licensed&active=False";
 const OUTGOING_TRANSFERS_URL =
-  origin({ divertToNullOrigin: false }) + "/api/transfers/outgoing?slt=Licensed";
+  origin({ divertToNullOrigin: false }) + "/api/transfers/outgoing?slt=Licensed&active=True";
+const OUTGOING_INACTIVE_TRANSFERS_URL =
+  origin({ divertToNullOrigin: false }) + "/api/transfers/outgoing?slt=Licensed&active=False";
 const REJECTED_TRANSFERS_URL = origin({ divertToNullOrigin: false }) + "/api/transfers/rejected";
+
+const TRANSFER_DESTINATIONS_URL =
+  origin({ divertToNullOrigin: false }) + "/api/transfers/destinations"; // TODO ?id=39
+const TRANSFER_DESTINATION_PACKAGES_URL =
+  origin({ divertToNullOrigin: false }) + "/api/transfers/destinations/packages"; // TODO ?id=39
 
 const LOCATIONS_URL = origin({ divertToNullOrigin: false }) + "/api/locations";
 const STRAINS_URL = origin({ divertToNullOrigin: false }) + "/api/strains";
@@ -115,6 +124,8 @@ enum UrlType {
   REMEDIATE_PACKAGE,
   CREATE_PLANTINGS_FROM_PACKAGE,
   CHANGE_PLANT_BATCH_GROWTH_PHASE,
+  TRANSFER_DESTINATIONS_BY_TRANSFER_ID,
+  DESTINATION_PACKAGES_BY_DESTINATION_ID,
 }
 
 // function persistedAuthStateOrError(): IAuthState {
@@ -253,6 +264,22 @@ async function buildDynamicUrl(
       return (
         origin({ divertToNullOrigin: false }) +
         `/api/transfers/history?id=${options.manifestNumber}`
+      );
+    case UrlType.TRANSFER_DESTINATIONS_BY_TRANSFER_ID:
+      if (!options || !options.transferId) {
+        throw new Error("Missing required URL options");
+      }
+      return (
+        origin({ divertToNullOrigin: false }) +
+        `/api/transfers/destinations?id=${options.transferId}`
+      );
+    case UrlType.DESTINATION_PACKAGES_BY_DESTINATION_ID:
+      if (!options || !options.destinationId) {
+        throw new Error("Missing required URL options");
+      }
+      return (
+        origin({ divertToNullOrigin: false }) +
+        `/api/transfers/destinations/packages?id=${options.destinationId}`
       );
     case UrlType.HARVEST_HISTORY_BY_HARVEST_ID:
       if (!options || !options.harvestId) {
@@ -578,8 +605,43 @@ export class MetrcRequestManager implements IAtomicService {
     });
   }
 
+  async getIncomingInactiveTransfers(
+    body: string,
+    retryOptions: IRetryOptions = {},
+    abortTimeout: number = 30000
+  ) {
+    const controller = new AbortController();
+    const signal = controller.signal;
+
+    setTimeout(() => controller.abort(), abortTimeout);
+
+    return customFetch(INCOMING_INACTIVE_TRANSFERS_URL, {
+      ...DEFAULT_FETCH_POST_OPTIONS,
+      ...retryOptions,
+      // @ts-ignore
+      headers: {
+        ...(await buildAuthenticationHeaders(this.authStateOrError)),
+        ...JSON_HEADERS,
+      },
+      body,
+      signal,
+    });
+  }
+
   async getOutgoingTransfers(body: string) {
     return customFetch(OUTGOING_TRANSFERS_URL, {
+      ...DEFAULT_FETCH_POST_OPTIONS,
+      // @ts-ignore
+      headers: {
+        ...(await buildAuthenticationHeaders(this.authStateOrError)),
+        ...JSON_HEADERS,
+      },
+      body,
+    });
+  }
+
+  async getOutgoingInactiveTransfers(body: string) {
+    return customFetch(OUTGOING_INACTIVE_TRANSFERS_URL, {
       ...DEFAULT_FETCH_POST_OPTIONS,
       // @ts-ignore
       headers: {
@@ -651,6 +713,52 @@ export class MetrcRequestManager implements IAtomicService {
           ...JSON_HEADERS,
         },
         body,
+      }
+    );
+  }
+
+  async getTransferDestinations(body: string, transferId: number, abortTimeout: number = 30000) {
+    const controller = new AbortController();
+    const signal = controller.signal;
+
+    setTimeout(() => controller.abort(), abortTimeout);
+
+    return customFetch(
+      await buildDynamicUrl(this.authStateOrError, UrlType.TRANSFER_DESTINATIONS_BY_TRANSFER_ID, {
+        transferId,
+      }),
+      {
+        ...DEFAULT_FETCH_POST_OPTIONS,
+        // @ts-ignore
+        headers: {
+          ...(await buildAuthenticationHeaders(this.authStateOrError)),
+          ...JSON_HEADERS,
+        },
+        body,
+        signal,
+      }
+    );
+  }
+
+  async getDestinationPackages(body: string, destinationId: number, abortTimeout: number = 30000) {
+    const controller = new AbortController();
+    const signal = controller.signal;
+
+    setTimeout(() => controller.abort(), abortTimeout);
+
+    return customFetch(
+      await buildDynamicUrl(this.authStateOrError, UrlType.DESTINATION_PACKAGES_BY_DESTINATION_ID, {
+        destinationId,
+      }),
+      {
+        ...DEFAULT_FETCH_POST_OPTIONS,
+        // @ts-ignore
+        headers: {
+          ...(await buildAuthenticationHeaders(this.authStateOrError)),
+          ...JSON_HEADERS,
+        },
+        body,
+        signal,
       }
     );
   }

@@ -1,19 +1,42 @@
 import { MessageType } from "@/consts";
-import { IIndexedPackageData, ISpreadsheet } from "@/interfaces";
+import {
+  IDestinationData,
+  IIndexedPackageData,
+  IIndexedRichTransferData,
+  IPackageData,
+  ISpreadsheet,
+  ITransferData,
+} from "@/interfaces";
 import { messageBus } from "@/modules/message-bus.module";
 import store from "@/store/page-overlay/index";
 import { todayIsodate } from "./date";
 
+enum SheetTitles {
+  OVERVIEW = "Overview",
+  PACKAGES = "Packages",
+  DEPARTED_TRANSFER_PACKAGES = "Departed Transfer Packages",
+}
+
 export async function createExportSpreadsheetOrError({
   activePackages,
+  richOutgoingInactiveTransfers,
 }: {
   activePackages?: IIndexedPackageData[];
+  richOutgoingInactiveTransfers?: IIndexedRichTransferData[];
 }): Promise<ISpreadsheet> {
   if (!store.state.pluginAuth?.authState?.license) {
     throw new Error("Invalid authState");
   }
 
-  const sheetTitles = ["Overview", "Packages"];
+  const sheetTitles: SheetTitles[] = [SheetTitles.OVERVIEW];
+
+  if (activePackages) {
+    sheetTitles.push(SheetTitles.PACKAGES);
+  }
+
+  if (richOutgoingInactiveTransfers) {
+    sheetTitles.push(SheetTitles.DEPARTED_TRANSFER_PACKAGES);
+  }
 
   const response: {
     data: {
@@ -29,23 +52,23 @@ export async function createExportSpreadsheetOrError({
     throw new Error("Unable to create export sheet");
   }
 
-  let packageRequests: any[] = [];
+  let activePackageRequests: any[] = [];
 
   if (activePackages) {
-    packageRequests = [
+    activePackageRequests = [
       // Add more rows
       {
         appendDimension: {
           dimension: "ROWS",
-          length: activePackages.length,
-          sheetId: sheetTitles.indexOf("Packages"),
+          length: Math.max(activePackages.length, 1),
+          sheetId: sheetTitles.indexOf(SheetTitles.PACKAGES),
         },
       },
       // Style top row - black bg, white text
       {
         repeatCell: {
           range: {
-            sheetId: sheetTitles.indexOf("Packages"),
+            sheetId: sheetTitles.indexOf(SheetTitles.PACKAGES),
             startRowIndex: 0,
             endRowIndex: 1,
           },
@@ -75,7 +98,83 @@ export async function createExportSpreadsheetOrError({
       {
         updateSheetProperties: {
           properties: {
-            sheetId: sheetTitles.indexOf("Packages"),
+            sheetId: sheetTitles.indexOf(SheetTitles.PACKAGES),
+            gridProperties: {
+              frozenRowCount: 1,
+            },
+          },
+          fields: "gridProperties.frozenRowCount",
+        },
+      },
+    ];
+  }
+
+  let richOutgoingInactiveTransfersRequests: any[] = [];
+  let flattenedOutgoingPackages: {
+    Package: IPackageData;
+    Destination: IDestinationData;
+    Transfer: ITransferData;
+  }[] = [];
+
+  if (richOutgoingInactiveTransfers) {
+    for (const transfer of richOutgoingInactiveTransfers) {
+      for (const destination of transfer?.outgoingDestinations || []) {
+        for (const pkg of destination.packages) {
+          flattenedOutgoingPackages.push({
+            Package: pkg,
+            Destination: destination,
+            Transfer: transfer,
+          });
+        }
+      }
+    }
+
+    console.log(flattenedOutgoingPackages);
+
+    richOutgoingInactiveTransfersRequests = [
+      // Add more rows
+      {
+        appendDimension: {
+          dimension: "ROWS",
+          length: Math.max(flattenedOutgoingPackages.length, 1),
+          sheetId: sheetTitles.indexOf(SheetTitles.DEPARTED_TRANSFER_PACKAGES),
+        },
+      },
+      // Style top row - black bg, white text
+      {
+        repeatCell: {
+          range: {
+            sheetId: sheetTitles.indexOf(SheetTitles.DEPARTED_TRANSFER_PACKAGES),
+            startRowIndex: 0,
+            endRowIndex: 1,
+          },
+          cell: {
+            userEnteredFormat: {
+              backgroundColor: {
+                red: 0.0,
+                green: 0.0,
+                blue: 0.0,
+              },
+              horizontalAlignment: "CENTER",
+              textFormat: {
+                foregroundColor: {
+                  red: 1.0,
+                  green: 1.0,
+                  blue: 1.0,
+                },
+                fontSize: 10,
+                bold: true,
+              },
+            },
+          },
+          fields: "userEnteredFormat(backgroundColor,textFormat,horizontalAlignment)",
+        },
+      },
+      // Freeze top row
+      {
+        updateSheetProperties: {
+          properties: {
+            sheetId: sheetTitles.indexOf(SheetTitles.DEPARTED_TRANSFER_PACKAGES),
             gridProperties: {
               frozenRowCount: 1,
             },
@@ -94,10 +193,11 @@ export async function createExportSpreadsheetOrError({
         appendDimension: {
           dimension: "ROWS",
           length: 19,
-          sheetId: sheetTitles.indexOf("Overview"),
+          sheetId: sheetTitles.indexOf(SheetTitles.OVERVIEW),
         },
       },
-      ...packageRequests,
+      ...activePackageRequests,
+      ...richOutgoingInactiveTransfersRequests,
     ],
   });
 
@@ -118,8 +218,8 @@ export async function createExportSpreadsheetOrError({
 
     await messageBus.sendMessageToBackground(MessageType.WRITE_SPREADSHEET_VALUES, {
       spreadsheetId: response.data.result.spreadsheetId,
-      range: "Packages!1:1",
-      values: [packageProperties],
+      range: `'${SheetTitles.PACKAGES}'!1:1`,
+      values: [packageProperties.map((x) => `     ${x}     `)],
     });
 
     let nextPageStartIdx = 0;
@@ -134,7 +234,7 @@ export async function createExportSpreadsheetOrError({
 
       await messageBus.sendMessageToBackground(MessageType.WRITE_SPREADSHEET_VALUES, {
         spreadsheetId: response.data.result.spreadsheetId,
-        range: `Packages!${nextPageRowIdx}:${nextPageRowIdx + nextPage.length}`,
+        range: `'${SheetTitles.PACKAGES}'!${nextPageRowIdx}:${nextPageRowIdx + nextPage.length}`,
         values: nextPage.map((pkg) =>
           packageProperties.map((property) => {
             let value = pkg;
@@ -152,23 +252,126 @@ export async function createExportSpreadsheetOrError({
     }
   }
 
+  if (richOutgoingInactiveTransfers) {
+    const richOutgoingInactiveTransferProperties = [
+      "Transfer.ManifestNumber",
+      "Transfer.ShipmentLicenseTypeName",
+      "Transfer.ShipperFacilityName",
+      "Transfer.ShipperFacilityLicenseNumber",
+      "Destination.RecipientFacilityName",
+      "Destination.RecipientFacilityLicenseNumber",
+      "Destination.EstimatedDepartureDateTime",
+      "Package.PackageLabel",
+      "Package.ProductName",
+      "Package.ShippedQuantity",
+      "Package.ShippedUnitOfMeasureAbbreviation",
+    ];
+
+    await messageBus.sendMessageToBackground(MessageType.WRITE_SPREADSHEET_VALUES, {
+      spreadsheetId: response.data.result.spreadsheetId,
+      range: `'${SheetTitles.DEPARTED_TRANSFER_PACKAGES}'!1:1`,
+      values: [richOutgoingInactiveTransferProperties.map((x) => `     ${x}     `)],
+    });
+
+    let nextPageStartIdx = 0;
+    let nextPageRowIdx = 2;
+    const pageSize = 2000;
+
+    while (true) {
+      const nextPage = flattenedOutgoingPackages.slice(
+        nextPageStartIdx,
+        nextPageStartIdx + pageSize
+      );
+      if (nextPage.length === 0) {
+        break;
+      }
+
+      await messageBus.sendMessageToBackground(MessageType.WRITE_SPREADSHEET_VALUES, {
+        spreadsheetId: response.data.result.spreadsheetId,
+        range: `'${SheetTitles.DEPARTED_TRANSFER_PACKAGES}'!${nextPageRowIdx}:${
+          nextPageRowIdx + nextPage.length
+        }`,
+        values: nextPage.map((data) =>
+          richOutgoingInactiveTransferProperties.map((property) => {
+            let value = data;
+            for (const subProperty of property.split(".")) {
+              // @ts-ignore
+              value = value[subProperty];
+            }
+            return value;
+          })
+        ),
+      });
+
+      nextPageStartIdx += nextPage.length;
+      nextPageRowIdx += nextPage.length;
+    }
+  }
+
   let packageSummary: any[] = [];
+  let departedTransferPackageSummary: any[] = [];
 
   if (activePackages) {
-    packageSummary = [null, "Active Packages", `=COUNTIF(Packages!C2:C, "ACTIVE")`];
+    packageSummary = [
+      null,
+      "Active Packages",
+      `=COUNTIF('${SheetTitles.PACKAGES}'!C2:C, "ACTIVE")`,
+    ];
+  }
+
+  if (richOutgoingInactiveTransfers) {
+    departedTransferPackageSummary = [
+      null,
+      "Departed Packages",
+      `=COUNT('${SheetTitles.DEPARTED_TRANSFER_PACKAGES}'!A2:A)`,
+    ];
   }
 
   await messageBus.sendMessageToBackground(MessageType.WRITE_SPREADSHEET_VALUES, {
     spreadsheetId: response.data.result.spreadsheetId,
-    range: "Overview",
+    range: `'${SheetTitles.OVERVIEW}'`,
     values: [
       [`Generated with Track & Trace Tools at ${Date().toString()}`],
       [],
       [null, "License", store.state.pluginAuth?.authState?.license],
       [],
       packageSummary,
+      departedTransferPackageSummary,
     ],
   });
+
+  let packageResizeRequests: any[] = [];
+  let departedTransferPackageResizeRequests: any[] = [];
+
+  if (activePackages) {
+    packageResizeRequests = [
+      {
+        autoResizeDimensions: {
+          dimensions: {
+            dimension: "COLUMNS",
+            sheetId: sheetTitles.indexOf(SheetTitles.PACKAGES),
+            startIndex: 0,
+            endIndex: 12,
+          },
+        },
+      },
+    ];
+  }
+
+  if (richOutgoingInactiveTransfers) {
+    departedTransferPackageResizeRequests = [
+      {
+        autoResizeDimensions: {
+          dimensions: {
+            dimension: "COLUMNS",
+            sheetId: sheetTitles.indexOf(SheetTitles.DEPARTED_TRANSFER_PACKAGES),
+            startIndex: 0,
+            endIndex: 12,
+          },
+        },
+      },
+    ];
+  }
 
   await messageBus.sendMessageToBackground(MessageType.BATCH_UPDATE_SPREADSHEET, {
     spreadsheetId: response.data.result.spreadsheetId,
@@ -178,22 +381,14 @@ export async function createExportSpreadsheetOrError({
         autoResizeDimensions: {
           dimensions: {
             dimension: "COLUMNS",
-            sheetId: sheetTitles.indexOf("Overview"),
+            sheetId: sheetTitles.indexOf(SheetTitles.OVERVIEW),
             startIndex: 1,
             endIndex: 12,
           },
         },
       },
-      {
-        autoResizeDimensions: {
-          dimensions: {
-            dimension: "COLUMNS",
-            sheetId: sheetTitles.indexOf("Packages"),
-            startIndex: 0,
-            endIndex: 12,
-          },
-        },
-      },
+      ...packageResizeRequests,
+      ...departedTransferPackageResizeRequests,
     ],
   });
 
