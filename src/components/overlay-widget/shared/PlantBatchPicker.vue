@@ -144,6 +144,7 @@
 
         <paste-tags
           v-if="selectedMenuItem === selectedMenuState.PASTED_TAGS"
+          :sourceLabels="sourcePlantBatches.map(x => x.Name)"
           :tags.sync="pastedTags"
           ref="pasteTags"
         >

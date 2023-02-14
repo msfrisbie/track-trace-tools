@@ -106,6 +106,7 @@
 
       <paste-tags
         v-if="selectedMenuItem === selectedMenuState.PASTED_TAGS"
+        :sourceLabels="sourceTags.map(x => x.Label)"
         :tags.sync="pastedTags"
         ref="pasteTags"
       >
