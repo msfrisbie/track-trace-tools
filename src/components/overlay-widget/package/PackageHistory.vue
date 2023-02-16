@@ -505,7 +505,6 @@
 import PackageHistoryTile from "@/components/overlay-widget/shared/PackageHistoryTile.vue";
 import SinglePackagePicker from "@/components/overlay-widget/shared/SinglePackagePicker.vue";
 import { ICsvFile, IHistoryTreeNode, IPluginState } from "@/interfaces";
-import { clientBuildManager } from "@/modules/client-build-manager.module";
 import router from "@/router/index";
 import store from "@/store/page-overlay/index";
 import {
@@ -680,7 +679,8 @@ export default Vue.extend({
     },
     unitOfMeasureNameToAbbreviation,
     validClient(): boolean {
-      return clientBuildManager.assertValues(["ENABLE_PACKAGE_HISTORY"]);
+      return true;
+      // return clientBuildManager.assertValues(["ENABLE_PACKAGE_HISTORY"]);
     },
   },
   async created() {},

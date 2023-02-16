@@ -38,7 +38,9 @@
           </div>
           <div class="font-bold">{{ ancestorTree.label }}</div>
         </div>
-        <template v-if="isOrigin">
+        <!-- <template v-if="isOrigin"> -->
+        <!-- </template> -->
+        <template v-if="ancestorTree.type === HistoryTreeNodeType.OWNED_PACKAGE">
           <hr />
           <div
             class="p-2 flex flex-row items-center justify-start space-x-4 text-sm whitespace-nowrap"
@@ -57,16 +59,16 @@
               :label="ancestorTree.pkg.Label"
             />
           </div>
-        </template>
-        <template v-if="ancestorTree.type === HistoryTreeNodeType.OWNED_PACKAGE">
           <hr />
           <div class="p-2">
-            <div v-if="ancestorTree.pkg.PackagedByFacilityLicenseNumber">
-              Packaged by {{ ancestorTree.pkg.PackagedByFacilityLicenseNumber }}
-            </div>
-            <div v-if="ancestorTree.pkg.ReceivedFromFacilityLicenseNumber">
-              Recieved from {{ ancestorTree.pkg.ReceivedFromFacilityLicenseNumber }}
-            </div>
+            <template v-if="ancestorTree.pkg.ProductionBatchNumber">
+              <div>
+                {{ ancestorTree.pkg.ProductionBatchNumber }}
+              </div>
+              <hr class="py-1" />
+            </template>
+            <div>Packaged by {{ ancestorTree.pkg.PackagedByFacilityLicenseNumber }}</div>
+            <div>Recieved from {{ ancestorTree.pkg.ReceivedFromFacilityLicenseNumber }}</div>
           </div>
         </template>
       </b-card>
@@ -89,7 +91,9 @@
           </div>
           <div class="font-bold">{{ childTree.label }}</div>
         </div>
-        <template v-if="isOrigin">
+        <!-- <template v-if="isOrigin"> -->
+        <!-- </template> -->
+        <template v-if="childTree.type === HistoryTreeNodeType.OWNED_PACKAGE">
           <hr />
           <div
             class="p-2 flex flex-row items-center justify-start space-x-4 text-sm whitespace-nowrap"
@@ -108,10 +112,14 @@
               :label="childTree.pkg.Label"
             />
           </div>
-        </template>
-        <template v-if="childTree.type === HistoryTreeNodeType.OWNED_PACKAGE">
           <hr />
           <div class="p-2">
+            <template v-if="childTree.pkg.ProductionBatchNumber">
+              <div>
+                {{ childTree.pkg.ProductionBatchNumber }}
+              </div>
+              <hr class="py-1" />
+            </template>
             <div v-if="childTree.pkg.PackagedByFacilityLicenseNumber">
               Packaged by {{ childTree.pkg.PackagedByFacilityLicenseNumber }}
             </div>

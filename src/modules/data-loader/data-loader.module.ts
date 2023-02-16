@@ -588,10 +588,10 @@ export class DataLoader implements IAtomicService {
 
     const body = JSON.stringify({
       request: {
-        take: 500,
+        take: DATA_LOAD_PAGE_SIZE,
         skip: 0,
         page: 1,
-        pageSize: 500,
+        pageSize: DATA_LOAD_PAGE_SIZE,
         filter: {
           logic: "and",
           filters,
@@ -621,10 +621,10 @@ export class DataLoader implements IAtomicService {
   onDemandPlantSearchBody({ queryString }: { queryString: string }): string {
     return JSON.stringify({
       request: {
-        take: 500,
+        take: DATA_LOAD_PAGE_SIZE,
         skip: 0,
         page: 1,
-        pageSize: 500,
+        pageSize: DATA_LOAD_PAGE_SIZE,
         filter: {
           logic: "or",
           filters: [
@@ -751,10 +751,10 @@ export class DataLoader implements IAtomicService {
 
     const body = JSON.stringify({
       request: {
-        take: 500,
+        take: DATA_LOAD_PAGE_SIZE,
         skip: 0,
         page: 1,
-        pageSize: 500,
+        pageSize: DATA_LOAD_PAGE_SIZE,
         filter: {
           logic: "or",
           filters: [
@@ -789,10 +789,10 @@ export class DataLoader implements IAtomicService {
   onDemandPackageSearchBody({ queryString }: { queryString: string }): string {
     return JSON.stringify({
       request: {
-        take: 500,
+        take: DATA_LOAD_PAGE_SIZE,
         skip: 0,
         page: 1,
-        pageSize: 500,
+        pageSize: DATA_LOAD_PAGE_SIZE,
         filter: {
           logic: "or",
           filters: [

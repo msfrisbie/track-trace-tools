@@ -279,9 +279,9 @@ export const packageHistoryModule = {
     ) => {
       analyticsManager.track(MessageType.GENERATE_PACKAGE_HISTORY, { pkg });
 
-      if (!clientBuildManager.assertValues(["ENABLE_PACKAGE_HISTORY"])) {
-        return;
-      }
+      // if (!clientBuildManager.assertValues(["ENABLE_PACKAGE_HISTORY"])) {
+      //   return;
+      // }
 
       ctx.commit(PackageHistoryMutations.SET_SOURCE_PACKAGE, { pkg });
 
