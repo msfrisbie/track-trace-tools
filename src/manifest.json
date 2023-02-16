@@ -48,11 +48,6 @@
   "content_security_policy": {
     "extension_pages": "default-src 'self'; style-src 'self' 'unsafe-inline'; connect-src *"
   },
-  "browser_specific_settings": {
-    "gecko": {
-      "id": "tracktracetools@gmail.com"
-    }
-  },
   "oauth2": {
     "client_id": "555065854761-ssc4dm7apif1e1ac4app1tru9h3graef.apps.googleusercontent.com",
     "scopes": [
