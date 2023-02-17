@@ -5,7 +5,7 @@
     modal-class="ttt-modal"
     content-class="ttt-content"
     dialog-class="ttt-dialog"
-    body-class="builder-body toolkit-scroll flex flex-column-shim flex-col items-center p-0"
+    body-class="document-body toolkit-scroll flex flex-column-shim flex-col items-center p-0"
     size="xl"
     :static="true"
     no-fade
@@ -193,6 +193,13 @@ export default Vue.extend({
 </script>
 
 <style type="text/scss" lang="scss">
+.document-body {
+  // If min-height is set, scroll doesn't work
+  max-height: none !important;
+  height: calc(90vh - 200px);
+  overflow-y: auto;
+}
+
 .doc-container {
   height: 80vh;
 }

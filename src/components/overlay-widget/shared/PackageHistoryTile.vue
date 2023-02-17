@@ -4,6 +4,7 @@
       <template v-if="depth < maxParentVisibleDepth">
         <div class="flex flex-row no-wrap gap-1">
           <package-history-tile
+            class="justify-end"
             v-for="subtree of filteredAncestors"
             v-bind:key="subtree.label"
             :ancestorTree="subtree"
@@ -24,6 +25,7 @@
     </template>
 
     <package-history-card
+      :id="isOrigin ? 'tree-origin' : ''"
       :node="childTree || ancestorTree"
       :isOrigin="isOrigin"
     ></package-history-card>
@@ -42,6 +44,7 @@
         </div>
         <div class="flex flex-row no-wrap gap-1">
           <package-history-tile
+            class="justify-start"
             v-for="subtree of filteredChildren"
             v-bind:key="subtree.label"
             :childTree="subtree"
@@ -68,10 +71,6 @@ export default Vue.extend({
   store,
   router,
   props: {
-    renderRootNode: {
-      type: Boolean,
-      default: true,
-    },
     depth: Number,
     isOrigin: {
       type: Boolean,
@@ -92,9 +91,6 @@ export default Vue.extend({
   },
   computed: {
     ...mapState([]),
-    renderNode() {
-      return !this.isOrigin || this.renderRootNode;
-    },
     filteredAncestors() {
       if (this.$store.state.packageHistory.showUnownedPackages) {
         return this.ancestorTree.ancestors;

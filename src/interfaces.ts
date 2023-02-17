@@ -1477,6 +1477,7 @@ export interface IStrippedIndexedPackage {
 
 export interface IHistoryTreeNode {
   type: HistoryTreeNodeType;
+  relationship: "PARENT" | "CHILD",
   label: string;
   pkg: IStrippedIndexedPackage;
 }

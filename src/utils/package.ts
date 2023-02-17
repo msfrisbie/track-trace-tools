@@ -255,6 +255,7 @@ export async function getParentPackageHistoryTreeImpl({
     });
     const node: IPackageAncestorTreeNode = {
       type: HistoryTreeNodeType.UNOWNED_PACKAGE,
+      relationship: "PARENT",
       label,
       pkg: { Label: "STUB_PACKAGE" } as IStrippedIndexedPackage,
       ancestors: [],
@@ -311,6 +312,7 @@ export async function getParentPackageHistoryTreeImpl({
 
   const node: IPackageAncestorTreeNode = {
     type: HistoryTreeNodeType.OWNED_PACKAGE,
+    relationship: "PARENT",
     label,
     pkg: stripPackage(pkg),
     // history,
@@ -436,6 +438,7 @@ export async function getChildPackageHistoryTreeImpl({
     });
     const node: IPackageChildTreeNode = {
       type: HistoryTreeNodeType.UNOWNED_PACKAGE,
+      relationship: "CHILD",
       label,
       pkg: { Label: "STUB_PACKAGE" } as IStrippedIndexedPackage,
       children: [],
@@ -492,6 +495,7 @@ export async function getChildPackageHistoryTreeImpl({
 
   const node: IPackageChildTreeNode = {
     type: HistoryTreeNodeType.OWNED_PACKAGE,
+    relationship: "CHILD",
     label,
     pkg: stripPackage(pkg),
     children,
