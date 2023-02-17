@@ -12,24 +12,41 @@
       </template>
 
       <template v-else>
-        <b-card no-body class="mb-24">
-          <b-tabs card pills align="center" content-class="" nav-wrapper-class="">
-            <b-tab no-body title="Tree" active>
-              <!-- <b-tabs
-                pills
-                align="center"
-                vertical
-                content-class="p-2"
-                nav-wrapper-class="bg-purple-100 py-2"
-                class="m-0"
-              >
-                <b-tab no-body title="Tree" active> -->
-              <template v-if="ancestorTree">
-                <b-dropdown
-                  class="pb-2"
-                  toggle-class="flex flex-row items-center gap-2"
-                  variant="outline-primary"
+        <div class="sticky bg-white py-2" style="top: -1.5rem; margin-top: -1.5rem; z-index: 1">
+          <div class="flex flex-col items-stretch gap-2">
+            <div class="flex flex-row justify-between">
+              <div class="flex flex-row items-center gap-2">
+                <b-button
+                  v-for="view of views"
+                  v-bind:key="view"
+                  :variant="activeView === view ? 'primary' : 'outline-primary'"
+                  size="sm"
+                  @click="activeView = view"
+                  >{{ view }}</b-button
                 >
+              </div>
+
+              <div>
+                <template v-if="status === PackageHistoryStatus.INFLIGHT">
+                  <b-button @click="halt({})" variant="outline-danger" size="sm"> STOP </b-button>
+                </template>
+
+                <template
+                  v-if="
+                    status === PackageHistoryStatus.SUCCESS ||
+                    status === PackageHistoryStatus.ERROR ||
+                    status === PackageHistoryStatus.HALTED
+                  "
+                >
+                  <b-button @click="setPackage({ pkg: null })" variant="outline-danger" size="sm">
+                    RESET
+                  </b-button>
+                </template>
+              </div>
+            </div>
+            <template v-if="activeView === 'Tree'">
+              <div class="flex flex-row items-center gap-2">
+                <b-dropdown toggle-class="flex flex-row items-center gap-2" variant="outline-dark">
                   <template #button-content>
                     <font-awesome-icon icon="sliders-h"></font-awesome-icon>
                   </template>
@@ -56,297 +73,159 @@
                     <b-checkbox v-model="showUnownedPackages">Show unowned packages</b-checkbox>
                   </b-form-group>
                 </b-dropdown>
-                <div class="flex flex-col items-start overflow-auto toolkit-scroll pb-4">
-                  <package-history-tile
-                    :ancestorTree="ancestorTree"
-                    :childTree="childTree"
-                    :depth="0"
-                    :isOrigin="true"
-                    style="transform-origin: 0% 0% 0px"
-                    v-bind:style="{
-                      transform: `scale(${parentZoom})`,
-                    }"
-                  ></package-history-tile>
-                </div>
-              </template>
-              <template v-else>
-                <template v-if="status == PackageHistoryStatus.INFLIGHT">
-                  <div class="text-center">History generation in progress...</div>
-                </template>
-                <template v-else>
-                  <div class="text-center">Generate package history to see results here</div>
-                </template>
-              </template>
-              <!-- </b-tab>
-                <b-tab no-body title="List">
-                  <template v-if="ancestorList && ancestorList.length">
-                    <div class="p-8">
-                      <b-button
-                        variant="outline-primary"
-                        @click="
-                          downloadListCsv(ancestorList, `${sourcePackage.Label}_parent_list.csv`)
-                        "
-                        >DOWNLOAD CSV</b-button
-                      >
-                    </div>
-                    <div class="flex flex-col items-start overflow-auto toolkit-scroll pb-4">
-                      <b-table
-                        striped
-                        hover
-                        :items="ancestorList"
-                        :fields="[
-                          'label',
-                          'pkg.LicenseNumber',
-                          'pkg.PackageState',
-                          'pkg.ItemName',
-                          'pkg.Quantity',
-                          'pkg.UnitOfMeasureAbbreviation',
-                        ]"
-                      ></b-table>
-                    </div>
-                  </template>
-                  <template v-else>
-                    <template v-if="status == PackageHistoryStatus.INFLIGHT">
-                      <div class="text-center">History generation in progress...</div>
-                    </template>
-                    <template v-else>
-                      <div class="text-center">Generate package history to see results here</div>
-                    </template>
-                  </template>
-                </b-tab>
-              </b-tabs> -->
-            </b-tab>
-            <b-tab no-body title="List">
-              <template v-if="mergedList && mergedList.length">
-                <div class="p-8">
-                  <b-button
-                    variant="outline-primary"
-                    @click="downloadListCsv(mergedList, `${sourcePackage.Label}_history_list.csv`)"
-                    >DOWNLOAD CSV</b-button
-                  >
-                </div>
-                <div class="flex flex-col items-start overflow-auto toolkit-scroll pb-4">
-                  <b-table
-                    striped
-                    hover
-                    :items="mergedList"
-                    :fields="[
-                      'label',
-                      'relationship',
-                      'pkg.LicenseNumber',
-                      'pkg.PackageState',
-                      'pkg.ItemName',
-                      'pkg.Quantity',
-                      'pkg.UnitOfMeasureAbbreviation',
-                    ]"
-                  ></b-table>
-                </div>
-              </template>
-              <template v-else>
-                <template v-if="status == PackageHistoryStatus.INFLIGHT">
-                  <div class="text-center">History generation in progress...</div>
-                </template>
-                <template v-else>
-                  <div class="text-center">Generate package history to see results here</div>
-                </template>
-              </template>
-            </b-tab>
-            <!-- <b-tab no-body title="Child Packages">
-              <b-tabs
-                pills
-                vertical
-                align="center"
-                content-class="p-2"
-                nav-wrapper-class="bg-purple-100 py-2"
-                class="m-0"
-              >
-                <b-tab no-body title="Tree">
-                  <template v-if="childTree">
-                    <b-dropdown
-                      class="pb-2"
-                      toggle-class="flex flex-row items-center gap-2"
-                      variant="outline-primary"
-                    >
-                      <template #button-content>
-                        <font-awesome-icon icon="sliders-h"></font-awesome-icon>
-                      </template>
-                      <b-dropdown-text>
-                        <b-form-group label="Visible generations" class="w-36">
-                          <vue-slider
-                            v-model="maxChildVisibleDepth"
-                            :min="0"
-                            :max="20"
-                            :interval="1"
-                          ></vue-slider>
-                        </b-form-group>
-                      </b-dropdown-text>
-                      <b-dropdown-text>
-                        <b-form-group label="Tree zoom" class="w-36">
-                          <vue-slider
-                            v-model="childZoom"
-                            :min="0.1"
-                            :max="1"
-                            :interval="0.05"
-                          ></vue-slider> </b-form-group
-                      ></b-dropdown-text>
-                      <b-form-group class="px-6">
-                        <b-checkbox v-model="showUnownedPackages">Show unowned packages</b-checkbox>
-                      </b-form-group>
-                    </b-dropdown>
+              </div>
+            </template>
+          </div>
+        </div>
 
-                    <div class="flex flex-col items-start overflow-auto toolkit-scroll pb-4">
-                      <package-history-tile
-                        :childTree="childTree"
-                        :depth="0"
-                        :isOrigin="true"
-                        style="transform-origin: 0% 0% 0px"
-                        v-bind:style="{
-                          transform: `scale(${childZoom})`,
-                        }"
-                      ></package-history-tile>
-                    </div>
-                  </template>
-                  <template v-else>
-                    <template v-if="status == PackageHistoryStatus.INFLIGHT">
-                      <div class="text-center">History generation in progress...</div>
-                    </template>
-                    <template v-else>
-                      <div class="text-center">Generate package history to see results here</div>
-                    </template>
-                  </template>
-                </b-tab>
-                <b-tab no-body title="List">
-                  <template v-if="childList && childList.length">
-                    <div class="p-8">
-                      <b-button
-                        variant="outline-primary"
-                        @click="
-                          downloadListCsv(childList, `${sourcePackage.Label}_children_list.csv`)
-                        "
-                        >DOWNLOAD CSV</b-button
-                      >
-                    </div>
-                    <div class="flex flex-col items-start overflow-auto toolkit-scroll pb-4">
-                      <b-table
-                        striped
-                        hover
-                        :items="childList"
-                        :fields="[
-                          'label',
-                          'pkg.LicenseNumber',
-                          'pkg.PackageState',
-                          'pkg.ItemName',
-                          'pkg.Quantity',
-                          'pkg.UnitOfMeasureAbbreviation',
-                        ]"
-                      ></b-table>
-                    </div>
-                  </template>
-                  <template v-else>
-                    <template v-if="status == PackageHistoryStatus.INFLIGHT">
-                      <div class="text-center">History generation in progress...</div>
-                    </template>
-                    <template v-else>
-                      <div class="text-center">Generate package history to see results here</div>
-                    </template>
-                  </template>
-                </b-tab>
-              </b-tabs>
-            </b-tab> -->
-            <b-tab no-body title="Source Harvests">
-              <template v-if="sourceHarvests && sourceHarvests.length">
-                <div class="flex flex-col items-stretch overflow-auto toolkit-scroll pb-4">
-                  <b-table
-                    striped
-                    hover
-                    :items="sourceHarvests"
-                    :fields="[
-                      'Name',
-                      'HarvestTypeName',
-                      'HarvestedByFacilityLicenseNumber',
-                      'HarvestStartDate',
-                    ]"
-                  ></b-table>
-                </div>
-              </template>
-              <template v-else>
-                <div class="text-center">No source harvests available</div>
-              </template>
-            </b-tab>
-            <b-tab no-body :title="`Log (${log.length})`">
-              <template v-if="log && log.length"
-                ><div class="flex flex-col items-stretch gap-2">
-                  <b-table
-                    striped
-                    hover
-                    :items="log.map((log) => ({ log }))"
-                    :fields="['log']"
-                  ></b-table></div
-              ></template>
-              <template v-else>
-                <div class="text-center">No log entries</div>
-              </template>
-            </b-tab>
-            <b-tab no-body :title="`Help`"
-              ><div class="flex flex-col items-stretch gap-2 p-4">
-                <div class="ttt-purple text-lg mt-2">What is this tool?</div>
-                <div>
-                  For any source package, this tool will progressively search Metrc across multiple
-                  licenses to find all the parent packages and all the child packages.
-                </div>
-                <div class="ttt-purple text-lg mt-2">Why does the history stop?</div>
-                <div>
-                  The tool can only search packages accessible by this Metrc login. If this login
-                  doesn't have access to a license, packages in that license will not be added.
-                </div>
-                <div class="ttt-purple text-lg mt-2">Why do some packages only show a tag?</div>
-                <div>
-                  Metrc package history may include package tags that are not visible to any of your
-                  licenses. These tags are shown here for convenience.
-                </div>
-                <div class="ttt-purple text-lg mt-2">Why is the tool slow for some packages?</div>
-                <div>
-                  Some package histories require thousands of lookups, these will take longer to
-                  complete.
-                </div>
-                <div class="ttt-purple text-lg mt-2">How can I speed up the results?</div>
-                <div>
-                  Use the <span class="font-bold">Generation limit</span> field for faster results.
-                </div>
-                <div>
-                  For example, a generation limit of 2 will only search 2 generations for parents
-                  and children. In a family tree, this would be equivalent to only searching your
-                  parents, grandparents, children, and grandchildren.
-                </div>
-                <div class="ttt-purple text-lg mt-2">What are the Parent and Child tabs?</div>
-                <div>
-                  The <span class="font-bold">Tree view</span> shows the tree of all packages that
-                  are in this package's ancestor and child lineage.
-                </div>
-                <div>
-                  The <span class="font-bold">Child Packages view</span> shows all the packages that
-                  were produced from the source package.
-                </div>
-                <div class="ttt-purple text-lg mt-2">
-                  What are the three tabs inside Parent and Child?
-                </div>
-                <div>
-                  The <span class="font-bold">Tree view</span> shows the "family tree" for that
-                  package. Parent/child packages may appear in multiple places.
-                </div>
-                <!-- <div>
+        <template v-if="activeView === 'Tree'">
+          <template v-if="ancestorTree">
+            <div class="flex flex-col items-start overflow-auto toolkit-scroll pb-4">
+              <package-history-tile
+                :ancestorTree="ancestorTree"
+                :childTree="childTree"
+                :depth="0"
+                :isOrigin="true"
+                style="transform-origin: 0% 0% 0px"
+                v-bind:style="{
+                  transform: `scale(${parentZoom})`,
+                }"
+              ></package-history-tile>
+            </div>
+          </template>
+          <template v-else>
+            <template v-if="status == PackageHistoryStatus.INFLIGHT">
+              <div class="text-center">History generation in progress...</div>
+            </template>
+            <template v-else>
+              <div class="text-center">Generate package history to see results here</div>
+            </template>
+          </template>
+        </template>
+        <template v-if="activeView === 'List'">
+          <template v-if="mergedList && mergedList.length">
+            <div class="p-8">
+              <b-button
+                variant="outline-primary"
+                @click="downloadListCsv(mergedList, `${sourcePackage.Label}_history_list.csv`)"
+                >DOWNLOAD CSV</b-button
+              >
+            </div>
+            <div class="flex flex-col items-start overflow-auto toolkit-scroll pb-4">
+              <b-table
+                striped
+                hover
+                :items="mergedList"
+                :fields="[
+                  'label',
+                  'relationship',
+                  'pkg.LicenseNumber',
+                  'pkg.PackageState',
+                  'pkg.ItemName',
+                  'pkg.Quantity',
+                  'pkg.UnitOfMeasureAbbreviation',
+                ]"
+              ></b-table>
+            </div>
+          </template>
+          <template v-else>
+            <template v-if="status == PackageHistoryStatus.INFLIGHT">
+              <div class="text-center">History generation in progress...</div>
+            </template>
+            <template v-else>
+              <div class="text-center">Generate package history to see results here</div>
+            </template>
+          </template>
+        </template>
+        <template v-if="activeView === 'Source Harvests'">
+          <template v-if="sourceHarvests && sourceHarvests.length">
+            <div class="flex flex-col items-stretch overflow-auto toolkit-scroll pb-4">
+              <b-table
+                striped
+                hover
+                :items="sourceHarvests"
+                :fields="[
+                  'Name',
+                  'HarvestTypeName',
+                  'HarvestedByFacilityLicenseNumber',
+                  'HarvestStartDate',
+                ]"
+              ></b-table>
+            </div>
+          </template>
+          <template v-else>
+            <div class="text-center">No source harvests available</div>
+          </template>
+        </template>
+        <template v-if="activeView === 'Log'">
+          <template v-if="log && log.length"
+            ><div class="flex flex-col items-stretch gap-2">
+              <b-table
+                striped
+                hover
+                :items="log.map((log) => ({ log }))"
+                :fields="['log']"
+              ></b-table></div
+          ></template>
+          <template v-else>
+            <div class="text-center">No log entries</div>
+          </template>
+        </template>
+
+        <template v-if="activeView === 'Help'">
+          <div class="flex flex-col items-stretch gap-2 p-4">
+            <div class="ttt-purple text-lg mt-2">What is this tool?</div>
+            <div>
+              For any source package, this tool will progressively search Metrc across multiple
+              licenses to find all the parent packages and all the child packages.
+            </div>
+            <div class="ttt-purple text-lg mt-2">Why does the history stop?</div>
+            <div>
+              The tool can only search packages accessible by this Metrc login. If this login
+              doesn't have access to a license, packages in that license will not be added.
+            </div>
+            <div class="ttt-purple text-lg mt-2">Why do some packages only show a tag?</div>
+            <div>
+              Metrc package history may include package tags that are not visible to any of your
+              licenses. These tags are shown here for convenience.
+            </div>
+            <div class="ttt-purple text-lg mt-2">Why is the tool slow for some packages?</div>
+            <div>
+              Some package histories require thousands of lookups, these will take longer to
+              complete.
+            </div>
+            <div class="ttt-purple text-lg mt-2">How can I speed up the results?</div>
+            <div>
+              Use the <span class="font-bold">Generation limit</span> field for faster results.
+            </div>
+            <div>
+              For example, a generation limit of 2 will only search 2 generations for parents and
+              children. In a family tree, this would be equivalent to only searching your parents,
+              grandparents, children, and grandchildren.
+            </div>
+            <div class="ttt-purple text-lg mt-2">What are the Parent and Child tabs?</div>
+            <div>
+              The <span class="font-bold">Tree view</span> shows the tree of all packages that are
+              in this package's ancestor and child lineage.
+            </div>
+            <!-- <div class="ttt-purple text-lg mt-2">
+              What are the three tabs inside Parent and Child?
+            </div> -->
+            <!-- <div>
+              The <span class="font-bold">Tree view</span> shows the "family tree" for that package.
+              Parent/child packages may appear in multiple places.
+            </div> -->
+            <!-- <div>
                   The <span class="font-bold">Generation view</span> bundles packages based on how
                   many "generations" they are separated from the source package. Parent/child
                   packages may appear in multiple places.
                 </div> -->
-                <div>
-                  The <span class="font-bold">List view</span> combines the entire history tree into
-                  a single list. Parent/child packages will only appear once.
-                </div>
-              </div>
-            </b-tab>
-          </b-tabs>
-        </b-card>
+            <!-- <div>
+              The <span class="font-bold">List view</span> combines the entire history tree into a
+              single list. Parent/child packages will only appear once.
+            </div> -->
+          </div>
+        </template>
 
         <div class="sticky bg-white py-2" style="bottom: -1.5rem">
           <div class="flex flex-col gap-4 items-center">
@@ -381,7 +260,6 @@
               </template>
               <div class="flex flex-row justify-center items-center gap-8 w-60">
                 <template v-if="status === PackageHistoryStatus.INFLIGHT">
-                  <b-button @click="halt({})" variant="outline-danger"> STOP </b-button>
                   <div class="flex flex-row items-center gap-2">
                     <b-form-input
                       class="w-48"
@@ -390,6 +268,7 @@
                       type="number"
                       step="1"
                       min="0"
+                      size="sm"
                     ></b-form-input>
                     <b-form-input
                       class="w-48"
@@ -398,6 +277,7 @@
                       type="number"
                       step="1"
                       min="0"
+                      size="sm"
                     ></b-form-input>
 
                     <b-badge
@@ -414,18 +294,6 @@
                       >Something went wrong while generating the history. See log for detail.</span
                     >
                   </div>
-                </template>
-
-                <template
-                  v-if="
-                    status === PackageHistoryStatus.SUCCESS ||
-                    status === PackageHistoryStatus.ERROR ||
-                    status === PackageHistoryStatus.HALTED
-                  "
-                >
-                  <b-button @click="setPackage({ pkg: null })" variant="outline-danger">
-                    RESET
-                  </b-button>
                 </template>
               </div>
             </template>
@@ -596,6 +464,8 @@ export default Vue.extend({
     return {
       PackageHistoryStatus,
       demoImageUrl: "",
+      activeView: "Tree",
+      views: ["Tree", "List", "Source Harvests", "Log", "Help"],
     };
   },
   methods: {
