@@ -57,30 +57,30 @@
                       </b-form-group>
                     </b-dropdown>
                     <div class="flex flex-col items-start overflow-auto toolkit-scroll pb-4">
+                      <!-- <div class="w-full flex flex-col items-center"> -->
                       <package-history-tile
                         :ancestorTree="ancestorTree"
                         :depth="0"
-                        :maxDepth="maxParentVisibleDepth"
                         :isOrigin="true"
                         style="transform-origin: 0% 0% 0px"
                         v-bind:style="{
                           transform: `scale(${parentZoom})`,
                         }"
                       ></package-history-tile>
+                      <!-- </div>
 
                       <div class="w-full flex flex-col items-center">
                         <package-history-tile
                           :childTree="childTree"
                           :renderRootNode="false"
                           :depth="0"
-                          :maxDepth="maxChildVisibleDepth"
                           :isOrigin="true"
                           style="transform-origin: 0% 0% 0px"
                           v-bind:style="{
                             transform: `scale(${childZoom})`,
                           }"
                         ></package-history-tile>
-                      </div>
+                      </div> -->
                     </div>
                   </template>
                   <template v-else>
@@ -92,7 +92,7 @@
                     </template>
                   </template>
                 </b-tab>
-                <b-tab no-body title="Generations">
+                <!-- <b-tab no-body title="Generations">
                   <template v-if="ancestorGenerations && ancestorGenerations.length">
                     <div class="p-8">
                       <b-button
@@ -119,9 +119,8 @@
                           <package-history-tile
                             v-for="node of generation"
                             v-bind:key="node.label"
-                            :ancestorTree="node"
+                            :ancestorTree="orphan(node)"
                             :depth="0"
-                            :maxDepth="0"
                             :isOrigin="node.label === sourcePackage.Label"
                             v-bind:class="{ 'col-span-2': node.label === sourcePackage.Label }"
                           ></package-history-tile>
@@ -137,7 +136,7 @@
                       <div class="text-center">Generate package history to see results here</div>
                     </template>
                   </template>
-                </b-tab>
+                </b-tab> -->
                 <b-tab no-body title="List">
                   <template v-if="ancestorList && ancestorList.length">
                     <div class="p-8">
@@ -223,7 +222,6 @@
                       <package-history-tile
                         :childTree="childTree"
                         :depth="0"
-                        :maxDepth="maxChildVisibleDepth"
                         :isOrigin="true"
                         style="transform-origin: 0% 0% 0px"
                         v-bind:style="{
@@ -241,7 +239,7 @@
                     </template>
                   </template>
                 </b-tab>
-                <b-tab no-body title="Generations">
+                <!-- <b-tab no-body title="Generations">
                   <template v-if="childGenerations && childGenerations.length">
                     <div class="p-8">
                       <b-button
@@ -268,9 +266,8 @@
                           <package-history-tile
                             v-for="node of generation"
                             v-bind:key="node.label"
-                            :childTree="node"
+                            :childTree="orphan(node)"
                             :depth="0"
-                            :maxDepth="0"
                             :isOrigin="node.label === sourcePackage.Label"
                             v-bind:class="{ 'col-span-2': node.label === sourcePackage.Label }"
                           ></package-history-tile>
@@ -286,7 +283,7 @@
                       <div class="text-center">Generate package history to see results here</div>
                     </template>
                   </template>
-                </b-tab>
+                </b-tab> -->
                 <b-tab no-body title="List">
                   <template v-if="childList && childList.length">
                     <div class="p-8">
@@ -406,11 +403,11 @@
                   The <span class="font-bold">Tree view</span> shows the "family tree" for that
                   package. Parent/child packages may appear in multiple places.
                 </div>
-                <div>
+                <!-- <div>
                   The <span class="font-bold">Generation view</span> bundles packages based on how
                   many "generations" they are separated from the source package. Parent/child
                   packages may appear in multiple places.
-                </div>
+                </div> -->
                 <div>
                   The <span class="font-bold">List view</span> combines the entire history tree into
                   a single list. Parent/child packages will only appear once.
@@ -713,6 +710,13 @@ export default Vue.extend({
     validClient(): boolean {
       return true;
       // return clientBuildManager.assertValues(["ENABLE_PACKAGE_HISTORY"]);
+    },
+    orphan(node: IHistoryTreeNode) {
+      return {
+        ...node,
+        parents: [],
+        children: [],
+      };
     },
   },
   async created() {},

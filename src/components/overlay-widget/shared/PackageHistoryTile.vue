@@ -1,14 +1,13 @@
 <template>
   <div class="flex flex-col items-center">
     <template v-if="ancestorTree">
-      <template v-if="depth < maxDepth">
+      <template v-if="depth < maxParentVisibleDepth">
         <div class="flex flex-row no-wrap gap-1">
           <package-history-tile
             v-for="subtree of filteredAncestors"
             v-bind:key="subtree.label"
             :ancestorTree="subtree"
             :depth="depth + 1"
-            :maxDepth="maxDepth"
           ></package-history-tile>
         </div>
         <div
@@ -126,7 +125,7 @@
         </template>
       </b-card>
 
-      <template v-if="depth < maxDepth">
+      <template v-if="depth < maxChildVisibleDepth">
         <div
           v-if="filteredChildren.length > 0"
           class="w-full flex flex-row justify-center"
@@ -143,7 +142,6 @@
             v-bind:key="subtree.label"
             :childTree="subtree"
             :depth="depth + 1"
-            :maxDepth="maxDepth"
           ></package-history-tile>
         </div>
       </template>
@@ -172,7 +170,6 @@ export default Vue.extend({
       default: true,
     },
     depth: Number,
-    maxDepth: { type: Number, required: false, default: 20 },
     isOrigin: {
       type: Boolean,
       required: false,
@@ -213,6 +210,16 @@ export default Vue.extend({
           (node) => node.type === HistoryTreeNodeType.OWNED_PACKAGE
         );
       }
+    },
+    maxParentVisibleDepth: {
+      get(): number {
+        return this.$store.state.packageHistory.maxParentVisibleDepth;
+      },
+    },
+    maxChildVisibleDepth: {
+      get(): number | null {
+        return this.$store.state.packageHistory.maxChildVisibleDepth;
+      },
     },
   },
   data() {
