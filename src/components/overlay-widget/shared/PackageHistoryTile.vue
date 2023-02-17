@@ -21,110 +21,14 @@
           <div style="border-right: 1px solid black" class="h-6"></div>
         </div>
       </template>
-      <b-card no-body v-if="renderNode">
-        <div
-          class="flex flex-col items-stretch gap-1 p-2"
-          v-bind:class="{ 'bg-gray-200': !isOrigin, 'bg-purple-100': isOrigin }"
-        >
-          <div class="flex flex-row items-center justify-between gap-2">
-            <span>
-              <div>{{ ancestorTree.pkg.LicenseNumber }}</div>
-            </span>
-
-            <b-badge :variant="getBadgeVariant(ancestorTree.pkg.PackageState)">{{
-              ancestorTree.pkg.PackageState
-            }}</b-badge>
-          </div>
-          <div class="font-bold">{{ ancestorTree.label }}</div>
-        </div>
-        <template v-if="ancestorTree.type === HistoryTreeNodeType.OWNED_PACKAGE">
-          <hr />
-          <div
-            class="p-2 flex flex-row items-center justify-start space-x-4 text-sm whitespace-nowrap"
-          >
-            <picker-icon
-              icon="box"
-              style="width: 5rem"
-              class="flex-shrink-0"
-              :textClass="ancestorTree.pkg.Quantity === 0 ? 'text-red-500' : ''"
-              :text="`${ancestorTree.pkg.Quantity} ${ancestorTree.pkg.UnitOfMeasureAbbreviation}`"
-            />
-
-            <picker-card
-              class="flex-grow"
-              :title="`${ancestorTree.pkg.ItemName}`"
-              :label="ancestorTree.pkg.Label"
-            />
-          </div>
-          <hr />
-          <div class="p-2">
-            <template v-if="ancestorTree.pkg.ProductionBatchNumber">
-              <div>
-                {{ ancestorTree.pkg.ProductionBatchNumber }}
-              </div>
-              <hr class="py-1" />
-            </template>
-            <div>Packaged by {{ ancestorTree.pkg.PackagedByFacilityLicenseNumber }}</div>
-            <div>Recieved from {{ ancestorTree.pkg.ReceivedFromFacilityLicenseNumber }}</div>
-          </div>
-        </template>
-      </b-card>
     </template>
 
+    <package-history-card
+      :node="childTree || ancestorTree"
+      :isOrigin="isOrigin"
+    ></package-history-card>
+
     <template v-if="childTree">
-      <b-card no-body v-if="renderNode">
-        <div
-          class="flex flex-col items-stretch gap-1 p-2"
-          v-bind:class="{ 'bg-gray-200': !isOrigin, 'bg-purple-100': isOrigin }"
-        >
-          <div class="flex flex-row items-center justify-between gap-2">
-            <span>
-              <div>{{ childTree.pkg.LicenseNumber }}</div>
-            </span>
-
-            <b-badge :variant="getBadgeVariant(childTree.pkg.PackageState)">{{
-              childTree.pkg.PackageState
-            }}</b-badge>
-          </div>
-          <div class="font-bold">{{ childTree.label }}</div>
-        </div>
-        <template v-if="childTree.type === HistoryTreeNodeType.OWNED_PACKAGE">
-          <hr />
-          <div
-            class="p-2 flex flex-row items-center justify-start space-x-4 text-sm whitespace-nowrap"
-          >
-            <picker-icon
-              icon="box"
-              style="width: 5rem"
-              class="flex-shrink-0"
-              :textClass="childTree.pkg.Quantity === 0 ? 'text-red-500' : ''"
-              :text="`${childTree.pkg.Quantity} ${childTree.pkg.UnitOfMeasureAbbreviation}`"
-            />
-
-            <picker-card
-              class="flex-grow"
-              :title="`${childTree.pkg.ItemName}`"
-              :label="childTree.pkg.Label"
-            />
-          </div>
-          <hr />
-          <div class="p-2">
-            <template v-if="childTree.pkg.ProductionBatchNumber">
-              <div>
-                {{ childTree.pkg.ProductionBatchNumber }}
-              </div>
-              <hr class="py-1" />
-            </template>
-            <div v-if="childTree.pkg.PackagedByFacilityLicenseNumber">
-              Packaged by {{ childTree.pkg.PackagedByFacilityLicenseNumber }}
-            </div>
-            <div v-if="childTree.pkg.ReceivedFromFacilityLicenseNumber">
-              Recieved from {{ childTree.pkg.ReceivedFromFacilityLicenseNumber }}
-            </div>
-          </div>
-        </template>
-      </b-card>
-
       <template v-if="depth < maxChildVisibleDepth">
         <div
           v-if="filteredChildren.length > 0"
@@ -150,8 +54,7 @@
 </template>
 
 <script lang="ts">
-import PickerCard from "@/components/overlay-widget/shared/PickerCard.vue";
-import PickerIcon from "@/components/overlay-widget/shared/PickerIcon.vue";
+import PackageHistoryCard from "@/components/overlay-widget/shared/PackageHistoryCard.vue";
 import { HistoryTreeNodeType, PackageState } from "@/consts";
 import { IPackageAncestorTreeNode, IPackageChildTreeNode } from "@/interfaces";
 import router from "@/router/index";
@@ -185,8 +88,7 @@ export default Vue.extend({
     },
   },
   components: {
-    PickerCard,
-    PickerIcon,
+    PackageHistoryCard,
   },
   computed: {
     ...mapState([]),

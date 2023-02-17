@@ -57,9 +57,9 @@
                       </b-form-group>
                     </b-dropdown>
                     <div class="flex flex-col items-start overflow-auto toolkit-scroll pb-4">
-                      <!-- <div class="w-full flex flex-col items-center"> -->
                       <package-history-tile
                         :ancestorTree="ancestorTree"
+                        :childTree="childTree"
                         :depth="0"
                         :isOrigin="true"
                         style="transform-origin: 0% 0% 0px"
@@ -67,20 +67,6 @@
                           transform: `scale(${parentZoom})`,
                         }"
                       ></package-history-tile>
-                      <!-- </div>
-
-                      <div class="w-full flex flex-col items-center">
-                        <package-history-tile
-                          :childTree="childTree"
-                          :renderRootNode="false"
-                          :depth="0"
-                          :isOrigin="true"
-                          style="transform-origin: 0% 0% 0px"
-                          v-bind:style="{
-                            transform: `scale(${childZoom})`,
-                          }"
-                        ></package-history-tile>
-                      </div> -->
                     </div>
                   </template>
                   <template v-else>
@@ -92,51 +78,6 @@
                     </template>
                   </template>
                 </b-tab>
-                <!-- <b-tab no-body title="Generations">
-                  <template v-if="ancestorGenerations && ancestorGenerations.length">
-                    <div class="p-8">
-                      <b-button
-                        variant="outline-primary"
-                        @click="
-                          downloadGenerationCsv(
-                            ancestorGenerations,
-                            `${sourcePackage.Label}_parent_generations.csv`
-                          )
-                        "
-                        >DOWNLOAD CSV</b-button
-                      >
-                    </div>
-                    <div class="flex flex-col gap-8">
-                      <div
-                        v-for="(generation, i) of ancestorGenerations"
-                        v-bind:key="i"
-                        class="flex flex-row gap-8"
-                      >
-                        <div class="w-48 text-right text-xl whitespace-nowrap">
-                          {{ i === 0 ? "Source Package" : `Generation #${i}` }}
-                        </div>
-                        <div class="grid grid-cols-2 gap-2">
-                          <package-history-tile
-                            v-for="node of generation"
-                            v-bind:key="node.label"
-                            :ancestorTree="orphan(node)"
-                            :depth="0"
-                            :isOrigin="node.label === sourcePackage.Label"
-                            v-bind:class="{ 'col-span-2': node.label === sourcePackage.Label }"
-                          ></package-history-tile>
-                        </div>
-                      </div>
-                    </div>
-                  </template>
-                  <template v-else>
-                    <template v-if="status == PackageHistoryStatus.INFLIGHT">
-                      <div class="text-center">History generation in progress...</div>
-                    </template>
-                    <template v-else>
-                      <div class="text-center">Generate package history to see results here</div>
-                    </template>
-                  </template>
-                </b-tab> -->
                 <b-tab no-body title="List">
                   <template v-if="ancestorList && ancestorList.length">
                     <div class="p-8">
@@ -239,51 +180,6 @@
                     </template>
                   </template>
                 </b-tab>
-                <!-- <b-tab no-body title="Generations">
-                  <template v-if="childGenerations && childGenerations.length">
-                    <div class="p-8">
-                      <b-button
-                        variant="outline-primary"
-                        @click="
-                          downloadGenerationCsv(
-                            childGenerations,
-                            `${sourcePackage.Label}_children_generations.csv`
-                          )
-                        "
-                        >DOWNLOAD CSV</b-button
-                      >
-                    </div>
-                    <div class="flex flex-col gap-8">
-                      <div
-                        v-for="(generation, i) of childGenerations"
-                        v-bind:key="i"
-                        class="flex flex-row gap-8"
-                      >
-                        <div class="w-48 text-right text-xl whitespace-nowrap">
-                          {{ i === 0 ? "Source Package" : `Generation #${i}` }}
-                        </div>
-                        <div class="grid grid-cols-2 gap-2">
-                          <package-history-tile
-                            v-for="node of generation"
-                            v-bind:key="node.label"
-                            :childTree="orphan(node)"
-                            :depth="0"
-                            :isOrigin="node.label === sourcePackage.Label"
-                            v-bind:class="{ 'col-span-2': node.label === sourcePackage.Label }"
-                          ></package-history-tile>
-                        </div>
-                      </div>
-                    </div>
-                  </template>
-                  <template v-else>
-                    <template v-if="status == PackageHistoryStatus.INFLIGHT">
-                      <div class="text-center">History generation in progress...</div>
-                    </template>
-                    <template v-else>
-                      <div class="text-center">Generate package history to see results here</div>
-                    </template>
-                  </template>
-                </b-tab> -->
                 <b-tab no-body title="List">
                   <template v-if="childList && childList.length">
                     <div class="p-8">
@@ -659,18 +555,6 @@ export default Vue.extend({
       setMaxChildVisibleDepth: `packageHistory/${PackageHistoryActions.SET_MAX_CHILD_VISIBLE_DEPTH}`,
       halt: `packageHistory/${PackageHistoryActions.HALT}`,
     }),
-    // maybeSetMaxParentVisibleDepth(e: any) {
-    //   const maxParentLookupDepth = parseInt(e as string, 10);
-    //   if (typeof maxParentLookupDepth === "number") {
-    //     this.setMaxParentVisibleDepth(maxParentLookupDepth);
-    //   }
-    // },
-    // maybeSetMaxChildVisibleDepth(e: any) {
-    //   const maxChildLookupDepth = parseInt(e as string, 10);
-    //   if (typeof maxChildLookupDepth === "number") {
-    //     this.setMaxChildVisibleDepth(maxChildLookupDepth);
-    //   }
-    // },
     downloadListCsv(historyList: IHistoryTreeNode[], filename: string) {
       const csvFile: ICsvFile = {
         filename,
