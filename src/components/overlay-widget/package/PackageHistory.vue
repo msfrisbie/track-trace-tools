@@ -49,49 +49,56 @@
               </div>
             </div>
 
-            <template v-if="activeView === 'Tree'">
-              <div class="flex flex-row items-center gap-2">
-                <b-button variant="outline-dark" @click="autofit()" size="sm">AUTOFIT</b-button>
+            <template v-if="status === PackageHistoryStatus.SUCCESS">
+              <hr />
 
-                <b-dropdown toggle-class="flex flex-row items-center gap-2" variant="outline-dark">
-                  <template #button-content>
-                    <font-awesome-icon icon="sliders-h"></font-awesome-icon>
-                  </template>
-                  <b-dropdown-text>
-                    <b-form-group label="Visible generations" class="w-36">
-                      <vue-slider
-                        v-model="maxParentVisibleDepth"
-                        :min="0"
-                        :max="20"
-                        :interval="1"
-                      ></vue-slider>
+              <template v-if="activeView === 'Tree'">
+                <div class="flex flex-row items-center gap-2">
+                  <b-button variant="outline-dark" @click="autofit()" size="sm">AUTOFIT</b-button>
+
+                  <b-dropdown
+                    toggle-class="flex flex-row items-center gap-2"
+                    variant="outline-dark"
+                  >
+                    <template #button-content>
+                      <font-awesome-icon icon="sliders-h"></font-awesome-icon>
+                    </template>
+                    <b-dropdown-text>
+                      <b-form-group label="Visible generations" class="w-36">
+                        <vue-slider
+                          v-model="maxParentVisibleDepth"
+                          :min="0"
+                          :max="20"
+                          :interval="1"
+                        ></vue-slider>
+                      </b-form-group>
+                    </b-dropdown-text>
+                    <b-dropdown-text>
+                      <b-form-group label="Tree zoom" class="w-36">
+                        <vue-slider
+                          v-model="parentZoom"
+                          :min="0.02"
+                          :max="1"
+                          :interval="0.02"
+                        ></vue-slider> </b-form-group
+                    ></b-dropdown-text>
+                    <b-form-group class="px-6">
+                      <b-checkbox v-model="showUnownedPackages">Show unowned packages</b-checkbox>
                     </b-form-group>
-                  </b-dropdown-text>
-                  <b-dropdown-text>
-                    <b-form-group label="Tree zoom" class="w-36">
-                      <vue-slider
-                        v-model="parentZoom"
-                        :min="0.05"
-                        :max="1"
-                        :interval="0.05"
-                      ></vue-slider> </b-form-group
-                  ></b-dropdown-text>
-                  <b-form-group class="px-6">
-                    <b-checkbox v-model="showUnownedPackages">Show unowned packages</b-checkbox>
-                  </b-form-group>
-                </b-dropdown>
-              </div>
-            </template>
+                  </b-dropdown>
+                </div>
+              </template>
 
-            <template v-if="activeView === 'List'">
-              <div class="flex flex-row items-center gap-2">
-                <b-button
-                  variant="outline-dark"
-                  @click="downloadListCsv(mergedList, `${sourcePackage.Label}_history_list.csv`)"
-                  size="sm"
-                  >DOWNLOAD CSV</b-button
-                >
-              </div>
+              <template v-if="activeView === 'List'">
+                <div class="flex flex-row items-center gap-2">
+                  <b-button
+                    variant="outline-dark"
+                    @click="downloadListCsv(mergedList, `${sourcePackage.Label}_history_list.csv`)"
+                    size="sm"
+                    >DOWNLOAD CSV</b-button
+                  >
+                </div>
+              </template>
             </template>
           </div>
         </div>
@@ -476,6 +483,17 @@ export default Vue.extend({
       views: ["Tree", "List", "Source Harvests", "Log", "Help"],
     };
   },
+  watch: {
+    status: {
+      immediate: true,
+      handler(newValue, oldValue) {
+        if (newValue === PackageHistoryStatus.SUCCESS) {
+          // @ts-ignore
+          // this.autofit();
+        }
+      },
+    },
+  },
   methods: {
     ...mapActions({
       setPackage: `packageHistory/${PackageHistoryActions.SET_SOURCE_PACKAGE}`,
@@ -555,7 +573,7 @@ export default Vue.extend({
       const xAdjust = containerWidth / contentWidth;
       const yAdjust = containerHeight / contentHeight;
 
-      this.parentZoom = Math.max(0.05, Math.min(1, xAdjust, yAdjust));
+      this.parentZoom = Math.max(0.02, Math.min(1, xAdjust, yAdjust));
 
       setTimeout(() => {
         container.scrollTo(0, 0);
