@@ -6,6 +6,7 @@ import {
   IPackageChildTreeNode,
   IPackageData,
   IPackageHistoryData,
+  IStrippedIndexedPackage,
 } from "@/interfaces";
 import { authManager } from "@/modules/auth-manager.module";
 import {
@@ -255,8 +256,7 @@ export async function getParentPackageHistoryTreeImpl({
     const node: IPackageAncestorTreeNode = {
       type: HistoryTreeNodeType.UNOWNED_PACKAGE,
       label,
-      pkg: { Label: "STUB_PACKAGE" } as IIndexedPackageData,
-      history: [],
+      pkg: { Label: "STUB_PACKAGE" } as IStrippedIndexedPackage,
       ancestors: [],
     };
     rootContext.treeNodeCache.set(label, node);
@@ -312,8 +312,8 @@ export async function getParentPackageHistoryTreeImpl({
   const node: IPackageAncestorTreeNode = {
     type: HistoryTreeNodeType.OWNED_PACKAGE,
     label,
-    pkg,
-    history,
+    pkg: stripPackage(pkg),
+    // history,
     ancestors: parents,
   };
 
@@ -437,8 +437,7 @@ export async function getChildPackageHistoryTreeImpl({
     const node: IPackageChildTreeNode = {
       type: HistoryTreeNodeType.UNOWNED_PACKAGE,
       label,
-      pkg: { Label: "STUB_PACKAGE" } as IIndexedPackageData,
-      history: [],
+      pkg: { Label: "STUB_PACKAGE" } as IStrippedIndexedPackage,
       children: [],
     };
     rootContext.treeNodeCache.set(label, node);
@@ -494,8 +493,7 @@ export async function getChildPackageHistoryTreeImpl({
   const node: IPackageChildTreeNode = {
     type: HistoryTreeNodeType.OWNED_PACKAGE,
     label,
-    pkg,
-    history,
+    pkg: stripPackage(pkg),
     children,
   };
 
@@ -507,13 +505,27 @@ export async function getChildPackageHistoryTreeImpl({
 export async function getParentHarvests(label: string): Promise<IHarvestHistoryData[]> {
   const pkg = await primaryDataLoader.activePackage(label);
 
-  const history: IHarvestHistoryData[] = await primaryDataLoader.packageHarvestHistoryByPackageId(
-    pkg.Id
-  );
+  const harvestHistory: IHarvestHistoryData[] =
+    await primaryDataLoader.packageHarvestHistoryByPackageId(pkg.Id);
 
   store.dispatch(`packageHistory/${PackageHistoryActions.LOG_EVENT}`, {
-    event: `Retrieved ${history.length} source harvests`,
+    event: `Retrieved ${harvestHistory.length} source harvests`,
   });
 
-  return history;
+  return harvestHistory;
+}
+
+export function stripPackage(pkg: IIndexedPackageData): IStrippedIndexedPackage {
+  return {
+    PackageState: pkg.PackageState,
+    Label: pkg.Label,
+    LicenseNumber: pkg.LicenseNumber,
+    ProductionBatchNumber: pkg.ProductionBatchNumber,
+    Quantity: pkg.Quantity,
+    ItemName: pkg.Item.Name,
+    PackagedByFacilityLicenseNumber: pkg.PackagedByFacilityLicenseNumber,
+    ReceivedFromFacilityLicenseNumber: pkg.ReceivedFromFacilityLicenseNumber || "",
+    UnitOfMeasureAbbreviation: pkg.UnitOfMeasureAbbreviation,
+    SourcePackageLabels: pkg.SourcePackageLabels,
+  };
 }

@@ -16,6 +16,7 @@ export interface IPackageHistoryState {
   maxChildLookupDepth: number | null;
   maxParentVisibleDepth: number;
   maxChildVisibleDepth: number;
+  showUnownedPackages: boolean;
   parentZoom: number;
   childZoom: number;
   log: string[];

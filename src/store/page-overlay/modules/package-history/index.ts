@@ -8,7 +8,6 @@ import {
   IPluginState,
 } from "@/interfaces";
 import { analyticsManager } from "@/modules/analytics-manager.module";
-import { clientBuildManager } from "@/modules/client-build-manager.module";
 import {
   getChildPackageHistoryTree,
   getParentHarvests,
@@ -35,6 +34,7 @@ const inMemoryState = {
   maxChildLookupDepth: null,
   maxParentVisibleDepth: 20,
   maxChildVisibleDepth: 20,
+  showUnownedPackages: false,
   parentZoom: 1,
   childZoom: 1,
 };
@@ -124,6 +124,16 @@ export const packageHistoryModule = {
       }
     ) {
       state.childTree = childTree;
+    },
+    [PackageHistoryMutations.SET_SHOW_UNOWNED_PACKAGES](
+      state: IPackageHistoryState,
+      {
+        showUnownedPackages,
+      }: {
+        showUnownedPackages: boolean;
+      }
+    ) {
+      state.showUnownedPackages = showUnownedPackages;
     },
     [PackageHistoryMutations.SET_STATUS](
       state: IPackageHistoryState,
@@ -398,6 +408,12 @@ export const packageHistoryModule = {
       { childZoom }: { childZoom: number }
     ) => {
       ctx.commit(PackageHistoryMutations.SET_CHILD_ZOOM, { childZoom });
+    },
+    [PackageHistoryActions.SET_SHOW_UNOWNED_PACKAGES]: async (
+      ctx: ActionContext<IPackageHistoryState, IPluginState>,
+      { showUnownedPackages }: { showUnownedPackages: boolean }
+    ) => {
+      ctx.commit(PackageHistoryMutations.SET_SHOW_UNOWNED_PACKAGES, { showUnownedPackages });
     },
     [PackageHistoryActions.LOG_EVENT]: async (
       ctx: ActionContext<IPackageHistoryState, IPluginState>,

@@ -27,13 +27,13 @@
           >
             <font-awesome-icon :icon="option.icon" />
             <span>{{ option.text }}</span>
-            <div style="width: 0rem">
+            <div v-bind:style="badgeWidth(option)">
               <template v-if="option.enabled">
                 <template v-if="option.isBeta">
                   <!-- flex struggles to vertical align the badge for some reason -->
                   <b-badge
                     style="padding-top: 0.3rem; margin-top: 0.1rem; line-height: initial"
-                    variant="light"
+                    variant="primary"
                     >BETA</b-badge
                   ></template
                 >
@@ -41,7 +41,7 @@
                   <!-- flex struggles to vertical align the badge for some reason -->
                   <b-badge
                     style="padding-top: 0.3rem; margin-top: 0.1rem; line-height: initial"
-                    variant="light"
+                    variant="primary"
                     >NEW!</b-badge
                   ></template
                 ></template
@@ -132,6 +132,16 @@ export default Vue.extend({
           enabled: true,
           isBeta: false,
           isNew: false,
+        },
+        {
+          route: "/package/history",
+          text: "PACKAGE HISTORY",
+          icon: "sitemap",
+          backgroundColor: "#2774ae",
+          // isBeta: true,
+          isNew: true,
+          enabled: isCurrentHostAllowed([HOST_WILDCARD]),
+          visible: true,
         },
         {
           backgroundColor: "#48b867",
@@ -233,6 +243,9 @@ export default Vue.extend({
   },
   methods: {
     ...mapActions({}),
+    badgeWidth(option: any) {
+      return { width: !option.enabled || (!option.isBeta && !option.isNew) ? "0rem" : "" };
+    },
     open({ route, url, handler }: { route?: string; url?: string; handler?: Function }) {
       if (!route && !url && !handler) {
         throw new Error("Must provide a route or URL or handler");

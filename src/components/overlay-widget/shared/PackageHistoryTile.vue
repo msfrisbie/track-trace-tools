@@ -4,7 +4,7 @@
       <template v-if="depth < maxDepth">
         <div class="flex flex-row no-wrap gap-1">
           <package-history-tile
-            v-for="subtree of ancestorTree.ancestors"
+            v-for="subtree of filteredAncestors"
             v-bind:key="subtree.label"
             :ancestorTree="subtree"
             :depth="depth + 1"
@@ -12,17 +12,17 @@
           ></package-history-tile>
         </div>
         <div
-          v-if="ancestorTree.ancestors.length > 0"
+          v-if="filteredAncestors.length > 0"
           class="w-full flex flex-row justify-center"
           :class="{
-            'one-parent': ancestorTree.ancestors.length === 1,
-            'multi-parent': ancestorTree.ancestors.length > 1,
+            'one-parent': filteredAncestors.length === 1,
+            'multi-parent': filteredAncestors.length > 1,
           }"
         >
           <div style="border-right: 1px solid black" class="h-6"></div>
         </div>
       </template>
-      <b-card no-body>
+      <b-card no-body v-if="renderNode">
         <div
           class="flex flex-col items-stretch gap-1 p-2"
           v-bind:class="{ 'bg-gray-200': !isOrigin, 'bg-purple-100': isOrigin }"
@@ -38,8 +38,6 @@
           </div>
           <div class="font-bold">{{ ancestorTree.label }}</div>
         </div>
-        <!-- <template v-if="isOrigin"> -->
-        <!-- </template> -->
         <template v-if="ancestorTree.type === HistoryTreeNodeType.OWNED_PACKAGE">
           <hr />
           <div
@@ -55,7 +53,7 @@
 
             <picker-card
               class="flex-grow"
-              :title="`${ancestorTree.pkg.Item.Name}`"
+              :title="`${ancestorTree.pkg.ItemName}`"
               :label="ancestorTree.pkg.Label"
             />
           </div>
@@ -75,7 +73,7 @@
     </template>
 
     <template v-if="childTree">
-      <b-card no-body>
+      <b-card no-body v-if="renderNode">
         <div
           class="flex flex-col items-stretch gap-1 p-2"
           v-bind:class="{ 'bg-gray-200': !isOrigin, 'bg-purple-100': isOrigin }"
@@ -91,8 +89,6 @@
           </div>
           <div class="font-bold">{{ childTree.label }}</div>
         </div>
-        <!-- <template v-if="isOrigin"> -->
-        <!-- </template> -->
         <template v-if="childTree.type === HistoryTreeNodeType.OWNED_PACKAGE">
           <hr />
           <div
@@ -108,7 +104,7 @@
 
             <picker-card
               class="flex-grow"
-              :title="`${childTree.pkg.Item.Name}`"
+              :title="`${childTree.pkg.ItemName}`"
               :label="childTree.pkg.Label"
             />
           </div>
@@ -132,18 +128,18 @@
 
       <template v-if="depth < maxDepth">
         <div
-          v-if="childTree.children.length > 0"
+          v-if="filteredChildren.length > 0"
           class="w-full flex flex-row justify-center"
           :class="{
-            'one-child': childTree.children.length === 1,
-            'multi-child': childTree.children.length > 1,
+            'one-child': filteredChildren.length === 1,
+            'multi-child': filteredChildren.length > 1,
           }"
         >
           <div style="border-right: 1px solid black" class="h-6"></div>
         </div>
         <div class="flex flex-row no-wrap gap-1">
           <package-history-tile
-            v-for="subtree of childTree.children"
+            v-for="subtree of filteredChildren"
             v-bind:key="subtree.label"
             :childTree="subtree"
             :depth="depth + 1"
@@ -171,6 +167,10 @@ export default Vue.extend({
   store,
   router,
   props: {
+    renderRootNode: {
+      type: Boolean,
+      default: true,
+    },
     depth: Number,
     maxDepth: { type: Number, required: false, default: 20 },
     isOrigin: {
@@ -193,6 +193,27 @@ export default Vue.extend({
   },
   computed: {
     ...mapState([]),
+    renderNode() {
+      return !this.isOrigin || this.renderRootNode;
+    },
+    filteredAncestors() {
+      if (this.$store.state.packageHistory.showUnownedPackages) {
+        return this.ancestorTree.ancestors;
+      } else {
+        return this.ancestorTree.ancestors.filter(
+          (node) => node.type === HistoryTreeNodeType.OWNED_PACKAGE
+        );
+      }
+    },
+    filteredChildren() {
+      if (this.$store.state.packageHistory.showUnownedPackages) {
+        return this.childTree.children;
+      } else {
+        return this.childTree.children.filter(
+          (node) => node.type === HistoryTreeNodeType.OWNED_PACKAGE
+        );
+      }
+    },
   },
   data() {
     return {
