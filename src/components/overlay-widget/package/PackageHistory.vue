@@ -14,8 +14,8 @@
       <template v-else>
         <b-card no-body class="mb-24">
           <b-tabs card pills align="center" content-class="" nav-wrapper-class="">
-            <b-tab no-body title="Parent Packages" active>
-              <b-tabs
+            <b-tab no-body title="Tree" active>
+              <!-- <b-tabs
                 pills
                 align="center"
                 vertical
@@ -23,61 +23,61 @@
                 nav-wrapper-class="bg-purple-100 py-2"
                 class="m-0"
               >
-                <b-tab no-body title="Tree" active>
-                  <template v-if="ancestorTree">
-                    <b-dropdown
-                      class="pb-2"
-                      toggle-class="flex flex-row items-center gap-2"
-                      variant="outline-primary"
-                    >
-                      <template #button-content>
-                        <font-awesome-icon icon="sliders-h"></font-awesome-icon>
-                      </template>
-                      <b-dropdown-text>
-                        <b-form-group label="Visible generations" class="w-36">
-                          <vue-slider
-                            v-model="maxParentVisibleDepth"
-                            :min="0"
-                            :max="20"
-                            :interval="1"
-                          ></vue-slider>
-                        </b-form-group>
-                      </b-dropdown-text>
-                      <b-dropdown-text>
-                        <b-form-group label="Tree zoom" class="w-36">
-                          <vue-slider
-                            v-model="parentZoom"
-                            :min="0.1"
-                            :max="1"
-                            :interval="0.05"
-                          ></vue-slider> </b-form-group
-                      ></b-dropdown-text>
-                      <b-form-group class="px-6">
-                        <b-checkbox v-model="showUnownedPackages">Show unowned packages</b-checkbox>
-                      </b-form-group>
-                    </b-dropdown>
-                    <div class="flex flex-col items-start overflow-auto toolkit-scroll pb-4">
-                      <package-history-tile
-                        :ancestorTree="ancestorTree"
-                        :childTree="childTree"
-                        :depth="0"
-                        :isOrigin="true"
-                        style="transform-origin: 0% 0% 0px"
-                        v-bind:style="{
-                          transform: `scale(${parentZoom})`,
-                        }"
-                      ></package-history-tile>
-                    </div>
+                <b-tab no-body title="Tree" active> -->
+              <template v-if="ancestorTree">
+                <b-dropdown
+                  class="pb-2"
+                  toggle-class="flex flex-row items-center gap-2"
+                  variant="outline-primary"
+                >
+                  <template #button-content>
+                    <font-awesome-icon icon="sliders-h"></font-awesome-icon>
                   </template>
-                  <template v-else>
-                    <template v-if="status == PackageHistoryStatus.INFLIGHT">
-                      <div class="text-center">History generation in progress...</div>
-                    </template>
-                    <template v-else>
-                      <div class="text-center">Generate package history to see results here</div>
-                    </template>
-                  </template>
-                </b-tab>
+                  <b-dropdown-text>
+                    <b-form-group label="Visible generations" class="w-36">
+                      <vue-slider
+                        v-model="maxParentVisibleDepth"
+                        :min="0"
+                        :max="20"
+                        :interval="1"
+                      ></vue-slider>
+                    </b-form-group>
+                  </b-dropdown-text>
+                  <b-dropdown-text>
+                    <b-form-group label="Tree zoom" class="w-36">
+                      <vue-slider
+                        v-model="parentZoom"
+                        :min="0.1"
+                        :max="1"
+                        :interval="0.05"
+                      ></vue-slider> </b-form-group
+                  ></b-dropdown-text>
+                  <b-form-group class="px-6">
+                    <b-checkbox v-model="showUnownedPackages">Show unowned packages</b-checkbox>
+                  </b-form-group>
+                </b-dropdown>
+                <div class="flex flex-col items-start overflow-auto toolkit-scroll pb-4">
+                  <package-history-tile
+                    :ancestorTree="ancestorTree"
+                    :childTree="childTree"
+                    :depth="0"
+                    :isOrigin="true"
+                    style="transform-origin: 0% 0% 0px"
+                    v-bind:style="{
+                      transform: `scale(${parentZoom})`,
+                    }"
+                  ></package-history-tile>
+                </div>
+              </template>
+              <template v-else>
+                <template v-if="status == PackageHistoryStatus.INFLIGHT">
+                  <div class="text-center">History generation in progress...</div>
+                </template>
+                <template v-else>
+                  <div class="text-center">Generate package history to see results here</div>
+                </template>
+              </template>
+              <!-- </b-tab>
                 <b-tab no-body title="List">
                   <template v-if="ancestorList && ancestorList.length">
                     <div class="p-8">
@@ -114,9 +114,44 @@
                     </template>
                   </template>
                 </b-tab>
-              </b-tabs>
+              </b-tabs> -->
             </b-tab>
-            <b-tab no-body title="Child Packages">
+            <b-tab no-body title="List">
+              <template v-if="mergedList && mergedList.length">
+                <div class="p-8">
+                  <b-button
+                    variant="outline-primary"
+                    @click="downloadListCsv(mergedList, `${sourcePackage.Label}_history_list.csv`)"
+                    >DOWNLOAD CSV</b-button
+                  >
+                </div>
+                <div class="flex flex-col items-start overflow-auto toolkit-scroll pb-4">
+                  <b-table
+                    striped
+                    hover
+                    :items="mergedList"
+                    :fields="[
+                      'label',
+                      'relationship',
+                      'pkg.LicenseNumber',
+                      'pkg.PackageState',
+                      'pkg.ItemName',
+                      'pkg.Quantity',
+                      'pkg.UnitOfMeasureAbbreviation',
+                    ]"
+                  ></b-table>
+                </div>
+              </template>
+              <template v-else>
+                <template v-if="status == PackageHistoryStatus.INFLIGHT">
+                  <div class="text-center">History generation in progress...</div>
+                </template>
+                <template v-else>
+                  <div class="text-center">Generate package history to see results here</div>
+                </template>
+              </template>
+            </b-tab>
+            <!-- <b-tab no-body title="Child Packages">
               <b-tabs
                 pills
                 vertical
@@ -217,7 +252,7 @@
                   </template>
                 </b-tab>
               </b-tabs>
-            </b-tab>
+            </b-tab> -->
             <b-tab no-body title="Source Harvests">
               <template v-if="sourceHarvests && sourceHarvests.length">
                 <div class="flex flex-col items-stretch overflow-auto toolkit-scroll pb-4">
@@ -285,8 +320,8 @@
                 </div>
                 <div class="ttt-purple text-lg mt-2">What are the Parent and Child tabs?</div>
                 <div>
-                  The <span class="font-bold">Parent Packages view</span> shows all the packages
-                  that preceded the source package.
+                  The <span class="font-bold">Tree view</span> shows the tree of all packages that
+                  are in this package's ancestor and child lineage.
                 </div>
                 <div>
                   The <span class="font-bold">Child Packages view</span> shows all the packages that
@@ -419,7 +454,13 @@
 <script lang="ts">
 import PackageHistoryTile from "@/components/overlay-widget/shared/PackageHistoryTile.vue";
 import SinglePackagePicker from "@/components/overlay-widget/shared/SinglePackagePicker.vue";
-import { ICsvFile, IHistoryTreeNode, IPluginState } from "@/interfaces";
+import {
+  ICsvFile,
+  IHistoryTreeNode,
+  IPackageAncestorTreeNode,
+  IPackageChildTreeNode,
+  IPluginState,
+} from "@/interfaces";
 import router from "@/router/index";
 import store from "@/store/page-overlay/index";
 import {
@@ -459,6 +500,15 @@ export default Vue.extend({
       childList: `packageHistory/${PackageHistoryGetters.CHILD_LIST}`,
       childGenerations: `packageHistory/${PackageHistoryGetters.CHILD_GENERATIONS}`,
     }),
+    mergedList() {
+      return [
+        ...this.ancestorList.map((x: IPackageAncestorTreeNode) => ({
+          ...x,
+          relationship: "PARENT",
+        })),
+        ...this.childList.map((x: IPackageChildTreeNode) => ({ ...x, relationship: "CHILD" })),
+      ];
+    },
     maxParentLookupDepth: {
       get(): number | null {
         return this.$store.state.packageHistory.maxParentLookupDepth;
