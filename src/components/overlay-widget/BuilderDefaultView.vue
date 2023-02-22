@@ -139,7 +139,7 @@ export default Vue.extend({
           icon: "sitemap",
           backgroundColor: "#2774ae",
           // isBeta: true,
-          isNew: true,
+          isNew: false,
           enabled: isCurrentHostAllowed([HOST_WILDCARD]),
           visible: true,
         },
