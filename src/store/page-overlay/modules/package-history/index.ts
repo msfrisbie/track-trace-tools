@@ -8,6 +8,7 @@ import {
   IPluginState,
 } from "@/interfaces";
 import { analyticsManager } from "@/modules/analytics-manager.module";
+import { clientBuildManager } from "@/modules/client-build-manager.module";
 import {
   getChildPackageHistoryTree,
   getParentHarvests,
@@ -289,9 +290,9 @@ export const packageHistoryModule = {
     ) => {
       analyticsManager.track(MessageType.GENERATE_PACKAGE_HISTORY, { pkg });
 
-      // if (!clientBuildManager.assertValues(["ENABLE_PACKAGE_HISTORY"])) {
-      //   return;
-      // }
+      if (!clientBuildManager.assertValues(["ENABLE_PACKAGE_HISTORY"])) {
+        return;
+      }
 
       ctx.commit(PackageHistoryMutations.SET_SOURCE_PACKAGE, { pkg });
 
