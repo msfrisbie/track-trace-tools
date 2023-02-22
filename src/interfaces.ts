@@ -1517,11 +1517,24 @@ export interface IClientInfo {
   licenseKey: string;
 }
 
+export interface IStrippedIndexedPackage {
+  PackageState: PackageState;
+  Label: string;
+  LicenseNumber: string;
+  ProductionBatchNumber: string;
+  Quantity: number;
+  ItemName: string;
+  PackagedByFacilityLicenseNumber: string;
+  ReceivedFromFacilityLicenseNumber: string;
+  UnitOfMeasureAbbreviation: string;
+  SourcePackageLabels: string;
+}
+
 export interface IHistoryTreeNode {
   type: HistoryTreeNodeType;
+  relationship: "PARENT" | "CHILD",
   label: string;
-  pkg: IIndexedPackageData;
-  history: IPackageHistoryData[];
+  pkg: IStrippedIndexedPackage;
 }
 
 export interface IPackageAncestorTreeNode extends IHistoryTreeNode {

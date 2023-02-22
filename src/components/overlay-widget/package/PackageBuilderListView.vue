@@ -27,7 +27,7 @@
               <!-- flex struggles to vertical align the badge for some reason -->
               <b-badge
                 style="padding-top: 0.3rem; margin-top: 0.1rem; line-height: initial"
-                variant="light"
+                variant="primary"
                 >BETA</b-badge
               ></template
             >
@@ -35,7 +35,7 @@
               <!-- flex struggles to vertical align the badge for some reason -->
               <b-badge
                 style="padding-top: 0.3rem; margin-top: 0.1rem; line-height: initial"
-                variant="light"
+                variant="primary"
                 >NEW!</b-badge
               ></template
             >
@@ -155,17 +155,6 @@ export default Vue.extend({
           // isBeta: true,
           isNew: false,
           enabled: false, //isCurrentHostAllowed([HOST_WILDCARD]),
-          visible: true,
-          showDisabledMessage: true,
-        },
-        {
-          route: "/package/history",
-          text: "PACKAGE HISTORY",
-          icon: "sitemap",
-          backgroundColor: "#2774ae",
-          // isBeta: true,
-          isNew: false,
-          enabled: isCurrentHostAllowed([HOST_WILDCARD]),
           visible: true,
           showDisabledMessage: true,
         },
