@@ -52,6 +52,7 @@ const persistedState: ISettingsState = {
   hideListingsButton: false,
   preventActiveProjectPageLeave: true,
   enableSearchOverMetrcModal: true,
+  useIsoDateFormatForSubmit: false,
 };
 
 const defaultState: ISettingsState = {

@@ -48,4 +48,5 @@ export interface ISettingsState {
   hideListingsButton: boolean;
   preventActiveProjectPageLeave: boolean;
   enableSearchOverMetrcModal: boolean;
+  useIsoDateFormatForSubmit: boolean;
 }

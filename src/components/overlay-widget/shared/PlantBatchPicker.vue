@@ -144,7 +144,7 @@
 
         <paste-tags
           v-if="selectedMenuItem === selectedMenuState.PASTED_TAGS"
-          :sourceLabels="sourcePlantBatches.map(x => x.Name)"
+          :sourceLabels="sourcePlantBatches.map((x) => x.Name)"
           :tags.sync="pastedTags"
           ref="pasteTags"
         >
@@ -202,7 +202,7 @@ import { authManager } from "@/modules/auth-manager.module";
 import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
 import store from "@/store/page-overlay/index";
 import { combineLatest, Subject } from "rxjs";
-import { debounceTime, distinctUntilChanged, filter, startWith, tap } from "rxjs/operators";
+import { debounceTime, distinctUntilChanged, startWith, tap } from "rxjs/operators";
 import { v4 } from "uuid";
 import Vue from "vue";
 import PasteTags from "./PasteTags.vue";
@@ -409,10 +409,10 @@ export default Vue.extend({
       .pipe(
         tap((_: any) => {
           this.$data.plantBatchesPageIndex = 0;
-        }),
-        filter(([location, strain]) => {
-          return !!location;
         })
+        // filter(([location, strain]) => {
+        //   return !!location;
+        // })
       )
       .subscribe(async ([location, strain]: [ILocationData, IStrainData]) => {
         this.$data.location = location;

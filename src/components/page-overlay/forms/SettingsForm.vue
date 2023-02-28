@@ -223,6 +223,16 @@
           </b-form-checkbox>
 
           <b-form-checkbox
+            id="checkbox-useIsoDateFormatForSubmit"
+            class="mb-2"
+            v-model="settings.useIsoDateFormatForSubmit"
+            name="checkbox-useIsoDateFormatForSubmit"
+            @change="onChange()"
+          >
+            Use ISO format when submitting dates
+          </b-form-checkbox>
+
+          <b-form-checkbox
             id="checkbox-disablePopups"
             class="mb-2"
             v-model="settings.disablePopups"
