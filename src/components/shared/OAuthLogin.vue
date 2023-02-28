@@ -18,12 +18,15 @@
       </template>
 
       <template v-if="!isAuthenticated">
-        <b-button
-          variant="outline-dark"
+        <div
           @click="login({ interactive: true })"
-          class="flex flex-row items-center gap-2 justify-center"
-          ><img src="img/google.svg" /><span>Sign in with Google</span></b-button
+          class="flex flex-row justify-between items-center gap-4 justify-center p-3 border border-gray-100 hover:bg-gray-100 rounded shadow-md cursor-pointer"
         >
+          <img src="img/google.svg" />
+          <span class="flex-grow text-center text-gray-400 text-lg font-semibold"
+            >Sign in with Google</span
+          >
+        </div>
       </template>
     </template>
     <template v-else>
@@ -43,6 +46,8 @@ import Vue from "vue";
 import { mapState } from "vuex";
 
 require("@/assets/images/google.svg");
+// require("@/assets/images/btn_google_signin_light_normal_web@2x.png");
+// require("@/assets/images/btn_google_light_normal_ios.svg");
 
 export default Vue.extend({
   name: "OAuthLogin",

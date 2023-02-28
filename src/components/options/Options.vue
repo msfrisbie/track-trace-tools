@@ -13,6 +13,7 @@
           <b-nav-item href="#/changelog">Changelog</b-nav-item>
           <b-nav-item href="#/google-sheets">Google Sheets</b-nav-item>
           <b-nav-item href="#/license">License</b-nav-item>
+          <b-nav-item href="#/privacy-policy">Privacy Policy</b-nav-item>
         </b-navbar-nav>
       </b-collapse>
     </b-navbar>

@@ -1,6 +1,5 @@
 <template>
   <div style="height: 100vh">
-
     <div class="flex flex-col p-4 space-y-6" style="height: 100%; overflow-y: auto">
       <div class="flex flex-row justify-between items-center">
         <title-banner />
