@@ -582,6 +582,7 @@ export class DataLoader implements IAtomicService {
         packageFilter: {
           itemName,
           locationName,
+          locationNameExact: true,
           isEmpty,
         },
       }
@@ -736,22 +737,18 @@ export class DataLoader implements IAtomicService {
 
     let packages: IIndexedPackageData[] = [];
 
-    const body = JSON.stringify({
-      request: {
-        take: DATA_LOAD_PAGE_SIZE,
-        skip: 0,
+    const body = buildBody(
+      {
         page: 1,
         pageSize: DATA_LOAD_PAGE_SIZE,
-        filter: {
-          logic: "or",
-          filters: [
-            { field: "Item.StrainName", operator: "contains", value: queryString },
-            { field: "Item.Name", operator: "contains", value: queryString },
-          ],
-        },
-        group: [],
       },
-    });
+      {
+        packageFilter: {
+          itemStrainName: queryString,
+          itemName: queryString,
+        },
+      }
+    );
 
     const activePackagesResponse = await primaryMetrcRequestManager.getActivePackages(body);
 

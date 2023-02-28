@@ -323,8 +323,19 @@ export function buildBodyFilter(
       ...filterSet.filters,
       {
         field: "Item.Name",
-        operator: "eq",
+        operator: packageFilter.itemNameExact ? "eq" : "contains",
         value: packageFilter.itemName,
+      },
+    ];
+  }
+
+  if (packageFilter?.itemStrainName) {
+    filterSet.filters = [
+      ...filterSet.filters,
+      {
+        field: "Item.StrainName",
+        operator: packageFilter.itemStrainNameExact ? "eq" : "contains",
+        value: packageFilter.itemStrainName,
       },
     ];
   }
@@ -334,7 +345,7 @@ export function buildBodyFilter(
       ...filterSet.filters,
       {
         field: "LocationName",
-        operator: "eq",
+        operator: packageFilter.locationNameExact ? "eq" : "contains",
         value: packageFilter.locationName,
       },
     ];

@@ -405,8 +405,12 @@ export interface IPlantBatchFilter {
 
 export interface IPackageFilter {
   label?: string | null;
+  itemStrainName?: string | null;
+  itemStrainNameExact?: boolean | null;
   itemName?: string | null;
+  itemNameExact?: boolean | null;
   locationName?: string | null;
+  locationNameExact?: boolean | null;
   isEmpty?: boolean | null;
 }
 
