@@ -2,6 +2,12 @@
   <b-tab title="Changelog"
     ><b-card-text class="flex flex-col gap-4 items-center">
       <div class="max-w-lg flex flex-col gap-4">
+        <p class="text-2xl ttt-purple">v0.20.0</p>
+
+        <ul class="list-disc">
+          <li>Fix for plant batch retag</li>
+          <li>Add settings option to change default date submit format</li>
+        </ul>
         <p class="text-2xl ttt-purple">v0.19.0</p>
 
         <ul class="list-disc">
