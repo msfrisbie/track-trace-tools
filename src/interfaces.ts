@@ -420,6 +420,9 @@ export interface IHarvestFilter {
 
 export interface ITransferFilter {
   manifestNumber?: string | null;
+  createdDateGt?: string | null;
+  createdDateEq?: string | null;
+  createdDateLt?: string | null;
 }
 
 export interface ITagFilter {
