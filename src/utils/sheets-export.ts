@@ -28,6 +28,10 @@ export async function createExportSpreadsheetOrError({
     throw new Error("Invalid authState");
   }
 
+  //
+  // Generate Sheets
+  //
+
   const sheetTitles: SheetTitles[] = [SheetTitles.OVERVIEW];
 
   if (activePackages) {
@@ -51,6 +55,11 @@ export async function createExportSpreadsheetOrError({
   if (!response.data.success) {
     throw new Error("Unable to create export sheet");
   }
+
+  //
+  // Marshal Data Into Matrix
+  // Format Sheet For Data
+  //
 
   let activePackageRequests: any[] = [];
 
@@ -129,8 +138,6 @@ export async function createExportSpreadsheetOrError({
       }
     }
 
-    console.log(flattenedOutgoingPackages);
-
     richOutgoingInactiveTransfersRequests = [
       // Add more rows
       {
@@ -200,6 +207,10 @@ export async function createExportSpreadsheetOrError({
       ...richOutgoingInactiveTransfersRequests,
     ],
   });
+
+  //
+  // Generate Data Matrix
+  //
 
   if (activePackages) {
     const packageProperties = [
@@ -308,6 +319,10 @@ export async function createExportSpreadsheetOrError({
     }
   }
 
+  //
+  // Generate Summary Sheet
+  //
+
   let packageSummary: any[] = [];
   let departedTransferPackageSummary: any[] = [];
 
@@ -339,6 +354,10 @@ export async function createExportSpreadsheetOrError({
       departedTransferPackageSummary,
     ],
   });
+
+  //
+  // Write All Values
+  //
 
   let packageResizeRequests: any[] = [];
   let departedTransferPackageResizeRequests: any[] = [];

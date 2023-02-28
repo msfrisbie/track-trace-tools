@@ -573,33 +573,19 @@ export class DataLoader implements IAtomicService {
       return mockDataManager.mockPackages();
     }
 
-    const filters = [];
-
-    if (itemName) {
-      filters.push({ field: "Item.Name", operator: "eq", value: itemName });
-    }
-
-    if (locationName) {
-      filters.push({ field: "LocationName", operator: "eq", value: locationName });
-    }
-
-    if (isEmpty !== null) {
-      filters.push({ field: "Quantity", operator: isEmpty ? "eq" : "gt", value: 0 });
-    }
-
-    const body = JSON.stringify({
-      request: {
-        take: DATA_LOAD_PAGE_SIZE,
-        skip: 0,
+    const body = buildBody(
+      {
         page: 1,
         pageSize: DATA_LOAD_PAGE_SIZE,
-        filter: {
-          logic: "and",
-          filters,
-        },
-        group: [],
       },
-    });
+      {
+        packageFilter: {
+          itemName,
+          locationName,
+          isEmpty,
+        },
+      }
+    );
 
     const activePackagesResponse = await primaryMetrcRequestManager.getActivePackages(body);
 

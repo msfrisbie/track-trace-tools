@@ -63,7 +63,7 @@ export interface ITrackedInteractions {
 export interface IFilter {
   field: string;
   operator: "eq" | "contains" | "endswith" | "gt" | "lt";
-  value: string;
+  value: string | number;
 }
 
 export interface ISort {
@@ -405,6 +405,9 @@ export interface IPlantBatchFilter {
 
 export interface IPackageFilter {
   label?: string | null;
+  itemName?: string | null;
+  locationName?: string | null;
+  isEmpty?: boolean | null;
 }
 
 export interface IHarvestFilter {
@@ -1532,7 +1535,7 @@ export interface IStrippedIndexedPackage {
 
 export interface IHistoryTreeNode {
   type: HistoryTreeNodeType;
-  relationship: "PARENT" | "CHILD",
+  relationship: "PARENT" | "CHILD";
   label: string;
   pkg: IStrippedIndexedPackage;
 }

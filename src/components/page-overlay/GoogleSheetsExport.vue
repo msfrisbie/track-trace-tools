@@ -100,7 +100,7 @@ export default Vue.extend({
         } = {};
 
         if (this.$data.exportActivePackages) {
-          exportData.activePackages = await primaryDataLoader.activePackages();
+          exportData.activePackages = await primaryDataLoader.onDemandPackageFilter({});
         }
 
         if (this.$data.exportDepartedTransferPackages) {

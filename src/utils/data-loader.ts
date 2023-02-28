@@ -124,6 +124,10 @@ export function buildBodyFilter(
     filters: [],
   };
 
+  //
+  // Plant Filter
+  //
+
   if (plantFilter?.locationName) {
     filterSet.filters = [
       ...filterSet.filters,
@@ -246,6 +250,21 @@ export function buildBodyFilter(
     ];
   }
 
+  if (plantFilter?.label) {
+    filterSet.filters = [
+      ...filterSet.filters,
+      {
+        field: "Label",
+        operator: "endswith",
+        value: plantFilter.label,
+      },
+    ];
+  }
+
+  //
+  // PlantBatch Filter
+  //
+
   if (plantBatchFilter?.locationName) {
     filterSet.filters = [
       ...filterSet.filters,
@@ -269,16 +288,9 @@ export function buildBodyFilter(
     ];
   }
 
-  if (plantFilter?.label) {
-    filterSet.filters = [
-      ...filterSet.filters,
-      {
-        field: "Label",
-        operator: "endswith",
-        value: plantFilter.label,
-      },
-    ];
-  }
+  //
+  // Tag Filter
+  //
 
   if (tagFilter?.label) {
     filterSet.filters = [
@@ -291,6 +303,10 @@ export function buildBodyFilter(
     ];
   }
 
+  //
+  // Package Filter
+  //
+
   if (packageFilter?.label) {
     filterSet.filters = [
       ...filterSet.filters,
@@ -302,6 +318,43 @@ export function buildBodyFilter(
     ];
   }
 
+  if (packageFilter?.itemName) {
+    filterSet.filters = [
+      ...filterSet.filters,
+      {
+        field: "Item.Name",
+        operator: "eq",
+        value: packageFilter.itemName,
+      },
+    ];
+  }
+
+  if (packageFilter?.locationName) {
+    filterSet.filters = [
+      ...filterSet.filters,
+      {
+        field: "LocationName",
+        operator: "eq",
+        value: packageFilter.locationName,
+      },
+    ];
+  }
+
+  if (typeof packageFilter?.isEmpty === "boolean") {
+    filterSet.filters = [
+      ...filterSet.filters,
+      {
+        field: "Quantity",
+        operator: packageFilter.isEmpty ? "eq" : "gt",
+        value: 0,
+      },
+    ];
+  }
+
+  //
+  // Transfer Filter
+  //
+
   if (transferFilter?.manifestNumber) {
     filterSet.filters = [
       ...filterSet.filters,
@@ -312,6 +365,10 @@ export function buildBodyFilter(
       },
     ];
   }
+
+  //
+  // Harvest Filter
+  //
 
   if (harvestFilter?.harvestName) {
     filterSet.filters = [
