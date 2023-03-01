@@ -260,7 +260,7 @@ export default Vue.extend({
   watch: {},
   data() {
     return {
-      builderType: BuilderType.REPLACE_PLANT_TAGS,
+      builderType: BuilderType.REPLACE_PLANT_BATCH_TAGS,
       activeStepIndex: 0,
       selectedPlantBatches: [],
       actualIsodate: todayIsodate(),

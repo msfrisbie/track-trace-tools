@@ -3,6 +3,12 @@
     <div id="changelog" class="flex flex-col items-center px-6">
       <div class="flex flex-col items-stretch max-w-md gap-16">
         <div class="max-w-lg flex flex-col gap-4">
+          <p class="text-2xl ttt-purple">v0.20.0</p>
+
+          <ul class="list-disc">
+            <li>Fix for plant batch retag</li>
+            <li>Add settings option to change default date submit format</li>
+          </ul>
           <p class="text-2xl ttt-purple">v0.19.0</p>
 
           <ul class="list-disc">
