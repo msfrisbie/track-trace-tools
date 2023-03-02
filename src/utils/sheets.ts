@@ -4,7 +4,14 @@
 
 // https://github.com/theoephraim/node-google-spreadsheet
 
-import { ISheet, ISheetValues, ISpreadsheet, IValueRange } from "@/interfaces";
+import {
+  ISheet,
+  ISheetValues,
+  ISimpleSheet,
+  ISimpleSpreadsheet,
+  ISpreadsheet,
+  IValueRange,
+} from "@/interfaces";
 import { customFetch } from "@/modules/fetch-manager.module";
 import { getAuthTokenOrError } from "./oauth";
 
@@ -39,6 +46,32 @@ export function buildSheetsApiURL(path: string, params?: { [key: string]: string
   }
 
   return url.toString();
+}
+
+export function getSimpleSpreadsheet(spreadsheet: ISpreadsheet): ISimpleSpreadsheet {
+  const { spreadsheetId, spreadsheetUrl } = spreadsheet;
+  const { title } = spreadsheet.properties;
+
+  return {
+    spreadsheetId,
+    spreadsheetUrl,
+    properties: {
+      title,
+    },
+    sheets: spreadsheet.sheets.map(getSimpleSheet),
+  };
+}
+
+export function getSimpleSheet(sheet: ISheet): ISimpleSheet {
+  const { sheetId, title, index } = sheet.properties;
+
+  return {
+    properties: {
+      sheetId,
+      title,
+      index,
+    },
+  };
 }
 
 export async function createSpreadsheet({

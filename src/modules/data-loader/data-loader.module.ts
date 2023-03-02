@@ -576,7 +576,7 @@ export class DataLoader implements IAtomicService {
 
     const body = buildBody(
       {
-        page: 1,
+        page: 0,
         pageSize: DATA_LOAD_PAGE_SIZE,
       },
       {
@@ -735,7 +735,7 @@ export class DataLoader implements IAtomicService {
 
     const body = buildBody(
       {
-        page: 1,
+        page: 0,
         pageSize: DATA_LOAD_PAGE_SIZE,
       },
       {

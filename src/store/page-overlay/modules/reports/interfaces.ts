@@ -4,6 +4,7 @@ import { ReportStatus, ReportType } from "./consts";
 export interface IReportsState {
   status: ReportStatus;
   statusMessage: string;
+  statusMessageHistory: string[];
   generatedSpreadsheet: ISpreadsheet | null;
   generatedSheetHistory: {
       uuid: string,

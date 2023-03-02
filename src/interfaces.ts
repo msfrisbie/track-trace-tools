@@ -422,6 +422,9 @@ export interface IPackageFilter {
   locationName?: string | null;
   locationNameExact?: boolean | null;
   isEmpty?: boolean | null;
+  packagedDateGt?: string | null;
+  packagedDateEq?: string | null;
+  packagedDateLt?: string | null;
 }
 
 export interface IHarvestFilter {

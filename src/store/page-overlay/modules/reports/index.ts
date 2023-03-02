@@ -5,6 +5,7 @@ import {
   ISpreadsheet,
 } from "@/interfaces";
 import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
+import { getSimpleSpreadsheet } from "@/utils/sheets";
 import { createExportSpreadsheetOrError } from "@/utils/sheets-export";
 import { v4 as uuidv4 } from "uuid";
 import { ActionContext } from "vuex";
@@ -20,6 +21,7 @@ import { IReportConfig, IReportData, IReportsState } from "./interfaces";
 const inMemoryState = {
   status: ReportStatus.INITIAL,
   statusMessage: "",
+  statusMessageHistory: [],
   generatedSpreadsheet: null,
 };
 
@@ -39,11 +41,19 @@ export const reportsModule = {
       state: IReportsState,
       { status, statusMessage }: { status?: ReportStatus; statusMessage?: string }
     ) {
-      if (state.status) {
-        // @ts-ignore
+      if (status) {
         state.status = status;
+
+        if (status === ReportStatus.INITIAL) {
+          state.statusMessageHistory = [];
+        }
       }
+
       if (typeof statusMessage === "string") {
+        if (state.statusMessage.length > 0) {
+          state.statusMessageHistory = [state.statusMessage, ...state.statusMessageHistory];
+        }
+
         state.statusMessage = statusMessage;
       }
     },
@@ -58,7 +68,7 @@ export const reportsModule = {
           {
             uuid: uuidv4(),
             timestamp: new Date().toISOString(),
-            spreadsheet,
+            spreadsheet: getSimpleSpreadsheet(spreadsheet),
           },
           ...state.generatedSheetHistory,
         ];
@@ -82,10 +92,16 @@ export const reportsModule = {
     ) => {
       ctx.commit(ReportsMutations.EXAMPLE_MUTATION, data);
     },
+    [ReportsActions.RESET]: async (ctx: ActionContext<IReportsState, IPluginState>, data: any) => {
+      ctx.commit(ReportsMutations.SET_STATUS, { status: ReportStatus.INITIAL, statusMessage: "" });
+      ctx.commit(ReportsMutations.SET_GENERATED_SPREADSHEET, { spreadsheet: null });
+    },
     [ReportsActions.GENERATE_REPORT_SPREADSHEET]: async (
       ctx: ActionContext<IReportsState, IPluginState>,
       { reportConfig }: { reportConfig: IReportConfig }
     ) => {
+      console.log({ reportConfig });
+
       ctx.commit(ReportsMutations.SET_STATUS, { status: ReportStatus.INFLIGHT });
 
       try {
@@ -94,10 +110,31 @@ export const reportsModule = {
         const activePackageConfig = reportConfig[ReportType.ACTIVE_PACKAGES];
         if (activePackageConfig?.packageFilter) {
           ctx.commit(ReportsMutations.SET_STATUS, { statusMessage: "Loading packages..." });
+
+          const activePackages = (await primaryDataLoader.activePackages()).filter((pkg) => {
+            if (activePackageConfig.packageFilter.packagedDateLt) {
+              if (pkg.PackagedDate > activePackageConfig.packageFilter.packagedDateLt) {
+                return false;
+              }
+            }
+
+            if (activePackageConfig.packageFilter.packagedDateEq) {
+              if (!pkg.PackagedDate.startsWith(activePackageConfig.packageFilter.packagedDateEq)) {
+                return false;
+              }
+            }
+
+            if (activePackageConfig.packageFilter.packagedDateGt) {
+              if (pkg.PackagedDate < activePackageConfig.packageFilter.packagedDateGt) {
+                return false;
+              }
+            }
+
+            return true;
+          });
+
           reportData[ReportType.ACTIVE_PACKAGES] = {
-            activePackages: await primaryDataLoader.onDemandPackageFilter(
-              activePackageConfig.packageFilter
-            ),
+            activePackages,
           };
         }
 

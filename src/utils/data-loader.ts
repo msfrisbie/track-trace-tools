@@ -362,6 +362,39 @@ export function buildBodyFilter(
     ];
   }
 
+  if (packageFilter?.packagedDateGt) {
+    filterSet.filters = [
+      ...filterSet.filters,
+      {
+        field: "PackagedDate",
+        operator: "gt",
+        value: packageFilter.packagedDateGt,
+      },
+    ];
+  }
+
+  if (packageFilter?.packagedDateEq) {
+    filterSet.filters = [
+      ...filterSet.filters,
+      {
+        field: "PackagedDate",
+        operator: "eq",
+        value: packageFilter.packagedDateEq,
+      },
+    ];
+  }
+
+  if (packageFilter?.packagedDateLt) {
+    filterSet.filters = [
+      ...filterSet.filters,
+      {
+        field: "PackagedDate",
+        operator: "lt",
+        value: packageFilter.packagedDateLt,
+      },
+    ];
+  }
+
   //
   // Transfer Filter
   //
