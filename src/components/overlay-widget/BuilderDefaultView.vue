@@ -140,7 +140,7 @@ export default Vue.extend({
           icon: "table",
           visible: true,
           enabled: true,
-          isBeta: false,
+          isBeta: true,
           isNew: false,
         },
         {

@@ -5,10 +5,10 @@
     </template>
     <template v-if="oAuthState === OAuthState.AUTHENTICATED">
       <button @click="createSpreadsheet()">CREATE</button>
-      <a v-if="spreadsheetData" :href="spreadsheetData.spreadsheetUrl" target="_blank"
+      <a v-if="generatedSpreadsheet" :href="generatedSpreadsheet.spreadsheetUrl" target="_blank"
         >OPEN SPREADSHEET</a
       >
-      <pre>{{ spreadsheetData }}</pre>
+      <pre>{{ generatedSpreadsheet }}</pre>
     </template>
     <template v-if="oAuthState === OAuthState.NOT_AUTHENTICATED">
       <div>Need to sign in</div>
@@ -19,32 +19,14 @@
 
 <script lang="ts">
 import { MessageType } from "@/consts";
-import {
-  IIndexedPackageData,
-  IIndexedRichTransferData,
-  IRichDestinationData,
-  ISpreadsheet,
-} from "@/interfaces";
-import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
 import { messageBus } from "@/modules/message-bus.module";
 import router from "@/router/index";
 import store from "@/store/page-overlay/index";
-import { createExportSpreadsheetOrError } from "@/utils/sheets-export";
+import { OAuthState, PluginAuthActions } from "@/store/page-overlay/modules/plugin-auth/consts";
+import { ReportsActions } from "@/store/page-overlay/modules/reports/consts";
+import { IReportConfig } from "@/store/page-overlay/modules/reports/interfaces";
 import Vue from "vue";
-import { mapState } from "vuex";
-
-enum ExportState {
-  INITIAL,
-  INFLIGHT,
-  SUCCESS,
-  ERROR,
-}
-
-enum OAuthState {
-  INITIAL,
-  AUTHENTICATED,
-  NOT_AUTHENTICATED,
-}
+import { mapActions, mapState } from "vuex";
 
 export default Vue.extend({
   name: "GoogleSheetsExport",
@@ -55,90 +37,43 @@ export default Vue.extend({
   computed: {
     ...mapState({
       authState: (state: any) => state.pluginAuth.authState,
+      oAuthState: (state: any) => state.pluginAuth.oAuthState,
+      generatedSpreadsheet: (state: any) => state.reports.generatedSpreadsheet,
+      reportStatus: (state: any) => state.reports.status,
+      reportStatusMessage: (state: any) => state.reports.statusMessage,
     }),
   },
   data() {
     return {
-      ExportState,
       OAuthState,
-      exportState: ExportState.INITIAL,
-      exportStateMessage: "",
       spreadsheetData: null,
-      oAuthState: OAuthState.INITIAL,
       exportActivePackages: true,
       exportDepartedTransferPackages: true,
     };
   },
   methods: {
+    ...mapActions({
+      refreshOAuthState: `pluginAuth/${PluginAuthActions.REFRESH_OAUTH_STATE}`,
+      generateReportSpreadsheet: `reports/${ReportsActions.GENERATE_REPORT_SPREADSHEET}`,
+    }),
     async openOAuthPage() {
       messageBus.sendMessageToBackground(MessageType.OPEN_OPTIONS_PAGE, {
         path: "/google-sheets",
       });
     },
-    async getOAuthData() {
-      const response: {
-        data: {
-          success: boolean;
-          isAuthenticated?: boolean;
-        };
-      } = await messageBus.sendMessageToBackground(MessageType.CHECK_OAUTH);
-
-      if (response.data.success && response.data.isAuthenticated) {
-        this.$data.oAuthState = OAuthState.AUTHENTICATED;
-      } else {
-        this.$data.oAuthState = OAuthState.NOT_AUTHENTICATED;
-      }
-    },
     async createSpreadsheet() {
-      this.$data.exportState = ExportState.INFLIGHT;
+      const reportConfig: IReportConfig = {};
 
-      try {
-        this.$data.exportStateMessage = "Loading packages...";
-        let exportData: {
-          activePackages?: IIndexedPackageData[];
-          richOutgoingInactiveTransfers?: IIndexedRichTransferData[];
-        } = {};
-
-        if (this.$data.exportActivePackages) {
-          exportData.activePackages = await primaryDataLoader.onDemandPackageFilter({});
-        }
-
-        if (this.$data.exportDepartedTransferPackages) {
-          exportData.richOutgoingInactiveTransfers =
-            await primaryDataLoader.outgoingInactiveTransfers();
-
-          for (const transfer of exportData.richOutgoingInactiveTransfers) {
-            const destinations: IRichDestinationData[] = (
-              await primaryDataLoader.transferDestinations(transfer.Id)
-            ).map((x) => ({ ...x, packages: [] }));
-
-            for (const destination of destinations) {
-              destination.packages = await primaryDataLoader.destinationPackages(destination.Id);
-            }
-            transfer.outgoingDestinations = destinations;
-          }
-        }
-
-        this.$data.exportStateMessage = "Generating spreadsheet...";
-        const spreadsheet: ISpreadsheet = await createExportSpreadsheetOrError(exportData);
-
-        this.$data.spreadsheetData = spreadsheet;
-        this.$data.exportState = ExportState.SUCCESS;
-        this.$data.exportStateMessage = "=";
-      } catch (e) {
-        this.$data.exportState = ExportState.ERROR;
-        // @ts-ignore
-        this.$data.exportStateMessage = e.toString();
-      }
+      this.generateReportSpreadsheet({ reportConfig });
     },
   },
   async created() {},
   async mounted() {
-    this.getOAuthData();
+    this.refreshOAuthState();
 
     document.addEventListener("visibilitychange", () => {
       if (document.visibilityState === "visible") {
-        this.getOAuthData();
+        this.refreshOAuthState();
       }
     });
   },

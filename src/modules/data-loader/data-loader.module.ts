@@ -555,16 +555,12 @@ export class DataLoader implements IAtomicService {
     });
   }
 
-  async onDemandPackageFilter({
-    itemName = null,
-    locationName = null,
-    isEmpty = null,
-  }: {
-    itemName?: string | null;
-    locationName?: string | null;
-    isEmpty?: boolean | null;
-  }): Promise<IIndexedPackageData[]> {
-    if (itemName === null && locationName === null && isEmpty === null) {
+  async onDemandPackageFilter(packageFilter: IPackageFilter): Promise<IIndexedPackageData[]> {
+    if (
+      packageFilter.itemName === null &&
+      packageFilter.locationName === null &&
+      packageFilter.isEmpty === null
+    ) {
       console.error("No filters applied, exiting");
       return [];
     }
@@ -573,18 +569,18 @@ export class DataLoader implements IAtomicService {
       return mockDataManager.mockPackages();
     }
 
+    // "Row 1" should not match "Row 10"
+    if (packageFilter.locationName) {
+      packageFilter.locationNameExact = true;
+    }
+
     const body = buildBody(
       {
         page: 1,
         pageSize: DATA_LOAD_PAGE_SIZE,
       },
       {
-        packageFilter: {
-          itemName,
-          locationName,
-          locationNameExact: true,
-          isEmpty,
-        },
+        packageFilter,
       }
     );
 

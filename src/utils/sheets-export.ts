@@ -9,6 +9,8 @@ import {
 } from "@/interfaces";
 import { messageBus } from "@/modules/message-bus.module";
 import store from "@/store/page-overlay/index";
+import { ReportType } from "@/store/page-overlay/modules/reports/consts";
+import { IReportConfig, IReportData } from "@/store/page-overlay/modules/reports/interfaces";
 import { todayIsodate } from "./date";
 
 enum SheetTitles {
@@ -18,14 +20,34 @@ enum SheetTitles {
 }
 
 export async function createExportSpreadsheetOrError({
-  activePackages,
-  richOutgoingInactiveTransfers,
+  reportData,
+  reportConfig,
 }: {
-  activePackages?: IIndexedPackageData[];
-  richOutgoingInactiveTransfers?: IIndexedRichTransferData[];
+  reportData: IReportData;
+  reportConfig: IReportConfig;
 }): Promise<ISpreadsheet> {
   if (!store.state.pluginAuth?.authState?.license) {
     throw new Error("Invalid authState");
+  }
+
+  //
+  // Check that inputs are well-formed
+  //
+
+  let includeActivePackageReport: boolean = false;
+  let activePackages: IIndexedPackageData[] = [];
+  if (reportConfig[ReportType.ACTIVE_PACKAGES] && reportData[ReportType.ACTIVE_PACKAGES]) {
+    includeActivePackageReport = true;
+    activePackages = reportData[ReportType.ACTIVE_PACKAGES]
+      ?.activePackages as IIndexedPackageData[];
+  }
+
+  let includeTransferPackagesReport: boolean = false;
+  let richOutgoingInactiveTransfers: IIndexedRichTransferData[] = [];
+  if (reportConfig[ReportType.TRANSFER_PACKAGES] && reportData[ReportType.TRANSFER_PACKAGES]) {
+    includeTransferPackagesReport = true;
+    richOutgoingInactiveTransfers = reportData[ReportType.TRANSFER_PACKAGES]
+      ?.richOutgoingInactiveTransfers as IIndexedRichTransferData[];
   }
 
   //
@@ -34,11 +56,11 @@ export async function createExportSpreadsheetOrError({
 
   const sheetTitles: SheetTitles[] = [SheetTitles.OVERVIEW];
 
-  if (activePackages) {
+  if (includeActivePackageReport) {
     sheetTitles.push(SheetTitles.PACKAGES);
   }
 
-  if (richOutgoingInactiveTransfers) {
+  if (includeTransferPackagesReport) {
     sheetTitles.push(SheetTitles.DEPARTED_TRANSFER_PACKAGES);
   }
 
@@ -63,7 +85,7 @@ export async function createExportSpreadsheetOrError({
 
   let activePackageRequests: any[] = [];
 
-  if (activePackages) {
+  if (includeActivePackageReport) {
     activePackageRequests = [
       // Add more rows
       {
@@ -125,7 +147,7 @@ export async function createExportSpreadsheetOrError({
     Transfer: ITransferData;
   }[] = [];
 
-  if (richOutgoingInactiveTransfers) {
+  if (includeTransferPackagesReport) {
     for (const transfer of richOutgoingInactiveTransfers) {
       for (const destination of transfer?.outgoingDestinations || []) {
         for (const pkg of destination.packages) {
@@ -212,7 +234,7 @@ export async function createExportSpreadsheetOrError({
   // Generate Data Matrix
   //
 
-  if (activePackages) {
+  if (includeActivePackageReport) {
     const packageProperties = [
       "Label",
       "LicenseNumber",
@@ -263,7 +285,7 @@ export async function createExportSpreadsheetOrError({
     }
   }
 
-  if (richOutgoingInactiveTransfers) {
+  if (includeTransferPackagesReport) {
     const richOutgoingInactiveTransferProperties = [
       "Transfer.ManifestNumber",
       "Transfer.ShipmentLicenseTypeName",
@@ -326,7 +348,7 @@ export async function createExportSpreadsheetOrError({
   let packageSummary: any[] = [];
   let departedTransferPackageSummary: any[] = [];
 
-  if (activePackages) {
+  if (includeActivePackageReport) {
     packageSummary = [
       null,
       "Active Packages",
@@ -334,7 +356,7 @@ export async function createExportSpreadsheetOrError({
     ];
   }
 
-  if (richOutgoingInactiveTransfers) {
+  if (includeTransferPackagesReport) {
     departedTransferPackageSummary = [
       null,
       "Departed Packages",
@@ -362,7 +384,7 @@ export async function createExportSpreadsheetOrError({
   let packageResizeRequests: any[] = [];
   let departedTransferPackageResizeRequests: any[] = [];
 
-  if (activePackages) {
+  if (includeActivePackageReport) {
     packageResizeRequests = [
       {
         autoResizeDimensions: {
@@ -377,7 +399,7 @@ export async function createExportSpreadsheetOrError({
     ];
   }
 
-  if (richOutgoingInactiveTransfers) {
+  if (includeTransferPackagesReport) {
     departedTransferPackageResizeRequests = [
       {
         autoResizeDimensions: {

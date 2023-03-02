@@ -1,13 +1,16 @@
+import { MessageType } from "@/consts";
 import { IAuthState, IPluginState } from "@/interfaces";
+import { messageBus } from "@/modules/message-bus.module";
 import { debugLogFactory } from "@/utils/debug";
 import { ActionContext } from "vuex";
-import { PluginAuthActions, PluginAuthGetters, PluginAuthMutations } from "./consts";
+import { OAuthState, PluginAuthActions, PluginAuthGetters, PluginAuthMutations } from "./consts";
 import { IPluginAuthState } from "./interfaces";
 
 const debugLog = debugLogFactory("plugin-auth/index.ts");
 
 const inMemoryState = {
   authState: null,
+  oAuthState: OAuthState.INITIAL,
 };
 
 const persistedState = {
@@ -31,6 +34,12 @@ export const pluginAuthModule = {
       { authState }: { authState: IAuthState | null }
     ) {
       state.authState = authState;
+    },
+    [PluginAuthMutations.SET_OAUTH_STATE](
+      state: IPluginAuthState,
+      { oAuthState }: { oAuthState: OAuthState }
+    ) {
+      state.oAuthState = oAuthState;
     },
     [PluginAuthMutations.SET_LOGIN_DATA](
       state: IPluginAuthState,
@@ -135,6 +144,23 @@ export const pluginAuthModule = {
       { authState }: { authState: IAuthState | null }
     ) {
       ctx.commit(PluginAuthMutations.SET_AUTH, { authState });
+    },
+    async [PluginAuthActions.REFRESH_OAUTH_STATE](
+      ctx: ActionContext<IPluginAuthState, IPluginState>,
+      { }: { }
+    ) {
+      const response: {
+        data: {
+          success: boolean;
+          isAuthenticated?: boolean;
+        };
+      } = await messageBus.sendMessageToBackground(MessageType.CHECK_OAUTH);
+
+      if (response.data.success && response.data.isAuthenticated) {
+        ctx.commit(PluginAuthMutations.SET_OAUTH_STATE, { oAuthState: OAuthState.AUTHENTICATED });
+      } else {
+        ctx.commit(PluginAuthMutations.SET_OAUTH_STATE, { oAuthState: OAuthState.NOT_AUTHENTICATED });
+      }
     },
   },
 };

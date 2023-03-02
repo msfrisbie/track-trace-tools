@@ -20,6 +20,7 @@ import { IPackageSearchState } from "./store/page-overlay/modules/package-search
 import { IPlantSearchState } from "./store/page-overlay/modules/plant-search/interfaces";
 import { IPluginAuthState } from "./store/page-overlay/modules/plugin-auth/interfaces";
 import { IPromoteImmaturePlantsBuilderState } from "./store/page-overlay/modules/promote-immature-plants-builder/interfaces";
+import { IReportsState } from "./store/page-overlay/modules/reports/interfaces";
 import { ISearchState } from "./store/page-overlay/modules/search/interfaces";
 import { ISettingsState } from "./store/page-overlay/modules/settings/interfaces";
 import { ISplitPackageBuilderState } from "./store/page-overlay/modules/split-package-builder/interfaces";
@@ -188,6 +189,7 @@ export interface IPluginState extends IRootState {
   search: ISearchState;
   settings: ISettingsState;
   listing: IListingState;
+  reports: IReportsState;
   flags: IFlagsState;
   packageHistory: IPackageHistoryState;
 }
@@ -378,6 +380,14 @@ export interface IPackageOptions extends IDataLoadOptions {}
 export interface IPlantOptions extends IDataLoadOptions {
   filter: IPlantFilter;
 }
+
+export type MetrcFilter =
+  | IPlantFilter
+  | IPackageFilter
+  | IPlantBatchFilter
+  | ITransferFilter
+  | IHarvestFilter
+  | ITagFilter;
 
 export interface IPlantFilter {
   locationName?: string | null;
@@ -1564,6 +1574,23 @@ export interface IGoogleOAuthOAuthUserInfo {
   family_name: string; // Last Name
   picture: string; // "https://lh3.googleusercontent.com/a/..."
   locale: string; //"en"
+}
+
+export interface ISimpleSpreadsheet {
+  spreadsheetId: string;
+  spreadsheetUrl: string;
+  properties: {
+    title: string;
+  };
+  sheets: ISimpleSheet[];
+}
+
+export interface ISimpleSheet {
+  properties: {
+    sheetId: number;
+    title: string;
+    index: number;
+  };
 }
 
 export interface ISpreadsheet {

@@ -4,6 +4,7 @@ export enum PluginAuthMutations {
   SET_CURRENT_USER_DATA = "SET_CURRENT_USER_DATA",
   CLEAR_LOGIN_DATA = "CLEAR_LOGIN_DATA",
   CLEAR_CURRENT_USER_DATA = "CLEAR_CURRENT_USER_DATA",
+  SET_OAUTH_STATE = "SET_OAUTH_STATE"
 }
 
 export enum PluginAuthGetters {
@@ -14,4 +15,12 @@ export enum PluginAuthGetters {
 
 export enum PluginAuthActions {
   SET_AUTH = "SET_AUTH",
+  REFRESH_OAUTH_STATE = "REFRESH_OAUTH_STATE"
+}
+
+
+export enum OAuthState {
+  INITIAL,
+  AUTHENTICATED,
+  NOT_AUTHENTICATED,
 }
