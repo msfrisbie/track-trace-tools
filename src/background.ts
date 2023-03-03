@@ -44,28 +44,31 @@ function logEvent(event: string, data: any, options: IBusMessageOptions) {
   amplitudeInstance.logEvent(event, data);
 }
 
-chrome.runtime.onMessage.addListener(async (inboundEvent, sender, sendResponse) => {
-  // portFromCS = p;
-  // portFromCS.onMessage.addListener(async (inboundEvent: IBusEvent) => {
-  // if (!portFromCS) {
-  //   console.warn("Missing port");
-  //   return;
-  // }
-
+chrome.runtime.onMessage.addListener((inboundEvent, sender, sendResponse) => {
   // This will only show in the background.js console output, so leave in place for debugging
   console.log("inboundEvent:", inboundEvent);
 
+  // It seems to be the case that async/await is causing problems when used with OAuth.
+  // "Unchecked runtime.lastError: The message port closed before a response was received"
+  // Seems to indicate that sendResponse is going out of scope before it is needed.
+  // Other message handlers seem to be able to use it no problem, can't really explain it.
+  // Attempting transition to .then()
   if (inboundEvent.message) {
     switch (inboundEvent.message.type) {
       case MessageType.KEEPALIVE:
         break;
       case MessageType.OPEN_OPTIONS_PAGE:
         if (inboundEvent.message.data.path) {
-          await chrome.storage.local.set({
-            [ChromeStorageKeys.INITIAL_OPTIONS_PATH]: inboundEvent.message.data.path,
-          });
+          chrome.storage.local
+            .set({
+              [ChromeStorageKeys.INITIAL_OPTIONS_PATH]: inboundEvent.message.data.path,
+            })
+            .then(() => {
+              chrome.runtime.openOptionsPage();
+            });
+        } else {
+          chrome.runtime.openOptionsPage();
         }
-        chrome.runtime.openOptionsPage();
         break;
       case MessageType.SET_USER_ID:
         amplitudeInstance.setUserId(inboundEvent.message.data.identity);
@@ -87,27 +90,29 @@ chrome.runtime.onMessage.addListener(async (inboundEvent, sender, sendResponse) 
         break;
 
       case MessageType.INDEX_PACKAGES:
-        await database.indexPackages(inboundEvent.message.data.indexedPackagesData);
-        respondToContentScript(sendResponse, inboundEvent, { success: true });
-        break;
-
-      case MessageType.SEARCH_PACKAGES:
-        // Log the search
-        // logEvent(MessageType.REFRESH_PACKAGE_RESULTS, inboundEvent.message.data, inboundEvent.message.options);
-
-        // Perform the search
-        respondToContentScript(sendResponse, inboundEvent, {
-          packages: await database.packageSearch(
-            inboundEvent.message.data.query,
-            inboundEvent.message.data.license,
-            inboundEvent.message.data.filters
-          ),
+        database.indexPackages(inboundEvent.message.data.indexedPackagesData).then(() => {
+          respondToContentScript(sendResponse, inboundEvent, { success: true });
         });
         break;
 
+      // case MessageType.SEARCH_PACKAGES:
+      //   // Log the search
+      //   // logEvent(MessageType.REFRESH_PACKAGE_RESULTS, inboundEvent.message.data, inboundEvent.message.options);
+
+      //   // Perform the search
+      //   respondToContentScript(sendResponse, inboundEvent, {
+      //     packages: await database.packageSearch(
+      //       inboundEvent.message.data.query,
+      //       inboundEvent.message.data.license,
+      //       inboundEvent.message.data.filters
+      //     ),
+      //   });
+      //   break;
+
       case MessageType.INDEX_TRANSFERS:
-        await database.indexTransfers(inboundEvent.message.data.indexedTransfersData);
-        respondToContentScript(sendResponse, inboundEvent, { success: true });
+        database.indexTransfers(inboundEvent.message.data.indexedTransfersData).then(() => {
+          respondToContentScript(sendResponse, inboundEvent, { success: true });
+        });
         break;
 
       case MessageType.SEARCH_TRANSFERS:
@@ -115,18 +120,24 @@ chrome.runtime.onMessage.addListener(async (inboundEvent, sender, sendResponse) 
         // logEvent(MessageType.REFRESH_TRANSFER_RESULTS, inboundEvent.message.data, inboundEvent.message.options);
 
         // Perform the search
-        respondToContentScript(sendResponse, inboundEvent, {
-          transfers: await database.transferSearch(
+        database
+          .transferSearch(
             inboundEvent.message.data.query,
             inboundEvent.message.data.license,
             inboundEvent.message.data.filters
-          ),
-        });
+          )
+          .then((transfers) => {
+            respondToContentScript(sendResponse, inboundEvent, {
+              transfers,
+            });
+          });
+
         break;
 
       case MessageType.INDEX_TAGS:
-        await database.indexTags(inboundEvent.message.data.indexedTagsData);
-        respondToContentScript(sendResponse, inboundEvent, { success: true });
+        database.indexTags(inboundEvent.message.data.indexedTagsData).then(() => {
+          respondToContentScript(sendResponse, inboundEvent, { success: true });
+        });
         break;
 
       case MessageType.SEARCH_TAGS:
@@ -134,13 +145,18 @@ chrome.runtime.onMessage.addListener(async (inboundEvent, sender, sendResponse) 
         logEvent(MessageType.SEARCH_TAGS, inboundEvent.message.data, inboundEvent.message.options);
 
         // Perform the search
-        respondToContentScript(sendResponse, inboundEvent, {
-          tags: await database.tagSearch(
+        database
+          .tagSearch(
             inboundEvent.message.data.query,
             inboundEvent.message.data.license,
             inboundEvent.message.data.filters
-          ),
-        });
+          )
+          .then((tags) => {
+            respondToContentScript(sendResponse, inboundEvent, {
+              tags,
+            });
+          });
+
         break;
 
       case MessageType.UPDATE_UNINSTALL_URL:
@@ -149,26 +165,26 @@ chrome.runtime.onMessage.addListener(async (inboundEvent, sender, sendResponse) 
         });
         break;
 
-      case MessageType.GET_EXTENSION_URL:
-        // https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/runtime/getURL
-        respondToContentScript(sendResponse, inboundEvent, {
-          success: true,
-          url: await browser.runtime.getURL(inboundEvent.message.data.path),
-        });
-        break;
+      // case MessageType.GET_EXTENSION_URL:
+      //   // https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/runtime/getURL
+      //   respondToContentScript(sendResponse, inboundEvent, {
+      //     success: true,
+      //     url: await browser.runtime.getURL(inboundEvent.message.data.path),
+      //   });
+      //   break;
 
-      case MessageType.CHECK_PERMISSIONS:
-        // https://chrome-apps-doc2.appspot.com/extensions/permissions.html
-        respondToContentScript(sendResponse, inboundEvent, {
-          success: true,
-          hasPermissions: await browser.permissions.contains(inboundEvent.message.data),
-        });
-        break;
+      // case MessageType.CHECK_PERMISSIONS:
+      //   // https://chrome-apps-doc2.appspot.com/extensions/permissions.html
+      //   respondToContentScript(sendResponse, inboundEvent, {
+      //     success: true,
+      //     hasPermissions: await browser.permissions.contains(inboundEvent.message.data),
+      //   });
+      //   break;
 
-      case MessageType.OPEN_CONNECT_STANDALONE:
-        // console.log(await result.data.url);
-        window.open(await browser.runtime.getURL("index.html#/connect"), "_blank");
-        break;
+      // case MessageType.OPEN_CONNECT_STANDALONE:
+      //   // console.log(await result.data.url);
+      //   window.open(await browser.runtime.getURL("index.html#/connect"), "_blank");
+      //   break;
 
       // case MessageType.ASYNC_STORAGE_LENGTH:
       //   respondToContentScript(sendResponse, inboundEvent, await CustomAsyncStorage.length())
@@ -196,11 +212,11 @@ chrome.runtime.onMessage.addListener(async (inboundEvent, sender, sendResponse) 
       //   break;
       case MessageType.CHECK_OAUTH:
         try {
-          await getAuthTokenOrError({ interactive: false });
-
-          respondToContentScript(sendResponse, inboundEvent, {
-            success: true,
-            isAuthenticated: true,
+          getAuthTokenOrError({ interactive: false }).then(() => {
+            respondToContentScript(sendResponse, inboundEvent, {
+              success: true,
+              isAuthenticated: true,
+            });
           });
         } catch (error) {
           respondToContentScript(sendResponse, inboundEvent, {
@@ -210,110 +226,123 @@ chrome.runtime.onMessage.addListener(async (inboundEvent, sender, sendResponse) 
         }
         break;
       case MessageType.GET_OAUTH_USER_INFO_OR_ERROR:
-        try {
-          respondToContentScript(sendResponse, inboundEvent, {
-            success: true,
-            result: await getOAuthUserInfoOrError(inboundEvent.message.data),
-          });
-        } catch (error) {
-          respondToContentScript(sendResponse, inboundEvent, {
-            success: false,
-          });
-          console.error("Event error in background", inboundEvent, error);
-        }
+        getOAuthUserInfoOrError(inboundEvent.message.data).then(
+          (result) => {
+            respondToContentScript(sendResponse, inboundEvent, {
+              success: true,
+              result,
+            });
+          },
+          (error) => {
+            respondToContentScript(sendResponse, inboundEvent, {
+              success: false,
+            });
+            console.error("Event error in background", inboundEvent, error);
+          }
+        );
         break;
       case MessageType.EXPIRE_AUTH_TOKEN:
-        try {
-          await expireAuthToken();
+        expireAuthToken().then(
+          () => {
+            respondToContentScript(sendResponse, inboundEvent, {
+              success: true,
+            });
+          },
+          (error) => {
+            respondToContentScript(sendResponse, inboundEvent, {
+              success: false,
+            });
+            console.error("Event error in background", inboundEvent, error);
+          }
+        );
 
-          respondToContentScript(sendResponse, inboundEvent, {
-            success: true,
-          });
-        } catch (error) {
-          respondToContentScript(sendResponse, inboundEvent, {
-            success: false,
-          });
-          console.error("Event error in background", inboundEvent, error);
-        }
         break;
       case MessageType.CREATE_SPREADSHEET:
-        try {
-          const result = await createSpreadsheet(inboundEvent.message.data);
+        createSpreadsheet(inboundEvent.message.data).then(
+          (result) => {
+            respondToContentScript(sendResponse, inboundEvent, {
+              success: true,
+              result,
+            });
+          },
+          (error) => {
+            respondToContentScript(sendResponse, inboundEvent, {
+              success: false,
+            });
+            console.error("Event error in background", inboundEvent, error);
+          }
+        );
 
-          respondToContentScript(sendResponse, inboundEvent, {
-            success: true,
-            result,
-          });
-        } catch (error) {
-          respondToContentScript(sendResponse, inboundEvent, {
-            success: false,
-          });
-          console.error("Event error in background", inboundEvent, error);
-        }
         break;
 
       case MessageType.BATCH_UPDATE_SPREADSHEET:
-        try {
-          const result = await batchUpdate(inboundEvent.message.data);
-
-          respondToContentScript(sendResponse, inboundEvent, {
-            success: true,
-            result,
-          });
-        } catch (error) {
-          respondToContentScript(sendResponse, inboundEvent, {
-            success: false,
-          });
-          console.error("Event error in background", inboundEvent, error);
-        }
+        batchUpdate(inboundEvent.message.data).then(
+          (result) => {
+            respondToContentScript(sendResponse, inboundEvent, {
+              success: true,
+              result,
+            });
+          },
+          (error) => {
+            respondToContentScript(sendResponse, inboundEvent, {
+              success: false,
+            });
+            console.error("Event error in background", inboundEvent, error);
+          }
+        );
         break;
 
       case MessageType.BATCH_UPDATE_SPREADSHEET_VALUES:
-        try {
-          const result = await batchUpdateValues(inboundEvent.message.data);
+        batchUpdateValues(inboundEvent.message.data).then(
+          (result) => {
+            respondToContentScript(sendResponse, inboundEvent, {
+              success: true,
+              result,
+            });
+          },
+          (error) => {
+            respondToContentScript(sendResponse, inboundEvent, {
+              success: false,
+            });
+            console.error("Event error in background", inboundEvent, error);
+          }
+        );
 
-          respondToContentScript(sendResponse, inboundEvent, {
-            success: true,
-            result,
-          });
-        } catch (error) {
-          respondToContentScript(sendResponse, inboundEvent, {
-            success: false,
-          });
-          console.error("Event error in background", inboundEvent, error);
-        }
         break;
 
       case MessageType.WRITE_SPREADSHEET_VALUES:
-        try {
-          const result = await writeValues(inboundEvent.message.data);
+        writeValues(inboundEvent.message.data).then(
+          (result) => {
+            respondToContentScript(sendResponse, inboundEvent, {
+              success: true,
+              result,
+            });
+          },
+          (error) => {
+            respondToContentScript(sendResponse, inboundEvent, {
+              success: false,
+            });
+            console.error("Event error in background", inboundEvent, error);
+          }
+        );
 
-          respondToContentScript(sendResponse, inboundEvent, {
-            success: true,
-            result,
-          });
-        } catch (error) {
-          respondToContentScript(sendResponse, inboundEvent, {
-            success: false,
-          });
-          console.error("Event error in background", inboundEvent, error);
-        }
         break;
 
       case MessageType.APPEND_SPREADSHEET_VALUES:
-        try {
-          const result = await appendValues(inboundEvent.message.data);
-
-          respondToContentScript(sendResponse, inboundEvent, {
-            success: true,
-            result,
-          });
-        } catch (error) {
-          respondToContentScript(sendResponse, inboundEvent, {
-            success: false,
-          });
-          console.error("Event error in background", inboundEvent, error);
-        }
+        appendValues(inboundEvent.message.data).then(
+          (result) => {
+            respondToContentScript(sendResponse, inboundEvent, {
+              success: true,
+              result,
+            });
+          },
+          (error) => {
+            respondToContentScript(sendResponse, inboundEvent, {
+              success: false,
+            });
+            console.error("Event error in background", inboundEvent, error);
+          }
+        );
         break;
 
       default:

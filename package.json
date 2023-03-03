@@ -23,7 +23,7 @@
     "@sentry/integrations": "^5.29.1",
     "@sentry/tracing": "^6.2.5",
     "@types/amplitude-js": "^8.16.2",
-    "@types/chrome": "^0.0.197",
+    "@types/chrome": "^0.0.219",
     "@types/crypto-js": "^4.1.1",
     "@types/google-spreadsheet": "^3.3.0",
     "amplitude-js": "^8.21.0",
