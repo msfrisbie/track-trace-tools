@@ -6,6 +6,7 @@
 
     <template v-if="oAuthState === OAuthState.AUTHENTICATED">
       <div class="grid grid-cols-3 gap-8 w-full">
+        <!-- First Column -->
         <div>
           <b-form-group>
             <b-form-checkbox-group v-model="selectedReports" class="flex flex-col gap-4">
@@ -21,10 +22,10 @@
               </b-form-checkbox>
               <div class="text-xs text-center text-gray-600">
                 Reach out to
-                <a style="color: #7714ea" class="underline" href="mailto:tracktracetools@gmail.com"
+                <a class="text-purple-500 underline" href="mailto:tracktracetools@gmail.com"
                   >tracktracetools@gmail.com</a
                 >
-                to enable premium reports or add custom reports.
+                to enable premium exports or request custom export types.
               </div>
               <b-form-checkbox
                 class="opacity-50"
@@ -40,23 +41,24 @@
             </b-form-checkbox-group>
           </b-form-group>
         </div>
-        <div>
+
+        <!-- Middle Column -->
+        <div v-bind:class="{ invisible: reportStatus !== ReportStatus.INITIAL }">
+          <template v-if="selectedReports.length === 0">
+            <div class="text-red-500 text-center">Select one or more export types</div>
+          </template>
           <template v-if="selectedReports.includes(ReportType.ACTIVE_PACKAGES)">
-            <b-form-group
-              label="Active Package Report Filters"
-              label-class="font-semibold text-gray-700"
-            >
+            <div class="rounded border border-gray-300 p-2 flex flex-col items-stretch gap-2">
+              <div class="font-semibold text-gray-700">Active Packages</div>
+              <hr />
               <div class="flex flex-col items-stretch gap-4">
                 <div class="flex flex-col items-start gap-1">
-                  <b-form-checkbox
-                    v-model="includePackagedDateGt"
-                    :disabled="reportStatus !== ReportStatus.INITIAL"
-                  >
-                    <span>Packaged on or after:</span>
+                  <b-form-checkbox v-model="includePackagedDateGt">
+                    <span class="leading-6">Packaged on or after:</span>
                   </b-form-checkbox>
                   <b-form-datepicker
                     v-if="includePackagedDateGt"
-                    :disabled="!includePackagedDateGt || reportStatus !== ReportStatus.INITIAL"
+                    :disabled="!includePackagedDateGt"
                     initial-date
                     size="sm"
                     v-model="packagedDateGt"
@@ -64,22 +66,60 @@
                 </div>
 
                 <div class="flex flex-col items-start gap-1">
-                  <b-form-checkbox
-                    v-model="includePackagedDateLt"
-                    :disabled="reportStatus !== ReportStatus.INITIAL"
-                  >
-                    <span>Packaged on or before:</span>
+                  <b-form-checkbox v-model="includePackagedDateLt">
+                    <span class="leading-6">Packaged on or before:</span>
                   </b-form-checkbox>
                   <b-form-datepicker
                     v-if="includePackagedDateLt"
-                    :disabled="!includePackagedDateLt || reportStatus !== ReportStatus.INITIAL"
+                    :disabled="!includePackagedDateLt"
                     initial-date
                     size="sm"
                     v-model="packagedDateLt"
                   />
                 </div>
+
+                <b-button
+                  size="sm"
+                  variant="outline-primary"
+                  @click="toggleFields(ReportType.ACTIVE_PACKAGES)"
+                  >{{
+                    showFields[ReportType.ACTIVE_PACKAGES]
+                      ? "HIDE FIELDS"
+                      : "SELECT FIELDS TO INCLUDE"
+                  }}</b-button
+                >
+                <template v-if="showFields[ReportType.ACTIVE_PACKAGES]">
+                  <div class="grid grid-cols-2 gap-2">
+                    <b-button
+                      variant="outline-primary"
+                      size="sm"
+                      @click="checkAll(ReportType.ACTIVE_PACKAGES)"
+                      >CHECK ALL</b-button
+                    >
+                    <b-button
+                      variant="outline-primary"
+                      size="sm"
+                      @click="uncheckAll(ReportType.ACTIVE_PACKAGES)"
+                      >UNCHECK ALL</b-button
+                    >
+                  </div>
+
+                  <b-form-checkbox-group
+                    v-model="fields[ReportType.ACTIVE_PACKAGES]"
+                    class="flex flex-col items-start gap-1"
+                  >
+                    <b-form-checkbox
+                      v-for="fieldData of SHEET_FIELDS[ReportType.ACTIVE_PACKAGES]"
+                      v-bind:key="fieldData.value"
+                      :value="fieldData"
+                      :disabled="fieldData.required"
+                    >
+                      <span class="leading-6">{{ fieldData.readableName }}</span>
+                    </b-form-checkbox>
+                  </b-form-checkbox-group>
+                </template>
               </div>
-            </b-form-group>
+            </div>
           </template>
 
           <template v-if="selectedReports.includes(ReportType.MATURE_PLANTS)">
@@ -88,25 +128,25 @@
               label-class="font-semibold text-gray-700"
             >
               <div class="flex flex-col items-stretch gap-4">
-                <b-form-checkbox :disabled="reportStatus !== ReportStatus.INITIAL">
+                <b-form-checkbox>
                   <span>Include Vegetative</span>
                 </b-form-checkbox>
-                <b-form-checkbox :disabled="reportStatus !== ReportStatus.INITIAL">
+                <b-form-checkbox>
                   <span>Include Flowering</span>
                 </b-form-checkbox>
               </div>
             </b-form-group>
           </template>
         </div>
+
+        <!-- End Column -->
         <div class="flex flex-col gap-4 items-stretch text-center">
           <template v-if="reportStatus === ReportStatus.INITIAL">
-            <div v-if="selectedReports.length === 0">Select one or more reports to generate</div>
-
             <b-button
               variant="primary"
               @click="createSpreadsheet()"
               :disabled="selectedReports.length === 0"
-              >GENERATE REPORT</b-button
+              >EXPORT TO SPREADSHEET</b-button
             >
           </template>
 
@@ -136,17 +176,48 @@
 
           <template v-if="reportStatus === ReportStatus.SUCCESS">
             <b-button variant="primary" :href="generatedSpreadsheet.spreadsheetUrl" target="_blank"
-              >VIEW YOUR REPORT</b-button
+              >VIEW SPREADSHEET</b-button
             >
-            <b-button variant="outline-primary" @click="reset()">GENERATE ANOTHER</b-button>
+            <b-button variant="outline-primary" @click="reset()">START OVER</b-button>
           </template>
+
+          <div
+            class="flex flex-col items-stretch gap-2 text-start py-12"
+            v-if="generatedSpreadsheetHistory.length > 0"
+          >
+            <div style="text-align: start">Previously generated sheets:</div>
+            <div
+              class="flex flex-col items-start"
+              v-bind:key="spreadsheetEntry.uuid"
+              v-for="spreadsheetEntry of generatedSpreadsheetHistory"
+            >
+              <a
+                class="underline text-purple-500 text-sm"
+                :href="spreadsheetEntry.spreadsheet.spreadsheetUrl"
+                target="_blank"
+              >
+                {{ spreadsheetEntry.spreadsheet.properties.title }}
+              </a>
+              <span class="text-xs text-gray-300"
+                >{{ new Date(spreadsheetEntry.timestamp).toLocaleDateString() }}
+                {{ new Date(spreadsheetEntry.timestamp).toLocaleTimeString() }}</span
+              >
+            </div>
+          </div>
         </div>
       </div>
     </template>
 
     <template v-if="oAuthState === OAuthState.NOT_AUTHENTICATED">
-      <div>You must sign in to your Google account to generate reports.</div>
-      <b-button variant="primary" @click="openOAuthPage()">SIGN IN</b-button>
+      <div class="flex flex-col gap-8">
+        <div class="text-lg font-semibold">
+          You must sign in to your Google account to use this tool.
+        </div>
+        <div class="text-base">
+          Track &amp; Trace Tools exports your Metrc data directly into Google Sheets.
+        </div>
+        <b-button variant="primary" @click="openOAuthPage()">SIGN IN</b-button>
+      </div>
     </template>
   </div>
 </template>
@@ -162,9 +233,11 @@ import {
   ReportsActions,
   ReportStatus,
   ReportType,
+  SHEET_FIELDS,
 } from "@/store/page-overlay/modules/reports/consts";
 import { IReportConfig } from "@/store/page-overlay/modules/reports/interfaces";
 import { todayIsodate } from "@/utils/date";
+import _ from "lodash";
 import Vue from "vue";
 import { mapActions, mapState } from "vuex";
 
@@ -179,6 +252,7 @@ export default Vue.extend({
       authState: (state: any) => state.pluginAuth.authState,
       oAuthState: (state: any) => state.pluginAuth.oAuthState,
       generatedSpreadsheet: (state: any) => state.reports.generatedSpreadsheet,
+      generatedSpreadsheetHistory: (state: any) => state.reports.generatedSpreadsheetHistory,
       reportStatus: (state: any) => state.reports.status,
       reportStatusMessage: (state: any) => state.reports.statusMessage,
       reportStatusMessageHistory: (state: any) => state.reports.statusMessageHistory,
@@ -189,6 +263,7 @@ export default Vue.extend({
       OAuthState,
       ReportStatus,
       ReportType,
+      SHEET_FIELDS,
       selectedReports: [],
       reportOptions: [
         {
@@ -200,7 +275,7 @@ export default Vue.extend({
         {
           text: "Mature Plants",
           value: ReportType.MATURE_PLANTS,
-          premium: false,
+          premium: true,
           description: "All plants within this license",
         },
         {
@@ -238,6 +313,14 @@ export default Vue.extend({
       packagedDateLt: todayIsodate(),
       includePackagedDateGt: false,
       includePackagedDateLt: false,
+      showFields: (() => {
+        const fields: { [key: string]: boolean } = {};
+        Object.keys(SHEET_FIELDS).map((x) => {
+          fields[x] = false;
+        });
+        return fields;
+      })(),
+      fields: _.cloneDeep(SHEET_FIELDS),
     };
   },
   methods: {
@@ -246,6 +329,17 @@ export default Vue.extend({
       generateReportSpreadsheet: `reports/${ReportsActions.GENERATE_REPORT_SPREADSHEET}`,
       reset: `reports/${ReportsActions.RESET}`,
     }),
+    toggleFields(reportType: ReportType) {
+      this.$data.showFields[reportType] = !this.$data.showFields[reportType];
+    },
+    checkAll(reportType: ReportType) {
+      this.$data.fields[reportType] = _.cloneDeep(SHEET_FIELDS[reportType]);
+    },
+    uncheckAll(reportType: ReportType) {
+      this.$data.fields[reportType] = _.cloneDeep(SHEET_FIELDS[reportType]).filter(
+        (x) => x.required
+      );
+    },
     async openOAuthPage() {
       messageBus.sendMessageToBackground(MessageType.OPEN_OPTIONS_PAGE, {
         path: "/google-sheets",
@@ -265,11 +359,17 @@ export default Vue.extend({
           packageFilter.packagedDateLt = this.$data.packagedDateLt;
         }
 
-        reportConfig[ReportType.ACTIVE_PACKAGES] = { packageFilter };
+        reportConfig[ReportType.ACTIVE_PACKAGES] = {
+          packageFilter,
+          fields: this.$data.fields[ReportType.ACTIVE_PACKAGES],
+        };
       }
 
       if (this.$data.selectedReports.includes(ReportType.TRANSFER_PACKAGES)) {
-        reportConfig[ReportType.TRANSFER_PACKAGES] = { transferFilter: {} };
+        reportConfig[ReportType.TRANSFER_PACKAGES] = {
+          transferFilter: {},
+          fields: this.$data.fields[ReportType.TRANSFER_PACKAGES],
+        };
       }
 
       this.generateReportSpreadsheet({ reportConfig });

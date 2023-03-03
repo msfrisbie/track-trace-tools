@@ -135,13 +135,13 @@ export default Vue.extend({
         },
         {
           backgroundColor: "#c14747",
-          text: "REPORTS",
+          text: "GOOGLE SHEETS",
           route: "/google-sheets-export",
           icon: "table",
           visible: true,
           enabled: true,
-          isBeta: true,
-          isNew: false,
+          isBeta: false,
+          isNew: true,
         },
         {
           route: "/package/history",

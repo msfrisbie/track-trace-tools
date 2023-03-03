@@ -216,7 +216,7 @@ const routes: Array<RouteConfig> = [
   },
   {
     path: "/google-sheets-export",
-    name: "Google Sheets Export",
+    name: "Google Sheets",
     component: GoogleSheetsExport,
   },
   {

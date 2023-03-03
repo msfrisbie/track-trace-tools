@@ -26,7 +26,7 @@ const inMemoryState = {
 };
 
 const persistedState = {
-  generatedSheetHistory: [],
+  generatedSpreadsheetHistory: [],
 };
 
 const defaultState: IReportsState = {
@@ -64,13 +64,13 @@ export const reportsModule = {
       state.generatedSpreadsheet = spreadsheet;
 
       if (spreadsheet) {
-        state.generatedSheetHistory = [
+        state.generatedSpreadsheetHistory = [
           {
             uuid: uuidv4(),
             timestamp: new Date().toISOString(),
             spreadsheet: getSimpleSpreadsheet(spreadsheet),
           },
-          ...state.generatedSheetHistory,
+          ...state.generatedSpreadsheetHistory,
         ];
       }
     },

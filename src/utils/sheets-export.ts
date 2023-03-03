@@ -10,7 +10,11 @@ import {
 import { messageBus } from "@/modules/message-bus.module";
 import store from "@/store/page-overlay/index";
 import { ReportType } from "@/store/page-overlay/modules/reports/consts";
-import { IReportConfig, IReportData } from "@/store/page-overlay/modules/reports/interfaces";
+import {
+  IFieldData,
+  IReportConfig,
+  IReportData,
+} from "@/store/page-overlay/modules/reports/interfaces";
 import { todayIsodate } from "./date";
 
 enum SheetTitles {
@@ -36,18 +40,23 @@ export async function createExportSpreadsheetOrError({
 
   let includeActivePackageReport: boolean = false;
   let activePackages: IIndexedPackageData[] = [];
+  let activePackageFields: IFieldData[] = [];
   if (reportConfig[ReportType.ACTIVE_PACKAGES] && reportData[ReportType.ACTIVE_PACKAGES]) {
     includeActivePackageReport = true;
     activePackages = reportData[ReportType.ACTIVE_PACKAGES]
       ?.activePackages as IIndexedPackageData[];
+    activePackageFields = reportConfig[ReportType.ACTIVE_PACKAGES]?.fields as IFieldData[];
   }
 
   let includeTransferPackagesReport: boolean = false;
   let richOutgoingInactiveTransfers: IIndexedRichTransferData[] = [];
+  let richOutgoingInactiveTransferFields: IFieldData[] = [];
   if (reportConfig[ReportType.TRANSFER_PACKAGES] && reportData[ReportType.TRANSFER_PACKAGES]) {
     includeTransferPackagesReport = true;
     richOutgoingInactiveTransfers = reportData[ReportType.TRANSFER_PACKAGES]
       ?.richOutgoingInactiveTransfers as IIndexedRichTransferData[];
+    richOutgoingInactiveTransferFields = reportConfig[ReportType.TRANSFER_PACKAGES]
+      ?.fields as IFieldData[];
   }
 
   //
@@ -106,9 +115,9 @@ export async function createExportSpreadsheetOrError({
           cell: {
             userEnteredFormat: {
               backgroundColor: {
-                red: 0.0,
-                green: 0.0,
-                blue: 0.0,
+                red: 73 / 256,
+                green: 39 / 256,
+                blue: 106 / 256,
               },
               horizontalAlignment: "CENTER",
               textFormat: {
@@ -180,9 +189,9 @@ export async function createExportSpreadsheetOrError({
           cell: {
             userEnteredFormat: {
               backgroundColor: {
-                red: 0.0,
-                green: 0.0,
-                blue: 0.0,
+                red: 73 / 256,
+                green: 39 / 256,
+                blue: 106 / 256,
               },
               horizontalAlignment: "CENTER",
               textFormat: {
@@ -235,24 +244,10 @@ export async function createExportSpreadsheetOrError({
   //
 
   if (includeActivePackageReport) {
-    const packageProperties = [
-      "Label",
-      "LicenseNumber",
-      "PackageState",
-      "Item.Name",
-      "Quantity",
-      "UnitOfMeasureAbbreviation",
-      "PackagedDate",
-      "LocationName",
-      "PackagedByFacilityLicenseNumber",
-      "LabTestingStateName",
-      "ProductionBatchNumber",
-    ];
-
     await messageBus.sendMessageToBackground(MessageType.WRITE_SPREADSHEET_VALUES, {
       spreadsheetId: response.data.result.spreadsheetId,
       range: `'${SheetTitles.PACKAGES}'!1:1`,
-      values: [packageProperties.map((x) => `     ${x}     `)],
+      values: [activePackageFields.map((fieldData) => `     ${fieldData.readableName}     `)],
     });
 
     let nextPageStartIdx = 0;
@@ -269,9 +264,9 @@ export async function createExportSpreadsheetOrError({
         spreadsheetId: response.data.result.spreadsheetId,
         range: `'${SheetTitles.PACKAGES}'!${nextPageRowIdx}:${nextPageRowIdx + nextPage.length}`,
         values: nextPage.map((pkg) =>
-          packageProperties.map((property) => {
+          activePackageFields.map((fieldData) => {
             let value = pkg;
-            for (const subProperty of property.split(".")) {
+            for (const subProperty of fieldData.value.split(".")) {
               // @ts-ignore
               value = value[subProperty];
             }
@@ -286,24 +281,14 @@ export async function createExportSpreadsheetOrError({
   }
 
   if (includeTransferPackagesReport) {
-    const richOutgoingInactiveTransferProperties = [
-      "Transfer.ManifestNumber",
-      "Transfer.ShipmentLicenseTypeName",
-      "Transfer.ShipperFacilityName",
-      "Transfer.ShipperFacilityLicenseNumber",
-      "Destination.RecipientFacilityName",
-      "Destination.RecipientFacilityLicenseNumber",
-      "Destination.EstimatedDepartureDateTime",
-      "Package.PackageLabel",
-      "Package.ProductName",
-      "Package.ShippedQuantity",
-      "Package.ShippedUnitOfMeasureAbbreviation",
-    ];
-
     await messageBus.sendMessageToBackground(MessageType.WRITE_SPREADSHEET_VALUES, {
       spreadsheetId: response.data.result.spreadsheetId,
       range: `'${SheetTitles.DEPARTED_TRANSFER_PACKAGES}'!1:1`,
-      values: [richOutgoingInactiveTransferProperties.map((x) => `     ${x}     `)],
+      values: [
+        richOutgoingInactiveTransferFields.map(
+          (fieldData) => `     ${fieldData.readableName}     `
+        ),
+      ],
     });
 
     let nextPageStartIdx = 0;
@@ -325,9 +310,9 @@ export async function createExportSpreadsheetOrError({
           nextPageRowIdx + nextPage.length
         }`,
         values: nextPage.map((data) =>
-          richOutgoingInactiveTransferProperties.map((property) => {
+          richOutgoingInactiveTransferFields.map((fieldData) => {
             let value = data;
-            for (const subProperty of property.split(".")) {
+            for (const subProperty of fieldData.value.split(".")) {
               // @ts-ignore
               value = value[subProperty];
             }
