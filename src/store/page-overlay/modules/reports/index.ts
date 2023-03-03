@@ -1,9 +1,11 @@
+import { MessageType } from "@/consts";
 import {
   IIndexedRichTransferData,
   IPluginState,
   IRichDestinationData,
   ISpreadsheet,
 } from "@/interfaces";
+import { analyticsManager } from "@/modules/analytics-manager.module";
 import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
 import { getSimpleSpreadsheet } from "@/utils/sheets";
 import { createExportSpreadsheetOrError } from "@/utils/sheets-export";
@@ -100,7 +102,7 @@ export const reportsModule = {
       ctx: ActionContext<IReportsState, IPluginState>,
       { reportConfig }: { reportConfig: IReportConfig }
     ) => {
-      console.log({ reportConfig });
+      analyticsManager.track(MessageType.GENERATED_SPREADSHEET, reportConfig);
 
       ctx.commit(ReportsMutations.SET_STATUS, { status: ReportStatus.INFLIGHT });
 
@@ -176,12 +178,16 @@ export const reportsModule = {
           status: ReportStatus.SUCCESS,
           statusMessage: "",
         });
+        analyticsManager.track(MessageType.GENERATED_SPREADSHEET_SUCCESS);
       } catch (e) {
         ctx.commit(ReportsMutations.SET_STATUS, {
           status: ReportStatus.ERROR,
           // @ts-ignore
           statusMessage: e.toString(),
         });
+
+        // @ts-ignore
+        analyticsManager.track(MessageType.GENERATED_SPREADSHEET_ERROR, { error: e.toString() });
       }
     },
   },

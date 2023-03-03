@@ -22,18 +22,6 @@ import store from "@/store/page-overlay/index";
 import Vue from "vue";
 import { mapState } from "vuex";
 
-/* 
-TODO Auth events:
-
-LOGIN
-LOGOUT
-GENERATE REPORT (incl. types)
-GENERATE REPORT SUCCESS
-GENERATE REPORT ERROR
-CHANGE REPORT CONFIG
-
-*/
-
 export default Vue.extend({
   name: "GoogleSheets",
   store,

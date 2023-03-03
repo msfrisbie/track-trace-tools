@@ -39,6 +39,7 @@
 
 <script lang="ts">
 import { MessageType } from "@/consts";
+import { analyticsManager } from "@/modules/analytics-manager.module";
 import { messageBus } from "@/modules/message-bus.module";
 import router from "@/router/index";
 import store from "@/store/page-overlay/index";
@@ -76,12 +77,19 @@ export default Vue.extend({
         { interactive }
       );
       this.$data.oauthUserInfo = response.data.result;
+      if (response.data.success) {
+        analyticsManager.track(MessageType.OAUTH_LOGIN_SUCCESS);
+      } else {
+        analyticsManager.track(MessageType.OAUTH_LOGIN_ERROR);
+      }
     },
 
     async logout() {
       await messageBus.sendMessageToBackground(MessageType.EXPIRE_AUTH_TOKEN);
 
       this.$data.oauthUserInfo = null;
+
+      analyticsManager.track(MessageType.OAUTH_LOGOUT);
     },
   },
   async created() {},
