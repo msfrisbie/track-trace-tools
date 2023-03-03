@@ -151,6 +151,12 @@
             </div>
           </div>
         </template>
+        <template v-if="slide === 'googlesheets'">
+          <div class="text-gray-700 flex flex-col justify-around gap-2">
+            <div class="font-semibold ttt-purple">Easily Export Metrc Data</div>
+            <div>Track &amp; Trace Tools can export your data directly into Google Sheets</div>
+          </div>
+        </template>
         <template v-if="slide === 'share'">
           <div class="text-gray-700 flex flex-col justify-around gap-2">
             <div class="font-semibold ttt-purple">
@@ -274,6 +280,7 @@ export default Vue.extend({
         "logout",
         "share",
         "donate",
+        "googlesheets",
       ]),
     };
   },
