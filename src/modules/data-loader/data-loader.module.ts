@@ -739,6 +739,7 @@ export class DataLoader implements IAtomicService {
         pageSize: DATA_LOAD_PAGE_SIZE,
       },
       {
+        operator: "or",
         packageFilter: {
           itemStrainName: queryString,
           itemName: queryString,

@@ -381,6 +381,22 @@ export interface IPlantOptions extends IDataLoadOptions {
   filter: IPlantFilter;
 }
 
+export interface IFilterOptions {
+  operator?: "and" | "or";
+  plantFilter?: IPlantFilter;
+  tagFilter?: ITagFilter;
+  plantBatchFilter?: IPlantBatchFilter;
+  packageFilter?: IPackageFilter;
+  transferFilter?: ITransferFilter;
+  harvestFilter?: IHarvestFilter;
+}
+
+export interface ISortOptions {
+  salesReceiptSort?: ISalesReceiptSort;
+  plantSort?: IPlantSort;
+  plantBatchSort?: IPlantBatchSort;
+}
+
 export type MetrcFilter =
   | IPlantFilter
   | IPackageFilter

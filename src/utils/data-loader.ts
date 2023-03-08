@@ -4,21 +4,14 @@ import {
   ICollectionRequest,
   ICollectionResponse,
   IDataLoadOptions,
-  IHarvestFilter,
+  IFilterOptions,
   IPaginationOptions,
-  IPlantBatchFilter,
-  IPlantBatchSort,
-  IPlantFilter,
-  IPlantSort,
-  ISalesReceiptSort,
   ISort,
-  ITagFilter,
-  ITransferFilter,
+  ISortOptions,
 } from "@/interfaces";
 import { DataLoadError, DataLoadErrorType } from "@/modules/data-loader/data-loader-error";
 import { debugLogFactory } from "@/utils/debug";
 import { Subject } from "rxjs";
-import { IPackageFilter } from "../interfaces";
 
 const debugLog = debugLogFactory("utils/data-loader.ts");
 
@@ -102,16 +95,7 @@ export function streamFactory<T>(
   return subject;
 }
 
-export function buildBodyFilter(
-  filterOptions: {
-    plantFilter?: IPlantFilter;
-    tagFilter?: ITagFilter;
-    plantBatchFilter?: IPlantBatchFilter;
-    packageFilter?: IPackageFilter;
-    transferFilter?: ITransferFilter;
-    harvestFilter?: IHarvestFilter;
-  } | null
-): ICollectionFilters | null {
+export function buildBodyFilter(filterOptions: IFilterOptions | null): ICollectionFilters | null {
   if (!filterOptions) {
     return null;
   }
@@ -120,7 +104,7 @@ export function buildBodyFilter(
     filterOptions;
 
   const filterSet: ICollectionFilters = {
-    logic: "and",
+    logic: filterOptions.operator || "and",
     filters: [],
   };
 
@@ -464,13 +448,7 @@ export function buildBodyFilter(
   return null;
 }
 
-export function buildBodySort(
-  sortOptions: {
-    salesReceiptSort?: ISalesReceiptSort;
-    plantSort?: IPlantSort;
-    plantBatchSort?: IPlantBatchSort;
-  } | null
-) {
+export function buildBodySort(sortOptions: ISortOptions | null) {
   if (!sortOptions) {
     return null;
   }
@@ -525,19 +503,8 @@ export function buildBodySort(
  */
 export function buildBody(
   { page, pageSize }: IPaginationOptions,
-  filterOptions: {
-    plantFilter?: IPlantFilter;
-    tagFilter?: ITagFilter;
-    plantBatchFilter?: IPlantBatchFilter;
-    packageFilter?: IPackageFilter;
-    transferFilter?: ITransferFilter;
-    harvestFilter?: IHarvestFilter;
-  } | null = null,
-  sortOptions: {
-    salesReceiptSort?: ISalesReceiptSort;
-    plantSort?: IPlantSort;
-    plantBatchSort?: IPlantBatchSort;
-  } | null = null
+  filterOptions: IFilterOptions | null = null,
+  sortOptions: ISortOptions | null = null
 ): string {
   const body: ICollectionRequest = {
     request: {
