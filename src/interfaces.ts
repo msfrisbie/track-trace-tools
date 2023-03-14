@@ -378,7 +378,7 @@ export interface IDataLoadOptions {
 export interface IPackageOptions extends IDataLoadOptions {}
 
 export interface IPlantOptions extends IDataLoadOptions {
-  filter: IPlantFilter;
+  filter?: IPlantFilter;
 }
 
 export interface IFilterOptions {
@@ -418,6 +418,8 @@ export interface IPlantFilter {
   plantedDateGt?: string | null;
   plantedDateEq?: string | null;
   plantedDateLt?: string | null;
+  includeVegetative?: boolean;
+  includeFlowering?: boolean;
 }
 
 export interface IPlantBatchOptions extends IDataLoadOptions {
@@ -452,6 +454,9 @@ export interface ITransferFilter {
   createdDateGt?: string | null;
   createdDateEq?: string | null;
   createdDateLt?: string | null;
+  onlyWholesale?: boolean;
+  estimatedDepartureDateGt?: string;
+  estimatedDepartureDateLt?: string;
 }
 
 export interface ITagFilter {

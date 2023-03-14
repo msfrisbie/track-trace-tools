@@ -140,8 +140,8 @@ export default Vue.extend({
           icon: "table",
           visible: true,
           enabled: true,
-          isBeta: false,
-          isNew: true,
+          isBeta: true,
+          isNew: false,
         },
         {
           route: "/package/history",

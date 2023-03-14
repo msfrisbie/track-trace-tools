@@ -34,6 +34,63 @@ export enum ReportType {
 }
 
 export const SHEET_FIELDS: { [key: string]: IFieldData[] } = {
+  [ReportType.MATURE_PLANTS]: [
+    {
+      value: "Label",
+      readableName: "Plant Tag",
+      required: true,
+    },
+    {
+      value: "LicenseNumber",
+      readableName: "Current License",
+      required: true,
+    },
+    {
+      value: "PlantState",
+      readableName: "Growth Phase",
+      required: true,
+    },
+    {
+      value: "PlantedDate",
+      readableName: "Planted Date",
+      required: false,
+    },
+    {
+      value: "VegetativeDate",
+      readableName: "Vegetative Date",
+      required: false,
+    },
+    {
+      value: "FloweringDate",
+      readableName: "Flowering Date",
+      required: false,
+    },
+    {
+      value: "DestroyedDate",
+      readableName: "Destroyed Date",
+      required: false,
+    },
+    {
+      value: "StrainName",
+      readableName: "Strain",
+      required: false,
+    },
+    {
+      value: "LocationName",
+      readableName: "Location",
+      required: false,
+    },
+    {
+      value: "PlantBatchName",
+      readableName: "Source Plant Batch",
+      required: false,
+    },
+    {
+      value: "HarvestCount",
+      readableName: "Harvest Count",
+      required: false,
+    },
+  ],
   [ReportType.ACTIVE_PACKAGES]: [
     {
       value: "Label",
@@ -91,16 +148,21 @@ export const SHEET_FIELDS: { [key: string]: IFieldData[] } = {
       required: false,
     },
   ],
-  [ReportType.TRANSFER_PACKAGES]: [
+  [ReportType.OUTGOING_TRANSFERS]: [
     {
       value: "Transfer.ManifestNumber",
       readableName: "Manifest #",
       required: true,
     },
     {
-      value: "Transfer.ShipmentLicenseTypeName",
+      value: "Destination.ShipmentTypeName",
       readableName: "Transfer Type",
-      required: false,
+      required: true,
+    },
+    {
+      value: "Destination.DeliveryPackageCount",
+      readableName: "Package Count",
+      required: true,
     },
     {
       value: "Transfer.ShipperFacilityName",
@@ -120,6 +182,48 @@ export const SHEET_FIELDS: { [key: string]: IFieldData[] } = {
     {
       value: "Destination.RecipientFacilityLicenseNumber",
       readableName: "Recipient License",
+      required: false,
+    },
+    {
+      value: "Destination.EstimatedDepartureDateTime",
+      readableName: "ETD",
+      required: false,
+    },
+    {
+      value: "Destination.EstimatedArrivalDateTime",
+      readableName: "ETA",
+      required: false,
+    },
+  ],
+  [ReportType.TRANSFER_PACKAGES]: [
+    {
+      value: "Transfer.ManifestNumber",
+      readableName: "Manifest #",
+      required: true,
+    },
+    {
+      value: "Destination.ShipmentTypeName",
+      readableName: "Transfer Type",
+      required: true,
+    },
+    {
+      value: "Transfer.ShipperFacilityName",
+      readableName: "Shipper Name",
+      required: false,
+    },
+    {
+      value: "Transfer.ShipperFacilityLicenseNumber",
+      readableName: "Shipper License",
+      required: false,
+    },
+    {
+      value: "Destination.RecipientFacilityName",
+      readableName: "Recipient Name",
+      required: false,
+    },
+    {
+      value: "Destination.EstimatedDepartureDateTime",
+      readableName: "ETD",
       required: false,
     },
     {

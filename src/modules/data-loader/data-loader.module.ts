@@ -461,8 +461,9 @@ export class DataLoader implements IAtomicService {
     return this._voidedTags;
   }
 
-  async vegetativePlants(options: IPlantOptions): Promise<IPlantData[]> {
+  async vegetativePlants(options: IPlantOptions = {}): Promise<IIndexedPlantData[]> {
     if (store.state.mockDataMode && store.state.flags?.mockedFlags.mockPlants.enabled) {
+      // @ts-ignore
       return mockDataManager.mockPlants(options);
     }
 
@@ -473,7 +474,11 @@ export class DataLoader implements IAtomicService {
       );
 
       try {
-        const plants = await this.loadVegetativePlants(options);
+        const plants = (await this.loadVegetativePlants(options)).map((x) => ({
+          ...x,
+          PlantState: PlantState.VEGETATIVE,
+          TagMatcher: "",
+        }));
 
         subscription.unsubscribe();
         resolve(plants);
@@ -484,8 +489,9 @@ export class DataLoader implements IAtomicService {
     });
   }
 
-  async floweringPlants(options: IPlantOptions): Promise<IPlantData[]> {
+  async floweringPlants(options: IPlantOptions = {}): Promise<IIndexedPlantData[]> {
     if (store.state.mockDataMode && store.state.flags?.mockedFlags.mockPlants.enabled) {
+      // @ts-ignore
       return mockDataManager.mockPlants(options);
     }
 
@@ -496,7 +502,11 @@ export class DataLoader implements IAtomicService {
       );
 
       try {
-        const plants = await this.loadFloweringPlants(options);
+        const plants = (await this.loadFloweringPlants(options)).map((x) => ({
+          ...x,
+          PlantState: PlantState.FLOWERING,
+          TagMatcher: "",
+        }));
 
         subscription.unsubscribe();
         resolve(plants);

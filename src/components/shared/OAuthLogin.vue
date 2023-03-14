@@ -19,7 +19,7 @@
 
       <template v-if="!isAuthenticated">
         <div
-          @click="login({ interactive: true })"
+          @click="loginOrError({ interactive: true })"
           class="flex flex-row justify-between items-center gap-4 justify-center p-3 border border-gray-100 hover:bg-gray-100 rounded shadow-md cursor-pointer"
         >
           <img src="img/google.svg" />
@@ -70,8 +70,7 @@ export default Vue.extend({
     };
   },
   methods: {
-    async login({ interactive = false }: { interactive?: boolean } = {}) {
-      console.log("attempting login");
+    async loginOrError({ interactive = false }: { interactive?: boolean } = {}) {
       const response = await messageBus.sendMessageToBackground(
         MessageType.GET_OAUTH_USER_INFO_OR_ERROR,
         { interactive }
@@ -95,8 +94,15 @@ export default Vue.extend({
   async created() {},
   async mounted() {
     try {
+      // If the login fails, dump out and show the login button
+      const timeout = setTimeout(() => {
+        this.$data.initial = false;
+      }, 5000);
+
       // @ts-ignore
-      await this.login();
+      await this.loginOrError();
+
+      clearTimeout(timeout);
     } catch (e) {
       console.error(e);
     } finally {
@@ -106,7 +112,7 @@ export default Vue.extend({
     document.addEventListener("visibilitychange", () => {
       if (document.visibilityState === "visible") {
         // @ts-ignore
-        this.login();
+        this.loginOrError();
       }
     });
   },

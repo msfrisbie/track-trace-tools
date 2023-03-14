@@ -1,7 +1,9 @@
 import {
   IIndexedPackageData,
+  IIndexedPlantData,
   IIndexedRichTransferData,
   IPackageFilter,
+  IPlantFilter,
   ISimpleSpreadsheet,
   ISpreadsheet,
   ITransferFilter,
@@ -25,6 +27,14 @@ export interface IReportConfig {
     packageFilter: IPackageFilter;
     fields: IFieldData[];
   };
+  [ReportType.MATURE_PLANTS]?: {
+    plantFilter: IPlantFilter;
+    fields: IFieldData[];
+  };
+  [ReportType.OUTGOING_TRANSFERS]?: {
+    transferFilter: ITransferFilter;
+    fields: IFieldData[];
+  }
   [ReportType.TRANSFER_PACKAGES]?: {
     transferFilter: ITransferFilter;
     fields: IFieldData[];
@@ -35,6 +45,12 @@ export interface IReportData {
   [ReportType.ACTIVE_PACKAGES]?: {
     activePackages: IIndexedPackageData[];
   };
+  [ReportType.MATURE_PLANTS]?: {
+    maturePlants: IIndexedPlantData[];
+  };
+  [ReportType.OUTGOING_TRANSFERS]?: {
+    outgoingTransfers: IIndexedRichTransferData[];
+  }
   [ReportType.TRANSFER_PACKAGES]?: {
     richOutgoingInactiveTransfers?: IIndexedRichTransferData[];
   };

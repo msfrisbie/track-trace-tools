@@ -43,61 +43,73 @@
         </div>
 
         <!-- Middle Column -->
-        <div v-bind:class="{ invisible: reportStatus !== ReportStatus.INITIAL }">
+        <div
+          v-bind:class="{ invisible: reportStatus !== ReportStatus.INITIAL }"
+          class="flex flex-col items-stretch gap-4"
+        >
           <template v-if="selectedReports.length === 0">
             <div class="text-red-500 text-center">Select one or more export types</div>
           </template>
+
           <template v-if="selectedReports.includes(ReportType.ACTIVE_PACKAGES)">
             <div class="rounded border border-gray-300 p-2 flex flex-col items-stretch gap-2">
               <div class="font-semibold text-gray-700">Active Packages</div>
               <hr />
               <div class="flex flex-col items-stretch gap-4">
-                <div class="flex flex-col items-start gap-1">
-                  <b-form-checkbox v-model="includePackagedDateGt">
-                    <span class="leading-6">Packaged on or after:</span>
-                  </b-form-checkbox>
-                  <b-form-datepicker
-                    v-if="includePackagedDateGt"
-                    :disabled="!includePackagedDateGt"
-                    initial-date
-                    size="sm"
-                    v-model="packagedDateGt"
-                  />
-                </div>
+                <b-button
+                  size="sm"
+                  variant="outline-primary"
+                  @click="toggleFilters(ReportType.ACTIVE_PACKAGES)"
+                  >{{
+                    showFilters[ReportType.ACTIVE_PACKAGES] ? "HIDE FILTERS" : "CHOOSE FILTERS"
+                  }}</b-button
+                >
+                <template v-if="showFilters[ReportType.ACTIVE_PACKAGES]">
+                  <div class="flex flex-col items-start gap-1">
+                    <b-form-checkbox v-model="activePackagesFormFilters.includePackagedDateGt">
+                      <span class="leading-6">Packaged on or after:</span>
+                    </b-form-checkbox>
+                    <b-form-datepicker
+                      v-if="activePackagesFormFilters.includePackagedDateGt"
+                      :disabled="!activePackagesFormFilters.includePackagedDateGt"
+                      initial-date
+                      size="sm"
+                      v-model="activePackagesFormFilters.packagedDateGt"
+                    />
+                  </div>
 
-                <div class="flex flex-col items-start gap-1">
-                  <b-form-checkbox v-model="includePackagedDateLt">
-                    <span class="leading-6">Packaged on or before:</span>
-                  </b-form-checkbox>
-                  <b-form-datepicker
-                    v-if="includePackagedDateLt"
-                    :disabled="!includePackagedDateLt"
-                    initial-date
-                    size="sm"
-                    v-model="packagedDateLt"
-                  />
-                </div>
+                  <div class="flex flex-col items-start gap-1">
+                    <b-form-checkbox v-model="activePackagesFormFilters.includePackagedDateLt">
+                      <span class="leading-6">Packaged on or before:</span>
+                    </b-form-checkbox>
+                    <b-form-datepicker
+                      v-if="activePackagesFormFilters.includePackagedDateLt"
+                      :disabled="!activePackagesFormFilters.includePackagedDateLt"
+                      initial-date
+                      size="sm"
+                      v-model="activePackagesFormFilters.packagedDateLt"
+                    />
+                  </div>
+                </template>
 
                 <b-button
                   size="sm"
                   variant="outline-primary"
                   @click="toggleFields(ReportType.ACTIVE_PACKAGES)"
                   >{{
-                    showFields[ReportType.ACTIVE_PACKAGES]
-                      ? "HIDE FIELDS"
-                      : "SELECT FIELDS TO INCLUDE"
+                    showFields[ReportType.ACTIVE_PACKAGES] ? "HIDE COLUMNS" : "CHOOSE COLUMNS"
                   }}</b-button
                 >
                 <template v-if="showFields[ReportType.ACTIVE_PACKAGES]">
                   <div class="grid grid-cols-2 gap-2">
                     <b-button
-                      variant="outline-primary"
+                      variant="outline-dark"
                       size="sm"
                       @click="checkAll(ReportType.ACTIVE_PACKAGES)"
                       >CHECK ALL</b-button
                     >
                     <b-button
-                      variant="outline-primary"
+                      variant="outline-dark"
                       size="sm"
                       @click="uncheckAll(ReportType.ACTIVE_PACKAGES)"
                       >UNCHECK ALL</b-button
@@ -123,19 +135,184 @@
           </template>
 
           <template v-if="selectedReports.includes(ReportType.MATURE_PLANTS)">
-            <b-form-group
-              label="Mature Plant Report Filters"
-              label-class="font-semibold text-gray-700"
-            >
+            <div class="rounded border border-gray-300 p-2 flex flex-col items-stretch gap-2">
+              <div class="font-semibold text-gray-700">Mature Plants</div>
+              <hr />
               <div class="flex flex-col items-stretch gap-4">
-                <b-form-checkbox>
-                  <span>Include Vegetative</span>
-                </b-form-checkbox>
-                <b-form-checkbox>
-                  <span>Include Flowering</span>
-                </b-form-checkbox>
+                <b-button
+                  size="sm"
+                  variant="outline-primary"
+                  @click="toggleFilters(ReportType.MATURE_PLANTS)"
+                  >{{
+                    showFilters[ReportType.MATURE_PLANTS] ? "HIDE FILTERS" : "CHOOSE FILTERS"
+                  }}</b-button
+                >
+                <template v-if="showFilters[ReportType.MATURE_PLANTS]">
+                  <b-form-checkbox v-model="maturePlantsFormFilters.includeVegetative">
+                    <span class="leading-6">Include Vegetative</span>
+                  </b-form-checkbox>
+                  <b-form-checkbox v-model="maturePlantsFormFilters.includeFlowering">
+                    <span class="leading-6">Include Flowering</span>
+                  </b-form-checkbox>
+
+                  <div class="flex flex-col items-start gap-1">
+                    <b-form-checkbox v-model="maturePlantsFormFilters.includePlantedDateGt">
+                      <span class="leading-6">Planted on or after:</span>
+                    </b-form-checkbox>
+                    <b-form-datepicker
+                      v-if="maturePlantsFormFilters.includePlantedDateGt"
+                      :disabled="!maturePlantsFormFilters.includePlantedDateGt"
+                      initial-date
+                      size="sm"
+                      v-model="maturePlantsFormFilters.plantedDateGt"
+                    />
+                  </div>
+
+                  <div class="flex flex-col items-start gap-1">
+                    <b-form-checkbox v-model="maturePlantsFormFilters.includePlantedDateLt">
+                      <span class="leading-6">Planted on or before:</span>
+                    </b-form-checkbox>
+                    <b-form-datepicker
+                      v-if="maturePlantsFormFilters.includePlantedDateLt"
+                      :disabled="!maturePlantsFormFilters.includePlantedDateLt"
+                      initial-date
+                      size="sm"
+                      v-model="maturePlantsFormFilters.plantedDateLt"
+                    />
+                  </div>
+                </template>
+
+                <b-button
+                  size="sm"
+                  variant="outline-primary"
+                  @click="toggleFields(ReportType.MATURE_PLANTS)"
+                  >{{
+                    showFields[ReportType.MATURE_PLANTS] ? "HIDE FIELDS" : "CHOOSE FIELDS"
+                  }}</b-button
+                >
+                <template v-if="showFields[ReportType.MATURE_PLANTS]">
+                  <div class="grid grid-cols-2 gap-2">
+                    <b-button
+                      variant="outline-dark"
+                      size="sm"
+                      @click="checkAll(ReportType.MATURE_PLANTS)"
+                      >CHECK ALL</b-button
+                    >
+                    <b-button
+                      variant="outline-dark"
+                      size="sm"
+                      @click="uncheckAll(ReportType.MATURE_PLANTS)"
+                      >UNCHECK ALL</b-button
+                    >
+                  </div>
+
+                  <b-form-checkbox-group
+                    v-model="fields[ReportType.MATURE_PLANTS]"
+                    class="flex flex-col items-start gap-1"
+                  >
+                    <b-form-checkbox
+                      v-for="fieldData of SHEET_FIELDS[ReportType.MATURE_PLANTS]"
+                      v-bind:key="fieldData.value"
+                      :value="fieldData"
+                      :disabled="fieldData.required"
+                    >
+                      <span class="leading-6">{{ fieldData.readableName }}</span>
+                    </b-form-checkbox>
+                  </b-form-checkbox-group>
+                </template>
               </div>
-            </b-form-group>
+            </div>
+          </template>
+
+          <template v-if="selectedReports.includes(ReportType.OUTGOING_TRANSFERS)">
+            <div class="rounded border border-gray-300 p-2 flex flex-col items-stretch gap-2">
+              <div class="font-semibold text-gray-700">Outgoing Transfers</div>
+              <hr />
+              <div class="flex flex-col items-stretch gap-4">
+                <b-button
+                  size="sm"
+                  variant="outline-primary"
+                  @click="toggleFilters(ReportType.OUTGOING_TRANSFERS)"
+                  >{{
+                    showFilters[ReportType.OUTGOING_TRANSFERS] ? "HIDE FILTERS" : "CHOOSE FILTERS"
+                  }}</b-button
+                >
+                <template v-if="showFilters[ReportType.OUTGOING_TRANSFERS]">
+                  <b-form-checkbox v-model="outgoingTransfersFormFilters.onlyWholesale">
+                    <span class="leading-6">Only Wholesale</span>
+                  </b-form-checkbox>
+
+                  <div class="flex flex-col items-start gap-1">
+                    <b-form-checkbox
+                      v-model="outgoingTransfersFormFilters.includeEstimatedDepartureDateGt"
+                    >
+                      <span class="leading-6">ETD on or after:</span>
+                    </b-form-checkbox>
+                    <b-form-datepicker
+                      v-if="outgoingTransfersFormFilters.includeEstimatedDepartureDateGt"
+                      :disabled="!outgoingTransfersFormFilters.includeEstimatedDepartureDateGt"
+                      initial-date
+                      size="sm"
+                      v-model="outgoingTransfersFormFilters.estimatedDepartureDateGt"
+                    />
+                  </div>
+
+                  <div class="flex flex-col items-start gap-1">
+                    <b-form-checkbox
+                      v-model="outgoingTransfersFormFilters.includeEstimatedDepartureDateLt"
+                    >
+                      <span class="leading-6">ETD on or before:</span>
+                    </b-form-checkbox>
+                    <b-form-datepicker
+                      v-if="outgoingTransfersFormFilters.includeEstimatedDepartureDateLt"
+                      :disabled="!outgoingTransfersFormFilters.includeEstimatedDepartureDateLt"
+                      initial-date
+                      size="sm"
+                      v-model="outgoingTransfersFormFilters.estimatedDepartureDateLt"
+                    />
+                  </div>
+                </template>
+
+                <b-button
+                  size="sm"
+                  variant="outline-primary"
+                  @click="toggleFields(ReportType.OUTGOING_TRANSFERS)"
+                  >{{
+                    showFields[ReportType.OUTGOING_TRANSFERS] ? "HIDE FIELDS" : "CHOOSE FIELDS"
+                  }}</b-button
+                >
+                <template v-if="showFields[ReportType.OUTGOING_TRANSFERS]">
+                  <div class="grid grid-cols-2 gap-2">
+                    <b-button
+                      variant="outline-dark"
+                      size="sm"
+                      @click="checkAll(ReportType.OUTGOING_TRANSFERS)"
+                      >CHECK ALL</b-button
+                    >
+                    <b-button
+                      variant="outline-dark"
+                      size="sm"
+                      @click="uncheckAll(ReportType.OUTGOING_TRANSFERS)"
+                      >UNCHECK ALL</b-button
+                    >
+                  </div>
+
+                  <b-form-checkbox-group
+                    v-model="fields[ReportType.OUTGOING_TRANSFERS]"
+                    class="flex flex-col items-start gap-1"
+                  >
+                    <b-form-checkbox
+                      v-for="fieldData of SHEET_FIELDS[ReportType.OUTGOING_TRANSFERS]"
+                      v-bind:key="fieldData.value"
+                      :value="fieldData"
+                      :disabled="fieldData.required"
+                    >
+                      <span class="leading-6">{{ fieldData.readableName }}</span>
+                    </b-form-checkbox>
+                  </b-form-checkbox-group>
+                </template>
+              </div>
+            </div>
           </template>
         </div>
 
@@ -224,7 +401,7 @@
 
 <script lang="ts">
 import { MessageType } from "@/consts";
-import { IPackageFilter } from "@/interfaces";
+import { IPackageFilter, IPlantFilter, ITransferFilter } from "@/interfaces";
 import { messageBus } from "@/modules/message-bus.module";
 import router from "@/router/index";
 import store from "@/store/page-overlay/index";
@@ -275,8 +452,14 @@ export default Vue.extend({
         {
           text: "Mature Plants",
           value: ReportType.MATURE_PLANTS,
-          premium: true,
-          description: "All plants within this license",
+          premium: false,
+          description: "Mature plants within this license",
+        },
+        {
+          text: "Outgoing Transfers",
+          value: ReportType.OUTGOING_TRANSFERS,
+          premium: false,
+          description: "Outgoing transfers from this license",
         },
         {
           text: "Straggler Inventory",
@@ -297,22 +480,40 @@ export default Vue.extend({
           description: "All plants and associated harvest data within this license",
         },
         {
-          text: "Outgoing Transfers",
-          value: ReportType.OUTGOING_TRANSFERS,
-          premium: true,
-          description: "Outgoing transfers from this license",
-        },
-        {
           text: "Outgoing Transfer Packages",
           value: ReportType.TRANSFER_PACKAGES,
           premium: true,
           description: "Packages that left this license via outgoing transfer",
         },
       ],
-      packagedDateGt: todayIsodate(),
-      packagedDateLt: todayIsodate(),
-      includePackagedDateGt: false,
-      includePackagedDateLt: false,
+      activePackagesFormFilters: {
+        packagedDateGt: todayIsodate(),
+        packagedDateLt: todayIsodate(),
+        includePackagedDateGt: false,
+        includePackagedDateLt: false,
+      },
+      maturePlantsFormFilters: {
+        plantedDateGt: todayIsodate(),
+        plantedDateLt: todayIsodate(),
+        includeVegetative: true,
+        includeFlowering: true,
+        includePlantedDateGt: false,
+        includePlantedDateLt: false,
+      },
+      outgoingTransfersFormFilters: {
+        estimatedDepartureDateLt: todayIsodate(),
+        estimatedDepartureDateGt: todayIsodate(),
+        includeEstimatedDepartureDateLt: false,
+        includeEstimatedDepartureDateGt: false,
+        onlyWholesale: false,
+      },
+      showFilters: (() => {
+        const fields: { [key: string]: boolean } = {};
+        Object.keys(SHEET_FIELDS).map((x) => {
+          fields[x] = false;
+        });
+        return fields;
+      })(),
       showFields: (() => {
         const fields: { [key: string]: boolean } = {};
         Object.keys(SHEET_FIELDS).map((x) => {
@@ -329,6 +530,9 @@ export default Vue.extend({
       generateReportSpreadsheet: `reports/${ReportsActions.GENERATE_REPORT_SPREADSHEET}`,
       reset: `reports/${ReportsActions.RESET}`,
     }),
+    toggleFilters(reportType: ReportType) {
+      this.$data.showFilters[reportType] = !this.$data.showFilters[reportType];
+    },
     toggleFields(reportType: ReportType) {
       this.$data.showFields[reportType] = !this.$data.showFields[reportType];
     },
@@ -349,19 +553,70 @@ export default Vue.extend({
       const reportConfig: IReportConfig = {};
 
       if (this.$data.selectedReports.includes(ReportType.ACTIVE_PACKAGES)) {
+        const activePackageFormFilters = this.$data.activePackagesFormFilters;
         const packageFilter: IPackageFilter = {};
 
-        if (this.$data.includePackagedDateGt) {
-          packageFilter.packagedDateGt = this.$data.packagedDateGt;
+        if (activePackageFormFilters.includePackagedDateGt) {
+          packageFilter.packagedDateGt = activePackageFormFilters.packagedDateGt;
         }
 
-        if (this.$data.includePackagedDateLt) {
-          packageFilter.packagedDateLt = this.$data.packagedDateLt;
+        if (activePackageFormFilters.includePackagedDateLt) {
+          packageFilter.packagedDateLt = activePackageFormFilters.packagedDateLt;
         }
 
         reportConfig[ReportType.ACTIVE_PACKAGES] = {
           packageFilter,
           fields: this.$data.fields[ReportType.ACTIVE_PACKAGES],
+        };
+      }
+
+      if (this.$data.selectedReports.includes(ReportType.MATURE_PLANTS)) {
+        const plantFilter: IPlantFilter = {};
+        const maturePlantsFormFilters = this.$data.maturePlantsFormFilters;
+
+        if (maturePlantsFormFilters.includeVegetative) {
+          plantFilter.includeVegetative = true;
+        }
+
+        if (maturePlantsFormFilters.includeFlowering) {
+          plantFilter.includeFlowering = true;
+        }
+
+        if (maturePlantsFormFilters.includePlantedDateGt) {
+          plantFilter.plantedDateGt = maturePlantsFormFilters.plantedDateGt;
+        }
+
+        if (maturePlantsFormFilters.includePackagedDateLt) {
+          plantFilter.plantedDateLt = maturePlantsFormFilters.plantedDateLt;
+        }
+
+        reportConfig[ReportType.MATURE_PLANTS] = {
+          plantFilter,
+          fields: this.$data.fields[ReportType.MATURE_PLANTS],
+        };
+      }
+
+      if (this.$data.selectedReports.includes(ReportType.OUTGOING_TRANSFERS)) {
+        const transferFilter: ITransferFilter = {};
+        const outgoingTransfersFormFilters = this.$data.outgoingTransfersFormFilters;
+
+        if (outgoingTransfersFormFilters.onlyWholesale) {
+          transferFilter.onlyWholesale = true;
+        }
+
+        if (outgoingTransfersFormFilters.includeEstimatedDepartureDateGt) {
+          transferFilter.estimatedDepartureDateGt =
+            outgoingTransfersFormFilters.estimatedDepartureDateGt;
+        }
+
+        if (outgoingTransfersFormFilters.includeEstimatedDepartureDateLt) {
+          transferFilter.estimatedDepartureDateLt =
+            outgoingTransfersFormFilters.estimatedDepartureDateLt;
+        }
+
+        reportConfig[ReportType.OUTGOING_TRANSFERS] = {
+          transferFilter,
+          fields: this.$data.fields[ReportType.OUTGOING_TRANSFERS],
         };
       }
 

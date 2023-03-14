@@ -7,6 +7,7 @@
 
           <ul class="list-disc">
             <li>Fix OAuth login</li>
+            <li>Add free export types</li>
           </ul>
 
           <p class="text-2xl ttt-purple">v0.21.2</p>

@@ -1,5 +1,7 @@
 import { MessageType } from "@/consts";
 import {
+  IIndexedPackageData,
+  IIndexedPlantData,
   IIndexedRichTransferData,
   IPluginState,
   IRichDestinationData,
@@ -113,7 +115,15 @@ export const reportsModule = {
         if (activePackageConfig?.packageFilter) {
           ctx.commit(ReportsMutations.SET_STATUS, { statusMessage: "Loading packages..." });
 
-          const activePackages = (await primaryDataLoader.activePackages()).filter((pkg) => {
+          let activePackages: IIndexedPackageData[] = [];
+
+          try {
+            activePackages = [...activePackages, ...(await primaryDataLoader.activePackages())];
+          } catch (e) {
+            ctx.commit(ReportsMutations.SET_STATUS, { statusMessage: "Failed to load packages." });
+          }
+
+          activePackages = activePackages.filter((pkg) => {
             if (activePackageConfig.packageFilter.packagedDateLt) {
               if (pkg.PackagedDate > activePackageConfig.packageFilter.packagedDateLt) {
                 return false;
@@ -137,6 +147,107 @@ export const reportsModule = {
 
           reportData[ReportType.ACTIVE_PACKAGES] = {
             activePackages,
+          };
+        }
+
+        const maturePlantConfig = reportConfig[ReportType.MATURE_PLANTS];
+        if (maturePlantConfig?.plantFilter) {
+          ctx.commit(ReportsMutations.SET_STATUS, { statusMessage: "Loading plants..." });
+
+          let maturePlants: IIndexedPlantData[] = [];
+
+          if (maturePlantConfig.plantFilter.includeVegetative) {
+            try {
+              maturePlants = [...maturePlants, ...(await primaryDataLoader.vegetativePlants())];
+            } catch (e) {
+              ctx.commit(ReportsMutations.SET_STATUS, {
+                statusMessage: "Failed to load vegetative plants.",
+              });
+            }
+          }
+
+          if (maturePlantConfig.plantFilter.includeFlowering) {
+            try {
+              maturePlants = [...maturePlants, ...(await primaryDataLoader.floweringPlants())];
+            } catch (e) {
+              ctx.commit(ReportsMutations.SET_STATUS, {
+                statusMessage: "Failed to load flowering plants.",
+              });
+            }
+          }
+
+          maturePlants = maturePlants.filter((plant) => {
+            if (maturePlantConfig.plantFilter.plantedDateLt) {
+              if (plant.PlantedDate > maturePlantConfig.plantFilter.plantedDateLt) {
+                return false;
+              }
+            }
+
+            if (maturePlantConfig.plantFilter.plantedDateGt) {
+              if (plant.PlantedDate < maturePlantConfig.plantFilter.plantedDateGt) {
+                return false;
+              }
+            }
+
+            return true;
+          });
+
+          reportData[ReportType.MATURE_PLANTS] = {
+            maturePlants,
+          };
+        }
+
+        const outgoingTransferConfig = reportConfig[ReportType.OUTGOING_TRANSFERS];
+        if (outgoingTransferConfig?.transferFilter) {
+          ctx.commit(ReportsMutations.SET_STATUS, {
+            statusMessage: "Loading outgoing transfers...",
+          });
+
+          let richOutgoingTransfers: IIndexedRichTransferData[] =
+            await primaryDataLoader.outgoingTransfers();
+
+          for (const transfer of richOutgoingTransfers) {
+            const destinations: IRichDestinationData[] = (
+              await primaryDataLoader.transferDestinations(transfer.Id)
+            ).map((x) => ({ ...x, packages: [] }));
+
+            console.log({ destinations, filter: outgoingTransferConfig.transferFilter });
+
+            transfer.outgoingDestinations = destinations.filter((destination) => {
+              if (outgoingTransferConfig.transferFilter.onlyWholesale) {
+                if (!destination.ShipmentTypeName.includes("Wholesale")) {
+                  return false;
+                }
+              }
+
+              if (outgoingTransferConfig.transferFilter.estimatedDepartureDateLt) {
+                if (
+                  destination.EstimatedDepartureDateTime >
+                  outgoingTransferConfig.transferFilter.estimatedDepartureDateLt
+                ) {
+                  return false;
+                }
+              }
+
+              if (outgoingTransferConfig.transferFilter.estimatedDepartureDateGt) {
+                if (
+                  destination.EstimatedDepartureDateTime <
+                  outgoingTransferConfig.transferFilter.estimatedDepartureDateGt
+                ) {
+                  return false;
+                }
+              }
+
+              return true;
+            });
+          }
+
+          richOutgoingTransfers = richOutgoingTransfers.filter((transfer) => {
+            return true;
+          });
+
+          reportData[ReportType.OUTGOING_TRANSFERS] = {
+            outgoingTransfers: richOutgoingTransfers,
           };
         }
 
@@ -167,12 +278,16 @@ export const reportsModule = {
 
         ctx.commit(ReportsMutations.SET_STATUS, { statusMessage: "Generating spreadsheet..." });
 
+        console.log({ reportData, reportConfig });
+
         const spreadsheet: ISpreadsheet = await createExportSpreadsheetOrError({
           reportData,
           reportConfig,
         });
 
         ctx.commit(ReportsMutations.SET_GENERATED_SPREADSHEET, { spreadsheet });
+
+        window.open(spreadsheet.spreadsheetUrl, "_blank");
 
         ctx.commit(ReportsMutations.SET_STATUS, {
           status: ReportStatus.SUCCESS,

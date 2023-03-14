@@ -26,7 +26,7 @@ class MessageBus implements IAtomicService {
       const responsePromise = new Promise((resolve, reject) => {
         this.handlers.set(uuid, resolve);
 
-        const id = setTimeout(() => reject("Background message send timed out"), 5000);
+        const id = setTimeout(() => reject("Background message send timed out"), 30000);
 
         this.handlers.set(uuid, (event: any) => {
           clearTimeout(id);
