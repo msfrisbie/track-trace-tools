@@ -211,19 +211,27 @@ chrome.runtime.onMessage.addListener((inboundEvent, sender, sendResponse) => {
 
       //   break;
       case MessageType.CHECK_OAUTH:
-        try {
-          getAuthTokenOrError({ interactive: false }).then(() => {
+        console.log("CHECK_OAUTH", 1);
+        getAuthTokenOrError({ interactive: false }).then(
+          () => {
+            console.log("CHECK_OAUTH", 3);
             respondToContentScript(sendResponse, inboundEvent, {
               success: true,
               isAuthenticated: true,
             });
-          });
-        } catch (error) {
-          respondToContentScript(sendResponse, inboundEvent, {
-            success: false,
-          });
-          console.error("Event error in background", inboundEvent, error);
-        }
+            console.log("CHECK_OAUTH", 4);
+          },
+          (error) => {
+            console.log("CHECK_OAUTH", 5);
+            respondToContentScript(sendResponse, inboundEvent, {
+              success: false,
+            });
+            console.log("CHECK_OAUTH", 6);
+            console.error("Event error in background", inboundEvent, error);
+          }
+        );
+        console.log("CHECK_OAUTH", 2);
+        console.log("CHECK_OAUTH", 7);
         break;
       case MessageType.GET_OAUTH_USER_INFO_OR_ERROR:
         getOAuthUserInfoOrError(inboundEvent.message.data).then(
