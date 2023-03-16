@@ -159,72 +159,159 @@ export async function createExportSpreadsheetOrError({
     throw new Error("Invalid authState");
   }
 
+  function shouldGenerateReport(reportType: ReportType): boolean {
+    return !!reportConfig[reportType] && !!reportData[reportType];
+  }
+
+  function extractNestedData(reportType: ReportType) {
+    switch (reportType) {
+      case ReportType.ACTIVE_PACKAGES:
+        return reportData[reportType]?.activePackages as IIndexedPackageData[];
+      case ReportType.MATURE_PLANTS:
+        return reportData[reportType]?.maturePlants as IIndexedPlantData[];
+      case ReportType.OUTGOING_TRANSFERS:
+        return reportData[reportType]?.outgoingTransfers as IIndexedRichTransferData[];
+      case ReportType.TRANSFER_PACKAGES:
+        return reportData[reportType]?.richOutgoingInactiveTransfers as IIndexedRichTransferData[];
+      default:
+        throw new Error("Bad reportType " + reportType);
+    }
+  }
+
+  function extractFlattenedData(reportType: ReportType) {
+    switch (reportType) {
+      case ReportType.ACTIVE_PACKAGES:
+        return extractNestedData(reportType);
+      case ReportType.MATURE_PLANTS:
+        return extractNestedData(reportType);
+      case ReportType.OUTGOING_TRANSFERS:
+        let flattenedOutgoingTransfers: {
+          Destination: IDestinationData;
+          Transfer: ITransferData;
+        }[] = [];
+
+        for (const transfer of extractNestedData(reportType) as IIndexedRichTransferData[]) {
+          for (const destination of transfer?.outgoingDestinations || []) {
+            flattenedOutgoingTransfers.push({
+              Destination: destination,
+              Transfer: transfer,
+            });
+          }
+        }
+
+        return flattenedOutgoingTransfers;
+      case ReportType.TRANSFER_PACKAGES:
+        let flattenedOutgoingPackages: {
+          Package: IPackageData;
+          Destination: IDestinationData;
+          Transfer: ITransferData;
+        }[] = [];
+
+        for (const transfer of extractNestedData(reportType) as IIndexedRichTransferData[]) {
+          for (const destination of transfer?.outgoingDestinations || []) {
+            for (const pkg of destination.packages) {
+              flattenedOutgoingPackages.push({
+                Package: pkg,
+                Destination: destination,
+                Transfer: transfer,
+              });
+            }
+          }
+        }
+        return flattenedOutgoingPackages;
+      default:
+        throw new Error("Bad reportType " + reportType);
+    }
+  }
+
+  function getSheetTitle(reportType: ReportType): SheetTitles {
+    switch (reportType) {
+      case ReportType.ACTIVE_PACKAGES:
+        return SheetTitles.PACKAGES;
+      case ReportType.MATURE_PLANTS:
+        return SheetTitles.MATURE_PLANTS;
+      case ReportType.OUTGOING_TRANSFERS:
+        return SheetTitles.OUTGOING_TRANSFERS;
+      case ReportType.TRANSFER_PACKAGES:
+        return SheetTitles.DEPARTED_TRANSFER_PACKAGES;
+      default:
+        throw new Error("Bad reportType " + reportType);
+    }
+  }
+
   //
   // Check that inputs are well-formed
   //
 
-  let includeActivePackageReport: boolean = false;
-  let activePackages: IIndexedPackageData[] = [];
-  let activePackageFields: IFieldData[] = [];
-  if (reportConfig[ReportType.ACTIVE_PACKAGES] && reportData[ReportType.ACTIVE_PACKAGES]) {
-    includeActivePackageReport = true;
-    activePackages = reportData[ReportType.ACTIVE_PACKAGES]
-      ?.activePackages as IIndexedPackageData[];
-    activePackageFields = reportConfig[ReportType.ACTIVE_PACKAGES]?.fields as IFieldData[];
-  }
+  const mergedReportData: {
+    [ReportType.ACTIVE_PACKAGES]?: {};
+    [ReportType.MATURE_PLANTS]?: {};
+    [ReportType.OUTGOING_TRANSFERS]?: {};
+    [ReportType.TRANSFER_PACKAGES]?: {};
+  } = {};
 
-  let includeMaturePlantsReport: boolean = false;
-  let maturePlants: IIndexedPlantData[] = [];
-  let maturePlantFields: IFieldData[] = [];
-  if (reportConfig[ReportType.MATURE_PLANTS] && reportData[ReportType.MATURE_PLANTS]) {
-    includeMaturePlantsReport = true;
-    maturePlants = reportData[ReportType.MATURE_PLANTS]?.maturePlants as IIndexedPlantData[];
-    maturePlantFields = reportConfig[ReportType.MATURE_PLANTS]?.fields as IFieldData[];
-  }
+  const ELIGIBLE_REPORT_TYPES: ReportType[] = [
+    ReportType.ACTIVE_PACKAGES,
+    ReportType.MATURE_PLANTS,
+    ReportType.OUTGOING_TRANSFERS,
+    ReportType.TRANSFER_PACKAGES,
+  ].filter(shouldGenerateReport);
 
-  let includeOutgoingTransfersReport: boolean = false;
-  let richOutgoingTransfers: IIndexedRichTransferData[] = [];
-  let richOutgoingTransferFields: IFieldData[] = [];
-  if (reportConfig[ReportType.OUTGOING_TRANSFERS] && reportData[ReportType.OUTGOING_TRANSFERS]) {
-    includeOutgoingTransfersReport = true;
-    richOutgoingTransfers = reportData[ReportType.OUTGOING_TRANSFERS]
-      ?.outgoingTransfers as IIndexedRichTransferData[];
-    richOutgoingTransferFields = reportConfig[ReportType.OUTGOING_TRANSFERS]
-      ?.fields as IFieldData[];
-  }
+  // if (shouldGenerateReport(ReportType.ACTIVE_PACKAGES)) {
+  //   reports.push({
+  //     reportType: ReportType.ACTIVE_PACKAGES,
+  //     sheetTitle: SheetTitles.PACKAGES,
+  //     nestedData: extractNestedData(ReportType.ACTIVE_PACKAGES) as ,
+  //     flattenedData: [],
+  //     fields: reportConfig[ReportType.ACTIVE_PACKAGES]?.fields as IFieldData[]
+  //   })
+  // }
 
-  let includeTransferPackagesReport: boolean = false;
-  let richOutgoingInactiveTransfers: IIndexedRichTransferData[] = [];
-  let richOutgoingInactiveTransferFields: IFieldData[] = [];
-  if (reportConfig[ReportType.TRANSFER_PACKAGES] && reportData[ReportType.TRANSFER_PACKAGES]) {
-    includeTransferPackagesReport = true;
-    richOutgoingInactiveTransfers = reportData[ReportType.TRANSFER_PACKAGES]
-      ?.richOutgoingInactiveTransfers as IIndexedRichTransferData[];
-    richOutgoingInactiveTransferFields = reportConfig[ReportType.TRANSFER_PACKAGES]
-      ?.fields as IFieldData[];
-  }
+  // let activePackages: IIndexedPackageData[] = [];
+  // let activePackageFields: IFieldData[] = [];
+  // if (reportConfig[ReportType.ACTIVE_PACKAGES] && reportData[ReportType.ACTIVE_PACKAGES]) {
+  //   reports.push(ReportType.ACTIVE_PACKAGES);
+  //   activePackages = reportData[ReportType.ACTIVE_PACKAGES]
+  //     ?.activePackages as IIndexedPackageData[];
+  //   activePackageFields = reportConfig[ReportType.ACTIVE_PACKAGES]?.fields as IFieldData[];
+  // }
+
+  // let maturePlants: IIndexedPlantData[] = [];
+  // let maturePlantFields: IFieldData[] = [];
+  // if (reportConfig[ReportType.MATURE_PLANTS] && reportData[ReportType.MATURE_PLANTS]) {
+  //   reports.push(ReportType.MATURE_PLANTS);
+  //   maturePlants = reportData[ReportType.MATURE_PLANTS]?.maturePlants as IIndexedPlantData[];
+  //   maturePlantFields = reportConfig[ReportType.MATURE_PLANTS]?.fields as IFieldData[];
+  // }
+
+  // let richOutgoingTransfers: IIndexedRichTransferData[] = [];
+  // let richOutgoingTransferFields: IFieldData[] = [];
+  // if (reportConfig[ReportType.OUTGOING_TRANSFERS] && reportData[ReportType.OUTGOING_TRANSFERS]) {
+  //   reports.push(ReportType.OUTGOING_TRANSFERS);
+  //   richOutgoingTransfers = reportData[ReportType.OUTGOING_TRANSFERS]
+  //     ?.outgoingTransfers as IIndexedRichTransferData[];
+  //   richOutgoingTransferFields = reportConfig[ReportType.OUTGOING_TRANSFERS]
+  //     ?.fields as IFieldData[];
+  // }
+
+  // let richOutgoingInactiveTransfers: IIndexedRichTransferData[] = [];
+  // let richOutgoingInactiveTransferFields: IFieldData[] = [];
+  // if (reportConfig[ReportType.TRANSFER_PACKAGES] && reportData[ReportType.TRANSFER_PACKAGES]) {
+  //   reports.push(ReportType.TRANSFER_PACKAGES);
+  //   richOutgoingInactiveTransfers = reportData[ReportType.TRANSFER_PACKAGES]
+  //     ?.richOutgoingInactiveTransfers as IIndexedRichTransferData[];
+  //   richOutgoingInactiveTransferFields = reportConfig[ReportType.TRANSFER_PACKAGES]
+  //     ?.fields as IFieldData[];
+  // }
 
   //
   // Generate Sheets
   //
 
-  const sheetTitles: SheetTitles[] = [SheetTitles.OVERVIEW];
-
-  if (includeActivePackageReport) {
-    sheetTitles.push(SheetTitles.PACKAGES);
-  }
-
-  if (includeMaturePlantsReport) {
-    sheetTitles.push(SheetTitles.MATURE_PLANTS);
-  }
-
-  if (includeOutgoingTransfersReport) {
-    sheetTitles.push(SheetTitles.OUTGOING_TRANSFERS);
-  }
-
-  if (includeTransferPackagesReport) {
-    sheetTitles.push(SheetTitles.DEPARTED_TRANSFER_PACKAGES);
-  }
+  const sheetTitles: SheetTitles[] = [
+    SheetTitles.OVERVIEW,
+    ...ELIGIBLE_REPORT_TYPES.map(getSheetTitle),
+  ];
 
   const response: {
     data: {
@@ -245,135 +332,122 @@ export async function createExportSpreadsheetOrError({
   // Format Sheet For Data
   //
 
-  let activePackageRequests: any[] = [];
+  let formattingRequests: any = [];
 
-  if (includeActivePackageReport) {
-    const sheetId: number = sheetTitles.indexOf(SheetTitles.PACKAGES);
-    const length = Math.max(activePackages.length, 1);
+  for (const reportType of ELIGIBLE_REPORT_TYPES) {
+    const sheetId: number = sheetTitles.indexOf(getSheetTitle(reportType));
+    const length = Math.max(extractFlattenedData(reportType).length, 1);
 
-    activePackageRequests = [
+    formattingRequests = [
+      ...formattingRequests,
+
       addRowsRequestFactory({ sheetId, length }),
       styleTopRowRequestFactory({ sheetId }),
       freezeTopRowRequestFactory({ sheetId }),
     ];
   }
 
-  let maturePlantRequests: any = [];
+  // let activePackageRequests: any[] = [];
 
-  if (includeMaturePlantsReport) {
-    const sheetId: number = sheetTitles.indexOf(SheetTitles.MATURE_PLANTS);
-    const length: number = Math.max(activePackages.length, 1);
-    maturePlantRequests = [
-      addRowsRequestFactory({ sheetId, length }),
-      styleTopRowRequestFactory({ sheetId }),
-      freezeTopRowRequestFactory({ sheetId }),
-    ];
-  }
+  // if (reports.includes(ReportType.ACTIVE_PACKAGES)) {
+  //   activePackageRequests = [
+  //     addRowsRequestFactory({ sheetId, length }),
+  //     styleTopRowRequestFactory({ sheetId }),
+  //     freezeTopRowRequestFactory({ sheetId }),
+  //   ];
+  // }
 
-  let richOutgoingTransfersRequests: any[] = [];
-  let flattenedOutgoingTransfers: {
-    Destination: IDestinationData;
-    Transfer: ITransferData;
-  }[] = [];
+  // let maturePlantRequests: any = [];
 
-  if (includeOutgoingTransfersReport) {
-    for (const transfer of richOutgoingTransfers) {
-      for (const destination of transfer?.outgoingDestinations || []) {
-        flattenedOutgoingTransfers.push({
-          Destination: destination,
-          Transfer: transfer,
-        });
-      }
-    }
+  // if (reports.includes(ReportType.MATURE_PLANTS)) {
+  //   const sheetId: number = sheetTitles.indexOf(SheetTitles.MATURE_PLANTS);
+  //   const length: number = Math.max(activePackages.length, 1);
+  //   maturePlantRequests = [
+  //     addRowsRequestFactory({ sheetId, length }),
+  //     styleTopRowRequestFactory({ sheetId }),
+  //     freezeTopRowRequestFactory({ sheetId }),
+  //   ];
+  // }
 
-    const sheetId: number = sheetTitles.indexOf(SheetTitles.OUTGOING_TRANSFERS);
-    const length: number = Math.max(flattenedOutgoingTransfers.length, 1);
+  // let richOutgoingTransfersRequests: any[] = [];
 
-    richOutgoingTransfersRequests = [
-      addRowsRequestFactory({ sheetId, length }),
-      styleTopRowRequestFactory({ sheetId }),
-      freezeTopRowRequestFactory({ sheetId }),
-    ];
-  }
+  // if (reports.includes(ReportType.OUTGOING_TRANSFERS)) {
+  //   const sheetId: number = sheetTitles.indexOf(SheetTitles.OUTGOING_TRANSFERS);
+  //   const length: number = Math.max(flattenedOutgoingTransfers.length, 1);
 
-  let richOutgoingInactiveTransferPackagesRequests: any[] = [];
-  let flattenedOutgoingPackages: {
-    Package: IPackageData;
-    Destination: IDestinationData;
-    Transfer: ITransferData;
-  }[] = [];
+  //   richOutgoingTransfersRequests = [
+  //     addRowsRequestFactory({ sheetId, length }),
+  //     styleTopRowRequestFactory({ sheetId }),
+  //     freezeTopRowRequestFactory({ sheetId }),
+  //   ];
+  // }
 
-  if (includeTransferPackagesReport) {
-    for (const transfer of richOutgoingInactiveTransfers) {
-      for (const destination of transfer?.outgoingDestinations || []) {
-        for (const pkg of destination.packages) {
-          flattenedOutgoingPackages.push({
-            Package: pkg,
-            Destination: destination,
-            Transfer: transfer,
-          });
-        }
-      }
-    }
-    const sheetId: number = sheetTitles.indexOf(SheetTitles.DEPARTED_TRANSFER_PACKAGES);
-    const length: number = Math.max(flattenedOutgoingTransfers.length, 1);
+  // let richOutgoingInactiveTransferPackagesRequests: any[] = [];
 
-    richOutgoingInactiveTransferPackagesRequests = [
-      addRowsRequestFactory({ sheetId, length }),
-      styleTopRowRequestFactory({ sheetId }),
-      freezeTopRowRequestFactory({ sheetId }),
-    ];
-  }
+  // if (reports.includes(ReportType.TRANSFER_PACKAGES)) {
+  //   const sheetId: number = sheetTitles.indexOf(SheetTitles.DEPARTED_TRANSFER_PACKAGES);
+  //   const length: number = Math.max(flattenedOutgoingTransfers.length, 1);
+
+  //   richOutgoingInactiveTransferPackagesRequests = [
+  //     addRowsRequestFactory({ sheetId, length }),
+  //     styleTopRowRequestFactory({ sheetId }),
+  //     freezeTopRowRequestFactory({ sheetId }),
+  //   ];
+  // }
 
   await messageBus.sendMessageToBackground(MessageType.BATCH_UPDATE_SPREADSHEET, {
     spreadsheetId: response.data.result.spreadsheetId,
-    requests: [
-      ...activePackageRequests,
-      ...maturePlantRequests,
-      ...richOutgoingTransfersRequests,
-      ...richOutgoingInactiveTransferPackagesRequests,
-    ],
+    requests: formattingRequests,
   });
 
   //
   // Generate Data Matrix
   //
 
-  if (includeActivePackageReport) {
+  for (const reportType of ELIGIBLE_REPORT_TYPES) {
     await writeDataSheet({
       spreadsheetId: response.data.result.spreadsheetId,
-      spreadsheetTitle: SheetTitles.PACKAGES,
-      fields: activePackageFields,
-      data: activePackages,
+      spreadsheetTitle: getSheetTitle(reportType),
+      fields: reportConfig[reportType]?.fields as IFieldData[],
+      data: extractFlattenedData(reportType) as any[],
     });
   }
 
-  if (includeMaturePlantsReport) {
-    await writeDataSheet({
-      spreadsheetId: response.data.result.spreadsheetId,
-      spreadsheetTitle: SheetTitles.MATURE_PLANTS,
-      fields: maturePlantFields,
-      data: maturePlants,
-    });
-  }
+  // if (reports.includes(ReportType.ACTIVE_PACKAGES)) {
+  //   await writeDataSheet({
+  //     spreadsheetId: response.data.result.spreadsheetId,
+  //     spreadsheetTitle: SheetTitles.PACKAGES,
+  //     fields: activePackageFields,
+  //     data: activePackages,
+  //   });
+  // }
 
-  if (includeOutgoingTransfersReport) {
-    await writeDataSheet({
-      spreadsheetId: response.data.result.spreadsheetId,
-      spreadsheetTitle: SheetTitles.OUTGOING_TRANSFERS,
-      fields: richOutgoingTransferFields,
-      data: flattenedOutgoingTransfers,
-    });
-  }
+  // if (reports.includes(ReportType.MATURE_PLANTS)) {
+  //   await writeDataSheet({
+  //     spreadsheetId: response.data.result.spreadsheetId,
+  //     spreadsheetTitle: SheetTitles.MATURE_PLANTS,
+  //     fields: maturePlantFields,
+  //     data: maturePlants,
+  //   });
+  // }
 
-  if (includeTransferPackagesReport) {
-    await writeDataSheet({
-      spreadsheetId: response.data.result.spreadsheetId,
-      spreadsheetTitle: SheetTitles.DEPARTED_TRANSFER_PACKAGES,
-      fields: richOutgoingInactiveTransferFields,
-      data: flattenedOutgoingPackages,
-    });
-  }
+  // if (reports.includes(ReportType.OUTGOING_TRANSFERS)) {
+  //   await writeDataSheet({
+  //     spreadsheetId: response.data.result.spreadsheetId,
+  //     spreadsheetTitle: SheetTitles.OUTGOING_TRANSFERS,
+  //     fields: richOutgoingTransferFields,
+  //     data: flattenedOutgoingTransfers,
+  //   });
+  // }
+
+  // if (reports.includes(ReportType.TRANSFER_PACKAGES)) {
+  //   await writeDataSheet({
+  //     spreadsheetId: response.data.result.spreadsheetId,
+  //     spreadsheetTitle: SheetTitles.DEPARTED_TRANSFER_PACKAGES,
+  //     fields: richOutgoingInactiveTransferFields,
+  //     data: flattenedOutgoingPackages,
+  //   });
+  // }
 
   //
   // Generate Summary Sheet
@@ -381,38 +455,47 @@ export async function createExportSpreadsheetOrError({
 
   const summaryList = [];
 
-  if (includeActivePackageReport) {
+  for (const reportType of ELIGIBLE_REPORT_TYPES) {
     summaryList.push([
       null,
-      SheetTitles.PACKAGES,
-      `=COUNTA('${SheetTitles.PACKAGES}'!A2:A)`,
+      getSheetTitle(reportType),
+      `=COUNTA('${getSheetTitle(reportType)}'!A2:A)`,
       // `=COUNTIF('${SheetTitles.PACKAGES}'!C2:C, "ACTIVE")`,
     ]);
   }
 
-  if (includeMaturePlantsReport) {
-    summaryList.push([
-      null,
-      SheetTitles.MATURE_PLANTS,
-      `=COUNTA('${SheetTitles.MATURE_PLANTS}'!A2:A)`,
-    ]);
-  }
+  // if (reports.includes(ReportType.ACTIVE_PACKAGES)) {
+  //   summaryList.push([
+  //     null,
+  //     SheetTitles.PACKAGES,
+  //     `=COUNTA('${SheetTitles.PACKAGES}'!A2:A)`,
+  //     // `=COUNTIF('${SheetTitles.PACKAGES}'!C2:C, "ACTIVE")`,
+  //   ]);
+  // }
 
-  if (includeOutgoingTransfersReport) {
-    summaryList.push([
-      null,
-      SheetTitles.OUTGOING_TRANSFERS,
-      `=COUNTA('${SheetTitles.OUTGOING_TRANSFERS}'!A2:A)`,
-    ]);
-  }
+  // if (reports.includes(ReportType.MATURE_PLANTS)) {
+  //   summaryList.push([
+  //     null,
+  //     SheetTitles.MATURE_PLANTS,
+  //     `=COUNTA('${SheetTitles.MATURE_PLANTS}'!A2:A)`,
+  //   ]);
+  // }
 
-  if (includeTransferPackagesReport) {
-    summaryList.push([
-      null,
-      "Departed Packages",
-      `=COUNTA('${SheetTitles.DEPARTED_TRANSFER_PACKAGES}'!A2:A)`,
-    ]);
-  }
+  // if (reports.includes(ReportType.OUTGOING_TRANSFERS)) {
+  //   summaryList.push([
+  //     null,
+  //     SheetTitles.OUTGOING_TRANSFERS,
+  //     `=COUNTA('${SheetTitles.OUTGOING_TRANSFERS}'!A2:A)`,
+  //   ]);
+  // }
+
+  // if (reports.includes(ReportType.TRANSFER_PACKAGES)) {
+  //   summaryList.push([
+  //     null,
+  //     SheetTitles.DEPARTED_TRANSFER_PACKAGES,
+  //     `=COUNTA('${SheetTitles.DEPARTED_TRANSFER_PACKAGES}'!A2:A)`,
+  //   ]);
+  // }
 
   await messageBus.sendMessageToBackground(MessageType.WRITE_SPREADSHEET_VALUES, {
     spreadsheetId: response.data.result.spreadsheetId,
@@ -430,54 +513,65 @@ export async function createExportSpreadsheetOrError({
   // Write All Values
   //
 
-  let packageResizeRequests: any[] = [];
-  let maturePlantResizeRequests: any[] = [];
-  let outgoingTransferResizeRequests: any[] = [];
-  let departedTransferPackageResizeRequests: any[] = [];
+  let resizeRequests: any[] = [
+    autoResizeDimensionsRequestFactory({
+      sheetId: sheetTitles.indexOf(SheetTitles.OVERVIEW),
+    }),
+  ];
 
-  if (includeActivePackageReport) {
-    packageResizeRequests = [
+  for (const reportType of ELIGIBLE_REPORT_TYPES) {
+    resizeRequests = [
+      ...resizeRequests,
       autoResizeDimensionsRequestFactory({
-        sheetId: sheetTitles.indexOf(SheetTitles.PACKAGES),
+        sheetId: sheetTitles.indexOf(getSheetTitle(reportType)),
       }),
     ];
   }
 
-  if (includeMaturePlantsReport) {
-    maturePlantResizeRequests = [
-      autoResizeDimensionsRequestFactory({
-        sheetId: sheetTitles.indexOf(SheetTitles.MATURE_PLANTS),
-      }),
-    ];
-  }
+  // let packageResizeRequests: any[] = [];
+  // let maturePlantResizeRequests: any[] = [];
+  // let outgoingTransferResizeRequests: any[] = [];
+  // let departedTransferPackageResizeRequests: any[] = [];
 
-  if (includeOutgoingTransfersReport) {
-    outgoingTransferResizeRequests = [
-      autoResizeDimensionsRequestFactory({
-        sheetId: sheetTitles.indexOf(SheetTitles.OUTGOING_TRANSFERS),
-      }),
-    ];
-  }
+  // if (reports.includes(ReportType.ACTIVE_PACKAGES)) {
+  //   packageResizeRequests = [
+  //     autoResizeDimensionsRequestFactory({
+  //       sheetId: sheetTitles.indexOf(SheetTitles.PACKAGES),
+  //     }),
+  //   ];
+  // }
 
-  if (includeTransferPackagesReport) {
-    departedTransferPackageResizeRequests = [
-      autoResizeDimensionsRequestFactory({
-        sheetId: sheetTitles.indexOf(SheetTitles.DEPARTED_TRANSFER_PACKAGES),
-      }),
-    ];
-  }
+  // if (reports.includes(ReportType.MATURE_PLANTS)) {
+  //   maturePlantResizeRequests = [
+  //     autoResizeDimensionsRequestFactory({
+  //       sheetId: sheetTitles.indexOf(SheetTitles.MATURE_PLANTS),
+  //     }),
+  //   ];
+  // }
+
+  // if (reports.includes(ReportType.OUTGOING_TRANSFERS)) {
+  //   outgoingTransferResizeRequests = [
+  //     autoResizeDimensionsRequestFactory({
+  //       sheetId: sheetTitles.indexOf(SheetTitles.OUTGOING_TRANSFERS),
+  //     }),
+  //   ];
+  // }
+
+  // if (reports.includes(ReportType.TRANSFER_PACKAGES)) {
+  //   departedTransferPackageResizeRequests = [
+  //     autoResizeDimensionsRequestFactory({
+  //       sheetId: sheetTitles.indexOf(SheetTitles.DEPARTED_TRANSFER_PACKAGES),
+  //     }),
+  //   ];
+  // }
 
   await messageBus.sendMessageToBackground(MessageType.BATCH_UPDATE_SPREADSHEET, {
     spreadsheetId: response.data.result.spreadsheetId,
-    requests: [
-      autoResizeDimensionsRequestFactory({
-        sheetId: sheetTitles.indexOf(SheetTitles.OVERVIEW),
-      }),
-      ...packageResizeRequests,
-      ...maturePlantResizeRequests,
-      ...outgoingTransferResizeRequests,
-      ...departedTransferPackageResizeRequests,
-    ],
+    requests: resizeRequests,
+    // ...packageResizeRequests,
+    // ...maturePlantResizeRequests,
+    // ...outgoingTransferResizeRequests,
+    // ...departedTransferPackageResizeRequests,
   });
 
   return response.data.result;

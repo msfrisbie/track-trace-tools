@@ -463,19 +463,19 @@ export default Vue.extend({
         },
         {
           text: "Straggler Inventory",
-          value: ReportType.STRAGGLER_INVENTORY,
+          value: null,
           premium: true,
           description: "Find straggler inventory so it can be cleared out",
         },
         {
           text: "Immature Plants",
-          value: ReportType.IMMATURE_PLANTS,
+          value: null,
           premium: true,
           description: "All plant batches within this license",
         },
         {
           text: "Harvested Plants",
-          value: ReportType.HARVESTED_PLANTS,
+          value: null,
           premium: true,
           description: "All plants and associated harvest data within this license",
         },
