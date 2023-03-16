@@ -1,7 +1,4 @@
-import { mockDebugUtils } from "@/test/utils/mocks";
-
-mockDebugUtils();
-
+import "@/test/utils/auto-mock-debug";
 import { extract, ExtractionType } from "./html";
 
 const fs = require("fs");
@@ -16,10 +13,12 @@ describe("html.ts", () => {
 
     const authData = extract(ExtractionType.AUTH_DATA, fdr);
 
-    expect(authData).toEqual({ authData: {
-      apiVerificationToken: "Api-Verification-Token",
-      identity: "USER_ID",
-      license: "LICENSE-NUMBER-0001"
-    } });
+    expect(authData).toEqual({
+      authData: {
+        apiVerificationToken: "Api-Verification-Token",
+        identity: "USER_ID",
+        license: "LICENSE-NUMBER-0001",
+      },
+    });
   });
 });

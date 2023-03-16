@@ -22,7 +22,7 @@ export function mockDebugUtils() {
     return {
       __esModule: true,
       //   ...originalModule,
-      debugLogFactory: jest.fn(() => {}),
+      debugLogFactory: jest.fn(() => () => {}),
     };
   });
 }

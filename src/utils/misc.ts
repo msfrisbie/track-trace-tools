@@ -4,7 +4,7 @@ import {
   IIntermediatePromotePlantBatchData,
   IPackageData,
   IPlantBatchData,
-  ITagData
+  ITagData,
 } from "@/interfaces";
 import { debugLogFactory } from "@/utils/debug";
 import { fStrip } from "./math";
@@ -37,7 +37,7 @@ export function allocatePromotePlantCounts(
 
     const nextBatch = {
       plantBatch: selectedPlantBatch,
-      count: batchSize
+      count: batchSize,
     };
 
     debugLog(async () => [nextBatch]);
@@ -92,7 +92,7 @@ export function divideTagsIntoRanges(tags: ITagData[], counts: number[]): ITagDa
 
 export function flattenTagsAndPlantBatches({
   tags,
-  promoteDataList
+  promoteDataList,
 }: {
   tags: ITagData[];
   promoteDataList: IIntermediatePromotePlantBatchData[];
@@ -134,7 +134,7 @@ export function allocatePackageQuantities(
 
     let outputPackageData: IIntermediateCreatePackageFromPackagesData = {
       ingredients: [],
-      quantity: newPackageQuantity
+      quantity: newPackageQuantity,
     };
 
     while (true) {
@@ -152,7 +152,7 @@ export function allocatePackageQuantities(
 
       outputPackageData.ingredients.push({
         pkg: selectedPackage,
-        quantity: batchSize
+        quantity: batchSize,
       });
 
       debugLog(async () => [outputPackageData]);
@@ -193,7 +193,21 @@ export function allocateImmaturePlantCounts(
   totalPlantCount: number,
   packages: IPackageData[]
 ): IIntermediateCreatePlantBatchFromPackageData[] {
+  // Sanity check: is mixed?
+  const unitOfMeasureSet = new Set();
+  packages.map((pkg) => unitOfMeasureSet.add(pkg.Item.UnitOfMeasureName));
+  if (unitOfMeasureSet.size !== 1) {
+    throw new Error("Mixed units of measure provided");
+  }
+
   const isWeightBased = packages[0].Item.UnitOfMeasureName !== "Each";
+
+  // Sanity check: do we have enough?
+  if (!isWeightBased) {
+    if (totalPlantCount > packages.map((x) => x.Quantity).reduce((a, b) => a + b, 0)) {
+      throw new Error("Not enough source package material to plant");
+    }
+  }
 
   let remainingTotal = totalPlantCount;
 
@@ -214,7 +228,10 @@ export function allocateImmaturePlantCounts(
       throw new Error("Killswitch");
     }
 
-    const batchSize: number = Math.min(remainingTotal, selectedPackageRemainingPlantCount, 100);
+    let batchSize: number = Math.min(remainingTotal, 100);
+    if (!isWeightBased) {
+      batchSize = Math.min(remainingTotal, selectedPackageRemainingPlantCount, 100);
+    }
 
     debugLog(async () => ["Next batch size:", batchSize]);
 
@@ -225,14 +242,16 @@ export function allocateImmaturePlantCounts(
       pkg: selectedPackage,
       count: batchSize,
       quantity,
-      unitOfMeasureId: selectedPackage.Item.UnitOfMeasureId
+      unitOfMeasureId: selectedPackage.Item.UnitOfMeasureId,
     };
 
     debugLog(async () => [nextBatch]);
 
     plantBatchData.push(nextBatch);
 
-    selectedPackageRemainingPlantCount -= batchSize;
+    if (!isWeightBased) {
+      selectedPackageRemainingPlantCount -= batchSize;
+    }
     remainingTotal -= batchSize;
 
     if (selectedPackageRemainingPlantCount < 0) {

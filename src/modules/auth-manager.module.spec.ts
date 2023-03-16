@@ -1,10 +1,8 @@
-import { mockDebugUtils } from "@/test/utils/mocks";
-import { enableFetchMocks } from 'jest-fetch-mock';
-
-mockDebugUtils();
+import "@/test/utils/auto-mock-debug";
+import { enableFetchMocks } from "jest-fetch-mock";
 
 enableFetchMocks();
 
 describe("auth-manager.module.ts", () => {
-    it('works', () => { });
+  it("works", () => {});
 });
