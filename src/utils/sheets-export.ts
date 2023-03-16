@@ -26,6 +26,128 @@ enum SheetTitles {
   DEPARTED_TRANSFER_PACKAGES = "Departed Transfer Packages",
 }
 
+function addRowsRequestFactory({ sheetId, length }: { sheetId: number; length: number }) {
+  return {
+    appendDimension: {
+      dimension: "ROWS",
+      length,
+      sheetId,
+    },
+  };
+}
+
+function styleTopRowRequestFactory({ sheetId }: { sheetId: number }) {
+  return {
+    repeatCell: {
+      range: {
+        sheetId,
+        startRowIndex: 0,
+        endRowIndex: 1,
+      },
+      cell: {
+        userEnteredFormat: {
+          backgroundColor: {
+            red: 73 / 256,
+            green: 39 / 256,
+            blue: 106 / 256,
+          },
+          horizontalAlignment: "CENTER",
+          textFormat: {
+            foregroundColor: {
+              red: 1.0,
+              green: 1.0,
+              blue: 1.0,
+            },
+            fontSize: 10,
+            bold: true,
+          },
+        },
+      },
+      fields: "userEnteredFormat(backgroundColor,textFormat,horizontalAlignment)",
+    },
+  };
+}
+
+function freezeTopRowRequestFactory({ sheetId }: { sheetId: number }) {
+  return {
+    updateSheetProperties: {
+      properties: {
+        sheetId,
+        gridProperties: {
+          frozenRowCount: 1,
+        },
+      },
+      fields: "gridProperties.frozenRowCount",
+    },
+  };
+}
+
+function autoResizeDimensionsRequestFactory({
+  sheetId,
+  endIndex = 12,
+}: {
+  sheetId: number;
+  endIndex?: number;
+}) {
+  return {
+    autoResizeDimensions: {
+      dimensions: {
+        dimension: "COLUMNS",
+        sheetId,
+        startIndex: 1,
+        endIndex,
+      },
+    },
+  };
+}
+
+async function writeDataSheet<T>({
+  spreadsheetId,
+  spreadsheetTitle,
+  fields,
+  data,
+}: {
+  spreadsheetId: string;
+  spreadsheetTitle: SheetTitles;
+  fields: IFieldData[];
+  data: T[];
+}) {
+  await messageBus.sendMessageToBackground(MessageType.WRITE_SPREADSHEET_VALUES, {
+    spreadsheetId,
+    range: `'${spreadsheetTitle}'!1:1`,
+    values: [fields.map((fieldData) => `     ${fieldData.readableName}     `)],
+  });
+
+  let nextPageStartIdx = 0;
+  let nextPageRowIdx = 2;
+  const pageSize = 2000;
+
+  while (true) {
+    const nextPage = data.slice(nextPageStartIdx, nextPageStartIdx + pageSize);
+    if (nextPage.length === 0) {
+      break;
+    }
+
+    await messageBus.sendMessageToBackground(MessageType.WRITE_SPREADSHEET_VALUES, {
+      spreadsheetId,
+      range: `'${spreadsheetTitle}'!${nextPageRowIdx}:${nextPageRowIdx + nextPage.length}`,
+      values: nextPage.map((data) =>
+        fields.map((fieldData) => {
+          let value = data;
+          for (const subProperty of fieldData.value.split(".")) {
+            // @ts-ignore
+            value = value[subProperty];
+          }
+          return value;
+        })
+      ),
+    });
+
+    nextPageStartIdx += nextPage.length;
+    nextPageRowIdx += nextPage.length;
+  }
+}
+
 export async function createExportSpreadsheetOrError({
   reportData,
   reportConfig,
@@ -126,114 +248,25 @@ export async function createExportSpreadsheetOrError({
   let activePackageRequests: any[] = [];
 
   if (includeActivePackageReport) {
+    const sheetId: number = sheetTitles.indexOf(SheetTitles.PACKAGES);
+    const length = Math.max(activePackages.length, 1);
+
     activePackageRequests = [
-      // Add more rows
-      {
-        appendDimension: {
-          dimension: "ROWS",
-          length: Math.max(activePackages.length, 1),
-          sheetId: sheetTitles.indexOf(SheetTitles.PACKAGES),
-        },
-      },
-      // Style top row - black bg, white text
-      {
-        repeatCell: {
-          range: {
-            sheetId: sheetTitles.indexOf(SheetTitles.PACKAGES),
-            startRowIndex: 0,
-            endRowIndex: 1,
-          },
-          cell: {
-            userEnteredFormat: {
-              backgroundColor: {
-                red: 73 / 256,
-                green: 39 / 256,
-                blue: 106 / 256,
-              },
-              horizontalAlignment: "CENTER",
-              textFormat: {
-                foregroundColor: {
-                  red: 1.0,
-                  green: 1.0,
-                  blue: 1.0,
-                },
-                fontSize: 10,
-                bold: true,
-              },
-            },
-          },
-          fields: "userEnteredFormat(backgroundColor,textFormat,horizontalAlignment)",
-        },
-      },
-      // Freeze top row
-      {
-        updateSheetProperties: {
-          properties: {
-            sheetId: sheetTitles.indexOf(SheetTitles.PACKAGES),
-            gridProperties: {
-              frozenRowCount: 1,
-            },
-          },
-          fields: "gridProperties.frozenRowCount",
-        },
-      },
+      addRowsRequestFactory({ sheetId, length }),
+      styleTopRowRequestFactory({ sheetId }),
+      freezeTopRowRequestFactory({ sheetId }),
     ];
   }
 
   let maturePlantRequests: any = [];
 
   if (includeMaturePlantsReport) {
+    const sheetId: number = sheetTitles.indexOf(SheetTitles.MATURE_PLANTS);
+    const length: number = Math.max(activePackages.length, 1);
     maturePlantRequests = [
-      // Add more rows
-      {
-        appendDimension: {
-          dimension: "ROWS",
-          length: Math.max(activePackages.length, 1),
-          sheetId: sheetTitles.indexOf(SheetTitles.MATURE_PLANTS),
-        },
-      },
-      // Style top row - black bg, white text
-      {
-        repeatCell: {
-          range: {
-            sheetId: sheetTitles.indexOf(SheetTitles.MATURE_PLANTS),
-            startRowIndex: 0,
-            endRowIndex: 1,
-          },
-          cell: {
-            userEnteredFormat: {
-              backgroundColor: {
-                red: 73 / 256,
-                green: 39 / 256,
-                blue: 106 / 256,
-              },
-              horizontalAlignment: "CENTER",
-              textFormat: {
-                foregroundColor: {
-                  red: 1.0,
-                  green: 1.0,
-                  blue: 1.0,
-                },
-                fontSize: 10,
-                bold: true,
-              },
-            },
-          },
-          fields: "userEnteredFormat(backgroundColor,textFormat,horizontalAlignment)",
-        },
-      },
-      // Freeze top row
-      {
-        updateSheetProperties: {
-          properties: {
-            sheetId: sheetTitles.indexOf(SheetTitles.MATURE_PLANTS),
-            gridProperties: {
-              frozenRowCount: 1,
-            },
-          },
-          fields: "gridProperties.frozenRowCount",
-        },
-      },
+      addRowsRequestFactory({ sheetId, length }),
+      styleTopRowRequestFactory({ sheetId }),
+      freezeTopRowRequestFactory({ sheetId }),
     ];
   }
 
@@ -244,7 +277,6 @@ export async function createExportSpreadsheetOrError({
   }[] = [];
 
   if (includeOutgoingTransfersReport) {
-    console.log({ richOutgoingTransfers });
     for (const transfer of richOutgoingTransfers) {
       for (const destination of transfer?.outgoingDestinations || []) {
         flattenedOutgoingTransfers.push({
@@ -253,59 +285,14 @@ export async function createExportSpreadsheetOrError({
         });
       }
     }
-    console.log({ flattenedOutgoingTransfers });
+
+    const sheetId: number = sheetTitles.indexOf(SheetTitles.OUTGOING_TRANSFERS);
+    const length: number = Math.max(flattenedOutgoingTransfers.length, 1);
 
     richOutgoingTransfersRequests = [
-      // Add more rows
-      {
-        appendDimension: {
-          dimension: "ROWS",
-          length: Math.max(flattenedOutgoingTransfers.length, 1),
-          sheetId: sheetTitles.indexOf(SheetTitles.OUTGOING_TRANSFERS),
-        },
-      },
-      // Style top row - black bg, white text
-      {
-        repeatCell: {
-          range: {
-            sheetId: sheetTitles.indexOf(SheetTitles.OUTGOING_TRANSFERS),
-            startRowIndex: 0,
-            endRowIndex: 1,
-          },
-          cell: {
-            userEnteredFormat: {
-              backgroundColor: {
-                red: 73 / 256,
-                green: 39 / 256,
-                blue: 106 / 256,
-              },
-              horizontalAlignment: "CENTER",
-              textFormat: {
-                foregroundColor: {
-                  red: 1.0,
-                  green: 1.0,
-                  blue: 1.0,
-                },
-                fontSize: 10,
-                bold: true,
-              },
-            },
-          },
-          fields: "userEnteredFormat(backgroundColor,textFormat,horizontalAlignment)",
-        },
-      },
-      // Freeze top row
-      {
-        updateSheetProperties: {
-          properties: {
-            sheetId: sheetTitles.indexOf(SheetTitles.OUTGOING_TRANSFERS),
-            gridProperties: {
-              frozenRowCount: 1,
-            },
-          },
-          fields: "gridProperties.frozenRowCount",
-        },
-      },
+      addRowsRequestFactory({ sheetId, length }),
+      styleTopRowRequestFactory({ sheetId }),
+      freezeTopRowRequestFactory({ sheetId }),
     ];
   }
 
@@ -328,72 +315,19 @@ export async function createExportSpreadsheetOrError({
         }
       }
     }
+    const sheetId: number = sheetTitles.indexOf(SheetTitles.DEPARTED_TRANSFER_PACKAGES);
+    const length: number = Math.max(flattenedOutgoingTransfers.length, 1);
 
     richOutgoingInactiveTransferPackagesRequests = [
-      // Add more rows
-      {
-        appendDimension: {
-          dimension: "ROWS",
-          length: Math.max(flattenedOutgoingPackages.length, 1),
-          sheetId: sheetTitles.indexOf(SheetTitles.DEPARTED_TRANSFER_PACKAGES),
-        },
-      },
-      // Style top row - black bg, white text
-      {
-        repeatCell: {
-          range: {
-            sheetId: sheetTitles.indexOf(SheetTitles.DEPARTED_TRANSFER_PACKAGES),
-            startRowIndex: 0,
-            endRowIndex: 1,
-          },
-          cell: {
-            userEnteredFormat: {
-              backgroundColor: {
-                red: 73 / 256,
-                green: 39 / 256,
-                blue: 106 / 256,
-              },
-              horizontalAlignment: "CENTER",
-              textFormat: {
-                foregroundColor: {
-                  red: 1.0,
-                  green: 1.0,
-                  blue: 1.0,
-                },
-                fontSize: 10,
-                bold: true,
-              },
-            },
-          },
-          fields: "userEnteredFormat(backgroundColor,textFormat,horizontalAlignment)",
-        },
-      },
-      // Freeze top row
-      {
-        updateSheetProperties: {
-          properties: {
-            sheetId: sheetTitles.indexOf(SheetTitles.DEPARTED_TRANSFER_PACKAGES),
-            gridProperties: {
-              frozenRowCount: 1,
-            },
-          },
-          fields: "gridProperties.frozenRowCount",
-        },
-      },
+      addRowsRequestFactory({ sheetId, length }),
+      styleTopRowRequestFactory({ sheetId }),
+      freezeTopRowRequestFactory({ sheetId }),
     ];
   }
 
   await messageBus.sendMessageToBackground(MessageType.BATCH_UPDATE_SPREADSHEET, {
     spreadsheetId: response.data.result.spreadsheetId,
     requests: [
-      // Add more rows
-      {
-        appendDimension: {
-          dimension: "ROWS",
-          length: 19,
-          sheetId: sheetTitles.indexOf(SheetTitles.OVERVIEW),
-        },
-      },
       ...activePackageRequests,
       ...maturePlantRequests,
       ...richOutgoingTransfersRequests,
@@ -406,171 +340,39 @@ export async function createExportSpreadsheetOrError({
   //
 
   if (includeActivePackageReport) {
-    await messageBus.sendMessageToBackground(MessageType.WRITE_SPREADSHEET_VALUES, {
+    await writeDataSheet({
       spreadsheetId: response.data.result.spreadsheetId,
-      range: `'${SheetTitles.PACKAGES}'!1:1`,
-      values: [activePackageFields.map((fieldData) => `     ${fieldData.readableName}     `)],
+      spreadsheetTitle: SheetTitles.PACKAGES,
+      fields: activePackageFields,
+      data: activePackages,
     });
-
-    let nextPageStartIdx = 0;
-    let nextPageRowIdx = 2;
-    const pageSize = 2000;
-
-    while (true) {
-      const nextPage = activePackages.slice(nextPageStartIdx, nextPageStartIdx + pageSize);
-      if (nextPage.length === 0) {
-        break;
-      }
-
-      await messageBus.sendMessageToBackground(MessageType.WRITE_SPREADSHEET_VALUES, {
-        spreadsheetId: response.data.result.spreadsheetId,
-        range: `'${SheetTitles.PACKAGES}'!${nextPageRowIdx}:${nextPageRowIdx + nextPage.length}`,
-        values: nextPage.map((pkg) =>
-          activePackageFields.map((fieldData) => {
-            let value = pkg;
-            for (const subProperty of fieldData.value.split(".")) {
-              // @ts-ignore
-              value = value[subProperty];
-            }
-            return value;
-          })
-        ),
-      });
-
-      nextPageStartIdx += nextPage.length;
-      nextPageRowIdx += nextPage.length;
-    }
   }
 
   if (includeMaturePlantsReport) {
-    await messageBus.sendMessageToBackground(MessageType.WRITE_SPREADSHEET_VALUES, {
+    await writeDataSheet({
       spreadsheetId: response.data.result.spreadsheetId,
-      range: `'${SheetTitles.MATURE_PLANTS}'!1:1`,
-      values: [maturePlantFields.map((fieldData) => `     ${fieldData.readableName}     `)],
+      spreadsheetTitle: SheetTitles.MATURE_PLANTS,
+      fields: maturePlantFields,
+      data: maturePlants,
     });
-
-    let nextPageStartIdx = 0;
-    let nextPageRowIdx = 2;
-    const pageSize = 2000;
-
-    while (true) {
-      const nextPage = maturePlants.slice(nextPageStartIdx, nextPageStartIdx + pageSize);
-      if (nextPage.length === 0) {
-        break;
-      }
-
-      await messageBus.sendMessageToBackground(MessageType.WRITE_SPREADSHEET_VALUES, {
-        spreadsheetId: response.data.result.spreadsheetId,
-        range: `'${SheetTitles.MATURE_PLANTS}'!${nextPageRowIdx}:${
-          nextPageRowIdx + nextPage.length
-        }`,
-        values: nextPage.map((plant) =>
-          maturePlantFields.map((fieldData) => {
-            let value = plant;
-            for (const subProperty of fieldData.value.split(".")) {
-              // @ts-ignore
-              value = value[subProperty];
-            }
-            return value;
-          })
-        ),
-      });
-
-      nextPageStartIdx += nextPage.length;
-      nextPageRowIdx += nextPage.length;
-    }
   }
 
-  console.log({ flattenedOutgoingTransfers });
-
   if (includeOutgoingTransfersReport) {
-    await messageBus.sendMessageToBackground(MessageType.WRITE_SPREADSHEET_VALUES, {
+    await writeDataSheet({
       spreadsheetId: response.data.result.spreadsheetId,
-      range: `'${SheetTitles.OUTGOING_TRANSFERS}'!1:1`,
-      values: [
-        richOutgoingTransferFields.map((fieldData) => `     ${fieldData.readableName}     `),
-      ],
+      spreadsheetTitle: SheetTitles.OUTGOING_TRANSFERS,
+      fields: richOutgoingTransferFields,
+      data: flattenedOutgoingTransfers,
     });
-
-    let nextPageStartIdx = 0;
-    let nextPageRowIdx = 2;
-    const pageSize = 2000;
-
-    while (true) {
-      const nextPage = flattenedOutgoingTransfers.slice(
-        nextPageStartIdx,
-        nextPageStartIdx + pageSize
-      );
-      if (nextPage.length === 0) {
-        break;
-      }
-
-      await messageBus.sendMessageToBackground(MessageType.WRITE_SPREADSHEET_VALUES, {
-        spreadsheetId: response.data.result.spreadsheetId,
-        range: `'${SheetTitles.OUTGOING_TRANSFERS}'!${nextPageRowIdx}:${
-          nextPageRowIdx + nextPage.length
-        }`,
-        values: nextPage.map((data) =>
-          richOutgoingTransferFields.map((fieldData) => {
-            let value = data;
-            for (const subProperty of fieldData.value.split(".")) {
-              // @ts-ignore
-              value = value[subProperty];
-            }
-            return value;
-          })
-        ),
-      });
-
-      nextPageStartIdx += nextPage.length;
-      nextPageRowIdx += nextPage.length;
-    }
   }
 
   if (includeTransferPackagesReport) {
-    await messageBus.sendMessageToBackground(MessageType.WRITE_SPREADSHEET_VALUES, {
+    await writeDataSheet({
       spreadsheetId: response.data.result.spreadsheetId,
-      range: `'${SheetTitles.DEPARTED_TRANSFER_PACKAGES}'!1:1`,
-      values: [
-        richOutgoingInactiveTransferFields.map(
-          (fieldData) => `     ${fieldData.readableName}     `
-        ),
-      ],
+      spreadsheetTitle: SheetTitles.DEPARTED_TRANSFER_PACKAGES,
+      fields: richOutgoingInactiveTransferFields,
+      data: flattenedOutgoingPackages,
     });
-
-    let nextPageStartIdx = 0;
-    let nextPageRowIdx = 2;
-    const pageSize = 2000;
-
-    while (true) {
-      const nextPage = flattenedOutgoingPackages.slice(
-        nextPageStartIdx,
-        nextPageStartIdx + pageSize
-      );
-      if (nextPage.length === 0) {
-        break;
-      }
-
-      await messageBus.sendMessageToBackground(MessageType.WRITE_SPREADSHEET_VALUES, {
-        spreadsheetId: response.data.result.spreadsheetId,
-        range: `'${SheetTitles.DEPARTED_TRANSFER_PACKAGES}'!${nextPageRowIdx}:${
-          nextPageRowIdx + nextPage.length
-        }`,
-        values: nextPage.map((data) =>
-          richOutgoingInactiveTransferFields.map((fieldData) => {
-            let value = data;
-            for (const subProperty of fieldData.value.split(".")) {
-              // @ts-ignore
-              value = value[subProperty];
-            }
-            return value;
-          })
-        ),
-      });
-
-      nextPageStartIdx += nextPage.length;
-      nextPageRowIdx += nextPage.length;
-    }
   }
 
   //
@@ -635,78 +437,42 @@ export async function createExportSpreadsheetOrError({
 
   if (includeActivePackageReport) {
     packageResizeRequests = [
-      {
-        autoResizeDimensions: {
-          dimensions: {
-            dimension: "COLUMNS",
-            sheetId: sheetTitles.indexOf(SheetTitles.PACKAGES),
-            startIndex: 0,
-            endIndex: 12, // TODO set to length of fields
-          },
-        },
-      },
+      autoResizeDimensionsRequestFactory({
+        sheetId: sheetTitles.indexOf(SheetTitles.PACKAGES),
+      }),
     ];
   }
 
   if (includeMaturePlantsReport) {
     maturePlantResizeRequests = [
-      {
-        autoResizeDimensions: {
-          dimensions: {
-            dimension: "COLUMNS",
-            sheetId: sheetTitles.indexOf(SheetTitles.MATURE_PLANTS),
-            startIndex: 0,
-            endIndex: 12,
-          },
-        },
-      },
+      autoResizeDimensionsRequestFactory({
+        sheetId: sheetTitles.indexOf(SheetTitles.MATURE_PLANTS),
+      }),
     ];
   }
 
   if (includeOutgoingTransfersReport) {
     outgoingTransferResizeRequests = [
-      {
-        autoResizeDimensions: {
-          dimensions: {
-            dimension: "COLUMNS",
-            sheetId: sheetTitles.indexOf(SheetTitles.OUTGOING_TRANSFERS),
-            startIndex: 0,
-            endIndex: 12,
-          },
-        },
-      },
+      autoResizeDimensionsRequestFactory({
+        sheetId: sheetTitles.indexOf(SheetTitles.OUTGOING_TRANSFERS),
+      }),
     ];
   }
 
   if (includeTransferPackagesReport) {
     departedTransferPackageResizeRequests = [
-      {
-        autoResizeDimensions: {
-          dimensions: {
-            dimension: "COLUMNS",
-            sheetId: sheetTitles.indexOf(SheetTitles.DEPARTED_TRANSFER_PACKAGES),
-            startIndex: 0,
-            endIndex: 12,
-          },
-        },
-      },
+      autoResizeDimensionsRequestFactory({
+        sheetId: sheetTitles.indexOf(SheetTitles.DEPARTED_TRANSFER_PACKAGES),
+      }),
     ];
   }
 
   await messageBus.sendMessageToBackground(MessageType.BATCH_UPDATE_SPREADSHEET, {
     spreadsheetId: response.data.result.spreadsheetId,
     requests: [
-      // Auto resize to fit added data
-      {
-        autoResizeDimensions: {
-          dimensions: {
-            dimension: "COLUMNS",
-            sheetId: sheetTitles.indexOf(SheetTitles.OVERVIEW),
-            startIndex: 1,
-            endIndex: 12,
-          },
-        },
-      },
+      autoResizeDimensionsRequestFactory({
+        sheetId: sheetTitles.indexOf(SheetTitles.OVERVIEW),
+      }),
       ...packageResizeRequests,
       ...maturePlantResizeRequests,
       ...outgoingTransferResizeRequests,
