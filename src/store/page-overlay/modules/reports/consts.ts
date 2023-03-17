@@ -24,7 +24,7 @@ export enum ReportStatus {
 }
 
 export enum ReportType {
-  ACTIVE_PACKAGES = "ACTIVE_PACKAGES",
+  PACKAGES = "PACKAGES",
   OUTGOING_TRANSFERS = "OUTGOING_TRANSFERS",
   TRANSFER_PACKAGES = "TRANSFER_PACKAGES",
   MATURE_PLANTS = "MATURE_PLANTS",
@@ -91,7 +91,7 @@ export const SHEET_FIELDS: { [key: string]: IFieldData[] } = {
       required: false,
     },
   ],
-  [ReportType.ACTIVE_PACKAGES]: [
+  [ReportType.PACKAGES]: [
     {
       value: "Label",
       readableName: "Package Tag",

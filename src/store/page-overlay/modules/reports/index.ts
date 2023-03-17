@@ -111,33 +111,47 @@ export const reportsModule = {
       try {
         let reportData: IReportData = {};
 
-        const activePackageConfig = reportConfig[ReportType.ACTIVE_PACKAGES];
-        if (activePackageConfig?.packageFilter) {
+        const packageConfig = reportConfig[ReportType.PACKAGES];
+        if (packageConfig?.packageFilter) {
           ctx.commit(ReportsMutations.SET_STATUS, { statusMessage: "Loading packages..." });
 
-          let activePackages: IIndexedPackageData[] = [];
+          let packages: IIndexedPackageData[] = [];
 
-          try {
-            activePackages = [...activePackages, ...(await primaryDataLoader.activePackages())];
-          } catch (e) {
-            ctx.commit(ReportsMutations.SET_STATUS, { statusMessage: "Failed to load packages." });
+          if (packageConfig.packageFilter.includeActive) {
+            try {
+              packages = [...packages, ...(await primaryDataLoader.activePackages())];
+            } catch (e) {
+              ctx.commit(ReportsMutations.SET_STATUS, {
+                statusMessage: "Failed to load active packages.",
+              });
+            }
           }
 
-          activePackages = activePackages.filter((pkg) => {
-            if (activePackageConfig.packageFilter.packagedDateLt) {
-              if (pkg.PackagedDate > activePackageConfig.packageFilter.packagedDateLt) {
+          if (packageConfig.packageFilter.includeInactive) {
+            try {
+              packages = [...packages, ...(await primaryDataLoader.inactivePackages())];
+            } catch (e) {
+              ctx.commit(ReportsMutations.SET_STATUS, {
+                statusMessage: "Failed to load inactive packages.",
+              });
+            }
+          }
+
+          packages = packages.filter((pkg) => {
+            if (packageConfig.packageFilter.packagedDateLt) {
+              if (pkg.PackagedDate > packageConfig.packageFilter.packagedDateLt) {
                 return false;
               }
             }
 
-            if (activePackageConfig.packageFilter.packagedDateEq) {
-              if (!pkg.PackagedDate.startsWith(activePackageConfig.packageFilter.packagedDateEq)) {
+            if (packageConfig.packageFilter.packagedDateEq) {
+              if (!pkg.PackagedDate.startsWith(packageConfig.packageFilter.packagedDateEq)) {
                 return false;
               }
             }
 
-            if (activePackageConfig.packageFilter.packagedDateGt) {
-              if (pkg.PackagedDate < activePackageConfig.packageFilter.packagedDateGt) {
+            if (packageConfig.packageFilter.packagedDateGt) {
+              if (pkg.PackagedDate < packageConfig.packageFilter.packagedDateGt) {
                 return false;
               }
             }
@@ -145,8 +159,8 @@ export const reportsModule = {
             return true;
           });
 
-          reportData[ReportType.ACTIVE_PACKAGES] = {
-            activePackages,
+          reportData[ReportType.PACKAGES] = {
+            packages,
           };
         }
 

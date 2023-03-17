@@ -443,6 +443,8 @@ export interface IPackageFilter {
   packagedDateGt?: string | null;
   packagedDateEq?: string | null;
   packagedDateLt?: string | null;
+  includeActive?: boolean;
+  includeInactive?: boolean;
 }
 
 export interface IHarvestFilter {

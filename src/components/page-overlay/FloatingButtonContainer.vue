@@ -73,7 +73,8 @@ export default Vue.extend({
 
 .floating-hover-reveal-target {
   // margin-right: -60px;
-  transition: visibility 0s;
+  transition: max-width visibility 0s;
+  max-width: 0px;
   visibility: hidden;
   z-index: -1;
   transition-delay: 1.5s;
@@ -82,6 +83,7 @@ export default Vue.extend({
 .floating-hover-reveal-container:hover .floating-hover-reveal-target {
   // margin-right: 0px;
   visibility: visible;
+  max-width: 100vw;
   z-index: 0;
   transition-delay: 0s;
 }

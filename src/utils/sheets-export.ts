@@ -167,8 +167,8 @@ export async function createExportSpreadsheetOrError({
 
   function extractNestedData(reportType: ReportType) {
     switch (reportType) {
-      case ReportType.ACTIVE_PACKAGES:
-        return reportData[reportType]?.activePackages as IIndexedPackageData[];
+      case ReportType.PACKAGES:
+        return reportData[reportType]?.packages as IIndexedPackageData[];
       case ReportType.MATURE_PLANTS:
         return reportData[reportType]?.maturePlants as IIndexedPlantData[];
       case ReportType.OUTGOING_TRANSFERS:
@@ -187,7 +187,7 @@ export async function createExportSpreadsheetOrError({
 
     const value = (() => {
       switch (reportType) {
-        case ReportType.ACTIVE_PACKAGES:
+        case ReportType.PACKAGES:
           return extractNestedData(reportType);
         case ReportType.MATURE_PLANTS:
           return extractNestedData(reportType);
@@ -238,7 +238,7 @@ export async function createExportSpreadsheetOrError({
 
   function getSheetTitle(reportType: ReportType): SheetTitles {
     switch (reportType) {
-      case ReportType.ACTIVE_PACKAGES:
+      case ReportType.PACKAGES:
         return SheetTitles.PACKAGES;
       case ReportType.MATURE_PLANTS:
         return SheetTitles.MATURE_PLANTS;
@@ -256,7 +256,7 @@ export async function createExportSpreadsheetOrError({
   //
 
   const ELIGIBLE_REPORT_TYPES: ReportType[] = [
-    ReportType.ACTIVE_PACKAGES,
+    ReportType.PACKAGES,
     ReportType.MATURE_PLANTS,
     ReportType.OUTGOING_TRANSFERS,
     ReportType.TRANSFER_PACKAGES,

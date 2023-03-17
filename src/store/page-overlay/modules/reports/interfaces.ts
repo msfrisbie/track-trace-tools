@@ -23,7 +23,7 @@ export interface IReportsState {
 }
 
 export interface IReportConfig {
-  [ReportType.ACTIVE_PACKAGES]?: {
+  [ReportType.PACKAGES]?: {
     packageFilter: IPackageFilter;
     fields: IFieldData[];
   };
@@ -34,7 +34,7 @@ export interface IReportConfig {
   [ReportType.OUTGOING_TRANSFERS]?: {
     transferFilter: ITransferFilter;
     fields: IFieldData[];
-  }
+  };
   [ReportType.TRANSFER_PACKAGES]?: {
     transferFilter: ITransferFilter;
     fields: IFieldData[];
@@ -42,15 +42,15 @@ export interface IReportConfig {
 }
 
 export interface IReportData {
-  [ReportType.ACTIVE_PACKAGES]?: {
-    activePackages: IIndexedPackageData[];
+  [ReportType.PACKAGES]?: {
+    packages: IIndexedPackageData[];
   };
   [ReportType.MATURE_PLANTS]?: {
     maturePlants: IIndexedPlantData[];
   };
   [ReportType.OUTGOING_TRANSFERS]?: {
     outgoingTransfers: IIndexedRichTransferData[];
-  }
+  };
   [ReportType.TRANSFER_PACKAGES]?: {
     richOutgoingInactiveTransfers?: IIndexedRichTransferData[];
   };
