@@ -38,7 +38,7 @@
                 <a class="text-purple-500 underline" href="mailto:tracktracetools@gmail.com"
                   >tracktracetools@gmail.com</a
                 >
-                to enable premium exports or request custom snapshot formats.
+                to enable premium features.
               </div>
               <b-form-checkbox
                 class="opacity-50"
@@ -505,6 +505,30 @@ const reportOptions = [
     description: "Find straggler inventory so it can be cleared out",
   },
   {
+    text: "Package Quickview",
+    value: null,
+    premium: true,
+    description: "Grouped summary of packages by item, remaining quantity, and testing status",
+  },
+  {
+    text: "Plant Quickview",
+    value: null,
+    premium: true,
+    description: "Grouped summary of plants by strain, location, and dates",
+  },
+  {
+    text: "Transfer Quickview",
+    value: null,
+    premium: true,
+    description: "Summary of incoming, outgoing, and rejected packages",
+  },
+  {
+    text: "Incoming Inventory",
+    value: null,
+    premium: true,
+    description: "See packages not yet recieved",
+  },
+  {
     text: "Immature Plants",
     value: null,
     premium: true,
@@ -514,7 +538,7 @@ const reportOptions = [
     text: "Tags",
     value: null,
     premium: true,
-    description: "All tags within this license",
+    description: "All tags within this license, including consecutive ranges",
   },
   {
     text: "Harvested Plants",

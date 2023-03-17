@@ -29,6 +29,16 @@
       <div class="flex flex-col space-y-2 text-base" style="min-width: 200px">
         <p>Generate snapshots of your Metrc data in Google Sheets.</p>
 
+        <a
+          class="underline text-purple-600"
+          href="https://docs.google.com/spreadsheets/d/1fxBfjBUhFt6Gj7PpbQO8DlT1e76DIDtTwiq_2A5tHCU/edit?usp=sharing"
+          target="_blank"
+          >Example snapshot</a
+        >
+        <a class="underline text-purple-600" href="https://youtu.be/JBR21XSKK3I" target="_blank"
+          >How do I make a snapshot?</a
+        >
+
         <b-button size="sm" variant="outline-primary" class="mb-2" @click="dismissSnapshotPopover()"
           >GOT IT</b-button
         >
