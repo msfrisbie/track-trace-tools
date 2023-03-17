@@ -305,10 +305,15 @@ export async function createExportSpreadsheetOrError({
     ];
   }
 
-  await messageBus.sendMessageToBackground(MessageType.BATCH_UPDATE_SPREADSHEET, {
-    spreadsheetId: response.data.result.spreadsheetId,
-    requests: formattingRequests,
-  });
+  await messageBus.sendMessageToBackground(
+    MessageType.BATCH_UPDATE_SPREADSHEET,
+    {
+      spreadsheetId: response.data.result.spreadsheetId,
+      requests: formattingRequests,
+    },
+    undefined,
+    90000
+  );
 
   //
   // Write all values
@@ -371,10 +376,15 @@ export async function createExportSpreadsheetOrError({
     ];
   }
 
-  await messageBus.sendMessageToBackground(MessageType.BATCH_UPDATE_SPREADSHEET, {
-    spreadsheetId: response.data.result.spreadsheetId,
-    requests: resizeRequests,
-  });
+  await messageBus.sendMessageToBackground(
+    MessageType.BATCH_UPDATE_SPREADSHEET,
+    {
+      spreadsheetId: response.data.result.spreadsheetId,
+      requests: resizeRequests,
+    },
+    undefined,
+    90000
+  );
 
   return response.data.result;
 }

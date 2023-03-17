@@ -15,7 +15,8 @@ class MessageBus implements IAtomicService {
   async sendMessageToBackground<T>(
     type: MessageType,
     data: any = [],
-    options: IBusMessageOptions = {}
+    options: IBusMessageOptions = {},
+    timeout: number = 5000
   ): Promise<any> {
     // Options are collected here for *all* message types
     options.muteAnalytics = store.state.muteAnalytics;
@@ -26,7 +27,7 @@ class MessageBus implements IAtomicService {
       const responsePromise = new Promise((resolve, reject) => {
         this.handlers.set(uuid, resolve);
 
-        const id = setTimeout(() => reject("Background message send timed out"), 30000);
+        const id = setTimeout(() => reject("Background message send timed out"), timeout);
 
         this.handlers.set(uuid, (event: any) => {
           clearTimeout(id);
