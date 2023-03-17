@@ -277,7 +277,7 @@ export async function createExportSpreadsheetOrError({
       result: ISpreadsheet;
     };
   } = await messageBus.sendMessageToBackground(MessageType.CREATE_SPREADSHEET, {
-    title: `${store.state.pluginAuth?.authState?.license} Metrc Export - ${todayIsodate()}`,
+    title: `${store.state.pluginAuth?.authState?.license} Metrc Snapshot - ${todayIsodate()}`,
     sheetTitles,
   });
 
@@ -332,7 +332,9 @@ export async function createExportSpreadsheetOrError({
   for (const reportType of ELIGIBLE_REPORT_TYPES) {
     summaryList.push([
       null,
-      getSheetTitle(reportType),
+      `=HYPERLINK("#gid=${sheetTitles.indexOf(getSheetTitle(reportType))}","${getSheetTitle(
+        reportType
+      )}")`,
       `=COUNTA('${getSheetTitle(reportType)}'!A2:A)`,
       // `=COUNTIF('${SheetTitles.PACKAGES}'!C2:C, "ACTIVE")`,
     ]);

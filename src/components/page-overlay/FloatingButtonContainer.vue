@@ -11,12 +11,13 @@
       class="relative flex flex-row gap-4"
     > -->
     <template v-if="pluginAuth.authState">
-      <quick-script-button
-        style="box-shadow: 0px 5px 5px rgba(0, 0, 0, 0.5)"
-        class="floating-hover-reveal-target"
-      ></quick-script-button>
+      <div class="flex flex-row gap-2 floating-hover-reveal-target">
+        <snapshot-button class="floating-shadow" />
 
-      <builder-button style="box-shadow: 0px 5px 5px rgba(0, 0, 0, 0.5)" />
+        <quick-script-button class="floating-shadow" />
+      </div>
+
+      <builder-button class="floating-shadow" />
     </template>
 
     <!-- <primary-toolkit-button /> -->
@@ -29,6 +30,7 @@ import BuilderButton from "@/components/page-overlay/BuilderButton.vue";
 import DebugButton from "@/components/page-overlay/DebugButton.vue";
 import QuickScriptButton from "@/components/page-overlay/QuickScriptButton.vue";
 import ScrollButton from "@/components/page-overlay/ScrollButton.vue";
+import SnapshotButton from "@/components/page-overlay/SnapshotButton.vue";
 import store from "@/store/page-overlay/index";
 import Vue from "vue";
 import { mapState } from "vuex";
@@ -39,6 +41,7 @@ export default Vue.extend({
   components: {
     BuilderButton,
     QuickScriptButton,
+    SnapshotButton,
     // PrimaryToolkitButton,
     // ListingsButton,
     ScrollButton,
@@ -64,15 +67,21 @@ export default Vue.extend({
   }
 }
 
+.floating-shadow {
+  box-shadow: 0px 5px 5px rgba(0, 0, 0, 0.5) !important;
+}
+
 .floating-hover-reveal-target {
-  margin-right: -60px;
-  transition: margin-right 0.1s ease-in-out;
+  // margin-right: -60px;
+  transition: visibility 0s;
+  visibility: hidden;
   z-index: -1;
   transition-delay: 1.5s;
 }
 
 .floating-hover-reveal-container:hover .floating-hover-reveal-target {
-  margin-right: 0px;
+  // margin-right: 0px;
+  visibility: visible;
   z-index: 0;
   transition-delay: 0s;
 }

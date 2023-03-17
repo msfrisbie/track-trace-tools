@@ -28,6 +28,9 @@ export enum ReportType {
   OUTGOING_TRANSFERS = "OUTGOING_TRANSFERS",
   TRANSFER_PACKAGES = "TRANSFER_PACKAGES",
   MATURE_PLANTS = "MATURE_PLANTS",
+  // IMMATURE_PLANTS = "IMMATURE_PLANTS",
+  // HARVESTS = "HARVESTS",
+  // TAGS = "TAGS"
 }
 
 export const SHEET_FIELDS: { [key: string]: IFieldData[] } = {

@@ -135,9 +135,9 @@ export default Vue.extend({
         },
         {
           backgroundColor: "#c14747",
-          text: "GOOGLE SHEETS",
+          text: "SNAPSHOTS",
           route: "/google-sheets-export",
-          icon: "table",
+          icon: "camera",
           visible: true,
           enabled: true,
           isBeta: true,

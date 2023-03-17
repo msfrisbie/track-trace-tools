@@ -9,7 +9,7 @@
     style="padding: 0"
   >
     <template #button-content>
-      <div style="width: 26px" class="flex flex-col items-center">
+      <div style="width: 26px" class="flex flex-col items-center justify-center">
         <font-awesome-icon icon="bolt" style="height: 26px"></font-awesome-icon>
       </div>
     </template>

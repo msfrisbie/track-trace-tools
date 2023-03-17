@@ -7,7 +7,20 @@
     <template v-if="oAuthState === OAuthState.AUTHENTICATED">
       <div class="grid grid-cols-3 gap-8 w-full">
         <!-- First Column -->
-        <div>
+        <div
+          class="flex flex-col gap-2 items-stretch"
+          v-bind:class="{ 'opacity-50': reportStatus !== ReportStatus.INITIAL }"
+        >
+          <b-button
+            size="sm"
+            :disabled="
+              eligibleReportOptions.length === selectedReports.length ||
+              reportStatus !== ReportStatus.INITIAL
+            "
+            variant="outline-primary"
+            @click="snapshotEverything()"
+            >SNAPSHOT EVERYTHING</b-button
+          >
           <b-form-group>
             <b-form-checkbox-group v-model="selectedReports" class="flex flex-col gap-4">
               <b-form-checkbox
@@ -25,7 +38,7 @@
                 <a class="text-purple-500 underline" href="mailto:tracktracetools@gmail.com"
                   >tracktracetools@gmail.com</a
                 >
-                to enable premium exports or request custom export types.
+                to enable premium exports or request custom snapshot formats.
               </div>
               <b-form-checkbox
                 class="opacity-50"
@@ -48,7 +61,12 @@
           class="flex flex-col items-stretch gap-4"
         >
           <template v-if="selectedReports.length === 0">
-            <div class="text-red-500 text-center">Select one or more export types</div>
+            <div class="text-red-500 text-center">Select something to include in your snapshot</div>
+          </template>
+          <template v-else>
+            <div class="text-purple-800 text-center">
+              Configure your snapshot below. <br />Defaults to all data and fields.
+            </div>
           </template>
 
           <template v-if="selectedReports.includes(ReportType.ACTIVE_PACKAGES)">
@@ -323,7 +341,7 @@
               variant="primary"
               @click="createSpreadsheet()"
               :disabled="selectedReports.length === 0"
-              >EXPORT TO SPREADSHEET</b-button
+              >CREATE SNAPSHOT</b-button
             >
           </template>
 
@@ -353,7 +371,7 @@
 
           <template v-if="reportStatus === ReportStatus.SUCCESS">
             <b-button variant="primary" :href="generatedSpreadsheet.spreadsheetUrl" target="_blank"
-              >VIEW SPREADSHEET</b-button
+              >VIEW SNAPSHOT</b-button
             >
             <b-button variant="outline-primary" @click="reset()">START OVER</b-button>
           </template>
@@ -362,11 +380,13 @@
             class="flex flex-col items-stretch gap-2 text-start py-12"
             v-if="generatedSpreadsheetHistory.length > 0"
           >
-            <div style="text-align: start">Previously generated sheets:</div>
+            <div style="text-align: start">Recent snapshots:</div>
             <div
               class="flex flex-col items-start"
               v-bind:key="spreadsheetEntry.uuid"
-              v-for="spreadsheetEntry of generatedSpreadsheetHistory"
+              v-for="spreadsheetEntry of showAllRecent
+                ? generatedSpreadsheetHistory
+                : generatedSpreadsheetHistory.slice(0, 5)"
             >
               <a
                 class="underline text-purple-500 text-sm"
@@ -380,19 +400,37 @@
                 {{ new Date(spreadsheetEntry.timestamp).toLocaleTimeString() }}</span
               >
             </div>
+            <b-button
+              @click="showAllRecent = true"
+              v-if="generatedSpreadsheetHistory.length > 5 && !showAllRecent"
+              variant="outline-dark"
+              size="sm"
+              >SHOW ALL</b-button
+            >
           </div>
         </div>
       </div>
     </template>
 
     <template v-if="oAuthState === OAuthState.NOT_AUTHENTICATED">
-      <div class="flex flex-col gap-8">
+      <div class="flex flex-col gap-8 text-center items-center">
         <div class="text-lg font-semibold">
-          You must sign in to your Google account to use this tool.
+          Sign in to your Google account to generate snapshots.
         </div>
         <div class="text-base">
-          Track &amp; Trace Tools exports your Metrc data directly into Google Sheets.
+          Track &amp; Trace Tools can generate Metrc snapshots in Google Sheets.
         </div>
+
+        <a
+          class="underline text-purple-600"
+          href="https://docs.google.com/spreadsheets/d/1fxBfjBUhFt6Gj7PpbQO8DlT1e76DIDtTwiq_2A5tHCU/edit?usp=sharing"
+          target="_blank"
+          >Example snapshot</a
+        >
+        <a class="underline text-purple-600" href="https://youtu.be/JBR21XSKK3I" target="_blank"
+          >How do I make a snapshot?</a
+        >
+
         <b-button variant="primary" @click="openOAuthPage()">SIGN IN</b-button>
       </div>
     </template>
@@ -418,6 +456,51 @@ import _ from "lodash";
 import Vue from "vue";
 import { mapActions, mapState } from "vuex";
 
+const reportOptions = [
+  {
+    text: "Active Packages",
+    value: ReportType.ACTIVE_PACKAGES,
+    premium: false,
+    description: "Active packages within this license.",
+  },
+  {
+    text: "Mature Plants",
+    value: ReportType.MATURE_PLANTS,
+    premium: false,
+    description: "Mature plants within this license",
+  },
+  {
+    text: "Outgoing Transfers",
+    value: ReportType.OUTGOING_TRANSFERS,
+    premium: false,
+    description: "Outgoing transfers from this license",
+  },
+  {
+    text: "Straggler Inventory",
+    value: null,
+    premium: true,
+    description: "Find straggler inventory so it can be cleared out",
+  },
+  {
+    text: "Immature Plants",
+    value: null,
+    premium: true,
+    description: "All plant batches within this license",
+  },
+  {
+    text: "Harvested Plants",
+    value: null,
+    premium: true,
+    description: "All plants and associated harvest data within this license",
+  },
+  {
+    text: "Outgoing Transfer Packages",
+    value: ReportType.TRANSFER_PACKAGES,
+    premium: true,
+    description: "Packages that left this license via outgoing transfer",
+  },
+];
+
 export default Vue.extend({
   name: "GoogleSheetsExport",
   store,
@@ -434,6 +517,9 @@ export default Vue.extend({
       reportStatusMessage: (state: any) => state.reports.statusMessage,
       reportStatusMessageHistory: (state: any) => state.reports.statusMessageHistory,
     }),
+    eligibleReportOptions() {
+      return reportOptions.filter((x) => !x.premium);
+    },
   },
   data() {
     return {
@@ -442,50 +528,7 @@ export default Vue.extend({
       ReportType,
       SHEET_FIELDS,
       selectedReports: [],
-      reportOptions: [
-        {
-          text: "Active Packages",
-          value: ReportType.ACTIVE_PACKAGES,
-          premium: false,
-          description: "Active packages within this license.",
-        },
-        {
-          text: "Mature Plants",
-          value: ReportType.MATURE_PLANTS,
-          premium: false,
-          description: "Mature plants within this license",
-        },
-        {
-          text: "Outgoing Transfers",
-          value: ReportType.OUTGOING_TRANSFERS,
-          premium: false,
-          description: "Outgoing transfers from this license",
-        },
-        {
-          text: "Straggler Inventory",
-          value: null,
-          premium: true,
-          description: "Find straggler inventory so it can be cleared out",
-        },
-        {
-          text: "Immature Plants",
-          value: null,
-          premium: true,
-          description: "All plant batches within this license",
-        },
-        {
-          text: "Harvested Plants",
-          value: null,
-          premium: true,
-          description: "All plants and associated harvest data within this license",
-        },
-        {
-          text: "Outgoing Transfer Packages",
-          value: ReportType.TRANSFER_PACKAGES,
-          premium: true,
-          description: "Packages that left this license via outgoing transfer",
-        },
-      ],
+      reportOptions,
       activePackagesFormFilters: {
         packagedDateGt: todayIsodate(),
         packagedDateLt: todayIsodate(),
@@ -522,6 +565,7 @@ export default Vue.extend({
         return fields;
       })(),
       fields: _.cloneDeep(SHEET_FIELDS),
+      showAllRecent: false,
     };
   },
   methods: {
@@ -543,6 +587,9 @@ export default Vue.extend({
       this.$data.fields[reportType] = _.cloneDeep(SHEET_FIELDS[reportType]).filter(
         (x) => x.required
       );
+    },
+    snapshotEverything() {
+      this.$data.selectedReports = this.eligibleReportOptions.map((x) => x.value);
     },
     async openOAuthPage() {
       messageBus.sendMessageToBackground(MessageType.OPEN_OPTIONS_PAGE, {
