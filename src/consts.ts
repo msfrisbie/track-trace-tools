@@ -199,6 +199,11 @@ export enum PackageState {
   IN_TRANSIT = "IN_TRANSIT",
 }
 
+export enum PlantBatchState {
+  ACTIVE = "ACTIVE",
+  INACTIVE = "INACTIVE",
+}
+
 export enum PlantState {
   VEGETATIVE = "VEGETATIVE",
   FLOWERING = "FLOWERING",

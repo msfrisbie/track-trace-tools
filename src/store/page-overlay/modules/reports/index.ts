@@ -190,6 +190,16 @@ export const reportsModule = {
             }
           }
 
+          if (maturePlantConfig.plantFilter.includeInactive) {
+            try {
+              maturePlants = [...maturePlants, ...(await primaryDataLoader.inactivePlants({}))];
+            } catch (e) {
+              ctx.commit(ReportsMutations.SET_STATUS, {
+                statusMessage: "Failed to load inactive plants.",
+              });
+            }
+          }
+
           maturePlants = maturePlants.filter((plant) => {
             if (maturePlantConfig.plantFilter.plantedDateLt) {
               if (plant.PlantedDate > maturePlantConfig.plantFilter.plantedDateLt) {

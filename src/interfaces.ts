@@ -6,6 +6,7 @@ import {
   MessageType,
   MetrcStatus,
   PackageState,
+  PlantBatchState,
   PlantState,
   SearchModalView,
   TagState,
@@ -521,6 +522,12 @@ export interface IPlantBatchData {
   UntrackedCount: number;
 }
 
+export interface IIndexedPlantBatchData extends IPlantBatchData {
+  PlantBatchState: PlantBatchState;
+  LicenseNumber: string;
+  TagMatcher: string;
+}
+
 export interface IPlantData extends ITaggedIResponseObjectData {
   DestroyedByUserName: string | null;
   DestroyedDate: string | null;
@@ -662,6 +669,7 @@ export interface ITestResultData {
 
 export interface IIndexedPlantData extends IPlantData {
   PlantState: PlantState;
+  LicenseNumber: string;
   TagMatcher: string;
 }
 
@@ -739,11 +747,13 @@ export interface IDriverData {
 
 export interface IIndexedHarvestData extends IHarvestData {
   HarvestState: HarvestState;
+  LicenseNumber: string;
   TagMatcher: string;
 }
 
 export interface IIndexedTransferData extends ITransferData {
   TransferState: TransferState;
+  LicenseNumber: string;
   TagMatcher: string;
 }
 
@@ -797,12 +807,13 @@ export interface IRichDestinationData extends IDestinationData {
 }
 
 export interface IIndexedRichTransferData extends IIndexedTransferData {
-  incomingTransporters?: ITransporterData[];
+  incomingTransporter?: ITransporterData[];
   incomingPackages?: IPackageData[];
   outgoingDestinations?: IRichDestinationData[];
 }
 
 export interface IIndexedTagData extends ITagData {
+  LicenseNumber: string;
   TagState: TagState;
   TagMatcher: string;
 }

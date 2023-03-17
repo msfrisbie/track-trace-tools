@@ -1,10 +1,12 @@
 import {
   IHarvestFilter,
+  IIndexedHarvestData,
   IIndexedPackageData,
+  IIndexedPlantBatchData,
   IIndexedPlantData,
   IIndexedRichTransferData,
+  IIndexedTagData,
   IPackageFilter,
-  IPlantBatchData,
   IPlantBatchFilter,
   IPlantFilter,
   ISimpleSpreadsheet,
@@ -65,8 +67,20 @@ export interface IReportData {
   [ReportType.PACKAGES]?: {
     packages: IIndexedPackageData[];
   };
+  [ReportType.IMMATURE_PLANTS]?: {
+    immaturePlants: IIndexedPlantBatchData[];
+  };
   [ReportType.MATURE_PLANTS]?: {
     maturePlants: IIndexedPlantData[];
+  };
+  [ReportType.TAGS]?: {
+    tags: IIndexedTagData[];
+  };
+  [ReportType.HARVESTS]?: {
+    harvests: IIndexedHarvestData[];
+  };
+  [ReportType.INCOMING_TRANSFERS]?: {
+    incomingTransfers: IIndexedRichTransferData[];
   };
   [ReportType.OUTGOING_TRANSFERS]?: {
     outgoingTransfers: IIndexedRichTransferData[];

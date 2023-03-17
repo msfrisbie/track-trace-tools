@@ -517,10 +517,11 @@ export class DataLoader implements IAtomicService {
     });
   }
 
-  async inactivePlants(options: IPlantOptions): Promise<IPlantData[]> {
+  async inactivePlants(options: IPlantOptions): Promise<IIndexedPlantData[]> {
     console.log("inactive plants");
 
     if (store.state.mockDataMode && store.state.flags?.mockedFlags.mockPlants.enabled) {
+      // @ts-ignore
       return mockDataManager.mockPlants(options);
     }
 
@@ -531,7 +532,11 @@ export class DataLoader implements IAtomicService {
       );
 
       try {
-        const plants = await this.loadInactivePlants(options);
+        const plants = (await this.loadInactivePlants(options)).map((x) => ({
+          ...x,
+          PlantState: PlantState.INACTIVE,
+          TagMatcher: "",
+        }));
 
         subscription.unsubscribe();
         resolve(plants);
@@ -643,6 +648,8 @@ export class DataLoader implements IAtomicService {
         ...x,
         TagMatcher: "",
         PlantState: PlantState.FLOWERING,
+
+        LicenseNumber: primaryMetrcRequestManager.authStateOrError.license,
       }));
     }
 
@@ -659,6 +666,8 @@ export class DataLoader implements IAtomicService {
         ...x,
         PlantState: PlantState.FLOWERING,
         TagMatcher: "",
+
+        LicenseNumber: primaryMetrcRequestManager.authStateOrError.license,
       }));
 
       plants = [...plants, ...floweringPlants];
@@ -691,6 +700,8 @@ export class DataLoader implements IAtomicService {
         ...x,
         PlantState: PlantState.VEGETATIVE,
         TagMatcher: "",
+
+        LicenseNumber: primaryMetrcRequestManager.authStateOrError.license,
       }));
 
       plants = [...plants, ...vegetativePlants];
@@ -722,6 +733,8 @@ export class DataLoader implements IAtomicService {
         ...x,
         PlantState: PlantState.INACTIVE,
         TagMatcher: "",
+
+        LicenseNumber: primaryMetrcRequestManager.authStateOrError.license,
       }));
 
       plants = [...plants, ...inactivePlants];
@@ -1143,6 +1156,7 @@ export class DataLoader implements IAtomicService {
             ...transfer,
             TransferState: TransferState.INCOMING,
             TagMatcher: "",
+            LicenseNumber: primaryMetrcRequestManager.authStateOrError.license,
           }));
 
           databaseInterface.indexTransfers(incomingTransfers, TransferState.INCOMING);
@@ -1178,6 +1192,7 @@ export class DataLoader implements IAtomicService {
             ...transfer,
             TransferState: TransferState.INCOMING_INACTIVE,
             TagMatcher: "",
+            LicenseNumber: primaryMetrcRequestManager.authStateOrError.license,
           }));
 
           databaseInterface.indexTransfers(incomingTransfers, TransferState.INCOMING);
@@ -1206,6 +1221,8 @@ export class DataLoader implements IAtomicService {
           ...(await this.loadIncomingTransfer(manifestNumber)),
           TransferState: TransferState.INCOMING,
           TagMatcher: "",
+
+          LicenseNumber: primaryMetrcRequestManager.authStateOrError.license,
         };
 
         subscription.unsubscribe();
@@ -1235,6 +1252,7 @@ export class DataLoader implements IAtomicService {
             ...transfer,
             TransferState: TransferState.OUTGOING,
             TagMatcher: "",
+            LicenseNumber: primaryMetrcRequestManager.authStateOrError.license,
           }));
 
           databaseInterface.indexTransfers(outgoingTransfers, TransferState.OUTGOING);
@@ -1270,6 +1288,7 @@ export class DataLoader implements IAtomicService {
             ...transfer,
             TransferState: TransferState.OUTGOING_INACTIVE,
             TagMatcher: "",
+            LicenseNumber: primaryMetrcRequestManager.authStateOrError.license,
           }));
 
           databaseInterface.indexTransfers(outgoingTransfers, TransferState.OUTGOING);
@@ -1298,6 +1317,8 @@ export class DataLoader implements IAtomicService {
           ...(await this.loadOutgoingTransfer(manifestNumber)),
           TransferState: TransferState.OUTGOING,
           TagMatcher: "",
+
+          LicenseNumber: primaryMetrcRequestManager.authStateOrError.license,
         };
 
         subscription.unsubscribe();
@@ -1327,6 +1348,7 @@ export class DataLoader implements IAtomicService {
             ...transfer,
             TransferState: TransferState.REJECTED,
             TagMatcher: "",
+            LicenseNumber: primaryMetrcRequestManager.authStateOrError.license,
           }));
 
           databaseInterface.indexTransfers(rejectedTransfers, TransferState.REJECTED);
@@ -1355,6 +1377,7 @@ export class DataLoader implements IAtomicService {
           ...(await this.loadRejectedTransfer(manifestNumber)),
           TransferState: TransferState.REJECTED,
           TagMatcher: "",
+          LicenseNumber: primaryMetrcRequestManager.authStateOrError.license,
         };
 
         subscription.unsubscribe();

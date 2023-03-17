@@ -1,9 +1,12 @@
 import { MessageType } from "@/consts";
 import {
   IDestinationData,
+  IIndexedHarvestData,
   IIndexedPackageData,
+  IIndexedPlantBatchData,
   IIndexedPlantData,
   IIndexedRichTransferData,
+  IIndexedTagData,
   IPackageData,
   ISpreadsheet,
   ITransferData,
@@ -21,7 +24,11 @@ import { todayIsodate } from "./date";
 enum SheetTitles {
   OVERVIEW = "Overview",
   PACKAGES = "Packages",
+  TAGS = "Tags",
+  HARVESTS = "Harvests",
+  IMMATURE_PLANTS = "Immature Plants",
   MATURE_PLANTS = "Mature Plants",
+  INCOMING_TRANSFERS = "Incoming Transfers",
   OUTGOING_TRANSFERS = "Outgoing Transfers",
   DEPARTED_TRANSFER_PACKAGES = "Departed Transfer Packages",
 }
@@ -169,8 +176,16 @@ export async function createExportSpreadsheetOrError({
     switch (reportType) {
       case ReportType.PACKAGES:
         return reportData[reportType]?.packages as IIndexedPackageData[];
+      case ReportType.TAGS:
+        return reportData[reportType]?.tags as IIndexedTagData[];
+      case ReportType.HARVESTS:
+        return reportData[reportType]?.harvests as IIndexedHarvestData[];
+      case ReportType.IMMATURE_PLANTS:
+        return reportData[reportType]?.immaturePlants as IIndexedPlantBatchData[];
       case ReportType.MATURE_PLANTS:
         return reportData[reportType]?.maturePlants as IIndexedPlantData[];
+      case ReportType.INCOMING_TRANSFERS:
+        return reportData[reportType]?.incomingTransfers as IIndexedRichTransferData[];
       case ReportType.OUTGOING_TRANSFERS:
         return reportData[reportType]?.outgoingTransfers as IIndexedRichTransferData[];
       case ReportType.TRANSFER_PACKAGES:
@@ -188,9 +203,15 @@ export async function createExportSpreadsheetOrError({
     const value = (() => {
       switch (reportType) {
         case ReportType.PACKAGES:
-          return extractNestedData(reportType);
         case ReportType.MATURE_PLANTS:
+        case ReportType.IMMATURE_PLANTS:
+        case ReportType.HARVESTS:
+        case ReportType.TAGS:
           return extractNestedData(reportType);
+        case ReportType.INCOMING_TRANSFERS:
+          return (extractNestedData(reportType) as IIndexedRichTransferData[]).map(
+            (x) => x.incomingTransporter
+          );
         case ReportType.OUTGOING_TRANSFERS:
           let flattenedOutgoingTransfers: {
             Destination: IDestinationData;
@@ -240,8 +261,16 @@ export async function createExportSpreadsheetOrError({
     switch (reportType) {
       case ReportType.PACKAGES:
         return SheetTitles.PACKAGES;
+      case ReportType.HARVESTS:
+        return SheetTitles.HARVESTS;
+      case ReportType.TAGS:
+        return SheetTitles.TAGS;
+      case ReportType.IMMATURE_PLANTS:
+        return SheetTitles.IMMATURE_PLANTS;
       case ReportType.MATURE_PLANTS:
         return SheetTitles.MATURE_PLANTS;
+      case ReportType.INCOMING_TRANSFERS:
+        return SheetTitles.INCOMING_TRANSFERS;
       case ReportType.OUTGOING_TRANSFERS:
         return SheetTitles.OUTGOING_TRANSFERS;
       case ReportType.TRANSFER_PACKAGES:
@@ -257,7 +286,11 @@ export async function createExportSpreadsheetOrError({
 
   const ELIGIBLE_REPORT_TYPES: ReportType[] = [
     ReportType.PACKAGES,
+    ReportType.TAGS,
+    ReportType.HARVESTS,
+    ReportType.IMMATURE_PLANTS,
     ReportType.MATURE_PLANTS,
+    ReportType.INCOMING_TRANSFERS,
     ReportType.OUTGOING_TRANSFERS,
     ReportType.TRANSFER_PACKAGES,
   ].filter(shouldGenerateReport);
