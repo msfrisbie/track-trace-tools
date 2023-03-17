@@ -1,11 +1,15 @@
 import {
+  IHarvestFilter,
   IIndexedPackageData,
   IIndexedPlantData,
   IIndexedRichTransferData,
   IPackageFilter,
+  IPlantBatchData,
+  IPlantBatchFilter,
   IPlantFilter,
   ISimpleSpreadsheet,
   ISpreadsheet,
+  ITagFilter,
   ITransferFilter,
 } from "@/interfaces";
 import { ReportStatus, ReportType } from "./consts";
@@ -37,6 +41,22 @@ export interface IReportConfig {
   };
   [ReportType.TRANSFER_PACKAGES]?: {
     transferFilter: ITransferFilter;
+    fields: IFieldData[];
+  };
+  [ReportType.INCOMING_TRANSFERS]?: {
+    transferFilter: ITransferFilter;
+    fields: IFieldData[];
+  };
+  [ReportType.HARVESTS]?: {
+    harvestFilter: IHarvestFilter;
+    fields: IFieldData[];
+  };
+  [ReportType.IMMATURE_PLANTS]?: {
+    immaturePlantFilter: IPlantBatchFilter;
+    fields: IFieldData[];
+  };
+  [ReportType.TAGS]?: {
+    tagFilter: ITagFilter;
     fields: IFieldData[];
   };
 }

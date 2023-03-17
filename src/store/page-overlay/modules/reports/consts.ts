@@ -25,15 +25,107 @@ export enum ReportStatus {
 
 export enum ReportType {
   PACKAGES = "PACKAGES",
+  INCOMING_TRANSFERS = "INCOMING_TRANSFERS",
   OUTGOING_TRANSFERS = "OUTGOING_TRANSFERS",
   TRANSFER_PACKAGES = "TRANSFER_PACKAGES",
   MATURE_PLANTS = "MATURE_PLANTS",
-  // IMMATURE_PLANTS = "IMMATURE_PLANTS",
-  // HARVESTS = "HARVESTS",
-  // TAGS = "TAGS"
+  IMMATURE_PLANTS = "IMMATURE_PLANTS",
+  HARVESTS = "HARVESTS",
+  TAGS = "TAGS",
 }
 
 export const SHEET_FIELDS: { [key: string]: IFieldData[] } = {
+  [ReportType.IMMATURE_PLANTS]: [
+    {
+      value: "Name",
+      readableName: "Plant Tag/Name",
+      required: true,
+    },
+    {
+      value: "LicenseNumber",
+      readableName: "Current License",
+      required: true,
+    },
+    {
+      value: "UntrackedCount",
+      readableName: "# Plants",
+      required: true,
+    },
+    {
+      value: "TrackedCount",
+      readableName: "# Tracked",
+      required: false,
+    },
+    {
+      value: "PackagedCount",
+      readableName: "# Packaged",
+      required: false,
+    },
+    {
+      value: "HarvestedCount",
+      readableName: "# Harvested",
+      required: false,
+    },
+    {
+      value: "DestroyedCount",
+      readableName: "# Destroyed",
+      required: false,
+    },
+  ],
+  [ReportType.HARVESTS]: [
+    {
+      value: "Name",
+      readableName: "Harvest Batch",
+      required: true,
+    },
+    {
+      value: "LicenseNumber",
+      readableName: "Current License",
+      required: true,
+    },
+    {
+      value: "HarvestState",
+      readableName: "Harvest Status",
+      required: true,
+    },
+    {
+      value: "CurrentWeight",
+      readableName: "Current Weight",
+      required: true,
+    },
+    {
+      value: "HarvestStartDate",
+      readableName: "Harvest Date",
+      required: false,
+    },
+    {
+      value: "HarvestType",
+      readableName: "Harvest Type",
+      required: false,
+    },
+  ],
+  [ReportType.TAGS]: [
+    {
+      value: "Label",
+      readableName: "Tag",
+      required: true,
+    },
+    {
+      value: "LicenseNumber",
+      readableName: "Current License",
+      required: true,
+    },
+    {
+      value: "TagTypeName",
+      readableName: "Tag Type",
+      required: true,
+    },
+    {
+      value: "StatusName",
+      readableName: "Status",
+      required: true,
+    },
+  ],
   [ReportType.MATURE_PLANTS]: [
     {
       value: "Label",
@@ -145,6 +237,54 @@ export const SHEET_FIELDS: { [key: string]: IFieldData[] } = {
     {
       value: "ProductionBatchNumber",
       readableName: "Production Batch",
+      required: false,
+    },
+  ],
+  // TODO check these:
+  [ReportType.INCOMING_TRANSFERS]: [
+    {
+      value: "Transfer.ManifestNumber",
+      readableName: "Manifest #",
+      required: true,
+    },
+    {
+      value: "Destination.ShipmentTypeName",
+      readableName: "Transfer Type",
+      required: true,
+    },
+    {
+      value: "Destination.DeliveryPackageCount",
+      readableName: "Package Count",
+      required: true,
+    },
+    {
+      value: "Transfer.ShipperFacilityName",
+      readableName: "Shipper Name",
+      required: false,
+    },
+    {
+      value: "Transfer.ShipperFacilityLicenseNumber",
+      readableName: "Shipper License",
+      required: false,
+    },
+    {
+      value: "Destination.RecipientFacilityName",
+      readableName: "Recipient Name",
+      required: false,
+    },
+    {
+      value: "Destination.RecipientFacilityLicenseNumber",
+      readableName: "Recipient License",
+      required: false,
+    },
+    {
+      value: "Destination.EstimatedDepartureDateTime",
+      readableName: "ETD",
+      required: false,
+    },
+    {
+      value: "Destination.EstimatedArrivalDateTime",
+      readableName: "ETA",
       required: false,
     },
   ],

@@ -421,6 +421,7 @@ export interface IPlantFilter {
   plantedDateLt?: string | null;
   includeVegetative?: boolean;
   includeFlowering?: boolean;
+  includeInactive?: boolean;
 }
 
 export interface IPlantBatchOptions extends IDataLoadOptions {
@@ -430,6 +431,11 @@ export interface IPlantBatchOptions extends IDataLoadOptions {
 export interface IPlantBatchFilter {
   locationName?: string | null;
   strainName?: string | null;
+  plantedDateGt?: string | null;
+  plantedDateEq?: string | null;
+  plantedDateLt?: string | null;
+  includeActive?: boolean;
+  includeInactive?: boolean;
 }
 
 export interface IPackageFilter {
@@ -445,11 +451,16 @@ export interface IPackageFilter {
   packagedDateEq?: string | null;
   packagedDateLt?: string | null;
   includeActive?: boolean;
+  includeIntransit?: boolean;
   includeInactive?: boolean;
 }
 
 export interface IHarvestFilter {
   harvestName?: string | null;
+  includeActive?: boolean;
+  includeInactive?: boolean;
+  harvestDateGt?: string;
+  harvestDateLt?: string;
 }
 
 export interface ITransferFilter {
@@ -458,12 +469,24 @@ export interface ITransferFilter {
   createdDateEq?: string | null;
   createdDateLt?: string | null;
   onlyWholesale?: boolean;
+  estimatedArrivalDateGt?: string;
+  estimatedArrivalDateLt?: string;
   estimatedDepartureDateGt?: string;
   estimatedDepartureDateLt?: string;
+  includeIncoming?: boolean;
+  includeIncomingInactive?: boolean;
+  includeOutgoing?: boolean;
+  includeRejected?: boolean;
+  includeOutgoingInactive?: boolean;
 }
 
 export interface ITagFilter {
   label?: string | null;
+  includeAvailable?: boolean;
+  includeUsed?: boolean;
+  includeVoided?: boolean;
+  includePlant?: boolean;
+  includePackage?: boolean;
 }
 
 export interface ISalesReceiptSort {

@@ -456,7 +456,7 @@
 
 <script lang="ts">
 import { MessageType } from "@/consts";
-import { IPackageFilter, IPlantFilter, ITransferFilter } from "@/interfaces";
+import { IHarvestFilter, IPackageFilter, IPlantBatchFilter, IPlantFilter, ITagFilter, ITransferFilter } from "@/interfaces";
 import { messageBus } from "@/modules/message-bus.module";
 import router from "@/router/index";
 import store from "@/store/page-overlay/index";
@@ -582,15 +582,39 @@ export default Vue.extend({
         filterPackagedDateGt: false,
         filterPackagedDateLt: false,
         includeActive: true,
-        includeInactive: true,
+        includeInactive: false,
       },
       maturePlantsFormFilters: {
         plantedDateGt: todayIsodate(),
         plantedDateLt: todayIsodate(),
         includeVegetative: true,
         includeFlowering: true,
+        includeInactive: false,
         filterPlantedDateGt: false,
         filterPlantedDateLt: false,
+      },
+      immaturePlantsFormFilters: {
+        plantedDateGt: todayIsodate(),
+        plantedDateLt: todayIsodate(),
+        filterPlantedDateGt: false,
+        filterPlantedDateLt: false,
+        includeInactive: false,
+      },
+      harvestsFormFilters: {
+        harvestDateGt: todayIsodate(),
+        harvestDateLt: todayIsodate(),
+        filterHarvestDateGt: false,
+        filterHarvestDateLt: false,
+        includeInactive: false,
+      },
+      incomingTransfersFormFilters: {
+        estimatedArrivalDateLt: todayIsodate(),
+        estimatedArrivalDateGt: todayIsodate(),
+        filterEstimatedArrivalDateLt: false,
+        filterEstimatedArrivalDateGt: false,
+        onlyWholesale: false,
+        includeIncoming: true,
+        includeIncomingInactive: false,
       },
       outgoingTransfersFormFilters: {
         estimatedDepartureDateLt: todayIsodate(),
@@ -598,6 +622,16 @@ export default Vue.extend({
         filterEstimatedDepartureDateLt: false,
         filterEstimatedDepartureDateGt: false,
         onlyWholesale: false,
+        includeOutgoing: true,
+        includeRejected: true,
+        includeOutgoingInactive: false,
+      },
+      tagsFormFilters: {
+        includeAvailable: true,
+        includeUsed: false,
+        includeVoided: false,
+        includePackage: true,
+        includePlant: true
       },
       showFilters: (() => {
         const fields: { [key: string]: boolean } = {};
@@ -651,21 +685,18 @@ export default Vue.extend({
       if (this.$data.selectedReports.includes(ReportType.PACKAGES)) {
         const packagesFormFilters = this.$data.packagesFormFilters;
         const packageFilter: IPackageFilter = {};
-        if (packagesFormFilters.includeActive) {
-          packageFilter.includeActive = true;
-        }
 
-        if (packagesFormFilters.includeInactive) {
-          packageFilter.includeInactive = true;
-        }
+        packageFilter.includeActive = packagesFormFilters.includeActive;
+        packageFilter.includeIntransit = packagesFormFilters.includeIntransit;
+        packageFilter.includeInactive = packagesFormFilters.includeInactive;
 
-        if (packagesFormFilters.filterPackagedDateGt) {
-          packageFilter.packagedDateGt = packagesFormFilters.packagedDateGt;
-        }
+        packageFilter.packagedDateGt = packagesFormFilters.filterPackagedDateGt
+          ? packagesFormFilters.packagedDateGt
+          : null;
 
-        if (packagesFormFilters.filterPackagedDateLt) {
-          packageFilter.packagedDateLt = packagesFormFilters.packagedDateLt;
-        }
+        packageFilter.packagedDateLt = packagesFormFilters.filterPackagedDateLt
+          ? packagesFormFilters.packagedDateLt
+          : null;
 
         reportConfig[ReportType.PACKAGES] = {
           packageFilter,
@@ -677,21 +708,17 @@ export default Vue.extend({
         const plantFilter: IPlantFilter = {};
         const maturePlantsFormFilters = this.$data.maturePlantsFormFilters;
 
-        if (maturePlantsFormFilters.includeVegetative) {
-          plantFilter.includeVegetative = true;
-        }
+        plantFilter.includeVegetative = maturePlantsFormFilters.includeVegetative;
+        plantFilter.includeFlowering = maturePlantsFormFilters.includeFlowering;
+        plantFilter.includeInactive = maturePlantsFormFilters.includeInactive;
 
-        if (maturePlantsFormFilters.includeFlowering) {
-          plantFilter.includeFlowering = true;
-        }
+        plantFilter.plantedDateGt = maturePlantsFormFilters.filterPlantedDateGt
+          ? maturePlantsFormFilters.plantedDateGt
+          : null;
 
-        if (maturePlantsFormFilters.filterPlantedDateGt) {
-          plantFilter.plantedDateGt = maturePlantsFormFilters.plantedDateGt;
-        }
-
-        if (maturePlantsFormFilters.filterPackagedDateLt) {
-          plantFilter.plantedDateLt = maturePlantsFormFilters.plantedDateLt;
-        }
+        plantFilter.plantedDateLt = maturePlantsFormFilters.filterPackagedDateLt
+          ? maturePlantsFormFilters.plantedDateLt
+          : null;
 
         reportConfig[ReportType.MATURE_PLANTS] = {
           plantFilter,
@@ -699,27 +726,112 @@ export default Vue.extend({
         };
       }
 
+      if (this.$data.selectedReports.includes(ReportType.INCOMING_TRANSFERS)) {
+        const transferFilter: ITransferFilter = {};
+        const incomingTransfersFormFilters = this.$data.incomingTransfersFormFilters;
+
+        transferFilter.onlyWholesale = incomingTransfersFormFilters.onlyWholesale;
+        transferFilter.includeIncoming = incomingTransfersFormFilters.includeIncoming;
+        transferFilter.includeIncomingInactive = incomingTransfersFormFilters.includeIncomingInactive;
+
+        transferFilter.estimatedArrivalDateGt =
+          incomingTransfersFormFilters.filterEstimatedArrivalDateGt
+            ? incomingTransfersFormFilters.estimatedArrivalDateGt
+            : null;
+
+        transferFilter.estimatedArrivalDateLt =
+          incomingTransfersFormFilters.filterEstimatedArrivalDateLt
+            ? incomingTransfersFormFilters.estimatedArrivalDateLt
+            : null;
+
+        reportConfig[ReportType.INCOMING_TRANSFERS] = {
+          transferFilter,
+          fields: this.$data.fields[ReportType.INCOMING_TRANSFERS],
+        };
+      }
+
       if (this.$data.selectedReports.includes(ReportType.OUTGOING_TRANSFERS)) {
         const transferFilter: ITransferFilter = {};
         const outgoingTransfersFormFilters = this.$data.outgoingTransfersFormFilters;
 
-        if (outgoingTransfersFormFilters.onlyWholesale) {
-          transferFilter.onlyWholesale = true;
-        }
+        transferFilter.onlyWholesale = outgoingTransfersFormFilters.onlyWholesale;
+        transferFilter.includeOutgoing = outgoingTransfersFormFilters.includeOutgoing;
+        transferFilter.includeRejected = outgoingTransfersFormFilters.includeRejected;
+        transferFilter.includeOutgoingInactive = outgoingTransfersFormFilters.includeOutgoingInactive;
 
-        if (outgoingTransfersFormFilters.filterEstimatedDepartureDateGt) {
-          transferFilter.estimatedDepartureDateGt =
-            outgoingTransfersFormFilters.estimatedDepartureDateGt;
-        }
+        transferFilter.estimatedDepartureDateGt =
+          outgoingTransfersFormFilters.filterEstimatedDepartureDateGt
+            ? outgoingTransfersFormFilters.estimatedDepartureDateGt
+            : null;
 
-        if (outgoingTransfersFormFilters.filterEstimatedDepartureDateLt) {
-          transferFilter.estimatedDepartureDateLt =
-            outgoingTransfersFormFilters.estimatedDepartureDateLt;
-        }
+        transferFilter.estimatedDepartureDateLt =
+          outgoingTransfersFormFilters.filterEstimatedDepartureDateLt
+            ? outgoingTransfersFormFilters.estimatedDepartureDateLt
+            : null;
 
         reportConfig[ReportType.OUTGOING_TRANSFERS] = {
           transferFilter,
           fields: this.$data.fields[ReportType.OUTGOING_TRANSFERS],
+        };
+      }
+
+      if (this.$data.selectedReports.includes(ReportType.HARVESTS)) {
+        const harvestFilter: IHarvestFilter = {};
+        const harvestsFormFilters = this.$data.harvestsFormFilters;
+
+        harvestFilter.includeActive = harvestsFormFilters.includeActive;
+        harvestFilter.includeInactive = harvestsFormFilters.includeInactive;
+
+        harvestFilter.harvestDateGt =
+          harvestsFormFilters.filterEstimatedArrivalDateGt
+            ? harvestsFormFilters.harvestDateGt
+            : null;
+
+        harvestFilter.harvestDateLt =
+          harvestsFormFilters.filterEstimatedArrivalDateLt
+            ? harvestsFormFilters.harvestDateLt
+            : null;
+
+        reportConfig[ReportType.HARVESTS] = {
+          harvestFilter,
+          fields: this.$data.fields[ReportType.HARVESTS],
+        };
+      }
+      if (this.$data.selectedReports.includes(ReportType.TAGS)) {
+
+        const tagFilter: ITagFilter = {};
+        const tagsFormFilters = this.$data.tagsFormFilters;
+
+        tagFilter.includeAvailable = tagsFormFilters.includeAvailable;
+        tagFilter.includeUsed = tagsFormFilters.includeUsed;
+        tagFilter.includeVoided = tagsFormFilters.includeVoided;
+        tagFilter.includePlant = tagsFormFilters.includePlant;
+        tagFilter.includePackage = tagsFormFilters.includePackage;
+
+        reportConfig[ReportType.TAGS] = {
+          tagFilter,
+          fields: this.$data.fields[ReportType.TAGS],
+        };
+      }
+
+      if (this.$data.selectedReports.includes(ReportType.IMMATURE_PLANTS)) {
+        const immaturePlantFilter: IPlantBatchFilter = {};
+        const immaturePlantsFormFilters = this.$data.immaturePlantsFormFilters;
+
+        immaturePlantFilter.includeActive = immaturePlantsFormFilters.includeActive;
+        immaturePlantFilter.includeInactive = immaturePlantsFormFilters.includeInactive;
+
+        immaturePlantFilter.plantedDateGt = immaturePlantsFormFilters.filterPlantedDateGt
+          ? immaturePlantsFormFilters.plantedDateGt
+          : null;
+
+          immaturePlantFilter.plantedDateLt = immaturePlantsFormFilters.filterPackagedDateLt
+          ? immaturePlantsFormFilters.plantedDateLt
+          : null;
+
+        reportConfig[ReportType.IMMATURE_PLANTS] = {
+          immaturePlantFilter,
+          fields: this.$data.fields[ReportType.IMMATURE_PLANTS],
         };
       }
 
