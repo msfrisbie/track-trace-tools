@@ -65,108 +65,7 @@
           </template>
           <template v-else>
             <div class="text-purple-800 text-center">
-              Configure your snapshot below. <br />Defaults to all data and fields.
-            </div>
-          </template>
-
-          <!-- Packages -->
-          <template v-if="selectedReports.includes(ReportType.PACKAGES)">
-            <div class="rounded border border-gray-300 p-2 flex flex-col items-stretch gap-2">
-              <div class="font-semibold text-gray-700">Packages</div>
-              <hr />
-              <div class="flex flex-col items-stretch gap-4">
-                <b-button
-                  size="sm"
-                  variant="outline-primary"
-                  @click="toggleFilters(ReportType.PACKAGES)"
-                  >{{
-                    showFilters[ReportType.PACKAGES] ? "HIDE FILTERS" : "CHOOSE FILTERS"
-                  }}</b-button
-                >
-                <template v-if="showFilters[ReportType.PACKAGES]">
-                  <b-form-checkbox v-model="packagesFormFilters.includeActive">
-                    <span class="leading-6">Include active packages</span>
-                  </b-form-checkbox>
-
-                  <b-form-checkbox v-model="packagesFormFilters.includeInactive">
-                    <span class="leading-6">Include inactive packages</span>
-                  </b-form-checkbox>
-
-                  <b-form-checkbox :disabled="true">
-                    <div class="flex flex-col items-start">
-                      <span class="leading-6"
-                        >Include packages transferred out of this facility</span
-                      >
-                      <span class="text-xs text-gray-300">This is a premium feature</span>
-                    </div>
-                  </b-form-checkbox>
-
-                  <div class="flex flex-col items-start gap-1">
-                    <b-form-checkbox v-model="packagesFormFilters.filterPackagedDateGt">
-                      <span class="leading-6">Packaged on or after:</span>
-                    </b-form-checkbox>
-                    <b-form-datepicker
-                      v-if="packagesFormFilters.filterPackagedDateGt"
-                      :disabled="!packagesFormFilters.filterPackagedDateGt"
-                      initial-date
-                      size="sm"
-                      v-model="packagesFormFilters.packagedDateGt"
-                    />
-                  </div>
-
-                  <div class="flex flex-col items-start gap-1">
-                    <b-form-checkbox v-model="packagesFormFilters.filterPackagedDateLt">
-                      <span class="leading-6">Packaged on or before:</span>
-                    </b-form-checkbox>
-                    <b-form-datepicker
-                      v-if="packagesFormFilters.filterPackagedDateLt"
-                      :disabled="!packagesFormFilters.filterPackagedDateLt"
-                      initial-date
-                      size="sm"
-                      v-model="packagesFormFilters.packagedDateLt"
-                    />
-                  </div>
-                </template>
-
-                <b-button
-                  size="sm"
-                  variant="outline-primary"
-                  @click="toggleFields(ReportType.PACKAGES)"
-                  >{{
-                    showFields[ReportType.PACKAGES] ? "HIDE COLUMNS" : "CHOOSE COLUMNS"
-                  }}</b-button
-                >
-                <template v-if="showFields[ReportType.PACKAGES]">
-                  <div class="grid grid-cols-2 gap-2">
-                    <b-button
-                      variant="outline-dark"
-                      size="sm"
-                      @click="checkAll(ReportType.PACKAGES)"
-                      >CHECK ALL</b-button
-                    >
-                    <b-button
-                      variant="outline-dark"
-                      size="sm"
-                      @click="uncheckAll(ReportType.PACKAGES)"
-                      >UNCHECK ALL</b-button
-                    >
-                  </div>
-
-                  <b-form-checkbox-group
-                    v-model="fields[ReportType.PACKAGES]"
-                    class="flex flex-col items-start gap-1"
-                  >
-                    <b-form-checkbox
-                      v-for="fieldData of SHEET_FIELDS[ReportType.PACKAGES]"
-                      v-bind:key="fieldData.value"
-                      :value="fieldData"
-                      :disabled="fieldData.required"
-                    >
-                      <span class="leading-6">{{ fieldData.readableName }}</span>
-                    </b-form-checkbox>
-                  </b-form-checkbox-group>
-                </template>
-              </div>
+              Configure your snapshot below. <br />Defaults to active data and all fields.
             </div>
           </template>
 
@@ -979,7 +878,7 @@ const reportOptions = [
     description: "Filter by tag type and status",
   },
   {
-    text: "Tags",
+    text: "Harvests",
     value: ReportType.HARVESTS,
     premium: false,
     description: "Filter by harvest date",

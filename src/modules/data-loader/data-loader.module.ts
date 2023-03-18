@@ -4,6 +4,7 @@ import {
   HarvestState,
   IdbKeyPiece,
   PackageState,
+  PlantBatchState,
   PlantState,
   TagState,
   TransferState,
@@ -21,6 +22,7 @@ import {
   IHarvestHistoryData,
   IIndexedHarvestData,
   IIndexedPackageData,
+  IIndexedPlantBatchData,
   IIndexedPlantData,
   IIndexedTagData,
   IIndexedTransferData,
@@ -98,6 +100,7 @@ export class DataLoader implements IAtomicService {
   private _strains: Promise<IStrainData[]> | null = null;
   private _items: Promise<IItemData[]> | null = null;
   private _activeHarvests: Promise<IIndexedHarvestData[]> | null = null;
+  private _inactiveHarvests: Promise<IIndexedHarvestData[]> | null = null;
 
   private _countPayload: string = buildBody({ page: 0, pageSize: 5 });
 
@@ -344,7 +347,9 @@ export class DataLoader implements IAtomicService {
    *
    */
 
-  async availableTags({ useCache = true }: { useCache?: boolean }): Promise<IIndexedTagData[]> {
+  async availableTags({ useCache = true }: { useCache?: boolean } = {}): Promise<
+    IIndexedTagData[]
+  > {
     if (store.state.mockDataMode && store.state.flags?.mockedFlags.mockTags.enabled) {
       return mockDataManager.mockTags();
     }
@@ -554,8 +559,9 @@ export class DataLoader implements IAtomicService {
     });
   }
 
-  async plantBatches(options: IPlantBatchOptions): Promise<IPlantBatchData[]> {
+  async plantBatches(options: IPlantBatchOptions = {}): Promise<IIndexedPlantBatchData[]> {
     if (store.state.mockDataMode && store.state.flags?.mockedFlags.mockPlantBatches.enabled) {
+      // @ts-ignore
       return mockDataManager.mockPlantBatches(options);
     }
 
@@ -566,10 +572,44 @@ export class DataLoader implements IAtomicService {
       );
 
       try {
-        const plants = await this.loadPlantBatches(options);
+        const plantBatches = (await this.loadPlantBatches(options)).map((x) => ({
+          ...x,
+          PlantBatchState: PlantBatchState.ACTIVE,
+          TagMatcher: "",
+          LicenseNumber: primaryMetrcRequestManager.authStateOrError.license,
+        }));
 
         subscription.unsubscribe();
-        resolve(plants);
+        resolve(plantBatches);
+      } catch (e) {
+        subscription.unsubscribe();
+        reject(e);
+      }
+    });
+  }
+
+  async inactivePlantBatches(options: IPlantBatchOptions = {}): Promise<IIndexedPlantBatchData[]> {
+    if (store.state.mockDataMode && store.state.flags?.mockedFlags.mockPlantBatches.enabled) {
+      // @ts-ignore
+      return mockDataManager.mockPlantBatches(options);
+    }
+
+    // This does NOT cache the result
+    return new Promise(async (resolve, reject) => {
+      const subscription = timer(DATA_LOAD_FETCH_TIMEOUT_MS).subscribe(() =>
+        reject("Plant batch fetch timed out")
+      );
+
+      try {
+        const plantBatches = (await this.loadInactivePlantBatches(options)).map((x) => ({
+          ...x,
+          PlantBatchState: PlantBatchState.INACTIVE,
+          TagMatcher: "",
+          LicenseNumber: primaryMetrcRequestManager.authStateOrError.license,
+        }));
+
+        subscription.unsubscribe();
+        resolve(plantBatches);
       } catch (e) {
         subscription.unsubscribe();
         reject(e);
@@ -1555,6 +1595,40 @@ export class DataLoader implements IAtomicService {
     return this._activeHarvests;
   }
 
+  async inactiveHarvests(): Promise<IIndexedHarvestData[]> {
+    if (store.state.mockDataMode && store.state.flags?.mockedFlags.mockHarvests.enabled) {
+      return mockDataManager.mockHarvests();
+    }
+
+    if (!this._inactiveHarvests) {
+      this._inactiveHarvests = new Promise(async (resolve, reject) => {
+        const subscription = timer(DATA_LOAD_FETCH_TIMEOUT_MS).subscribe(() =>
+          reject("Inactive harvest fetch timed out")
+        );
+
+        try {
+          const harvests: IIndexedHarvestData[] = (await this.loadInactiveHarvests()).map(
+            (harvest) => ({
+              ...harvest,
+              HarvestState: HarvestState.INACTIVE,
+              TagMatcher: "",
+              LicenseNumber: primaryMetrcRequestManager.authStateOrError.license,
+            })
+          );
+
+          subscription.unsubscribe();
+          resolve(harvests);
+        } catch (e) {
+          subscription.unsubscribe();
+          reject(e);
+          this._inactiveHarvests = null;
+        }
+      });
+    }
+
+    return this._inactiveHarvests;
+  }
+
   async activeSalesReceipts(): Promise<ISalesReceiptData[]> {
     const activeSalesReceipts: Promise<ISalesReceiptData[]> = new Promise(
       async (resolve, reject) => {
@@ -1780,6 +1854,18 @@ export class DataLoader implements IAtomicService {
     return streamFactory<IHarvestData>(dataLoadOptions, responseFactory);
   }
 
+  inactiveHarvestsStream(
+    dataLoadOptions: IDataLoadOptions = {}
+  ): Subject<ICollectionResponse<IHarvestData>> {
+    const responseFactory = (paginationOptions: IPaginationOptions): Promise<Response> => {
+      const body = buildBody(paginationOptions);
+
+      return this.metrcRequestManagerOrError.getInactiveHarvests(body);
+    };
+
+    return streamFactory<IHarvestData>(dataLoadOptions, responseFactory);
+  }
+
   incomingTransfersStream(
     dataLoadOptions: IDataLoadOptions = {}
   ): Subject<ICollectionResponse<ITransferData>> {
@@ -1869,6 +1955,22 @@ export class DataLoader implements IAtomicService {
       );
 
       return this.metrcRequestManagerOrError.getPlantBatches(body);
+    };
+
+    return streamFactory<IPlantBatchData>(options, responseFactory);
+  }
+
+  inactivePlantBatchesStream(
+    options: IPlantBatchOptions
+  ): Subject<ICollectionResponse<IPlantBatchData>> {
+    const responseFactory = (paginationOptions: IPaginationOptions): Promise<Response> => {
+      const body = buildBody(
+        paginationOptions,
+        { plantBatchFilter: options.filter },
+        { plantBatchSort: { Name: "asc" } }
+      );
+
+      return this.metrcRequestManagerOrError.getInactivePlantBatches(body);
     };
 
     return streamFactory<IPlantBatchData>(options, responseFactory);
@@ -2380,6 +2482,24 @@ export class DataLoader implements IAtomicService {
     return harvests;
   }
 
+  private async loadInactiveHarvests(): Promise<IHarvestData[]> {
+    await authManager.authStateOrError();
+
+    store.commit(MutationType.SET_LOADING_MESSAGE, "Loading inactive harvests...");
+
+    let harvests: IHarvestData[] = [];
+
+    await this.inactiveHarvestsStream().forEach((next: ICollectionResponse<IHarvestData>) => {
+      harvests = [...harvests, ...next.Data];
+    });
+
+    console.log(`Loaded ${harvests.length} inactive harvests`);
+
+    store.commit(MutationType.SET_LOADING_MESSAGE, null);
+
+    return harvests;
+  }
+
   private async loadLocations(): Promise<ILocationData[]> {
     await authManager.authStateOrError();
 
@@ -2524,6 +2644,26 @@ export class DataLoader implements IAtomicService {
     });
 
     console.log(`Loaded ${plantBatches.length} plant batches`);
+
+    store.commit(MutationType.SET_LOADING_MESSAGE, null);
+
+    return plantBatches;
+  }
+
+  private async loadInactivePlantBatches(options: IPlantBatchOptions): Promise<IPlantBatchData[]> {
+    await authManager.authStateOrError();
+
+    store.commit(MutationType.SET_LOADING_MESSAGE, "Loading inactive plant batches...");
+
+    let plantBatches: IPlantBatchData[] = [];
+
+    await this.inactivePlantBatchesStream(options).forEach(
+      (next: ICollectionResponse<IPlantBatchData>) => {
+        plantBatches = [...plantBatches, ...next.Data];
+      }
+    );
+
+    console.log(`Loaded ${plantBatches.length} inactive plant batches`);
 
     store.commit(MutationType.SET_LOADING_MESSAGE, null);
 

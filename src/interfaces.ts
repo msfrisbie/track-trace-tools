@@ -426,7 +426,7 @@ export interface IPlantFilter {
 }
 
 export interface IPlantBatchOptions extends IDataLoadOptions {
-  filter: IPlantBatchFilter;
+  filter?: IPlantBatchFilter;
 }
 
 export interface IPlantBatchFilter {
@@ -1000,7 +1000,7 @@ export interface IHarvestData {
   FacilityLicenseNumber: string | null;
   FacilityName: string | null;
   FinishedDate: string | null;
-  HarvestStartDate: string | null;
+  HarvestStartDate: string;
   HarvestType: HarvestType;
   HarvestTypeName: "Harvest Batch";
   Id: number;
