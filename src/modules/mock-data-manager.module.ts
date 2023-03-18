@@ -317,6 +317,7 @@ const FROZEN_STORAGE_LOCATION: ILocationData = {
 const NEW_HARVEST: IIndexedHarvestData = {
   HarvestState: HarvestState.ACTIVE,
   TagMatcher: "",
+  LicenseNumber: "",
   ArchivedDate: null,
   CurrentWeight: 0,
   DryingLocationName: "Frozen Storage",
@@ -352,6 +353,7 @@ const NEW_HARVEST: IIndexedHarvestData = {
 const OLD_HARVEST: IIndexedHarvestData = {
   HarvestState: HarvestState.ACTIVE,
   TagMatcher: "",
+  LicenseNumber: "",
   ArchivedDate: null,
   CurrentWeight: 0,
   DryingLocationName: "Frozen Storage",
@@ -840,6 +842,7 @@ class MockDataManager implements IAtomicService {
         this._mockTags.push({
           TagState: TagState.AVAILABLE,
           TagMatcher: "",
+          LicenseNumber: "",
           Label: label,
           Id: 20000000 + i,
           IsArchived: false,
@@ -857,6 +860,7 @@ class MockDataManager implements IAtomicService {
         this._mockTags.push({
           TagState: TagState.AVAILABLE,
           TagMatcher: "",
+          LicenseNumber: "",
           Label: label,
           Id: 20000000 + i,
           IsArchived: false,

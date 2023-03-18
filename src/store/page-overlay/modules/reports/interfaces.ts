@@ -4,7 +4,8 @@ import {
   IIndexedPackageData,
   IIndexedPlantBatchData,
   IIndexedPlantData,
-  IIndexedRichTransferData,
+  IIndexedRichIncomingTransferData,
+  IIndexedRichOutgoingTransferData,
   IIndexedTagData,
   IPackageFilter,
   IPlantBatchFilter,
@@ -80,13 +81,13 @@ export interface IReportData {
     harvests: IIndexedHarvestData[];
   };
   [ReportType.INCOMING_TRANSFERS]?: {
-    incomingTransfers: IIndexedRichTransferData[];
+    incomingTransfers: IIndexedRichIncomingTransferData[];
   };
   [ReportType.OUTGOING_TRANSFERS]?: {
-    outgoingTransfers: IIndexedRichTransferData[];
+    outgoingTransfers: IIndexedRichOutgoingTransferData[];
   };
   [ReportType.TRANSFER_PACKAGES]?: {
-    richOutgoingInactiveTransfers?: IIndexedRichTransferData[];
+    richOutgoingInactiveTransfers?: IIndexedRichOutgoingTransferData[];
   };
 }
 

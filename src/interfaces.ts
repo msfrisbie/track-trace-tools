@@ -803,13 +803,31 @@ export interface IDestinationData {
 }
 
 export interface IRichDestinationData extends IDestinationData {
-  packages: IPackageData[];
+  transporters?: ITransporterData[];
+  packages?: IPackageData[];
 }
 
-export interface IIndexedRichTransferData extends IIndexedTransferData {
-  incomingTransporter?: ITransporterData[];
-  incomingPackages?: IPackageData[];
+/**
+ * The transfer format is gnarly. There are a lot of field overlaps
+ * between incoming/outgoing transfer, destination, and transporter
+ *
+ * Incoming transfers:
+ *   Single transporter
+ *   Multiple packages per transporter
+ *
+ * Outgoing transfers:
+ *   Multiple destinations
+ *   Multiple packages per destination
+ *
+ * This wrap them up into
+ */
+export interface IIndexedRichOutgoingTransferData extends IIndexedTransferData {
   outgoingDestinations?: IRichDestinationData[];
+}
+
+export interface IIndexedRichIncomingTransferData extends IIndexedTransferData {
+  incomingTransporters?: ITransporterData[];
+  incomingPackages?: IPackageData[];
 }
 
 export interface IIndexedTagData extends ITagData {

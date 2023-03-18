@@ -2,7 +2,7 @@ import { MessageType } from "@/consts";
 import {
   IIndexedPackageData,
   IIndexedPlantData,
-  IIndexedRichTransferData,
+  IIndexedRichOutgoingTransferData,
   IPluginState,
   IRichDestinationData,
   ISpreadsheet,
@@ -227,15 +227,33 @@ export const reportsModule = {
             statusMessage: "Loading outgoing transfers...",
           });
 
-          let richOutgoingTransfers: IIndexedRichTransferData[] =
-            await primaryDataLoader.outgoingTransfers();
+          let richOutgoingTransfers: IIndexedRichOutgoingTransferData[] = [];
+
+          if (outgoingTransferConfig.transferFilter.includeOutgoing) {
+            richOutgoingTransfers = [
+              ...(await primaryDataLoader.outgoingTransfers()),
+              ...richOutgoingTransfers,
+            ];
+          }
+
+          if (outgoingTransferConfig.transferFilter.includeRejected) {
+            richOutgoingTransfers = [
+              ...(await primaryDataLoader.rejectedTransfers()),
+              ...richOutgoingTransfers,
+            ];
+          }
+
+          if (outgoingTransferConfig.transferFilter.includeOutgoingInactive) {
+            richOutgoingTransfers = [
+              ...(await primaryDataLoader.outgoingInactiveTransfers()),
+              ...richOutgoingTransfers,
+            ];
+          }
 
           for (const transfer of richOutgoingTransfers) {
             const destinations: IRichDestinationData[] = (
               await primaryDataLoader.transferDestinations(transfer.Id)
             ).map((x) => ({ ...x, packages: [] }));
-
-            console.log({ destinations, filter: outgoingTransferConfig.transferFilter });
 
             transfer.outgoingDestinations = destinations.filter((destination) => {
               if (outgoingTransferConfig.transferFilter.onlyWholesale) {
@@ -281,7 +299,7 @@ export const reportsModule = {
             statusMessage: "Loading transfer packages...",
           });
           // TODO use transferFilter
-          const richOutgoingInactiveTransfers: IIndexedRichTransferData[] =
+          const richOutgoingInactiveTransfers: IIndexedRichOutgoingTransferData[] =
             await primaryDataLoader.outgoingInactiveTransfers();
 
           for (const transfer of richOutgoingInactiveTransfers) {

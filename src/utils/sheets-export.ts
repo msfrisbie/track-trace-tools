@@ -5,11 +5,14 @@ import {
   IIndexedPackageData,
   IIndexedPlantBatchData,
   IIndexedPlantData,
-  IIndexedRichTransferData,
+  IIndexedRichIncomingTransferData,
+  IIndexedRichOutgoingTransferData,
   IIndexedTagData,
+  IIndexedTransferData,
   IPackageData,
   ISpreadsheet,
   ITransferData,
+  ITransporterData,
 } from "@/interfaces";
 import { messageBus } from "@/modules/message-bus.module";
 import store from "@/store/page-overlay/index";
@@ -185,11 +188,12 @@ export async function createExportSpreadsheetOrError({
       case ReportType.MATURE_PLANTS:
         return reportData[reportType]?.maturePlants as IIndexedPlantData[];
       case ReportType.INCOMING_TRANSFERS:
-        return reportData[reportType]?.incomingTransfers as IIndexedRichTransferData[];
+        return reportData[reportType]?.incomingTransfers as IIndexedRichOutgoingTransferData[];
       case ReportType.OUTGOING_TRANSFERS:
-        return reportData[reportType]?.outgoingTransfers as IIndexedRichTransferData[];
+        return reportData[reportType]?.outgoingTransfers as IIndexedRichOutgoingTransferData[];
       case ReportType.TRANSFER_PACKAGES:
-        return reportData[reportType]?.richOutgoingInactiveTransfers as IIndexedRichTransferData[];
+        return reportData[reportType]
+          ?.richOutgoingInactiveTransfers as IIndexedRichOutgoingTransferData[];
       default:
         throw new Error("Bad reportType " + reportType);
     }
@@ -209,17 +213,33 @@ export async function createExportSpreadsheetOrError({
         case ReportType.TAGS:
           return extractNestedData(reportType);
         case ReportType.INCOMING_TRANSFERS:
-          return (extractNestedData(reportType) as IIndexedRichTransferData[]).map(
-            (x) => x.incomingTransporter
-          );
+          let flattenedIncomingTransfers: {
+            Transporter: ITransporterData;
+            Transfer: IIndexedTransferData;
+          }[] = [];
+
+          for (const transfer of extractNestedData(
+            reportType
+          ) as IIndexedRichIncomingTransferData[]) {
+            for (const transporter of transfer?.incomingTransporters ?? []) {
+              flattenedIncomingTransfers.push({
+                Transporter: transporter,
+                Transfer: transfer,
+              });
+            }
+          }
+
+          return flattenedIncomingTransfers;
         case ReportType.OUTGOING_TRANSFERS:
           let flattenedOutgoingTransfers: {
             Destination: IDestinationData;
             Transfer: ITransferData;
           }[] = [];
 
-          for (const transfer of extractNestedData(reportType) as IIndexedRichTransferData[]) {
-            for (const destination of transfer?.outgoingDestinations || []) {
+          for (const transfer of extractNestedData(
+            reportType
+          ) as IIndexedRichOutgoingTransferData[]) {
+            for (const destination of transfer?.outgoingDestinations ?? []) {
               flattenedOutgoingTransfers.push({
                 Destination: destination,
                 Transfer: transfer,
@@ -235,9 +255,11 @@ export async function createExportSpreadsheetOrError({
             Transfer: ITransferData;
           }[] = [];
 
-          for (const transfer of extractNestedData(reportType) as IIndexedRichTransferData[]) {
-            for (const destination of transfer?.outgoingDestinations || []) {
-              for (const pkg of destination.packages) {
+          for (const transfer of extractNestedData(
+            reportType
+          ) as IIndexedRichOutgoingTransferData[]) {
+            for (const destination of transfer?.outgoingDestinations ?? []) {
+              for (const pkg of destination.packages ?? []) {
                 flattenedOutgoingPackages.push({
                   Package: pkg,
                   Destination: destination,
