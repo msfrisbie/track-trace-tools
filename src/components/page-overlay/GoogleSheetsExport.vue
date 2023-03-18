@@ -824,6 +824,7 @@ import {
   ITagFilter,
   ITransferFilter,
 } from "@/interfaces";
+import { authManager } from "@/modules/auth-manager.module";
 import { messageBus } from "@/modules/message-bus.module";
 import router from "@/router/index";
 import store from "@/store/page-overlay/index";
@@ -902,10 +903,16 @@ const reportOptions = [
     description: "Grouped summary of packages by item, remaining quantity, and testing status",
   },
   {
-    text: "Plant Quickview",
+    text: "Immature Plant Quickview",
     value: null,
     premium: true,
-    description: "Grouped summary of plants by strain, location, and dates",
+    description: "Grouped summary of mature plants by strain, location, and dates",
+  },
+  {
+    text: "Mature Plant Quickview",
+    value: null,
+    premium: true,
+    description: "Grouped summary of mature plants by growth phase, strain, location, and dates",
   },
   {
     text: "Transfer Quickview",
@@ -977,6 +984,7 @@ export default Vue.extend({
         plantedDateLt: todayIsodate(),
         filterPlantedDateGt: false,
         filterPlantedDateLt: false,
+        includeActive: true,
         includeInactive: false,
       },
       harvestsFormFilters: {
@@ -1060,7 +1068,9 @@ export default Vue.extend({
       });
     },
     async createSpreadsheet() {
-      const reportConfig: IReportConfig = {};
+      const reportConfig: IReportConfig = {
+        authState: await authManager.authStateOrError(),
+      };
 
       if (this.$data.selectedReports.includes(ReportType.PACKAGES)) {
         const packagesFormFilters = this.$data.packagesFormFilters;
@@ -1177,6 +1187,7 @@ export default Vue.extend({
           fields: this.$data.fields[ReportType.HARVESTS],
         };
       }
+
       if (this.$data.selectedReports.includes(ReportType.TAGS)) {
         const tagFilter: ITagFilter = {};
         const tagsFormFilters = this.$data.tagsFormFilters;

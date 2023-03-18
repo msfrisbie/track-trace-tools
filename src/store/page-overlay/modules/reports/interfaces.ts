@@ -1,4 +1,5 @@
 import {
+  IAuthState,
   IHarvestFilter,
   IIndexedHarvestData,
   IIndexedPackageData,
@@ -30,6 +31,7 @@ export interface IReportsState {
 }
 
 export interface IReportConfig {
+  authState: IAuthState,
   [ReportType.PACKAGES]?: {
     packageFilter: IPackageFilter;
     fields: IFieldData[];

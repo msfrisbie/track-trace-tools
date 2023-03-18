@@ -679,6 +679,7 @@ export interface IIndexedPackageData extends IPackageData {
   TagMatcher: string;
 }
 
+// This is a shared type between incoming and outgoing
 export interface ITransferData {
   ActualArrivalDateTime: string | null;
   ActualDepartureDateTime: string | null;
@@ -729,6 +730,16 @@ export interface ITransferData {
   VehicleLicensePlateNumber: string;
   VehicleMake: string;
   VehicleModel: string;
+}
+
+export interface IOutgoingTransferData extends ITransferData {
+  DeliveryId: 0;
+  DeliveryPackageCount: 0;
+  DeliveryReceivedPackageCount: 0;
+}
+
+export interface IIncomingTransferData extends ITransferData {
+
 }
 
 export interface IVehicleData {

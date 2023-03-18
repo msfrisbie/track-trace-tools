@@ -45,6 +45,7 @@ import {
   ITransferData,
   ITransferFilter,
   ITransferHistoryData,
+  ITransporterData,
 } from "@/interfaces";
 import { authManager } from "@/modules/auth-manager.module";
 import { databaseInterface } from "@/modules/database-interface.module";
@@ -1054,10 +1055,30 @@ export class DataLoader implements IAtomicService {
     return this._inactivePackages;
   }
 
+  async destinationTransporters(destinationId: number): Promise<ITransporterData[]> {
+    return new Promise(async (resolve, reject) => {
+      const subscription = timer(DATA_LOAD_FETCH_TIMEOUT_MS).subscribe(() =>
+        reject("Destination transporters fetch timed out")
+      );
+
+      try {
+        const destinationTransporters: ITransporterData[] = await this.loadDestinationTransporters(
+          destinationId
+        );
+
+        subscription.unsubscribe();
+        resolve(destinationTransporters);
+      } catch (e) {
+        subscription.unsubscribe();
+        reject(e);
+      }
+    });
+  }
+
   async transferDestinations(transferId: number): Promise<IDestinationData[]> {
     return new Promise(async (resolve, reject) => {
       const subscription = timer(DATA_LOAD_FETCH_TIMEOUT_MS).subscribe(() =>
-        reject("Departed packages fetch timed out")
+        reject("Destination fetch timed out")
       );
 
       try {
@@ -1325,7 +1346,7 @@ export class DataLoader implements IAtomicService {
 
         try {
           const outgoingTransfers: IIndexedTransferData[] = (
-            await this.loadOutgoingTransfers()
+            await this.loadOutgoingInactiveTransfers()
           ).map((transfer) => ({
             ...transfer,
             TransferState: TransferState.OUTGOING_INACTIVE,
@@ -1740,6 +1761,19 @@ export class DataLoader implements IAtomicService {
    *
    */
 
+  destinationTransportersStream(
+    dataLoadOptions: IDataLoadOptions = {},
+    destinationId: number
+  ): Subject<ICollectionResponse<ITransporterData>> {
+    const responseFactory = (paginationOptions: IPaginationOptions): Promise<Response> => {
+      const body = buildBody(paginationOptions);
+
+      return this.metrcRequestManagerOrError.getDestinationTransporters(body, destinationId);
+    };
+
+    return streamFactory<ITransporterData>(dataLoadOptions, responseFactory);
+  }
+
   transferDestinationStream(
     dataLoadOptions: IDataLoadOptions = {},
     transferId: number
@@ -1995,6 +2029,26 @@ export class DataLoader implements IAtomicService {
    *
    * These are used
    */
+
+  private async loadDestinationTransporters(destinationId: number): Promise<ITransporterData[]> {
+    await authManager.authStateOrError();
+
+    store.commit(MutationType.SET_LOADING_MESSAGE, "Loading destination transporters...");
+
+    let destinationTransporters: ITransporterData[] = [];
+
+    await this.destinationTransportersStream({}, destinationId).forEach(
+      (next: ICollectionResponse<ITransporterData>) => {
+        destinationTransporters = [...destinationTransporters, ...next.Data];
+      }
+    );
+
+    console.log(`Loaded ${destinationTransporters.length} destinationTransporters`);
+
+    store.commit(MutationType.SET_LOADING_MESSAGE, null);
+
+    return destinationTransporters;
+  }
 
   private async loadTransferDestinations(transferId: number): Promise<IDestinationData[]> {
     await authManager.authStateOrError();

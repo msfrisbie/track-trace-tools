@@ -126,6 +126,7 @@ enum UrlType {
   CHANGE_PLANT_BATCH_GROWTH_PHASE,
   TRANSFER_DESTINATIONS_BY_TRANSFER_ID,
   DESTINATION_PACKAGES_BY_DESTINATION_ID,
+  DESTINATION_TRANSPORTERS_BY_DESTINATION_ID,
 }
 
 // function persistedAuthStateOrError(): IAuthState {
@@ -272,6 +273,14 @@ async function buildDynamicUrl(
       return (
         origin({ divertToNullOrigin: false }) +
         `/api/transfers/destinations?id=${options.transferId}`
+      );
+    case UrlType.DESTINATION_TRANSPORTERS_BY_DESTINATION_ID:
+      if (!options || !options.destinationId) {
+        throw new Error("Missing required URL options");
+      }
+      return (
+        origin({ divertToNullOrigin: false }) +
+        `/api/transfers/destinations/transporters?id=${options.destinationId}`
       );
     case UrlType.DESTINATION_PACKAGES_BY_DESTINATION_ID:
       if (!options || !options.destinationId) {
@@ -713,6 +722,37 @@ export class MetrcRequestManager implements IAtomicService {
           ...JSON_HEADERS,
         },
         body,
+      }
+    );
+  }
+
+  async getDestinationTransporters(
+    body: string,
+    destinationId: number,
+    abortTimeout: number = 30000
+  ) {
+    const controller = new AbortController();
+    const signal = controller.signal;
+
+    setTimeout(() => controller.abort(), abortTimeout);
+
+    return customFetch(
+      await buildDynamicUrl(
+        this.authStateOrError,
+        UrlType.DESTINATION_TRANSPORTERS_BY_DESTINATION_ID,
+        {
+          destinationId,
+        }
+      ),
+      {
+        ...DEFAULT_FETCH_POST_OPTIONS,
+        // @ts-ignore
+        headers: {
+          ...(await buildAuthenticationHeaders(this.authStateOrError)),
+          ...JSON_HEADERS,
+        },
+        body,
+        signal,
       }
     );
   }

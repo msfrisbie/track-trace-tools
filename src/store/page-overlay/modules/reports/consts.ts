@@ -268,22 +268,22 @@ export const SHEET_FIELDS: { [key: string]: IFieldData[] } = {
       required: false,
     },
     {
-      value: "Destination.RecipientFacilityName",
+      value: "Transporter.RecipientFacilityName",
       readableName: "Recipient Name",
       required: false,
     },
     {
-      value: "Destination.RecipientFacilityLicenseNumber",
+      value: "Transporter.RecipientFacilityLicenseNumber",
       readableName: "Recipient License",
       required: false,
     },
     {
-      value: "Destination.EstimatedDepartureDateTime",
+      value: "Transporter.EstimatedDepartureDateTime",
       readableName: "ETD",
       required: false,
     },
     {
-      value: "Destination.EstimatedArrivalDateTime",
+      value: "Transporter.EstimatedArrivalDateTime",
       readableName: "ETA",
       required: false,
     },

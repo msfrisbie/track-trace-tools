@@ -4,11 +4,13 @@ import {
   IIndexedPackageData,
   IIndexedPlantBatchData,
   IIndexedPlantData,
+  IIndexedRichIncomingTransferData,
   IIndexedRichOutgoingTransferData,
   IIndexedTagData,
   IPluginState,
   IRichDestinationData,
   ISpreadsheet,
+  ITransporterData,
 } from "@/interfaces";
 import { analyticsManager } from "@/modules/analytics-manager.module";
 import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
@@ -381,6 +383,68 @@ export const reportsModule = {
           };
         }
 
+        const incomingTransferConfig = reportConfig[ReportType.INCOMING_TRANSFERS];
+        if (incomingTransferConfig?.transferFilter) {
+          ctx.commit(ReportsMutations.SET_STATUS, {
+            statusMessage: "Loading incoming transfers...",
+          });
+
+          let richIncomingTransfers: IIndexedRichIncomingTransferData[] = [];
+
+          if (incomingTransferConfig.transferFilter.includeOutgoing) {
+            richIncomingTransfers = [
+              ...(await primaryDataLoader.incomingTransfers()),
+              ...richIncomingTransfers,
+            ];
+          }
+
+          if (incomingTransferConfig.transferFilter.includeOutgoingInactive) {
+            richIncomingTransfers = [
+              ...(await primaryDataLoader.incomingInactiveTransfers()),
+              ...richIncomingTransfers,
+            ];
+          }
+
+          richIncomingTransfers = richIncomingTransfers.filter((transfer) => {
+            if (incomingTransferConfig.transferFilter.onlyWholesale) {
+              if (!transfer.ShipmentTypeName.includes("Wholesale")) {
+                return false;
+              }
+            }
+
+            if (incomingTransferConfig.transferFilter.estimatedArrivalDateLt) {
+              if (
+                transfer.EstimatedDepartureDateTime >
+                incomingTransferConfig.transferFilter.estimatedArrivalDateLt
+              ) {
+                return false;
+              }
+            }
+
+            if (incomingTransferConfig.transferFilter.estimatedArrivalDateGt) {
+              if (
+                transfer.EstimatedDepartureDateTime <
+                incomingTransferConfig.transferFilter.estimatedArrivalDateGt
+              ) {
+                return false;
+              }
+            }
+
+            return true;
+          });
+
+          for (const transfer of richIncomingTransfers) {
+            const transporters: ITransporterData[] =
+              await primaryDataLoader.destinationTransporters(transfer.DeliveryId);
+
+            transfer.incomingTransporters = transporters;
+          }
+
+          reportData[ReportType.INCOMING_TRANSFERS] = {
+            incomingTransfers: richIncomingTransfers,
+          };
+        }
+
         const outgoingTransferConfig = reportConfig[ReportType.OUTGOING_TRANSFERS];
         if (outgoingTransferConfig?.transferFilter) {
           ctx.commit(ReportsMutations.SET_STATUS, {
@@ -479,7 +543,7 @@ export const reportsModule = {
         }
 
         ctx.commit(ReportsMutations.SET_STATUS, {
-          statusMessage: "Generating spreadsheet, this can take a minute...",
+          statusMessage: "Generating spreadsheet...",
         });
 
         console.log({ reportData, reportConfig });

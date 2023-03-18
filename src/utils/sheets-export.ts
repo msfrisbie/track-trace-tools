@@ -61,7 +61,7 @@ function styleTopRowRequestFactory({ sheetId }: { sheetId: number }) {
             green: 39 / 256,
             blue: 106 / 256,
           },
-          horizontalAlignment: "CENTER",
+          // horizontalAlignment: "CENTER",
           textFormat: {
             foregroundColor: {
               red: 1.0,
@@ -73,7 +73,26 @@ function styleTopRowRequestFactory({ sheetId }: { sheetId: number }) {
           },
         },
       },
-      fields: "userEnteredFormat(backgroundColor,textFormat,horizontalAlignment)",
+      fields: "userEnteredFormat(backgroundColor,textFormat)",
+    },
+  };
+}
+
+function shrinkFontRequestFactory({ sheetId }: { sheetId: number }) {
+  return {
+    repeatCell: {
+      range: {
+        sheetId,
+        startRowIndex: 1,
+      },
+      cell: {
+        userEnteredFormat: {
+          textFormat: {
+            fontSize: 9,
+          },
+        },
+      },
+      fields: "userEnteredFormat(textFormat)",
     },
   };
 }
@@ -94,17 +113,21 @@ function freezeTopRowRequestFactory({ sheetId }: { sheetId: number }) {
 
 function autoResizeDimensionsRequestFactory({
   sheetId,
-  endIndex = 12,
+  dimension = "COLUMNS",
+  startIndex,
+  endIndex,
 }: {
   sheetId: number;
+  dimension?: "COLUMNS" | "ROWS";
+  startIndex?: number;
   endIndex?: number;
 }) {
   return {
     autoResizeDimensions: {
       dimensions: {
-        dimension: "COLUMNS",
+        dimension,
         sheetId,
-        startIndex: 1,
+        startIndex,
         endIndex,
       },
     },
@@ -125,12 +148,12 @@ async function writeDataSheet<T>({
   await messageBus.sendMessageToBackground(MessageType.WRITE_SPREADSHEET_VALUES, {
     spreadsheetId,
     range: `'${spreadsheetTitle}'!1:1`,
-    values: [fields.map((fieldData) => `     ${fieldData.readableName}     `)],
+    values: [fields.map((fieldData) => `${fieldData.readableName}     `)],
   });
 
   let nextPageStartIdx = 0;
   let nextPageRowIdx = 2;
-  const pageSize = 2000;
+  const pageSize = 5000;
 
   while (true) {
     const nextPage = data.slice(nextPageStartIdx, nextPageStartIdx + pageSize);
@@ -188,7 +211,7 @@ export async function createExportSpreadsheetOrError({
       case ReportType.MATURE_PLANTS:
         return reportData[reportType]?.maturePlants as IIndexedPlantData[];
       case ReportType.INCOMING_TRANSFERS:
-        return reportData[reportType]?.incomingTransfers as IIndexedRichOutgoingTransferData[];
+        return reportData[reportType]?.incomingTransfers as IIndexedRichIncomingTransferData[];
       case ReportType.OUTGOING_TRANSFERS:
         return reportData[reportType]?.outgoingTransfers as IIndexedRichOutgoingTransferData[];
       case ReportType.TRANSFER_PACKAGES:
@@ -345,7 +368,15 @@ export async function createExportSpreadsheetOrError({
   // Format Sheet For Data
   //
 
-  let formattingRequests: any = [];
+  let formattingRequests: any = [
+    addRowsRequestFactory({
+      sheetId: sheetTitles.indexOf(SheetTitles.OVERVIEW),
+      length: 20,
+    }),
+    styleTopRowRequestFactory({
+      sheetId: sheetTitles.indexOf(SheetTitles.OVERVIEW),
+    }),
+  ];
 
   for (const reportType of ELIGIBLE_REPORT_TYPES) {
     const sheetId: number = sheetTitles.indexOf(getSheetTitle(reportType));
@@ -353,7 +384,6 @@ export async function createExportSpreadsheetOrError({
 
     formattingRequests = [
       ...formattingRequests,
-
       addRowsRequestFactory({ sheetId, length }),
       styleTopRowRequestFactory({ sheetId }),
       freezeTopRowRequestFactory({ sheetId }),
@@ -391,7 +421,6 @@ export async function createExportSpreadsheetOrError({
 
   for (const reportType of ELIGIBLE_REPORT_TYPES) {
     summaryList.push([
-      null,
       `=HYPERLINK("#gid=${sheetTitles.indexOf(getSheetTitle(reportType))}","${getSheetTitle(
         reportType
       )}")`,
@@ -403,13 +432,7 @@ export async function createExportSpreadsheetOrError({
   await messageBus.sendMessageToBackground(MessageType.WRITE_SPREADSHEET_VALUES, {
     spreadsheetId: response.data.result.spreadsheetId,
     range: `'${SheetTitles.OVERVIEW}'`,
-    values: [
-      [`Generated with Track & Trace Tools at ${Date().toString()}`],
-      [],
-      [null, "License", store.state.pluginAuth?.authState?.license],
-      [],
-      ...summaryList,
-    ],
+    values: [[], [], ...summaryList],
   });
 
   //
@@ -419,6 +442,7 @@ export async function createExportSpreadsheetOrError({
   let resizeRequests: any[] = [
     autoResizeDimensionsRequestFactory({
       sheetId: sheetTitles.indexOf(SheetTitles.OVERVIEW),
+      dimension: "COLUMNS",
     }),
   ];
 
@@ -440,6 +464,33 @@ export async function createExportSpreadsheetOrError({
     undefined,
     90000
   );
+
+  let shrinkFontRequests: any[] = [];
+
+  for (const reportType of ELIGIBLE_REPORT_TYPES) {
+    shrinkFontRequests = [
+      ...shrinkFontRequests,
+      shrinkFontRequestFactory({
+        sheetId: sheetTitles.indexOf(getSheetTitle(reportType)),
+      }),
+    ];
+  }
+
+  await messageBus.sendMessageToBackground(
+    MessageType.BATCH_UPDATE_SPREADSHEET,
+    {
+      spreadsheetId: response.data.result.spreadsheetId,
+      requests: shrinkFontRequests,
+    },
+    undefined,
+    90000
+  );
+
+  await messageBus.sendMessageToBackground(MessageType.WRITE_SPREADSHEET_VALUES, {
+    spreadsheetId: response.data.result.spreadsheetId,
+    range: `'${SheetTitles.OVERVIEW}'`,
+    values: [[`Created with Track & Trace Tools @ ${Date().toString()}`]],
+  });
 
   return response.data.result;
 }
