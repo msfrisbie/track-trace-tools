@@ -7,7 +7,7 @@
       </p>
 
       <b-form-checkbox size="md" v-model="hideBeforeScreenshot">
-        Hide TTT before taking screenshot
+        Hide T3 before taking screenshot
       </b-form-checkbox>
 
       <b-form-group label="Delay taking screenshot by:" size="md">

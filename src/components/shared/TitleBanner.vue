@@ -5,7 +5,7 @@
         <track-trace-tools-logo :inverted="true" fill="#49276a" />
       </a>
 
-      <span class="text-gray-600 font-extralight tracking-widest text-4xl">TTT</span>
+      <span class="text-gray-600 font-extralight tracking-widest text-4xl">T3</span>
     </div>
   </div>
 </template>

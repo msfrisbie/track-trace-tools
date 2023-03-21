@@ -46,7 +46,7 @@ export default Vue.extend({
 
       this.$store.commit(MutationType.UPDATE_ACCOUNT_SETTINGS, this.accountSettings);
 
-      toastManager.openToast(`TTT account settings successfully updated`, {
+      toastManager.openToast(`T3 account settings successfully updated`, {
         title: "Updated Account Settings",
         autoHideDelay: 3000,
         variant: "primary",

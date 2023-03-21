@@ -19,7 +19,7 @@ class ScreenshotManager implements IAtomicService {
     analyticsManager.track(MessageType.CLICKED_SCREENSHOT_BUTTON);
 
     // toastManager.openToast(`Preparing screenshot, sit tight...`, {
-    //     title: "TTT",
+    //     title: "T3",
     //     autoHideDelay: 500,
     //     variant: "primary",
     //     appendToast: true,

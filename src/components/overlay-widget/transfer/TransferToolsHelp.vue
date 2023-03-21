@@ -37,7 +37,7 @@
           <font-awesome-icon size="2x" icon="clipboard-check" class="ttt-purple inline-block" />
         </div>
 
-        <div class="text-lg text-start">TTT can submit directly to Metrc for you.</div>
+        <div class="text-lg text-start">T3 can submit directly to Metrc for you.</div>
 
         <div class="flex flex-col items-center justify-center">
           <font-awesome-icon
@@ -48,7 +48,7 @@
         </div>
 
         <div class="text-lg text-start">
-          TTT will ignore random Metrc errors and ensure everything is sent to Metrc.
+          T3 will ignore random Metrc errors and ensure everything is sent to Metrc.
         </div>
       </div>
 

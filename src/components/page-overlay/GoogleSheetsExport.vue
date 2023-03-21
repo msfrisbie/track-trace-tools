@@ -33,12 +33,14 @@
                   <span class="text-xs text-gray-400">{{ reportOption.description }}</span>
                 </div>
               </b-form-checkbox>
-              <div class="text-xs text-center text-gray-600">
-                Reach out to
-                <a class="text-purple-500 underline" href="mailto:tracktracetools@gmail.com"
-                  >tracktracetools@gmail.com</a
+              <div class="text-xs text-start text-gray-600">
+                Get access to advanced snapshots with
+                <a
+                  class="text-purple-500 underline"
+                  href="https://trackandtrace.tools/plus"
+                  target="_blank"
+                  >T3+</a
                 >
-                to enable premium features.
               </div>
               <b-form-checkbox
                 class="opacity-50"
@@ -97,7 +99,10 @@
                       <span class="leading-6"
                         >Include packages transferred out of this facility</span
                       >
-                      <span class="text-xs text-gray-300">This is a premium feature</span>
+                      <span class="text-xs text-gray-300"
+                        >Enable this with
+                        <a href="https://trackandtrace.tools/plus" target="_blank">T3+</a></span
+                      >
                     </div>
                   </b-form-checkbox>
 
@@ -863,7 +868,7 @@ const reportOptions = [
   {
     text: "Incoming Transfers",
     value: ReportType.INCOMING_TRANSFERS,
-    premium: false,
+    premium: true,
     description: "Filter by wholesale and estimated time of arrival",
   },
   {
@@ -875,7 +880,7 @@ const reportOptions = [
   {
     text: "Tags",
     value: ReportType.TAGS,
-    premium: false,
+    premium: true,
     description: "Filter by tag type and status",
   },
   {

@@ -6,7 +6,7 @@
           <div class="text-2xl ttt-purple">What is Track &amp; Trace Tools?</div>
 
           <div>
-            Track &amp; Trace Tools (TTT) is an open source Chrome extension that integrates with
+            Track &amp; Trace Tools (T3) is an open source Chrome extension that integrates with
             Metrc to add extra features. It is not affiliated with Metrc.
           </div>
           <hr />

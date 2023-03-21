@@ -13,7 +13,7 @@ const debugLog = debugLogFactory("api-key-manager.module.ts");
 /**
  * This module operates as if permissions can be added or revoked at any time
  *
- * A user's Metrc API key will only be accessed if they connect TTT
+ * A user's Metrc API key will only be accessed if they connect T3
  *
  * When an account is enabled, it should immediately enable access to account features, but the
  * API key will be fetched asynchronously. Other modules may attempt to access this key immediately.

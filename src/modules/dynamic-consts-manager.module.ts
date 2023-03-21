@@ -409,7 +409,7 @@ class DynamicConstsManager implements IAtomicService {
       debugLog(async () => ["Sending transfer modal request"]);
 
       toastManager.openToast(
-        "TTT is storing the New Transfer form so it can be reused. The page may be slow for a few seconds.",
+        "T3 is storing the New Transfer form so it can be reused. The page may be slow for a few seconds.",
         {
           title: "Loading transfer data",
           autoHideDelay: 5000,

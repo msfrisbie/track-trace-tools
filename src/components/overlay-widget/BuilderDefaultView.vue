@@ -2,7 +2,11 @@
   <!-- need this wrapping element to absorb the inherited classes -->
 
   <div>
-    <div class="w-full grid gap-8 grid-cols-2" style="grid-template-columns: auto 1fr">
+    <div
+      ref="mainmenu"
+      class="w-full grid gap-8 grid-cols-2"
+      style="grid-template-columns: auto 1fr"
+    >
       <div class="flex gap-2 flex-col">
         <div
           v-for="option of options"
@@ -140,7 +144,7 @@ export default Vue.extend({
           icon: "camera",
           visible: true,
           enabled: true,
-          isBeta: true,
+          isBeta: false,
           isNew: false,
         },
         {

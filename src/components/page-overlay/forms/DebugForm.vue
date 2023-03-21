@@ -204,7 +204,7 @@ export default Vue.extend({
     },
     async testToast() {
       toastManager.openToast(`This is toast number ${this.count++}`, {
-        title: "TTT",
+        title: "T3",
         autoHideDelay: 5000,
         variant: "primary",
         appendToast: true,
@@ -226,7 +226,7 @@ export default Vue.extend({
       this.$store.dispatch(`flags/${FlagsActions.RESET_FLAGS}`);
 
       toastManager.openToast("Flags reset", {
-        title: "TTT",
+        title: "T3",
         autoHideDelay: 5000,
         variant: "success",
         appendToast: true,
@@ -256,7 +256,7 @@ export default Vue.extend({
       this.trackedInteractions = JSON.stringify(this.$store.state.trackedInteractions, null, 2);
 
       toastManager.openToast("Tracked interactions reset", {
-        title: "TTT",
+        title: "T3",
         autoHideDelay: 5000,
         variant: "success",
         appendToast: true,
@@ -279,7 +279,7 @@ export default Vue.extend({
         this.$store.dispatch(`flags/${FlagsActions.SET_FLAGS}`, updatedFlags);
 
         toastManager.openToast("Flags updated", {
-          title: "TTT",
+          title: "T3",
           autoHideDelay: 5000,
           variant: "success",
           appendToast: true,
@@ -302,7 +302,7 @@ export default Vue.extend({
         );
 
         toastManager.openToast("Tracked interactions updated", {
-          title: "TTT",
+          title: "T3",
           autoHideDelay: 5000,
           variant: "success",
           appendToast: true,

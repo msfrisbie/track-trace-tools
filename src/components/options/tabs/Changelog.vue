@@ -169,25 +169,25 @@
           <p class="text-2xl ttt-purple">v0.2.2</p>
 
           <ul class="list-disc">
-            <li>Additional TTT promo slider content</li>
+            <li>Additional T3 promo slider content</li>
           </ul>
 
           <p class="text-2xl ttt-purple">v0.2.1</p>
 
           <ul class="list-disc">
-            <li>Fix TTT promo slider</li>
+            <li>Fix T3 promo slider</li>
           </ul>
 
           <p class="text-2xl ttt-purple">v0.2.0</p>
 
           <ul class="list-disc">
-            <li>Add TTT promo slider</li>
+            <li>Add T3 promo slider</li>
           </ul>
 
           <p class="text-2xl ttt-purple">v0.1.0</p>
 
           <ul class="list-disc">
-            <li>Add TTT dashboard</li>
+            <li>Add T3 dashboard</li>
             <li>Fix font loading</li>
           </ul>
 

@@ -17,7 +17,7 @@
         </div>
 
         <div class="text-lg text-start">
-          TTT can submit directly to Metrc for you, or you can download the CSVs to submit yourself.
+          T3 can submit directly to Metrc for you, or you can download the CSVs to submit yourself.
         </div>
 
         <div class="flex flex-col items-center justify-center">
@@ -29,7 +29,7 @@
         </div>
 
         <div class="text-lg text-start">
-          TTT will ignore random Metrc errors and ensure everything is sent to Metrc.
+          T3 will ignore random Metrc errors and ensure everything is sent to Metrc.
         </div>
 
         <!-- <div class="flex flex-col items-center justify-center">
@@ -37,7 +37,7 @@
         </div> -->
 
         <!-- <div class="text-lg text-start">
-          After you connect TTT, TTT can backup what you submit.
+          After you connect T3, T3 can backup what you submit.
         </div> -->
       </div>
 

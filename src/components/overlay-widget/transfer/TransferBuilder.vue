@@ -72,7 +72,7 @@
                 <span class="font-bold"
                   >Something went wrong while setting up this transfer tool.</span
                 >
-                <span>The TTT team has been notified, and we're working on a fix.</span>
+                <span>The T3 team has been notified, and we're working on a fix.</span>
               </div>
             </template>
 
@@ -183,7 +183,7 @@
                       <p>
                         Select
                         <span class="font-bold">Same Site Transfer</span>
-                        when the origin and destination are in the same location. TTT will use 'N/A'
+                        when the origin and destination are in the same location. T3 will use 'N/A'
                         for route, driver, and vehicle.
                       </p>
                     </div>
@@ -691,9 +691,9 @@ export default Vue.extend({
         });
 
         toastManager.openToast(
-          "Unable to submit transfer. TTT team has been notified, we'll be in touch.",
+          "Unable to submit transfer. T3 team has been notified, we'll be in touch.",
           {
-            title: "TTT Error",
+            title: "T3 Error",
             autoHideDelay: 10000,
             variant: "danger",
             appendToast: true,

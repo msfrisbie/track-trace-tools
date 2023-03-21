@@ -36,7 +36,7 @@ export default Vue.extend({
         },
         // {
         //   value: ToolkitView.MANAGE_ACCOUNT,
-        //   text: "Connect TTT"
+        //   text: "Connect T3"
         // },
         {
           value: ToolkitView.SCREENSHOT,

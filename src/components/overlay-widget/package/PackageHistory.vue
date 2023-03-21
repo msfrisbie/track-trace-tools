@@ -330,18 +330,17 @@
     </template>
     <template v-else>
       <div class="flex flex-col items-center gap-4">
-
-
         <div class="text-lg text-center max-w-lg">
-          This is a premium feature. Enter your client key in Settings to enable this feature.
-          
+          This is a T3+ feature. Enter your client key in Settings to enable this feature.
         </div>
         <div class="text-md text-center max-w-lg">
-          Want access to tools like this? Reach out to
-          <a class="text-purple-500 underline" href="mailto:tracktracetools@gmail.com"
-            >tracktracetools@gmail.com</a
-          >
-          to discuss premium Track &amp; Trace Tools features.
+          Want access to tools like this?
+          <a
+            class="text-purple-500 underline"
+            href="https://trackandtrace.tools/plus"
+            target="_blank"
+            >Learn about T3+</a
+          >.
         </div>
         <img style="width: 75%; opacity: 75%" :src="demoImageUrl" />
       </div>

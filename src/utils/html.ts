@@ -254,7 +254,7 @@ function extractTagOrderData(html: string) {
   return null;
 }
 
-function extractContactData(html: string): { contactData: {email?: string | null, phoneNumber?: string | null} } {
+function extractContactData(html: string): { contactData: IExtractedContactData } {
   const container = document.createElement("div");
   container.innerHTML = html;
 

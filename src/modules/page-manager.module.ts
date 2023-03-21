@@ -612,7 +612,7 @@ class PageManager implements IAtomicService {
       // Redirect should not interfere with site use. Unset
       // in all situations, even if a redirect is not triggered.
       // This will protect against worst-case situations where
-      // TTT attempts to redirect to invalid URLs, limiting it to
+      // T3 attempts to redirect to invalid URLs, limiting it to
       // one redirect.
       store.commit(MutationType.SET_REDIRECT, false);
 

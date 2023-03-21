@@ -37,14 +37,14 @@
         </template>
         <template v-if="slide === 'shortcuts'">
           <div class="text-gray-700 flex flex-col justify-around gap-2">
-            <div class="font-semibold ttt-purple">Quickly open TTT with keyboard shortcuts</div>
+            <div class="font-semibold ttt-purple">Quickly open T3 with keyboard shortcuts</div>
             <div>
               Use
               <b-badge variant="light" class="font-mono" style="text-shadow: none">Alt</b-badge> +
               <b-badge variant="light" class="font-mono" style="text-shadow: none">t</b-badge> or
               <b-badge variant="light" class="font-mono" style="text-shadow: none">⌥</b-badge> +
               <b-badge variant="light" class="font-mono" style="text-shadow: none">t</b-badge> to
-              open/close TTT
+              open/close T3
             </div>
           </div>
         </template>
@@ -96,7 +96,13 @@
         <template v-if="slide === 'harvest'">
           <div class="text-gray-700 flex flex-col justify-around gap-2">
             <div class="font-semibold ttt-purple">Harvest and manicure in bulk!</div>
-            <div>Use TTT to harvest thousands of plants by just the total weight.</div>
+            <div>Use T3 to harvest thousands of plants by just the total weight.</div>
+          </div>
+        </template>
+        <template v-if="slide === 'clickme'">
+          <div class="text-gray-700 flex flex-col justify-around gap-2">
+            <div class="font-semibold ttt-purple">Get tips even faster!</div>
+            <div>Click here to skip to the next tip.</div>
           </div>
         </template>
         <template v-if="slide === 'logout'">
@@ -108,7 +114,7 @@
         <template v-if="slide === 'finalize'">
           <div class="text-gray-700 flex flex-col justify-around gap-2">
             <div class="font-semibold ttt-purple">Finalize sales in bulk!</div>
-            <div>TTT can auto-finalize all sales before a specific date.</div>
+            <div>T3 can auto-finalize all sales before a specific date.</div>
           </div>
         </template>
         <template v-if="slide === 'tagvoid'">
@@ -127,13 +133,28 @@
         <template v-if="slide === 'settings'">
           <div class="text-gray-700 flex flex-col justify-around gap-2">
             <div class="font-semibold ttt-purple">Customize Track &amp; Trace Tools</div>
-            <div>Control and configure how TTT interacts with Metrc in Settings.</div>
+            <div>Control and configure how T3 interacts with Metrc in Settings.</div>
           </div>
         </template>
         <template v-if="slide === 'csv'">
           <div class="text-gray-700 flex flex-col justify-around gap-2">
             <div class="font-semibold ttt-purple">Generate CSVs</div>
-            <div>TTT can generate Metrc CSVs. Click "Download CSV" in the "Submit" step.</div>
+            <div>T3 can generate Metrc CSVs. Click "Download CSV" in the "Submit" step.</div>
+          </div>
+        </template>
+        <template v-if="slide === 'plus'">
+          <div class="text-gray-700 flex flex-col justify-around gap-2">
+            <div class="font-semibold ttt-purple">Introducing T3+</div>
+            <div>
+              Get access to advanced Track &amp; Trace Tools features with
+              <a
+                class="text-purple-500 hover:text-purple-500 underline"
+                href="https://trackandtrace.tools/plus"
+                target="_blank"
+                @click.stop
+                >T3+</a
+              >
+            </div>
           </div>
         </template>
         <template v-if="slide === 'donate'">
@@ -153,8 +174,8 @@
         </template>
         <template v-if="slide === 'googlesheets'">
           <div class="text-gray-700 flex flex-col justify-around gap-2">
-            <div class="font-semibold ttt-purple">Easily Export Metrc Data</div>
-            <div>Track &amp; Trace Tools can export your data directly into Google Sheets</div>
+            <div class="font-semibold ttt-purple">Google Sheets + Metrc</div>
+            <div>Securely generate reports and export data with T3 Snapshots</div>
           </div>
         </template>
         <template v-if="slide === 'share'">
@@ -266,12 +287,14 @@ export default Vue.extend({
       slide: 0,
       sliding: null,
       slides: _.shuffle([
+        "plus",
         "review",
         "finalize",
         "tagvoid",
         "shortcuts",
         "settings",
         "forum",
+        "clickme",
         "solutions",
         "opensource",
         "snowflakes",
@@ -279,7 +302,7 @@ export default Vue.extend({
         "harvest",
         "logout",
         "share",
-        "donate",
+        // "donate",
         "googlesheets",
       ]),
     };

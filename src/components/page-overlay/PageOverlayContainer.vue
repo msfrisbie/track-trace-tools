@@ -18,7 +18,7 @@ export default Vue.extend({
   computed: {
     defaultText() {
       // return browser.i18n.getMessage("extName");
-      return "TTT";
+      return "T3";
     },
   },
   components: { DefaultOverlayView },

@@ -22,7 +22,7 @@
         >
           <track-trace-tools-logo fill="#49276a" :inverted="true" />
 
-          <span class="sans-serif font-extralight tracking-widest text-3xl">TTT</span>
+          <span class="sans-serif font-extralight tracking-widest text-3xl">T3</span>
         </div>
 
         <template v-if="documentUrls.length > 1">
@@ -106,7 +106,7 @@ export default Vue.extend({
 
       if (!blobUrl) {
         toastManager.openToast("Opening file...", {
-          title: "TTT",
+          title: "T3",
           autoHideDelay: 2000,
           variant: "primary",
           appendToast: true,

@@ -11,7 +11,7 @@ import { renderOverlayWidget } from "./overlay-widget";
 import { renderTTTOverlay } from "./ttt-overlay";
 import { renderUnifiedSearch } from "./unified-search";
 
-console.log("Loaded TTT");
+console.log("Loaded T3");
 
 storageManager.init();
 
@@ -21,7 +21,7 @@ tabManager.init();
 async function initializeTooklit() {
   if (DISALLOWED_HOSTNAMES.includes(window.location.hostname)) {
     console.info(
-      `The hostname '${window.location.hostname}' matches the disallow list, declining to render TTT`
+      `The hostname '${window.location.hostname}' matches the disallow list, declining to render T3`
     );
     return;
   }

@@ -201,7 +201,7 @@ const routes: Array<RouteConfig> = [
   },
   {
     path: "/misc",
-    name: "TTT",
+    name: "T3",
     component: MiscellaneousListView,
   },
   {

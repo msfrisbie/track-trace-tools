@@ -209,7 +209,7 @@
             name="checkbox-enableSearchOverMetrcModal"
             @change="onChange()"
           >
-            Show TTT search over Metrc modal windows
+            Show T3 search over Metrc modal windows
           </b-form-checkbox>
 
           <b-form-checkbox
@@ -219,7 +219,7 @@
             name="checkbox-preventActiveProjectPageLeave"
             @change="onChange()"
           >
-            Stop me from leaving the page when TTT submit is in progress
+            Stop me from leaving the page when T3 submit is in progress
           </b-form-checkbox>
 
           <b-form-checkbox
@@ -339,7 +339,7 @@
             name="checkbox-enableManifestDocumentViewer"
             @change="onChange()"
           >
-            Always use TTT PDF viewer for manifests
+            Always use T3 PDF viewer for manifests
           </b-form-checkbox>
 
           <div class="mb-2 flex flex-row items-center gap-2">
@@ -634,7 +634,7 @@ export default Vue.extend({
       this.$store.commit(`settings/${SettingsMutations.SET_SETTINGS}`, this.settings);
 
       toastManager.openToast(
-        `TTT settings successfully updated. Refresh the page to apply changes.`,
+        `T3 settings successfully updated. Refresh the page to apply changes.`,
         {
           title: "Updated Settings",
           autoHideDelay: 3000,

@@ -46,7 +46,7 @@
               <track-trace-tools-logo fill="#49276a" :inverted="true" />
 
               <span class="sans-serif font-extralight tracking-widest text-3xl"
-                >TTT{{ clientBuildSuffix }}</span
+                >T3{{ clientBuildSuffix }}</span
               >
             </div>
           </template>
@@ -77,7 +77,7 @@
         >
           <track-trace-tools-logo fill="#49276a" :inverted="true" />
 
-          <span class="sans-serif font-extralight tracking-widest text-3xl">TTT</span>
+          <span class="sans-serif font-extralight tracking-widest text-3xl">T3</span>
         </div>
 
         <div class="col-span-3">

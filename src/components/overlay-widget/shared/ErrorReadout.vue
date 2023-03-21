@@ -40,7 +40,7 @@
 
       <template v-if="unknownError">
         <span class="text-red-700">
-          TTT is blocked from accessing Metrc. Check if internet firewalls or other browser
+          T3 is blocked from accessing Metrc. Check if internet firewalls or other browser
           extensions are causing this.
         </span>
 
