@@ -476,8 +476,17 @@
                   <b-form-checkbox v-model="outgoingTransfersFormFilters.includeOutgoingInactive">
                     <span class="leading-6">Include Inactive Outgoing</span>
                   </b-form-checkbox>
-                  <b-form-checkbox v-model="outgoingTransfersFormFilters.onlyWholesale">
-                    <span class="leading-6">Only Wholesale</span>
+                  <b-form-checkbox
+                    :disabled="true"
+                    v-model="outgoingTransfersFormFilters.onlyWholesale"
+                  >
+                    <div class="flex flex-col items-start">
+                      <span class="leading-6">Only Wholesale</span>
+                    </div>
+                    <span class="text-xs text-gray-300"
+                      >Enable this with
+                      <a href="https://trackandtrace.tools/plus" target="_blank">T3+</a></span
+                    >
                   </b-form-checkbox>
 
                   <div class="flex flex-col items-start gap-1">
