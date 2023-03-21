@@ -155,30 +155,37 @@ async function writeDataSheet<T>({
   let nextPageRowIdx = 2;
   const pageSize = 5000;
 
+  const promises = [];
+
   while (true) {
     const nextPage = data.slice(nextPageStartIdx, nextPageStartIdx + pageSize);
     if (nextPage.length === 0) {
       break;
     }
 
-    await messageBus.sendMessageToBackground(MessageType.WRITE_SPREADSHEET_VALUES, {
-      spreadsheetId,
-      range: `'${spreadsheetTitle}'!${nextPageRowIdx}:${nextPageRowIdx + nextPage.length}`,
-      values: nextPage.map((data) =>
-        fields.map((fieldData) => {
-          let value = data;
-          for (const subProperty of fieldData.value.split(".")) {
-            // @ts-ignore
-            value = value[subProperty];
-          }
-          return value;
-        })
-      ),
-    });
+    // await
+    promises.push(
+      messageBus.sendMessageToBackground(MessageType.WRITE_SPREADSHEET_VALUES, {
+        spreadsheetId,
+        range: `'${spreadsheetTitle}'!${nextPageRowIdx}:${nextPageRowIdx + nextPage.length}`,
+        values: nextPage.map((data) =>
+          fields.map((fieldData) => {
+            let value = data;
+            for (const subProperty of fieldData.value.split(".")) {
+              // @ts-ignore
+              value = value[subProperty];
+            }
+            return value;
+          })
+        ),
+      })
+    );
 
     nextPageStartIdx += nextPage.length;
     nextPageRowIdx += nextPage.length;
   }
+
+  await Promise.allSettled(promises);
 }
 
 export async function createExportSpreadsheetOrError({

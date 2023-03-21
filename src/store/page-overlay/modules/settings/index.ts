@@ -53,6 +53,7 @@ const persistedState: ISettingsState = {
   preventActiveProjectPageLeave: true,
   enableSearchOverMetrcModal: true,
   useIsoDateFormatForSubmit: false,
+  loadDataInParallel: true,
 };
 
 const defaultState: ISettingsState = {

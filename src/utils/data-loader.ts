@@ -10,6 +10,7 @@ import {
   ISortOptions,
 } from "@/interfaces";
 import { DataLoadError, DataLoadErrorType } from "@/modules/data-loader/data-loader-error";
+import store from "@/store/page-overlay/index";
 import { debugLogFactory } from "@/utils/debug";
 import { Subject } from "rxjs";
 
@@ -20,37 +21,19 @@ export function streamFactory<T>(
   responseFactory: (paginationOptions: IPaginationOptions) => Promise<Response>
 ): Subject<ICollectionResponse<T>> {
   const subject: Subject<ICollectionResponse<T>> = new Subject();
+  let runningTotal = 0;
+  const t0 = performance.now();
 
   (async () => {
-    let page = 0;
-    let runningTotal = 0;
-    const t0 = performance.now();
-
-    while (true) {
-      let response = null;
-
-      debugLog(async () => ["page:", page]);
-
-      try {
-        response = await responseFactory({ page, pageSize });
-      } catch (e) {
-        subject.error(new DataLoadError(DataLoadErrorType.NETWORK, e.toString()));
-        return;
-      } finally {
-        if (!response) {
-          subject.error(
-            new DataLoadError(DataLoadErrorType.NETWORK, "Network request unable to complete.")
-          );
-          return;
-        }
-      }
-
-      if (response.status !== 200) {
-        if (response.status === 401) {
+    if (store.state.settings.loadDataInParallel) {
+      // Parallelized Load
+      const countResponse = await responseFactory({ page: 0, pageSize: 1 });
+      if (countResponse.status !== 200) {
+        if (countResponse.status === 401) {
           subject.error(
             new DataLoadError(
               DataLoadErrorType.PERMISSIONS,
-              `Server indicated user is missing permissions for ${response.url}`
+              `Server indicated user is missing permissions for ${countResponse.url}`
             )
           );
           return;
@@ -59,37 +42,123 @@ export function streamFactory<T>(
           return;
         }
       }
+      const totalCountResponse: ICollectionResponse<T> = await countResponse.json();
+      const lastPageIndex = Math.ceil(totalCountResponse.Total / pageSize);
 
-      const responseData: ICollectionResponse<T> = await response.json();
-      subject.next(responseData);
+      try {
+        const responses = Array.from(Array(lastPageIndex).keys()).map((page) =>
+          responseFactory({ page, pageSize })
+        );
 
-      debugLog(async () => ["responseData.Data:", responseData.Data]);
+        Promise.allSettled(responses);
 
-      runningTotal += responseData.Data.length;
+        for await (const response of responses) {
+          if (response.status !== 200) {
+            if (response.status === 401) {
+              subject.error(
+                new DataLoadError(
+                  DataLoadErrorType.PERMISSIONS,
+                  `Server indicated user is missing permissions for ${response.url}`
+                )
+              );
+              return;
+            } else {
+              subject.error(
+                new DataLoadError(DataLoadErrorType.SERVER, "Server returned an error.")
+              );
+              return;
+            }
+          } else {
+            const responseData: ICollectionResponse<T> = await response.json();
+            subject.next(responseData);
 
-      debugLog(async () => ["runningTotal:", runningTotal]);
+            debugLog(async () => ["responseData.Data:", responseData.Data]);
 
-      if (runningTotal >= responseData.Total) {
-        break;
+            runningTotal += responseData.Data.length;
+
+            debugLog(async () => ["runningTotal:", runningTotal]);
+          }
+        }
+
+        const t1 = performance.now();
+
+        debugLog(async () => [`Finished loading ${runningTotal} objects in ${t1 - t0} ms`]);
+
+        subject.complete();
+      } catch (e) {
+        subject.error(
+          new DataLoadError(DataLoadErrorType.NETWORK, "Network request unable to complete.")
+        );
+      }
+    } else {
+      // Serialized Load
+      let page = 0;
+
+      while (true) {
+        let response = null;
+
+        debugLog(async () => ["page:", page]);
+
+        try {
+          response = await responseFactory({ page, pageSize });
+        } catch (e) {
+          subject.error(new DataLoadError(DataLoadErrorType.NETWORK, e.toString()));
+          return;
+        } finally {
+          if (!response) {
+            subject.error(
+              new DataLoadError(DataLoadErrorType.NETWORK, "Network request unable to complete.")
+            );
+            return;
+          }
+        }
+
+        if (response.status !== 200) {
+          if (response.status === 401) {
+            subject.error(
+              new DataLoadError(
+                DataLoadErrorType.PERMISSIONS,
+                `Server indicated user is missing permissions for ${response.url}`
+              )
+            );
+            return;
+          } else {
+            subject.error(new DataLoadError(DataLoadErrorType.SERVER, "Server returned an error."));
+            return;
+          }
+        }
+
+        const responseData: ICollectionResponse<T> = await response.json();
+        subject.next(responseData);
+
+        debugLog(async () => ["responseData.Data:", responseData.Data]);
+
+        runningTotal += responseData.Data.length;
+
+        debugLog(async () => ["runningTotal:", runningTotal]);
+
+        if (runningTotal >= responseData.Total) {
+          break;
+        }
+
+        if (runningTotal >= maxCount) {
+          break;
+        }
+
+        if (page >= DATA_LOAD_MAX_ITERATION_FAILSAFE) {
+          subject.error(new Error("Page exceeded max iteration failsafe"));
+          return;
+        }
+
+        page++;
       }
 
-      if (runningTotal >= maxCount) {
-        break;
-      }
+      const t1 = performance.now();
 
-      if (page >= DATA_LOAD_MAX_ITERATION_FAILSAFE) {
-        subject.error(new Error("Page exceeded max iteration failsafe"));
-        return;
-      }
+      debugLog(async () => [`Finished loading ${runningTotal} objects in ${t1 - t0} ms`]);
 
-      page++;
+      subject.complete();
     }
-
-    const t1 = performance.now();
-
-    debugLog(async () => [`Finished loading ${runningTotal} objects in ${t1 - t0} ms`]);
-
-    subject.complete();
   })();
 
   return subject;

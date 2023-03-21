@@ -242,6 +242,16 @@
             Disable overlay messages (not recommended)
           </b-form-checkbox>
 
+          <b-form-checkbox
+            id="checkbox-loadDataInParallel"
+            class="mb-2"
+            v-model="settings.loadDataInParallel"
+            name="checkbox-loadDataInParallel"
+            @change="onChange()"
+          >
+            Load Metrc data in parallel (more efficient)
+          </b-form-checkbox>
+
           <!-- <b-form-checkbox
           id="checkbox-hideScreenshotButton"
           class="mb-2"

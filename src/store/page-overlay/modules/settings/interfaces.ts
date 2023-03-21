@@ -49,4 +49,5 @@ export interface ISettingsState {
   preventActiveProjectPageLeave: boolean;
   enableSearchOverMetrcModal: boolean;
   useIsoDateFormatForSubmit: boolean;
+  loadDataInParallel: boolean;
 }
