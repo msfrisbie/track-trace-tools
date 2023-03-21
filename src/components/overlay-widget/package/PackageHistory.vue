@@ -492,7 +492,7 @@ export default Vue.extend({
       handler(newValue, oldValue) {
         if (newValue === PackageHistoryStatus.SUCCESS) {
           // @ts-ignore
-          // this.autofit();
+          this.autofit();
         }
       },
     },

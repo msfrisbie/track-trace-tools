@@ -13,7 +13,7 @@ import {
   getChildPackageHistoryTree,
   getParentHarvests,
   getParentPackageHistoryTree,
-} from "@/utils/package";
+} from "@/utils/package-history";
 import _ from "lodash";
 import { ActionContext } from "vuex";
 import {

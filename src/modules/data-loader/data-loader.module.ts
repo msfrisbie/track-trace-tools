@@ -996,7 +996,24 @@ export class DataLoader implements IAtomicService {
     return this._activePackages;
   }
 
-  async activePackage(label: string): Promise<IIndexedPackageData> {
+  async activePackage(
+    label: string,
+    options: { useCache?: boolean } = {}
+  ): Promise<IIndexedPackageData> {
+    if (options.useCache) {
+      if (!this._activePackages) {
+        await this.activePackages();
+      }
+
+      if (this._activePackages) {
+        const match = (await this._activePackages).find((pkg) => pkg.Label === label);
+
+        if (match) {
+          return match;
+        }
+      }
+    }
+
     return new Promise(async (resolve, reject) => {
       const subscription = timer(DATA_LOAD_FETCH_TIMEOUT_MS).subscribe(() =>
         reject("Active package fetch timed out")
@@ -1120,7 +1137,24 @@ export class DataLoader implements IAtomicService {
     });
   }
 
-  async inactivePackage(label: string): Promise<IIndexedPackageData> {
+  async inactivePackage(
+    label: string,
+    options: { useCache?: boolean } = {}
+  ): Promise<IIndexedPackageData> {
+    if (options.useCache) {
+      if (!this._inactivePackages) {
+        await this.inactivePackages();
+      }
+
+      if (this._inactivePackages) {
+        const match = (await this._inactivePackages).find((pkg) => pkg.Label === label);
+
+        if (match) {
+          return match;
+        }
+      }
+    }
+
     return new Promise(async (resolve, reject) => {
       const subscription = timer(DATA_LOAD_FETCH_TIMEOUT_MS).subscribe(() =>
         reject("Inactive package fetch timed out")
@@ -1179,7 +1213,24 @@ export class DataLoader implements IAtomicService {
     return this._inTransitPackages;
   }
 
-  async inTransitPackage(label: string): Promise<IIndexedPackageData> {
+  async inTransitPackage(
+    label: string,
+    options: { useCache?: boolean } = {}
+  ): Promise<IIndexedPackageData> {
+    if (options.useCache) {
+      if (!this._inTransitPackages) {
+        await this.inTransitPackages();
+      }
+
+      if (this._inTransitPackages) {
+        const match = (await this._inTransitPackages).find((pkg) => pkg.Label === label);
+
+        if (match) {
+          return match;
+        }
+      }
+    }
+
     return new Promise(async (resolve, reject) => {
       const subscription = timer(DATA_LOAD_FETCH_TIMEOUT_MS).subscribe(() =>
         reject("In Transit package fetch timed out")
