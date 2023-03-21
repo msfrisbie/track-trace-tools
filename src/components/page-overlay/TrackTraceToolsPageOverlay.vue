@@ -118,6 +118,7 @@ library.add(
   fontawesomeRegular.faCircle,
   fontawesomeRegular.faCopy,
   fontawesomeSolid.faArchive,
+  fontawesomeSolid.faPlusCircle,
   fontawesomeSolid.faArrowLeft,
   fontawesomeSolid.faArrowRight,
   fontawesomeSolid.faBackspace,

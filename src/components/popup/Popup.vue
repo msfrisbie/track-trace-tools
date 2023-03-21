@@ -7,7 +7,15 @@
     <!-- <ttt-permissions-button /> -->
     <o-auth-login></o-auth-login>
 
-    <div class="p-2 flex flex-col items-stretch">
+    <div class="p-2 flex flex-col items-stretch gap-2">
+      <b-button
+        variant="outline-primary"
+        @click="openOptions('#/plus')"
+        class="flex flex-row gap-2 justify-center items-center"
+      >
+        <font-awesome-icon icon="plus-circle"></font-awesome-icon><span>T3+</span>
+      </b-button>
+
       <b-button
         variant="outline-primary"
         @click="openOptions()"
@@ -43,6 +51,7 @@ Vue.component("font-awesome-icon", FontAwesomeIcon);
 library.add(
   // @ts-ignore
   fontawesomeSolid.faInfoCircle,
+  fontawesomeSolid.faPlusCircle,
   fontawesomeSolid.faSignOutAlt
 );
 
@@ -61,8 +70,8 @@ export default Vue.extend({
     messageBus.init();
   },
   methods: {
-    async openOptions() {
-      window.open(await browser.runtime.getURL(TRACK_TRACE_TOOLS_STANDALONE_PAGE), "_blank");
+    async openOptions(path = "") {
+      window.open(await browser.runtime.getURL(TRACK_TRACE_TOOLS_STANDALONE_PAGE + path), "_blank");
     },
   },
 });

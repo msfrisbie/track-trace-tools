@@ -330,8 +330,11 @@
     </template>
     <template v-else>
       <div class="flex flex-col items-center gap-4">
+
+
         <div class="text-lg text-center max-w-lg">
           This is a premium feature. Enter your client key in Settings to enable this feature.
+          
         </div>
         <div class="text-md text-center max-w-lg">
           Want access to tools like this? Reach out to
