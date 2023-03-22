@@ -16,7 +16,7 @@ import {
 } from "@/interfaces";
 import { messageBus } from "@/modules/message-bus.module";
 import store from "@/store/page-overlay/index";
-import { ReportType } from "@/store/page-overlay/modules/reports/consts";
+import { ReportsMutations, ReportType } from "@/store/page-overlay/modules/reports/consts";
 import {
   IFieldData,
   IReportConfig,
@@ -145,11 +145,16 @@ async function writeDataSheet<T>({
   fields: IFieldData[];
   data: T[];
 }) {
-  await messageBus.sendMessageToBackground(MessageType.WRITE_SPREADSHEET_VALUES, {
-    spreadsheetId,
-    range: `'${spreadsheetTitle}'!1:1`,
-    values: [fields.map((fieldData) => `${fieldData.readableName}     `)],
-  });
+  await messageBus.sendMessageToBackground(
+    MessageType.WRITE_SPREADSHEET_VALUES,
+    {
+      spreadsheetId,
+      range: `'${spreadsheetTitle}'!1:1`,
+      values: [fields.map((fieldData) => `${fieldData.readableName}     `)],
+    },
+    undefined,
+    90000
+  );
 
   let nextPageStartIdx = 0;
   let nextPageRowIdx = 2;
@@ -163,22 +168,26 @@ async function writeDataSheet<T>({
       break;
     }
 
-    // await
     promises.push(
-      messageBus.sendMessageToBackground(MessageType.WRITE_SPREADSHEET_VALUES, {
-        spreadsheetId,
-        range: `'${spreadsheetTitle}'!${nextPageRowIdx}:${nextPageRowIdx + nextPage.length}`,
-        values: nextPage.map((data) =>
-          fields.map((fieldData) => {
-            let value = data;
-            for (const subProperty of fieldData.value.split(".")) {
-              // @ts-ignore
-              value = value[subProperty];
-            }
-            return value;
-          })
-        ),
-      })
+      messageBus.sendMessageToBackground(
+        MessageType.WRITE_SPREADSHEET_VALUES,
+        {
+          spreadsheetId,
+          range: `'${spreadsheetTitle}'!${nextPageRowIdx}:${nextPageRowIdx + nextPage.length}`,
+          values: nextPage.map((data) =>
+            fields.map((fieldData) => {
+              let value = data;
+              for (const subProperty of fieldData.value.split(".")) {
+                // @ts-ignore
+                value = value[subProperty];
+              }
+              return value;
+            })
+          ),
+        },
+        undefined,
+        90000
+      )
     );
 
     nextPageStartIdx += nextPage.length;
@@ -361,10 +370,15 @@ export async function createExportSpreadsheetOrError({
       success: boolean;
       result: ISpreadsheet;
     };
-  } = await messageBus.sendMessageToBackground(MessageType.CREATE_SPREADSHEET, {
-    title: `${store.state.pluginAuth?.authState?.license} Metrc Snapshot - ${todayIsodate()}`,
-    sheetTitles,
-  });
+  } = await messageBus.sendMessageToBackground(
+    MessageType.CREATE_SPREADSHEET,
+    {
+      title: `${store.state.pluginAuth?.authState?.license} Metrc Snapshot - ${todayIsodate()}`,
+      sheetTitles,
+    },
+    undefined,
+    90000
+  );
 
   if (!response.data.success) {
     throw new Error("Unable to create export sheet");
@@ -374,6 +388,10 @@ export async function createExportSpreadsheetOrError({
   // Marshal Data Into Matrix
   // Format Sheet For Data
   //
+
+  store.commit(`reports/${ReportsMutations.SET_STATUS}`, {
+    statusMessage: "Formatting spreadsheet...",
+  });
 
   let formattingRequests: any = [
     addRowsRequestFactory({
@@ -412,6 +430,10 @@ export async function createExportSpreadsheetOrError({
   //
 
   for (const reportType of ELIGIBLE_REPORT_TYPES) {
+    store.commit(`reports/${ReportsMutations.SET_STATUS}`, {
+      statusMessage: `Writing ${reportType}...`,
+    });
+
     await writeDataSheet({
       spreadsheetId: response.data.result.spreadsheetId,
       spreadsheetTitle: getSheetTitle(reportType),
@@ -423,6 +445,10 @@ export async function createExportSpreadsheetOrError({
   //
   // Generate Summary Sheet
   //
+
+  store.commit(`reports/${ReportsMutations.SET_STATUS}`, {
+    statusMessage: `Generating summary...`,
+  });
 
   const summaryList = [];
 
@@ -436,15 +462,24 @@ export async function createExportSpreadsheetOrError({
     ]);
   }
 
-  await messageBus.sendMessageToBackground(MessageType.WRITE_SPREADSHEET_VALUES, {
-    spreadsheetId: response.data.result.spreadsheetId,
-    range: `'${SheetTitles.OVERVIEW}'`,
-    values: [[], [], ...summaryList],
-  });
+  await messageBus.sendMessageToBackground(
+    MessageType.WRITE_SPREADSHEET_VALUES,
+    {
+      spreadsheetId: response.data.result.spreadsheetId,
+      range: `'${SheetTitles.OVERVIEW}'`,
+      values: [[], [], ...summaryList],
+    },
+    undefined,
+    90000
+  );
 
   //
-  // Write All Values
+  // Resize
   //
+
+  store.commit(`reports/${ReportsMutations.SET_STATUS}`, {
+    statusMessage: `Resizing sheets...`,
+  });
 
   let resizeRequests: any[] = [
     autoResizeDimensionsRequestFactory({
@@ -462,7 +497,8 @@ export async function createExportSpreadsheetOrError({
     ];
   }
 
-  await messageBus.sendMessageToBackground(
+  // This is incredibly slow for huge sheets
+  messageBus.sendMessageToBackground(
     MessageType.BATCH_UPDATE_SPREADSHEET,
     {
       spreadsheetId: response.data.result.spreadsheetId,
@@ -471,6 +507,13 @@ export async function createExportSpreadsheetOrError({
     undefined,
     90000
   );
+
+  // 3000ms grace period for all sheets
+  await new Promise((resolve) => setTimeout(resolve, 3000));
+
+  store.commit(`reports/${ReportsMutations.SET_STATUS}`, {
+    statusMessage: `Cleaning up...`,
+  });
 
   let shrinkFontRequests: any[] = [];
 
@@ -493,11 +536,16 @@ export async function createExportSpreadsheetOrError({
     90000
   );
 
-  await messageBus.sendMessageToBackground(MessageType.WRITE_SPREADSHEET_VALUES, {
-    spreadsheetId: response.data.result.spreadsheetId,
-    range: `'${SheetTitles.OVERVIEW}'`,
-    values: [[`Created with Track & Trace Tools @ ${Date().toString()}`]],
-  });
+  await messageBus.sendMessageToBackground(
+    MessageType.WRITE_SPREADSHEET_VALUES,
+    {
+      spreadsheetId: response.data.result.spreadsheetId,
+      range: `'${SheetTitles.OVERVIEW}'`,
+      values: [[`Created with Track & Trace Tools @ ${Date().toString()}`]],
+    },
+    undefined,
+    90000
+  );
 
   return response.data.result;
 }

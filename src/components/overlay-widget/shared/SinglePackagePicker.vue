@@ -5,7 +5,7 @@
       <div class="w-full flex flex-col space-y-4" style="max-width: 480px">
         <div class="flex flex-row items-stretch justify-center">
           <b-form-group
-            label="SELECT PACKAGES"
+            label="SELECT PACKAGE"
             label-size="sm"
             label-class="text-gray-400"
             class="w-full"
@@ -84,7 +84,7 @@
     </div>
 
     <!-- Selected packages -->
-    <div class="flex flex-col items-stretch space-y-8 overflow-y-auto">
+    <div v-if="showSelection" class="flex flex-col items-stretch space-y-8 overflow-y-auto">
       <div
         class="pr-4 pb-4 overflow-x-hidden overflow-y-auto toolkit-scroll"
         style="max-height: 35vh"
@@ -182,6 +182,10 @@ export default Vue.extend({
     selectAllPackageTypes: {
       type: Boolean,
       default: false,
+    },
+    showSelection: {
+      type: Boolean,
+      default: true,
     },
   },
   methods: {

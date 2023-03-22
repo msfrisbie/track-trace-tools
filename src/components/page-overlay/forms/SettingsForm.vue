@@ -223,6 +223,16 @@
           </b-form-checkbox>
 
           <b-form-checkbox
+            id="checkbox-loadDataInParallel"
+            class="mb-2"
+            v-model="settings.loadDataInParallel"
+            name="checkbox-loadDataInParallel"
+            @change="onChange()"
+          >
+            Load Metrc data in parallel
+          </b-form-checkbox>
+
+          <b-form-checkbox
             id="checkbox-useIsoDateFormatForSubmit"
             class="mb-2"
             v-model="settings.useIsoDateFormatForSubmit"
@@ -240,16 +250,6 @@
             @change="onChange()"
           >
             Disable overlay messages (not recommended)
-          </b-form-checkbox>
-
-          <b-form-checkbox
-            id="checkbox-loadDataInParallel"
-            class="mb-2"
-            v-model="settings.loadDataInParallel"
-            name="checkbox-loadDataInParallel"
-            @change="onChange()"
-          >
-            Load Metrc data in parallel (more efficient)
           </b-form-checkbox>
 
           <!-- <b-form-checkbox

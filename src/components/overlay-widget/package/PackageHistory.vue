@@ -8,6 +8,7 @@
           v-on:removePackage="setPackage({ pkg: null })"
           v-on:addPackage="setPackage({ pkg: $event })"
           :selectAllPackageTypes="true"
+          :showSelection="false"
         ></single-package-picker>
       </template>
 
