@@ -27,7 +27,7 @@ export enum ReportType {
   PACKAGES = "PACKAGES",
   INCOMING_TRANSFERS = "INCOMING_TRANSFERS",
   OUTGOING_TRANSFERS = "OUTGOING_TRANSFERS",
-  TRANSFER_PACKAGES = "TRANSFER_PACKAGES",
+  OUTGOING_TRANSFER_MANIFESTS = "OUTGOING_TRANSFER_MANIFESTS",
   MATURE_PLANTS = "MATURE_PLANTS",
   IMMATURE_PLANTS = "IMMATURE_PLANTS",
   HARVESTS = "HARVESTS",
@@ -335,7 +335,7 @@ export const SHEET_FIELDS: { [key: string]: IFieldData[] } = {
       required: false,
     },
   ],
-  [ReportType.TRANSFER_PACKAGES]: [
+  [ReportType.OUTGOING_TRANSFER_MANIFESTS]: [
     {
       value: "Transfer.ManifestNumber",
       readableName: "Manifest #",
@@ -345,6 +345,26 @@ export const SHEET_FIELDS: { [key: string]: IFieldData[] } = {
       value: "Destination.ShipmentTypeName",
       readableName: "Transfer Type",
       required: true,
+    },
+    {
+      value: "Package.PackageLabel",
+      readableName: "Package Tag",
+      required: true,
+    },
+    {
+      value: "Package.ProductName",
+      readableName: "Item",
+      required: false,
+    },
+    {
+      value: "Package.ShippedQuantity",
+      readableName: "Quantity",
+      required: false,
+    },
+    {
+      value: "Package.ShippedUnitOfMeasureAbbreviation",
+      readableName: "Unit of Measure",
+      required: false,
     },
     {
       value: "Transfer.ShipperFacilityName",
@@ -376,25 +396,113 @@ export const SHEET_FIELDS: { [key: string]: IFieldData[] } = {
       readableName: "ETA",
       required: false,
     },
-    {
-      value: "Package.PackageLabel",
-      readableName: "Package Tag",
-      required: true,
-    },
-    {
-      value: "Package.ProductName",
-      readableName: "Item",
-      required: false,
-    },
-    {
-      value: "Package.ShippedQuantity",
-      readableName: "Quantity",
-      required: false,
-    },
-    {
-      value: "Package.ShippedUnitOfMeasureAbbreviation",
-      readableName: "Unit of Measure",
-      required: false,
-    },
   ],
 };
+
+export const REPORT_OPTIONS = [
+  {
+    text: "Packages",
+    value: ReportType.PACKAGES,
+    premium: false,
+    enabled: true,
+    description: "Filter by packaged date, active/inactive, and transferred",
+  },
+  {
+    text: "Immature Plants",
+    value: ReportType.IMMATURE_PLANTS,
+    premium: false,
+    enabled: true,
+    description: "Filter by planted date",
+  },
+  {
+    text: "Mature Plants",
+    value: ReportType.MATURE_PLANTS,
+    premium: false,
+    enabled: true,
+    description: "Filter by growth phase and planted date",
+  },
+  {
+    text: "Incoming Transfers",
+    value: ReportType.INCOMING_TRANSFERS,
+    premium: true,
+    enabled: true,
+    description: "Filter by wholesale and estimated time of arrival",
+  },
+  {
+    text: "Outgoing Transfers",
+    value: ReportType.OUTGOING_TRANSFERS,
+    premium: false,
+    enabled: true,
+    description: "Filter by wholesale and estimated time of departure",
+  },
+  {
+    text: "Tags",
+    value: ReportType.TAGS,
+    premium: true,
+    enabled: true,
+    description: "Filter by tag type and status",
+  },
+  {
+    text: "Harvests",
+    value: ReportType.HARVESTS,
+    premium: false,
+    enabled: true,
+    description: "Filter by harvest date",
+  },
+  {
+    text: "Outgoing Transfer Manifests",
+    value: ReportType.OUTGOING_TRANSFER_MANIFESTS,
+    premium: true,
+    enabled: true,
+    description: "Full transfer and package data for all outgoing transfers",
+  },
+  {
+    text: "Straggler Inventory",
+    value: null,
+    premium: true,
+    enabled: false,
+    description: "Find straggler inventory so it can be cleared out",
+  },
+  {
+    text: "Package Quickview",
+    value: null,
+    premium: true,
+    enabled: false,
+    description: "Grouped summary of packages by item, remaining quantity, and testing status",
+  },
+  {
+    text: "Immature Plant Quickview",
+    value: null,
+    premium: true,
+    enabled: false,
+    description: "Grouped summary of mature plants by strain, location, and dates",
+  },
+  {
+    text: "Mature Plant Quickview",
+    value: null,
+    premium: true,
+    enabled: false,
+    description: "Grouped summary of mature plants by growth phase, strain, location, and dates",
+  },
+  {
+    text: "Transfer Quickview",
+    value: null,
+    premium: true,
+    enabled: false,
+    description: "Summary of incoming, outgoing, and rejected packages",
+  },
+  {
+    text: "Incoming Inventory",
+    value: null,
+    premium: true,
+    enabled: false,
+    description: "See packages not yet recieved",
+  },
+  {
+    text: "Harvested Plants",
+    value: null,
+    premium: true,
+    enabled: false,
+    description: "All plants and associated harvest data within this license",
+  },
+];

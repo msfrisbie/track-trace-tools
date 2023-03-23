@@ -31,7 +31,7 @@ export interface IReportsState {
 }
 
 export interface IReportConfig {
-  authState: IAuthState,
+  authState: IAuthState;
   [ReportType.PACKAGES]?: {
     packageFilter: IPackageFilter;
     fields: IFieldData[];
@@ -44,7 +44,7 @@ export interface IReportConfig {
     transferFilter: ITransferFilter;
     fields: IFieldData[];
   };
-  [ReportType.TRANSFER_PACKAGES]?: {
+  [ReportType.OUTGOING_TRANSFER_MANIFESTS]?: {
     transferFilter: ITransferFilter;
     fields: IFieldData[];
   };
@@ -88,8 +88,8 @@ export interface IReportData {
   [ReportType.OUTGOING_TRANSFERS]?: {
     outgoingTransfers: IIndexedRichOutgoingTransferData[];
   };
-  [ReportType.TRANSFER_PACKAGES]?: {
-    richOutgoingInactiveTransfers?: IIndexedRichOutgoingTransferData[];
+  [ReportType.OUTGOING_TRANSFER_MANIFESTS]?: {
+    richOutgoingTransfers?: IIndexedRichOutgoingTransferData[];
   };
 }
 

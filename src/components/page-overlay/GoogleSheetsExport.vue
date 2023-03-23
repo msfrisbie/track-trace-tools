@@ -24,16 +24,17 @@
           <b-form-group>
             <b-form-checkbox-group v-model="selectedReports" class="flex flex-col gap-4">
               <b-form-checkbox
-                v-for="reportOption of reportOptions.filter((x) => !x.premium)"
+                v-for="reportOption of eligibleReportOptions"
                 v-bind:key="reportOption.value"
                 :value="reportOption.value"
-                :disabled="reportOption.premium || reportStatus !== ReportStatus.INITIAL"
+                :disabled="reportStatus !== ReportStatus.INITIAL"
                 ><div class="flex flex-col items-start gap-1">
                   <span class="">{{ reportOption.text }}</span>
                   <span class="text-xs text-gray-400">{{ reportOption.description }}</span>
                 </div>
               </b-form-checkbox>
-              <div class="text-xs text-start text-gray-600">
+
+              <div class="text-xs text-start text-gray-600" v-if="!enablePremium">
                 Get access to advanced snapshots with
                 <a
                   class="text-purple-500 underline"
@@ -42,12 +43,18 @@
                   >T3+</a
                 >
               </div>
+
               <b-form-checkbox
                 class="opacity-50"
-                v-for="reportOption of reportOptions.filter((x) => x.premium)"
+                v-for="reportOption of reportOptions.filter(
+                  (x) => !eligibleReportOptions.includes(x)
+                )"
                 v-bind:key="reportOption.value"
                 :value="reportOption.value"
-                :disabled="reportOption.premium || reportStatus !== ReportStatus.INITIAL"
+                :disabled="
+                  !eligibleReportOptions.includes(reportOption) ||
+                  reportStatus !== ReportStatus.INITIAL
+                "
                 ><div class="flex flex-col items-start gap-1">
                   <span class="">{{ reportOption.text }}</span>
                   <span class="text-xs text-gray-400">{{ reportOption.description }}</span>
@@ -94,12 +101,12 @@
                     <span class="leading-6">Include inactive packages</span>
                   </b-form-checkbox>
 
-                  <b-form-checkbox :disabled="true">
+                  <b-form-checkbox :disabled="!enablePremium">
                     <div class="flex flex-col items-start">
                       <span class="leading-6"
                         >Include packages transferred out of this facility</span
                       >
-                      <span class="text-xs text-gray-300"
+                      <span v-if="!enablePremium" class="text-xs text-gray-300"
                         >Enable this with
                         <a href="https://trackandtrace.tools/plus" target="_blank">T3+</a></span
                       >
@@ -477,13 +484,13 @@
                     <span class="leading-6">Include Inactive Outgoing</span>
                   </b-form-checkbox>
                   <b-form-checkbox
-                    :disabled="true"
+                    :disabled="!enablePremium"
                     v-model="outgoingTransfersFormFilters.onlyWholesale"
                   >
                     <div class="flex flex-col items-start">
                       <span class="leading-6">Only Wholesale</span>
                     </div>
-                    <span class="text-xs text-gray-300"
+                    <span v-if="!enablePremium" class="text-xs text-gray-300"
                       >Enable this with
                       <a href="https://trackandtrace.tools/plus" target="_blank">T3+</a></span
                     >
@@ -723,6 +730,126 @@
               </div>
             </div>
           </template>
+
+          <!-- Outgoing Transfer Manifests -->
+          <template v-if="selectedReports.includes(ReportType.OUTGOING_TRANSFER_MANIFESTS)">
+            <div class="rounded border border-gray-300 p-2 flex flex-col items-stretch gap-2">
+              <div class="font-semibold text-gray-700">Outgoing Transfer Manifests</div>
+              <hr />
+              <div class="flex flex-col items-stretch gap-4">
+                <b-button
+                  size="sm"
+                  variant="outline-primary"
+                  @click="toggleFilters(ReportType.OUTGOING_TRANSFER_MANIFESTS)"
+                  >{{
+                    showFilters[ReportType.OUTGOING_TRANSFER_MANIFESTS]
+                      ? "HIDE FILTERS"
+                      : "CHOOSE FILTERS"
+                  }}</b-button
+                >
+                <template v-if="showFilters[ReportType.OUTGOING_TRANSFER_MANIFESTS]">
+                  <b-form-checkbox v-model="outgoingTransferManifestsFormFilters.includeOutgoing">
+                    <span class="leading-6">Include Active Outgoing</span>
+                  </b-form-checkbox>
+                  <b-form-checkbox v-model="outgoingTransferManifestsFormFilters.includeRejected">
+                    <span class="leading-6">Include Rejected</span>
+                  </b-form-checkbox>
+                  <b-form-checkbox
+                    v-model="outgoingTransferManifestsFormFilters.includeOutgoingInactive"
+                  >
+                    <span class="leading-6">Include Inactive Outgoing</span>
+                  </b-form-checkbox>
+                  <b-form-checkbox
+                    :disabled="!enablePremium"
+                    v-model="outgoingTransferManifestsFormFilters.onlyWholesale"
+                  >
+                    <div class="flex flex-col items-start">
+                      <span class="leading-6">Only Wholesale</span>
+                    </div>
+                    <span v-if="!enablePremium" class="text-xs text-gray-300"
+                      >Enable this with
+                      <a href="https://trackandtrace.tools/plus" target="_blank">T3+</a></span
+                    >
+                  </b-form-checkbox>
+
+                  <div class="flex flex-col items-start gap-1">
+                    <b-form-checkbox
+                      v-model="outgoingTransferManifestsFormFilters.filterEstimatedDepartureDateGt"
+                    >
+                      <span class="leading-6">ETD on or after:</span>
+                    </b-form-checkbox>
+                    <b-form-datepicker
+                      v-if="outgoingTransferManifestsFormFilters.filterEstimatedDepartureDateGt"
+                      :disabled="
+                        !outgoingTransferManifestsFormFilters.filterEstimatedDepartureDateGt
+                      "
+                      initial-date
+                      size="sm"
+                      v-model="outgoingTransferManifestsFormFilters.estimatedDepartureDateGt"
+                    />
+                  </div>
+
+                  <div class="flex flex-col items-start gap-1">
+                    <b-form-checkbox
+                      v-model="outgoingTransferManifestsFormFilters.filterEstimatedDepartureDateLt"
+                    >
+                      <span class="leading-6">ETD on or before:</span>
+                    </b-form-checkbox>
+                    <b-form-datepicker
+                      v-if="outgoingTransferManifestsFormFilters.filterEstimatedDepartureDateLt"
+                      :disabled="
+                        !outgoingTransferManifestsFormFilters.filterEstimatedDepartureDateLt
+                      "
+                      initial-date
+                      size="sm"
+                      v-model="outgoingTransferManifestsFormFilters.estimatedDepartureDateLt"
+                    />
+                  </div>
+                </template>
+
+                <b-button
+                  size="sm"
+                  variant="outline-primary"
+                  @click="toggleFields(ReportType.OUTGOING_TRANSFER_MANIFESTS)"
+                  >{{
+                    showFields[ReportType.OUTGOING_TRANSFER_MANIFESTS]
+                      ? "HIDE FIELDS"
+                      : "CHOOSE FIELDS"
+                  }}</b-button
+                >
+                <template v-if="showFields[ReportType.OUTGOING_TRANSFER_MANIFESTS]">
+                  <div class="grid grid-cols-2 gap-2">
+                    <b-button
+                      variant="outline-dark"
+                      size="sm"
+                      @click="checkAll(ReportType.OUTGOING_TRANSFER_MANIFESTS)"
+                      >CHECK ALL</b-button
+                    >
+                    <b-button
+                      variant="outline-dark"
+                      size="sm"
+                      @click="uncheckAll(ReportType.OUTGOING_TRANSFER_MANIFESTS)"
+                      >UNCHECK ALL</b-button
+                    >
+                  </div>
+
+                  <b-form-checkbox-group
+                    v-model="fields[ReportType.OUTGOING_TRANSFER_MANIFESTS]"
+                    class="flex flex-col items-start gap-1"
+                  >
+                    <b-form-checkbox
+                      v-for="fieldData of SHEET_FIELDS[ReportType.OUTGOING_TRANSFER_MANIFESTS]"
+                      v-bind:key="fieldData.value"
+                      :value="fieldData"
+                      :disabled="fieldData.required"
+                    >
+                      <span class="leading-6">{{ fieldData.readableName }}</span>
+                    </b-form-checkbox>
+                  </b-form-checkbox-group>
+                </template>
+              </div>
+            </div>
+          </template>
         </div>
 
         <!-- End Column -->
@@ -839,6 +966,7 @@ import {
   ITransferFilter,
 } from "@/interfaces";
 import { authManager } from "@/modules/auth-manager.module";
+import { clientBuildManager } from "@/modules/client-build-manager.module";
 import { messageBus } from "@/modules/message-bus.module";
 import router from "@/router/index";
 import store from "@/store/page-overlay/index";
@@ -847,6 +975,7 @@ import {
   ReportsActions,
   ReportStatus,
   ReportType,
+  REPORT_OPTIONS,
   SHEET_FIELDS,
 } from "@/store/page-overlay/modules/reports/consts";
 import { IReportConfig } from "@/store/page-overlay/modules/reports/interfaces";
@@ -854,99 +983,6 @@ import { todayIsodate } from "@/utils/date";
 import _ from "lodash";
 import Vue from "vue";
 import { mapActions, mapState } from "vuex";
-
-const reportOptions = [
-  {
-    text: "Packages",
-    value: ReportType.PACKAGES,
-    premium: false,
-    description: "Filter by packaged date, active/inactive, and transferred",
-  },
-  {
-    text: "Immature Plants",
-    value: ReportType.IMMATURE_PLANTS,
-    premium: false,
-    description: "Filter by planted date",
-  },
-  {
-    text: "Mature Plants",
-    value: ReportType.MATURE_PLANTS,
-    premium: false,
-    description: "Filter by growth phase and planted date",
-  },
-  {
-    text: "Incoming Transfers",
-    value: ReportType.INCOMING_TRANSFERS,
-    premium: true,
-    description: "Filter by wholesale and estimated time of arrival",
-  },
-  {
-    text: "Outgoing Transfers",
-    value: ReportType.OUTGOING_TRANSFERS,
-    premium: false,
-    description: "Filter by wholesale and estimated time of departure",
-  },
-  {
-    text: "Tags",
-    value: ReportType.TAGS,
-    premium: true,
-    description: "Filter by tag type and status",
-  },
-  {
-    text: "Harvests",
-    value: ReportType.HARVESTS,
-    premium: false,
-    description: "Filter by harvest date",
-  },
-  {
-    text: "Outgoing Transfer Manifests",
-    value: null,
-    premium: true,
-    description: "Full transfer and package data for all outgoing transfers",
-  },
-  {
-    text: "Straggler Inventory",
-    value: null,
-    premium: true,
-    description: "Find straggler inventory so it can be cleared out",
-  },
-  {
-    text: "Package Quickview",
-    value: null,
-    premium: true,
-    description: "Grouped summary of packages by item, remaining quantity, and testing status",
-  },
-  {
-    text: "Immature Plant Quickview",
-    value: null,
-    premium: true,
-    description: "Grouped summary of mature plants by strain, location, and dates",
-  },
-  {
-    text: "Mature Plant Quickview",
-    value: null,
-    premium: true,
-    description: "Grouped summary of mature plants by growth phase, strain, location, and dates",
-  },
-  {
-    text: "Transfer Quickview",
-    value: null,
-    premium: true,
-    description: "Summary of incoming, outgoing, and rejected packages",
-  },
-  {
-    text: "Incoming Inventory",
-    value: null,
-    premium: true,
-    description: "See packages not yet recieved",
-  },
-  {
-    text: "Harvested Plants",
-    value: null,
-    premium: true,
-    description: "All plants and associated harvest data within this license",
-  },
-];
 
 export default Vue.extend({
   name: "GoogleSheetsExport",
@@ -965,7 +1001,16 @@ export default Vue.extend({
       reportStatusMessageHistory: (state: any) => state.reports.statusMessageHistory,
     }),
     eligibleReportOptions() {
-      return reportOptions.filter((x) => !x.premium);
+      const enabledOptions = REPORT_OPTIONS.filter((x) => x.enabled);
+
+      if (clientBuildManager.assertValues(["ENABLE_T3PLUS"])) {
+        return enabledOptions;
+      } else {
+        return enabledOptions.filter((x) => !x.premium);
+      }
+    },
+    enablePremium() {
+      return clientBuildManager.assertValues(["ENABLE_T3PLUS"]);
     },
   },
   data() {
@@ -975,7 +1020,7 @@ export default Vue.extend({
       ReportType,
       SHEET_FIELDS,
       selectedReports: [],
-      reportOptions,
+      reportOptions: REPORT_OPTIONS,
       packagesFormFilters: {
         packagedDateGt: todayIsodate(),
         packagedDateLt: todayIsodate(),
@@ -1019,6 +1064,16 @@ export default Vue.extend({
         includeIncomingInactive: false,
       },
       outgoingTransfersFormFilters: {
+        estimatedDepartureDateLt: todayIsodate(),
+        estimatedDepartureDateGt: todayIsodate(),
+        filterEstimatedDepartureDateLt: false,
+        filterEstimatedDepartureDateGt: false,
+        onlyWholesale: false,
+        includeOutgoing: true,
+        includeRejected: true,
+        includeOutgoingInactive: false,
+      },
+      outgoingTransferManifestsFormFilters: {
         estimatedDepartureDateLt: todayIsodate(),
         estimatedDepartureDateGt: todayIsodate(),
         filterEstimatedDepartureDateLt: false,
@@ -1239,10 +1294,30 @@ export default Vue.extend({
         };
       }
 
-      if (this.$data.selectedReports.includes(ReportType.TRANSFER_PACKAGES)) {
-        reportConfig[ReportType.TRANSFER_PACKAGES] = {
-          transferFilter: {},
-          fields: this.$data.fields[ReportType.TRANSFER_PACKAGES],
+      if (this.$data.selectedReports.includes(ReportType.OUTGOING_TRANSFER_MANIFESTS)) {
+        const transferFilter: ITransferFilter = {};
+        const outgoingTransferManifestsFormFilters =
+          this.$data.outgoingTransferManifestsFormFilters;
+
+        transferFilter.onlyWholesale = outgoingTransferManifestsFormFilters.onlyWholesale;
+        transferFilter.includeOutgoing = outgoingTransferManifestsFormFilters.includeOutgoing;
+        transferFilter.includeRejected = outgoingTransferManifestsFormFilters.includeRejected;
+        transferFilter.includeOutgoingInactive =
+          outgoingTransferManifestsFormFilters.includeOutgoingInactive;
+
+        transferFilter.estimatedDepartureDateGt =
+          outgoingTransferManifestsFormFilters.filterEstimatedDepartureDateGt
+            ? outgoingTransferManifestsFormFilters.estimatedDepartureDateGt
+            : null;
+
+        transferFilter.estimatedDepartureDateLt =
+          outgoingTransferManifestsFormFilters.filterEstimatedDepartureDateLt
+            ? outgoingTransferManifestsFormFilters.estimatedDepartureDateLt
+            : null;
+
+        reportConfig[ReportType.OUTGOING_TRANSFER_MANIFESTS] = {
+          transferFilter,
+          fields: this.$data.fields[ReportType.OUTGOING_TRANSFER_MANIFESTS],
         };
       }
 

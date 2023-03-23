@@ -1115,7 +1115,7 @@ export class DataLoader implements IAtomicService {
   async destinationPackages(destinationId: number): Promise<IIndexedPackageData[]> {
     return new Promise(async (resolve, reject) => {
       const subscription = timer(DATA_LOAD_FETCH_TIMEOUT_MS).subscribe(() =>
-        reject("Departed packages fetch timed out")
+        reject("Destination packages fetch timed out")
       );
 
       try {

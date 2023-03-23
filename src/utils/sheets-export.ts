@@ -33,7 +33,7 @@ enum SheetTitles {
   MATURE_PLANTS = "Mature Plants",
   INCOMING_TRANSFERS = "Incoming Transfers",
   OUTGOING_TRANSFERS = "Outgoing Transfers",
-  DEPARTED_TRANSFER_PACKAGES = "Departed Transfer Packages",
+  OUTGOING_TRANSFER_MANIFESTS = "Outgoing Transfer Manifest Packages",
 }
 
 function addRowsRequestFactory({ sheetId, length }: { sheetId: number; length: number }) {
@@ -230,9 +230,8 @@ export async function createExportSpreadsheetOrError({
         return reportData[reportType]?.incomingTransfers as IIndexedRichIncomingTransferData[];
       case ReportType.OUTGOING_TRANSFERS:
         return reportData[reportType]?.outgoingTransfers as IIndexedRichOutgoingTransferData[];
-      case ReportType.TRANSFER_PACKAGES:
-        return reportData[reportType]
-          ?.richOutgoingInactiveTransfers as IIndexedRichOutgoingTransferData[];
+      case ReportType.OUTGOING_TRANSFER_MANIFESTS:
+        return reportData[reportType]?.richOutgoingTransfers as IIndexedRichOutgoingTransferData[];
       default:
         throw new Error("Bad reportType " + reportType);
     }
@@ -287,7 +286,7 @@ export async function createExportSpreadsheetOrError({
           }
 
           return flattenedOutgoingTransfers;
-        case ReportType.TRANSFER_PACKAGES:
+        case ReportType.OUTGOING_TRANSFER_MANIFESTS:
           let flattenedOutgoingPackages: {
             Package: IPackageData;
             Destination: IDestinationData;
@@ -334,8 +333,8 @@ export async function createExportSpreadsheetOrError({
         return SheetTitles.INCOMING_TRANSFERS;
       case ReportType.OUTGOING_TRANSFERS:
         return SheetTitles.OUTGOING_TRANSFERS;
-      case ReportType.TRANSFER_PACKAGES:
-        return SheetTitles.DEPARTED_TRANSFER_PACKAGES;
+      case ReportType.OUTGOING_TRANSFER_MANIFESTS:
+        return SheetTitles.OUTGOING_TRANSFER_MANIFESTS;
       default:
         throw new Error("Bad reportType " + reportType);
     }
@@ -353,7 +352,7 @@ export async function createExportSpreadsheetOrError({
     ReportType.MATURE_PLANTS,
     ReportType.INCOMING_TRANSFERS,
     ReportType.OUTGOING_TRANSFERS,
-    ReportType.TRANSFER_PACKAGES,
+    ReportType.OUTGOING_TRANSFER_MANIFESTS,
   ].filter(shouldGenerateReport);
 
   //

@@ -517,16 +517,36 @@ export const reportsModule = {
           };
         }
 
-        const transferPackageConfig = reportConfig[ReportType.TRANSFER_PACKAGES];
-        if (transferPackageConfig?.transferFilter) {
+        const transferManifestConfig = reportConfig[ReportType.OUTGOING_TRANSFER_MANIFESTS];
+        if (transferManifestConfig?.transferFilter) {
           ctx.commit(ReportsMutations.SET_STATUS, {
-            statusMessage: "Loading transfer packages...",
+            statusMessage: "Loading transfer manifest packages...",
           });
-          // TODO use transferFilter
-          const richOutgoingInactiveTransfers: IIndexedRichOutgoingTransferData[] =
-            await primaryDataLoader.outgoingInactiveTransfers();
 
-          for (const transfer of richOutgoingInactiveTransfers) {
+          let richOutgoingTransfers: IIndexedRichOutgoingTransferData[] = [];
+
+          if (transferManifestConfig.transferFilter.includeOutgoing) {
+            richOutgoingTransfers = [
+              ...(await primaryDataLoader.outgoingTransfers()),
+              ...richOutgoingTransfers,
+            ];
+          }
+
+          if (transferManifestConfig.transferFilter.includeRejected) {
+            richOutgoingTransfers = [
+              ...(await primaryDataLoader.rejectedTransfers()),
+              ...richOutgoingTransfers,
+            ];
+          }
+
+          if (transferManifestConfig.transferFilter.includeOutgoingInactive) {
+            richOutgoingTransfers = [
+              ...(await primaryDataLoader.outgoingInactiveTransfers()),
+              ...richOutgoingTransfers,
+            ];
+          }
+
+          for (const transfer of richOutgoingTransfers) {
             const destinations: IRichDestinationData[] = (
               await primaryDataLoader.transferDestinations(transfer.Id)
             ).map((x) => ({ ...x, packages: [] }));
@@ -535,10 +555,42 @@ export const reportsModule = {
               destination.packages = await primaryDataLoader.destinationPackages(destination.Id);
             }
             transfer.outgoingDestinations = destinations;
+
+            transfer.outgoingDestinations = destinations.filter((destination) => {
+              if (transferManifestConfig.transferFilter.onlyWholesale) {
+                if (!destination.ShipmentTypeName.includes("Wholesale")) {
+                  return false;
+                }
+              }
+
+              if (transferManifestConfig.transferFilter.estimatedDepartureDateLt) {
+                if (
+                  destination.EstimatedDepartureDateTime >
+                  transferManifestConfig.transferFilter.estimatedDepartureDateLt
+                ) {
+                  return false;
+                }
+              }
+
+              if (transferManifestConfig.transferFilter.estimatedDepartureDateGt) {
+                if (
+                  destination.EstimatedDepartureDateTime <
+                  transferManifestConfig.transferFilter.estimatedDepartureDateGt
+                ) {
+                  return false;
+                }
+              }
+
+              return true;
+            });
           }
 
-          reportData[ReportType.TRANSFER_PACKAGES] = {
-            richOutgoingInactiveTransfers,
+          richOutgoingTransfers = richOutgoingTransfers.filter((transfer) => {
+            return true;
+          });
+
+          reportData[ReportType.OUTGOING_TRANSFER_MANIFESTS] = {
+            richOutgoingTransfers,
           };
         }
 
