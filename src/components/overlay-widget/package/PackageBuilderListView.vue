@@ -103,6 +103,16 @@ export default Vue.extend({
     options() {
       return [
         {
+          route: "/package/history",
+          text: "PACKAGE HISTORY",
+          icon: "sitemap",
+          backgroundColor: "#2774ae",
+          // isBeta: true,
+          isNew: false,
+          enabled: isCurrentHostAllowed([HOST_WILDCARD]),
+          visible: true,
+        },
+        {
           route: "/package/split-package",
           text: "SPLIT PACKAGE",
           icon: "expand-alt",

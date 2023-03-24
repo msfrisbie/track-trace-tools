@@ -36,6 +36,10 @@ export interface IReportConfig {
     packageFilter: IPackageFilter;
     fields: IFieldData[];
   };
+  [ReportType.STRAGGLER_PACKAGES]?: {
+    stragglerPackageFilter: IPackageFilter;
+    fields: IFieldData[];
+  };
   [ReportType.MATURE_PLANTS]?: {
     plantFilter: IPlantFilter;
     fields: IFieldData[];
@@ -69,6 +73,9 @@ export interface IReportConfig {
 export interface IReportData {
   [ReportType.PACKAGES]?: {
     packages: IIndexedPackageData[];
+  };
+  [ReportType.STRAGGLER_PACKAGES]?: {
+    stragglerPackages: IIndexedPackageData[];
   };
   [ReportType.IMMATURE_PLANTS]?: {
     immaturePlants: IIndexedPlantBatchData[];

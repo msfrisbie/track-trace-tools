@@ -32,6 +32,7 @@ export enum ReportType {
   IMMATURE_PLANTS = "IMMATURE_PLANTS",
   HARVESTS = "HARVESTS",
   TAGS = "TAGS",
+  STRAGGLER_PACKAGES = "STRAGGLER_PACKAGES",
 }
 
 export const SHEET_FIELDS: { [key: string]: IFieldData[] } = {
@@ -184,6 +185,63 @@ export const SHEET_FIELDS: { [key: string]: IFieldData[] } = {
     },
   ],
   [ReportType.PACKAGES]: [
+    {
+      value: "Label",
+      readableName: "Package Tag",
+      required: true,
+    },
+    {
+      value: "LicenseNumber",
+      readableName: "Current License",
+      required: true,
+    },
+    {
+      value: "PackageState",
+      readableName: "Is Active?",
+      required: true,
+    },
+    {
+      value: "Item.Name",
+      readableName: "Package Item",
+      required: false,
+    },
+    {
+      value: "Quantity",
+      readableName: "Package Quantity",
+      required: false,
+    },
+    {
+      value: "UnitOfMeasureAbbreviation",
+      readableName: "Unit of Measure",
+      required: false,
+    },
+    {
+      value: "PackagedDate",
+      readableName: "Packaged On",
+      required: false,
+    },
+    {
+      value: "LocationName",
+      readableName: "Location",
+      required: false,
+    },
+    {
+      value: "PackagedByFacilityLicenseNumber",
+      readableName: "Packaged By",
+      required: false,
+    },
+    {
+      value: "LabTestingStateName",
+      readableName: "Testing Status",
+      required: false,
+    },
+    {
+      value: "ProductionBatchNumber",
+      readableName: "Production Batch",
+      required: false,
+    },
+  ],
+  [ReportType.STRAGGLER_PACKAGES]: [
     {
       value: "Label",
       readableName: "Package Tag",
@@ -458,9 +516,9 @@ export const REPORT_OPTIONS = [
   },
   {
     text: "Straggler Inventory",
-    value: null,
+    value: ReportType.STRAGGLER_PACKAGES,
     premium: true,
-    enabled: false,
+    enabled: true,
     description: "Find straggler inventory so it can be cleared out",
   },
   {

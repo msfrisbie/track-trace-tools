@@ -850,6 +850,134 @@
               </div>
             </div>
           </template>
+
+          <!-- Straggler Packages -->
+          <template v-if="selectedReports.includes(ReportType.STRAGGLER_PACKAGES)">
+            <div class="rounded border border-gray-300 p-2 flex flex-col items-stretch gap-2">
+              <div class="font-semibold text-gray-700">Straggler Packages</div>
+              <hr />
+              <div class="flex flex-col items-stretch gap-4">
+                <b-button
+                  size="sm"
+                  variant="outline-primary"
+                  @click="toggleFilters(ReportType.STRAGGLER_PACKAGES)"
+                  >{{
+                    showFilters[ReportType.STRAGGLER_PACKAGES] ? "HIDE FILTERS" : "CHOOSE FILTERS"
+                  }}</b-button
+                >
+                <template v-if="showFilters[ReportType.STRAGGLER_PACKAGES]">
+                  <div class="flex flex-col items-start gap-1">
+                    <b-form-checkbox v-model="stragglerPackagesFormFilters.includeNearlyEmpty">
+                      <span class="leading-6">Quantity less than:</span>
+                    </b-form-checkbox>
+
+                    <template v-if="stragglerPackagesFormFilters.includeNearlyEmpty">
+                      <b-form-select
+                        size="sm"
+                        :options="[20, 10, 5, 3, 2, 1]"
+                        v-model="stragglerPackagesFormFilters.quantityLt"
+                      />
+                    </template>
+                  </div>
+
+                  <div class="flex flex-col items-start gap-1">
+                    <b-form-checkbox
+                      v-model="stragglerPackagesFormFilters.filterLastModifiedDateGt"
+                    >
+                      <span class="leading-6">Last modified on or after:</span>
+                    </b-form-checkbox>
+                    <b-form-datepicker
+                      v-if="stragglerPackagesFormFilters.filterLastModifiedDateGt"
+                      :disabled="!stragglerPackagesFormFilters.filterLastModifiedDateGt"
+                      initial-date
+                      size="sm"
+                      v-model="stragglerPackagesFormFilters.lastModifiedDateGt"
+                    />
+                  </div>
+
+                  <div class="flex flex-col items-start gap-1">
+                    <b-form-checkbox
+                      v-model="stragglerPackagesFormFilters.filterLastModifiedDateLt"
+                    >
+                      <span class="leading-6">Last modified on or before:</span>
+                    </b-form-checkbox>
+                    <b-form-datepicker
+                      v-if="stragglerPackagesFormFilters.filterLastModifiedDateLt"
+                      :disabled="!stragglerPackagesFormFilters.filterLastModifiedDateLt"
+                      initial-date
+                      size="sm"
+                      v-model="stragglerPackagesFormFilters.lastModifiedDateLt"
+                    />
+                  </div>
+
+                  <div class="flex flex-col items-start gap-1">
+                    <b-form-checkbox v-model="stragglerPackagesFormFilters.filterPackagedDateGt">
+                      <span class="leading-6">Packaged on or after:</span>
+                    </b-form-checkbox>
+                    <b-form-datepicker
+                      v-if="stragglerPackagesFormFilters.filterPackagedDateGt"
+                      :disabled="!stragglerPackagesFormFilters.filterPackagedDateGt"
+                      initial-date
+                      size="sm"
+                      v-model="stragglerPackagesFormFilters.packagedDateGt"
+                    />
+                  </div>
+
+                  <div class="flex flex-col items-start gap-1">
+                    <b-form-checkbox v-model="stragglerPackagesFormFilters.filterPackagedDateLt">
+                      <span class="leading-6">Packaged on or before:</span>
+                    </b-form-checkbox>
+                    <b-form-datepicker
+                      v-if="stragglerPackagesFormFilters.filterPackagedDateLt"
+                      :disabled="!stragglerPackagesFormFilters.filterPackagedDateLt"
+                      initial-date
+                      size="sm"
+                      v-model="stragglerPackagesFormFilters.packagedDateLt"
+                    />
+                  </div>
+                </template>
+
+                <b-button
+                  size="sm"
+                  variant="outline-primary"
+                  @click="toggleFields(ReportType.STRAGGLER_PACKAGES)"
+                  >{{
+                    showFields[ReportType.STRAGGLER_PACKAGES] ? "HIDE COLUMNS" : "CHOOSE COLUMNS"
+                  }}</b-button
+                >
+                <template v-if="showFields[ReportType.STRAGGLER_PACKAGES]">
+                  <div class="grid grid-cols-2 gap-2">
+                    <b-button
+                      variant="outline-dark"
+                      size="sm"
+                      @click="checkAll(ReportType.STRAGGLER_PACKAGES)"
+                      >CHECK ALL</b-button
+                    >
+                    <b-button
+                      variant="outline-dark"
+                      size="sm"
+                      @click="uncheckAll(ReportType.STRAGGLER_PACKAGES)"
+                      >UNCHECK ALL</b-button
+                    >
+                  </div>
+
+                  <b-form-checkbox-group
+                    v-model="fields[ReportType.STRAGGLER_PACKAGES]"
+                    class="flex flex-col items-start gap-1"
+                  >
+                    <b-form-checkbox
+                      v-for="fieldData of SHEET_FIELDS[ReportType.STRAGGLER_PACKAGES]"
+                      v-bind:key="fieldData.value"
+                      :value="fieldData"
+                      :disabled="fieldData.required"
+                    >
+                      <span class="leading-6">{{ fieldData.readableName }}</span>
+                    </b-form-checkbox>
+                  </b-form-checkbox-group>
+                </template>
+              </div>
+            </div>
+          </template>
         </div>
 
         <!-- End Column -->
@@ -1029,6 +1157,18 @@ export default Vue.extend({
         includeActive: true,
         includeInactive: false,
       },
+      stragglerPackagesFormFilters: {
+        packagedDateGt: todayIsodate(),
+        packagedDateLt: todayIsodate(),
+        filterPackagedDateGt: false,
+        filterPackagedDateLt: false,
+        includeNearlyEmpty: false,
+        quantityLt: 5,
+        lastModifiedDateGt: todayIsodate(),
+        lastModifiedDateLt: todayIsodate(),
+        filterLastModifiedDateGt: false,
+        filterLastModifiedDateLt: false,
+      },
       maturePlantsFormFilters: {
         plantedDateGt: todayIsodate(),
         plantedDateLt: todayIsodate(),
@@ -1160,6 +1300,40 @@ export default Vue.extend({
         reportConfig[ReportType.PACKAGES] = {
           packageFilter,
           fields: this.$data.fields[ReportType.PACKAGES],
+        };
+      }
+
+      if (this.$data.selectedReports.includes(ReportType.STRAGGLER_PACKAGES)) {
+        const stragglerPackagesFormFilters = this.$data.stragglerPackagesFormFilters;
+        const stragglerPackageFilter: IPackageFilter = {};
+
+        stragglerPackageFilter.includeActive = true;
+
+        stragglerPackageFilter.quantityLt = stragglerPackagesFormFilters.includeNearlyEmpty
+          ? stragglerPackagesFormFilters.quantityLt
+          : null;
+
+        stragglerPackageFilter.packagedDateGt = stragglerPackagesFormFilters.filterPackagedDateGt
+          ? stragglerPackagesFormFilters.packagedDateGt
+          : null;
+
+        stragglerPackageFilter.packagedDateLt = stragglerPackagesFormFilters.filterPackagedDateLt
+          ? stragglerPackagesFormFilters.packagedDateLt
+          : null;
+
+        stragglerPackageFilter.lastModifiedDateGt =
+          stragglerPackagesFormFilters.filterLastModifiedDateGt
+            ? stragglerPackagesFormFilters.lastModifiedDateGt
+            : null;
+
+        stragglerPackageFilter.lastModifiedDateLt =
+          stragglerPackagesFormFilters.filterLastModifiedDateLt
+            ? stragglerPackagesFormFilters.lastModifiedDateLt
+            : null;
+
+        reportConfig[ReportType.STRAGGLER_PACKAGES] = {
+          stragglerPackageFilter,
+          fields: this.$data.fields[ReportType.STRAGGLER_PACKAGES],
         };
       }
 

@@ -448,12 +448,16 @@ export interface IPackageFilter {
   locationName?: string | null;
   locationNameExact?: boolean | null;
   isEmpty?: boolean | null;
+  quantityLt?: number | null;
   packagedDateGt?: string | null;
   packagedDateEq?: string | null;
   packagedDateLt?: string | null;
   includeActive?: boolean;
   includeIntransit?: boolean;
   includeInactive?: boolean;
+  lastModifiedDateGt?: string | null;
+  lastModifiedDateEq?: string | null;
+  lastModifiedDateLt?: string | null;
 }
 
 export interface IHarvestFilter {
@@ -738,9 +742,7 @@ export interface IOutgoingTransferData extends ITransferData {
   DeliveryReceivedPackageCount: 0;
 }
 
-export interface IIncomingTransferData extends ITransferData {
-
-}
+export interface IIncomingTransferData extends ITransferData {}
 
 export interface IVehicleData {
   Id: number;

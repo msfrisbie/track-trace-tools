@@ -34,6 +34,7 @@ enum SheetTitles {
   INCOMING_TRANSFERS = "Incoming Transfers",
   OUTGOING_TRANSFERS = "Outgoing Transfers",
   OUTGOING_TRANSFER_MANIFESTS = "Outgoing Transfer Manifest Packages",
+  STRAGGLER_PACKAGES = "Straggler Packages",
 }
 
 function addRowsRequestFactory({ sheetId, length }: { sheetId: number; length: number }) {
@@ -232,6 +233,8 @@ export async function createExportSpreadsheetOrError({
         return reportData[reportType]?.outgoingTransfers as IIndexedRichOutgoingTransferData[];
       case ReportType.OUTGOING_TRANSFER_MANIFESTS:
         return reportData[reportType]?.richOutgoingTransfers as IIndexedRichOutgoingTransferData[];
+      case ReportType.STRAGGLER_PACKAGES:
+        return reportData[reportType]?.stragglerPackages as IIndexedPackageData[];
       default:
         throw new Error("Bad reportType " + reportType);
     }
@@ -245,6 +248,7 @@ export async function createExportSpreadsheetOrError({
     const value = (() => {
       switch (reportType) {
         case ReportType.PACKAGES:
+        case ReportType.STRAGGLER_PACKAGES:
         case ReportType.MATURE_PLANTS:
         case ReportType.IMMATURE_PLANTS:
         case ReportType.HARVESTS:
@@ -321,6 +325,8 @@ export async function createExportSpreadsheetOrError({
     switch (reportType) {
       case ReportType.PACKAGES:
         return SheetTitles.PACKAGES;
+      case ReportType.STRAGGLER_PACKAGES:
+        return SheetTitles.STRAGGLER_PACKAGES;
       case ReportType.HARVESTS:
         return SheetTitles.HARVESTS;
       case ReportType.TAGS:
@@ -346,6 +352,7 @@ export async function createExportSpreadsheetOrError({
 
   const ELIGIBLE_REPORT_TYPES: ReportType[] = [
     ReportType.PACKAGES,
+    ReportType.STRAGGLER_PACKAGES,
     ReportType.TAGS,
     ReportType.HARVESTS,
     ReportType.IMMATURE_PLANTS,

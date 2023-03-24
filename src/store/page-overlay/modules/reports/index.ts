@@ -169,6 +169,80 @@ export const reportsModule = {
           };
         }
 
+        const stragglerPackageConfig = reportConfig[ReportType.STRAGGLER_PACKAGES];
+        if (stragglerPackageConfig?.stragglerPackageFilter) {
+          ctx.commit(ReportsMutations.SET_STATUS, { statusMessage: "Loading packages..." });
+
+          let stragglerPackages: IIndexedPackageData[] = [];
+
+          try {
+            stragglerPackages = [
+              ...stragglerPackages,
+              ...(await primaryDataLoader.activePackages()),
+            ];
+          } catch (e) {
+            ctx.commit(ReportsMutations.SET_STATUS, {
+              statusMessage: "Failed to load active packages.",
+            });
+          }
+
+          stragglerPackages = stragglerPackages.filter((pkg) => {
+            if (stragglerPackageConfig.stragglerPackageFilter.isEmpty) {
+              if (pkg.Quantity > 0) {
+                return false;
+              }
+            } else if (stragglerPackageConfig.stragglerPackageFilter.quantityLt) {
+              if (pkg.Quantity > stragglerPackageConfig.stragglerPackageFilter.quantityLt) {
+                return false;
+              }
+            }
+
+            if (stragglerPackageConfig.stragglerPackageFilter.packagedDateLt) {
+              if (pkg.PackagedDate > stragglerPackageConfig.stragglerPackageFilter.packagedDateLt) {
+                return false;
+              }
+            }
+
+            if (stragglerPackageConfig.stragglerPackageFilter.packagedDateEq) {
+              if (
+                !pkg.PackagedDate.startsWith(
+                  stragglerPackageConfig.stragglerPackageFilter.packagedDateEq
+                )
+              ) {
+                return false;
+              }
+            }
+
+            if (stragglerPackageConfig.stragglerPackageFilter.packagedDateGt) {
+              if (pkg.PackagedDate < stragglerPackageConfig.stragglerPackageFilter.packagedDateGt) {
+                return false;
+              }
+            }
+
+            if (stragglerPackageConfig.stragglerPackageFilter.lastModifiedDateLt) {
+              if (
+                pkg.LastModified > stragglerPackageConfig.stragglerPackageFilter.lastModifiedDateLt
+              ) {
+                return false;
+              }
+            }
+
+            if (stragglerPackageConfig.stragglerPackageFilter.lastModifiedDateGt) {
+              if (
+                pkg.LastModified < stragglerPackageConfig.stragglerPackageFilter.lastModifiedDateGt
+              ) {
+                return false;
+              }
+            }
+
+            return true;
+          });
+
+          reportData[ReportType.STRAGGLER_PACKAGES] = {
+            stragglerPackages,
+          };
+        }
+
         const immaturePlantConfig = reportConfig[ReportType.IMMATURE_PLANTS];
         if (immaturePlantConfig?.immaturePlantFilter) {
           ctx.commit(ReportsMutations.SET_STATUS, { statusMessage: "Loading plant batches..." });
