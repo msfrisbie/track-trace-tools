@@ -36,4 +36,4 @@ To run tests:
 
 ## License
 
-Track & Trace Tools is released under the [MIT License](https://opensource.org/licenses/MIT).
+Track & Trace Tools is released under the GPL-3.0 license
