@@ -48,15 +48,15 @@
             <a class="ttt-purple underline" v-bind:href="githubUrl" target="_blank">
               publicly available here</a
             >. It is released under the
-            <a v-bind:href="mitLicenseUrl" target="_blank" class="ttt-purple underline"
-              >MIT license</a
+            <a v-bind:href="gplLicenseUrl" target="_blank" class="ttt-purple underline"
+              >GPL-3.0 license</a
             >.
           </div>
           <hr />
-          <div class="text-2xl ttt-purple">What does the MIT license mean?</div>
+          <div class="text-2xl ttt-purple">What does the GPL-3.0 license mean?</div>
           <div>
-            You can read the MIT license
-            <a v-bind:href="mitLicenseUrl" target="_blank" class="ttt-purple underline"> here</a>.
+            You can read the GPL-3.0 license
+            <a v-bind:href="gplLicenseUrl" target="_blank" class="ttt-purple underline"> here</a>.
             Some things to note:
             <ul class="list-disc ml-4 my-6 flex flex-col gap-4">
               <li>Track &amp; Trace Tools has no warranty of any kind.</li>
@@ -103,6 +103,7 @@ export default Vue.extend({
       forumUrl: "https://track-trace-tools.talkyard.net/latest",
       email: "mailto:tracktracetools@gmail.com",
       mitLicenseUrl: "https://github.com/msfrisbie/track-trace-tools/blob/master/LICENSE.md",
+      gplLicenseUrl: "https://www.gnu.org/licenses/gpl-3.0.txt"
     };
   },
   methods: {},

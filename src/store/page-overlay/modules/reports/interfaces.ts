@@ -32,6 +32,10 @@ export interface IReportsState {
 
 export interface IReportConfig {
   authState: IAuthState;
+  [ReportType.COGS]?: {
+    packageFilter: IPackageFilter;
+    fields: IFieldData[];
+  };
   [ReportType.PACKAGES]?: {
     packageFilter: IPackageFilter;
     fields: IFieldData[];
@@ -71,6 +75,10 @@ export interface IReportConfig {
 }
 
 export interface IReportData {
+  [ReportType.COGS]?: {
+    packages: IIndexedPackageData[];
+    richOutgoingTransfers?: IIndexedRichOutgoingTransferData[];
+  };
   [ReportType.PACKAGES]?: {
     packages: IIndexedPackageData[];
   };

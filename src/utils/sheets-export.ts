@@ -555,3 +555,50 @@ export async function createExportSpreadsheetOrError({
 
   return response.data.result;
 }
+
+export async function createCogsSpreadsheetOrError({
+  reportData,
+  reportConfig,
+}: {
+  reportData: IReportData;
+  reportConfig: IReportConfig;
+}): Promise<ISpreadsheet> {
+  if (!store.state.pluginAuth?.authState?.license) {
+    throw new Error("Invalid authState");
+  }
+
+  const response: {
+    data: {
+      success: boolean;
+      result: ISpreadsheet;
+    };
+  } = await messageBus.sendMessageToBackground(
+    MessageType.CREATE_SPREADSHEET,
+    {
+      title: `COGS - ${todayIsodate()}`,
+      sheetTitles: [
+        'Batches',
+        ''
+      ],
+    },
+    undefined,
+    90000
+  );
+
+  if (!response.data.success) {
+    throw new Error("Unable to create COGS sheet");
+  }
+
+  // await messageBus.sendMessageToBackground(
+  //   MessageType.WRITE_SPREADSHEET_VALUES,
+  //   {
+  //     spreadsheetId: response.data.result.spreadsheetId,
+  //     range: `'${SheetTitles.OVERVIEW}'`,
+  //     values: [[`Created with Track & Trace Tools @ ${Date().toString()}`]],
+  //   },
+  //   undefined,
+  //   90000
+  // );
+
+  return response.data.result;
+}
