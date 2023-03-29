@@ -116,6 +116,29 @@ export const reportsModule = {
       try {
         let reportData: IReportData = {};
 
+        analyticsManager.track(MessageType.GENERATED_SPREADSHEET_SUCCESS);
+      } catch (e) {
+        ctx.commit(ReportsMutations.SET_STATUS, {
+          status: ReportStatus.ERROR,
+          // @ts-ignore
+          statusMessage: e.toString(),
+        });
+
+        // @ts-ignore
+        analyticsManager.track(MessageType.GENERATED_SPREADSHEET_ERROR, { error: e.toString() });
+      }
+    },
+    [ReportsActions.GENERATE_REPORT_SPREADSHEET]: async (
+      ctx: ActionContext<IReportsState, IPluginState>,
+      { reportConfig }: { reportConfig: IReportConfig }
+    ) => {
+      analyticsManager.track(MessageType.GENERATED_SPREADSHEET, reportConfig);
+
+      ctx.commit(ReportsMutations.SET_STATUS, { status: ReportStatus.INFLIGHT });
+
+      try {
+        let reportData: IReportData = {};
+
         const packageConfig = reportConfig[ReportType.PACKAGES];
         if (packageConfig?.packageFilter) {
           ctx.commit(ReportsMutations.SET_STATUS, { statusMessage: "Loading packages..." });
