@@ -7,8 +7,8 @@ import { analyticsManager } from "./analytics-manager.module";
 import { authManager } from "./auth-manager.module";
 import { primaryMetrcRequestManager } from "./metrc-request-manager.module";
 
-// 3 minutes
-const CONTACT_DATA_FETCH_INTERVAL_MS = 1000 * 60 * 3;
+// 30 seconds
+const CONTACT_DATA_FETCH_INTERVAL_MS = 1000 * 30;
 
 class ContactDataManager implements IAtomicService {
   async init() {
@@ -20,6 +20,7 @@ class ContactDataManager implements IAtomicService {
       !!store.state.contactData &&
       now - store.state.contactData.lastSuccessfulContactDataFetch < CONTACT_DATA_FETCH_INTERVAL_MS
     ) {
+      console.log("User data is up to date");
       return;
     }
 

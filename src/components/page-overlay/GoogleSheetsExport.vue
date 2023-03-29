@@ -11,16 +11,6 @@
           class="flex flex-col gap-2 items-stretch"
           v-bind:class="{ 'opacity-50': reportStatus !== ReportStatus.INITIAL }"
         >
-          <b-button
-            size="sm"
-            :disabled="
-              eligibleReportOptions.length === selectedReports.length ||
-              reportStatus !== ReportStatus.INITIAL
-            "
-            variant="outline-primary"
-            @click="snapshotEverything()"
-            >SNAPSHOT EVERYTHING</b-button
-          >
           <b-form-group>
             <b-form-checkbox-group v-model="selectedReports" class="flex flex-col gap-4">
               <b-form-checkbox
@@ -70,7 +60,7 @@
           class="flex flex-col items-stretch gap-4"
         >
           <template v-if="selectedReports.length === 0">
-            <div class="text-red-500 text-center">Select something to include in your snapshot</div>
+            <!-- <div class="text-red-500 text-center">Select something to include in your snapshot</div> -->
           </template>
           <template v-else>
             <div class="text-purple-800 text-center">
@@ -82,6 +72,15 @@
           <template v-if="selectedReports.includes(ReportType.PACKAGES)">
             <div class="rounded border border-gray-300 p-2 flex flex-col items-stretch gap-2">
               <div class="font-semibold text-gray-700">Packages</div>
+
+              <b-form-checkbox
+                :value="ReportType.PACKAGES"
+                :disabled="reportStatus !== ReportStatus.INITIAL"
+                ><div class="flex flex-col items-start gap-1">
+                  <span class="">Packages</span>
+                  <span class="text-xs text-gray-400">{{ reportOption.description }}</span>
+                </div>
+              </b-form-checkbox>
               <hr />
               <div class="flex flex-col items-stretch gap-4">
                 <b-button
@@ -206,12 +205,12 @@
                   </b-form-checkbox>
 
                   <div class="flex flex-col items-start gap-1">
-                    <b-form-checkbox v-model="harvestsFormFilters.filterHarvestedDateGt">
+                    <b-form-checkbox v-model="harvestsFormFilters.filterHarvestDateGt">
                       <span class="leading-6">Harvested on or after:</span>
                     </b-form-checkbox>
                     <b-form-datepicker
-                      v-if="harvestsFormFilters.filterHarvestedDateGt"
-                      :disabled="!harvestsFormFilters.filterHarvestedDateGt"
+                      v-if="harvestsFormFilters.filterHarvestDateGt"
+                      :disabled="!harvestsFormFilters.filterHarvestDateGt"
                       initial-date
                       size="sm"
                       v-model="harvestsFormFilters.harvestDateGt"
@@ -219,12 +218,12 @@
                   </div>
 
                   <div class="flex flex-col items-start gap-1">
-                    <b-form-checkbox v-model="harvestsFormFilters.filterHarvestedDateLt">
+                    <b-form-checkbox v-model="harvestsFormFilters.filterHarvestDateLt">
                       <span class="leading-6">Harvested on or before:</span>
                     </b-form-checkbox>
                     <b-form-datepicker
-                      v-if="harvestsFormFilters.filterHarvestedDateLt"
-                      :disabled="!harvestsFormFilters.filterHarvestedDateLt"
+                      v-if="harvestsFormFilters.filterHarvestDateLt"
+                      :disabled="!harvestsFormFilters.filterHarvestDateLt"
                       initial-date
                       size="sm"
                       v-model="harvestsFormFilters.harvestDateLt"
@@ -985,9 +984,27 @@
           <template v-if="reportStatus === ReportStatus.INITIAL">
             <b-button
               variant="primary"
+              size="sm"
               @click="createSpreadsheet()"
               :disabled="selectedReports.length === 0"
               >CREATE SNAPSHOT</b-button
+            >
+
+            <template v-if="selectedReports.length === 0">
+              <div class="text-red-500 text-center">
+                Select something to include in your snapshot
+              </div>
+            </template>
+
+            <b-button
+              size="sm"
+              :disabled="
+                eligibleReportOptions.length === selectedReports.length ||
+                reportStatus !== ReportStatus.INITIAL
+              "
+              variant="outline-primary"
+              @click="snapshotEverything()"
+              >SNAPSHOT EVERYTHING</b-button
             >
           </template>
 
