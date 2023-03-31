@@ -484,3 +484,18 @@ export enum TransfersTabLabel {
   REJECTED = "Rejected",
   INACTIVE = "Inactive",
 }
+
+
+
+export enum SheetTitles {
+  OVERVIEW = "Overview",
+  PACKAGES = "Packages",
+  TAGS = "Tags",
+  HARVESTS = "Harvests",
+  IMMATURE_PLANTS = "Immature Plants",
+  MATURE_PLANTS = "Mature Plants",
+  INCOMING_TRANSFERS = "Incoming Transfers",
+  OUTGOING_TRANSFERS = "Outgoing Transfers",
+  OUTGOING_TRANSFER_MANIFESTS = "Outgoing Transfer Manifest Packages",
+  STRAGGLER_PACKAGES = "Straggler Packages",
+}

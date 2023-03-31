@@ -24,6 +24,7 @@ import MergePackagesBuilder from "@/components/overlay-widget/package/MergePacka
 import MovePackagesBuilder from "@/components/overlay-widget/package/MovePackagesBuilder.vue";
 import PackageBuilderListView from "@/components/overlay-widget/package/PackageBuilderListView.vue";
 import PackageHistory from "@/components/overlay-widget/package/PackageHistory.vue";
+import CogsTool from "@/components/overlay-widget/package/CogsTool.vue";
 import PackageToolsHelp from "@/components/overlay-widget/package/PackageToolsHelp.vue";
 import SplitPackageBuilder from "@/components/overlay-widget/package/SplitPackageBuilder.vue";
 import TransferBuilder from "@/components/overlay-widget/transfer/TransferBuilder.vue";
@@ -108,6 +109,11 @@ const routes: Array<RouteConfig> = [
     path: "/package/history",
     name: "Package History",
     component: PackageHistory,
+  },
+  {
+    path: "/package/cogs",
+    name: "COGS",
+    component: CogsTool,
   },
   {
     path: "/package/split-package",

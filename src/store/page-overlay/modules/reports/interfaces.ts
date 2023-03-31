@@ -34,6 +34,7 @@ export interface IReportConfig {
   authState: IAuthState;
   [ReportType.COGS]?: {
     packageFilter: IPackageFilter;
+    transferFilter: ITransferFilter;
     fields: IFieldData[];
   };
   [ReportType.PACKAGES]?: {

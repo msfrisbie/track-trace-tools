@@ -1,19 +1,5 @@
-import { MessageType } from "@/consts";
-import {
-  IDestinationData,
-  IIndexedHarvestData,
-  IIndexedPackageData,
-  IIndexedPlantBatchData,
-  IIndexedPlantData,
-  IIndexedRichIncomingTransferData,
-  IIndexedRichOutgoingTransferData,
-  IIndexedTagData,
-  IIndexedTransferData,
-  IPackageData,
-  ISpreadsheet,
-  ITransferData,
-  ITransporterData,
-} from "@/interfaces";
+import { MessageType, SheetTitles } from "@/consts";
+import { ISpreadsheet } from "@/interfaces";
 import { messageBus } from "@/modules/message-bus.module";
 import store from "@/store/page-overlay/index";
 import { ReportsMutations, ReportType } from "@/store/page-overlay/modules/reports/consts";
@@ -23,19 +9,11 @@ import {
   IReportData,
 } from "@/store/page-overlay/modules/reports/interfaces";
 import { todayIsodate } from "./date";
-
-enum SheetTitles {
-  OVERVIEW = "Overview",
-  PACKAGES = "Packages",
-  TAGS = "Tags",
-  HARVESTS = "Harvests",
-  IMMATURE_PLANTS = "Immature Plants",
-  MATURE_PLANTS = "Mature Plants",
-  INCOMING_TRANSFERS = "Incoming Transfers",
-  OUTGOING_TRANSFERS = "Outgoing Transfers",
-  OUTGOING_TRANSFER_MANIFESTS = "Outgoing Transfer Manifest Packages",
-  STRAGGLER_PACKAGES = "Straggler Packages",
-}
+import {
+  extractFlattenedData,
+  getSheetTitle,
+  shouldGenerateReport,
+} from "./reports/reports-shared";
 
 function addRowsRequestFactory({ sheetId, length }: { sheetId: number; length: number }) {
   return {
@@ -198,7 +176,7 @@ async function writeDataSheet<T>({
   await Promise.allSettled(promises);
 }
 
-export async function createExportSpreadsheetOrError({
+export async function createSpreadsheetOrError({
   reportData,
   reportConfig,
 }: {
@@ -210,141 +188,6 @@ export async function createExportSpreadsheetOrError({
   }
 
   const flattenedCache = new Map<ReportType, any[]>();
-
-  function shouldGenerateReport(reportType: ReportType): boolean {
-    return !!reportConfig[reportType] && !!reportData[reportType];
-  }
-
-  function extractNestedData(reportType: ReportType) {
-    switch (reportType) {
-      case ReportType.PACKAGES:
-        return reportData[reportType]?.packages as IIndexedPackageData[];
-      case ReportType.TAGS:
-        return reportData[reportType]?.tags as IIndexedTagData[];
-      case ReportType.HARVESTS:
-        return reportData[reportType]?.harvests as IIndexedHarvestData[];
-      case ReportType.IMMATURE_PLANTS:
-        return reportData[reportType]?.immaturePlants as IIndexedPlantBatchData[];
-      case ReportType.MATURE_PLANTS:
-        return reportData[reportType]?.maturePlants as IIndexedPlantData[];
-      case ReportType.INCOMING_TRANSFERS:
-        return reportData[reportType]?.incomingTransfers as IIndexedRichIncomingTransferData[];
-      case ReportType.OUTGOING_TRANSFERS:
-        return reportData[reportType]?.outgoingTransfers as IIndexedRichOutgoingTransferData[];
-      case ReportType.OUTGOING_TRANSFER_MANIFESTS:
-        return reportData[reportType]?.richOutgoingTransfers as IIndexedRichOutgoingTransferData[];
-      case ReportType.STRAGGLER_PACKAGES:
-        return reportData[reportType]?.stragglerPackages as IIndexedPackageData[];
-      default:
-        throw new Error("Bad reportType " + reportType);
-    }
-  }
-
-  function extractFlattenedData(reportType: ReportType): any[] {
-    if (flattenedCache.has(reportType)) {
-      return flattenedCache.get(reportType) as any[];
-    }
-
-    const value = (() => {
-      switch (reportType) {
-        case ReportType.PACKAGES:
-        case ReportType.STRAGGLER_PACKAGES:
-        case ReportType.MATURE_PLANTS:
-        case ReportType.IMMATURE_PLANTS:
-        case ReportType.HARVESTS:
-        case ReportType.TAGS:
-          return extractNestedData(reportType);
-        case ReportType.INCOMING_TRANSFERS:
-          let flattenedIncomingTransfers: {
-            Transporter: ITransporterData;
-            Transfer: IIndexedTransferData;
-          }[] = [];
-
-          for (const transfer of extractNestedData(
-            reportType
-          ) as IIndexedRichIncomingTransferData[]) {
-            for (const transporter of transfer?.incomingTransporters ?? []) {
-              flattenedIncomingTransfers.push({
-                Transporter: transporter,
-                Transfer: transfer,
-              });
-            }
-          }
-
-          return flattenedIncomingTransfers;
-        case ReportType.OUTGOING_TRANSFERS:
-          let flattenedOutgoingTransfers: {
-            Destination: IDestinationData;
-            Transfer: ITransferData;
-          }[] = [];
-
-          for (const transfer of extractNestedData(
-            reportType
-          ) as IIndexedRichOutgoingTransferData[]) {
-            for (const destination of transfer?.outgoingDestinations ?? []) {
-              flattenedOutgoingTransfers.push({
-                Destination: destination,
-                Transfer: transfer,
-              });
-            }
-          }
-
-          return flattenedOutgoingTransfers;
-        case ReportType.OUTGOING_TRANSFER_MANIFESTS:
-          let flattenedOutgoingPackages: {
-            Package: IPackageData;
-            Destination: IDestinationData;
-            Transfer: ITransferData;
-          }[] = [];
-
-          for (const transfer of extractNestedData(
-            reportType
-          ) as IIndexedRichOutgoingTransferData[]) {
-            for (const destination of transfer?.outgoingDestinations ?? []) {
-              for (const pkg of destination.packages ?? []) {
-                flattenedOutgoingPackages.push({
-                  Package: pkg,
-                  Destination: destination,
-                  Transfer: transfer,
-                });
-              }
-            }
-          }
-          return flattenedOutgoingPackages;
-        default:
-          throw new Error("Bad reportType " + reportType);
-      }
-    })();
-
-    flattenedCache.set(reportType, value);
-
-    return value;
-  }
-
-  function getSheetTitle(reportType: ReportType): SheetTitles {
-    switch (reportType) {
-      case ReportType.PACKAGES:
-        return SheetTitles.PACKAGES;
-      case ReportType.STRAGGLER_PACKAGES:
-        return SheetTitles.STRAGGLER_PACKAGES;
-      case ReportType.HARVESTS:
-        return SheetTitles.HARVESTS;
-      case ReportType.TAGS:
-        return SheetTitles.TAGS;
-      case ReportType.IMMATURE_PLANTS:
-        return SheetTitles.IMMATURE_PLANTS;
-      case ReportType.MATURE_PLANTS:
-        return SheetTitles.MATURE_PLANTS;
-      case ReportType.INCOMING_TRANSFERS:
-        return SheetTitles.INCOMING_TRANSFERS;
-      case ReportType.OUTGOING_TRANSFERS:
-        return SheetTitles.OUTGOING_TRANSFERS;
-      case ReportType.OUTGOING_TRANSFER_MANIFESTS:
-        return SheetTitles.OUTGOING_TRANSFER_MANIFESTS;
-      default:
-        throw new Error("Bad reportType " + reportType);
-    }
-  }
 
   //
   // Check that inputs are well-formed
@@ -360,7 +203,7 @@ export async function createExportSpreadsheetOrError({
     ReportType.INCOMING_TRANSFERS,
     ReportType.OUTGOING_TRANSFERS,
     ReportType.OUTGOING_TRANSFER_MANIFESTS,
-  ].filter(shouldGenerateReport);
+  ].filter((reportType) => shouldGenerateReport({ reportType, reportConfig, reportData }));
 
   //
   // Generate Sheets
@@ -368,7 +211,7 @@ export async function createExportSpreadsheetOrError({
 
   const sheetTitles: SheetTitles[] = [
     SheetTitles.OVERVIEW,
-    ...ELIGIBLE_REPORT_TYPES.map(getSheetTitle),
+    ...ELIGIBLE_REPORT_TYPES.map((reportType) => getSheetTitle({ reportType })),
   ];
 
   const response: {
@@ -410,8 +253,11 @@ export async function createExportSpreadsheetOrError({
   ];
 
   for (const reportType of ELIGIBLE_REPORT_TYPES) {
-    const sheetId: number = sheetTitles.indexOf(getSheetTitle(reportType));
-    const length = Math.max(extractFlattenedData(reportType).length, 1);
+    const sheetId: number = sheetTitles.indexOf(getSheetTitle({ reportType }));
+    const length = Math.max(
+      extractFlattenedData({ flattenedCache, reportType, reportData }).length,
+      1
+    );
 
     formattingRequests = [
       ...formattingRequests,
@@ -442,9 +288,9 @@ export async function createExportSpreadsheetOrError({
 
     await writeDataSheet({
       spreadsheetId: response.data.result.spreadsheetId,
-      spreadsheetTitle: getSheetTitle(reportType),
+      spreadsheetTitle: getSheetTitle({ reportType }),
       fields: reportConfig[reportType]?.fields as IFieldData[],
-      data: extractFlattenedData(reportType) as any[],
+      data: extractFlattenedData({ flattenedCache, reportType, reportData }) as any[],
     });
   }
 
@@ -460,10 +306,10 @@ export async function createExportSpreadsheetOrError({
 
   for (const reportType of ELIGIBLE_REPORT_TYPES) {
     summaryList.push([
-      `=HYPERLINK("#gid=${sheetTitles.indexOf(getSheetTitle(reportType))}","${getSheetTitle(
-        reportType
-      )}")`,
-      `=COUNTA('${getSheetTitle(reportType)}'!A2:A)`,
+      `=HYPERLINK("#gid=${sheetTitles.indexOf(getSheetTitle({ reportType }))}","${getSheetTitle({
+        reportType,
+      })}")`,
+      `=COUNTA('${getSheetTitle({ reportType })}'!A2:A)`,
       // `=COUNTIF('${SheetTitles.PACKAGES}'!C2:C, "ACTIVE")`,
     ]);
   }
@@ -498,7 +344,7 @@ export async function createExportSpreadsheetOrError({
     resizeRequests = [
       ...resizeRequests,
       autoResizeDimensionsRequestFactory({
-        sheetId: sheetTitles.indexOf(getSheetTitle(reportType)),
+        sheetId: sheetTitles.indexOf(getSheetTitle({ reportType })),
       }),
     ];
   }
@@ -527,7 +373,7 @@ export async function createExportSpreadsheetOrError({
     shrinkFontRequests = [
       ...shrinkFontRequests,
       shrinkFontRequestFactory({
-        sheetId: sheetTitles.indexOf(getSheetTitle(reportType)),
+        sheetId: sheetTitles.indexOf(getSheetTitle({ reportType })),
       }),
     ];
   }
@@ -556,49 +402,46 @@ export async function createExportSpreadsheetOrError({
   return response.data.result;
 }
 
-export async function createCogsSpreadsheetOrError({
-  reportData,
-  reportConfig,
-}: {
-  reportData: IReportData;
-  reportConfig: IReportConfig;
-}): Promise<ISpreadsheet> {
-  if (!store.state.pluginAuth?.authState?.license) {
-    throw new Error("Invalid authState");
-  }
+// export async function createCogsSpreadsheetOrError({
+//   reportData,
+//   reportConfig,
+// }: {
+//   reportData: IReportData;
+//   reportConfig: IReportConfig;
+// }): Promise<ISpreadsheet> {
+//   if (!store.state.pluginAuth?.authState?.license) {
+//     throw new Error("Invalid authState");
+//   }
 
-  const response: {
-    data: {
-      success: boolean;
-      result: ISpreadsheet;
-    };
-  } = await messageBus.sendMessageToBackground(
-    MessageType.CREATE_SPREADSHEET,
-    {
-      title: `COGS - ${todayIsodate()}`,
-      sheetTitles: [
-        'Batches',
-        ''
-      ],
-    },
-    undefined,
-    90000
-  );
+//   const response: {
+//     data: {
+//       success: boolean;
+//       result: ISpreadsheet;
+//     };
+//   } = await messageBus.sendMessageToBackground(
+//     MessageType.CREATE_SPREADSHEET,
+//     {
+//       title: `COGS - ${todayIsodate()}`,
+//       sheetTitles: ["Batches", ""],
+//     },
+//     undefined,
+//     90000
+//   );
 
-  if (!response.data.success) {
-    throw new Error("Unable to create COGS sheet");
-  }
+//   if (!response.data.success) {
+//     throw new Error("Unable to create COGS sheet");
+//   }
 
-  // await messageBus.sendMessageToBackground(
-  //   MessageType.WRITE_SPREADSHEET_VALUES,
-  //   {
-  //     spreadsheetId: response.data.result.spreadsheetId,
-  //     range: `'${SheetTitles.OVERVIEW}'`,
-  //     values: [[`Created with Track & Trace Tools @ ${Date().toString()}`]],
-  //   },
-  //   undefined,
-  //   90000
-  // );
+//   // await messageBus.sendMessageToBackground(
+//   //   MessageType.WRITE_SPREADSHEET_VALUES,
+//   //   {
+//   //     spreadsheetId: response.data.result.spreadsheetId,
+//   //     range: `'${SheetTitles.OVERVIEW}'`,
+//   //     values: [[`Created with Track & Trace Tools @ ${Date().toString()}`]],
+//   //   },
+//   //   undefined,
+//   //   90000
+//   // );
 
-  return response.data.result;
-}
+//   return response.data.result;
+// }

@@ -14,8 +14,9 @@ import {
 } from "@/interfaces";
 import { analyticsManager } from "@/modules/analytics-manager.module";
 import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
+import { maybeLoadPackageReportData } from "@/utils/reports/package-report";
 import { getSimpleSpreadsheet } from "@/utils/sheets";
-import { createExportSpreadsheetOrError } from "@/utils/sheets-export";
+import { createSpreadsheetOrError } from "@/utils/sheets-export";
 import { v4 as uuidv4 } from "uuid";
 import { ActionContext } from "vuex";
 import {
@@ -105,7 +106,7 @@ export const reportsModule = {
       ctx.commit(ReportsMutations.SET_STATUS, { status: ReportStatus.INITIAL, statusMessage: "" });
       ctx.commit(ReportsMutations.SET_GENERATED_SPREADSHEET, { spreadsheet: null });
     },
-    [ReportsActions.GENERATE_REPORT_SPREADSHEET]: async (
+    [ReportsActions.GENERATE_SPREADSHEET]: async (
       ctx: ActionContext<IReportsState, IPluginState>,
       { reportConfig }: { reportConfig: IReportConfig }
     ) => {
@@ -116,81 +117,8 @@ export const reportsModule = {
       try {
         let reportData: IReportData = {};
 
-        analyticsManager.track(MessageType.GENERATED_SPREADSHEET_SUCCESS);
-      } catch (e) {
-        ctx.commit(ReportsMutations.SET_STATUS, {
-          status: ReportStatus.ERROR,
-          // @ts-ignore
-          statusMessage: e.toString(),
-        });
+        await maybeLoadPackageReportData({ctx, reportData, reportConfig});
 
-        // @ts-ignore
-        analyticsManager.track(MessageType.GENERATED_SPREADSHEET_ERROR, { error: e.toString() });
-      }
-    },
-    [ReportsActions.GENERATE_REPORT_SPREADSHEET]: async (
-      ctx: ActionContext<IReportsState, IPluginState>,
-      { reportConfig }: { reportConfig: IReportConfig }
-    ) => {
-      analyticsManager.track(MessageType.GENERATED_SPREADSHEET, reportConfig);
-
-      ctx.commit(ReportsMutations.SET_STATUS, { status: ReportStatus.INFLIGHT });
-
-      try {
-        let reportData: IReportData = {};
-
-        const packageConfig = reportConfig[ReportType.PACKAGES];
-        if (packageConfig?.packageFilter) {
-          ctx.commit(ReportsMutations.SET_STATUS, { statusMessage: "Loading packages..." });
-
-          let packages: IIndexedPackageData[] = [];
-
-          if (packageConfig.packageFilter.includeActive) {
-            try {
-              packages = [...packages, ...(await primaryDataLoader.activePackages())];
-            } catch (e) {
-              ctx.commit(ReportsMutations.SET_STATUS, {
-                statusMessage: "Failed to load active packages.",
-              });
-            }
-          }
-
-          if (packageConfig.packageFilter.includeInactive) {
-            try {
-              packages = [...packages, ...(await primaryDataLoader.inactivePackages())];
-            } catch (e) {
-              ctx.commit(ReportsMutations.SET_STATUS, {
-                statusMessage: "Failed to load inactive packages.",
-              });
-            }
-          }
-
-          packages = packages.filter((pkg) => {
-            if (packageConfig.packageFilter.packagedDateLt) {
-              if (pkg.PackagedDate > packageConfig.packageFilter.packagedDateLt) {
-                return false;
-              }
-            }
-
-            if (packageConfig.packageFilter.packagedDateEq) {
-              if (!pkg.PackagedDate.startsWith(packageConfig.packageFilter.packagedDateEq)) {
-                return false;
-              }
-            }
-
-            if (packageConfig.packageFilter.packagedDateGt) {
-              if (pkg.PackagedDate < packageConfig.packageFilter.packagedDateGt) {
-                return false;
-              }
-            }
-
-            return true;
-          });
-
-          reportData[ReportType.PACKAGES] = {
-            packages,
-          };
-        }
 
         const stragglerPackageConfig = reportConfig[ReportType.STRAGGLER_PACKAGES];
         if (stragglerPackageConfig?.stragglerPackageFilter) {
@@ -691,13 +619,130 @@ export const reportsModule = {
           };
         }
 
+        const cogsConfig = reportConfig[ReportType.COGS];
+        if (cogsConfig?.packageFilter && cogsConfig?.transferFilter) {
+          if (!cogsConfig.transferFilter.estimatedDepartureDateGt) {
+            throw new Error("Must provide estimatedDepartureDateGt");
+          }
+          const estimatedDepartureDateGt = cogsConfig.transferFilter
+            .estimatedDepartureDateGt as string;
+
+          if (!cogsConfig.transferFilter.estimatedDepartureDateLt) {
+            throw new Error("Must provide estimatedDepartureDateLt");
+          }
+          const estimatedDepartureDateLt = cogsConfig.transferFilter
+            .estimatedDepartureDateLt as string;
+
+          ctx.commit(ReportsMutations.SET_STATUS, { statusMessage: "Loading packages..." });
+
+          let packages: IIndexedPackageData[] = [];
+
+          try {
+            packages = [...packages, ...(await primaryDataLoader.activePackages())];
+          } catch (e) {
+            ctx.commit(ReportsMutations.SET_STATUS, {
+              statusMessage: "Failed to load active packages.",
+            });
+          }
+
+          try {
+            packages = [...packages, ...(await primaryDataLoader.inactivePackages())];
+          } catch (e) {
+            ctx.commit(ReportsMutations.SET_STATUS, {
+              statusMessage: "Failed to load inactive packages.",
+            });
+          }
+
+          packages = packages.filter((pkg) => {
+            // if (packageFilter.packagedDateLt) {
+            //   if (pkg.PackagedDate > packageFilter.packagedDateLt) {
+            //     return false;
+            //   }
+            // }
+
+            // if (packageFilter.packagedDateEq) {
+            //   if (!pkg.PackagedDate.startsWith(packageFilter.packagedDateEq)) {
+            //     return false;
+            //   }
+            // }
+
+            // if (packageFilter.packagedDateGt) {
+            //   if (pkg.PackagedDate < packageFilter.packagedDateGt) {
+            //     return false;
+            //   }
+            // }
+
+            return true;
+          });
+
+          ctx.commit(ReportsMutations.SET_STATUS, {
+            statusMessage: "Loading transfer manifest packages...",
+          });
+
+          let richOutgoingTransfers: IIndexedRichOutgoingTransferData[] = [];
+
+          richOutgoingTransfers = [
+            ...(await primaryDataLoader.outgoingTransfers()),
+            ...richOutgoingTransfers,
+          ];
+
+          richOutgoingTransfers = [
+            ...(await primaryDataLoader.outgoingInactiveTransfers()),
+            ...richOutgoingTransfers,
+          ];
+
+          richOutgoingTransfers = richOutgoingTransfers.filter((transfer) => {
+            if (transfer.CreatedDateTime > estimatedDepartureDateLt) {
+              return false;
+            }
+
+            if (transfer.LastModified < estimatedDepartureDateGt) {
+              return false;
+            }
+
+            return true;
+          });
+
+          for (const transfer of richOutgoingTransfers) {
+            const destinations: IRichDestinationData[] = (
+              await primaryDataLoader.transferDestinations(transfer.Id)
+            ).map((x) => ({ ...x, packages: [] }));
+
+            for (const destination of destinations) {
+              destination.packages = await primaryDataLoader.destinationPackages(destination.Id);
+            }
+            transfer.outgoingDestinations = destinations;
+
+            transfer.outgoingDestinations = destinations.filter((destination) => {
+              if (!destination.ShipmentTypeName.includes("Wholesale")) {
+                return false;
+              }
+
+              if (destination.EstimatedDepartureDateTime > estimatedDepartureDateLt) {
+                return false;
+              }
+
+              if (destination.EstimatedDepartureDateTime < estimatedDepartureDateGt) {
+                return false;
+              }
+
+              return true;
+            });
+          }
+
+          reportData[ReportType.COGS] = {
+            packages,
+            richOutgoingTransfers,
+          };
+        }
+
         ctx.commit(ReportsMutations.SET_STATUS, {
           statusMessage: "Generating spreadsheet...",
         });
 
         console.log({ reportData, reportConfig });
 
-        const spreadsheet: ISpreadsheet = await createExportSpreadsheetOrError({
+        const spreadsheet: ISpreadsheet = await createSpreadsheetOrError({
           reportData,
           reportConfig,
         });

@@ -113,12 +113,12 @@
                   </b-form-checkbox>
 
                   <div class="flex flex-col items-start gap-1">
-                    <b-form-checkbox v-model="packagesFormFilters.filterPackagedDateGt">
+                    <b-form-checkbox v-model="packagesFormFilters.shouldFilterPackagedDateGt">
                       <span class="leading-6">Packaged on or after:</span>
                     </b-form-checkbox>
                     <b-form-datepicker
-                      v-if="packagesFormFilters.filterPackagedDateGt"
-                      :disabled="!packagesFormFilters.filterPackagedDateGt"
+                      v-if="packagesFormFilters.shouldFilterPackagedDateGt"
+                      :disabled="!packagesFormFilters.shouldFilterPackagedDateGt"
                       initial-date
                       size="sm"
                       v-model="packagesFormFilters.packagedDateGt"
@@ -126,12 +126,12 @@
                   </div>
 
                   <div class="flex flex-col items-start gap-1">
-                    <b-form-checkbox v-model="packagesFormFilters.filterPackagedDateLt">
+                    <b-form-checkbox v-model="packagesFormFilters.shouldFilterPackagedDateLt">
                       <span class="leading-6">Packaged on or before:</span>
                     </b-form-checkbox>
                     <b-form-datepicker
-                      v-if="packagesFormFilters.filterPackagedDateLt"
-                      :disabled="!packagesFormFilters.filterPackagedDateLt"
+                      v-if="packagesFormFilters.shouldFilterPackagedDateLt"
+                      :disabled="!packagesFormFilters.shouldFilterPackagedDateLt"
                       initial-date
                       size="sm"
                       v-model="packagesFormFilters.packagedDateLt"
@@ -205,12 +205,12 @@
                   </b-form-checkbox>
 
                   <div class="flex flex-col items-start gap-1">
-                    <b-form-checkbox v-model="harvestsFormFilters.filterHarvestDateGt">
+                    <b-form-checkbox v-model="harvestsFormFilters.shouldFilterHarvestDateGt">
                       <span class="leading-6">Harvested on or after:</span>
                     </b-form-checkbox>
                     <b-form-datepicker
-                      v-if="harvestsFormFilters.filterHarvestDateGt"
-                      :disabled="!harvestsFormFilters.filterHarvestDateGt"
+                      v-if="harvestsFormFilters.shouldFilterHarvestDateGt"
+                      :disabled="!harvestsFormFilters.shouldFilterHarvestDateGt"
                       initial-date
                       size="sm"
                       v-model="harvestsFormFilters.harvestDateGt"
@@ -218,12 +218,12 @@
                   </div>
 
                   <div class="flex flex-col items-start gap-1">
-                    <b-form-checkbox v-model="harvestsFormFilters.filterHarvestDateLt">
+                    <b-form-checkbox v-model="harvestsFormFilters.shouldFilterHarvestDateLt">
                       <span class="leading-6">Harvested on or before:</span>
                     </b-form-checkbox>
                     <b-form-datepicker
-                      v-if="harvestsFormFilters.filterHarvestDateLt"
-                      :disabled="!harvestsFormFilters.filterHarvestDateLt"
+                      v-if="harvestsFormFilters.shouldFilterHarvestDateLt"
+                      :disabled="!harvestsFormFilters.shouldFilterHarvestDateLt"
                       initial-date
                       size="sm"
                       v-model="harvestsFormFilters.harvestDateLt"
@@ -299,12 +299,12 @@
                   </b-form-checkbox>
 
                   <div class="flex flex-col items-start gap-1">
-                    <b-form-checkbox v-model="maturePlantsFormFilters.filterPlantedDateGt">
+                    <b-form-checkbox v-model="maturePlantsFormFilters.shouldFilterPlantedDateGt">
                       <span class="leading-6">Planted on or after:</span>
                     </b-form-checkbox>
                     <b-form-datepicker
-                      v-if="maturePlantsFormFilters.filterPlantedDateGt"
-                      :disabled="!maturePlantsFormFilters.filterPlantedDateGt"
+                      v-if="maturePlantsFormFilters.shouldFilterPlantedDateGt"
+                      :disabled="!maturePlantsFormFilters.shouldFilterPlantedDateGt"
                       initial-date
                       size="sm"
                       v-model="maturePlantsFormFilters.plantedDateGt"
@@ -312,12 +312,12 @@
                   </div>
 
                   <div class="flex flex-col items-start gap-1">
-                    <b-form-checkbox v-model="maturePlantsFormFilters.filterPlantedDateLt">
+                    <b-form-checkbox v-model="maturePlantsFormFilters.shouldFilterPlantedDateLt">
                       <span class="leading-6">Planted on or before:</span>
                     </b-form-checkbox>
                     <b-form-datepicker
-                      v-if="maturePlantsFormFilters.filterPlantedDateLt"
-                      :disabled="!maturePlantsFormFilters.filterPlantedDateLt"
+                      v-if="maturePlantsFormFilters.shouldFilterPlantedDateLt"
+                      :disabled="!maturePlantsFormFilters.shouldFilterPlantedDateLt"
                       initial-date
                       size="sm"
                       v-model="maturePlantsFormFilters.plantedDateLt"
@@ -390,12 +390,12 @@
                   </b-form-checkbox>
 
                   <div class="flex flex-col items-start gap-1">
-                    <b-form-checkbox v-model="immaturePlantsFormFilters.filterPlantedDateGt">
+                    <b-form-checkbox v-model="immaturePlantsFormFilters.shouldFilterPlantedDateGt">
                       <span class="leading-6">Planted on or after:</span>
                     </b-form-checkbox>
                     <b-form-datepicker
-                      v-if="immaturePlantsFormFilters.filterPlantedDateGt"
-                      :disabled="!immaturePlantsFormFilters.filterPlantedDateGt"
+                      v-if="immaturePlantsFormFilters.shouldFilterPlantedDateGt"
+                      :disabled="!immaturePlantsFormFilters.shouldFilterPlantedDateGt"
                       initial-date
                       size="sm"
                       v-model="immaturePlantsFormFilters.plantedDateGt"
@@ -403,12 +403,12 @@
                   </div>
 
                   <div class="flex flex-col items-start gap-1">
-                    <b-form-checkbox v-model="immaturePlantsFormFilters.filterPlantedDateLt">
+                    <b-form-checkbox v-model="immaturePlantsFormFilters.shouldFilterPlantedDateLt">
                       <span class="leading-6">Planted on or before:</span>
                     </b-form-checkbox>
                     <b-form-datepicker
-                      v-if="immaturePlantsFormFilters.filterPlantedDateLt"
-                      :disabled="!immaturePlantsFormFilters.filterPlantedDateLt"
+                      v-if="immaturePlantsFormFilters.shouldFilterPlantedDateLt"
+                      :disabled="!immaturePlantsFormFilters.shouldFilterPlantedDateLt"
                       initial-date
                       size="sm"
                       v-model="immaturePlantsFormFilters.plantedDateLt"
@@ -497,13 +497,13 @@
 
                   <div class="flex flex-col items-start gap-1">
                     <b-form-checkbox
-                      v-model="outgoingTransfersFormFilters.filterEstimatedDepartureDateGt"
+                      v-model="outgoingTransfersFormFilters.shouldFilterEstimatedDepartureDateGt"
                     >
                       <span class="leading-6">ETD on or after:</span>
                     </b-form-checkbox>
                     <b-form-datepicker
-                      v-if="outgoingTransfersFormFilters.filterEstimatedDepartureDateGt"
-                      :disabled="!outgoingTransfersFormFilters.filterEstimatedDepartureDateGt"
+                      v-if="outgoingTransfersFormFilters.shouldFilterEstimatedDepartureDateGt"
+                      :disabled="!outgoingTransfersFormFilters.shouldFilterEstimatedDepartureDateGt"
                       initial-date
                       size="sm"
                       v-model="outgoingTransfersFormFilters.estimatedDepartureDateGt"
@@ -512,13 +512,13 @@
 
                   <div class="flex flex-col items-start gap-1">
                     <b-form-checkbox
-                      v-model="outgoingTransfersFormFilters.filterEstimatedDepartureDateLt"
+                      v-model="outgoingTransfersFormFilters.shouldFilterEstimatedDepartureDateLt"
                     >
                       <span class="leading-6">ETD on or before:</span>
                     </b-form-checkbox>
                     <b-form-datepicker
-                      v-if="outgoingTransfersFormFilters.filterEstimatedDepartureDateLt"
-                      :disabled="!outgoingTransfersFormFilters.filterEstimatedDepartureDateLt"
+                      v-if="outgoingTransfersFormFilters.shouldFilterEstimatedDepartureDateLt"
+                      :disabled="!outgoingTransfersFormFilters.shouldFilterEstimatedDepartureDateLt"
                       initial-date
                       size="sm"
                       v-model="outgoingTransfersFormFilters.estimatedDepartureDateLt"
@@ -595,13 +595,13 @@
 
                   <div class="flex flex-col items-start gap-1">
                     <b-form-checkbox
-                      v-model="incomingTransfersFormFilters.filterEstimatedArrivalDateGt"
+                      v-model="incomingTransfersFormFilters.shouldFilterEstimatedArrivalDateGt"
                     >
                       <span class="leading-6">ETA on or after:</span>
                     </b-form-checkbox>
                     <b-form-datepicker
-                      v-if="incomingTransfersFormFilters.filterEstimatedArrivalDateGt"
-                      :disabled="!incomingTransfersFormFilters.filterEstimatedArrivalDateGt"
+                      v-if="incomingTransfersFormFilters.shouldFilterEstimatedArrivalDateGt"
+                      :disabled="!incomingTransfersFormFilters.shouldFilterEstimatedArrivalDateGt"
                       initial-date
                       size="sm"
                       v-model="incomingTransfersFormFilters.estimatedArrivalDateGt"
@@ -610,13 +610,13 @@
 
                   <div class="flex flex-col items-start gap-1">
                     <b-form-checkbox
-                      v-model="incomingTransfersFormFilters.filterEstimatedArrivalDateLt"
+                      v-model="incomingTransfersFormFilters.shouldFilterEstimatedArrivalDateLt"
                     >
                       <span class="leading-6">ETA on or before:</span>
                     </b-form-checkbox>
                     <b-form-datepicker
-                      v-if="incomingTransfersFormFilters.filterEstimatedArrivalDateLt"
-                      :disabled="!incomingTransfersFormFilters.filterEstimatedArrivalDateLt"
+                      v-if="incomingTransfersFormFilters.shouldFilterEstimatedArrivalDateLt"
+                      :disabled="!incomingTransfersFormFilters.shouldFilterEstimatedArrivalDateLt"
                       initial-date
                       size="sm"
                       v-model="incomingTransfersFormFilters.estimatedArrivalDateLt"
@@ -773,14 +773,18 @@
 
                   <div class="flex flex-col items-start gap-1">
                     <b-form-checkbox
-                      v-model="outgoingTransferManifestsFormFilters.filterEstimatedDepartureDateGt"
+                      v-model="
+                        outgoingTransferManifestsFormFilters.shouldFilterEstimatedDepartureDateGt
+                      "
                     >
                       <span class="leading-6">ETD on or after:</span>
                     </b-form-checkbox>
                     <b-form-datepicker
-                      v-if="outgoingTransferManifestsFormFilters.filterEstimatedDepartureDateGt"
+                      v-if="
+                        outgoingTransferManifestsFormFilters.shouldFilterEstimatedDepartureDateGt
+                      "
                       :disabled="
-                        !outgoingTransferManifestsFormFilters.filterEstimatedDepartureDateGt
+                        !outgoingTransferManifestsFormFilters.shouldFilterEstimatedDepartureDateGt
                       "
                       initial-date
                       size="sm"
@@ -790,14 +794,18 @@
 
                   <div class="flex flex-col items-start gap-1">
                     <b-form-checkbox
-                      v-model="outgoingTransferManifestsFormFilters.filterEstimatedDepartureDateLt"
+                      v-model="
+                        outgoingTransferManifestsFormFilters.shouldFilterEstimatedDepartureDateLt
+                      "
                     >
                       <span class="leading-6">ETD on or before:</span>
                     </b-form-checkbox>
                     <b-form-datepicker
-                      v-if="outgoingTransferManifestsFormFilters.filterEstimatedDepartureDateLt"
+                      v-if="
+                        outgoingTransferManifestsFormFilters.shouldFilterEstimatedDepartureDateLt
+                      "
                       :disabled="
-                        !outgoingTransferManifestsFormFilters.filterEstimatedDepartureDateLt
+                        !outgoingTransferManifestsFormFilters.shouldFilterEstimatedDepartureDateLt
                       "
                       initial-date
                       size="sm"
@@ -881,13 +889,13 @@
 
                   <div class="flex flex-col items-start gap-1">
                     <b-form-checkbox
-                      v-model="stragglerPackagesFormFilters.filterLastModifiedDateGt"
+                      v-model="stragglerPackagesFormFilters.shouldFilterLastModifiedDateGt"
                     >
                       <span class="leading-6">Last modified on or after:</span>
                     </b-form-checkbox>
                     <b-form-datepicker
-                      v-if="stragglerPackagesFormFilters.filterLastModifiedDateGt"
-                      :disabled="!stragglerPackagesFormFilters.filterLastModifiedDateGt"
+                      v-if="stragglerPackagesFormFilters.shouldFilterLastModifiedDateGt"
+                      :disabled="!stragglerPackagesFormFilters.shouldFilterLastModifiedDateGt"
                       initial-date
                       size="sm"
                       v-model="stragglerPackagesFormFilters.lastModifiedDateGt"
@@ -896,13 +904,13 @@
 
                   <div class="flex flex-col items-start gap-1">
                     <b-form-checkbox
-                      v-model="stragglerPackagesFormFilters.filterLastModifiedDateLt"
+                      v-model="stragglerPackagesFormFilters.shouldFilterLastModifiedDateLt"
                     >
                       <span class="leading-6">Last modified on or before:</span>
                     </b-form-checkbox>
                     <b-form-datepicker
-                      v-if="stragglerPackagesFormFilters.filterLastModifiedDateLt"
-                      :disabled="!stragglerPackagesFormFilters.filterLastModifiedDateLt"
+                      v-if="stragglerPackagesFormFilters.shouldFilterLastModifiedDateLt"
+                      :disabled="!stragglerPackagesFormFilters.shouldFilterLastModifiedDateLt"
                       initial-date
                       size="sm"
                       v-model="stragglerPackagesFormFilters.lastModifiedDateLt"
@@ -910,12 +918,14 @@
                   </div>
 
                   <div class="flex flex-col items-start gap-1">
-                    <b-form-checkbox v-model="stragglerPackagesFormFilters.filterPackagedDateGt">
+                    <b-form-checkbox
+                      v-model="stragglerPackagesFormFilters.shouldFilterPackagedDateGt"
+                    >
                       <span class="leading-6">Packaged on or after:</span>
                     </b-form-checkbox>
                     <b-form-datepicker
-                      v-if="stragglerPackagesFormFilters.filterPackagedDateGt"
-                      :disabled="!stragglerPackagesFormFilters.filterPackagedDateGt"
+                      v-if="stragglerPackagesFormFilters.shouldFilterPackagedDateGt"
+                      :disabled="!stragglerPackagesFormFilters.shouldFilterPackagedDateGt"
                       initial-date
                       size="sm"
                       v-model="stragglerPackagesFormFilters.packagedDateGt"
@@ -923,12 +933,14 @@
                   </div>
 
                   <div class="flex flex-col items-start gap-1">
-                    <b-form-checkbox v-model="stragglerPackagesFormFilters.filterPackagedDateLt">
+                    <b-form-checkbox
+                      v-model="stragglerPackagesFormFilters.shouldFilterPackagedDateLt"
+                    >
                       <span class="leading-6">Packaged on or before:</span>
                     </b-form-checkbox>
                     <b-form-datepicker
-                      v-if="stragglerPackagesFormFilters.filterPackagedDateLt"
-                      :disabled="!stragglerPackagesFormFilters.filterPackagedDateLt"
+                      v-if="stragglerPackagesFormFilters.shouldFilterPackagedDateLt"
+                      :disabled="!stragglerPackagesFormFilters.shouldFilterPackagedDateLt"
                       initial-date
                       size="sm"
                       v-model="stragglerPackagesFormFilters.packagedDateLt"
@@ -1125,6 +1137,7 @@ import {
 } from "@/store/page-overlay/modules/reports/consts";
 import { IReportConfig } from "@/store/page-overlay/modules/reports/interfaces";
 import { todayIsodate } from "@/utils/date";
+import { addPackageReport, packageFormFiltersFactory } from "@/utils/reports/package-report";
 import _ from "lodash";
 import Vue from "vue";
 import { mapActions, mapState } from "vuex";
@@ -1145,8 +1158,20 @@ export default Vue.extend({
       reportStatusMessage: (state: any) => state.reports.statusMessage,
       reportStatusMessageHistory: (state: any) => state.reports.statusMessageHistory,
     }),
-    eligibleReportOptions() {
-      const enabledOptions = REPORT_OPTIONS.filter((x) => x.enabled);
+    eligibleReportOptions(): {
+      text: string;
+      value: ReportType;
+      premium: boolean;
+      enabled: boolean;
+      description: string;
+    }[] {
+      const enabledOptions = REPORT_OPTIONS.filter((x) => x.enabled && x.value !== null) as {
+        text: string;
+        value: ReportType;
+        premium: boolean;
+        enabled: boolean;
+        description: string;
+      }[];
 
       if (clientBuildManager.assertValues(["ENABLE_T3PLUS"])) {
         return enabledOptions;
@@ -1164,27 +1189,20 @@ export default Vue.extend({
       ReportStatus,
       ReportType,
       SHEET_FIELDS,
-      selectedReports: [],
+      selectedReports: [] as ReportType[],
       reportOptions: REPORT_OPTIONS,
-      packagesFormFilters: {
-        packagedDateGt: todayIsodate(),
-        packagedDateLt: todayIsodate(),
-        filterPackagedDateGt: false,
-        filterPackagedDateLt: false,
-        includeActive: true,
-        includeInactive: false,
-      },
+      packagesFormFilters: packageFormFiltersFactory(),
       stragglerPackagesFormFilters: {
         packagedDateGt: todayIsodate(),
         packagedDateLt: todayIsodate(),
-        filterPackagedDateGt: false,
-        filterPackagedDateLt: false,
+        shouldFilterPackagedDateGt: false,
+        shouldFilterPackagedDateLt: false,
         includeNearlyEmpty: false,
         quantityLt: 5,
         lastModifiedDateGt: todayIsodate(),
         lastModifiedDateLt: todayIsodate(),
-        filterLastModifiedDateGt: false,
-        filterLastModifiedDateLt: false,
+        shouldFilterLastModifiedDateGt: false,
+        shouldFilterLastModifiedDateLt: false,
       },
       maturePlantsFormFilters: {
         plantedDateGt: todayIsodate(),
@@ -1192,30 +1210,30 @@ export default Vue.extend({
         includeVegetative: true,
         includeFlowering: true,
         includeInactive: false,
-        filterPlantedDateGt: false,
-        filterPlantedDateLt: false,
+        shouldFilterPlantedDateGt: false,
+        shouldFilterPlantedDateLt: false,
       },
       immaturePlantsFormFilters: {
         plantedDateGt: todayIsodate(),
         plantedDateLt: todayIsodate(),
-        filterPlantedDateGt: false,
-        filterPlantedDateLt: false,
+        shouldFilterPlantedDateGt: false,
+        shouldFilterPlantedDateLt: false,
         includeActive: true,
         includeInactive: false,
       },
       harvestsFormFilters: {
         harvestDateGt: todayIsodate(),
         harvestDateLt: todayIsodate(),
-        filterHarvestDateGt: false,
-        filterHarvestDateLt: false,
+        shouldFilterHarvestDateGt: false,
+        shouldFilterHarvestDateLt: false,
         includeActive: true,
         includeInactive: false,
       },
       incomingTransfersFormFilters: {
         estimatedArrivalDateLt: todayIsodate(),
         estimatedArrivalDateGt: todayIsodate(),
-        filterEstimatedArrivalDateLt: false,
-        filterEstimatedArrivalDateGt: false,
+        shouldFilterEstimatedArrivalDateLt: false,
+        shouldFilterEstimatedArrivalDateGt: false,
         onlyWholesale: false,
         includeIncoming: true,
         includeIncomingInactive: false,
@@ -1223,8 +1241,8 @@ export default Vue.extend({
       outgoingTransfersFormFilters: {
         estimatedDepartureDateLt: todayIsodate(),
         estimatedDepartureDateGt: todayIsodate(),
-        filterEstimatedDepartureDateLt: false,
-        filterEstimatedDepartureDateGt: false,
+        shouldFilterEstimatedDepartureDateLt: false,
+        shouldFilterEstimatedDepartureDateGt: false,
         onlyWholesale: false,
         includeOutgoing: true,
         includeRejected: true,
@@ -1233,8 +1251,8 @@ export default Vue.extend({
       outgoingTransferManifestsFormFilters: {
         estimatedDepartureDateLt: todayIsodate(),
         estimatedDepartureDateGt: todayIsodate(),
-        filterEstimatedDepartureDateLt: false,
-        filterEstimatedDepartureDateGt: false,
+        shouldFilterEstimatedDepartureDateLt: false,
+        shouldFilterEstimatedDepartureDateGt: false,
         onlyWholesale: false,
         includeOutgoing: true,
         includeRejected: true,
@@ -1268,25 +1286,23 @@ export default Vue.extend({
   methods: {
     ...mapActions({
       refreshOAuthState: `pluginAuth/${PluginAuthActions.REFRESH_OAUTH_STATE}`,
-      generateReportSpreadsheet: `reports/${ReportsActions.GENERATE_REPORT_SPREADSHEET}`,
+      generateReportSpreadsheet: `reports/${ReportsActions.GENERATE_SPREADSHEET}`,
       reset: `reports/${ReportsActions.RESET}`,
     }),
     toggleFilters(reportType: ReportType) {
-      this.$data.showFilters[reportType] = !this.$data.showFilters[reportType];
+      this.showFilters[reportType] = !this.showFilters[reportType];
     },
     toggleFields(reportType: ReportType) {
-      this.$data.showFields[reportType] = !this.$data.showFields[reportType];
+      this.showFields[reportType] = !this.showFields[reportType];
     },
     checkAll(reportType: ReportType) {
-      this.$data.fields[reportType] = _.cloneDeep(SHEET_FIELDS[reportType]);
+      this.fields[reportType] = _.cloneDeep(SHEET_FIELDS[reportType]);
     },
     uncheckAll(reportType: ReportType) {
-      this.$data.fields[reportType] = _.cloneDeep(SHEET_FIELDS[reportType]).filter(
-        (x) => x.required
-      );
+      this.fields[reportType] = _.cloneDeep(SHEET_FIELDS[reportType]).filter((x) => x.required);
     },
     snapshotEverything() {
-      this.$data.selectedReports = this.eligibleReportOptions.map((x) => x.value);
+      this.selectedReports = this.eligibleReportOptions.map((x) => x.value);
     },
     async openOAuthPage() {
       messageBus.sendMessageToBackground(MessageType.OPEN_OPTIONS_PAGE, {
@@ -1298,30 +1314,16 @@ export default Vue.extend({
         authState: await authManager.authStateOrError(),
       };
 
-      if (this.$data.selectedReports.includes(ReportType.PACKAGES)) {
-        const packagesFormFilters = this.$data.packagesFormFilters;
-        const packageFilter: IPackageFilter = {};
-
-        packageFilter.includeActive = packagesFormFilters.includeActive;
-        packageFilter.includeIntransit = packagesFormFilters.includeIntransit;
-        packageFilter.includeInactive = packagesFormFilters.includeInactive;
-
-        packageFilter.packagedDateGt = packagesFormFilters.filterPackagedDateGt
-          ? packagesFormFilters.packagedDateGt
-          : null;
-
-        packageFilter.packagedDateLt = packagesFormFilters.filterPackagedDateLt
-          ? packagesFormFilters.packagedDateLt
-          : null;
-
-        reportConfig[ReportType.PACKAGES] = {
-          packageFilter,
-          fields: this.$data.fields[ReportType.PACKAGES],
-        };
+      if (this.selectedReports.includes(ReportType.PACKAGES)) {
+        addPackageReport({
+          reportConfig,
+          packagesFormFilters: this.packagesFormFilters,
+          fields: this.fields[ReportType.PACKAGES],
+        });
       }
 
-      if (this.$data.selectedReports.includes(ReportType.STRAGGLER_PACKAGES)) {
-        const stragglerPackagesFormFilters = this.$data.stragglerPackagesFormFilters;
+      if (this.selectedReports.includes(ReportType.STRAGGLER_PACKAGES)) {
+        const stragglerPackagesFormFilters = this.stragglerPackagesFormFilters;
         const stragglerPackageFilter: IPackageFilter = {};
 
         stragglerPackageFilter.includeActive = true;
@@ -1330,55 +1332,57 @@ export default Vue.extend({
           ? stragglerPackagesFormFilters.quantityLt
           : null;
 
-        stragglerPackageFilter.packagedDateGt = stragglerPackagesFormFilters.filterPackagedDateGt
-          ? stragglerPackagesFormFilters.packagedDateGt
-          : null;
+        stragglerPackageFilter.packagedDateGt =
+          stragglerPackagesFormFilters.shouldFilterPackagedDateGt
+            ? stragglerPackagesFormFilters.packagedDateGt
+            : null;
 
-        stragglerPackageFilter.packagedDateLt = stragglerPackagesFormFilters.filterPackagedDateLt
-          ? stragglerPackagesFormFilters.packagedDateLt
-          : null;
+        stragglerPackageFilter.packagedDateLt =
+          stragglerPackagesFormFilters.shouldFilterPackagedDateLt
+            ? stragglerPackagesFormFilters.packagedDateLt
+            : null;
 
         stragglerPackageFilter.lastModifiedDateGt =
-          stragglerPackagesFormFilters.filterLastModifiedDateGt
+          stragglerPackagesFormFilters.shouldFilterLastModifiedDateGt
             ? stragglerPackagesFormFilters.lastModifiedDateGt
             : null;
 
         stragglerPackageFilter.lastModifiedDateLt =
-          stragglerPackagesFormFilters.filterLastModifiedDateLt
+          stragglerPackagesFormFilters.shouldFilterLastModifiedDateLt
             ? stragglerPackagesFormFilters.lastModifiedDateLt
             : null;
 
         reportConfig[ReportType.STRAGGLER_PACKAGES] = {
           stragglerPackageFilter,
-          fields: this.$data.fields[ReportType.STRAGGLER_PACKAGES],
+          fields: this.fields[ReportType.STRAGGLER_PACKAGES],
         };
       }
 
-      if (this.$data.selectedReports.includes(ReportType.MATURE_PLANTS)) {
+      if (this.selectedReports.includes(ReportType.MATURE_PLANTS)) {
         const plantFilter: IPlantFilter = {};
-        const maturePlantsFormFilters = this.$data.maturePlantsFormFilters;
+        const maturePlantsFormFilters = this.maturePlantsFormFilters;
 
         plantFilter.includeVegetative = maturePlantsFormFilters.includeVegetative;
         plantFilter.includeFlowering = maturePlantsFormFilters.includeFlowering;
         plantFilter.includeInactive = maturePlantsFormFilters.includeInactive;
 
-        plantFilter.plantedDateGt = maturePlantsFormFilters.filterPlantedDateGt
+        plantFilter.plantedDateGt = maturePlantsFormFilters.shouldFilterPlantedDateGt
           ? maturePlantsFormFilters.plantedDateGt
           : null;
 
-        plantFilter.plantedDateLt = maturePlantsFormFilters.filterPackagedDateLt
+        plantFilter.plantedDateLt = maturePlantsFormFilters.shouldFilterPlantedDateLt
           ? maturePlantsFormFilters.plantedDateLt
           : null;
 
         reportConfig[ReportType.MATURE_PLANTS] = {
           plantFilter,
-          fields: this.$data.fields[ReportType.MATURE_PLANTS],
+          fields: this.fields[ReportType.MATURE_PLANTS],
         };
       }
 
-      if (this.$data.selectedReports.includes(ReportType.INCOMING_TRANSFERS)) {
+      if (this.selectedReports.includes(ReportType.INCOMING_TRANSFERS)) {
         const transferFilter: ITransferFilter = {};
-        const incomingTransfersFormFilters = this.$data.incomingTransfersFormFilters;
+        const incomingTransfersFormFilters = this.incomingTransfersFormFilters;
 
         transferFilter.onlyWholesale = incomingTransfersFormFilters.onlyWholesale;
         transferFilter.includeIncoming = incomingTransfersFormFilters.includeIncoming;
@@ -1386,24 +1390,24 @@ export default Vue.extend({
           incomingTransfersFormFilters.includeIncomingInactive;
 
         transferFilter.estimatedArrivalDateGt =
-          incomingTransfersFormFilters.filterEstimatedArrivalDateGt
+          incomingTransfersFormFilters.shouldFilterEstimatedArrivalDateGt
             ? incomingTransfersFormFilters.estimatedArrivalDateGt
             : null;
 
         transferFilter.estimatedArrivalDateLt =
-          incomingTransfersFormFilters.filterEstimatedArrivalDateLt
+          incomingTransfersFormFilters.shouldFilterEstimatedArrivalDateLt
             ? incomingTransfersFormFilters.estimatedArrivalDateLt
             : null;
 
         reportConfig[ReportType.INCOMING_TRANSFERS] = {
           transferFilter,
-          fields: this.$data.fields[ReportType.INCOMING_TRANSFERS],
+          fields: this.fields[ReportType.INCOMING_TRANSFERS],
         };
       }
 
-      if (this.$data.selectedReports.includes(ReportType.OUTGOING_TRANSFERS)) {
+      if (this.selectedReports.includes(ReportType.OUTGOING_TRANSFERS)) {
         const transferFilter: ITransferFilter = {};
-        const outgoingTransfersFormFilters = this.$data.outgoingTransfersFormFilters;
+        const outgoingTransfersFormFilters = this.outgoingTransfersFormFilters;
 
         transferFilter.onlyWholesale = outgoingTransfersFormFilters.onlyWholesale;
         transferFilter.includeOutgoing = outgoingTransfersFormFilters.includeOutgoing;
@@ -1412,45 +1416,45 @@ export default Vue.extend({
           outgoingTransfersFormFilters.includeOutgoingInactive;
 
         transferFilter.estimatedDepartureDateGt =
-          outgoingTransfersFormFilters.filterEstimatedDepartureDateGt
-            ? outgoingTransfersFormFilters.estimatedDepartureDateGt
+          outgoingTransfersFormFilters.shouldFilterEstimatedDepartureDateGt
+            ? (outgoingTransfersFormFilters.estimatedDepartureDateGt as string)
             : null;
 
         transferFilter.estimatedDepartureDateLt =
-          outgoingTransfersFormFilters.filterEstimatedDepartureDateLt
+          outgoingTransfersFormFilters.shouldFilterEstimatedDepartureDateLt
             ? outgoingTransfersFormFilters.estimatedDepartureDateLt
             : null;
 
         reportConfig[ReportType.OUTGOING_TRANSFERS] = {
           transferFilter,
-          fields: this.$data.fields[ReportType.OUTGOING_TRANSFERS],
+          fields: this.fields[ReportType.OUTGOING_TRANSFERS],
         };
       }
 
-      if (this.$data.selectedReports.includes(ReportType.HARVESTS)) {
+      if (this.selectedReports.includes(ReportType.HARVESTS)) {
         const harvestFilter: IHarvestFilter = {};
-        const harvestsFormFilters = this.$data.harvestsFormFilters;
+        const harvestsFormFilters = this.harvestsFormFilters;
 
         harvestFilter.includeActive = harvestsFormFilters.includeActive;
         harvestFilter.includeInactive = harvestsFormFilters.includeInactive;
 
-        harvestFilter.harvestDateGt = harvestsFormFilters.filterEstimatedArrivalDateGt
+        harvestFilter.harvestDateGt = harvestsFormFilters.shouldFilterHarvestDateGt
           ? harvestsFormFilters.harvestDateGt
           : null;
 
-        harvestFilter.harvestDateLt = harvestsFormFilters.filterEstimatedArrivalDateLt
+        harvestFilter.harvestDateLt = harvestsFormFilters.shouldFilterHarvestDateLt
           ? harvestsFormFilters.harvestDateLt
           : null;
 
         reportConfig[ReportType.HARVESTS] = {
           harvestFilter,
-          fields: this.$data.fields[ReportType.HARVESTS],
+          fields: this.fields[ReportType.HARVESTS],
         };
       }
 
-      if (this.$data.selectedReports.includes(ReportType.TAGS)) {
+      if (this.selectedReports.includes(ReportType.TAGS)) {
         const tagFilter: ITagFilter = {};
-        const tagsFormFilters = this.$data.tagsFormFilters;
+        const tagsFormFilters = this.tagsFormFilters;
 
         tagFilter.includeAvailable = tagsFormFilters.includeAvailable;
         tagFilter.includeUsed = tagsFormFilters.includeUsed;
@@ -1460,35 +1464,34 @@ export default Vue.extend({
 
         reportConfig[ReportType.TAGS] = {
           tagFilter,
-          fields: this.$data.fields[ReportType.TAGS],
+          fields: this.fields[ReportType.TAGS],
         };
       }
 
-      if (this.$data.selectedReports.includes(ReportType.IMMATURE_PLANTS)) {
+      if (this.selectedReports.includes(ReportType.IMMATURE_PLANTS)) {
         const immaturePlantFilter: IPlantBatchFilter = {};
-        const immaturePlantsFormFilters = this.$data.immaturePlantsFormFilters;
+        const immaturePlantsFormFilters = this.immaturePlantsFormFilters;
 
         immaturePlantFilter.includeActive = immaturePlantsFormFilters.includeActive;
         immaturePlantFilter.includeInactive = immaturePlantsFormFilters.includeInactive;
 
-        immaturePlantFilter.plantedDateGt = immaturePlantsFormFilters.filterPlantedDateGt
+        immaturePlantFilter.plantedDateGt = immaturePlantsFormFilters.shouldFilterPlantedDateGt
           ? immaturePlantsFormFilters.plantedDateGt
           : null;
 
-        immaturePlantFilter.plantedDateLt = immaturePlantsFormFilters.filterPackagedDateLt
+        immaturePlantFilter.plantedDateLt = immaturePlantsFormFilters.shouldFilterPlantedDateLt
           ? immaturePlantsFormFilters.plantedDateLt
           : null;
 
         reportConfig[ReportType.IMMATURE_PLANTS] = {
           immaturePlantFilter,
-          fields: this.$data.fields[ReportType.IMMATURE_PLANTS],
+          fields: this.fields[ReportType.IMMATURE_PLANTS],
         };
       }
 
-      if (this.$data.selectedReports.includes(ReportType.OUTGOING_TRANSFER_MANIFESTS)) {
+      if (this.selectedReports.includes(ReportType.OUTGOING_TRANSFER_MANIFESTS)) {
         const transferFilter: ITransferFilter = {};
-        const outgoingTransferManifestsFormFilters =
-          this.$data.outgoingTransferManifestsFormFilters;
+        const outgoingTransferManifestsFormFilters = this.outgoingTransferManifestsFormFilters;
 
         transferFilter.onlyWholesale = outgoingTransferManifestsFormFilters.onlyWholesale;
         transferFilter.includeOutgoing = outgoingTransferManifestsFormFilters.includeOutgoing;
@@ -1497,18 +1500,18 @@ export default Vue.extend({
           outgoingTransferManifestsFormFilters.includeOutgoingInactive;
 
         transferFilter.estimatedDepartureDateGt =
-          outgoingTransferManifestsFormFilters.filterEstimatedDepartureDateGt
+          outgoingTransferManifestsFormFilters.shouldFilterEstimatedDepartureDateGt
             ? outgoingTransferManifestsFormFilters.estimatedDepartureDateGt
             : null;
 
         transferFilter.estimatedDepartureDateLt =
-          outgoingTransferManifestsFormFilters.filterEstimatedDepartureDateLt
+          outgoingTransferManifestsFormFilters.shouldFilterEstimatedDepartureDateLt
             ? outgoingTransferManifestsFormFilters.estimatedDepartureDateLt
             : null;
 
         reportConfig[ReportType.OUTGOING_TRANSFER_MANIFESTS] = {
           transferFilter,
-          fields: this.$data.fields[ReportType.OUTGOING_TRANSFER_MANIFESTS],
+          fields: this.fields[ReportType.OUTGOING_TRANSFER_MANIFESTS],
         };
       }
 

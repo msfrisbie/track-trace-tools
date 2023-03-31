@@ -464,8 +464,8 @@ export interface IHarvestFilter {
   harvestName?: string | null;
   includeActive?: boolean;
   includeInactive?: boolean;
-  harvestDateGt?: string;
-  harvestDateLt?: string;
+  harvestDateGt?: string | null;
+  harvestDateLt?: string | null;
 }
 
 export interface ITransferFilter {
@@ -474,10 +474,10 @@ export interface ITransferFilter {
   createdDateEq?: string | null;
   createdDateLt?: string | null;
   onlyWholesale?: boolean;
-  estimatedArrivalDateGt?: string;
-  estimatedArrivalDateLt?: string;
-  estimatedDepartureDateGt?: string;
-  estimatedDepartureDateLt?: string;
+  estimatedArrivalDateGt?: string | null;
+  estimatedArrivalDateLt?: string | null;
+  estimatedDepartureDateGt?: string | null;
+  estimatedDepartureDateLt?: string | null;
   includeIncoming?: boolean;
   includeIncomingInactive?: boolean;
   includeOutgoing?: boolean;

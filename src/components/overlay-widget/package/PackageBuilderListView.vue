@@ -58,6 +58,7 @@
 <script lang="ts">
 import { MessageType } from "@/consts";
 import { analyticsManager } from "@/modules/analytics-manager.module";
+import { clientBuildManager } from "@/modules/client-build-manager.module";
 import { dynamicConstsManager } from "@/modules/dynamic-consts-manager.module";
 import store from "@/store/page-overlay/index";
 import { HOST_WILDCARD, isCurrentHostAllowed } from "@/utils/builder";
@@ -111,6 +112,16 @@ export default Vue.extend({
           isNew: false,
           enabled: isCurrentHostAllowed([HOST_WILDCARD]),
           visible: true,
+        },
+        {
+          route: "/package/cogs",
+          text: "COGS",
+          icon: "sitemap",
+          backgroundColor: "#2774ae",
+          // isBeta: true,
+          isNew: false,
+          enabled: isCurrentHostAllowed([HOST_WILDCARD]),
+          visible: clientBuildManager.assertValues(["ENABLE_COGS"]),
         },
         {
           route: "/package/split-package",
