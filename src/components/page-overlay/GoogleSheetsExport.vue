@@ -14,14 +14,15 @@
           <b-form-group>
             <b-form-checkbox-group v-model="selectedReports" class="flex flex-col gap-4">
               <b-form-checkbox
-                v-for="reportOption of eligibleReportOptions"
-                v-bind:key="reportOption.value"
-                :value="reportOption.value"
+                v-for="eligibleReportOption of eligibleReportOptions"
+                v-bind:key="eligibleReportOption.value"
+                :value="eligibleReportOption.value"
                 :disabled="reportStatus !== ReportStatus.INITIAL"
                 ><div class="flex flex-col items-start gap-1">
-                  <span class="">{{ reportOption.text }}</span>
-                  <span class="text-xs text-gray-400">{{ reportOption.description }}</span>
+                  <span class="">{{ eligibleReportOption.text }}</span>
+                  <span class="text-xs text-gray-400">{{ eligibleReportOption.description }}</span>
                 </div>
+                {{ JSON.stringify(eligibleReportOption) }}
               </b-form-checkbox>
 
               <div class="text-xs text-start text-gray-600" v-if="!enablePremium">
@@ -36,18 +37,18 @@
 
               <b-form-checkbox
                 class="opacity-50"
-                v-for="reportOption of reportOptions.filter(
-                  (x) => !eligibleReportOptions.includes(x)
-                )"
-                v-bind:key="reportOption.value"
-                :value="reportOption.value"
+                v-for="ineligibleReportOption of ineligibleReportOptions"
+                v-bind:key="ineligibleReportOption.value"
+                :value="ineligibleReportOption.value"
                 :disabled="
-                  !eligibleReportOptions.includes(reportOption) ||
+                  !eligibleReportOptions.includes(ineligibleReportOption) ||
                   reportStatus !== ReportStatus.INITIAL
                 "
                 ><div class="flex flex-col items-start gap-1">
-                  <span class="">{{ reportOption.text }}</span>
-                  <span class="text-xs text-gray-400">{{ reportOption.description }}</span>
+                  <span class="">{{ ineligibleReportOption.text }}</span>
+                  <span class="text-xs text-gray-400">{{
+                    ineligibleReportOption.description
+                  }}</span>
                 </div>
               </b-form-checkbox>
             </b-form-checkbox-group>
@@ -72,15 +73,6 @@
           <template v-if="selectedReports.includes(ReportType.PACKAGES)">
             <div class="rounded border border-gray-300 p-2 flex flex-col items-stretch gap-2">
               <div class="font-semibold text-gray-700">Packages</div>
-
-              <b-form-checkbox
-                :value="ReportType.PACKAGES"
-                :disabled="reportStatus !== ReportStatus.INITIAL"
-                ><div class="flex flex-col items-start gap-1">
-                  <span class="">Packages</span>
-                  <span class="text-xs text-gray-400">{{ reportOption.description }}</span>
-                </div>
-              </b-form-checkbox>
               <hr />
               <div class="flex flex-col items-stretch gap-4">
                 <b-button
@@ -1165,19 +1157,17 @@ export default Vue.extend({
       enabled: boolean;
       description: string;
     }[] {
-      const enabledOptions = REPORT_OPTIONS.filter((x) => x.enabled && x.value !== null) as {
-        text: string;
-        value: ReportType;
-        premium: boolean;
-        enabled: boolean;
-        description: string;
-      }[];
-
-      if (clientBuildManager.assertValues(["ENABLE_T3PLUS"])) {
-        return enabledOptions;
-      } else {
-        return enabledOptions.filter((x) => !x.premium);
-      }
+      return this.eligibleReportOptionsImpl();
+    },
+    ineligibleReportOptions(): {
+      text: string;
+      value: ReportType | null;
+      premium: boolean;
+      enabled: boolean;
+      description: string;
+    }[] {
+      // @ts-ignore
+      return REPORT_OPTIONS.filter((x) => !this.eligibleReportOptionsImpl().includes(x));
     },
     enablePremium() {
       return clientBuildManager.assertValues(["ENABLE_T3PLUS"]);
@@ -1303,6 +1293,23 @@ export default Vue.extend({
     },
     snapshotEverything() {
       this.selectedReports = this.eligibleReportOptions.map((x) => x.value);
+    },
+    eligibleReportOptionsImpl() {
+      const enabledOptions = REPORT_OPTIONS.filter((x) => x.enabled && x.value) as {
+        text: string;
+        value: ReportType;
+        premium: boolean;
+        enabled: boolean;
+        description: string;
+      }[];
+
+      console.log({ enabledOptions });
+
+      if (clientBuildManager.assertValues(["ENABLE_T3PLUS"])) {
+        return enabledOptions;
+      } else {
+        return enabledOptions.filter((x) => !x.premium);
+      }
     },
     async openOAuthPage() {
       messageBus.sendMessageToBackground(MessageType.OPEN_OPTIONS_PAGE, {
