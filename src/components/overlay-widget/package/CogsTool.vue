@@ -38,7 +38,7 @@ export default Vue.extend({
   methods: {
     ...mapActions({
       refreshOAuthState: `pluginAuth/${PluginAuthActions.REFRESH_OAUTH_STATE}`,
-      generateReportSpreadsheet: `reports/${ReportsActions.GENERATE_SPREADSHEET}`,
+      generateSpreadsheet: `reports/${ReportsActions.GENERATE_SPREADSHEET}`,
       reset: `reports/${ReportsActions.RESET}`,
     }),
     validClient(): boolean {

@@ -22,7 +22,6 @@
                   <span class="">{{ eligibleReportOption.text }}</span>
                   <span class="text-xs text-gray-400">{{ eligibleReportOption.description }}</span>
                 </div>
-                {{ JSON.stringify(eligibleReportOption) }}
               </b-form-checkbox>
 
               <div class="text-xs text-start text-gray-600" v-if="!enablePremium">
@@ -40,10 +39,7 @@
                 v-for="ineligibleReportOption of ineligibleReportOptions"
                 v-bind:key="ineligibleReportOption.value"
                 :value="ineligibleReportOption.value"
-                :disabled="
-                  !eligibleReportOptions.includes(ineligibleReportOption) ||
-                  reportStatus !== ReportStatus.INITIAL
-                "
+                :disabled="true"
                 ><div class="flex flex-col items-start gap-1">
                   <span class="">{{ ineligibleReportOption.text }}</span>
                   <span class="text-xs text-gray-400">{{
@@ -1276,7 +1272,7 @@ export default Vue.extend({
   methods: {
     ...mapActions({
       refreshOAuthState: `pluginAuth/${PluginAuthActions.REFRESH_OAUTH_STATE}`,
-      generateReportSpreadsheet: `reports/${ReportsActions.GENERATE_SPREADSHEET}`,
+      generateSpreadsheet: `reports/${ReportsActions.GENERATE_SPREADSHEET}`,
       reset: `reports/${ReportsActions.RESET}`,
     }),
     toggleFilters(reportType: ReportType) {
@@ -1302,8 +1298,6 @@ export default Vue.extend({
         enabled: boolean;
         description: string;
       }[];
-
-      console.log({ enabledOptions });
 
       if (clientBuildManager.assertValues(["ENABLE_T3PLUS"])) {
         return enabledOptions;
@@ -1522,7 +1516,7 @@ export default Vue.extend({
         };
       }
 
-      this.generateReportSpreadsheet({ reportConfig });
+      this.generateSpreadsheet({ reportConfig });
     },
   },
   async created() {},

@@ -21,7 +21,7 @@ class FacilityManager implements IAtomicService {
       return ownedFacilities[0];
     }
 
-    const activeFacility = ownedFacilities.find(facility =>
+    const activeFacility = ownedFacilities.find((facility) =>
       facility.name.includes(authState.license)
     );
 
@@ -40,41 +40,41 @@ class FacilityManager implements IAtomicService {
     if (store.state.mockDataMode) {
       return [
         {
-          name: "Foo 123 | LIC-0000001",
-          link: "#",
-          licenseName: "Foo 123",
-          licenseNumber: "LIC-0000001"
+          name: "Metrc Direct - Microbusiness 01 | 4b-X0002",
+          link: "?",
+          licenseName: "Metrc Direct - Microbusiness 01",
+          licenseNumber: "4b-X0002",
         },
         {
-          name: "Foobar 123456 | LIC-0000002",
-          link: "#",
-          licenseName: "Foobar 123456",
-          licenseNumber: "LIC-0000002"
+          name: "Metrc Direct - Cultivation 02 | LIC-0000002",
+          link: "?",
+          licenseName: "Metrc Direct - Cultivation 02",
+          licenseNumber: "LIC-0000002",
         },
         {
-          name: "Bar 123 | LIC-0000003",
-          link: "#",
-          licenseName: "Bar 123",
-          licenseNumber: "LIC-0000003"
+          name: "Metrc Direct - Lab 03 | LIC-0000003",
+          link: "?",
+          licenseName: "Metrc Direct - Lab 03",
+          licenseNumber: "LIC-0000003",
         },
         {
-          name: "123 Bar Foo | LIC-0000004",
-          link: "#",
-          licenseName: "123 Bar Foo",
-          licenseNumber: "LIC-0000004"
+          name: "Metrc Direct - Processor 04 | LIC-0000004",
+          link: "?",
+          licenseName: "Metrc Direct - Processor 04",
+          licenseNumber: "LIC-0000004",
         },
         {
-          name: "Baz 456 123 | LIC-0000005",
-          link: "#",
-          licenseName: "Baz 456 123",
-          licenseNumber: "LIC-0000005"
+          name: "Metrc Direct - Transporter 05 | LIC-0000005",
+          link: "?",
+          licenseName: "Metrc Direct - Transporter 05",
+          licenseNumber: "LIC-0000005",
         },
         {
-          name: "FooBarBazQux FooBarBazQux 123456 | LIC-0000006",
-          link: "#",
-          licenseName: "FooBarBazQux FooBarBazQux 123456",
-          licenseNumber: "LIC-0000006"
-        }
+          name: "Metrc Direct - Dispensary 06 | LIC-0000006",
+          link: "?",
+          licenseName: "Metrc Direct - Dispensary 06",
+          licenseNumber: "LIC-0000006",
+        },
       ];
     }
 
@@ -83,7 +83,7 @@ class FacilityManager implements IAtomicService {
 
     if (!facilityLinks || facilityLinks.length === 0) {
       // Fall back to network request
-      const loadedHTML = await customFetch(window.location.origin).then(response =>
+      const loadedHTML = await customFetch(window.location.origin).then((response) =>
         response.text()
       );
 
@@ -120,7 +120,7 @@ class FacilityManager implements IAtomicService {
         licenseName,
         licenseNumber,
         // @ts-ignore
-        name: `${licenseName} | ${licenseNumber}`
+        name: `${licenseName} | ${licenseNumber}`,
       });
     }
 
@@ -131,7 +131,7 @@ class FacilityManager implements IAtomicService {
       category: "FACILITIES",
       dataType: "json",
       authState,
-      data: ownedFacilities
+      data: ownedFacilities,
     });
 
     return ownedFacilities;
