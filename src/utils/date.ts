@@ -39,3 +39,11 @@ export function getIsoTimeStringFromIsoDatetime(isoDatetime: string): string {
 
   return isoDatetime.split("T")[1];
 }
+
+export function getIsoDateFromOffset(
+  offset: number,
+  isoDatetime: string = new Date().toISOString()
+): string {
+  const d = new Date(isoDatetime);
+  return new Date(d.setDate(d.getDate() + offset)).toISOString();
+}

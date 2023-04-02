@@ -1,23 +1,12 @@
-import { enableFetchMocks} from 'jest-fetch-mock';
-import { chrome } from "jest-chrome";
 
-// Stub before remaining imports
-enableFetchMocks();
-
-const manifest: chrome.runtime.Manifest = {
-  name: "my chrome extension",
-  manifest_version: 3,
-  version: "1.0.0",
-};
-
-chrome.runtime.getManifest.mockImplementation(() => manifest);
-
-import { mockDataManager } from '@/modules/mock-data-manager.module';
-import { mockVuex } from '@/test/utils/mocks';
-import { todayIsodate } from '@/utils/date';
-import { shallowMount, Wrapper } from '@vue/test-utils';
-import Vuex, { Store } from 'vuex';
-import HarvestBuilder from './HarvestBuilder.vue';
+import "@/test/utils/auto-mock-chrome";
+import "@/test/utils/auto-mock-fetch";
+import { mockDataManager } from "@/modules/mock-data-manager.module";
+import { mockVuex } from "@/test/utils/mocks";
+import { todayIsodate } from "@/utils/date";
+import { shallowMount, Wrapper } from "@vue/test-utils";
+import Vuex, { Store } from "vuex";
+import HarvestBuilder from "./HarvestBuilder.vue";
 
 let localVue = mockVuex();
 

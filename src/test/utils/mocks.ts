@@ -1,5 +1,6 @@
 import { createLocalVue } from "@vue/test-utils";
 import { BootstrapVue } from "bootstrap-vue";
+import { chrome } from "jest-chrome";
 import Vuex from "vuex";
 
 export function mockConsts() {
@@ -13,6 +14,16 @@ export function mockConsts() {
   });
 }
 
+export function mockChrome() {
+  const manifest: chrome.runtime.Manifest = {
+    name: "my chrome extension",
+    manifest_version: 3,
+    version: "1.0.0",
+  };
+
+  chrome.runtime.getManifest.mockImplementation(() => manifest);
+}
+
 export function mockDebugUtils() {
   // Mock out a single function from the imported module
   jest.mock("@/utils/debug", () => {
@@ -23,6 +34,14 @@ export function mockDebugUtils() {
       __esModule: true,
       //   ...originalModule,
       debugLogFactory: jest.fn(() => () => {}),
+    };
+  });
+}
+
+export function mockStore() {
+  jest.mock("@/store/page-overlay/index", () => {
+    return {
+      __esModule: true,
     };
   });
 }
@@ -65,5 +84,3 @@ export function mockVuex() {
 
   return localVue;
 }
-
-export function mockStore() {}
