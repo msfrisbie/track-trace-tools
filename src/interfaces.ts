@@ -624,8 +624,8 @@ export interface ITagOrderData extends IResponseObjectData {
   FacilityPhoneNumber: string;
 }
 
-export interface ITransferHistoryData {
-  ActualDate: null;
+export interface IMetrcObjectHistoryData {
+  ActualDate: string | null;
   Descriptions: string[];
   ExternalSourceName: string;
   InputSourcesNames: string;
@@ -633,7 +633,9 @@ export interface ITransferHistoryData {
   UserName: string;
 }
 
-export interface IPackageHistoryData extends ITransferHistoryData {}
+export interface ITransferHistoryData extends IMetrcObjectHistoryData {}
+
+export interface IPackageHistoryData extends IMetrcObjectHistoryData {}
 
 export interface IHarvestHistoryData {
   HarvestStartDate: string; // "2022-09-22"

@@ -9,8 +9,17 @@ function extractParentPackageLabelOrNull(description: string): string | null {
 }
 
 function extractChildPackageLabelOrNull(description: string): string | null {
-  const parentMatcher = new RegExp(`for Package (${METRC_TAG_REGEX_PATTERN})`);
-  const match = description.match(parentMatcher);
+  const childMatcher = new RegExp(`for Package (${METRC_TAG_REGEX_PATTERN})`);
+  const match = description.match(childMatcher);
+
+  return match ? match[1] : null;
+}
+
+function extractTestSamplePackageLabelOrNull(description: string): string | null {
+  const testSampleMatcher = new RegExp(
+    `Related Package's \\((${METRC_TAG_REGEX_PATTERN})\\) Lab Testing set to`
+  );
+  const match = description.match(testSampleMatcher);
 
   return match ? match[1] : null;
 }
@@ -47,4 +56,22 @@ export function extractChildPackageLabelsFromHistory(historyList: IPackageHistor
   }
 
   return childPackageLabels;
+}
+
+export function extractTestSamplePackageLabelsFromHistory(
+  historyList: IPackageHistoryData[]
+): string[] {
+  const testSamplePackageLabels = [];
+
+  for (const history of historyList) {
+    for (const description of history.Descriptions) {
+      const testSamplePackageLabel = extractTestSamplePackageLabelOrNull(description);
+
+      if (testSamplePackageLabel) {
+        testSamplePackageLabels.push(testSamplePackageLabel);
+      }
+    }
+  }
+
+  return testSamplePackageLabels;
 }
