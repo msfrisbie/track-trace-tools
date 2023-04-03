@@ -1,0 +1,59 @@
+The following is littered everywhere:
+
+...mapState({
+    plantQueryStringHistory: (state: any) => state.plantSearch.plantQueryStringHistory,
+}),
+
+Replace with:
+
+...mapState<IPluginState>({
+
+
+
+
+
+
+Migrate to https://github.com/maoberlehner/vuex-map-fields
+
+<template>
+  <div id="app">
+    <input v-model="fieldA">
+    <input v-model="fieldB">
+  </div>
+</template>
+
+<script>
+import { mapFields } from 'vuex-map-fields';
+
+export default {
+  computed: {
+    // The `mapFields` function takes an array of
+    // field names and generates corresponding
+    // computed properties with getter and setter
+    // functions for accessing the Vuex store.
+    ...mapFields([
+      'fieldA',
+      'fieldB',
+    ]),
+  },
+};
+</script>
+
+
+
+
+
+TS indexed access types:
+interface Foo {
+    bar: {
+        baz: string
+    }
+}
+
+const a: Foo['bar'] = {
+    baz: '3'
+}
+
+
+
+
