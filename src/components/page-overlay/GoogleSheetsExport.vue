@@ -1103,12 +1103,13 @@
 <script lang="ts">
 import { MessageType } from "@/consts";
 import {
-  IHarvestFilter,
-  IPackageFilter,
-  IPlantBatchFilter,
-  IPlantFilter,
-  ITagFilter,
-  ITransferFilter,
+IHarvestFilter,
+IPackageFilter,
+IPlantBatchFilter,
+IPlantFilter,
+IPluginState,
+ITagFilter,
+ITransferFilter
 } from "@/interfaces";
 import { authManager } from "@/modules/auth-manager.module";
 import { clientBuildManager } from "@/modules/client-build-manager.module";
@@ -1117,15 +1118,15 @@ import router from "@/router/index";
 import store from "@/store/page-overlay/index";
 import { OAuthState, PluginAuthActions } from "@/store/page-overlay/modules/plugin-auth/consts";
 import {
-  ReportsActions,
-  ReportStatus,
-  ReportType,
-  REPORT_OPTIONS,
-  SHEET_FIELDS,
+ReportsActions,
+ReportStatus,
+ReportType,
+REPORT_OPTIONS,
+SHEET_FIELDS
 } from "@/store/page-overlay/modules/reports/consts";
 import { IReportConfig } from "@/store/page-overlay/modules/reports/interfaces";
 import { todayIsodate } from "@/utils/date";
-import { addPackageReport, packageFormFiltersFactory } from "@/utils/reports/package-report";
+import { addPackageReport } from "@/utils/reports/package-report";
 import _ from "lodash";
 import Vue from "vue";
 import { mapActions, mapState } from "vuex";
@@ -1137,14 +1138,15 @@ export default Vue.extend({
   props: {},
   components: {},
   computed: {
-    ...mapState({
-      authState: (state: any) => state.pluginAuth.authState,
-      oAuthState: (state: any) => state.pluginAuth.oAuthState,
-      generatedSpreadsheet: (state: any) => state.reports.generatedSpreadsheet,
-      generatedSpreadsheetHistory: (state: any) => state.reports.generatedSpreadsheetHistory,
-      reportStatus: (state: any) => state.reports.status,
-      reportStatusMessage: (state: any) => state.reports.statusMessage,
-      reportStatusMessageHistory: (state: any) => state.reports.statusMessageHistory,
+    ...mapState<IPluginState>({
+      authState: (state: IPluginState) => state.pluginAuth.authState,
+      oAuthState: (state: IPluginState) => state.pluginAuth.oAuthState,
+      generatedSpreadsheet: (state: IPluginState) => state.reports.generatedSpreadsheet,
+      generatedSpreadsheetHistory: (state: IPluginState) => state.reports.generatedSpreadsheetHistory,
+      reportStatus: (state: IPluginState) => state.reports.status,
+      reportStatusMessage: (state: IPluginState) => state.reports.statusMessage,
+      reportStatusMessageHistory: (state: IPluginState) => state.reports.statusMessageHistory,
+      packageFormFilters: (state: IPluginState) => state.reports.formFilters[ReportType.PACKAGES],
     }),
     eligibleReportOptions(): {
       text: string;

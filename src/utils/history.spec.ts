@@ -154,6 +154,23 @@ const PACKAGE_WITH_CHILD_SENT_FOR_TESTING: IPackageHistoryData[] = [
   },
 ];
 
+const SPLIT_INTO_SMALLER_PACKAGE: IPackageHistoryData[] = [
+  {
+    Descriptions: [
+      "Packaged 50 Each of Crude Boys - 1g Cartridge - Hippie Crack (Hybrid) from another Package",
+      "- Took 50 Each of Crude Boys - 1g Cartridge - Hippie Crack (Hybrid) from Package 1A4000000000000000216865",
+      "- Package Type: Product",
+      "- Location: Product Storage",
+      "- Location Type: Default Location Type",
+    ],
+    UserName: "",
+    ActualDate: "2023-03-29",
+    RecordedDateTime: "2023-03-29T14:28:25.9602973Z",
+    InputSourcesNames: "User",
+    ExternalSourceName: "",
+  },
+];
+
 describe("history.ts", () => {
   it("Correctly extracts parent labels from history", () => {
     expect(extractParentPackageLabelsFromHistory(BULK_BIOMASS_ACCEPTED_VIA_TRANSFER)).toEqual([
@@ -177,6 +194,9 @@ describe("history.ts", () => {
       "1A4000000000000000216887",
       "1A4000000000000000216266",
     ]);
+    expect(extractParentPackageLabelsFromHistory(SPLIT_INTO_SMALLER_PACKAGE)).toEqual([
+      "1A4000000000000000216865",
+    ]);
   });
 
   it("Correctly extracts child labels from history", () => {
@@ -190,6 +210,7 @@ describe("history.ts", () => {
       "1A4000000000000000183917",
       "1A4000000000000000213863",
     ]);
+    expect(extractChildPackageLabelsFromHistory(SPLIT_INTO_SMALLER_PACKAGE)).toEqual([]);
   });
 
   it("Correctly extracts test sample labels from history", () => {
@@ -200,5 +221,6 @@ describe("history.ts", () => {
     expect(extractTestSamplePackageLabelsFromHistory(PACKAGE_WITH_CHILD_SENT_FOR_TESTING)).toEqual([
       "1A4000000000000000213863",
     ]);
+    expect(extractTestSamplePackageLabelsFromHistory(SPLIT_INTO_SMALLER_PACKAGE)).toEqual([]);
   });
 });

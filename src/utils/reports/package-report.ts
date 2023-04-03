@@ -10,25 +10,7 @@ import {
 import { ActionContext } from "vuex";
 import { todayIsodate } from "../date";
 
-interface IPackageReportFormFilters {
-  packagedDateGt: string;
-  packagedDateLt: string;
-  shouldFilterPackagedDateGt: boolean;
-  shouldFilterPackagedDateLt: boolean;
-  includeActive: boolean;
-  includeIntransit: boolean;
-  includeInactive: boolean;
-}
 
-export const packageFormFiltersFactory: () => IPackageReportFormFilters = () => ({
-  packagedDateGt: todayIsodate(),
-  packagedDateLt: todayIsodate(),
-  shouldFilterPackagedDateGt: false,
-  shouldFilterPackagedDateLt: false,
-  includeActive: true,
-  includeIntransit: false,
-  includeInactive: false,
-});
 
 export function addPackageReport({
   reportConfig,

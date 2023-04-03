@@ -28,6 +28,9 @@ export interface IReportsState {
     timestamp: string;
     spreadsheet: ISimpleSpreadsheet;
   }[];
+  formFilters: {
+    [ReportType.PACKAGES]: IPackageReportFormFilters
+  }
 }
 
 export interface IReportConfig {
@@ -113,4 +116,14 @@ export interface IFieldData {
   value: string;
   readableName: string;
   required: boolean;
+}
+
+export interface IPackageReportFormFilters {
+  packagedDateGt: string;
+  packagedDateLt: string;
+  shouldFilterPackagedDateGt: boolean;
+  shouldFilterPackagedDateLt: boolean;
+  includeActive: boolean;
+  includeIntransit: boolean;
+  includeInactive: boolean;
 }

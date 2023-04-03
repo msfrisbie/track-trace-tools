@@ -14,6 +14,7 @@ import {
 } from "@/interfaces";
 import { analyticsManager } from "@/modules/analytics-manager.module";
 import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
+import { todayIsodate } from "@/utils/date";
 import { maybeLoadPackageReportData } from "@/utils/reports/package-report";
 import { getSimpleSpreadsheet } from "@/utils/sheets";
 import { createSpreadsheetOrError } from "@/utils/sheets-export";
@@ -33,6 +34,17 @@ const inMemoryState = {
   statusMessage: "",
   statusMessageHistory: [],
   generatedSpreadsheet: null,
+  formFilters: {
+    [ReportType.PACKAGES]: {
+      packagedDateGt: todayIsodate(),
+      packagedDateLt: todayIsodate(),
+      shouldFilterPackagedDateGt: false,
+      shouldFilterPackagedDateLt: false,
+      includeActive: true,
+      includeIntransit: false,
+      includeInactive: false,
+    }
+  }
 };
 
 const persistedState = {
