@@ -14,6 +14,7 @@ import {
 } from "@/interfaces";
 import { analyticsManager } from "@/modules/analytics-manager.module";
 import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
+import { maybeLoadCogsReportData } from "@/utils/reports/cogs-report";
 import { maybeLoadPackageReportData } from "@/utils/reports/package-report";
 import { getSimpleSpreadsheet } from "@/utils/sheets";
 import { createSpreadsheetOrError } from "@/utils/sheets-export";
@@ -117,8 +118,9 @@ export const reportsModule = {
       try {
         let reportData: IReportData = {};
 
-        await maybeLoadPackageReportData({ctx, reportData, reportConfig});
+        await maybeLoadPackageReportData({ ctx, reportData, reportConfig });
 
+        await maybeLoadCogsReportData({ ctx, reportData, reportConfig });
 
         const stragglerPackageConfig = reportConfig[ReportType.STRAGGLER_PACKAGES];
         if (stragglerPackageConfig?.stragglerPackageFilter) {
@@ -615,123 +617,6 @@ export const reportsModule = {
           });
 
           reportData[ReportType.OUTGOING_TRANSFER_MANIFESTS] = {
-            richOutgoingTransfers,
-          };
-        }
-
-        const cogsConfig = reportConfig[ReportType.COGS];
-        if (cogsConfig?.packageFilter && cogsConfig?.transferFilter) {
-          if (!cogsConfig.transferFilter.estimatedDepartureDateGt) {
-            throw new Error("Must provide estimatedDepartureDateGt");
-          }
-          const estimatedDepartureDateGt = cogsConfig.transferFilter
-            .estimatedDepartureDateGt as string;
-
-          if (!cogsConfig.transferFilter.estimatedDepartureDateLt) {
-            throw new Error("Must provide estimatedDepartureDateLt");
-          }
-          const estimatedDepartureDateLt = cogsConfig.transferFilter
-            .estimatedDepartureDateLt as string;
-
-          ctx.commit(ReportsMutations.SET_STATUS, { statusMessage: "Loading packages..." });
-
-          let packages: IIndexedPackageData[] = [];
-
-          try {
-            packages = [...packages, ...(await primaryDataLoader.activePackages())];
-          } catch (e) {
-            ctx.commit(ReportsMutations.SET_STATUS, {
-              statusMessage: "Failed to load active packages.",
-            });
-          }
-
-          try {
-            packages = [...packages, ...(await primaryDataLoader.inactivePackages())];
-          } catch (e) {
-            ctx.commit(ReportsMutations.SET_STATUS, {
-              statusMessage: "Failed to load inactive packages.",
-            });
-          }
-
-          packages = packages.filter((pkg) => {
-            // if (packageFilter.packagedDateLt) {
-            //   if (pkg.PackagedDate > packageFilter.packagedDateLt) {
-            //     return false;
-            //   }
-            // }
-
-            // if (packageFilter.packagedDateEq) {
-            //   if (!pkg.PackagedDate.startsWith(packageFilter.packagedDateEq)) {
-            //     return false;
-            //   }
-            // }
-
-            // if (packageFilter.packagedDateGt) {
-            //   if (pkg.PackagedDate < packageFilter.packagedDateGt) {
-            //     return false;
-            //   }
-            // }
-
-            return true;
-          });
-
-          ctx.commit(ReportsMutations.SET_STATUS, {
-            statusMessage: "Loading transfer manifest packages...",
-          });
-
-          let richOutgoingTransfers: IIndexedRichOutgoingTransferData[] = [];
-
-          richOutgoingTransfers = [
-            ...(await primaryDataLoader.outgoingTransfers()),
-            ...richOutgoingTransfers,
-          ];
-
-          richOutgoingTransfers = [
-            ...(await primaryDataLoader.outgoingInactiveTransfers()),
-            ...richOutgoingTransfers,
-          ];
-
-          richOutgoingTransfers = richOutgoingTransfers.filter((transfer) => {
-            if (transfer.CreatedDateTime > estimatedDepartureDateLt) {
-              return false;
-            }
-
-            if (transfer.LastModified < estimatedDepartureDateGt) {
-              return false;
-            }
-
-            return true;
-          });
-
-          for (const transfer of richOutgoingTransfers) {
-            const destinations: IRichDestinationData[] = (
-              await primaryDataLoader.transferDestinations(transfer.Id)
-            ).map((x) => ({ ...x, packages: [] }));
-
-            for (const destination of destinations) {
-              destination.packages = await primaryDataLoader.destinationPackages(destination.Id);
-            }
-            transfer.outgoingDestinations = destinations;
-
-            transfer.outgoingDestinations = destinations.filter((destination) => {
-              if (!destination.ShipmentTypeName.includes("Wholesale")) {
-                return false;
-              }
-
-              if (destination.EstimatedDepartureDateTime > estimatedDepartureDateLt) {
-                return false;
-              }
-
-              if (destination.EstimatedDepartureDateTime < estimatedDepartureDateGt) {
-                return false;
-              }
-
-              return true;
-            });
-          }
-
-          reportData[ReportType.COGS] = {
-            packages,
             richOutgoingTransfers,
           };
         }

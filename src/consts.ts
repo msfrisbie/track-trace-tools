@@ -498,4 +498,7 @@ export enum SheetTitles {
   OUTGOING_TRANSFERS = "Outgoing Transfers",
   OUTGOING_TRANSFER_MANIFESTS = "Outgoing Transfer Manifest Packages",
   STRAGGLER_PACKAGES = "Straggler Packages",
+  PRODUCTION_BATCH_COSTS = "Production Batch Costs",
+  WORKSHEET = "Worksheet",
+  MANIFEST_COGS = "Manifest Cogs"
 }

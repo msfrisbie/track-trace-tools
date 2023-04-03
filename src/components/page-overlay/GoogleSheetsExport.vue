@@ -65,6 +65,33 @@
             </div>
           </template>
 
+          <!-- COGS -->
+          <template v-if="selectedReports.includes(ReportType.COGS)">
+            <div class="rounded border border-gray-300 p-2 flex flex-col items-stretch gap-2">
+              <div class="font-semibold text-gray-700">COGS</div>
+              <hr />
+              <div class="flex flex-col items-stretch gap-4">
+                <div class="flex flex-col items-start gap-1">
+                  <b-form-datepicker
+                    :required="true"
+                    initial-date
+                    size="sm"
+                    v-model="cogsFormFilters.packagedDateGt"
+                  />
+                </div>
+
+                <div class="flex flex-col items-start gap-1">
+                  <b-form-datepicker
+                    :required="true"
+                    initial-date
+                    size="sm"
+                    v-model="cogsFormFilters.packagedDateLt"
+                  />
+                </div>
+              </div>
+            </div>
+          </template>
+
           <!-- Packages -->
           <template v-if="selectedReports.includes(ReportType.PACKAGES)">
             <div class="rounded border border-gray-300 p-2 flex flex-col items-stretch gap-2">
@@ -1125,6 +1152,7 @@ import {
 } from "@/store/page-overlay/modules/reports/consts";
 import { IReportConfig } from "@/store/page-overlay/modules/reports/interfaces";
 import { todayIsodate } from "@/utils/date";
+import { addCogsReport, cogsFormFiltersFactory } from "@/utils/reports/cogs-report";
 import { addPackageReport, packageFormFiltersFactory } from "@/utils/reports/package-report";
 import _ from "lodash";
 import Vue from "vue";
@@ -1177,6 +1205,7 @@ export default Vue.extend({
       SHEET_FIELDS,
       selectedReports: [] as ReportType[],
       reportOptions: REPORT_OPTIONS,
+      cogsFormFilters: cogsFormFiltersFactory(),
       packagesFormFilters: packageFormFiltersFactory(),
       stragglerPackagesFormFilters: {
         packagedDateGt: todayIsodate(),
@@ -1314,6 +1343,14 @@ export default Vue.extend({
       const reportConfig: IReportConfig = {
         authState: await authManager.authStateOrError(),
       };
+
+      // TODO: cogs must UNCHECK all other report types
+      if (this.selectedReports.includes(ReportType.COGS)) {
+        addCogsReport({
+          reportConfig,
+          cogsFormFilters: this.cogsFormFilters,
+        });
+      }
 
       if (this.selectedReports.includes(ReportType.PACKAGES)) {
         addPackageReport({

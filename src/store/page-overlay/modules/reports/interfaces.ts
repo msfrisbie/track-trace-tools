@@ -30,12 +30,17 @@ export interface IReportsState {
   }[];
 }
 
+export interface IPackageCostCalculationData {
+  parentTag: string;
+  costFraction: number;
+}
+
 export interface IReportConfig {
   authState: IAuthState;
   [ReportType.COGS]?: {
     packageFilter: IPackageFilter;
     transferFilter: ITransferFilter;
-    fields: IFieldData[];
+    fields: null;
   };
   [ReportType.PACKAGES]?: {
     packageFilter: IPackageFilter;
@@ -78,6 +83,7 @@ export interface IReportConfig {
 export interface IReportData {
   [ReportType.COGS]?: {
     packages: IIndexedPackageData[];
+    packageCostCalculationData: IPackageCostCalculationData[];
     richOutgoingTransfers?: IIndexedRichOutgoingTransferData[];
   };
   [ReportType.PACKAGES]?: {

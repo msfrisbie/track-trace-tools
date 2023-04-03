@@ -187,6 +187,14 @@ export async function createSpreadsheetOrError({
     throw new Error("Invalid authState");
   }
 
+  // Handle special cases
+  if (reportConfig[ReportType.COGS]) {
+    return createCogsSpreadsheetOrError({
+      reportData,
+      reportConfig,
+    });
+  }
+
   const flattenedCache = new Map<ReportType, any[]>();
 
   //
@@ -402,46 +410,51 @@ export async function createSpreadsheetOrError({
   return response.data.result;
 }
 
-// export async function createCogsSpreadsheetOrError({
-//   reportData,
-//   reportConfig,
-// }: {
-//   reportData: IReportData;
-//   reportConfig: IReportConfig;
-// }): Promise<ISpreadsheet> {
-//   if (!store.state.pluginAuth?.authState?.license) {
-//     throw new Error("Invalid authState");
-//   }
+export async function createCogsSpreadsheetOrError({
+  reportData,
+  reportConfig,
+}: {
+  reportData: IReportData;
+  reportConfig: IReportConfig;
+}): Promise<ISpreadsheet> {
+  if (!store.state.pluginAuth?.authState?.license) {
+    throw new Error("Invalid authState");
+  }
 
-//   const response: {
-//     data: {
-//       success: boolean;
-//       result: ISpreadsheet;
-//     };
-//   } = await messageBus.sendMessageToBackground(
-//     MessageType.CREATE_SPREADSHEET,
-//     {
-//       title: `COGS - ${todayIsodate()}`,
-//       sheetTitles: ["Batches", ""],
-//     },
-//     undefined,
-//     90000
-//   );
+  const response: {
+    data: {
+      success: boolean;
+      result: ISpreadsheet;
+    };
+  } = await messageBus.sendMessageToBackground(
+    MessageType.CREATE_SPREADSHEET,
+    {
+      title: `COGS - ${todayIsodate()}`,
+      sheetTitles: [
+        SheetTitles.OVERVIEW,
+        SheetTitles.PRODUCTION_BATCH_COSTS,
+        SheetTitles.WORKSHEET,
+        SheetTitles.MANIFEST_COGS,
+      ],
+    },
+    undefined,
+    90000
+  );
 
-//   if (!response.data.success) {
-//     throw new Error("Unable to create COGS sheet");
-//   }
+  if (!response.data.success) {
+    throw new Error("Unable to create COGS sheet");
+  }
 
-//   // await messageBus.sendMessageToBackground(
-//   //   MessageType.WRITE_SPREADSHEET_VALUES,
-//   //   {
-//   //     spreadsheetId: response.data.result.spreadsheetId,
-//   //     range: `'${SheetTitles.OVERVIEW}'`,
-//   //     values: [[`Created with Track & Trace Tools @ ${Date().toString()}`]],
-//   //   },
-//   //   undefined,
-//   //   90000
-//   // );
+  // await messageBus.sendMessageToBackground(
+  //   MessageType.WRITE_SPREADSHEET_VALUES,
+  //   {
+  //     spreadsheetId: response.data.result.spreadsheetId,
+  //     range: `'${SheetTitles.OVERVIEW}'`,
+  //     values: [[`Created with Track & Trace Tools @ ${Date().toString()}`]],
+  //   },
+  //   undefined,
+  //   90000
+  // );
 
-//   return response.data.result;
-// }
+  return response.data.result;
+}
