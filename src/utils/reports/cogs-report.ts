@@ -6,11 +6,7 @@ import {
   IPluginState,
   ITransferFilter,
 } from "@/interfaces";
-import {
-  DataLoader,
-  getDataLoaderByLicense,
-  primaryDataLoader,
-} from "@/modules/data-loader/data-loader.module";
+import { DataLoader, getDataLoaderByLicense } from "@/modules/data-loader/data-loader.module";
 import { facilityManager } from "@/modules/facility-manager.module";
 import { ReportsMutations, ReportType } from "@/store/page-overlay/modules/reports/consts";
 import {
@@ -124,54 +120,33 @@ export async function maybeLoadCogsReportData({
     }
   }
 
-  packages = packages.filter((pkg) => {
-    // if (packageFilter.packagedDateLt) {
-    //   if (pkg.PackagedDate > packageFilter.packagedDateLt) {
-    //     return false;
-    //   }
-    // }
-
-    // if (packageFilter.packagedDateEq) {
-    //   if (!pkg.PackagedDate.startsWith(packageFilter.packagedDateEq)) {
-    //     return false;
-    //   }
-    // }
-
-    // if (packageFilter.packagedDateGt) {
-    //   if (pkg.PackagedDate < packageFilter.packagedDateGt) {
-    //     return false;
-    //   }
-    // }
-
-    return true;
-  });
-
   const globalPackageMap: Map<string, IIndexedPackageData | IIndexedDestinationPackageData> =
     new Map(packages.map((pkg) => [pkg.Label, pkg]));
 
   let richOutgoingTransfers: IIndexedRichOutgoingTransferData[] = [];
 
-  // TODO perform for all available licenses
-  try {
-    richOutgoingTransfers = [
-      ...richOutgoingTransfers,
-      ...(await primaryDataLoader.outgoingTransfers()),
-    ];
-  } catch (e) {
-    ctx.commit(ReportsMutations.SET_STATUS, {
-      statusMessage: "Failed to load outgoing transfers.",
-    });
-  }
+  for (const license of await (
+    await facilityManager.ownedFacilitiesOrError()
+  ).map((x) => x.licenseNumber)) {
+    dataLoader = await getDataLoaderByLicense(license);
+    try {
+      richOutgoingTransfers = [...richOutgoingTransfers, ...(await dataLoader.outgoingTransfers())];
+    } catch (e) {
+      ctx.commit(ReportsMutations.SET_STATUS, {
+        statusMessage: "Failed to load outgoing transfers.",
+      });
+    }
 
-  try {
-    richOutgoingTransfers = [
-      ...richOutgoingTransfers,
-      ...(await primaryDataLoader.outgoingInactiveTransfers()),
-    ];
-  } catch (e) {
-    ctx.commit(ReportsMutations.SET_STATUS, {
-      statusMessage: "Failed to load outgoing inactive transfers.",
-    });
+    try {
+      richOutgoingTransfers = [
+        ...richOutgoingTransfers,
+        ...(await dataLoader.outgoingInactiveTransfers()),
+      ];
+    } catch (e) {
+      ctx.commit(ReportsMutations.SET_STATUS, {
+        statusMessage: "Failed to load outgoing inactive transfers.",
+      });
+    }
   }
 
   // Assumption: a transfer will not sit around for 90 days
@@ -209,25 +184,27 @@ export async function maybeLoadCogsReportData({
 
   richOutgoingTransfers.map((transfer) =>
     richOutgoingTransferDestinationRequests.push(
-      primaryDataLoader.transferDestinations(transfer.Id).then((destinations) => {
-        transfer.outgoingDestinations = destinations
-          .map((x) => ({ ...x, packages: [] }))
-          .filter((destination) => {
-            if (!destination.ShipmentTypeName.includes("Wholesale")) {
-              return false;
-            }
+      getDataLoaderByLicense(transfer.LicenseNumber).then((dataLoader) =>
+        dataLoader.transferDestinations(transfer.Id).then((destinations) => {
+          transfer.outgoingDestinations = destinations
+            .map((x) => ({ ...x, packages: [] }))
+            .filter((destination) => {
+              if (!destination.ShipmentTypeName.includes("Wholesale")) {
+                return false;
+              }
 
-            if (destination.EstimatedDepartureDateTime < departureDateBufferGt) {
-              return false;
-            }
+              if (destination.EstimatedDepartureDateTime < departureDateBufferGt) {
+                return false;
+              }
 
-            if (destination.EstimatedDepartureDateTime > departureDateBufferLt) {
-              return false;
-            }
+              if (destination.EstimatedDepartureDateTime > departureDateBufferLt) {
+                return false;
+              }
 
-            return true;
-          });
-      })
+              return true;
+            });
+        })
+      )
     )
   );
 
@@ -242,9 +219,11 @@ export async function maybeLoadCogsReportData({
   richOutgoingTransfers.map((transfer) =>
     transfer.outgoingDestinations?.map((destination) =>
       packageRequests.push(
-        primaryDataLoader.destinationPackages(destination.Id).then((packages) => {
-          destination.packages = packages;
-        })
+        getDataLoaderByLicense(transfer.LicenseNumber).then((dataLoader) =>
+          dataLoader.destinationPackages(destination.Id).then((packages) => {
+            destination.packages = packages;
+          })
+        )
       )
     )
   );
@@ -271,14 +250,16 @@ export async function maybeLoadCogsReportData({
     manifestPackages.map((pkg) => [pkg.PackageLabel, pkg])
   );
 
+  const touchedPackageTags: Set<string> = new Set();
+
   const packageTagStack: string[] = [...manifestPackages].map((pkg) => pkg.PackageLabel);
   while (packageTagStack.length > 0) {
     const label = packageTagStack.pop();
-    console.log({ label });
-
     if (!label) {
       throw new Error("Couldn't pop next package tag");
     }
+
+    touchedPackageTags.add(label);
 
     // if (historyTreeMap.has(label)) {
     //   continue;
@@ -288,30 +269,39 @@ export async function maybeLoadCogsReportData({
 
     if (!pkg) {
       // TODO this might be OK
-      //   throw new Error(`Couldn't match tag to package: ${label}`);
-      console.error(`Couldn't match tag to package: ${label}`);
+      //   console.error(`Couldn't match tag to package: ${label}`);
       continue;
     }
 
     historyTreeMap.set(label, pkg);
 
-    console.log(pkg.SourcePackageLabels);
-    console.log(pkg.SourcePackageLabels.split(","));
-    console.log(pkg.SourcePackageLabels.split(",").map((x) => x.trim()));
-
-    pkg.SourcePackageLabels.split(",").map((x) => packageTagStack.push(x.trim()));
+    pkg.SourcePackageLabels.split(",")
+      .map((x) => x.trim())
+      .filter((x) => x.length > 0)
+      .filter((x) => !touchedPackageTags.has(x))
+      .map((x) => packageTagStack.push(x));
   }
 
   console.log({ historyTreeMap });
 
   // Load all history objects into map
-  const packageHistoryRequests = [...historyTreeMap.values()].map((pkg) =>
-    getDataLoaderByLicense(pkg.LicenseNumber).then((dataLoader) =>
-      dataLoader.packageHistoryByPackageId(getId(pkg)).then((history) => {
-        pkg.history = history;
-      })
-    )
-  );
+  const packageHistoryRequests: Promise<any>[] = [];
+
+  let counter = 0;
+  for (const pkg of historyTreeMap.values()) {
+    packageHistoryRequests.push(
+      getDataLoaderByLicense(pkg.LicenseNumber).then((dataLoader) =>
+        dataLoader.packageHistoryByPackageId(getId(pkg)).then((history) => {
+          pkg.history = history;
+        })
+      )
+    );
+
+    if (counter++ > 50) {
+      await Promise.allSettled(packageHistoryRequests);
+      counter = 0;
+    }
+  }
 
   await Promise.allSettled(packageHistoryRequests);
 
@@ -341,9 +331,14 @@ export async function maybeLoadCogsReportData({
         continue;
       }
 
+      if (!parentPkg.history || parentPkg.history.length === 0) {
+        console.log("Parent pkg does not have a history loaded");
+        continue;
+      }
+
       pkgStack.push(parentPkg);
 
-      const tagQuantityPairs = extractTagQuantityPairsFromHistory(parentPkg.history ?? []);
+      const tagQuantityPairs = extractTagQuantityPairsFromHistory(parentPkg.history);
 
       const totalParentQuantity = tagQuantityPairs
         .map((x) => x.quantity)
@@ -353,6 +348,9 @@ export async function maybeLoadCogsReportData({
 
       const currentPackagePair = tagQuantityPairs.find((x) => x.tag === getLabel(pkg));
       if (!currentPackagePair) {
+        console.error(parentPkg.history);
+        console.error(getLabel(pkg));
+        console.error({ tagQuantityPairs });
         throw new Error("Could not match a tag when pairing quantities");
       }
 
