@@ -1,30 +1,53 @@
 import {
+  IIndexedDestinationPackageData,
   IIndexedPackageData,
   IIndexedRichOutgoingTransferData,
   IPackageFilter,
-  IPackageHistoryData,
   IPluginState,
   ITransferFilter,
 } from "@/interfaces";
-import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
+import {
+  DataLoader,
+  getDataLoaderByLicense,
+  primaryDataLoader,
+} from "@/modules/data-loader/data-loader.module";
+import { facilityManager } from "@/modules/facility-manager.module";
 import { ReportsMutations, ReportType } from "@/store/page-overlay/modules/reports/consts";
 import {
+  IPackageCostCalculationData,
   IReportConfig,
   IReportData,
   IReportsState,
 } from "@/store/page-overlay/modules/reports/interfaces";
 import { ActionContext } from "vuex";
 import { getIsoDateFromOffset, todayIsodate } from "../date";
+import { extractTagQuantityPairsFromHistory } from "../history";
 
 interface ICogsReportFormFilters {
   cogsDateGt: string;
   cogsDateLt: string;
 }
 
-class CogsCost {
-  historyCache: Map<string, IPackageHistoryData> = new Map();
+function getId(unionPkg: IIndexedPackageData | IIndexedDestinationPackageData): number {
+  const pkg = unionPkg as any;
+  if (pkg.Id) {
+    return pkg.Id;
+  }
+  if (pkg.PackageId) {
+    return pkg.PackageId;
+  }
+  throw new Error("Could not extract ID");
+}
 
-  getCostFraction(childPackageTag: string, parentPackageTag: string) {}
+function getLabel(unionPkg: IIndexedPackageData | IIndexedDestinationPackageData): string {
+  const pkg = unionPkg as any;
+  if (pkg.Label) {
+    return pkg.Label;
+  }
+  if (pkg.PackageLabel) {
+    return pkg.PackageLabel;
+  }
+  throw new Error("Could not extract Label");
 }
 
 export const cogsFormFiltersFactory: () => ICogsReportFormFilters = () => ({
@@ -73,26 +96,32 @@ export async function maybeLoadCogsReportData({
     transferFilter: ITransferFilter;
   };
 
-  console.log({ transferFilter, packageFilter });
-
   ctx.commit(ReportsMutations.SET_STATUS, { statusMessage: "Loading packages..." });
 
   let packages: IIndexedPackageData[] = [];
 
-  try {
-    packages = [...packages, ...(await primaryDataLoader.activePackages())];
-  } catch (e) {
-    ctx.commit(ReportsMutations.SET_STATUS, {
-      statusMessage: "Failed to load active packages.",
-    });
-  }
+  let dataLoader: DataLoader | null = null;
 
-  try {
-    packages = [...packages, ...(await primaryDataLoader.inactivePackages())];
-  } catch (e) {
-    ctx.commit(ReportsMutations.SET_STATUS, {
-      statusMessage: "Failed to load inactive packages.",
-    });
+  for (const license of await (
+    await facilityManager.ownedFacilitiesOrError()
+  ).map((x) => x.licenseNumber)) {
+    dataLoader = await getDataLoaderByLicense(license);
+
+    try {
+      packages = [...packages, ...(await dataLoader.activePackages())];
+    } catch (e) {
+      ctx.commit(ReportsMutations.SET_STATUS, {
+        statusMessage: `Failed to load active packages. (${license})`,
+      });
+    }
+
+    try {
+      packages = [...packages, ...(await dataLoader.inactivePackages())];
+    } catch (e) {
+      ctx.commit(ReportsMutations.SET_STATUS, {
+        statusMessage: `Failed to load inactive packages. (${license})`,
+      });
+    }
   }
 
   packages = packages.filter((pkg) => {
@@ -117,9 +146,8 @@ export async function maybeLoadCogsReportData({
     return true;
   });
 
-  const packageMap: Map<string, IIndexedPackageData> = new Map(
-    packages.map((pkg) => [pkg.Label, pkg])
-  );
+  const globalPackageMap: Map<string, IIndexedPackageData | IIndexedDestinationPackageData> =
+    new Map(packages.map((pkg) => [pkg.Label, pkg]));
 
   let richOutgoingTransfers: IIndexedRichOutgoingTransferData[] = [];
 
@@ -177,26 +205,30 @@ export async function maybeLoadCogsReportData({
     statusMessage: "Loading destinations....",
   });
 
-  const richOutgoingTransferDestinationRequests = richOutgoingTransfers.map((transfer) =>
-    primaryDataLoader.transferDestinations(transfer.Id).then((destinations) => {
-      transfer.outgoingDestinations = destinations
-        .map((x) => ({ ...x, packages: [] }))
-        .filter((destination) => {
-          if (!destination.ShipmentTypeName.includes("Wholesale")) {
-            return false;
-          }
+  const richOutgoingTransferDestinationRequests: Promise<any>[] = [];
 
-          if (destination.EstimatedDepartureDateTime < departureDateBufferGt) {
-            return false;
-          }
+  richOutgoingTransfers.map((transfer) =>
+    richOutgoingTransferDestinationRequests.push(
+      primaryDataLoader.transferDestinations(transfer.Id).then((destinations) => {
+        transfer.outgoingDestinations = destinations
+          .map((x) => ({ ...x, packages: [] }))
+          .filter((destination) => {
+            if (!destination.ShipmentTypeName.includes("Wholesale")) {
+              return false;
+            }
 
-          if (destination.EstimatedDepartureDateTime > departureDateBufferLt) {
-            return false;
-          }
+            if (destination.EstimatedDepartureDateTime < departureDateBufferGt) {
+              return false;
+            }
 
-          return true;
-        });
-    })
+            if (destination.EstimatedDepartureDateTime > departureDateBufferLt) {
+              return false;
+            }
+
+            return true;
+          });
+      })
+    )
   );
 
   await Promise.allSettled(richOutgoingTransferDestinationRequests);
@@ -205,21 +237,140 @@ export async function maybeLoadCogsReportData({
     statusMessage: "Loading manifest packages...",
   });
 
-  const packageRequests = richOutgoingTransfers.map((transfer) =>
+  const packageRequests: Promise<any>[] = [];
+
+  richOutgoingTransfers.map((transfer) =>
     transfer.outgoingDestinations?.map((destination) =>
-      primaryDataLoader.destinationPackages(destination.Id).then((packages) => {
-        destination.packages = packages;
-      })
+      packageRequests.push(
+        primaryDataLoader.destinationPackages(destination.Id).then((packages) => {
+          destination.packages = packages;
+        })
+      )
     )
   );
 
   await Promise.allSettled(packageRequests);
 
-  // TODO for each parent package, call getCostFraction()
+  // Register all outgoing manifest packages
+  const manifestPackages: IIndexedDestinationPackageData[] = [];
+
+  for (const transfer of richOutgoingTransfers) {
+    for (const destination of transfer.outgoingDestinations ?? []) {
+      for (const pkg of destination.packages ?? []) {
+        manifestPackages.push(pkg);
+      }
+    }
+  }
+
+  // Also add manifest packages to global pkg map
+  manifestPackages.map((pkg) => globalPackageMap.set(pkg.PackageLabel, pkg));
+
+  // Mark all packages that need to have history loaded
+  // Initialize to manifest packages
+  const historyTreeMap = new Map<string, IIndexedPackageData | IIndexedDestinationPackageData>(
+    manifestPackages.map((pkg) => [pkg.PackageLabel, pkg])
+  );
+
+  const packageTagStack: string[] = [...manifestPackages].map((pkg) => pkg.PackageLabel);
+  while (packageTagStack.length > 0) {
+    const label = packageTagStack.pop();
+    console.log({ label });
+
+    if (!label) {
+      throw new Error("Couldn't pop next package tag");
+    }
+
+    // if (historyTreeMap.has(label)) {
+    //   continue;
+    // }
+
+    const pkg = globalPackageMap.get(label);
+
+    if (!pkg) {
+      // TODO this might be OK
+      //   throw new Error(`Couldn't match tag to package: ${label}`);
+      console.error(`Couldn't match tag to package: ${label}`);
+      continue;
+    }
+
+    historyTreeMap.set(label, pkg);
+
+    console.log(pkg.SourcePackageLabels);
+    console.log(pkg.SourcePackageLabels.split(","));
+    console.log(pkg.SourcePackageLabels.split(",").map((x) => x.trim()));
+
+    pkg.SourcePackageLabels.split(",").map((x) => packageTagStack.push(x.trim()));
+  }
+
+  console.log({ historyTreeMap });
+
+  // Load all history objects into map
+  const packageHistoryRequests = [...historyTreeMap.values()].map((pkg) =>
+    getDataLoaderByLicense(pkg.LicenseNumber).then((dataLoader) =>
+      dataLoader.packageHistoryByPackageId(getId(pkg)).then((history) => {
+        pkg.history = history;
+      })
+    )
+  );
+
+  await Promise.allSettled(packageHistoryRequests);
+
+  console.log({ historyTreeMap });
+
+  const packageCostCalculationData: IPackageCostCalculationData[] = [];
+
+  const pkgStack: (IIndexedPackageData | IIndexedDestinationPackageData)[] = [
+    ...historyTreeMap.values(),
+  ];
+  while (pkgStack.length > 0) {
+    const pkg = pkgStack.pop();
+
+    if (!pkg) {
+      throw new Error("Bad package pop");
+    }
+
+    const parentTags: string[] = pkg.SourcePackageLabels.split(",").map((x) => x.trim());
+
+    const sourceCostData: { parentTag: string; costFractionMultiplier: number }[] = [];
+
+    for (const parentTag of parentTags) {
+      const parentPkg = historyTreeMap.get(parentTag);
+
+      if (!parentPkg) {
+        console.log(`Couldn't look up package: ${parentTag}`);
+        continue;
+      }
+
+      pkgStack.push(parentPkg);
+
+      const tagQuantityPairs = extractTagQuantityPairsFromHistory(parentPkg.history ?? []);
+
+      const totalParentQuantity = tagQuantityPairs
+        .map((x) => x.quantity)
+        .reduce((a, b) => a + b, 0);
+
+      console.log({ tagQuantityPairs });
+
+      const currentPackagePair = tagQuantityPairs.find((x) => x.tag === getLabel(pkg));
+      if (!currentPackagePair) {
+        throw new Error("Could not match a tag when pairing quantities");
+      }
+
+      sourceCostData.push({
+        parentTag,
+        costFractionMultiplier: currentPackagePair.quantity / totalParentQuantity,
+      });
+    }
+
+    packageCostCalculationData.push({
+      tag: getLabel(pkg),
+      sourceCostData,
+    });
+  }
 
   reportData[ReportType.COGS] = {
     packages,
-    packageCostCalculationData: [],
+    packageCostCalculationData,
     richOutgoingTransfers,
   };
 

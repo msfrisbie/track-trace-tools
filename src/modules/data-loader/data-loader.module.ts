@@ -16,10 +16,12 @@ import {
   ICsvUploadResult,
   IDataLoadOptions,
   IDestinationData,
+  IDestinationPackageData,
   IExtractedITagOrderData,
   IHarvestData,
   IHarvestFilter,
   IHarvestHistoryData,
+  IIndexedDestinationPackageData,
   IIndexedHarvestData,
   IIndexedPackageData,
   IIndexedPlantBatchData,
@@ -69,6 +71,15 @@ import { DataLoadError, DataLoadErrorType } from "./data-loader-error";
 const debugLog = debugLogFactory("data-loader.module.ts");
 
 export const dataLoaderCache: Map<string, DataLoader> = new Map();
+
+export async function getDataLoaderByLicense(license: string) {
+  const authState = {
+    ...(await authManager.authStateOrError()),
+    license,
+  };
+
+  return getDataLoader(authState);
+}
 
 export async function getDataLoader(
   spoofedAuthState: IAuthState | null = null
@@ -1112,14 +1123,14 @@ export class DataLoader implements IAtomicService {
     });
   }
 
-  async destinationPackages(destinationId: number): Promise<IIndexedPackageData[]> {
+  async destinationPackages(destinationId: number): Promise<IIndexedDestinationPackageData[]> {
     return new Promise(async (resolve, reject) => {
       const subscription = timer(DATA_LOAD_FETCH_TIMEOUT_MS).subscribe(() =>
         reject("Destination packages fetch timed out")
       );
 
       try {
-        const destinationPackages: IIndexedPackageData[] = (
+        const destinationPackages: IIndexedDestinationPackageData[] = (
           await this.loadDestinationPackages(destinationId)
         ).map((pkg) => ({
           ...pkg,
@@ -1841,14 +1852,14 @@ export class DataLoader implements IAtomicService {
   destinationPackagesStream(
     dataLoadOptions: IDataLoadOptions = {},
     destinationId: number
-  ): Subject<ICollectionResponse<IPackageData>> {
+  ): Subject<ICollectionResponse<IDestinationPackageData>> {
     const responseFactory = (paginationOptions: IPaginationOptions): Promise<Response> => {
       const body = buildBody(paginationOptions);
 
       return this.metrcRequestManagerOrError.getDestinationPackages(body, destinationId);
     };
 
-    return streamFactory<IPackageData>(dataLoadOptions, responseFactory);
+    return streamFactory<IDestinationPackageData>(dataLoadOptions, responseFactory);
   }
 
   activePackagesStream(options: IPackageOptions = {}): Subject<ICollectionResponse<IPackageData>> {
@@ -2121,15 +2132,15 @@ export class DataLoader implements IAtomicService {
     return transferDestinations;
   }
 
-  private async loadDestinationPackages(destinationId: number): Promise<IPackageData[]> {
+  private async loadDestinationPackages(destinationId: number): Promise<IDestinationPackageData[]> {
     await authManager.authStateOrError();
 
     store.commit(MutationType.SET_LOADING_MESSAGE, "Loading destination packages...");
 
-    let destinationPackages: IPackageData[] = [];
+    let destinationPackages: IDestinationPackageData[] = [];
 
     await this.destinationPackagesStream({}, destinationId).forEach(
-      (next: ICollectionResponse<IPackageData>) => {
+      (next: ICollectionResponse<IDestinationPackageData>) => {
         destinationPackages = [...destinationPackages, ...next.Data];
       }
     );

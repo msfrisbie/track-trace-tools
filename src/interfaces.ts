@@ -683,6 +683,71 @@ export interface IIndexedPackageData extends IPackageData {
   PackageState: PackageState;
   LicenseNumber: string;
   TagMatcher: string;
+  history?: IPackageHistoryData[];
+}
+
+export interface IDestinationPackageData {
+  ContainsRemediatedProduct: boolean;
+  DonationFacilityLicenseNumber: null;
+  DonationFacilityName: null;
+  GrossUnitOfWeightAbbreviation: string; // "g"
+  GrossWeight: number | null;
+  IsDonation: boolean;
+  IsTestingSample: boolean;
+  IsTradeSample: boolean;
+  IsTradeSamplePersistent: boolean;
+  ItemBrandName: null;
+  ItemServingSize: "";
+  ItemStrainName: null;
+  ItemSupplyDurationDays: null;
+  ItemUnitCbdContent: null;
+  ItemUnitCbdContentDose: null;
+  ItemUnitCbdContentDoseUnitOfMeasureAbbreviation: null;
+  ItemUnitCbdContentUnitOfMeasureAbbreviation: null;
+  ItemUnitCbdPercent: null;
+  ItemUnitQuantity: null;
+  ItemUnitQuantityUnitOfMeasureAbbreviation: null;
+  ItemUnitThcContent: null;
+  ItemUnitThcContentDose: null;
+  ItemUnitThcContentDoseUnitOfMeasureAbbreviation: null;
+  ItemUnitThcContentUnitOfMeasureAbbreviation: null;
+  ItemUnitThcPercent: null;
+  ItemUnitVolume: null;
+  ItemUnitVolumeUnitOfMeasureAbbreviation: null;
+  ItemUnitWeight: number | null;
+  ItemUnitWeightUnitOfMeasureAbbreviation: string; // "g";
+  LabTestingStateName: string; //"TestPassed";
+  MultiHarvest: true;
+  MultiPackage: boolean;
+  PackageId: number;
+  PackageLabel: string; // "1A4000000000000000213809";
+  PackageType: string; // "Product";
+  PackagedDate: null;
+  ProductCategoryName: string; // "Infused-Edible";
+  ProductName: string; // "Mojo - Chocolate 20mg (Sativa)";
+  ProductRequiresRemediation: false;
+  ProductionBatchNumber: null;
+  ReceivedQuantity: number;
+  ReceivedUnitOfMeasureAbbreviation: string;
+  ReceiverWholesalePrice: null;
+  RemediationDate: null;
+  ShipmentPackageState: string; // "Accepted";
+  ShippedQuantity: number;
+  ShippedUnitOfMeasureAbbreviation: string;
+  ShipperWholesalePrice: null;
+  SourceHarvestNames: string;
+  SourcePackageIsDonation: false;
+  SourcePackageIsTradeSample: false;
+  SourcePackageLabels: string;
+  TradeSampleFacilityLicenseNumber: null;
+  TradeSampleFacilityName: null;
+}
+
+export interface IIndexedDestinationPackageData extends IDestinationPackageData {
+  PackageState: PackageState;
+  LicenseNumber: string;
+  TagMatcher: string;
+  history?: IPackageHistoryData[];
 }
 
 // This is a shared type between incoming and outgoing
@@ -819,7 +884,7 @@ export interface IDestinationData {
 
 export interface IRichDestinationData extends IDestinationData {
   transporters?: ITransporterData[];
-  packages?: IPackageData[];
+  packages?: IIndexedDestinationPackageData[];
 }
 
 /**

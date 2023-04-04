@@ -1,6 +1,7 @@
 import { SheetTitles } from "@/consts";
 import {
   IDestinationData,
+  IIndexedDestinationPackageData,
   IIndexedHarvestData,
   IIndexedPackageData,
   IIndexedPlantBatchData,
@@ -9,7 +10,6 @@ import {
   IIndexedRichOutgoingTransferData,
   IIndexedTagData,
   IIndexedTransferData,
-  IPackageData,
   ITransferData,
   ITransporterData,
 } from "@/interfaces";
@@ -121,7 +121,7 @@ export function extractFlattenedData({
         return flattenedOutgoingTransfers;
       case ReportType.OUTGOING_TRANSFER_MANIFESTS:
         let flattenedOutgoingPackages: {
-          Package: IPackageData;
+          Package: IIndexedDestinationPackageData;
           Destination: IDestinationData;
           Transfer: ITransferData;
         }[] = [];
