@@ -461,13 +461,6 @@ export const SHEET_FIELDS: { [key: string]: IFieldData[] } = {
 
 export const REPORT_OPTIONS = [
   {
-    text: "Packages",
-    value: ReportType.PACKAGES,
-    premium: false,
-    enabled: true,
-    description: "Filter by packaged date, active/inactive, and transferred",
-  },
-  {
     text: "Immature Plants",
     value: ReportType.IMMATURE_PLANTS,
     premium: false,
@@ -522,6 +515,13 @@ export const REPORT_OPTIONS = [
     premium: true,
     enabled: true,
     description: "Find straggler inventory so it can be cleared out",
+  },
+  {
+    text: "COGS",
+    value: ReportType.COGS,
+    premium: true,
+    enabled: true,
+    description: "Generate COGS",
   },
   {
     text: "Package Quickview",

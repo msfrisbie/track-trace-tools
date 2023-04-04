@@ -45,8 +45,8 @@ export function addCogsReport({
   packageFilter.packagedDateGt = cogsFormFilters.cogsDateGt;
   packageFilter.packagedDateLt = cogsFormFilters.cogsDateLt;
 
-  transferFilter.estimatedArrivalDateGt = cogsFormFilters.cogsDateGt;
-  transferFilter.estimatedArrivalDateLt = cogsFormFilters.cogsDateLt;
+  transferFilter.estimatedDepartureDateGt = cogsFormFilters.cogsDateGt;
+  transferFilter.estimatedDepartureDateLt = cogsFormFilters.cogsDateLt;
 
   reportConfig[ReportType.COGS] = {
     packageFilter,
@@ -72,6 +72,8 @@ export async function maybeLoadCogsReportData({
     packageFilter: IPackageFilter;
     transferFilter: ITransferFilter;
   };
+
+  console.log({ transferFilter, packageFilter });
 
   ctx.commit(ReportsMutations.SET_STATUS, { statusMessage: "Loading packages..." });
 
@@ -121,6 +123,7 @@ export async function maybeLoadCogsReportData({
 
   let richOutgoingTransfers: IIndexedRichOutgoingTransferData[] = [];
 
+  // TODO perform for all available licenses
   try {
     richOutgoingTransfers = [
       ...richOutgoingTransfers,
@@ -213,8 +216,6 @@ export async function maybeLoadCogsReportData({
   await Promise.allSettled(packageRequests);
 
   // TODO for each parent package, call getCostFraction()
-
-  console.log(reportData);
 
   reportData[ReportType.COGS] = {
     packages,

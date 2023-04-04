@@ -56,10 +56,7 @@
           v-bind:class="{ invisible: reportStatus !== ReportStatus.INITIAL }"
           class="flex flex-col items-stretch gap-4"
         >
-          <template v-if="selectedReports.length === 0">
-            <!-- <div class="text-red-500 text-center">Select something to include in your snapshot</div> -->
-          </template>
-          <template v-else>
+          <template v-if="selectedReports.length > 0">
             <div class="text-purple-800 text-center">
               Configure your snapshot below. <br />Defaults to active data and all fields.
             </div>
@@ -76,7 +73,7 @@
                     :required="true"
                     initial-date
                     size="sm"
-                    v-model="cogsFormFilters.packagedDateGt"
+                    v-model="cogsFormFilters.cogsDateGt"
                   />
                 </div>
 
@@ -85,7 +82,7 @@
                     :required="true"
                     initial-date
                     size="sm"
-                    v-model="cogsFormFilters.packagedDateLt"
+                    v-model="cogsFormFilters.cogsDateLt"
                   />
                 </div>
               </div>
@@ -1554,6 +1551,17 @@ export default Vue.extend({
       }
 
       this.generateSpreadsheet({ reportConfig });
+    },
+  },
+
+  watch: {
+    selectedReports: {
+      immediate: true,
+      handler(newValue, oldValue) {
+        if (newValue.length > 1 && newValue.includes(ReportType.COGS)) {
+          this.selectedReports = [ReportType.COGS];
+        }
+      },
     },
   },
   async created() {},
