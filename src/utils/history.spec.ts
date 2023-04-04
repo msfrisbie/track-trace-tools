@@ -2,6 +2,7 @@ import { IPackageHistoryData } from "@/interfaces";
 import {
   extractChildPackageLabelsFromHistory,
   extractParentPackageLabelsFromHistory,
+  extractTagQuantityPairsFromHistory,
   extractTestSamplePackageLabelsFromHistory,
 } from "./history";
 
@@ -199,6 +200,34 @@ describe("history.ts", () => {
     expect(extractTestSamplePackageLabelsFromHistory(MULTI_PARENT_BIOMASS_PACKAGE)).toEqual([]);
     expect(extractTestSamplePackageLabelsFromHistory(PACKAGE_WITH_CHILD_SENT_FOR_TESTING)).toEqual([
       "1A4000000000000000213863",
+    ]);
+  });
+
+  it("Correctly extracts tag-quantity pairs from history", () => {
+    expect(extractTagQuantityPairsFromHistory(BULK_BIOMASS_ACCEPTED_VIA_TRANSFER)).toEqual([]);
+    expect(extractTagQuantityPairsFromHistory(MULTI_PARENT_BIOMASS_PACKAGE)).toEqual([
+      {
+        tag: "1A4000000000000000005001",
+        quantity: 172507,
+      },
+      {
+        tag: "1A4000000000000000005002",
+        quantity: 1154050.116,
+      },
+      {
+        tag: "1A4000000000000000005003",
+        quantity: 34220,
+      },
+    ]);
+    expect(extractTagQuantityPairsFromHistory(PACKAGE_WITH_CHILD_SENT_FOR_TESTING)).toEqual([
+      {
+        tag: "1A4000000000000000183917",
+        quantity: 196,
+      },
+      {
+        tag: "1A4000000000000000213863",
+        quantity: 36,
+      },
     ]);
   });
 });

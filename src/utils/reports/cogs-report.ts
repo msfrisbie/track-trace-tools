@@ -2,8 +2,8 @@ import {
   IIndexedPackageData,
   IIndexedRichOutgoingTransferData,
   IPackageFilter,
+  IPackageHistoryData,
   IPluginState,
-  IRichDestinationData,
   ITransferFilter,
 } from "@/interfaces";
 import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
@@ -19,6 +19,12 @@ import { getIsoDateFromOffset, todayIsodate } from "../date";
 interface ICogsReportFormFilters {
   cogsDateGt: string;
   cogsDateLt: string;
+}
+
+class CogsCost {
+  historyCache: Map<string, IPackageHistoryData> = new Map();
+
+  getCostFraction(childPackageTag: string, parentPackageTag: string) {}
 }
 
 export const cogsFormFiltersFactory: () => ICogsReportFormFilters = () => ({
@@ -109,6 +115,10 @@ export async function maybeLoadCogsReportData({
     return true;
   });
 
+  const packageMap: Map<string, IIndexedPackageData> = new Map(
+    packages.map((pkg) => [pkg.Label, pkg])
+  );
+
   let richOutgoingTransfers: IIndexedRichOutgoingTransferData[] = [];
 
   try {
@@ -142,11 +152,13 @@ export async function maybeLoadCogsReportData({
     90,
     transferFilter.estimatedDepartureDateLt as string
   );
+
   const departureDateBufferGt = (transferFilter.estimatedDepartureDateGt as string).split("T")[0];
   const departureDateBufferLt = getIsoDateFromOffset(
     1,
     transferFilter.estimatedDepartureDateLt as string
   ).split("T")[0];
+
   richOutgoingTransfers = richOutgoingTransfers.filter((richOutgoingTransfer) => {
     if (richOutgoingTransfer.CreatedDateTime < createdDateBufferGt) {
       return false;
@@ -158,36 +170,57 @@ export async function maybeLoadCogsReportData({
     return true;
   });
 
-  for (const transfer of richOutgoingTransfers) {
-    transfer.outgoingDestinations = (await primaryDataLoader.transferDestinations(transfer.Id))
-      .map((x) => ({ ...x, packages: [] }))
-      .filter((destination) => {
-        if (!destination.ShipmentTypeName.includes("Wholesale")) {
-          return false;
-        }
+  ctx.commit(ReportsMutations.SET_STATUS, {
+    statusMessage: "Loading destinations....",
+  });
 
-        if (destination.EstimatedDepartureDateTime < departureDateBufferGt) {
-          return false;
-        }
+  const richOutgoingTransferDestinationRequests = richOutgoingTransfers.map((transfer) =>
+    primaryDataLoader.transferDestinations(transfer.Id).then((destinations) => {
+      transfer.outgoingDestinations = destinations
+        .map((x) => ({ ...x, packages: [] }))
+        .filter((destination) => {
+          if (!destination.ShipmentTypeName.includes("Wholesale")) {
+            return false;
+          }
 
-        if (destination.EstimatedDepartureDateTime > departureDateBufferLt) {
-          return false;
-        }
+          if (destination.EstimatedDepartureDateTime < departureDateBufferGt) {
+            return false;
+          }
 
-        return true;
-      });
-  }
+          if (destination.EstimatedDepartureDateTime > departureDateBufferLt) {
+            return false;
+          }
 
-  // TODO parallelize
-  for (const transfer of richOutgoingTransfers) {
-    for (const destination of transfer.outgoingDestinations as IRichDestinationData[]) {
-      destination.packages = await primaryDataLoader.destinationPackages(destination.Id);
-    }
-  }
+          return true;
+        });
+    })
+  );
+
+  await Promise.allSettled(richOutgoingTransferDestinationRequests);
+
+  ctx.commit(ReportsMutations.SET_STATUS, {
+    statusMessage: "Loading manifest packages...",
+  });
+
+  const packageRequests = richOutgoingTransfers.map((transfer) =>
+    transfer.outgoingDestinations?.map((destination) =>
+      primaryDataLoader.destinationPackages(destination.Id).then((packages) => {
+        destination.packages = packages;
+      })
+    )
+  );
+
+  await Promise.allSettled(packageRequests);
+
+  // TODO for each parent package, call getCostFraction()
+
+  console.log(reportData);
 
   reportData[ReportType.COGS] = {
     packages,
     packageCostCalculationData: [],
     richOutgoingTransfers,
   };
+
+  console.log(reportData);
 }

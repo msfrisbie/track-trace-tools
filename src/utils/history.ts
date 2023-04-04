@@ -24,6 +24,23 @@ function extractTestSamplePackageLabelOrNull(description: string): string | null
   return match ? match[1] : null;
 }
 
+function extractTagQuantityPairOrNull(description: string): {
+  tag: string;
+  quantity: number;
+} | null {
+  const pairMatcher = new RegExp(`Used ([\\d,\\.]+) .* for Package (${METRC_TAG_REGEX_PATTERN})`);
+
+  const match = description.match(pairMatcher);
+
+  return match
+    ? {
+        tag: match[2] as string,
+        // @ts-ignore
+        quantity: parseFloat(match[1].replaceAll(",", "")),
+      }
+    : null;
+}
+
 export function extractParentPackageLabelsFromHistory(
   historyList: IPackageHistoryData[]
 ): string[] {
@@ -74,4 +91,26 @@ export function extractTestSamplePackageLabelsFromHistory(
   }
 
   return testSamplePackageLabels;
+}
+
+export function extractTagQuantityPairsFromHistory(historyList: IPackageHistoryData[]): {
+  tag: string;
+  quantity: number;
+}[] {
+  const pairs: {
+    tag: string;
+    quantity: number;
+  }[] = [];
+
+  for (const history of historyList) {
+    for (const description of history.Descriptions) {
+      const result = extractTagQuantityPairOrNull(description);
+
+      if (result) {
+        pairs.push(result);
+      }
+    }
+  }
+
+  return pairs;
 }

@@ -31,8 +31,11 @@ export interface IReportsState {
 }
 
 export interface IPackageCostCalculationData {
-  parentTag: string;
-  costFraction: number;
+  tag: string;
+  sourceCostData: {
+    parentTag: string;
+    costFractionMultiplier: number;
+  }[];
 }
 
 export interface IReportConfig {

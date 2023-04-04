@@ -37,7 +37,7 @@ export function streamFactory<T>(
             )
           );
           return;
-        } else {
+      } else {
           subject.error(new DataLoadError(DataLoadErrorType.SERVER, "Server returned an error."));
           return;
         }
