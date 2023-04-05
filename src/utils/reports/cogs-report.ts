@@ -220,6 +220,10 @@ export async function maybeLoadCogsReportData({
     }
   }
 
+  ctx.commit(ReportsMutations.SET_STATUS, {
+    statusMessage: "Building package history...",
+  });
+
   // Also add manifest packages to global pkg map
   manifestPackages.map((pkg) => globalPackageMap.set(pkg.PackageLabel, pkg));
 
@@ -263,6 +267,10 @@ export async function maybeLoadCogsReportData({
 
   console.log({ historyTreeMap });
 
+  ctx.commit(ReportsMutations.SET_STATUS, {
+    statusMessage: "Loading package split data...",
+  });
+
   // Load all history objects into map
   const packageHistoryRequests: Promise<any>[] = [];
 
@@ -276,15 +284,13 @@ export async function maybeLoadCogsReportData({
       )
     );
 
-    if (counter++ > 100) {
+    if (counter++ > 250) {
       await Promise.allSettled(packageHistoryRequests);
       counter = 0;
     }
   }
 
   await Promise.allSettled(packageHistoryRequests);
-
-  console.log({ historyTreeMap });
 
   const packageCostCalculationData: IPackageCostCalculationData[] = [];
 
@@ -322,8 +328,6 @@ export async function maybeLoadCogsReportData({
       const totalParentQuantity = tagQuantityPairs
         .map((x) => x.quantity)
         .reduce((a, b) => a + b, 0);
-
-      console.log({ tagQuantityPairs });
 
       const currentPackagePair = tagQuantityPairs.find((x) => x.tag === getLabel(pkg));
       if (!currentPackagePair) {
