@@ -1,6 +1,7 @@
 import {
   IAuthState,
   IHarvestFilter,
+  IIndexedDestinationPackageData,
   IIndexedHarvestData,
   IIndexedPackageData,
   IIndexedPlantBatchData,
@@ -85,7 +86,7 @@ export interface IReportConfig {
 
 export interface IReportData {
   [ReportType.COGS]?: {
-    packages: IIndexedPackageData[];
+    packages: (IIndexedPackageData | IIndexedDestinationPackageData)[];
     packageCostCalculationData: IPackageCostCalculationData[];
     richOutgoingTransfers?: IIndexedRichOutgoingTransferData[];
   };

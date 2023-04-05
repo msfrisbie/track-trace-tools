@@ -18,32 +18,11 @@ import {
 import { ActionContext } from "vuex";
 import { getIsoDateFromOffset, todayIsodate } from "../date";
 import { extractTagQuantityPairsFromHistory } from "../history";
+import { getId, getLabel } from "../package";
 
 interface ICogsReportFormFilters {
   cogsDateGt: string;
   cogsDateLt: string;
-}
-
-function getId(unionPkg: IIndexedPackageData | IIndexedDestinationPackageData): number {
-  const pkg = unionPkg as any;
-  if (pkg.Id) {
-    return pkg.Id;
-  }
-  if (pkg.PackageId) {
-    return pkg.PackageId;
-  }
-  throw new Error("Could not extract ID");
-}
-
-function getLabel(unionPkg: IIndexedPackageData | IIndexedDestinationPackageData): string {
-  const pkg = unionPkg as any;
-  if (pkg.Label) {
-    return pkg.Label;
-  }
-  if (pkg.PackageLabel) {
-    return pkg.PackageLabel;
-  }
-  throw new Error("Could not extract Label");
 }
 
 export const cogsFormFiltersFactory: () => ICogsReportFormFilters = () => ({
@@ -297,7 +276,7 @@ export async function maybeLoadCogsReportData({
       )
     );
 
-    if (counter++ > 50) {
+    if (counter++ > 100) {
       await Promise.allSettled(packageHistoryRequests);
       counter = 0;
     }
@@ -348,9 +327,6 @@ export async function maybeLoadCogsReportData({
 
       const currentPackagePair = tagQuantityPairs.find((x) => x.tag === getLabel(pkg));
       if (!currentPackagePair) {
-        console.error(parentPkg.history);
-        console.error(getLabel(pkg));
-        console.error({ tagQuantityPairs });
         throw new Error("Could not match a tag when pairing quantities");
       }
 
@@ -367,7 +343,7 @@ export async function maybeLoadCogsReportData({
   }
 
   reportData[ReportType.COGS] = {
-    packages,
+    packages: [...historyTreeMap.values()],
     packageCostCalculationData,
     richOutgoingTransfers,
   };

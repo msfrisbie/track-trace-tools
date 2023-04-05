@@ -1,9 +1,31 @@
 import { PackageFilterIdentifiers } from "@/consts";
-import { IPackageData } from "@/interfaces";
+import { IIndexedDestinationPackageData, IIndexedPackageData, IPackageData } from "@/interfaces";
 import { authManager } from "@/modules/auth-manager.module";
 import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
 import { toastManager } from "@/modules/toast-manager.module";
 import { downloadFileFromUrl } from "./dom";
+
+export function getId(unionPkg: IIndexedPackageData | IIndexedDestinationPackageData): number {
+  const pkg = unionPkg as any;
+  if (pkg.Id) {
+    return pkg.Id;
+  }
+  if (pkg.PackageId) {
+    return pkg.PackageId;
+  }
+  throw new Error("Could not extract ID");
+}
+
+export function getLabel(unionPkg: IIndexedPackageData | IIndexedDestinationPackageData): string {
+  const pkg = unionPkg as any;
+  if (pkg.Label) {
+    return pkg.Label;
+  }
+  if (pkg.PackageLabel) {
+    return pkg.PackageLabel;
+  }
+  throw new Error("Could not extract Label");
+}
 
 export async function getLabTestUrlsFromPackage({
   pkg,
