@@ -100,12 +100,12 @@ export async function getParentPackageHistoryTreeImpl({
       switch (packageState) {
         case PackageState.ACTIVE:
           try {
-            pkg = await dataLoader.activePackage(label, { useCache: false });
+            pkg = await dataLoader.activePackage(label);
           } catch (e) {}
           break;
         case PackageState.INACTIVE:
           try {
-            pkg = await dataLoader.inactivePackage(label, { useCache: false });
+            pkg = await dataLoader.inactivePackage(label);
           } catch (e) {}
           break;
         case PackageState.IN_TRANSIT:
@@ -283,12 +283,12 @@ export async function getChildPackageHistoryTreeImpl({
       switch (packageState) {
         case PackageState.ACTIVE:
           try {
-            pkg = await dataLoader.activePackage(label, { useCache: false });
+            pkg = await dataLoader.activePackage(label);
           } catch (e) {}
           break;
         case PackageState.INACTIVE:
           try {
-            pkg = await dataLoader.inactivePackage(label, { useCache: false });
+            pkg = await dataLoader.inactivePackage(label);
           } catch (e) {}
           break;
         case PackageState.IN_TRANSIT:

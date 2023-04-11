@@ -461,11 +461,11 @@ export const SHEET_FIELDS: { [key: string]: IFieldData[] } = {
 
 export const REPORT_OPTIONS = [
   {
-    text: "Immature Plants",
-    value: ReportType.IMMATURE_PLANTS,
+    text: "Packages",
+    value: ReportType.PACKAGES,
     premium: false,
     enabled: true,
-    description: "Filter by planted date",
+    description: "Filter by packaged date",
   },
   {
     text: "Mature Plants",
@@ -566,3 +566,8 @@ export const REPORT_OPTIONS = [
     description: "All plants and associated harvest data within this license",
   },
 ];
+
+export interface IStatusMessage {
+  text: string;
+  level: "success" | "warning" | "error";
+}

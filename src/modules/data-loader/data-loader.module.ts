@@ -62,6 +62,7 @@ import { CsvUpload } from "@/types";
 import { buildBody, streamFactory } from "@/utils/data-loader";
 import { debugLogFactory } from "@/utils/debug";
 import { extract, ExtractedData, ExtractionType } from "@/utils/html";
+import { readDataOrNull, StorageKeyType, writeData } from "@/utils/storage";
 import { get } from "idb-keyval";
 import { Subject, timer } from "rxjs";
 import { map, take } from "rxjs/operators";
@@ -101,8 +102,8 @@ export class DataLoader implements IAtomicService {
   private _availableTags: Promise<IIndexedTagData[]> | null = null;
   private _usedTags: Promise<IIndexedTagData[]> | null = null;
   private _voidedTags: Promise<IIndexedTagData[]> | null = null;
-  private _activePackages: Promise<IIndexedPackageData[]> | null = null;
-  private _inactivePackages: Promise<IIndexedPackageData[]> | null = null;
+  // private _activePackages: Promise<IIndexedPackageData[]> | null = null;
+  // private _inactivePackages: Promise<IIndexedPackageData[]> | null = null;
   private _inTransitPackages: Promise<IIndexedPackageData[]> | null = null;
   private _previousTagOrders: Promise<ITagOrderData[]> | null = null;
   private _incomingTransfers: Promise<IIndexedTransferData[]> | null = null;
@@ -116,6 +117,7 @@ export class DataLoader implements IAtomicService {
 
   private _countPayload: string = buildBody({ page: 0, pageSize: 5 });
 
+  private _authState: IAuthState | null = null;
   private _metrcRequestManager: MetrcRequestManager | null = null;
 
   /**
@@ -123,14 +125,17 @@ export class DataLoader implements IAtomicService {
    */
   async init(spoofedAuthState: IAuthState | null = null) {
     if (spoofedAuthState) {
+      this._authState = spoofedAuthState;
       const spoofedMetrcRequestManager = new MetrcRequestManager();
       spoofedMetrcRequestManager.init(spoofedAuthState);
       this._metrcRequestManager = spoofedMetrcRequestManager;
     } else {
+      // This ordering matters, other methods eagerly access this value
       this._metrcRequestManager = primaryMetrcRequestManager;
+      this._authState = await authManager.authStateOrError();
     }
 
-    dataLoaderCache.set((spoofedAuthState || (await authManager.authStateOrError())).license, this);
+    dataLoaderCache.set(this._authState.license, this);
 
     // await authManager.authStateOrError();
 
@@ -969,60 +974,68 @@ export class DataLoader implements IAtomicService {
     return packages;
   }
 
-  async activePackages(resetCache: boolean = false): Promise<IIndexedPackageData[]> {
+  async activePackages(
+    ttlMs: number = 0,
+    hitNetworkOnCacheMiss: boolean = true
+  ): Promise<IIndexedPackageData[]> {
+    const keyType = StorageKeyType.ACTIVE_PACKAGES;
+
     if (store.state.mockDataMode && store.state.flags?.mockedFlags.mockPackages.enabled) {
       return mockDataManager.mockPackages();
     }
 
-    if (resetCache) {
-      this._activePackages = null;
+    const cachedData = await readDataOrNull<IIndexedPackageData[]>({
+      license: this._authState?.license as string,
+      keyType,
+      ttlMs,
+      validatorFn: (data) => data instanceof Array,
+    });
+
+    if (cachedData) {
+      console.log(`${keyType} cache hit`);
+      return cachedData;
     }
 
-    if (!this._activePackages) {
-      this._activePackages = new Promise(async (resolve, reject) => {
-        const subscription = timer(DATA_LOAD_FETCH_TIMEOUT_MS).subscribe(() =>
-          reject("Active package fetch timed out")
-        );
-
-        try {
-          const activePackages = (await this.loadActivePackages()).map((pkg) => ({
-            ...pkg,
-            PackageState: PackageState.ACTIVE,
-            TagMatcher: "",
-            LicenseNumber: primaryMetrcRequestManager.authStateOrError.license,
-          }));
-
-          // databaseInterface.indexPackages(activePackages, PackageState.ACTIVE);
-
-          subscription.unsubscribe();
-          resolve(activePackages);
-        } catch (e) {
-          subscription.unsubscribe();
-          reject(e);
-          this._activePackages = null;
-        }
-      });
+    if (!hitNetworkOnCacheMiss) {
+      console.log("Declining to send network request, returning []");
+      return [];
     }
 
-    return this._activePackages;
+    const freshData = new Promise<IIndexedPackageData[]>(async (resolve, reject) => {
+      const subscription = timer(DATA_LOAD_FETCH_TIMEOUT_MS).subscribe(() =>
+        reject("Active package fetch timed out")
+      );
+
+      try {
+        const activePackages = (await this.loadActivePackages()).map((pkg) => ({
+          ...pkg,
+          PackageState: PackageState.ACTIVE,
+          TagMatcher: "",
+          LicenseNumber: primaryMetrcRequestManager.authStateOrError.license,
+        }));
+
+        resolve(activePackages);
+
+        writeData({
+          data: activePackages,
+          license: this._authState?.license as string,
+          keyType,
+        });
+      } catch (e) {
+        reject(e);
+      } finally {
+        subscription.unsubscribe();
+      }
+    });
+
+    return freshData;
   }
 
-  async activePackage(
-    label: string,
-    options: { useCache?: boolean } = {}
-  ): Promise<IIndexedPackageData> {
-    if (options.useCache) {
-      if (!this._activePackages) {
-        await this.activePackages();
-      }
+  async activePackage(label: string, ttlMs: number = 0): Promise<IIndexedPackageData> {
+    const match = (await this.activePackages(ttlMs, false)).find((pkg) => pkg.Label === label);
 
-      if (this._activePackages) {
-        const match = (await this._activePackages).find((pkg) => pkg.Label === label);
-
-        if (match) {
-          return match;
-        }
-      }
+    if (match) {
+      return match;
     }
 
     return new Promise(async (resolve, reject) => {
@@ -1047,40 +1060,59 @@ export class DataLoader implements IAtomicService {
     });
   }
 
-  async inactivePackages(resetCache: boolean = false): Promise<IIndexedPackageData[]> {
-    if (resetCache) {
-      this._inactivePackages = null;
+  async inactivePackages(
+    ttlMs: number = 0,
+    hitNetworkOnCacheMiss: boolean = true
+  ): Promise<IIndexedPackageData[]> {
+    const keyType = StorageKeyType.INACTIVE_PACKAGES;
+
+    const cachedData = await readDataOrNull<IIndexedPackageData[]>({
+      license: this._authState?.license as string,
+      keyType,
+      ttlMs,
+      validatorFn: (data) => data instanceof Array,
+    });
+
+    if (cachedData) {
+      console.log(`${keyType} cache hit`);
+      return cachedData;
     }
 
-    if (!this._inactivePackages) {
-      this._inactivePackages = new Promise(async (resolve, reject) => {
-        const subscription = timer(DATA_LOAD_FETCH_TIMEOUT_MS).subscribe(() =>
-          reject("Inactive package fetch timed out")
+    if (!hitNetworkOnCacheMiss) {
+      console.log("Declining to send network request, returning []");
+      return [];
+    }
+
+    const freshData = new Promise<IIndexedPackageData[]>(async (resolve, reject) => {
+      const subscription = timer(DATA_LOAD_FETCH_TIMEOUT_MS).subscribe(() =>
+        reject("Inactive package fetch timed out")
+      );
+
+      try {
+        const inactivePackages: IIndexedPackageData[] = (await this.loadInactivePackages()).map(
+          (pkg) => ({
+            ...pkg,
+            PackageState: PackageState.INACTIVE,
+            TagMatcher: "",
+            LicenseNumber: primaryMetrcRequestManager.authStateOrError.license,
+          })
         );
 
-        try {
-          const inactivePackages: IIndexedPackageData[] = (await this.loadInactivePackages()).map(
-            (pkg) => ({
-              ...pkg,
-              PackageState: PackageState.INACTIVE,
-              TagMatcher: "",
-              LicenseNumber: primaryMetrcRequestManager.authStateOrError.license,
-            })
-          );
+        resolve(inactivePackages);
 
-          // databaseInterface.indexPackages(inactivePackages, PackageState.INACTIVE);
+        writeData({
+          data: inactivePackages,
+          license: this._authState?.license as string,
+          keyType,
+        });
+      } catch (e) {
+        reject(e);
+      } finally {
+        subscription.unsubscribe();
+      }
+    });
 
-          subscription.unsubscribe();
-          resolve(inactivePackages);
-        } catch (e) {
-          subscription.unsubscribe();
-          reject(e);
-          this._inactivePackages = null;
-        }
-      });
-    }
-
-    return this._inactivePackages;
+    return freshData;
   }
 
   async destinationTransporters(destinationId: number): Promise<ITransporterData[]> {
@@ -1148,22 +1180,11 @@ export class DataLoader implements IAtomicService {
     });
   }
 
-  async inactivePackage(
-    label: string,
-    options: { useCache?: boolean } = {}
-  ): Promise<IIndexedPackageData> {
-    if (options.useCache) {
-      if (!this._inactivePackages) {
-        await this.inactivePackages();
-      }
+  async inactivePackage(label: string, ttlMs: number = 0): Promise<IIndexedPackageData> {
+    const match = (await this.inactivePackages(ttlMs, false)).find((pkg) => pkg.Label === label);
 
-      if (this._inactivePackages) {
-        const match = (await this._inactivePackages).find((pkg) => pkg.Label === label);
-
-        if (match) {
-          return match;
-        }
-      }
+    if (match) {
+      return match;
     }
 
     return new Promise(async (resolve, reject) => {
@@ -1179,11 +1200,11 @@ export class DataLoader implements IAtomicService {
           LicenseNumber: primaryMetrcRequestManager.authStateOrError.license,
         };
 
-        subscription.unsubscribe();
         resolve(packageData);
       } catch (e) {
-        subscription.unsubscribe();
         reject(e);
+      } finally {
+        subscription.unsubscribe();
       }
     });
   }

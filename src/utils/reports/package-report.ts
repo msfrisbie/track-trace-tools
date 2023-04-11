@@ -70,7 +70,9 @@ export async function maybeLoadPackageReportData({
 }) {
   const packageConfig = reportConfig[ReportType.PACKAGES];
   if (packageConfig?.packageFilter) {
-    ctx.commit(ReportsMutations.SET_STATUS, { statusMessage: "Loading packages..." });
+    ctx.commit(ReportsMutations.SET_STATUS, {
+      statusMessage: { text: "Loading packages...", level: "success" },
+    });
 
     let packages: IIndexedPackageData[] = [];
 
@@ -79,7 +81,7 @@ export async function maybeLoadPackageReportData({
         packages = [...packages, ...(await primaryDataLoader.activePackages())];
       } catch (e) {
         ctx.commit(ReportsMutations.SET_STATUS, {
-          statusMessage: "Failed to load active packages.",
+          statusMessage: { text: "Failed to load active packages.", level: "warning" },
         });
       }
     }
@@ -89,7 +91,7 @@ export async function maybeLoadPackageReportData({
         packages = [...packages, ...(await primaryDataLoader.inactivePackages())];
       } catch (e) {
         ctx.commit(ReportsMutations.SET_STATUS, {
-          statusMessage: "Failed to load inactive packages.",
+          statusMessage: { text: "Failed to load inactive packages.", level: "warning" },
         });
       }
     }

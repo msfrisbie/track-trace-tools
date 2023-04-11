@@ -83,6 +83,7 @@
 <script lang="ts">
 import BuilderDashboard from "@/components/overlay-widget/BuilderDashboard.vue";
 import { MessageType } from "@/consts";
+import { IPluginState } from "@/interfaces";
 import { analyticsManager } from "@/modules/analytics-manager.module";
 import router from "@/router/index";
 import store from "@/store/page-overlay/index";
@@ -117,13 +118,13 @@ export default Vue.extend({
     };
   },
   computed: {
-    ...mapState({
-      pluginAuth: (state: any) => state.pluginAuth,
-      authState: (state: any) => state.pluginAuth.authState,
-      credentials: (state: any) => state.credentials,
-      accountEnabled: (state: any) => state.accountEnabled,
-      flags: (state: any) => state.flags,
-      debugMode: (state: any) => state.debugMode,
+    ...mapState<IPluginState>({
+      pluginAuth: (state: IPluginState) => state.pluginAuth,
+      authState: (state: IPluginState) => state.pluginAuth.authState,
+      credentials: (state: IPluginState) => state.credentials,
+      accountEnabled: (state: IPluginState) => state.accountEnabled,
+      flags: (state: IPluginState) => state.flags,
+      debugMode: (state: IPluginState) => state.debugMode,
     }),
     options() {
       return [
@@ -175,7 +176,7 @@ export default Vue.extend({
           route: "/transfer/create-transfer",
           icon: "truck-loading",
           enabled: isIdentityEligibleForTransferTools({
-            identity: this.authState?.identity,
+            identity: this.$store.state.authState?.identity,
             hostname: window.location.hostname,
           }),
           visible: true,
@@ -228,7 +229,7 @@ export default Vue.extend({
           text: "ADMIN",
           route: "/admin",
           icon: "cog",
-          visible: this.debugMode,
+          visible: this.$store.state.debugMode,
           enabled: true,
           isBeta: false,
           isNew: false,
@@ -238,7 +239,10 @@ export default Vue.extend({
     showFeedback() {
       const identities: string[] = [];
 
-      if (this.authState?.identity && !identities.includes(this.authState?.identity)) {
+      if (
+        this.$store.state.authState?.identity &&
+        !identities.includes(this.$store.state.authState?.identity)
+      ) {
         return true;
       }
 
@@ -278,9 +282,6 @@ export default Vue.extend({
 
         handler();
       }
-    },
-    reportsAccessRoute() {
-      return this.accountEnabled ? "/reports" : "";
     },
   },
   async mounted() {},

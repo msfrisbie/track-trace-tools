@@ -2,7 +2,7 @@ import {
   IAtomicService,
   IIndexedPackageData,
   IIndexedPlantData,
-  ITransferData
+  ITransferData,
 } from "@/interfaces";
 import { authManager } from "@/modules/auth-manager.module";
 import { MutationType } from "@/mutation-types";
@@ -36,12 +36,10 @@ export interface ISelectedTransferMetadata {
 class SearchManager implements IAtomicService {
   public plantQueryString: BehaviorSubject<string> = new BehaviorSubject<string>("");
   public packageQueryString: BehaviorSubject<string> = new BehaviorSubject<string>("");
-  public selectedPackage: BehaviorSubject<ISelectedPackageMetadata | null> = new BehaviorSubject<ISelectedPackageMetadata | null>(
-    null
-  );
-  public selectedPlant: BehaviorSubject<ISelectedPlantMetadata | null> = new BehaviorSubject<ISelectedPlantMetadata | null>(
-    null
-  );
+  public selectedPackage: BehaviorSubject<ISelectedPackageMetadata | null> =
+    new BehaviorSubject<ISelectedPackageMetadata | null>(null);
+  public selectedPlant: BehaviorSubject<ISelectedPlantMetadata | null> =
+    new BehaviorSubject<ISelectedPlantMetadata | null>(null);
   public packageSearchVisibility: BehaviorSubject<{
     showPackageSearchResults: boolean;
   }> = new BehaviorSubject<{
@@ -64,9 +62,8 @@ class SearchManager implements IAtomicService {
   );
 
   public transferQueryString: BehaviorSubject<string> = new BehaviorSubject<string>("");
-  public selectedTransfer: BehaviorSubject<ISelectedTransferMetadata | null> = new BehaviorSubject<ISelectedTransferMetadata | null>(
-    null
-  );
+  public selectedTransfer: BehaviorSubject<ISelectedTransferMetadata | null> =
+    new BehaviorSubject<ISelectedTransferMetadata | null>(null);
   public transferSearchVisibility: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   public incomingTransferIndexInflight: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(
     false
@@ -82,7 +79,7 @@ class SearchManager implements IAtomicService {
     this.plantSearchVisibility.subscribe(
       ({ showPlantSearchResults }: { showPlantSearchResults: boolean }) => {
         store.dispatch(`plantSearch/${PlantSearchActions.SET_SHOW_PLANT_SEARCH_RESULTS}`, {
-          showPlantSearchResults
+          showPlantSearchResults,
         });
       }
     );
@@ -90,17 +87,17 @@ class SearchManager implements IAtomicService {
     this.packageSearchVisibility.subscribe(
       ({ showPackageSearchResults }: { showPackageSearchResults: boolean }) => {
         store.dispatch(`packageSearch/${PackageSearchActions.SET_SHOW_PACKAGE_SEARCH_RESULTS}`, {
-          showPackageSearchResults
+          showPackageSearchResults,
         });
       }
     );
 
-    this.transferSearchVisibility.subscribe(showTransferSearchResults => {
+    this.transferSearchVisibility.subscribe((showTransferSearchResults) => {
       store.commit(MutationType.SET_SHOW_TRANSFER_SEARCH_RESULTS, showTransferSearchResults);
     });
 
     this.packageSearchVisibility.next({
-      showPackageSearchResults: !!store.state.packageSearch?.showPackageSearchResults
+      showPackageSearchResults: !!store.state.packageSearch?.showPackageSearchResults,
     });
     this.transferSearchVisibility.next(store.state.showTransferSearchResults);
   }
@@ -125,7 +122,7 @@ class SearchManager implements IAtomicService {
     this.selectedPlant
       .asObservable()
       .pipe(take(1))
-      .subscribe(selectedPlant => {
+      .subscribe((selectedPlant) => {
         if (!selectedPlant || priority <= selectedPlant.priority) {
           this.selectedPlant.next({ plantData, sectionName, priority });
         }
@@ -140,7 +137,7 @@ class SearchManager implements IAtomicService {
     this.selectedPackage
       .asObservable()
       .pipe(take(1))
-      .subscribe(selectedPackage => {
+      .subscribe((selectedPackage) => {
         if (!selectedPackage || priority <= selectedPackage.priority) {
           this.selectedPackage.next({ packageData, sectionName, priority });
         }
@@ -155,7 +152,7 @@ class SearchManager implements IAtomicService {
     this.selectedTransfer
       .asObservable()
       .pipe(take(1))
-      .subscribe(selectedTransfer => {
+      .subscribe((selectedTransfer) => {
         if (!selectedTransfer || priority <= selectedTransfer.priority) {
           this.selectedTransfer.next({ transferData, sectionName, priority });
         }
@@ -166,7 +163,7 @@ class SearchManager implements IAtomicService {
     return combineLatest([
       this.activePackageIndexInflight.asObservable(),
       this.inactivePackageIndexInflight.asObservable(),
-      this.inTransitPackageIndexInflight.asObservable()
+      this.inTransitPackageIndexInflight.asObservable(),
     ]);
   }
 
@@ -209,7 +206,7 @@ class SearchManager implements IAtomicService {
     // in the order they were created.
     try {
       this.activePackageIndexInflight.next(true);
-      await primaryDataLoader.activePackages(true);
+      await primaryDataLoader.activePackages();
     } catch (e) {
       console.error(e);
     } finally {
@@ -218,7 +215,7 @@ class SearchManager implements IAtomicService {
 
     try {
       this.inactivePackageIndexInflight.next(true);
-      await primaryDataLoader.inactivePackages(true);
+      await primaryDataLoader.inactivePackages();
     } catch (e) {
       console.error(e);
     } finally {
@@ -239,7 +236,7 @@ class SearchManager implements IAtomicService {
     return combineLatest([
       this.incomingTransferIndexInflight.asObservable(),
       this.outgoingTransferIndexInflight.asObservable(),
-      this.rejectedTransferIndexInflight.asObservable()
+      this.rejectedTransferIndexInflight.asObservable(),
     ]);
   }
 

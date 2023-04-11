@@ -17,12 +17,12 @@ import {
   ITagFilter,
   ITransferFilter,
 } from "@/interfaces";
-import { ReportStatus, ReportType } from "./consts";
+import { IStatusMessage, ReportStatus, ReportType } from "./consts";
 
 export interface IReportsState {
   status: ReportStatus;
-  statusMessage: string;
-  statusMessageHistory: string[];
+  statusMessage: IStatusMessage | null;
+  statusMessageHistory: IStatusMessage[];
   generatedSpreadsheet: ISpreadsheet | null;
   generatedSpreadsheetHistory: {
     uuid: string;

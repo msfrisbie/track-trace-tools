@@ -1033,19 +1033,33 @@
           </template>
 
           <template v-if="reportStatus === ReportStatus.INFLIGHT">
-            <div class="flex flex-row items-center gap-4">
+            <div v-if="reportStatusMessage" class="flex flex-row items-center gap-4">
               <b-spinner small></b-spinner>
-              <span>{{ reportStatusMessage }}</span>
+              <span>{{ reportStatusMessage.text }}</span>
             </div>
 
             <div class="flex flex-col items-stretch gap-2">
               <div
                 v-for="statusMessageHistoryEntry of reportStatusMessageHistory"
-                v-bind:key="statusMessageHistoryEntry"
+                v-bind:key="statusMessageHistoryEntry.text"
                 class="flex flex-row justify-start items-center gap-2"
               >
-                <font-awesome-icon class="text-green-400" icon="check"></font-awesome-icon>
-                <span class="text-gray-300">{{ statusMessageHistoryEntry }}</span>
+                <font-awesome-icon
+                  v-if="statusMessageHistoryEntry.level === 'success'"
+                  class="text-green-400"
+                  icon="check"
+                ></font-awesome-icon>
+                <font-awesome-icon
+                  v-if="statusMessageHistoryEntry.level === 'warning'"
+                  class="text-yellow-300"
+                  icon="exclamation-triangle"
+                ></font-awesome-icon>
+                <font-awesome-icon
+                  v-if="statusMessageHistoryEntry.level === 'error'"
+                  class="text-red-500"
+                  icon="cross"
+                ></font-awesome-icon>
+                <span class="text-gray-300">{{ statusMessageHistoryEntry.text }}</span>
               </div>
             </div>
           </template>

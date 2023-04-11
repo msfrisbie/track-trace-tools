@@ -181,34 +181,6 @@ chrome.runtime.onMessage.addListener((inboundEvent, sender, sendResponse) => {
       //   });
       //   break;
 
-      // case MessageType.OPEN_CONNECT_STANDALONE:
-      //   // console.log(await result.data.url);
-      //   window.open(await browser.runtime.getURL("index.html#/connect"), "_blank");
-      //   break;
-
-      // case MessageType.ASYNC_STORAGE_LENGTH:
-      //   respondToContentScript(sendResponse, inboundEvent, await CustomAsyncStorage.length())
-
-      //   break;
-      // case MessageType.ASYNC_STORAGE_KEY:
-      //   respondToContentScript(sendResponse, inboundEvent, await CustomAsyncStorage.key(inboundEvent.message.data.index));
-
-      //   break;
-      // case MessageType.ASYNC_STORAGE_CLEAR:
-      //   respondToContentScript(sendResponse, inboundEvent, await CustomAsyncStorage.clear());
-
-      //   break;
-      // case MessageType.ASYNC_STORAGE_GET_ITEM:
-      //   respondToContentScript(sendResponse, inboundEvent, await CustomAsyncStorage.getItem(inboundEvent.message.data.key));
-
-      //   break;
-      // case MessageType.ASYNC_STORAGE_SET_ITEM:
-      //   respondToContentScript(sendResponse, inboundEvent, await CustomAsyncStorage.setItem(inboundEvent.message.data.key, inboundEvent.message.data.data));
-
-      //   break;
-      // case MessageType.ASYNC_STORAGE_REMOVE_ITEM:
-      //   respondToContentScript(sendResponse, inboundEvent, await CustomAsyncStorage.removeItem(inboundEvent.message.data.key));
-
       //   break;
       case MessageType.CHECK_OAUTH:
         getAuthTokenOrError({ interactive: false }).then(

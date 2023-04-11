@@ -21,6 +21,7 @@ import { createSpreadsheetOrError } from "@/utils/sheets-export";
 import { v4 as uuidv4 } from "uuid";
 import { ActionContext } from "vuex";
 import {
+  IStatusMessage,
   ReportsActions,
   ReportsGetters,
   ReportsMutations,
@@ -31,7 +32,7 @@ import { IReportConfig, IReportData, IReportsState } from "./interfaces";
 
 const inMemoryState = {
   status: ReportStatus.INITIAL,
-  statusMessage: "",
+  statusMessage: null,
   statusMessageHistory: [],
   generatedSpreadsheet: null,
 };
@@ -50,7 +51,7 @@ export const reportsModule = {
   mutations: {
     [ReportsMutations.SET_STATUS](
       state: IReportsState,
-      { status, statusMessage }: { status?: ReportStatus; statusMessage?: string }
+      { status, statusMessage }: { status?: ReportStatus; statusMessage?: IStatusMessage }
     ) {
       if (status) {
         state.status = status;
@@ -60,8 +61,8 @@ export const reportsModule = {
         }
       }
 
-      if (typeof statusMessage === "string") {
-        if (state.statusMessage.length > 0) {
+      if (statusMessage) {
+        if (state.statusMessage) {
           state.statusMessageHistory = [state.statusMessage, ...state.statusMessageHistory];
         }
 
@@ -104,7 +105,10 @@ export const reportsModule = {
       ctx.commit(ReportsMutations.EXAMPLE_MUTATION, data);
     },
     [ReportsActions.RESET]: async (ctx: ActionContext<IReportsState, IPluginState>, data: any) => {
-      ctx.commit(ReportsMutations.SET_STATUS, { status: ReportStatus.INITIAL, statusMessage: "" });
+      ctx.commit(ReportsMutations.SET_STATUS, {
+        status: ReportStatus.INITIAL,
+        statusMessage: null,
+      });
       ctx.commit(ReportsMutations.SET_GENERATED_SPREADSHEET, { spreadsheet: null });
     },
     [ReportsActions.GENERATE_SPREADSHEET]: async (
@@ -124,7 +128,9 @@ export const reportsModule = {
 
         const stragglerPackageConfig = reportConfig[ReportType.STRAGGLER_PACKAGES];
         if (stragglerPackageConfig?.stragglerPackageFilter) {
-          ctx.commit(ReportsMutations.SET_STATUS, { statusMessage: "Loading packages..." });
+          ctx.commit(ReportsMutations.SET_STATUS, {
+            statusMessage: { text: "Loading packages...", level: "success" },
+          });
 
           let stragglerPackages: IIndexedPackageData[] = [];
 
@@ -135,7 +141,7 @@ export const reportsModule = {
             ];
           } catch (e) {
             ctx.commit(ReportsMutations.SET_STATUS, {
-              statusMessage: "Failed to load active packages.",
+              statusMessage: { text: "Failed to load active packages.", level: "warning" },
             });
           }
 
@@ -198,7 +204,9 @@ export const reportsModule = {
 
         const immaturePlantConfig = reportConfig[ReportType.IMMATURE_PLANTS];
         if (immaturePlantConfig?.immaturePlantFilter) {
-          ctx.commit(ReportsMutations.SET_STATUS, { statusMessage: "Loading plant batches..." });
+          ctx.commit(ReportsMutations.SET_STATUS, {
+            statusMessage: { text: "Loading plant batches...", level: "success" },
+          });
 
           let immaturePlants: IIndexedPlantBatchData[] = [];
 
@@ -207,7 +215,7 @@ export const reportsModule = {
               immaturePlants = [...immaturePlants, ...(await primaryDataLoader.plantBatches({}))];
             } catch (e) {
               ctx.commit(ReportsMutations.SET_STATUS, {
-                statusMessage: "Failed to load active plant batches.",
+                statusMessage: { text: "Failed to load active plant batches.", level: "warning" },
               });
             }
           }
@@ -220,7 +228,7 @@ export const reportsModule = {
               ];
             } catch (e) {
               ctx.commit(ReportsMutations.SET_STATUS, {
-                statusMessage: "Failed to load inactive plant batches.",
+                statusMessage: { text: "Failed to load inactive plant batches.", level: "warning" },
               });
             }
           }
@@ -248,7 +256,9 @@ export const reportsModule = {
 
         const harvestConfig = reportConfig[ReportType.HARVESTS];
         if (harvestConfig?.harvestFilter) {
-          ctx.commit(ReportsMutations.SET_STATUS, { statusMessage: "Loading harvests..." });
+          ctx.commit(ReportsMutations.SET_STATUS, {
+            statusMessage: { text: "Loading harvests...", level: "success" },
+          });
 
           let harvests: IIndexedHarvestData[] = [];
 
@@ -257,7 +267,7 @@ export const reportsModule = {
               harvests = [...harvests, ...(await primaryDataLoader.activeHarvests())];
             } catch (e) {
               ctx.commit(ReportsMutations.SET_STATUS, {
-                statusMessage: "Failed to load active harvests.",
+                statusMessage: { text: "Failed to load active harvests.", level: "warning" },
               });
             }
           }
@@ -267,7 +277,7 @@ export const reportsModule = {
               harvests = [...harvests, ...(await primaryDataLoader.inactiveHarvests())];
             } catch (e) {
               ctx.commit(ReportsMutations.SET_STATUS, {
-                statusMessage: "Failed to load inactive harvests.",
+                statusMessage: { text: "Failed to load inactive harvests.", level: "warning" },
               });
             }
           }
@@ -295,7 +305,9 @@ export const reportsModule = {
 
         const tagConfig = reportConfig[ReportType.TAGS];
         if (tagConfig?.tagFilter) {
-          ctx.commit(ReportsMutations.SET_STATUS, { statusMessage: "Loading tags..." });
+          ctx.commit(ReportsMutations.SET_STATUS, {
+            statusMessage: { text: "Loading tags...", level: "success" },
+          });
 
           let tags: IIndexedTagData[] = [];
 
@@ -304,7 +316,7 @@ export const reportsModule = {
               tags = [...tags, ...(await primaryDataLoader.availableTags())];
             } catch (e) {
               ctx.commit(ReportsMutations.SET_STATUS, {
-                statusMessage: "Failed to load active tags.",
+                statusMessage: { text: "Failed to load active tags.", level: "warning" },
               });
             }
           }
@@ -314,7 +326,7 @@ export const reportsModule = {
               tags = [...tags, ...(await primaryDataLoader.usedTags())];
             } catch (e) {
               ctx.commit(ReportsMutations.SET_STATUS, {
-                statusMessage: "Failed to load used tags.",
+                statusMessage: { text: "Failed to load used tags.", level: "warning" },
               });
             }
           }
@@ -324,7 +336,7 @@ export const reportsModule = {
               tags = [...tags, ...(await primaryDataLoader.voidedTags())];
             } catch (e) {
               ctx.commit(ReportsMutations.SET_STATUS, {
-                statusMessage: "Failed to load voided tags.",
+                statusMessage: { text: "Failed to load voided tags.", level: "warning" },
               });
             }
           }
@@ -355,7 +367,9 @@ export const reportsModule = {
 
         const maturePlantConfig = reportConfig[ReportType.MATURE_PLANTS];
         if (maturePlantConfig?.plantFilter) {
-          ctx.commit(ReportsMutations.SET_STATUS, { statusMessage: "Loading plants..." });
+          ctx.commit(ReportsMutations.SET_STATUS, {
+            statusMessage: { text: "Loading plants...", level: "success" },
+          });
 
           let maturePlants: IIndexedPlantData[] = [];
 
@@ -364,7 +378,7 @@ export const reportsModule = {
               maturePlants = [...maturePlants, ...(await primaryDataLoader.vegetativePlants())];
             } catch (e) {
               ctx.commit(ReportsMutations.SET_STATUS, {
-                statusMessage: "Failed to load vegetative plants.",
+                statusMessage: { text: "Failed to load vegetative plants.", level: "warning" },
               });
             }
           }
@@ -374,7 +388,7 @@ export const reportsModule = {
               maturePlants = [...maturePlants, ...(await primaryDataLoader.floweringPlants())];
             } catch (e) {
               ctx.commit(ReportsMutations.SET_STATUS, {
-                statusMessage: "Failed to load flowering plants.",
+                statusMessage: { text: "Failed to load flowering plants.", level: "warning" },
               });
             }
           }
@@ -384,7 +398,7 @@ export const reportsModule = {
               maturePlants = [...maturePlants, ...(await primaryDataLoader.inactivePlants({}))];
             } catch (e) {
               ctx.commit(ReportsMutations.SET_STATUS, {
-                statusMessage: "Failed to load inactive plants.",
+                statusMessage: { text: "Failed to load inactive plants.", level: "warning" },
               });
             }
           }
@@ -413,7 +427,7 @@ export const reportsModule = {
         const incomingTransferConfig = reportConfig[ReportType.INCOMING_TRANSFERS];
         if (incomingTransferConfig?.transferFilter) {
           ctx.commit(ReportsMutations.SET_STATUS, {
-            statusMessage: "Loading incoming transfers...",
+            statusMessage: { text: "Loading incoming transfers...", level: "success" },
           });
 
           let richIncomingTransfers: IIndexedRichIncomingTransferData[] = [];
@@ -475,7 +489,7 @@ export const reportsModule = {
         const outgoingTransferConfig = reportConfig[ReportType.OUTGOING_TRANSFERS];
         if (outgoingTransferConfig?.transferFilter) {
           ctx.commit(ReportsMutations.SET_STATUS, {
-            statusMessage: "Loading outgoing transfers...",
+            statusMessage: { text: "Loading outgoing transfers...", level: "success" },
           });
 
           let richOutgoingTransfers: IIndexedRichOutgoingTransferData[] = [];
@@ -547,7 +561,7 @@ export const reportsModule = {
         const transferManifestConfig = reportConfig[ReportType.OUTGOING_TRANSFER_MANIFESTS];
         if (transferManifestConfig?.transferFilter) {
           ctx.commit(ReportsMutations.SET_STATUS, {
-            statusMessage: "Loading transfer manifest packages...",
+            statusMessage: { text: "Loading transfer manifest packages...", level: "success" },
           });
 
           let richOutgoingTransfers: IIndexedRichOutgoingTransferData[] = [];
@@ -622,7 +636,7 @@ export const reportsModule = {
         }
 
         ctx.commit(ReportsMutations.SET_STATUS, {
-          statusMessage: "Generating spreadsheet...",
+          statusMessage: { text: "Generating spreadsheet...", level: "success" },
         });
 
         console.log({ reportData, reportConfig });
@@ -638,7 +652,7 @@ export const reportsModule = {
 
         ctx.commit(ReportsMutations.SET_STATUS, {
           status: ReportStatus.SUCCESS,
-          statusMessage: "",
+          statusMessage: null,
         });
         analyticsManager.track(MessageType.GENERATED_SPREADSHEET_SUCCESS);
       } catch (e) {

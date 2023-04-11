@@ -247,7 +247,7 @@ export async function createSpreadsheetOrError({
   //
 
   store.commit(`reports/${ReportsMutations.SET_STATUS}`, {
-    statusMessage: "Formatting spreadsheet...",
+    statusMessage: { text: "Formatting spreadsheet...", level: "success" },
   });
 
   let formattingRequests: any = [
@@ -291,7 +291,7 @@ export async function createSpreadsheetOrError({
 
   for (const reportType of ELIGIBLE_REPORT_TYPES) {
     store.commit(`reports/${ReportsMutations.SET_STATUS}`, {
-      statusMessage: `Writing ${reportType}...`,
+      statusMessage: { text: `Writing ${reportType}...`, level: "success" },
     });
 
     await writeDataSheet({
@@ -307,7 +307,7 @@ export async function createSpreadsheetOrError({
   //
 
   store.commit(`reports/${ReportsMutations.SET_STATUS}`, {
-    statusMessage: `Generating summary...`,
+    statusMessage: { text: `Generating summary...`, level: "success" },
   });
 
   const summaryList = [];
@@ -338,7 +338,7 @@ export async function createSpreadsheetOrError({
   //
 
   store.commit(`reports/${ReportsMutations.SET_STATUS}`, {
-    statusMessage: `Resizing sheets...`,
+    statusMessage: { text: `Resizing sheets...`, level: "success" },
   });
 
   let resizeRequests: any[] = [
@@ -372,7 +372,7 @@ export async function createSpreadsheetOrError({
   await new Promise((resolve) => setTimeout(resolve, 3000));
 
   store.commit(`reports/${ReportsMutations.SET_STATUS}`, {
-    statusMessage: `Cleaning up...`,
+    statusMessage: { text: `Cleaning up...`, level: "success" },
   });
 
   let shrinkFontRequests: any[] = [];

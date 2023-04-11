@@ -1,71 +1,143 @@
+type StorageKey = string;
 
-import { MessageType } from '@/consts';
-import { messageBus } from '@/modules/message-bus.module';
-import { clear, del, get, keys, set } from 'idb-keyval';
-import { AsyncStorage } from 'vuex-persist';
-
-// UNTESTED CODE
-// UNTESTED CODE
-// UNTESTED CODE
-// UNTESTED CODE
-// UNTESTED CODE
-// UNTESTED CODE
-// UNTESTED CODE
-
-// Frontend
-export const CustomAsyncStorageWrapper: AsyncStorage = {
-    async length(): Promise<number> {
-        const response = await messageBus.sendMessageToBackground(MessageType.ASYNC_STORAGE_LENGTH, {});
-
-        return response.data;
-    },
-    async key(index: number): Promise<string> {
-        const response = await messageBus.sendMessageToBackground(MessageType.ASYNC_STORAGE_LENGTH, { index });
-
-        return response.data;
-    },
-    async clear(): Promise<void> {
-        const response = await messageBus.sendMessageToBackground(MessageType.ASYNC_STORAGE_LENGTH, {});
-
-        return response.data;
-    },
-    async getItem<T>(key: string): Promise<T> {
-        const response = await messageBus.sendMessageToBackground(MessageType.ASYNC_STORAGE_LENGTH, { key });
-
-        return response.data;
-    },
-    async setItem<T>(key: string, data: T): Promise<T> {
-        const response = await messageBus.sendMessageToBackground(MessageType.ASYNC_STORAGE_LENGTH, { key, data });
-
-        return response.data;
-    },
-    async removeItem(key: string): Promise<void> {
-        const response = await messageBus.sendMessageToBackground(MessageType.ASYNC_STORAGE_LENGTH, { key });
-
-        return response.data;
-    }
+export enum StorageKeyType {
+  ACTIVE_PACKAGES = "ACTIVE_PACKAGES",
+  INACTIVE_PACKAGES = "INACTIVE_PACKAGES",
 }
 
-// Backend
-export const CustomAsyncStorage: AsyncStorage = {
-    async length(): Promise<number> {
-        return (await keys()).length;
-    },
-    async key(index: number): Promise<string> {
-        return (await keys())[index].toString();
-    },
-    async clear(): Promise<void> {
-        return clear();
-    },
-    async getItem<T>(key: string): Promise<T> {
-        // @ts-ignore
-        return get(key);
-    },
-    async setItem<T>(key: string, data: T): Promise<T> {
-        await set(key, data);
-        return data;
-    },
-    async removeItem(key: string): Promise<void> {
-        return del(key);
-    }
+export function storageKeyFactory(values: {
+  license: string;
+  keyType: string;
+  keyProperty: "timestamp" | "data";
+}): StorageKey {
+  return `${values.license}::${values.keyType}::${values.keyProperty}`;
 }
+
+export async function writeData({
+  data,
+  license,
+  keyType,
+}: {
+  data: any;
+  license: string;
+  keyType: StorageKeyType;
+}) {
+  const dataStorageKey: StorageKey = storageKeyFactory({
+    license,
+    keyType,
+    keyProperty: "data",
+  });
+
+  await simpleSet(dataStorageKey, data);
+
+  const timestampStorageKey: StorageKey = storageKeyFactory({
+    license,
+    keyType,
+    keyProperty: "timestamp",
+  });
+
+  await simpleSet(timestampStorageKey, Date.now());
+}
+
+/**
+ *
+ * Reads and returns the data if it exists and is fresh, otherwise returns null.
+ * Performs minimal reads.
+ */
+export async function readDataOrNull<T>({
+  license,
+  keyType,
+  ttlMs,
+  validatorFn,
+}: {
+  license: string;
+  keyType: StorageKeyType;
+  ttlMs: number;
+  validatorFn?: (data: any) => boolean;
+}): Promise<T | null> {
+  if (ttlMs === 0) {
+    return null;
+  }
+
+  const timestampStorageKey: StorageKey = storageKeyFactory({
+    license,
+    keyType,
+    keyProperty: "timestamp",
+  });
+
+  const timestamp = await simpleGet<number | null>(timestampStorageKey);
+
+  if (timestamp === null) {
+    console.log(`${timestampStorageKey} not set`);
+    return null;
+  }
+
+  if (timestamp < Date.now() - ttlMs) {
+    console.log(`${timestampStorageKey} expired`);
+    return null;
+  }
+
+  const dataStorageKey: StorageKey = storageKeyFactory({
+    license,
+    keyType,
+    keyProperty: "data",
+  });
+
+  const data = await simpleGet<T>(dataStorageKey);
+
+  if (!data) {
+    console.log(`${dataStorageKey} not set`);
+    return null;
+  }
+
+  if (validatorFn && !validatorFn(data)) {
+    console.log(`Data failed validation`);
+    return null;
+  }
+
+  return data;
+}
+
+async function simpleGet<T>(key: StorageKey, defaultValue?: T): Promise<T> {
+  const result = await chrome.storage.local.get([key]);
+  return result[key] || defaultValue;
+}
+
+async function simpleHas(key: StorageKey) {
+  return (await simpleGet<any>(key)) !== undefined;
+}
+
+async function simpleSet<T>(key: StorageKey, value: T) {
+  await chrome.storage.local.set({
+    [key]: value,
+  });
+}
+
+// export async function simplePrepend<T>(key: StorageKey, value: T, maxLength: number = 500) {
+//   const current: T[] = await simpleGet<T[]>(key, []);
+//   await simpleSet<T[]>(key, [value, ...current].slice(0, maxLength));
+// }
+
+// export async function simpleAppend<T>(key: StorageKey, value: T, maxLength: number = 500) {
+//   const current: T[] = await simpleGet<T[]>(key, []);
+//   await simpleSet<T[]>(key, [...current, value].slice(-maxLength));
+// }
+
+// export async function clear() {
+//   chrome.storage.local.clear();
+// }
+
+// export async function watch<T>(
+//   key: StorageKey,
+//   callback: (storageChange: chrome.storage.StorageChange) => void
+// ) {
+//   chrome.storage.onChanged.addListener((changes) => {
+//     for (let [k, v] of Object.entries(changes)) {
+//       if (k === key) {
+//         callback(v);
+//       }
+//     }
+//   });
+
+//   callback({ newValue: await simpleGet<T>(key) });
+// }

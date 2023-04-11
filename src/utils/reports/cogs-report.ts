@@ -63,7 +63,7 @@ export async function maybeLoadCogsReportData({
   reportConfig: IReportConfig;
 }) {
   if (!reportConfig[ReportType.COGS]) {
-    throw new Error("Bad config");
+    return;
   }
 
   const { packageFilter, transferFilter } = reportConfig[ReportType.COGS] as {
@@ -71,30 +71,36 @@ export async function maybeLoadCogsReportData({
     transferFilter: ITransferFilter;
   };
 
-  ctx.commit(ReportsMutations.SET_STATUS, { statusMessage: "Loading packages..." });
+  ctx.commit(ReportsMutations.SET_STATUS, {
+    statusMessage: { text: "Loading packages...", level: "success" },
+  });
 
   let packages: IIndexedPackageData[] = [];
 
   let dataLoader: DataLoader | null = null;
 
+  // TODO bulk persistent caching
+  // TODO incremental chunk caching
   for (const license of await (
     await facilityManager.ownedFacilitiesOrError()
   ).map((x) => x.licenseNumber)) {
     dataLoader = await getDataLoaderByLicense(license);
 
     try {
-      packages = [...packages, ...(await dataLoader.activePackages())];
+      packages = [...packages, ...(await dataLoader.activePackages(24 * 60 * 60 * 1000))];
     } catch (e) {
+      console.log(e);
       ctx.commit(ReportsMutations.SET_STATUS, {
-        statusMessage: `Failed to load active packages. (${license})`,
+        statusMessage: { text: `Failed to load active packages. (${license})`, level: "warning" },
       });
     }
 
     try {
-      packages = [...packages, ...(await dataLoader.inactivePackages())];
+      packages = [...packages, ...(await dataLoader.inactivePackages(24 * 60 * 60 * 1000))];
     } catch (e) {
+      console.log(e);
       ctx.commit(ReportsMutations.SET_STATUS, {
-        statusMessage: `Failed to load inactive packages. (${license})`,
+        statusMessage: { text: `Failed to load inactive packages. (${license})`, level: "warning" },
       });
     }
   }
@@ -112,7 +118,7 @@ export async function maybeLoadCogsReportData({
       richOutgoingTransfers = [...richOutgoingTransfers, ...(await dataLoader.outgoingTransfers())];
     } catch (e) {
       ctx.commit(ReportsMutations.SET_STATUS, {
-        statusMessage: "Failed to load outgoing transfers.",
+        statusMessage: { text: "Failed to load outgoing transfers.", level: "warning" },
       });
     }
 
@@ -123,7 +129,7 @@ export async function maybeLoadCogsReportData({
       ];
     } catch (e) {
       ctx.commit(ReportsMutations.SET_STATUS, {
-        statusMessage: "Failed to load outgoing inactive transfers.",
+        statusMessage: { text: "Failed to load outgoing inactive transfers.", level: "warning" },
       });
     }
   }
@@ -156,7 +162,7 @@ export async function maybeLoadCogsReportData({
   });
 
   ctx.commit(ReportsMutations.SET_STATUS, {
-    statusMessage: "Loading destinations....",
+    statusMessage: { text: "Loading destinations....", level: "success" },
   });
 
   const richOutgoingTransferDestinationRequests: Promise<any>[] = [];
@@ -190,7 +196,7 @@ export async function maybeLoadCogsReportData({
   await Promise.allSettled(richOutgoingTransferDestinationRequests);
 
   ctx.commit(ReportsMutations.SET_STATUS, {
-    statusMessage: "Loading manifest packages...",
+    statusMessage: { text: "Loading manifest packages...", level: "success" },
   });
 
   const packageRequests: Promise<any>[] = [];
@@ -221,7 +227,7 @@ export async function maybeLoadCogsReportData({
   }
 
   ctx.commit(ReportsMutations.SET_STATUS, {
-    statusMessage: "Building package history...",
+    statusMessage: { text: "Building package history...", level: "succes" },
   });
 
   // Also add manifest packages to global pkg map
@@ -244,14 +250,9 @@ export async function maybeLoadCogsReportData({
 
     touchedPackageTags.add(label);
 
-    // if (historyTreeMap.has(label)) {
-    //   continue;
-    // }
-
     const pkg = globalPackageMap.get(label);
 
     if (!pkg) {
-      // TODO this might be OK
       //   console.error(`Couldn't match tag to package: ${label}`);
       continue;
     }
@@ -268,7 +269,7 @@ export async function maybeLoadCogsReportData({
   console.log({ historyTreeMap });
 
   ctx.commit(ReportsMutations.SET_STATUS, {
-    statusMessage: "Loading package split data...",
+    statusMessage: { text: "Loading package split data...", level: "success" },
   });
 
   // Load all history objects into map
