@@ -1,11 +1,15 @@
 import { PackageFilterIdentifiers } from "@/consts";
-import { IIndexedDestinationPackageData, IIndexedPackageData, IPackageData } from "@/interfaces";
+import { IPackageData, IUnionIndexedPackageData } from "@/interfaces";
 import { authManager } from "@/modules/auth-manager.module";
-import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
+import {
+  getDataLoaderByLicense,
+  primaryDataLoader,
+} from "@/modules/data-loader/data-loader.module";
 import { toastManager } from "@/modules/toast-manager.module";
 import { downloadFileFromUrl } from "./dom";
+import { extractParentPackageLabelsFromHistory } from "./history";
 
-export function getId(unionPkg: IIndexedPackageData | IIndexedDestinationPackageData): number {
+export function getId(unionPkg: IUnionIndexedPackageData): number {
   const pkg = unionPkg as any;
   if (pkg.Id) {
     return pkg.Id;
@@ -16,7 +20,7 @@ export function getId(unionPkg: IIndexedPackageData | IIndexedDestinationPackage
   throw new Error("Could not extract ID");
 }
 
-export function getLabel(unionPkg: IIndexedPackageData | IIndexedDestinationPackageData): string {
+export function getLabel(unionPkg: IUnionIndexedPackageData): string {
   const pkg = unionPkg as any;
   if (pkg.Label) {
     return pkg.Label;
@@ -25,6 +29,24 @@ export function getLabel(unionPkg: IIndexedPackageData | IIndexedDestinationPack
     return pkg.PackageLabel;
   }
   throw new Error("Could not extract Label");
+}
+
+// Extremely long lists will be truncated with an ellipsis
+export async function getParentPackageLabels(pkg: IUnionIndexedPackageData) {
+  if (pkg.SourcePackageLabels.length < 500) {
+    return pkg.SourcePackageLabels.split(",").map((x) => x.trim());
+  } else {
+    // Source package labels may have been truncated
+    if (pkg.history) {
+      return extractParentPackageLabelsFromHistory(pkg.history);
+    } else {
+      const history = await getDataLoaderByLicense(pkg.LicenseNumber).then((dataLoader) =>
+        dataLoader.packageHistoryByPackageId(getId(pkg))
+      );
+
+      return extractParentPackageLabelsFromHistory(history);
+    }
+  }
 }
 
 export async function getLabTestUrlsFromPackage({

@@ -1,7 +1,6 @@
 import {
   IAuthState,
   IHarvestFilter,
-  IIndexedDestinationPackageData,
   IIndexedHarvestData,
   IIndexedPackageData,
   IIndexedPlantBatchData,
@@ -16,6 +15,7 @@ import {
   ISpreadsheet,
   ITagFilter,
   ITransferFilter,
+  IUnionIndexedPackageData,
 } from "@/interfaces";
 import { IStatusMessage, ReportStatus, ReportType } from "./consts";
 
@@ -37,6 +37,7 @@ export interface IPackageCostCalculationData {
     parentTag: string;
     costFractionMultiplier: number;
   }[];
+  errors: string[];
 }
 
 export interface IReportConfig {
@@ -86,7 +87,7 @@ export interface IReportConfig {
 
 export interface IReportData {
   [ReportType.COGS]?: {
-    packages: (IIndexedPackageData | IIndexedDestinationPackageData)[];
+    packages: IUnionIndexedPackageData[];
     packageCostCalculationData: IPackageCostCalculationData[];
     richOutgoingTransfers?: IIndexedRichOutgoingTransferData[];
   };

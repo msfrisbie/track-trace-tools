@@ -750,6 +750,8 @@ export interface IIndexedDestinationPackageData extends IDestinationPackageData 
   history?: IPackageHistoryData[];
 }
 
+export type IUnionIndexedPackageData = IIndexedPackageData | IIndexedDestinationPackageData;
+
 // This is a shared type between incoming and outgoing
 export interface ITransferData {
   ActualArrivalDateTime: string | null;

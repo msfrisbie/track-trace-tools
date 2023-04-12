@@ -1,5 +1,5 @@
 import { MessageType, SheetTitles } from "@/consts";
-import { ISpreadsheet } from "@/interfaces";
+import { ISpreadsheet, IUnionIndexedPackageData } from "@/interfaces";
 import { messageBus } from "@/modules/message-bus.module";
 import store from "@/store/page-overlay/index";
 import { ReportsMutations, ReportType } from "@/store/page-overlay/modules/reports/consts";
@@ -9,6 +9,7 @@ import {
   IReportData,
 } from "@/store/page-overlay/modules/reports/interfaces";
 import { todayIsodate } from "./date";
+import { getLabel } from "./package";
 import {
   extractFlattenedData,
   getSheetTitle,
@@ -118,11 +119,15 @@ async function writeDataSheet<T>({
   spreadsheetTitle,
   fields,
   data,
+  options = {},
 }: {
   spreadsheetId: string;
   spreadsheetTitle: SheetTitles;
   fields: IFieldData[];
   data: T[];
+  options?: {
+    useFieldTransformer?: boolean;
+  };
 }) {
   await messageBus.sendMessageToBackground(
     MessageType.WRITE_SPREADSHEET_VALUES,
@@ -147,22 +152,30 @@ async function writeDataSheet<T>({
       break;
     }
 
+    const range = `'${spreadsheetTitle}'!${nextPageRowIdx}:${nextPageRowIdx + nextPage.length}`;
+
+    let values = nextPage;
+    if (options.useFieldTransformer) {
+      // @ts-ignore
+      values = values.map((row) =>
+        fields.map((fieldData) => {
+          let value = row;
+          for (const subProperty of fieldData.value.split(".")) {
+            // @ts-ignore
+            value = value[subProperty];
+          }
+          return value;
+        })
+      );
+    }
+
     promises.push(
       messageBus.sendMessageToBackground(
         MessageType.WRITE_SPREADSHEET_VALUES,
         {
           spreadsheetId,
-          range: `'${spreadsheetTitle}'!${nextPageRowIdx}:${nextPageRowIdx + nextPage.length}`,
-          values: nextPage.map((data) =>
-            fields.map((fieldData) => {
-              let value = data;
-              for (const subProperty of fieldData.value.split(".")) {
-                // @ts-ignore
-                value = value[subProperty];
-              }
-              return value;
-            })
-          ),
+          range,
+          values,
         },
         undefined,
         90000
@@ -195,6 +208,19 @@ export async function createSpreadsheetOrError({
     });
   }
 
+  return createReportSpreadsheeetOrError({
+    reportData,
+    reportConfig,
+  });
+}
+
+export async function createReportSpreadsheeetOrError({
+  reportData,
+  reportConfig,
+}: {
+  reportData: IReportData;
+  reportConfig: IReportConfig;
+}): Promise<ISpreadsheet> {
   const flattenedCache = new Map<ReportType, any[]>();
 
   //
@@ -299,6 +325,9 @@ export async function createSpreadsheetOrError({
       spreadsheetTitle: getSheetTitle({ reportType }),
       fields: reportConfig[reportType]?.fields as IFieldData[],
       data: extractFlattenedData({ flattenedCache, reportType, reportData }) as any[],
+      options: {
+        useFieldTransformer: true,
+      },
     });
   }
 
@@ -421,6 +450,17 @@ export async function createCogsSpreadsheetOrError({
     throw new Error("Invalid authState");
   }
 
+  if (!reportData[ReportType.COGS]) {
+    throw new Error("Missing COGS data");
+  }
+
+  const sheetTitles = [
+    SheetTitles.OVERVIEW,
+    SheetTitles.PRODUCTION_BATCH_COSTS,
+    SheetTitles.WORKSHEET,
+    SheetTitles.MANIFEST_COGS,
+  ];
+
   const response: {
     data: {
       success: boolean;
@@ -430,12 +470,7 @@ export async function createCogsSpreadsheetOrError({
     MessageType.CREATE_SPREADSHEET,
     {
       title: `COGS - ${todayIsodate()}`,
-      sheetTitles: [
-        SheetTitles.OVERVIEW,
-        SheetTitles.PRODUCTION_BATCH_COSTS,
-        SheetTitles.WORKSHEET,
-        SheetTitles.MANIFEST_COGS,
-      ],
+      sheetTitles,
     },
     undefined,
     90000
@@ -445,16 +480,99 @@ export async function createCogsSpreadsheetOrError({
     throw new Error("Unable to create COGS sheet");
   }
 
-  // await messageBus.sendMessageToBackground(
-  //   MessageType.WRITE_SPREADSHEET_VALUES,
-  //   {
-  //     spreadsheetId: response.data.result.spreadsheetId,
-  //     range: `'${SheetTitles.OVERVIEW}'`,
-  //     values: [[`Created with Track & Trace Tools @ ${Date().toString()}`]],
-  //   },
-  //   undefined,
-  //   90000
-  // );
+  await messageBus.sendMessageToBackground(
+    MessageType.WRITE_SPREADSHEET_VALUES,
+    {
+      spreadsheetId: response.data.result.spreadsheetId,
+      range: `'${SheetTitles.OVERVIEW}'`,
+      values: [[`Created with Track & Trace Tools @ ${Date().toString()}`]],
+    },
+    undefined,
+    90000
+  );
+
+  const packageData = (reportData[ReportType.COGS]?.packages as IUnionIndexedPackageData[])
+    .sort((a, b) => ((a.ProductionBatchNumber ?? "") > (b.ProductionBatchNumber ?? "") ? 1 : -1))
+    .map((pkg) => [getLabel(pkg), pkg.ProductionBatchNumber ?? ""]);
+
+  let formattingRequests: any = [
+    addRowsRequestFactory({
+      sheetId: sheetTitles.indexOf(SheetTitles.OVERVIEW),
+      length: 20,
+    }),
+    styleTopRowRequestFactory({
+      sheetId: sheetTitles.indexOf(SheetTitles.OVERVIEW),
+    }),
+  ];
+
+  const batchCostSheetId = sheetTitles.indexOf(SheetTitles.PRODUCTION_BATCH_COSTS);
+  const worksheetSheetId = sheetTitles.indexOf(SheetTitles.WORKSHEET);
+  const manifestSheetId = sheetTitles.indexOf(SheetTitles.MANIFEST_COGS);
+
+  formattingRequests = [
+    ...formattingRequests,
+    // Batch Costs
+    addRowsRequestFactory({ sheetId: batchCostSheetId, length: packageData.length }),
+    styleTopRowRequestFactory({ sheetId: batchCostSheetId }),
+    freezeTopRowRequestFactory({ sheetId: batchCostSheetId }),
+    // Worksheet
+    addRowsRequestFactory({ sheetId: worksheetSheetId, length: 100 }),
+    styleTopRowRequestFactory({ sheetId: worksheetSheetId }),
+    freezeTopRowRequestFactory({ sheetId: worksheetSheetId }),
+    // Manifest COGS
+    addRowsRequestFactory({ sheetId: manifestSheetId, length: 200 }),
+    styleTopRowRequestFactory({ sheetId: manifestSheetId }),
+    freezeTopRowRequestFactory({ sheetId: manifestSheetId }),
+  ];
+
+  await messageBus.sendMessageToBackground(
+    MessageType.BATCH_UPDATE_SPREADSHEET,
+    {
+      spreadsheetId: response.data.result.spreadsheetId,
+      requests: formattingRequests,
+    },
+    undefined,
+    90000
+  );
+
+  // Tag	Production Batch Number	Cost
+  // 1A4050100000900000000001	PR-C100GSSRA-03/21/2023	$1,500.00
+
+  store.commit(`reports/${ReportsMutations.SET_STATUS}`, {
+    statusMessage: { text: `Writing package data...`, level: "success" },
+  });
+
+  await writeDataSheet({
+    spreadsheetId: response.data.result.spreadsheetId,
+    spreadsheetTitle: SheetTitles.PRODUCTION_BATCH_COSTS,
+    fields: [
+      {
+        value: "",
+        readableName: "Package Tag",
+        required: true,
+      },
+      {
+        value: "",
+        readableName: "Production Batch Number",
+        required: true,
+      },
+      {
+        value: "",
+        readableName: "Cost",
+        required: true,
+      },
+    ],
+    data: packageData,
+    options: {
+      useFieldTransformer: false,
+    },
+  });
+
+  // Tag	Computed Cost	Production Batch Cost	Fractional Costs
+  // 1A4050100000900000000004	=SUM(C5:5) =IFERROR(VLOOKUP(A5, 'Production Batches'!A5:C, 3), 0)	=VLOOKUP("1A4050100000900000000001", $A$2:$B, 2) * 0.25
+
+  // Manifest	Tag	Wholesale Cost	Units	COGS (package)	COGS (per unit)
+  // 10000001	1A4050100000900000000008	$500.00	50	=VLOOKUP(B3, 'Calculation Sheet'!A3:B, 2)	=E3/D3
 
   return response.data.result;
 }

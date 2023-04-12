@@ -3,8 +3,10 @@ import {
   IIndexedPackageData,
   IIndexedRichOutgoingTransferData,
   IPackageFilter,
+  IPackageHistoryData,
   IPluginState,
   ITransferFilter,
+  IUnionIndexedPackageData,
 } from "@/interfaces";
 import { DataLoader, getDataLoaderByLicense } from "@/modules/data-loader/data-loader.module";
 import { facilityManager } from "@/modules/facility-manager.module";
@@ -17,8 +19,11 @@ import {
 } from "@/store/page-overlay/modules/reports/interfaces";
 import { ActionContext } from "vuex";
 import { getIsoDateFromOffset, todayIsodate } from "../date";
-import { extractTagQuantityPairsFromHistory } from "../history";
-import { getId, getLabel } from "../package";
+import {
+  extractParentPackageLabelsFromHistory,
+  extractTagQuantityPairsFromHistory,
+} from "../history";
+import { getId, getParentPackageLabels } from "../package";
 
 interface ICogsReportFormFilters {
   cogsDateGt: string;
@@ -79,8 +84,6 @@ export async function maybeLoadCogsReportData({
 
   let dataLoader: DataLoader | null = null;
 
-  // TODO bulk persistent caching
-  // TODO incremental chunk caching
   for (const license of await (
     await facilityManager.ownedFacilitiesOrError()
   ).map((x) => x.licenseNumber)) {
@@ -105,8 +108,13 @@ export async function maybeLoadCogsReportData({
     }
   }
 
-  const globalPackageMap: Map<string, IIndexedPackageData | IIndexedDestinationPackageData> =
-    new Map(packages.map((pkg) => [pkg.Label, pkg]));
+  const globalPackageMap: Map<string, IUnionIndexedPackageData> = new Map(
+    packages.map((pkg) => [pkg.Label, pkg])
+  );
+
+  ctx.commit(ReportsMutations.SET_STATUS, {
+    statusMessage: { text: "Loading transfers...", level: "success" },
+  });
 
   let richOutgoingTransfers: IIndexedRichOutgoingTransferData[] = [];
 
@@ -144,11 +152,11 @@ export async function maybeLoadCogsReportData({
     transferFilter.estimatedDepartureDateLt as string
   );
 
-  const departureDateBufferGt = (transferFilter.estimatedDepartureDateGt as string).split("T")[0];
-  const departureDateBufferLt = getIsoDateFromOffset(
+  const [departureDateBufferGt] = (transferFilter.estimatedDepartureDateGt as string).split("T");
+  const [departureDateBufferLt] = getIsoDateFromOffset(
     1,
     transferFilter.estimatedDepartureDateLt as string
-  ).split("T")[0];
+  ).split("T");
 
   richOutgoingTransfers = richOutgoingTransfers.filter((richOutgoingTransfer) => {
     if (richOutgoingTransfer.CreatedDateTime < createdDateBufferGt) {
@@ -171,23 +179,10 @@ export async function maybeLoadCogsReportData({
     richOutgoingTransferDestinationRequests.push(
       getDataLoaderByLicense(transfer.LicenseNumber).then((dataLoader) =>
         dataLoader.transferDestinations(transfer.Id).then((destinations) => {
-          transfer.outgoingDestinations = destinations
-            .map((x) => ({ ...x, packages: [] }))
-            .filter((destination) => {
-              if (!destination.ShipmentTypeName.includes("Wholesale")) {
-                return false;
-              }
-
-              if (destination.EstimatedDepartureDateTime < departureDateBufferGt) {
-                return false;
-              }
-
-              if (destination.EstimatedDepartureDateTime > departureDateBufferLt) {
-                return false;
-              }
-
-              return true;
-            });
+          transfer.outgoingDestinations = destinations.map((x) => ({ ...x, packages: [] }));
+          // .filter((destination) => {
+          //   return true;
+          // });
         })
       )
     )
@@ -217,25 +212,34 @@ export async function maybeLoadCogsReportData({
 
   // Register all outgoing manifest packages
   const manifestPackages: IIndexedDestinationPackageData[] = [];
+  const allTransferredPackages: IIndexedDestinationPackageData[] = [];
 
   for (const transfer of richOutgoingTransfers) {
     for (const destination of transfer.outgoingDestinations ?? []) {
+      const isEligibleWholesaleTransfer: boolean =
+        destination.ShipmentTypeName.includes("Wholesale") &&
+        destination.EstimatedDepartureDateTime > departureDateBufferGt &&
+        destination.EstimatedDepartureDateTime < departureDateBufferLt;
+
       for (const pkg of destination.packages ?? []) {
-        manifestPackages.push(pkg);
+        allTransferredPackages.push(pkg);
+        if (isEligibleWholesaleTransfer) {
+          manifestPackages.push(pkg);
+        }
       }
     }
   }
 
   ctx.commit(ReportsMutations.SET_STATUS, {
-    statusMessage: { text: "Building package history...", level: "succes" },
+    statusMessage: { text: "Building package history...", level: "success" },
   });
 
   // Also add manifest packages to global pkg map
-  manifestPackages.map((pkg) => globalPackageMap.set(pkg.PackageLabel, pkg));
+  allTransferredPackages.map((pkg) => globalPackageMap.set(pkg.PackageLabel, pkg));
 
   // Mark all packages that need to have history loaded
-  // Initialize to manifest packages
-  const historyTreeMap = new Map<string, IIndexedPackageData | IIndexedDestinationPackageData>(
+  // Initialize to contain manifest packages
+  const historyTreeMap = new Map<string, IUnionIndexedPackageData>(
     manifestPackages.map((pkg) => [pkg.PackageLabel, pkg])
   );
 
@@ -259,8 +263,7 @@ export async function maybeLoadCogsReportData({
 
     historyTreeMap.set(label, pkg);
 
-    pkg.SourcePackageLabels.split(",")
-      .map((x) => x.trim())
+    (await getParentPackageLabels(pkg))
       .filter((x) => x.length > 0)
       .filter((x) => !touchedPackageTags.has(x))
       .map((x) => packageTagStack.push(x));
@@ -293,36 +296,75 @@ export async function maybeLoadCogsReportData({
 
   await Promise.allSettled(packageHistoryRequests);
 
-  const packageCostCalculationData: IPackageCostCalculationData[] = [];
+  for (const [label, pkg] of historyTreeMap.entries()) {
+    if (!pkg.history || !pkg.history.length) {
+      console.error(`${label} has no history, stripping out`);
 
-  const pkgStack: (IIndexedPackageData | IIndexedDestinationPackageData)[] = [
-    ...historyTreeMap.values(),
-  ];
-  while (pkgStack.length > 0) {
-    const pkg = pkgStack.pop();
+      historyTreeMap.delete(label);
+    }
+  }
 
-    if (!pkg) {
-      throw new Error("Bad package pop");
+  // At this point, all packages in map should have history
+
+  // Validate that all packages have parents that are either
+  // - All missing from the history tree
+  // - All present in the history tree
+  for (const [label, pkg] of historyTreeMap.entries()) {
+    const parentLabels = extractParentPackageLabelsFromHistory(
+      pkg.history as IPackageHistoryData[]
+    );
+
+    const missing = parentLabels.filter((x) => !historyTreeMap.has(x));
+    const included = parentLabels.filter((x) => historyTreeMap.has(x));
+
+    if (missing.length === 0 && included.length === 0) {
+      console.error(`${label} has both counts === 0`);
     }
 
-    const parentTags: string[] = pkg.SourcePackageLabels.split(",").map((x) => x.trim());
+    if (missing.length > 0 && included.length > 0) {
+      console.error(`${label} has both counts > 0`);
+      console.log(pkg.SourcePackageLabels);
+      console.groupCollapsed("missing");
+      missing.map(console.log);
+      console.groupEnd();
+      console.groupCollapsed("included");
+      included.map(console.log);
+      console.groupEnd();
+    }
+  }
+
+  const packageCostCalculationData: IPackageCostCalculationData[] = [];
+
+  //   const pkgStack: (IUnionIndexedPackageData)[] = [
+  //     ...historyTreeMap.values(),
+  //   ];
+  // TODO shouldnt the history tree just be iterated?
+  //   while (pkgStack.length > 0) {
+  //     const pkg = pkgStack.pop();
+  for (const [label, pkg] of historyTreeMap.entries()) {
+    // if (!pkg) {
+    //   throw new Error("Bad package pop");
+    // }
 
     const sourceCostData: { parentTag: string; costFractionMultiplier: number }[] = [];
+    const errors: string[] = [];
 
-    for (const parentTag of parentTags) {
+    for (const parentTag of extractParentPackageLabelsFromHistory(
+      pkg.history as IPackageHistoryData[]
+    )) {
       const parentPkg = historyTreeMap.get(parentTag);
 
       if (!parentPkg) {
-        console.log(`Couldn't look up package: ${parentTag}`);
+        //console.log(`Couldn't look up package: ${parentTag}`);
         continue;
       }
 
       if (!parentPkg.history || parentPkg.history.length === 0) {
-        console.log("Parent pkg does not have a history loaded");
-        continue;
+        throw new Error("FATAL: Parent pkg does not have a history loaded");
+        // continue;
       }
 
-      pkgStack.push(parentPkg);
+      //   pkgStack.push(parentPkg);
 
       const tagQuantityPairs = extractTagQuantityPairsFromHistory(parentPkg.history);
 
@@ -330,9 +372,14 @@ export async function maybeLoadCogsReportData({
         .map((x) => x.quantity)
         .reduce((a, b) => a + b, 0);
 
-      const currentPackagePair = tagQuantityPairs.find((x) => x.tag === getLabel(pkg));
+      const currentPackagePair = tagQuantityPairs.find((x) => x.tag === label);
       if (!currentPackagePair) {
-        throw new Error("Could not match a tag when pairing quantities");
+        errors.push(
+          `Could not match a tag when pairing quantities: label:${label}, parent: ${parentTag}, pairLen: ${tagQuantityPairs.length}`
+        );
+        console.error({ tagQuantityPairs, label, parentPkg });
+        continue;
+        // throw new Error("Could not match a tag when pairing quantities");
       }
 
       sourceCostData.push({
@@ -341,10 +388,13 @@ export async function maybeLoadCogsReportData({
       });
     }
 
-    packageCostCalculationData.push({
-      tag: getLabel(pkg),
-      sourceCostData,
-    });
+    if (sourceCostData.length > 0) {
+      packageCostCalculationData.push({
+        tag: label,
+        sourceCostData,
+        errors,
+      });
+    }
   }
 
   reportData[ReportType.COGS] = {
@@ -352,6 +402,4 @@ export async function maybeLoadCogsReportData({
     packageCostCalculationData,
     richOutgoingTransfers,
   };
-
-  console.log(reportData);
 }
