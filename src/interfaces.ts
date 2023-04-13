@@ -742,7 +742,7 @@ export interface IDestinationPackageData {
   ProductCategoryName: string; // "Infused-Edible";
   ProductName: string; // "Mojo - Chocolate 20mg (Sativa)";
   ProductRequiresRemediation: false;
-  ProductionBatchNumber: null;
+  ProductionBatchNumber: string | null;
   ReceivedQuantity: number;
   ReceivedUnitOfMeasureAbbreviation: string;
   ReceiverWholesalePrice: null;
@@ -771,6 +771,21 @@ export type IUnionIndexedPackageData = IIndexedPackageData | IIndexedDestination
 export type IUnionRichIndexedPackageData =
   | IRichIndexedPackageData
   | IRichIndexedDestinationPackageData;
+
+export interface ISimpleCogsPackageData {
+  LicenseNumber: string;
+  Id: number;
+  PackageState: PackageState;
+  Label: string;
+  ItemName: string;
+  manifest: boolean;
+  manifestGraph: boolean;
+  SourcePackageLabels: string;
+  ProductionBatchNumber: string | null;
+  history?: IPackageHistoryData[];
+  fractionalCostData: IFractionalCostData[];
+  errors: string[];
+}
 
 // This is a shared type between incoming and outgoing
 export interface ITransferData {

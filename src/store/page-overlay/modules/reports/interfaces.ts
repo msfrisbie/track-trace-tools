@@ -11,12 +11,11 @@ import {
   IPackageFilter,
   IPlantBatchFilter,
   IPlantFilter,
+  ISimpleCogsPackageData,
   ISimpleSpreadsheet,
   ISpreadsheet,
   ITagFilter,
   ITransferFilter,
-  IUnionIndexedPackageData,
-  IUnionRichIndexedPackageData,
 } from "@/interfaces";
 import { IStatusMessage, ReportStatus, ReportType } from "./consts";
 
@@ -88,8 +87,7 @@ export interface IReportConfig {
 
 export interface IReportData {
   [ReportType.COGS]?: {
-    packages: IUnionRichIndexedPackageData[];
-    // packageCostCalculationData: IPackageCostCalculationData[];
+    packages: ISimpleCogsPackageData[];
     richOutgoingTransfers: IIndexedRichOutgoingTransferData[];
     auditData: { text: string; value: string | number }[];
   };

@@ -1,11 +1,9 @@
 import {
-  IIndexedDestinationPackageData,
   IIndexedRichOutgoingTransferData,
   IPackageFilter,
   IPluginState,
+  ISimpleCogsPackageData,
   ITransferFilter,
-  IUnionIndexedPackageData,
-  IUnionRichIndexedPackageData,
 } from "@/interfaces";
 import { DataLoader, getDataLoaderByLicense } from "@/modules/data-loader/data-loader.module";
 import { facilityManager } from "@/modules/facility-manager.module";
@@ -21,7 +19,7 @@ import {
   extractParentPackageLabelsFromHistory,
   extractTagQuantityPairsFromHistory,
 } from "../history";
-import { getId, getLabel, getParentPackageLabels } from "../package";
+import { getId, getItemName, getLabel, getParentPackageLabels } from "../package";
 
 interface ICogsReportFormFilters {
   cogsDateGt: string;
@@ -71,7 +69,9 @@ export async function maybeLoadCogsReportData({
 
   const { packageFilter, transferFilter } = reportConfig[ReportType.COGS]!;
 
-  let packages: IUnionIndexedPackageData[] = [];
+  const globalPackageMap: Map<string, ISimpleCogsPackageData> = new Map();
+
+  // let packages: IUnionIndexedPackageData[] = [];
 
   let dataLoader: DataLoader | null = null;
 
@@ -85,27 +85,79 @@ export async function maybeLoadCogsReportData({
     dataLoader = await getDataLoaderByLicense(license);
 
     try {
-      packages = [...packages, ...(await dataLoader.activePackages(24 * 60 * 60 * 1000))];
+      (await dataLoader.activePackages(24 * 60 * 60 * 1000)).map((pkg) =>
+        globalPackageMap.set(getLabel(pkg), {
+          LicenseNumber: pkg.LicenseNumber,
+          Id: getId(pkg),
+          PackageState: pkg.PackageState,
+          Label: getLabel(pkg),
+          ItemName: getItemName(pkg),
+          manifest: false,
+          manifestGraph: false,
+          SourcePackageLabels: pkg.SourcePackageLabels,
+          ProductionBatchNumber: pkg.ProductionBatchNumber,
+          fractionalCostData: [],
+          errors: [],
+        })
+      );
+      // packages = [...packages, ...(await dataLoader.activePackages(24 * 60 * 60 * 1000))];
     } catch (e) {
-      console.log(e);
       ctx.commit(ReportsMutations.SET_STATUS, {
         statusMessage: { text: `Failed to load active packages. (${license})`, level: "warning" },
       });
     }
 
     try {
-      packages = [...packages, ...(await dataLoader.inactivePackages(24 * 60 * 60 * 1000))];
+      // packages = [...packages, ...(await dataLoader.inactivePackages(24 * 60 * 60 * 1000))];
+
+      (await dataLoader.inactivePackages(24 * 60 * 60 * 1000)).map((pkg) =>
+        globalPackageMap.set(getLabel(pkg), {
+          LicenseNumber: pkg.LicenseNumber,
+          Id: getId(pkg),
+          PackageState: pkg.PackageState,
+          Label: getLabel(pkg),
+          ItemName: getItemName(pkg),
+          manifest: false,
+          manifestGraph: false,
+          SourcePackageLabels: pkg.SourcePackageLabels,
+          ProductionBatchNumber: pkg.ProductionBatchNumber,
+          fractionalCostData: [],
+          errors: [],
+        })
+      );
     } catch (e) {
-      console.log(e);
       ctx.commit(ReportsMutations.SET_STATUS, {
         statusMessage: { text: `Failed to load inactive packages. (${license})`, level: "warning" },
       });
     }
-  }
 
-  const globalPackageMap: Map<string, IUnionIndexedPackageData> = new Map(
-    packages.map((pkg) => [getLabel(pkg), pkg])
-  );
+    try {
+      // packages = [...packages, ...(await dataLoader.inactivePackages(24 * 60 * 60 * 1000))];
+
+      (await dataLoader.inTransitPackages()).map((pkg) =>
+        globalPackageMap.set(getLabel(pkg), {
+          LicenseNumber: pkg.LicenseNumber,
+          Id: getId(pkg),
+          PackageState: pkg.PackageState,
+          Label: getLabel(pkg),
+          ItemName: getItemName(pkg),
+          manifest: false,
+          manifestGraph: false,
+          SourcePackageLabels: pkg.SourcePackageLabels,
+          ProductionBatchNumber: pkg.ProductionBatchNumber,
+          fractionalCostData: [],
+          errors: [],
+        })
+      );
+    } catch (e) {
+      ctx.commit(ReportsMutations.SET_STATUS, {
+        statusMessage: {
+          text: `Failed to load in transit packages. (${license})`,
+          level: "warning",
+        },
+      });
+    }
+  }
 
   let richOutgoingTransfers: IIndexedRichOutgoingTransferData[] = [];
 
@@ -117,19 +169,17 @@ export async function maybeLoadCogsReportData({
     });
 
     dataLoader = await getDataLoaderByLicense(license);
-    try {
-      const outgoingTransfers = await dataLoader.outgoingTransfers();
-      console.log({ outgoingTransfers });
-      richOutgoingTransfers = [...richOutgoingTransfers, ...outgoingTransfers];
-    } catch (e) {
-      ctx.commit(ReportsMutations.SET_STATUS, {
-        statusMessage: { text: "Failed to load outgoing transfers.", level: "warning" },
-      });
-    }
+    // try {
+    //   const outgoingTransfers = await dataLoader.outgoingTransfers();
+    //   richOutgoingTransfers = [...richOutgoingTransfers, ...outgoingTransfers];
+    // } catch (e) {
+    //   ctx.commit(ReportsMutations.SET_STATUS, {
+    //     statusMessage: { text: "Failed to load outgoing transfers.", level: "warning" },
+    //   });
+    // }
 
     try {
       const outgoingInactiveTransfers = await dataLoader.outgoingInactiveTransfers();
-      console.log({ outgoingInactiveTransfers });
       richOutgoingTransfers = [...richOutgoingTransfers, ...outgoingInactiveTransfers];
     } catch (e) {
       ctx.commit(ReportsMutations.SET_STATUS, {
@@ -168,7 +218,7 @@ export async function maybeLoadCogsReportData({
     richOutgoingTransferDestinationRequests.push(
       getDataLoaderByLicense(transfer.LicenseNumber).then((dataLoader) =>
         dataLoader.transferDestinations(transfer.Id).then((destinations) => {
-          transfer.outgoingDestinations = destinations.map((x) => ({ ...x, packages: [] }));
+          transfer.outgoingDestinations = destinations;
         })
       )
     )
@@ -182,34 +232,11 @@ export async function maybeLoadCogsReportData({
 
   const packageRequests: Promise<any>[] = [];
 
-  richOutgoingTransfers.map((transfer) =>
-    transfer.outgoingDestinations?.map((destination) =>
-      packageRequests.push(
-        getDataLoaderByLicense(transfer.LicenseNumber).then((dataLoader) =>
-          dataLoader.destinationPackages(destination.Id).then((destinationPackages) => {
-            destination.packages = destinationPackages;
-            packages = [...packages, ...destinationPackages];
-          })
-        )
-      )
-    )
-  );
-
-  const totalTransfersWithMultiDestinations = richOutgoingTransfers
-    .map((x) => x.outgoingDestinations!.length)
-    .filter((x) => x > 1)
-    .reduce((a, b) => a + b, 0);
-
-  await Promise.allSettled(packageRequests);
-
-  // Register all outgoing manifest packages
-  const manifestPackages: IIndexedDestinationPackageData[] = [];
-  const allTransferredPackages: IIndexedDestinationPackageData[] = [];
   const eligibleTransfers: IIndexedRichOutgoingTransferData[] = [];
   const wholesaleTransfers: IIndexedRichOutgoingTransferData[] = [];
 
-  for (const transfer of richOutgoingTransfers) {
-    for (const destination of transfer.outgoingDestinations ?? []) {
+  richOutgoingTransfers.map((transfer) =>
+    transfer.outgoingDestinations?.map((destination) => {
       const isWholesaleTransfer: boolean = destination.ShipmentTypeName.includes("Wholesale");
 
       const isEligibleTransfer: boolean =
@@ -223,31 +250,92 @@ export async function maybeLoadCogsReportData({
         }
       }
 
-      for (const pkg of destination.packages ?? []) {
-        allTransferredPackages.push(pkg);
-        if (isEligibleTransfer && isWholesaleTransfer) {
-          manifestPackages.push(pkg);
-        }
-      }
-    }
-  }
+      packageRequests.push(
+        getDataLoaderByLicense(transfer.LicenseNumber).then((dataLoader) =>
+          dataLoader.destinationPackages(destination.Id).then((destinationPackages) => {
+            destination.packages = destinationPackages;
+
+            destinationPackages.map((pkg) =>
+              globalPackageMap.set(getLabel(pkg), {
+                LicenseNumber: pkg.LicenseNumber,
+                Id: getId(pkg),
+                PackageState: pkg.PackageState,
+                Label: getLabel(pkg),
+                ItemName: getItemName(pkg),
+                manifest: isWholesaleTransfer && isEligibleTransfer,
+                manifestGraph: true,
+                SourcePackageLabels: pkg.SourcePackageLabels,
+                ProductionBatchNumber: pkg.ProductionBatchNumber,
+                fractionalCostData: [],
+                errors: [],
+              })
+            );
+            // packages = [...packages, ...destinationPackages];
+          })
+        )
+      );
+    })
+  );
+
+  // const globalPackageMap: Map<string, IUnionIndexedPackageData> = new Map(
+  //   packages.map((pkg) => [getLabel(pkg), pkg])
+  // );
+
+  const totalTransfersWithMultiDestinations = richOutgoingTransfers
+    .map((x) => x.outgoingDestinations!.length)
+    .filter((x) => x > 1)
+    .reduce((a, b) => a + b, 0);
+
+  await Promise.allSettled(packageRequests);
+
+  // Register all outgoing manifest packages
+  // const manifestPackages: IIndexedDestinationPackageData[] = [];
+  // const allTransferredPackages: IIndexedDestinationPackageData[] = [];
+  // const eligibleTransfers: IIndexedRichOutgoingTransferData[] = [];
+  // const wholesaleTransfers: IIndexedRichOutgoingTransferData[] = [];
+
+  // for (const transfer of richOutgoingTransfers) {
+  //   for (const destination of transfer.outgoingDestinations ?? []) {
+  //     const isWholesaleTransfer: boolean = destination.ShipmentTypeName.includes("Wholesale");
+
+  //     const isEligibleTransfer: boolean =
+  //       destination.EstimatedDepartureDateTime > departureDateGt &&
+  //       destination.EstimatedDepartureDateTime < departureDateLt;
+
+  //     if (isEligibleTransfer) {
+  //       eligibleTransfers.push(transfer);
+  //       if (isWholesaleTransfer) {
+  //         wholesaleTransfers.push(transfer);
+  //       }
+  //     }
+
+  //     for (const pkg of destination.packages ?? []) {
+  //       allTransferredPackages.push(pkg);
+  //       if (isEligibleTransfer && isWholesaleTransfer) {
+  //         manifestPackages.push(pkg);
+  //       }
+  //     }
+  //   }
+  // }
 
   ctx.commit(ReportsMutations.SET_STATUS, {
     statusMessage: { text: "Building package history...", level: "success" },
   });
 
   // Also add manifest packages to global pkg map
-  allTransferredPackages.map((pkg) => globalPackageMap.set(pkg.PackageLabel, pkg));
+  // allTransferredPackages.map((pkg) => globalPackageMap.set(pkg.PackageLabel, pkg));
 
   // Mark all packages that need to have history loaded
   // Initialize to contain manifest packages
-  const historyTreeMap = new Map<string, IUnionRichIndexedPackageData>(
-    manifestPackages.map((pkg) => [pkg.PackageLabel, pkg])
-  );
+  // const historyTreeMap = new Map<string, IUnionRichIndexedPackageData>(
+  //   manifestPackages.map((pkg) => [pkg.PackageLabel, pkg])
+  // );
 
   const touchedPackageTags: Set<string> = new Set();
 
-  const packageTagStack: string[] = [...manifestPackages].map((pkg) => pkg.PackageLabel);
+  const packageTagStack: string[] = [...globalPackageMap.values()]
+    .filter((pkg) => pkg.manifest)
+    .map((pkg) => pkg.Label);
 
   console.log(`Initial package tag stack: ${packageTagStack.length}`);
 
@@ -266,7 +354,10 @@ export async function maybeLoadCogsReportData({
       continue;
     }
 
-    historyTreeMap.set(label, pkg);
+    globalPackageMap.set(pkg.Label, {
+      ...pkg,
+      manifestGraph: true,
+    });
 
     (await getParentPackageLabels(pkg))
       .filter((x) => x.length > 0)
@@ -274,7 +365,7 @@ export async function maybeLoadCogsReportData({
       .map((x) => packageTagStack.push(x));
   }
 
-  console.log({ historyTreeMap });
+  console.log({ manifestGraph: [...globalPackageMap.values()].filter((pkg) => pkg.manifestGraph) });
 
   ctx.commit(ReportsMutations.SET_STATUS, {
     statusMessage: { text: "Loading package split data...", level: "success" },
@@ -284,10 +375,14 @@ export async function maybeLoadCogsReportData({
   const packageHistoryRequests: Promise<any>[] = [];
 
   let counter = 0;
-  for (const pkg of historyTreeMap.values()) {
+  for (const pkg of globalPackageMap.values()) {
+    if (!pkg.manifestGraph) {
+      continue;
+    }
+
     packageHistoryRequests.push(
       getDataLoaderByLicense(pkg.LicenseNumber).then((dataLoader) =>
-        dataLoader.packageHistoryByPackageId(getId(pkg)).then((history) => {
+        dataLoader.packageHistoryByPackageId(pkg.Id).then((history) => {
           pkg.history = history;
         })
       )
@@ -336,9 +431,10 @@ export async function maybeLoadCogsReportData({
   //   }
   // }
 
-  for (const [label, pkg] of historyTreeMap.entries()) {
-    pkg.errors = [];
-    pkg.fractionalCostData = [];
+  for (const pkg of globalPackageMap.values()) {
+    if (!pkg.manifestGraph) {
+      continue;
+    }
 
     if (!pkg.history) {
       pkg.errors.push("No history");
@@ -352,7 +448,7 @@ export async function maybeLoadCogsReportData({
       continue;
     }
 
-    const parentPackages = parentPackageLabels.map((pkg) => historyTreeMap.get(pkg));
+    const parentPackages = parentPackageLabels.map((pkg) => globalPackageMap.get(pkg));
     const matchedParentPackages = parentPackages.filter((x) => x !== undefined);
     const unmatchedParentPackages = parentPackages.filter((x) => x === undefined);
     const noHistoryParentPackages = matchedParentPackages.filter((x) => !pkg.history);
@@ -382,14 +478,14 @@ export async function maybeLoadCogsReportData({
         .map((x) => x.quantity)
         .reduce((a, b) => a + b, 0);
 
-      const matchingPackagePair = tagQuantityPairs.find((x) => x.tag === label);
+      const matchingPackagePair = tagQuantityPairs.find((x) => x.tag === pkg.Label);
       if (!matchingPackagePair) {
-        pkg.errors.push(`No parent history match: ${getLabel(parentPkg!)}`);
+        pkg.errors.push(`No parent history match: ${parentPkg!.Label}`);
         continue;
       }
 
       pkg.fractionalCostData.push({
-        parentLabel: getLabel(parentPkg!),
+        parentLabel: parentPkg!.Label,
         totalParentQuantity,
         fractionalQuantity: matchingPackagePair.quantity / totalParentQuantity,
       });
@@ -463,9 +559,10 @@ export async function maybeLoadCogsReportData({
   //   }
   // }
 
+  const manifestGraphPackages = [...globalPackageMap.values()].filter((pkg) => pkg.manifestGraph);
+
   reportData[ReportType.COGS] = {
-    packages: [...historyTreeMap.values()],
-    // packageCostCalculationData,
+    packages: manifestGraphPackages,
     richOutgoingTransfers,
     auditData: [
       {
@@ -486,19 +583,19 @@ export async function maybeLoadCogsReportData({
       },
       {
         text: "Total Eligible Manifest Packages (All Transfer Types)",
-        value: allTransferredPackages.length,
+        value: [...globalPackageMap.values()].filter((pkg) => pkg.manifestGraph).length,
       },
       {
         text: "Total Eligible Manifest Packages (Wholesale Only)",
-        value: manifestPackages.length,
+        value: manifestGraphPackages.filter((pkg) => pkg.manifest).length,
       },
       {
         text: "Total Packages in History Graph",
-        value: historyTreeMap.size,
+        value: manifestGraphPackages.length,
       },
       {
         text: "Total Production Batch Packages",
-        value: [...historyTreeMap.values()].filter((pkg) => !!pkg.ProductionBatchNumber).length,
+        value: manifestGraphPackages.filter((pkg) => !!pkg.ProductionBatchNumber).length,
       },
       {
         text: "Total Packages in Dataset",
@@ -508,9 +605,7 @@ export async function maybeLoadCogsReportData({
         text: "Transfer License Set",
         value: (() => {
           const allTransferLicenses = eligibleTransfers.map((x) => x.LicenseNumber);
-          console.log({ allTransferLicenses });
           const uniqueTransferLicenses = new Set(allTransferLicenses);
-          console.log({ uniqueTransferLicenses });
           return [...uniqueTransferLicenses].join(", ");
         })(),
       },
@@ -518,9 +613,7 @@ export async function maybeLoadCogsReportData({
         text: "Package License Set",
         value: (() => {
           const allPackageLicenses = [...globalPackageMap.values()].map((x) => x.LicenseNumber);
-          console.log({ allPackageLicenses });
           const uniqueLicenses = new Set(allPackageLicenses);
-          console.log({ uniqueLicenses });
           return [...uniqueLicenses].join(", ");
         })(),
       },

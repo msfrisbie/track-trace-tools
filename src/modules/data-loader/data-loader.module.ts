@@ -1170,7 +1170,7 @@ export class DataLoader implements IAtomicService {
           ...pkg,
           PackageState: PackageState.DEPARTED_FACILITY,
           TagMatcher: "",
-          LicenseNumber: "",
+          LicenseNumber: this._authState!.license,
         }));
 
         subscription.unsubscribe();

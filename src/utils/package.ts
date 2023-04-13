@@ -1,5 +1,5 @@
 import { PackageFilterIdentifiers } from "@/consts";
-import { IPackageData, IUnionIndexedPackageData } from "@/interfaces";
+import { IPackageData, ISimpleCogsPackageData, IUnionIndexedPackageData } from "@/interfaces";
 import { authManager } from "@/modules/auth-manager.module";
 import {
   getDataLoaderByLicense,
@@ -43,7 +43,8 @@ export function getItemName(unionPkg: IUnionIndexedPackageData): string {
 }
 
 // Extremely long lists will be truncated with an ellipsis
-export async function getParentPackageLabels(pkg: IUnionIndexedPackageData) {
+export async function getParentPackageLabels(pkg: ISimpleCogsPackageData) {
+  debugger;
   if (!pkg.SourcePackageLabels.endsWith("...")) {
     return pkg.SourcePackageLabels.split(",").map((x) => x.trim());
   } else {
