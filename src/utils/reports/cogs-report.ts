@@ -72,8 +72,6 @@ export async function maybeLoadCogsReportData({
 
   const globalPackageMap: Map<string, ISimpleCogsPackageData> = new Map();
 
-  // let packages: IUnionIndexedPackageData[] = [];
-
   let dataLoader: DataLoader | null = null;
 
   for (const license of await (
@@ -101,7 +99,6 @@ export async function maybeLoadCogsReportData({
           errors: [],
         })
       );
-      // packages = [...packages, ...(await dataLoader.activePackages(24 * 60 * 60 * 1000))];
     } catch (e) {
       ctx.commit(ReportsMutations.SET_STATUS, {
         statusMessage: { text: `Failed to load active packages. (${license})`, level: "warning" },
@@ -109,8 +106,6 @@ export async function maybeLoadCogsReportData({
     }
 
     try {
-      // packages = [...packages, ...(await dataLoader.inactivePackages(24 * 60 * 60 * 1000))];
-
       (await dataLoader.inactivePackages(24 * 60 * 60 * 1000)).map((pkg) =>
         globalPackageMap.set(getLabel(pkg), {
           LicenseNumber: pkg.LicenseNumber,
@@ -133,8 +128,6 @@ export async function maybeLoadCogsReportData({
     }
 
     try {
-      // packages = [...packages, ...(await dataLoader.inactivePackages(24 * 60 * 60 * 1000))];
-
       (await dataLoader.inTransitPackages()).map((pkg) =>
         globalPackageMap.set(getLabel(pkg), {
           LicenseNumber: pkg.LicenseNumber,
@@ -294,7 +287,6 @@ export async function maybeLoadCogsReportData({
                 errors: [],
               })
             );
-            // packages = [...packages, ...destinationPackages];
           })
         )
       );
@@ -319,48 +311,9 @@ export async function maybeLoadCogsReportData({
     .filter((x) => x > 1)
     .reduce((a, b) => a + b, 0);
 
-  // Register all outgoing manifest packages
-  // const manifestPackages: IIndexedDestinationPackageData[] = [];
-  // const allTransferredPackages: IIndexedDestinationPackageData[] = [];
-  // const eligibleTransfers: IIndexedRichOutgoingTransferData[] = [];
-  // const wholesaleTransfers: IIndexedRichOutgoingTransferData[] = [];
-
-  // for (const transfer of richOutgoingTransfers) {
-  //   for (const destination of transfer.outgoingDestinations ?? []) {
-  //     const isWholesaleTransfer: boolean = destination.ShipmentTypeName.includes("Wholesale");
-
-  //     const isEligibleTransfer: boolean =
-  //       destination.EstimatedDepartureDateTime > departureDateGt &&
-  //       destination.EstimatedDepartureDateTime < departureDateLt;
-
-  //     if (isEligibleTransfer) {
-  //       eligibleTransfers.push(transfer);
-  //       if (isWholesaleTransfer) {
-  //         wholesaleTransfers.push(transfer);
-  //       }
-  //     }
-
-  //     for (const pkg of destination.packages ?? []) {
-  //       allTransferredPackages.push(pkg);
-  //       if (isEligibleTransfer && isWholesaleTransfer) {
-  //         manifestPackages.push(pkg);
-  //       }
-  //     }
-  //   }
-  // }
-
   ctx.commit(ReportsMutations.SET_STATUS, {
     statusMessage: { text: "Building package history...", level: "success" },
   });
-
-  // Also add manifest packages to global pkg map
-  // allTransferredPackages.map((pkg) => globalPackageMap.set(pkg.PackageLabel, pkg));
-
-  // Mark all packages that need to have history loaded
-  // Initialize to contain manifest packages
-  // const historyTreeMap = new Map<string, IUnionRichIndexedPackageData>(
-  //   manifestPackages.map((pkg) => [pkg.PackageLabel, pkg])
-  // );
 
   const touchedPackageTags: Set<string> = new Set();
 
@@ -466,41 +419,6 @@ export async function maybeLoadCogsReportData({
     }`
   );
 
-  // for (const [label, pkg] of historyTreeMap.entries()) {
-  //   if (!pkg.history || !pkg.history.length) {
-  //     console.error(`${label} has no history, stripping out`);
-
-  //     historyTreeMap.delete(label);
-  //   }
-  // }
-
-  // At this point, all packages in map should have history
-
-  // Validate that all packages have parents that are either
-  // - All missing from the history tree
-  // - All present in the history tree
-  // for (const [label, pkg] of historyTreeMap.entries()) {
-  //   const parentLabels = extractParentPackageLabelsFromHistory(pkg.history!);
-
-  //   const missing = parentLabels.filter((x) => !historyTreeMap.has(x));
-  //   const included = parentLabels.filter((x) => historyTreeMap.has(x));
-
-  //   if (missing.length === 0 && included.length === 0) {
-  //     console.error(`${label} has both counts === 0`);
-  //   }
-
-  //   if (missing.length > 0 && included.length > 0) {
-  //     console.error(`${label} has both counts > 0`);
-  //     console.log(pkg.SourcePackageLabels);
-  //     console.groupCollapsed("missing");
-  //     missing.map(console.log);
-  //     console.groupEnd();
-  //     console.groupCollapsed("included");
-  //     included.map(console.log);
-  //     console.groupEnd();
-  //   }
-  // }
-
   for (const pkg of globalPackageMap.values()) {
     if (!pkg.manifestGraph) {
       continue;
@@ -510,8 +428,6 @@ export async function maybeLoadCogsReportData({
       pkg.errors.push("No history");
       continue;
     }
-
-    // const parentPackageLabels = extractParentPackageLabelsFromHistory(pkg.history!);
 
     if (pkg.historyExtracts.parentPackageLabels.length === 0) {
       pkg.errors.push("Extracted 0 parent package labels");
@@ -561,75 +477,8 @@ export async function maybeLoadCogsReportData({
         totalParentQuantity,
         fractionalQuantity: matchingPackagePair.quantity / totalParentQuantity,
       });
-
-      // sourceCostData.push({
-      //   parentTag,
-      //   costFractionMultiplier: matchingPackagePair.quantity / totalParentQuantity,
-      // });
     }
   }
-
-  // const packageCostCalculationData: IPackageCostCalculationData[] = [];
-
-  //   const pkgStack: (IUnionIndexedPackageData)[] = [
-  //     ...historyTreeMap.values(),
-  //   ];
-  // TODO shouldnt the history tree just be iterated?
-  //   while (pkgStack.length > 0) {
-  //     const pkg = pkgStack.pop();
-  // for (const [label, pkg] of historyTreeMap.entries()) {
-  //   // if (!pkg) {
-  //   //   throw new Error("Bad package pop");
-  //   // }
-
-  //   const sourceCostData: { parentTag: string; costFractionMultiplier: number }[] = [];
-  //   const errors: string[] = [];
-
-  //   for (const parentTag of extractParentPackageLabelsFromHistory(pkg.history!)) {
-  //     const parentPkg = historyTreeMap.get(parentTag);
-
-  //     if (!parentPkg) {
-  //       //console.log(`Couldn't look up package: ${parentTag}`);
-  //       continue;
-  //     }
-
-  //     if (!parentPkg.history || parentPkg.history.length === 0) {
-  //       throw new Error("FATAL: Parent pkg does not have a history loaded");
-  //       // continue;
-  //     }
-
-  //     //   pkgStack.push(parentPkg);
-
-  //     const tagQuantityPairs = extractTagQuantityPairsFromHistory(parentPkg.history);
-
-  //     const totalParentQuantity = tagQuantityPairs
-  //       .map((x) => x.quantity)
-  //       .reduce((a, b) => a + b, 0);
-
-  //     const matchingPackagePair = tagQuantityPairs.find((x) => x.tag === label);
-  //     if (!matchingPackagePair) {
-  //       errors.push(
-  //         `Could not match a tag when pairing quantities: label:${label}, parent: ${parentTag}, pairLen: ${tagQuantityPairs.length}`
-  //       );
-  //       console.error({ tagQuantityPairs, label, parentPkg });
-  //       continue;
-  //       // throw new Error("Could not match a tag when pairing quantities");
-  //     }
-
-  //     sourceCostData.push({
-  //       parentTag,
-  //       costFractionMultiplier: matchingPackagePair.quantity / totalParentQuantity,
-  //     });
-  //   }
-
-  //   if (sourceCostData.length > 0) {
-  //     packageCostCalculationData.push({
-  //       tag: label,
-  //       sourceCostData,
-  //       errors,
-  //     });
-  //   }
-  // }
 
   const manifestGraphPackages = [...globalPackageMap.values()].filter((pkg) => pkg.manifestGraph);
 
