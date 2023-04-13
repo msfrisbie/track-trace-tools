@@ -16,6 +16,7 @@ import {
   ITagFilter,
   ITransferFilter,
   IUnionIndexedPackageData,
+  IUnionRichIndexedPackageData,
 } from "@/interfaces";
 import { IStatusMessage, ReportStatus, ReportType } from "./consts";
 
@@ -87,7 +88,7 @@ export interface IReportConfig {
 
 export interface IReportData {
   [ReportType.COGS]?: {
-    packages: IUnionIndexedPackageData[];
+    packages: IUnionRichIndexedPackageData[];
     // packageCostCalculationData: IPackageCostCalculationData[];
     richOutgoingTransfers: IIndexedRichOutgoingTransferData[];
     auditData: { text: string; value: string | number }[];

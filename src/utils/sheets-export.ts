@@ -490,23 +490,46 @@ export async function createCogsSpreadsheetOrError({
     return a.ProductionBatchNumber!.localeCompare(b.ProductionBatchNumber!);
   }).map((pkg) => [getLabel(pkg), pkg.ProductionBatchNumber ?? ""]);
 
-  const worksheetData = reportData[ReportType.COGS]!.packageCostCalculationData.map(
-    ({ tag, sourceCostData, errors }, idx) => [
-      tag,
-      `=SUM(C${idx + 2}:D${idx + 2})`,
-      `=IFERROR(VLOOKUP(A${idx + 2}, '${SheetTitles.PRODUCTION_BATCH_COSTS}'!A${
-        idx + 2
-      }:C, 3, false), 0)`,
-      "=" +
-        sourceCostData
-          .map(
-            ({ parentTag, costFractionMultiplier }) =>
-              `(VLOOKUP("${parentTag}", $A$2:$B, 2) * ${costFractionMultiplier})`
+  // const worksheetData = reportData[ReportType.COGS]!.packageCostCalculationData.map(
+  //   ({ tag, sourceCostData, errors }, idx) => [
+  //     tag,
+  //     `=SUM(C${idx + 2}:D${idx + 2})`,
+  //     `=IFERROR(VLOOKUP(A${idx + 2}, '${SheetTitles.PRODUCTION_BATCH_COSTS}'!A${
+  //       idx + 2
+  //     }:C, 3, false), 0)`,
+  //     "=" +
+  //       sourceCostData
+  //         .map(
+  //           ({ parentTag, costFractionMultiplier }) =>
+  //             `(VLOOKUP("${parentTag}", $A$2:$B, 2) * ${costFractionMultiplier})`
+  //         )
+  //         .join("+"),
+  //     errors.toString(),
+  //   ]
+  // );
+
+  const worksheetData = reportData[ReportType.COGS]!.packages.map((pkg, idx) => {
+    let fractionalCostExpression = "";
+    if (pkg!.fractionalCostData!.length) {
+      fractionalCostExpression =
+        "=" +
+        pkg!
+          .fractionalCostData!.map(
+            ({ parentLabel, fractionalQuantity }) =>
+              `(VLOOKUP("${parentLabel}", $A$2:$C, 3) * ${fractionalQuantity})`
           )
-          .join("+"),
-      errors.toString(),
-    ]
-  );
+          .join("+");
+    }
+
+    return [
+      getLabel(pkg),
+      pkg.ProductionBatchNumber,
+      ``,
+      fractionalCostExpression,
+      `=SUM(C${idx + 2}:D${idx + 2})`,
+      (pkg.errors ?? "").toString(),
+    ];
+  });
 
   let formattingRequests: any = [
     addRowsRequestFactory({
@@ -518,7 +541,7 @@ export async function createCogsSpreadsheetOrError({
     }),
   ];
 
-  const batchCostSheetId = sheetTitles.indexOf(SheetTitles.PRODUCTION_BATCH_COSTS);
+  // const batchCostSheetId = sheetTitles.indexOf(SheetTitles.PRODUCTION_BATCH_COSTS);
   const worksheetSheetId = sheetTitles.indexOf(SheetTitles.WORKSHEET);
   const manifestSheetId = sheetTitles.indexOf(SheetTitles.MANIFEST_COGS);
 
@@ -614,17 +637,22 @@ export async function createCogsSpreadsheetOrError({
       },
       {
         value: "",
-        readableName: "Computed Cost",
+        readableName: "PB #",
         required: true,
       },
       {
         value: "",
-        readableName: "Production Batch Cost",
+        readableName: "Cost",
         required: true,
       },
       {
         value: "",
         readableName: "Fractional Cost",
+        required: true,
+      },
+      {
+        value: "",
+        readableName: "Total Cost",
         required: true,
       },
       {
@@ -657,9 +685,9 @@ export async function createCogsSpreadsheetOrError({
 
   resizeRequests = [
     ...resizeRequests,
-    autoResizeDimensionsRequestFactory({
-      sheetId: batchCostSheetId,
-    }),
+    // autoResizeDimensionsRequestFactory({
+    //   sheetId: batchCostSheetId,
+    // }),
     autoResizeDimensionsRequestFactory({
       sheetId: worksheetSheetId,
     }),

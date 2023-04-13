@@ -1,6 +1,5 @@
 import {
   IIndexedDestinationPackageData,
-  IIndexedPackageData,
   IIndexedRichOutgoingTransferData,
   IPackageFilter,
   IPluginState,
@@ -12,7 +11,6 @@ import { DataLoader, getDataLoaderByLicense } from "@/modules/data-loader/data-l
 import { facilityManager } from "@/modules/facility-manager.module";
 import { ReportsMutations, ReportType } from "@/store/page-overlay/modules/reports/consts";
 import {
-  IPackageCostCalculationData,
   IReportConfig,
   IReportData,
   IReportsState,
@@ -23,7 +21,7 @@ import {
   extractParentPackageLabelsFromHistory,
   extractTagQuantityPairsFromHistory,
 } from "../history";
-import { getId, getParentPackageLabels } from "../package";
+import { getId, getLabel, getParentPackageLabels } from "../package";
 
 interface ICogsReportFormFilters {
   cogsDateGt: string;
@@ -73,7 +71,7 @@ export async function maybeLoadCogsReportData({
 
   const { packageFilter, transferFilter } = reportConfig[ReportType.COGS]!;
 
-  let packages: IIndexedPackageData[] = [];
+  let packages: IUnionIndexedPackageData[] = [];
 
   let dataLoader: DataLoader | null = null;
 
@@ -106,7 +104,7 @@ export async function maybeLoadCogsReportData({
   }
 
   const globalPackageMap: Map<string, IUnionIndexedPackageData> = new Map(
-    packages.map((pkg) => [pkg.Label, pkg])
+    packages.map((pkg) => [getLabel(pkg), pkg])
   );
 
   let richOutgoingTransfers: IIndexedRichOutgoingTransferData[] = [];
@@ -188,8 +186,9 @@ export async function maybeLoadCogsReportData({
     transfer.outgoingDestinations?.map((destination) =>
       packageRequests.push(
         getDataLoaderByLicense(transfer.LicenseNumber).then((dataLoader) =>
-          dataLoader.destinationPackages(destination.Id).then((packages) => {
-            destination.packages = packages;
+          dataLoader.destinationPackages(destination.Id).then((destinationPackages) => {
+            destination.packages = destinationPackages;
+            packages = [...packages, ...destinationPackages];
           })
         )
       )
@@ -250,6 +249,9 @@ export async function maybeLoadCogsReportData({
   const touchedPackageTags: Set<string> = new Set();
 
   const packageTagStack: string[] = [...manifestPackages].map((pkg) => pkg.PackageLabel);
+
+  console.log(`Initial package tag stack: ${packageTagStack.length}`);
+
   while (packageTagStack.length > 0) {
     const label = packageTagStack.pop();
     if (!label) {
@@ -261,7 +263,7 @@ export async function maybeLoadCogsReportData({
     const pkg = globalPackageMap.get(label);
 
     if (!pkg) {
-      //   console.error(`Couldn't match tag to package: ${label}`);
+      console.error(`Couldn't match tag to package: ${label}`);
       continue;
     }
 
@@ -336,7 +338,68 @@ export async function maybeLoadCogsReportData({
   // }
 
   for (const [label, pkg] of historyTreeMap.entries()) {
-    
+    pkg.errors = [];
+    pkg.fractionalCostData = [];
+
+    if (!pkg.history) {
+      pkg.errors.push("No history");
+      continue;
+    }
+
+    const parentPackageLabels = extractParentPackageLabelsFromHistory(pkg.history!);
+
+    if (!parentPackageLabels.length) {
+      pkg.errors.push("Extracted 0 parent package labels");
+      continue;
+    }
+
+    const parentPackages = parentPackageLabels.map((pkg) => historyTreeMap.get(pkg));
+    const matchedParentPackages = parentPackages.filter((x) => x !== undefined);
+    const unmatchedParentPackages = parentPackages.filter((x) => x === undefined);
+    const noHistoryParentPackages = matchedParentPackages.filter((x) => !pkg.history);
+
+    if (matchedParentPackages.length === 0) {
+      pkg.errors.push("No parents matched");
+      // TODO this might be OK
+      continue;
+    }
+
+    if (unmatchedParentPackages.length > 0) {
+      pkg.errors.push(`${unmatchedParentPackages.length}/${parentPackages.length} parents matched`);
+      continue;
+    }
+
+    if (noHistoryParentPackages.length > 0) {
+      pkg.errors.push(
+        `${noHistoryParentPackages.length}/${parentPackages.length} parent packages have no history`
+      );
+      continue;
+    }
+
+    for (const parentPkg of matchedParentPackages) {
+      const tagQuantityPairs = extractTagQuantityPairsFromHistory(parentPkg!.history!);
+
+      const totalParentQuantity = tagQuantityPairs
+        .map((x) => x.quantity)
+        .reduce((a, b) => a + b, 0);
+
+      const matchingPackagePair = tagQuantityPairs.find((x) => x.tag === label);
+      if (!matchingPackagePair) {
+        pkg.errors.push(`No parent history match: ${getLabel(parentPkg!)}`);
+        continue;
+      }
+
+      pkg.fractionalCostData.push({
+        parentLabel: getLabel(parentPkg!),
+        totalParentQuantity,
+        fractionalQuantity: matchingPackagePair.quantity / totalParentQuantity,
+      });
+
+      // sourceCostData.push({
+      //   parentTag,
+      //   costFractionMultiplier: matchingPackagePair.quantity / totalParentQuantity,
+      // });
+    }
   }
 
   // const packageCostCalculationData: IPackageCostCalculationData[] = [];
@@ -347,59 +410,59 @@ export async function maybeLoadCogsReportData({
   // TODO shouldnt the history tree just be iterated?
   //   while (pkgStack.length > 0) {
   //     const pkg = pkgStack.pop();
-  for (const [label, pkg] of historyTreeMap.entries()) {
-    // if (!pkg) {
-    //   throw new Error("Bad package pop");
-    // }
+  // for (const [label, pkg] of historyTreeMap.entries()) {
+  //   // if (!pkg) {
+  //   //   throw new Error("Bad package pop");
+  //   // }
 
-    const sourceCostData: { parentTag: string; costFractionMultiplier: number }[] = [];
-    const errors: string[] = [];
+  //   const sourceCostData: { parentTag: string; costFractionMultiplier: number }[] = [];
+  //   const errors: string[] = [];
 
-    for (const parentTag of extractParentPackageLabelsFromHistory(pkg.history!)) {
-      const parentPkg = historyTreeMap.get(parentTag);
+  //   for (const parentTag of extractParentPackageLabelsFromHistory(pkg.history!)) {
+  //     const parentPkg = historyTreeMap.get(parentTag);
 
-      if (!parentPkg) {
-        //console.log(`Couldn't look up package: ${parentTag}`);
-        continue;
-      }
+  //     if (!parentPkg) {
+  //       //console.log(`Couldn't look up package: ${parentTag}`);
+  //       continue;
+  //     }
 
-      if (!parentPkg.history || parentPkg.history.length === 0) {
-        throw new Error("FATAL: Parent pkg does not have a history loaded");
-        // continue;
-      }
+  //     if (!parentPkg.history || parentPkg.history.length === 0) {
+  //       throw new Error("FATAL: Parent pkg does not have a history loaded");
+  //       // continue;
+  //     }
 
-      //   pkgStack.push(parentPkg);
+  //     //   pkgStack.push(parentPkg);
 
-      const tagQuantityPairs = extractTagQuantityPairsFromHistory(parentPkg.history);
+  //     const tagQuantityPairs = extractTagQuantityPairsFromHistory(parentPkg.history);
 
-      const totalParentQuantity = tagQuantityPairs
-        .map((x) => x.quantity)
-        .reduce((a, b) => a + b, 0);
+  //     const totalParentQuantity = tagQuantityPairs
+  //       .map((x) => x.quantity)
+  //       .reduce((a, b) => a + b, 0);
 
-      const currentPackagePair = tagQuantityPairs.find((x) => x.tag === label);
-      if (!currentPackagePair) {
-        errors.push(
-          `Could not match a tag when pairing quantities: label:${label}, parent: ${parentTag}, pairLen: ${tagQuantityPairs.length}`
-        );
-        console.error({ tagQuantityPairs, label, parentPkg });
-        continue;
-        // throw new Error("Could not match a tag when pairing quantities");
-      }
+  //     const matchingPackagePair = tagQuantityPairs.find((x) => x.tag === label);
+  //     if (!matchingPackagePair) {
+  //       errors.push(
+  //         `Could not match a tag when pairing quantities: label:${label}, parent: ${parentTag}, pairLen: ${tagQuantityPairs.length}`
+  //       );
+  //       console.error({ tagQuantityPairs, label, parentPkg });
+  //       continue;
+  //       // throw new Error("Could not match a tag when pairing quantities");
+  //     }
 
-      sourceCostData.push({
-        parentTag,
-        costFractionMultiplier: currentPackagePair.quantity / totalParentQuantity,
-      });
-    }
+  //     sourceCostData.push({
+  //       parentTag,
+  //       costFractionMultiplier: matchingPackagePair.quantity / totalParentQuantity,
+  //     });
+  //   }
 
-    if (sourceCostData.length > 0) {
-      packageCostCalculationData.push({
-        tag: label,
-        sourceCostData,
-        errors,
-      });
-    }
-  }
+  //   if (sourceCostData.length > 0) {
+  //     packageCostCalculationData.push({
+  //       tag: label,
+  //       sourceCostData,
+  //       errors,
+  //     });
+  //   }
+  // }
 
   reportData[ReportType.COGS] = {
     packages: [...historyTreeMap.values()],
@@ -444,11 +507,23 @@ export async function maybeLoadCogsReportData({
       },
       {
         text: "Transfer License Set",
-        value: [...new Set(allTransfers.map((x) => x.LicenseNumber))].join(", "),
+        value: (() => {
+          const allTransferLicenses = allTransfers.map((x) => x.LicenseNumber);
+          console.log({ allTransferLicenses });
+          const uniqueTransferLicenses = new Set(allTransferLicenses);
+          console.log({ uniqueTransferLicenses });
+          return [...uniqueTransferLicenses].join(", ");
+        })(),
       },
       {
         text: "Package License Set",
-        value: [...new Set([...globalPackageMap.values()].map((x) => x.LicenseNumber))].join(", "),
+        value: (() => {
+          const allPackageLicenses = [...globalPackageMap.values()].map((x) => x.LicenseNumber);
+          console.log({ allPackageLicenses });
+          const uniqueLicenses = new Set(allPackageLicenses);
+          console.log({ uniqueLicenses });
+          return [...uniqueLicenses].join(", ");
+        })(),
       },
     ],
   };

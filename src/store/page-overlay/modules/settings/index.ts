@@ -54,7 +54,7 @@ const persistedState: ISettingsState = {
   enableSearchOverMetrcModal: true,
   useIsoDateFormatForSubmit: false,
   loadDataInParallel: true,
-  usePersistedCache: true
+  usePersistedCache: false,
 };
 
 const defaultState: ISettingsState = {
