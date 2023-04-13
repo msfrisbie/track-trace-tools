@@ -33,7 +33,7 @@ export function getLabel(unionPkg: IUnionIndexedPackageData): string {
 
 // Extremely long lists will be truncated with an ellipsis
 export async function getParentPackageLabels(pkg: IUnionIndexedPackageData) {
-  if (pkg.SourcePackageLabels.length < 500) {
+  if (!pkg.SourcePackageLabels.endsWith("...")) {
     return pkg.SourcePackageLabels.split(",").map((x) => x.trim());
   } else {
     // Source package labels may have been truncated

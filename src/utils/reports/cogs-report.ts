@@ -3,10 +3,10 @@ import {
   IIndexedPackageData,
   IIndexedRichOutgoingTransferData,
   IPackageFilter,
-  IPackageHistoryData,
   IPluginState,
   ITransferFilter,
   IUnionIndexedPackageData,
+  IUnionRichIndexedPackageData,
 } from "@/interfaces";
 import { DataLoader, getDataLoaderByLicense } from "@/modules/data-loader/data-loader.module";
 import { facilityManager } from "@/modules/facility-manager.module";
@@ -71,14 +71,7 @@ export async function maybeLoadCogsReportData({
     return;
   }
 
-  const { packageFilter, transferFilter } = reportConfig[ReportType.COGS] as {
-    packageFilter: IPackageFilter;
-    transferFilter: ITransferFilter;
-  };
-
-  ctx.commit(ReportsMutations.SET_STATUS, {
-    statusMessage: { text: "Loading packages...", level: "success" },
-  });
+  const { packageFilter, transferFilter } = reportConfig[ReportType.COGS]!;
 
   let packages: IIndexedPackageData[] = [];
 
@@ -87,6 +80,10 @@ export async function maybeLoadCogsReportData({
   for (const license of await (
     await facilityManager.ownedFacilitiesOrError()
   ).map((x) => x.licenseNumber)) {
+    ctx.commit(ReportsMutations.SET_STATUS, {
+      statusMessage: { text: `Loading ${license} packages...`, level: "success" },
+    });
+
     dataLoader = await getDataLoaderByLicense(license);
 
     try {
@@ -112,15 +109,15 @@ export async function maybeLoadCogsReportData({
     packages.map((pkg) => [pkg.Label, pkg])
   );
 
-  ctx.commit(ReportsMutations.SET_STATUS, {
-    statusMessage: { text: "Loading transfers...", level: "success" },
-  });
-
   let richOutgoingTransfers: IIndexedRichOutgoingTransferData[] = [];
 
   for (const license of await (
     await facilityManager.ownedFacilitiesOrError()
   ).map((x) => x.licenseNumber)) {
+    ctx.commit(ReportsMutations.SET_STATUS, {
+      statusMessage: { text: `Loading ${license} transfers...`, level: "success" },
+    });
+
     dataLoader = await getDataLoaderByLicense(license);
     try {
       richOutgoingTransfers = [...richOutgoingTransfers, ...(await dataLoader.outgoingTransfers())];
@@ -143,19 +140,13 @@ export async function maybeLoadCogsReportData({
   }
 
   // Assumption: a transfer will not sit around for 90 days
-  const createdDateBufferGt = getIsoDateFromOffset(
-    -90,
-    transferFilter.estimatedDepartureDateGt as string
-  );
-  const createdDateBufferLt = getIsoDateFromOffset(
-    90,
-    transferFilter.estimatedDepartureDateLt as string
-  );
+  const createdDateBufferGt = getIsoDateFromOffset(-90, transferFilter.estimatedDepartureDateGt!);
+  const createdDateBufferLt = getIsoDateFromOffset(90, transferFilter.estimatedDepartureDateLt!);
 
-  const [departureDateBufferGt] = (transferFilter.estimatedDepartureDateGt as string).split("T");
+  const [departureDateBufferGt] = transferFilter.estimatedDepartureDateGt!.split("T");
   const [departureDateBufferLt] = getIsoDateFromOffset(
     1,
-    transferFilter.estimatedDepartureDateLt as string
+    transferFilter.estimatedDepartureDateLt!
   ).split("T");
 
   richOutgoingTransfers = richOutgoingTransfers.filter((richOutgoingTransfer) => {
@@ -180,9 +171,6 @@ export async function maybeLoadCogsReportData({
       getDataLoaderByLicense(transfer.LicenseNumber).then((dataLoader) =>
         dataLoader.transferDestinations(transfer.Id).then((destinations) => {
           transfer.outgoingDestinations = destinations.map((x) => ({ ...x, packages: [] }));
-          // .filter((destination) => {
-          //   return true;
-          // });
         })
       )
     )
@@ -208,22 +196,38 @@ export async function maybeLoadCogsReportData({
     )
   );
 
+  const totalTransfersWithMultiDestinations = richOutgoingTransfers
+    .map((x) => x.outgoingDestinations!.length)
+    .filter((x) => x > 1)
+    .reduce((a, b) => a + b, 0);
+
   await Promise.allSettled(packageRequests);
 
   // Register all outgoing manifest packages
   const manifestPackages: IIndexedDestinationPackageData[] = [];
   const allTransferredPackages: IIndexedDestinationPackageData[] = [];
+  const allTransfers: IIndexedRichOutgoingTransferData[] = [];
+  const wholesaleTransfers: IIndexedRichOutgoingTransferData[] = [];
 
   for (const transfer of richOutgoingTransfers) {
     for (const destination of transfer.outgoingDestinations ?? []) {
-      const isEligibleWholesaleTransfer: boolean =
-        destination.ShipmentTypeName.includes("Wholesale") &&
+      const isWholesaleTransfer: boolean = destination.ShipmentTypeName.includes("Wholesale");
+
+      const isEligibleTransfer: boolean =
         destination.EstimatedDepartureDateTime > departureDateBufferGt &&
         destination.EstimatedDepartureDateTime < departureDateBufferLt;
 
+      if (isEligibleTransfer) {
+        allTransfers.push(transfer);
+      }
+
+      if (!wholesaleTransfers.includes(transfer)) {
+        wholesaleTransfers.push(transfer);
+      }
+
       for (const pkg of destination.packages ?? []) {
         allTransferredPackages.push(pkg);
-        if (isEligibleWholesaleTransfer) {
+        if (isEligibleTransfer && isWholesaleTransfer) {
           manifestPackages.push(pkg);
         }
       }
@@ -239,7 +243,7 @@ export async function maybeLoadCogsReportData({
 
   // Mark all packages that need to have history loaded
   // Initialize to contain manifest packages
-  const historyTreeMap = new Map<string, IUnionIndexedPackageData>(
+  const historyTreeMap = new Map<string, IUnionRichIndexedPackageData>(
     manifestPackages.map((pkg) => [pkg.PackageLabel, pkg])
   );
 
@@ -296,44 +300,46 @@ export async function maybeLoadCogsReportData({
 
   await Promise.allSettled(packageHistoryRequests);
 
-  for (const [label, pkg] of historyTreeMap.entries()) {
-    if (!pkg.history || !pkg.history.length) {
-      console.error(`${label} has no history, stripping out`);
+  // for (const [label, pkg] of historyTreeMap.entries()) {
+  //   if (!pkg.history || !pkg.history.length) {
+  //     console.error(`${label} has no history, stripping out`);
 
-      historyTreeMap.delete(label);
-    }
-  }
+  //     historyTreeMap.delete(label);
+  //   }
+  // }
 
   // At this point, all packages in map should have history
 
   // Validate that all packages have parents that are either
   // - All missing from the history tree
   // - All present in the history tree
+  // for (const [label, pkg] of historyTreeMap.entries()) {
+  //   const parentLabels = extractParentPackageLabelsFromHistory(pkg.history!);
+
+  //   const missing = parentLabels.filter((x) => !historyTreeMap.has(x));
+  //   const included = parentLabels.filter((x) => historyTreeMap.has(x));
+
+  //   if (missing.length === 0 && included.length === 0) {
+  //     console.error(`${label} has both counts === 0`);
+  //   }
+
+  //   if (missing.length > 0 && included.length > 0) {
+  //     console.error(`${label} has both counts > 0`);
+  //     console.log(pkg.SourcePackageLabels);
+  //     console.groupCollapsed("missing");
+  //     missing.map(console.log);
+  //     console.groupEnd();
+  //     console.groupCollapsed("included");
+  //     included.map(console.log);
+  //     console.groupEnd();
+  //   }
+  // }
+
   for (const [label, pkg] of historyTreeMap.entries()) {
-    const parentLabels = extractParentPackageLabelsFromHistory(
-      pkg.history as IPackageHistoryData[]
-    );
-
-    const missing = parentLabels.filter((x) => !historyTreeMap.has(x));
-    const included = parentLabels.filter((x) => historyTreeMap.has(x));
-
-    if (missing.length === 0 && included.length === 0) {
-      console.error(`${label} has both counts === 0`);
-    }
-
-    if (missing.length > 0 && included.length > 0) {
-      console.error(`${label} has both counts > 0`);
-      console.log(pkg.SourcePackageLabels);
-      console.groupCollapsed("missing");
-      missing.map(console.log);
-      console.groupEnd();
-      console.groupCollapsed("included");
-      included.map(console.log);
-      console.groupEnd();
-    }
+    
   }
 
-  const packageCostCalculationData: IPackageCostCalculationData[] = [];
+  // const packageCostCalculationData: IPackageCostCalculationData[] = [];
 
   //   const pkgStack: (IUnionIndexedPackageData)[] = [
   //     ...historyTreeMap.values(),
@@ -349,9 +355,7 @@ export async function maybeLoadCogsReportData({
     const sourceCostData: { parentTag: string; costFractionMultiplier: number }[] = [];
     const errors: string[] = [];
 
-    for (const parentTag of extractParentPackageLabelsFromHistory(
-      pkg.history as IPackageHistoryData[]
-    )) {
+    for (const parentTag of extractParentPackageLabelsFromHistory(pkg.history!)) {
       const parentPkg = historyTreeMap.get(parentTag);
 
       if (!parentPkg) {
@@ -399,7 +403,53 @@ export async function maybeLoadCogsReportData({
 
   reportData[ReportType.COGS] = {
     packages: [...historyTreeMap.values()],
-    packageCostCalculationData,
+    // packageCostCalculationData,
     richOutgoingTransfers,
+    auditData: [
+      {
+        text: "Eligible Date Range",
+        value: `${transferFilter.estimatedDepartureDateGt}  -  ${transferFilter.estimatedDepartureDateLt}`,
+      },
+      {
+        text: "Total Eligible Transfers (All Transfer Types)",
+        value: allTransfers.length,
+      },
+      {
+        text: "Total Eligible Transfers (Wholesale Only)",
+        value: wholesaleTransfers.length,
+      },
+      {
+        text: "Total Eligible Multi-Destionation Transfers",
+        value: totalTransfersWithMultiDestinations,
+      },
+      {
+        text: "Total Eligible Manifest Packages (All Transfer Types)",
+        value: allTransferredPackages.length,
+      },
+      {
+        text: "Total Eligible Manifest Packages (Wholesale Only)",
+        value: manifestPackages.length,
+      },
+      {
+        text: "Total Packages in History Graph",
+        value: historyTreeMap.size,
+      },
+      {
+        text: "Total Production Batch Packages",
+        value: [...historyTreeMap.values()].filter((pkg) => !!pkg.ProductionBatchNumber).length,
+      },
+      {
+        text: "Total Packages in Dataset",
+        value: globalPackageMap.size,
+      },
+      {
+        text: "Transfer License Set",
+        value: [...new Set(allTransfers.map((x) => x.LicenseNumber))].join(", "),
+      },
+      {
+        text: "Package License Set",
+        value: [...new Set([...globalPackageMap.values()].map((x) => x.LicenseNumber))].join(", "),
+      },
+    ],
   };
 }

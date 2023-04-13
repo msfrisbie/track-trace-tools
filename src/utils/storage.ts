@@ -1,3 +1,5 @@
+import store from "@/store/page-overlay/index";
+
 type StorageKey = string;
 
 export enum StorageKeyType {
@@ -55,6 +57,10 @@ export async function readDataOrNull<T>({
   ttlMs: number;
   validatorFn?: (data: any) => boolean;
 }): Promise<T | null> {
+  if (!store.state.settings.usePersistedCache) {
+    return null;
+  }
+
   if (ttlMs === 0) {
     return null;
   }

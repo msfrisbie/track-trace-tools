@@ -31,14 +31,14 @@ export interface IReportsState {
   }[];
 }
 
-export interface IPackageCostCalculationData {
-  tag: string;
-  sourceCostData: {
-    parentTag: string;
-    costFractionMultiplier: number;
-  }[];
-  errors: string[];
-}
+// export interface IPackageCostCalculationData {
+//   tag: string;
+//   sourceCostData: {
+//     parentTag: string;
+//     costFractionMultiplier: number;
+//   }[];
+//   errors: string[];
+// }
 
 export interface IReportConfig {
   authState: IAuthState;
@@ -88,8 +88,9 @@ export interface IReportConfig {
 export interface IReportData {
   [ReportType.COGS]?: {
     packages: IUnionIndexedPackageData[];
-    packageCostCalculationData: IPackageCostCalculationData[];
-    richOutgoingTransfers?: IIndexedRichOutgoingTransferData[];
+    // packageCostCalculationData: IPackageCostCalculationData[];
+    richOutgoingTransfers: IIndexedRichOutgoingTransferData[];
+    auditData: { text: string; value: string | number }[];
   };
   [ReportType.PACKAGES]?: {
     packages: IIndexedPackageData[];

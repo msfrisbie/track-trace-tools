@@ -243,6 +243,16 @@
           </b-form-checkbox>
 
           <b-form-checkbox
+            id="checkbox-usePersistedCache"
+            class="mb-2"
+            v-model="settings.usePersistedCache"
+            name="checkbox-usePersistedCache"
+            @change="onChange()"
+          >
+            Use persisted cache
+          </b-form-checkbox>
+
+          <b-form-checkbox
             id="checkbox-disablePopups"
             class="mb-2"
             v-model="settings.disablePopups"

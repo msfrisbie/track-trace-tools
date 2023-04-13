@@ -1,5 +1,5 @@
 import { MessageType, SheetTitles } from "@/consts";
-import { ISpreadsheet, IUnionIndexedPackageData } from "@/interfaces";
+import { ISpreadsheet } from "@/interfaces";
 import { messageBus } from "@/modules/message-bus.module";
 import store from "@/store/page-overlay/index";
 import { ReportsMutations, ReportType } from "@/store/page-overlay/modules/reports/consts";
@@ -456,7 +456,7 @@ export async function createCogsSpreadsheetOrError({
 
   const sheetTitles = [
     SheetTitles.OVERVIEW,
-    SheetTitles.PRODUCTION_BATCH_COSTS,
+    // SheetTitles.PRODUCTION_BATCH_COSTS,
     SheetTitles.WORKSHEET,
     SheetTitles.MANIFEST_COGS,
   ];
@@ -480,20 +480,33 @@ export async function createCogsSpreadsheetOrError({
     throw new Error("Unable to create COGS sheet");
   }
 
-  await messageBus.sendMessageToBackground(
-    MessageType.WRITE_SPREADSHEET_VALUES,
-    {
-      spreadsheetId: response.data.result.spreadsheetId,
-      range: `'${SheetTitles.OVERVIEW}'`,
-      values: [[`Created with Track & Trace Tools @ ${Date().toString()}`]],
-    },
-    undefined,
-    90000
-  );
+  const packageData = reportData[ReportType.COGS]!.packages.sort((a, b) => {
+    if (!a.ProductionBatchNumber) {
+      return 1;
+    }
+    if (!b.ProductionBatchNumber) {
+      return -1;
+    }
+    return a.ProductionBatchNumber!.localeCompare(b.ProductionBatchNumber!);
+  }).map((pkg) => [getLabel(pkg), pkg.ProductionBatchNumber ?? ""]);
 
-  const packageData = (reportData[ReportType.COGS]?.packages as IUnionIndexedPackageData[])
-    .sort((a, b) => ((a.ProductionBatchNumber ?? "") > (b.ProductionBatchNumber ?? "") ? 1 : -1))
-    .map((pkg) => [getLabel(pkg), pkg.ProductionBatchNumber ?? ""]);
+  const worksheetData = reportData[ReportType.COGS]!.packageCostCalculationData.map(
+    ({ tag, sourceCostData, errors }, idx) => [
+      tag,
+      `=SUM(C${idx + 2}:D${idx + 2})`,
+      `=IFERROR(VLOOKUP(A${idx + 2}, '${SheetTitles.PRODUCTION_BATCH_COSTS}'!A${
+        idx + 2
+      }:C, 3, false), 0)`,
+      "=" +
+        sourceCostData
+          .map(
+            ({ parentTag, costFractionMultiplier }) =>
+              `(VLOOKUP("${parentTag}", $A$2:$B, 2) * ${costFractionMultiplier})`
+          )
+          .join("+"),
+      errors.toString(),
+    ]
+  );
 
   let formattingRequests: any = [
     addRowsRequestFactory({
@@ -512,11 +525,11 @@ export async function createCogsSpreadsheetOrError({
   formattingRequests = [
     ...formattingRequests,
     // Batch Costs
-    addRowsRequestFactory({ sheetId: batchCostSheetId, length: packageData.length }),
-    styleTopRowRequestFactory({ sheetId: batchCostSheetId }),
-    freezeTopRowRequestFactory({ sheetId: batchCostSheetId }),
+    // addRowsRequestFactory({ sheetId: batchCostSheetId, length: packageData.length }),
+    // styleTopRowRequestFactory({ sheetId: batchCostSheetId }),
+    // freezeTopRowRequestFactory({ sheetId: batchCostSheetId }),
     // Worksheet
-    addRowsRequestFactory({ sheetId: worksheetSheetId, length: 100 }),
+    addRowsRequestFactory({ sheetId: worksheetSheetId, length: worksheetData.length }),
     styleTopRowRequestFactory({ sheetId: worksheetSheetId }),
     freezeTopRowRequestFactory({ sheetId: worksheetSheetId }),
     // Manifest COGS
@@ -535,6 +548,21 @@ export async function createCogsSpreadsheetOrError({
     90000
   );
 
+  await messageBus.sendMessageToBackground(
+    MessageType.WRITE_SPREADSHEET_VALUES,
+    {
+      spreadsheetId: response.data.result.spreadsheetId,
+      range: `'${SheetTitles.OVERVIEW}'`,
+      values: [
+        [],
+        [],
+        ...reportData[ReportType.COGS]!.auditData.map(({ text, value }) => ["", text, value]),
+      ],
+    },
+    undefined,
+    90000
+  );
+
   // Tag	Production Batch Number	Cost
   // 1A4050100000900000000001	PR-C100GSSRA-03/21/2023	$1,500.00
 
@@ -542,9 +570,42 @@ export async function createCogsSpreadsheetOrError({
     statusMessage: { text: `Writing package data...`, level: "success" },
   });
 
+  // await writeDataSheet({
+  //   spreadsheetId: response.data.result.spreadsheetId,
+  //   spreadsheetTitle: SheetTitles.PRODUCTION_BATCH_COSTS,
+  //   fields: [
+  //     {
+  //       value: "",
+  //       readableName: "Package Tag",
+  //       required: true,
+  //     },
+  //     {
+  //       value: "",
+  //       readableName: "Production Batch Number",
+  //       required: true,
+  //     },
+  //     {
+  //       value: "",
+  //       readableName: "Cost",
+  //       required: true,
+  //     },
+  //   ],
+  //   data: packageData,
+  //   options: {
+  //     useFieldTransformer: false,
+  //   },
+  // });
+
+  // Tag	Computed Cost	Production Batch Cost	Fractional Costs
+  // 1A4050100000900000000004	=SUM(C5:5) =IFERROR(VLOOKUP(A5, 'Production Batches'!A5:C, 3), 0)	=VLOOKUP("1A4050100000900000000001", $A$2:$B, 2) * 0.25
+
+  store.commit(`reports/${ReportsMutations.SET_STATUS}`, {
+    statusMessage: { text: `Writing worksheet data...`, level: "success" },
+  });
+
   await writeDataSheet({
     spreadsheetId: response.data.result.spreadsheetId,
-    spreadsheetTitle: SheetTitles.PRODUCTION_BATCH_COSTS,
+    spreadsheetTitle: SheetTitles.WORKSHEET,
     fields: [
       {
         value: "",
@@ -553,26 +614,81 @@ export async function createCogsSpreadsheetOrError({
       },
       {
         value: "",
-        readableName: "Production Batch Number",
+        readableName: "Computed Cost",
         required: true,
       },
       {
         value: "",
-        readableName: "Cost",
+        readableName: "Production Batch Cost",
+        required: true,
+      },
+      {
+        value: "",
+        readableName: "Fractional Cost",
+        required: true,
+      },
+      {
+        value: "",
+        readableName: "Errors",
         required: true,
       },
     ],
-    data: packageData,
+    data: worksheetData,
     options: {
       useFieldTransformer: false,
     },
   });
 
-  // Tag	Computed Cost	Production Batch Cost	Fractional Costs
-  // 1A4050100000900000000004	=SUM(C5:5) =IFERROR(VLOOKUP(A5, 'Production Batches'!A5:C, 3), 0)	=VLOOKUP("1A4050100000900000000001", $A$2:$B, 2) * 0.25
-
   // Manifest	Tag	Wholesale Cost	Units	COGS (package)	COGS (per unit)
   // 10000001	1A4050100000900000000008	$500.00	50	=VLOOKUP(B3, 'Calculation Sheet'!A3:B, 2)	=E3/D3
+
+  // TODO
+
+  store.commit(`reports/${ReportsMutations.SET_STATUS}`, {
+    statusMessage: { text: `Resizing sheets...`, level: "success" },
+  });
+
+  let resizeRequests: any[] = [
+    autoResizeDimensionsRequestFactory({
+      sheetId: sheetTitles.indexOf(SheetTitles.OVERVIEW),
+      dimension: "COLUMNS",
+    }),
+  ];
+
+  resizeRequests = [
+    ...resizeRequests,
+    autoResizeDimensionsRequestFactory({
+      sheetId: batchCostSheetId,
+    }),
+    autoResizeDimensionsRequestFactory({
+      sheetId: worksheetSheetId,
+    }),
+    autoResizeDimensionsRequestFactory({
+      sheetId: manifestSheetId,
+    }),
+  ];
+
+  // This is incredibly slow for huge sheets
+  messageBus.sendMessageToBackground(
+    MessageType.BATCH_UPDATE_SPREADSHEET,
+    {
+      spreadsheetId: response.data.result.spreadsheetId,
+      requests: resizeRequests,
+    },
+    undefined,
+    90000
+  );
+
+  await messageBus.sendMessageToBackground(
+    MessageType.WRITE_SPREADSHEET_VALUES,
+    {
+      spreadsheetId: response.data.result.spreadsheetId,
+      range: `'${SheetTitles.OVERVIEW}'`,
+      values: [[`Created with Track & Trace Tools @ ${Date().toString()}`]],
+    },
+    undefined,
+    90000
+  );
 
   return response.data.result;
 }

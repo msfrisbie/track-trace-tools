@@ -679,11 +679,27 @@ export interface IIndexedPlantData extends IPlantData {
   TagMatcher: string;
 }
 
+export interface IFractionalCostData {
+  parentLabel: string;
+  totalParentQuantity: number;
+  fractionalQuantity: number;
+}
+
 export interface IIndexedPackageData extends IPackageData {
   PackageState: PackageState;
   LicenseNumber: string;
   TagMatcher: string;
   history?: IPackageHistoryData[];
+}
+
+export interface IRichIndexedPackageData extends IIndexedPackageData {
+  fractionalCostData?: IFractionalCostData[];
+  errors?: string[];
+}
+
+export interface IRichIndexedDestinationPackageData extends IIndexedDestinationPackageData {
+  fractionalCostData?: IFractionalCostData[];
+  errors?: string[];
 }
 
 export interface IDestinationPackageData {
@@ -748,9 +764,13 @@ export interface IIndexedDestinationPackageData extends IDestinationPackageData 
   LicenseNumber: string;
   TagMatcher: string;
   history?: IPackageHistoryData[];
+  fractionalCostData?: IFractionalCostData[];
 }
 
 export type IUnionIndexedPackageData = IIndexedPackageData | IIndexedDestinationPackageData;
+export type IUnionRichIndexedPackageData =
+  | IRichIndexedPackageData
+  | IRichIndexedDestinationPackageData;
 
 // This is a shared type between incoming and outgoing
 export interface ITransferData {

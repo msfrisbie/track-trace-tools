@@ -50,4 +50,5 @@ export interface ISettingsState {
   enableSearchOverMetrcModal: boolean;
   useIsoDateFormatForSubmit: boolean;
   loadDataInParallel: boolean;
+  usePersistedCache: boolean;
 }
