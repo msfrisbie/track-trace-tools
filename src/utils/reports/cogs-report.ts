@@ -118,7 +118,9 @@ export async function maybeLoadCogsReportData({
 
     dataLoader = await getDataLoaderByLicense(license);
     try {
-      richOutgoingTransfers = [...richOutgoingTransfers, ...(await dataLoader.outgoingTransfers())];
+      const outgoingTransfers = await dataLoader.outgoingTransfers();
+      console.log({ outgoingTransfers });
+      richOutgoingTransfers = [...richOutgoingTransfers, ...outgoingTransfers];
     } catch (e) {
       ctx.commit(ReportsMutations.SET_STATUS, {
         statusMessage: { text: "Failed to load outgoing transfers.", level: "warning" },
@@ -126,10 +128,9 @@ export async function maybeLoadCogsReportData({
     }
 
     try {
-      richOutgoingTransfers = [
-        ...richOutgoingTransfers,
-        ...(await dataLoader.outgoingInactiveTransfers()),
-      ];
+      const outgoingInactiveTransfers = await dataLoader.outgoingInactiveTransfers();
+      console.log({ outgoingInactiveTransfers });
+      richOutgoingTransfers = [...richOutgoingTransfers, ...outgoingInactiveTransfers];
     } catch (e) {
       ctx.commit(ReportsMutations.SET_STATUS, {
         statusMessage: { text: "Failed to load outgoing inactive transfers.", level: "warning" },
@@ -141,11 +142,10 @@ export async function maybeLoadCogsReportData({
   const createdDateBufferGt = getIsoDateFromOffset(-90, transferFilter.estimatedDepartureDateGt!);
   const createdDateBufferLt = getIsoDateFromOffset(90, transferFilter.estimatedDepartureDateLt!);
 
-  const [departureDateBufferGt] = transferFilter.estimatedDepartureDateGt!.split("T");
-  const [departureDateBufferLt] = getIsoDateFromOffset(
-    1,
-    transferFilter.estimatedDepartureDateLt!
-  ).split("T");
+  const [departureDateGt] = transferFilter.estimatedDepartureDateGt!.split("T");
+  const [departureDateLt] = getIsoDateFromOffset(1, transferFilter.estimatedDepartureDateLt!).split(
+    "T"
+  );
 
   richOutgoingTransfers = richOutgoingTransfers.filter((richOutgoingTransfer) => {
     if (richOutgoingTransfer.CreatedDateTime < createdDateBufferGt) {
@@ -205,7 +205,7 @@ export async function maybeLoadCogsReportData({
   // Register all outgoing manifest packages
   const manifestPackages: IIndexedDestinationPackageData[] = [];
   const allTransferredPackages: IIndexedDestinationPackageData[] = [];
-  const allTransfers: IIndexedRichOutgoingTransferData[] = [];
+  const eligibleTransfers: IIndexedRichOutgoingTransferData[] = [];
   const wholesaleTransfers: IIndexedRichOutgoingTransferData[] = [];
 
   for (const transfer of richOutgoingTransfers) {
@@ -213,15 +213,14 @@ export async function maybeLoadCogsReportData({
       const isWholesaleTransfer: boolean = destination.ShipmentTypeName.includes("Wholesale");
 
       const isEligibleTransfer: boolean =
-        destination.EstimatedDepartureDateTime > departureDateBufferGt &&
-        destination.EstimatedDepartureDateTime < departureDateBufferLt;
+        destination.EstimatedDepartureDateTime > departureDateGt &&
+        destination.EstimatedDepartureDateTime < departureDateLt;
 
       if (isEligibleTransfer) {
-        allTransfers.push(transfer);
-      }
-
-      if (!wholesaleTransfers.includes(transfer)) {
-        wholesaleTransfers.push(transfer);
+        eligibleTransfers.push(transfer);
+        if (isWholesaleTransfer) {
+          wholesaleTransfers.push(transfer);
+        }
       }
 
       for (const pkg of destination.packages ?? []) {
@@ -475,7 +474,7 @@ export async function maybeLoadCogsReportData({
       },
       {
         text: "Total Eligible Transfers (All Transfer Types)",
-        value: allTransfers.length,
+        value: eligibleTransfers.length,
       },
       {
         text: "Total Eligible Transfers (Wholesale Only)",
@@ -508,7 +507,7 @@ export async function maybeLoadCogsReportData({
       {
         text: "Transfer License Set",
         value: (() => {
-          const allTransferLicenses = allTransfers.map((x) => x.LicenseNumber);
+          const allTransferLicenses = eligibleTransfers.map((x) => x.LicenseNumber);
           console.log({ allTransferLicenses });
           const uniqueTransferLicenses = new Set(allTransferLicenses);
           console.log({ uniqueTransferLicenses });

@@ -31,6 +31,17 @@ export function getLabel(unionPkg: IUnionIndexedPackageData): string {
   throw new Error("Could not extract Label");
 }
 
+export function getItemName(unionPkg: IUnionIndexedPackageData): string {
+  const pkg = unionPkg as any;
+  if (pkg.Item?.Name) {
+    return pkg.Item.Name;
+  }
+  if (pkg.ProductName) {
+    return pkg.ProductName;
+  }
+  throw new Error("Could not extract Item Name");
+}
+
 // Extremely long lists will be truncated with an ellipsis
 export async function getParentPackageLabels(pkg: IUnionIndexedPackageData) {
   if (!pkg.SourcePackageLabels.endsWith("...")) {

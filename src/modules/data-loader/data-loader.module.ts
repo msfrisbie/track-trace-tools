@@ -107,7 +107,9 @@ export class DataLoader implements IAtomicService {
   private _inTransitPackages: Promise<IIndexedPackageData[]> | null = null;
   private _previousTagOrders: Promise<ITagOrderData[]> | null = null;
   private _incomingTransfers: Promise<IIndexedTransferData[]> | null = null;
+  private _incomingInactiveTransfers: Promise<IIndexedTransferData[]> | null = null;
   private _outgoingTransfers: Promise<IIndexedTransferData[]> | null = null;
+  private _outgoingInactiveTransfers: Promise<IIndexedTransferData[]> | null = null;
   private _rejectedTransfers: Promise<IIndexedTransferData[]> | null = null;
   private _locations: Promise<ILocationData[]> | null = null;
   private _strains: Promise<IStrainData[]> | null = null;
@@ -1323,11 +1325,11 @@ export class DataLoader implements IAtomicService {
 
   async incomingInactiveTransfers(resetCache: boolean = false): Promise<IIndexedTransferData[]> {
     if (resetCache) {
-      this._incomingTransfers = null;
+      this._incomingInactiveTransfers = null;
     }
 
-    if (!this._incomingTransfers) {
-      this._incomingTransfers = new Promise(async (resolve, reject) => {
+    if (!this._incomingInactiveTransfers) {
+      this._incomingInactiveTransfers = new Promise(async (resolve, reject) => {
         const subscription = timer(DATA_LOAD_FETCH_TIMEOUT_MS).subscribe(() =>
           reject("Incoming transfer fetch timed out")
         );
@@ -1349,12 +1351,12 @@ export class DataLoader implements IAtomicService {
         } catch (e) {
           subscription.unsubscribe();
           reject(e);
-          this._incomingTransfers = null;
+          this._incomingInactiveTransfers = null;
         }
       });
     }
 
-    return this._incomingTransfers;
+    return this._incomingInactiveTransfers;
   }
 
   async incomingTransfer(manifestNumber: string): Promise<IIndexedTransferData> {
@@ -1418,11 +1420,11 @@ export class DataLoader implements IAtomicService {
 
   async outgoingInactiveTransfers(resetCache: boolean = false): Promise<IIndexedTransferData[]> {
     if (resetCache) {
-      this._outgoingTransfers = null;
+      this._outgoingInactiveTransfers = null;
     }
 
-    if (!this._outgoingTransfers) {
-      this._outgoingTransfers = new Promise(async (resolve, reject) => {
+    if (!this._outgoingInactiveTransfers) {
+      this._outgoingInactiveTransfers = new Promise(async (resolve, reject) => {
         const subscription = timer(DATA_LOAD_FETCH_TIMEOUT_MS).subscribe(() =>
           reject("Outgoing transfer fetch timed out")
         );
@@ -1444,12 +1446,12 @@ export class DataLoader implements IAtomicService {
         } catch (e) {
           subscription.unsubscribe();
           reject(e);
-          this._outgoingTransfers = null;
+          this._outgoingInactiveTransfers = null;
         }
       });
     }
 
-    return this._outgoingTransfers;
+    return this._outgoingInactiveTransfers;
   }
 
   async outgoingTransfer(manifestNumber: string): Promise<IIndexedTransferData> {

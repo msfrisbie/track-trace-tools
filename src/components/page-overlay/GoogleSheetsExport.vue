@@ -1150,6 +1150,7 @@ import {
 } from "@/interfaces";
 import { authManager } from "@/modules/auth-manager.module";
 import { clientBuildManager } from "@/modules/client-build-manager.module";
+import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
 import { messageBus } from "@/modules/message-bus.module";
 import router from "@/router/index";
 import store from "@/store/page-overlay/index";

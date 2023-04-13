@@ -1,5 +1,10 @@
 import { MessageType, SheetTitles } from "@/consts";
-import { ISpreadsheet } from "@/interfaces";
+import {
+  IDestinationData,
+  IIndexedDestinationPackageData,
+  IIndexedTransferData,
+  ISpreadsheet,
+} from "@/interfaces";
 import { messageBus } from "@/modules/message-bus.module";
 import store from "@/store/page-overlay/index";
 import { ReportsMutations, ReportType } from "@/store/page-overlay/modules/reports/consts";
@@ -9,7 +14,7 @@ import {
   IReportData,
 } from "@/store/page-overlay/modules/reports/interfaces";
 import { todayIsodate } from "./date";
-import { getLabel } from "./package";
+import { getItemName, getLabel } from "./package";
 import {
   extractFlattenedData,
   getSheetTitle,
@@ -516,17 +521,19 @@ export async function createCogsSpreadsheetOrError({
         pkg!
           .fractionalCostData!.map(
             ({ parentLabel, fractionalQuantity }) =>
-              `(VLOOKUP("${parentLabel}", $A$2:$C, 3) * ${fractionalQuantity})`
+              `(VLOOKUP("${parentLabel}", B2:E, 4, false) * ${fractionalQuantity})`
           )
           .join("+");
     }
 
     return [
+      pkg.LicenseNumber,
       getLabel(pkg),
+      getItemName(pkg),
       pkg.ProductionBatchNumber,
       ``,
       fractionalCostExpression,
-      `=SUM(C${idx + 2}:D${idx + 2})`,
+      `=SUM(E${idx + 2}:F${idx + 2})`,
       (pkg.errors ?? "").toString(),
     ];
   });
@@ -632,7 +639,17 @@ export async function createCogsSpreadsheetOrError({
     fields: [
       {
         value: "",
+        readableName: "License #",
+        required: true,
+      },
+      {
+        value: "",
         readableName: "Package Tag",
+        required: true,
+      },
+      {
+        value: "",
+        readableName: "Item",
         required: true,
       },
       {
@@ -670,7 +687,93 @@ export async function createCogsSpreadsheetOrError({
   // Manifest	Tag	Wholesale Cost	Units	COGS (package)	COGS (per unit)
   // 10000001	1A4050100000900000000008	$500.00	50	=VLOOKUP(B3, 'Calculation Sheet'!A3:B, 2)	=E3/D3
 
-  // TODO
+  let flattenedOutgoingPackages: {
+    Package: IIndexedDestinationPackageData;
+    Destination: IDestinationData;
+    Transfer: IIndexedTransferData;
+  }[] = [];
+
+  for (const transfer of reportData[ReportType.COGS]!.richOutgoingTransfers) {
+    for (const destination of transfer.outgoingDestinations ?? []) {
+      for (const pkg of destination.packages ?? []) {
+        flattenedOutgoingPackages.push({
+          Package: pkg,
+          Destination: destination,
+          Transfer: transfer,
+        });
+      }
+    }
+  }
+
+  const cogsData = flattenedOutgoingPackages.map(({ Package, Destination, Transfer }) => {
+    const isEach = Package.ShippedUnitOfMeasureAbbreviation === "ea";
+
+    return [
+      Transfer.LicenseNumber,
+      "# " + Transfer.ManifestNumber,
+      getLabel(Package),
+      getItemName(Package),
+      Package.ShipperWholesalePrice,
+      isEach ? Package.ShippedQuantity : "",
+      `=VLOOKUP("${getLabel(Package)}", ${SheetTitles.WORKSHEET}!B2:G, 6, false)`,
+      isEach
+        ? `=VLOOKUP("${getLabel(Package)}", ${SheetTitles.WORKSHEET}!B2:G, 6, false) / ${
+            Package.ShippedQuantity
+          }`
+        : "",
+    ];
+  });
+
+  await writeDataSheet({
+    spreadsheetId: response.data.result.spreadsheetId,
+    spreadsheetTitle: SheetTitles.MANIFEST_COGS,
+    fields: [
+      {
+        value: "",
+        readableName: "License Number",
+        required: true,
+      },
+      {
+        value: "",
+        readableName: "Manifest #",
+        required: true,
+      },
+      {
+        value: "",
+        readableName: "Package Tag",
+        required: true,
+      },
+      {
+        value: "",
+        readableName: "Item Name",
+        required: true,
+      },
+      {
+        value: "",
+        readableName: "Wholesale Cost",
+        required: true,
+      },
+      {
+        value: "",
+        readableName: "Units",
+        required: true,
+      },
+      {
+        value: "",
+        readableName: "COGS (total)",
+        required: true,
+      },
+      {
+        value: "",
+        readableName: "COGS (unit)",
+        required: true,
+      },
+    ],
+    data: cogsData,
+    options: {
+      useFieldTransformer: false,
+    },
+  });
 
   store.commit(`reports/${ReportsMutations.SET_STATUS}`, {
     statusMessage: { text: `Resizing sheets...`, level: "success" },
