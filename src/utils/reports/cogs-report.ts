@@ -1,3 +1,4 @@
+import { PackageState } from "@/consts";
 import {
   IIndexedRichOutgoingTransferData,
   IPackageFilter,
@@ -179,6 +180,15 @@ export async function maybeLoadCogsReportData({
     // }
 
     try {
+      const rejectedTransfers = await dataLoader.rejectedTransfers();
+      richOutgoingTransfers = [...richOutgoingTransfers, ...rejectedTransfers];
+    } catch (e) {
+      ctx.commit(ReportsMutations.SET_STATUS, {
+        statusMessage: { text: "Failed to load rejected transfers.", level: "warning" },
+      });
+    }
+
+    try {
       const outgoingInactiveTransfers = await dataLoader.outgoingInactiveTransfers();
       richOutgoingTransfers = [...richOutgoingTransfers, ...outgoingInactiveTransfers];
     } catch (e) {
@@ -197,6 +207,8 @@ export async function maybeLoadCogsReportData({
     "T"
   );
 
+  console.log(`Transfers before loose filter: ${richOutgoingTransfers.length}`);
+
   richOutgoingTransfers = richOutgoingTransfers.filter((richOutgoingTransfer) => {
     if (richOutgoingTransfer.CreatedDateTime < createdDateBufferGt) {
       return false;
@@ -207,6 +219,8 @@ export async function maybeLoadCogsReportData({
     }
     return true;
   });
+
+  console.log(`Transfers after loose filter: ${richOutgoingTransfers.length}`);
 
   ctx.commit(ReportsMutations.SET_STATUS, {
     statusMessage: { text: "Loading destinations....", level: "success" },
@@ -224,7 +238,13 @@ export async function maybeLoadCogsReportData({
     )
   );
 
-  await Promise.allSettled(richOutgoingTransferDestinationRequests);
+  const destinationResults = await Promise.allSettled(richOutgoingTransferDestinationRequests);
+
+  console.log(
+    `Failed destination requests: ${
+      destinationResults.filter((x) => x.status !== "fulfilled").length
+    }`
+  );
 
   ctx.commit(ReportsMutations.SET_STATUS, {
     statusMessage: { text: "Loading manifest packages...", level: "success" },
@@ -234,6 +254,10 @@ export async function maybeLoadCogsReportData({
 
   const eligibleTransfers: IIndexedRichOutgoingTransferData[] = [];
   const wholesaleTransfers: IIndexedRichOutgoingTransferData[] = [];
+
+  console.log({ departureDateGt, departureDateLt });
+
+  console.log(`Total transfers: ${richOutgoingTransfers.length}`);
 
   richOutgoingTransfers.map((transfer) =>
     transfer.outgoingDestinations?.map((destination) => {
@@ -263,7 +287,7 @@ export async function maybeLoadCogsReportData({
                 Label: getLabel(pkg),
                 ItemName: getItemName(pkg),
                 manifest: isWholesaleTransfer && isEligibleTransfer,
-                manifestGraph: true,
+                manifestGraph: isWholesaleTransfer && isEligibleTransfer,
                 SourcePackageLabels: pkg.SourcePackageLabels,
                 ProductionBatchNumber: pkg.ProductionBatchNumber,
                 fractionalCostData: [],
@@ -277,16 +301,23 @@ export async function maybeLoadCogsReportData({
     })
   );
 
-  // const globalPackageMap: Map<string, IUnionIndexedPackageData> = new Map(
-  //   packages.map((pkg) => [getLabel(pkg), pkg])
-  // );
+  console.log(`Total eligible transfers: ${eligibleTransfers.length}`);
+  console.log(`Total wholesale transfers: ${wholesaleTransfers.length}`);
+
+  const packageResults = await Promise.allSettled(packageRequests);
+
+  console.log(
+    `Failed package requests: ${packageResults.filter((x) => x.status !== "fulfilled").length}`
+  );
+
+  console.log(
+    `Manifest packages: ${[...globalPackageMap.values()].filter((pkg) => pkg.manifest).length}`
+  );
 
   const totalTransfersWithMultiDestinations = richOutgoingTransfers
     .map((x) => x.outgoingDestinations!.length)
     .filter((x) => x > 1)
     .reduce((a, b) => a + b, 0);
-
-  await Promise.allSettled(packageRequests);
 
   // Register all outgoing manifest packages
   // const manifestPackages: IIndexedDestinationPackageData[] = [];
@@ -365,7 +396,37 @@ export async function maybeLoadCogsReportData({
       .map((x) => packageTagStack.push(x));
   }
 
-  console.log({ manifestGraph: [...globalPackageMap.values()].filter((pkg) => pkg.manifestGraph) });
+  const manifestGraph = [...globalPackageMap.values()].filter((pkg) => pkg.manifestGraph);
+
+  console.log({
+    manifestGraph: manifestGraph.length,
+  });
+
+  const emptyParentManifestGraphMembers = manifestGraph.filter(
+    (pkg) => pkg.SourcePackageLabels.length < 24
+  );
+
+  console.log({
+    emptyParentManifestGraphMembers: emptyParentManifestGraphMembers.length,
+  });
+
+  const singleParentManifestGraphMembers = manifestGraph.filter(
+    (pkg) => pkg.SourcePackageLabels.length === 24
+  );
+
+  console.log({
+    singleParentManifestGraphMembers: singleParentManifestGraphMembers.length,
+  });
+
+  const singleParentNonBatchManifestGraphMembers = manifestGraph.filter(
+    (pkg) => pkg.SourcePackageLabels.length <= 24 && !pkg.ProductionBatchNumber
+  );
+
+  console.log({
+    singleParentNonBatchManifestGraphMembers: singleParentNonBatchManifestGraphMembers.length,
+  });
+
+  debugger;
 
   ctx.commit(ReportsMutations.SET_STATUS, {
     statusMessage: { text: "Loading package split data...", level: "success" },
@@ -383,7 +444,10 @@ export async function maybeLoadCogsReportData({
     packageHistoryRequests.push(
       getDataLoaderByLicense(pkg.LicenseNumber).then((dataLoader) =>
         dataLoader.packageHistoryByPackageId(pkg.Id).then((history) => {
-          pkg.history = history;
+          pkg.historyExtracts = {
+            parentPackageLabels: extractParentPackageLabelsFromHistory(history),
+            tagQuantityPairs: extractTagQuantityPairsFromHistory(history),
+          };
         })
       )
     );
@@ -394,7 +458,13 @@ export async function maybeLoadCogsReportData({
     }
   }
 
-  await Promise.allSettled(packageHistoryRequests);
+  const packageHistoryResults = await Promise.allSettled(packageHistoryRequests);
+
+  console.log(
+    `Failed package history requests: ${
+      packageHistoryResults.filter((x) => x.status !== "fulfilled").length
+    }`
+  );
 
   // for (const [label, pkg] of historyTreeMap.entries()) {
   //   if (!pkg.history || !pkg.history.length) {
@@ -436,51 +506,53 @@ export async function maybeLoadCogsReportData({
       continue;
     }
 
-    if (!pkg.history) {
+    if (!pkg.historyExtracts) {
       pkg.errors.push("No history");
       continue;
     }
 
-    const parentPackageLabels = extractParentPackageLabelsFromHistory(pkg.history!);
+    // const parentPackageLabels = extractParentPackageLabelsFromHistory(pkg.history!);
 
-    if (!parentPackageLabels.length) {
+    if (pkg.historyExtracts.parentPackageLabels.length === 0) {
       pkg.errors.push("Extracted 0 parent package labels");
       continue;
     }
 
-    const parentPackages = parentPackageLabels.map((pkg) => globalPackageMap.get(pkg));
-    const matchedParentPackages = parentPackages.filter((x) => x !== undefined);
+    const parentPackages = pkg.historyExtracts.parentPackageLabels.map((pkg) =>
+      globalPackageMap.get(pkg)
+    );
+    const matchedParentPackages = parentPackages.filter(
+      (x) => x !== undefined
+    ) as ISimpleCogsPackageData[];
     const unmatchedParentPackages = parentPackages.filter((x) => x === undefined);
-    const noHistoryParentPackages = matchedParentPackages.filter((x) => !pkg.history);
+    const noHistoryParentPackages = matchedParentPackages.filter((x) => !x.historyExtracts);
+    const validParentPackages = matchedParentPackages.filter((x) => !!x.historyExtracts);
 
     if (matchedParentPackages.length === 0) {
       pkg.errors.push("No parents matched");
       // TODO this might be OK
-      continue;
     }
 
     if (unmatchedParentPackages.length > 0) {
       pkg.errors.push(`${unmatchedParentPackages.length}/${parentPackages.length} parents matched`);
-      continue;
     }
 
     if (noHistoryParentPackages.length > 0) {
       pkg.errors.push(
         `${noHistoryParentPackages.length}/${parentPackages.length} parent packages have no history`
       );
-      continue;
     }
 
-    for (const parentPkg of matchedParentPackages) {
-      const tagQuantityPairs = extractTagQuantityPairsFromHistory(parentPkg!.history!);
-
-      const totalParentQuantity = tagQuantityPairs
-        .map((x) => x.quantity)
+    for (const parentPkg of validParentPackages) {
+      const totalParentQuantity = parentPkg!
+        .historyExtracts!.tagQuantityPairs.map((x) => x.quantity)
         .reduce((a, b) => a + b, 0);
 
-      const matchingPackagePair = tagQuantityPairs.find((x) => x.tag === pkg.Label);
+      const matchingPackagePair = parentPkg!.historyExtracts!.tagQuantityPairs.find(
+        (x) => x.tag === pkg.Label
+      );
       if (!matchingPackagePair) {
-        pkg.errors.push(`No parent history match: ${parentPkg!.Label}`);
+        pkg.errors.push(`No parent history pair match: ${parentPkg!.Label}`);
         continue;
       }
 
@@ -583,7 +655,12 @@ export async function maybeLoadCogsReportData({
       },
       {
         text: "Total Eligible Manifest Packages (All Transfer Types)",
-        value: [...globalPackageMap.values()].filter((pkg) => pkg.manifestGraph).length,
+        value: [...globalPackageMap.values()].filter((pkg) => {
+          return (
+            pkg.PackageState === PackageState.DEPARTED_FACILITY ||
+            pkg.PackageState === PackageState.IN_TRANSIT
+          );
+        }).length,
       },
       {
         text: "Total Eligible Manifest Packages (Wholesale Only)",

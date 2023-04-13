@@ -485,7 +485,7 @@ export async function createCogsSpreadsheetOrError({
     throw new Error("Unable to create COGS sheet");
   }
 
-  const packageData = reportData[ReportType.COGS]!.packages.sort((a, b) => {
+  reportData[ReportType.COGS]!.packages.sort((a, b) => {
     if (!a.ProductionBatchNumber) {
       return 1;
     }
@@ -493,7 +493,7 @@ export async function createCogsSpreadsheetOrError({
       return -1;
     }
     return a.ProductionBatchNumber!.localeCompare(b.ProductionBatchNumber!);
-  }).map((pkg) => [getLabel(pkg), pkg.ProductionBatchNumber ?? ""]);
+  }).map((pkg) => [pkg.Label, pkg.ProductionBatchNumber ?? ""]);
 
   // const worksheetData = reportData[ReportType.COGS]!.packageCostCalculationData.map(
   //   ({ tag, sourceCostData, errors }, idx) => [
@@ -528,8 +528,8 @@ export async function createCogsSpreadsheetOrError({
 
     return [
       pkg.LicenseNumber,
-      getLabel(pkg),
-      getItemName(pkg),
+      pkg.Label,
+      pkg.ItemName,
       pkg.ProductionBatchNumber,
       ``,
       fractionalCostExpression,

@@ -782,7 +782,10 @@ export interface ISimpleCogsPackageData {
   manifestGraph: boolean;
   SourcePackageLabels: string;
   ProductionBatchNumber: string | null;
-  history?: IPackageHistoryData[];
+  historyExtracts?: {
+    parentPackageLabels: string[],
+    tagQuantityPairs: {tag: string, quantity: number}[]
+  },
   fractionalCostData: IFractionalCostData[];
   errors: string[];
 }

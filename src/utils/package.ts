@@ -44,16 +44,15 @@ export function getItemName(unionPkg: IUnionIndexedPackageData): string {
 
 // Extremely long lists will be truncated with an ellipsis
 export async function getParentPackageLabels(pkg: ISimpleCogsPackageData) {
-  debugger;
   if (!pkg.SourcePackageLabels.endsWith("...")) {
     return pkg.SourcePackageLabels.split(",").map((x) => x.trim());
   } else {
     // Source package labels may have been truncated
-    if (pkg.history) {
-      return extractParentPackageLabelsFromHistory(pkg.history);
+    if (pkg.historyExtracts) {
+      return pkg.historyExtracts.parentPackageLabels;
     } else {
       const history = await getDataLoaderByLicense(pkg.LicenseNumber).then((dataLoader) =>
-        dataLoader.packageHistoryByPackageId(getId(pkg))
+        dataLoader.packageHistoryByPackageId(pkg.Id)
       );
 
       return extractParentPackageLabelsFromHistory(history);
