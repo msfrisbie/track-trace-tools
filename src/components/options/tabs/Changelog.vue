@@ -6,6 +6,12 @@
           <p class="text-2xl ttt-purple">v0.26.0</p>
 
           <ul class="list-disc">
+            <li>T3+ beta</li>
+          </ul>
+
+          <p class="text-2xl ttt-purple">v0.26.0</p>
+
+          <ul class="list-disc">
             <li>Improvements to data load</li>
           </ul>
 

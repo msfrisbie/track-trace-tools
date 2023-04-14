@@ -129,7 +129,7 @@ export const reportsModule = {
         const stragglerPackageConfig = reportConfig[ReportType.STRAGGLER_PACKAGES];
         if (stragglerPackageConfig?.stragglerPackageFilter) {
           ctx.commit(ReportsMutations.SET_STATUS, {
-            statusMessage: { text: "Loading packages...", level: "success" },
+            statusMessage: { text: "Loading straggler packages...", level: "success" },
           });
 
           let stragglerPackages: IIndexedPackageData[] = [];

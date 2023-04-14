@@ -8,7 +8,7 @@ Track & Trace Tools is an open source browser extension that adds extra features
 
 ## Liability
 
-This software is released under the MIT license. [Read a quick overview of this license](https://choosealicense.com/licenses/mit/).
+This software is released under the GPL-3 license. [Read a quick overview of this license](https://www.gnu.org/licenses/gpl-3.0.txt).
 
 ## Getting Started
 
