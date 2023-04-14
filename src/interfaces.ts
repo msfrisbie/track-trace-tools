@@ -786,6 +786,7 @@ export interface ISimpleCogsPackageData {
     parentPackageLabels: string[],
     tagQuantityPairs: {tag: string, quantity: number}[]
   },
+  childLabels: string[];
   fractionalCostData: IFractionalCostData[];
   errors: string[];
 }

@@ -95,6 +95,7 @@ export async function maybeLoadCogsReportData({
           manifestGraph: false,
           SourcePackageLabels: pkg.SourcePackageLabels,
           ProductionBatchNumber: pkg.ProductionBatchNumber,
+          childLabels: [],
           fractionalCostData: [],
           errors: [],
         })
@@ -117,6 +118,7 @@ export async function maybeLoadCogsReportData({
           manifestGraph: false,
           SourcePackageLabels: pkg.SourcePackageLabels,
           ProductionBatchNumber: pkg.ProductionBatchNumber,
+          childLabels: [],
           fractionalCostData: [],
           errors: [],
         })
@@ -139,6 +141,7 @@ export async function maybeLoadCogsReportData({
           manifestGraph: false,
           SourcePackageLabels: pkg.SourcePackageLabels,
           ProductionBatchNumber: pkg.ProductionBatchNumber,
+          childLabels: [],
           fractionalCostData: [],
           errors: [],
         })
@@ -283,6 +286,7 @@ export async function maybeLoadCogsReportData({
                 manifestGraph: isWholesaleTransfer && isEligibleTransfer,
                 SourcePackageLabels: pkg.SourcePackageLabels,
                 ProductionBatchNumber: pkg.ProductionBatchNumber,
+                childLabels: [],
                 fractionalCostData: [],
                 errors: [],
               })
@@ -334,7 +338,7 @@ export async function maybeLoadCogsReportData({
     const pkg = globalPackageMap.get(label);
 
     if (!pkg) {
-      console.error(`Couldn't match tag to package: ${label}`);
+      //console.error(`Couldn't match tag to package: ${label}`);
       continue;
     }
 
@@ -343,41 +347,83 @@ export async function maybeLoadCogsReportData({
       manifestGraph: true,
     });
 
-    (await getParentPackageLabels(pkg))
+    const parentPackageLabels = await getParentPackageLabels(pkg);
+
+    // Overwrite source package labels with full list
+    if (pkg.SourcePackageLabels.endsWith("...")) {
+      pkg.SourcePackageLabels = parentPackageLabels.join(", ");
+    }
+
+    parentPackageLabels
       .filter((x) => x.length > 0)
       .filter((x) => !touchedPackageTags.has(x))
       .map((x) => packageTagStack.push(x));
   }
 
-  const manifestGraph = [...globalPackageMap.values()].filter((pkg) => pkg.manifestGraph);
+  // At this point, we're done with all packages that are not in the manifest graph.
+  // Remove them
+  const globalPackageMapCount = globalPackageMap.size;
+  [...globalPackageMap.keys()].map((packageTag) => {
+    const pkg = globalPackageMap.get(packageTag);
 
-  console.log({
-    manifestGraph: manifestGraph.length,
+    if (!pkg!.manifestGraph) {
+      globalPackageMap.delete(packageTag);
+    }
   });
 
-  const emptyParentManifestGraphMembers = manifestGraph.filter(
-    (pkg) => pkg.SourcePackageLabels.length < 24
-  );
+  // Create a new identifier that is just a reference
+  const manifestGraphPackageMap = globalPackageMap;
 
-  console.log({
-    emptyParentManifestGraphMembers: emptyParentManifestGraphMembers.length,
-  });
+  // Perform eager optimizations:
+  // - Assess child counts
+  // - Determine if a history lookup is required
+  for (const manifestGraphPackage of manifestGraphPackageMap.values()) {
+    for (const parentPackageLabel of manifestGraphPackage.SourcePackageLabels.split(",").map((x) =>
+      x.trim()
+    )) {
+      const parentPkg = manifestGraphPackageMap.get(parentPackageLabel);
 
-  const singleParentManifestGraphMembers = manifestGraph.filter(
-    (pkg) => pkg.SourcePackageLabels.length === 24
-  );
+      if (!parentPkg) {
+        continue;
+      }
 
-  console.log({
-    singleParentManifestGraphMembers: singleParentManifestGraphMembers.length,
-  });
+      parentPkg!.childLabels.push(manifestGraphPackage.Label);
+    }
+  }
 
-  const singleParentNonBatchManifestGraphMembers = manifestGraph.filter(
-    (pkg) => pkg.SourcePackageLabels.length <= 24 && !pkg.ProductionBatchNumber
-  );
+  for (const manifestGraphPackage of manifestGraphPackageMap.values()) {
+    if (
+      manifestGraphPackage.childLabels.length === 1 &&
+      !manifestGraphPackage.SourcePackageLabels.endsWith("...")
+    ) {
+      const [childLabel] = manifestGraphPackage.childLabels;
 
-  console.log({
-    singleParentNonBatchManifestGraphMembers: singleParentNonBatchManifestGraphMembers.length,
-  });
+      // Spoof the history extracts, eliminating the need for a history lookup
+      manifestGraphPackage.historyExtracts = {
+        parentPackageLabels: manifestGraphPackage.SourcePackageLabels.split(",").map((x) =>
+          x.trim()
+        ),
+        tagQuantityPairs: [{ tag: childLabel, quantity: 1 }],
+      };
+    }
+  }
+
+  // const tmpManifestGraphPackages = [...manifestGraphPackageMap.values()];
+
+  // console.log({
+  //   manifestGraph: tmpManifestGraphPackages.length,
+  // });
+
+  // const removableManifestGraphMembers = tmpManifestGraphPackages.filter(
+  //   (pkg) =>
+  //     !pkg.ProductionBatchNumber &&
+  //     pkg.SourcePackageLabels.length === 24 &&
+  //     pkg.childLabels.length === 1
+  // );
+
+  // console.log({
+  //   removableManifestGraphMembers: removableManifestGraphMembers.length,
+  // });
 
   debugger;
 
@@ -389,8 +435,9 @@ export async function maybeLoadCogsReportData({
   const packageHistoryRequests: Promise<any>[] = [];
 
   let counter = 0;
-  for (const pkg of globalPackageMap.values()) {
-    if (!pkg.manifestGraph) {
+  for (const pkg of manifestGraphPackageMap.values()) {
+    if (pkg.historyExtracts) {
+      // Already generated history data
       continue;
     }
 
@@ -419,11 +466,7 @@ export async function maybeLoadCogsReportData({
     }`
   );
 
-  for (const pkg of globalPackageMap.values()) {
-    if (!pkg.manifestGraph) {
-      continue;
-    }
-
+  for (const pkg of manifestGraphPackageMap.values()) {
     if (!pkg.historyExtracts) {
       pkg.errors.push("No history");
       continue;
@@ -435,7 +478,7 @@ export async function maybeLoadCogsReportData({
     }
 
     const parentPackages = pkg.historyExtracts.parentPackageLabels.map((pkg) =>
-      globalPackageMap.get(pkg)
+      manifestGraphPackageMap.get(pkg)
     );
     const matchedParentPackages = parentPackages.filter(
       (x) => x !== undefined
@@ -444,7 +487,7 @@ export async function maybeLoadCogsReportData({
     const noHistoryParentPackages = matchedParentPackages.filter((x) => !x.historyExtracts);
     const validParentPackages = matchedParentPackages.filter((x) => !!x.historyExtracts);
 
-    if (matchedParentPackages.length === 0) {
+    if (parentPackages.length > 0 && matchedParentPackages.length === 0) {
       pkg.errors.push("No parents matched");
       // TODO this might be OK
     }
@@ -480,7 +523,7 @@ export async function maybeLoadCogsReportData({
     }
   }
 
-  const manifestGraphPackages = [...globalPackageMap.values()].filter((pkg) => pkg.manifestGraph);
+  const manifestGraphPackages = [...manifestGraphPackageMap.values()];
 
   reportData[ReportType.COGS] = {
     packages: manifestGraphPackages,
@@ -504,7 +547,7 @@ export async function maybeLoadCogsReportData({
       },
       {
         text: "Total Eligible Manifest Packages (All Transfer Types)",
-        value: [...globalPackageMap.values()].filter((pkg) => {
+        value: [...manifestGraphPackageMap.values()].filter((pkg) => {
           return (
             pkg.PackageState === PackageState.DEPARTED_FACILITY ||
             pkg.PackageState === PackageState.IN_TRANSIT
@@ -525,7 +568,7 @@ export async function maybeLoadCogsReportData({
       },
       {
         text: "Total Packages in Dataset",
-        value: globalPackageMap.size,
+        value: globalPackageMapCount,
       },
       {
         text: "Transfer License Set",
@@ -538,7 +581,9 @@ export async function maybeLoadCogsReportData({
       {
         text: "Package License Set",
         value: (() => {
-          const allPackageLicenses = [...globalPackageMap.values()].map((x) => x.LicenseNumber);
+          const allPackageLicenses = [...manifestGraphPackageMap.values()].map(
+            (x) => x.LicenseNumber
+          );
           const uniqueLicenses = new Set(allPackageLicenses);
           return [...uniqueLicenses].join(", ");
         })(),
