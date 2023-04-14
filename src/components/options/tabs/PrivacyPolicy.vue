@@ -5,7 +5,7 @@
         Read the privacy policy
         <a
           href="https://trackandtrace.tools/privacy-policy"
-          class="underline ttt-purple"
+          class="underline text-blue-500"
           target="_blank"
           >here</a
         >.

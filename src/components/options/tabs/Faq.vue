@@ -101,9 +101,9 @@ export default Vue.extend({
       githubUrl: "https://github.com/msfrisbie/track-trace-tools",
       githubReleasesUrl: "https://github.com/msfrisbie/track-trace-tools/releases",
       forumUrl: "https://track-trace-tools.talkyard.net/latest",
-      email: "mailto:tracktracetools@gmail.com",
+      email: "mailto:matt@trackandtrace.tools",
       mitLicenseUrl: "https://github.com/msfrisbie/track-trace-tools/blob/master/LICENSE.md",
-      gplLicenseUrl: "https://www.gnu.org/licenses/gpl-3.0.txt"
+      gplLicenseUrl: "https://www.gnu.org/licenses/gpl-3.0.txt",
     };
   },
   methods: {},

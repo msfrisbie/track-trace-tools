@@ -2,8 +2,22 @@
   <div class="flex flex-col items-center">
     <div class="flex flex-col items-stretch max-w-lg gap-4">
       <div class="text-xl text-center">
-        Track &amp; Trace Tools can generate reports directly in Google Sheets. Sign in to your
-        Google account to enable this feature.
+        Track &amp; Trace Tools can export directly to Google Sheets.
+      </div>
+      <div class="text-md text-gray-600 text-center">
+        Sign in to your Google account to enable this feature.
+      </div>
+
+      <div class="flex flex-col items-center">
+        <iframe
+          width="640"
+          height="400"
+          src="https://www.youtube.com/embed/JBR21XSKK3I"
+          title="Generating snapshots with Track &amp; Trace Tools"
+          frameborder="0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+          allowfullscreen
+        ></iframe>
       </div>
 
       <hr />

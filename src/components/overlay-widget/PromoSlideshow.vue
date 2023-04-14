@@ -70,10 +70,10 @@
               Reach out to
               <a
                 class="text-purple-500 hover:text-purple-500 underline"
-                href="mailto:tracktracetools@gmail.com"
+                href="mailto:matt@trackandtrace.tools"
                 target="_blank"
                 @click.stop
-                >tracktracetools@gmail.com</a
+                >matt@trackandtrace.tools</a
               >
             </div>
           </div>

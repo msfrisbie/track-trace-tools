@@ -3,7 +3,12 @@
     <div class="max-w-lg flex flex-col gap-4">
       <p>
         You can read the text of the GPL-3 license
-        <a href="https://www.gnu.org/licenses/gpl-3.0.txt">here</a>.
+        <a
+          class="underline text-blue-500"
+          href="https://www.gnu.org/licenses/gpl-3.0.txt"
+          target="_blank"
+          >here</a
+        >.
       </p>
     </div>
   </div>

@@ -7,18 +7,15 @@
           Signed in as <span class="font-bold ttt-purple">{{ oauthUserInfo.email }}</span>
         </div>
 
-        <div>Generate Metrc snapshots from the Track &amp; Trace Tools menu.</div>
+        <!-- <div>Generate Metrc snapshots from the Track &amp; Trace Tools menu.</div>
 
         <a
           href="https://docs.google.com/spreadsheets/d/1fxBfjBUhFt6Gj7PpbQO8DlT1e76DIDtTwiq_2A5tHCU/edit?usp=sharing"
           target="_blank"
           class="underline text-purple-600"
           >Example snapshot</a
-        >
-        <a
-          href="https://youtu.be/JBR21XSKK3I"
-          class="underline text-purple-600"
-          target="_blank"
+        > -->
+        <a href="https://youtu.be/JBR21XSKK3I" class="underline text-purple-600" target="_blank"
           >How do I make a snapshot?</a
         >
 

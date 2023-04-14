@@ -7,7 +7,7 @@ export class LRU<T> {
 
   touch(element: T) {
     if (!this.elements.includes(element)) {
-      throw new Error("Element does not exist");
+      throw new Error(`Element does not exist: ${element}`);
     }
 
     this.elements = [element, ...this.elements.filter((x) => x !== element)];

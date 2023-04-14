@@ -20,8 +20,8 @@
 
     <div>
       Let's discuss your custom solution!
-      <a class="ttt-purple underline" href="mailto:tracktracetools@gmail.com">
-        tracktracetools@gmail.com
+      <a class="ttt-purple underline" href="mailto:matt@trackandtrace.tools">
+        matt@trackandtrace.tools
       </a>
     </div>
   </div>

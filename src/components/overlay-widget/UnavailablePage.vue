@@ -6,8 +6,8 @@
       <div class="text-lg text-start">
         Some tools require customization on a per-business or per-state basis. If you'd like to
         enable this tool, reach out:
-        <a class="underline text-purple-500" href="mailto:tracktracetools@gmail.com"
-          >tracktracetools@gmail.com</a
+        <a class="underline text-purple-500" href="mailto:matt@trackandtrace.tools"
+          >matt@trackandtrace.tools</a
         >
       </div>
     </div>

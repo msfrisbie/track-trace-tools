@@ -73,14 +73,6 @@
             <div class="rounded border border-gray-300 p-2 flex flex-col items-stretch gap-2">
               <div class="font-semibold text-gray-700">Packages</div>
 
-              <b-form-checkbox
-                :value="ReportType.PACKAGES"
-                :disabled="reportStatus !== ReportStatus.INITIAL"
-                ><div class="flex flex-col items-start gap-1">
-                  <span class="">Packages</span>
-                  <span class="text-xs text-gray-400">{{ reportOption.description }}</span>
-                </div>
-              </b-form-checkbox>
               <hr />
               <div class="flex flex-col items-stretch gap-4">
                 <b-button
