@@ -548,7 +548,7 @@ export default Vue.extend({
         });
       }
 
-      if (this.perPackageQuantity < 0) {
+      if (this.perPackageQuantity && this.perPackageQuantity! < 0) {
         errors.push({
           tags: ["page2", "perPackageQuantity"],
           message: "Per package quantity must be greater than 0",
@@ -657,6 +657,7 @@ export default Vue.extend({
       // }
 
       return unitOfMeasureNameToAbbreviation(
+        // @ts-ignore
         this.outputItem?.UnitOfMeasureName || ""
       ).toLocaleLowerCase();
     },

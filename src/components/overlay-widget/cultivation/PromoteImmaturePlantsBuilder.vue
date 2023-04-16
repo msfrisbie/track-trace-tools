@@ -297,7 +297,7 @@ export default Vue.extend({
         (this as PromoteImmaturePlantsBuilderVuexCoupler).selectedPlantBatches
       );
     },
-    async downloadAll(): void {
+    async downloadAll(): Promise<void> {
       for (let csvFile of this.csvFiles) {
         await downloadCsvFile({ csvFile, delay: 500 });
       }
