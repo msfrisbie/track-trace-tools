@@ -24,7 +24,7 @@
                 </div>
               </b-form-checkbox>
 
-              <div class="text-xs text-start text-gray-600" v-if="!enablePremium">
+              <div class="text-xs text-start text-gray-600" v-if="!enableT3Plus">
                 Get access to advanced snapshots with
                 <a
                   class="text-purple-500 underline"
@@ -36,14 +36,14 @@
 
               <b-form-checkbox
                 class="opacity-50"
-                v-for="ineligibleReportOption of ineligibleReportOptions"
-                v-bind:key="ineligibleReportOption.value"
-                :value="ineligibleReportOption.value"
+                v-for="disabledVisibleReportOption of disabledVisibleReportOptions"
+                v-bind:key="disabledVisibleReportOption.value"
+                :value="disabledVisibleReportOption.value"
                 :disabled="true"
                 ><div class="flex flex-col items-start gap-1">
-                  <span class="">{{ ineligibleReportOption.text }}</span>
+                  <span class="">{{ disabledVisibleReportOption.text }}</span>
                   <span class="text-xs text-gray-400">{{
-                    ineligibleReportOption.description
+                    disabledVisibleReportOption.description
                   }}</span>
                 </div>
               </b-form-checkbox>
@@ -112,12 +112,12 @@
                     <span class="leading-6">Include inactive packages</span>
                   </b-form-checkbox>
 
-                  <b-form-checkbox :disabled="!enablePremium">
+                  <b-form-checkbox :disabled="!enableT3Plus">
                     <div class="flex flex-col items-start">
                       <span class="leading-6"
                         >Include packages transferred out of this facility</span
                       >
-                      <span v-if="!enablePremium" class="text-xs text-gray-300"
+                      <span v-if="!enableT3Plus" class="text-xs text-gray-300"
                         >Enable this with
                         <a href="https://trackandtrace.tools/plus" target="_blank">T3+</a></span
                       >
@@ -495,13 +495,13 @@
                     <span class="leading-6">Include Inactive Outgoing</span>
                   </b-form-checkbox>
                   <b-form-checkbox
-                    :disabled="!enablePremium"
+                    :disabled="!enableT3Plus"
                     v-model="outgoingTransfersFormFilters.onlyWholesale"
                   >
                     <div class="flex flex-col items-start">
                       <span class="leading-6">Only Wholesale</span>
                     </div>
-                    <span v-if="!enablePremium" class="text-xs text-gray-300"
+                    <span v-if="!enableT3Plus" class="text-xs text-gray-300"
                       >Enable this with
                       <a href="https://trackandtrace.tools/plus" target="_blank">T3+</a></span
                     >
@@ -771,13 +771,13 @@
                     <span class="leading-6">Include Inactive Outgoing</span>
                   </b-form-checkbox>
                   <b-form-checkbox
-                    :disabled="!enablePremium"
+                    :disabled="!enableT3Plus"
                     v-model="outgoingTransferManifestsFormFilters.onlyWholesale"
                   >
                     <div class="flex flex-col items-start">
                       <span class="leading-6">Only Wholesale</span>
                     </div>
-                    <span v-if="!enablePremium" class="text-xs text-gray-300"
+                    <span v-if="!enableT3Plus" class="text-xs text-gray-300"
                       >Enable this with
                       <a href="https://trackandtrace.tools/plus" target="_blank">T3+</a></span
                     >
@@ -1171,8 +1171,9 @@ import { mapActions, mapState } from "vuex";
 interface IReportOption {
   text: string;
   value: ReportType | null;
-  premium: boolean;
+  t3plus: boolean;
   enabled: boolean;
+  hidden?: boolean;
   description: string;
 }
 
@@ -1195,16 +1196,11 @@ export default Vue.extend({
     eligibleReportOptions(): IReportOption[] {
       return this.eligibleReportOptionsImpl();
     },
-    ineligibleReportOptions(): IReportOption[] {
-      return this.reportOptionsImpl().filter(
-        (x: IReportOption) => !this.eligibleReportOptionsImpl().includes(x)
-      );
+    disabledVisibleReportOptions(): IReportOption[] {
+      return this.disabledVisibleReportOptionsImpl();
     },
-    enablePremium(): boolean {
+    enableT3Plus(): boolean {
       return clientBuildManager.assertValues(["ENABLE_T3PLUS"]);
-    },
-    reportOptions(): IReportOption[] {
-      return this.reportOptionsImpl();
     },
   },
   data(): any {
@@ -1329,74 +1325,75 @@ export default Vue.extend({
       this.selectedReports = this.eligibleReportOptions.map((x: IReportOption) => x.value);
     },
     reportOptionsImpl(): IReportOption[] {
-      return [
+      const reportOptions: IReportOption[] = [
         {
           text: "Packages",
           value: ReportType.PACKAGES,
-          premium: false,
+          t3plus: false,
           enabled: true,
           description: "Filter by packaged date",
         },
         {
           text: "Mature Plants",
           value: ReportType.MATURE_PLANTS,
-          premium: false,
+          t3plus: false,
           enabled: true,
           description: "Filter by growth phase and planted date",
         },
         {
           text: "Incoming Transfers",
           value: ReportType.INCOMING_TRANSFERS,
-          premium: true,
+          t3plus: true,
           enabled: true,
           description: "Filter by wholesale and estimated time of arrival",
         },
         {
           text: "Outgoing Transfers",
           value: ReportType.OUTGOING_TRANSFERS,
-          premium: false,
+          t3plus: false,
           enabled: true,
           description: "Filter by wholesale and estimated time of departure",
         },
         {
           text: "Tags",
           value: ReportType.TAGS,
-          premium: true,
+          t3plus: true,
           enabled: true,
           description: "Filter by tag type and status",
         },
         {
           text: "Harvests",
           value: ReportType.HARVESTS,
-          premium: false,
+          t3plus: false,
           enabled: true,
           description: "Filter by harvest date",
         },
         {
           text: "Outgoing Transfer Manifests",
           value: ReportType.OUTGOING_TRANSFER_MANIFESTS,
-          premium: true,
+          t3plus: true,
           enabled: true,
           description: "Full transfer and package data for all outgoing transfers",
         },
         {
           text: "Straggler Inventory",
           value: ReportType.STRAGGLER_PACKAGES,
-          premium: true,
+          t3plus: true,
           enabled: true,
           description: "Find straggler inventory so it can be cleared out",
         },
         {
           text: "COGS",
           value: ReportType.COGS,
-          premium: true,
-          enabled: true,
+          t3plus: false,
+          enabled: clientBuildManager.assertValues(["ENABLE_COGS"]),
+          hidden: !clientBuildManager.assertValues(["ENABLE_COGS"]),
           description: "Generate COGS",
         },
         {
           text: "Package Quickview",
           value: null,
-          premium: true,
+          t3plus: true,
           enabled: false,
           description:
             "Grouped summary of packages by item, remaining quantity, and testing status",
@@ -1404,14 +1401,14 @@ export default Vue.extend({
         {
           text: "Immature Plant Quickview",
           value: null,
-          premium: true,
+          t3plus: true,
           enabled: false,
           description: "Grouped summary of mature plants by strain, location, and dates",
         },
         {
           text: "Mature Plant Quickview",
           value: null,
-          premium: true,
+          t3plus: true,
           enabled: false,
           description:
             "Grouped summary of mature plants by growth phase, strain, location, and dates",
@@ -1419,36 +1416,61 @@ export default Vue.extend({
         {
           text: "Transfer Quickview",
           value: null,
-          premium: true,
+          t3plus: true,
           enabled: false,
           description: "Summary of incoming, outgoing, and rejected packages",
         },
         {
           text: "Incoming Inventory",
           value: null,
-          premium: true,
+          t3plus: true,
           enabled: false,
           description: "See packages not yet recieved",
         },
         {
           text: "Harvested Plants",
           value: null,
-          premium: true,
+          t3plus: true,
           enabled: false,
           description: "All plants and associated harvest data within this license",
         },
       ];
+
+      return reportOptions.filter((x) => !x.hidden);
     },
     eligibleReportOptionsImpl(): IReportOption[] {
-      const enabledOptions = this.reportOptionsImpl().filter(
-        (x: IReportOption) => x.enabled && x.value
-      );
+      return this.reportOptionsImpl().filter((x: IReportOption) => {
+        if (x.hidden) {
+          return false;
+        }
 
-      if (clientBuildManager.assertValues(["ENABLE_T3PLUS"])) {
-        return enabledOptions;
-      } else {
-        return enabledOptions.filter((x: IReportOption) => !x.premium);
-      }
+        if (!x.enabled) {
+          return false;
+        }
+
+        if (x.t3plus) {
+          return clientBuildManager.assertValues(["ENABLE_T3PLUS"]);
+        } else {
+          return true;
+        }
+      });
+    },
+    disabledVisibleReportOptionsImpl(): IReportOption[] {
+      return this.reportOptionsImpl().filter((x: IReportOption) => {
+        if (x.hidden) {
+          return false;
+        }
+
+        if (!x.enabled) {
+          return true;
+        }
+
+        if (x.t3plus) {
+          return !clientBuildManager.assertValues(["ENABLE_T3PLUS"]);
+        } else {
+          return false;
+        }
+      });
     },
     openOAuthPage(): void {
       messageBus.sendMessageToBackground(MessageType.OPEN_OPTIONS_PAGE, {
