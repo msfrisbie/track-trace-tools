@@ -242,7 +242,7 @@ export default Vue.extend({
     TagPicker,
   },
   methods: {
-    setActiveStepIndex(index: number) {
+    setActiveStepIndex(index: number): void {
       this.$data.activeStepIndex = index;
 
       analyticsManager.track(MessageType.BUILDER_ENGAGEMENT, {
@@ -250,7 +250,7 @@ export default Vue.extend({
         action: `Set active step to ${index}`,
       });
     },
-    submit() {
+    submit(): void {
       const rows: IMetrcPromoteImmaturePlantsPayload[] = [];
 
       const flattened: {
@@ -288,18 +288,16 @@ export default Vue.extend({
             .length,
           plantTotal: (this as PromoteImmaturePlantsBuilderVuexCoupler).plantTags.length,
         },
-        // @ts-ignore
         this.buildCsvFiles(),
         25
       );
     },
-    promoteMax() {
+    promoteMax(): void {
       this.totalPlantCount = totalPlantsAvailableOrNull(
         (this as PromoteImmaturePlantsBuilderVuexCoupler).selectedPlantBatches
       );
     },
-    async downloadAll() {
-      // @ts-ignore
+    async downloadAll(): void {
       for (let csvFile of this.csvFiles) {
         await downloadCsvFile({ csvFile, delay: 500 });
       }
@@ -419,33 +417,28 @@ export default Vue.extend({
     }),
     pageOneErrorMessage(): string | null {
       return (
-        // @ts-ignore
         this.errors.find((x: IBuilderComponentError) => x.tags.includes("page1"))?.message || null
       );
     },
     pageTwoErrorMessage(): string | null {
       return (
-        // @ts-ignore
         this.errors.find((x: IBuilderComponentError) => x.tags.includes("page2"))?.message || null
       );
     },
     pageThreeErrorMessage(): string | null {
       return (
-        // @ts-ignore
         this.errors.find((x: IBuilderComponentError) => x.tags.includes("page3"))?.message || null
       );
     },
     errorMessage(): string | null {
       return (
-        // @ts-ignore
         this.errors.find((x: IBuilderComponentError) => true)?.message || null
       );
     },
     errors(): IBuilderComponentError[] {
-      // @ts-ignore
       return this.calculateErrors();
     },
-    suggestedLocationName() {
+    suggestedLocationName(): string | null {
       if ((this.selectedPlantBatches as IPlantBatchData[]).length > 0) {
         return (this.selectedPlantBatches as IPlantBatchData[])[0].LocationName;
       }
@@ -562,17 +555,16 @@ export default Vue.extend({
         );
       },
     },
-    tagsSelected() {
+    tagsSelected(): boolean {
       return (
         (this as PromoteImmaturePlantsBuilderVuexCoupler).plantTags.length > 0 &&
         (this as PromoteImmaturePlantsBuilderVuexCoupler).plantTags.length === this.totalPlantCount
       );
     },
     csvFiles(): ICsvFile[] {
-      // @ts-ignore
       return this.buildCsvFiles();
     },
-    maximumTotalPlantCount() {
+    maximumTotalPlantCount(): number | null {
       return totalPlantsAvailableOrNull(
         (this as PromoteImmaturePlantsBuilderVuexCoupler).selectedPlantBatches
       );
