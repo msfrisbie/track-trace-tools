@@ -365,7 +365,7 @@ export default Vue.extend({
       setPackage: `splitPackageBuilder/${SplitPackageBuilderActions.SET_SOURCE_PACKAGE}`,
       updateSplitPackageData: `splitPackageBuilder/${SplitPackageBuilderActions.UPDATE_SPLIT_PACKAGE_DATA}`,
     }),
-    setActiveStepIndex(index: number) {
+    setActiveStepIndex(index: number): void {
       this.$data.activeStepIndex = index;
 
       analyticsManager.track(MessageType.BUILDER_ENGAGEMENT, {
@@ -375,7 +375,7 @@ export default Vue.extend({
     },
     unitOfMeasureNameToAbbreviation,
     round,
-    async submit() {
+    async submit(): Promise<void> {
       const rows: IMetrcCreatePackagesFromPackagesPayload[] = [];
 
       // @ts-ignore
@@ -432,7 +432,6 @@ export default Vue.extend({
         {
           packageTotal: this.quantityList.length,
         },
-        // @ts-ignore
         this.buildCsvFiles(),
         5
       );
@@ -524,98 +523,95 @@ export default Vue.extend({
     calculateErrors(): IBuilderComponentError[] {
       const errors: IBuilderComponentError[] = [];
 
-      if (!(this as any).sourcePackage) {
+      if (!this.sourcePackage) {
         errors.push({ tags: ["page1"], message: "Select a source package" });
       }
 
-      if ((this as any).sourcePackage?.Quantity === 0) {
+      if (this.sourcePackage?.Quantity === 0) {
         errors.push({
           tags: ["page1"],
           message: "The source package is empty",
         });
       }
 
-      if ((this as any).quantityList.length === 0) {
+      if (this.quantityList.length === 0) {
         errors.push({
           tags: ["page2"],
           message: "Specity one or more new packages to create",
         });
       }
 
-      if (!(this as any).perPackageQuantity) {
+      if (!this.perPackageQuantity) {
         errors.push({
           tags: ["page2", "perPackageQuantity"],
           message: "Enter a per package quantity",
         });
       }
 
-      if ((this as any).perPackageQuantity < 0) {
+      if (this.perPackageQuantity < 0) {
         errors.push({
           tags: ["page2", "perPackageQuantity"],
           message: "Per package quantity must be greater than 0",
         });
       }
 
-      if (!(this as any).newPackageCount) {
+      if (!this.newPackageCount) {
         errors.push({
           tags: ["page2", "newPackageCount"],
           message: "Enter a new package count",
         });
       }
 
-      if ((this as any).newPackageCount < 0) {
+      if (this.newPackageCount < 0) {
         errors.push({
           tags: ["page2", "newPackageCount"],
           message: "New package count must be greater than 0",
         });
       }
 
-      if (!(this as any).sourcePackageAdjustQuantity) {
+      if (!this.sourcePackageAdjustQuantity) {
         errors.push({
           tags: ["page2", "sourcePackageAdjustQuantity"],
           message: "Enter a source package quantity used",
         });
       }
 
-      if ((this as any).sourcePackageAdjustQuantity < 0) {
+      if (this.sourcePackageAdjustQuantity < 0) {
         errors.push({
           tags: ["page2", "sourcePackageAdjustQuantity"],
           message: "Source package quantity used must be greater than 0",
         });
       }
 
-      if (
-        (this as any).sourcePackage &&
-        (this as any).sourcePackageAdjustQuantity > (this as any).sourcePackage.Quantity
-      ) {
+      if (this.sourcePackage && this.sourcePackageAdjustQuantity > this.sourcePackage.Quantity) {
         errors.push({
           tags: ["page2", "sourcePackageAdjustQuantity"],
           message: "Source package quantity used cannot exceed the package quantity",
         });
       }
 
-      if (!(this as any).outputItem) {
+      if (!this.outputItem) {
         errors.push({
           tags: ["page2"],
           message: "Select an item for newly created packages",
         });
       }
 
-      if (!(this as any).location && this.$data.facilityUsesLocationForPackages) {
+      if (!this.location && this.$data.facilityUsesLocationForPackages) {
         errors.push({
           tags: ["page2"],
           message: "Select a location for newly created packages",
         });
       }
 
-      if ((this as any).packageTags.length === 0) {
+      if (this.packageTags.length === 0) {
         errors.push({
           tags: ["page2"],
           message: "Select package tags for your new packages",
         });
       }
 
-      if ((this as any).packageTags.length !== (this as any).quantityList.length) {
+      if (this.packageTags.length !== this.quantityList.length) {
         errors.push({
           tags: ["page2"],
           message: "You must select one package tag for each new package",
@@ -624,13 +620,13 @@ export default Vue.extend({
 
       return errors;
     },
-    updateQuantities() {
+    updateQuantities(): void {
       let quantityList = [];
 
       if (this.$data.perPackageQuantity && this.$data.newPackageCount) {
         quantityList = new Array(this.$data.newPackageCount).fill(this.$data.perPackageQuantity);
 
-        if ((this as any).outputItem?.Id === this.sourcePackage.Item.Id) {
+        if (this.outputItem?.Id === this.sourcePackage.Item.Id) {
           this.sourcePackageAdjustQuantity = round(
             quantityList.reduce((a, b) => a + b, 0),
             4
@@ -638,7 +634,6 @@ export default Vue.extend({
         }
       }
 
-      // @ts-ignore
       this.updateSplitPackageData({
         quantityList,
       });
@@ -656,64 +651,53 @@ export default Vue.extend({
         this.sourcePackage?.Item.UnitOfMeasureName || ""
       ).toLocaleLowerCase();
     },
-    outputUnitAbbreviation() {
+    outputUnitAbbreviation(): string {
       // if (this.useSameItem) {
       //   return this.sourceUnitAbbreviation;
       // }
 
       return unitOfMeasureNameToAbbreviation(
-        // @ts-ignore
         this.outputItem?.UnitOfMeasureName || ""
       ).toLocaleLowerCase();
     },
     pageOneErrorMessage(): string | null {
       return (
-        // @ts-ignore
         this.errors.find((x: IBuilderComponentError) => x.tags.includes("page1"))?.message || null
       );
     },
     pageTwoErrorMessage(): string | null {
       return (
-        // @ts-ignore
         this.errors.find((x: IBuilderComponentError) => x.tags.includes("page2"))?.message || null
       );
     },
     pageThreeErrorMessage(): string | null {
       return (
-        // @ts-ignore
         this.errors.find((x: IBuilderComponentError) => x.tags.includes("page3"))?.message || null
       );
     },
     perPackageQuantityErrorMessage(): string | null {
       return (
-        // @ts-ignore
         this.errors.find((x: IBuilderComponentError) => x.tags.includes("perPackageQuantity"))
           ?.message || null
       );
     },
     newPackageCountErrorMessage(): string | null {
       return (
-        // @ts-ignore
         this.errors.find((x: IBuilderComponentError) => x.tags.includes("newPackageCount"))
           ?.message || null
       );
     },
     sourcePackageAdjustQuantityErrorMessage(): string | null {
       return (
-        // @ts-ignore
         this.errors.find((x: IBuilderComponentError) =>
           x.tags.includes("sourcePackageAdjustQuantity")
         )?.message || null
       );
     },
     errorMessage(): string | null {
-      return (
-        // @ts-ignore
-        this.errors.find((x: IBuilderComponentError) => true)?.message || null
-      );
+      return this.errors.find((x: IBuilderComponentError) => true)?.message || null;
     },
     errors(): IBuilderComponentError[] {
-      // @ts-ignore
       return this.calculateErrors();
     },
     outputItem: {
@@ -848,7 +832,7 @@ export default Vue.extend({
         );
       },
     },
-    allDetailsProvided() {
+    allDetailsProvided(): boolean {
       return (
         !!this.sourcePackage &&
         this.packageTags.length > 0 &&
@@ -858,7 +842,6 @@ export default Vue.extend({
       );
     },
     csvFiles(): ICsvFile[] {
-      // @ts-ignore
       return this.buildCsvFiles();
     },
   },
@@ -882,14 +865,12 @@ export default Vue.extend({
     perPackageQuantity: {
       immediate: true,
       handler(newValue, oldValue) {
-        // @ts-ignore
         this.updateQuantities();
       },
     },
     newPackageCount: {
       immediate: true,
       handler(newValue, oldValue) {
-        // @ts-ignore
         this.updateQuantities();
       },
     },

@@ -372,18 +372,15 @@ export default Vue.extend({
   },
   computed: {
     selectedPlantBatchesCount(): number {
-      // @ts-ignore
       return this.$data.selectedPlantBatches ? this.$data.selectedPlantBatches.length : null;
     },
     pageOneErrorMessage(): string | null {
       return (
-        // @ts-ignore
         this.errors.find((x: IBuilderComponentError) => x.tags.includes("page1"))?.message || null
       );
     },
     pageTwoPreTagErrorMessage(): string | null {
       return (
-        // @ts-ignore
         this.errors.find(
           (x: IBuilderComponentError) => x.tags.includes("page2") && !x.tags.includes("tagging")
         )?.message || null
@@ -391,89 +388,82 @@ export default Vue.extend({
     },
     pageTwoErrorMessage(): string | null {
       return (
-        // @ts-ignore
         this.errors.find((x: IBuilderComponentError) => x.tags.includes("page2"))?.message || null
       );
     },
     pageThreeErrorMessage(): string | null {
       return (
-        // @ts-ignore
         this.errors.find((x: IBuilderComponentError) => x.tags.includes("page3"))?.message || null
       );
     },
     errorMessage(): string | null {
-      return (
-        // @ts-ignore
-        this.errors.find((x: IBuilderComponentError) => true)?.message || null
-      );
+      return this.errors.find((x: IBuilderComponentError) => true)?.message || null;
     },
     errors(): IBuilderComponentError[] {
       const errors: IBuilderComponentError[] = [];
 
-      if ((this as any).selectedPlantBatches.length === 0) {
+      if (this.selectedPlantBatches.length === 0) {
         errors.push({
           tags: ["page1"],
           message: "Select one or more immature plant batches",
         });
       }
 
-      if (!(this as any).item) {
+      if (!this.item) {
         errors.push({
           tags: ["page2"],
           message: "Select the new package item",
         });
       }
 
-      if (!(this as any).location && this.$data.facilityUsesLocationForPackages) {
+      if (!this.location && this.$data.facilityUsesLocationForPackages) {
         errors.push({
           tags: ["page2"],
           message: "Select the new package location",
         });
       }
 
-      if ((this as any).selectedPlantBatches.length === 0) {
+      if (this.selectedPlantBatches.length === 0) {
         errors.push({
           tags: ["page2"],
           message: "Select immature plants for your new packages",
         });
       }
 
-      if ((this as any).$data.packageTags.length === 0) {
+      if (this.$data.packageTags.length === 0) {
         errors.push({
           tags: ["page2", "tagging"],
           message: "Select package tags for your new packages",
         });
       }
 
-      if ((this as any).$data.packageTags.length !== (this as any).selectedPlantBatches.length) {
+      if (this.$data.packageTags.length !== this.selectedPlantBatches.length) {
         errors.push({
           tags: ["page2", "tagging"],
           message: "You must select one package tag for each new package",
         });
       }
 
-      if (!(this as any).item) {
+      if (!this.item) {
         errors.push({
           tags: ["page2"],
           message: "Specify an item for new packages",
         });
       }
 
-      if (!(this as any).packageDate) {
+      if (!this.packageDate) {
         errors.push({ tags: ["page2"], message: "Specify a package date" });
       }
 
       return errors;
     },
-    tagsSelected() {
+    tagsSelected(): boolean {
       return (
         this.$data.packageTags.length > 0 &&
-        // @ts-ignore
         this.$data.packageTags.length === this.selectedPlantBatchesCount
       );
     },
     csvFiles(): ICsvFile[] {
-      // @ts-ignore
       return this.buildCsvFiles();
     },
   },
