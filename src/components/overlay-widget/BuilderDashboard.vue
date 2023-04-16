@@ -160,76 +160,58 @@ export default Vue.extend({
   },
   computed: {
     ...mapState(["authState"]),
-    activePlantBatchesUrl() {
-      // @ts-ignore
+    activePlantBatchesUrl(): string {
       return this.tabKeyUrl("plants", TabKey.PLANTS_PLANTBATCHES_ACTIVE);
     },
-    inactivePlantBatchesUrl() {
-      // @ts-ignore
+    inactivePlantBatchesUrl(): string {
       return this.tabKeyUrl("plants", TabKey.PLANTS_PLANTBATCHES_INACTIVE);
     },
-    vegetativePlantsUrl() {
-      // @ts-ignore
+    vegetativePlantsUrl(): string {
       return this.tabKeyUrl("plants", TabKey.PlANTS_PLANTS_VEGETATIVE);
     },
-    floweringPlantsUrl() {
-      // @ts-ignore
+    floweringPlantsUrl(): string {
       return this.tabKeyUrl("plants", TabKey.PlANTS_PLANTS_FLOWERING);
     },
-    inactivePlantsUrl() {
-      // @ts-ignore
+    inactivePlantsUrl(): string {
       return this.tabKeyUrl("plants", TabKey.PlANTS_PLANTS_INACTIVE);
     },
-    activeHarvestsUrl() {
-      // @ts-ignore
+    activeHarvestsUrl(): string {
       return this.tabKeyUrl("plants", TabKey.PlANTS_HARVESTED_ACTIVE);
     },
-    inactiveHarvestsUrl() {
-      // @ts-ignore
+    inactiveHarvestsUrl(): string {
       return this.tabKeyUrl("plants", TabKey.PlANTS_HARVESTED_INACTIVE);
     },
-    activePackagesUrl() {
-      // @ts-ignore
+    activePackagesUrl(): string {
       return this.tabKeyUrl("packages", TabKey.PACKAGES_ACTIVE);
     },
-    inactivePackagesUrl() {
-      // @ts-ignore
+    inactivePackagesUrl(): string {
       return this.tabKeyUrl("packages", TabKey.PACKAGES_INACTIVE);
     },
-    intransitPackagesUrl() {
-      // @ts-ignore
+    intransitPackagesUrl(): string {
       return this.tabKeyUrl("packages", TabKey.PACKAGES_INTRANSIT);
     },
-    incomingTransfersUrl() {
-      // @ts-ignore
+    incomingTransfersUrl(): string {
       return this.tabKeyUrl("transfers/licensed", TabKey.TRANSFERS_INCOMING);
     },
-    outgoingTransfersUrl() {
-      // @ts-ignore
+    outgoingTransfersUrl(): string {
       return this.tabKeyUrl("transfers/licensed", TabKey.TRANSFERS_OUTGOING);
     },
-    rejectedTransfersUrl() {
-      // @ts-ignore
+    rejectedTransfersUrl(): string {
       return this.tabKeyUrl("transfers/licensed", TabKey.TRANSFERS_REJECTED);
     },
-    availableTagsUrl() {
-      // @ts-ignore
+    availableTagsUrl(): string {
       return this.tabKeyUrl("admin/tags", TabKey.TAGS_AVAILABLE);
     },
-    usedTagsUrl() {
-      // @ts-ignore
+    usedTagsUrl(): string {
       return this.tabKeyUrl("admin/tags", TabKey.TAGS_USED);
     },
-    voidedTagsUrl() {
-      // @ts-ignore
+    voidedTagsUrl(): string {
       return this.tabKeyUrl("admin/tags", TabKey.TAGS_VOIDED);
     },
-    activeSalesUrl() {
-      // @ts-ignore
+    activeSalesUrl(): string {
       return this.tabKeyUrl("sales/receipts", TabKey.SALES_ACTIVE);
     },
-    inactiveSalesUrl() {
-      // @ts-ignore
+    inactiveSalesUrl(): string {
       return this.tabKeyUrl("sales/receipts", TabKey.SALES_INACTIVE);
     },
   },
@@ -237,10 +219,10 @@ export default Vue.extend({
     return { TabKey, ...initialState };
   },
   methods: {
-    reset() {
+    reset(): void {
       Object.assign(this.$data, initialState);
     },
-    tabKeyUrl(path: string, tabKey: TabKey) {
+    tabKeyUrl(path: string, tabKey: TabKey): string {
       const hash = JSON.stringify({
         tabKey,
       });

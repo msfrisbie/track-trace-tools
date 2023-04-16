@@ -1150,7 +1150,6 @@ import {
 } from "@/interfaces";
 import { authManager } from "@/modules/auth-manager.module";
 import { clientBuildManager } from "@/modules/client-build-manager.module";
-import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
 import { messageBus } from "@/modules/message-bus.module";
 import router from "@/router/index";
 import store from "@/store/page-overlay/index";
@@ -1159,7 +1158,6 @@ import {
   ReportsActions,
   ReportStatus,
   ReportType,
-  REPORT_OPTIONS,
   SHEET_FIELDS,
 } from "@/store/page-overlay/modules/reports/consts";
 import { IReportConfig } from "@/store/page-overlay/modules/reports/interfaces";
@@ -1169,6 +1167,14 @@ import { addPackageReport, packageFormFiltersFactory } from "@/utils/reports/pac
 import _ from "lodash";
 import Vue from "vue";
 import { mapActions, mapState } from "vuex";
+
+interface IReportOption {
+  text: string;
+  value: ReportType | null;
+  premium: boolean;
+  enabled: boolean;
+  description: string;
+}
 
 export default Vue.extend({
   name: "GoogleSheetsExport",
@@ -1186,37 +1192,28 @@ export default Vue.extend({
       reportStatusMessage: (state: any) => state.reports.statusMessage,
       reportStatusMessageHistory: (state: any) => state.reports.statusMessageHistory,
     }),
-    eligibleReportOptions(): {
-      text: string;
-      value: ReportType;
-      premium: boolean;
-      enabled: boolean;
-      description: string;
-    }[] {
+    eligibleReportOptions(): IReportOption[] {
       return this.eligibleReportOptionsImpl();
     },
-    ineligibleReportOptions(): {
-      text: string;
-      value: ReportType | null;
-      premium: boolean;
-      enabled: boolean;
-      description: string;
-    }[] {
-      // @ts-ignore
-      return REPORT_OPTIONS.filter((x) => !this.eligibleReportOptionsImpl().includes(x));
+    ineligibleReportOptions(): IReportOption[] {
+      return this.reportOptionsImpl().filter(
+        (x: IReportOption) => !this.eligibleReportOptionsImpl().includes(x)
+      );
     },
-    enablePremium() {
+    enablePremium(): boolean {
       return clientBuildManager.assertValues(["ENABLE_T3PLUS"]);
     },
+    reportOptions(): IReportOption[] {
+      return this.reportOptionsImpl();
+    },
   },
-  data() {
+  data(): any {
     return {
       OAuthState,
       ReportStatus,
       ReportType,
       SHEET_FIELDS,
       selectedReports: [] as ReportType[],
-      reportOptions: REPORT_OPTIONS,
       cogsFormFilters: cogsFormFiltersFactory(),
       packagesFormFilters: packageFormFiltersFactory(),
       stragglerPackagesFormFilters: {
@@ -1294,14 +1291,14 @@ export default Vue.extend({
       },
       showFilters: (() => {
         const fields: { [key: string]: boolean } = {};
-        Object.keys(SHEET_FIELDS).map((x) => {
+        Object.keys(SHEET_FIELDS).map((x: any) => {
           fields[x] = false;
         });
         return fields;
       })(),
       showFields: (() => {
         const fields: { [key: string]: boolean } = {};
-        Object.keys(SHEET_FIELDS).map((x) => {
+        Object.keys(SHEET_FIELDS).map((x: any) => {
           fields[x] = false;
         });
         return fields;
@@ -1316,42 +1313,149 @@ export default Vue.extend({
       generateSpreadsheet: `reports/${ReportsActions.GENERATE_SPREADSHEET}`,
       reset: `reports/${ReportsActions.RESET}`,
     }),
-    toggleFilters(reportType: ReportType) {
+    toggleFilters(reportType: ReportType): void {
       this.showFilters[reportType] = !this.showFilters[reportType];
     },
-    toggleFields(reportType: ReportType) {
+    toggleFields(reportType: ReportType): void {
       this.showFields[reportType] = !this.showFields[reportType];
     },
-    checkAll(reportType: ReportType) {
+    checkAll(reportType: ReportType): void {
       this.fields[reportType] = _.cloneDeep(SHEET_FIELDS[reportType]);
     },
-    uncheckAll(reportType: ReportType) {
+    uncheckAll(reportType: ReportType): void {
       this.fields[reportType] = _.cloneDeep(SHEET_FIELDS[reportType]).filter((x) => x.required);
     },
-    snapshotEverything() {
-      this.selectedReports = this.eligibleReportOptions.map((x) => x.value);
+    snapshotEverything(): void {
+      this.selectedReports = this.eligibleReportOptions.map((x: IReportOption) => x.value);
     },
-    eligibleReportOptionsImpl() {
-      const enabledOptions = REPORT_OPTIONS.filter((x) => x.enabled && x.value) as {
-        text: string;
-        value: ReportType;
-        premium: boolean;
-        enabled: boolean;
-        description: string;
-      }[];
+    reportOptionsImpl(): IReportOption[] {
+      return [
+        {
+          text: "Packages",
+          value: ReportType.PACKAGES,
+          premium: false,
+          enabled: true,
+          description: "Filter by packaged date",
+        },
+        {
+          text: "Mature Plants",
+          value: ReportType.MATURE_PLANTS,
+          premium: false,
+          enabled: true,
+          description: "Filter by growth phase and planted date",
+        },
+        {
+          text: "Incoming Transfers",
+          value: ReportType.INCOMING_TRANSFERS,
+          premium: true,
+          enabled: true,
+          description: "Filter by wholesale and estimated time of arrival",
+        },
+        {
+          text: "Outgoing Transfers",
+          value: ReportType.OUTGOING_TRANSFERS,
+          premium: false,
+          enabled: true,
+          description: "Filter by wholesale and estimated time of departure",
+        },
+        {
+          text: "Tags",
+          value: ReportType.TAGS,
+          premium: true,
+          enabled: true,
+          description: "Filter by tag type and status",
+        },
+        {
+          text: "Harvests",
+          value: ReportType.HARVESTS,
+          premium: false,
+          enabled: true,
+          description: "Filter by harvest date",
+        },
+        {
+          text: "Outgoing Transfer Manifests",
+          value: ReportType.OUTGOING_TRANSFER_MANIFESTS,
+          premium: true,
+          enabled: true,
+          description: "Full transfer and package data for all outgoing transfers",
+        },
+        {
+          text: "Straggler Inventory",
+          value: ReportType.STRAGGLER_PACKAGES,
+          premium: true,
+          enabled: true,
+          description: "Find straggler inventory so it can be cleared out",
+        },
+        {
+          text: "COGS",
+          value: ReportType.COGS,
+          premium: true,
+          enabled: true,
+          description: "Generate COGS",
+        },
+        {
+          text: "Package Quickview",
+          value: null,
+          premium: true,
+          enabled: false,
+          description:
+            "Grouped summary of packages by item, remaining quantity, and testing status",
+        },
+        {
+          text: "Immature Plant Quickview",
+          value: null,
+          premium: true,
+          enabled: false,
+          description: "Grouped summary of mature plants by strain, location, and dates",
+        },
+        {
+          text: "Mature Plant Quickview",
+          value: null,
+          premium: true,
+          enabled: false,
+          description:
+            "Grouped summary of mature plants by growth phase, strain, location, and dates",
+        },
+        {
+          text: "Transfer Quickview",
+          value: null,
+          premium: true,
+          enabled: false,
+          description: "Summary of incoming, outgoing, and rejected packages",
+        },
+        {
+          text: "Incoming Inventory",
+          value: null,
+          premium: true,
+          enabled: false,
+          description: "See packages not yet recieved",
+        },
+        {
+          text: "Harvested Plants",
+          value: null,
+          premium: true,
+          enabled: false,
+          description: "All plants and associated harvest data within this license",
+        },
+      ];
+    },
+    eligibleReportOptionsImpl(): IReportOption[] {
+      const enabledOptions = this.reportOptionsImpl().filter(
+        (x: IReportOption) => x.enabled && x.value
+      );
 
       if (clientBuildManager.assertValues(["ENABLE_T3PLUS"])) {
         return enabledOptions;
       } else {
-        return enabledOptions.filter((x) => !x.premium);
+        return enabledOptions.filter((x: IReportOption) => !x.premium);
       }
     },
-    async openOAuthPage() {
+    openOAuthPage(): void {
       messageBus.sendMessageToBackground(MessageType.OPEN_OPTIONS_PAGE, {
         path: "/google-sheets",
       });
     },
-    async createSpreadsheet() {
+    async createSpreadsheet(): Promise<void> {
       const reportConfig: IReportConfig = {
         authState: await authManager.authStateOrError(),
       };
