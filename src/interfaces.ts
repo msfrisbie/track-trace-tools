@@ -14,6 +14,7 @@ import {
   ToolkitView,
   TransferState,
 } from "@/consts";
+import { IExplorerState } from "./store/page-overlay/modules/explorer/interfaces";
 import { IFlagsState } from "./store/page-overlay/modules/flags/interfaces";
 import { IListingState } from "./store/page-overlay/modules/listing/interfaces";
 import { IPackageHistoryState } from "./store/page-overlay/modules/package-history/interfaces";
@@ -194,6 +195,7 @@ export interface IPluginState extends IRootState {
   reports: IReportsState;
   flags: IFlagsState;
   packageHistory: IPackageHistoryState;
+  explorer: IExplorerState;
 }
 
 export type MetrcTagType = "CannabisPlant" | "CannabisPackage" | "MedicalPlant" | "MedicalPackage";
@@ -648,6 +650,10 @@ export interface IHarvestHistoryData {
   Name: string; // "Birthday Cake 10.21"
 }
 
+export interface IPlantHistoryData {}
+export interface IPlantBatchHistoryData {}
+export interface ITransferHistoryData {}
+
 export interface ITestResultData {
   IsRevoked: boolean;
   LabFacilityLicenseNumber: string;
@@ -783,9 +789,9 @@ export interface ISimpleCogsPackageData {
   SourcePackageLabels: string;
   ProductionBatchNumber: string | null;
   historyExtracts?: {
-    parentPackageLabels: string[],
-    tagQuantityPairs: {tag: string, quantity: number}[]
-  },
+    parentPackageLabels: string[];
+    tagQuantityPairs: { tag: string; quantity: number }[];
+  };
   childLabels: string[];
   fractionalCostData: IFractionalCostData[];
   errors: string[];

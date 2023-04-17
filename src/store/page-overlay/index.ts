@@ -40,6 +40,7 @@ import {
   splitPackageBuilderReducer,
 } from "./modules/split-package-builder";
 import { transferBuilderModule, transferBuilderReducer } from "./modules/transfer-builder/index";
+import { explorerModule, explorerReducer } from "./modules/explorer";
 
 // Taken from https://gist.github.com/Myeris/3f13b42f6764ded6640cef693d9d1987
 const vuexLocal = {
@@ -62,6 +63,7 @@ const vuexShared = {
       search: searchReducer(state.search),
       transferBuilder: transferBuilderReducer(state.transferBuilder),
       packageSearch: packageSearchReducer(state.packageSearch),
+      explorer: explorerReducer(state.explorer),
       plantSearch: plantSearchReducer(state.plantSearch),
       flags: flagsReducer(state.flags),
       splitPackageBuilder: splitPackageBuilderReducer(state.splitPackageBuilder),
@@ -437,6 +439,10 @@ export default new Vuex.Store<IPluginState>({
     settings: {
       namespaced: true,
       ...settingsModule,
+    },
+    explorer: {
+      namespaced: true,
+      ...explorerModule,
     },
   },
   plugins: [vuexPersistence.plugin],

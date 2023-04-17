@@ -12,6 +12,7 @@ import router from "@/router/index";
 import store from "@/store/page-overlay/index";
 import { PluginAuthActions } from "@/store/page-overlay/modules/plugin-auth/consts";
 import { ReportsActions } from "@/store/page-overlay/modules/reports/consts";
+import { IReportsState } from "@/store/page-overlay/modules/reports/interfaces";
 import Vue from "vue";
 import { mapActions, mapGetters, mapState } from "vuex";
 
@@ -23,9 +24,9 @@ export default Vue.extend({
   components: {},
   computed: {
     ...mapState<IPluginState>({
-      authState: (state: any) => state.pluginAuth.authState,
-      oAuthState: (state: any) => state.pluginAuth.oAuthState,
-      generatedSpreadsheet: (state: any) => state.reports.generatedSpreadsheet,
+      authState: (state: IPluginState) => state.pluginAuth.authState,
+      oAuthState: (state: IPluginState) => state.pluginAuth.oAuthState,
+      generatedSpreadsheet: (state: IPluginState) => state.reports.generatedSpreadsheet,
     }),
     ...mapGetters({
       // ancestorList: `packageHistory/${PackageHistoryGetters.ANCESTOR_LIST}`,

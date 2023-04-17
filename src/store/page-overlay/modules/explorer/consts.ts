@@ -1,0 +1,33 @@
+export enum ExplorerMutations {
+  SET_TARGET = "SET_TARGET",
+  SET_STATUS = "SET_STATUS",
+  SET_HISTORY = "SET_HISTORY",
+  SET_QUERY = "SET_QUERY",
+  SET_TARGET_TYPE = "SET_TARGET_TYPE",
+  ADD_QUERY = "ADD_QUERY",
+}
+
+export enum ExplorerGetters {}
+
+export enum ExplorerActions {
+  RESET = "RESET",
+  SUBMIT_QUERY = "SUBMIT_QUERY",
+  SET_QUERY = "SET_QUERY",
+  SET_TARGET_TYPE = "SET_TARGET_TYPE",
+}
+
+export enum ExplorerStatus {
+  INITIAL = "INITIAL",
+  INFLIGHT = "INFLIGHT",
+  SUCCESS = "SUCCESS",
+  ERROR = "ERROR",
+}
+
+export enum ExplorerTargetType {
+  PACKAGE = "PACKAGE",
+  PLANT = "PLANT",
+  PLANT_BATCH = "PLANT_BATCH",
+  HARVEST = "HARVEST",
+  INCOMING_TRANSFER = "INCOMING_TRANSFER",
+  OUTGOING_TRANSFER = "OUTGOING_TRANSFER",
+}

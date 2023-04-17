@@ -171,6 +171,16 @@ export default Vue.extend({
           isNew: false,
         },
         {
+          backgroundColor: "#c14747",
+          text: "EXPLORER",
+          route: "/metrc-explorer",
+          icon: "sitemap",
+          visible: true,
+          enabled: true,
+          isBeta: false,
+          isNew: false,
+        },
+        {
           backgroundColor: "#773c77",
           text: "NEW TRANSFER",
           route: "/transfer/create-transfer",

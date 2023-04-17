@@ -1,21 +1,21 @@
 import { METRC_TAG_REGEX_PATTERN } from "@/consts";
 import { IPackageHistoryData } from "@/interfaces";
 
-function extractParentPackageLabelOrNull(description: string): string | null {
+export function extractParentPackageLabelOrNull(description: string): string | null {
   const parentMatcher = new RegExp(`from Package (${METRC_TAG_REGEX_PATTERN})`);
   const match = description.match(parentMatcher);
 
   return match ? match[1] : null;
 }
 
-function extractChildPackageLabelOrNull(description: string): string | null {
+export function extractChildPackageLabelOrNull(description: string): string | null {
   const childMatcher = new RegExp(`for Package (${METRC_TAG_REGEX_PATTERN})`);
   const match = description.match(childMatcher);
 
   return match ? match[1] : null;
 }
 
-function extractTestSamplePackageLabelOrNull(description: string): string | null {
+export function extractTestSamplePackageLabelOrNull(description: string): string | null {
   const testSampleMatcher = new RegExp(
     `Related Package's \\((${METRC_TAG_REGEX_PATTERN})\\) Lab Testing set to`
   );
@@ -24,7 +24,21 @@ function extractTestSamplePackageLabelOrNull(description: string): string | null
   return match ? match[1] : null;
 }
 
-function extractTagQuantityPairOrNull(description: string): {
+export function extractPackagedPlantBatchNameOrNull(description: string): string | null {
+  const matcher = new RegExp(`Plant Batch: (${METRC_TAG_REGEX_PATTERN})`);
+  const match = description.match(matcher);
+
+  return match ? match[1] : null;
+}
+
+export function extractMotherPlantBatchNameOrNull(description: string): string | null {
+  const matcher = new RegExp(`from Mother Plant in Plant Batch: "(${METRC_TAG_REGEX_PATTERN})"`);
+  const match = description.match(matcher);
+
+  return match ? match[1] : null;
+}
+
+export function extractTagQuantityPairOrNull(description: string): {
   tag: string;
   quantity: number;
 } | null {

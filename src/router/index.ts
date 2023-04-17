@@ -17,14 +17,15 @@ import PromoteImmaturePlantsBuilder from "@/components/overlay-widget/cultivatio
 import ReplacePlantBatchTagsBuilder from "@/components/overlay-widget/cultivation/ReplacePlantBatchTagsBuilder.vue";
 import ReplacePlantTagsBuilder from "@/components/overlay-widget/cultivation/ReplacePlantTagsBuilder.vue";
 import UnpackImmaturePlantsBuilder from "@/components/overlay-widget/cultivation/UnpackImmaturePlantsBuilder.vue";
+import MetrcExplorer from "@/components/overlay-widget/explorer/MetrcExplorer.vue";
 import MiscellaneousListView from "@/components/overlay-widget/miscellaneous/MiscellaneousListView.vue";
+import CogsTool from "@/components/overlay-widget/package/CogsTool.vue";
 import FinishPackagesBuilder from "@/components/overlay-widget/package/FinishPackagesBuilder.vue";
 import ItemTemplateBuilder from "@/components/overlay-widget/package/ItemTemplateBuilder.vue";
 import MergePackagesBuilder from "@/components/overlay-widget/package/MergePackagesBuilder.vue";
 import MovePackagesBuilder from "@/components/overlay-widget/package/MovePackagesBuilder.vue";
 import PackageBuilderListView from "@/components/overlay-widget/package/PackageBuilderListView.vue";
 import PackageHistory from "@/components/overlay-widget/package/PackageHistory.vue";
-import CogsTool from "@/components/overlay-widget/package/CogsTool.vue";
 import PackageToolsHelp from "@/components/overlay-widget/package/PackageToolsHelp.vue";
 import SplitPackageBuilder from "@/components/overlay-widget/package/SplitPackageBuilder.vue";
 import TransferBuilder from "@/components/overlay-widget/transfer/TransferBuilder.vue";
@@ -109,6 +110,11 @@ const routes: Array<RouteConfig> = [
     path: "/package/history",
     name: "Package History",
     component: PackageHistory,
+  },
+  {
+    path: "/metrc-explorer",
+    name: "Metrc Explorer",
+    component: MetrcExplorer,
   },
   {
     path: "/package/cogs",
