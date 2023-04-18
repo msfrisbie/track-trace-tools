@@ -1,7 +1,7 @@
 <template>
   <b-button
     size="sm"
-    variant="primary"
+    variant="outline-primary"
     class="flex flex-row gap-2 items-center"
     @click="
       reset().then(() =>

@@ -1,13 +1,14 @@
 <template>
   <div>
-    <div class="grid grid-cols-3 gap-8">
+    <div class="grid grid-cols-3 gap-8 w-full">
       <template v-if="explorer.status === ExplorerStatus.INITIAL">
         <div class="col-span-3 flex flex-col items-center">
-          <b-input-group class="max-w-lg">
+          <b-input-group class="max-w-xl">
             <template #prepend>
               <b-form-select v-model="targetType">
                 <b-form-select-option
                   :value="targetTypeOption.value"
+                  :disabled="targetTypeOption.disabled"
                   v-for="targetTypeOption of targetTypeOptions"
                   v-bind:key="targetTypeOption.value"
                 >
@@ -38,29 +39,52 @@
           </template>
         </template>
 
-        <b-button
-          v-if="explorer.status !== ExplorerStatus.INITIAL"
-          variant="outline-danger"
-          @click="reset()"
-          >RESET</b-button
-        >
+        <template v-if="explorer.status !== ExplorerStatus.INITIAL">
+          <b-button variant="outline-danger" @click="reset()">RESET</b-button>
 
-        <template v-if="explorer.status === ExplorerStatus.INFLIGHT">
-          <b-spinner></b-spinner>
+          <template v-if="explorer.status === ExplorerStatus.INFLIGHT">
+            <div class="flex flex-row items-center justify-center gap-2">
+              <b-spinner small class="ttt-purple"></b-spinner>
+              <span>Loading...</span>
+            </div>
+          </template>
+
+          <div
+            class="text-center"
+            v-if="explorer.statusMessage"
+            v-bind:class="[explorer.status === ExplorerStatus.ERROR ? 'text-red-500' : '']"
+          >
+            {{ explorer.statusMessage }}
+          </div>
+
+          <template v-if="explorer.status === ExplorerStatus.ERROR">
+            <div class="text-red-500 flex flex-col gap-2">
+              <span>Things to check:</span>
+              <ul class="ml-2 list-disc">
+                <li><b>Ensure your search type is correct.</b> (Package, Plant, etc)</li>
+                <li>
+                  <b> Ensure your search text exactly matches your object.</b> Partial tags or
+                  manifest #'s will not work.
+                </li>
+                <li>
+                  <b>Ensure you have access to this object.</b> This account might not be able to
+                  see this object.
+                </li>
+              </ul>
+            </div>
+          </template>
+
+          <recent-explorer-queries></recent-explorer-queries>
         </template>
-
-        <div
-          v-if="explorer.statusMessage"
-          v-bind:class="[explorer.status === ExplorerStatus.ERROR ? 'text-red-500' : '']"
-        >
-          {{ explorer.statusMessage }}
-        </div>
-
-        <recent-explorer-queries></recent-explorer-queries>
       </div>
       <div class="col-span-2">
         <smart-history v-if="explorer.history"></smart-history>
       </div>
+      <template v-if="explorer.status === ExplorerStatus.INITIAL">
+        <div class="col-span-3 flex flex-col items-center">
+          <recent-explorer-queries></recent-explorer-queries>
+        </div>
+      </template>
     </div>
   </div>
 </template>
@@ -123,12 +147,12 @@ export default Vue.extend({
     queryStringPlaceholder(): string {
       switch (this.targetType) {
         case ExplorerTargetType.PACKAGE:
-          return "Package tag";
+          return "Package tag (1A4400005000000000001234)";
         case ExplorerTargetType.INCOMING_TRANSFER:
         case ExplorerTargetType.OUTGOING_TRANSFER:
-          return "Manifest #";
+          return "Manifest # (0000012345)";
         case ExplorerTargetType.PLANT:
-          return "Plant tag";
+          return "Plant tag (1A4400005000000000001234)";
         case ExplorerTargetType.PLANT_BATCH:
           return "Plant batch name/tag";
         default:
@@ -148,13 +172,24 @@ export default Vue.extend({
           readableText: "Package",
         },
         {
+          value: ExplorerTargetType.PLANT,
+          readableText: "Plant",
+          disabled: true,
+        },
+        {
           value: ExplorerTargetType.PLANT_BATCH,
           readableText: "Plant Batch",
         },
-        // {
-        //   value: ExplorerTargetType.INCOMING_TRANSFER,
-        //   readableText: "Incoming Transfer",
-        // },
+        {
+          value: ExplorerTargetType.HARVEST,
+          readableText: "Harvest",
+          disabled: true,
+        },
+        {
+          value: ExplorerTargetType.INCOMING_TRANSFER,
+          readableText: "Incoming Transfer",
+          disabled: true,
+        },
         {
           value: ExplorerTargetType.OUTGOING_TRANSFER,
           readableText: "Outgoing Transfer",

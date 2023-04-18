@@ -88,7 +88,7 @@ export const explorerModule = {
         queryString: string;
       }
     ) {
-      state.queryString = queryString;
+      state.queryString = queryString.trim();
     },
     [ExplorerMutations.SET_TARGET_TYPE](
       state: IExplorerState,

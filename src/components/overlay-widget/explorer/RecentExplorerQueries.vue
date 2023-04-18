@@ -1,5 +1,6 @@
 <template>
   <div class="flex flex-col items-stretch gap-2">
+    <span v-if="explorer.recent.length > 0">Recent queries:</span>
     <smart-link
       v-for="(smartLink, idx) of explorer.recent"
       v-bind:key="idx + smartLink.queryString"

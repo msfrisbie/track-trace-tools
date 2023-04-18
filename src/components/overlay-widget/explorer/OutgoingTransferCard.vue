@@ -16,17 +16,12 @@
     <div
       class="p-2 flex flex-row items-center justify-start space-x-4 text-sm whitespace-nowrap overflow-x-auto"
     >
-      <picker-icon
-        icon="truck"
-        style="width: 5rem"
-        class="flex-shrink-0"
-        :text="`${outgoingTransfer.PackageCount}`"
-      />
+      <picker-icon icon="truck" style="width: 5rem" class="flex-shrink-0" text="" link="" />
 
       <picker-card
         class="flex-grow"
-        :title="`${outgoingTransfer.ManifestNumber}`"
-        label=""
+        :title="`Manifest # ${outgoingTransfer.ManifestNumber}`"
+        :label="`${outgoingTransfer.PackageCount} packages`"
       />
     </div>
   </div>

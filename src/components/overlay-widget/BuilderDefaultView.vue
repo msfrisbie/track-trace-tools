@@ -179,7 +179,7 @@ export default Vue.extend({
           icon: "sitemap",
           visible: this.$data.enableT3Plus,
           enabled: true,
-          isBeta: false,
+          isBeta: true,
           isNew: false,
         },
         {
