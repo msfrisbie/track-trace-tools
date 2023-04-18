@@ -3,7 +3,14 @@
     <div id="changelog" class="flex flex-col items-center px-6">
       <div class="flex flex-col items-stretch max-w-md gap-16">
         <div class="max-w-lg flex flex-col gap-4">
-          <p class="text-2xl ttt-purple">v0.26.0</p>
+          <p class="text-2xl ttt-purple">v0.28.0</p>
+
+          <ul class="list-disc">
+            <li>Snapshot enhancements</li>
+            <li>Metrc Explorer beta launch</li>
+          </ul>
+
+          <p class="text-2xl ttt-purple">v0.27.0</p>
 
           <ul class="list-disc">
             <li>T3+ beta</li>
