@@ -474,6 +474,7 @@ export function buildBodyFilter(filterOptions: IFilterOptions | null): ICollecti
       },
     ];
   }
+  
   if (transferFilter?.createdDateLt) {
     filterSet.filters = [
       ...filterSet.filters,

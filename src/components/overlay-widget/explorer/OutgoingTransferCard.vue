@@ -3,11 +3,11 @@
     <div class="flex flex-col items-stretch gap-1 p-2 ttt-purple-bg text-white">
       <div class="flex flex-row items-center justify-between gap-2">
         <span>
-          <div>{{ plantBatch.LicenseNumber }}</div>
+          <div>{{ outgoingTransfer.LicenseNumber }}</div>
         </span>
 
-        <b-badge :variant="getBadgeVariant(plantBatch.PlantBatchState)">{{
-          plantBatch.PlantBatchState
+        <b-badge :variant="getBadgeVariant(outgoingTransfer.TransferState)">{{
+          outgoingTransfer.TransferState
         }}</b-badge>
       </div>
     </div>
@@ -17,14 +17,17 @@
       class="p-2 flex flex-row items-center justify-start space-x-4 text-sm whitespace-nowrap overflow-x-auto"
     >
       <picker-icon
-        icon="box"
+        icon="truck"
         style="width: 5rem"
         class="flex-shrink-0"
-        :textClass="plantBatch.UntrackedCount === 0 ? 'text-red-500' : ''"
-        :text="`${plantBatch.UntrackedCount}`"
+        :text="`${outgoingTransfer.PackageCount}`"
       />
 
-      <picker-card class="flex-grow" :title="`${plantBatch.StrainName}`" :label="plantBatch.Name" />
+      <picker-card
+        class="flex-grow"
+        :title="`${outgoingTransfer.ManifestNumber}`"
+        label=""
+      />
     </div>
   </div>
 </template>
@@ -32,8 +35,8 @@
 <script lang="ts">
 import PickerCard from "@/components/overlay-widget/shared/PickerCard.vue";
 import PickerIcon from "@/components/overlay-widget/shared/PickerIcon.vue";
-import { PlantBatchState } from "@/consts";
-import { IIndexedPlantBatchData } from "@/interfaces";
+import { TransferState } from "@/consts";
+import { IIndexedTransferData } from "@/interfaces";
 import router from "@/router/index";
 import store from "@/store/page-overlay/index";
 import { unitOfMeasureNameToAbbreviation } from "@/utils/units";
@@ -45,7 +48,7 @@ export default Vue.extend({
   store,
   router,
   props: {
-    plantBatch: Object as () => IIndexedPlantBatchData,
+    outgoingTransfer: Object as () => IIndexedTransferData,
   },
   components: {
     PickerCard,
@@ -59,12 +62,14 @@ export default Vue.extend({
   },
   methods: {
     unitOfMeasureNameToAbbreviation,
-    getBadgeVariant(plantBatchState: PlantBatchState): string {
-      switch (plantBatchState) {
-        case PlantBatchState.ACTIVE:
+    getBadgeVariant(outgoingTransferState: TransferState): string {
+      switch (outgoingTransferState) {
+        case TransferState.OUTGOING:
           return "success";
-        case PlantBatchState.INACTIVE:
+        case TransferState.REJECTED:
           return "danger";
+        case TransferState.OUTGOING_INACTIVE:
+          return "light";
         default:
           return "light";
       }

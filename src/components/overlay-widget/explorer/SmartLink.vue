@@ -44,6 +44,9 @@ export default Vue.extend({
           return "leaf";
         case ExplorerTargetType.PACKAGE:
           return "box";
+        case ExplorerTargetType.INCOMING_TRANSFER:
+        case ExplorerTargetType.OUTGOING_TRANSFER:
+          return "truck";
         default:
           return "";
       }

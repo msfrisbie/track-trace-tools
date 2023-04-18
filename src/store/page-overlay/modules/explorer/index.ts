@@ -1,9 +1,11 @@
 import {
   IIndexedPackageData,
   IIndexedPlantBatchData,
+  IIndexedTransferData,
   IPackageHistoryData,
   IPlantBatchHistoryData,
   IPluginState,
+  ITransferHistoryData,
 } from "@/interfaces";
 import { authManager } from "@/modules/auth-manager.module";
 import { DataLoader, getDataLoader } from "@/modules/data-loader/data-loader.module";
@@ -325,6 +327,85 @@ export const explorerModule = {
           });
 
           break;
+
+        case ExplorerTargetType.OUTGOING_TRANSFER:
+          let outgoingTransfer: IIndexedTransferData | null = null;
+
+          for (const license of licenseCache.elements) {
+            const authState = {
+              ...(await authManager.authStateOrError()),
+              license,
+            };
+
+            dataLoader = await getDataLoader(authState);
+
+            try {
+              // @ts-ignore
+              outgoingTransfer = await Promise.any([
+                dataLoader.outgoingTransfer(ctx.state.queryString!),
+                dataLoader.rejectedTransfer(ctx.state.queryString!),
+                dataLoader.outgoingInactiveTransfer(ctx.state.queryString!),
+              ]);
+            } catch {}
+            if (outgoingTransfer) {
+              break;
+            }
+          }
+
+          if (!outgoingTransfer) {
+            ctx.commit(ExplorerMutations.SET_STATUS, {
+              status: ExplorerStatus.ERROR,
+              statusMessage: "Unable to match outgoing transfer",
+            });
+            return;
+          }
+
+          ctx.commit(ExplorerMutations.SET_TARGET, {
+            target: outgoingTransfer,
+          });
+
+          let outgoingTransferHistory: ITransferHistoryData[] | null = null;
+
+          for (const license of licenseCache.elements) {
+            const authState = {
+              ...(await authManager.authStateOrError()),
+              license,
+            };
+
+            dataLoader = await getDataLoader(authState);
+
+            try {
+              outgoingTransferHistory = await dataLoader.transferHistoryByOutGoingTransferId(
+                outgoingTransfer.Id
+              );
+            } catch {}
+
+            // A license mismatch will return 200 w/ 0 entries
+            if (outgoingTransferHistory && outgoingTransferHistory.length > 0) {
+              break;
+            }
+          }
+
+          if (!outgoingTransferHistory) {
+            ctx.commit(ExplorerMutations.SET_STATUS, {
+              status: ExplorerStatus.ERROR,
+              statusMessage: "Unable to match outgoing transfer history",
+            });
+
+            return;
+          }
+
+          ctx.commit(ExplorerMutations.SET_HISTORY, {
+            targetHistory: outgoingTransferHistory,
+          });
+
+          ctx.commit(ExplorerMutations.SET_STATUS, {
+            status: ExplorerStatus.SUCCESS,
+            statusMessage: "",
+          });
+
+          break;
+
         default:
           throw new Error("Bad target type");
       }

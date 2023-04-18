@@ -1440,6 +1440,29 @@ export class DataLoader implements IAtomicService {
     });
   }
 
+  async incomingInactiveTransfer(manifestNumber: string): Promise<IIndexedTransferData> {
+    return new Promise(async (resolve, reject) => {
+      const subscription = timer(DATA_LOAD_FETCH_TIMEOUT_MS).subscribe(() =>
+        reject("Incoming inactive transfer fetch timed out")
+      );
+
+      try {
+        const transferData: IIndexedTransferData = {
+          ...(await this.loadIncomingInactiveTransfer(manifestNumber)),
+          TransferState: TransferState.INCOMING_INACTIVE,
+          TagMatcher: "",
+          LicenseNumber: this._authState!.license,
+        };
+
+        subscription.unsubscribe();
+        resolve(transferData);
+      } catch (e) {
+        subscription.unsubscribe();
+        reject(e);
+      }
+    });
+  }
+
   async outgoingTransfers(resetCache: boolean = false): Promise<IIndexedTransferData[]> {
     if (resetCache) {
       this._outgoingTransfers = null;
@@ -1522,6 +1545,29 @@ export class DataLoader implements IAtomicService {
         const transferData: IIndexedTransferData = {
           ...(await this.loadOutgoingTransfer(manifestNumber)),
           TransferState: TransferState.OUTGOING,
+          TagMatcher: "",
+          LicenseNumber: this._authState!.license,
+        };
+
+        subscription.unsubscribe();
+        resolve(transferData);
+      } catch (e) {
+        subscription.unsubscribe();
+        reject(e);
+      }
+    });
+  }
+
+  async outgoingInactiveTransfer(manifestNumber: string): Promise<IIndexedTransferData> {
+    return new Promise(async (resolve, reject) => {
+      const subscription = timer(DATA_LOAD_FETCH_TIMEOUT_MS).subscribe(() =>
+        reject("Outgoing inactive transfer fetch timed out")
+      );
+
+      try {
+        const transferData: IIndexedTransferData = {
+          ...(await this.loadOutgoingInactiveTransfer(manifestNumber)),
+          TransferState: TransferState.OUTGOING_INACTIVE,
           TagMatcher: "",
           LicenseNumber: this._authState!.license,
         };
@@ -2236,7 +2282,6 @@ export class DataLoader implements IAtomicService {
   private async loadIncomingTransfer(manifestNumber: string): Promise<ITransferData> {
     if (store.state.mockDataMode) {
       // TODO
-      // return mockDataManager.mockTags().filter(tagData => tagData.Label === label)[0];
     }
 
     await authManager.authStateOrError();
@@ -2274,7 +2319,6 @@ export class DataLoader implements IAtomicService {
   private async loadOutgoingTransfer(manifestNumber: string): Promise<ITransferData> {
     if (store.state.mockDataMode) {
       // TODO
-      // return mockDataManager.mockTags().filter(tagData => tagData.Label === label)[0];
     }
 
     await authManager.authStateOrError();
@@ -2288,6 +2332,80 @@ export class DataLoader implements IAtomicService {
     const body = buildBody({ page, pageSize: 1 }, { transferFilter });
 
     const response = await this.metrcRequestManagerOrError.getOutgoingTransfers(body);
+
+    if (response.status !== 200) {
+      throw new Error("Request failed");
+    }
+
+    const responseData: ICollectionResponse<ITransferData> = await response.json();
+
+    if (responseData.Data.length !== 1) {
+      if (responseData.Data.length === 0) {
+        throw new DataLoadError(
+          DataLoadErrorType.ZERO_RESULTS,
+          `Metrc indicated ${manifestNumber} is not available`
+        );
+      } else {
+        throw new Error("Returned multiple transfers");
+      }
+    }
+
+    return responseData.Data[0];
+  }
+
+  private async loadOutgoingInactiveTransfer(manifestNumber: string): Promise<ITransferData> {
+    if (store.state.mockDataMode) {
+      // TODO
+    }
+
+    await authManager.authStateOrError();
+
+    const page = 0;
+
+    const transferFilter: ITransferFilter = {
+      manifestNumber,
+    };
+
+    const body = buildBody({ page, pageSize: 1 }, { transferFilter });
+
+    const response = await this.metrcRequestManagerOrError.getOutgoingInactiveTransfers(body);
+
+    if (response.status !== 200) {
+      throw new Error("Request failed");
+    }
+
+    const responseData: ICollectionResponse<ITransferData> = await response.json();
+
+    if (responseData.Data.length !== 1) {
+      if (responseData.Data.length === 0) {
+        throw new DataLoadError(
+          DataLoadErrorType.ZERO_RESULTS,
+          `Metrc indicated ${manifestNumber} is not available`
+        );
+      } else {
+        throw new Error("Returned multiple transfers");
+      }
+    }
+
+    return responseData.Data[0];
+  }
+
+  private async loadIncomingInactiveTransfer(manifestNumber: string): Promise<ITransferData> {
+    if (store.state.mockDataMode) {
+      // TODO
+    }
+
+    await authManager.authStateOrError();
+
+    const page = 0;
+
+    const transferFilter: ITransferFilter = {
+      manifestNumber,
+    };
+
+    const body = buildBody({ page, pageSize: 1 }, { transferFilter });
+
+    const response = await this.metrcRequestManagerOrError.getIncomingInactiveTransfers(body);
 
     if (response.status !== 200) {
       throw new Error("Request failed");

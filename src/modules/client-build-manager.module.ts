@@ -13,7 +13,7 @@ class ClientBuildManager implements IAtomicService {
   }
 
   async loadClientConfig() {
-    this._clientConfig = Object.freeze(await clientConfig());
+    this._clientConfig = Object.freeze(clientConfig());
   }
 
   assertValues(keys: string[]): boolean {

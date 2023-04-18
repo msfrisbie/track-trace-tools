@@ -1,4 +1,8 @@
-import { METRC_TAG_REGEX_PATTERN, PLANT_BATCH_NAME_REGEX_PATTERN } from "@/consts";
+import {
+  METRC_TAG_REGEX_PATTERN,
+  PLANT_BATCH_NAME_REGEX_PATTERN,
+  ZERO_PADDED_MANIFEST_NUMBER_REGEX_PATTERN,
+} from "@/consts";
 import { IPackageHistoryData } from "@/interfaces";
 
 export function extractParentPackageLabelOrNull(description: string): string | null {
@@ -54,6 +58,22 @@ export function extractPackageLabelOrNull(description: string): string | null {
     new RegExp(`for Package (${METRC_TAG_REGEX_PATTERN})`),
     new RegExp(`from Package (${METRC_TAG_REGEX_PATTERN})`),
     new RegExp(`Packaged into (${METRC_TAG_REGEX_PATTERN})`),
+    new RegExp(`Package (${METRC_TAG_REGEX_PATTERN})`),
+  ];
+  for (const matcher of matchers) {
+    const match = description.match(matcher);
+
+    if (match) {
+      return match[1];
+    }
+  }
+
+  return null;
+}
+
+export function extractOutgoingTransferManifestNumberOrNull(description: string): string | null {
+  const matchers: RegExp[] = [
+    new RegExp(`Manifest # (${ZERO_PADDED_MANIFEST_NUMBER_REGEX_PATTERN})`),
   ];
   for (const matcher of matchers) {
     const match = description.match(matcher);

@@ -85,6 +85,7 @@ import BuilderDashboard from "@/components/overlay-widget/BuilderDashboard.vue";
 import { MessageType } from "@/consts";
 import { IPluginState } from "@/interfaces";
 import { analyticsManager } from "@/modules/analytics-manager.module";
+import { clientBuildManager } from "@/modules/client-build-manager.module";
 import router from "@/router/index";
 import store from "@/store/page-overlay/index";
 import { isIdentityEligibleForTransferTools } from "@/utils/access-control";
@@ -115,6 +116,7 @@ export default Vue.extend({
   data() {
     return {
       notAvailableMessage: notAvailableMessage(),
+      enableT3Plus: false,
     };
   },
   computed: {
@@ -175,7 +177,7 @@ export default Vue.extend({
           text: "EXPLORER",
           route: "/metrc-explorer",
           icon: "sitemap",
-          visible: true,
+          visible: this.$data.enableT3Plus,
           enabled: true,
           isBeta: false,
           isNew: false,
@@ -294,6 +296,8 @@ export default Vue.extend({
       }
     },
   },
-  async mounted() {},
+  async created() {
+    this.$data.enableT3Plus = clientBuildManager.assertValues(["ENABLE_T3PLUS"]);
+  },
 });
 </script>

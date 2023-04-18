@@ -4,7 +4,7 @@
       class="border border-purple-100 border-solid"
       v-bind:class="[idx % 2 === 0 ? 'bg-purple-100' : '0']"
       v-for="(historyEntry, idx) of explorer.history"
-      v-bind:key="historyEntry.RecordedDateTime"
+      v-bind:key="idx+historyEntry.RecordedDateTime"
     >
       <div class="grid grid-cols-2 p-4 gap-4">
         <template v-for="description of historyEntry.Descriptions">

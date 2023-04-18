@@ -1,41 +1,65 @@
 <template>
   <div>
-    <template v-if="explorer.status === ExplorerStatus.INITIAL">
-      <b-input-group>
-        <template #prepend>
-          <b-form-select v-model="targetType">
-            <b-form-select-option
-              :value="targetTypeOption.value"
-              v-for="targetTypeOption of targetTypeOptions"
-              v-bind:key="targetTypeOption.value"
-            >
-              {{ targetTypeOption.readableText }}
-            </b-form-select-option>
-          </b-form-select>
-        </template>
-        <b-form-input v-model="queryString" :placeholder="queryStringPlaceholder"></b-form-input>
-        <template #append>
-          <b-button variant="primary" @click="submitQuery()">GO</b-button>
-        </template>
-      </b-input-group>
-    </template>
     <div class="grid grid-cols-3 gap-8">
-      <div v-if="explorer.target">
-        <template v-if="targetType === ExplorerTargetType.PACKAGE">
-          <package-card :pkg="explorer.target"></package-card>
+      <template v-if="explorer.status === ExplorerStatus.INITIAL">
+        <div class="col-span-3 flex flex-col items-center">
+          <b-input-group class="max-w-lg">
+            <template #prepend>
+              <b-form-select v-model="targetType">
+                <b-form-select-option
+                  :value="targetTypeOption.value"
+                  v-for="targetTypeOption of targetTypeOptions"
+                  v-bind:key="targetTypeOption.value"
+                >
+                  {{ targetTypeOption.readableText }}
+                </b-form-select-option>
+              </b-form-select>
+            </template>
+            <b-form-input
+              v-model="queryString"
+              :placeholder="queryStringPlaceholder"
+            ></b-form-input>
+            <template #append>
+              <b-button variant="primary" @click="submitQuery()">GO</b-button>
+            </template>
+          </b-input-group>
+        </div>
+      </template>
+      <div class="flex flex-col items-stretch gap-8">
+        <template v-if="explorer.target">
+          <template v-if="targetType === ExplorerTargetType.PACKAGE">
+            <package-card :pkg="explorer.target"></package-card>
+          </template>
+          <template v-if="targetType === ExplorerTargetType.PLANT_BATCH">
+            <plant-batch-card :plantBatch="explorer.target"></plant-batch-card>
+          </template>
+          <template v-if="targetType === ExplorerTargetType.OUTGOING_TRANSFER">
+            <outgoing-transfer-card :outgoingTransfer="explorer.target"></outgoing-transfer-card>
+          </template>
         </template>
-        <template v-if="targetType === ExplorerTargetType.PLANT_BATCH">
-          <plant-batch-card :plantBatch="explorer.target"></plant-batch-card>
+
+        <b-button
+          v-if="explorer.status !== ExplorerStatus.INITIAL"
+          variant="outline-danger"
+          @click="reset()"
+          >RESET</b-button
+        >
+
+        <template v-if="explorer.status === ExplorerStatus.INFLIGHT">
+          <b-spinner></b-spinner>
         </template>
+
+        <div
+          v-if="explorer.statusMessage"
+          v-bind:class="[explorer.status === ExplorerStatus.ERROR ? 'text-red-500' : '']"
+        >
+          {{ explorer.statusMessage }}
+        </div>
+
+        <recent-explorer-queries></recent-explorer-queries>
       </div>
-      <div class="col-span-2" v-if="explorer.history">
-        <smart-history></smart-history>
-      </div>
-      <div class="col-span-3">
-        <div>status: {{ explorer.status }}</div>
-        <div>statusMessage: {{ explorer.statusMessage }}</div>
-        <b-button @click="reset()">RESET</b-button>
-        <explorer-history></explorer-history>
+      <div class="col-span-2">
+        <smart-history v-if="explorer.history"></smart-history>
       </div>
     </div>
   </div>
@@ -54,9 +78,10 @@ import {
 import { ExplorerTarget } from "@/store/page-overlay/modules/explorer/interfaces";
 import Vue from "vue";
 import { mapActions, mapState } from "vuex";
-import ExplorerHistory from "./ExplorerHistory.vue";
+import OutgoingTransferCard from "./OutgoingTransferCard.vue";
 import PackageCard from "./PackageCard.vue";
 import PlantBatchCard from "./PlantBatchCard.vue";
+import RecentExplorerQueries from "./RecentExplorerQueries.vue";
 import SmartHistory from "./SmartHistory.vue";
 
 export default Vue.extend({
@@ -68,7 +93,8 @@ export default Vue.extend({
     PackageCard,
     PlantBatchCard,
     SmartHistory,
-    ExplorerHistory,
+    OutgoingTransferCard,
+    RecentExplorerQueries,
   },
   computed: {
     ...mapState<IPluginState>({
@@ -125,9 +151,13 @@ export default Vue.extend({
           value: ExplorerTargetType.PLANT_BATCH,
           readableText: "Plant Batch",
         },
+        // {
+        //   value: ExplorerTargetType.INCOMING_TRANSFER,
+        //   readableText: "Incoming Transfer",
+        // },
         {
-          value: ExplorerTargetType.INCOMING_TRANSFER,
-          readableText: "Incoming Transfer",
+          value: ExplorerTargetType.OUTGOING_TRANSFER,
+          readableText: "Outgoing Transfer",
         },
       ],
     };

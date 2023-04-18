@@ -31,7 +31,8 @@ export enum TaskType {
 
 export const METRC_INT_SUFFIX_CHARCOUNT = 8;
 export const METRC_TAG_REGEX_PATTERN = `[A-Z0-9]{24}`;
-export const PLANT_BATCH_NAME_REGEX_PATTERN = `[^"]+`
+export const ZERO_PADDED_MANIFEST_NUMBER_REGEX_PATTERN = `[0-9]{10}`;
+export const PLANT_BATCH_NAME_REGEX_PATTERN = `[^"]+`;
 export const METRC_TAG_REGEX = new RegExp(`^${METRC_TAG_REGEX_PATTERN}$`);
 export const WEIGHT_NUMBER_REGEX = new RegExp(/^[0-9,]*\.?[0-9]*$/);
 export const DOLLAR_NUMBER_REGEX = new RegExp(/^\$?[0-9,]*\.?[0-9]*$/);
@@ -486,8 +487,6 @@ export enum TransfersTabLabel {
   INACTIVE = "Inactive",
 }
 
-
-
 export enum SheetTitles {
   OVERVIEW = "Overview",
   PACKAGES = "Packages",
@@ -501,5 +500,5 @@ export enum SheetTitles {
   STRAGGLER_PACKAGES = "Straggler Packages",
   PRODUCTION_BATCH_COSTS = "Production Batch Costs",
   WORKSHEET = "Worksheet",
-  MANIFEST_COGS = "Manifest Cogs"
+  MANIFEST_COGS = "Manifest Cogs",
 }

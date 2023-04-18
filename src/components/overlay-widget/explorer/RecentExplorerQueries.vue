@@ -1,8 +1,8 @@
 <template>
   <div class="flex flex-col items-stretch gap-2">
     <smart-link
-      v-for="smartLink of explorer.recent"
-      v-bind:key="smartLink.timestamp + smartLink.queryString"
+      v-for="(smartLink, idx) of explorer.recent"
+      v-bind:key="idx + smartLink.queryString"
       :text="smartLink.queryString"
       :targetType="smartLink.targetType"
     ></smart-link>
@@ -19,7 +19,7 @@ import { mapActions, mapState } from "vuex";
 import SmartLink from "./SmartLink.vue";
 
 export default Vue.extend({
-  name: "ExplorerHistory",
+  name: "RecentExplorerQueries",
   store,
   router,
   props: {},

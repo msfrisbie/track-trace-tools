@@ -1,8 +1,8 @@
 <template>
   <div class="flex flex-col items-stretch gap-2">
     <smart-link
-      v-for="smartLink of smartLinks"
-      v-bind:key="smartLink.text"
+      v-for="(smartLink, idx) of smartLinks"
+      v-bind:key="idx + smartLink.text"
       :text="smartLink.text"
       :targetType="smartLink.targetType"
     ></smart-link>
@@ -14,7 +14,11 @@ import { IPluginState } from "@/interfaces";
 import router from "@/router/index";
 import store from "@/store/page-overlay/index";
 import { ExplorerTargetType } from "@/store/page-overlay/modules/explorer/consts";
-import { extractPackageLabelOrNull, extractPlantBatchNameOrNull } from "@/utils/history";
+import {
+  extractOutgoingTransferManifestNumberOrNull,
+  extractPackageLabelOrNull,
+  extractPlantBatchNameOrNull,
+} from "@/utils/history";
 import Vue from "vue";
 import { mapActions, mapState } from "vuex";
 import SmartLink from "./SmartLink.vue";
@@ -55,6 +59,16 @@ export default Vue.extend({
         smartLinks.push({
           text: plantBatchName,
           targetType: ExplorerTargetType.PLANT_BATCH,
+        });
+      }
+
+      const outgoingTransferManifestNumber = extractOutgoingTransferManifestNumberOrNull(
+        this.description
+      );
+      if (outgoingTransferManifestNumber) {
+        smartLinks.push({
+          text: outgoingTransferManifestNumber,
+          targetType: ExplorerTargetType.OUTGOING_TRANSFER,
         });
       }
 
