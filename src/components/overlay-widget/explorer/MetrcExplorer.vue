@@ -2,28 +2,74 @@
   <div>
     <div class="grid grid-cols-3 gap-8 w-full">
       <template v-if="explorer.status === ExplorerStatus.INITIAL">
-        <div class="col-span-3 flex flex-col items-center">
-          <b-input-group class="max-w-xl">
-            <template #prepend>
-              <b-form-select v-model="targetType">
-                <b-form-select-option
-                  :value="targetTypeOption.value"
-                  :disabled="targetTypeOption.disabled"
-                  v-for="targetTypeOption of targetTypeOptions"
-                  v-bind:key="targetTypeOption.value"
-                >
-                  {{ targetTypeOption.readableText }}
-                </b-form-select-option>
-              </b-form-select>
-            </template>
-            <b-form-input
-              v-model="queryString"
-              :placeholder="queryStringPlaceholder"
-            ></b-form-input>
-            <template #append>
-              <b-button variant="primary" @click="submitQuery()">GO</b-button>
-            </template>
-          </b-input-group>
+        <div class="col-span-3 flex flex-col items-center gap-8">
+          <div class="flex flex-col items-stretch" style="min-width: 720px">
+            <div class="flex flex-row items-center gap-8">
+              <b-input-group class="flex-grow">
+                <template #prepend>
+                  <b-form-select v-model="targetType">
+                    <b-form-select-option
+                      :value="targetTypeOption.value"
+                      :disabled="targetTypeOption.disabled"
+                      v-for="targetTypeOption of targetTypeOptions"
+                      v-bind:key="targetTypeOption.value"
+                    >
+                      {{ targetTypeOption.readableText }}
+                    </b-form-select-option>
+                  </b-form-select>
+                </template>
+                <b-form-input
+                  v-model="queryString"
+                  :placeholder="queryStringPlaceholder"
+                ></b-form-input>
+                <template #append>
+                  <b-button variant="primary" @click="submitQuery()">GO</b-button>
+                </template>
+              </b-input-group>
+
+              <b-button variant="outline-dark" @click="showHelp = !showHelp"
+                >LEARN&nbsp;MORE</b-button
+              >
+            </div>
+          </div>
+
+          <template v-if="showHelp">
+            <div class="max-w-md flex flex-col items-stretch gap-4">
+              <div class="font-bold text-lg ttt-purple">What is Metrc Explorer?</div>
+
+              <div>
+                The Metrc Explorer allows you to easily navigate around your Metrc "network": all
+                the interconnected objects in Metrc.
+              </div>
+
+              <div>
+                Metrc Explorer will load the object on the left, and its history on the right. It
+                can search all your active licenses, not just the one you are currently viewing.
+              </div>
+
+              <div>
+                Any history entries that link to a different Metrc object will show a button that
+                allow you to easily click over to it.
+              </div>
+
+              <div class="font-bold text-lg ttt-purple">How do I use Metrc Explorer?</div>
+
+              <div>
+                Search for a starting object by its primary type and identifier: (e.g. package tag,
+                manifest #, harvest name). Partial identifiers won't work, it must be a full and
+                exact match.
+              </div>
+
+              <a
+                class="text-purple-500 text-center underline"
+                href="https://www.youtube.com/watch?v=pETAMIdNQAM"
+                target="_blank"
+                >DEMO</a
+              >
+
+              <b-button variant="outline-dark" @click="showHelp = !showHelp">HIDE</b-button>
+            </div>
+          </template>
         </div>
       </template>
       <div class="flex flex-col items-stretch gap-8">
@@ -166,6 +212,7 @@ export default Vue.extend({
       ExplorerStatus,
       ExplorerTargetType,
       HistoryTreeNodeType,
+      showHelp: false,
       targetTypeOptions: [
         {
           value: ExplorerTargetType.PACKAGE,

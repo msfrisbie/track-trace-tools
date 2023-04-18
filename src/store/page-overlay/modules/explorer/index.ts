@@ -1,3 +1,4 @@
+import { MessageType } from "@/consts";
 import {
   IIndexedPackageData,
   IIndexedPlantBatchData,
@@ -7,6 +8,7 @@ import {
   IPluginState,
   ITransferHistoryData,
 } from "@/interfaces";
+import { analyticsManager } from "@/modules/analytics-manager.module";
 import { authManager } from "@/modules/auth-manager.module";
 import { DataLoader, getDataLoader } from "@/modules/data-loader/data-loader.module";
 import { facilityManager } from "@/modules/facility-manager.module";
@@ -153,261 +155,323 @@ export const explorerModule = {
         targetType?: ExplorerTargetType;
       } = {}
     ) => {
-      if (queryString) {
-        ctx.commit(ExplorerMutations.SET_QUERY, { queryString });
-      }
-
-      if (targetType) {
-        ctx.commit(ExplorerMutations.SET_TARGET_TYPE, { targetType });
-      }
-
-      if (!ctx.state.queryString) {
-        throw new Error("Must provide query string");
-      }
-
-      ctx.commit(ExplorerMutations.SET_STATUS, {
-        status: ExplorerStatus.INFLIGHT,
+      analyticsManager.track(MessageType.EXPLORER_QUERY, {
+        queryString,
+        targetType,
       });
 
-      ctx.commit(ExplorerMutations.ADD_QUERY, {});
+      try {
+        if (queryString) {
+          ctx.commit(ExplorerMutations.SET_QUERY, { queryString });
+        }
 
-      const ownedLicenses: string[] = (await facilityManager.ownedFacilitiesOrError()).map(
-        (facility) => facility.licenseNumber
-      );
-      const licenseCache: LRU<string> = new LRU(ownedLicenses);
-      let dataLoader: DataLoader | null = null;
+        if (targetType) {
+          ctx.commit(ExplorerMutations.SET_TARGET_TYPE, { targetType });
+        }
 
-      switch (ctx.state.targetType) {
-        case ExplorerTargetType.PACKAGE:
-          let pkg: IIndexedPackageData | null = null;
+        if (!ctx.state.queryString) {
+          throw new Error("Must provide query string");
+        }
 
-          for (const license of licenseCache.elements) {
-            const authState = {
-              ...(await authManager.authStateOrError()),
-              license,
-            };
+        ctx.commit(ExplorerMutations.SET_STATUS, {
+          status: ExplorerStatus.INFLIGHT,
+        });
 
-            dataLoader = await getDataLoader(authState);
+        ctx.commit(ExplorerMutations.ADD_QUERY, {});
 
-            try {
-              // @ts-ignore
-              pkg = await Promise.any([
-                dataLoader.activePackage(ctx.state.queryString!),
-                dataLoader.inactivePackage(ctx.state.queryString!),
-                dataLoader.inTransitPackage(ctx.state.queryString!, { useCache: false }),
-              ]);
-            } catch {}
-            if (pkg) {
-              break;
+        const ownedLicenses: string[] = (await facilityManager.ownedFacilitiesOrError()).map(
+          (facility) => facility.licenseNumber
+        );
+        const licenseCache: LRU<string> = new LRU(ownedLicenses);
+        let dataLoader: DataLoader | null = null;
+
+        switch (ctx.state.targetType) {
+          case ExplorerTargetType.PACKAGE:
+            let pkg: IIndexedPackageData | null = null;
+
+            for (const license of licenseCache.elements) {
+              const authState = {
+                ...(await authManager.authStateOrError()),
+                license,
+              };
+
+              dataLoader = await getDataLoader(authState);
+
+              try {
+                // @ts-ignore
+                pkg = await Promise.any([
+                  dataLoader.activePackage(ctx.state.queryString!),
+                  dataLoader.inactivePackage(ctx.state.queryString!),
+                  dataLoader.inTransitPackage(ctx.state.queryString!, { useCache: false }),
+                ]);
+              } catch {}
+              if (pkg) {
+                break;
+              }
             }
-          }
 
-          if (!pkg) {
-            ctx.commit(ExplorerMutations.SET_STATUS, {
-              status: ExplorerStatus.ERROR,
-              statusMessage: "Unable to match package",
-            });
-            return;
-          }
+            if (!pkg) {
+              ctx.commit(ExplorerMutations.SET_STATUS, {
+                status: ExplorerStatus.ERROR,
+                statusMessage: "Unable to match package",
+              });
 
-          ctx.commit(ExplorerMutations.SET_TARGET, {
-            target: pkg,
-          });
+              analyticsManager.track(MessageType.EXPLORER_ERROR, {
+                queryString,
+                targetType,
+                statusMessage: ctx.state.statusMessage,
+              });
 
-          let pkgHistory: IPackageHistoryData[] | null = null;
-
-          for (const license of licenseCache.elements) {
-            const authState = {
-              ...(await authManager.authStateOrError()),
-              license,
-            };
-
-            dataLoader = await getDataLoader(authState);
-
-            try {
-              pkgHistory = await dataLoader.packageHistoryByPackageId(pkg.Id);
-            } catch {}
-
-            // A license mismatch will return 200 w/ 0 entries
-            if (pkgHistory && pkgHistory.length > 0) {
-              break;
+              return;
             }
-          }
 
-          if (!pkgHistory) {
-            ctx.commit(ExplorerMutations.SET_STATUS, {
-              status: ExplorerStatus.ERROR,
-              statusMessage: "Unable to match package history",
+            ctx.commit(ExplorerMutations.SET_TARGET, {
+              target: pkg,
             });
 
-            return;
-          }
+            let pkgHistory: IPackageHistoryData[] | null = null;
 
-          ctx.commit(ExplorerMutations.SET_HISTORY, {
-            targetHistory: pkgHistory,
-          });
+            for (const license of licenseCache.elements) {
+              const authState = {
+                ...(await authManager.authStateOrError()),
+                license,
+              };
 
-          ctx.commit(ExplorerMutations.SET_STATUS, {
-            status: ExplorerStatus.SUCCESS,
-            statusMessage: "",
-          });
+              dataLoader = await getDataLoader(authState);
 
-          break;
-        case ExplorerTargetType.PLANT_BATCH:
-          let plantBatch: IIndexedPlantBatchData | null = null;
+              try {
+                pkgHistory = await dataLoader.packageHistoryByPackageId(pkg.Id);
+              } catch {}
 
-          for (const license of licenseCache.elements) {
-            const authState = {
-              ...(await authManager.authStateOrError()),
-              license,
-            };
-
-            dataLoader = await getDataLoader(authState);
-
-            try {
-              // @ts-ignore
-              plantBatch = await Promise.any([
-                dataLoader.plantBatch(ctx.state.queryString!),
-                dataLoader.inactivePlantBatch(ctx.state.queryString!),
-              ]);
-            } catch {}
-            if (plantBatch) {
-              break;
+              // A license mismatch will return 200 w/ 0 entries
+              if (pkgHistory && pkgHistory.length > 0) {
+                break;
+              }
             }
-          }
 
-          if (!plantBatch) {
-            ctx.commit(ExplorerMutations.SET_STATUS, {
-              status: ExplorerStatus.ERROR,
-              statusMessage: "Unable to match plant batch",
-            });
-            return;
-          }
+            if (!pkgHistory) {
+              ctx.commit(ExplorerMutations.SET_STATUS, {
+                status: ExplorerStatus.ERROR,
+                statusMessage: "Unable to match package history",
+              });
 
-          ctx.commit(ExplorerMutations.SET_TARGET, {
-            target: plantBatch,
-          });
+              analyticsManager.track(MessageType.EXPLORER_ERROR, {
+                queryString,
+                targetType,
+                statusMessage: ctx.state.statusMessage,
+              });
 
-          let plantBatchHistory: IPlantBatchHistoryData[] | null = null;
-
-          for (const license of licenseCache.elements) {
-            const authState = {
-              ...(await authManager.authStateOrError()),
-              license,
-            };
-
-            dataLoader = await getDataLoader(authState);
-
-            try {
-              plantBatchHistory = await dataLoader.plantBatchHistoryByPlantBatchId(plantBatch.Id);
-            } catch {}
-
-            // A license mismatch will return 200 w/ 0 entries
-            if (plantBatchHistory && plantBatchHistory.length > 0) {
-              break;
+              return;
             }
-          }
 
-          if (!plantBatchHistory) {
-            ctx.commit(ExplorerMutations.SET_STATUS, {
-              status: ExplorerStatus.ERROR,
-              statusMessage: "Unable to match plant batch history",
+            ctx.commit(ExplorerMutations.SET_HISTORY, {
+              targetHistory: pkgHistory,
             });
 
-            return;
-          }
-
-          ctx.commit(ExplorerMutations.SET_HISTORY, {
-            targetHistory: plantBatchHistory,
-          });
-
-          ctx.commit(ExplorerMutations.SET_STATUS, {
-            status: ExplorerStatus.SUCCESS,
-            statusMessage: "",
-          });
-
-          break;
-
-        case ExplorerTargetType.OUTGOING_TRANSFER:
-          let outgoingTransfer: IIndexedTransferData | null = null;
-
-          for (const license of licenseCache.elements) {
-            const authState = {
-              ...(await authManager.authStateOrError()),
-              license,
-            };
-
-            dataLoader = await getDataLoader(authState);
-
-            try {
-              // @ts-ignore
-              outgoingTransfer = await Promise.any([
-                dataLoader.outgoingTransfer(ctx.state.queryString!),
-                dataLoader.rejectedTransfer(ctx.state.queryString!),
-                dataLoader.outgoingInactiveTransfer(ctx.state.queryString!),
-              ]);
-            } catch {}
-            if (outgoingTransfer) {
-              break;
-            }
-          }
-
-          if (!outgoingTransfer) {
             ctx.commit(ExplorerMutations.SET_STATUS, {
-              status: ExplorerStatus.ERROR,
-              statusMessage: "Unable to match outgoing transfer",
-            });
-            return;
-          }
-
-          ctx.commit(ExplorerMutations.SET_TARGET, {
-            target: outgoingTransfer,
-          });
-
-          let outgoingTransferHistory: ITransferHistoryData[] | null = null;
-
-          for (const license of licenseCache.elements) {
-            const authState = {
-              ...(await authManager.authStateOrError()),
-              license,
-            };
-
-            dataLoader = await getDataLoader(authState);
-
-            try {
-              outgoingTransferHistory = await dataLoader.transferHistoryByOutGoingTransferId(
-                outgoingTransfer.Id
-              );
-            } catch {}
-
-            // A license mismatch will return 200 w/ 0 entries
-            if (outgoingTransferHistory && outgoingTransferHistory.length > 0) {
-              break;
-            }
-          }
-
-          if (!outgoingTransferHistory) {
-            ctx.commit(ExplorerMutations.SET_STATUS, {
-              status: ExplorerStatus.ERROR,
-              statusMessage: "Unable to match outgoing transfer history",
+              status: ExplorerStatus.SUCCESS,
+              statusMessage: "",
             });
 
-            return;
-          }
+            break;
+          case ExplorerTargetType.PLANT_BATCH:
+            let plantBatch: IIndexedPlantBatchData | null = null;
 
-          ctx.commit(ExplorerMutations.SET_HISTORY, {
-            targetHistory: outgoingTransferHistory,
-          });
+            for (const license of licenseCache.elements) {
+              const authState = {
+                ...(await authManager.authStateOrError()),
+                license,
+              };
 
-          ctx.commit(ExplorerMutations.SET_STATUS, {
-            status: ExplorerStatus.SUCCESS,
-            statusMessage: "",
-          });
+              dataLoader = await getDataLoader(authState);
 
-          break;
+              try {
+                // @ts-ignore
+                plantBatch = await Promise.any([
+                  dataLoader.plantBatch(ctx.state.queryString!),
+                  dataLoader.inactivePlantBatch(ctx.state.queryString!),
+                ]);
+              } catch {}
+              if (plantBatch) {
+                break;
+              }
+            }
 
-        default:
-          throw new Error("Bad target type");
+            if (!plantBatch) {
+              ctx.commit(ExplorerMutations.SET_STATUS, {
+                status: ExplorerStatus.ERROR,
+                statusMessage: "Unable to match plant batch",
+              });
+
+              analyticsManager.track(MessageType.EXPLORER_ERROR, {
+                queryString,
+                targetType,
+                statusMessage: ctx.state.statusMessage,
+              });
+
+              return;
+            }
+
+            ctx.commit(ExplorerMutations.SET_TARGET, {
+              target: plantBatch,
+            });
+
+            let plantBatchHistory: IPlantBatchHistoryData[] | null = null;
+
+            for (const license of licenseCache.elements) {
+              const authState = {
+                ...(await authManager.authStateOrError()),
+                license,
+              };
+
+              dataLoader = await getDataLoader(authState);
+
+              try {
+                plantBatchHistory = await dataLoader.plantBatchHistoryByPlantBatchId(plantBatch.Id);
+              } catch {}
+
+              // A license mismatch will return 200 w/ 0 entries
+              if (plantBatchHistory && plantBatchHistory.length > 0) {
+                break;
+              }
+            }
+
+            if (!plantBatchHistory) {
+              ctx.commit(ExplorerMutations.SET_STATUS, {
+                status: ExplorerStatus.ERROR,
+                statusMessage: "Unable to match plant batch history",
+              });
+
+              analyticsManager.track(MessageType.EXPLORER_ERROR, {
+                queryString,
+                targetType,
+                statusMessage: ctx.state.statusMessage,
+              });
+
+              return;
+            }
+
+            ctx.commit(ExplorerMutations.SET_HISTORY, {
+              targetHistory: plantBatchHistory,
+            });
+
+            ctx.commit(ExplorerMutations.SET_STATUS, {
+              status: ExplorerStatus.SUCCESS,
+              statusMessage: "",
+            });
+
+            break;
+
+          case ExplorerTargetType.OUTGOING_TRANSFER:
+            let outgoingTransfer: IIndexedTransferData | null = null;
+
+            for (const license of licenseCache.elements) {
+              const authState = {
+                ...(await authManager.authStateOrError()),
+                license,
+              };
+
+              dataLoader = await getDataLoader(authState);
+
+              try {
+                // @ts-ignore
+                outgoingTransfer = await Promise.any([
+                  dataLoader.outgoingTransfer(ctx.state.queryString!),
+                  dataLoader.rejectedTransfer(ctx.state.queryString!),
+                  dataLoader.outgoingInactiveTransfer(ctx.state.queryString!),
+                ]);
+              } catch {}
+              if (outgoingTransfer) {
+                break;
+              }
+            }
+
+            if (!outgoingTransfer) {
+              ctx.commit(ExplorerMutations.SET_STATUS, {
+                status: ExplorerStatus.ERROR,
+                statusMessage: "Unable to match outgoing transfer",
+              });
+
+              analyticsManager.track(MessageType.EXPLORER_ERROR, {
+                queryString,
+                targetType,
+                statusMessage: ctx.state.statusMessage,
+              });
+
+              return;
+            }
+
+            ctx.commit(ExplorerMutations.SET_TARGET, {
+              target: outgoingTransfer,
+            });
+
+            let outgoingTransferHistory: ITransferHistoryData[] | null = null;
+
+            for (const license of licenseCache.elements) {
+              const authState = {
+                ...(await authManager.authStateOrError()),
+                license,
+              };
+
+              dataLoader = await getDataLoader(authState);
+
+              try {
+                outgoingTransferHistory = await dataLoader.transferHistoryByOutGoingTransferId(
+                  outgoingTransfer.Id
+                );
+              } catch {}
+
+              // A license mismatch will return 200 w/ 0 entries
+              if (outgoingTransferHistory && outgoingTransferHistory.length > 0) {
+                break;
+              }
+            }
+
+            if (!outgoingTransferHistory) {
+              ctx.commit(ExplorerMutations.SET_STATUS, {
+                status: ExplorerStatus.ERROR,
+                statusMessage: "Unable to match outgoing transfer history",
+              });
+
+              analyticsManager.track(MessageType.EXPLORER_ERROR, {
+                queryString,
+                targetType,
+                statusMessage: ctx.state.statusMessage,
+              });
+
+              return;
+            }
+
+            ctx.commit(ExplorerMutations.SET_HISTORY, {
+              targetHistory: outgoingTransferHistory,
+            });
+
+            ctx.commit(ExplorerMutations.SET_STATUS, {
+              status: ExplorerStatus.SUCCESS,
+              statusMessage: "",
+            });
+
+            break;
+
+          default:
+            throw new Error("Bad target type");
+        }
+
+        analyticsManager.track(MessageType.EXPLORER_SUCCESS, {
+          queryString,
+          targetType,
+        });
+      } catch (e) {
+        ctx.commit(ExplorerMutations.SET_STATUS, {
+          status: ExplorerStatus.ERROR,
+          statusMessage: e,
+        });
+
+        analyticsManager.track(MessageType.EXPLORER_ERROR, {
+          queryString,
+          targetType,
+          error: e,
+        });
       }
     },
   },
