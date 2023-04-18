@@ -31,6 +31,7 @@ export enum TaskType {
 
 export const METRC_INT_SUFFIX_CHARCOUNT = 8;
 export const METRC_TAG_REGEX_PATTERN = `[A-Z0-9]{24}`;
+export const PLANT_BATCH_NAME_REGEX_PATTERN = `[^"]+`
 export const METRC_TAG_REGEX = new RegExp(`^${METRC_TAG_REGEX_PATTERN}$`);
 export const WEIGHT_NUMBER_REGEX = new RegExp(/^[0-9,]*\.?[0-9]*$/);
 export const DOLLAR_NUMBER_REGEX = new RegExp(/^\$?[0-9,]*\.?[0-9]*$/);

@@ -425,8 +425,6 @@ export async function maybeLoadCogsReportData({
   //   removableManifestGraphMembers: removableManifestGraphMembers.length,
   // });
 
-  debugger;
-
   ctx.commit(ReportsMutations.SET_STATUS, {
     statusMessage: { text: "Loading package split data...", level: "success" },
   });

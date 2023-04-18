@@ -515,6 +515,28 @@ export const reportsModule = {
             ];
           }
 
+          richOutgoingTransfers = richOutgoingTransfers.filter((transfer) => {
+            if (outgoingTransferConfig.transferFilter.estimatedDepartureDateLt) {
+              if (
+                transfer.CreatedDateTime >
+                outgoingTransferConfig.transferFilter.estimatedDepartureDateLt
+              ) {
+                return false;
+              }
+            }
+
+            if (outgoingTransferConfig.transferFilter.estimatedDepartureDateGt) {
+              if (
+                transfer.LastModified <
+                outgoingTransferConfig.transferFilter.estimatedDepartureDateGt
+              ) {
+                return false;
+              }
+            }
+
+            return true;
+          });
+
           for (const transfer of richOutgoingTransfers) {
             const destinations: IRichDestinationData[] = (
               await primaryDataLoader.transferDestinations(transfer.Id)
@@ -586,6 +608,28 @@ export const reportsModule = {
               ...richOutgoingTransfers,
             ];
           }
+
+          richOutgoingTransfers = richOutgoingTransfers.filter((transfer) => {
+            if (transferManifestConfig.transferFilter.estimatedDepartureDateLt) {
+              if (
+                transfer.CreatedDateTime >
+                transferManifestConfig.transferFilter.estimatedDepartureDateLt
+              ) {
+                return false;
+              }
+            }
+
+            if (transferManifestConfig.transferFilter.estimatedDepartureDateGt) {
+              if (
+                transfer.LastModified <
+                transferManifestConfig.transferFilter.estimatedDepartureDateGt
+              ) {
+                return false;
+              }
+            }
+
+            return true;
+          });
 
           for (const transfer of richOutgoingTransfers) {
             const destinations: IRichDestinationData[] = (

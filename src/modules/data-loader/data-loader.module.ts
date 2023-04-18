@@ -35,6 +35,8 @@ import {
   IPackageOptions,
   IPaginationOptions,
   IPlantBatchData,
+  IPlantBatchFilter,
+  IPlantBatchHistoryData,
   IPlantBatchOptions,
   IPlantData,
   IPlantOptions,
@@ -607,6 +609,35 @@ export class DataLoader implements IAtomicService {
     });
   }
 
+  async plantBatch(name: string): Promise<IIndexedPlantBatchData> {
+    const match = (await this.plantBatches()).find((plantBatch) => plantBatch.Name === name);
+
+    if (match) {
+      return match;
+    }
+
+    return new Promise(async (resolve, reject) => {
+      const subscription = timer(DATA_LOAD_FETCH_TIMEOUT_MS).subscribe(() =>
+        reject("Plant batch fetch timed out")
+      );
+
+      try {
+        const packageData: IIndexedPlantBatchData = {
+          ...(await this.loadPlantBatch(name)),
+          PlantBatchState: PlantBatchState.ACTIVE,
+          TagMatcher: "",
+          LicenseNumber: this._authState!.license,
+        };
+
+        subscription.unsubscribe();
+        resolve(packageData);
+      } catch (e) {
+        subscription.unsubscribe();
+        reject(e);
+      }
+    });
+  }
+
   async inactivePlantBatches(options: IPlantBatchOptions = {}): Promise<IIndexedPlantBatchData[]> {
     if (store.state.mockDataMode && store.state.flags?.mockedFlags.mockPlantBatches.enabled) {
       // @ts-ignore
@@ -629,6 +660,37 @@ export class DataLoader implements IAtomicService {
 
         subscription.unsubscribe();
         resolve(plantBatches);
+      } catch (e) {
+        subscription.unsubscribe();
+        reject(e);
+      }
+    });
+  }
+
+  async inactivePlantBatch(name: string): Promise<IIndexedPlantBatchData> {
+    const match = (await this.inactivePlantBatches()).find(
+      (plantBatch) => plantBatch.Name === name
+    );
+
+    if (match) {
+      return match;
+    }
+
+    return new Promise(async (resolve, reject) => {
+      const subscription = timer(DATA_LOAD_FETCH_TIMEOUT_MS).subscribe(() =>
+        reject("Inactive plant batch fetch timed out")
+      );
+
+      try {
+        const packageData: IIndexedPlantBatchData = {
+          ...(await this.loadInactivePlantBatch(name)),
+          PlantBatchState: PlantBatchState.INACTIVE,
+          TagMatcher: "",
+          LicenseNumber: this._authState!.license,
+        };
+
+        subscription.unsubscribe();
+        resolve(packageData);
       } catch (e) {
         subscription.unsubscribe();
         reject(e);
@@ -994,12 +1056,10 @@ export class DataLoader implements IAtomicService {
     });
 
     if (cachedData) {
-      console.log(`${keyType} cache hit`);
       return cachedData;
     }
 
     if (!hitNetworkOnCacheMiss) {
-      console.log("Declining to send network request, returning []");
       return [];
     }
 
@@ -1076,12 +1136,10 @@ export class DataLoader implements IAtomicService {
     });
 
     if (cachedData) {
-      console.log(`${keyType} cache hit`);
       return cachedData;
     }
 
     if (!hitNetworkOnCacheMiss) {
-      console.log("Declining to send network request, returning []");
       return [];
     }
 
@@ -2789,6 +2847,39 @@ export class DataLoader implements IAtomicService {
     return plantBatches;
   }
 
+  private async loadPlantBatch(name: string): Promise<IPlantBatchData> {
+    await authManager.authStateOrError();
+
+    const page = 0;
+
+    const plantBatchFilter: IPlantBatchFilter = {
+      name,
+    };
+
+    const body = buildBody({ page, pageSize: 1 }, { plantBatchFilter });
+
+    const response = await this.metrcRequestManagerOrError.getPlantBatches(body);
+
+    if (response.status !== 200) {
+      throw new Error("Request failed");
+    }
+
+    const responseData: ICollectionResponse<IPlantBatchData> = await response.json();
+
+    if (responseData.Data.length !== 1) {
+      if (responseData.Data.length === 0) {
+        throw new DataLoadError(
+          DataLoadErrorType.ZERO_RESULTS,
+          `Metrc indicated ${name} is not available`
+        );
+      } else {
+        throw new Error("Returned multiple plant batches");
+      }
+    }
+
+    return responseData.Data[0];
+  }
+
   private async loadInactivePlantBatches(options: IPlantBatchOptions): Promise<IPlantBatchData[]> {
     await authManager.authStateOrError();
 
@@ -2807,6 +2898,39 @@ export class DataLoader implements IAtomicService {
     store.commit(MutationType.SET_LOADING_MESSAGE, null);
 
     return plantBatches;
+  }
+
+  private async loadInactivePlantBatch(name: string): Promise<IPlantBatchData> {
+    await authManager.authStateOrError();
+
+    const page = 0;
+
+    const plantBatchFilter: IPlantBatchFilter = {
+      name,
+    };
+
+    const body = buildBody({ page, pageSize: 1 }, { plantBatchFilter });
+
+    const response = await this.metrcRequestManagerOrError.getInactivePlantBatches(body);
+
+    if (response.status !== 200) {
+      throw new Error("Request failed");
+    }
+
+    const responseData: ICollectionResponse<IPlantBatchData> = await response.json();
+
+    if (responseData.Data.length !== 1) {
+      if (responseData.Data.length === 0) {
+        throw new DataLoadError(
+          DataLoadErrorType.ZERO_RESULTS,
+          `Metrc indicated ${name} is not available`
+        );
+      } else {
+        throw new Error("Returned multiple plant batches");
+      }
+    }
+
+    return responseData.Data[0];
   }
 
   // Only loads single page of receipts
@@ -2954,6 +3078,21 @@ export class DataLoader implements IAtomicService {
     }
 
     const responseData: ICollectionResponse<IPackageHistoryData> = await response.json();
+
+    return responseData.Data;
+  }
+
+  async plantBatchHistoryByPlantBatchId(plantBatchId: number): Promise<IPlantBatchHistoryData[]> {
+    const page = 0;
+    const body = buildBody({ page, pageSize: DATA_LOAD_PAGE_SIZE });
+
+    const response = await this.metrcRequestManagerOrError.getPlantBatchHistory(body, plantBatchId);
+
+    if (response.status !== 200) {
+      throw new Error("Request failed");
+    }
+
+    const responseData: ICollectionResponse<IPlantBatchHistoryData> = await response.json();
 
     return responseData.Data;
   }

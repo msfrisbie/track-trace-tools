@@ -3,12 +3,13 @@
     <div class="flex flex-col items-stretch gap-1 p-2 ttt-purple-bg text-white">
       <div class="flex flex-row items-center justify-between gap-2">
         <span>
-          <div>{{ pkg.LicenseNumber }}</div>
+          <div>{{ plantBatch.LicenseNumber }}</div>
         </span>
 
-        <b-badge :variant="getBadgeVariant(pkg.PackageState)">{{ pkg.PackageState }}</b-badge>
+        <b-badge :variant="getBadgeVariant(plantBatch.PlantBatchState)">{{
+          plantBatch.PlantBatchState
+        }}</b-badge>
       </div>
-      <!-- <div class="font-bold">{{ pkg.Label }}</div> -->
     </div>
 
     <hr />
@@ -19,33 +20,33 @@
         icon="box"
         style="width: 5rem"
         class="flex-shrink-0"
-        :textClass="pkg.Quantity === 0 ? 'text-red-500' : ''"
-        :text="`${pkg.Quantity} ${pkg.UnitOfMeasureAbbreviation}`"
+        :textClass="plantBatch.UntrackedCount === 0 ? 'text-red-500' : ''"
+        :text="`${plantBatch.UntrackedCount}`"
       />
 
-      <picker-card class="flex-grow" :title="`${pkg.Item.Name}`" :label="pkg.Label" />
+      <picker-card class="flex-grow" :title="`${plantBatch.StrainName}`" :label="plantBatch.Name" />
     </div>
-    <hr />
+    <!-- <hr />
     <div class="p-2 text-gray-500">
-      <template v-if="pkg.ProductionBatchNumber">
+      <template v-if="plantBatch.ProductionBatchNumber">
         <div>
-          {{ pkg.ProductionBatchNumber }}
+          {{ plantBatch.ProductionBatchNumber }}
         </div>
         <hr class="py-1" />
       </template>
-      <div>Packaged by {{ pkg.PackagedByFacilityLicenseNumber }}</div>
-      <div v-if="pkg.ReceivedFromFacilityLicenseNumber">
-        Recieved from {{ pkg.ReceivedFromFacilityLicenseNumber }}
+      <div>Packaged by {{ plantBatch.PackagedByFacilityLicenseNumber }}</div>
+      <div v-if="plantBatch.ReceivedFromFacilityLicenseNumber">
+        Recieved from {{ plantBatch.ReceivedFromFacilityLicenseNumber }}
       </div>
-    </div>
+    </div> -->
   </div>
 </template>
 
 <script lang="ts">
 import PickerCard from "@/components/overlay-widget/shared/PickerCard.vue";
 import PickerIcon from "@/components/overlay-widget/shared/PickerIcon.vue";
-import { PackageState } from "@/consts";
-import { IIndexedPackageData } from "@/interfaces";
+import { PlantBatchState } from "@/consts";
+import { IIndexedPlantBatchData } from "@/interfaces";
 import router from "@/router/index";
 import store from "@/store/page-overlay/index";
 import { unitOfMeasureNameToAbbreviation } from "@/utils/units";
@@ -53,11 +54,11 @@ import Vue from "vue";
 import { mapState } from "vuex";
 
 export default Vue.extend({
-  name: "PackageCard",
+  name: "PlantBatchCard",
   store,
   router,
   props: {
-    pkg: Object as () => IIndexedPackageData,
+    plantBatch: Object as () => IIndexedPlantBatchData,
   },
   components: {
     PickerCard,
@@ -71,14 +72,12 @@ export default Vue.extend({
   },
   methods: {
     unitOfMeasureNameToAbbreviation,
-    getBadgeVariant(packageState: PackageState): string {
-      switch (packageState) {
-        case PackageState.ACTIVE:
+    getBadgeVariant(plantBatchState: PlantBatchState): string {
+      switch (plantBatchState) {
+        case PlantBatchState.ACTIVE:
           return "success";
-        case PackageState.INACTIVE:
+        case PlantBatchState.INACTIVE:
           return "danger";
-        case PackageState.IN_TRANSIT:
-          return "dark";
         default:
           return "light";
       }
@@ -89,9 +88,4 @@ export default Vue.extend({
 });
 </script>
 
-<style type="text/scss" lang="scss" scoped>
-.origin {
-  border-width: 2px;
-  border-style: solid;
-}
-</style>
+<style type="text/scss" lang="scss" scoped></style>

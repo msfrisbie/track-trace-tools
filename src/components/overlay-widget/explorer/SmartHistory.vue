@@ -1,26 +1,24 @@
 <template>
   <div class="flex flex-col items-stretch">
-    <template v-if="explorer.targetType === ExplorerTargetType.PACKAGE">
-      <div
-        class="border border-purple-100 border-solid"
-        v-bind:class="[idx % 2 === 0 ? 'bg-purple-100' : '0']"
-        v-for="(historyEntry, idx) of explorer.history"
-        v-bind:key="historyEntry.RecordedDateTime"
-      >
-        <div class="grid grid-cols-2 p-4 gap-4">
-          <template v-for="description of historyEntry.Descriptions">
-            <div v-bind:key="description">{{ description }}</div>
-            <div v-bind:key="'_' + description">
-              <smart-links :description="description"></smart-links>
-            </div>
-          </template>
-
-          <div class="col-span-2 text-gray-500 text-xs">
-            {{ new Date(historyEntry.RecordedDateTime) }}
+    <div
+      class="border border-purple-100 border-solid"
+      v-bind:class="[idx % 2 === 0 ? 'bg-purple-100' : '0']"
+      v-for="(historyEntry, idx) of explorer.history"
+      v-bind:key="historyEntry.RecordedDateTime"
+    >
+      <div class="grid grid-cols-2 p-4 gap-4">
+        <template v-for="description of historyEntry.Descriptions">
+          <div v-bind:key="description">{{ description }}</div>
+          <div v-bind:key="'_' + description">
+            <smart-links :description="description"></smart-links>
           </div>
+        </template>
+
+        <div class="col-span-2 text-gray-500 text-xs">
+          {{ new Date(historyEntry.RecordedDateTime) }}
         </div>
       </div>
-    </template>
+    </div>
   </div>
 </template>
 

@@ -432,6 +432,7 @@ export interface IPlantBatchOptions extends IDataLoadOptions {
 }
 
 export interface IPlantBatchFilter {
+  name?: string;
   locationName?: string | null;
   strainName?: string | null;
   plantedDateGt?: string | null;

@@ -127,6 +127,7 @@ enum UrlType {
   TRANSFER_DESTINATIONS_BY_TRANSFER_ID,
   DESTINATION_PACKAGES_BY_DESTINATION_ID,
   DESTINATION_TRANSPORTERS_BY_DESTINATION_ID,
+  PLANT_BATCH_HISTORY_BY_PLANT_BATCH_ID,
 }
 
 // function persistedAuthStateOrError(): IAuthState {
@@ -249,6 +250,14 @@ async function buildDynamicUrl(
       }
       return (
         origin({ divertToNullOrigin: false }) + `/api/packages/history?id=${options.packageId}`
+      );
+    case UrlType.PLANT_BATCH_HISTORY_BY_PLANT_BATCH_ID:
+      if (!options || !options.plantBatchId) {
+        throw new Error("Missing required URL options");
+      }
+      return (
+        origin({ divertToNullOrigin: false }) +
+        `/api/plantbatches/history?id=${options.plantBatchId}`
       );
     case UrlType.PACKAGE_HARVEST_HISTORY_BY_PACKAGE_ID:
       if (!options || !options.packageId) {
@@ -835,6 +844,29 @@ export class MetrcRequestManager implements IAtomicService {
     return customFetch(
       await buildDynamicUrl(this.authStateOrError, UrlType.PACKAGE_HARVEST_HISTORY_BY_PACKAGE_ID, {
         packageId,
+      }),
+      {
+        ...DEFAULT_FETCH_POST_OPTIONS,
+        // @ts-ignore
+        headers: {
+          ...(await buildAuthenticationHeaders(this.authStateOrError)),
+          ...JSON_HEADERS,
+        },
+        body,
+        signal,
+      }
+    );
+  }
+
+  async getPlantBatchHistory(body: string, plantBatchId: number, abortTimeout: number = 30000) {
+    const controller = new AbortController();
+    const signal = controller.signal;
+
+    setTimeout(() => controller.abort(), abortTimeout);
+
+    return customFetch(
+      await buildDynamicUrl(this.authStateOrError, UrlType.PLANT_BATCH_HISTORY_BY_PLANT_BATCH_ID, {
+        plantBatchId,
       }),
       {
         ...DEFAULT_FETCH_POST_OPTIONS,

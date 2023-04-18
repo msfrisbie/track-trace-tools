@@ -39,7 +39,8 @@ export interface IExplorerState {
   history: ExplorerTargetHistory | null;
   recent: {
     queryString: string,
-    targetType: ExplorerTargetType
+    targetType: ExplorerTargetType,
+    timestamp: number
   }[]
   // Parents
   //   parentPackageLabels?: string[];

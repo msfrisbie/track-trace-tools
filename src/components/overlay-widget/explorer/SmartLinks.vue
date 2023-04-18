@@ -1,14 +1,11 @@
 <template>
   <div class="flex flex-col items-stretch gap-2">
-    <b-button
+    <smart-link
       v-for="smartLink of smartLinks"
       v-bind:key="smartLink.text"
-      size="sm"
-      class="flex flex-row gap-2 items-center"
-    >
-      <font-awesome-icon :icon="smartLink.icon" size="sm"></font-awesome-icon>
-      <span class="flex-grow text-center">{{ smartLink.text }}</span>
-    </b-button>
+      :text="smartLink.text"
+      :targetType="smartLink.targetType"
+    ></smart-link>
   </div>
 </template>
 
@@ -17,14 +14,10 @@ import { IPluginState } from "@/interfaces";
 import router from "@/router/index";
 import store from "@/store/page-overlay/index";
 import { ExplorerTargetType } from "@/store/page-overlay/modules/explorer/consts";
-import {
-  extractChildPackageLabelOrNull,
-  extractMotherPlantBatchNameOrNull,
-  extractPackagedPlantBatchNameOrNull,
-  extractParentPackageLabelOrNull,
-} from "@/utils/history";
+import { extractPackageLabelOrNull, extractPlantBatchNameOrNull } from "@/utils/history";
 import Vue from "vue";
-import { mapState } from "vuex";
+import { mapActions, mapState } from "vuex";
+import SmartLink from "./SmartLink.vue";
 
 export default Vue.extend({
   name: "SmartLinks",
@@ -33,49 +26,35 @@ export default Vue.extend({
   props: {
     description: String,
   },
-  components: {},
+  components: {
+    SmartLink,
+  },
   computed: {
     ...mapState<IPluginState>({
       explorer: (state: IPluginState) => state.explorer,
     }),
     smartLinks(): {
-      icon: string;
       text: string;
+      targetType: ExplorerTargetType;
     }[] {
       const smartLinks: {
-        icon: string;
         text: string;
+        targetType: ExplorerTargetType;
       }[] = [];
 
-      const parentPackageTag = extractParentPackageLabelOrNull(this.description);
-      if (parentPackageTag) {
+      const packageLabel = extractPackageLabelOrNull(this.description);
+      if (packageLabel) {
         smartLinks.push({
-          icon: "box",
-          text: parentPackageTag,
+          text: packageLabel,
+          targetType: ExplorerTargetType.PACKAGE,
         });
       }
 
-      const childPackageTag = extractChildPackageLabelOrNull(this.description);
-      if (childPackageTag) {
+      const plantBatchName = extractPlantBatchNameOrNull(this.description);
+      if (plantBatchName) {
         smartLinks.push({
-          icon: "box",
-          text: childPackageTag,
-        });
-      }
-
-      const motherPlantBatchName = extractMotherPlantBatchNameOrNull(this.description);
-      if (motherPlantBatchName) {
-        smartLinks.push({
-          icon: "leaf",
-          text: motherPlantBatchName,
-        });
-      }
-
-      const packagedPlantBatchName = extractPackagedPlantBatchNameOrNull(this.description);
-      if (packagedPlantBatchName) {
-        smartLinks.push({
-          icon: "leaf",
-          text: packagedPlantBatchName,
+          text: plantBatchName,
+          targetType: ExplorerTargetType.PLANT_BATCH,
         });
       }
 
@@ -87,7 +66,9 @@ export default Vue.extend({
       ExplorerTargetType,
     };
   },
-  methods: {},
+  methods: {
+    ...mapActions({}),
+  },
   async created() {},
   async mounted() {},
 });

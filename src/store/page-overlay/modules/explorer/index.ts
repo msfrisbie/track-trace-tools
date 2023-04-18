@@ -1,4 +1,10 @@
-import { IIndexedPackageData, IPackageHistoryData, IPluginState } from "@/interfaces";
+import {
+  IIndexedPackageData,
+  IIndexedPlantBatchData,
+  IPackageHistoryData,
+  IPlantBatchHistoryData,
+  IPluginState,
+} from "@/interfaces";
 import { authManager } from "@/modules/auth-manager.module";
 import { DataLoader, getDataLoader } from "@/modules/data-loader/data-loader.module";
 import { facilityManager } from "@/modules/facility-manager.module";
@@ -97,9 +103,10 @@ export const explorerModule = {
         {
           queryString: state.queryString,
           targetType: state.targetType,
+          timestamp: Date.now(),
         },
         ...state.recent,
-      ].slice(0, 25);
+      ].slice(0, 50);
     },
   },
   getters: {
@@ -134,7 +141,24 @@ export const explorerModule = {
         targetType,
       });
     },
-    [ExplorerActions.SUBMIT_QUERY]: async (ctx: ActionContext<IExplorerState, IPluginState>) => {
+    [ExplorerActions.SUBMIT_QUERY]: async (
+      ctx: ActionContext<IExplorerState, IPluginState>,
+      {
+        queryString,
+        targetType,
+      }: {
+        queryString?: string;
+        targetType?: ExplorerTargetType;
+      } = {}
+    ) => {
+      if (queryString) {
+        ctx.commit(ExplorerMutations.SET_QUERY, { queryString });
+      }
+
+      if (targetType) {
+        ctx.commit(ExplorerMutations.SET_TARGET_TYPE, { targetType });
+      }
+
       if (!ctx.state.queryString) {
         throw new Error("Must provide query string");
       }
@@ -164,19 +188,12 @@ export const explorerModule = {
             dataLoader = await getDataLoader(authState);
 
             try {
-              pkg = await dataLoader.activePackage(ctx.state.queryString!);
-            } catch {}
-            if (pkg) {
-              break;
-            }
-            try {
-              pkg = await dataLoader.inactivePackage(ctx.state.queryString!);
-            } catch {}
-            if (pkg) {
-              break;
-            }
-            try {
-              pkg = await dataLoader.inTransitPackage(ctx.state.queryString!, { useCache: false });
+              // @ts-ignore
+              pkg = await Promise.any([
+                dataLoader.activePackage(ctx.state.queryString!),
+                dataLoader.inactivePackage(ctx.state.queryString!),
+                dataLoader.inTransitPackage(ctx.state.queryString!, { useCache: false }),
+              ]);
             } catch {}
             if (pkg) {
               break;
@@ -226,6 +243,80 @@ export const explorerModule = {
 
           ctx.commit(ExplorerMutations.SET_HISTORY, {
             targetHistory: pkgHistory,
+          });
+
+          ctx.commit(ExplorerMutations.SET_STATUS, {
+            status: ExplorerStatus.SUCCESS,
+            statusMessage: "",
+          });
+
+          break;
+        case ExplorerTargetType.PLANT_BATCH:
+          let plantBatch: IIndexedPlantBatchData | null = null;
+
+          for (const license of licenseCache.elements) {
+            const authState = {
+              ...(await authManager.authStateOrError()),
+              license,
+            };
+
+            dataLoader = await getDataLoader(authState);
+
+            try {
+              // @ts-ignore
+              plantBatch = await Promise.any([
+                dataLoader.plantBatch(ctx.state.queryString!),
+                dataLoader.inactivePlantBatch(ctx.state.queryString!),
+              ]);
+            } catch {}
+            if (plantBatch) {
+              break;
+            }
+          }
+
+          if (!plantBatch) {
+            ctx.commit(ExplorerMutations.SET_STATUS, {
+              status: ExplorerStatus.ERROR,
+              statusMessage: "Unable to match plant batch",
+            });
+            return;
+          }
+
+          ctx.commit(ExplorerMutations.SET_TARGET, {
+            target: plantBatch,
+          });
+
+          let plantBatchHistory: IPlantBatchHistoryData[] | null = null;
+
+          for (const license of licenseCache.elements) {
+            const authState = {
+              ...(await authManager.authStateOrError()),
+              license,
+            };
+
+            dataLoader = await getDataLoader(authState);
+
+            try {
+              plantBatchHistory = await dataLoader.plantBatchHistoryByPlantBatchId(plantBatch.Id);
+            } catch {}
+
+            // A license mismatch will return 200 w/ 0 entries
+            if (plantBatchHistory && plantBatchHistory.length > 0) {
+              break;
+            }
+          }
+
+          if (!plantBatchHistory) {
+            ctx.commit(ExplorerMutations.SET_STATUS, {
+              status: ExplorerStatus.ERROR,
+              statusMessage: "Unable to match plant batch history",
+            });
+
+            return;
+          }
+
+          ctx.commit(ExplorerMutations.SET_HISTORY, {
+            targetHistory: plantBatchHistory,
           });
 
           ctx.commit(ExplorerMutations.SET_STATUS, {

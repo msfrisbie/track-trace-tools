@@ -24,16 +24,18 @@
         <template v-if="targetType === ExplorerTargetType.PACKAGE">
           <package-card :pkg="explorer.target"></package-card>
         </template>
+        <template v-if="targetType === ExplorerTargetType.PLANT_BATCH">
+          <plant-batch-card :plantBatch="explorer.target"></plant-batch-card>
+        </template>
       </div>
       <div class="col-span-2" v-if="explorer.history">
-        <template v-if="targetType === ExplorerTargetType.PACKAGE">
-          <smart-history></smart-history>
-        </template>
+        <smart-history></smart-history>
       </div>
       <div class="col-span-3">
         <div>status: {{ explorer.status }}</div>
         <div>statusMessage: {{ explorer.statusMessage }}</div>
         <b-button @click="reset()">RESET</b-button>
+        <explorer-history></explorer-history>
       </div>
     </div>
   </div>
@@ -52,7 +54,9 @@ import {
 import { ExplorerTarget } from "@/store/page-overlay/modules/explorer/interfaces";
 import Vue from "vue";
 import { mapActions, mapState } from "vuex";
+import ExplorerHistory from "./ExplorerHistory.vue";
 import PackageCard from "./PackageCard.vue";
+import PlantBatchCard from "./PlantBatchCard.vue";
 import SmartHistory from "./SmartHistory.vue";
 
 export default Vue.extend({
@@ -62,7 +66,9 @@ export default Vue.extend({
   props: {},
   components: {
     PackageCard,
+    PlantBatchCard,
     SmartHistory,
+    ExplorerHistory,
   },
   computed: {
     ...mapState<IPluginState>({
@@ -74,7 +80,7 @@ export default Vue.extend({
       },
       set(queryString: string) {
         this.$store.dispatch(`explorer/${ExplorerActions.SET_QUERY}`, {
-          queryString: queryString || "",
+          queryString: queryString.trim() || "",
         });
       },
     },
@@ -114,6 +120,10 @@ export default Vue.extend({
         {
           value: ExplorerTargetType.PACKAGE,
           readableText: "Package",
+        },
+        {
+          value: ExplorerTargetType.PLANT_BATCH,
+          readableText: "Plant Batch",
         },
         {
           value: ExplorerTargetType.INCOMING_TRANSFER,

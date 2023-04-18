@@ -1,4 +1,4 @@
-import { METRC_TAG_REGEX_PATTERN } from "@/consts";
+import { METRC_TAG_REGEX_PATTERN, PLANT_BATCH_NAME_REGEX_PATTERN } from "@/consts";
 import { IPackageHistoryData } from "@/interfaces";
 
 export function extractParentPackageLabelOrNull(description: string): string | null {
@@ -24,18 +24,46 @@ export function extractTestSamplePackageLabelOrNull(description: string): string
   return match ? match[1] : null;
 }
 
-export function extractPackagedPlantBatchNameOrNull(description: string): string | null {
-  const matcher = new RegExp(`Plant Batch: (${METRC_TAG_REGEX_PATTERN})`);
-  const match = description.match(matcher);
+export function extractPlantBatchNameOrNull(description: string): string | null {
+  const matchers = [
+    // Order is important here: first match will be retunred
+    new RegExp(`Plant Batch: (${PLANT_BATCH_NAME_REGEX_PATTERN}) > ${METRC_TAG_REGEX_PATTERN}`),
+    new RegExp(`Plant Batch: "(${PLANT_BATCH_NAME_REGEX_PATTERN})" > ${METRC_TAG_REGEX_PATTERN}`),
+    new RegExp(`Plant Batch: (${PLANT_BATCH_NAME_REGEX_PATTERN})`),
+    new RegExp(`Plant Batch \\((${PLANT_BATCH_NAME_REGEX_PATTERN})\\)`),
+    new RegExp(`Plant Batch: "(${PLANT_BATCH_NAME_REGEX_PATTERN})"`),
+    new RegExp(`Plant Batch "(${PLANT_BATCH_NAME_REGEX_PATTERN})"`),
+  ];
+  for (const matcher of matchers) {
+    const match = description.match(matcher);
 
-  return match ? match[1] : null;
+    if (match) {
+      return match[1];
+    }
+  }
+
+  return null;
 }
 
-export function extractMotherPlantBatchNameOrNull(description: string): string | null {
-  const matcher = new RegExp(`from Mother Plant in Plant Batch: "(${METRC_TAG_REGEX_PATTERN})"`);
-  const match = description.match(matcher);
+export function extractPackageLabelOrNull(description: string): string | null {
+  const matchers = [
+    new RegExp(`Plant Batch Package "(${METRC_TAG_REGEX_PATTERN})"`),
+    new RegExp(`Plant Batch: ${PLANT_BATCH_NAME_REGEX_PATTERN} > (${METRC_TAG_REGEX_PATTERN})`),
+    new RegExp(`Plant Batch: "${PLANT_BATCH_NAME_REGEX_PATTERN}" > (${METRC_TAG_REGEX_PATTERN})`),
+    new RegExp(`Related Package's \\((${METRC_TAG_REGEX_PATTERN})\\) Lab Testing set to`),
+    new RegExp(`for Package (${METRC_TAG_REGEX_PATTERN})`),
+    new RegExp(`from Package (${METRC_TAG_REGEX_PATTERN})`),
+    new RegExp(`Packaged into (${METRC_TAG_REGEX_PATTERN})`),
+  ];
+  for (const matcher of matchers) {
+    const match = description.match(matcher);
 
-  return match ? match[1] : null;
+    if (match) {
+      return match[1];
+    }
+  }
+
+  return null;
 }
 
 export function extractTagQuantityPairOrNull(description: string): {

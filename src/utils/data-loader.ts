@@ -318,6 +318,18 @@ export function buildBodyFilter(filterOptions: IFilterOptions | null): ICollecti
   // PlantBatch Filter
   //
 
+
+  if (plantBatchFilter?.name) {
+    filterSet.filters = [
+      ...filterSet.filters,
+      {
+        field: "Name",
+        operator: "eq",
+        value: plantBatchFilter.name,
+      },
+    ];
+  }
+
   if (plantBatchFilter?.locationName) {
     filterSet.filters = [
       ...filterSet.filters,
