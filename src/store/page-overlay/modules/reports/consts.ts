@@ -50,6 +50,16 @@ export const SHEET_FIELDS: { [key: string]: IFieldData[] } = {
       required: true,
     },
     {
+      value: "StrainName",
+      readableName: "Strain",
+      required: false,
+    },
+    {
+      value: "LocationName",
+      readableName: "Location",
+      required: false,
+    },
+    {
       value: "UntrackedCount",
       readableName: "# Plants",
       required: true,
