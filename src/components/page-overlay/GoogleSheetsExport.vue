@@ -1334,6 +1334,13 @@ export default Vue.extend({
           description: "Filter by packaged date",
         },
         {
+          text: "Plant Batches",
+          value: ReportType.IMMATURE_PLANTS,
+          t3plus: false,
+          enabled: true,
+          description: "Filter by planted date",
+        },
+        {
           text: "Mature Plants",
           value: ReportType.MATURE_PLANTS,
           t3plus: false,
