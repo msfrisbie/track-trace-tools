@@ -166,14 +166,14 @@ export async function maybeLoadCogsReportData({
     });
 
     dataLoader = await getDataLoaderByLicense(license);
-    // try {
-    //   const outgoingTransfers = await dataLoader.outgoingTransfers();
-    //   richOutgoingTransfers = [...richOutgoingTransfers, ...outgoingTransfers];
-    // } catch (e) {
-    //   ctx.commit(ReportsMutations.SET_STATUS, {
-    //     statusMessage: { text: "Failed to load outgoing transfers.", level: "warning" },
-    //   });
-    // }
+    try {
+      const outgoingTransfers = await dataLoader.outgoingTransfers();
+      richOutgoingTransfers = [...richOutgoingTransfers, ...outgoingTransfers];
+    } catch (e) {
+      ctx.commit(ReportsMutations.SET_STATUS, {
+        statusMessage: { text: "Failed to load outgoing transfers.", level: "warning" },
+      });
+    }
 
     try {
       const rejectedTransfers = await dataLoader.rejectedTransfers();
@@ -194,53 +194,82 @@ export async function maybeLoadCogsReportData({
     }
   }
 
-  // Assumption: a transfer will not sit around for 90 days
-  const createdDateBufferGt = getIsoDateFromOffset(-90, transferFilter.estimatedDepartureDateGt!);
-  const createdDateBufferLt = getIsoDateFromOffset(90, transferFilter.estimatedDepartureDateLt!);
-
   const [departureDateGt] = transferFilter.estimatedDepartureDateGt!.split("T");
   const [departureDateLt] = getIsoDateFromOffset(1, transferFilter.estimatedDepartureDateLt!).split(
     "T"
   );
 
-  console.log(`Transfers before loose filter: ${richOutgoingTransfers.length}`);
+  // console.log(`Transfers before loose filter: ${richOutgoingTransfers.length}`);
 
-  richOutgoingTransfers = richOutgoingTransfers.filter((richOutgoingTransfer) => {
-    if (richOutgoingTransfer.CreatedDateTime < createdDateBufferGt) {
-      return false;
-    }
+  // richOutgoingTransfers = richOutgoingTransfers.filter((richOutgoingTransfer) => {
+  //   if (richOutgoingTransfer.CreatedDateTime > departureDateLt!) {
+  //     return false;
+  //   }
 
-    if (richOutgoingTransfer.CreatedDateTime > createdDateBufferLt) {
-      return false;
-    }
-    return true;
-  });
+  //   if (richOutgoingTransfer.LastModified < departureDateGt!) {
+  //     return false;
+  //   }
+  //   return true;
+  // });
 
-  console.log(`Transfers after loose filter: ${richOutgoingTransfers.length}`);
+  // console.log(`Transfers after loose filter: ${richOutgoingTransfers.length}`);
 
   ctx.commit(ReportsMutations.SET_STATUS, {
     statusMessage: { text: "Loading destinations....", level: "success" },
   });
 
+  let inflightCount = 0;
+
   const richOutgoingTransferDestinationRequests: Promise<any>[] = [];
 
-  richOutgoingTransfers.map((transfer) =>
+  for (const transfer of richOutgoingTransfers) {
+    inflightCount++;
     richOutgoingTransferDestinationRequests.push(
       getDataLoaderByLicense(transfer.LicenseNumber).then((dataLoader) =>
-        dataLoader.transferDestinations(transfer.Id).then((destinations) => {
-          transfer.outgoingDestinations = destinations;
-        })
+        dataLoader
+          .transferDestinations(transfer.Id)
+          .then((destinations) => {
+            transfer.outgoingDestinations = destinations;
+          })
+          .finally(() => inflightCount--)
       )
-    )
-  );
+    );
+
+    if (richOutgoingTransferDestinationRequests.length % 250 === 0) {
+      await Promise.allSettled(richOutgoingTransferDestinationRequests);
+
+      ctx.commit(ReportsMutations.SET_STATUS, {
+        statusMessage: {
+          text: `Loaded ${richOutgoingTransferDestinationRequests.length} destinations....`,
+          level: "success",
+        },
+        prependMessage: false,
+      });
+    }
+
+    while (inflightCount > 10) {
+      ctx.commit(ReportsMutations.SET_STATUS, {
+        statusMessage: {
+          text: `Waiting for ${inflightCount} requests to finish....`,
+          level: "success",
+        },
+        prependMessage: false,
+      });
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+    }
+  }
 
   const destinationResults = await Promise.allSettled(richOutgoingTransferDestinationRequests);
 
-  console.log(
-    `Failed destination requests: ${
-      destinationResults.filter((x) => x.status !== "fulfilled").length
-    }`
-  );
+  debugger;
+
+  ctx.commit(ReportsMutations.SET_STATUS, {
+    statusMessage: {
+      text: `Loaded ${richOutgoingTransferDestinationRequests.length} destinations`,
+      level: "success",
+    },
+    prependMessage: false,
+  });
 
   ctx.commit(ReportsMutations.SET_STATUS, {
     statusMessage: { text: "Loading manifest packages...", level: "success" },
@@ -251,12 +280,8 @@ export async function maybeLoadCogsReportData({
   const eligibleTransfers: IIndexedRichOutgoingTransferData[] = [];
   const wholesaleTransfers: IIndexedRichOutgoingTransferData[] = [];
 
-  console.log({ departureDateGt, departureDateLt });
-
-  console.log(`Total transfers: ${richOutgoingTransfers.length}`);
-
-  richOutgoingTransfers.map((transfer) =>
-    transfer.outgoingDestinations?.map((destination) => {
+  for (const transfer of richOutgoingTransfers) {
+    for (const destination of transfer.outgoingDestinations || []) {
       const isWholesaleTransfer: boolean = destination.ShipmentTypeName.includes("Wholesale");
 
       const isEligibleTransfer: boolean =
@@ -294,13 +319,34 @@ export async function maybeLoadCogsReportData({
           })
         )
       );
-    })
-  );
 
-  console.log(`Total eligible transfers: ${eligibleTransfers.length}`);
-  console.log(`Total wholesale transfers: ${wholesaleTransfers.length}`);
+      if (packageRequests.length % 50 === 0) {
+        await Promise.allSettled(packageRequests);
+
+        ctx.commit(ReportsMutations.SET_STATUS, {
+          statusMessage: {
+            text: `Loaded ${packageRequests.length} manifests....`,
+            level: "success",
+          },
+          prependMessage: false,
+        });
+      }
+    }
+  }
+
+  // console.log(`Total eligible transfers: ${eligibleTransfers.length}`);
+  // console.log(`Total wholesale transfers: ${wholesaleTransfers.length}`);
 
   const packageResults = await Promise.allSettled(packageRequests);
+
+  ctx.commit(ReportsMutations.SET_STATUS, {
+    statusMessage: {
+      text: `Loaded ${packageRequests.length} manifests`,
+      level: "success",
+    },
+  });
+
+  debugger;
 
   console.log(
     `Failed package requests: ${packageResults.filter((x) => x.status !== "fulfilled").length}`
@@ -432,7 +478,6 @@ export async function maybeLoadCogsReportData({
   // Load all history objects into map
   const packageHistoryRequests: Promise<any>[] = [];
 
-  let counter = 0;
   for (const pkg of manifestGraphPackageMap.values()) {
     if (pkg.historyExtracts) {
       // Already generated history data
@@ -450,9 +495,8 @@ export async function maybeLoadCogsReportData({
       )
     );
 
-    if (counter++ > 250) {
+    if (packageHistoryRequests.length % 250 === 0) {
       await Promise.allSettled(packageHistoryRequests);
-      counter = 0;
     }
   }
 

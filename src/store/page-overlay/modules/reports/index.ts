@@ -51,7 +51,11 @@ export const reportsModule = {
   mutations: {
     [ReportsMutations.SET_STATUS](
       state: IReportsState,
-      { status, statusMessage }: { status?: ReportStatus; statusMessage?: IStatusMessage }
+      {
+        status,
+        statusMessage,
+        prependMessage = true,
+      }: { status?: ReportStatus; statusMessage?: IStatusMessage; prependMessage?: boolean }
     ) {
       if (status) {
         state.status = status;
@@ -62,7 +66,7 @@ export const reportsModule = {
       }
 
       if (statusMessage) {
-        if (state.statusMessage) {
+        if (state.statusMessage && prependMessage) {
           state.statusMessageHistory = [state.statusMessage, ...state.statusMessageHistory];
         }
 

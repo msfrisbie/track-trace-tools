@@ -86,6 +86,8 @@
                   />
                 </div>
               </div>
+              <hr />
+              <archive-widget></archive-widget>
             </div>
           </template>
 
@@ -1167,6 +1169,7 @@ import { addPackageReport, packageFormFiltersFactory } from "@/utils/reports/pac
 import _ from "lodash";
 import Vue from "vue";
 import { mapActions, mapState } from "vuex";
+import ArchiveWidget from "../shared/ArchiveWidget.vue";
 
 interface IReportOption {
   text: string;
@@ -1182,7 +1185,9 @@ export default Vue.extend({
   store,
   router,
   props: {},
-  components: {},
+  components: {
+    ArchiveWidget,
+  },
   computed: {
     ...mapState({
       authState: (state: any) => state.pluginAuth.authState,
@@ -1700,6 +1705,7 @@ export default Vue.extend({
 
       this.generateSpreadsheet({ reportConfig });
     },
+    generateArchive() {},
   },
 
   watch: {

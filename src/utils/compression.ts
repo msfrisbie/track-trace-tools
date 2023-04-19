@@ -31,7 +31,7 @@ export class CompressedMetrcTags implements ICompressedMetrcTagRanges {
     {
       tagExtractor,
       propertyMask,
-      rawCollection
+      rawCollection,
     }: {
       tagExtractor: (rawData: Object) => string;
       propertyMask: (rawData: Object) => Object;
@@ -40,13 +40,13 @@ export class CompressedMetrcTags implements ICompressedMetrcTagRanges {
     includeRawData: boolean = true
   ) {
     const sortedMaskedCollection: IFormattedTagData[] = rawCollection
-      .map(data => {
+      .map((data) => {
         const tag = tagExtractor(data);
         const maskedData = propertyMask(data);
 
         let parsed: IFormattedTagData = {
           tag,
-          maskedData
+          maskedData,
         };
 
         if (includeRawData) {
@@ -57,7 +57,7 @@ export class CompressedMetrcTags implements ICompressedMetrcTagRanges {
       })
       .sort((a, b) => (a.tag > b.tag ? 1 : -1));
 
-    sortedMaskedCollection.map(x => this.insert(x));
+    sortedMaskedCollection.map((x) => this.insert(x));
 
     this._compressedTagRanges.sort((a, b) => (a.startTag > b.startTag ? 1 : -1));
   }
@@ -96,7 +96,7 @@ export class CompressedMetrcTags implements ICompressedMetrcTagRanges {
       startTag: data.tag,
       endTag: data.tag,
       maskedData: data.maskedData,
-      rawData: data.rawData
+      rawData: data.rawData,
     });
   }
 
@@ -105,7 +105,7 @@ export class CompressedMetrcTags implements ICompressedMetrcTagRanges {
       return isTagInsidePair({
         startTag: compressedTagRange.startTag,
         endTag: compressedTagRange.endTag,
-        targetTag: tag
+        targetTag: tag,
       });
     });
   }
@@ -122,4 +122,92 @@ export class CompressedMetrcTags implements ICompressedMetrcTagRanges {
   // constructor() {
 
   // }
+}
+
+export function compressJSON<T>(
+  expanded: T[],
+  keys?: string[]
+): { compressed: any[][]; keys: string[] } {
+  if (expanded.length === 0) {
+    throw new Error("Cannot compress empty array");
+  }
+
+  if (!keys) {
+    keys = Object.keys(expanded[0]);
+  }
+
+  keys.sort();
+
+  const compressed: any[][] = [];
+
+  for (const obj of expanded) {
+    // @ts-ignore
+    compressed.push(keys.map((key) => obj[key]));
+  }
+
+  return { compressed, keys };
+}
+
+export class CompressedData<T> {
+  data: any[][];
+  keys: string[];
+  indexProperty: string;
+  index: Map<string, number>;
+
+  constructor(data: any[][], keys: string[], indexProperty: string) {
+    this.data = data;
+    this.keys=keys;
+    this.indexProperty = indexProperty;
+    this.index = new Map<string, number>();
+
+    const j = keys.indexOf(indexProperty);
+
+    for (let i = 0; i < data.length; ++i) {
+      this.index.set(data[i][j], i);
+    }
+  }
+
+  findOrNull(key: string): T | null {
+    const idx = this.index.get(key);
+
+    if (idx === undefined) {
+      return null;
+    }
+
+    return this.arrayToObject(this.data[idx]);
+  }
+
+  arrayToObject<T>(input: any): T {
+    const output: any = {};
+    for (const [k, idx] of Object.entries(this.keys)) {
+      output[k] = input[idx];
+    } 
+    return output as T;
+  }
+}
+
+export function getCompressedValue({
+  object,
+  property,
+  keys,
+}: {
+  object: any[];
+  property: string;
+  keys: string[];
+}) {
+  return object[keys.indexOf(property)];
+}
+
+export function setCompressedValue({
+  object,
+  keys,
+  property,
+  value,
+}: {
+  object: any[];
+  keys: string[];
+  property: string;
+  value: any;
+}) {
+  object[keys.indexOf(property)] = value;
 }

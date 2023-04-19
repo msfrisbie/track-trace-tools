@@ -779,16 +779,19 @@ export type IUnionRichIndexedPackageData =
   | IRichIndexedPackageData
   | IRichIndexedDestinationPackageData;
 
-export interface ISimpleCogsPackageData {
+export interface ISimplePackageData {
   LicenseNumber: string;
   Id: number;
   PackageState: PackageState;
   Label: string;
   ItemName: string;
-  manifest: boolean;
-  manifestGraph: boolean;
   SourcePackageLabels: string;
   ProductionBatchNumber: string | null;
+}
+
+export interface ISimpleCogsPackageData extends ISimplePackageData {
+  manifest: boolean;
+  manifestGraph: boolean;
   historyExtracts?: {
     parentPackageLabels: string[];
     tagQuantityPairs: { tag: string; quantity: number }[];
