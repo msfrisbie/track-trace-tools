@@ -789,6 +789,22 @@ export interface ISimplePackageData {
   ProductionBatchNumber: string | null;
 }
 
+export interface ISimpleOutgoingTransferData {
+  LicenseNumber: string;
+  ManifestNumber: string;
+  Id: number;
+  TransferState: TransferState;
+  Destinations: {
+    Id: number;
+    Type: string;
+    ETD: string;
+  }[];
+}
+
+export interface ISimpleTransferPackage {
+  
+}
+
 export interface ISimpleCogsPackageData extends ISimplePackageData {
   manifest: boolean;
   manifestGraph: boolean;

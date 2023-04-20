@@ -30,16 +30,18 @@
 </template>
 
 <script lang="ts">
+import { TransferState } from "@/consts";
 import {
   IIndexedPackageData,
   IIndexedRichOutgoingTransferData,
+  ISimpleOutgoingTransferData,
   ISimplePackageData,
 } from "@/interfaces";
 import { DataLoader, getDataLoaderByLicense } from "@/modules/data-loader/data-loader.module";
 import { facilityManager } from "@/modules/facility-manager.module";
 import router from "@/router/index";
 import store from "@/store/page-overlay/index";
-import { CompressedDataWrapper, compressJSON, getCompressedValue } from "@/utils/compression";
+import { CompressedDataWrapper, compressJSON } from "@/utils/compression";
 import { readJSONFile } from "@/utils/file";
 import {
   extractParentPackageLabelsFromHistory,
@@ -192,39 +194,27 @@ export default Vue.extend({
 
           this.$data.message = `Processing ${rawTransfers.length} inactive outgoing transfers...`;
 
-          const { compressed, keys } = compressJSON(
+          const wrapper = compressJSON<ISimpleOutgoingTransferData>(
             rawTransfers.map((transfer) => ({
               LicenseNumber: transfer.LicenseNumber,
               ManifestNumber: transfer.ManifestNumber,
               Id: transfer.Id,
               TransferState: transfer.TransferState,
               Destinations: [],
-            }))
+            })),
+            "ManifestNumber"
           );
 
-          archive.transfers = compressed;
-          archive.transfersKeys = keys;
+          archive.transfers = wrapper.data;
+          archive.transfersKeys = wrapper.keys;
 
           const transferDestinationRequests: Promise<any>[] = [];
 
-          const DestinationKey = keys.indexOf("Destinations");
-
-          for (const transfer of archive.transfers) {
-            const licenseNumber = getCompressedValue({
-              object: transfer,
-              property: "LicenseNumber",
-              keys: archive.transfersKeys,
-            });
-            const transferId = getCompressedValue({
-              object: transfer,
-              property: "Id",
-              keys: archive.transfersKeys,
-            });
-
+          for (const transfer of wrapper) {
             transferDestinationRequests.push(
-              getDataLoaderByLicense(licenseNumber).then((dataLoader) =>
-                dataLoader.transferDestinations(transferId).then((destinations) => {
-                  transfer[DestinationKey] = destinations.map((destination) => ({
+              getDataLoaderByLicense(transfer.LicenseNumber).then((dataLoader) =>
+                dataLoader.transferDestinations(transfer.Id).then((destinations) => {
+                  transfer.Destinations = destinations.map((destination) => ({
                     Id: destination.Id,
                     Type: destination.ShipmentTypeName,
                     ETD: destination.EstimatedDepartureDateTime,
@@ -249,33 +239,23 @@ export default Vue.extend({
 
           const rawTransferPackages: any[] = [];
 
-          for (const transfer of archive.transfers) {
-            const licenseNumber = getCompressedValue({
-              object: transfer,
-              property: "LicenseNumber",
-              keys: archive.transfersKeys,
-            });
-            const manifestNumber = getCompressedValue({
-              object: transfer,
-              property: "manifestNumber",
-              keys: archive.transfersKeys,
-            });
-            const destinations = getCompressedValue({
-              object: transfer,
-              property: "Destinations",
-              keys: archive.transfersKeys,
-            });
+          const wrapper = new CompressedDataWrapper<ISimpleOutgoingTransferData>(
+            archive.transfers,
+            "ManifestNumber",
+            archive.transfersKeys
+          );
 
-            for (const destination of destinations) {
+          for (const transfer of wrapper) {
+            for (const destination of transfer.Destinations) {
               packageRequests.push(
-                getDataLoaderByLicense(licenseNumber).then((dataLoader) =>
+                getDataLoaderByLicense(transfer.LicenseNumber).then((dataLoader) =>
                   dataLoader.destinationPackages(destination.Id).then((destinationPackages) => {
                     for (const pkg of destinationPackages) {
                       rawTransferPackages.push({
                         ETD: destination.ETD,
                         Type: destination.Type,
-                        ManifestNumber: manifestNumber,
-                        LicenseNumber: licenseNumber,
+                        ManifestNumber: transfer.ManifestNumber,
+                        LicenseNumber: transfer.LicenseNumber,
                         Id: getId(pkg),
                         PackageState: pkg.PackageState,
                         Label: getLabel(pkg),
@@ -299,7 +279,7 @@ export default Vue.extend({
 
           this.$data.message = `Processing ${rawTransferPackages.length} manifest packages...`;
 
-          const { compressed, keys } = compressJSON(rawTransferPackages);
+          const wrapper = compressJSON<ISimpleTransferPackage>(rawTransferPackages);
 
           archive.transfersPackages = compressed;
           archive.transfersPackagesKeys = keys;
