@@ -1,4 +1,4 @@
-import { CompressedMetrcTags } from "./compression";
+import { CompressedMetrcTags, compressJSON } from "./compression";
 
 describe("compression.ts", () => {
   it("has the correct version", () => {
@@ -12,7 +12,7 @@ describe("compression.ts", () => {
       { tag: "1AFF00000000000000001236", jake: "hsu", foo: "bar" },
       { tag: "1AFF00000000000000001234", jake: "hsu", foo: "bar" },
       { tag: "1AFF00000000000000001235", jake: "hsu", foo: "bar" },
-      { tag: "1AFF00000000000000001237", jake: "hsu", foo: "bar" }
+      { tag: "1AFF00000000000000001237", jake: "hsu", foo: "bar" },
     ];
 
     const tagExtractor = (x: any) => x.tag;
@@ -23,7 +23,7 @@ describe("compression.ts", () => {
     compressedMetrcTags.insertCollection({
       tagExtractor,
       propertyMask,
-      rawCollection
+      rawCollection,
     });
 
     expect(compressedMetrcTags.compressedTagRanges).toEqual([
@@ -31,10 +31,10 @@ describe("compression.ts", () => {
         startTag: "1AFF00000000000000001234",
         endTag: "1AFF00000000000000001237",
         maskedData: {
-          foo: "bar"
+          foo: "bar",
         },
-        rawData: rawCollection[1]
-      }
+        rawData: rawCollection[1],
+      },
     ]);
   });
 
@@ -43,7 +43,7 @@ describe("compression.ts", () => {
       { tag: "1AFF00000000000000001236", jake: "hsu", foo: "baz" },
       { tag: "1AFF00000000000000001234", jake: "hsu", foo: "bar" },
       { tag: "1AFF00000000000000001235", jake: "hsu", foo: "bar" },
-      { tag: "1AFF00000000000000001237", jake: "hsu", foo: "baz" }
+      { tag: "1AFF00000000000000001237", jake: "hsu", foo: "baz" },
     ];
 
     const tagExtractor = (x: any) => x.tag;
@@ -54,7 +54,7 @@ describe("compression.ts", () => {
     compressedMetrcTags.insertCollection({
       tagExtractor,
       propertyMask,
-      rawCollection
+      rawCollection,
     });
 
     expect(compressedMetrcTags.compressedTagRanges).toEqual([
@@ -62,18 +62,18 @@ describe("compression.ts", () => {
         startTag: "1AFF00000000000000001234",
         endTag: "1AFF00000000000000001235",
         maskedData: {
-          foo: "bar"
+          foo: "bar",
         },
-        rawData: rawCollection[1]
+        rawData: rawCollection[1],
       },
       {
         startTag: "1AFF00000000000000001236",
         endTag: "1AFF00000000000000001237",
         maskedData: {
-          foo: "baz"
+          foo: "baz",
         },
-        rawData: rawCollection[0]
-      }
+        rawData: rawCollection[0],
+      },
     ]);
   });
 
@@ -82,7 +82,7 @@ describe("compression.ts", () => {
       { tag: "1ADD00000000000000001236", jake: "hsu", foo: "bar" },
       { tag: "1AFF00000000000000001234", jake: "hsu", foo: "bar" },
       { tag: "1AFF00000000000000001235", jake: "hsu", foo: "bar" },
-      { tag: "1ADD00000000000000001237", jake: "hsu", foo: "bar" }
+      { tag: "1ADD00000000000000001237", jake: "hsu", foo: "bar" },
     ];
 
     const tagExtractor = (x: any) => x.tag;
@@ -93,7 +93,7 @@ describe("compression.ts", () => {
     compressedMetrcTags.insertCollection({
       tagExtractor,
       propertyMask,
-      rawCollection
+      rawCollection,
     });
 
     expect(compressedMetrcTags.compressedTagRanges).toEqual([
@@ -101,18 +101,18 @@ describe("compression.ts", () => {
         startTag: "1ADD00000000000000001236",
         endTag: "1ADD00000000000000001237",
         maskedData: {
-          foo: "bar"
+          foo: "bar",
         },
-        rawData: rawCollection[0]
+        rawData: rawCollection[0],
       },
       {
         startTag: "1AFF00000000000000001234",
         endTag: "1AFF00000000000000001235",
         maskedData: {
-          foo: "bar"
+          foo: "bar",
         },
-        rawData: rawCollection[1]
-      }
+        rawData: rawCollection[1],
+      },
     ]);
   });
 
@@ -121,7 +121,7 @@ describe("compression.ts", () => {
       { tag: "1AFF00000000000000001236", jake: "hsu", foo: "bar" },
       { tag: "1AFF00000000000000001234", jake: "hsu", foo: "bar" },
       { tag: "1AFF00000000000000001235", jake: "hsu", foo: "bar" },
-      { tag: "1AFF00000000000000001236", jake: "hsu", foo: "baz" }
+      { tag: "1AFF00000000000000001236", jake: "hsu", foo: "baz" },
     ];
 
     const tagExtractor = (x: any) => x.tag;
@@ -132,7 +132,7 @@ describe("compression.ts", () => {
     compressedMetrcTags.insertCollection({
       tagExtractor,
       propertyMask,
-      rawCollection
+      rawCollection,
     });
 
     expect(compressedMetrcTags.compressedTagRanges).toEqual([
@@ -140,18 +140,18 @@ describe("compression.ts", () => {
         startTag: "1AFF00000000000000001234",
         endTag: "1AFF00000000000000001236",
         maskedData: {
-          foo: "bar"
+          foo: "bar",
         },
-        rawData: rawCollection[1]
+        rawData: rawCollection[1],
       },
       {
         startTag: "1AFF00000000000000001236",
         endTag: "1AFF00000000000000001236",
         maskedData: {
-          foo: "baz"
+          foo: "baz",
         },
-        rawData: rawCollection[3]
-      }
+        rawData: rawCollection[3],
+      },
     ]);
   });
 
@@ -161,7 +161,7 @@ describe("compression.ts", () => {
       { tag: "1AFF00000000000000001234", jake: "hsu", foo: "bar" },
       { tag: "1AFF00000000000000001235", jake: "hsu", foo: "bar" },
       { tag: "1AFF00000000000000001236", jake: "hsu", foo: "baz" },
-      { tag: "1AFF00000000000000001237", jake: "hsu", foo: "qux" }
+      { tag: "1AFF00000000000000001237", jake: "hsu", foo: "qux" },
     ];
 
     const tagExtractor = (x: any) => x.tag;
@@ -172,7 +172,7 @@ describe("compression.ts", () => {
     compressedMetrcTags.insertCollection({
       tagExtractor,
       propertyMask,
-      rawCollection
+      rawCollection,
     });
 
     expect(compressedMetrcTags.find("1AFF00000000000000001236")).toEqual([
@@ -180,21 +180,56 @@ describe("compression.ts", () => {
         startTag: "1AFF00000000000000001234",
         endTag: "1AFF00000000000000001236",
         maskedData: {
-          foo: "bar"
+          foo: "bar",
         },
-        rawData: rawCollection[1]
+        rawData: rawCollection[1],
       },
       {
         startTag: "1AFF00000000000000001236",
         endTag: "1AFF00000000000000001236",
         maskedData: {
-          foo: "baz"
+          foo: "baz",
         },
-        rawData: rawCollection[3]
-      }
+        rawData: rawCollection[3],
+      },
     ]);
   });
 
   // TODO different maps
   // TODO duplicate tags
+
+  it("Compresses data correctly", () => {
+    const expandedData = [
+      {
+        foo: 1,
+        bar: "two",
+        baz: 3,
+      },
+      {
+        foo: 4,
+        bar: "five",
+        baz: null,
+      },
+      {
+        foo: 7,
+        bar: "eight",
+        baz: 9,
+      },
+    ];
+
+    const wrapper = compressJSON(expandedData, "foo", ["foo", "bar"]);
+
+    expect(wrapper.data).toEqual([
+      ["two", 1],
+      ["five", 4],
+      ["eight", 7],
+    ]);
+    expect(wrapper.findOrNull(4)).toEqual({
+      foo: 4,
+      bar: "five",
+    });
+    expect(wrapper.findOrNull(12)).toEqual(null);
+
+    expect([...wrapper]).toEqual(expandedData.map(({ foo, bar }) => ({ foo, bar })));
+  });
 });

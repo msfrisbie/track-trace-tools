@@ -39,7 +39,7 @@ import { DataLoader, getDataLoaderByLicense } from "@/modules/data-loader/data-l
 import { facilityManager } from "@/modules/facility-manager.module";
 import router from "@/router/index";
 import store from "@/store/page-overlay/index";
-import { compressJSON, getCompressedValue, setCompressedValue } from "@/utils/compression";
+import { CompressedDataWrapper, compressJSON, getCompressedValue } from "@/utils/compression";
 import { readJSONFile } from "@/utils/file";
 import {
   extractParentPackageLabelsFromHistory,
@@ -73,12 +73,6 @@ export default Vue.extend({
   },
   methods: {
     async inspectFile(e: any) {
-      //   if (!this.$data.existingArchive) {
-      //       console.log(e);
-      //     return;
-      //   }
-      console.log(e);
-
       console.log(await readJSONFile(e.target.files[0]));
     },
     async generateArchive() {
@@ -90,22 +84,22 @@ export default Vue.extend({
 
         const archive: {
           licenses: string[];
-          inactivePackages: any[];
-          inactivePackagesKeys: string[];
-          inactiveOutgoingTransfers: any[];
-          inactiveOutgoingTransfersKeys: string[];
-          inactiveOutgoingTransfersPackages: any[];
-          inactiveOutgoingTransfersPackagesKeys: string[];
+          packages: any[];
+          packagesKeys: string[];
+          transfers: any[];
+          transfersKeys: string[];
+          transfersPackages: any[];
+          transfersPackagesKeys: string[];
         } = this.$data.existingArchive
           ? ((await readJSONFile(this.$data.existingArchive)) as any)
           : {
               licenses: [],
-              inactivePackages: [],
-              inactivePackagesKeys: [],
-              inactiveOutgoingTransfers: [],
-              inactiveOutgoingTransfersKeys: [],
-              inactiveOutgoingTransfersPackages: [],
-              inactiveOutgoingTransfersPackagesKeys: [],
+              packages: [],
+              packagesKeys: [],
+              transfers: [],
+              transfersKeys: [],
+              transfersPackages: [],
+              transfersPackagesKeys: [],
             };
 
         archive.licenses = (await facilityManager.ownedFacilitiesOrError()).map(
@@ -117,21 +111,18 @@ export default Vue.extend({
         if (this.$data.loadInactivePackages) {
           this.$data.message = "Loading inactive packages...";
 
-          let rawInactivePackages: IIndexedPackageData[] = [];
+          let rawPackages: IIndexedPackageData[] = [];
 
           for (const license of archive.licenses) {
             dataLoader = await getDataLoaderByLicense(license);
 
-            rawInactivePackages = [
-              ...rawInactivePackages,
-              ...(await dataLoader!.inactivePackages()),
-            ];
+            rawPackages = [...rawPackages, ...(await dataLoader!.inactivePackages())];
           }
 
-          this.$data.message = `Processing ${rawInactivePackages.length} inactive packages...`;
+          this.$data.message = `Processing ${rawPackages.length} inactive packages...`;
 
-          const { compressed, keys } = compressJSON<ISimplePackageData>(
-            rawInactivePackages.map((pkg) => ({
+          const wrapper = compressJSON<ISimplePackageData>(
+            rawPackages.map((pkg) => ({
               LicenseNumber: pkg.LicenseNumber,
               Id: getId(pkg),
               PackageState: pkg.PackageState,
@@ -141,11 +132,12 @@ export default Vue.extend({
               ProductionBatchNumber: pkg.ProductionBatchNumber,
               ParentPackageLabels: null,
               TagQuantityPairs: null,
-            }))
+            })),
+            "Label"
           );
 
-          archive.inactivePackages = compressed;
-          archive.inactivePackagesKeys = keys;
+          archive.packages = wrapper.data;
+          archive.packagesKeys = wrapper.keys;
         }
 
         if (this.$data.loadInactivePackagesHistory) {
@@ -153,34 +145,27 @@ export default Vue.extend({
 
           const packageHistoryRequests: Promise<any>[] = [];
 
-          for (const pkg of archive.inactivePackages) {
-            const licenseNumber = getCompressedValue({
-              object: pkg,
-              property: "LicenseNumber",
-              keys: archive.inactivePackagesKeys,
-            });
-            const id = getCompressedValue({
-              object: pkg,
-              property: "Id",
-              keys: archive.inactivePackagesKeys,
-            });
+          const wrapper = new CompressedDataWrapper<ISimplePackageData>(
+            archive.packages,
+            "Label",
+            archive.packagesKeys
+          );
 
+          for (const pkg of wrapper) {
             packageHistoryRequests.push(
-              getDataLoaderByLicense(licenseNumber).then((dataLoader) =>
-                dataLoader.packageHistoryByPackageId(id).then((history) => {
-                  setCompressedValue({
-                    object: pkg,
-                    property: "ParentPackageLabels",
-                    keys: archive.inactivePackagesKeys,
-                    value: extractParentPackageLabelsFromHistory(history),
-                  });
+              getDataLoaderByLicense(pkg.LicenseNumber).then((dataLoader) =>
+                dataLoader.packageHistoryByPackageId(pkg.Id).then((history) => {
+                  wrapper.write(
+                    pkg.Label,
+                    "ParentPackageLabels",
+                    extractParentPackageLabelsFromHistory(history)
+                  );
 
-                  setCompressedValue({
-                    object: pkg,
-                    property: "TagQuantityPairs",
-                    keys: archive.inactivePackagesKeys,
-                    value: extractTagQuantityPairsFromHistory(history),
-                  });
+                  wrapper.write(
+                    pkg.Label,
+                    "TagQuantityPairs",
+                    extractTagQuantityPairsFromHistory(history)
+                  );
                 })
               )
             );
@@ -197,21 +182,18 @@ export default Vue.extend({
         if (this.$data.loadInactiveOutgoingTransfers) {
           this.$data.message = "Loading inactive outgoing transfers...";
 
-          let rawInactiveOutgoingTransfers: IIndexedRichOutgoingTransferData[] = [];
+          let rawTransfers: IIndexedRichOutgoingTransferData[] = [];
 
           for (const license of archive.licenses) {
             dataLoader = await getDataLoaderByLicense(license);
 
-            rawInactiveOutgoingTransfers = [
-              ...rawInactiveOutgoingTransfers,
-              ...(await dataLoader!.outgoingInactiveTransfers()),
-            ];
+            rawTransfers = [...rawTransfers, ...(await dataLoader!.outgoingInactiveTransfers())];
           }
 
-          this.$data.message = `Processing ${rawInactiveOutgoingTransfers.length} inactive outgoing transfers...`;
+          this.$data.message = `Processing ${rawTransfers.length} inactive outgoing transfers...`;
 
           const { compressed, keys } = compressJSON(
-            rawInactiveOutgoingTransfers.map((transfer) => ({
+            rawTransfers.map((transfer) => ({
               LicenseNumber: transfer.LicenseNumber,
               ManifestNumber: transfer.ManifestNumber,
               Id: transfer.Id,
@@ -220,23 +202,23 @@ export default Vue.extend({
             }))
           );
 
-          archive.inactiveOutgoingTransfers = compressed;
-          archive.inactiveOutgoingTransfersKeys = keys;
+          archive.transfers = compressed;
+          archive.transfersKeys = keys;
 
           const transferDestinationRequests: Promise<any>[] = [];
 
           const DestinationKey = keys.indexOf("Destinations");
 
-          for (const transfer of archive.inactiveOutgoingTransfers) {
+          for (const transfer of archive.transfers) {
             const licenseNumber = getCompressedValue({
               object: transfer,
               property: "LicenseNumber",
-              keys: archive.inactiveOutgoingTransfersKeys,
+              keys: archive.transfersKeys,
             });
             const transferId = getCompressedValue({
               object: transfer,
               property: "Id",
-              keys: archive.inactiveOutgoingTransfersKeys,
+              keys: archive.transfersKeys,
             });
 
             transferDestinationRequests.push(
@@ -267,21 +249,21 @@ export default Vue.extend({
 
           const rawTransferPackages: any[] = [];
 
-          for (const transfer of archive.inactiveOutgoingTransfers) {
+          for (const transfer of archive.transfers) {
             const licenseNumber = getCompressedValue({
               object: transfer,
               property: "LicenseNumber",
-              keys: archive.inactiveOutgoingTransfersKeys,
+              keys: archive.transfersKeys,
             });
             const manifestNumber = getCompressedValue({
               object: transfer,
               property: "manifestNumber",
-              keys: archive.inactiveOutgoingTransfersKeys,
+              keys: archive.transfersKeys,
             });
             const destinations = getCompressedValue({
               object: transfer,
               property: "Destinations",
-              keys: archive.inactiveOutgoingTransfersKeys,
+              keys: archive.transfersKeys,
             });
 
             for (const destination of destinations) {
@@ -319,8 +301,8 @@ export default Vue.extend({
 
           const { compressed, keys } = compressJSON(rawTransferPackages);
 
-          archive.inactiveOutgoingTransfersPackages = compressed;
-          archive.inactiveOutgoingTransfersPackagesKeys = keys;
+          archive.transfersPackages = compressed;
+          archive.transfersPackagesKeys = keys;
         }
 
         this.$data.message = "Writing archive to file...";

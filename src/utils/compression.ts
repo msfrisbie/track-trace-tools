@@ -126,8 +126,9 @@ export class CompressedMetrcTags implements ICompressedMetrcTagRanges {
 
 export function compressJSON<T>(
   expanded: T[],
+  indexProperty: string,
   keys?: string[]
-): { compressed: any[][]; keys: string[] } {
+): CompressedDataWrapper<T> {
   if (expanded.length === 0) {
     throw new Error("Cannot compress empty array");
   }
@@ -145,44 +146,64 @@ export function compressJSON<T>(
     compressed.push(keys.map((key) => obj[key]));
   }
 
-  return { compressed, keys };
+  return new CompressedDataWrapper<T>(compressed, indexProperty, keys);
 }
 
-export class CompressedData<T> {
+export class CompressedDataWrapper<T> {
   data: any[][];
   keys: string[];
   indexProperty: string;
-  index: Map<string, number>;
+  index: Map<any, number>;
 
-  constructor(data: any[][], keys: string[], indexProperty: string) {
+  constructor(data: any[][], indexProperty: string, keys: string[]) {
     this.data = data;
-    this.keys=keys;
+    this.keys = keys;
     this.indexProperty = indexProperty;
-    this.index = new Map<string, number>();
+    this.index = new Map<any, number>();
 
-    const j = keys.indexOf(indexProperty);
+    const columnIdx = this.keys.indexOf(indexProperty);
 
-    for (let i = 0; i < data.length; ++i) {
-      this.index.set(data[i][j], i);
+    for (let rowIdx = 0; rowIdx < data.length; ++rowIdx) {
+      if (this.index.has(data[rowIdx][columnIdx])) {
+        throw new Error("Duplicate index!");
+      }
+      this.index.set(data[rowIdx][columnIdx], rowIdx);
     }
   }
 
-  findOrNull(key: string): T | null {
+  *[Symbol.iterator](): Generator<T> {
+    for (const x of this.data) {
+      yield this.unpack(x);
+    }
+  }
+
+  findOrNull(key: any): T | null {
     const idx = this.index.get(key);
 
     if (idx === undefined) {
       return null;
     }
 
-    return this.arrayToObject(this.data[idx]);
+    return this.unpack(this.data[idx]);
   }
 
-  arrayToObject<T>(input: any): T {
+  unpack<T>(input: any[]): T {
     const output: any = {};
-    for (const [k, idx] of Object.entries(this.keys)) {
+    for (const [idx, k] of this.keys.entries()) {
       output[k] = input[idx];
-    } 
+    }
     return output as T;
+  }
+
+  write(indexValue: any, property: any, value: any) {
+    const rowIdx = this.index.get(indexValue);
+
+    if (!rowIdx) {
+      throw new Error("Bad index");
+    }
+
+    const colIdx = this.keys.indexOf(property);
+    this.data[rowIdx][colIdx] = value;
   }
 }
 
