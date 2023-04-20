@@ -153,6 +153,7 @@ export class CompressedDataWrapper<T> {
   data: any[][];
   keys: string[];
   indexProperty: string;
+  indexColumnIdx: number;
   index: Map<any, number>;
 
   constructor(data: any[][], indexProperty: string, keys: string[]) {
@@ -161,13 +162,10 @@ export class CompressedDataWrapper<T> {
     this.indexProperty = indexProperty;
     this.index = new Map<any, number>();
 
-    const columnIdx = this.keys.indexOf(indexProperty);
+    this.indexColumnIdx = this.keys.indexOf(indexProperty);
 
     for (let rowIdx = 0; rowIdx < data.length; ++rowIdx) {
-      if (this.index.has(data[rowIdx][columnIdx])) {
-        throw new Error("Duplicate index!");
-      }
-      this.index.set(data[rowIdx][columnIdx], rowIdx);
+      this.addToIndex(data[rowIdx][this.indexColumnIdx], rowIdx);
     }
   }
 
@@ -175,6 +173,23 @@ export class CompressedDataWrapper<T> {
     for (const x of this.data) {
       yield this.unpack(x);
     }
+  }
+
+  add(object: T) {
+    // @ts-ignore
+    const index = object[this.indexProperty];
+    const packed = this.pack(object);
+    console.log(packed);
+    this.data.push(packed);
+    console.log(this.data);
+    this.addToIndex(index, this.data.length - 1);
+  }
+
+  private addToIndex(k: any, v: number) {
+    if (this.index.has(k)) {
+      throw new Error("Duplicate index!");
+    }
+    this.index.set(k, v);
   }
 
   findOrNull(key: any): T | null {
@@ -187,6 +202,11 @@ export class CompressedDataWrapper<T> {
     return this.unpack(this.data[idx]);
   }
 
+  pack<T>(input: T): any[] {
+    // @ts-ignore
+    return this.keys.map((k) => input[k]);
+  }
+
   unpack<T>(input: any[]): T {
     const output: any = {};
     for (const [idx, k] of this.keys.entries()) {
@@ -195,7 +215,7 @@ export class CompressedDataWrapper<T> {
     return output as T;
   }
 
-  write(indexValue: any, property: any, value: any) {
+  update(indexValue: any, property: any, value: any) {
     const rowIdx = this.index.get(indexValue);
 
     if (!rowIdx) {
@@ -205,30 +225,4 @@ export class CompressedDataWrapper<T> {
     const colIdx = this.keys.indexOf(property);
     this.data[rowIdx][colIdx] = value;
   }
-}
-
-export function getCompressedValue({
-  object,
-  property,
-  keys,
-}: {
-  object: any[];
-  property: string;
-  keys: string[];
-}) {
-  return object[keys.indexOf(property)];
-}
-
-export function setCompressedValue({
-  object,
-  keys,
-  property,
-  value,
-}: {
-  object: any[];
-  keys: string[];
-  property: string;
-  value: any;
-}) {
-  object[keys.indexOf(property)] = value;
 }

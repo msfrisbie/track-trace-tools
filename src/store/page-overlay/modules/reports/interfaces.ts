@@ -46,6 +46,7 @@ export interface IReportConfig {
     packageFilter: IPackageFilter;
     transferFilter: ITransferFilter;
     fields: null;
+    archive: ICogsArchive;
   };
   [ReportType.PACKAGES]?: {
     packageFilter: IPackageFilter;
@@ -124,4 +125,14 @@ export interface IFieldData {
   value: string;
   readableName: string;
   required: boolean;
+}
+
+export interface ICogsArchive {
+  licenses: string[];
+  packages: any[];
+  packagesKeys: string[];
+  transfers: any[];
+  transfersKeys: string[];
+  transfersPackages: any[];
+  transfersPackagesKeys: string[];
 }

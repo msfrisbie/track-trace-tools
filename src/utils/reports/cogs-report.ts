@@ -10,6 +10,7 @@ import { DataLoader, getDataLoaderByLicense } from "@/modules/data-loader/data-l
 import { facilityManager } from "@/modules/facility-manager.module";
 import { ReportsMutations, ReportType } from "@/store/page-overlay/modules/reports/consts";
 import {
+  ICogsArchive,
   IReportConfig,
   IReportData,
   IReportsState,
@@ -35,9 +36,11 @@ export const cogsFormFiltersFactory: () => ICogsReportFormFilters = () => ({
 export function addCogsReport({
   reportConfig,
   cogsFormFilters,
+  archive
 }: {
   reportConfig: IReportConfig;
   cogsFormFilters: ICogsReportFormFilters;
+  archive: ICogsArchive;
 }) {
   const packageFilter: IPackageFilter = {};
   const transferFilter: ITransferFilter = {};
@@ -52,6 +55,7 @@ export function addCogsReport({
     packageFilter,
     transferFilter,
     fields: null,
+    archive
   };
 }
 

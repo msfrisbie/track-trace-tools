@@ -30,18 +30,18 @@
 </template>
 
 <script lang="ts">
-import { TransferState } from "@/consts";
 import {
   IIndexedPackageData,
   IIndexedRichOutgoingTransferData,
   ISimpleOutgoingTransferData,
   ISimplePackageData,
-ISimpleTransferPackage,
+  ISimpleTransferPackage,
 } from "@/interfaces";
 import { DataLoader, getDataLoaderByLicense } from "@/modules/data-loader/data-loader.module";
 import { facilityManager } from "@/modules/facility-manager.module";
 import router from "@/router/index";
 import store from "@/store/page-overlay/index";
+import { ICogsArchive } from "@/store/page-overlay/modules/reports/interfaces";
 import { CompressedDataWrapper, compressJSON } from "@/utils/compression";
 import { readJSONFile } from "@/utils/file";
 import {
@@ -49,7 +49,6 @@ import {
   extractTagQuantityPairsFromHistory,
 } from "@/utils/history";
 import { getId, getItemName, getLabel } from "@/utils/package";
-import { keys } from "localforage";
 import Vue from "vue";
 import { mapState } from "vuex";
 
@@ -76,26 +75,21 @@ export default Vue.extend({
     };
   },
   methods: {
-    async inspectFile(e: any) {
+    async getArchiveData(): Promise<any> {
+      return readJSONFile(this.$data.existingArchive);
+    },
+    async inspectFile(e: any): Promise<void> {
       console.log(await readJSONFile(e.target.files[0]));
     },
-    async generateArchive() {
+    async generateArchive(): Promise<void> {
       try {
         this.$data.inflight = true;
         this.$data.message = null;
         URL.revokeObjectURL(this.$data.archiveUrl);
         this.$data.archiveUrl = null;
 
-        const archive: {
-          licenses: string[];
-          packages: any[];
-          packagesKeys: string[];
-          transfers: any[];
-          transfersKeys: string[];
-          transfersPackages: any[];
-          transfersPackagesKeys: string[];
-        } = this.$data.existingArchive
-          ? ((await readJSONFile(this.$data.existingArchive)) as any)
+        const archive: ICogsArchive = this.$data.existingArchive
+          ? await this.getArchiveData()
           : {
               licenses: [],
               packages: [],
@@ -159,13 +153,13 @@ export default Vue.extend({
             packageHistoryRequests.push(
               getDataLoaderByLicense(pkg.LicenseNumber).then((dataLoader) =>
                 dataLoader.packageHistoryByPackageId(pkg.Id).then((history) => {
-                  wrapper.write(
+                  wrapper.update(
                     pkg.Label,
                     "ParentPackageLabels",
                     extractParentPackageLabelsFromHistory(history)
                   );
 
-                  wrapper.write(
+                  wrapper.update(
                     pkg.Label,
                     "TagQuantityPairs",
                     extractTagQuantityPairsFromHistory(history)

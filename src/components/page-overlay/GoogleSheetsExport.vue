@@ -87,7 +87,7 @@
                 </div>
               </div>
               <hr />
-              <archive-widget></archive-widget>
+              <archive-widget ref="archive"></archive-widget>
             </div>
           </template>
 
@@ -1499,6 +1499,7 @@ export default Vue.extend({
         addCogsReport({
           reportConfig,
           cogsFormFilters: this.cogsFormFilters,
+          archive: await this.$refs["archive"].getArchiveData(),
         });
       }
 
