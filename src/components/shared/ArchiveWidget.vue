@@ -36,6 +36,7 @@ import {
   IIndexedRichOutgoingTransferData,
   ISimpleOutgoingTransferData,
   ISimplePackageData,
+ISimpleTransferPackage,
 } from "@/interfaces";
 import { DataLoader, getDataLoaderByLicense } from "@/modules/data-loader/data-loader.module";
 import { facilityManager } from "@/modules/facility-manager.module";
@@ -48,6 +49,7 @@ import {
   extractTagQuantityPairsFromHistory,
 } from "@/utils/history";
 import { getId, getItemName, getLabel } from "@/utils/package";
+import { keys } from "localforage";
 import Vue from "vue";
 import { mapState } from "vuex";
 
@@ -279,10 +281,10 @@ export default Vue.extend({
 
           this.$data.message = `Processing ${rawTransferPackages.length} manifest packages...`;
 
-          const wrapper = compressJSON<ISimpleTransferPackage>(rawTransferPackages);
+          const packageWrapper = compressJSON<ISimpleTransferPackage>(rawTransferPackages, "Label");
 
-          archive.transfersPackages = compressed;
-          archive.transfersPackagesKeys = keys;
+          archive.transfersPackages = packageWrapper.data;
+          archive.transfersPackagesKeys = packageWrapper.keys;
         }
 
         this.$data.message = "Writing archive to file...";

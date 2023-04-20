@@ -802,7 +802,16 @@ export interface ISimpleOutgoingTransferData {
 }
 
 export interface ISimpleTransferPackage {
-  
+  ETD: string;
+  Type: string;
+  ManifestNumber: string;
+  LicenseNumber: string;
+  Id: number;
+  PackageState: PackageState;
+  Label: string;
+  ItemName: string;
+  SourcePackageLabels: string;
+  ProductionBatchNumber: string;
 }
 
 export interface ISimpleCogsPackageData extends ISimplePackageData {
