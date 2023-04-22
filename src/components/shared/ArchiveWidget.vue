@@ -128,8 +128,8 @@ export default Vue.extend({
               ItemName: getItemName(pkg),
               SourcePackageLabels: pkg.SourcePackageLabels,
               ProductionBatchNumber: pkg.ProductionBatchNumber,
-              ParentPackageLabels: null,
-              TagQuantityPairs: null,
+              parentPackageLabels: null,
+              tagQuantityPairs: null,
             })),
             "Label"
           );
@@ -155,13 +155,13 @@ export default Vue.extend({
                 dataLoader.packageHistoryByPackageId(pkg.Id).then((history) => {
                   wrapper.update(
                     pkg.Label,
-                    "ParentPackageLabels",
+                    "parentPackageLabels",
                     extractParentPackageLabelsFromHistory(history)
                   );
 
                   wrapper.update(
                     pkg.Label,
-                    "TagQuantityPairs",
+                    "tagQuantityPairs",
                     extractTagQuantityPairsFromHistory(history)
                   );
                 })

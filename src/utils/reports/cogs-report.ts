@@ -36,7 +36,7 @@ export const cogsFormFiltersFactory: () => ICogsReportFormFilters = () => ({
 export function addCogsReport({
   reportConfig,
   cogsFormFilters,
-  archive
+  archive,
 }: {
   reportConfig: IReportConfig;
   cogsFormFilters: ICogsReportFormFilters;
@@ -55,7 +55,7 @@ export function addCogsReport({
     packageFilter,
     transferFilter,
     fields: null,
-    archive
+    archive,
   };
 }
 
@@ -99,6 +99,8 @@ export async function maybeLoadCogsReportData({
           manifestGraph: false,
           SourcePackageLabels: pkg.SourcePackageLabels,
           ProductionBatchNumber: pkg.ProductionBatchNumber,
+          parentPackageLabels: null,
+          tagQuantityPairs: null,
           childLabels: [],
           fractionalCostData: [],
           errors: [],
@@ -122,6 +124,8 @@ export async function maybeLoadCogsReportData({
           manifestGraph: false,
           SourcePackageLabels: pkg.SourcePackageLabels,
           ProductionBatchNumber: pkg.ProductionBatchNumber,
+          parentPackageLabels: null,
+          tagQuantityPairs: null,
           childLabels: [],
           fractionalCostData: [],
           errors: [],
@@ -145,6 +149,8 @@ export async function maybeLoadCogsReportData({
           manifestGraph: false,
           SourcePackageLabels: pkg.SourcePackageLabels,
           ProductionBatchNumber: pkg.ProductionBatchNumber,
+          parentPackageLabels: null,
+          tagQuantityPairs: null,
           childLabels: [],
           fractionalCostData: [],
           errors: [],
@@ -315,6 +321,8 @@ export async function maybeLoadCogsReportData({
                 manifestGraph: isWholesaleTransfer && isEligibleTransfer,
                 SourcePackageLabels: pkg.SourcePackageLabels,
                 ProductionBatchNumber: pkg.ProductionBatchNumber,
+                parentPackageLabels: null,
+                tagQuantityPairs: null,
                 childLabels: [],
                 fractionalCostData: [],
                 errors: [],
@@ -449,12 +457,10 @@ export async function maybeLoadCogsReportData({
       const [childLabel] = manifestGraphPackage.childLabels;
 
       // Spoof the history extracts, eliminating the need for a history lookup
-      manifestGraphPackage.historyExtracts = {
-        parentPackageLabels: manifestGraphPackage.SourcePackageLabels.split(",").map((x) =>
-          x.trim()
-        ),
-        tagQuantityPairs: [{ tag: childLabel, quantity: 1 }],
-      };
+      manifestGraphPackage.parentPackageLabels = manifestGraphPackage.SourcePackageLabels.split(
+        ","
+      ).map((x) => x.trim());
+      manifestGraphPackage.tagQuantityPairs = [{ tag: childLabel, quantity: 1 }];
     }
   }
 
@@ -483,7 +489,7 @@ export async function maybeLoadCogsReportData({
   const packageHistoryRequests: Promise<any>[] = [];
 
   for (const pkg of manifestGraphPackageMap.values()) {
-    if (pkg.historyExtracts) {
+    if (pkg.parentPackageLabels) {
       // Already generated history data
       continue;
     }
@@ -491,10 +497,8 @@ export async function maybeLoadCogsReportData({
     packageHistoryRequests.push(
       getDataLoaderByLicense(pkg.LicenseNumber).then((dataLoader) =>
         dataLoader.packageHistoryByPackageId(pkg.Id).then((history) => {
-          pkg.historyExtracts = {
-            parentPackageLabels: extractParentPackageLabelsFromHistory(history),
-            tagQuantityPairs: extractTagQuantityPairsFromHistory(history),
-          };
+          pkg.parentPackageLabels = extractParentPackageLabelsFromHistory(history);
+          pkg.tagQuantityPairs = extractTagQuantityPairsFromHistory(history);
         })
       )
     );
@@ -513,25 +517,23 @@ export async function maybeLoadCogsReportData({
   );
 
   for (const pkg of manifestGraphPackageMap.values()) {
-    if (!pkg.historyExtracts) {
+    if (!pkg.parentPackageLabels) {
       pkg.errors.push("No history");
       continue;
     }
 
-    if (pkg.historyExtracts.parentPackageLabels.length === 0) {
+    if (pkg.parentPackageLabels.length === 0) {
       pkg.errors.push("Extracted 0 parent package labels");
       continue;
     }
 
-    const parentPackages = pkg.historyExtracts.parentPackageLabels.map((pkg) =>
-      manifestGraphPackageMap.get(pkg)
-    );
+    const parentPackages = pkg.parentPackageLabels.map((pkg) => manifestGraphPackageMap.get(pkg));
     const matchedParentPackages = parentPackages.filter(
       (x) => x !== undefined
     ) as ISimpleCogsPackageData[];
     const unmatchedParentPackages = parentPackages.filter((x) => x === undefined);
-    const noHistoryParentPackages = matchedParentPackages.filter((x) => !x.historyExtracts);
-    const validParentPackages = matchedParentPackages.filter((x) => !!x.historyExtracts);
+    const noHistoryParentPackages = matchedParentPackages.filter((x) => !x.parentPackageLabels);
+    const validParentPackages = matchedParentPackages.filter((x) => !!x.parentPackageLabels);
 
     if (parentPackages.length > 0 && matchedParentPackages.length === 0) {
       pkg.errors.push("No parents matched");
@@ -550,12 +552,10 @@ export async function maybeLoadCogsReportData({
 
     for (const parentPkg of validParentPackages) {
       const totalParentQuantity = parentPkg!
-        .historyExtracts!.tagQuantityPairs.map((x) => x.quantity)
+        .tagQuantityPairs!.map((x) => x.quantity)
         .reduce((a, b) => a + b, 0);
 
-      const matchingPackagePair = parentPkg!.historyExtracts!.tagQuantityPairs.find(
-        (x) => x.tag === pkg.Label
-      );
+      const matchingPackagePair = parentPkg!.tagQuantityPairs!.find((x) => x.tag === pkg.Label);
       if (!matchingPackagePair) {
         pkg.errors.push(`No parent history pair match: ${parentPkg!.Label}`);
         continue;

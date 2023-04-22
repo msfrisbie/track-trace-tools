@@ -48,8 +48,8 @@ export async function getParentPackageLabels(pkg: ISimpleCogsPackageData) {
     return pkg.SourcePackageLabels.split(",").map((x) => x.trim());
   } else {
     // Source package labels may have been truncated
-    if (pkg.historyExtracts) {
-      return pkg.historyExtracts.parentPackageLabels;
+    if (pkg.parentPackageLabels) {
+      return pkg.parentPackageLabels;
     } else {
       const history = await getDataLoaderByLicense(pkg.LicenseNumber).then((dataLoader) =>
         dataLoader.packageHistoryByPackageId(pkg.Id)

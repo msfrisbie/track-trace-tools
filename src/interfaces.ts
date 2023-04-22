@@ -787,6 +787,8 @@ export interface ISimplePackageData {
   ItemName: string;
   SourcePackageLabels: string;
   ProductionBatchNumber: string | null;
+  parentPackageLabels: string[] | null;
+  tagQuantityPairs: { tag: string; quantity: number }[] | null;
 }
 
 export interface ISimpleOutgoingTransferData {
@@ -811,16 +813,14 @@ export interface ISimpleTransferPackage {
   Label: string;
   ItemName: string;
   SourcePackageLabels: string;
-  ProductionBatchNumber: string;
+  ProductionBatchNumber: string | null;
+  parentPackageLabels: string[] | null;
+  tagQuantityPairs: { tag: string; quantity: number }[] | null;
 }
 
 export interface ISimpleCogsPackageData extends ISimplePackageData {
   manifest: boolean;
   manifestGraph: boolean;
-  historyExtracts?: {
-    parentPackageLabels: string[];
-    tagQuantityPairs: { tag: string; quantity: number }[];
-  };
   childLabels: string[];
   fractionalCostData: IFractionalCostData[];
   errors: string[];
