@@ -20,104 +20,14 @@ import {
   getSheetTitle,
   shouldGenerateReport,
 } from "./reports/reports-shared";
-
-function addRowsRequestFactory({ sheetId, length }: { sheetId: number; length: number }) {
-  return {
-    appendDimension: {
-      dimension: "ROWS",
-      length,
-      sheetId,
-    },
-  };
-}
-
-function styleTopRowRequestFactory({ sheetId }: { sheetId: number }) {
-  return {
-    repeatCell: {
-      range: {
-        sheetId,
-        startRowIndex: 0,
-        endRowIndex: 1,
-      },
-      cell: {
-        userEnteredFormat: {
-          backgroundColor: {
-            red: 73 / 256,
-            green: 39 / 256,
-            blue: 106 / 256,
-          },
-          // horizontalAlignment: "CENTER",
-          textFormat: {
-            foregroundColor: {
-              red: 1.0,
-              green: 1.0,
-              blue: 1.0,
-            },
-            fontSize: 10,
-            bold: true,
-          },
-        },
-      },
-      fields: "userEnteredFormat(backgroundColor,textFormat)",
-    },
-  };
-}
-
-function shrinkFontRequestFactory({ sheetId }: { sheetId: number }) {
-  return {
-    repeatCell: {
-      range: {
-        sheetId,
-        startRowIndex: 1,
-      },
-      cell: {
-        userEnteredFormat: {
-          textFormat: {
-            fontSize: 9,
-          },
-        },
-      },
-      fields: "userEnteredFormat(textFormat)",
-    },
-  };
-}
-
-function freezeTopRowRequestFactory({ sheetId }: { sheetId: number }) {
-  return {
-    updateSheetProperties: {
-      properties: {
-        sheetId,
-        gridProperties: {
-          frozenRowCount: 1,
-        },
-      },
-      fields: "gridProperties.frozenRowCount",
-    },
-  };
-}
-
-function autoResizeDimensionsRequestFactory({
-  sheetId,
-  dimension = "COLUMNS",
-  startIndex,
-  endIndex,
-}: {
-  sheetId: number;
-  dimension?: "COLUMNS" | "ROWS";
-  startIndex?: number;
-  endIndex?: number;
-}) {
-  return {
-    autoResizeDimensions: {
-      dimensions: {
-        dimension,
-        sheetId,
-        startIndex,
-        endIndex,
-      },
-    },
-  };
-}
+import {
+  addRowsRequestFactory,
+  autoResizeDimensionsRequestFactory,
+  conditinalFormattingRequestFactory,
+  freezeTopRowRequestFactory,
+  shrinkFontRequestFactory,
+  styleTopRowRequestFactory,
+} from "./sheets";
 
 async function writeDataSheet<T>({
   spreadsheetId,
@@ -857,5 +767,27 @@ export async function createScanSheetOrError(
     90000
   );
 
-  return response.data.result
+  const sheetId = 0;
+
+  const formattingRequests = [
+    addRowsRequestFactory({ sheetId, length: packageTags.length }),
+    styleTopRowRequestFactory({ sheetId }),
+    freezeTopRowRequestFactory({ sheetId }),
+    autoResizeDimensionsRequestFactory({
+      sheetId,
+    }),
+    conditinalFormattingRequestFactory({ sheetId }),
+  ];
+
+  await messageBus.sendMessageToBackground(
+    MessageType.BATCH_UPDATE_SPREADSHEET,
+    {
+      spreadsheetId: response.data.result.spreadsheetId,
+      requests: formattingRequests,
+    },
+    undefined,
+    90000
+  );
+
+  return response.data.result;
 }

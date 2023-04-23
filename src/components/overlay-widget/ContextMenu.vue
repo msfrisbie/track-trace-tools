@@ -329,7 +329,7 @@ export default Vue.extend({
     }),
     isIdentityEligibleForTransferToolsImpl(): boolean {
       return isIdentityEligibleForTransferTools({
-        identity: this.authState.identity,
+        identity: this.$store.state.pluginAuth?.authState?.identity,
         hostname: window.location.hostname,
       });
     },
@@ -338,12 +338,12 @@ export default Vue.extend({
     },
     isIdentityEligibleForSplitToolsImpl(): boolean {
       return isIdentityEligibleForSplitTools({
-        identity: this.authState?.identity,
+        identity: this.$store.state.pluginAuth?.authState?.identity,
         hostname: window.location.hostname,
       });
     },
     manifestUrl(): string {
-      return `${window.location.origin}/reports/transfers/${this.authState?.license}/manifest?id=${this.contextMenuEvent?.manifestNumber}`;
+      return `${window.location.origin}/reports/transfers/${this.$store.state.pluginAuth?.authState?.license}/manifest?id=${this.contextMenuEvent?.manifestNumber}`;
     },
     manifestNumber(): string | undefined {
       return this.contextMenuEvent?.manifestNumber;

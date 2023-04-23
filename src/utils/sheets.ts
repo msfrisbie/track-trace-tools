@@ -328,3 +328,134 @@ export async function batchUpdateValues({
     }),
   });
 }
+
+export function addRowsRequestFactory({ sheetId, length }: { sheetId: number; length: number }) {
+  return {
+    appendDimension: {
+      dimension: "ROWS",
+      length,
+      sheetId,
+    },
+  };
+}
+
+export function styleTopRowRequestFactory({ sheetId }: { sheetId: number }) {
+  return {
+    repeatCell: {
+      range: {
+        sheetId,
+        startRowIndex: 0,
+        endRowIndex: 1,
+      },
+      cell: {
+        userEnteredFormat: {
+          backgroundColor: {
+            red: 73 / 256,
+            green: 39 / 256,
+            blue: 106 / 256,
+          },
+          // horizontalAlignment: "CENTER",
+          textFormat: {
+            foregroundColor: {
+              red: 1.0,
+              green: 1.0,
+              blue: 1.0,
+            },
+            fontSize: 10,
+            bold: true,
+          },
+        },
+      },
+      fields: "userEnteredFormat(backgroundColor,textFormat)",
+    },
+  };
+}
+
+export function shrinkFontRequestFactory({ sheetId }: { sheetId: number }) {
+  return {
+    repeatCell: {
+      range: {
+        sheetId,
+        startRowIndex: 1,
+      },
+      cell: {
+        userEnteredFormat: {
+          textFormat: {
+            fontSize: 9,
+          },
+        },
+      },
+      fields: "userEnteredFormat(textFormat)",
+    },
+  };
+}
+
+export function freezeTopRowRequestFactory({ sheetId }: { sheetId: number }) {
+  return {
+    updateSheetProperties: {
+      properties: {
+        sheetId,
+        gridProperties: {
+          frozenRowCount: 1,
+        },
+      },
+      fields: "gridProperties.frozenRowCount",
+    },
+  };
+}
+
+export function autoResizeDimensionsRequestFactory({
+  sheetId,
+  dimension = "COLUMNS",
+  startIndex,
+  endIndex,
+}: {
+  sheetId: number;
+  dimension?: "COLUMNS" | "ROWS";
+  startIndex?: number;
+  endIndex?: number;
+}) {
+  return {
+    autoResizeDimensions: {
+      dimensions: {
+        dimension,
+        sheetId,
+        startIndex,
+        endIndex,
+      },
+    },
+  };
+}
+
+export function conditinalFormattingRequestFactory({ sheetId }: { sheetId: number }) {
+  return {
+    addConditionalFormatRule: {
+      rule: {
+        ranges: [
+          {
+            sheetId,
+            startColumnIndex: 0,
+            endColumnIndex: 1,
+            startRowIndex: 1,
+          },
+        ],
+        booleanRule: {
+          condition: {
+            type: "CUSTOM_FORMULA",
+            values: [
+              {
+                userEnteredValue: "=COUNTIF(A:B,A2)>1",
+              },
+            ],
+          },
+          format: {
+            backgroundColor: {
+              green: 1,
+            },
+          },
+        },
+      },
+      index: 0,
+    },
+  };
+}
