@@ -1,5 +1,5 @@
 <template>
-  <div style="min-width:280px" class="w-full flex flex-col items-stretch space-y-4">
+  <div style="min-width: 280px" class="w-full flex flex-col items-stretch space-y-4">
     <b-button-group vertical>
       <template v-if="contextMenuEvent && contextMenuEvent.packageTag">
         <template v-if="pkg">
@@ -77,16 +77,21 @@
             </b-button>
           </template>
 
-          <b-button variant="outline-primary" class="" @click.stop.prevent="setPackageHistorySourcePackage({ pkg }) && openPackageHistoryBuilder()"
-              ><div
-                class="grid grid-cols-2 place-items-center"
-                style="grid-template-columns: auto 1fr auto"
-              >
-                <span>PACKAGE HISTORY</span>
-                <div></div>
-                <div class=""><font-awesome-icon icon="sitemap" /></div>
-              </div>
-            </b-button>
+          <b-button
+            variant="outline-primary"
+            class=""
+            @click.stop.prevent="
+              setPackageHistorySourcePackage({ pkg }) && openPackageHistoryBuilder()
+            "
+            ><div
+              class="grid grid-cols-2 place-items-center"
+              style="grid-template-columns: auto 1fr auto"
+            >
+              <span>PACKAGE HISTORY</span>
+              <div></div>
+              <div class=""><font-awesome-icon icon="sitemap" /></div>
+            </div>
+          </b-button>
 
           <template v-if="isIdentityEligibleForSplitToolsImpl && isPackageEligibleForSplit">
             <b-button variant="outline-primary" class="" @click.stop.prevent="splitPackage()"
@@ -189,6 +194,17 @@
           </div>
         </b-button>
 
+        <b-button variant="outline-primary" class="" @click.stop.prevent="createScanSheet()"
+          ><div
+            class="grid grid-cols-2 place-items-center"
+            style="grid-template-columns: auto 1fr auto"
+          >
+            <span>CREATE SCAN SHEET</span>
+            <div></div>
+            <div class=""><font-awesome-icon icon="barcode" /></div>
+          </div>
+        </b-button>
+
         <b-dropdown variant="outline-primary" no-caret :disabled="!transfer">
           <template #button-content>
             <div
@@ -266,35 +282,35 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import { mapActions, mapState } from "vuex";
-import router from "@/router/index";
-import store from "@/store/page-overlay/index";
+import { MessageType, ModalAction, ModalType, PackageState } from "@/consts";
 import {
-  MessageType,
-  METRC_HOSTNAMES_LACKING_LAB_PDFS,
-  ModalAction,
-  ModalType,
-  PackageFilterIdentifiers,
-  PackageState
-} from "@/consts";
+  IIndexedPackageData,
+  IIndexedTransferData,
+  IPackageSearchFilters,
+  IPluginState,
+} from "@/interfaces";
 import { analyticsManager } from "@/modules/analytics-manager.module";
-import { searchManager } from "@/modules/search-manager.module";
+import { clientBuildManager } from "@/modules/client-build-manager.module";
 import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
 import { IContextMenuEvent, modalManager } from "@/modules/modal-manager.module";
+import { searchManager } from "@/modules/search-manager.module";
+import router from "@/router/index";
+import store from "@/store/page-overlay/index";
+import { PackageHistoryActions } from "@/store/page-overlay/modules/package-history/consts";
+import { PackageSearchActions } from "@/store/page-overlay/modules/package-search/consts";
+import { PluginAuthActions } from "@/store/page-overlay/modules/plugin-auth/consts";
+import { SearchActions } from "@/store/page-overlay/modules/search/consts";
+import { SplitPackageBuilderActions } from "@/store/page-overlay/modules/split-package-builder/consts";
 import { TransferBuilderActions } from "@/store/page-overlay/modules/transfer-builder/consts";
 import {
   isIdentityEligibleForSplitTools,
-  isIdentityEligibleForTransferTools
+  isIdentityEligibleForTransferTools,
 } from "@/utils/access-control";
-import { downloadLabTests, getLabTestUrlsFromPackage } from "@/utils/package";
 import { downloadFileFromUrl, printPdfFromUrl } from "@/utils/dom";
-import { SplitPackageBuilderActions } from "@/store/page-overlay/modules/split-package-builder/consts";
-import { pageManager } from "@/modules/page-manager.module";
-import { PackageSearchActions } from "@/store/page-overlay/modules/package-search/consts";
-import { IPackageSearchFilters } from "@/interfaces";
-import { SearchActions } from "@/store/page-overlay/modules/search/consts";
-import { PackageHistoryActions } from "@/store/page-overlay/modules/package-history/consts";
+import { downloadLabTests, getLabTestUrlsFromPackage } from "@/utils/package";
+import { createScanSheet } from "@/utils/transfer";
+import Vue from "vue";
+import { mapActions, mapState } from "vuex";
 
 // const packageLabTestPdfEligible = !METRC_HOSTNAMES_LACKING_LAB_PDFS.includes(window.location.hostname);
 
@@ -303,17 +319,18 @@ export default Vue.extend({
   store,
   router,
   props: {
-    contextMenuEvent: Object as () => IContextMenuEvent
+    contextMenuEvent: Object as () => IContextMenuEvent,
   },
   components: {},
   computed: {
-    ...mapState({
-      authState: (state: any) => state.pluginAuth.authState
+    ...mapState<IPluginState>({
+      authState: (state: IPluginState) => state.pluginAuth.authState,
+      oAuthState: (state: IPluginState) => state.pluginAuth.oAuthState,
     }),
-    isIdentityEligibleForTransferToolsImpl() {
+    isIdentityEligibleForTransferToolsImpl(): boolean {
       return isIdentityEligibleForTransferTools({
-        identity: this.authState.identity,
-        hostname: window.location.hostname
+        identity: this.$store.state.pluginAuth?.authState?.identity,
+        hostname: window.location.hostname,
       });
     },
     isPackageEligibleForSplit(): boolean {
@@ -321,26 +338,29 @@ export default Vue.extend({
     },
     isIdentityEligibleForSplitToolsImpl(): boolean {
       return isIdentityEligibleForSplitTools({
-        identity: this.authState?.identity,
-        hostname: window.location.hostname
+        identity: this.$store.state.pluginAuth?.authState?.identity,
+        hostname: window.location.hostname,
       });
     },
-    manifestUrl() {
-      return `${window.location.origin}/reports/transfers/${this.authState?.license}/manifest?id=${this.contextMenuEvent?.manifestNumber}`;
+    manifestUrl(): string {
+      return `${window.location.origin}/reports/transfers/${this.$store.state.pluginAuth?.authState?.license}/manifest?id=${this.contextMenuEvent?.manifestNumber}`;
     },
-    manifestNumber() {
+    manifestNumber(): string | undefined {
       return this.contextMenuEvent?.manifestNumber;
-    }
+    },
+    t3plusEnabled() {
+      return clientBuildManager.assertValues(["ENABLE_T3PLUS"]);
+    },
   },
   data() {
     return {
-      pkg: null,
+      pkg: null as IIndexedPackageData | null,
       pkgState: null,
-      transfer: null,
+      transfer: null as IIndexedTransferData | null,
       transferState: null,
       labTestUrls: [],
       packageLoadError: false,
-      transferLoadError: false
+      transferLoadError: false,
     };
   },
   methods: {
@@ -351,6 +371,7 @@ export default Vue.extend({
       partialUpdatePackageSearchFilters: `packageSearch/${PackageSearchActions.PARTIAL_UPDATE_PACKAGE_SEARCH_FILTERS}`,
       setSearchType: `search/${SearchActions.SET_SEARCH_TYPE}`,
       setPackageHistorySourcePackage: `packageHistory/${PackageHistoryActions.SET_SOURCE_PACKAGE}`,
+      refreshOAuthState: `pluginAuth/${PluginAuthActions.REFRESH_OAUTH_STATE}`,
     }),
     openPackageHistoryBuilder() {
       analyticsManager.track(MessageType.OPENED_PACKAGE_HISTORY_FROM_TOOLKIT_SEARCH, {});
@@ -364,25 +385,25 @@ export default Vue.extend({
     filterPackages(packageSearchFilters: IPackageSearchFilters) {
       analyticsManager.track(MessageType.CONTEXT_MENU_SELECT, {
         event: "filterPackage",
-        packageSearchFilters
+        packageSearchFilters,
       });
 
       analyticsManager.track(MessageType.CLICKED_SEARCH_PACKAGE_BUTTON);
 
-      (this as any).dismiss();
+      this.dismiss();
 
-      (this as any).partialUpdatePackageSearchFilters({
-        packageSearchFilters: packageSearchFilters
+      this.partialUpdatePackageSearchFilters({
+        packageSearchFilters: packageSearchFilters,
       });
 
-      (this as any).setSearchType({ searchType: "PACKAGES" });
+      this.setSearchType({ searchType: "PACKAGES" });
     },
     searchTransfer(text: string) {
       analyticsManager.track(MessageType.CONTEXT_MENU_SELECT, { event: "searchTransfer", text });
 
       searchManager.setTransferSearchVisibility(true);
       searchManager.transferQueryString.next(text);
-      (this as any).dismiss();
+      this.dismiss();
     },
     reset() {
       this.$data.pkg = null;
@@ -426,7 +447,7 @@ export default Vue.extend({
         if (this.$data.pkg) {
           this.$data.labTestUrls = await getLabTestUrlsFromPackage({
             pkg: this.$data.pkg,
-            showZeroResultsError: false
+            showZeroResultsError: false,
           });
         } else {
           this.$data.packageLoadError = true;
@@ -475,30 +496,29 @@ export default Vue.extend({
 
       analyticsManager.track(MessageType.STARTED_TRANSFER_FROM_INLINE_BUTTON, {});
       modalManager.dispatchModalEvent(ModalType.BUILDER, ModalAction.OPEN, {
-        initialRoute: "/transfer/create-transfer"
+        initialRoute: "/transfer/create-transfer",
       });
-      (this as any).dismiss();
+      this.dismiss();
     },
     splitPackage() {
       analyticsManager.track(MessageType.CONTEXT_MENU_SELECT, { event: "splitPackage" });
 
-      // @ts-ignore
       this.setSplitSourcePackage({ pkg: this.$data.pkg });
 
       analyticsManager.track(MessageType.SPLIT_PACKAGE_FROM_TOOLKIT_SEARCH, {});
       modalManager.dispatchModalEvent(ModalType.BUILDER, ModalAction.OPEN, {
-        initialRoute: "/package/split-package"
+        initialRoute: "/package/split-package",
       });
-      (this as any).dismiss();
+      this.dismiss();
     },
     viewLabTests() {
       analyticsManager.track(MessageType.CONTEXT_MENU_SELECT, { event: "viewLabTests" });
 
       modalManager.dispatchModalEvent(ModalType.DOCUMENT, ModalAction.OPEN, {
-        documentUrls: this.$data.labTestUrls
+        documentUrls: this.$data.labTestUrls,
       });
       analyticsManager.track(MessageType.CLICKED_VIEW_LAB_TEST_BUTTON);
-      (this as any).dismiss();
+      this.dismiss();
     },
     printLabTests() {
       analyticsManager.track(MessageType.CONTEXT_MENU_SELECT, { event: "printLabTests" });
@@ -506,7 +526,7 @@ export default Vue.extend({
       printPdfFromUrl({ urls: this.$data.labTestUrls, modal: true });
 
       analyticsManager.track(MessageType.CLICKED_PRINT_LAB_TEST_BUTTON);
-      (this as any).dismiss();
+      this.dismiss();
     },
     downloadLabTests() {
       analyticsManager.track(MessageType.CONTEXT_MENU_SELECT, { event: "downloadLabTests" });
@@ -514,56 +534,66 @@ export default Vue.extend({
       downloadLabTests({ pkg: this.$data.pkg });
 
       analyticsManager.track(MessageType.CLICKED_DOWNLOAD_LAB_TEST_BUTTON);
-      (this as any).dismiss();
+      this.dismiss();
     },
     viewManifest() {
       analyticsManager.track(MessageType.CONTEXT_MENU_SELECT, { event: "viewManifest" });
 
       modalManager.dispatchModalEvent(ModalType.DOCUMENT, ModalAction.OPEN, {
-        documentUrls: [this.manifestUrl]
+        documentUrls: [this.manifestUrl],
       });
       analyticsManager.track(MessageType.CLICKED_VIEW_MANIFEST_BUTTON);
-      (this as any).dismiss();
+      this.dismiss();
     },
     newTabManifest() {
       analyticsManager.track(MessageType.CONTEXT_MENU_SELECT, { event: "newTabManifest" });
 
-      window.open((this as any).manifestUrl, "_blank");
-      (this as any).dismiss();
+      window.open(this.manifestUrl, "_blank");
+      this.dismiss();
     },
     printManifest() {
       analyticsManager.track(MessageType.CONTEXT_MENU_SELECT, { event: "printManifest" });
 
-      printPdfFromUrl({ urls: [(this as any).manifestUrl], modal: true });
+      printPdfFromUrl({ urls: [this.manifestUrl], modal: true });
 
       analyticsManager.track(MessageType.CLICKED_PRINT_MANIFEST_BUTTON);
-      (this as any).dismiss();
+      this.dismiss();
     },
     downloadManifest() {
       analyticsManager.track(MessageType.CONTEXT_MENU_SELECT, { event: "downloadManifest" });
 
       downloadFileFromUrl({
-        url: (this as any).manifestUrl,
-        filename: `Manifest_${this.contextMenuEvent.manifestNumber}.pdf`
+        url: this.manifestUrl,
+        filename: `Manifest_${this.contextMenuEvent.manifestNumber}.pdf`,
       });
 
       analyticsManager.track(MessageType.CLICKED_DOWNLOAD_MANIFEST_BUTTON);
-      (this as any).dismiss();
-    }
+      this.dismiss();
+    },
+    async createScanSheet() {
+      analyticsManager.track(MessageType.CONTEXT_MENU_SELECT, { event: "createScanSheet" });
+
+      await createScanSheet(
+        parseInt(this.contextMenuEvent.manifestNumber!),
+        this.contextMenuEvent.zeroPaddedManifestNumber!
+      );
+
+      this.dismiss();
+    },
   },
   watch: {
     contextMenuEvent: {
       immediate: true,
       handler() {
-        // @ts-ignore
         this.updatePackage();
-        // @ts-ignore
         this.updateTransfer();
-      }
-    }
+      },
+    },
   },
   async created() {},
-  async mounted() {}
+  async mounted() {
+    this.refreshOAuthState({});
+  },
 });
 </script>
 

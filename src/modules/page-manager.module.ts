@@ -1332,15 +1332,16 @@ class PageManager implements IAtomicService {
 
       row.setAttribute("mesinline", "1");
 
-      const targetCell = row.children[1];
+      const targetCell = row.children[1] as HTMLElement;
 
-      // @ts-ignore
       const manifestNumber = parseInt(targetCell.innerText.trim(), 10);
 
       if (!manifestNumber) {
         console.error("bad manifestNumber");
         continue;
       }
+
+      const zeroPaddedManifestNumber = targetCell.innerText.match(/[0-9]+/)![0];
 
       const container = document.createElement("div");
       container.classList.add("inline-button-container", "btn-group");
@@ -1357,6 +1358,7 @@ class PageManager implements IAtomicService {
           // y: event.clientY,
           x: event.pageX,
           y: event.pageY,
+          zeroPaddedManifestNumber,
           manifestNumber: manifestNumber.toString(),
         };
 
