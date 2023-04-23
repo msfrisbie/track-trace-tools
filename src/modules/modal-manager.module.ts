@@ -12,6 +12,7 @@ export interface IContextMenuEvent {
   x: number;
   y: number;
   packageTag?: string;
+  zeroPaddedManifestNumber?: string;
   manifestNumber?: string;
 }
 

@@ -98,13 +98,13 @@ export interface ICollectionResponse<T> {
 }
 
 export interface IPackageSearchFilters {
-  label: string | null;
-  sourceHarvestName: string | null;
-  sourcePackageLabel: string | null;
-  itemName: string | null;
-  itemStrainName: string | null;
-  itemProductCategoryName: string | null;
-  locationName: string | null;
+  label?: string | null;
+  sourceHarvestName?: string | null;
+  sourcePackageLabel?: string | null;
+  itemName?: string | null;
+  itemStrainName?: string | null;
+  itemProductCategoryName?: string | null;
+  locationName?: string | null;
 }
 
 export interface IPlantSearchFilters {

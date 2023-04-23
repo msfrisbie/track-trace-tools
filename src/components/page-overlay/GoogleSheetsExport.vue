@@ -1145,6 +1145,7 @@ import {
   IPackageFilter,
   IPlantBatchFilter,
   IPlantFilter,
+  IPluginState,
   ITagFilter,
   ITransferFilter,
 } from "@/interfaces";
@@ -1184,14 +1185,15 @@ export default Vue.extend({
   props: {},
   components: {},
   computed: {
-    ...mapState({
-      authState: (state: any) => state.pluginAuth.authState,
-      oAuthState: (state: any) => state.pluginAuth.oAuthState,
-      generatedSpreadsheet: (state: any) => state.reports.generatedSpreadsheet,
-      generatedSpreadsheetHistory: (state: any) => state.reports.generatedSpreadsheetHistory,
-      reportStatus: (state: any) => state.reports.status,
-      reportStatusMessage: (state: any) => state.reports.statusMessage,
-      reportStatusMessageHistory: (state: any) => state.reports.statusMessageHistory,
+    ...mapState<IPluginState>({
+      authState: (state: IPluginState) => state.pluginAuth.authState,
+      oAuthState: (state: IPluginState) => state.pluginAuth.oAuthState,
+      generatedSpreadsheet: (state: IPluginState) => state.reports.generatedSpreadsheet,
+      generatedSpreadsheetHistory: (state: IPluginState) =>
+        state.reports.generatedSpreadsheetHistory,
+      reportStatus: (state: IPluginState) => state.reports.status,
+      reportStatusMessage: (state: IPluginState) => state.reports.statusMessage,
+      reportStatusMessageHistory: (state: IPluginState) => state.reports.statusMessageHistory,
     }),
     eligibleReportOptions(): IReportOption[] {
       return this.eligibleReportOptionsImpl();

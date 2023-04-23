@@ -823,3 +823,39 @@ export async function createCogsSpreadsheetOrError({
 
   return response.data.result;
 }
+
+export async function createScanSheetOrError(
+  manifestNumber: string,
+  licenseNumber: string,
+  packageTags: string[]
+): Promise<ISpreadsheet> {
+  const SHEET_TITLE = `${manifestNumber} Scan Sheet`;
+
+  const response: {
+    data: {
+      success: boolean;
+      result: ISpreadsheet;
+    };
+  } = await messageBus.sendMessageToBackground(
+    MessageType.CREATE_SPREADSHEET,
+    {
+      title: `Manifest ${manifestNumber} Scan Sheet (${packageTags.length} tags) - ${licenseNumber}`,
+      sheetTitles: [SHEET_TITLE],
+    },
+    undefined,
+    90000
+  );
+
+  await messageBus.sendMessageToBackground(
+    MessageType.WRITE_SPREADSHEET_VALUES,
+    {
+      spreadsheetId: response.data.result.spreadsheetId,
+      range: `'${SHEET_TITLE}'`,
+      values: [["Manifest Tags", "Scanned Tags"], ...packageTags.map((x) => [x])],
+    },
+    undefined,
+    90000
+  );
+
+  return response.data.result
+}

@@ -10,6 +10,7 @@
         triggers="manual"
         placement="right"
         container="foo-container"
+        variant="outline-primary"
       >
         <template #title v-if="contextMenuEvent">
           <div class="text-center text-normal text-lg">
@@ -18,7 +19,7 @@
             </template>
 
             <template v-if="contextMenuEvent.manifestNumber">
-              <span>Transfer {{ contextMenuEvent.manifestNumber }}</span>
+              <span>Manifest {{ contextMenuEvent.zeroPaddedManifestNumber }}</span>
             </template>
           </div>
         </template>

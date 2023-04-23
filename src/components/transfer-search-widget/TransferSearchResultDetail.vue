@@ -64,6 +64,17 @@
         <font-awesome-icon icon="print" />
       </b-button>
 
+      <b-button
+        variant="outline-primary"
+        size="sm"
+        style="width: 100%"
+        @click.stop.prevent="createScanSheet(transfer)"
+        class="flex flex-row items-center justify-between space-x-4"
+      >
+        <span>CREATE SCAN SHEET</span>
+        <font-awesome-icon icon="barcode" />
+      </b-button>
+
       <!-- <b-button
         variant="outline-secondary"
         size="sm"
@@ -114,6 +125,7 @@ import { toastManager } from "@/modules/toast-manager.module";
 import { MutationType } from "@/mutation-types";
 import store from "@/store/page-overlay/index";
 import { copyToClipboard, downloadFileFromUrl, printPdfFromUrl } from "@/utils/dom";
+import { createScanSheet } from "@/utils/transfer";
 import { Subject } from "rxjs";
 import { takeUntil } from "rxjs/operators";
 import Vue from "vue";
@@ -350,6 +362,13 @@ export default Vue.extend({
       printPdfFromUrl({ urls: [manifestUrl], modal: true });
 
       analyticsManager.track(MessageType.CLICKED_TOOLKIT_PRINT_BUTTON);
+      this.$store.commit(MutationType.SET_SHOW_TRANSFER_SEARCH_RESULTS, false);
+    },
+    async createScanSheet(transfer: IIndexedTransferData) {
+      analyticsManager.track(MessageType.CLICKED_TOOLKIT_CREATE_SCAN_SHEET_BUTTON);
+
+      await createScanSheet(transfer.Id, transfer.ManifestNumber);
+
       this.$store.commit(MutationType.SET_SHOW_TRANSFER_SEARCH_RESULTS, false);
     },
     badgeVariant(transfer: IIndexedTransferData) {
