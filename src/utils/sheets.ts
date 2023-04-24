@@ -427,16 +427,29 @@ export function autoResizeDimensionsRequestFactory({
   };
 }
 
-export function conditinalFormattingRequestFactory({ sheetId }: { sheetId: number }) {
+export function conditionalFormattingRequestFactory({
+  sheetId,
+  range,
+  customFormula,
+  backgroundColor,
+}: {
+  sheetId: number;
+  range: {
+    startColumnIndex?: number;
+    endColumnIndex?: number;
+    startRowIndex?: number;
+    endRowIndex?: number;
+  };
+  customFormula: string;
+  backgroundColor: { red?: number; green?: number; blue?: number };
+}) {
   return {
     addConditionalFormatRule: {
       rule: {
         ranges: [
           {
             sheetId,
-            startColumnIndex: 0,
-            endColumnIndex: 1,
-            startRowIndex: 1,
+            ...range,
           },
         ],
         booleanRule: {
@@ -444,14 +457,12 @@ export function conditinalFormattingRequestFactory({ sheetId }: { sheetId: numbe
             type: "CUSTOM_FORMULA",
             values: [
               {
-                userEnteredValue: "=COUNTIF(A:B,A2)>1",
+                userEnteredValue: customFormula,
               },
             ],
           },
           format: {
-            backgroundColor: {
-              green: 1,
-            },
+            backgroundColor,
           },
         },
       },

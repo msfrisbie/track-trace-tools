@@ -1,12 +1,12 @@
-import { MessageType } from "@/consts";
 import {
+  IDestinationData,
+  IDestinationPackageData,
   IMetrcDriverData,
   IMetrcFacilityData,
   IMetrcVehicleData,
   ITransferHistoryData,
   ITransferPackageList,
 } from "@/interfaces";
-import { analyticsManager } from "@/modules/analytics-manager.module";
 import { authManager } from "@/modules/auth-manager.module";
 import { clientBuildManager } from "@/modules/client-build-manager.module";
 import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
@@ -186,7 +186,6 @@ export async function extractDriversAndVehiclesFromTransferHistory(): Promise<{
 }
 
 export async function createScanSheet(transferId: number, manifestNumber: string) {
-
   if (!clientBuildManager.assertValues(["ENABLE_T3PLUS"])) {
     toastManager.openToast(
       "This feature is only availble for T3+ users. Learn more at trackandtrace.tools/plus",
@@ -226,28 +225,33 @@ export async function createScanSheet(transferId: number, manifestNumber: string
   });
 
   try {
-    const packageTags = await primaryDataLoader
-      .transferDestinations(transferId)
-      .then(async (destinations) => {
-        let packageTags: string[] = [];
+    const manifest: {
+      pkg: IDestinationPackageData;
+      destination: IDestinationData;
+    }[] = await primaryDataLoader.transferDestinations(transferId).then(async (destinations) => {
+      let packages: {
+        pkg: IDestinationPackageData;
+        destination: IDestinationData;
+      }[] = [];
 
-        for (const destination of destinations) {
-          packageTags = packageTags.concat(
-            await primaryDataLoader
-              .destinationPackages(destination.Id)
-              .then((packages) => packages.map((pkg) => pkg.PackageLabel))
-          );
-        }
+      for (const destination of destinations) {
+        packages = packages.concat(
+          (await primaryDataLoader.destinationPackages(destination.Id)).map((pkg) => ({
+            pkg,
+            destination,
+          }))
+        );
+      }
 
-        return packageTags;
-      });
+      return packages;
+    });
 
     const spreadsheet = await createScanSheetOrError(
       manifestNumber,
       (
         await authManager.authStateOrError()
       ).license,
-      packageTags
+      manifest
     );
 
     window.open(spreadsheet.spreadsheetUrl, "_blank");

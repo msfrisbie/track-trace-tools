@@ -1,6 +1,7 @@
 import { MessageType, SheetTitles } from "@/consts";
 import {
   IDestinationData,
+  IDestinationPackageData,
   IIndexedDestinationPackageData,
   IIndexedTransferData,
   ISpreadsheet,
@@ -23,7 +24,7 @@ import {
 import {
   addRowsRequestFactory,
   autoResizeDimensionsRequestFactory,
-  conditinalFormattingRequestFactory,
+  conditionalFormattingRequestFactory,
   freezeTopRowRequestFactory,
   shrinkFontRequestFactory,
   styleTopRowRequestFactory,
@@ -737,7 +738,10 @@ export async function createCogsSpreadsheetOrError({
 export async function createScanSheetOrError(
   manifestNumber: string,
   licenseNumber: string,
-  packageTags: string[]
+  manifest: {
+    pkg: IDestinationPackageData;
+    destination: IDestinationData;
+  }[]
 ): Promise<ISpreadsheet> {
   const SHEET_TITLE = `${manifestNumber} Scan Sheet`;
 
@@ -749,7 +753,7 @@ export async function createScanSheetOrError(
   } = await messageBus.sendMessageToBackground(
     MessageType.CREATE_SPREADSHEET,
     {
-      title: `Manifest ${manifestNumber} Scan Sheet (${packageTags.length} tags) - ${licenseNumber}`,
+      title: `Manifest ${manifestNumber} Scan Sheet (${manifest.length} tags) - ${licenseNumber}`,
       sheetTitles: [SHEET_TITLE],
     },
     undefined,
@@ -761,7 +765,19 @@ export async function createScanSheetOrError(
     {
       spreadsheetId: response.data.result.spreadsheetId,
       range: `'${SHEET_TITLE}'`,
-      values: [["Manifest Tags", "Scanned Tags"], ...packageTags.map((x) => [x])],
+      values: [
+        [
+          "Destination",
+          "Package Contents",
+          "Package Tag                                    ",
+          "Scanned Tags                                   ",
+        ],
+        ...manifest.map((x) => [
+          x.destination.RecipientFacilityName + "      ",
+          `${x.pkg.ShippedQuantity} ${x.pkg.ShippedUnitOfMeasureAbbreviation} ${x.pkg.ProductName}      `,
+          x.pkg.PackageLabel,
+        ]),
+      ],
     },
     undefined,
     90000
@@ -770,13 +786,52 @@ export async function createScanSheetOrError(
   const sheetId = 0;
 
   const formattingRequests = [
-    addRowsRequestFactory({ sheetId, length: packageTags.length }),
+    addRowsRequestFactory({ sheetId, length: manifest.length + 2 }),
     styleTopRowRequestFactory({ sheetId }),
     freezeTopRowRequestFactory({ sheetId }),
     autoResizeDimensionsRequestFactory({
       sheetId,
     }),
-    conditinalFormattingRequestFactory({ sheetId }),
+    conditionalFormattingRequestFactory({
+      sheetId,
+      range: {
+        startColumnIndex: 2,
+        endColumnIndex: 3,
+        startRowIndex: 1,
+      },
+      customFormula: "=COUNTIF(C$2:D,C2)=2",
+      backgroundColor: { green: 1 },
+    }),
+    conditionalFormattingRequestFactory({
+      sheetId,
+      range: {
+        startColumnIndex: 2,
+        endColumnIndex: 3,
+        startRowIndex: 1,
+      },
+      customFormula: "=COUNTIF(C$2:D,C2)=1",
+      backgroundColor: { red: 1 },
+    }),
+    conditionalFormattingRequestFactory({
+      sheetId,
+      range: {
+        startColumnIndex: 2,
+        endColumnIndex: 3,
+        startRowIndex: 1,
+      },
+      customFormula: "=COUNTIF($C$2:D,C2)>2",
+      backgroundColor: { red: 1, green: 1 },
+    }),
+    conditionalFormattingRequestFactory({
+      sheetId,
+      range: {
+        startColumnIndex: 3,
+        endColumnIndex: 4,
+        startRowIndex: 1,
+      },
+      customFormula: "=COUNTIF($D$2:D,D2)>1",
+      backgroundColor: { red: 1, green: 1 },
+    }),
   ];
 
   await messageBus.sendMessageToBackground(
@@ -784,6 +839,17 @@ export async function createScanSheetOrError(
     {
       spreadsheetId: response.data.result.spreadsheetId,
       requests: formattingRequests,
+    },
+    undefined,
+    90000
+  );
+
+  await messageBus.sendMessageToBackground(
+    MessageType.WRITE_SPREADSHEET_VALUES,
+    {
+      spreadsheetId: response.data.result.spreadsheetId,
+      range: `'${SHEET_TITLE}'!A${manifest.length + 3}`,
+      values: [[`Created with Track & Trace Tools @ ${Date().toString()}`]],
     },
     undefined,
     90000
