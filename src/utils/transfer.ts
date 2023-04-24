@@ -191,11 +191,12 @@ export async function createScanSheet(transferId: number, manifestNumber: string
       "This feature is only availble for T3+ users. Learn more at trackandtrace.tools/plus",
       {
         title: "T3+ Required",
-        autoHideDelay: 2000,
+        autoHideDelay: 5000,
         variant: "warning",
         appendToast: true,
         toaster: "ttt-toaster",
         solid: true,
+        href: "https://trackandtrace.tools/plus",
       }
     );
 
@@ -203,14 +204,17 @@ export async function createScanSheet(transferId: number, manifestNumber: string
   }
 
   if (store.state.pluginAuth.oAuthState !== OAuthState.AUTHENTICATED) {
-    toastManager.openToast("You must sign in to your Google account to create scan sheets", {
-      title: "Google Sign-in Required",
-      autoHideDelay: 2000,
-      variant: "warning",
-      appendToast: true,
-      toaster: "ttt-toaster",
-      solid: true,
-    });
+    toastManager.openToast(
+      "You must sign in to your Google account to create scan sheets. Click the Track & Trace Tools icon in the browser toolbar to log in.",
+      {
+        title: "Google Sign-in Required",
+        autoHideDelay: 5000,
+        variant: "warning",
+        appendToast: true,
+        toaster: "ttt-toaster",
+        solid: true,
+      }
+    );
 
     return;
   }
