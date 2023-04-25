@@ -803,7 +803,7 @@ export interface ISimpleOutgoingTransferData {
   }[];
 }
 
-export interface ISimpleTransferPackage {
+export interface ISimpleTransferPackageData {
   ETD: string;
   Type: string;
   ManifestNumber: string;

@@ -39,26 +39,30 @@ async function writeDataSheet<T>({
 }: {
   spreadsheetId: string;
   spreadsheetTitle: SheetTitles;
-  fields: IFieldData[];
+  fields?: IFieldData[];
   data: T[];
   options?: {
     useFieldTransformer?: boolean;
   };
 }) {
-  await messageBus.sendMessageToBackground(
-    MessageType.WRITE_SPREADSHEET_VALUES,
-    {
-      spreadsheetId,
-      range: `'${spreadsheetTitle}'!1:1`,
-      values: [fields.map((fieldData) => `${fieldData.readableName}     `)],
-    },
-    undefined,
-    90000
-  );
-
-  let nextPageStartIdx = 0;
-  let nextPageRowIdx = 2;
   const pageSize = 5000;
+  let nextPageStartIdx = 0;
+  let nextPageRowIdx = 1;
+
+  if (fields) {
+    await messageBus.sendMessageToBackground(
+      MessageType.WRITE_SPREADSHEET_VALUES,
+      {
+        spreadsheetId,
+        range: `'${spreadsheetTitle}'!1:1`,
+        values: [fields.map((fieldData) => `${fieldData.readableName}     `)],
+      },
+      undefined,
+      90000
+    );
+
+    nextPageRowIdx += 1;
+  }
 
   const promises = [];
 
@@ -72,6 +76,9 @@ async function writeDataSheet<T>({
 
     let values = nextPage;
     if (options.useFieldTransformer) {
+      if (!fields) {
+        throw new Error("Must provide fields transformer");
+      }
       // @ts-ignore
       values = values.map((row) =>
         fields.map((fieldData) => {
@@ -103,6 +110,39 @@ async function writeDataSheet<T>({
   }
 
   await Promise.allSettled(promises);
+}
+
+export async function createDebugSheetOrError({
+  spreadsheetName,
+  sheetTitles,
+  sheetDataMatrixes,
+}: {
+  spreadsheetName: string;
+  sheetTitles: string[];
+  sheetDataMatrixes: any[][][];
+}) {
+  if (sheetTitles.length !== sheetDataMatrixes.length) {
+    throw new Error("Sheet size mismatch");
+  }
+
+  const response: {
+    data: {
+      success: boolean;
+      result: ISpreadsheet;
+    };
+  } = await messageBus.sendMessageToBackground(
+    MessageType.CREATE_SPREADSHEET,
+    {
+      title: `Debug - ${todayIsodate()}`,
+      sheetTitles,
+    },
+    undefined,
+    90000
+  );
+
+  if (!response.data.success) {
+    throw new Error("Unable to create debug sheet");
+  }
 }
 
 export async function createSpreadsheetOrError({
@@ -396,15 +436,15 @@ export async function createCogsSpreadsheetOrError({
     throw new Error("Unable to create COGS sheet");
   }
 
-  reportData[ReportType.COGS]!.packages.sort((a, b) => {
-    if (!a.ProductionBatchNumber) {
-      return 1;
-    }
-    if (!b.ProductionBatchNumber) {
-      return -1;
-    }
-    return a.ProductionBatchNumber!.localeCompare(b.ProductionBatchNumber!);
-  }).map((pkg) => [pkg.Label, pkg.ProductionBatchNumber ?? ""]);
+  // reportData[ReportType.COGS]!.packages.sort((a, b) => {
+  //   if (!a.ProductionBatchNumber) {
+  //     return 1;
+  //   }
+  //   if (!b.ProductionBatchNumber) {
+  //     return -1;
+  //   }
+  //   return a.ProductionBatchNumber!.localeCompare(b.ProductionBatchNumber!);
+  // }).map((pkg) => [pkg.Label, pkg.ProductionBatchNumber ?? ""]);
 
   // const worksheetData = reportData[ReportType.COGS]!.packageCostCalculationData.map(
   //   ({ tag, sourceCostData, errors }, idx) => [
@@ -424,30 +464,31 @@ export async function createCogsSpreadsheetOrError({
   //   ]
   // );
 
-  const worksheetData = reportData[ReportType.COGS]!.packages.map((pkg, idx) => {
-    let fractionalCostExpression = "";
-    if (pkg!.fractionalCostData!.length) {
-      fractionalCostExpression =
-        "=" +
-        pkg!
-          .fractionalCostData!.map(
-            ({ parentLabel, fractionalQuantity }) =>
-              `(VLOOKUP("${parentLabel}", B2:E, 4, false) * ${fractionalQuantity})`
-          )
-          .join("+");
-    }
+  const worksheetData: any[] = [];
+  // const worksheetData = reportData[ReportType.COGS]!.packages.map((pkg, idx) => {
+  //   let fractionalCostExpression = "";
+  //   if (pkg!.fractionalCostData!.length) {
+  //     fractionalCostExpression =
+  //       "=" +
+  //       pkg!
+  //         .fractionalCostData!.map(
+  //           ({ parentLabel, fractionalQuantity }) =>
+  //             `(VLOOKUP("${parentLabel}", B2:E, 4, false) * ${fractionalQuantity})`
+  //         )
+  //         .join("+");
+  //   }
 
-    return [
-      pkg.LicenseNumber,
-      pkg.Label,
-      pkg.ItemName,
-      pkg.ProductionBatchNumber,
-      ``,
-      fractionalCostExpression,
-      `=SUM(E${idx + 2}:F${idx + 2})`,
-      (pkg.errors ?? "").toString(),
-    ];
-  });
+  //   return [
+  //     pkg.LicenseNumber,
+  //     pkg.Label,
+  //     pkg.ItemName,
+  //     pkg.ProductionBatchNumber,
+  //     ``,
+  //     fractionalCostExpression,
+  //     `=SUM(E${idx + 2}:F${idx + 2})`,
+  //     (pkg.errors ?? "").toString(),
+  //   ];
+  // });
 
   let formattingRequests: any = [
     addRowsRequestFactory({
@@ -497,7 +538,7 @@ export async function createCogsSpreadsheetOrError({
       values: [
         [],
         [],
-        ...reportData[ReportType.COGS]!.auditData.map(({ text, value }) => ["", text, value]),
+        // ...reportData[ReportType.COGS]!.auditData.map(({ text, value }) => ["", text, value]),
       ],
     },
     undefined,
@@ -598,42 +639,42 @@ export async function createCogsSpreadsheetOrError({
   // Manifest	Tag	Wholesale Cost	Units	COGS (package)	COGS (per unit)
   // 10000001	1A4050100000900000000008	$500.00	50	=VLOOKUP(B3, 'Calculation Sheet'!A3:B, 2)	=E3/D3
 
-  let flattenedOutgoingPackages: {
-    Package: IIndexedDestinationPackageData;
-    Destination: IDestinationData;
-    Transfer: IIndexedTransferData;
-  }[] = [];
+  // let flattenedOutgoingPackages: {
+  //   Package: IIndexedDestinationPackageData;
+  //   Destination: IDestinationData;
+  //   Transfer: IIndexedTransferData;
+  // }[] = [];
 
-  for (const transfer of reportData[ReportType.COGS]!.richOutgoingTransfers) {
-    for (const destination of transfer.outgoingDestinations ?? []) {
-      for (const pkg of destination.packages ?? []) {
-        flattenedOutgoingPackages.push({
-          Package: pkg,
-          Destination: destination,
-          Transfer: transfer,
-        });
-      }
-    }
-  }
+  // for (const transfer of reportData[ReportType.COGS]!.richOutgoingTransfers) {
+  //   for (const destination of transfer.outgoingDestinations ?? []) {
+  //     for (const pkg of destination.packages ?? []) {
+  //       flattenedOutgoingPackages.push({
+  //         Package: pkg,
+  //         Destination: destination,
+  //         Transfer: transfer,
+  //       });
+  //     }
+  //   }
+  // }
 
-  const cogsData = flattenedOutgoingPackages.map(({ Package, Destination, Transfer }) => {
-    const isEach = Package.ShippedUnitOfMeasureAbbreviation === "ea";
+  // const cogsData = flattenedOutgoingPackages.map(({ Package, Destination, Transfer }) => {
+  //   const isEach = Package.ShippedUnitOfMeasureAbbreviation === "ea";
 
-    return [
-      Transfer.LicenseNumber,
-      "# " + Transfer.ManifestNumber,
-      getLabel(Package),
-      getItemName(Package),
-      Package.ShipperWholesalePrice,
-      isEach ? Package.ShippedQuantity : "",
-      `=VLOOKUP("${getLabel(Package)}", ${SheetTitles.WORKSHEET}!B2:G, 6, false)`,
-      isEach
-        ? `=VLOOKUP("${getLabel(Package)}", ${SheetTitles.WORKSHEET}!B2:G, 6, false) / ${
-            Package.ShippedQuantity
-          }`
-        : "",
-    ];
-  });
+  //   return [
+  //     Transfer.LicenseNumber,
+  //     "# " + Transfer.ManifestNumber,
+  //     getLabel(Package),
+  //     getItemName(Package),
+  //     Package.ShipperWholesalePrice,
+  //     isEach ? Package.ShippedQuantity : "",
+  //     `=VLOOKUP("${getLabel(Package)}", ${SheetTitles.WORKSHEET}!B2:G, 6, false)`,
+  //     isEach
+  //       ? `=VLOOKUP("${getLabel(Package)}", ${SheetTitles.WORKSHEET}!B2:G, 6, false) / ${
+  //           Package.ShippedQuantity
+  //         }`
+  //       : "",
+  //   ];
+  // });
 
   await writeDataSheet({
     spreadsheetId: response.data.result.spreadsheetId,
@@ -680,7 +721,7 @@ export async function createCogsSpreadsheetOrError({
         required: true,
       },
     ],
-    data: cogsData,
+    data: [],//cogsData,
     options: {
       useFieldTransformer: false,
     },

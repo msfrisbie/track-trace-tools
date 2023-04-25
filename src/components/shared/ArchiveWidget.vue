@@ -35,7 +35,7 @@ import {
   IIndexedRichOutgoingTransferData,
   ISimpleOutgoingTransferData,
   ISimplePackageData,
-  ISimpleTransferPackage,
+  ISimpleTransferPackageData,
 } from "@/interfaces";
 import { DataLoader, getDataLoaderByLicense } from "@/modules/data-loader/data-loader.module";
 import { facilityManager } from "@/modules/facility-manager.module";
@@ -75,7 +75,7 @@ export default Vue.extend({
     };
   },
   methods: {
-    async getArchiveData(): Promise<any> {
+    async getMutableArchiveData(): Promise<any> {
       return readJSONFile(this.$data.existingArchive);
     },
     async inspectFile(e: any): Promise<void> {
@@ -89,7 +89,7 @@ export default Vue.extend({
         this.$data.archiveUrl = null;
 
         const archive: ICogsArchive = this.$data.existingArchive
-          ? await this.getArchiveData()
+          ? await this.getMutableArchiveData()
           : {
               licenses: [],
               packages: [],
@@ -233,7 +233,7 @@ export default Vue.extend({
 
           const packageRequests: Promise<any>[] = [];
 
-          const rawTransferPackages: ISimpleTransferPackage[] = [];
+          const rawTransferPackages: ISimpleTransferPackageData[] = [];
 
           const wrapper = new CompressedDataWrapper<ISimpleOutgoingTransferData>(
             archive.transfers,
@@ -277,7 +277,7 @@ export default Vue.extend({
 
           this.$data.message = `Processing ${rawTransferPackages.length} manifest packages...`;
 
-          const packageWrapper = compressedDataWrapperFactory<ISimpleTransferPackage>(
+          const packageWrapper = compressedDataWrapperFactory<ISimpleTransferPackageData>(
             rawTransferPackages,
             "Label"
           );

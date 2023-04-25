@@ -1,9 +1,14 @@
-import { PackageState } from "@/consts";
 import {
+  IDestinationData,
+  IIndexedDestinationPackageData,
+  IIndexedPackageData,
   IIndexedRichOutgoingTransferData,
+  IIndexedTransferData,
   IPackageFilter,
   IPluginState,
-  ISimpleCogsPackageData,
+  ISimpleOutgoingTransferData,
+  ISimplePackageData,
+  ISimpleTransferPackageData,
   ITransferFilter,
 } from "@/interfaces";
 import { DataLoader, getDataLoaderByLicense } from "@/modules/data-loader/data-loader.module";
@@ -16,12 +21,9 @@ import {
   IReportsState,
 } from "@/store/page-overlay/modules/reports/interfaces";
 import { ActionContext } from "vuex";
+import { CompressedDataWrapper } from "../compression";
 import { getIsoDateFromOffset, todayIsodate } from "../date";
-import {
-  extractParentPackageLabelsFromHistory,
-  extractTagQuantityPairsFromHistory,
-} from "../history";
-import { getId, getItemName, getLabel, getParentPackageLabels } from "../package";
+import { getId, getItemName, getLabel } from "../package";
 
 interface ICogsReportFormFilters {
   cogsDateGt: string;
@@ -36,11 +38,11 @@ export const cogsFormFiltersFactory: () => ICogsReportFormFilters = () => ({
 export function addCogsReport({
   reportConfig,
   cogsFormFilters,
-  archive,
+  mutableArchiveData,
 }: {
   reportConfig: IReportConfig;
   cogsFormFilters: ICogsReportFormFilters;
-  archive: ICogsArchive;
+  mutableArchiveData: ICogsArchive;
 }) {
   const packageFilter: IPackageFilter = {};
   const transferFilter: ITransferFilter = {};
@@ -55,7 +57,42 @@ export function addCogsReport({
     packageFilter,
     transferFilter,
     fields: null,
-    archive,
+    mutableArchiveData,
+  };
+}
+
+function simplePackageConverter(pkg: IIndexedPackageData): ISimplePackageData {
+  return {
+    LicenseNumber: pkg.LicenseNumber,
+    Id: getId(pkg),
+    PackageState: pkg.PackageState,
+    Label: getLabel(pkg),
+    ItemName: getItemName(pkg),
+    SourcePackageLabels: pkg.SourcePackageLabels,
+    ProductionBatchNumber: pkg.ProductionBatchNumber,
+    parentPackageLabels: null,
+    childPackageLabelQuantityPairs: null,
+  };
+}
+
+function simpleTransferPackageConverter(
+  transfer: IIndexedTransferData,
+  destination: IDestinationData,
+  pkg: IIndexedDestinationPackageData
+): ISimpleTransferPackageData {
+  return {
+    ETD: destination.EstimatedDepartureDateTime,
+    Type: destination.ShipmentTypeName,
+    ManifestNumber: transfer.ManifestNumber,
+    LicenseNumber: transfer.LicenseNumber,
+    Id: getId(pkg),
+    PackageState: pkg.PackageState,
+    Label: getLabel(pkg),
+    ItemName: getItemName(pkg),
+    SourcePackageLabels: pkg.SourcePackageLabels,
+    ProductionBatchNumber: pkg.ProductionBatchNumber,
+    parentPackageLabels: null,
+    childPackageLabelQuantityPairs: null,
   };
 }
 
@@ -75,7 +112,25 @@ export async function maybeLoadCogsReportData({
   // packageFilter and transferFilter will have identical dates
   const { transferFilter } = reportConfig[ReportType.COGS]!;
 
-  const globalPackageMap: Map<string, ISimpleCogsPackageData> = new Map();
+  // const globalPackageMap: Map<string, ISimpleCogsPackageData> = new Map();
+
+  const mutableArchiveData = reportConfig[ReportType.COGS]!.mutableArchiveData;
+
+  const packageWrapper = new CompressedDataWrapper<ISimplePackageData>(
+    mutableArchiveData.packages,
+    "Label",
+    mutableArchiveData.packagesKeys
+  );
+  const transferWrapper = new CompressedDataWrapper<ISimpleOutgoingTransferData>(
+    mutableArchiveData.transfers,
+    "ManifestNumber",
+    mutableArchiveData.transfersKeys
+  );
+  const transferPackageWrapper = new CompressedDataWrapper<ISimpleTransferPackageData>(
+    mutableArchiveData.transfersPackages,
+    "PackageLabel",
+    mutableArchiveData.transfersPackagesKeys
+  );
 
   let dataLoader: DataLoader | null = null;
 
@@ -89,49 +144,32 @@ export async function maybeLoadCogsReportData({
     dataLoader = await getDataLoaderByLicense(license);
 
     try {
-      (await dataLoader.activePackages(24 * 60 * 60 * 1000)).map((pkg) =>
-        globalPackageMap.set(getLabel(pkg), {
-          LicenseNumber: pkg.LicenseNumber,
-          Id: getId(pkg),
-          PackageState: pkg.PackageState,
-          Label: getLabel(pkg),
-          ItemName: getItemName(pkg),
-          manifest: false,
-          manifestGraph: false,
-          SourcePackageLabels: pkg.SourcePackageLabels,
-          ProductionBatchNumber: pkg.ProductionBatchNumber,
-          parentPackageLabels: null,
-          childPackageLabelQuantityPairs: null,
-          childLabels: [],
-          fractionalCostData: [],
-          errors: [],
-        })
-      );
+      (await dataLoader.activePackages(24 * 60 * 60 * 1000)).map((pkg) => {
+        packageWrapper.add(simplePackageConverter(pkg));
+      });
     } catch (e) {
       ctx.commit(ReportsMutations.SET_STATUS, {
         statusMessage: { text: `Failed to load active packages. (${license})`, level: "warning" },
       });
     }
 
+    // TODO
+    // try {
+    //   (await dataLoader.onHoldPackages(24 * 60 * 60 * 1000)).map(simplePackageConverter
+    //   );
+    // } catch (e) {
+    //   ctx.commit(ReportsMutations.SET_STATUS, {
+    //     statusMessage: { text: `Failed to load on hold packages. (${license})`, level: "warning" },
+    //   });
+    // }
+
     try {
-      (await dataLoader.inactivePackages(24 * 60 * 60 * 1000)).map((pkg) =>
-        globalPackageMap.set(getLabel(pkg), {
-          LicenseNumber: pkg.LicenseNumber,
-          Id: getId(pkg),
-          PackageState: pkg.PackageState,
-          Label: getLabel(pkg),
-          ItemName: getItemName(pkg),
-          manifest: false,
-          manifestGraph: false,
-          SourcePackageLabels: pkg.SourcePackageLabels,
-          ProductionBatchNumber: pkg.ProductionBatchNumber,
-          parentPackageLabels: null,
-          childPackageLabelQuantityPairs: null,
-          childLabels: [],
-          fractionalCostData: [],
-          errors: [],
-        })
-      );
+      (await dataLoader.inactivePackages(24 * 60 * 60 * 1000)).map((pkg) => {
+        // Don't overwrite existing
+        if (!packageWrapper.index.has(getLabel(pkg))) {
+          packageWrapper.add(simplePackageConverter(pkg));
+        }
+      });
     } catch (e) {
       ctx.commit(ReportsMutations.SET_STATUS, {
         statusMessage: { text: `Failed to load inactive packages. (${license})`, level: "warning" },
@@ -139,24 +177,9 @@ export async function maybeLoadCogsReportData({
     }
 
     try {
-      (await dataLoader.inTransitPackages()).map((pkg) =>
-        globalPackageMap.set(getLabel(pkg), {
-          LicenseNumber: pkg.LicenseNumber,
-          Id: getId(pkg),
-          PackageState: pkg.PackageState,
-          Label: getLabel(pkg),
-          ItemName: getItemName(pkg),
-          manifest: false,
-          manifestGraph: false,
-          SourcePackageLabels: pkg.SourcePackageLabels,
-          ProductionBatchNumber: pkg.ProductionBatchNumber,
-          parentPackageLabels: null,
-          childPackageLabelQuantityPairs: null,
-          childLabels: [],
-          fractionalCostData: [],
-          errors: [],
-        })
-      );
+      (await dataLoader.inTransitPackages()).map((pkg) => {
+        packageWrapper.add(simplePackageConverter(pkg));
+      });
     } catch (e) {
       ctx.commit(ReportsMutations.SET_STATUS, {
         statusMessage: {
@@ -210,21 +233,6 @@ export async function maybeLoadCogsReportData({
     "T"
   );
 
-  // console.log(`Transfers before loose filter: ${richOutgoingTransfers.length}`);
-
-  // richOutgoingTransfers = richOutgoingTransfers.filter((richOutgoingTransfer) => {
-  //   if (richOutgoingTransfer.CreatedDateTime > departureDateLt!) {
-  //     return false;
-  //   }
-
-  //   if (richOutgoingTransfer.LastModified < departureDateGt!) {
-  //     return false;
-  //   }
-  //   return true;
-  // });
-
-  // console.log(`Transfers after loose filter: ${richOutgoingTransfers.length}`);
-
   ctx.commit(ReportsMutations.SET_STATUS, {
     statusMessage: { text: "Loading destinations....", level: "success" },
   });
@@ -234,6 +242,10 @@ export async function maybeLoadCogsReportData({
   const richOutgoingTransferDestinationRequests: Promise<any>[] = [];
 
   for (const transfer of richOutgoingTransfers) {
+    if (transferWrapper.index.has(transfer.ManifestNumber)) {
+      continue;
+    }
+
     inflightCount++;
     richOutgoingTransferDestinationRequests.push(
       getDataLoaderByLicense(transfer.LicenseNumber).then((dataLoader) =>
@@ -270,9 +282,7 @@ export async function maybeLoadCogsReportData({
     }
   }
 
-  const destinationResults = await Promise.allSettled(richOutgoingTransferDestinationRequests);
-
-  debugger;
+  await Promise.allSettled(richOutgoingTransferDestinationRequests);
 
   ctx.commit(ReportsMutations.SET_STATUS, {
     statusMessage: {
@@ -288,47 +298,52 @@ export async function maybeLoadCogsReportData({
 
   const packageRequests: Promise<any>[] = [];
 
-  const eligibleTransfers: IIndexedRichOutgoingTransferData[] = [];
-  const wholesaleTransfers: IIndexedRichOutgoingTransferData[] = [];
+  // const eligibleTransfers: IIndexedRichOutgoingTransferData[] = [];
+  // const wholesaleTransfers: IIndexedRichOutgoingTransferData[] = [];
 
   for (const transfer of richOutgoingTransfers) {
     for (const destination of transfer.outgoingDestinations || []) {
-      const isWholesaleTransfer: boolean = destination.ShipmentTypeName.includes("Wholesale");
-
-      const isEligibleTransfer: boolean =
-        destination.EstimatedDepartureDateTime > departureDateGt &&
-        destination.EstimatedDepartureDateTime < departureDateLt;
-
-      if (isEligibleTransfer) {
-        eligibleTransfers.push(transfer);
-        if (isWholesaleTransfer) {
-          wholesaleTransfers.push(transfer);
-        }
+      if (transferWrapper.index.has(transfer.ManifestNumber)) {
+        continue;
       }
+      // const isWholesaleTransfer: boolean = destination.ShipmentTypeName.includes("Wholesale");
+
+      // const isEligibleTransfer: boolean =
+      //   destination.EstimatedDepartureDateTime > departureDateGt &&
+      //   destination.EstimatedDepartureDateTime < departureDateLt;
+
+      // if (isEligibleTransfer) {
+      //   eligibleTransfers.push(transfer);
+      //   if (isWholesaleTransfer) {
+      //     wholesaleTransfers.push(transfer);
+      //   }
+      // }
 
       packageRequests.push(
         getDataLoaderByLicense(transfer.LicenseNumber).then((dataLoader) =>
           dataLoader.destinationPackages(destination.Id).then((destinationPackages) => {
-            destination.packages = destinationPackages;
-
             destinationPackages.map((pkg) =>
-              globalPackageMap.set(getLabel(pkg), {
-                LicenseNumber: pkg.LicenseNumber,
-                Id: getId(pkg),
-                PackageState: pkg.PackageState,
-                Label: getLabel(pkg),
-                ItemName: getItemName(pkg),
-                manifest: isWholesaleTransfer && isEligibleTransfer,
-                manifestGraph: isWholesaleTransfer && isEligibleTransfer,
-                SourcePackageLabels: pkg.SourcePackageLabels,
-                ProductionBatchNumber: pkg.ProductionBatchNumber,
-                parentPackageLabels: null,
-                childPackageLabelQuantityPairs: null,
-                childLabels: [],
-                fractionalCostData: [],
-                errors: [],
-              })
+              transferPackageWrapper.add(simpleTransferPackageConverter(transfer, destination, pkg))
             );
+            // destination.packages = destinationPackages;
+            // destinationPackages.map((pkg) =>
+            //   globalPackageMap.set(getLabel(pkg), {
+            //     LicenseNumber: pkg.LicenseNumber,
+            //     Id: getId(pkg),
+            //     PackageState: pkg.PackageState,
+            //     Label: getLabel(pkg),
+            //     ItemName: getItemName(pkg),
+            //     manifest: isWholesaleTransfer && isEligibleTransfer,
+            //     manifestGraph: isWholesaleTransfer && isEligibleTransfer,
+            //     SourcePackageLabels: pkg.SourcePackageLabels,
+            //     ProductionBatchNumber: pkg.ProductionBatchNumber,
+            //     parentPackageLabels: null,
+            //     childPackageLabelQuantityPairs: null,
+            //     childLabels: [],
+            //     fractionalCostData: [],
+            //     errors: [],
+            //   })
+            // );
           })
         )
       );
@@ -359,111 +374,111 @@ export async function maybeLoadCogsReportData({
     },
   });
 
-  debugger;
-
   console.log(
     `Failed package requests: ${packageResults.filter((x) => x.status !== "fulfilled").length}`
   );
 
-  console.log(
-    `Manifest packages: ${[...globalPackageMap.values()].filter((pkg) => pkg.manifest).length}`
-  );
+  debugger;
 
-  const totalTransfersWithMultiDestinations = richOutgoingTransfers
-    .map((x) => x.outgoingDestinations!.length)
-    .filter((x) => x > 1)
-    .reduce((a, b) => a + b, 0);
+  // console.log(
+  //   `Manifest packages: ${[...globalPackageMap.values()].filter((pkg) => pkg.manifest).length}`
+  // );
 
-  ctx.commit(ReportsMutations.SET_STATUS, {
-    statusMessage: { text: "Building package history...", level: "success" },
-  });
+  // const totalTransfersWithMultiDestinations = richOutgoingTransfers
+  //   .map((x) => x.outgoingDestinations!.length)
+  //   .filter((x) => x > 1)
+  //   .reduce((a, b) => a + b, 0);
 
-  const touchedPackageTags: Set<string> = new Set();
+  // ctx.commit(ReportsMutations.SET_STATUS, {
+  //   statusMessage: { text: "Building package history...", level: "success" },
+  // });
 
-  const packageTagStack: string[] = [...globalPackageMap.values()]
-    .filter((pkg) => pkg.manifest)
-    .map((pkg) => pkg.Label);
+  // const touchedPackageTags: Set<string> = new Set();
 
-  console.log(`Initial package tag stack: ${packageTagStack.length}`);
+  // const packageTagStack: string[] = [...globalPackageMap.values()]
+  //   .filter((pkg) => pkg.manifest)
+  //   .map((pkg) => pkg.Label);
 
-  while (packageTagStack.length > 0) {
-    const label = packageTagStack.pop();
-    if (!label) {
-      throw new Error("Couldn't pop next package tag");
-    }
+  // console.log(`Initial package tag stack: ${packageTagStack.length}`);
 
-    touchedPackageTags.add(label);
+  // while (packageTagStack.length > 0) {
+  //   const label = packageTagStack.pop();
+  //   if (!label) {
+  //     throw new Error("Couldn't pop next package tag");
+  //   }
 
-    const pkg = globalPackageMap.get(label);
+  //   touchedPackageTags.add(label);
 
-    if (!pkg) {
-      //console.error(`Couldn't match tag to package: ${label}`);
-      continue;
-    }
+  //   const pkg = globalPackageMap.get(label);
 
-    globalPackageMap.set(pkg.Label, {
-      ...pkg,
-      manifestGraph: true,
-    });
+  //   if (!pkg) {
+  //     //console.error(`Couldn't match tag to package: ${label}`);
+  //     continue;
+  //   }
 
-    const parentPackageLabels = await getParentPackageLabels(pkg);
+  //   globalPackageMap.set(pkg.Label, {
+  //     ...pkg,
+  //     manifestGraph: true,
+  //   });
 
-    // Overwrite source package labels with full list
-    if (pkg.SourcePackageLabels.endsWith("...")) {
-      pkg.SourcePackageLabels = parentPackageLabels.join(", ");
-    }
+  //   const parentPackageLabels = await getParentPackageLabels(pkg);
 
-    parentPackageLabels
-      .filter((x) => x.length > 0)
-      .filter((x) => !touchedPackageTags.has(x))
-      .map((x) => packageTagStack.push(x));
-  }
+  //   // Overwrite source package labels with full list
+  //   if (pkg.SourcePackageLabels.endsWith("...")) {
+  //     pkg.SourcePackageLabels = parentPackageLabels.join(", ");
+  //   }
+
+  //   parentPackageLabels
+  //     .filter((x) => x.length > 0)
+  //     .filter((x) => !touchedPackageTags.has(x))
+  //     .map((x) => packageTagStack.push(x));
+  // }
 
   // At this point, we're done with all packages that are not in the manifest graph.
   // Remove them
-  const globalPackageMapCount = globalPackageMap.size;
-  [...globalPackageMap.keys()].map((packageTag) => {
-    const pkg = globalPackageMap.get(packageTag);
+  // const globalPackageMapCount = globalPackageMap.size;
+  // [...globalPackageMap.keys()].map((packageTag) => {
+  //   const pkg = globalPackageMap.get(packageTag);
 
-    if (!pkg!.manifestGraph) {
-      globalPackageMap.delete(packageTag);
-    }
-  });
+  //   if (!pkg!.manifestGraph) {
+  //     globalPackageMap.delete(packageTag);
+  //   }
+  // });
 
   // Create a new identifier that is just a reference
-  const manifestGraphPackageMap = globalPackageMap;
+  // const manifestGraphPackageMap = globalPackageMap;
 
   // Perform eager optimizations:
   // - Assess child counts
   // - Determine if a history lookup is required
-  for (const manifestGraphPackage of manifestGraphPackageMap.values()) {
-    for (const parentPackageLabel of manifestGraphPackage.SourcePackageLabels.split(",").map((x) =>
-      x.trim()
-    )) {
-      const parentPkg = manifestGraphPackageMap.get(parentPackageLabel);
+  // for (const manifestGraphPackage of manifestGraphPackageMap.values()) {
+  //   for (const parentPackageLabel of manifestGraphPackage.SourcePackageLabels.split(",").map((x) =>
+  //     x.trim()
+  //   )) {
+  //     const parentPkg = manifestGraphPackageMap.get(parentPackageLabel);
 
-      if (!parentPkg) {
-        continue;
-      }
+  //     if (!parentPkg) {
+  //       continue;
+  //     }
 
-      parentPkg!.childLabels.push(manifestGraphPackage.Label);
-    }
-  }
+  //     parentPkg!.childLabels.push(manifestGraphPackage.Label);
+  //   }
+  // }
 
-  for (const manifestGraphPackage of manifestGraphPackageMap.values()) {
-    if (
-      manifestGraphPackage.childLabels.length === 1 &&
-      !manifestGraphPackage.SourcePackageLabels.endsWith("...")
-    ) {
-      const [childLabel] = manifestGraphPackage.childLabels;
+  // for (const manifestGraphPackage of manifestGraphPackageMap.values()) {
+  //   if (
+  //     manifestGraphPackage.childLabels.length === 1 &&
+  //     !manifestGraphPackage.SourcePackageLabels.endsWith("...")
+  //   ) {
+  //     const [childLabel] = manifestGraphPackage.childLabels;
 
-      // Spoof the history extracts, eliminating the need for a history lookup
-      manifestGraphPackage.parentPackageLabels = manifestGraphPackage.SourcePackageLabels.split(
-        ","
-      ).map((x) => x.trim());
-      manifestGraphPackage.childPackageLabelQuantityPairs = [[childLabel, 1]];
-    }
-  }
+  //     // Spoof the history extracts, eliminating the need for a history lookup
+  //     manifestGraphPackage.parentPackageLabels = manifestGraphPackage.SourcePackageLabels.split(
+  //       ","
+  //     ).map((x) => x.trim());
+  //     manifestGraphPackage.childPackageLabelQuantityPairs = [[childLabel, 1]];
+  //   }
+  // }
 
   // const tmpManifestGraphPackages = [...manifestGraphPackageMap.values()];
 
@@ -482,161 +497,102 @@ export async function maybeLoadCogsReportData({
   //   removableManifestGraphMembers: removableManifestGraphMembers.length,
   // });
 
-  ctx.commit(ReportsMutations.SET_STATUS, {
-    statusMessage: { text: "Loading package split data...", level: "success" },
-  });
+  // ctx.commit(ReportsMutations.SET_STATUS, {
+  //   statusMessage: { text: "Loading package split data...", level: "success" },
+  // });
 
-  // Load all history objects into map
-  const packageHistoryRequests: Promise<any>[] = [];
+  // // Load all history objects into map
+  // const packageHistoryRequests: Promise<any>[] = [];
 
-  for (const pkg of manifestGraphPackageMap.values()) {
-    if (pkg.parentPackageLabels) {
-      // Already generated history data
-      continue;
-    }
+  // for (const pkg of manifestGraphPackageMap.values()) {
+  //   if (pkg.parentPackageLabels) {
+  //     // Already generated history data
+  //     continue;
+  //   }
 
-    packageHistoryRequests.push(
-      getDataLoaderByLicense(pkg.LicenseNumber).then((dataLoader) =>
-        dataLoader.packageHistoryByPackageId(pkg.Id).then((history) => {
-          pkg.parentPackageLabels = extractParentPackageLabelsFromHistory(history);
-          pkg.childPackageLabelQuantityPairs = extractTagQuantityPairsFromHistory(history);
-        })
-      )
-    );
+  //   packageHistoryRequests.push(
+  //     getDataLoaderByLicense(pkg.LicenseNumber).then((dataLoader) =>
+  //       dataLoader.packageHistoryByPackageId(pkg.Id).then((history) => {
+  //         pkg.parentPackageLabels = extractParentPackageLabelsFromHistory(history);
+  //         pkg.childPackageLabelQuantityPairs = extractTagQuantityPairsFromHistory(history);
+  //       })
+  //     )
+  //   );
 
-    if (packageHistoryRequests.length % 250 === 0) {
-      await Promise.allSettled(packageHistoryRequests);
-    }
-  }
+  //   if (packageHistoryRequests.length % 250 === 0) {
+  //     await Promise.allSettled(packageHistoryRequests);
+  //   }
+  // }
 
-  const packageHistoryResults = await Promise.allSettled(packageHistoryRequests);
+  // const packageHistoryResults = await Promise.allSettled(packageHistoryRequests);
 
-  console.log(
-    `Failed package history requests: ${
-      packageHistoryResults.filter((x) => x.status !== "fulfilled").length
-    }`
-  );
+  // console.log(
+  //   `Failed package history requests: ${
+  //     packageHistoryResults.filter((x) => x.status !== "fulfilled").length
+  //   }`
+  // );
 
-  for (const pkg of manifestGraphPackageMap.values()) {
-    if (!pkg.parentPackageLabels) {
-      pkg.errors.push("No history");
-      continue;
-    }
+  // for (const pkg of manifestGraphPackageMap.values()) {
+  //   if (!pkg.parentPackageLabels) {
+  //     pkg.errors.push("No history");
+  //     continue;
+  //   }
 
-    if (pkg.parentPackageLabels.length === 0) {
-      pkg.errors.push("Extracted 0 parent package labels");
-      continue;
-    }
+  //   if (pkg.parentPackageLabels.length === 0) {
+  //     pkg.errors.push("Extracted 0 parent package labels");
+  //     continue;
+  //   }
 
-    const parentPackages = pkg.parentPackageLabels.map((pkg) => manifestGraphPackageMap.get(pkg));
-    const matchedParentPackages = parentPackages.filter(
-      (x) => x !== undefined
-    ) as ISimpleCogsPackageData[];
-    const unmatchedParentPackages = parentPackages.filter((x) => x === undefined);
-    const noHistoryParentPackages = matchedParentPackages.filter((x) => !x.parentPackageLabels);
-    const validParentPackages = matchedParentPackages.filter((x) => !!x.parentPackageLabels);
+  //   const parentPackages = pkg.parentPackageLabels.map((pkg) => manifestGraphPackageMap.get(pkg));
+  //   const matchedParentPackages = parentPackages.filter(
+  //     (x) => x !== undefined
+  //   ) as ISimpleCogsPackageData[];
+  //   const unmatchedParentPackages = parentPackages.filter((x) => x === undefined);
+  //   const noHistoryParentPackages = matchedParentPackages.filter((x) => !x.parentPackageLabels);
+  //   const validParentPackages = matchedParentPackages.filter((x) => !!x.parentPackageLabels);
 
-    if (parentPackages.length > 0 && matchedParentPackages.length === 0) {
-      pkg.errors.push("No parents matched");
-      // TODO this might be OK
-    }
+  //   if (parentPackages.length > 0 && matchedParentPackages.length === 0) {
+  //     pkg.errors.push("No parents matched");
+  //     // TODO this might be OK
+  //   }
 
-    if (unmatchedParentPackages.length > 0) {
-      pkg.errors.push(`${unmatchedParentPackages.length}/${parentPackages.length} parents matched`);
-    }
+  //   if (unmatchedParentPackages.length > 0) {
+  //     pkg.errors.push(`${unmatchedParentPackages.length}/${parentPackages.length} parents matched`);
+  //   }
 
-    if (noHistoryParentPackages.length > 0) {
-      pkg.errors.push(
-        `${noHistoryParentPackages.length}/${parentPackages.length} parent packages have no history`
-      );
-    }
+  //   if (noHistoryParentPackages.length > 0) {
+  //     pkg.errors.push(
+  //       `${noHistoryParentPackages.length}/${parentPackages.length} parent packages have no history`
+  //     );
+  //   }
 
-    for (const parentPkg of validParentPackages) {
-      const totalParentQuantity = parentPkg!
-        .childPackageLabelQuantityPairs!.map(([label, quantity]) => quantity)
-        .reduce((a, b) => a + b, 0);
+  //   for (const parentPkg of validParentPackages) {
+  //     const totalParentQuantity = parentPkg!
+  //       .childPackageLabelQuantityPairs!.map(([label, quantity]) => quantity)
+  //       .reduce((a, b) => a + b, 0);
 
-      const matchingPackagePair = parentPkg!.childPackageLabelQuantityPairs!.find(
-        ([label, quantity]) => label === pkg.Label
-      );
-      if (!matchingPackagePair) {
-        pkg.errors.push(`No parent history pair match: ${parentPkg!.Label}`);
-        continue;
-      }
+  //     const matchingPackagePair = parentPkg!.childPackageLabelQuantityPairs!.find(
+  //       ([label, quantity]) => label === pkg.Label
+  //     );
+  //     if (!matchingPackagePair) {
+  //       pkg.errors.push(`No parent history pair match: ${parentPkg!.Label}`);
+  //       continue;
+  //     }
 
-      pkg.fractionalCostData.push({
-        parentLabel: parentPkg!.Label,
-        totalParentQuantity,
-        fractionalQuantity: matchingPackagePair[1] / totalParentQuantity,
-      });
-    }
-  }
+  //     pkg.fractionalCostData.push({
+  //       parentLabel: parentPkg!.Label,
+  //       totalParentQuantity,
+  //       fractionalQuantity: matchingPackagePair[1] / totalParentQuantity,
+  //     });
+  //   }
+  // }
 
-  const manifestGraphPackages = [...manifestGraphPackageMap.values()];
+  // const manifestGraphPackages = [...manifestGraphPackageMap.values()];
 
   reportData[ReportType.COGS] = {
-    packages: manifestGraphPackages,
-    richOutgoingTransfers,
-    auditData: [
-      {
-        text: "Eligible Date Range",
-        value: `${transferFilter.estimatedDepartureDateGt}  -  ${transferFilter.estimatedDepartureDateLt}`,
-      },
-      {
-        text: "Total Eligible Transfers (All Transfer Types)",
-        value: eligibleTransfers.length,
-      },
-      {
-        text: "Total Eligible Transfers (Wholesale Only)",
-        value: wholesaleTransfers.length,
-      },
-      {
-        text: "Total Eligible Multi-Destionation Transfers",
-        value: totalTransfersWithMultiDestinations,
-      },
-      {
-        text: "Total Eligible Manifest Packages (All Transfer Types)",
-        value: [...manifestGraphPackageMap.values()].filter((pkg) => {
-          return (
-            pkg.PackageState === PackageState.DEPARTED_FACILITY ||
-            pkg.PackageState === PackageState.IN_TRANSIT
-          );
-        }).length,
-      },
-      {
-        text: "Total Eligible Manifest Packages (Wholesale Only)",
-        value: manifestGraphPackages.filter((pkg) => pkg.manifest).length,
-      },
-      {
-        text: "Total Packages in History Graph",
-        value: manifestGraphPackages.length,
-      },
-      {
-        text: "Total Production Batch Packages",
-        value: manifestGraphPackages.filter((pkg) => !!pkg.ProductionBatchNumber).length,
-      },
-      {
-        text: "Total Packages in Dataset",
-        value: globalPackageMapCount,
-      },
-      {
-        text: "Transfer License Set",
-        value: (() => {
-          const allTransferLicenses = eligibleTransfers.map((x) => x.LicenseNumber);
-          const uniqueTransferLicenses = new Set(allTransferLicenses);
-          return [...uniqueTransferLicenses].join(", ");
-        })(),
-      },
-      {
-        text: "Package License Set",
-        value: (() => {
-          const allPackageLicenses = [...manifestGraphPackageMap.values()].map(
-            (x) => x.LicenseNumber
-          );
-          const uniqueLicenses = new Set(allPackageLicenses);
-          return [...uniqueLicenses].join(", ");
-        })(),
-      },
-    ],
+    packages: packageWrapper,
+    transferredPackages: transferPackageWrapper
+    // packages: manifestGraphPackages,
+    // richOutgoingTransfers,
   };
 }

@@ -1143,13 +1143,13 @@
 <script lang="ts">
 import { MessageType } from "@/consts";
 import {
-  IHarvestFilter,
-  IPackageFilter,
-  IPlantBatchFilter,
-  IPlantFilter,
-  IPluginState,
-  ITagFilter,
-  ITransferFilter,
+IHarvestFilter,
+IPackageFilter,
+IPlantBatchFilter,
+IPlantFilter,
+IPluginState,
+ITagFilter,
+ITransferFilter
 } from "@/interfaces";
 import { authManager } from "@/modules/auth-manager.module";
 import { clientBuildManager } from "@/modules/client-build-manager.module";
@@ -1158,10 +1158,10 @@ import router from "@/router/index";
 import store from "@/store/page-overlay/index";
 import { OAuthState, PluginAuthActions } from "@/store/page-overlay/modules/plugin-auth/consts";
 import {
-  ReportsActions,
-  ReportStatus,
-  ReportType,
-  SHEET_FIELDS,
+ReportsActions,
+ReportStatus,
+ReportType,
+SHEET_FIELDS
 } from "@/store/page-overlay/modules/reports/consts";
 import { IReportConfig } from "@/store/page-overlay/modules/reports/interfaces";
 import { todayIsodate } from "@/utils/date";
@@ -1501,7 +1501,7 @@ export default Vue.extend({
         addCogsReport({
           reportConfig,
           cogsFormFilters: this.cogsFormFilters,
-          archive: await this.$refs["archive"].getArchiveData(),
+          mutableArchiveData: await this.$refs["archive"].getMutableArchiveData(),
         });
       }
 
@@ -1708,7 +1708,6 @@ export default Vue.extend({
 
       this.generateSpreadsheet({ reportConfig });
     },
-    generateArchive() {},
   },
 
   watch: {

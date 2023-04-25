@@ -11,12 +11,14 @@ import {
   IPackageFilter,
   IPlantBatchFilter,
   IPlantFilter,
-  ISimpleCogsPackageData,
+  ISimplePackageData,
   ISimpleSpreadsheet,
+  ISimpleTransferPackageData,
   ISpreadsheet,
   ITagFilter,
   ITransferFilter,
 } from "@/interfaces";
+import { CompressedDataWrapper } from "@/utils/compression";
 import { IStatusMessage, ReportStatus, ReportType } from "./consts";
 
 export interface IReportsState {
@@ -46,7 +48,7 @@ export interface IReportConfig {
     packageFilter: IPackageFilter;
     transferFilter: ITransferFilter;
     fields: null;
-    archive: ICogsArchive;
+    mutableArchiveData: ICogsArchive;
   };
   [ReportType.PACKAGES]?: {
     packageFilter: IPackageFilter;
@@ -88,9 +90,8 @@ export interface IReportConfig {
 
 export interface IReportData {
   [ReportType.COGS]?: {
-    packages: ISimpleCogsPackageData[];
-    richOutgoingTransfers: IIndexedRichOutgoingTransferData[];
-    auditData: { text: string; value: string | number }[];
+    packages: CompressedDataWrapper<ISimplePackageData>;
+    transferredPackages: CompressedDataWrapper<ISimpleTransferPackageData>;
   };
   [ReportType.PACKAGES]?: {
     packages: IIndexedPackageData[];
