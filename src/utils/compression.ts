@@ -124,9 +124,9 @@ export class CompressedMetrcTags implements ICompressedMetrcTagRanges {
   // }
 }
 
-export function compressJSON<T>(
+export function compressedDataWrapperFactory<T>(
   expanded: T[],
-  indexProperty: string,
+  indexedKey: string,
   keys?: string[]
 ): CompressedDataWrapper<T> {
   if (expanded.length === 0) {
@@ -146,26 +146,25 @@ export function compressJSON<T>(
     compressed.push(keys.map((key) => obj[key]));
   }
 
-  return new CompressedDataWrapper<T>(compressed, indexProperty, keys);
+  return new CompressedDataWrapper<T>(compressed, indexedKey, keys);
 }
 
 export class CompressedDataWrapper<T> {
   data: any[][];
   keys: string[];
-  indexProperty: string;
-  indexColumnIdx: number;
+  indexedKey: string;
   index: Map<any, number>;
 
-  constructor(data: any[][], indexProperty: string, keys: string[]) {
+  constructor(data: any[][], indexedKey: string, keys: string[]) {
     this.data = data;
     this.keys = keys;
-    this.indexProperty = indexProperty;
+    this.indexedKey = indexedKey;
     this.index = new Map<any, number>();
 
-    this.indexColumnIdx = this.keys.indexOf(indexProperty);
+    const j = this.keys.indexOf(indexedKey);
 
-    for (let rowIdx = 0; rowIdx < data.length; ++rowIdx) {
-      this.addToIndex(data[rowIdx][this.indexColumnIdx], rowIdx);
+    for (let i = 0; i < data.length; ++i) {
+      this.addToIndex(data[i][j], i);
     }
   }
 
@@ -177,11 +176,9 @@ export class CompressedDataWrapper<T> {
 
   add(object: T) {
     // @ts-ignore
-    const index = object[this.indexProperty];
+    const index = object[this.indexedKey];
     const packed = this.pack(object);
-    console.log(packed);
     this.data.push(packed);
-    console.log(this.data);
     this.addToIndex(index, this.data.length - 1);
   }
 
@@ -222,7 +219,6 @@ export class CompressedDataWrapper<T> {
       throw new Error("Bad index");
     }
 
-    const colIdx = this.keys.indexOf(property);
-    this.data[rowIdx][colIdx] = value;
+    this.data[rowIdx][this.keys.indexOf(property)] = value;
   }
 }

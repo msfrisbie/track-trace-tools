@@ -86,20 +86,17 @@ export function extractOutgoingTransferManifestNumberOrNull(description: string)
   return null;
 }
 
-export function extractTagQuantityPairOrNull(description: string): {
-  tag: string;
-  quantity: number;
-} | null {
+export function extractTagQuantityPairOrNull(description: string): [string, number] | null {
   const pairMatcher = new RegExp(`Used ([\\d,\\.]+) .* for Package (${METRC_TAG_REGEX_PATTERN})`);
 
   const match = description.match(pairMatcher);
 
   return match
-    ? {
-        tag: match[2] as string,
+    ? [
+        match[2] as string,
         // @ts-ignore
-        quantity: parseFloat(match[1].replaceAll(",", "")),
-      }
+        parseFloat(match[1].replaceAll(",", "")),
+    ]
     : null;
 }
 
@@ -155,14 +152,8 @@ export function extractTestSamplePackageLabelsFromHistory(
   return testSamplePackageLabels;
 }
 
-export function extractTagQuantityPairsFromHistory(historyList: IPackageHistoryData[]): {
-  tag: string;
-  quantity: number;
-}[] {
-  const pairs: {
-    tag: string;
-    quantity: number;
-  }[] = [];
+export function extractTagQuantityPairsFromHistory(historyList: IPackageHistoryData[]): [string, number][] {
+  const pairs: [string, number][] = [];
 
   for (const history of historyList) {
     for (const description of history.Descriptions) {

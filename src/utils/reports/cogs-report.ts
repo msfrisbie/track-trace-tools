@@ -72,7 +72,8 @@ export async function maybeLoadCogsReportData({
     return;
   }
 
-  const { packageFilter, transferFilter } = reportConfig[ReportType.COGS]!;
+  // packageFilter and transferFilter will have identical dates
+  const { transferFilter } = reportConfig[ReportType.COGS]!;
 
   const globalPackageMap: Map<string, ISimpleCogsPackageData> = new Map();
 
@@ -100,7 +101,7 @@ export async function maybeLoadCogsReportData({
           SourcePackageLabels: pkg.SourcePackageLabels,
           ProductionBatchNumber: pkg.ProductionBatchNumber,
           parentPackageLabels: null,
-          tagQuantityPairs: null,
+          childPackageLabelQuantityPairs: null,
           childLabels: [],
           fractionalCostData: [],
           errors: [],
@@ -125,7 +126,7 @@ export async function maybeLoadCogsReportData({
           SourcePackageLabels: pkg.SourcePackageLabels,
           ProductionBatchNumber: pkg.ProductionBatchNumber,
           parentPackageLabels: null,
-          tagQuantityPairs: null,
+          childPackageLabelQuantityPairs: null,
           childLabels: [],
           fractionalCostData: [],
           errors: [],
@@ -150,7 +151,7 @@ export async function maybeLoadCogsReportData({
           SourcePackageLabels: pkg.SourcePackageLabels,
           ProductionBatchNumber: pkg.ProductionBatchNumber,
           parentPackageLabels: null,
-          tagQuantityPairs: null,
+          childPackageLabelQuantityPairs: null,
           childLabels: [],
           fractionalCostData: [],
           errors: [],
@@ -322,7 +323,7 @@ export async function maybeLoadCogsReportData({
                 SourcePackageLabels: pkg.SourcePackageLabels,
                 ProductionBatchNumber: pkg.ProductionBatchNumber,
                 parentPackageLabels: null,
-                tagQuantityPairs: null,
+                childPackageLabelQuantityPairs: null,
                 childLabels: [],
                 fractionalCostData: [],
                 errors: [],
@@ -460,7 +461,7 @@ export async function maybeLoadCogsReportData({
       manifestGraphPackage.parentPackageLabels = manifestGraphPackage.SourcePackageLabels.split(
         ","
       ).map((x) => x.trim());
-      manifestGraphPackage.tagQuantityPairs = [{ tag: childLabel, quantity: 1 }];
+      manifestGraphPackage.childPackageLabelQuantityPairs = [[childLabel, 1]];
     }
   }
 
@@ -498,7 +499,7 @@ export async function maybeLoadCogsReportData({
       getDataLoaderByLicense(pkg.LicenseNumber).then((dataLoader) =>
         dataLoader.packageHistoryByPackageId(pkg.Id).then((history) => {
           pkg.parentPackageLabels = extractParentPackageLabelsFromHistory(history);
-          pkg.tagQuantityPairs = extractTagQuantityPairsFromHistory(history);
+          pkg.childPackageLabelQuantityPairs = extractTagQuantityPairsFromHistory(history);
         })
       )
     );
@@ -552,10 +553,12 @@ export async function maybeLoadCogsReportData({
 
     for (const parentPkg of validParentPackages) {
       const totalParentQuantity = parentPkg!
-        .tagQuantityPairs!.map((x) => x.quantity)
+        .childPackageLabelQuantityPairs!.map(([label, quantity]) => quantity)
         .reduce((a, b) => a + b, 0);
 
-      const matchingPackagePair = parentPkg!.tagQuantityPairs!.find((x) => x.tag === pkg.Label);
+      const matchingPackagePair = parentPkg!.childPackageLabelQuantityPairs!.find(
+        ([label, quantity]) => label === pkg.Label
+      );
       if (!matchingPackagePair) {
         pkg.errors.push(`No parent history pair match: ${parentPkg!.Label}`);
         continue;
@@ -564,7 +567,7 @@ export async function maybeLoadCogsReportData({
       pkg.fractionalCostData.push({
         parentLabel: parentPkg!.Label,
         totalParentQuantity,
-        fractionalQuantity: matchingPackagePair.quantity / totalParentQuantity,
+        fractionalQuantity: matchingPackagePair[1] / totalParentQuantity,
       });
     }
   }

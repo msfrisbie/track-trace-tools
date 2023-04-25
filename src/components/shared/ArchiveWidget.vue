@@ -42,7 +42,7 @@ import { facilityManager } from "@/modules/facility-manager.module";
 import router from "@/router/index";
 import store from "@/store/page-overlay/index";
 import { ICogsArchive } from "@/store/page-overlay/modules/reports/interfaces";
-import { CompressedDataWrapper, compressJSON } from "@/utils/compression";
+import { CompressedDataWrapper, compressedDataWrapperFactory } from "@/utils/compression";
 import { readJSONFile } from "@/utils/file";
 import {
   extractParentPackageLabelsFromHistory,
@@ -119,7 +119,7 @@ export default Vue.extend({
 
           this.$data.message = `Processing ${rawPackages.length} inactive packages...`;
 
-          const wrapper = compressJSON<ISimplePackageData>(
+          const wrapper = compressedDataWrapperFactory<ISimplePackageData>(
             rawPackages.map((pkg) => ({
               LicenseNumber: pkg.LicenseNumber,
               Id: getId(pkg),
@@ -129,7 +129,7 @@ export default Vue.extend({
               SourcePackageLabels: pkg.SourcePackageLabels,
               ProductionBatchNumber: pkg.ProductionBatchNumber,
               parentPackageLabels: null,
-              tagQuantityPairs: null,
+              childPackageLabelQuantityPairs: null,
             })),
             "Label"
           );
@@ -161,7 +161,7 @@ export default Vue.extend({
 
                   wrapper.update(
                     pkg.Label,
-                    "tagQuantityPairs",
+                    "childPackageLabelQuantityPairs",
                     extractTagQuantityPairsFromHistory(history)
                   );
                 })
@@ -190,7 +190,7 @@ export default Vue.extend({
 
           this.$data.message = `Processing ${rawTransfers.length} inactive outgoing transfers...`;
 
-          const wrapper = compressJSON<ISimpleOutgoingTransferData>(
+          const wrapper = compressedDataWrapperFactory<ISimpleOutgoingTransferData>(
             rawTransfers.map((transfer) => ({
               LicenseNumber: transfer.LicenseNumber,
               ManifestNumber: transfer.ManifestNumber,
@@ -233,7 +233,7 @@ export default Vue.extend({
 
           const packageRequests: Promise<any>[] = [];
 
-          const rawTransferPackages: any[] = [];
+          const rawTransferPackages: ISimpleTransferPackage[] = [];
 
           const wrapper = new CompressedDataWrapper<ISimpleOutgoingTransferData>(
             archive.transfers,
@@ -258,6 +258,8 @@ export default Vue.extend({
                         ItemName: getItemName(pkg),
                         SourcePackageLabels: pkg.SourcePackageLabels,
                         ProductionBatchNumber: pkg.ProductionBatchNumber,
+                        parentPackageLabels: null,
+                        childPackageLabelQuantityPairs: null,
                       });
                     }
                   })
@@ -275,7 +277,10 @@ export default Vue.extend({
 
           this.$data.message = `Processing ${rawTransferPackages.length} manifest packages...`;
 
-          const packageWrapper = compressJSON<ISimpleTransferPackage>(rawTransferPackages, "Label");
+          const packageWrapper = compressedDataWrapperFactory<ISimpleTransferPackage>(
+            rawTransferPackages,
+            "Label"
+          );
 
           archive.transfersPackages = packageWrapper.data;
           archive.transfersPackagesKeys = packageWrapper.keys;

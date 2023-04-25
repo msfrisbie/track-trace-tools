@@ -788,7 +788,7 @@ export interface ISimplePackageData {
   SourcePackageLabels: string;
   ProductionBatchNumber: string | null;
   parentPackageLabels: string[] | null;
-  tagQuantityPairs: { tag: string; quantity: number }[] | null;
+  childPackageLabelQuantityPairs: [string, number][] | null;
 }
 
 export interface ISimpleOutgoingTransferData {
@@ -815,7 +815,7 @@ export interface ISimpleTransferPackage {
   SourcePackageLabels: string;
   ProductionBatchNumber: string | null;
   parentPackageLabels: string[] | null;
-  tagQuantityPairs: { tag: string; quantity: number }[] | null;
+  childPackageLabelQuantityPairs: [string, number][] | null;
 }
 
 export interface ISimpleCogsPackageData extends ISimplePackageData {

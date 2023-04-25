@@ -19,7 +19,6 @@ import ReplacePlantTagsBuilder from "@/components/overlay-widget/cultivation/Rep
 import UnpackImmaturePlantsBuilder from "@/components/overlay-widget/cultivation/UnpackImmaturePlantsBuilder.vue";
 import MetrcExplorer from "@/components/overlay-widget/explorer/MetrcExplorer.vue";
 import MiscellaneousListView from "@/components/overlay-widget/miscellaneous/MiscellaneousListView.vue";
-import CogsTool from "@/components/overlay-widget/package/CogsTool.vue";
 import FinishPackagesBuilder from "@/components/overlay-widget/package/FinishPackagesBuilder.vue";
 import ItemTemplateBuilder from "@/components/overlay-widget/package/ItemTemplateBuilder.vue";
 import MergePackagesBuilder from "@/components/overlay-widget/package/MergePackagesBuilder.vue";
@@ -115,11 +114,6 @@ const routes: Array<RouteConfig> = [
     path: "/metrc-explorer",
     name: "Metrc Explorer",
     component: MetrcExplorer,
-  },
-  {
-    path: "/package/cogs",
-    name: "COGS",
-    component: CogsTool,
   },
   {
     path: "/package/split-package",

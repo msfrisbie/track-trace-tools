@@ -1,4 +1,4 @@
-import { CompressedMetrcTags, compressJSON } from "./compression";
+import { compressedDataWrapperFactory, CompressedMetrcTags } from "./compression";
 
 describe("compression.ts", () => {
   it("has the correct version", () => {
@@ -217,7 +217,7 @@ describe("compression.ts", () => {
       },
     ];
 
-    const wrapper = compressJSON(expandedData, "foo", ["foo", "bar"]);
+    const wrapper = compressedDataWrapperFactory(expandedData, "foo", ["foo", "bar"]);
 
     expect(wrapper.data).toEqual([
       ["two", 1],
