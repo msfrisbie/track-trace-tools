@@ -23,7 +23,7 @@ import {
 import { ActionContext } from "vuex";
 import { CompressedDataWrapper } from "../compression";
 import { getIsoDateFromOffset, todayIsodate } from "../date";
-import { getId, getItemName, getLabel } from "../package";
+import { getId, getItemName, getLabel, getParentPackageLabels } from "../package";
 import { createDebugSheetOrError } from "../sheets-export";
 
 interface ICogsReportFormFilters {
@@ -387,7 +387,7 @@ export async function maybeLoadCogsReportData({
     `Failed package requests: ${packageResults.filter((x) => x.status !== "fulfilled").length}`
   );
 
-  const sheetDataMatrixes: any[][] = [];
+  const eligibleWholesaleTransferPackages: any[][] = [];
 
   const etdRowIndex = transferPackageWrapper.keys.indexOf("ETD");
   const typeIndex = transferPackageWrapper.keys.indexOf("Type");
@@ -405,14 +405,86 @@ export async function maybeLoadCogsReportData({
       continue;
     }
 
-    sheetDataMatrixes.push(row);
+    eligibleWholesaleTransferPackages.push(row);
   }
 
   await createDebugSheetOrError({
     spreadsheetName: "Manifest Packages",
     sheetTitles: ["Manifest Pkgs"],
-    sheetDataMatrixes: [sheetDataMatrixes],
+    sheetDataMatrixes: [eligibleWholesaleTransferPackages],
   });
+
+  const eligibleWholesaleTransferPackageWrapper =
+    new CompressedDataWrapper<ISimpleTransferPackageData>(
+      "Eligible Wholesale Transfer Packages",
+      eligibleWholesaleTransferPackages,
+      transferPackageWrapper.indexedKey,
+      transferPackageWrapper.keys
+    );
+
+  const stack: string[] = [...eligibleWholesaleTransferPackageWrapper].map((x) => x.Label);
+
+  let roundCount = 0;
+  const eligibleWholesaleManifestUptreeLabels = new Set<string>();
+
+  let labelBuffer: string[] = [];
+
+  console.log(`Eligible package count: ${stack.length}`);
+  console.log(`Unique package count: ${new Set(stack).size}`);
+
+  while (true) {
+    if (stack.length === 0) {
+      console.log(
+        `Stack size after ${roundCount++} rounds: ${eligibleWholesaleManifestUptreeLabels.size}`
+      );
+      console.log(`Buffer size: ${labelBuffer.length}`);
+
+      // Flush label buffer
+      labelBuffer.map((label) => stack.push(label));
+      labelBuffer = [];
+
+      if (stack.length === 0) {
+        break;
+      }
+    }
+
+    const nextLabel = stack.pop()!;
+
+    if (eligibleWholesaleManifestUptreeLabels.has(nextLabel)) {
+      continue;
+    }
+
+    let parentLabels: string[] | null = null;
+
+    // Prefer package lookup over transfer package
+    const matchedPkg = packageWrapper.findOrNull(nextLabel);
+    if (matchedPkg) {
+      parentLabels = await getParentPackageLabels(matchedPkg);
+    }
+
+    if (!parentLabels) {
+      const matchedTransferPkg = transferPackageWrapper.findOrNull(nextLabel);
+      if (matchedTransferPkg) {
+        parentLabels = await getParentPackageLabels(matchedTransferPkg);
+      }
+    }
+
+    if (parentLabels) {
+      parentLabels.map((parentLabel) => {
+        if (!eligibleWholesaleManifestUptreeLabels.has(parentLabel)) {
+          labelBuffer.push(parentLabel);
+        }
+      });
+    }
+
+    if (!parentLabels && roundCount < 2) {
+      console.error(`No parent labels found for ${nextLabel} in round ${roundCount}`);
+    }
+
+    eligibleWholesaleManifestUptreeLabels.add(nextLabel);
+  }
+
+  console.log(`Touched labels: ${eligibleWholesaleManifestUptreeLabels.size}`);
 
   debugger;
 
@@ -457,7 +529,7 @@ export async function maybeLoadCogsReportData({
   //     manifestGraph: true,
   //   });
 
-  //   const parentPackageLabels = await getParentPackageLabels(pkg);
+  //   const parentPackageLabels = await getParentPackageLabelsDeprecated(pkg);
 
   //   // Overwrite source package labels with full list
   //   if (pkg.SourcePackageLabels.endsWith("...")) {

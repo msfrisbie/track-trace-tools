@@ -1,5 +1,11 @@
-import { PackageFilterIdentifiers } from "@/consts";
-import { IPackageData, ISimpleCogsPackageData, IUnionIndexedPackageData } from "@/interfaces";
+import { METRC_TAG_REGEX, PackageFilterIdentifiers } from "@/consts";
+import {
+  IPackageData,
+  ISimpleCogsPackageData,
+  ISimplePackageData,
+  ISimpleTransferPackageData,
+  IUnionIndexedPackageData,
+} from "@/interfaces";
 import { authManager } from "@/modules/auth-manager.module";
 import {
   getDataLoaderByLicense,
@@ -43,10 +49,30 @@ export function getItemName(unionPkg: IUnionIndexedPackageData): string {
 }
 
 // Extremely long lists will be truncated with an ellipsis
-export async function getParentPackageLabels(pkg: ISimpleCogsPackageData) {
+export async function getParentPackageLabelsDeprecated(pkg: ISimpleCogsPackageData) {
   if (!pkg.SourcePackageLabels.endsWith("...")) {
     return pkg.SourcePackageLabels.split(",").map((x) => x.trim());
   } else {
+    // Source package labels may have been truncated
+    if (pkg.parentPackageLabels) {
+      return pkg.parentPackageLabels;
+    } else {
+      console.warn(`${pkg.Label} falling back to parent label history fetch`);
+      const history = await getDataLoaderByLicense(pkg.LicenseNumber).then((dataLoader) =>
+        dataLoader.packageHistoryByPackageId(pkg.Id)
+      );
+
+      return extractParentPackageLabelsFromHistory(history);
+    }
+  }
+}
+
+export async function getParentPackageLabels(pkg: ISimpleTransferPackageData | ISimplePackageData) {
+  const stringParsedPackageLabels = pkg.SourcePackageLabels.split(",")
+    .map((x) => x.trim())
+    .filter((label) => label.match(METRC_TAG_REGEX));
+
+  if (pkg.SourcePackageLabels.endsWith("...")) {
     // Source package labels may have been truncated
     if (pkg.parentPackageLabels) {
       return pkg.parentPackageLabels;
@@ -55,9 +81,15 @@ export async function getParentPackageLabels(pkg: ISimpleCogsPackageData) {
         dataLoader.packageHistoryByPackageId(pkg.Id)
       );
 
-      return extractParentPackageLabelsFromHistory(history);
+      const historyParsedLabels = extractParentPackageLabelsFromHistory(history);
+
+      if (historyParsedLabels.length > 0) {
+        return historyParsedLabels;
+      }
     }
   }
+
+  return stringParsedPackageLabels;
 }
 
 export async function getLabTestUrlsFromPackage({

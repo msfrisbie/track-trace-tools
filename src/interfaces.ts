@@ -803,19 +803,10 @@ export interface ISimpleOutgoingTransferData {
   }[];
 }
 
-export interface ISimpleTransferPackageData {
+export interface ISimpleTransferPackageData extends ISimplePackageData {
   ETD: string;
   Type: string;
   ManifestNumber: string;
-  LicenseNumber: string;
-  Id: number;
-  PackageState: PackageState;
-  Label: string;
-  ItemName: string;
-  SourcePackageLabels: string;
-  ProductionBatchNumber: string | null;
-  parentPackageLabels: string[] | null;
-  childPackageLabelQuantityPairs: [string, number][] | null;
 }
 
 export interface ISimpleCogsPackageData extends ISimplePackageData {
