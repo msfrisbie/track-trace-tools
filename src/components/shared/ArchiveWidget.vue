@@ -4,28 +4,34 @@
       <b-form-file v-on:change="inspectFile($event)" v-model="existingArchive"></b-form-file>
     </b-form-group>
 
-    <!-- <b-button @click="inspect()">INSPECT FILE</b-button> -->
+    <pre v-if="metadata">{{ metadata }}</pre>
 
-    <b-form-checkbox v-model="loadInactivePackages">Load inactive packages</b-form-checkbox>
-    <b-form-checkbox v-model="loadInactivePackagesHistory"
-      >Load inactive package history</b-form-checkbox
-    >
-    <b-form-checkbox v-model="loadInactiveOutgoingTransfers"
-      >Load inactive outgoing transfers</b-form-checkbox
-    >
-    <b-form-checkbox v-model="loadInactiveOutgoingTransfersPackages"
-      >Load inactive outgoing transfer packages</b-form-checkbox
+    <b-button v-if="!showGenerate" size="sm" variant="light" @click="showGenerate = !showGenerate"
+      >ADVANCED</b-button
     >
 
-    <b-button size="sm" :disabled="inflight" @click="generateArchive()"
-      >GENERATE ARCHIVE FILE</b-button
-    >
+    <template v-if="showGenerate">
+      <b-form-checkbox v-model="loadInactivePackages">Load inactive packages</b-form-checkbox>
+      <b-form-checkbox v-model="loadInactivePackagesHistory"
+        >Load inactive package history</b-form-checkbox
+      >
+      <b-form-checkbox v-model="loadInactiveOutgoingTransfers"
+        >Load inactive outgoing transfers</b-form-checkbox
+      >
+      <b-form-checkbox v-model="loadInactiveOutgoingTransfersPackages"
+        >Load inactive outgoing transfer packages</b-form-checkbox
+      >
 
-    <span v-if="message">{{ message }}</span>
+      <b-button size="sm" :disabled="inflight" @click="generateArchive()"
+        >GENERATE ARCHIVE FILE</b-button
+      >
 
-    <b-button size="sm" v-if="archiveUrl" :href="archiveUrl" download="archive.json"
-      >DOWNLOAD ARCHIVE FILE ({{ Math.floor(archiveFileSize / 1000) }} kB)</b-button
-    >
+      <span v-if="message">{{ message }}</span>
+
+      <b-button size="sm" v-if="archiveUrl" :href="archiveUrl" download="archive.json"
+        >DOWNLOAD ARCHIVE FILE ({{ Math.floor(archiveFileSize / 1000) }} kB)</b-button
+      >
+    </template>
   </div>
 </template>
 
@@ -64,8 +70,10 @@ export default Vue.extend({
   data() {
     return {
       existingArchive: null,
+      metadata: null,
       archiveUrl: null,
       archiveFileSize: 0,
+      showGenerate: false,
       inflight: false,
       message: null,
       loadInactivePackages: false,
@@ -79,7 +87,43 @@ export default Vue.extend({
       return readJSONFile(this.$data.existingArchive);
     },
     async inspectFile(e: any): Promise<void> {
-      console.log(await readJSONFile(e.target.files[0]));
+      if (!e) {
+        this.$data.metadata = null;
+        return;
+      }
+      const data: ICogsArchive = await readJSONFile(e.target.files[0]);
+
+      console.log(data);
+
+      const packageWrapper = new CompressedDataWrapper(
+        "Package",
+        data.packages,
+        "Label",
+        data.packagesKeys
+      );
+      const transferWrapper = new CompressedDataWrapper(
+        "Transfer",
+        data.transfers,
+        "ManifestNumber",
+        data.transfersKeys
+      );
+      const transferPackageWrapper = new CompressedDataWrapper(
+        "Transfer Package",
+        data.transfersPackages,
+        "Label",
+        data.transfersPackagesKeys
+      );
+
+      // const packages = new Set<string>(packa);
+      // const transfers = new Set<string>();
+      // const transferPackages = new Set<string>();
+
+      this.$data.metadata = {
+        licenses: data.licenses,
+        packages: data.packages.length,
+        transfers: data.transfers.length,
+        transferPackages: data.transfersPackages.length,
+      };
     },
     async generateArchive(): Promise<void> {
       try {
@@ -120,6 +164,7 @@ export default Vue.extend({
           this.$data.message = `Processing ${rawPackages.length} inactive packages...`;
 
           const wrapper = compressedDataWrapperFactory<ISimplePackageData>(
+            "Package",
             rawPackages.map((pkg) => ({
               LicenseNumber: pkg.LicenseNumber,
               Id: getId(pkg),
@@ -144,6 +189,7 @@ export default Vue.extend({
           const packageHistoryRequests: Promise<any>[] = [];
 
           const wrapper = new CompressedDataWrapper<ISimplePackageData>(
+            "Package",
             archive.packages,
             "Label",
             archive.packagesKeys
@@ -191,6 +237,7 @@ export default Vue.extend({
           this.$data.message = `Processing ${rawTransfers.length} inactive outgoing transfers...`;
 
           const wrapper = compressedDataWrapperFactory<ISimpleOutgoingTransferData>(
+            "Transfers",
             rawTransfers.map((transfer) => ({
               LicenseNumber: transfer.LicenseNumber,
               ManifestNumber: transfer.ManifestNumber,
@@ -210,11 +257,15 @@ export default Vue.extend({
             transferDestinationRequests.push(
               getDataLoaderByLicense(transfer.LicenseNumber).then((dataLoader) =>
                 dataLoader.transferDestinations(transfer.Id).then((destinations) => {
-                  transfer.Destinations = destinations.map((destination) => ({
-                    Id: destination.Id,
-                    Type: destination.ShipmentTypeName,
-                    ETD: destination.EstimatedDepartureDateTime,
-                  }));
+                  wrapper.update(
+                    transfer.ManifestNumber,
+                    "Destinations",
+                    destinations.map((destination) => ({
+                      Id: destination.Id,
+                      Type: destination.ShipmentTypeName,
+                      ETD: destination.EstimatedDepartureDateTime,
+                    }))
+                  );
                 })
               )
             );
@@ -236,6 +287,7 @@ export default Vue.extend({
           const rawTransferPackages: ISimpleTransferPackageData[] = [];
 
           const wrapper = new CompressedDataWrapper<ISimpleOutgoingTransferData>(
+            "Transfers",
             archive.transfers,
             "ManifestNumber",
             archive.transfersKeys
@@ -278,6 +330,7 @@ export default Vue.extend({
           this.$data.message = `Processing ${rawTransferPackages.length} manifest packages...`;
 
           const packageWrapper = compressedDataWrapperFactory<ISimpleTransferPackageData>(
+            "Transfer Package",
             rawTransferPackages,
             "Label"
           );

@@ -1269,6 +1269,31 @@ export class DataLoader implements IAtomicService {
     });
   }
 
+  async onHoldPackages(): Promise<IIndexedPackageData[]> {
+      return new Promise(async (resolve, reject) => {
+        const subscription = timer(DATA_LOAD_FETCH_TIMEOUT_MS).subscribe(() =>
+          reject("On hold package fetch timed out")
+        );
+
+        try {
+          const onHoldPackages: IIndexedPackageData[] = (await this.loadOnHoldPackages()).map(
+            (pkg) => ({
+              ...pkg,
+              PackageState: PackageState.ON_HOLD,
+              TagMatcher: "",
+              LicenseNumber: this._authState!.license,
+            })
+          );
+
+          subscription.unsubscribe();
+          resolve(onHoldPackages);
+        } catch (e) {
+          subscription.unsubscribe();
+          reject(e);
+        }
+      });
+  }
+
   async inTransitPackages(resetCache: boolean = false): Promise<IIndexedPackageData[]> {
     if (resetCache) {
       this._inTransitPackages = null;
@@ -2011,6 +2036,18 @@ export class DataLoader implements IAtomicService {
     return streamFactory<IPackageData>(options, responseFactory);
   }
 
+  onHoldPackagesStream(
+    options: IPackageOptions = {}
+  ): Subject<ICollectionResponse<IPackageData>> {
+    const responseFactory = (paginationOptions: IPaginationOptions): Promise<Response> => {
+      const body = buildBody(paginationOptions);
+
+      return this.metrcRequestManagerOrError.getOnHoldPackages(body);
+    };
+
+    return streamFactory<IPackageData>(options, responseFactory);
+  }
+
   inTransitPackagesStream(
     options: IPackageOptions = {}
   ): Subject<ICollectionResponse<IPackageData>> {
@@ -2685,6 +2722,24 @@ export class DataLoader implements IAtomicService {
     }
 
     return responseData.Data[0];
+  }
+
+  private async loadOnHoldPackages(): Promise<IPackageData[]> {
+    await authManager.authStateOrError();
+
+    store.commit(MutationType.SET_LOADING_MESSAGE, "Loading on hold packages...");
+
+    let onHoldPackages: IPackageData[] = [];
+
+    await this.onHoldPackagesStream().forEach((next: ICollectionResponse<IPackageData>) => {
+      onHoldPackages = [...onHoldPackages, ...next.Data];
+    });
+
+    console.log(`Loaded ${onHoldPackages.length} onHoldPackages`);
+
+    store.commit(MutationType.SET_LOADING_MESSAGE, null);
+
+    return onHoldPackages;
   }
 
   private async loadInTransitPackages(): Promise<IPackageData[]> {

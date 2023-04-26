@@ -1,11 +1,5 @@
 import { MessageType, SheetTitles } from "@/consts";
-import {
-  IDestinationData,
-  IDestinationPackageData,
-  IIndexedDestinationPackageData,
-  IIndexedTransferData,
-  ISpreadsheet,
-} from "@/interfaces";
+import { IDestinationData, IDestinationPackageData, ISpreadsheet } from "@/interfaces";
 import { messageBus } from "@/modules/message-bus.module";
 import store from "@/store/page-overlay/index";
 import { ReportsMutations, ReportType } from "@/store/page-overlay/modules/reports/consts";
@@ -15,7 +9,6 @@ import {
   IReportData,
 } from "@/store/page-overlay/modules/reports/interfaces";
 import { todayIsodate } from "./date";
-import { getItemName, getLabel } from "./package";
 import {
   extractFlattenedData,
   getSheetTitle,
@@ -133,7 +126,7 @@ export async function createDebugSheetOrError({
   } = await messageBus.sendMessageToBackground(
     MessageType.CREATE_SPREADSHEET,
     {
-      title: `Debug - ${todayIsodate()}`,
+      title: `Debug - ${spreadsheetName} - ${todayIsodate()}`,
       sheetTitles,
     },
     undefined,
@@ -143,6 +136,35 @@ export async function createDebugSheetOrError({
   if (!response.data.success) {
     throw new Error("Unable to create debug sheet");
   }
+
+  for (const [idx, sheetTitle] of sheetTitles.entries()) {
+    let formattingRequests: any = [
+      addRowsRequestFactory({
+        sheetId: idx,
+        length: sheetDataMatrixes[idx].length,
+      }),
+    ];
+
+    await messageBus.sendMessageToBackground(
+      MessageType.BATCH_UPDATE_SPREADSHEET,
+      {
+        spreadsheetId: response.data.result.spreadsheetId,
+        requests: formattingRequests,
+      },
+      undefined,
+      90000
+    );
+
+    await writeDataSheet({
+      spreadsheetId: response.data.result.spreadsheetId,
+      spreadsheetTitle: sheetTitle as SheetTitles,
+      data: sheetDataMatrixes[idx],
+    });
+  }
+
+  console.log(response.data);
+
+  return response.data;
 }
 
 export async function createSpreadsheetOrError({
@@ -721,7 +743,7 @@ export async function createCogsSpreadsheetOrError({
         required: true,
       },
     ],
-    data: [],//cogsData,
+    data: [], //cogsData,
     options: {
       useFieldTransformer: false,
     },

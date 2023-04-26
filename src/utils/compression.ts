@@ -125,12 +125,15 @@ export class CompressedMetrcTags implements ICompressedMetrcTagRanges {
 }
 
 export function compressedDataWrapperFactory<T>(
+  name: string,
   expanded: T[],
   indexedKey: string,
   keys?: string[]
 ): CompressedDataWrapper<T> {
   if (expanded.length === 0) {
-    throw new Error("Cannot compress empty array");
+    console.error("Compressing empty array");
+    console.trace();
+    return new CompressedDataWrapper("Empty", [], "", []);
   }
 
   if (!keys) {
@@ -146,25 +149,46 @@ export function compressedDataWrapperFactory<T>(
     compressed.push(keys.map((key) => obj[key]));
   }
 
-  return new CompressedDataWrapper<T>(compressed, indexedKey, keys);
+  return new CompressedDataWrapper<T>(name, compressed, indexedKey, keys);
 }
 
 export class CompressedDataWrapper<T> {
+  name: string;
   data: any[][];
   keys: string[];
   indexedKey: string;
   index: Map<any, number>;
+  duplicateCounter: number = 0;
 
-  constructor(data: any[][], indexedKey: string, keys: string[]) {
-    this.data = data;
+  constructor(name: string, data: any[][], indexedKey: string, keys: string[]) {
+    this.name = name;
+    this.data = [];
     this.keys = keys;
     this.indexedKey = indexedKey;
     this.index = new Map<any, number>();
 
     const j = this.keys.indexOf(indexedKey);
 
-    for (let i = 0; i < data.length; ++i) {
-      this.addToIndex(data[i][j], i);
+    if (j === -1) {
+      throw new Error(`Bad indexedKey: ${indexedKey} --- ${keys.toString()}`);
+    }
+
+    let skippedCt = 0;
+
+    for (const [i, row] of data.entries()) {
+      const key = row[j];
+
+      if (this.index.has(key)) {
+        ++skippedCt;
+        continue;
+      }
+
+      this.data.push(row);
+      this.index.set(key, i);
+    }
+
+    if (skippedCt > 0) {
+      console.error(`${this.name} skipped: ${skippedCt} insertions`);
     }
   }
 
@@ -174,19 +198,22 @@ export class CompressedDataWrapper<T> {
     }
   }
 
-  add(object: T) {
-    // @ts-ignore
-    const index = object[this.indexedKey];
-    const packed = this.pack(object);
-    this.data.push(packed);
-    this.addToIndex(index, this.data.length - 1);
+  flushCounter() {
+    console.log(`${this.name} logged ${this.duplicateCounter} duplicate additions`);
+    this.duplicateCounter = 0;
   }
 
-  private addToIndex(k: any, v: number) {
-    if (this.index.has(k)) {
-      throw new Error("Duplicate index!");
+  add(object: T): boolean {
+    // @ts-ignore
+    const key = object[this.indexedKey];
+    if (this.index.has(key)) {
+      this.duplicateCounter++;
+      return false;
     }
-    this.index.set(k, v);
+    const packed = this.pack(object);
+    this.data.push(packed);
+    this.index.set(key, this.data.length - 1);
+    return true;
   }
 
   findOrNull(key: any): T | null {

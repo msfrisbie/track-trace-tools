@@ -15,6 +15,7 @@ const VOIDED_TAGS_URL = origin({ divertToNullOrigin: false }) + "/api/tags/voide
 
 const ACTIVE_PACKAGES_URL = origin({ divertToNullOrigin: false }) + "/api/packages";
 const INACTIVE_PACKAGES_URL = origin({ divertToNullOrigin: false }) + "/api/packages/inactive";
+const ON_HOLD_PACKAGES_URL = origin({ divertToNullOrigin: false }) + "/api/packages/onhold";
 const IN_TRANSIT_PACKAGES_URL = origin({ divertToNullOrigin: false }) + "/api/packages/intransit";
 
 const TAG_ORDER_HISTORY_URL = origin({ divertToNullOrigin: false }) + "/api/tagorders/history";
@@ -578,6 +579,18 @@ export class MetrcRequestManager implements IAtomicService {
 
   async getInactivePackages(body: string) {
     return customFetch(INACTIVE_PACKAGES_URL, {
+      ...DEFAULT_FETCH_POST_OPTIONS,
+      // @ts-ignore
+      headers: {
+        ...(await buildAuthenticationHeaders(this.authStateOrError)),
+        ...JSON_HEADERS,
+      },
+      body,
+    });
+  }
+
+  async getOnHoldPackages(body: string) {
+    return customFetch(ON_HOLD_PACKAGES_URL, {
       ...DEFAULT_FETCH_POST_OPTIONS,
       // @ts-ignore
       headers: {

@@ -24,6 +24,7 @@ import { ActionContext } from "vuex";
 import { CompressedDataWrapper } from "../compression";
 import { getIsoDateFromOffset, todayIsodate } from "../date";
 import { getId, getItemName, getLabel } from "../package";
+import { createDebugSheetOrError } from "../sheets-export";
 
 interface ICogsReportFormFilters {
   cogsDateGt: string;
@@ -117,18 +118,21 @@ export async function maybeLoadCogsReportData({
   const mutableArchiveData = reportConfig[ReportType.COGS]!.mutableArchiveData;
 
   const packageWrapper = new CompressedDataWrapper<ISimplePackageData>(
+    "Package",
     mutableArchiveData.packages,
     "Label",
     mutableArchiveData.packagesKeys
   );
   const transferWrapper = new CompressedDataWrapper<ISimpleOutgoingTransferData>(
+    "Transfers",
     mutableArchiveData.transfers,
     "ManifestNumber",
     mutableArchiveData.transfersKeys
   );
   const transferPackageWrapper = new CompressedDataWrapper<ISimpleTransferPackageData>(
+    "Transfer Package",
     mutableArchiveData.transfersPackages,
-    "PackageLabel",
+    "Label",
     mutableArchiveData.transfersPackagesKeys
   );
 
@@ -153,28 +157,29 @@ export async function maybeLoadCogsReportData({
       });
     }
 
-    // TODO
-    // try {
-    //   (await dataLoader.onHoldPackages(24 * 60 * 60 * 1000)).map(simplePackageConverter
-    //   );
-    // } catch (e) {
-    //   ctx.commit(ReportsMutations.SET_STATUS, {
-    //     statusMessage: { text: `Failed to load on hold packages. (${license})`, level: "warning" },
-    //   });
-    // }
+    packageWrapper.flushCounter();
+
+    try {
+      (await dataLoader.onHoldPackages()).map(simplePackageConverter);
+    } catch (e) {
+      ctx.commit(ReportsMutations.SET_STATUS, {
+        statusMessage: { text: `Failed to load on hold packages. (${license})`, level: "warning" },
+      });
+    }
+
+    packageWrapper.flushCounter();
 
     try {
       (await dataLoader.inactivePackages(24 * 60 * 60 * 1000)).map((pkg) => {
-        // Don't overwrite existing
-        if (!packageWrapper.index.has(getLabel(pkg))) {
-          packageWrapper.add(simplePackageConverter(pkg));
-        }
+        packageWrapper.add(simplePackageConverter(pkg));
       });
     } catch (e) {
       ctx.commit(ReportsMutations.SET_STATUS, {
         statusMessage: { text: `Failed to load inactive packages. (${license})`, level: "warning" },
       });
     }
+
+    packageWrapper.flushCounter();
 
     try {
       (await dataLoader.inTransitPackages()).map((pkg) => {
@@ -188,6 +193,8 @@ export async function maybeLoadCogsReportData({
         },
       });
     }
+
+    packageWrapper.flushCounter();
   }
 
   let richOutgoingTransfers: IIndexedRichOutgoingTransferData[] = [];
@@ -348,6 +355,8 @@ export async function maybeLoadCogsReportData({
         )
       );
 
+      transferPackageWrapper.flushCounter();
+
       if (packageRequests.length % 50 === 0) {
         await Promise.allSettled(packageRequests);
 
@@ -377,6 +386,33 @@ export async function maybeLoadCogsReportData({
   console.log(
     `Failed package requests: ${packageResults.filter((x) => x.status !== "fulfilled").length}`
   );
+
+  const sheetDataMatrixes: any[][] = [];
+
+  const etdRowIndex = transferPackageWrapper.keys.indexOf("ETD");
+  const typeIndex = transferPackageWrapper.keys.indexOf("Type");
+
+  for (const row of transferPackageWrapper.data) {
+    if (row[etdRowIndex] < departureDateGt) {
+      continue;
+    }
+
+    if (row[etdRowIndex] > departureDateLt) {
+      continue;
+    }
+
+    if (!row[typeIndex].includes("Wholesale")) {
+      continue;
+    }
+
+    sheetDataMatrixes.push(row);
+  }
+
+  await createDebugSheetOrError({
+    spreadsheetName: "Manifest Packages",
+    sheetTitles: ["Manifest Pkgs"],
+    sheetDataMatrixes: [sheetDataMatrixes],
+  });
 
   debugger;
 
@@ -591,7 +627,7 @@ export async function maybeLoadCogsReportData({
 
   reportData[ReportType.COGS] = {
     packages: packageWrapper,
-    transferredPackages: transferPackageWrapper
+    transferredPackages: transferPackageWrapper,
     // packages: manifestGraphPackages,
     // richOutgoingTransfers,
   };

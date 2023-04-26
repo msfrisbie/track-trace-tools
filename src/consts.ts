@@ -204,6 +204,7 @@ export enum PackageState {
   ACTIVE = "ACTIVE",
   INACTIVE = "INACTIVE",
   IN_TRANSIT = "IN_TRANSIT",
+  ON_HOLD = "ON_HOLD",
 }
 
 export enum PlantBatchState {
