@@ -167,11 +167,7 @@ export class CompressedDataWrapper<T> {
     this.indexedKey = indexedKey;
     this.index = new Map<any, number>();
 
-    const j = this.keys.indexOf(indexedKey);
-
-    if (j === -1) {
-      throw new Error(`Bad indexedKey: ${indexedKey} --- ${keys.toString()}`);
-    }
+    const j = this.columnIdxOrError(indexedKey);
 
     let skippedCt = 0;
 
@@ -198,6 +194,16 @@ export class CompressedDataWrapper<T> {
     }
   }
 
+  columnIdxOrError(key: string): number {
+    const idx = this.keys.indexOf(key);
+
+    if (idx < 0) {
+      throw new Error(`Bad indexedKey: ${key} --- ${this.keys.toString()}`);
+    }
+
+    return idx;
+  }
+
   flushCounter() {
     console.log(`${this.name} logged ${this.duplicateCounter} duplicate additions`);
     this.duplicateCounter = 0;
@@ -216,14 +222,20 @@ export class CompressedDataWrapper<T> {
     return true;
   }
 
-  findOrNull(key: any): T | null {
+  findOrNull(key: any): any[] | null {
     const idx = this.index.get(key);
 
     if (idx === undefined) {
       return null;
     }
 
-    return this.unpack(this.data[idx]);
+    return this.data[idx];
+  }
+
+  findAndUnpackOrNull(key: any): T | null {
+    const match = this.findOrNull(key);
+
+    return match ? this.unpack(match) : null;
   }
 
   pack<T>(input: T): any[] {
@@ -246,6 +258,6 @@ export class CompressedDataWrapper<T> {
       throw new Error("Bad index");
     }
 
-    this.data[rowIdx][this.keys.indexOf(property)] = value;
+    this.data[rowIdx][this.columnIdxOrError(property)] = value;
   }
 }

@@ -1,4 +1,4 @@
-import { METRC_TAG_REGEX, PackageFilterIdentifiers } from "@/consts";
+import { METRC_TAG_REGEX, PackageFilterIdentifiers, PackageState } from "@/consts";
 import {
   IPackageData,
   ISimpleCogsPackageData,
@@ -77,14 +77,16 @@ export async function getParentPackageLabels(pkg: ISimpleTransferPackageData | I
     if (pkg.parentPackageLabels) {
       return pkg.parentPackageLabels;
     } else {
-      const history = await getDataLoaderByLicense(pkg.LicenseNumber).then((dataLoader) =>
-        dataLoader.packageHistoryByPackageId(pkg.Id)
-      );
+      if (pkg.PackageState !== PackageState.DEPARTED_FACILITY) {
+        const history = await getDataLoaderByLicense(pkg.LicenseNumber).then((dataLoader) =>
+          dataLoader.packageHistoryByPackageId(pkg.Id)
+        );
 
-      const historyParsedLabels = extractParentPackageLabelsFromHistory(history);
+        const historyParsedLabels = extractParentPackageLabelsFromHistory(history);
 
-      if (historyParsedLabels.length > 0) {
-        return historyParsedLabels;
+        if (historyParsedLabels.length > 0) {
+          return historyParsedLabels;
+        }
       }
     }
   }

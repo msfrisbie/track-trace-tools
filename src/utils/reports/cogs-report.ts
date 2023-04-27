@@ -23,6 +23,10 @@ import {
 import { ActionContext } from "vuex";
 import { CompressedDataWrapper } from "../compression";
 import { getIsoDateFromOffset, todayIsodate } from "../date";
+import {
+  extractParentPackageLabelsFromHistory,
+  extractTagQuantityPairsFromHistory,
+} from "../history";
 import { getId, getItemName, getLabel, getParentPackageLabels } from "../package";
 import { createDebugSheetOrError } from "../sheets-export";
 
@@ -457,13 +461,13 @@ export async function maybeLoadCogsReportData({
     let parentLabels: string[] | null = null;
 
     // Prefer package lookup over transfer package
-    const matchedPkg = packageWrapper.findOrNull(nextLabel);
+    const matchedPkg = packageWrapper.findAndUnpackOrNull(nextLabel);
     if (matchedPkg) {
       parentLabels = await getParentPackageLabels(matchedPkg);
     }
 
     if (!parentLabels) {
-      const matchedTransferPkg = transferPackageWrapper.findOrNull(nextLabel);
+      const matchedTransferPkg = transferPackageWrapper.findAndUnpackOrNull(nextLabel);
       if (matchedTransferPkg) {
         parentLabels = await getParentPackageLabels(matchedTransferPkg);
       }
@@ -485,6 +489,101 @@ export async function maybeLoadCogsReportData({
   }
 
   console.log(`Touched labels: ${eligibleWholesaleManifestUptreeLabels.size}`);
+
+  const treePackageWrapper = new CompressedDataWrapper<ISimplePackageData>(
+    "Tree Packages",
+    [...eligibleWholesaleManifestUptreeLabels]
+      .map((label) => packageWrapper.findOrNull(label)!)
+      .filter((x) => !!x),
+    packageWrapper.indexedKey,
+    packageWrapper.keys
+  );
+
+  const packageHistoryRequests: Promise<any>[] = [];
+
+  for (const pkg of treePackageWrapper) {
+    if (pkg.childPackageLabelQuantityPairs || pkg.parentPackageLabels) {
+      // History has already been parsed
+      continue;
+    }
+
+    packageHistoryRequests.push(
+      getDataLoaderByLicense(pkg.LicenseNumber).then((dataLoader) =>
+        dataLoader.packageHistoryByPackageId(pkg.Id).then((history) => {
+          treePackageWrapper.update(
+            pkg.Label,
+            "parentPackageLabels",
+            extractParentPackageLabelsFromHistory(history)
+          );
+
+          treePackageWrapper.update(
+            pkg.Label,
+            "childPackageLabelQuantityPairs",
+            extractTagQuantityPairsFromHistory(history)
+          );
+        })
+      )
+    );
+
+    if (packageHistoryRequests.length % 100 === 0) {
+      await Promise.allSettled(packageHistoryRequests);
+    }
+  }
+
+  await Promise.allSettled(packageHistoryRequests);
+
+  const treeTransferPackageWrapper = new CompressedDataWrapper<ISimpleTransferPackageData>(
+    "Tree Transfer Packages",
+    [...eligibleWholesaleManifestUptreeLabels]
+      .map((label) => transferPackageWrapper.findOrNull(label)!)
+      .filter((x) => !!x),
+    transferPackageWrapper.indexedKey,
+    transferPackageWrapper.keys
+  );
+
+  // const treePackageWrapper = packageWrapper.filter("Label", () => {}
+
+  // const packageHistoryRequests: Promise<any>[] = [];
+
+  // for (const [idx, pkgData] of treePackageData.entries()) {
+
+  // }
+
+  // These will exclusively have no access to transfer history
+  // const treeTransferPackageData = [...eligibleWholesaleManifestUptreeLabels]
+  //   .map((label) => transferPackageWrapper.findOrNull(label))
+  //   .filter((x) => !!x);
+
+  const childMap = new Map<string, Set<string>>();
+
+  for (const treePkg of treePackageWrapper) {
+    const parentPackageLabels = await getParentPackageLabels(treePkg);
+
+    for (const parentLabel of parentPackageLabels) {
+      if (childMap.has(parentLabel)) {
+        childMap.get(parentLabel)!.add(treePkg.Label);
+      } else {
+        childMap.set(parentLabel, new Set([treePkg.Label]));
+      }
+    }
+  }
+
+  for (const treeTransferPkg of treeTransferPackageWrapper) {
+    const parentPackageLabels = await getParentPackageLabels(treeTransferPkg);
+
+    for (const parentLabel of parentPackageLabels) {
+      if (childMap.has(parentLabel)) {
+        childMap.get(parentLabel)!.add(treeTransferPkg.Label);
+      } else {
+        childMap.set(parentLabel, new Set([treeTransferPkg.Label]));
+      }
+    }
+  }
+
+  // Look up all remaining history values for both
+
+  // Generate child list map (used for backup)
+  // Generate parent fractional cost map
 
   debugger;
 

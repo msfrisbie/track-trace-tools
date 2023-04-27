@@ -224,11 +224,11 @@ describe("compression.ts", () => {
       ["five", 4],
       ["eight", 7],
     ]);
-    expect(wrapper.findOrNull(4)).toEqual({
+    expect(wrapper.findAndUnpackOrNull(4)).toEqual({
       foo: 4,
       bar: "five",
     });
-    expect(wrapper.findOrNull(12)).toEqual(null);
+    expect(wrapper.findAndUnpackOrNull(12)).toEqual(null);
     expect([...wrapper]).toEqual(expandedData.map(({ foo, bar }) => ({ foo, bar })));
 
     wrapper.add({
