@@ -1,4 +1,4 @@
-import { compressedDataWrapperFactory, CompressedMetrcTags } from "./compression";
+import { CompressedDataWrapper, CompressedMetrcTags } from "./compression";
 
 describe("compression.ts", () => {
   it("has the correct version", () => {
@@ -217,30 +217,40 @@ describe("compression.ts", () => {
       },
     ];
 
-    const wrapper = compressedDataWrapperFactory(expandedData, "foo", ["foo", "bar"]);
+    const wrapperA = new CompressedDataWrapper("name", [], "foo", ["foo", "bar"]);
+    expandedData.map((x) => wrapperA.add(x));
 
-    expect(wrapper.data).toEqual([
-      ["two", 1],
-      ["five", 4],
-      ["eight", 7],
-    ]);
-    expect(wrapper.findAndUnpackOrNull(4)).toEqual({
-      foo: 4,
-      bar: "five",
-    });
-    expect(wrapper.findAndUnpackOrNull(12)).toEqual(null);
-    expect([...wrapper]).toEqual(expandedData.map(({ foo, bar }) => ({ foo, bar })));
+    const wrapperB = new CompressedDataWrapper(
+      "name",
+      expandedData.map((x) => wrapperA.pack(x)),
+      "foo",
+      ["foo", "bar"]
+    );
 
-    wrapper.add({
-      foo: 10,
-      bar: "eleven",
-      baz: null,
-    });
-    expect(wrapper.data).toEqual([
-      ["two", 1],
-      ["five", 4],
-      ["eight", 7],
-      ["eleven", 10],
-    ]);
+    for (const wrapper of [wrapperA, wrapperB]) {
+      expect(wrapper.data).toEqual([
+        ["two", 1],
+        ["five", 4],
+        ["eight", 7],
+      ]);
+      expect(wrapper.findAndUnpackOrNull(4)).toEqual({
+        foo: 4,
+        bar: "five",
+      });
+      expect(wrapper.findAndUnpackOrNull(12)).toEqual(null);
+      expect([...wrapper]).toEqual(expandedData.map(({ foo, bar }) => ({ foo, bar })));
+
+      wrapper.add({
+        foo: 10,
+        bar: "eleven",
+        baz: null,
+      });
+      expect(wrapper.data).toEqual([
+        ["two", 1],
+        ["five", 4],
+        ["eight", 7],
+        ["eleven", 10],
+      ]);
+    }
   });
 });

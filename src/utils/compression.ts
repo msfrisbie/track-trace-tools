@@ -163,7 +163,7 @@ export class CompressedDataWrapper<T> {
   constructor(name: string, data: any[][], indexedKey: string, keys: string[]) {
     this.name = name;
     this.data = [];
-    this.keys = keys;
+    this.keys = keys.sort();
     this.indexedKey = indexedKey;
     this.index = new Map<any, number>();
 
@@ -171,7 +171,7 @@ export class CompressedDataWrapper<T> {
 
     let skippedCt = 0;
 
-    for (const [i, row] of data.entries()) {
+    for (const row of data) {
       const key = row[j];
 
       if (this.index.has(key)) {
@@ -180,7 +180,7 @@ export class CompressedDataWrapper<T> {
       }
 
       this.data.push(row);
-      this.index.set(key, i);
+      this.index.set(key, this.data.length - 1);
     }
 
     if (skippedCt > 0) {
@@ -254,8 +254,8 @@ export class CompressedDataWrapper<T> {
   update(indexValue: any, property: any, value: any) {
     const rowIdx = this.index.get(indexValue);
 
-    if (!rowIdx) {
-      throw new Error("Bad index");
+    if (rowIdx === undefined) {
+      throw new Error(`Bad index, ${indexValue}`);
     }
 
     this.data[rowIdx][this.columnIdxOrError(property)] = value;

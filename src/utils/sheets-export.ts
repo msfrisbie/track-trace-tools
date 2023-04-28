@@ -36,9 +36,19 @@ async function writeDataSheet<T>({
   data: T[];
   options?: {
     useFieldTransformer?: boolean;
+    pageSize?: number;
+    maxParallelRequests?: number;
+    valueInputOption?: "RAW" | "USER_ENTERED";
   };
 }) {
-  const pageSize = 5000;
+  const mergedOptions = {
+    useFieldTransformer: false,
+    pageSize: 5000,
+    maxParallelRequests: 25,
+    valueInputOption: "USER_ENTERED",
+    ...options,
+  };
+
   let nextPageStartIdx = 0;
   let nextPageRowIdx = 1;
 
@@ -51,7 +61,7 @@ async function writeDataSheet<T>({
         values: [fields.map((fieldData) => `${fieldData.readableName}     `)],
       },
       undefined,
-      90000
+      180000
     );
 
     nextPageRowIdx += 1;
@@ -60,15 +70,15 @@ async function writeDataSheet<T>({
   const promises = [];
 
   while (true) {
-    const nextPage = data.slice(nextPageStartIdx, nextPageStartIdx + pageSize);
+    const nextPage = data.slice(nextPageStartIdx, nextPageStartIdx + mergedOptions.pageSize);
     if (nextPage.length === 0) {
       break;
     }
 
-    const range = `'${spreadsheetTitle}'!${nextPageRowIdx}:${nextPageRowIdx + nextPage.length}`;
+    const range = `'${spreadsheetTitle}'!${nextPageRowIdx}:${nextPageRowIdx + nextPage.length - 1}`;
 
     let values = nextPage;
-    if (options.useFieldTransformer) {
+    if (mergedOptions.useFieldTransformer) {
       if (!fields) {
         throw new Error("Must provide fields transformer");
       }
@@ -92,17 +102,33 @@ async function writeDataSheet<T>({
           spreadsheetId,
           range,
           values,
+          valueInputOption: mergedOptions.valueInputOption,
         },
         undefined,
-        90000
+        180000
       )
     );
 
     nextPageStartIdx += nextPage.length;
     nextPageRowIdx += nextPage.length;
+
+    if (promises.length % mergedOptions.maxParallelRequests === 0) {
+      for (const result of await Promise.allSettled(promises)) {
+        if (result.status === "rejected") {
+          throw new Error("Write failed");
+        }
+      }
+
+      // Wait for 3 seconds
+      await new Promise((resolve) => setTimeout(resolve, 3000));
+    }
   }
 
-  await Promise.allSettled(promises);
+  for (const result of await Promise.allSettled(promises)) {
+    if (result.status === "rejected") {
+      throw new Error("Write failed");
+    }
+  }
 }
 
 export async function createDebugSheetOrError({
@@ -130,7 +156,7 @@ export async function createDebugSheetOrError({
       sheetTitles,
     },
     undefined,
-    90000
+    180000
   );
 
   if (!response.data.success) {
@@ -152,13 +178,16 @@ export async function createDebugSheetOrError({
         requests: formattingRequests,
       },
       undefined,
-      90000
+      180000
     );
 
     await writeDataSheet({
       spreadsheetId: response.data.result.spreadsheetId,
       spreadsheetTitle: sheetTitle as SheetTitles,
       data: sheetDataMatrixes[idx],
+      options: {
+        valueInputOption: "RAW",
+      },
     });
   }
 
@@ -238,7 +267,7 @@ export async function createReportSpreadsheeetOrError({
       sheetTitles,
     },
     undefined,
-    90000
+    180000
   );
 
   if (!response.data.success) {
@@ -286,7 +315,7 @@ export async function createReportSpreadsheeetOrError({
       requests: formattingRequests,
     },
     undefined,
-    90000
+    180000
   );
 
   //
@@ -337,7 +366,7 @@ export async function createReportSpreadsheeetOrError({
       values: [[], [], ...summaryList],
     },
     undefined,
-    90000
+    180000
   );
 
   //
@@ -372,7 +401,7 @@ export async function createReportSpreadsheeetOrError({
       requests: resizeRequests,
     },
     undefined,
-    90000
+    180000
   );
 
   // 3000ms grace period for all sheets
@@ -400,7 +429,7 @@ export async function createReportSpreadsheeetOrError({
       requests: shrinkFontRequests,
     },
     undefined,
-    90000
+    180000
   );
 
   await messageBus.sendMessageToBackground(
@@ -411,7 +440,7 @@ export async function createReportSpreadsheeetOrError({
       values: [[`Created with Track & Trace Tools @ ${Date().toString()}`]],
     },
     undefined,
-    90000
+    180000
   );
 
   return response.data.result;
@@ -451,7 +480,7 @@ export async function createCogsSpreadsheetOrError({
       sheetTitles,
     },
     undefined,
-    90000
+    180000
   );
 
   if (!response.data.success) {
@@ -549,7 +578,7 @@ export async function createCogsSpreadsheetOrError({
       requests: formattingRequests,
     },
     undefined,
-    90000
+    180000
   );
 
   await messageBus.sendMessageToBackground(
@@ -564,7 +593,7 @@ export async function createCogsSpreadsheetOrError({
       ],
     },
     undefined,
-    90000
+    180000
   );
 
   // Tag	Production Batch Number	Cost
@@ -781,7 +810,7 @@ export async function createCogsSpreadsheetOrError({
       requests: resizeRequests,
     },
     undefined,
-    90000
+    180000
   );
 
   await messageBus.sendMessageToBackground(
@@ -792,7 +821,7 @@ export async function createCogsSpreadsheetOrError({
       values: [[`Created with Track & Trace Tools @ ${Date().toString()}`]],
     },
     undefined,
-    90000
+    180000
   );
 
   return response.data.result;
@@ -820,7 +849,7 @@ export async function createScanSheetOrError(
       sheetTitles: [SHEET_TITLE],
     },
     undefined,
-    90000
+    180000
   );
 
   await messageBus.sendMessageToBackground(
@@ -843,7 +872,7 @@ export async function createScanSheetOrError(
       ],
     },
     undefined,
-    90000
+    180000
   );
 
   const sheetId = 0;
@@ -904,7 +933,7 @@ export async function createScanSheetOrError(
       requests: formattingRequests,
     },
     undefined,
-    90000
+    180000
   );
 
   await messageBus.sendMessageToBackground(
@@ -915,7 +944,7 @@ export async function createScanSheetOrError(
       values: [[`Created with Track & Trace Tools @ ${Date().toString()}`]],
     },
     undefined,
-    90000
+    180000
   );
 
   return response.data.result;

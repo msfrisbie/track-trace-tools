@@ -12,7 +12,7 @@ import {
   ISpreadsheet,
   IValueRange,
 } from "@/interfaces";
-import { customFetch } from "@/modules/fetch-manager.module";
+import { customFetch, retryDefaults } from "@/modules/fetch-manager.module";
 import { getAuthTokenOrError } from "./oauth";
 
 async function headersFactory() {
@@ -230,13 +230,15 @@ export async function writeValues({
   spreadsheetId,
   range,
   values,
+  valueInputOption,
 }: {
   spreadsheetId: string;
   range: string;
   values: ISheetValues;
+  valueInputOption?: "RAW" | "USER_ENTERED";
 }) {
   const url = buildSheetsApiURL(`/${spreadsheetId}/values/${range}`, {
-    valueInputOption: "USER_ENTERED",
+    valueInputOption: valueInputOption ?? "USER_ENTERED",
   });
 
   const headers = await headersFactory();
@@ -248,6 +250,7 @@ export async function writeValues({
   };
 
   return customFetch(url, {
+    ...retryDefaults,
     method: "PUT",
     headers,
     body: JSON.stringify(payload),
@@ -258,14 +261,16 @@ export async function appendValues({
   spreadsheetId,
   range,
   values,
+  valueInputOption,
 }: {
   spreadsheetId: string;
   range: string;
   values: ISheetValues;
+  valueInputOption?: "RAW" | "USER_ENTERED";
 }) {
   // https://developers.google.com/sheets/api/reference/rest/v4/spreadsheets.values/append
   const url = buildSheetsApiURL(`/${spreadsheetId}/values/${range}:append`, {
-    valueInputOption: "USER_ENTERED",
+    valueInputOption: valueInputOption ?? "USER_ENTERED",
   });
 
   const headers = await headersFactory();
@@ -277,6 +282,7 @@ export async function appendValues({
   };
 
   return customFetch(url, {
+    ...retryDefaults,
     method: "POST",
     headers,
     body: JSON.stringify(payload),
@@ -297,11 +303,11 @@ export async function batchUpdate({
   const headers = await headersFactory();
 
   return customFetch(url, {
+    ...retryDefaults,
     method: "POST",
     headers,
     body: JSON.stringify({
       requests,
-      // valueInputOption: "USER_ENTERED",
     }),
   });
 }
@@ -309,9 +315,11 @@ export async function batchUpdate({
 export async function batchUpdateValues({
   spreadsheetId,
   data,
+  valueInputOption,
 }: {
   spreadsheetId: string;
   data: IValueRange[];
+  valueInputOption?: "RAW" | "USER_ENTERED";
 }) {
   // https://developers.google.com/sheets/api/reference/rest/v4/spreadsheets.values/batchUpdate
   // https://sheets.googleapis.com/v4/spreadsheets/{spreadsheetId}/values:batchUpdate
@@ -320,11 +328,12 @@ export async function batchUpdateValues({
   const headers = await headersFactory();
 
   return customFetch(url, {
+    ...retryDefaults,
     method: "POST",
     headers,
     body: JSON.stringify({
       data,
-      valueInputOption: "USER_ENTERED",
+      valueInputOption: valueInputOption ?? "USER_ENTERED",
     }),
   });
 }
