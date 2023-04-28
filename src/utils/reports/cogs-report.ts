@@ -556,7 +556,18 @@ export async function maybeLoadCogsReportData({
 
   const childMap = new Map<string, Set<string>>();
 
-  for (const treePkg of treePackageWrapper) {
+  const unifiedPackageWrapper = new CompressedDataWrapper<ISimplePackageData>(
+    treePackageWrapper.name,
+    treePackageWrapper.data,
+    treePackageWrapper.indexedKey,
+    treePackageWrapper.keys
+  );
+
+  for (const transferPkg of treeTransferPackageWrapper) {
+    unifiedPackageWrapper.add(transferPkg);
+  }
+
+  for (const treePkg of unifiedPackageWrapper) {
     const parentPackageLabels = await getParentPackageLabels(treePkg);
 
     for (const parentLabel of parentPackageLabels) {
@@ -568,24 +579,129 @@ export async function maybeLoadCogsReportData({
     }
   }
 
-  for (const treeTransferPkg of treeTransferPackageWrapper) {
-    const parentPackageLabels = await getParentPackageLabels(treeTransferPkg);
+  let unmatchedParentCount = 0;
+  let unmatchedChildLabelCount = 0;
+  let unmatchedChildSetCount = 0;
+  let fatalChildMismatchCount = 0;
+  let usedBackupAlgorithmCount = 0;
+  let successfulMatchCount = 0;
+  let fullInheritanceBackupCount = 0;
+  let inexactInheritanceBackupCount = 0;
 
-    for (const parentLabel of parentPackageLabels) {
-      if (childMap.has(parentLabel)) {
-        childMap.get(parentLabel)!.add(treeTransferPkg.Label);
+  // [childLabel, [parentLabel, fractionalCostMultiplier]]
+  const labelCostFunctionPairs: Map<string, [string, number][]> = new Map();
+
+  for (const pkg of unifiedPackageWrapper) {
+    const pairs: [string, number][] = [];
+
+    for (const parentLabel of await getParentPackageLabels(pkg)) {
+      const parentPkg = unifiedPackageWrapper.findAndUnpackOrNull(parentLabel);
+
+      if (!parentPkg) {
+        ++unmatchedParentCount;
+        continue;
+      }
+
+      if (parentPkg.childPackageLabelQuantityPairs) {
+        const total = parentPkg.childPackageLabelQuantityPairs.reduce((a, b) => a + b[1], 0);
+
+        const matchingPair = parentPkg.childPackageLabelQuantityPairs.find(
+          (x) => x[0] === pkg.Label
+        );
+
+        if (!matchingPair) {
+          unmatchedChildLabelCount++;
+          continue;
+        }
+
+        ++successfulMatchCount;
+
+        pairs.push([parentPkg.Label, matchingPair[1] / total]);
       } else {
-        childMap.set(parentLabel, new Set([treeTransferPkg.Label]));
+        ++usedBackupAlgorithmCount;
+        const childLabels = childMap.get(parentPkg.Label);
+
+        if (!childLabels) {
+          ++unmatchedChildSetCount;
+          continue;
+        } else {
+          if (!childLabels.has(pkg.Label)) {
+            fatalChildMismatchCount++;
+            continue;
+          }
+
+          if (childLabels.size === 1) {
+            ++fullInheritanceBackupCount;
+            // 100% goes to the child
+            pairs.push([parentLabel, 1]);
+          } else {
+            ++inexactInheritanceBackupCount;
+            pairs.push([parentLabel, 1 / childLabels.size]);
+          }
+        }
       }
     }
+
+    labelCostFunctionPairs.set(pkg.Label, pairs);
   }
 
-  // Look up all remaining history values for both
+  console.log({
+    unmatchedParentCount,
+    unmatchedChildLabelCount,
+    unmatchedChildSetCount,
+    fatalChildMismatchCount,
+    usedBackupAlgorithmCount,
+    successfulMatchCount,
+    fullInheritanceBackupCount,
+    inexactInheritanceBackupCount,
+  });
 
-  // Generate child list map (used for backup)
-  // Generate parent fractional cost map
+  console.log({ labelCostFunctionPairs });
+
+  // unified index will match the cost function pairs.
+
+  const sheetMatrix = [];
+
+  for (const [idx, [label, pairs]] of [...labelCostFunctionPairs].entries()) {
+    const expr: string = pairs
+      .map(([parentLabel, multiplier]) => {
+        return `(C${unifiedPackageWrapper.index.get(parentLabel)} * ${multiplier})`;
+      })
+      .join("+");
+
+    sheetMatrix.push([
+      label,
+      unifiedPackageWrapper.findAndUnpackOrNull(label)!.ProductionBatchNumber,
+      ``,
+      `=C${idx + 1}+(${expr || 0})`,
+    ]);
+  }
+
+  console.log(
+    await createDebugSheetOrError({
+      spreadsheetName: "Cost Sheet",
+      sheetTitles: ["Cost"],
+      sheetDataMatrixes: [sheetMatrix],
+    })
+  );
 
   debugger;
+
+  // // unify into single table
+
+  // for (const treeLabel of eligibleWholesaleManifestUptreeLabels) {
+  //   const pkg = treePackageWrapper.findAndUnpackOrNull(treeLabel);
+  //   if (pkg) {
+  //     const childLabels = childMap.get(pkg.Label);
+
+  //     continue;
+  //   }
+  //   const transferPkg = treeTransferPackageWrapper.findAndUnpackOrNull(treeLabel);
+  //   if (transferPkg) {
+  //   }
+
+  //   throw new Error(`Could not match tree label: ${treeLabel}`);
+  // }
 
   // console.log(
   //   `Manifest packages: ${[...globalPackageMap.values()].filter((pkg) => pkg.manifest).length}`
