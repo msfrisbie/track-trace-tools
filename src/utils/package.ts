@@ -240,6 +240,8 @@ export function simpleTransferPackageConverter(
     PackageState: pkg.PackageState,
     Label: getLabel(pkg),
     ItemName: getItemName(pkg),
+    Quantity: pkg.ShippedQuantity,
+    UnitOfMeasureAbbreviation: pkg.ShippedUnitOfMeasureAbbreviation,
     SourcePackageLabels: pkg.SourcePackageLabels,
     ProductionBatchNumber: pkg.ProductionBatchNumber,
     parentPackageLabels: null,
@@ -255,6 +257,8 @@ export function simplePackageNormalizer(
     Type: "",
     ETD: "",
     ManifestNumber: "",
+    UnitOfMeasureAbbreviation: "",
+    Quantity: null,
     fractionalCostMultiplierPairs: undefined,
     ...pkg,
   };

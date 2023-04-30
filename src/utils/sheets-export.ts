@@ -1,5 +1,5 @@
 import { MessageType, SHEETS_API_MESSAGE_TIMEOUT_MS, SheetTitles } from "@/consts";
-import { IDestinationData, IDestinationPackageData, ISpreadsheet } from "@/interfaces";
+import { IDestinationData, IDestinationPackageData, ISpreadsheet, IValueRange } from "@/interfaces";
 import { messageBus } from "@/modules/message-bus.module";
 import store from "@/store/page-overlay/index";
 import { ReportsMutations, ReportType } from "@/store/page-overlay/modules/reports/consts";
@@ -42,6 +42,7 @@ async function writeDataSheet<T>({
     valueInputOption?: "RAW" | "USER_ENTERED";
     rangeStartColumn?: string;
     rangeEndColumn?: string;
+    batchWrite?: boolean;
   };
 }) {
   const mergedOptions = {
@@ -51,6 +52,7 @@ async function writeDataSheet<T>({
     valueInputOption: "USER_ENTERED",
     rangeStartColumn: "A",
     rangeEndColumn: "",
+    batchWrite: false,
     ...options,
   };
 
@@ -73,6 +75,7 @@ async function writeDataSheet<T>({
   }
 
   const promises = [];
+  let batchRequests: IValueRange[] = [];
 
   while (true) {
     const nextPage = data.slice(nextPageStartIdx, nextPageStartIdx + mergedOptions.pageSize);
@@ -102,33 +105,77 @@ async function writeDataSheet<T>({
       );
     }
 
-    promises.push(
-      messageBus.sendMessageToBackground(
-        MessageType.WRITE_SPREADSHEET_VALUES,
-        {
-          spreadsheetId,
-          range,
-          values,
-          valueInputOption: mergedOptions.valueInputOption,
-        },
-        undefined,
-        SHEETS_API_MESSAGE_TIMEOUT_MS
-      )
-    );
+    if (mergedOptions.batchWrite) {
+      batchRequests.push({
+        range,
+        majorDimension: "ROWS",
+        // @ts-ignore
+        values,
+      });
+    } else {
+      promises.push(
+        messageBus.sendMessageToBackground(
+          MessageType.WRITE_SPREADSHEET_VALUES,
+          {
+            spreadsheetId,
+            range,
+            values,
+            valueInputOption: mergedOptions.valueInputOption,
+          },
+          undefined,
+          SHEETS_API_MESSAGE_TIMEOUT_MS
+        )
+      );
+    }
 
     nextPageStartIdx += nextPage.length;
     nextPageRowIdx += nextPage.length;
 
-    if (promises.length % mergedOptions.maxParallelRequests === 0) {
+    if (
+      (promises.length > 0 && promises.length % mergedOptions.maxParallelRequests === 0) ||
+      (batchRequests.length > 0 && batchRequests.length % mergedOptions.maxParallelRequests === 0)
+    ) {
+      if (mergedOptions.batchWrite) {
+        promises.push(
+          messageBus.sendMessageToBackground(
+            MessageType.BATCH_UPDATE_SPREADSHEET_VALUES,
+            {
+              spreadsheetId,
+              data: batchRequests,
+              valueInputOption: mergedOptions.valueInputOption,
+            },
+            undefined,
+            SHEETS_API_MESSAGE_TIMEOUT_MS
+          )
+        );
+      }
+
       for (const result of await Promise.allSettled(promises)) {
         if (result.status === "rejected") {
           throw new Error("Write failed");
         }
       }
 
+      batchRequests = [];
+
       // Wait for 3 seconds
       await new Promise((resolve) => setTimeout(resolve, 1000));
     }
+  }
+
+  if (mergedOptions.batchWrite) {
+    promises.push(
+      messageBus.sendMessageToBackground(
+        MessageType.BATCH_UPDATE_SPREADSHEET_VALUES,
+        {
+          spreadsheetId,
+          data: batchRequests,
+          valueInputOption: mergedOptions.valueInputOption,
+        },
+        undefined,
+        SHEETS_API_MESSAGE_TIMEOUT_MS
+      )
+    );
   }
 
   for (const result of await Promise.allSettled(promises)) {
@@ -494,60 +541,6 @@ export async function createCogsSpreadsheetOrError({
     throw new Error("Unable to create COGS sheet");
   }
 
-  // reportData[ReportType.COGS]!.packages.sort((a, b) => {
-  //   if (!a.ProductionBatchNumber) {
-  //     return 1;
-  //   }
-  //   if (!b.ProductionBatchNumber) {
-  //     return -1;
-  //   }
-  //   return a.ProductionBatchNumber!.localeCompare(b.ProductionBatchNumber!);
-  // }).map((pkg) => [pkg.Label, pkg.ProductionBatchNumber ?? ""]);
-
-  // const worksheetData = reportData[ReportType.COGS]!.packageCostCalculationData.map(
-  //   ({ tag, sourceCostData, errors }, idx) => [
-  //     tag,
-  //     `=SUM(C${idx + 2}:D${idx + 2})`,
-  //     `=IFERROR(VLOOKUP(A${idx + 2}, '${SheetTitles.PRODUCTION_BATCH_COSTS}'!A${
-  //       idx + 2
-  //     }:C, 3, false), 0)`,
-  //     "=" +
-  //       sourceCostData
-  //         .map(
-  //           ({ parentTag, costFractionMultiplier }) =>
-  //             `(VLOOKUP("${parentTag}", $A$2:$B, 2) * ${costFractionMultiplier})`
-  //         )
-  //         .join("+"),
-  //     errors.toString(),
-  //   ]
-  // );
-
-  // const worksheetData: any[] = [];
-  // const worksheetData = reportData[ReportType.COGS]!.packages.map((pkg, idx) => {
-  //   let fractionalCostExpression = "";
-  //   if (pkg!.fractionalCostData!.length) {
-  //     fractionalCostExpression =
-  //       "=" +
-  //       pkg!
-  //         .fractionalCostData!.map(
-  //           ({ parentLabel, fractionalQuantity }) =>
-  //             `(VLOOKUP("${parentLabel}", B2:E, 4, false) * ${fractionalQuantity})`
-  //         )
-  //         .join("+");
-  //   }
-
-  //   return [
-  //     pkg.LicenseNumber,
-  //     pkg.Label,
-  //     pkg.ItemName,
-  //     pkg.ProductionBatchNumber,
-  //     ``,
-  //     fractionalCostExpression,
-  //     `=SUM(E${idx + 2}:F${idx + 2})`,
-  //     (pkg.errors ?? "").toString(),
-  //   ];
-  // });
-
   let formattingRequests: any = [
     addRowsRequestFactory({
       sheetId: sheetTitles.indexOf(SheetTitles.OVERVIEW),
@@ -560,16 +553,11 @@ export async function createCogsSpreadsheetOrError({
 
   const { worksheetMatrix, cogsMatrix, auditData } = reportData[ReportType.COGS]!;
 
-  // const batchCostSheetId = sheetTitles.indexOf(SheetTitles.PRODUCTION_BATCH_COSTS);
   const worksheetSheetId = sheetTitles.indexOf(SheetTitles.WORKSHEET);
   const manifestSheetId = sheetTitles.indexOf(SheetTitles.MANIFEST_COGS);
 
   formattingRequests = [
     ...formattingRequests,
-    // Batch Costs
-    // addRowsRequestFactory({ sheetId: batchCostSheetId, length: packageData.length }),
-    // styleTopRowRequestFactory({ sheetId: batchCostSheetId }),
-    // freezeTopRowRequestFactory({ sheetId: batchCostSheetId }),
     // Worksheet
     addRowsRequestFactory({ sheetId: worksheetSheetId, length: worksheetMatrix.length }),
     styleTopRowRequestFactory({ sheetId: worksheetSheetId }),
@@ -597,6 +585,7 @@ export async function createCogsSpreadsheetOrError({
       range: `'${SheetTitles.OVERVIEW}'`,
       values: [
         [],
+        [null, "Enable calculator:"],
         [],
         ...Object.entries(auditData).map(([key, value]) => ["", key, JSON.stringify(value)]),
       ],
@@ -604,42 +593,6 @@ export async function createCogsSpreadsheetOrError({
     undefined,
     SHEETS_API_MESSAGE_TIMEOUT_MS
   );
-
-  // Tag	Production Batch Number	Cost
-  // 1A4050100000900000000001	PR-C100GSSRA-03/21/2023	$1,500.00
-
-  store.commit(`reports/${ReportsMutations.SET_STATUS}`, {
-    statusMessage: { text: `Writing package data...`, level: "success" },
-  });
-
-  // await writeDataSheet({
-  //   spreadsheetId: response.data.result.spreadsheetId,
-  //   spreadsheetTitle: SheetTitles.PRODUCTION_BATCH_COSTS,
-  //   fields: [
-  //     {
-  //       value: "",
-  //       readableName: "Package Tag",
-  //       required: true,
-  //     },
-  //     {
-  //       value: "",
-  //       readableName: "Production Batch Number",
-  //       required: true,
-  //     },
-  //     {
-  //       value: "",
-  //       readableName: "Cost",
-  //       required: true,
-  //     },
-  //   ],
-  //   data: packageData,
-  //   options: {
-  //     useFieldTransformer: false,
-  //   },
-  // });
-
-  // Tag	Computed Cost	Production Batch Cost	Fractional Costs
-  // 1A4050100000900000000004	=SUM(C5:5) =IFERROR(VLOOKUP(A5, 'Production Batches'!A5:C, 3), 0)	=VLOOKUP("1A4050100000900000000001", $A$2:$B, 2) * 0.25
 
   store.commit(`reports/${ReportsMutations.SET_STATUS}`, {
     statusMessage: { text: `Writing worksheet data...`, level: "success" },
@@ -651,6 +604,7 @@ export async function createCogsSpreadsheetOrError({
     data: worksheetMatrix.map((row) => row.slice(0, row.length - 1)),
     options: {
       valueInputOption: "RAW",
+      batchWrite: true,
     },
   });
 
@@ -660,9 +614,15 @@ export async function createCogsSpreadsheetOrError({
     data: worksheetMatrix.map((row) => row.slice(row.length - 1)),
     options: {
       rangeStartColumn: getLetterFromIndex(worksheetMatrix[0].length - 1),
-      pageSize: 500,
+      pageSize: 10,
       valueInputOption: "USER_ENTERED",
+      batchWrite: true,
+      maxParallelRequests: 250,
     },
+  });
+
+  store.commit(`reports/${ReportsMutations.SET_STATUS}`, {
+    statusMessage: { text: `Writing manifest data...`, level: "success" },
   });
 
   await writeDataSheet({
@@ -671,6 +631,7 @@ export async function createCogsSpreadsheetOrError({
     data: cogsMatrix.map((row) => row.slice(0, row.length - 1)),
     options: {
       valueInputOption: "RAW",
+      batchWrite: true,
     },
   });
 
@@ -682,6 +643,8 @@ export async function createCogsSpreadsheetOrError({
       rangeStartColumn: getLetterFromIndex(cogsMatrix[0].length - 1),
       pageSize: 500,
       valueInputOption: "USER_ENTERED",
+      batchWrite: true,
+      maxParallelRequests: 10,
     },
   });
 
@@ -698,9 +661,6 @@ export async function createCogsSpreadsheetOrError({
 
   resizeRequests = [
     ...resizeRequests,
-    // autoResizeDimensionsRequestFactory({
-    //   sheetId: batchCostSheetId,
-    // }),
     autoResizeDimensionsRequestFactory({
       sheetId: worksheetSheetId,
     }),
@@ -709,7 +669,7 @@ export async function createCogsSpreadsheetOrError({
     }),
   ];
 
-  // This is incredibly slow for huge sheets
+  // This is incredibly slow for huge sheets, don't wait for it to finish
   messageBus.sendMessageToBackground(
     MessageType.BATCH_UPDATE_SPREADSHEET,
     {

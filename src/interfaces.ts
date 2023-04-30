@@ -807,6 +807,8 @@ export interface ISimpleTransferPackageData extends ISimplePackageData {
   ETD: string;
   Type: string;
   ManifestNumber: string;
+  UnitOfMeasureAbbreviation: string;
+  Quantity: number | null;
 }
 
 export interface ISimpleCogsPackageData extends ISimplePackageData {
@@ -1851,7 +1853,7 @@ export interface ISheet {
   };
 }
 
-export type ISheetValues = string[][];
+export type ISheetValues = any[][];
 
 export interface IValueRange {
   range: string;

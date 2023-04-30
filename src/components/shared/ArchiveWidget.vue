@@ -308,6 +308,8 @@ export default Vue.extend({
                         PackageState: pkg.PackageState,
                         Label: getLabel(pkg),
                         ItemName: getItemName(pkg),
+                        Quantity: pkg.ShippedQuantity,
+                        UnitOfMeasureAbbreviation: pkg.ShippedUnitOfMeasureAbbreviation,
                         SourcePackageLabels: pkg.SourcePackageLabels,
                         ProductionBatchNumber: pkg.ProductionBatchNumber,
                         parentPackageLabels: null,

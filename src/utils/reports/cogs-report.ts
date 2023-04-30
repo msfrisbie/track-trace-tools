@@ -20,7 +20,6 @@ import {
 } from "@/store/page-overlay/modules/reports/interfaces";
 import { ActionContext } from "vuex";
 import { CompressedDataWrapper } from "../compression";
-import { downloadCsvFile } from "../csv";
 import { getIsoDateFromOffset, todayIsodate } from "../date";
 import {
   extractParentPackageLabelsFromHistory,
@@ -331,6 +330,18 @@ export async function maybeLoadCogsReportData({
     },
   });
 
+  const tradeSampleTransferLabels: Set<string> = new Set();
+  const testingSampleTransferLabels: Set<string> = new Set();
+
+  for (const transferPackage of transferPackageWrapper) {
+    if (transferPackage.Type.includes("Trade Sample Transfer")) {
+      tradeSampleTransferLabels.add(transferPackage.Label);
+    }
+    if (transferPackage.Type.includes("Testing Transfer")) {
+      testingSampleTransferLabels.add(transferPackage.Label);
+    }
+  }
+
   console.log(
     `Failed package requests: ${packageResults.filter((x) => x.status !== "fulfilled").length}`
   );
@@ -343,6 +354,13 @@ export async function maybeLoadCogsReportData({
       transferPackageWrapper.indexedKey,
       transferPackageWrapper.keys
     );
+
+  ctx.commit(ReportsMutations.SET_STATUS, {
+    statusMessage: {
+      text: `Locating wholesale packages...`,
+      level: "success",
+    },
+  });
 
   // Find eligible packages that should be included in this report
   for (const transferPkg of transferPackageWrapper) {
@@ -361,38 +379,33 @@ export async function maybeLoadCogsReportData({
     eligibleWholesaleTransferPackageWrapper.add(transferPkg);
   }
 
+  ctx.commit(ReportsMutations.SET_STATUS, {
+    statusMessage: {
+      text: `Found ${eligibleWholesaleTransferPackageWrapper.data.length} wholesale packages`,
+      level: "success",
+    },
+  });
+
+  ctx.commit(ReportsMutations.SET_STATUS, {
+    statusMessage: {
+      text: `Building package history tree...`,
+      level: "success",
+    },
+  });
+
   const stack: string[] = [...eligibleWholesaleTransferPackageWrapper].map((x) => x.Label);
 
   // The "manifest tree" is all packages that are upstream of a wholesale transfer package
   const eligibleWholesaleManifestTreeLabels = new Set<string>();
-  // let roundCount = 0;
 
-  // let labelBuffer: string[] = [];
-
-  console.log(`Eligible package count: ${stack.length}`);
-  console.log(`Unique package count: ${new Set(stack).size}`);
+  // console.log(`Eligible package count: ${stack.length}`);
 
   while (true) {
-    // if (stack.length === 0) {
-    //   console.log(
-    //     `Stack size after ${roundCount++} rounds: ${eligibleWholesaleManifestTreeLabels.size}`
-    //   );
-    //   console.log(`Buffer size: ${labelBuffer.length}`);
-
-    //   // Flush label buffer
-    //   labelBuffer.map((label) => stack.push(label));
-    //   labelBuffer = [];
-
     if (stack.length === 0) {
       break;
     }
-    // }
 
     const nextLabel = stack.pop()!;
-
-    // if (eligibleWholesaleManifestTreeLabels.has(nextLabel)) {
-    //   continue;
-    // }
 
     let parentLabels: string[] | null = null;
 
@@ -411,15 +424,22 @@ export async function maybeLoadCogsReportData({
       });
     }
 
-    // Sanity check to ensure there are no orphaned packages
-    // if (!parentLabels && roundCount < 2) {
-    //   console.error(`No parent labels found for ${nextLabel} in round ${roundCount}`);
-    // }
-
     eligibleWholesaleManifestTreeLabels.add(nextLabel);
   }
 
-  console.log(`# labels in tree: ${eligibleWholesaleManifestTreeLabels.size}`);
+  ctx.commit(ReportsMutations.SET_STATUS, {
+    statusMessage: {
+      text: `${eligibleWholesaleManifestTreeLabels.size} packages in history tree`,
+      level: "success",
+    },
+  });
+
+  ctx.commit(ReportsMutations.SET_STATUS, {
+    statusMessage: {
+      text: `Loading remaining history data...`,
+      level: "success",
+    },
+  });
 
   const treePackageWrapper = new CompressedDataWrapper<ISimplePackageData>(
     "Tree Packages",
@@ -469,6 +489,13 @@ export async function maybeLoadCogsReportData({
 
   await Promise.allSettled(packageHistoryRequests);
 
+  ctx.commit(ReportsMutations.SET_STATUS, {
+    statusMessage: {
+      text: `Finished loading history`,
+      level: "success",
+    },
+  });
+
   const treeTransferPackageWrapper = new CompressedDataWrapper<ISimpleTransferPackageData>(
     "Tree Transfer Packages",
     [],
@@ -483,6 +510,13 @@ export async function maybeLoadCogsReportData({
       treeTransferPackageWrapper.add(pkg);
     }
   }
+
+  ctx.commit(ReportsMutations.SET_STATUS, {
+    statusMessage: {
+      text: `Calculating cost distribution...`,
+      level: "success",
+    },
+  });
 
   // Build a list of children for each package, this is used as the backup when
   // history is not available for a package
@@ -529,11 +563,10 @@ export async function maybeLoadCogsReportData({
   let fullInheritanceBackupCount = 0;
   let inexactInheritanceBackupCount = 0;
   let duplicateLabelCount = 0;
+  let emptiedChildLabelsCount = 0;
   let unmatchedChildPackages: string[] = [];
   let inexactInheritanceBackupLabels: string[] = [];
-
-  // [childLabel, [parentLabel, fractionalCostMultiplier][]]
-  // const labelCostFunctionPairs: Map<string, [string, number][]> = new Map();
+  let testOrTradeExcludedCount = 0;
 
   for (const pkg of unifiedTreePackageWrapper) {
     const pairs: [string, number][] = [];
@@ -550,7 +583,21 @@ export async function maybeLoadCogsReportData({
 
       if (parentPkg.childPackageLabelQuantityPairs) {
         // Calculate the sum of all child package material
-        const total = parentPkg.childPackageLabelQuantityPairs.reduce((a, b) => a + b[1], 0);
+        const total = parentPkg.childPackageLabelQuantityPairs
+          .filter(([label, qty]) => {
+            if (testingSampleTransferLabels.has(label)) {
+              testOrTradeExcludedCount++;
+              return false;
+            }
+
+            if (tradeSampleTransferLabels.has(label)) {
+              testOrTradeExcludedCount++;
+              return false;
+            }
+
+            return true;
+          })
+          .reduce((a, b) => a + b[1], 0);
 
         const matchingPair = parentPkg.childPackageLabelQuantityPairs.find(
           (x) => x[0] === pkg.Label
@@ -571,12 +618,25 @@ export async function maybeLoadCogsReportData({
         // Packages that have left the facilitty have no history. If they are a parent package,
         // the a fallback calculation is needed to estimate fractional cost.
         ++usedBackupAlgorithmCount;
-        const childLabels = treeChildMap.get(parentPkg.Label);
+        let childLabels = treeChildMap.get(parentPkg.Label);
 
         if (!childLabels) {
           ++unmatchedChildSetCount;
           continue;
         } else {
+          for (const label of childLabels) {
+            if (tradeSampleTransferLabels.has(label)) {
+              childLabels.delete(label);
+            }
+            if (testingSampleTransferLabels.has(label)) {
+              childLabels.delete(label);
+            }
+          }
+
+          if (childLabels.size === 0) {
+            emptiedChildLabelsCount++;
+          }
+
           if (!childLabels.has(pkg.Label)) {
             fatalChildMismatchCount++;
             continue;
@@ -598,6 +658,20 @@ export async function maybeLoadCogsReportData({
 
     unifiedTreePackageWrapper.update(pkg.Label, FRACTIONAL_COST_KEY, pairs);
   }
+
+  ctx.commit(ReportsMutations.SET_STATUS, {
+    statusMessage: {
+      text: `Completed cost calculation`,
+      level: "success",
+    },
+  });
+
+  ctx.commit(ReportsMutations.SET_STATUS, {
+    statusMessage: {
+      text: `Organizing data for sheets export...`,
+      level: "success",
+    },
+  });
 
   const keyIdx = unifiedTreePackageWrapper.columnIdxOrError("ProductionBatchNumber");
   unifiedTreePackageWrapper.sort((a, b) => {
@@ -624,12 +698,13 @@ export async function maybeLoadCogsReportData({
     successfulMatchCount,
     duplicateLabelCount,
     fullInheritanceBackupCount,
-    inexactInheritanceBackupLabels,
     inexactInheritanceBackupCount,
-    unmatchedChildPackages,
+    testOrTradeExcludedCount,
+    testingSampleTransferCount: testingSampleTransferLabels.size,
+    tradeSampleTransferCount: tradeSampleTransferLabels.size,
   };
 
-  console.log();
+  const ENABLE_CELL = `'${SheetTitles.OVERVIEW}'!C3`;
 
   const titles = ["Label", "PB #", "PB Cost", "Computed Cost"];
 
@@ -664,37 +739,42 @@ export async function maybeLoadCogsReportData({
     worksheetMatrix.push([
       pkg.Label,
       pkg.ProductionBatchNumber,
-      pkg.ManifestNumber,
-      pkg.parentPackageLabels?.map(decodeLabelToIndex).join(","),
-      [...(treeChildMap.get(pkg.Label) || [])].map(decodeLabelToIndex).join(","),
-      ``,
-      `=${getLetterFromIndex(inputCostColumnIndex)}${idx + OFFSET}${inheritedCostExpression}`,
+      (pkg.ProductionBatchNumber ?? "").length === 0 ? `0` : ``,
+      `=IF(ISBLANK(${ENABLE_CELL}),"",${getLetterFromIndex(inputCostColumnIndex)}${
+        idx + OFFSET
+      }${inheritedCostExpression})`,
     ]);
   }
 
-  const cogsMatrix: any[][] = [["Manifest #", "Item", "COGS"]];
+  const cogsMatrix: any[][] = [
+    ["Manifest #", "Package", "Item", "Quantity", "UOM", "COGS", "Unit COGS"],
+  ];
 
+  let idx = 0;
   for (const pkg of eligibleWholesaleTransferPackageWrapper) {
+    // TODO figure out grouping for manifest coloring
     cogsMatrix.push([
       pkg.ManifestNumber,
+      pkg.Label,
       pkg.ItemName,
+      pkg.Quantity,
+      pkg.UnitOfMeasureAbbreviation,
       `='${SheetTitles.WORKSHEET}'!${getLetterFromIndex(
         computedCostColumnIndex
       )}${decodeLabelToIndex(pkg.Label)}`,
+      pkg.UnitOfMeasureAbbreviation === "ea"
+        ? `=IF(ISBLANK(${ENABLE_CELL}),"",${getLetterFromIndex(5)}${idx + 1}/${getLetterFromIndex(
+            3
+          )}${idx + 1})`
+        : ``,
     ]);
+    idx++;
   }
 
-  await downloadCsvFile({
-    csvFile: {
-      filename: "worksheetMatrix.csv",
-      data: worksheetMatrix,
-    },
-  });
-
-  await downloadCsvFile({
-    csvFile: {
-      filename: "cogsMatrix.csv",
-      data: cogsMatrix,
+  ctx.commit(ReportsMutations.SET_STATUS, {
+    statusMessage: {
+      text: `Exporting to Google Sheets...`,
+      level: "success",
     },
   });
 

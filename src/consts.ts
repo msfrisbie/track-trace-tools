@@ -509,5 +509,5 @@ export enum SheetTitles {
 }
 
 // Sheets self-enforced timeout is 180000ms,
-// this allows for 2 requests plus a little extra
-export const SHEETS_API_MESSAGE_TIMEOUT_MS = 400000;
+// this allows for 3 requests plus a little extra
+export const SHEETS_API_MESSAGE_TIMEOUT_MS = 3 * 180000 + 60000;
