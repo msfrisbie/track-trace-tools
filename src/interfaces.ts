@@ -817,6 +817,10 @@ export interface ISimpleCogsPackageData extends ISimplePackageData {
   errors: string[];
 }
 
+export interface IMetadataSimplePackageData extends ISimpleTransferPackageData {
+  fractionalCostMultiplierPairs: [string, number][] | undefined;
+}
+
 // This is a shared type between incoming and outgoing
 export interface ITransferData {
   ActualArrivalDateTime: string | null;

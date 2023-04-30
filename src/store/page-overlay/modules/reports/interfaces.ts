@@ -19,6 +19,7 @@ import {
   ITransferFilter,
 } from "@/interfaces";
 import { CompressedDataWrapper } from "@/utils/compression";
+import { IMetadataSimplePackageData } from "@/utils/reports/cogs-report";
 import { IStatusMessage, ReportStatus, ReportType } from "./consts";
 
 export interface IReportsState {
@@ -90,8 +91,9 @@ export interface IReportConfig {
 
 export interface IReportData {
   [ReportType.COGS]?: {
-    packages: CompressedDataWrapper<ISimplePackageData>;
-    transferredPackages: CompressedDataWrapper<ISimpleTransferPackageData>;
+    auditData: {[key: string]: any},
+    worksheetMatrix: any[][],
+    cogsMatrix: any[][]
   };
   [ReportType.PACKAGES]?: {
     packages: IIndexedPackageData[];

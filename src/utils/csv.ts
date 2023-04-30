@@ -2,7 +2,7 @@ import { ICsvFile } from "@/interfaces";
 import { timer } from "rxjs";
 
 export function serialize(csvData: any[][]) {
-  return csvData.map(e => e.join(",")).join("\n");
+  return csvData.map(e => e.map(encodeURIComponent).join(",")).join("\n");
 }
 
 export async function downloadCsvFile({

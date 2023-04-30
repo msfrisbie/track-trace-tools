@@ -1,9 +1,7 @@
+import { SheetTitles } from "@/consts";
 import {
-  IDestinationData,
-  IIndexedDestinationPackageData,
-  IIndexedPackageData,
   IIndexedRichOutgoingTransferData,
-  IIndexedTransferData,
+  IMetadataSimplePackageData,
   IPackageFilter,
   IPluginState,
   ISimpleOutgoingTransferData,
@@ -28,8 +26,13 @@ import {
   extractParentPackageLabelsFromHistory,
   extractTagQuantityPairsFromHistory,
 } from "../history";
-import { getId, getItemName, getLabel, getParentPackageLabels } from "../package";
-import { createDebugSheetOrError } from "../sheets-export";
+import {
+  getParentPackageLabels,
+  simplePackageConverter,
+  simplePackageNormalizer,
+  simpleTransferPackageConverter,
+} from "../package";
+import { getLetterFromIndex } from "../sheets";
 
 interface ICogsReportFormFilters {
   cogsDateGt: string;
@@ -64,41 +67,6 @@ export function addCogsReport({
     transferFilter,
     fields: null,
     mutableArchiveData,
-  };
-}
-
-function simplePackageConverter(pkg: IIndexedPackageData): ISimplePackageData {
-  return {
-    LicenseNumber: pkg.LicenseNumber,
-    Id: getId(pkg),
-    PackageState: pkg.PackageState,
-    Label: getLabel(pkg),
-    ItemName: getItemName(pkg),
-    SourcePackageLabels: pkg.SourcePackageLabels,
-    ProductionBatchNumber: pkg.ProductionBatchNumber,
-    parentPackageLabels: null,
-    childPackageLabelQuantityPairs: null,
-  };
-}
-
-function simpleTransferPackageConverter(
-  transfer: IIndexedTransferData,
-  destination: IDestinationData,
-  pkg: IIndexedDestinationPackageData
-): ISimpleTransferPackageData {
-  return {
-    ETD: destination.EstimatedDepartureDateTime,
-    Type: destination.ShipmentTypeName,
-    ManifestNumber: transfer.ManifestNumber,
-    LicenseNumber: transfer.LicenseNumber,
-    Id: getId(pkg),
-    PackageState: pkg.PackageState,
-    Label: getLabel(pkg),
-    ItemName: getItemName(pkg),
-    SourcePackageLabels: pkg.SourcePackageLabels,
-    ProductionBatchNumber: pkg.ProductionBatchNumber,
-    parentPackageLabels: null,
-    childPackageLabelQuantityPairs: null,
   };
 }
 
@@ -138,6 +106,18 @@ export async function maybeLoadCogsReportData({
     "Label",
     mutableArchiveData.transfersPackagesKeys
   );
+
+  function mergedFindAndUnpackOrNull(label: string): IMetadataSimplePackageData | null {
+    const pkg = packageWrapper.findOrNull(label);
+    if (pkg) {
+      return simplePackageNormalizer(packageWrapper.unpack(pkg));
+    }
+    const transferPkg = transferPackageWrapper.findOrNull(label);
+    if (transferPkg) {
+      return simplePackageNormalizer(transferPackageWrapper.unpack(transferPkg));
+    }
+    return null;
+  }
 
   let dataLoader: DataLoader | null = null;
 
@@ -418,16 +398,9 @@ export async function maybeLoadCogsReportData({
 
     // Package might appear in both lists,
     // Prefer package lookup over transfer package
-    const matchedPkg = packageWrapper.findAndUnpackOrNull(nextLabel);
+    const matchedPkg = mergedFindAndUnpackOrNull(nextLabel);
     if (matchedPkg) {
       parentLabels = await getParentPackageLabels(matchedPkg);
-    }
-
-    if (!parentLabels) {
-      const matchedTransferPkg = transferPackageWrapper.findAndUnpackOrNull(nextLabel);
-      if (matchedTransferPkg) {
-        parentLabels = await getParentPackageLabels(matchedTransferPkg);
-      }
     }
 
     if (parentLabels) {
@@ -456,7 +429,7 @@ export async function maybeLoadCogsReportData({
   );
 
   for (const label of eligibleWholesaleManifestTreeLabels) {
-    const pkg = packageWrapper.findAndUnpackOrNull(label);
+    const pkg = mergedFindAndUnpackOrNull(label);
     if (pkg) {
       treePackageWrapper.add(pkg);
     }
@@ -503,63 +476,46 @@ export async function maybeLoadCogsReportData({
     transferPackageWrapper.keys
   );
 
-  debugger;
-
   for (const label of eligibleWholesaleManifestTreeLabels) {
-    const pkg = transferPackageWrapper.findAndUnpackOrNull(label);
+    const pkg = mergedFindAndUnpackOrNull(label);
 
     if (pkg) {
-      if (pkg.Label === "1A4050300005C96000546890") {
-        debugger;
-      }
       treeTransferPackageWrapper.add(pkg);
     }
   }
 
-  debugger;
-
   // Build a list of children for each package, this is used as the backup when
   // history is not available for a package
-  const childMap = new Map<string, Set<string>>();
+  const treeChildMap = new Map<string, Set<string>>();
 
   const FRACTIONAL_COST_KEY = "fractionalCostMultiplierPairs";
 
-  interface IMetadataSimplePackageData extends ISimpleTransferPackageData {
-    fractionalCostMultiplierPairs: [string, number][] | undefined;
-  }
-
   // Merge the two package types to prepare for fractional cost calculation
-  const unifiedPackageWrapper = new CompressedDataWrapper<IMetadataSimplePackageData>(
-    "Unified Wrapper",
+  const unifiedTreePackageWrapper = new CompressedDataWrapper<IMetadataSimplePackageData>(
+    "Unified Tree Wrapper",
     [],
     treeTransferPackageWrapper.indexedKey,
     [...treeTransferPackageWrapper.keys, FRACTIONAL_COST_KEY]
   );
 
   for (const pkg of treePackageWrapper) {
-    unifiedPackageWrapper.add({
-      ...pkg,
-      Type: "",
-      ETD: "",
-      ManifestNumber: "",
-      fractionalCostMultiplierPairs: undefined,
-    });
+    unifiedTreePackageWrapper.add(simplePackageNormalizer(pkg));
   }
 
   for (const transferPkg of treeTransferPackageWrapper) {
-    unifiedPackageWrapper.add({ ...transferPkg, fractionalCostMultiplierPairs: undefined });
+    unifiedTreePackageWrapper.add(simplePackageNormalizer(transferPkg));
   }
 
-  for (const treePkg of unifiedPackageWrapper) {
+  for (const treePkg of unifiedTreePackageWrapper) {
     const parentPackageLabels = await getParentPackageLabels(treePkg);
 
-    unifiedPackageWrapper.update(treePkg.Label, "parentPackageLabels", parentPackageLabels);
+    unifiedTreePackageWrapper.update(treePkg.Label, "parentPackageLabels", parentPackageLabels);
 
     for (const parentLabel of parentPackageLabels) {
-      if (childMap.has(parentLabel)) {
-        childMap.get(parentLabel)!.add(treePkg.Label);
+      if (treeChildMap.has(parentLabel)) {
+        treeChildMap.get(parentLabel)!.add(treePkg.Label);
       } else {
-        childMap.set(parentLabel, new Set([treePkg.Label]));
+        treeChildMap.set(parentLabel, new Set([treePkg.Label]));
       }
     }
   }
@@ -573,17 +529,17 @@ export async function maybeLoadCogsReportData({
   let fullInheritanceBackupCount = 0;
   let inexactInheritanceBackupCount = 0;
   let duplicateLabelCount = 0;
-  let unmatchedChildPackages: ISimplePackageData[] = [];
+  let unmatchedChildPackages: string[] = [];
   let inexactInheritanceBackupLabels: string[] = [];
 
   // [childLabel, [parentLabel, fractionalCostMultiplier][]]
   // const labelCostFunctionPairs: Map<string, [string, number][]> = new Map();
 
-  for (const pkg of unifiedPackageWrapper) {
+  for (const pkg of unifiedTreePackageWrapper) {
     const pairs: [string, number][] = [];
 
     for (const parentLabel of pkg.parentPackageLabels!) {
-      const parentPkg = unifiedPackageWrapper.findAndUnpackOrNull(parentLabel);
+      const parentPkg = mergedFindAndUnpackOrNull(parentLabel);
 
       if (!parentPkg) {
         // Parent package is not loaded. This can happend for packages that were
@@ -604,7 +560,7 @@ export async function maybeLoadCogsReportData({
           // Child package indicated it came from a parent, but the parent's
           // contribution to the child could not be extracted. TODO investigate
           unmatchedChildLabelCount++;
-          unmatchedChildPackages.push(pkg);
+          unmatchedChildPackages.push(pkg.Label);
           continue;
         }
 
@@ -615,7 +571,7 @@ export async function maybeLoadCogsReportData({
         // Packages that have left the facilitty have no history. If they are a parent package,
         // the a fallback calculation is needed to estimate fractional cost.
         ++usedBackupAlgorithmCount;
-        const childLabels = childMap.get(parentPkg.Label);
+        const childLabels = treeChildMap.get(parentPkg.Label);
 
         if (!childLabels) {
           ++unmatchedChildSetCount;
@@ -640,10 +596,26 @@ export async function maybeLoadCogsReportData({
       }
     }
 
-    unifiedPackageWrapper.update(pkg.Label, FRACTIONAL_COST_KEY, pairs);
+    unifiedTreePackageWrapper.update(pkg.Label, FRACTIONAL_COST_KEY, pairs);
   }
 
-  console.log({
+  const keyIdx = unifiedTreePackageWrapper.columnIdxOrError("ProductionBatchNumber");
+  unifiedTreePackageWrapper.sort((a, b) => {
+    const aVal = a[keyIdx] ?? "";
+    const bVal = b[keyIdx] ?? "";
+
+    if (aVal === "" && bVal === "") {
+      return 0;
+    } else if (aVal === "") {
+      return 1;
+    } else if (bVal === "") {
+      return -1;
+    } else {
+      return aVal.localeCompare(bVal);
+    }
+  });
+
+  const auditData = {
     unmatchedParentCount,
     unmatchedChildLabelCount,
     unmatchedChildSetCount,
@@ -655,54 +627,86 @@ export async function maybeLoadCogsReportData({
     inexactInheritanceBackupLabels,
     inexactInheritanceBackupCount,
     unmatchedChildPackages,
-  });
+  };
 
-  const sheetMatrix: any[][] = [
-    ["Label", "PB #", "Manifest", "# Parents", "# Children", "PB Cost", "Computed Cost"],
-  ];
+  console.log();
+
+  const titles = ["Label", "PB #", "PB Cost", "Computed Cost"];
+
+  const inputCostColumnIndex = 2;
+  const computedCostColumnIndex = 3;
+
+  const worksheetMatrix: any[][] = [titles];
 
   // off-by-one index plus header row
   const OFFSET = 2;
 
-  for (const [idx, pkg] of [...unifiedPackageWrapper].entries()) {
+  function decodeLabelToIndex(label: string): number {
+    const idx = unifiedTreePackageWrapper.index.get(label);
+    return idx! + OFFSET;
+  }
+
+  for (const [idx, pkg] of [...unifiedTreePackageWrapper].entries()) {
     if (!pkg.fractionalCostMultiplierPairs) {
       console.error(`Empty fractional pairs: ${pkg}`);
     }
 
     const expr: string = pkg
       .fractionalCostMultiplierPairs!.map(([parentLabel, multiplier]) => {
-        return `(G${unifiedPackageWrapper.index.get(parentLabel)! + OFFSET} * ${multiplier})`;
+        return `(${getLetterFromIndex(computedCostColumnIndex)}${decodeLabelToIndex(
+          parentLabel
+        )} * ${multiplier})`;
       })
       .join("+");
 
-    sheetMatrix.push([
+    const inheritedCostExpression = expr.length > 0 ? `+(${expr})` : "";
+
+    worksheetMatrix.push([
       pkg.Label,
       pkg.ProductionBatchNumber,
       pkg.ManifestNumber,
-      pkg.parentPackageLabels?.length || 0,
-      childMap.get(pkg.Label)?.size || 0,
+      pkg.parentPackageLabels?.map(decodeLabelToIndex).join(","),
+      [...(treeChildMap.get(pkg.Label) || [])].map(decodeLabelToIndex).join(","),
       ``,
-      `=F${idx + OFFSET}+(${expr || 0})`,
+      `=${getLetterFromIndex(inputCostColumnIndex)}${idx + OFFSET}${inheritedCostExpression}`,
+    ]);
+  }
+
+  const cogsMatrix: any[][] = [["Manifest #", "Item", "COGS"]];
+
+  for (const pkg of eligibleWholesaleTransferPackageWrapper) {
+    cogsMatrix.push([
+      pkg.ManifestNumber,
+      pkg.ItemName,
+      `='${SheetTitles.WORKSHEET}'!${getLetterFromIndex(
+        computedCostColumnIndex
+      )}${decodeLabelToIndex(pkg.Label)}`,
     ]);
   }
 
   await downloadCsvFile({
     csvFile: {
-      filename: "Cost",
-      data: sheetMatrix,
+      filename: "worksheetMatrix.csv",
+      data: worksheetMatrix,
     },
   });
 
-  await createDebugSheetOrError({
-    spreadsheetName: "Cost Sheet",
-    sheetTitles: ["Cost"],
-    sheetDataMatrixes: [sheetMatrix],
+  await downloadCsvFile({
+    csvFile: {
+      filename: "cogsMatrix.csv",
+      data: cogsMatrix,
+    },
   });
 
-  debugger;
+  // await createDebugSheetOrError({
+  //   spreadsheetName: "Cost Sheet",
+  //   sheetTitles: [SheetTitles.WORKSHEET, SheetTitles.MANIFEST_COGS],
+  //   sheetDataMatrixes: [worksheetMatrix, cogsMatrix],
+  // });
 
   reportData[ReportType.COGS] = {
-    packages: packageWrapper,
-    transferredPackages: transferPackageWrapper,
+    auditData,
+    worksheetMatrix,
+    cogsMatrix,
   };
 }

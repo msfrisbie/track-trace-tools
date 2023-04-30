@@ -507,3 +507,7 @@ export enum SheetTitles {
   WORKSHEET = "Worksheet",
   MANIFEST_COGS = "Manifest Cogs",
 }
+
+// Sheets self-enforced timeout is 180000ms,
+// this allows for 2 requests plus a little extra
+export const SHEETS_API_MESSAGE_TIMEOUT_MS = 400000;

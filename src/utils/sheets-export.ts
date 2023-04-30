@@ -1,4 +1,4 @@
-import { MessageType, SheetTitles } from "@/consts";
+import { MessageType, SHEETS_API_MESSAGE_TIMEOUT_MS, SheetTitles } from "@/consts";
 import { IDestinationData, IDestinationPackageData, ISpreadsheet } from "@/interfaces";
 import { messageBus } from "@/modules/message-bus.module";
 import store from "@/store/page-overlay/index";
@@ -19,6 +19,7 @@ import {
   autoResizeDimensionsRequestFactory,
   conditionalFormattingRequestFactory,
   freezeTopRowRequestFactory,
+  getLetterFromIndex,
   shrinkFontRequestFactory,
   styleTopRowRequestFactory,
 } from "./sheets";
@@ -39,6 +40,8 @@ async function writeDataSheet<T>({
     pageSize?: number;
     maxParallelRequests?: number;
     valueInputOption?: "RAW" | "USER_ENTERED";
+    rangeStartColumn?: string;
+    rangeEndColumn?: string;
   };
 }) {
   const mergedOptions = {
@@ -46,6 +49,8 @@ async function writeDataSheet<T>({
     pageSize: 5000,
     maxParallelRequests: 25,
     valueInputOption: "USER_ENTERED",
+    rangeStartColumn: "A",
+    rangeEndColumn: "",
     ...options,
   };
 
@@ -61,7 +66,7 @@ async function writeDataSheet<T>({
         values: [fields.map((fieldData) => `${fieldData.readableName}     `)],
       },
       undefined,
-      180000
+      SHEETS_API_MESSAGE_TIMEOUT_MS
     );
 
     nextPageRowIdx += 1;
@@ -75,7 +80,9 @@ async function writeDataSheet<T>({
       break;
     }
 
-    const range = `'${spreadsheetTitle}'!${nextPageRowIdx}:${nextPageRowIdx + nextPage.length - 1}`;
+    const range = `'${spreadsheetTitle}'!${mergedOptions.rangeStartColumn}${nextPageRowIdx}:${
+      mergedOptions.rangeEndColumn
+    }${nextPageRowIdx + nextPage.length - 1}`;
 
     let values = nextPage;
     if (mergedOptions.useFieldTransformer) {
@@ -105,7 +112,7 @@ async function writeDataSheet<T>({
           valueInputOption: mergedOptions.valueInputOption,
         },
         undefined,
-        180000
+        SHEETS_API_MESSAGE_TIMEOUT_MS
       )
     );
 
@@ -120,7 +127,7 @@ async function writeDataSheet<T>({
       }
 
       // Wait for 3 seconds
-      await new Promise((resolve) => setTimeout(resolve, 3000));
+      await new Promise((resolve) => setTimeout(resolve, 1000));
     }
   }
 
@@ -156,7 +163,7 @@ export async function createDebugSheetOrError({
       sheetTitles,
     },
     undefined,
-    180000
+    SHEETS_API_MESSAGE_TIMEOUT_MS
   );
 
   if (!response.data.success) {
@@ -178,7 +185,7 @@ export async function createDebugSheetOrError({
         requests: formattingRequests,
       },
       undefined,
-      180000
+      SHEETS_API_MESSAGE_TIMEOUT_MS
     );
 
     await writeDataSheet({
@@ -267,7 +274,7 @@ export async function createReportSpreadsheeetOrError({
       sheetTitles,
     },
     undefined,
-    180000
+    SHEETS_API_MESSAGE_TIMEOUT_MS
   );
 
   if (!response.data.success) {
@@ -315,7 +322,7 @@ export async function createReportSpreadsheeetOrError({
       requests: formattingRequests,
     },
     undefined,
-    180000
+    SHEETS_API_MESSAGE_TIMEOUT_MS
   );
 
   //
@@ -366,7 +373,7 @@ export async function createReportSpreadsheeetOrError({
       values: [[], [], ...summaryList],
     },
     undefined,
-    180000
+    SHEETS_API_MESSAGE_TIMEOUT_MS
   );
 
   //
@@ -401,7 +408,7 @@ export async function createReportSpreadsheeetOrError({
       requests: resizeRequests,
     },
     undefined,
-    180000
+    SHEETS_API_MESSAGE_TIMEOUT_MS
   );
 
   // 3000ms grace period for all sheets
@@ -429,7 +436,7 @@ export async function createReportSpreadsheeetOrError({
       requests: shrinkFontRequests,
     },
     undefined,
-    180000
+    SHEETS_API_MESSAGE_TIMEOUT_MS
   );
 
   await messageBus.sendMessageToBackground(
@@ -440,7 +447,7 @@ export async function createReportSpreadsheeetOrError({
       values: [[`Created with Track & Trace Tools @ ${Date().toString()}`]],
     },
     undefined,
-    180000
+    SHEETS_API_MESSAGE_TIMEOUT_MS
   );
 
   return response.data.result;
@@ -480,7 +487,7 @@ export async function createCogsSpreadsheetOrError({
       sheetTitles,
     },
     undefined,
-    180000
+    SHEETS_API_MESSAGE_TIMEOUT_MS
   );
 
   if (!response.data.success) {
@@ -515,7 +522,7 @@ export async function createCogsSpreadsheetOrError({
   //   ]
   // );
 
-  const worksheetData: any[] = [];
+  // const worksheetData: any[] = [];
   // const worksheetData = reportData[ReportType.COGS]!.packages.map((pkg, idx) => {
   //   let fractionalCostExpression = "";
   //   if (pkg!.fractionalCostData!.length) {
@@ -551,6 +558,8 @@ export async function createCogsSpreadsheetOrError({
     }),
   ];
 
+  const { worksheetMatrix, cogsMatrix, auditData } = reportData[ReportType.COGS]!;
+
   // const batchCostSheetId = sheetTitles.indexOf(SheetTitles.PRODUCTION_BATCH_COSTS);
   const worksheetSheetId = sheetTitles.indexOf(SheetTitles.WORKSHEET);
   const manifestSheetId = sheetTitles.indexOf(SheetTitles.MANIFEST_COGS);
@@ -562,11 +571,11 @@ export async function createCogsSpreadsheetOrError({
     // styleTopRowRequestFactory({ sheetId: batchCostSheetId }),
     // freezeTopRowRequestFactory({ sheetId: batchCostSheetId }),
     // Worksheet
-    addRowsRequestFactory({ sheetId: worksheetSheetId, length: worksheetData.length }),
+    addRowsRequestFactory({ sheetId: worksheetSheetId, length: worksheetMatrix.length }),
     styleTopRowRequestFactory({ sheetId: worksheetSheetId }),
     freezeTopRowRequestFactory({ sheetId: worksheetSheetId }),
     // Manifest COGS
-    addRowsRequestFactory({ sheetId: manifestSheetId, length: 200 }),
+    addRowsRequestFactory({ sheetId: manifestSheetId, length: cogsMatrix.length }),
     styleTopRowRequestFactory({ sheetId: manifestSheetId }),
     freezeTopRowRequestFactory({ sheetId: manifestSheetId }),
   ];
@@ -578,7 +587,7 @@ export async function createCogsSpreadsheetOrError({
       requests: formattingRequests,
     },
     undefined,
-    180000
+    SHEETS_API_MESSAGE_TIMEOUT_MS
   );
 
   await messageBus.sendMessageToBackground(
@@ -589,11 +598,11 @@ export async function createCogsSpreadsheetOrError({
       values: [
         [],
         [],
-        // ...reportData[ReportType.COGS]!.auditData.map(({ text, value }) => ["", text, value]),
+        ...Object.entries(auditData).map(([key, value]) => ["", key, JSON.stringify(value)]),
       ],
     },
     undefined,
-    180000
+    SHEETS_API_MESSAGE_TIMEOUT_MS
   );
 
   // Tag	Production Batch Number	Cost
@@ -639,142 +648,40 @@ export async function createCogsSpreadsheetOrError({
   await writeDataSheet({
     spreadsheetId: response.data.result.spreadsheetId,
     spreadsheetTitle: SheetTitles.WORKSHEET,
-    fields: [
-      {
-        value: "",
-        readableName: "License #",
-        required: true,
-      },
-      {
-        value: "",
-        readableName: "Package Tag",
-        required: true,
-      },
-      {
-        value: "",
-        readableName: "Item",
-        required: true,
-      },
-      {
-        value: "",
-        readableName: "PB #",
-        required: true,
-      },
-      {
-        value: "",
-        readableName: "Cost",
-        required: true,
-      },
-      {
-        value: "",
-        readableName: "Fractional Cost",
-        required: true,
-      },
-      {
-        value: "",
-        readableName: "Total Cost",
-        required: true,
-      },
-      {
-        value: "",
-        readableName: "Errors",
-        required: true,
-      },
-    ],
-    data: worksheetData,
+    data: worksheetMatrix.map((row) => row.slice(0, row.length - 1)),
     options: {
-      useFieldTransformer: false,
+      valueInputOption: "RAW",
     },
   });
 
-  // Manifest	Tag	Wholesale Cost	Units	COGS (package)	COGS (per unit)
-  // 10000001	1A4050100000900000000008	$500.00	50	=VLOOKUP(B3, 'Calculation Sheet'!A3:B, 2)	=E3/D3
-
-  // let flattenedOutgoingPackages: {
-  //   Package: IIndexedDestinationPackageData;
-  //   Destination: IDestinationData;
-  //   Transfer: IIndexedTransferData;
-  // }[] = [];
-
-  // for (const transfer of reportData[ReportType.COGS]!.richOutgoingTransfers) {
-  //   for (const destination of transfer.outgoingDestinations ?? []) {
-  //     for (const pkg of destination.packages ?? []) {
-  //       flattenedOutgoingPackages.push({
-  //         Package: pkg,
-  //         Destination: destination,
-  //         Transfer: transfer,
-  //       });
-  //     }
-  //   }
-  // }
-
-  // const cogsData = flattenedOutgoingPackages.map(({ Package, Destination, Transfer }) => {
-  //   const isEach = Package.ShippedUnitOfMeasureAbbreviation === "ea";
-
-  //   return [
-  //     Transfer.LicenseNumber,
-  //     "# " + Transfer.ManifestNumber,
-  //     getLabel(Package),
-  //     getItemName(Package),
-  //     Package.ShipperWholesalePrice,
-  //     isEach ? Package.ShippedQuantity : "",
-  //     `=VLOOKUP("${getLabel(Package)}", ${SheetTitles.WORKSHEET}!B2:G, 6, false)`,
-  //     isEach
-  //       ? `=VLOOKUP("${getLabel(Package)}", ${SheetTitles.WORKSHEET}!B2:G, 6, false) / ${
-  //           Package.ShippedQuantity
-  //         }`
-  //       : "",
-  //   ];
-  // });
+  await writeDataSheet({
+    spreadsheetId: response.data.result.spreadsheetId,
+    spreadsheetTitle: SheetTitles.WORKSHEET,
+    data: worksheetMatrix.map((row) => row.slice(row.length - 1)),
+    options: {
+      rangeStartColumn: getLetterFromIndex(worksheetMatrix[0].length - 1),
+      pageSize: 500,
+      valueInputOption: "USER_ENTERED",
+    },
+  });
 
   await writeDataSheet({
     spreadsheetId: response.data.result.spreadsheetId,
     spreadsheetTitle: SheetTitles.MANIFEST_COGS,
-    fields: [
-      {
-        value: "",
-        readableName: "License Number",
-        required: true,
-      },
-      {
-        value: "",
-        readableName: "Manifest #",
-        required: true,
-      },
-      {
-        value: "",
-        readableName: "Package Tag",
-        required: true,
-      },
-      {
-        value: "",
-        readableName: "Item Name",
-        required: true,
-      },
-      {
-        value: "",
-        readableName: "Wholesale Cost",
-        required: true,
-      },
-      {
-        value: "",
-        readableName: "Units",
-        required: true,
-      },
-      {
-        value: "",
-        readableName: "COGS (total)",
-        required: true,
-      },
-      {
-        value: "",
-        readableName: "COGS (unit)",
-        required: true,
-      },
-    ],
-    data: [], //cogsData,
+    data: cogsMatrix.map((row) => row.slice(0, row.length - 1)),
     options: {
-      useFieldTransformer: false,
+      valueInputOption: "RAW",
+    },
+  });
+
+  await writeDataSheet({
+    spreadsheetId: response.data.result.spreadsheetId,
+    spreadsheetTitle: SheetTitles.MANIFEST_COGS,
+    data: cogsMatrix.map((row) => row.slice(row.length - 1)),
+    options: {
+      rangeStartColumn: getLetterFromIndex(cogsMatrix[0].length - 1),
+      pageSize: 500,
+      valueInputOption: "USER_ENTERED",
     },
   });
 
@@ -810,7 +717,7 @@ export async function createCogsSpreadsheetOrError({
       requests: resizeRequests,
     },
     undefined,
-    180000
+    SHEETS_API_MESSAGE_TIMEOUT_MS
   );
 
   await messageBus.sendMessageToBackground(
@@ -821,7 +728,7 @@ export async function createCogsSpreadsheetOrError({
       values: [[`Created with Track & Trace Tools @ ${Date().toString()}`]],
     },
     undefined,
-    180000
+    SHEETS_API_MESSAGE_TIMEOUT_MS
   );
 
   return response.data.result;
@@ -849,7 +756,7 @@ export async function createScanSheetOrError(
       sheetTitles: [SHEET_TITLE],
     },
     undefined,
-    180000
+    SHEETS_API_MESSAGE_TIMEOUT_MS
   );
 
   await messageBus.sendMessageToBackground(
@@ -872,7 +779,7 @@ export async function createScanSheetOrError(
       ],
     },
     undefined,
-    180000
+    SHEETS_API_MESSAGE_TIMEOUT_MS
   );
 
   const sheetId = 0;
@@ -933,7 +840,7 @@ export async function createScanSheetOrError(
       requests: formattingRequests,
     },
     undefined,
-    180000
+    SHEETS_API_MESSAGE_TIMEOUT_MS
   );
 
   await messageBus.sendMessageToBackground(
@@ -944,7 +851,7 @@ export async function createScanSheetOrError(
       values: [[`Created with Track & Trace Tools @ ${Date().toString()}`]],
     },
     undefined,
-    180000
+    SHEETS_API_MESSAGE_TIMEOUT_MS
   );
 
   return response.data.result;

@@ -1,5 +1,10 @@
 import { METRC_TAG_REGEX, PackageFilterIdentifiers, PackageState } from "@/consts";
 import {
+  IDestinationData,
+  IIndexedDestinationPackageData,
+  IIndexedPackageData,
+  IIndexedTransferData,
+  IMetadataSimplePackageData,
   IPackageData,
   ISimpleCogsPackageData,
   ISimplePackageData,
@@ -205,4 +210,52 @@ export function packageFieldMatch(
   packageFilterIdentifier: PackageFilterIdentifiers
 ): string[] | null {
   return null;
+}
+
+export function simplePackageConverter(pkg: IIndexedPackageData): ISimplePackageData {
+  return {
+    LicenseNumber: pkg.LicenseNumber,
+    Id: getId(pkg),
+    PackageState: pkg.PackageState,
+    Label: getLabel(pkg),
+    ItemName: getItemName(pkg),
+    SourcePackageLabels: pkg.SourcePackageLabels,
+    ProductionBatchNumber: pkg.ProductionBatchNumber,
+    parentPackageLabels: null,
+    childPackageLabelQuantityPairs: null,
+  };
+}
+
+export function simpleTransferPackageConverter(
+  transfer: IIndexedTransferData,
+  destination: IDestinationData,
+  pkg: IIndexedDestinationPackageData
+): ISimpleTransferPackageData {
+  return {
+    ETD: destination.EstimatedDepartureDateTime,
+    Type: destination.ShipmentTypeName,
+    ManifestNumber: transfer.ManifestNumber,
+    LicenseNumber: transfer.LicenseNumber,
+    Id: getId(pkg),
+    PackageState: pkg.PackageState,
+    Label: getLabel(pkg),
+    ItemName: getItemName(pkg),
+    SourcePackageLabels: pkg.SourcePackageLabels,
+    ProductionBatchNumber: pkg.ProductionBatchNumber,
+    parentPackageLabels: null,
+    childPackageLabelQuantityPairs: null,
+  };
+}
+
+
+export function simplePackageNormalizer(
+  pkg: ISimplePackageData | ISimpleTransferPackageData | IMetadataSimplePackageData
+): IMetadataSimplePackageData {
+  return {
+    Type: "",
+    ETD: "",
+    ManifestNumber: "",
+    fractionalCostMultiplierPairs: undefined,
+    ...pkg,
+  };
 }

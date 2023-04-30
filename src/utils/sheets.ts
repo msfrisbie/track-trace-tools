@@ -479,3 +479,9 @@ export function conditionalFormattingRequestFactory({
     },
   };
 }
+
+
+  // 0 -> A
+  export function getLetterFromIndex(columnIndex: number): string {
+    return String.fromCharCode(columnIndex + 97).toUpperCase();
+  }

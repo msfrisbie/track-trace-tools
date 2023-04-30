@@ -260,4 +260,20 @@ export class CompressedDataWrapper<T> {
 
     this.data[rowIdx][this.columnIdxOrError(property)] = value;
   }
+
+  sort(sortFn: (a: any[], b:any[]) => number) {
+    this.data.sort(sortFn);
+
+    this.regenerateIndex();
+  }
+
+  regenerateIndex() {
+    this.index = new Map();
+
+    const j = this.columnIdxOrError(this.indexedKey);
+
+    for (const [idx, row] of this.data.entries()) {
+      this.index.set(row[j], idx);
+    }
+  }
 }
