@@ -2,24 +2,46 @@ import { ICsvFile } from "@/interfaces";
 import { timer } from "rxjs";
 
 export function serialize(csvData: any[][]) {
-  return csvData.map(e => e.map(encodeURIComponent).join(",")).join("\n");
+  return csvData.map((e) => e.join(",")).join("\n");
 }
 
 export async function downloadCsvFile({
   csvFile,
-  delay = 0
+  delay = 0,
 }: {
   csvFile: ICsvFile;
   delay?: number;
 }) {
   // https://stackoverflow.com/questions/14964035/how-to-export-javascript-array-info-to-csv-on-client-side
+  // let csvContent = "data:text/csv;charset=utf-8,";
+  let csvContent = "";
 
-  let fileData: string = "data:text/csv;charset=utf-8," + serialize(csvFile.data);
+  // Convert the 2D array to a comma-separated string with commas escaped and quotes added where necessary
+  csvFile.data.forEach(function (rowArray) {
+    let row = rowArray
+      .map(function (cell) {
+        if (typeof cell !== "string") {
+          return cell;
+        }
 
-  let encodedUri = encodeURI(fileData);
+        // If the cell contains a comma or a double quote, add double quotes around the cell contents and escape any double quotes
+        if (cell.includes(",") || cell.includes('"')) {
+          cell = '"' + cell.replace(/"/g, '""') + '"';
+        }
+        return cell;
+      })
+      .join(",");
+    csvContent += row + "\r\n";
+  });
+
+  // let fileData: string = "data:text/csv;charset=utf-8," + serialize(csvFile.data);
+  let blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+
+  // let encodedUri = encodeURI(fileData);
+  let url = URL.createObjectURL(blob);
 
   let link = document.createElement("a");
-  link.setAttribute("href", encodedUri);
+  link.setAttribute("href", url);
   link.setAttribute("download", csvFile.filename);
   document.body.appendChild(link); // Required for FF
 
@@ -101,7 +123,7 @@ export function buildNamedCsvFileData(
     const endIdx = chunkSize * (chunkIdx + 1);
     files.push({
       filename: `${parsedFilenameSeed}_${timestamp}_${chunkIdx + 1}_of_${chunkCount}.csv`,
-      data: csvData.slice(startIdx, endIdx)
+      data: csvData.slice(startIdx, endIdx),
     });
   }
 

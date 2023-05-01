@@ -740,9 +740,7 @@ export async function maybeLoadCogsReportData({
       pkg.Label,
       pkg.ProductionBatchNumber,
       (pkg.ProductionBatchNumber ?? "").length === 0 ? `0` : ``,
-      `=IF(ISBLANK(${ENABLE_CELL}),"",${getLetterFromIndex(inputCostColumnIndex)}${
-        idx + OFFSET
-      }${inheritedCostExpression})`,
+      `=${getLetterFromIndex(inputCostColumnIndex)}${idx + OFFSET}${inheritedCostExpression}`,
     ]);
   }
 
@@ -763,9 +761,7 @@ export async function maybeLoadCogsReportData({
         computedCostColumnIndex
       )}${decodeLabelToIndex(pkg.Label)}`,
       pkg.UnitOfMeasureAbbreviation === "ea"
-        ? `=IF(ISBLANK(${ENABLE_CELL}),"",${getLetterFromIndex(5)}${idx + 1}/${getLetterFromIndex(
-            3
-          )}${idx + 1})`
+        ? `=${getLetterFromIndex(5)}${idx + 2}/${getLetterFromIndex(3)}${idx + 2}`
         : ``,
     ]);
     idx++;

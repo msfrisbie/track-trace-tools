@@ -8,6 +8,7 @@ import {
   IReportConfig,
   IReportData,
 } from "@/store/page-overlay/modules/reports/interfaces";
+import { downloadCsvFile } from "./csv";
 import { todayIsodate } from "./date";
 import {
   extractFlattenedData,
@@ -585,6 +586,7 @@ export async function createCogsSpreadsheetOrError({
       range: `'${SheetTitles.OVERVIEW}'`,
       values: [
         [],
+        [],
         [null, "Enable calculator:"],
         [],
         ...Object.entries(auditData).map(([key, value]) => ["", key, JSON.stringify(value)]),
@@ -598,6 +600,33 @@ export async function createCogsSpreadsheetOrError({
     statusMessage: { text: `Writing worksheet data...`, level: "success" },
   });
 
+  await downloadCsvFile({
+    csvFile: {
+      filename: "worksheet.csv",
+      data: worksheetMatrix,
+    },
+  });
+
+  await downloadCsvFile({
+    csvFile: {
+      filename: "cogs.csv",
+      data: cogsMatrix,
+    },
+  });
+
+  await writeDataSheet({
+    spreadsheetId: response.data.result.spreadsheetId,
+    spreadsheetTitle: SheetTitles.WORKSHEET,
+    data: worksheetMatrix.map((row) => row.slice(row.length - 1)),
+    options: {
+      rangeStartColumn: getLetterFromIndex(worksheetMatrix[0].length - 1),
+      pageSize: 1000,
+      valueInputOption: "USER_ENTERED",
+      // batchWrite: true,
+      maxParallelRequests: 50,
+    },
+  });
+
   await writeDataSheet({
     spreadsheetId: response.data.result.spreadsheetId,
     spreadsheetTitle: SheetTitles.WORKSHEET,
@@ -608,19 +637,6 @@ export async function createCogsSpreadsheetOrError({
     },
   });
 
-  await writeDataSheet({
-    spreadsheetId: response.data.result.spreadsheetId,
-    spreadsheetTitle: SheetTitles.WORKSHEET,
-    data: worksheetMatrix.map((row) => row.slice(row.length - 1)),
-    options: {
-      rangeStartColumn: getLetterFromIndex(worksheetMatrix[0].length - 1),
-      pageSize: 10,
-      valueInputOption: "USER_ENTERED",
-      batchWrite: true,
-      maxParallelRequests: 250,
-    },
-  });
-
   store.commit(`reports/${ReportsMutations.SET_STATUS}`, {
     statusMessage: { text: `Writing manifest data...`, level: "success" },
   });
@@ -628,23 +644,23 @@ export async function createCogsSpreadsheetOrError({
   await writeDataSheet({
     spreadsheetId: response.data.result.spreadsheetId,
     spreadsheetTitle: SheetTitles.MANIFEST_COGS,
-    data: cogsMatrix.map((row) => row.slice(0, row.length - 1)),
+    data: cogsMatrix.map((row) => row.slice(row.length - 2)),
     options: {
-      valueInputOption: "RAW",
-      batchWrite: true,
+      rangeStartColumn: getLetterFromIndex(cogsMatrix[0].length - 2),
+      pageSize: 5000,
+      valueInputOption: "USER_ENTERED",
+      // batchWrite: true,
+      maxParallelRequests: 10,
     },
   });
 
   await writeDataSheet({
     spreadsheetId: response.data.result.spreadsheetId,
     spreadsheetTitle: SheetTitles.MANIFEST_COGS,
-    data: cogsMatrix.map((row) => row.slice(row.length - 1)),
+    data: cogsMatrix.map((row) => row.slice(0, row.length - 2)),
     options: {
-      rangeStartColumn: getLetterFromIndex(cogsMatrix[0].length - 1),
-      pageSize: 500,
-      valueInputOption: "USER_ENTERED",
+      valueInputOption: "RAW",
       batchWrite: true,
-      maxParallelRequests: 10,
     },
   });
 
