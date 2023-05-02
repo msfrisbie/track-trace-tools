@@ -166,9 +166,9 @@ export default Vue.extend({
       .asObservable()
       .pipe(takeUntil(this.$data.destroyed$))
       .subscribe(
-        (selectedTransferMetatdata: ISelectedTransferMetadata | null) =>
-          (this.$data.transfer = selectedTransferMetatdata
-            ? selectedTransferMetatdata.transferData
+        (selectedTransferMetadata: ISelectedTransferMetadata | null) =>
+          (this.$data.transfer = selectedTransferMetadata
+            ? selectedTransferMetadata.transferData
             : null)
       );
   },

@@ -5,10 +5,10 @@ import {
   ITransferData,
 } from "@/interfaces";
 import { authManager } from "@/modules/auth-manager.module";
-import { MutationType } from "@/mutation-types";
 import store from "@/store/page-overlay/index";
 import { PackageSearchActions } from "@/store/page-overlay/modules/package-search/consts";
 import { PlantSearchActions } from "@/store/page-overlay/modules/plant-search/consts";
+import { TransferSearchActions } from "@/store/page-overlay/modules/transfer-search/consts";
 import { BehaviorSubject, combineLatest, Observable } from "rxjs";
 import { bufferCount, map, take } from "rxjs/operators";
 import { primaryDataLoader } from "./data-loader/data-loader.module";
@@ -45,6 +45,13 @@ class SearchManager implements IAtomicService {
   }> = new BehaviorSubject<{
     showPackageSearchResults: boolean;
   }>({ showPackageSearchResults: false });
+
+  public transferSearchVisibility: BehaviorSubject<{
+    showTransferSearchResults: boolean;
+  }> = new BehaviorSubject<{
+    showTransferSearchResults: boolean;
+  }>({ showTransferSearchResults: false });
+
   public plantSearchVisibility: BehaviorSubject<{
     showPlantSearchResults: boolean;
   }> = new BehaviorSubject<{
@@ -64,7 +71,6 @@ class SearchManager implements IAtomicService {
   public transferQueryString: BehaviorSubject<string> = new BehaviorSubject<string>("");
   public selectedTransfer: BehaviorSubject<ISelectedTransferMetadata | null> =
     new BehaviorSubject<ISelectedTransferMetadata | null>(null);
-  public transferSearchVisibility: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   public incomingTransferIndexInflight: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(
     false
   );
@@ -92,14 +98,25 @@ class SearchManager implements IAtomicService {
       }
     );
 
-    this.transferSearchVisibility.subscribe((showTransferSearchResults) => {
-      store.commit(MutationType.SET_SHOW_TRANSFER_SEARCH_RESULTS, showTransferSearchResults);
+    this.transferSearchVisibility.subscribe(
+      ({ showTransferSearchResults }: { showTransferSearchResults: boolean }) => {
+        store.dispatch(`transferSearch/${TransferSearchActions.SET_SHOW_TRANSFER_SEARCH_RESULTS}`, {
+          showTransferSearchResults,
+        });
+      }
+    );
+
+    this.plantSearchVisibility.next({
+      showPlantSearchResults: !!store.state.plantSearch?.showPlantSearchResults,
     });
 
     this.packageSearchVisibility.next({
       showPackageSearchResults: !!store.state.packageSearch?.showPackageSearchResults,
     });
-    this.transferSearchVisibility.next(store.state.showTransferSearchResults);
+
+    this.transferSearchVisibility.next({
+      showTransferSearchResults: !!store.state.transferSearch?.showTransferSearchResults,
+    });
   }
 
   setPlantSearchVisibility({ showPlantSearchResults }: { showPlantSearchResults: boolean }) {
@@ -110,8 +127,12 @@ class SearchManager implements IAtomicService {
     this.packageSearchVisibility.next({ showPackageSearchResults });
   }
 
-  setTransferSearchVisibility(showTransferSearchResults: boolean) {
-    this.transferSearchVisibility.next(showTransferSearchResults);
+  setTransferSearchVisibility({
+    showTransferSearchResults,
+  }: {
+    showTransferSearchResults: boolean;
+  }) {
+    this.transferSearchVisibility.next({ showTransferSearchResults });
   }
 
   maybeInitializeSelectedPlant(
@@ -138,6 +159,7 @@ class SearchManager implements IAtomicService {
       .asObservable()
       .pipe(take(1))
       .subscribe((selectedPackage) => {
+        console.log({ selectedPackage: selectedPackage?.packageData.Label });
         if (!selectedPackage || priority <= selectedPackage.priority) {
           this.selectedPackage.next({ packageData, sectionName, priority });
         }

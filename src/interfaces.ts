@@ -27,6 +27,7 @@ import { ISearchState } from "./store/page-overlay/modules/search/interfaces";
 import { ISettingsState } from "./store/page-overlay/modules/settings/interfaces";
 import { ISplitPackageBuilderState } from "./store/page-overlay/modules/split-package-builder/interfaces";
 import { ITransferBuilderState } from "./store/page-overlay/modules/transfer-builder/interfaces";
+import { ITransferSearchState } from "./store/page-overlay/modules/transfer-search/interfaces";
 import { CsvUpload, CsvUploadStatus } from "./types";
 
 export type PlantBatchTypeName = "Clone" | "Seed";
@@ -187,6 +188,7 @@ export interface IPluginState extends IRootState {
   transferBuilder: ITransferBuilderState;
   packageSearch: IPackageSearchState;
   plantSearch: IPlantSearchState;
+  transferSearch: ITransferSearchState;
   splitPackageBuilder: ISplitPackageBuilderState;
   promoteImmaturePlantsBuilder: IPromoteImmaturePlantsBuilderState;
   search: ISearchState;

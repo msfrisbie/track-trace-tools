@@ -131,7 +131,9 @@ export default Vue.extend({
       tap((queryString: string) => {
         this.$data.queryString = queryString;
       }),
-      filter((queryString: string) => queryString !== this.$store.state.plantSearch.plantQueryString),
+      filter(
+        (queryString: string) => queryString !== this.$store.state.plantSearch.plantQueryString
+      ),
       debounceTime(500),
       tap((queryString: string) => {
         if (queryString) {
@@ -170,17 +172,20 @@ export default Vue.extend({
 
         promises.push(
           primaryDataLoader.onDemandFloweringPlantSearch({ queryString }).then((plants) => {
-            this.$data.plants = this.$data.plants.concat(plants);
+            // Flowering should appear first
+            this.$data.plants = [...plants, ...this.$data.plants];
           })
         );
         promises.push(
           primaryDataLoader.onDemandVegetativePlantSearch({ queryString }).then((plants) => {
-            this.$data.plants = this.$data.plants.concat(plants);
+            // Veg should appear first
+            this.$data.plants = [...plants, ...this.$data.plants];
           })
         );
         promises.push(
           primaryDataLoader.onDemandInactivePlantSearch({ queryString }).then((plants) => {
-            this.$data.plants = this.$data.plants.concat(plants);
+            // Flowering should appear first
+            this.$data.plants = [...this.$data.plants, ...plants];
           })
         );
 

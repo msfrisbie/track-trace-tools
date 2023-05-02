@@ -745,6 +745,22 @@ export class DataLoader implements IAtomicService {
     throw new Error("Active packages request failed.");
   }
 
+  onDemandTransferSearchBody({ queryString }: { queryString: string }): string {
+    return JSON.stringify({
+      request: {
+        take: DATA_LOAD_PAGE_SIZE,
+        skip: 0,
+        page: 1,
+        pageSize: DATA_LOAD_PAGE_SIZE,
+        filter: {
+          logic: "or",
+          filters: [{ field: "ManifestNumber", operator: "contains", value: queryString }],
+        },
+        group: [],
+      },
+    });
+  }
+
   onDemandPlantSearchBody({ queryString }: { queryString: string }): string {
     return JSON.stringify({
       request: {
@@ -763,6 +779,38 @@ export class DataLoader implements IAtomicService {
         group: [],
       },
     });
+  }
+
+  async onDemandIncomingTransferSearch({
+    queryString,
+  }: {
+    queryString: string;
+  }): Promise<IIndexedTransferData[]> {
+    if (store.state.mockDataMode && store.state.flags?.mockedFlags.mockPackages.enabled) {
+    }
+
+    let transfers: IIndexedTransferData[] = [];
+
+    const body = this.onDemandTransferSearchBody({ queryString });
+
+    const transfersResponse = await primaryMetrcRequestManager.getIncomingTransfers(body);
+
+    if (transfersResponse.status === 200) {
+      const responseData: ICollectionResponse<ITransferData> = await transfersResponse.json();
+
+      const incomingTransfers: IIndexedTransferData[] = responseData["Data"].map((x) => ({
+        ...x,
+        TransferState: TransferState.INCOMING,
+        TagMatcher: "",
+        LicenseNumber: this._authState!.license,
+      }));
+
+      transfers = [...transfers, ...incomingTransfers];
+    } else {
+      console.error("Transfers request failed.");
+    }
+
+    return transfers;
   }
 
   async onDemandFloweringPlantSearch({
@@ -1270,28 +1318,28 @@ export class DataLoader implements IAtomicService {
   }
 
   async onHoldPackages(): Promise<IIndexedPackageData[]> {
-      return new Promise(async (resolve, reject) => {
-        const subscription = timer(DATA_LOAD_FETCH_TIMEOUT_MS).subscribe(() =>
-          reject("On hold package fetch timed out")
+    return new Promise(async (resolve, reject) => {
+      const subscription = timer(DATA_LOAD_FETCH_TIMEOUT_MS).subscribe(() =>
+        reject("On hold package fetch timed out")
+      );
+
+      try {
+        const onHoldPackages: IIndexedPackageData[] = (await this.loadOnHoldPackages()).map(
+          (pkg) => ({
+            ...pkg,
+            PackageState: PackageState.ON_HOLD,
+            TagMatcher: "",
+            LicenseNumber: this._authState!.license,
+          })
         );
 
-        try {
-          const onHoldPackages: IIndexedPackageData[] = (await this.loadOnHoldPackages()).map(
-            (pkg) => ({
-              ...pkg,
-              PackageState: PackageState.ON_HOLD,
-              TagMatcher: "",
-              LicenseNumber: this._authState!.license,
-            })
-          );
-
-          subscription.unsubscribe();
-          resolve(onHoldPackages);
-        } catch (e) {
-          subscription.unsubscribe();
-          reject(e);
-        }
-      });
+        subscription.unsubscribe();
+        resolve(onHoldPackages);
+      } catch (e) {
+        subscription.unsubscribe();
+        reject(e);
+      }
+    });
   }
 
   async inTransitPackages(resetCache: boolean = false): Promise<IIndexedPackageData[]> {
@@ -2036,9 +2084,7 @@ export class DataLoader implements IAtomicService {
     return streamFactory<IPackageData>(options, responseFactory);
   }
 
-  onHoldPackagesStream(
-    options: IPackageOptions = {}
-  ): Subject<ICollectionResponse<IPackageData>> {
+  onHoldPackagesStream(options: IPackageOptions = {}): Subject<ICollectionResponse<IPackageData>> {
     const responseFactory = (paginationOptions: IPaginationOptions): Promise<Response> => {
       const body = buildBody(paginationOptions);
 

@@ -111,8 +111,8 @@ export default Vue.extend({
       .asObservable()
       .pipe(takeUntil(this.$data.destroyed$))
       .subscribe(
-        (selectedPlantMetatdata) =>
-          (this.$data.plant = selectedPlantMetatdata ? selectedPlantMetatdata.plantData : null)
+        (selectedPlantMetadata) =>
+          (this.$data.plant = selectedPlantMetadata ? selectedPlantMetadata.plantData : null)
       );
   },
   beforeDestroy() {

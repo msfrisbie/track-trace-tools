@@ -61,16 +61,19 @@ import SearchPickerSelect from "@/components/page-overlay/SearchPickerSelect.vue
 import TransferSearchFilters from "@/components/transfer-search-widget/TransferSearchFilters.vue";
 import TransferSearchResults from "@/components/transfer-search-widget/TransferSearchResults.vue";
 import { MessageType } from "@/consts";
+import { IPluginState } from "@/interfaces";
 import { analyticsManager } from "@/modules/analytics-manager.module";
 import { authManager } from "@/modules/auth-manager.module";
+import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
 import { databaseInterface } from "@/modules/database-interface.module";
 import { searchManager } from "@/modules/search-manager.module";
 import { MutationType } from "@/mutation-types";
 import store from "@/store/page-overlay/index";
-import { combineLatest, Observable } from "rxjs";
+import { TransferSearchActions } from "@/store/page-overlay/modules/transfer-search/consts";
+import { combineLatest, Observable, of, timer } from "rxjs";
 import { debounceTime, filter, startWith, tap } from "rxjs/operators";
 import Vue from "vue";
-import { mapState } from "vuex";
+import { mapActions, mapState } from "vuex";
 
 export default Vue.extend({
   name: "TransferSearchWidget",
@@ -103,13 +106,13 @@ export default Vue.extend({
 
     document.addEventListener("keyup", (e) => {
       if (e.isTrusted && e.key === "Escape") {
-        searchManager.setTransferSearchVisibility(false);
+        searchManager.setTransferSearchVisibility({ showTransferSearchResults: false });
       }
     });
 
     document.addEventListener("click", (e) => {
       if (e.isTrusted) {
-        searchManager.setTransferSearchVisibility(false);
+        searchManager.setTransferSearchVisibility({ showTransferSearchResults: false });
       }
     });
 
@@ -123,13 +126,15 @@ export default Vue.extend({
     this.$data.firstSearch = new Promise((resolve) => {
       this.$data.firstSearchResolver = resolve;
     });
-    // this.$data.firstSearch.then(() => searchManager.indexTransfers());
 
     const queryString$: Observable<string> = searchManager.transferQueryString.asObservable().pipe(
       tap((queryString: string) => {
         this.$data.queryString = queryString;
       }),
-      filter((queryString: string) => queryString !== this.$store.state.transferQueryString),
+      filter(
+        (queryString: string) =>
+          queryString !== this.$store.state.transferSearch.transferQueryString
+      ),
       debounceTime(500),
       tap((queryString: string) => {
         if (queryString) {
@@ -144,19 +149,16 @@ export default Vue.extend({
 
         // This also writes to the search history,
         // so this must be after debounce
-        this.$store.commit(MutationType.SET_TRANSFER_QUERY_STRING, queryString);
+        this.setTransferQueryString({ transferQueryString: queryString });
       })
     );
 
     combineLatest([
       queryString$.pipe(
         filter((queryString: string) => !!queryString),
-        startWith(this.$store.state.transferQueryString)
+        startWith(this.$store.state.transferSearch.transferQueryString)
       ),
-      searchManager.transferIndexUpdated().pipe(
-        filter((x) => !!x),
-        startWith(true)
-      ),
+      of(true),
     ]).subscribe(async ([queryString, transferIndexUpdated]: [string, boolean]) => {
       this.$data.searchInflight = true;
 
@@ -164,11 +166,42 @@ export default Vue.extend({
         this.$data.firstSearchResolver();
       }
 
+      this.$data.transfers = [];
+
       try {
-        this.$data.transfers = await databaseInterface.transferSearch(
-          queryString,
-          this.$data.filters
+        const promises: Promise<any>[] = [];
+
+        promises.push(
+          primaryDataLoader.onDemandIncomingTransferSearch({ queryString }).then((transfers) => {
+            this.$data.transfers = [...transfers, ...this.$data.transfers];
+          })
         );
+        // promises.push(
+        //   primaryDataLoader.onDemandIncomingInactiveTransferSearch({ queryString }).then((transfers) => {
+        //     this.$data.transfers = this.$data.transfers.concat(transfers);
+        //   })
+        // );
+        // promises.push(
+        //   primaryDataLoader.onDemandOutgoingTransferSearch({ queryString }).then((transfers) => {
+        //     this.$data.transfers = this.$data.transfers.concat(transfers);
+        //   })
+        // );
+        // promises.push(
+        //   primaryDataLoader.onDemandRejectedTransferSearch({ queryString }).then((transfers) => {
+        //     this.$data.transfers = this.$data.transfers.concat(transfers);
+        //   })
+        // );
+        // promises.push(
+        //   primaryDataLoader.onDemandOutgoingInactiveTransferSearch({ queryString }).then((transfers) => {
+        //     this.$data.transfers = this.$data.transfers.concat(transfers);
+        //   })
+        // );
+
+        const results = await Promise.allSettled(promises);
+
+        if (results.find((promise) => promise.status === "rejected")) {
+          throw new Error("Could not resolve all transfer requests");
+        }
       } catch (e) {
         console.error(e);
       } finally {
@@ -177,36 +210,46 @@ export default Vue.extend({
     });
   },
   computed: {
-    inflight() {
+    inflight(): boolean {
       return this.$data.searchInflight || this.$data.indexInflight;
     },
-    ...mapState([
-      "loadingMessage",
-      "errorMessage",
-      "flashMessage",
-      "transferQueryStringHistory",
-      "showTransferSearchResults",
-      "transferQueryString",
-    ]),
+    ...mapState<IPluginState>({
+      transferQueryString: (state: IPluginState) => state.transferSearch.transferQueryString,
+      showTransferSearchResults: (state: IPluginState) =>
+        state.transferSearch.showTransferSearchResults,
+    }),
   },
   methods: {
-    async setShowTransferSearchResults(showTransferSearchResults: boolean) {
-      searchManager.setTransferSearchVisibility(showTransferSearchResults);
+    ...mapActions({
+      setTransferQueryString: `transferSearch/${TransferSearchActions.SET_TRANSFER_QUERY_STRING}`,
+      setExpandSearchOnNextLoad: `transferSearch/${TransferSearchActions.SET_EXPAND_SEARCH_ON_NEXT_LOAD}`,
+    }),
+    async setShowTransferSearchResults({
+      showTransferSearchResults,
+    }: {
+      showTransferSearchResults: boolean;
+    }) {
+      searchManager.setTransferSearchVisibility({ showTransferSearchResults });
     },
     search(queryString: string) {
-      searchManager.setTransferSearchVisibility(true);
+      searchManager.setTransferSearchVisibility({ showTransferSearchResults: true });
       searchManager.transferQueryString.next(queryString);
     },
     clearSearchField() {
       searchManager.transferQueryString.next("");
     },
-    setSearch(queryString: string) {
-      // @ts-ignore
-      this.$refs.search.$el?.focus();
-      searchManager.transferQueryString.next(queryString);
-      analyticsManager.track(MessageType.CLICKED_RECENT_TRANSFER_QUERY, {
-        queryString,
-      });
+  },
+  watch: {
+    showTransferSearchResults: {
+      immediate: true,
+      handler(newValue, oldValue) {
+        if (newValue) {
+          timer(500).subscribe(
+            // @ts-ignore
+            () => this.$refs.search?.$el.focus()
+          );
+        }
+      },
     },
   },
 });

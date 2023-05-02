@@ -99,6 +99,7 @@ export default Vue.extend({
               newValue.length > 0 &&
               !newValue.find((x: any) => x.Id === packageMetadata?.packageData.Id)
             ) {
+              console.log({newValue: newValue[0].Label})
               searchManager.maybeInitializeSelectedPackage(
                 newValue[0],
                 this.sectionName,

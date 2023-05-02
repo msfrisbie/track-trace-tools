@@ -171,17 +171,18 @@ export default Vue.extend({
 
         promises.push(
           primaryDataLoader.onDemandActivePackageSearch({ queryString }).then((packages) => {
-            this.$data.packages = this.$data.packages.concat(packages);
+            // Active should appear first
+            this.$data.packages = [...packages, ...this.$data.packages];
           })
         );
         promises.push(
           primaryDataLoader.onDemandInTransitPackageSearch({ queryString }).then((packages) => {
-            this.$data.packages = this.$data.packages.concat(packages);
+            this.$data.packages = [...this.$data.packages, ...packages];
           })
         );
         promises.push(
           primaryDataLoader.onDemandInactivePackageSearch({ queryString }).then((packages) => {
-            this.$data.packages = this.$data.packages.concat(packages);
+            this.$data.packages = [...this.$data.packages, ...packages];
           })
         );
 
@@ -240,8 +241,10 @@ export default Vue.extend({
       immediate: true,
       handler(newValue, oldValue) {
         if (newValue) {
-          // @ts-ignore
-          timer(500).subscribe(() => this.$refs.search?.$el.focus());
+          timer(500).subscribe(
+            // @ts-ignore
+            () => this.$refs.search?.$el.focus()
+          );
         }
       },
     },
