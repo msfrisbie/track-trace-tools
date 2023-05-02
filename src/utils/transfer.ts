@@ -1,6 +1,7 @@
 import {
   IDestinationData,
   IDestinationPackageData,
+  IIndexedTransferData,
   IMetrcDriverData,
   IMetrcFacilityData,
   IMetrcVehicleData,
@@ -231,41 +232,49 @@ export async function createScanSheet(transferId: number, manifestNumber: string
   try {
     const manifest: {
       pkg: IDestinationPackageData;
-      destination: IDestinationData;
+      destination?: IDestinationData;
+      incomingTransfer?: IIndexedTransferData;
     }[] = await primaryDataLoader.transferDestinations(transferId).then(async (destinations) => {
       let packages: {
         pkg: IDestinationPackageData;
-        destination: IDestinationData;
+        destination?: IDestinationData;
+        incomingTransfer?: IIndexedTransferData;
       }[] = [];
 
       // This is an incoming transfer, use the DeliveryId instead
       if (destinations.length === 0) {
-        let deliveryId: number | null = null;
-        const incomingTransfer = await primaryDataLoader.incomingTransfer(manifestNumber);
-        if (incomingTransfer) {
-          deliveryId = incomingTransfer.DeliveryId;
-        } else {
-          const incomingInactiveTransfer = await primaryDataLoader.incomingInactiveTransfer(
-            manifestNumber
-          );
-          if (incomingInactiveTransfer) {
-            deliveryId = incomingInactiveTransfer.DeliveryId;
-          }
+        let incomingTransfer: IIndexedTransferData | null = null;
+
+        incomingTransfer = await primaryDataLoader.incomingTransfer(manifestNumber);
+        if (!incomingTransfer) {
+          incomingTransfer = await primaryDataLoader.incomingInactiveTransfer(manifestNumber);
         }
 
-        if (deliveryId !== null) {
-          // @ts-ignore
-          destinations = [{ Id: deliveryId }];
+        if (!incomingTransfer) {
+          throw new Error("Unable to match incoming transfer");
+        }
+
+        packages = packages.concat(
+          (await primaryDataLoader.destinationPackages(incomingTransfer!.DeliveryId)).map(
+            (pkg) => ({
+              pkg,
+              incomingTransfer: incomingTransfer!,
+            })
+          )
+        );
+      } else {
+        for (const destination of destinations) {
+          packages = packages.concat(
+            (await primaryDataLoader.destinationPackages(destination.Id)).map((pkg) => ({
+              pkg,
+              destination,
+            }))
+          );
         }
       }
 
-      for (const destination of destinations) {
-        packages = packages.concat(
-          (await primaryDataLoader.destinationPackages(destination.Id)).map((pkg) => ({
-            pkg,
-            destination,
-          }))
-        );
+      if (manifest.find((x) => !x.destination && !x.incomingTransfer)) {
+        throw new Error("Cannot generate scan sheet with no destination information");
       }
 
       return packages;

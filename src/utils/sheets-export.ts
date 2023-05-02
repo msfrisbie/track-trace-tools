@@ -1,5 +1,5 @@
 import { MessageType, SHEETS_API_MESSAGE_TIMEOUT_MS, SheetTitles } from "@/consts";
-import { IDestinationData, IDestinationPackageData, ISpreadsheet, IValueRange } from "@/interfaces";
+import { IDestinationData, IDestinationPackageData, IIndexedTransferData, ISpreadsheet, IValueRange } from "@/interfaces";
 import { messageBus } from "@/modules/message-bus.module";
 import store from "@/store/page-overlay/index";
 import { ReportsMutations, ReportType } from "@/store/page-overlay/modules/reports/consts";
@@ -715,7 +715,8 @@ export async function createScanSheetOrError(
   licenseNumber: string,
   manifest: {
     pkg: IDestinationPackageData;
-    destination: IDestinationData;
+    destination?: IDestinationData;
+    incomingTransfer?: IIndexedTransferData;
   }[]
 ): Promise<ISpreadsheet> {
   const SHEET_TITLE = `${manifestNumber} Scan Sheet`;
@@ -748,7 +749,7 @@ export async function createScanSheetOrError(
           "Scanned Tags                                   ",
         ],
         ...manifest.map((x) => [
-          x.destination.RecipientFacilityName + "      ",
+          (x.destination! || x.incomingTransfer!).RecipientFacilityName + "      ",
           `${x.pkg.ShippedQuantity} ${x.pkg.ShippedUnitOfMeasureAbbreviation} ${x.pkg.ProductName}      `,
           x.pkg.PackageLabel,
         ]),
