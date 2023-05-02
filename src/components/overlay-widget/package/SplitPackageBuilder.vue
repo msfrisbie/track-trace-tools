@@ -404,8 +404,7 @@ export default Vue.extend({
             },
           ],
           ItemId: newPackageItem.Id.toString(),
-          Note: this.note as string,
-          ProductionBatchNumber: this.productionBatchNumber as string,
+          Note: this.note,
           Quantity: quantity.toString(),
           TagId: tag.Id.toString(),
           UnitOfMeasureId: newPackageItem.UnitOfMeasureId.toString(),
@@ -414,9 +413,12 @@ export default Vue.extend({
           RemediationSteps: "",
           ...(this.isDonation ? { IsDonation: "true" } : {}),
           ...(this.isTradeSample ? { IsTradeSample: "true" } : {}),
+          ...(this.productionBatchNumber
+            ? { ProductionBatchNumber: this.productionBatchNumber }
+            : {}),
           ...(this.$data.facilityUsesLocationForPackages
             ? {
-                LocationId: (this.location as ILocationData).Id.toString(),
+                LocationId: this.location!.Id.toString(),
               }
             : {}),
           // UseSameItem: "false", // default to false and just provide the item id anyway

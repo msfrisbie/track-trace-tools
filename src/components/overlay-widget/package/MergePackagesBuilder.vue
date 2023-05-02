@@ -312,7 +312,7 @@ export default Vue.extend({
           })),
           ItemId: this.$data.outputItem.Id.toString(),
           Note: this.$data.note,
-          ProductionBatchNumber: "",
+          // ProductionBatchNumber: "",
           Quantity: newPackageData.quantity.toString(),
           TagId: tag.Id.toString(),
           UnitOfMeasureId: this.$data.outputItem.UnitOfMeasureId.toString(),

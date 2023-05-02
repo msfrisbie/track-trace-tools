@@ -1358,7 +1358,7 @@ export interface IMetrcCreatePackagesFromPackagesPayload {
   ItemId: string;
   LocationId?: string;
   Note: string;
-  ProductionBatchNumber: string;
+  ProductionBatchNumber?: string;
   Quantity: string;
   TagId: string;
   UnitOfMeasureId: string;
