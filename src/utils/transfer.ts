@@ -238,6 +238,27 @@ export async function createScanSheet(transferId: number, manifestNumber: string
         destination: IDestinationData;
       }[] = [];
 
+      // This is an incoming transfer, use the DeliveryId instead
+      if (destinations.length === 0) {
+        let deliveryId: number | null = null;
+        const incomingTransfer = await primaryDataLoader.incomingTransfer(manifestNumber);
+        if (incomingTransfer) {
+          deliveryId = incomingTransfer.DeliveryId;
+        } else {
+          const incomingInactiveTransfer = await primaryDataLoader.incomingInactiveTransfer(
+            manifestNumber
+          );
+          if (incomingInactiveTransfer) {
+            deliveryId = incomingInactiveTransfer.DeliveryId;
+          }
+        }
+
+        if (deliveryId !== null) {
+          // @ts-ignore
+          destinations = [{ Id: deliveryId }];
+        }
+      }
+
       for (const destination of destinations) {
         packages = packages.concat(
           (await primaryDataLoader.destinationPackages(destination.Id)).map((pkg) => ({
