@@ -7,7 +7,8 @@
     "build": "NODE_OPTIONS=--openssl-legacy-provider; vue-cli-service build --prod",
     "test:unit": "vue-cli-service test:unit",
     "lint": "vue-cli-service lint",
-    "clientupdate": "node bin/encrypt-client-data.js"
+    "clientupdate": "node bin/encrypt-client-data.js",
+    "cleanup": "git branch --merged | egrep -v \"(^\\*|master|main|dev)\" | xargs git branch -d"
   },
   "dependencies": {
     "@fortawesome/fontawesome-free": "^5.15.3",
