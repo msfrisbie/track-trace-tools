@@ -273,12 +273,12 @@ export async function createScanSheet(transferId: number, manifestNumber: string
         }
       }
 
-      if (manifest.find((x) => !x.destination && !x.incomingTransfer)) {
-        throw new Error("Cannot generate scan sheet with no destination information");
-      }
-
       return packages;
     });
+
+    if (manifest.find((x) => !x.destination && !x.incomingTransfer)) {
+      throw new Error("Cannot generate scan sheet with no destination information");
+    }
 
     const spreadsheet = await createScanSheetOrError(
       manifestNumber,
