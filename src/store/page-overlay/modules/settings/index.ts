@@ -51,8 +51,8 @@ const persistedState: ISettingsState = {
   enableManifestDocumentViewer: false,
   hideListingsButton: false,
   preventActiveProjectPageLeave: true,
-  enableSearchOverMetrcModal: true,
-  useIsoDateFormatForSubmit: false,
+  enableSearchOverMetrcModal: false,
+  useIsoDateFormatForSubmit: true,
   loadDataInParallel: true,
   usePersistedCache: false,
 };
