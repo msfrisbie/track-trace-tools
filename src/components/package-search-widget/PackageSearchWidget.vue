@@ -69,7 +69,7 @@ import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
 import { searchManager } from "@/modules/search-manager.module";
 import store from "@/store/page-overlay/index";
 import { PackageSearchActions } from "@/store/page-overlay/modules/package-search/consts";
-import { combineLatest, Observable, timer } from "rxjs";
+import { combineLatest, Observable, of, timer } from "rxjs";
 import { debounceTime, filter, startWith, tap } from "rxjs/operators";
 import Vue from "vue";
 import { mapActions, mapState } from "vuex";
@@ -125,7 +125,6 @@ export default Vue.extend({
     this.$data.firstSearch = new Promise((resolve) => {
       this.$data.firstSearchResolver = resolve;
     });
-    // this.$data.firstSearch.then(() => searchManager.indexPackages());
 
     const queryString$: Observable<string> = searchManager.packageQueryString.asObservable().pipe(
       tap((queryString: string) => {
@@ -157,11 +156,8 @@ export default Vue.extend({
         filter((queryString: string) => !!queryString),
         startWith(this.$store.state.packageSearch.packageQueryString || "")
       ),
-      // searchManager.packageIndexUpdated().pipe(
-      //   filter((x) => !!x),
-      //   startWith(true)
-      // ),
-    ]).subscribe(async ([queryString]: [string]) => {
+      of(true),
+    ]).subscribe(async ([queryString, packageIndexUpdated]: [string, boolean]) => {
       this.$data.searchInflight = true;
 
       if (queryString.length > 0) {

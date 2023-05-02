@@ -62,6 +62,7 @@ import SearchPickerSelect from "@/components/page-overlay/SearchPickerSelect.vue
 import PlantSearchFilters from "@/components/plant-search-widget/PlantSearchFilters.vue";
 import PlantSearchResults from "@/components/plant-search-widget/PlantSearchResults.vue";
 import { MessageType } from "@/consts";
+import { IPluginState } from "@/interfaces";
 import { analyticsManager } from "@/modules/analytics-manager.module";
 import { authManager } from "@/modules/auth-manager.module";
 import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
@@ -130,7 +131,7 @@ export default Vue.extend({
       tap((queryString: string) => {
         this.$data.queryString = queryString;
       }),
-      filter((queryString: string) => queryString !== (this as any).plantQueryString),
+      filter((queryString: string) => queryString !== this.$store.state.plantSearch.plantQueryString),
       debounceTime(500),
       tap((queryString: string) => {
         if (queryString) {
@@ -145,7 +146,7 @@ export default Vue.extend({
 
         // This also writes to the search history,
         // so this must be after debounce
-        (this as any).setPlantQueryString({ plantQueryString: queryString });
+        this.setPlantQueryString({ plantQueryString: queryString });
       })
     );
 
@@ -162,16 +163,32 @@ export default Vue.extend({
         this.$data.firstSearchResolver();
       }
 
+      this.$data.plants = [];
+
       try {
-        this.$data.plants = await primaryDataLoader.onDemandFloweringPlantSearch({ queryString });
-        this.$data.plants = [
-          ...this.$data.plants,
-          ...(await primaryDataLoader.onDemandVegetativePlantSearch({ queryString })),
-        ];
-        this.$data.plants = [
-          ...this.$data.plants,
-          ...(await primaryDataLoader.onDemandInactivePlantSearch({ queryString })),
-        ];
+        const promises: Promise<any>[] = [];
+
+        promises.push(
+          primaryDataLoader.onDemandFloweringPlantSearch({ queryString }).then((plants) => {
+            this.$data.plants = this.$data.plants.concat(plants);
+          })
+        );
+        promises.push(
+          primaryDataLoader.onDemandVegetativePlantSearch({ queryString }).then((plants) => {
+            this.$data.plants = this.$data.plants.concat(plants);
+          })
+        );
+        promises.push(
+          primaryDataLoader.onDemandInactivePlantSearch({ queryString }).then((plants) => {
+            this.$data.plants = this.$data.plants.concat(plants);
+          })
+        );
+
+        const results = await Promise.allSettled(promises);
+
+        if (results.find((promise) => promise.status === "rejected")) {
+          throw new Error("Could not resolve all plant requests");
+        }
       } catch (e) {
         console.error(e);
       } finally {
@@ -179,8 +196,8 @@ export default Vue.extend({
       }
     });
 
-    if (this.$store.state.expandSearchOnNextLoad) {
-      (this as any).setExpandSearchOnNextLoad({
+    if (this.$store.state.plantSearch.expandSearchOnNextLoad) {
+      this.setExpandSearchOnNextLoad({
         expandSearchOnNextLoad: false,
       });
 
@@ -188,8 +205,9 @@ export default Vue.extend({
     }
   },
   computed: {
-    ...mapState({
-      showPlantSearchResults: (state: any) => state.plantSearch.showPlantSearchResults,
+    ...mapState<IPluginState>({
+      plantQueryString: (state: IPluginState) => state.plantSearch.plantQueryString,
+      showPlantSearchResults: (state: IPluginState) => state.plantSearch.showPlantSearchResults,
     }),
     inflight() {
       return this.$data.searchInflight || this.$data.indexInflight;
