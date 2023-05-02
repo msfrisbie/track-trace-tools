@@ -123,7 +123,7 @@ export default Vue.extend({
     this.$data.firstSearch = new Promise((resolve) => {
       this.$data.firstSearchResolver = resolve;
     });
-    this.$data.firstSearch.then(() => searchManager.indexTransfers());
+    // this.$data.firstSearch.then(() => searchManager.indexTransfers());
 
     const queryString$: Observable<string> = searchManager.transferQueryString.asObservable().pipe(
       tap((queryString: string) => {

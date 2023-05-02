@@ -62,6 +62,7 @@ import PackageSearchFilters from "@/components/package-search-widget/PackageSear
 import PackageSearchResults from "@/components/package-search-widget/PackageSearchResults.vue";
 import SearchPickerSelect from "@/components/page-overlay/SearchPickerSelect.vue";
 import { MessageType } from "@/consts";
+import { IPluginState } from "@/interfaces";
 import { analyticsManager } from "@/modules/analytics-manager.module";
 import { authManager } from "@/modules/auth-manager.module";
 import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
@@ -130,7 +131,9 @@ export default Vue.extend({
       tap((queryString: string) => {
         this.$data.queryString = queryString;
       }),
-      filter((queryString: string) => queryString !== (this as any).packageQueryString),
+      filter(
+        (queryString: string) => queryString !== this.$store.state.packageSearch.packageQueryString
+      ),
       debounceTime(500),
       tap((queryString: string) => {
         if (queryString) {
@@ -145,36 +148,52 @@ export default Vue.extend({
 
         // This also writes to the search history,
         // so this must be after debounce
-        (this as any).setPackageQueryString({ packageQueryString: queryString });
+        this.setPackageQueryString({ packageQueryString: queryString });
       })
     );
 
     combineLatest([
       queryString$.pipe(
         filter((queryString: string) => !!queryString),
-        startWith(this.$store.state.packageSearch?.packageQueryString || "")
+        startWith(this.$store.state.packageSearch.packageQueryString || "")
       ),
-      searchManager.packageIndexUpdated().pipe(
-        filter((x) => !!x),
-        startWith(true)
-      ),
-    ]).subscribe(async ([queryString, packageIndexUpdated]: [string, boolean]) => {
+      // searchManager.packageIndexUpdated().pipe(
+      //   filter((x) => !!x),
+      //   startWith(true)
+      // ),
+    ]).subscribe(async ([queryString]: [string]) => {
       this.$data.searchInflight = true;
 
       if (queryString.length > 0) {
         this.$data.firstSearchResolver();
       }
 
+      this.$data.packages = [];
+
       try {
-        this.$data.packages = await primaryDataLoader.onDemandActivePackageSearch({ queryString });
-        this.$data.packages = [
-          ...this.$data.packages,
-          ...(await primaryDataLoader.onDemandInTransitPackageSearch({ queryString })),
-        ];
-        this.$data.packages = [
-          ...this.$data.packages,
-          ...(await primaryDataLoader.onDemandInactivePackageSearch({ queryString })),
-        ];
+        const promises: Promise<any>[] = [];
+
+        promises.push(
+          primaryDataLoader.onDemandActivePackageSearch({ queryString }).then((packages) => {
+            this.$data.packages = this.$data.packages.concat(packages);
+          })
+        );
+        promises.push(
+          primaryDataLoader.onDemandInTransitPackageSearch({ queryString }).then((packages) => {
+            this.$data.packages = this.$data.packages.concat(packages);
+          })
+        );
+        promises.push(
+          primaryDataLoader.onDemandInactivePackageSearch({ queryString }).then((packages) => {
+            this.$data.packages = this.$data.packages.concat(packages);
+          })
+        );
+
+        const results = await Promise.allSettled(promises);
+
+        if (results.find((promise) => promise.status === "rejected")) {
+          throw new Error("Could not resolve all package requests");
+        }
       } catch (e) {
         console.error(e);
       } finally {
@@ -182,8 +201,8 @@ export default Vue.extend({
       }
     });
 
-    if (this.$store.state.expandSearchOnNextLoad) {
-      (this as any).setExpandSearchOnNextLoad({
+    if (this.$store.state.packageSearch.expandSearchOnNextLoad) {
+      this.setExpandSearchOnNextLoad({
         expandSearchOnNextLoad: false,
       });
 
@@ -191,10 +210,12 @@ export default Vue.extend({
     }
   },
   computed: {
-    ...mapState({
-      showPackageSearchResults: (state: any) => state.packageSearch.showPackageSearchResults,
+    ...mapState<IPluginState>({
+      packageQueryString: (state: IPluginState) => state.packageSearch.packageQueryString,
+      showPackageSearchResults: (state: IPluginState) =>
+        state.packageSearch.showPackageSearchResults,
     }),
-    inflight() {
+    inflight(): boolean {
       return this.$data.searchInflight || this.$data.indexInflight;
     },
   },
