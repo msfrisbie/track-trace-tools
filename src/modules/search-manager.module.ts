@@ -10,7 +10,7 @@ import { PackageSearchActions } from "@/store/page-overlay/modules/package-searc
 import { PlantSearchActions } from "@/store/page-overlay/modules/plant-search/consts";
 import { TransferSearchActions } from "@/store/page-overlay/modules/transfer-search/consts";
 import { BehaviorSubject, combineLatest, Observable } from "rxjs";
-import { bufferCount, map, take } from "rxjs/operators";
+import { bufferCount, map, take, tap } from "rxjs/operators";
 import { primaryDataLoader } from "./data-loader/data-loader.module";
 
 export interface ISelectedPlantMetadata {
@@ -36,8 +36,8 @@ export interface ISelectedTransferMetadata {
 class SearchManager implements IAtomicService {
   public plantQueryString: BehaviorSubject<string> = new BehaviorSubject<string>("");
   public packageQueryString: BehaviorSubject<string> = new BehaviorSubject<string>("");
-  public selectedPackage: BehaviorSubject<ISelectedPackageMetadata | null> =
-    new BehaviorSubject<ISelectedPackageMetadata | null>(null);
+  // public selectedPackage: BehaviorSubject<ISelectedPackageMetadata | null> =
+  //   new BehaviorSubject<ISelectedPackageMetadata | null>(null);
   public selectedPlant: BehaviorSubject<ISelectedPlantMetadata | null> =
     new BehaviorSubject<ISelectedPlantMetadata | null>(null);
   public packageSearchVisibility: BehaviorSubject<{
@@ -150,21 +150,24 @@ class SearchManager implements IAtomicService {
       });
   }
 
-  maybeInitializeSelectedPackage(
-    packageData: IIndexedPackageData,
-    sectionName: string,
-    priority: number
-  ) {
-    this.selectedPackage
-      .asObservable()
-      .pipe(take(1))
-      .subscribe((selectedPackage) => {
-        console.log({ selectedPackage: selectedPackage?.packageData.Label });
-        if (!selectedPackage || priority <= selectedPackage.priority) {
-          this.selectedPackage.next({ packageData, sectionName, priority });
-        }
-      });
-  }
+  // maybeInitializeSelectedPackage(
+  //   packageData: IIndexedPackageData,
+  //   sectionName: string,
+  //   priority: number
+  // ) {
+  //   this.selectedPackage
+  //     .asObservable()
+  //     .pipe(
+  //       tap((x) => console.log(JSON.parse(JSON.stringify(x)))),
+  //       take(1)
+  //     )
+  //     .subscribe((selectedPackage) => {
+  //       console.log({ selectedPackage: selectedPackage?.packageData.Label });
+  //       if (!selectedPackage || priority <= selectedPackage.priority) {
+  //         this.selectedPackage.next({ packageData, sectionName, priority });
+  //       }
+  //     });
+  // }
 
   maybeInitializeSelectedTransfer(
     transferData: ITransferData,

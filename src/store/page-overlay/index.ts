@@ -22,9 +22,9 @@ import { maybePushOntoUniqueStack } from "@/utils/search";
 import Vue from "vue";
 import Vuex from "vuex";
 import VuexPersistence from "vuex-persist";
+import { explorerModule, explorerReducer } from "./modules/explorer";
 import { flagsModule, flagsReducer } from "./modules/flags/index";
 import { listingModule, listingReducer } from "./modules/listing";
-import { reportsModule, reportsReducer } from "./modules/reports";
 import { packageHistoryModule, packageHistoryReducer } from "./modules/package-history";
 import { packageSearchModule, packageSearchReducer } from "./modules/package-search";
 import { plantSearchModule, plantSearchReducer } from "./modules/plant-search";
@@ -33,6 +33,7 @@ import {
   promoteImmaturePlantsBuilderModule,
   promoteImmaturePlantsBuilderReducer,
 } from "./modules/promote-immature-plants-builder";
+import { reportsModule, reportsReducer } from "./modules/reports";
 import { searchModule, searchReducer } from "./modules/search";
 import { settingsModule, settingsReducer } from "./modules/settings";
 import {
@@ -40,7 +41,6 @@ import {
   splitPackageBuilderReducer,
 } from "./modules/split-package-builder";
 import { transferBuilderModule, transferBuilderReducer } from "./modules/transfer-builder/index";
-import { explorerModule, explorerReducer } from "./modules/explorer";
 import { transferSearchModule, transferSearchReducer } from "./modules/transfer-search";
 
 // Taken from https://gist.github.com/Myeris/3f13b42f6764ded6640cef693d9d1987
@@ -67,6 +67,7 @@ const vuexShared = {
       explorer: explorerReducer(state.explorer),
       plantSearch: plantSearchReducer(state.plantSearch),
       transferSearch: transferSearchReducer(state.transferSearch),
+      omniSearch: omniSearchReducer(state.omniSearch),
       flags: flagsReducer(state.flags),
       splitPackageBuilder: splitPackageBuilderReducer(state.splitPackageBuilder),
       promoteImmaturePlantsBuilder: promoteImmaturePlantsBuilderReducer(
@@ -133,7 +134,7 @@ const defaultState: IRootState = {
     dismissedFacilityPopover: false,
     dismissedSearchPopover: false,
     dismissedQuickScriptsPopover: false,
-    dismissedSnapshotPopover: false
+    dismissedSnapshotPopover: false,
   },
   backgroundTasks: {
     finalizeSalesReceiptsState: BackgroundTaskState.IDLE,
@@ -150,7 +151,7 @@ const defaultState: IRootState = {
     voidTagsReadout: null,
     voidTagsRunningTotal: 0,
     voidTagsConsecutiveErrorTotal: 0,
-  }
+  },
 };
 
 export default new Vuex.Store<IPluginState>({
@@ -260,7 +261,7 @@ export default new Vuex.Store<IPluginState>({
         state.tagQueryStringHistory
       );
     },
-    [MutationType.SET_OMNI_QUERY_STRING](state: IRootState, omniQueryString: string) {
+    [MutationType.SET_QUERY_STRING](state: IRootState, omniQueryString: string) {
       state.omniQueryString = omniQueryString;
 
       state.omniQueryStringHistory = maybePushOntoUniqueStack(
@@ -418,6 +419,10 @@ export default new Vuex.Store<IPluginState>({
       namespaced: true,
       ...transferSearchModule,
     },
+    omniSearch: {
+      namespaced: true,
+      ...omniSearchModule,
+    },
     flags: {
       namespaced: true,
       ...flagsModule,
@@ -436,7 +441,7 @@ export default new Vuex.Store<IPluginState>({
     },
     reports: {
       namespaced: true,
-      ...reportsModule
+      ...reportsModule,
     },
     search: {
       namespaced: true,

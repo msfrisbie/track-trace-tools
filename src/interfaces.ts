@@ -17,6 +17,7 @@ import {
 import { IExplorerState } from "./store/page-overlay/modules/explorer/interfaces";
 import { IFlagsState } from "./store/page-overlay/modules/flags/interfaces";
 import { IListingState } from "./store/page-overlay/modules/listing/interfaces";
+import { IOmniSearchState } from "./store/page-overlay/modules/omni-search/interfaces";
 import { IPackageHistoryState } from "./store/page-overlay/modules/package-history/interfaces";
 import { IPackageSearchState } from "./store/page-overlay/modules/package-search/interfaces";
 import { IPlantSearchState } from "./store/page-overlay/modules/plant-search/interfaces";
@@ -189,6 +190,7 @@ export interface IPluginState extends IRootState {
   packageSearch: IPackageSearchState;
   plantSearch: IPlantSearchState;
   transferSearch: ITransferSearchState;
+  omniSearch: IOmniSearchState;
   splitPackageBuilder: ISplitPackageBuilderState;
   promoteImmaturePlantsBuilder: IPromoteImmaturePlantsBuilderState;
   search: ISearchState;

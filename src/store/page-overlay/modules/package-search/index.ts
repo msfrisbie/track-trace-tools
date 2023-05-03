@@ -1,6 +1,7 @@
 import { PackageFilterIdentifiers, PackageState } from "@/consts";
 import { IPackageSearchFilters, IPluginState } from "@/interfaces";
 import { pageManager } from "@/modules/page-manager.module";
+import { ISelectedPackageMetadata } from "@/modules/search-manager.module";
 import { maybePushOntoUniqueStack } from "@/utils/search";
 import { timer } from "rxjs";
 import { ActionContext } from "vuex";
@@ -9,6 +10,7 @@ import { IPackageSearchState } from "./interfaces";
 
 const inMemoryState = {
   packageQueryString: "",
+  selectedPackageMetadata: null,
   showPackageSearchResults: false,
   packageSearchFilters: {
     label: null,
@@ -39,6 +41,12 @@ export const packageSearchModule = {
       { expandSearchOnNextLoad }: { expandSearchOnNextLoad: boolean }
     ) {
       state.expandSearchOnNextLoad = expandSearchOnNextLoad;
+    },
+    [PackageSearchMutations.SET_SELECTED_PACKAGE_METADATA](
+      state: IPackageSearchState,
+      { selectedPackageMetadata }: { selectedPackageMetadata: ISelectedPackageMetadata | null }
+    ) {
+      state.selectedPackageMetadata = selectedPackageMetadata;
     },
     [PackageSearchMutations.SET_PACKAGE_QUERY_STRING](
       state: IPackageSearchState,

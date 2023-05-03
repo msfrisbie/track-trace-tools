@@ -191,7 +191,7 @@ export default Vue.extend({
       .asObservable()
       .pipe(takeUntil(this.$data.onDestroyed), distinctUntilChanged(), debounceTime(500))
       .subscribe((query: string) => {
-        this.$store.commit(MutationType.SET_OMNI_QUERY_STRING, query);
+        this.$store.commit(MutationType.SET_QUERY_STRING, query);
 
         this.$data.queryString = query;
       });
