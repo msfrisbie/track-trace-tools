@@ -3,6 +3,12 @@
     <div id="changelog" class="flex flex-col items-center px-6">
       <div class="flex flex-col items-stretch max-w-md gap-16">
         <div class="max-w-lg flex flex-col gap-4">
+          <p class="text-2xl ttt-purple">v0.32.0</p>
+
+          <ul class="list-disc">
+            <li>Allow for settings to be persisted in Chrome storage</li>
+          </ul>
+
           <p class="text-2xl ttt-purple">v0.30.1</p>
 
           <ul class="list-disc">
