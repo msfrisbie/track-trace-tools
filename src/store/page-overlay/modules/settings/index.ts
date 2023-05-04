@@ -53,6 +53,7 @@ const persistedState: ISettingsState = {
   preventActiveProjectPageLeave: true,
   enableSearchOverMetrcModal: false,
   useIsoDateFormatForSubmit: true,
+  loadSettingsFromChromeStorage: false,
   loadDataInParallel: true,
   usePersistedCache: false,
 };

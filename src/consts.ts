@@ -8,6 +8,9 @@ export const TTT_SNOWFLAKES = "ttt-snowflakes";
 export enum ChromeStorageKeys {
   OAUTH_USER_DATA = "OAUTH_USER_DATA",
   INITIAL_OPTIONS_PATH = "INITIAL_OPTIONS_PATH",
+  VUEX_STATE = "VUEX_STATE",
+  LICENSE_KEY = "LICENSE_KEY",
+  SETTINGS = "SETTINGS",
 }
 
 export enum ToolkitView {

@@ -49,6 +49,7 @@ export interface ISettingsState {
   preventActiveProjectPageLeave: boolean;
   enableSearchOverMetrcModal: boolean;
   useIsoDateFormatForSubmit: boolean;
+  loadSettingsFromChromeStorage: boolean;
   loadDataInParallel: boolean;
   usePersistedCache: boolean;
 }

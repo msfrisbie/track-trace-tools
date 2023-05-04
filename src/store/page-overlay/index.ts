@@ -1,5 +1,6 @@
 import {
   BackgroundTaskState,
+  ChromeStorageKeys,
   DEBUG_ATTRIBUTE,
   SearchModalView,
   ToolkitView,
@@ -22,9 +23,9 @@ import { maybePushOntoUniqueStack } from "@/utils/search";
 import Vue from "vue";
 import Vuex from "vuex";
 import VuexPersistence from "vuex-persist";
+import { explorerModule, explorerReducer } from "./modules/explorer";
 import { flagsModule, flagsReducer } from "./modules/flags/index";
 import { listingModule, listingReducer } from "./modules/listing";
-import { reportsModule, reportsReducer } from "./modules/reports";
 import { packageHistoryModule, packageHistoryReducer } from "./modules/package-history";
 import { packageSearchModule, packageSearchReducer } from "./modules/package-search";
 import { plantSearchModule, plantSearchReducer } from "./modules/plant-search";
@@ -33,14 +34,15 @@ import {
   promoteImmaturePlantsBuilderModule,
   promoteImmaturePlantsBuilderReducer,
 } from "./modules/promote-immature-plants-builder";
+import { reportsModule, reportsReducer } from "./modules/reports";
 import { searchModule, searchReducer } from "./modules/search";
 import { settingsModule, settingsReducer } from "./modules/settings";
+import { SettingsMutations } from "./modules/settings/consts";
 import {
   splitPackageBuilderModule,
   splitPackageBuilderReducer,
 } from "./modules/split-package-builder";
 import { transferBuilderModule, transferBuilderReducer } from "./modules/transfer-builder/index";
-import { explorerModule, explorerReducer } from "./modules/explorer";
 
 // Taken from https://gist.github.com/Myeris/3f13b42f6764ded6640cef693d9d1987
 const vuexLocal = {
@@ -78,7 +80,20 @@ const vuexShared = {
   },
 };
 
-const vuexPersistence = new VuexPersistence({ ...vuexLocal, ...vuexShared });
+const vuexPersistence = new VuexPersistence({
+  ...vuexLocal,
+  ...vuexShared,
+  // https://github.com/championswimmer/vuex-persist/blob/57d79b4a526ca12cafe7341613d8382621a0d704/src/index.ts#L229
+  saveState(key: string, state: {}, storage: Storage | undefined): void {
+    try {
+      chrome.storage.local.set({ [ChromeStorageKeys.SETTINGS]: (state as IPluginState).settings });
+    } catch (e) {
+      console.error(e);
+    }
+
+    return storage!.setItem(key, JSON.stringify(state));
+  },
+});
 
 Vue.use(Vuex);
 
@@ -131,7 +146,7 @@ const defaultState: IRootState = {
     dismissedFacilityPopover: false,
     dismissedSearchPopover: false,
     dismissedQuickScriptsPopover: false,
-    dismissedSnapshotPopover: false
+    dismissedSnapshotPopover: false,
   },
   backgroundTasks: {
     finalizeSalesReceiptsState: BackgroundTaskState.IDLE,
@@ -148,10 +163,10 @@ const defaultState: IRootState = {
     voidTagsReadout: null,
     voidTagsRunningTotal: 0,
     voidTagsConsecutiveErrorTotal: 0,
-  }
+  },
 };
 
-export default new Vuex.Store<IPluginState>({
+const vuexStore = new Vuex.Store<IPluginState>({
   // Modules will set their own default state
   state: defaultState as IPluginState,
   mutations: {
@@ -430,7 +445,7 @@ export default new Vuex.Store<IPluginState>({
     },
     reports: {
       namespaced: true,
-      ...reportsModule
+      ...reportsModule,
     },
     search: {
       namespaced: true,
@@ -447,3 +462,19 @@ export default new Vuex.Store<IPluginState>({
   },
   plugins: [vuexPersistence.plugin],
 });
+
+if (vuexStore.state.settings?.loadSettingsFromChromeStorage) {
+  try {
+    chrome.storage.local.get(ChromeStorageKeys.SETTINGS).then((result) => {
+      const settings = result[ChromeStorageKeys.SETTINGS];
+
+      if (settings) {
+        vuexStore.commit(`settings/${SettingsMutations.SET_SETTINGS}`, settings);
+      }
+    });
+  } catch (e) {
+    console.error(e);
+  }
+}
+
+export default vuexStore;
