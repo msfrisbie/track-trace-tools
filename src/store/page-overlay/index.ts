@@ -84,15 +84,9 @@ const vuexPersistence = new VuexPersistence({
   ...vuexLocal,
   ...vuexShared,
   // https://github.com/championswimmer/vuex-persist/blob/57d79b4a526ca12cafe7341613d8382621a0d704/src/index.ts#L229
-  saveState(key: string, state: {}, storage: Storage | undefined): void {
-    try {
-      chrome.storage.local.set({ [ChromeStorageKeys.SETTINGS]: (state as IPluginState).settings });
-    } catch (e) {
-      console.error(e);
-    }
-
-    return storage!.setItem(key, JSON.stringify(state));
-  },
+  // saveState(key: string, state: {}, storage: Storage | undefined): void {
+  //   return storage!.setItem(key, JSON.stringify(state));
+  // },
 });
 
 Vue.use(Vuex);
@@ -463,18 +457,20 @@ const vuexStore = new Vuex.Store<IPluginState>({
   plugins: [vuexPersistence.plugin],
 });
 
-if (vuexStore.state.settings?.loadSettingsFromChromeStorage) {
-  try {
-    chrome.storage.local.get(ChromeStorageKeys.SETTINGS).then((result) => {
-      const settings = result[ChromeStorageKeys.SETTINGS];
+try {
+  chrome.storage.local.get(ChromeStorageKeys.SETTINGS).then((result) => {
+    console.log("Stored settings", result);
 
-      if (settings) {
-        vuexStore.commit(`settings/${SettingsMutations.SET_SETTINGS}`, settings);
-      }
-    });
-  } catch (e) {
-    console.error(e);
-  }
+    const settings = result[ChromeStorageKeys.SETTINGS];
+
+    if (settings) {
+      console.log("Rehydrating settings");
+      vuexStore.commit(`settings/${SettingsMutations.SET_SETTINGS}`, settings);
+    }
+  });
+} catch (e) {
+  console.error(e);
 }
+// }
 
 export default vuexStore;

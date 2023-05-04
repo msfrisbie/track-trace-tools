@@ -22,6 +22,9 @@ export function mockChrome() {
   };
 
   chrome.runtime.getManifest.mockImplementation(() => manifest);
+
+  chrome.storage.local.set.mockImplementation(() => Promise.resolve());
+  chrome.storage.local.get.mockImplementation(() => Promise.resolve({}));
 }
 
 export function mockDebugUtils() {

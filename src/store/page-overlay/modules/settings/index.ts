@@ -1,4 +1,5 @@
 import {
+  ChromeStorageKeys,
   LandingPage,
   PackageTabLabel,
   PlantsTabLabel,
@@ -53,7 +54,7 @@ const persistedState: ISettingsState = {
   preventActiveProjectPageLeave: true,
   enableSearchOverMetrcModal: false,
   useIsoDateFormatForSubmit: true,
-  loadSettingsFromChromeStorage: false,
+  writeSettingsToChromeStorage: false,
   loadDataInParallel: true,
   usePersistedCache: false,
 };
@@ -70,6 +71,15 @@ export const settingsModule = {
       for (const [key, value] of Object.entries(settings)) {
         // @ts-ignore
         state[key] = value;
+      }
+
+      if (state.writeSettingsToChromeStorage) {
+        console.log("Persisting settings");
+        try {
+          chrome.storage.local.set({ [ChromeStorageKeys.SETTINGS]: state });
+        } catch (e) {
+          console.error(e);
+        }
       }
     },
     [SettingsMutations.SET_HOME_LICENSE](state: ISettingsState, homeLicense: [string, string]) {

@@ -243,10 +243,10 @@
           </b-form-checkbox>
 
           <b-form-checkbox
-            id="checkbox-loadSettingsFromChromeStorage"
+            id="checkbox-writeSettingsToChromeStorage"
             class="mb-2"
-            v-model="settings.loadSettingsFromChromeStorage"
-            name="checkbox-loadSettingsFromChromeStorage"
+            v-model="settings.writeSettingsToChromeStorage"
+            name="checkbox-writeSettingsToChromeStorage"
             @change="onChange()"
           >
             Persist T3 to Chrome storage
