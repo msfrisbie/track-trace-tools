@@ -6,10 +6,6 @@
       <debug-button />
     </template>
 
-    <!-- <b-button-group
-      style="box-shadow: 0px 5px 5px rgba(0, 0, 0, 0.5)"
-      class="relative flex flex-row gap-4"
-    > -->
     <template v-if="pluginAuth.authState">
       <div class="flex flex-row gap-2 floating-hover-reveal-target">
         <!-- <snapshot-button class="floating-shadow" /> -->
@@ -21,7 +17,6 @@
     </template>
 
     <!-- <primary-toolkit-button /> -->
-    <!-- </b-button-group> -->
   </div>
 </template>
 
@@ -30,7 +25,6 @@ import BuilderButton from "@/components/page-overlay/BuilderButton.vue";
 import DebugButton from "@/components/page-overlay/DebugButton.vue";
 import QuickScriptButton from "@/components/page-overlay/QuickScriptButton.vue";
 import ScrollButton from "@/components/page-overlay/ScrollButton.vue";
-import SnapshotButton from "@/components/page-overlay/SnapshotButton.vue";
 import store from "@/store/page-overlay/index";
 import Vue from "vue";
 import { mapState } from "vuex";
@@ -41,9 +35,6 @@ export default Vue.extend({
   components: {
     BuilderButton,
     QuickScriptButton,
-    SnapshotButton,
-    // PrimaryToolkitButton,
-    // ListingsButton,
     ScrollButton,
     DebugButton,
   },
