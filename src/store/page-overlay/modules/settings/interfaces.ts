@@ -48,6 +48,7 @@ export interface ISettingsState {
   hideListingsButton: boolean;
   preventActiveProjectPageLeave: boolean;
   enableSearchOverMetrcModal: boolean;
+  autoRefreshOnModalClose: boolean;
   useIsoDateFormatForSubmit: boolean;
   writeSettingsToChromeStorage: boolean;
   loadDataInParallel: boolean;

@@ -1,10 +1,12 @@
 import { MessageType } from "@/consts";
 import { IAtomicService } from "@/interfaces";
+import store from "@/store/page-overlay/index";
 import { debugLogFactory } from "@/utils/debug";
 import { activeMetrcModalOrNull, modalTitleOrError } from "@/utils/metrc-modal";
-import { timer } from "rxjs";
+import _ from "lodash";
 import { analyticsManager } from "./analytics-manager.module";
 import { authManager } from "./auth-manager.module";
+import { pageManager } from "./page-manager.module";
 import { upsertManager } from "./upsert-manager.module";
 
 const debugLog = debugLogFactory("modules/passive-page-analyzer.module.ts");
@@ -13,22 +15,34 @@ class PassivePageAnalyzer implements IAtomicService {
   lastObservedActiveModalName: string | null = null;
 
   async init() {
-    timer(10000, 2000).subscribe(() => {
-      const modal = activeMetrcModalOrNull();
+    const debouncedHandler = _.debounce(() => this.analyzePage(), 100);
 
-      if (!modal) {
-        this.lastObservedActiveModalName = null;
-        return;
+    const observer = new MutationObserver(() => debouncedHandler());
+
+    observer.observe(document.body, { subtree: true, childList: true });
+  }
+
+  private analyzePage() {
+    const modal = activeMetrcModalOrNull();
+
+    if (!modal) {
+      if (this.lastObservedActiveModalName) {
+        analyticsManager.track(MessageType.CLOSED_METRC_MODAL, {});
+        if (store.state.settings.autoRefreshOnModalClose) {
+          pageManager.clickRefreshLinks();
+        }
       }
+      this.lastObservedActiveModalName = null;
+      return;
+    }
 
-      this.recordModalState(modal as HTMLElement);
+    this.recordModalState(modal as HTMLElement);
 
-      try {
-        this.maybeRecordFieldNames(modal as HTMLElement);
-      } catch (e) {
-        console.error(e);
-      }
-    });
+    try {
+      this.maybeRecordFieldNames(modal as HTMLElement);
+    } catch (e) {
+      console.error(e);
+    }
   }
 
   recordModalState(modalElement: HTMLElement) {

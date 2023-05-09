@@ -203,6 +203,16 @@
       </b-form-checkbox> -->
 
           <b-form-checkbox
+            id="checkbox-autoRefreshOnModalClose"
+            class="mb-2"
+            v-model="settings.autoRefreshOnModalClose"
+            name="checkbox-autoRefreshOnModalClose"
+            @change="onChange()"
+          >
+            Auto-refresh Metrc interface after closing modal windows
+          </b-form-checkbox>
+
+          <b-form-checkbox
             id="checkbox-enableSearchOverMetrcModal"
             class="mb-2"
             v-model="settings.enableSearchOverMetrcModal"
