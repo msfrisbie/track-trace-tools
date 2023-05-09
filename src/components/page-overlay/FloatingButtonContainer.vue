@@ -12,7 +12,7 @@
     > -->
     <template v-if="pluginAuth.authState">
       <div class="flex flex-row gap-2 floating-hover-reveal-target">
-        <snapshot-button class="floating-shadow" />
+        <!-- <snapshot-button class="floating-shadow" /> -->
 
         <quick-script-button class="floating-shadow" />
       </div>
