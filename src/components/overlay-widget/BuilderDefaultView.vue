@@ -188,11 +188,10 @@ export default Vue.extend({
           route: "/transfer/create-transfer",
           icon: "truck-loading",
           enabled: isIdentityEligibleForTransferTools({
-            identity: this.$store.state.authState?.identity,
             hostname: window.location.hostname,
           }),
           visible: true,
-          isBeta: false,
+          isBeta: true,
           isNew: false,
           helpRoute: "/help/transfer",
         },

@@ -1,4 +1,8 @@
-const ALLOW_TRANSFER_TOOL_ACCESS_HOSTNAMES: string[] = ["ca.metrc.com", "mi.metrc.com"];
+const ALLOW_TRANSFER_TOOL_ACCESS_HOSTNAMES: string[] = [
+  "ca.metrc.com",
+  "mi.metrc.com",
+  "testing-az.metrc.com",
+];
 const DENY_TRANSFER_TOOL_ACCESS_REGEXPS: RegExp[] = [];
 
 // Adds coverage to any possible subdomain
@@ -52,20 +56,10 @@ export function isLicenseEligibleForItemTemplateTools({
   return false;
 }
 
-export function isIdentityEligibleForTransferTools({
-  identity,
-  hostname,
-}: {
-  identity: string | null;
-  hostname: string;
-}): boolean {
-  if (!identity) {
-    return false;
-  }
-
-  if (!ALLOW_TRANSFER_TOOL_ACCESS_HOSTNAMES.includes(hostname)) {
-    return false;
-  }
+export function isIdentityEligibleForTransferTools({ hostname }: { hostname: string }): boolean {
+  // if (!ALLOW_TRANSFER_TOOL_ACCESS_HOSTNAMES.includes(hostname)) {
+  //   return false;
+  // }
 
   // if (regExpMatchOrNull({ value: identity, regExps: DENY_TRANSFER_TOOL_ACCESS_REGEXPS })) {
   //   return false;

@@ -361,6 +361,9 @@ class BuilderManager implements IAtomicService {
       case BuilderType.CREATE_TRANSFER:
         response = await primaryMetrcRequestManager.createTransfers(JSON.stringify(rows));
         break;
+      case BuilderType.UPDATE_TRANSFER:
+        response = await primaryMetrcRequestManager.updateTransfers(JSON.stringify(rows));
+        break
       case BuilderType.CREATE_ITEMS:
         response = await primaryMetrcRequestManager.createItems(JSON.stringify(rows));
         break;

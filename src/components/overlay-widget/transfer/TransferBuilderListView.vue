@@ -74,7 +74,7 @@ export default Vue.extend({
       builderOptions: [
         {
           route: "/transfer/create-transfer",
-          text: "CREATE TRANSFER",
+          text: "CREATE/EDIT TRANSFER",
           icon: "truck-loading",
           backgroundColor: "#773c77",
           enabled: isCurrentHostAllowed([CALIFORNIA_METRC_HOSTNAME]),

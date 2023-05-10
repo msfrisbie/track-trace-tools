@@ -22,6 +22,7 @@ export interface ITransferBuilderState {
   packageGrossWeights: number[];
   packageGrossUnitsOfWeight: number[];
   isSameSiteTransfer: boolean;
+  transferIdForUpdate: number | null;
 }
 
 export interface ITransferBuilderUpdateData {

@@ -219,7 +219,6 @@ export default Vue.extend({
     },
     isIdentityEligibleForTransferToolsImpl(): boolean {
       return isIdentityEligibleForTransferTools({
-        identity: this.authState?.identity,
         hostname: window.location.hostname,
       });
     },

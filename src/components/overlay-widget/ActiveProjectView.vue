@@ -197,6 +197,7 @@ export default Vue.extend({
         case BuilderType.MOVE_PACKAGES:
           return "packages";
         case BuilderType.CREATE_TRANSFER:
+        case BuilderType.UPDATE_TRANSFER:
         case BuilderType.CREATE_TRANSFER_TEMPLATE:
           return "transfers";
         case BuilderType.DESTROY_PLANTS:

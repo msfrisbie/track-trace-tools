@@ -28,7 +28,8 @@ const inMemoryState = {
   vehicleModel: "",
   vehicleLicensePlate: "",
   phoneNumberForQuestions: "",
-  isSameSiteTransfer: false
+  isSameSiteTransfer: false,
+  transferIdForUpdate: null
 };
 
 const persistedState = {

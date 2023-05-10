@@ -53,6 +53,10 @@ export default Vue.extend({
   props: {
     originAddress: String,
     destinationAddress: String,
+    loadGoogleMapsDirections: {
+      type: Boolean,
+      default: false,
+    },
   },
   components: {
     GoogleMaps,
@@ -60,11 +64,11 @@ export default Vue.extend({
   store,
   computed: {
     plannedRoute: {
-      get() {
+      get(): string {
         // @ts-ignore
         return this.$store.state.transferBuilder.plannedRoute;
       },
-      set(plannedRoute) {
+      set(plannedRoute): void {
         // @ts-ignore
         this.$store.dispatch(`transferBuilder/${TransferBuilderActions.UPDATE_TRANSFER_DATA}`, {
           plannedRoute,
@@ -97,10 +101,13 @@ export default Vue.extend({
   methods: {
     updateDirections() {
       this.$data.showMapsIframe = false;
-      this.$data.directionDataLoading = true;
-
       // @ts-ignore
-      this.updateDirectionsImpl();
+      if (this.loadGoogleMapsDirections) {
+        this.$data.directionDataLoading = true;
+
+        // @ts-ignore
+        this.updateDirectionsImpl();
+      }
     },
     updateDirectionsImpl: _.debounce(async function () {
       // This is a sucky way of binding to this

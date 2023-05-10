@@ -50,7 +50,7 @@
               <div style="height: 3rem"></div>
 
               <b-button class="w-full" variant="success" size="md" @click="submit()"
-                >CREATE TRANSFER</b-button
+                >CREATE/EDIT TRANSFER</b-button
               >
             </div>
 

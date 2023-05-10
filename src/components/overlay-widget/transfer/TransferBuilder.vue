@@ -191,7 +191,7 @@
                 </div>
               </div>
 
-              <template v-if="destinationAddress && originAddress && !isSameSiteTransfer">
+              <template v-if="!isSameSiteTransfer">
                 <route-picker
                   class="flex-grow"
                   :originAddress="originAddress"
@@ -404,8 +404,10 @@
                   variant="success"
                   size="md"
                   @click="submit()"
-                  >CREATE TRANSFER</b-button
                 >
+                  <template v-if="transferIdForUpdate === null"> CREATE TRANSFER </template>
+                  <template v-else> UPDATE TRANSFER </template>
+                </b-button>
               </template>
 
               <template v-else>
@@ -433,6 +435,8 @@ import StartFinishIcons from "@/components/overlay-widget/shared/StartFinishIcon
 import { BuilderType, MessageType, ModalAction, ModalType } from "@/consts";
 import {
   IBuilderComponentError,
+  IComputedGetSet,
+  IComputedGetSetMismatched,
   ICsvFile,
   IMetrcCreateStateAuthorizedTransferPayload,
   IMetrcCreateTransferPayload,
@@ -442,7 +446,9 @@ import {
   IMetrcTransferType,
   IMetrcTransferTypeData,
   IPackageData,
+  IPluginState,
   ITransferData,
+  IUnitOfMeasure,
 } from "@/interfaces";
 import { analyticsManager } from "@/modules/analytics-manager.module";
 import { authManager } from "@/modules/auth-manager.module";
@@ -458,6 +464,7 @@ import {
   TransferBuilderActions,
   TransferBuilderGetters,
 } from "@/store/page-overlay/modules/transfer-builder/consts";
+import { ITransferBuilderState } from "@/store/page-overlay/modules/transfer-builder/interfaces";
 import { facilityReadableAddressLinesOrNull } from "@/utils/address";
 import { buildCsvDataOrError, buildNamedCsvFileData } from "@/utils/csv";
 import { nowIsotime, todayIsodate } from "@/utils/date";
@@ -471,7 +478,7 @@ import { unitOfMeasureNameToAbbreviation } from "@/utils/units";
 import _ from "lodash";
 import { timer } from "rxjs";
 import Vue from "vue";
-import { mapActions, mapGetters, mapState } from "vuex";
+import { mapActions, mapGetters, mapState, Store } from "vuex";
 
 const debugLog = debugLogFactory("TransferBuilder.vue");
 
@@ -570,31 +577,41 @@ export default Vue.extend({
         isodate: todayIsodate(),
       });
 
-      const plannedRoute: string = this.isSameSiteTransfer ? "N/A" : this.plannedRoute;
+      const plannedRoute: string = this.isSameSiteTransfer
+        ? "N/A"
+        : this.transferBuilderState.plannedRoute;
       const estimatedDepartureDateTime: string = this.isSameSiteTransfer
         ? isoNowDatetime
         : combineTimeAndDate({
-            isodate: this.departureIsodate,
-            isotime: this.departureIsotime,
+            isodate: this.transferBuilderState.departureIsodate,
+            isotime: this.transferBuilderState.departureIsotime,
           });
       const estimatedArrivalDateTime: string = this.isSameSiteTransfer
         ? isoNowDatetime
         : combineTimeAndDate({
-            isodate: this.arrivalIsodate,
-            isotime: this.arrivalIsotime,
+            isodate: this.transferBuilderState.arrivalIsodate,
+            isotime: this.transferBuilderState.arrivalIsotime,
           });
 
-      const driverName: string = this.isSameSiteTransfer ? "N/A" : this.driverName;
-      const driverEmployeeId: string = this.isSameSiteTransfer ? "N/A" : this.driverEmployeeId;
+      const driverName: string = this.isSameSiteTransfer
+        ? "N/A"
+        : this.transferBuilderState.driverName;
+      const driverEmployeeId: string = this.isSameSiteTransfer
+        ? "N/A"
+        : this.transferBuilderState.driverEmployeeId;
       const driverLicenseNumber: string = this.isSameSiteTransfer
         ? "N/A"
-        : this.driverLicenseNumber;
+        : this.transferBuilderState.driverLicenseNumber;
 
-      const vehicleMake: string = this.isSameSiteTransfer ? "N/A" : this.vehicleMake;
-      const vehicleModel: string = this.isSameSiteTransfer ? "N/A" : this.vehicleModel;
+      const vehicleMake: string = this.isSameSiteTransfer
+        ? "N/A"
+        : this.transferBuilderState.vehicleMake;
+      const vehicleModel: string = this.isSameSiteTransfer
+        ? "N/A"
+        : this.transferBuilderState.vehicleModel;
       const vehicleLicensePlate: string = this.isSameSiteTransfer
         ? "N/A"
-        : this.vehicleLicensePlate;
+        : this.transferBuilderState.vehicleLicensePlate;
 
       const packages: IMetrcTransferPackageData[] = [];
 
@@ -604,12 +621,14 @@ export default Vue.extend({
         let GrossUnitOfWeightId: string = "";
 
         if (this.isTransferSubmittedWithWholesalePrice) {
-          WholesalePrice = (this as any).wholesalePackageValues[idx].toString();
+          WholesalePrice = this.wholesalePackageValues[idx].toString();
         }
 
         if (this.isTransferSubmittedWithGrossWeight) {
-          GrossWeight = (this as any).packageGrossWeights[idx].toString();
-          GrossUnitOfWeightId = (this as any).packageGrossUnitsOfWeight[idx].Id.toString();
+          GrossWeight = this.packageGrossWeights[idx].toString();
+          GrossUnitOfWeightId = (this.$data.unitsOfWeight as IUnitOfMeasure[])[
+            this.packageGrossUnitsOfWeight[idx]
+          ].Id.toString();
         }
 
         packages.push({
@@ -709,12 +728,11 @@ export default Vue.extend({
         rows,
         this.$data.builderType,
         {
-          packageTotal: (this as any).transferPackages.length,
+          packageTotal: this.transferPackages.length,
           origin: this.originFacility,
           destination: this.destinationFacility,
           transporter: this.transporterFacility,
         },
-        // @ts-ignore
         this.buildCsvFiles(),
         5
       );
@@ -736,9 +754,7 @@ export default Vue.extend({
         const csvData = buildCsvDataOrError([
           {
             isVector: true,
-            data: (this as any).transferPackages.map(
-              (packageData: IPackageData) => packageData.Label
-            ),
+            data: this.transferPackages.map((packageData: IPackageData) => packageData.Label),
           },
           {
             isVector: false,
@@ -762,27 +778,25 @@ export default Vue.extend({
           },
           {
             isVector: false,
-            data: `${this.driverName}|${this.driverEmployeeId}|${this.driverLicenseNumber}`,
+            data: `${this.transferBuilderState.driverName}|${this.transferBuilderState.driverEmployeeId}|${this.transferBuilderState.driverLicenseNumber}`,
           },
           {
             isVector: false,
-            data: `${this.vehicleMake}|${this.vehicleModel}|${this.vehicleLicensePlate}`,
+            data: `${this.transferBuilderState.vehicleMake}|${this.transferBuilderState.vehicleModel}|${this.transferBuilderState.vehicleLicensePlate}`,
           },
           {
             isVector: false,
-            data: `${this.departureIsodate} ${this.departureIsotime}`,
+            data: `${this.transferBuilderState.departureIsodate} ${this.transferBuilderState.departureIsotime}`,
           },
           {
             isVector: false,
-            data: `${this.arrivalIsodate} ${this.arrivalIsotime}`,
+            data: `${this.transferBuilderState.arrivalIsodate} ${this.transferBuilderState.arrivalIsotime}`,
           },
         ]);
 
         return buildNamedCsvFileData(
           csvData,
-          `Transfer ${(this as any).transferPackages.length} packages from ${
-            originFacility.LicenseNumber
-          } to ${destinationFacility.LicenseNumber} via ${transporterFacility.LicenseNumber}`
+          `Transfer ${this.transferPackages.length} packages from ${originFacility.LicenseNumber} to ${destinationFacility.LicenseNumber} via ${transporterFacility.LicenseNumber}`
         );
       } catch (e) {
         console.error(e);
@@ -792,7 +806,7 @@ export default Vue.extend({
     calculateErrors(): IBuilderComponentError[] {
       const errors: IBuilderComponentError[] = [];
 
-      if ((this as any).transferPackages.length === 0) {
+      if (this.transferPackages.length === 0) {
         errors.push({
           tags: ["page1"],
           message: "Select at least one package to transfer",
@@ -834,43 +848,43 @@ export default Vue.extend({
       }
 
       if (!this.isSameSiteTransfer && !this.isTransferSubmittedWithoutTransporter) {
-        if (!this.plannedRoute) {
+        if (!this.transferBuilderState.plannedRoute) {
           errors.push({ tags: ["page2"], message: "Enter a planned route" });
         }
-        if (!this.departureIsodate) {
+        if (!this.transferBuilderState.departureIsodate) {
           errors.push({ tags: ["page3"], message: "Select a departure date" });
         }
-        if (!this.departureIsotime) {
+        if (!this.transferBuilderState.departureIsotime) {
           errors.push({ tags: ["page3"], message: "Select a departure time" });
         }
-        if (!this.arrivalIsodate) {
+        if (!this.transferBuilderState.arrivalIsodate) {
           errors.push({ tags: ["page3"], message: "Select an arrivaal date" });
         }
-        if (!this.arrivalIsotime) {
+        if (!this.transferBuilderState.arrivalIsotime) {
           errors.push({ tags: ["page3"], message: "Select an arrival time" });
         }
-        if (!this.driverName) {
+        if (!this.transferBuilderState.driverName) {
           errors.push({ tags: ["page3"], message: "Enter a driver name" });
         }
-        if (!this.driverEmployeeId) {
+        if (!this.transferBuilderState.driverEmployeeId) {
           errors.push({
             tags: ["page3"],
             message: "Enter a driver employee ID",
           });
         }
-        if (!this.driverLicenseNumber) {
+        if (!this.transferBuilderState.driverLicenseNumber) {
           errors.push({
             tags: ["page3"],
             message: "Enter a driver license number",
           });
         }
-        if (!this.vehicleMake) {
+        if (!this.transferBuilderState.vehicleMake) {
           errors.push({ tags: ["page3"], message: "Enter a vehicle make" });
         }
-        if (!this.vehicleModel) {
+        if (!this.transferBuilderState.vehicleModel) {
           errors.push({ tags: ["page3"], message: "Enter a vehicle model" });
         }
-        if (!this.vehicleLicensePlate) {
+        if (!this.transferBuilderState.vehicleLicensePlate) {
           errors.push({
             tags: ["page3"],
             message: "Enter a vehicle license plate",
@@ -888,9 +902,9 @@ export default Vue.extend({
         return typeof n === "number";
       }
 
-      for (let i = 0; i < (this as any).transferPackages.length; ++i) {
-        if ((this as any).isTransferSubmittedWithWholesalePrice) {
-          const wholesalePrice = parseFloat((this as any).wholesalePackageValues[i]);
+      for (let i = 0; i < this.transferPackages.length; ++i) {
+        if (this.isTransferSubmittedWithWholesalePrice) {
+          const wholesalePrice = parseFloat(this.wholesalePackageValues[i].toString());
 
           if (!isNumber(wholesalePrice)) {
             errors.push({
@@ -900,9 +914,9 @@ export default Vue.extend({
           }
         }
 
-        if ((this as any).isTransferSubmittedWithGrossWeight) {
-          const grossWeight = parseFloat((this as any).packageGrossWeights[i]);
-          const unitOfMeasure = (this as any).packageGrossUnitsOfWeight[i];
+        if (this.isTransferSubmittedWithGrossWeight) {
+          const grossWeight = parseFloat(this.packageGrossWeights[i].toString());
+          const unitOfMeasure = this.packageGrossUnitsOfWeight[i];
 
           if (!isNumber(grossWeight)) {
             errors.push({
@@ -925,22 +939,12 @@ export default Vue.extend({
   },
   watch: {},
   computed: {
-    ...mapState({
-      authState: (state: any) => state.pluginAuth.authState,
-      accountEnabled: (state: any) => state.accountEnabled,
-      plannedRoute: (state: any) => state.transferBuilder.plannedRoute,
-      departureIsodate: (state: any) => state.transferBuilder.departureIsodate,
-      departureIsotime: (state: any) => state.transferBuilder.departureIsotime,
-      arrivalIsodate: (state: any) => state.transferBuilder.arrivalIsodate,
-      arrivalIsotime: (state: any) => state.transferBuilder.arrivalIsotime,
-      vehicleMake: (state: any) => state.transferBuilder.vehicleMake,
-      vehicleModel: (state: any) => state.transferBuilder.vehicleModel,
-      vehicleLicensePlate: (state: any) => state.transferBuilder.vehicleLicensePlate,
-      driverName: (state: any) => state.transferBuilder.driverName,
-      driverEmployeeId: (state: any) => state.transferBuilder.driverEmployeeId,
-      driverLicenseNumber: (state: any) => state.transferBuilder.driverLicenseNumber,
-      weightOptions() {
-        return this.$data.unitsOfWeight.map((unitOfWeight: any) => ({
+    ...mapState<IPluginState>({
+      authState: (state: IPluginState) => state.pluginAuth.authState,
+      accountEnabled: (state: IPluginState) => state.accountEnabled,
+      weightOptions(): { text: string; unitOfWeight: IUnitOfMeasure }[] {
+        // @ts-ignore
+        return this.$data.unitsOfWeight.map((unitOfWeight: IUnitOfMeasure) => ({
           text: unitOfWeight.Name,
           value: unitOfWeight,
         }));
@@ -952,31 +956,27 @@ export default Vue.extend({
     }),
     pageOneErrorMessage(): string | null {
       return (
-        // @ts-ignore
         this.errors.find((x: IBuilderComponentError) => x.tags.includes("page1"))?.message || null
       );
     },
     pageTwoErrorMessage(): string | null {
       return (
-        // @ts-ignore
         this.errors.find((x: IBuilderComponentError) => x.tags.includes("page2"))?.message || null
       );
     },
     pageThreeErrorMessage(): string | null {
       return (
-        // @ts-ignore
         this.errors.find((x: IBuilderComponentError) => x.tags.includes("page3"))?.message || null
       );
     },
     errorMessage(): string | null {
-      return (
-        // @ts-ignore
-        this.errors.find((x: IBuilderComponentError) => true)?.message || null
-      );
+      return this.errors.find((x: IBuilderComponentError) => true)?.message || null;
     },
     errors(): IBuilderComponentError[] {
-      // @ts-ignore
       return this.calculateErrors();
+    },
+    transferBuilderState(): ITransferBuilderState {
+      return this.$store.state.transferBuilder;
     },
     transferType: {
       get(): IMetrcTransferType | null {
@@ -987,7 +987,7 @@ export default Vue.extend({
           transferType,
         });
       },
-    },
+    } as IComputedGetSetMismatched<IMetrcTransferType | null, ITransferData>,
     originFacility: {
       get(): IMetrcFacilityData | null {
         return this.$store.state.transferBuilder.originFacility;
@@ -997,7 +997,7 @@ export default Vue.extend({
           originFacility,
         });
       },
-    },
+    } as IComputedGetSet<IMetrcFacilityData | null>,
     phoneNumberForQuestions: {
       get(): string {
         return this.$store.state.transferBuilder.phoneNumberForQuestions;
@@ -1007,7 +1007,7 @@ export default Vue.extend({
           phoneNumberForQuestions,
         });
       },
-    },
+    } as IComputedGetSet<string>,
     destinationFacility: {
       get(): IMetrcFacilityData | null {
         return this.$store.state.transferBuilder.destinationFacility;
@@ -1017,7 +1017,7 @@ export default Vue.extend({
           destinationFacility,
         });
       },
-    },
+    } as IComputedGetSet<IMetrcFacilityData | null>,
     transporterFacility: {
       get(): IMetrcFacilityData | null {
         return this.$store.state.transferBuilder.transporterFacility;
@@ -1027,7 +1027,7 @@ export default Vue.extend({
           transporterFacility,
         });
       },
-    },
+    } as IComputedGetSet<IMetrcFacilityData | null>,
     wholesalePackageValues: {
       get() {
         return this.$store.state.transferBuilder.wholesalePackageValues;
@@ -1037,7 +1037,7 @@ export default Vue.extend({
           wholesalePackageValues,
         });
       },
-    },
+    } as IComputedGetSet<number[]>,
     packageGrossWeights: {
       get() {
         return this.$store.state.transferBuilder.packageGrossWeights;
@@ -1047,7 +1047,7 @@ export default Vue.extend({
           packageGrossWeights,
         });
       },
-    },
+    } as IComputedGetSet<number[]>,
     packageGrossUnitsOfWeight: {
       get() {
         return this.$store.state.transferBuilder.packageGrossUnitsOfWeight;
@@ -1057,7 +1057,7 @@ export default Vue.extend({
           packageGrossUnitsOfWeight,
         });
       },
-    },
+    } as IComputedGetSet<number[]>,
     isSameSiteTransfer: {
       get(): boolean {
         return this.$store.state.transferBuilder.isSameSiteTransfer;
@@ -1067,10 +1067,9 @@ export default Vue.extend({
           isSameSiteTransfer,
         });
       },
-    },
+    } as IComputedGetSet<boolean>,
     isTransferSubmittedWithoutTransporter(): boolean {
       return (
-        // @ts-ignore
         this.transferType?.Name === "State Authorized" &&
         window.location.hostname === "ca.metrc.com"
       );
@@ -1079,10 +1078,9 @@ export default Vue.extend({
       return window.location.hostname === "mi.metrc.com";
     },
     isTransferSubmittedWithWholesalePrice(): boolean {
-      // @ts-ignore
       return this.transferType?.Name === "Wholesale";
     },
-    transferTypeOptions() {
+    transferTypeOptions(): { value: IMetrcTransferType; text: string; disabled: boolean }[] {
       return this.$data.transferTypes
         .map((transferType: IMetrcTransferTypeData) => {
           const enabled = true; //["Transfer", "Return", "State Authorized"].includes(transferType.Name);
@@ -1099,7 +1097,6 @@ export default Vue.extend({
       return this.transferPackageList.packages;
     },
     csvFiles(): ICsvFile[] {
-      // @ts-ignore
       return this.buildCsvFiles();
     },
   },
@@ -1147,7 +1144,6 @@ export default Vue.extend({
     this.$data.unitsOfWeight = await dynamicConstsManager.unitsOfWeight();
 
     try {
-      // @ts-ignore
       this.$store.dispatch(`transferBuilder/${TransferBuilderActions.REFRESH_PACKAGES}`);
 
       // Currently limit support to Transfer
@@ -1179,7 +1175,7 @@ export default Vue.extend({
       this.phoneNumberForQuestions = this.$data.defaultPhoneNumberForQuestions;
 
       dynamicConstsManager.facilityMap().then((facilityMap: Map<string, IMetrcFacilityData>) => {
-        this.originFacility = facilityMap.get(authState.license);
+        this.originFacility = facilityMap.get(authState.license) ?? null;
 
         this.$data.originAddress = (
           facilityReadableAddressLinesOrNull(this.originFacility as IMetrcFacilityData) || []

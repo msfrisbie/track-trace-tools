@@ -83,6 +83,7 @@ const IMMATURE_PLANT_PACKAGES_FROM_MOTHER_PLANT_URL =
 const IMMATURE_PLANT_PACKAGES_FROM_MOTHER_PLANT_BATCH_URL =
   origin() + "/api/plantbatches/create/packages";
 const CREATE_TRANSFERS_URL = origin() + "/api/transfers/create";
+const UPDATE_TRANSFERS_URL = origin() + "/api/transfers/update";
 
 // DATAIMPORT
 const DATAIMPORT_MOVE_PLANTS_URL = origin() + "/api/dataimport/plants/change/locations";
@@ -697,6 +698,18 @@ export class MetrcRequestManager implements IAtomicService {
 
   async createTransfers(body: string) {
     return customFetch(CREATE_TRANSFERS_URL, {
+      ...DEFAULT_FETCH_POST_OPTIONS,
+      // @ts-ignore
+      headers: {
+        ...(await buildAuthenticationHeaders(this.authStateOrError)),
+        ...JSON_HEADERS,
+      },
+      body,
+    });
+  }
+
+  async updateTransfers(body: string) {
+    return customFetch(UPDATE_TRANSFERS_URL, {
       ...DEFAULT_FETCH_POST_OPTIONS,
       // @ts-ignore
       headers: {

@@ -1,12 +1,10 @@
 <template>
   <div class="flex flex-col items-center">
-    <font-awesome-icon class="mb-1 mt-4" size="md" :icon="['far', 'circle']" />
+    <font-awesome-icon class="mb-1 mt-4" size="lg" :icon="['far', 'circle']" />
     <template v-for="x in Array(ellipsisCount)">
-      <font-awesome-icon v-bind:key="x" size="md" icon="ellipsis-v" style="margin-bottom: 1px" />
+      <font-awesome-icon v-bind:key="x" size="lg" icon="ellipsis-v" style="margin-bottom: 1px" />
     </template>
-    <!-- <font-awesome-icon size="md" icon="ellipsis-v" style="margin-bottom: 1px" />
-    <font-awesome-icon size="md" icon="ellipsis-v" /> -->
-    <font-awesome-icon class="mt-1 mb-4" size="2x" icon="map-marker-alt" />
+    <font-awesome-icon class="mt-1 mb-4" size="lg" icon="map-marker-alt" />
   </div>
 </template>
 
@@ -23,19 +21,19 @@ export default Vue.extend({
   props: {
     ellipsisCount: {
       type: Number,
-      default: 3
-    }
+      default: 3,
+    },
   },
   components: {},
   computed: {
-    ...mapState([])
+    ...mapState([]),
   },
   data() {
     return {};
   },
   methods: {},
   async created() {},
-  async mounted() {}
+  async mounted() {},
 });
 </script>
 

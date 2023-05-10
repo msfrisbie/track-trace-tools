@@ -14,6 +14,7 @@ import {
   ToolkitView,
   TransferState,
 } from "@/consts";
+import { Store } from "vuex";
 import { IExplorerState } from "./store/page-overlay/modules/explorer/interfaces";
 import { IFlagsState } from "./store/page-overlay/modules/flags/interfaces";
 import { IListingState } from "./store/page-overlay/modules/listing/interfaces";
@@ -32,6 +33,18 @@ import { CsvUpload, CsvUploadStatus } from "./types";
 export type PlantBatchTypeName = "Clone" | "Seed";
 export type PlantGrowthPhase = "Vegetative" | "Flowering";
 export type HarvestType = "WholePlant" | "Manicure";
+
+export interface IComputedGetSet<T> {
+  get: () => T,
+  set: (x: T) => void,
+  $store: Store<IPluginState>
+}
+
+export interface IComputedGetSetMismatched<T, U> {
+  get: () => T,
+  set: (x: U) => void,
+  $store: Store<IPluginState>
+}
 
 export interface IAtomicService {
   init: () => Promise<void>;

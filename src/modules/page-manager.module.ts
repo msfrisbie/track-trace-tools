@@ -739,7 +739,6 @@ class PageManager implements IAtomicService {
     if (!this.tttTransferButton) {
       if (
         !isIdentityEligibleForTransferTools({
-          identity: (await authManager.authStateOrNull())?.identity || null,
           hostname: window.location.hostname,
         })
       ) {
@@ -846,7 +845,6 @@ class PageManager implements IAtomicService {
     if (!this.tttTransferButton) {
       if (
         !isIdentityEligibleForTransferTools({
-          identity: (await authManager.authStateOrNull())?.identity || null,
           hostname: window.location.hostname,
         })
       ) {
@@ -951,7 +949,6 @@ class PageManager implements IAtomicService {
 
     if (
       !isIdentityEligibleForTransferTools({
-        identity: authState?.identity,
         hostname: window.location.hostname,
       })
     ) {
@@ -1111,7 +1108,6 @@ class PageManager implements IAtomicService {
 
       //     if (
       //         isIdentityEligibleForTransferTools({
-      //             identity: authState.identity,
       //             hostname: window.location.hostname,
       //         })) {
 
