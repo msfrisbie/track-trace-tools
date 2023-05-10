@@ -21,3 +21,20 @@ Specify generics when using mapState
 ## Tailwind Grid
 
 `grid grid-rows-[200px_minmax(900px,_1fr)_100px]`
+
+## Typing Vue Get/Set
+
+See transfer builder:
+
+```
+originFacility: {
+    get(): IMetrcFacilityData | null {
+    return this.$store.state.transferBuilder.originFacility;
+    },
+    set(originFacility) {
+    this.$store.dispatch(`transferBuilder/${TransferBuilderActions.UPDATE_TRANSFER_DATA}`, {
+        originFacility,
+    });
+    },
+} as IComputedGetSet<IMetrcFacilityData | null>,
+```
