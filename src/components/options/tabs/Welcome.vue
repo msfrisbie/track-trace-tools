@@ -7,7 +7,7 @@
       use it.
     </p>
 
-    <div class="flex flex-col items-center gap-2">
+    <!-- <div class="flex flex-col items-center gap-2">
       <div
         class="fake-metrc-container flex flex-row justify-end items-end border-b border-r border-gray-500"
         style="height: 250px; width: 500px"
@@ -25,7 +25,18 @@
         The Toolbox button will appear in the bottom right. <br />
         Click it to access tools and change your settings.
       </div>
-    </div>
+
+    </div> -->
+
+    <iframe
+      width="950"
+      height="534"
+      src="https://www.youtube.com/embed/p1ubKzy4ZKQ"
+      title="Track &amp; Trace Tools Demo"
+      frameborder="0"
+      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+      allowfullscreen
+    ></iframe>
   </div>
 </template>
 
@@ -44,7 +55,7 @@ export default Vue.extend({
   router,
   props: {},
   components: {
-    TrackTraceToolsLogo,
+    // TrackTraceToolsLogo,
   },
   computed: {
     ...mapState([]),
