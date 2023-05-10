@@ -8,6 +8,19 @@
 
     <template v-if="pluginAuth.authState">
       <div class="flex flex-row gap-2 floating-hover-reveal-target">
+        <b-button
+          title="Search survey"
+          variant="primary"
+          class="floating-shadow"
+          style="padding: 0"
+          href="https://forms.gle/HnGn8hAN9tMXK3fp9"
+          target="_blank"
+        >
+          <div class="flex flex-col items-center justify-center" style="width: 52px; height: 52px">
+            <font-awesome-icon icon="poll" style="height: 26px"></font-awesome-icon>
+          </div>
+        </b-button>
+
         <!-- <snapshot-button class="floating-shadow" /> -->
 
         <quick-script-button class="floating-shadow" />

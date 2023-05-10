@@ -176,6 +176,7 @@ library.add(
   fontawesomeSolid.faPhone,
   fontawesomeSolid.faPlus,
   fontawesomeSolid.faPlusCircle,
+  fontawesomeSolid.faPoll,
   fontawesomeSolid.faPrint,
   fontawesomeSolid.faPumpMedical,
   fontawesomeSolid.faQuestionCircle,

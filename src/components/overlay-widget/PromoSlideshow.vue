@@ -178,6 +178,21 @@
             <div>Securely generate reports and export data with T3 Snapshots</div>
           </div>
         </template>
+        <template v-if="slide === 'searchsurvey'">
+          <div class="text-gray-700 flex flex-col justify-around gap-2">
+            <div class="font-semibold ttt-purple">T3 Search is getting an upgrade!</div>
+            <div>
+              <a
+                class="text-purple-500 hover:text-purple-500 underline"
+                href="https://forms.gle/HnGn8hAN9tMXK3fp9"
+                target="_blank"
+                @click.stop
+                >Take this quick survey</a
+              >
+              to make sure search V2 has what you need
+            </div>
+          </div>
+        </template>
         <template v-if="slide === 'share'">
           <div class="text-gray-700 flex flex-col justify-around gap-2">
             <div class="font-semibold ttt-purple">
@@ -304,6 +319,7 @@ export default Vue.extend({
         "share",
         // "donate",
         "googlesheets",
+        "searchsurvey",
       ]),
     };
   },
