@@ -37,14 +37,32 @@ enum BuilderSubmitState {
   SUBMIT_PROJECT_QUEUE,
 }
 
+type IEligibleRowType =
+  | IMetrcHarvestPlantsPayload
+  | IMetrcManicurePlantsPayload
+  | IMetrcMovePlantsPayload
+  | IMetrcMovePackagesPayload
+  | IMetrcDestroyPlantsPayload
+  | IMetrcUnpackImmaturePlantsPayload
+  | IMetrcPromoteImmaturePlantsPayload
+  | IMetrcCreatePackagesFromPackagesPayload
+  | IMetrcFinishPackagesPayload
+  | IMetrcCreatePlantBatchPackagesFromMotherPlantPayload
+  | IMetrcCreatePlantBatchPackagesFromMotherPlantBatchPayload
+  | IMetrcCreateTransferPayload
+  | IMetrcCreateStateAuthorizedTransferPayload
+  | IMetrcCreateItemsPayload
+  | IMetrcReplacePlantBatchTagsPayload
+  | IMetrcReplacePlantTagsPayload;
+
 const debugLog = debugLogFactory("builder-manager.module.ts");
 
 export interface IBuilderProject {
   builderType: BuilderType;
-  pendingRows: Object[];
-  inflightRows: Object[];
-  failedRows: Object[];
-  successRows: Object[];
+  pendingRows: IEligibleRowType[];
+  inflightRows: IEligibleRowType[];
+  failedRows: IEligibleRowType[];
+  successRows: IEligibleRowType[];
   pageSize: number;
 }
 
@@ -98,23 +116,7 @@ class BuilderManager implements IAtomicService {
   }
 
   submitProject(
-    rows:
-      | IMetrcHarvestPlantsPayload[]
-      | IMetrcManicurePlantsPayload[]
-      | IMetrcMovePlantsPayload[]
-      | IMetrcMovePackagesPayload[]
-      | IMetrcDestroyPlantsPayload[]
-      | IMetrcUnpackImmaturePlantsPayload[]
-      | IMetrcPromoteImmaturePlantsPayload[]
-      | IMetrcCreatePackagesFromPackagesPayload[]
-      | IMetrcFinishPackagesPayload[]
-      | IMetrcCreatePlantBatchPackagesFromMotherPlantPayload[]
-      | IMetrcCreatePlantBatchPackagesFromMotherPlantBatchPayload[]
-      | IMetrcCreateTransferPayload[]
-      | IMetrcCreateStateAuthorizedTransferPayload[]
-      | IMetrcCreateItemsPayload[]
-      | IMetrcReplacePlantBatchTagsPayload[]
-      | IMetrcReplacePlantTagsPayload[],
+    rows: IEligibleRowType[],
     builderType: BuilderType,
     summary: Object,
     csvFiles: ICsvFile[],
@@ -131,23 +133,7 @@ class BuilderManager implements IAtomicService {
   }
 
   private async submitProjectImpl(
-    rows:
-      | IMetrcHarvestPlantsPayload[]
-      | IMetrcManicurePlantsPayload[]
-      | IMetrcMovePlantsPayload[]
-      | IMetrcMovePackagesPayload[]
-      | IMetrcDestroyPlantsPayload[]
-      | IMetrcUnpackImmaturePlantsPayload[]
-      | IMetrcPromoteImmaturePlantsPayload[]
-      | IMetrcCreatePackagesFromPackagesPayload[]
-      | IMetrcFinishPackagesPayload[]
-      | IMetrcCreatePlantBatchPackagesFromMotherPlantPayload[]
-      | IMetrcCreatePlantBatchPackagesFromMotherPlantBatchPayload[]
-      | IMetrcCreateTransferPayload[]
-      | IMetrcCreateStateAuthorizedTransferPayload[]
-      | IMetrcCreateItemsPayload[]
-      | IMetrcReplacePlantBatchTagsPayload[]
-      | IMetrcReplacePlantTagsPayload[],
+    rows: IEligibleRowType[],
     builderType: BuilderType,
     summary: Object,
     csvFiles: ICsvFile[],
@@ -264,20 +250,26 @@ class BuilderManager implements IAtomicService {
       );
       success = response.status === 200;
       if (!success && response instanceof Response) {
-        response.text().then((data) => {
-          let errorMessage = data;
-          try {
-            errorMessage = JSON.parse(data)["Message"] ?? data;
-          } catch {}
-          toastManager.openToast(errorMessage, {
-            title: "T3 Submit Error",
-            autoHideDelay: 30000,
-            variant: "danger",
-            appendToast: true,
-            toaster: "ttt-toaster",
-            solid: true,
-          });
-        });
+        response.text().then(
+          (data) => {
+            if (!data.length) {
+              return;
+            }
+            let errorMessage = data;
+            try {
+              errorMessage = JSON.parse(data)["Message"] ?? data;
+            } catch {}
+            toastManager.openToast(errorMessage, {
+              title: "T3 Submit Error",
+              autoHideDelay: 30000,
+              variant: "danger",
+              appendToast: true,
+              toaster: "ttt-toaster",
+              solid: true,
+            });
+          },
+          () => {}
+        );
       }
     } catch (e) {
       console.error(`Builder submit error`, e);
@@ -320,7 +312,7 @@ class BuilderManager implements IAtomicService {
     timer(100).subscribe(() => this.submit());
   }
 
-  async submitRows(rows: Object[], builderType: BuilderType) {
+  async submitRows(rows: IEligibleRowType[], builderType: BuilderType) {
     let response = null;
 
     if (SUBMIT_INTERVAL_DELAY_MS > 0) {
