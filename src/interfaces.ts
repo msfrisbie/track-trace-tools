@@ -1272,6 +1272,12 @@ export interface IMetrcCreateTransferPayload {
   ShipmentLicenseType: string;
 }
 
+export interface IMetrcUpdateTransferPayload {
+  Destinations: IMetrcTransferDestinationData[];
+  Id: number;
+  ShipmentLicenseType: string;
+}
+
 interface IMetrcSharedTransferDestinationData {
   ShipmentLicenseType: string;
   RecipientId: string;

@@ -11,30 +11,14 @@
 
     <div class="col-span-3 h-full">
       <template v-if="activeStepIndex === 0">
-        <div class="grid grid-cols-2 grid-rows-2 gap-8 h-full" style="grid-template-rows: 1fr auto">
-          <single-package-picker
-            class="col-span-2 h-full"
-            :enablePaste="true"
-            :selectedPackages="transferPackages"
-            v-on:removePackage="removePackage({ pkg: $event })"
-            v-on:addPackage="addPackage({ pkg: $event })"
-          />
-
-          <div class="col-start-2 flex flex-col items-stretch space-y-2">
-            <template v-if="!pageOneErrorMessage">
-              <b-button variant="success" size="md" @click="activeStepIndex = 1"> NEXT </b-button>
-            </template>
-
-            <template v-else>
-              <span class="text-center text-red-700"> {{ pageOneErrorMessage }}</span>
-            </template>
-          </div>
-        </div>
-      </template>
-
-      <template v-if="activeStepIndex === 1">
         <div class="grid grid-cols-2 gap-8 h-full">
           <div class="flex flex-col items-stretch space-y-4 hide-scroll overflow-y-auto">
+            <b-form-checkbox size="sm" v-model="editTransfer">
+              <span>Edit existing transfer</span>
+            </b-form-checkbox>
+
+            <transfer-picker v-if="editTransfer" :transfer.sync="transferToEdit"></transfer-picker>
+
             <template v-if="!destinationFacility">
               <b-form-group label="SELECT DESTINATION" label-class="text-gray-400" label-size="sm">
                 <!-- position:relative fixes a bug where the dropdown falls off the screen -->
@@ -212,14 +196,36 @@
               class="col-span-2 flex flex-col justify-end"
               v-bind:class="{ 'flex-grow': isSameSiteTransfer }"
             >
-              <template v-if="!pageTwoErrorMessage">
-                <b-button variant="success" size="md" @click="activeStepIndex = 2"> NEXT </b-button>
+              <template v-if="!pageOneErrorMessage">
+                <b-button variant="success" size="md" @click="activeStepIndex = 1"> NEXT </b-button>
               </template>
 
               <template v-else>
-                <span class="text-center text-red-700"> {{ pageTwoErrorMessage }}</span>
+                <span class="text-center text-red-700"> {{ pageOneErrorMessage }}</span>
               </template>
             </div>
+          </div>
+        </div>
+      </template>
+
+      <template v-if="activeStepIndex === 1">
+        <div class="grid grid-cols-2 grid-rows-2 gap-8 h-full" style="grid-template-rows: 1fr auto">
+          <single-package-picker
+            class="col-span-2 h-full"
+            :enablePaste="true"
+            :selectedPackages="transferPackages"
+            v-on:removePackage="removePackage({ pkg: $event })"
+            v-on:addPackage="addPackage({ pkg: $event })"
+          />
+
+          <div class="col-start-2 flex flex-col items-stretch space-y-2">
+            <template v-if="!pageTwoErrorMessage">
+              <b-button variant="success" size="md" @click="activeStepIndex = 2"> NEXT </b-button>
+            </template>
+
+            <template v-else>
+              <span class="text-center text-red-700"> {{ pageTwoErrorMessage }}</span>
+            </template>
           </div>
         </div>
       </template>
@@ -444,6 +450,7 @@ import FacilitySummary from "@/components/overlay-widget/shared/FacilitySummary.
 import RecentFacilityPicker from "@/components/overlay-widget/shared/RecentFacilityPicker.vue";
 import RoutePicker from "@/components/overlay-widget/shared/RoutePicker.vue";
 import SinglePackagePicker from "@/components/overlay-widget/shared/SinglePackagePicker.vue";
+import TransferPicker from "@/components/overlay-widget/shared/TransferPicker.vue";
 import StartFinishIcons from "@/components/overlay-widget/shared/StartFinishIcons.vue";
 import { BuilderType, MessageType, ModalAction, ModalType } from "@/consts";
 import {
@@ -507,6 +514,7 @@ export default Vue.extend({
     RoutePicker,
     SinglePackagePicker,
     StartFinishIcons,
+    TransferPicker,
   },
   methods: {
     ...mapActions({
@@ -821,14 +829,14 @@ export default Vue.extend({
 
       if (this.transferPackages.length === 0) {
         errors.push({
-          tags: ["page1"],
+          tags: ["page2"],
           message: "Select at least one package to transfer",
         });
       }
 
       if (!this.destinationFacility) {
         errors.push({
-          tags: ["page2"],
+          tags: ["page1"],
           message: "Select a destination facility",
         });
       }
@@ -862,7 +870,7 @@ export default Vue.extend({
 
       if (!this.isSameSiteTransfer && !this.isTransferSubmittedWithoutTransporter) {
         if (!this.transferBuilderState.plannedRoute) {
-          errors.push({ tags: ["page2"], message: "Enter a planned route" });
+          errors.push({ tags: ["page1"], message: "Enter a planned route" });
         }
         if (!this.transferBuilderState.departureIsodate) {
           errors.push({ tags: ["page3"], message: "Select a departure date" });
@@ -950,7 +958,14 @@ export default Vue.extend({
       return errors;
     },
   },
-  watch: {},
+  watch: {
+    transferToEdit: {
+      immediate: true,
+      handler(newValue, oldValue) {
+        this.$data.editTransfer = !!this.$data.transferToEdit;
+      },
+    },
+  },
   computed: {
     ...mapState<IPluginState>({
       authState: (state: IPluginState) => state.pluginAuth.authState,
@@ -1144,12 +1159,14 @@ export default Vue.extend({
       showMapsIframe: false,
       unitsOfWeight: [],
       showInitializationError: false,
+      editTransfer: false,
+      transferToEdit: null,
       steps: [
         {
-          stepText: "Select packages to transfer",
+          stepText: "Destination details",
         },
         {
-          stepText: "Destination details",
+          stepText: "Select packages to transfer",
         },
         {
           stepText: "Transport details",

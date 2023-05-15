@@ -17,6 +17,7 @@ import {
   IMetrcReplacePlantBatchTagsPayload,
   IMetrcReplacePlantTagsPayload,
   IMetrcUnpackImmaturePlantsPayload,
+  IMetrcUpdateTransferPayload,
 } from "@/interfaces";
 import { primaryMetrcRequestManager } from "@/modules/metrc-request-manager.module";
 import store from "@/store/page-overlay/index";
@@ -53,7 +54,8 @@ type IEligibleRowType =
   | IMetrcCreateStateAuthorizedTransferPayload
   | IMetrcCreateItemsPayload
   | IMetrcReplacePlantBatchTagsPayload
-  | IMetrcReplacePlantTagsPayload;
+  | IMetrcReplacePlantTagsPayload
+  | IMetrcUpdateTransferPayload;
 
 const debugLog = debugLogFactory("builder-manager.module.ts");
 
