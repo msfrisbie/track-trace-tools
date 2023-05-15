@@ -94,8 +94,14 @@
                   </template>
                 </b-form-group>
 
+                <!-- Only needed for google maps -->
                 <template v-if="!isSameSiteTransfer">
-                  <b-form-group label="ORIGIN ADDRESS" label-class="text-gray-400" label-size="sm">
+                  <b-form-group
+                    label="ORIGIN ADDRESS"
+                    label-class="text-gray-400"
+                    label-size="sm"
+                    class="opacity-0"
+                  >
                     <b-form-textarea
                       v-model="originAddress"
                       rows="3"
@@ -114,11 +120,13 @@
                   <facility-summary :facility="destinationFacility" />
                 </b-form-group>
 
+                <!-- Only needed for google maps -->
                 <template v-if="!isSameSiteTransfer">
                   <b-form-group
                     label="DESTINATION ADDRESS"
                     label-class="text-gray-400"
                     label-size="sm"
+                    class="opacity-0"
                   >
                     <b-form-textarea
                       v-model="destinationAddress"
@@ -235,18 +243,21 @@
             </b-form-group>
 
             <div
-              class="flex flex-col items-stretch text-md text-gray-700 space-y-8 overflow-y-auto toolkit-scroll px-2"
+              class="flex flex-col items-stretch text-md text-gray-700 gap-2 overflow-y-auto toolkit-scroll px-2"
               style="max-height: 35vh"
             >
               <template v-for="(pkg, idx) in transferPackages">
-                <b-card
-                  :key="pkg.Label"
-                  :title="`${pkg.Quantity} ${unitOfMeasureNameToAbbreviation(
-                    pkg.Item.UnitOfMeasureName
-                  )} ${pkg.Item.Name}`"
-                >
+                <div class="border border-gray-200 rounded p-2" v-bind:key="pkg.Label">
+                  <div class="font-bold">{{ pkg.Label }}</div>
+                  <div>
+                    {{
+                      `${pkg.Quantity} ${unitOfMeasureNameToAbbreviation(
+                        pkg.Item.UnitOfMeasureName
+                      )} ${pkg.Item.Name}`
+                    }}
+                  </div>
                   <template v-if="isTransferSubmittedWithGrossWeight">
-                    <b-input-group>
+                    <b-input-group class="mt-2">
                       <b-form-input
                         size="md"
                         type="number"
@@ -278,7 +289,7 @@
                     </b-input-group>
                     <b-form-text>Wholesale Price</b-form-text>
                   </template>
-                </b-card>
+                </div>
               </template>
             </div>
 
@@ -358,7 +369,9 @@
                 </div>
 
                 <b-form-group label="PHONE NUMBER" label-class="text-gray-400" label-size="sm">
-                  <div class="flex flex-row items-center space-x-2">
+                  <div
+                    class="flex flex-row items-center space-x-2 border border-gray-200 px-2 rounded-sm"
+                  >
                     <font-awesome-icon icon="phone" class="text-gray-500" />
 
                     <b-form-input
@@ -1068,6 +1081,16 @@ export default Vue.extend({
         });
       },
     } as IComputedGetSet<boolean>,
+    transferIdForUpdate: {
+      get(): number | null {
+        return this.$store.state.transferBuilder.transferIdForUpdate;
+      },
+      set(transferIdForUpdate) {
+        this.$store.dispatch(`transferBuilder/${TransferBuilderActions.UPDATE_TRANSFER_DATA}`, {
+          transferIdForUpdate,
+        });
+      },
+    } as IComputedGetSet<number | null>,
     isTransferSubmittedWithoutTransporter(): boolean {
       return (
         this.transferType?.Name === "State Authorized" &&

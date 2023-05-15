@@ -1,22 +1,22 @@
 import { BuilderType, MessageType } from "@/consts";
 import {
-    IAtomicService,
-    ICsvFile,
-    IMetrcCreateItemsPayload,
-    IMetrcCreatePackagesFromPackagesPayload,
-    IMetrcCreatePlantBatchPackagesFromMotherPlantBatchPayload,
-    IMetrcCreatePlantBatchPackagesFromMotherPlantPayload,
-    IMetrcCreateStateAuthorizedTransferPayload,
-    IMetrcDestroyPlantsPayload,
-    IMetrcFinishPackagesPayload,
-    IMetrcHarvestPlantsPayload,
-    IMetrcManicurePlantsPayload,
-    IMetrcMovePackagesPayload,
-    IMetrcMovePlantsPayload,
-    IMetrcPromoteImmaturePlantsPayload,
-    IMetrcReplacePlantBatchTagsPayload,
-    IMetrcReplacePlantTagsPayload,
-    IMetrcUnpackImmaturePlantsPayload
+  IAtomicService,
+  ICsvFile,
+  IMetrcCreateItemsPayload,
+  IMetrcCreatePackagesFromPackagesPayload,
+  IMetrcCreatePlantBatchPackagesFromMotherPlantBatchPayload,
+  IMetrcCreatePlantBatchPackagesFromMotherPlantPayload,
+  IMetrcCreateStateAuthorizedTransferPayload,
+  IMetrcDestroyPlantsPayload,
+  IMetrcFinishPackagesPayload,
+  IMetrcHarvestPlantsPayload,
+  IMetrcManicurePlantsPayload,
+  IMetrcMovePackagesPayload,
+  IMetrcMovePlantsPayload,
+  IMetrcPromoteImmaturePlantsPayload,
+  IMetrcReplacePlantBatchTagsPayload,
+  IMetrcReplacePlantTagsPayload,
+  IMetrcUnpackImmaturePlantsPayload,
 } from "@/interfaces";
 import { primaryMetrcRequestManager } from "@/modules/metrc-request-manager.module";
 import store from "@/store/page-overlay/index";
@@ -30,6 +30,7 @@ import { TransferBuilderActions } from "../store/page-overlay/modules/transfer-b
 import { analyticsManager } from "./analytics-manager.module";
 import { authManager } from "./auth-manager.module";
 import { pageManager } from "./page-manager.module";
+import { toastManager } from "./toast-manager.module";
 
 enum BuilderSubmitState {
   IDLE,
@@ -262,8 +263,24 @@ class BuilderManager implements IAtomicService {
         this.activeBuilderProject.builderType
       );
       success = response.status === 200;
+      if (!success && response instanceof Response) {
+        response.text().then((data) => {
+          let errorMessage = data;
+          try {
+            errorMessage = JSON.parse(data)["Message"] ?? data;
+          } catch {}
+          toastManager.openToast(errorMessage, {
+            title: "T3 Submit Error",
+            autoHideDelay: 30000,
+            variant: "danger",
+            appendToast: true,
+            toaster: "ttt-toaster",
+            solid: true,
+          });
+        });
+      }
     } catch (e) {
-      console.error(e);
+      console.error(`Builder submit error`, e);
       error = e;
     }
 
@@ -363,7 +380,7 @@ class BuilderManager implements IAtomicService {
         break;
       case BuilderType.UPDATE_TRANSFER:
         response = await primaryMetrcRequestManager.updateTransfers(JSON.stringify(rows));
-        break
+        break;
       case BuilderType.CREATE_ITEMS:
         response = await primaryMetrcRequestManager.createItems(JSON.stringify(rows));
         break;

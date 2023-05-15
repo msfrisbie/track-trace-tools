@@ -2,7 +2,7 @@
   <div>
     <div class="grid grid-cols-2 gap-4" style="grid-template-columns: auto 1fr">
       <start-finish-icons
-        :ellipsisCount="isSameSiteTransfer ? 6 : 13"
+        :ellipsisCount="isSameSiteTransfer ? 7 : 14"
         class="row-span-3 text-purple-500"
       />
 
