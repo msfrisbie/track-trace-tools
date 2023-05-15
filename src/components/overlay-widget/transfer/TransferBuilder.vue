@@ -917,7 +917,7 @@ export default Vue.extend({
 
       for (let i = 0; i < this.transferPackages.length; ++i) {
         if (this.isTransferSubmittedWithWholesalePrice) {
-          const wholesalePrice = parseFloat(this.wholesalePackageValues[i].toString());
+          const wholesalePrice = parseFloat(this.wholesalePackageValues[i]?.toString());
 
           if (!isNumber(wholesalePrice)) {
             errors.push({
@@ -928,7 +928,7 @@ export default Vue.extend({
         }
 
         if (this.isTransferSubmittedWithGrossWeight) {
-          const grossWeight = parseFloat(this.packageGrossWeights[i].toString());
+          const grossWeight = parseFloat(this.packageGrossWeights[i]?.toString());
           const unitOfMeasure = this.packageGrossUnitsOfWeight[i];
 
           if (!isNumber(grossWeight)) {
