@@ -62,7 +62,7 @@ export default Vue.extend({
     startTransfer() {
       analyticsManager.track(MessageType.STARTED_TRANSFER_FROM_TOOLKIT_SEARCH, {});
       modalManager.dispatchModalEvent(ModalType.BUILDER, ModalAction.OPEN, {
-        initialRoute: "/transfer/create-transfer",
+        initialRoute: "/transfer/transfer-builder",
       });
     },
   },

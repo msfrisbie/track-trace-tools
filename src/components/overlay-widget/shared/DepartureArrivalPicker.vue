@@ -16,10 +16,9 @@
       <div class="py-8 flex flex-col space-y-0">
         <template v-if="!isSameSiteTransfer">
           <b-form-group label="DEPART" label-class="text-gray-400" label-size="sm">
-            <b-input-group>
+            <b-input-group class="flex flex-row gap-1">
               <b-form-timepicker
                 v-model="departureIsotime"
-                class="borderless-input"
                 size="sm"
                 required
                 :state="!departureIsotime ? false : null"
@@ -27,7 +26,6 @@
 
               <b-form-datepicker
                 :date-format-options="dateFormatOptions"
-                class="borderless-input"
                 v-model="departureIsodate"
                 size="sm"
                 required
@@ -37,10 +35,9 @@
           </b-form-group>
 
           <b-form-group label="ARRIVE" label-class="text-gray-400" label-size="sm">
-            <b-input-group>
+            <b-input-group class="flex flex-row gap-1">
               <b-form-timepicker
                 v-model="arrivalIsotime"
-                class="borderless-input"
                 required
                 size="sm"
                 :state="!arrivalIsotime ? false : null"
@@ -48,7 +45,6 @@
 
               <b-form-datepicker
                 :date-format-options="dateFormatOptions"
-                class="borderless-input"
                 required
                 v-model="arrivalIsodate"
                 size="sm"

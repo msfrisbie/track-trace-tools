@@ -54,7 +54,7 @@ import {
   extractParentPackageLabelsFromHistory,
   extractTagQuantityPairsFromHistory,
 } from "@/utils/history";
-import { getId, getItemName, getLabel } from "@/utils/package";
+import { getIdOrError, getItemNameOrError, getLabelOrError } from "@/utils/package";
 import Vue from "vue";
 import { mapState } from "vuex";
 
@@ -167,10 +167,10 @@ export default Vue.extend({
             "Package",
             rawPackages.map((pkg) => ({
               LicenseNumber: pkg.LicenseNumber,
-              Id: getId(pkg),
+              Id: getIdOrError(pkg),
               PackageState: pkg.PackageState,
-              Label: getLabel(pkg),
-              ItemName: getItemName(pkg),
+              Label: getLabelOrError(pkg),
+              ItemName: getItemNameOrError(pkg),
               SourcePackageLabels: pkg.SourcePackageLabels,
               ProductionBatchNumber: pkg.ProductionBatchNumber,
               parentPackageLabels: null,
@@ -304,10 +304,10 @@ export default Vue.extend({
                         Type: destination.Type,
                         ManifestNumber: transfer.ManifestNumber,
                         LicenseNumber: transfer.LicenseNumber,
-                        Id: getId(pkg),
+                        Id: getIdOrError(pkg),
                         PackageState: pkg.PackageState,
-                        Label: getLabel(pkg),
-                        ItemName: getItemName(pkg),
+                        Label: getLabelOrError(pkg),
+                        ItemName: getItemNameOrError(pkg),
                         Quantity: pkg.ShippedQuantity,
                         UnitOfMeasureAbbreviation: pkg.ShippedUnitOfMeasureAbbreviation,
                         SourcePackageLabels: pkg.SourcePackageLabels,

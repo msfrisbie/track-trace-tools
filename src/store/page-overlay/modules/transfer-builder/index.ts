@@ -1,6 +1,15 @@
-import { IPackageData, IPluginState } from "@/interfaces";
+import {
+  IIndexedTransferData,
+  IPackageData,
+  IPluginState,
+  IUnionIndexedPackageData,
+} from "@/interfaces";
 import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
+import { dynamicConstsManager } from "@/modules/dynamic-consts-manager.module";
+import { toastManager } from "@/modules/toast-manager.module";
+import { getLabelOrError } from "@/utils/package";
 import { getActiveTransferPackageListOrNull } from "@/utils/transfer";
+import { UnitOfMeasureAbbreviation, unitOfMeasureAbbreviationToName } from "@/utils/units";
 import _ from "lodash";
 import { ActionContext } from "vuex";
 import { BuilderType, MessageType } from "../../../../consts";
@@ -29,16 +38,16 @@ const inMemoryState = {
   vehicleLicensePlate: "",
   phoneNumberForQuestions: "",
   isSameSiteTransfer: false,
-  transferIdForUpdate: null
+  transferForUpdate: null,
 };
 
 const persistedState = {
-  transferPackageLists: []
+  transferPackageLists: [],
 };
 
 const defaultState: ITransferBuilderState = {
   ...persistedState,
-  ...inMemoryState
+  ...inMemoryState,
 };
 
 export const transferBuilderModule = {
@@ -46,7 +55,11 @@ export const transferBuilderModule = {
   mutations: {
     [TransferBuilderMutations.ADD_PACKAGE](
       state: ITransferBuilderState,
-      { license, identity, pkg }: { license: string; identity: string; pkg: IPackageData }
+      {
+        license,
+        identity,
+        pkg,
+      }: { license: string; identity: string; pkg: IUnionIndexedPackageData }
     ) {
       if (!identity || !license) {
         throw new Error("Missing identity/license");
@@ -58,24 +71,30 @@ export const transferBuilderModule = {
         currentList = {
           identity,
           license,
-          packages: []
+          packages: [],
         };
 
         state.transferPackageLists.push(currentList);
       }
 
-      const existingPackageIndex = currentList.packages.findIndex(x => x.Label === pkg.Label);
+      const existingPackageIndex = currentList.packages.findIndex(
+        (x) => getLabelOrError(x) === getLabelOrError(pkg)
+      );
 
       if (existingPackageIndex >= 0) {
         currentList.packages.splice(existingPackageIndex, 1);
       }
       currentList.packages.push(pkg);
 
-      currentList.packages.sort((a, b) => (a.Label > b.Label ? 1 : -1));
+      currentList.packages.sort((a, b) => (getLabelOrError(a) > getLabelOrError(b) ? 1 : -1));
     },
     [TransferBuilderMutations.REMOVE_PACKAGE](
       state: ITransferBuilderState,
-      { license, identity, pkg }: { license: string; identity: string; pkg: IPackageData }
+      {
+        license,
+        identity,
+        pkg,
+      }: { license: string; identity: string; pkg: IUnionIndexedPackageData }
     ) {
       if (!identity || !license) {
         throw new Error("Missing identity/license");
@@ -87,7 +106,9 @@ export const transferBuilderModule = {
         return;
       }
 
-      const existingPackageIndex = currentList.packages.findIndex(x => x.Label === pkg.Label);
+      const existingPackageIndex = currentList.packages.findIndex(
+        (x) => getLabelOrError(x) === getLabelOrError(pkg)
+      );
 
       if (existingPackageIndex >= 0) {
         currentList.packages.splice(existingPackageIndex, 1);
@@ -98,8 +119,8 @@ export const transferBuilderModule = {
       {
         license,
         identity,
-        packages
-      }: { license: string; identity: string; packages: IPackageData[] }
+        packages,
+      }: { license: string; identity: string; packages: IUnionIndexedPackageData[] }
     ) {
       if (!identity || !license) {
         throw new Error("Missing identity/license");
@@ -111,7 +132,7 @@ export const transferBuilderModule = {
         currentList = {
           identity,
           license,
-          packages: []
+          packages: [],
         };
 
         state.transferPackageLists.push(currentList);
@@ -119,7 +140,7 @@ export const transferBuilderModule = {
 
       currentList.packages = packages;
 
-      currentList.packages.sort((a, b) => (a.Label > b.Label ? 1 : -1));
+      currentList.packages.sort((a, b) => (getLabelOrError(a) > getLabelOrError(b) ? 1 : -1));
     },
     [TransferBuilderMutations.UPDATE_TRANSFER_DATA](
       state: ITransferBuilderState,
@@ -130,9 +151,15 @@ export const transferBuilderModule = {
         state[key] = value;
       }
     },
+    [TransferBuilderMutations.SET_TRANSFER_FOR_UPDATE](
+      state: ITransferBuilderState,
+      { transferForUpdate }: { transferForUpdate: IIndexedTransferData | null }
+    ) {
+      state.transferForUpdate = transferForUpdate;
+    },
     [TransferBuilderMutations.RESET_TRANSFER_DATA](state: ITransferBuilderState) {
       Object.assign(state, _.cloneDeep(defaultState));
-    }
+    },
   },
 
   getters: {
@@ -152,30 +179,27 @@ export const transferBuilderModule = {
         getActiveTransferPackageListOrNull({ state, identity, license }) || {
           license,
           identity,
-          packages: []
+          packages: [],
         }
       );
     },
-    [TransferBuilderGetters.IS_PACKAGE_IN_ACTIVE_LIST]: (
-      state: ITransferBuilderState,
-      getters: any,
-      rootState: any,
-      rootGetters: any
-    ) => ({ pkg }: { pkg: IPackageData }): boolean => {
-      if (!rootGetters.authState) {
-        throw new Error("Missing identity/license");
-      }
+    [TransferBuilderGetters.IS_PACKAGE_IN_ACTIVE_LIST]:
+      (state: ITransferBuilderState, getters: any, rootState: any, rootGetters: any) =>
+      ({ pkg }: { pkg: IUnionIndexedPackageData }): boolean => {
+        if (!rootGetters.authState) {
+          throw new Error("Missing identity/license");
+        }
 
-      const { identity, license } = rootGetters.authState;
+        const { identity, license } = rootGetters.authState;
 
-      const activeList = getActiveTransferPackageListOrNull({ state, identity, license });
+        const activeList = getActiveTransferPackageListOrNull({ state, identity, license });
 
-      if (!activeList) {
-        return false;
-      }
+        if (!activeList) {
+          return false;
+        }
 
-      return !!activeList.packages.find((x: IPackageData) => x.Label === pkg?.Label);
-    }
+        return !!activeList.packages.find((x) => getLabelOrError(x) === getLabelOrError(pkg));
+      },
   },
 
   actions: {
@@ -190,7 +214,7 @@ export const transferBuilderModule = {
       analyticsManager.track(MessageType.BUILDER_EVENT, {
         builder: BuilderType.CREATE_TRANSFER,
         action: `Added a package to transfer list`,
-        pkg
+        pkg,
       });
     },
     [TransferBuilderActions.REMOVE_PACKAGE]: async (
@@ -204,7 +228,7 @@ export const transferBuilderModule = {
       analyticsManager.track(MessageType.BUILDER_EVENT, {
         builder: BuilderType.CREATE_TRANSFER,
         action: `Removed a package from the transfer list`,
-        pkg
+        pkg,
       });
     },
     [TransferBuilderActions.REFRESH_PACKAGES]: async (
@@ -233,12 +257,12 @@ export const transferBuilderModule = {
       ctx.commit(TransferBuilderMutations.SET_PACKAGES, {
         license,
         identity,
-        packages: refreshedPackages
+        packages: refreshedPackages,
       });
 
       analyticsManager.track(MessageType.BUILDER_EVENT, {
         builder: BuilderType.CREATE_TRANSFER,
-        action: `Finished resetting packages`
+        action: `Finished resetting packages`,
       });
     },
     [TransferBuilderActions.UPDATE_TRANSFER_DATA]: async (
@@ -250,7 +274,143 @@ export const transferBuilderModule = {
       analyticsManager.track(MessageType.BUILDER_EVENT, {
         builder: BuilderType.CREATE_TRANSFER,
         action: `Update transfer data`,
-        payload
+        payload,
+      });
+    },
+    [TransferBuilderActions.SET_TRANSFER_FOR_UPDATE]: async (
+      ctx: ActionContext<ITransferBuilderState, IPluginState>,
+      payload: {
+        transferForUpdate: IIndexedTransferData | null;
+      }
+    ) => {
+      ctx.dispatch(TransferBuilderActions.RESET_TRANSFER_DATA);
+
+      ctx.commit(TransferBuilderMutations.SET_TRANSFER_FOR_UPDATE, payload);
+
+      if (!payload.transferForUpdate) {
+        return;
+      }
+
+      const { transferForUpdate } = payload;
+
+      const destinations = await primaryDataLoader.transferDestinations(transferForUpdate.Id);
+
+      const transporters = await primaryDataLoader.destinationTransporters(transferForUpdate.Id);
+
+      if (destinations.length !== 1) {
+        toastManager.openToast(
+          `Unable to populate transfer data: ${destinations.length} destinations found`,
+          {
+            title: "Edit Transfer Error",
+            autoHideDelay: 10000,
+            variant: "danger",
+            appendToast: true,
+            toaster: "ttt-toaster",
+            solid: true,
+          }
+        );
+
+        analyticsManager.track(MessageType.BUILDER_EVENT, {
+          builder: BuilderType.UPDATE_TRANSFER,
+          action: `Unable to populate transfer data: ${destinations.length} destinations found`,
+          payload,
+        });
+
+        return;
+      }
+
+      if (transporters.length !== 1) {
+        toastManager.openToast(
+          `Unable to populate transfer data: ${transporters.length} transporters found`,
+          {
+            title: "Edit Transfer Error",
+            autoHideDelay: 10000,
+            variant: "danger",
+            appendToast: true,
+            toaster: "ttt-toaster",
+            solid: true,
+          }
+        );
+
+        analyticsManager.track(MessageType.BUILDER_EVENT, {
+          builder: BuilderType.UPDATE_TRANSFER,
+          action: `Unable to populate transfer data: ${transporters.length} transporters found`,
+          payload,
+        });
+
+        return;
+      }
+
+      const [destination] = destinations;
+      const [transporter] = transporters;
+
+      const inTransitPackages = await primaryDataLoader.inTransitPackages();
+
+      const transferTypes = await dynamicConstsManager.transferTypes();
+      const facilities = await dynamicConstsManager.facilities();
+      const transporterFacilities = await dynamicConstsManager.transporterFacilities();
+      const destinationFacilities = await dynamicConstsManager.destinationFacilities();
+      const unitsOfWeight = await dynamicConstsManager.unitsOfWeight();
+
+      const [departureIsodate, departureIsotime] =
+        destination.EstimatedDepartureDateTime.split("T");
+      const [arrivalIsodate, arrivalIsotime] = destination.EstimatedArrivalDateTime.split("T");
+
+      const destinationPackages = await primaryDataLoader.destinationPackages(destination.Id);
+
+      const packages = await destinationPackages;
+      destinationPackages.map((pkg) =>
+        inTransitPackages.find((transitPkg) => transitPkg.Label === pkg.PackageLabel)
+      );
+
+      const transferType = transferTypes.find((x) => x.Name === destination.ShipmentTypeName);
+
+      ctx.dispatch(TransferBuilderActions.UPDATE_TRANSFER_DATA, {
+        originFacility: facilities.find(
+          (x) => x.LicenseNumber === ctx.rootState.pluginAuth.authState?.license
+        ),
+        transporterFacility: transporterFacilities.find(
+          (x) => x.LicenseNumber === transporter.TransporterFacilityLicenseNumber
+        ),
+        destinationFacility: destinationFacilities.find(
+          (x) => x.LicenseNumber === destination.RecipientFacilityLicenseNumber
+        ),
+        transferType,
+        departureIsodate,
+        departureIsotime,
+        arrivalIsodate,
+        arrivalIsotime,
+        plannedRoute: destination.PlannedRoute,
+        driverName: transporter.DriverName,
+        driverEmployeeId: transporter.DriverOccupationalLicenseNumber,
+        driverLicenseNumber: transporter.DriverVehicleLicenseNumber,
+        vehicleMake: transporter.VehicleMake,
+        vehicleModel: transporter.VehicleModel,
+        vehicleLicensePlate: transporter.VehicleLicensePlateNumber,
+        // Phone number appears to not be available via api
+        // phoneNumberForQuestions: transporter.
+        wholesalePackageValues: destinationPackages.map((x) => x.ShipperWholesalePrice),
+        packageGrossWeights: destinationPackages.map((x) => x.GrossWeight),
+        packageGrossUnitsOfWeight: destinationPackages.map((pkg) =>
+          unitsOfWeight.find(
+            (x) =>
+              x.Name ===
+              unitOfMeasureAbbreviationToName(
+                pkg.GrossUnitOfWeightAbbreviation as UnitOfMeasureAbbreviation
+              )
+          )
+        ),
+        isSameSiteTransfer: false,
+      });
+
+      for (const pkg of packages) {
+        await ctx.dispatch(TransferBuilderActions.ADD_PACKAGE, { pkg });
+      }
+
+      analyticsManager.track(MessageType.BUILDER_EVENT, {
+        builder: BuilderType.UPDATE_TRANSFER,
+        action: `Select transfer for update`,
+        payload,
       });
     },
     [TransferBuilderActions.RESET_TRANSFER_DATA]: async (
@@ -260,15 +420,15 @@ export const transferBuilderModule = {
 
       analyticsManager.track(MessageType.BUILDER_EVENT, {
         builder: BuilderType.CREATE_TRANSFER,
-        action: `Reset transfer data`
+        action: `Reset transfer data`,
       });
-    }
-  }
+    },
+  },
 };
 
 export const transferBuilderReducer = (state: ITransferBuilderState): ITransferBuilderState => {
   return {
     ...state,
-    ...inMemoryState
+    ...inMemoryState,
   };
 };

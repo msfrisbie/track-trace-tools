@@ -495,7 +495,7 @@ export default Vue.extend({
 
       analyticsManager.track(MessageType.STARTED_TRANSFER_FROM_INLINE_BUTTON, {});
       modalManager.dispatchModalEvent(ModalType.BUILDER, ModalAction.OPEN, {
-        initialRoute: "/transfer/create-transfer",
+        initialRoute: "/transfer/transfer-builder",
       });
       this.dismiss();
     },

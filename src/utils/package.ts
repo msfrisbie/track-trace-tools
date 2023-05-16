@@ -1,6 +1,7 @@
 import { METRC_TAG_REGEX, PackageFilterIdentifiers, PackageState } from "@/consts";
 import {
   IDestinationData,
+  IDestinationPackageData,
   IIndexedDestinationPackageData,
   IIndexedPackageData,
   IIndexedTransferData,
@@ -19,38 +20,87 @@ import {
 import { toastManager } from "@/modules/toast-manager.module";
 import { downloadFileFromUrl } from "./dom";
 import { extractParentPackageLabelsFromHistory } from "./history";
+import {
+  UnitOfMeasureAbbreviation,
+  unitOfMeasureAbbreviationToName,
+  UnitOfMeasureName,
+  unitOfMeasureNameToAbbreviation,
+} from "./units";
 
-export function getId(unionPkg: IUnionIndexedPackageData): number {
+export function getIdOrError(unionPkg: IUnionIndexedPackageData): number {
   const pkg = unionPkg as any;
   if (pkg.Id) {
-    return pkg.Id;
+    return (pkg as IIndexedPackageData).Id;
   }
   if (pkg.PackageId) {
-    return pkg.PackageId;
+    return (pkg as IDestinationPackageData).PackageId;
   }
   throw new Error("Could not extract ID");
 }
 
-export function getLabel(unionPkg: IUnionIndexedPackageData): string {
+export function getLabelOrError(unionPkg: IUnionIndexedPackageData): string {
   const pkg = unionPkg as any;
   if (pkg.Label) {
-    return pkg.Label;
+    return (pkg as IIndexedPackageData).Label;
   }
   if (pkg.PackageLabel) {
-    return pkg.PackageLabel;
+    return (pkg as IDestinationPackageData).PackageLabel;
   }
   throw new Error("Could not extract Label");
 }
 
-export function getItemName(unionPkg: IUnionIndexedPackageData): string {
+export function getQuantityOrError(unionPkg: IUnionIndexedPackageData): number {
   const pkg = unionPkg as any;
   if (pkg.Item?.Name) {
-    return pkg.Item.Name;
+    return (pkg as IIndexedPackageData).Quantity;
   }
   if (pkg.ProductName) {
-    return pkg.ProductName;
+    return (pkg as IDestinationPackageData).ShippedQuantity;
   }
   throw new Error("Could not extract Item Name");
+}
+
+export function getStrainNameOrError(unionPkg: IUnionIndexedPackageData): string {
+  const pkg = unionPkg as any;
+  if (pkg.Item?.StrainName) {
+    return (pkg as IIndexedPackageData).Item.StrainName ?? "";
+  }
+  if (pkg.ProductName) {
+    return (pkg as IDestinationPackageData).ItemStrainName ?? "";
+  }
+  throw new Error("Could not extract Strain Name");
+}
+
+export function getItemNameOrError(unionPkg: IUnionIndexedPackageData): string {
+  const pkg = unionPkg as any;
+  if (pkg.Item?.Name) {
+    return (pkg as IIndexedPackageData).Item.Name;
+  }
+  if (pkg.ProductName) {
+    return (pkg as IDestinationPackageData).ProductName;
+  }
+  throw new Error("Could not extract Item Name");
+}
+
+export function getItemUnitOfMeasureAbbreviationOrError(
+  unionPkg: IUnionIndexedPackageData
+): UnitOfMeasureAbbreviation {
+  return unitOfMeasureNameToAbbreviation(getItemUnitOfMeasureNameOrError(unionPkg));
+}
+
+export function getItemUnitOfMeasureNameOrError(
+  unionPkg: IUnionIndexedPackageData
+): UnitOfMeasureName {
+  const pkg = unionPkg as any;
+  if (pkg.Item?.UnitOfMeasureName) {
+    return (pkg as IIndexedPackageData).Item.UnitOfMeasureName as UnitOfMeasureName;
+  }
+  if (pkg.ProductName) {
+    return unitOfMeasureAbbreviationToName(
+      (pkg as IDestinationPackageData).ShippedUnitOfMeasureAbbreviation as UnitOfMeasureAbbreviation
+    );
+  }
+  throw new Error("Could not extract Item UnitOfMeasureName");
 }
 
 // Extremely long lists will be truncated with an ellipsis
@@ -215,10 +265,10 @@ export function packageFieldMatch(
 export function simplePackageConverter(pkg: IIndexedPackageData): ISimplePackageData {
   return {
     LicenseNumber: pkg.LicenseNumber,
-    Id: getId(pkg),
+    Id: getIdOrError(pkg),
     PackageState: pkg.PackageState,
-    Label: getLabel(pkg),
-    ItemName: getItemName(pkg),
+    Label: getLabelOrError(pkg),
+    ItemName: getItemNameOrError(pkg),
     SourcePackageLabels: pkg.SourcePackageLabels,
     ProductionBatchNumber: pkg.ProductionBatchNumber,
     parentPackageLabels: null,
@@ -236,10 +286,10 @@ export function simpleTransferPackageConverter(
     Type: destination.ShipmentTypeName,
     ManifestNumber: transfer.ManifestNumber,
     LicenseNumber: transfer.LicenseNumber,
-    Id: getId(pkg),
+    Id: getIdOrError(pkg),
     PackageState: pkg.PackageState,
-    Label: getLabel(pkg),
-    ItemName: getItemName(pkg),
+    Label: getLabelOrError(pkg),
+    ItemName: getItemNameOrError(pkg),
     Quantity: pkg.ShippedQuantity,
     UnitOfMeasureAbbreviation: pkg.ShippedUnitOfMeasureAbbreviation,
     SourcePackageLabels: pkg.SourcePackageLabels,
@@ -248,7 +298,6 @@ export function simpleTransferPackageConverter(
     childPackageLabelQuantityPairs: null,
   };
 }
-
 
 export function simplePackageNormalizer(
   pkg: ISimplePackageData | ISimpleTransferPackageData | IMetadataSimplePackageData

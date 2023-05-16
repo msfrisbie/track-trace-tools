@@ -15,7 +15,11 @@
               :data="filteredSourcePackages"
               :serializer="
                 (pkg) =>
-                  `${pkg.Label} ${pkg.Quantity} ${pkg.Item.UnitOfMeasureName} ${pkg.Item.Name} ${pkg.Item.StrainName}`
+                  `${getLabelOrError(pkg)} ${getQuantityOrError(
+                    pkg
+                  )} ${getItemUnitOfMeasureNameOrError(pkg)} ${getItemNameOrError(
+                    pkg
+                  )} ${getStrainNameOrError(pkg)}`
               "
               :minMatchingChars="0"
               :showOnFocus="true"
@@ -34,12 +38,14 @@
                     style="width: 5rem"
                     class="flex-shrink-0"
                     :textClass="data.Quantity === 0 ? 'text-red-500' : ''"
-                    :text="`${data.Quantity} ${unitOfMeasureNameToAbbreviation(
-                      data.Item.UnitOfMeasureName
-                    )}`"
+                    :text="`${data.Quantity} ${getItemUnitOfMeasureAbbreviation(data)}`"
                   />
 
-                  <picker-card class="flex-grow" :title="`${data.Item.Name}`" :label="data.Label" />
+                  <picker-card
+                    class="flex-grow"
+                    :title="`${getItemNameOrError(data)}`"
+                    :label="getLabelOrError(data)"
+                  />
                   <div style="display: none">{{ htmlText }}</div>
                   <div style="display: none">{{ data }}</div>
                 </div>
@@ -63,7 +69,7 @@
           >
             <paste-tags
               :tags.sync="pastedTags"
-              :sourceLabels="sourcePackages.map((x) => x.Label)"
+              :sourceLabels="sourcePackages.map((x) => getLabelOrError(x))"
               ref="pasteTags"
             ></paste-tags>
           </b-form-group>
@@ -94,7 +100,7 @@
           <transition-group name="list">
             <template v-for="pkg in selectedPackages">
               <b-list-group-item
-                :key="pkg.Label"
+                :key="getLabelOrError(pkg)"
                 class="flex flex-row items-center justify-start space-x-4 flex-nowrap"
               >
                 <!-- grid-column-start:1 is to fix some rendering weirdness when items enter/leave -->
@@ -102,13 +108,17 @@
                   icon="box"
                   style="width: 5rem"
                   class="flex-shrink-0"
-                  :textClass="pkg.Quantity === 0 ? 'text-red-500' : ''"
-                  :text="`${pkg.Quantity} ${unitOfMeasureNameToAbbreviation(
-                    pkg.Item.UnitOfMeasureName
+                  :textClass="getQuantityOrError(pkg) === 0 ? 'text-red-500' : ''"
+                  :text="`${getQuantityOrError(pkg)} ${unitOfMeasureNameToAbbreviation(
+                    getItemUnitOfMeasureNameOrError(pkg)
                   )}`"
                 />
 
-                <picker-card class="flex-grow" :title="`${pkg.Item.Name}`" :label="pkg.Label" />
+                <picker-card
+                  class="flex-grow"
+                  :title="`${getItemNameOrError(pkg)}`"
+                  :label="getLabelOrError(pkg)"
+                />
 
                 <b-button
                   class="px-4 text-red-500 hover:text-red-800"
@@ -153,6 +163,14 @@ import { IPackageData } from "@/interfaces";
 import { authManager } from "@/modules/auth-manager.module";
 import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
 import store from "@/store/page-overlay/index";
+import {
+  getLabelOrError,
+  getQuantityOrError,
+  getStrainNameOrError,
+  getItemNameOrError,
+  getItemUnitOfMeasureNameOrError,
+  getItemUnitOfMeasureAbbreviationOrError,
+} from "@/utils/package";
 import { unitOfMeasureNameToAbbreviation } from "@/utils/units";
 import _ from "lodash";
 import { timer } from "rxjs";
@@ -189,7 +207,12 @@ export default Vue.extend({
     },
   },
   methods: {
-    unitOfMeasureNameToAbbreviation,
+    getLabelOrError,
+    getQuantityOrError,
+    getStrainNameOrError,
+    getItemNameOrError,
+    getItemUnitOfMeasureNameOrError,
+    getItemUnitOfMeasureAbbreviationOrError,
     async loadPackages() {
       this.$data.inflight = false;
       this.$data.error = null;

@@ -81,7 +81,7 @@ const routes: Array<RouteConfig> = [
   },
   {
     path: "/transfer",
-    redirect: "/transfer/create-transfer",
+    redirect: "/transfer/transfer-builder",
     // name: "Transfer Tools",
     // component: TransferBuilderListView
   },
@@ -186,12 +186,12 @@ const routes: Array<RouteConfig> = [
     component: MotherPlantBatchPackageBuilder,
   },
   {
-    path: "/transfer/create-transfer",
-    name: "Create Transfer",
+    path: "/transfer/transfer-builder",
+    name: "Transfer Builder",
     component: TransferBuilder,
   },
   {
-    path: "/transfer/create-transfer-template",
+    path: "/transfer/transfer-builder-template",
     name: "Create Transfer Template",
     component: TransferTemplateBuilder,
   },

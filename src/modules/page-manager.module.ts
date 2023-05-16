@@ -761,7 +761,7 @@ class PageManager implements IAtomicService {
               this.tttTransferButton.setAttribute("class", "btn shadow quick-action-button");
               this.tttTransferButton.addEventListener("click", () => {
                 modalManager.dispatchModalEvent(ModalType.BUILDER, ModalAction.OPEN, {
-                  initialRoute: "/transfer/create-transfer",
+                  initialRoute: "/transfer/transfer-builder",
                 });
 
                 analyticsManager.track(MessageType.STARTED_TRANSFER_FROM_INLINE_BUTTON, {
@@ -862,7 +862,7 @@ class PageManager implements IAtomicService {
         this.tttTransferButton.setAttribute("class", "btn shadow quick-action-button");
         this.tttTransferButton.addEventListener("click", () => {
           modalManager.dispatchModalEvent(ModalType.BUILDER, ModalAction.OPEN, {
-            initialRoute: "/transfer/create-transfer",
+            initialRoute: "/transfer/transfer-builder",
           });
 
           analyticsManager.track(MessageType.STARTED_TRANSFER_FROM_INLINE_BUTTON, {
@@ -977,7 +977,7 @@ class PageManager implements IAtomicService {
               type: "Transfer tools",
             });
             modalManager.dispatchModalEvent(ModalType.BUILDER, ModalAction.OPEN, {
-              initialRoute: "/transfer/create-transfer",
+              initialRoute: "/transfer/transfer-builder",
             });
           });
           items[i].parentElement?.append(this.transferToolsButton);
@@ -1125,7 +1125,7 @@ class PageManager implements IAtomicService {
       //                 {}
       //             );
       //             modalManager.dispatchModalEvent(ModalType.BUILDER, ModalAction.OPEN, {
-      //                 initialRoute: "/transfer/create-transfer",
+      //                 initialRoute: "/transfer/transfer-builder",
       //             });
 
       //             this.addSelectedPackagesToTransferPackageList();

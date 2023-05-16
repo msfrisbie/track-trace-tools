@@ -125,7 +125,9 @@
                     :value="pkg"
                   >
                     <picker-card
-                      :title="`${pkg.Quantity} ${pkg.Item.UnitOfMeasureName} ${pkg.Item.Name}`"
+                      :title="`${pkg.Quantity} ${getItemUnitOfMeasureNameOrError(
+                        pkg
+                      )} ${getItemNameOrError(pkg)}`"
                       :label="pkg.Label"
                     />
                   </b-form-checkbox>
@@ -163,7 +165,7 @@
 
         <paste-tags
           v-if="selectedMenuItem === selectedMenuState.PASTED_TAGS"
-          :sourceLabels="sourcePackages.map(x => x.Label)"
+          :sourceLabels="sourcePackages.map((x) => x.Label)"
           :tags.sync="pastedTags"
           ref="pasteTags"
         >
@@ -229,6 +231,7 @@ import { authManager } from "@/modules/auth-manager.module";
 import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
 import store from "@/store/page-overlay/index";
 import { itemMatchesFilters } from "@/utils/filters";
+import { getItemUnitOfMeasureNameOrError, getItemNameOrError } from "@/utils/package";
 import { combineLatest, Subject } from "rxjs";
 import { debounceTime, distinctUntilChanged, filter, startWith, tap } from "rxjs/operators";
 import { v4 } from "uuid";
@@ -280,6 +283,8 @@ export default Vue.extend({
     locationFilterZeroResultsErrorSuggestionMessage: String,
   },
   methods: {
+    getItemUnitOfMeasureNameOrError,
+    getItemNameOrError,
     clear() {
       this.$data.item = null;
       this.$data.location = null;

@@ -2,7 +2,7 @@
   <div class="flex flex-col space-y-4 items-center">
     <!-- https://mattzollinhofer.github.io/vue-typeahead-bootstrap-docs/examples/examples.html#prepend-append -->
 
-    <b-form-group class="w-full" label="Select a transfer" label-size="sm">
+    <b-form-group class="w-full" :label="label" label-size="sm">
       <template v-if="transfer">
         <b-button-group class="self-start">
           <b-button
@@ -85,9 +85,13 @@ export default Vue.extend({
     this.loadTransfers();
   },
   props: {
+    label: {
+      type: String,
+      required: false,
+      default: "",
+    },
     transfer: Object as () => IIndexedTransferData,
     zeroResultsErrorSuggestionMessage: String,
-    selectOwnedItems: Boolean,
   },
   data() {
     return {

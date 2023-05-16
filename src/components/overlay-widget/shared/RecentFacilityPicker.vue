@@ -1,28 +1,19 @@
 <template>
   <div v-if="facilities.length" class="flex flex-col items-stretch">
-    <div class="grid grid-cols-2" style="grid-template-columns: auto 1fr">
-      <div class="p-2">
-        <span class="text-md text-gray-500">Recently used:</span>
-      </div>
-      <div
-        class="
-          flex flex-col
-          items-stretch
-          space-y-4
-          px-4
-          overflow-y-auto
-          toolkit-scroll
-        "
-        style="max-height: 25vh"
+    <div class="pb-2">
+      <span class="text-md text-gray-500">Recently used:</span>
+    </div>
+    <div
+      class="flex flex-col items-stretch space-y-4 px-4 overflow-y-auto toolkit-scroll"
+      style="max-height: 25vh"
+    >
+      <b-button
+        @click="selectFacility(facility)"
+        v-for="facility of facilities"
+        v-bind:key="facility.LicenseNumber"
+        variant="outline-primary"
+        >{{ facilitySummary(facility) }}</b-button
       >
-        <b-button
-          @click="selectFacility(facility)"
-          v-for="facility of facilities"
-          v-bind:key="facility.LicenseNumber"
-          variant="outline-primary"
-          >{{ facilitySummary(facility) }}</b-button
-        >
-      </div>
     </div>
   </div>
 </template>

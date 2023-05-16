@@ -12,12 +12,25 @@
     <div class="col-span-3 h-full">
       <template v-if="activeStepIndex === 0">
         <div class="grid grid-cols-2 gap-8 h-full">
-          <div class="flex flex-col items-stretch space-y-4 hide-scroll overflow-y-auto">
-            <b-form-checkbox size="sm" v-model="editTransfer">
-              <span>Edit existing transfer</span>
-            </b-form-checkbox>
+          <div class="flex flex-col items-stretch space-y-4 hide-scroll overflow-y-auto px-1">
+            <div>
+              <b-form-checkbox size="sm" v-model="editTransfer">
+                <span>Edit existing transfer</span>
+              </b-form-checkbox>
 
-            <transfer-picker v-if="editTransfer" :transfer.sync="transferToEdit"></transfer-picker>
+              <transfer-picker
+                v-if="editTransfer"
+                :transfer.sync="transferForUpdate"
+              ></transfer-picker>
+            </div>
+
+            <b-form-group label="TRANSFER TYPE" label-class="text-gray-400">
+              <b-form-select
+                v-model="transferType"
+                :options="transferTypeOptions"
+                size="md"
+              ></b-form-select>
+            </b-form-group>
 
             <template v-if="!destinationFacility">
               <b-form-group label="SELECT DESTINATION" label-class="text-gray-400" label-size="sm">
@@ -240,26 +253,18 @@
               SHIPMENT
             </div>
 
-            <b-form-group class="px-2">
-              <b-form-select
-                v-model="transferType"
-                :options="transferTypeOptions"
-                size="md"
-              ></b-form-select>
-            </b-form-group>
-
             <div
               class="flex flex-col items-stretch text-md text-gray-700 gap-2 overflow-y-auto toolkit-scroll px-2"
               style="max-height: 35vh"
             >
               <template v-for="(pkg, idx) in transferPackages">
-                <div class="border border-gray-200 rounded p-2" v-bind:key="pkg.Label">
-                  <div class="font-bold">{{ pkg.Label }}</div>
+                <div class="border border-gray-200 rounded p-2" v-bind:key="getLabelOrError(pkg)">
+                  <div class="font-bold">{{ getLabelOrError(pkg) }}</div>
                   <div>
                     {{
-                      `${pkg.Quantity} ${unitOfMeasureNameToAbbreviation(
-                        pkg.Item.UnitOfMeasureName
-                      )} ${pkg.Item.Name}`
+                      `${getQuantityOrError(pkg)} ${getItemUnitOfMeasureAbbreviation(
+                        pkg
+                      )} ${getItemNameOrError(pkg)}`
                     }}
                   </div>
                   <template v-if="isTransferSubmittedWithGrossWeight">
@@ -319,7 +324,7 @@
 
           <!-- Column 3 -->
           <div
-            class="flex flex-col items-stretch space-y-8 overflow-y-auto overflow-x-hidden toolkit-scroll"
+            class="flex flex-col items-stretch space-y-8 overflow-y-auto overflow-x-hidden toolkit-scroll px-1"
           >
             <div class="text-start text-2xl font-bold border-b border-gray-400 text-gray-400">
               TRANSPORTER
@@ -424,7 +429,7 @@
                   size="md"
                   @click="submit()"
                 >
-                  <template v-if="transferIdForUpdate === null"> CREATE TRANSFER </template>
+                  <template v-if="transferForUpdate === null"> CREATE TRANSFER </template>
                   <template v-else> UPDATE TRANSFER </template>
                 </b-button>
               </template>
@@ -458,6 +463,7 @@ import {
   IComputedGetSet,
   IComputedGetSetMismatched,
   ICsvFile,
+  IIndexedTransferData,
   IMetrcCreateStateAuthorizedTransferPayload,
   IMetrcCreateTransferPayload,
   IMetrcFacilityData,
@@ -465,9 +471,11 @@ import {
   IMetrcTransferTransporterData,
   IMetrcTransferType,
   IMetrcTransferTypeData,
-  IPackageData,
+  IMetrcUpdateStateAuthorizedTransferPayload,
+  IMetrcUpdateTransferPayload,
   IPluginState,
   ITransferData,
+  IUnionIndexedPackageData,
   IUnitOfMeasure,
 } from "@/interfaces";
 import { analyticsManager } from "@/modules/analytics-manager.module";
@@ -494,11 +502,19 @@ import {
   extractRecentDestinationFacilitiesFromTransfers,
   extractRecentTransporterFacilitiesFromTransfers,
 } from "@/utils/transfer";
-import { unitOfMeasureNameToAbbreviation } from "@/utils/units";
 import _ from "lodash";
 import { timer } from "rxjs";
 import Vue from "vue";
 import { mapActions, mapGetters, mapState, Store } from "vuex";
+import {
+  getLabelOrError,
+  getQuantityOrError,
+  getStrainNameOrError,
+  getItemNameOrError,
+  getItemUnitOfMeasureNameOrError,
+  getItemUnitOfMeasureAbbreviationOrError,
+  getIdOrError,
+} from "@/utils/package";
 
 const debugLog = debugLogFactory("TransferBuilder.vue");
 
@@ -523,7 +539,12 @@ export default Vue.extend({
       removePackage: `transferBuilder/${TransferBuilderActions.REMOVE_PACKAGE}`,
       // updateTransferData: `transferBuilder/${TransferBuilderActions.UPDATE_TRANSFER_DATA}`,
     }),
-    unitOfMeasureNameToAbbreviation,
+    getLabelOrError,
+    getQuantityOrError,
+    getStrainNameOrError,
+    getItemNameOrError,
+    getItemUnitOfMeasureNameOrError,
+    getItemUnitOfMeasureAbbreviationOrError,
     facilitySummary,
     maybeNavigateAndOpenPackageSearch() {
       // Currently unused. Will force open the package search
@@ -555,7 +576,7 @@ export default Vue.extend({
         }
 
         analyticsManager.track(MessageType.BUILDER_ENGAGEMENT, {
-          builder: this.$data.builderType,
+          builder: this.builderType,
           action: `Set destination facility to ${facility?.FacilityName}`,
         });
       });
@@ -568,7 +589,7 @@ export default Vue.extend({
         this.$data.transporterQuery = facilitySummary(facility);
 
         analyticsManager.track(MessageType.BUILDER_ENGAGEMENT, {
-          builder: this.$data.builderType,
+          builder: this.builderType,
           action: `Set transporter facility to ${facility?.FacilityName}`,
         });
       });
@@ -577,7 +598,7 @@ export default Vue.extend({
       this.$data.activeStepIndex = index;
 
       analyticsManager.track(MessageType.BUILDER_ENGAGEMENT, {
-        builder: this.$data.builderType,
+        builder: this.builderType,
         action: `Set active step to ${index}`,
       });
     },
@@ -636,7 +657,7 @@ export default Vue.extend({
 
       const packages: IMetrcTransferPackageData[] = [];
 
-      for (const [idx, pkg] of (this.transferPackages as IPackageData[]).entries()) {
+      for (const [idx, pkg] of this.transferPackages.entries()) {
         let WholesalePrice: string = "";
         let GrossWeight: string = "";
         let GrossUnitOfWeightId: string = "";
@@ -653,7 +674,7 @@ export default Vue.extend({
         }
 
         packages.push({
-          Id: pkg.Id.toString(),
+          Id: getIdOrError(pkg).toString(),
           WholesalePrice,
           GrossWeight,
           GrossUnitOfWeightId,
@@ -679,8 +700,19 @@ export default Vue.extend({
         },
       ];
 
-      const transferData: IMetrcCreateTransferPayload = {
+      const TransportersMixin = this.isTransferSubmittedWithoutTransporter
+        ? {}
+        : { Transporters: transporters };
+
+      const IdMixin = this.transferForUpdate ? { Id: this.transferForUpdate.Id } : {};
+
+      const transferData:
+        | IMetrcCreateTransferPayload
+        | IMetrcCreateStateAuthorizedTransferPayload
+        | IMetrcUpdateTransferPayload
+        | IMetrcUpdateStateAuthorizedTransferPayload = {
         ShipmentLicenseType: "Licensed",
+        ...IdMixin,
         Destinations: [
           {
             ShipmentLicenseType: "Licensed",
@@ -692,36 +724,16 @@ export default Vue.extend({
             GrossWeight: "",
             GrossUnitOfWeightId: "",
             Packages: packages,
-            Transporters: transporters,
+            ...TransportersMixin,
           },
         ],
       };
 
-      const stateAuthorizedTransferData: IMetrcCreateStateAuthorizedTransferPayload = {
-        ShipmentLicenseType: "Licensed",
-        Destinations: [
-          {
-            ShipmentLicenseType: "Licensed",
-            RecipientId: (this.destinationFacility as IMetrcFacilityData).Id.toString(),
-            PlannedRoute: plannedRoute,
-            TransferTypeId: (this.transferType as IMetrcTransferType).Id.toString(),
-            EstimatedDepartureDateTime: estimatedDepartureDateTime,
-            EstimatedArrivalDateTime: estimatedArrivalDateTime,
-            GrossWeight: "",
-            GrossUnitOfWeightId: "",
-            Packages: packages,
-          },
-        ],
-      };
-
-      // IMetrcCreateStateAuthorizedTransferPayload
-
-      let rows: IMetrcCreateTransferPayload[] | IMetrcCreateStateAuthorizedTransferPayload[];
-      if (this.isTransferSubmittedWithoutTransporter) {
-        rows = _.cloneDeep([stateAuthorizedTransferData]);
-      } else {
-        rows = _.cloneDeep([transferData]);
-      }
+      let rows:
+        | IMetrcCreateTransferPayload[]
+        | IMetrcCreateStateAuthorizedTransferPayload[]
+        | IMetrcUpdateTransferPayload[]
+        | IMetrcUpdateStateAuthorizedTransferPayload[] = [transferData];
 
       if (rows[0].Destinations.length === 0) {
         analyticsManager.track(MessageType.BUILDER_DATA_ERROR, {
@@ -747,7 +759,7 @@ export default Vue.extend({
 
       builderManager.submitProject(
         rows,
-        this.$data.builderType,
+        this.builderType,
         {
           packageTotal: this.transferPackages.length,
           origin: this.originFacility,
@@ -758,11 +770,19 @@ export default Vue.extend({
         5
       );
 
-      analyticsManager.track(MessageType.BUILDER_EVENT, {
-        builder: BuilderType.CREATE_TRANSFER,
-        action: `Created transfer`,
-        payload: JSON.stringify(rows),
-      });
+      if (this.transferForUpdate) {
+        analyticsManager.track(MessageType.BUILDER_EVENT, {
+          builder: BuilderType.UPDATE_TRANSFER,
+          action: `Updated transfer`,
+          payload: JSON.stringify(rows),
+        });
+      } else {
+        analyticsManager.track(MessageType.BUILDER_EVENT, {
+          builder: BuilderType.CREATE_TRANSFER,
+          action: `Created transfer`,
+          payload: JSON.stringify(rows),
+        });
+      }
     },
     buildCsvFiles(): ICsvFile[] {
       const originFacility: IMetrcFacilityData = this.originFacility as IMetrcFacilityData;
@@ -775,7 +795,9 @@ export default Vue.extend({
         const csvData = buildCsvDataOrError([
           {
             isVector: true,
-            data: this.transferPackages.map((packageData: IPackageData) => packageData.Label),
+            data: this.transferPackages.map((packageData: IUnionIndexedPackageData) =>
+              getLabelOrError(packageData)
+            ),
           },
           {
             isVector: false,
@@ -959,10 +981,10 @@ export default Vue.extend({
     },
   },
   watch: {
-    transferToEdit: {
+    transferForUpdate: {
       immediate: true,
       handler(newValue, oldValue) {
-        this.$data.editTransfer = !!this.$data.transferToEdit;
+        this.$data.editTransfer = !!this.transferForUpdate;
       },
     },
   },
@@ -982,6 +1004,9 @@ export default Vue.extend({
       transferPackageList: `transferBuilder/${TransferBuilderGetters.ACTIVE_PACKAGE_LIST}`,
       packagesUrl: `pluginAuth/${PluginAuthGetters.PACKAGES_URL}`,
     }),
+    builderType(): BuilderType {
+      return this.transferForUpdate ? BuilderType.UPDATE_TRANSFER : BuilderType.CREATE_TRANSFER;
+    },
     pageOneErrorMessage(): string | null {
       return (
         this.errors.find((x: IBuilderComponentError) => x.tags.includes("page1"))?.message || null
@@ -1096,16 +1121,17 @@ export default Vue.extend({
         });
       },
     } as IComputedGetSet<boolean>,
-    transferIdForUpdate: {
-      get(): number | null {
-        return this.$store.state.transferBuilder.transferIdForUpdate;
+    transferForUpdate: {
+      get(): IIndexedTransferData | null {
+        return this.$store.state.transferBuilder.transferForUpdate;
       },
-      set(transferIdForUpdate) {
-        this.$store.dispatch(`transferBuilder/${TransferBuilderActions.UPDATE_TRANSFER_DATA}`, {
-          transferIdForUpdate,
+      set(transferForUpdate) {
+        console.log({ transferForUpdate });
+        this.$store.dispatch(`transferBuilder/${TransferBuilderActions.SET_TRANSFER_FOR_UPDATE}`, {
+          transferForUpdate,
         });
       },
-    } as IComputedGetSet<number | null>,
+    } as IComputedGetSet<IIndexedTransferData | null>,
     isTransferSubmittedWithoutTransporter(): boolean {
       return (
         this.transferType?.Name === "State Authorized" &&
@@ -1131,7 +1157,7 @@ export default Vue.extend({
         })
         .sort((a: any, b: any) => (a.disabled ? 1 : -1));
     },
-    transferPackages(): IPackageData[] {
+    transferPackages(): IUnionIndexedPackageData[] {
       return this.transferPackageList.packages;
     },
     csvFiles(): ICsvFile[] {
@@ -1145,7 +1171,6 @@ export default Vue.extend({
       transferDataLoading: false,
       showPhoneNumberInput: false,
       activePackages: [],
-      builderType: BuilderType.CREATE_TRANSFER,
       activeStepIndex: 0,
       sourcePackages: [],
       transferTypes: [],
@@ -1160,7 +1185,6 @@ export default Vue.extend({
       unitsOfWeight: [],
       showInitializationError: false,
       editTransfer: false,
-      transferToEdit: null,
       steps: [
         {
           stepText: "Destination details",

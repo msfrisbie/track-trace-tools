@@ -5,45 +5,50 @@ const whitelist: string[] | null = null;
 const blacklist: string[] | null = null;
 
 function textToColor(val: string): string {
-    return `color: #${textToRGB(val)}`
+  return `color: #${textToRGB(val)}`;
 }
 
 // https://stackoverflow.com/questions/3426404/create-a-hexadecimal-colour-based-on-a-string-with-javascript
 function textToRGB(text: string): string {
-    let hash = 0;
+  let hash = 0;
 
-    for (let i = 0; i < text.length; i++) {
-        hash = text.charCodeAt(i) + ((hash << 5) - hash);
-    }
+  for (let i = 0; i < text.length; i++) {
+    hash = text.charCodeAt(i) + ((hash << 5) - hash);
+  }
 
-    // This mask ensures the text is sufficiently dark
-    // https://stackoverflow.com/questions/596216/formula-to-determine-perceived-brightness-of-rgb-color
-    // the human eyeball is most sensitive to green light, less to red and least to blue
-    let c = (hash & 0x00FF0FFF)
-        .toString(16)
-        .toUpperCase();
+  // This mask ensures the text is sufficiently dark
+  // https://stackoverflow.com/questions/596216/formula-to-determine-perceived-brightness-of-rgb-color
+  // the human eyeball is most sensitive to green light, less to red and least to blue
+  let c = (hash & 0x00ff0fff).toString(16).toUpperCase();
 
-    return "00000".substring(0, 6 - c.length) + c;
+  return "00000".substring(0, 6 - c.length) + c;
 }
 
-
-export function debugLogFactory(name: string,) {
-    return async function (argFn: () => Promise<any[]>) {
-        if (!store.state.debugMode) {
-            return;
-        }
-
-        // Lazily evaluate the args
-        const args = await argFn();
-
-        if (whitelist?.includes(name)) {
-            return;
-        }
-
-        if (blacklist?.includes(name)) {
-            return;
-        }
-
-        console.log(`%c ${name}:`, textToColor(name), ...args);
+export function debugLogFactory(name: string) {
+  return async function (argFn: () => Promise<any[]>) {
+    if (!store.state.debugMode) {
+      return;
     }
+
+    // Lazily evaluate the args
+    const args = await argFn();
+
+    if (whitelist?.includes(name)) {
+      return;
+    }
+
+    if (blacklist?.includes(name)) {
+      return;
+    }
+
+    console.log(`%c ${name}:`, textToColor(name), ...args);
+  };
+}
+
+export function snap(object: Object): Object {
+  return JSON.parse(JSON.stringify(object));
+}
+
+export function pretty(object: Object): string {
+  return JSON.stringify(object, null, 2);
 }

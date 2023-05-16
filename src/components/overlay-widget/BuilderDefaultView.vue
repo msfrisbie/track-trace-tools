@@ -184,8 +184,8 @@ export default Vue.extend({
         },
         {
           backgroundColor: "#773c77",
-          text: "NEW TRANSFER",
-          route: "/transfer/create-transfer",
+          text: "TRANSFER BUILDER",
+          route: "/transfer/transfer-builder",
           icon: "truck-loading",
           enabled: isIdentityEligibleForTransferTools({
             hostname: window.location.hostname,

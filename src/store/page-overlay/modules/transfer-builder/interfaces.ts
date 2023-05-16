@@ -1,4 +1,4 @@
-import { IMetrcFacilityData, IMetrcTransferTypeData, ITransferPackageList } from "@/interfaces";
+import { IIndexedTransferData, IMetrcFacilityData, IMetrcTransferTypeData, ITransferPackageList } from "@/interfaces";
 
 export interface ITransferBuilderState {
   transferPackageLists: ITransferPackageList[];
@@ -22,7 +22,7 @@ export interface ITransferBuilderState {
   packageGrossWeights: number[];
   packageGrossUnitsOfWeight: number[];
   isSameSiteTransfer: boolean;
-  transferIdForUpdate: number | null;
+  transferForUpdate: IIndexedTransferData | null;
 }
 
 export interface ITransferBuilderUpdateData {

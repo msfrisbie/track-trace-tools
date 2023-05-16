@@ -35,15 +35,15 @@ export type PlantGrowthPhase = "Vegetative" | "Flowering";
 export type HarvestType = "WholePlant" | "Manicure";
 
 export interface IComputedGetSet<T> {
-  get: () => T,
-  set: (x: T) => void,
-  $store: Store<IPluginState>
+  get: () => T;
+  set: (x: T) => void;
+  $store: Store<IPluginState>;
 }
 
 export interface IComputedGetSetMismatched<T, U> {
-  get: () => T,
-  set: (x: U) => void,
-  $store: Store<IPluginState>
+  get: () => T;
+  set: (x: U) => void;
+  $store: Store<IPluginState>;
 }
 
 export interface IAtomicService {
@@ -137,7 +137,7 @@ export interface ITagSearchFilters {
 export interface ITransferPackageList {
   identity: string;
   license: string;
-  packages: IPackageData[];
+  packages: IUnionIndexedPackageData[];
 }
 
 export interface IBackgroundTasksState {
@@ -1264,6 +1264,12 @@ export interface IMetrcTransferType {
 
 export interface IMetrcCreateStateAuthorizedTransferPayload {
   Destinations: IMetrcStateAuthorizedTransferDestinationData[];
+  ShipmentLicenseType: string;
+}
+
+export interface IMetrcUpdateStateAuthorizedTransferPayload {
+  Destinations: IMetrcStateAuthorizedTransferDestinationData[];
+  Id: number;
   ShipmentLicenseType: string;
 }
 

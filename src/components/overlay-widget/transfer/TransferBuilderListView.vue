@@ -73,7 +73,7 @@ export default Vue.extend({
       notAvailableMessage: notAvailableMessage(),
       builderOptions: [
         {
-          route: "/transfer/create-transfer",
+          route: "/transfer/transfer-builder",
           text: "CREATE/EDIT TRANSFER",
           icon: "truck-loading",
           backgroundColor: "#773c77",
@@ -81,7 +81,7 @@ export default Vue.extend({
           isBeta: true,
         },
         // {
-        //   route: "/transfer/create-transfer-template",
+        //   route: "/transfer/transfer-builder-template",
         //   text: "CREATE TEMPLATE",
         //   icon: "truck-loading",
         //   backgroundColor: "#773c77",
