@@ -38,7 +38,7 @@
                     style="width: 5rem"
                     class="flex-shrink-0"
                     :textClass="data.Quantity === 0 ? 'text-red-500' : ''"
-                    :text="`${data.Quantity} ${getItemUnitOfMeasureAbbreviation(data)}`"
+                    :text="`${data.Quantity} ${getItemUnitOfMeasureAbbreviationOrError(data)}`"
                   />
 
                   <picker-card
@@ -109,8 +109,8 @@
                   style="width: 5rem"
                   class="flex-shrink-0"
                   :textClass="getQuantityOrError(pkg) === 0 ? 'text-red-500' : ''"
-                  :text="`${getQuantityOrError(pkg)} ${unitOfMeasureNameToAbbreviation(
-                    getItemUnitOfMeasureNameOrError(pkg)
+                  :text="`${getQuantityOrError(pkg)} ${getItemUnitOfMeasureAbbreviationOrError(
+                    pkg
                   )}`"
                 />
 
@@ -171,7 +171,6 @@ import {
   getItemUnitOfMeasureNameOrError,
   getItemUnitOfMeasureAbbreviationOrError,
 } from "@/utils/package";
-import { unitOfMeasureNameToAbbreviation } from "@/utils/units";
 import _ from "lodash";
 import { timer } from "rxjs";
 import Vue from "vue";

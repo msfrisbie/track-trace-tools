@@ -262,7 +262,7 @@
                   <div class="font-bold">{{ getLabelOrError(pkg) }}</div>
                   <div>
                     {{
-                      `${getQuantityOrError(pkg)} ${getItemUnitOfMeasureAbbreviation(
+                      `${getQuantityOrError(pkg)} ${getItemUnitOfMeasureAbbreviationOrError(
                         pkg
                       )} ${getItemNameOrError(pkg)}`
                     }}
