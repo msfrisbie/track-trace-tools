@@ -30,6 +30,7 @@ import {
   IIndexedTransferData,
   IItemData,
   ILocationData,
+  IMetrcEmployeeData,
   IPackageData,
   IPackageHistoryData,
   IPackageOptions,
@@ -102,6 +103,7 @@ export async function getDataLoader(
 }
 
 export class DataLoader implements IAtomicService {
+  private _employees: Promise<IMetrcEmployeeData[]> | null = null;
   private _availableTags: Promise<IIndexedTagData[]> | null = null;
   private _usedTags: Promise<IIndexedTagData[]> | null = null;
   private _voidedTags: Promise<IIndexedTagData[]> | null = null;
@@ -368,6 +370,29 @@ export class DataLoader implements IAtomicService {
    * Primary load methods
    *
    */
+
+  async employees(): Promise<IMetrcEmployeeData[]> {
+    if (!this._employees) {
+      this._employees = new Promise(async (resolve, reject) => {
+        const subscription = timer(DATA_LOAD_FETCH_TIMEOUT_MS).subscribe(() =>
+          reject("Available employee timed out")
+        );
+
+        try {
+          const employees: IMetrcEmployeeData[] = await this.loadEmployees();
+
+          subscription.unsubscribe();
+          resolve(employees);
+        } catch (e) {
+          subscription.unsubscribe();
+          reject(e);
+          this._employees = null;
+        }
+      });
+    }
+
+    return this._employees;
+  }
 
   async availableTags({ useCache = true }: { useCache?: boolean } = {}): Promise<
     IIndexedTagData[]
@@ -2205,6 +2230,18 @@ export class DataLoader implements IAtomicService {
     return streamFactory<ITransferData>(dataLoadOptions, responseFactory);
   }
 
+  employeesStream(
+    dataLoadOptions: IDataLoadOptions = {}
+  ): Subject<ICollectionResponse<IMetrcEmployeeData>> {
+    const responseFactory = (paginationOptions: IPaginationOptions): Promise<Response> => {
+      const body = buildBody(paginationOptions);
+
+      return this.metrcRequestManagerOrError.getEmployees(body);
+    };
+
+    return streamFactory<IMetrcEmployeeData>(dataLoadOptions, responseFactory);
+  }
+
   availableTagsStream(
     dataLoadOptions: IDataLoadOptions = {}
   ): Subject<ICollectionResponse<ITagData>> {
@@ -3216,6 +3253,28 @@ export class DataLoader implements IAtomicService {
     }
 
     return responseData.Data[0];
+  }
+
+  private async loadEmployees(
+    dataLoadOptions: IDataLoadOptions = {}
+  ): Promise<IMetrcEmployeeData[]> {
+    await authManager.authStateOrError();
+
+    store.commit(MutationType.SET_LOADING_MESSAGE, "Loading employees...");
+
+    let employees: IMetrcEmployeeData[] = [];
+
+    await this.employeesStream(dataLoadOptions).forEach(
+      (next: ICollectionResponse<IMetrcEmployeeData>) => {
+        employees = [...employees, ...next.Data];
+      }
+    );
+
+    console.log(`Loaded ${employees.length} employees`);
+
+    store.commit(MutationType.SET_LOADING_MESSAGE, null);
+
+    return employees;
   }
 
   private async loadAvailableTags(dataLoadOptions: IDataLoadOptions = {}): Promise<ITagData[]> {

@@ -19,6 +19,7 @@ import ReplacePlantTagsBuilder from "@/components/overlay-widget/cultivation/Rep
 import UnpackImmaturePlantsBuilder from "@/components/overlay-widget/cultivation/UnpackImmaturePlantsBuilder.vue";
 import MetrcExplorer from "@/components/overlay-widget/explorer/MetrcExplorer.vue";
 import MiscellaneousListView from "@/components/overlay-widget/miscellaneous/MiscellaneousListView.vue";
+import AllocateSamplesBuilder from "@/components/overlay-widget/package/AllocateSamplesBuilder.vue";
 import FinishPackagesBuilder from "@/components/overlay-widget/package/FinishPackagesBuilder.vue";
 import ItemTemplateBuilder from "@/components/overlay-widget/package/ItemTemplateBuilder.vue";
 import MergePackagesBuilder from "@/components/overlay-widget/package/MergePackagesBuilder.vue";
@@ -104,6 +105,11 @@ const routes: Array<RouteConfig> = [
     path: "/package/add-item-group",
     name: "Add Item Group",
     component: ItemTemplateBuilder,
+  },
+  {
+    path: "/package/allocate-samples",
+    name: "Allocate Samples",
+    component: AllocateSamplesBuilder,
   },
   {
     path: "/package/history",

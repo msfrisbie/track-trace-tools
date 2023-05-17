@@ -1417,7 +1417,19 @@ export interface IMetrcFinishPackagesPayload {
   Id: string;
 }
 
-export interface IMetrcAdjustPackagePayload {}
+export interface IMetrcAdjustPackagePayload {
+  AdjustmentDate: string; // ISODATE
+  AdjustmentQuantity: string;
+  AdjustmentReasonId: string;
+  AdjustmentUnitOfMeasureId: number;
+  CurrentQuantity: string; // "5.4"
+  CurrentQuantityUom: UnitOfMeasureName;
+  FinishDate: string; // ISODATE or ""
+  Id: string; // "123"
+  NewQuantity: string; // 6.4
+  NewQuantityUom: UnitOfMeasureName;
+  ReasonNote: string;
+}
 
 export interface IMetrcChangePackageItemPayload {}
 
@@ -1907,4 +1919,55 @@ export interface IValueRange {
   range: string;
   majorDimension: "ROWS";
   values: ISheetValues;
+}
+
+export interface IMetrcEmployeeData {
+  Id: number;
+  GivenNames: string; // Matt
+  FamilyName: string; // Frisbie
+  FullName: string; // Matt Frisbie
+  License: {
+    Number: string; // "12345"
+    Status: "Active";
+    StartDate: null;
+    EndDate: null;
+    MainPhoneNumber: string; // "1231231234"
+    MobilePhoneNumber: "";
+    LicenseType: "Unlicensed";
+  };
+  SelectedFacilityEmployee: {
+    FacilityId: number;
+    HireDate: string; // "2023-01-01";
+    TerminationDate: null;
+    CanLogIn: boolean;
+    HomePage: "Packages";
+    IsBlocked: boolean;
+    IsIndustryAdmin: boolean;
+    IsOwner: boolean;
+    IsManager: boolean;
+    Name: null;
+    Alias: null;
+    DisplayName: null;
+    FacilityType: null;
+    License: null;
+  };
+  UserId: number;
+  User: {
+    Id: number; // same as UserId
+    Username: string; // "12345"
+    UserType: "Industry";
+    Name: string; // Matt Frisbie
+    Email: string;
+    UseSingleSignOn: boolean;
+    HomePage: "";
+    UserRoleId: null;
+    UserRoleName: null;
+    DatabaseQueryRoleName: null;
+    LastLogIn: string;
+    LockedUntil: null;
+    RequiresMultiFactorAuthentication: boolean;
+    MultiFactorAuthenticationEnabled: boolean;
+    AcceptedLicenseDateTime: string;
+    StoreGridConfigRemotely: boolean;
+  };
 }

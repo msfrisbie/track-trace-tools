@@ -9,6 +9,8 @@ const LOGIN_URL = origin({ divertToNullOrigin: false }) + "/log-in";
 /**
  * API READ
  */
+const EMPLOYEES_URL = origin({ divertToNullOrigin: false }) + "/api/employees";
+
 const AVAILABLE_TAGS_URL = origin({ divertToNullOrigin: false }) + "/api/tags/available";
 const USED_TAGS_URL = origin({ divertToNullOrigin: false }) + "/api/tags/used";
 const VOIDED_TAGS_URL = origin({ divertToNullOrigin: false }) + "/api/tags/voided";
@@ -60,6 +62,7 @@ const NOOP_URL = origin({ divertToNullOrigin: false }) + "/api/system/noop";
 /**
  * API WRITE
  */
+const PACKAGE_ADJUST_URL = origin() + "/api/packages/adjust";
 const PACKAGE_NOTE_URL = origin() + "/api/packages/change/notes";
 const VOID_TAG_URL = origin() + "/api/tags/void";
 const REORDER_TAGS_URL = origin() + "/api/tagorders/create";
@@ -361,6 +364,18 @@ export class MetrcRequestManager implements IAtomicService {
   async getLoginPage() {
     return customFetch(LOGIN_URL, {
       ...DEFAULT_FETCH_GET_OPTIONS,
+    });
+  }
+
+  async getEmployees(body: string) {
+    return customFetch(EMPLOYEES_URL, {
+      ...DEFAULT_FETCH_POST_OPTIONS,
+      // @ts-ignore
+      headers: {
+        ...(await buildAuthenticationHeaders(this.authStateOrError)),
+        ...JSON_HEADERS,
+      },
+      body,
     });
   }
 
