@@ -1,4 +1,10 @@
-import { IIndexedTransferData, IMetrcFacilityData, IMetrcTransferTypeData, ITransferPackageList } from "@/interfaces";
+import {
+  IIndexedTransferData,
+  IMetrcFacilityData,
+  IMetrcTransferTypeData,
+  ITransferPackageList,
+  IUnitOfMeasure,
+} from "@/interfaces";
 
 export interface ITransferBuilderState {
   transferPackageLists: ITransferPackageList[];
@@ -20,7 +26,7 @@ export interface ITransferBuilderState {
   phoneNumberForQuestions: string;
   wholesalePackageValues: number[];
   packageGrossWeights: number[];
-  packageGrossUnitsOfWeight: number[];
+  packageGrossUnitsOfWeight: IUnitOfMeasure[];
   isSameSiteTransfer: boolean;
   transferForUpdate: IIndexedTransferData | null;
 }
@@ -32,7 +38,7 @@ export interface ITransferBuilderUpdateData {
   transferType?: IMetrcTransferTypeData | null;
   wholesalePackageValues?: number[];
   packageGrossWeights?: number[];
-  packageGrossUnitsOfWeight?: number[];
+  packageGrossUnitsOfWeight?: IUnitOfMeasure[];
   departureIsodate?: string;
   departureIsotime?: string;
   arrivalIsodate?: string;

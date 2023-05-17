@@ -19,7 +19,7 @@
                     pkg
                   )} ${getItemUnitOfMeasureNameOrError(pkg)} ${getItemNameOrError(
                     pkg
-                  )} ${getStrainNameOrError(pkg)}`
+                  )}`
               "
               :minMatchingChars="0"
               :showOnFocus="true"
@@ -166,7 +166,6 @@ import store from "@/store/page-overlay/index";
 import {
   getLabelOrError,
   getQuantityOrError,
-  getStrainNameOrError,
   getItemNameOrError,
   getItemUnitOfMeasureNameOrError,
   getItemUnitOfMeasureAbbreviationOrError,
@@ -208,7 +207,6 @@ export default Vue.extend({
   methods: {
     getLabelOrError,
     getQuantityOrError,
-    getStrainNameOrError,
     getItemNameOrError,
     getItemUnitOfMeasureNameOrError,
     getItemUnitOfMeasureAbbreviationOrError,

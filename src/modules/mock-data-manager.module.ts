@@ -895,7 +895,7 @@ class MockDataManager implements IAtomicService {
         Id: 5002,
         Name: "Pounds",
       },
-    ];
+    ] as IUnitOfMeasure[];
   }
 
   mockUnitsOfWeight() {}

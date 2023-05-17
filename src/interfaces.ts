@@ -29,6 +29,7 @@ import { ISettingsState } from "./store/page-overlay/modules/settings/interfaces
 import { ISplitPackageBuilderState } from "./store/page-overlay/modules/split-package-builder/interfaces";
 import { ITransferBuilderState } from "./store/page-overlay/modules/transfer-builder/interfaces";
 import { CsvUpload, CsvUploadStatus } from "./types";
+import { UnitOfMeasureAbbreviation, UnitOfMeasureName } from "./utils/units";
 
 export type PlantBatchTypeName = "Clone" | "Seed";
 export type PlantGrowthPhase = "Vegetative" | "Flowering";
@@ -1645,8 +1646,14 @@ export interface IItemCategory {
 }
 
 export interface IUnitOfMeasure {
+  Abbreviation: UnitOfMeasureAbbreviation;
+  FromBaseFactor: number;
   Id: number;
-  Name: string;
+  IsArchived: boolean;
+  IsBaseUnit: boolean;
+  Name: UnitOfMeasureName;
+  QuantityType: "WeightBased";
+  ToBaseFactor: number;
 }
 
 export interface IWasteReason {

@@ -35,7 +35,6 @@
           </b-form-group>
 
           <b-form-group label="ARRIVE" label-class="text-gray-400" label-size="sm">
-            ISO: {{ arrivalIsodate }} {{ arrivalIsotime }}
             <b-input-group class="flex flex-row gap-1">
               <b-form-timepicker
                 v-model="arrivalIsotime"

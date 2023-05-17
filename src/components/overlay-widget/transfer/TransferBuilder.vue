@@ -505,7 +505,6 @@ import { mapActions, mapGetters, mapState, Store } from "vuex";
 import {
   getLabelOrError,
   getQuantityOrError,
-  getStrainNameOrError,
   getItemNameOrError,
   getItemUnitOfMeasureNameOrError,
   getItemUnitOfMeasureAbbreviationOrError,
@@ -537,7 +536,6 @@ export default Vue.extend({
     }),
     getLabelOrError,
     getQuantityOrError,
-    getStrainNameOrError,
     getItemNameOrError,
     getItemUnitOfMeasureNameOrError,
     getItemUnitOfMeasureAbbreviationOrError,
@@ -667,9 +665,7 @@ export default Vue.extend({
 
         if (this.isTransferSubmittedWithGrossWeight) {
           GrossWeight = this.packageGrossWeights[idx].toString();
-          GrossUnitOfWeightId = (this.$data.unitsOfWeight as IUnitOfMeasure[])[
-            this.packageGrossUnitsOfWeight[idx]
-          ].Id.toString();
+          GrossUnitOfWeightId = this.packageGrossUnitsOfWeight[idx].Id.toString();
         }
 
         packages.push({
@@ -1109,7 +1105,7 @@ export default Vue.extend({
           packageGrossUnitsOfWeight,
         });
       },
-    } as IComputedGetSet<number[]>,
+    } as IComputedGetSet<IUnitOfMeasure[]>,
     isSameSiteTransfer: {
       get(): boolean {
         return this.$store.state.transferBuilder.isSameSiteTransfer;

@@ -8,10 +8,8 @@ import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
 import { dynamicConstsManager } from "@/modules/dynamic-consts-manager.module";
 import { toastManager } from "@/modules/toast-manager.module";
 import { todayIsodate } from "@/utils/date";
-import { snap } from "@/utils/debug";
 import { getLabelOrError } from "@/utils/package";
 import { getActiveTransferPackageListOrNull } from "@/utils/transfer";
-import { UnitOfMeasureAbbreviation, unitOfMeasureAbbreviationToName } from "@/utils/units";
 import _ from "lodash";
 import { ActionContext } from "vuex";
 import { BuilderType, MessageType } from "../../../../consts";
@@ -303,7 +301,7 @@ export const transferBuilderModule = {
         transferForUpdate.Id
       );
 
-      if (destinations.length !== 1) {
+      if (destinations.length > 1) {
         toastManager.openToast(
           `Unable to populate transfer data: ${destinations.length} destinations found`,
           {
@@ -325,7 +323,7 @@ export const transferBuilderModule = {
         return;
       }
 
-      if (transporters.length !== 1) {
+      if (transporters.length > 1) {
         toastManager.openToast(
           `Unable to populate transfer data: ${transporters.length} transporters found`,
           {
@@ -347,7 +345,7 @@ export const transferBuilderModule = {
         return;
       }
 
-      if (transporterDetails.length !== 1) {
+      if (transporterDetails.length > 1) {
         toastManager.openToast(
           `Unable to populate transfer data: ${transporterDetails.length} transporter details found`,
           {
@@ -369,9 +367,9 @@ export const transferBuilderModule = {
         return;
       }
 
-      const [destination] = destinations;
-      const [transporter] = transporters;
-      const [transporterDetail] = transporterDetails;
+      const destination = destinations.length > 0 ? destinations[0] : null;
+      const transporter = transporters.length > 0 ? transporters[0] : null;
+      const transporterDetail = transporterDetails.length > 0 ? transporterDetails[0] : null;
 
       const inTransitPackages = await primaryDataLoader.inTransitPackages();
 
@@ -381,11 +379,16 @@ export const transferBuilderModule = {
       const destinationFacilities = await dynamicConstsManager.destinationFacilities();
       const unitsOfWeight = await dynamicConstsManager.unitsOfWeight();
 
-      const [departureIsodate, departureIsotime] =
-        destination.EstimatedDepartureDateTime.split("T");
-      const [arrivalIsodate, arrivalIsotime] = destination.EstimatedArrivalDateTime.split("T");
+      const [departureIsodate, departureIsotime] = destination
+        ? destination.EstimatedDepartureDateTime.split("T")
+        : [undefined, undefined];
+      const [arrivalIsodate, arrivalIsotime] = destination
+        ? destination.EstimatedArrivalDateTime.split("T")
+        : [undefined, undefined];
 
-      const destinationPackages = await primaryDataLoader.destinationPackages(destination.Id);
+      const destinationPackages = destination
+        ? await primaryDataLoader.destinationPackages(destination.Id)
+        : [];
 
       const packages = await destinationPackages;
       destinationPackages.map((pkg) =>
@@ -396,47 +399,40 @@ export const transferBuilderModule = {
         await ctx.dispatch(TransferBuilderActions.ADD_PACKAGE, { pkg });
       }
 
-      const transferType = transferTypes.find((x) => x.Name === destination.ShipmentTypeName);
-
-      console.log(snap({ transporter }));
+      const transferType = destination
+        ? transferTypes.find((x) => x.Name === destination.ShipmentTypeName)
+        : transferTypes[0];
 
       const transferData: ITransferBuilderUpdateData = {
         originFacility: facilities.find(
           (x) => x.LicenseNumber === ctx.rootState.pluginAuth.authState?.license
         ),
-        transporterFacility: transporterFacilities.find(
-          (x) => x.LicenseNumber === transporter.TransporterFacilityLicenseNumber
-        ),
-        destinationFacility: destinationFacilities.find(
-          (x) => x.LicenseNumber === destination.RecipientFacilityLicenseNumber
-        ),
+        transporterFacility: transporterDetail
+          ? transporterFacilities.find((x) => x.Id === transporterDetail.TransporterFacilityId)
+          : undefined,
+        destinationFacility: destination
+          ? destinationFacilities.find(
+              (x) => x.LicenseNumber === destination.RecipientFacilityLicenseNumber
+            )
+          : undefined,
         transferType,
         departureIsodate,
         departureIsotime,
         arrivalIsodate,
         arrivalIsotime,
-        plannedRoute: destination.PlannedRoute,
-        driverName: transporterDetail.DriverName,
-        driverEmployeeId: transporterDetail.DriverOccupationalLicenseNumber,
-        driverLicenseNumber: transporterDetail.DriverVehicleLicenseNumber,
-        vehicleMake: transporterDetail.VehicleMake,
-        vehicleModel: transporterDetail.VehicleModel,
-        vehicleLicensePlate: transporterDetail.VehicleLicensePlateNumber,
+        plannedRoute: destination?.PlannedRoute,
+        driverName: transporterDetail?.DriverName,
+        driverEmployeeId: transporterDetail?.DriverOccupationalLicenseNumber,
+        driverLicenseNumber: transporterDetail?.DriverVehicleLicenseNumber,
+        vehicleMake: transporterDetail?.VehicleMake,
+        vehicleModel: transporterDetail?.VehicleModel,
+        vehicleLicensePlate: transporterDetail?.VehicleLicensePlateNumber,
         wholesalePackageValues: destinationPackages.map((x) => x.ShipperWholesalePrice) as number[],
         packageGrossWeights: destinationPackages.map((x) => x.GrossWeight) as number[],
         packageGrossUnitsOfWeight: destinationPackages.map(
-          (pkg) =>
-            unitsOfWeight.find(
-              (x) =>
-                x.Name ===
-                unitOfMeasureAbbreviationToName(
-                  pkg.GrossUnitOfWeightAbbreviation as UnitOfMeasureAbbreviation
-                )
-            )?.Id
-        ) as number[],
+          (pkg) => unitsOfWeight.find((x) => x.Abbreviation === pkg.GrossUnitOfWeightAbbreviation)!
+        ),
       };
-
-      console.log({ transferData });
 
       await ctx.dispatch(TransferBuilderActions.UPDATE_TRANSFER_DATA, transferData);
 
