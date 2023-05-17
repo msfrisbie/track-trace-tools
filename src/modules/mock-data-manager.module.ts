@@ -8,7 +8,7 @@ import {
   ILocationData,
   IMetrcDriverData,
   IMetrcFacilityData,
-  IMetrcTransferTypeData,
+  IMetrcTransferType,
   IMetrcVehicleData,
   IPlantBatchData,
   IPlantBatchGrowthPhase,
@@ -1055,7 +1055,7 @@ class MockDataManager implements IAtomicService {
     ];
   }
 
-  mockTransferTypes(): IMetrcTransferTypeData[] {
+  mockTransferTypes(): IMetrcTransferType[] {
     return [
       {
         Id: 101,

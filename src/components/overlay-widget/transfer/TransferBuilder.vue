@@ -466,7 +466,6 @@ import {
   IMetrcTransferPackageData,
   IMetrcTransferTransporterData,
   IMetrcTransferType,
-  IMetrcTransferTypeData,
   IMetrcUpdateStateAuthorizedTransferPayload,
   IMetrcUpdateTransferPayload,
   IPluginState,
@@ -1031,12 +1030,12 @@ export default Vue.extend({
       get(): IMetrcTransferType | null {
         return this.$store.state.transferBuilder.transferType;
       },
-      set(transferType: ITransferData) {
+      set(transferType: IMetrcTransferType | null) {
         this.$store.dispatch(`transferBuilder/${TransferBuilderActions.UPDATE_TRANSFER_DATA}`, {
           transferType,
         });
       },
-    } as IComputedGetSetMismatched<IMetrcTransferType | null, ITransferData>,
+    } as IComputedGetSet<IMetrcTransferType | null>,
     originFacility: {
       get(): IMetrcFacilityData | null {
         return this.$store.state.transferBuilder.originFacility;
@@ -1137,12 +1136,12 @@ export default Vue.extend({
       return window.location.hostname === "mi.metrc.com";
     },
     isTransferSubmittedWithWholesalePrice(): boolean {
-      return this.transferType?.Name === "Wholesale";
+      return this.transferType?.Name?.includes("Wholesale") ?? false;
     },
     transferTypeOptions(): { value: IMetrcTransferType; text: string; disabled: boolean }[] {
       return this.$data.transferTypes
-        .map((transferType: IMetrcTransferTypeData) => {
-          const enabled = true; //["Transfer", "Return", "State Authorized"].includes(transferType.Name);
+        .map((transferType: IMetrcTransferType) => {
+          const enabled = true;
 
           return {
             value: transferType,
@@ -1208,9 +1207,10 @@ export default Vue.extend({
     try {
       this.$store.dispatch(`transferBuilder/${TransferBuilderActions.REFRESH_PACKAGES}`);
 
-      // Currently limit support to Transfer
       this.$data.transferTypes = await dynamicConstsManager.transferTypes();
-      this.transferType = this.$data.transferTypes[0];
+      if (!this.transferType) {
+        this.transferType = this.$data.transferTypes[0];
+      }
 
       this.$data.facilities = await dynamicConstsManager.facilities();
       this.$data.transporterFacilities = await dynamicConstsManager.transporterFacilities();
@@ -1243,10 +1243,6 @@ export default Vue.extend({
           facilityReadableAddressLinesOrNull(this.originFacility as IMetrcFacilityData) || []
         ).join("\n");
       });
-
-      this.transferType = this.$data.transferTypes.find(
-        (transferType: IMetrcTransferType) => transferType.Name === "Transfer"
-      );
     } catch (e) {
       console.error(e);
 

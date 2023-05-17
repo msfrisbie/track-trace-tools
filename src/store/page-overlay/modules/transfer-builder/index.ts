@@ -8,6 +8,7 @@ import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
 import { dynamicConstsManager } from "@/modules/dynamic-consts-manager.module";
 import { toastManager } from "@/modules/toast-manager.module";
 import { todayIsodate } from "@/utils/date";
+import { snap } from "@/utils/debug";
 import { getLabelOrError } from "@/utils/package";
 import { getActiveTransferPackageListOrNull } from "@/utils/transfer";
 import _ from "lodash";
@@ -380,6 +381,8 @@ export const transferBuilderModule = {
       const transferType = destination
         ? transferTypes.find((x) => x.Name === destination.ShipmentTypeName)
         : transferTypes[0];
+
+      console.log(snap({ destination, transferTypes, transferType }));
 
       const transferData: ITransferBuilderUpdateData = {
         originFacility: facilities.find(
