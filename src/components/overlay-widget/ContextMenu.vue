@@ -150,6 +150,21 @@
       </template>
 
       <template v-if="contextMenuEvent && contextMenuEvent.manifestNumber">
+        <b-button
+          v-if="enableEditTransferButton"
+          variant="outline-primary"
+          class=""
+          @click.stop.prevent="editTransfer()"
+          ><div
+            class="grid grid-cols-2 place-items-center"
+            style="grid-template-columns: auto 1fr auto"
+          >
+            <span>EDIT TRANSFER</span>
+            <div></div>
+            <div class=""><font-awesome-icon icon="edit" /></div>
+          </div>
+        </b-button>
+
         <b-button variant="outline-primary" class="" @click.stop.prevent="viewManifest()"
           ><div
             class="grid grid-cols-2 place-items-center"
@@ -282,7 +297,7 @@
 </template>
 
 <script lang="ts">
-import { MessageType, ModalAction, ModalType, PackageState } from "@/consts";
+import { MessageType, ModalAction, ModalType, PackageState, TransferState } from "@/consts";
 import {
   IIndexedPackageData,
   IIndexedTransferData,
@@ -312,8 +327,6 @@ import { createScanSheet } from "@/utils/transfer";
 import Vue from "vue";
 import { mapActions, mapState } from "vuex";
 
-// const packageLabTestPdfEligible = !METRC_HOSTNAMES_LACKING_LAB_PDFS.includes(window.location.hostname);
-
 export default Vue.extend({
   name: "ContextMenu",
   store,
@@ -327,6 +340,17 @@ export default Vue.extend({
       authState: (state: IPluginState) => state.pluginAuth.authState,
       oAuthState: (state: IPluginState) => state.pluginAuth.oAuthState,
     }),
+    enableEditTransferButton() {
+      if ((this.$data.transfer as IIndexedTransferData)?.TransferState !== TransferState.OUTGOING) {
+        return false;
+      }
+
+      if (!clientBuildManager.assertValues(["ENABLE_TRANSFER_EDIT"])) {
+        return false;
+      }
+
+      return true;
+    },
     isIdentityEligibleForTransferToolsImpl(): boolean {
       return isIdentityEligibleForTransferTools({
         hostname: window.location.hostname,
@@ -371,6 +395,7 @@ export default Vue.extend({
       setSearchType: `search/${SearchActions.SET_SEARCH_TYPE}`,
       setPackageHistorySourcePackage: `packageHistory/${PackageHistoryActions.SET_SOURCE_PACKAGE}`,
       refreshOAuthState: `pluginAuth/${PluginAuthActions.REFRESH_OAUTH_STATE}`,
+      setTransferForUpdate: `transferBuilder/${TransferBuilderActions.SET_TRANSFER_FOR_UPDATE}`,
     }),
     openPackageHistoryBuilder() {
       analyticsManager.track(MessageType.OPENED_PACKAGE_HISTORY_FROM_TOOLKIT_SEARCH, {});
@@ -411,7 +436,6 @@ export default Vue.extend({
       this.$data.transferLoadError = false;
     },
     async updatePackage() {
-      // @ts-ignore
       this.reset();
 
       this.$data.labTestUrls = [];
@@ -454,33 +478,28 @@ export default Vue.extend({
       }
     },
     async updateTransfer() {
-      // @ts-ignore
       this.reset();
 
       if (this.contextMenuEvent?.manifestNumber) {
-        if (!this.$data.transfer) {
-          try {
-            this.$data.transfer = await primaryDataLoader.incomingTransfer(
-              this.contextMenuEvent.manifestNumber
-            );
-          } catch (e) {}
-        }
+        this.$data.transfer = null;
 
-        if (!this.$data.transfer) {
-          try {
-            this.$data.transfer = await primaryDataLoader.outgoingTransfer(
-              this.contextMenuEvent.manifestNumber
-            );
-          } catch (e) {}
-        }
+        const handler = (transfer: IIndexedTransferData) => {
+          if (!this.$data.transfer) {
+            this.$data.transfer = transfer;
+          }
+        };
 
-        if (!this.$data.transfer) {
-          try {
-            this.$data.transfer = await primaryDataLoader.rejectedTransfer(
-              this.contextMenuEvent.manifestNumber
-            );
-          } catch (e) {}
-        }
+        await Promise.allSettled([
+          primaryDataLoader.incomingTransfer(this.contextMenuEvent.manifestNumber).then(handler),
+          primaryDataLoader
+            .incomingInactiveTransfer(this.contextMenuEvent.manifestNumber)
+            .then(handler),
+          primaryDataLoader.outgoingTransfer(this.contextMenuEvent.manifestNumber).then(handler),
+          primaryDataLoader
+            .outgoingInactiveTransfer(this.contextMenuEvent.manifestNumber)
+            .then(handler),
+          primaryDataLoader.rejectedTransfer(this.contextMenuEvent.manifestNumber).then(handler),
+        ]);
 
         if (!this.$data.transfer) {
           this.$data.transferLoadError = true;
@@ -490,7 +509,6 @@ export default Vue.extend({
     transferPackage() {
       analyticsManager.track(MessageType.CONTEXT_MENU_SELECT, { event: "transferPackage" });
 
-      // @ts-ignore
       this.addPackageToTransferList({ pkg: this.$data.pkg });
 
       analyticsManager.track(MessageType.STARTED_TRANSFER_FROM_INLINE_BUTTON, {});
@@ -533,6 +551,18 @@ export default Vue.extend({
       downloadLabTests({ pkg: this.$data.pkg });
 
       analyticsManager.track(MessageType.CLICKED_DOWNLOAD_LAB_TEST_BUTTON);
+      this.dismiss();
+    },
+    async editTransfer() {
+      analyticsManager.track(MessageType.CONTEXT_MENU_SELECT, { event: "editTransfer" });
+
+      await this.setTransferForUpdate({ transferForUpdate: this.$data.transfer });
+
+      modalManager.dispatchModalEvent(ModalType.BUILDER, ModalAction.OPEN, {
+        initialRoute: "/transfer/transfer-builder",
+      });
+
+      analyticsManager.track(MessageType.CLICKED_EDIT_TRANSFER);
       this.dismiss();
     },
     viewManifest() {

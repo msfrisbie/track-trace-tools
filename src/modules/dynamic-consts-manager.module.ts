@@ -5,7 +5,7 @@ import {
   IItemCategory,
   IMetrcDriverData,
   IMetrcFacilityData,
-  IMetrcTransferTypeData,
+  IMetrcTransferType,
   IMetrcVehicleData,
   IPlantBatchGrowthPhase,
   IPlantBatchType,
@@ -69,7 +69,7 @@ interface INewTransferRepeaterData {
   Drivers: IMetrcDriverData[];
   Vehicles: IMetrcVehicleData[];
   Facilities: { [key: string]: IMetrcFacilityData };
-  TransferTypes: IMetrcTransferTypeData[];
+  TransferTypes: IMetrcTransferType[];
 }
 
 const debugLog = debugLogFactory("dynamic-consts-manager.module.ts");
@@ -760,7 +760,7 @@ class DynamicConstsManager implements IAtomicService {
     return this._cachedTransportFacilities;
   }
 
-  async transferTypes(): Promise<IMetrcTransferTypeData[]> {
+  async transferTypes(): Promise<IMetrcTransferType[]> {
     if (store.state.mockDataMode && store.state.flags?.mockedFlags.mockTransferTypes.enabled) {
       return mockDataManager.mockTransferTypes();
     }

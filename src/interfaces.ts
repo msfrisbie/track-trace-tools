@@ -1759,33 +1759,6 @@ export interface IMetrcVehicleData {
   VehicleModel: string;
 }
 
-export interface IMetrcTransferTypeData {
-  Id: number;
-  Name: string;
-  TransactionType: "Standard" | "Wholesale";
-  TransactionTypeName: "Standard" | "Wholesale";
-  ForLicensedShipments: boolean;
-  ForExternalIncomingShipments: boolean;
-  ShipperLicenseNumberFieldEnabled: boolean;
-  ShipperLicenseNumberFieldLabel: string;
-  ShipperLicenseNameFieldEnabled: boolean;
-  ShipperAddressFieldsEnabled: boolean;
-  ForExternalOutgoingShipments: boolean;
-  RecipientLicenseNumberFieldEnabled: boolean;
-  RecipientLicenseNumberFieldLabel: string;
-  RecipientLicenseNameFieldEnabled: boolean;
-  RecipientAddressFieldsEnabled: boolean;
-  TransporterFieldsEnabled: boolean;
-  RequiresDestinationGrossWeight: boolean;
-  RequiresPackagesGrossWeight: boolean;
-  MinimumWholesalePrice: null;
-  MaximumWholesalePrice: null;
-  FacilityTypes: {
-    FacilityTypeId: number;
-    FacilityTypeName: "Cannabis - Microbusiness License";
-  }[];
-}
-
 export type PluginKeyvalCategory =
   | "GENERIC"
   | "FACILITIES"

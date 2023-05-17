@@ -1,7 +1,7 @@
 import {
   IIndexedTransferData,
   IMetrcFacilityData,
-  IMetrcTransferTypeData,
+  IMetrcTransferType,
   ITransferPackageList,
   IUnitOfMeasure,
 } from "@/interfaces";
@@ -11,7 +11,7 @@ export interface ITransferBuilderState {
   originFacility: IMetrcFacilityData | null;
   transporterFacility: IMetrcFacilityData | null;
   destinationFacility: IMetrcFacilityData | null;
-  transferType: IMetrcTransferTypeData | null;
+  transferType: IMetrcTransferType | null;
   departureIsodate: string;
   departureIsotime: string;
   arrivalIsodate: string;
@@ -35,7 +35,7 @@ export interface ITransferBuilderUpdateData {
   originFacility?: IMetrcFacilityData | null;
   transporterFacility?: IMetrcFacilityData | null;
   destinationFacility?: IMetrcFacilityData | null;
-  transferType?: IMetrcTransferTypeData | null;
+  transferType?: IMetrcTransferType | null;
   wholesalePackageValues?: number[];
   packageGrossWeights?: number[];
   packageGrossUnitsOfWeight?: IUnitOfMeasure[];
