@@ -345,31 +345,9 @@ export const transferBuilderModule = {
         return;
       }
 
-      if (transporterDetails.length > 1) {
-        toastManager.openToast(
-          `Unable to populate transfer data: ${transporterDetails.length} transporter details found`,
-          {
-            title: "Edit Transfer Error",
-            autoHideDelay: 10000,
-            variant: "danger",
-            appendToast: true,
-            toaster: "ttt-toaster",
-            solid: true,
-          }
-        );
-
-        analyticsManager.track(MessageType.BUILDER_EVENT, {
-          builder: BuilderType.UPDATE_TRANSFER,
-          action: `Unable to populate transfer data: ${transporterDetails.length} transporter details found`,
-          payload,
-        });
-
-        return;
-      }
-
       const destination = destinations.length > 0 ? destinations[0] : null;
-      const transporter = transporters.length > 0 ? transporters[0] : null;
-      const transporterDetail = transporterDetails.length > 0 ? transporterDetails[0] : null;
+      const transporterDetail =
+        transporterDetails.length > 0 ? transporterDetails[transporterDetails.length - 1] : null;
 
       const inTransitPackages = await primaryDataLoader.inTransitPackages();
 
