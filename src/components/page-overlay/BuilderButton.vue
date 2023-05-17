@@ -4,7 +4,8 @@
     @click="openBuilder($event)"
     title="Toolbox"
     id="builder-popover-target"
-    style="padding: 0"
+    style="padding: 0; width: 52px"
+    class="flex flex-col items-center justify-center"
   >
     <!-- class="bg-gray-50 hover:bg-gray-200 rounded-full shadow-2xl border border-gray-400 h-16 w-16 flex items-center justify-center cursor-pointer" -->
 
