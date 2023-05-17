@@ -127,6 +127,7 @@ enum UrlType {
   CREATE_PLANTINGS_FROM_PACKAGE,
   CHANGE_PLANT_BATCH_GROWTH_PHASE,
   TRANSFER_DESTINATIONS_BY_TRANSFER_ID,
+  TRANSFER_TRANSPORTER_DETAILS_BY_TRANSFER_ID,
   DESTINATION_PACKAGES_BY_DESTINATION_ID,
   DESTINATION_TRANSPORTERS_BY_DESTINATION_ID,
   PLANT_BATCH_HISTORY_BY_PLANT_BATCH_ID,
@@ -284,6 +285,14 @@ async function buildDynamicUrl(
       return (
         origin({ divertToNullOrigin: false }) +
         `/api/transfers/destinations?id=${options.transferId}`
+      );
+    case UrlType.TRANSFER_TRANSPORTER_DETAILS_BY_TRANSFER_ID:
+      if (!options || !options.transferId) {
+        throw new Error("Missing required URL options");
+      }
+      return (
+        origin({ divertToNullOrigin: false }) +
+        `/api/transfers/transporters/details?id=${options.transferId}`
       );
     case UrlType.DESTINATION_TRANSPORTERS_BY_DESTINATION_ID:
       if (!options || !options.destinationId) {
@@ -802,6 +811,37 @@ export class MetrcRequestManager implements IAtomicService {
       await buildDynamicUrl(this.authStateOrError, UrlType.TRANSFER_DESTINATIONS_BY_TRANSFER_ID, {
         transferId,
       }),
+      {
+        ...DEFAULT_FETCH_POST_OPTIONS,
+        // @ts-ignore
+        headers: {
+          ...(await buildAuthenticationHeaders(this.authStateOrError)),
+          ...JSON_HEADERS,
+        },
+        body,
+        signal,
+      }
+    );
+  }
+
+  async getTransferTransporterDetails(
+    body: string,
+    transferId: number,
+    abortTimeout: number = 30000
+  ) {
+    const controller = new AbortController();
+    const signal = controller.signal;
+
+    setTimeout(() => controller.abort(), abortTimeout);
+
+    return customFetch(
+      await buildDynamicUrl(
+        this.authStateOrError,
+        UrlType.TRANSFER_TRANSPORTER_DETAILS_BY_TRANSFER_ID,
+        {
+          transferId,
+        }
+      ),
       {
         ...DEFAULT_FETCH_POST_OPTIONS,
         // @ts-ignore

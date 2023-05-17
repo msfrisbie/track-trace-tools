@@ -303,10 +303,6 @@
                 </div>
               </template>
             </div>
-
-            <!-- <pre>{{ JSON.stringify(wholesalePackageValues, null, 2) }}</pre>
-              <pre>{{ JSON.stringify(packageGrossUnitsOfWeight, null, 2) }}</pre>
-              <pre>{{ JSON.stringify(packageGrossWeights, null, 2) }}</pre> -->
           </div>
 
           <!-- Column 2 -->
@@ -571,7 +567,10 @@ export default Vue.extend({
           "\n"
         );
 
-        if (this.$data.destinationAddress === this.$data.originAddress) {
+        if (
+          this.$data.destinationAddress === this.$data.originAddress &&
+          this.$data.destinationAddress.trim().length > 0
+        ) {
           this.isSameSiteTransfer = true;
         }
 
@@ -1126,7 +1125,6 @@ export default Vue.extend({
         return this.$store.state.transferBuilder.transferForUpdate;
       },
       set(transferForUpdate) {
-        console.log({ transferForUpdate });
         this.$store.dispatch(`transferBuilder/${TransferBuilderActions.SET_TRANSFER_FOR_UPDATE}`, {
           transferForUpdate,
         });

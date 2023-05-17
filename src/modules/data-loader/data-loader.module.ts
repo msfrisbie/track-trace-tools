@@ -49,6 +49,7 @@ import {
   ITransferData,
   ITransferFilter,
   ITransferHistoryData,
+  ITransferTransporterDetails,
   ITransporterData,
 } from "@/interfaces";
 import { authManager } from "@/modules/auth-manager.module";
@@ -1215,6 +1216,25 @@ export class DataLoader implements IAtomicService {
     });
   }
 
+  async transferTransporterDetails(transferId: number): Promise<ITransferTransporterDetails[]> {
+    return new Promise(async (resolve, reject) => {
+      const subscription = timer(DATA_LOAD_FETCH_TIMEOUT_MS).subscribe(() =>
+        reject("Transporter details fetch timed out")
+      );
+
+      try {
+        const transferTransporterDetails: ITransferTransporterDetails[] =
+          await this.loadTransferTransporterDetails(transferId);
+
+        subscription.unsubscribe();
+        resolve(transferTransporterDetails);
+      } catch (e) {
+        subscription.unsubscribe();
+        reject(e);
+      }
+    });
+  }
+
   async destinationPackages(destinationId: number): Promise<IIndexedDestinationPackageData[]> {
     return new Promise(async (resolve, reject) => {
       const subscription = timer(DATA_LOAD_FETCH_TIMEOUT_MS).subscribe(() =>
@@ -1270,28 +1290,28 @@ export class DataLoader implements IAtomicService {
   }
 
   async onHoldPackages(): Promise<IIndexedPackageData[]> {
-      return new Promise(async (resolve, reject) => {
-        const subscription = timer(DATA_LOAD_FETCH_TIMEOUT_MS).subscribe(() =>
-          reject("On hold package fetch timed out")
+    return new Promise(async (resolve, reject) => {
+      const subscription = timer(DATA_LOAD_FETCH_TIMEOUT_MS).subscribe(() =>
+        reject("On hold package fetch timed out")
+      );
+
+      try {
+        const onHoldPackages: IIndexedPackageData[] = (await this.loadOnHoldPackages()).map(
+          (pkg) => ({
+            ...pkg,
+            PackageState: PackageState.ON_HOLD,
+            TagMatcher: "",
+            LicenseNumber: this._authState!.license,
+          })
         );
 
-        try {
-          const onHoldPackages: IIndexedPackageData[] = (await this.loadOnHoldPackages()).map(
-            (pkg) => ({
-              ...pkg,
-              PackageState: PackageState.ON_HOLD,
-              TagMatcher: "",
-              LicenseNumber: this._authState!.license,
-            })
-          );
-
-          subscription.unsubscribe();
-          resolve(onHoldPackages);
-        } catch (e) {
-          subscription.unsubscribe();
-          reject(e);
-        }
-      });
+        subscription.unsubscribe();
+        resolve(onHoldPackages);
+      } catch (e) {
+        subscription.unsubscribe();
+        reject(e);
+      }
+    });
   }
 
   async inTransitPackages(resetCache: boolean = false): Promise<IIndexedPackageData[]> {
@@ -2001,6 +2021,19 @@ export class DataLoader implements IAtomicService {
     return streamFactory<IDestinationData>(dataLoadOptions, responseFactory);
   }
 
+  transferTransporterDetailsStream(
+    dataLoadOptions: IDataLoadOptions = {},
+    transferId: number
+  ): Subject<ICollectionResponse<ITransferTransporterDetails>> {
+    const responseFactory = (paginationOptions: IPaginationOptions): Promise<Response> => {
+      const body = buildBody(paginationOptions);
+
+      return this.metrcRequestManagerOrError.getTransferTransporterDetails(body, transferId);
+    };
+
+    return streamFactory<ITransferTransporterDetails>(dataLoadOptions, responseFactory);
+  }
+
   destinationPackagesStream(
     dataLoadOptions: IDataLoadOptions = {},
     destinationId: number
@@ -2036,9 +2069,7 @@ export class DataLoader implements IAtomicService {
     return streamFactory<IPackageData>(options, responseFactory);
   }
 
-  onHoldPackagesStream(
-    options: IPackageOptions = {}
-  ): Subject<ICollectionResponse<IPackageData>> {
+  onHoldPackagesStream(options: IPackageOptions = {}): Subject<ICollectionResponse<IPackageData>> {
     const responseFactory = (paginationOptions: IPaginationOptions): Promise<Response> => {
       const body = buildBody(paginationOptions);
 
@@ -2290,6 +2321,28 @@ export class DataLoader implements IAtomicService {
     );
 
     console.log(`Loaded ${transferDestinations.length} transferDestinations`);
+
+    store.commit(MutationType.SET_LOADING_MESSAGE, null);
+
+    return transferDestinations;
+  }
+
+  private async loadTransferTransporterDetails(
+    transferId: number
+  ): Promise<ITransferTransporterDetails[]> {
+    await authManager.authStateOrError();
+
+    store.commit(MutationType.SET_LOADING_MESSAGE, "Loading transfer transporter details...");
+
+    let transferDestinations: ITransferTransporterDetails[] = [];
+
+    await this.transferTransporterDetailsStream({}, transferId).forEach(
+      (next: ICollectionResponse<ITransferTransporterDetails>) => {
+        transferDestinations = [...transferDestinations, ...next.Data];
+      }
+    );
+
+    console.log(`Loaded ${transferDestinations.length} transfer transporter details`);
 
     store.commit(MutationType.SET_LOADING_MESSAGE, null);
 

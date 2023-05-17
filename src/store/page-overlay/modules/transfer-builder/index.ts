@@ -7,6 +7,8 @@ import {
 import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
 import { dynamicConstsManager } from "@/modules/dynamic-consts-manager.module";
 import { toastManager } from "@/modules/toast-manager.module";
+import { todayIsodate } from "@/utils/date";
+import { snap } from "@/utils/debug";
 import { getLabelOrError } from "@/utils/package";
 import { getActiveTransferPackageListOrNull } from "@/utils/transfer";
 import { UnitOfMeasureAbbreviation, unitOfMeasureAbbreviationToName } from "@/utils/units";
@@ -25,10 +27,10 @@ const inMemoryState = {
   wholesalePackageValues: [],
   packageGrossWeights: [],
   packageGrossUnitsOfWeight: [],
-  departureIsodate: "",
-  departureIsotime: "",
-  arrivalIsodate: "",
-  arrivalIsotime: "",
+  departureIsodate: todayIsodate(),
+  departureIsotime: "10:00:00.000",
+  arrivalIsodate: todayIsodate(),
+  arrivalIsotime: "14:00:00.000",
   plannedRoute: "",
   driverName: "",
   driverEmployeeId: "",
@@ -283,7 +285,7 @@ export const transferBuilderModule = {
         transferForUpdate: IIndexedTransferData | null;
       }
     ) => {
-      ctx.dispatch(TransferBuilderActions.RESET_TRANSFER_DATA);
+      await ctx.dispatch(TransferBuilderActions.RESET_TRANSFER_DATA);
 
       ctx.commit(TransferBuilderMutations.SET_TRANSFER_FOR_UPDATE, payload);
 
@@ -296,6 +298,10 @@ export const transferBuilderModule = {
       const destinations = await primaryDataLoader.transferDestinations(transferForUpdate.Id);
 
       const transporters = await primaryDataLoader.destinationTransporters(transferForUpdate.Id);
+
+      const transporterDetails = await primaryDataLoader.transferTransporterDetails(
+        transferForUpdate.Id
+      );
 
       if (destinations.length !== 1) {
         toastManager.openToast(
@@ -341,8 +347,31 @@ export const transferBuilderModule = {
         return;
       }
 
+      if (transporterDetails.length !== 1) {
+        toastManager.openToast(
+          `Unable to populate transfer data: ${transporterDetails.length} transporter details found`,
+          {
+            title: "Edit Transfer Error",
+            autoHideDelay: 10000,
+            variant: "danger",
+            appendToast: true,
+            toaster: "ttt-toaster",
+            solid: true,
+          }
+        );
+
+        analyticsManager.track(MessageType.BUILDER_EVENT, {
+          builder: BuilderType.UPDATE_TRANSFER,
+          action: `Unable to populate transfer data: ${transporterDetails.length} transporter details found`,
+          payload,
+        });
+
+        return;
+      }
+
       const [destination] = destinations;
       const [transporter] = transporters;
+      const [transporterDetail] = transporterDetails;
 
       const inTransitPackages = await primaryDataLoader.inTransitPackages();
 
@@ -363,9 +392,15 @@ export const transferBuilderModule = {
         inTransitPackages.find((transitPkg) => transitPkg.Label === pkg.PackageLabel)
       );
 
+      for (const pkg of packages) {
+        await ctx.dispatch(TransferBuilderActions.ADD_PACKAGE, { pkg });
+      }
+
       const transferType = transferTypes.find((x) => x.Name === destination.ShipmentTypeName);
 
-      ctx.dispatch(TransferBuilderActions.UPDATE_TRANSFER_DATA, {
+      console.log(snap({ transporter }));
+
+      const transferData: ITransferBuilderUpdateData = {
         originFacility: facilities.find(
           (x) => x.LicenseNumber === ctx.rootState.pluginAuth.authState?.license
         ),
@@ -381,31 +416,29 @@ export const transferBuilderModule = {
         arrivalIsodate,
         arrivalIsotime,
         plannedRoute: destination.PlannedRoute,
-        driverName: transporter.DriverName,
-        driverEmployeeId: transporter.DriverOccupationalLicenseNumber,
-        driverLicenseNumber: transporter.DriverVehicleLicenseNumber,
-        vehicleMake: transporter.VehicleMake,
-        vehicleModel: transporter.VehicleModel,
-        vehicleLicensePlate: transporter.VehicleLicensePlateNumber,
-        // Phone number appears to not be available via api
-        // phoneNumberForQuestions: transporter.
-        wholesalePackageValues: destinationPackages.map((x) => x.ShipperWholesalePrice),
-        packageGrossWeights: destinationPackages.map((x) => x.GrossWeight),
-        packageGrossUnitsOfWeight: destinationPackages.map((pkg) =>
-          unitsOfWeight.find(
-            (x) =>
-              x.Name ===
-              unitOfMeasureAbbreviationToName(
-                pkg.GrossUnitOfWeightAbbreviation as UnitOfMeasureAbbreviation
-              )
-          )
-        ),
-        isSameSiteTransfer: false,
-      });
+        driverName: transporterDetail.DriverName,
+        driverEmployeeId: transporterDetail.DriverOccupationalLicenseNumber,
+        driverLicenseNumber: transporterDetail.DriverVehicleLicenseNumber,
+        vehicleMake: transporterDetail.VehicleMake,
+        vehicleModel: transporterDetail.VehicleModel,
+        vehicleLicensePlate: transporterDetail.VehicleLicensePlateNumber,
+        wholesalePackageValues: destinationPackages.map((x) => x.ShipperWholesalePrice) as number[],
+        packageGrossWeights: destinationPackages.map((x) => x.GrossWeight) as number[],
+        packageGrossUnitsOfWeight: destinationPackages.map(
+          (pkg) =>
+            unitsOfWeight.find(
+              (x) =>
+                x.Name ===
+                unitOfMeasureAbbreviationToName(
+                  pkg.GrossUnitOfWeightAbbreviation as UnitOfMeasureAbbreviation
+                )
+            )?.Id
+        ) as number[],
+      };
 
-      for (const pkg of packages) {
-        await ctx.dispatch(TransferBuilderActions.ADD_PACKAGE, { pkg });
-      }
+      console.log({ transferData });
+
+      await ctx.dispatch(TransferBuilderActions.UPDATE_TRANSFER_DATA, transferData);
 
       analyticsManager.track(MessageType.BUILDER_EVENT, {
         builder: BuilderType.UPDATE_TRANSFER,

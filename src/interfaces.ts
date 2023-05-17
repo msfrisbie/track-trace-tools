@@ -770,7 +770,7 @@ export interface IDestinationPackageData {
   ShipmentPackageState: string; // "Accepted";
   ShippedQuantity: number;
   ShippedUnitOfMeasureAbbreviation: string;
-  ShipperWholesalePrice: null;
+  ShipperWholesalePrice: number | null;
   SourceHarvestNames: string;
   SourcePackageIsDonation: false;
   SourcePackageIsTradeSample: false;
@@ -966,6 +966,22 @@ export interface IDestinationData {
   RejectedPackagesReturned: boolean;
   ShipmentTransactionTypeName: string;
   ShipmentTypeName: "Transfer";
+}
+
+export interface ITransferTransporterDetails {
+  ShipmentPlanId: number;
+  ShipmentDeliveryId: number;
+  TransporterDirection: "Outbound";
+  TransporterFacilityId: number;
+  LineNumber: number;
+  DriverName: string;
+  DriverOccupationalLicenseNumber: string;
+  DriverVehicleLicenseNumber: string;
+  DriverLayoverLeg: null;
+  VehicleMake: string;
+  VehicleModel: string;
+  VehicleLicensePlateNumber: string;
+  ActualDriverStartDateTime: null;
 }
 
 export interface IRichDestinationData extends IDestinationData {

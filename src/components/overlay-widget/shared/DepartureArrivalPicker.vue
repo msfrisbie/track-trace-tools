@@ -35,6 +35,7 @@
           </b-form-group>
 
           <b-form-group label="ARRIVE" label-class="text-gray-400" label-size="sm">
+            ISO: {{ arrivalIsodate }} {{ arrivalIsotime }}
             <b-input-group class="flex flex-row gap-1">
               <b-form-timepicker
                 v-model="arrivalIsotime"
@@ -221,10 +222,10 @@ export default Vue.extend({
   },
   async created() {},
   async mounted() {
-    this.departureIsodate = todayIsodate();
-    this.departureIsotime = "10:00:00.000";
-    this.arrivalIsodate = todayIsodate();
-    this.arrivalIsotime = "14:00:00.000";
+    // this.departureIsodate = todayIsodate();
+    // this.departureIsotime = "10:00:00.000";
+    // this.arrivalIsodate = todayIsodate();
+    // this.arrivalIsotime = "14:00:00.000";
   },
 });
 </script>
