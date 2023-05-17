@@ -13,7 +13,7 @@
       <template v-if="activeStepIndex === 0">
         <div class="grid grid-cols-2 gap-8 h-full">
           <div class="flex flex-col items-stretch space-y-4 hide-scroll overflow-y-auto px-1">
-            <div>
+            <div v-if="enableEdit">
               <b-form-checkbox size="sm" v-model="editTransfer">
                 <span>Edit existing transfer</span>
               </b-form-checkbox>
@@ -510,6 +510,7 @@ import {
   getItemUnitOfMeasureAbbreviationOrError,
   getIdOrError,
 } from "@/utils/package";
+import { clientBuildManager } from "@/modules/client-build-manager.module";
 
 const debugLog = debugLogFactory("TransferBuilder.vue");
 
@@ -1160,6 +1161,7 @@ export default Vue.extend({
   },
   data() {
     return {
+      enableEdit: false,
       destinationQuery: "",
       transporterQuery: "",
       transferDataLoading: false,
@@ -1194,6 +1196,8 @@ export default Vue.extend({
   },
   async mounted() {
     const authState = await authManager.authStateOrError();
+
+    this.$data.enableEdit = clientBuildManager.assertValues(["ENABLE_TRANSFER_EDIT"]);
 
     dynamicConstsManager.transferTemplateHTML();
 
