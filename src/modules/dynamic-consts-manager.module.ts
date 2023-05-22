@@ -446,17 +446,21 @@ class DynamicConstsManager implements IAtomicService {
       return clientBuildManager.clientConfig.overrides.transferTemplateHtmlUrl;
     }
 
-    // If it's expired but cached, return the cache and refetch
-    if (await this.isNewTransferModalCached()) {
-      this.refreshNewTransferModalCacheIfExpired();
-    } else {
-      // Not cached, must fetch in real time
-      await this.refreshTransferTemplateHTMLCache();
-    }
+    return this.newTransferModalRequest();
 
-    const htmlKey = await this.licenseKey(IdbKeyPiece.TRANSFER_MODAL_HTML);
+    // Caching is no longer required since packages are lazy-loaded
+    //
+    // // If it's expired but cached, return the cache and refetch
+    // if (await this.isNewTransferModalCached()) {
+    //   this.refreshNewTransferModalCacheIfExpired();
+    // } else {
+    //   // Not cached, must fetch in real time
+    //   await this.refreshTransferTemplateHTMLCache();
+    // }
 
-    return get(htmlKey) as Promise<string>;
+    // const htmlKey = await this.licenseKey(IdbKeyPiece.TRANSFER_MODAL_HTML);
+
+    // return get(htmlKey) as Promise<string>;
   }
 
   private async refreshNewTransferModalCacheIfExpired() {
