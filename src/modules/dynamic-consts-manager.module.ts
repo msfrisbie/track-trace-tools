@@ -24,7 +24,6 @@ import { get, keys, set } from "idb-keyval";
 import _ from "lodash";
 import { timer } from "rxjs";
 import { clientBuildManager } from "./client-build-manager.module";
-import { toastManager } from "./toast-manager.module";
 const DYNAMIC_CONST_TIMEOUT_MS = 30000;
 
 const TRANSFER_MODAL_HTML_EXPIRATION_MS: number = 1000 * 60 * 60 * 24;
@@ -408,17 +407,17 @@ class DynamicConstsManager implements IAtomicService {
     if (!this._newTransferModalText) {
       debugLog(async () => ["Sending transfer modal request"]);
 
-      toastManager.openToast(
-        "T3 is storing the New Transfer form so it can be reused. The page may be slow for a few seconds.",
-        {
-          title: "Loading transfer data",
-          autoHideDelay: 5000,
-          variant: "primary",
-          appendToast: true,
-          toaster: "ttt-toaster",
-          solid: true,
-        }
-      );
+      // toastManager.openToast(
+      //   "T3 is storing the New Transfer form so it can be reused. The page may be slow for a few seconds.",
+      //   {
+      //     title: "Loading transfer data",
+      //     autoHideDelay: 5000,
+      //     variant: "primary",
+      //     appendToast: true,
+      //     toaster: "ttt-toaster",
+      //     solid: true,
+      //   }
+      // );
 
       this._newTransferModalText = primaryMetrcRequestManager
         .getNewTransferHTML()
