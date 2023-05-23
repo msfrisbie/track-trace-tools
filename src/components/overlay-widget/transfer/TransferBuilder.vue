@@ -257,6 +257,26 @@
               class="flex flex-col items-stretch text-md text-gray-700 gap-2 overflow-y-auto toolkit-scroll px-2"
               style="max-height: 35vh"
             >
+              <template v-if="isTransferSubmittedWithGrossWeight">
+                <b-input-group class="mt-2">
+                  <b-form-input
+                    size="md"
+                    type="number"
+                    value="null"
+                    v-model="destinationGrossWeight"
+                    :state="!!destinationGrossWeight"
+                  ></b-form-input>
+
+                  <b-form-select
+                    size="md"
+                    :options="weightOptions"
+                    v-model="destinationGrossUnitOfWeight"
+                    :state="!!destinationGrossUnitOfWeight"
+                  />
+                </b-input-group>
+                <b-form-text>Destination Gross Weight</b-form-text>
+              </template>
+
               <template v-for="(pkg, idx) in transferPackages">
                 <div class="border border-gray-200 rounded p-2" v-bind:key="getLabelOrError(pkg)">
                   <div class="font-bold">{{ getLabelOrError(pkg) }}</div>
@@ -267,7 +287,7 @@
                       )} ${getItemNameOrError(pkg)}`
                     }}
                   </div>
-                  <template v-if="isTransferSubmittedWithGrossWeight">
+                  <!-- <template v-if="isTransferSubmittedWithGrossWeight">
                     <b-input-group class="mt-2">
                       <b-form-input
                         size="md"
@@ -285,7 +305,7 @@
                       />
                     </b-input-group>
                     <b-form-text>Gross Weight</b-form-text>
-                  </template>
+                  </template> -->
 
                   <template v-if="isTransferSubmittedWithWholesalePrice">
                     <b-input-group prepend="$">
@@ -1180,6 +1200,7 @@ export default Vue.extend({
       unitsOfWeight: [],
       showInitializationError: false,
       editTransfer: false,
+      driverLayoverLegOptions: ["FromAndToLayover", "FromLayover", "ToLayover"],
       steps: [
         {
           stepText: "Destination details",

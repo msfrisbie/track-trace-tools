@@ -8,9 +8,8 @@ import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
 import { dynamicConstsManager } from "@/modules/dynamic-consts-manager.module";
 import { toastManager } from "@/modules/toast-manager.module";
 import { todayIsodate } from "@/utils/date";
-import { snap } from "@/utils/debug";
 import { getLabelOrError } from "@/utils/package";
-import { getActiveTransferPackageListOrNull } from "@/utils/transfer";
+// import { getActiveTransferPackageListOrNull } from "@/utils/transfer";
 import _ from "lodash";
 import { ActionContext } from "vuex";
 import { BuilderType, MessageType } from "../../../../consts";
@@ -26,25 +25,32 @@ const inMemoryState = {
   wholesalePackageValues: [],
   packageGrossWeights: [],
   packageGrossUnitsOfWeight: [],
+  destinationGrossWeight: null,
+  destinationGrossUnitOfWeight: null,
   departureIsodate: todayIsodate(),
   departureIsotime: "10:00:00.000",
   arrivalIsodate: todayIsodate(),
   arrivalIsotime: "14:00:00.000",
+  layoverCheckInIsodate: todayIsodate(),
+  layoverCheckInIsotime: "10:00:00.000",
+  layoverCheckOutIsodate: todayIsodate(),
+  layoverCheckOutIsotime: "14:00:00.000",
   plannedRoute: "",
   driverName: "",
   driverEmployeeId: "",
   driverLicenseNumber: "",
+  driverLayoverLeg: "FromAndToLayover",
   vehicleMake: "",
   vehicleModel: "",
   vehicleLicensePlate: "",
   phoneNumberForQuestions: "",
   isSameSiteTransfer: false,
+  isLayover: false,
   transferForUpdate: null,
+  transferPackageList: [],
 };
 
-const persistedState = {
-  transferPackageLists: [],
-};
+const persistedState = {};
 
 const defaultState: ITransferBuilderState = {
   ...persistedState,
@@ -66,28 +72,28 @@ export const transferBuilderModule = {
         throw new Error("Missing identity/license");
       }
 
-      let currentList = getActiveTransferPackageListOrNull({ state, identity, license });
+      // let currentList = getActiveTransferPackageListOrNull({ state, identity, license });
 
-      if (!currentList) {
-        currentList = {
-          identity,
-          license,
-          packages: [],
-        };
+      // if (!currentList) {
+      //   currentList = {
+      //     identity,
+      //     license,
+      //     packages: [],
+      //   };
 
-        state.transferPackageLists.push(currentList);
-      }
+      //   state.transferPackageLists.push(currentList);
+      // }
 
-      const existingPackageIndex = currentList.packages.findIndex(
-        (x) => getLabelOrError(x) === getLabelOrError(pkg)
-      );
+      // const existingPackageIndex = currentList.packages.findIndex(
+      //   (x) => getLabelOrError(x) === getLabelOrError(pkg)
+      // );
 
-      if (existingPackageIndex >= 0) {
-        currentList.packages.splice(existingPackageIndex, 1);
-      }
-      currentList.packages.push(pkg);
+      // if (existingPackageIndex >= 0) {
+      //   currentList.packages.splice(existingPackageIndex, 1);
+      // }
+      // currentList.packages.push(pkg);
 
-      currentList.packages.sort((a, b) => (getLabelOrError(a) > getLabelOrError(b) ? 1 : -1));
+      // currentList.packages.sort((a, b) => (getLabelOrError(a) > getLabelOrError(b) ? 1 : -1));
     },
     [TransferBuilderMutations.REMOVE_PACKAGE](
       state: ITransferBuilderState,
@@ -97,22 +103,25 @@ export const transferBuilderModule = {
         pkg,
       }: { license: string; identity: string; pkg: IUnionIndexedPackageData }
     ) {
-      if (!identity || !license) {
-        throw new Error("Missing identity/license");
-      }
+      // if (!identity || !license) {
+      //   throw new Error("Missing identity/license");
+      // }
 
-      let currentList = getActiveTransferPackageListOrNull({ state, identity, license });
+      // let currentList = getActiveTransferPackageListOrNull({ state, identity, license });
 
-      if (!currentList) {
-        return;
-      }
+      // if (!currentList) {
+      //   return;
+      // }
 
-      const existingPackageIndex = currentList.packages.findIndex(
+      const existingPackageIndex = state.transferPackageList.findIndex(
         (x) => getLabelOrError(x) === getLabelOrError(pkg)
       );
 
       if (existingPackageIndex >= 0) {
-        currentList.packages.splice(existingPackageIndex, 1);
+        state.transferPackageList.splice(existingPackageIndex, 1);
+        state.wholesalePackageValues.splice(existingPackageIndex, 1);
+        state.packageGrossWeights.splice(existingPackageIndex, 1);
+        state.packageGrossUnitsOfWeight.splice(existingPackageIndex, 1);
       }
     },
     [TransferBuilderMutations.SET_PACKAGES](
@@ -123,25 +132,29 @@ export const transferBuilderModule = {
         packages,
       }: { license: string; identity: string; packages: IUnionIndexedPackageData[] }
     ) {
-      if (!identity || !license) {
-        throw new Error("Missing identity/license");
-      }
+      // if (!identity || !license) {
+      //   throw new Error("Missing identity/license");
+      // }
 
-      let currentList = getActiveTransferPackageListOrNull({ state, identity, license });
+      // let currentList = getActiveTransferPackageListOrNull({ state, identity, license });
 
-      if (!currentList) {
-        currentList = {
-          identity,
-          license,
-          packages: [],
-        };
+      // if (!currentList) {
+      //   currentList = {
+      //     identity,
+      //     license,
+      //     packages: [],
+      //   };
 
-        state.transferPackageLists.push(currentList);
-      }
+      //   state.transferPackageLists.push(currentList);
+      // }
 
-      currentList.packages = packages;
+      // currentList.packages = packages;
 
-      currentList.packages.sort((a, b) => (getLabelOrError(a) > getLabelOrError(b) ? 1 : -1));
+      // currentList.packages.sort((a, b) => (getLabelOrError(a) > getLabelOrError(b) ? 1 : -1));
+
+      state.transferPackageList = packages.sort((a, b) =>
+        getLabelOrError(a) > getLabelOrError(b) ? 1 : -1
+      );
     },
     [TransferBuilderMutations.UPDATE_TRANSFER_DATA](
       state: ITransferBuilderState,
@@ -170,19 +183,20 @@ export const transferBuilderModule = {
       rootState: any,
       rootGetters: any
     ) => {
-      if (!rootGetters.authState) {
-        throw new Error("Missing identity/license");
-      }
+      return state.transferPackageList;
+      // if (!rootGetters.authState) {
+      //   throw new Error("Missing identity/license");
+      // }
 
-      const { identity, license } = rootGetters.authState;
+      // const { identity, license } = rootGetters.authState;
 
-      return (
-        getActiveTransferPackageListOrNull({ state, identity, license }) || {
-          license,
-          identity,
-          packages: [],
-        }
-      );
+      // return (
+      //   getActiveTransferPackageListOrNull({ state, identity, license }) || {
+      //     license,
+      //     identity,
+      //     packages: [],
+      //   }
+      // );
     },
     [TransferBuilderGetters.IS_PACKAGE_IN_ACTIVE_LIST]:
       (state: ITransferBuilderState, getters: any, rootState: any, rootGetters: any) =>
@@ -191,15 +205,15 @@ export const transferBuilderModule = {
           throw new Error("Missing identity/license");
         }
 
-        const { identity, license } = rootGetters.authState;
+        // const { identity, license } = rootGetters.authState;
 
-        const activeList = getActiveTransferPackageListOrNull({ state, identity, license });
+        // const activeList = getActiveTransferPackageListOrNull({ state, identity, license });
 
-        if (!activeList) {
-          return false;
-        }
+        // if (!activeList) {
+        //   return false;
+        // }
 
-        return !!activeList.packages.find((x) => getLabelOrError(x) === getLabelOrError(pkg));
+        return !!state.transferPackageList.find((x) => getLabelOrError(x) === getLabelOrError(pkg));
       },
   },
 
@@ -381,8 +395,6 @@ export const transferBuilderModule = {
       const transferType = destination
         ? transferTypes.find((x) => x.Name === destination.ShipmentTypeName)
         : transferTypes[0];
-
-      console.log(snap({ destination, transferTypes, transferType }));
 
       const transferData: ITransferBuilderUpdateData = {
         originFacility: facilities.find(

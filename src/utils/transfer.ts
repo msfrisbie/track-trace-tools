@@ -23,21 +23,21 @@ const DRIVER_EMPLOYEE_ID_MATCHER = /^- Driver Employee ID: (.+)$/;
 const DRIVER_LICENSE_NUMBER_MATCHER = /^- Driver's License Number: (.+)$/;
 const VEHICLE_MATCHER = /^- Vehicle Make Model \(Lic. No.\): (.+) \((.+)\)$/;
 
-export function getActiveTransferPackageListOrNull({
-  state,
-  identity,
-  license,
-}: {
-  state: ITransferBuilderState;
-  identity: string;
-  license: string;
-}): ITransferPackageList | null {
-  return (
-    state.transferPackageLists.find(
-      (list) => list.license === license && list.identity === identity
-    ) || null
-  );
-}
+// export function getActiveTransferPackageListOrNull({
+//   state,
+//   identity,
+//   license,
+// }: {
+//   state: ITransferBuilderState;
+//   identity: string;
+//   license: string;
+// }): ITransferPackageList | null {
+//   return (
+//     state.transferPackageLists.find(
+//       (list) => list.license === license && list.identity === identity
+//     ) || null
+//   );
+// }
 
 export async function extractRecentDestinationFacilitiesFromTransfers(): Promise<
   IMetrcFacilityData[]
