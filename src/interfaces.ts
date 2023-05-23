@@ -627,7 +627,7 @@ export interface IPackageData extends ITaggedIResponseObjectData {
   TransferPackageStateName: string | null;
   UnitOfMeasureAbbreviation: "lb" | "ea";
   UnitOfMeasureId: number;
-  UnitOfMeasureQuantityType: "WeightBased" | "CountBased";
+  UnitOfMeasureQuantityType: "WeightBased" | "CountBased" | "VolumeBased";
 }
 export interface ITagOrderData extends IResponseObjectData {
   FacilityContactName: string;
@@ -1659,13 +1659,13 @@ export interface IItemCategory {
 
 export interface IUnitOfMeasure {
   Abbreviation: UnitOfMeasureAbbreviation;
-  FromBaseFactor: number;
+  FromBaseFactor: number;  // g is 28.349523125
   Id: number;
   IsArchived: boolean;
   IsBaseUnit: boolean;
   Name: UnitOfMeasureName;
-  QuantityType: "WeightBased";
-  ToBaseFactor: number;
+  QuantityType: "WeightBased" | "VolumeBased" | "CountBased";
+  ToBaseFactor: number;  // g is 0.035273961949580414
 }
 
 export interface IWasteReason {

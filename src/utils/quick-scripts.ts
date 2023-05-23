@@ -1,6 +1,7 @@
 import { MessageType } from "@/consts";
 import { analyticsManager } from "@/modules/analytics-manager.module";
 import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
+import { dynamicConstsManager } from "@/modules/dynamic-consts-manager.module";
 import { pageManager } from "@/modules/page-manager/page-manager.module";
 import { toastManager } from "@/modules/toast-manager.module";
 
@@ -105,6 +106,11 @@ export async function fillTransferWeights() {
   let successCount = 0;
   let skippedCount = 0;
 
+  const quantities: number[] = [];
+  const unitOfWeightIds: number[] = [];
+
+  const unitsOfMeasure = await dynamicConstsManager.unitsOfMeasure();
+
   for (const packageRow of packageRows) {
     const packageInput = packageRow.querySelector(
       `input[ng-model="package.Id"]`
@@ -136,19 +142,55 @@ export async function fillTransferWeights() {
     try {
       const packageData = await primaryDataLoader.activePackage(packageLabel);
 
-      if (packageData.UnitOfMeasureQuantityType === "CountBased") {
-        if (packageData.Item?.UnitWeight && packageData.Item?.UnitWeightUnitOfMeasureId) {
-          grossWeightInput.value = (packageData.Quantity * packageData.Item.UnitWeight).toString();
+      if (packageData.UnitOfMeasureQuantityType === "VolumeBased") {
+        skippedCount++;
 
-          unitOfMeasureSelect.value = `number:${packageData.Item?.UnitWeightUnitOfMeasureId}`;
+        toastManager.openToast(
+          `Couldn't calculate a weight for package ${packageData.Label} because it is Volume Based`,
+          {
+            title: "Quick Script Warning",
+            autoHideDelay: 5000,
+            variant: "warning",
+            appendToast: true,
+            toaster: "ttt-toaster",
+            solid: true,
+          }
+        );
+
+        continue;
+      } else if (packageData.UnitOfMeasureQuantityType === "CountBased") {
+        if (packageData.Item?.UnitWeight && packageData.Item?.UnitWeightUnitOfMeasureId) {
+          const quantity: number = packageData.Quantity * packageData.Item.UnitWeight;
+
+          grossWeightInput.value = quantity.toString();
+
+          unitOfMeasureSelect.value = `number:${packageData.Item.UnitWeightUnitOfMeasureId}`;
+
+          quantities.push(quantity);
+          unitOfWeightIds.push(packageData.Item.UnitWeightUnitOfMeasureId);
         } else {
           skippedCount++;
+
+          toastManager.openToast(`Couldn't calculate a weight for package ${packageData.Label}`, {
+            title: "Quick Script Warning",
+            autoHideDelay: 5000,
+            variant: "warning",
+            appendToast: true,
+            toaster: "ttt-toaster",
+            solid: true,
+          });
+
           continue;
         }
       } else {
-        grossWeightInput.value = packageData.Quantity.toString();
+        const quantity: number = packageData.Quantity;
+
+        grossWeightInput.value = quantity.toString();
 
         unitOfMeasureSelect.value = `number:${packageData.UnitOfMeasureId}`;
+
+        quantities.push(quantity);
+        unitOfWeightIds.push(packageData.UnitOfMeasureId);
       }
 
       unitOfMeasureSelect.dispatchEvent(new Event("change"));
@@ -157,6 +199,62 @@ export async function fillTransferWeights() {
     } catch (e) {
       skippedCount++;
     }
+  }
+
+  const grossWeightInput = document.querySelector(
+    `input[ng-model="destination.GrossWeight"]`
+  ) as HTMLInputElement | null;
+  const unitOfMeasureSelect = document.querySelector(
+    `select[ng-model="destination.GrossUnitOfWeightId"]`
+  ) as HTMLSelectElement | null;
+
+  if (!grossWeightInput || !unitOfMeasureSelect) {
+    toastManager.openToast(`Couldn't autofill the destination gross weight: inputs missing`, {
+      title: "Quick Script Error",
+      autoHideDelay: 5000,
+      variant: "danger",
+      appendToast: true,
+      toaster: "ttt-toaster",
+      solid: true,
+    });
+  } else {
+    const normalizedGrossWeight: number[] = [];
+    const baseUnitOfMeasureId: number = unitsOfMeasure.find(
+      (x) => x.IsBaseUnit && x.QuantityType === "WeightBased"
+    )!.Id;
+
+    if (
+      quantities.length !== unitOfWeightIds.length ||
+      quantities.length === 0 ||
+      unitOfWeightIds.length === 0
+    ) {
+      toastManager.openToast(
+        `Couldn't autofill the destination gross weight: mismatched extracted data`,
+        {
+          title: "Quick Script Error",
+          autoHideDelay: 5000,
+          variant: "danger",
+          appendToast: true,
+          toaster: "ttt-toaster",
+          solid: true,
+        }
+      );
+    } else {
+      for (const [idx, quantity] of quantities.entries()) {
+        const unitOfMeasure = unitsOfMeasure.find((x) => x.Id === unitOfWeightIds[idx]);
+
+        if (!unitOfMeasure) {
+          skippedCount++;
+          continue;
+        }
+
+        normalizedGrossWeight.push(quantity * unitOfMeasure.ToBaseFactor);
+      }
+    }
+
+    grossWeightInput.value = normalizedGrossWeight.reduce((a, b) => a + b, 0).toString();
+    unitOfMeasureSelect.value = `number:${baseUnitOfMeasureId}`;
+    unitOfMeasureSelect.dispatchEvent(new Event("change"));
   }
 
   toastManager.openToast(`Autofilled ${successCount} packages`, {
@@ -170,7 +268,7 @@ export async function fillTransferWeights() {
 
   if (skippedCount > 0) {
     toastManager.openToast(
-      `Skipped filling ${skippedCount} packages. This usually happens if a package input is empty, or the selected package does not have a weight unit of measure.`,
+      `Skipped ${skippedCount} packages. This usually happens if a package input is empty, or the selected package does not have a weight unit of measure.`,
       {
         title: "Quick Script Warning",
         autoHideDelay: 5000,
