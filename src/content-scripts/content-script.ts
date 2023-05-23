@@ -112,60 +112,6 @@ async function initializeTooklit() {
     });
   }
 
-  //   // Package Search
-  //   if (window.location.pathname.match(PACKAGE_TAB_REGEX)) {
-  //     const titleElement = document.querySelector(".title");
-  //     const containerElement = titleElement?.parentElement;
-
-  //     if (containerElement && titleElement && titleElement.nextSibling) {
-  //       const packageSearchComponent = document.createElement("div");
-  //       packageSearchComponent.setAttribute("id", "ttt-unified-search");
-
-  //       containerElement.insertBefore(packageSearchComponent, titleElement.nextSibling);
-
-  //       new Vue({
-  //         el: "#ttt-unified-search",
-  //         render: h => h(UnifiedSearchWidget)
-  //       });
-  //     }
-  //   }
-
-  //   // Transfer Search
-  //   if (window.location.pathname.match(TRANSFER_TAB_REGEX)) {
-  //     const titleElement = document.querySelector(".title");
-  //     const containerElement = titleElement?.parentElement;
-
-  //     if (containerElement && titleElement && titleElement.nextSibling) {
-  //       const transferSearchComponent = document.createElement("div");
-  //       transferSearchComponent.setAttribute("id", "ttt-unified-search");
-
-  //       containerElement.insertBefore(transferSearchComponent, titleElement.nextSibling);
-
-  //       new Vue({
-  //         el: "#ttt-unified-search",
-  //         render: h => h(UnifiedSearchWidget)
-  //       });
-  //     }
-  //   }
-
-  //   // Tag Search
-  //   if (window.location.pathname.match(TAG_TAB_REGEX)) {
-  //     const titleElement = document.querySelector(".title");
-  //     const containerElement = titleElement?.parentElement;
-
-  //     if (containerElement && titleElement && titleElement.nextSibling) {
-  //       const tagSearchComponent = document.createElement("div");
-  //       tagSearchComponent.setAttribute("id", "ttt-unified-search");
-
-  //       containerElement.insertBefore(tagSearchComponent, titleElement.nextSibling);
-
-  //       new Vue({
-  //         el: "#ttt-unified-search",
-  //         render: h => h(UnifiedSearchWidget)
-  //       });
-  //     }
-  //   }
-
   // Facility Picker
   const dropdownElement = document.querySelector(".facilities-dropdown");
 
