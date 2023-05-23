@@ -103,7 +103,7 @@ import { BuilderType, MessageType, ToolkitView } from "@/consts";
 import { analyticsManager } from "@/modules/analytics-manager.module";
 import { builderManager } from "@/modules/builder-manager.module";
 import { clientBuildManager } from "@/modules/client-build-manager.module";
-import { pageManager } from "@/modules/page-manager.module";
+import { pageManager } from "@/modules/page-manager/page-manager.module";
 import { MutationType } from "@/mutation-types";
 import router from "@/router/index";
 import store from "@/store/page-overlay/index";

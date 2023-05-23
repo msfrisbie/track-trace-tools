@@ -52,7 +52,7 @@
 import Vue from "vue";
 import store from "@/store/page-overlay/index";
 import { IPlantSearchFilters } from "@/interfaces";
-import { PLANTS_TAB_REGEX, pageManager } from "@/modules/page-manager.module";
+import { PLANTS_TAB_REGEX } from "@/modules/page-manager/consts";
 import { mapActions, mapState } from "vuex";
 import { PlantFilterIdentifiers } from "@/consts";
 import { MutationType } from "@/mutation-types";
@@ -67,25 +67,25 @@ export default Vue.extend({
   store,
   computed: {
     ...mapState({
-      plantSearchFilters: (state: any) => state.plantSearch.plantSearchFilters
+      plantSearchFilters: (state: any) => state.plantSearch.plantSearchFilters,
     }),
     isOnPlantsPage() {
       return window.location.pathname.match(PLANTS_TAB_REGEX);
     },
     hasFiltersApplied() {
-      return Object.values(this.plantSearchFilters || {}).filter(x => !!x).length > 0;
-    }
+      return Object.values(this.plantSearchFilters || {}).filter((x) => !!x).length > 0;
+    },
   },
   methods: {
     ...mapActions({
       partialUpdatePlantSearchFilters: `plantSearch/${PlantSearchActions.PARTIAL_UPDATE_PLANT_SEARCH_FILTERS}`,
-      setPlantSearchFilters: `plantSearch/${PlantSearchActions.SET_PLANT_SEARCH_FILTERS}`
-    })
+      setPlantSearchFilters: `plantSearch/${PlantSearchActions.SET_PLANT_SEARCH_FILTERS}`,
+    }),
   },
   async mounted() {
     if (!this.isOnPlantsPage) {
       // this.$store.dispatch(`plantSearch/${PlantSearchActions.SET_PLANT_SEARCH_FILTERS}`, {});
     }
-  }
+  },
 });
 </script>

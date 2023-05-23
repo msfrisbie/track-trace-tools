@@ -55,7 +55,7 @@
 <script lang="ts">
 import PackageSearchResultPreview from "@/components/package-search-widget/PackageSearchResultPreview.vue";
 import { IIndexedPackageData } from "@/interfaces";
-import { PACKAGE_TAB_REGEX } from "@/modules/page-manager.module";
+import { PACKAGE_TAB_REGEX } from "@/modules/page-manager/consts";
 import { ISelectedPackageMetadata, searchManager } from "@/modules/search-manager.module";
 import store from "@/store/page-overlay/index";
 import { PackageSearchActions } from "@/store/page-overlay/modules/package-search/consts";

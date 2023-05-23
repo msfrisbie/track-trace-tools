@@ -18,10 +18,11 @@
 import Vue from "vue";
 import store from "@/store/page-overlay/index";
 import { ITagSearchFilters } from "@/interfaces";
-import { pageManager, TAG_TAB_REGEX } from "@/modules/page-manager.module";
+import { TAG_TAB_REGEX } from "@/modules/page-manager/consts";
 import { mapState } from "vuex";
 import { TagFilterIdentifiers } from "@/consts";
 import { MutationType } from "@/mutation-types";
+import { pageManager } from "@/modules/page-manager/page-manager.module";
 
 interface ComponentData {
   tagSearchFilters: ITagSearchFilters;
@@ -37,7 +38,7 @@ export default Vue.extend({
     hasTagNumberFilter() {
       return !!this.$store.state.tagSearchFilters.label;
     },
-    ...mapState(["tagSearchFilters"])
+    ...mapState(["tagSearchFilters"]),
   },
   methods: {
     clearTagLabelFilter() {
@@ -45,12 +46,12 @@ export default Vue.extend({
     },
     clearMetrcSearch() {
       pageManager.resetMetrcTagFilters();
-    }
+    },
   },
   async mounted() {
     if (!this.isOnTagsPage) {
       this.$store.commit(MutationType.SET_TAG_SEARCH_FILTERS, {});
     }
-  }
+  },
 });
 </script>

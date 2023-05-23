@@ -98,7 +98,7 @@
 import NextStepOptions from "@/components/overlay-widget/NextStepOptions.vue";
 import { BuilderType, ToolkitView } from "@/consts";
 import { builderManager, IBuilderProject } from "@/modules/builder-manager.module";
-import { pageManager } from "@/modules/page-manager.module";
+import { pageManager } from "@/modules/page-manager/page-manager.module";
 import { MutationType } from "@/mutation-types";
 import router from "@/router/index";
 import store from "@/store/page-overlay/index";

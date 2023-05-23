@@ -1,6 +1,6 @@
 import { PackageFilterIdentifiers, PackageState } from "@/consts";
 import { IPackageSearchFilters, IPluginState } from "@/interfaces";
-import { pageManager } from "@/modules/page-manager.module";
+import { pageManager } from "@/modules/page-manager/page-manager.module";
 import { maybePushOntoUniqueStack } from "@/utils/search";
 import { timer } from "rxjs";
 import { ActionContext } from "vuex";

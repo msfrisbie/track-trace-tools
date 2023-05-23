@@ -20,10 +20,11 @@
 import Vue from "vue";
 import store from "@/store/page-overlay/index";
 import { ITransferSearchFilters } from "@/interfaces";
-import { pageManager, TRANSFER_TAB_REGEX } from "@/modules/page-manager.module";
+import { TRANSFER_TAB_REGEX } from "@/modules/page-manager/consts";
 import { mapState } from "vuex";
 import { TransferFilterIdentifiers } from "@/consts";
 import { MutationType } from "@/mutation-types";
+import { pageManager } from "@/modules/page-manager/page-manager.module";
 
 interface ComponentData {
   transferSearchFilters: ITransferSearchFilters;
@@ -39,7 +40,7 @@ export default Vue.extend({
     hasManifestNumberFilter() {
       return !!this.$store.state.transferSearchFilters.manifestNumber;
     },
-    ...mapState(["transferSearchFilters"])
+    ...mapState(["transferSearchFilters"]),
   },
   methods: {
     clearTransferManifestNumberFilter() {
@@ -47,12 +48,12 @@ export default Vue.extend({
     },
     clearMetrcSearch() {
       pageManager.resetMetrcTransferFilters();
-    }
+    },
   },
   async mounted() {
     if (!this.isOnTransfersPage) {
       this.$store.commit(MutationType.SET_TRANSFER_SEARCH_FILTERS, {});
     }
-  }
+  },
 });
 </script>

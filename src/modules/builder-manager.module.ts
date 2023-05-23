@@ -30,7 +30,7 @@ import { IMetrcCreateTransferPayload } from "../interfaces";
 import { TransferBuilderActions } from "../store/page-overlay/modules/transfer-builder/consts";
 import { analyticsManager } from "./analytics-manager.module";
 import { authManager } from "./auth-manager.module";
-import { pageManager } from "./page-manager.module";
+import { pageManager } from "./page-manager/page-manager.module";
 import { toastManager } from "./toast-manager.module";
 
 enum BuilderSubmitState {

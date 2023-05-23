@@ -13,7 +13,7 @@
 </template>
 
 <script lang="ts">
-import { pageManager } from "@/modules/page-manager.module";
+import { pageManager } from "@/modules/page-manager/page-manager.module";
 import { MutationType } from "@/mutation-types";
 import store from "@/store/page-overlay/index";
 import Vue from "vue";

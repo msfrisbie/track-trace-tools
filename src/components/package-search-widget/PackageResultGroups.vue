@@ -109,7 +109,7 @@ import PackageSearchResultsGroup from "@/components/package-search-widget/Packag
 import { MessageType } from "@/consts";
 import { IIndexedPackageData } from "@/interfaces";
 import { analyticsManager } from "@/modules/analytics-manager.module";
-import { pageManager } from "@/modules/page-manager.module";
+import { pageManager } from "@/modules/page-manager/page-manager.module";
 import { PackageSearchActions } from "@/store/page-overlay/modules/package-search/consts";
 import Vue from "vue";
 import { mapActions, mapState } from "vuex";

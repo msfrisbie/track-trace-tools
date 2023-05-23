@@ -40,7 +40,7 @@ import { metrcModalManager } from "@/modules/metrc-modal-manager.module";
 import { primaryMetrcRequestManager } from "@/modules/metrc-request-manager.module";
 import { mockDataManager } from "@/modules/mock-data-manager.module";
 import { modalManager } from "@/modules/modal-manager.module";
-import { pageManager } from "@/modules/page-manager.module";
+import { pageManager } from "@/modules/page-manager/page-manager.module";
 import { passivePageAnalyzer } from "@/modules/passive-page-analyzer.module";
 import { telemetryManager } from "@/modules/telemetry-manager.module";
 import { toastManager } from "@/modules/toast-manager.module";

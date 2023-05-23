@@ -50,7 +50,7 @@ import {
   TransferState,
 } from "@/consts";
 import { analyticsManager } from "@/modules/analytics-manager.module";
-import { pageManager } from "@/modules/page-manager.module";
+import { pageManager } from "@/modules/page-manager/page-manager.module";
 import { toastManager } from "@/modules/toast-manager.module";
 import { copyToClipboard } from "@/utils/dom";
 import { mapState } from "vuex";

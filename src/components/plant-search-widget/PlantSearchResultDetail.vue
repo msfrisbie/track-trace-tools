@@ -91,7 +91,7 @@ import PlantIcon from "@/components/plant-search-widget/PlantIcon.vue";
 import { MessageType, PlantState } from "@/consts";
 import { IIndexedPlantData } from "@/interfaces";
 import { analyticsManager } from "@/modules/analytics-manager.module";
-import { PLANTS_TAB_REGEX } from "@/modules/page-manager.module";
+import { PLANTS_TAB_REGEX } from "@/modules/page-manager/consts";
 import { searchManager } from "@/modules/search-manager.module";
 import { toastManager } from "@/modules/toast-manager.module";
 import store from "@/store/page-overlay/index";

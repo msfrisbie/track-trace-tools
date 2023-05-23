@@ -28,7 +28,7 @@
 import { MessageType, TransferFilterIdentifiers, TransferState } from "@/consts";
 import { IIndexedTransferData } from "@/interfaces";
 import { analyticsManager } from "@/modules/analytics-manager.module";
-import { pageManager } from "@/modules/page-manager.module";
+import { pageManager } from "@/modules/page-manager/page-manager.module";
 import { MutationType } from "@/mutation-types";
 import Vue from "vue";
 

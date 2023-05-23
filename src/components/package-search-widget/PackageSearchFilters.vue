@@ -86,7 +86,7 @@
         variant="light"
         @click="
           partialUpdatePackageSearchFilters({
-            packageSearchFilters: { itemProductCategoryName: '' }
+            packageSearchFilters: { itemProductCategoryName: '' },
           })
         "
         >&#10006;</b-button
@@ -108,7 +108,7 @@
 import Vue from "vue";
 import store from "@/store/page-overlay/index";
 import { IPackageSearchFilters } from "@/interfaces";
-import { PACKAGE_TAB_REGEX, pageManager } from "@/modules/page-manager.module";
+import { PACKAGE_TAB_REGEX } from "@/modules/page-manager/consts";
 import { mapActions, mapState } from "vuex";
 import { PackageFilterIdentifiers } from "@/consts";
 import { MutationType } from "@/mutation-types";
@@ -123,25 +123,25 @@ export default Vue.extend({
   store,
   computed: {
     ...mapState({
-      packageSearchFilters: (state: any) => state.packageSearch.packageSearchFilters
+      packageSearchFilters: (state: any) => state.packageSearch.packageSearchFilters,
     }),
     isOnPackagesPage() {
       return window.location.pathname.match(PACKAGE_TAB_REGEX);
     },
     hasFiltersApplied() {
-      return Object.values(this.packageSearchFilters || {}).filter(x => !!x).length > 0;
-    }
+      return Object.values(this.packageSearchFilters || {}).filter((x) => !!x).length > 0;
+    },
   },
   methods: {
     ...mapActions({
       partialUpdatePackageSearchFilters: `packageSearch/${PackageSearchActions.PARTIAL_UPDATE_PACKAGE_SEARCH_FILTERS}`,
-      setPackageSearchFilters: `packageSearch/${PackageSearchActions.SET_PACKAGE_SEARCH_FILTERS}`
-    })
+      setPackageSearchFilters: `packageSearch/${PackageSearchActions.SET_PACKAGE_SEARCH_FILTERS}`,
+    }),
   },
   async mounted() {
     if (!this.isOnPackagesPage) {
       // this.$store.dispatch(`packageSearch/${PackageSearchActions.SET_PACKAGE_SEARCH_FILTERS}`, {});
     }
-  }
+  },
 });
 </script>

@@ -37,7 +37,7 @@
 import { MessageType, TagFilterIdentifiers, TagState } from "@/consts";
 import { ITagData } from "@/interfaces";
 import { analyticsManager } from "@/modules/analytics-manager.module";
-import { pageManager } from "@/modules/page-manager.module";
+import { pageManager } from "@/modules/page-manager/page-manager.module";
 import { toastManager } from "@/modules/toast-manager.module";
 import store from "@/store/page-overlay/index";
 import { copyToClipboard } from "@/utils/dom";

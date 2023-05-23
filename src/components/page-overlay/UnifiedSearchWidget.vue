@@ -36,7 +36,7 @@ import {
   TAG_TAB_REGEX,
   TRANSFER_TAB_REGEX,
   PACKAGE_TAB_REGEX
-} from "@/modules/page-manager.module";
+} from "@/modules/page-manager/consts";
 
 export default Vue.extend({
   name: "UnifiedSearchWidget",

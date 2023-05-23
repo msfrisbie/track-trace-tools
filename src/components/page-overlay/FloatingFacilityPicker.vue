@@ -51,7 +51,7 @@ import FacilityPicker from "@/components/shared/FacilityPicker.vue";
 import TrackTraceToolsLogo from "@/components/shared/TrackTraceToolsLogo.vue";
 import { ToolkitView } from "@/consts";
 import { authManager } from "@/modules/auth-manager.module";
-import { pageManager } from "@/modules/page-manager.module";
+import { pageManager } from "@/modules/page-manager/page-manager.module";
 import { MutationType } from "@/mutation-types";
 import store from "@/store/page-overlay/index";
 import Vue from "vue";

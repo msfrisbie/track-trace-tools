@@ -55,7 +55,7 @@
 <script lang="ts">
 import PlantSearchResultPreview from "@/components/plant-search-widget/PlantSearchResultPreview.vue";
 import { IIndexedPlantData } from "@/interfaces";
-import { PLANTS_TAB_REGEX } from "@/modules/page-manager.module";
+import { PLANTS_TAB_REGEX } from "@/modules/page-manager/consts";
 import { ISelectedPlantMetadata, searchManager } from "@/modules/search-manager.module";
 import store from "@/store/page-overlay/index";
 import { PlantSearchActions } from "@/store/page-overlay/modules/plant-search/consts";

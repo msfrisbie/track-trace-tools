@@ -6,7 +6,7 @@ import { activeMetrcModalOrNull, modalTitleOrError } from "@/utils/metrc-modal";
 import _ from "lodash";
 import { analyticsManager } from "./analytics-manager.module";
 import { authManager } from "./auth-manager.module";
-import { pageManager } from "./page-manager.module";
+import { pageManager } from "./page-manager/page-manager.module";
 import { upsertManager } from "./upsert-manager.module";
 
 const debugLog = debugLogFactory("modules/passive-page-analyzer.module.ts");
