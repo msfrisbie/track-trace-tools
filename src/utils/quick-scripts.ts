@@ -4,6 +4,7 @@ import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
 import { dynamicConstsManager } from "@/modules/dynamic-consts-manager.module";
 import { pageManager } from "@/modules/page-manager/page-manager.module";
 import { toastManager } from "@/modules/toast-manager.module";
+import { zip } from "lodash";
 
 export interface IQuickScript {
   id: string;
@@ -240,8 +241,11 @@ export async function fillTransferWeights() {
         }
       );
     } else {
-      for (const [idx, quantity] of quantities.entries()) {
-        const unitOfMeasure = unitsOfMeasure.find((x) => x.Id === unitOfWeightIds[idx]);
+      for (const [quantity, unitOfWeightId] of zip(quantities, unitOfWeightIds) as [
+        number,
+        number
+      ][]) {
+        const unitOfMeasure = unitsOfMeasure.find((x) => x.Id === unitOfWeightId);
 
         if (!unitOfMeasure) {
           skippedCount++;
