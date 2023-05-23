@@ -314,14 +314,19 @@ function extractDataImportApiKey(html: string) {
 }
 
 function extractRepeaterData(html: string) {
-  const repeaterDataMatch = html.match(REPEATER_DATA_REGEX);
+  const matchResult = html.match(REPEATER_DATA_REGEX);
 
-  if (repeaterDataMatch) {
-    const sliced = repeaterDataMatch[1].slice(12, -2);
+  if (matchResult) {
+    const match = matchResult[1];
+
+    // This is a bullshit hack
+    // const sliced = matchResult[1].slice(29, -3);
+
+    const sliced = match.slice(match.indexOf(`'`) + 1, match.lastIndexOf(`'`));
 
     // Metrc includes a blob of escaped JSON
     // (This is manifest v3 incompatible)
-    // const parsedRepeaterData = eval(repeaterDataMatch[1]);
+    // const parsedRepeaterData = eval(matchResult[1]);
     // @ts-ignore
     const parsedRepeaterData = JSON.parse(decodeURIComponent(sliced.replaceAll("\\x", "%")));
 

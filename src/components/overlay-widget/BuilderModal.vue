@@ -1,6 +1,7 @@
 <template>
   <!-- animation is breaking modal, disable -->
   <b-modal
+    v-if="pluginAuth.authState"
     id="builder-modal"
     modal-class="ttt-modal"
     content-class="ttt-content"
@@ -222,7 +223,13 @@ export default Vue.extend({
         return "";
       }
     },
-    ...mapState(["trackedInteractions", "settings", "accountEnabled", "currentVersion"]),
+    ...mapState([
+      "trackedInteractions",
+      "settings",
+      "accountEnabled",
+      "currentVersion",
+      "pluginAuth",
+    ]),
   },
 });
 </script>
