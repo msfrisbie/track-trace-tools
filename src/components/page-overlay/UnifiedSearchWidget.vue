@@ -63,11 +63,13 @@ export default Vue.extend({
       }
     },
     enableMetrcModalMode() {
-      if (!this.enableSearchOverMetrcModal) {
-        return false;
-      }
+      return false;
 
-      return this.$data.metrcModalVislble;
+      // if (!this.enableSearchOverMetrcModal) {
+      //   return false;
+      // }
+
+      // return this.$data.metrcModalVislble;
     }
   },
   data() {
