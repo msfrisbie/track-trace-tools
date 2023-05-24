@@ -128,10 +128,10 @@ export async function fillTransferWeights() {
       continue;
     }
 
-    if (!grossWeightInput || !unitOfMeasureSelect) {
-      skippedCount++;
-      continue;
-    }
+    // if (!grossWeightInput || !unitOfMeasureSelect) {
+    //   skippedCount++;
+    //   continue;
+    // }
 
     const packageLabel = packageInput.value;
 
@@ -163,9 +163,13 @@ export async function fillTransferWeights() {
         if (packageData.Item?.UnitWeight && packageData.Item?.UnitWeightUnitOfMeasureId) {
           const quantity: number = packageData.Quantity * packageData.Item.UnitWeight;
 
-          grossWeightInput.value = quantity.toString();
+          if (grossWeightInput) {
+            grossWeightInput.value = quantity.toString();
+          }
 
-          unitOfMeasureSelect.value = `number:${packageData.Item.UnitWeightUnitOfMeasureId}`;
+          if (unitOfMeasureSelect) {
+            unitOfMeasureSelect.value = `number:${packageData.Item.UnitWeightUnitOfMeasureId}`;
+          }
 
           quantities.push(quantity);
           unitOfWeightIds.push(packageData.Item.UnitWeightUnitOfMeasureId);
@@ -186,15 +190,21 @@ export async function fillTransferWeights() {
       } else {
         const quantity: number = packageData.Quantity;
 
-        grossWeightInput.value = quantity.toString();
+        if (grossWeightInput) {
+          grossWeightInput.value = quantity.toString();
+        }
 
-        unitOfMeasureSelect.value = `number:${packageData.UnitOfMeasureId}`;
+        if (unitOfMeasureSelect) {
+          unitOfMeasureSelect.value = `number:${packageData.UnitOfMeasureId}`;
+        }
 
         quantities.push(quantity);
         unitOfWeightIds.push(packageData.UnitOfMeasureId);
       }
 
-      unitOfMeasureSelect.dispatchEvent(new Event("change"));
+      if (unitOfMeasureSelect) {
+        unitOfMeasureSelect.dispatchEvent(new Event("change"));
+      }
 
       successCount++;
     } catch (e) {

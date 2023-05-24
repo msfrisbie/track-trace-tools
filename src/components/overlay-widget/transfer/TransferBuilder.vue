@@ -258,23 +258,28 @@
               style="max-height: 35vh"
             >
               <template v-if="isTransferSubmittedWithDestinationGrossWeight">
-                <b-input-group class="mt-2">
-                  <b-form-input
-                    size="md"
-                    type="number"
-                    value="null"
-                    v-model="destinationGrossWeight"
-                    :state="!!destinationGrossWeight"
-                  ></b-form-input>
+                <b-form-group
+                  label="DESTINATION GROSS WEIGHT"
+                  label-class="text-gray-400"
+                  label-size="sm"
+                >
+                  <b-input-group class="mt-2">
+                    <b-form-input
+                      size="md"
+                      type="number"
+                      value="null"
+                      v-model="destinationGrossWeight"
+                      :state="!!destinationGrossWeight"
+                    ></b-form-input>
 
-                  <b-form-select
-                    size="md"
-                    :options="weightOptions"
-                    v-model="destinationGrossUnitOfWeight"
-                    :state="!!destinationGrossUnitOfWeight"
-                  />
-                </b-input-group>
-                <b-form-text>Destination Gross Weight</b-form-text>
+                    <b-form-select
+                      size="md"
+                      :options="weightOptions"
+                      v-model="destinationGrossUnitOfWeight"
+                      :state="!!destinationGrossUnitOfWeight"
+                    />
+                  </b-input-group>
+                </b-form-group>
               </template>
 
               <template v-for="(pkg, idx) in transferPackages">
@@ -1186,6 +1191,26 @@ export default Vue.extend({
         });
       },
     } as IComputedGetSet<IUnitOfMeasure[]>,
+    destinationGrossWeight: {
+      get() {
+        return this.$store.state.transferBuilder.destinationGrossWeight;
+      },
+      set(destinationGrossWeight) {
+        this.$store.dispatch(`transferBuilder/${TransferBuilderActions.UPDATE_TRANSFER_DATA}`, {
+          destinationGrossWeight,
+        });
+      },
+    } as IComputedGetSet<number>,
+    destinationGrossUnitOfWeight: {
+      get() {
+        return this.$store.state.transferBuilder.destinationGrossUnitOfWeight;
+      },
+      set(destinationGrossUnitOfWeight) {
+        this.$store.dispatch(`transferBuilder/${TransferBuilderActions.UPDATE_TRANSFER_DATA}`, {
+          destinationGrossUnitOfWeight,
+        });
+      },
+    } as IComputedGetSet<IUnitOfMeasure>,
     isSameSiteTransfer: {
       get(): boolean {
         return this.$store.state.transferBuilder.isSameSiteTransfer;

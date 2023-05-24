@@ -442,7 +442,7 @@ export const transferBuilderModule = {
         destinationGrossWeight: destination?.GrossWeight ?? null,
         destinationGrossUnitOfWeight:
           unitsOfWeight.find(
-            (x) => x.Abbreviation === destination?.GrossUnitOfWeightAbbreviation
+            (x) => x.Id === destination?.GrossUnitOfWeightId
           ) ?? null,
         packageGrossWeights: destinationPackages.map((x) => x.GrossWeight) as number[],
         packageGrossUnitsOfWeight: destinationPackages.map(

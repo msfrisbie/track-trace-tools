@@ -12,7 +12,7 @@ import {
   TagState,
   TaskType,
   ToolkitView,
-  TransferState
+  TransferState,
 } from "@/consts";
 import { Store } from "vuex";
 import { IExplorerState } from "./store/page-overlay/modules/explorer/interfaces";
@@ -27,7 +27,10 @@ import { IReportsState } from "./store/page-overlay/modules/reports/interfaces";
 import { ISearchState } from "./store/page-overlay/modules/search/interfaces";
 import { ISettingsState } from "./store/page-overlay/modules/settings/interfaces";
 import { ISplitPackageBuilderState } from "./store/page-overlay/modules/split-package-builder/interfaces";
-import { DriverLayoverLeg, ITransferBuilderState } from "./store/page-overlay/modules/transfer-builder/interfaces";
+import {
+  DriverLayoverLeg,
+  ITransferBuilderState,
+} from "./store/page-overlay/modules/transfer-builder/interfaces";
 import { CsvUpload, CsvUploadStatus } from "./types";
 import { UnitOfMeasureAbbreviation, UnitOfMeasureName } from "./utils/units";
 
@@ -1316,7 +1319,7 @@ export interface IMetrcTransferTransporterData {
   PhoneNumberForQuestions: string;
   TransporterDetails: IMetrcTransferTransporterDetailsData[];
   // These are the layover ETA/ETD
-  IsLayover?: string;  // "true";
+  IsLayover?: string; // "true";
   EstimatedArrivalDateTime?: string;
   EstimatedDepartureDateTime?: string;
 }
@@ -1328,7 +1331,7 @@ export interface IMetrcTransferTransporterDetailsData {
   VehicleMake: string;
   VehicleModel: string;
   VehicleLicensePlateNumber: string;
-  DriverLayoverLeg: 
+  DriverLayoverLeg: DriverLayoverLeg;
 }
 
 export interface IMetrcMovePlantsPayload {
