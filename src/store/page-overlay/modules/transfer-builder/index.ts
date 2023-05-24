@@ -15,7 +15,7 @@ import { ActionContext } from "vuex";
 import { BuilderType, MessageType } from "../../../../consts";
 import { analyticsManager } from "../../../../modules/analytics-manager.module";
 import { TransferBuilderActions, TransferBuilderGetters, TransferBuilderMutations } from "./consts";
-import { ITransferBuilderState, ITransferBuilderUpdateData } from "./interfaces";
+import { DriverLayoverLeg, ITransferBuilderState, ITransferBuilderUpdateData } from "./interfaces";
 
 const inMemoryState = {
   originFacility: null,
@@ -39,7 +39,7 @@ const inMemoryState = {
   driverName: "",
   driverEmployeeId: "",
   driverLicenseNumber: "",
-  driverLayoverLeg: "FromAndToLayover",
+  driverLayoverLeg: "FromAndToLayover" as DriverLayoverLeg,
   vehicleMake: "",
   vehicleModel: "",
   vehicleLicensePlate: "",
@@ -309,10 +309,18 @@ export const transferBuilderModule = {
       const { transferForUpdate } = payload;
 
       const destinations = await primaryDataLoader.transferDestinations(transferForUpdate.Id);
-      const transporters = await primaryDataLoader.destinationTransporters(transferForUpdate.Id);
+      const destination = destinations.length > 0 ? destinations[0] : null;
+
+      const transporters = destination
+        ? await primaryDataLoader.destinationTransporters(destination.Id)
+        : [];
+      const transporter = transporters.length > 0 ? transporters[0] : null;
+
       const transporterDetails = await primaryDataLoader.transferTransporterDetails(
         transferForUpdate.Id
       );
+      const transporterDetail =
+        transporterDetails.length > 0 ? transporterDetails[transporterDetails.length - 1] : null;
 
       if (destinations.length > 1) {
         toastManager.openToast(
@@ -358,11 +366,6 @@ export const transferBuilderModule = {
         return;
       }
 
-      const destination = destinations.length > 0 ? destinations[0] : null;
-      const transporter = transporters.length > 0 ? transporters[0] : null;
-      const transporterDetail =
-        transporterDetails.length > 0 ? transporterDetails[transporterDetails.length - 1] : null;
-
       const inTransitPackages = await primaryDataLoader.inTransitPackages();
 
       const transferTypes = await dynamicConstsManager.transferTypes();
@@ -381,11 +384,11 @@ export const transferBuilderModule = {
         : [undefined, undefined];
 
       const [layoverCheckInIsodate, layoverCheckInIsotime] = transporter?.EstimatedArrivalDateTime
-        ? transporter?.EstimatedArrivalDateTime.split("T")
+        ? transporter.EstimatedArrivalDateTime.split("T")
         : [undefined, undefined];
       const [layoverCheckOutIsodate, layoverCheckOutIsotime] =
         transporter?.EstimatedDepartureDateTime
-          ? transporter?.EstimatedDepartureDateTime.split("T")
+          ? transporter.EstimatedDepartureDateTime.split("T")
           : [undefined, undefined];
 
       const destinationPackages = destination
@@ -431,7 +434,7 @@ export const transferBuilderModule = {
         driverName: transporterDetail?.DriverName,
         driverEmployeeId: transporterDetail?.DriverOccupationalLicenseNumber,
         driverLicenseNumber: transporterDetail?.DriverVehicleLicenseNumber,
-        driverLayoverLeg: transporterDetail?.DriverLayoverLeg ?? "",
+        driverLayoverLeg: transporterDetail?.DriverLayoverLeg ?? ("" as DriverLayoverLeg),
         vehicleMake: transporterDetail?.VehicleMake,
         vehicleModel: transporterDetail?.VehicleModel,
         vehicleLicensePlate: transporterDetail?.VehicleLicensePlateNumber,

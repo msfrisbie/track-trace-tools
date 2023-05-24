@@ -6,6 +6,8 @@ import {
   IUnitOfMeasure,
 } from "@/interfaces";
 
+export type DriverLayoverLeg = "" | "FromLayover" | "ToLayover" | "FromAndToLayover";
+
 export interface ITransferBuilderState {
   transferPackageList: IUnionIndexedPackageData[];
   originFacility: IMetrcFacilityData | null;
@@ -24,7 +26,7 @@ export interface ITransferBuilderState {
   driverName: string;
   driverEmployeeId: string;
   driverLicenseNumber: string;
-  driverLayoverLeg: string;
+  driverLayoverLeg: DriverLayoverLeg;
   vehicleMake: string;
   vehicleModel: string;
   vehicleLicensePlate: string;
@@ -61,7 +63,7 @@ export interface ITransferBuilderUpdateData {
   driverName?: string;
   driverEmployeeId?: string;
   driverLicenseNumber?: string;
-  driverLayoverLeg?: string;
+  driverLayoverLeg?: DriverLayoverLeg;
   vehicleMake?: string;
   vehicleModel?: string;
   vehicleLicensePlate?: string;

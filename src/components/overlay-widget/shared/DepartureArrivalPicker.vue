@@ -134,14 +134,14 @@ export default Vue.extend({
       isSameSiteTransfer: (state: any) => state.transferBuilder.isSameSiteTransfer,
     }),
     ellipsisCount(): number {
-      let base = 7;
+      let base = 14;
 
       if (this.isSameSiteTransfer) {
-        base += 7;
+        base -= 7;
       }
 
       if (this.isLayover) {
-        base += 7;
+        base += 9;
       }
 
       return base;

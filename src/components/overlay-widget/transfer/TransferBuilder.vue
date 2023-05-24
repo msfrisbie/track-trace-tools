@@ -250,14 +250,14 @@
             class="flex flex-col items-stretch space-y-8 overflow-y-auto overflow-x-hidden toolkit-scroll"
           >
             <div class="text-start text-2xl font-bold border-b border-gray-400 text-gray-400">
-              SHIPMENT
+              PACKAGES ({{ transferPackages.length }})
             </div>
 
             <div
               class="flex flex-col items-stretch text-md text-gray-700 gap-2 overflow-y-auto toolkit-scroll px-2"
               style="max-height: 35vh"
             >
-              <template v-if="isTransferSubmittedWithGrossWeight">
+              <template v-if="isTransferSubmittedWithDestinationGrossWeight">
                 <b-input-group class="mt-2">
                   <b-form-input
                     size="md"
@@ -287,7 +287,7 @@
                       )} ${getItemNameOrError(pkg)}`
                     }}
                   </div>
-                  <!-- <template v-if="isTransferSubmittedWithGrossWeight">
+                  <template v-if="isTransferSubmittedWithPackageGrossWeight">
                     <b-input-group class="mt-2">
                       <b-form-input
                         size="md"
@@ -305,7 +305,7 @@
                       />
                     </b-input-group>
                     <b-form-text>Gross Weight</b-form-text>
-                  </template> -->
+                  </template>
 
                   <template v-if="isTransferSubmittedWithWholesalePrice">
                     <b-input-group prepend="$">
@@ -505,7 +505,10 @@ import {
   TransferBuilderActions,
   TransferBuilderGetters,
 } from "@/store/page-overlay/modules/transfer-builder/consts";
-import { ITransferBuilderState } from "@/store/page-overlay/modules/transfer-builder/interfaces";
+import {
+  DriverLayoverLeg,
+  ITransferBuilderState,
+} from "@/store/page-overlay/modules/transfer-builder/interfaces";
 import { facilityReadableAddressLinesOrNull } from "@/utils/address";
 import { buildCsvDataOrError, buildNamedCsvFileData } from "@/utils/csv";
 import { nowIsotime, todayIsodate } from "@/utils/date";
@@ -681,7 +684,7 @@ export default Vue.extend({
           WholesalePrice = this.wholesalePackageValues[idx].toString();
         }
 
-        if (this.isTransferSubmittedWithGrossWeight) {
+        if (this.isTransferSubmittedWithPackageGrossWeight) {
           GrossWeight = this.packageGrossWeights[idx].toString();
           GrossUnitOfWeightId = this.packageGrossUnitsOfWeight[idx].Id.toString();
         }
@@ -694,12 +697,33 @@ export default Vue.extend({
         });
       }
 
+      const layoverTransporterMixin = this.transferBuilderState.isLayover
+        ? {
+            IsLayover: "true",
+            EstimatedDepartureDateTime: combineTimeAndDate({
+              isodate: this.transferBuilderState.layoverCheckOutIsodate,
+              isotime: this.transferBuilderState.layoverCheckOutIsotime,
+            }),
+            EstimatedArrivalDateTime: combineTimeAndDate({
+              isodate: this.transferBuilderState.layoverCheckInIsodate,
+              isotime: this.transferBuilderState.layoverCheckInIsotime,
+            }),
+          }
+        : {};
+
+      const layoverDriverMixin = this.transferBuilderState.isLayover
+        ? {
+            DriverLayoverLeg: this.transferBuilderState.driverLayoverLeg,
+          }
+        : {
+            DriverLayoverLeg: "" as DriverLayoverLeg,
+          };
+
       const transporters: IMetrcTransferTransporterData[] = [
         {
           TransporterId: (this.transporterFacility as IMetrcFacilityData).Id.toString(),
           PhoneNumberForQuestions: this.phoneNumberForQuestions as string,
-          EstimatedDepartureDateTime: estimatedDepartureDateTime,
-          EstimatedArrivalDateTime: estimatedArrivalDateTime,
+          ...layoverTransporterMixin,
           TransporterDetails: [
             {
               DriverName: driverName,
@@ -708,7 +732,7 @@ export default Vue.extend({
               VehicleMake: vehicleMake,
               VehicleModel: vehicleModel,
               VehicleLicensePlateNumber: vehicleLicensePlate,
-              DriverLayoverLeg: "",
+              ...layoverDriverMixin,
             },
           ],
         },
@@ -719,6 +743,17 @@ export default Vue.extend({
         : { Transporters: transporters };
 
       const IdMixin = this.transferForUpdate ? { Id: this.transferForUpdate.Id } : {};
+
+      const destinationGrossWeightMixin = this.isTransferSubmittedWithDestinationGrossWeight
+        ? {
+            GrossWeight: this.transferBuilderState.destinationGrossWeight!.toString(),
+            GrossUnitOfWeightId:
+              this.transferBuilderState.destinationGrossUnitOfWeight!.Id.toString(),
+          }
+        : {
+            GrossWeight: "",
+            GrossUnitOfWeightId: "",
+          };
 
       const transferData: IMetrcCreateTransferPayload | IMetrcUpdateTransferPayload = {
         ShipmentLicenseType: "Licensed",
@@ -731,8 +766,7 @@ export default Vue.extend({
             TransferTypeId: (this.transferType as IMetrcTransferType).Id.toString(),
             EstimatedDepartureDateTime: estimatedDepartureDateTime,
             EstimatedArrivalDateTime: estimatedArrivalDateTime,
-            GrossWeight: "",
-            GrossUnitOfWeightId: "",
+            ...destinationGrossWeightMixin,
             Packages: packages,
             ...TransportersMixin,
           },
@@ -912,6 +946,20 @@ export default Vue.extend({
         if (!this.transferBuilderState.arrivalIsotime) {
           errors.push({ tags: ["page3"], message: "Select an arrival time" });
         }
+        if (this.transferBuilderState.isLayover) {
+          if (!this.transferBuilderState.layoverCheckInIsodate) {
+            errors.push({ tags: ["page3"], message: "Select a layover check in date" });
+          }
+          if (!this.transferBuilderState.layoverCheckInIsotime) {
+            errors.push({ tags: ["page3"], message: "Select a layover check in time" });
+          }
+          if (!this.transferBuilderState.layoverCheckOutIsodate) {
+            errors.push({ tags: ["page3"], message: "Select a layover check out date" });
+          }
+          if (!this.transferBuilderState.layoverCheckOutIsotime) {
+            errors.push({ tags: ["page3"], message: "Select a layover check out time" });
+          }
+        }
         if (!this.transferBuilderState.driverName) {
           errors.push({ tags: ["page3"], message: "Enter a driver name" });
         }
@@ -951,6 +999,27 @@ export default Vue.extend({
         return typeof n === "number";
       }
 
+      if (this.isTransferSubmittedWithDestinationGrossWeight) {
+        const grossWeight = parseFloat(
+          (this.transferBuilderState.destinationGrossWeight ?? "").toString()
+        );
+        const unitOfMeasure = this.transferBuilderState.destinationGrossUnitOfWeight;
+
+        if (!isNumber(grossWeight)) {
+          errors.push({
+            tags: ["page3"],
+            message: "Destination must have a gross weight",
+          });
+        }
+
+        if (!unitOfMeasure) {
+          errors.push({
+            tags: ["page3"],
+            message: "Destination must have a gross unit of weight",
+          });
+        }
+      }
+
       for (let i = 0; i < this.transferPackages.length; ++i) {
         if (this.isTransferSubmittedWithWholesalePrice) {
           const wholesalePrice = parseFloat(this.wholesalePackageValues[i]?.toString());
@@ -963,7 +1032,7 @@ export default Vue.extend({
           }
         }
 
-        if (this.isTransferSubmittedWithGrossWeight) {
+        if (this.isTransferSubmittedWithPackageGrossWeight) {
           const grossWeight = parseFloat(this.packageGrossWeights[i]?.toString());
           const unitOfMeasure = this.packageGrossUnitsOfWeight[i];
 
@@ -1143,8 +1212,11 @@ export default Vue.extend({
         window.location.hostname === "ca.metrc.com"
       );
     },
-    isTransferSubmittedWithGrossWeight(): boolean {
+    isTransferSubmittedWithDestinationGrossWeight(): boolean {
       return window.location.hostname === "mi.metrc.com";
+    },
+    isTransferSubmittedWithPackageGrossWeight(): boolean {
+      return false;
     },
     isTransferSubmittedWithWholesalePrice(): boolean {
       return this.transferType?.Name?.includes("Wholesale") ?? false;
@@ -1227,11 +1299,8 @@ export default Vue.extend({
       this.$data.transporterFacilities = await dynamicConstsManager.transporterFacilities();
       this.$data.destinationFacilities = await dynamicConstsManager.destinationFacilities();
 
-      await dynamicConstsManager
-        .defaultPhoneNumberForQuestions()
-        .then((defaultPhoneNumberForQuestions) => {
-          this.$data.defaultPhoneNumberForQuestions = defaultPhoneNumberForQuestions;
-        });
+      this.$data.defaultPhoneNumberForQuestions =
+        await dynamicConstsManager.defaultPhoneNumberForQuestions();
 
       extractRecentDestinationFacilitiesFromTransfers().then(
         (recentDestinationFacilities: IMetrcFacilityData[]) => {
