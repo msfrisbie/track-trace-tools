@@ -229,8 +229,8 @@ export async function fillTransferWeights() {
       solid: true,
     });
   } else {
-    const normalizedGrossWeight: number[] = [];
-    const baseUnitOfMeasureId: number = unitsOfMeasure.find(
+    let normalizedGrossWeights: number[] = [];
+    let baseUnitOfMeasureId: number = unitsOfMeasure.find(
       (x) => x.IsBaseUnit && x.QuantityType === "WeightBased"
     )!.Id;
 
@@ -262,11 +262,21 @@ export async function fillTransferWeights() {
           continue;
         }
 
-        normalizedGrossWeight.push(quantity * unitOfMeasure.ToBaseFactor);
+        normalizedGrossWeights.push(quantity * unitOfMeasure.ToBaseFactor);
       }
     }
 
-    grossWeightInput.value = normalizedGrossWeight.reduce((a, b) => a + b, 0).toString();
+    // Attempt conversion to Pounds
+    const poundsUnitOfMeasure = unitsOfMeasure.find((x) => x.Name === "Pounds");
+    if (poundsUnitOfMeasure) {
+      debugger;
+      normalizedGrossWeights = normalizedGrossWeights.map(
+        (x) => x * poundsUnitOfMeasure.FromBaseFactor
+      );
+      baseUnitOfMeasureId = poundsUnitOfMeasure.Id;
+    }
+
+    grossWeightInput.value = normalizedGrossWeights.reduce((a, b) => a + b, 0).toString();
     unitOfMeasureSelect.value = `number:${baseUnitOfMeasureId}`;
     unitOfMeasureSelect.dispatchEvent(new Event("change"));
   }

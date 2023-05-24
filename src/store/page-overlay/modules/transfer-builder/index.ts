@@ -93,7 +93,7 @@ export const transferBuilderModule = {
       }
       state.transferPackageList.push(pkg);
 
-      state.transferPackageList.sort((a, b) => (getLabelOrError(a) > getLabelOrError(b) ? 1 : -1));
+      // state.transferPackageList.sort((a, b) => (getLabelOrError(a) > getLabelOrError(b) ? 1 : -1));
     },
     [TransferBuilderMutations.REMOVE_PACKAGE](
       state: ITransferBuilderState,
@@ -441,9 +441,7 @@ export const transferBuilderModule = {
         wholesalePackageValues: destinationPackages.map((x) => x.ShipperWholesalePrice) as number[],
         destinationGrossWeight: destination?.GrossWeight ?? null,
         destinationGrossUnitOfWeight:
-          unitsOfWeight.find(
-            (x) => x.Id === destination?.GrossUnitOfWeightId
-          ) ?? null,
+          unitsOfWeight.find((x) => x.Id === destination?.GrossUnitOfWeightId) ?? null,
         packageGrossWeights: destinationPackages.map((x) => x.GrossWeight) as number[],
         packageGrossUnitsOfWeight: destinationPackages.map(
           (pkg) => unitsOfWeight.find((x) => x.Abbreviation === pkg.GrossUnitOfWeightAbbreviation)!
