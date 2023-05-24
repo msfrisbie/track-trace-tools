@@ -1,10 +1,7 @@
 <template>
   <div>
     <div class="grid grid-cols-2 gap-4" style="grid-template-columns: auto 1fr">
-      <start-finish-icons
-        :ellipsisCount="isSameSiteTransfer ? 7 : 14"
-        class="row-span-3 text-purple-500"
-      />
+      <start-finish-icons :ellipsisCount="ellipsisCount" class="row-span-3 text-purple-500" />
 
       <template v-if="originFacility">
         <facility-summary :facility="originFacility" />
@@ -13,7 +10,9 @@
         <div></div>
       </template>
 
-      <div class="py-8 flex flex-col space-y-0">
+      <div class="py-8 flex flex-col space-y-2">
+        <b-form-checkbox v-model="isLayover" size="md">Is Layover </b-form-checkbox>
+
         <template v-if="!isSameSiteTransfer">
           <b-form-group label="DEPART" label-class="text-gray-400" label-size="sm">
             <b-input-group class="flex flex-row gap-1">
@@ -33,6 +32,45 @@
               ></b-form-datepicker>
             </b-input-group>
           </b-form-group>
+
+          <template v-if="isLayover">
+            <b-form-group label="LAYOVER CHECK IN" label-class="text-gray-400" label-size="sm">
+              <b-input-group class="flex flex-row gap-1">
+                <b-form-timepicker
+                  v-model="layoverCheckInIsotime"
+                  size="sm"
+                  required
+                  :state="!layoverCheckInIsotime ? false : null"
+                ></b-form-timepicker>
+
+                <b-form-datepicker
+                  :date-format-options="dateFormatOptions"
+                  v-model="layoverCheckInIsodate"
+                  size="sm"
+                  required
+                  :state="!layoverCheckInIsodate ? false : null"
+                ></b-form-datepicker>
+              </b-input-group>
+            </b-form-group>
+            <b-form-group label="LAYOVER CHECK OUT" label-class="text-gray-400" label-size="sm">
+              <b-input-group class="flex flex-row gap-1">
+                <b-form-timepicker
+                  v-model="layoverCheckOutIsotime"
+                  required
+                  size="sm"
+                  :state="!layoverCheckOutIsotime ? false : null"
+                ></b-form-timepicker>
+
+                <b-form-datepicker
+                  :date-format-options="dateFormatOptions"
+                  required
+                  v-model="layoverCheckOutIsodate"
+                  size="sm"
+                  :state="!layoverCheckOutIsodate ? false : null"
+                ></b-form-datepicker>
+              </b-input-group>
+            </b-form-group>
+          </template>
 
           <b-form-group label="ARRIVE" label-class="text-gray-400" label-size="sm">
             <b-input-group class="flex flex-row gap-1">
@@ -71,6 +109,7 @@
 import FacilitySummary from "@/components/overlay-widget/shared/FacilitySummary.vue";
 import StartFinishIcons from "@/components/overlay-widget/shared/StartFinishIcons.vue";
 import { BuilderType, MessageType } from "@/consts";
+import { IComputedGetSet } from "@/interfaces";
 import { analyticsManager } from "@/modules/analytics-manager.module";
 import router from "@/router/index";
 import store from "@/store/page-overlay/index";
@@ -94,16 +133,39 @@ export default Vue.extend({
       destinationFacility: (state: any) => state.transferBuilder.destinationFacility,
       isSameSiteTransfer: (state: any) => state.transferBuilder.isSameSiteTransfer,
     }),
+    ellipsisCount(): number {
+      let base = 7;
+
+      if (this.isSameSiteTransfer) {
+        base += 7;
+      }
+
+      if (this.isLayover) {
+        base += 7;
+      }
+
+      return base;
+    },
+    isLayover: {
+      get() {
+        return this.$store.state.transferBuilder.isLayover;
+      },
+      set(isLayover: boolean) {
+        this.$store.dispatch(`transferBuilder/${TransferBuilderActions.UPDATE_TRANSFER_DATA}`, {
+          isLayover,
+        });
+      },
+    } as IComputedGetSet<boolean>,
     departureIsodate: {
       get() {
         return this.$store.state.transferBuilder.departureIsodate;
       },
-      set(departureIsodate) {
+      set(departureIsodate: string) {
         this.$store.dispatch(`transferBuilder/${TransferBuilderActions.UPDATE_TRANSFER_DATA}`, {
           departureIsodate,
         });
       },
-    },
+    } as IComputedGetSet<string>,
     departureIsotime: {
       get() {
         return isotimeToNaiveTime(this.$store.state.transferBuilder.departureIsotime);
@@ -115,17 +177,17 @@ export default Vue.extend({
           departureIsotime,
         });
       },
-    },
+    } as IComputedGetSet<string>,
     arrivalIsodate: {
       get() {
         return this.$store.state.transferBuilder.arrivalIsodate;
       },
-      set(arrivalIsodate) {
+      set(arrivalIsodate: string) {
         this.$store.dispatch(`transferBuilder/${TransferBuilderActions.UPDATE_TRANSFER_DATA}`, {
           arrivalIsodate,
         });
       },
-    },
+    } as IComputedGetSet<string>,
     arrivalIsotime: {
       get() {
         return isotimeToNaiveTime(this.$store.state.transferBuilder.arrivalIsotime);
@@ -137,7 +199,51 @@ export default Vue.extend({
           arrivalIsotime,
         });
       },
-    },
+    } as IComputedGetSet<string>,
+    layoverCheckInIsodate: {
+      get() {
+        return this.$store.state.transferBuilder.layoverCheckInIsodate;
+      },
+      set(layoverCheckInIsodate: string) {
+        this.$store.dispatch(`transferBuilder/${TransferBuilderActions.UPDATE_TRANSFER_DATA}`, {
+          layoverCheckInIsodate,
+        });
+      },
+    } as IComputedGetSet<string>,
+    layoverCheckInIsotime: {
+      get() {
+        return isotimeToNaiveTime(this.$store.state.transferBuilder.layoverCheckInIsotime);
+      },
+      set(naiveDepartureTime: string) {
+        const layoverCheckInIsotime = naiveTimeToIsotime(naiveDepartureTime);
+
+        this.$store.dispatch(`transferBuilder/${TransferBuilderActions.UPDATE_TRANSFER_DATA}`, {
+          layoverCheckInIsotime,
+        });
+      },
+    } as IComputedGetSet<string>,
+    layoverCheckOutIsodate: {
+      get() {
+        return this.$store.state.transferBuilder.layoverCheckOutIsodate;
+      },
+      set(layoverCheckOutIsodate: string) {
+        this.$store.dispatch(`transferBuilder/${TransferBuilderActions.UPDATE_TRANSFER_DATA}`, {
+          layoverCheckOutIsodate,
+        });
+      },
+    } as IComputedGetSet<string>,
+    layoverCheckOutIsotime: {
+      get() {
+        return isotimeToNaiveTime(this.$store.state.transferBuilder.layoverCheckOutIsotime);
+      },
+      set(naiveArrivalTime: string) {
+        const layoverCheckOutIsotime = naiveTimeToIsotime(naiveArrivalTime);
+
+        this.$store.dispatch(`transferBuilder/${TransferBuilderActions.UPDATE_TRANSFER_DATA}`, {
+          layoverCheckOutIsotime,
+        });
+      },
+    } as IComputedGetSet<string>,
   },
   data() {
     return {
@@ -152,33 +258,90 @@ export default Vue.extend({
     departureIsotime: {
       immediate: true,
       handler(newValue, oldValue) {
-        // @ts-ignore
         this.enforceArrivalGteDeparture(false);
       },
     },
     departureIsodate: {
       immediate: true,
       handler(newValue, oldValue) {
-        // @ts-ignore
         this.enforceArrivalGteDeparture(false);
       },
     },
     arrivalIsotime: {
       immediate: true,
       handler(newValue, oldValue) {
-        // @ts-ignore
         this.enforceArrivalGteDeparture(true);
       },
     },
     arrivalIsodate: {
       immediate: true,
       handler(newValue, oldValue) {
-        // @ts-ignore
         this.enforceArrivalGteDeparture(true);
+      },
+    },
+    layoverCheckInIsotime: {
+      immediate: true,
+      handler(newValue, oldValue) {
+        this.enforceLayoverArrivalGteDeparture(false);
+      },
+    },
+    layoverCheckInIsodate: {
+      immediate: true,
+      handler(newValue, oldValue) {
+        this.enforceLayoverArrivalGteDeparture(false);
+      },
+    },
+    layoverCheckOutIsotime: {
+      immediate: true,
+      handler(newValue, oldValue) {
+        this.enforceLayoverArrivalGteDeparture(true);
+      },
+    },
+    layoverCheckOutIsodate: {
+      immediate: true,
+      handler(newValue, oldValue) {
+        this.enforceLayoverArrivalGteDeparture(true);
       },
     },
   },
   methods: {
+    enforceLayoverArrivalGteDeparture(updateDeparture: boolean) {
+      // If one or both of the dates isn't provided,
+      // there is no meaningful enforcement possible
+      if (!this.layoverCheckInIsodate || !this.layoverCheckOutIsodate) {
+        return;
+      }
+
+      // Force layoverCheckOut date to be greater or equal to layoverCheckIn date
+      if (this.layoverCheckOutIsodate < this.layoverCheckInIsodate) {
+        if (updateDeparture) {
+          this.layoverCheckInIsodate = this.layoverCheckOutIsodate;
+        } else {
+          this.layoverCheckOutIsodate = this.layoverCheckInIsodate;
+        }
+      }
+
+      // If the layoverCheckOut and layoverCheckIn dates are on the same day,
+      // force layoverCheckOut time to be greater or equal to layoverCheckIn time
+      if (
+        this.layoverCheckOutIsodate === this.layoverCheckInIsodate &&
+        !!this.layoverCheckInIsotime &&
+        !!this.layoverCheckOutIsotime
+      ) {
+        if (this.layoverCheckOutIsotime < this.layoverCheckInIsotime) {
+          if (updateDeparture) {
+            this.layoverCheckInIsotime = this.layoverCheckOutIsotime;
+          } else {
+            this.layoverCheckOutIsotime = this.layoverCheckInIsotime;
+          }
+        }
+      }
+
+      analyticsManager.track(MessageType.BUILDER_ENGAGEMENT, {
+        builder: BuilderType.CREATE_TRANSFER,
+        action: `Updated layoverCheckOut/layoverCheckIn: ${this.layoverCheckInIsodate} ${this.layoverCheckInIsotime} -> ${this.layoverCheckOutIsodate} ${this.layoverCheckOutIsotime}`,
+      });
+    },
     enforceArrivalGteDeparture(updateDeparture: boolean) {
       // If one or both of the dates isn't provided,
       // there is no meaningful enforcement possible
@@ -187,7 +350,6 @@ export default Vue.extend({
       }
 
       // Force arrival date to be greater or equal to departure date
-      // @ts-ignore
       if (this.arrivalIsodate < this.departureIsodate) {
         if (updateDeparture) {
           this.departureIsodate = this.arrivalIsodate;
@@ -203,7 +365,6 @@ export default Vue.extend({
         !!this.departureIsotime &&
         !!this.arrivalIsotime
       ) {
-        // @ts-ignore
         if (this.arrivalIsotime < this.departureIsotime) {
           if (updateDeparture) {
             this.departureIsotime = this.arrivalIsotime;
@@ -220,12 +381,7 @@ export default Vue.extend({
     },
   },
   async created() {},
-  async mounted() {
-    // this.departureIsodate = todayIsodate();
-    // this.departureIsotime = "10:00:00.000";
-    // this.arrivalIsodate = todayIsodate();
-    // this.arrivalIsotime = "14:00:00.000";
-  },
+  async mounted() {},
 });
 </script>
 

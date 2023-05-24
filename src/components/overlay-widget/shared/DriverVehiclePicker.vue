@@ -11,10 +11,7 @@
             class="flex-grow"
             :data="drivers"
             :showOnFocus="true"
-            :serializer="
-              (driver) =>
-                `${driver.DriverName} | ${driver.DriverVehicleLicenseNumber}`
-            "
+            :serializer="(driver) => `${driver.DriverName} | ${driver.DriverVehicleLicenseNumber}`"
             @hit="selectDriver($event)"
           >
           </vue-typeahead-bootstrap>
@@ -45,14 +42,8 @@
 
         <template v-if="drivers.length > 0">
           <b-input-group-append>
-            <b-button
-              variant="outline-dark"
-              class="opacity-70"
-              @click="toggleDriverSearch()"
-            >
-              <font-awesome-icon
-                :icon="showDriverSearch ? 'times' : 'search'"
-              />
+            <b-button variant="outline-dark" class="opacity-70" @click="toggleDriverSearch()">
+              <font-awesome-icon :icon="showDriverSearch ? 'times' : 'search'" />
             </b-button>
           </b-input-group-append>
         </template>
@@ -102,30 +93,22 @@
 
         <template v-if="vehicles.length > 0">
           <b-input-group-append>
-            <b-button
-              variant="outline-dark"
-              class="opacity-70"
-              @click="toggleVehicleSearch()"
-            >
-              <font-awesome-icon
-                :icon="showVehicleSearch ? 'times' : 'search'"
-              />
+            <b-button variant="outline-dark" class="opacity-70" @click="toggleVehicleSearch()">
+              <font-awesome-icon :icon="showVehicleSearch ? 'times' : 'search'" />
             </b-button>
           </b-input-group-append>
         </template>
       </b-input-group>
     </b-form-group>
 
+    <template v-if="transferBuilder.isLayover">
+      <b-form-group label="LAYOVER LEG" label-class="text-gray-400" label-size="sm">
+        <b-form-select size="sm" :options="layoverLegOptions" v-model="driverLayoverLeg" />
+      </b-form-group>
+    </template>
+
     <template v-if="transferDataLoading">
-      <div
-        class="
-          flex flex-row
-          items-center
-          justify-center
-          space-x-2
-          text-gray-500
-        "
-      >
+      <div class="flex flex-row items-center justify-center space-x-2 text-gray-500">
         <b-spinner small />
         <span>Loading transporters...</span>
       </div>
@@ -155,6 +138,7 @@ import {
   IMetrcVehicleData,
   ITransferPackageList,
   ITransferData,
+  IComputedGetSet,
 } from "@/interfaces";
 import { combineLatest, from, Subject, timer } from "rxjs";
 import { authManager } from "@/modules/auth-manager.module";
@@ -163,6 +147,7 @@ import { extractDriversAndVehiclesFromTransferHistory } from "@/utils/transfer";
 import _ from "lodash";
 import { BuilderType, MessageType } from "@/consts";
 import { analyticsManager } from "@/modules/analytics-manager.module";
+import { mapState } from "vuex";
 
 const dedupObjects = (acc: any[], current: any) =>
   acc.find((x: any) => _.isEqual(x, current)) ? acc : [...acc, current];
@@ -171,75 +156,87 @@ export default Vue.extend({
   name: "DriverVehiclePicker",
   store,
   computed: {
+    ...mapState<IPluginState>({
+      transferBuilder: (state: IPluginState) => state.transferBuilder,
+    }),
     driverName: {
       get() {
         return this.$store.state.transferBuilder.driverName;
       },
-      set(driverName) {
-        this.$store.dispatch(
-          `transferBuilder/${TransferBuilderActions.UPDATE_TRANSFER_DATA}`,
-          { driverName }
-        );
+      set(driverName: string) {
+        this.$store.dispatch(`transferBuilder/${TransferBuilderActions.UPDATE_TRANSFER_DATA}`, {
+          driverName,
+        });
       },
-    },
+    } as IComputedGetSet<string>,
     driverEmployeeId: {
       get() {
         return this.$store.state.transferBuilder.driverEmployeeId;
       },
-      set(driverEmployeeId) {
-        this.$store.dispatch(
-          `transferBuilder/${TransferBuilderActions.UPDATE_TRANSFER_DATA}`,
-          { driverEmployeeId }
-        );
+      set(driverEmployeeId: string) {
+        this.$store.dispatch(`transferBuilder/${TransferBuilderActions.UPDATE_TRANSFER_DATA}`, {
+          driverEmployeeId,
+        });
       },
-    },
+    } as IComputedGetSet<string>,
     driverLicenseNumber: {
       get() {
         return this.$store.state.transferBuilder.driverLicenseNumber;
       },
-      set(driverLicenseNumber) {
-        this.$store.dispatch(
-          `transferBuilder/${TransferBuilderActions.UPDATE_TRANSFER_DATA}`,
-          { driverLicenseNumber }
-        );
+      set(driverLicenseNumber: string) {
+        this.$store.dispatch(`transferBuilder/${TransferBuilderActions.UPDATE_TRANSFER_DATA}`, {
+          driverLicenseNumber,
+        });
       },
-    },
+    } as IComputedGetSet<string>,
     vehicleMake: {
       get() {
         return this.$store.state.transferBuilder.vehicleMake;
       },
-      set(vehicleMake) {
-        this.$store.dispatch(
-          `transferBuilder/${TransferBuilderActions.UPDATE_TRANSFER_DATA}`,
-          { vehicleMake }
-        );
+      set(vehicleMake: string) {
+        this.$store.dispatch(`transferBuilder/${TransferBuilderActions.UPDATE_TRANSFER_DATA}`, {
+          vehicleMake,
+        });
       },
-    },
+    } as IComputedGetSet<string>,
     vehicleModel: {
       get() {
         return this.$store.state.transferBuilder.vehicleModel;
       },
-      set(vehicleModel) {
-        this.$store.dispatch(
-          `transferBuilder/${TransferBuilderActions.UPDATE_TRANSFER_DATA}`,
-          { vehicleModel }
-        );
+      set(vehicleModel: string) {
+        this.$store.dispatch(`transferBuilder/${TransferBuilderActions.UPDATE_TRANSFER_DATA}`, {
+          vehicleModel,
+        });
       },
-    },
+    } as IComputedGetSet<string>,
     vehicleLicensePlate: {
       get() {
         return this.$store.state.transferBuilder.vehicleLicensePlate;
       },
-      set(vehicleLicensePlate) {
-        this.$store.dispatch(
-          `transferBuilder/${TransferBuilderActions.UPDATE_TRANSFER_DATA}`,
-          { vehicleLicensePlate }
-        );
+      set(vehicleLicensePlate: string) {
+        this.$store.dispatch(`transferBuilder/${TransferBuilderActions.UPDATE_TRANSFER_DATA}`, {
+          vehicleLicensePlate,
+        });
       },
-    },
+    } as IComputedGetSet<string>,
+    driverLayoverLeg: {
+      get() {
+        return this.$store.state.transferBuilder.driverLayoverLeg;
+      },
+      set(driverLayoverLeg: string) {
+        this.$store.dispatch(`transferBuilder/${TransferBuilderActions.UPDATE_TRANSFER_DATA}`, {
+          driverLayoverLeg,
+        });
+      },
+    } as IComputedGetSet<string>,
   },
   data() {
     return {
+      layoverLegOptions: [
+        { value: "FromAndToLayover", text: "From And To Layover" },
+        { value: "FromLayover", text: "From Layover" },
+        { value: "ToLayover", text: "To Layover" },
+      ],
       transferDataLoading: false,
       drivers: [],
       showDriverSearch: false,
@@ -253,14 +250,11 @@ export default Vue.extend({
         return;
       }
 
-      this.$store.dispatch(
-        `transferBuilder/${TransferBuilderActions.UPDATE_TRANSFER_DATA}`,
-        {
-          driverName: driver.DriverName,
-          driverEmployeeId: driver.DriverOccupationalLicenseNumber,
-          driverLicenseNumber: driver.DriverVehicleLicenseNumber,
-        }
-      );
+      this.$store.dispatch(`transferBuilder/${TransferBuilderActions.UPDATE_TRANSFER_DATA}`, {
+        driverName: driver.DriverName,
+        driverEmployeeId: driver.DriverOccupationalLicenseNumber,
+        driverLicenseNumber: driver.DriverVehicleLicenseNumber,
+      });
 
       this.$data.showDriverSearch = false;
 
@@ -275,14 +269,11 @@ export default Vue.extend({
         return;
       }
 
-      this.$store.dispatch(
-        `transferBuilder/${TransferBuilderActions.UPDATE_TRANSFER_DATA}`,
-        {
-          vehicleMake: vehicle.VehicleMake,
-          vehicleModel: vehicle.VehicleModel,
-          vehicleLicensePlate: vehicle.VehicleLicensePlateNumber,
-        }
-      );
+      this.$store.dispatch(`transferBuilder/${TransferBuilderActions.UPDATE_TRANSFER_DATA}`, {
+        vehicleMake: vehicle.VehicleMake,
+        vehicleModel: vehicle.VehicleModel,
+        vehicleLicensePlate: vehicle.VehicleLicensePlateNumber,
+      });
 
       this.$data.showVehicleSearch = false;
 
@@ -344,15 +335,15 @@ export default Vue.extend({
             drivers: IMetrcDriverData[];
             vehicles: IMetrcVehicleData[];
           }) => {
-            this.$data.drivers = [
-              ...(await dynamicConstsManager.drivers()),
-              ...drivers,
-            ].reduce(dedupObjects, []);
+            this.$data.drivers = [...(await dynamicConstsManager.drivers()), ...drivers].reduce(
+              dedupObjects,
+              []
+            );
 
-            this.$data.vehicles = [
-              ...(await dynamicConstsManager.vehicles()),
-              ...vehicles,
-            ].reduce(dedupObjects, []);
+            this.$data.vehicles = [...(await dynamicConstsManager.vehicles()), ...vehicles].reduce(
+              dedupObjects,
+              []
+            );
 
             analyticsManager.track(MessageType.BUILDER_EVENT, {
               builder: BuilderType.CREATE_TRANSFER,

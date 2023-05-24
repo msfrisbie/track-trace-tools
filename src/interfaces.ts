@@ -932,8 +932,8 @@ export interface ITransporterData {
   DriverName: string;
   DriverOccupationalLicenseNumber: string;
   DriverVehicleLicenseNumber: string;
-  EstimatedArrivalDateTime: null;
-  EstimatedDepartureDateTime: null;
+  EstimatedArrivalDateTime: string | null;
+  EstimatedDepartureDateTime: string | null;
   IsLayover: boolean;
   TransporterDirectionName: "Outbound";
   TransporterFacilityLicenseNumber: string;
@@ -978,7 +978,7 @@ export interface ITransferTransporterDetails {
   DriverName: string;
   DriverOccupationalLicenseNumber: string;
   DriverVehicleLicenseNumber: string;
-  DriverLayoverLeg: null;
+  DriverLayoverLeg: string | null;
   VehicleMake: string;
   VehicleModel: string;
   VehicleLicensePlateNumber: string;

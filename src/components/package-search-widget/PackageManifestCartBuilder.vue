@@ -1,15 +1,15 @@
 "
 <template>
   <div style="height: 100%; position: relative" class="bg-purple-50">
-    <template v-if="transferPackageList.packages.length">
+    <template v-if="transferPackageList.length">
       <div style="height: 100%" class="flex flex-col overflow-y-scroll toolkit-scroll">
         <div class="flex flex-col space-y-2">
           <!-- <div class="mt-4 text-xl text-center text-gray-500 font-bold">
-            {{ transferPackageList.packages.length }} packages in cart
+            {{ transferPackageList.length }} packages in cart
           </div> -->
 
           <package-manifest-cart-package-preview
-            v-for="pkg in transferPackageList.packages"
+            v-for="pkg in transferPackageList"
             :key="pkg.Label"
             :pkg="pkg"
           />
@@ -28,7 +28,7 @@
           class="flex-grow"
           size="md"
           variant="success"
-          >TRANSFER {{ transferPackageList.packages.length }} PACKAGES</b-button
+          >TRANSFER {{ transferPackageList.length }} PACKAGES</b-button
         >
       </div>
     </template>

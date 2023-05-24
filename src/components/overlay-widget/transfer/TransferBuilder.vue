@@ -1163,7 +1163,7 @@ export default Vue.extend({
         .sort((a: any, b: any) => (a.disabled ? 1 : -1));
     },
     transferPackages(): IUnionIndexedPackageData[] {
-      return this.transferPackageList.packages;
+      return this.transferPackageList;
     },
     csvFiles(): ICsvFile[] {
       return this.buildCsvFiles();
@@ -1191,7 +1191,6 @@ export default Vue.extend({
       unitsOfWeight: [],
       showInitializationError: false,
       editTransfer: false,
-      driverLayoverLegOptions: ["FromAndToLayover", "FromLayover", "ToLayover"],
       steps: [
         {
           stepText: "Destination details",
@@ -1217,7 +1216,7 @@ export default Vue.extend({
     this.$data.unitsOfWeight = await dynamicConstsManager.unitsOfWeight();
 
     try {
-      this.$store.dispatch(`transferBuilder/${TransferBuilderActions.REFRESH_PACKAGES}`);
+      // this.$store.dispatch(`transferBuilder/${TransferBuilderActions.REFRESH_PACKAGES}`);
 
       this.$data.transferTypes = await dynamicConstsManager.transferTypes();
       if (!this.transferType) {

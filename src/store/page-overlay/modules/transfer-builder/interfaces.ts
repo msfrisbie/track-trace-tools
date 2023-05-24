@@ -14,12 +14,12 @@ export interface ITransferBuilderState {
   transferType: IMetrcTransferType | null;
   departureIsodate: string;
   departureIsotime: string;
+  arrivalIsodate: string;
+  arrivalIsotime: string;
   layoverCheckInIsodate: string;
   layoverCheckInIsotime: string;
   layoverCheckOutIsodate: string;
   layoverCheckOutIsotime: string;
-  arrivalIsodate: string;
-  arrivalIsotime: string;
   plannedRoute: string;
   driverName: string;
   driverEmployeeId: string;
@@ -47,12 +47,16 @@ export interface ITransferBuilderUpdateData {
   wholesalePackageValues?: number[];
   packageGrossWeights?: number[];
   packageGrossUnitsOfWeight?: IUnitOfMeasure[];
-  destinationGrossWeight?: number;
-  destinationGrossUnitOfWeight?: IUnitOfMeasure;
+  destinationGrossWeight?: number | null;
+  destinationGrossUnitOfWeight?: IUnitOfMeasure | null;
   departureIsodate?: string;
   departureIsotime?: string;
   arrivalIsodate?: string;
   arrivalIsotime?: string;
+  layoverCheckInIsodate?: string;
+  layoverCheckInIsotime?: string;
+  layoverCheckOutIsodate?: string;
+  layoverCheckOutIsotime?: string;
   plannedRoute?: string;
   driverName?: string;
   driverEmployeeId?: string;
@@ -61,5 +65,6 @@ export interface ITransferBuilderUpdateData {
   vehicleMake?: string;
   vehicleModel?: string;
   vehicleLicensePlate?: string;
+  isLayover?: boolean;
   phoneNumberForQuestions?: string;
 }

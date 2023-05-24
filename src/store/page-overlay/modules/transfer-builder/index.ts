@@ -84,16 +84,16 @@ export const transferBuilderModule = {
       //   state.transferPackageLists.push(currentList);
       // }
 
-      // const existingPackageIndex = currentList.packages.findIndex(
-      //   (x) => getLabelOrError(x) === getLabelOrError(pkg)
-      // );
+      const existingPackageIndex = state.transferPackageList.findIndex(
+        (x) => getLabelOrError(x) === getLabelOrError(pkg)
+      );
 
-      // if (existingPackageIndex >= 0) {
-      //   currentList.packages.splice(existingPackageIndex, 1);
-      // }
-      // currentList.packages.push(pkg);
+      if (existingPackageIndex >= 0) {
+        state.transferPackageList.splice(existingPackageIndex, 1);
+      }
+      state.transferPackageList.push(pkg);
 
-      // currentList.packages.sort((a, b) => (getLabelOrError(a) > getLabelOrError(b) ? 1 : -1));
+      state.transferPackageList.sort((a, b) => (getLabelOrError(a) > getLabelOrError(b) ? 1 : -1));
     },
     [TransferBuilderMutations.REMOVE_PACKAGE](
       state: ITransferBuilderState,
@@ -224,6 +224,8 @@ export const transferBuilderModule = {
     ) => {
       const { identity, license } = ctx.rootGetters.authState;
 
+      console.log({ pkg });
+
       ctx.commit(TransferBuilderMutations.ADD_PACKAGE, { license, identity, pkg });
 
       analyticsManager.track(MessageType.BUILDER_EVENT, {
@@ -258,7 +260,7 @@ export const transferBuilderModule = {
       const refreshedPackages: IPackageData[] = [];
 
       // Removing and adding all packages will preserve order
-      for (let pkg of ctx.getters[TransferBuilderGetters.ACTIVE_PACKAGE_LIST].packages) {
+      for (let pkg of ctx.getters[TransferBuilderGetters.ACTIVE_PACKAGE_LIST]) {
         // const match = packageMap.get(pkg.Label);
         try {
           const matchedPkg = await primaryDataLoader.activePackage(pkg.Label);
@@ -309,9 +311,7 @@ export const transferBuilderModule = {
       const { transferForUpdate } = payload;
 
       const destinations = await primaryDataLoader.transferDestinations(transferForUpdate.Id);
-
       const transporters = await primaryDataLoader.destinationTransporters(transferForUpdate.Id);
-
       const transporterDetails = await primaryDataLoader.transferTransporterDetails(
         transferForUpdate.Id
       );
@@ -361,6 +361,7 @@ export const transferBuilderModule = {
       }
 
       const destination = destinations.length > 0 ? destinations[0] : null;
+      const transporter = transporters.length > 0 ? transporters[0] : null;
       const transporterDetail =
         transporterDetails.length > 0 ? transporterDetails[transporterDetails.length - 1] : null;
 
@@ -372,12 +373,22 @@ export const transferBuilderModule = {
       const destinationFacilities = await dynamicConstsManager.destinationFacilities();
       const unitsOfWeight = await dynamicConstsManager.unitsOfWeight();
 
-      const [departureIsodate, departureIsotime] = destination
+      const isLayover = !!transporterDetail?.DriverLayoverLeg;
+
+      const [departureIsodate, departureIsotime] = destination?.EstimatedDepartureDateTime
         ? destination.EstimatedDepartureDateTime.split("T")
         : [undefined, undefined];
-      const [arrivalIsodate, arrivalIsotime] = destination
+      const [arrivalIsodate, arrivalIsotime] = destination?.EstimatedArrivalDateTime
         ? destination.EstimatedArrivalDateTime.split("T")
         : [undefined, undefined];
+
+      const [layoverCheckInIsodate, layoverCheckInIsotime] = transporter?.EstimatedArrivalDateTime
+        ? transporter?.EstimatedArrivalDateTime.split("T")
+        : [undefined, undefined];
+      const [layoverCheckOutIsodate, layoverCheckOutIsotime] =
+        transporter?.EstimatedDepartureDateTime
+          ? transporter?.EstimatedDepartureDateTime.split("T")
+          : [undefined, undefined];
 
       const destinationPackages = destination
         ? await primaryDataLoader.destinationPackages(destination.Id)
@@ -413,14 +424,25 @@ export const transferBuilderModule = {
         departureIsotime,
         arrivalIsodate,
         arrivalIsotime,
+        isLayover,
+        layoverCheckInIsodate,
+        layoverCheckInIsotime,
+        layoverCheckOutIsodate,
+        layoverCheckOutIsotime,
         plannedRoute: destination?.PlannedRoute,
         driverName: transporterDetail?.DriverName,
         driverEmployeeId: transporterDetail?.DriverOccupationalLicenseNumber,
         driverLicenseNumber: transporterDetail?.DriverVehicleLicenseNumber,
+        driverLayoverLeg: transporterDetail?.DriverLayoverLeg ?? "",
         vehicleMake: transporterDetail?.VehicleMake,
         vehicleModel: transporterDetail?.VehicleModel,
         vehicleLicensePlate: transporterDetail?.VehicleLicensePlateNumber,
         wholesalePackageValues: destinationPackages.map((x) => x.ShipperWholesalePrice) as number[],
+        destinationGrossWeight: destination?.GrossWeight ?? null,
+        destinationGrossUnitOfWeight:
+          unitsOfWeight.find(
+            (x) => x.Abbreviation === destination?.GrossUnitOfWeightAbbreviation
+          ) ?? null,
         packageGrossWeights: destinationPackages.map((x) => x.GrossWeight) as number[],
         packageGrossUnitsOfWeight: destinationPackages.map(
           (pkg) => unitsOfWeight.find((x) => x.Abbreviation === pkg.GrossUnitOfWeightAbbreviation)!
