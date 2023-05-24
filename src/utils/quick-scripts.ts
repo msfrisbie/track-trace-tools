@@ -269,7 +269,6 @@ export async function fillTransferWeights() {
     // Attempt conversion to Pounds
     const poundsUnitOfMeasure = unitsOfMeasure.find((x) => x.Name === "Pounds");
     if (poundsUnitOfMeasure) {
-      debugger;
       normalizedGrossWeights = normalizedGrossWeights.map(
         (x) => x * poundsUnitOfMeasure.FromBaseFactor
       );
