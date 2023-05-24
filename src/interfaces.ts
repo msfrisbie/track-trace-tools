@@ -954,9 +954,9 @@ export interface IDestinationData {
   EstimatedDepartureDateTime: string;
   EstimatedReturnArrivalDateTime: null;
   EstimatedReturnDepartureDateTime: null;
-  GrossUnitOfWeightAbbreviation: null;
-  GrossUnitOfWeightId: null;
-  GrossWeight: null;
+  GrossUnitOfWeightAbbreviation: string | null;
+  GrossUnitOfWeightId: number | null;
+  GrossWeight: number | null;
   Id: number;
   PlannedRoute: string;
   ReceivedByName: null;
@@ -1279,45 +1279,29 @@ export interface IMetrcTransferType {
   FacilityTypes: { FacilityTypeId: number; FacilityTypeName: string }[];
 }
 
-export interface IMetrcCreateStateAuthorizedTransferPayload {
-  Destinations: IMetrcStateAuthorizedTransferDestinationData[];
-  ShipmentLicenseType: string;
-}
-
-export interface IMetrcUpdateStateAuthorizedTransferPayload {
-  Destinations: IMetrcStateAuthorizedTransferDestinationData[];
-  Id: number;
-  ShipmentLicenseType: string;
-}
-
 export interface IMetrcCreateTransferPayload {
   Destinations: IMetrcTransferDestinationData[];
   ShipmentLicenseType: string;
 }
 
-export interface IMetrcUpdateTransferPayload {
-  Destinations: IMetrcTransferDestinationData[];
+export interface IMetrcUpdateTransferPayload extends IMetrcCreateTransferPayload {
   Id: number;
-  ShipmentLicenseType: string;
 }
 
-interface IMetrcSharedTransferDestinationData {
+export interface IMetrcTransferDestinationData {
   ShipmentLicenseType: string;
   RecipientId: string;
   PlannedRoute: string;
   TransferTypeId: string;
+  Packages: IMetrcTransferPackageData[];
+  // These are thre transfer ETA/ETD
   EstimatedDepartureDateTime: string;
   EstimatedArrivalDateTime: string;
+  // These fields are provided in MI for wholesale transfers
   GrossWeight: string;
   GrossUnitOfWeightId: string;
-  Packages: IMetrcTransferPackageData[];
-}
-
-export interface IMetrcStateAuthorizedTransferDestinationData
-  extends IMetrcSharedTransferDestinationData {}
-
-export interface IMetrcTransferDestinationData extends IMetrcSharedTransferDestinationData {
-  Transporters: IMetrcTransferTransporterData[];
+  // Some types such as State Authorized do not submit a Transporter
+  Transporters?: IMetrcTransferTransporterData[];
 }
 
 export interface IMetrcTransferPackageData {
@@ -1330,9 +1314,11 @@ export interface IMetrcTransferPackageData {
 export interface IMetrcTransferTransporterData {
   TransporterId: string;
   PhoneNumberForQuestions: string;
-  EstimatedArrivalDateTime: string;
-  EstimatedDepartureDateTime: string;
   TransporterDetails: IMetrcTransferTransporterDetailsData[];
+  // These are the layover ETA/ETD
+  IsLayover?: "true";
+  EstimatedArrivalDateTime?: string;
+  EstimatedDepartureDateTime?: string;
 }
 
 export interface IMetrcTransferTransporterDetailsData {
@@ -1342,6 +1328,7 @@ export interface IMetrcTransferTransporterDetailsData {
   VehicleMake: string;
   VehicleModel: string;
   VehicleLicensePlateNumber: string;
+  DriverLayoverLeg: "" | "FromLayover" | "ToLayover" | "FromAndToLayover";
 }
 
 export interface IMetrcMovePlantsPayload {
@@ -1659,13 +1646,13 @@ export interface IItemCategory {
 
 export interface IUnitOfMeasure {
   Abbreviation: UnitOfMeasureAbbreviation;
-  FromBaseFactor: number;  // g is 28.349523125
+  FromBaseFactor: number; // g is 28.349523125
   Id: number;
   IsArchived: boolean;
   IsBaseUnit: boolean;
   Name: UnitOfMeasureName;
   QuantityType: "WeightBased" | "VolumeBased" | "CountBased";
-  ToBaseFactor: number;  // g is 0.035273961949580414
+  ToBaseFactor: number; // g is 0.035273961949580414
 }
 
 export interface IWasteReason {

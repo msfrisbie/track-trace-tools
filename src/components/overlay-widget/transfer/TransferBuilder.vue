@@ -480,13 +480,11 @@ import {
   IComputedGetSetMismatched,
   ICsvFile,
   IIndexedTransferData,
-  IMetrcCreateStateAuthorizedTransferPayload,
   IMetrcCreateTransferPayload,
   IMetrcFacilityData,
   IMetrcTransferPackageData,
   IMetrcTransferTransporterData,
   IMetrcTransferType,
-  IMetrcUpdateStateAuthorizedTransferPayload,
   IMetrcUpdateTransferPayload,
   IPluginState,
   ITransferData,
@@ -710,6 +708,7 @@ export default Vue.extend({
               VehicleMake: vehicleMake,
               VehicleModel: vehicleModel,
               VehicleLicensePlateNumber: vehicleLicensePlate,
+              DriverLayoverLeg: "",
             },
           ],
         },
@@ -721,11 +720,7 @@ export default Vue.extend({
 
       const IdMixin = this.transferForUpdate ? { Id: this.transferForUpdate.Id } : {};
 
-      const transferData:
-        | IMetrcCreateTransferPayload
-        | IMetrcCreateStateAuthorizedTransferPayload
-        | IMetrcUpdateTransferPayload
-        | IMetrcUpdateStateAuthorizedTransferPayload = {
+      const transferData: IMetrcCreateTransferPayload | IMetrcUpdateTransferPayload = {
         ShipmentLicenseType: "Licensed",
         ...IdMixin,
         Destinations: [
@@ -744,11 +739,7 @@ export default Vue.extend({
         ],
       };
 
-      let rows:
-        | IMetrcCreateTransferPayload[]
-        | IMetrcCreateStateAuthorizedTransferPayload[]
-        | IMetrcUpdateTransferPayload[]
-        | IMetrcUpdateStateAuthorizedTransferPayload[] = [transferData];
+      let rows: IMetrcCreateTransferPayload[] | IMetrcUpdateTransferPayload[] = [transferData];
 
       if (rows[0].Destinations.length === 0) {
         analyticsManager.track(MessageType.BUILDER_DATA_ERROR, {

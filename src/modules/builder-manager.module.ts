@@ -6,7 +6,6 @@ import {
   IMetrcCreatePackagesFromPackagesPayload,
   IMetrcCreatePlantBatchPackagesFromMotherPlantBatchPayload,
   IMetrcCreatePlantBatchPackagesFromMotherPlantPayload,
-  IMetrcCreateStateAuthorizedTransferPayload,
   IMetrcDestroyPlantsPayload,
   IMetrcFinishPackagesPayload,
   IMetrcHarvestPlantsPayload,
@@ -51,7 +50,6 @@ type IEligibleRowType =
   | IMetrcCreatePlantBatchPackagesFromMotherPlantPayload
   | IMetrcCreatePlantBatchPackagesFromMotherPlantBatchPayload
   | IMetrcCreateTransferPayload
-  | IMetrcCreateStateAuthorizedTransferPayload
   | IMetrcCreateItemsPayload
   | IMetrcReplacePlantBatchTagsPayload
   | IMetrcReplacePlantTagsPayload
