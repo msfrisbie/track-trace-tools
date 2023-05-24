@@ -15,6 +15,7 @@ import {
   TransferState,
 } from "@/consts";
 import { Store } from "vuex";
+import { IEmployeeSamplesState } from "./store/page-overlay/modules/employee-samples/interfaces";
 import { IExplorerState } from "./store/page-overlay/modules/explorer/interfaces";
 import { IFlagsState } from "./store/page-overlay/modules/flags/interfaces";
 import { IListingState } from "./store/page-overlay/modules/listing/interfaces";
@@ -213,6 +214,7 @@ export interface IPluginState extends IRootState {
   flags: IFlagsState;
   packageHistory: IPackageHistoryState;
   explorer: IExplorerState;
+  employeeSamples: IEmployeeSamplesState;
 }
 
 export type MetrcTagType = "CannabisPlant" | "CannabisPackage" | "MedicalPlant" | "MedicalPackage";

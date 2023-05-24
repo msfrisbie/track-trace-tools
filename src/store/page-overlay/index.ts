@@ -23,6 +23,7 @@ import { maybePushOntoUniqueStack } from "@/utils/search";
 import Vue from "vue";
 import Vuex from "vuex";
 import VuexPersistence from "vuex-persist";
+import { employeeSamplesModule, employeeSamplesReducer } from "./modules/employee-samples";
 import { explorerModule, explorerReducer } from "./modules/explorer";
 import { flagsModule, flagsReducer } from "./modules/flags/index";
 import { listingModule, listingReducer } from "./modules/listing";
@@ -76,6 +77,7 @@ const vuexShared = {
       settings: settingsReducer(state.settings),
       packageHistory: packageHistoryReducer(state.packageHistory),
       reports: reportsReducer(state.reports),
+      employeeSamples: employeeSamplesReducer(state.employeeSamples)
     };
   },
 };
@@ -452,6 +454,10 @@ const vuexStore = new Vuex.Store<IPluginState>({
     explorer: {
       namespaced: true,
       ...explorerModule,
+    },
+    employeeSamples: {
+      namespaced: true,
+      ...employeeSamplesModule,
     },
   },
   plugins: [vuexPersistence.plugin],
