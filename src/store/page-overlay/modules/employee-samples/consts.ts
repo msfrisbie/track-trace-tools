@@ -1,5 +1,6 @@
 export enum EmployeeSamplesMutations {
   EMPLOYEE_SAMPLES_MUTATION = "EMPLOYEE_SAMPLES_MUTATION",
+  UPDATE_DATA = "UPDATE_DATA",
 }
 
 export enum EmployeeSamplesGetters {
@@ -8,4 +9,5 @@ export enum EmployeeSamplesGetters {
 
 export enum EmployeeSamplesActions {
   EMPLOYEE_SAMPLES_ACTION = "EMPLOYEE_SAMPLES_ACTION",
+  LOAD_OBJECTS = "LOAD_OBJECTS",
 }

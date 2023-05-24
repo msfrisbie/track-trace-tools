@@ -1,9 +1,13 @@
-import { IPluginState } from "@/interfaces";
+import { IIndexedPackageData, IMetrcEmployeeData, IPluginState } from "@/interfaces";
+import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
 import { ActionContext } from "vuex";
 import { EmployeeSamplesActions, EmployeeSamplesGetters, EmployeeSamplesMutations } from "./consts";
 import { IEmployeeSamplesState } from "./interfaces";
 
-const inMemoryState = {};
+const inMemoryState = {
+  employees: [],
+  availableSamplePackages: [],
+};
 
 const persistedState = {};
 
@@ -15,8 +19,17 @@ const defaultState: IEmployeeSamplesState = {
 export const employeeSamplesModule = {
   state: () => defaultState,
   mutations: {
-    [EmployeeSamplesMutations.EMPLOYEE_SAMPLES_MUTATION](state: IEmployeeSamplesState, data: any) {
-      // state.data = data;
+    [EmployeeSamplesMutations.UPDATE_DATA](
+      state: IEmployeeSamplesState,
+      payload: {
+        employees?: IMetrcEmployeeData[];
+        availableSamplePackages?: IIndexedPackageData[];
+      }
+    ) {
+      for (const [key, value] of Object.entries(payload)) {
+        // @ts-ignore
+        state[key] = value;
+      }
     },
   },
   getters: {
@@ -35,6 +48,19 @@ export const employeeSamplesModule = {
       data: any
     ) => {
       ctx.commit(EmployeeSamplesMutations.EMPLOYEE_SAMPLES_MUTATION, data);
+    },
+    [EmployeeSamplesActions.LOAD_OBJECTS]: async (
+      ctx: ActionContext<IEmployeeSamplesState, IPluginState>,
+      data: any
+    ) => {
+      const payload = {
+        employees: await primaryDataLoader.employees(),
+        availableSamplePackages: (await primaryDataLoader.activePackages()).filter(
+          (pkg) => pkg.IsTradeSample && pkg.Quantity > 0
+        ),
+      };
+
+      ctx.commit(EmployeeSamplesMutations.UPDATE_DATA, payload);
     },
   },
 };
