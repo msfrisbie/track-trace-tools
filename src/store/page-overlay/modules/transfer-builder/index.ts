@@ -224,8 +224,6 @@ export const transferBuilderModule = {
     ) => {
       const { identity, license } = ctx.rootGetters.authState;
 
-      console.log({ pkg });
-
       ctx.commit(TransferBuilderMutations.ADD_PACKAGE, { license, identity, pkg });
 
       analyticsManager.track(MessageType.BUILDER_EVENT, {
