@@ -68,9 +68,13 @@ body.ttt-styling-fix {
 
   .k-grid td:not(:first-child) {
     min-width: 80px;
-    max-width: 300px;
-    overflow-x: auto;
+    max-width: 400px;
+    // overflow-x: auto;
     white-space: nowrap;
+  }
+
+  .k-grid td:hover {
+    white-space: normal;
   }
 
   .k-grid td:nth-child(2) {
