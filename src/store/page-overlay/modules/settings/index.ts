@@ -39,6 +39,8 @@ const persistedState: ISettingsState = {
   packageDefaultPageSize: 20,
   plantDefaultPageSize: 20,
   preventLogout: true,
+  fixMetrcStyling: true,
+  autoDismissPopups: true,
   salesDefaultPageSize: 20,
   snowflakeState: SnowflakeState.DISABLED,
   snowflakeCharacter: "❅",

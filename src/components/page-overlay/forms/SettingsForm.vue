@@ -77,6 +77,26 @@
             Prevent Metrc from logging me out
           </b-form-checkbox>
 
+          <b-form-checkbox
+            id="checkbox-autoDismissPopups"
+            class="mb-2"
+            v-model="settings.autoDismissPopups"
+            name="checkbox-autoDismissPopups"
+            @change="onChange()"
+          >
+            Auto-dismiss Metrc banners
+          </b-form-checkbox>
+
+          <b-form-checkbox
+            id="checkbox-fixMetrcStyling"
+            class="mb-2"
+            v-model="settings.fixMetrcStyling"
+            name="checkbox-fixMetrcStyling"
+            @change="onChange()"
+          >
+            Fix Metrc styling
+          </b-form-checkbox>
+
           <!-- <b-form-checkbox
             id="checkbox-darkModeState"
             class="mb-2"

@@ -21,7 +21,8 @@
 // Need extra specificity to override bootstrap
 tr.k-master-row {
   .inline-button-container {
-    display: block;
+    // display: block;
+    float: right;
     margin: 5px;
     opacity: 0.6;
   }

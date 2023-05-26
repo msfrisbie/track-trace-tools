@@ -41,6 +41,12 @@ export function togglePageVisibilityClassesImpl() {
   } else {
     document.body.classList.remove("demo-mode");
   }
+
+  if (store.state.settings?.fixMetrcStyling) {
+    document.body.classList.add("ttt-styling-fix");
+  } else {
+    document.body.classList.remove("ttt-styling-fix");
+  }
 }
 
 export function controlLogoutBarImpl(hide: boolean) {

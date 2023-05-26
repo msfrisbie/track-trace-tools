@@ -1,12 +1,16 @@
+import { PackageState } from "@/consts";
 import { IIndexedPackageData, IMetrcEmployeeData, IPluginState } from "@/interfaces";
 import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
+import { getIsoDateFromOffset } from "@/utils/date";
 import { ActionContext } from "vuex";
 import { EmployeeSamplesActions, EmployeeSamplesGetters, EmployeeSamplesMutations } from "./consts";
 import { IEmployeeSamplesState } from "./interfaces";
 
 const inMemoryState = {
+  loadInflight: false,
   employees: [],
   availableSamplePackages: [],
+  modifiedSamplePackages: [],
 };
 
 const persistedState = {};
@@ -24,6 +28,7 @@ export const employeeSamplesModule = {
       payload: {
         employees?: IMetrcEmployeeData[];
         availableSamplePackages?: IIndexedPackageData[];
+        modifiedSamplePackages?: IIndexedPackageData[];
       }
     ) {
       for (const [key, value] of Object.entries(payload)) {
@@ -53,14 +58,49 @@ export const employeeSamplesModule = {
       ctx: ActionContext<IEmployeeSamplesState, IPluginState>,
       data: any
     ) => {
-      const payload = {
-        employees: await primaryDataLoader.employees(),
-        availableSamplePackages: (await primaryDataLoader.activePackages()).filter(
-          (pkg) => pkg.IsTradeSample && pkg.Quantity > 0
-        ),
-      };
+      let packages: IIndexedPackageData[] = [];
+      let employees: IMetrcEmployeeData[] = [];
 
-      ctx.commit(EmployeeSamplesMutations.UPDATE_DATA, payload);
+      ctx.state.loadInflight = true;
+
+      const promises: Promise<any>[] = [
+        primaryDataLoader.activePackages().then((result) => {
+          packages = [...packages, ...result];
+        }),
+        primaryDataLoader.inactivePackages().then((result) => {
+          packages = [...packages, ...result];
+        }),
+        primaryDataLoader.employees().then((result) => {
+          employees = result;
+        }),
+      ];
+
+      await Promise.allSettled(promises);
+
+      // Only consider packages recieved from a separate facility
+      packages = packages.filter((pkg) => (pkg.ReceivedFromManifestNumber ?? "").length > 0);
+
+      const slidingWindowIsodate = getIsoDateFromOffset(-180);
+
+      ctx.state.employees = employees;
+      ctx.state.availableSamplePackages = packages.filter(
+        (pkg) => pkg.IsTradeSample && pkg.Quantity > 0 && pkg.PackageState === PackageState.ACTIVE
+      );
+      ctx.state.modifiedSamplePackages = packages.filter(
+        (pkg) => pkg.IsTradeSample //&& pkg.LastModified >= slidingWindowIsodate
+      );
+
+      ctx.state.modifiedSamplePackages.map((pkg) => {
+        promises.push(
+          primaryDataLoader.packageHistoryByPackageId(pkg.Id).then((history) => {
+            pkg.history = history;
+          })
+        );
+      });
+
+      await Promise.allSettled(promises);
+
+      ctx.state.loadInflight = false;
     },
   },
 };

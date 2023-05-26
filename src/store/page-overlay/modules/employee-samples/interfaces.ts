@@ -1,6 +1,14 @@
 import { IIndexedPackageData, IMetrcEmployeeData } from "@/interfaces";
 
+export interface ISampleAllocation {
+  flowerAllocationGrams: number;
+  concentrateAllocationGrams: number;
+  infusedAllocationGrams: number;
+}
+
 export interface IEmployeeSamplesState {
-    employees: IMetrcEmployeeData[],
-    availableSamplePackages: IIndexedPackageData[]
+  loadInflight: boolean;
+  employees: IMetrcEmployeeData[];
+  availableSamplePackages: IIndexedPackageData[];
+  modifiedSamplePackages: IIndexedPackageData[];
 }

@@ -390,6 +390,16 @@ class PageManager implements IAtomicService {
         await this.clickLogoutDismiss();
       }
 
+      if (store.state.settings?.autoDismissPopups) {
+        setTimeout(() => {
+          for (const btn of document.querySelectorAll(
+            "#user-alerts .alert button"
+          ) as NodeListOf<HTMLElement>) {
+            btn.click();
+          }
+        }, 5000);
+      }
+
       if (store.state.settings) {
         this.controlLogoutBar(store.state.settings.preventLogout);
         this.controlSnowflakeAnimation(store.state.settings.snowflakeState);

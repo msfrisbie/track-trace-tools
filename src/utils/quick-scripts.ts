@@ -23,6 +23,18 @@ export async function runQuickScript(quickScript: IQuickScript, childOption?: an
 
 export const QUICK_SCRIPTS: IQuickScript[] = [
   {
+    id: "SHOW_ALL_COLUMNS",
+    name: "Show All Columns",
+    description: "Makes all Metrc table columns visible",
+    quickScriptFunction: showAllColumns,
+  },
+  {
+    id: "SHOW_ONLY_PRIMARY_COLUMN",
+    name: "Show Only Primary Column",
+    description: "Hides all Metrc table columns except for the primary one",
+    quickScriptFunction: showOnlyPrimaryColumn,
+  },
+  {
     id: "AUTOFILL_TRANSFER_GROSS_WEIGHTS",
     name: "Autofill Transfer Gross Weight",
     description:
@@ -97,6 +109,136 @@ export async function checkAllPlantsForHarvestRestore() {
     toaster: "ttt-toaster",
     solid: true,
   });
+}
+
+export async function showAllColumns() {
+  try {
+    const menuButton = document.querySelector(`th .k-header-column-menu`) as HTMLElement | null;
+
+    if (menuButton) {
+      pageManager.suppressAnimationContainer();
+
+      // This opens the menu and creates the form
+      menuButton.click();
+
+      let form = null;
+      const animationContainer = pageManager.getVisibleAnimationContainer("Sort Ascending");
+
+      console.log({ animationContainer });
+
+      if (animationContainer) {
+        form = animationContainer.querySelector(".k-columns-item");
+      }
+
+      console.log({ form });
+
+      if (form) {
+        for (const checkbox of form.querySelectorAll(
+          `input[type="checkbox"]`
+        ) as NodeListOf<HTMLInputElement>) {
+          if (!checkbox.checked) {
+            checkbox.click();
+          }
+        }
+      }
+
+      // Close the menu
+      if (menuButton) {
+        menuButton.click();
+      }
+
+      toastManager.openToast(`Checked all columns`, {
+        title: "Quick Script Success",
+        autoHideDelay: 5000,
+        variant: "success",
+        appendToast: true,
+        toaster: "ttt-toaster",
+        solid: true,
+      });
+
+      return;
+    }
+  } catch {}
+
+  toastManager.openToast(
+    `Couldn't find a Metrc table. This quick script only works on Metrc pages with tables.`,
+    {
+      title: "Quick Script Error",
+      autoHideDelay: 5000,
+      variant: "warning",
+      appendToast: true,
+      toaster: "ttt-toaster",
+      solid: true,
+    }
+  );
+}
+
+export async function showOnlyPrimaryColumn() {
+  try {
+    const menuButton = document.querySelector(`th .k-header-column-menu`) as HTMLElement | null;
+
+    if (menuButton) {
+      pageManager.suppressAnimationContainer();
+
+      // This opens the menu and creates the form
+      menuButton.click();
+
+      let form = null;
+      const animationContainer = pageManager.getVisibleAnimationContainer("Sort Ascending");
+
+      console.log({ animationContainer });
+
+      if (animationContainer) {
+        form = animationContainer.querySelector(".k-columns-item");
+      }
+
+      console.log({ form });
+
+      if (form) {
+        for (const [idx, checkbox] of [
+          ...(form.querySelectorAll(`input[type="checkbox"]`) as NodeListOf<HTMLInputElement>),
+        ].entries()) {
+          if (idx === 0) {
+            if (!checkbox.checked) {
+              checkbox.click();
+            }
+          } else {
+            if (checkbox.checked) {
+              checkbox.click();
+            }
+          }
+        }
+      }
+
+      // Close the menu
+      if (menuButton) {
+        menuButton.click();
+      }
+
+      toastManager.openToast(`Unchecked all columns`, {
+        title: "Quick Script Success",
+        autoHideDelay: 5000,
+        variant: "success",
+        appendToast: true,
+        toaster: "ttt-toaster",
+        solid: true,
+      });
+
+      return;
+    }
+  } catch {}
+
+  toastManager.openToast(
+    `Couldn't find a Metrc table. This quick script only works on Metrc pages with tables.`,
+    {
+      title: "Quick Script Error",
+      autoHideDelay: 5000,
+      variant: "warning",
+      appendToast: true,
+      toaster: "ttt-toaster",
+      solid: true,
+    }
+  );
 }
 
 export async function fillTransferWeights() {

@@ -60,6 +60,24 @@
   box-shadow: none !important;
 }
 
+body.ttt-styling-fix {
+  // Fix Metrc table scrolling
+  .k-grid {
+    overflow-x: auto;
+  }
+
+  .k-grid td:not(:first-child) {
+    min-width: 80px;
+    max-width: 300px;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+
+  .k-grid td:nth-child(2) {
+    min-width: 280px;
+  }
+}
+
 @import "@/scss/page-overlay";
 @import "@/scss/modal";
 @import "@/scss/inline";

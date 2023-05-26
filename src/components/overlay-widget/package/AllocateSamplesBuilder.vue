@@ -13,7 +13,7 @@
         </b-collapse>
 
         <b-button variant="outline-primary" v-b-toggle="'collapse-2'"
-          >Available Samples ({{ employeeSamples.availableSamplePackages.length }})</b-button
+          >Unallocated Samples ({{ employeeSamples.availableSamplePackages.length }})</b-button
         >
 
         <b-collapse id="collapse-2" class="h-auto" style="transition: none !important">
@@ -21,6 +21,33 @@
             <pre>{{ JSON.stringify(employeeSamples.availableSamplePackages, null, 2) }}</pre>
           </b-card>
         </b-collapse>
+
+        <b-button variant="outline-primary" v-b-toggle="'collapse-3'"
+          >30 day modified samples ({{ employeeSamples.modifiedSamples.length }})</b-button
+        >
+
+        <b-collapse id="collapse-3" class="h-auto" style="transition: none !important">
+          <b-card>
+            <pre>{{ JSON.stringify(employeeSamples.modifiedSamples, null, 2) }}</pre>
+          </b-card>
+        </b-collapse>
+
+        <!-- 
+        A producer or marijuana sales location is limited to transferring: 
+        
+        a total of 1 ounce of marijuana, 
+        a total of 6grams of marijuana concentrate, and 
+        marijuana-infused products with a total THC content of 2000 mgs 
+        
+        of internal product samples to each of its employees in a
+        30-day period. 
+        -->
+      </div>
+
+      <div>
+        <template v-if="employeeSamples.loadInflight">
+          <b-spinner></b-spinner>
+        </template>
       </div>
     </div>
   </div>
