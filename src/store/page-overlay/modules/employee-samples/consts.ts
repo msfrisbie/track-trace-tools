@@ -8,6 +8,6 @@ export enum EmployeeSamplesGetters {
 }
 
 export enum EmployeeSamplesActions {
-  EMPLOYEE_SAMPLES_ACTION = "EMPLOYEE_SAMPLES_ACTION",
+  ALLOCATE_SAMPLES = "ALLOCATE_SAMPLES",
   LOAD_OBJECTS = "LOAD_OBJECTS",
 }

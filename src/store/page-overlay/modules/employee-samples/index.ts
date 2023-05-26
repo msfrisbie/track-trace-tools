@@ -48,11 +48,12 @@ export const employeeSamplesModule = {
     },
   },
   actions: {
-    [EmployeeSamplesActions.EMPLOYEE_SAMPLES_ACTION]: async (
+    [EmployeeSamplesActions.ALLOCATE_SAMPLES]: async (
       ctx: ActionContext<IEmployeeSamplesState, IPluginState>,
       data: any
     ) => {
-      ctx.commit(EmployeeSamplesMutations.EMPLOYEE_SAMPLES_MUTATION, data);
+      // ctx.commit(EmployeeSamplesMutations.EMPLOYEE_SAMPLES_MUTATION, data);
+      
     },
     [EmployeeSamplesActions.LOAD_OBJECTS]: async (
       ctx: ActionContext<IEmployeeSamplesState, IPluginState>,

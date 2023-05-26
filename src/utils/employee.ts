@@ -7,6 +7,18 @@ import { getIsoDateFromOffset } from "./date";
 const ADJUSTMENT_REGEX = new RegExp(`Package adjusted by -([0-9\.]+) ([a-zA-Z]+)`);
 const EMPLOYEE_REGEX = new RegExp(`Note: ([^0-9]+) ([0-9]+)`);
 
+export function getEstimatedNumberOfSamplesRemaining(pkg: IIndexedPackageData): number {
+  if (pkg.Quantity === 0) {
+    return 0;
+  }
+
+  if (pkg.UnitOfMeasureAbbreviation === "ea") {
+    return pkg.Quantity;
+  }
+
+  return 1;
+}
+
 export function getAvailableSamplesFromPackage(pkg: IIndexedPackageData): ISampleAllocation[] {
   const sampleAllocations: ISampleAllocation[] = [];
 
