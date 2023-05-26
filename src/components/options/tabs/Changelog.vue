@@ -3,6 +3,36 @@
     <div id="changelog" class="flex flex-col items-center px-6">
       <div class="flex flex-col items-stretch max-w-md gap-16">
         <div class="max-w-lg flex flex-col gap-4">
+          <p class="text-2xl ttt-purple">v0.39.0</p>
+
+          <ul class="list-disc">
+            <li>New quick scripts and settings</li>
+          </ul>
+
+          <p class="text-2xl ttt-purple">v0.37.0</p>
+
+          <ul class="list-disc">
+            <li>Fixes to transfer tool and metrc repeaterData interface</li>
+          </ul>
+
+          <p class="text-2xl ttt-purple">v0.36.0</p>
+
+          <ul class="list-disc">
+            <li>Updates to transfer tool</li>
+          </ul>
+
+          <p class="text-2xl ttt-purple">v0.35.0</p>
+
+          <ul class="list-disc">
+            <li>Add search survey and demo video</li>
+          </ul>
+
+          <p class="text-2xl ttt-purple">v0.34.0</p>
+
+          <ul class="list-disc">
+            <li>Cosmetic changes</li>
+          </ul>
+
           <p class="text-2xl ttt-purple">v0.32.0</p>
 
           <ul class="list-disc">
