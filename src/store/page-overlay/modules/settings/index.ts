@@ -40,6 +40,7 @@ const persistedState: ISettingsState = {
   plantDefaultPageSize: 20,
   preventLogout: true,
   fixMetrcStyling: true,
+  efficientSpacing: false,
   autoDismissPopups: true,
   salesDefaultPageSize: 20,
   snowflakeState: SnowflakeState.DISABLED,

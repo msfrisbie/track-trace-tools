@@ -47,6 +47,12 @@ export function togglePageVisibilityClassesImpl() {
   } else {
     document.body.classList.remove("ttt-styling-fix");
   }
+
+  if (store.state.settings?.efficientSpacing) {
+    document.body.classList.add("ttt-efficient-spacing");
+  } else {
+    document.body.classList.remove("ttt-efficient-spacing");
+  }
 }
 
 export function controlLogoutBarImpl(hide: boolean) {

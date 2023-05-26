@@ -26,7 +26,7 @@
 }
 
 #footer {
-  height: 400px;
+  // height: 400px;
 }
 
 .ttt-wrapper.absolute {
@@ -79,6 +79,29 @@ body.ttt-styling-fix {
 
   .k-grid td:nth-child(2) {
     min-width: 280px;
+  }
+}
+
+body.ttt-efficient-spacing {
+  .well.shadow.span24 {
+    padding: 0;
+  }
+
+  .k-content.k-state-active {
+    padding: 0;
+  }
+
+  #body_content {
+    padding: 2px;
+  }
+
+  .navbar-inner .nav.pull-right > * > a {
+    font-size: 0;
+    margin-top: -0.5rem;
+
+    i {
+      margin-top: 1rem;
+    }
   }
 }
 
