@@ -35,6 +35,7 @@ export interface ISettingsState {
   plantDefaultPageSize: number;
   preventLogout: boolean;
   fixMetrcStyling: boolean;
+  efficientSpacing: boolean;
   autoDismissPopups: boolean;
   salesDefaultPageSize: number;
   snowflakeState: SnowflakeState;

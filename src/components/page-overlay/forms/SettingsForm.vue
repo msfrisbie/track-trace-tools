@@ -97,6 +97,16 @@
             Fix Metrc styling
           </b-form-checkbox>
 
+          <b-form-checkbox
+            id="checkbox-efficientSpacing"
+            class="mb-2"
+            v-model="settings.efficientSpacing"
+            name="checkbox-efficientSpacing"
+            @change="onChange()"
+          >
+            Enable high-density Metrc UI
+          </b-form-checkbox>
+
           <!-- <b-form-checkbox
             id="checkbox-darkModeState"
             class="mb-2"
