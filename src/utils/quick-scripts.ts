@@ -23,18 +23,6 @@ export async function runQuickScript(quickScript: IQuickScript, childOption?: an
 
 export const QUICK_SCRIPTS: IQuickScript[] = [
   {
-    id: "SHOW_ALL_COLUMNS",
-    name: "Show All Columns",
-    description: "Makes all Metrc table columns visible",
-    quickScriptFunction: showAllColumns,
-  },
-  {
-    id: "SHOW_ONLY_PRIMARY_COLUMN",
-    name: "Show Only Primary Column",
-    description: "Hides all Metrc table columns except for the primary one",
-    quickScriptFunction: showOnlyPrimaryColumn,
-  },
-  {
     id: "AUTOFILL_TRANSFER_GROSS_WEIGHTS",
     name: "Autofill Transfer Gross Weight",
     description:
@@ -67,6 +55,24 @@ export const QUICK_SCRIPTS: IQuickScript[] = [
     description: "Bulk add package content fields in the New Package window",
     childOptions: [5, 10, 15, 20, 25],
     quickScriptFunction: addPackageContents,
+  },
+  {
+    id: "SHOW_ALL_COLUMNS",
+    name: "Show All Columns",
+    description: "Makes all Metrc table columns visible",
+    quickScriptFunction: showAllColumns,
+  },
+  {
+    id: "SHOW_DEFAULT_COLUMNS",
+    name: "Show Default Columns",
+    description: "Resets Metrc table to default columns",
+    quickScriptFunction: showDefaultColumns,
+  },
+  {
+    id: "SHOW_ONLY_PRIMARY_COLUMN",
+    name: "Show Only Primary Column",
+    description: "Hides all Metrc table columns except for the primary one",
+    quickScriptFunction: showOnlyPrimaryColumn,
   },
 ];
 
@@ -171,6 +177,26 @@ export async function showAllColumns() {
       solid: true,
     }
   );
+}
+
+export async function showDefaultColumns() {
+  try {
+    [...(document.querySelectorAll(`a[href="#"]`) as NodeListOf<HTMLAnchorElement>)]
+      .find((x) => x.innerText.includes("Reset Settings"))!
+      .click();
+  } catch {
+    toastManager.openToast(
+      `Couldn't find a Metrc table. This quick script only works on Metrc pages with tables.`,
+      {
+        title: "Quick Script Error",
+        autoHideDelay: 5000,
+        variant: "warning",
+        appendToast: true,
+        toaster: "ttt-toaster",
+        solid: true,
+      }
+    );
+  }
 }
 
 export async function showOnlyPrimaryColumn() {
