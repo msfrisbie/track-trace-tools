@@ -48,6 +48,18 @@
         <template v-if="employeeSamples.loadInflight">
           <b-spinner></b-spinner>
         </template>
+
+        <template v-else>
+          <b-button variant="primary" @click="allocateSamples()">ALLOCATE SAMPLES</b-button>
+
+          <pre>
+            {{ JSON.stringify(employeeSamples.recordedAllocationBuffer.slice(0, 3)) }}
+          </pre>
+
+          <pre>
+            {{ JSON.stringify(employeeSamples.pendingAllocationBuffer).slice(0, 3) }}
+          </pre>
+        </template>
       </div>
     </div>
   </div>
@@ -78,6 +90,7 @@ export default Vue.extend({
   methods: {
     ...mapActions({
       loadObjects: `employeeSamples/${EmployeeSamplesActions.LOAD_OBJECTS}`,
+      allocateSamples: `employeeSamples/${EmployeeSamplesActions.ALLOCATE_SAMPLES}`,
     }),
   },
   async created() {},

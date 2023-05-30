@@ -37,16 +37,33 @@ describe("employee.ts", () => {
       ExternalSourceName: "",
     };
 
-    expect(getAllocatedSampleFromPackageHistoryEntryOrNull(ignoredHistoryEntry)).toEqual(null);
-    expect(getAllocatedSampleFromPackageHistoryEntryOrNull(sampleHistoryEntryEach)).toEqual({
-      employeeId: "0123456789",
+    expect(
+      getAllocatedSampleFromPackageHistoryEntryOrNull(
+        "1A4F00000000000000001234",
+        ignoredHistoryEntry
+      )
+    ).toEqual(null);
+    expect(
+      getAllocatedSampleFromPackageHistoryEntryOrNull(
+        "1A4F00000000000000001234",
+        sampleHistoryEntryEach
+      )
+    ).toEqual({
+      packageLabel: "1A4F00000000000000001234",
+      employeeLicenseNumber: "0123456789",
       employeeName: "Justin Fields",
       isodate: "2022-02-16",
       quantity: 1,
       unitOfMeasureName: "Each",
     });
-    expect(getAllocatedSampleFromPackageHistoryEntryOrNull(sampleHistoryEntryGrams)).toEqual({
-      employeeId: "0123456789",
+    expect(
+      getAllocatedSampleFromPackageHistoryEntryOrNull(
+        "1A4F00000000000000001234",
+        sampleHistoryEntryGrams
+      )
+    ).toEqual({
+      packageLabel: "1A4F00000000000000001234",
+      employeeLicenseNumber: "0123456789",
       employeeName: "Justin Fields",
       isodate: "2022-02-16",
       quantity: 3.5,

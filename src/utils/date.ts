@@ -47,3 +47,25 @@ export function getIsoDateFromOffset(
   const d = new Date(isoDatetime);
   return new Date(d.setDate(d.getDate() + offset)).toISOString();
 }
+
+export function getDatesInRange(startDate: string, endDate: string): string[] {
+  const dates: string[] = [];
+
+  if (startDate > endDate) {
+    throw new Error("Invalid startDate/endDate pair");
+  }
+
+  let nextDate = startDate;
+
+  while (true) {
+    if (nextDate > endDate) {
+      break;
+    }
+
+    dates.push(nextDate);
+
+    nextDate = getIsoDateFromOffset(1, nextDate).split("T")[0];
+  }
+
+  return dates;
+}

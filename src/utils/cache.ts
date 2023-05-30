@@ -1,15 +1,23 @@
 export class LRU<T> {
-  elements: T[];
+  private _elements: T[];
 
   constructor(elements: T[]) {
-    this.elements = elements;
+    this._elements = elements;
   }
 
   touch(element: T) {
-    if (!this.elements.includes(element)) {
+    if (!this._elements.includes(element)) {
       throw new Error(`Element does not exist: ${element}`);
     }
 
-    this.elements = [element, ...this.elements.filter((x) => x !== element)];
+    this._elements = [element, ...this._elements.filter((x) => x !== element)];
+  }
+
+  get elements() {
+    return this._elements.slice();
+  }
+
+  get elementsReversed() {
+    return this._elements.slice().reverse();
   }
 }

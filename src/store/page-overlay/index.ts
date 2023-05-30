@@ -77,7 +77,7 @@ const vuexShared = {
       settings: settingsReducer(state.settings),
       packageHistory: packageHistoryReducer(state.packageHistory),
       reports: reportsReducer(state.reports),
-      employeeSamples: employeeSamplesReducer(state.employeeSamples)
+      employeeSamples: employeeSamplesReducer(state.employeeSamples),
     };
   },
 };
@@ -465,12 +465,9 @@ const vuexStore = new Vuex.Store<IPluginState>({
 
 try {
   chrome.storage.local.get(ChromeStorageKeys.SETTINGS).then((result) => {
-    console.log("Stored settings", result);
-
     const settings = result[ChromeStorageKeys.SETTINGS];
 
     if (settings) {
-      console.log("Rehydrating settings");
       vuexStore.commit(`settings/${SettingsMutations.SET_SETTINGS}`, settings);
     }
   });
