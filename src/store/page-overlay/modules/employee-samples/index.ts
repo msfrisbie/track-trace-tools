@@ -4,9 +4,11 @@ import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
 import { LRU } from "@/utils/cache";
 import { getIsoDateFromOffset, todayIsodate } from "@/utils/date";
 import {
+  canEmployeeAcceptSample,
   getAllocatedSamplesFromPackageHistoryOrError,
   getEstimatedNumberOfSamplesRemaining,
   getSampleAllocationFromAllocationDataOrNull,
+  toNormalizedAllocationQuantity,
 } from "@/utils/employee";
 import { ActionContext } from "vuex";
 import { EmployeeSamplesActions, EmployeeSamplesGetters, EmployeeSamplesMutations } from "./consts";
@@ -85,6 +87,7 @@ export const employeeSamplesModule = {
       // Only consider packages recieved from a separate facility
       packages = packages.filter((pkg) => (pkg.ReceivedFromManifestNumber ?? "").length > 0);
 
+      // TODO allow for employees to be de-selected
       ctx.state.employees = employees;
       ctx.state.availableSamples = [];
 
@@ -95,11 +98,13 @@ export const employeeSamplesModule = {
       // TODO: recalculate this on change
       for (const pkg of ctx.state.availableSamplePackages) {
         const sampleCount = getEstimatedNumberOfSamplesRemaining(pkg);
+        const perSampleQuantity = Math.floor(pkg.Quantity / sampleCount);
 
         for (let i = 0; i < sampleCount; ++i) {
           ctx.state.availableSamples.push({
             pkg,
-            quantity: Math.floor(pkg.Quantity / sampleCount),
+            quantity: perSampleQuantity,
+            allocation: await toNormalizedAllocationQuantity(pkg, perSampleQuantity),
           });
         }
       }
@@ -165,7 +170,7 @@ export const employeeSamplesModule = {
 
         employeeLRU.touch(employee);
 
-        const allocation = getSampleAllocationFromAllocationDataOrNull(
+        const allocation = await getSampleAllocationFromAllocationDataOrNull(
           employeeLRU.elements,
           ctx.state.modifiedSamplePackages,
           allocationData
@@ -184,10 +189,30 @@ export const employeeSamplesModule = {
           break;
         }
 
-        const nextSample = ctx.state.availableSamples.shift();
+        const currentSample = ctx.state.availableSamples.shift()!;
 
         for (const employee of employeeLRU.elementsReversed) {
-          // TODO
+          if (
+            await canEmployeeAcceptSample(
+              employee,
+              currentSample,
+              ctx.state.recordedAllocationBuffer,
+              ctx.state.pendingAllocationBuffer
+            )
+          ) {
+            // Record allocation
+            ctx.state.pendingAllocationBuffer.push({
+              pkg: currentSample.pkg,
+              employee,
+              adjustmentQuantity: currentSample.quantity,
+              ...(await toNormalizedAllocationQuantity(currentSample.pkg, currentSample.quantity)),
+            });
+
+            // Send employee to back of queue
+            employeeLRU.touch(employee);
+
+            break;
+          }
         }
       }
     },

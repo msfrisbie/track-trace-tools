@@ -1,6 +1,8 @@
 import { IIndexedPackageData, IMetrcEmployeeData, IPackageHistoryData } from "@/interfaces";
+import { dynamicConstsManager } from "@/modules/dynamic-consts-manager.module";
 import {
   IHistoryAllocationData,
+  INormalizedAllocation,
   ISampleAllocation,
 } from "@/store/page-overlay/modules/employee-samples/interfaces";
 
@@ -85,29 +87,11 @@ export function getAllocatedSamplesFromPackageHistoryOrError(
   return allocatedSamples;
 }
 
-// export function getEmployeeAllocationOnDate(
-//   employees: IMetrcEmployeeData[],
-//   samplePackages: IIndexedPackageData[],
-//   isodate: string,
-//   daysInSlidingWindow: number
-// ): {
-//   employee: IMetrcEmployeeData;
-//   allocation: ISampleAllocation;
-// }[] {
-//   const startDate = getIsoDateFromOffset(-daysInSlidingWindow, isodate);
-
-//   const eligiblePackages = samplePackages
-//     .filter((pkg) => pkg.ReceivedDateTime! >= startDate)
-//     .sort((a, b) => a.ReceivedDateTime!.localeCompare(b.ReceivedDateTime!));
-
-//   return [];
-// }
-
-export function getSampleAllocationFromAllocationDataOrNull(
+export async function getSampleAllocationFromAllocationDataOrNull(
   employees: IMetrcEmployeeData[],
   packages: IIndexedPackageData[],
   allocationData: IHistoryAllocationData
-): ISampleAllocation | null {
+): Promise<ISampleAllocation | null> {
   const employee = employees.find(
     (x) => parseInt(x.License.Number, 10) === parseInt(allocationData.employeeLicenseNumber, 10)
   );
@@ -128,19 +112,129 @@ export function getSampleAllocationFromAllocationDataOrNull(
     pkg,
     employee,
     adjustmentQuantity: allocationData.quantity,
-    // TODO
-    flowerAllocationGrams: 1,
-    concentrateAllocationGrams: 0,
-    infusedAllocationGrams: 0,
+    ...(await toNormalizedAllocationQuantity(pkg, allocationData.quantity)),
   };
 }
 
-export function canEmployeeAcceptSample(
+export async function canEmployeeAcceptSample(
   employee: IMetrcEmployeeData,
   sample: { quantity: number; pkg: IIndexedPackageData },
   recordedAllocationBuffer: ISampleAllocation[],
   pendingAllocationBuffer: ISampleAllocation[]
-): boolean {
-  // TODO
+): Promise<boolean> {
+  // A producer or marijuana sales location is limited to transferring:
+
+  // a total of 1 ounce of marijuana,
+  // a total of 6grams of marijuana concentrate, and
+  // marijuana-infused products with a total THC content of 2000 mgs
+
+  // of internal product samples to each of its employees in a
+  // 30-day period.
+  const normalizedSample = await toNormalizedAllocationQuantity(sample.pkg, sample.quantity);
+
+  const totalFlowerGrams =
+    normalizedSample.flowerAllocationGrams +
+    recordedAllocationBuffer
+      .filter((x) => x.employee.Id === employee.Id)
+      .map((x) => x.flowerAllocationGrams)
+      .reduce((a, b) => a + b, 0) +
+    pendingAllocationBuffer
+      .filter((x) => x.employee.Id === employee.Id)
+      .map((x) => x.flowerAllocationGrams)
+      .reduce((a, b) => a + b, 0);
+
+  if (totalFlowerGrams > 28) {
+    return false;
+  }
+
+  const totalConcentrateGrams =
+    normalizedSample.concentrateAllocationGrams +
+    recordedAllocationBuffer
+      .filter((x) => x.employee.Id === employee.Id)
+      .map((x) => x.concentrateAllocationGrams)
+      .reduce((a, b) => a + b, 0) +
+    pendingAllocationBuffer
+      .filter((x) => x.employee.Id === employee.Id)
+      .map((x) => x.concentrateAllocationGrams)
+      .reduce((a, b) => a + b, 0);
+
+  if (totalConcentrateGrams > 6) {
+    return false;
+  }
+
+  const totalInfusedGrams =
+    normalizedSample.infusedAllocationGrams +
+    recordedAllocationBuffer
+      .filter((x) => x.employee.Id === employee.Id)
+      .map((x) => x.infusedAllocationGrams)
+      .reduce((a, b) => a + b, 0) +
+    pendingAllocationBuffer
+      .filter((x) => x.employee.Id === employee.Id)
+      .map((x) => x.infusedAllocationGrams)
+      .reduce((a, b) => a + b, 0);
+
+  if (totalInfusedGrams > 2) {
+    return false;
+  }
+
   return true;
+}
+
+export async function toNormalizedAllocationQuantity(
+  pkg: IIndexedPackageData,
+  quantity: number
+): Promise<INormalizedAllocation> {
+  const unitsOfMeasure = await dynamicConstsManager.unitsOfMeasure();
+
+  let flowerAllocationGrams = 0;
+  let concentrateAllocationGrams = 0;
+  let infusedAllocationGrams = 0;
+
+  const unitOfMeasure = unitsOfMeasure.find((x) => x.Id === pkg.UnitOfMeasureId);
+
+  if (!unitOfMeasure) {
+    throw new Error("Could not match unit of measure");
+  }
+
+  enum AllocationType {
+    FLOWER,
+    CONCENTRATE,
+    INFUSED,
+  }
+
+  let allocationType: AllocationType = AllocationType.INFUSED;
+
+  if (
+    pkg.Item.ProductCategoryName.includes("Buds") ||
+    pkg.Item.ProductCategoryName.includes("Shake")
+  ) {
+    allocationType = AllocationType.FLOWER;
+  } else if (
+    pkg.Item.ProductCategoryName.includes("Concentrate") ||
+    pkg.Item.ProductCategoryName.includes("Vape")
+  ) {
+    allocationType = AllocationType.CONCENTRATE;
+  }
+
+  let computedQuantity = quantity;
+
+  if (pkg.Item.UnitOfMeasureName === "Each") {
+  } else {
+    // quantity is the
+  }
+
+  switch (allocationType) {
+    case AllocationType.FLOWER:
+      break;
+    case AllocationType.CONCENTRATE:
+      break;
+    case AllocationType.INFUSED:
+      break;
+  }
+
+  return {
+    flowerAllocationGrams,
+    concentrateAllocationGrams,
+    infusedAllocationGrams,
+  };
 }
