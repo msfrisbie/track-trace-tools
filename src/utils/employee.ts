@@ -1,3 +1,5 @@
+import "@/test/utils/auto-mock-chrome";
+import "@/test/utils/auto-mock-fetch";
 import { IIndexedPackageData, IMetrcEmployeeData, IPackageHistoryData } from "@/interfaces";
 import { dynamicConstsManager } from "@/modules/dynamic-consts-manager.module";
 import {

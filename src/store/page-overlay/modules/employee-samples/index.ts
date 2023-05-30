@@ -3,6 +3,7 @@ import { IIndexedPackageData, IMetrcEmployeeData, IPluginState } from "@/interfa
 import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
 import { LRU } from "@/utils/cache";
 import { getIsoDateFromOffset, todayIsodate } from "@/utils/date";
+import { snap } from "@/utils/debug";
 import {
   canEmployeeAcceptSample,
   getAllocatedSamplesFromPackageHistoryOrError,
@@ -182,6 +183,8 @@ export const employeeSamplesModule = {
 
       allocationDataList.sort((a, b) => (a.isodate > b.isodate ? 1 : -1));
 
+      console.log(snap({ allocationDataList }));
+
       for (const allocationData of allocationDataList) {
         const employee = employeeLRU.elements.find(
           (x) =>
@@ -211,12 +214,16 @@ export const employeeSamplesModule = {
         ctx.state.recordedAllocationBuffer.push(allocation);
       }
 
+      console.log(snap(ctx.state.recordedAllocationBuffer));
+
       while (true) {
         if (ctx.state.availableSamples.length === 0) {
           break;
         }
 
         const currentSample = ctx.state.availableSamples.shift()!;
+
+        console.log(snap({ currentSample }));
 
         for (const employee of employeeLRU.elementsReversed) {
           if (
