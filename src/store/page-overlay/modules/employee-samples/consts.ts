@@ -10,4 +10,6 @@ export enum EmployeeSamplesGetters {
 export enum EmployeeSamplesActions {
   ALLOCATE_SAMPLES = "ALLOCATE_SAMPLES",
   LOAD_OBJECTS = "LOAD_OBJECTS",
+  TOGGLE_EMPLOYEE = "TOGGLE_EMPLOYEE",
+  TOGGLE_PACKAGE = "TOGGLE_PACKAGE",
 }

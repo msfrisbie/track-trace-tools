@@ -103,6 +103,31 @@ body.ttt-efficient-spacing {
       margin-top: 1rem;
     }
   }
+
+  .k-grid {
+    th:nth-child(2),
+    td:nth-child(2) {
+      position: sticky;
+      left: 0;
+    }
+
+    tr {
+      td:nth-child(2) {
+        background-color: white;
+      }
+    }
+
+    tr.k-alt {
+      td:nth-child(2) {
+        background-color: inherit;
+      }
+    }
+  }
+
+  .k-header .k-grid-toolbar {
+    position: sticky;
+    left: 0;
+  }
 }
 
 @import "@/scss/page-overlay";

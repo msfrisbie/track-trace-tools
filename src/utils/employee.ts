@@ -182,7 +182,7 @@ export async function canEmployeeAcceptSample(
 
 export async function toNormalizedAllocationQuantity(
   pkg: IIndexedPackageData,
-  quantity: number
+  sampleQuantity: number
 ): Promise<INormalizedAllocation> {
   const unitsOfMeasure = await dynamicConstsManager.unitsOfMeasure();
 
@@ -216,10 +216,11 @@ export async function toNormalizedAllocationQuantity(
     allocationType = AllocationType.CONCENTRATE;
   }
 
-  let computedQuantity = quantity;
+  let computedQuantity = sampleQuantity;
 
   if (pkg.Item.UnitOfMeasureName === "Each") {
   } else {
+    // TODO
     // quantity is the
   }
 

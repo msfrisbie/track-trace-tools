@@ -1,7 +1,6 @@
 import { IIndexedPackageData, IMetrcEmployeeData } from "@/interfaces";
 
 export interface INormalizedAllocation {
-
   flowerAllocationGrams: number;
   concentrateAllocationGrams: number;
   infusedAllocationGrams: number;
@@ -10,12 +9,14 @@ export interface INormalizedAllocation {
 export interface IEmployeeSamplesState {
   loadInflight: boolean;
   employees: IMetrcEmployeeData[];
+  selectedEmployeeIds: number[];
   availableSamples: {
     quantity: number;
     pkg: IIndexedPackageData;
-    allocation: INormalizedAllocation
+    allocation: INormalizedAllocation;
   }[];
   availableSamplePackages: IIndexedPackageData[];
+  selectedSamplePackageIds: number[];
   modifiedSamplePackages: IIndexedPackageData[];
   pendingAllocationBuffer: ISampleAllocation[];
   recordedAllocationBuffer: ISampleAllocation[];
@@ -35,7 +36,7 @@ export interface IHistoryAllocationData {
 
 // Indicates a package-employee match,
 // or a proposed adjustment that will be sent to Metrc
-export interface ISampleAllocation extends INormalizedAllocation{
+export interface ISampleAllocation extends INormalizedAllocation {
   employee: IMetrcEmployeeData;
   pkg: IIndexedPackageData;
   adjustmentQuantity: number;

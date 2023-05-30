@@ -17,8 +17,10 @@ import { IEmployeeSamplesState, IHistoryAllocationData } from "./interfaces";
 const inMemoryState = {
   loadInflight: false,
   employees: [],
+  selectedEmployeeIds: [],
   availableSamples: [],
   availableSamplePackages: [],
+  selectedSamplePackageIds: [],
   modifiedSamplePackages: [],
   recordedAllocationBuffer: [],
   pendingAllocationBuffer: [],
@@ -87,18 +89,19 @@ export const employeeSamplesModule = {
       // Only consider packages recieved from a separate facility
       packages = packages.filter((pkg) => (pkg.ReceivedFromManifestNumber ?? "").length > 0);
 
-      // TODO allow for employees to be de-selected
       ctx.state.employees = employees;
-      ctx.state.availableSamples = [];
+      ctx.state.selectedEmployeeIds = employees.map((x) => x.Id);
 
       ctx.state.availableSamplePackages = packages.filter(
         (pkg) => pkg.IsTradeSample && pkg.Quantity > 0 && pkg.PackageState === PackageState.ACTIVE
       );
+      ctx.state.selectedSamplePackageIds = ctx.state.availableSamplePackages.map((x) => x.Id);
 
-      // TODO: recalculate this on change
+      ctx.state.availableSamples = [];
+
       for (const pkg of ctx.state.availableSamplePackages) {
         const sampleCount = getEstimatedNumberOfSamplesRemaining(pkg);
-        const perSampleQuantity = Math.floor(pkg.Quantity / sampleCount);
+        const perSampleQuantity = pkg.Quantity / sampleCount;
 
         for (let i = 0; i < sampleCount; ++i) {
           ctx.state.availableSamples.push({
@@ -125,6 +128,30 @@ export const employeeSamplesModule = {
       await Promise.allSettled(promises);
 
       ctx.state.loadInflight = false;
+    },
+    [EmployeeSamplesActions.TOGGLE_EMPLOYEE]: async (
+      ctx: ActionContext<IEmployeeSamplesState, IPluginState>,
+      data: { employeeId: number }
+    ) => {
+      if (ctx.state.selectedEmployeeIds.includes(data.employeeId)) {
+        ctx.state.selectedEmployeeIds = ctx.state.selectedEmployeeIds.filter(
+          (x) => x !== data.employeeId
+        );
+      } else {
+        ctx.state.selectedEmployeeIds.push(data.employeeId);
+      }
+    },
+    [EmployeeSamplesActions.TOGGLE_PACKAGE]: async (
+      ctx: ActionContext<IEmployeeSamplesState, IPluginState>,
+      data: { packageId: number }
+    ) => {
+      if (ctx.state.selectedSamplePackageIds.includes(data.packageId)) {
+        ctx.state.selectedSamplePackageIds = ctx.state.selectedSamplePackageIds.filter(
+          (x) => x !== data.packageId
+        );
+      } else {
+        ctx.state.selectedSamplePackageIds.push(data.packageId);
+      }
     },
     [EmployeeSamplesActions.ALLOCATE_SAMPLES]: async (
       ctx: ActionContext<IEmployeeSamplesState, IPluginState>,
@@ -162,7 +189,7 @@ export const employeeSamplesModule = {
         );
 
         if (!employee) {
-          console.error(
+          console.warn(
             `No match for employee with license # ${allocationData.employeeLicenseNumber} (${allocationData.employeeName}) (${allocationData.packageLabel})`
           );
           continue;
