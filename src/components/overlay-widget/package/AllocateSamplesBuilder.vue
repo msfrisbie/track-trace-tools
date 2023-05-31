@@ -34,6 +34,27 @@
             <b-collapse id="collapse-1" class="h-auto" style="transition: none !important">
               <b-card
                 ><div class="grid grid-cols-1 gap-1">
+                  <div class="w-full grid grid-cols-2 gap-2 mb-4">
+                    <b-button
+                      variant="light"
+                      @click="
+                        employeeSamples.employees.map((x) =>
+                          toggleEmployee({ employeeId: x.Id, add: true })
+                        )
+                      "
+                      >ALL</b-button
+                    >
+                    <b-button
+                      variant="light"
+                      @click="
+                        employeeSamples.employees.map((x) =>
+                          toggleEmployee({ employeeId: x.Id, remove: true })
+                        )
+                      "
+                      >NONE</b-button
+                    >
+                  </div>
+
                   <b-form-checkbox
                     v-for="employee of employeeSamples.employees"
                     v-bind:key="employee.Id"
@@ -54,23 +75,68 @@
             <b-collapse id="collapse-2" class="h-auto" style="transition: none !important">
               <b-card
                 ><div class="grid grid-cols-1 gap-1">
-                  <b-form-checkbox
-                    v-for="pkg of employeeSamples.availableSamplePackages"
-                    v-bind:key="pkg.Id"
-                    size="sm"
-                    :checked="employeeSamples.selectedSamplePackageIds.includes(pkg.Id)"
-                    @change="togglePackage({ packageId: pkg.Id })"
+                  <div class="w-full grid grid-cols-2 gap-2">
+                    <b-button
+                      variant="light"
+                      @click="
+                        employeeSamples.availableSamplePackages.map((x) =>
+                          togglePackage({ packageId: x.Id, add: true })
+                        )
+                      "
+                      >ALL</b-button
+                    >
+                    <b-button
+                      variant="light"
+                      @click="
+                        employeeSamples.availableSamplePackages.map((x) =>
+                          togglePackage({ packageId: x.Id, remove: true })
+                        )
+                      "
+                      >NONE</b-button
+                    >
+                  </div>
+
+                  <div
+                    v-for="[date, packages] of dateGroupedAvailableSamplePackages"
+                    v-bind:key="date"
                   >
-                    <div class="text-xs">
-                      <div class="font-bold">
-                        {{ pkg.Item.Name }} ({{ pkg.Quantity }} {{ pkg.UnitOfMeasureAbbreviation }})
-                      </div>
-                      <div>
-                        {{ pkg.Label }}
-                      </div>
-                      <div>Received {{ pkg.ReceivedDateTime.split('T')[0] }}</div>
+                    <div class="flex flex-row gap-2 space-between items-center">
+                      <div class="font-bold text-lg my-4">{{ date }}</div>
+                      <b-button
+                        variant="light"
+                        size="sm"
+                        @click="packages.map((x) => togglePackage({ packageId: x.Id, add: true }))"
+                        >+</b-button
+                      >
+                      <b-button
+                        variant="light"
+                        size="sm"
+                        @click="
+                          packages.map((x) => togglePackage({ packageId: x.Id, remove: true }))
+                        "
+                        >-</b-button
+                      >
                     </div>
-                  </b-form-checkbox>
+
+                    <b-form-checkbox
+                      v-for="pkg of packages"
+                      v-bind:key="pkg.Id"
+                      size="sm"
+                      :checked="employeeSamples.selectedSamplePackageIds.includes(pkg.Id)"
+                      @change="togglePackage({ packageId: pkg.Id })"
+                    >
+                      <div class="text-xs">
+                        <div class="font-bold">
+                          {{ pkg.Item.Name }} ({{ pkg.Quantity }}
+                          {{ pkg.UnitOfMeasureAbbreviation }})
+                        </div>
+                        <div>
+                          {{ pkg.Label }}
+                        </div>
+                        <div>Received {{ pkg.ReceivedDateTime.split("T")[0] }}</div>
+                      </div>
+                    </b-form-checkbox>
+                  </div>
                 </div>
               </b-card>
             </b-collapse>
@@ -94,9 +160,18 @@
                   >SUBMIT {{ employeeSamples.pendingAllocationBuffer.length }} ADJUSTMENTS</b-button
                 >
 
-                <b-button class="opacity-40" variant="light" size="md" @click="downloadAll()"
-                  >DOWNLOAD CSVs</b-button
-                >
+                <div class="grid grid-cols-2 gap-2">
+                  <b-button
+                    class="opacity-40"
+                    variant="light"
+                    size="md"
+                    @click="downloadTextSummary()"
+                    >DOWNLOAD SUMMARY</b-button
+                  >
+                  <b-button class="opacity-40" variant="light" size="md" @click="downloadAll()"
+                    >DOWNLOAD CSVs</b-button
+                  >
+                </div>
 
                 <b-card v-for="employee of selectedEmployees" v-bind:key="employee.Id">
                   <div class="grid grid-cols-2 gap-8">
@@ -176,6 +251,12 @@ import { dynamicConstsManager } from "@/modules/dynamic-consts-manager.module";
 import { ISampleAllocation } from "@/store/page-overlay/modules/employee-samples/interfaces";
 import { analyticsManager } from "@/modules/analytics-manager.module";
 import { sum } from "lodash";
+import { downloadTextFile } from "@/utils/file";
+
+// TODO:
+// - remove individual allocations
+// - toggle all packages
+// - show packages by recieved date/source
 
 export default Vue.extend({
   name: "AllocateSamplesBuilder",
@@ -190,6 +271,7 @@ export default Vue.extend({
     ...mapGetters({
       selectedEmployees: `employeeSamples/${EmployeeSamplesGetters.SELECTED_EMPLOYEES}`,
       selectedSamplePackages: `employeeSamples/${EmployeeSamplesGetters.SELECTED_SAMPLE_PACKAGES}`,
+      dateGroupedAvailableSamplePackages: `employeeSamples/${EmployeeSamplesGetters.DATE_GROUPED_AVAILABLE_SAMPLE_PACKAGES}`,
     }),
     csvFiles(): ICsvFile[] {
       // @ts-ignore
@@ -341,6 +423,36 @@ export default Vue.extend({
         builderType: this.$data.builderType,
         csvData: {
           sampleTotal: this.$store.state.employeeSamples.pendingAllocationBuffer.length,
+        },
+      });
+    },
+    async downloadTextSummary() {
+      let data = `Total samples: ${this.$store.state.employeeSamples.pendingAllocationBuffer.length}\n`;
+
+      const employeeSampleMap = new Map<number, ISampleAllocation[]>();
+
+      for (const sampleAllocation of this.$store.state.employeeSamples.pendingAllocationBuffer) {
+        if (employeeSampleMap.has(sampleAllocation.employee.Id)) {
+          employeeSampleMap.get(sampleAllocation.employee.Id)!.push(sampleAllocation);
+        } else {
+          employeeSampleMap.set(sampleAllocation.employee.Id, [sampleAllocation]);
+        }
+      }
+
+      for (const [employeeId, samples] of employeeSampleMap.entries()) {
+        samples.sort((a, b) => a.pkg.Label.localeCompare(b.pkg.Label));
+
+        data += `\n${samples[0].employee.FullName}\n\n`;
+
+        for (const sampleAllocation of samples) {
+          data += `${sampleAllocation.pkg.Label} - ${sampleAllocation.pkg.Item.Name} (${sampleAllocation.adjustmentQuantity}${sampleAllocation.pkg.UnitOfMeasureAbbreviation})\n`;
+        }
+      }
+
+      downloadTextFile({
+        textFile: {
+          filename: `sample_allocation_${todayIsodate()}.txt`,
+          data,
         },
       });
     },

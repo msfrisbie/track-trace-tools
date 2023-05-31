@@ -77,6 +77,25 @@ export const employeeSamplesModule = {
         state.selectedSamplePackageIds.includes(x.Id)
       );
     },
+    [EmployeeSamplesGetters.DATE_GROUPED_AVAILABLE_SAMPLE_PACKAGES]: (
+      state: IEmployeeSamplesState,
+      getters: any,
+      rootState: any,
+      rootGetters: any
+    ) => {
+      const dateGroups: Map<string, IIndexedPackageData[]> = new Map();
+
+      for (const pkg of state.availableSamplePackages) {
+        const isodate = pkg.ReceivedDateTime!.split("T")[0];
+        if (!dateGroups.has(isodate)) {
+          dateGroups.set(isodate, [pkg]);
+        } else {
+          dateGroups.get(isodate)!.push(pkg);
+        }
+      }
+
+      return [...dateGroups];
+    },
   },
   actions: {
     [EmployeeSamplesActions.RESET]: async (
@@ -151,26 +170,34 @@ export const employeeSamplesModule = {
     },
     [EmployeeSamplesActions.TOGGLE_EMPLOYEE]: async (
       ctx: ActionContext<IEmployeeSamplesState, IPluginState>,
-      data: { employeeId: number }
+      data: { employeeId: number; remove?: boolean; add?: boolean }
     ) => {
       if (ctx.state.selectedEmployeeIds.includes(data.employeeId)) {
-        ctx.state.selectedEmployeeIds = ctx.state.selectedEmployeeIds.filter(
-          (x) => x !== data.employeeId
-        );
+        if (data.add !== true) {
+          ctx.state.selectedEmployeeIds = ctx.state.selectedEmployeeIds.filter(
+            (x) => x !== data.employeeId
+          );
+        }
       } else {
-        ctx.state.selectedEmployeeIds.push(data.employeeId);
+        if (data.remove !== true) {
+          ctx.state.selectedEmployeeIds.push(data.employeeId);
+        }
       }
     },
     [EmployeeSamplesActions.TOGGLE_PACKAGE]: async (
       ctx: ActionContext<IEmployeeSamplesState, IPluginState>,
-      data: { packageId: number }
+      data: { packageId: number; remove?: boolean; add?: boolean }
     ) => {
       if (ctx.state.selectedSamplePackageIds.includes(data.packageId)) {
-        ctx.state.selectedSamplePackageIds = ctx.state.selectedSamplePackageIds.filter(
-          (x) => x !== data.packageId
-        );
+        if (data.add !== true) {
+          ctx.state.selectedSamplePackageIds = ctx.state.selectedSamplePackageIds.filter(
+            (x) => x !== data.packageId
+          );
+        }
       } else {
-        ctx.state.selectedSamplePackageIds.push(data.packageId);
+        if (data.remove !== true) {
+          ctx.state.selectedSamplePackageIds.push(data.packageId);
+        }
       }
     },
     [EmployeeSamplesActions.ALLOCATE_SAMPLES]: async (

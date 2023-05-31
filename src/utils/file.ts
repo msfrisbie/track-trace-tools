@@ -1,3 +1,6 @@
+import { ITextFile } from "@/interfaces";
+import { timer } from "rxjs";
+
 export async function toBase64(file: File) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -42,4 +45,28 @@ export async function readJSONFile(file: File): Promise<any> {
     };
     reader.readAsText(file);
   });
+}
+
+export async function downloadTextFile({
+  textFile,
+  delay = 0,
+}: {
+  textFile: ITextFile;
+  delay?: number;
+}) {
+  let textContent = textFile.data;
+
+  let blob = new Blob([textContent], { type: "text/plain;charset=utf-8;" });
+
+  // let encodedUri = encodeURI(fileData);
+  let url = URL.createObjectURL(blob);
+
+  let link = document.createElement("a");
+  link.setAttribute("href", url);
+  link.setAttribute("download", textFile.filename);
+  document.body.appendChild(link); // Required for FF
+
+  link.click(); // This will download the data file named "my_data.csv".
+
+  await timer(delay).toPromise();
 }

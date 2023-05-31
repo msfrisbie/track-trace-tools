@@ -1140,6 +1140,11 @@ export interface ICsvFile {
   data: any[][];
 }
 
+export interface ITextFile {
+  filename: string;
+  data: string;
+}
+
 export interface ICsvUploadResult {
   DataTag: CsvUpload;
   DataTagString: CsvUpload;
