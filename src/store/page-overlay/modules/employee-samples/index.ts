@@ -3,7 +3,6 @@ import { IIndexedPackageData, IMetrcEmployeeData, IPluginState } from "@/interfa
 import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
 import { LRU } from "@/utils/cache";
 import { getIsoDateFromOffset, todayIsodate } from "@/utils/date";
-import { snap } from "@/utils/debug";
 import {
   canEmployeeAcceptSample,
   getAllocatedSamplesFromPackageHistoryOrError,
@@ -54,13 +53,23 @@ export const employeeSamplesModule = {
     },
   },
   getters: {
-    [EmployeeSamplesGetters.EMPLOYEE_SAMPLES_GETTER]: (
+    [EmployeeSamplesGetters.SELECTED_EMPLOYEES]: (
       state: IEmployeeSamplesState,
       getters: any,
       rootState: any,
       rootGetters: any
     ) => {
-      // return state.data
+      return state.employees.filter((x) => state.selectedEmployeeIds.includes(x.Id));
+    },
+    [EmployeeSamplesGetters.SELECTED_SAMPLE_PACKAGES]: (
+      state: IEmployeeSamplesState,
+      getters: any,
+      rootState: any,
+      rootGetters: any
+    ) => {
+      return state.availableSamplePackages.filter((x) =>
+        state.selectedSamplePackageIds.includes(x.Id)
+      );
     },
   },
   actions: {
@@ -93,25 +102,13 @@ export const employeeSamplesModule = {
       ctx.state.employees = employees;
       ctx.state.selectedEmployeeIds = employees.map((x) => x.Id);
 
-      ctx.state.availableSamplePackages = packages.filter(
-        (pkg) => pkg.IsTradeSample && pkg.Quantity > 0 && pkg.PackageState === PackageState.ACTIVE
-      );
+      ctx.state.availableSamplePackages = packages
+        .filter(
+          (pkg) => pkg.IsTradeSample && pkg.Quantity > 0 && pkg.PackageState === PackageState.ACTIVE
+        )
+        // Sorted in received order
+        .sort((a, b) => a.ReceivedDateTime!.localeCompare(b.ReceivedDateTime!));
       ctx.state.selectedSamplePackageIds = ctx.state.availableSamplePackages.map((x) => x.Id);
-
-      ctx.state.availableSamples = [];
-
-      for (const pkg of ctx.state.availableSamplePackages) {
-        const sampleCount = getEstimatedNumberOfSamplesRemaining(pkg);
-        const perSampleQuantity = pkg.Quantity / sampleCount;
-
-        for (let i = 0; i < sampleCount; ++i) {
-          ctx.state.availableSamples.push({
-            pkg,
-            quantity: perSampleQuantity,
-            allocation: await toNormalizedAllocationQuantity(pkg, perSampleQuantity),
-          });
-        }
-      }
 
       ctx.state.modifiedSamplePackages = packages
         .filter((pkg) => pkg.IsTradeSample && pkg.LastModified >= ctx.state.startDate)
@@ -164,10 +161,27 @@ export const employeeSamplesModule = {
         console.error("Zero allocations");
       }
 
+      ctx.state.availableSamples = [];
+
+      for (const pkg of ctx.getters[EmployeeSamplesGetters.SELECTED_SAMPLE_PACKAGES]) {
+        const sampleCount = getEstimatedNumberOfSamplesRemaining(pkg);
+        const perSampleQuantity = pkg.Quantity / sampleCount;
+
+        for (let i = 0; i < sampleCount; ++i) {
+          ctx.state.availableSamples.push({
+            pkg,
+            quantity: perSampleQuantity,
+            allocation: await toNormalizedAllocationQuantity(pkg, perSampleQuantity),
+          });
+        }
+      }
+
       ctx.state.pendingAllocationBuffer = [];
       ctx.state.recordedAllocationBuffer = [];
 
-      const employeeLRU = new LRU<IMetrcEmployeeData>(ctx.state.employees);
+      const employeeLRU = new LRU<IMetrcEmployeeData>(
+        ctx.getters[EmployeeSamplesGetters.SELECTED_EMPLOYEES]
+      );
 
       const allocationDataList: IHistoryAllocationData[] = [];
 
@@ -182,8 +196,6 @@ export const employeeSamplesModule = {
       }
 
       allocationDataList.sort((a, b) => (a.isodate > b.isodate ? 1 : -1));
-
-      console.log(snap({ allocationDataList }));
 
       for (const allocationData of allocationDataList) {
         const employee = employeeLRU.elements.find(
@@ -214,16 +226,12 @@ export const employeeSamplesModule = {
         ctx.state.recordedAllocationBuffer.push(allocation);
       }
 
-      console.log(snap(ctx.state.recordedAllocationBuffer));
-
       while (true) {
         if (ctx.state.availableSamples.length === 0) {
           break;
         }
 
         const currentSample = ctx.state.availableSamples.shift()!;
-
-        console.log(snap({ currentSample }));
 
         for (const employee of employeeLRU.elementsReversed) {
           if (

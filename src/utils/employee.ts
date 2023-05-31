@@ -230,7 +230,6 @@ export async function toNormalizedAllocationQuantity(
     unitOfWeightId = pkg.Item.UnitOfMeasureId;
 
     // TODO attempt to find a "weight" in the item name
-  } else {
   }
 
   const unitOfMeasure = unitsOfMeasure.find((x) => x.Id === unitOfWeightId);

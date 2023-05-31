@@ -4,7 +4,8 @@ export enum EmployeeSamplesMutations {
 }
 
 export enum EmployeeSamplesGetters {
-  EMPLOYEE_SAMPLES_GETTER = "EMPLOYEE_SAMPLES_GETTER",
+  SELECTED_EMPLOYEES = "SELECTED_EMPLOYEES",
+  SELECTED_SAMPLE_PACKAGES = "SELECTED_SAMPLE_PACKAGES",
 }
 
 export enum EmployeeSamplesActions {

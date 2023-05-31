@@ -20,7 +20,7 @@
 
             <b-collapse id="collapse-1" class="h-auto" style="transition: none !important">
               <b-card
-                ><div class="grid grid-cols-1 gap-8">
+                ><div class="grid grid-cols-1 gap-1">
                   <b-form-checkbox
                     v-for="employee of employeeSamples.employees"
                     v-bind:key="employee.Id"
@@ -40,7 +40,7 @@
 
             <b-collapse id="collapse-2" class="h-auto" style="transition: none !important">
               <b-card
-                ><div class="grid grid-cols-1 gap-8">
+                ><div class="grid grid-cols-1 gap-1">
                   <b-form-checkbox
                     v-for="pkg of employeeSamples.availableSamplePackages"
                     v-bind:key="pkg.Id"
@@ -69,15 +69,24 @@
             </template>
 
             <template v-else>
-              <b-card
-                v-for="(sampleAllocation, index) of employeeSamples.pendingAllocationBuffer"
-                v-bind:key="
-                  index + '_' + sampleAllocation.employee.Id + '_' + sampleAllocation.pkg.Id
-                "
-              >
-                {{ sampleAllocation.employee.FullName }}
-                {{ sampleAllocation.pkg.Label }}
-                {{ sampleAllocation.adjustmentQuantity }}
+              <b-card v-for="employee of selectedEmployees" v-bind:key="employee.Id">
+                <b-card-title>{{ employee.FullName }}</b-card-title>
+                <b-card-body>
+                  <div
+                    v-for="(
+                      sampleAllocation, index
+                    ) of employeeSamples.pendingAllocationBuffer.filter(
+                      (allocation) => allocation.employee.Id === employee.Id
+                    )"
+                    v-bind:key="
+                      index + '_' + sampleAllocation.employee.Id + '_' + sampleAllocation.pkg.Id
+                    "
+                  >
+                    {{ sampleAllocation.employee.FullName }}
+                    {{ sampleAllocation.pkg.Label }}
+                    {{ sampleAllocation.adjustmentQuantity }}
+                  </div>
+                </b-card-body>
               </b-card>
             </template>
           </div>
@@ -121,10 +130,13 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { mapActions, mapState } from "vuex";
+import { mapActions, mapGetters, mapState } from "vuex";
 import router from "@/router/index";
 import store from "@/store/page-overlay/index";
-import { EmployeeSamplesActions } from "@/store/page-overlay/modules/employee-samples/consts";
+import {
+  EmployeeSamplesActions,
+  EmployeeSamplesGetters,
+} from "@/store/page-overlay/modules/employee-samples/consts";
 import { IPluginState } from "@/interfaces";
 
 export default Vue.extend({
@@ -136,6 +148,10 @@ export default Vue.extend({
   computed: {
     ...mapState<IPluginState>({
       employeeSamples: (state: IPluginState) => state.employeeSamples,
+    }),
+    ...mapGetters({
+      selectedEmployees: `employeeSamples/${EmployeeSamplesGetters.SELECTED_EMPLOYEES}`,
+      selectedSamplePackages: `employeeSamples/${EmployeeSamplesGetters.SELECTED_SAMPLE_PACKAGES}`,
     }),
   },
   data() {
