@@ -1651,14 +1651,14 @@ export interface IItemCategory {
 
 export interface IUnitOfMeasure {
   Abbreviation: UnitOfMeasureAbbreviation;
-  // oz * FromBaseFactor = g
+  // (weight in oz) * FromBaseFactor = (weight in g)
   FromBaseFactor: number; // g is 28.349523125
   Id: number;
   IsArchived: boolean;
   IsBaseUnit: boolean;
   Name: UnitOfMeasureName;
   QuantityType: "WeightBased" | "VolumeBased" | "CountBased";
-  // oz * ToBaseFactor = g
+  // (weight in oz) * ToBaseFactor = (weight in g)
   ToBaseFactor: number; // g is 0.035273961949580414
 }
 

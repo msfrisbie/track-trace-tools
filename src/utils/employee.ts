@@ -1,5 +1,3 @@
-import "@/test/utils/auto-mock-chrome";
-import "@/test/utils/auto-mock-fetch";
 import { IIndexedPackageData, IMetrcEmployeeData, IPackageHistoryData } from "@/interfaces";
 import { dynamicConstsManager } from "@/modules/dynamic-consts-manager.module";
 import {
@@ -16,7 +14,6 @@ export function getEstimatedNumberOfSamplesRemaining(pkg: IIndexedPackageData): 
     return 0;
   }
 
-  // TODO
   if (pkg.UnitOfMeasureAbbreviation === "ea") {
     return pkg.Quantity;
   }
@@ -186,17 +183,17 @@ export async function toNormalizedAllocationQuantity(
   pkg: IIndexedPackageData,
   sampleQuantity: number
 ): Promise<INormalizedAllocation> {
+  const FALLBACK_ALLOCATION = {
+    flowerAllocationGrams: 0,
+    concentrateAllocationGrams: 0,
+    infusedAllocationGrams: 0.2,
+  };
+
   const unitsOfMeasure = await dynamicConstsManager.unitsOfMeasure();
 
   let flowerAllocationGrams = 0;
   let concentrateAllocationGrams = 0;
   let infusedAllocationGrams = 0;
-
-  const unitOfMeasure = unitsOfMeasure.find((x) => x.Id === pkg.UnitOfMeasureId);
-
-  if (!unitOfMeasure) {
-    throw new Error("Could not match unit of measure");
-  }
 
   enum AllocationType {
     FLOWER,
@@ -219,19 +216,43 @@ export async function toNormalizedAllocationQuantity(
   }
 
   let computedQuantity = sampleQuantity;
+  let unitOfWeightId = pkg.UnitOfMeasureId;
+
+  if (
+    pkg.UnitOfMeasureQuantityType === "VolumeBased" ||
+    pkg.Item.QuantityTypeName === "VolumeBased"
+  ) {
+    return FALLBACK_ALLOCATION;
+  }
 
   if (pkg.Item.UnitOfMeasureName === "Each") {
+    computedQuantity = sampleQuantity * pkg.Item.UnitWeight!;
+    unitOfWeightId = pkg.Item.UnitOfMeasureId;
+
+    // TODO attempt to find a "weight" in the item name
   } else {
-    // TODO
-    // quantity is the
   }
+
+  const unitOfMeasure = unitsOfMeasure.find((x) => x.Id === unitOfWeightId);
+  const gramsUnitOfMeasure = unitsOfMeasure.find((x) => x.Name === "Grams")!;
+  if (!unitOfMeasure || !gramsUnitOfMeasure) {
+    throw new Error("Could not match unit of measure");
+  }
+
+  // Force into grams
+  computedQuantity =
+    computedQuantity * unitOfMeasure.ToBaseFactor * gramsUnitOfMeasure.FromBaseFactor;
 
   switch (allocationType) {
     case AllocationType.FLOWER:
+      flowerAllocationGrams = computedQuantity;
       break;
     case AllocationType.CONCENTRATE:
+      concentrateAllocationGrams = computedQuantity;
       break;
     case AllocationType.INFUSED:
+      // Edible: assume it cannot possibly be higher than 200mg per each
+      infusedAllocationGrams = Math.min(0.2, computedQuantity);
       break;
   }
 

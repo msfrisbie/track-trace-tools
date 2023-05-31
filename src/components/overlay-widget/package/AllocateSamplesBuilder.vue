@@ -28,7 +28,7 @@
                     :checked="employeeSamples.selectedEmployeeIds.includes(employee.Id)"
                     @change="toggleEmployee({ employeeId: employee.Id })"
                   >
-                    {{ employee.FullName }}
+                    <div class="text-xs">{{ employee.FullName }}</div>
                   </b-form-checkbox>
                 </div>
               </b-card>
@@ -48,7 +48,15 @@
                     :checked="employeeSamples.selectedSamplePackageIds.includes(pkg.Id)"
                     @change="togglePackage({ packageId: pkg.Id })"
                   >
-                    {{ pkg.Label }} ({{ pkg.Item.Name }})
+                    <div class="text-xs">
+                      <div class="font-bold">
+                        {{ pkg.Item.Name }} ({{ pkg.Quantity }} {{ pkg.UnitOfMeasureAbbreviation }})
+                      </div>
+                      <div>
+                        {{ pkg.Label }}
+                      </div>
+                      <div>Received {{ pkg.ReceivedDateTime }}</div>
+                    </div>
                   </b-form-checkbox>
                 </div>
               </b-card>
@@ -62,12 +70,14 @@
 
             <template v-else>
               <b-card
-                v-for="sampleAllocation of employeeSamples.pendingAllocationBuffer"
-                v-bind:key="sampleAllocation.employee.Id + '_' + sampleAllocation.pkg.Id"
+                v-for="(sampleAllocation, index) of employeeSamples.pendingAllocationBuffer"
+                v-bind:key="
+                  index + '_' + sampleAllocation.employee.Id + '_' + sampleAllocation.pkg.Id
+                "
               >
                 {{ sampleAllocation.employee.FullName }}
                 {{ sampleAllocation.pkg.Label }}
-                {{ sampleAllocation.pkg.adjustmentQuantity }}
+                {{ sampleAllocation.adjustmentQuantity }}
               </b-card>
             </template>
           </div>

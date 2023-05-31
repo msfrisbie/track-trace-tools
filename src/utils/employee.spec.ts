@@ -1,3 +1,5 @@
+import "@/test/utils/auto-mock-chrome";
+import "@/test/utils/auto-mock-fetch";
 import { getAllocatedSampleFromPackageHistoryEntryOrNull } from "./employee";
 
 describe("employee.ts", () => {
