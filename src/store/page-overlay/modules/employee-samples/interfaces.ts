@@ -1,4 +1,5 @@
 import { IIndexedPackageData, IMetrcEmployeeData } from "@/interfaces";
+import { EmployeeSamplesState } from "./consts";
 
 export interface INormalizedAllocation {
   flowerAllocationGrams: number;
@@ -7,7 +8,7 @@ export interface INormalizedAllocation {
 }
 
 export interface IEmployeeSamplesState {
-  loadInflight: boolean;
+  state: EmployeeSamplesState;
   employees: IMetrcEmployeeData[];
   selectedEmployeeIds: number[];
   availableSamples: {

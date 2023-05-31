@@ -11,11 +11,16 @@ import {
   toNormalizedAllocationQuantity,
 } from "@/utils/employee";
 import { ActionContext } from "vuex";
-import { EmployeeSamplesActions, EmployeeSamplesGetters, EmployeeSamplesMutations } from "./consts";
+import {
+  EmployeeSamplesActions,
+  EmployeeSamplesGetters,
+  EmployeeSamplesMutations,
+  EmployeeSamplesState,
+} from "./consts";
 import { IEmployeeSamplesState, IHistoryAllocationData } from "./interfaces";
 
 const inMemoryState = {
-  loadInflight: false,
+  state: EmployeeSamplesState.INITIAL,
   employees: [],
   selectedEmployeeIds: [],
   availableSamples: [],
@@ -24,7 +29,7 @@ const inMemoryState = {
   modifiedSamplePackages: [],
   recordedAllocationBuffer: [],
   pendingAllocationBuffer: [],
-  startDate: getIsoDateFromOffset(-180).split("T")[0],
+  startDate: getIsoDateFromOffset(-30).split("T")[0],
   endDate: todayIsodate(),
 };
 
@@ -80,7 +85,7 @@ export const employeeSamplesModule = {
       let packages: IIndexedPackageData[] = [];
       let employees: IMetrcEmployeeData[] = [];
 
-      ctx.state.loadInflight = true;
+      ctx.state.state = EmployeeSamplesState.LOADING;
 
       const promises: Promise<any>[] = [
         primaryDataLoader.activePackages().then((result) => {
@@ -125,7 +130,7 @@ export const employeeSamplesModule = {
 
       await Promise.allSettled(promises);
 
-      ctx.state.loadInflight = false;
+      ctx.state.state = EmployeeSamplesState.IDLE;
     },
     [EmployeeSamplesActions.TOGGLE_EMPLOYEE]: async (
       ctx: ActionContext<IEmployeeSamplesState, IPluginState>,
@@ -155,7 +160,9 @@ export const employeeSamplesModule = {
       ctx: ActionContext<IEmployeeSamplesState, IPluginState>,
       data: any
     ) => {
-      console.log("Allocate");
+      ctx.state.state = EmployeeSamplesState.ALLOCATION_INFLIGHT;
+
+      await new Promise((resolve) => setTimeout(resolve, 300));
 
       if (!ctx.state.modifiedSamplePackages.length) {
         console.error("Zero allocations");
@@ -257,6 +264,8 @@ export const employeeSamplesModule = {
           }
         }
       }
+
+      ctx.state.state = EmployeeSamplesState.ALLOCATION_SUCCESS;
     },
   },
 };

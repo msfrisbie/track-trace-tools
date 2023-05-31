@@ -1,3 +1,12 @@
+export enum EmployeeSamplesState {
+  INITIAL,
+  LOADING,
+  IDLE,
+  ALLOCATION_INFLIGHT,
+  ALLOCATION_SUCCESS,
+  ALLOCATION_ERROR,
+}
+
 export enum EmployeeSamplesMutations {
   EMPLOYEE_SAMPLES_MUTATION = "EMPLOYEE_SAMPLES_MUTATION",
   UPDATE_DATA = "UPDATE_DATA",

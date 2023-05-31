@@ -104,30 +104,30 @@ body.ttt-efficient-spacing {
     }
   }
 
-  .k-grid {
-    th:nth-child(2),
-    td:nth-child(2) {
-      position: sticky;
-      left: 0;
-    }
+  // .k-grid {
+  //   th:nth-child(2),
+  //   td:nth-child(2) {
+  //     position: sticky;
+  //     left: 0;
+  //   }
 
-    tr {
-      td:nth-child(2) {
-        background-color: white;
-      }
-    }
+  //   tr {
+  //     td:nth-child(2) {
+  //       background-color: white;
+  //     }
+  //   }
 
-    tr.k-alt {
-      td:nth-child(2) {
-        background-color: inherit;
-      }
-    }
-  }
+  //   tr.k-alt {
+  //     td:nth-child(2) {
+  //       background-color: inherit;
+  //     }
+  //   }
+  // }
 
-  .k-header .k-grid-toolbar {
-    position: sticky;
-    left: 0;
-  }
+  // .k-header .k-grid-toolbar {
+  //   position: sticky;
+  //   left: 0;
+  // }
 }
 
 @import "@/scss/page-overlay";

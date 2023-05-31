@@ -2,7 +2,7 @@
   <div>
     <!-- <div class="grid grid-cols-3 w-full"> -->
     <div class="flex flex-col gap-2 items-stretch w-full">
-      <template v-if="employeeSamples.loadInflight">
+      <template v-if="employeeSamples.state === EmployeeSamplesState.LOADING">
         <div class="flex flex-row justify-center items-center gap-2">
           <b-spinner small></b-spinner>
           <div>Loading...</div>
@@ -12,7 +12,12 @@
       <template v-else>
         <div class="grid grid-cols-3 gap-8">
           <div class="flex flex-col items-stretch gap-4">
-            <b-button variant="primary" @click="allocateSamples()">ALLOCATE SAMPLES</b-button>
+            <b-button
+              variant="primary"
+              @click="allocateSamples()"
+              :disabled="employeeSamples.state === EmployeeSamplesState.ALLOCATION_INFLIGHT"
+              >CALCULATE EMPLOYEE SAMPLES</b-button
+            >
 
             <b-button variant="outline-primary" v-b-toggle="'collapse-1'"
               >Employees ({{ employeeSamples.employees.length }})</b-button
@@ -64,30 +69,65 @@
           </div>
 
           <div class="col-span-2 flex flex-col items-stretch gap-4">
-            <template v-if="employeeSamples.pendingAllocationBuffer.length === 0">
-              <div>No pending sample adjustments.</div>
+            <template v-if="employeeSamples.state === EmployeeSamplesState.ALLOCATION_INFLIGHT">
+              <div class="flex flex-row justify-center items-center gap-2">
+                <b-spinner small></b-spinner>
+                <div>Generating sample allocations...</div>
+              </div>
             </template>
 
-            <template v-else>
-              <b-card v-for="employee of selectedEmployees" v-bind:key="employee.Id">
-                <b-card-title>{{ employee.FullName }}</b-card-title>
-                <b-card-body>
-                  <div
-                    v-for="(
-                      sampleAllocation, index
-                    ) of employeeSamples.pendingAllocationBuffer.filter(
-                      (allocation) => allocation.employee.Id === employee.Id
-                    )"
-                    v-bind:key="
-                      index + '_' + sampleAllocation.employee.Id + '_' + sampleAllocation.pkg.Id
-                    "
-                  >
-                    {{ sampleAllocation.employee.FullName }}
-                    {{ sampleAllocation.pkg.Label }}
-                    {{ sampleAllocation.adjustmentQuantity }}
+            <template v-if="employeeSamples.state === EmployeeSamplesState.ALLOCATION_SUCCESS">
+              <template v-if="employeeSamples.pendingAllocationBuffer.length === 0">
+                <div class="text-center">No pending sample adjustments.</div>
+              </template>
+
+              <template v-else>
+                <b-card v-for="employee of selectedEmployees" v-bind:key="employee.Id">
+                  <div class="grid grid-cols-2 gap-8">
+                    <div class="text-lg font-bold">
+                      {{ employee.FullName }}
+                    </div>
+                    <div class="flex flex-col gap-2 text-xs">
+                      <div
+                        v-for="(
+                          sampleAllocation, index
+                        ) of employeeSamples.pendingAllocationBuffer.filter(
+                          (allocation) => allocation.employee.Id === employee.Id
+                        )"
+                        v-bind:key="
+                          index + '_' + sampleAllocation.employee.Id + '_' + sampleAllocation.pkg.Id
+                        "
+                      >
+                        <div class="font-bold">
+                          {{ sampleAllocation.pkg.Item.Name }} ({{
+                            sampleAllocation.adjustmentQuantity
+                          }}
+                          {{ sampleAllocation.pkg.UnitOfMeasureAbbreviation }})
+                        </div>
+                        <div>
+                          {{ sampleAllocation.pkg.Label }}
+                        </div>
+                        <div v-if="sampleAllocation.flowerAllocationGrams > 0">
+                          {{ Number(sampleAllocation.flowerAllocationGrams.toFixed(3)) }}g flower
+                        </div>
+                        <div v-if="sampleAllocation.concentrateAllocationGrams > 0">
+                          {{ Number(sampleAllocation.concentrateAllocationGrams.toFixed(3)) }}g
+                          concentrate
+                        </div>
+                        <div v-if="sampleAllocation.infusedAllocationGrams > 0">
+                          {{
+                            Number((sampleAllocation.infusedAllocationGrams * 1000).toFixed(3))
+                          }}mg infused
+                        </div>
+                      </div>
+                    </div>
                   </div>
-                </b-card-body>
-              </b-card>
+                </b-card>
+              </template>
+            </template>
+
+            <template v-if="employeeSamples.state === EmployeeSamplesState.ALLOCATION_ERROR">
+              <div class="text-center text-red-500">Something went wrong</div>
             </template>
           </div>
         </div>
@@ -136,6 +176,7 @@ import store from "@/store/page-overlay/index";
 import {
   EmployeeSamplesActions,
   EmployeeSamplesGetters,
+  EmployeeSamplesState,
 } from "@/store/page-overlay/modules/employee-samples/consts";
 import { IPluginState } from "@/interfaces";
 
@@ -155,7 +196,9 @@ export default Vue.extend({
     }),
   },
   data() {
-    return {};
+    return {
+      EmployeeSamplesState,
+    };
   },
   methods: {
     ...mapActions({

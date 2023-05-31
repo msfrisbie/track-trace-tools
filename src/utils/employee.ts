@@ -227,9 +227,7 @@ export async function toNormalizedAllocationQuantity(
 
   if (pkg.Item.UnitOfMeasureName === "Each") {
     computedQuantity = sampleQuantity * pkg.Item.UnitWeight!;
-    unitOfWeightId = pkg.Item.UnitOfMeasureId;
-
-    // TODO attempt to find a "weight" in the item name
+    unitOfWeightId = pkg.Item.UnitWeightUnitOfMeasureId!;
   }
 
   const unitOfMeasure = unitsOfMeasure.find((x) => x.Id === unitOfWeightId);
@@ -250,6 +248,13 @@ export async function toNormalizedAllocationQuantity(
       concentrateAllocationGrams = computedQuantity;
       break;
     case AllocationType.INFUSED:
+      const match = pkg.Item.Name.match(`([0-9]+)\s?mg`);
+
+      // Find "milligrams"
+      if (match && match[1] && typeof parseInt(match[1], 10) === "number") {
+        computedQuantity = parseInt(match[1], 10) / 1000;
+      }
+
       // Edible: assume it cannot possibly be higher than 200mg per each
       infusedAllocationGrams = Math.min(0.2, computedQuantity);
       break;
