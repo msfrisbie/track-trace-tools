@@ -1193,6 +1193,18 @@ export class MetrcRequestManager implements IAtomicService {
     });
   }
 
+  async adjustPackages(body: string) {
+    return customFetch(PACKAGE_ADJUST_URL, {
+      ...DEFAULT_FETCH_POST_OPTIONS,
+      // @ts-ignore
+      headers: {
+        ...(await buildAuthenticationHeaders(this.authStateOrError)),
+        ...JSON_HEADERS,
+      },
+      body,
+    });
+  }
+
   async replacePlantTags(body: string) {
     return customFetch(REPLACE_PLANT_TAGS_URL, {
       ...DEFAULT_FETCH_POST_OPTIONS,

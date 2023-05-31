@@ -1,6 +1,5 @@
 <template>
   <div>
-    <!-- <div class="grid grid-cols-3 w-full"> -->
     <div class="flex flex-col gap-2 items-stretch w-full">
       <template v-if="employeeSamples.state === EmployeeSamplesState.LOADING">
         <div class="flex flex-row justify-center items-center gap-2">
@@ -82,6 +81,14 @@
               </template>
 
               <template v-else>
+                <b-button class="w-full" variant="success" size="md" @click="submit()"
+                  >SUBMIT {{ employeeSamples.pendingAllocationBuffer.length }} ADJUSTMENTS</b-button
+                >
+
+                <b-button class="opacity-40" variant="light" size="md" @click="downloadAll()"
+                  >DOWNLOAD CSVs</b-button
+                >
+
                 <b-card v-for="employee of selectedEmployees" v-bind:key="employee.Id">
                   <div class="grid grid-cols-2 gap-8">
                     <div class="text-lg font-bold">
@@ -132,39 +139,7 @@
           </div>
         </div>
       </template>
-
-      <!-- <b-button variant="outline-primary" v-b-toggle="'collapse-2'"
-          >Unallocated Samples ({{ employeeSamples.availableSamplePackages.length }})</b-button
-        >
-
-        <b-collapse id="collapse-2" class="h-auto" style="transition: none !important">
-          <b-card>
-            <pre>{{ JSON.stringify(employeeSamples.availableSamplePackages, null, 2) }}</pre>
-          </b-card>
-        </b-collapse>
-
-        <b-button variant="outline-primary" v-b-toggle="'collapse-3'"
-          >30 day modified samples ({{ employeeSamples.modifiedSamples.length }})</b-button
-        >
-
-        <b-collapse id="collapse-3" class="h-auto" style="transition: none !important">
-          <b-card>
-            <pre>{{ JSON.stringify(employeeSamples.modifiedSamples, null, 2) }}</pre>
-          </b-card>
-        </b-collapse> -->
-
-      <!-- 
-        A producer or marijuana sales location is limited to transferring: 
-        
-        a total of 1 ounce of marijuana, 
-        a total of 6grams of marijuana concentrate, and 
-        marijuana-infused products with a total THC content of 2000 mgs 
-        
-        of internal product samples to each of its employees in a
-        30-day period. 
-        -->
     </div>
-    <!-- </div> -->
   </div>
 </template>
 
@@ -178,7 +153,24 @@ import {
   EmployeeSamplesGetters,
   EmployeeSamplesState,
 } from "@/store/page-overlay/modules/employee-samples/consts";
-import { IPluginState } from "@/interfaces";
+import {
+  IAdjustPackageReason,
+  ICsvFile,
+  IMetrcAddPackageNoteData,
+  IMetrcAdjustPackagePayload,
+  IMetrcFinishPackagesPayload,
+  IPackageData,
+  IPluginState,
+  IUnitOfMeasure,
+} from "@/interfaces";
+import { builderManager } from "@/modules/builder-manager.module";
+import { buildCsvDataOrError, buildNamedCsvFileData, downloadCsvFile } from "@/utils/csv";
+import { submitDateFromIsodate, todayIsodate } from "@/utils/date";
+import { BuilderType, MessageType } from "@/consts";
+import { dynamicConstsManager } from "@/modules/dynamic-consts-manager.module";
+import { ISampleAllocation } from "@/store/page-overlay/modules/employee-samples/interfaces";
+import { analyticsManager } from "@/modules/analytics-manager.module";
+import { sum } from "lodash";
 
 export default Vue.extend({
   name: "AllocateSamplesBuilder",
@@ -194,9 +186,16 @@ export default Vue.extend({
       selectedEmployees: `employeeSamples/${EmployeeSamplesGetters.SELECTED_EMPLOYEES}`,
       selectedSamplePackages: `employeeSamples/${EmployeeSamplesGetters.SELECTED_SAMPLE_PACKAGES}`,
     }),
+    csvFiles(): ICsvFile[] {
+      // @ts-ignore
+      return this.buildCsvFiles();
+    },
   },
   data() {
     return {
+      unitsOfMeasure: [],
+      adjustmentReasons: [],
+      builderType: BuilderType.ADJUST_PACKAGE,
       EmployeeSamplesState,
     };
   },
@@ -207,10 +206,129 @@ export default Vue.extend({
       toggleEmployee: `employeeSamples/${EmployeeSamplesActions.TOGGLE_EMPLOYEE}`,
       togglePackage: `employeeSamples/${EmployeeSamplesActions.TOGGLE_PACKAGE}`,
     }),
+    async submit() {
+      const rows: IMetrcAdjustPackagePayload[] = [];
+
+      const adjustmentReasons = await dynamicConstsManager.adjustPackageReasons();
+      const unitsOfMeasure = await dynamicConstsManager.unitsOfMeasure();
+
+      for (let sampleAllocation of this.$store.state.employeeSamples
+        .pendingAllocationBuffer as ISampleAllocation[]) {
+        const row = {
+          AdjustmentDate: submitDateFromIsodate(todayIsodate()),
+          AdjustmentQuantity: (-1 * sampleAllocation.adjustmentQuantity).toString(),
+          AdjustmentReasonId: adjustmentReasons
+            .find((x) => x.Name.includes("Trade Sample"))!
+            .Id.toString(),
+          Id: sampleAllocation.pkg.Id.toString(),
+          AdjustmentUnitOfMeasureId: sampleAllocation.pkg.UnitOfMeasureId.toString(),
+          CurrentQuantity: sampleAllocation.pkg.Quantity.toString(),
+          CurrentQuantityUom: unitsOfMeasure.find(
+          (x) => x.Id === sampleAllocation.pkg.UnitOfMeasureId
+          )!.Name,
+          FinishDate: "",
+          NewQuantity: (
+            sampleAllocation.pkg.Quantity - sampleAllocation.adjustmentQuantity
+          ).toString(),
+          NewQuantityUom: unitsOfMeasure.find((x) => x.Id === sampleAllocation.pkg.UnitOfMeasureId)!
+            .Name,
+          ReasonNote: `${sampleAllocation.employee.FullName} ${sampleAllocation.employee.License.Number} ${sampleAllocation.adjustmentQuantity} ${sampleAllocation.pkg.UnitOfMeasureAbbreviation}`,
+        };
+
+        rows.push(row);
+      }
+
+      builderManager.submitProject(
+        rows,
+        this.$data.builderType,
+        {
+          sampleTotal: this.$store.state.employeeSamples.pendingAllocationBuffer.length,
+        },
+        this.buildCsvFiles(),
+        25
+      );
+    },
+    buildCsvFiles(): ICsvFile[] {
+      try {
+        const csvData = buildCsvDataOrError([
+          {
+            isVector: true,
+            data: (
+              this.$store.state.employeeSamples.pendingAllocationBuffer as ISampleAllocation[]
+            ).map((x) => x.pkg.Label),
+          },
+          {
+            isVector: true,
+            data: (
+              this.$store.state.employeeSamples.pendingAllocationBuffer as ISampleAllocation[]
+            ).map((x) => -1 * x.adjustmentQuantity),
+          },
+          {
+            isVector: true,
+            data: (
+              this.$store.state.employeeSamples.pendingAllocationBuffer as ISampleAllocation[]
+            ).map(
+              (x) =>
+                this.$data.unitsOfMeasure.find(
+                  (y: IUnitOfMeasure) => y.Id === x.pkg.UnitOfMeasureId
+                )!.Name
+            ),
+          },
+          {
+            isVector: false,
+            data: this.$data.adjustmentReasons.find((x: IAdjustPackageReason) =>
+              x.Name.includes("Trade Sample")
+            )!.Name,
+          },
+          {
+            isVector: true,
+            data: (
+              this.$store.state.employeeSamples.pendingAllocationBuffer as ISampleAllocation[]
+            ).map(
+              (x) =>
+                `${x.employee.FullName} ${x.employee.License.Number} ${x.adjustmentQuantity} ${x.pkg.UnitOfMeasureAbbreviation}`
+            ),
+          },
+          {
+            isVector: false,
+            data: submitDateFromIsodate(todayIsodate()),
+          },
+          {
+            isVector: true,
+            data: (
+              this.$store.state.employeeSamples.pendingAllocationBuffer as ISampleAllocation[]
+            ).map((x) => x.employee.License.Number),
+          },
+        ]);
+
+        return buildNamedCsvFileData(
+          csvData,
+          `Adjust ${this.$store.state.employeeSamples.pendingAllocationBuffer.length} samples`
+        );
+      } catch (e) {
+        console.error(e);
+        return [];
+      }
+    },
+    async downloadAll() {
+      for (let csvFile of this.csvFiles) {
+        await downloadCsvFile({ csvFile, delay: 500 });
+      }
+
+      analyticsManager.track(MessageType.DOWNLOADED_CSVS, {
+        builderType: this.$data.builderType,
+        csvData: {
+          sampleTotal: this.$store.state.employeeSamples.pendingAllocationBuffer.length,
+        },
+      });
+    },
   },
   async created() {},
   async mounted() {
     this.loadObjects();
+
+    this.$data.unitsOfMeasure = await dynamicConstsManager.unitsOfMeasure();
+    this.$data.adjustmentReasons = await dynamicConstsManager.adjustPackageReasons();
   },
 });
 </script>

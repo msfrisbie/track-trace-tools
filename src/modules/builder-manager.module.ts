@@ -2,6 +2,7 @@ import { BuilderType, MessageType } from "@/consts";
 import {
   IAtomicService,
   ICsvFile,
+  IMetrcAdjustPackagePayload,
   IMetrcCreateItemsPayload,
   IMetrcCreatePackagesFromPackagesPayload,
   IMetrcCreatePlantBatchPackagesFromMotherPlantBatchPayload,
@@ -53,6 +54,7 @@ type IEligibleRowType =
   | IMetrcCreateItemsPayload
   | IMetrcReplacePlantBatchTagsPayload
   | IMetrcReplacePlantTagsPayload
+  | IMetrcAdjustPackagePayload
   | IMetrcUpdateTransferPayload;
 
 const debugLog = debugLogFactory("builder-manager.module.ts");
@@ -356,6 +358,9 @@ class BuilderManager implements IAtomicService {
         break;
       case BuilderType.FINISH_PACKAGES:
         response = await primaryMetrcRequestManager.finishPackages(JSON.stringify(rows));
+        break;
+      case BuilderType.ADJUST_PACKAGE:
+        response = await primaryMetrcRequestManager.adjustPackages(JSON.stringify(rows));
         break;
       case BuilderType.CREATE_IMMATURE_PLANT_PACKAGES_FROM_MOTHER_PLANT:
         response = await primaryMetrcRequestManager.immaturePlantPackagesFromMotherPlant(

@@ -1413,7 +1413,7 @@ export interface IMetrcAdjustPackagePayload {
   AdjustmentDate: string; // ISODATE
   AdjustmentQuantity: string;
   AdjustmentReasonId: string;
-  AdjustmentUnitOfMeasureId: number;
+  AdjustmentUnitOfMeasureId: string;
   CurrentQuantity: string; // "5.4"
   CurrentQuantityUom: UnitOfMeasureName;
   FinishDate: string; // ISODATE or ""
