@@ -69,7 +69,7 @@
             </b-collapse>
 
             <b-button variant="outline-primary" v-b-toggle="'collapse-2'"
-              >Packages ({{ selectedSamplePackages.length }})</b-button
+              >Sample Packages ({{ selectedSamplePackages.length }})</b-button
             >
 
             <b-collapse id="collapse-2" class="h-auto" style="transition: none !important">
