@@ -4,7 +4,7 @@ export enum EmployeeSamplesState {
   IDLE,
   ALLOCATION_INFLIGHT,
   ALLOCATION_SUCCESS,
-  ALLOCATION_ERROR,
+  ERROR,
 }
 
 export enum EmployeeSamplesMutations {
@@ -19,7 +19,7 @@ export enum EmployeeSamplesGetters {
 
 export enum EmployeeSamplesActions {
   ALLOCATE_SAMPLES = "ALLOCATE_SAMPLES",
-  LOAD_OBJECTS = "LOAD_OBJECTS",
+  RESET = "RESET",
   TOGGLE_EMPLOYEE = "TOGGLE_EMPLOYEE",
   TOGGLE_PACKAGE = "TOGGLE_PACKAGE",
 }

@@ -8,7 +8,7 @@ export interface INormalizedAllocation {
 }
 
 export interface IEmployeeSamplesState {
-  state: EmployeeSamplesState;
+  toolState: EmployeeSamplesState;
   employees: IMetrcEmployeeData[];
   selectedEmployeeIds: number[];
   availableSamples: {
@@ -23,6 +23,7 @@ export interface IEmployeeSamplesState {
   recordedAllocationBuffer: ISampleAllocation[];
   startDate: string;
   endDate: string;
+  stateMessage: string;
 }
 // Indicates what can be extracted from a package history
 // Employee may or may not exist

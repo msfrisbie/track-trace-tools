@@ -1,7 +1,16 @@
 <template>
   <div>
     <div class="flex flex-col gap-2 items-stretch w-full">
-      <template v-if="employeeSamples.state === EmployeeSamplesState.LOADING">
+      <template v-if="employeeSamples.toolState === EmployeeSamplesState.ERROR">
+        <div class="flex flex-row justify-center items-center gap-2">
+          <div class="text-center text-red-500">
+            Something went wrong. {{ employeeSamples.stateMessage }}
+          </div>
+          <b-button variant="outline-danger" @click="reset()">RESET</b-button>
+        </div>
+      </template>
+
+      <template v-if="employeeSamples.toolState === EmployeeSamplesState.LOADING">
         <div class="flex flex-row justify-center items-center gap-2">
           <b-spinner small></b-spinner>
           <div>Loading...</div>
@@ -14,7 +23,7 @@
             <b-button
               variant="primary"
               @click="allocateSamples()"
-              :disabled="employeeSamples.state === EmployeeSamplesState.ALLOCATION_INFLIGHT"
+              :disabled="allocateButtonDisabled"
               >CALCULATE EMPLOYEE SAMPLES</b-button
             >
 
@@ -59,7 +68,7 @@
                       <div>
                         {{ pkg.Label }}
                       </div>
-                      <div>Received {{ pkg.ReceivedDateTime }}</div>
+                      <div>Received {{ pkg.ReceivedDateTime.split('T')[0] }}</div>
                     </div>
                   </b-form-checkbox>
                 </div>
@@ -68,14 +77,14 @@
           </div>
 
           <div class="col-span-2 flex flex-col items-stretch gap-4">
-            <template v-if="employeeSamples.state === EmployeeSamplesState.ALLOCATION_INFLIGHT">
+            <template v-if="employeeSamples.toolState === EmployeeSamplesState.ALLOCATION_INFLIGHT">
               <div class="flex flex-row justify-center items-center gap-2">
                 <b-spinner small></b-spinner>
                 <div>Generating sample allocations...</div>
               </div>
             </template>
 
-            <template v-if="employeeSamples.state === EmployeeSamplesState.ALLOCATION_SUCCESS">
+            <template v-if="employeeSamples.toolState === EmployeeSamplesState.ALLOCATION_SUCCESS">
               <template v-if="employeeSamples.pendingAllocationBuffer.length === 0">
                 <div class="text-center">No pending sample adjustments.</div>
               </template>
@@ -132,10 +141,6 @@
                 </b-card>
               </template>
             </template>
-
-            <template v-if="employeeSamples.state === EmployeeSamplesState.ALLOCATION_ERROR">
-              <div class="text-center text-red-500">Something went wrong</div>
-            </template>
           </div>
         </div>
       </template>
@@ -190,6 +195,23 @@ export default Vue.extend({
       // @ts-ignore
       return this.buildCsvFiles();
     },
+    allocateButtonDisabled(): boolean {
+      if (
+        this.$store.state.employeeSamples.toolState === EmployeeSamplesState.ALLOCATION_INFLIGHT
+      ) {
+        return true;
+      }
+
+      if (this.$store.state.employeeSamples.selectedEmployeeIds.length === 0) {
+        return true;
+      }
+
+      if (this.$store.state.employeeSamples.selectedSamplePackageIds.length === 0) {
+        return true;
+      }
+
+      return false;
+    },
   },
   data() {
     return {
@@ -201,7 +223,7 @@ export default Vue.extend({
   },
   methods: {
     ...mapActions({
-      loadObjects: `employeeSamples/${EmployeeSamplesActions.LOAD_OBJECTS}`,
+      reset: `employeeSamples/${EmployeeSamplesActions.RESET}`,
       allocateSamples: `employeeSamples/${EmployeeSamplesActions.ALLOCATE_SAMPLES}`,
       toggleEmployee: `employeeSamples/${EmployeeSamplesActions.TOGGLE_EMPLOYEE}`,
       togglePackage: `employeeSamples/${EmployeeSamplesActions.TOGGLE_PACKAGE}`,
@@ -224,7 +246,7 @@ export default Vue.extend({
           AdjustmentUnitOfMeasureId: sampleAllocation.pkg.UnitOfMeasureId.toString(),
           CurrentQuantity: sampleAllocation.pkg.Quantity.toString(),
           CurrentQuantityUom: unitsOfMeasure.find(
-          (x) => x.Id === sampleAllocation.pkg.UnitOfMeasureId
+            (x) => x.Id === sampleAllocation.pkg.UnitOfMeasureId
           )!.Name,
           FinishDate: "",
           NewQuantity: (
@@ -325,7 +347,7 @@ export default Vue.extend({
   },
   async created() {},
   async mounted() {
-    this.loadObjects();
+    this.reset();
 
     this.$data.unitsOfMeasure = await dynamicConstsManager.unitsOfMeasure();
     this.$data.adjustmentReasons = await dynamicConstsManager.adjustPackageReasons();
