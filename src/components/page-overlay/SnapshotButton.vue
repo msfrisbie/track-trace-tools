@@ -22,21 +22,21 @@
       <template #title>
         <div class="flex flex-row items-center space-x-2">
           <font-awesome-icon icon="camera" style="height: 26px"></font-awesome-icon>
-          <span class="text-base font-bold">SNAPSHOT</span>
+          <span class="text-base font-bold">REPORT</span>
         </div>
       </template>
 
       <div class="flex flex-col space-y-2 text-base" style="min-width: 200px">
-        <p>Generate snapshots of your Metrc data in Google Sheets.</p>
+        <p>Generate reports of your Metrc data in Google Sheets.</p>
 
         <a
           class="underline text-purple-600"
           href="https://docs.google.com/spreadsheets/d/1fxBfjBUhFt6Gj7PpbQO8DlT1e76DIDtTwiq_2A5tHCU/edit?usp=sharing"
           target="_blank"
-          >Example snapshot</a
+          >Example report</a
         >
         <a class="underline text-purple-600" href="https://youtu.be/JBR21XSKK3I" target="_blank"
-          >How do I make a snapshot?</a
+          >How do I make a report?</a
         >
 
         <b-button size="sm" variant="outline-primary" class="mb-2" @click="dismissSnapshotPopover()"

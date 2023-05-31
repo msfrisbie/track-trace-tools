@@ -13,7 +13,7 @@
           width="640"
           height="400"
           src="https://www.youtube.com/embed/JBR21XSKK3I"
-          title="Generating snapshots with Track &amp; Trace Tools"
+          title="Generating reports with Track &amp; Trace Tools"
           frameborder="0"
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
           allowfullscreen

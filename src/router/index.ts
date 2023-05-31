@@ -228,7 +228,7 @@ const routes: Array<RouteConfig> = [
   },
   {
     path: "/google-sheets-export",
-    name: "Snapshots",
+    name: "Reports",
     component: GoogleSheetsExport,
   },
   {

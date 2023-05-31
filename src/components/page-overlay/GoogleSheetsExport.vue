@@ -25,7 +25,7 @@
               </b-form-checkbox>
 
               <div class="text-xs text-start text-gray-600" v-if="!enableT3Plus">
-                Get access to advanced snapshots with
+                Get access to advanced reports with
                 <a
                   class="text-purple-500 underline"
                   href="https://trackandtrace.tools/plus"
@@ -58,7 +58,7 @@
         >
           <template v-if="selectedReports.length > 0">
             <div class="text-purple-800 text-center">
-              Configure your snapshot below. <br />Defaults to active data and all fields.
+              Configure your report below. <br />Defaults to active data and all fields.
             </div>
           </template>
 
@@ -1013,12 +1013,12 @@
               size="sm"
               @click="createSpreadsheet()"
               :disabled="selectedReports.length === 0"
-              >CREATE SNAPSHOT</b-button
+              >CREATE REPORT</b-button
             >
 
             <template v-if="selectedReports.length === 0">
               <div class="text-red-500 text-center">
-                Select something to include in your snapshot
+                Select something to include in your report
               </div>
             </template>
 
@@ -1030,7 +1030,7 @@
               "
               variant="outline-primary"
               @click="snapshotEverything()"
-              >SNAPSHOT EVERYTHING</b-button
+              >GENERATE ALL REPORTS</b-button
             >
           </template>
 
@@ -1074,7 +1074,7 @@
 
           <template v-if="reportStatus === ReportStatus.SUCCESS">
             <b-button variant="primary" :href="generatedSpreadsheet.spreadsheetUrl" target="_blank"
-              >VIEW SNAPSHOT</b-button
+              >VIEW REPORT</b-button
             >
             <b-button variant="outline-primary" @click="reset()">START OVER</b-button>
           </template>
@@ -1083,7 +1083,7 @@
             class="flex flex-col items-stretch gap-2 text-start py-12"
             v-if="generatedSpreadsheetHistory.length > 0"
           >
-            <div style="text-align: start">Recent snapshots:</div>
+            <div style="text-align: start">Recent reports:</div>
             <div
               class="flex flex-col items-start"
               v-bind:key="spreadsheetEntry.uuid"
@@ -1118,20 +1118,20 @@
     <template v-if="oAuthState === OAuthState.NOT_AUTHENTICATED">
       <div class="flex flex-col gap-8 text-center items-center">
         <div class="text-lg font-semibold">
-          Sign in to your Google account to generate snapshots.
+          Sign in to your Google account to generate reports.
         </div>
         <div class="text-base">
-          Track &amp; Trace Tools can generate Metrc snapshots in Google Sheets.
+          Track &amp; Trace Tools can generate Metrc reports in Google Sheets.
         </div>
 
         <a
           class="underline text-purple-600"
           href="https://docs.google.com/spreadsheets/d/1fxBfjBUhFt6Gj7PpbQO8DlT1e76DIDtTwiq_2A5tHCU/edit?usp=sharing"
           target="_blank"
-          >Example snapshot</a
+          >Example report</a
         >
         <a class="underline text-purple-600" href="https://youtu.be/JBR21XSKK3I" target="_blank"
-          >How do I make a snapshot?</a
+          >How do I make a report?</a
         >
 
         <b-button variant="primary" @click="openOAuthPage()">SIGN IN</b-button>

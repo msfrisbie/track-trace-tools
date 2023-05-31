@@ -2,21 +2,12 @@
   <div class="flex flex-col items-stretch gap-4 text-center p-2">
     <template v-if="!initial">
       <template v-if="isAuthenticated">
-        <!-- <pre>{{ oauthUserInfo }}</pre> -->
         <div>
           Signed in as <span class="font-bold ttt-purple">{{ oauthUserInfo.email }}</span>
         </div>
 
-        <!-- <div>Generate Metrc snapshots from the Track &amp; Trace Tools menu.</div>
-
-        <a
-          href="https://docs.google.com/spreadsheets/d/1fxBfjBUhFt6Gj7PpbQO8DlT1e76DIDtTwiq_2A5tHCU/edit?usp=sharing"
-          target="_blank"
-          class="underline text-purple-600"
-          >Example snapshot</a
-        > -->
         <a href="https://youtu.be/JBR21XSKK3I" class="underline text-purple-600" target="_blank"
-          >How do I make a snapshot?</a
+          >How do I make a report?</a
         >
 
         <b-button

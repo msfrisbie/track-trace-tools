@@ -10,6 +10,7 @@ import {
   getSampleAllocationFromAllocationDataOrNull,
   toNormalizedAllocationQuantity,
 } from "@/utils/employee";
+import { v4 as uuidv4 } from "uuid";
 import { ActionContext } from "vuex";
 import {
   EmployeeSamplesActions,
@@ -29,6 +30,7 @@ const inMemoryState = {
   modifiedSamplePackages: [],
   recordedAllocationBuffer: [],
   pendingAllocationBuffer: [],
+  pendingAllocationBufferIds: [],
   startDate: getIsoDateFromOffset(-30).split("T")[0],
   endDate: todayIsodate(),
   stateMessage: "",
@@ -75,6 +77,16 @@ export const employeeSamplesModule = {
     ) => {
       return state.availableSamplePackages.filter((x) =>
         state.selectedSamplePackageIds.includes(x.Id)
+      );
+    },
+    [EmployeeSamplesGetters.SELECTED_SAMPLE_ALLOCATIONS]: (
+      state: IEmployeeSamplesState,
+      getters: any,
+      rootState: any,
+      rootGetters: any
+    ) => {
+      return state.pendingAllocationBuffer.filter((x) =>
+        state.pendingAllocationBufferIds.includes(x.uuid)
       );
     },
     [EmployeeSamplesGetters.DATE_GROUPED_AVAILABLE_SAMPLE_PACKAGES]: (
@@ -200,6 +212,22 @@ export const employeeSamplesModule = {
         }
       }
     },
+    [EmployeeSamplesActions.TOGGLE_SAMPLE_ALLOCATION]: async (
+      ctx: ActionContext<IEmployeeSamplesState, IPluginState>,
+      data: { uuid: string; remove?: boolean; add?: boolean }
+    ) => {
+      if (ctx.state.pendingAllocationBufferIds.includes(data.uuid)) {
+        if (data.add !== true) {
+          ctx.state.pendingAllocationBufferIds = ctx.state.pendingAllocationBufferIds.filter(
+            (x) => x !== data.uuid
+          );
+        }
+      } else {
+        if (data.remove !== true) {
+          ctx.state.pendingAllocationBufferIds.push(data.uuid);
+        }
+      }
+    },
     [EmployeeSamplesActions.ALLOCATE_SAMPLES]: async (
       ctx: ActionContext<IEmployeeSamplesState, IPluginState>,
       data: any
@@ -296,6 +324,7 @@ export const employeeSamplesModule = {
             ) {
               // Record allocation
               ctx.state.pendingAllocationBuffer.push({
+                uuid: uuidv4(),
                 pkg: currentSample.pkg,
                 employee,
                 adjustmentQuantity: currentSample.quantity,
@@ -312,6 +341,8 @@ export const employeeSamplesModule = {
             }
           }
         }
+
+        ctx.state.pendingAllocationBufferIds = ctx.state.pendingAllocationBuffer.map((x) => x.uuid);
 
         ctx.state.toolState = EmployeeSamplesState.ALLOCATION_SUCCESS;
       } catch (e) {

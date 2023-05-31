@@ -28,7 +28,7 @@
             >
 
             <b-button variant="outline-primary" v-b-toggle="'collapse-1'"
-              >Employees ({{ employeeSamples.employees.length }})</b-button
+              >Employees ({{ selectedEmployees.length }})</b-button
             >
 
             <b-collapse id="collapse-1" class="h-auto" style="transition: none !important">
@@ -69,7 +69,7 @@
             </b-collapse>
 
             <b-button variant="outline-primary" v-b-toggle="'collapse-2'"
-              >Packages ({{ employeeSamples.availableSamplePackages.length }})</b-button
+              >Packages ({{ selectedSamplePackages.length }})</b-button
             >
 
             <b-collapse id="collapse-2" class="h-auto" style="transition: none !important">
@@ -156,11 +156,15 @@
               </template>
 
               <template v-else>
-                <b-button class="w-full" variant="success" size="md" @click="submit()"
-                  >SUBMIT {{ employeeSamples.pendingAllocationBuffer.length }} ADJUSTMENTS</b-button
-                >
+                <div class="w-full grid grid-cols-3 gap-2">
+                  <b-button variant="success" size="md" @click="submit()"
+                    >SUBMIT {{ selectedSampleAllocations.length }} ADJUSTMENTS</b-button
+                  >
 
-                <div class="grid grid-cols-2 gap-2">
+                  <b-button class="opacity-40" variant="light" size="md" @click="downloadAll()"
+                    >DOWNLOAD CSVs</b-button
+                  >
+
                   <b-button
                     class="opacity-40"
                     variant="light"
@@ -168,49 +172,49 @@
                     @click="downloadTextSummary()"
                     >DOWNLOAD SUMMARY</b-button
                   >
-                  <b-button class="opacity-40" variant="light" size="md" @click="downloadAll()"
-                    >DOWNLOAD CSVs</b-button
-                  >
                 </div>
 
                 <b-card v-for="employee of selectedEmployees" v-bind:key="employee.Id">
-                  <div class="grid grid-cols-2 gap-8">
+                  <div class="grid grid-cols-3 gap-8">
                     <div class="text-lg font-bold">
                       {{ employee.FullName }}
                     </div>
-                    <div class="flex flex-col gap-2 text-xs">
-                      <div
-                        v-for="(
-                          sampleAllocation, index
-                        ) of employeeSamples.pendingAllocationBuffer.filter(
+                    <div class="col-span-2 flex flex-col gap-2 text-xs">
+                      <b-form-checkbox
+                        v-for="sampleAllocation of employeeSamples.pendingAllocationBuffer.filter(
                           (allocation) => allocation.employee.Id === employee.Id
                         )"
-                        v-bind:key="
-                          index + '_' + sampleAllocation.employee.Id + '_' + sampleAllocation.pkg.Id
+                        v-bind:key="sampleAllocation.uuid"
+                        size="sm"
+                        :checked="
+                          employeeSamples.pendingAllocationBufferIds.includes(sampleAllocation.uuid)
                         "
+                        @change="toggleSampleAllocation({ uuid: sampleAllocation.uuid })"
                       >
-                        <div class="font-bold">
-                          {{ sampleAllocation.pkg.Item.Name }} ({{
-                            sampleAllocation.adjustmentQuantity
-                          }}
-                          {{ sampleAllocation.pkg.UnitOfMeasureAbbreviation }})
+                        <div class="flex-grow">
+                          <div class="font-bold">
+                            {{ sampleAllocation.pkg.Item.Name }} ({{
+                              sampleAllocation.adjustmentQuantity
+                            }}
+                            {{ sampleAllocation.pkg.UnitOfMeasureAbbreviation }})
+                          </div>
+                          <div>
+                            {{ sampleAllocation.pkg.Label }}
+                          </div>
+                          <div v-if="sampleAllocation.flowerAllocationGrams > 0">
+                            {{ Number(sampleAllocation.flowerAllocationGrams.toFixed(3)) }}g flower
+                          </div>
+                          <div v-if="sampleAllocation.concentrateAllocationGrams > 0">
+                            {{ Number(sampleAllocation.concentrateAllocationGrams.toFixed(3)) }}g
+                            concentrate
+                          </div>
+                          <div v-if="sampleAllocation.infusedAllocationGrams > 0">
+                            {{
+                              Number((sampleAllocation.infusedAllocationGrams * 1000).toFixed(3))
+                            }}mg infused
+                          </div>
                         </div>
-                        <div>
-                          {{ sampleAllocation.pkg.Label }}
-                        </div>
-                        <div v-if="sampleAllocation.flowerAllocationGrams > 0">
-                          {{ Number(sampleAllocation.flowerAllocationGrams.toFixed(3)) }}g flower
-                        </div>
-                        <div v-if="sampleAllocation.concentrateAllocationGrams > 0">
-                          {{ Number(sampleAllocation.concentrateAllocationGrams.toFixed(3)) }}g
-                          concentrate
-                        </div>
-                        <div v-if="sampleAllocation.infusedAllocationGrams > 0">
-                          {{
-                            Number((sampleAllocation.infusedAllocationGrams * 1000).toFixed(3))
-                          }}mg infused
-                        </div>
-                      </div>
+                      </b-form-checkbox>
                     </div>
                   </div>
                 </b-card>
@@ -271,6 +275,7 @@ export default Vue.extend({
     ...mapGetters({
       selectedEmployees: `employeeSamples/${EmployeeSamplesGetters.SELECTED_EMPLOYEES}`,
       selectedSamplePackages: `employeeSamples/${EmployeeSamplesGetters.SELECTED_SAMPLE_PACKAGES}`,
+      selectedSampleAllocations: `employeeSamples/${EmployeeSamplesGetters.SELECTED_SAMPLE_ALLOCATIONS}`,
       dateGroupedAvailableSamplePackages: `employeeSamples/${EmployeeSamplesGetters.DATE_GROUPED_AVAILABLE_SAMPLE_PACKAGES}`,
     }),
     csvFiles(): ICsvFile[] {
@@ -309,6 +314,7 @@ export default Vue.extend({
       allocateSamples: `employeeSamples/${EmployeeSamplesActions.ALLOCATE_SAMPLES}`,
       toggleEmployee: `employeeSamples/${EmployeeSamplesActions.TOGGLE_EMPLOYEE}`,
       togglePackage: `employeeSamples/${EmployeeSamplesActions.TOGGLE_PACKAGE}`,
+      toggleSampleAllocation: `employeeSamples/${EmployeeSamplesActions.TOGGLE_SAMPLE_ALLOCATION}`,
     }),
     async submit() {
       const rows: IMetrcAdjustPackagePayload[] = [];
@@ -316,8 +322,7 @@ export default Vue.extend({
       const adjustmentReasons = await dynamicConstsManager.adjustPackageReasons();
       const unitsOfMeasure = await dynamicConstsManager.unitsOfMeasure();
 
-      for (let sampleAllocation of this.$store.state.employeeSamples
-        .pendingAllocationBuffer as ISampleAllocation[]) {
+      for (let sampleAllocation of this.selectedSampleAllocations) {
         const row = {
           AdjustmentDate: submitDateFromIsodate(todayIsodate()),
           AdjustmentQuantity: (-1 * sampleAllocation.adjustmentQuantity).toString(),
@@ -346,7 +351,7 @@ export default Vue.extend({
         rows,
         this.$data.builderType,
         {
-          sampleTotal: this.$store.state.employeeSamples.pendingAllocationBuffer.length,
+          sampleTotal: this.selectedSampleAllocations.length,
         },
         this.buildCsvFiles(),
         25
@@ -357,21 +362,17 @@ export default Vue.extend({
         const csvData = buildCsvDataOrError([
           {
             isVector: true,
-            data: (
-              this.$store.state.employeeSamples.pendingAllocationBuffer as ISampleAllocation[]
-            ).map((x) => x.pkg.Label),
+            data: (this.selectedSampleAllocations as ISampleAllocation[]).map((x) => x.pkg.Label),
           },
           {
             isVector: true,
-            data: (
-              this.$store.state.employeeSamples.pendingAllocationBuffer as ISampleAllocation[]
-            ).map((x) => -1 * x.adjustmentQuantity),
+            data: (this.selectedSampleAllocations as ISampleAllocation[]).map(
+              (x) => -1 * x.adjustmentQuantity
+            ),
           },
           {
             isVector: true,
-            data: (
-              this.$store.state.employeeSamples.pendingAllocationBuffer as ISampleAllocation[]
-            ).map(
+            data: (this.selectedSampleAllocations as ISampleAllocation[]).map(
               (x) =>
                 this.$data.unitsOfMeasure.find(
                   (y: IUnitOfMeasure) => y.Id === x.pkg.UnitOfMeasureId
@@ -386,9 +387,7 @@ export default Vue.extend({
           },
           {
             isVector: true,
-            data: (
-              this.$store.state.employeeSamples.pendingAllocationBuffer as ISampleAllocation[]
-            ).map(
+            data: (this.selectedSampleAllocations as ISampleAllocation[]).map(
               (x) =>
                 `${x.employee.FullName} ${x.employee.License.Number} ${x.adjustmentQuantity} ${x.pkg.UnitOfMeasureAbbreviation}`
             ),
@@ -399,15 +398,15 @@ export default Vue.extend({
           },
           {
             isVector: true,
-            data: (
-              this.$store.state.employeeSamples.pendingAllocationBuffer as ISampleAllocation[]
-            ).map((x) => x.employee.License.Number),
+            data: (this.selectedSampleAllocations as ISampleAllocation[]).map(
+              (x) => x.employee.License.Number
+            ),
           },
         ]);
 
         return buildNamedCsvFileData(
           csvData,
-          `Adjust ${this.$store.state.employeeSamples.pendingAllocationBuffer.length} samples`
+          `Adjust ${this.selectedSampleAllocations.length} samples`
         );
       } catch (e) {
         console.error(e);
@@ -422,16 +421,16 @@ export default Vue.extend({
       analyticsManager.track(MessageType.DOWNLOADED_CSVS, {
         builderType: this.$data.builderType,
         csvData: {
-          sampleTotal: this.$store.state.employeeSamples.pendingAllocationBuffer.length,
+          sampleTotal: this.selectedSampleAllocations.length,
         },
       });
     },
     async downloadTextSummary() {
-      let data = `Total samples: ${this.$store.state.employeeSamples.pendingAllocationBuffer.length}\n`;
+      let data = `Total samples: ${this.selectedSampleAllocations.length}\n`;
 
       const employeeSampleMap = new Map<number, ISampleAllocation[]>();
 
-      for (const sampleAllocation of this.$store.state.employeeSamples.pendingAllocationBuffer) {
+      for (const sampleAllocation of this.selectedSampleAllocations) {
         if (employeeSampleMap.has(sampleAllocation.employee.Id)) {
           employeeSampleMap.get(sampleAllocation.employee.Id)!.push(sampleAllocation);
         } else {

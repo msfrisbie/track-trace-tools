@@ -36,7 +36,7 @@ Please let me know next steps!"
         <div class="text-2xl ttt-purple">What you get with T3+:</div>
         <ul class="list-disc">
           <li>
-            <span class="font-semibold text-purple-700">Advanced snapshots</span>
+            <span class="font-semibold text-purple-700">Advanced reports</span>
             such as Outgoing Transfer Manifests, Straggler Inventory, Harvested Plants, and
             Quickviews
           </li>

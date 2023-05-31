@@ -175,7 +175,7 @@
         <template v-if="slide === 'googlesheets'">
           <div class="text-gray-700 flex flex-col justify-around gap-2">
             <div class="font-semibold ttt-purple">Google Sheets + Metrc</div>
-            <div>Securely generate reports and export data with T3 Snapshots</div>
+            <div>Securely generate reports and export data with T3 Reports</div>
           </div>
         </template>
         <template v-if="slide === 'searchsurvey'">

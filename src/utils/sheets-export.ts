@@ -1,5 +1,11 @@
 import { MessageType, SHEETS_API_MESSAGE_TIMEOUT_MS, SheetTitles } from "@/consts";
-import { IDestinationData, IDestinationPackageData, IIndexedTransferData, ISpreadsheet, IValueRange } from "@/interfaces";
+import {
+  IDestinationData,
+  IDestinationPackageData,
+  IIndexedTransferData,
+  ISpreadsheet,
+  IValueRange,
+} from "@/interfaces";
 import { messageBus } from "@/modules/message-bus.module";
 import store from "@/store/page-overlay/index";
 import { ReportsMutations, ReportType } from "@/store/page-overlay/modules/reports/consts";
@@ -318,7 +324,7 @@ export async function createReportSpreadsheeetOrError({
   } = await messageBus.sendMessageToBackground(
     MessageType.CREATE_SPREADSHEET,
     {
-      title: `${store.state.pluginAuth?.authState?.license} Metrc Snapshot - ${todayIsodate()}`,
+      title: `${store.state.pluginAuth?.authState?.license} Metrc Report - ${todayIsodate()}`,
       sheetTitles,
     },
     undefined,

@@ -54,7 +54,7 @@
           <p class="text-2xl ttt-purple">v0.28.0</p>
 
           <ul class="list-disc">
-            <li>Snapshot enhancements</li>
+            <li>Report enhancements</li>
             <li>Metrc Explorer beta launch</li>
           </ul>
 
@@ -79,13 +79,13 @@
           <p class="text-2xl ttt-purple">v0.24.0</p>
 
           <ul class="list-disc">
-            <li>Additional snapshots</li>
+            <li>Additional reports</li>
           </ul>
 
           <p class="text-2xl ttt-purple">v0.23.0</p>
 
           <ul class="list-disc">
-            <li>Enhancements for snapshots</li>
+            <li>Enhancements for reports</li>
           </ul>
 
           <p class="text-2xl ttt-purple">v0.22.1</p>

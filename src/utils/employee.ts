@@ -5,6 +5,7 @@ import {
   INormalizedAllocation,
   ISampleAllocation,
 } from "@/store/page-overlay/modules/employee-samples/interfaces";
+import { v4 as uuidv4 } from "uuid";
 
 const ADJUSTMENT_REGEX = new RegExp(`Package adjusted by -([0-9\.]+) ([a-zA-Z]+)`);
 const EMPLOYEE_REGEX = new RegExp(`Note: ([^0-9]+) ([0-9]+)`);
@@ -108,6 +109,7 @@ export async function getSampleAllocationFromAllocationDataOrNull(
   }
 
   return {
+    uuid: uuidv4(),
     pkg,
     employee,
     adjustmentQuantity: allocationData.quantity,
