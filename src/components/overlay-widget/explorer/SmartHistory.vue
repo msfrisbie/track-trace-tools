@@ -4,17 +4,22 @@
       class="border border-purple-100 border-solid"
       v-bind:class="[idx % 2 === 0 ? 'bg-purple-100' : '0']"
       v-for="(historyEntry, idx) of explorer.history"
-      v-bind:key="idx+historyEntry.RecordedDateTime"
+      v-bind:key="idx + historyEntry.RecordedDateTime"
     >
-      <div class="grid grid-cols-2 p-4 gap-4">
-        <template v-for="description of historyEntry.Descriptions">
-          <div v-bind:key="description">{{ description }}</div>
+      <div class="grid grid-cols-2 p-4">
+        <template v-for="(description, index) of historyEntry.Descriptions">
+          <div
+            v-bind:class="{ 'font-bold': index === 0, 'mb-4': index === 0 }"
+            v-bind:key="description"
+          >
+            {{ description }}
+          </div>
           <div v-bind:key="'_' + description">
             <smart-links :description="description"></smart-links>
           </div>
         </template>
 
-        <div class="col-span-2 text-gray-500 text-xs">
+        <div class="col-span-2 text-gray-500 text-xs mt-4">
           {{ new Date(historyEntry.RecordedDateTime) }}
         </div>
       </div>

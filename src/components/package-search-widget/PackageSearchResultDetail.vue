@@ -29,14 +29,29 @@
     </div>
 
     <div class="flex flex-col items-stretch space-y-2">
-      <b-button
-        class="w-full flex flex-row items-center justify-between space-x-4"
-        variant="outline-primary"
-        @click.stop.prevent="setPackageHistorySourcePackage({ pkg }) && openPackageHistoryBuilder()"
-      >
-        <span>PACKAGE HISTORY</span>
-        <font-awesome-icon icon="sitemap" />
-      </b-button>
+      <template v-if="t3plusEnabled">
+        <b-button
+          class="w-full flex flex-row items-center justify-between space-x-4"
+          variant="outline-primary"
+          @click.stop.prevent="
+            setPackageHistorySourcePackage({ pkg }) && openPackageHistoryBuilder()
+          "
+        >
+          <span>PACKAGE HISTORY</span>
+          <font-awesome-icon icon="sitemap" />
+        </b-button>
+
+        <b-button
+          class="w-full flex flex-row items-center justify-between space-x-4"
+          variant="outline-primary"
+          @click.stop.prevent="
+            setExplorerData({ packageLabel: getLabelOrError(pkg) }) && openMetrcExplorer()
+          "
+        >
+          <span>OPEN IN EXPLORER</span>
+          <font-awesome-icon icon="sitemap" />
+        </b-button>
+      </template>
 
       <template v-if="isIdentityEligibleForTransferToolsImpl">
         <template v-if="isPackageEligibleForTransfer">
@@ -152,11 +167,13 @@ import {
 } from "@/consts";
 import { IIndexedPackageData, ITransferPackageList } from "@/interfaces";
 import { analyticsManager } from "@/modules/analytics-manager.module";
+import { clientBuildManager } from "@/modules/client-build-manager.module";
 import { modalManager } from "@/modules/modal-manager.module";
 import { PACKAGE_TAB_REGEX } from "@/modules/page-manager/consts";
 import { searchManager } from "@/modules/search-manager.module";
 import { toastManager } from "@/modules/toast-manager.module";
 import store from "@/store/page-overlay/index";
+import { ExplorerActions } from "@/store/page-overlay/modules/explorer/consts";
 import { PackageHistoryActions } from "@/store/page-overlay/modules/package-history/consts";
 import { PackageSearchActions } from "@/store/page-overlay/modules/package-search/consts";
 import { SplitPackageBuilderActions } from "@/store/page-overlay/modules/split-package-builder/consts";
@@ -169,7 +186,7 @@ import {
   isIdentityEligibleForTransferTools,
 } from "@/utils/access-control";
 import { copyToClipboard, printPdfFromUrl } from "@/utils/dom";
-import { downloadLabTests, getLabTestUrlsFromPackage } from "@/utils/package";
+import { downloadLabTests, getLabelOrError, getLabTestUrlsFromPackage } from "@/utils/package";
 import { Subject } from "rxjs";
 import { takeUntil } from "rxjs/operators";
 import Vue from "vue";
@@ -234,9 +251,13 @@ export default Vue.extend({
     ...mapGetters({
       isPackageInActiveList: `transferBuilder/${TransferBuilderGetters.IS_PACKAGE_IN_ACTIVE_LIST}`,
     }),
+    t3plusEnabled() {
+      return clientBuildManager.assertValues(["ENABLE_T3PLUS"]);
+    },
   },
   watch: {},
   methods: {
+    getLabelOrError,
     ...mapActions({
       addPackageToTransferList: `transferBuilder/${TransferBuilderActions.ADD_PACKAGE}`,
       removePackageFromTransferList: `transferBuilder/${TransferBuilderActions.REMOVE_PACKAGE}`,
@@ -245,11 +266,22 @@ export default Vue.extend({
       partialUpdatePackageSearchFilters: `packageSearch/${PackageSearchActions.PARTIAL_UPDATE_PACKAGE_SEARCH_FILTERS}`,
       setPackageSearchFilters: `packageSearch/${PackageSearchActions.SET_PACKAGE_SEARCH_FILTERS}`,
       setPackageHistorySourcePackage: `packageHistory/${PackageHistoryActions.SET_SOURCE_PACKAGE}`,
+      setExplorerData: `explorer/${ExplorerActions.SET_EXPLORER_DATA}`,
     }),
     openPackageHistoryBuilder() {
-      analyticsManager.track(MessageType.OPENED_PACKAGE_HISTORY_FROM_TOOLKIT_SEARCH, {});
+      analyticsManager.track(MessageType.OPENED_PACKAGE_HISTORY, {
+        source: "CONTEXT_MENU",
+      });
       modalManager.dispatchModalEvent(ModalType.BUILDER, ModalAction.OPEN, {
         initialRoute: "/package/history",
+      });
+    },
+    openMetrcExplorer() {
+      analyticsManager.track(MessageType.OPENED_METRC_EXPLORER, {
+        source: "CONTEXT_MENU",
+      });
+      modalManager.dispatchModalEvent(ModalType.BUILDER, ModalAction.OPEN, {
+        initialRoute: "/metrc-explorer",
       });
     },
     openNewTransferBuilder() {

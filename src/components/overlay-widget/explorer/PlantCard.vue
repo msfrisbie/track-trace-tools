@@ -3,12 +3,10 @@
     <div class="flex flex-col items-stretch gap-1 p-2 ttt-purple-bg text-white">
       <div class="flex flex-row items-center justify-between gap-2">
         <span>
-          <div>{{ outgoingTransfer.LicenseNumber }}</div>
+          <div>{{ plant.LicenseNumber }}</div>
         </span>
 
-        <b-badge :variant="getBadgeVariant(outgoingTransfer.TransferState)">{{
-          outgoingTransfer.TransferState
-        }}</b-badge>
+        <b-badge :variant="getBadgeVariant(plant.PlantState)">{{ plant.PlantState }}</b-badge>
       </div>
     </div>
 
@@ -16,13 +14,9 @@
     <div
       class="p-2 flex flex-row items-center justify-start space-x-4 text-sm whitespace-nowrap overflow-x-auto"
     >
-      <picker-icon icon="truck" style="width: 5rem" class="flex-shrink-0" text="" link="" />
+      <picker-icon icon="box" style="width: 5rem" class="flex-shrink-0" text="" />
 
-      <picker-card
-        class="flex-grow"
-        :title="`Manifest # ${outgoingTransfer.ManifestNumber}`"
-        :label="`${outgoingTransfer.PackageCount} packages`"
-      />
+      <picker-card class="flex-grow" :title="`${plant.Label}`" :label="plant.StrainName" />
     </div>
   </div>
 </template>
@@ -30,8 +24,8 @@
 <script lang="ts">
 import PickerCard from "@/components/overlay-widget/shared/PickerCard.vue";
 import PickerIcon from "@/components/overlay-widget/shared/PickerIcon.vue";
-import { TransferState } from "@/consts";
-import { IIndexedTransferData } from "@/interfaces";
+import { PlantState } from "@/consts";
+import { IIndexedPlantBatchData, IIndexedPlantData } from "@/interfaces";
 import router from "@/router/index";
 import store from "@/store/page-overlay/index";
 import { unitOfMeasureNameToAbbreviation } from "@/utils/units";
@@ -39,11 +33,11 @@ import Vue from "vue";
 import { mapState } from "vuex";
 
 export default Vue.extend({
-  name: "OutgoingTransferCard",
+  name: "PlantCard",
   store,
   router,
   props: {
-    outgoingTransfer: Object as () => IIndexedTransferData,
+    plant: Object as () => IIndexedPlantData,
   },
   components: {
     PickerCard,
@@ -57,14 +51,14 @@ export default Vue.extend({
   },
   methods: {
     unitOfMeasureNameToAbbreviation,
-    getBadgeVariant(outgoingTransferState: TransferState): string {
-      switch (outgoingTransferState) {
-        case TransferState.OUTGOING:
+    getBadgeVariant(plantState: PlantState): string {
+      switch (plantState) {
+        case PlantState.FLOWERING:
           return "success";
-        case TransferState.REJECTED:
+        case PlantState.VEGETATIVE:
+          return "info";
+        case PlantState.INACTIVE:
           return "danger";
-        case TransferState.OUTGOING_INACTIVE:
-          return "light";
         default:
           return "light";
       }

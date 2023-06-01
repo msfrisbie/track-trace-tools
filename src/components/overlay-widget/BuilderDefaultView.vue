@@ -131,6 +131,16 @@ export default Vue.extend({
     options() {
       return [
         {
+          backgroundColor: "gray",
+          text: "T3+",
+          icon: "plus",
+          visible: !this.$data.enableT3Plus,
+          enabled: true,
+          isBeta: false,
+          isNew: false,
+          url: "https://www.trackandtrace.tools/plus",
+        },
+        {
           backgroundColor: "#2774ae",
           text: "PACKAGE TOOLS",
           route: "/package",
@@ -179,7 +189,7 @@ export default Vue.extend({
           icon: "sitemap",
           visible: this.$data.enableT3Plus,
           enabled: true,
-          isBeta: true,
+          isBeta: false,
           isNew: false,
         },
         {

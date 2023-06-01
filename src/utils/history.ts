@@ -49,6 +49,25 @@ export function extractPlantBatchNameOrNull(description: string): string | null 
   return null;
 }
 
+export function extractPlantLabelOrNull(description: string): string | null {
+  const matchers = [
+    new RegExp(`Plant "(${METRC_TAG_REGEX_PATTERN})"`),
+    new RegExp(`Plant: ${PLANT_BATCH_NAME_REGEX_PATTERN} > (${METRC_TAG_REGEX_PATTERN})`),
+    new RegExp(`Plant: "${PLANT_BATCH_NAME_REGEX_PATTERN}" > (${METRC_TAG_REGEX_PATTERN})`),
+    new RegExp(`from Plant (${METRC_TAG_REGEX_PATTERN})`),
+    new RegExp(`Plant (${METRC_TAG_REGEX_PATTERN})`),
+  ];
+  for (const matcher of matchers) {
+    const match = description.match(matcher);
+
+    if (match) {
+      return match[1];
+    }
+  }
+
+  return null;
+}
+
 export function extractPackageLabelOrNull(description: string): string | null {
   const matchers = [
     new RegExp(`Plant Batch Package "(${METRC_TAG_REGEX_PATTERN})"`),
@@ -86,6 +105,19 @@ export function extractOutgoingTransferManifestNumberOrNull(description: string)
   return null;
 }
 
+export function extractHarvestNameOrNull(description: string): string | null {
+  const matchers: RegExp[] = [new RegExp(`Harvest "([^"]+)"`)];
+  for (const matcher of matchers) {
+    const match = description.match(matcher);
+
+    if (match) {
+      return match[1];
+    }
+  }
+
+  return null;
+}
+
 export function extractTagQuantityPairOrNull(description: string): [string, number] | null {
   const pairMatcher = new RegExp(`Used ([\\d,\\.]+) .* for Package (${METRC_TAG_REGEX_PATTERN})`);
 
@@ -96,7 +128,7 @@ export function extractTagQuantityPairOrNull(description: string): [string, numb
         match[2] as string,
         // @ts-ignore
         parseFloat(match[1].replaceAll(",", "")),
-    ]
+      ]
     : null;
 }
 
@@ -152,7 +184,9 @@ export function extractTestSamplePackageLabelsFromHistory(
   return testSamplePackageLabels;
 }
 
-export function extractTagQuantityPairsFromHistory(historyList: IPackageHistoryData[]): [string, number][] {
+export function extractTagQuantityPairsFromHistory(
+  historyList: IPackageHistoryData[]
+): [string, number][] {
   const pairs: [string, number][] = [];
 
   for (const history of historyList) {

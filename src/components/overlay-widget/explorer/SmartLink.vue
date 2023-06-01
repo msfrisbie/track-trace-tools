@@ -41,10 +41,14 @@ export default Vue.extend({
     icon(): string {
       switch (this.targetType) {
         case ExplorerTargetType.PLANT_BATCH:
+          return "seedling";
+        case ExplorerTargetType.PLANT:
           return "leaf";
         case ExplorerTargetType.PACKAGE:
           return "box";
-        case ExplorerTargetType.INCOMING_TRANSFER:
+        case ExplorerTargetType.HARVEST:
+          return "cut";
+        // case ExplorerTargetType.INCOMING_TRANSFER:
         case ExplorerTargetType.OUTGOING_TRANSFER:
           return "truck";
         default:

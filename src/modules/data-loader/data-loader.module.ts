@@ -40,6 +40,8 @@ import {
   IPlantBatchHistoryData,
   IPlantBatchOptions,
   IPlantData,
+  IPlantFilter,
+  IPlantHistoryData,
   IPlantOptions,
   ISalesReceiptData,
   IStrainData,
@@ -546,6 +548,35 @@ export class DataLoader implements IAtomicService {
     });
   }
 
+  async vegetativePlant(label: string, ttlMs: number = 0): Promise<IIndexedPlantData> {
+    // const match = (await this.vegetativePlants()).find((plant) => plant.Label === label);
+
+    // if (match) {
+    //   return match;
+    // }
+
+    return new Promise(async (resolve, reject) => {
+      const subscription = timer(DATA_LOAD_FETCH_TIMEOUT_MS).subscribe(() =>
+        reject("Vegetative plant fetch timed out")
+      );
+
+      try {
+        const plantData: IIndexedPlantData = {
+          ...(await this.loadVegetativePlant(label)),
+          PlantState: PlantState.VEGETATIVE,
+          TagMatcher: "",
+          LicenseNumber: this._authState!.license,
+        };
+
+        subscription.unsubscribe();
+        resolve(plantData);
+      } catch (e) {
+        subscription.unsubscribe();
+        reject(e);
+      }
+    });
+  }
+
   async floweringPlants(options: IPlantOptions = {}): Promise<IIndexedPlantData[]> {
     if (store.state.mockDataMode && store.state.flags?.mockedFlags.mockPlants.enabled) {
       // @ts-ignore
@@ -568,6 +599,35 @@ export class DataLoader implements IAtomicService {
 
         subscription.unsubscribe();
         resolve(plants);
+      } catch (e) {
+        subscription.unsubscribe();
+        reject(e);
+      }
+    });
+  }
+
+  async floweringPlant(label: string, ttlMs: number = 0): Promise<IIndexedPlantData> {
+    // const match = (await this.floweringPlants()).find((plant) => plant.Label === label);
+
+    // if (match) {
+    //   return match;
+    // }
+
+    return new Promise(async (resolve, reject) => {
+      const subscription = timer(DATA_LOAD_FETCH_TIMEOUT_MS).subscribe(() =>
+        reject("Flowering plant fetch timed out")
+      );
+
+      try {
+        const plantData: IIndexedPlantData = {
+          ...(await this.loadFloweringPlant(label)),
+          PlantState: PlantState.FLOWERING,
+          TagMatcher: "",
+          LicenseNumber: this._authState!.license,
+        };
+
+        subscription.unsubscribe();
+        resolve(plantData);
       } catch (e) {
         subscription.unsubscribe();
         reject(e);
@@ -599,6 +659,35 @@ export class DataLoader implements IAtomicService {
 
         subscription.unsubscribe();
         resolve(plants);
+      } catch (e) {
+        subscription.unsubscribe();
+        reject(e);
+      }
+    });
+  }
+
+  async inactivePlant(label: string, ttlMs: number = 0): Promise<IIndexedPlantData> {
+    // const match = (await this.floweringPlants()).find((plant) => plant.Label === label);
+
+    // if (match) {
+    //   return match;
+    // }
+
+    return new Promise(async (resolve, reject) => {
+      const subscription = timer(DATA_LOAD_FETCH_TIMEOUT_MS).subscribe(() =>
+        reject("Inactive plant fetch timed out")
+      );
+
+      try {
+        const plantData: IIndexedPlantData = {
+          ...(await this.loadInactivePlant(label)),
+          PlantState: PlantState.INACTIVE,
+          TagMatcher: "",
+          LicenseNumber: this._authState!.license,
+        };
+
+        subscription.unsubscribe();
+        resolve(plantData);
       } catch (e) {
         subscription.unsubscribe();
         reject(e);
@@ -3070,6 +3159,42 @@ export class DataLoader implements IAtomicService {
     return strains;
   }
 
+  private async loadVegetativePlant(label: string): Promise<IPlantData> {
+    if (store.state.mockDataMode) {
+    }
+
+    await authManager.authStateOrError();
+
+    const page = 0;
+
+    const plantFilter: IPlantFilter = {
+      label,
+    };
+
+    const body = buildBody({ page, pageSize: 1 }, { plantFilter });
+
+    const response = await this.metrcRequestManagerOrError.getVegetativePlants(body);
+
+    if (response.status !== 200) {
+      throw new Error("Request failed");
+    }
+
+    const responseData: ICollectionResponse<IPlantData> = await response.json();
+
+    if (responseData.Data.length !== 1) {
+      if (responseData.Data.length === 0) {
+        throw new DataLoadError(
+          DataLoadErrorType.ZERO_RESULTS,
+          `Metrc indicated ${label} is not available`
+        );
+      } else {
+        throw new Error("Returned multiple plants");
+      }
+    }
+
+    return responseData.Data[0];
+  }
+
   private async loadVegetativePlants(options: IPlantOptions): Promise<IPlantData[]> {
     await authManager.authStateOrError();
 
@@ -3088,6 +3213,42 @@ export class DataLoader implements IAtomicService {
     return plants;
   }
 
+  private async loadFloweringPlant(label: string): Promise<IPlantData> {
+    if (store.state.mockDataMode) {
+    }
+
+    await authManager.authStateOrError();
+
+    const page = 0;
+
+    const plantFilter: IPlantFilter = {
+      label,
+    };
+
+    const body = buildBody({ page, pageSize: 1 }, { plantFilter });
+
+    const response = await this.metrcRequestManagerOrError.getFloweringPlants(body);
+
+    if (response.status !== 200) {
+      throw new Error("Request failed");
+    }
+
+    const responseData: ICollectionResponse<IPlantData> = await response.json();
+
+    if (responseData.Data.length !== 1) {
+      if (responseData.Data.length === 0) {
+        throw new DataLoadError(
+          DataLoadErrorType.ZERO_RESULTS,
+          `Metrc indicated ${label} is not available`
+        );
+      } else {
+        throw new Error("Returned multiple plants");
+      }
+    }
+
+    return responseData.Data[0];
+  }
+
   private async loadFloweringPlants(options: IPlantOptions): Promise<IPlantData[]> {
     await authManager.authStateOrError();
 
@@ -3104,6 +3265,42 @@ export class DataLoader implements IAtomicService {
     store.commit(MutationType.SET_LOADING_MESSAGE, null);
 
     return plants;
+  }
+
+  private async loadInactivePlant(label: string): Promise<IPlantData> {
+    if (store.state.mockDataMode) {
+    }
+
+    await authManager.authStateOrError();
+
+    const page = 0;
+
+    const plantFilter: IPlantFilter = {
+      label,
+    };
+
+    const body = buildBody({ page, pageSize: 1 }, { plantFilter });
+
+    const response = await this.metrcRequestManagerOrError.getInactivePlants(body);
+
+    if (response.status !== 200) {
+      throw new Error("Request failed");
+    }
+
+    const responseData: ICollectionResponse<IPlantData> = await response.json();
+
+    if (responseData.Data.length !== 1) {
+      if (responseData.Data.length === 0) {
+        throw new DataLoadError(
+          DataLoadErrorType.ZERO_RESULTS,
+          `Metrc indicated ${label} is not available`
+        );
+      } else {
+        throw new Error("Returned multiple plants");
+      }
+    }
+
+    return responseData.Data[0];
   }
 
   private async loadInactivePlants(options: IPlantOptions): Promise<IPlantData[]> {
@@ -3399,6 +3596,21 @@ export class DataLoader implements IAtomicService {
     return responseData.Data;
   }
 
+  async plantHistoryByPlantId(plantId: number): Promise<IPlantHistoryData[]> {
+    const page = 0;
+    const body = buildBody({ page, pageSize: DATA_LOAD_PAGE_SIZE });
+
+    const response = await this.metrcRequestManagerOrError.getPlantHistory(body, plantId);
+
+    if (response.status !== 200) {
+      throw new Error("Request failed");
+    }
+
+    const responseData: ICollectionResponse<IPlantHistoryData> = await response.json();
+
+    return responseData.Data;
+  }
+
   async plantBatchHistoryByPlantBatchId(plantBatchId: number): Promise<IPlantBatchHistoryData[]> {
     const page = 0;
     const body = buildBody({ page, pageSize: DATA_LOAD_PAGE_SIZE });
@@ -3431,6 +3643,21 @@ export class DataLoader implements IAtomicService {
     }
 
     const responseData: ICollectionResponse<ITransferHistoryData> = await response.json();
+
+    return responseData.Data;
+  }
+
+  async harvestHistoryByHarvestId(harvestId: number): Promise<IHarvestHistoryData[]> {
+    const page = 0;
+    const body = buildBody({ page, pageSize: DATA_LOAD_PAGE_SIZE });
+
+    const response = await this.metrcRequestManagerOrError.getHarvestHistory(body, harvestId);
+
+    if (response.status !== 200) {
+      throw new Error("Request failed");
+    }
+
+    const responseData: ICollectionResponse<IHarvestHistoryData> = await response.json();
 
     return responseData.Data;
   }

@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-col items-stretch gap-2">
+  <div class="flex flex-col items-stretch gap-2 pt-16">
     <span v-if="explorer.recent.length > 0">Recent queries:</span>
     <smart-link
       v-for="(smartLink, idx) of explorer.recent"

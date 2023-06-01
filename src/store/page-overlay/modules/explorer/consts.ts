@@ -14,6 +14,7 @@ export enum ExplorerActions {
   SUBMIT_QUERY = "SUBMIT_QUERY",
   SET_QUERY = "SET_QUERY",
   SET_TARGET_TYPE = "SET_TARGET_TYPE",
+  SET_EXPLORER_DATA = "SET_EXPLORER_DATA",
 }
 
 export enum ExplorerStatus {

@@ -77,21 +77,39 @@
             </b-button>
           </template>
 
-          <b-button
-            variant="outline-primary"
-            class=""
-            @click.stop.prevent="
-              setPackageHistorySourcePackage({ pkg }) && openPackageHistoryBuilder()
-            "
-            ><div
-              class="grid grid-cols-2 place-items-center"
-              style="grid-template-columns: auto 1fr auto"
-            >
-              <span>PACKAGE HISTORY</span>
-              <div></div>
-              <div class=""><font-awesome-icon icon="sitemap" /></div>
-            </div>
-          </b-button>
+          <template v-if="t3plusEnabled">
+            <b-button
+              variant="outline-primary"
+              class=""
+              @click.stop.prevent="
+                setPackageHistorySourcePackage({ pkg }) && openPackageHistoryBuilder()
+              "
+              ><div
+                class="grid grid-cols-2 place-items-center"
+                style="grid-template-columns: auto 1fr auto"
+              >
+                <span>PACKAGE HISTORY</span>
+                <div></div>
+                <div class=""><font-awesome-icon icon="sitemap" /></div>
+              </div>
+            </b-button>
+
+            <b-button
+              variant="outline-primary"
+              class=""
+              @click.stop.prevent="
+                setExplorerData({ packageLabel: getLabelOrError(pkg) }) && openMetrcExplorer()
+              "
+              ><div
+                class="grid grid-cols-2 place-items-center"
+                style="grid-template-columns: auto 1fr auto"
+              >
+                <span>OPEN IN EXPLORER</span>
+                <div></div>
+                <div class=""><font-awesome-icon icon="sitemap" /></div>
+              </div>
+            </b-button>
+          </template>
 
           <template v-if="isIdentityEligibleForSplitToolsImpl && isPackageEligibleForSplit">
             <b-button variant="outline-primary" class="" @click.stop.prevent="splitPackage()"
@@ -311,6 +329,7 @@ import { IContextMenuEvent, modalManager } from "@/modules/modal-manager.module"
 import { searchManager } from "@/modules/search-manager.module";
 import router from "@/router/index";
 import store from "@/store/page-overlay/index";
+import { ExplorerActions } from "@/store/page-overlay/modules/explorer/consts";
 import { PackageHistoryActions } from "@/store/page-overlay/modules/package-history/consts";
 import { PackageSearchActions } from "@/store/page-overlay/modules/package-search/consts";
 import { PluginAuthActions } from "@/store/page-overlay/modules/plugin-auth/consts";
@@ -322,7 +341,7 @@ import {
   isIdentityEligibleForTransferTools,
 } from "@/utils/access-control";
 import { downloadFileFromUrl, printPdfFromUrl } from "@/utils/dom";
-import { downloadLabTests, getLabTestUrlsFromPackage } from "@/utils/package";
+import { downloadLabTests, getLabelOrError, getLabTestUrlsFromPackage } from "@/utils/package";
 import { createScanSheet } from "@/utils/transfer";
 import Vue from "vue";
 import { mapActions, mapState } from "vuex";
@@ -387,6 +406,7 @@ export default Vue.extend({
     };
   },
   methods: {
+    getLabelOrError,
     ...mapActions({
       addPackageToTransferList: `transferBuilder/${TransferBuilderActions.ADD_PACKAGE}`,
       removePackageFromTransferList: `transferBuilder/${TransferBuilderActions.REMOVE_PACKAGE}`,
@@ -394,13 +414,24 @@ export default Vue.extend({
       partialUpdatePackageSearchFilters: `packageSearch/${PackageSearchActions.PARTIAL_UPDATE_PACKAGE_SEARCH_FILTERS}`,
       setSearchType: `search/${SearchActions.SET_SEARCH_TYPE}`,
       setPackageHistorySourcePackage: `packageHistory/${PackageHistoryActions.SET_SOURCE_PACKAGE}`,
+      setExplorerData: `explorer/${ExplorerActions.SET_EXPLORER_DATA}`,
       refreshOAuthState: `pluginAuth/${PluginAuthActions.REFRESH_OAUTH_STATE}`,
       setTransferForUpdate: `transferBuilder/${TransferBuilderActions.SET_TRANSFER_FOR_UPDATE}`,
     }),
     openPackageHistoryBuilder() {
-      analyticsManager.track(MessageType.OPENED_PACKAGE_HISTORY_FROM_TOOLKIT_SEARCH, {});
+      analyticsManager.track(MessageType.OPENED_PACKAGE_HISTORY, {
+        source: "CONTEXT_MENU",
+      });
       modalManager.dispatchModalEvent(ModalType.BUILDER, ModalAction.OPEN, {
         initialRoute: "/package/history",
+      });
+    },
+    openMetrcExplorer() {
+      analyticsManager.track(MessageType.OPENED_METRC_EXPLORER, {
+        source: "CONTEXT_MENU",
+      });
+      modalManager.dispatchModalEvent(ModalType.BUILDER, ModalAction.OPEN, {
+        initialRoute: "/metrc-explorer",
       });
     },
     dismiss() {

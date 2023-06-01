@@ -1,10 +1,14 @@
 import { MessageType } from "@/consts";
 import {
+  IHarvestHistoryData,
+  IIndexedHarvestData,
   IIndexedPackageData,
   IIndexedPlantBatchData,
+  IIndexedPlantData,
   IIndexedTransferData,
   IPackageHistoryData,
   IPlantBatchHistoryData,
+  IPlantHistoryData,
   IPluginState,
   ITransferHistoryData,
 } from "@/interfaces";
@@ -129,6 +133,18 @@ export const explorerModule = {
         target: null,
       });
     },
+    [ExplorerActions.SET_EXPLORER_DATA]: async (
+      ctx: ActionContext<IExplorerState, IPluginState>,
+      { packageLabel }: { packageLabel?: string }
+    ) => {
+      if (packageLabel) {
+        ctx.dispatch(ExplorerActions.SUBMIT_QUERY, {
+          queryString: packageLabel,
+          targetType: ExplorerTargetType.PACKAGE,
+        });
+        return;
+      }
+    },
     [ExplorerActions.SET_QUERY]: async (
       ctx: ActionContext<IExplorerState, IPluginState>,
       { queryString }: { queryString: string }
@@ -186,6 +202,7 @@ export const explorerModule = {
         let dataLoader: DataLoader | null = null;
 
         switch (ctx.state.targetType) {
+          // PACKAGE
           case ExplorerTargetType.PACKAGE:
             let pkg: IIndexedPackageData | null = null;
 
@@ -204,7 +221,9 @@ export const explorerModule = {
                   dataLoader.inactivePackage(ctx.state.queryString!),
                   dataLoader.inTransitPackage(ctx.state.queryString!, { useCache: false }),
                 ]);
-              } catch {}
+              } catch (e) {
+                console.error(e);
+              }
               if (pkg) {
                 break;
               }
@@ -241,7 +260,9 @@ export const explorerModule = {
 
               try {
                 pkgHistory = await dataLoader.packageHistoryByPackageId(pkg.Id);
-              } catch {}
+              } catch (e) {
+                console.error(e);
+              }
 
               // A license mismatch will return 200 w/ 0 entries
               if (pkgHistory && pkgHistory.length > 0) {
@@ -274,6 +295,195 @@ export const explorerModule = {
             });
 
             break;
+
+          // HARVEST
+          case ExplorerTargetType.HARVEST:
+            let harvest: IIndexedHarvestData | null = null;
+
+            for (const license of licenseCache.elements) {
+              const authState = {
+                ...(await authManager.authStateOrError()),
+                license,
+              };
+
+              dataLoader = await getDataLoader(authState);
+
+              try {
+                // @ts-ignore
+                harvest = await Promise.any([
+                  dataLoader.activeHarvestByName(ctx.state.queryString!),
+                  dataLoader.inactiveHarvestByName(ctx.state.queryString!),
+                ]);
+              } catch (e) {
+                console.error(e);
+              }
+              if (harvest) {
+                break;
+              }
+            }
+
+            if (!harvest) {
+              ctx.commit(ExplorerMutations.SET_STATUS, {
+                status: ExplorerStatus.ERROR,
+                statusMessage: "Unable to match harvest",
+              });
+
+              analyticsManager.track(MessageType.EXPLORER_ERROR, {
+                queryString,
+                targetType,
+                statusMessage: ctx.state.statusMessage,
+              });
+
+              return;
+            }
+
+            ctx.commit(ExplorerMutations.SET_TARGET, {
+              target: harvest,
+            });
+
+            let harvestHistory: IHarvestHistoryData[] | null = null;
+
+            for (const license of licenseCache.elements) {
+              const authState = {
+                ...(await authManager.authStateOrError()),
+                license,
+              };
+
+              dataLoader = await getDataLoader(authState);
+
+              try {
+                harvestHistory = await dataLoader.harvestHistoryByHarvestId(harvest.Id);
+              } catch (e) {
+                console.error(e);
+              }
+
+              // A license mismatch will return 200 w/ 0 entries
+              if (harvestHistory && harvestHistory.length > 0) {
+                break;
+              }
+            }
+
+            if (!harvestHistory) {
+              ctx.commit(ExplorerMutations.SET_STATUS, {
+                status: ExplorerStatus.ERROR,
+                statusMessage: "Unable to match harvest history",
+              });
+
+              analyticsManager.track(MessageType.EXPLORER_ERROR, {
+                queryString,
+                targetType,
+                statusMessage: ctx.state.statusMessage,
+              });
+
+              return;
+            }
+
+            ctx.commit(ExplorerMutations.SET_HISTORY, {
+              targetHistory: harvestHistory,
+            });
+
+            ctx.commit(ExplorerMutations.SET_STATUS, {
+              status: ExplorerStatus.SUCCESS,
+              statusMessage: "",
+            });
+
+            break;
+
+          // PLANT
+          case ExplorerTargetType.PLANT:
+            let plant: IIndexedPlantData | null = null;
+
+            for (const license of licenseCache.elements) {
+              const authState = {
+                ...(await authManager.authStateOrError()),
+                license,
+              };
+
+              dataLoader = await getDataLoader(authState);
+
+              try {
+                // @ts-ignore
+                plant = await Promise.any([
+                  dataLoader.floweringPlant(ctx.state.queryString!),
+                  dataLoader.vegetativePlant(ctx.state.queryString!),
+                  dataLoader.inactivePlant(ctx.state.queryString!),
+                ]);
+              } catch (e) {
+                console.error(e);
+              }
+              if (plant) {
+                break;
+              }
+            }
+
+            if (!plant) {
+              ctx.commit(ExplorerMutations.SET_STATUS, {
+                status: ExplorerStatus.ERROR,
+                statusMessage: "Unable to match plant",
+              });
+
+              analyticsManager.track(MessageType.EXPLORER_ERROR, {
+                queryString,
+                targetType,
+                statusMessage: ctx.state.statusMessage,
+              });
+
+              return;
+            }
+
+            ctx.commit(ExplorerMutations.SET_TARGET, {
+              target: plant,
+            });
+
+            let plantHistory: IPlantHistoryData[] | null = null;
+
+            for (const license of licenseCache.elements) {
+              const authState = {
+                ...(await authManager.authStateOrError()),
+                license,
+              };
+
+              dataLoader = await getDataLoader(authState);
+
+              try {
+                plantHistory = await dataLoader.plantHistoryByPlantId(plant.Id);
+              } catch (e) {
+                console.error(e);
+              }
+
+              // A license mismatch will return 200 w/ 0 entries
+              if (plantHistory && plantHistory.length > 0) {
+                break;
+              }
+            }
+
+            if (!plantHistory) {
+              ctx.commit(ExplorerMutations.SET_STATUS, {
+                status: ExplorerStatus.ERROR,
+                statusMessage: "Unable to match plant history",
+              });
+
+              analyticsManager.track(MessageType.EXPLORER_ERROR, {
+                queryString,
+                targetType,
+                statusMessage: ctx.state.statusMessage,
+              });
+
+              return;
+            }
+
+            ctx.commit(ExplorerMutations.SET_HISTORY, {
+              targetHistory: plantHistory,
+            });
+
+            ctx.commit(ExplorerMutations.SET_STATUS, {
+              status: ExplorerStatus.SUCCESS,
+              statusMessage: "",
+            });
+
+            break;
+
+          // PLANT BATCH
           case ExplorerTargetType.PLANT_BATCH:
             let plantBatch: IIndexedPlantBatchData | null = null;
 
@@ -291,7 +501,9 @@ export const explorerModule = {
                   dataLoader.plantBatch(ctx.state.queryString!),
                   dataLoader.inactivePlantBatch(ctx.state.queryString!),
                 ]);
-              } catch {}
+              } catch (e) {
+                console.error(e);
+              }
               if (plantBatch) {
                 break;
               }
@@ -328,7 +540,9 @@ export const explorerModule = {
 
               try {
                 plantBatchHistory = await dataLoader.plantBatchHistoryByPlantBatchId(plantBatch.Id);
-              } catch {}
+              } catch (e) {
+                console.error(e);
+              }
 
               // A license mismatch will return 200 w/ 0 entries
               if (plantBatchHistory && plantBatchHistory.length > 0) {
@@ -362,6 +576,102 @@ export const explorerModule = {
 
             break;
 
+          // INCOMING TRANSFER
+          // case ExplorerTargetType.INCOMING_TRANSFER:
+          //   let incomingTransfer: IIndexedTransferData | null = null;
+
+          //   for (const license of licenseCache.elements) {
+          //     const authState = {
+          //       ...(await authManager.authStateOrError()),
+          //       license,
+          //     };
+
+          //     dataLoader = await getDataLoader(authState);
+
+          //     try {
+          //       // @ts-ignore
+          //       incomingTransfer = await Promise.any([
+          //         dataLoader.incomingTransfer(ctx.state.queryString!),
+          //         dataLoader.incomingInactiveTransfer(ctx.state.queryString!),
+          //       ]);
+          //     } catch (e) {
+          //       console.error(e);
+          //     }
+          //     if (incomingTransfer) {
+          //       break;
+          //     }
+          //   }
+
+          //   if (!incomingTransfer) {
+          //     ctx.commit(ExplorerMutations.SET_STATUS, {
+          //       status: ExplorerStatus.ERROR,
+          //       statusMessage: "Unable to match incoming transfer",
+          //     });
+
+          //     analyticsManager.track(MessageType.EXPLORER_ERROR, {
+          //       queryString,
+          //       targetType,
+          //       statusMessage: ctx.state.statusMessage,
+          //     });
+
+          //     return;
+          //   }
+
+          //   ctx.commit(ExplorerMutations.SET_TARGET, {
+          //     target: incomingTransfer,
+          //   });
+
+          //   let incomingTransferHistory: ITransferHistoryData[] | null = null;
+
+          //   for (const license of licenseCache.elements) {
+          //     const authState = {
+          //       ...(await authManager.authStateOrError()),
+          //       license,
+          //     };
+
+          //     dataLoader = await getDataLoader(authState);
+
+          //     try {
+          //       incomingTransferHistory = await dataLoader.transferHistoryByOutGoingTransferId(
+          //         incomingTransfer.DeliveryId
+          //       );
+          //     } catch (e) {
+          //       console.error(e);
+          //     }
+
+          //     // A license mismatch will return 200 w/ 0 entries
+          //     if (incomingTransferHistory && incomingTransferHistory.length > 0) {
+          //       break;
+          //     }
+          //   }
+
+          //   if (!incomingTransferHistory) {
+          //     ctx.commit(ExplorerMutations.SET_STATUS, {
+          //       status: ExplorerStatus.ERROR,
+          //       statusMessage: "Unable to match incoming transfer history",
+          //     });
+
+          //     analyticsManager.track(MessageType.EXPLORER_ERROR, {
+          //       queryString,
+          //       targetType,
+          //       statusMessage: ctx.state.statusMessage,
+          //     });
+
+          //     return;
+          //   }
+
+          //   ctx.commit(ExplorerMutations.SET_HISTORY, {
+          //     targetHistory: incomingTransferHistory,
+          //   });
+
+          //   ctx.commit(ExplorerMutations.SET_STATUS, {
+          //     status: ExplorerStatus.SUCCESS,
+          //     statusMessage: "",
+          //   });
+
+          //   break;
+
+          // OUTGOING TRANSFER
           case ExplorerTargetType.OUTGOING_TRANSFER:
             let outgoingTransfer: IIndexedTransferData | null = null;
 
@@ -380,7 +690,9 @@ export const explorerModule = {
                   dataLoader.rejectedTransfer(ctx.state.queryString!),
                   dataLoader.outgoingInactiveTransfer(ctx.state.queryString!),
                 ]);
-              } catch {}
+              } catch (e) {
+                console.error(e);
+              }
               if (outgoingTransfer) {
                 break;
               }
@@ -419,7 +731,9 @@ export const explorerModule = {
                 outgoingTransferHistory = await dataLoader.transferHistoryByOutGoingTransferId(
                   outgoingTransfer.Id
                 );
-              } catch {}
+              } catch (e) {
+                console.error(e);
+              }
 
               // A license mismatch will return 200 w/ 0 entries
               if (outgoingTransferHistory && outgoingTransferHistory.length > 0) {

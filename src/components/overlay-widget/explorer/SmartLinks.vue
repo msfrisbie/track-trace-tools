@@ -15,9 +15,11 @@ import router from "@/router/index";
 import store from "@/store/page-overlay/index";
 import { ExplorerTargetType } from "@/store/page-overlay/modules/explorer/consts";
 import {
+  extractHarvestNameOrNull,
   extractOutgoingTransferManifestNumberOrNull,
   extractPackageLabelOrNull,
   extractPlantBatchNameOrNull,
+  extractPlantLabelOrNull,
 } from "@/utils/history";
 import Vue from "vue";
 import { mapActions, mapState } from "vuex";
@@ -54,6 +56,14 @@ export default Vue.extend({
         });
       }
 
+      const plantLabel = extractPlantLabelOrNull(this.description);
+      if (plantLabel) {
+        smartLinks.push({
+          text: plantLabel,
+          targetType: ExplorerTargetType.PLANT,
+        });
+      }
+
       const plantBatchName = extractPlantBatchNameOrNull(this.description);
       if (plantBatchName) {
         smartLinks.push({
@@ -69,6 +79,14 @@ export default Vue.extend({
         smartLinks.push({
           text: outgoingTransferManifestNumber,
           targetType: ExplorerTargetType.OUTGOING_TRANSFER,
+        });
+      }
+
+      const harvestName = extractHarvestNameOrNull(this.description);
+      if (harvestName) {
+        smartLinks.push({
+          text: harvestName,
+          targetType: ExplorerTargetType.HARVEST,
         });
       }
 

@@ -133,6 +133,7 @@ enum UrlType {
   TRANSFER_TRANSPORTER_DETAILS_BY_TRANSFER_ID,
   DESTINATION_PACKAGES_BY_DESTINATION_ID,
   DESTINATION_TRANSPORTERS_BY_DESTINATION_ID,
+  PLANT_HISTORY_BY_PLANT_ID,
   PLANT_BATCH_HISTORY_BY_PLANT_BATCH_ID,
 }
 
@@ -243,7 +244,7 @@ async function buildDynamicUrl(
     case UrlType.DATAIMPORT_HISTORY:
       return origin({ divertToNullOrigin: false }) + `/api/dataimport?type=${options.csvUpload}`;
     case UrlType.LAB_RESULTS_BY_PACKAGE_ID:
-      if (!options || !options.packageId) {
+      if (!options?.packageId) {
         throw new Error("Missing required URL options");
       }
       return (
@@ -251,22 +252,27 @@ async function buildDynamicUrl(
         `/api/packages/labresults/byid?id=${options.packageId}`
       );
     case UrlType.PACKAGE_HISTORY_BY_PACKAGE_ID:
-      if (!options || !options.packageId) {
+      if (!options?.packageId) {
         throw new Error("Missing required URL options");
       }
       return (
         origin({ divertToNullOrigin: false }) + `/api/packages/history?id=${options.packageId}`
       );
     case UrlType.PLANT_BATCH_HISTORY_BY_PLANT_BATCH_ID:
-      if (!options || !options.plantBatchId) {
+      if (!options?.plantBatchId) {
         throw new Error("Missing required URL options");
       }
       return (
         origin({ divertToNullOrigin: false }) +
         `/api/plantbatches/history?id=${options.plantBatchId}`
       );
+    case UrlType.PLANT_HISTORY_BY_PLANT_ID:
+      if (!options?.plantId) {
+        throw new Error("Missing required URL options");
+      }
+      return origin({ divertToNullOrigin: false }) + `/api/plants/history?id=${options.plantId}`;
     case UrlType.PACKAGE_HARVEST_HISTORY_BY_PACKAGE_ID:
-      if (!options || !options.packageId) {
+      if (!options?.packageId) {
         throw new Error("Missing required URL options");
       }
       return (
@@ -274,7 +280,7 @@ async function buildDynamicUrl(
         `/api/packages/sourceHarvest?id=${options.packageId}`
       );
     case UrlType.TRANSFER_HISTORY_BY_TRANSFER_ID:
-      if (!options || !options.manifestNumber) {
+      if (!options?.manifestNumber) {
         throw new Error("Missing required URL options");
       }
       return (
@@ -282,7 +288,7 @@ async function buildDynamicUrl(
         `/api/transfers/history?id=${options.manifestNumber}`
       );
     case UrlType.TRANSFER_DESTINATIONS_BY_TRANSFER_ID:
-      if (!options || !options.transferId) {
+      if (!options?.transferId) {
         throw new Error("Missing required URL options");
       }
       return (
@@ -290,7 +296,7 @@ async function buildDynamicUrl(
         `/api/transfers/destinations?id=${options.transferId}`
       );
     case UrlType.TRANSFER_TRANSPORTER_DETAILS_BY_TRANSFER_ID:
-      if (!options || !options.transferId) {
+      if (!options?.transferId) {
         throw new Error("Missing required URL options");
       }
       return (
@@ -298,7 +304,7 @@ async function buildDynamicUrl(
         `/api/transfers/transporters/details?id=${options.transferId}`
       );
     case UrlType.DESTINATION_TRANSPORTERS_BY_DESTINATION_ID:
-      if (!options || !options.destinationId) {
+      if (!options?.destinationId) {
         throw new Error("Missing required URL options");
       }
       return (
@@ -306,7 +312,7 @@ async function buildDynamicUrl(
         `/api/transfers/destinations/transporters?id=${options.destinationId}`
       );
     case UrlType.DESTINATION_PACKAGES_BY_DESTINATION_ID:
-      if (!options || !options.destinationId) {
+      if (!options?.destinationId) {
         throw new Error("Missing required URL options");
       }
       return (
@@ -314,7 +320,7 @@ async function buildDynamicUrl(
         `/api/transfers/destinations/packages?id=${options.destinationId}`
       );
     case UrlType.HARVEST_HISTORY_BY_HARVEST_ID:
-      if (!options || !options.harvestId) {
+      if (!options?.harvestId) {
         throw new Error("Missing required URL options");
       }
       return (
@@ -925,6 +931,29 @@ export class MetrcRequestManager implements IAtomicService {
     return customFetch(
       await buildDynamicUrl(this.authStateOrError, UrlType.PACKAGE_HARVEST_HISTORY_BY_PACKAGE_ID, {
         packageId,
+      }),
+      {
+        ...DEFAULT_FETCH_POST_OPTIONS,
+        // @ts-ignore
+        headers: {
+          ...(await buildAuthenticationHeaders(this.authStateOrError)),
+          ...JSON_HEADERS,
+        },
+        body,
+        signal,
+      }
+    );
+  }
+
+  async getPlantHistory(body: string, plantId: number, abortTimeout: number = 30000) {
+    const controller = new AbortController();
+    const signal = controller.signal;
+
+    setTimeout(() => controller.abort(), abortTimeout);
+
+    return customFetch(
+      await buildDynamicUrl(this.authStateOrError, UrlType.PLANT_HISTORY_BY_PLANT_ID, {
+        plantId,
       }),
       {
         ...DEFAULT_FETCH_POST_OPTIONS,

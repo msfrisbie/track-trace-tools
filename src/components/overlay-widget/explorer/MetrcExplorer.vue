@@ -74,14 +74,24 @@
       </template>
       <div class="flex flex-col items-stretch gap-8">
         <template v-if="explorer.target">
+          <!-- <div class="text-start text-xl text-purple-800 font-bold">Object:</div> -->
           <template v-if="targetType === ExplorerTargetType.PACKAGE">
             <package-card :pkg="explorer.target"></package-card>
           </template>
           <template v-if="targetType === ExplorerTargetType.PLANT_BATCH">
             <plant-batch-card :plantBatch="explorer.target"></plant-batch-card>
           </template>
+          <template v-if="targetType === ExplorerTargetType.PLANT">
+            <plant-card :plant="explorer.target"></plant-card>
+          </template>
+          <!-- <template v-if="targetType === ExplorerTargetType.INCOMING_TRANSFER">
+            <incoming-transfer-card :incomingTransfer="explorer.target"></incoming-transfer-card>
+          </template> -->
           <template v-if="targetType === ExplorerTargetType.OUTGOING_TRANSFER">
             <outgoing-transfer-card :outgoingTransfer="explorer.target"></outgoing-transfer-card>
+          </template>
+          <template v-if="targetType === ExplorerTargetType.HARVEST">
+            <harvest-card :harvest="explorer.target"></harvest-card>
           </template>
         </template>
 
@@ -124,7 +134,13 @@
         </template>
       </div>
       <div class="col-span-2">
-        <smart-history v-if="explorer.history"></smart-history>
+        <template v-if="explorer.history">
+          <div class="flex flex-col items-stretch gap-8">
+            <!-- <div class="text-start text-xl text-purple-800 font-bold">History:</div> -->
+
+            <smart-history></smart-history>
+          </div>
+        </template>
       </div>
       <template v-if="explorer.status === ExplorerStatus.INITIAL">
         <div class="col-span-3 flex flex-col items-center">
@@ -151,6 +167,8 @@ import { mapActions, mapState } from "vuex";
 import OutgoingTransferCard from "./OutgoingTransferCard.vue";
 import PackageCard from "./PackageCard.vue";
 import PlantBatchCard from "./PlantBatchCard.vue";
+import PlantCard from "./PlantCard.vue";
+import HarvestCard from "./HarvestCard.vue";
 import RecentExplorerQueries from "./RecentExplorerQueries.vue";
 import SmartHistory from "./SmartHistory.vue";
 
@@ -162,7 +180,10 @@ export default Vue.extend({
   components: {
     PackageCard,
     PlantBatchCard,
+    HarvestCard,
+    PlantCard,
     SmartHistory,
+    // IncomingTransferCard,
     OutgoingTransferCard,
     RecentExplorerQueries,
   },
@@ -194,13 +215,15 @@ export default Vue.extend({
       switch (this.targetType) {
         case ExplorerTargetType.PACKAGE:
           return "Package tag (1A4400005000000000001234)";
-        case ExplorerTargetType.INCOMING_TRANSFER:
+        // case ExplorerTargetType.INCOMING_TRANSFER:
         case ExplorerTargetType.OUTGOING_TRANSFER:
           return "Manifest # (0000012345)";
         case ExplorerTargetType.PLANT:
           return "Plant tag (1A4400005000000000001234)";
         case ExplorerTargetType.PLANT_BATCH:
           return "Plant batch name/tag";
+        case ExplorerTargetType.HARVEST:
+          return "Harvest name";
         default:
           console.error("Bad target type for placeholder");
           return "";
@@ -221,7 +244,6 @@ export default Vue.extend({
         {
           value: ExplorerTargetType.PLANT,
           readableText: "Plant",
-          disabled: true,
         },
         {
           value: ExplorerTargetType.PLANT_BATCH,
@@ -230,13 +252,11 @@ export default Vue.extend({
         {
           value: ExplorerTargetType.HARVEST,
           readableText: "Harvest",
-          disabled: true,
         },
-        {
-          value: ExplorerTargetType.INCOMING_TRANSFER,
-          readableText: "Incoming Transfer",
-          disabled: true,
-        },
+        // {
+        //   value: ExplorerTargetType.INCOMING_TRANSFER,
+        //   readableText: "Incoming Transfer",
+        // },
         {
           value: ExplorerTargetType.OUTGOING_TRANSFER,
           readableText: "Outgoing Transfer",
