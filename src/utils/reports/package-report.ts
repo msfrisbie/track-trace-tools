@@ -5,7 +5,7 @@ import {
   IFieldData,
   IReportConfig,
   IReportData,
-  IReportsState,
+  IReportsState
 } from "@/store/page-overlay/modules/reports/interfaces";
 import { ActionContext } from "vuex";
 import { todayIsodate } from "../date";

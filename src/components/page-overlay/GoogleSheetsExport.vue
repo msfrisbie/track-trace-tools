@@ -600,7 +600,7 @@
                   <b-form-checkbox v-model="incomingTransfersFormFilters.includeIncoming">
                     <span class="leading-6">Include Active Incoming</span>
                   </b-form-checkbox>
-                  <b-form-checkbox v-model="incomingTransfersFormFilters.includeIncoming">
+                  <b-form-checkbox v-model="incomingTransfersFormFilters.includeIncomingInactive">
                     <span class="leading-6">Include Inactive Incoming</span>
                   </b-form-checkbox>
                   <b-form-checkbox v-model="incomingTransfersFormFilters.onlyWholesale">
@@ -1017,12 +1017,10 @@
             >
 
             <template v-if="selectedReports.length === 0">
-              <div class="text-red-500 text-center">
-                Select something to include in your report
-              </div>
+              <div class="text-red-500 text-center">Select something to include in your report</div>
             </template>
 
-            <b-button
+            <!-- <b-button
               size="sm"
               :disabled="
                 eligibleReportOptions.length === selectedReports.length ||
@@ -1031,7 +1029,7 @@
               variant="outline-primary"
               @click="snapshotEverything()"
               >GENERATE ALL REPORTS</b-button
-            >
+            > -->
           </template>
 
           <template v-if="reportStatus === ReportStatus.INFLIGHT">
@@ -1117,9 +1115,7 @@
 
     <template v-if="oAuthState === OAuthState.NOT_AUTHENTICATED">
       <div class="flex flex-col gap-8 text-center items-center">
-        <div class="text-lg font-semibold">
-          Sign in to your Google account to generate reports.
-        </div>
+        <div class="text-lg font-semibold">Sign in to your Google account to generate reports.</div>
         <div class="text-base">
           Track &amp; Trace Tools can generate Metrc reports in Google Sheets.
         </div>
@@ -1143,13 +1139,13 @@
 <script lang="ts">
 import { MessageType } from "@/consts";
 import {
-IHarvestFilter,
-IPackageFilter,
-IPlantBatchFilter,
-IPlantFilter,
-IPluginState,
-ITagFilter,
-ITransferFilter
+  IHarvestFilter,
+  IPackageFilter,
+  IPlantBatchFilter,
+  IPlantFilter,
+  IPluginState,
+  ITagFilter,
+  ITransferFilter,
 } from "@/interfaces";
 import { authManager } from "@/modules/auth-manager.module";
 import { clientBuildManager } from "@/modules/client-build-manager.module";
@@ -1158,15 +1154,41 @@ import router from "@/router/index";
 import store from "@/store/page-overlay/index";
 import { OAuthState, PluginAuthActions } from "@/store/page-overlay/modules/plugin-auth/consts";
 import {
-ReportsActions,
-ReportStatus,
-ReportType,
-SHEET_FIELDS
+  ReportsActions,
+  ReportStatus,
+  ReportType,
+  SHEET_FIELDS,
 } from "@/store/page-overlay/modules/reports/consts";
 import { IReportConfig } from "@/store/page-overlay/modules/reports/interfaces";
 import { todayIsodate } from "@/utils/date";
 import { addCogsReport, cogsFormFiltersFactory } from "@/utils/reports/cogs-report";
+import { addHarvestsReport, harvestsFormFiltersFactory } from "@/utils/reports/harvests-report";
+import {
+  addImmaturePlantsReport,
+  immaturePlantsFormFiltersFactory,
+} from "@/utils/reports/immature-plants-report";
+import {
+  addIncomingTransfersReport,
+  incomingTransfersFormFiltersFactory,
+} from "@/utils/reports/incoming-transfers-report";
+import {
+  addMaturePlantsReport,
+  maturePlantsFormFiltersFactory,
+} from "@/utils/reports/mature-plants-report";
+import {
+  addOutgoingTransferManifestsFeport,
+  outgoingTransferManifestsFormFiltersFactory,
+} from "@/utils/reports/outgoing-transfer-manifests-report";
+import {
+  addOutgoingTransfersReport,
+  outgoingTransfersFormFiltersFactory,
+} from "@/utils/reports/outgoing-transfers-report";
 import { addPackageReport, packageFormFiltersFactory } from "@/utils/reports/package-report";
+import {
+  addStragglerPackagesReport,
+  stragglerPackagesFormFiltersFactory,
+} from "@/utils/reports/straggler-package-report";
+import { addTagsReport, tagsFormFiltersFactory } from "@/utils/reports/tags-report";
 import _ from "lodash";
 import Vue from "vue";
 import { mapActions, mapState } from "vuex";
@@ -1176,6 +1198,7 @@ interface IReportOption {
   text: string;
   value: ReportType | null;
   t3plus: boolean;
+  isCustom: false;
   enabled: boolean;
   hidden?: boolean;
   description: string;
@@ -1219,79 +1242,14 @@ export default Vue.extend({
       selectedReports: [] as ReportType[],
       cogsFormFilters: cogsFormFiltersFactory(),
       packagesFormFilters: packageFormFiltersFactory(),
-      stragglerPackagesFormFilters: {
-        packagedDateGt: todayIsodate(),
-        packagedDateLt: todayIsodate(),
-        shouldFilterPackagedDateGt: false,
-        shouldFilterPackagedDateLt: false,
-        includeNearlyEmpty: false,
-        quantityLt: 5,
-        lastModifiedDateGt: todayIsodate(),
-        lastModifiedDateLt: todayIsodate(),
-        shouldFilterLastModifiedDateGt: false,
-        shouldFilterLastModifiedDateLt: false,
-      },
-      maturePlantsFormFilters: {
-        plantedDateGt: todayIsodate(),
-        plantedDateLt: todayIsodate(),
-        includeVegetative: true,
-        includeFlowering: true,
-        includeInactive: false,
-        shouldFilterPlantedDateGt: false,
-        shouldFilterPlantedDateLt: false,
-      },
-      immaturePlantsFormFilters: {
-        plantedDateGt: todayIsodate(),
-        plantedDateLt: todayIsodate(),
-        shouldFilterPlantedDateGt: false,
-        shouldFilterPlantedDateLt: false,
-        includeActive: true,
-        includeInactive: false,
-      },
-      harvestsFormFilters: {
-        harvestDateGt: todayIsodate(),
-        harvestDateLt: todayIsodate(),
-        shouldFilterHarvestDateGt: false,
-        shouldFilterHarvestDateLt: false,
-        includeActive: true,
-        includeInactive: false,
-      },
-      incomingTransfersFormFilters: {
-        estimatedArrivalDateLt: todayIsodate(),
-        estimatedArrivalDateGt: todayIsodate(),
-        shouldFilterEstimatedArrivalDateLt: false,
-        shouldFilterEstimatedArrivalDateGt: false,
-        onlyWholesale: false,
-        includeIncoming: true,
-        includeIncomingInactive: false,
-      },
-      outgoingTransfersFormFilters: {
-        estimatedDepartureDateLt: todayIsodate(),
-        estimatedDepartureDateGt: todayIsodate(),
-        shouldFilterEstimatedDepartureDateLt: false,
-        shouldFilterEstimatedDepartureDateGt: false,
-        onlyWholesale: false,
-        includeOutgoing: true,
-        includeRejected: true,
-        includeOutgoingInactive: false,
-      },
-      outgoingTransferManifestsFormFilters: {
-        estimatedDepartureDateLt: todayIsodate(),
-        estimatedDepartureDateGt: todayIsodate(),
-        shouldFilterEstimatedDepartureDateLt: false,
-        shouldFilterEstimatedDepartureDateGt: false,
-        onlyWholesale: false,
-        includeOutgoing: true,
-        includeRejected: true,
-        includeOutgoingInactive: false,
-      },
-      tagsFormFilters: {
-        includeAvailable: true,
-        includeUsed: false,
-        includeVoided: false,
-        includePackage: true,
-        includePlant: true,
-      },
+      stragglerPackagesFormFilters: stragglerPackagesFormFiltersFactory(),
+      maturePlantsFormFilters: maturePlantsFormFiltersFactory(),
+      immaturePlantsFormFilters: immaturePlantsFormFiltersFactory(),
+      harvestsFormFilters: harvestsFormFiltersFactory(),
+      incomingTransfersFormFilters: incomingTransfersFormFiltersFactory(),
+      outgoingTransfersFormFilters: outgoingTransfersFormFiltersFactory(),
+      outgoingTransferManifestsFormFilters: outgoingTransferManifestsFormFiltersFactory(),
+      tagsFormFilters: tagsFormFiltersFactory(),
       showFilters: (() => {
         const fields: { [key: string]: boolean } = {};
         Object.keys(SHEET_FIELDS).map((x: any) => {
@@ -1339,6 +1297,7 @@ export default Vue.extend({
           t3plus: false,
           enabled: true,
           description: "Filter by packaged date",
+          isCustom: false,
         },
         {
           text: "Plant Batches",
@@ -1346,6 +1305,7 @@ export default Vue.extend({
           t3plus: false,
           enabled: true,
           description: "Filter by planted date",
+          isCustom: false,
         },
         {
           text: "Mature Plants",
@@ -1353,6 +1313,7 @@ export default Vue.extend({
           t3plus: false,
           enabled: true,
           description: "Filter by growth phase and planted date",
+          isCustom: false,
         },
         {
           text: "Incoming Transfers",
@@ -1360,6 +1321,7 @@ export default Vue.extend({
           t3plus: true,
           enabled: true,
           description: "Filter by wholesale and estimated time of arrival",
+          isCustom: false,
         },
         {
           text: "Outgoing Transfers",
@@ -1367,6 +1329,7 @@ export default Vue.extend({
           t3plus: false,
           enabled: true,
           description: "Filter by wholesale and estimated time of departure",
+          isCustom: false,
         },
         {
           text: "Tags",
@@ -1374,6 +1337,7 @@ export default Vue.extend({
           t3plus: true,
           enabled: true,
           description: "Filter by tag type and status",
+          isCustom: false,
         },
         {
           text: "Harvests",
@@ -1381,6 +1345,7 @@ export default Vue.extend({
           t3plus: false,
           enabled: true,
           description: "Filter by harvest date",
+          isCustom: false,
         },
         {
           text: "Outgoing Transfer Manifests",
@@ -1388,6 +1353,7 @@ export default Vue.extend({
           t3plus: true,
           enabled: true,
           description: "Full transfer and package data for all outgoing transfers",
+          isCustom: false,
         },
         {
           text: "Straggler Inventory",
@@ -1395,6 +1361,7 @@ export default Vue.extend({
           t3plus: true,
           enabled: true,
           description: "Find straggler inventory so it can be cleared out",
+          isCustom: false,
         },
         {
           text: "COGS",
@@ -1403,6 +1370,7 @@ export default Vue.extend({
           enabled: clientBuildManager.assertValues(["ENABLE_COGS"]),
           hidden: !clientBuildManager.assertValues(["ENABLE_COGS"]),
           description: "Generate COGS",
+          isCustom: false,
         },
         {
           text: "Package Quickview",
@@ -1411,6 +1379,7 @@ export default Vue.extend({
           enabled: false,
           description:
             "Grouped summary of packages by item, remaining quantity, and testing status",
+          isCustom: false,
         },
         {
           text: "Immature Plant Quickview",
@@ -1418,6 +1387,7 @@ export default Vue.extend({
           t3plus: true,
           enabled: false,
           description: "Grouped summary of mature plants by strain, location, and dates",
+          isCustom: false,
         },
         {
           text: "Mature Plant Quickview",
@@ -1426,6 +1396,7 @@ export default Vue.extend({
           enabled: false,
           description:
             "Grouped summary of mature plants by growth phase, strain, location, and dates",
+          isCustom: false,
         },
         {
           text: "Transfer Quickview",
@@ -1433,6 +1404,7 @@ export default Vue.extend({
           t3plus: true,
           enabled: false,
           description: "Summary of incoming, outgoing, and rejected packages",
+          isCustom: false,
         },
         {
           text: "Incoming Inventory",
@@ -1440,6 +1412,7 @@ export default Vue.extend({
           t3plus: true,
           enabled: false,
           description: "See packages not yet recieved",
+          isCustom: false,
         },
         {
           text: "Harvested Plants",
@@ -1447,6 +1420,7 @@ export default Vue.extend({
           t3plus: true,
           enabled: false,
           description: "All plants and associated harvest data within this license",
+          isCustom: false,
         },
       ];
 
@@ -1514,196 +1488,67 @@ export default Vue.extend({
       }
 
       if (this.selectedReports.includes(ReportType.STRAGGLER_PACKAGES)) {
-        const stragglerPackagesFormFilters = this.stragglerPackagesFormFilters;
-        const stragglerPackageFilter: IPackageFilter = {};
-
-        stragglerPackageFilter.includeActive = true;
-
-        stragglerPackageFilter.quantityLt = stragglerPackagesFormFilters.includeNearlyEmpty
-          ? stragglerPackagesFormFilters.quantityLt
-          : null;
-
-        stragglerPackageFilter.packagedDateGt =
-          stragglerPackagesFormFilters.shouldFilterPackagedDateGt
-            ? stragglerPackagesFormFilters.packagedDateGt
-            : null;
-
-        stragglerPackageFilter.packagedDateLt =
-          stragglerPackagesFormFilters.shouldFilterPackagedDateLt
-            ? stragglerPackagesFormFilters.packagedDateLt
-            : null;
-
-        stragglerPackageFilter.lastModifiedDateGt =
-          stragglerPackagesFormFilters.shouldFilterLastModifiedDateGt
-            ? stragglerPackagesFormFilters.lastModifiedDateGt
-            : null;
-
-        stragglerPackageFilter.lastModifiedDateLt =
-          stragglerPackagesFormFilters.shouldFilterLastModifiedDateLt
-            ? stragglerPackagesFormFilters.lastModifiedDateLt
-            : null;
-
-        reportConfig[ReportType.STRAGGLER_PACKAGES] = {
-          stragglerPackageFilter,
+        addStragglerPackagesReport({
+          reportConfig,
+          stragglerPackagesFormFilters: this.stragglerPackagesFormFilters,
           fields: this.fields[ReportType.STRAGGLER_PACKAGES],
-        };
+        });
       }
 
       if (this.selectedReports.includes(ReportType.MATURE_PLANTS)) {
-        const plantFilter: IPlantFilter = {};
-        const maturePlantsFormFilters = this.maturePlantsFormFilters;
-
-        plantFilter.includeVegetative = maturePlantsFormFilters.includeVegetative;
-        plantFilter.includeFlowering = maturePlantsFormFilters.includeFlowering;
-        plantFilter.includeInactive = maturePlantsFormFilters.includeInactive;
-
-        plantFilter.plantedDateGt = maturePlantsFormFilters.shouldFilterPlantedDateGt
-          ? maturePlantsFormFilters.plantedDateGt
-          : null;
-
-        plantFilter.plantedDateLt = maturePlantsFormFilters.shouldFilterPlantedDateLt
-          ? maturePlantsFormFilters.plantedDateLt
-          : null;
-
-        reportConfig[ReportType.MATURE_PLANTS] = {
-          plantFilter,
+        addMaturePlantsReport({
+          reportConfig,
+          maturePlantsFormFilters: this.maturePlantsFormFilters,
           fields: this.fields[ReportType.MATURE_PLANTS],
-        };
+        });
       }
 
       if (this.selectedReports.includes(ReportType.INCOMING_TRANSFERS)) {
-        const transferFilter: ITransferFilter = {};
-        const incomingTransfersFormFilters = this.incomingTransfersFormFilters;
-
-        transferFilter.onlyWholesale = incomingTransfersFormFilters.onlyWholesale;
-        transferFilter.includeIncoming = incomingTransfersFormFilters.includeIncoming;
-        transferFilter.includeIncomingInactive =
-          incomingTransfersFormFilters.includeIncomingInactive;
-
-        transferFilter.estimatedArrivalDateGt =
-          incomingTransfersFormFilters.shouldFilterEstimatedArrivalDateGt
-            ? incomingTransfersFormFilters.estimatedArrivalDateGt
-            : null;
-
-        transferFilter.estimatedArrivalDateLt =
-          incomingTransfersFormFilters.shouldFilterEstimatedArrivalDateLt
-            ? incomingTransfersFormFilters.estimatedArrivalDateLt
-            : null;
-
-        reportConfig[ReportType.INCOMING_TRANSFERS] = {
-          transferFilter,
+        addIncomingTransfersReport({
+          reportConfig,
+          incomingTransfersFormFilters: this.incomingTransfersFormFilters,
           fields: this.fields[ReportType.INCOMING_TRANSFERS],
-        };
+        });
       }
 
       if (this.selectedReports.includes(ReportType.OUTGOING_TRANSFERS)) {
-        const transferFilter: ITransferFilter = {};
-        const outgoingTransfersFormFilters = this.outgoingTransfersFormFilters;
-
-        transferFilter.onlyWholesale = outgoingTransfersFormFilters.onlyWholesale;
-        transferFilter.includeOutgoing = outgoingTransfersFormFilters.includeOutgoing;
-        transferFilter.includeRejected = outgoingTransfersFormFilters.includeRejected;
-        transferFilter.includeOutgoingInactive =
-          outgoingTransfersFormFilters.includeOutgoingInactive;
-
-        transferFilter.estimatedDepartureDateGt =
-          outgoingTransfersFormFilters.shouldFilterEstimatedDepartureDateGt
-            ? (outgoingTransfersFormFilters.estimatedDepartureDateGt as string)
-            : null;
-
-        transferFilter.estimatedDepartureDateLt =
-          outgoingTransfersFormFilters.shouldFilterEstimatedDepartureDateLt
-            ? outgoingTransfersFormFilters.estimatedDepartureDateLt
-            : null;
-
-        reportConfig[ReportType.OUTGOING_TRANSFERS] = {
-          transferFilter,
+        addOutgoingTransfersReport({
+          reportConfig,
+          outgoingTransfersFormFilters: this.outgoingTransfersFormFilters,
           fields: this.fields[ReportType.OUTGOING_TRANSFERS],
-        };
+        });
       }
 
       if (this.selectedReports.includes(ReportType.HARVESTS)) {
-        const harvestFilter: IHarvestFilter = {};
-        const harvestsFormFilters = this.harvestsFormFilters;
-
-        harvestFilter.includeActive = harvestsFormFilters.includeActive;
-        harvestFilter.includeInactive = harvestsFormFilters.includeInactive;
-
-        harvestFilter.harvestDateGt = harvestsFormFilters.shouldFilterHarvestDateGt
-          ? harvestsFormFilters.harvestDateGt
-          : null;
-
-        harvestFilter.harvestDateLt = harvestsFormFilters.shouldFilterHarvestDateLt
-          ? harvestsFormFilters.harvestDateLt
-          : null;
-
-        reportConfig[ReportType.HARVESTS] = {
-          harvestFilter,
+        addHarvestsReport({
+          reportConfig,
+          harvestsFormFilters: this.harvestsFormFilters,
           fields: this.fields[ReportType.HARVESTS],
-        };
+        });
       }
 
       if (this.selectedReports.includes(ReportType.TAGS)) {
-        const tagFilter: ITagFilter = {};
-        const tagsFormFilters = this.tagsFormFilters;
-
-        tagFilter.includeAvailable = tagsFormFilters.includeAvailable;
-        tagFilter.includeUsed = tagsFormFilters.includeUsed;
-        tagFilter.includeVoided = tagsFormFilters.includeVoided;
-        tagFilter.includePlant = tagsFormFilters.includePlant;
-        tagFilter.includePackage = tagsFormFilters.includePackage;
-
-        reportConfig[ReportType.TAGS] = {
-          tagFilter,
+        addTagsReport({
+          reportConfig,
+          tagsFormFilters: this.tagsFormFilters,
           fields: this.fields[ReportType.TAGS],
-        };
+        });
       }
 
       if (this.selectedReports.includes(ReportType.IMMATURE_PLANTS)) {
-        const immaturePlantFilter: IPlantBatchFilter = {};
-        const immaturePlantsFormFilters = this.immaturePlantsFormFilters;
-
-        immaturePlantFilter.includeActive = immaturePlantsFormFilters.includeActive;
-        immaturePlantFilter.includeInactive = immaturePlantsFormFilters.includeInactive;
-
-        immaturePlantFilter.plantedDateGt = immaturePlantsFormFilters.shouldFilterPlantedDateGt
-          ? immaturePlantsFormFilters.plantedDateGt
-          : null;
-
-        immaturePlantFilter.plantedDateLt = immaturePlantsFormFilters.shouldFilterPlantedDateLt
-          ? immaturePlantsFormFilters.plantedDateLt
-          : null;
-
-        reportConfig[ReportType.IMMATURE_PLANTS] = {
-          immaturePlantFilter,
+        addImmaturePlantsReport({
+          reportConfig,
+          immaturePlantsFormFilters: this.immaturePlantsFormFilters,
           fields: this.fields[ReportType.IMMATURE_PLANTS],
-        };
+        });
       }
 
       if (this.selectedReports.includes(ReportType.OUTGOING_TRANSFER_MANIFESTS)) {
-        const transferFilter: ITransferFilter = {};
-        const outgoingTransferManifestsFormFilters = this.outgoingTransferManifestsFormFilters;
-
-        transferFilter.onlyWholesale = outgoingTransferManifestsFormFilters.onlyWholesale;
-        transferFilter.includeOutgoing = outgoingTransferManifestsFormFilters.includeOutgoing;
-        transferFilter.includeRejected = outgoingTransferManifestsFormFilters.includeRejected;
-        transferFilter.includeOutgoingInactive =
-          outgoingTransferManifestsFormFilters.includeOutgoingInactive;
-
-        transferFilter.estimatedDepartureDateGt =
-          outgoingTransferManifestsFormFilters.shouldFilterEstimatedDepartureDateGt
-            ? outgoingTransferManifestsFormFilters.estimatedDepartureDateGt
-            : null;
-
-        transferFilter.estimatedDepartureDateLt =
-          outgoingTransferManifestsFormFilters.shouldFilterEstimatedDepartureDateLt
-            ? outgoingTransferManifestsFormFilters.estimatedDepartureDateLt
-            : null;
-
-        reportConfig[ReportType.OUTGOING_TRANSFER_MANIFESTS] = {
-          transferFilter,
+        addOutgoingTransferManifestsFeport({
+          reportConfig,
+          outgoingTransferManifestsFormFilters: this.outgoingTransferManifestsFormFilters,
           fields: this.fields[ReportType.OUTGOING_TRANSFER_MANIFESTS],
-        };
+        });
       }
 
       this.generateSpreadsheet({ reportConfig });

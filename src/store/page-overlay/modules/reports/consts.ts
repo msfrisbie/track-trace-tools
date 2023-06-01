@@ -318,12 +318,17 @@ export const SHEET_FIELDS: { [key: string]: IFieldData[] } = {
       required: true,
     },
     {
-      value: "Destination.ShipmentTypeName",
+      value: "Transfer.TransferState",
+      readableName: "Transfer Status",
+      required: true,
+    },
+    {
+      value: "Transfer.ShipmentTypeName",
       readableName: "Transfer Type",
       required: true,
     },
     {
-      value: "Destination.DeliveryPackageCount",
+      value: "Transfer.DeliveryPackageCount",
       readableName: "Package Count",
       required: true,
     },
@@ -338,22 +343,22 @@ export const SHEET_FIELDS: { [key: string]: IFieldData[] } = {
       required: false,
     },
     {
-      value: "Transporter.RecipientFacilityName",
+      value: "Transfer.RecipientFacilityName",
       readableName: "Recipient Name",
       required: false,
     },
     {
-      value: "Transporter.RecipientFacilityLicenseNumber",
+      value: "Transfer.RecipientFacilityLicenseNumber",
       readableName: "Recipient License",
       required: false,
     },
     {
-      value: "Transporter.EstimatedDepartureDateTime",
+      value: "Transfer.EstimatedDepartureDateTime",
       readableName: "ETD",
       required: false,
     },
     {
-      value: "Transporter.EstimatedArrivalDateTime",
+      value: "Transfer.EstimatedArrivalDateTime",
       readableName: "ETA",
       required: false,
     },
@@ -362,6 +367,11 @@ export const SHEET_FIELDS: { [key: string]: IFieldData[] } = {
     {
       value: "Transfer.ManifestNumber",
       readableName: "Manifest #",
+      required: true,
+    },
+    {
+      value: "Transfer.TransferState",
+      readableName: "Transfer Status",
       required: true,
     },
     {
@@ -409,6 +419,11 @@ export const SHEET_FIELDS: { [key: string]: IFieldData[] } = {
     {
       value: "Transfer.ManifestNumber",
       readableName: "Manifest #",
+      required: true,
+    },
+    {
+      value: "Transfer.TransferState",
+      readableName: "Transfer Status",
       required: true,
     },
     {
