@@ -600,7 +600,7 @@
                   <b-form-checkbox v-model="incomingTransfersFormFilters.includeIncoming">
                     <span class="leading-6">Include Active Incoming</span>
                   </b-form-checkbox>
-                  <b-form-checkbox v-model="incomingTransfersFormFilters.includeIncoming">
+                  <b-form-checkbox v-model="incomingTransfersFormFilters.includeIncomingInactive">
                     <span class="leading-6">Include Inactive Incoming</span>
                   </b-form-checkbox>
                   <b-form-checkbox v-model="incomingTransfersFormFilters.onlyWholesale">
@@ -1020,7 +1020,7 @@
               <div class="text-red-500 text-center">Select something to include in your report</div>
             </template>
 
-            <b-button
+            <!-- <b-button
               size="sm"
               :disabled="
                 eligibleReportOptions.length === selectedReports.length ||
@@ -1029,7 +1029,7 @@
               variant="outline-primary"
               @click="snapshotEverything()"
               >GENERATE ALL REPORTS</b-button
-            >
+            > -->
           </template>
 
           <template v-if="reportStatus === ReportStatus.INFLIGHT">
@@ -1198,6 +1198,7 @@ interface IReportOption {
   text: string;
   value: ReportType | null;
   t3plus: boolean;
+  isCustom: false;
   enabled: boolean;
   hidden?: boolean;
   description: string;
@@ -1296,6 +1297,7 @@ export default Vue.extend({
           t3plus: false,
           enabled: true,
           description: "Filter by packaged date",
+          isCustom: false,
         },
         {
           text: "Plant Batches",
@@ -1303,6 +1305,7 @@ export default Vue.extend({
           t3plus: false,
           enabled: true,
           description: "Filter by planted date",
+          isCustom: false,
         },
         {
           text: "Mature Plants",
@@ -1310,6 +1313,7 @@ export default Vue.extend({
           t3plus: false,
           enabled: true,
           description: "Filter by growth phase and planted date",
+          isCustom: false,
         },
         {
           text: "Incoming Transfers",
@@ -1317,6 +1321,7 @@ export default Vue.extend({
           t3plus: true,
           enabled: true,
           description: "Filter by wholesale and estimated time of arrival",
+          isCustom: false,
         },
         {
           text: "Outgoing Transfers",
@@ -1324,6 +1329,7 @@ export default Vue.extend({
           t3plus: false,
           enabled: true,
           description: "Filter by wholesale and estimated time of departure",
+          isCustom: false,
         },
         {
           text: "Tags",
@@ -1331,6 +1337,7 @@ export default Vue.extend({
           t3plus: true,
           enabled: true,
           description: "Filter by tag type and status",
+          isCustom: false,
         },
         {
           text: "Harvests",
@@ -1338,6 +1345,7 @@ export default Vue.extend({
           t3plus: false,
           enabled: true,
           description: "Filter by harvest date",
+          isCustom: false,
         },
         {
           text: "Outgoing Transfer Manifests",
@@ -1345,6 +1353,7 @@ export default Vue.extend({
           t3plus: true,
           enabled: true,
           description: "Full transfer and package data for all outgoing transfers",
+          isCustom: false,
         },
         {
           text: "Straggler Inventory",
@@ -1352,6 +1361,7 @@ export default Vue.extend({
           t3plus: true,
           enabled: true,
           description: "Find straggler inventory so it can be cleared out",
+          isCustom: false,
         },
         {
           text: "COGS",
@@ -1360,6 +1370,7 @@ export default Vue.extend({
           enabled: clientBuildManager.assertValues(["ENABLE_COGS"]),
           hidden: !clientBuildManager.assertValues(["ENABLE_COGS"]),
           description: "Generate COGS",
+          isCustom: false,
         },
         {
           text: "Package Quickview",
@@ -1368,6 +1379,7 @@ export default Vue.extend({
           enabled: false,
           description:
             "Grouped summary of packages by item, remaining quantity, and testing status",
+          isCustom: false,
         },
         {
           text: "Immature Plant Quickview",
@@ -1375,6 +1387,7 @@ export default Vue.extend({
           t3plus: true,
           enabled: false,
           description: "Grouped summary of mature plants by strain, location, and dates",
+          isCustom: false,
         },
         {
           text: "Mature Plant Quickview",
@@ -1383,6 +1396,7 @@ export default Vue.extend({
           enabled: false,
           description:
             "Grouped summary of mature plants by growth phase, strain, location, and dates",
+          isCustom: false,
         },
         {
           text: "Transfer Quickview",
@@ -1390,6 +1404,7 @@ export default Vue.extend({
           t3plus: true,
           enabled: false,
           description: "Summary of incoming, outgoing, and rejected packages",
+          isCustom: false,
         },
         {
           text: "Incoming Inventory",
@@ -1397,6 +1412,7 @@ export default Vue.extend({
           t3plus: true,
           enabled: false,
           description: "See packages not yet recieved",
+          isCustom: false,
         },
         {
           text: "Harvested Plants",
@@ -1404,6 +1420,7 @@ export default Vue.extend({
           t3plus: true,
           enabled: false,
           description: "All plants and associated harvest data within this license",
+          isCustom: false,
         },
       ];
 

@@ -1464,7 +1464,7 @@ export class DataLoader implements IAtomicService {
 
         try {
           const incomingTransfers: IIndexedTransferData[] = (
-            await this.loadIncomingTransfers()
+            await this.loadIncomingInactiveTransfers()
           ).map((transfer) => ({
             ...transfer,
             TransferState: TransferState.INCOMING_INACTIVE,
@@ -2194,6 +2194,18 @@ export class DataLoader implements IAtomicService {
     return streamFactory<ITransferData>(dataLoadOptions, responseFactory);
   }
 
+  incomingInactiveTransfersStream(
+    dataLoadOptions: IDataLoadOptions = {}
+  ): Subject<ICollectionResponse<ITransferData>> {
+    const responseFactory = (paginationOptions: IPaginationOptions): Promise<Response> => {
+      const body = buildBody(paginationOptions);
+
+      return this.metrcRequestManagerOrError.getIncomingInactiveTransfers(body);
+    };
+
+    return streamFactory<ITransferData>(dataLoadOptions, responseFactory);
+  }
+
   outgoingTransfersStream(
     dataLoadOptions: IDataLoadOptions = {}
   ): Subject<ICollectionResponse<ITransferData>> {
@@ -2866,6 +2878,26 @@ export class DataLoader implements IAtomicService {
     store.commit(MutationType.SET_LOADING_MESSAGE, null);
 
     return incomingTransfers;
+  }
+
+  private async loadIncomingInactiveTransfers(): Promise<ITransferData[]> {
+    await authManager.authStateOrError();
+
+    store.commit(MutationType.SET_LOADING_MESSAGE, "Loading incoming inactive transfers...");
+
+    let incomingInactiveTransfers: ITransferData[] = [];
+
+    await this.incomingInactiveTransfersStream().forEach(
+      (next: ICollectionResponse<ITransferData>) => {
+        incomingInactiveTransfers = [...incomingInactiveTransfers, ...next.Data];
+      }
+    );
+
+    console.log(`Loaded ${incomingInactiveTransfers.length} incomingInactiveTransfers`);
+
+    store.commit(MutationType.SET_LOADING_MESSAGE, null);
+
+    return incomingInactiveTransfers;
   }
 
   private async loadOutgoingTransfers(): Promise<ITransferData[]> {

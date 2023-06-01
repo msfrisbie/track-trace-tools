@@ -84,14 +84,14 @@ export async function maybeLoadIncomingTransfersReportData({
 
     let richIncomingTransfers: IIndexedRichIncomingTransferData[] = [];
 
-    if (incomingTransferConfig.transferFilter.includeOutgoing) {
+    if (incomingTransferConfig.transferFilter.includeIncoming) {
       richIncomingTransfers = [
         ...(await primaryDataLoader.incomingTransfers()),
         ...richIncomingTransfers,
       ];
     }
 
-    if (incomingTransferConfig.transferFilter.includeOutgoingInactive) {
+    if (incomingTransferConfig.transferFilter.includeIncomingInactive) {
       richIncomingTransfers = [
         ...(await primaryDataLoader.incomingInactiveTransfers()),
         ...richIncomingTransfers,
