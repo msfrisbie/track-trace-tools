@@ -66,44 +66,52 @@ import { backgroundTaskManager } from "@/modules/background-task-manager.module"
 import { BackgroundTaskState } from "@/consts";
 import { MutationType } from "@/mutation-types";
 import { mapState } from "vuex";
+import { IPluginAuthState } from "@/store/page-overlay/modules/plugin-auth/interfaces";
+import { IPluginState } from "@/interfaces";
 
 export default Vue.extend({
   name: "FinalizeSalesReceiptsForm",
   store,
   data() {
     return {
-      stopIsodate: store.state.backgroundTasks.finalizeSalesReceiptsStopIsodate
+      stopIsodate: store.state.backgroundTasks.finalizeSalesReceiptsStopIsodate,
     };
   },
   mounted() {
     this.$store.commit(MutationType.SET_FINALIZE_SALES_RECEIPTS_READOUT, "");
   },
   computed: {
-    ...mapState(["backgroundTasks"]),
+    ...mapState<IPluginState>(["backgroundTasks"]),
     isBackgroundTaskRunning() {
-      return this.backgroundTasks.finalizeSalesReceiptsState === BackgroundTaskState.RUNNING;
+      return (
+        this.$store.state.backgroundTasks.finalizeSalesReceiptsState === BackgroundTaskState.RUNNING
+      );
     },
     isBackgroundTaskSuccess() {
-      return this.backgroundTasks.finalizeSalesReceiptsState === BackgroundTaskState.SUCCESS;
+      return (
+        this.$store.state.backgroundTasks.finalizeSalesReceiptsState === BackgroundTaskState.SUCCESS
+      );
     },
     isBackgroundTaskError() {
-      return this.backgroundTasks.finalizeSalesReceiptsState === BackgroundTaskState.ERROR;
-    }
+      return (
+        this.$store.state.backgroundTasks.finalizeSalesReceiptsState === BackgroundTaskState.ERROR
+      );
+    },
   },
   destroyed() {},
   methods: {
-    setStopIsodate(stopIsodate: string) {
+    setStopIsodate(stopIsodate: string): void {
       console.log(stopIsodate);
 
       this.$store.commit(MutationType.SET_FINALIZE_SALES_RECEIPTS_STOP_DATE, stopIsodate);
     },
-    startFinalizer() {
+    startFinalizer(): void {
       this.$data.runningTotal = 0;
       backgroundTaskManager.startFinalize();
     },
-    stopFinalizer() {
+    stopFinalizer(): void {
       backgroundTaskManager.stopFinalize();
-    }
-  }
+    },
+  },
 });
 </script>

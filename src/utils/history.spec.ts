@@ -227,6 +227,6 @@ describe("history.ts", () => {
     ]);
     expect(
       extractInitialPackageQuantityAndUnitOrError(PACKAGE_WITH_CHILD_SENT_FOR_TESTING)
-    ).toEqual([]);
+    ).toEqual([225849, "Each"]);
   });
 });

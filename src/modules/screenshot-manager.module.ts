@@ -144,8 +144,8 @@ class ScreenshotManager implements IAtomicService {
     video.srcObject = stream;
     video.play();
 
-    canvas.width = track.getSettings().width;
-    canvas.height = track.getSettings().height;
+    canvas.width = track.getSettings().width!;
+    canvas.height = track.getSettings().height!;
 
     // 100ms is not long enough
     await new Promise((resolve) => setTimeout(resolve, 1000));
@@ -157,12 +157,12 @@ class ScreenshotManager implements IAtomicService {
         video,
         0,
         0,
-        track.getSettings().width,
-        track.getSettings().height,
+        track.getSettings().width!,
+        track.getSettings().height!,
         0,
         0,
-        track.getSettings().width,
-        track.getSettings().height
+        track.getSettings().width!,
+        track.getSettings().height!
       );
 
     track.stop();

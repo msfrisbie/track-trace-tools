@@ -20,6 +20,7 @@
 </template>
 
 <script lang="ts">
+import { IPluginState } from "@/interfaces";
 import router from "@/router/index";
 import store from "@/store/page-overlay/index";
 import Vue from "vue";
@@ -65,11 +66,11 @@ export default Vue.extend({
   props: {},
   components: {},
   computed: {
-    ...mapState(["settings"]),
-    snowflakeImageStyle() {
-      const dimension = imageWidth(this.settings.snowflakeSize);
+    ...mapState<IPluginState>(["settings"]),
+    snowflakeImageStyle(): string {
+      const dimension = imageWidth(this.$store.state.settings.snowflakeSize);
 
-      return `width: ${dimension}; height: ${dimension}; background-image: url(${this.settings.snowflakeImage});`;
+      return `width: ${dimension}; height: ${dimension}; background-image: url(${this.$store.state.settings.snowflakeImage});`;
     },
   },
   data() {
