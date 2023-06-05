@@ -98,6 +98,7 @@
               <hr />
               <div class="flex flex-col items-stretch gap-4">
                 <div class="flex flex-col items-start gap-1">
+                  <div class="text-gray-500">Start date</div>
                   <b-form-datepicker
                     :required="true"
                     initial-date
@@ -107,6 +108,7 @@
                 </div>
 
                 <div class="flex flex-col items-start gap-1">
+                  <div class="text-gray-500">End date</div>
                   <b-form-datepicker
                     :required="true"
                     initial-date

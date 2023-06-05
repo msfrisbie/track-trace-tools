@@ -1,9 +1,10 @@
 import { IPackageHistoryData } from "@/interfaces";
 import {
   extractChildPackageLabelsFromHistory,
-  extractInitialPackageQuantityAndUnitOrError,
+  extractInitialPackageQuantityAndUnitFromHistoryOrError,
   extractParentPackageLabelsFromHistory,
   extractTagQuantityPairsFromHistory,
+  extractTagQuantityUnitSetsFromHistory,
   extractTestSamplePackageLabelsFromHistory,
 } from "./history";
 
@@ -204,7 +205,7 @@ describe("history.ts", () => {
     ]);
   });
 
-  it("Correctly extracts tag-quantity pairs from history", () => {
+  it("Correctly extracts tag-quantity pairs and sets from history", () => {
     expect(extractTagQuantityPairsFromHistory(BULK_BIOMASS_ACCEPTED_VIA_TRANSFER)).toEqual([]);
     expect(extractTagQuantityPairsFromHistory(MULTI_PARENT_BIOMASS_PACKAGE)).toEqual([
       ["1A4000000000000000005001", 172507],
@@ -215,18 +216,28 @@ describe("history.ts", () => {
       ["1A4000000000000000183917", 196],
       ["1A4000000000000000213863", 36],
     ]);
+
+    expect(extractTagQuantityUnitSetsFromHistory(BULK_BIOMASS_ACCEPTED_VIA_TRANSFER)).toEqual([]);
+    expect(extractTagQuantityUnitSetsFromHistory(MULTI_PARENT_BIOMASS_PACKAGE)).toEqual([
+      ["1A4000000000000000005001", 172507, "Grams"],
+      ["1A4000000000000000005002", 1154050.116, "Grams"],
+      ["1A4000000000000000005003", 34220, "Grams"],
+    ]);
+    expect(extractTagQuantityUnitSetsFromHistory(PACKAGE_WITH_CHILD_SENT_FOR_TESTING)).toEqual([
+      ["1A4000000000000000183917", 196, "Each"],
+      ["1A4000000000000000213863", 36, "Each"],
+    ]);
   });
 
   it("Correctly extracts initial quantity", () => {
-    expect(extractInitialPackageQuantityAndUnitOrError(BULK_BIOMASS_ACCEPTED_VIA_TRANSFER)).toEqual(
-      [1003, "Pounds"]
-    );
-    expect(extractInitialPackageQuantityAndUnitOrError(MULTI_PARENT_BIOMASS_PACKAGE)).toEqual([
-      1360777.116,
-      "Grams",
-    ]);
     expect(
-      extractInitialPackageQuantityAndUnitOrError(PACKAGE_WITH_CHILD_SENT_FOR_TESTING)
+      extractInitialPackageQuantityAndUnitFromHistoryOrError(BULK_BIOMASS_ACCEPTED_VIA_TRANSFER)
+    ).toEqual([1003, "Pounds"]);
+    expect(
+      extractInitialPackageQuantityAndUnitFromHistoryOrError(MULTI_PARENT_BIOMASS_PACKAGE)
+    ).toEqual([1360777.116, "Grams"]);
+    expect(
+      extractInitialPackageQuantityAndUnitFromHistoryOrError(PACKAGE_WITH_CHILD_SENT_FOR_TESTING)
     ).toEqual([225849, "Each"]);
   });
 });

@@ -137,9 +137,21 @@ export function extractTagQuantityPairOrNull(description: string): [string, numb
   return match ? [match[2] as string, parseFloat(match[1].replaceAll(",", ""))] : null;
 }
 
+export function extractTagQuantityUnitSetOrNull(
+  description: string
+): [string, number, string] | null {
+  const pairMatcher = new RegExp(
+    `Used ([0-9,\.]+) ([a-zA-Z\s]+) for Package (${METRC_TAG_REGEX_PATTERN})`
+  );
+
+  const match = description.match(pairMatcher);
+
+  return match ? [match[3], parseFloat(match[1].replaceAll(",", "")), match[2]] : null;
+}
+
 // Full history methods
 
-export function extractInitialPackageQuantityAndUnitOrError(
+export function extractInitialPackageQuantityAndUnitFromHistoryOrError(
   historyList: IPackageHistoryData[]
 ): [number, string] {
   for (const history of historyList) {
@@ -207,6 +219,7 @@ export function extractTestSamplePackageLabelsFromHistory(
   return testSamplePackageLabels;
 }
 
+// This is used by COGS, technically should be replaced with extractTagQuantityUnitSetsFromHistory
 export function extractTagQuantityPairsFromHistory(
   historyList: IPackageHistoryData[]
 ): [string, number][] {
@@ -223,4 +236,22 @@ export function extractTagQuantityPairsFromHistory(
   }
 
   return pairs;
+}
+
+export function extractTagQuantityUnitSetsFromHistory(
+  historyList: IPackageHistoryData[]
+): [string, number, string][] {
+  const sets: [string, number, string][] = [];
+
+  for (const history of historyList) {
+    for (const description of history.Descriptions) {
+      const result = extractTagQuantityUnitSetOrNull(description);
+
+      if (result) {
+        sets.push(result);
+      }
+    }
+  }
+
+  return sets;
 }

@@ -18,6 +18,11 @@ import {
 import { ActionContext } from "vuex";
 import { todayIsodate } from "../date";
 import {
+  extractInitialPackageQuantityAndUnitFromHistoryOrError,
+  extractTagQuantityUnitSetsFromHistory,
+  extractTestSamplePackageLabelsFromHistory,
+} from "../history";
+import {
   addRowsRequestFactory,
   autoResizeDimensionsRequestFactory,
   freezeTopRowRequestFactory,
@@ -71,17 +76,23 @@ export async function maybeLoadCogsTrackerReportData({
     statusMessage: { text: `Loading package data...`, level: "success" },
   });
 
-  let packages: IIndexedPackageData[] = [];
+  let allPackages: IIndexedPackageData[] = [];
 
   const promises: Promise<any>[] = [
-    primaryDataLoader.activePackages().then((result) => (packages = [...packages, ...result])),
-    primaryDataLoader.onHoldPackages().then((result) => (packages = [...packages, ...result])),
-    primaryDataLoader.inactivePackages().then((result) => (packages = [...packages, ...result])),
+    primaryDataLoader
+      .activePackages()
+      .then((result) => (allPackages = [...allPackages, ...result])),
+    primaryDataLoader
+      .onHoldPackages()
+      .then((result) => (allPackages = [...allPackages, ...result])),
+    primaryDataLoader
+      .inactivePackages()
+      .then((result) => (allPackages = [...allPackages, ...result])),
   ];
 
   await Promise.allSettled(promises);
 
-  packages = packages.filter((pkg) => {
+  const dateFilteredPackages = allPackages.filter((pkg) => {
     if (pkg.PackagedDate < reportConfig[ReportType.COGS_TRACKER]!.packageFilter.packagedDateGt!) {
       return false;
     }
@@ -93,7 +104,7 @@ export async function maybeLoadCogsTrackerReportData({
     return true;
   });
 
-  const historyPromises: Promise<any>[] = packages.map((pkg) =>
+  const historyPromises: Promise<any>[] = dateFilteredPackages.map((pkg) =>
     primaryDataLoader.packageHistoryByPackageId(pkg.Id).then((history) => {
       pkg.history = history;
     })
@@ -122,6 +133,7 @@ export async function maybeLoadCogsTrackerReportData({
     "Production Batch Number",
     "Category",
     "Packaged Date",
+    "Source Harvests",
     "Starting Quantity",
     "Input Material COGS",
     "Weight Post Test If Applicable",
@@ -135,11 +147,31 @@ export async function maybeLoadCogsTrackerReportData({
   bulkInfusedMatrix.push(headers);
   inputCogsMatrix.push(headers);
 
-  // TODO
-  const bulkInfusedPackages = packages;
-  const inputCogsPackages = packages;
+  const bulkInfusedPackages = dateFilteredPackages.filter((pkg) =>
+    pkg.Item.ProductCategoryName.includes("Bulk")
+  );
+  const inputCogsPackages = dateFilteredPackages.filter(
+    (pkg) => !pkg.Item.ProductCategoryName.includes("Bulk")
+  );
 
   function cogsTrackerRowFactory(pkg: IIndexedPackageData): any[] {
+    const initialWeightData = extractInitialPackageQuantityAndUnitFromHistoryOrError(pkg.history!);
+    const testLabels = extractTestSamplePackageLabelsFromHistory(pkg.history!);
+    const tagQuantityUnitSets = extractTagQuantityUnitSetsFromHistory(pkg.history!);
+
+    const testMaterialWeightSum = testLabels
+      .map((testLabel) => tagQuantityUnitSets.find((x) => x[0] === testLabel)![1])
+      .reduce((a, b) => a + b, 0);
+
+    const sourceValues: [string, string, number, string][] = tagQuantityUnitSets.map(
+      ([label, quantity, unit]) => [
+        label,
+        allPackages.find((x) => x.Label)!.Item.Name,
+        quantity,
+        "",
+      ]
+    );
+
     return [
       pkg.Item.Name,
       pkg.Label,
@@ -148,13 +180,15 @@ export async function maybeLoadCogsTrackerReportData({
       pkg.ProductionBatchNumber,
       pkg.Item.ProductCategoryName,
       pkg.PackagedDate,
-      "", // TODO starting quantity
+      pkg.SourceHarvestNames,
+      initialWeightData[0], // TODO starting quantity
       "", // input material COGS
-      "", // TODO Weight post test if applicable
+      initialWeightData[0] - testMaterialWeightSum, // TODO Weight post test if applicable
       "", // test costs
       "", // tested $/g
       "", // cost basis value
       "", // notes
+      ...sourceValues.flat(),
     ];
   }
 
@@ -249,7 +283,12 @@ export async function createCogsTrackerSpreadsheetOrError({
     {
       spreadsheetId: response.data.result.spreadsheetId,
       range: `'${SheetTitles.OVERVIEW}'`,
-      values: [[], []],
+      values: [
+        [],
+        [],
+        [null, `Start date:`, reportConfig[ReportType.COGS_TRACKER]?.packageFilter.packagedDateGt],
+        [null, `End date:`, reportConfig[ReportType.COGS_TRACKER]?.packageFilter.packagedDateLt],
+      ],
     },
     undefined,
     SHEETS_API_MESSAGE_TIMEOUT_MS
