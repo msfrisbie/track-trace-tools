@@ -13,7 +13,7 @@ export function extractInitialPackageQuantityAndUnitOrNull(
   const matcher = new RegExp(`^Packaged ([0-9,\.]+) ([a-zA-Z\s]+) of`);
   const match = description.match(matcher);
 
-  return match ? [parseFloat(match[1].replaceAll(',', '')), match[2]] : null;
+  return match ? [parseFloat(match[1].replaceAll(",", "")), match[2]] : null;
 }
 
 export function extractParentPackageLabelOrNull(description: string): string | null {
@@ -134,13 +134,7 @@ export function extractTagQuantityPairOrNull(description: string): [string, numb
 
   const match = description.match(pairMatcher);
 
-  return match
-    ? [
-        match[2] as string,
-        // @ts-ignore
-        parseFloat(match[1].replaceAll(",", "")),
-      ]
-    : null;
+  return match ? [match[2] as string, parseFloat(match[1].replaceAll(",", ""))] : null;
 }
 
 // Full history methods

@@ -61,8 +61,8 @@ function extractMaxTagOrderSize(data: ITagOrderModalData, tagType: MetrcTagType)
 
 function decodeData(data: string): string {
   // Taken from https://stackoverflow.com/questions/31715030/javascript-hex-escape-character-decoding
-  return data.replace(/\\x([0-9A-F]{2})/gi, function () {
-    return String.fromCharCode(parseInt(arguments[1], 16));
+  return data.replace(/\\x([0-9A-F]{2})/gi, (...args) => {
+    return String.fromCharCode(parseInt(args[1], 16));
   });
 }
 
@@ -177,10 +177,8 @@ function extractAuthData(html: string) {
     if (authMatch && authMatch[1]) {
       let authJson = authMatch[1];
 
-      // @ts-ignore
       authJson = authJson.replaceAll("headers", '"headers"');
 
-      // @ts-ignore
       authJson = authJson.replaceAll("'", '"');
 
       extractedAuthDataDict = JSON.parse(authJson);
@@ -193,7 +191,6 @@ function extractAuthData(html: string) {
     if (identityMatch && identityMatch[1]) {
       const identityString = identityMatch[1];
 
-      // @ts-ignore
       let identityJson = identityString.replaceAll("'", '"');
 
       identityJson = `[${identityJson}]`;
@@ -327,7 +324,6 @@ function extractRepeaterData(html: string) {
     // Metrc includes a blob of escaped JSON
     // (This is manifest v3 incompatible)
     // const parsedRepeaterData = eval(matchResult[1]);
-    // @ts-ignore
     const parsedRepeaterData = JSON.parse(decodeURIComponent(sliced.replaceAll("\\x", "%")));
 
     debugLog(async () => [Object.keys(parsedRepeaterData)]);
