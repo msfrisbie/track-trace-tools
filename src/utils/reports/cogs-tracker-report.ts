@@ -160,7 +160,9 @@ export async function maybeLoadCogsTrackerReportData({
     const tagQuantityUnitSets = extractTagQuantityUnitSetsFromHistory(pkg.history!);
 
     const testMaterialWeightSum = testLabels
-      .map((testLabel) => tagQuantityUnitSets.find((x) => x[0] === testLabel)![1])
+      .map(
+        (testLabel) => (tagQuantityUnitSets.find((x) => x[0] === testLabel) ?? [null, 0, null])[1]
+      )
       .reduce((a, b) => a + b, 0);
 
     const sourceValues: [string, string, number, string][] = tagQuantityUnitSets.map(
@@ -181,9 +183,9 @@ export async function maybeLoadCogsTrackerReportData({
       pkg.Item.ProductCategoryName,
       pkg.PackagedDate,
       pkg.SourceHarvestNames,
-      initialWeightData[0], // TODO starting quantity
+      initialWeightData[0], // starting quantity
       "", // input material COGS
-      initialWeightData[0] - testMaterialWeightSum, // TODO Weight post test if applicable
+      testMaterialWeightSum > 0 ? initialWeightData[0] - testMaterialWeightSum : "", // Weight post test if applicable
       "", // test costs
       "", // tested $/g
       "", // cost basis value
