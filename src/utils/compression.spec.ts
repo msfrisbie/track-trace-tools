@@ -217,10 +217,10 @@ describe("compression.ts", () => {
       },
     ];
 
-    const wrapperA = new CompressedDataWrapper("name", [], "foo", ["foo", "bar"]);
+    const wrapperA = new CompressedDataWrapper<any>("name", [], "foo", ["foo", "bar"]);
     expandedData.map((x) => wrapperA.add(x));
 
-    const wrapperB = new CompressedDataWrapper(
+    const wrapperB = new CompressedDataWrapper<any>(
       "name",
       expandedData.map((x) => wrapperA.pack(x)),
       "foo",

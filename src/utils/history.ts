@@ -5,6 +5,17 @@ import {
 } from "@/consts";
 import { IPackageHistoryData } from "@/interfaces";
 
+// Single history entry methods
+
+export function extractInitialPackageQuantityAndUnitOrNull(
+  description: string
+): [number, string] | null {
+  const matcher = new RegExp(`^Packaged ([0-9,\.]+) ([a-zA-Z\s]+) of`);
+  const match = description.match(matcher);
+
+  return match ? [parseFloat(match[1].replaceAll(',', '')), match[2]] : null;
+}
+
 export function extractParentPackageLabelOrNull(description: string): string | null {
   const parentMatcher = new RegExp(`from Package (${METRC_TAG_REGEX_PATTERN})`);
   const match = description.match(parentMatcher);
@@ -130,6 +141,24 @@ export function extractTagQuantityPairOrNull(description: string): [string, numb
         parseFloat(match[1].replaceAll(",", "")),
       ]
     : null;
+}
+
+// Full history methods
+
+export function extractInitialPackageQuantityAndUnitOrError(
+  historyList: IPackageHistoryData[]
+): [number, string] {
+  for (const history of historyList) {
+    for (const description of history.Descriptions) {
+      const match = extractInitialPackageQuantityAndUnitOrNull(description);
+
+      if (match) {
+        return match;
+      }
+    }
+  }
+
+  throw new Error("Could not locate initial quantity");
 }
 
 export function extractParentPackageLabelsFromHistory(

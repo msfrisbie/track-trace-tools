@@ -135,6 +135,32 @@ export async function maybeLoadCogsTrackerReportData({
   bulkInfusedMatrix.push(headers);
   inputCogsMatrix.push(headers);
 
+  // TODO
+  const bulkInfusedPackages = packages;
+  const inputCogsPackages = packages;
+
+  function cogsTrackerRowFactory(pkg: IIndexedPackageData): any[] {
+    return [
+      pkg.Item.Name,
+      pkg.Label,
+      pkg.SourcePackageLabels,
+      "",
+      pkg.ProductionBatchNumber,
+      pkg.Item.ProductCategoryName,
+      pkg.PackagedDate,
+      "", // TODO starting quantity
+      "", // input material COGS
+      "", // TODO Weight post test if applicable
+      "", // test costs
+      "", // tested $/g
+      "", // cost basis value
+      "", // notes
+    ];
+  }
+
+  bulkInfusedPackages.map((pkg) => bulkInfusedMatrix.push(cogsTrackerRowFactory(pkg)));
+  inputCogsPackages.map((pkg) => inputCogsMatrix.push(cogsTrackerRowFactory(pkg)));
+
   reportData[ReportType.COGS_TRACKER] = {
     bulkInfusedMatrix,
     inputCogsMatrix,

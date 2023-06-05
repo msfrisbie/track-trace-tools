@@ -1,6 +1,7 @@
 import { IPackageHistoryData } from "@/interfaces";
 import {
   extractChildPackageLabelsFromHistory,
+  extractInitialPackageQuantityAndUnitOrError,
   extractParentPackageLabelsFromHistory,
   extractTagQuantityPairsFromHistory,
   extractTestSamplePackageLabelsFromHistory,
@@ -214,5 +215,18 @@ describe("history.ts", () => {
       ["1A4000000000000000183917", 196],
       ["1A4000000000000000213863", 36],
     ]);
+  });
+
+  it("Correctly extracts initial quantity", () => {
+    expect(extractInitialPackageQuantityAndUnitOrError(BULK_BIOMASS_ACCEPTED_VIA_TRANSFER)).toEqual(
+      [1003, "Pounds"]
+    );
+    expect(extractInitialPackageQuantityAndUnitOrError(MULTI_PARENT_BIOMASS_PACKAGE)).toEqual([
+      1360777.116,
+      "Grams",
+    ]);
+    expect(
+      extractInitialPackageQuantityAndUnitOrError(PACKAGE_WITH_CHILD_SENT_FOR_TESTING)
+    ).toEqual([]);
   });
 });

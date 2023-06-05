@@ -133,10 +133,11 @@ export function compressedDataWrapperFactory<T>(
   if (expanded.length === 0) {
     console.error("Compressing empty array");
     console.trace();
-    return new CompressedDataWrapper("Empty", [], "", []);
+    return new CompressedDataWrapper<T>("Empty", [], "", []);
   }
 
   if (!keys) {
+    // @ts-ignore
     keys = Object.keys(expanded[0]);
   }
 

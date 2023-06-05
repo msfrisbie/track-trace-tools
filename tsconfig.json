@@ -17,14 +17,22 @@
     "paths": {
       "@/*": ["src/*"]
     },
-    "lib": ["es2020", "dom", "dom.iterable", "scripthost"]
+    "lib": ["es2021", "dom", "dom.iterable", "scripthost"]
   },
   "include": [
     "src/**/*.ts",
     "src/**/*.tsx",
     "src/**/*.vue",
     "test/**/*.ts",
-    "test/**/*.tsx"
-, "src/client/secrets/client-keys/client-002.js", "src/client/secrets/client-keys/client-001.js", "src/client/decrypted-data/data-002.js", "src/client/decrypted-data/data-001.js", "src/client/decrypted-data/data-001.js", "src/client/decrypted-data/data-002.js", "src/client/secrets/client-keys/client-001.js", "src/client/secrets/client-keys/client-002.js"  ],
+    "test/**/*.tsx",
+    "src/client/secrets/client-keys/client-002.js",
+    "src/client/secrets/client-keys/client-001.js",
+    "src/client/decrypted-data/data-002.js",
+    "src/client/decrypted-data/data-001.js",
+    "src/client/decrypted-data/data-001.js",
+    "src/client/decrypted-data/data-002.js",
+    "src/client/secrets/client-keys/client-001.js",
+    "src/client/secrets/client-keys/client-002.js"
+  ],
   "exclude": ["node_modules"]
 }

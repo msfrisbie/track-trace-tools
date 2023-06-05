@@ -37,7 +37,7 @@ export function streamFactory<T>(
             )
           );
           return;
-      } else {
+        } else {
           subject.error(new DataLoadError(DataLoadErrorType.SERVER, "Server returned an error."));
           return;
         }
@@ -85,7 +85,7 @@ export function streamFactory<T>(
         debugLog(async () => [`Finished loading ${runningTotal} objects in ${t1 - t0} ms`]);
 
         subject.complete();
-      } catch (e) {
+      } catch (e: any) {
         subject.error(
           new DataLoadError(DataLoadErrorType.NETWORK, "Network request unable to complete.")
         );
@@ -101,7 +101,7 @@ export function streamFactory<T>(
 
         try {
           response = await responseFactory({ page, pageSize });
-        } catch (e) {
+        } catch (e: any) {
           subject.error(new DataLoadError(DataLoadErrorType.NETWORK, e.toString()));
           return;
         } finally {
@@ -318,7 +318,6 @@ export function buildBodyFilter(filterOptions: IFilterOptions | null): ICollecti
   // PlantBatch Filter
   //
 
-
   if (plantBatchFilter?.name) {
     filterSet.filters = [
       ...filterSet.filters,
@@ -474,7 +473,7 @@ export function buildBodyFilter(filterOptions: IFilterOptions | null): ICollecti
       },
     ];
   }
-  
+
   if (transferFilter?.createdDateLt) {
     filterSet.filters = [
       ...filterSet.filters,

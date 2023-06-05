@@ -332,7 +332,7 @@ export const packageHistoryModule = {
             ctx.commit(PackageHistoryMutations.SET_SOURCE_HARVESTS, {
               sourceHarvests: await getParentHarvests(pkg.Label),
             });
-          } catch (e) {
+          } catch (e: any) {
             console.error("Cannot load source harvests", e);
           }
           ctx.commit(PackageHistoryMutations.SET_ANCESTORS, {
@@ -351,7 +351,7 @@ export const packageHistoryModule = {
             });
           }
           analyticsManager.track(MessageType.GENERATE_PACKAGE_HISTORY_SUCCESS);
-        } catch (e) {
+        } catch (e: any) {
           console.error(e);
           analyticsManager.track(MessageType.GENERATE_PACKAGE_HISTORY_ERROR, { e });
           ctx.commit(PackageHistoryMutations.LOG_EVENT, {
