@@ -1,4 +1,4 @@
-import { SheetTitles } from "@/consts";
+import { MessageType, SHEETS_API_MESSAGE_TIMEOUT_MS, SheetTitles } from "@/consts";
 import {
   IIndexedRichOutgoingTransferData,
   IMetadataSimplePackageData,
@@ -7,10 +7,13 @@ import {
   ISimpleOutgoingTransferData,
   ISimplePackageData,
   ISimpleTransferPackageData,
+  ISpreadsheet,
   ITransferFilter,
 } from "@/interfaces";
 import { DataLoader, getDataLoaderByLicense } from "@/modules/data-loader/data-loader.module";
 import { facilityManager } from "@/modules/facility-manager.module";
+import { messageBus } from "@/modules/message-bus.module";
+import store from "@/store/page-overlay/index";
 import { ReportsMutations, ReportType } from "@/store/page-overlay/modules/reports/consts";
 import {
   ICogsArchive,
@@ -20,6 +23,7 @@ import {
 } from "@/store/page-overlay/modules/reports/interfaces";
 import { ActionContext } from "vuex";
 import { CompressedDataWrapper } from "../compression";
+import { downloadCsvFile } from "../csv";
 import { getIsoDateFromOffset, todayIsodate } from "../date";
 import {
   extractParentPackageLabelsFromHistory,
@@ -31,7 +35,14 @@ import {
   simplePackageNormalizer,
   simpleTransferPackageConverter,
 } from "../package";
-import { getLetterFromIndex } from "../sheets";
+import {
+  addRowsRequestFactory,
+  autoResizeDimensionsRequestFactory,
+  freezeTopRowRequestFactory,
+  getLetterFromIndex,
+  styleTopRowRequestFactory,
+} from "../sheets";
+import { writeDataSheet } from "../sheets-export";
 
 interface ICogsReportFormFilters {
   cogsDateGt: string;
@@ -785,4 +796,213 @@ export async function maybeLoadCogsReportData({
     worksheetMatrix,
     cogsMatrix,
   };
+}
+
+export async function createCogsSpreadsheetOrError({
+  reportData,
+  reportConfig,
+}: {
+  reportData: IReportData;
+  reportConfig: IReportConfig;
+}): Promise<ISpreadsheet> {
+  if (!store.state.pluginAuth?.authState?.license) {
+    throw new Error("Invalid authState");
+  }
+
+  if (!reportData[ReportType.COGS]) {
+    throw new Error("Missing COGS data");
+  }
+
+  const sheetTitles = [
+    SheetTitles.OVERVIEW,
+    // SheetTitles.PRODUCTION_BATCH_COSTS,
+    SheetTitles.WORKSHEET,
+    SheetTitles.MANIFEST_COGS,
+  ];
+
+  const response: {
+    data: {
+      success: boolean;
+      result: ISpreadsheet;
+    };
+  } = await messageBus.sendMessageToBackground(
+    MessageType.CREATE_SPREADSHEET,
+    {
+      title: `COGS - ${todayIsodate()}`,
+      sheetTitles,
+    },
+    undefined,
+    SHEETS_API_MESSAGE_TIMEOUT_MS
+  );
+
+  if (!response.data.success) {
+    throw new Error("Unable to create COGS sheet");
+  }
+
+  let formattingRequests: any = [
+    addRowsRequestFactory({
+      sheetId: sheetTitles.indexOf(SheetTitles.OVERVIEW),
+      length: 20,
+    }),
+    styleTopRowRequestFactory({
+      sheetId: sheetTitles.indexOf(SheetTitles.OVERVIEW),
+    }),
+  ];
+
+  const { worksheetMatrix, cogsMatrix, auditData } = reportData[ReportType.COGS]!;
+
+  const worksheetSheetId = sheetTitles.indexOf(SheetTitles.WORKSHEET);
+  const manifestSheetId = sheetTitles.indexOf(SheetTitles.MANIFEST_COGS);
+
+  formattingRequests = [
+    ...formattingRequests,
+    // Worksheet
+    addRowsRequestFactory({ sheetId: worksheetSheetId, length: worksheetMatrix.length }),
+    styleTopRowRequestFactory({ sheetId: worksheetSheetId }),
+    freezeTopRowRequestFactory({ sheetId: worksheetSheetId }),
+    // Manifest COGS
+    addRowsRequestFactory({ sheetId: manifestSheetId, length: cogsMatrix.length }),
+    styleTopRowRequestFactory({ sheetId: manifestSheetId }),
+    freezeTopRowRequestFactory({ sheetId: manifestSheetId }),
+  ];
+
+  await messageBus.sendMessageToBackground(
+    MessageType.BATCH_UPDATE_SPREADSHEET,
+    {
+      spreadsheetId: response.data.result.spreadsheetId,
+      requests: formattingRequests,
+    },
+    undefined,
+    SHEETS_API_MESSAGE_TIMEOUT_MS
+  );
+
+  await messageBus.sendMessageToBackground(
+    MessageType.WRITE_SPREADSHEET_VALUES,
+    {
+      spreadsheetId: response.data.result.spreadsheetId,
+      range: `'${SheetTitles.OVERVIEW}'`,
+      values: [
+        [],
+        [],
+        [null, "Enable calculator:"],
+        [],
+        ...Object.entries(auditData).map(([key, value]) => ["", key, JSON.stringify(value)]),
+      ],
+    },
+    undefined,
+    SHEETS_API_MESSAGE_TIMEOUT_MS
+  );
+
+  store.commit(`reports/${ReportsMutations.SET_STATUS}`, {
+    statusMessage: { text: `Writing worksheet data...`, level: "success" },
+  });
+
+  await downloadCsvFile({
+    csvFile: {
+      filename: "worksheet.csv",
+      data: worksheetMatrix,
+    },
+  });
+
+  await downloadCsvFile({
+    csvFile: {
+      filename: "cogs.csv",
+      data: cogsMatrix,
+    },
+  });
+
+  await writeDataSheet({
+    spreadsheetId: response.data.result.spreadsheetId,
+    spreadsheetTitle: SheetTitles.WORKSHEET,
+    data: worksheetMatrix.map((row) => row.slice(row.length - 1)),
+    options: {
+      rangeStartColumn: getLetterFromIndex(worksheetMatrix[0].length - 1),
+      pageSize: 1000,
+      valueInputOption: "USER_ENTERED",
+      // batchWrite: true,
+      maxParallelRequests: 50,
+    },
+  });
+
+  await writeDataSheet({
+    spreadsheetId: response.data.result.spreadsheetId,
+    spreadsheetTitle: SheetTitles.WORKSHEET,
+    data: worksheetMatrix.map((row) => row.slice(0, row.length - 1)),
+    options: {
+      valueInputOption: "RAW",
+      batchWrite: true,
+    },
+  });
+
+  store.commit(`reports/${ReportsMutations.SET_STATUS}`, {
+    statusMessage: { text: `Writing manifest data...`, level: "success" },
+  });
+
+  await writeDataSheet({
+    spreadsheetId: response.data.result.spreadsheetId,
+    spreadsheetTitle: SheetTitles.MANIFEST_COGS,
+    data: cogsMatrix.map((row) => row.slice(row.length - 2)),
+    options: {
+      rangeStartColumn: getLetterFromIndex(cogsMatrix[0].length - 2),
+      pageSize: 5000,
+      valueInputOption: "USER_ENTERED",
+      // batchWrite: true,
+      maxParallelRequests: 10,
+    },
+  });
+
+  await writeDataSheet({
+    spreadsheetId: response.data.result.spreadsheetId,
+    spreadsheetTitle: SheetTitles.MANIFEST_COGS,
+    data: cogsMatrix.map((row) => row.slice(0, row.length - 2)),
+    options: {
+      valueInputOption: "RAW",
+      batchWrite: true,
+    },
+  });
+
+  store.commit(`reports/${ReportsMutations.SET_STATUS}`, {
+    statusMessage: { text: `Resizing sheets...`, level: "success" },
+  });
+
+  let resizeRequests: any[] = [
+    autoResizeDimensionsRequestFactory({
+      sheetId: sheetTitles.indexOf(SheetTitles.OVERVIEW),
+      dimension: "COLUMNS",
+    }),
+  ];
+
+  resizeRequests = [
+    ...resizeRequests,
+    autoResizeDimensionsRequestFactory({
+      sheetId: worksheetSheetId,
+    }),
+    autoResizeDimensionsRequestFactory({
+      sheetId: manifestSheetId,
+    }),
+  ];
+
+  // This is incredibly slow for huge sheets, don't wait for it to finish
+  messageBus.sendMessageToBackground(
+    MessageType.BATCH_UPDATE_SPREADSHEET,
+    {
+      spreadsheetId: response.data.result.spreadsheetId,
+      requests: resizeRequests,
+    },
+    undefined,
+    SHEETS_API_MESSAGE_TIMEOUT_MS
+  );
+
+  await messageBus.sendMessageToBackground(
+    MessageType.WRITE_SPREADSHEET_VALUES,
+    {
+      spreadsheetId: response.data.result.spreadsheetId,
+      range: `'${SheetTitles.OVERVIEW}'`,
+      values: [[`Created with Track & Trace Tools @ ${Date().toString()}`]],
+    },
+    undefined,
+    SHEETS_API_MESSAGE_TIMEOUT_MS
+  );
+
+  return response.data.result;
 }

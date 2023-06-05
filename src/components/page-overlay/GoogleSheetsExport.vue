@@ -91,6 +91,33 @@
             </div>
           </template>
 
+          <!-- COGS Tracker -->
+          <template v-if="selectedReports.includes(ReportType.COGS_TRACKER)">
+            <div class="rounded border border-gray-300 p-2 flex flex-col items-stretch gap-2">
+              <div class="font-semibold text-gray-700">COGS Tracker</div>
+              <hr />
+              <div class="flex flex-col items-stretch gap-4">
+                <div class="flex flex-col items-start gap-1">
+                  <b-form-datepicker
+                    :required="true"
+                    initial-date
+                    size="sm"
+                    v-model="cogsTrackerFormFilters.cogsTrackerDateGt"
+                  />
+                </div>
+
+                <div class="flex flex-col items-start gap-1">
+                  <b-form-datepicker
+                    :required="true"
+                    initial-date
+                    size="sm"
+                    v-model="cogsTrackerFormFilters.cogsTrackerDateLt"
+                  />
+                </div>
+              </div>
+            </div>
+          </template>
+
           <!-- Packages -->
           <template v-if="selectedReports.includes(ReportType.PACKAGES)">
             <div class="rounded border border-gray-300 p-2 flex flex-col items-stretch gap-2">
@@ -1162,6 +1189,10 @@ import {
 import { IReportConfig } from "@/store/page-overlay/modules/reports/interfaces";
 import { todayIsodate } from "@/utils/date";
 import { addCogsReport, cogsFormFiltersFactory } from "@/utils/reports/cogs-report";
+import {
+  addCogsTrackerReport,
+  cogsTrackerFormFiltersFactory,
+} from "@/utils/reports/cogs-tracker-report";
 import { addHarvestsReport, harvestsFormFiltersFactory } from "@/utils/reports/harvests-report";
 import {
   addImmaturePlantsReport,
@@ -1241,6 +1272,7 @@ export default Vue.extend({
       SHEET_FIELDS,
       selectedReports: [] as ReportType[],
       cogsFormFilters: cogsFormFiltersFactory(),
+      cogsTrackerFormFilters: cogsTrackerFormFiltersFactory(),
       packagesFormFilters: packageFormFiltersFactory(),
       stragglerPackagesFormFilters: stragglerPackagesFormFiltersFactory(),
       maturePlantsFormFilters: maturePlantsFormFiltersFactory(),
@@ -1373,6 +1405,15 @@ export default Vue.extend({
           isCustom: false,
         },
         {
+          text: "COGS Tracker",
+          value: ReportType.COGS_TRACKER,
+          t3plus: false,
+          enabled: clientBuildManager.assertValues(["ENABLE_COGS_TRACKER"]),
+          hidden: !clientBuildManager.assertValues(["ENABLE_COGS_TRACKER"]),
+          description: "Generate COGS Tracker",
+          isCustom: false,
+        },
+        {
           text: "Package Quickview",
           value: null,
           t3plus: true,
@@ -1479,6 +1520,14 @@ export default Vue.extend({
         });
       }
 
+      // TODO: cogs must UNCHECK all other report types
+      if (this.selectedReports.includes(ReportType.COGS_TRACKER)) {
+        addCogsTrackerReport({
+          reportConfig,
+          cogsTrackerFormFilters: this.cogsTrackerFormFilters,
+        });
+      }
+
       if (this.selectedReports.includes(ReportType.PACKAGES)) {
         addPackageReport({
           reportConfig,
@@ -1561,6 +1610,10 @@ export default Vue.extend({
       handler(newValue, oldValue) {
         if (newValue.length > 1 && newValue.includes(ReportType.COGS)) {
           this.selectedReports = [ReportType.COGS];
+        }
+
+        if (newValue.length > 1 && newValue.includes(ReportType.COGS_TRACKER)) {
+          this.selectedReports = [ReportType.COGS_TRACKER];
         }
       },
     },

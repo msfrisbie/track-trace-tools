@@ -163,6 +163,8 @@ export function getSheetTitle({ reportType }: { reportType: ReportType }): Sheet
       return SheetTitles.TAGS;
     case ReportType.IMMATURE_PLANTS:
       return SheetTitles.IMMATURE_PLANTS;
+    case ReportType.MATURE_PLANTS_QUICKVIEW:
+      return SheetTitles.MATURE_PLANTS_QUICKVIEW;
     case ReportType.MATURE_PLANTS:
       return SheetTitles.MATURE_PLANTS;
     case ReportType.INCOMING_TRANSFERS:

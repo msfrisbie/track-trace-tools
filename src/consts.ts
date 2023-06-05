@@ -508,6 +508,7 @@ export enum SheetTitles {
   HARVESTS = "Harvests",
   IMMATURE_PLANTS = "Immature Plants",
   MATURE_PLANTS = "Mature Plants",
+  MATURE_PLANTS_QUICKVIEW = "Mature Plants Quickview",
   INCOMING_TRANSFERS = "Incoming Transfers",
   OUTGOING_TRANSFERS = "Outgoing Transfers",
   OUTGOING_TRANSFER_MANIFESTS = "Outgoing Transfer Manifest Packages",
@@ -515,6 +516,8 @@ export enum SheetTitles {
   PRODUCTION_BATCH_COSTS = "Production Batch Costs",
   WORKSHEET = "Worksheet",
   MANIFEST_COGS = "Manifest Cogs",
+  BULK_INFUSED_GOODS_COGS = "Bulk Infused Goods COGS",
+  INPUT_COGS = "Input COGS",
 }
 
 // Sheets self-enforced timeout is 180000ms,

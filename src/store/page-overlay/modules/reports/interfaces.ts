@@ -11,15 +11,11 @@ import {
   IPackageFilter,
   IPlantBatchFilter,
   IPlantFilter,
-  ISimplePackageData,
   ISimpleSpreadsheet,
-  ISimpleTransferPackageData,
   ISpreadsheet,
   ITagFilter,
   ITransferFilter,
 } from "@/interfaces";
-import { CompressedDataWrapper } from "@/utils/compression";
-import { IMetadataSimplePackageData } from "@/utils/reports/cogs-report";
 import { IStatusMessage, ReportStatus, ReportType } from "./consts";
 
 export interface IReportsState {
@@ -51,6 +47,10 @@ export interface IReportConfig {
     fields: null;
     mutableArchiveData: ICogsArchive;
   };
+  [ReportType.COGS_TRACKER]?: {
+    packageFilter: IPackageFilter;
+    fields: null;
+  };
   [ReportType.PACKAGES]?: {
     packageFilter: IPackageFilter;
     fields: IFieldData[];
@@ -58,6 +58,12 @@ export interface IReportConfig {
   [ReportType.STRAGGLER_PACKAGES]?: {
     stragglerPackageFilter: IPackageFilter;
     fields: IFieldData[];
+  };
+  [ReportType.MATURE_PLANTS_QUICKVIEW]?: {
+    plantFilter: IPlantFilter;
+    primaryDimension: string;
+    secondaryDimension: string | null;
+    fields: null;
   };
   [ReportType.MATURE_PLANTS]?: {
     plantFilter: IPlantFilter;
@@ -91,9 +97,13 @@ export interface IReportConfig {
 
 export interface IReportData {
   [ReportType.COGS]?: {
-    auditData: {[key: string]: any},
-    worksheetMatrix: any[][],
-    cogsMatrix: any[][]
+    auditData: { [key: string]: any };
+    worksheetMatrix: any[][];
+    cogsMatrix: any[][];
+  };
+  [ReportType.COGS_TRACKER]?: {
+    bulkInfusedMatrix: any[][];
+    inputCogsMatrix: any[][];
   };
   [ReportType.PACKAGES]?: {
     packages: IIndexedPackageData[];
@@ -105,6 +115,9 @@ export interface IReportData {
     immaturePlants: IIndexedPlantBatchData[];
   };
   [ReportType.MATURE_PLANTS]?: {
+    maturePlants: IIndexedPlantData[];
+  };
+  [ReportType.MATURE_PLANTS_QUICKVIEW]?: {
     maturePlants: IIndexedPlantData[];
   };
   [ReportType.TAGS]?: {

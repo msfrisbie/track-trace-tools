@@ -429,7 +429,16 @@ class PageManager implements IAtomicService {
       }
 
       if (window.location.pathname.match(TRANSFER_HUB_REGEX)) {
+        // this.acquireTransferFilterElements();
+        // this.readTransferFilters();
+
         this.interceptViewManifestButton();
+
+        // this.addButtonsToTransferTable();
+
+        // // Transfer subtable for packages should get these too
+        // // This MUST occur after the transfer buttons are added
+        // this.addButtonsToPackageTable();
       }
 
       if (window.location.pathname.match(TRANSFER_TEMPLATE_TAB_REGEX)) {

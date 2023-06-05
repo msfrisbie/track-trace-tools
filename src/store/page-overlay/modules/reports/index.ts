@@ -2,9 +2,11 @@ import { MessageType } from "@/consts";
 import { IPluginState, ISpreadsheet } from "@/interfaces";
 import { analyticsManager } from "@/modules/analytics-manager.module";
 import { maybeLoadCogsReportData } from "@/utils/reports/cogs-report";
+import { maybeLoadCogsTrackerReportData } from "@/utils/reports/cogs-tracker-report";
 import { maybeLoadHarvestsReportData } from "@/utils/reports/harvests-report";
 import { maybeLoadImmaturePlantsReportData } from "@/utils/reports/immature-plants-report";
 import { maybeLoadIncomingTransfersReportData } from "@/utils/reports/incoming-transfers-report";
+import { maybeLoadMaturePlantsQuickviewReportData } from "@/utils/reports/mature-plant-quickview-report";
 import { maybeLoadMaturePlantsReportData } from "@/utils/reports/mature-plants-report";
 import { maybeLoadOutgoingTransferManifestsReportData } from "@/utils/reports/outgoing-transfer-manifests-report";
 import { maybeLoadOutgoingTransfersReportData } from "@/utils/reports/outgoing-transfers-report";
@@ -86,22 +88,8 @@ export const reportsModule = {
     },
   },
   getters: {
-    [ReportsGetters.EXAMPLE_GETTER]: (
-      state: IReportsState,
-      getters: any,
-      rootState: any,
-      rootGetters: any
-    ) => {
-      // return state.data
-    },
   },
   actions: {
-    [ReportsActions.EXAMPLE_ACTION]: async (
-      ctx: ActionContext<IReportsState, IPluginState>,
-      data: any
-    ) => {
-      ctx.commit(ReportsMutations.EXAMPLE_MUTATION, data);
-    },
     [ReportsActions.RESET]: async (ctx: ActionContext<IReportsState, IPluginState>, data: any) => {
       ctx.commit(ReportsMutations.SET_STATUS, {
         status: ReportStatus.INITIAL,
@@ -122,11 +110,13 @@ export const reportsModule = {
 
         await maybeLoadPackageReportData({ ctx, reportData, reportConfig });
         await maybeLoadCogsReportData({ ctx, reportData, reportConfig });
+        await maybeLoadCogsTrackerReportData({ ctx, reportData, reportConfig });
         await maybeLoadStragglerPackageReportData({ ctx, reportData, reportConfig });
         await maybeLoadImmaturePlantsReportData({ ctx, reportData, reportConfig });
         await maybeLoadHarvestsReportData({ ctx, reportData, reportConfig });
         await maybeLoadTagsReportData({ ctx, reportData, reportConfig });
         await maybeLoadMaturePlantsReportData({ ctx, reportData, reportConfig });
+        await maybeLoadMaturePlantsQuickviewReportData({ ctx, reportData, reportConfig });
         await maybeLoadIncomingTransfersReportData({ ctx, reportData, reportConfig });
         await maybeLoadOutgoingTransfersReportData({ ctx, reportData, reportConfig });
         await maybeLoadOutgoingTransferManifestsReportData({ ctx, reportData, reportConfig });

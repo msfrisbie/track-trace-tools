@@ -14,8 +14,9 @@ import {
   IReportConfig,
   IReportData,
 } from "@/store/page-overlay/modules/reports/interfaces";
-import { downloadCsvFile } from "./csv";
 import { todayIsodate } from "./date";
+import { createCogsSpreadsheetOrError } from "./reports/cogs-report";
+import { createCogsTrackerSpreadsheetOrError } from "./reports/cogs-tracker-report";
 import {
   extractFlattenedData,
   getSheetTitle,
@@ -26,12 +27,11 @@ import {
   autoResizeDimensionsRequestFactory,
   conditionalFormattingRequestFactory,
   freezeTopRowRequestFactory,
-  getLetterFromIndex,
   shrinkFontRequestFactory,
   styleTopRowRequestFactory,
 } from "./sheets";
 
-async function writeDataSheet<T>({
+export async function writeDataSheet<T>({
   spreadsheetId,
   spreadsheetTitle,
   fields,
@@ -54,8 +54,8 @@ async function writeDataSheet<T>({
 }) {
   const mergedOptions = {
     useFieldTransformer: false,
-    pageSize: 5000,
-    maxParallelRequests: 25,
+    pageSize: 10000,
+    maxParallelRequests: 10,
     valueInputOption: "USER_ENTERED",
     rangeStartColumn: "A",
     rangeEndColumn: "",
@@ -276,6 +276,13 @@ export async function createSpreadsheetOrError({
     });
   }
 
+  if (reportConfig[ReportType.COGS_TRACKER]) {
+    return createCogsTrackerSpreadsheetOrError({
+      reportData,
+      reportConfig,
+    });
+  }
+
   return createReportSpreadsheeetOrError({
     reportData,
     reportConfig,
@@ -302,6 +309,7 @@ export async function createReportSpreadsheeetOrError({
     ReportType.HARVESTS,
     ReportType.IMMATURE_PLANTS,
     ReportType.MATURE_PLANTS,
+    ReportType.MATURE_PLANTS_QUICKVIEW,
     ReportType.INCOMING_TRANSFERS,
     ReportType.OUTGOING_TRANSFERS,
     ReportType.OUTGOING_TRANSFER_MANIFESTS,
@@ -353,6 +361,8 @@ export async function createReportSpreadsheeetOrError({
       sheetId: sheetTitles.indexOf(SheetTitles.OVERVIEW),
     }),
   ];
+
+  // TODO report data should be pre-formatted before getting here
 
   for (const reportType of ELIGIBLE_REPORT_TYPES) {
     const sheetId: number = sheetTitles.indexOf(getSheetTitle({ reportType }));
@@ -488,215 +498,6 @@ export async function createReportSpreadsheeetOrError({
     {
       spreadsheetId: response.data.result.spreadsheetId,
       requests: shrinkFontRequests,
-    },
-    undefined,
-    SHEETS_API_MESSAGE_TIMEOUT_MS
-  );
-
-  await messageBus.sendMessageToBackground(
-    MessageType.WRITE_SPREADSHEET_VALUES,
-    {
-      spreadsheetId: response.data.result.spreadsheetId,
-      range: `'${SheetTitles.OVERVIEW}'`,
-      values: [[`Created with Track & Trace Tools @ ${Date().toString()}`]],
-    },
-    undefined,
-    SHEETS_API_MESSAGE_TIMEOUT_MS
-  );
-
-  return response.data.result;
-}
-
-export async function createCogsSpreadsheetOrError({
-  reportData,
-  reportConfig,
-}: {
-  reportData: IReportData;
-  reportConfig: IReportConfig;
-}): Promise<ISpreadsheet> {
-  if (!store.state.pluginAuth?.authState?.license) {
-    throw new Error("Invalid authState");
-  }
-
-  if (!reportData[ReportType.COGS]) {
-    throw new Error("Missing COGS data");
-  }
-
-  const sheetTitles = [
-    SheetTitles.OVERVIEW,
-    // SheetTitles.PRODUCTION_BATCH_COSTS,
-    SheetTitles.WORKSHEET,
-    SheetTitles.MANIFEST_COGS,
-  ];
-
-  const response: {
-    data: {
-      success: boolean;
-      result: ISpreadsheet;
-    };
-  } = await messageBus.sendMessageToBackground(
-    MessageType.CREATE_SPREADSHEET,
-    {
-      title: `COGS - ${todayIsodate()}`,
-      sheetTitles,
-    },
-    undefined,
-    SHEETS_API_MESSAGE_TIMEOUT_MS
-  );
-
-  if (!response.data.success) {
-    throw new Error("Unable to create COGS sheet");
-  }
-
-  let formattingRequests: any = [
-    addRowsRequestFactory({
-      sheetId: sheetTitles.indexOf(SheetTitles.OVERVIEW),
-      length: 20,
-    }),
-    styleTopRowRequestFactory({
-      sheetId: sheetTitles.indexOf(SheetTitles.OVERVIEW),
-    }),
-  ];
-
-  const { worksheetMatrix, cogsMatrix, auditData } = reportData[ReportType.COGS]!;
-
-  const worksheetSheetId = sheetTitles.indexOf(SheetTitles.WORKSHEET);
-  const manifestSheetId = sheetTitles.indexOf(SheetTitles.MANIFEST_COGS);
-
-  formattingRequests = [
-    ...formattingRequests,
-    // Worksheet
-    addRowsRequestFactory({ sheetId: worksheetSheetId, length: worksheetMatrix.length }),
-    styleTopRowRequestFactory({ sheetId: worksheetSheetId }),
-    freezeTopRowRequestFactory({ sheetId: worksheetSheetId }),
-    // Manifest COGS
-    addRowsRequestFactory({ sheetId: manifestSheetId, length: cogsMatrix.length }),
-    styleTopRowRequestFactory({ sheetId: manifestSheetId }),
-    freezeTopRowRequestFactory({ sheetId: manifestSheetId }),
-  ];
-
-  await messageBus.sendMessageToBackground(
-    MessageType.BATCH_UPDATE_SPREADSHEET,
-    {
-      spreadsheetId: response.data.result.spreadsheetId,
-      requests: formattingRequests,
-    },
-    undefined,
-    SHEETS_API_MESSAGE_TIMEOUT_MS
-  );
-
-  await messageBus.sendMessageToBackground(
-    MessageType.WRITE_SPREADSHEET_VALUES,
-    {
-      spreadsheetId: response.data.result.spreadsheetId,
-      range: `'${SheetTitles.OVERVIEW}'`,
-      values: [
-        [],
-        [],
-        [null, "Enable calculator:"],
-        [],
-        ...Object.entries(auditData).map(([key, value]) => ["", key, JSON.stringify(value)]),
-      ],
-    },
-    undefined,
-    SHEETS_API_MESSAGE_TIMEOUT_MS
-  );
-
-  store.commit(`reports/${ReportsMutations.SET_STATUS}`, {
-    statusMessage: { text: `Writing worksheet data...`, level: "success" },
-  });
-
-  await downloadCsvFile({
-    csvFile: {
-      filename: "worksheet.csv",
-      data: worksheetMatrix,
-    },
-  });
-
-  await downloadCsvFile({
-    csvFile: {
-      filename: "cogs.csv",
-      data: cogsMatrix,
-    },
-  });
-
-  await writeDataSheet({
-    spreadsheetId: response.data.result.spreadsheetId,
-    spreadsheetTitle: SheetTitles.WORKSHEET,
-    data: worksheetMatrix.map((row) => row.slice(row.length - 1)),
-    options: {
-      rangeStartColumn: getLetterFromIndex(worksheetMatrix[0].length - 1),
-      pageSize: 1000,
-      valueInputOption: "USER_ENTERED",
-      // batchWrite: true,
-      maxParallelRequests: 50,
-    },
-  });
-
-  await writeDataSheet({
-    spreadsheetId: response.data.result.spreadsheetId,
-    spreadsheetTitle: SheetTitles.WORKSHEET,
-    data: worksheetMatrix.map((row) => row.slice(0, row.length - 1)),
-    options: {
-      valueInputOption: "RAW",
-      batchWrite: true,
-    },
-  });
-
-  store.commit(`reports/${ReportsMutations.SET_STATUS}`, {
-    statusMessage: { text: `Writing manifest data...`, level: "success" },
-  });
-
-  await writeDataSheet({
-    spreadsheetId: response.data.result.spreadsheetId,
-    spreadsheetTitle: SheetTitles.MANIFEST_COGS,
-    data: cogsMatrix.map((row) => row.slice(row.length - 2)),
-    options: {
-      rangeStartColumn: getLetterFromIndex(cogsMatrix[0].length - 2),
-      pageSize: 5000,
-      valueInputOption: "USER_ENTERED",
-      // batchWrite: true,
-      maxParallelRequests: 10,
-    },
-  });
-
-  await writeDataSheet({
-    spreadsheetId: response.data.result.spreadsheetId,
-    spreadsheetTitle: SheetTitles.MANIFEST_COGS,
-    data: cogsMatrix.map((row) => row.slice(0, row.length - 2)),
-    options: {
-      valueInputOption: "RAW",
-      batchWrite: true,
-    },
-  });
-
-  store.commit(`reports/${ReportsMutations.SET_STATUS}`, {
-    statusMessage: { text: `Resizing sheets...`, level: "success" },
-  });
-
-  let resizeRequests: any[] = [
-    autoResizeDimensionsRequestFactory({
-      sheetId: sheetTitles.indexOf(SheetTitles.OVERVIEW),
-      dimension: "COLUMNS",
-    }),
-  ];
-
-  resizeRequests = [
-    ...resizeRequests,
-    autoResizeDimensionsRequestFactory({
-      sheetId: worksheetSheetId,
-    }),
-    autoResizeDimensionsRequestFactory({
-      sheetId: manifestSheetId,
-    }),
-  ];
-
-  // This is incredibly slow for huge sheets, don't wait for it to finish
-  messageBus.sendMessageToBackground(
-    MessageType.BATCH_UPDATE_SPREADSHEET,
-    {
-      spreadsheetId: response.data.result.spreadsheetId,
-      requests: resizeRequests,
     },
     undefined,
     SHEETS_API_MESSAGE_TIMEOUT_MS
