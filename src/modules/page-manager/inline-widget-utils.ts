@@ -15,14 +15,12 @@ export async function addButtonsToTransferTableImpl() {
 
   const rows: Element[] = [];
 
-  const treeGrids = [
-    ...document.querySelectorAll(`table[role="treegrid"][${TTT_TABLEGROUP_ATTRIBUTE}]`),
-  ];
+  const grids = [...document.querySelectorAll(`table[${TTT_TABLEGROUP_ATTRIBUTE}]`)];
 
-  for (const treeGrid of treeGrids) {
-    const groupId = treeGrid.getAttribute(TTT_TABLEGROUP_ATTRIBUTE);
+  for (const grid of grids) {
+    const groupId = grid.getAttribute(TTT_TABLEGROUP_ATTRIBUTE);
 
-    const transferHeaderCell = treeGrid.querySelector(
+    const transferHeaderCell = grid.querySelector(
       `[${TTT_TABLEGROUP_ATTRIBUTE}="${groupId}"] th[data-field="ManifestNumber"]`
     );
 
@@ -31,8 +29,8 @@ export async function addButtonsToTransferTableImpl() {
       continue;
     }
 
-    for (const row of treeGrid.querySelectorAll(
-      `.k-master-row[${TTT_TABLEGROUP_ATTRIBUTE}="${groupId}"]:not([mesinline="1"])`
+    for (const row of grid.querySelectorAll(
+      `[role="row"][${TTT_TABLEGROUP_ATTRIBUTE}="${groupId}"]:not([mesinline="1"])`
     )) {
       rows.push(row);
     }
@@ -109,14 +107,12 @@ export async function addButtonsToPackageTableImpl() {
 
   const rows: Element[] = [];
 
-  const treeGrids = [
-    ...document.querySelectorAll(`table[role="treegrid"][${TTT_TABLEGROUP_ATTRIBUTE}]`),
-  ];
+  const grids = [...document.querySelectorAll(`table[${TTT_TABLEGROUP_ATTRIBUTE}]`)];
 
-  for (const treeGrid of treeGrids) {
-    const groupId = treeGrid.getAttribute(TTT_TABLEGROUP_ATTRIBUTE);
+  for (const grid of grids) {
+    const groupId = grid.getAttribute(TTT_TABLEGROUP_ATTRIBUTE);
 
-    const packageHeaderCell = treeGrid.querySelector(
+    const packageHeaderCell = grid.querySelector(
       // TODO: this might select plants too?
       `[${TTT_TABLEGROUP_ATTRIBUTE}="${groupId}"] th[data-field="Label"],
       [${TTT_TABLEGROUP_ATTRIBUTE}="${groupId}"] th[data-field="PackageLabel"]`
@@ -127,8 +123,8 @@ export async function addButtonsToPackageTableImpl() {
       continue;
     }
 
-    for (const row of treeGrid.querySelectorAll(
-      `.k-master-row[${TTT_TABLEGROUP_ATTRIBUTE}="${groupId}"]:not([mesinline="1"])`
+    for (const row of grid.querySelectorAll(
+      `[role="row"][${TTT_TABLEGROUP_ATTRIBUTE}="${groupId}"]:not([mesinline="1"])`
     )) {
       rows.push(row);
     }
@@ -143,12 +139,23 @@ export async function addButtonsToPackageTableImpl() {
 
     row.setAttribute("mesinline", "1");
 
-    const targetCell = row.children[1];
+    const candidateCells: Element[] = [row.children[0], row.children[1]];
 
-    // @ts-ignore
-    const packageTag = targetCell.innerText.trim();
+    let targetCell: Element | null = null;
+    let packageTag: string | null = null;
 
-    if (!packageTag || !packageTag.match(METRC_TAG_REGEX)) {
+    for (const candidateCell of candidateCells) {
+      // @ts-ignore
+      const candidatePackageTag = candidateCell.innerText.trim();
+
+      if (candidatePackageTag && candidatePackageTag.match(METRC_TAG_REGEX)) {
+        targetCell = candidateCell;
+        packageTag = candidatePackageTag;
+        break;
+      }
+    }
+
+    if (!targetCell || !packageTag) {
       console.error("bad packageTag");
       continue;
     }
@@ -167,7 +174,7 @@ export async function addButtonsToPackageTableImpl() {
       const e = {
         x: event.pageX,
         y: event.pageY,
-        packageTag,
+        packageTag: packageTag!,
       };
 
       analyticsManager.track(MessageType.OPENED_CONTEXT_MENU, e);

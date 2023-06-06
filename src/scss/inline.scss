@@ -19,7 +19,7 @@
 }
 
 // Need extra specificity to override bootstrap
-tr.k-master-row {
+tr[role="row"] {
   .inline-button-container {
     // display: block;
     float: right;

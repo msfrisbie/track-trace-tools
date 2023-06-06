@@ -73,8 +73,8 @@ body.ttt-styling-fix {
     white-space: nowrap;
   }
 
-  .k-grid td:hover {
-    white-space: normal;
+  .k-grid td {
+    white-space: nowrap !important;
   }
 
   .k-grid td:nth-child(2) {

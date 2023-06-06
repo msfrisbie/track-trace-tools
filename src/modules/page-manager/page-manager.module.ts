@@ -699,7 +699,9 @@ class PageManager implements IAtomicService {
     try {
       const tablesAndRows = document.querySelectorAll(
         `table[role="treegrid"], 
-        table[role="treegrid"] tr:not([${TTT_TABLEGROUP_ATTRIBUTE}])`
+        table[role="treegrid"] tr:not([${TTT_TABLEGROUP_ATTRIBUTE}]),
+        table[role="grid"], 
+        table[role="grid"] tr:not([${TTT_TABLEGROUP_ATTRIBUTE}])`
       );
 
       let groupId = null;
