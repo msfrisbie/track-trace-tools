@@ -15,7 +15,7 @@
         <template #title v-if="contextMenuEvent">
           <div class="text-center text-normal text-lg">
             <template v-if="contextMenuEvent.packageTag">
-              <dual-color-tag class="text-md" :label="contextMenuEvent.packageTag" />
+              <metrc-tag :label="contextMenuEvent.packageTag"></metrc-tag>
             </template>
 
             <template v-if="contextMenuEvent.manifestNumber">
@@ -48,7 +48,7 @@ import ContextMenu from "@/components/overlay-widget/ContextMenu.vue";
 import DebugModal from "@/components/overlay-widget/debug/DebugModal.vue";
 import DocumentModal from "@/components/overlay-widget/DocumentModal.vue";
 import PromoModal from "@/components/overlay-widget/PromoModal.vue";
-import DualColorTag from "@/components/overlay-widget/shared/DualColorTag.vue";
+import MetrcTag from "@/components/overlay-widget/shared/MetrcTag.vue";
 import { ModalAction, ModalType } from "@/consts";
 import { IContextMenuEvent, IModalEvent, modalManager } from "@/modules/modal-manager.module";
 import { toastManager } from "@/modules/toast-manager.module";
@@ -71,7 +71,7 @@ export default Vue.extend({
     DebugModal,
     DocumentModal,
     ContextMenu,
-    DualColorTag,
+    MetrcTag,
     PromoModal,
   },
   data() {
