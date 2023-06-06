@@ -376,7 +376,7 @@ export default Vue.extend({
       });
     },
     isPackageEligibleForSplit(): boolean {
-      return this.$data.pkgState === PackageState.ACTIVE;
+      return this.$data.pkg?.PackageState === PackageState.ACTIVE;
     },
     isIdentityEligibleForSplitToolsImpl(): boolean {
       return isIdentityEligibleForSplitTools({
@@ -397,7 +397,6 @@ export default Vue.extend({
   data() {
     return {
       pkg: null as IIndexedPackageData | null,
-      pkgState: null,
       transfer: null as IIndexedTransferData | null,
       transferState: null,
       labTestUrls: [],
@@ -471,32 +470,19 @@ export default Vue.extend({
 
       this.$data.labTestUrls = [];
       if (this.contextMenuEvent?.packageTag) {
-        if (!this.$data.pkg) {
-          try {
-            this.$data.pkg = await primaryDataLoader.activePackage(
-              this.contextMenuEvent.packageTag
-            );
-            this.$data.pkgState = PackageState.ACTIVE;
-          } catch (e) {}
-        }
+        const promises: Promise<any>[] = [
+          primaryDataLoader.activePackage(this.contextMenuEvent.packageTag).then((pkg) => {
+            this.$data.pkg = pkg;
+          }),
+          primaryDataLoader.inactivePackage(this.contextMenuEvent.packageTag).then((pkg) => {
+            this.$data.pkg = pkg;
+          }),
+          primaryDataLoader.inTransitPackage(this.contextMenuEvent.packageTag).then((pkg) => {
+            this.$data.pkg = pkg;
+          }),
+        ];
 
-        if (!this.$data.pkg) {
-          try {
-            this.$data.pkg = await primaryDataLoader.inactivePackage(
-              this.contextMenuEvent.packageTag
-            );
-            this.$data.pkgState = PackageState.INACTIVE;
-          } catch (e) {}
-        }
-
-        if (!this.$data.pkg) {
-          try {
-            this.$data.pkg = await primaryDataLoader.inTransitPackage(
-              this.contextMenuEvent.packageTag
-            );
-            this.$data.pkgState = PackageState.IN_TRANSIT;
-          } catch (e) {}
-        }
+        await Promise.allSettled(promises);
 
         if (this.$data.pkg) {
           this.$data.labTestUrls = await getLabTestUrlsFromPackage({

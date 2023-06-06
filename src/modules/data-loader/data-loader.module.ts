@@ -1799,6 +1799,7 @@ export class DataLoader implements IAtomicService {
       }
     });
   }
+
   async layoverTransfers(resetCache: boolean = false): Promise<IIndexedTransferData[]> {
     if (resetCache) {
       this._layoverTransfers = null;
@@ -1811,14 +1812,14 @@ export class DataLoader implements IAtomicService {
         );
 
         try {
-          const layoverTransfers: IIndexedTransferData[] = (
-            await this.loadLayoverTransfers()
-          ).map((transfer) => ({
-            ...transfer,
-            TransferState: TransferState.LAYOVER,
-            TagMatcher: "",
-            LicenseNumber: this._authState!.license,
-          }));
+          const layoverTransfers: IIndexedTransferData[] = (await this.loadLayoverTransfers()).map(
+            (transfer) => ({
+              ...transfer,
+              TransferState: TransferState.LAYOVER,
+              TagMatcher: "",
+              LicenseNumber: this._authState!.license,
+            })
+          );
 
           subscription.unsubscribe();
           resolve(layoverTransfers);
@@ -1831,6 +1832,29 @@ export class DataLoader implements IAtomicService {
     }
 
     return this._layoverTransfers;
+  }
+
+  async layoverTransfer(manifestNumber: string): Promise<IIndexedTransferData> {
+    return new Promise(async (resolve, reject) => {
+      const subscription = timer(DATA_LOAD_FETCH_TIMEOUT_MS).subscribe(() =>
+        reject("Transfer fetch timed out")
+      );
+
+      try {
+        const transferData: IIndexedTransferData = {
+          ...(await this.loadLayoverTransfer(manifestNumber)),
+          TransferState: TransferState.LAYOVER,
+          TagMatcher: "",
+          LicenseNumber: this._authState!.license,
+        };
+
+        subscription.unsubscribe();
+        resolve(transferData);
+      } catch (e) {
+        subscription.unsubscribe();
+        reject(e);
+      }
+    });
   }
 
   async locations(): Promise<ILocationData[]> {
@@ -2365,6 +2389,18 @@ export class DataLoader implements IAtomicService {
     return streamFactory<ITransferData>(dataLoadOptions, responseFactory);
   }
 
+  layoverTransfersStream(
+    dataLoadOptions: IDataLoadOptions = {}
+  ): Subject<ICollectionResponse<ITransferData>> {
+    const responseFactory = (paginationOptions: IPaginationOptions): Promise<Response> => {
+      const body = buildBody(paginationOptions);
+
+      return this.metrcRequestManagerOrError.getLayoverTransfers(body);
+    };
+
+    return streamFactory<ITransferData>(dataLoadOptions, responseFactory);
+  }
+
   employeesStream(
     dataLoadOptions: IDataLoadOptions = {}
   ): Subject<ICollectionResponse<IMetrcEmployeeData>> {
@@ -2706,6 +2742,42 @@ export class DataLoader implements IAtomicService {
     const body = buildBody({ page, pageSize: 1 }, { transferFilter });
 
     const response = await this.metrcRequestManagerOrError.getRejectedTransfers(body);
+
+    if (response.status !== 200) {
+      throw new Error("Request failed");
+    }
+
+    const responseData: ICollectionResponse<ITransferData> = await response.json();
+
+    if (responseData.Data.length !== 1) {
+      if (responseData.Data.length === 0) {
+        throw new DataLoadError(
+          DataLoadErrorType.ZERO_RESULTS,
+          `Metrc indicated ${manifestNumber} is not available`
+        );
+      } else {
+        throw new Error("Returned multiple transfers");
+      }
+    }
+
+    return responseData.Data[0];
+  }
+
+  private async loadLayoverTransfer(manifestNumber: string): Promise<ITransferData> {
+    if (store.state.mockDataMode) {
+    }
+
+    await authManager.authStateOrError();
+
+    const page = 0;
+
+    const transferFilter: ITransferFilter = {
+      manifestNumber,
+    };
+
+    const body = buildBody({ page, pageSize: 1 }, { transferFilter });
+
+    const response = await this.metrcRequestManagerOrError.getLayoverTransfers(body);
 
     if (response.status !== 200) {
       throw new Error("Request failed");
@@ -3077,6 +3149,24 @@ export class DataLoader implements IAtomicService {
     store.commit(MutationType.SET_LOADING_MESSAGE, null);
 
     return rejectedTransfers;
+  }
+
+  private async loadLayoverTransfers(): Promise<ITransferData[]> {
+    await authManager.authStateOrError();
+
+    store.commit(MutationType.SET_LOADING_MESSAGE, "Loading layover transfers...");
+
+    let layoverTransfers: ITransferData[] = [];
+
+    await this.layoverTransfersStream().forEach((next: ICollectionResponse<ITransferData>) => {
+      layoverTransfers = [...layoverTransfers, ...next.Data];
+    });
+
+    console.log(`Loaded ${layoverTransfers.length} layoverTransfers`);
+
+    store.commit(MutationType.SET_LOADING_MESSAGE, null);
+
+    return layoverTransfers;
   }
 
   private async loadActiveHarvests(): Promise<IHarvestData[]> {

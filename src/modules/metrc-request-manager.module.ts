@@ -42,6 +42,7 @@ const OUTGOING_TRANSFERS_URL =
 const OUTGOING_INACTIVE_TRANSFERS_URL =
   origin({ divertToNullOrigin: false }) + "/api/transfers/outgoing?slt=Licensed&active=False";
 const REJECTED_TRANSFERS_URL = origin({ divertToNullOrigin: false }) + "/api/transfers/rejected";
+const LAYOVER_TRANSFERS_URL = origin({ divertToNullOrigin: false }) + "/api/transfers/layovers";
 
 const TRANSFER_DESTINATIONS_URL =
   origin({ divertToNullOrigin: false }) + "/api/transfers/destinations"; // TODO ?id=39
@@ -716,6 +717,18 @@ export class MetrcRequestManager implements IAtomicService {
 
   async getRejectedTransfers(body: string) {
     return customFetch(REJECTED_TRANSFERS_URL, {
+      ...DEFAULT_FETCH_POST_OPTIONS,
+      // @ts-ignore
+      headers: {
+        ...(await buildAuthenticationHeaders(this.authStateOrError)),
+        ...JSON_HEADERS,
+      },
+      body,
+    });
+  }
+
+  async getLayoverTransfers(body: string) {
+    return customFetch(LAYOVER_TRANSFERS_URL, {
       ...DEFAULT_FETCH_POST_OPTIONS,
       // @ts-ignore
       headers: {
