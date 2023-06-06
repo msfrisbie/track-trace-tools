@@ -118,6 +118,7 @@ export class DataLoader implements IAtomicService {
   private _outgoingTransfers: Promise<IIndexedTransferData[]> | null = null;
   private _outgoingInactiveTransfers: Promise<IIndexedTransferData[]> | null = null;
   private _rejectedTransfers: Promise<IIndexedTransferData[]> | null = null;
+  private _layoverTransfers: Promise<IIndexedTransferData[]> | null = null;
   private _locations: Promise<ILocationData[]> | null = null;
   private _strains: Promise<IStrainData[]> | null = null;
   private _items: Promise<IItemData[]> | null = null;
@@ -1797,6 +1798,39 @@ export class DataLoader implements IAtomicService {
         reject(e);
       }
     });
+  }
+  async layoverTransfers(resetCache: boolean = false): Promise<IIndexedTransferData[]> {
+    if (resetCache) {
+      this._layoverTransfers = null;
+    }
+
+    if (!this._layoverTransfers) {
+      this._layoverTransfers = new Promise(async (resolve, reject) => {
+        const subscription = timer(DATA_LOAD_FETCH_TIMEOUT_MS).subscribe(() =>
+          reject("Layover transfer fetch timed out")
+        );
+
+        try {
+          const layoverTransfers: IIndexedTransferData[] = (
+            await this.loadLayoverTransfers()
+          ).map((transfer) => ({
+            ...transfer,
+            TransferState: TransferState.LAYOVER,
+            TagMatcher: "",
+            LicenseNumber: this._authState!.license,
+          }));
+
+          subscription.unsubscribe();
+          resolve(layoverTransfers);
+        } catch (e) {
+          subscription.unsubscribe();
+          reject(e);
+          this._layoverTransfers = null;
+        }
+      });
+    }
+
+    return this._layoverTransfers;
   }
 
   async locations(): Promise<ILocationData[]> {

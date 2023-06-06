@@ -243,6 +243,7 @@ export enum TransferState {
   OUTGOING = "OUTGOING",
   OUTGOING_INACTIVE = "OUTGOING_INACTIVE",
   REJECTED = "REJECTED",
+  LAYOVER = "LAYOVER",
 }
 
 export enum LandingPage {
