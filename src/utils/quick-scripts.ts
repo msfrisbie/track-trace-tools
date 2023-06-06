@@ -332,7 +332,7 @@ export async function fillTransferWeights() {
           const quantity: number = packageData.Quantity * packageData.Item.UnitWeight;
 
           if (grossWeightInput) {
-            grossWeightInput.value = quantity.toString();
+            grossWeightInput.value = _.round(quantity, 3).toString();
           }
 
           if (unitOfMeasureSelect) {
@@ -359,7 +359,7 @@ export async function fillTransferWeights() {
         const quantity: number = packageData.Quantity;
 
         if (grossWeightInput) {
-          grossWeightInput.value = quantity.toString();
+          grossWeightInput.value = _.round(quantity, 3).toString();
         }
 
         if (unitOfMeasureSelect) {
@@ -497,11 +497,13 @@ export async function sumPackageQuantities() {
       continue;
     }
 
-    output.value = inputs
-      .map((input) => parseFloat(input.value))
-      .filter((x) => !isNaN(x))
-      .reduce((a, b) => a + b, 0)
-      .toString();
+    output.value = _.round(
+      inputs
+        .map((input) => parseFloat(input.value))
+        .filter((x) => !isNaN(x))
+        .reduce((a, b) => a + b, 0),
+      3
+    ).toString();
   }
 
   toastManager.openToast(`Totaled ${packageSets.length} packages`, {
