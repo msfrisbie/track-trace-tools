@@ -1,6 +1,6 @@
 <template>
   <div class="flex flex-row items-stretch rounded overflow-hidden">
-    <div class="metrc-tag-blue flex flex-col items-center py-2">
+    <div class="metrc-tag-blue flex flex-col items-center p-2">
       <canvas :id="`barcode-${label}`"></canvas>
       <dual-color-tag class="text-md" :label="label" />
     </div>

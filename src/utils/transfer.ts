@@ -6,7 +6,6 @@ import {
   IMetrcFacilityData,
   IMetrcVehicleData,
   ITransferHistoryData,
-  ITransferPackageList,
 } from "@/interfaces";
 import { authManager } from "@/modules/auth-manager.module";
 import { clientBuildManager } from "@/modules/client-build-manager.module";
@@ -15,7 +14,6 @@ import { dynamicConstsManager } from "@/modules/dynamic-consts-manager.module";
 import { toastManager } from "@/modules/toast-manager.module";
 import store from "@/store/page-overlay/index";
 import { OAuthState } from "@/store/page-overlay/modules/plugin-auth/consts";
-import { ITransferBuilderState } from "@/store/page-overlay/modules/transfer-builder/interfaces";
 import { createScanSheetOrError } from "./sheets-export";
 
 const DRIVER_NAME_MATCHER = /^- Driver Name: (.+)$/;
@@ -245,16 +243,24 @@ export async function createScanSheet(transferId: number, manifestNumber: string
       if (destinations.length === 0) {
         let incomingTransfer: IIndexedTransferData | null = null;
 
-        incomingTransfer = await primaryDataLoader.incomingTransfer(manifestNumber);
-        if (!incomingTransfer) {
-          incomingTransfer = await primaryDataLoader.incomingInactiveTransfer(manifestNumber);
-        }
+        await Promise.allSettled([
+          primaryDataLoader.incomingTransfer(manifestNumber).then((transfer) => {
+            incomingTransfer = transfer;
+          }),
+          primaryDataLoader.incomingInactiveTransfer(manifestNumber).then((transfer) => {
+            incomingTransfer = transfer;
+          }),
+          primaryDataLoader.layoverTransfer(manifestNumber).then((transfer) => {
+            incomingTransfer = transfer;
+          }),
+        ]);
 
         if (!incomingTransfer) {
           throw new Error("Unable to match incoming transfer");
         }
 
         packages = packages.concat(
+          // @ts-ignore
           (await primaryDataLoader.destinationPackages(incomingTransfer!.DeliveryId)).map(
             (pkg) => ({
               pkg,
