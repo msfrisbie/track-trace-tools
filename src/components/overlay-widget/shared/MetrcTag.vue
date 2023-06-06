@@ -1,6 +1,6 @@
 <template>
   <div class="flex flex-row items-stretch rounded overflow-hidden">
-    <div class="metrc-tag-blue flex flex-col items-center p-2">
+    <div class="metrc-tag-blue flex flex-col items-center py-2">
       <canvas :id="`barcode-${label}`"></canvas>
       <dual-color-tag class="text-md" :label="label" />
     </div>
@@ -39,8 +39,8 @@ export default Vue.extend({
   async mounted() {
     JsBarcode(`#barcode-${this.$props.label}`, this.$props.label, {
       background: "transparent",
-      width: 1.4,
-      height: 50,
+      width: 1.3,
+      height: 56,
       displayValue: false,
     });
   },
