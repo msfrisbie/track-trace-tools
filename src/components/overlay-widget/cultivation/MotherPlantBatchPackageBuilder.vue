@@ -243,7 +243,7 @@ import store from "@/store/page-overlay/index";
 import { arrayIsValid, safeZip } from "@/utils/array";
 import { buildCsvDataOrError, buildNamedCsvFileData, downloadCsvFile } from "@/utils/csv";
 import { submitDateFromIsodate, todayIsodate } from "@/utils/date";
-import { sum } from "lodash";
+import { sum } from "lodash-es";
 import { timer } from "rxjs";
 import Vue from "vue";
 

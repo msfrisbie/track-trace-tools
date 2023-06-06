@@ -41,7 +41,7 @@ import store from "@/store/page-overlay/index";
 import { TransferBuilderActions } from "@/store/page-overlay/modules/transfer-builder/consts";
 import { debugLogFactory } from "@/utils/debug";
 import { extractTextDirections, IGoogleMapsDirections, isStubAddress } from "@/utils/google-maps";
-import _ from "lodash";
+import _ from "lodash-es";
 import Vue from "vue";
 
 const debugLog = debugLogFactory("RoutePicker.vue");

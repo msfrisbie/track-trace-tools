@@ -321,7 +321,7 @@ import { buildCsvDataOrError, buildNamedCsvFileData } from "@/utils/csv";
 import { submitDateFromIsodate } from "@/utils/date";
 import { round } from "@/utils/math";
 import { unitOfMeasureNameToAbbreviation } from "@/utils/units";
-import _ from "lodash";
+import _ from "lodash-es";
 import { timer } from "rxjs";
 import Vue from "vue";
 import { mapActions, mapState } from "vuex";

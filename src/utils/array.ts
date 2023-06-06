@@ -1,98 +1,100 @@
-import { zip } from "lodash";
+import { zip } from "lodash-es";
 
 interface CollectionValidator<T> {
-    fn: (arr: T[]) => boolean,
-    message: string
+  fn: (arr: T[]) => boolean;
+  message: string;
 }
 
 interface RowValidator<T> {
-    fn: (row: T) => boolean,
-    message: string
+  fn: (row: T) => boolean;
+  message: string;
 }
 
 interface ArrayStatus<T> {
-    valid: boolean,
-    error?: {
-        row: any,
-        message: string
-    }
+  valid: boolean;
+  error?: {
+    row: any;
+    message: string;
+  };
 }
 
 export function arrayIsValid<T>(
-    arr: T[],
-    { collectionValidators, rowValidators }: { collectionValidators?: CollectionValidator<T>[], rowValidators?: RowValidator<T>[] }
+  arr: T[],
+  {
+    collectionValidators,
+    rowValidators,
+  }: { collectionValidators?: CollectionValidator<T>[]; rowValidators?: RowValidator<T>[] }
 ): ArrayStatus<T> {
-    if (collectionValidators) {
-        for (let collectionValidator of collectionValidators) {
-            const valid = collectionValidator.fn(arr);
+  if (collectionValidators) {
+    for (let collectionValidator of collectionValidators) {
+      const valid = collectionValidator.fn(arr);
 
-            if (!valid) {
-                return {
-                    valid,
-                    error: {
-                        message: collectionValidator.message,
-                        row: JSON.stringify(arr)
-                    }
-                };
-            }
-        }
+      if (!valid) {
+        return {
+          valid,
+          error: {
+            message: collectionValidator.message,
+            row: JSON.stringify(arr),
+          },
+        };
+      }
     }
+  }
 
-    if (rowValidators) {
-        for (let rowValidator of rowValidators) {
-            for (let row of arr) {
-                const valid = rowValidator.fn(row);
+  if (rowValidators) {
+    for (let rowValidator of rowValidators) {
+      for (let row of arr) {
+        const valid = rowValidator.fn(row);
 
-                if (!valid) {
-                    return {
-                        valid,
-                        error: {
-                            message: rowValidator.message,
-                            row: JSON.stringify(arr)
-                        }
-                    };
-                }
-            }
+        if (!valid) {
+          return {
+            valid,
+            error: {
+              message: rowValidator.message,
+              row: JSON.stringify(arr),
+            },
+          };
         }
+      }
     }
+  }
 
-    return {
-        valid: true
-    };
+  return {
+    valid: true,
+  };
 }
 
-
 export function splitMax(value: number, max: number | null): number[] {
-    let row = [];
+  let row = [];
 
-    if (!max) {
-        max = Number.POSITIVE_INFINITY;
-    }
+  if (!max) {
+    max = Number.POSITIVE_INFINITY;
+  }
 
-    let remaining = value;
+  let remaining = value;
 
-    while (remaining > 0) {
-        let next = Math.min(remaining, max);
-        row.push(next);
-        remaining -= next;
-    }
+  while (remaining > 0) {
+    let next = Math.min(remaining, max);
+    row.push(next);
+    remaining -= next;
+  }
 
-    return row;
+  return row;
 }
 
 export function sameLength(...arrs: any[][]): boolean {
-    return arrs.map((x: any[]) => x.length).every((val, i, arr) => val === arr[0]);
+  return arrs.map((x: any[]) => x.length).every((val, i, arr) => val === arr[0]);
 }
 
 /**
  * lodash zip() does not enfore same length arrays
- * 
- * @param arrs 
+ *
+ * @param arrs
  */
 export function safeZip(...arrs: any[][]) {
-    if (!sameLength(...arrs)) {
-        throw new Error('Array length mismatch');
-    }
+  if (!sameLength(...arrs)) {
+    throw new Error("Array length mismatch");
+  }
 
-    return zip(...arrs);
+  return zip(...arrs);
 }

@@ -65,6 +65,7 @@
   "devDependencies": {
     "@types/jest": "^24.0.19",
     "@types/lodash": "^4.14.170",
+    "@types/lodash-es": "^4.17.7",
     "@types/papaparse": "^5.3.5",
     "@typescript-eslint/eslint-plugin": "^5.59.8",
     "@typescript-eslint/parser": "^5.59.8",
@@ -89,6 +90,7 @@
     "jest-chrome": "^0.7.2",
     "jest-fetch-mock": "^3.0.3",
     "jest-runner-tsc": "^1.6.0",
+    "lodash": "^4.17.21",
     "node-fetch": "^2.6.1",
     "roboto-fontface": "^0.10.0",
     "sass": "^1.26.5",

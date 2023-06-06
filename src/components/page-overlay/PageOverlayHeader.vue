@@ -17,7 +17,7 @@ import { MutationType } from "@/mutation-types";
 import { MessageType } from "@/consts";
 import { analyticsManager } from "@/modules/analytics-manager.module";
 import { pageManager } from "@/modules/page-manager/page-manager.module";
-import _ from "lodash";
+import _ from "lodash-es";
 
 export default Vue.extend({
   name: "PageOverlayHeader",

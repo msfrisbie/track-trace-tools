@@ -117,7 +117,7 @@ import { IPlantBatchData, IPlantBatchType, IPlantData } from "@/interfaces";
 import store from "@/store/page-overlay/index";
 import { splitMax } from "@/utils/array";
 import { evenIntegerDistribution } from "@/utils/math";
-import { sum } from "lodash";
+import { sum } from "lodash-es";
 import Vue from "vue";
 
 const PAGE_SIZE = 100;

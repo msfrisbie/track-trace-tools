@@ -24,7 +24,7 @@ import store from "@/store/page-overlay/index";
 import { PromoteImmaturePlantsBuilderActions } from "@/store/page-overlay/modules/promote-immature-plants-builder/consts";
 import { SplitPackageBuilderActions } from "@/store/page-overlay/modules/split-package-builder/consts";
 import { debugLogFactory } from "@/utils/debug";
-import _ from "lodash";
+import _ from "lodash-es";
 import { Subject, timer } from "rxjs";
 import { IMetrcCreateTransferPayload } from "../interfaces";
 import { TransferBuilderActions } from "../store/page-overlay/modules/transfer-builder/consts";

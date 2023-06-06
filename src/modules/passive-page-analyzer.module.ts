@@ -3,7 +3,7 @@ import { IAtomicService } from "@/interfaces";
 import store from "@/store/page-overlay/index";
 import { debugLogFactory } from "@/utils/debug";
 import { activeMetrcModalOrNull, modalTitleOrError } from "@/utils/metrc-modal";
-import _ from "lodash";
+import _ from "lodash-es";
 import { analyticsManager } from "./analytics-manager.module";
 import { authManager } from "./auth-manager.module";
 import { pageManager } from "./page-manager/page-manager.module";

@@ -268,7 +268,7 @@
 <script lang="ts">
 import router from "@/router/index";
 import store from "@/store/page-overlay/index";
-import _ from "lodash";
+import _ from "lodash-es";
 import Vue from "vue";
 import { mapState } from "vuex";
 

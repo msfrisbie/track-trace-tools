@@ -17,6 +17,8 @@ module.exports = {
   testURL: "http://localhost/",
   moduleNameMapper: {
     "^@/(.*)$": "<rootDir>/src/$1",
+    // https://stackoverflow.com/questions/42260218/jest-setup-syntaxerror-unexpected-token-export
+    "^lodash-es$": "lodash",
   },
   setupFiles: ["<rootDir>/jest/envVars.js"],
   setupFilesAfterEnv: ["<rootDir>/jest/jest.setup.js"],

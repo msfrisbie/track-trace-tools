@@ -22,7 +22,7 @@ import {
 import store from "@/store/page-overlay/index";
 import { evenIntegerDistribution } from "@/utils/math";
 import { generateTagRangeOrError, getTagFromOffset } from "@/utils/tags";
-import { sum } from "lodash";
+import { sum } from "lodash-es";
 /**
  *
  * Mock principles

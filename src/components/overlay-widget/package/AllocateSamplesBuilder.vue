@@ -254,7 +254,7 @@ import { BuilderType, MessageType } from "@/consts";
 import { dynamicConstsManager } from "@/modules/dynamic-consts-manager.module";
 import { ISampleAllocation } from "@/store/page-overlay/modules/employee-samples/interfaces";
 import { analyticsManager } from "@/modules/analytics-manager.module";
-import { sum } from "lodash";
+import { sum } from "lodash-es";
 import { downloadTextFile } from "@/utils/file";
 
 // TODO:

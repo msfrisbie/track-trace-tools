@@ -72,7 +72,7 @@ import { DataLoadError, DataLoadErrorType } from "@/modules/data-loader/data-loa
 import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
 import store from "@/store/page-overlay/index";
 import { itemMatchesFilters } from "@/utils/filters";
-import _ from "lodash";
+import _ from "lodash-es";
 import Vue from "vue";
 
 export default Vue.extend({

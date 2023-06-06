@@ -13,7 +13,7 @@
 
     <template v-if="activeStepIndex === 0">
       <template v-if="categories.length > 0 && unitsOfMeasure.length > 0">
-        <div class="flex flex-col" style="width:600px">
+        <div class="flex flex-col" style="width: 600px">
           <b-form-group
             label="Enter Batch Number"
             label-size="sm"
@@ -73,7 +73,7 @@
 
           <div class="flex flex-col items-center">
             <div class="flex flex-col items-center space-y-4" style="width: 600px">
-              <b-alert v-model="catalogError" :variant="catalogVariant" style="color: #d93442;">
+              <b-alert v-model="catalogError" :variant="catalogVariant" style="color: #d93442">
                 <strong>{{ catalogErrorMessage }}</strong>
               </b-alert>
 
@@ -150,7 +150,7 @@ import {
   IBuilderComponentError,
   IUnitOfMeasure,
   IItemCategory,
-  IItemData
+  IItemData,
 } from "@/interfaces";
 import { buildCsvDataOrError, buildNamedCsvFileData } from "@/utils/csv";
 import { BuilderType, MessageType } from "@/consts";
@@ -163,7 +163,7 @@ import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
 import { unitOfMeasureNameToAbbreviation } from "@/utils/units";
 import { abbreviateString } from "@/utils/abbreviate";
 import { round } from "@/utils/math";
-import _ from "lodash";
+import _ from "lodash-es";
 
 export default Vue.extend({
   name: "ItemTemplateBuilder",
@@ -171,7 +171,7 @@ export default Vue.extend({
   components: {
     BuilderStepHeader,
     ItemDataList,
-    StrainPicker
+    StrainPicker,
   },
   methods: {
     ...mapActions({}),
@@ -179,7 +179,7 @@ export default Vue.extend({
       this.$data.activeStepIndex = index;
       analyticsManager.track(MessageType.BUILDER_ENGAGEMENT, {
         builder: this.$data.builderType,
-        action: `Set active step to ${index}`
+        action: `Set active step to ${index}`,
       });
     },
     populateDuplicateItems() {
@@ -223,7 +223,7 @@ export default Vue.extend({
         "bulk rosin infusion - crude",
         "bulk rosin infusion - decarbed",
         "washed flower",
-        "bulk rosin 90-149um"
+        "bulk rosin 90-149um",
       ];
 
       this.$data.items = [];
@@ -234,7 +234,7 @@ export default Vue.extend({
           StrainId: this.$data.strain.Id,
           Category: this.$data.freshCannabisPlantCategory,
           UnitOfMeasureId: this.unitOfMeasureGrams.Id,
-          UnitOfMeasureName: this.unitOfMeasureGrams.Name
+          UnitOfMeasureName: this.unitOfMeasureGrams.Name,
         });
       }
 
@@ -244,7 +244,7 @@ export default Vue.extend({
             Name: `${this.$data.batchNumber} (${this.formattedStrainName}) ${itemGradeType}`,
             Category: this.$data.otherConcentrateWeightCategory,
             UnitOfMeasureId: this.unitOfMeasureGrams.Id,
-            UnitOfMeasureName: this.unitOfMeasureGrams.Name
+            UnitOfMeasureName: this.unitOfMeasureGrams.Name,
           })
         );
       }
@@ -254,7 +254,7 @@ export default Vue.extend({
           Name: `${this.$data.batchNumber} (${this.formattedStrainName}) ${"Waste"}`,
           Category: this.$data.wasteCategory,
           UnitOfMeasureId: this.unitOfMeasureGrams.Id,
-          UnitOfMeasureName: this.unitOfMeasureGrams.Name
+          UnitOfMeasureName: this.unitOfMeasureGrams.Name,
         });
       }
 
@@ -270,7 +270,7 @@ export default Vue.extend({
           UnitOfMeasureName: this.unitOfMeasureEach.Name,
           UnitWeight: 1,
           UnitWeightUnitOfMeasureId: this.unitOfMeasureGrams.Id,
-          UnitWeightUnitOfMeasureName: this.unitOfMeasureGrams.Name
+          UnitWeightUnitOfMeasureName: this.unitOfMeasureGrams.Name,
         });
       }
 
@@ -286,7 +286,7 @@ export default Vue.extend({
           UnitOfMeasureName: this.unitOfMeasureEach.Name,
           UnitWeight: 0.5,
           UnitWeightUnitOfMeasureId: this.unitOfMeasureGrams.Id,
-          UnitWeightUnitOfMeasureName: this.unitOfMeasureGrams.Name
+          UnitWeightUnitOfMeasureName: this.unitOfMeasureGrams.Name,
         });
       }
 
@@ -323,14 +323,14 @@ export default Vue.extend({
         UnitWeight: item.UnitWeight ? item.UnitWeight.toString() : "",
         UnitWeightUoMId: item.UnitWeightUnitOfMeasureId
           ? item.UnitWeightUnitOfMeasureId.toString()
-          : ""
+          : "",
       }));
 
       builderManager.submitProject(
         _.cloneDeep(rows),
         this.$data.builderType,
         {
-          itemTotal: this.$data.items.length
+          itemTotal: this.$data.items.length,
         },
         // @ts-ignore
         this.buildCsvFiles(),
@@ -345,40 +345,40 @@ export default Vue.extend({
         const csvData = buildCsvDataOrError([
           {
             isVector: true,
-            data: this.$data.items.map((item: IItemTemplate) => item.Category.Id)
+            data: this.$data.items.map((item: IItemTemplate) => item.Category.Id),
           },
           {
             isVector: true,
-            data: this.$data.items.map((item: IItemTemplate) => item.Category.Name)
+            data: this.$data.items.map((item: IItemTemplate) => item.Category.Name),
           },
           {
             isVector: true,
             data: this.$data.items.map((item: IItemTemplate) =>
               item.StrainId ? item.StrainId.toString() : ""
-            )
+            ),
           },
           {
             isVector: true,
-            data: this.$data.items.map((item: IItemTemplate) => item.UnitOfMeasureId)
+            data: this.$data.items.map((item: IItemTemplate) => item.UnitOfMeasureId),
           },
           {
             isVector: true,
-            data: this.$data.items.map((item: IItemTemplate) => item.UnitOfMeasureName)
+            data: this.$data.items.map((item: IItemTemplate) => item.UnitOfMeasureName),
           },
           {
             isVector: true,
             data: this.$data.items.map((item: IItemTemplate) =>
               item.UnitWeight ? item.UnitWeight.toString() : ""
-            )
+            ),
           },
           {
             isVector: true,
             data: this.$data.items.map((item: IItemTemplate) =>
               item.UnitWeightUnitOfMeasureId ? item.UnitWeightUnitOfMeasureId.toString() : ""
-            )
+            ),
           },
           { isVector: false, data: this.$data.strain.Name },
-          { isVector: false, data: this.formattedStrainName }
+          { isVector: false, data: this.formattedStrainName },
         ]);
 
         return buildNamedCsvFileData(csvData, `Created ${this.$data.items.length} items`);
@@ -394,21 +394,21 @@ export default Vue.extend({
       if (!this.$data.strain && !this.$data.batchNumber) {
         errors.push({
           tags: ["noItemsCreatedError"],
-          message: itemDetailsMsg
+          message: itemDetailsMsg,
         });
       }
 
       if (this.removedItemsCount === this.expectedItemCount) {
         errors.push({
           tags: ["allItemsRemovedError"],
-          message: itemDetailsMsg
+          message: itemDetailsMsg,
         });
       }
 
       if (this.duplicateItemsExist) {
         errors.push({
           tags: ["duplicateItemsError"],
-          message: "Pre-existing items could not be created"
+          message: "Pre-existing items could not be created",
         });
       }
 
@@ -421,30 +421,30 @@ export default Vue.extend({
       ) {
         errors.push({
           tags: ["missingItemCategoriesError"],
-          message: `This license is missing item categories`
+          message: `This license is missing item categories`,
         });
       }
 
       if (!this.$data.items || this.$data.items.length === 0) {
         errors.push({
           tags: ["page3"],
-          message: "No items to submit"
+          message: "No items to submit",
         });
       }
 
       if (this.catalogError) {
         errors.push({
           tags: ["catalogError"],
-          message: `${this.removedItemsCount} item(s) excluded`
+          message: `${this.removedItemsCount} item(s) excluded`,
         });
       }
 
       return errors;
-    }
+    },
   },
   computed: {
     ...mapState({
-      authState: (state: any) => state.pluginAuth.authState
+      authState: (state: any) => state.pluginAuth.authState,
     }),
     unitOfMeasureGrams(): IUnitOfMeasure {
       return this.$data.unitsOfMeasure.find((x: IUnitOfMeasure) => x.Name === "Grams") || null;
@@ -518,7 +518,7 @@ export default Vue.extend({
     csvFiles(): ICsvFile[] {
       // @ts-ignore
       return this.buildCsvFiles();
-    }
+    },
   },
   watch: {
     strain: {
@@ -530,7 +530,7 @@ export default Vue.extend({
         if (this.$data.strain && this.$data.batchNumber) {
           this.populateItems();
         }
-      }
+      },
     },
     batchNumber: {
       immediate: true,
@@ -541,8 +541,8 @@ export default Vue.extend({
         if (this.$data.strain && this.$data.batchNumber) {
           this.populateItems();
         }
-      }
-    }
+      },
+    },
   },
   data() {
     return {
@@ -550,14 +550,14 @@ export default Vue.extend({
       activeStepIndex: 0,
       steps: [
         {
-          stepText: "Enter item details"
+          stepText: "Enter item details",
         },
         {
-          stepText: "Item details"
+          stepText: "Item details",
         },
         {
-          stepText: "Submit"
-        }
+          stepText: "Submit",
+        },
       ],
       strain: null,
       items: [],
@@ -572,7 +572,7 @@ export default Vue.extend({
       wasteCategory: null,
       freshCannabisPlantCategory: null,
       preExistingItems: [],
-      duplicateItems: []
+      duplicateItems: [],
     };
   },
   async mounted() {
@@ -597,7 +597,7 @@ export default Vue.extend({
       ) || null;
   },
   async created() {},
-  destroyed() {}
+  destroyed() {},
 });
 </script>
 

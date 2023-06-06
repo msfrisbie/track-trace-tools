@@ -17,9 +17,7 @@
                 (pkg) =>
                   `${getLabelOrError(pkg)} ${getQuantityOrError(
                     pkg
-                  )} ${getItemUnitOfMeasureNameOrError(pkg)} ${getItemNameOrError(
-                    pkg
-                  )}`
+                  )} ${getItemUnitOfMeasureNameOrError(pkg)} ${getItemNameOrError(pkg)}`
               "
               :minMatchingChars="0"
               :showOnFocus="true"
@@ -170,7 +168,7 @@ import {
   getItemUnitOfMeasureNameOrError,
   getItemUnitOfMeasureAbbreviationOrError,
 } from "@/utils/package";
-import _ from "lodash";
+import _ from "lodash-es";
 import { timer } from "rxjs";
 import Vue from "vue";
 

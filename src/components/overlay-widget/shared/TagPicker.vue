@@ -106,7 +106,7 @@
 
       <paste-tags
         v-if="selectedMenuItem === selectedMenuState.PASTED_TAGS"
-        :sourceLabels="sourceTags.map(x => x.Label)"
+        :sourceLabels="sourceTags.map((x) => x.Label)"
         :tags.sync="pastedTags"
         ref="pasteTags"
       >
@@ -188,7 +188,7 @@ import { ITagData, MetrcTagType } from "@/interfaces";
 import { authManager } from "@/modules/auth-manager.module";
 import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
 import { isValidTag } from "@/utils/tags";
-import _ from "lodash";
+import _ from "lodash-es";
 import { v4 } from "uuid";
 import Vue from "vue";
 import PasteTags from "./PasteTags.vue";

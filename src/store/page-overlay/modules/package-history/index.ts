@@ -14,7 +14,7 @@ import {
   getParentHarvests,
   getParentPackageHistoryTree,
 } from "@/utils/package-history";
-import _ from "lodash";
+import _ from "lodash-es";
 import { ActionContext } from "vuex";
 import {
   PackageHistoryActions,

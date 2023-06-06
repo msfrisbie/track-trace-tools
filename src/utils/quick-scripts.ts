@@ -4,7 +4,7 @@ import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
 import { dynamicConstsManager } from "@/modules/dynamic-consts-manager.module";
 import { pageManager } from "@/modules/page-manager/page-manager.module";
 import { toastManager } from "@/modules/toast-manager.module";
-import _, { zip } from "lodash";
+import _, { zip } from "lodash-es";
 
 export interface IQuickScript {
   id: string;

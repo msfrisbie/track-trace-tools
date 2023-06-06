@@ -144,7 +144,7 @@ import { combineLatest, from, Subject, timer } from "rxjs";
 import { authManager } from "@/modules/auth-manager.module";
 import { dynamicConstsManager } from "@/modules/dynamic-consts-manager.module";
 import { extractDriversAndVehiclesFromTransferHistory } from "@/utils/transfer";
-import _ from "lodash";
+import _ from "lodash-es";
 import { BuilderType, MessageType } from "@/consts";
 import { analyticsManager } from "@/modules/analytics-manager.module";
 import { mapState } from "vuex";

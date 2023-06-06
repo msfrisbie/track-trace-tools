@@ -3,7 +3,7 @@
 // 0.1 + 0.2 = 0.30000000000000004
 //
 
-import _ from "lodash";
+import _ from "lodash-es";
 
 // fStrip(0.1 + 0.2) = 0.3
 export function fStrip(x: number): number {

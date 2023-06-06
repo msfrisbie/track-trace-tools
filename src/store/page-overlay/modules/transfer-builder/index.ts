@@ -10,7 +10,7 @@ import { toastManager } from "@/modules/toast-manager.module";
 import { todayIsodate } from "@/utils/date";
 import { getLabelOrError } from "@/utils/package";
 // import { getActiveTransferPackageListOrNull } from "@/utils/transfer";
-import _ from "lodash";
+import _ from "lodash-es";
 import { ActionContext } from "vuex";
 import { BuilderType, MessageType } from "../../../../consts";
 import { analyticsManager } from "../../../../modules/analytics-manager.module";

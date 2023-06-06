@@ -1,5 +1,5 @@
 import { ICompressedMetrcTagRange, ICompressedMetrcTagRanges } from "@/interfaces";
-import _ from "lodash";
+import _ from "lodash-es";
 import { getOffsetFromTag, isTagInsidePair } from "./tags";
 
 interface IFormattedTagData {
@@ -262,7 +262,7 @@ export class CompressedDataWrapper<T> {
     this.data[rowIdx][this.columnIdxOrError(property)] = value;
   }
 
-  sort(sortFn: (a: any[], b:any[]) => number) {
+  sort(sortFn: (a: any[], b: any[]) => number) {
     this.data.sort(sortFn);
 
     this.regenerateIndex();

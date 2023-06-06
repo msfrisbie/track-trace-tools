@@ -1222,7 +1222,7 @@ import {
   stragglerPackagesFormFiltersFactory,
 } from "@/utils/reports/straggler-package-report";
 import { addTagsReport, tagsFormFiltersFactory } from "@/utils/reports/tags-report";
-import _ from "lodash";
+import _ from "lodash-es";
 import Vue from "vue";
 import { mapActions, mapState } from "vuex";
 import ArchiveWidget from "../shared/ArchiveWidget.vue";

@@ -21,7 +21,7 @@ import store from "@/store/page-overlay/index";
 import { debugLogFactory } from "@/utils/debug";
 import { extract, ExtractionType } from "@/utils/html";
 import { get, keys, set } from "idb-keyval";
-import _ from "lodash";
+import _ from "lodash-es";
 import { timer } from "rxjs";
 import { clientBuildManager } from "./client-build-manager.module";
 const DYNAMIC_CONST_TIMEOUT_MS = 30000;

@@ -523,7 +523,7 @@ import {
   extractRecentDestinationFacilitiesFromTransfers,
   extractRecentTransporterFacilitiesFromTransfers,
 } from "@/utils/transfer";
-import _ from "lodash";
+import _ from "lodash-es";
 import { timer } from "rxjs";
 import Vue from "vue";
 import { mapActions, mapGetters, mapState, Store } from "vuex";

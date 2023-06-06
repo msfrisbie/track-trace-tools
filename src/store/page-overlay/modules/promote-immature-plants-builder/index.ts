@@ -1,10 +1,10 @@
 import { IPluginState, ITagData } from "@/interfaces";
 import { todayIsodate } from "@/utils/date";
-import _ from "lodash";
+import _ from "lodash-es";
 import { ActionContext } from "vuex";
 import {
   PromoteImmaturePlantsBuilderActions,
-  PromoteImmaturePlantsBuilderMutations
+  PromoteImmaturePlantsBuilderMutations,
 } from "./consts";
 import { IPromoteImmaturePlantsBuilderState } from "./interfaces";
 
@@ -18,14 +18,14 @@ const inMemoryState = {
   showTagPicker: false,
   growthIsodate: todayIsodate(),
   plantLocation: null,
-  showHiddenDetailFields: false
+  showHiddenDetailFields: false,
 };
 
 const persistedState = {};
 
 const defaultState: IPromoteImmaturePlantsBuilderState = {
   ...persistedState,
-  ...inMemoryState
+  ...inMemoryState,
 };
 
 export const promoteImmaturePlantsBuilderModule = {
@@ -44,7 +44,7 @@ export const promoteImmaturePlantsBuilderModule = {
       state: IPromoteImmaturePlantsBuilderState
     ) {
       Object.assign(state, _.cloneDeep(defaultState));
-    }
+    },
   },
   getters: {},
   actions: {
@@ -58,8 +58,8 @@ export const promoteImmaturePlantsBuilderModule = {
       ctx: ActionContext<IPromoteImmaturePlantsBuilderState, IPluginState>
     ) => {
       ctx.commit(PromoteImmaturePlantsBuilderMutations.RESET_PROMOTE_IMMATURE_PLANTS_DATA);
-    }
-  }
+    },
+  },
 };
 
 export const promoteImmaturePlantsBuilderReducer = (
@@ -67,6 +67,6 @@ export const promoteImmaturePlantsBuilderReducer = (
 ): IPromoteImmaturePlantsBuilderState => {
   return {
     ...state,
-    ...inMemoryState
+    ...inMemoryState,
   };
 };

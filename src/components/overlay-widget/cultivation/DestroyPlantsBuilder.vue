@@ -13,7 +13,11 @@
 
     <template v-if="activeStepIndex === 0">
       <div class="w-full flex flex-col space-y-4">
-        <plant-picker :enableVegetative="true" :builderType="builderType" :selectedPlants.sync="selectedPlants" />
+        <plant-picker
+          :enableVegetative="true"
+          :builderType="builderType"
+          :selectedPlants.sync="selectedPlants"
+        />
 
         <template v-if="selectedPlants.length > 0">
           <div class="w-full flex flex-row justify-end">
@@ -80,9 +84,7 @@
             />
 
             <template v-if="!allPlantsHaveValidWeight">
-              <p class="text-red-500">
-                One or more plants is missing a weight value.
-              </p>
+              <p class="text-red-500">One or more plants is missing a weight value.</p>
             </template>
 
             <template v-if="allDetailsProvided">
@@ -192,7 +194,7 @@ import { builderManager } from "@/modules/builder-manager.module";
 import PlantPicker from "@/components/overlay-widget/shared/PlantPicker.vue";
 import PlantWeightPicker from "@/components/overlay-widget/shared/PlantWeightPicker.vue";
 import CsvBreakout from "@/components/overlay-widget/shared/CsvBreakout.vue";
-import { sum } from "lodash";
+import { sum } from "lodash-es";
 import { dynamicConstsManager } from "@/modules/dynamic-consts-manager.module";
 
 export default Vue.extend({
@@ -202,7 +204,7 @@ export default Vue.extend({
     BuilderStepHeader,
     PlantPicker,
     PlantWeightPicker,
-    CsvBreakout
+    CsvBreakout,
   },
   methods: {
     selectPlants(selectedPlants: IPlantData[]) {
@@ -213,7 +215,7 @@ export default Vue.extend({
 
       analyticsManager.track(MessageType.BUILDER_ENGAGEMENT, {
         builder: this.$data.builderType,
-        action: `Set active step to ${index}`
+        action: `Set active step to ${index}`,
       });
     },
     submit() {
@@ -231,7 +233,7 @@ export default Vue.extend({
           MaterialMixed: this.$data.wasteMaterialMixed,
           Id: plant.Id.toString(),
           WasteWeight: weight.toString(),
-          WasteUnitOfMeasureId: this.$data.unitOfWeight.Id.toString()
+          WasteUnitOfMeasureId: this.$data.unitOfWeight.Id.toString(),
         });
       }
 
@@ -241,7 +243,7 @@ export default Vue.extend({
         {
           plantTotal: this.$data.selectedPlants.length,
           totalDestroyedWeight: sum(this.$data.destroyedWeights),
-          unitOfWeight: this.$data.unitOfWeight.Name
+          unitOfWeight: this.$data.unitOfWeight.Name,
         },
         this.buildCsvFiles(),
         25
@@ -258,8 +260,8 @@ export default Vue.extend({
           tagCount: this.$data.selectedPlants.length,
           totalDestroyedWeight: sum(this.$data.destroyedWeights),
           unitOfWeight: this.$data.unitOfWeight.Name,
-          destroyIsodate: this.$data.destroyPlantsIsodate
-        }
+          destroyIsodate: this.$data.destroyPlantsIsodate,
+        },
       });
     },
     buildCsvFiles(): ICsvFile[] {
@@ -267,7 +269,7 @@ export default Vue.extend({
         const csvData = buildCsvDataOrError([
           {
             isVector: true,
-            data: this.$data.selectedPlants.map((plantData: IPlantData) => plantData.Label)
+            data: this.$data.selectedPlants.map((plantData: IPlantData) => plantData.Label),
           },
           { isVector: false, data: this.$data.wasteMethod.Name },
           { isVector: false, data: this.$data.wasteMaterialMixed },
@@ -275,7 +277,7 @@ export default Vue.extend({
           { isVector: false, data: this.$data.unitOfWeight.Name },
           { isVector: false, data: this.$data.wasteReason.Name },
           { isVector: false, data: this.$data.reasonNote },
-          { isVector: false, data: this.$data.destroyPlantsIsodate }
+          { isVector: false, data: this.$data.destroyPlantsIsodate },
         ]);
 
         return buildNamedCsvFileData(
@@ -296,15 +298,15 @@ export default Vue.extend({
             fn: (row: any): boolean => {
               return typeof row === "number" && row > 0;
             },
-            message: "All values must be a number greater than 0"
-          }
+            message: "All values must be a number greater than 0",
+          },
         ],
         collectionValidators: [
           {
             fn: (rows: any[]): boolean => {
               return rows.length === this.$data.selectedPlants.length;
             },
-            message: "Collection must be same size as plants"
+            message: "Collection must be same size as plants",
           },
           {
             fn: (rows: any[]): boolean => {
@@ -314,11 +316,11 @@ export default Vue.extend({
                 return false;
               }
             },
-            message: "Collection must sum to a positive number"
-          }
-        ]
+            message: "Collection must sum to a positive number",
+          },
+        ],
       }).valid;
-    }
+    },
   },
   computed: {
     totalDestroyedWeight() {
@@ -327,19 +329,19 @@ export default Vue.extend({
     weightOptions() {
       return this.$data.unitsOfWeight.map((unitOfWeight: any) => ({
         text: unitOfWeight.Name,
-        value: unitOfWeight
+        value: unitOfWeight,
       }));
     },
     wasteReasonOptions() {
       return this.$data.wasteReasons.map((wasteReason: any) => ({
         text: wasteReason.Name,
-        value: wasteReason
+        value: wasteReason,
       }));
     },
     wasteMethodOptions() {
       return this.$data.wasteMethods.map((wasteMethod: any) => ({
         text: wasteMethod.Name,
-        value: wasteMethod
+        value: wasteMethod,
       }));
     },
     averagePerPlantWaste() {
@@ -374,7 +376,7 @@ export default Vue.extend({
     csvFiles(): ICsvFile[] {
       // @ts-ignore
       return this.buildCsvFiles();
-    }
+    },
   },
   data() {
     return {
@@ -393,18 +395,18 @@ export default Vue.extend({
       reasonNote: null,
       steps: [
         {
-          stepText: "Select plants to destroy"
+          stepText: "Select plants to destroy",
         },
         {
-          stepText: "Destroy details"
+          stepText: "Destroy details",
         },
         {
-          stepText: "Submit"
-        }
+          stepText: "Submit",
+        },
       ],
       unitsOfWeight: [],
       wasteMethods: [],
-      wasteReasons: []
+      wasteReasons: [],
     };
   },
   watch: {
@@ -414,8 +416,8 @@ export default Vue.extend({
         if (this.$data.destroyedWeights.length !== newValue.length) {
           this.$data.destroyedWeights = Array(newValue.length).fill(0);
         }
-      }
-    }
+      },
+    },
     // totalDestroyedWeight: {
     //   immediate: true,
     //   handler(newValue, oldValue) {
@@ -438,7 +440,7 @@ export default Vue.extend({
   async created() {},
   destroyed() {
     // Looks like modal is not actually destroyed
-  }
+  },
 });
 </script>
 

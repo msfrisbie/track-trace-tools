@@ -90,9 +90,7 @@
             />
 
             <template v-if="!allPlantsHaveValidWeight">
-              <p class="text-red-500">
-                One or more plants is missing a weight value.
-              </p>
+              <p class="text-red-500">One or more plants is missing a weight value.</p>
             </template>
 
             <template v-if="allDetailsProvided">
@@ -203,7 +201,7 @@ import {
   IPlantFilter,
   ICsvFile,
   ILocationData,
-  IMetrcHarvestPlantsPayload
+  IMetrcHarvestPlantsPayload,
 } from "@/interfaces";
 import { downloadCsvFile, buildCsvDataOrError, buildNamedCsvFileData } from "@/utils/csv";
 
@@ -217,7 +215,7 @@ import PlantPicker from "@/components/overlay-widget/shared/PlantPicker.vue";
 import LocationPicker from "@/components/overlay-widget/shared/LocationPicker.vue";
 import HarvestPicker from "@/components/overlay-widget/shared/HarvestPicker.vue";
 import PlantWeightPicker from "@/components/overlay-widget/shared/PlantWeightPicker.vue";
-import { sum } from "lodash";
+import { sum } from "lodash-es";
 import { dynamicConstsManager } from "@/modules/dynamic-consts-manager.module";
 import CsvBreakout from "@/components/overlay-widget/shared/CsvBreakout.vue";
 
@@ -233,7 +231,7 @@ export default Vue.extend({
     HarvestYieldChecker,
     LocationPicker,
     PlantPicker,
-    PlantWeightPicker
+    PlantWeightPicker,
   },
   methods: {
     updateHarvestedWeights(plantWeights: number[]) {
@@ -244,7 +242,7 @@ export default Vue.extend({
 
       analyticsManager.track(MessageType.BUILDER_ENGAGEMENT, {
         builder: this.$data.builderType,
-        action: `Set active step to ${index}`
+        action: `Set active step to ${index}`,
       });
     },
     submit() {
@@ -260,7 +258,7 @@ export default Vue.extend({
           HarvestName: this.$data.harvestName,
           Id: plant.Id.toString(),
           PlantWeight: weight.toString(),
-          UnitOfWeightId: this.$data.unitOfWeight.Id.toString()
+          UnitOfWeightId: this.$data.unitOfWeight.Id.toString(),
         });
       }
 
@@ -270,7 +268,7 @@ export default Vue.extend({
         {
           plantTotal: this.$data.selectedPlants.length,
           totalHarvestedWeight: sum(this.$data.harvestedWeights),
-          unitOfWeight: this.$data.unitOfWeight.Name
+          unitOfWeight: this.$data.unitOfWeight.Name,
         },
         this.buildCsvFiles(),
         25
@@ -292,7 +290,7 @@ export default Vue.extend({
 
       analyticsManager.track(MessageType.BUILDER_ENGAGEMENT, {
         builder: this.$data.builderType,
-        action: "Fill previous harvest data"
+        action: "Fill previous harvest data",
       });
     },
     saveHarvestAndAdvance() {
@@ -306,7 +304,7 @@ export default Vue.extend({
             dryingLocation: this.$data.dryingLocation,
             unitOfWeight: this.$data.unitOfWeight,
             harvestName: this.$data.harvestName,
-            harvestIsodate: this.$data.harvestIsodate
+            harvestIsodate: this.$data.harvestIsodate,
           })
         );
       } catch (e) {
@@ -326,8 +324,8 @@ export default Vue.extend({
           unitOfWeight: this.$data.unitOfWeight.Name,
           dryingLocationName: this.$data.dryingLocation.Name,
           harvestName: this.$data.harvestName,
-          harvestIsodate: this.$data.harvestIsodate
-        }
+          harvestIsodate: this.$data.harvestIsodate,
+        },
       });
     },
     buildCsvFiles(): ICsvFile[] {
@@ -335,14 +333,14 @@ export default Vue.extend({
         const csvData = buildCsvDataOrError([
           {
             isVector: true,
-            data: this.$data.selectedPlants.map((plantData: IPlantData) => plantData.Label)
+            data: this.$data.selectedPlants.map((plantData: IPlantData) => plantData.Label),
           },
           { isVector: true, data: this.$data.harvestedWeights },
           { isVector: false, data: this.$data.unitOfWeight.Name },
           { isVector: false, data: this.$data.dryingLocation.Name },
           { isVector: false, data: this.$data.harvestName },
           { isVector: false, data: this.$data.patientLicenseNumber },
-          { isVector: false, data: this.$data.harvestIsodate }
+          { isVector: false, data: this.$data.harvestIsodate },
         ]);
 
         return buildNamedCsvFileData(
@@ -363,15 +361,15 @@ export default Vue.extend({
             fn: (row: any): boolean => {
               return typeof row === "number" && row > 0;
             },
-            message: "All values must be a number greater than 0"
-          }
+            message: "All values must be a number greater than 0",
+          },
         ],
         collectionValidators: [
           {
             fn: (rows: any[]): boolean => {
               return rows.length === this.$data.selectedPlants.length;
             },
-            message: "Collection must be same size as plants"
+            message: "Collection must be same size as plants",
           },
           {
             fn: (rows: any[]): boolean => {
@@ -381,11 +379,11 @@ export default Vue.extend({
                 return false;
               }
             },
-            message: "Collection must sum to a positive number"
-          }
-        ]
+            message: "Collection must sum to a positive number",
+          },
+        ],
       }).valid;
-    }
+    },
   },
   computed: {
     totalHarvestedWeight() {
@@ -420,7 +418,7 @@ export default Vue.extend({
         !!this.$data.previousHarvestDataKey &&
         !!localStorage.getItem(this.$data.previousHarvestDataKey)
       );
-    }
+    },
   },
   data() {
     return {
@@ -439,15 +437,15 @@ export default Vue.extend({
       patientLicenseNumber: "",
       steps: [
         {
-          stepText: "Select plants to harvest"
+          stepText: "Select plants to harvest",
         },
         {
-          stepText: "Harvest details"
+          stepText: "Harvest details",
         },
         {
-          stepText: "Submit"
-        }
-      ]
+          stepText: "Submit",
+        },
+      ],
     };
   },
   watch: {
@@ -457,8 +455,8 @@ export default Vue.extend({
         if (this.$data.harvestedWeights.length !== newValue.length) {
           this.$data.harvestedWeights = Array(newValue.length).fill(0);
         }
-      }
-    }
+      },
+    },
   },
   async mounted() {
     const authState = await authManager.authStateOrError();
@@ -470,7 +468,7 @@ export default Vue.extend({
   async created() {},
   destroyed() {
     // Looks like modal is not actually destroyed
-  }
+  },
 });
 </script>
 

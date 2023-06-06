@@ -13,7 +13,7 @@ import { toastManager } from "@/modules/toast-manager.module";
 import { MutationType } from "@/mutation-types";
 import store from "@/store/page-overlay/index";
 import { debugLogFactory } from "@/utils/debug";
-import _ from "lodash";
+import _ from "lodash-es";
 import { timer } from "rxjs";
 import { analyticsManager } from "../analytics-manager.module";
 import { authManager } from "../auth-manager.module";

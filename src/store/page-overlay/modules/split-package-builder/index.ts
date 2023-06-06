@@ -1,6 +1,6 @@
 import { IPackageData, IPluginState, ITagData } from "@/interfaces";
 import { todayIsodate } from "@/utils/date";
-import _ from "lodash";
+import _ from "lodash-es";
 import { ActionContext } from "vuex";
 import { SplitPackageBuilderActions, SplitPackageBuilderMutations } from "./consts";
 import { ISplitPackageBuilderState } from "./interfaces";
