@@ -23,7 +23,7 @@ export async function addButtonsToTransferTableImpl() {
     const groupId = treeGrid.getAttribute(TTT_TABLEGROUP_ATTRIBUTE);
 
     const transferHeaderCell = treeGrid.querySelector(
-      `th[${TTT_TABLEGROUP_ATTRIBUTE}="${groupId}"][data-field="ManifestNumber"]`
+      `[${TTT_TABLEGROUP_ATTRIBUTE}="${groupId}"] th[data-field="ManifestNumber"]`
     );
 
     if (!transferHeaderCell) {
@@ -118,7 +118,8 @@ export async function addButtonsToPackageTableImpl() {
 
     const packageHeaderCell = treeGrid.querySelector(
       // TODO: this might select plants too?
-      `th[${TTT_TABLEGROUP_ATTRIBUTE}="${groupId}"][data-field="Label"]`
+      `[${TTT_TABLEGROUP_ATTRIBUTE}="${groupId}"] th[data-field="Label"],
+      [${TTT_TABLEGROUP_ATTRIBUTE}="${groupId}"] th[data-field="PackageLabel"]`
     );
 
     if (!packageHeaderCell) {
