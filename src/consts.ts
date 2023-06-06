@@ -522,7 +522,8 @@ export enum SheetTitles {
   WORKSHEET = "Worksheet",
   MANIFEST_COGS = "Manifest Cogs",
   BULK_INFUSED_GOODS_COGS = "Bulk Infused Goods COGS",
-  INPUT_COGS = "Input COGS",
+  DIST_REX_COGS = "Dist ReX COGS",
+  PACKAGED_GOODS_COGS = "Packaged Goods COGS",
 }
 
 // Sheets self-enforced timeout is 180000ms,

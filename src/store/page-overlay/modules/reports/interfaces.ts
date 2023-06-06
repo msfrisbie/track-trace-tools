@@ -111,7 +111,8 @@ export interface IReportData {
   };
   [ReportType.COGS_TRACKER]?: {
     bulkInfusedMatrix: any[][];
-    inputCogsMatrix: any[][];
+    distRexCogsMatrix: any[][];
+    packagedGoodsCogsMatrix: any[][];
   };
   [ReportType.PACKAGES]?: {
     packages: IIndexedPackageData[];

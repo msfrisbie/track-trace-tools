@@ -113,7 +113,8 @@ export async function maybeLoadCogsTrackerReportData({
   await Promise.allSettled(historyPromises);
 
   const bulkInfusedMatrix: any[][] = [];
-  const inputCogsMatrix: any[][] = [];
+  const distRexCogsMatrix: any[][] = [];
+  const packagedGoodsCogsMatrix: any[][] = [];
 
   const ordinals = ["1st", "2nd", "3rd", "4th", "5th", "6th", "7th", "8th"];
   const ordinalHeaders = ordinals
@@ -145,13 +146,23 @@ export async function maybeLoadCogsTrackerReportData({
   ];
 
   bulkInfusedMatrix.push(headers);
-  inputCogsMatrix.push(headers);
+  distRexCogsMatrix.push(headers);
+  packagedGoodsCogsMatrix.push(headers);
 
-  const bulkInfusedPackages = dateFilteredPackages.filter((pkg) =>
-    pkg.Item.ProductCategoryName.includes("Bulk")
+  const bulkInfusedPackages = dateFilteredPackages.filter(
+    (pkg) =>
+      pkg.Item.ProductCategoryName.includes("Bulk") &&
+      !pkg.Item.ProductCategoryName.includes("Shake/Trim") &&
+      !pkg.Item.ProductCategoryName.includes("Bulk Flower")
   );
-  const inputCogsPackages = dateFilteredPackages.filter(
-    (pkg) => !pkg.Item.ProductCategoryName.includes("Bulk")
+  const distRexCogsPackages = dateFilteredPackages.filter(
+    (pkg) =>
+      pkg.Item.ProductCategoryName.includes("Bulk") &&
+      !pkg.Item.ProductCategoryName.includes("Shake/Trim") &&
+      !pkg.Item.ProductCategoryName.includes("Bulk Flower")
+  );
+  const packagedGoodsCogsPackages = dateFilteredPackages.filter(
+    (pkg) => pkg.UnitOfMeasureQuantityType === "CountBased"
   );
 
   function cogsTrackerRowFactory(pkg: IIndexedPackageData): any[] {
@@ -195,11 +206,13 @@ export async function maybeLoadCogsTrackerReportData({
   }
 
   bulkInfusedPackages.map((pkg) => bulkInfusedMatrix.push(cogsTrackerRowFactory(pkg)));
-  inputCogsPackages.map((pkg) => inputCogsMatrix.push(cogsTrackerRowFactory(pkg)));
+  distRexCogsPackages.map((pkg) => distRexCogsMatrix.push(cogsTrackerRowFactory(pkg)));
+  packagedGoodsCogsPackages.map((pkg) => packagedGoodsCogsMatrix.push(cogsTrackerRowFactory(pkg)));
 
   reportData[ReportType.COGS_TRACKER] = {
     bulkInfusedMatrix,
-    inputCogsMatrix,
+    distRexCogsMatrix,
+    packagedGoodsCogsMatrix,
   };
 }
 
@@ -221,7 +234,8 @@ export async function createCogsTrackerSpreadsheetOrError({
   const sheetTitles = [
     SheetTitles.OVERVIEW,
     SheetTitles.BULK_INFUSED_GOODS_COGS,
-    SheetTitles.INPUT_COGS,
+    SheetTitles.DIST_REX_COGS,
+    SheetTitles.PACKAGED_GOODS_COGS,
   ];
 
   const response: {
@@ -253,21 +267,30 @@ export async function createCogsTrackerSpreadsheetOrError({
     }),
   ];
 
-  const { bulkInfusedMatrix, inputCogsMatrix } = reportData[ReportType.COGS_TRACKER]!;
+  const { bulkInfusedMatrix, distRexCogsMatrix, packagedGoodsCogsMatrix } =
+    reportData[ReportType.COGS_TRACKER]!;
 
   const bulkInfusedSheetId = sheetTitles.indexOf(SheetTitles.BULK_INFUSED_GOODS_COGS);
-  const inputCogsSheetId = sheetTitles.indexOf(SheetTitles.INPUT_COGS);
+  const distRexCogsSheetId = sheetTitles.indexOf(SheetTitles.DIST_REX_COGS);
+  const packagedGoodsCogsSheetId = sheetTitles.indexOf(SheetTitles.PACKAGED_GOODS_COGS);
 
   formattingRequests = [
     ...formattingRequests,
-    // Bulk Infused
+    // Bulk Infused COGS
     addRowsRequestFactory({ sheetId: bulkInfusedSheetId, length: bulkInfusedMatrix.length }),
     styleTopRowRequestFactory({ sheetId: bulkInfusedSheetId }),
     freezeTopRowRequestFactory({ sheetId: bulkInfusedSheetId }),
-    // Input COGS
-    addRowsRequestFactory({ sheetId: inputCogsSheetId, length: inputCogsMatrix.length }),
-    styleTopRowRequestFactory({ sheetId: inputCogsSheetId }),
-    freezeTopRowRequestFactory({ sheetId: inputCogsSheetId }),
+    // Dist/Rex COGS
+    addRowsRequestFactory({ sheetId: distRexCogsSheetId, length: distRexCogsMatrix.length }),
+    styleTopRowRequestFactory({ sheetId: distRexCogsSheetId }),
+    freezeTopRowRequestFactory({ sheetId: distRexCogsSheetId }),
+    // Packaged Goods COGS
+    addRowsRequestFactory({
+      sheetId: packagedGoodsCogsSheetId,
+      length: packagedGoodsCogsMatrix.length,
+    }),
+    styleTopRowRequestFactory({ sheetId: packagedGoodsCogsSheetId }),
+    freezeTopRowRequestFactory({ sheetId: packagedGoodsCogsSheetId }),
   ];
 
   await messageBus.sendMessageToBackground(
@@ -313,8 +336,19 @@ export async function createCogsTrackerSpreadsheetOrError({
 
   await writeDataSheet({
     spreadsheetId: response.data.result.spreadsheetId,
-    spreadsheetTitle: SheetTitles.INPUT_COGS,
-    data: inputCogsMatrix,
+    spreadsheetTitle: SheetTitles.DIST_REX_COGS,
+    data: distRexCogsMatrix,
+    options: {
+      pageSize: 5000,
+      valueInputOption: "USER_ENTERED",
+      maxParallelRequests: 10,
+    },
+  });
+
+  await writeDataSheet({
+    spreadsheetId: response.data.result.spreadsheetId,
+    spreadsheetTitle: SheetTitles.PACKAGED_GOODS_COGS,
+    data: packagedGoodsCogsMatrix,
     options: {
       pageSize: 5000,
       valueInputOption: "USER_ENTERED",
@@ -339,7 +373,10 @@ export async function createCogsTrackerSpreadsheetOrError({
       sheetId: bulkInfusedSheetId,
     }),
     autoResizeDimensionsRequestFactory({
-      sheetId: inputCogsSheetId,
+      sheetId: distRexCogsSheetId,
+    }),
+    autoResizeDimensionsRequestFactory({
+      sheetId: packagedGoodsCogsSheetId,
     }),
   ];
 
