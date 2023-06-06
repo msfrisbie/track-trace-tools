@@ -1,4 +1,4 @@
-import { MessageType, METRC_TAG_REGEX } from "@/consts";
+import { MessageType, METRC_TAG_REGEX, TTT_TABLEGROUP_ATTRIBUTE } from "@/consts";
 import { getUrl } from "@/utils/assets";
 import { analyticsManager } from "../analytics-manager.module";
 import { modalManager } from "../modal-manager.module";
@@ -13,10 +13,30 @@ export async function addButtonsToTransferTableImpl() {
   const barsIconUrl = await getUrl(require("@/assets/images/bars-solid.svg"));
   const toolsIconUrl = await getUrl(require("@/assets/images/tools-solid.svg"));
 
-  // This selector is horrific
-  const rows = document.querySelectorAll(
-    '.k-content > * > * > * >.k-master-row:not([mesinline="1"])'
-  );
+  const rows: Element[] = [];
+
+  const treeGrids = [
+    ...document.querySelectorAll(`table[role="treegrid"][${TTT_TABLEGROUP_ATTRIBUTE}]`),
+  ];
+
+  for (const treeGrid of treeGrids) {
+    const groupId = treeGrid.getAttribute(TTT_TABLEGROUP_ATTRIBUTE);
+
+    const transferHeaderCell = treeGrid.querySelector(
+      `th[${TTT_TABLEGROUP_ATTRIBUTE}="${groupId}"][data-field="ManifestNumber"]`
+    );
+
+    if (!transferHeaderCell) {
+      // This is not a table grid, skip
+      continue;
+    }
+
+    for (const row of treeGrid.querySelectorAll(
+      `.k-master-row[${TTT_TABLEGROUP_ATTRIBUTE}="${groupId}"]:not([mesinline="1"])`
+    )) {
+      rows.push(row);
+    }
+  }
 
   if (rows.length === 0) {
     return;
@@ -87,8 +107,31 @@ export async function addButtonsToPackageTableImpl() {
   const barsIconUrl = await getUrl(require("@/assets/images/bars-solid.svg"));
   const toolsIconUrl = await getUrl(require("@/assets/images/tools-solid.svg"));
 
-  // This selector is horrific
-  const rows = document.querySelectorAll('.k-content .k-master-row:not([mesinline="1"])');
+  const rows: Element[] = [];
+
+  const treeGrids = [
+    ...document.querySelectorAll(`table[role="treegrid"][${TTT_TABLEGROUP_ATTRIBUTE}]`),
+  ];
+
+  for (const treeGrid of treeGrids) {
+    const groupId = treeGrid.getAttribute(TTT_TABLEGROUP_ATTRIBUTE);
+
+    const packageHeaderCell = treeGrid.querySelector(
+      // TODO: this might select plants too?
+      `th[${TTT_TABLEGROUP_ATTRIBUTE}="${groupId}"][data-field="Label"]`
+    );
+
+    if (!packageHeaderCell) {
+      // This is not a table grid, skip
+      continue;
+    }
+
+    for (const row of treeGrid.querySelectorAll(
+      `.k-master-row[${TTT_TABLEGROUP_ATTRIBUTE}="${groupId}"]:not([mesinline="1"])`
+    )) {
+      rows.push(row);
+    }
+  }
 
   if (rows.length === 0) {
     return;

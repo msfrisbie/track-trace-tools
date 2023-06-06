@@ -280,6 +280,8 @@ export enum TagFilterIdentifiers {
 
 export const DEBUG_ATTRIBUTE = "debug";
 
+export const TTT_TABLEGROUP_ATTRIBUTE = "ttt-tablegroup"
+
 export const TRACK_TRACE_TOOLS_STANDALONE_PAGE = "index.html";
 
 export enum ModalType {

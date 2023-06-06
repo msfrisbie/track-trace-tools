@@ -516,6 +516,7 @@ export default Vue.extend({
             .outgoingInactiveTransfer(this.contextMenuEvent.manifestNumber)
             .then(handler),
           primaryDataLoader.rejectedTransfer(this.contextMenuEvent.manifestNumber).then(handler),
+          primaryDataLoader.layoverTransfer(this.contextMenuEvent.manifestNumber).then(handler),
         ]);
 
         if (!this.$data.transfer) {

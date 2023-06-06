@@ -7,6 +7,7 @@ import {
   PlantFilterIdentifiers,
   TagFilterIdentifiers,
   TransferFilterIdentifiers,
+  TTT_TABLEGROUP_ATTRIBUTE,
 } from "@/consts";
 import { DarkModeState, IAtomicService, SnowflakeState } from "@/interfaces";
 import { toastManager } from "@/modules/toast-manager.module";
@@ -15,6 +16,7 @@ import store from "@/store/page-overlay/index";
 import { debugLogFactory } from "@/utils/debug";
 import _ from "lodash-es";
 import { timer } from "rxjs";
+import { v4 as uuidv4 } from "uuid";
 import { analyticsManager } from "../analytics-manager.module";
 import { authManager } from "../auth-manager.module";
 import { metrcModalManager } from "../metrc-modal-manager.module";
@@ -407,6 +409,8 @@ class PageManager implements IAtomicService {
       }
       this.togglePageVisibilityClasses();
 
+      this.tagTableGroups();
+
       if (window.location.pathname.match(PACKAGE_TAB_REGEX)) {
         await this.managePackageTabs();
         this.acquirePackageFilterElements();
@@ -685,6 +689,41 @@ class PageManager implements IAtomicService {
 
   controlLogoutBar(hide: boolean) {
     return controlLogoutBarImpl(hide);
+  }
+
+  tagTableGroups() {
+    // Metrc nests tables, which makes adding widgets very difficult.
+    // This performs eager attribute grouping, which allows CSS selectors to tease apart nested tables
+    // and associates them with their immediate parents.
+
+    try {
+      const tablesAndRows = document.querySelectorAll(
+        `table[role="treegrid"], 
+        table[role="treegrid"] tr:not([${TTT_TABLEGROUP_ATTRIBUTE}]), 
+        table[role="treegrid"] th:not([${TTT_TABLEGROUP_ATTRIBUTE}])`
+      );
+
+      let groupId = null;
+      for (const el of tablesAndRows) {
+        if (el.hasAttribute(TTT_TABLEGROUP_ATTRIBUTE)) {
+          groupId = el.getAttribute(TTT_TABLEGROUP_ATTRIBUTE);
+          continue;
+        }
+
+        // We are encountering a node with no group ID
+        if (el.nodeName === "TABLE") {
+          groupId = uuidv4();
+          el.setAttribute(TTT_TABLEGROUP_ATTRIBUTE, groupId);
+        } else {
+          if (!groupId) {
+            throw new Error("Needed groupId, but was not yet assigned");
+          }
+          el.setAttribute(TTT_TABLEGROUP_ATTRIBUTE, groupId);
+        }
+      }
+    } catch (e: any) {
+      console.error(e);
+    }
   }
 
   async managePlantTabs() {
