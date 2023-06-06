@@ -4,7 +4,7 @@ import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
 import { dynamicConstsManager } from "@/modules/dynamic-consts-manager.module";
 import { pageManager } from "@/modules/page-manager/page-manager.module";
 import { toastManager } from "@/modules/toast-manager.module";
-import { zip } from "lodash";
+import _, { zip } from "lodash";
 
 export interface IQuickScript {
   id: string;
@@ -443,7 +443,10 @@ export async function fillTransferWeights() {
       baseUnitOfMeasureId = poundsUnitOfMeasure.Id;
     }
 
-    grossWeightInput.value = normalizedGrossWeights.reduce((a, b) => a + b, 0).toString();
+    grossWeightInput.value = _.round(
+      normalizedGrossWeights.reduce((a, b) => a + b, 0),
+      3
+    ).toString();
     unitOfMeasureSelect.value = `number:${baseUnitOfMeasureId}`;
     unitOfMeasureSelect.dispatchEvent(new Event("change"));
   }
