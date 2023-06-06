@@ -52,6 +52,10 @@ export function extractNestedData({
       return reportData[reportType]?.outgoingTransfers as IIndexedRichOutgoingTransferData[];
     case ReportType.OUTGOING_TRANSFER_MANIFESTS:
       return reportData[reportType]?.richOutgoingTransfers as IIndexedRichOutgoingTransferData[];
+    case ReportType.TRANSFER_HUB_TRANSFERS:
+      return reportData[reportType]?.transferHubTransfers as IIndexedRichOutgoingTransferData[];
+    case ReportType.TRANSFER_HUB_TRANSFER_MANIFESTS:
+      return reportData[reportType]?.richTransferHubTransfers as IIndexedRichOutgoingTransferData[];
     case ReportType.STRAGGLER_PACKAGES:
       return reportData[reportType]?.stragglerPackages as IIndexedPackageData[];
     default:
@@ -173,6 +177,10 @@ export function getSheetTitle({ reportType }: { reportType: ReportType }): Sheet
       return SheetTitles.OUTGOING_TRANSFERS;
     case ReportType.OUTGOING_TRANSFER_MANIFESTS:
       return SheetTitles.OUTGOING_TRANSFER_MANIFESTS;
+      case ReportType.TRANSFER_HUB_TRANSFERS:
+        return SheetTitles.TRANSFER_HUB_TRANSFERS;
+      case ReportType.TRANSFER_HUB_TRANSFER_MANIFESTS:
+        return SheetTitles.TRANSFER_HUB_TRANSFER_MANIFESTS;
     default:
       throw new Error("Bad reportType " + reportType);
   }

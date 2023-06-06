@@ -280,7 +280,7 @@ export enum TagFilterIdentifiers {
 
 export const DEBUG_ATTRIBUTE = "debug";
 
-export const TTT_TABLEGROUP_ATTRIBUTE = "ttt-tablegroup"
+export const TTT_TABLEGROUP_ATTRIBUTE = "ttt-tablegroup";
 
 export const TRACK_TRACE_TOOLS_STANDALONE_PAGE = "index.html";
 
@@ -514,7 +514,9 @@ export enum SheetTitles {
   MATURE_PLANTS_QUICKVIEW = "Mature Plants Quickview",
   INCOMING_TRANSFERS = "Incoming Transfers",
   OUTGOING_TRANSFERS = "Outgoing Transfers",
+  TRANSFER_HUB_TRANSFERS = "Transfer Hub Transfers",
   OUTGOING_TRANSFER_MANIFESTS = "Outgoing Transfer Manifest Packages",
+  TRANSFER_HUB_TRANSFER_MANIFESTS = "Transfer Hub Manifest Packages",
   STRAGGLER_PACKAGES = "Straggler Packages",
   PRODUCTION_BATCH_COSTS = "Production Batch Costs",
   WORKSHEET = "Worksheet",

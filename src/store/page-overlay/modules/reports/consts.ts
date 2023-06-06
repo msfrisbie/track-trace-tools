@@ -29,7 +29,9 @@ export enum ReportType {
   PACKAGES = "PACKAGES",
   INCOMING_TRANSFERS = "INCOMING_TRANSFERS",
   OUTGOING_TRANSFERS = "OUTGOING_TRANSFERS",
+  TRANSFER_HUB_TRANSFERS = "TRANSFER_HUB_TRANSFERS",
   OUTGOING_TRANSFER_MANIFESTS = "OUTGOING_TRANSFER_MANIFESTS",
+  TRANSFER_HUB_TRANSFER_MANIFESTS = "TRANSFER_HUB_TRANSFER_MANIFESTS",
   MATURE_PLANTS = "MATURE_PLANTS",
   IMMATURE_PLANTS = "IMMATURE_PLANTS",
   HARVESTS = "HARVESTS",
@@ -416,7 +418,126 @@ export const SHEET_FIELDS: { [key: string]: IFieldData[] } = {
       required: false,
     },
   ],
+  [ReportType.TRANSFER_HUB_TRANSFERS]: [
+    {
+      value: "Transfer.ManifestNumber",
+      readableName: "Manifest #",
+      required: true,
+    },
+    {
+      value: "Transfer.TransferState",
+      readableName: "Transfer Status",
+      required: true,
+    },
+    {
+      value: "Destination.ShipmentTypeName",
+      readableName: "Transfer Type",
+      required: true,
+    },
+    {
+      value: "Destination.DeliveryPackageCount",
+      readableName: "Package Count",
+      required: true,
+    },
+    {
+      value: "Transfer.ShipperFacilityName",
+      readableName: "Shipper Name",
+      required: false,
+    },
+    {
+      value: "Transfer.ShipperFacilityLicenseNumber",
+      readableName: "Shipper License",
+      required: false,
+    },
+    {
+      value: "Destination.RecipientFacilityName",
+      readableName: "Recipient Name",
+      required: false,
+    },
+    {
+      value: "Destination.RecipientFacilityLicenseNumber",
+      readableName: "Recipient License",
+      required: false,
+    },
+    {
+      value: "Destination.EstimatedDepartureDateTime",
+      readableName: "ETD",
+      required: false,
+    },
+    {
+      value: "Destination.EstimatedArrivalDateTime",
+      readableName: "ETA",
+      required: false,
+    },
+  ],
   [ReportType.OUTGOING_TRANSFER_MANIFESTS]: [
+    {
+      value: "Transfer.ManifestNumber",
+      readableName: "Manifest #",
+      required: true,
+    },
+    {
+      value: "Transfer.TransferState",
+      readableName: "Transfer Status",
+      required: true,
+    },
+    {
+      value: "Destination.ShipmentTypeName",
+      readableName: "Transfer Type",
+      required: true,
+    },
+    {
+      value: "Package.PackageLabel",
+      readableName: "Package Tag",
+      required: true,
+    },
+    {
+      value: "Package.ProductName",
+      readableName: "Item",
+      required: false,
+    },
+    {
+      value: "Package.ShippedQuantity",
+      readableName: "Quantity",
+      required: false,
+    },
+    {
+      value: "Package.ShippedUnitOfMeasureAbbreviation",
+      readableName: "Unit of Measure",
+      required: false,
+    },
+    {
+      value: "Transfer.ShipperFacilityName",
+      readableName: "Shipper Name",
+      required: false,
+    },
+    {
+      value: "Transfer.ShipperFacilityLicenseNumber",
+      readableName: "Shipper License",
+      required: false,
+    },
+    {
+      value: "Destination.RecipientFacilityName",
+      readableName: "Recipient Name",
+      required: false,
+    },
+    {
+      value: "Destination.EstimatedDepartureDateTime",
+      readableName: "ETD",
+      required: false,
+    },
+    {
+      value: "Destination.EstimatedDepartureDateTime",
+      readableName: "ETD",
+      required: false,
+    },
+    {
+      value: "Destination.EstimatedArrivalDateTime",
+      readableName: "ETA",
+      required: false,
+    },
+  ],
+  [ReportType.TRANSFER_HUB_TRANSFER_MANIFESTS]: [
     {
       value: "Transfer.ManifestNumber",
       readableName: "Manifest #",
