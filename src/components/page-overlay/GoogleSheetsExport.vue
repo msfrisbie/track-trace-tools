@@ -12,7 +12,7 @@
           v-bind:class="{ 'opacity-50': reportStatus !== ReportStatus.INITIAL }"
         >
           <b-form-group>
-            <b-form-checkbox-group v-model="selectedReports" class="flex flex-col gap-4">
+            <b-form-checkbox-group v-model="selectedReports" class="flex flex-col gap-1">
               <b-form-checkbox
                 v-for="eligibleReportOption of eligibleReportOptions"
                 v-bind:key="eligibleReportOption.value"
@@ -20,7 +20,7 @@
                 :disabled="reportStatus !== ReportStatus.INITIAL"
                 ><div class="flex flex-col items-start gap-1">
                   <span class="">{{ eligibleReportOption.text }}</span>
-                  <span class="text-xs text-gray-400">{{ eligibleReportOption.description }}</span>
+                  <!-- <span class="text-xs text-gray-400">{{ eligibleReportOption.description }}</span> -->
                 </div>
               </b-form-checkbox>
 
@@ -42,9 +42,9 @@
                 :disabled="true"
                 ><div class="flex flex-col items-start gap-1">
                   <span class="">{{ disabledVisibleReportOption.text }}</span>
-                  <span class="text-xs text-gray-400">{{
+                  <!-- <span class="text-xs text-gray-400">{{
                     disabledVisibleReportOption.description
-                  }}</span>
+                  }}</span> -->
                 </div>
               </b-form-checkbox>
             </b-form-checkbox-group>
@@ -114,6 +114,35 @@
                     initial-date
                     size="sm"
                     v-model="cogsTrackerFormFilters.cogsTrackerDateLt"
+                  />
+                </div>
+              </div>
+            </div>
+          </template>
+
+          <!-- Employee Samples -->
+          <template v-if="selectedReports.includes(ReportType.EMPLOYEE_SAMPLES)">
+            <div class="rounded border border-gray-300 p-2 flex flex-col items-stretch gap-2">
+              <div class="font-semibold text-gray-700">Employee Samples</div>
+              <hr />
+              <div class="flex flex-col items-stretch gap-4">
+                <div class="flex flex-col items-start gap-1">
+                  <div class="text-gray-500">Start date</div>
+                  <b-form-datepicker
+                    :required="true"
+                    initial-date
+                    size="sm"
+                    v-model="employeeSamplesFormFilters.employeeSamplesDateGt"
+                  />
+                </div>
+
+                <div class="flex flex-col items-start gap-1">
+                  <div class="text-gray-500">End date</div>
+                  <b-form-datepicker
+                    :required="true"
+                    initial-date
+                    size="sm"
+                    v-model="employeeSamplesFormFilters.employeeSamplesDateLt"
                   />
                 </div>
               </div>
@@ -599,6 +628,100 @@
                   >
                     <b-form-checkbox
                       v-for="fieldData of SHEET_FIELDS[ReportType.OUTGOING_TRANSFERS]"
+                      v-bind:key="fieldData.value"
+                      :value="fieldData"
+                      :disabled="fieldData.required"
+                    >
+                      <span class="leading-6">{{ fieldData.readableName }}</span>
+                    </b-form-checkbox>
+                  </b-form-checkbox-group>
+                </template>
+              </div>
+            </div>
+          </template>
+
+          <!-- Transfer Hub Transfers -->
+          <template v-if="selectedReports.includes(ReportType.TRANSFER_HUB_TRANSFERS)">
+            <div class="rounded border border-gray-300 p-2 flex flex-col items-stretch gap-2">
+              <div class="font-semibold text-gray-700">Hub Transfers</div>
+              <hr />
+              <div class="flex flex-col items-stretch gap-4">
+                <b-button
+                  size="sm"
+                  variant="outline-primary"
+                  @click="toggleFilters(ReportType.TRANSFER_HUB_TRANSFERS)"
+                  >{{
+                    showFilters[ReportType.TRANSFER_HUB_TRANSFERS]
+                      ? "HIDE FILTERS"
+                      : "CHOOSE FILTERS"
+                  }}</b-button
+                >
+                <template v-if="showFilters[ReportType.TRANSFER_HUB_TRANSFERS]">
+                  <div class="flex flex-col items-start gap-1">
+                    <b-form-checkbox
+                      v-model="transferHubTransfersFormFilters.shouldFilterEstimatedDepartureDateGt"
+                    >
+                      <span class="leading-6">ETD on or after:</span>
+                    </b-form-checkbox>
+                    <b-form-datepicker
+                      v-if="transferHubTransfersFormFilters.shouldFilterEstimatedDepartureDateGt"
+                      :disabled="
+                        !transferHubTransfersFormFilters.shouldFilterEstimatedDepartureDateGt
+                      "
+                      initial-date
+                      size="sm"
+                      v-model="transferHubTransfersFormFilters.estimatedDepartureDateGt"
+                    />
+                  </div>
+
+                  <div class="flex flex-col items-start gap-1">
+                    <b-form-checkbox
+                      v-model="transferHubTransfersFormFilters.shouldFilterEstimatedDepartureDateLt"
+                    >
+                      <span class="leading-6">ETD on or before:</span>
+                    </b-form-checkbox>
+                    <b-form-datepicker
+                      v-if="transferHubTransfersFormFilters.shouldFilterEstimatedDepartureDateLt"
+                      :disabled="
+                        !transferHubTransfersFormFilters.shouldFilterEstimatedDepartureDateLt
+                      "
+                      initial-date
+                      size="sm"
+                      v-model="transferHubTransfersFormFilters.estimatedDepartureDateLt"
+                    />
+                  </div>
+                </template>
+
+                <b-button
+                  size="sm"
+                  variant="outline-primary"
+                  @click="toggleFields(ReportType.TRANSFER_HUB_TRANSFERS)"
+                  >{{
+                    showFields[ReportType.TRANSFER_HUB_TRANSFERS] ? "HIDE FIELDS" : "CHOOSE FIELDS"
+                  }}</b-button
+                >
+                <template v-if="showFields[ReportType.TRANSFER_HUB_TRANSFERS]">
+                  <div class="grid grid-cols-2 gap-2">
+                    <b-button
+                      variant="outline-dark"
+                      size="sm"
+                      @click="checkAll(ReportType.TRANSFER_HUB_TRANSFERS)"
+                      >CHECK ALL</b-button
+                    >
+                    <b-button
+                      variant="outline-dark"
+                      size="sm"
+                      @click="uncheckAll(ReportType.TRANSFER_HUB_TRANSFERS)"
+                      >UNCHECK ALL</b-button
+                    >
+                  </div>
+
+                  <b-form-checkbox-group
+                    v-model="fields[ReportType.TRANSFER_HUB_TRANSFERS]"
+                    class="flex flex-col items-start gap-1"
+                  >
+                    <b-form-checkbox
+                      v-for="fieldData of SHEET_FIELDS[ReportType.TRANSFER_HUB_TRANSFERS]"
                       v-bind:key="fieldData.value"
                       :value="fieldData"
                       :disabled="fieldData.required"
@@ -1209,13 +1332,17 @@ import {
   maturePlantsFormFiltersFactory,
 } from "@/utils/reports/mature-plants-report";
 import {
-  addOutgoingTransferManifestsFeport,
+  addOutgoingTransferManifestsReport,
   outgoingTransferManifestsFormFiltersFactory,
 } from "@/utils/reports/outgoing-transfer-manifests-report";
 import {
   addOutgoingTransfersReport,
   outgoingTransfersFormFiltersFactory,
 } from "@/utils/reports/outgoing-transfers-report";
+import {
+  addTransferHubTransfersReport,
+  transferHubTransfersFormFiltersFactory,
+} from "@/utils/reports/transfer-hub-transfers-report";
 import { addPackageReport, packageFormFiltersFactory } from "@/utils/reports/package-report";
 import {
   addStragglerPackagesReport,
@@ -1226,6 +1353,10 @@ import _ from "lodash-es";
 import Vue from "vue";
 import { mapActions, mapState } from "vuex";
 import ArchiveWidget from "../shared/ArchiveWidget.vue";
+import {
+  addEmployeeSamplesReport,
+  employeeSamplesFormFiltersFactory,
+} from "@/utils/reports/employee-samples-report";
 
 interface IReportOption {
   text: string;
@@ -1282,8 +1413,11 @@ export default Vue.extend({
       harvestsFormFilters: harvestsFormFiltersFactory(),
       incomingTransfersFormFilters: incomingTransfersFormFiltersFactory(),
       outgoingTransfersFormFilters: outgoingTransfersFormFiltersFactory(),
+      transferHubTransfersFormFilters: transferHubTransfersFormFiltersFactory(),
       outgoingTransferManifestsFormFilters: outgoingTransferManifestsFormFiltersFactory(),
+      // transferHubTransferManifestsFormFilters: transferHubTransferManifestsFormFiltersFactory(),
       tagsFormFilters: tagsFormFiltersFactory(),
+      employeeSamplesFormFilters: employeeSamplesFormFiltersFactory(),
       showFilters: (() => {
         const fields: { [key: string]: boolean } = {};
         Object.keys(SHEET_FIELDS).map((x: any) => {
@@ -1365,6 +1499,15 @@ export default Vue.extend({
           description: "Filter by wholesale and estimated time of departure",
           isCustom: false,
         },
+        // Disabled - Destinations returns 0, more like incoming?
+        // {
+        //   text: "Hub Transfers",
+        //   value: ReportType.TRANSFER_HUB_TRANSFERS,
+        //   t3plus: false,
+        //   enabled: true,
+        //   description: "Filter by estimated time of departure",
+        //   isCustom: false,
+        // },
         {
           text: "Tags",
           value: ReportType.TAGS,
@@ -1403,7 +1546,7 @@ export default Vue.extend({
           t3plus: false,
           enabled: clientBuildManager.assertValues(["ENABLE_COGS"]),
           hidden: !clientBuildManager.assertValues(["ENABLE_COGS"]),
-          description: "Generate COGS",
+          description: "Generate COGS calculator",
           isCustom: false,
         },
         {
@@ -1412,9 +1555,18 @@ export default Vue.extend({
           t3plus: false,
           enabled: clientBuildManager.assertValues(["ENABLE_COGS_TRACKER"]),
           hidden: !clientBuildManager.assertValues(["ENABLE_COGS_TRACKER"]),
-          description: "Generate COGS Tracker",
+          description: "Generate COGS Tracker sheets",
           isCustom: false,
         },
+        // {
+        //   text: "Employee Samples",
+        //   value: ReportType.EMPLOYEE_SAMPLES,
+        //   t3plus: false,
+        //   enabled: clientBuildManager.assertValues(["ENABLE_EMPLOYEE_SAMPLE_TOOL"]),
+        //   hidden: !clientBuildManager.assertValues(["ENABLE_EMPLOYEE_SAMPLE_TOOL"]),
+        //   description: "Generate summary of employee samples",
+        //   isCustom: false,
+        // },
         {
           text: "Package Quickview",
           value: null,
@@ -1513,7 +1665,6 @@ export default Vue.extend({
         authState: await authManager.authStateOrError(),
       };
 
-      // TODO: cogs must UNCHECK all other report types
       if (this.selectedReports.includes(ReportType.COGS)) {
         addCogsReport({
           reportConfig,
@@ -1522,11 +1673,17 @@ export default Vue.extend({
         });
       }
 
-      // TODO: cogs must UNCHECK all other report types
       if (this.selectedReports.includes(ReportType.COGS_TRACKER)) {
         addCogsTrackerReport({
           reportConfig,
           cogsTrackerFormFilters: this.cogsTrackerFormFilters,
+        });
+      }
+
+      if (this.selectedReports.includes(ReportType.EMPLOYEE_SAMPLES)) {
+        addEmployeeSamplesReport({
+          reportConfig,
+          employeeSamplesFormFilters: this.employeeSamplesFormFilters,
         });
       }
 
@@ -1570,6 +1727,14 @@ export default Vue.extend({
         });
       }
 
+      if (this.selectedReports.includes(ReportType.TRANSFER_HUB_TRANSFERS)) {
+        addTransferHubTransfersReport({
+          reportConfig,
+          transferHubTransfersFormFilters: this.transferHubTransfersFormFilters,
+          fields: this.fields[ReportType.TRANSFER_HUB_TRANSFERS],
+        });
+      }
+
       if (this.selectedReports.includes(ReportType.HARVESTS)) {
         addHarvestsReport({
           reportConfig,
@@ -1595,11 +1760,19 @@ export default Vue.extend({
       }
 
       if (this.selectedReports.includes(ReportType.OUTGOING_TRANSFER_MANIFESTS)) {
-        addOutgoingTransferManifestsFeport({
+        addOutgoingTransferManifestsReport({
           reportConfig,
           outgoingTransferManifestsFormFilters: this.outgoingTransferManifestsFormFilters,
           fields: this.fields[ReportType.OUTGOING_TRANSFER_MANIFESTS],
         });
+      }
+
+      if (this.selectedReports.includes(ReportType.TRANSFER_HUB_TRANSFER_MANIFESTS)) {
+        // addTransferHubTransferManifestsReport({
+        //   reportConfig,
+        //   transferHubTransferManifestsFormFilters: this.transferHubTransferManifestsFormFilters,
+        //   fields: this.fields[ReportType.TRANSFER_HUB_TRANSFER_MANIFESTS],
+        // });
       }
 
       this.generateSpreadsheet({ reportConfig });
@@ -1610,12 +1783,16 @@ export default Vue.extend({
     selectedReports: {
       immediate: true,
       handler(newValue, oldValue) {
-        if (newValue.length > 1 && newValue.includes(ReportType.COGS)) {
-          this.selectedReports = [ReportType.COGS];
-        }
+        const singleonReportTypes: ReportType[] = [
+          ReportType.COGS,
+          ReportType.COGS_TRACKER,
+          ReportType.EMPLOYEE_SAMPLES,
+        ];
 
-        if (newValue.length > 1 && newValue.includes(ReportType.COGS_TRACKER)) {
-          this.selectedReports = [ReportType.COGS_TRACKER];
+        for (const reportType of singleonReportTypes) {
+          if (newValue.length > 1 && newValue.includes(reportType)) {
+            this.selectedReports = [reportType];
+          }
         }
       },
     },

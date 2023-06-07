@@ -4,6 +4,7 @@ import {
   ZERO_PADDED_MANIFEST_NUMBER_REGEX_PATTERN,
 } from "@/consts";
 import { IPackageHistoryData } from "@/interfaces";
+import _ from "lodash-es";
 
 // Single history entry methods
 
@@ -129,7 +130,9 @@ export function extractHarvestNameOrNull(description: string): string | null {
   return null;
 }
 
-export function extractTagQuantityPairOrNull(description: string): [string, number] | null {
+export function extractChildPackageTagQuantityPairOrNull(
+  description: string
+): [string, number] | null {
   const pairMatcher = new RegExp(`Used ([\\d,\\.]+) .* for Package (${METRC_TAG_REGEX_PATTERN})`);
 
   const match = description.match(pairMatcher);
@@ -137,7 +140,7 @@ export function extractTagQuantityPairOrNull(description: string): [string, numb
   return match ? [match[2] as string, parseFloat(match[1].replaceAll(",", ""))] : null;
 }
 
-export function extractTagQuantityUnitSetOrNull(
+export function extractChildPackageTagQuantityUnitSetOrNull(
   description: string
 ): [string, number, string] | null {
   const pairMatcher = new RegExp(
@@ -147,6 +150,18 @@ export function extractTagQuantityUnitSetOrNull(
   const match = description.match(pairMatcher);
 
   return match ? [match[3], parseFloat(match[1].replaceAll(",", "")), match[2]] : null;
+}
+
+export function extractParentPackageTagQuantityUnitItemSetOrNull(
+  description: string
+): [string, number, string, string] | null {
+  const pairMatcher = new RegExp(
+    `Took ([0-9,\.]+) ([a-zA-Z\s]+) of (.*) from Package (${METRC_TAG_REGEX_PATTERN})`
+  );
+
+  const match = description.match(pairMatcher);
+
+  return match ? [match[4], parseFloat(match[1].replaceAll(",", "")), match[2], match[3]] : null;
 }
 
 // Full history methods
@@ -182,7 +197,7 @@ export function extractParentPackageLabelsFromHistory(
     }
   }
 
-  return parentPackageLabels;
+  return _.uniq(parentPackageLabels);
 }
 
 export function extractChildPackageLabelsFromHistory(historyList: IPackageHistoryData[]): string[] {
@@ -198,7 +213,7 @@ export function extractChildPackageLabelsFromHistory(historyList: IPackageHistor
     }
   }
 
-  return childPackageLabels;
+  return _.uniq(childPackageLabels);
 }
 
 export function extractTestSamplePackageLabelsFromHistory(
@@ -216,18 +231,18 @@ export function extractTestSamplePackageLabelsFromHistory(
     }
   }
 
-  return testSamplePackageLabels;
+  return _.uniq(testSamplePackageLabels);
 }
 
-// This is used by COGS, technically should be replaced with extractTagQuantityUnitSetsFromHistory
-export function extractTagQuantityPairsFromHistory(
+// This is used by COGS, technically should be replaced with extractChildPackageTagQuantityUnitSetsFromHistory
+export function extractChildPackageTagQuantityPairsFromHistory(
   historyList: IPackageHistoryData[]
 ): [string, number][] {
   const pairs: [string, number][] = [];
 
   for (const history of historyList) {
     for (const description of history.Descriptions) {
-      const result = extractTagQuantityPairOrNull(description);
+      const result = extractChildPackageTagQuantityPairOrNull(description);
 
       if (result) {
         pairs.push(result);
@@ -238,14 +253,32 @@ export function extractTagQuantityPairsFromHistory(
   return pairs;
 }
 
-export function extractTagQuantityUnitSetsFromHistory(
+export function extractChildPackageTagQuantityUnitSetsFromHistory(
   historyList: IPackageHistoryData[]
 ): [string, number, string][] {
   const sets: [string, number, string][] = [];
 
   for (const history of historyList) {
     for (const description of history.Descriptions) {
-      const result = extractTagQuantityUnitSetOrNull(description);
+      const result = extractChildPackageTagQuantityUnitSetOrNull(description);
+
+      if (result) {
+        sets.push(result);
+      }
+    }
+  }
+
+  return sets;
+}
+
+export function extractParentPackageTagQuantityUnitItemSetsFromHistory(
+  historyList: IPackageHistoryData[]
+): [string, number, string, string][] {
+  const sets: [string, number, string, string][] = [];
+
+  for (const history of historyList) {
+    for (const description of history.Descriptions) {
+      const result = extractParentPackageTagQuantityUnitItemSetOrNull(description);
 
       if (result) {
         sets.push(result);

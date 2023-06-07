@@ -51,6 +51,10 @@ export interface IReportConfig {
     packageFilter: IPackageFilter;
     fields: null;
   };
+  [ReportType.EMPLOYEE_SAMPLES]?: {
+    packageFilter: IPackageFilter;
+    fields: null;
+  };
   [ReportType.PACKAGES]?: {
     packageFilter: IPackageFilter;
     fields: IFieldData[];
@@ -116,6 +120,9 @@ export interface IReportData {
   };
   [ReportType.PACKAGES]?: {
     packages: IIndexedPackageData[];
+  };
+  [ReportType.EMPLOYEE_SAMPLES]?: {
+    employeeSamplesMatrix: any[][];
   };
   [ReportType.STRAGGLER_PACKAGES]?: {
     stragglerPackages: IIndexedPackageData[];

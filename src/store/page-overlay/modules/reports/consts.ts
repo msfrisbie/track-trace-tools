@@ -38,8 +38,10 @@ export enum ReportType {
   TAGS = "TAGS",
   STRAGGLER_PACKAGES = "STRAGGLER_PACKAGES",
   MATURE_PLANTS_QUICKVIEW = "MATURE_PLANTS_QUICKVIEW",
+  EMPLOYEE_SAMPLES = "EMPLOYEE_SAMPLES",
 }
 
+// Used to unpack arrays of objects and auto-generate column headers
 export const SHEET_FIELDS: { [key: string]: IFieldData[] } = {
   [ReportType.IMMATURE_PLANTS]: [
     {

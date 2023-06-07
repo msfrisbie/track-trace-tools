@@ -3,6 +3,7 @@ import { IPluginState, ISpreadsheet } from "@/interfaces";
 import { analyticsManager } from "@/modules/analytics-manager.module";
 import { maybeLoadCogsReportData } from "@/utils/reports/cogs-report";
 import { maybeLoadCogsTrackerReportData } from "@/utils/reports/cogs-tracker-report";
+import { maybeLoadEmployeeSamplesReportData } from "@/utils/reports/employee-samples-report";
 import { maybeLoadHarvestsReportData } from "@/utils/reports/harvests-report";
 import { maybeLoadImmaturePlantsReportData } from "@/utils/reports/immature-plants-report";
 import { maybeLoadIncomingTransfersReportData } from "@/utils/reports/incoming-transfers-report";
@@ -13,17 +14,12 @@ import { maybeLoadOutgoingTransfersReportData } from "@/utils/reports/outgoing-t
 import { maybeLoadPackageReportData } from "@/utils/reports/package-report";
 import { maybeLoadStragglerPackageReportData } from "@/utils/reports/straggler-package-report";
 import { maybeLoadTagsReportData } from "@/utils/reports/tags-report";
+import { maybeLoadTransferHubTransfersReportData } from "@/utils/reports/transfer-hub-transfers-report";
 import { getSimpleSpreadsheet } from "@/utils/sheets";
 import { createSpreadsheetOrError } from "@/utils/sheets-export";
 import { v4 as uuidv4 } from "uuid";
 import { ActionContext } from "vuex";
-import {
-  IStatusMessage,
-  ReportsActions,
-  ReportsGetters,
-  ReportsMutations,
-  ReportStatus,
-} from "./consts";
+import { IStatusMessage, ReportsActions, ReportsMutations, ReportStatus } from "./consts";
 import { IReportConfig, IReportData, IReportsState } from "./interfaces";
 
 const inMemoryState = {
@@ -87,8 +83,7 @@ export const reportsModule = {
       }
     },
   },
-  getters: {
-  },
+  getters: {},
   actions: {
     [ReportsActions.RESET]: async (ctx: ActionContext<IReportsState, IPluginState>, data: any) => {
       ctx.commit(ReportsMutations.SET_STATUS, {
@@ -119,7 +114,9 @@ export const reportsModule = {
         await maybeLoadMaturePlantsQuickviewReportData({ ctx, reportData, reportConfig });
         await maybeLoadIncomingTransfersReportData({ ctx, reportData, reportConfig });
         await maybeLoadOutgoingTransfersReportData({ ctx, reportData, reportConfig });
+        await maybeLoadTransferHubTransfersReportData({ ctx, reportData, reportConfig });
         await maybeLoadOutgoingTransferManifestsReportData({ ctx, reportData, reportConfig });
+        await maybeLoadEmployeeSamplesReportData({ ctx, reportData, reportConfig });
 
         ctx.commit(ReportsMutations.SET_STATUS, {
           statusMessage: { text: "Generating spreadsheet...", level: "success" },

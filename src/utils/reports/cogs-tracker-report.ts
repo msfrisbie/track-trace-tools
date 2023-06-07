@@ -16,10 +16,11 @@ import {
   IReportsState,
 } from "@/store/page-overlay/modules/reports/interfaces";
 import { ActionContext } from "vuex";
-import { todayIsodate } from "../date";
+import { isodateToSlashDate, todayIsodate } from "../date";
 import {
+  extractChildPackageTagQuantityUnitSetsFromHistory,
   extractInitialPackageQuantityAndUnitFromHistoryOrError,
-  extractTagQuantityUnitSetsFromHistory,
+  extractParentPackageTagQuantityUnitItemSetsFromHistory,
   extractTestSamplePackageLabelsFromHistory,
 } from "../history";
 import {
@@ -126,7 +127,7 @@ export async function maybeLoadCogsTrackerReportData({
     ])
     .flat();
 
-  const headers = [
+  const srcHeaders = [
     "Item",
     "Tag",
     "Source Packages",
@@ -137,6 +138,7 @@ export async function maybeLoadCogsTrackerReportData({
     "Source Harvests",
     "Starting Quantity",
     "Input Material COGS",
+    "Number of Test Samples Pulled",
     "Weight Post Test If Applicable",
     "Test Cost",
     "Tested $/G",
@@ -145,9 +147,23 @@ export async function maybeLoadCogsTrackerReportData({
     ...ordinalHeaders,
   ];
 
-  bulkInfusedMatrix.push(headers);
-  distRexCogsMatrix.push(headers);
-  packagedGoodsCogsMatrix.push(headers);
+  const packagedHeaders = [
+    "Tag",
+    "Item",
+    "Category",
+    "Sub-Category",
+    "JV/CM/Int",
+    "Packaged Date",
+    "Starting Quantity (ea)",
+    "Cost Basis of Whole Lot",
+    "Tag of Bulk Input",
+    "Tested $/G From Bulk Tag",
+    "gram weight / unit of finished goods",
+  ];
+
+  bulkInfusedMatrix.push(srcHeaders);
+  distRexCogsMatrix.push(srcHeaders);
+  packagedGoodsCogsMatrix.push(packagedHeaders);
 
   const bulkInfusedPackages = dateFilteredPackages.filter(
     (pkg) =>
@@ -165,24 +181,27 @@ export async function maybeLoadCogsTrackerReportData({
     (pkg) => pkg.UnitOfMeasureQuantityType === "CountBased"
   );
 
-  function cogsTrackerRowFactory(pkg: IIndexedPackageData): any[] {
+  function cogsTrackerInputRowFactory(pkg: IIndexedPackageData): any[] {
     const initialWeightData = extractInitialPackageQuantityAndUnitFromHistoryOrError(pkg.history!);
     const testLabels = extractTestSamplePackageLabelsFromHistory(pkg.history!);
-    const tagQuantityUnitSets = extractTagQuantityUnitSetsFromHistory(pkg.history!);
+    const parentTagQuantityUnitItemSets = extractParentPackageTagQuantityUnitItemSetsFromHistory(
+      pkg.history!
+    );
+    const childTagQuantityUnitItemSets = extractChildPackageTagQuantityUnitSetsFromHistory(
+      pkg.history!
+    );
 
     const testMaterialWeightSum = testLabels
       .map(
-        (testLabel) => (tagQuantityUnitSets.find((x) => x[0] === testLabel) ?? [null, 0, null])[1]
+        (testLabel) =>
+          (childTagQuantityUnitItemSets.find((x) => x[0] === testLabel) ?? [null, 0, null])[1]
       )
       .reduce((a, b) => a + b, 0);
 
-    const sourceValues: [string, string, number, string][] = tagQuantityUnitSets.map(
-      ([label, quantity, unit]) => [
-        label,
-        allPackages.find((x) => x.Label)!.Item.Name,
-        quantity,
-        "",
-      ]
+    const sourceValues: [string, string, number, string][] = parentTagQuantityUnitItemSets.map(
+      ([label, quantity, unit, itemName]) => {
+        return [label, itemName, quantity, ""];
+      }
     );
 
     return [
@@ -192,10 +211,11 @@ export async function maybeLoadCogsTrackerReportData({
       "",
       pkg.ProductionBatchNumber,
       pkg.Item.ProductCategoryName,
-      pkg.PackagedDate,
+      isodateToSlashDate(pkg.PackagedDate),
       pkg.SourceHarvestNames,
       initialWeightData[0], // starting quantity
       "", // input material COGS
+      testLabels.length,
       testMaterialWeightSum > 0 ? initialWeightData[0] - testMaterialWeightSum : "", // Weight post test if applicable
       "", // test costs
       "", // tested $/g
@@ -205,9 +225,29 @@ export async function maybeLoadCogsTrackerReportData({
     ];
   }
 
-  bulkInfusedPackages.map((pkg) => bulkInfusedMatrix.push(cogsTrackerRowFactory(pkg)));
-  distRexCogsPackages.map((pkg) => distRexCogsMatrix.push(cogsTrackerRowFactory(pkg)));
-  packagedGoodsCogsPackages.map((pkg) => packagedGoodsCogsMatrix.push(cogsTrackerRowFactory(pkg)));
+  function cogsTrackerOutputRowFactory(pkg: IIndexedPackageData): any[] {
+    const initialWeightData = extractInitialPackageQuantityAndUnitFromHistoryOrError(pkg.history!);
+
+    return [
+      pkg.Label,
+      pkg.Item.Name,
+      pkg.Item.ProductCategoryName,
+      "",
+      "",
+      isodateToSlashDate(pkg.PackagedDate),
+      initialWeightData[0],
+      "",
+      pkg.SourcePackageLabels,
+      "",
+      pkg.Item.UnitWeight,
+    ];
+  }
+
+  bulkInfusedPackages.map((pkg) => bulkInfusedMatrix.push(cogsTrackerInputRowFactory(pkg)));
+  distRexCogsPackages.map((pkg) => distRexCogsMatrix.push(cogsTrackerInputRowFactory(pkg)));
+  packagedGoodsCogsPackages.map((pkg) =>
+    packagedGoodsCogsMatrix.push(cogsTrackerOutputRowFactory(pkg))
+  );
 
   reportData[ReportType.COGS_TRACKER] = {
     bulkInfusedMatrix,

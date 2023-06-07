@@ -2,13 +2,8 @@ import { SheetTitles } from "@/consts";
 import {
   IDestinationData,
   IIndexedDestinationPackageData,
-  IIndexedHarvestData,
-  IIndexedPackageData,
-  IIndexedPlantBatchData,
-  IIndexedPlantData,
   IIndexedRichIncomingTransferData,
   IIndexedRichOutgoingTransferData,
-  IIndexedTagData,
   IIndexedTransferData,
   ITransferData,
   ITransporterData,
@@ -37,27 +32,27 @@ export function extractNestedData({
 }) {
   switch (reportType) {
     case ReportType.PACKAGES:
-      return reportData[reportType]?.packages as IIndexedPackageData[];
+      return reportData[reportType]!.packages!;
     case ReportType.TAGS:
-      return reportData[reportType]?.tags as IIndexedTagData[];
+      return reportData[reportType]!.tags!;
     case ReportType.HARVESTS:
-      return reportData[reportType]?.harvests as IIndexedHarvestData[];
+      return reportData[reportType]!.harvests!;
     case ReportType.IMMATURE_PLANTS:
-      return reportData[reportType]?.immaturePlants as IIndexedPlantBatchData[];
+      return reportData[reportType]!.immaturePlants!;
     case ReportType.MATURE_PLANTS:
-      return reportData[reportType]?.maturePlants as IIndexedPlantData[];
+      return reportData[reportType]!.maturePlants!;
     case ReportType.INCOMING_TRANSFERS:
-      return reportData[reportType]?.incomingTransfers as IIndexedRichIncomingTransferData[];
+      return reportData[reportType]!.incomingTransfers!;
     case ReportType.OUTGOING_TRANSFERS:
-      return reportData[reportType]?.outgoingTransfers as IIndexedRichOutgoingTransferData[];
+      return reportData[reportType]!.outgoingTransfers!;
     case ReportType.OUTGOING_TRANSFER_MANIFESTS:
-      return reportData[reportType]?.richOutgoingTransfers as IIndexedRichOutgoingTransferData[];
+      return reportData[reportType]!.richOutgoingTransfers!;
     case ReportType.TRANSFER_HUB_TRANSFERS:
-      return reportData[reportType]?.transferHubTransfers as IIndexedRichOutgoingTransferData[];
+      return reportData[reportType]!.transferHubTransfers!;
     case ReportType.TRANSFER_HUB_TRANSFER_MANIFESTS:
-      return reportData[reportType]?.richTransferHubTransfers as IIndexedRichOutgoingTransferData[];
+      return reportData[reportType]!.richTransferHubTransfers!;
     case ReportType.STRAGGLER_PACKAGES:
-      return reportData[reportType]?.stragglerPackages as IIndexedPackageData[];
+      return reportData[reportType]!.stragglerPackages!;
     default:
       throw new Error("Bad reportType " + reportType);
   }
@@ -123,6 +118,25 @@ export function extractFlattenedData({
         }
 
         return flattenedOutgoingTransfers;
+      case ReportType.TRANSFER_HUB_TRANSFERS:
+        let flattenedTransferHubTransfers: {
+          Destination: IDestinationData;
+          Transfer: ITransferData;
+        }[] = [];
+
+        for (const transfer of extractNestedData({
+          reportType,
+          reportData,
+        }) as IIndexedRichOutgoingTransferData[]) {
+          for (const destination of transfer?.outgoingDestinations ?? []) {
+            flattenedTransferHubTransfers.push({
+              Destination: destination,
+              Transfer: transfer,
+            });
+          }
+        }
+
+        return flattenedTransferHubTransfers;
       case ReportType.OUTGOING_TRANSFER_MANIFESTS:
         let flattenedOutgoingPackages: {
           Package: IIndexedDestinationPackageData;
@@ -177,10 +191,10 @@ export function getSheetTitle({ reportType }: { reportType: ReportType }): Sheet
       return SheetTitles.OUTGOING_TRANSFERS;
     case ReportType.OUTGOING_TRANSFER_MANIFESTS:
       return SheetTitles.OUTGOING_TRANSFER_MANIFESTS;
-      case ReportType.TRANSFER_HUB_TRANSFERS:
-        return SheetTitles.TRANSFER_HUB_TRANSFERS;
-      case ReportType.TRANSFER_HUB_TRANSFER_MANIFESTS:
-        return SheetTitles.TRANSFER_HUB_TRANSFER_MANIFESTS;
+    case ReportType.TRANSFER_HUB_TRANSFERS:
+      return SheetTitles.TRANSFER_HUB_TRANSFERS;
+    case ReportType.TRANSFER_HUB_TRANSFER_MANIFESTS:
+      return SheetTitles.TRANSFER_HUB_TRANSFER_MANIFESTS;
     default:
       throw new Error("Bad reportType " + reportType);
   }

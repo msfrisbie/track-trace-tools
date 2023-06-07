@@ -38,7 +38,7 @@ export const outgoingTransferManifestsFormFiltersFactory: () => IOutgoingTransfe
     includeOutgoingInactive: false,
   });
 
-export function addOutgoingTransferManifestsFeport({
+export function addOutgoingTransferManifestsReport({
   reportConfig,
   outgoingTransferManifestsFormFilters,
   fields,

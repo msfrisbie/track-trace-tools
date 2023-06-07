@@ -51,7 +51,7 @@ export function addTransferHubTransfersReport({
       ? transferHubTransfersFormFilters.estimatedDepartureDateLt
       : null;
 
-  reportConfig[ReportType.OUTGOING_TRANSFERS] = {
+  reportConfig[ReportType.TRANSFER_HUB_TRANSFERS] = {
     transferFilter,
     fields,
   };
@@ -66,10 +66,10 @@ export async function maybeLoadTransferHubTransfersReportData({
   reportData: IReportData;
   reportConfig: IReportConfig;
 }) {
-  const transferHubTransferConfig = reportConfig[ReportType.OUTGOING_TRANSFERS];
+  const transferHubTransferConfig = reportConfig[ReportType.TRANSFER_HUB_TRANSFERS];
   if (transferHubTransferConfig?.transferFilter) {
     ctx.commit(ReportsMutations.SET_STATUS, {
-      statusMessage: { text: "Loading outgoing transfers...", level: "success" },
+      statusMessage: { text: "Loading layover transfers...", level: "success" },
     });
 
     let richTransferHubTransfers: IIndexedRichOutgoingTransferData[] = [];
@@ -106,12 +106,6 @@ export async function maybeLoadTransferHubTransfersReportData({
       ).map((x) => ({ ...x, packages: [] }));
 
       transfer.outgoingDestinations = destinations.filter((destination) => {
-        if (transferHubTransferConfig.transferFilter.onlyWholesale) {
-          if (!destination.ShipmentTypeName.includes("Wholesale")) {
-            return false;
-          }
-        }
-
         if (transferHubTransferConfig.transferFilter.estimatedDepartureDateLt) {
           if (
             destination.EstimatedDepartureDateTime >

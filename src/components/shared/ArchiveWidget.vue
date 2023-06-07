@@ -52,7 +52,7 @@ import { CompressedDataWrapper, compressedDataWrapperFactory } from "@/utils/com
 import { readJSONFile } from "@/utils/file";
 import {
   extractParentPackageLabelsFromHistory,
-  extractTagQuantityPairsFromHistory,
+  extractChildPackageTagQuantityPairsFromHistory,
 } from "@/utils/history";
 import { getIdOrError, getItemNameOrError, getLabelOrError } from "@/utils/package";
 import Vue from "vue";
@@ -208,7 +208,7 @@ export default Vue.extend({
                   wrapper.update(
                     pkg.Label,
                     "childPackageLabelQuantityPairs",
-                    extractTagQuantityPairsFromHistory(history)
+                    extractChildPackageTagQuantityPairsFromHistory(history)
                   );
                 })
               )

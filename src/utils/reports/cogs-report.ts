@@ -26,8 +26,8 @@ import { CompressedDataWrapper } from "../compression";
 import { downloadCsvFile } from "../csv";
 import { getIsoDateFromOffset, todayIsodate } from "../date";
 import {
+  extractChildPackageTagQuantityPairsFromHistory,
   extractParentPackageLabelsFromHistory,
-  extractTagQuantityPairsFromHistory,
 } from "../history";
 import {
   getParentPackageLabels,
@@ -487,7 +487,7 @@ export async function maybeLoadCogsReportData({
           treePackageWrapper.update(
             pkg.Label,
             "childPackageLabelQuantityPairs",
-            extractTagQuantityPairsFromHistory(history)
+            extractChildPackageTagQuantityPairsFromHistory(history)
           );
         })
       )

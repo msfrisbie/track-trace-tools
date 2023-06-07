@@ -17,6 +17,7 @@ import {
 import { todayIsodate } from "./date";
 import { createCogsSpreadsheetOrError } from "./reports/cogs-report";
 import { createCogsTrackerSpreadsheetOrError } from "./reports/cogs-tracker-report";
+import { createEmployeeSamplesSpreadsheetOrError } from "./reports/employee-samples-report";
 import {
   extractFlattenedData,
   getSheetTitle,
@@ -283,19 +284,13 @@ export async function createSpreadsheetOrError({
     });
   }
 
-  return createReportSpreadsheeetOrError({
-    reportData,
-    reportConfig,
-  });
-}
+  if (reportConfig[ReportType.EMPLOYEE_SAMPLES]) {
+    return createEmployeeSamplesSpreadsheetOrError({
+      reportData,
+      reportConfig,
+    });
+  }
 
-export async function createReportSpreadsheeetOrError({
-  reportData,
-  reportConfig,
-}: {
-  reportData: IReportData;
-  reportConfig: IReportConfig;
-}): Promise<ISpreadsheet> {
   const flattenedCache = new Map<ReportType, any[]>();
 
   //
@@ -312,7 +307,9 @@ export async function createReportSpreadsheeetOrError({
     ReportType.MATURE_PLANTS_QUICKVIEW,
     ReportType.INCOMING_TRANSFERS,
     ReportType.OUTGOING_TRANSFERS,
+    ReportType.TRANSFER_HUB_TRANSFERS,
     ReportType.OUTGOING_TRANSFER_MANIFESTS,
+    ReportType.TRANSFER_HUB_TRANSFER_MANIFESTS,
   ].filter((reportType) => shouldGenerateReport({ reportType, reportConfig, reportData }));
 
   //

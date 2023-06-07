@@ -1,10 +1,11 @@
 import { IPackageHistoryData } from "@/interfaces";
 import {
   extractChildPackageLabelsFromHistory,
+  extractChildPackageTagQuantityPairsFromHistory,
+  extractChildPackageTagQuantityUnitSetsFromHistory,
   extractInitialPackageQuantityAndUnitFromHistoryOrError,
   extractParentPackageLabelsFromHistory,
-  extractTagQuantityPairsFromHistory,
-  extractTagQuantityUnitSetsFromHistory,
+  extractParentPackageTagQuantityUnitItemSetsFromHistory,
   extractTestSamplePackageLabelsFromHistory,
 } from "./history";
 
@@ -206,24 +207,60 @@ describe("history.ts", () => {
   });
 
   it("Correctly extracts tag-quantity pairs and sets from history", () => {
-    expect(extractTagQuantityPairsFromHistory(BULK_BIOMASS_ACCEPTED_VIA_TRANSFER)).toEqual([]);
-    expect(extractTagQuantityPairsFromHistory(MULTI_PARENT_BIOMASS_PACKAGE)).toEqual([
+    expect(
+      extractChildPackageTagQuantityPairsFromHistory(BULK_BIOMASS_ACCEPTED_VIA_TRANSFER)
+    ).toEqual([]);
+    expect(extractChildPackageTagQuantityPairsFromHistory(MULTI_PARENT_BIOMASS_PACKAGE)).toEqual([
       ["1A4000000000000000005001", 172507],
       ["1A4000000000000000005002", 1154050.116],
       ["1A4000000000000000005003", 34220],
     ]);
-    expect(extractTagQuantityPairsFromHistory(PACKAGE_WITH_CHILD_SENT_FOR_TESTING)).toEqual([
+    expect(
+      extractChildPackageTagQuantityPairsFromHistory(PACKAGE_WITH_CHILD_SENT_FOR_TESTING)
+    ).toEqual([
       ["1A4000000000000000183917", 196],
       ["1A4000000000000000213863", 36],
     ]);
 
-    expect(extractTagQuantityUnitSetsFromHistory(BULK_BIOMASS_ACCEPTED_VIA_TRANSFER)).toEqual([]);
-    expect(extractTagQuantityUnitSetsFromHistory(MULTI_PARENT_BIOMASS_PACKAGE)).toEqual([
-      ["1A4000000000000000005001", 172507, "Grams"],
-      ["1A4000000000000000005002", 1154050.116, "Grams"],
-      ["1A4000000000000000005003", 34220, "Grams"],
+    expect(
+      extractParentPackageTagQuantityUnitItemSetsFromHistory(BULK_BIOMASS_ACCEPTED_VIA_TRANSFER)
+    ).toEqual([["1A4000000000000000002468", 1003, "Pounds", "SL Biscotti | Untrimmed Flower"]]);
+    expect(
+      extractParentPackageTagQuantityUnitItemSetsFromHistory(MULTI_PARENT_BIOMASS_PACKAGE)
+    ).toEqual([
+      ["1A4000000000000000000564", 250, "Pounds", "Hello Biomass"],
+      ["1A4000000000000000000565", 250, "Pounds", "Hello Biomass"],
+      ["1A4000000000000000000567", 250, "Pounds", "Hello Biomass"],
+      ["1A4000000000000000000566", 250, "Pounds", "Hello Biomass"],
+      ["1A4000000000000000000605", 250, "Pounds", "Hello Biomass"],
+      ["1A4000000000000000000623", 250, "Pounds", "Hello Biomass"],
+      ["1A4000000000000000000624", 250, "Pounds", "Hello Biomass"],
+      ["1A4000000000000000000625", 250, "Pounds", "Hello Biomass"],
+      ["1A4000000000000000000621", 250, "Pounds", "Hello Biomass"],
+      ["1A4000000000000000000622", 250, "Pounds", "Hello Biomass"],
+      ["1A4000000000000000000626", 250, "Pounds", "Hello Biomass"],
+      ["1A4000000000000000000620", 250, "Pounds", "Hello Biomass"],
     ]);
-    expect(extractTagQuantityUnitSetsFromHistory(PACKAGE_WITH_CHILD_SENT_FOR_TESTING)).toEqual([
+    expect(
+      extractParentPackageTagQuantityUnitItemSetsFromHistory(PACKAGE_WITH_CHILD_SENT_FOR_TESTING)
+    ).toEqual([
+      ["1A4000000000000000216887", 5555, "Each", "Gummies - Super Sour Lemon - 20mg"],
+      ["1A4000000000000000216266", 5180, "Grams", "THC Distillate - Distilled in VTA"],
+    ]);
+
+    expect(
+      extractChildPackageTagQuantityUnitSetsFromHistory(BULK_BIOMASS_ACCEPTED_VIA_TRANSFER)
+    ).toEqual([]);
+    expect(extractChildPackageTagQuantityUnitSetsFromHistory(MULTI_PARENT_BIOMASS_PACKAGE)).toEqual(
+      [
+        ["1A4000000000000000005001", 172507, "Grams"],
+        ["1A4000000000000000005002", 1154050.116, "Grams"],
+        ["1A4000000000000000005003", 34220, "Grams"],
+      ]
+    );
+    expect(
+      extractChildPackageTagQuantityUnitSetsFromHistory(PACKAGE_WITH_CHILD_SENT_FOR_TESTING)
+    ).toEqual([
       ["1A4000000000000000183917", 196, "Each"],
       ["1A4000000000000000213863", 36, "Each"],
     ]);

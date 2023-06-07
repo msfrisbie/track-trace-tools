@@ -69,3 +69,8 @@ export function getDatesInRange(startDate: string, endDate: string): string[] {
 
   return dates;
 }
+
+export function isodateToSlashDate(isodate: string): string {
+  const [year, month, day] = isodate.split("-");
+  return `${month}/${day}/${year}`;
+}
