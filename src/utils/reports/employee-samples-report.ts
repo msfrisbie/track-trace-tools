@@ -122,22 +122,22 @@ export async function maybeLoadEmployeeSamplesReportData({
 
   await Promise.allSettled(historyPromises);
 
-  let employeeSamplesMatrix: any[][] = [];
+  let employeeSamplesMatrix: any[][] = [
+    [
+      "Employee Name",
+      "Employee ID",
+      "Adjustment Date",
+      "Package Label",
+      "Item",
+      "Adjustment Quantity",
+      "Units",
+      "Flower allocation (g)",
+      "Concentrate allocation (g)",
+      "Infused allocation (mg)",
+    ],
+  ];
 
-  employeeSamplesMatrix.push([
-    "Employee Name",
-    "Employee ID",
-    "Adjustment Date",
-    "Package Label",
-    "Item",
-    "Adjustment Quantity",
-    "Units",
-    "Flower allocation (g)",
-    "Concentrate allocation (g)",
-    "Infused allocation (mg)",
-  ]);
-
-  console.log(filteredPackages)
+  let employeeData: Map<string, any[]> = new Map();
 
   for (const pkg of filteredPackages) {
     for (const allocationData of getAllocatedSamplesFromPackageHistoryOrError(pkg)) {
@@ -146,19 +146,49 @@ export async function maybeLoadEmployeeSamplesReportData({
         allocationData.quantity
       );
 
-      employeeSamplesMatrix.push([
-        allocationData.employeeName,
-        allocationData.employeeLicenseNumber,
-        allocationData.isodate,
-        allocationData.packageLabel,
-        pkg.Item.Name,
-        allocationData.quantity,
-        allocationData.unitOfMeasureName,
-        normalizedAllocationQuantity.flowerAllocationGrams,
-        normalizedAllocationQuantity.concentrateAllocationGrams,
-        normalizedAllocationQuantity.infusedAllocationGrams / 1000,
-      ]);
+      if (!employeeData.has(allocationData.employeeName)) {
+        employeeData.set(allocationData.employeeName, []);
+      }
+
+      employeeData
+        .get(allocationData.employeeName)!
+        .push([
+          allocationData.employeeName,
+          allocationData.employeeLicenseNumber,
+          allocationData.isodate,
+          allocationData.packageLabel,
+          pkg.Item.Name,
+          allocationData.quantity,
+          allocationData.unitOfMeasureName,
+          normalizedAllocationQuantity.flowerAllocationGrams,
+          normalizedAllocationQuantity.concentrateAllocationGrams,
+          normalizedAllocationQuantity.infusedAllocationGrams * 1000,
+        ]);
     }
+  }
+
+  for (const [key, rows] of [...employeeData.entries()].sort((a, b) => a[0].localeCompare(b[0]))) {
+    rows.sort((a, b) => a[3].localeCompare(b[3]));
+
+    for (const row of rows) {
+      employeeSamplesMatrix.push(row);
+    }
+
+    employeeSamplesMatrix.push(
+      [
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        `=SUM(H${employeeSamplesMatrix.length - rows.length + 1}:H${employeeSamplesMatrix.length})`,
+        `=SUM(I${employeeSamplesMatrix.length - rows.length + 1}:I${employeeSamplesMatrix.length})`,
+        `=SUM(J${employeeSamplesMatrix.length - rows.length + 1}:J${employeeSamplesMatrix.length})`,
+      ],
+      []
+    );
   }
 
   reportData[ReportType.EMPLOYEE_SAMPLES] = {
@@ -279,12 +309,7 @@ export async function createEmployeeSamplesSpreadsheetOrError({
     statusMessage: { text: `Resizing sheets...`, level: "success" },
   });
 
-  let resizeRequests: any[] = [
-    autoResizeDimensionsRequestFactory({
-      sheetId: sheetTitles.indexOf(SheetTitles.OVERVIEW),
-      dimension: "COLUMNS",
-    }),
-  ];
+  let resizeRequests: any[] = [];
 
   resizeRequests = [
     ...resizeRequests,

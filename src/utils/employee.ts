@@ -6,6 +6,7 @@ import {
   ISampleAllocation,
 } from "@/store/page-overlay/modules/employee-samples/interfaces";
 import { v4 as uuidv4 } from "uuid";
+import { convertUnits } from "./units";
 
 const ADJUSTMENT_REGEX = new RegExp(`Package adjusted by -([0-9\.]+) ([a-zA-Z]+)`);
 const EMPLOYEE_REGEX = new RegExp(`Note: ([^0-9]+) ([0-9]+)`);
@@ -48,7 +49,7 @@ export function getAllocatedSampleFromPackageHistoryEntryOrNull(
   );
 
   if (!adjustmentLineMatch || !employeeLineMatch) {
-    console.error("Regex non-match");
+    console.error("Regex non-match", historyEntry.Descriptions);
     return null;
   }
 
@@ -193,8 +194,6 @@ export async function toNormalizedAllocationQuantity(
 
   const unitsOfMeasure = await dynamicConstsManager.unitsOfMeasure();
 
-  console.log({ unitsOfMeasure });
-
   let flowerAllocationGrams = 0;
   let concentrateAllocationGrams = 0;
   let infusedAllocationGrams = 0;
@@ -241,8 +240,7 @@ export async function toNormalizedAllocationQuantity(
   }
 
   // Force into grams
-  computedQuantity =
-    computedQuantity * unitOfMeasure.ToBaseFactor * gramsUnitOfMeasure.FromBaseFactor;
+  computedQuantity = convertUnits(computedQuantity, unitOfMeasure, gramsUnitOfMeasure);
 
   switch (allocationType) {
     case AllocationType.FLOWER:
@@ -252,11 +250,33 @@ export async function toNormalizedAllocationQuantity(
       concentrateAllocationGrams = computedQuantity;
       break;
     case AllocationType.INFUSED:
-      const match = pkg.Item.Name.match(`([0-9]+)\s?mg`);
+      const thcRegexes = [
+        // Look for THC identifier
+        `([0-9]+)\s?mg THC`,
+        // Look for THC identifier
+        `([0-9]+)\s?mg thc`,
+        // Look for any weight at all
+        `([0-9]+)\s?mg`,
+      ];
 
-      // Find "milligrams"
-      if (match && match[1] && typeof parseInt(match[1], 10) === "number") {
-        computedQuantity = parseInt(match[1], 10) / 1000;
+      for (const rx of thcRegexes) {
+        const match = pkg.Item.Name.match(rx);
+
+        // Find "milligrams"
+        if (match && match[1] && typeof parseInt(match[1], 10) === "number") {
+          computedQuantity = parseInt(match[1], 10) / 1000;
+
+          const multiplierRegexes = [/(\d+)\s?pk/i, /(\d+)\s?pack/i, /(\d+)\s?pck/i];
+
+          for (const rx of multiplierRegexes) {
+            const match = pkg.Item.Name.match(rx);
+
+            if (match && match[1] && typeof parseInt(match[1], 10) === "number") {
+              computedQuantity *= parseInt(match[1], 10);
+            }
+          }
+          break;
+        }
       }
 
       // Edible: assume it cannot possibly be higher than 200mg per each
