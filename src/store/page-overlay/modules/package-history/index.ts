@@ -290,7 +290,7 @@ export const packageHistoryModule = {
     ) => {
       analyticsManager.track(MessageType.GENERATE_PACKAGE_HISTORY, { pkg });
 
-      if (!clientBuildManager.assertValues(["ENABLE_PACKAGE_HISTORY"])) {
+      if (!clientBuildManager.assertValues(["ENABLE_T3PLUS"])) {
         return;
       }
 

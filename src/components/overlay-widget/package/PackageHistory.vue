@@ -544,7 +544,7 @@ export default Vue.extend({
     },
     unitOfMeasureNameToAbbreviation,
     validClient(): boolean {
-      return clientBuildManager.assertValues(["ENABLE_PACKAGE_HISTORY"]);
+      return clientBuildManager.assertValues(["ENABLE_T3PLUS"]);
     },
     orphan(node: IHistoryTreeNode) {
       return {

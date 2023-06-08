@@ -193,6 +193,8 @@ export async function toNormalizedAllocationQuantity(
 
   const unitsOfMeasure = await dynamicConstsManager.unitsOfMeasure();
 
+  console.log({ unitsOfMeasure });
+
   let flowerAllocationGrams = 0;
   let concentrateAllocationGrams = 0;
   let infusedAllocationGrams = 0;

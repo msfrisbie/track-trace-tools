@@ -1,5 +1,11 @@
 import { MessageType, SHEETS_API_MESSAGE_TIMEOUT_MS, SheetTitles } from "@/consts";
-import { IIndexedPackageData, IPackageFilter, IPluginState, ISpreadsheet } from "@/interfaces";
+import {
+  IIndexedPackageData,
+  IMetrcEmployeeData,
+  IPackageFilter,
+  IPluginState,
+  ISpreadsheet,
+} from "@/interfaces";
 import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
 import { messageBus } from "@/modules/message-bus.module";
 import store from "@/store/page-overlay/index";
@@ -11,6 +17,10 @@ import {
 } from "@/store/page-overlay/modules/reports/interfaces";
 import { ActionContext } from "vuex";
 import { todayIsodate } from "../date";
+import {
+  getAllocatedSamplesFromPackageHistoryOrError,
+  toNormalizedAllocationQuantity,
+} from "../employee";
 import {
   addRowsRequestFactory,
   autoResizeDimensionsRequestFactory,
@@ -65,6 +75,7 @@ export async function maybeLoadEmployeeSamplesReportData({
   });
 
   let allPackages: IIndexedPackageData[] = [];
+  let employees: IMetrcEmployeeData[] = [];
 
   const promises: Promise<any>[] = [
     primaryDataLoader
@@ -76,13 +87,16 @@ export async function maybeLoadEmployeeSamplesReportData({
     primaryDataLoader
       .inactivePackages()
       .then((result) => (allPackages = [...allPackages, ...result])),
+    primaryDataLoader.employees().then((result) => {
+      employees = result;
+    }),
   ];
 
   await Promise.allSettled(promises);
 
-  const dateFilteredPackages = allPackages.filter((pkg) => {
+  const filteredPackages = allPackages.filter((pkg) => {
     if (
-      pkg.PackagedDate < reportConfig[ReportType.EMPLOYEE_SAMPLES]!.packageFilter.packagedDateGt!
+      pkg.LastModified < reportConfig[ReportType.EMPLOYEE_SAMPLES]!.packageFilter.packagedDateGt!
     ) {
       return false;
     }
@@ -93,10 +107,14 @@ export async function maybeLoadEmployeeSamplesReportData({
       return false;
     }
 
+    if (!pkg.IsTradeSample) {
+      return false;
+    }
+
     return true;
   });
 
-  const historyPromises: Promise<any>[] = dateFilteredPackages.map((pkg) =>
+  const historyPromises: Promise<any>[] = filteredPackages.map((pkg) =>
     primaryDataLoader.packageHistoryByPackageId(pkg.Id).then((history) => {
       pkg.history = history;
     })
@@ -104,7 +122,44 @@ export async function maybeLoadEmployeeSamplesReportData({
 
   await Promise.allSettled(historyPromises);
 
-  const employeeSamplesMatrix: any[][] = [];
+  let employeeSamplesMatrix: any[][] = [];
+
+  employeeSamplesMatrix.push([
+    "Employee Name",
+    "Employee ID",
+    "Adjustment Date",
+    "Package Label",
+    "Item",
+    "Adjustment Quantity",
+    "Units",
+    "Flower allocation (g)",
+    "Concentrate allocation (g)",
+    "Infused allocation (mg)",
+  ]);
+
+  console.log(filteredPackages)
+
+  for (const pkg of filteredPackages) {
+    for (const allocationData of getAllocatedSamplesFromPackageHistoryOrError(pkg)) {
+      const normalizedAllocationQuantity = await toNormalizedAllocationQuantity(
+        pkg,
+        allocationData.quantity
+      );
+
+      employeeSamplesMatrix.push([
+        allocationData.employeeName,
+        allocationData.employeeLicenseNumber,
+        allocationData.isodate,
+        allocationData.packageLabel,
+        pkg.Item.Name,
+        allocationData.quantity,
+        allocationData.unitOfMeasureName,
+        normalizedAllocationQuantity.flowerAllocationGrams,
+        normalizedAllocationQuantity.concentrateAllocationGrams,
+        normalizedAllocationQuantity.infusedAllocationGrams / 1000,
+      ]);
+    }
+  }
 
   reportData[ReportType.EMPLOYEE_SAMPLES] = {
     employeeSamplesMatrix,

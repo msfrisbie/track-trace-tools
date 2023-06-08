@@ -1,3 +1,5 @@
+import { IUnitOfMeasure } from "@/interfaces";
+
 export type UnitOfMeasureName =
   | "Pounds"
   | "Ounces"
@@ -6,8 +8,27 @@ export type UnitOfMeasureName =
   | "Kilograms"
   | "Each"
   | "Milliliters"
+  | "Liters"
+  | "Fluid Ounces"
+  | "Gallons"
+  | "Milliliters"
+  | "Pints"
+  | "Quarts"
   | "Units";
-export type UnitOfMeasureAbbreviation = "lb" | "oz" | "g" | "mg" | "kg" | "ct" | "mL" | "units";
+export type UnitOfMeasureAbbreviation =
+  | "lb"
+  | "oz"
+  | "g"
+  | "mg"
+  | "kg"
+  | "ml"
+  | "l"
+  | "fl oz"
+  | "pt"
+  | "qt"
+  | "gal"
+  | "ea"
+  | "units";
 
 export function normalizeToGrams(quantity: number, unitOfMeasureName: UnitOfMeasureName): number {
   switch (unitOfMeasureName) {
@@ -40,9 +61,9 @@ export function unitOfMeasureNameToAbbreviation(
     case "Pounds":
       return "lb";
     case "Each":
-      return "ct";
+      return "ea";
     case "Milliliters":
-      return "mL";
+      return "ml";
     default:
       // If it's unexpected, just return the original value
       return "units";
@@ -62,10 +83,18 @@ export function unitOfMeasureAbbreviationToName(
       return "Ounces";
     case "lb":
       return "Pounds";
-    case "mL":
+    case "ml":
       return "Milliliters";
     default:
       // If it's unexpected, just return the original value
       return "Units";
   }
+}
+
+export function convertUnits(
+  quantity: number,
+  fromUnitOfMeasure: IUnitOfMeasure,
+  toUnitOfMeasure: IUnitOfMeasure
+): number {
+  return quantity * fromUnitOfMeasure.ToBaseFactor * toUnitOfMeasure.FromBaseFactor;
 }

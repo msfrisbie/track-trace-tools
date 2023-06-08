@@ -342,7 +342,8 @@ export function addRowsRequestFactory({ sheetId, length }: { sheetId: number; le
   return {
     appendDimension: {
       dimension: "ROWS",
-      length,
+      // Adding 0 rows causes the Sheets API to 500
+      length: Math.max(length, 1),
       sheetId,
     },
   };
@@ -480,8 +481,7 @@ export function conditionalFormattingRequestFactory({
   };
 }
 
-
-  // 0 -> A
-  export function getLetterFromIndex(columnIndex: number): string {
-    return String.fromCharCode(columnIndex + 97).toUpperCase();
-  }
+// 0 -> A
+export function getLetterFromIndex(columnIndex: number): string {
+  return String.fromCharCode(columnIndex + 97).toUpperCase();
+}
