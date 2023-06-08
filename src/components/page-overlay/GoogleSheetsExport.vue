@@ -138,12 +138,29 @@
 
                 <div class="flex flex-col items-start gap-1">
                   <div class="text-gray-500">End date</div>
-                  <b-form-datepicker
-                    :required="true"
-                    initial-date
-                    size="sm"
-                    v-model="employeeSamplesFormFilters.employeeSamplesDateLt"
-                  />
+                  <b-input-group>
+                    <b-form-datepicker
+                      :required="true"
+                      initial-date
+                      size="sm"
+                      v-model="employeeSamplesFormFilters.employeeSamplesDateLt"
+                    />
+
+                    <template #append>
+                      <b-button
+                        variant="outline-primary"
+                        size="sm"
+                        @click="
+                          employeeSamplesFormFilters.employeeSamplesDateLt = getIsoDateFromOffset(
+                            29,
+                            employeeSamplesFormFilters.employeeSamplesDateGt
+                          ).split('T')[0]
+                        "
+                      >
+                        START + 30
+                      </b-button>
+                    </template>
+                  </b-input-group>
                 </div>
               </div>
             </div>
@@ -1312,7 +1329,7 @@ import {
   SHEET_FIELDS,
 } from "@/store/page-overlay/modules/reports/consts";
 import { IReportConfig } from "@/store/page-overlay/modules/reports/interfaces";
-import { todayIsodate } from "@/utils/date";
+import { getIsoDateFromOffset, todayIsodate } from "@/utils/date";
 import { addCogsReport, cogsFormFiltersFactory } from "@/utils/reports/cogs-report";
 import {
   addCogsTrackerReport,
@@ -1437,6 +1454,7 @@ export default Vue.extend({
     };
   },
   methods: {
+    getIsoDateFromOffset,
     ...mapActions({
       refreshOAuthState: `pluginAuth/${PluginAuthActions.REFRESH_OAUTH_STATE}`,
       generateSpreadsheet: `reports/${ReportsActions.GENERATE_SPREADSHEET}`,

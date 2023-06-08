@@ -123,6 +123,7 @@ export interface IReportData {
   };
   [ReportType.EMPLOYEE_SAMPLES]?: {
     employeeSamplesMatrix: any[][];
+    receivedSamplesMatrix: any[][];
   };
   [ReportType.STRAGGLER_PACKAGES]?: {
     stragglerPackages: IIndexedPackageData[];

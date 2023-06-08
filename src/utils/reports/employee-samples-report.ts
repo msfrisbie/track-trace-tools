@@ -21,6 +21,7 @@ import {
   getAllocatedSamplesFromPackageHistoryOrError,
   toNormalizedAllocationQuantity,
 } from "../employee";
+import { extractInitialPackageQuantityAndUnitFromHistoryOrError } from "../history";
 import {
   addRowsRequestFactory,
   autoResizeDimensionsRequestFactory,
@@ -191,8 +192,45 @@ export async function maybeLoadEmployeeSamplesReportData({
     );
   }
 
+  let receivedSamplesMatrix: any[][] = [];
+
+  for (const pkg of filteredPackages) {
+    if (!pkg.ReceivedDateTime) {
+      continue;
+    }
+
+    if (
+      pkg.ReceivedDateTime <
+      reportConfig[ReportType.EMPLOYEE_SAMPLES]!.packageFilter.packagedDateGt!
+    ) {
+      continue;
+    }
+
+    if (
+      pkg.ReceivedDateTime >
+      reportConfig[ReportType.EMPLOYEE_SAMPLES]!.packageFilter.packagedDateLt!
+    ) {
+      continue;
+    }
+
+    receivedSamplesMatrix.push([
+      pkg.ReceivedDateTime.split("T")[0],
+      pkg.Label,
+      pkg.Item.Name,
+      ...extractInitialPackageQuantityAndUnitFromHistoryOrError(pkg.history!),
+    ]);
+  }
+
+  receivedSamplesMatrix.sort((a, b) => a[0].localeCompare(b[0]));
+
+  receivedSamplesMatrix = [
+    ["Received Date", "Package Label", "Item", "Quantity", "Units"],
+    ...receivedSamplesMatrix,
+  ];
+
   reportData[ReportType.EMPLOYEE_SAMPLES] = {
     employeeSamplesMatrix,
+    receivedSamplesMatrix,
   };
 }
 
@@ -211,7 +249,11 @@ export async function createEmployeeSamplesSpreadsheetOrError({
     throw new Error("Missing employee samples data");
   }
 
-  const sheetTitles = [SheetTitles.OVERVIEW, SheetTitles.EMPLOYEE_SAMPLES];
+  const sheetTitles = [
+    SheetTitles.OVERVIEW,
+    SheetTitles.EMPLOYEE_SAMPLES,
+    SheetTitles.RECEIVED_SAMPLES,
+  ];
 
   const response: {
     data: {
@@ -242,9 +284,10 @@ export async function createEmployeeSamplesSpreadsheetOrError({
     }),
   ];
 
-  const { employeeSamplesMatrix } = reportData[ReportType.EMPLOYEE_SAMPLES]!;
+  const { employeeSamplesMatrix, receivedSamplesMatrix } = reportData[ReportType.EMPLOYEE_SAMPLES]!;
 
   const employeeSamplesSheetId = sheetTitles.indexOf(SheetTitles.EMPLOYEE_SAMPLES);
+  const receivedSamplesSheetId = sheetTitles.indexOf(SheetTitles.RECEIVED_SAMPLES);
 
   formattingRequests = [
     ...formattingRequests,
@@ -254,6 +297,12 @@ export async function createEmployeeSamplesSpreadsheetOrError({
     }),
     styleTopRowRequestFactory({ sheetId: employeeSamplesSheetId }),
     freezeTopRowRequestFactory({ sheetId: employeeSamplesSheetId }),
+    addRowsRequestFactory({
+      sheetId: receivedSamplesSheetId,
+      length: receivedSamplesMatrix.length,
+    }),
+    styleTopRowRequestFactory({ sheetId: receivedSamplesSheetId }),
+    freezeTopRowRequestFactory({ sheetId: receivedSamplesSheetId }),
   ];
 
   await messageBus.sendMessageToBackground(
@@ -305,6 +354,17 @@ export async function createEmployeeSamplesSpreadsheetOrError({
     },
   });
 
+  await writeDataSheet({
+    spreadsheetId: response.data.result.spreadsheetId,
+    spreadsheetTitle: SheetTitles.RECEIVED_SAMPLES,
+    data: receivedSamplesMatrix,
+    options: {
+      pageSize: 5000,
+      valueInputOption: "USER_ENTERED",
+      maxParallelRequests: 10,
+    },
+  });
+
   store.commit(`reports/${ReportsMutations.SET_STATUS}`, {
     statusMessage: { text: `Resizing sheets...`, level: "success" },
   });
@@ -315,6 +375,9 @@ export async function createEmployeeSamplesSpreadsheetOrError({
     ...resizeRequests,
     autoResizeDimensionsRequestFactory({
       sheetId: employeeSamplesSheetId,
+    }),
+    autoResizeDimensionsRequestFactory({
+      sheetId: receivedSamplesSheetId,
     }),
   ];
 
