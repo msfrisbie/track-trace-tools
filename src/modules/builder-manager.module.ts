@@ -361,6 +361,7 @@ class BuilderManager implements IAtomicService {
         break;
       case BuilderType.ADJUST_PACKAGE:
         response = await primaryMetrcRequestManager.adjustPackages(JSON.stringify(rows));
+        await new Promise((resolve) => setTimeout(resolve, 5000));
         break;
       case BuilderType.CREATE_IMMATURE_PLANT_PACKAGES_FROM_MOTHER_PLANT:
         response = await primaryMetrcRequestManager.immaturePlantPackagesFromMotherPlant(
