@@ -148,7 +148,7 @@ export default Vue.extend({
           enabled: isCurrentHostAllowed([HOST_WILDCARD]),
           visible: true,
           isBeta: false,
-          isNew: true,
+          isNew: false,
           helpRoute: "/help/package",
         },
         {
