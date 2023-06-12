@@ -354,7 +354,7 @@ export default Vue.extend({
           sampleTotal: this.selectedSampleAllocations.length,
         },
         this.buildCsvFiles(),
-        25
+        1
       );
     },
     buildCsvFiles(): ICsvFile[] {
