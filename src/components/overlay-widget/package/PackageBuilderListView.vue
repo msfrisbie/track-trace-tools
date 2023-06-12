@@ -27,7 +27,7 @@
               <!-- flex struggles to vertical align the badge for some reason -->
               <b-badge
                 style="padding-top: 0.3rem; margin-top: 0.1rem; line-height: initial"
-                variant="primary"
+                variant="light"
                 >BETA</b-badge
               ></template
             >
@@ -35,7 +35,7 @@
               <!-- flex struggles to vertical align the badge for some reason -->
               <b-badge
                 style="padding-top: 0.3rem; margin-top: 0.1rem; line-height: initial"
-                variant="primary"
+                variant="light"
                 >NEW!</b-badge
               ></template
             >
@@ -103,6 +103,16 @@ export default Vue.extend({
     }),
     options() {
       return [
+        {
+          route: "/package/create-package-csv",
+          text: "CSV PACKAGES",
+          icon: "file-csv",
+          backgroundColor: "#2774ae",
+          isBeta: true,
+          isNew: false,
+          enabled: false, ///isCurrentHostAllowed([HOST_WILDCARD]),
+          visible: true,
+        },
         {
           route: "/package/history",
           text: "PACKAGE HISTORY",

@@ -15,6 +15,7 @@ import {
   TransferState,
 } from "@/consts";
 import { Store } from "vuex";
+import { ICreatePackageCsvState } from "./store/page-overlay/modules/create-package-csv/interfaces";
 import { IEmployeeSamplesState } from "./store/page-overlay/modules/employee-samples/interfaces";
 import { IExplorerState } from "./store/page-overlay/modules/explorer/interfaces";
 import { IFlagsState } from "./store/page-overlay/modules/flags/interfaces";
@@ -215,6 +216,7 @@ export interface IPluginState extends IRootState {
   packageHistory: IPackageHistoryState;
   explorer: IExplorerState;
   employeeSamples: IEmployeeSamplesState;
+  createPackageCsv: ICreatePackageCsvState;
 }
 
 export type MetrcTagType = "CannabisPlant" | "CannabisPackage" | "MedicalPlant" | "MedicalPackage";

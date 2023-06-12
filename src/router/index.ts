@@ -28,6 +28,7 @@ import PackageBuilderListView from "@/components/overlay-widget/package/PackageB
 import PackageHistory from "@/components/overlay-widget/package/PackageHistory.vue";
 import PackageToolsHelp from "@/components/overlay-widget/package/PackageToolsHelp.vue";
 import SplitPackageBuilder from "@/components/overlay-widget/package/SplitPackageBuilder.vue";
+import CreatePackageCsvBuilder from "@/components/overlay-widget/package/CreatePackageCsvBuilder.vue";
 import TransferBuilder from "@/components/overlay-widget/transfer/TransferBuilder.vue";
 import TransferTemplateBuilder from "@/components/overlay-widget/transfer/TransferTemplateBuilder.vue";
 import TransferToolsHelp from "@/components/overlay-widget/transfer/TransferToolsHelp.vue";
@@ -125,6 +126,11 @@ const routes: Array<RouteConfig> = [
     path: "/package/split-package",
     name: "Split Package",
     component: SplitPackageBuilder,
+  },
+  {
+    path: "/package/create-package-csv",
+    name: "Create Package CSV",
+    component: CreatePackageCsvBuilder,
   },
   {
     path: "/package/finish-packages",

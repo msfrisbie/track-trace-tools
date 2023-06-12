@@ -514,6 +514,61 @@ export async function createSpreadsheetOrError({
   return response.data.result;
 }
 
+export async function createPackageCsvTemplateSheetOrError(
+  columns: string[]
+): Promise<ISpreadsheet> {
+  const SHEET_TITLE = `Create Packages`;
+
+  const response: {
+    data: {
+      success: boolean;
+      result: ISpreadsheet;
+    };
+  } = await messageBus.sendMessageToBackground(
+    MessageType.CREATE_SPREADSHEET,
+    {
+      title: `Create Package CSV Template`,
+      sheetTitles: [SHEET_TITLE],
+    },
+    undefined,
+    SHEETS_API_MESSAGE_TIMEOUT_MS
+  );
+
+  await messageBus.sendMessageToBackground(
+    MessageType.WRITE_SPREADSHEET_VALUES,
+    {
+      spreadsheetId: response.data.result.spreadsheetId,
+      range: `'${SHEET_TITLE}'`,
+      values: [columns],
+    },
+    undefined,
+    SHEETS_API_MESSAGE_TIMEOUT_MS
+  );
+
+  const sheetId = 0;
+
+  const formattingRequests = [
+    addRowsRequestFactory({ sheetId, length: 100 }),
+    styleTopRowRequestFactory({ sheetId }),
+    freezeTopRowRequestFactory({ sheetId }),
+    autoResizeDimensionsRequestFactory({
+      sheetId,
+    }),
+  ];
+
+  await messageBus.sendMessageToBackground(
+    MessageType.BATCH_UPDATE_SPREADSHEET,
+    {
+      spreadsheetId: response.data.result.spreadsheetId,
+      requests: formattingRequests,
+    },
+    undefined,
+    SHEETS_API_MESSAGE_TIMEOUT_MS
+  );
+
+  return response.data.result;
+}
+
 export async function createScanSheetOrError(
   manifestNumber: string,
   licenseNumber: string,
