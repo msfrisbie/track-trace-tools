@@ -2,7 +2,7 @@ import { PackageState } from "@/consts";
 import { IIndexedPackageData, IMetrcEmployeeData, IPluginState } from "@/interfaces";
 import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
 import { LRU } from "@/utils/cache";
-import { getIsoDateFromOffset, todayIsodate } from "@/utils/date";
+import { getIsoDateFromOffset } from "@/utils/date";
 import {
   canEmployeeAcceptSample,
   getAllocatedSamplesFromPackageHistoryOrError,
@@ -31,8 +31,9 @@ const inMemoryState = {
   recordedAllocationBuffer: [],
   pendingAllocationBuffer: [],
   pendingAllocationBufferIds: [],
-  startDate: getIsoDateFromOffset(-30).split("T")[0],
-  endDate: todayIsodate(),
+  // startDate: getIsoDateFromOffset(-30).split("T")[0],
+  // endDate: todayIsodate(),
+  daysInRange: 30,
   stateMessage: "",
 };
 
@@ -143,6 +144,10 @@ export const employeeSamplesModule = {
         ctx.state.selectedEmployeeIds = employees.map((x) => x.Id);
 
         ctx.state.availableSamplePackages = packages
+          // Only select:
+          // - trade samples
+          // - nonzero quantity
+          // - active
           .filter(
             (pkg) =>
               pkg.IsTradeSample && pkg.Quantity > 0 && pkg.PackageState === PackageState.ACTIVE
@@ -151,8 +156,12 @@ export const employeeSamplesModule = {
           .sort((a, b) => a.ReceivedDateTime!.localeCompare(b.ReceivedDateTime!));
         ctx.state.selectedSamplePackageIds = ctx.state.availableSamplePackages.map((x) => x.Id);
 
+        const daysAgoStart = ctx.state.daysInRange;
+
+        const startDate = getIsoDateFromOffset(-1 * daysAgoStart).split("T")[0];
+
         ctx.state.modifiedSamplePackages = packages
-          .filter((pkg) => pkg.IsTradeSample && pkg.LastModified >= ctx.state.startDate)
+          .filter((pkg) => pkg.IsTradeSample && pkg.LastModified >= startDate)
           // Sorted in received order
           .sort((a, b) => a.ReceivedDateTime!.localeCompare(b.ReceivedDateTime!));
 
@@ -243,6 +252,7 @@ export const employeeSamplesModule = {
 
         ctx.state.availableSamples = [];
 
+        // Record all samples that need to be given out
         for (const pkg of ctx.getters[EmployeeSamplesGetters.SELECTED_SAMPLE_PACKAGES]) {
           const sampleCount = getEstimatedNumberOfSamplesRemaining(pkg);
           const perSampleQuantity = pkg.Quantity / sampleCount;
@@ -269,6 +279,7 @@ export const employeeSamplesModule = {
           console.log("Zero modified packages");
         }
 
+        // Parse package history to determine previous allocations
         for (const pkg of ctx.state.modifiedSamplePackages) {
           for (const allocationData of getAllocatedSamplesFromPackageHistoryOrError(pkg)) {
             allocationDataList.push(allocationData);
@@ -306,40 +317,54 @@ export const employeeSamplesModule = {
           ctx.state.recordedAllocationBuffer.push(allocation);
         }
 
-        while (true) {
-          if (ctx.state.availableSamples.length === 0) {
-            break;
-          }
+        // recordedAllocationBuffer is now updto date,
+        // and availableSamples has all samples that might be distributed
 
-          const currentSample = ctx.state.availableSamples.shift()!;
+        for (const daysAgo of [120, 90, 60, 30]) {
+          let skippedSamples = [];
 
-          for (const employee of employeeLRU.elementsReversed) {
-            if (
-              await canEmployeeAcceptSample(
-                employee,
-                currentSample,
-                ctx.state.recordedAllocationBuffer,
-                ctx.state.pendingAllocationBuffer
-              )
-            ) {
-              // Record allocation
-              ctx.state.pendingAllocationBuffer.push({
-                uuid: uuidv4(),
-                pkg: currentSample.pkg,
-                employee,
-                adjustmentQuantity: currentSample.quantity,
-                ...(await toNormalizedAllocationQuantity(
-                  currentSample.pkg,
-                  currentSample.quantity
-                )),
-              });
-
-              // Send employee to back of queue
-              employeeLRU.touch(employee);
-
+          while (true) {
+            if (ctx.state.availableSamples.length === 0) {
               break;
             }
+
+            // TODO check if sample was received yet
+
+            const currentSample = ctx.state.availableSamples.shift()!;
+
+            for (const employee of employeeLRU.elementsReversed) {
+              if (
+                await canEmployeeAcceptSample(
+                  employee,
+                  currentSample,
+                  // TODO filter 30 days
+                  ctx.state.recordedAllocationBuffer,
+                  // TODO filter 30 days
+                  ctx.state.pendingAllocationBuffer
+                )
+              ) {
+                // Record allocation
+                ctx.state.pendingAllocationBuffer.push({
+                  uuid: uuidv4(),
+                  pkg: currentSample.pkg,
+                  employee,
+                  adjustmentQuantity: currentSample.quantity,
+                  ...(await toNormalizedAllocationQuantity(
+                    currentSample.pkg,
+                    currentSample.quantity
+                  )),
+                });
+
+                // Send employee to back of queue
+                employeeLRU.touch(employee);
+
+                continue;
+              }
+            }
+
+            skippedSamples.push(currentSample);
           }
+          ctx.state.availableSamples = [...skippedSamples, ...ctx.state.availableSamples];
         }
 
         ctx.state.pendingAllocationBufferIds = ctx.state.pendingAllocationBuffer.map((x) => x.uuid);

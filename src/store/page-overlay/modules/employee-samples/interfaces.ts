@@ -16,8 +16,9 @@ export interface IEmployeeSamplesState {
   pendingAllocationBuffer: ISampleAllocation[];
   pendingAllocationBufferIds: string[];
   recordedAllocationBuffer: ISampleAllocation[];
-  startDate: string;
-  endDate: string;
+  // startDate: string;
+  // endDate: string;
+  daysInRange: number;
   stateMessage: string;
 }
 
