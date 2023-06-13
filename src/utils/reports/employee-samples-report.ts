@@ -16,7 +16,7 @@ import {
   IReportsState,
 } from "@/store/page-overlay/modules/reports/interfaces";
 import { ActionContext } from "vuex";
-import { todayIsodate } from "../date";
+import { normalizeIsodate, todayIsodate } from "../date";
 import {
   getAllocatedSamplesFromPackageHistoryOrError,
   toNormalizedAllocationQuantity,
@@ -214,7 +214,7 @@ export async function maybeLoadEmployeeSamplesReportData({
     }
 
     receivedSamplesMatrix.push([
-      pkg.ReceivedDateTime.split("T")[0],
+      normalizeIsodate(pkg.ReceivedDateTime),
       pkg.Label,
       pkg.Item.Name,
       ...extractInitialPackageQuantityAndUnitFromHistoryOrError(pkg.history!),

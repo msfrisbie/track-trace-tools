@@ -1,11 +1,17 @@
 import { IIndexedPackageData, IMetrcEmployeeData, IPackageHistoryData } from "@/interfaces";
 import { dynamicConstsManager } from "@/modules/dynamic-consts-manager.module";
 import {
+  MAX_30_DAY_CONCENTRATE_GRAMS,
+  MAX_30_DAY_FLOWER_GRAMS,
+  MAX_30_DAY_INFUSED_GRAMS,
+} from "@/store/page-overlay/modules/employee-samples/consts";
+import {
   IHistoryAllocationData,
   INormalizedAllocation,
   ISampleAllocation,
 } from "@/store/page-overlay/modules/employee-samples/interfaces";
 import { v4 as uuidv4 } from "uuid";
+import { getIsoDateFromOffset, normalizeIsodate } from "./date";
 import { convertUnits } from "./units";
 
 const ADJUSTMENT_REGEX = new RegExp(`Package adjusted by -([0-9\.]+) ([a-zA-Z]+)`);
@@ -119,13 +125,13 @@ export async function getSampleAllocationFromAllocationDataOrNull(
   };
 }
 
-export async function canEmployeeAcceptSample(
+export function canEmployeeAcceptSample(
   employee: IMetrcEmployeeData,
-  sample: { quantity: number; pkg: IIndexedPackageData },
+  sample: { quantity: number; pkg: IIndexedPackageData; allocation: INormalizedAllocation },
   distributionDate: string,
   recordedAllocationBuffer: ISampleAllocation[],
   pendingAllocationBuffer: ISampleAllocation[]
-): Promise<boolean> {
+): boolean {
   // Cannot give out if distribution date is before received date
   if (sample.pkg.ReceivedDateTime! > distributionDate) {
     return false;
@@ -144,54 +150,108 @@ export async function canEmployeeAcceptSample(
 
   // of internal product samples to each of its employees in a
   // 30-day period.
-  const normalizedSample = await toNormalizedAllocationQuantity(sample.pkg, sample.quantity);
 
-  const totalFlowerGrams =
-    normalizedSample.flowerAllocationGrams +
-    recordedAllocationBuffer
-      .filter((x) => x.employee.Id === employee.Id)
+  const startDate = normalizeIsodate(getIsoDateFromOffset(-29, distributionDate));
+  const currentDate = normalizeIsodate(distributionDate);
+  const endDate = normalizeIsodate(getIsoDateFromOffset(29, distributionDate));
+
+  const preceding30dayWindow = [
+    ...recordedAllocationBuffer.filter(
+      (x) =>
+        x.distributionDate >= startDate &&
+        x.distributionDate <= currentDate &&
+        x.employee.Id === employee.Id
+    ),
+    ...pendingAllocationBuffer.filter(
+      (x) =>
+        x.distributionDate >= startDate &&
+        x.distributionDate <= currentDate &&
+        x.employee.Id === employee.Id
+    ),
+  ];
+
+  const following30dayWindow = [
+    ...recordedAllocationBuffer.filter(
+      (x) =>
+        x.distributionDate >= currentDate &&
+        x.distributionDate <= endDate &&
+        x.employee.Id === employee.Id
+    ),
+    ...pendingAllocationBuffer.filter(
+      (x) =>
+        x.distributionDate >= currentDate &&
+        x.distributionDate <= endDate &&
+        x.employee.Id === employee.Id
+    ),
+  ];
+
+  if (sample.allocation.flowerAllocationGrams > 0) {
+    const totalPrecedingGrams = preceding30dayWindow
       .map((x) => x.flowerAllocationGrams)
-      .reduce((a, b) => a + b, 0) +
-    pendingAllocationBuffer
-      .filter((x) => x.employee.Id === employee.Id)
+      .reduce((a, b) => a + b, 0);
+
+    const totalFollowingGrams = following30dayWindow
       .map((x) => x.flowerAllocationGrams)
       .reduce((a, b) => a + b, 0);
 
-  if (totalFlowerGrams > 28) {
-    return false;
+    if (sample.allocation.flowerAllocationGrams + totalPrecedingGrams > MAX_30_DAY_FLOWER_GRAMS) {
+      return false;
+    }
+
+    if (sample.allocation.flowerAllocationGrams + totalFollowingGrams > MAX_30_DAY_FLOWER_GRAMS) {
+      return false;
+    }
+
+    return true;
   }
 
-  const totalConcentrateGrams =
-    normalizedSample.concentrateAllocationGrams +
-    recordedAllocationBuffer
-      .filter((x) => x.employee.Id === employee.Id)
-      .map((x) => x.concentrateAllocationGrams)
-      .reduce((a, b) => a + b, 0) +
-    pendingAllocationBuffer
-      .filter((x) => x.employee.Id === employee.Id)
+  if (sample.allocation.concentrateAllocationGrams > 0) {
+    const totalPrecedingGrams = preceding30dayWindow
       .map((x) => x.concentrateAllocationGrams)
       .reduce((a, b) => a + b, 0);
 
-  if (totalConcentrateGrams > 6) {
-    return false;
+    const totalFollowingGrams = preceding30dayWindow
+      .map((x) => x.concentrateAllocationGrams)
+      .reduce((a, b) => a + b, 0);
+
+    if (
+      sample.allocation.concentrateAllocationGrams + totalPrecedingGrams >
+      MAX_30_DAY_CONCENTRATE_GRAMS
+    ) {
+      return false;
+    }
+
+    if (
+      sample.allocation.concentrateAllocationGrams + totalFollowingGrams >
+      MAX_30_DAY_CONCENTRATE_GRAMS
+    ) {
+      return false;
+    }
+
+    return true;
   }
 
-  const totalInfusedGrams =
-    normalizedSample.infusedAllocationGrams +
-    recordedAllocationBuffer
-      .filter((x) => x.employee.Id === employee.Id)
-      .map((x) => x.infusedAllocationGrams)
-      .reduce((a, b) => a + b, 0) +
-    pendingAllocationBuffer
-      .filter((x) => x.employee.Id === employee.Id)
+  if (sample.allocation.infusedAllocationGrams > 0) {
+    const totalPrecedingGrams = preceding30dayWindow
       .map((x) => x.infusedAllocationGrams)
       .reduce((a, b) => a + b, 0);
 
-  if (totalInfusedGrams > 2) {
-    return false;
+    const totalFollowingGrams = preceding30dayWindow
+      .map((x) => x.infusedAllocationGrams)
+      .reduce((a, b) => a + b, 0);
+
+    if (sample.allocation.infusedAllocationGrams + totalPrecedingGrams > MAX_30_DAY_INFUSED_GRAMS) {
+      return false;
+    }
+
+    if (sample.allocation.infusedAllocationGrams + totalFollowingGrams > MAX_30_DAY_INFUSED_GRAMS) {
+      return false;
+    }
+
+    return true;
   }
 
-  return true;
+  throw new Error("Invalid sample allocation");
 }
 
 export async function toNormalizedAllocationQuantity(
@@ -294,6 +354,8 @@ export async function toNormalizedAllocationQuantity(
       // Edible: assume it cannot possibly be higher than 200mg per each
       infusedAllocationGrams = Math.min(0.2, computedQuantity);
       break;
+    default:
+      throw new Error("Bad allocation type");
   }
 
   return {

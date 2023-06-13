@@ -29,7 +29,7 @@ export function getIsoDateStringFromIsoDatetime(isoDatetime: string): string {
     throw new Error("This does not look like an isoDatetime");
   }
 
-  return isoDatetime.split("T")[0];
+  return normalizeIsodate(isoDatetime);
 }
 
 export function getIsoTimeStringFromIsoDatetime(isoDatetime: string): string {
@@ -37,7 +37,7 @@ export function getIsoTimeStringFromIsoDatetime(isoDatetime: string): string {
     throw new Error("This does not look like an isoDatetime");
   }
 
-  return isoDatetime.split("T")[1];
+  return normalizeIsodate(isoDatetime);
 }
 
 export function getIsoDateFromOffset(
@@ -64,7 +64,7 @@ export function getDatesInRange(startDate: string, endDate: string): string[] {
 
     dates.push(nextDate);
 
-    nextDate = getIsoDateFromOffset(1, nextDate).split("T")[0];
+    nextDate = normalizeIsodate(getIsoDateFromOffset(1, nextDate));
   }
 
   return dates;
@@ -73,4 +73,24 @@ export function getDatesInRange(startDate: string, endDate: string): string[] {
 export function isodateToSlashDate(isodate: string): string {
   const [year, month, day] = isodate.split("-");
   return `${month}/${day}/${year}`;
+}
+
+// Might be date, or datetime. Idempotent date return.
+export function normalizeIsodate(x: string): string {
+  return x.split("T")[0];
+}
+
+export function isWeekend(isoDate: string) {
+  const dateParts = normalizeIsodate(isoDate).split("-");
+  const year = parseInt(dateParts[0]);
+  const month = parseInt(dateParts[1]) - 1; // Month is zero-based
+  const day = parseInt(dateParts[2]);
+
+  const date = new Date();
+  date.setUTCFullYear(year);
+  date.setUTCMonth(month);
+  date.setUTCDate(day);
+
+  const dayOfWeek = date.getUTCDay();
+  return dayOfWeek === 0 || dayOfWeek === 6;
 }

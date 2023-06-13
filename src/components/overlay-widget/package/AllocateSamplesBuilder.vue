@@ -20,10 +20,7 @@
       <template v-else>
         <div class="grid grid-cols-3 gap-8">
           <div class="flex flex-col items-stretch gap-4">
-            <b-button
-              variant="primary"
-              @click="allocateSamples()"
-              :disabled="allocateButtonDisabled"
+            <b-button variant="primary" @click="allocateSamples()" :disabled="!enableAllocation"
               >CALCULATE EMPLOYEE SAMPLES</b-button
             >
 
@@ -201,6 +198,9 @@
                           <div>
                             {{ sampleAllocation.pkg.Label }}
                           </div>
+                          <div>
+                            {{ sampleAllocation.distributionDate }}
+                          </div>
                           <div v-if="sampleAllocation.flowerAllocationGrams > 0">
                             {{ Number(sampleAllocation.flowerAllocationGrams.toFixed(3)) }}g flower
                           </div>
@@ -257,11 +257,6 @@ import { analyticsManager } from "@/modules/analytics-manager.module";
 import { sum } from "lodash-es";
 import { downloadTextFile } from "@/utils/file";
 
-// TODO:
-// - remove individual allocations
-// - toggle all packages
-// - show packages by recieved date/source
-
 export default Vue.extend({
   name: "AllocateSamplesBuilder",
   store,
@@ -273,6 +268,7 @@ export default Vue.extend({
       employeeSamples: (state: IPluginState) => state.employeeSamples,
     }),
     ...mapGetters({
+      enableAllocation: `employeeSamples/${EmployeeSamplesGetters.ENABLE_ALLOCATION}`,
       selectedEmployees: `employeeSamples/${EmployeeSamplesGetters.SELECTED_EMPLOYEES}`,
       selectedSamplePackages: `employeeSamples/${EmployeeSamplesGetters.SELECTED_SAMPLE_PACKAGES}`,
       selectedSampleAllocations: `employeeSamples/${EmployeeSamplesGetters.SELECTED_SAMPLE_ALLOCATIONS}`,
@@ -281,23 +277,6 @@ export default Vue.extend({
     csvFiles(): ICsvFile[] {
       // @ts-ignore
       return this.buildCsvFiles();
-    },
-    allocateButtonDisabled(): boolean {
-      if (
-        this.$store.state.employeeSamples.toolState === EmployeeSamplesState.ALLOCATION_INFLIGHT
-      ) {
-        return true;
-      }
-
-      if (this.$store.state.employeeSamples.selectedEmployeeIds.length === 0) {
-        return true;
-      }
-
-      if (this.$store.state.employeeSamples.selectedSamplePackageIds.length === 0) {
-        return true;
-      }
-
-      return false;
     },
   },
   data() {
@@ -439,12 +418,22 @@ export default Vue.extend({
       }
 
       for (const [employeeId, samples] of employeeSampleMap.entries()) {
-        samples.sort((a, b) => a.pkg.Label.localeCompare(b.pkg.Label));
+        samples.sort((a, b) => a.distributionDate.localeCompare(b.distributionDate));
 
         data += `\n${samples[0].employee.FullName}\n\n`;
 
         for (const sampleAllocation of samples) {
-          data += `${sampleAllocation.pkg.Label} - ${sampleAllocation.pkg.Item.Name} (${sampleAllocation.adjustmentQuantity}${sampleAllocation.pkg.UnitOfMeasureAbbreviation})\n`;
+          data += `[${sampleAllocation.distributionDate}] ${
+            sampleAllocation.pkg.Label
+          } - ${sampleAllocation.flowerAllocationGrams.toFixed(
+            2
+          )}/${sampleAllocation.concentrateAllocationGrams.toFixed(
+            2
+          )}/${sampleAllocation.infusedAllocationGrams.toFixed(2)} - ${
+            sampleAllocation.pkg.Item.Name
+          } (${sampleAllocation.adjustmentQuantity}${
+            sampleAllocation.pkg.UnitOfMeasureAbbreviation
+          })\n`;
         }
       }
 
