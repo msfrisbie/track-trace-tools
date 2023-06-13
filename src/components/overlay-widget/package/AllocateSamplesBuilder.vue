@@ -20,9 +20,25 @@
       <template v-else>
         <div class="grid grid-cols-3 gap-8">
           <div class="flex flex-col items-stretch gap-4">
-            <b-button variant="primary" @click="allocateSamples()" :disabled="!enableAllocation"
-              >CALCULATE EMPLOYEE SAMPLES</b-button
-            >
+            <div class="grid grid-cols-3 gap-2">
+              <b-button
+                class="col-span-2"
+                variant="primary"
+                @click="allocateSamples()"
+                :disabled="!enableAllocation"
+                >SUGGEST&nbsp;SAMPLES</b-button
+              >
+              <b-form-select
+                v-model="daysInRange"
+                :options="
+                  [0, 30, 60, 90, 120].map((x) => ({
+                    value: x,
+                    text: x === 0 ? 'today' : `past ${x} days`,
+                  }))
+                "
+              >
+              </b-form-select>
+            </div>
 
             <b-button variant="outline-primary" v-b-toggle="'collapse-1'"
               >Employees ({{ selectedEmployees.length }})</b-button
@@ -143,7 +159,7 @@
             <template v-if="employeeSamples.toolState === EmployeeSamplesState.ALLOCATION_INFLIGHT">
               <div class="flex flex-row justify-center items-center gap-2">
                 <b-spinner small></b-spinner>
-                <div>Generating sample allocations...</div>
+                <div>Allocating employee samples, this takes a few seconds...</div>
               </div>
             </template>
 
@@ -274,6 +290,14 @@ export default Vue.extend({
       selectedSampleAllocations: `employeeSamples/${EmployeeSamplesGetters.SELECTED_SAMPLE_ALLOCATIONS}`,
       dateGroupedAvailableSamplePackages: `employeeSamples/${EmployeeSamplesGetters.DATE_GROUPED_AVAILABLE_SAMPLE_PACKAGES}`,
     }),
+    daysInRange: {
+      get(): number {
+        return this.$store.state.employeeSamples.daysInRange;
+      },
+      set(daysInRange: number) {
+        this.$store.state.employeeSamples.daysInRange = daysInRange;
+      },
+    },
     csvFiles(): ICsvFile[] {
       // @ts-ignore
       return this.buildCsvFiles();

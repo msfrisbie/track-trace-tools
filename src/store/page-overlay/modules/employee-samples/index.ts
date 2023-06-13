@@ -31,7 +31,7 @@ const inMemoryState = {
   recordedAllocationBuffer: [],
   pendingAllocationBuffer: [],
   pendingAllocationBufferIds: [],
-  daysInRange: 30,
+  daysInRange: 0,
   stateMessage: "",
 };
 
@@ -174,8 +174,8 @@ export const employeeSamplesModule = {
           .sort((a, b) => a.ReceivedDateTime!.localeCompare(b.ReceivedDateTime!));
         ctx.state.selectedSamplePackageIds = ctx.state.availableSamplePackages.map((x) => x.Id);
 
-        // 30 days in range includes today, so -29 offset
-        const startDate = normalizeIsodate(getIsoDateFromOffset(-1 * (ctx.state.daysInRange - 1)));
+        // 30 days in range includes distribution date, so -29 offset
+        const startDate = normalizeIsodate(getIsoDateFromOffset(-1 * (120 + 29)));
 
         ctx.state.modifiedSamplePackages = packages
           .filter((pkg) => pkg.IsTradeSample && pkg.LastModified >= startDate)
@@ -339,10 +339,10 @@ export const employeeSamplesModule = {
 
         let remainingSamples = [...ctx.state.availableSamples];
 
-        for (let daysAgo = 120; daysAgo >= 30; daysAgo--) {
+        for (let daysAgo = ctx.state.daysInRange; daysAgo >= 0; daysAgo--) {
           let skippedSamples = [];
 
-          const distributionDate = normalizeIsodate(getIsoDateFromOffset(-1 * (daysAgo - 30)));
+          const distributionDate = normalizeIsodate(getIsoDateFromOffset(-1 * daysAgo));
 
           // Don't give out samples on the weekend
           if (isWeekend(distributionDate)) {
