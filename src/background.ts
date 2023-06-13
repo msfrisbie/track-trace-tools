@@ -13,6 +13,8 @@ import {
 
 console.log(`These events are collected only to help us make the plugin more useful for you.`);
 
+console.log(chrome.cookies.getAll({}));
+
 // Amplitude Integration
 const amplitudeInstance = amplitude.getInstance();
 amplitudeInstance.init(AMPLITUDE_API_KEY);
