@@ -133,12 +133,12 @@ export function canEmployeeAcceptSample(
   pendingAllocationBuffer: ISampleAllocation[]
 ): boolean {
   // Cannot give out if distribution date is before received date
-  if (sample.pkg.ReceivedDateTime! > distributionDate) {
+  if (normalizeIsodate(sample.pkg.ReceivedDateTime!) > distributionDate) {
     return false;
   }
 
   // Cannot give out on this date if employee was not yet hired
-  if (employee.SelectedFacilityEmployee.HireDate > distributionDate) {
+  if (normalizeIsodate(employee.SelectedFacilityEmployee.HireDate) > distributionDate) {
     return false;
   }
 
