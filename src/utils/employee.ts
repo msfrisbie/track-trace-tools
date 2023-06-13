@@ -113,6 +113,7 @@ export async function getSampleAllocationFromAllocationDataOrNull(
     uuid: uuidv4(),
     pkg,
     employee,
+    distributionDate: allocationData.isodate,
     adjustmentQuantity: allocationData.quantity,
     ...(await toNormalizedAllocationQuantity(pkg, allocationData.quantity)),
   };
@@ -121,9 +122,20 @@ export async function getSampleAllocationFromAllocationDataOrNull(
 export async function canEmployeeAcceptSample(
   employee: IMetrcEmployeeData,
   sample: { quantity: number; pkg: IIndexedPackageData },
+  distributionDate: string,
   recordedAllocationBuffer: ISampleAllocation[],
   pendingAllocationBuffer: ISampleAllocation[]
 ): Promise<boolean> {
+  // Cannot give out if distribution date is before received date
+  if (sample.pkg.ReceivedDateTime! > distributionDate) {
+    return false;
+  }
+
+  // Cannot give out on this date if employee was not yet hired
+  if (employee.SelectedFacilityEmployee.HireDate > distributionDate) {
+    return false;
+  }
+
   // A producer or marijuana sales location is limited to transferring:
 
   // a total of 1 ounce of marijuana,

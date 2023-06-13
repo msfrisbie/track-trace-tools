@@ -317,30 +317,30 @@ export const employeeSamplesModule = {
           ctx.state.recordedAllocationBuffer.push(allocation);
         }
 
-        // recordedAllocationBuffer is now updto date,
+        // recordedAllocationBuffer is now up to date,
         // and availableSamples has all samples that might be distributed
 
         for (const daysAgo of [120, 90, 60, 30]) {
           let skippedSamples = [];
 
-          while (true) {
-            if (ctx.state.availableSamples.length === 0) {
-              break;
-            }
+          const distributionDate = getIsoDateFromOffset(-1 * (daysAgo - 30)).split("T")[0];
 
-            // TODO check if sample was received yet
-
+          while (ctx.state.availableSamples.length > 0) {
             const currentSample = ctx.state.availableSamples.shift()!;
 
+            // TODO: check if there are any distributions 30 days upstream of this
             for (const employee of employeeLRU.elementsReversed) {
               if (
                 await canEmployeeAcceptSample(
                   employee,
                   currentSample,
-                  // TODO filter 30 days
-                  ctx.state.recordedAllocationBuffer,
-                  // TODO filter 30 days
-                  ctx.state.pendingAllocationBuffer
+                  distributionDate,
+                  ctx.state.recordedAllocationBuffer.filter(
+                    (allocation) => allocation.pkg.ReceivedDateTime! <= distributionDate
+                  ),
+                  ctx.state.pendingAllocationBuffer.filter(
+                    (allocation) => allocation.pkg.ReceivedDateTime! <= distributionDate
+                  )
                 )
               ) {
                 // Record allocation
@@ -348,6 +348,7 @@ export const employeeSamplesModule = {
                   uuid: uuidv4(),
                   pkg: currentSample.pkg,
                   employee,
+                  distributionDate,
                   adjustmentQuantity: currentSample.quantity,
                   ...(await toNormalizedAllocationQuantity(
                     currentSample.pkg,

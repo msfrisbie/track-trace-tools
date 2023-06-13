@@ -46,4 +46,5 @@ export interface ISampleAllocation extends INormalizedAllocation {
   employee: IMetrcEmployeeData;
   pkg: IIndexedPackageData;
   adjustmentQuantity: number;
+  distributionDate: string;
 }
