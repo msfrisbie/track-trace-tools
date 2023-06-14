@@ -861,6 +861,22 @@ export class DataLoader implements IAtomicService {
     throw new Error("Active packages request failed.");
   }
 
+  onDemandTransferSearchBody({ queryString }: { queryString: string }): string {
+    return JSON.stringify({
+      request: {
+        take: DATA_LOAD_PAGE_SIZE,
+        skip: 0,
+        page: 1,
+        pageSize: DATA_LOAD_PAGE_SIZE,
+        filter: {
+          logic: "or",
+          filters: [{ field: "ManifestNumber", operator: "contains", value: queryString }],
+        },
+        group: [],
+      },
+    });
+  }
+
   onDemandPlantSearchBody({ queryString }: { queryString: string }): string {
     return JSON.stringify({
       request: {
@@ -1503,6 +1519,34 @@ export class DataLoader implements IAtomicService {
         reject(e);
       }
     });
+  }
+
+  async onDemandIncomingTransferSearch({
+    queryString,
+  }: {
+    queryString: string;
+  }): Promise<IIndexedTransferData[]> {
+
+    let transfers: IIndexedTransferData[] = [];
+
+    const body = this.onDemandTransferSearchBody({ queryString });
+
+    const transferResponse = await primaryMetrcRequestManager.getIncomingTransfers(body);
+
+    if (transferResponse.status === 200) {
+      const responseData: ICollectionResponse<ITransferData> = await transferResponse.json();
+
+      transfers = responseData["Data"].map((x) => ({
+        ...x,
+        TransferState: TransferState.INCOMING,
+        TagMatcher: "",
+        LicenseNumber: this._authState!.license,
+      }));
+    } else {
+      console.error("Incoming transfers request failed.");
+    }
+
+    return transfers;
   }
 
   async incomingTransfers(resetCache: boolean = false): Promise<IIndexedTransferData[]> {

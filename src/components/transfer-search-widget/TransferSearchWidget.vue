@@ -4,7 +4,8 @@
       <div class="flex flex-row space-x-2">
         <div v-on:click.stop.prevent class="search-bar-container flex flex-col flex-grow">
           <b-input-group size="md">
-            <b-input-group-prepend @click="setShowTransferSearchResults(true)"
+            <b-input-group-prepend
+              @click="setShowTransferSearchResults({ showTransferSearchResults: true })"
               ><b-input-group-text class="search-icon">
                 <font-awesome-icon icon="search" />
               </b-input-group-text>
@@ -18,8 +19,8 @@
               placeholder="Manifest number, license, source/destination..."
               autocomplete="off"
               @input="search($event)"
-              @click="setShowTransferSearchResults(true)"
-              @focus="setShowTransferSearchResults(true)"
+              @click="setShowTransferSearchResults({ showTransferSearchResults: true })"
+              @focus="setShowTransferSearchResults({ showTransferSearchResults: true })"
               ref="search"
             ></b-form-input>
 
@@ -31,10 +32,10 @@
           </b-input-group>
 
           <!-- Anchor point for dropdown results card -->
-          <div v-if="showTransferSearchResults" class="search-anchor">
+          <div v-if="transferSearchState.showTransferSearchResults" class="search-anchor">
             <div class="search-bar flex flex-col bg-white rounded-b-md">
               <div class="flex-grow overflow-y-auto">
-                <transfer-search-results :transfers="transfers" :inflight="inflight" />
+                <transfer-search-results :transfers="transfers" :inflight="searchInflight" />
               </div>
 
               <div
@@ -61,16 +62,19 @@ import SearchPickerSelect from "@/components/page-overlay/SearchPickerSelect.vue
 import TransferSearchFilters from "@/components/transfer-search-widget/TransferSearchFilters.vue";
 import TransferSearchResults from "@/components/transfer-search-widget/TransferSearchResults.vue";
 import { MessageType } from "@/consts";
+import { IPluginState } from "@/interfaces";
 import { analyticsManager } from "@/modules/analytics-manager.module";
 import { authManager } from "@/modules/auth-manager.module";
+import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
 import { databaseInterface } from "@/modules/database-interface.module";
 import { searchManager } from "@/modules/search-manager.module";
 import { MutationType } from "@/mutation-types";
 import store from "@/store/page-overlay/index";
-import { combineLatest, Observable } from "rxjs";
+import { TransferSearchActions } from "@/store/page-overlay/modules/transfer-search/consts";
+import { combineLatest, Observable, timer } from "rxjs";
 import { debounceTime, filter, startWith, tap } from "rxjs/operators";
 import Vue from "vue";
-import { mapState } from "vuex";
+import { mapActions, mapState } from "vuex";
 
 export default Vue.extend({
   name: "TransferSearchWidget",
@@ -85,9 +89,8 @@ export default Vue.extend({
       firstSearch: null,
       firstSearchResolver: null,
       searchInflight: false,
-      indexInflight: false,
       showFilters: false,
-      queryString: "", //this.$store.state.transferQueryString,
+      queryString: "",
       transfers: [],
       filters: {
         license: null,
@@ -103,18 +106,14 @@ export default Vue.extend({
 
     document.addEventListener("keyup", (e) => {
       if (e.isTrusted && e.key === "Escape") {
-        searchManager.setTransferSearchVisibility(false);
+        searchManager.setTransferSearchVisibility({ showTransferSearchResults: true });
       }
     });
 
     document.addEventListener("click", (e) => {
       if (e.isTrusted) {
-        searchManager.setTransferSearchVisibility(false);
+        searchManager.setTransferSearchVisibility({ showTransferSearchResults: true });
       }
-    });
-
-    searchManager.transferIndexInflight().subscribe((indexInflight: boolean) => {
-      this.$data.indexInflight = indexInflight;
     });
 
     // Initialize
@@ -123,7 +122,6 @@ export default Vue.extend({
     this.$data.firstSearch = new Promise((resolve) => {
       this.$data.firstSearchResolver = resolve;
     });
-    this.$data.firstSearch.then(() => searchManager.indexTransfers());
 
     const queryString$: Observable<string> = searchManager.transferQueryString.asObservable().pipe(
       tap((queryString: string) => {
@@ -144,20 +142,16 @@ export default Vue.extend({
 
         // This also writes to the search history,
         // so this must be after debounce
-        this.$store.commit(MutationType.SET_TRANSFER_QUERY_STRING, queryString);
+        this.setTransferQueryString({ transferQueryString: queryString });
       })
     );
 
     combineLatest([
       queryString$.pipe(
         filter((queryString: string) => !!queryString),
-        startWith(this.$store.state.transferQueryString)
+        startWith(this.$store.state.transferSearch.transferQueryString || "")
       ),
-      searchManager.transferIndexUpdated().pipe(
-        filter((x) => !!x),
-        startWith(true)
-      ),
-    ]).subscribe(async ([queryString, transferIndexUpdated]: [string, boolean]) => {
+    ]).subscribe(async ([queryString]: [string]) => {
       this.$data.searchInflight = true;
 
       if (queryString.length > 0) {
@@ -165,48 +159,68 @@ export default Vue.extend({
       }
 
       try {
-        this.$data.transfers = await databaseInterface.transferSearch(
+        this.$data.transfers = await primaryDataLoader.onDemandIncomingTransferSearch({
           queryString,
-          this.$data.filters
-        );
+        });
+        // this.$data.transfers = [
+        //   ...this.$data.transfers,
+        //   ...(await primaryDataLoader.onDemandInTransitTransferSearch({ queryString })),
+        // ];
+        // this.$data.transfers = [
+        //   ...this.$data.transfers,
+        //   ...(await primaryDataLoader.onDemandInactiveTransferSearch({ queryString })),
+        // ];
       } catch (e) {
         console.error(e);
       } finally {
         this.$data.searchInflight = false;
       }
     });
+
+    if (this.$store.state.expandSearchOnNextLoad) {
+      this.setExpandSearchOnNextLoad({
+        expandSearchOnNextLoad: false,
+      });
+
+      searchManager.setTransferSearchVisibility({ showTransferSearchResults: true });
+    }
   },
   computed: {
-    inflight() {
-      return this.$data.searchInflight || this.$data.indexInflight;
-    },
-    ...mapState([
-      "loadingMessage",
-      "errorMessage",
-      "flashMessage",
-      "transferQueryStringHistory",
-      "showTransferSearchResults",
-      "transferQueryString",
-    ]),
+    ...mapState<IPluginState>({
+      transferSearchState: (state: IPluginState) => state.transferSearch,
+    }),
   },
   methods: {
-    async setShowTransferSearchResults(showTransferSearchResults: boolean) {
-      searchManager.setTransferSearchVisibility(showTransferSearchResults);
+    ...mapActions({
+      setTransferQueryString: `transferSearch/${TransferSearchActions.SET_TRANSFER_QUERY_STRING}`,
+      setExpandSearchOnNextLoad: `transferSearch/${TransferSearchActions.SET_EXPAND_SEARCH_ON_NEXT_LOAD}`,
+    }),
+    async setShowTransferSearchResults({
+      showTransferSearchResults,
+    }: {
+      showTransferSearchResults: boolean;
+    }) {
+      searchManager.setTransferSearchVisibility({ showTransferSearchResults });
     },
     search(queryString: string) {
-      searchManager.setTransferSearchVisibility(true);
+      searchManager.setTransferSearchVisibility({ showTransferSearchResults: true });
       searchManager.transferQueryString.next(queryString);
     },
     clearSearchField() {
       searchManager.transferQueryString.next("");
     },
-    setSearch(queryString: string) {
-      // @ts-ignore
-      this.$refs.search.$el?.focus();
-      searchManager.transferQueryString.next(queryString);
-      analyticsManager.track(MessageType.CLICKED_RECENT_TRANSFER_QUERY, {
-        queryString,
-      });
+  },
+  watch: {
+    "transferSearchState.showTransferSearchResults": {
+      immediate: true,
+      handler(newValue, oldValue) {
+        if (newValue) {
+          timer(500).subscribe(() =>
+            // @ts-ignore
+            this.$refs.search?.$el.focus()
+          );
+        }
+      },
     },
   },
 });

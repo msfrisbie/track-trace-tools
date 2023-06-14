@@ -455,7 +455,7 @@ export default Vue.extend({
     searchTransfer(text: string) {
       analyticsManager.track(MessageType.CONTEXT_MENU_SELECT, { event: "searchTransfer", text });
 
-      searchManager.setTransferSearchVisibility(true);
+      searchManager.setTransferSearchVisibility({ showTransferSearchResults: true });
       searchManager.transferQueryString.next(text);
       this.dismiss();
     },

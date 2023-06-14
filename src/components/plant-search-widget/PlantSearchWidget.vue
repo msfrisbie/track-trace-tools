@@ -32,10 +32,10 @@
           </b-input-group>
 
           <!-- Anchor point for dropdown results card -->
-          <div v-if="showPlantSearchResults" class="search-anchor">
+          <div v-if="plantSearchState.showPlantSearchResults" class="search-anchor">
             <div class="search-bar flex flex-col bg-white rounded-b-md">
               <div class="flex-grow overflow-y-auto">
-                <plant-search-results :plants="plants" :inflight="inflight" />
+                <plant-search-results :plants="plants" :inflight="searchInflight" />
               </div>
 
               <div
@@ -62,6 +62,7 @@ import SearchPickerSelect from "@/components/page-overlay/SearchPickerSelect.vue
 import PlantSearchFilters from "@/components/plant-search-widget/PlantSearchFilters.vue";
 import PlantSearchResults from "@/components/plant-search-widget/PlantSearchResults.vue";
 import { MessageType } from "@/consts";
+import { IPluginState } from "@/interfaces";
 import { analyticsManager } from "@/modules/analytics-manager.module";
 import { authManager } from "@/modules/auth-manager.module";
 import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
@@ -86,7 +87,6 @@ export default Vue.extend({
       firstSearch: null,
       firstSearchResolver: null,
       searchInflight: false,
-      indexInflight: false,
       showFilters: false,
       queryString: "",
       plants: [],
@@ -114,10 +114,6 @@ export default Vue.extend({
       }
     });
 
-    searchManager.plantIndexInFlight.subscribe((indexInflight: boolean) => {
-      this.$data.indexInflight = indexInflight;
-    });
-
     // Initialize
     searchManager.plantQueryString.next(this.$data.queryString);
 
@@ -130,7 +126,7 @@ export default Vue.extend({
       tap((queryString: string) => {
         this.$data.queryString = queryString;
       }),
-      filter((queryString: string) => queryString !== (this as any).plantQueryString),
+      filter((queryString: string) => queryString !== this.$store.state.plantSearch.plantQueryString),
       debounceTime(500),
       tap((queryString: string) => {
         if (queryString) {
@@ -145,7 +141,7 @@ export default Vue.extend({
 
         // This also writes to the search history,
         // so this must be after debounce
-        (this as any).setPlantQueryString({ plantQueryString: queryString });
+        this.setPlantQueryString({ plantQueryString: queryString });
       })
     );
 
@@ -180,7 +176,7 @@ export default Vue.extend({
     });
 
     if (this.$store.state.expandSearchOnNextLoad) {
-      (this as any).setExpandSearchOnNextLoad({
+      this.setExpandSearchOnNextLoad({
         expandSearchOnNextLoad: false,
       });
 
@@ -188,12 +184,9 @@ export default Vue.extend({
     }
   },
   computed: {
-    ...mapState({
-      showPlantSearchResults: (state: any) => state.plantSearch.showPlantSearchResults,
+    ...mapState<IPluginState>({
+      plantSearchState: (state: IPluginState) => state.plantSearch,
     }),
-    inflight() {
-      return this.$data.searchInflight || this.$data.indexInflight;
-    },
   },
   methods: {
     ...mapActions({
@@ -216,12 +209,14 @@ export default Vue.extend({
     },
   },
   watch: {
-    showPlantSearchResults: {
+    'plantSearchState.showPlantSearchResults': {
       immediate: true,
       handler(newValue, oldValue) {
         if (newValue) {
-          // @ts-ignore
-          timer(500).subscribe(() => this.$refs.search?.$el.focus());
+          timer(500).subscribe(() =>
+            // @ts-ignore
+            this.$refs.search?.$el.focus()
+          );
         }
       },
     },

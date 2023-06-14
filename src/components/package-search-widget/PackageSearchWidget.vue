@@ -32,10 +32,10 @@
           </b-input-group>
 
           <!-- Anchor point for dropdown results card -->
-          <div v-if="showPackageSearchResults" class="search-anchor">
+          <div v-if="packageSearchState.showPackageSearchResults" class="search-anchor">
             <div class="search-bar flex flex-col bg-white rounded-b-md">
               <div class="flex-grow overflow-y-auto">
-                <package-search-results :packages="packages" :inflight="inflight" />
+                <package-search-results :packages="packages" :inflight="searchInflight" />
               </div>
 
               <div
@@ -62,6 +62,7 @@ import PackageSearchFilters from "@/components/package-search-widget/PackageSear
 import PackageSearchResults from "@/components/package-search-widget/PackageSearchResults.vue";
 import SearchPickerSelect from "@/components/page-overlay/SearchPickerSelect.vue";
 import { MessageType } from "@/consts";
+import { IPluginState } from "@/interfaces";
 import { analyticsManager } from "@/modules/analytics-manager.module";
 import { authManager } from "@/modules/auth-manager.module";
 import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
@@ -86,7 +87,6 @@ export default Vue.extend({
       firstSearch: null,
       firstSearchResolver: null,
       searchInflight: false,
-      indexInflight: false,
       showFilters: false,
       queryString: "",
       packages: [],
@@ -114,23 +114,20 @@ export default Vue.extend({
       }
     });
 
-    searchManager.packageIndexInflight().subscribe((indexInflight: boolean) => {
-      this.$data.indexInflight = indexInflight;
-    });
-
     // Initialize
     searchManager.packageQueryString.next(this.$data.queryString);
 
     this.$data.firstSearch = new Promise((resolve) => {
       this.$data.firstSearchResolver = resolve;
     });
-    // this.$data.firstSearch.then(() => searchManager.indexPackages());
 
     const queryString$: Observable<string> = searchManager.packageQueryString.asObservable().pipe(
       tap((queryString: string) => {
         this.$data.queryString = queryString;
       }),
-      filter((queryString: string) => queryString !== (this as any).packageQueryString),
+      filter(
+        (queryString: string) => queryString !== this.$store.state.packageSearch.packageQueryString
+      ),
       debounceTime(500),
       tap((queryString: string) => {
         if (queryString) {
@@ -145,7 +142,7 @@ export default Vue.extend({
 
         // This also writes to the search history,
         // so this must be after debounce
-        (this as any).setPackageQueryString({ packageQueryString: queryString });
+        this.setPackageQueryString({ packageQueryString: queryString });
       })
     );
 
@@ -154,11 +151,7 @@ export default Vue.extend({
         filter((queryString: string) => !!queryString),
         startWith(this.$store.state.packageSearch?.packageQueryString || "")
       ),
-      searchManager.packageIndexUpdated().pipe(
-        filter((x) => !!x),
-        startWith(true)
-      ),
-    ]).subscribe(async ([queryString, packageIndexUpdated]: [string, boolean]) => {
+    ]).subscribe(async ([queryString]: [string]) => {
       this.$data.searchInflight = true;
 
       if (queryString.length > 0) {
@@ -183,7 +176,7 @@ export default Vue.extend({
     });
 
     if (this.$store.state.expandSearchOnNextLoad) {
-      (this as any).setExpandSearchOnNextLoad({
+      this.setExpandSearchOnNextLoad({
         expandSearchOnNextLoad: false,
       });
 
@@ -191,12 +184,9 @@ export default Vue.extend({
     }
   },
   computed: {
-    ...mapState({
-      showPackageSearchResults: (state: any) => state.packageSearch.showPackageSearchResults,
+    ...mapState<IPluginState>({
+      packageSearchState: (state: IPluginState) => state.packageSearch,
     }),
-    inflight() {
-      return this.$data.searchInflight || this.$data.indexInflight;
-    },
   },
   methods: {
     ...mapActions({
@@ -219,12 +209,14 @@ export default Vue.extend({
     },
   },
   watch: {
-    showPackageSearchResults: {
+    'packageSearchState.showPackageSearchResults': {
       immediate: true,
       handler(newValue, oldValue) {
         if (newValue) {
-          // @ts-ignore
-          timer(500).subscribe(() => this.$refs.search?.$el.focus());
+          timer(500).subscribe(() =>
+            // @ts-ignore
+            this.$refs.search?.$el.focus()
+          );
         }
       },
     },

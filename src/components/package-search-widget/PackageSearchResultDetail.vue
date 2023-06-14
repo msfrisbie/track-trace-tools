@@ -309,7 +309,7 @@ export default Vue.extend({
         }
       );
 
-      (this as any).setShowPackageSearchResults({ showPackageSearchResults: false });
+      this.setShowPackageSearchResults({ showPackageSearchResults: false });
     },
     copyToClipboard(pkg: IIndexedPackageData) {
       analyticsManager.track(MessageType.COPIED_TEXT, { value: pkg.Label });
@@ -326,8 +326,7 @@ export default Vue.extend({
       });
     },
     badgeVariant(pkg: IIndexedPackageData) {
-      // @ts-ignore
-      switch (pkg.PackageState as PackageState) {
+      switch (pkg.PackageState) {
         case PackageState.ACTIVE:
           return "success";
         case PackageState.INACTIVE:
@@ -339,12 +338,10 @@ export default Vue.extend({
       }
     },
     displayPackageState(pkg: IIndexedPackageData) {
-      // @ts-ignore
-      switch (pkg.PackageState as PackageState) {
+      switch (pkg.PackageState) {
         case PackageState.IN_TRANSIT:
           return PackageState.IN_TRANSIT;
         default:
-          // @ts-ignore
           return pkg.PackageState;
       }
     },
@@ -360,7 +357,7 @@ export default Vue.extend({
       });
 
       analyticsManager.track(MessageType.CLICKED_TOOLKIT_VIEW_LAB_TEST_BUTTON);
-      (this as any).setShowPackageSearchResults({ showPackageSearchResults: false });
+      this.setShowPackageSearchResults({ showPackageSearchResults: false });
     },
     async printLabResult(pkg: IIndexedPackageData) {
       const urls = await getLabTestUrlsFromPackage({ pkg });
@@ -372,22 +369,15 @@ export default Vue.extend({
       printPdfFromUrl({ urls, modal: true });
 
       analyticsManager.track(MessageType.CLICKED_TOOLKIT_PRINT_LAB_TEST_BUTTON);
-      (this as any).setShowPackageSearchResults({ showPackageSearchResults: false });
+      this.setShowPackageSearchResults({ showPackageSearchResults: false });
     },
     async downloadLabResult(pkg: IIndexedPackageData) {
       downloadLabTests({ pkg });
 
       analyticsManager.track(MessageType.CLICKED_TOOLKIT_DOWNLOAD_LAB_TEST_BUTTON);
-      (this as any).setShowPackageSearchResults({ showPackageSearchResults: false });
+      this.setShowPackageSearchResults({ showPackageSearchResults: false });
     },
     async upsertPackage({ pkg }: { pkg: IIndexedPackageData }) {
-      // stubRequestManager.upsertPackage({
-      //   authState: this.authState,
-      //   pkg,
-      //   status: pkg.PackageState,
-      //   history: [],
-      //   labTests: []
-      // });
     },
   },
 });

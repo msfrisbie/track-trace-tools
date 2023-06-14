@@ -25,11 +25,10 @@ import store from "@/store/page-overlay/index";
 import Vue from "vue";
 import { mapState } from "vuex";
 export default Vue.extend({
-  name: "transferHistoryList",
+  name: "TransferHistoryList",
   store,
   methods: {
     setSearch(queryString: string) {
-      // @ts-ignore
       searchManager.transferQueryString.next(queryString);
       analyticsManager.track(MessageType.CLICKED_RECENT_TRANSFER_QUERY, {
         queryString,
@@ -37,7 +36,9 @@ export default Vue.extend({
     },
   },
   computed: {
-    ...mapState(["transferQueryStringHistory"]),
+    ...mapState({
+      transferQueryStringHistory: (state: any) => state.transferSearch.transferQueryStringHistory,
+    }),
   },
 });
 </script>

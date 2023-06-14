@@ -130,6 +130,8 @@ import { createScanSheet } from "@/utils/transfer";
 import { Subject } from "rxjs";
 import { takeUntil } from "rxjs/operators";
 import Vue from "vue";
+import { TransferSearchActions } from "@/store/page-overlay/modules/transfer-search/consts";
+import { mapActions } from "vuex";
 
 function isIsoDateToday(isodate: string): boolean {
   if (!isodate) {
@@ -174,8 +176,8 @@ export default Vue.extend({
       );
   },
   computed: {
-    isOnTransfersPage() {
-      return window.location.pathname.match(TRANSFER_TAB_REGEX);
+    isOnTransfersPage(): boolean {
+      return !!window.location.pathname.match(TRANSFER_TAB_REGEX);
     },
     transferDescriptor() {
       const transfer: IIndexedTransferData = this.$data.transfer;
@@ -295,6 +297,9 @@ export default Vue.extend({
     };
   },
   methods: {
+    ...mapActions({
+      setShowTransferSearchResults: `transferSearch/${TransferSearchActions.SET_SHOW_TRANSFER_SEARCH_RESULTS}`,
+    }),
     async setTransferManifestNumberFilter(transfer: IIndexedTransferData) {
       analyticsManager.track(MessageType.SELECTED_TRANSFER);
 
@@ -302,11 +307,17 @@ export default Vue.extend({
         case TransferState.INCOMING:
           await pageManager.clickTabStartingWith(pageManager.transferTabs, "Incoming");
           break;
+        case TransferState.INCOMING_INACTIVE:
+          await pageManager.clickTabStartingWith(pageManager.transferTabs, "Inactive");
+          break;
         case TransferState.OUTGOING:
           await pageManager.clickTabStartingWith(pageManager.transferTabs, "Outgoing");
           break;
         case TransferState.REJECTED:
           await pageManager.clickTabStartingWith(pageManager.transferTabs, "Rejected");
+          break;
+        case TransferState.OUTGOING_INACTIVE:
+          await pageManager.clickTabStartingWith(pageManager.transferTabs, "Outgoing", "Rejected");
           break;
         default:
           return null;
@@ -318,7 +329,7 @@ export default Vue.extend({
         transfer.ManifestNumber
       );
 
-      this.$store.commit(MutationType.SET_SHOW_TRANSFER_SEARCH_RESULTS, false);
+      this.setShowTransferSearchResults({ showTransferSearchResults: false });
     },
     copyToClipboard(transfer: IIndexedTransferData) {
       analyticsManager.track(MessageType.COPIED_TEXT, {

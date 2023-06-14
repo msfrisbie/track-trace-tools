@@ -33,6 +33,7 @@ import {
   DriverLayoverLeg,
   ITransferBuilderState,
 } from "./store/page-overlay/modules/transfer-builder/interfaces";
+import { ITransferSearchState } from "./store/page-overlay/modules/transfer-search/interfaces";
 import { CsvUpload, CsvUploadStatus } from "./types";
 import { UnitOfMeasureAbbreviation, UnitOfMeasureName } from "./utils/units";
 
@@ -206,6 +207,7 @@ export interface IPluginState extends IRootState {
   transferBuilder: ITransferBuilderState;
   packageSearch: IPackageSearchState;
   plantSearch: IPlantSearchState;
+  transferSearch: ITransferSearchState;
   splitPackageBuilder: ISplitPackageBuilderState;
   promoteImmaturePlantsBuilder: IPromoteImmaturePlantsBuilderState;
   search: ISearchState;

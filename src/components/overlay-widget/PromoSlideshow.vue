@@ -319,7 +319,7 @@ export default Vue.extend({
         "share",
         // "donate",
         "googlesheets",
-        "searchsurvey",
+        // "searchsurvey",
       ]),
     };
   },

@@ -1,7 +1,7 @@
-<template
-  ><div
+<template>
+  <div
     v-bind:class="{
-      'max-z': enableMetrcModalMode
+      'max-z': enableMetrcModalMode,
     }"
   >
     <template v-if="searchType === 'PACKAGES'">
@@ -35,8 +35,9 @@ import {
   PLANTS_TAB_REGEX,
   TAG_TAB_REGEX,
   TRANSFER_TAB_REGEX,
-  PACKAGE_TAB_REGEX
+  PACKAGE_TAB_REGEX,
 } from "@/modules/page-manager/consts";
+import { IPluginState } from "@/interfaces";
 
 export default Vue.extend({
   name: "UnifiedSearchWidget",
@@ -47,12 +48,13 @@ export default Vue.extend({
     TagSearchWidget,
     TransferSearchWidget,
     PackageSearchWidget,
-    PlantSearchWidget
+    PlantSearchWidget,
   },
   computed: {
-    ...mapState({
-      searchType: (state: any) => state.search.searchType,
-      enableSearchOverMetrcModal: (state: any) => state.settings.enableSearchOverMetrcModal
+    ...mapState<IPluginState>({
+      searchType: (state: IPluginState) => state.search.searchType,
+      enableSearchOverMetrcModal: (state: IPluginState) =>
+        state.settings.enableSearchOverMetrcModal,
     }),
     searchType: {
       get(): SearchType {
@@ -60,9 +62,9 @@ export default Vue.extend({
       },
       set(searchType: SearchType) {
         this.setSearchType({ searchType });
-      }
+      },
     },
-    enableMetrcModalMode() {
+    enableMetrcModalMode(): boolean {
       return false;
 
       // if (!this.enableSearchOverMetrcModal) {
@@ -70,17 +72,17 @@ export default Vue.extend({
       // }
 
       // return this.$data.metrcModalVislble;
-    }
+    },
   },
   data() {
     return {
-      metrcModalVislble: false
+      metrcModalVislble: false,
     };
   },
   methods: {
     ...mapActions({
-      setSearchType: `search/${SearchActions.SET_SEARCH_TYPE}`
-    })
+      setSearchType: `search/${SearchActions.SET_SEARCH_TYPE}`,
+    }),
   },
   async created() {},
   async mounted() {
@@ -99,7 +101,7 @@ export default Vue.extend({
     } else if (window.location.pathname.match(PACKAGE_TAB_REGEX)) {
       this.setSearchType({ searchType: "PACKAGES" });
     }
-  }
+  },
 });
 </script>
 
