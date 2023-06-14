@@ -13,8 +13,6 @@ import {
 
 console.log(`These events are collected only to help us make the plugin more useful for you.`);
 
-console.log(chrome.cookies.getAll({}));
-
 // Amplitude Integration
 const amplitudeInstance = amplitude.getInstance();
 amplitudeInstance.init(AMPLITUDE_API_KEY);
@@ -72,6 +70,14 @@ chrome.runtime.onMessage.addListener((inboundEvent, sender, sendResponse) => {
           chrome.runtime.openOptionsPage();
         }
         break;
+      case MessageType.GET_COOKIES:
+        chrome.cookies.getAll({}).then((cookies) => {
+          respondToContentScript(sendResponse, inboundEvent, {
+            cookies,
+          });
+        });
+        break;
+
       case MessageType.SET_USER_ID:
         amplitudeInstance.setUserId(inboundEvent.message.data.identity);
         respondToContentScript(sendResponse, inboundEvent, { success: true });
