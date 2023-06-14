@@ -14,7 +14,6 @@ import {
   IRootState,
   ITagSearchFilters,
   ITrackedInteractions,
-  ITransferSearchFilters,
 } from "@/interfaces";
 import { isDevelopment } from "@/modules/environment.module";
 import { MutationType } from "@/mutation-types";
@@ -118,20 +117,12 @@ const defaultState: IRootState = {
   loadingMessage: null,
   muteAnalytics: isDevelopment(),
   navigateOnNextLoad: false,
-  showTransferSearchResults: false,
   omniQueryString: "",
   omniQueryStringHistory: [],
   searchModalView: null,
   taskQueue: [],
   taskQueuePaused: false,
   metrcStatusData: null,
-  // packageSearchFilters: {
-  // },
-  transferQueryString: "",
-  transferQueryStringHistory: [],
-  transferSearchFilters: {
-    manifestNumber: null,
-  },
   tagQueryString: "",
   tagQueryStringHistory: [],
   tagSearchFilters: {
@@ -206,14 +197,6 @@ const vuexStore = new Vuex.Store<IPluginState>({
     [MutationType.RESET_TRACKED_INTERACTIONS](state: IRootState) {
       state.trackedInteractions = defaultState.trackedInteractions;
     },
-    [MutationType.SET_TRANSFER_SEARCH_FILTERS](
-      state: IRootState,
-      transferSearchFilters: ITransferSearchFilters
-    ) {
-      state.transferSearchFilters = {
-        ...transferSearchFilters,
-      };
-    },
     [MutationType.SET_TAG_SEARCH_FILTERS](state: IRootState, tagSearchFilters: ITagSearchFilters) {
       state.tagSearchFilters = {
         ...tagSearchFilters,
@@ -257,14 +240,6 @@ const vuexStore = new Vuex.Store<IPluginState>({
     [MutationType.SET_MUTE_ANALYTICS](state: IRootState, muteAnalytics: boolean) {
       state.muteAnalytics = muteAnalytics;
     },
-    [MutationType.SET_TRANSFER_QUERY_STRING](state: IRootState, transferQueryString: string) {
-      state.transferQueryString = transferQueryString;
-
-      state.transferQueryStringHistory = maybePushOntoUniqueStack(
-        transferQueryString,
-        state.transferQueryStringHistory
-      );
-    },
     [MutationType.SET_TAG_QUERY_STRING](state: IRootState, tagQueryString: string) {
       state.tagQueryString = tagQueryString;
 
@@ -304,12 +279,6 @@ const vuexStore = new Vuex.Store<IPluginState>({
     },
     [MutationType.SET_SEARCH_MODAL_VIEW](state: IRootState, searchModalView: SearchModalView) {
       state.searchModalView = searchModalView;
-    },
-    [MutationType.SET_SHOW_TRANSFER_SEARCH_RESULTS](
-      state: IRootState,
-      showTransferSearchResults: boolean
-    ) {
-      state.showTransferSearchResults = showTransferSearchResults;
     },
     [MutationType.SET_BUILDER_MODAL_DISPLAY_STATE](
       state: IRootState,

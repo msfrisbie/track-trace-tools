@@ -61,7 +61,7 @@
 import SearchPickerSelect from "@/components/page-overlay/SearchPickerSelect.vue";
 import TransferSearchFilters from "@/components/transfer-search-widget/TransferSearchFilters.vue";
 import TransferSearchResults from "@/components/transfer-search-widget/TransferSearchResults.vue";
-import { MessageType } from "@/consts";
+import { MessageType, TransferState } from "@/consts";
 import { IPluginState } from "@/interfaces";
 import { analyticsManager } from "@/modules/analytics-manager.module";
 import { authManager } from "@/modules/auth-manager.module";
@@ -106,13 +106,13 @@ export default Vue.extend({
 
     document.addEventListener("keyup", (e) => {
       if (e.isTrusted && e.key === "Escape") {
-        searchManager.setTransferSearchVisibility({ showTransferSearchResults: true });
+        searchManager.setTransferSearchVisibility({ showTransferSearchResults: false });
       }
     });
 
     document.addEventListener("click", (e) => {
       if (e.isTrusted) {
-        searchManager.setTransferSearchVisibility({ showTransferSearchResults: true });
+        searchManager.setTransferSearchVisibility({ showTransferSearchResults: false });
       }
     });
 
@@ -159,17 +159,20 @@ export default Vue.extend({
       }
 
       try {
-        this.$data.transfers = await primaryDataLoader.onDemandIncomingTransferSearch({
-          queryString,
-        });
-        // this.$data.transfers = [
-        //   ...this.$data.transfers,
-        //   ...(await primaryDataLoader.onDemandInTransitTransferSearch({ queryString })),
-        // ];
-        // this.$data.transfers = [
-        //   ...this.$data.transfers,
-        //   ...(await primaryDataLoader.onDemandInactiveTransferSearch({ queryString })),
-        // ];
+        this.$data.transfers = [
+          ...(await primaryDataLoader.onDemandTransferSearch({
+            transferState: TransferState.INCOMING,
+            queryString,
+          })),
+          ...(await primaryDataLoader.onDemandTransferSearch({
+            transferState: TransferState.OUTGOING,
+            queryString,
+          })),
+          ...(await primaryDataLoader.onDemandTransferSearch({
+            transferState: TransferState.REJECTED,
+            queryString,
+          })),
+        ];
       } catch (e) {
         console.error(e);
       } finally {

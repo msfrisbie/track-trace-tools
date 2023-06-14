@@ -1521,29 +1521,49 @@ export class DataLoader implements IAtomicService {
     });
   }
 
-  async onDemandIncomingTransferSearch({
+  async onDemandTransferSearch({
+    transferState,
     queryString,
   }: {
+    transferState: TransferState;
     queryString: string;
   }): Promise<IIndexedTransferData[]> {
-
     let transfers: IIndexedTransferData[] = [];
 
     const body = this.onDemandTransferSearchBody({ queryString });
 
-    const transferResponse = await primaryMetrcRequestManager.getIncomingTransfers(body);
+    let transferResponse;
+    switch (transferState) {
+      case TransferState.INCOMING:
+        transferResponse = await primaryMetrcRequestManager.getIncomingTransfers(body);
+        break;
+      case TransferState.INCOMING_INACTIVE:
+        transferResponse = await primaryMetrcRequestManager.getIncomingInactiveTransfers(body);
+        break;
+      case TransferState.OUTGOING:
+        transferResponse = await primaryMetrcRequestManager.getOutgoingTransfers(body);
+        break;
+      case TransferState.OUTGOING_INACTIVE:
+        transferResponse = await primaryMetrcRequestManager.getOutgoingInactiveTransfers(body);
+        break;
+      case TransferState.REJECTED:
+        transferResponse = await primaryMetrcRequestManager.getRejectedTransfers(body);
+        break;
+      default:
+        throw new Error('Invalid transfer state');
+    }
 
     if (transferResponse.status === 200) {
       const responseData: ICollectionResponse<ITransferData> = await transferResponse.json();
 
       transfers = responseData["Data"].map((x) => ({
         ...x,
-        TransferState: TransferState.INCOMING,
+        TransferState: transferState,
         TagMatcher: "",
         LicenseNumber: this._authState!.license,
       }));
     } else {
-      console.error("Incoming transfers request failed.");
+      console.error(`${transferState} transfers request failed.`);
     }
 
     return transfers;

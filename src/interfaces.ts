@@ -187,16 +187,12 @@ export interface IRootState {
   omniQueryString: string;
   omniQueryStringHistory: string[];
   searchModalView: SearchModalView | null;
-  showTransferSearchResults: boolean;
   tagQueryString: string;
   tagQueryStringHistory: string[];
   tagSearchFilters: ITagSearchFilters;
   taskQueue: Array<Task>;
   taskQueuePaused: boolean;
   trackedInteractions: ITrackedInteractions;
-  transferQueryString: string;
-  transferQueryStringHistory: string[];
-  transferSearchFilters: ITransferSearchFilters;
   backgroundTasks: IBackgroundTasksState;
   metrcStatusData: IMetrcStatusData | null;
 }
