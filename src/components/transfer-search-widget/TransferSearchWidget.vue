@@ -165,7 +165,15 @@ export default Vue.extend({
             queryString,
           })),
           ...(await primaryDataLoader.onDemandTransferSearch({
+            transferState: TransferState.INCOMING_INACTIVE,
+            queryString,
+          })),
+          ...(await primaryDataLoader.onDemandTransferSearch({
             transferState: TransferState.OUTGOING,
+            queryString,
+          })),
+          ...(await primaryDataLoader.onDemandTransferSearch({
+            transferState: TransferState.OUTGOING_INACTIVE,
             queryString,
           })),
           ...(await primaryDataLoader.onDemandTransferSearch({

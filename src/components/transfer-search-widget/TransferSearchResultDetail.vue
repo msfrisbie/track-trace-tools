@@ -317,7 +317,7 @@ export default Vue.extend({
           await pageManager.clickTabStartingWith(pageManager.transferTabs, "Rejected");
           break;
         case TransferState.OUTGOING_INACTIVE:
-          await pageManager.clickTabStartingWith(pageManager.transferTabs, "Outgoing", "Rejected");
+          await pageManager.clickTabStartingWith(pageManager.transferTabs, "Inactive", "Rejected");
           break;
         default:
           return null;

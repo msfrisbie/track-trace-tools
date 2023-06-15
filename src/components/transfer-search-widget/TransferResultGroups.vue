@@ -27,6 +27,24 @@
       :previewLength="3"
     />
 
+    <transfer-search-results-group
+      :transfers="incomingInactiveTransfers"
+      sectionName="incoming inactive transfer"
+      :transferFilterIdentifier="null"
+      :sectionPriority="3"
+      :expanded="false"
+      :previewLength="3"
+    />
+
+    <transfer-search-results-group
+      :transfers="outgoingInactiveTransfers"
+      sectionName="outgoing inactive transfer"
+      :transferFilterIdentifier="null"
+      :sectionPriority="4"
+      :expanded="false"
+      :previewLength="3"
+    />
+
     <!-- All results -->
     <!-- <transfer-search-results-group
       :transfers="transfers"
@@ -43,7 +61,7 @@
 <script lang="ts">
 import Vue from "vue";
 import { MutationType } from "@/mutation-types";
-import { IIndexedTransferData } from "@/interfaces";
+import { IIndexedTransferData, IPluginState } from "@/interfaces";
 import {
   MessageType,
   TransferFilterIdentifiers,
@@ -81,6 +99,22 @@ export default Vue.extend({
 
       return transfers;
     },
+    incomingInactiveTransfers() {
+      const transfers = this.transfers.filter(
+        (transferData: IIndexedTransferData) =>
+          transferData.TransferState === TransferState.INCOMING_INACTIVE
+      );
+
+      return transfers;
+    },
+    outgoingInactiveTransfers() {
+      const transfers = this.transfers.filter(
+        (transferData: IIndexedTransferData) =>
+          transferData.TransferState === TransferState.OUTGOING_INACTIVE
+      );
+
+      return transfers;
+    },
     rejectedTransfers() {
       const transfers = this.transfers.filter(
         (transferData: IIndexedTransferData) =>
@@ -89,7 +123,9 @@ export default Vue.extend({
 
       return transfers;
     },
-    ...mapState(["transferSearchFilters", "transferQueryString"]),
+    ...mapState<IPluginState>({
+      transferSearchState: (state: IPluginState) => state.transferSearch,
+    }),
   },
   methods: {
     async setTransferManifestNumberFilter() {

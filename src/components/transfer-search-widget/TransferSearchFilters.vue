@@ -19,7 +19,7 @@
 <script lang="ts">
 import Vue from "vue";
 import store from "@/store/page-overlay/index";
-import { ITransferSearchFilters } from "@/interfaces";
+import { IPluginState, ITransferSearchFilters } from "@/interfaces";
 import { TRANSFER_TAB_REGEX } from "@/modules/page-manager/consts";
 import { mapState } from "vuex";
 import { TransferFilterIdentifiers } from "@/consts";
@@ -38,9 +38,11 @@ export default Vue.extend({
       return window.location.pathname.match(TRANSFER_TAB_REGEX);
     },
     hasManifestNumberFilter() {
-      return !!this.$store.state.transferSearchFilters.manifestNumber;
+      return !!this.$store.state.transferSearch.transferSearchFilters.manifestNumber;
     },
-    ...mapState(["transferSearchFilters"]),
+    ...mapState<IPluginState>({
+      transferSearchState: (state: IPluginState) => state.transferSearch,
+    }),
   },
   methods: {
     clearTransferManifestNumberFilter() {

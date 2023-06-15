@@ -36,7 +36,7 @@
 <script lang="ts">
 import TransferSearchResultPreview from "@/components/transfer-search-widget/TransferSearchResultPreview.vue";
 import { TransferFilterIdentifiers } from "@/consts";
-import { IIndexedTransferData } from "@/interfaces";
+import { IIndexedTransferData, IPluginState } from "@/interfaces";
 import { ISelectedTransferMetadata, searchManager } from "@/modules/search-manager.module";
 import store from "@/store/page-overlay/index";
 import { Subject } from "rxjs";
@@ -107,7 +107,9 @@ export default Vue.extend({
           return "truck";
       }
     },
-    ...mapState(["transferQueryString"]),
+    ...mapState<IPluginState>({
+      transferSearchState: (state: IPluginState) => state.transferSearch,
+    }),
   },
   methods: {
     showTransferDetail(transferData: IIndexedTransferData) {
