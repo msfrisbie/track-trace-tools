@@ -116,9 +116,7 @@ export async function acquirePlantFilterElementsImpl() {
       }
 
       // Close the menu
-      if (menuButton) {
-        menuButton.click();
-      }
+      menuButton.click();
     } else {
       console.error("Menu button not found", plantFilterIdentifier);
     }
@@ -288,9 +286,7 @@ export async function acquirePackageFilterElementsImpl() {
       }
 
       // Close the menu
-      if (menuButton) {
-        menuButton.click();
-      }
+      menuButton.click();
     } else {
       console.error("Menu button not found", packageFilterIdentifier);
     }
@@ -326,7 +322,7 @@ export async function acquireTransferFilterElementsImpl() {
 
   const transferFilterIdentifiers: TransferFilterIdentifiers[] = [
     TransferFilterIdentifiers.ManifestNumber,
-    TransferFilterIdentifiers.DestinationFacilities,
+    TransferFilterIdentifiers.DeliveryFacilities,
     TransferFilterIdentifiers.ShipperFacilityInfo,
   ];
 
@@ -366,7 +362,7 @@ export async function acquireTransferFilterElementsImpl() {
               pageManager.transferManifestNumberFilterSelect = select;
               pageManager.transferManifestNumberApplyFiltersButton = button;
               break;
-            case TransferFilterIdentifiers.DestinationFacilities:
+            case TransferFilterIdentifiers.DeliveryFacilities:
               pageManager.transferOutgoingDeliveryFacilitiesFilterInput = input;
               pageManager.transferOutgoingDeliveryFacilitiesApplyFiltersButton = button;
               break;
@@ -379,14 +375,12 @@ export async function acquireTransferFilterElementsImpl() {
           }
         }
       }
+
+      // Close the menu
+      menuButton.click();
     } else {
       console.error("Menu button not found", transferFilterIdentifier);
     }
-  }
-
-  // Close the menu
-  if (menuButton) {
-    menuButton.click();
   }
 }
 
@@ -456,14 +450,12 @@ export async function acquireTagFilterElementsImpl() {
           }
         }
       }
+
+      // Close the menu
+      menuButton.click();
     } else {
       console.error("Menu button not found", tagFilterIdentifier);
     }
-  }
-
-  // Close the menu
-  if (menuButton) {
-    menuButton.click();
   }
 }
 
@@ -641,7 +633,7 @@ export async function setTransferFilterImpl(
     case TransferFilterIdentifiers.ManifestNumber:
       input = pageManager.transferManifestNumberFilterInput;
       break;
-    case TransferFilterIdentifiers.DestinationFacilities:
+    case TransferFilterIdentifiers.DeliveryFacilities:
       input = pageManager.transferOutgoingDeliveryFacilitiesFilterInput;
       break;
     case TransferFilterIdentifiers.ShipperFacilityInfo:
@@ -772,6 +764,12 @@ export function applyTransferFilterImpl(transferFilterIdentifier: TransferFilter
   switch (transferFilterIdentifier) {
     case TransferFilterIdentifiers.ManifestNumber:
       button = pageManager.transferManifestNumberApplyFiltersButton;
+      break;
+    case TransferFilterIdentifiers.DeliveryFacilities:
+      button = pageManager.transferOutgoingDeliveryFacilitiesApplyFiltersButton;
+      break;
+    case TransferFilterIdentifiers.ShipperFacilityInfo:
+      button = pageManager.transferIncomingShipperFacilityInfoApplyFiltersButton;
       break;
     default:
       console.error("bad identifier:", transferFilterIdentifier);

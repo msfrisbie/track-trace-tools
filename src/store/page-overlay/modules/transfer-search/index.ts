@@ -159,7 +159,7 @@ export const transferSearchModule = {
                 pageManager.setTransferFilter(TransferFilterIdentifiers.ManifestNumber, v);
                 break;
               case "destinationFacilities":
-                pageManager.setTransferFilter(TransferFilterIdentifiers.DestinationFacilities, v);
+                pageManager.setTransferFilter(TransferFilterIdentifiers.DeliveryFacilities, v);
                 break;
               case "shipperFacilityInfo":
                 pageManager.setTransferFilter(TransferFilterIdentifiers.ShipperFacilityInfo, v);

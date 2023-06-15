@@ -273,7 +273,7 @@ export enum PlantFilterIdentifiers {
 
 export enum TransferFilterIdentifiers {
   ManifestNumber = "ManifestNumber",
-  DestinationFacilities = "DestinationFacilities",
+  DeliveryFacilities = "DeliveryFacilities",
   ShipperFacilityInfo = "ShipperFacilityInfo",
 }
 
