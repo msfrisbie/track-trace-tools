@@ -1,5 +1,15 @@
 <template>
-  <div>
+  <div class="flex flex-col items-stretch">
+    <div class="flex flex-row justify-end mb-1 opacity-50 hover:opacity-100">
+      <b-button
+        size="sm"
+        variant="link"
+        v-if="!showEmptyValues"
+        @click.stop.prevent="showEmptyValues = true"
+        >SHOW EMPTY VALUES</b-button
+      >
+    </div>
+
     <div
       class="grid grid-cols-3 gap-1 cursor-pointer hover:bg-purple-50"
       v-bind:class="{ 'bg-purple-100': idx % 2 === 0 }"
@@ -57,7 +67,7 @@ export default Vue.extend({
       const pairs = Object.entries(flattenObject(this.$props.jsonObject)) as [string, any][];
 
       return pairs
-        .filter(([k, v]) => v !== null)
+        .filter(([k, v]) => this.$data.showEmptyValues || (v !== null && v !== ""))
         .map(([k, v]) => [
           k
             .replace(/([A-Z])/g, " $1")
@@ -70,7 +80,9 @@ export default Vue.extend({
     ...mapState([]),
   },
   data() {
-    return {};
+    return {
+      showEmptyValues: false,
+    };
   },
   methods: {
     copyToClipboard(text: string) {

@@ -158,21 +158,21 @@ export default Vue.extend({
         this.$data.firstSearchResolver();
       }
 
-      try {
-        this.$data.packages = await primaryDataLoader.onDemandActivePackageSearch({ queryString });
-        this.$data.packages = [
-          ...this.$data.packages,
-          ...(await primaryDataLoader.onDemandInTransitPackageSearch({ queryString })),
-        ];
-        this.$data.packages = [
-          ...this.$data.packages,
-          ...(await primaryDataLoader.onDemandInactivePackageSearch({ queryString })),
-        ];
-      } catch (e) {
-        console.error(e);
-      } finally {
-        this.$data.searchInflight = false;
-      }
+      this.$data.packages = [];
+
+      await Promise.allSettled([
+        primaryDataLoader.onDemandActivePackageSearch({ queryString }).then((result) => {
+          this.$data.packages = [...this.$data.packages, ...result];
+        }),
+        primaryDataLoader.onDemandInTransitPackageSearch({ queryString }).then((result) => {
+          this.$data.packages = [...this.$data.packages, ...result];
+        }),
+        primaryDataLoader.onDemandInactivePackageSearch({ queryString }).then((result) => {
+          this.$data.packages = [...this.$data.packages, ...result];
+        }),
+      ]);
+
+      this.$data.searchInflight = false;
     });
 
     if (this.$store.state.expandSearchOnNextLoad) {

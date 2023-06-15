@@ -6,9 +6,7 @@
       <div class="flex flex-col items-center space-y-8 flex-grow">
         <div class="flex flex-col space-y-2 items-center">
           <div class="flex flex-col items-center space-x-4 text-center">
-            <plant-icon :plant="plant" class="text-5xl" />
-
-            <!-- <div class="text-3xl">{{ plant.StrainName }}</div> -->
+            <metrc-tag :label="plant.Label" sideText="PLANT"></metrc-tag>
           </div>
 
           <b-badge :variant="badgeVariant(plant)">{{ displayPlantState(plant) }}</b-badge>
@@ -24,65 +22,7 @@
       </div>
     </div>
 
-    <div class="text-2xl text-purple-800 text-center demo-blur">
-      {{ plant.StrainName }}
-    </div>
-
-    <div class="flex flex-col items-stretch space-y-2"></div>
-
-    <table class="text-lg">
-      <tr class="cursor-pointer hover:bg-purple-50" @click.stop.prevent="copyToClipboard(plant)">
-        <td class="text-right p-2 text-gray-400 text-2xl">
-          <font-awesome-icon icon="tag" />
-        </td>
-        <td class="p-2">
-          {{ plant.Label }}
-        </td>
-      </tr>
-      <tr>
-        <td class="text-right p-2 text-gray-400 text-2xl">
-          <font-awesome-icon icon="map-marker-alt" />
-        </td>
-        <td class="p-2">
-          {{ plant.LocationName }}
-        </td>
-      </tr>
-      <tr>
-        <td class="text-right p-2 text-gray-400 text-2xl">
-          <font-awesome-icon icon="seedling" />
-        </td>
-        <td class="p-2">
-          {{ plant.PlantBatchName }}
-        </td>
-      </tr>
-      <tr>
-        <td class="text-right p-2 text-gray-400 text-2xl">
-          <font-awesome-icon icon="cut" />
-        </td>
-        <td class="p-2">{{ plant.HarvestCount }}x Harvests</td>
-      </tr>
-      <tr>
-        <td class="align-top text-right p-2 text-gray-400 text-2xl">
-          <font-awesome-icon icon="calendar" />
-        </td>
-        <td class="p-2 grid grid-cols-2 gap-2">
-          <div>Planted Date:</div>
-          <div>{{ plant.PlantedDate }}</div>
-          <template v-if="!!plant.VegetativeDate">
-            <div>Vegetative Date:</div>
-            <div>{{ plant.VegetativeDate }}</div>
-          </template>
-          <template v-if="!!plant.FloweringDate">
-            <div>Flowering Date:</div>
-            <div>{{ plant.FloweringDate }}</div>
-          </template>
-          <template v-if="!!plant.DestroyedDate">
-            <div>Destroyed Date:</div>
-            <div>{{ plant.DestroyedDate }}</div>
-          </template>
-        </td>
-      </tr>
-    </table>
+    <recursive-json-table :jsonObject="plant"></recursive-json-table>
   </div>
 </template>
 
@@ -101,11 +41,13 @@ import { Subject } from "rxjs";
 import { takeUntil } from "rxjs/operators";
 import Vue from "vue";
 import { mapActions, mapGetters, mapState } from "vuex";
+import MetrcTag from "@/components/overlay-widget/shared/MetrcTag.vue";
+import RecursiveJsonTable from "@/components/search/shared/RecursiveJsonTable.vue";
 
 export default Vue.extend({
   name: "PlantSearchResultDetail",
   store,
-  components: { PlantIcon },
+  components: { MetrcTag, RecursiveJsonTable },
   async created() {
     searchManager.selectedPlant
       .asObservable()

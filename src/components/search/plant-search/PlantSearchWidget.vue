@@ -160,21 +160,21 @@ export default Vue.extend({
         this.$data.firstSearchResolver();
       }
 
-      try {
-        this.$data.plants = await primaryDataLoader.onDemandFloweringPlantSearch({ queryString });
-        this.$data.plants = [
-          ...this.$data.plants,
-          ...(await primaryDataLoader.onDemandVegetativePlantSearch({ queryString })),
-        ];
-        this.$data.plants = [
-          ...this.$data.plants,
-          ...(await primaryDataLoader.onDemandInactivePlantSearch({ queryString })),
-        ];
-      } catch (e) {
-        console.error(e);
-      } finally {
-        this.$data.searchInflight = false;
-      }
+      this.$data.plants = [];
+
+      await Promise.allSettled([
+        primaryDataLoader.onDemandFloweringPlantSearch({ queryString }).then((result) => {
+          this.$data.plants = [...this.$data.plants, ...result];
+        }),
+        primaryDataLoader.onDemandVegetativePlantSearch({ queryString }).then((result) => {
+          this.$data.plants = [...this.$data.plants, ...result];
+        }),
+        primaryDataLoader.onDemandInactivePlantSearch({ queryString }).then((result) => {
+          this.$data.plants = [...this.$data.plants, ...result];
+        }),
+      ]);
+
+      this.$data.searchInflight = false;
     });
 
     if (this.$store.state.expandSearchOnNextLoad) {
