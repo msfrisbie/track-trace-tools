@@ -12,6 +12,8 @@ const inMemoryState = {
   showTransferSearchResults: false,
   transferSearchFilters: {
     manifestNumber: null,
+    shipperFacilityInfo: null,
+    deliveryFacilities: null
   },
 };
 

@@ -314,7 +314,11 @@ export async function acquireTransferFilterElementsImpl() {
     atLeastOneIsTruthy(
       pageManager.transferManifestNumberFilterInput,
       pageManager.transferManifestNumberFilterSelect,
-      pageManager.transferManifestNumberApplyFiltersButton
+      pageManager.transferManifestNumberApplyFiltersButton,
+      pageManager.transferOutgoingDeliveryFacilitiesFilterInput,
+      pageManager.transferOutgoingDeliveryFacilitiesApplyFiltersButton,
+      pageManager.transferIncomingShipperFacilityInfoFilterInput,
+      pageManager.transferIncomingShipperFacilityInfoApplyFiltersButton
     )
   ) {
     return;
@@ -322,6 +326,8 @@ export async function acquireTransferFilterElementsImpl() {
 
   const transferFilterIdentifiers: TransferFilterIdentifiers[] = [
     TransferFilterIdentifiers.ManifestNumber,
+    TransferFilterIdentifiers.DestinationFacilities,
+    TransferFilterIdentifiers.ShipperFacilityInfo,
   ];
 
   let menuButton;
@@ -359,6 +365,14 @@ export async function acquireTransferFilterElementsImpl() {
               pageManager.transferManifestNumberFilterInput = input;
               pageManager.transferManifestNumberFilterSelect = select;
               pageManager.transferManifestNumberApplyFiltersButton = button;
+              break;
+            case TransferFilterIdentifiers.DestinationFacilities:
+              pageManager.transferOutgoingDeliveryFacilitiesFilterInput = input;
+              pageManager.transferOutgoingDeliveryFacilitiesApplyFiltersButton = button;
+              break;
+            case TransferFilterIdentifiers.ShipperFacilityInfo:
+              pageManager.transferIncomingShipperFacilityInfoFilterInput = input;
+              pageManager.transferIncomingShipperFacilityInfoApplyFiltersButton = button;
               break;
             default:
               break;
@@ -481,11 +495,23 @@ export function readPackageFiltersImpl() {
 export function readTransferFiltersImpl() {
   const filters: ITransferSearchFilters = {
     manifestNumber: null,
+    deliveryFacilities: null,
+    shipperFacilityInfo: null
   };
   let updated = false;
 
   if (pageManager.transferManifestNumberFilterInput) {
     filters.manifestNumber = pageManager.transferManifestNumberFilterInput.value;
+    updated = true;
+  }
+
+  if (pageManager.transferIncomingShipperFacilityInfoFilterInput) {
+    filters.shipperFacilityInfo = pageManager.transferIncomingShipperFacilityInfoFilterInput.value;
+    updated = true;
+  }
+
+  if (pageManager.transferOutgoingDeliveryFacilitiesFilterInput) {
+    filters.deliveryFacilities = pageManager.transferOutgoingDeliveryFacilitiesFilterInput.value;
     updated = true;
   }
 
@@ -863,6 +889,12 @@ export async function resetFilterElementReferencesImpl() {
   pageManager.transferManifestNumberFilterInput = null;
   pageManager.transferManifestNumberFilterSelect = null;
   pageManager.transferManifestNumberApplyFiltersButton = null;
+
+  pageManager.transferOutgoingDeliveryFacilitiesFilterInput = null;
+  pageManager.transferOutgoingDeliveryFacilitiesApplyFiltersButton = null;
+
+  pageManager.transferIncomingShipperFacilityInfoFilterInput = null;
+  pageManager.transferIncomingShipperFacilityInfoApplyFiltersButton = null;
 
   // Tag
   pageManager.tagClearFiltersButton = null;

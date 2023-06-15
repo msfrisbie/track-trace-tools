@@ -135,6 +135,8 @@ export interface IPlantSearchFilters {
 
 export interface ITransferSearchFilters {
   manifestNumber: string | null;
+  shipperFacilityInfo: string | null;
+  deliveryFacilities: string | null;
 }
 
 export interface ITagSearchFilters {

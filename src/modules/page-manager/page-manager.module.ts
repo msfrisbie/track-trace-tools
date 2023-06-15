@@ -133,6 +133,7 @@ class PageManager implements IAtomicService {
   packageTagInputContainer: HTMLElement | null = null;
 
   // Plant Search
+
   plantSearchComponent: HTMLElement | null = null;
 
   plantLabelFilterInput: HTMLInputElement | null = null;
@@ -180,6 +181,12 @@ class PageManager implements IAtomicService {
   transferManifestNumberFilterInput: HTMLInputElement | null = null;
   transferManifestNumberFilterSelect: HTMLElement | null = null;
   transferManifestNumberApplyFiltersButton: HTMLButtonElement | null = null;
+
+  transferIncomingShipperFacilityInfoFilterInput: HTMLInputElement | null = null;
+  transferIncomingShipperFacilityInfoApplyFiltersButton: HTMLButtonElement | null = null;
+
+  transferOutgoingDeliveryFacilitiesFilterInput: HTMLInputElement | null = null;
+  transferOutgoingDeliveryFacilitiesApplyFiltersButton: HTMLButtonElement | null = null;
 
   transferClearFiltersButton: HTMLButtonElement | null = null;
 
