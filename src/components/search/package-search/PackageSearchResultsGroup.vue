@@ -53,7 +53,7 @@
 </template>
 
 <script lang="ts">
-import PackageSearchResultPreview from "@/components/package-search-widget/PackageSearchResultPreview.vue";
+import PackageSearchResultPreview from "@/components/search/package-search/PackageSearchResultPreview.vue";
 import { IIndexedPackageData } from "@/interfaces";
 import { PACKAGE_TAB_REGEX } from "@/modules/page-manager/consts";
 import { ISelectedPackageMetadata, searchManager } from "@/modules/search-manager.module";

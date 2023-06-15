@@ -54,7 +54,7 @@ export default Vue.extend({
   },
   async mounted() {
     if (!this.isOnTransfersPage) {
-      this.$store.commit(MutationType.SET_TRANSFER_SEARCH_FILTERS, {});
+      this.$store.commit(`transferSearch/${MutationType.SET_TRANSFER_SEARCH_FILTERS}`, {});
     }
   },
 });

@@ -34,7 +34,7 @@
 </template>
 
 <script lang="ts">
-import TransferSearchResultPreview from "@/components/transfer-search-widget/TransferSearchResultPreview.vue";
+import TransferSearchResultPreview from "@/components/search/transfer-search/TransferSearchResultPreview.vue";
 import { TransferFilterIdentifiers } from "@/consts";
 import { IIndexedTransferData, IPluginState } from "@/interfaces";
 import { ISelectedTransferMetadata, searchManager } from "@/modules/search-manager.module";

@@ -490,7 +490,7 @@ export function readTransferFiltersImpl() {
   }
 
   if (updated) {
-    store.commit(MutationType.SET_TRANSFER_SEARCH_FILTERS, filters);
+    store.commit(`transferSearch/${MutationType.SET_TRANSFER_SEARCH_FILTERS}`, filters);
   }
 }
 

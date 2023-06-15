@@ -58,8 +58,8 @@
 </template>
 
 <script lang="ts">
-import PackageSearchFilters from "@/components/package-search-widget/PackageSearchFilters.vue";
-import PackageSearchResults from "@/components/package-search-widget/PackageSearchResults.vue";
+import PackageSearchFilters from "@/components/search/package-search/PackageSearchFilters.vue";
+import PackageSearchResults from "@/components/search/package-search/PackageSearchResults.vue";
 import SearchPickerSelect from "@/components/page-overlay/SearchPickerSelect.vue";
 import { MessageType } from "@/consts";
 import { IPluginState } from "@/interfaces";
@@ -209,7 +209,7 @@ export default Vue.extend({
     },
   },
   watch: {
-    'packageSearchState.showPackageSearchResults': {
+    "packageSearchState.showPackageSearchResults": {
       immediate: true,
       handler(newValue, oldValue) {
         if (newValue) {

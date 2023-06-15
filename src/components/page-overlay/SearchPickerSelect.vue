@@ -1,5 +1,5 @@
-<template
-  ><div class="flex flex-row items-stretch space-x-4">
+<template>
+  <div class="flex flex-row items-stretch space-x-4">
     <b-form-select
       style="border-radius: 0"
       v-model="searchType"
@@ -13,9 +13,9 @@ import Vue from "vue";
 import { mapState, mapActions } from "vuex";
 import router from "@/router/index";
 import store from "@/store/page-overlay/index";
-import TagSearchWidget from "@/components/tag-search-widget/TagSearchWidget.vue";
-import TransferSearchWidget from "@/components/transfer-search-widget/TransferSearchWidget.vue";
-import PackageSearchWidget from "@/components/package-search-widget/PackageSearchWidget.vue";
+import TagSearchWidget from "@/components/search/tag-search/TagSearchWidget.vue";
+import TransferSearchWidget from "@/components/search/transfer-search/TransferSearchWidget.vue";
+import PackageSearchWidget from "@/components/search/package-search/PackageSearchWidget.vue";
 import { SearchActions } from "@/store/page-overlay/modules/search/consts";
 import { SearchType } from "@/store/page-overlay/modules/search/interfaces";
 
@@ -27,7 +27,7 @@ export default Vue.extend({
   components: {},
   computed: {
     ...mapState({
-      searchType: (state: any) => state.search.searchType
+      searchType: (state: any) => state.search.searchType,
     }),
     searchType: {
       get(): SearchType {
@@ -35,16 +35,16 @@ export default Vue.extend({
       },
       set(searchType: SearchType) {
         this.setSearchType({ searchType });
-      }
-    }
+      },
+    },
   },
   data() {
     return {};
   },
   methods: {
     ...mapActions({
-      setSearchType: `search/${SearchActions.SET_SEARCH_TYPE}`
-    })
+      setSearchType: `search/${SearchActions.SET_SEARCH_TYPE}`,
+    }),
   },
   async created() {},
   async mounted() {
@@ -54,7 +54,7 @@ export default Vue.extend({
     //   this.setSearchType("TAGS");
     // }
     //   this.setSearchType("TRANSFERS");
-  }
+  },
 });
 </script>
 

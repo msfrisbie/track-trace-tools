@@ -68,8 +68,8 @@
 
 <script lang="ts">
 import SearchPickerSelect from "@/components/page-overlay/SearchPickerSelect.vue";
-import TagSearchFilters from "@/components/tag-search-widget/TagSearchFilters.vue";
-import TagSearchResult from "@/components/tag-search-widget/TagSearchResult.vue";
+import TagSearchFilters from "@/components/search/tag-search/TagSearchFilters.vue";
+import TagSearchResult from "@/components/search/tag-search/TagSearchResult.vue";
 import { IIndexedTagData, IIndexedTagFilters } from "@/interfaces";
 import { authManager } from "@/modules/auth-manager.module";
 import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";

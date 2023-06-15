@@ -108,7 +108,7 @@
 </template>
 
 <script lang="ts">
-import TransferIcon from "@/components/transfer-search-widget/TransferIcon.vue";
+import TransferIcon from "@/components/search/transfer-search/TransferIcon.vue";
 import {
   MessageType,
   ModalAction,

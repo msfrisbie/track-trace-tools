@@ -87,7 +87,7 @@
 </template>
 
 <script lang="ts">
-import PlantIcon from "@/components/plant-search-widget/PlantIcon.vue";
+import PlantIcon from "@/components/search/plant-search/PlantIcon.vue";
 import { MessageType, PlantState } from "@/consts";
 import { IIndexedPlantData } from "@/interfaces";
 import { analyticsManager } from "@/modules/analytics-manager.module";

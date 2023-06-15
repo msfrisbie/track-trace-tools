@@ -57,7 +57,7 @@ import { pageManager } from "@/modules/page-manager/page-manager.module";
 import { toastManager } from "@/modules/toast-manager.module";
 import { copyToClipboard } from "@/utils/dom";
 import { mapActions, mapState } from "vuex";
-import PlantSearchResultsGroup from "@/components/plant-search-widget/PlantSearchResultsGroup.vue";
+import PlantSearchResultsGroup from "@/components/search/plant-search/PlantSearchResultsGroup.vue";
 import PlantSearchFiltersVue from "./PlantSearchFilters.vue";
 import { searchManager } from "@/modules/search-manager.module";
 import { PlantSearchActions } from "@/store/page-overlay/modules/plant-search/consts";
@@ -66,7 +66,7 @@ import { timer } from "rxjs";
 export default Vue.extend({
   name: "PlantResultGroups",
   props: {
-    plants: Array as () => IIndexedPlantData[]
+    plants: Array as () => IIndexedPlantData[],
   },
   components: { PlantSearchResultsGroup },
   data(): {} {
@@ -75,7 +75,7 @@ export default Vue.extend({
   computed: {
     ...mapState({
       plantQueryString: (state: any) => state.plantSearch?.plantQueryString,
-      plantSearchFilters: (state: any) => state.plantSearch?.plantSearchFilters
+      plantSearchFilters: (state: any) => state.plantSearch?.plantSearchFilters,
     }),
     filtersApplied() {
       return false;
@@ -114,34 +114,34 @@ export default Vue.extend({
       return 3;
     },
     labelPlants(): IIndexedPlantData[] {
-      const plants = this.plants.filter(plantData =>
+      const plants = this.plants.filter((plantData) =>
         plantData.Label.includes(this.plantQueryString)
       );
 
       return plants;
     },
     strainNamePlants(): IIndexedPlantData[] {
-      const plants = this.plants.filter(plantData =>
+      const plants = this.plants.filter((plantData) =>
         plantData.StrainName?.toUpperCase().includes(this.plantQueryString.toUpperCase())
       );
 
       return plants;
     },
     locationNamePlants(): IIndexedPlantData[] {
-      const plants = this.plants.filter(plantData =>
+      const plants = this.plants.filter((plantData) =>
         plantData.LocationName?.toUpperCase().includes(this.plantQueryString.toUpperCase())
       );
 
       return plants;
-    }
+    },
   },
   methods: {
     ...mapActions({
-      setShowPlantSearchResults: `plantSearch/${PlantSearchActions.SET_SHOW_PLANT_SEARCH_RESULTS}`
+      setShowPlantSearchResults: `plantSearch/${PlantSearchActions.SET_SHOW_PLANT_SEARCH_RESULTS}`,
     }),
     resetFilters() {
       pageManager.resetMetrcPlantFilters();
-    }
+    },
     // async setPlantLabelFilter(plant: IIndexedPlantData) {
     //   analyticsManager.track(MessageType.SELECTED_PLANT);
 
@@ -157,6 +157,6 @@ export default Vue.extend({
 
     //   (this as any).setShowPlantSearchResults({ showPlantSearchResults: false });
     // }
-  }
+  },
 });
 </script>

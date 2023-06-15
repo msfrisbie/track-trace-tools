@@ -43,9 +43,9 @@
 </template>
 
 <script lang="ts">
-import TransferHistoryList from "@/components/transfer-search-widget/TransferHistoryList.vue";
-import TransferResultGroups from "@/components/transfer-search-widget/TransferResultGroups.vue";
-import TransferSearchResultDetail from "@/components/transfer-search-widget/TransferSearchResultDetail.vue";
+import TransferHistoryList from "@/components/search/transfer-search/TransferHistoryList.vue";
+import TransferResultGroups from "@/components/search/transfer-search/TransferResultGroups.vue";
+import TransferSearchResultDetail from "@/components/search/transfer-search/TransferSearchResultDetail.vue";
 import { IIndexedTransferData, ITransferData, IPluginState } from "@/interfaces";
 import store from "@/store/page-overlay/index";
 import { TransferSearchActions } from "@/store/page-overlay/modules/transfer-search/consts";

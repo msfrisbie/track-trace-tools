@@ -36,7 +36,7 @@
 </template>
 
 <script lang="ts">
-import PackageManifestCartPackagePreview from "@/components/package-search-widget/PackageManifestCartPackagePreview.vue";
+import PackageManifestCartPackagePreview from "@/components/search/package-search/PackageManifestCartPackagePreview.vue";
 import { MessageType, ModalAction, ModalType } from "@/consts";
 import { analyticsManager } from "@/modules/analytics-manager.module";
 import { modalManager } from "@/modules/modal-manager.module";

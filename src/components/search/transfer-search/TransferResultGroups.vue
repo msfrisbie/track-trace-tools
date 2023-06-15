@@ -57,22 +57,17 @@
   </div>
 </template>
 
-
 <script lang="ts">
 import Vue from "vue";
 import { MutationType } from "@/mutation-types";
 import { IIndexedTransferData, IPluginState } from "@/interfaces";
-import {
-  MessageType,
-  TransferFilterIdentifiers,
-  TransferState,
-} from "@/consts";
+import { MessageType, TransferFilterIdentifiers, TransferState } from "@/consts";
 import { analyticsManager } from "@/modules/analytics-manager.module";
 import { pageManager } from "@/modules/page-manager/page-manager.module";
 import { toastManager } from "@/modules/toast-manager.module";
 import { copyToClipboard } from "@/utils/dom";
 import { mapState } from "vuex";
-import TransferSearchResultsGroup from "@/components/transfer-search-widget/TransferSearchResultsGroup.vue";
+import TransferSearchResultsGroup from "@/components/search/transfer-search/TransferSearchResultsGroup.vue";
 import TransferSearchFiltersVue from "./TransferSearchFilters.vue";
 import { searchManager } from "@/modules/search-manager.module";
 
@@ -133,22 +128,13 @@ export default Vue.extend({
 
       switch (this.$props.transfer.TransferState as TransferState) {
         case TransferState.INCOMING:
-          await pageManager.clickTabStartingWith(
-            pageManager.transferTabs,
-            "Incoming"
-          );
+          await pageManager.clickTabStartingWith(pageManager.transferTabs, "Incoming");
           break;
         case TransferState.OUTGOING:
-          await pageManager.clickTabStartingWith(
-            pageManager.transferTabs,
-            "Outgoing"
-          );
+          await pageManager.clickTabStartingWith(pageManager.transferTabs, "Outgoing");
           break;
         case TransferState.REJECTED:
-          await pageManager.clickTabStartingWith(
-            pageManager.transferTabs,
-            "Rejected"
-          );
+          await pageManager.clickTabStartingWith(pageManager.transferTabs, "Rejected");
           break;
         default:
           return null;

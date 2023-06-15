@@ -53,7 +53,7 @@
 </template>
 
 <script lang="ts">
-import PlantSearchResultPreview from "@/components/plant-search-widget/PlantSearchResultPreview.vue";
+import PlantSearchResultPreview from "@/components/search/plant-search/PlantSearchResultPreview.vue";
 import { IIndexedPlantData } from "@/interfaces";
 import { PLANTS_TAB_REGEX } from "@/modules/page-manager/consts";
 import { ISelectedPlantMetadata, searchManager } from "@/modules/search-manager.module";

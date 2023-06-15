@@ -157,7 +157,7 @@
 </template>
 
 <script lang="ts">
-import PackageIcon from "@/components/package-search-widget/PackageIcon.vue";
+import PackageIcon from "@/components/search/package-search/PackageIcon.vue";
 import {
   MessageType,
   METRC_HOSTNAMES_LACKING_LAB_PDFS,
@@ -377,8 +377,7 @@ export default Vue.extend({
       analyticsManager.track(MessageType.CLICKED_TOOLKIT_DOWNLOAD_LAB_TEST_BUTTON);
       this.setShowPackageSearchResults({ showPackageSearchResults: false });
     },
-    async upsertPackage({ pkg }: { pkg: IIndexedPackageData }) {
-    },
+    async upsertPackage({ pkg }: { pkg: IIndexedPackageData }) {},
   },
 });
 </script>

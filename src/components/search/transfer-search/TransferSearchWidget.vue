@@ -59,8 +59,8 @@
 
 <script lang="ts">
 import SearchPickerSelect from "@/components/page-overlay/SearchPickerSelect.vue";
-import TransferSearchFilters from "@/components/transfer-search-widget/TransferSearchFilters.vue";
-import TransferSearchResults from "@/components/transfer-search-widget/TransferSearchResults.vue";
+import TransferSearchFilters from "@/components/search/transfer-search/TransferSearchFilters.vue";
+import TransferSearchResults from "@/components/search/transfer-search/TransferSearchResults.vue";
 import { MessageType, TransferState } from "@/consts";
 import { IPluginState } from "@/interfaces";
 import { analyticsManager } from "@/modules/analytics-manager.module";

@@ -71,10 +71,10 @@
 </template>
 
 <script lang="ts">
-// import PlantManifestCartBuilder from "@/components/plant-search-widget/PlantManifestCartBuilder.vue";
-import PlantHistoryList from "@/components/plant-search-widget/PlantHistoryList.vue";
-import PlantResultGroups from "@/components/plant-search-widget/PlantResultGroups.vue";
-import PlantSearchResultDetail from "@/components/plant-search-widget/PlantSearchResultDetail.vue";
+// import PlantManifestCartBuilder from "@/components/search/plant-search/PlantManifestCartBuilder.vue";
+import PlantHistoryList from "@/components/search/plant-search/PlantHistoryList.vue";
+import PlantResultGroups from "@/components/search/plant-search/PlantResultGroups.vue";
+import PlantSearchResultDetail from "@/components/search/plant-search/PlantSearchResultDetail.vue";
 import { IIndexedPlantData, IPlantData } from "@/interfaces";
 import store from "@/store/page-overlay/index";
 import { PlantSearchActions } from "@/store/page-overlay/modules/plant-search/consts";

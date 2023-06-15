@@ -105,7 +105,7 @@
 </template>
 
 <script lang="ts">
-import PackageSearchResultsGroup from "@/components/package-search-widget/PackageSearchResultsGroup.vue";
+import PackageSearchResultsGroup from "@/components/search/package-search/PackageSearchResultsGroup.vue";
 import { MessageType } from "@/consts";
 import { IIndexedPackageData } from "@/interfaces";
 import { analyticsManager } from "@/modules/analytics-manager.module";

@@ -43,9 +43,9 @@
 </template>
 
 <script lang="ts">
-import PackageHistoryList from "@/components/package-search-widget/PackageHistoryList.vue";
-import PackageResultGroups from "@/components/package-search-widget/PackageResultGroups.vue";
-import PackageSearchResultDetail from "@/components/package-search-widget/PackageSearchResultDetail.vue";
+import PackageHistoryList from "@/components/search/package-search/PackageHistoryList.vue";
+import PackageResultGroups from "@/components/search/package-search/PackageResultGroups.vue";
+import PackageSearchResultDetail from "@/components/search/package-search/PackageSearchResultDetail.vue";
 import { IIndexedPackageData, IPackageData, IPluginState } from "@/interfaces";
 import store from "@/store/page-overlay/index";
 import { PackageSearchActions } from "@/store/page-overlay/modules/package-search/consts";

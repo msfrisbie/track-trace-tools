@@ -59,8 +59,8 @@
 
 <script lang="ts">
 import SearchPickerSelect from "@/components/page-overlay/SearchPickerSelect.vue";
-import PlantSearchFilters from "@/components/plant-search-widget/PlantSearchFilters.vue";
-import PlantSearchResults from "@/components/plant-search-widget/PlantSearchResults.vue";
+import PlantSearchFilters from "@/components/search/plant-search/PlantSearchFilters.vue";
+import PlantSearchResults from "@/components/search/plant-search/PlantSearchResults.vue";
 import { MessageType } from "@/consts";
 import { IPluginState } from "@/interfaces";
 import { analyticsManager } from "@/modules/analytics-manager.module";
@@ -126,7 +126,9 @@ export default Vue.extend({
       tap((queryString: string) => {
         this.$data.queryString = queryString;
       }),
-      filter((queryString: string) => queryString !== this.$store.state.plantSearch.plantQueryString),
+      filter(
+        (queryString: string) => queryString !== this.$store.state.plantSearch.plantQueryString
+      ),
       debounceTime(500),
       tap((queryString: string) => {
         if (queryString) {
@@ -209,7 +211,7 @@ export default Vue.extend({
     },
   },
   watch: {
-    'plantSearchState.showPlantSearchResults': {
+    "plantSearchState.showPlantSearchResults": {
       immediate: true,
       handler(newValue, oldValue) {
         if (newValue) {
