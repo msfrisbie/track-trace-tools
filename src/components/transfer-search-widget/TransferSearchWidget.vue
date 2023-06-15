@@ -158,34 +158,52 @@ export default Vue.extend({
         this.$data.firstSearchResolver();
       }
 
-      try {
-        this.$data.transfers = [
-          ...(await primaryDataLoader.onDemandTransferSearch({
+      this.$data.transfers = [];
+
+      await Promise.allSettled([
+        primaryDataLoader
+          .onDemandTransferSearch({
             transferState: TransferState.INCOMING,
             queryString,
-          })),
-          ...(await primaryDataLoader.onDemandTransferSearch({
+          })
+          .then((result) => {
+            this.$data.transfers = [...this.$data.transfers, ...result];
+          }),
+        primaryDataLoader
+          .onDemandTransferSearch({
             transferState: TransferState.INCOMING_INACTIVE,
             queryString,
-          })),
-          ...(await primaryDataLoader.onDemandTransferSearch({
+          })
+          .then((result) => {
+            this.$data.transfers = [...this.$data.transfers, ...result];
+          }),
+        primaryDataLoader
+          .onDemandTransferSearch({
             transferState: TransferState.OUTGOING,
             queryString,
-          })),
-          ...(await primaryDataLoader.onDemandTransferSearch({
+          })
+          .then((result) => {
+            this.$data.transfers = [...this.$data.transfers, ...result];
+          }),
+        primaryDataLoader
+          .onDemandTransferSearch({
             transferState: TransferState.OUTGOING_INACTIVE,
             queryString,
-          })),
-          ...(await primaryDataLoader.onDemandTransferSearch({
+          })
+          .then((result) => {
+            this.$data.transfers = [...this.$data.transfers, ...result];
+          }),
+        primaryDataLoader
+          .onDemandTransferSearch({
             transferState: TransferState.REJECTED,
             queryString,
-          })),
-        ];
-      } catch (e) {
-        console.error(e);
-      } finally {
-        this.$data.searchInflight = false;
-      }
+          })
+          .then((result) => {
+            this.$data.transfers = [...this.$data.transfers, ...result];
+          }),
+      ]);
+
+      this.$data.searchInflight = false;
     });
 
     if (this.$store.state.expandSearchOnNextLoad) {
