@@ -5,7 +5,7 @@
       <dual-color-tag class="text-md" :label="label" />
     </div>
     <div class="bg-black w-8 flex flex-col items-center justify-center text-center">
-      <span class="transform rotate-90 text-white font-semibold block">PACKAGE</span>
+      <span class="transform rotate-90 text-white font-semibold block">{{ sideText }}</span>
     </div>
   </div>
 </template>
@@ -24,6 +24,7 @@ export default Vue.extend({
   router,
   props: {
     label: String,
+    sideText: String
   },
   components: {
     DualColorTag,

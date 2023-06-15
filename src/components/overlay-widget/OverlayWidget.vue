@@ -15,7 +15,7 @@
         <template #title v-if="contextMenuEvent">
           <div class="text-center text-normal text-lg">
             <template v-if="contextMenuEvent.packageTag">
-              <metrc-tag :label="contextMenuEvent.packageTag"></metrc-tag>
+              <metrc-tag :label="contextMenuEvent.packageTag" sideText="PACKAGE"></metrc-tag>
             </template>
 
             <template v-if="contextMenuEvent.manifestNumber">

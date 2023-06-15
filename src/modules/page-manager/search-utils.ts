@@ -496,7 +496,7 @@ export function readTransferFiltersImpl() {
   const filters: ITransferSearchFilters = {
     manifestNumber: null,
     deliveryFacilities: null,
-    shipperFacilityInfo: null
+    shipperFacilityInfo: null,
   };
   let updated = false;
 
@@ -640,6 +640,12 @@ export async function setTransferFilterImpl(
   switch (transferFilterIdentifier) {
     case TransferFilterIdentifiers.ManifestNumber:
       input = pageManager.transferManifestNumberFilterInput;
+      break;
+    case TransferFilterIdentifiers.DestinationFacilities:
+      input = pageManager.transferOutgoingDeliveryFacilitiesFilterInput;
+      break;
+    case TransferFilterIdentifiers.ShipperFacilityInfo:
+      input = pageManager.transferIncomingShipperFacilityInfoFilterInput;
       break;
     default:
       console.error("bad identifier:", transferFilterIdentifier);

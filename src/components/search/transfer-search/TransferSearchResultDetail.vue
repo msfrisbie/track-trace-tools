@@ -6,11 +6,7 @@
       <div class="flex flex-col items-center space-y-8 flex-grow">
         <div class="flex flex-col space-y-2 items-center">
           <div class="flex flex-row items-center space-x-4 text-center">
-            <transfer-icon :transfer="transfer" class="text-5xl" />
-
-            <div class="text-2xl">
-              {{ transferPackageSummary }}
-            </div>
+            <div class="text-2xl text-purple-800">Manifest {{ transfer.ManifestNumber }}</div>
           </div>
 
           <b-badge :variant="badgeVariant(transfer)">{{ displayTransferState(transfer) }}</b-badge>
@@ -26,11 +22,7 @@
       </div>
     </div>
 
-    <div class="text-3xl text-purple-800 text-center">
-      {{ transferDescriptor }}
-    </div>
-
-    <div class="flex flex-col space-y-2">
+    <div class="grid grid-cols-2 gap-2">
       <b-button
         variant="outline-primary"
         size="sm"
@@ -74,41 +66,14 @@
         <span>CREATE SCAN SHEET</span>
         <font-awesome-icon icon="barcode" />
       </b-button>
-
-      <!-- <b-button
-        variant="outline-secondary"
-        size="sm"
-        @click.stop.prevent="setTransferManifestNumberFilter(transfer)"
-        >SHOW IN METRC</b-button
-      > -->
-
-      <!-- <b-button
-        variant="outline-secondary"
-        size="sm"
-        @click.stop.prevent="copyToClipboard(transfer)"
-        >COPY MANIFEST #</b-button
-      > -->
     </div>
 
-    <table class="text-lg">
-      <tr class="cursor-pointer hover:bg-purple-50" @click.stop.prevent="copyToClipboard(transfer)">
-        <td class="text-right p-2 text-gray-400 text-2xl">
-          <font-awesome-icon icon="file" />
-        </td>
-        <td class="p-2">Manifest {{ transfer.ManifestNumber }}</td>
-      </tr>
-      <tr>
-        <td class="text-right p-2 text-gray-400 text-2xl">
-          <font-awesome-icon icon="clock" />
-        </td>
-        <td class="p-2">{{ transferNextCheckpoint }}</td>
-      </tr>
-    </table>
+    <recursive-json-table :jsonObject="transfer"></recursive-json-table>
   </div>
 </template>
 
 <script lang="ts">
-import TransferIcon from "@/components/search/transfer-search/TransferIcon.vue";
+import RecursiveJsonTable from "@/components/search/shared/RecursiveJsonTable.vue";
 import {
   MessageType,
   ModalAction,
@@ -163,7 +128,10 @@ function deliveryTimeDescriptor(isodate: string | null): string {
 export default Vue.extend({
   name: "TransferSearchResultDetail",
   store,
-  components: { TransferIcon },
+  components: {
+    // TransferIcon,
+    RecursiveJsonTable,
+  },
   created() {
     searchManager.selectedTransfer
       .asObservable()
@@ -355,7 +323,7 @@ export default Vue.extend({
       });
 
       analyticsManager.track(MessageType.CLICKED_TOOLKIT_VIEW_MANIFEST_BUTTON);
-      this.$store.commit(MutationType.SET_SHOW_TRANSFER_SEARCH_RESULTS, false);
+      this.$store.commit(`transferSearch/${MutationType.SET_SHOW_TRANSFER_SEARCH_RESULTS}`, false);
     },
     downloadManifest(transfer: IIndexedTransferData) {
       const manifestUrl = `${window.location.origin}/reports/transfers/${store.state.pluginAuth?.authState?.license}/manifest?id=${transfer.ManifestNumber}`;
@@ -366,7 +334,7 @@ export default Vue.extend({
       });
 
       analyticsManager.track(MessageType.CLICKED_TOOLKIT_DOWNLOAD_BUTTON);
-      this.$store.commit(MutationType.SET_SHOW_TRANSFER_SEARCH_RESULTS, false);
+      this.$store.commit(`transferSearch/${MutationType.SET_SHOW_TRANSFER_SEARCH_RESULTS}`, false);
     },
     printManifest(transfer: IIndexedTransferData) {
       const manifestUrl = `${window.location.origin}/reports/transfers/${store.state.pluginAuth?.authState?.license}/manifest?id=${transfer.ManifestNumber}`;
@@ -374,14 +342,14 @@ export default Vue.extend({
       printPdfFromUrl({ urls: [manifestUrl], modal: true });
 
       analyticsManager.track(MessageType.CLICKED_TOOLKIT_PRINT_BUTTON);
-      this.$store.commit(MutationType.SET_SHOW_TRANSFER_SEARCH_RESULTS, false);
+      this.$store.commit(`transferSearch/${MutationType.SET_SHOW_TRANSFER_SEARCH_RESULTS}`, false);
     },
     async createScanSheet(transfer: IIndexedTransferData) {
       analyticsManager.track(MessageType.CLICKED_TOOLKIT_CREATE_SCAN_SHEET_BUTTON);
 
       await createScanSheet(transfer.Id, transfer.ManifestNumber);
 
-      this.$store.commit(MutationType.SET_SHOW_TRANSFER_SEARCH_RESULTS, false);
+      this.$store.commit(`transferSearch/${MutationType.SET_SHOW_TRANSFER_SEARCH_RESULTS}`, false);
     },
     badgeVariant(transfer: IIndexedTransferData) {
       // @ts-ignore
@@ -392,6 +360,9 @@ export default Vue.extend({
           return "primary";
         case TransferState.REJECTED:
           return "danger";
+        case TransferState.OUTGOING_INACTIVE:
+        case TransferState.INCOMING_INACTIVE:
+          return "light";
         default:
           return null;
       }

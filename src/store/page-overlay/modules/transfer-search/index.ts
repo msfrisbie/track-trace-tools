@@ -13,7 +13,7 @@ const inMemoryState = {
   transferSearchFilters: {
     manifestNumber: null,
     shipperFacilityInfo: null,
-    deliveryFacilities: null
+    deliveryFacilities: null,
   },
 };
 
@@ -157,6 +157,12 @@ export const transferSearchModule = {
             switch (k) {
               case "manifestNumber":
                 pageManager.setTransferFilter(TransferFilterIdentifiers.ManifestNumber, v);
+                break;
+              case "destinationFacilities":
+                pageManager.setTransferFilter(TransferFilterIdentifiers.DestinationFacilities, v);
+                break;
+              case "shipperFacilityInfo":
+                pageManager.setTransferFilter(TransferFilterIdentifiers.ShipperFacilityInfo, v);
                 break;
               default:
                 break;

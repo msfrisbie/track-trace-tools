@@ -78,7 +78,7 @@ export default Vue.extend({
   },
   components: { TransferSearchResultsGroup },
   computed: {
-    incomingTransfers() {
+    incomingTransfers(): IIndexedTransferData[] {
       const transfers = this.transfers.filter(
         (transferData: IIndexedTransferData) =>
           transferData.TransferState === TransferState.INCOMING
@@ -86,7 +86,7 @@ export default Vue.extend({
 
       return transfers;
     },
-    outgoingTransfers() {
+    outgoingTransfers(): IIndexedTransferData[] {
       const transfers = this.transfers.filter(
         (transferData: IIndexedTransferData) =>
           transferData.TransferState === TransferState.OUTGOING
@@ -94,7 +94,7 @@ export default Vue.extend({
 
       return transfers;
     },
-    incomingInactiveTransfers() {
+    incomingInactiveTransfers(): IIndexedTransferData[] {
       const transfers = this.transfers.filter(
         (transferData: IIndexedTransferData) =>
           transferData.TransferState === TransferState.INCOMING_INACTIVE
@@ -102,7 +102,7 @@ export default Vue.extend({
 
       return transfers;
     },
-    outgoingInactiveTransfers() {
+    outgoingInactiveTransfers(): IIndexedTransferData[] {
       const transfers = this.transfers.filter(
         (transferData: IIndexedTransferData) =>
           transferData.TransferState === TransferState.OUTGOING_INACTIVE
@@ -110,10 +110,19 @@ export default Vue.extend({
 
       return transfers;
     },
-    rejectedTransfers() {
+    rejectedTransfers(): IIndexedTransferData[] {
       const transfers = this.transfers.filter(
         (transferData: IIndexedTransferData) =>
           transferData.TransferState === TransferState.REJECTED
+      );
+
+      return transfers;
+    },
+    deliveryFacilitiesTransfers(): IIndexedTransferData[] {
+      const transfers = this.transfers.filter((transferData: IIndexedTransferData) =>
+        transferData.DeliveryFacilities.includes(
+          this.$store.state.transferSearch.transferQueryString
+        )
       );
 
       return transfers;
@@ -130,11 +139,17 @@ export default Vue.extend({
         case TransferState.INCOMING:
           await pageManager.clickTabStartingWith(pageManager.transferTabs, "Incoming");
           break;
+        case TransferState.INCOMING_INACTIVE:
+          await pageManager.clickTabStartingWith(pageManager.transferTabs, "Inactive");
+          break;
         case TransferState.OUTGOING:
           await pageManager.clickTabStartingWith(pageManager.transferTabs, "Outgoing");
           break;
         case TransferState.REJECTED:
           await pageManager.clickTabStartingWith(pageManager.transferTabs, "Rejected");
+          break;
+        case TransferState.OUTGOING_INACTIVE:
+          await pageManager.clickTabStartingWith(pageManager.transferTabs, "Inactive", "Rejected");
           break;
         default:
           return null;
@@ -146,7 +161,7 @@ export default Vue.extend({
         this.$props.transfer.ManifestNumber
       );
 
-      this.$store.commit(MutationType.SET_SHOW_TRANSFER_SEARCH_RESULTS, false);
+      this.$store.commit(`transferSearch/${MutationType.SET_SHOW_TRANSFER_SEARCH_RESULTS}`, false);
     },
   },
 });

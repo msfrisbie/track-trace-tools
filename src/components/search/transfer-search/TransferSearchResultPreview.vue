@@ -89,7 +89,7 @@ export default Vue.extend({
         this.$props.transfer.ManifestNumber
       );
 
-      this.$store.commit(MutationType.SET_SHOW_TRANSFER_SEARCH_RESULTS, false);
+      this.$store.commit(`transferSearch/${MutationType.SET_SHOW_TRANSFER_SEARCH_RESULTS}`, false);
     },
   },
 });

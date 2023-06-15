@@ -71,7 +71,7 @@ export default Vue.extend({
   },
   methods: {
     async openOptions(path = "") {
-      window.open(await browser.runtime.getURL(TRACK_TRACE_TOOLS_STANDALONE_PAGE + path), "_blank");
+      window.open(await chrome.runtime.getURL(TRACK_TRACE_TOOLS_STANDALONE_PAGE + path), "_blank");
     },
   },
 });

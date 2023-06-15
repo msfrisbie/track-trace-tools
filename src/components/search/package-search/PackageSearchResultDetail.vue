@@ -6,9 +6,7 @@
       <div class="flex flex-col items-center space-y-8 flex-grow">
         <div class="flex flex-col space-y-2 items-center">
           <div class="flex flex-row items-center space-x-4 text-center">
-            <package-icon :pkg="pkg" class="text-5xl" />
-
-            <div class="text-3xl">{{ pkg.Quantity }}{{ pkg.UnitOfMeasureAbbreviation }}</div>
+            <metrc-tag :label="pkg.Label" sideText="PACKAGE"></metrc-tag>
           </div>
 
           <b-badge :variant="badgeVariant(pkg)">{{ displayPackageState(pkg) }}</b-badge>
@@ -24,11 +22,7 @@
       </div>
     </div>
 
-    <div class="text-2xl text-purple-800 text-center demo-blur">
-      {{ pkg.Item.Name }}
-    </div>
-
-    <div class="flex flex-col items-stretch space-y-2">
+    <div class="grid grid-cols-2 gap-2">
       <template v-if="t3plusEnabled">
         <b-button
           class="w-full flex flex-row items-center justify-between space-x-4"
@@ -109,54 +103,14 @@
           </b-button>
         </div>
       </template>
-
-      <!-- <b-button
-        variant="outline-secondary"
-        
-        @click.stop.prevent="setPackageLabelFilter(pkg)"
-        >SHOW IN METRC</b-button
-      >
-
-      <b-button
-        variant="outline-secondary"
-        
-        @click.stop.prevent="copyToClipboard(pkg)"
-        >COPY TAG</b-button
-      > -->
     </div>
 
-    <table class="text-lg">
-      <tr class="cursor-pointer hover:bg-purple-50" @click.stop.prevent="copyToClipboard(pkg)">
-        <td class="text-right p-2 text-gray-400 text-2xl">
-          <font-awesome-icon icon="tag" />
-        </td>
-        <td class="p-2">
-          {{ pkg.Label }}
-        </td>
-      </tr>
-      <tr>
-        <td class="text-right p-2 text-gray-400 text-2xl">
-          <font-awesome-icon icon="box" />
-        </td>
-        <td class="p-2">{{ pkg.Item.ProductCategoryName }}</td>
-      </tr>
-      <tr>
-        <td class="text-right p-2 text-gray-400 text-2xl">
-          <font-awesome-icon icon="flask" />
-        </td>
-        <td class="p-2">{{ pkg.LabTestingStateName }}</td>
-      </tr>
-      <tr v-if="pkg.SourceHarvestNames">
-        <td class="text-right align-top p-2 text-gray-400 text-2xl">
-          <font-awesome-icon icon="cut" />
-        </td>
-        <td class="p-2">{{ pkg.SourceHarvestNames }}</td>
-      </tr>
-    </table>
+    <recursive-json-table :jsonObject="pkg"></recursive-json-table>
   </div>
 </template>
 
 <script lang="ts">
+import MetrcTag from "@/components/overlay-widget/shared/MetrcTag.vue";
 import PackageIcon from "@/components/search/package-search/PackageIcon.vue";
 import {
   MessageType,
@@ -191,11 +145,12 @@ import { Subject } from "rxjs";
 import { takeUntil } from "rxjs/operators";
 import Vue from "vue";
 import { mapActions, mapGetters, mapState } from "vuex";
+import RecursiveJsonTable from "@/components/search/shared/RecursiveJsonTable.vue";
 
 export default Vue.extend({
   name: "PackageSearchResultDetail",
   store,
-  components: { PackageIcon },
+  components: { MetrcTag, RecursiveJsonTable },
   async created() {
     searchManager.selectedPackage
       .asObservable()
