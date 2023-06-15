@@ -29,7 +29,7 @@
 <script lang="ts">
 import PlantIcon from "@/components/search/plant-search/PlantIcon.vue";
 import { MessageType, PlantState } from "@/consts";
-import { IIndexedPlantData } from "@/interfaces";
+import { IIndexedPlantData, IPluginState } from "@/interfaces";
 import { analyticsManager } from "@/modules/analytics-manager.module";
 import { PLANTS_TAB_REGEX } from "@/modules/page-manager/consts";
 import { searchManager } from "@/modules/search-manager.module";
@@ -70,9 +70,9 @@ export default Vue.extend({
     };
   },
   computed: {
-    ...mapState({
-      authState: (state: any) => state.pluginAuth.authState,
-      flags: (state: any) => state.flags,
+    ...mapState<IPluginState>({
+      authState: (state: IPluginState) => state.pluginAuth.authState,
+      flags: (state: IPluginState) => state.flags,
     }),
     isOnPlantsPage() {
       return window.location.pathname.match(PLANTS_TAB_REGEX);
@@ -99,7 +99,7 @@ export default Vue.extend({
         }
       );
 
-      (this as any).setShowPlantSearchResults({ showPlantSearchResults: false });
+      this.setShowPlantSearchResults({ showPlantSearchResults: false });
     },
     copyToClipboard(plant: IIndexedPlantData) {
       analyticsManager.track(MessageType.COPIED_TEXT, { value: plant.Label });
