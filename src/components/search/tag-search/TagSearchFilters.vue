@@ -38,10 +38,7 @@
     </b-button-group>
 
     <b-button-group>
-      <b-button
-        size="sm"
-        variant="danger"
-        @click="setTagSearchFilters({ tagSearchFilters: {} })"
+      <b-button size="sm" variant="danger" @click="setTagSearchFilters({ tagSearchFilters: {} })"
         >RESET FILTERS</b-button
       >
     </b-button-group>
@@ -52,7 +49,7 @@
 import Vue from "vue";
 import store from "@/store/page-overlay/index";
 import { ITagSearchFilters } from "@/interfaces";
-import { TAGS_TAB_REGEX } from "@/modules/page-manager/consts";
+import { TAG_TAB_REGEX } from "@/modules/page-manager/consts";
 import { mapActions, mapState } from "vuex";
 import { TagFilterIdentifiers } from "@/consts";
 import { MutationType } from "@/mutation-types";
@@ -70,7 +67,7 @@ export default Vue.extend({
       tagSearchFilters: (state: any) => state.tagSearch.tagSearchFilters,
     }),
     isOnTagsPage() {
-      return window.location.pathname.match(TAGS_TAB_REGEX);
+      return window.location.pathname.match(TAG_TAB_REGEX);
     },
     hasFiltersApplied() {
       return Object.values(this.tagSearchFilters || {}).filter((x) => !!x).length > 0;

@@ -55,7 +55,7 @@
 <script lang="ts">
 import TagSearchResultPreview from "@/components/search/tag-search/TagSearchResultPreview.vue";
 import { IIndexedTagData } from "@/interfaces";
-import { TAGS_TAB_REGEX } from "@/modules/page-manager/consts";
+import { TAG_TAB_REGEX } from "@/modules/page-manager/consts";
 import { ISelectedTagMetadata, searchManager } from "@/modules/search-manager.module";
 import store from "@/store/page-overlay/index";
 import { TagSearchActions } from "@/store/page-overlay/modules/tag-search/consts";
@@ -111,7 +111,7 @@ export default Vue.extend({
   },
   computed: {
     isOnTagsPage() {
-      return window.location.pathname.match(TAGS_TAB_REGEX);
+      return window.location.pathname.match(TAG_TAB_REGEX);
     },
     visibleTags() {
       return this.expanded || this.$data.showAll
@@ -151,14 +151,11 @@ export default Vue.extend({
         return;
       }
 
-      this.$store.dispatch(
-        `tagSearch/${TagSearchActions.PARTIAL_UPDATE_TAG_SEARCH_FILTERS}`,
-        {
-          tagSearchFilters: {
-            [this.tagFilterIdentifier]: this.tagQueryString,
-          },
-        }
-      );
+      this.$store.dispatch(`tagSearch/${TagSearchActions.PARTIAL_UPDATE_TAG_SEARCH_FILTERS}`, {
+        tagSearchFilters: {
+          [this.tagFilterIdentifier]: this.tagQueryString,
+        },
+      });
 
       searchManager.setTagSearchVisibility({ showTagSearchResults: false });
     },
@@ -167,9 +164,7 @@ export default Vue.extend({
     searchManager.selectedTag
       .asObservable()
       .pipe(takeUntil(this.$data.destroyed$))
-      .subscribe(
-        (selectedTagMetadata) => (this.$data.selectedTagMetadata = selectedTagMetadata)
-      );
+      .subscribe((selectedTagMetadata) => (this.$data.selectedTagMetadata = selectedTagMetadata));
   },
   beforeDestroy() {
     this.$data.destroyed$.next(null);

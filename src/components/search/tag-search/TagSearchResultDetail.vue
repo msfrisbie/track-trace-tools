@@ -27,11 +27,10 @@
 </template>
 
 <script lang="ts">
-import TagIcon from "@/components/search/tag-search/TagIcon.vue";
 import { MessageType, TagState } from "@/consts";
 import { IIndexedTagData, IPluginState } from "@/interfaces";
 import { analyticsManager } from "@/modules/analytics-manager.module";
-import { TAGS_TAB_REGEX } from "@/modules/page-manager/consts";
+import { TAG_TAB_REGEX } from "@/modules/page-manager/consts";
 import { searchManager } from "@/modules/search-manager.module";
 import { toastManager } from "@/modules/toast-manager.module";
 import store from "@/store/page-overlay/index";
@@ -75,7 +74,7 @@ export default Vue.extend({
       flags: (state: IPluginState) => state.flags,
     }),
     isOnTagsPage() {
-      return window.location.pathname.match(TAGS_TAB_REGEX);
+      return window.location.pathname.match(TAG_TAB_REGEX);
     },
     ...mapGetters({}),
   },
@@ -89,15 +88,12 @@ export default Vue.extend({
     async setTagLabelFilter(tag: IIndexedTagData) {
       analyticsManager.track(MessageType.SELECTED_TAG);
 
-      this.$store.dispatch(
-        `tagSearch/${TagSearchActions.PARTIAL_UPDATE_TAG_SEARCH_FILTERS}`,
-        {
-          tagState: tag.TagState,
-          tagSearchFilters: {
-            label: tag.Label,
-          },
-        }
-      );
+      this.$store.dispatch(`tagSearch/${TagSearchActions.PARTIAL_UPDATE_TAG_SEARCH_FILTERS}`, {
+        tagState: tag.TagState,
+        tagSearchFilters: {
+          label: tag.Label,
+        },
+      });
 
       this.setShowTagSearchResults({ showTagSearchResults: false });
     },
@@ -118,11 +114,12 @@ export default Vue.extend({
     badgeVariant(tag: IIndexedTagData) {
       // @ts-ignore
       switch (tag.TagState as TagState) {
-        case TagState.VEGETATIVE:
-        case TagState.FLOWERING:
+        case TagState.AVAILABLE:
           return "success";
-        case TagState.INACTIVE:
+        case TagState.USED:
           return "dark";
+        case TagState.VOIDED:
+          return "danger";
         default:
           return null;
       }

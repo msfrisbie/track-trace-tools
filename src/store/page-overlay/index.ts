@@ -43,6 +43,7 @@ import {
   splitPackageBuilderModule,
   splitPackageBuilderReducer,
 } from "./modules/split-package-builder";
+import { tagSearchModule, tagSearchReducer } from "./modules/tag-search";
 import { transferBuilderModule, transferBuilderReducer } from "./modules/transfer-builder/index";
 import { transferSearchModule, transferSearchReducer } from "./modules/transfer-search";
 
@@ -70,6 +71,7 @@ const vuexShared = {
       explorer: explorerReducer(state.explorer),
       plantSearch: plantSearchReducer(state.plantSearch),
       transferSearch: transferSearchReducer(state.transferSearch),
+      tagSearch: tagSearchReducer(state.tagSearch),
       flags: flagsReducer(state.flags),
       splitPackageBuilder: splitPackageBuilderReducer(state.splitPackageBuilder),
       promoteImmaturePlantsBuilder: promoteImmaturePlantsBuilderReducer(
@@ -399,6 +401,10 @@ const vuexStore = new Vuex.Store<IPluginState>({
     transferSearch: {
       namespaced: true,
       ...transferSearchModule,
+    },
+    tagSearch: {
+      namespaced: true,
+      ...tagSearchModule,
     },
     flags: {
       namespaced: true,

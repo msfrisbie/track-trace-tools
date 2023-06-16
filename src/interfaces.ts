@@ -29,6 +29,7 @@ import { IReportsState } from "./store/page-overlay/modules/reports/interfaces";
 import { ISearchState } from "./store/page-overlay/modules/search/interfaces";
 import { ISettingsState } from "./store/page-overlay/modules/settings/interfaces";
 import { ISplitPackageBuilderState } from "./store/page-overlay/modules/split-package-builder/interfaces";
+import { ITagSearchState } from "./store/page-overlay/modules/tag-search/interfaces";
 import {
   DriverLayoverLeg,
   ITransferBuilderState,
@@ -206,6 +207,7 @@ export interface IPluginState extends IRootState {
   packageSearch: IPackageSearchState;
   plantSearch: IPlantSearchState;
   transferSearch: ITransferSearchState;
+  tagSearch: ITagSearchState;
   splitPackageBuilder: ISplitPackageBuilderState;
   promoteImmaturePlantsBuilder: IPromoteImmaturePlantsBuilderState;
   search: ISearchState;
