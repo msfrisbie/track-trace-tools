@@ -124,7 +124,7 @@ export default Vue.extend({
       tap((queryString: string) => {
         this.$data.queryString = queryString;
       }),
-      filter((queryString: string) => queryString !== this.$store.state.tagSearch.tagQueryString),
+      filter((queryString: string) => queryString !== this.$store.state.search.queryString),
       debounceTime(500),
       tap((queryString: string) => {
         if (queryString) {
@@ -139,14 +139,14 @@ export default Vue.extend({
 
         // This also writes to the search history,
         // so this must be after debounce
-        this.setTagQueryString({ tagQueryString: queryString });
+        this.setQueryString({ queryString });
       })
     );
 
     combineLatest([
       queryString$.pipe(
         filter((queryString: string) => !!queryString),
-        startWith(this.$store.state.tagSearch?.tagQueryString || "")
+        startWith(this.$store.state.search.queryString || "")
       ),
       of(true),
     ]).subscribe(async ([queryString, tagIndexUpdated]: [string, boolean]) => {
@@ -195,8 +195,8 @@ export default Vue.extend({
   methods: {
     ...mapActions({
       setShowSearchResults: `search/${SearchActions.SET_SHOW_SEARCH_RESULTS}`,
-      setTagQueryString: `tagSearch/${TagSearchActions.SET_TAG_QUERY_STRING}`,
-      setExpandSearchOnNextLoad: `tagSearch/${TagSearchActions.SET_EXPAND_SEARCH_ON_NEXT_LOAD}`,
+      setQueryString: `search/${SearchActions.SET_QUERY_STRING}`,
+      setExpandSearchOnNextLoad: `search/${SearchActions.SET_EXPAND_SEARCH_ON_NEXT_LOAD}`,
     }),
     async setShowSearchResults({ showSearchResults }: { showSearchResults: boolean }) {
       this.setShowSearchResults({ showSearchResults });

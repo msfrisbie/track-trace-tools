@@ -125,7 +125,7 @@ export default Vue.extend({
       tap((queryString: string) => {
         this.$data.queryString = queryString;
       }),
-      filter((queryString: string) => queryString !== this.$store.state.transferQueryString),
+      filter((queryString: string) => queryString !== this.$store.state.search.queryString),
       debounceTime(500),
       tap((queryString: string) => {
         if (queryString) {
@@ -140,14 +140,14 @@ export default Vue.extend({
 
         // This also writes to the search history,
         // so this must be after debounce
-        this.setTransferQueryString({ transferQueryString: queryString });
+        this.setQueryString({ queryString });
       })
     );
 
     combineLatest([
       queryString$.pipe(
         filter((queryString: string) => !!queryString),
-        startWith(this.$store.state.transferSearch.transferQueryString || "")
+        startWith(this.$store.state.search.queryString || "")
       ),
     ]).subscribe(async ([queryString]: [string]) => {
       this.$data.searchInflight = true;
@@ -220,8 +220,8 @@ export default Vue.extend({
   methods: {
     ...mapActions({
       setShowSearchResults: `search/${SearchActions.SET_SHOW_SEARCH_RESULTS}`,
-      setTransferQueryString: `transferSearch/${TransferSearchActions.SET_TRANSFER_QUERY_STRING}`,
-      setExpandSearchOnNextLoad: `transferSearch/${TransferSearchActions.SET_EXPAND_SEARCH_ON_NEXT_LOAD}`,
+      setQueryString: `search/${SearchActions.SET_QUERY_STRING}`,
+      setExpandSearchOnNextLoad: `search/${SearchActions.SET_EXPAND_SEARCH_ON_NEXT_LOAD}`,
     }),
     search(queryString: string) {
       this.setShowSearchResults({ showSearchResults: true });

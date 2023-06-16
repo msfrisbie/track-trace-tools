@@ -3,10 +3,10 @@
     class="hide-scrollbar grid grid-cols-6 grid-rows-2"
     style="height: 100%; grid-template-rows: auto 1fr"
   >
-    <template v-if="transferSearchState.transferQueryString.length > 0">
+    <template v-if="searchState.queryString.length > 0">
       <div class="col-span-6 flex flex-row items-center space-x-2 p-4 border-purple-300 border-b">
         <p class="text-lg text-gray-600">
-          <span class="font-bold text-gray-900">{{ transferSearchState.transferQueryString }}</span>
+          <span class="font-bold text-gray-900">{{ searchState.queryString }}</span>
           matches {{ transfers.length }}{{ transfers.length === 500 ? "+" : "" }} transfers
         </p>
 
@@ -18,7 +18,7 @@
       </div>
     </template>
 
-    <template v-if="transferSearchState.transferQueryString.length > 0">
+    <template v-if="searchState.queryString.length > 0">
       <div class="flex flex-col overflow-y-auto bg-purple-50 col-span-3">
         <transfer-result-groups :transfers="transfers" />
 
@@ -77,6 +77,7 @@ export default Vue.extend({
     ...mapState<IPluginState>({
       authState: (state: IPluginState) => state.pluginAuth.authState,
       transferSearchState: (state: IPluginState) => state.transferSearch,
+      searchState: (state: IPluginState) => state.search,
     }),
     ...mapGetters({}),
     filtersApplied() {

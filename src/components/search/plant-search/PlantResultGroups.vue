@@ -50,7 +50,7 @@
 <script lang="ts">
 import Vue from "vue";
 import { MutationType } from "@/mutation-types";
-import { IIndexedPlantData } from "@/interfaces";
+import { IIndexedPlantData, IPluginState } from "@/interfaces";
 import { MessageType, PlantFilterIdentifiers, PlantState } from "@/consts";
 import { analyticsManager } from "@/modules/analytics-manager.module";
 import { pageManager } from "@/modules/page-manager/page-manager.module";
@@ -63,9 +63,12 @@ import { searchManager } from "@/modules/search-manager.module";
 import { PlantSearchActions } from "@/store/page-overlay/modules/plant-search/consts";
 import { timer } from "rxjs";
 import { SearchActions } from "@/store/page-overlay/modules/search/consts";
+import { IPlantSearchState } from "@/store/page-overlay/modules/plant-search/interfaces";
+import store from "@/store/page-overlay/index";
 
 export default Vue.extend({
   name: "PlantResultGroups",
+  store,
   props: {
     plants: Array as () => IIndexedPlantData[],
   },
@@ -74,31 +77,31 @@ export default Vue.extend({
     return {};
   },
   computed: {
-    ...mapState({
-      plantQueryString: (state: any) => state.plantSearch?.plantQueryString,
-      plantSearchFilters: (state: any) => state.plantSearch?.plantSearchFilters,
+    ...mapState<IPluginState>({
+      plantSearchData: (state: IPluginState) => state.plantSearch,
+      plantSearchFilters: (state: IPluginState) => state.plantSearch?.plantSearchFilters,
     }),
-    filtersApplied() {
+    filtersApplied(): boolean {
       return false;
     },
-    expandLabelGroup() {
-      return !!this.plantSearchFilters.label;
+    expandLabelGroup(): boolean {
+      return !!this.$store.state.plantSearch.plantSearchFilters.label;
     },
-    expandStrainNameGroup() {
+    expandStrainNameGroup(): boolean {
       if (this.expandLabelGroup) {
         return false;
       }
 
-      return !!this.plantSearchFilters.strainName;
+      return !!this.$store.state.plantSearch.plantSearchFilters.strainName;
     },
-    expandLocationNameGroup() {
+    expandLocationNameGroup(): boolean {
       if (this.expandLabelGroup) {
         return false;
       }
 
-      return !!this.plantSearchFilters.locationName;
+      return !!this.$store.state.plantSearch.plantSearchFilters.locationName;
     },
-    allPlantsPreviewLength() {
+    allPlantsPreviewLength(): number {
       // @ts-ignore
       if (this.labelPlants.length > 0) {
         return 0;
@@ -116,21 +119,25 @@ export default Vue.extend({
     },
     labelPlants(): IIndexedPlantData[] {
       const plants = this.plants.filter((plantData) =>
-        plantData.Label.includes(this.plantQueryString)
+        plantData.Label.includes(this.$store.state.search.queryString)
       );
 
       return plants;
     },
     strainNamePlants(): IIndexedPlantData[] {
       const plants = this.plants.filter((plantData) =>
-        plantData.StrainName?.toUpperCase().includes(this.plantQueryString.toUpperCase())
+        plantData.StrainName?.toUpperCase().includes(
+          this.$store.state.search.queryString.toUpperCase()
+        )
       );
 
       return plants;
     },
     locationNamePlants(): IIndexedPlantData[] {
       const plants = this.plants.filter((plantData) =>
-        plantData.LocationName?.toUpperCase().includes(this.plantQueryString.toUpperCase())
+        plantData.LocationName?.toUpperCase().includes(
+          this.$store.state.search.queryString.toUpperCase()
+        )
       );
 
       return plants;

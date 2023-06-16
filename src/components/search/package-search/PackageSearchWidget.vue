@@ -123,9 +123,7 @@ export default Vue.extend({
       tap((queryString: string) => {
         this.$data.queryString = queryString;
       }),
-      filter(
-        (queryString: string) => queryString !== this.$store.state.packageSearch.packageQueryString
-      ),
+      filter((queryString: string) => queryString !== this.$store.state.search.queryString),
       debounceTime(500),
       tap((queryString: string) => {
         if (queryString) {
@@ -140,14 +138,14 @@ export default Vue.extend({
 
         // This also writes to the search history,
         // so this must be after debounce
-        this.setPackageQueryString({ packageQueryString: queryString });
+        this.setQueryString({ queryString });
       })
     );
 
     combineLatest([
       queryString$.pipe(
         filter((queryString: string) => !!queryString),
-        startWith(this.$store.state.packageSearch?.packageQueryString || "")
+        startWith(this.$store.state.search.queryString || "")
       ),
     ]).subscribe(async ([queryString]: [string]) => {
       this.$data.searchInflight = true;
@@ -189,8 +187,8 @@ export default Vue.extend({
   methods: {
     ...mapActions({
       setShowSearchResults: `search/${SearchActions.SET_SHOW_SEARCH_RESULTS}`,
-      setPackageQueryString: `packageSearch/${PackageSearchActions.SET_PACKAGE_QUERY_STRING}`,
-      setExpandSearchOnNextLoad: `packageSearch/${PackageSearchActions.SET_EXPAND_SEARCH_ON_NEXT_LOAD}`,
+      setQueryString: `search/${SearchActions.SET_QUERY_STRING}`,
+      setExpandSearchOnNextLoad: `search/${SearchActions.SET_EXPAND_SEARCH_ON_NEXT_LOAD}`,
     }),
     search(queryString: string) {
       this.setShowSearchResults({ showSearchResults: true });

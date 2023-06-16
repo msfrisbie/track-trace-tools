@@ -2,7 +2,6 @@ import {
   BackgroundTaskState,
   ChromeStorageKeys,
   DEBUG_ATTRIBUTE,
-  SearchModalView,
   ToolkitView,
   VUEX_KEY,
 } from "@/consts";
@@ -12,13 +11,11 @@ import {
   IMetrcStatusData,
   IPluginState,
   IRootState,
-  ITagSearchFilters,
   ITrackedInteractions,
 } from "@/interfaces";
 import { isDevelopment } from "@/modules/environment.module";
 import { MutationType } from "@/mutation-types";
 import { CsvUpload } from "@/types";
-import { maybePushOntoUniqueStack } from "@/utils/search";
 import Vue from "vue";
 import Vuex from "vuex";
 import VuexPersistence from "vuex-persist";
@@ -119,17 +116,10 @@ const defaultState: IRootState = {
   loadingMessage: null,
   muteAnalytics: isDevelopment(),
   navigateOnNextLoad: false,
-  omniQueryString: "",
-  omniQueryStringHistory: [],
   searchModalView: null,
   taskQueue: [],
   taskQueuePaused: false,
   metrcStatusData: null,
-  tagQueryString: "",
-  tagQueryStringHistory: [],
-  tagSearchFilters: {
-    label: null,
-  },
   trackedInteractions: {
     dismissedScreenshotPopover: false,
     dismissedCsvBuilderPopover: false,
@@ -199,11 +189,6 @@ const vuexStore = new Vuex.Store<IPluginState>({
     [MutationType.RESET_TRACKED_INTERACTIONS](state: IRootState) {
       state.trackedInteractions = defaultState.trackedInteractions;
     },
-    [MutationType.SET_TAG_SEARCH_FILTERS](state: IRootState, tagSearchFilters: ITagSearchFilters) {
-      state.tagSearchFilters = {
-        ...tagSearchFilters,
-      };
-    },
     // [MutationType.ENQUEUE_TASK](state: IRootState, taskData: Task) {
     //   state.taskQueue.push(taskData);
     // },
@@ -242,22 +227,6 @@ const vuexStore = new Vuex.Store<IPluginState>({
     [MutationType.SET_MUTE_ANALYTICS](state: IRootState, muteAnalytics: boolean) {
       state.muteAnalytics = muteAnalytics;
     },
-    [MutationType.SET_TAG_QUERY_STRING](state: IRootState, tagQueryString: string) {
-      state.tagQueryString = tagQueryString;
-
-      state.tagQueryStringHistory = maybePushOntoUniqueStack(
-        tagQueryString,
-        state.tagQueryStringHistory
-      );
-    },
-    [MutationType.SET_OMNI_QUERY_STRING](state: IRootState, omniQueryString: string) {
-      state.omniQueryString = omniQueryString;
-
-      state.omniQueryStringHistory = maybePushOntoUniqueStack(
-        omniQueryString,
-        state.omniQueryStringHistory
-      );
-    },
     [MutationType.SET_LOADING_MESSAGE](state: IRootState, loadingMessage: string | null) {
       state.loadingMessage = loadingMessage;
     },
@@ -278,9 +247,6 @@ const vuexStore = new Vuex.Store<IPluginState>({
           state.flashMessage = null;
         }, 3000) as any;
       }
-    },
-    [MutationType.SET_SEARCH_MODAL_VIEW](state: IRootState, searchModalView: SearchModalView) {
-      state.searchModalView = searchModalView;
     },
     [MutationType.SET_BUILDER_MODAL_DISPLAY_STATE](
       state: IRootState,

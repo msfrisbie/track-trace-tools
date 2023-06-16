@@ -53,7 +53,6 @@ export default Vue.extend({
   },
   computed: {
     ...mapState<IPluginState>({
-      tagQueryString: (state: IPluginState) => state.tagSearch.tagQueryString,
       tagSearchFilters: (state: IPluginState) => state.tagSearch.tagSearchFilters,
     }),
     filtersApplied(): boolean {
@@ -71,7 +70,7 @@ export default Vue.extend({
     },
     labelTags(): IIndexedTagData[] {
       const tags = this.tags.filter((tagData) =>
-        tagData.Label.includes(this.$store.state.tagSearch.tagQueryString)
+        tagData.Label.includes(this.$store.state.search.queryString)
       );
 
       return tags;

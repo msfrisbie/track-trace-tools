@@ -140,7 +140,7 @@ export default Vue.extend({
       return !this.packageFilterIdentifier || this.packageFilterIdentifier === "label";
     },
     ...mapState<IPluginState>({
-      packageQueryString: (state: IPluginState) => state.packageSearch.packageQueryString,
+      queryString: (state: IPluginState) => state.search.queryString,
     }),
   },
   methods: {
@@ -164,7 +164,7 @@ export default Vue.extend({
         `packageSearch/${PackageSearchActions.PARTIAL_UPDATE_PACKAGE_SEARCH_FILTERS}`,
         {
           packageSearchFilters: {
-            [this.packageFilterIdentifier]: this.$store.state.packageSearch.packageQueryString,
+            [this.packageFilterIdentifier]: this.$store.state.search.queryString,
           },
         }
       );

@@ -3,7 +3,7 @@
     class="hide-scrollbar grid grid-cols-6 grid-rows-2"
     style="height: 100%; grid-template-rows: auto 1fr"
   >
-    <template v-if="tagQueryString.length > 0">
+    <template v-if="queryString.length > 0">
       <div class="col-span-6 flex flex-row items-center space-x-2 p-4 border-purple-300 border-b">
         <!-- <template v-if="filtersApplied">
           <b-button-group v-if="tagSearchFilters.locationName">
@@ -33,7 +33,7 @@
 
         <!-- <template v-if="!filtersApplied"> -->
         <p class="text-lg text-gray-600">
-          <span class="font-bold text-gray-900">{{ tagQueryString }}</span>
+          <span class="font-bold text-gray-900">{{ queryString }}</span>
           matches {{ filteredTags.length }}{{ filteredTags.length === 500 ? "+" : "" }} tags
         </p>
         <!-- </template> -->
@@ -46,7 +46,7 @@
       </div>
     </template>
 
-    <template v-if="tagQueryString.length > 0">
+    <template v-if="queryString.length > 0">
       <div class="flex flex-col overflow-y-auto bg-purple-50 col-span-3">
         <tag-result-groups :tags="filteredTags" />
 
@@ -119,7 +119,6 @@ export default Vue.extend({
   computed: {
     ...mapState({
       authState: (state: any) => state.pluginAuth.authState,
-      tagQueryString: (state: any) => state.tagSearch?.tagQueryString,
       tagSearchFilters: (state: any) => state.tagSearch?.tagSearchFilters,
     }),
     ...mapGetters({}),

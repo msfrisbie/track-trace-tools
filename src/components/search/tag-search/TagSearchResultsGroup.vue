@@ -112,12 +112,12 @@ export default Vue.extend({
   },
   computed: {
     ...mapState<IPluginState>({
-      tagQueryString: (state: IPluginState) => state.tagSearch?.tagQueryString,
+      queryString: (state: IPluginState) => state.search.queryString,
     }),
     isOnTagsPage(): boolean {
       return !!window.location.pathname.match(TAG_TAB_REGEX);
     },
-    visibleTags():IIndexedTagData[] {
+    visibleTags(): IIndexedTagData[] {
       return this.expanded || this.$data.showAll
         ? this.tags
         : this.tags.slice(0, this.previewLength);
@@ -134,7 +134,7 @@ export default Vue.extend({
           return "boxes";
       }
     },
-    disableFilter():boolean {
+    disableFilter(): boolean {
       return !this.tagFilterIdentifier || this.tagFilterIdentifier === "label";
     },
   },
@@ -157,7 +157,7 @@ export default Vue.extend({
 
       this.$store.dispatch(`tagSearch/${TagSearchActions.PARTIAL_UPDATE_TAG_SEARCH_FILTERS}`, {
         tagSearchFilters: {
-          [this.tagFilterIdentifier]: this.$store.state.tagSearch.tagQueryString,
+          [this.tagFilterIdentifier]: this.$store.state.search.queryString,
         },
       });
 

@@ -113,7 +113,7 @@ export default Vue.extend({
   },
   computed: {
     ...mapState<IPluginState>({
-      plantQueryString: (state: IPluginState) => state.plantSearch.plantQueryString,
+      queryString: (state: IPluginState) => state.search.queryString,
     }),
     isOnPlantsPage(): boolean {
       return !!window.location.pathname.match(PLANTS_TAB_REGEX);
@@ -160,7 +160,7 @@ export default Vue.extend({
         `plantSearch/${PlantSearchActions.PARTIAL_UPDATE_PLANT_SEARCH_FILTERS}`,
         {
           plantSearchFilters: {
-            [this.plantFilterIdentifier]: this.$store.state.plantSearch.plantQueryString,
+            [this.plantFilterIdentifier]: this.$store.state.search.queryString,
           },
         }
       );

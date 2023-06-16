@@ -3,7 +3,7 @@
     class="hide-scrollbar grid grid-cols-6 grid-rows-2"
     style="height: 100%; grid-template-rows: auto 1fr"
   >
-    <template v-if="plantQueryString.length > 0">
+    <template v-if="queryString.length > 0">
       <div class="col-span-6 flex flex-row items-center space-x-2 p-4 border-purple-300 border-b">
         <!-- <template v-if="filtersApplied">
           <b-button-group v-if="plantSearchFilters.locationName">
@@ -33,7 +33,7 @@
 
         <!-- <template v-if="!filtersApplied"> -->
         <p class="text-lg text-gray-600">
-          <span class="font-bold text-gray-900">{{ plantQueryString }}</span>
+          <span class="font-bold text-gray-900">{{ queryString }}</span>
           matches {{ filteredPlants.length }}{{ filteredPlants.length === 500 ? "+" : "" }} plants
         </p>
         <!-- </template> -->
@@ -46,7 +46,7 @@
       </div>
     </template>
 
-    <template v-if="plantQueryString.length > 0">
+    <template v-if="queryString.length > 0">
       <div class="flex flex-col overflow-y-auto bg-purple-50 col-span-3">
         <plant-result-groups :plants="filteredPlants" />
 
@@ -119,7 +119,7 @@ export default Vue.extend({
   computed: {
     ...mapState({
       authState: (state: any) => state.pluginAuth.authState,
-      plantQueryString: (state: any) => state.plantSearch?.plantQueryString,
+      queryString: (state: any) => state.search.ueryString,
       plantSearchFilters: (state: any) => state.plantSearch?.plantSearchFilters,
     }),
     ...mapGetters({}),

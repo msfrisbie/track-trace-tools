@@ -38,11 +38,6 @@ export interface ISelectedTagMetadata {
 class SearchManager implements IAtomicService {
   public queryString: BehaviorSubject<string> = new BehaviorSubject<string>("");
 
-  public plantQueryString: BehaviorSubject<string> = new BehaviorSubject<string>("");
-  public packageQueryString: BehaviorSubject<string> = new BehaviorSubject<string>("");
-  public transferQueryString: BehaviorSubject<string> = new BehaviorSubject<string>("");
-  public tagQueryString: BehaviorSubject<string> = new BehaviorSubject<string>("");
-
   public selectedPackage: BehaviorSubject<ISelectedPackageMetadata | null> =
     new BehaviorSubject<ISelectedPackageMetadata | null>(null);
   public selectedPlant: BehaviorSubject<ISelectedPlantMetadata | null> =

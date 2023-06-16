@@ -107,7 +107,7 @@
 <script lang="ts">
 import PackageSearchResultsGroup from "@/components/search/package-search/PackageSearchResultsGroup.vue";
 import { MessageType } from "@/consts";
-import { IIndexedPackageData } from "@/interfaces";
+import { IIndexedPackageData, IPluginState } from "@/interfaces";
 import { analyticsManager } from "@/modules/analytics-manager.module";
 import { pageManager } from "@/modules/page-manager/page-manager.module";
 import { PackageSearchActions } from "@/store/page-overlay/modules/package-search/consts";
@@ -125,57 +125,57 @@ export default Vue.extend({
     return {};
   },
   computed: {
-    ...mapState({
-      packageQueryString: (state: any) => state.packageSearch?.packageQueryString,
-      packageSearchFilters: (state: any) => state.packageSearch?.packageSearchFilters,
+    ...mapState<IPluginState>({
+      queryString: (state: IPluginState) => state.search.queryString,
+      packageSearchFilters: (state: IPluginState) => state.packageSearch?.packageSearchFilters,
     }),
     filtersApplied(): boolean {
       return false;
     },
     expandLabelGroup(): boolean {
-      return !!this.packageSearchFilters.label;
+      return !!this.$store.state.packageSearch.packageSearchFilters.label;
     },
     expandItemNameGroup(): boolean {
       if (this.expandLabelGroup) {
         return false;
       }
 
-      return !!this.packageSearchFilters.itemName;
+      return !!this.$store.state.packageSearch.packageSearchFilters.itemName;
     },
     expandItemProductCategoryGroup(): boolean {
       if (this.expandItemNameGroup) {
         return false;
       }
 
-      return !!this.packageSearchFilters.itemProductCategoryName;
+      return !!this.$store.state.packageSearch.packageSearchFilters.itemProductCategoryName;
     },
     expandItemStrainNameGroup(): boolean {
       if (this.expandItemProductCategoryGroup) {
         return false;
       }
 
-      return !!this.packageSearchFilters.itemStrainName;
+      return !!this.$store.state.packageSearch.packageSearchFilters.itemStrainName;
     },
     expandItemHarvestNameGroup(): boolean {
       if (this.expandItemStrainNameGroup) {
         return false;
       }
 
-      return !!this.packageSearchFilters.sourceHarvestName;
+      return !!this.$store.state.packageSearch.packageSearchFilters.sourceHarvestName;
     },
     expandSourcePackagelabelNameGroup(): boolean {
       if (this.expandItemHarvestNameGroup) {
         return false;
       }
 
-      return !!this.packageSearchFilters.sourcePackageLabel;
+      return !!this.$store.state.packageSearch.packageSearchFilters.sourcePackageLabel;
     },
     expandLocationNameGroup(): boolean {
       if (this.expandSourcePackagelabelNameGroup) {
         return false;
       }
 
-      return !!this.packageSearchFilters.locationName;
+      return !!this.$store.state.packageSearch.packageSearchFilters.locationName;
     },
     allPackagesPreviewLength(): number {
       if (this.labelPackages.length > 0) {
@@ -204,7 +204,7 @@ export default Vue.extend({
     },
     labelPackages(): IIndexedPackageData[] {
       const packages = this.packages.filter((packageData) =>
-        packageData.Label.includes(this.packageQueryString)
+        packageData.Label.includes(this.$store.state.search.queryString)
       );
 
       return packages;
@@ -212,7 +212,7 @@ export default Vue.extend({
     sourceHarvestNamePackages(): IIndexedPackageData[] {
       const packages = this.packages.filter((packageData) =>
         packageData.SourceHarvestNames?.toUpperCase().includes(
-          this.packageQueryString.toUpperCase()
+          this.$store.state.search.queryString.toUpperCase()
         )
       );
 
@@ -221,7 +221,7 @@ export default Vue.extend({
     sourcePackageLabelPackages(): IIndexedPackageData[] {
       const packages = this.packages.filter((packageData) =>
         packageData.SourcePackageLabels?.toUpperCase().includes(
-          this.packageQueryString.toUpperCase()
+          this.$store.state.search.queryString.toUpperCase()
         )
       );
 
@@ -229,21 +229,27 @@ export default Vue.extend({
     },
     itemNamePackages(): IIndexedPackageData[] {
       const packages = this.packages.filter((packageData) =>
-        packageData.Item?.Name?.toUpperCase().includes(this.packageQueryString.toUpperCase())
+        packageData.Item?.Name?.toUpperCase().includes(
+          this.$store.state.search.queryString.toUpperCase()
+        )
       );
 
       return packages;
     },
     itemStrainNamePackages(): IIndexedPackageData[] {
       const packages = this.packages.filter((packageData) =>
-        packageData.Item.StrainName?.toUpperCase().includes(this.packageQueryString.toUpperCase())
+        packageData.Item.StrainName?.toUpperCase().includes(
+          this.$store.state.search.queryString.toUpperCase()
+        )
       );
 
       return packages;
     },
     locationNamePackages(): IIndexedPackageData[] {
       const packages = this.packages.filter((packageData) =>
-        packageData.LocationName?.toUpperCase().includes(this.packageQueryString.toUpperCase())
+        packageData.LocationName?.toUpperCase().includes(
+          this.$store.state.search.queryString.toUpperCase()
+        )
       );
 
       return packages;
@@ -251,7 +257,7 @@ export default Vue.extend({
     itemProductCategoryNamePackages(): IIndexedPackageData[] {
       const packages = this.packages.filter((packageData) =>
         packageData.Item.ProductCategoryName?.toUpperCase().includes(
-          this.packageQueryString.toUpperCase()
+          this.$store.state.search.queryString.toUpperCase()
         )
       );
 

@@ -187,12 +187,7 @@ export interface IRootState {
   loadingMessage: string | null;
   muteAnalytics: boolean;
   navigateOnNextLoad: boolean;
-  omniQueryString: string;
-  omniQueryStringHistory: string[];
   searchModalView: SearchModalView | null;
-  tagQueryString: string;
-  tagQueryStringHistory: string[];
-  tagSearchFilters: ITagSearchFilters;
   taskQueue: Array<Task>;
   taskQueuePaused: boolean;
   trackedInteractions: ITrackedInteractions;

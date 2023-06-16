@@ -120,9 +120,7 @@ export default Vue.extend({
     },
     deliveryFacilitiesTransfers(): IIndexedTransferData[] {
       const transfers = this.transfers.filter((transferData: IIndexedTransferData) =>
-        transferData.DeliveryFacilities.includes(
-          this.$store.state.transferSearch.transferQueryString
-        )
+        transferData.DeliveryFacilities.includes(this.$store.state.search.queryString)
       );
 
       return transfers;
