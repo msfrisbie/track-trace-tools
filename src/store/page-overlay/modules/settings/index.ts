@@ -56,7 +56,7 @@ const persistedState: ISettingsState = {
   hideListingsButton: false,
   preventActiveProjectPageLeave: true,
   autoRefreshOnModalClose: false,
-  useIsoDateFormatForSubmit: true,
+  useLegacyDateFormatForSubmit: false,
   writeSettingsToChromeStorage: false,
   loadDataInParallel: true,
   usePersistedCache: false,

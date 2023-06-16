@@ -11,10 +11,7 @@ export function nowIsotime(): string {
 }
 
 export function submitDateFromIsodate(isodate: string): string {
-  // NOTE: it appears that Metrc is now submitting dates in ISO format.
-  // Leaving this alone for now, but this should be changed into a NOOP.
-
-  if (store.state.settings.useIsoDateFormatForSubmit) {
+  if (!store.state.settings.useLegacyDateFormatForSubmit) {
     return isodate;
   }
 

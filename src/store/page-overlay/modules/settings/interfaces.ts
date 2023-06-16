@@ -51,7 +51,7 @@ export interface ISettingsState {
   hideListingsButton: boolean;
   preventActiveProjectPageLeave: boolean;
   autoRefreshOnModalClose: boolean;
-  useIsoDateFormatForSubmit: boolean;
+  useLegacyDateFormatForSubmit: boolean;
   writeSettingsToChromeStorage: boolean;
   loadDataInParallel: boolean;
   usePersistedCache: boolean;

@@ -6,7 +6,7 @@
       <div class="flex flex-col items-center space-y-8 flex-grow">
         <div class="flex flex-col space-y-2 items-center">
           <div class="flex flex-col items-center space-x-4 text-center">
-            <metrc-tag :label="tag.Label" :sideText="tag.tagTypeName"></metrc-tag>
+            <metrc-tag :label="tag.Label" :sideText="tag.TagTypeName"></metrc-tag>
           </div>
 
           <b-badge class="text-lg" :variant="badgeVariant(tag)">{{ displayTagState(tag) }}</b-badge>

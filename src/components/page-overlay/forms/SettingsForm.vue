@@ -263,13 +263,13 @@
           </b-form-checkbox>
 
           <b-form-checkbox
-            id="checkbox-useIsoDateFormatForSubmit"
+            id="checkbox-useLegacyDateFormatForSubmit"
             class="mb-2"
-            v-model="settings.useIsoDateFormatForSubmit"
-            name="checkbox-useIsoDateFormatForSubmit"
+            v-model="settings.useLegacyDateFormatForSubmit"
+            name="checkbox-useLegacyDateFormatForSubmit"
             @change="onChange()"
           >
-            Use ISO format when submitting dates
+            Use legacy format when submitting dates
           </b-form-checkbox>
 
           <b-form-checkbox
