@@ -2,9 +2,10 @@
   <div class="ttt-wrapper tag-search">
     <div class="">
       <div class="flex flex-row space-x-2">
-        <div class="search-bar-container flex flex-col flex-grow">
+        <div v-on:click.stop.prevent class="search-bar-container flex flex-col flex-grow">
           <b-input-group size="md">
             <b-input-group-prepend
+              @click="setShowTagSearchResults({ showTagSearchResults: true })"
               ><b-input-group-text class="search-icon">
                 <font-awesome-icon icon="search" />
               </b-input-group-text>
@@ -15,11 +16,12 @@
             <b-form-input
               v-model="queryString"
               type="text"
-              placeholder="Tag number"
+              placeholder="Tag #, strain, location..."
+              autocomplete="off"
               @input="search($event)"
-              @click="openResultsCard"
-              @focus="openResultsCard"
-              @blur="closeResultsCard"
+              @click="setShowTagSearchResults({ showTagSearchResults: true })"
+              @focus="setShowTagSearchResults({ showTagSearchResults: true })"
+              ref="search"
             ></b-form-input>
 
             <b-input-group-append v-if="queryString.length > 0">
@@ -30,21 +32,10 @@
           </b-input-group>
 
           <!-- Anchor point for dropdown results card -->
-          <div v-if="showResultsCard && queryString.length > 0" class="search-anchor">
+          <div v-if="tagSearchState.showTagSearchResults" class="search-anchor">
             <div class="search-bar flex flex-col bg-white rounded-b-md">
               <div class="flex-grow overflow-y-auto">
-                <p v-if="queryString.length > 0 && !inflight" class="text-gray-600 p-4">
-                  <span class="font-bold text-gray-900">{{ queryString }}</span>
-                  matches {{ tags.length }} tags:
-                </p>
-
-                <p v-if="inflight" class="flex flex-row justify-center text-gray-400 p-4">
-                  <b-spinner class="ttt-purple mr-2" />Searching...
-                </p>
-
-                <div v-for="tag in visibleTags" :key="tag.Id" class="border-gray-300 border-t">
-                  <tag-search-result :tag="tag" />
-                </div>
+                <tag-search-results :tags="tags" :inflight="searchInflight" />
               </div>
 
               <div
@@ -59,7 +50,7 @@
         </div>
       </div>
 
-      <div class="mt-4">
+      <div class="my-4">
         <tag-search-filters />
       </div>
     </div>
@@ -69,124 +60,167 @@
 <script lang="ts">
 import SearchPickerSelect from "@/components/page-overlay/SearchPickerSelect.vue";
 import TagSearchFilters from "@/components/search/tag-search/TagSearchFilters.vue";
-import TagSearchResult from "@/components/search/tag-search/TagSearchResult.vue";
-import { IIndexedTagData, IIndexedTagFilters } from "@/interfaces";
+import TagSearchResults from "@/components/search/tag-search/TagSearchResults.vue";
+import { MessageType } from "@/consts";
+import { IPluginState } from "@/interfaces";
+import { analyticsManager } from "@/modules/analytics-manager.module";
 import { authManager } from "@/modules/auth-manager.module";
 import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
-import { databaseInterface } from "@/modules/database-interface.module";
-import { MutationType } from "@/mutation-types";
+import { searchManager } from "@/modules/search-manager.module";
 import store from "@/store/page-overlay/index";
+import { TagSearchActions } from "@/store/page-overlay/modules/tag-search/consts";
+import { combineLatest, Observable, of, timer } from "rxjs";
+import { debounceTime, filter, startWith, tap } from "rxjs/operators";
 import Vue from "vue";
-import { mapState } from "vuex";
-
-interface ComponentData {
-  inflight: boolean;
-  showFilters: boolean;
-  limit: number;
-  queryString: string;
-  tags: Array<IIndexedTagData>;
-  searchDebounceTimeoutId: number | null;
-  closeCardTimeoutId: number | null;
-  filters: IIndexedTagFilters;
-}
-
-const PAGE_SIZE = 10;
+import { mapActions, mapState } from "vuex";
 
 export default Vue.extend({
   name: "TagSearchWidget",
   store,
   components: {
-    TagSearchResult,
+    TagSearchResults,
     TagSearchFilters,
     SearchPickerSelect,
   },
-  data(): ComponentData {
+  data() {
     return {
-      showResultsCard: false,
-      inflight: false,
+      firstSearch: null,
+      firstSearchResolver: null,
+      searchInflight: false,
       showFilters: false,
-      queryString: "", //this.$store.state.tagQueryString,
-      limit: PAGE_SIZE,
+      queryString: "",
       tags: [],
-      searchDebounceTimeoutId: null,
-      closeCardTimeoutId: null,
       filters: {
         license: null,
       },
-    } as ComponentData;
+    };
   },
   async mounted() {
     const authState = await authManager.authStateOrError();
 
     this.$data.filters.license = authState.license;
 
-    this.$data.inflight = this.queryString?.length > 0;
+    searchManager.init();
 
-    // load tags now and show spinner
-    primaryDataLoader.availableTags({}).then(() => this.search(this.queryString));
-    // usedTags is enormous, don't index
-    // primaryDataLoader.usedTags().then(() => this.search(this.queryString));
-    primaryDataLoader.voidedTags().then(() => this.search(this.queryString));
+    document.addEventListener("keyup", (e) => {
+      if (e.isTrusted && e.key === "Escape") {
+        searchManager.setTagSearchVisibility({ showTagSearchResults: false });
+      }
+    });
+
+    document.addEventListener("click", (e) => {
+      if (e.isTrusted) {
+        searchManager.setTagSearchVisibility({ showTagSearchResults: false });
+      }
+    });
 
     // Initialize
-    this.search(this.queryString);
+    searchManager.tagQueryString.next(this.$data.queryString);
+
+    this.$data.firstSearch = new Promise((resolve) => {
+      this.$data.firstSearchResolver = resolve;
+    });
+    // this.$data.firstSearch.then(() => searchManager.indexTags());
+
+    const queryString$: Observable<string> = searchManager.tagQueryString.asObservable().pipe(
+      tap((queryString: string) => {
+        this.$data.queryString = queryString;
+      }),
+      filter(
+        (queryString: string) => queryString !== this.$store.state.tagSearch.tagQueryString
+      ),
+      debounceTime(500),
+      tap((queryString: string) => {
+        if (queryString) {
+          analyticsManager.track(MessageType.ENTERED_TAG_SEARCH_QUERY, {
+            queryString,
+          });
+        }
+
+        this.$data.tags = [];
+
+        searchManager.selectedTag.next(null);
+
+        // This also writes to the search history,
+        // so this must be after debounce
+        this.setTagQueryString({ tagQueryString: queryString });
+      })
+    );
+
+    combineLatest([
+      queryString$.pipe(
+        filter((queryString: string) => !!queryString),
+        startWith(this.$store.state.tagSearch?.tagQueryString || "")
+      ),
+      of(true),
+    ]).subscribe(async ([queryString, tagIndexUpdated]: [string, boolean]) => {
+      this.$data.searchInflight = true;
+
+      if (queryString.length > 0) {
+        this.$data.firstSearchResolver();
+      }
+
+      this.$data.tags = [];
+
+      await Promise.allSettled([
+        primaryDataLoader.onDemandFloweringTagSearch({ queryString }).then((result) => {
+          this.$data.tags = [...this.$data.tags, ...result];
+        }),
+        primaryDataLoader.onDemandVegetativeTagSearch({ queryString }).then((result) => {
+          this.$data.tags = [...this.$data.tags, ...result];
+        }),
+        primaryDataLoader.onDemandInactiveTagSearch({ queryString }).then((result) => {
+          this.$data.tags = [...this.$data.tags, ...result];
+        }),
+      ]);
+
+      this.$data.searchInflight = false;
+    });
+
+    if (this.$store.state.expandSearchOnNextLoad) {
+      this.setExpandSearchOnNextLoad({
+        expandSearchOnNextLoad: false,
+      });
+
+      searchManager.setTagSearchVisibility({ showTagSearchResults: true });
+    }
   },
   computed: {
-    visibleTags(): Array<IIndexedTagData> {
-      // return this.tags.slice(0, this.limit);
-      return this.tags;
-    },
-    ...mapState(["loadingMessage", "errorMessage", "flashMessage"]),
-    // displayPaginationButton(): boolean {
-    //   return this.tags.length > 0 && this.limit < this.tags.length;
-    // },
+    ...mapState<IPluginState>({
+      tagSearchState: (state: IPluginState) => state.tagSearch,
+    }),
   },
   methods: {
+    ...mapActions({
+      setTagQueryString: `tagSearch/${TagSearchActions.SET_TAG_QUERY_STRING}`,
+      setExpandSearchOnNextLoad: `tagSearch/${TagSearchActions.SET_EXPAND_SEARCH_ON_NEXT_LOAD}`,
+    }),
+    async setShowTagSearchResults({
+      showTagSearchResults,
+    }: {
+      showTagSearchResults: boolean;
+    }) {
+      searchManager.setTagSearchVisibility({ showTagSearchResults });
+    },
+    search(queryString: string) {
+      searchManager.setTagSearchVisibility({ showTagSearchResults: true });
+      searchManager.tagQueryString.next(queryString);
+    },
     clearSearchField() {
-      this.queryString = "";
-      this.search(this.queryString);
+      searchManager.tagQueryString.next("");
     },
-    async openResultsCard(event: any) {
-      this.$data.showResultsCard = true;
-    },
-    async closeResultsCard(event: any) {
-      // This is a hack. Immediately setting this to false cancels all click handers
-      // in the nested components.
-      this.$data.closeCardTimeoutId && clearTimeout(this.$data.closeCardTimeoutId);
-
-      this.$data.closeCardTimeoutId = window.setTimeout(() => {
-        this.$data.showResultsCard = false;
-        this.$data.closeCardTimeoutId = null;
-      }, 300);
-    },
-    async search(event: string) {
-      this.searchDebounceTimeoutId && clearTimeout(this.searchDebounceTimeoutId);
-
-      this.searchDebounceTimeoutId = window.setTimeout(async () => {
-        this.searchDebounceTimeoutId = null;
-
-        if (event !== this.$store.state.tagQueryString) {
-          this.tags = [];
+  },
+  watch: {
+    "tagSearchState.showTagSearchResults": {
+      immediate: true,
+      handler(newValue, oldValue) {
+        if (newValue) {
+          timer(500).subscribe(() =>
+            // @ts-ignore
+            this.$refs.search?.$el.focus()
+          );
         }
-
-        this.$store.commit(MutationType.SET_TAG_QUERY_STRING, event);
-
-        this.inflight = false;
-        // this.tags = [];
-        this.limit = PAGE_SIZE;
-
-        if (event.length > 0) {
-          this.inflight = true;
-
-          try {
-            this.tags = (await databaseInterface.tagSearch(event, this.filters)).slice(0, 100);
-          } catch (e) {
-            console.error(e);
-          } finally {
-            this.inflight = false;
-          }
-        }
-      }, 500);
+      },
     },
   },
 });
