@@ -9,7 +9,6 @@ import { ITransferSearchState } from "./interfaces";
 
 const inMemoryState = {
   transferQueryString: "",
-  showSearchResults: false,
   transferSearchFilters: {
     manifestNumber: null,
     shipperFacilityInfo: null,
@@ -47,12 +46,6 @@ export const transferSearchModule = {
         state.transferQueryStringHistory
       );
     },
-    [TransferSearchMutations.SET_SHOW_TRANSFER_SEARCH_RESULTS](
-      state: ITransferSearchState,
-      { showSearchResults }: { showSearchResults: boolean }
-    ) {
-      state.showSearchResults = showSearchResults;
-    },
     [TransferSearchMutations.SET_TRANSFER_SEARCH_FILTERS](
       state: ITransferSearchState,
       { transferSearchFilters }: { transferSearchFilters: ITransferSearchFilters }
@@ -77,14 +70,6 @@ export const transferSearchModule = {
       { transferQueryString }: { transferQueryString: string }
     ) {
       ctx.commit(TransferSearchMutations.SET_TRANSFER_QUERY_STRING, { transferQueryString });
-    },
-    [TransferSearchActions.SET_SHOW_TRANSFER_SEARCH_RESULTS](
-      ctx: ActionContext<ITransferSearchState, IPluginState>,
-      { showSearchResults }: { showSearchResults: boolean }
-    ) {
-      ctx.commit(TransferSearchMutations.SET_SHOW_TRANSFER_SEARCH_RESULTS, {
-        showSearchResults,
-      });
     },
     [TransferSearchActions.PARTIAL_UPDATE_TRANSFER_SEARCH_FILTERS]: async (
       ctx: ActionContext<ITransferSearchState, IPluginState>,

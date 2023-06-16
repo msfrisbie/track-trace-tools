@@ -54,7 +54,7 @@
 
 <script lang="ts">
 import PackageSearchResultPreview from "@/components/search/package-search/PackageSearchResultPreview.vue";
-import { IIndexedPackageData } from "@/interfaces";
+import { IIndexedPackageData, IPluginState } from "@/interfaces";
 import { PACKAGE_TAB_REGEX } from "@/modules/page-manager/consts";
 import { ISelectedPackageMetadata, searchManager } from "@/modules/search-manager.module";
 import store from "@/store/page-overlay/index";
@@ -111,15 +111,15 @@ export default Vue.extend({
     },
   },
   computed: {
-    isOnPackagesPage() {
-      return window.location.pathname.match(PACKAGE_TAB_REGEX);
+    isOnPackagesPage(): boolean {
+      return !!window.location.pathname.match(PACKAGE_TAB_REGEX);
     },
-    visiblePackages() {
+    visiblePackages(): IIndexedPackageData[] {
       return this.expanded || this.$data.showAll
         ? this.packages
         : this.packages.slice(0, this.previewLength);
     },
-    groupIcon() {
+    groupIcon(): string {
       switch (this.packageFilterIdentifier) {
         case "label":
         case "sourcePackageLabel":
@@ -136,11 +136,11 @@ export default Vue.extend({
           return "boxes";
       }
     },
-    disableFilter() {
+    disableFilter(): boolean {
       return !this.packageFilterIdentifier || this.packageFilterIdentifier === "label";
     },
-    ...mapState({
-      packageQueryString: (state: any) => state.packageSearch?.packageQueryString,
+    ...mapState<IPluginState>({
+      packageQueryString: (state: IPluginState) => state.packageSearch.packageQueryString,
     }),
   },
   methods: {
@@ -164,12 +164,12 @@ export default Vue.extend({
         `packageSearch/${PackageSearchActions.PARTIAL_UPDATE_PACKAGE_SEARCH_FILTERS}`,
         {
           packageSearchFilters: {
-            [this.packageFilterIdentifier]: this.packageQueryString,
+            [this.packageFilterIdentifier]: this.$store.state.packageSearch.packageQueryString,
           },
         }
       );
 
-      this.setShowSearchresults({ showSearchResults: false });
+      this.setShowSearchResults({ showSearchResults: false });
     },
   },
   created() {

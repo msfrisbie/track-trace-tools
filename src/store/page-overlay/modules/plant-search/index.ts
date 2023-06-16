@@ -8,8 +8,7 @@ import { PlantSearchActions, PlantSearchMutations } from "./consts";
 import { IPlantSearchState } from "./interfaces";
 
 const inMemoryState = {
-  plantQueryString: "",
-  showSearchResults: false,
+  plantQueryString: "",\
   plantSearchFilters: {
     label: null,
     strainName: null,
@@ -47,12 +46,6 @@ export const plantSearchModule = {
         state.plantQueryStringHistory
       );
     },
-    [PlantSearchMutations.SET_SHOW_PLANT_SEARCH_RESULTS](
-      state: IPlantSearchState,
-      { showSearchResults }: { showSearchResults: boolean }
-    ) {
-      state.showSearchResults = showSearchResults;
-    },
     [PlantSearchMutations.SET_PLANT_SEARCH_FILTERS](
       state: IPlantSearchState,
       { plantSearchFilters }: { plantSearchFilters: IPlantSearchFilters }
@@ -75,14 +68,6 @@ export const plantSearchModule = {
       { plantQueryString }: { plantQueryString: string }
     ) {
       ctx.commit(PlantSearchMutations.SET_PLANT_QUERY_STRING, { plantQueryString });
-    },
-    [PlantSearchActions.SET_SHOW_PLANT_SEARCH_RESULTS](
-      ctx: ActionContext<IPlantSearchState, IPluginState>,
-      { showSearchResults }: { showSearchResults: boolean }
-    ) {
-      ctx.commit(PlantSearchMutations.SET_SHOW_PLANT_SEARCH_RESULTS, {
-        showSearchResults,
-      });
     },
     [PlantSearchActions.PARTIAL_UPDATE_PLANT_SEARCH_FILTERS]: async (
       ctx: ActionContext<IPlantSearchState, IPluginState>,

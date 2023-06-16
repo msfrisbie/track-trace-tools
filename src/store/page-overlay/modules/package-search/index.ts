@@ -9,7 +9,6 @@ import { IPackageSearchState } from "./interfaces";
 
 const inMemoryState = {
   packageQueryString: "",
-  showSearchResults: false,
   packageSearchFilters: {
     label: null,
     sourceHarvestName: null,
@@ -51,12 +50,6 @@ export const packageSearchModule = {
         state.packageQueryStringHistory
       );
     },
-    [PackageSearchMutations.SET_SHOW_PACKAGE_SEARCH_RESULTS](
-      state: IPackageSearchState,
-      { showSearchResults }: { showSearchResults: boolean }
-    ) {
-      state.showSearchResults = showSearchResults;
-    },
     [PackageSearchMutations.SET_PACKAGE_SEARCH_FILTERS](
       state: IPackageSearchState,
       { packageSearchFilters }: { packageSearchFilters: IPackageSearchFilters }
@@ -79,14 +72,6 @@ export const packageSearchModule = {
       { packageQueryString }: { packageQueryString: string }
     ) {
       ctx.commit(PackageSearchMutations.SET_PACKAGE_QUERY_STRING, { packageQueryString });
-    },
-    [PackageSearchActions.SET_SHOW_PACKAGE_SEARCH_RESULTS](
-      ctx: ActionContext<IPackageSearchState, IPluginState>,
-      { showSearchResults }: { showSearchResults: boolean }
-    ) {
-      ctx.commit(PackageSearchMutations.SET_SHOW_PACKAGE_SEARCH_RESULTS, {
-        showSearchResults,
-      });
     },
     [PackageSearchActions.PARTIAL_UPDATE_PACKAGE_SEARCH_FILTERS]: async (
       ctx: ActionContext<IPackageSearchState, IPluginState>,
