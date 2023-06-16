@@ -880,13 +880,13 @@ export class DataLoader implements IAtomicService {
   onDemandTagSearchBody({ queryString }: { queryString: string }): string {
     return JSON.stringify({
       request: {
-        take: DATA_LOAD_PAGE_SIZE,
+        take: 500,
         skip: 0,
         page: 1,
-        pageSize: DATA_LOAD_PAGE_SIZE,
+        pageSize: 500,
         filter: {
           logic: "or",
-          filters: [{ field: "Label", operator: "contains", value: queryString }],
+          filters: [{ field: "Label", operator: "endswith", value: queryString }],
         },
         group: [],
       },
