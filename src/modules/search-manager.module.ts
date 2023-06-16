@@ -9,6 +9,7 @@ import {
 import store from "@/store/page-overlay/index";
 import { PackageSearchActions } from "@/store/page-overlay/modules/package-search/consts";
 import { PlantSearchActions } from "@/store/page-overlay/modules/plant-search/consts";
+import { TagSearchActions } from "@/store/page-overlay/modules/tag-search/consts";
 import { TransferSearchActions } from "@/store/page-overlay/modules/transfer-search/consts";
 import { BehaviorSubject } from "rxjs";
 import { take } from "rxjs/operators";
@@ -40,6 +41,11 @@ export interface ISelectedTagMetadata {
 // let timeoutId: any = null;
 
 class SearchManager implements IAtomicService {
+  public plantQueryString: BehaviorSubject<string> = new BehaviorSubject<string>("");	
+  public packageQueryString: BehaviorSubject<string> = new BehaviorSubject<string>("");	
+  public transferQueryString: BehaviorSubject<string> = new BehaviorSubject<string>("");
+  public tagQueryString: BehaviorSubject<string> = new BehaviorSubject<string>("");
+
   public selectedPackage: BehaviorSubject<ISelectedPackageMetadata | null> =
     new BehaviorSubject<ISelectedPackageMetadata | null>(null);
   public selectedPlant: BehaviorSubject<ISelectedPlantMetadata | null> =

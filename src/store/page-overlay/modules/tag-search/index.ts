@@ -131,8 +131,6 @@ export const tagSearchModule = {
     ) {
       const defaultTagSearchFilters = {
         label: null,
-        strainName: null,
-        locationName: null,
       };
 
       tagSearchFilters = {
@@ -147,12 +145,6 @@ export const tagSearchModule = {
             switch (k) {
               case "label":
                 pageManager.setTagFilter(TagFilterIdentifiers.Label, v);
-                break;
-              case "strainName":
-                pageManager.setTagFilter(TagFilterIdentifiers.StrainName, v);
-                break;
-              case "locationName":
-                pageManager.setTagFilter(TagFilterIdentifiers.LocationName, v);
                 break;
               default:
                 break;

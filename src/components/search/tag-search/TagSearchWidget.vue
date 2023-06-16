@@ -61,7 +61,7 @@
 import SearchPickerSelect from "@/components/page-overlay/SearchPickerSelect.vue";
 import TagSearchFilters from "@/components/search/tag-search/TagSearchFilters.vue";
 import TagSearchResults from "@/components/search/tag-search/TagSearchResults.vue";
-import { MessageType } from "@/consts";
+import { MessageType, TagState } from "@/consts";
 import { IPluginState } from "@/interfaces";
 import { analyticsManager } from "@/modules/analytics-manager.module";
 import { authManager } from "@/modules/auth-manager.module";
@@ -163,13 +163,13 @@ export default Vue.extend({
       this.$data.tags = [];
 
       await Promise.allSettled([
-        primaryDataLoader.onDemandFloweringTagSearch({ queryString }).then((result) => {
+        primaryDataLoader.onDemandTagSearch({ queryString, tagState: TagState.AVAILABLE }).then((result) => {
           this.$data.tags = [...this.$data.tags, ...result];
         }),
-        primaryDataLoader.onDemandVegetativeTagSearch({ queryString }).then((result) => {
+        primaryDataLoader.onDemandTagSearch({ queryString, tagState: TagState.USED }).then((result) => {
           this.$data.tags = [...this.$data.tags, ...result];
         }),
-        primaryDataLoader.onDemandInactiveTagSearch({ queryString }).then((result) => {
+        primaryDataLoader.onDemandTagSearch({ queryString, tagState: TagState.VOIDED }).then((result) => {
           this.$data.tags = [...this.$data.tags, ...result];
         }),
       ]);

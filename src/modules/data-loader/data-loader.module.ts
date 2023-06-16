@@ -877,6 +877,22 @@ export class DataLoader implements IAtomicService {
     });
   }
 
+  onDemandTagSearchBody({ queryString }: { queryString: string }): string {
+    return JSON.stringify({
+      request: {
+        take: DATA_LOAD_PAGE_SIZE,
+        skip: 0,
+        page: 1,
+        pageSize: DATA_LOAD_PAGE_SIZE,
+        filter: {
+          logic: "or",
+          filters: [{ field: "Label", operator: "contains", value: queryString }],
+        },
+        group: [],
+      },
+    });
+  }
+
   onDemandPlantSearchBody({ queryString }: { queryString: string }): string {
     return JSON.stringify({
       request: {
@@ -1550,7 +1566,7 @@ export class DataLoader implements IAtomicService {
         transferResponse = await primaryMetrcRequestManager.getRejectedTransfers(body);
         break;
       default:
-        throw new Error('Invalid transfer state');
+        throw new Error("Invalid transfer state");
     }
 
     if (transferResponse.status === 200) {
@@ -1567,6 +1583,48 @@ export class DataLoader implements IAtomicService {
     }
 
     return transfers;
+  }
+
+  async onDemandTagSearch({
+    tagState,
+    queryString,
+  }: {
+    tagState: TagState;
+    queryString: string;
+  }): Promise<IIndexedTagData[]> {
+    let tags: IIndexedTagData[] = [];
+
+    const body = this.onDemandTagSearchBody({ queryString });
+
+    let tagResponse;
+    switch (tagState) {
+      case TagState.AVAILABLE:
+        tagResponse = await primaryMetrcRequestManager.getAvailableTags(body);
+        break;
+      case TagState.USED:
+        tagResponse = await primaryMetrcRequestManager.getUsedTags(body);
+        break;
+      case TagState.VOIDED:
+        tagResponse = await primaryMetrcRequestManager.getVoidedTags(body);
+        break;
+      default:
+        throw new Error("Invalid transfer state");
+    }
+
+    if (tagResponse.status === 200) {
+      const responseData: ICollectionResponse<ITagData> = await tagResponse.json();
+
+      tags = responseData["Data"].map((x) => ({
+        ...x,
+        TagState: tagState,
+        TagMatcher: "",
+        LicenseNumber: this._authState!.license,
+      }));
+    } else {
+      console.error(`${tagState} tags request failed.`);
+    }
+
+    return tags;
   }
 
   async incomingTransfers(resetCache: boolean = false): Promise<IIndexedTransferData[]> {

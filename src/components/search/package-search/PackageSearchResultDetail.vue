@@ -9,7 +9,9 @@
             <metrc-tag :label="pkg.Label" sideText="PACKAGE"></metrc-tag>
           </div>
 
-          <b-badge :variant="badgeVariant(pkg)">{{ displayPackageState(pkg) }}</b-badge>
+          <b-badge class="text-lg" :variant="badgeVariant(pkg)">{{
+            displayPackageState(pkg)
+          }}</b-badge>
         </div>
       </div>
 
@@ -293,12 +295,7 @@ export default Vue.extend({
       }
     },
     displayPackageState(pkg: IIndexedPackageData) {
-      switch (pkg.PackageState) {
-        case PackageState.IN_TRANSIT:
-          return PackageState.IN_TRANSIT;
-        default:
-          return pkg.PackageState;
-      }
+      return pkg.PackageState.replaceAll("_", " ");
     },
     async viewLabResult(pkg: IIndexedPackageData) {
       const urls = await getLabTestUrlsFromPackage({ pkg });

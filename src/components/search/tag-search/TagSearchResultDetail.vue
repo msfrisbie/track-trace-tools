@@ -6,10 +6,10 @@
       <div class="flex flex-col items-center space-y-8 flex-grow">
         <div class="flex flex-col space-y-2 items-center">
           <div class="flex flex-col items-center space-x-4 text-center">
-            <metrc-tag :label="tag.Label" sideText="TAG"></metrc-tag>
+            <metrc-tag :label="tag.Label" :sideText="tag.tagTypeName"></metrc-tag>
           </div>
 
-          <b-badge :variant="badgeVariant(tag)">{{ displayTagState(tag) }}</b-badge>
+          <b-badge class="text-lg" :variant="badgeVariant(tag)">{{ displayTagState(tag) }}</b-badge>
         </div>
       </div>
 
@@ -125,7 +125,7 @@ export default Vue.extend({
       }
     },
     displayTagState(tag: IIndexedTagData) {
-      return tag.TagState;
+      return tag.TagState.replaceAll('_', ' ');
     },
   },
 });

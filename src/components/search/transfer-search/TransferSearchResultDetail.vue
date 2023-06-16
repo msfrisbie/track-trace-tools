@@ -9,7 +9,9 @@
             <div class="text-2xl text-purple-800">Manifest {{ transfer.ManifestNumber }}</div>
           </div>
 
-          <b-badge :variant="badgeVariant(transfer)">{{ displayTransferState(transfer) }}</b-badge>
+          <b-badge class="text-lg" :variant="badgeVariant(transfer)">{{
+            displayTransferState(transfer)
+          }}</b-badge>
         </div>
       </div>
 
@@ -293,7 +295,6 @@ export default Vue.extend({
 
       pageManager.setTransferFilter(
         TransferFilterIdentifiers.ManifestNumber,
-        // @ts-ignore
         transfer.ManifestNumber
       );
 
@@ -352,7 +353,6 @@ export default Vue.extend({
       this.$store.commit(`transferSearch/${MutationType.SET_SHOW_TRANSFER_SEARCH_RESULTS}`, false);
     },
     badgeVariant(transfer: IIndexedTransferData) {
-      // @ts-ignore
       switch (transfer.TransferState as TransferState) {
         case TransferState.INCOMING:
           return "success";
@@ -368,8 +368,7 @@ export default Vue.extend({
       }
     },
     displayTransferState(transfer: IIndexedTransferData) {
-      // @ts-ignore
-      return transfer.TransferState;
+      return transfer.TransferState.replaceAll("_", " ");
     },
   },
 });

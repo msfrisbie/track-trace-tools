@@ -9,7 +9,9 @@
             <metrc-tag :label="plant.Label" sideText="PLANT"></metrc-tag>
           </div>
 
-          <b-badge :variant="badgeVariant(plant)">{{ displayPlantState(plant) }}</b-badge>
+          <b-badge class="text-lg" :variant="badgeVariant(plant)">{{
+            displayPlantState(plant)
+          }}</b-badge>
         </div>
       </div>
 
@@ -128,7 +130,7 @@ export default Vue.extend({
       }
     },
     displayPlantState(plant: IIndexedPlantData) {
-      return plant.PlantState;
+      return plant.PlantState.replaceAll('_', ' ');
     },
   },
 });
