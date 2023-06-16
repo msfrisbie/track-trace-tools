@@ -31,7 +31,7 @@
           </b-input-group>
 
           <!-- Anchor point for dropdown results card -->
-          <div v-if="transferSearchState.showSearchResults" class="search-anchor">
+          <div v-if="searchState.showSearchResults" class="search-anchor">
             <div class="search-bar flex flex-col bg-white rounded-b-md">
               <div class="flex-grow overflow-y-auto">
                 <transfer-search-results :transfers="transfers" :inflight="searchInflight" />
@@ -215,6 +215,7 @@ export default Vue.extend({
   computed: {
     ...mapState<IPluginState>({
       transferSearchState: (state: IPluginState) => state.transferSearch,
+      searchState: (state: IPluginState) => state.search,
     }),
   },
   methods: {
@@ -232,7 +233,7 @@ export default Vue.extend({
     },
   },
   watch: {
-    "transferSearchState.showSearchResults": {
+    "searchState.showSearchResults": {
       immediate: true,
       handler(newValue, oldValue) {
         if (newValue) {

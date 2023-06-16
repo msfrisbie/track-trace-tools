@@ -31,7 +31,7 @@
           </b-input-group>
 
           <!-- Anchor point for dropdown results card -->
-          <div v-if="tagSearchState.showSearchResults" class="search-anchor">
+          <div v-if="searchState.showSearchResults" class="search-anchor">
             <div class="search-bar flex flex-col bg-white rounded-b-md">
               <div class="flex-grow overflow-y-auto">
                 <tag-search-results :tags="tags" :inflight="searchInflight" />
@@ -156,6 +156,8 @@ export default Vue.extend({
         this.$data.firstSearchResolver();
       }
 
+      TODO move these into modules
+
       this.$data.tags = [];
 
       await Promise.allSettled([
@@ -190,6 +192,7 @@ export default Vue.extend({
   computed: {
     ...mapState<IPluginState>({
       tagSearchState: (state: IPluginState) => state.tagSearch,
+      searchState: (state: IPluginState) => state.search,
     }),
   },
   methods: {
@@ -210,7 +213,7 @@ export default Vue.extend({
     },
   },
   watch: {
-    "tagSearchState.showSearchResults": {
+    "searchState.showSearchResults": {
       immediate: true,
       handler(newValue, oldValue) {
         if (newValue) {

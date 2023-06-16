@@ -1,34 +1,38 @@
 <template>
   <div
-    class="flex flex-col items-stretch"
+    class="ttt-wrapper flex flex-col items-stretch"
     v-bind:class="{ 'inline-search': !enableModalStyling, 'modal-search': enableModalStyling }"
   >
-    <b-input-group size="md">
-      <b-input-group-prepend @click="setShowSearchResults({ showSearchResults: true })"
-        ><b-input-group-text class="search-icon">
-          <font-awesome-icon icon="search" />
-        </b-input-group-text>
+    <div class="flex flex-row space-x-2">
+      <div v-on:click.stop.prevent class="search-bar-container flex flex-col flex-grow">
+        <b-input-group size="md">
+          <b-input-group-prepend @click="setShowSearchResults({ showSearchResults: true })"
+            ><b-input-group-text class="search-icon">
+              <font-awesome-icon icon="search" />
+            </b-input-group-text>
 
-        <search-picker-select />
-      </b-input-group-prepend>
+            <search-picker-select />
+          </b-input-group-prepend>
 
-      <b-form-input
-        v-model="queryString"
-        type="text"
-        placeholder="Tag #, item, location, harvest, strain..."
-        autocomplete="off"
-        @input="search($event)"
-        @click="setShowSearchResults({ showSearchResults: true })"
-        @focus="setShowSearchResults({ showSearchResults: true })"
-        ref="search"
-      ></b-form-input>
+          <b-form-input
+            v-model="queryString"
+            type="text"
+            placeholder="Packages, plants, tags, transfers"
+            autocomplete="off"
+            @input="setQueryString({ queryString: $event })"
+            @click="setShowSearchResults({ showSearchResults: true })"
+            @focus="setShowSearchResults({ showSearchResults: true })"
+            ref="search"
+          ></b-form-input>
 
-      <b-input-group-append v-if="queryString.length > 0">
-        <b-button variant="light" @click="clearSearchField"
-          ><font-awesome-icon icon="backspace"
-        /></b-button>
-      </b-input-group-append>
-    </b-input-group>
+          <b-input-group-append v-if="queryString.length > 0">
+            <b-button variant="light" @click="setQueryString({ queryString: '' })"
+              ><font-awesome-icon icon="backspace"
+            /></b-button>
+          </b-input-group-append>
+        </b-input-group>
+      </div>
+    </div>
 
     <template v-if="searchType === 'PACKAGES'">
       <package-search-widget />
@@ -56,6 +60,7 @@ import PackageSearchWidget from "@/components/search/package-search/PackageSearc
 import PlantSearchWidget from "@/components/search/plant-search/PlantSearchWidget.vue";
 import { SearchActions } from "@/store/page-overlay/modules/search/consts";
 import { IPluginState } from "@/interfaces";
+import SearchPickerSelect from "@/components/page-overlay/SearchPickerSelect.vue";
 
 export default Vue.extend({
   name: "UnifiedSearchWidget",
@@ -73,11 +78,20 @@ export default Vue.extend({
     TransferSearchWidget,
     PackageSearchWidget,
     PlantSearchWidget,
+    SearchPickerSelect,
   },
   computed: {
     ...mapState<IPluginState>({
       searchType: (state: IPluginState) => state.search.searchType,
     }),
+    queryString: {
+      get(): string {
+        return this.$store.state.search.queryString;
+      },
+      set(queryString: string): void {
+        this.setQueryString({ queryString });
+      },
+    },
   },
   data() {
     return {};
@@ -85,12 +99,12 @@ export default Vue.extend({
   methods: {
     ...mapActions({
       setSearchType: `search/${SearchActions.INITIALIZE_SEARCH_TYPE}`,
+      setQueryString: `search/${SearchActions.SET_QUERY_STRING}`,
+      setShowSearchResults: `search/${SearchActions.SET_SHOW_SEARCH_RESULTS}`,
     }),
   },
   async created() {},
-  async mounted() {
-    
-  },
+  async mounted() {},
 });
 </script>
 

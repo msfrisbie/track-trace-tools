@@ -31,7 +31,7 @@
           </b-input-group>
 
           <!-- Anchor point for dropdown results card -->
-          <div v-if="plantSearchState.showSearchResults" class="search-anchor">
+          <div v-if="searchState.showSearchResults" class="search-anchor">
             <div class="search-bar flex flex-col bg-white rounded-b-md">
               <div class="flex-grow overflow-y-auto">
                 <plant-search-results :plants="plants" :inflight="searchInflight" />
@@ -184,6 +184,7 @@ export default Vue.extend({
   computed: {
     ...mapState<IPluginState>({
       plantSearchState: (state: IPluginState) => state.plantSearch,
+      searchState: (state: IPluginState) => state.search,
     }),
   },
   methods: {
@@ -201,7 +202,7 @@ export default Vue.extend({
     },
   },
   watch: {
-    "plantSearchState.showSearchResults": {
+    "searchState.showSearchResults": {
       immediate: true,
       handler(newValue, oldValue) {
         if (newValue) {

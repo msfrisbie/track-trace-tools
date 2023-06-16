@@ -1,11 +1,15 @@
+import { MessageType } from "@/consts";
 import { IPluginState } from "@/interfaces";
+import { analyticsManager } from "@/modules/analytics-manager.module";
 import {
   PACKAGE_TAB_REGEX,
   PLANTS_TAB_REGEX,
   TAG_TAB_REGEX,
   TRANSFER_TAB_REGEX,
 } from "@/modules/page-manager/consts";
+import { searchManager } from "@/modules/search-manager.module";
 import { maybePushOntoUniqueStack } from "@/utils/search";
+import _ from "lodash-es";
 import { ActionContext } from "vuex";
 import { SearchActions } from "./consts";
 import { ISearchState, SearchType } from "./interfaces";
@@ -43,10 +47,7 @@ export const searchModule = {
     ) {
       ctx.state.queryString = queryString;
 
-      ctx.state.queryStringHistory = maybePushOntoUniqueStack(
-        queryString,
-        ctx.state.queryStringHistory
-      );
+      ctx.dispatch(SearchActions.EXECUTE_QUERY, { queryString });
     },
     [SearchActions.SET_SHOW_SEARCH_RESULTS](
       ctx: ActionContext<ISearchState, IPluginState>,
@@ -73,6 +74,31 @@ export const searchModule = {
         ctx.dispatch(SearchActions.SET_SEARCH_TYPE, { searchType: "PACKAGES" });
       }
     },
+    [SearchActions.EXECUTE_QUERY]: _.debounce(
+      (
+        ctx: ActionContext<ISearchState, IPluginState>,
+        { queryString }: { queryString: string }
+      ) => {
+        if (!queryString.length) {
+          return;
+        }
+
+        analyticsManager.track(MessageType.ENTERED_SEARCH_QUERY, {
+          queryString,
+        });
+
+        ctx.state.queryStringHistory = maybePushOntoUniqueStack(
+          queryString,
+          ctx.state.queryStringHistory
+        );
+
+        searchManager.selectedPackage.next(null);
+        searchManager.selectedPlant.next(null);
+        searchManager.selectedTag.next(null);
+        searchManager.selectedTransfer.next(null);
+      },
+      500
+    ),
   },
 };
 
