@@ -38,6 +38,7 @@
       <builder-modal ref="builder" />
       <document-modal ref="document" />
       <promo-modal ref="promo" />
+      <search-modal ref="search" />
     </div>
   </div>
 </template>
@@ -48,6 +49,7 @@ import ContextMenu from "@/components/overlay-widget/ContextMenu.vue";
 import DebugModal from "@/components/overlay-widget/debug/DebugModal.vue";
 import DocumentModal from "@/components/overlay-widget/DocumentModal.vue";
 import PromoModal from "@/components/overlay-widget/PromoModal.vue";
+import SearchModal from "@/components/overlay-widget/SearchModal.vue";
 import MetrcTag from "@/components/overlay-widget/shared/MetrcTag.vue";
 import { ModalAction, ModalType } from "@/consts";
 import { IContextMenuEvent, IModalEvent, modalManager } from "@/modules/modal-manager.module";
@@ -70,6 +72,7 @@ export default Vue.extend({
     BuilderModal,
     DebugModal,
     DocumentModal,
+    SearchModal,
     ContextMenu,
     MetrcTag,
     PromoModal,
@@ -86,11 +89,12 @@ export default Vue.extend({
 
     document.addEventListener("keydown", (e) => {
       // ß is the macOS alt value
-      if (e.altKey && (e.key === "ß" || e.key === "s")) {
+      if (e.altKey && (e.key === "ß" || e.key === "q")) {
         (this.$refs.document as any)?.hide();
         (this.$refs.promo as any)?.hide();
         (this.$refs.builder as any)?.hide();
         (this.$refs.debug as any)?.toggle();
+        (this.$refs.search as any)?.hide();
       }
 
       // † is the macOS alt value
@@ -99,6 +103,13 @@ export default Vue.extend({
         (this.$refs.debug as any)?.hide();
         (this.$refs.promo as any)?.hide();
         (this.$refs.builder as any)?.toggle();
+        (this.$refs.search as any)?.hide();
+      } else if (e.altKey && (e.key === "†" || e.key === "s")) {
+        (this.$refs.document as any)?.hide();
+        (this.$refs.debug as any)?.hide();
+        (this.$refs.promo as any)?.hide();
+        (this.$refs.builder as any)?.hide();
+        (this.$refs.search as any)?.toggle();
       }
     });
 
@@ -152,6 +163,9 @@ export default Vue.extend({
             break;
           case ModalType.PROMO:
             modal = this.$refs.promo;
+            break;
+          case ModalType.SEARCH:
+            modal = this.$refs.search;
             break;
           default:
             throw new Error("Invalid modal type");
