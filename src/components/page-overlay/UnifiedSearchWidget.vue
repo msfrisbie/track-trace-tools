@@ -1,9 +1,35 @@
 <template>
   <div
-    v-bind:class="{
-      'max-z': enableMetrcModalMode,
-    }"
+    class="flex flex-col items-stretch"
+    v-bind:class="{ 'inline-search': !enableModalStyling, 'modal-search': enableModalStyling }"
   >
+    <b-input-group size="md">
+      <b-input-group-prepend @click="setShowSearchResults({ showSearchResults: true })"
+        ><b-input-group-text class="search-icon">
+          <font-awesome-icon icon="search" />
+        </b-input-group-text>
+
+        <search-picker-select />
+      </b-input-group-prepend>
+
+      <b-form-input
+        v-model="queryString"
+        type="text"
+        placeholder="Tag #, item, location, harvest, strain..."
+        autocomplete="off"
+        @input="search($event)"
+        @click="setShowSearchResults({ showSearchResults: true })"
+        @focus="setShowSearchResults({ showSearchResults: true })"
+        ref="search"
+      ></b-form-input>
+
+      <b-input-group-append v-if="queryString.length > 0">
+        <b-button variant="light" @click="clearSearchField"
+          ><font-awesome-icon icon="backspace"
+        /></b-button>
+      </b-input-group-append>
+    </b-input-group>
+
     <template v-if="searchType === 'PACKAGES'">
       <package-search-widget />
     </template>
@@ -29,21 +55,19 @@ import TransferSearchWidget from "@/components/search/transfer-search/TransferSe
 import PackageSearchWidget from "@/components/search/package-search/PackageSearchWidget.vue";
 import PlantSearchWidget from "@/components/search/plant-search/PlantSearchWidget.vue";
 import { SearchActions } from "@/store/page-overlay/modules/search/consts";
-import { SearchType } from "@/store/page-overlay/modules/search/interfaces";
-import { timer } from "rxjs";
-import {
-  PLANTS_TAB_REGEX,
-  TAG_TAB_REGEX,
-  TRANSFER_TAB_REGEX,
-  PACKAGE_TAB_REGEX,
-} from "@/modules/page-manager/consts";
 import { IPluginState } from "@/interfaces";
 
 export default Vue.extend({
   name: "UnifiedSearchWidget",
   store,
   router,
-  props: {},
+  props: {
+    enableModalStyling: {
+      type: Boolean,
+      default: false,
+      required: false,
+    },
+  },
   components: {
     TagSearchWidget,
     TransferSearchWidget,
@@ -53,55 +77,18 @@ export default Vue.extend({
   computed: {
     ...mapState<IPluginState>({
       searchType: (state: IPluginState) => state.search.searchType,
-      enableSearchOverMetrcModal: (state: IPluginState) =>
-        state.settings.enableSearchOverMetrcModal,
     }),
-    searchType: {
-      get(): SearchType {
-        return this.$store.state.search.searchType;
-      },
-      set(searchType: SearchType) {
-        this.setSearchType({ searchType });
-      },
-    },
-    enableMetrcModalMode(): boolean {
-      return false;
-
-      // if (!this.enableSearchOverMetrcModal) {
-      //   return false;
-      // }
-
-      // return this.$data.metrcModalVislble;
-    },
   },
   data() {
-    return {
-      metrcModalVislble: false,
-    };
+    return {};
   },
   methods: {
     ...mapActions({
-      setSearchType: `search/${SearchActions.SET_SEARCH_TYPE}`,
+      setSearchType: `search/${SearchActions.INITIALIZE_SEARCH_TYPE}`,
     }),
   },
   async created() {},
-  async mounted() {
-    timer(0, 1000).subscribe(() => {
-      this.$data.metrcModalVislble = !!document.querySelector(".k-widget.k-window");
-    });
-
-    console.log(window.location.pathname);
-
-    if (window.location.pathname.match(PLANTS_TAB_REGEX)) {
-      this.setSearchType({ searchType: "PLANTS" });
-    } else if (window.location.pathname.match(TAG_TAB_REGEX)) {
-      this.setSearchType({ searchType: "TAGS" });
-    } else if (window.location.pathname.match(TRANSFER_TAB_REGEX)) {
-      this.setSearchType({ searchType: "TRANSFERS" });
-    } else if (window.location.pathname.match(PACKAGE_TAB_REGEX)) {
-      this.setSearchType({ searchType: "PACKAGES" });
-    }
-  },
+  async mounted() {},
 });
 </script>
 
@@ -113,5 +100,9 @@ export default Vue.extend({
   top: 0 !important;
   left: 0 !important;
   height: 0 !important;
+}
+
+.inline-search {
+  max-width: calc(100% - 400px) !important;
 }
 </style>

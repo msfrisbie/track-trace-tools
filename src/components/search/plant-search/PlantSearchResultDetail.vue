@@ -45,6 +45,7 @@ import Vue from "vue";
 import { mapActions, mapGetters, mapState } from "vuex";
 import MetrcTag from "@/components/overlay-widget/shared/MetrcTag.vue";
 import RecursiveJsonTable from "@/components/search/shared/RecursiveJsonTable.vue";
+import { SearchActions } from "@/store/page-overlay/modules/search/consts";
 
 export default Vue.extend({
   name: "PlantSearchResultDetail",
@@ -84,7 +85,7 @@ export default Vue.extend({
   watch: {},
   methods: {
     ...mapActions({
-      setShowPlantSearchResults: `plantSearch/${PlantSearchActions.SET_SHOW_PLANT_SEARCH_RESULTS}`,
+      setShowSearchResults: `search/${SearchActions.SET_SHOW_SEARCH_RESULTS}`,
       partialUpdatePlantSearchFilters: `plantSearch/${PlantSearchActions.PARTIAL_UPDATE_PLANT_SEARCH_FILTERS}`,
       setPlantSearchFilters: `plantSearch/${PlantSearchActions.SET_PLANT_SEARCH_FILTERS}`,
     }),
@@ -101,7 +102,7 @@ export default Vue.extend({
         }
       );
 
-      this.setShowPlantSearchResults({ showPlantSearchResults: false });
+      this.setShowSearchResults({ showSearchResults: false });
     },
     copyToClipboard(plant: IIndexedPlantData) {
       analyticsManager.track(MessageType.COPIED_TEXT, { value: plant.Label });
@@ -130,7 +131,7 @@ export default Vue.extend({
       }
     },
     displayPlantState(plant: IIndexedPlantData) {
-      return plant.PlantState.replaceAll('_', ' ');
+      return plant.PlantState.replaceAll("_", " ");
     },
   },
 });

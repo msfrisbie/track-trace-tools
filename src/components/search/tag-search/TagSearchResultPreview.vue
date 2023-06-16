@@ -25,6 +25,7 @@
 import { MessageType } from "@/consts";
 import { IIndexedTagData } from "@/interfaces";
 import { analyticsManager } from "@/modules/analytics-manager.module";
+import { SearchActions } from "@/store/page-overlay/modules/search/consts";
 import { TagSearchActions } from "@/store/page-overlay/modules/tag-search/consts";
 import Vue from "vue";
 import { mapActions } from "vuex";
@@ -39,7 +40,7 @@ export default Vue.extend({
   },
   methods: {
     ...mapActions({
-      setShowTagSearchResults: `tagSearch/${TagSearchActions.SET_SHOW_TAG_SEARCH_RESULTS}`,
+      setShowSearchResults: `search/${SearchActions.SET_SHOW_SEARCH_RESULTS}`,
       partialUpdateTagSearchFilters: `tagSearch/${TagSearchActions.PARTIAL_UPDATE_TAG_SEARCH_FILTERS}`,
       setTagSearchFilters: `tagSearch/${TagSearchActions.SET_TAG_SEARCH_FILTERS}`,
     }),
@@ -49,17 +50,14 @@ export default Vue.extend({
     async setTagLabelFilter(tag: IIndexedTagData) {
       analyticsManager.track(MessageType.SELECTED_TAG);
 
-      this.$store.dispatch(
-        `tagSearch/${TagSearchActions.PARTIAL_UPDATE_TAG_SEARCH_FILTERS}`,
-        {
-          tagState: tag.TagState,
-          tagSearchFilters: {
-            label: tag.Label,
-          },
-        }
-      );
+      this.$store.dispatch(`tagSearch/${TagSearchActions.PARTIAL_UPDATE_TAG_SEARCH_FILTERS}`, {
+        tagState: tag.TagState,
+        tagSearchFilters: {
+          label: tag.Label,
+        },
+      });
 
-      (this as any).setShowTagSearchResults({ showTagSearchResults: false });
+      this.setShowSearchResults({ showSearchResults: false });
     },
   },
 });

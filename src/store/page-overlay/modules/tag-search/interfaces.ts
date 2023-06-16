@@ -5,5 +5,4 @@ export interface ITagSearchState {
   tagQueryString: string;
   tagQueryStringHistory: string[];
   tagSearchFilters: ITagSearchFilters;
-  showTagSearchResults: boolean;
 }

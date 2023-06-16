@@ -5,5 +5,4 @@ export interface IPlantSearchState {
   plantQueryString: string;
   plantQueryStringHistory: string[];
   plantSearchFilters: IPlantSearchFilters;
-  showPlantSearchResults: boolean;
 }

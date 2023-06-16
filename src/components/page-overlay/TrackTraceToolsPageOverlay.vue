@@ -42,6 +42,7 @@ import { mockDataManager } from "@/modules/mock-data-manager.module";
 import { modalManager } from "@/modules/modal-manager.module";
 import { pageManager } from "@/modules/page-manager/page-manager.module";
 import { passivePageAnalyzer } from "@/modules/passive-page-analyzer.module";
+import { searchManager } from "@/modules/search-manager.module";
 import { telemetryManager } from "@/modules/telemetry-manager.module";
 import { toastManager } from "@/modules/toast-manager.module";
 import { updateManager } from "@/modules/update-manager.module";
@@ -262,6 +263,7 @@ export default Vue.extend({
       accountManager.init();
       dynamicConstsManager.init();
       facilityManager.init();
+      searchManager.init();
 
       const identities: string[] = [];
 

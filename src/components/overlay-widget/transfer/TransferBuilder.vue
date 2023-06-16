@@ -536,6 +536,7 @@ import {
   getIdOrError,
 } from "@/utils/package";
 import { clientBuildManager } from "@/modules/client-build-manager.module";
+import { SearchActions } from "@/store/page-overlay/modules/search/consts";
 
 const debugLog = debugLogFactory("TransferBuilder.vue");
 
@@ -556,6 +557,7 @@ export default Vue.extend({
   methods: {
     ...mapActions({
       // refreshPackages: `transferBuilder/${TransferBuilderActions.REFRESH_PACKAGES}`,
+      setShowSearchResults: `search/${SearchActions.SET_SHOW_SEARCH_RESULTS}`,
       addPackage: `transferBuilder/${TransferBuilderActions.ADD_PACKAGE}`,
       removePackage: `transferBuilder/${TransferBuilderActions.REMOVE_PACKAGE}`,
       // updateTransferData: `transferBuilder/${TransferBuilderActions.UPDATE_TRANSFER_DATA}`,
@@ -571,7 +573,7 @@ export default Vue.extend({
       if (window.location.pathname === this.packagesUrl) {
         modalManager.dispatchModalEvent(ModalType.BUILDER, ModalAction.CLOSE);
 
-        searchManager.setPackageSearchVisibility({ showPackageSearchResults: true });
+        this.setShowSearchResults({ showSearchResults: true });
       } else {
         this.$store.dispatch(
           `packageSearch/${PackageSearchActions.SET_EXPAND_SEARCH_ON_NEXT_LOAD}`,

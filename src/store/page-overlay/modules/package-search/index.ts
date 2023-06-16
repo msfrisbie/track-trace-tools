@@ -9,7 +9,7 @@ import { IPackageSearchState } from "./interfaces";
 
 const inMemoryState = {
   packageQueryString: "",
-  showPackageSearchResults: false,
+  showSearchResults: false,
   packageSearchFilters: {
     label: null,
     sourceHarvestName: null,
@@ -17,18 +17,18 @@ const inMemoryState = {
     itemName: null,
     itemStrainName: null,
     itemProductCategoryName: null,
-    locationName: null
-  }
+    locationName: null,
+  },
 };
 
 const persistedState = {
   expandSearchOnNextLoad: false,
-  packageQueryStringHistory: []
+  packageQueryStringHistory: [],
 };
 
 const defaultState: IPackageSearchState = {
   ...inMemoryState,
-  ...persistedState
+  ...persistedState,
 };
 
 export const packageSearchModule = {
@@ -53,18 +53,18 @@ export const packageSearchModule = {
     },
     [PackageSearchMutations.SET_SHOW_PACKAGE_SEARCH_RESULTS](
       state: IPackageSearchState,
-      { showPackageSearchResults }: { showPackageSearchResults: boolean }
+      { showSearchResults }: { showSearchResults: boolean }
     ) {
-      state.showPackageSearchResults = showPackageSearchResults;
+      state.showSearchResults = showSearchResults;
     },
     [PackageSearchMutations.SET_PACKAGE_SEARCH_FILTERS](
       state: IPackageSearchState,
       { packageSearchFilters }: { packageSearchFilters: IPackageSearchFilters }
     ) {
       state.packageSearchFilters = {
-        ...packageSearchFilters
+        ...packageSearchFilters,
       };
-    }
+    },
   },
   getters: {},
   actions: {
@@ -82,10 +82,10 @@ export const packageSearchModule = {
     },
     [PackageSearchActions.SET_SHOW_PACKAGE_SEARCH_RESULTS](
       ctx: ActionContext<IPackageSearchState, IPluginState>,
-      { showPackageSearchResults }: { showPackageSearchResults: boolean }
+      { showSearchResults }: { showSearchResults: boolean }
     ) {
       ctx.commit(PackageSearchMutations.SET_SHOW_PACKAGE_SEARCH_RESULTS, {
-        showPackageSearchResults
+        showSearchResults,
       });
     },
     [PackageSearchActions.PARTIAL_UPDATE_PACKAGE_SEARCH_FILTERS]: async (
@@ -93,7 +93,7 @@ export const packageSearchModule = {
       {
         packageSearchFilters,
         propagate = true,
-        packageState = null
+        packageState = null,
       }: {
         packageSearchFilters: IPackageSearchFilters;
         propagate?: boolean;
@@ -121,16 +121,16 @@ export const packageSearchModule = {
       ctx.dispatch(PackageSearchActions.SET_PACKAGE_SEARCH_FILTERS, {
         packageSearchFilters: {
           ...ctx.state.packageSearchFilters,
-          ...packageSearchFilters
+          ...packageSearchFilters,
         },
-        propagate
+        propagate,
       });
     },
     [PackageSearchActions.SET_PACKAGE_SEARCH_FILTERS](
       ctx: ActionContext<IPackageSearchState, IPluginState>,
       {
         packageSearchFilters,
-        propagate = true
+        propagate = true,
       }: { packageSearchFilters: IPackageSearchFilters; propagate?: boolean }
     ) {
       const defaultPackageSearchFilters = {
@@ -140,12 +140,12 @@ export const packageSearchModule = {
         itemName: null,
         itemStrainName: null,
         itemProductCategoryName: null,
-        locationName: null
+        locationName: null,
       };
 
       packageSearchFilters = {
         ...defaultPackageSearchFilters,
-        ...packageSearchFilters
+        ...packageSearchFilters,
       };
 
       if (propagate) {
@@ -182,13 +182,13 @@ export const packageSearchModule = {
       }
 
       ctx.commit(PackageSearchMutations.SET_PACKAGE_SEARCH_FILTERS, { packageSearchFilters });
-    }
-  }
+    },
+  },
 };
 
 export const packageSearchReducer = (state: IPackageSearchState): IPackageSearchState => {
   return {
     ...state,
-    ...inMemoryState
+    ...inMemoryState,
   };
 };

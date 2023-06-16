@@ -88,8 +88,8 @@ export default Vue.extend({
     });
 
     document.addEventListener("keydown", (e) => {
-      // ß is the macOS alt value
-      if (e.altKey && (e.key === "ß" || e.key === "q")) {
+      // œ is the macOS alt value
+      if (e.altKey && (e.key === "œ" || e.key === "q")) {
         (this.$refs.document as any)?.hide();
         (this.$refs.promo as any)?.hide();
         (this.$refs.builder as any)?.hide();
@@ -104,7 +104,9 @@ export default Vue.extend({
         (this.$refs.promo as any)?.hide();
         (this.$refs.builder as any)?.toggle();
         (this.$refs.search as any)?.hide();
-      } else if (e.altKey && (e.key === "†" || e.key === "s")) {
+
+        // ß is the macOS alt value
+      } else if (e.altKey && (e.key === "ß" || e.key === "s")) {
         (this.$refs.document as any)?.hide();
         (this.$refs.debug as any)?.hide();
         (this.$refs.promo as any)?.hide();

@@ -9,7 +9,7 @@ import { ITagSearchState } from "./interfaces";
 
 const inMemoryState = {
   tagQueryString: "",
-  showTagSearchResults: false,
+  showSearchResults: false,
   tagSearchFilters: {
     label: null,
     strainName: null,
@@ -49,9 +49,9 @@ export const tagSearchModule = {
     },
     [TagSearchMutations.SET_SHOW_TAG_SEARCH_RESULTS](
       state: ITagSearchState,
-      { showTagSearchResults }: { showTagSearchResults: boolean }
+      { showSearchResults }: { showSearchResults: boolean }
     ) {
-      state.showTagSearchResults = showTagSearchResults;
+      state.showSearchResults = showSearchResults;
     },
     [TagSearchMutations.SET_TAG_SEARCH_FILTERS](
       state: ITagSearchState,
@@ -78,10 +78,10 @@ export const tagSearchModule = {
     },
     [TagSearchActions.SET_SHOW_TAG_SEARCH_RESULTS](
       ctx: ActionContext<ITagSearchState, IPluginState>,
-      { showTagSearchResults }: { showTagSearchResults: boolean }
+      { showSearchResults }: { showSearchResults: boolean }
     ) {
       ctx.commit(TagSearchMutations.SET_SHOW_TAG_SEARCH_RESULTS, {
-        showTagSearchResults,
+        showSearchResults,
       });
     },
     [TagSearchActions.PARTIAL_UPDATE_TAG_SEARCH_FILTERS]: async (

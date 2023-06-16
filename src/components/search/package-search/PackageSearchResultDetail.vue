@@ -148,6 +148,7 @@ import { takeUntil } from "rxjs/operators";
 import Vue from "vue";
 import { mapActions, mapGetters, mapState } from "vuex";
 import RecursiveJsonTable from "@/components/search/shared/RecursiveJsonTable.vue";
+import { SearchActions } from "@/store/page-overlay/modules/search/consts";
 
 export default Vue.extend({
   name: "PackageSearchResultDetail",
@@ -219,7 +220,7 @@ export default Vue.extend({
       addPackageToTransferList: `transferBuilder/${TransferBuilderActions.ADD_PACKAGE}`,
       removePackageFromTransferList: `transferBuilder/${TransferBuilderActions.REMOVE_PACKAGE}`,
       setSplitSourcePackage: `splitPackageBuilder/${SplitPackageBuilderActions.SET_SOURCE_PACKAGE}`,
-      setShowPackageSearchResults: `packageSearch/${PackageSearchActions.SET_SHOW_PACKAGE_SEARCH_RESULTS}`,
+      setShowSearchResults: `search/${SearchActions.SET_SHOW_SEARCH_RESULTS}`,
       partialUpdatePackageSearchFilters: `packageSearch/${PackageSearchActions.PARTIAL_UPDATE_PACKAGE_SEARCH_FILTERS}`,
       setPackageSearchFilters: `packageSearch/${PackageSearchActions.SET_PACKAGE_SEARCH_FILTERS}`,
       setPackageHistorySourcePackage: `packageHistory/${PackageHistoryActions.SET_SOURCE_PACKAGE}`,
@@ -266,7 +267,7 @@ export default Vue.extend({
         }
       );
 
-      this.setShowPackageSearchResults({ showPackageSearchResults: false });
+      this.setShowSearchResults({ showSearchResults: false });
     },
     copyToClipboard(pkg: IIndexedPackageData) {
       analyticsManager.track(MessageType.COPIED_TEXT, { value: pkg.Label });
@@ -309,7 +310,7 @@ export default Vue.extend({
       });
 
       analyticsManager.track(MessageType.CLICKED_TOOLKIT_VIEW_LAB_TEST_BUTTON);
-      this.setShowPackageSearchResults({ showPackageSearchResults: false });
+      this.setShowSearchResults({ showSearchResults: false });
     },
     async printLabResult(pkg: IIndexedPackageData) {
       const urls = await getLabTestUrlsFromPackage({ pkg });
@@ -321,13 +322,13 @@ export default Vue.extend({
       printPdfFromUrl({ urls, modal: true });
 
       analyticsManager.track(MessageType.CLICKED_TOOLKIT_PRINT_LAB_TEST_BUTTON);
-      this.setShowPackageSearchResults({ showPackageSearchResults: false });
+      this.setShowSearchResults({ showSearchResults: false });
     },
     async downloadLabResult(pkg: IIndexedPackageData) {
       downloadLabTests({ pkg });
 
       analyticsManager.track(MessageType.CLICKED_TOOLKIT_DOWNLOAD_LAB_TEST_BUTTON);
-      this.setShowPackageSearchResults({ showPackageSearchResults: false });
+      this.setShowSearchResults({ showSearchResults: false });
     },
     async upsertPackage({ pkg }: { pkg: IIndexedPackageData }) {},
   },

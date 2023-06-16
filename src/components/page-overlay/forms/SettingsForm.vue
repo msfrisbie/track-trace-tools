@@ -242,16 +242,6 @@
             Auto-refresh Metrc interface after closing modal windows
           </b-form-checkbox>
 
-          <!-- <b-form-checkbox
-            id="checkbox-enableSearchOverMetrcModal"
-            class="mb-2"
-            v-model="settings.enableSearchOverMetrcModal"
-            name="checkbox-enableSearchOverMetrcModal"
-            @change="onChange()"
-          >
-            Show T3 search over Metrc modal windows
-          </b-form-checkbox> -->
-
           <b-form-checkbox
             id="checkbox-preventActiveProjectPageLeave"
             class="mb-2"

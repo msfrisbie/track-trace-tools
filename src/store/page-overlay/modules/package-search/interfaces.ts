@@ -5,5 +5,4 @@ export interface IPackageSearchState {
   packageQueryString: string;
   packageQueryStringHistory: string[];
   packageSearchFilters: IPackageSearchFilters;
-  showPackageSearchResults: boolean;
 }

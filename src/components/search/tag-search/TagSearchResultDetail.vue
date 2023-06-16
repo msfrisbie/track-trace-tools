@@ -42,6 +42,7 @@ import Vue from "vue";
 import { mapActions, mapGetters, mapState } from "vuex";
 import MetrcTag from "@/components/overlay-widget/shared/MetrcTag.vue";
 import RecursiveJsonTable from "@/components/search/shared/RecursiveJsonTable.vue";
+import { SearchActions } from "@/store/page-overlay/modules/search/consts";
 
 export default Vue.extend({
   name: "TagSearchResultDetail",
@@ -81,7 +82,7 @@ export default Vue.extend({
   watch: {},
   methods: {
     ...mapActions({
-      setShowTagSearchResults: `tagSearch/${TagSearchActions.SET_SHOW_TAG_SEARCH_RESULTS}`,
+      setShowSearchResults: `search/${SearchActions.SET_SHOW_SEARCH_RESULTS}`,
       partialUpdateTagSearchFilters: `tagSearch/${TagSearchActions.PARTIAL_UPDATE_TAG_SEARCH_FILTERS}`,
       setTagSearchFilters: `tagSearch/${TagSearchActions.SET_TAG_SEARCH_FILTERS}`,
     }),
@@ -95,7 +96,7 @@ export default Vue.extend({
         },
       });
 
-      this.setShowTagSearchResults({ showTagSearchResults: false });
+      this.setShowSearchResults({ showSearchResults: false });
     },
     copyToClipboard(tag: IIndexedTagData) {
       analyticsManager.track(MessageType.COPIED_TEXT, { value: tag.Label });
@@ -125,7 +126,7 @@ export default Vue.extend({
       }
     },
     displayTagState(tag: IIndexedTagData) {
-      return tag.TagState.replaceAll('_', ' ');
+      return tag.TagState.replaceAll("_", " ");
     },
   },
 });

@@ -4,8 +4,7 @@
       <div class="flex flex-row space-x-2">
         <div v-on:click.stop.prevent class="search-bar-container flex flex-col flex-grow">
           <b-input-group size="md">
-            <b-input-group-prepend
-              @click="setShowPackageSearchResults({ showPackageSearchResults: true })"
+            <b-input-group-prepend @click="setShowSearchResults({ showSearchResults: true })"
               ><b-input-group-text class="search-icon">
                 <font-awesome-icon icon="search" />
               </b-input-group-text>
@@ -19,8 +18,8 @@
               placeholder="Tag #, item, location, harvest, strain..."
               autocomplete="off"
               @input="search($event)"
-              @click="setShowPackageSearchResults({ showPackageSearchResults: true })"
-              @focus="setShowPackageSearchResults({ showPackageSearchResults: true })"
+              @click="setShowSearchResults({ showSearchResults: true })"
+              @focus="setShowSearchResults({ showSearchResults: true })"
               ref="search"
             ></b-form-input>
 
@@ -32,7 +31,7 @@
           </b-input-group>
 
           <!-- Anchor point for dropdown results card -->
-          <div v-if="packageSearchState.showPackageSearchResults" class="search-anchor">
+          <div v-if="packageSearchState.showSearchResults" class="search-anchor">
             <div class="search-bar flex flex-col bg-white rounded-b-md">
               <div class="flex-grow overflow-y-auto">
                 <package-search-results :packages="packages" :inflight="searchInflight" />
@@ -73,6 +72,7 @@ import { combineLatest, Observable, timer } from "rxjs";
 import { debounceTime, filter, startWith, tap } from "rxjs/operators";
 import Vue from "vue";
 import { mapActions, mapState } from "vuex";
+import { SearchActions } from "@/store/page-overlay/modules/search/consts";
 
 export default Vue.extend({
   name: "PackageSearchWidget",
@@ -100,17 +100,15 @@ export default Vue.extend({
 
     this.$data.filters.license = authState.license;
 
-    searchManager.init();
-
     document.addEventListener("keyup", (e) => {
       if (e.isTrusted && e.key === "Escape") {
-        searchManager.setPackageSearchVisibility({ showPackageSearchResults: false });
+        this.setShowSearchResults({ showSearchResults: false });
       }
     });
 
     document.addEventListener("click", (e) => {
       if (e.isTrusted) {
-        searchManager.setPackageSearchVisibility({ showPackageSearchResults: false });
+        this.setShowSearchResults({ showSearchResults: false });
       }
     });
 
@@ -180,7 +178,7 @@ export default Vue.extend({
         expandSearchOnNextLoad: false,
       });
 
-      searchManager.setPackageSearchVisibility({ showPackageSearchResults: true });
+      this.setShowSearchResults({ showSearchResults: true });
     }
   },
   computed: {
@@ -190,18 +188,12 @@ export default Vue.extend({
   },
   methods: {
     ...mapActions({
+      setShowSearchResults: `search/${SearchActions.SET_SHOW_SEARCH_RESULTS}`,
       setPackageQueryString: `packageSearch/${PackageSearchActions.SET_PACKAGE_QUERY_STRING}`,
       setExpandSearchOnNextLoad: `packageSearch/${PackageSearchActions.SET_EXPAND_SEARCH_ON_NEXT_LOAD}`,
     }),
-    async setShowPackageSearchResults({
-      showPackageSearchResults,
-    }: {
-      showPackageSearchResults: boolean;
-    }) {
-      searchManager.setPackageSearchVisibility({ showPackageSearchResults });
-    },
     search(queryString: string) {
-      searchManager.setPackageSearchVisibility({ showPackageSearchResults: true });
+      this.setShowSearchResults({ showSearchResults: true });
       searchManager.packageQueryString.next(queryString);
     },
     clearSearchField() {
@@ -209,7 +201,7 @@ export default Vue.extend({
     },
   },
   watch: {
-    "packageSearchState.showPackageSearchResults": {
+    "packageSearchState.showSearchResults": {
       immediate: true,
       handler(newValue, oldValue) {
         if (newValue) {

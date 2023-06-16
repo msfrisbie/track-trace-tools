@@ -4,8 +4,7 @@
       <div class="flex flex-row space-x-2">
         <div v-on:click.stop.prevent class="search-bar-container flex flex-col flex-grow">
           <b-input-group size="md">
-            <b-input-group-prepend
-              @click="setShowPlantSearchResults({ showPlantSearchResults: true })"
+            <b-input-group-prepend @click="setShowSearchResults({ showSearchResults: true })"
               ><b-input-group-text class="search-icon">
                 <font-awesome-icon icon="search" />
               </b-input-group-text>
@@ -19,8 +18,8 @@
               placeholder="Tag #, strain, location..."
               autocomplete="off"
               @input="search($event)"
-              @click="setShowPlantSearchResults({ showPlantSearchResults: true })"
-              @focus="setShowPlantSearchResults({ showPlantSearchResults: true })"
+              @click="setShowSearchResults({ showSearchResults: true })"
+              @focus="setShowSearchResults({ showSearchResults: true })"
               ref="search"
             ></b-form-input>
 
@@ -32,7 +31,7 @@
           </b-input-group>
 
           <!-- Anchor point for dropdown results card -->
-          <div v-if="plantSearchState.showPlantSearchResults" class="search-anchor">
+          <div v-if="plantSearchState.showSearchResults" class="search-anchor">
             <div class="search-bar flex flex-col bg-white rounded-b-md">
               <div class="flex-grow overflow-y-auto">
                 <plant-search-results :plants="plants" :inflight="searchInflight" />
@@ -69,6 +68,7 @@ import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
 import { searchManager } from "@/modules/search-manager.module";
 import store from "@/store/page-overlay/index";
 import { PlantSearchActions } from "@/store/page-overlay/modules/plant-search/consts";
+import { SearchActions } from "@/store/page-overlay/modules/search/consts";
 import { combineLatest, Observable, of, timer } from "rxjs";
 import { debounceTime, filter, startWith, tap } from "rxjs/operators";
 import Vue from "vue";
@@ -100,17 +100,15 @@ export default Vue.extend({
 
     this.$data.filters.license = authState.license;
 
-    searchManager.init();
-
     document.addEventListener("keyup", (e) => {
       if (e.isTrusted && e.key === "Escape") {
-        searchManager.setPlantSearchVisibility({ showPlantSearchResults: false });
+        this.setShowSearchResults({ showSearchResults: false });
       }
     });
 
     document.addEventListener("click", (e) => {
       if (e.isTrusted) {
-        searchManager.setPlantSearchVisibility({ showPlantSearchResults: false });
+        this.setShowSearchResults({ showSearchResults: false });
       }
     });
 
@@ -182,7 +180,7 @@ export default Vue.extend({
         expandSearchOnNextLoad: false,
       });
 
-      searchManager.setPlantSearchVisibility({ showPlantSearchResults: true });
+      this.setShowSearchResults({ showSearchResults: true });
     }
   },
   computed: {
@@ -192,18 +190,12 @@ export default Vue.extend({
   },
   methods: {
     ...mapActions({
+      setShowSearchResults: `search/${SearchActions.SET_SHOW_SEARCH_RESULTS}`,
       setPlantQueryString: `plantSearch/${PlantSearchActions.SET_PLANT_QUERY_STRING}`,
       setExpandSearchOnNextLoad: `plantSearch/${PlantSearchActions.SET_EXPAND_SEARCH_ON_NEXT_LOAD}`,
     }),
-    async setShowPlantSearchResults({
-      showPlantSearchResults,
-    }: {
-      showPlantSearchResults: boolean;
-    }) {
-      searchManager.setPlantSearchVisibility({ showPlantSearchResults });
-    },
     search(queryString: string) {
-      searchManager.setPlantSearchVisibility({ showPlantSearchResults: true });
+      this.setShowSearchResults({ showSearchResults: true });
       searchManager.plantQueryString.next(queryString);
     },
     clearSearchField() {
@@ -211,7 +203,7 @@ export default Vue.extend({
     },
   },
   watch: {
-    "plantSearchState.showPlantSearchResults": {
+    "plantSearchState.showSearchResults": {
       immediate: true,
       handler(newValue, oldValue) {
         if (newValue) {

@@ -59,10 +59,11 @@ import { PACKAGE_TAB_REGEX } from "@/modules/page-manager/consts";
 import { ISelectedPackageMetadata, searchManager } from "@/modules/search-manager.module";
 import store from "@/store/page-overlay/index";
 import { PackageSearchActions } from "@/store/page-overlay/modules/package-search/consts";
+import { SearchActions } from "@/store/page-overlay/modules/search/consts";
 import { Subject } from "rxjs";
 import { take, takeUntil } from "rxjs/operators";
 import Vue from "vue";
-import { mapState } from "vuex";
+import { mapActions, mapState } from "vuex";
 
 export default Vue.extend({
   name: "PackageSearchResultsGroup",
@@ -143,6 +144,9 @@ export default Vue.extend({
     }),
   },
   methods: {
+    ...mapActions({
+      setShowSearchResults: `search/${SearchActions.SET_SHOW_SEARCH_RESULTS}`,
+    }),
     showPackageDetail(packageData: IIndexedPackageData) {
       // TODO debounce this to improve mouseover accuracy
       searchManager.selectedPackage.next({
@@ -165,7 +169,7 @@ export default Vue.extend({
         }
       );
 
-      searchManager.setPackageSearchVisibility({ showPackageSearchResults: false });
+      this.setShowSearchresults({ showSearchResults: false });
     },
   },
   created() {

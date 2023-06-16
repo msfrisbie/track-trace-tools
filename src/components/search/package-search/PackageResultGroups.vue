@@ -111,6 +111,7 @@ import { IIndexedPackageData } from "@/interfaces";
 import { analyticsManager } from "@/modules/analytics-manager.module";
 import { pageManager } from "@/modules/page-manager/page-manager.module";
 import { PackageSearchActions } from "@/store/page-overlay/modules/package-search/consts";
+import { SearchActions } from "@/store/page-overlay/modules/search/consts";
 import Vue from "vue";
 import { mapActions, mapState } from "vuex";
 
@@ -128,80 +129,73 @@ export default Vue.extend({
       packageQueryString: (state: any) => state.packageSearch?.packageQueryString,
       packageSearchFilters: (state: any) => state.packageSearch?.packageSearchFilters,
     }),
-    filtersApplied() {
+    filtersApplied(): boolean {
       return false;
     },
-    expandLabelGroup() {
+    expandLabelGroup(): boolean {
       return !!this.packageSearchFilters.label;
     },
-    expandItemNameGroup() {
+    expandItemNameGroup(): boolean {
       if (this.expandLabelGroup) {
         return false;
       }
 
       return !!this.packageSearchFilters.itemName;
     },
-    expandItemProductCategoryGroup() {
+    expandItemProductCategoryGroup(): boolean {
       if (this.expandItemNameGroup) {
         return false;
       }
 
       return !!this.packageSearchFilters.itemProductCategoryName;
     },
-    expandItemStrainNameGroup() {
+    expandItemStrainNameGroup(): boolean {
       if (this.expandItemProductCategoryGroup) {
         return false;
       }
 
       return !!this.packageSearchFilters.itemStrainName;
     },
-    expandItemHarvestNameGroup() {
+    expandItemHarvestNameGroup(): boolean {
       if (this.expandItemStrainNameGroup) {
         return false;
       }
 
       return !!this.packageSearchFilters.sourceHarvestName;
     },
-    expandSourcePackagelabelNameGroup() {
+    expandSourcePackagelabelNameGroup(): boolean {
       if (this.expandItemHarvestNameGroup) {
         return false;
       }
 
       return !!this.packageSearchFilters.sourcePackageLabel;
     },
-    expandLocationNameGroup() {
+    expandLocationNameGroup(): boolean {
       if (this.expandSourcePackagelabelNameGroup) {
         return false;
       }
 
       return !!this.packageSearchFilters.locationName;
     },
-    allPackagesPreviewLength() {
-      // @ts-ignore
+    allPackagesPreviewLength(): number {
       if (this.labelPackages.length > 0) {
         return 0;
       }
-      // @ts-ignore
       if (this.sourceHarvestNamePackages.length > 0) {
         return 0;
       }
-      // @ts-ignore
       if (this.sourcePackageLabelPackages.length > 0) {
         return 0;
       }
-      // @ts-ignore
       if (this.itemNamePackages.length > 0) {
         return 0;
       }
-      // @ts-ignore
       if (this.itemStrainNamePackages.length > 0) {
         return 0;
       }
-      // @ts-ignore
       if (this.itemProductCategoryNamePackages.length > 0) {
         return 0;
       }
-      // @ts-ignore
       if (this.locationNamePackages.length > 0) {
         return 0;
       }
@@ -266,7 +260,7 @@ export default Vue.extend({
   },
   methods: {
     ...mapActions({
-      setShowPackageSearchResults: `packageSearch/${PackageSearchActions.SET_SHOW_PACKAGE_SEARCH_RESULTS}`,
+      setShowSearchResults: `search/${SearchActions.SET_SHOW_SEARCH_RESULTS}`,
     }),
     resetFilters() {
       pageManager.resetMetrcPackageFilters();
@@ -284,7 +278,7 @@ export default Vue.extend({
         }
       );
 
-      (this as any).setShowPackageSearchResults({ showPackageSearchResults: false });
+      this.setShowSearchResults({ showSearchResults: false });
     },
   },
 });

@@ -84,7 +84,7 @@ export default Vue.extend({
     }),
     filtersApplied() {
       return (
-        Object.values(this.$store.state.packageSearchState.packageSearchFilters || {}).filter(
+        Object.values(this.$store.state.packageSearch.packageSearchFilters || {}).filter(
           (x) => !!x
         ).length > 0
       );

@@ -10,12 +10,19 @@
   width: 100%;
   // Metrc navbar is 1003
   z-index: 1000;
-  height: 75vh;
   box-shadow: 0px 5px 5px rgba(0, 0, 0, 0.5);
 }
 
+.inline-search .search-bar {
+  height: 75vh;
+}
+
+.modal-search .search-bar {
+  height: 100%;
+}
+
 .search-bar-container {
-  max-width: 1200px;
+  // max-width: 1200px;
 }
 
 .search-icon {
@@ -33,5 +40,5 @@
   // Metrc navbar is 1003
   z-index: 1000;
   // Prevent overlap with metrc dropdowns
-  max-width: calc(100% - 400px);
+  // max-width: calc(100% - 400px);
 }

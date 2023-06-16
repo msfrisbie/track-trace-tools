@@ -62,6 +62,7 @@ import PlantSearchFiltersVue from "./PlantSearchFilters.vue";
 import { searchManager } from "@/modules/search-manager.module";
 import { PlantSearchActions } from "@/store/page-overlay/modules/plant-search/consts";
 import { timer } from "rxjs";
+import { SearchActions } from "@/store/page-overlay/modules/search/consts";
 
 export default Vue.extend({
   name: "PlantResultGroups",
@@ -137,7 +138,7 @@ export default Vue.extend({
   },
   methods: {
     ...mapActions({
-      setShowPlantSearchResults: `plantSearch/${PlantSearchActions.SET_SHOW_PLANT_SEARCH_RESULTS}`,
+      setShowSearchResults: `search/${SearchActions.SET_SHOW_SEARCH_RESULTS}`,
     }),
     resetFilters() {
       pageManager.resetMetrcPlantFilters();
@@ -155,7 +156,7 @@ export default Vue.extend({
     //     }
     //   );
 
-    //   (this as any).setShowPlantSearchResults({ showPlantSearchResults: false });
+    //   this.setShowSearchResults({ showSearchResults: false });
     // }
   },
 });

@@ -4,8 +4,7 @@
       <div class="flex flex-row space-x-2">
         <div v-on:click.stop.prevent class="search-bar-container flex flex-col flex-grow">
           <b-input-group size="md">
-            <b-input-group-prepend
-              @click="setShowTransferSearchResults({ showTransferSearchResults: true })"
+            <b-input-group-prepend @click="setShowSearchResults({ showSearchResults: true })"
               ><b-input-group-text class="search-icon">
                 <font-awesome-icon icon="search" />
               </b-input-group-text>
@@ -19,8 +18,8 @@
               placeholder="Manifest number, license, source/destination..."
               autocomplete="off"
               @input="search($event)"
-              @click="setShowTransferSearchResults({ showTransferSearchResults: true })"
-              @focus="setShowTransferSearchResults({ showTransferSearchResults: true })"
+              @click="setShowSearchResults({ showSearchResults: true })"
+              @focus="setShowSearchResults({ showSearchResults: true })"
               ref="search"
             ></b-form-input>
 
@@ -32,7 +31,7 @@
           </b-input-group>
 
           <!-- Anchor point for dropdown results card -->
-          <div v-if="transferSearchState.showTransferSearchResults" class="search-anchor">
+          <div v-if="transferSearchState.showSearchResults" class="search-anchor">
             <div class="search-bar flex flex-col bg-white rounded-b-md">
               <div class="flex-grow overflow-y-auto">
                 <transfer-search-results :transfers="transfers" :inflight="searchInflight" />
@@ -70,6 +69,7 @@ import { databaseInterface } from "@/modules/database-interface.module";
 import { searchManager } from "@/modules/search-manager.module";
 import { MutationType } from "@/mutation-types";
 import store from "@/store/page-overlay/index";
+import { SearchActions } from "@/store/page-overlay/modules/search/consts";
 import { TransferSearchActions } from "@/store/page-overlay/modules/transfer-search/consts";
 import { combineLatest, Observable, timer } from "rxjs";
 import { debounceTime, filter, startWith, tap } from "rxjs/operators";
@@ -102,17 +102,15 @@ export default Vue.extend({
 
     this.$data.filters.license = authState.license;
 
-    searchManager.init();
-
     document.addEventListener("keyup", (e) => {
       if (e.isTrusted && e.key === "Escape") {
-        searchManager.setTransferSearchVisibility({ showTransferSearchResults: false });
+        this.setShowSearchResults({ showSearchResults: false });
       }
     });
 
     document.addEventListener("click", (e) => {
       if (e.isTrusted) {
-        searchManager.setTransferSearchVisibility({ showTransferSearchResults: false });
+        this.setShowSearchResults({ showSearchResults: false });
       }
     });
 
@@ -211,7 +209,7 @@ export default Vue.extend({
         expandSearchOnNextLoad: false,
       });
 
-      searchManager.setTransferSearchVisibility({ showTransferSearchResults: true });
+      this.setShowSearchResults({ showSearchResults: true });
     }
   },
   computed: {
@@ -221,18 +219,12 @@ export default Vue.extend({
   },
   methods: {
     ...mapActions({
+      setShowSearchResults: `search/${SearchActions.SET_SHOW_SEARCH_RESULTS}`,
       setTransferQueryString: `transferSearch/${TransferSearchActions.SET_TRANSFER_QUERY_STRING}`,
       setExpandSearchOnNextLoad: `transferSearch/${TransferSearchActions.SET_EXPAND_SEARCH_ON_NEXT_LOAD}`,
     }),
-    async setShowTransferSearchResults({
-      showTransferSearchResults,
-    }: {
-      showTransferSearchResults: boolean;
-    }) {
-      searchManager.setTransferSearchVisibility({ showTransferSearchResults });
-    },
     search(queryString: string) {
-      searchManager.setTransferSearchVisibility({ showTransferSearchResults: true });
+      this.setShowSearchResults({ showSearchResults: true });
       searchManager.transferQueryString.next(queryString);
     },
     clearSearchField() {
@@ -240,7 +232,7 @@ export default Vue.extend({
     },
   },
   watch: {
-    "transferSearchState.showTransferSearchResults": {
+    "transferSearchState.showSearchResults": {
       immediate: true,
       handler(newValue, oldValue) {
         if (newValue) {

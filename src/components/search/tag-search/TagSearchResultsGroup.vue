@@ -54,15 +54,16 @@
 
 <script lang="ts">
 import TagSearchResultPreview from "@/components/search/tag-search/TagSearchResultPreview.vue";
-import { IIndexedTagData } from "@/interfaces";
+import { IIndexedTagData, IPluginState } from "@/interfaces";
 import { TAG_TAB_REGEX } from "@/modules/page-manager/consts";
 import { ISelectedTagMetadata, searchManager } from "@/modules/search-manager.module";
 import store from "@/store/page-overlay/index";
+import { SearchActions } from "@/store/page-overlay/modules/search/consts";
 import { TagSearchActions } from "@/store/page-overlay/modules/tag-search/consts";
 import { Subject } from "rxjs";
 import { take, takeUntil } from "rxjs/operators";
 import Vue from "vue";
-import { mapState } from "vuex";
+import { mapActions, mapState } from "vuex";
 
 export default Vue.extend({
   name: "TagSearchResultsGroup",
@@ -110,15 +111,18 @@ export default Vue.extend({
     },
   },
   computed: {
-    isOnTagsPage() {
-      return window.location.pathname.match(TAG_TAB_REGEX);
+    ...mapState<IPluginState>({
+      tagQueryString: (state: IPluginState) => state.tagSearch?.tagQueryString,
+    }),
+    isOnTagsPage(): boolean {
+      return !!window.location.pathname.match(TAG_TAB_REGEX);
     },
-    visibleTags() {
+    visibleTags():IIndexedTagData[] {
       return this.expanded || this.$data.showAll
         ? this.tags
         : this.tags.slice(0, this.previewLength);
     },
-    groupIcon() {
+    groupIcon(): string {
       switch (this.tagFilterIdentifier) {
         case "label":
           return "tags";
@@ -130,14 +134,14 @@ export default Vue.extend({
           return "boxes";
       }
     },
-    disableFilter() {
+    disableFilter():boolean {
       return !this.tagFilterIdentifier || this.tagFilterIdentifier === "label";
     },
-    ...mapState({
-      tagQueryString: (state: any) => state.tagSearch?.tagQueryString,
-    }),
   },
   methods: {
+    ...mapActions({
+      setShowSearchResults: `search/${SearchActions.SET_SHOW_SEARCH_RESULTS}`,
+    }),
     showTagDetail(tagData: IIndexedTagData) {
       // TODO debounce this to improve mouseover accuracy
       searchManager.selectedTag.next({
@@ -153,11 +157,11 @@ export default Vue.extend({
 
       this.$store.dispatch(`tagSearch/${TagSearchActions.PARTIAL_UPDATE_TAG_SEARCH_FILTERS}`, {
         tagSearchFilters: {
-          [this.tagFilterIdentifier]: this.tagQueryString,
+          [this.tagFilterIdentifier]: this.$store.state.tagSearch.tagQueryString,
         },
       });
 
-      searchManager.setTagSearchVisibility({ showTagSearchResults: false });
+      this.setShowSearchResults({ showSearchResults: false });
     },
   },
   created() {

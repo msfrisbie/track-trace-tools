@@ -26,6 +26,7 @@ import { MessageType } from "@/consts";
 import { IIndexedPlantData } from "@/interfaces";
 import { analyticsManager } from "@/modules/analytics-manager.module";
 import { PlantSearchActions } from "@/store/page-overlay/modules/plant-search/consts";
+import { SearchActions } from "@/store/page-overlay/modules/search/consts";
 import Vue from "vue";
 import { mapActions } from "vuex";
 
@@ -39,7 +40,7 @@ export default Vue.extend({
   },
   methods: {
     ...mapActions({
-      setShowPlantSearchResults: `plantSearch/${PlantSearchActions.SET_SHOW_PLANT_SEARCH_RESULTS}`,
+      setShowSearchResults: `search/${SearchActions.SET_SHOW_SEARCH_RESULTS}`,
       partialUpdatePlantSearchFilters: `plantSearch/${PlantSearchActions.PARTIAL_UPDATE_PLANT_SEARCH_FILTERS}`,
       setPlantSearchFilters: `plantSearch/${PlantSearchActions.SET_PLANT_SEARCH_FILTERS}`,
     }),
@@ -59,7 +60,7 @@ export default Vue.extend({
         }
       );
 
-      (this as any).setShowPlantSearchResults({ showPlantSearchResults: false });
+      this.setShowSearchResults({ showSearchResults: false });
     },
   },
 });

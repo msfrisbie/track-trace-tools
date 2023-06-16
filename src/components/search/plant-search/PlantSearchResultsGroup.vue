@@ -54,15 +54,17 @@
 
 <script lang="ts">
 import PlantSearchResultPreview from "@/components/search/plant-search/PlantSearchResultPreview.vue";
-import { IIndexedPlantData } from "@/interfaces";
+import { IIndexedPlantData, IPluginState } from "@/interfaces";
 import { PLANTS_TAB_REGEX } from "@/modules/page-manager/consts";
 import { ISelectedPlantMetadata, searchManager } from "@/modules/search-manager.module";
 import store from "@/store/page-overlay/index";
 import { PlantSearchActions } from "@/store/page-overlay/modules/plant-search/consts";
+import { IPluginAuthState } from "@/store/page-overlay/modules/plugin-auth/interfaces";
+import { SearchActions } from "@/store/page-overlay/modules/search/consts";
 import { Subject } from "rxjs";
 import { take, takeUntil } from "rxjs/operators";
 import Vue from "vue";
-import { mapState } from "vuex";
+import { mapActions, mapState } from "vuex";
 
 export default Vue.extend({
   name: "PlantSearchResultsGroup",
@@ -110,15 +112,18 @@ export default Vue.extend({
     },
   },
   computed: {
-    isOnPlantsPage() {
-      return window.location.pathname.match(PLANTS_TAB_REGEX);
+    ...mapState<IPluginState>({
+      plantQueryString: (state: IPluginState) => state.plantSearch.plantQueryString,
+    }),
+    isOnPlantsPage(): boolean {
+      return !!window.location.pathname.match(PLANTS_TAB_REGEX);
     },
-    visiblePlants() {
+    visiblePlants(): IIndexedPlantData[] {
       return this.expanded || this.$data.showAll
         ? this.plants
         : this.plants.slice(0, this.previewLength);
     },
-    groupIcon() {
+    groupIcon(): string {
       switch (this.plantFilterIdentifier) {
         case "label":
           return "tags";
@@ -130,14 +135,14 @@ export default Vue.extend({
           return "boxes";
       }
     },
-    disableFilter() {
+    disableFilter(): boolean {
       return !this.plantFilterIdentifier || this.plantFilterIdentifier === "label";
     },
-    ...mapState({
-      plantQueryString: (state: any) => state.plantSearch?.plantQueryString,
-    }),
   },
   methods: {
+    ...mapActions({
+      setShowSearchResults: `search/${SearchActions.SET_SHOW_SEARCH_RESULTS}`,
+    }),
     showPlantDetail(plantData: IIndexedPlantData) {
       // TODO debounce this to improve mouseover accuracy
       searchManager.selectedPlant.next({
@@ -155,12 +160,12 @@ export default Vue.extend({
         `plantSearch/${PlantSearchActions.PARTIAL_UPDATE_PLANT_SEARCH_FILTERS}`,
         {
           plantSearchFilters: {
-            [this.plantFilterIdentifier]: this.plantQueryString,
+            [this.plantFilterIdentifier]: this.$store.state.plantSearch.plantQueryString,
           },
         }
       );
 
-      searchManager.setPlantSearchVisibility({ showPlantSearchResults: false });
+      this.setShowSearchResults({ showSearchResults: false });
     },
   },
   created() {

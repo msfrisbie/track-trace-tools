@@ -8,28 +8,23 @@
 
     <template v-if="pluginAuth.authState">
       <div class="flex flex-row gap-2 floating-hover-reveal-target">
-        <!-- <b-button
-          title="Search survey"
+        <b-button
+          title="Search"
           variant="primary"
           class="floating-shadow"
           style="padding: 0"
-          href="https://forms.gle/HnGn8hAN9tMXK3fp9"
-          target="_blank"
+          @click="openSearchModal()"
         >
           <div class="flex flex-col items-center justify-center" style="width: 52px; height: 52px">
-            <font-awesome-icon icon="poll" style="height: 26px"></font-awesome-icon>
+            <font-awesome-icon icon="search" style="height: 26px"></font-awesome-icon>
           </div>
-        </b-button> -->
-
-        <!-- <snapshot-button class="floating-shadow" /> -->
+        </b-button>
 
         <quick-script-button class="floating-shadow" />
       </div>
 
       <builder-button class="floating-shadow" />
     </template>
-
-    <!-- <primary-toolkit-button /> -->
   </div>
 </template>
 
@@ -38,6 +33,8 @@ import BuilderButton from "@/components/page-overlay/BuilderButton.vue";
 import DebugButton from "@/components/page-overlay/DebugButton.vue";
 import QuickScriptButton from "@/components/page-overlay/QuickScriptButton.vue";
 import ScrollButton from "@/components/page-overlay/ScrollButton.vue";
+import { ModalAction, ModalType } from "@/consts";
+import { modalManager } from "@/modules/modal-manager.module";
 import store from "@/store/page-overlay/index";
 import Vue from "vue";
 import { mapState } from "vuex";
@@ -58,7 +55,11 @@ export default Vue.extend({
   computed: {
     ...mapState(["pluginAuth", "trackedInteractions", "settings", "debugMode"]),
   },
-  methods: {},
+  methods: {
+    openSearchModal() {
+      modalManager.dispatchModalEvent(ModalType.SEARCH, ModalAction.OPEN);
+    },
+  },
 });
 </script>
 

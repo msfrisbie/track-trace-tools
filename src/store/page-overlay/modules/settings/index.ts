@@ -55,7 +55,6 @@ const persistedState: ISettingsState = {
   enableManifestDocumentViewer: false,
   hideListingsButton: false,
   preventActiveProjectPageLeave: true,
-  enableSearchOverMetrcModal: false,
   autoRefreshOnModalClose: false,
   useIsoDateFormatForSubmit: true,
   writeSettingsToChromeStorage: false,

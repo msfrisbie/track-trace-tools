@@ -412,6 +412,7 @@ export default Vue.extend({
       setSplitSourcePackage: `splitPackageBuilder/${SplitPackageBuilderActions.SET_SOURCE_PACKAGE}`,
       partialUpdatePackageSearchFilters: `packageSearch/${PackageSearchActions.PARTIAL_UPDATE_PACKAGE_SEARCH_FILTERS}`,
       setSearchType: `search/${SearchActions.SET_SEARCH_TYPE}`,
+      setShowSearchResults: `search/${SearchActions.SET_SHOW_SEARCH_RESULTS}`,
       setPackageHistorySourcePackage: `packageHistory/${PackageHistoryActions.SET_SOURCE_PACKAGE}`,
       setExplorerData: `explorer/${ExplorerActions.SET_EXPLORER_DATA}`,
       refreshOAuthState: `pluginAuth/${PluginAuthActions.REFRESH_OAUTH_STATE}`,
@@ -455,7 +456,7 @@ export default Vue.extend({
     searchTransfer(text: string) {
       analyticsManager.track(MessageType.CONTEXT_MENU_SELECT, { event: "searchTransfer", text });
 
-      searchManager.setTransferSearchVisibility({ showTransferSearchResults: true });
+      this.setShowSearchResults({ showSearchResults: true });
       searchManager.transferQueryString.next(text);
       this.dismiss();
     },

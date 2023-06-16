@@ -99,6 +99,7 @@ import { takeUntil } from "rxjs/operators";
 import Vue from "vue";
 import { TransferSearchActions } from "@/store/page-overlay/modules/transfer-search/consts";
 import { mapActions } from "vuex";
+import { SearchActions } from "@/store/page-overlay/modules/search/consts";
 
 function isIsoDateToday(isodate: string): boolean {
   if (!isodate) {
@@ -268,7 +269,7 @@ export default Vue.extend({
   },
   methods: {
     ...mapActions({
-      setShowTransferSearchResults: `transferSearch/${TransferSearchActions.SET_SHOW_TRANSFER_SEARCH_RESULTS}`,
+      setShowSearchResults: `search/${SearchActions.SET_SHOW_SEARCH_RESULTS}`,
     }),
     async setTransferManifestNumberFilter(transfer: IIndexedTransferData) {
       analyticsManager.track(MessageType.SELECTED_TRANSFER);
@@ -298,7 +299,7 @@ export default Vue.extend({
         transfer.ManifestNumber
       );
 
-      this.setShowTransferSearchResults({ showTransferSearchResults: false });
+      this.setShowSearchResults({ showSearchResults: false });
     },
     copyToClipboard(transfer: IIndexedTransferData) {
       analyticsManager.track(MessageType.COPIED_TEXT, {

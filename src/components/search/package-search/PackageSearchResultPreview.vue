@@ -27,6 +27,7 @@ import { MessageType } from "@/consts";
 import { IIndexedPackageData } from "@/interfaces";
 import { analyticsManager } from "@/modules/analytics-manager.module";
 import { PackageSearchActions } from "@/store/page-overlay/modules/package-search/consts";
+import { SearchActions } from "@/store/page-overlay/modules/search/consts";
 import Vue from "vue";
 import { mapActions } from "vuex";
 
@@ -40,7 +41,7 @@ export default Vue.extend({
   },
   methods: {
     ...mapActions({
-      setShowPackageSearchResults: `packageSearch/${PackageSearchActions.SET_SHOW_PACKAGE_SEARCH_RESULTS}`,
+      setShowSearchResults: `search/${SearchActions.SET_SHOW_SEARCH_RESULTS}`,
       partialUpdatePackageSearchFilters: `packageSearch/${PackageSearchActions.PARTIAL_UPDATE_PACKAGE_SEARCH_FILTERS}`,
       setPackageSearchFilters: `packageSearch/${PackageSearchActions.SET_PACKAGE_SEARCH_FILTERS}`,
     }),
@@ -60,7 +61,7 @@ export default Vue.extend({
         }
       );
 
-      (this as any).setShowPackageSearchResults({ showPackageSearchResults: false });
+      this.setShowSearchResults({ showSearchResults: false });
     },
   },
 });

@@ -5,5 +5,4 @@ export interface ITransferSearchState {
   transferQueryString: string;
   transferQueryStringHistory: string[];
   transferSearchFilters: ITransferSearchFilters;
-  showTransferSearchResults: boolean;
 }

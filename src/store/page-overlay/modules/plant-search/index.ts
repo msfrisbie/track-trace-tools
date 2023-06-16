@@ -9,22 +9,22 @@ import { IPlantSearchState } from "./interfaces";
 
 const inMemoryState = {
   plantQueryString: "",
-  showPlantSearchResults: false,
+  showSearchResults: false,
   plantSearchFilters: {
     label: null,
     strainName: null,
-    locationName: null
-  }
+    locationName: null,
+  },
 };
 
 const persistedState = {
   expandSearchOnNextLoad: false,
-  plantQueryStringHistory: []
+  plantQueryStringHistory: [],
 };
 
 const defaultState: IPlantSearchState = {
   ...inMemoryState,
-  ...persistedState
+  ...persistedState,
 };
 
 export const plantSearchModule = {
@@ -49,18 +49,18 @@ export const plantSearchModule = {
     },
     [PlantSearchMutations.SET_SHOW_PLANT_SEARCH_RESULTS](
       state: IPlantSearchState,
-      { showPlantSearchResults }: { showPlantSearchResults: boolean }
+      { showSearchResults }: { showSearchResults: boolean }
     ) {
-      state.showPlantSearchResults = showPlantSearchResults;
+      state.showSearchResults = showSearchResults;
     },
     [PlantSearchMutations.SET_PLANT_SEARCH_FILTERS](
       state: IPlantSearchState,
       { plantSearchFilters }: { plantSearchFilters: IPlantSearchFilters }
     ) {
       state.plantSearchFilters = {
-        ...plantSearchFilters
+        ...plantSearchFilters,
       };
-    }
+    },
   },
   getters: {},
   actions: {
@@ -78,10 +78,10 @@ export const plantSearchModule = {
     },
     [PlantSearchActions.SET_SHOW_PLANT_SEARCH_RESULTS](
       ctx: ActionContext<IPlantSearchState, IPluginState>,
-      { showPlantSearchResults }: { showPlantSearchResults: boolean }
+      { showSearchResults }: { showSearchResults: boolean }
     ) {
       ctx.commit(PlantSearchMutations.SET_SHOW_PLANT_SEARCH_RESULTS, {
-        showPlantSearchResults
+        showSearchResults,
       });
     },
     [PlantSearchActions.PARTIAL_UPDATE_PLANT_SEARCH_FILTERS]: async (
@@ -89,7 +89,7 @@ export const plantSearchModule = {
       {
         plantSearchFilters,
         propagate = true,
-        plantState = null
+        plantState = null,
       }: {
         plantSearchFilters: IPlantSearchFilters;
         propagate?: boolean;
@@ -117,27 +117,27 @@ export const plantSearchModule = {
       ctx.dispatch(PlantSearchActions.SET_PLANT_SEARCH_FILTERS, {
         plantSearchFilters: {
           ...ctx.state.plantSearchFilters,
-          ...plantSearchFilters
+          ...plantSearchFilters,
         },
-        propagate
+        propagate,
       });
     },
     [PlantSearchActions.SET_PLANT_SEARCH_FILTERS](
       ctx: ActionContext<IPlantSearchState, IPluginState>,
       {
         plantSearchFilters,
-        propagate = true
+        propagate = true,
       }: { plantSearchFilters: IPlantSearchFilters; propagate?: boolean }
     ) {
       const defaultPlantSearchFilters = {
         label: null,
         strainName: null,
-        locationName: null
+        locationName: null,
       };
 
       plantSearchFilters = {
         ...defaultPlantSearchFilters,
-        ...plantSearchFilters
+        ...plantSearchFilters,
       };
 
       if (propagate) {
@@ -162,13 +162,13 @@ export const plantSearchModule = {
       }
 
       ctx.commit(PlantSearchMutations.SET_PLANT_SEARCH_FILTERS, { plantSearchFilters });
-    }
-  }
+    },
+  },
 };
 
 export const plantSearchReducer = (state: IPlantSearchState): IPlantSearchState => {
   return {
     ...state,
-    ...inMemoryState
+    ...inMemoryState,
   };
 };
