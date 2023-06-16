@@ -2,17 +2,16 @@ import {
   IAtomicService,
   IIndexedPackageData,
   IIndexedPlantData,
+  IIndexedTagData,
+  ITagData,
   ITransferData,
 } from "@/interfaces";
-import { authManager } from "@/modules/auth-manager.module";
-import { MutationType } from "@/mutation-types";
 import store from "@/store/page-overlay/index";
 import { PackageSearchActions } from "@/store/page-overlay/modules/package-search/consts";
 import { PlantSearchActions } from "@/store/page-overlay/modules/plant-search/consts";
 import { TransferSearchActions } from "@/store/page-overlay/modules/transfer-search/consts";
-import { BehaviorSubject, combineLatest, Observable } from "rxjs";
-import { bufferCount, map, take } from "rxjs/operators";
-import { primaryDataLoader } from "./data-loader/data-loader.module";
+import { BehaviorSubject } from "rxjs";
+import { take } from "rxjs/operators";
 
 export interface ISelectedPlantMetadata {
   plantData: IIndexedPlantData;
@@ -32,19 +31,23 @@ export interface ISelectedTransferMetadata {
   priority: number;
 }
 
+export interface ISelectedTagMetadata {
+  tagData: ITagData;
+  sectionName: string;
+  priority: number;
+}
+
 // let timeoutId: any = null;
 
 class SearchManager implements IAtomicService {
-  public plantQueryString: BehaviorSubject<string> = new BehaviorSubject<string>("");
-  public packageQueryString: BehaviorSubject<string> = new BehaviorSubject<string>("");
-  public transferQueryString: BehaviorSubject<string> = new BehaviorSubject<string>("");
-
   public selectedPackage: BehaviorSubject<ISelectedPackageMetadata | null> =
     new BehaviorSubject<ISelectedPackageMetadata | null>(null);
   public selectedPlant: BehaviorSubject<ISelectedPlantMetadata | null> =
     new BehaviorSubject<ISelectedPlantMetadata | null>(null);
-    public selectedTransfer: BehaviorSubject<ISelectedTransferMetadata | null> =
-      new BehaviorSubject<ISelectedTransferMetadata | null>(null);
+  public selectedTransfer: BehaviorSubject<ISelectedTransferMetadata | null> =
+    new BehaviorSubject<ISelectedTransferMetadata | null>(null);
+  public selectedTag: BehaviorSubject<ISelectedTagMetadata | null> =
+    new BehaviorSubject<ISelectedTagMetadata | null>(null);
 
   public packageSearchVisibility: BehaviorSubject<{
     showPackageSearchResults: boolean;
@@ -61,6 +64,11 @@ class SearchManager implements IAtomicService {
   }> = new BehaviorSubject<{
     showTransferSearchResults: boolean;
   }>({ showTransferSearchResults: false });
+  public tagSearchVisibility: BehaviorSubject<{
+    showTagSearchResults: boolean;
+  }> = new BehaviorSubject<{
+    showTagSearchResults: boolean;
+  }>({ showTagSearchResults: false });
 
   async init() {
     this.plantSearchVisibility.subscribe(
@@ -86,15 +94,26 @@ class SearchManager implements IAtomicService {
         });
       }
     );
+    
+    this.tagSearchVisibility.subscribe(
+      ({ showTagSearchResults }: { showTagSearchResults: boolean }) => {
+        store.dispatch(`tagSearch/${TagSearchActions.SET_SHOW_TAG_SEARCH_RESULTS}`, {
+          showTagSearchResults,
+        });
+      }
+    );
 
     this.packageSearchVisibility.next({
-      showPackageSearchResults: !!store.state.packageSearch?.showPackageSearchResults,
+      showPackageSearchResults: !!store.state.packageSearch.showPackageSearchResults,
     });
     this.plantSearchVisibility.next({
-      showPlantSearchResults: !!store.state.plantSearch?.showPlantSearchResults,
+      showPlantSearchResults: !!store.state.plantSearch.showPlantSearchResults,
     });
     this.transferSearchVisibility.next({
-      showTransferSearchResults: !!store.state.transferSearch?.showTransferSearchResults,
+      showTransferSearchResults: !!store.state.transferSearch.showTransferSearchResults,
+    });
+    this.tagSearchVisibility.next({
+      showTagSearchResults: !!store.state.tagSearch.showTagSearchResults,
     });
   }
 
@@ -106,8 +125,16 @@ class SearchManager implements IAtomicService {
     this.packageSearchVisibility.next({ showPackageSearchResults });
   }
 
-  setTransferSearchVisibility({ showTransferSearchResults }: { showTransferSearchResults: boolean }) {
+  setTransferSearchVisibility({
+    showTransferSearchResults,
+  }: {
+    showTransferSearchResults: boolean;
+  }) {
     this.transferSearchVisibility.next({ showTransferSearchResults });
+  }
+  
+  setTagSearchVisibility({ showTagSearchResults }: { showTagSearchResults: boolean }) {
+    this.tagSearchVisibility.next({ showTagSearchResults });
   }
 
   maybeInitializeSelectedPlant(
@@ -151,6 +178,22 @@ class SearchManager implements IAtomicService {
       .subscribe((selectedTransfer) => {
         if (!selectedTransfer || priority <= selectedTransfer.priority) {
           this.selectedTransfer.next({ transferData, sectionName, priority });
+        }
+      });
+  }
+  
+
+  maybeInitializeSelectedTag(
+    tagData: IIndexedTagData,
+    sectionName: string,
+    priority: number
+  ) {
+    this.selectedTag
+      .asObservable()
+      .pipe(take(1))
+      .subscribe((selectedTag) => {
+        if (!selectedTag || priority <= selectedTag.priority) {
+          this.selectedTag.next({ tagData, sectionName, priority });
         }
       });
   }
