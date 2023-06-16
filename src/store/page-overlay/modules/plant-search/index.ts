@@ -8,7 +8,6 @@ import { PlantSearchActions, PlantSearchMutations } from "./consts";
 import { IPlantSearchState } from "./interfaces";
 
 const inMemoryState = {
-  plantQueryString: "",\
   plantSearchFilters: {
     label: null,
     strainName: null,
@@ -17,8 +16,6 @@ const inMemoryState = {
 };
 
 const persistedState = {
-  expandSearchOnNextLoad: false,
-  plantQueryStringHistory: [],
 };
 
 const defaultState: IPlantSearchState = {
@@ -29,23 +26,6 @@ const defaultState: IPlantSearchState = {
 export const plantSearchModule = {
   state: () => defaultState,
   mutations: {
-    [PlantSearchMutations.SET_EXPAND_SEARCH_ON_NEXT_LOAD](
-      state: IPlantSearchState,
-      { expandSearchOnNextLoad }: { expandSearchOnNextLoad: boolean }
-    ) {
-      state.expandSearchOnNextLoad = expandSearchOnNextLoad;
-    },
-    [PlantSearchMutations.SET_PLANT_QUERY_STRING](
-      state: IPlantSearchState,
-      { plantQueryString }: { plantQueryString: string }
-    ) {
-      state.plantQueryString = plantQueryString;
-
-      state.plantQueryStringHistory = maybePushOntoUniqueStack(
-        plantQueryString,
-        state.plantQueryStringHistory
-      );
-    },
     [PlantSearchMutations.SET_PLANT_SEARCH_FILTERS](
       state: IPlantSearchState,
       { plantSearchFilters }: { plantSearchFilters: IPlantSearchFilters }
@@ -57,18 +37,6 @@ export const plantSearchModule = {
   },
   getters: {},
   actions: {
-    [PlantSearchActions.SET_EXPAND_SEARCH_ON_NEXT_LOAD](
-      ctx: ActionContext<IPlantSearchState, IPluginState>,
-      { expandSearchOnNextLoad }: { expandSearchOnNextLoad: boolean }
-    ) {
-      ctx.commit(PlantSearchMutations.SET_EXPAND_SEARCH_ON_NEXT_LOAD, { expandSearchOnNextLoad });
-    },
-    [PlantSearchActions.SET_PLANT_QUERY_STRING](
-      ctx: ActionContext<IPlantSearchState, IPluginState>,
-      { plantQueryString }: { plantQueryString: string }
-    ) {
-      ctx.commit(PlantSearchMutations.SET_PLANT_QUERY_STRING, { plantQueryString });
-    },
     [PlantSearchActions.PARTIAL_UPDATE_PLANT_SEARCH_FILTERS]: async (
       ctx: ActionContext<IPlantSearchState, IPluginState>,
       {

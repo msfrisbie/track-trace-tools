@@ -5,15 +5,20 @@ import {
   TAG_TAB_REGEX,
   TRANSFER_TAB_REGEX,
 } from "@/modules/page-manager/consts";
+import { maybePushOntoUniqueStack } from "@/utils/search";
 import { ActionContext } from "vuex";
 import { SearchActions } from "./consts";
 import { ISearchState, SearchType } from "./interfaces";
 
-const inMemoryState = {};
-
-const persistedState = {
+const inMemoryState = {
+  queryString: "",
   searchType: "PACKAGES" as SearchType,
   showSearchResults: false,
+};
+
+const persistedState = {
+  expandSearchOnNextLoad: false,
+  queryStringHistory: [],
 };
 
 const defaultState: ISearchState = {
@@ -26,6 +31,23 @@ export const searchModule = {
   mutations: {},
   getters: {},
   actions: {
+    [SearchActions.SET_EXPAND_SEARCH_ON_NEXT_LOAD](
+      ctx: ActionContext<ISearchState, IPluginState>,
+      { expandSearchOnNextLoad }: { expandSearchOnNextLoad: boolean }
+    ) {
+      ctx.state.expandSearchOnNextLoad = expandSearchOnNextLoad;
+    },
+    [SearchActions.SET_QUERY_STRING](
+      ctx: ActionContext<ISearchState, IPluginState>,
+      { queryString }: { queryString: string }
+    ) {
+      ctx.state.queryString = queryString;
+
+      ctx.state.queryStringHistory = maybePushOntoUniqueStack(
+        queryString,
+        ctx.state.queryStringHistory
+      );
+    },
     [SearchActions.SET_SHOW_SEARCH_RESULTS](
       ctx: ActionContext<ISearchState, IPluginState>,
       { showSearchResults }: { showSearchResults: boolean }

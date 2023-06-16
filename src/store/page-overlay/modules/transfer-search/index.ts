@@ -1,14 +1,12 @@
 import { TransferFilterIdentifiers, TransferState } from "@/consts";
 import { IPluginState, ITransferSearchFilters } from "@/interfaces";
 import { pageManager } from "@/modules/page-manager/page-manager.module";
-import { maybePushOntoUniqueStack } from "@/utils/search";
 import { timer } from "rxjs";
 import { ActionContext } from "vuex";
 import { TransferSearchActions, TransferSearchMutations } from "./consts";
 import { ITransferSearchState } from "./interfaces";
 
 const inMemoryState = {
-  transferQueryString: "",
   transferSearchFilters: {
     manifestNumber: null,
     shipperFacilityInfo: null,
@@ -16,10 +14,7 @@ const inMemoryState = {
   },
 };
 
-const persistedState = {
-  expandSearchOnNextLoad: false,
-  transferQueryStringHistory: [],
-};
+const persistedState = {};
 
 const defaultState: ITransferSearchState = {
   ...inMemoryState,
@@ -29,23 +24,6 @@ const defaultState: ITransferSearchState = {
 export const transferSearchModule = {
   state: () => defaultState,
   mutations: {
-    [TransferSearchMutations.SET_EXPAND_SEARCH_ON_NEXT_LOAD](
-      state: ITransferSearchState,
-      { expandSearchOnNextLoad }: { expandSearchOnNextLoad: boolean }
-    ) {
-      state.expandSearchOnNextLoad = expandSearchOnNextLoad;
-    },
-    [TransferSearchMutations.SET_TRANSFER_QUERY_STRING](
-      state: ITransferSearchState,
-      { transferQueryString }: { transferQueryString: string }
-    ) {
-      state.transferQueryString = transferQueryString;
-
-      state.transferQueryStringHistory = maybePushOntoUniqueStack(
-        transferQueryString,
-        state.transferQueryStringHistory
-      );
-    },
     [TransferSearchMutations.SET_TRANSFER_SEARCH_FILTERS](
       state: ITransferSearchState,
       { transferSearchFilters }: { transferSearchFilters: ITransferSearchFilters }
@@ -57,20 +35,6 @@ export const transferSearchModule = {
   },
   getters: {},
   actions: {
-    [TransferSearchActions.SET_EXPAND_SEARCH_ON_NEXT_LOAD](
-      ctx: ActionContext<ITransferSearchState, IPluginState>,
-      { expandSearchOnNextLoad }: { expandSearchOnNextLoad: boolean }
-    ) {
-      ctx.commit(TransferSearchMutations.SET_EXPAND_SEARCH_ON_NEXT_LOAD, {
-        expandSearchOnNextLoad,
-      });
-    },
-    [TransferSearchActions.SET_TRANSFER_QUERY_STRING](
-      ctx: ActionContext<ITransferSearchState, IPluginState>,
-      { transferQueryString }: { transferQueryString: string }
-    ) {
-      ctx.commit(TransferSearchMutations.SET_TRANSFER_QUERY_STRING, { transferQueryString });
-    },
     [TransferSearchActions.PARTIAL_UPDATE_TRANSFER_SEARCH_FILTERS]: async (
       ctx: ActionContext<ITransferSearchState, IPluginState>,
       {

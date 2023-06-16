@@ -113,13 +113,13 @@ export default Vue.extend({
     });
 
     // Initialize
-    searchManager.packageQueryString.next(this.$data.queryString);
+    searchManager.queryString.next(this.$data.queryString);
 
     this.$data.firstSearch = new Promise((resolve) => {
       this.$data.firstSearchResolver = resolve;
     });
 
-    const queryString$: Observable<string> = searchManager.packageQueryString.asObservable().pipe(
+    const queryString$: Observable<string> = searchManager.queryString.asObservable().pipe(
       tap((queryString: string) => {
         this.$data.queryString = queryString;
       }),
@@ -194,10 +194,10 @@ export default Vue.extend({
     }),
     search(queryString: string) {
       this.setShowSearchResults({ showSearchResults: true });
-      searchManager.packageQueryString.next(queryString);
+      searchManager.queryString.next(queryString);
     },
     clearSearchField() {
-      searchManager.packageQueryString.next("");
+      searchManager.queryString.next("");
     },
   },
   watch: {

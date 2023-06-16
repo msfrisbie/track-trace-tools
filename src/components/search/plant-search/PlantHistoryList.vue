@@ -29,7 +29,7 @@ export default Vue.extend({
   store,
   methods: {
     setSearch(queryString: string) {
-      searchManager.plantQueryString.next(queryString);
+      searchManager.queryString.next(queryString);
       analyticsManager.track(MessageType.CLICKED_RECENT_PLANT_QUERY, {
         queryString,
       });

@@ -1,14 +1,12 @@
 import { TagFilterIdentifiers, TagState } from "@/consts";
 import { IPluginState, ITagSearchFilters } from "@/interfaces";
 import { pageManager } from "@/modules/page-manager/page-manager.module";
-import { maybePushOntoUniqueStack } from "@/utils/search";
 import { timer } from "rxjs";
 import { ActionContext } from "vuex";
 import { TagSearchActions, TagSearchMutations } from "./consts";
 import { ITagSearchState } from "./interfaces";
 
 const inMemoryState = {
-  tagQueryString: "",
   tagSearchFilters: {
     label: null,
     strainName: null,
@@ -16,10 +14,7 @@ const inMemoryState = {
   },
 };
 
-const persistedState = {
-  expandSearchOnNextLoad: false,
-  tagQueryStringHistory: [],
-};
+const persistedState = {};
 
 const defaultState: ITagSearchState = {
   ...inMemoryState,
@@ -29,23 +24,6 @@ const defaultState: ITagSearchState = {
 export const tagSearchModule = {
   state: () => defaultState,
   mutations: {
-    [TagSearchMutations.SET_EXPAND_SEARCH_ON_NEXT_LOAD](
-      state: ITagSearchState,
-      { expandSearchOnNextLoad }: { expandSearchOnNextLoad: boolean }
-    ) {
-      state.expandSearchOnNextLoad = expandSearchOnNextLoad;
-    },
-    [TagSearchMutations.SET_TAG_QUERY_STRING](
-      state: ITagSearchState,
-      { tagQueryString }: { tagQueryString: string }
-    ) {
-      state.tagQueryString = tagQueryString;
-
-      state.tagQueryStringHistory = maybePushOntoUniqueStack(
-        tagQueryString,
-        state.tagQueryStringHistory
-      );
-    },
     [TagSearchMutations.SET_TAG_SEARCH_FILTERS](
       state: ITagSearchState,
       { tagSearchFilters }: { tagSearchFilters: ITagSearchFilters }
@@ -57,18 +35,6 @@ export const tagSearchModule = {
   },
   getters: {},
   actions: {
-    [TagSearchActions.SET_EXPAND_SEARCH_ON_NEXT_LOAD](
-      ctx: ActionContext<ITagSearchState, IPluginState>,
-      { expandSearchOnNextLoad }: { expandSearchOnNextLoad: boolean }
-    ) {
-      ctx.commit(TagSearchMutations.SET_EXPAND_SEARCH_ON_NEXT_LOAD, { expandSearchOnNextLoad });
-    },
-    [TagSearchActions.SET_TAG_QUERY_STRING](
-      ctx: ActionContext<ITagSearchState, IPluginState>,
-      { tagQueryString }: { tagQueryString: string }
-    ) {
-      ctx.commit(TagSearchMutations.SET_TAG_QUERY_STRING, { tagQueryString });
-    },
     [TagSearchActions.PARTIAL_UPDATE_TAG_SEARCH_FILTERS]: async (
       ctx: ActionContext<ITagSearchState, IPluginState>,
       {

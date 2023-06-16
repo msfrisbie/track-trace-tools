@@ -36,6 +36,8 @@ export interface ISelectedTagMetadata {
 // let timeoutId: any = null;
 
 class SearchManager implements IAtomicService {
+  public queryString: BehaviorSubject<string> = new BehaviorSubject<string>("");
+
   public plantQueryString: BehaviorSubject<string> = new BehaviorSubject<string>("");
   public packageQueryString: BehaviorSubject<string> = new BehaviorSubject<string>("");
   public transferQueryString: BehaviorSubject<string> = new BehaviorSubject<string>("");

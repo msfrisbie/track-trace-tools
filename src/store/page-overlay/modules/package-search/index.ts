@@ -8,7 +8,6 @@ import { PackageSearchActions, PackageSearchMutations } from "./consts";
 import { IPackageSearchState } from "./interfaces";
 
 const inMemoryState = {
-  packageQueryString: "",
   packageSearchFilters: {
     label: null,
     sourceHarvestName: null,
@@ -21,8 +20,6 @@ const inMemoryState = {
 };
 
 const persistedState = {
-  expandSearchOnNextLoad: false,
-  packageQueryStringHistory: [],
 };
 
 const defaultState: IPackageSearchState = {
@@ -33,23 +30,6 @@ const defaultState: IPackageSearchState = {
 export const packageSearchModule = {
   state: () => defaultState,
   mutations: {
-    [PackageSearchMutations.SET_EXPAND_SEARCH_ON_NEXT_LOAD](
-      state: IPackageSearchState,
-      { expandSearchOnNextLoad }: { expandSearchOnNextLoad: boolean }
-    ) {
-      state.expandSearchOnNextLoad = expandSearchOnNextLoad;
-    },
-    [PackageSearchMutations.SET_PACKAGE_QUERY_STRING](
-      state: IPackageSearchState,
-      { packageQueryString }: { packageQueryString: string }
-    ) {
-      state.packageQueryString = packageQueryString;
-
-      state.packageQueryStringHistory = maybePushOntoUniqueStack(
-        packageQueryString,
-        state.packageQueryStringHistory
-      );
-    },
     [PackageSearchMutations.SET_PACKAGE_SEARCH_FILTERS](
       state: IPackageSearchState,
       { packageSearchFilters }: { packageSearchFilters: IPackageSearchFilters }
@@ -61,18 +41,6 @@ export const packageSearchModule = {
   },
   getters: {},
   actions: {
-    [PackageSearchActions.SET_EXPAND_SEARCH_ON_NEXT_LOAD](
-      ctx: ActionContext<IPackageSearchState, IPluginState>,
-      { expandSearchOnNextLoad }: { expandSearchOnNextLoad: boolean }
-    ) {
-      ctx.commit(PackageSearchMutations.SET_EXPAND_SEARCH_ON_NEXT_LOAD, { expandSearchOnNextLoad });
-    },
-    [PackageSearchActions.SET_PACKAGE_QUERY_STRING](
-      ctx: ActionContext<IPackageSearchState, IPluginState>,
-      { packageQueryString }: { packageQueryString: string }
-    ) {
-      ctx.commit(PackageSearchMutations.SET_PACKAGE_QUERY_STRING, { packageQueryString });
-    },
     [PackageSearchActions.PARTIAL_UPDATE_PACKAGE_SEARCH_FILTERS]: async (
       ctx: ActionContext<IPackageSearchState, IPluginState>,
       {
