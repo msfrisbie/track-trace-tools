@@ -4,6 +4,7 @@
     style="height: 100%; grid-template-rows: auto 1fr"
   >
     <template v-if="searchState.queryString.length > 0">
+      <search-view-selector />
       <div class="col-span-6 flex flex-row items-center space-x-2 p-4 border-purple-300 border-b">
         <!-- <template v-if="filtersApplied">
           <b-button-group v-if="plantSearchFilters.locationName">
@@ -64,7 +65,7 @@
       </div>
 
       <div class="flex flex-col overflow-y-auto col-span-6">
-        <plant-history-list />
+        <history-list />
       </div>
     </template>
   </div>
@@ -80,6 +81,8 @@ import store from "@/store/page-overlay/index";
 import { PlantSearchActions } from "@/store/page-overlay/modules/plant-search/consts";
 import Vue from "vue";
 import { mapActions, mapGetters, mapState } from "vuex";
+import HistoryList from "@/components/search/shared/HistoryList.vue";
+import SearchViewSelector from "@/components/search/shared/SearchViewSelector.vue";
 
 export default Vue.extend({
   name: "PlantSearchResults",
@@ -88,7 +91,9 @@ export default Vue.extend({
     PlantSearchResultDetail,
     PlantResultGroups,
     // PlantManifestCartBuilder,
-    PlantHistoryList,
+    // PlantHistoryList,
+    HistoryList,
+    SearchViewSelector,
   },
   data() {
     return {};

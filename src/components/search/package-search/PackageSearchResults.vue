@@ -4,6 +4,8 @@
     style="height: 100%; grid-template-rows: auto 1fr"
   >
     <template v-if="searchState.queryString.length > 0">
+      <search-view-selector />
+
       <div class="col-span-6 flex flex-row items-center space-x-2 p-4 border-purple-300 border-b">
         <p class="text-lg text-gray-600">
           <span class="font-bold text-gray-900">{{ searchState.queryString }}</span>
@@ -36,7 +38,7 @@
       </div>
 
       <div class="flex flex-col overflow-y-auto col-span-6">
-        <package-history-list />
+        <history-list />
       </div>
     </template>
   </div>
@@ -52,6 +54,8 @@ import { PackageSearchActions } from "@/store/page-overlay/modules/package-searc
 import { TransferBuilderGetters } from "@/store/page-overlay/modules/transfer-builder/consts";
 import Vue from "vue";
 import { mapActions, mapGetters, mapState } from "vuex";
+import HistoryList from "@/components/search/shared/HistoryList.vue"
+import SearchViewSelector from "@/components/search/shared/SearchViewSelector.vue"
 
 export default Vue.extend({
   name: "PackageSearchResults",
@@ -59,7 +63,8 @@ export default Vue.extend({
   components: {
     PackageSearchResultDetail,
     PackageResultGroups,
-    PackageHistoryList,
+    HistoryList,
+    SearchViewSelector,
   },
   data() {
     return {};
