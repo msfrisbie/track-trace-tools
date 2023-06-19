@@ -92,7 +92,7 @@ export default Vue.extend({
     tags: {
       immediate: true,
       handler(newValue, oldValue) {
-        if (!newValue) {
+        if (!newValue || newValue.length === 0) {
           return;
         }
 

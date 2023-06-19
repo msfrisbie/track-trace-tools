@@ -3,7 +3,7 @@
     <div class="">
       <div class="flex flex-row space-x-2">
         <div v-on:click.stop.prevent class="search-bar-container flex flex-col flex-grow">
-          <b-input-group size="md">
+          <!-- <b-input-group size="md">
             <b-input-group-prepend @click="setShowSearchResults({ showSearchResults: true })"
               ><b-input-group-text class="search-icon">
                 <font-awesome-icon icon="search" />
@@ -28,15 +28,15 @@
                 ><font-awesome-icon icon="backspace"
               /></b-button>
             </b-input-group-append>
-          </b-input-group>
+          </b-input-group> -->
 
           <!-- Anchor point for dropdown results card -->
           <div v-if="searchState.showSearchResults" class="search-anchor">
             <div class="search-bar flex flex-col bg-white rounded-b-md">
               <div class="flex-grow overflow-y-auto">
                 <transfer-search-results
-                  :transfers="transfers"
-                  :inflight="searchState.searchInflight"
+                  :transfers="transferSearchState.transfers"
+                  :inflight="transferSearchState.searchInflight"
                 />
               </div>
 
@@ -85,7 +85,7 @@ export default Vue.extend({
   components: {
     TransferSearchResults,
     TransferSearchFilters,
-    SearchPickerSelect,
+    // SearchPickerSelect,
   },
   data() {
     return {

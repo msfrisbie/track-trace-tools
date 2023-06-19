@@ -72,7 +72,7 @@ export default Vue.extend({
     transfers: {
       immediate: true,
       handler(newValue, oldValue) {
-        if (!newValue) {
+        if (!newValue || newValue.length === 0) {
           return;
         }
 

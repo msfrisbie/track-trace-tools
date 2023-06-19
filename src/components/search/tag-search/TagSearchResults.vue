@@ -33,7 +33,7 @@
 
         <!-- <template v-if="!filtersApplied"> -->
         <p class="text-lg text-gray-600">
-          <span class="font-bold text-gray-900">{{ queryString }}</span>
+          <span class="font-bold text-gray-900">{{ searchState.queryString }}</span>
           matches {{ filteredTags.length }}{{ filteredTags.length === 500 ? "+" : "" }} tags
         </p>
         <!-- </template> -->

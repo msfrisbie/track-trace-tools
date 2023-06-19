@@ -45,7 +45,7 @@ export const transferSearchModule = {
     ) => {
       ctx.state.transfers = [];
       ctx.state.selectedTransferMetadata = null;
-      
+
       ctx.state.searchInflight = true;
 
       await Promise.allSettled([

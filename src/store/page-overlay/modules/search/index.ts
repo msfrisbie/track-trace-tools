@@ -64,9 +64,7 @@ export const searchModule = {
     ) {
       ctx.state.searchType = searchType;
     },
-    [SearchActions.INITIALIZE_SEARCH_TYPE](ctx: ActionContext<ISearchState, IPluginState>, {}: {}) {
-      console.log(window.location.pathname);
-
+    [SearchActions.INITIALIZE_SEARCH_TYPE](ctx: ActionContext<ISearchState, IPluginState>) {
       if (window.location.pathname.match(PLANTS_TAB_REGEX)) {
         ctx.dispatch(SearchActions.SET_SEARCH_TYPE, { searchType: "PLANTS" });
       } else if (window.location.pathname.match(TAG_TAB_REGEX)) {

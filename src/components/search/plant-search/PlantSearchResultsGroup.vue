@@ -93,7 +93,7 @@ export default Vue.extend({
     plants: {
       immediate: true,
       handler(newValue, oldValue) {
-        if (newValue.length === 0) {
+        if (!newValue || newValue.length === 0) {
           return;
         }
 

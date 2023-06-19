@@ -72,6 +72,8 @@ class SearchManager implements IAtomicService {
       }
     });
 
+    store.dispatch(`search/${SearchActions.INITIALIZE_SEARCH_TYPE}`);
+
     // this.plantSearchVisibility.subscribe(
     //   ({ showSearchResults }: { showSearchResults: boolean }) => {
     //     store.dispatch(`plantSearch/${PlantSearchActions.SET_SHOW_PLANT_SEARCH_RESULTS}`, {

@@ -6,6 +6,7 @@ import {
   PackageState,
   PlantBatchState,
   PlantState,
+  SEARCH_LOAD_PAGE_SIZE,
   TagState,
   TransferState,
 } from "@/consts";
@@ -864,10 +865,10 @@ export class DataLoader implements IAtomicService {
   onDemandTransferSearchBody({ queryString }: { queryString: string }): string {
     return JSON.stringify({
       request: {
-        take: DATA_LOAD_PAGE_SIZE,
+        take: SEARCH_LOAD_PAGE_SIZE,
         skip: 0,
         page: 1,
-        pageSize: DATA_LOAD_PAGE_SIZE,
+        pageSize: SEARCH_LOAD_PAGE_SIZE,
         filter: {
           logic: "or",
           filters: [{ field: "ManifestNumber", operator: "contains", value: queryString }],
@@ -880,10 +881,10 @@ export class DataLoader implements IAtomicService {
   onDemandTagSearchBody({ queryString }: { queryString: string }): string {
     return JSON.stringify({
       request: {
-        take: 500,
+        take: SEARCH_LOAD_PAGE_SIZE,
         skip: 0,
         page: 1,
-        pageSize: 500,
+        pageSize: SEARCH_LOAD_PAGE_SIZE,
         filter: {
           logic: "or",
           filters: [{ field: "Label", operator: "endswith", value: queryString }],
@@ -896,10 +897,10 @@ export class DataLoader implements IAtomicService {
   onDemandPlantSearchBody({ queryString }: { queryString: string }): string {
     return JSON.stringify({
       request: {
-        take: DATA_LOAD_PAGE_SIZE,
+        take: SEARCH_LOAD_PAGE_SIZE,
         skip: 0,
         page: 1,
-        pageSize: DATA_LOAD_PAGE_SIZE,
+        pageSize: SEARCH_LOAD_PAGE_SIZE,
         filter: {
           logic: "or",
           filters: [
@@ -1065,10 +1066,10 @@ export class DataLoader implements IAtomicService {
   onDemandPackageSearchBody({ queryString }: { queryString: string }): string {
     return JSON.stringify({
       request: {
-        take: DATA_LOAD_PAGE_SIZE,
+        take: SEARCH_LOAD_PAGE_SIZE,
         skip: 0,
         page: 1,
-        pageSize: DATA_LOAD_PAGE_SIZE,
+        pageSize: SEARCH_LOAD_PAGE_SIZE,
         filter: {
           logic: "or",
           filters: [

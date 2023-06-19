@@ -18,6 +18,7 @@ import TransferSearchWidget from "@/components/search/transfer-search/TransferSe
 import PackageSearchWidget from "@/components/search/package-search/PackageSearchWidget.vue";
 import { SearchActions } from "@/store/page-overlay/modules/search/consts";
 import { SearchType } from "@/store/page-overlay/modules/search/interfaces";
+import { IPluginState } from "@/interfaces";
 
 export default Vue.extend({
   name: "SearchPickerSeelect",
@@ -26,8 +27,8 @@ export default Vue.extend({
   props: {},
   components: {},
   computed: {
-    ...mapState({
-      searchType: (state: any) => state.search.searchType,
+    ...mapState<IPluginState>({
+      searchType: (state: IPluginState) => state.search.searchType,
     }),
     searchType: {
       get(): SearchType {

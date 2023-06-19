@@ -33,7 +33,7 @@
 
         <!-- <template v-if="!filtersApplied"> -->
         <p class="text-lg text-gray-600">
-          <span class="font-bold text-gray-900">{{ queryString }}</span>
+          <span class="font-bold text-gray-900">{{ searchState.queryString }}</span>
           matches {{ filteredPlants.length }}{{ filteredPlants.length === 500 ? "+" : "" }} plants
         </p>
         <!-- </template> -->
@@ -75,7 +75,7 @@
 import PlantHistoryList from "@/components/search/plant-search/PlantHistoryList.vue";
 import PlantResultGroups from "@/components/search/plant-search/PlantResultGroups.vue";
 import PlantSearchResultDetail from "@/components/search/plant-search/PlantSearchResultDetail.vue";
-import { IIndexedPlantData, IPlantData } from "@/interfaces";
+import { IIndexedPlantData, IPlantData, IPluginState } from "@/interfaces";
 import store from "@/store/page-overlay/index";
 import { PlantSearchActions } from "@/store/page-overlay/modules/plant-search/consts";
 import Vue from "vue";
@@ -117,10 +117,11 @@ export default Vue.extend({
     }),
   },
   computed: {
-    ...mapState({
-      authState: (state: any) => state.pluginAuth.authState,
-      queryString: (state: any) => state.search.ueryString,
-      plantSearchFilters: (state: any) => state.plantSearch.plantSearchFilters,
+    ...mapState<IPluginState>({
+      authState: (state: IPluginState) => state.pluginAuth.authState,
+      searchState: (state: IPluginState) => state.search,
+      queryString: (state: IPluginState) => state.search.queryString,
+      plantSearchFilters: (state: IPluginState) => state.plantSearch.plantSearchFilters,
     }),
     ...mapGetters({}),
     filteredPlants() {
@@ -140,7 +141,10 @@ export default Vue.extend({
       });
     },
     filtersApplied() {
-      return Object.values(this.plantSearchFilters || {}).filter((x) => !!x).length > 0;
+      return (
+        Object.values(this.$store.state.plantSearch.plantSearchFilters || {}).filter((x) => !!x)
+          .length > 0
+      );
     },
   },
 });

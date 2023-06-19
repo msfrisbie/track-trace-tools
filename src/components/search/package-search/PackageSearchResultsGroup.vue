@@ -63,7 +63,7 @@ import { SearchActions } from "@/store/page-overlay/modules/search/consts";
 import { Subject } from "rxjs";
 import { take, takeUntil } from "rxjs/operators";
 import Vue from "vue";
-import { mapActions, mapState } from "vuex";
+import { mapActions, mapState, Store } from "vuex";
 
 export default Vue.extend({
   name: "PackageSearchResultsGroup",
@@ -92,8 +92,7 @@ export default Vue.extend({
     packages: {
       immediate: true,
       handler(newValue, oldValue) {
-        console.log({ newValue });
-        if (!newValue) {
+        if (!newValue || newValue.length === 0) {
           return;
         }
 
@@ -108,7 +107,8 @@ export default Vue.extend({
           this.$store.state.packageSearch.selectedPackageMetadata.priority >=
             candidateMetadata.priority
         ) {
-          this.$store.state.packageSearch.selectedPackageMetadata = candidateMetadata;
+          (this.$store as Store<IPluginState>).state.packageSearch.selectedPackageMetadata =
+            candidateMetadata;
         }
 
         // searchManager.selectedPackage
