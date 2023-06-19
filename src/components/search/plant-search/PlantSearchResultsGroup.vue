@@ -34,9 +34,9 @@
       :plant="plant"
       :sectionName="sectionName"
       :selected="
-        !!selectedPlantMetadata &&
-        plant.Id === selectedPlantMetadata.plantData.Id &&
-        sectionName === selectedPlantMetadata.sectionName
+        !!plantSearchData.selectedPlantMetadata &&
+        plant.Id === plantSearchData.selectedPlantMetadata.plantData.Id &&
+        sectionName === plantSearchData.selectedPlantMetadata.sectionName
       "
       :idx="index"
       v-on:selected-plant="showPlantDetail($event)"
@@ -56,9 +56,9 @@
 import PlantSearchResultPreview from "@/components/search/plant-search/PlantSearchResultPreview.vue";
 import { IIndexedPlantData, IPluginState } from "@/interfaces";
 import { PLANTS_TAB_REGEX } from "@/modules/page-manager/consts";
-import { ISelectedPlantMetadata, searchManager } from "@/modules/search-manager.module";
 import store from "@/store/page-overlay/index";
 import { PlantSearchActions } from "@/store/page-overlay/modules/plant-search/consts";
+import { ISelectedPlantMetadata } from "@/store/page-overlay/modules/plant-search/interfaces";
 import { IPluginAuthState } from "@/store/page-overlay/modules/plugin-auth/interfaces";
 import { SearchActions } from "@/store/page-overlay/modules/search/consts";
 import { Subject } from "rxjs";
@@ -71,13 +71,13 @@ export default Vue.extend({
   store,
   components: { PlantSearchResultPreview },
   data(): {
-    destroyed$: Subject<void>;
-    selectedPlantMetadata: ISelectedPlantMetadata | null;
+    // destroyed$: Subject<void>;
+    // selectedPlantMetadata: ISelectedPlantMetadata | null;
     showAll: boolean;
   } {
     return {
-      destroyed$: new Subject(),
-      selectedPlantMetadata: null,
+      // destroyed$: new Subject(),
+      // selectedPlantMetadata: null,
       showAll: false,
     };
   },
@@ -93,27 +93,29 @@ export default Vue.extend({
     plants: {
       immediate: true,
       handler(newValue, oldValue) {
-        searchManager.selectedPlant
-          .asObservable()
-          .pipe(take(1))
-          .subscribe((plantMetadata) => {
-            if (
-              newValue.length > 0 &&
-              !newValue.find((x: any) => x.Id === plantMetadata?.plantData.Id)
-            ) {
-              searchManager.maybeInitializeSelectedPlant(
-                newValue[0],
-                this.sectionName,
-                this.sectionPriority
-              );
-            }
-          });
+        if (newValue.length === 0) {
+          return;
+        }
+
+        const candidateMetadata: ISelectedPlantMetadata = {
+          plantData: newValue[0],
+          sectionName: this.sectionName,
+          priority: this.sectionPriority,
+        };
+
+        if (
+          !this.$store.state.plantSearch.selectedPlantMetadata ||
+          this.$store.state.plantSearch.selectedPlantMetadata.priority > candidateMetadata.priority
+        ) {
+          this.$store.state.plantSearch.selectedPlantMetadata = candidateMetadata;
+        }
       },
     },
   },
   computed: {
     ...mapState<IPluginState>({
       queryString: (state: IPluginState) => state.search.queryString,
+      plantSearchData: (state: IPluginState) => state.plantSearch
     }),
     isOnPlantsPage(): boolean {
       return !!window.location.pathname.match(PLANTS_TAB_REGEX);
@@ -145,11 +147,15 @@ export default Vue.extend({
     }),
     showPlantDetail(plantData: IIndexedPlantData) {
       // TODO debounce this to improve mouseover accuracy
-      searchManager.selectedPlant.next({
+      // searchManager.selectedPlant.next({
+      //   plantData,
+      // });
+
+      this.$store.state.plantSearch.selectedPlantMetadata = {
         plantData,
         sectionName: this.sectionName,
         priority: this.sectionPriority,
-      });
+      };
     },
     applyFilter() {
       if (this.disableFilter) {
@@ -168,16 +174,16 @@ export default Vue.extend({
       this.setShowSearchResults({ showSearchResults: false });
     },
   },
-  created() {
-    searchManager.selectedPlant
-      .asObservable()
-      .pipe(takeUntil(this.$data.destroyed$))
-      .subscribe(
-        (selectedPlantMetadata) => (this.$data.selectedPlantMetadata = selectedPlantMetadata)
-      );
-  },
-  beforeDestroy() {
-    this.$data.destroyed$.next(null);
-  },
+  // created() {
+  //   // searchManager.selectedPlant
+  //   //   .asObservable()
+  //   //   .pipe(takeUntil(this.$data.destroyed$))
+  //   //   .subscribe(
+  //   //     (selectedPlantMetadata) => (this.$data.selectedPlantMetadata = selectedPlantMetadata)
+  //   //   );
+  // },
+  // beforeDestroy() {
+  //   this.$data.destroyed$.next(null);
+  // },
 });
 </script>

@@ -457,7 +457,7 @@ export default Vue.extend({
       analyticsManager.track(MessageType.CONTEXT_MENU_SELECT, { event: "searchTransfer", text });
 
       this.setShowSearchResults({ showSearchResults: true });
-      searchManager.queryString.next(text);
+      this.$store.dispatch(`search/${SearchActions.SET_QUERY_STRING}`, { queryString: text });
       this.dismiss();
     },
     reset() {

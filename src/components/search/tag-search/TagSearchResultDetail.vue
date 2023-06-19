@@ -48,24 +48,24 @@ export default Vue.extend({
   name: "TagSearchResultDetail",
   store,
   components: { MetrcTag, RecursiveJsonTable },
-  async created() {
-    searchManager.selectedTag
-      .asObservable()
-      .pipe(takeUntil(this.$data.destroyed$))
-      .subscribe(
-        (selectedTagMetatdata) =>
-          (this.$data.tag = selectedTagMetatdata ? selectedTagMetatdata.tagData : null)
-      );
-  },
-  beforeDestroy() {
-    this.$data.destroyed$.next(null);
-  },
+  // async created() {
+  //   searchManager.selectedTag
+  //     .asObservable()
+  //     .pipe(takeUntil(this.$data.destroyed$))
+  //     .subscribe(
+  //       (selectedTagMetatdata) =>
+  //         (this.$data.tag = selectedTagMetatdata ? selectedTagMetatdata.tagData : null)
+  //     );
+  // },
+  // beforeDestroy() {
+  //   this.$data.destroyed$.next(null);
+  // },
   data(): {
-    destroyed$: Subject<void>;
+    // destroyed$: Subject<void>;
     tag: IIndexedTagData | null;
   } {
     return {
-      destroyed$: new Subject(),
+      // destroyed$: new Subject(),
       tag: null,
     };
   },

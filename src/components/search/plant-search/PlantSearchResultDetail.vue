@@ -51,24 +51,24 @@ export default Vue.extend({
   name: "PlantSearchResultDetail",
   store,
   components: { MetrcTag, RecursiveJsonTable },
-  async created() {
-    searchManager.selectedPlant
-      .asObservable()
-      .pipe(takeUntil(this.$data.destroyed$))
-      .subscribe(
-        (selectedPlantMetatdata) =>
-          (this.$data.plant = selectedPlantMetatdata ? selectedPlantMetatdata.plantData : null)
-      );
-  },
-  beforeDestroy() {
-    this.$data.destroyed$.next(null);
-  },
+  // async created() {
+  //   searchManager.selectedPlant
+  //     .asObservable()
+  //     .pipe(takeUntil(this.$data.destroyed$))
+  //     .subscribe(
+  //       (selectedPlantMetatdata) =>
+  //         (this.$data.plant = selectedPlantMetatdata ? selectedPlantMetatdata.plantData : null)
+  //     );
+  // },
+  // beforeDestroy() {
+  //   this.$data.destroyed$.next(null);
+  // },
   data(): {
-    destroyed$: Subject<void>;
+    // destroyed$: Subject<void>;
     plant: IIndexedPlantData | null;
   } {
     return {
-      destroyed$: new Subject(),
+      // destroyed$: new Subject(),
       plant: null,
     };
   },

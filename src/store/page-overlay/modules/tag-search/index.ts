@@ -1,5 +1,6 @@
 import { TagFilterIdentifiers, TagState } from "@/consts";
 import { IPluginState, ITagSearchFilters } from "@/interfaces";
+import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
 import { pageManager } from "@/modules/page-manager/page-manager.module";
 import { timer } from "rxjs";
 import { ActionContext } from "vuex";
@@ -7,6 +8,9 @@ import { TagSearchActions, TagSearchMutations } from "./consts";
 import { ITagSearchState } from "./interfaces";
 
 const inMemoryState = {
+  searchInflight: false,
+  selectedTagMetadata: null,
+  tags: [],
   tagSearchFilters: {
     label: null,
     strainName: null,
@@ -35,6 +39,35 @@ export const tagSearchModule = {
   },
   getters: {},
   actions: {
+    [TagSearchActions.EXECUTE_QUERY]: async (
+      ctx: ActionContext<ITagSearchState, IPluginState>,
+      { queryString }: { queryString: string }
+    ) => {
+      ctx.state.tags = [];
+      ctx.state.selectedTagMetadata = null;
+
+      ctx.state.searchInflight = true;
+
+      await Promise.allSettled([
+        primaryDataLoader
+          .onDemandTagSearch({ queryString, tagState: TagState.AVAILABLE })
+          .then((result) => {
+            ctx.state.tags = [...ctx.state.tags, ...result];
+          }),
+        primaryDataLoader
+          .onDemandTagSearch({ queryString, tagState: TagState.USED })
+          .then((result) => {
+            ctx.state.tags = [...ctx.state.tags, ...result];
+          }),
+        primaryDataLoader
+          .onDemandTagSearch({ queryString, tagState: TagState.VOIDED })
+          .then((result) => {
+            ctx.state.tags = [...ctx.state.tags, ...result];
+          }),
+      ]);
+
+      ctx.state.searchInflight = false;
+    },
     [TagSearchActions.PARTIAL_UPDATE_TAG_SEARCH_FILTERS]: async (
       ctx: ActionContext<ITagSearchState, IPluginState>,
       {

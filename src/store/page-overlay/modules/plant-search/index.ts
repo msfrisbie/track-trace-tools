@@ -1,13 +1,16 @@
 import { PlantFilterIdentifiers, PlantState } from "@/consts";
 import { IPlantSearchFilters, IPluginState } from "@/interfaces";
+import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
 import { pageManager } from "@/modules/page-manager/page-manager.module";
-import { maybePushOntoUniqueStack } from "@/utils/search";
 import { timer } from "rxjs";
 import { ActionContext } from "vuex";
 import { PlantSearchActions, PlantSearchMutations } from "./consts";
 import { IPlantSearchState } from "./interfaces";
 
 const inMemoryState = {
+  searchInflight: false,
+  selectedPlantMetadata: null,
+  plants: [],
   plantSearchFilters: {
     label: null,
     strainName: null,
@@ -15,8 +18,7 @@ const inMemoryState = {
   },
 };
 
-const persistedState = {
-};
+const persistedState = {};
 
 const defaultState: IPlantSearchState = {
   ...inMemoryState,
@@ -37,6 +39,29 @@ export const plantSearchModule = {
   },
   getters: {},
   actions: {
+    [PlantSearchActions.EXECUTE_QUERY]: async (
+      ctx: ActionContext<IPlantSearchState, IPluginState>,
+      { queryString }: { queryString: string }
+    ) => {
+      ctx.state.plants = [];
+      ctx.state.selectedPlantMetadata = null;
+
+      ctx.state.searchInflight = true;
+
+      await Promise.allSettled([
+        primaryDataLoader.onDemandFloweringPlantSearch({ queryString }).then((result) => {
+          ctx.state.plants = [...ctx.state.plants, ...result];
+        }),
+        primaryDataLoader.onDemandVegetativePlantSearch({ queryString }).then((result) => {
+          ctx.state.plants = [...ctx.state.plants, ...result];
+        }),
+        primaryDataLoader.onDemandInactivePlantSearch({ queryString }).then((result) => {
+          ctx.state.plants = [...ctx.state.plants, ...result];
+        }),
+      ]);
+
+      ctx.state.searchInflight = false;
+    },
     [PlantSearchActions.PARTIAL_UPDATE_PLANT_SEARCH_FILTERS]: async (
       ctx: ActionContext<IPlantSearchState, IPluginState>,
       {

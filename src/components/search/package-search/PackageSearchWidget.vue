@@ -23,8 +23,8 @@
               ref="search"
             ></b-form-input>
 
-            <b-input-group-append v-if="queryString.length > 0">
-              <b-button variant="light" @click="clearSearchField"
+            <b-input-group-append v-if="searchState.queryString.length > 0">
+              <b-button variant="light" @click="clearSearchField()"
                 ><font-awesome-icon icon="backspace"
               /></b-button>
             </b-input-group-append>
@@ -34,7 +34,10 @@
           <div v-if="searchState.showSearchResults" class="search-anchor">
             <div class="search-bar flex flex-col bg-white rounded-b-md">
               <div class="flex-grow overflow-y-auto">
-                <package-search-results :packages="packages" :inflight="searchInflight" />
+                <package-search-results
+                  :packages="packageSearchState.packages"
+                  :inflight="packageSearchState.searchInflight"
+                />
               </div>
 
               <div
@@ -84,106 +87,100 @@ export default Vue.extend({
   },
   data() {
     return {
-      firstSearch: null,
-      firstSearchResolver: null,
-      searchInflight: false,
-      showFilters: false,
-      queryString: "",
-      packages: [],
-      filters: {
-        license: null,
-      },
+      // firstSearch: null,
+      // firstSearchResolver: null,
+      // searchInflight: false,
+      // // showFilters: false,
+      // queryString: "",
+      // packages: [],
+      // filters: {
+      //   license: null,
+      // },
     };
   },
   async mounted() {
-    const authState = await authManager.authStateOrError();
-
-    this.$data.filters.license = authState.license;
-
-    document.addEventListener("keyup", (e) => {
-      if (e.isTrusted && e.key === "Escape") {
-        this.setShowSearchResults({ showSearchResults: false });
-      }
-    });
-
-    document.addEventListener("click", (e) => {
-      if (e.isTrusted) {
-        this.setShowSearchResults({ showSearchResults: false });
-      }
-    });
-
+    // const authState = await authManager.authStateOrError();
+    // this.$data.filters.license = authState.license;
+    // document.addEventListener("keyup", (e) => {
+    //   if (e.isTrusted && e.key === "Escape") {
+    //     this.setShowSearchResults({ showSearchResults: false });
+    //   }
+    // });
+    // document.addEventListener("click", (e) => {
+    //   if (e.isTrusted) {
+    //     this.setShowSearchResults({ showSearchResults: false });
+    //   }
+    // });
     // Initialize
-    searchManager.queryString.next(this.$data.queryString);
-
-    this.$data.firstSearch = new Promise((resolve) => {
-      this.$data.firstSearchResolver = resolve;
-    });
-
-    const queryString$: Observable<string> = searchManager.queryString.asObservable().pipe(
-      tap((queryString: string) => {
-        this.$data.queryString = queryString;
-      }),
-      filter((queryString: string) => queryString !== this.$store.state.search.queryString),
-      debounceTime(500),
-      tap((queryString: string) => {
-        if (queryString) {
-          analyticsManager.track(MessageType.ENTERED_PACKAGE_SEARCH_QUERY, {
-            queryString,
-          });
-        }
-
-        this.$data.packages = [];
-
-        searchManager.selectedPackage.next(null);
-
-        // This also writes to the search history,
-        // so this must be after debounce
-        this.setQueryString({ queryString });
-      })
-    );
-
-    combineLatest([
-      queryString$.pipe(
-        filter((queryString: string) => !!queryString),
-        startWith(this.$store.state.search.queryString || "")
-      ),
-    ]).subscribe(async ([queryString]: [string]) => {
-      this.$data.searchInflight = true;
-
-      if (queryString.length > 0) {
-        this.$data.firstSearchResolver();
-      }
-
-      this.$data.packages = [];
-
-      await Promise.allSettled([
-        primaryDataLoader.onDemandActivePackageSearch({ queryString }).then((result) => {
-          this.$data.packages = [...this.$data.packages, ...result];
-        }),
-        primaryDataLoader.onDemandInTransitPackageSearch({ queryString }).then((result) => {
-          this.$data.packages = [...this.$data.packages, ...result];
-        }),
-        primaryDataLoader.onDemandInactivePackageSearch({ queryString }).then((result) => {
-          this.$data.packages = [...this.$data.packages, ...result];
-        }),
-      ]);
-
-      this.$data.searchInflight = false;
-    });
-
-    if (this.$store.state.expandSearchOnNextLoad) {
-      this.setExpandSearchOnNextLoad({
-        expandSearchOnNextLoad: false,
-      });
-
-      this.setShowSearchResults({ showSearchResults: true });
-    }
+    // searchManager.queryString.next(this.$data.queryString);
+    // this.$data.firstSearch = new Promise((resolve) => {
+    //   this.$data.firstSearchResolver = resolve;
+    // });
+    // const queryString$: Observable<string> = searchManager.queryString.asObservable().pipe(
+    //   tap((queryString: string) => {
+    //     this.$data.queryString = queryString;
+    //   }),
+    //   filter((queryString: string) => queryString !== this.$store.state.search.queryString),
+    //   debounceTime(500),
+    //   tap((queryString: string) => {
+    //     if (queryString) {
+    //       analyticsManager.track(MessageType.ENTERED_PACKAGE_SEARCH_QUERY, {
+    //         queryString,
+    //       });
+    //     }
+    //     this.$data.packages = [];
+    //     searchManager.selectedPackage.next(null);
+    //     // This also writes to the search history,
+    //     // so this must be after debounce
+    //     this.setQueryString({ queryString });
+    //   })
+    // );
+    // combineLatest([
+    //   queryString$.pipe(
+    //     filter((queryString: string) => !!queryString),
+    //     startWith(this.$store.state.search.queryString || "")
+    //   ),
+    // ]).subscribe(async ([queryString]: [string]) => {
+    //   this.$data.searchInflight = true;
+    //   if (queryString.length > 0) {
+    //     this.$data.firstSearchResolver();
+    //   }
+    //   this.$data.packages = [];
+    //   await Promise.allSettled([
+    //     primaryDataLoader.onDemandActivePackageSearch({ queryString }).then((result) => {
+    //       this.$data.packages = [...this.$data.packages, ...result];
+    //     }),
+    //     primaryDataLoader.onDemandInTransitPackageSearch({ queryString }).then((result) => {
+    //       this.$data.packages = [...this.$data.packages, ...result];
+    //     }),
+    //     primaryDataLoader.onDemandInactivePackageSearch({ queryString }).then((result) => {
+    //       this.$data.packages = [...this.$data.packages, ...result];
+    //     }),
+    //   ]);
+    //   this.$data.searchInflight = false;
+    // });
+    // if (this.$store.state.expandSearchOnNextLoad) {
+    //   this.setExpandSearchOnNextLoad({
+    //     expandSearchOnNextLoad: false,
+    //   });
+    //   this.setShowSearchResults({ showSearchResults: true });
+    // }
   },
   computed: {
     ...mapState<IPluginState>({
       packageSearchState: (state: IPluginState) => state.packageSearch,
       searchState: (state: IPluginState) => state.search,
     }),
+    queryString: {
+      get(): string {
+        return this.$store.state.search.queryString;
+      },
+      set(queryString: string) {
+        this.setQueryString({
+          queryString,
+        });
+      },
+    },
   },
   methods: {
     ...mapActions({
@@ -192,17 +189,18 @@ export default Vue.extend({
       setExpandSearchOnNextLoad: `search/${SearchActions.SET_EXPAND_SEARCH_ON_NEXT_LOAD}`,
     }),
     search(queryString: string) {
-      this.setShowSearchResults({ showSearchResults: true });
-      searchManager.queryString.next(queryString);
+      // this.setShowSearchResults({ showSearchResults: true });
+      // this.$store.dispatch(`search/${SearchActions.SET_QUERY_STRING}`, { queryString });
+      this.setQueryString({ queryString });
     },
     clearSearchField() {
-      searchManager.queryString.next("");
+      this.setQueryString({ queryString: "" });
     },
   },
   watch: {
     "searchState.showSearchResults": {
       immediate: true,
-      handler(newValue, oldValue) {
+      handler(newValue: boolean, oldValue: boolean) {
         if (newValue) {
           timer(500).subscribe(() =>
             // @ts-ignore

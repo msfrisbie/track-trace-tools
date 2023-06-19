@@ -1,51 +1,38 @@
-import {
-  IAtomicService,
-  IIndexedPackageData,
-  IIndexedPlantData,
-  IIndexedTagData,
-  ITagData,
-  ITransferData,
-} from "@/interfaces";
-import { BehaviorSubject } from "rxjs";
-import { take } from "rxjs/operators";
+import { IAtomicService } from "@/interfaces";
+import store from "@/store/page-overlay/index";
+import { SearchActions } from "@/store/page-overlay/modules/search/consts";
 
-export interface ISelectedPlantMetadata {
-  plantData: IIndexedPlantData;
-  sectionName: string;
-  priority: number;
-}
+// export interface ISelectedPlantMetadata {
+//   plantData: IIndexedPlantData;
+//   sectionName: string;
+//   priority: number;
+// }
 
-export interface ISelectedPackageMetadata {
-  packageData: IIndexedPackageData;
-  sectionName: string;
-  priority: number;
-}
+// export interface ISelectedTransferMetadata {
+//   transferData: ITransferData;
+//   sectionName: string;
+//   priority: number;
+// }
 
-export interface ISelectedTransferMetadata {
-  transferData: ITransferData;
-  sectionName: string;
-  priority: number;
-}
-
-export interface ISelectedTagMetadata {
-  tagData: ITagData;
-  sectionName: string;
-  priority: number;
-}
+// export interface ISelectedTagMetadata {
+//   tagData: ITagData;
+//   sectionName: string;
+//   priority: number;
+// }
 
 // let timeoutId: any = null;
 
 class SearchManager implements IAtomicService {
-  public queryString: BehaviorSubject<string> = new BehaviorSubject<string>("");
+  // public queryString: BehaviorSubject<string> = new BehaviorSubject<string>("");
 
-  public selectedPackage: BehaviorSubject<ISelectedPackageMetadata | null> =
-    new BehaviorSubject<ISelectedPackageMetadata | null>(null);
-  public selectedPlant: BehaviorSubject<ISelectedPlantMetadata | null> =
-    new BehaviorSubject<ISelectedPlantMetadata | null>(null);
-  public selectedTransfer: BehaviorSubject<ISelectedTransferMetadata | null> =
-    new BehaviorSubject<ISelectedTransferMetadata | null>(null);
-  public selectedTag: BehaviorSubject<ISelectedTagMetadata | null> =
-    new BehaviorSubject<ISelectedTagMetadata | null>(null);
+  // // public selectedPackage: BehaviorSubject<ISelectedPackageMetadata | null> =
+  // //   new BehaviorSubject<ISelectedPackageMetadata | null>(null);
+  // public selectedPlant: BehaviorSubject<ISelectedPlantMetadata | null> =
+  //   new BehaviorSubject<ISelectedPlantMetadata | null>(null);
+  // public selectedTransfer: BehaviorSubject<ISelectedTransferMetadata | null> =
+  //   new BehaviorSubject<ISelectedTransferMetadata | null>(null);
+  // public selectedTag: BehaviorSubject<ISelectedTagMetadata | null> =
+  //   new BehaviorSubject<ISelectedTagMetadata | null>(null);
 
   // public packageSearchVisibility: BehaviorSubject<{
   //   showSearchResults: boolean;
@@ -69,6 +56,22 @@ class SearchManager implements IAtomicService {
   // }>({ showSearchResults: false });
 
   async init() {
+    document.addEventListener("keyup", (e) => {
+      if (e.isTrusted && e.key === "Escape") {
+        store.dispatch(`search/${SearchActions.SET_SHOW_SEARCH_RESULTS}`, {
+          showSearchResults: false,
+        });
+      }
+    });
+
+    document.addEventListener("click", (e) => {
+      if (e.isTrusted) {
+        store.dispatch(`search/${SearchActions.SET_SHOW_SEARCH_RESULTS}`, {
+          showSearchResults: false,
+        });
+      }
+    });
+
     // this.plantSearchVisibility.subscribe(
     //   ({ showSearchResults }: { showSearchResults: boolean }) => {
     //     store.dispatch(`plantSearch/${PlantSearchActions.SET_SHOW_PLANT_SEARCH_RESULTS}`, {
@@ -125,61 +128,61 @@ class SearchManager implements IAtomicService {
   //   this.tagSearchVisibility.next({ showSearchResults });
   // }
 
-  maybeInitializeSelectedPlant(
-    plantData: IIndexedPlantData,
-    sectionName: string,
-    priority: number
-  ) {
-    this.selectedPlant
-      .asObservable()
-      .pipe(take(1))
-      .subscribe((selectedPlant) => {
-        if (!selectedPlant || priority <= selectedPlant.priority) {
-          this.selectedPlant.next({ plantData, sectionName, priority });
-        }
-      });
-  }
+  // maybeInitializeSelectedPlant(
+  //   plantData: IIndexedPlantData,
+  //   sectionName: string,
+  //   priority: number
+  // ) {
+  //   this.selectedPlant
+  //     .asObservable()
+  //     .pipe(take(1))
+  //     .subscribe((selectedPlant) => {
+  //       if (!selectedPlant || priority <= selectedPlant.priority) {
+  //         this.selectedPlant.next({ plantData, sectionName, priority });
+  //       }
+  //     });
+  // }
 
-  maybeInitializeSelectedPackage(
-    packageData: IIndexedPackageData,
-    sectionName: string,
-    priority: number
-  ) {
-    this.selectedPackage
-      .asObservable()
-      .pipe(take(1))
-      .subscribe((selectedPackage) => {
-        if (!selectedPackage || priority <= selectedPackage.priority) {
-          this.selectedPackage.next({ packageData, sectionName, priority });
-        }
-      });
-  }
+  // maybeInitializeSelectedPackage(
+  //   packageData: IIndexedPackageData,
+  //   sectionName: string,
+  //   priority: number
+  // ) {
+  //   this.selectedPackage
+  //     .asObservable()
+  //     .pipe(take(1))
+  //     .subscribe((selectedPackage) => {
+  //       if (!selectedPackage || priority <= selectedPackage.priority) {
+  //         this.selectedPackage.next({ packageData, sectionName, priority });
+  //       }
+  //     });
+  // }
 
-  maybeInitializeSelectedTransfer(
-    transferData: ITransferData,
-    sectionName: string,
-    priority: number
-  ) {
-    this.selectedTransfer
-      .asObservable()
-      .pipe(take(1))
-      .subscribe((selectedTransfer) => {
-        if (!selectedTransfer || priority <= selectedTransfer.priority) {
-          this.selectedTransfer.next({ transferData, sectionName, priority });
-        }
-      });
-  }
+  // maybeInitializeSelectedTransfer(
+  //   transferData: ITransferData,
+  //   sectionName: string,
+  //   priority: number
+  // ) {
+  //   this.selectedTransfer
+  //     .asObservable()
+  //     .pipe(take(1))
+  //     .subscribe((selectedTransfer) => {
+  //       if (!selectedTransfer || priority <= selectedTransfer.priority) {
+  //         this.selectedTransfer.next({ transferData, sectionName, priority });
+  //       }
+  //     });
+  // }
 
-  maybeInitializeSelectedTag(tagData: IIndexedTagData, sectionName: string, priority: number) {
-    this.selectedTag
-      .asObservable()
-      .pipe(take(1))
-      .subscribe((selectedTag) => {
-        if (!selectedTag || priority <= selectedTag.priority) {
-          this.selectedTag.next({ tagData, sectionName, priority });
-        }
-      });
-  }
+  // maybeInitializeSelectedTag(tagData: IIndexedTagData, sectionName: string, priority: number) {
+  //   this.selectedTag
+  //     .asObservable()
+  //     .pipe(take(1))
+  //     .subscribe((selectedTag) => {
+  //       if (!selectedTag || priority <= selectedTag.priority) {
+  //         this.selectedTag.next({ tagData, sectionName, priority });
+  //       }
+  //     });
+  // }
 }
 
 export let searchManager = new SearchManager();

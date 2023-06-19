@@ -1,13 +1,16 @@
 import { PackageFilterIdentifiers, PackageState } from "@/consts";
 import { IPackageSearchFilters, IPluginState } from "@/interfaces";
+import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
 import { pageManager } from "@/modules/page-manager/page-manager.module";
-import { maybePushOntoUniqueStack } from "@/utils/search";
 import { timer } from "rxjs";
 import { ActionContext } from "vuex";
 import { PackageSearchActions, PackageSearchMutations } from "./consts";
 import { IPackageSearchState } from "./interfaces";
 
 const inMemoryState = {
+  searchInflight: false,
+  packages: [],
+  selectedPackageMetadata: null,
   packageSearchFilters: {
     label: null,
     sourceHarvestName: null,
@@ -19,8 +22,7 @@ const inMemoryState = {
   },
 };
 
-const persistedState = {
-};
+const persistedState = {};
 
 const defaultState: IPackageSearchState = {
   ...inMemoryState,
@@ -41,6 +43,29 @@ export const packageSearchModule = {
   },
   getters: {},
   actions: {
+    [PackageSearchActions.EXECUTE_QUERY]: async (
+      ctx: ActionContext<IPackageSearchState, IPluginState>,
+      { queryString }: { queryString: string }
+    ) => {
+      ctx.state.packages = [];
+      ctx.state.selectedPackageMetadata = null;
+
+      ctx.state.searchInflight = true;
+
+      await Promise.allSettled([
+        primaryDataLoader.onDemandActivePackageSearch({ queryString }).then((result) => {
+          ctx.state.packages = [...ctx.state.packages, ...result];
+        }),
+        primaryDataLoader.onDemandInTransitPackageSearch({ queryString }).then((result) => {
+          ctx.state.packages = [...ctx.state.packages, ...result];
+        }),
+        primaryDataLoader.onDemandInactivePackageSearch({ queryString }).then((result) => {
+          ctx.state.packages = [...ctx.state.packages, ...result];
+        }),
+      ]);
+
+      ctx.state.searchInflight = false;
+    },
     [PackageSearchActions.PARTIAL_UPDATE_PACKAGE_SEARCH_FILTERS]: async (
       ctx: ActionContext<IPackageSearchState, IPluginState>,
       {

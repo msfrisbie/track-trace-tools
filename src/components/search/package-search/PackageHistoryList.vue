@@ -23,6 +23,7 @@ import { IPluginState } from "@/interfaces";
 import { analyticsManager } from "@/modules/analytics-manager.module";
 import { searchManager } from "@/modules/search-manager.module";
 import store from "@/store/page-overlay/index";
+import { SearchActions } from "@/store/page-overlay/modules/search/consts";
 import Vue from "vue";
 import { mapState } from "vuex";
 export default Vue.extend({
@@ -30,7 +31,7 @@ export default Vue.extend({
   store,
   methods: {
     setSearch(queryString: string) {
-      searchManager.queryString.next(queryString);
+      this.$store.dispatch(`search/${SearchActions.SET_QUERY_STRING}`, { queryString });
       analyticsManager.track(MessageType.CLICKED_RECENT_PACKAGE_QUERY, {
         queryString,
       });

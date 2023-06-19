@@ -154,21 +154,21 @@ export default Vue.extend({
   name: "PackageSearchResultDetail",
   store,
   components: { MetrcTag, RecursiveJsonTable },
-  async created() {
-    searchManager.selectedPackage
-      .asObservable()
-      .pipe(takeUntil(this.$data.destroyed$))
-      .subscribe(
-        (selectedPackageMetatdata) =>
-          (this.$data.pkg = selectedPackageMetatdata ? selectedPackageMetatdata.packageData : null)
-      );
-  },
-  beforeDestroy() {
-    this.$data.destroyed$.next(null);
-  },
+  // async created() {
+  //   searchManager.selectedPackage
+  //     .asObservable()
+  //     .pipe(takeUntil(this.$data.destroyed$))
+  //     .subscribe(
+  //       (selectedPackageMetatdata) =>
+  //         (this.$data.pkg = selectedPackageMetatdata ? selectedPackageMetatdata.packageData : null)
+  //     );
+  // },
+  // beforeDestroy() {
+  //   this.$data.destroyed$.next(null);
+  // },
   data(): {
     packageLabTestPdfEligible: boolean;
-    destroyed$: Subject<void>;
+    // destroyed$: Subject<void>;
     pkg: IIndexedPackageData | null;
     activeTransferPackageList: ITransferPackageList | null;
   } {
@@ -176,7 +176,7 @@ export default Vue.extend({
       packageLabTestPdfEligible: !METRC_HOSTNAMES_LACKING_LAB_PDFS.includes(
         window.location.hostname
       ),
-      destroyed$: new Subject(),
+      // destroyed$: new Subject(),
       pkg: null,
       activeTransferPackageList: null,
     };

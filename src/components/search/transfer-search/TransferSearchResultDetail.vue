@@ -88,7 +88,6 @@ import { analyticsManager } from "@/modules/analytics-manager.module";
 import { modalManager } from "@/modules/modal-manager.module";
 import { pageManager } from "@/modules/page-manager/page-manager.module";
 import { TRANSFER_TAB_REGEX } from "@/modules/page-manager/consts";
-import { ISelectedTransferMetadata, searchManager } from "@/modules/search-manager.module";
 import { toastManager } from "@/modules/toast-manager.module";
 import { MutationType } from "@/mutation-types";
 import store from "@/store/page-overlay/index";
@@ -135,17 +134,17 @@ export default Vue.extend({
     // TransferIcon,
     RecursiveJsonTable,
   },
-  created() {
-    searchManager.selectedTransfer
-      .asObservable()
-      .pipe(takeUntil(this.$data.destroyed$))
-      .subscribe(
-        (selectedTransferMetatdata: ISelectedTransferMetadata | null) =>
-          (this.$data.transfer = selectedTransferMetatdata
-            ? selectedTransferMetatdata.transferData
-            : null)
-      );
-  },
+  // created() {
+  //   searchManager.selectedTransfer
+  //     .asObservable()
+  //     .pipe(takeUntil(this.$data.destroyed$))
+  //     .subscribe(
+  //       (selectedTransferMetatdata: ISelectedTransferMetadata | null) =>
+  //         (this.$data.transfer = selectedTransferMetatdata
+  //           ? selectedTransferMetatdata.transferData
+  //           : null)
+  //     );
+  // },
   computed: {
     isOnTransfersPage(): boolean {
       return !!window.location.pathname.match(TRANSFER_TAB_REGEX);

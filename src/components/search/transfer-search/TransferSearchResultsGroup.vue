@@ -15,9 +15,9 @@
       :key="transfer.Id"
       :transfer="transfer"
       :selected="
-        !!selectedTransferMetadata &&
-        transfer.Id === selectedTransferMetadata.transferData.Id &&
-        sectionName === selectedTransferMetadata.sectionName
+        !!transferSearchData.selectedTransferMetadata &&
+        transfer.Id === transferSearchData.selectedTransferMetadata.transferData.Id &&
+        sectionName === transferSearchData.selectedTransferMetadata.sectionName
       "
       :idx="index"
       v-on:selected-transfer="showTransferDetail($event)"
@@ -37,8 +37,9 @@
 import TransferSearchResultPreview from "@/components/search/transfer-search/TransferSearchResultPreview.vue";
 import { TransferFilterIdentifiers } from "@/consts";
 import { IIndexedTransferData, IPluginState } from "@/interfaces";
-import { ISelectedTransferMetadata, searchManager } from "@/modules/search-manager.module";
+import { searchManager } from "@/modules/search-manager.module";
 import store from "@/store/page-overlay/index";
+import { ISelectedTransferMetadata } from "@/store/page-overlay/modules/transfer-search/interfaces";
 import { Subject } from "rxjs";
 import { take, takeUntil } from "rxjs/operators";
 import Vue from "vue";
@@ -49,13 +50,13 @@ export default Vue.extend({
   store,
   components: { TransferSearchResultPreview },
   data(): {
-    destroyed$: Subject<void>;
-    selectedTransferMetadata: ISelectedTransferMetadata | null;
+    // destroyed$: Subject<void>;
+    // selectedTransferMetadata: ISelectedTransferMetadata | null;
     showAll: boolean;
   } {
     return {
-      destroyed$: new Subject(),
-      selectedTransferMetadata: null,
+      // destroyed$: new Subject(),
+      // selectedTransferMetadata: null,
       showAll: false,
     };
   },
@@ -71,21 +72,39 @@ export default Vue.extend({
     transfers: {
       immediate: true,
       handler(newValue, oldValue) {
-        searchManager.selectedTransfer
-          .asObservable()
-          .pipe(take(1))
-          .subscribe((transferMetadata) => {
-            if (
-              newValue.length > 0 &&
-              !newValue.find((x: any) => x.Id === transferMetadata?.transferData.Id)
-            ) {
-              searchManager.maybeInitializeSelectedTransfer(
-                newValue[0],
-                this.sectionName,
-                this.sectionPriority
-              );
-            }
-          });
+        if (!newValue) {
+          return;
+        }
+
+        const candidateMetadata: ISelectedTransferMetadata = {
+          transferData: newValue[0],
+          sectionName: this.sectionName,
+          priority: this.sectionPriority,
+        };
+
+        if (
+          !this.$store.state.transferSearch.selectedTransferMetadata ||
+          this.$store.state.transferSearch.selectedTransferMetadata.priority <
+            candidateMetadata.priority
+        ) {
+          this.$store.state.transferSearch.selectedTransferMetadata = candidateMetadata;
+        }
+
+        // searchManager.selectedTransfer
+        //   .asObservable()
+        //   .pipe(take(1))
+        //   .subscribe((transferMetadata) => {
+        //     if (
+        //       newValue.length > 0 &&
+        //       !newValue.find((x: any) => x.Id === transferMetadata?.transferData.Id)
+        //     ) {
+        //       searchManager.maybeInitializeSelectedTransfer(
+        //         newValue[0],
+        //         this.sectionName,
+        //         this.sectionPriority
+        //       );
+        //     }
+        //   });
       },
     },
   },
@@ -113,24 +132,30 @@ export default Vue.extend({
   },
   methods: {
     showTransferDetail(transferData: IIndexedTransferData) {
-      searchManager.selectedTransfer.next({
+      // searchManager.selectedTransfer.next({
+      //   transferData,
+      //   sectionName: this.sectionName,
+      //   priority: this.sectionPriority,
+      // });
+
+      this.$store.state.transferSearch.selectedTransferMetadata = {
         transferData,
         sectionName: this.sectionName,
         priority: this.sectionPriority,
-      });
+      };
     },
   },
-  created() {
-    searchManager.selectedTransfer
-      .asObservable()
-      .pipe(takeUntil(this.$data.destroyed$))
-      .subscribe(
-        (selectedTransferMetadata) =>
-          (this.$data.selectedTransferMetadata = selectedTransferMetadata)
-      );
-  },
-  beforeDestroy() {
-    this.$data.destroyed$.next(null);
-  },
+  // created() {
+  //   searchManager.selectedTransfer
+  //     .asObservable()
+  //     .pipe(takeUntil(this.$data.destroyed$))
+  //     .subscribe(
+  //       (selectedTransferMetadata) =>
+  //         (this.$data.selectedTransferMetadata = selectedTransferMetadata)
+  //     );
+  // },
+  // beforeDestroy() {
+  //   this.$data.destroyed$.next(null);
+  // },
 });
 </script>

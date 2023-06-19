@@ -3,7 +3,7 @@
     class="hide-scrollbar grid grid-cols-6 grid-rows-2"
     style="height: 100%; grid-template-rows: auto 1fr"
   >
-    <template v-if="queryString.length > 0">
+    <template v-if="searchState.queryString.length > 0">
       <div class="col-span-6 flex flex-row items-center space-x-2 p-4 border-purple-300 border-b">
         <!-- <template v-if="filtersApplied">
           <b-button-group v-if="tagSearchFilters.locationName">
@@ -46,7 +46,7 @@
       </div>
     </template>
 
-    <template v-if="queryString.length > 0">
+    <template v-if="searchState.queryString.length > 0">
       <div class="flex flex-col overflow-y-auto bg-purple-50 col-span-3">
         <tag-result-groups :tags="filteredTags" />
 

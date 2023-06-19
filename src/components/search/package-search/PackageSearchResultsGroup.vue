@@ -34,9 +34,9 @@
       :pkg="pkg"
       :sectionName="sectionName"
       :selected="
-        !!selectedPackageMetadata &&
-        pkg.Id === selectedPackageMetadata.packageData.Id &&
-        sectionName === selectedPackageMetadata.sectionName
+        !!packageSearchData.selectedPackageMetadata &&
+        pkg.Id === packageSearchData.selectedPackageMetadata.packageData.Id &&
+        sectionName === packageSearchData.selectedPackageMetadata.sectionName
       "
       :idx="index"
       v-on:selected-package="showPackageDetail($event)"
@@ -56,9 +56,9 @@
 import PackageSearchResultPreview from "@/components/search/package-search/PackageSearchResultPreview.vue";
 import { IIndexedPackageData, IPluginState } from "@/interfaces";
 import { PACKAGE_TAB_REGEX } from "@/modules/page-manager/consts";
-import { ISelectedPackageMetadata, searchManager } from "@/modules/search-manager.module";
 import store from "@/store/page-overlay/index";
 import { PackageSearchActions } from "@/store/page-overlay/modules/package-search/consts";
+import { ISelectedPlantMetadata } from "@/store/page-overlay/modules/plant-search/interfaces";
 import { SearchActions } from "@/store/page-overlay/modules/search/consts";
 import { Subject } from "rxjs";
 import { take, takeUntil } from "rxjs/operators";
@@ -70,13 +70,13 @@ export default Vue.extend({
   store,
   components: { PackageSearchResultPreview },
   data(): {
-    destroyed$: Subject<void>;
-    selectedPackageMetadata: ISelectedPackageMetadata | null;
+    // destroyed$: Subject<void>;
+    // selectedPackageMetadata: ISelectedPackageMetadata | null;
     showAll: boolean;
   } {
     return {
-      destroyed$: new Subject(),
-      selectedPackageMetadata: null,
+      // destroyed$: new Subject(),
+      // selectedPackageMetadata: null,
       showAll: false,
     };
   },
@@ -92,21 +92,38 @@ export default Vue.extend({
     packages: {
       immediate: true,
       handler(newValue, oldValue) {
-        searchManager.selectedPackage
-          .asObservable()
-          .pipe(take(1))
-          .subscribe((packageMetadata) => {
-            if (
-              newValue.length > 0 &&
-              !newValue.find((x: any) => x.Id === packageMetadata?.packageData.Id)
-            ) {
-              searchManager.maybeInitializeSelectedPackage(
-                newValue[0],
-                this.sectionName,
-                this.sectionPriority
-              );
-            }
-          });
+        if (!newValue) {
+          return;
+        }
+
+        const candidateMetadata: ISelectedPlantMetadata = {
+          plantData: newValue[0],
+          sectionName: this.sectionName,
+          priority: this.sectionPriority,
+        };
+
+        if (
+          !this.$store.state.plantSearch.selectedPlantMetadata ||
+          this.$store.state.plantSearch.selectedPlantMetadata.priority < candidateMetadata.priority
+        ) {
+          this.$store.state.plantSearch.selectedPlantMetadata = candidateMetadata;
+        }
+
+        // searchManager.selectedPackage
+        //   .asObservable()
+        //   .pipe(take(1))
+        //   .subscribe((packageMetadata) => {
+        //     if (
+        //       newValue.length > 0 &&
+        //       !newValue.find((x: any) => x.Id === packageMetadata?.packageData.Id)
+        //     ) {
+        //       searchManager.maybeInitializeSelectedPackage(
+        //         newValue[0],
+        //         this.sectionName,
+        //         this.sectionPriority
+        //       );
+        //     }
+        //   });
       },
     },
   },
@@ -141,6 +158,7 @@ export default Vue.extend({
     },
     ...mapState<IPluginState>({
       queryString: (state: IPluginState) => state.search.queryString,
+      packageSearchData: (state: IPluginState) => state.packageSearch,
     }),
   },
   methods: {
@@ -148,12 +166,18 @@ export default Vue.extend({
       setShowSearchResults: `search/${SearchActions.SET_SHOW_SEARCH_RESULTS}`,
     }),
     showPackageDetail(packageData: IIndexedPackageData) {
-      // TODO debounce this to improve mouseover accuracy
-      searchManager.selectedPackage.next({
+      this.$store.state.packageSearch.selectedPackageMetadata = {
         packageData,
         sectionName: this.sectionName,
         priority: this.sectionPriority,
-      });
+      };
+      // }
+      // // TODO debounce this to improve mouseover accuracy
+      // searchManager.selectedPackage.next({
+      //   packageData,
+      //   sectionName: this.sectionName,
+      //   priority: this.sectionPriority,
+      // });
     },
     applyFilter() {
       if (this.disableFilter) {
@@ -172,16 +196,16 @@ export default Vue.extend({
       this.setShowSearchResults({ showSearchResults: false });
     },
   },
-  created() {
-    searchManager.selectedPackage
-      .asObservable()
-      .pipe(takeUntil(this.$data.destroyed$))
-      .subscribe(
-        (selectedPackageMetadata) => (this.$data.selectedPackageMetadata = selectedPackageMetadata)
-      );
-  },
-  beforeDestroy() {
-    this.$data.destroyed$.next(null);
-  },
+  // created() {
+  //   searchManager.selectedPackage
+  //     .asObservable()
+  //     .pipe(takeUntil(this.$data.destroyed$))
+  //     .subscribe(
+  //       (selectedPackageMetadata) => (this.$data.selectedPackageMetadata = selectedPackageMetadata)
+  //     );
+  // },
+  // beforeDestroy() {
+  //   this.$data.destroyed$.next(null);
+  // },
 });
 </script>

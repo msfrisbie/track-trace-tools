@@ -1,5 +1,6 @@
 import { TransferFilterIdentifiers, TransferState } from "@/consts";
 import { IPluginState, ITransferSearchFilters } from "@/interfaces";
+import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
 import { pageManager } from "@/modules/page-manager/page-manager.module";
 import { timer } from "rxjs";
 import { ActionContext } from "vuex";
@@ -7,6 +8,9 @@ import { TransferSearchActions, TransferSearchMutations } from "./consts";
 import { ITransferSearchState } from "./interfaces";
 
 const inMemoryState = {
+  searchInflight: false,
+  transfers: [],
+  selectedTransferMetadata: null,
   transferSearchFilters: {
     manifestNumber: null,
     shipperFacilityInfo: null,
@@ -35,6 +39,60 @@ export const transferSearchModule = {
   },
   getters: {},
   actions: {
+    [TransferSearchActions.EXECUTE_QUERY]: async (
+      ctx: ActionContext<ITransferSearchState, IPluginState>,
+      { queryString }: { queryString: string }
+    ) => {
+      ctx.state.transfers = [];
+      ctx.state.selectedTransferMetadata = null;
+      
+      ctx.state.searchInflight = true;
+
+      await Promise.allSettled([
+        primaryDataLoader
+          .onDemandTransferSearch({
+            transferState: TransferState.INCOMING,
+            queryString,
+          })
+          .then((result) => {
+            ctx.state.transfers = [...ctx.state.transfers, ...result];
+          }),
+        primaryDataLoader
+          .onDemandTransferSearch({
+            transferState: TransferState.INCOMING_INACTIVE,
+            queryString,
+          })
+          .then((result) => {
+            ctx.state.transfers = [...ctx.state.transfers, ...result];
+          }),
+        primaryDataLoader
+          .onDemandTransferSearch({
+            transferState: TransferState.OUTGOING,
+            queryString,
+          })
+          .then((result) => {
+            ctx.state.transfers = [...ctx.state.transfers, ...result];
+          }),
+        primaryDataLoader
+          .onDemandTransferSearch({
+            transferState: TransferState.OUTGOING_INACTIVE,
+            queryString,
+          })
+          .then((result) => {
+            ctx.state.transfers = [...ctx.state.transfers, ...result];
+          }),
+        primaryDataLoader
+          .onDemandTransferSearch({
+            transferState: TransferState.REJECTED,
+            queryString,
+          })
+          .then((result) => {
+            ctx.state.transfers = [...ctx.state.transfers, ...result];
+          }),
+      ]);
+
+      ctx.state.searchInflight = false;
+    },
     [TransferSearchActions.PARTIAL_UPDATE_TRANSFER_SEARCH_FILTERS]: async (
       ctx: ActionContext<ITransferSearchState, IPluginState>,
       {

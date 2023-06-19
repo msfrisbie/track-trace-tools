@@ -7,10 +7,13 @@ import {
   TAG_TAB_REGEX,
   TRANSFER_TAB_REGEX,
 } from "@/modules/page-manager/consts";
-import { searchManager } from "@/modules/search-manager.module";
 import { maybePushOntoUniqueStack } from "@/utils/search";
 import _ from "lodash-es";
 import { ActionContext } from "vuex";
+import { PackageSearchActions } from "../package-search/consts";
+import { PlantSearchActions } from "../plant-search/consts";
+import { TagSearchActions } from "../tag-search/consts";
+import { TransferSearchActions } from "../transfer-search/consts";
 import { SearchActions } from "./consts";
 import { ISearchState, SearchType } from "./interfaces";
 
@@ -92,10 +95,31 @@ export const searchModule = {
           ctx.state.queryStringHistory
         );
 
-        searchManager.selectedPackage.next(null);
-        searchManager.selectedPlant.next(null);
-        searchManager.selectedTag.next(null);
-        searchManager.selectedTransfer.next(null);
+        // searchManager.selectedPackage.next(null);
+        // searchManager.selectedPlant.next(null);
+        // searchManager.selectedTag.next(null);
+        // searchManager.selectedTransfer.next(null);
+
+        ctx.dispatch(
+          `packageSearch/${PackageSearchActions.EXECUTE_QUERY}`,
+          { queryString },
+          { root: true }
+        );
+        ctx.dispatch(
+          `plantSearch/${PlantSearchActions.EXECUTE_QUERY}`,
+          { queryString },
+          { root: true }
+        );
+        ctx.dispatch(
+          `tagSearch/${TagSearchActions.EXECUTE_QUERY}`,
+          { queryString },
+          { root: true }
+        );
+        ctx.dispatch(
+          `transferSearch/${TransferSearchActions.EXECUTE_QUERY}`,
+          { queryString },
+          { root: true }
+        );
       },
       500
     ),

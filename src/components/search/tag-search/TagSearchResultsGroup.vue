@@ -34,9 +34,9 @@
       :tag="tag"
       :sectionName="sectionName"
       :selected="
-        !!selectedTagMetadata &&
-        tag.Id === selectedTagMetadata.tagData.Id &&
-        sectionName === selectedTagMetadata.sectionName
+        !!tagSearchData.selectedTagMetadata &&
+        tag.Id === tagSearchData.selectedTagMetadata.tagData.Id &&
+        sectionName === tagSearchData.selectedTagMetadata.sectionName
       "
       :idx="index"
       v-on:selected-tag="showTagDetail($event)"
@@ -56,10 +56,10 @@
 import TagSearchResultPreview from "@/components/search/tag-search/TagSearchResultPreview.vue";
 import { IIndexedTagData, IPluginState } from "@/interfaces";
 import { TAG_TAB_REGEX } from "@/modules/page-manager/consts";
-import { ISelectedTagMetadata, searchManager } from "@/modules/search-manager.module";
 import store from "@/store/page-overlay/index";
 import { SearchActions } from "@/store/page-overlay/modules/search/consts";
 import { TagSearchActions } from "@/store/page-overlay/modules/tag-search/consts";
+import { ISelectedTagMetadata } from "@/store/page-overlay/modules/tag-search/interfaces";
 import { Subject } from "rxjs";
 import { take, takeUntil } from "rxjs/operators";
 import Vue from "vue";
@@ -70,13 +70,13 @@ export default Vue.extend({
   store,
   components: { TagSearchResultPreview },
   data(): {
-    destroyed$: Subject<void>;
-    selectedTagMetadata: ISelectedTagMetadata | null;
+    // destroyed$: Subject<void>;
+    // selectedTagMetadata: ISelectedTagMetadata | null;
     showAll: boolean;
   } {
     return {
-      destroyed$: new Subject(),
-      selectedTagMetadata: null,
+      // destroyed$: new Subject(),
+      // selectedTagMetadata: null,
       showAll: false,
     };
   },
@@ -92,27 +92,45 @@ export default Vue.extend({
     tags: {
       immediate: true,
       handler(newValue, oldValue) {
-        searchManager.selectedTag
-          .asObservable()
-          .pipe(take(1))
-          .subscribe((tagMetadata) => {
-            if (
-              newValue.length > 0 &&
-              !newValue.find((x: any) => x.Id === tagMetadata?.tagData.Id)
-            ) {
-              searchManager.maybeInitializeSelectedTag(
-                newValue[0],
-                this.sectionName,
-                this.sectionPriority
-              );
-            }
-          });
+        if (!newValue) {
+          return;
+        }
+
+        const candidateMetadata: ISelectedTagMetadata = {
+          tagData: newValue[0],
+          sectionName: this.sectionName,
+          priority: this.sectionPriority,
+        };
+
+        if (
+          !this.$store.state.tagSearch.selectedTagMetadata ||
+          this.$store.state.tagSearch.selectedTagMetadata.priority < candidateMetadata.priority
+        ) {
+          this.$store.state.tagSearch.selectedTagMetadata = candidateMetadata;
+        }
+
+        // searchManager.selectedTag
+        //   .asObservable()
+        //   .pipe(take(1))
+        //   .subscribe((tagMetadata) => {
+        //     if (
+        //       newValue.length > 0 &&
+        //       !newValue.find((x: any) => x.Id === tagMetadata?.tagData.Id)
+        //     ) {
+        //       searchManager.maybeInitializeSelectedTag(
+        //         newValue[0],
+        //         this.sectionName,
+        //         this.sectionPriority
+        //       );
+        //     }
+        //   });
       },
     },
   },
   computed: {
     ...mapState<IPluginState>({
       queryString: (state: IPluginState) => state.search.queryString,
+      tagSearchData: (state: IPluginState) => state.tagSearch,
     }),
     isOnTagsPage(): boolean {
       return !!window.location.pathname.match(TAG_TAB_REGEX);
@@ -143,12 +161,11 @@ export default Vue.extend({
       setShowSearchResults: `search/${SearchActions.SET_SHOW_SEARCH_RESULTS}`,
     }),
     showTagDetail(tagData: IIndexedTagData) {
-      // TODO debounce this to improve mouseover accuracy
-      searchManager.selectedTag.next({
+      this.$store.state.tagSearch.selectedTagMetadata = {
         tagData,
         sectionName: this.sectionName,
         priority: this.sectionPriority,
-      });
+      };
     },
     applyFilter() {
       if (this.disableFilter) {
@@ -164,14 +181,14 @@ export default Vue.extend({
       this.setShowSearchResults({ showSearchResults: false });
     },
   },
-  created() {
-    searchManager.selectedTag
-      .asObservable()
-      .pipe(takeUntil(this.$data.destroyed$))
-      .subscribe((selectedTagMetadata) => (this.$data.selectedTagMetadata = selectedTagMetadata));
-  },
-  beforeDestroy() {
-    this.$data.destroyed$.next(null);
-  },
+  // created() {
+  //   searchManager.selectedTag
+  //     .asObservable()
+  //     .pipe(takeUntil(this.$data.destroyed$))
+  //     .subscribe((selectedTagMetadata) => (this.$data.selectedTagMetadata = selectedTagMetadata));
+  // },
+  // beforeDestroy() {
+  //   this.$data.destroyed$.next(null);
+  // },
 });
 </script>

@@ -16,3 +16,8 @@ export function maybePushOntoUniqueStack(value: any | null, stack: Array<string>
 
   return stack;
 }
+
+// export function collectionTransformer<T>(objects: T[], groupConfigs: ): {
+//   objects,
+//   groups: 
+// }

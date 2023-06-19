@@ -25,7 +25,7 @@
             ref="search"
           ></b-form-input>
 
-          <b-input-group-append v-if="queryString.length > 0">
+          <b-input-group-append v-if="searchData.queryString.length > 0">
             <b-button variant="light" @click="setQueryString({ queryString: '' })"
               ><font-awesome-icon icon="backspace"
             /></b-button>
@@ -83,6 +83,7 @@ export default Vue.extend({
   computed: {
     ...mapState<IPluginState>({
       searchType: (state: IPluginState) => state.search.searchType,
+      searchData: (state: IPluginState) => state.search,
     }),
     queryString: {
       get(): string {
