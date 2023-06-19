@@ -127,7 +127,7 @@ export default Vue.extend({
   computed: {
     ...mapState<IPluginState>({
       queryString: (state: IPluginState) => state.search.queryString,
-      packageSearchFilters: (state: IPluginState) => state.packageSearch?.packageSearchFilters,
+      packageSearchFilters: (state: IPluginState) => state.packageSearch.packageSearchFilters,
     }),
     filtersApplied(): boolean {
       return false;

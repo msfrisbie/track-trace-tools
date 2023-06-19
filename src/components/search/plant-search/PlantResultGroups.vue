@@ -79,7 +79,7 @@ export default Vue.extend({
   computed: {
     ...mapState<IPluginState>({
       plantSearchData: (state: IPluginState) => state.plantSearch,
-      plantSearchFilters: (state: IPluginState) => state.plantSearch?.plantSearchFilters,
+      plantSearchFilters: (state: IPluginState) => state.plantSearch.plantSearchFilters,
     }),
     filtersApplied(): boolean {
       return false;

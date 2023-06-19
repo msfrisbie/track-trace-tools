@@ -1,30 +1,40 @@
 <template>
-  <div v-if="plant" class="flex flex-col items-center space-y-8 px-2 p-4">
+  <div
+    v-if="plantSearchData.selectedPlantMetadata"
+    class="flex flex-col items-center space-y-8 px-2 p-4"
+  >
     <div class="w-full grid grid-cols-3" style="grid-template-columns: 1fr 8fr 1fr">
       <div></div>
 
       <div class="flex flex-col items-center space-y-8 flex-grow">
         <div class="flex flex-col space-y-2 items-center">
           <div class="flex flex-col items-center space-x-4 text-center">
-            <metrc-tag :label="plant.Label" sideText="PLANT"></metrc-tag>
+            <metrc-tag
+              :label="plantSearchData.selectedPlantMetadata.plantData.Label"
+              sideText="PLANT"
+            ></metrc-tag>
           </div>
 
-          <b-badge class="text-lg" :variant="badgeVariant(plant)">{{
-            displayPlantState(plant)
-          }}</b-badge>
+          <b-badge
+            class="text-lg"
+            :variant="badgeVariant(plantSearchData.selectedPlantMetadata.plantData)"
+            >{{ displayPlantState(plantSearchData.selectedPlantMetadata.plantData) }}</b-badge
+          >
         </div>
       </div>
 
       <div
         v-show="isOnPlantsPage"
-        @click.stop.prevent="setPlantLabelFilter(plant)"
+        @click.stop.prevent="setPlantLabelFilter(plantSearchData.selectedPlantMetadata.plantData)"
         class="flex flex-row items-center justify-center cursor-pointer h-full"
       >
         <font-awesome-icon icon="chevron-right" class="text-2xl text-purple-500" />
       </div>
     </div>
 
-    <recursive-json-table :jsonObject="plant"></recursive-json-table>
+    <recursive-json-table
+      :jsonObject="plantSearchData.selectedPlantMetadata.plantData"
+    ></recursive-json-table>
   </div>
 </template>
 
@@ -65,20 +75,21 @@ export default Vue.extend({
   // },
   data(): {
     // destroyed$: Subject<void>;
-    plant: IIndexedPlantData | null;
+    // plant: IIndexedPlantData | null;
   } {
     return {
       // destroyed$: new Subject(),
-      plant: null,
+      // plant: null,
     };
   },
   computed: {
     ...mapState<IPluginState>({
       authState: (state: IPluginState) => state.pluginAuth.authState,
       flags: (state: IPluginState) => state.flags,
+      plantSearchData: (state: IPluginState) => state.plantSearch,
     }),
-    isOnPlantsPage() {
-      return window.location.pathname.match(PLANTS_TAB_REGEX);
+    isOnPlantsPage(): boolean {
+      return !!window.location.pathname.match(PLANTS_TAB_REGEX);
     },
     ...mapGetters({}),
   },

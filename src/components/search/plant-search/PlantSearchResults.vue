@@ -120,7 +120,7 @@ export default Vue.extend({
     ...mapState({
       authState: (state: any) => state.pluginAuth.authState,
       queryString: (state: any) => state.search.ueryString,
-      plantSearchFilters: (state: any) => state.plantSearch?.plantSearchFilters,
+      plantSearchFilters: (state: any) => state.plantSearch.plantSearchFilters,
     }),
     ...mapGetters({}),
     filteredPlants() {

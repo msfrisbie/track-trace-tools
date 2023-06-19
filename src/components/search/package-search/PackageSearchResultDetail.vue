@@ -1,23 +1,35 @@
 <template>
-  <div v-if="pkg" class="flex flex-col items-center space-y-8 px-2 p-4">
+  <div
+    v-if="packageSearchData.selectedPackageMetadata"
+    class="flex flex-col items-center space-y-8 px-2 p-4"
+  >
     <div class="w-full grid grid-cols-3" style="grid-template-columns: 1fr 8fr 1fr">
       <div></div>
 
       <div class="flex flex-col items-center space-y-8 flex-grow">
         <div class="flex flex-col space-y-2 items-center">
           <div class="flex flex-row items-center space-x-4 text-center">
-            <metrc-tag :label="pkg.Label" sideText="PACKAGE"></metrc-tag>
+            <metrc-tag
+              :label="packageSearchData.selectedPackageMetadata.packageData.Label"
+              sideText="PACKAGE"
+            ></metrc-tag>
           </div>
 
-          <b-badge class="text-lg" :variant="badgeVariant(pkg)">{{
-            displayPackageState(pkg)
-          }}</b-badge>
+          <b-badge
+            class="text-lg"
+            :variant="badgeVariant(packageSearchData.selectedPackageMetadata.packageData)"
+            >{{
+              displayPackageState(packageSearchData.selectedPackageMetadata.packageData)
+            }}</b-badge
+          >
         </div>
       </div>
 
       <div
         v-show="isOnPackagesPage"
-        @click.stop.prevent="setPackageLabelFilter(pkg)"
+        @click.stop.prevent="
+          setPackageLabelFilter(packageSearchData.selectedPackageMetadata.packageData)
+        "
         class="flex flex-row items-center justify-center cursor-pointer h-full"
       >
         <font-awesome-icon icon="chevron-right" class="text-2xl text-purple-500" />
@@ -30,7 +42,9 @@
           class="w-full flex flex-row items-center justify-between space-x-4"
           variant="outline-primary"
           @click.stop.prevent="
-            setPackageHistorySourcePackage({ pkg }) && openPackageHistoryBuilder()
+            setPackageHistorySourcePackage({
+              pkg: packageSearchData.selectedPackageMetadata.packageData,
+            }) && openPackageHistoryBuilder()
           "
         >
           <span>PACKAGE HISTORY</span>
@@ -41,7 +55,9 @@
           class="w-full flex flex-row items-center justify-between space-x-4"
           variant="outline-primary"
           @click.stop.prevent="
-            setExplorerData({ packageLabel: getLabelOrError(pkg) }) && openMetrcExplorer()
+            setExplorerData({
+              packageLabel: getLabelOrError(packageSearchData.selectedPackageMetadata.packageData),
+            }) && openMetrcExplorer()
           "
         >
           <span>OPEN IN EXPLORER</span>
@@ -54,7 +70,11 @@
           <b-button
             class="w-full flex flex-row items-center justify-between space-x-4"
             variant="outline-primary"
-            @click.stop.prevent="addPackageToTransferList({ pkg }) && openNewTransferBuilder()"
+            @click.stop.prevent="
+              addPackageToTransferList({
+                pkg: packageSearchData.selectedPackageMetadata.packageData,
+              }) && openNewTransferBuilder()
+            "
           >
             <span>CREATE TRANSFER</span>
             <font-awesome-icon icon="plus" />
@@ -66,7 +86,11 @@
         <template v-if="isPackageEligibleForSplit">
           <b-button
             variant="outline-primary"
-            @click.stop.prevent="setSplitSourcePackage({ pkg }) && openSplitPackageBuilder()"
+            @click.stop.prevent="
+              setSplitSourcePackage({
+                pkg: packageSearchData.selectedPackageMetadata.packageData,
+              }) && openSplitPackageBuilder()
+            "
             class="w-full flex flex-row items-center justify-between space-x-4"
           >
             <span>SPLIT PACKAGE</span>
@@ -75,11 +99,18 @@
         </template>
       </template>
 
-      <template v-if="packageLabTestPdfEligible && pkg.LabTestingStateName === 'TestPassed'">
+      <template
+        v-if="
+          packageLabTestPdfEligible &&
+          packageSearchData.selectedPackageMetadata.packageData.LabTestingStateName === 'TestPassed'
+        "
+      >
         <div class="flex flex-col space-y-2">
           <b-button
             variant="outline-primary"
-            @click.stop.prevent="viewLabResult(pkg)"
+            @click.stop.prevent="
+              viewLabResult(packageSearchData.selectedPackageMetadata.packageData)
+            "
             class="w-full flex flex-row items-center justify-between space-x-4"
           >
             <span>VIEW LAB TEST</span>
@@ -88,7 +119,9 @@
 
           <b-button
             variant="outline-primary"
-            @click.stop.prevent="printLabResult(pkg)"
+            @click.stop.prevent="
+              printLabResult(packageSearchData.selectedPackageMetadata.packageData)
+            "
             class="w-full flex flex-row items-center justify-between space-x-4"
           >
             <span>PRINT LAB TEST</span>
@@ -98,7 +131,9 @@
           <b-button
             variant="outline-primary"
             class="w-full flex flex-row items-center justify-between space-x-4"
-            @click.stop.prevent="downloadLabResult(pkg)"
+            @click.stop.prevent="
+              downloadLabResult(packageSearchData.selectedPackageMetadata.packageData)
+            "
           >
             <span>DOWNLOAD LAB TEST</span>
             <font-awesome-icon icon="file-download" />
@@ -107,7 +142,9 @@
       </template>
     </div>
 
-    <recursive-json-table :jsonObject="pkg"></recursive-json-table>
+    <recursive-json-table
+      :jsonObject="packageSearchData.selectedPackageMetadata.packageData"
+    ></recursive-json-table>
   </div>
 </template>
 
@@ -121,7 +158,7 @@ import {
   ModalType,
   PackageState,
 } from "@/consts";
-import { IIndexedPackageData, ITransferPackageList } from "@/interfaces";
+import { IIndexedPackageData, IPluginState, ITransferPackageList } from "@/interfaces";
 import { analyticsManager } from "@/modules/analytics-manager.module";
 import { clientBuildManager } from "@/modules/client-build-manager.module";
 import { modalManager } from "@/modules/modal-manager.module";
@@ -169,7 +206,7 @@ export default Vue.extend({
   data(): {
     packageLabTestPdfEligible: boolean;
     // destroyed$: Subject<void>;
-    pkg: IIndexedPackageData | null;
+    // pkg: IIndexedPackageData | null;
     activeTransferPackageList: ITransferPackageList | null;
   } {
     return {
@@ -177,20 +214,24 @@ export default Vue.extend({
         window.location.hostname
       ),
       // destroyed$: new Subject(),
-      pkg: null,
+      // pkg: null,
       activeTransferPackageList: null,
     };
   },
   computed: {
-    ...mapState({
-      authState: (state: any) => state.pluginAuth.authState,
-      flags: (state: any) => state.flags,
+    ...mapState<IPluginState>({
+      authState: (state: IPluginState) => state.pluginAuth.authState,
+      flags: (state: IPluginState) => state.flags,
+      packageSearchData: (state: IPluginState) => state.packageSearch,
     }),
     isOnPackagesPage() {
       return window.location.pathname.match(PACKAGE_TAB_REGEX);
     },
     isPackageEligibleForTransfer(): boolean {
-      return this.$data.pkg.PackageState === PackageState.ACTIVE;
+      return (
+        this.$store.state.packageSearch.selectedPackageMetadata?.packageData.PackageState ===
+        PackageState.ACTIVE
+      );
     },
     isIdentityEligibleForTransferToolsImpl(): boolean {
       return isIdentityEligibleForTransferTools({
@@ -198,11 +239,14 @@ export default Vue.extend({
       });
     },
     isPackageEligibleForSplit(): boolean {
-      return this.$data.pkg.PackageState === PackageState.ACTIVE;
+      return (
+        this.$store.state.packageSearch.selectedPackageMetadata?.packageData.PackageState ===
+        PackageState.ACTIVE
+      );
     },
     isIdentityEligibleForSplitToolsImpl(): boolean {
       return isIdentityEligibleForSplitTools({
-        identity: this.authState?.identity,
+        identity: this.$store.state.pluginAuth.authState.identity,
         hostname: window.location.hostname,
       });
     },

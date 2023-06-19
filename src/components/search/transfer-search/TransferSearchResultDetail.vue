@@ -1,23 +1,34 @@
 <template>
-  <div v-if="transfer" class="flex flex-col items-center space-y-8 px-2 p-4">
+  <div
+    v-if="transferSearchData.selectedTransferMetadata"
+    class="flex flex-col items-center space-y-8 px-2 p-4"
+  >
     <div class="w-full grid grid-cols-3" style="grid-template-columns: 1fr 8fr 1fr">
       <div></div>
 
       <div class="flex flex-col items-center space-y-8 flex-grow">
         <div class="flex flex-col space-y-2 items-center">
           <div class="flex flex-row items-center space-x-4 text-center">
-            <div class="text-2xl text-purple-800">Manifest {{ transfer.ManifestNumber }}</div>
+            <div class="text-2xl text-purple-800">
+              Manifest {{ transferSearchData.selectedTransferMetadata.transferData.ManifestNumber }}
+            </div>
           </div>
 
-          <b-badge class="text-lg" :variant="badgeVariant(transfer)">{{
-            displayTransferState(transfer)
-          }}</b-badge>
+          <b-badge
+            class="text-lg"
+            :variant="badgeVariant(transferSearchData.selectedTransferMetadata.transferData)"
+            >{{
+              displayTransferState(transferSearchData.selectedTransferMetadata.transferData)
+            }}</b-badge
+          >
         </div>
       </div>
 
       <div
         v-show="isOnTransfersPage"
-        @click.stop.prevent="setTransferManifestNumberFilter(transfer)"
+        @click.stop.prevent="
+          setTransferManifestNumberFilter(transferSearchData.selectedTransferMetadata.transferData)
+        "
         class="flex flex-row items-center justify-center cursor-pointer h-full"
       >
         <font-awesome-icon icon="chevron-right" class="text-2xl text-purple-500" />
@@ -29,7 +40,7 @@
         variant="outline-primary"
         size="sm"
         style="width: 100%"
-        @click.stop.prevent="viewManifest(transfer)"
+        @click.stop.prevent="viewManifest(transferSearchData.selectedTransferMetadata.transferData)"
         class="flex flex-row items-center justify-between space-x-4"
       >
         <span>VIEW MANIFEST</span>
@@ -40,7 +51,9 @@
         variant="outline-primary"
         size="sm"
         style="width: 100%"
-        @click.stop.prevent="downloadManifest(transfer)"
+        @click.stop.prevent="
+          downloadManifest(transferSearchData.selectedTransferMetadata.transferData)
+        "
         class="flex flex-row items-center justify-between space-x-4"
       >
         <span>DOWNLOAD MANIFEST</span>
@@ -51,7 +64,9 @@
         variant="outline-primary"
         size="sm"
         style="width: 100%"
-        @click.stop.prevent="printManifest(transfer)"
+        @click.stop.prevent="
+          printManifest(transferSearchData.selectedTransferMetadata.transferData)
+        "
         class="flex flex-row items-center justify-between space-x-4"
       >
         <span>PRINT MANIFEST</span>
@@ -62,7 +77,9 @@
         variant="outline-primary"
         size="sm"
         style="width: 100%"
-        @click.stop.prevent="createScanSheet(transfer)"
+        @click.stop.prevent="
+          createScanSheet(transferSearchData.selectedTransferMetadata.transferData)
+        "
         class="flex flex-row items-center justify-between space-x-4"
       >
         <span>CREATE SCAN SHEET</span>
@@ -70,7 +87,9 @@
       </b-button>
     </div>
 
-    <recursive-json-table :jsonObject="transfer"></recursive-json-table>
+    <recursive-json-table
+      :jsonObject="transferSearchData.selectedTransferMetadata.transferData"
+    ></recursive-json-table>
   </div>
 </template>
 
@@ -83,7 +102,7 @@ import {
   TransferFilterIdentifiers,
   TransferState,
 } from "@/consts";
-import { IIndexedTransferData } from "@/interfaces";
+import { IIndexedTransferData, IPluginState } from "@/interfaces";
 import { analyticsManager } from "@/modules/analytics-manager.module";
 import { modalManager } from "@/modules/modal-manager.module";
 import { pageManager } from "@/modules/page-manager/page-manager.module";
@@ -97,7 +116,7 @@ import { Subject } from "rxjs";
 import { takeUntil } from "rxjs/operators";
 import Vue from "vue";
 import { TransferSearchActions } from "@/store/page-overlay/modules/transfer-search/consts";
-import { mapActions } from "vuex";
+import { mapActions, mapState } from "vuex";
 import { SearchActions } from "@/store/page-overlay/modules/search/consts";
 
 function isIsoDateToday(isodate: string): boolean {
@@ -146,6 +165,9 @@ export default Vue.extend({
   //     );
   // },
   computed: {
+    ...mapState<IPluginState>({
+      transferSearchData: (state: IPluginState) => state.transferSearch,
+    }),
     isOnTransfersPage(): boolean {
       return !!window.location.pathname.match(TRANSFER_TAB_REGEX);
     },
@@ -254,16 +276,16 @@ export default Vue.extend({
     //   }
     // },
   },
-  beforeDestroy() {
-    this.$data.destroyed$.next(null);
-  },
+  // beforeDestroy() {
+  //   this.$data.destroyed$.next(null);
+  // },
   data(): {
-    destroyed$: Subject<void>;
-    transfer: IIndexedTransferData | null;
+    // destroyed$: Subject<void>;
+    // transfer: IIndexedTransferData | null;
   } {
     return {
-      destroyed$: new Subject(),
-      transfer: null,
+      // destroyed$: new Subject(),
+      // transfer: null,
     };
   },
   methods: {

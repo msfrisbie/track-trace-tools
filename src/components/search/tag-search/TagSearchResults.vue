@@ -75,7 +75,7 @@
 import TagHistoryList from "@/components/search/tag-search/TagHistoryList.vue";
 import TagResultGroups from "@/components/search/tag-search/TagResultGroups.vue";
 import TagSearchResultDetail from "@/components/search/tag-search/TagSearchResultDetail.vue";
-import { IIndexedTagData, ITagData } from "@/interfaces";
+import { IIndexedTagData, IPluginState, ITagData } from "@/interfaces";
 import store from "@/store/page-overlay/index";
 import { TagSearchActions } from "@/store/page-overlay/modules/tag-search/consts";
 import Vue from "vue";
@@ -117,13 +117,13 @@ export default Vue.extend({
     }),
   },
   computed: {
-    ...mapState({
-      authState: (state: any) => state.pluginAuth.authState,
-      tagSearchFilters: (state: any) => state.tagSearch?.tagSearchFilters,
+    ...mapState<IPluginState>({
+      authState: (state: IPluginState) => state.pluginAuth.authState,
+      tagSearchFilters: (state: IPluginState) => state.tagSearch.tagSearchFilters,
     }),
     ...mapGetters({}),
-    filteredTags() {
-      return this.tags.filter((x: ITagData) => {
+    filteredTags(): IIndexedTagData[] {
+      return this.tags.filter((x: IIndexedTagData) => {
         // if (!!this.tagSearchFilters.strainName) {
         //   if (!!x.StrainName && !x.StrainName.includes(this.tagSearchFilters.strainName)) {
         //     return false;
@@ -138,8 +138,11 @@ export default Vue.extend({
         return true;
       });
     },
-    filtersApplied() {
-      return Object.values(this.tagSearchFilters || {}).filter((x) => !!x).length > 0;
+    filtersApplied(): boolean {
+      return (
+        Object.values(this.$store.state.tagSearch.tagSearchFilters || {}).filter((x) => !!x)
+          .length > 0
+      );
     },
   },
 });

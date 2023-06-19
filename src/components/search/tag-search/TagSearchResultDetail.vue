@@ -1,28 +1,40 @@
 <template>
-  <div v-if="tag" class="flex flex-col items-center space-y-8 px-2 p-4">
+  <div
+    v-if="tagSearchData.selectedTagMetadata"
+    class="flex flex-col items-center space-y-8 px-2 p-4"
+  >
     <div class="w-full grid grid-cols-3" style="grid-template-columns: 1fr 8fr 1fr">
       <div></div>
 
       <div class="flex flex-col items-center space-y-8 flex-grow">
         <div class="flex flex-col space-y-2 items-center">
           <div class="flex flex-col items-center space-x-4 text-center">
-            <metrc-tag :label="tag.Label" :sideText="tag.TagTypeName"></metrc-tag>
+            <metrc-tag
+              :label="tagSearchData.selectedTagMetadata.tagData.Label"
+              :sideText="tagSearchData.selectedTagMetadata.tagData.TagTypeName"
+            ></metrc-tag>
           </div>
 
-          <b-badge class="text-lg" :variant="badgeVariant(tag)">{{ displayTagState(tag) }}</b-badge>
+          <b-badge
+            class="text-lg"
+            :variant="badgeVariant(tagSearchData.selectedTagMetadata.tagData)"
+            >{{ displayTagState(tagSearchData.selectedTagMetadata.tagData) }}</b-badge
+          >
         </div>
       </div>
 
       <div
         v-show="isOnTagsPage"
-        @click.stop.prevent="setTagLabelFilter(tag)"
+        @click.stop.prevent="setTagLabelFilter(tagSearchData.selectedTagMetadata.tagData)"
         class="flex flex-row items-center justify-center cursor-pointer h-full"
       >
         <font-awesome-icon icon="chevron-right" class="text-2xl text-purple-500" />
       </div>
     </div>
 
-    <recursive-json-table :jsonObject="tag"></recursive-json-table>
+    <recursive-json-table
+      :jsonObject="tagSearchData.selectedTagMetadata.tagData"
+    ></recursive-json-table>
   </div>
 </template>
 
@@ -62,17 +74,18 @@ export default Vue.extend({
   // },
   data(): {
     // destroyed$: Subject<void>;
-    tag: IIndexedTagData | null;
+    // tag: IIndexedTagData | null;
   } {
     return {
       // destroyed$: new Subject(),
-      tag: null,
+      // tag: null,
     };
   },
   computed: {
     ...mapState<IPluginState>({
       authState: (state: IPluginState) => state.pluginAuth.authState,
       flags: (state: IPluginState) => state.flags,
+      tagSearchData: (state: IPluginState) => state.tagSearch,
     }),
     isOnTagsPage() {
       return window.location.pathname.match(TAG_TAB_REGEX);
