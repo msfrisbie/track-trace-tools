@@ -1,6 +1,6 @@
 <template>
   <div
-    v-if="packageSearchData.selectedPackageMetadata"
+    v-if="packageSearchState.selectedPackageMetadata"
     class="flex flex-col items-center space-y-8 px-2 p-4"
   >
     <div class="w-full grid grid-cols-3" style="grid-template-columns: 1fr 8fr 1fr">
@@ -10,16 +10,16 @@
         <div class="flex flex-col space-y-2 items-center">
           <div class="flex flex-row items-center space-x-4 text-center">
             <metrc-tag
-              :label="packageSearchData.selectedPackageMetadata.packageData.Label"
+              :label="packageSearchState.selectedPackageMetadata.packageData.Label"
               sideText="PACKAGE"
             ></metrc-tag>
           </div>
 
           <b-badge
             class="text-lg"
-            :variant="badgeVariant(packageSearchData.selectedPackageMetadata.packageData)"
+            :variant="badgeVariant(packageSearchState.selectedPackageMetadata.packageData)"
             >{{
-              displayPackageState(packageSearchData.selectedPackageMetadata.packageData)
+              displayPackageState(packageSearchState.selectedPackageMetadata.packageData)
             }}</b-badge
           >
         </div>
@@ -28,7 +28,7 @@
       <div
         v-show="isOnPackagesPage"
         @click.stop.prevent="
-          setPackageLabelFilter(packageSearchData.selectedPackageMetadata.packageData)
+          setPackageLabelFilter(packageSearchState.selectedPackageMetadata.packageData)
         "
         class="flex flex-row items-center justify-center cursor-pointer h-full"
       >
@@ -43,7 +43,7 @@
           variant="outline-primary"
           @click.stop.prevent="
             setPackageHistorySourcePackage({
-              pkg: packageSearchData.selectedPackageMetadata.packageData,
+              pkg: packageSearchState.selectedPackageMetadata.packageData,
             }) && openPackageHistoryBuilder()
           "
         >
@@ -56,7 +56,7 @@
           variant="outline-primary"
           @click.stop.prevent="
             setExplorerData({
-              packageLabel: getLabelOrError(packageSearchData.selectedPackageMetadata.packageData),
+              packageLabel: getLabelOrError(packageSearchState.selectedPackageMetadata.packageData),
             }) && openMetrcExplorer()
           "
         >
@@ -72,7 +72,7 @@
             variant="outline-primary"
             @click.stop.prevent="
               addPackageToTransferList({
-                pkg: packageSearchData.selectedPackageMetadata.packageData,
+                pkg: packageSearchState.selectedPackageMetadata.packageData,
               }) && openNewTransferBuilder()
             "
           >
@@ -88,7 +88,7 @@
             variant="outline-primary"
             @click.stop.prevent="
               setSplitSourcePackage({
-                pkg: packageSearchData.selectedPackageMetadata.packageData,
+                pkg: packageSearchState.selectedPackageMetadata.packageData,
               }) && openSplitPackageBuilder()
             "
             class="w-full flex flex-row items-center justify-between space-x-4"
@@ -102,14 +102,15 @@
       <template
         v-if="
           packageLabTestPdfEligible &&
-          packageSearchData.selectedPackageMetadata.packageData.LabTestingStateName === 'TestPassed'
+          packageSearchState.selectedPackageMetadata.packageData.LabTestingStateName ===
+            'TestPassed'
         "
       >
         <div class="flex flex-col space-y-2">
           <b-button
             variant="outline-primary"
             @click.stop.prevent="
-              viewLabResult(packageSearchData.selectedPackageMetadata.packageData)
+              viewLabResult(packageSearchState.selectedPackageMetadata.packageData)
             "
             class="w-full flex flex-row items-center justify-between space-x-4"
           >
@@ -120,7 +121,7 @@
           <b-button
             variant="outline-primary"
             @click.stop.prevent="
-              printLabResult(packageSearchData.selectedPackageMetadata.packageData)
+              printLabResult(packageSearchState.selectedPackageMetadata.packageData)
             "
             class="w-full flex flex-row items-center justify-between space-x-4"
           >
@@ -132,7 +133,7 @@
             variant="outline-primary"
             class="w-full flex flex-row items-center justify-between space-x-4"
             @click.stop.prevent="
-              downloadLabResult(packageSearchData.selectedPackageMetadata.packageData)
+              downloadLabResult(packageSearchState.selectedPackageMetadata.packageData)
             "
           >
             <span>DOWNLOAD LAB TEST</span>
@@ -143,7 +144,7 @@
     </div>
 
     <recursive-json-table
-      :jsonObject="packageSearchData.selectedPackageMetadata.packageData"
+      :jsonObject="packageSearchState.selectedPackageMetadata.packageData"
     ></recursive-json-table>
   </div>
 </template>
@@ -222,7 +223,7 @@ export default Vue.extend({
     ...mapState<IPluginState>({
       authState: (state: IPluginState) => state.pluginAuth.authState,
       flags: (state: IPluginState) => state.flags,
-      packageSearchData: (state: IPluginState) => state.packageSearch,
+      packageSearchState: (state: IPluginState) => state.packageSearch,
     }),
     isOnPackagesPage() {
       return window.location.pathname.match(PACKAGE_TAB_REGEX);

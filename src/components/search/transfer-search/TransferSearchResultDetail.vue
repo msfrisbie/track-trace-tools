@@ -1,6 +1,6 @@
 <template>
   <div
-    v-if="transferSearchData.selectedTransferMetadata"
+    v-if="transferSearchState.selectedTransferMetadata"
     class="flex flex-col items-center space-y-8 px-2 p-4"
   >
     <div class="w-full grid grid-cols-3" style="grid-template-columns: 1fr 8fr 1fr">
@@ -10,15 +10,16 @@
         <div class="flex flex-col space-y-2 items-center">
           <div class="flex flex-row items-center space-x-4 text-center">
             <div class="text-2xl text-purple-800">
-              Manifest {{ transferSearchData.selectedTransferMetadata.transferData.ManifestNumber }}
+              Manifest
+              {{ transferSearchState.selectedTransferMetadata.transferData.ManifestNumber }}
             </div>
           </div>
 
           <b-badge
             class="text-lg"
-            :variant="badgeVariant(transferSearchData.selectedTransferMetadata.transferData)"
+            :variant="badgeVariant(transferSearchState.selectedTransferMetadata.transferData)"
             >{{
-              displayTransferState(transferSearchData.selectedTransferMetadata.transferData)
+              displayTransferState(transferSearchState.selectedTransferMetadata.transferData)
             }}</b-badge
           >
         </div>
@@ -27,7 +28,7 @@
       <div
         v-show="isOnTransfersPage"
         @click.stop.prevent="
-          setTransferManifestNumberFilter(transferSearchData.selectedTransferMetadata.transferData)
+          setTransferManifestNumberFilter(transferSearchState.selectedTransferMetadata.transferData)
         "
         class="flex flex-row items-center justify-center cursor-pointer h-full"
       >
@@ -40,7 +41,9 @@
         variant="outline-primary"
         size="sm"
         style="width: 100%"
-        @click.stop.prevent="viewManifest(transferSearchData.selectedTransferMetadata.transferData)"
+        @click.stop.prevent="
+          viewManifest(transferSearchState.selectedTransferMetadata.transferData)
+        "
         class="flex flex-row items-center justify-between space-x-4"
       >
         <span>VIEW MANIFEST</span>
@@ -52,7 +55,7 @@
         size="sm"
         style="width: 100%"
         @click.stop.prevent="
-          downloadManifest(transferSearchData.selectedTransferMetadata.transferData)
+          downloadManifest(transferSearchState.selectedTransferMetadata.transferData)
         "
         class="flex flex-row items-center justify-between space-x-4"
       >
@@ -65,7 +68,7 @@
         size="sm"
         style="width: 100%"
         @click.stop.prevent="
-          printManifest(transferSearchData.selectedTransferMetadata.transferData)
+          printManifest(transferSearchState.selectedTransferMetadata.transferData)
         "
         class="flex flex-row items-center justify-between space-x-4"
       >
@@ -78,7 +81,7 @@
         size="sm"
         style="width: 100%"
         @click.stop.prevent="
-          createScanSheet(transferSearchData.selectedTransferMetadata.transferData)
+          createScanSheet(transferSearchState.selectedTransferMetadata.transferData)
         "
         class="flex flex-row items-center justify-between space-x-4"
       >
@@ -88,7 +91,7 @@
     </div>
 
     <recursive-json-table
-      :jsonObject="transferSearchData.selectedTransferMetadata.transferData"
+      :jsonObject="transferSearchState.selectedTransferMetadata.transferData"
     ></recursive-json-table>
   </div>
 </template>
@@ -166,7 +169,7 @@ export default Vue.extend({
   // },
   computed: {
     ...mapState<IPluginState>({
-      transferSearchData: (state: IPluginState) => state.transferSearch,
+      transferSearchState: (state: IPluginState) => state.transferSearch,
     }),
     isOnTransfersPage(): boolean {
       return !!window.location.pathname.match(TRANSFER_TAB_REGEX);

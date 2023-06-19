@@ -1,6 +1,6 @@
 <template>
   <div
-    v-if="plantSearchData.selectedPlantMetadata"
+    v-if="plantSearchState.selectedPlantMetadata"
     class="flex flex-col items-center space-y-8 px-2 p-4"
   >
     <div class="w-full grid grid-cols-3" style="grid-template-columns: 1fr 8fr 1fr">
@@ -10,22 +10,22 @@
         <div class="flex flex-col space-y-2 items-center">
           <div class="flex flex-col items-center space-x-4 text-center">
             <metrc-tag
-              :label="plantSearchData.selectedPlantMetadata.plantData.Label"
+              :label="plantSearchState.selectedPlantMetadata.plantData.Label"
               sideText="PLANT"
             ></metrc-tag>
           </div>
 
           <b-badge
             class="text-lg"
-            :variant="badgeVariant(plantSearchData.selectedPlantMetadata.plantData)"
-            >{{ displayPlantState(plantSearchData.selectedPlantMetadata.plantData) }}</b-badge
+            :variant="badgeVariant(plantSearchState.selectedPlantMetadata.plantData)"
+            >{{ displayPlantState(plantSearchState.selectedPlantMetadata.plantData) }}</b-badge
           >
         </div>
       </div>
 
       <div
         v-show="isOnPlantsPage"
-        @click.stop.prevent="setPlantLabelFilter(plantSearchData.selectedPlantMetadata.plantData)"
+        @click.stop.prevent="setPlantLabelFilter(plantSearchState.selectedPlantMetadata.plantData)"
         class="flex flex-row items-center justify-center cursor-pointer h-full"
       >
         <font-awesome-icon icon="chevron-right" class="text-2xl text-purple-500" />
@@ -33,7 +33,7 @@
     </div>
 
     <recursive-json-table
-      :jsonObject="plantSearchData.selectedPlantMetadata.plantData"
+      :jsonObject="plantSearchState.selectedPlantMetadata.plantData"
     ></recursive-json-table>
   </div>
 </template>
@@ -86,7 +86,7 @@ export default Vue.extend({
     ...mapState<IPluginState>({
       authState: (state: IPluginState) => state.pluginAuth.authState,
       flags: (state: IPluginState) => state.flags,
-      plantSearchData: (state: IPluginState) => state.plantSearch,
+      plantSearchState: (state: IPluginState) => state.plantSearch,
     }),
     isOnPlantsPage(): boolean {
       return !!window.location.pathname.match(PLANTS_TAB_REGEX);

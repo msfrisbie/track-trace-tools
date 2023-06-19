@@ -34,7 +34,10 @@
           <div v-if="searchState.showSearchResults" class="search-anchor">
             <div class="search-bar flex flex-col bg-white rounded-b-md">
               <div class="flex-grow overflow-y-auto">
-                <tag-search-results :tags="tags" :inflight="searchState.searchInflight" />
+                <tag-search-results
+                  :tags="tagSearchState.tags"
+                  :inflight="searchState.searchInflight"
+                />
               </div>
 
               <div

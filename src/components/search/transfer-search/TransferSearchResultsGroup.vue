@@ -15,9 +15,9 @@
       :key="transfer.Id"
       :transfer="transfer"
       :selected="
-        !!transferSearchData.selectedTransferMetadata &&
-        transfer.Id === transferSearchData.selectedTransferMetadata.transferData.Id &&
-        sectionName === transferSearchData.selectedTransferMetadata.sectionName
+        !!transferSearchState.selectedTransferMetadata &&
+        transfer.Id === transferSearchState.selectedTransferMetadata.transferData.Id &&
+        sectionName === transferSearchState.selectedTransferMetadata.sectionName
       "
       :idx="index"
       v-on:selected-transfer="showTransferDetail($event)"
@@ -84,7 +84,7 @@ export default Vue.extend({
 
         if (
           !this.$store.state.transferSearch.selectedTransferMetadata ||
-          this.$store.state.transferSearch.selectedTransferMetadata.priority <
+          this.$store.state.transferSearch.selectedTransferMetadata.priority >=
             candidateMetadata.priority
         ) {
           this.$store.state.transferSearch.selectedTransferMetadata = candidateMetadata;

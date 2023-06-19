@@ -34,9 +34,9 @@
       :tag="tag"
       :sectionName="sectionName"
       :selected="
-        !!tagSearchData.selectedTagMetadata &&
-        tag.Id === tagSearchData.selectedTagMetadata.tagData.Id &&
-        sectionName === tagSearchData.selectedTagMetadata.sectionName
+        !!tagSearchState.selectedTagMetadata &&
+        tag.Id === tagSearchState.selectedTagMetadata.tagData.Id &&
+        sectionName === tagSearchState.selectedTagMetadata.sectionName
       "
       :idx="index"
       v-on:selected-tag="showTagDetail($event)"
@@ -104,7 +104,7 @@ export default Vue.extend({
 
         if (
           !this.$store.state.tagSearch.selectedTagMetadata ||
-          this.$store.state.tagSearch.selectedTagMetadata.priority < candidateMetadata.priority
+          this.$store.state.tagSearch.selectedTagMetadata.priority >= candidateMetadata.priority
         ) {
           this.$store.state.tagSearch.selectedTagMetadata = candidateMetadata;
         }
@@ -130,7 +130,7 @@ export default Vue.extend({
   computed: {
     ...mapState<IPluginState>({
       queryString: (state: IPluginState) => state.search.queryString,
-      tagSearchData: (state: IPluginState) => state.tagSearch,
+      tagSearchState: (state: IPluginState) => state.tagSearch,
     }),
     isOnTagsPage(): boolean {
       return !!window.location.pathname.match(TAG_TAB_REGEX);

@@ -34,9 +34,9 @@
       :plant="plant"
       :sectionName="sectionName"
       :selected="
-        !!plantSearchData.selectedPlantMetadata &&
-        plant.Id === plantSearchData.selectedPlantMetadata.plantData.Id &&
-        sectionName === plantSearchData.selectedPlantMetadata.sectionName
+        !!plantSearchState.selectedPlantMetadata &&
+        plant.Id === plantSearchState.selectedPlantMetadata.plantData.Id &&
+        sectionName === plantSearchState.selectedPlantMetadata.sectionName
       "
       :idx="index"
       v-on:selected-plant="showPlantDetail($event)"
@@ -105,7 +105,7 @@ export default Vue.extend({
 
         if (
           !this.$store.state.plantSearch.selectedPlantMetadata ||
-          this.$store.state.plantSearch.selectedPlantMetadata.priority > candidateMetadata.priority
+          this.$store.state.plantSearch.selectedPlantMetadata.priority >= candidateMetadata.priority
         ) {
           this.$store.state.plantSearch.selectedPlantMetadata = candidateMetadata;
         }
@@ -115,7 +115,7 @@ export default Vue.extend({
   computed: {
     ...mapState<IPluginState>({
       queryString: (state: IPluginState) => state.search.queryString,
-      plantSearchData: (state: IPluginState) => state.plantSearch
+      plantSearchState: (state: IPluginState) => state.plantSearch,
     }),
     isOnPlantsPage(): boolean {
       return !!window.location.pathname.match(PLANTS_TAB_REGEX);

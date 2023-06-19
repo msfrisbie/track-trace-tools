@@ -34,9 +34,9 @@
       :pkg="pkg"
       :sectionName="sectionName"
       :selected="
-        !!packageSearchData.selectedPackageMetadata &&
-        pkg.Id === packageSearchData.selectedPackageMetadata.packageData.Id &&
-        sectionName === packageSearchData.selectedPackageMetadata.sectionName
+        !!packageSearchState.selectedPackageMetadata &&
+        pkg.Id === packageSearchState.selectedPackageMetadata.packageData.Id &&
+        sectionName === packageSearchState.selectedPackageMetadata.sectionName
       "
       :idx="index"
       v-on:selected-package="showPackageDetail($event)"
@@ -58,7 +58,7 @@ import { IIndexedPackageData, IPluginState } from "@/interfaces";
 import { PACKAGE_TAB_REGEX } from "@/modules/page-manager/consts";
 import store from "@/store/page-overlay/index";
 import { PackageSearchActions } from "@/store/page-overlay/modules/package-search/consts";
-import { ISelectedPlantMetadata } from "@/store/page-overlay/modules/plant-search/interfaces";
+import { ISelectedPackageMetadata } from "@/store/page-overlay/modules/package-search/interfaces";
 import { SearchActions } from "@/store/page-overlay/modules/search/consts";
 import { Subject } from "rxjs";
 import { take, takeUntil } from "rxjs/operators";
@@ -92,21 +92,23 @@ export default Vue.extend({
     packages: {
       immediate: true,
       handler(newValue, oldValue) {
+        console.log({ newValue });
         if (!newValue) {
           return;
         }
 
-        const candidateMetadata: ISelectedPlantMetadata = {
-          plantData: newValue[0],
+        const candidateMetadata: ISelectedPackageMetadata = {
+          packageData: newValue[0],
           sectionName: this.sectionName,
           priority: this.sectionPriority,
         };
 
         if (
-          !this.$store.state.plantSearch.selectedPlantMetadata ||
-          this.$store.state.plantSearch.selectedPlantMetadata.priority < candidateMetadata.priority
+          !this.$store.state.packageSearch.selectedPackageMetadata ||
+          this.$store.state.packageSearch.selectedPackageMetadata.priority >=
+            candidateMetadata.priority
         ) {
-          this.$store.state.plantSearch.selectedPlantMetadata = candidateMetadata;
+          this.$store.state.packageSearch.selectedPackageMetadata = candidateMetadata;
         }
 
         // searchManager.selectedPackage
@@ -158,7 +160,7 @@ export default Vue.extend({
     },
     ...mapState<IPluginState>({
       queryString: (state: IPluginState) => state.search.queryString,
-      packageSearchData: (state: IPluginState) => state.packageSearch,
+      packageSearchState: (state: IPluginState) => state.packageSearch,
     }),
   },
   methods: {
