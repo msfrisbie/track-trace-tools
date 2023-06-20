@@ -1,28 +1,20 @@
 @import "@/scss/palette";
 
-.search-anchor {
-  position: relative;
-}
-
 .search-bar {
-  position: absolute;
-  max-width: 1200px;
-  width: 100%;
-  // Metrc navbar is 1003
-  z-index: 1000;
-  box-shadow: 0px 5px 5px rgba(0, 0, 0, 0.5);
+  // position: absolute;
+  // max-width: 1200px;
+  // width: 100%;
 }
 
 .inline-search .search-bar {
   height: 75vh;
+  box-shadow: 0px 5px 5px rgba(0, 0, 0, 0.5);
+  // Metrc navbar is 1003
+  z-index: 1000;
 }
 
 .modal-search .search-bar {
-  height: 100%;
-}
-
-.search-bar-container {
-  // max-width: 1200px;
+  // height: 100%;
 }
 
 .search-icon {

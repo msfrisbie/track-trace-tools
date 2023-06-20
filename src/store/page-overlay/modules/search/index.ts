@@ -14,13 +14,14 @@ import { PackageSearchActions } from "../package-search/consts";
 import { PlantSearchActions } from "../plant-search/consts";
 import { TagSearchActions } from "../tag-search/consts";
 import { TransferSearchActions } from "../transfer-search/consts";
-import { SearchActions } from "./consts";
-import { ISearchState, SearchType } from "./interfaces";
+import { SearchActions, SearchType } from "./consts";
+import { ISearchState } from "./interfaces";
 
 const inMemoryState = {
   queryString: "",
-  searchType: "PACKAGES" as SearchType,
+  searchType: SearchType.PACKAGES,
   showSearchResults: false,
+  modalSearchOpen: false,
 };
 
 const persistedState = {
@@ -66,13 +67,13 @@ export const searchModule = {
     },
     [SearchActions.INITIALIZE_SEARCH_TYPE](ctx: ActionContext<ISearchState, IPluginState>) {
       if (window.location.pathname.match(PLANTS_TAB_REGEX)) {
-        ctx.dispatch(SearchActions.SET_SEARCH_TYPE, { searchType: "PLANTS" });
+        ctx.dispatch(SearchActions.SET_SEARCH_TYPE, { searchType: SearchType.PLANTS });
       } else if (window.location.pathname.match(TAG_TAB_REGEX)) {
-        ctx.dispatch(SearchActions.SET_SEARCH_TYPE, { searchType: "TAGS" });
+        ctx.dispatch(SearchActions.SET_SEARCH_TYPE, { searchType: SearchType.TAGS });
       } else if (window.location.pathname.match(TRANSFER_TAB_REGEX)) {
-        ctx.dispatch(SearchActions.SET_SEARCH_TYPE, { searchType: "TRANSFERS" });
+        ctx.dispatch(SearchActions.SET_SEARCH_TYPE, { searchType: SearchType.TRANSFERS });
       } else if (window.location.pathname.match(PACKAGE_TAB_REGEX)) {
-        ctx.dispatch(SearchActions.SET_SEARCH_TYPE, { searchType: "PACKAGES" });
+        ctx.dispatch(SearchActions.SET_SEARCH_TYPE, { searchType: SearchType.PACKAGES });
       }
     },
     [SearchActions.EXECUTE_QUERY]: _.debounce(

@@ -1,7 +1,7 @@
 <template>
   <div
-    class="hide-scrollbar grid grid-cols-6 grid-rows-2"
-    style="height: 100%; grid-template-rows: auto 1fr"
+    class="hide-scrollbar grid grid-cols-6 grid-rows-3 h-full"
+    style="grid-template-rows: auto auto 1fr"
   >
     <template v-if="searchState.queryString.length > 0">
       <search-view-selector />

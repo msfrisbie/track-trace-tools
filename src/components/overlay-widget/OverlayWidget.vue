@@ -34,11 +34,11 @@
     />
 
     <div style="position: absolute">
-      <debug-modal ref="debug" />
-      <builder-modal ref="builder" />
-      <document-modal ref="document" />
-      <promo-modal ref="promo" />
-      <search-modal ref="search" />
+      <debug-modal ref="debugmodal" />
+      <builder-modal ref="buildermodal" />
+      <document-modal ref="documentmodal" />
+      <promo-modal ref="promomodal" />
+      <search-modal ref="searchmodal" />
     </div>
   </div>
 </template>
@@ -90,28 +90,28 @@ export default Vue.extend({
     document.addEventListener("keydown", (e) => {
       // œ is the macOS alt value
       if (e.altKey && (e.key === "œ" || e.key === "q")) {
-        (this.$refs.document as any)?.hide();
-        (this.$refs.promo as any)?.hide();
-        (this.$refs.builder as any)?.hide();
-        (this.$refs.debug as any)?.toggle();
-        (this.$refs.search as any)?.hide();
+        (this.$refs.documentmodal as any)?.hide();
+        (this.$refs.promomodal as any)?.hide();
+        (this.$refs.buildermodal as any)?.hide();
+        (this.$refs.debugmodal as any)?.toggle();
+        (this.$refs.searchmodal as any)?.hide();
       }
 
       // † is the macOS alt value
       else if (e.altKey && (e.key === "†" || e.key === "t")) {
-        (this.$refs.document as any)?.hide();
-        (this.$refs.debug as any)?.hide();
-        (this.$refs.promo as any)?.hide();
-        (this.$refs.builder as any)?.toggle();
-        (this.$refs.search as any)?.hide();
+        (this.$refs.documentmodal as any)?.hide();
+        (this.$refs.debugmodal as any)?.hide();
+        (this.$refs.promomodal as any)?.hide();
+        (this.$refs.buildermodal as any)?.toggle();
+        (this.$refs.searchmodal as any)?.hide();
 
         // ß is the macOS alt value
       } else if (e.altKey && (e.key === "ß" || e.key === "s")) {
-        (this.$refs.document as any)?.hide();
-        (this.$refs.debug as any)?.hide();
-        (this.$refs.promo as any)?.hide();
-        (this.$refs.builder as any)?.hide();
-        (this.$refs.search as any)?.toggle();
+        (this.$refs.documentmodal as any)?.hide();
+        (this.$refs.debugmodal as any)?.hide();
+        (this.$refs.promomodal as any)?.hide();
+        (this.$refs.buildermodal as any)?.hide();
+        (this.$refs.searchmodal as any)?.toggle();
       }
     });
 
@@ -155,19 +155,19 @@ export default Vue.extend({
 
         switch (modalType) {
           case ModalType.DEBUG:
-            modal = this.$refs.debug;
+            modal = this.$refs.debugmodal;
             break;
           case ModalType.BUILDER:
-            modal = this.$refs.builder;
+            modal = this.$refs.buildermodal;
             break;
           case ModalType.DOCUMENT:
-            modal = this.$refs.document;
+            modal = this.$refs.documentmodal;
             break;
           case ModalType.PROMO:
-            modal = this.$refs.promo;
+            modal = this.$refs.promomodal;
             break;
           case ModalType.SEARCH:
-            modal = this.$refs.search;
+            modal = this.$refs.searchmodal;
             break;
           default:
             throw new Error("Invalid modal type");

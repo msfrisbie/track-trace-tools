@@ -1,4 +1,4 @@
-export type SearchType = "PACKAGES" | "TRANSFERS" | "TAGS" | "PLANTS";
+import { SearchType } from "./consts";
 
 export interface ISearchState {
   showSearchResults: boolean;
@@ -6,4 +6,5 @@ export interface ISearchState {
   expandSearchOnNextLoad: boolean;
   queryString: string;
   queryStringHistory: string[];
+  modalSearchOpen: boolean;
 }

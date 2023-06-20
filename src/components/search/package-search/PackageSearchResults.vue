@@ -1,7 +1,7 @@
 <template>
   <div
-    class="hide-scrollbar grid grid-cols-6 grid-rows-2"
-    style="height: 100%; grid-template-rows: auto 1fr"
+    class="hide-scrollbar grid grid-cols-6 grid-rows-3 h-full"
+    style="grid-template-rows: auto auto 1fr"
   >
     <template v-if="searchState.queryString.length > 0">
       <search-view-selector />
@@ -54,8 +54,8 @@ import { PackageSearchActions } from "@/store/page-overlay/modules/package-searc
 import { TransferBuilderGetters } from "@/store/page-overlay/modules/transfer-builder/consts";
 import Vue from "vue";
 import { mapActions, mapGetters, mapState } from "vuex";
-import HistoryList from "@/components/search/shared/HistoryList.vue"
-import SearchViewSelector from "@/components/search/shared/SearchViewSelector.vue"
+import HistoryList from "@/components/search/shared/HistoryList.vue";
+import SearchViewSelector from "@/components/search/shared/SearchViewSelector.vue";
 
 export default Vue.extend({
   name: "PackageSearchResults",
@@ -90,9 +90,8 @@ export default Vue.extend({
     }),
     filtersApplied() {
       return (
-        Object.values(this.$store.state.packageSearch.packageSearchFilters || {}).filter(
-          (x) => !!x
-        ).length > 0
+        Object.values(this.$store.state.packageSearch.packageSearchFilters || {}).filter((x) => !!x)
+          .length > 0
       );
     },
   },

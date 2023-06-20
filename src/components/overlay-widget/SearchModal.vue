@@ -16,7 +16,7 @@
     @show="handleOpen()"
     @hidden="handleClose()"
   >
-    <unified-search-widget :enableModalStyling="true"></unified-search-widget>
+    <unified-search-widget ref="unifiedsearch" :modalSearch="true"></unified-search-widget>
   </b-modal>
 </template>
 
@@ -47,9 +47,16 @@ export default Vue.extend({
     },
     handleOpen() {
       analyticsManager.track(MessageType.OPENED_SEARCH_MODAL);
+
+      this.$store.state.search.modalSearchOpen = true;
+
+      // @ts-ignore
+      this.$refs.unifiedsearch!.setFocus();
     },
     handleClose() {
       analyticsManager.track(MessageType.CLOSED_SEARCH_MODAL);
+
+      this.$store.state.search.modalSearchOpen = false;
     },
   },
   async mounted() {},

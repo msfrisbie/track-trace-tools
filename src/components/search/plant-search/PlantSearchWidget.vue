@@ -31,8 +31,8 @@
           </b-input-group> -->
 
           <!-- Anchor point for dropdown results card -->
-          <div v-if="searchState.showSearchResults" class="search-anchor">
-            <div class="search-bar flex flex-col bg-white rounded-b-md">
+          <div v-if="searchState.showSearchResults" class="relative">
+            <div class="search-bar flex absolute w-full flex-col bg-white rounded-b-md">
               <div class="flex-grow overflow-y-auto">
                 <plant-search-results
                   :plants="plantSearchState.plants"
@@ -41,6 +41,7 @@
               </div>
 
               <div
+                v-if="!searchState.modalSearchOpen"
                 class="flex flex-row items-center space-x-1 p-1 text-xs text-gray-500 border-purple-300 border-t"
               >
                 <span>Press</span>

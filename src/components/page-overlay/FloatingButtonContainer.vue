@@ -8,20 +8,13 @@
 
     <template v-if="pluginAuth.authState">
       <div class="flex flex-row gap-2 floating-hover-reveal-target">
-        <b-button
-          title="Search"
-          variant="primary"
-          class="floating-shadow"
-          style="padding: 0"
-          @click="openSearchModal()"
-        >
-          <div class="flex flex-col items-center justify-center" style="width: 52px; height: 52px">
-            <font-awesome-icon icon="search" style="height: 26px"></font-awesome-icon>
-          </div>
-        </b-button>
+        <search-button class="floating-shadow"></search-button>
 
         <quick-script-button class="floating-shadow" />
       </div>
+
+      <!-- TODO enable when T3+ signup is ready -->
+      <plus-button v-if="false && !hasT3plus" class="floating-shadow" />
 
       <builder-button class="floating-shadow" />
     </template>
@@ -32,12 +25,15 @@
 import BuilderButton from "@/components/page-overlay/BuilderButton.vue";
 import DebugButton from "@/components/page-overlay/DebugButton.vue";
 import QuickScriptButton from "@/components/page-overlay/QuickScriptButton.vue";
+import SearchButton from "@/components/page-overlay/SearchButton.vue";
 import ScrollButton from "@/components/page-overlay/ScrollButton.vue";
+import PlusButton from "@/components/page-overlay/PlusButton.vue";
 import { ModalAction, ModalType } from "@/consts";
 import { modalManager } from "@/modules/modal-manager.module";
 import store from "@/store/page-overlay/index";
 import Vue from "vue";
 import { mapState } from "vuex";
+import { clientBuildManager } from "@/modules/client-build-manager.module";
 
 export default Vue.extend({
   name: "FloatingButtonContainer",
@@ -47,17 +43,32 @@ export default Vue.extend({
     QuickScriptButton,
     ScrollButton,
     DebugButton,
+    SearchButton,
+    PlusButton,
   },
-  async mounted() {},
+  async mounted() {
+    this.checkT3plus();
+  },
   data() {
-    return {};
+    return {
+      hasT3plus: true,
+    };
   },
   computed: {
     ...mapState(["pluginAuth", "trackedInteractions", "settings", "debugMode"]),
   },
   methods: {
-    openSearchModal() {
-      modalManager.dispatchModalEvent(ModalType.SEARCH, ModalAction.OPEN);
+    checkT3plus() {
+      this.$data.hasT3plus = clientBuildManager.assertValues(["ENABLE_T3PLUS"]);
+    },
+  },
+  watch: {
+    "settings.licenseKey": {
+      immediate: true,
+      handler() {
+        console.log("check");
+        this.checkT3plus();
+      },
     },
   },
 });

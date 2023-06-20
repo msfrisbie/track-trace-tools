@@ -11,11 +11,15 @@
     <b-button-group>
       <b-button
         size="sm"
-        v-for="searchTypeOption of ['PLANTS', 'PACKAGES', 'TRANSFERS', 'TAGS']"
-        v-bind:key="searchTypeOption"
-        :variant="searchType === searchTypeOption ? 'primary' : 'outline-primary'"
-        @click.stop.prevent="setSearchType({ searchType: searchTypeOption })"
-        >{{ searchTypeOption }}</b-button
+        v-for="searchTypeOption of searchTypeOptions"
+        v-bind:key="searchTypeOption.value"
+        :disabled="!searchTypeOption.enabled"
+        :variant="searchType === searchTypeOption.value ? 'primary' : 'outline-primary'"
+        @click.stop.prevent="setSearchType({ searchType: searchTypeOption.value })"
+        >{{ searchTypeOption.text }}
+        <template v-if="searchTypeOption.enabled"
+          >({{ searchTypeOption.count }})</template
+        ></b-button
       >
     </b-button-group>
   </div>
@@ -29,8 +33,7 @@ import store from "@/store/page-overlay/index";
 import TagSearchWidget from "@/components/search/tag-search/TagSearchWidget.vue";
 import TransferSearchWidget from "@/components/search/transfer-search/TransferSearchWidget.vue";
 import PackageSearchWidget from "@/components/search/package-search/PackageSearchWidget.vue";
-import { SearchActions } from "@/store/page-overlay/modules/search/consts";
-import { SearchType } from "@/store/page-overlay/modules/search/interfaces";
+import { SearchActions, SearchType } from "@/store/page-overlay/modules/search/consts";
 import { IPluginState } from "@/interfaces";
 
 export default Vue.extend({
@@ -42,7 +45,63 @@ export default Vue.extend({
   computed: {
     ...mapState<IPluginState>({
       searchType: (state: IPluginState) => state.search.searchType,
+      packageSearchState: (state: IPluginState) => state.packageSearch,
+      plantSearchState: (state: IPluginState) => state.plantSearch,
+      tagSearchState: (state: IPluginState) => state.tagSearch,
+      transferSearchState: (state: IPluginState) => state.transferSearch,
     }),
+    searchTypeOptions(): { text: string; value: SearchType; count: number; enabled: boolean }[] {
+      return [
+        {
+          text: "PACKAGES",
+          value: SearchType.PACKAGES,
+          count: this.$store.state.packageSearch.packages.length,
+          enabled: true,
+        },
+        {
+          text: "PLANTS",
+          value: SearchType.PLANTS,
+          count: this.$store.state.plantSearch.plants.length,
+          enabled: true,
+        },
+        {
+          text: "TRANSFERS",
+          value: SearchType.TRANSFERS,
+          count: this.$store.state.transferSearch.transfers.length,
+          enabled: true,
+        },
+        {
+          text: "TAGS",
+          value: SearchType.TAGS,
+          count: this.$store.state.tagSearch.tags.length,
+          enabled: true,
+        },
+        {
+          text: "TRANSFER TEMPLATES",
+          value: SearchType.TRANSFER_TEMPLATES,
+          count: 0,
+          enabled: false,
+        },
+        {
+          text: "HARVESTS",
+          value: SearchType.HARVESTS,
+          count: 0,
+          enabled: false,
+        },
+        {
+          text: "PLANT BATCHES",
+          value: SearchType.PLANT_BATCHES,
+          count: 0,
+          enabled: false,
+        },
+        {
+          text: "SALES",
+          value: SearchType.SALES,
+          count: 0,
+          enabled: false,
+        },
+      ];
+    },
   },
   data() {
     return {};
