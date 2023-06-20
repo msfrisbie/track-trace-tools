@@ -54,6 +54,7 @@
                 borderBottomRightRadius: searchState.showSearchResults ? '0 !important' : 'inherit',
                 borderBottomLeftRadius: searchState.showSearchResults ? '0 !important' : 'inherit',
               }"
+              style="margin-bottom: 0"
               v-model="queryString"
               type="search"
               id="default-search"
