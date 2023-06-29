@@ -3,6 +3,7 @@ import {
   extractChildPackageLabelsFromHistory,
   extractChildPackageTagQuantityPairsFromHistory,
   extractChildPackageTagQuantityUnitSetsFromHistory,
+  extractInitialPackageLocationNameFromHistoryOrNull,
   extractInitialPackageQuantityAndUnitFromHistoryOrError,
   extractParentPackageLabelsFromHistory,
   extractParentPackageTagQuantityUnitItemSetsFromHistory,
@@ -276,5 +277,17 @@ describe("history.ts", () => {
     expect(
       extractInitialPackageQuantityAndUnitFromHistoryOrError(PACKAGE_WITH_CHILD_SENT_FOR_TESTING)
     ).toEqual([225849, "Each"]);
+  });
+
+  it("Correctly extracts the initial location name", () => {
+    expect(
+      extractInitialPackageLocationNameFromHistoryOrNull(BULK_BIOMASS_ACCEPTED_VIA_TRANSFER)
+    ).toEqual("Building 1");
+    expect(
+      extractInitialPackageLocationNameFromHistoryOrNull(MULTI_PARENT_BIOMASS_PACKAGE)
+    ).toEqual("Biomass Storage");
+    expect(
+      extractInitialPackageLocationNameFromHistoryOrNull(PACKAGE_WITH_CHILD_SENT_FOR_TESTING)
+    ).toEqual("Quarantine Room");
   });
 });

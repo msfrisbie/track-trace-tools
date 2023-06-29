@@ -6,6 +6,7 @@ import {
   ISpreadsheet,
   ITransferFilter,
 } from "@/interfaces";
+import { clientBuildManager } from "@/modules/client-build-manager.module";
 import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
 import { messageBus } from "@/modules/message-bus.module";
 import store from "@/store/page-overlay/index";
@@ -19,6 +20,7 @@ import { ActionContext } from "vuex";
 import { isodateToSlashDate, todayIsodate } from "../date";
 import {
   extractChildPackageTagQuantityUnitSetsFromHistory,
+  extractInitialPackageLocationNameFromHistoryOrNull,
   extractInitialPackageQuantityAndUnitFromHistoryOrError,
   extractParentPackageTagQuantityUnitItemSetsFromHistory,
   extractTestSamplePackageLabelsFromHistory,
@@ -165,6 +167,9 @@ export async function maybeLoadCogsTrackerReportData({
   distRexCogsMatrix.push(srcHeaders);
   packagedGoodsCogsMatrix.push(packagedHeaders);
 
+  const values = clientBuildManager.validateAndGetValuesOrError(["PACKAGE_LOCATION_BLACKLIST"]);
+  const locationNameBlacklist = values.PACKAGE_LOCATION_BLACKLIST;
+
   const bulkInfusedPackages = dateFilteredPackages.filter(
     (pkg) =>
       pkg.Item.ProductCategoryName.includes("Bulk") &&
@@ -178,7 +183,11 @@ export async function maybeLoadCogsTrackerReportData({
       !pkg.Item.ProductCategoryName.includes("Bulk Flower")
   );
   const packagedGoodsCogsPackages = dateFilteredPackages.filter(
-    (pkg) => pkg.UnitOfMeasureQuantityType === "CountBased"
+    (pkg) =>
+      pkg.UnitOfMeasureQuantityType === "CountBased" &&
+      !locationNameBlacklist.includes(
+        extractInitialPackageLocationNameFromHistoryOrNull(pkg.history!)
+      )
   );
 
   function cogsTrackerInputRowFactory(pkg: IIndexedPackageData): any[] {

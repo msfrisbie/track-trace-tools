@@ -164,6 +164,14 @@ export function extractParentPackageTagQuantityUnitItemSetOrNull(
   return match ? [match[4], parseFloat(match[1].replaceAll(",", "")), match[2], match[3]] : null;
 }
 
+export function extractLocationNameOrNull(description: string): string | null {
+  const matcher = new RegExp(`- Location: (.*)`);
+
+  const match = description.match(matcher);
+
+  return match ? match[1] : null;
+}
+
 // Full history methods
 
 export function extractInitialPackageQuantityAndUnitFromHistoryOrError(
@@ -287,4 +295,18 @@ export function extractParentPackageTagQuantityUnitItemSetsFromHistory(
   }
 
   return sets;
+}
+
+export function extractInitialPackageLocationNameFromHistoryOrNull(
+  historyList: IPackageHistoryData[]
+): string | null {
+  for (const description of historyList[0].Descriptions) {
+    const result = extractLocationNameOrNull(description);
+
+    if (result) {
+      return result;
+    }
+  }
+
+  return null;
 }
