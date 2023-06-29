@@ -223,13 +223,38 @@
 
       <template v-if="activeStepIndex === 1">
         <div class="grid grid-cols-2 grid-rows-2 gap-8 h-full" style="grid-template-rows: 1fr auto">
-          <single-package-picker
-            class="col-span-2 h-full"
-            :enablePaste="true"
-            :selectedPackages="transferPackages"
-            v-on:removePackage="removePackage({ pkg: $event })"
-            v-on:addPackage="addPackage({ pkg: $event })"
-          />
+          <div class="flex flex-col items-stretch gap-2 col-span-2 h-full">
+            <div v-if="enableTransferCsv" class="flex flex-row gap-2" ref="csvdestination">
+              <label class="btn btn-primary btn-sm">
+                SELECT CSVs
+                <div class="hidden" ref="csvdestination">
+                  <input
+                    type="file"
+                    accept=".txt,.csv,text/plain,text/csv"
+                    multiple="multiple"
+                    class="hidden"
+                    @change="collectCsvs($event)"
+                  />
+                  <input
+                    type="file"
+                    accept=".txt,.csv,text/plain,text/csv"
+                    multiple="multiple"
+                    class="hidden"
+                    ref="mergedcsv"
+                    v-bind:[clientValues.INTERMEDIATE_CSV_ATTRIBUTE]="true"
+                  />
+                </div>
+              </label>
+
+              <b-button variant="primary" size="sm">FILL CSV DATA</b-button>
+            </div>
+            <single-package-picker
+              :enablePaste="true"
+              :selectedPackages="transferPackages"
+              v-on:removePackage="removePackage({ pkg: $event })"
+              v-on:addPackage="addPackage({ pkg: $event })"
+            />
+          </div>
 
           <div class="col-start-2 flex flex-col items-stretch space-y-2">
             <template v-if="!pageTwoErrorMessage">
@@ -515,7 +540,12 @@ import {
   ITransferBuilderState,
 } from "@/store/page-overlay/modules/transfer-builder/interfaces";
 import { facilityReadableAddressLinesOrNull } from "@/utils/address";
-import { buildCsvDataOrError, buildNamedCsvFileData } from "@/utils/csv";
+import {
+  buildCsvDataOrError,
+  buildNamedCsvFileData,
+  clientCsvKeys,
+  propagateCsv,
+} from "@/utils/csv";
 import { nowIsotime, todayIsodate } from "@/utils/date";
 import { debugLogFactory } from "@/utils/debug";
 import { facilitySummary } from "@/utils/facility";
@@ -562,6 +592,10 @@ export default Vue.extend({
       removePackage: `transferBuilder/${TransferBuilderActions.REMOVE_PACKAGE}`,
       // updateTransferData: `transferBuilder/${TransferBuilderActions.UPDATE_TRANSFER_DATA}`,
     }),
+    collectCsvs() {
+      // @ts-ignore
+      propagateCsv(this.$refs.csvdestination);
+    },
     getLabelOrError,
     getQuantityOrError,
     getItemNameOrError,
@@ -1270,6 +1304,8 @@ export default Vue.extend({
   },
   data() {
     return {
+      clientValues: {},
+      enableTransferCsv: false,
       enableEdit: false,
       destinationQuery: "",
       transporterQuery: "",
@@ -1307,6 +1343,8 @@ export default Vue.extend({
     const authState = await authManager.authStateOrError();
 
     this.$data.enableEdit = clientBuildManager.assertValues(["ENABLE_TRANSFER_EDIT"]);
+    this.$data.enableTransferCsv = clientBuildManager.assertValues(["ENABLE_TRANSFER_CSV"]);
+    this.$data.clientValues = clientBuildManager.validateAndGetValuesOrError(clientCsvKeys);
 
     dynamicConstsManager.transferTemplateHTML();
 
