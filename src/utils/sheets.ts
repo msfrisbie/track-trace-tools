@@ -349,6 +349,17 @@ export function addRowsRequestFactory({ sheetId, length }: { sheetId: number; le
   };
 }
 
+export function addColumnsRequestFactory({ sheetId, length }: { sheetId: number; length: number }) {
+  return {
+    appendDimension: {
+      dimension: "COLUMNS",
+      // Adding 0 columns causes the Sheets API to 500
+      length: Math.max(length, 1),
+      sheetId,
+    },
+  };
+}
+
 export function styleTopRowRequestFactory({ sheetId }: { sheetId: number }) {
   return {
     repeatCell: {
@@ -359,12 +370,12 @@ export function styleTopRowRequestFactory({ sheetId }: { sheetId: number }) {
       },
       cell: {
         userEnteredFormat: {
+          horizontalAlignment: "CENTER",
           backgroundColor: {
             red: 73 / 256,
             green: 39 / 256,
             blue: 106 / 256,
           },
-          // horizontalAlignment: "CENTER",
           textFormat: {
             foregroundColor: {
               red: 1.0,
@@ -376,7 +387,71 @@ export function styleTopRowRequestFactory({ sheetId }: { sheetId: number }) {
           },
         },
       },
-      fields: "userEnteredFormat(backgroundColor,textFormat)",
+      fields: "userEnteredFormat(backgroundColor,textFormat,horizontalAlignment)",
+    },
+  };
+}
+
+export function numberColumnRequestFactory({
+  sheetId,
+  columnIndex,
+  endColumnIndex,
+  numberFormatType,
+  numberFormatPattern,
+}: {
+  sheetId: number;
+  columnIndex: number;
+  endColumnIndex?: number;
+  numberFormatType: "CURRENCY" | "NUMBER";
+  numberFormatPattern: `$#,##0.00` | "0.00";
+}) {
+  return {
+    repeatCell: {
+      range: {
+        sheetId,
+        startColumnIndex: columnIndex,
+        endColumnIndex: endColumnIndex ?? columnIndex + 1,
+      },
+      cell: {
+        userEnteredFormat: {
+          numberFormat: {
+            type: numberFormatType,
+            pattern: numberFormatPattern,
+          },
+        },
+      },
+      fields: "userEnteredFormat.numberFormat",
+    },
+  };
+}
+
+export function alignColumnRequestFactory({
+  sheetId,
+  columnIndex,
+  endColumnIndex,
+  horizontalAlignment,
+  verticalAlignment,
+}: {
+  sheetId: number;
+  columnIndex: number;
+  endColumnIndex?: number;
+  horizontalAlignment: "CENTER";
+  verticalAlignment: "MIDDLE";
+}) {
+  return {
+    repeatCell: {
+      range: {
+        sheetId,
+        startColumnIndex: columnIndex,
+        endColumnIndex: endColumnIndex ?? columnIndex + 1,
+      },
+      cell: {
+        userEnteredFormat: {
+          horizontalAlignment,
+          verticalAlignment,
+        },
+      },
+      fields: "userEnteredFormat(horizontalAlignment,verticalAlignment)",
     },
   };
 }

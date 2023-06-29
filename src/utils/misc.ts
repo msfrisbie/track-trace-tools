@@ -278,3 +278,7 @@ export function allocateImmaturePlantCounts(
 
   return plantBatchData;
 }
+
+export function pad(x: string, len: number): string {
+  return `${" ".repeat(len)}${x}${" ".repeat(len)}`;
+}

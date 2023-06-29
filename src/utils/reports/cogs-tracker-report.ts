@@ -25,10 +25,14 @@ import {
   extractParentPackageTagQuantityUnitItemSetsFromHistory,
   extractTestSamplePackageLabelsFromHistory,
 } from "../history";
+import { pad } from "../misc";
 import {
+  addColumnsRequestFactory,
   addRowsRequestFactory,
+  alignColumnRequestFactory,
   autoResizeDimensionsRequestFactory,
   freezeTopRowRequestFactory,
+  numberColumnRequestFactory,
   styleTopRowRequestFactory,
 } from "../sheets";
 import { writeDataSheet } from "../sheets-export";
@@ -37,6 +41,8 @@ interface ICogsTrackerReportFormFilters {
   cogsTrackerDateGt: string;
   cogsTrackerDateLt: string;
 }
+
+const ORDINALS = ["1st", "2nd", "3rd", "4th", "5th", "6th", "7th", "8th"];
 
 export const cogsTrackerFormFiltersFactory: () => ICogsTrackerReportFormFilters = () => ({
   cogsTrackerDateGt: todayIsodate(),
@@ -119,35 +125,34 @@ export async function maybeLoadCogsTrackerReportData({
   const distRexCogsMatrix: any[][] = [];
   const packagedGoodsCogsMatrix: any[][] = [];
 
-  const ordinals = ["1st", "2nd", "3rd", "4th", "5th", "6th", "7th", "8th"];
-  const ordinalHeaders = ordinals
-    .map((ordinal) => [
-      `${ordinal} Input Tag`,
-      `${ordinal} Name`,
-      `${ordinal} Weight Used For Combination`,
-      `${ordinal} $/g`,
-    ])
-    .flat();
+  const ordinalHeaders = ORDINALS.map((ordinal) => [
+    `${ordinal} Input Tag`,
+    `${ordinal} Name`,
+    `${ordinal} Weight Used For Combination`,
+    `${ordinal} $/g`,
+  ])
+    .flat()
+    .map((x) => pad(x, 8));
 
   const srcHeaders = [
-    "Item",
+    "Item", // 0
     "Tag",
     "Source Packages",
-    "JV/CM",
+    "JV/CM", // 3
     "Production Batch Number",
-    "Category",
+    "Category", // 5
     "Packaged Date",
     "Source Harvests",
-    "Starting Quantity",
+    "Starting Quantity", // 8
     "Input Material COGS",
-    "Number of Test Samples Pulled",
+    "Number of Test Samples Pulled", // 10
     "Weight Post Test If Applicable",
     "Test Cost",
     "Tested $/G",
     "Cost Basis Value for Package",
-    "Notes",
+    "Notes", // 15
     ...ordinalHeaders,
-  ];
+  ].map((x) => pad(x, 8));
 
   const packagedHeaders = [
     "Tag",
@@ -161,11 +166,11 @@ export async function maybeLoadCogsTrackerReportData({
     "Tag of Bulk Input",
     "Tested $/G From Bulk Tag",
     "gram weight / unit of finished goods",
-  ];
+  ].map((x) => pad(x, 8));
 
-  bulkInfusedMatrix.push(srcHeaders);
-  distRexCogsMatrix.push(srcHeaders);
-  packagedGoodsCogsMatrix.push(packagedHeaders);
+  bulkInfusedMatrix.push(srcHeaders.map((x) => x));
+  distRexCogsMatrix.push(srcHeaders.map((x) => x));
+  packagedGoodsCogsMatrix.push(packagedHeaders.map((x) => x));
 
   const values = clientBuildManager.validateAndGetValuesOrError(["PACKAGE_LOCATION_BLACKLIST"]);
   const locationNameBlacklist = values.PACKAGE_LOCATION_BLACKLIST;
@@ -323,16 +328,99 @@ export async function createCogsTrackerSpreadsheetOrError({
   const distRexCogsSheetId = sheetTitles.indexOf(SheetTitles.DIST_REX_COGS);
   const packagedGoodsCogsSheetId = sheetTitles.indexOf(SheetTitles.PACKAGED_GOODS_COGS);
 
+  const ORDINAL_OFFSET = 16;
+  const ORDINAL_COLUMN_LENGTH = 4;
+
+  function inputCogsFormatFactory({ sheetId }: { sheetId: number }): any[] {
+    return [
+      // Starting Quantity
+      numberColumnRequestFactory({
+        sheetId,
+        columnIndex: 8,
+        numberFormatType: "NUMBER",
+        numberFormatPattern: `0.00`,
+      }),
+      // Input COGS
+      numberColumnRequestFactory({
+        sheetId,
+        columnIndex: 9,
+        numberFormatType: "CURRENCY",
+        numberFormatPattern: `$#,##0.00`,
+      }),
+      // Weight post test
+      numberColumnRequestFactory({
+        sheetId,
+        columnIndex: 11,
+        numberFormatType: "NUMBER",
+        numberFormatPattern: `0.00`,
+      }),
+      // Test Cost - Cost Basis
+      numberColumnRequestFactory({
+        sheetId,
+        columnIndex: 12,
+        endColumnIndex: 15,
+        numberFormatType: "CURRENCY",
+        numberFormatPattern: `$#,##0.00`,
+      }),
+      alignColumnRequestFactory({
+        sheetId,
+        columnIndex: 4,
+        endColumnIndex: 7,
+        horizontalAlignment: "CENTER",
+        verticalAlignment: "MIDDLE",
+      }),
+      alignColumnRequestFactory({
+        sheetId,
+        columnIndex: 8,
+        endColumnIndex: 15,
+        horizontalAlignment: "CENTER",
+        verticalAlignment: "MIDDLE",
+      }),
+      // Ordinal Headers
+      ...Array.from(Array(ORDINALS.length).keys())
+        .map((i) => {
+          const idx = ORDINAL_OFFSET + ORDINAL_COLUMN_LENGTH * i;
+
+          return [
+            numberColumnRequestFactory({
+              sheetId,
+              columnIndex: idx + 2,
+              numberFormatType: "NUMBER",
+              numberFormatPattern: `0.00`,
+            }),
+            numberColumnRequestFactory({
+              sheetId,
+              columnIndex: idx + 3,
+              numberFormatType: "CURRENCY",
+              numberFormatPattern: `$#,##0.00`,
+            }),
+            alignColumnRequestFactory({
+              sheetId,
+              columnIndex: idx + 2,
+              endColumnIndex: idx + 4,
+              horizontalAlignment: "CENTER",
+              verticalAlignment: "MIDDLE",
+            }),
+          ];
+        })
+        .flat(),
+    ];
+  }
+
   formattingRequests = [
     ...formattingRequests,
     // Bulk Infused COGS
     addRowsRequestFactory({ sheetId: bulkInfusedSheetId, length: bulkInfusedMatrix.length }),
+    addColumnsRequestFactory({ sheetId: bulkInfusedSheetId, length: bulkInfusedMatrix[0].length }),
     styleTopRowRequestFactory({ sheetId: bulkInfusedSheetId }),
     freezeTopRowRequestFactory({ sheetId: bulkInfusedSheetId }),
+    ...inputCogsFormatFactory({ sheetId: bulkInfusedSheetId }),
     // Dist/Rex COGS
     addRowsRequestFactory({ sheetId: distRexCogsSheetId, length: distRexCogsMatrix.length }),
+    addColumnsRequestFactory({ sheetId: distRexCogsSheetId, length: distRexCogsMatrix[0].length }),
     styleTopRowRequestFactory({ sheetId: distRexCogsSheetId }),
     freezeTopRowRequestFactory({ sheetId: distRexCogsSheetId }),
+    ...inputCogsFormatFactory({ sheetId: distRexCogsSheetId }),
     // Packaged Goods COGS
     addRowsRequestFactory({
       sheetId: packagedGoodsCogsSheetId,
@@ -340,6 +428,44 @@ export async function createCogsTrackerSpreadsheetOrError({
     }),
     styleTopRowRequestFactory({ sheetId: packagedGoodsCogsSheetId }),
     freezeTopRowRequestFactory({ sheetId: packagedGoodsCogsSheetId }),
+    alignColumnRequestFactory({
+      sheetId: packagedGoodsCogsSheetId,
+      columnIndex: 3,
+      endColumnIndex: 8,
+      horizontalAlignment: "CENTER",
+      verticalAlignment: "MIDDLE",
+    }),
+    alignColumnRequestFactory({
+      sheetId: packagedGoodsCogsSheetId,
+      columnIndex: 9,
+      endColumnIndex: 11,
+      horizontalAlignment: "CENTER",
+      verticalAlignment: "MIDDLE",
+    }),
+    numberColumnRequestFactory({
+      sheetId: packagedGoodsCogsSheetId,
+      columnIndex: 6, // Starting Quantity
+      numberFormatType: "NUMBER",
+      numberFormatPattern: `0.00`,
+    }),
+    numberColumnRequestFactory({
+      sheetId: packagedGoodsCogsSheetId,
+      columnIndex: 7, // Cost Basis
+      numberFormatType: "CURRENCY",
+      numberFormatPattern: `$#,##0.00`,
+    }),
+    numberColumnRequestFactory({
+      sheetId: packagedGoodsCogsSheetId,
+      columnIndex: 9, // Tested $/g
+      numberFormatType: "CURRENCY",
+      numberFormatPattern: `$#,##0.00`,
+    }),
+    numberColumnRequestFactory({
+      sheetId: packagedGoodsCogsSheetId,
+      columnIndex: 10, // gram wt / unit
+      numberFormatType: "NUMBER",
+      numberFormatPattern: `0.00`,
+    }),
   ];
 
   await messageBus.sendMessageToBackground(
