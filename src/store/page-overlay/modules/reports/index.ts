@@ -139,14 +139,20 @@ export const reportsModule = {
         });
         analyticsManager.track(MessageType.GENERATED_SPREADSHEET_SUCCESS);
       } catch (e) {
+        console.error((e as Error).stack);
+
         ctx.commit(ReportsMutations.SET_STATUS, {
           status: ReportStatus.ERROR,
           // @ts-ignore
-          statusMessage: e.toString(),
+          statusMessage: `${e.toString()}
+          
+          ${(e as Error).stack}`,
         });
 
         // @ts-ignore
         analyticsManager.track(MessageType.GENERATED_SPREADSHEET_ERROR, { error: e.toString() });
+
+        throw e;
       }
     },
   },
