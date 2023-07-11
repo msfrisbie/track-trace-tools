@@ -257,6 +257,11 @@ export const SHEET_FIELDS: { [key: string]: IFieldData[] } = {
       readableName: "Production Batch",
       required: false,
     },
+    {
+      value: "SourceProductionBatchNumbers",
+      readableName: "Source Production Batch Numbers",
+      required: false,
+    },
   ],
   [ReportType.STRAGGLER_PACKAGES]: [
     {
@@ -312,6 +317,11 @@ export const SHEET_FIELDS: { [key: string]: IFieldData[] } = {
     {
       value: "ProductionBatchNumber",
       readableName: "Production Batch",
+      required: false,
+    },
+    {
+      value: "SourceProductionBatchNumbers",
+      readableName: "Source Production Batch Numbers",
       required: false,
     },
   ],

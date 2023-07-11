@@ -24,7 +24,11 @@ class StorageManager implements IAtomicService {
   }
 
   get keepalivePath(): string {
-    return window.location.pathname.slice(1);
+    if (window.location.pathname.startsWith("/industry")) {
+      return window.location.pathname.split("/").slice(1, 3).join("/");
+    } else {
+      return window.location.pathname.slice(1);
+    }
   }
 
   private testWrite() {

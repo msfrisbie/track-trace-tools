@@ -29,7 +29,7 @@ class AnalyticsManager implements IAtomicService {
 
   async identify(identity: string) {
     sendAnalyticsMessage(MessageType.SET_USER_ID, {
-      identity
+      identity,
     });
   }
 
@@ -39,12 +39,15 @@ class AnalyticsManager implements IAtomicService {
     phoneNumber?: string;
     hasAccountPermissions?: boolean;
     verificationEligible?: boolean;
+    totalFacilities?: number;
+    facilities?: string;
+    vuexBlobSize?: number;
   }) {
     sendAnalyticsMessage(MessageType.SET_USER_PROPERTIES, {
       ...userProperties,
       version,
       hostname,
-      url
+      url,
     });
   }
 
@@ -88,7 +91,7 @@ class AnalyticsManager implements IAtomicService {
       version,
       hostname,
       url,
-      license
+      license,
     };
 
     sendAnalyticsMessage(eventName, { eventName, eventData });

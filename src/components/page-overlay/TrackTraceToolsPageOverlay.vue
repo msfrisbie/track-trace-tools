@@ -18,7 +18,7 @@
 import FloatingButtonContainer from "@/components/page-overlay/FloatingButtonContainer.vue";
 import PageOverlayContainer from "@/components/page-overlay/PageOverlayContainer.vue";
 import Snowflakes from "@/components/page-overlay/Snowflakes.vue";
-import { MessageType } from "@/consts";
+import { MessageType, VUEX_KEY } from "@/consts";
 // import { queueWrapper } from "@/modules/queue-wrapper.module";
 import { IAuthState } from "@/interfaces";
 import { accountManager } from "@/modules/account-manager.module";
@@ -270,6 +270,14 @@ export default Vue.extend({
       if (authState.identity && !identities.includes(authState.identity)) {
         messageBus.sendMessageToBackground(MessageType.UPDATE_UNINSTALL_URL, {});
       }
+
+      analyticsManager.setUserProperties({
+        totalFacilities: (await facilityManager.ownedFacilitiesOrError()).length,
+        facilities: (await facilityManager.ownedFacilitiesOrError())
+          .map((x) => x.licenseNumber)
+          .join(","),
+        vuexBlobSize: (localStorage.getItem(VUEX_KEY) || "").length,
+      });
     } else {
       // User is not logged in. Collect what we can.
       analyticsManager.setUserProperties({});
