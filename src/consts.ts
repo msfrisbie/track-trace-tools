@@ -269,6 +269,8 @@ export enum PackageFilterIdentifiers {
   ItemStrainName = "Item.StrainName",
   ItemProductCategoryName = "Item.ProductCategoryName",
   LocationName = "LocationName",
+  ProductionBatchNumber = "ProductionBatchNumber",
+  SourceProductionBatchNumbers = "SourceProductionBatchNumbers",
 }
 
 export enum PlantFilterIdentifiers {

@@ -15,6 +15,8 @@ const inMemoryState = {
     label: null,
     sourceHarvestName: null,
     sourcePackageLabel: null,
+    productionBatchNumber: null,
+    sourceProductionBatchNumbers: null,
     itemName: null,
     itemStrainName: null,
     itemProductCategoryName: null,
@@ -115,6 +117,8 @@ export const packageSearchModule = {
         label: null,
         sourceHarvestName: null,
         sourcePackageLabel: null,
+        productionBatchNumber: null,
+        sourceProductionBatchNumbers: null,
         itemName: null,
         itemStrainName: null,
         itemProductCategoryName: null,
@@ -139,6 +143,15 @@ export const packageSearchModule = {
                 break;
               case "sourcePackageLabel":
                 pageManager.setPackageFilter(PackageFilterIdentifiers.SourcePackageLabels, v);
+                break;
+              case "productionBatchNumber":
+                pageManager.setPackageFilter(PackageFilterIdentifiers.ProductionBatchNumber, v);
+                break;
+              case "sourceProductionBatchNumbers":
+                pageManager.setPackageFilter(
+                  PackageFilterIdentifiers.SourceProductionBatchNumbers,
+                  v
+                );
                 break;
               case "itemName":
                 pageManager.setPackageFilter(PackageFilterIdentifiers.ItemName, v);

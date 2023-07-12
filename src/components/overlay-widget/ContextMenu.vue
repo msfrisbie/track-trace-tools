@@ -55,6 +55,22 @@
             >
             <b-dropdown-item
               class="text-lg"
+              @click.stop.prevent="filterPackages({ productionBatchNumber: pkg.ProductionBatchNumber })"
+              ><div class="flex flex-row space-x-2 justify-between flex-nowrap">
+                <span>PB #:</span>
+                <span class="font-bold">{{ pkg.ProductionBatchNumber.slice(0, 30) }}</span>
+              </div></b-dropdown-item
+            >
+            <b-dropdown-item
+              class="text-lg"
+              @click.stop.prevent="filterPackages({ sourceProductionBatchNumbers: pkg.SourceProductionBatchNumbers })"
+              ><div class="flex flex-row space-x-2 justify-between flex-nowrap">
+                <span>Source PB #:</span>
+                <span class="font-bold">{{ pkg.SourceProductionBatchNumbers.slice(0, 30) }}</span>
+              </div></b-dropdown-item
+            >
+            <b-dropdown-item
+              class="text-lg"
               v-if="pkg.SourceHarvestNames"
               @click.stop.prevent="filterPackages({ sourceHarvestName: pkg.SourceHarvestNames })"
               ><div class="flex flex-row space-x-2 justify-between flex-nowrap">

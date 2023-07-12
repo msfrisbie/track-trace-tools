@@ -162,6 +162,8 @@ export async function acquirePackageFilterElementsImpl() {
     PackageFilterIdentifiers.Label,
     PackageFilterIdentifiers.SourceHarvestNames,
     PackageFilterIdentifiers.SourcePackageLabels,
+    PackageFilterIdentifiers.ProductionBatchNumber,
+    PackageFilterIdentifiers.SourceProductionBatchNumbers,
     PackageFilterIdentifiers.ItemName,
     PackageFilterIdentifiers.ItemStrainName,
     PackageFilterIdentifiers.ItemProductCategoryName,
@@ -235,6 +237,32 @@ export async function acquirePackageFilterElementsImpl() {
                 )
               );
               pageManager.packageSourcePackageLabelApplyFiltersButton = button;
+              break;
+            case PackageFilterIdentifiers.ProductionBatchNumber:
+              pageManager.packageProductionBatchNumberFilterInput = input;
+              input.addEventListener("input", (e: any) =>
+                store.dispatch(
+                  `packageSearch/${PackageSearchActions.PARTIAL_UPDATE_PACKAGE_SEARCH_FILTERS}`,
+                  {
+                    packageSearchFilters: { productionBatchNumber: e.target.value },
+                    propagate: false,
+                  }
+                )
+              );
+              pageManager.packageProductionBatchNumberApplyFiltersButton = button;
+              break;
+            case PackageFilterIdentifiers.SourceProductionBatchNumbers:
+              pageManager.packageSourceProductionBatchNumbersFilterInput = input;
+              input.addEventListener("input", (e: any) =>
+                store.dispatch(
+                  `packageSearch/${PackageSearchActions.PARTIAL_UPDATE_PACKAGE_SEARCH_FILTERS}`,
+                  {
+                    packageSearchFilters: { sourceProductionBatchNumbers: e.target.value },
+                    propagate: false,
+                  }
+                )
+              );
+              pageManager.packageSourceProductionBatchNumbersApplyFiltersButton = button;
               break;
             case PackageFilterIdentifiers.ItemName:
               pageManager.packageItemNameFilterInput = input;
@@ -464,6 +492,8 @@ export function readPackageFiltersImpl() {
     label: null,
     sourceHarvestName: null,
     sourcePackageLabel: null,
+    productionBatchNumber: null,
+    sourceProductionBatchNumbers: null,
     itemName: null,
     itemStrainName: null,
     itemProductCategoryName: null,
@@ -473,6 +503,10 @@ export function readPackageFiltersImpl() {
   filters.label = pageManager.packageLabelFilterInput?.value || null;
   filters.sourceHarvestName = pageManager.packageSourceHarvestNameFilterInput?.value || null;
   filters.sourcePackageLabel = pageManager.packageSourcePackageLabelFilterInput?.value || null;
+  filters.productionBatchNumber =
+    pageManager.packageProductionBatchNumberFilterInput?.value || null;
+  filters.sourceProductionBatchNumbers =
+    pageManager.packageSourceProductionBatchNumbersFilterInput?.value || null;
   filters.itemName = pageManager.packageItemNameFilterInput?.value || null;
   filters.itemStrainName = pageManager.packageItemStrainNameFilterInput?.value || null;
   filters.itemProductCategoryName =
@@ -588,6 +622,12 @@ export async function setPackageFilterImpl(
       break;
     case PackageFilterIdentifiers.SourcePackageLabels:
       input = pageManager.packageSourcePackageLabelFilterInput;
+      break;
+    case PackageFilterIdentifiers.ProductionBatchNumber:
+      input = pageManager.packageProductionBatchNumberFilterInput;
+      break;
+    case PackageFilterIdentifiers.SourceProductionBatchNumbers:
+      input = pageManager.packageSourceProductionBatchNumbersFilterInput;
       break;
     case PackageFilterIdentifiers.ItemName:
       input = pageManager.packageItemNameFilterInput;
@@ -733,6 +773,12 @@ export function applyPackageFilterImpl(packageFilterIdentifier: PackageFilterIde
       break;
     case PackageFilterIdentifiers.SourcePackageLabels:
       button = pageManager.packageSourcePackageLabelApplyFiltersButton;
+      break;
+    case PackageFilterIdentifiers.ProductionBatchNumber:
+      button = pageManager.packageProductionBatchNumberApplyFiltersButton;
+      break;
+    case PackageFilterIdentifiers.SourceProductionBatchNumbers:
+      button = pageManager.packageSourceProductionBatchNumbersApplyFiltersButton;
       break;
     case PackageFilterIdentifiers.ItemName:
       button = pageManager.packageItemNameApplyFiltersButton;

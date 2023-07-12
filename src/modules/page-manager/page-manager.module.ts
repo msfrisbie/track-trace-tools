@@ -162,6 +162,13 @@ class PageManager implements IAtomicService {
   packageSourcePackageLabelFilterInput: HTMLInputElement | null = null;
   packageSourcePackageLabelApplyFiltersButton: HTMLButtonElement | null = null;
 
+
+  packageProductionBatchNumberFilterInput: HTMLInputElement | null = null;
+  packageProductionBatchNumberApplyFiltersButton: HTMLButtonElement | null = null;
+
+  packageSourceProductionBatchNumbersFilterInput: HTMLInputElement | null = null;
+  packageSourceProductionBatchNumbersApplyFiltersButton: HTMLButtonElement | null = null;
+
   packageItemNameFilterInput: HTMLInputElement | null = null;
   packageItemNameApplyFiltersButton: HTMLButtonElement | null = null;
 

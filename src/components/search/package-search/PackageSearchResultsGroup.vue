@@ -151,6 +151,8 @@ export default Vue.extend({
           return "map-marker-alt";
         case "itemName":
         case "itemProductCategoryName":
+        case "productionBatchNumber":
+        case "sourceProductionBatchNumbers":
         default:
           return "boxes";
       }

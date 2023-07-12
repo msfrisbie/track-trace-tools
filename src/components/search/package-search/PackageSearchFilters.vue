@@ -41,6 +41,38 @@
       >
     </b-button-group>
 
+    <b-button-group v-if="packageSearchFilters.productionBatchNumber">
+      <b-button size="sm" variant="light" disabled
+        >Production batch # matches "{{ packageSearchFilters.productionBatchNumber }}"</b-button
+      >
+      <b-button
+        size="sm"
+        variant="light"
+        @click="
+          partialUpdatePackageSearchFilters({ packageSearchFilters: { productionBatchNumber: '' } })
+        "
+        >&#10006;</b-button
+      >
+    </b-button-group>
+
+    <b-button-group v-if="packageSearchFilters.sourceProductionBatchNumbers">
+      <b-button size="sm" variant="light" disabled
+        >Source production batch #s matches "{{
+          packageSearchFilters.sourceProductionBatchNumbers
+        }}"</b-button
+      >
+      <b-button
+        size="sm"
+        variant="light"
+        @click="
+          partialUpdatePackageSearchFilters({
+            packageSearchFilters: { sourceProductionBatchNumbers: '' },
+          })
+        "
+        >&#10006;</b-button
+      >
+    </b-button-group>
+
     <b-button-group v-if="packageSearchFilters.itemName">
       <b-button size="sm" variant="light" disabled
         >Item matches "{{ packageSearchFilters.itemName }}"</b-button

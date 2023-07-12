@@ -122,6 +122,8 @@ export interface IPackageSearchFilters {
   label?: string | null;
   sourceHarvestName?: string | null;
   sourcePackageLabel?: string | null;
+  productionBatchNumber?: string | null;
+  sourceProductionBatchNumbers?: string | null;
   itemName?: string | null;
   itemStrainName?: string | null;
   itemProductCategoryName?: string | null;

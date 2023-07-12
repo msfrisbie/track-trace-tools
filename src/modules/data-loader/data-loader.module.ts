@@ -1077,6 +1077,8 @@ export class DataLoader implements IAtomicService {
             { field: "Item.ProductCategoryName", operator: "contains", value: queryString },
             { field: "LocationName", operator: "contains", value: queryString },
             { field: "SourcePackageLabels", operator: "contains", value: queryString },
+            { field: "ProductionBatchNumber", operator: "contains", value: queryString },
+            { field: "SourceProductionBatchNumbers", operator: "contains", value: queryString },
             { field: "SourceHarvestNames", operator: "contains", value: queryString },
             { field: "Item.StrainName", operator: "contains", value: queryString },
             { field: "Item.Name", operator: "contains", value: queryString },

@@ -79,13 +79,35 @@
       />
     </template>
 
-    <template v-if="!filtersApplied || expandSourcePackagelabelNameGroup">
+    <template v-if="!filtersApplied || expandSourcePackageLabelGroup">
       <package-search-results-group
         :packages="sourcePackageLabelPackages"
         sectionName="source tag"
         packageFilterIdentifier="sourcePackageLabel"
         :sectionPriority="6"
-        :expanded="expandSourcePackagelabelNameGroup"
+        :expanded="expandSourcePackageLabelGroup"
+        :previewLength="3"
+      />
+    </template>
+
+    <template v-if="!filtersApplied || expandProductionBatchNumberGroup">
+      <package-search-results-group
+        :packages="productionBatchNumberPackages"
+        sectionName="production batch"
+        packageFilterIdentifier="productionBatchNumber"
+        :sectionPriority="7"
+        :expanded="expandProductionBatchNumberGroup"
+        :previewLength="3"
+      />
+    </template>
+
+    <template v-if="!filtersApplied || expandSourceProductionBatchNumbersGroup">
+      <package-search-results-group
+        :packages="sourceProductionBatchNumbersPackages"
+        sectionName="source production batches"
+        packageFilterIdentifier="sourceProductionBatchNumbers"
+        :sectionPriority="8"
+        :expanded="expandSourceProductionBatchNumbersGroup"
         :previewLength="3"
       />
     </template>
@@ -96,7 +118,7 @@
         :packages="packages"
         sectionName=""
         :packageFilterIdentifier="null"
-        :sectionPriority="7"
+        :sectionPriority="8"
         :expanded="false"
         :previewLength="allPackagesPreviewLength"
       />
@@ -163,15 +185,29 @@ export default Vue.extend({
 
       return !!this.$store.state.packageSearch.packageSearchFilters.sourceHarvestName;
     },
-    expandSourcePackagelabelNameGroup(): boolean {
+    expandSourcePackageLabelGroup(): boolean {
       if (this.expandItemHarvestNameGroup) {
         return false;
       }
 
       return !!this.$store.state.packageSearch.packageSearchFilters.sourcePackageLabel;
     },
+    expandProductionBatchNumberGroup(): boolean {
+      if (this.expandSourcePackageLabelGroup) {
+        return false;
+      }
+
+      return !!this.$store.state.packageSearch.packageSearchFilters.productionBatchNumber;
+    },
+    expandSourceProductionBatchNumbersGroup(): boolean {
+      if (this.expandProductionBatchNumberGroup) {
+        return false;
+      }
+
+      return !!this.$store.state.packageSearch.packageSearchFilters.sourceProductionBatchNumbers;
+    },
     expandLocationNameGroup(): boolean {
-      if (this.expandSourcePackagelabelNameGroup) {
+      if (this.expandSourceProductionBatchNumbersGroup) {
         return false;
       }
 
@@ -185,6 +221,12 @@ export default Vue.extend({
         return 0;
       }
       if (this.sourcePackageLabelPackages.length > 0) {
+        return 0;
+      }
+      if (this.productionBatchNumberPackages.length > 0) {
+        return 0;
+      }
+      if (this.sourceProductionBatchNumbersPackages.length > 0) {
         return 0;
       }
       if (this.itemNamePackages.length > 0) {
@@ -221,6 +263,24 @@ export default Vue.extend({
     sourcePackageLabelPackages(): IIndexedPackageData[] {
       const packages = this.packages.filter((packageData) =>
         packageData.SourcePackageLabels?.toUpperCase().includes(
+          this.$store.state.search.queryString.toUpperCase()
+        )
+      );
+
+      return packages;
+    },
+    productionBatchNumberPackages(): IIndexedPackageData[] {
+      const packages = this.packages.filter((packageData) =>
+        packageData.ProductionBatchNumber?.toUpperCase().includes(
+          this.$store.state.search.queryString.toUpperCase()
+        )
+      );
+
+      return packages;
+    },
+    sourceProductionBatchNumbersPackages(): IIndexedPackageData[] {
+      const packages = this.packages.filter((packageData) =>
+        packageData.SourceProductionBatchNumbers?.toUpperCase().includes(
           this.$store.state.search.queryString.toUpperCase()
         )
       );
