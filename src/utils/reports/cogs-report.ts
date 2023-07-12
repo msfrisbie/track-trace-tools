@@ -11,7 +11,6 @@ import {
   ITransferFilter,
 } from "@/interfaces";
 import { DataLoader, getDataLoaderByLicense } from "@/modules/data-loader/data-loader.module";
-import { facilityManager } from "@/modules/facility-manager.module";
 import { messageBus } from "@/modules/message-bus.module";
 import store from "@/store/page-overlay/index";
 import { ReportsMutations, ReportType } from "@/store/page-overlay/modules/reports/consts";
@@ -131,9 +130,7 @@ export async function maybeLoadCogsReportData({
 
   let dataLoader: DataLoader | null = null;
 
-  for (const license of await (
-    await facilityManager.ownedFacilitiesOrError()
-  ).map((x) => x.licenseNumber)) {
+  for (const license of mutableArchiveData.licenses) {
     ctx.commit(ReportsMutations.SET_STATUS, {
       statusMessage: { text: `Loading ${license} packages...`, level: "success" },
     });
@@ -192,9 +189,7 @@ export async function maybeLoadCogsReportData({
 
   let richOutgoingTransfers: IIndexedRichOutgoingTransferData[] = [];
 
-  for (const license of await (
-    await facilityManager.ownedFacilitiesOrError()
-  ).map((x) => x.licenseNumber)) {
+  for (const license of mutableArchiveData.licenses) {
     ctx.commit(ReportsMutations.SET_STATUS, {
       statusMessage: { text: `Loading ${license} transfers...`, level: "success" },
     });
