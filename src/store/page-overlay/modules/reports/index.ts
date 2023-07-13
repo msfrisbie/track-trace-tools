@@ -3,6 +3,7 @@ import { IPluginState, ISpreadsheet } from "@/interfaces";
 import { analyticsManager } from "@/modules/analytics-manager.module";
 import { maybeLoadCogsReportData } from "@/utils/reports/cogs-report";
 import { maybeLoadCogsTrackerReportData } from "@/utils/reports/cogs-tracker-report";
+import { maybeLoadCogsV2ReportData } from "@/utils/reports/cogs-v2-report";
 import { maybeLoadEmployeeSamplesReportData } from "@/utils/reports/employee-samples-report";
 import { maybeLoadHarvestsReportData } from "@/utils/reports/harvests-report";
 import { maybeLoadImmaturePlantsReportData } from "@/utils/reports/immature-plants-report";
@@ -105,6 +106,7 @@ export const reportsModule = {
 
         await maybeLoadPackageReportData({ ctx, reportData, reportConfig });
         await maybeLoadCogsReportData({ ctx, reportData, reportConfig });
+        await maybeLoadCogsV2ReportData({ ctx, reportData, reportConfig });
         await maybeLoadCogsTrackerReportData({ ctx, reportData, reportConfig });
         await maybeLoadStragglerPackageReportData({ ctx, reportData, reportConfig });
         await maybeLoadImmaturePlantsReportData({ ctx, reportData, reportConfig });

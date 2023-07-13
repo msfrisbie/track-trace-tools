@@ -91,6 +91,40 @@
             </div>
           </template>
 
+          <!-- COGS V2 -->
+          <template v-if="selectedReports.includes(ReportType.COGS_V2)">
+            <div class="rounded border border-gray-300 p-2 flex flex-col items-stretch gap-2">
+              <div class="font-semibold text-gray-700">COGS</div>
+              <hr />
+              <div class="flex flex-col items-stretch gap-4">
+                <div class="flex flex-col items-start gap-1">
+                  <b-form-datepicker
+                    :required="true"
+                    initial-date
+                    size="sm"
+                    v-model="cogsV2FormFilters.cogsDateGt"
+                  />
+                </div>
+
+                <div class="flex flex-col items-start gap-1">
+                  <b-form-datepicker
+                    :required="true"
+                    initial-date
+                    size="sm"
+                    v-model="cogsV2FormFilters.cogsDateLt"
+                  />
+                </div>
+
+                <b-form-group label="Licenses:">
+                  <b-form-checkbox-group
+                    v-model="cogsV2FormFilters.licenses"
+                    :options="cogsV2FormFilters.licenseOptions"
+                  ></b-form-checkbox-group>
+                </b-form-group>
+              </div>
+            </div>
+          </template>
+
           <!-- COGS Tracker -->
           <template v-if="selectedReports.includes(ReportType.COGS_TRACKER)">
             <div class="rounded border border-gray-300 p-2 flex flex-col items-stretch gap-2">
@@ -1331,6 +1365,7 @@ import {
 import { IReportConfig } from "@/store/page-overlay/modules/reports/interfaces";
 import { getIsoDateFromOffset, todayIsodate } from "@/utils/date";
 import { addCogsReport, cogsFormFiltersFactory } from "@/utils/reports/cogs-report";
+import { addCogsV2Report, cogsV2FormFiltersFactory } from "@/utils/reports/cogs-v2-report";
 import {
   addCogsTrackerReport,
   cogsTrackerFormFiltersFactory,
@@ -1422,6 +1457,7 @@ export default Vue.extend({
       SHEET_FIELDS,
       selectedReports: [] as ReportType[],
       cogsFormFilters: cogsFormFiltersFactory(),
+      cogsV2FormFilters: cogsV2FormFiltersFactory(),
       cogsTrackerFormFilters: cogsTrackerFormFiltersFactory(),
       packagesFormFilters: packageFormFiltersFactory(),
       stragglerPackagesFormFilters: stragglerPackagesFormFiltersFactory(),
@@ -1568,6 +1604,15 @@ export default Vue.extend({
           isCustom: false,
         },
         {
+          text: "COGS V2",
+          value: ReportType.COGS_V2,
+          t3plus: false,
+          enabled: clientBuildManager.assertValues(["ENABLE_COGS"]),
+          hidden: !clientBuildManager.assertValues(["ENABLE_COGS"]),
+          description: "Generate COGS V2 calculator",
+          isCustom: false,
+        },
+        {
           text: "COGS Tracker",
           value: ReportType.COGS_TRACKER,
           t3plus: false,
@@ -1691,6 +1736,13 @@ export default Vue.extend({
         });
       }
 
+      if (this.selectedReports.includes(ReportType.COGS_V2)) {
+        addCogsV2Report({
+          reportConfig,
+          cogsV2FormFilters: this.cogsV2FormFilters,
+        });
+      }
+
       if (this.selectedReports.includes(ReportType.COGS_TRACKER)) {
         addCogsTrackerReport({
           reportConfig,
@@ -1803,6 +1855,7 @@ export default Vue.extend({
       handler(newValue, oldValue) {
         const singleonReportTypes: ReportType[] = [
           ReportType.COGS,
+          ReportType.COGS_V2,
           ReportType.COGS_TRACKER,
           ReportType.EMPLOYEE_SAMPLES,
         ];

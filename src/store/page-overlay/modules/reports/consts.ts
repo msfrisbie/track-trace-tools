@@ -24,7 +24,9 @@ export enum ReportStatus {
 }
 
 export enum ReportType {
+  TEST = "TEST",
   COGS = "COGS",
+  COGS_V2 = "COGS_V2",
   COGS_TRACKER = "COGS_TRACKER",
   PACKAGES = "PACKAGES",
   INCOMING_TRANSFERS = "INCOMING_TRANSFERS",

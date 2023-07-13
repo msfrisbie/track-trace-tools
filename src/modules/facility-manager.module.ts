@@ -8,6 +8,8 @@ import { upsertManager } from "./upsert-manager.module";
 const debugLog = debugLogFactory("facility-manager.module.ts");
 
 class FacilityManager implements IAtomicService {
+  cachedFacilities: IPageMetrcFacilityData[] = [];
+
   async init() {
     this.ownedFacilitiesOrError();
   }
@@ -133,6 +135,8 @@ class FacilityManager implements IAtomicService {
       authState,
       data: ownedFacilities,
     });
+
+    this.cachedFacilities = ownedFacilities;
 
     return ownedFacilities;
   }

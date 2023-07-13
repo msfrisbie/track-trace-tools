@@ -41,11 +41,21 @@ export interface IReportsState {
 
 export interface IReportConfig {
   authState: IAuthState;
+  [ReportType.TEST]?: {
+    exampleFilter: any;
+    fields: IFieldData[];
+  };
   [ReportType.COGS]?: {
     packageFilter: IPackageFilter;
     transferFilter: ITransferFilter;
     fields: null;
     mutableArchiveData: ICogsArchive;
+  };
+  [ReportType.COGS_V2]?: {
+    packageFilter: IPackageFilter;
+    transferFilter: ITransferFilter;
+    licenses: string[];
+    fields: null;
   };
   [ReportType.COGS_TRACKER]?: {
     packageFilter: IPackageFilter;
@@ -108,7 +118,15 @@ export interface IReportConfig {
 }
 
 export interface IReportData {
+  [ReportType.TEST]?: {
+    exampleData: any[];
+  };
   [ReportType.COGS]?: {
+    auditData: { [key: string]: any };
+    worksheetMatrix: any[][];
+    cogsMatrix: any[][];
+  };
+  [ReportType.COGS_V2]?: {
     auditData: { [key: string]: any };
     worksheetMatrix: any[][];
     cogsMatrix: any[][];
