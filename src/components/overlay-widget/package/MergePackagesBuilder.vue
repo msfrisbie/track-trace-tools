@@ -319,6 +319,8 @@ export default Vue.extend({
           RemediationDate: "",
           RemediationMethodId: "0", //await defaultRemediatePackageMethod(),
           RemediationSteps: "",
+          UseByDate: "",
+          SellByDate: "",
           ...(this.$data.facilityUsesLocationForPackages
             ? {
                 LocationId: this.$data.location.Id.toString(),

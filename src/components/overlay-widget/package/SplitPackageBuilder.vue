@@ -411,6 +411,8 @@ export default Vue.extend({
           RemediationDate: "",
           RemediationMethodId: "0", //await defaultRemediatePackageMethod(),
           RemediationSteps: "",
+          UseByDate: "",
+          SellByDate: "",
           ...(this.isDonation ? { IsDonation: "true" } : {}),
           ...(this.isTradeSample ? { IsTradeSample: "true" } : {}),
           ...(this.productionBatchNumber

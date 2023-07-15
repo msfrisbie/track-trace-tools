@@ -1408,6 +1408,8 @@ export interface IMetrcCreatePackagesFromPackagesPayload {
   UseSameItem?: "true" | "false";
   IsDonation?: "true";
   IsFromMotherPlant?: "true";
+  UseByDate: "";
+  SellByDate: "";
 }
 
 export interface IMetrcFinishPackagesPayload {
