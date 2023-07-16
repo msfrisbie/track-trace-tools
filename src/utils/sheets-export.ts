@@ -17,6 +17,7 @@ import {
 import { todayIsodate } from "./date";
 import { createCogsSpreadsheetOrError } from "./reports/cogs-report";
 import { createCogsTrackerSpreadsheetOrError } from "./reports/cogs-tracker-report";
+import { createCogsV2SpreadsheetOrError } from "./reports/cogs-v2-report";
 import { createEmployeeSamplesSpreadsheetOrError } from "./reports/employee-samples-report";
 import {
   extractFlattenedData,
@@ -272,6 +273,12 @@ export async function createSpreadsheetOrError({
   // Handle special cases
   if (reportConfig[ReportType.COGS]) {
     return createCogsSpreadsheetOrError({
+      reportData,
+      reportConfig,
+    });
+  }
+  if (reportConfig[ReportType.COGS_V2]) {
+    return createCogsV2SpreadsheetOrError({
       reportData,
       reportConfig,
     });

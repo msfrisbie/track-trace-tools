@@ -146,6 +146,15 @@ export async function maybeLoadCogsV2ReportData({
     );
   }
 
+  const packageLabelMap = new Map<string, IIndexedPackageData>(
+    packages.map((pkg) => [pkg.Label, pkg])
+  );
+  const productionBatchMap = new Map<string, IIndexedPackageData>(
+    packages
+      .filter((pkg) => !!pkg.ProductionBatchNumber)
+      .map((pkg) => [pkg.ProductionBatchNumber, pkg])
+  );
+
   ctx.commit(ReportsMutations.SET_STATUS, {
     statusMessage: { text: `Loaded ${packages.length} total packages`, level: "success" },
   });
@@ -252,6 +261,7 @@ export async function maybeLoadCogsV2ReportData({
     .map((x) => {
       x.outgoingDestinations = (x.outgoingDestinations || []).filter(
         (y) =>
+          y.ShipmentTypeName.includes("Wholesale") &&
           y.EstimatedArrivalDateTime >= departureDateGt &&
           y.EstimatedArrivalDateTime <= departureDateLt
       );
@@ -318,6 +328,115 @@ export async function maybeLoadCogsV2ReportData({
   const worksheetMatrix: any[][] = [];
   const cogsMatrix: any[][] = [];
 
+  worksheetMatrix.push([
+    "Manifest #",
+    "Package Label",
+    "Package Unit",
+    "Source Packages",
+    "Matched src packages",
+    "Matched src package count",
+    "Matched src package units",
+    "Unmatched src packages",
+    "Unmatched src package count",
+    "Source Production Batches",
+    "Matched production batches",
+    "Matched production batch count",
+    "Matched produciton batch units",
+    "Unmatched production batches",
+    "Unmatched production batch count",
+  ]);
+
+  for (const transfer of richOutgoingTransfers) {
+    const manifestNumber = transfer.ManifestNumber;
+
+    for (const destination of transfer.outgoingDestinations || []) {
+      for (const pkg of destination.packages || []) {
+        const sourcePackageLabels: string[] = pkg.SourcePackageLabels.split(",");
+
+        const matchedSourcePackages: IIndexedPackageData[] = sourcePackageLabels
+          .filter((x) => packageLabelMap.has(x))
+          .map((x) => packageLabelMap.get(x)!);
+        const matchedSourcePackageLabels: string = matchedSourcePackages
+          .map((x) => x.Label)
+          .join(",");
+        const unmatchedSourcePackages: string = sourcePackageLabels
+          .filter((x) => !packageLabelMap.has(x))
+          .join(",");
+        const matchedSourcePackageUnits: string = matchedSourcePackages
+          .map((pkg) => pkg.UnitOfMeasureAbbreviation)
+          .join(",");
+
+        const sourceProductionBatchNumbers: string[] = matchedSourcePackages.map(
+          (pkg) => pkg.SourceProductionBatchNumbers || pkg.ProductionBatchNumber
+        );
+        const sourceProductionBatches: string = sourceProductionBatchNumbers.join(",");
+
+        const matchedSourceProductionBatchPackages: IIndexedPackageData[] =
+          sourceProductionBatchNumbers
+            .filter((x) => productionBatchMap.has(x))
+            .map((x) => productionBatchMap.get(x)!);
+        const matchedSourceProductionBatchNumbers: string = matchedSourceProductionBatchPackages
+          .map((x) => x.SourceProductionBatchNumbers)
+          .join(",");
+        const matchedSourceProductionBatchUnits: string = matchedSourceProductionBatchPackages
+          .map((pkg) => pkg.UnitOfMeasureAbbreviation)
+          .join(",");
+        const unmatchedSourceProductionBatchNumbers: string = sourceProductionBatchNumbers
+          .filter((x) => !productionBatchMap.has(x))
+          .join(",");
+
+        const row: string[] = [
+          //   "Manifest #",
+          manifestNumber,
+          //   "Package Label",
+          pkg.PackageLabel,
+          //   "Package Unit",
+          pkg.ShippedUnitOfMeasureAbbreviation,
+          //   "Source Packages",
+          pkg.SourcePackageLabels,
+          //   "Matched src packages",
+          matchedSourcePackageLabels,
+          //   "Matched src package count",
+          matchedSourcePackageLabels
+            .split(",")
+            .filter((x) => x.length > 0)
+            .length.toString(),
+          //   "Matched src package units",
+          matchedSourcePackageUnits,
+          //   "Unmatched src packages",
+          unmatchedSourcePackages,
+          //   "Unmatched src package count",
+          unmatchedSourcePackages
+            .split(",")
+            .filter((x) => x.length > 0)
+            .length.toString(),
+          //   "Source Production Batches",
+          sourceProductionBatches,
+          //   "Matched production batches",
+          matchedSourceProductionBatchNumbers,
+          //   "Matched production batch count",
+          matchedSourceProductionBatchNumbers
+            .split(",")
+            .filter((x) => x.length > 0)
+            .length.toString(),
+          //   "Matched produciton batch units",
+          matchedSourceProductionBatchUnits,
+          //   "Unmatched production batches",
+          unmatchedSourceProductionBatchNumbers,
+          //   "Unmatched production batch count",
+          unmatchedSourceProductionBatchNumbers
+            .split(",")
+            .filter((x) => x.length > 0)
+            .length.toString(),
+        ];
+
+        worksheetMatrix.push(row);
+      }
+    }
+  }
+
+  console.log({ worksheetMatrix });
+
   reportData[ReportType.COGS_V2] = {
     auditData,
     worksheetMatrix,
@@ -371,7 +490,7 @@ export async function createCogsV2SpreadsheetOrError({
     }),
   ];
 
-  const { worksheetMatrix, cogsMatrix, auditData } = reportData[ReportType.COGS]!;
+  const { worksheetMatrix, cogsMatrix, auditData } = reportData[ReportType.COGS_V2]!;
 
   const worksheetSheetId = sheetTitles.indexOf(SheetTitles.WORKSHEET);
   const manifestSheetId = sheetTitles.indexOf(SheetTitles.MANIFEST_COGS);
@@ -405,8 +524,6 @@ export async function createCogsV2SpreadsheetOrError({
       range: `'${SheetTitles.OVERVIEW}'`,
       values: [
         [],
-        [],
-        [null, "Enable calculator:"],
         [],
         ...Object.entries(auditData).map(([key, value]) => ["", key, JSON.stringify(value)]),
       ],
