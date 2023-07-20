@@ -257,6 +257,23 @@ export async function writeValues({
   });
 }
 
+export async function readValues({
+  spreadsheetId,
+  sheetName
+}: {
+  spreadsheetId: string;
+  sheetName: string;  // index or name
+}) {
+  const url = buildSheetsApiURL(`/${spreadsheetId}/values/${sheetName}`);
+
+  const headers = await headersFactory();
+
+  return customFetch(url, {
+    ...retryDefaults,
+    headers,
+  });
+}
+
 export async function appendValues({
   spreadsheetId,
   range,

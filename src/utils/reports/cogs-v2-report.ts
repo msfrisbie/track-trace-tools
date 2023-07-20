@@ -20,6 +20,7 @@ import {
 } from "@/store/page-overlay/modules/reports/interfaces";
 import { ActionContext } from "vuex";
 import { getIsoDateFromOffset, todayIsodate } from "../date";
+import { extractInitialPackageQuantityAndUnitFromHistoryOrError } from "../history";
 import {
   addRowsRequestFactory,
   autoResizeDimensionsRequestFactory,
@@ -346,6 +347,8 @@ export async function maybeLoadCogsV2ReportData({
     "Unmatched production batch count",
   ]);
 
+  const productionBatchPackages: Set<IIndexedPackageData> = new Set();
+
   for (const transfer of richOutgoingTransfers) {
     const manifestNumber = transfer.ManifestNumber;
 
@@ -375,8 +378,13 @@ export async function maybeLoadCogsV2ReportData({
           sourceProductionBatchNumbers
             .filter((x) => productionBatchMap.has(x))
             .map((x) => productionBatchMap.get(x)!);
+
+        for (const pkg of matchedSourceProductionBatchPackages) {
+          productionBatchPackages.add(pkg);
+        }
+
         const matchedSourceProductionBatchNumbers: string = matchedSourceProductionBatchPackages
-          .map((x) => x.SourceProductionBatchNumbers)
+          .map((x) => x.ProductionBatchNumber)
           .join(",");
         const matchedSourceProductionBatchUnits: string = matchedSourceProductionBatchPackages
           .map((pkg) => pkg.UnitOfMeasureAbbreviation)
@@ -430,9 +438,31 @@ export async function maybeLoadCogsV2ReportData({
             .length.toString(),
         ];
 
+        if (row.length !== 15) {
+          console.error(row);
+          throw new Error("Bad row length");
+        }
+
         worksheetMatrix.push(row);
       }
     }
+  }
+
+  for (const pkg of productionBatchPackages) {
+    const dataLoader = await getDataLoaderByLicense(pkg.LicenseNumber);
+
+    pkg.history = await dataLoader.packageHistoryByPackageId(pkg.Id);
+
+    const initialQuantity = extractInitialPackageQuantityAndUnitFromHistoryOrError(pkg.history);
+
+    cogsMatrix.push([
+      pkg.LicenseNumber,
+      pkg.Label,
+      pkg.ProductionBatchNumber,
+      pkg.Item.Name,
+      ...initialQuantity,
+      pkg.PackagedDate,
+    ]);
   }
 
   console.log({ worksheetMatrix });
@@ -543,7 +573,7 @@ export async function createCogsV2SpreadsheetOrError({
     options: {
       pageSize: 5000,
       valueInputOption: "USER_ENTERED",
-      maxParallelRequests: 50,
+      maxParallelRequests: 1,
     },
   });
 
@@ -558,7 +588,7 @@ export async function createCogsV2SpreadsheetOrError({
     options: {
       pageSize: 5000,
       valueInputOption: "USER_ENTERED",
-      maxParallelRequests: 10,
+      maxParallelRequests: 1,
     },
   });
 
