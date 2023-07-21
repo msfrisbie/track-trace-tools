@@ -13,7 +13,7 @@ export const retryDefaults = {
     // retry on any network error, or 4xx or 5xx status codes
     // 401 indicates no permissions - do not retry
     if (error !== null || [400, 429, 500, 501, 502, 503].includes(response?.status || -1)) {
-      console.log(`retrying, attempt number ${attempt + 1}`);
+      console.log(error, `retrying, attempt number ${attempt + 1}`);
       return true;
     }
     return false;
