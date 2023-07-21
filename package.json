@@ -36,7 +36,7 @@
     "csv-parser": "^3.0.0",
     "csv-writer": "^1.6.0",
     "dexie": "^3.0.3",
-    "fetch-retry": "^4.1.1",
+    "fetch-retry": "5.0.6",
     "html2canvas": "^1.0.0-rc.7",
     "idb-keyval": "^5.0.1",
     "jsbarcode": "^3.11.5",

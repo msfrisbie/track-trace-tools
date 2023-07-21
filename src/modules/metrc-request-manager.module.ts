@@ -1,7 +1,8 @@
 import { IAtomicService, IAuthState } from "@/interfaces";
 import { origin } from "@/modules/environment.module";
-import { customFetch, IRetryOptions, retryDefaults } from "@/modules/fetch-manager.module";
+import { customFetch, retryDefaults } from "@/modules/fetch-manager.module";
 import { CsvUpload } from "@/types";
+import { RequestInitRetryParams } from "fetch-retry";
 import { authManager } from "./auth-manager.module";
 
 const LOGIN_URL = origin({ divertToNullOrigin: false }) + "/log-in";
@@ -501,7 +502,7 @@ export class MetrcRequestManager implements IAtomicService {
 
   async getVegetativePlants(
     body: string,
-    retryOptions: IRetryOptions = {},
+    retryOptions: RequestInitRetryParams = {},
     abortTimeout: number = 30000
   ) {
     const controller = new AbortController();
@@ -522,7 +523,7 @@ export class MetrcRequestManager implements IAtomicService {
 
   async getFloweringPlants(
     body: string,
-    retryOptions: IRetryOptions = {},
+    retryOptions: RequestInitRetryParams = {},
     abortTimeout: number = 30000
   ) {
     const controller = new AbortController();
@@ -543,7 +544,7 @@ export class MetrcRequestManager implements IAtomicService {
 
   async getInactivePlants(
     body: string,
-    retryOptions: IRetryOptions = {},
+    retryOptions: RequestInitRetryParams = {},
     abortTimeout: number = 30000
   ) {
     const controller = new AbortController();
@@ -588,7 +589,7 @@ export class MetrcRequestManager implements IAtomicService {
 
   async getActivePackages(
     body: string,
-    retryOptions: IRetryOptions = {},
+    retryOptions: RequestInitRetryParams = {},
     abortTimeout: number = 30000
   ) {
     const controller = new AbortController();
@@ -612,6 +613,7 @@ export class MetrcRequestManager implements IAtomicService {
   async getInactivePackages(body: string) {
     return customFetch(INACTIVE_PACKAGES_URL, {
       ...DEFAULT_FETCH_POST_OPTIONS,
+      retries: 10,
       // @ts-ignore
       headers: {
         ...(await buildAuthenticationHeaders(this.authStateOrError)),
@@ -647,7 +649,7 @@ export class MetrcRequestManager implements IAtomicService {
 
   async getIncomingTransfers(
     body: string,
-    retryOptions: IRetryOptions = {},
+    retryOptions: RequestInitRetryParams = {},
     abortTimeout: number = 30000
   ) {
     const controller = new AbortController();
@@ -670,7 +672,7 @@ export class MetrcRequestManager implements IAtomicService {
 
   async getIncomingInactiveTransfers(
     body: string,
-    retryOptions: IRetryOptions = {},
+    retryOptions: RequestInitRetryParams = {},
     abortTimeout: number = 30000
   ) {
     const controller = new AbortController();

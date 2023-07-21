@@ -20,7 +20,8 @@ import {
 } from "@/store/page-overlay/modules/reports/interfaces";
 import { ActionContext } from "vuex";
 import { getIsoDateFromOffset, todayIsodate } from "../date";
-import { extractInitialPackageQuantityAndUnitFromHistoryOrError } from "../history";
+import { extractChildPackageTagQuantityUnitSetsFromHistory } from "../history";
+import { getLabelOrError } from "../package";
 import {
   addRowsRequestFactory,
   autoResizeDimensionsRequestFactory,
@@ -329,143 +330,178 @@ export async function maybeLoadCogsV2ReportData({
   const worksheetMatrix: any[][] = [];
   const cogsMatrix: any[][] = [];
 
-  worksheetMatrix.push([
-    "Manifest #",
-    "Package Label",
-    "Package Unit",
-    "Source Packages",
-    "Matched src packages",
-    "Matched src package count",
-    "Matched src package units",
-    "Unmatched src packages",
-    "Unmatched src package count",
-    "Source Production Batches",
-    "Matched production batches",
-    "Matched production batch count",
-    "Matched produciton batch units",
-    "Unmatched production batches",
-    "Unmatched production batch count",
-  ]);
+  // Keyed by label
+  const ancestorPackages: Map<string, IIndexedPackageData> = new Map();
 
-  const productionBatchPackages: Set<IIndexedPackageData> = new Set();
+  // Keyed by production batch
+  const productionBatchPackages: Map<string, IIndexedPackageData> = new Map();
+
+  function recursiveSourcePackageMatch(label: string) {
+    const pkg = packageLabelMap.get(label);
+
+    if (!pkg) {
+      throw new Error(`Unmatched package: ${label}`);
+    }
+
+    ancestorPackages.set(pkg.Label, pkg);
+
+    if (pkg.ProductionBatchNumber.length === 0) {
+      // This is not a PB, recurse
+      console.log(pkg);
+      pkg.SourcePackageLabels.split(",")
+        .map((x) => x.trim())
+        .map((label) => recursiveSourcePackageMatch(label));
+    } else {
+      // This is a PB, add to PB map and return
+      productionBatchPackages.set(pkg.ProductionBatchNumber, pkg);
+    }
+  }
 
   for (const transfer of richOutgoingTransfers) {
     const manifestNumber = transfer.ManifestNumber;
 
     for (const destination of transfer.outgoingDestinations || []) {
       for (const pkg of destination.packages || []) {
-        const sourcePackageLabels: string[] = pkg.SourcePackageLabels.split(",");
-
-        const matchedSourcePackages: IIndexedPackageData[] = sourcePackageLabels
-          .filter((x) => packageLabelMap.has(x))
-          .map((x) => packageLabelMap.get(x)!);
-        const matchedSourcePackageLabels: string = matchedSourcePackages
-          .map((x) => x.Label)
-          .join(",");
-        const unmatchedSourcePackages: string = sourcePackageLabels
-          .filter((x) => !packageLabelMap.has(x))
-          .join(",");
-        const matchedSourcePackageUnits: string = matchedSourcePackages
-          .map((pkg) => pkg.UnitOfMeasureAbbreviation)
-          .join(",");
-
-        const sourceProductionBatchNumbers: string[] = matchedSourcePackages.map(
-          (pkg) => pkg.SourceProductionBatchNumbers || pkg.ProductionBatchNumber
+        const sourcePackageLabels: string[] = pkg.SourcePackageLabels.split(",").map((x) =>
+          x.trim()
         );
-        const sourceProductionBatches: string = sourceProductionBatchNumbers.join(",");
 
-        const matchedSourceProductionBatchPackages: IIndexedPackageData[] =
-          sourceProductionBatchNumbers
-            .filter((x) => productionBatchMap.has(x))
-            .map((x) => productionBatchMap.get(x)!);
+        console.log(pkg);
+        sourcePackageLabels.map((label) => recursiveSourcePackageMatch(label));
 
-        for (const pkg of matchedSourceProductionBatchPackages) {
-          productionBatchPackages.add(pkg);
-        }
+        // const matchedSourcePackages: IIndexedPackageData[] = sourcePackageLabels
+        //   .filter((x) => packageLabelMap.has(x))
+        //   .map((x) => packageLabelMap.get(x)!);
 
-        const matchedSourceProductionBatchNumbers: string = matchedSourceProductionBatchPackages
-          .map((x) => x.ProductionBatchNumber)
-          .join(",");
-        const matchedSourceProductionBatchUnits: string = matchedSourceProductionBatchPackages
-          .map((pkg) => pkg.UnitOfMeasureAbbreviation)
-          .join(",");
-        const unmatchedSourceProductionBatchNumbers: string = sourceProductionBatchNumbers
-          .filter((x) => !productionBatchMap.has(x))
-          .join(",");
+        // if (matchedSourcePackages.length !== sourcePackageLabels.length) {
+        //   console.error("Unable to match one or more source packages");
+        // }
 
-        const row: string[] = [
-          //   "Manifest #",
-          manifestNumber,
-          //   "Package Label",
-          pkg.PackageLabel,
-          //   "Package Unit",
-          pkg.ShippedUnitOfMeasureAbbreviation,
-          //   "Source Packages",
-          pkg.SourcePackageLabels,
-          //   "Matched src packages",
-          matchedSourcePackageLabels,
-          //   "Matched src package count",
-          matchedSourcePackageLabels
-            .split(",")
-            .filter((x) => x.length > 0)
-            .length.toString(),
-          //   "Matched src package units",
-          matchedSourcePackageUnits,
-          //   "Unmatched src packages",
-          unmatchedSourcePackages,
-          //   "Unmatched src package count",
-          unmatchedSourcePackages
-            .split(",")
-            .filter((x) => x.length > 0)
-            .length.toString(),
-          //   "Source Production Batches",
-          sourceProductionBatches,
-          //   "Matched production batches",
-          matchedSourceProductionBatchNumbers,
-          //   "Matched production batch count",
-          matchedSourceProductionBatchNumbers
-            .split(",")
-            .filter((x) => x.length > 0)
-            .length.toString(),
-          //   "Matched produciton batch units",
-          matchedSourceProductionBatchUnits,
-          //   "Unmatched production batches",
-          unmatchedSourceProductionBatchNumbers,
-          //   "Unmatched production batch count",
-          unmatchedSourceProductionBatchNumbers
-            .split(",")
-            .filter((x) => x.length > 0)
-            .length.toString(),
-        ];
+        // matchedSourcePackages.map((pkg) => ancestorPackages.set(pkg.Label, pkg));
 
-        if (row.length !== 15) {
-          console.error(row);
-          throw new Error("Bad row length");
-        }
+        // for (const pkg of matchedSourcePackages) {
+        // }
 
-        worksheetMatrix.push(row);
+        // const sourceProductionBatchNumbers: string[] = matchedSourcePackages.map(
+        //   (pkg) => pkg.SourceProductionBatchNumbers || pkg.ProductionBatchNumber
+        // );
+
+        // const sourceProductionBatchPackages: IIndexedPackageData[] = sourceProductionBatchNumbers
+        //   .filter((x) => productionBatchMap.has(x))
+        //   .map((x) => productionBatchMap.get(x)!);
+
+        // sourceProductionBatchPackages.map((pkg) => ancestorPackages.set(pkg.Label, pkg));
+        // sourceProductionBatchPackages.map((pkg) =>
+        //   productionBatchPackages.set(pkg.ProductionBatchNumber, pkg)
+        // );
       }
     }
   }
 
-  for (const pkg of productionBatchPackages) {
+  debugger;
+
+  const historyPromises: Promise<any>[] = [];
+
+  for (const [label, pkg] of ancestorPackages) {
     const dataLoader = await getDataLoaderByLicense(pkg.LicenseNumber);
 
     pkg.history = await dataLoader.packageHistoryByPackageId(pkg.Id);
 
-    const initialQuantity = extractInitialPackageQuantityAndUnitFromHistoryOrError(pkg.history);
-
-    cogsMatrix.push([
-      pkg.LicenseNumber,
-      pkg.Label,
-      pkg.ProductionBatchNumber,
-      pkg.Item.Name,
-      ...initialQuantity,
-      pkg.PackagedDate,
-    ]);
+    if (history.length % 100 === 0) {
+      await Promise.allSettled(historyPromises);
+    }
   }
 
-  console.log({ worksheetMatrix });
+  await Promise.allSettled(historyPromises);
+
+  worksheetMatrix.push(["Package Tag", "Production Batch #", "Cost"]);
+
+  for (const [label, pkg] of ancestorPackages) {
+    if (pkg.ProductionBatchNumber.length > 0) {
+      worksheetMatrix.push([pkg.Label, pkg.ProductionBatchNumber, 0]);
+    }
+  }
+
+  cogsMatrix.push([
+    "Package Tag",
+    "Source Production Batch",
+    "Multiplier",
+    "Package COGS",
+    "Unit COGS",
+    "Note",
+  ]);
+
+  for (const transfer of richOutgoingTransfers) {
+    const manifestNumber = transfer.ManifestNumber;
+
+    for (const destination of transfer.outgoingDestinations || []) {
+      for (const pkg of destination.packages || []) {
+        let multiplier = 1;
+        let srcPB = null;
+
+        const sourcePackageLabels: string[] = pkg.SourcePackageLabels.split(",").map((x) =>
+          x.trim()
+        );
+
+        if (sourcePackageLabels.length !== 1) {
+          cogsMatrix.push([
+            getLabelOrError(pkg),
+            null,
+            null,
+            null,
+            null,
+            `Invalid src package count: ${sourcePackageLabels.length}`,
+          ]);
+          continue;
+        }
+
+        const [sourcePackageLabel] = sourcePackageLabels;
+
+        if (!ancestorPackages.has(sourcePackageLabel)) {
+          cogsMatrix.push([
+            getLabelOrError(pkg),
+            null,
+            null,
+            null,
+            null,
+            `Missing src package: ${sourcePackageLabel}`,
+          ]);
+          continue;
+        }
+
+        const sourcePackage: IIndexedPackageData = ancestorPackages.get(sourcePackageLabel)!;
+
+        if (sourcePackage.ProductionBatchNumber.length > 0) {
+          // This is the source PB.
+          const tagQuantityUnitSets = extractChildPackageTagQuantityUnitSetsFromHistory(
+            sourcePackage.history!
+          );
+        } else {
+          // One more hop to the source PB
+          // TODO check for matching units
+        }
+      }
+    }
+  }
+
+  //   for (const pkg of productionBatchPackages) {
+  //     const dataLoader = await getDataLoaderByLicense(pkg.LicenseNumber);
+
+  //     pkg.history = await dataLoader.packageHistoryByPackageId(pkg.Id);
+
+  //     const initialQuantity = extractInitialPackageQuantityAndUnitFromHistoryOrError(pkg.history);
+
+  //     cogsMatrix.push([
+  //       pkg.LicenseNumber,
+  //       pkg.Label,
+  //       pkg.ProductionBatchNumber,
+  //       pkg.Item.Name,
+  //       ...initialQuantity,
+  //       pkg.PackagedDate,
+  //     ]);
+  //   }
+
+  //   console.log({ worksheetMatrix });
 
   reportData[ReportType.COGS_V2] = {
     auditData,
