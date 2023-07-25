@@ -162,7 +162,6 @@ class PageManager implements IAtomicService {
   packageSourcePackageLabelFilterInput: HTMLInputElement | null = null;
   packageSourcePackageLabelApplyFiltersButton: HTMLButtonElement | null = null;
 
-
   packageProductionBatchNumberFilterInput: HTMLInputElement | null = null;
   packageProductionBatchNumberApplyFiltersButton: HTMLButtonElement | null = null;
 
@@ -248,7 +247,16 @@ class PageManager implements IAtomicService {
     observer.observe(document.body, { subtree: true, childList: true });
 
     if (store.state.settings?.preventLogout) {
-      //  wake lock API
+      if ("wakeLock" in navigator) {
+        try {
+          // @ts-ignore
+          await navigator.wakeLock.request("screen");
+          console.log("Wake lock engaged");
+        } catch (err) {
+          // The Wake Lock request has failed - usually system related, such as battery.
+          console.error(err);
+        }
+      }
     }
   }
 
