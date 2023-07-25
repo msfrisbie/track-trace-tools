@@ -46,7 +46,6 @@ import { searchManager } from "@/modules/search-manager.module";
 import { telemetryManager } from "@/modules/telemetry-manager.module";
 import { toastManager } from "@/modules/toast-manager.module";
 import { updateManager } from "@/modules/update-manager.module";
-import { upsertManager } from "@/modules/upsert-manager.module";
 import store from "@/store/page-overlay/index";
 import { library } from "@fortawesome/fontawesome-svg-core";
 import * as fontawesomeBrands from "@fortawesome/free-brands-svg-icons";
@@ -236,7 +235,6 @@ export default Vue.extend({
     pageManager.init();
     authManager.init();
     integrityManager.init();
-    upsertManager.init();
     passivePageAnalyzer.init();
     metrcModalManager.init();
 

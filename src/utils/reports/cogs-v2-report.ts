@@ -8,6 +8,7 @@ import {
   ISpreadsheet,
   ITransferFilter,
 } from "@/interfaces";
+import { clientBuildManager } from "@/modules/client-build-manager.module";
 import { DataLoader, getDataLoaderByLicense } from "@/modules/data-loader/data-loader.module";
 import { facilityManager } from "@/modules/facility-manager.module";
 import { messageBus } from "@/modules/message-bus.module";
@@ -28,10 +29,11 @@ import { getLabelOrError } from "../package";
 import {
   addRowsRequestFactory,
   autoResizeDimensionsRequestFactory,
+  extractSheetIdOrError,
   freezeTopRowRequestFactory,
   styleTopRowRequestFactory,
 } from "../sheets";
-import { writeDataSheet } from "../sheets-export";
+import { appendSpreadsheetValues, readSpreadsheet, writeDataSheet } from "../sheets-export";
 
 interface ICogsReportFormFilters {
   cogsDateGt: string;
@@ -88,6 +90,30 @@ export async function maybeLoadCogsV2ReportData({
 
   // packageFilter and transferFilter will have identical dates
   const { transferFilter, licenses } = reportConfig[ReportType.COGS_V2]!;
+
+  // Load data sheet
+
+  clientBuildManager.assertValues(["MASTER_PB_COST_SHEET_URL"]);
+
+  const spreadsheetId = extractSheetIdOrError(
+    clientBuildManager.clientConfig!.values!["MASTER_PB_COST_SHEET_URL"]
+  );
+
+  const response: { data: { result: { values: any[][] } } } = await readSpreadsheet({
+    spreadsheetId,
+    sheetName: "Worksheet",
+  });
+
+  await appendSpreadsheetValues({
+    spreadsheetId,
+    range: "Worksheet!A:H",
+    values: [
+      [1, 2, 3, 4, 5, 6, 7, 8],
+      ["a", "b", "c", "d"],
+    ],
+  });
+
+  debugger;
 
   // Load all packages
 
@@ -339,27 +365,6 @@ export async function maybeLoadCogsV2ReportData({
   // Keyed by production batch
   const productionBatchPackages: Map<string, IIndexedPackageData> = new Map();
 
-  //   function recursiveSourcePackageMatch(label: string) {
-  //     const pkg = packageLabelMap.get(label);
-
-  //     if (!pkg) {
-  //       throw new Error(`Unmatched package: ${label}`);
-  //     }
-
-  //     ancestorPackages.set(pkg.Label, pkg);
-
-  //     if (pkg.ProductionBatchNumber.length === 0) {
-  //       // This is not a PB, recurse
-  //       console.log(pkg);
-  //       pkg.SourcePackageLabels.split(",")
-  //         .map((x) => x.trim())
-  //         .map((label) => recursiveSourcePackageMatch(label));
-  //     } else {
-  //       // This is a PB, add to PB map and return
-  //       productionBatchPackages.set(pkg.ProductionBatchNumber, pkg);
-  //     }
-  //   }
-
   for (const transfer of richOutgoingTransfers) {
     const manifestNumber = transfer.ManifestNumber;
 
@@ -378,9 +383,6 @@ export async function maybeLoadCogsV2ReportData({
         }
 
         matchedSourcePackages.map((pkg) => ancestorPackages.set(pkg.Label, pkg));
-
-        for (const pkg of matchedSourcePackages) {
-        }
 
         const sourceProductionBatchNumbers: string[] = matchedSourcePackages.map(
           (pkg) => pkg.SourceProductionBatchNumbers || pkg.ProductionBatchNumber

@@ -43,9 +43,6 @@ class DatabaseInterface implements IAtomicService {
   async indexPackages(packagesData: IPackageData[], packageState: PackageState) {
     const authState = await authManager.authStateOrError("User is not authenticated");
 
-    // Experimental upsert, intentionally disabled
-    // upsertManager.maybeSendPackages({ packages: packagesData, status: packageState });
-
     const indexedPackagesData = packagesData.map((packageData) => {
       const tagMatcher = dataObjectToIndexableTags(packageData).join(" ");
 

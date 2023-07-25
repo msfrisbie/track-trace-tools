@@ -246,6 +246,10 @@ class PageManager implements IAtomicService {
     const observer = new MutationObserver(() => debouncedHandler());
 
     observer.observe(document.body, { subtree: true, childList: true });
+
+    if (store.state.settings?.preventLogout) {
+      //  wake lock API
+    }
   }
 
   pauseFor(pauseMs: number) {

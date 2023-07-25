@@ -3,7 +3,6 @@ import { authManager } from "@/modules/auth-manager.module";
 import { customFetch } from "@/modules/fetch-manager.module";
 import store from "@/store/page-overlay/index";
 import { debugLogFactory } from "@/utils/debug";
-import { upsertManager } from "./upsert-manager.module";
 
 const debugLog = debugLogFactory("facility-manager.module.ts");
 
@@ -127,14 +126,6 @@ class FacilityManager implements IAtomicService {
     }
 
     debugLog(async () => ["Owned facilities", ownedFacilities]);
-
-    upsertManager.maybeSendKeyval({
-      key: "facilities",
-      category: "FACILITIES",
-      dataType: "json",
-      authState,
-      data: ownedFacilities,
-    });
 
     this.cachedFacilities = ownedFacilities;
 

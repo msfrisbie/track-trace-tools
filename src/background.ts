@@ -8,6 +8,7 @@ import {
   batchUpdate,
   batchUpdateValues,
   createSpreadsheet,
+  readValues,
   writeValues,
 } from "./utils/sheets";
 
@@ -275,6 +276,24 @@ chrome.runtime.onMessage.addListener((inboundEvent, sender, sendResponse) => {
 
       case MessageType.BATCH_UPDATE_SPREADSHEET_VALUES:
         batchUpdateValues(inboundEvent.message.data).then(
+          (result) => {
+            respondToContentScript(sendResponse, inboundEvent, {
+              success: true,
+              result,
+            });
+          },
+          (error) => {
+            respondToContentScript(sendResponse, inboundEvent, {
+              success: false,
+            });
+            console.error("Event error in background", inboundEvent, error);
+          }
+        );
+
+        break;
+
+      case MessageType.READ_SPREADSHEET_VALUES:
+        readValues(inboundEvent.message.data).then(
           (result) => {
             respondToContentScript(sendResponse, inboundEvent, {
               success: true,

@@ -7,7 +7,6 @@ import _ from "lodash-es";
 import { analyticsManager } from "./analytics-manager.module";
 import { authManager } from "./auth-manager.module";
 import { pageManager } from "./page-manager/page-manager.module";
-import { upsertManager } from "./upsert-manager.module";
 
 const debugLog = debugLogFactory("modules/passive-page-analyzer.module.ts");
 
@@ -82,15 +81,6 @@ class PassivePageAnalyzer implements IAtomicService {
       return;
     }
 
-    upsertManager.maybeSendKeyval({
-      key: key + "ModalFields",
-      category: "MODAL_FIELDS",
-      dataType: "json",
-      authState,
-      data: {
-        fieldNames,
-      },
-    });
     const repeaterDataKeys: string[] = [
       ...new Set(
         ngModelElements
@@ -123,16 +113,6 @@ class PassivePageAnalyzer implements IAtomicService {
     if (!repeaterDataKeys.length) {
       throw new Error("repeaterDataKeys empty");
     }
-
-    upsertManager.maybeSendKeyval({
-      key: key + "RepeaterDataKeys",
-      category: "REPEATER_DATA_KEYS",
-      dataType: "json",
-      authState,
-      data: {
-        repeaterDataKeys,
-      },
-    });
   }
 }
 

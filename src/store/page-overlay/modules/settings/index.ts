@@ -59,7 +59,7 @@ const persistedState: ISettingsState = {
   useLegacyDateFormatForSubmit: false,
   writeSettingsToChromeStorage: false,
   loadDataInParallel: true,
-  usePersistedCache: false,
+  usePersistedCache: false
 };
 
 const defaultState: ISettingsState = {

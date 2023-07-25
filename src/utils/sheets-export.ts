@@ -3,6 +3,7 @@ import {
   IDestinationData,
   IDestinationPackageData,
   IIndexedTransferData,
+  ISheetValues,
   ISpreadsheet,
   IValueRange,
 } from "@/interfaces";
@@ -32,6 +33,48 @@ import {
   shrinkFontRequestFactory,
   styleTopRowRequestFactory,
 } from "./sheets";
+
+export async function readSpreadsheet({
+  spreadsheetId,
+  sheetName,
+}: {
+  spreadsheetId: string;
+  sheetName: string;
+}) {
+  return messageBus.sendMessageToBackground(
+    MessageType.READ_SPREADSHEET_VALUES,
+    {
+      spreadsheetId,
+      sheetName,
+    },
+    undefined,
+    SHEETS_API_MESSAGE_TIMEOUT_MS
+  );
+}
+
+export async function appendSpreadsheetValues({
+  spreadsheetId,
+  range,
+  values,
+  valueInputOption,
+}: {
+  spreadsheetId: string;
+  range: string;
+  values: ISheetValues;
+  valueInputOption?: "RAW" | "USER_ENTERED";
+}) {
+  await messageBus.sendMessageToBackground(
+    MessageType.APPEND_SPREADSHEET_VALUES,
+    {
+      spreadsheetId,
+      range,
+      values,
+      valueInputOption
+    },
+    undefined,
+    SHEETS_API_MESSAGE_TIMEOUT_MS
+  );
+}
 
 export async function writeDataSheet<T>({
   spreadsheetId,

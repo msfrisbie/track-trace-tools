@@ -271,7 +271,7 @@ export async function readValues({
   return customFetch(url, {
     ...retryDefaults,
     headers,
-  });
+  }).then(response => response.json());
 }
 
 export async function appendValues({

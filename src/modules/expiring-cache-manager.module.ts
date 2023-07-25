@@ -32,17 +32,33 @@ function extractKeyValues(key: string): { keyPiece: string; expiration: number }
 
 class ExpiringCacheManager implements IAtomicService {
   async init() {
+    this.inMemoryCache = {};
+    this.persistedCache.setItem(EXPIRING_CACHE_KEY_PREFIX, "{}");
+
     timer(10000).subscribe(() => this.lazyFlushExpiredValues());
   }
 
+  set inMemoryCache(value: any) {
+    // @ts-ignore
+    globalThis[EXPIRING_CACHE_KEY_PREFIX] = value;
+  }
+
+  get inMemoryCache(): { [key: string]: any } {
+    // @ts-ignore
+    return globalThis[EXPIRING_CACHE_KEY_PREFIX] || {};
+  }
+
+  get persistedCache(): Storage {
+    return localStorage;
+  }
+
   managedKeys(): string[] {
-    const managedKeys = Object.keys(localStorage).filter((k) =>
-      k.startsWith(EXPIRING_CACHE_KEY_PREFIX)
-    );
-
-    // debugLog(async () => [managedKeys]);
-
-    return managedKeys;
+    return [
+      ...new Set(
+        ...Object.keys(this.inMemoryCache || {}),
+        ...Object.keys(JSON.parse(this.persistedCache.getItem(EXPIRING_CACHE_KEY_PREFIX) || "{}"))
+      ),
+    ];
   }
 
   lazyFlushExpiredValues() {
@@ -53,7 +69,8 @@ class ExpiringCacheManager implements IAtomicService {
 
       if (expiration < Date.now()) {
         ++count;
-        localStorage.removeItem(k);
+        this.persistedCache.removeItem(k);
+        this.inMemoryCache[k] = null;
       }
     }
 
@@ -65,23 +82,35 @@ class ExpiringCacheManager implements IAtomicService {
       const { keyPiece, expiration } = extractKeyValues(k);
 
       if (keyPiece === key && expiration > Date.now()) {
-        return localStorage.getItem(k);
+        return this.inMemoryCache[k] || this.persistedCache.getItem(k);
       }
     }
   }
 
-  set({ key, value, expirationMs }: { key: string; value: string; expirationMs: number }) {
+  set({
+    key,
+    value,
+    expirationMs,
+    persist = false,
+  }: {
+    key: string;
+    value: string;
+    expirationMs: number;
+    persist?: boolean;
+  }) {
     // Check for existing value and removeItem if it exists
     for (const k of this.managedKeys()) {
       const { keyPiece } = extractKeyValues(k);
 
       if (keyPiece === key) {
-        localStorage.removeItem(k);
+        if (persist) {
+          this.persistedCache.removeItem(k);
+        }
         break;
       }
     }
 
-    localStorage.setItem(keyFactory({ keyPiece: key, expirationMs }), value);
+    this.persistedCache.setItem(keyFactory({ keyPiece: key, expirationMs }), value);
   }
 }
 

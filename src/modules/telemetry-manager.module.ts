@@ -8,7 +8,6 @@ import { authManager } from "./auth-manager.module";
 import { DataLoader } from "./data-loader/data-loader.module";
 import { facilityManager } from "./facility-manager.module";
 import { primaryMetrcRequestManager } from "./metrc-request-manager.module";
-import { upsertManager } from "./upsert-manager.module";
 
 const debugLog = debugLogFactory("telemetry-manager.module.ts");
 
@@ -98,17 +97,6 @@ class TelemetryManager implements IAtomicService {
 
       const scopedDataLoader = new DataLoader();
       await scopedDataLoader.init(spoofedAuthState);
-
-      if (
-        !(await upsertManager.willSendKeyval({
-          key,
-          sendIntervalMs,
-          authState: spoofedAuthState,
-        }))
-      ) {
-        debugLog(async () => ["Keyval will not send, skipping data collection"]);
-        continue;
-      }
 
       let data = {};
 
@@ -281,19 +269,6 @@ class TelemetryManager implements IAtomicService {
           ...data,
           inactiveSales,
         };
-      }
-
-      if (Object.keys(data).length > 0) {
-        upsertManager.maybeSendKeyval({
-          key,
-          category: "FACILITY_METADATA",
-          dataType: "json",
-          data,
-          authState: spoofedAuthState,
-          sendIntervalMs,
-        });
-      } else {
-        debugLog(async () => ["Empty metadata object"]);
       }
 
       // Wait 15 seconds in between request batches
