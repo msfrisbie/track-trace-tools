@@ -251,6 +251,7 @@ class PageManager implements IAtomicService {
         try {
           // @ts-ignore
           await navigator.wakeLock.request("screen");
+          console.log("Wake lock engaged");
         } catch (err) {
           // The Wake Lock request has failed - usually system related, such as battery.
           console.error(err);
