@@ -8,7 +8,6 @@ import {
   ISpreadsheet,
   ITransferFilter,
 } from "@/interfaces";
-import { clientBuildManager } from "@/modules/client-build-manager.module";
 import { DataLoader, getDataLoaderByLicense } from "@/modules/data-loader/data-loader.module";
 import { facilityManager } from "@/modules/facility-manager.module";
 import { messageBus } from "@/modules/message-bus.module";
@@ -29,11 +28,10 @@ import { getLabelOrError } from "../package";
 import {
   addRowsRequestFactory,
   autoResizeDimensionsRequestFactory,
-  extractSheetIdOrError,
   freezeTopRowRequestFactory,
   styleTopRowRequestFactory,
 } from "../sheets";
-import { appendSpreadsheetValues, readSpreadsheet, writeDataSheet } from "../sheets-export";
+import { writeDataSheet } from "../sheets-export";
 
 interface ICogsReportFormFilters {
   cogsDateGt: string;
@@ -75,51 +73,39 @@ export function addCogsV2Report({
   };
 }
 
-export async function maybeLoadCogsV2ReportData({
+export async function loadAndCacheCogsV2Data({
   ctx,
-  reportData,
-  reportConfig,
+  licenses,
+  departureDateLt,
+  departureDateGt,
 }: {
   ctx: ActionContext<IReportsState, IPluginState>;
-  reportData: IReportData;
-  reportConfig: IReportConfig;
-}) {
-  if (!reportConfig[ReportType.COGS_V2]) {
-    return;
+  licenses: string[];
+  departureDateGt: string;
+  departureDateLt: string;
+}): Promise<{
+  packages: IIndexedPackageData[];
+  richOutgoingTransfers: IIndexedRichOutgoingTransferData[];
+  ancestorPackages: Map<string, IIndexedPackageData>;
+  productionBatchPackages: Map<string, IIndexedPackageData>;
+  packageLabelMap: Map<string, IIndexedPackageData>;
+  productionBatchMap: Map<string, IIndexedPackageData>;
+}> {
+  const COGS_V2_CACHE_KEY = `COGS_V2_DATA__${licenses.join(
+    ","
+  )}__${departureDateGt}__${departureDateLt}`;
+
+  // @ts-ignore
+  const cachedValue = globalThis[COGS_V2_CACHE_KEY];
+
+  if (cachedValue) {
+    return cachedValue;
   }
 
-  // packageFilter and transferFilter will have identical dates
-  const { transferFilter, licenses } = reportConfig[ReportType.COGS_V2]!;
-
-  // Load data sheet
-
-  clientBuildManager.assertValues(["MASTER_PB_COST_SHEET_URL"]);
-
-  const spreadsheetId = extractSheetIdOrError(
-    clientBuildManager.clientConfig!.values!["MASTER_PB_COST_SHEET_URL"]
-  );
-
-  const response: { data: { result: { values: any[][] } } } = await readSpreadsheet({
-    spreadsheetId,
-    sheetName: "Worksheet",
-  });
-
-  await appendSpreadsheetValues({
-    spreadsheetId,
-    range: "Worksheet!A:H",
-    values: [
-      [1, 2, 3, 4, 5, 6, 7, 8],
-      ["a", "b", "c", "d"],
-    ],
-  });
-
-  debugger;
-
-  // Load all packages
-
-  let packages: IIndexedPackageData[] = [];
-
   let dataLoader: DataLoader | null = null;
+
+  // @ts-ignore
+  let packages: IIndexedPackageData[] = [];
 
   for (const license of licenses) {
     ctx.commit(ReportsMutations.SET_STATUS, {
@@ -177,19 +163,6 @@ export async function maybeLoadCogsV2ReportData({
     );
   }
 
-  const packageLabelMap = new Map<string, IIndexedPackageData>(
-    packages.map((pkg) => [pkg.Label, pkg])
-  );
-  const productionBatchMap = new Map<string, IIndexedPackageData>(
-    packages
-      .filter((pkg) => !!pkg.ProductionBatchNumber)
-      .map((pkg) => [pkg.ProductionBatchNumber, pkg])
-  );
-
-  ctx.commit(ReportsMutations.SET_STATUS, {
-    statusMessage: { text: `Loaded ${packages.length} total packages`, level: "success" },
-  });
-
   let richOutgoingTransfers: IIndexedRichOutgoingTransferData[] = [];
 
   for (const license of licenses) {
@@ -225,11 +198,6 @@ export async function maybeLoadCogsV2ReportData({
       });
     }
   }
-
-  const [departureDateGt] = transferFilter.estimatedDepartureDateGt!.split("T");
-  const [departureDateLt] = getIsoDateFromOffset(1, transferFilter.estimatedDepartureDateLt!).split(
-    "T"
-  );
 
   let filter1initial = richOutgoingTransfers.length;
 
@@ -355,9 +323,14 @@ export async function maybeLoadCogsV2ReportData({
     },
   });
 
-  const auditData = {};
-  const worksheetMatrix: any[][] = [];
-  const cogsMatrix: any[][] = [];
+  const packageLabelMap = new Map<string, IIndexedPackageData>(
+    packages.map((pkg) => [pkg.Label, pkg])
+  );
+  const productionBatchMap = new Map<string, IIndexedPackageData>(
+    packages
+      .filter((pkg) => !!pkg.ProductionBatchNumber)
+      .map((pkg) => [pkg.ProductionBatchNumber, pkg])
+  );
 
   // Keyed by label
   const ancestorPackages: Map<string, IIndexedPackageData> = new Map();
@@ -418,6 +391,84 @@ export async function maybeLoadCogsV2ReportData({
   }
 
   await Promise.allSettled(historyPromises);
+
+  const updatedCachedValue = {
+    packages,
+    richOutgoingTransfers,
+    ancestorPackages,
+    productionBatchPackages,
+    packageLabelMap,
+    productionBatchMap,
+  };
+
+  // @ts-ignore
+  globalThis[COGS_V2_CACHE_KEY] = updatedCachedValue;
+
+  return updatedCachedValue;
+}
+
+export async function updateCogsV2MasterCostSheet() {}
+
+export async function maybeLoadCogsV2ReportData({
+  ctx,
+  reportData,
+  reportConfig,
+}: {
+  ctx: ActionContext<IReportsState, IPluginState>;
+  reportData: IReportData;
+  reportConfig: IReportConfig;
+}) {
+  if (!reportConfig[ReportType.COGS_V2]) {
+    return;
+  }
+
+  // packageFilter and transferFilter will have identical dates
+  const { transferFilter, licenses } = reportConfig[ReportType.COGS_V2]!;
+
+  // Load data sheet
+
+  //   clientBuildManager.assertValues(["MASTER_PB_COST_SHEET_URL"]);
+
+  //   const spreadsheetId = extractSheetIdOrError(
+  //     clientBuildManager.clientConfig!.values!["MASTER_PB_COST_SHEET_URL"]
+  //   );
+
+  //   const response: { data: { result: { values: any[][] } } } = await readSpreadsheet({
+  //     spreadsheetId,
+  //     sheetName: "Worksheet",
+  //   });
+
+  //   await appendSpreadsheetValues({
+  //     spreadsheetId,
+  //     range: "Worksheet!A:H",
+  //     values: [
+  //       [1, 2, 3, 4, 5, 6, 7, 8],
+  //       ["a", "b", "c", "d"],
+  //     ],
+  //   });
+
+  //   debugger;
+
+  // Load all packages
+
+  //   let packages: IIndexedPackageData[] = [];
+
+  const [departureDateGt] = transferFilter.estimatedDepartureDateGt!.split("T");
+  const [departureDateLt] = getIsoDateFromOffset(1, transferFilter.estimatedDepartureDateLt!).split(
+    "T"
+  );
+
+  let { richOutgoingTransfers, ancestorPackages, productionBatchMap } =
+    await loadAndCacheCogsV2Data({
+      ctx,
+      licenses,
+      departureDateGt,
+      departureDateLt,
+    });
+
+  const auditData = {};
+  const worksheetMatrix: any[][] = [];
+  const cogsMatrix: any[][] = [];
 
   worksheetMatrix.push(["Package Tag", "Production Batch #", "Cost"]);
 
