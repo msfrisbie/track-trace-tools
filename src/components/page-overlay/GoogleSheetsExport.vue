@@ -1462,6 +1462,7 @@ export default Vue.extend({
       selectedReports: [] as ReportType[],
       cogsFormFilters: cogsFormFiltersFactory(),
       cogsV2FormFilters: cogsV2FormFiltersFactory(),
+      
       cogsTrackerFormFilters: cogsTrackerFormFiltersFactory(),
       packagesFormFilters: packageFormFiltersFactory(),
       stragglerPackagesFormFilters: stragglerPackagesFormFiltersFactory(),

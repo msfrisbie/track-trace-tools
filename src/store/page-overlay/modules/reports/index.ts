@@ -106,11 +106,19 @@ export const reportsModule = {
       ctx: ActionContext<IReportsState, IPluginState>,
       { auxTask, reportConfig }: { auxTask: ReportAuxTask; reportConfig: IReportConfig }
     ) => {
-      switch (auxTask) {
-        case ReportAuxTask.UPDATE_MASTER_COST_SHEET:
-          await updateCogsV2MasterCostSheet({ ctx, reportConfig });
-        default:
-          throw new Error("Bad aux task");
+      ctx.commit(ReportsMutations.SET_STATUS, { status: ReportStatus.INFLIGHT });
+
+      try {
+        switch (auxTask) {
+          case ReportAuxTask.UPDATE_MASTER_COST_SHEET:
+            await updateCogsV2MasterCostSheet({ ctx, reportConfig });
+          default:
+            throw new Error("Bad aux task");
+        }
+      } finally {
+        ctx.commit(ReportsMutations.SET_STATUS, {
+          status: ReportStatus.INITIAL,
+        });
       }
     },
     [ReportsActions.GENERATE_SPREADSHEET]: async (

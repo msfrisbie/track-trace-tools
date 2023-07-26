@@ -13,7 +13,7 @@ import { DataLoader, getDataLoaderByLicense } from "@/modules/data-loader/data-l
 import { facilityManager } from "@/modules/facility-manager.module";
 import { messageBus } from "@/modules/message-bus.module";
 import store from "@/store/page-overlay/index";
-import { ReportsMutations, ReportType } from "@/store/page-overlay/modules/reports/consts";
+import { ReportType, ReportsMutations } from "@/store/page-overlay/modules/reports/consts";
 import {
   IReportConfig,
   IReportData,
@@ -125,6 +125,7 @@ export async function loadAndCacheCogsV2Data({
             level: "warning",
           },
         });
+        throw e;
       }
     );
 
@@ -137,6 +138,7 @@ export async function loadAndCacheCogsV2Data({
             level: "warning",
           },
         });
+        throw e;
       }
     );
 
@@ -149,6 +151,7 @@ export async function loadAndCacheCogsV2Data({
             level: "warning",
           },
         });
+        throw e;
       }
     );
 
@@ -161,6 +164,7 @@ export async function loadAndCacheCogsV2Data({
             level: "warning",
           },
         });
+        throw e;
       }
     );
   }
@@ -180,6 +184,7 @@ export async function loadAndCacheCogsV2Data({
       ctx.commit(ReportsMutations.SET_STATUS, {
         statusMessage: { text: "Failed to load outgoing transfers.", level: "warning" },
       });
+      throw e;
     }
 
     try {
@@ -189,6 +194,7 @@ export async function loadAndCacheCogsV2Data({
       ctx.commit(ReportsMutations.SET_STATUS, {
         statusMessage: { text: "Failed to load rejected transfers.", level: "warning" },
       });
+      throw e;
     }
 
     try {
@@ -198,6 +204,7 @@ export async function loadAndCacheCogsV2Data({
       ctx.commit(ReportsMutations.SET_STATUS, {
         statusMessage: { text: "Failed to load outgoing inactive transfers.", level: "warning" },
       });
+      throw e;
     }
   }
 
@@ -449,7 +456,8 @@ export async function updateCogsV2MasterCostSheet({
       sheetName: "Worksheet",
     });
 
-    const currentSheetLabels = new Set(response.data.result.values.map((row) => row[0]));
+    // Ignore header
+    const currentSheetLabels = new Set(response.data.result.values.slice(1).map((row) => row[1]));
     const requiredSheetLabels = new Set(
       [...productionBatchPackages.values()].map((pkg) => getLabelOrError(pkg))
     );
@@ -480,8 +488,8 @@ export async function updateCogsV2MasterCostSheet({
           "",
           "",
           pkg.Item.Name,
-          extractInitialPackageQuantityAndUnitFromHistoryOrError(pkg.history!),
-          pkg.UnitOfMeasureAbbreviation,
+          ...extractInitialPackageQuantityAndUnitFromHistoryOrError(pkg.history!),
+          // pkg.UnitOfMeasureAbbreviation,
           pkg.PackagedDate,
         ]);
       }
