@@ -42,6 +42,8 @@
                 v-model="unsavedLicenseKey"
                 :state="validKey"
                 name="input-licenseKey"
+                type="text"
+                v-on:keydown.enter.prevent="saveLicenseKey()"
               >
               </b-form-input>
               <b-input-group-append>

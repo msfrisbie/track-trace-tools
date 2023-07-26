@@ -3,7 +3,10 @@ import { IPluginState, ISpreadsheet } from "@/interfaces";
 import { analyticsManager } from "@/modules/analytics-manager.module";
 import { maybeLoadCogsReportData } from "@/utils/reports/cogs-report";
 import { maybeLoadCogsTrackerReportData } from "@/utils/reports/cogs-tracker-report";
-import { maybeLoadCogsV2ReportData } from "@/utils/reports/cogs-v2-report";
+import {
+  maybeLoadCogsV2ReportData,
+  updateCogsV2MasterCostSheet,
+} from "@/utils/reports/cogs-v2-report";
 import { maybeLoadEmployeeSamplesReportData } from "@/utils/reports/employee-samples-report";
 import { maybeLoadHarvestsReportData } from "@/utils/reports/harvests-report";
 import { maybeLoadImmaturePlantsReportData } from "@/utils/reports/immature-plants-report";
@@ -20,7 +23,13 @@ import { getSimpleSpreadsheet } from "@/utils/sheets";
 import { createSpreadsheetOrError } from "@/utils/sheets-export";
 import { v4 as uuidv4 } from "uuid";
 import { ActionContext } from "vuex";
-import { IStatusMessage, ReportsActions, ReportsMutations, ReportStatus } from "./consts";
+import {
+  IStatusMessage,
+  ReportAuxTask,
+  ReportStatus,
+  ReportsActions,
+  ReportsMutations,
+} from "./consts";
 import { IReportConfig, IReportData, IReportsState } from "./interfaces";
 
 const inMemoryState = {
@@ -92,6 +101,17 @@ export const reportsModule = {
         statusMessage: null,
       });
       ctx.commit(ReportsMutations.SET_GENERATED_SPREADSHEET, { spreadsheet: null });
+    },
+    [ReportsActions.RUN_AUX_REPORT_TASK]: async (
+      ctx: ActionContext<IReportsState, IPluginState>,
+      { auxTask, reportConfig }: { auxTask: ReportAuxTask; reportConfig: IReportConfig }
+    ) => {
+      switch (auxTask) {
+        case ReportAuxTask.UPDATE_MASTER_COST_SHEET:
+          await updateCogsV2MasterCostSheet({ ctx, reportConfig });
+        default:
+          throw new Error("Bad aux task");
+      }
     },
     [ReportsActions.GENERATE_SPREADSHEET]: async (
       ctx: ActionContext<IReportsState, IPluginState>,

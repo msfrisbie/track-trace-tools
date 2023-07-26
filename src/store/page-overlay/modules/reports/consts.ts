@@ -14,6 +14,7 @@ export enum ReportsActions {
   EXAMPLE_ACTION = "EXAMPLE_ACTION",
   RESET = "RESET",
   GENERATE_SPREADSHEET = "GENERATE_SPREADSHEET",
+  RUN_AUX_REPORT_TASK = "RUN_AUX_REPORT_TASK",
 }
 
 export enum ReportStatus {
@@ -41,6 +42,10 @@ export enum ReportType {
   STRAGGLER_PACKAGES = "STRAGGLER_PACKAGES",
   MATURE_PLANTS_QUICKVIEW = "MATURE_PLANTS_QUICKVIEW",
   EMPLOYEE_SAMPLES = "EMPLOYEE_SAMPLES",
+}
+
+export enum ReportAuxTask {
+  UPDATE_MASTER_COST_SHEET = "UPDATE_MASTER_COST_SHEET",
 }
 
 // Used to unpack arrays of objects and auto-generate column headers

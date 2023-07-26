@@ -121,6 +121,9 @@
                     :options="cogsV2FormFilters.licenseOptions"
                   ></b-form-checkbox-group>
                 </b-form-group>
+
+                <b-button @click="updateMasterPbCostSheet()">UPDATE MASTER PB COST SHEET</b-button>
+                <a href="masterCostSheetUrl" target="_blank">Master PB Cost Sheet</a>
               </div>
             </div>
           </template>
@@ -1357,6 +1360,7 @@ import router from "@/router/index";
 import store from "@/store/page-overlay/index";
 import { OAuthState, PluginAuthActions } from "@/store/page-overlay/modules/plugin-auth/consts";
 import {
+  ReportAuxTask,
   ReportsActions,
   ReportStatus,
   ReportType,
@@ -1495,7 +1499,27 @@ export default Vue.extend({
       refreshOAuthState: `pluginAuth/${PluginAuthActions.REFRESH_OAUTH_STATE}`,
       generateSpreadsheet: `reports/${ReportsActions.GENERATE_SPREADSHEET}`,
       reset: `reports/${ReportsActions.RESET}`,
+      runAuxReportTask: `reports/${ReportsActions.RUN_AUX_REPORT_TASK}`,
     }),
+    async updateMasterPbCostSheet() {
+      const reportConfig: IReportConfig = {
+        authState: await authManager.authStateOrError(),
+      };
+
+      if (!this.selectedReports.includes(ReportType.COGS_V2)) {
+        throw new Error("Must include Cogs V2 report");
+      }
+
+      addCogsV2Report({
+        reportConfig,
+        cogsV2FormFilters: this.cogsV2FormFilters,
+      });
+
+      this.$store.dispatch(`reports/${ReportsActions.RUN_AUX_REPORT_TASK}`, {
+        auxTask: ReportAuxTask.UPDATE_MASTER_COST_SHEET,
+        reportConfig,
+      });
+    },
     toggleFilters(reportType: ReportType): void {
       this.showFilters[reportType] = !this.showFilters[reportType];
     },

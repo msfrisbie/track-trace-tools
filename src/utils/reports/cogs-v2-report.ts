@@ -411,11 +411,9 @@ export async function loadAndCacheCogsV2Data({
 
 export async function updateCogsV2MasterCostSheet({
   ctx,
-  reportData,
   reportConfig,
 }: {
   ctx: ActionContext<IReportsState, IPluginState>;
-  reportData: IReportData;
   reportConfig: IReportConfig;
 }) {
   if (!reportConfig[ReportType.COGS_V2]) {
