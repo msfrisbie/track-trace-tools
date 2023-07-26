@@ -8,6 +8,7 @@ import {
   ISpreadsheet,
   ITransferFilter,
 } from "@/interfaces";
+import { clientBuildManager } from "@/modules/client-build-manager.module";
 import { DataLoader, getDataLoaderByLicense } from "@/modules/data-loader/data-loader.module";
 import { facilityManager } from "@/modules/facility-manager.module";
 import { messageBus } from "@/modules/message-bus.module";
@@ -28,10 +29,11 @@ import { getLabelOrError } from "../package";
 import {
   addRowsRequestFactory,
   autoResizeDimensionsRequestFactory,
+  extractSheetIdOrError,
   freezeTopRowRequestFactory,
   styleTopRowRequestFactory,
 } from "../sheets";
-import { writeDataSheet } from "../sheets-export";
+import { appendSpreadsheetValues, readSpreadsheet, writeDataSheet } from "../sheets-export";
 
 interface ICogsReportFormFilters {
   cogsDateGt: string;
@@ -407,7 +409,93 @@ export async function loadAndCacheCogsV2Data({
   return updatedCachedValue;
 }
 
-export async function updateCogsV2MasterCostSheet() {}
+export async function updateCogsV2MasterCostSheet({
+  ctx,
+  reportData,
+  reportConfig,
+}: {
+  ctx: ActionContext<IReportsState, IPluginState>;
+  reportData: IReportData;
+  reportConfig: IReportConfig;
+}) {
+  if (!reportConfig[ReportType.COGS_V2]) {
+    return;
+  }
+  {
+    const { transferFilter, licenses } = reportConfig[ReportType.COGS_V2]!;
+
+    const [departureDateGt] = transferFilter.estimatedDepartureDateGt!.split("T");
+    const [departureDateLt] = getIsoDateFromOffset(
+      1,
+      transferFilter.estimatedDepartureDateLt!
+    ).split("T");
+
+    let { richOutgoingTransfers, ancestorPackages, productionBatchMap, productionBatchPackages } =
+      await loadAndCacheCogsV2Data({
+        ctx,
+        licenses,
+        departureDateGt,
+        departureDateLt,
+      });
+
+    // Load data sheet
+
+    clientBuildManager.assertValues(["MASTER_PB_COST_SHEET_URL"]);
+
+    const spreadsheetId = extractSheetIdOrError(
+      clientBuildManager.clientConfig!.values!["MASTER_PB_COST_SHEET_URL"]
+    );
+
+    const response: { data: { result: { values: any[][] } } } = await readSpreadsheet({
+      spreadsheetId,
+      sheetName: "Worksheet",
+    });
+
+    const currentSheetLabels = new Set(response.data.result.values.map((row) => row[0]));
+    const requiredSheetLabels = new Set(
+      [...productionBatchPackages.values()].map((pkg) => getLabelOrError(pkg))
+    );
+
+    const rows = [];
+
+    for (const label of requiredSheetLabels) {
+      if (!currentSheetLabels.has(label)) {
+        const pkg = ancestorPackages.get(label)!;
+
+        // License
+        // Package Tag
+        // Production Batch Number
+        // PB Total Cost
+        // Cost from Previous PB
+        // Item Name
+        // Initial Quantity
+        // UoM
+        // Packaged Date
+        // Approx Cost per Piece
+        // Approx Cost per Unit
+        // Pieces per Unit
+
+        rows.push([
+          pkg.LicenseNumber,
+          pkg.Label,
+          pkg.ProductionBatchNumber,
+          "",
+          "",
+          pkg.Item.Name,
+          extractInitialPackageQuantityAndUnitFromHistoryOrError(pkg.history!),
+          pkg.UnitOfMeasureAbbreviation,
+          pkg.PackagedDate,
+        ]);
+      }
+    }
+
+    await appendSpreadsheetValues({
+      spreadsheetId,
+      range: "Worksheet!A:L",
+      values: rows,
+    });
+  }
+}
 
 export async function maybeLoadCogsV2ReportData({
   ctx,
@@ -424,34 +512,6 @@ export async function maybeLoadCogsV2ReportData({
 
   // packageFilter and transferFilter will have identical dates
   const { transferFilter, licenses } = reportConfig[ReportType.COGS_V2]!;
-
-  // Load data sheet
-
-  //   clientBuildManager.assertValues(["MASTER_PB_COST_SHEET_URL"]);
-
-  //   const spreadsheetId = extractSheetIdOrError(
-  //     clientBuildManager.clientConfig!.values!["MASTER_PB_COST_SHEET_URL"]
-  //   );
-
-  //   const response: { data: { result: { values: any[][] } } } = await readSpreadsheet({
-  //     spreadsheetId,
-  //     sheetName: "Worksheet",
-  //   });
-
-  //   await appendSpreadsheetValues({
-  //     spreadsheetId,
-  //     range: "Worksheet!A:H",
-  //     values: [
-  //       [1, 2, 3, 4, 5, 6, 7, 8],
-  //       ["a", "b", "c", "d"],
-  //     ],
-  //   });
-
-  //   debugger;
-
-  // Load all packages
-
-  //   let packages: IIndexedPackageData[] = [];
 
   const [departureDateGt] = transferFilter.estimatedDepartureDateGt!.split("T");
   const [departureDateLt] = getIsoDateFromOffset(1, transferFilter.estimatedDepartureDateLt!).split(
