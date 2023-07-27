@@ -363,9 +363,9 @@ export enum BackgroundTaskState {
 const DATA_LOAD_MAX_PAGES: number = 1;
 export const SEARCH_LOAD_PAGE_SIZE: number = 500;
 export const DATA_LOAD_PAGE_SIZE: number = 5000;
-export const DATA_LOAD_MAX_COUNT: number = 5000; //DATA_LOAD_PAGE_SIZE * DATA_LOAD_MAX_PAGES;
+export const DATA_LOAD_MAX_COUNT: number = DATA_LOAD_PAGE_SIZE * DATA_LOAD_MAX_PAGES;
 export const DATA_LOAD_MAX_ITERATION_FAILSAFE: number = 100;
-export const DATA_LOAD_FETCH_TIMEOUT_MS: number = 5 * 60 * 1000;
+export const DATA_LOAD_FETCH_TIMEOUT_MS: number = 3 * 60 * 1000;
 
 export const PLANTABLE_ITEM_CATEGORY_NAMES = [
   // Note: this was to match an inconsistency in the plural.

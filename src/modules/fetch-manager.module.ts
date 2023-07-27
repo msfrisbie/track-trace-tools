@@ -2,7 +2,7 @@ import fetchRetry from "fetch-retry";
 
 const fetchWithTimeout = async function (
   input: RequestInfo | URL,
-  init?: RequestInit | undefined,
+  init?: RequestInit | undefined
 ): Promise<Response> {
   const controller = new AbortController();
   const signal = controller.signal;

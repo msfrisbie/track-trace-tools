@@ -399,10 +399,25 @@ export async function loadAndCacheCogsV2Data({
 
     if (historyPromises.length % 100 === 0) {
       await Promise.allSettled(historyPromises);
+
+      ctx.commit(ReportsMutations.SET_STATUS, {
+        statusMessage: {
+          text: `Loaded ${historyPromises.length} package histories....`,
+          level: "success",
+        },
+        prependMessage: false,
+      });
     }
   }
 
   await Promise.allSettled(historyPromises);
+
+  ctx.commit(ReportsMutations.SET_STATUS, {
+    statusMessage: {
+      text: `Loaded ${historyPromises.length} package histories`,
+      level: "success",
+    },
+  });
 
   const updatedCachedValue = {
     packages,
@@ -649,9 +664,9 @@ export async function maybeLoadCogsV2ReportData({
             connectedMessage = "CONNECTED";
             break;
           }
-          const [targetSourcePackageLabel, extraLabels] = target.SourcePackageLabels.split(",").map(
-            (x) => x.trim()
-          );
+          const [targetSourcePackageLabel, ...extraLabels] = target.SourcePackageLabels.split(
+            ","
+          ).map((x) => x.trim());
           if (extraLabels.length > 0) {
             connectedMessage = `${target.Label} mas multiple source packages`;
             break;

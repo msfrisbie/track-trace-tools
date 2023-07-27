@@ -606,7 +606,7 @@ export class MetrcRequestManager implements IAtomicService {
         ...JSON_HEADERS,
       },
       body,
-      signal,
+      //signal,
     });
   }
 
