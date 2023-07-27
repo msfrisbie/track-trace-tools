@@ -1,6 +1,21 @@
 import fetchRetry from "fetch-retry";
 
+const fetchWithTimeout = async function (
+  input: RequestInfo | URL,
+  init?: RequestInit | undefined,
+): Promise<Response> {
+  const controller = new AbortController();
+  const signal = controller.signal;
+
+  const timeout = 30000;
+
+  const timeoutId = setTimeout(() => controller.abort(), timeout);
+
+  return fetch(input, { ...init, signal }).finally(() => clearTimeout(timeoutId));
+};
+
 export const customFetch = fetchRetry(fetch);
+export const customTimeoutFetch = fetchRetry(fetchWithTimeout);
 
 // https://www.npmjs.com/package/fetch-retry
 export const retryDefaults = {

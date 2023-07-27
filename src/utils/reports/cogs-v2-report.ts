@@ -88,10 +88,10 @@ export async function loadAndCacheCogsV2Data({
 }): Promise<{
   packages: IIndexedPackageData[];
   richOutgoingTransfers: IIndexedRichOutgoingTransferData[];
-  ancestorPackages: Map<string, IIndexedPackageData>;
-  productionBatchPackages: Map<string, IIndexedPackageData>;
-  packageLabelMap: Map<string, IIndexedPackageData>;
-  productionBatchMap: Map<string, IIndexedPackageData>;
+  scopedAncestorPackageMap: Map<string, IIndexedPackageData>;
+  scopedProductionBatchPackageMap: Map<string, IIndexedPackageData>;
+  fullPackageLabelMap: Map<string, IIndexedPackageData>;
+  fullProductionBatchMap: Map<string, IIndexedPackageData>;
 }> {
   const COGS_V2_CACHE_KEY = `COGS_V2_DATA__${licenses.join(
     ","
@@ -332,20 +332,20 @@ export async function loadAndCacheCogsV2Data({
     },
   });
 
-  const packageLabelMap = new Map<string, IIndexedPackageData>(
+  const fullPackageLabelMap = new Map<string, IIndexedPackageData>(
     packages.map((pkg) => [pkg.Label, pkg])
   );
-  const productionBatchMap = new Map<string, IIndexedPackageData>(
+  const fullProductionBatchMap = new Map<string, IIndexedPackageData>(
     packages
       .filter((pkg) => !!pkg.ProductionBatchNumber)
       .map((pkg) => [pkg.ProductionBatchNumber, pkg])
   );
 
   // Keyed by label
-  const ancestorPackages: Map<string, IIndexedPackageData> = new Map();
+  const scopedAncestorPackageMap: Map<string, IIndexedPackageData> = new Map();
 
   // Keyed by production batch
-  const productionBatchPackages: Map<string, IIndexedPackageData> = new Map();
+  const scopedProductionBatchPackageMap: Map<string, IIndexedPackageData> = new Map();
 
   for (const transfer of richOutgoingTransfers) {
     const manifestNumber = transfer.ManifestNumber;
@@ -357,27 +357,30 @@ export async function loadAndCacheCogsV2Data({
         );
 
         const matchedSourcePackages: IIndexedPackageData[] = sourcePackageLabels
-          .filter((x) => packageLabelMap.has(x))
-          .map((x) => packageLabelMap.get(x)!);
+          .filter((x) => fullPackageLabelMap.has(x))
+          .map((x) => fullPackageLabelMap.get(x)!);
 
         if (matchedSourcePackages.length !== sourcePackageLabels.length) {
           console.error("Unable to match one or more source packages");
         }
 
-        matchedSourcePackages.map((pkg) => ancestorPackages.set(pkg.Label, pkg));
+        matchedSourcePackages.map((pkg) => scopedAncestorPackageMap.set(pkg.Label, pkg));
 
         const sourceProductionBatchNumbers: string[] = matchedSourcePackages.map(
           (pkg) => pkg.SourceProductionBatchNumbers || pkg.ProductionBatchNumber
         );
 
-        const sourceProductionBatchPackages: IIndexedPackageData[] = sourceProductionBatchNumbers
-          .filter((x) => productionBatchMap.has(x))
-          .map((x) => productionBatchMap.get(x)!);
+        const sourcescopedProductionBatchPackageMap: IIndexedPackageData[] =
+          sourceProductionBatchNumbers
+            .filter((x) => fullProductionBatchMap.has(x))
+            .map((x) => fullProductionBatchMap.get(x)!);
 
         // Add to both maps
-        sourceProductionBatchPackages.map((pkg) => ancestorPackages.set(pkg.Label, pkg));
-        sourceProductionBatchPackages.map((pkg) =>
-          productionBatchPackages.set(pkg.ProductionBatchNumber, pkg)
+        sourcescopedProductionBatchPackageMap.map((pkg) =>
+          scopedAncestorPackageMap.set(pkg.Label, pkg)
+        );
+        sourcescopedProductionBatchPackageMap.map((pkg) =>
+          scopedProductionBatchPackageMap.set(pkg.ProductionBatchNumber, pkg)
         );
       }
     }
@@ -385,7 +388,7 @@ export async function loadAndCacheCogsV2Data({
 
   const historyPromises: Promise<any>[] = [];
 
-  for (const pkg of ancestorPackages.values()) {
+  for (const pkg of scopedAncestorPackageMap.values()) {
     const dataLoader = await getDataLoaderByLicense(pkg.LicenseNumber);
 
     historyPromises.push(
@@ -404,10 +407,10 @@ export async function loadAndCacheCogsV2Data({
   const updatedCachedValue = {
     packages,
     richOutgoingTransfers,
-    ancestorPackages,
-    productionBatchPackages,
-    packageLabelMap,
-    productionBatchMap,
+    scopedAncestorPackageMap,
+    scopedProductionBatchPackageMap,
+    fullPackageLabelMap,
+    fullProductionBatchMap,
   };
 
   // @ts-ignore
@@ -435,13 +438,18 @@ export async function updateCogsV2MasterCostSheet({
       transferFilter.estimatedDepartureDateLt!
     ).split("T");
 
-    let { richOutgoingTransfers, ancestorPackages, productionBatchMap, productionBatchPackages } =
-      await loadAndCacheCogsV2Data({
-        ctx,
-        licenses,
-        departureDateGt,
-        departureDateLt,
-      });
+    let {
+      richOutgoingTransfers,
+      scopedAncestorPackageMap,
+      fullPackageLabelMap,
+      fullProductionBatchMap,
+      scopedProductionBatchPackageMap,
+    } = await loadAndCacheCogsV2Data({
+      ctx,
+      licenses,
+      departureDateGt,
+      departureDateLt,
+    });
 
     // Load data sheet
 
@@ -459,14 +467,14 @@ export async function updateCogsV2MasterCostSheet({
     // Ignore header
     const currentSheetLabels = new Set(response.data.result.values.slice(1).map((row) => row[1]));
     const requiredSheetLabels = new Set(
-      [...productionBatchPackages.values()].map((pkg) => getLabelOrError(pkg))
+      [...scopedProductionBatchPackageMap.values()].map((pkg) => getLabelOrError(pkg))
     );
 
     const rows = [];
 
     for (const label of requiredSheetLabels) {
       if (!currentSheetLabels.has(label)) {
-        const pkg = ancestorPackages.get(label)!;
+        const pkg = scopedAncestorPackageMap.get(label)!;
 
         // License
         // Package Tag
@@ -524,25 +532,34 @@ export async function maybeLoadCogsV2ReportData({
     "T"
   );
 
-  let { richOutgoingTransfers, ancestorPackages, productionBatchMap } =
-    await loadAndCacheCogsV2Data({
-      ctx,
-      licenses,
-      departureDateGt,
-      departureDateLt,
-    });
+  let {
+    richOutgoingTransfers,
+    scopedAncestorPackageMap,
+    fullProductionBatchMap,
+    fullPackageLabelMap,
+  } = await loadAndCacheCogsV2Data({
+    ctx,
+    licenses,
+    departureDateGt,
+    departureDateLt,
+  });
 
   const auditData = {};
   const worksheetMatrix: any[][] = [];
   const cogsMatrix: any[][] = [];
 
-  worksheetMatrix.push(["Package Tag", "Production Batch #", "Cost"]);
+  clientBuildManager.assertValues(["MASTER_PB_COST_SHEET_URL"]);
 
-  for (const [label, pkg] of ancestorPackages) {
-    if (pkg.ProductionBatchNumber.length > 0) {
-      worksheetMatrix.push([pkg.Label, pkg.ProductionBatchNumber, 0]);
-    }
-  }
+  const spreadsheetId = extractSheetIdOrError(
+    clientBuildManager.clientConfig!.values!["MASTER_PB_COST_SHEET_URL"]
+  );
+
+  const response: { data: { result: { values: any[][] } } } = await readSpreadsheet({
+    spreadsheetId,
+    sheetName: "Worksheet",
+  });
+
+  response.data.result.values.map((row) => worksheetMatrix.push(row));
 
   cogsMatrix.push([
     "License",
@@ -555,6 +572,7 @@ export async function maybeLoadCogsV2ReportData({
     "Multiplier",
     "Package COGS",
     "Unit COGS",
+    "Is Connected?",
     "Note",
   ]);
 
@@ -579,6 +597,7 @@ export async function maybeLoadCogsV2ReportData({
             null,
             null,
             null,
+            null,
             `Invalid src package count: ${sourcePackageLabels.length}`,
           ]);
           continue;
@@ -586,9 +605,10 @@ export async function maybeLoadCogsV2ReportData({
 
         const [sourcePackageLabel] = sourcePackageLabels;
 
-        if (!ancestorPackages.has(sourcePackageLabel)) {
+        if (!scopedAncestorPackageMap.has(sourcePackageLabel)) {
           cogsMatrix.push([
             getLabelOrError(pkg),
+            null,
             null,
             null,
             null,
@@ -603,9 +623,10 @@ export async function maybeLoadCogsV2ReportData({
           continue;
         }
 
-        const sourcePackage: IIndexedPackageData = ancestorPackages.get(sourcePackageLabel)!;
+        const sourcePackage: IIndexedPackageData =
+          scopedAncestorPackageMap.get(sourcePackageLabel)!;
 
-        // This is the source PB.
+        // Initial guess as the source PB
         const tagQuantityUnitSets = extractChildPackageTagQuantityUnitSetsFromHistory(
           sourcePackage.history!
         );
@@ -619,6 +640,30 @@ export async function maybeLoadCogsV2ReportData({
         );
 
         const sourcePackageMultiplier = childPackageQuantity[1] / initialQuantity[0];
+
+        let connectedMessage = "Not connected - initial";
+        let target: IIndexedPackageData = sourcePackage;
+
+        while (true) {
+          if (target.ProductionBatchNumber.length > 0) {
+            connectedMessage = "CONNECTED";
+            break;
+          }
+          const [targetSourcePackageLabel, extraLabels] = target.SourcePackageLabels.split(",").map(
+            (x) => x.trim()
+          );
+          if (extraLabels.length > 0) {
+            connectedMessage = `${target.Label} mas multiple source packages`;
+            break;
+          }
+
+          if (!fullPackageLabelMap.has(targetSourcePackageLabel)) {
+            connectedMessage = `Unable to match ${targetSourcePackageLabel}, parent of ${target.Label}`;
+            break;
+          }
+
+          target = fullPackageLabelMap.get(target.Label)!;
+        }
 
         if (sourcePackage.ProductionBatchNumber.length > 0) {
           // "License",
@@ -643,8 +688,9 @@ export async function maybeLoadCogsV2ReportData({
             `=${sourcePackageMultiplier}`,
             `=INDIRECT(ADDRESS(ROW(), COLUMN()-1)) * VLOOKUP("${getLabelOrError(
               sourcePackage
-            )}", Worksheet!A:C, 3, FALSE)`,
+            )}", Worksheet!B:D, 3, FALSE)`,
             `=INDIRECT(ADDRESS(ROW(), COLUMN()-1)) / ${pkg.ShippedQuantity}`,
+            connectedMessage,
             null,
           ]);
         } else {
@@ -665,6 +711,7 @@ export async function maybeLoadCogsV2ReportData({
               null,
               null,
               null,
+              null,
               `Invalid pb count: ${sourceProductionBatchNames.length}`,
             ]);
             continue;
@@ -672,11 +719,12 @@ export async function maybeLoadCogsV2ReportData({
 
           const [sourceProductionBatchName] = sourceProductionBatchNames;
 
-          const pbPackage = productionBatchMap.get(sourceProductionBatchName)!;
+          const pbPackage = fullProductionBatchMap.get(sourceProductionBatchName)!;
 
           if (!pbPackage) {
             cogsMatrix.push([
               getLabelOrError(pkg),
+              null,
               null,
               null,
               null,
@@ -729,8 +777,9 @@ export async function maybeLoadCogsV2ReportData({
             `=${sourcePackageMultiplier} * ${pbPackageMultiplier}`,
             `=INDIRECT(ADDRESS(ROW(), COLUMN()-1)) * VLOOKUP("${getLabelOrError(
               pbPackage
-            )}", Worksheet!A:C, 3, FALSE)`,
+            )}", Worksheet!B:D, 3, FALSE)`,
             `=INDIRECT(ADDRESS(ROW(), COLUMN()-1)) / ${pkg.ShippedQuantity}`,
+            connectedMessage,
             note,
           ]);
         }
@@ -818,6 +867,13 @@ export async function createCogsV2SpreadsheetOrError({
     SHEETS_API_MESSAGE_TIMEOUT_MS
   );
 
+  const [departureDateGt] =
+    reportConfig[ReportType.COGS_V2]!.transferFilter.estimatedDepartureDateGt!.split("T")!;
+  const [departureDateLt] = getIsoDateFromOffset(
+    1,
+    reportConfig[ReportType.COGS_V2]!.transferFilter.estimatedDepartureDateLt!
+  ).split("T");
+
   await messageBus.sendMessageToBackground(
     MessageType.WRITE_SPREADSHEET_VALUES,
     {
@@ -825,7 +881,15 @@ export async function createCogsV2SpreadsheetOrError({
       range: `'${SheetTitles.OVERVIEW}'`,
       values: [
         [],
-        [],
+        [
+          [null, `Date range`, `${departureDateGt}-${departureDateLt}`],
+          [null, `# Manifests`, `=COUNTUNIQUE('Manifest Cogs'!B2:B)`],
+          [null, `# Manifest Packages`, `=COUNTUNIQUE('Manifest Cogs'!C2:C)`],
+          [null, `# Source PBs`, `=COUNTUNIQUE('Worksheet'!B2:B)`],
+          [null, `# Packages w/ mismatched PB item`, `=COUNTA('Manifest Cogs'!K2:K)`],
+          [null, `# Manifest Packages w/ $0 COGS`, `=COUNTIF('Manifest Cogs'!I2:I, 0)`],
+          [null, `# PB Packages w/ $0 cost`, `=COUNTIF(Worksheet!D2:D, 0)`],
+        ],
         ...Object.entries(auditData).map(([key, value]) => ["", key, JSON.stringify(value)]),
       ],
     },
