@@ -349,8 +349,6 @@ export async function loadAndCacheCogsV2Data({
   const scopedProductionBatchPackageMap: Map<string, IIndexedPackageData> = new Map();
 
   for (const transfer of richOutgoingTransfers) {
-    const manifestNumber = transfer.ManifestNumber;
-
     for (const destination of transfer.outgoingDestinations || []) {
       for (const pkg of destination.packages || []) {
         const sourcePackageLabels: string[] = pkg.SourcePackageLabels.split(",").map((x) =>
@@ -365,56 +363,47 @@ export async function loadAndCacheCogsV2Data({
           console.error("Unable to match one or more source packages");
         }
 
-        for (const pkg of matchedSourcePackages) {
-          const buffer: IIndexedPackageData[] = [pkg];
+        const buffer: IIndexedPackageData[] = [...matchedSourcePackages];
 
-          let count = 0;
-          while (buffer.length > 0) {
-            ++count;
+        while (buffer.length > 0) {
+          let target = buffer.pop()!;
 
-            let target = buffer.pop()!;
+          scopedAncestorPackageMap.set(target.Label, target);
 
-            if (count % 100 === 0) {
-              console.log("Walking history tree", count, { target });
-            }
+          if (target.ProductionBatchNumber.length > 0) {
+            scopedProductionBatchPackageMap.set(target.ProductionBatchNumber, target);
+            break;
+          }
 
-            scopedAncestorPackageMap.set(pkg.Label, pkg);
+          const targetSourcePackageLabels = target.SourcePackageLabels.split(",").map((x) =>
+            x.trim()
+          );
 
-            if (target.ProductionBatchNumber.length > 0) {
-              scopedProductionBatchPackageMap.set(pkg.ProductionBatchNumber, pkg);
-              break;
-            }
-
-            const targetSourcePackageLabels = target.SourcePackageLabels.split(",").map((x) =>
-              x.trim()
-            );
-
-            for (const label of targetSourcePackageLabels) {
-              if (fullPackageLabelMap.has(label)) {
-                buffer.push(fullPackageLabelMap.get(label)!);
-              }
+          for (const label of targetSourcePackageLabels) {
+            if (fullPackageLabelMap.has(label)) {
+              buffer.push(fullPackageLabelMap.get(label)!);
             }
           }
         }
 
-        matchedSourcePackages.map((pkg) => scopedAncestorPackageMap.set(pkg.Label, pkg));
+        // const sourceProductionBatchNumbers: string[] = matchedSourcePackages.map((pkg) =>
+        //   pkg.ProductionBatchNumber.length > 0
+        //     ? [pkg.ProductionBatchNumber]
+        //     : pkg.SourceProductionBatchNumbers.split(",").map((x) => x.trim())
+        // );
 
-        const sourceProductionBatchNumbers: string[] = matchedSourcePackages.map(
-          (pkg) => pkg.SourceProductionBatchNumbers || pkg.ProductionBatchNumber
-        );
+        // const scopedSourceProductionBatchPackages: IIndexedPackageData[] =
+        //   sourceProductionBatchNumbers
+        //     .filter((x) => fullProductionBatchMap.has(x))
+        //     .map((x) => fullProductionBatchMap.get(x)!);
 
-        const scopedSourceProductionBatchPackages: IIndexedPackageData[] =
-          sourceProductionBatchNumbers
-            .filter((x) => fullProductionBatchMap.has(x))
-            .map((x) => fullProductionBatchMap.get(x)!);
-
-        // Add to both maps
-        scopedSourceProductionBatchPackages.map((pkg) =>
-          scopedAncestorPackageMap.set(pkg.Label, pkg)
-        );
-        scopedSourceProductionBatchPackages.map((pkg) =>
-          scopedProductionBatchPackageMap.set(pkg.ProductionBatchNumber, pkg)
-        );
+        // // Add to both maps
+        // scopedSourceProductionBatchPackages.map((pkg) =>
+        //   scopedAncestorPackageMap.set(pkg.Label, pkg)
+        // );
+        // scopedSourceProductionBatchPackages.map((pkg) =>
+        //   scopedProductionBatchPackageMap.set(pkg.ProductionBatchNumber, pkg)
+        // );
       }
     }
   }
@@ -618,30 +607,31 @@ export async function maybeLoadCogsV2ReportData({
     "Item",
     "Quantity",
     "Units",
-    "Multiplier",
     "Package COGS",
     "Unit COGS",
-    "Is Connected?",
+    "Status",
     "Note",
   ]);
 
   function computeIsConnected(
     pkg: IIndexedPackageData,
-    fullPackageLabelMap: Map<string, IIndexedPackageData>
+    scopedAncestorPackageMap: Map<string, IIndexedPackageData>
   ): [boolean, string] {
     let buffer: IIndexedPackageData[] = [pkg];
 
     while (buffer.length > 0) {
       const target = buffer.pop()!;
 
-      const sourcePackageLabels = target.SourcePackageLabels.split(",").map((x) => x.trim());
+      const sourcePackageLabels: string[] = target.SourcePackageLabels.split(",").map((x) =>
+        x.trim()
+      );
 
       for (const label of sourcePackageLabels) {
-        if (!fullPackageLabelMap.has(label)) {
+        if (!scopedAncestorPackageMap.has(label)) {
           return [false, `${label} missing from package map`];
         }
 
-        const matchedPkg = fullPackageLabelMap.get(label)!;
+        const matchedPkg = scopedAncestorPackageMap.get(label)!;
 
         if (matchedPkg.ProductionBatchNumber.length > 0) {
           continue;
@@ -706,8 +696,7 @@ export async function maybeLoadCogsV2ReportData({
             "",
             "",
             "",
-            "",
-            "",
+            "FAIL",
             `Invalid src package count: ${sourcePackageLabels.length}`,
           ]);
           continue;
@@ -726,8 +715,7 @@ export async function maybeLoadCogsV2ReportData({
             "",
             "",
             "",
-            "",
-            "",
+            "FAIL",
             `Missing src package: ${sourcePackageLabel}`,
           ]);
           continue;
@@ -738,10 +726,11 @@ export async function maybeLoadCogsV2ReportData({
 
         let note = "";
         let costEquation = `=0`;
+        let status = "INITIAL";
 
         const [isConnected, isConnectedMessage] = computeIsConnected(
           sourcePackage,
-          fullPackageLabelMap
+          scopedAncestorPackageMap
         );
         const [isEligibleForItemOptimization, isEligibleForItemOptimizationMesage] =
           computeIsEligibleForItemOptimization(
@@ -758,6 +747,12 @@ export async function maybeLoadCogsV2ReportData({
               : sourcePackage.SourceProductionBatchNumbers
           )!;
 
+          if (!sourceProductionBatch.history) {
+            status = "FAIL";
+            note = `Src PB ${sourceProductionBatch.Label} is missing history`;
+            break;
+          }
+
           const initialProductionBatchQuantity =
             extractInitialPackageQuantityAndUnitFromHistoryOrError(sourceProductionBatch.history!);
 
@@ -768,9 +763,11 @@ export async function maybeLoadCogsV2ReportData({
             sourceProductionBatch
           )}", Worksheet!B:D, 3, FALSE)`;
 
-          note = "Used optimization";
+          if (status === "INITIAL") {
+            note = "Used optimization";
+            status = "SUCCESS";
+          }
         } else if (isConnected) {
-          debugger;
           // Is connected, walk up package tree recursively
 
           try {
@@ -782,12 +779,24 @@ export async function maybeLoadCogsV2ReportData({
             while (connectedMultiplierBuffer.length > 0) {
               const [target, childLabel, currentMultiplier] = connectedMultiplierBuffer.pop()!;
 
+              if (!target.history) {
+                status = "FAIL";
+                note = `${target.Label} is missing history`;
+                break;
+              }
+
               const initialProductionBatchQuantity =
                 extractInitialPackageQuantityAndUnitFromHistoryOrError(target.history!);
 
               const childPackageQuantity = extractChildPackageTagQuantityUnitSetsFromHistory(
                 sourcePackage.history!
-              ).find((x) => x[0] === childLabel)!;
+              ).find((x) => x[0] === childLabel);
+
+              if (!childPackageQuantity) {
+                status = "FAIL";
+                note = `Unable to extract ${childLabel} in ${target.Label} history`;
+                break;
+              }
 
               const newMultiplier =
                 currentMultiplier * (childPackageQuantity[1] / initialProductionBatchQuantity[0]);
@@ -802,28 +811,41 @@ export async function maybeLoadCogsV2ReportData({
                 );
 
                 for (const label of sourcePackageLabels) {
-                  const source = fullPackageLabelMap.get(label)!;
+                  const source = scopedAncestorPackageMap.get(label);
+
+                  if (!source) {
+                    status = "FAIL";
+                    note = `Unable to find ${label} in scopedAncestorPackageMap`;
+                    break;
+                  }
 
                   connectedMultiplierBuffer.push([source, target.Label, newMultiplier]);
                 }
               }
             }
 
-            costEquation =
-              "=" +
-              finalBuffer
-                .map(
-                  ([pkg, multiplier]) =>
-                    `(${multiplier} * VLOOKUP("${getLabelOrError(pkg)}", Worksheet!B:D, 3, FALSE))`
-                )
-                .join(" + ");
+            if (status === "INITIAL") {
+              costEquation =
+                "=" +
+                finalBuffer
+                  .map(
+                    ([pkg, multiplier]) =>
+                      `(${multiplier} * VLOOKUP("${getLabelOrError(
+                        pkg
+                      )}", Worksheet!B:D, 3, FALSE))`
+                  )
+                  .join(" + ");
 
-            note = "Walked graph";
+              note = "Walked graph";
+              status = "SUCCESS";
+            }
           } catch (e) {
-            note = `ERROR: failed to walk graph, ${e}`;
+            note = `Failed to walk graph, ${e}`;
+            status = "FAIL";
           }
         } else {
-          note = `ERROR: Package is not connected and is not eligible for item match optimization`;
+          note = `No eligible strategy - ${isEligibleForItemOptimizationMesage} /// ${isConnectedMessage}`;
+          status = "FAIL";
         }
 
         // "License",
@@ -846,6 +868,7 @@ export async function maybeLoadCogsV2ReportData({
           manifestPkg.ShippedUnitOfMeasureAbbreviation,
           costEquation,
           `=INDIRECT(ADDRESS(ROW(), COLUMN()-1)) / ${manifestPkg.ShippedQuantity}`,
+          status,
           note,
         ]);
       }
