@@ -115,15 +115,22 @@
                   />
                 </div>
 
-                <b-form-group label="Licenses:">
-                  <b-form-checkbox-group
-                    v-model="cogsV2FormFilters.licenses"
-                    :options="cogsV2FormFilters.licenseOptions"
-                  ></b-form-checkbox-group>
-                </b-form-group>
-
                 <b-button @click="updateMasterPbCostSheet()">UPDATE MASTER PB COST SHEET</b-button>
                 <a href="masterCostSheetUrl" target="_blank">Master PB Cost Sheet</a>
+
+                <b-button @click="showCogsV2Advanced = !showCogsV2Advanced"
+                  >TOGGLE ADVANCED</b-button
+                >
+                <template v-if="showCogsV2Advanced">
+                  <b-form-group label="Licenses:">
+                    <b-form-checkbox-group
+                      v-model="cogsV2FormFilters.licenses"
+                      :options="cogsV2FormFilters.licenseOptions"
+                    ></b-form-checkbox-group>
+                  </b-form-group>
+
+                  <blob-cache-widget :cachekey="cogsV2key"></blob-cache-widget>
+                </template>
               </div>
             </div>
           </template>
@@ -1369,7 +1376,11 @@ import {
 import { IReportConfig } from "@/store/page-overlay/modules/reports/interfaces";
 import { getIsoDateFromOffset, todayIsodate } from "@/utils/date";
 import { addCogsReport, cogsFormFiltersFactory } from "@/utils/reports/cogs-report";
-import { addCogsV2Report, cogsV2FormFiltersFactory } from "@/utils/reports/cogs-v2-report";
+import {
+  addCogsV2Report,
+  cogsV2FormFiltersFactory,
+  getCogsV2CacheKey,
+} from "@/utils/reports/cogs-v2-report";
 import {
   addCogsTrackerReport,
   cogsTrackerFormFiltersFactory,
@@ -1409,6 +1420,7 @@ import _ from "lodash-es";
 import Vue from "vue";
 import { mapActions, mapState } from "vuex";
 import ArchiveWidget from "../shared/ArchiveWidget.vue";
+import BlobCacheWidget from "../shared/BlobCacheWidget.vue";
 import {
   addEmployeeSamplesReport,
   employeeSamplesFormFiltersFactory,
@@ -1431,6 +1443,7 @@ export default Vue.extend({
   props: {},
   components: {
     ArchiveWidget,
+    BlobCacheWidget,
   },
   computed: {
     ...mapState<IPluginState>({
@@ -1452,6 +1465,13 @@ export default Vue.extend({
     enableT3Plus(): boolean {
       return clientBuildManager.assertValues(["ENABLE_T3PLUS"]);
     },
+    cogsV2key(): string {
+      return getCogsV2CacheKey({
+        licenses: this.$data.cogsV2FormFilters.licenses,
+        departureDateGt: this.$data.cogsV2FormFilters.cogsDateGt,
+        departureDateLt: this.$data.cogsV2FormFilters.cogsDateLt,
+      });
+    },
   },
   data(): any {
     return {
@@ -1462,7 +1482,7 @@ export default Vue.extend({
       selectedReports: [] as ReportType[],
       cogsFormFilters: cogsFormFiltersFactory(),
       cogsV2FormFilters: cogsV2FormFiltersFactory(),
-      
+      showCogsV2Advanced: false,
       cogsTrackerFormFilters: cogsTrackerFormFiltersFactory(),
       packagesFormFilters: packageFormFiltersFactory(),
       stragglerPackagesFormFilters: stragglerPackagesFormFiltersFactory(),

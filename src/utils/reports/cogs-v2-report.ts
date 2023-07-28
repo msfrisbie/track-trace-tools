@@ -76,6 +76,18 @@ export function addCogsV2Report({
   };
 }
 
+export function getCogsV2CacheKey({
+  licenses,
+  departureDateLt,
+  departureDateGt,
+}: {
+  licenses: string[];
+  departureDateGt: string;
+  departureDateLt: string;
+}): string {
+  return `COGS_V2_DATA__${licenses.join(",")}__${departureDateGt}__${departureDateLt}`;
+}
+
 export async function loadAndCacheCogsV2Data({
   ctx,
   licenses,
@@ -94,244 +106,242 @@ export async function loadAndCacheCogsV2Data({
   fullPackageLabelMap: Map<string, IIndexedPackageData>;
   fullProductionBatchMap: Map<string, IIndexedPackageData>;
 }> {
-  const COGS_V2_CACHE_KEY = `COGS_V2_DATA__${licenses.join(
-    ","
-  )}__${departureDateGt}__${departureDateLt}`;
-
-  // @ts-ignore
-  const cachedValue = globalThis[COGS_V2_CACHE_KEY];
-
-  if (cachedValue) {
-    return cachedValue;
-  }
+  const COGS_V2_CACHE_KEY = getCogsV2CacheKey({ licenses, departureDateGt, departureDateLt });
 
   let dataLoader: DataLoader | null = null;
 
   // @ts-ignore
   let packages: IIndexedPackageData[] = [];
-
-  for (const license of licenses) {
-    ctx.commit(ReportsMutations.SET_STATUS, {
-      statusMessage: { text: `Loading ${license} packages...`, level: "success" },
-    });
-
-    dataLoader = await getDataLoaderByLicense(license);
-
-    await dataLoader.activePackages().then(
-      (pkgs) => (packages = packages.concat(pkgs)),
-      (e) => {
-        ctx.commit(ReportsMutations.SET_STATUS, {
-          statusMessage: {
-            text: `Failed to load active packages. (${license})`,
-            level: "warning",
-          },
-        });
-        throw e;
-      }
-    );
-
-    await dataLoader.onHoldPackages().then(
-      (pkgs) => (packages = packages.concat(pkgs)),
-      (e) => {
-        ctx.commit(ReportsMutations.SET_STATUS, {
-          statusMessage: {
-            text: `Failed to load on hold packages. (${license})`,
-            level: "warning",
-          },
-        });
-        throw e;
-      }
-    );
-
-    await dataLoader.inactivePackages().then(
-      (pkgs) => (packages = packages.concat(pkgs)),
-      (e) => {
-        ctx.commit(ReportsMutations.SET_STATUS, {
-          statusMessage: {
-            text: `Failed to load inactive packages. (${license})`,
-            level: "warning",
-          },
-        });
-        throw e;
-      }
-    );
-
-    await dataLoader.inTransitPackages().then(
-      (pkgs) => (packages = packages.concat(pkgs)),
-      (e) => {
-        ctx.commit(ReportsMutations.SET_STATUS, {
-          statusMessage: {
-            text: `Failed to load in transit packages. (${license})`,
-            level: "warning",
-          },
-        });
-        throw e;
-      }
-    );
-  }
-
   let richOutgoingTransfers: IIndexedRichOutgoingTransferData[] = [];
 
-  for (const license of licenses) {
-    ctx.commit(ReportsMutations.SET_STATUS, {
-      statusMessage: { text: `Loading ${license} transfers...`, level: "success" },
-    });
+  // @ts-ignore
+  const cachedValue = globalThis[COGS_V2_CACHE_KEY];
 
-    dataLoader = await getDataLoaderByLicense(license);
-    try {
-      const outgoingTransfers = await dataLoader.outgoingTransfers();
-      richOutgoingTransfers = [...richOutgoingTransfers, ...outgoingTransfers];
-    } catch (e) {
+  if (cachedValue) {
+    packages = cachedValue.packages;
+    richOutgoingTransfers = cachedValue.richOutgoingTransfers;
+  } else {
+    for (const license of licenses) {
       ctx.commit(ReportsMutations.SET_STATUS, {
-        statusMessage: { text: "Failed to load outgoing transfers.", level: "warning" },
+        statusMessage: { text: `Loading ${license} packages...`, level: "success" },
       });
-      throw e;
-    }
 
-    try {
-      const rejectedTransfers = await dataLoader.rejectedTransfers();
-      richOutgoingTransfers = [...richOutgoingTransfers, ...rejectedTransfers];
-    } catch (e) {
-      ctx.commit(ReportsMutations.SET_STATUS, {
-        statusMessage: { text: "Failed to load rejected transfers.", level: "warning" },
-      });
-      throw e;
-    }
+      dataLoader = await getDataLoaderByLicense(license);
 
-    try {
-      const outgoingInactiveTransfers = await dataLoader.outgoingInactiveTransfers();
-      richOutgoingTransfers = [...richOutgoingTransfers, ...outgoingInactiveTransfers];
-    } catch (e) {
-      ctx.commit(ReportsMutations.SET_STATUS, {
-        statusMessage: { text: "Failed to load outgoing inactive transfers.", level: "warning" },
-      });
-      throw e;
-    }
-  }
-
-  let filter1initial = richOutgoingTransfers.length;
-
-  // Apply wide filter to transfers before loading destinations
-  // createdAt < LT, and lastModified > GT
-  richOutgoingTransfers = richOutgoingTransfers.filter(
-    (x) => x.LastModified > departureDateGt && x.CreatedDateTime < departureDateLt
-  );
-
-  console.log(
-    `Filtered out ${filter1initial - richOutgoingTransfers.length} transfers on first filter`
-  );
-
-  ctx.commit(ReportsMutations.SET_STATUS, {
-    statusMessage: { text: "Loading destinations....", level: "success" },
-  });
-
-  const richOutgoingTransferDestinationRequests: Promise<any>[] = [];
-
-  for (const transfer of richOutgoingTransfers) {
-    richOutgoingTransferDestinationRequests.push(
-      getDataLoaderByLicense(transfer.LicenseNumber).then((dataLoader) =>
-        dataLoader.transferDestinations(transfer.Id).then((destinations) => {
-          transfer.outgoingDestinations = destinations;
-        })
-      )
-    );
-
-    if (richOutgoingTransferDestinationRequests.length % 250 === 0) {
-      await Promise.allSettled(richOutgoingTransferDestinationRequests);
-
-      ctx.commit(ReportsMutations.SET_STATUS, {
-        statusMessage: {
-          text: `Loaded ${richOutgoingTransferDestinationRequests.length} destinations....`,
-          level: "success",
-        },
-        prependMessage: false,
-      });
-    }
-  }
-
-  await Promise.allSettled(richOutgoingTransferDestinationRequests);
-
-  ctx.commit(ReportsMutations.SET_STATUS, {
-    statusMessage: {
-      text: `Loaded ${richOutgoingTransferDestinationRequests.length} destinations`,
-      level: "success",
-    },
-    prependMessage: false,
-  });
-
-  let filter2initial = richOutgoingTransfers.length;
-  let filter2initialSubcount = richOutgoingTransfers
-    .map((x) => (x.outgoingDestinations || []).length)
-    .reduce((a, b) => a + b, 0);
-
-  // Apply rough filter again to destinations based on ETD
-  // etd < LT, and etd > GT
-  richOutgoingTransfers = richOutgoingTransfers
-    .map((x) => {
-      x.outgoingDestinations = (x.outgoingDestinations || []).filter(
-        (y) =>
-          y.ShipmentTypeName.includes("Wholesale") &&
-          y.EstimatedArrivalDateTime >= departureDateGt &&
-          y.EstimatedArrivalDateTime <= departureDateLt
+      await dataLoader.activePackages().then(
+        (pkgs) => (packages = packages.concat(pkgs)),
+        (e) => {
+          ctx.commit(ReportsMutations.SET_STATUS, {
+            statusMessage: {
+              text: `Failed to load active packages. (${license})`,
+              level: "warning",
+            },
+          });
+          throw e;
+        }
       );
 
-      return x;
-    })
-    .filter((z) => (z.outgoingDestinations || []).length > 0);
+      await dataLoader.onHoldPackages().then(
+        (pkgs) => (packages = packages.concat(pkgs)),
+        (e) => {
+          ctx.commit(ReportsMutations.SET_STATUS, {
+            statusMessage: {
+              text: `Failed to load on hold packages. (${license})`,
+              level: "warning",
+            },
+          });
+          throw e;
+        }
+      );
 
-  console.log(
-    `Filtered out ${filter2initial - richOutgoingTransfers.length} transfers and ${
-      filter2initialSubcount -
-      richOutgoingTransfers
-        .map((x) => (x.outgoingDestinations || []).length)
-        .reduce((a, b) => a + b, 0)
-    } destinations on second filter`
-  );
+      await dataLoader.inactivePackages().then(
+        (pkgs) => (packages = packages.concat(pkgs)),
+        (e) => {
+          ctx.commit(ReportsMutations.SET_STATUS, {
+            statusMessage: {
+              text: `Failed to load inactive packages. (${license})`,
+              level: "warning",
+            },
+          });
+          throw e;
+        }
+      );
 
-  ctx.commit(ReportsMutations.SET_STATUS, {
-    statusMessage: { text: "Loading manifest packages...", level: "success" },
-  });
+      await dataLoader.inTransitPackages().then(
+        (pkgs) => (packages = packages.concat(pkgs)),
+        (e) => {
+          ctx.commit(ReportsMutations.SET_STATUS, {
+            statusMessage: {
+              text: `Failed to load in transit packages. (${license})`,
+              level: "warning",
+            },
+          });
+          throw e;
+        }
+      );
+    }
 
-  const packageRequests: Promise<any>[] = [];
+    for (const license of licenses) {
+      ctx.commit(ReportsMutations.SET_STATUS, {
+        statusMessage: { text: `Loading ${license} transfers...`, level: "success" },
+      });
 
-  // Load manifest packages for all transfers
-  for (const transfer of richOutgoingTransfers) {
-    for (const destination of transfer.outgoingDestinations || ([] as IRichDestinationData[])) {
-      packageRequests.push(
+      dataLoader = await getDataLoaderByLicense(license);
+      try {
+        const outgoingTransfers = await dataLoader.outgoingTransfers();
+        richOutgoingTransfers = [...richOutgoingTransfers, ...outgoingTransfers];
+      } catch (e) {
+        ctx.commit(ReportsMutations.SET_STATUS, {
+          statusMessage: { text: "Failed to load outgoing transfers.", level: "warning" },
+        });
+        throw e;
+      }
+
+      try {
+        const rejectedTransfers = await dataLoader.rejectedTransfers();
+        richOutgoingTransfers = [...richOutgoingTransfers, ...rejectedTransfers];
+      } catch (e) {
+        ctx.commit(ReportsMutations.SET_STATUS, {
+          statusMessage: { text: "Failed to load rejected transfers.", level: "warning" },
+        });
+        throw e;
+      }
+
+      try {
+        const outgoingInactiveTransfers = await dataLoader.outgoingInactiveTransfers();
+        richOutgoingTransfers = [...richOutgoingTransfers, ...outgoingInactiveTransfers];
+      } catch (e) {
+        ctx.commit(ReportsMutations.SET_STATUS, {
+          statusMessage: { text: "Failed to load outgoing inactive transfers.", level: "warning" },
+        });
+        throw e;
+      }
+    }
+
+    let filter1initial = richOutgoingTransfers.length;
+
+    // Apply wide filter to transfers before loading destinations
+    // createdAt < LT, and lastModified > GT
+    richOutgoingTransfers = richOutgoingTransfers.filter(
+      (x) => x.LastModified > departureDateGt && x.CreatedDateTime < departureDateLt
+    );
+
+    console.log(
+      `Filtered out ${filter1initial - richOutgoingTransfers.length} transfers on first filter`
+    );
+
+    ctx.commit(ReportsMutations.SET_STATUS, {
+      statusMessage: { text: "Loading destinations....", level: "success" },
+    });
+
+    const richOutgoingTransferDestinationRequests: Promise<any>[] = [];
+
+    for (const transfer of richOutgoingTransfers) {
+      richOutgoingTransferDestinationRequests.push(
         getDataLoaderByLicense(transfer.LicenseNumber).then((dataLoader) =>
-          dataLoader.destinationPackages(destination.Id).then((destinationPackages) => {
-            destination.packages = destinationPackages;
+          dataLoader.transferDestinations(transfer.Id).then((destinations) => {
+            transfer.outgoingDestinations = destinations;
           })
         )
       );
 
-      if (packageRequests.length % 50 === 0) {
-        await Promise.allSettled(packageRequests);
+      if (richOutgoingTransferDestinationRequests.length % 250 === 0) {
+        await Promise.allSettled(richOutgoingTransferDestinationRequests);
 
         ctx.commit(ReportsMutations.SET_STATUS, {
           statusMessage: {
-            text: `Loaded ${packageRequests.length} manifests....`,
+            text: `Loaded ${richOutgoingTransferDestinationRequests.length} destinations....`,
             level: "success",
           },
           prependMessage: false,
         });
       }
     }
-  }
 
-  ctx.commit(ReportsMutations.SET_STATUS, {
-    statusMessage: {
-      text: `Loaded ${packageRequests.length} manifests containing ${richOutgoingTransfers
-        .map((x) =>
-          (x.outgoingDestinations || [])
-            .map((x) => x.packages?.length || 0)
-            .reduce((a, b) => a + b, 0)
-        )
-        .flat()
-        .reduce((a, b) => a + b, 0)} packages`,
-      level: "success",
-    },
-  });
+    await Promise.allSettled(richOutgoingTransferDestinationRequests);
+
+    ctx.commit(ReportsMutations.SET_STATUS, {
+      statusMessage: {
+        text: `Loaded ${richOutgoingTransferDestinationRequests.length} destinations`,
+        level: "success",
+      },
+      prependMessage: false,
+    });
+
+    let filter2initial = richOutgoingTransfers.length;
+    let filter2initialSubcount = richOutgoingTransfers
+      .map((x) => (x.outgoingDestinations || []).length)
+      .reduce((a, b) => a + b, 0);
+
+    // Apply rough filter again to destinations based on ETD
+    // etd < LT, and etd > GT
+    richOutgoingTransfers = richOutgoingTransfers
+      .map((x) => {
+        x.outgoingDestinations = (x.outgoingDestinations || []).filter(
+          (y) =>
+            y.ShipmentTypeName.includes("Wholesale") &&
+            y.EstimatedArrivalDateTime >= departureDateGt &&
+            y.EstimatedArrivalDateTime <= departureDateLt
+        );
+
+        return x;
+      })
+      .filter((z) => (z.outgoingDestinations || []).length > 0);
+
+    console.log(
+      `Filtered out ${filter2initial - richOutgoingTransfers.length} transfers and ${
+        filter2initialSubcount -
+        richOutgoingTransfers
+          .map((x) => (x.outgoingDestinations || []).length)
+          .reduce((a, b) => a + b, 0)
+      } destinations on second filter`
+    );
+
+    ctx.commit(ReportsMutations.SET_STATUS, {
+      statusMessage: { text: "Loading manifest packages...", level: "success" },
+    });
+
+    const packageRequests: Promise<any>[] = [];
+
+    // Load manifest packages for all transfers
+    for (const transfer of richOutgoingTransfers) {
+      for (const destination of transfer.outgoingDestinations || ([] as IRichDestinationData[])) {
+        packageRequests.push(
+          getDataLoaderByLicense(transfer.LicenseNumber).then((dataLoader) =>
+            dataLoader.destinationPackages(destination.Id).then((destinationPackages) => {
+              destination.packages = destinationPackages;
+            })
+          )
+        );
+
+        if (packageRequests.length % 50 === 0) {
+          await Promise.allSettled(packageRequests);
+
+          ctx.commit(ReportsMutations.SET_STATUS, {
+            statusMessage: {
+              text: `Loaded ${packageRequests.length} manifests....`,
+              level: "success",
+            },
+            prependMessage: false,
+          });
+        }
+      }
+    }
+
+    ctx.commit(ReportsMutations.SET_STATUS, {
+      statusMessage: {
+        text: `Loaded ${packageRequests.length} manifests containing ${richOutgoingTransfers
+          .map((x) =>
+            (x.outgoingDestinations || [])
+              .map((x) => x.packages?.length || 0)
+              .reduce((a, b) => a + b, 0)
+          )
+          .flat()
+          .reduce((a, b) => a + b, 0)} packages`,
+        level: "success",
+      },
+    });
+  }
 
   const fullPackageLabelMap = new Map<string, IIndexedPackageData>(
     packages.map((pkg) => [pkg.Label, pkg])
@@ -411,6 +421,10 @@ export async function loadAndCacheCogsV2Data({
   const historyPromises: Promise<any>[] = [];
 
   for (const pkg of scopedAncestorPackageMap.values()) {
+    if (pkg.history !== undefined) {
+      continue;
+    }
+
     const dataLoader = await getDataLoaderByLicense(pkg.LicenseNumber);
 
     historyPromises.push(
@@ -451,7 +465,10 @@ export async function loadAndCacheCogsV2Data({
   };
 
   // @ts-ignore
-  globalThis[COGS_V2_CACHE_KEY] = updatedCachedValue;
+  globalThis[COGS_V2_CACHE_KEY] = {
+    packages,
+    richOutgoingTransfers,
+  };
 
   return updatedCachedValue;
 }
@@ -661,12 +678,10 @@ export async function maybeLoadCogsV2ReportData({
 
     const [sourceProductBatchNumber] = sourceProductionBatchNumbers;
 
-    const sourceProductionBatch = scopedProductionBatchPackageMap.get(
-      sourcePackage.SourceProductionBatchNumbers
-    );
+    const sourceProductionBatch = scopedProductionBatchPackageMap.get(sourceProductBatchNumber);
 
     if (!sourceProductionBatch) {
-      return [false, `${sourceProductionBatch} missing from PB map`];
+      return [false, `${sourcePackage.SourceProductionBatchNumbers} missing from PB map`];
     }
 
     if (sourceProductionBatch.Item.Name !== pkg.ProductName) {
@@ -747,7 +762,7 @@ export async function maybeLoadCogsV2ReportData({
               : sourcePackage.SourceProductionBatchNumbers
           )!;
 
-          if (!sourceProductionBatch.history) {
+          if (sourceProductionBatch.history === undefined) {
             status = "FAIL";
             note = `Src PB ${sourceProductionBatch.Label} is missing history`;
             break;
@@ -779,7 +794,7 @@ export async function maybeLoadCogsV2ReportData({
             while (connectedMultiplierBuffer.length > 0) {
               const [target, childLabel, currentMultiplier] = connectedMultiplierBuffer.pop()!;
 
-              if (!target.history) {
+              if (target.history === undefined) {
                 status = "FAIL";
                 note = `${target.Label} is missing history`;
                 break;
@@ -789,7 +804,7 @@ export async function maybeLoadCogsV2ReportData({
                 extractInitialPackageQuantityAndUnitFromHistoryOrError(target.history!);
 
               const childPackageQuantity = extractChildPackageTagQuantityUnitSetsFromHistory(
-                sourcePackage.history!
+                target.history!
               ).find((x) => x[0] === childLabel);
 
               if (!childPackageQuantity) {
@@ -848,6 +863,11 @@ export async function maybeLoadCogsV2ReportData({
           status = "FAIL";
         }
 
+        const sourceProductionBatch: string =
+          sourcePackage.ProductionBatchNumber.length > 0
+            ? sourcePackage.ProductionBatchNumber
+            : sourcePackage.SourceProductionBatchNumbers;
+
         // "License",
         // "Manifest #",
         // "Package Tag",
@@ -862,7 +882,7 @@ export async function maybeLoadCogsV2ReportData({
           manifestPkg.LicenseNumber,
           manifestNumber,
           getLabelOrError(manifestPkg),
-          sourcePackage.ProductionBatchNumber,
+          sourceProductionBatch,
           manifestPkg.ProductName,
           manifestPkg.ShippedQuantity,
           manifestPkg.ShippedUnitOfMeasureAbbreviation,
