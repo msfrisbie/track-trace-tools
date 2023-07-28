@@ -360,20 +360,26 @@ export async function loadAndCacheCogsV2Data({
 
   for (const transfer of richOutgoingTransfers) {
     for (const destination of transfer.outgoingDestinations || []) {
-      for (const pkg of destination.packages || []) {
-        const sourcePackageLabels: string[] = pkg.SourcePackageLabels.split(",").map((x) =>
+      for (const manifestPkg of destination.packages || []) {
+        const sourcePackageLabels: string[] = manifestPkg.SourcePackageLabels.split(",").map((x) =>
           x.trim()
         );
 
-        const matchedSourcePackages: IIndexedPackageData[] = sourcePackageLabels
-          .filter((x) => fullPackageLabelMap.has(x))
-          .map((x) => fullPackageLabelMap.get(x)!);
-
-        if (matchedSourcePackages.length !== sourcePackageLabels.length) {
-          console.error("Unable to match one or more source packages");
+        if (sourcePackageLabels.length !== 1) {
+          console.error(`${sourcePackageLabels.length} manifest pkg source packages`);
         }
 
-        const buffer: IIndexedPackageData[] = [...matchedSourcePackages];
+        const buffer: IIndexedPackageData[] = [];
+
+        for (const label of sourcePackageLabels) {
+          if (fullPackageLabelMap.has(label)) {
+            buffer.push(fullPackageLabelMap.get(label)!);
+          } else {
+            console.error(
+              `Unable to match source package label ${label} for manifest pkg ${manifestPkg.PackageLabel}`
+            );
+          }
+        }
 
         while (buffer.length > 0) {
           let target = buffer.pop()!;
@@ -382,7 +388,7 @@ export async function loadAndCacheCogsV2Data({
 
           if (target.ProductionBatchNumber.length > 0) {
             scopedProductionBatchPackageMap.set(target.ProductionBatchNumber, target);
-            break;
+            continue;
           }
 
           const targetSourcePackageLabels = target.SourcePackageLabels.split(",").map((x) =>
@@ -392,6 +398,10 @@ export async function loadAndCacheCogsV2Data({
           for (const label of targetSourcePackageLabels) {
             if (fullPackageLabelMap.has(label)) {
               buffer.push(fullPackageLabelMap.get(label)!);
+            } else {
+              console.error(
+                `Unable to match upstream source package label ${label} for pkg ${manifestPkg.PackageLabel}`
+              );
             }
           }
         }
@@ -565,6 +575,67 @@ export async function updateCogsV2MasterCostSheet({
   }
 }
 
+function computeIsConnected(
+  pkg: IIndexedPackageData,
+  scopedAncestorPackageMap: Map<string, IIndexedPackageData>
+): [boolean, string] {
+  let buffer: IIndexedPackageData[] = [pkg];
+
+  while (buffer.length > 0) {
+    const target = buffer.pop()!;
+
+    if (target.ProductionBatchNumber.length > 0) {
+      continue;
+    }
+
+    const sourcePackageLabels: string[] = target.SourcePackageLabels.split(",").map((x) =>
+      x.trim()
+    );
+
+    for (const label of sourcePackageLabels) {
+      if (!scopedAncestorPackageMap.has(label)) {
+        return [false, `${label} missing from package map`];
+      }
+
+      const matchedPkg = scopedAncestorPackageMap.get(label)!;
+
+      buffer.push(matchedPkg);
+    }
+  }
+
+  return [true, ""];
+}
+
+function computeIsEligibleForItemOptimization(
+  pkg: IIndexedDestinationPackageData,
+  sourcePackage: IIndexedPackageData,
+  scopedProductionBatchPackageMap: Map<string, IIndexedPackageData>
+): [boolean, string] {
+  // sourcePackage might itself be the production batch
+  const sourceProductionBatchNumbers: string[] =
+    sourcePackage.ProductionBatchNumber.length > 0
+      ? [sourcePackage.ProductionBatchNumber]
+      : sourcePackage.SourceProductionBatchNumbers.split(",").map((x) => x.trim());
+
+  if (sourceProductionBatchNumbers.length !== 1) {
+    return [false, `Invalid production batch nubmers: ${sourceProductionBatchNumbers}`];
+  }
+
+  const [sourceProductBatchNumber] = sourceProductionBatchNumbers;
+
+  const sourceProductionBatch = scopedProductionBatchPackageMap.get(sourceProductBatchNumber);
+
+  if (!sourceProductionBatch) {
+    return [false, `${sourcePackage.SourceProductionBatchNumbers} missing from PB map`];
+  }
+
+  if (sourceProductionBatch.Item.Name !== pkg.ProductName) {
+    return [false, `Item mismatch: ${sourceProductionBatch.Item.Name} <=> ${pkg.ProductName}`];
+  }
+
+  return [true, ``];
+}
+
 export async function maybeLoadCogsV2ReportData({
   ctx,
   reportData,
@@ -629,67 +700,6 @@ export async function maybeLoadCogsV2ReportData({
     "Status",
     "Note",
   ]);
-
-  function computeIsConnected(
-    pkg: IIndexedPackageData,
-    scopedAncestorPackageMap: Map<string, IIndexedPackageData>
-  ): [boolean, string] {
-    let buffer: IIndexedPackageData[] = [pkg];
-
-    while (buffer.length > 0) {
-      const target = buffer.pop()!;
-
-      const sourcePackageLabels: string[] = target.SourcePackageLabels.split(",").map((x) =>
-        x.trim()
-      );
-
-      for (const label of sourcePackageLabels) {
-        if (!scopedAncestorPackageMap.has(label)) {
-          return [false, `${label} missing from package map`];
-        }
-
-        const matchedPkg = scopedAncestorPackageMap.get(label)!;
-
-        if (matchedPkg.ProductionBatchNumber.length > 0) {
-          continue;
-        }
-
-        buffer.push(matchedPkg);
-      }
-    }
-
-    return [true, ""];
-  }
-
-  function computeIsEligibleForItemOptimization(
-    pkg: IIndexedDestinationPackageData,
-    sourcePackage: IIndexedPackageData,
-    scopedProductionBatchPackageMap: Map<string, IIndexedPackageData>
-  ): [boolean, string] {
-    // sourcePackage might itself be the production batch
-    const sourceProductionBatchNumbers: string[] =
-      sourcePackage.ProductionBatchNumber.length > 0
-        ? [sourcePackage.ProductionBatchNumber]
-        : sourcePackage.SourceProductionBatchNumbers.split(",").map((x) => x.trim());
-
-    if (sourceProductionBatchNumbers.length !== 1) {
-      return [false, `Invalid production batch nubmers: ${sourceProductionBatchNumbers}`];
-    }
-
-    const [sourceProductBatchNumber] = sourceProductionBatchNumbers;
-
-    const sourceProductionBatch = scopedProductionBatchPackageMap.get(sourceProductBatchNumber);
-
-    if (!sourceProductionBatch) {
-      return [false, `${sourcePackage.SourceProductionBatchNumbers} missing from PB map`];
-    }
-
-    if (sourceProductionBatch.Item.Name !== pkg.ProductName) {
-      return [false, `Item mismatch: ${sourceProductionBatch.Item.Name} <=> ${pkg.ProductName}`];
-    }
-
-    return [true, ``];
-  }
 
   for (const transfer of richOutgoingTransfers) {
     const manifestNumber = transfer.ManifestNumber;
@@ -765,20 +775,19 @@ export async function maybeLoadCogsV2ReportData({
           if (sourceProductionBatch.history === undefined) {
             status = "FAIL";
             note = `Src PB ${sourceProductionBatch.Label} is missing history`;
-            break;
-          }
+          } else {
+            const initialProductionBatchQuantity =
+              extractInitialPackageQuantityAndUnitFromHistoryOrError(
+                sourceProductionBatch.history!
+              );
 
-          const initialProductionBatchQuantity =
-            extractInitialPackageQuantityAndUnitFromHistoryOrError(sourceProductionBatch.history!);
+            const optimizationMultiplier =
+              manifestPkg.ShippedQuantity / initialProductionBatchQuantity[0];
 
-          const optimizationMultiplier =
-            manifestPkg.ShippedQuantity / initialProductionBatchQuantity[0];
+            costEquation = `=${optimizationMultiplier} * VLOOKUP("${getLabelOrError(
+              sourceProductionBatch
+            )}", Worksheet!B:D, 3, FALSE)`;
 
-          costEquation = `=${optimizationMultiplier} * VLOOKUP("${getLabelOrError(
-            sourceProductionBatch
-          )}", Worksheet!B:D, 3, FALSE)`;
-
-          if (status === "INITIAL") {
             note = "Used optimization";
             status = "SUCCESS";
           }
@@ -836,6 +845,10 @@ export async function maybeLoadCogsV2ReportData({
 
                   connectedMultiplierBuffer.push([source, target.Label, newMultiplier]);
                 }
+              }
+
+              if (status === "FAIL") {
+                break;
               }
             }
 
