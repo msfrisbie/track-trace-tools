@@ -27,7 +27,7 @@ export function streamFactory<T>(
   (async () => {
     if (store.state.settings.loadDataInParallel) {
       // Parallelized Load
-      const countResponse = await responseFactory({ page: 0, pageSize: 1 });
+      const countResponse = await responseFactory({ page: 0, pageSize: 5 });
       if (countResponse.status !== 200) {
         if (countResponse.status === 401) {
           subject.error(

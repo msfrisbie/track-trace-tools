@@ -68,8 +68,8 @@ import store from "@/store/page-overlay/index";
 import { CsvUpload } from "@/types";
 import { buildBody, streamFactory } from "@/utils/data-loader";
 import { debugLogFactory } from "@/utils/debug";
-import { extract, ExtractedData, ExtractionType } from "@/utils/html";
-import { readDataOrNull, StorageKeyType, writeData } from "@/utils/storage";
+import { ExtractedData, ExtractionType, extract } from "@/utils/html";
+import { StorageKeyType, readDataOrNull, writeData } from "@/utils/storage";
 import { get } from "idb-keyval";
 import { Subject, timer } from "rxjs";
 import { map, take } from "rxjs/operators";
@@ -2715,7 +2715,7 @@ export class DataLoader implements IAtomicService {
       manifestNumber,
     };
 
-    const body = buildBody({ page, pageSize: 1 }, { transferFilter });
+    const body = buildBody({ page, pageSize: 5 }, { transferFilter });
 
     const response = await this.metrcRequestManagerOrError.getIncomingTransfers(body);
 
@@ -2752,7 +2752,7 @@ export class DataLoader implements IAtomicService {
       manifestNumber,
     };
 
-    const body = buildBody({ page, pageSize: 1 }, { transferFilter });
+    const body = buildBody({ page, pageSize: 5 }, { transferFilter });
 
     const response = await this.metrcRequestManagerOrError.getOutgoingTransfers(body);
 
@@ -2789,7 +2789,7 @@ export class DataLoader implements IAtomicService {
       manifestNumber,
     };
 
-    const body = buildBody({ page, pageSize: 1 }, { transferFilter });
+    const body = buildBody({ page, pageSize: 5 }, { transferFilter });
 
     const response = await this.metrcRequestManagerOrError.getOutgoingInactiveTransfers(body);
 
@@ -2826,7 +2826,7 @@ export class DataLoader implements IAtomicService {
       manifestNumber,
     };
 
-    const body = buildBody({ page, pageSize: 1 }, { transferFilter });
+    const body = buildBody({ page, pageSize: 5 }, { transferFilter });
 
     const response = await this.metrcRequestManagerOrError.getIncomingInactiveTransfers(body);
 
@@ -2864,7 +2864,7 @@ export class DataLoader implements IAtomicService {
       manifestNumber,
     };
 
-    const body = buildBody({ page, pageSize: 1 }, { transferFilter });
+    const body = buildBody({ page, pageSize: 5 }, { transferFilter });
 
     const response = await this.metrcRequestManagerOrError.getRejectedTransfers(body);
 
@@ -2900,7 +2900,7 @@ export class DataLoader implements IAtomicService {
       manifestNumber,
     };
 
-    const body = buildBody({ page, pageSize: 1 }, { transferFilter });
+    const body = buildBody({ page, pageSize: 5 }, { transferFilter });
 
     const response = await this.metrcRequestManagerOrError.getLayoverTransfers(body);
 
@@ -2936,7 +2936,7 @@ export class DataLoader implements IAtomicService {
       harvestName,
     };
 
-    const body = buildBody({ page, pageSize: 1 }, { harvestFilter });
+    const body = buildBody({ page, pageSize: 5 }, { harvestFilter });
 
     const response = await this.metrcRequestManagerOrError.getActiveHarvests(body);
 
@@ -2972,7 +2972,7 @@ export class DataLoader implements IAtomicService {
       harvestName,
     };
 
-    const body = buildBody({ page, pageSize: 1 }, { harvestFilter });
+    const body = buildBody({ page, pageSize: 5 }, { harvestFilter });
 
     const response = await this.metrcRequestManagerOrError.getInactiveHarvests(body);
 
@@ -3010,7 +3010,7 @@ export class DataLoader implements IAtomicService {
       label,
     };
 
-    const body = buildBody({ page, pageSize: 1 }, { packageFilter });
+    const body = buildBody({ page, pageSize: 5 }, { packageFilter });
 
     const response = await this.metrcRequestManagerOrError.getActivePackages(body);
 
@@ -3066,7 +3066,7 @@ export class DataLoader implements IAtomicService {
       label,
     };
 
-    const body = buildBody({ page, pageSize: 1 }, { packageFilter });
+    const body = buildBody({ page, pageSize: 5 }, { packageFilter });
 
     const response = await this.metrcRequestManagerOrError.getInactivePackages(body);
 
@@ -3097,7 +3097,9 @@ export class DataLoader implements IAtomicService {
 
     let inactivePackages: IPackageData[] = [];
 
-    await this.inactivePackagesStream().forEach((next: ICollectionResponse<IPackageData>) => {
+    await this.inactivePackagesStream({
+      // pageSize: 500
+    }).forEach((next: ICollectionResponse<IPackageData>) => {
       inactivePackages = [...inactivePackages, ...next.Data];
     });
 
@@ -3122,7 +3124,7 @@ export class DataLoader implements IAtomicService {
       label,
     };
 
-    const body = buildBody({ page, pageSize: 1 }, { packageFilter });
+    const body = buildBody({ page, pageSize: 5 }, { packageFilter });
 
     const response = await this.metrcRequestManagerOrError.getInTransitPackages(body);
 
@@ -3420,7 +3422,7 @@ export class DataLoader implements IAtomicService {
       label,
     };
 
-    const body = buildBody({ page, pageSize: 1 }, { plantFilter });
+    const body = buildBody({ page, pageSize: 5 }, { plantFilter });
 
     const response = await this.metrcRequestManagerOrError.getVegetativePlants(body);
 
@@ -3474,7 +3476,7 @@ export class DataLoader implements IAtomicService {
       label,
     };
 
-    const body = buildBody({ page, pageSize: 1 }, { plantFilter });
+    const body = buildBody({ page, pageSize: 5 }, { plantFilter });
 
     const response = await this.metrcRequestManagerOrError.getFloweringPlants(body);
 
@@ -3528,7 +3530,7 @@ export class DataLoader implements IAtomicService {
       label,
     };
 
-    const body = buildBody({ page, pageSize: 1 }, { plantFilter });
+    const body = buildBody({ page, pageSize: 5 }, { plantFilter });
 
     const response = await this.metrcRequestManagerOrError.getInactivePlants(body);
 
@@ -3597,7 +3599,7 @@ export class DataLoader implements IAtomicService {
       name,
     };
 
-    const body = buildBody({ page, pageSize: 1 }, { plantBatchFilter });
+    const body = buildBody({ page, pageSize: 5 }, { plantBatchFilter });
 
     const response = await this.metrcRequestManagerOrError.getPlantBatches(body);
 
@@ -3650,7 +3652,7 @@ export class DataLoader implements IAtomicService {
       name,
     };
 
-    const body = buildBody({ page, pageSize: 1 }, { plantBatchFilter });
+    const body = buildBody({ page, pageSize: 5 }, { plantBatchFilter });
 
     const response = await this.metrcRequestManagerOrError.getInactivePlantBatches(body);
 
@@ -3709,7 +3711,7 @@ export class DataLoader implements IAtomicService {
       label,
     };
 
-    const body = buildBody({ page, pageSize: 1 }, { tagFilter });
+    const body = buildBody({ page, pageSize: 5 }, { tagFilter });
 
     const response = await this.metrcRequestManagerOrError.getAvailableTags(body);
 

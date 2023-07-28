@@ -603,16 +603,16 @@ export async function maybeLoadCogsV2ReportData({
         if (sourcePackageLabels.length !== 1) {
           cogsMatrix.push([
             getLabelOrError(pkg),
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
             `Invalid src package count: ${sourcePackageLabels.length}`,
           ]);
           continue;
@@ -623,16 +623,16 @@ export async function maybeLoadCogsV2ReportData({
         if (!scopedAncestorPackageMap.has(sourcePackageLabel)) {
           cogsMatrix.push([
             getLabelOrError(pkg),
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
             `Missing src package: ${sourcePackageLabel}`,
           ]);
           continue;
@@ -659,14 +659,23 @@ export async function maybeLoadCogsV2ReportData({
         let connectedMessage = "Not connected - initial";
         let target: IIndexedPackageData = sourcePackage;
 
+        let count = 0;
         while (true) {
+          ++count;
+
+          if (count % 100 === 0) {
+            console.log("Walking history tree", count, { target });
+          }
+
           if (target.ProductionBatchNumber.length > 0) {
             connectedMessage = "CONNECTED";
             break;
           }
+
           const [targetSourcePackageLabel, ...extraLabels] = target.SourcePackageLabels.split(
             ","
           ).map((x) => x.trim());
+
           if (extraLabels.length > 0) {
             connectedMessage = `${target.Label} mas multiple source packages`;
             break;
@@ -677,7 +686,7 @@ export async function maybeLoadCogsV2ReportData({
             break;
           }
 
-          target = fullPackageLabelMap.get(target.Label)!;
+          target = fullPackageLabelMap.get(targetSourcePackageLabel)!;
         }
 
         if (sourcePackage.ProductionBatchNumber.length > 0) {
@@ -706,7 +715,7 @@ export async function maybeLoadCogsV2ReportData({
             )}", Worksheet!B:D, 3, FALSE)`,
             `=INDIRECT(ADDRESS(ROW(), COLUMN()-1)) / ${pkg.ShippedQuantity}`,
             connectedMessage,
-            null,
+            "",
           ]);
         } else {
           // One more hop to the source PB
@@ -717,16 +726,16 @@ export async function maybeLoadCogsV2ReportData({
           if (sourceProductionBatchNames.length !== 1) {
             cogsMatrix.push([
               getLabelOrError(pkg),
-              null,
-              null,
-              null,
-              null,
-              null,
-              null,
-              null,
-              null,
-              null,
-              null,
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
               `Invalid pb count: ${sourceProductionBatchNames.length}`,
             ]);
             continue;
@@ -739,16 +748,16 @@ export async function maybeLoadCogsV2ReportData({
           if (!pbPackage) {
             cogsMatrix.push([
               getLabelOrError(pkg),
-              null,
-              null,
-              null,
-              null,
-              null,
-              null,
-              null,
-              null,
-              null,
-              null,
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
               `Missing pb package: ${sourceProductionBatchName}`,
             ]);
             continue;
@@ -896,15 +905,14 @@ export async function createCogsV2SpreadsheetOrError({
       range: `'${SheetTitles.OVERVIEW}'`,
       values: [
         [],
-        [
-          [null, `Date range`, `${departureDateGt}-${departureDateLt}`],
-          [null, `# Manifests`, `=COUNTUNIQUE('Manifest Cogs'!B2:B)`],
-          [null, `# Manifest Packages`, `=COUNTUNIQUE('Manifest Cogs'!C2:C)`],
-          [null, `# Source PBs`, `=COUNTUNIQUE('Worksheet'!B2:B)`],
-          [null, `# Packages w/ mismatched PB item`, `=COUNTA('Manifest Cogs'!K2:K)`],
-          [null, `# Manifest Packages w/ $0 COGS`, `=COUNTIF('Manifest Cogs'!I2:I, 0)`],
-          [null, `# PB Packages w/ $0 cost`, `=COUNTIF(Worksheet!D2:D, 0)`],
-        ],
+        [],
+        ["", `Date range`, `${departureDateGt}-${departureDateLt}`],
+        ["", `# Manifests`, `=COUNTUNIQUE('Manifest Cogs'!B2:B)`],
+        ["", `# Manifest Packages`, `=COUNTUNIQUE('Manifest Cogs'!C2:C)`],
+        ["", `# Source PBs`, `=COUNTUNIQUE('Worksheet'!B2:B)`],
+        ["", `# Packages w/ mismatched PB item`, `=COUNTA('Manifest Cogs'!K2:K)`],
+        ["", `# Manifest Packages w/ $0 COGS`, `=COUNTIF('Manifest Cogs'!I2:I, 0)`],
+        ["", `# PB Packages w/ $0 cost`, `=COUNTIF(Worksheet!D2:D, 0)`],
         ...Object.entries(auditData).map(([key, value]) => ["", key, JSON.stringify(value)]),
       ],
     },
