@@ -712,9 +712,9 @@ export async function maybeLoadCogsV2ReportData({
 
         if (sourcePackageLabels.length !== 1) {
           cogsMatrix.push([
+            manifestPkg.LicenseNumber,
+            manifestNumber,
             getLabelOrError(manifestPkg),
-            "",
-            "",
             "",
             "",
             "",
@@ -731,9 +731,9 @@ export async function maybeLoadCogsV2ReportData({
 
         if (!scopedAncestorPackageMap.has(sourcePackageLabel)) {
           cogsMatrix.push([
+            manifestPkg.LicenseNumber,
+            manifestNumber,
             getLabelOrError(manifestPkg),
-            "",
-            "",
             "",
             "",
             "",
@@ -1007,8 +1007,8 @@ export async function createCogsV2SpreadsheetOrError({
         ["", `# Manifests`, `=COUNTUNIQUE('Manifest Cogs'!B2:B)`],
         ["", `# Manifest Packages`, `=COUNTUNIQUE('Manifest Cogs'!C2:C)`],
         ["", `# Source PBs`, `=COUNTUNIQUE('Worksheet'!B2:B)`],
-        ["", `# Packages w/ mismatched PB item`, `=COUNTA('Manifest Cogs'!K2:K)`],
-        ["", `# Manifest Packages w/ $0 COGS`, `=COUNTIF('Manifest Cogs'!I2:I, 0)`],
+        ["", `# Packages w/ FAIL status`, `=COUNTIF('Manifest Cogs'!J2:J, "FAIL")`],
+        ["", `# Manifest Packages w/ $0 COGS`, `=COUNTIF('Manifest Cogs'!H2:H, 0)`],
         ["", `# PB Packages w/ $0 cost`, `=COUNTIF(Worksheet!D2:D, 0)`],
         ...Object.entries(auditData).map(([key, value]) => ["", key, JSON.stringify(value)]),
       ],
