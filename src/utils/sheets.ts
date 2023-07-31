@@ -12,7 +12,7 @@ import {
   ISpreadsheet,
   IValueRange,
 } from "@/interfaces";
-import { customFetch, retryDefaults } from "@/modules/fetch-manager.module";
+import { customFetch } from "@/modules/fetch-manager.module";
 import { getAuthTokenOrError } from "./oauth";
 
 async function headersFactory() {
@@ -250,7 +250,6 @@ export async function writeValues({
   };
 
   return customFetch(url, {
-    ...retryDefaults,
     method: "PUT",
     headers,
     body: JSON.stringify(payload),
@@ -282,7 +281,6 @@ export async function appendValues({
   };
 
   return customFetch(url, {
-    ...retryDefaults,
     method: "POST",
     headers,
     body: JSON.stringify(payload),
@@ -303,7 +301,6 @@ export async function batchUpdate({
   const headers = await headersFactory();
 
   return customFetch(url, {
-    ...retryDefaults,
     method: "POST",
     headers,
     body: JSON.stringify({
@@ -328,7 +325,6 @@ export async function batchUpdateValues({
   const headers = await headersFactory();
 
   return customFetch(url, {
-    ...retryDefaults,
     method: "POST",
     headers,
     body: JSON.stringify({
