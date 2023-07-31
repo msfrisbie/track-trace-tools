@@ -47,7 +47,9 @@ export const cogsV2FormFiltersFactory: () => ICogsReportFormFilters = () => ({
   cogsDateGt: todayIsodate(),
   cogsDateLt: todayIsodate(),
   licenseOptions: facilityManager.cachedFacilities.map((x) => x.licenseNumber),
-  licenses: facilityManager.cachedFacilities.map((x) => x.licenseNumber),
+  licenses: facilityManager.cachedFacilities
+    .map((x) => x.licenseNumber)
+    .filter((x) => x.startsWith("PR-") || x.startsWith("AU-P")),
 });
 
 export function addCogsV2Report({

@@ -3821,8 +3821,7 @@ export class DataLoader implements IAtomicService {
 
     const response = await this.metrcRequestManagerOrError.getPackageHarvestHistory(
       body,
-      packageId,
-      3000
+      packageId
     );
 
     if (response.status !== 200) {
@@ -3885,11 +3884,7 @@ export class DataLoader implements IAtomicService {
     const page = 0;
     const body = buildBody({ page, pageSize: DATA_LOAD_PAGE_SIZE });
 
-    const response = await this.metrcRequestManagerOrError.getTransferHistory(
-      body,
-      manifestNumber,
-      3000
-    );
+    const response = await this.metrcRequestManagerOrError.getTransferHistory(body, manifestNumber);
 
     if (response.status !== 200) {
       throw new Error("Request failed");
