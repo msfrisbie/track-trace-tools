@@ -216,7 +216,7 @@ export default Vue.extend({
               JSON.stringify({}),
               matchingHarvest.Id
             )
-          ).json();
+          ).data;
 
           if (msAgo(responseData.Data[0].RecordedDateTime) > HARVEST_EXPIRATION_MS) {
             this.$data.harvestNameIsExpired = true;

@@ -12,13 +12,14 @@ import {
 import { DataLoadError, DataLoadErrorType } from "@/modules/data-loader/data-loader-error";
 import store from "@/store/page-overlay/index";
 import { debugLogFactory } from "@/utils/debug";
+import { AxiosResponse } from "axios";
 import { Subject } from "rxjs";
 
 const debugLog = debugLogFactory("utils/data-loader.ts");
 
 export function streamFactory<T>(
   { maxCount = Number.POSITIVE_INFINITY, pageSize = DATA_LOAD_PAGE_SIZE }: IDataLoadOptions,
-  responseFactory: (paginationOptions: IPaginationOptions) => Promise<Response>
+  responseFactory: (paginationOptions: IPaginationOptions) => Promise<AxiosResponse>
 ): Subject<ICollectionResponse<T>> {
   const subject: Subject<ICollectionResponse<T>> = new Subject();
   let runningTotal = 0;
@@ -33,7 +34,7 @@ export function streamFactory<T>(
           subject.error(
             new DataLoadError(
               DataLoadErrorType.PERMISSIONS,
-              `Server indicated user is missing permissions for ${countResponse.url}`
+              `Server indicated user is missing permissions for ${countResponse.config.url}`
             )
           );
           return;
@@ -42,7 +43,7 @@ export function streamFactory<T>(
           return;
         }
       }
-      const totalCountResponse: ICollectionResponse<T> = await countResponse.json();
+      const totalCountResponse: ICollectionResponse<T> = await countResponse.data;
       const lastPageIndex = Math.ceil(totalCountResponse.Total / pageSize);
 
       try {
@@ -58,7 +59,7 @@ export function streamFactory<T>(
               subject.error(
                 new DataLoadError(
                   DataLoadErrorType.PERMISSIONS,
-                  `Server indicated user is missing permissions for ${response.url}`
+                  `Server indicated user is missing permissions for ${response.config.url}`
                 )
               );
               return;
@@ -69,7 +70,7 @@ export function streamFactory<T>(
               return;
             }
           } else {
-            const responseData: ICollectionResponse<T> = await response.json();
+            const responseData: ICollectionResponse<T> = await response.data;
             subject.next(responseData);
 
             debugLog(async () => ["responseData.Data:", responseData.Data]);
@@ -118,7 +119,7 @@ export function streamFactory<T>(
             subject.error(
               new DataLoadError(
                 DataLoadErrorType.PERMISSIONS,
-                `Server indicated user is missing permissions for ${response.url}`
+                `Server indicated user is missing permissions for ${response.config.url}`
               )
             );
             return;
@@ -128,7 +129,7 @@ export function streamFactory<T>(
           }
         }
 
-        const responseData: ICollectionResponse<T> = await response.json();
+        const responseData: ICollectionResponse<T> = await response.data;
         subject.next(responseData);
 
         debugLog(async () => ["responseData.Data:", responseData.Data]);

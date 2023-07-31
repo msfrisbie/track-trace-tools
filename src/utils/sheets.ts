@@ -108,7 +108,7 @@ export async function createSpreadsheet({
     method: "POST",
     headers,
     body: JSON.stringify(payload),
-  }).then((response) => response.json());
+  }).then((response) => response.data);
 
   // {
   //   "spreadsheetId": "1zLwDLKVkjoS67LqtTiIOP1RLRm-JUxuSO9GqRlZwGxo",
@@ -223,7 +223,7 @@ export async function getSheetProperties({ spreadsheetId }: { spreadsheetId: str
   return customFetch(url, {
     method: "GET",
     headers,
-  }).then((response) => response.json());
+  }).then((response) => response.data);
 }
 
 export async function writeValues({

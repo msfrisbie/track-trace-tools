@@ -172,7 +172,7 @@ class ScriptContextManager implements IAtomicService {
 
             try {
                 // Angular throws some bullshit error, its Metrc's fault
-                eval(await response.text());
+                eval(await response.data);
             } catch (e) {
                 console.error('Static asset eval error:', e);
             }

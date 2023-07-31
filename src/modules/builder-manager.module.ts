@@ -24,6 +24,7 @@ import store from "@/store/page-overlay/index";
 import { PromoteImmaturePlantsBuilderActions } from "@/store/page-overlay/modules/promote-immature-plants-builder/consts";
 import { SplitPackageBuilderActions } from "@/store/page-overlay/modules/split-package-builder/consts";
 import { debugLogFactory } from "@/utils/debug";
+import { AxiosResponse } from "axios";
 import _ from "lodash-es";
 import { Subject, timer } from "rxjs";
 import { IMetrcCreateTransferPayload } from "../interfaces";
@@ -251,27 +252,24 @@ class BuilderManager implements IAtomicService {
         this.activeBuilderProject.builderType
       );
       success = response.status === 200;
-      if (!success && response instanceof Response) {
-        response.text().then(
-          (data) => {
-            if (!data.length) {
-              return;
-            }
-            let errorMessage = data;
-            try {
-              errorMessage = JSON.parse(data)["Message"] ?? data;
-            } catch {}
-            toastManager.openToast(errorMessage, {
-              title: "T3 Submit Error",
-              autoHideDelay: 30000,
-              variant: "danger",
-              appendToast: true,
-              toaster: "ttt-toaster",
-              solid: true,
-            });
-          },
-          () => {}
-        );
+      if (!success) {
+        const data = response.data;
+
+        if (!data.length) {
+          return;
+        }
+        let errorMessage = data;
+        try {
+          errorMessage = JSON.parse(data)["Message"] ?? data;
+        } catch {}
+        toastManager.openToast(errorMessage, {
+          title: "T3 Submit Error",
+          autoHideDelay: 30000,
+          variant: "danger",
+          appendToast: true,
+          toaster: "ttt-toaster",
+          solid: true,
+        });
       }
     } catch (e) {
       console.error(`Builder submit error`, e);
@@ -314,7 +312,7 @@ class BuilderManager implements IAtomicService {
     timer(100).subscribe(() => this.submit());
   }
 
-  async submitRows(rows: IEligibleRowType[], builderType: BuilderType) {
+  async submitRows(rows: IEligibleRowType[], builderType: BuilderType): Promise<AxiosResponse> {
     let response = null;
 
     if (SUBMIT_INTERVAL_DELAY_MS > 0) {
@@ -323,7 +321,7 @@ class BuilderManager implements IAtomicService {
 
     if (MOCK_PERCENT_FAILURE > 0) {
       if (Math.random() < MOCK_PERCENT_FAILURE) {
-        return { status: 500 };
+        return { status: 500 } as AxiosResponse;
       }
     }
 

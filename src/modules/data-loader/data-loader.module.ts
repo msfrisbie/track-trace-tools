@@ -68,8 +68,9 @@ import store from "@/store/page-overlay/index";
 import { CsvUpload } from "@/types";
 import { buildBody, streamFactory } from "@/utils/data-loader";
 import { debugLogFactory } from "@/utils/debug";
-import { extract, ExtractedData, ExtractionType } from "@/utils/html";
-import { readDataOrNull, StorageKeyType, writeData } from "@/utils/storage";
+import { ExtractedData, ExtractionType, extract } from "@/utils/html";
+import { StorageKeyType, readDataOrNull, writeData } from "@/utils/storage";
+import { AxiosResponse } from "axios";
 import { get } from "idb-keyval";
 import { Subject, timer } from "rxjs";
 import { map, take } from "rxjs/operators";
@@ -244,11 +245,13 @@ export class DataLoader implements IAtomicService {
    * These dispatch a single lightweight request and therefore are not cached.
    */
 
-  private async extractTotalOrNull(responsePromise: Promise<Response>): Promise<number | null> {
+  private async extractTotalOrNull(
+    responsePromise: Promise<AxiosResponse>
+  ): Promise<number | null> {
     let total: number | null = null;
 
     try {
-      const json = await (await responsePromise).json();
+      const json = await (await responsePromise).data;
 
       if (typeof json.Total !== "number") {
         throw new Error("Could not extract Total");
@@ -847,7 +850,7 @@ export class DataLoader implements IAtomicService {
     const activePackagesResponse = await primaryMetrcRequestManager.getActivePackages(body);
 
     if (activePackagesResponse.status === 200) {
-      const responseData: ICollectionResponse<IPackageData> = await activePackagesResponse.json();
+      const responseData: ICollectionResponse<IPackageData> = await activePackagesResponse.data;
 
       const activePackages: IIndexedPackageData[] = responseData["Data"].map((x) => ({
         ...x,
@@ -936,7 +939,7 @@ export class DataLoader implements IAtomicService {
     const floweringPlantsResponse = await primaryMetrcRequestManager.getFloweringPlants(body);
 
     if (floweringPlantsResponse.status === 200) {
-      const responseData: ICollectionResponse<IPlantData> = await floweringPlantsResponse.json();
+      const responseData: ICollectionResponse<IPlantData> = await floweringPlantsResponse.data;
 
       const floweringPlants: IIndexedPlantData[] = responseData["Data"].map((x) => ({
         ...x,
@@ -969,7 +972,7 @@ export class DataLoader implements IAtomicService {
     const vegetativePlantsResponse = await primaryMetrcRequestManager.getVegetativePlants(body);
 
     if (vegetativePlantsResponse.status === 200) {
-      const responseData: ICollectionResponse<IPlantData> = await vegetativePlantsResponse.json();
+      const responseData: ICollectionResponse<IPlantData> = await vegetativePlantsResponse.data;
 
       const vegetativePlants: IIndexedPlantData[] = responseData["Data"].map((x) => ({
         ...x,
@@ -1001,7 +1004,7 @@ export class DataLoader implements IAtomicService {
     const inactivePlantsResponse = await primaryMetrcRequestManager.getInactivePlants(body);
 
     if (inactivePlantsResponse.status === 200) {
-      const responseData: ICollectionResponse<IPlantData> = await inactivePlantsResponse.json();
+      const responseData: ICollectionResponse<IPlantData> = inactivePlantsResponse.data;
 
       const inactivePlants: IIndexedPlantData[] = responseData["Data"].map((x) => ({
         ...x,
@@ -1046,7 +1049,7 @@ export class DataLoader implements IAtomicService {
     const activePackagesResponse = await primaryMetrcRequestManager.getActivePackages(body);
 
     if (activePackagesResponse.status === 200) {
-      const responseData: ICollectionResponse<IPackageData> = await activePackagesResponse.json();
+      const responseData: ICollectionResponse<IPackageData> = await activePackagesResponse.data;
 
       const activePackages: IIndexedPackageData[] = responseData["Data"].map((x) => ({
         ...x,
@@ -1105,7 +1108,7 @@ export class DataLoader implements IAtomicService {
     const activePackagesResponse = await primaryMetrcRequestManager.getActivePackages(body);
 
     if (activePackagesResponse.status === 200) {
-      const responseData: ICollectionResponse<IPackageData> = await activePackagesResponse.json();
+      const responseData: ICollectionResponse<IPackageData> = await activePackagesResponse.data;
 
       const activePackages: IIndexedPackageData[] = responseData["Data"].map((x) => ({
         ...x,
@@ -1138,7 +1141,7 @@ export class DataLoader implements IAtomicService {
     const inactivePackagesResponse = await primaryMetrcRequestManager.getInactivePackages(body);
 
     if (inactivePackagesResponse.status === 200) {
-      const responseData: ICollectionResponse<IPackageData> = await inactivePackagesResponse.json();
+      const responseData: ICollectionResponse<IPackageData> = await inactivePackagesResponse.data;
 
       const activePackages: IIndexedPackageData[] = responseData["Data"].map((x) => ({
         ...x,
@@ -1171,8 +1174,7 @@ export class DataLoader implements IAtomicService {
     const inTransitPackagesResponse = await primaryMetrcRequestManager.getInTransitPackages(body);
 
     if (inTransitPackagesResponse.status === 200) {
-      const responseData: ICollectionResponse<IPackageData> =
-        await inTransitPackagesResponse.json();
+      const responseData: ICollectionResponse<IPackageData> = await inTransitPackagesResponse.data;
 
       const activePackages: IIndexedPackageData[] = responseData["Data"].map((x) => ({
         ...x,
@@ -1573,7 +1575,7 @@ export class DataLoader implements IAtomicService {
     }
 
     if (transferResponse.status === 200) {
-      const responseData: ICollectionResponse<ITransferData> = await transferResponse.json();
+      const responseData: ICollectionResponse<ITransferData> = await transferResponse.data;
 
       transfers = responseData["Data"].map((x) => ({
         ...x,
@@ -1615,7 +1617,7 @@ export class DataLoader implements IAtomicService {
     }
 
     if (tagResponse.status === 200) {
-      const responseData: ICollectionResponse<ITagData> = await tagResponse.json();
+      const responseData: ICollectionResponse<ITagData> = await tagResponse.data;
 
       tags = responseData["Data"].map((x) => ({
         ...x,
@@ -2213,7 +2215,7 @@ export class DataLoader implements IAtomicService {
       throw new Error("Request failed");
     }
 
-    const responseData: ICollectionResponse<ITestResultData> = await response.json();
+    const responseData: ICollectionResponse<ITestResultData> = await response.data;
 
     return responseData.Data;
   }
@@ -2261,7 +2263,7 @@ export class DataLoader implements IAtomicService {
 
   async getExtractedITagOrderModalData(): Promise<IExtractedITagOrderData> {
     const response = await this.metrcRequestManagerOrError.getTagOrderHTML();
-    const html: string = await response.text();
+    const html: string = await response.data;
 
     const result: ExtractedData | null = extract(ExtractionType.TAG_ORDER_DATA, html);
 
@@ -2296,7 +2298,7 @@ export class DataLoader implements IAtomicService {
     dataLoadOptions: IDataLoadOptions = {},
     destinationId: number
   ): Subject<ICollectionResponse<ITransporterData>> {
-    const responseFactory = (paginationOptions: IPaginationOptions): Promise<Response> => {
+    const responseFactory = (paginationOptions: IPaginationOptions): Promise<AxiosResponse> => {
       const body = buildBody(paginationOptions);
 
       return this.metrcRequestManagerOrError.getDestinationTransporters(body, destinationId);
@@ -2309,7 +2311,7 @@ export class DataLoader implements IAtomicService {
     dataLoadOptions: IDataLoadOptions = {},
     transferId: number
   ): Subject<ICollectionResponse<IDestinationData>> {
-    const responseFactory = (paginationOptions: IPaginationOptions): Promise<Response> => {
+    const responseFactory = (paginationOptions: IPaginationOptions): Promise<AxiosResponse> => {
       const body = buildBody(paginationOptions);
 
       return this.metrcRequestManagerOrError.getTransferDestinations(body, transferId);
@@ -2322,7 +2324,7 @@ export class DataLoader implements IAtomicService {
     dataLoadOptions: IDataLoadOptions = {},
     transferId: number
   ): Subject<ICollectionResponse<ITransferTransporterDetails>> {
-    const responseFactory = (paginationOptions: IPaginationOptions): Promise<Response> => {
+    const responseFactory = (paginationOptions: IPaginationOptions): Promise<AxiosResponse> => {
       const body = buildBody(paginationOptions);
 
       return this.metrcRequestManagerOrError.getTransferTransporterDetails(body, transferId);
@@ -2335,7 +2337,7 @@ export class DataLoader implements IAtomicService {
     dataLoadOptions: IDataLoadOptions = {},
     destinationId: number
   ): Subject<ICollectionResponse<IDestinationPackageData>> {
-    const responseFactory = (paginationOptions: IPaginationOptions): Promise<Response> => {
+    const responseFactory = (paginationOptions: IPaginationOptions): Promise<AxiosResponse> => {
       const body = buildBody(paginationOptions);
 
       return this.metrcRequestManagerOrError.getDestinationPackages(body, destinationId);
@@ -2345,7 +2347,7 @@ export class DataLoader implements IAtomicService {
   }
 
   activePackagesStream(options: IPackageOptions = {}): Subject<ICollectionResponse<IPackageData>> {
-    const responseFactory = (paginationOptions: IPaginationOptions): Promise<Response> => {
+    const responseFactory = (paginationOptions: IPaginationOptions): Promise<AxiosResponse> => {
       const body = buildBody(paginationOptions);
 
       return this.metrcRequestManagerOrError.getActivePackages(body);
@@ -2357,7 +2359,7 @@ export class DataLoader implements IAtomicService {
   inactivePackagesStream(
     options: IPackageOptions = {}
   ): Subject<ICollectionResponse<IPackageData>> {
-    const responseFactory = (paginationOptions: IPaginationOptions): Promise<Response> => {
+    const responseFactory = (paginationOptions: IPaginationOptions): Promise<AxiosResponse> => {
       const body = buildBody(paginationOptions);
 
       return this.metrcRequestManagerOrError.getInactivePackages(body);
@@ -2367,7 +2369,7 @@ export class DataLoader implements IAtomicService {
   }
 
   onHoldPackagesStream(options: IPackageOptions = {}): Subject<ICollectionResponse<IPackageData>> {
-    const responseFactory = (paginationOptions: IPaginationOptions): Promise<Response> => {
+    const responseFactory = (paginationOptions: IPaginationOptions): Promise<AxiosResponse> => {
       const body = buildBody(paginationOptions);
 
       return this.metrcRequestManagerOrError.getOnHoldPackages(body);
@@ -2379,7 +2381,7 @@ export class DataLoader implements IAtomicService {
   inTransitPackagesStream(
     options: IPackageOptions = {}
   ): Subject<ICollectionResponse<IPackageData>> {
-    const responseFactory = (paginationOptions: IPaginationOptions): Promise<Response> => {
+    const responseFactory = (paginationOptions: IPaginationOptions): Promise<AxiosResponse> => {
       const body = buildBody(paginationOptions);
 
       return this.metrcRequestManagerOrError.getInTransitPackages(body);
@@ -2389,7 +2391,7 @@ export class DataLoader implements IAtomicService {
   }
 
   vegetativePlantsStream(options: IPlantOptions): Subject<ICollectionResponse<IPlantData>> {
-    const responseFactory = (paginationOptions: IPaginationOptions): Promise<Response> => {
+    const responseFactory = (paginationOptions: IPaginationOptions): Promise<AxiosResponse> => {
       const body = buildBody(
         paginationOptions,
         { plantFilter: options.filter },
@@ -2403,7 +2405,7 @@ export class DataLoader implements IAtomicService {
   }
 
   floweringPlantsStream(options: IPlantOptions): Subject<ICollectionResponse<IPlantData>> {
-    const responseFactory = (paginationOptions: IPaginationOptions): Promise<Response> => {
+    const responseFactory = (paginationOptions: IPaginationOptions): Promise<AxiosResponse> => {
       const body = buildBody(
         paginationOptions,
         { plantFilter: options.filter },
@@ -2417,7 +2419,7 @@ export class DataLoader implements IAtomicService {
   }
 
   inactivePlantsStream(options: IPlantOptions): Subject<ICollectionResponse<IPlantData>> {
-    const responseFactory = (paginationOptions: IPaginationOptions): Promise<Response> => {
+    const responseFactory = (paginationOptions: IPaginationOptions): Promise<AxiosResponse> => {
       const body = buildBody(
         paginationOptions,
         { plantFilter: options.filter },
@@ -2433,7 +2435,7 @@ export class DataLoader implements IAtomicService {
   activeHarvestsStream(
     dataLoadOptions: IDataLoadOptions = {}
   ): Subject<ICollectionResponse<IHarvestData>> {
-    const responseFactory = (paginationOptions: IPaginationOptions): Promise<Response> => {
+    const responseFactory = (paginationOptions: IPaginationOptions): Promise<AxiosResponse> => {
       const body = buildBody(paginationOptions);
 
       return this.metrcRequestManagerOrError.getActiveHarvests(body);
@@ -2445,7 +2447,7 @@ export class DataLoader implements IAtomicService {
   inactiveHarvestsStream(
     dataLoadOptions: IDataLoadOptions = {}
   ): Subject<ICollectionResponse<IHarvestData>> {
-    const responseFactory = (paginationOptions: IPaginationOptions): Promise<Response> => {
+    const responseFactory = (paginationOptions: IPaginationOptions): Promise<AxiosResponse> => {
       const body = buildBody(paginationOptions);
 
       return this.metrcRequestManagerOrError.getInactiveHarvests(body);
@@ -2457,7 +2459,7 @@ export class DataLoader implements IAtomicService {
   incomingTransfersStream(
     dataLoadOptions: IDataLoadOptions = {}
   ): Subject<ICollectionResponse<ITransferData>> {
-    const responseFactory = (paginationOptions: IPaginationOptions): Promise<Response> => {
+    const responseFactory = (paginationOptions: IPaginationOptions): Promise<AxiosResponse> => {
       const body = buildBody(paginationOptions);
 
       return this.metrcRequestManagerOrError.getIncomingTransfers(body);
@@ -2469,7 +2471,7 @@ export class DataLoader implements IAtomicService {
   incomingInactiveTransfersStream(
     dataLoadOptions: IDataLoadOptions = {}
   ): Subject<ICollectionResponse<ITransferData>> {
-    const responseFactory = (paginationOptions: IPaginationOptions): Promise<Response> => {
+    const responseFactory = (paginationOptions: IPaginationOptions): Promise<AxiosResponse> => {
       const body = buildBody(paginationOptions);
 
       return this.metrcRequestManagerOrError.getIncomingInactiveTransfers(body);
@@ -2481,7 +2483,7 @@ export class DataLoader implements IAtomicService {
   outgoingTransfersStream(
     dataLoadOptions: IDataLoadOptions = {}
   ): Subject<ICollectionResponse<ITransferData>> {
-    const responseFactory = (paginationOptions: IPaginationOptions): Promise<Response> => {
+    const responseFactory = (paginationOptions: IPaginationOptions): Promise<AxiosResponse> => {
       const body = buildBody(paginationOptions);
 
       return this.metrcRequestManagerOrError.getOutgoingTransfers(body);
@@ -2493,7 +2495,7 @@ export class DataLoader implements IAtomicService {
   outgoingInactiveTransfersStream(
     dataLoadOptions: IDataLoadOptions = {}
   ): Subject<ICollectionResponse<ITransferData>> {
-    const responseFactory = (paginationOptions: IPaginationOptions): Promise<Response> => {
+    const responseFactory = (paginationOptions: IPaginationOptions): Promise<AxiosResponse> => {
       const body = buildBody(paginationOptions);
 
       return this.metrcRequestManagerOrError.getOutgoingInactiveTransfers(body);
@@ -2505,7 +2507,7 @@ export class DataLoader implements IAtomicService {
   rejectedTransfersStream(
     dataLoadOptions: IDataLoadOptions = {}
   ): Subject<ICollectionResponse<ITransferData>> {
-    const responseFactory = (paginationOptions: IPaginationOptions): Promise<Response> => {
+    const responseFactory = (paginationOptions: IPaginationOptions): Promise<AxiosResponse> => {
       const body = buildBody(paginationOptions);
 
       return this.metrcRequestManagerOrError.getRejectedTransfers(body);
@@ -2517,7 +2519,7 @@ export class DataLoader implements IAtomicService {
   layoverTransfersStream(
     dataLoadOptions: IDataLoadOptions = {}
   ): Subject<ICollectionResponse<ITransferData>> {
-    const responseFactory = (paginationOptions: IPaginationOptions): Promise<Response> => {
+    const responseFactory = (paginationOptions: IPaginationOptions): Promise<AxiosResponse> => {
       const body = buildBody(paginationOptions);
 
       return this.metrcRequestManagerOrError.getLayoverTransfers(body);
@@ -2529,7 +2531,7 @@ export class DataLoader implements IAtomicService {
   employeesStream(
     dataLoadOptions: IDataLoadOptions = {}
   ): Subject<ICollectionResponse<IMetrcEmployeeData>> {
-    const responseFactory = (paginationOptions: IPaginationOptions): Promise<Response> => {
+    const responseFactory = (paginationOptions: IPaginationOptions): Promise<AxiosResponse> => {
       const body = buildBody(paginationOptions);
 
       return this.metrcRequestManagerOrError.getEmployees(body);
@@ -2541,7 +2543,7 @@ export class DataLoader implements IAtomicService {
   availableTagsStream(
     dataLoadOptions: IDataLoadOptions = {}
   ): Subject<ICollectionResponse<ITagData>> {
-    const responseFactory = (paginationOptions: IPaginationOptions): Promise<Response> => {
+    const responseFactory = (paginationOptions: IPaginationOptions): Promise<AxiosResponse> => {
       const body = buildBody(paginationOptions);
 
       return this.metrcRequestManagerOrError.getAvailableTags(body);
@@ -2551,7 +2553,7 @@ export class DataLoader implements IAtomicService {
   }
 
   usedTagsStream(dataLoadOptions: IDataLoadOptions = {}): Subject<ICollectionResponse<ITagData>> {
-    const responseFactory = (paginationOptions: IPaginationOptions): Promise<Response> => {
+    const responseFactory = (paginationOptions: IPaginationOptions): Promise<AxiosResponse> => {
       const body = buildBody(paginationOptions);
 
       return this.metrcRequestManagerOrError.getUsedTags(body);
@@ -2561,7 +2563,7 @@ export class DataLoader implements IAtomicService {
   }
 
   voidedTagsStream(dataLoadOptions: IDataLoadOptions = {}): Subject<ICollectionResponse<ITagData>> {
-    const responseFactory = (paginationOptions: IPaginationOptions): Promise<Response> => {
+    const responseFactory = (paginationOptions: IPaginationOptions): Promise<AxiosResponse> => {
       const body = buildBody(paginationOptions);
 
       return this.metrcRequestManagerOrError.getVoidedTags(body);
@@ -2571,7 +2573,7 @@ export class DataLoader implements IAtomicService {
   }
 
   plantBatchesStream(options: IPlantBatchOptions): Subject<ICollectionResponse<IPlantBatchData>> {
-    const responseFactory = (paginationOptions: IPaginationOptions): Promise<Response> => {
+    const responseFactory = (paginationOptions: IPaginationOptions): Promise<AxiosResponse> => {
       const body = buildBody(
         paginationOptions,
         { plantBatchFilter: options.filter },
@@ -2587,7 +2589,7 @@ export class DataLoader implements IAtomicService {
   inactivePlantBatchesStream(
     options: IPlantBatchOptions
   ): Subject<ICollectionResponse<IPlantBatchData>> {
-    const responseFactory = (paginationOptions: IPaginationOptions): Promise<Response> => {
+    const responseFactory = (paginationOptions: IPaginationOptions): Promise<AxiosResponse> => {
       const body = buildBody(
         paginationOptions,
         { plantBatchFilter: options.filter },
@@ -2603,7 +2605,7 @@ export class DataLoader implements IAtomicService {
   activeSalesReceiptsStream(
     dataLoadOptions: IDataLoadOptions = { pageSize: DATA_LOAD_PAGE_SIZE }
   ): Subject<ICollectionResponse<ISalesReceiptData>> {
-    const responseFactory = (paginationOptions: IPaginationOptions): Promise<Response> => {
+    const responseFactory = (paginationOptions: IPaginationOptions): Promise<AxiosResponse> => {
       const body = buildBody(paginationOptions, null, {
         salesReceiptSort: { RecordedDateTime: "asc" },
       });
@@ -2723,7 +2725,7 @@ export class DataLoader implements IAtomicService {
       throw new Error("Request failed");
     }
 
-    const responseData: ICollectionResponse<ITransferData> = await response.json();
+    const responseData: ICollectionResponse<ITransferData> = await response.data;
 
     if (responseData.Data.length !== 1) {
       if (responseData.Data.length === 0) {
@@ -2760,7 +2762,7 @@ export class DataLoader implements IAtomicService {
       throw new Error("Request failed");
     }
 
-    const responseData: ICollectionResponse<ITransferData> = await response.json();
+    const responseData: ICollectionResponse<ITransferData> = await response.data;
 
     if (responseData.Data.length !== 1) {
       if (responseData.Data.length === 0) {
@@ -2797,7 +2799,7 @@ export class DataLoader implements IAtomicService {
       throw new Error("Request failed");
     }
 
-    const responseData: ICollectionResponse<ITransferData> = await response.json();
+    const responseData: ICollectionResponse<ITransferData> = await response.data;
 
     if (responseData.Data.length !== 1) {
       if (responseData.Data.length === 0) {
@@ -2834,7 +2836,7 @@ export class DataLoader implements IAtomicService {
       throw new Error("Request failed");
     }
 
-    const responseData: ICollectionResponse<ITransferData> = await response.json();
+    const responseData: ICollectionResponse<ITransferData> = await response.data;
 
     if (responseData.Data.length !== 1) {
       if (responseData.Data.length === 0) {
@@ -2872,7 +2874,7 @@ export class DataLoader implements IAtomicService {
       throw new Error("Request failed");
     }
 
-    const responseData: ICollectionResponse<ITransferData> = await response.json();
+    const responseData: ICollectionResponse<ITransferData> = await response.data;
 
     if (responseData.Data.length !== 1) {
       if (responseData.Data.length === 0) {
@@ -2908,7 +2910,7 @@ export class DataLoader implements IAtomicService {
       throw new Error("Request failed");
     }
 
-    const responseData: ICollectionResponse<ITransferData> = await response.json();
+    const responseData: ICollectionResponse<ITransferData> = await response.data;
 
     if (responseData.Data.length !== 1) {
       if (responseData.Data.length === 0) {
@@ -2944,7 +2946,7 @@ export class DataLoader implements IAtomicService {
       throw new Error("Request failed");
     }
 
-    const responseData: ICollectionResponse<IHarvestData> = await response.json();
+    const responseData: ICollectionResponse<IHarvestData> = await response.data;
 
     if (responseData.Data.length !== 1) {
       if (responseData.Data.length === 0) {
@@ -2980,7 +2982,7 @@ export class DataLoader implements IAtomicService {
       throw new Error("Request failed");
     }
 
-    const responseData: ICollectionResponse<IHarvestData> = await response.json();
+    const responseData: ICollectionResponse<IHarvestData> = await response.data;
 
     if (responseData.Data.length !== 1) {
       if (responseData.Data.length === 0) {
@@ -3018,7 +3020,7 @@ export class DataLoader implements IAtomicService {
       throw new Error("Request failed");
     }
 
-    const responseData: ICollectionResponse<IPackageData> = await response.json();
+    const responseData: ICollectionResponse<IPackageData> = await response.data;
 
     if (responseData.Data.length !== 1) {
       if (responseData.Data.length === 0) {
@@ -3074,7 +3076,7 @@ export class DataLoader implements IAtomicService {
       throw new Error("Request failed");
     }
 
-    const responseData: ICollectionResponse<IPackageData> = await response.json();
+    const responseData: ICollectionResponse<IPackageData> = await response.data;
 
     if (responseData.Data.length !== 1) {
       if (responseData.Data.length === 0) {
@@ -3130,7 +3132,7 @@ export class DataLoader implements IAtomicService {
       throw new Error("Request failed");
     }
 
-    const responseData: ICollectionResponse<IPackageData> = await response.json();
+    const responseData: ICollectionResponse<IPackageData> = await response.data;
 
     if (responseData.Data.length !== 1) {
       if (responseData.Data.length === 0) {
@@ -3337,7 +3339,7 @@ export class DataLoader implements IAtomicService {
 
     let locations: ILocationData[] = [];
 
-    const responseFactory = (paginationOptions: IPaginationOptions): Promise<Response> => {
+    const responseFactory = (paginationOptions: IPaginationOptions): Promise<AxiosResponse> => {
       const body = buildBody(paginationOptions);
 
       return this.metrcRequestManagerOrError.getLocations(body);
@@ -3363,7 +3365,7 @@ export class DataLoader implements IAtomicService {
 
     let items: IItemData[] = [];
 
-    const responseFactory = (paginationOptions: IPaginationOptions): Promise<Response> => {
+    const responseFactory = (paginationOptions: IPaginationOptions): Promise<AxiosResponse> => {
       const body = buildBody(paginationOptions);
 
       return this.metrcRequestManagerOrError.getItems(body);
@@ -3389,7 +3391,7 @@ export class DataLoader implements IAtomicService {
 
     let strains: IStrainData[] = [];
 
-    const responseFactory = (paginationOptions: IPaginationOptions): Promise<Response> => {
+    const responseFactory = (paginationOptions: IPaginationOptions): Promise<AxiosResponse> => {
       const body = buildBody(paginationOptions);
 
       return this.metrcRequestManagerOrError.getStrains(body);
@@ -3428,7 +3430,7 @@ export class DataLoader implements IAtomicService {
       throw new Error("Request failed");
     }
 
-    const responseData: ICollectionResponse<IPlantData> = await response.json();
+    const responseData: ICollectionResponse<IPlantData> = await response.data;
 
     if (responseData.Data.length !== 1) {
       if (responseData.Data.length === 0) {
@@ -3482,7 +3484,7 @@ export class DataLoader implements IAtomicService {
       throw new Error("Request failed");
     }
 
-    const responseData: ICollectionResponse<IPlantData> = await response.json();
+    const responseData: ICollectionResponse<IPlantData> = await response.data;
 
     if (responseData.Data.length !== 1) {
       if (responseData.Data.length === 0) {
@@ -3536,7 +3538,7 @@ export class DataLoader implements IAtomicService {
       throw new Error("Request failed");
     }
 
-    const responseData: ICollectionResponse<IPlantData> = await response.json();
+    const responseData: ICollectionResponse<IPlantData> = await response.data;
 
     if (responseData.Data.length !== 1) {
       if (responseData.Data.length === 0) {
@@ -3605,7 +3607,7 @@ export class DataLoader implements IAtomicService {
       throw new Error("Request failed");
     }
 
-    const responseData: ICollectionResponse<IPlantBatchData> = await response.json();
+    const responseData: ICollectionResponse<IPlantBatchData> = await response.data;
 
     if (responseData.Data.length !== 1) {
       if (responseData.Data.length === 0) {
@@ -3658,7 +3660,7 @@ export class DataLoader implements IAtomicService {
       throw new Error("Request failed");
     }
 
-    const responseData: ICollectionResponse<IPlantBatchData> = await response.json();
+    const responseData: ICollectionResponse<IPlantBatchData> = await response.data;
 
     if (responseData.Data.length !== 1) {
       if (responseData.Data.length === 0) {
@@ -3717,7 +3719,7 @@ export class DataLoader implements IAtomicService {
       throw new Error("Request failed");
     }
 
-    const responseData: ICollectionResponse<ITagData> = await response.json();
+    const responseData: ICollectionResponse<ITagData> = await response.data;
 
     if (responseData.Data.length !== 1) {
       if (responseData.Data.length === 0) {
@@ -3825,7 +3827,7 @@ export class DataLoader implements IAtomicService {
       throw new Error("Request failed");
     }
 
-    const responseData: ICollectionResponse<IHarvestHistoryData> = await response.json();
+    const responseData: ICollectionResponse<IHarvestHistoryData> = await response.data;
 
     return responseData.Data;
   }
@@ -3840,7 +3842,7 @@ export class DataLoader implements IAtomicService {
       throw new Error("Request failed");
     }
 
-    const responseData: ICollectionResponse<IPackageHistoryData> = await response.json();
+    const responseData: ICollectionResponse<IPackageHistoryData> = await response.data;
 
     return responseData.Data;
   }
@@ -3855,7 +3857,7 @@ export class DataLoader implements IAtomicService {
       throw new Error("Request failed");
     }
 
-    const responseData: ICollectionResponse<IPlantHistoryData> = await response.json();
+    const responseData: ICollectionResponse<IPlantHistoryData> = await response.data;
 
     return responseData.Data;
   }
@@ -3870,7 +3872,7 @@ export class DataLoader implements IAtomicService {
       throw new Error("Request failed");
     }
 
-    const responseData: ICollectionResponse<IPlantBatchHistoryData> = await response.json();
+    const responseData: ICollectionResponse<IPlantBatchHistoryData> = await response.data;
 
     return responseData.Data;
   }
@@ -3891,7 +3893,7 @@ export class DataLoader implements IAtomicService {
       throw new Error("Request failed");
     }
 
-    const responseData: ICollectionResponse<ITransferHistoryData> = await response.json();
+    const responseData: ICollectionResponse<ITransferHistoryData> = await response.data;
 
     return responseData.Data;
   }
@@ -3906,7 +3908,7 @@ export class DataLoader implements IAtomicService {
       throw new Error("Request failed");
     }
 
-    const responseData: ICollectionResponse<IHarvestHistoryData> = await response.json();
+    const responseData: ICollectionResponse<IHarvestHistoryData> = await response.data;
 
     return responseData.Data;
   }
@@ -3924,7 +3926,7 @@ export class DataLoader implements IAtomicService {
 
     let previousTagOrders: ITagOrderData[] = [];
 
-    const responseFactory = (paginationOptions: IPaginationOptions): Promise<Response> => {
+    const responseFactory = (paginationOptions: IPaginationOptions): Promise<AxiosResponse> => {
       const body = buildBody(paginationOptions);
 
       return this.metrcRequestManagerOrError.getTagOrderHistory(body);
@@ -3950,7 +3952,7 @@ export class DataLoader implements IAtomicService {
 
     let csvUploads: ICsvUploadResult[] = [];
 
-    const responseFactory = (paginationOptions: IPaginationOptions): Promise<Response> => {
+    const responseFactory = (paginationOptions: IPaginationOptions): Promise<AxiosResponse> => {
       const body = buildBody(paginationOptions);
 
       return this.metrcRequestManagerOrError.getDataImportHistory(body, csvUpload);

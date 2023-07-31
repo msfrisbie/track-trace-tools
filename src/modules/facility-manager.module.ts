@@ -85,8 +85,8 @@ class FacilityManager implements IAtomicService {
 
     if (!facilityLinks || facilityLinks.length === 0) {
       // Fall back to network request
-      const loadedHTML = await customFetch(window.location.origin).then((response) =>
-        response.text()
+      const loadedHTML = await customFetch(window.location.origin).then(
+        (response) => response.data
       );
 
       // @ts-ignore
@@ -154,7 +154,7 @@ class FacilityManager implements IAtomicService {
   //     const currentKeys = await keys();
 
   //     if (!transferTimestamp || ((now - transferTimestamp) > TRANSFER_MODAL_HTML_EXPIRATION_MS) || !currentKeys.includes(IdbKeyPiece.TRANSFER_MODAL_HTML)) {
-  //         primaryMetrcRequestManager.getNewTransferHTML().then((response: Response) => response.text().then((text: string) => set(IdbKeyPiece.TRANSFER_MODAL_HTML, text)))
+  //         primaryMetrcRequestManager.getNewTransferHTML().then((response: AxiosResponse) => response.text().then((text: string) => set(IdbKeyPiece.TRANSFER_MODAL_HTML, text)))
   //     }
   // }
 
@@ -165,7 +165,7 @@ class FacilityManager implements IAtomicService {
   //         return html;
   //     }
 
-  //     return await primaryMetrcRequestManager.getNewTransferHTML().then((response: Response) => response.text());
+  //     return await primaryMetrcRequestManager.getNewTransferHTML().then((response: AxiosResponse) => response.text());
   // }
 
   // async allFacilities() {

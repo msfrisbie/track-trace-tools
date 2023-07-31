@@ -19,7 +19,8 @@ import { primaryMetrcRequestManager } from "@/modules/metrc-request-manager.modu
 import { mockDataManager } from "@/modules/mock-data-manager.module";
 import store from "@/store/page-overlay/index";
 import { debugLogFactory } from "@/utils/debug";
-import { extract, ExtractionType } from "@/utils/html";
+import { ExtractionType, extract } from "@/utils/html";
+import { AxiosResponse } from "axios";
 import { get, keys, set } from "idb-keyval";
 import _ from "lodash-es";
 import { timer } from "rxjs";
@@ -117,7 +118,7 @@ class DynamicConstsManager implements IAtomicService {
         try {
           const html = await primaryMetrcRequestManager
             .getMovePackagesHTML()
-            .then((response) => response.text());
+            .then((response) => response.data);
 
           const extractedData = extract(ExtractionType.REPEATER_DATA, html);
 
@@ -150,7 +151,7 @@ class DynamicConstsManager implements IAtomicService {
         try {
           const html = await primaryMetrcRequestManager
             .getNewItemHTML()
-            .then((response) => response.text());
+            .then((response) => response.data);
 
           const extractedData = extract(ExtractionType.REPEATER_DATA, html);
 
@@ -183,7 +184,7 @@ class DynamicConstsManager implements IAtomicService {
         try {
           const html = await primaryMetrcRequestManager
             .getNewStrainHTML()
-            .then((response) => response.text());
+            .then((response) => response.data);
 
           const extractedData = extract(ExtractionType.REPEATER_DATA, html);
 
@@ -216,7 +217,7 @@ class DynamicConstsManager implements IAtomicService {
         try {
           const html = await primaryMetrcRequestManager
             .getWasteByLocationHTML()
-            .then((response) => response.text());
+            .then((response) => response.data);
 
           const extractedData = extract(ExtractionType.REPEATER_DATA, html);
 
@@ -249,7 +250,7 @@ class DynamicConstsManager implements IAtomicService {
         try {
           const html = await primaryMetrcRequestManager
             .getAdjustPackageHTML()
-            .then((response) => response.text());
+            .then((response) => response.data);
 
           const extractedData = extract(ExtractionType.REPEATER_DATA, html);
 
@@ -282,7 +283,7 @@ class DynamicConstsManager implements IAtomicService {
         try {
           const html = await primaryMetrcRequestManager
             .getRemediatePackageHTML()
-            .then((response) => response.text());
+            .then((response) => response.data);
 
           const extractedData = extract(ExtractionType.REPEATER_DATA, html);
 
@@ -315,7 +316,7 @@ class DynamicConstsManager implements IAtomicService {
         try {
           const html = await primaryMetrcRequestManager
             .getCreatePlantingsFromPackageHTML()
-            .then((response) => response.text());
+            .then((response) => response.data);
 
           const extractedData = extract(ExtractionType.REPEATER_DATA, html);
 
@@ -350,7 +351,7 @@ class DynamicConstsManager implements IAtomicService {
         try {
           const html = await primaryMetrcRequestManager
             .getChangePlantBatchGrowthPhaseHTML()
-            .then((response) => response.text());
+            .then((response) => response.data);
 
           const extractedData = extract(ExtractionType.REPEATER_DATA, html);
 
@@ -421,7 +422,7 @@ class DynamicConstsManager implements IAtomicService {
 
       this._newTransferModalText = primaryMetrcRequestManager
         .getNewTransferHTML()
-        .then((response: Response) => response.text());
+        .then((response: AxiosResponse) => response.data);
     }
 
     return this._newTransferModalText;
@@ -433,7 +434,7 @@ class DynamicConstsManager implements IAtomicService {
       debugLog(async () => ["Sending package modal request"]);
       this._newPackageModalText = primaryMetrcRequestManager
         .getNewPackageHTML()
-        .then((response: Response) => response.text());
+        .then((response: AxiosResponse) => response.data);
     }
 
     return this._newPackageModalText;
@@ -656,7 +657,7 @@ class DynamicConstsManager implements IAtomicService {
     try {
       return primaryMetrcRequestManager
         .getPackagesHTML()
-        .then((response) => response.text())
+        .then((response) => response.data)
         .then((body: string) => body.includes("Change Locations"));
     } catch (e) {
       console.error(e);
