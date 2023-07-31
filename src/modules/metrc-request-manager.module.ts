@@ -1,6 +1,6 @@
 import { IAtomicService, IAuthState } from "@/interfaces";
 import { origin } from "@/modules/environment.module";
-import { customFetch } from "@/modules/fetch-manager.module";
+import { customAxios } from "@/modules/fetch-manager.module";
 import { CsvUpload } from "@/types";
 import { authManager } from "./auth-manager.module";
 
@@ -372,13 +372,13 @@ export class MetrcRequestManager implements IAtomicService {
   }
 
   async getLoginPage() {
-    return customFetch(LOGIN_URL, {
+    return customAxios(LOGIN_URL, {
       ...DEFAULT_FETCH_GET_OPTIONS,
     });
   }
 
   async getEmployees(body: string) {
-    return customFetch(EMPLOYEES_URL, {
+    return customAxios(EMPLOYEES_URL, {
       ...DEFAULT_FETCH_POST_READ_OPTIONS,
       headers: {
         ...(await buildAuthenticationHeaders(this.authStateOrError)),
@@ -389,7 +389,7 @@ export class MetrcRequestManager implements IAtomicService {
   }
 
   async getAvailableTags(body: string) {
-    return customFetch(AVAILABLE_TAGS_URL, {
+    return customAxios(AVAILABLE_TAGS_URL, {
       ...DEFAULT_FETCH_POST_READ_OPTIONS,
       headers: {
         ...(await buildAuthenticationHeaders(this.authStateOrError)),
@@ -400,7 +400,7 @@ export class MetrcRequestManager implements IAtomicService {
   }
 
   async getUsedTags(body: string) {
-    return customFetch(USED_TAGS_URL, {
+    return customAxios(USED_TAGS_URL, {
       ...DEFAULT_FETCH_POST_READ_OPTIONS,
       headers: {
         ...(await buildAuthenticationHeaders(this.authStateOrError)),
@@ -411,7 +411,7 @@ export class MetrcRequestManager implements IAtomicService {
   }
 
   async getVoidedTags(body: string) {
-    return customFetch(VOIDED_TAGS_URL, {
+    return customAxios(VOIDED_TAGS_URL, {
       ...DEFAULT_FETCH_POST_READ_OPTIONS,
       headers: {
         ...(await buildAuthenticationHeaders(this.authStateOrError)),
@@ -422,7 +422,7 @@ export class MetrcRequestManager implements IAtomicService {
   }
 
   async getLocations(body: string) {
-    return customFetch(LOCATIONS_URL, {
+    return customAxios(LOCATIONS_URL, {
       ...DEFAULT_FETCH_POST_READ_OPTIONS,
       headers: {
         ...(await buildAuthenticationHeaders(this.authStateOrError)),
@@ -433,7 +433,7 @@ export class MetrcRequestManager implements IAtomicService {
   }
 
   async getItems(body: string) {
-    return customFetch(ITEMS_URL, {
+    return customAxios(ITEMS_URL, {
       ...DEFAULT_FETCH_POST_READ_OPTIONS,
       headers: {
         ...(await buildAuthenticationHeaders(this.authStateOrError)),
@@ -444,7 +444,7 @@ export class MetrcRequestManager implements IAtomicService {
   }
 
   async getStrains(body: string) {
-    return customFetch(STRAINS_URL, {
+    return customAxios(STRAINS_URL, {
       ...DEFAULT_FETCH_POST_READ_OPTIONS,
       headers: {
         ...(await buildAuthenticationHeaders(this.authStateOrError)),
@@ -455,7 +455,7 @@ export class MetrcRequestManager implements IAtomicService {
   }
 
   async getActiveHarvests(body: string) {
-    return customFetch(ACTIVE_HARVESTS_URL, {
+    return customAxios(ACTIVE_HARVESTS_URL, {
       ...DEFAULT_FETCH_POST_READ_OPTIONS,
       headers: {
         ...(await buildAuthenticationHeaders(this.authStateOrError)),
@@ -466,7 +466,7 @@ export class MetrcRequestManager implements IAtomicService {
   }
 
   async getInactiveHarvests(body: string) {
-    return customFetch(INACTIVE_HARVESTS_URL, {
+    return customAxios(INACTIVE_HARVESTS_URL, {
       ...DEFAULT_FETCH_POST_READ_OPTIONS,
       headers: {
         ...(await buildAuthenticationHeaders(this.authStateOrError)),
@@ -477,7 +477,7 @@ export class MetrcRequestManager implements IAtomicService {
   }
 
   async getHarvestHistory(body: string, harvestId: number) {
-    return customFetch(
+    return customAxios(
       await buildDynamicUrl(this.authStateOrError, UrlType.HARVEST_HISTORY_BY_HARVEST_ID, {
         harvestId,
       }),
@@ -494,7 +494,7 @@ export class MetrcRequestManager implements IAtomicService {
   }
 
   async getVegetativePlants(body: string) {
-    return customFetch(VEGETATIVE_PLANTS_URL, {
+    return customAxios(VEGETATIVE_PLANTS_URL, {
       ...DEFAULT_FETCH_POST_READ_OPTIONS,
       headers: {
         ...(await buildAuthenticationHeaders(this.authStateOrError)),
@@ -505,7 +505,7 @@ export class MetrcRequestManager implements IAtomicService {
   }
 
   async getFloweringPlants(body: string) {
-    return customFetch(FLOWERING_PLANTS_URL, {
+    return customAxios(FLOWERING_PLANTS_URL, {
       ...DEFAULT_FETCH_POST_READ_OPTIONS,
       headers: {
         ...(await buildAuthenticationHeaders(this.authStateOrError)),
@@ -516,7 +516,7 @@ export class MetrcRequestManager implements IAtomicService {
   }
 
   async getInactivePlants(body: string) {
-    return customFetch(INACTIVE_PLANTS_URL, {
+    return customAxios(INACTIVE_PLANTS_URL, {
       ...DEFAULT_FETCH_POST_READ_OPTIONS,
       headers: {
         ...(await buildAuthenticationHeaders(this.authStateOrError)),
@@ -527,7 +527,7 @@ export class MetrcRequestManager implements IAtomicService {
   }
 
   async getPlantBatches(body: string) {
-    return customFetch(PLANT_BATCHES_URL, {
+    return customAxios(PLANT_BATCHES_URL, {
       ...DEFAULT_FETCH_POST_READ_OPTIONS,
       headers: {
         ...(await buildAuthenticationHeaders(this.authStateOrError)),
@@ -538,7 +538,7 @@ export class MetrcRequestManager implements IAtomicService {
   }
 
   async getInactivePlantBatches(body: string) {
-    return customFetch(INACTIVE_PLANT_BATCHES_URL, {
+    return customAxios(INACTIVE_PLANT_BATCHES_URL, {
       ...DEFAULT_FETCH_POST_READ_OPTIONS,
       headers: {
         ...(await buildAuthenticationHeaders(this.authStateOrError)),
@@ -549,7 +549,7 @@ export class MetrcRequestManager implements IAtomicService {
   }
 
   async getActivePackages(body: string) {
-    return customFetch(ACTIVE_PACKAGES_URL, {
+    return customAxios(ACTIVE_PACKAGES_URL, {
       ...DEFAULT_FETCH_POST_READ_OPTIONS,
       headers: {
         ...(await buildAuthenticationHeaders(this.authStateOrError)),
@@ -560,7 +560,7 @@ export class MetrcRequestManager implements IAtomicService {
   }
 
   async getInactivePackages(body: string) {
-    return customFetch(INACTIVE_PACKAGES_URL, {
+    return customAxios(INACTIVE_PACKAGES_URL, {
       ...DEFAULT_FETCH_POST_READ_OPTIONS,
       // timeout: 10000,
       axiosRetry: {
@@ -575,7 +575,7 @@ export class MetrcRequestManager implements IAtomicService {
   }
 
   async getOnHoldPackages(body: string) {
-    return customFetch(ON_HOLD_PACKAGES_URL, {
+    return customAxios(ON_HOLD_PACKAGES_URL, {
       ...DEFAULT_FETCH_POST_READ_OPTIONS,
       headers: {
         ...(await buildAuthenticationHeaders(this.authStateOrError)),
@@ -586,7 +586,7 @@ export class MetrcRequestManager implements IAtomicService {
   }
 
   async getInTransitPackages(body: string) {
-    return customFetch(IN_TRANSIT_PACKAGES_URL, {
+    return customAxios(IN_TRANSIT_PACKAGES_URL, {
       ...DEFAULT_FETCH_POST_READ_OPTIONS,
       headers: {
         ...(await buildAuthenticationHeaders(this.authStateOrError)),
@@ -597,7 +597,7 @@ export class MetrcRequestManager implements IAtomicService {
   }
 
   async getIncomingTransfers(body: string) {
-    return customFetch(INCOMING_TRANSFERS_URL, {
+    return customAxios(INCOMING_TRANSFERS_URL, {
       ...DEFAULT_FETCH_POST_READ_OPTIONS,
       headers: {
         ...(await buildAuthenticationHeaders(this.authStateOrError)),
@@ -608,7 +608,7 @@ export class MetrcRequestManager implements IAtomicService {
   }
 
   async getIncomingInactiveTransfers(body: string) {
-    return customFetch(INCOMING_INACTIVE_TRANSFERS_URL, {
+    return customAxios(INCOMING_INACTIVE_TRANSFERS_URL, {
       ...DEFAULT_FETCH_POST_READ_OPTIONS,
       headers: {
         ...(await buildAuthenticationHeaders(this.authStateOrError)),
@@ -619,7 +619,7 @@ export class MetrcRequestManager implements IAtomicService {
   }
 
   async getOutgoingTransfers(body: string) {
-    return customFetch(OUTGOING_TRANSFERS_URL, {
+    return customAxios(OUTGOING_TRANSFERS_URL, {
       ...DEFAULT_FETCH_POST_READ_OPTIONS,
       headers: {
         ...(await buildAuthenticationHeaders(this.authStateOrError)),
@@ -630,7 +630,7 @@ export class MetrcRequestManager implements IAtomicService {
   }
 
   async getOutgoingInactiveTransfers(body: string) {
-    return customFetch(OUTGOING_INACTIVE_TRANSFERS_URL, {
+    return customAxios(OUTGOING_INACTIVE_TRANSFERS_URL, {
       ...DEFAULT_FETCH_POST_READ_OPTIONS,
       headers: {
         ...(await buildAuthenticationHeaders(this.authStateOrError)),
@@ -641,7 +641,7 @@ export class MetrcRequestManager implements IAtomicService {
   }
 
   async getRejectedTransfers(body: string) {
-    return customFetch(REJECTED_TRANSFERS_URL, {
+    return customAxios(REJECTED_TRANSFERS_URL, {
       ...DEFAULT_FETCH_POST_READ_OPTIONS,
       headers: {
         ...(await buildAuthenticationHeaders(this.authStateOrError)),
@@ -652,7 +652,7 @@ export class MetrcRequestManager implements IAtomicService {
   }
 
   async getLayoverTransfers(body: string) {
-    return customFetch(LAYOVER_TRANSFERS_URL, {
+    return customAxios(LAYOVER_TRANSFERS_URL, {
       ...DEFAULT_FETCH_POST_READ_OPTIONS,
       headers: {
         ...(await buildAuthenticationHeaders(this.authStateOrError)),
@@ -663,7 +663,7 @@ export class MetrcRequestManager implements IAtomicService {
   }
 
   async createTransfers(body: string) {
-    return customFetch(CREATE_TRANSFERS_URL, {
+    return customAxios(CREATE_TRANSFERS_URL, {
       ...DEFAULT_FETCH_POST_WRITE_OPTIONS,
       headers: {
         ...(await buildAuthenticationHeaders(this.authStateOrError)),
@@ -674,7 +674,7 @@ export class MetrcRequestManager implements IAtomicService {
   }
 
   async updateTransfers(body: string) {
-    return customFetch(UPDATE_TRANSFERS_URL, {
+    return customAxios(UPDATE_TRANSFERS_URL, {
       ...DEFAULT_FETCH_POST_WRITE_OPTIONS,
       headers: {
         ...(await buildAuthenticationHeaders(this.authStateOrError)),
@@ -685,7 +685,7 @@ export class MetrcRequestManager implements IAtomicService {
   }
 
   async getActiveSalesReceipts(body: string) {
-    return customFetch(ACTIVE_SALES_RECEIPTS_URL, {
+    return customAxios(ACTIVE_SALES_RECEIPTS_URL, {
       ...DEFAULT_FETCH_POST_READ_OPTIONS,
       headers: {
         ...(await buildAuthenticationHeaders(this.authStateOrError)),
@@ -696,7 +696,7 @@ export class MetrcRequestManager implements IAtomicService {
   }
 
   async getInactiveSalesReceipts(body: string) {
-    return customFetch(INACTIVE_SALES_RECEIPTS_URL, {
+    return customAxios(INACTIVE_SALES_RECEIPTS_URL, {
       ...DEFAULT_FETCH_POST_READ_OPTIONS,
       headers: {
         ...(await buildAuthenticationHeaders(this.authStateOrError)),
@@ -707,7 +707,7 @@ export class MetrcRequestManager implements IAtomicService {
   }
 
   async getTestResults(body: string, packageId: number) {
-    return customFetch(
+    return customAxios(
       await buildDynamicUrl(this.authStateOrError, UrlType.LAB_RESULTS_BY_PACKAGE_ID, {
         packageId,
       }),
@@ -723,7 +723,7 @@ export class MetrcRequestManager implements IAtomicService {
   }
 
   async getDestinationTransporters(body: string, destinationId: number) {
-    return customFetch(
+    return customAxios(
       await buildDynamicUrl(
         this.authStateOrError,
         UrlType.DESTINATION_TRANSPORTERS_BY_DESTINATION_ID,
@@ -743,7 +743,7 @@ export class MetrcRequestManager implements IAtomicService {
   }
 
   async getTransferDestinations(body: string, transferId: number) {
-    return customFetch(
+    return customAxios(
       await buildDynamicUrl(this.authStateOrError, UrlType.TRANSFER_DESTINATIONS_BY_TRANSFER_ID, {
         transferId,
       }),
@@ -759,7 +759,7 @@ export class MetrcRequestManager implements IAtomicService {
   }
 
   async getTransferTransporterDetails(body: string, transferId: number) {
-    return customFetch(
+    return customAxios(
       await buildDynamicUrl(
         this.authStateOrError,
         UrlType.TRANSFER_TRANSPORTER_DETAILS_BY_TRANSFER_ID,
@@ -779,7 +779,7 @@ export class MetrcRequestManager implements IAtomicService {
   }
 
   async getDestinationPackages(body: string, destinationId: number) {
-    return customFetch(
+    return customAxios(
       await buildDynamicUrl(this.authStateOrError, UrlType.DESTINATION_PACKAGES_BY_DESTINATION_ID, {
         destinationId,
       }),
@@ -795,7 +795,7 @@ export class MetrcRequestManager implements IAtomicService {
   }
 
   async getPackageHistory(body: string, packageId: number) {
-    return customFetch(
+    return customAxios(
       await buildDynamicUrl(this.authStateOrError, UrlType.PACKAGE_HISTORY_BY_PACKAGE_ID, {
         packageId,
       }),
@@ -811,7 +811,7 @@ export class MetrcRequestManager implements IAtomicService {
   }
 
   async getPackageHarvestHistory(body: string, packageId: number) {
-    return customFetch(
+    return customAxios(
       await buildDynamicUrl(this.authStateOrError, UrlType.PACKAGE_HARVEST_HISTORY_BY_PACKAGE_ID, {
         packageId,
       }),
@@ -827,7 +827,7 @@ export class MetrcRequestManager implements IAtomicService {
   }
 
   async getPlantHistory(body: string, plantId: number) {
-    return customFetch(
+    return customAxios(
       await buildDynamicUrl(this.authStateOrError, UrlType.PLANT_HISTORY_BY_PLANT_ID, {
         plantId,
       }),
@@ -843,7 +843,7 @@ export class MetrcRequestManager implements IAtomicService {
   }
 
   async getPlantBatchHistory(body: string, plantBatchId: number) {
-    return customFetch(
+    return customAxios(
       await buildDynamicUrl(this.authStateOrError, UrlType.PLANT_BATCH_HISTORY_BY_PLANT_BATCH_ID, {
         plantBatchId,
       }),
@@ -859,7 +859,7 @@ export class MetrcRequestManager implements IAtomicService {
   }
 
   async getTransferHistory(body: string, manifestNumber: number) {
-    return customFetch(
+    return customAxios(
       await buildDynamicUrl(this.authStateOrError, UrlType.TRANSFER_HISTORY_BY_TRANSFER_ID, {
         manifestNumber,
       }),
@@ -875,7 +875,7 @@ export class MetrcRequestManager implements IAtomicService {
   }
 
   async getTagOrderHistory(body: string) {
-    return customFetch(TAG_ORDER_HISTORY_URL, {
+    return customAxios(TAG_ORDER_HISTORY_URL, {
       ...DEFAULT_FETCH_POST_WRITE_OPTIONS,
       headers: {
         ...(await buildAuthenticationHeaders(this.authStateOrError)),
@@ -886,7 +886,7 @@ export class MetrcRequestManager implements IAtomicService {
   }
 
   async getDataImportHistory(body: string, csvUpload: CsvUpload) {
-    return customFetch(
+    return customAxios(
       await buildDynamicUrl(this.authStateOrError, UrlType.DATAIMPORT_HISTORY, { csvUpload }),
       {
         ...DEFAULT_FETCH_POST_WRITE_OPTIONS,
@@ -900,7 +900,7 @@ export class MetrcRequestManager implements IAtomicService {
   }
 
   async getTagOrderHTML() {
-    return customFetch(await buildDynamicUrl(this.authStateOrError, UrlType.REORDER_TAGS_MODAL), {
+    return customAxios(await buildDynamicUrl(this.authStateOrError, UrlType.REORDER_TAGS_MODAL), {
       ...DEFAULT_FETCH_GET_OPTIONS,
       headers: {
         ...(await buildAuthenticationHeaders(this.authStateOrError)),
@@ -910,7 +910,7 @@ export class MetrcRequestManager implements IAtomicService {
   }
 
   async getUserProfileHTML() {
-    return customFetch(await buildDynamicUrl(this.authStateOrError, UrlType.USER_PROFILE), {
+    return customAxios(await buildDynamicUrl(this.authStateOrError, UrlType.USER_PROFILE), {
       ...DEFAULT_FETCH_GET_OPTIONS,
       headers: {
         ...(await buildAuthenticationHeaders(this.authStateOrError)),
@@ -920,7 +920,7 @@ export class MetrcRequestManager implements IAtomicService {
   }
 
   async getApiKeyHTML() {
-    return customFetch(await buildDynamicUrl(this.authStateOrError, UrlType.API_KEYS), {
+    return customAxios(await buildDynamicUrl(this.authStateOrError, UrlType.API_KEYS), {
       ...DEFAULT_FETCH_GET_OPTIONS,
       headers: {
         ...(await buildAuthenticationHeaders(this.authStateOrError)),
@@ -930,7 +930,7 @@ export class MetrcRequestManager implements IAtomicService {
   }
 
   async getDataImportHTML() {
-    return customFetch(await buildDynamicUrl(this.authStateOrError, UrlType.DATAIMPORT), {
+    return customAxios(await buildDynamicUrl(this.authStateOrError, UrlType.DATAIMPORT), {
       ...DEFAULT_FETCH_GET_OPTIONS,
       headers: {
         ...(await buildAuthenticationHeaders(this.authStateOrError)),
@@ -940,7 +940,7 @@ export class MetrcRequestManager implements IAtomicService {
   }
 
   async noop() {
-    return customFetch(NOOP_URL, {
+    return customAxios(NOOP_URL, {
       ...DEFAULT_FETCH_POST_WRITE_OPTIONS,
       headers: {
         ...(await buildAuthenticationHeaders(this.authStateOrError)),
@@ -950,7 +950,7 @@ export class MetrcRequestManager implements IAtomicService {
   }
 
   async addPackageNote(body: string) {
-    return customFetch(PACKAGE_NOTE_URL, {
+    return customAxios(PACKAGE_NOTE_URL, {
       ...DEFAULT_FETCH_POST_WRITE_OPTIONS,
       headers: {
         ...(await buildAuthenticationHeaders(this.authStateOrError)),
@@ -961,7 +961,7 @@ export class MetrcRequestManager implements IAtomicService {
   }
 
   async voidTag(body: string) {
-    return customFetch(VOID_TAG_URL, {
+    return customAxios(VOID_TAG_URL, {
       ...DEFAULT_FETCH_POST_WRITE_OPTIONS,
       headers: {
         ...(await buildAuthenticationHeaders(this.authStateOrError)),
@@ -975,7 +975,7 @@ export class MetrcRequestManager implements IAtomicService {
   // async uploadMovePlantsCsv(body: string) {
   //     // https://stackoverflow.com/questions/35192841/how-do-i-post-with-multipart-form-data-using-fetch
 
-  //     return customFetch(DATAIMPORT_MOVE_PLANTS_URL, {
+  //     return customAxios(DATAIMPORT_MOVE_PLANTS_URL, {
   //         ...DEFAULT_FETCH_POST_WRITE_OPTIONS,
   //         // @ts-ignore
   //         headers: {
@@ -990,7 +990,7 @@ export class MetrcRequestManager implements IAtomicService {
   // }
 
   async reorderTags(body: string) {
-    return customFetch(REORDER_TAGS_URL, {
+    return customAxios(REORDER_TAGS_URL, {
       ...DEFAULT_FETCH_POST_WRITE_OPTIONS,
       headers: {
         ...(await buildAuthenticationHeaders(this.authStateOrError)),
@@ -1001,7 +1001,7 @@ export class MetrcRequestManager implements IAtomicService {
   }
 
   async movePlants(body: string) {
-    return customFetch(MOVE_PLANTS_URL, {
+    return customAxios(MOVE_PLANTS_URL, {
       ...DEFAULT_FETCH_POST_WRITE_OPTIONS,
       headers: {
         ...(await buildAuthenticationHeaders(this.authStateOrError)),
@@ -1012,7 +1012,7 @@ export class MetrcRequestManager implements IAtomicService {
   }
 
   async movePackages(body: string) {
-    return customFetch(MOVE_PACKAGES_URL, {
+    return customAxios(MOVE_PACKAGES_URL, {
       ...DEFAULT_FETCH_POST_WRITE_OPTIONS,
       headers: {
         ...(await buildAuthenticationHeaders(this.authStateOrError)),
@@ -1023,7 +1023,7 @@ export class MetrcRequestManager implements IAtomicService {
   }
 
   async harvestPlants(body: string) {
-    return customFetch(HARVEST_PLANTS_URL, {
+    return customAxios(HARVEST_PLANTS_URL, {
       ...DEFAULT_FETCH_POST_WRITE_OPTIONS,
       headers: {
         ...(await buildAuthenticationHeaders(this.authStateOrError)),
@@ -1034,7 +1034,7 @@ export class MetrcRequestManager implements IAtomicService {
   }
 
   async manicurePlants(body: string) {
-    return customFetch(MANICURE_PLANTS_URL, {
+    return customAxios(MANICURE_PLANTS_URL, {
       ...DEFAULT_FETCH_POST_WRITE_OPTIONS,
       headers: {
         ...(await buildAuthenticationHeaders(this.authStateOrError)),
@@ -1045,7 +1045,7 @@ export class MetrcRequestManager implements IAtomicService {
   }
 
   async createPackages(body: string) {
-    return customFetch(CREATE_PACKAGES_URL, {
+    return customAxios(CREATE_PACKAGES_URL, {
       ...DEFAULT_FETCH_POST_WRITE_OPTIONS,
       headers: {
         ...(await buildAuthenticationHeaders(this.authStateOrError)),
@@ -1056,7 +1056,7 @@ export class MetrcRequestManager implements IAtomicService {
   }
 
   async finishPackages(body: string) {
-    return customFetch(FINISH_PACKAGES_URL, {
+    return customAxios(FINISH_PACKAGES_URL, {
       ...DEFAULT_FETCH_POST_WRITE_OPTIONS,
       headers: {
         ...(await buildAuthenticationHeaders(this.authStateOrError)),
@@ -1067,7 +1067,7 @@ export class MetrcRequestManager implements IAtomicService {
   }
 
   async adjustPackages(body: string) {
-    return customFetch(PACKAGE_ADJUST_URL, {
+    return customAxios(PACKAGE_ADJUST_URL, {
       ...DEFAULT_FETCH_POST_WRITE_OPTIONS,
       headers: {
         ...(await buildAuthenticationHeaders(this.authStateOrError)),
@@ -1078,7 +1078,7 @@ export class MetrcRequestManager implements IAtomicService {
   }
 
   async replacePlantTags(body: string) {
-    return customFetch(REPLACE_PLANT_TAGS_URL, {
+    return customAxios(REPLACE_PLANT_TAGS_URL, {
       ...DEFAULT_FETCH_POST_WRITE_OPTIONS,
       headers: {
         ...(await buildAuthenticationHeaders(this.authStateOrError)),
@@ -1089,7 +1089,7 @@ export class MetrcRequestManager implements IAtomicService {
   }
 
   async replacePlantBatchTags(body: string) {
-    return customFetch(REPLACE_PLANT_BATCH_TAGS_URL, {
+    return customAxios(REPLACE_PLANT_BATCH_TAGS_URL, {
       ...DEFAULT_FETCH_POST_WRITE_OPTIONS,
       headers: {
         ...(await buildAuthenticationHeaders(this.authStateOrError)),
@@ -1100,7 +1100,7 @@ export class MetrcRequestManager implements IAtomicService {
   }
 
   async unpackImmaturePlants(body: string) {
-    return customFetch(UNPACK_IMMATURE_PLANTS_URL, {
+    return customAxios(UNPACK_IMMATURE_PLANTS_URL, {
       ...DEFAULT_FETCH_POST_WRITE_OPTIONS,
       headers: {
         ...(await buildAuthenticationHeaders(this.authStateOrError)),
@@ -1111,7 +1111,7 @@ export class MetrcRequestManager implements IAtomicService {
   }
 
   async packImmaturePlants(body: string) {
-    return customFetch(IMMATURE_PLANT_PACKAGES_FROM_MOTHER_PLANT_BATCH_URL, {
+    return customAxios(IMMATURE_PLANT_PACKAGES_FROM_MOTHER_PLANT_BATCH_URL, {
       ...DEFAULT_FETCH_POST_WRITE_OPTIONS,
       headers: {
         ...(await buildAuthenticationHeaders(this.authStateOrError)),
@@ -1122,7 +1122,7 @@ export class MetrcRequestManager implements IAtomicService {
   }
 
   async immaturePlantPackagesFromMotherPlant(body: string) {
-    return customFetch(IMMATURE_PLANT_PACKAGES_FROM_MOTHER_PLANT_URL, {
+    return customAxios(IMMATURE_PLANT_PACKAGES_FROM_MOTHER_PLANT_URL, {
       ...DEFAULT_FETCH_POST_WRITE_OPTIONS,
       headers: {
         ...(await buildAuthenticationHeaders(this.authStateOrError)),
@@ -1133,7 +1133,7 @@ export class MetrcRequestManager implements IAtomicService {
   }
 
   async immaturePlantPackagesFromMotherPlantBatch(body: string) {
-    return customFetch(IMMATURE_PLANT_PACKAGES_FROM_MOTHER_PLANT_BATCH_URL, {
+    return customAxios(IMMATURE_PLANT_PACKAGES_FROM_MOTHER_PLANT_BATCH_URL, {
       ...DEFAULT_FETCH_POST_WRITE_OPTIONS,
       headers: {
         ...(await buildAuthenticationHeaders(this.authStateOrError)),
@@ -1144,7 +1144,7 @@ export class MetrcRequestManager implements IAtomicService {
   }
 
   async promoteImmaturePlants(body: string) {
-    return customFetch(PROMOTE_IMMATURE_PLANTS_URL, {
+    return customAxios(PROMOTE_IMMATURE_PLANTS_URL, {
       ...DEFAULT_FETCH_POST_WRITE_OPTIONS,
       headers: {
         ...(await buildAuthenticationHeaders(this.authStateOrError)),
@@ -1155,7 +1155,7 @@ export class MetrcRequestManager implements IAtomicService {
   }
 
   async destroyPlants(body: string) {
-    return customFetch(DESTROY_PLANTS_URL, {
+    return customAxios(DESTROY_PLANTS_URL, {
       ...DEFAULT_FETCH_POST_WRITE_OPTIONS,
       headers: {
         ...(await buildAuthenticationHeaders(this.authStateOrError)),
@@ -1166,7 +1166,7 @@ export class MetrcRequestManager implements IAtomicService {
   }
 
   async createItems(body: string) {
-    return customFetch(CREATE_ITEMS_URL, {
+    return customAxios(CREATE_ITEMS_URL, {
       ...DEFAULT_FETCH_POST_WRITE_OPTIONS,
       headers: {
         ...(await buildAuthenticationHeaders(this.authStateOrError)),
@@ -1177,7 +1177,7 @@ export class MetrcRequestManager implements IAtomicService {
   }
 
   async createStrains(body: string) {
-    return customFetch(CREATE_STRAINS_URL, {
+    return customAxios(CREATE_STRAINS_URL, {
       ...DEFAULT_FETCH_POST_WRITE_OPTIONS,
       headers: {
         ...(await buildAuthenticationHeaders(this.authStateOrError)),
@@ -1188,7 +1188,7 @@ export class MetrcRequestManager implements IAtomicService {
   }
 
   async generateApiKey() {
-    return customFetch(GENERATE_API_KEY_URL, {
+    return customAxios(GENERATE_API_KEY_URL, {
       ...DEFAULT_FETCH_POST_WRITE_OPTIONS,
       headers: {
         ...(await buildAuthenticationHeaders(this.authStateOrError)),
@@ -1197,7 +1197,7 @@ export class MetrcRequestManager implements IAtomicService {
     });
   }
   async finalizeSalesReceipts(body: string) {
-    return customFetch(FINALIZE_SALES_RECEIPTS_URL, {
+    return customAxios(FINALIZE_SALES_RECEIPTS_URL, {
       ...DEFAULT_FETCH_POST_WRITE_OPTIONS,
       headers: {
         ...(await buildAuthenticationHeaders(this.authStateOrError)),
@@ -1208,7 +1208,7 @@ export class MetrcRequestManager implements IAtomicService {
   }
 
   async getNewTransferHTML() {
-    return customFetch(await buildDynamicUrl(this.authStateOrError, UrlType.NEW_TRANSFER_MODAL), {
+    return customAxios(await buildDynamicUrl(this.authStateOrError, UrlType.NEW_TRANSFER_MODAL), {
       ...DEFAULT_FETCH_GET_OPTIONS,
       headers: {
         ...(await buildAuthenticationHeaders(this.authStateOrError)),
@@ -1218,7 +1218,7 @@ export class MetrcRequestManager implements IAtomicService {
   }
 
   async getPackagesHTML() {
-    return customFetch(await buildDynamicUrl(this.authStateOrError, UrlType.PACKAGES), {
+    return customAxios(await buildDynamicUrl(this.authStateOrError, UrlType.PACKAGES), {
       ...DEFAULT_FETCH_GET_OPTIONS,
       headers: {
         ...(await buildAuthenticationHeaders(this.authStateOrError)),
@@ -1228,7 +1228,7 @@ export class MetrcRequestManager implements IAtomicService {
   }
 
   async getMovePackagesHTML() {
-    return customFetch(await buildDynamicUrl(this.authStateOrError, UrlType.MOVE_PACKAGES_MODAL), {
+    return customAxios(await buildDynamicUrl(this.authStateOrError, UrlType.MOVE_PACKAGES_MODAL), {
       ...DEFAULT_FETCH_GET_OPTIONS,
       headers: {
         ...(await buildAuthenticationHeaders(this.authStateOrError)),
@@ -1238,7 +1238,7 @@ export class MetrcRequestManager implements IAtomicService {
   }
 
   async getNewItemHTML() {
-    return customFetch(await buildDynamicUrl(this.authStateOrError, UrlType.NEW_ITEM_MODAL), {
+    return customAxios(await buildDynamicUrl(this.authStateOrError, UrlType.NEW_ITEM_MODAL), {
       ...DEFAULT_FETCH_GET_OPTIONS,
       headers: {
         ...(await buildAuthenticationHeaders(this.authStateOrError)),
@@ -1248,7 +1248,7 @@ export class MetrcRequestManager implements IAtomicService {
   }
 
   async getNewStrainHTML() {
-    return customFetch(await buildDynamicUrl(this.authStateOrError, UrlType.NEW_STRAIN_MODAL), {
+    return customAxios(await buildDynamicUrl(this.authStateOrError, UrlType.NEW_STRAIN_MODAL), {
       ...DEFAULT_FETCH_GET_OPTIONS,
       headers: {
         ...(await buildAuthenticationHeaders(this.authStateOrError)),
@@ -1258,7 +1258,7 @@ export class MetrcRequestManager implements IAtomicService {
   }
 
   async getWasteByLocationHTML() {
-    return customFetch(await buildDynamicUrl(this.authStateOrError, UrlType.WASTE_BY_LOCATION), {
+    return customAxios(await buildDynamicUrl(this.authStateOrError, UrlType.WASTE_BY_LOCATION), {
       ...DEFAULT_FETCH_GET_OPTIONS,
       headers: {
         ...(await buildAuthenticationHeaders(this.authStateOrError)),
@@ -1268,7 +1268,7 @@ export class MetrcRequestManager implements IAtomicService {
   }
 
   async getAdjustPackageHTML() {
-    return customFetch(await buildDynamicUrl(this.authStateOrError, UrlType.ADJUST_PACKAGE), {
+    return customAxios(await buildDynamicUrl(this.authStateOrError, UrlType.ADJUST_PACKAGE), {
       ...DEFAULT_FETCH_GET_OPTIONS,
       headers: {
         ...(await buildAuthenticationHeaders(this.authStateOrError)),
@@ -1278,7 +1278,7 @@ export class MetrcRequestManager implements IAtomicService {
   }
 
   async getRemediatePackageHTML() {
-    return customFetch(await buildDynamicUrl(this.authStateOrError, UrlType.REMEDIATE_PACKAGE), {
+    return customAxios(await buildDynamicUrl(this.authStateOrError, UrlType.REMEDIATE_PACKAGE), {
       ...DEFAULT_FETCH_GET_OPTIONS,
       headers: {
         ...(await buildAuthenticationHeaders(this.authStateOrError)),
@@ -1288,7 +1288,7 @@ export class MetrcRequestManager implements IAtomicService {
   }
 
   async getCreatePlantingsFromPackageHTML() {
-    return customFetch(
+    return customAxios(
       await buildDynamicUrl(this.authStateOrError, UrlType.CREATE_PLANTINGS_FROM_PACKAGE),
       {
         ...DEFAULT_FETCH_GET_OPTIONS,
@@ -1301,7 +1301,7 @@ export class MetrcRequestManager implements IAtomicService {
   }
 
   async getChangePlantBatchGrowthPhaseHTML() {
-    return customFetch(
+    return customAxios(
       await buildDynamicUrl(this.authStateOrError, UrlType.CHANGE_PLANT_BATCH_GROWTH_PHASE),
       {
         ...DEFAULT_FETCH_GET_OPTIONS,
@@ -1314,7 +1314,7 @@ export class MetrcRequestManager implements IAtomicService {
   }
 
   async getNewPackageHTML() {
-    return customFetch(await buildDynamicUrl(this.authStateOrError, UrlType.NEW_PACKAGE_MODAL), {
+    return customAxios(await buildDynamicUrl(this.authStateOrError, UrlType.NEW_PACKAGE_MODAL), {
       ...DEFAULT_FETCH_GET_OPTIONS,
       headers: {
         ...(await buildAuthenticationHeaders(this.authStateOrError)),
@@ -1324,7 +1324,7 @@ export class MetrcRequestManager implements IAtomicService {
   }
 
   async getNewTransferTemplateHTML() {
-    return customFetch(
+    return customAxios(
       await buildDynamicUrl(this.authStateOrError, UrlType.NEW_TRANSFER_TEMPLATE_MODAL),
       {
         ...DEFAULT_FETCH_GET_OPTIONS,

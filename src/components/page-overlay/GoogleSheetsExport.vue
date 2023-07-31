@@ -95,9 +95,22 @@
           <template v-if="selectedReports.includes(ReportType.COGS_V2)">
             <div class="rounded border border-gray-300 p-2 flex flex-col items-stretch gap-2">
               <div class="font-semibold text-gray-700">COGS</div>
+
+              <div>
+                <span class="font-semibold text-red-500"
+                  >Note: This can take up to 10 minutes to finish. Do not close the tab before it
+                  finishes.</span
+                >
+              </div>
+
+              <a size="sm" variant="link" class="text-purple-500 underline" href="#" target="_blank"
+                >How to use this tool</a
+              >
+
               <hr />
               <div class="flex flex-col items-stretch gap-4">
                 <div class="flex flex-col items-start gap-1">
+                  <span>Start date:</span>
                   <b-form-datepicker
                     :required="true"
                     initial-date
@@ -107,6 +120,7 @@
                 </div>
 
                 <div class="flex flex-col items-start gap-1">
+                  <span>End date:</span>
                   <b-form-datepicker
                     :required="true"
                     initial-date
@@ -115,13 +129,23 @@
                   />
                 </div>
 
-                <b-button @click="updateMasterPbCostSheet()">UPDATE MASTER PB COST SHEET</b-button>
-                <a :href="masterCostSheetUrl" target="_blank">Master PB Cost Sheet</a>
+                <hr />
 
-                <b-button @click="showCogsV2Advanced = !showCogsV2Advanced"
-                  >TOGGLE ADVANCED</b-button
+                <b-button size="sm" variant="primary" @click="updateMasterPbCostSheet()"
+                  >UPDATE MASTER PB COST SHEET</b-button
                 >
-                <template v-if="showCogsV2Advanced">
+                <a
+                  size="sm"
+                  variant="link"
+                  class="text-purple-500 underline"
+                  :href="masterCostSheetUrl"
+                  target="_blank"
+                  >Master PB Cost Sheet</a
+                >
+
+                <hr />
+
+                <simple-drawer toggleText="ADVANCED">
                   <b-form-group label="Licenses:">
                     <b-form-checkbox-group
                       v-model="cogsV2FormFilters.licenses"
@@ -130,7 +154,16 @@
                   </b-form-group>
 
                   <blob-cache-widget :cachekey="cogsV2key"></blob-cache-widget>
-                </template>
+                </simple-drawer>
+
+                <!-- <b-button
+                  size="sm"
+                  variant="outline-dark"
+                  @click="showCogsV2Advanced = !showCogsV2Advanced"
+                  >ADVANCED</b-button
+                >
+                <template v-if="showCogsV2Advanced">
+                </template> -->
               </div>
             </div>
           </template>
@@ -1421,6 +1454,7 @@ import Vue from "vue";
 import { mapActions, mapState } from "vuex";
 import ArchiveWidget from "../shared/ArchiveWidget.vue";
 import BlobCacheWidget from "../shared/BlobCacheWidget.vue";
+import SimpleDrawer from "../shared/SimpleDrawer.vue";
 import {
   addEmployeeSamplesReport,
   employeeSamplesFormFiltersFactory,
@@ -1444,6 +1478,7 @@ export default Vue.extend({
   components: {
     ArchiveWidget,
     BlobCacheWidget,
+    SimpleDrawer,
   },
   computed: {
     ...mapState<IPluginState>({
@@ -1482,7 +1517,7 @@ export default Vue.extend({
       selectedReports: [] as ReportType[],
       cogsFormFilters: cogsFormFiltersFactory(),
       cogsV2FormFilters: cogsV2FormFiltersFactory(),
-      showCogsV2Advanced: false,
+      // showCogsV2Advanced: false,
       masterCostSheetUrl: "",
       cogsTrackerFormFilters: cogsTrackerFormFiltersFactory(),
       packagesFormFilters: packageFormFiltersFactory(),

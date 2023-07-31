@@ -26,9 +26,9 @@ import { ActionContext } from "vuex";
 import {
   IStatusMessage,
   ReportAuxTask,
-  ReportStatus,
   ReportsActions,
   ReportsMutations,
+  ReportStatus,
 } from "./consts";
 import { IReportConfig, IReportData, IReportsState } from "./interfaces";
 
@@ -113,7 +113,7 @@ export const reportsModule = {
           case ReportAuxTask.UPDATE_MASTER_COST_SHEET:
             await updateCogsV2MasterCostSheet({ ctx, reportConfig });
           default:
-            throw new Error("Bad aux task");
+            throw new Error(`Bad aux task: ${auxTask}`);
         }
       } finally {
         ctx.commit(ReportsMutations.SET_STATUS, {

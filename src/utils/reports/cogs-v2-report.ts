@@ -13,8 +13,9 @@ import { clientBuildManager } from "@/modules/client-build-manager.module";
 import { DataLoader, getDataLoaderByLicense } from "@/modules/data-loader/data-loader.module";
 import { facilityManager } from "@/modules/facility-manager.module";
 import { messageBus } from "@/modules/message-bus.module";
+import { toastManager } from "@/modules/toast-manager.module";
 import store from "@/store/page-overlay/index";
-import { ReportType, ReportsMutations } from "@/store/page-overlay/modules/reports/consts";
+import { ReportsMutations, ReportType } from "@/store/page-overlay/modules/reports/consts";
 import {
   IReportConfig,
   IReportData,
@@ -492,10 +493,11 @@ export async function updateCogsV2MasterCostSheet({
   ctx: ActionContext<IReportsState, IPluginState>;
   reportConfig: IReportConfig;
 }) {
-  if (!reportConfig[ReportType.COGS_V2]) {
-    return;
-  }
-  {
+  try {
+    if (!reportConfig[ReportType.COGS_V2]) {
+      throw new Error("Cogs report must be selected");
+    }
+
     const { transferFilter, licenses } = reportConfig[ReportType.COGS_V2]!;
 
     const [departureDateGt] = transferFilter.estimatedDepartureDateGt!.split("T");
@@ -529,6 +531,8 @@ export async function updateCogsV2MasterCostSheet({
       spreadsheetId,
       sheetName: SheetTitles.MASTER_WORKSHEET,
     });
+
+    console.log({ response });
 
     // Ignore header
     const currentSheetLabels = new Set(response.data.result.values.slice(1).map((row) => row[1]));
@@ -573,6 +577,27 @@ export async function updateCogsV2MasterCostSheet({
       spreadsheetId,
       range: `'${SheetTitles.MASTER_WORKSHEET}'!A:L`,
       values: rows,
+    });
+
+    toastManager.openToast(
+      `The master worksheet was updated with ${rows.length} new production batches`,
+      {
+        title: "Master worksheet updated",
+        autoHideDelay: 2000,
+        variant: "primary",
+        appendToast: true,
+        toaster: "ttt-toaster",
+        solid: true,
+      }
+    );
+  } catch (e) {
+    toastManager.openToast((e as Error).toString(), {
+      title: "Failed to update master worksheet",
+      autoHideDelay: 30000,
+      variant: "danger",
+      appendToast: true,
+      toaster: "ttt-toaster",
+      solid: true,
     });
   }
 }
@@ -689,19 +714,21 @@ export async function maybeLoadCogsV2ReportData({
 
   response.data.result.values.map((row) => worksheetMatrix.push(row));
 
-  cogsMatrix.push([
-    "License",
-    "Manifest #",
-    "Package Tag",
-    "Source Production Batch",
-    "Item",
-    "Quantity",
-    "Units",
-    "Package COGS",
-    "Unit COGS",
-    "Status",
-    "Note",
-  ]);
+  cogsMatrix.push(
+    [
+      "License",
+      "Manifest #",
+      "Package Tag",
+      "Source Production Batch",
+      "Item",
+      "Quantity",
+      "Units",
+      "Package COGS",
+      "Unit COGS",
+      "Status",
+      "Note",
+    ].map((x) => x.padStart(8).padEnd(8))
+  );
 
   for (const transfer of richOutgoingTransfers) {
     const manifestNumber = transfer.ManifestNumber;
@@ -1011,7 +1038,11 @@ export async function createCogsV2SpreadsheetOrError({
         ["", `# Source PBs`, `=COUNTUNIQUE('${SheetTitles.WORKSHEET}'!B2:B)`],
         ["", `# Packages w/ FAIL status`, `=COUNTIF('Manifest Cogs'!J2:J, "FAIL")`],
         ["", `# Manifest Packages w/ $0 COGS`, `=COUNTIF('Manifest Cogs'!H2:H, 0)`],
-        ["", `# PB Packages w/ $0 cost`, `=COUNTIF('${SheetTitles.WORKSHEET}'!D2:D, 0)`],
+        [
+          "",
+          `# PB Packages w/ $0 cost`,
+          `=COUNTIF('${SheetTitles.WORKSHEET}'!D2:D, 0) + COUNTIF('${SheetTitles.WORKSHEET}'!D2:D, "")`,
+        ],
         ...Object.entries(auditData).map(([key, value]) => ["", key, JSON.stringify(value)]),
       ],
     },

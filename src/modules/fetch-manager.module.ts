@@ -1,5 +1,6 @@
 import axios, { AxiosRequestConfig } from "axios";
 import axiosRetry from "axios-retry";
+import fetchRetry from "fetch-retry";
 
 const client = axios.create({
   timeout: 180000,
@@ -10,8 +11,6 @@ axiosRetry(client, {
   retries: 5,
   retryDelay: axiosRetry.exponentialDelay,
   retryCondition: (error) => {
-    console.log("RETRY CONDITION", { error });
-
     if (error.code && ["ECONNABORTED", "ERR_CANCELED"].includes(error.code)) {
       return true;
     }
@@ -34,8 +33,11 @@ client.interceptors.response.use(
   }
 );
 
+// Service workers cannot use Axios
+export const customFetch = fetchRetry(fetch);
+
 // fetch() adapter
-export const customFetch = function (
+export const customAxios = function (
   url: string,
   init?:
     | {

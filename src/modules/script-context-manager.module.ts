@@ -1,5 +1,5 @@
 import { IAtomicService } from "@/interfaces";
-import { customFetch } from "@/modules/fetch-manager.module";
+import { customAxios } from "@/modules/fetch-manager.module";
 import * as Sentry from "@sentry/browser";
 import { timer } from "rxjs";
 
@@ -174,7 +174,7 @@ class ScriptContextManager implements IAtomicService {
     for (let path of staticAssetPaths) {
       let response;
       try {
-        response = await customFetch(window.location.origin + path, {});
+        response = await customAxios(window.location.origin + path, {});
       } catch (e) {
         console.error("Static asset fetch error:", e);
         throw e;

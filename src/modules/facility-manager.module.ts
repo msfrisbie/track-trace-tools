@@ -1,6 +1,6 @@
 import { IAtomicService, IPageMetrcFacilityData } from "@/interfaces";
 import { authManager } from "@/modules/auth-manager.module";
-import { customFetch } from "@/modules/fetch-manager.module";
+import { customAxios } from "@/modules/fetch-manager.module";
 import store from "@/store/page-overlay/index";
 import { debugLogFactory } from "@/utils/debug";
 
@@ -84,7 +84,7 @@ class FacilityManager implements IAtomicService {
 
     if (!facilityLinks || facilityLinks.length === 0) {
       // Fall back to network request
-      const loadedHTML = await customFetch(window.location.origin).then(
+      const loadedHTML = await customAxios(window.location.origin).then(
         (response) => response.data
       );
 
