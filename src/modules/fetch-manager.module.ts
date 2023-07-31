@@ -15,8 +15,6 @@ const fetchWithTimeout = async function (
 };
 // TODO this is bullshit, switch over to axios
 export const customFetch = fetchRetry(fetch);
-export const customTimeoutFetch = fetchRetry(fetch);
-// export const customTimeoutFetch = fetchRetry(fetchWithTimeout);
 
 // https://www.npmjs.com/package/fetch-retry
 export const retryDefaults = {
@@ -32,6 +30,7 @@ export const retryDefaults = {
       console.log(`Error on attempt #${attempt + 1} [${error}]`);
       return true;
     }
-    return false;
+
+    throw error;
   },
 };

@@ -525,7 +525,7 @@ export async function updateCogsV2MasterCostSheet({
 
     const response: { data: { result: { values: any[][] } } } = await readSpreadsheet({
       spreadsheetId,
-      sheetName: "Worksheet",
+      sheetName: SheetTitles.MASTER_WORKSHEET,
     });
 
     // Ignore header
@@ -569,7 +569,7 @@ export async function updateCogsV2MasterCostSheet({
 
     await appendSpreadsheetValues({
       spreadsheetId,
-      range: "Worksheet!A:L",
+      range: `'${SheetTitles.MASTER_WORKSHEET}'!A:L`,
       values: rows,
     });
   }
@@ -682,7 +682,7 @@ export async function maybeLoadCogsV2ReportData({
 
   const response: { data: { result: { values: any[][] } } } = await readSpreadsheet({
     spreadsheetId,
-    sheetName: "Worksheet",
+    sheetName: SheetTitles.MASTER_WORKSHEET,
   });
 
   response.data.result.values.map((row) => worksheetMatrix.push(row));
@@ -786,7 +786,7 @@ export async function maybeLoadCogsV2ReportData({
 
             costEquation = `=${optimizationMultiplier} * VLOOKUP("${getLabelOrError(
               sourceProductionBatch
-            )}", Worksheet!B:D, 3, FALSE)`;
+            )}", '${SheetTitles.WORKSHEET}'!B:D, 3, FALSE)`;
 
             note = "Used optimization";
             status = "SUCCESS";
@@ -858,9 +858,9 @@ export async function maybeLoadCogsV2ReportData({
                 finalBuffer
                   .map(
                     ([pkg, multiplier]) =>
-                      `(${multiplier} * VLOOKUP("${getLabelOrError(
-                        pkg
-                      )}", Worksheet!B:D, 3, FALSE))`
+                      `(${multiplier} * VLOOKUP("${getLabelOrError(pkg)}", '${
+                        SheetTitles.WORKSHEET
+                      }'!B:D, 3, FALSE))`
                   )
                   .join(" + ");
 
@@ -1006,10 +1006,10 @@ export async function createCogsV2SpreadsheetOrError({
         ["", `Date range`, `${departureDateGt}-${departureDateLt}`],
         ["", `# Manifests`, `=COUNTUNIQUE('Manifest Cogs'!B2:B)`],
         ["", `# Manifest Packages`, `=COUNTUNIQUE('Manifest Cogs'!C2:C)`],
-        ["", `# Source PBs`, `=COUNTUNIQUE('Worksheet'!B2:B)`],
+        ["", `# Source PBs`, `=COUNTUNIQUE('${SheetTitles.WORKSHEET}'!B2:B)`],
         ["", `# Packages w/ FAIL status`, `=COUNTIF('Manifest Cogs'!J2:J, "FAIL")`],
         ["", `# Manifest Packages w/ $0 COGS`, `=COUNTIF('Manifest Cogs'!H2:H, 0)`],
-        ["", `# PB Packages w/ $0 cost`, `=COUNTIF(Worksheet!D2:D, 0)`],
+        ["", `# PB Packages w/ $0 cost`, `=COUNTIF('${SheetTitles.WORKSHEET}'!D2:D, 0)`],
         ...Object.entries(auditData).map(([key, value]) => ["", key, JSON.stringify(value)]),
       ],
     },

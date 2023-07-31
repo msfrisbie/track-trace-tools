@@ -116,7 +116,7 @@
                 </div>
 
                 <b-button @click="updateMasterPbCostSheet()">UPDATE MASTER PB COST SHEET</b-button>
-                <a href="masterCostSheetUrl" target="_blank">Master PB Cost Sheet</a>
+                <a :href="masterCostSheetUrl" target="_blank">Master PB Cost Sheet</a>
 
                 <b-button @click="showCogsV2Advanced = !showCogsV2Advanced"
                   >TOGGLE ADVANCED</b-button
@@ -1483,6 +1483,7 @@ export default Vue.extend({
       cogsFormFilters: cogsFormFiltersFactory(),
       cogsV2FormFilters: cogsV2FormFiltersFactory(),
       showCogsV2Advanced: false,
+      masterCostSheetUrl: "",
       cogsTrackerFormFilters: cogsTrackerFormFiltersFactory(),
       packagesFormFilters: packageFormFiltersFactory(),
       stragglerPackagesFormFilters: stragglerPackagesFormFiltersFactory(),
@@ -1639,22 +1640,22 @@ export default Vue.extend({
           description: "Find straggler inventory so it can be cleared out",
           isCustom: false,
         },
+        // {
+        //   text: "COGS (deprecated)",
+        //   value: ReportType.COGS,
+        //   t3plus: false,
+        //   enabled: clientBuildManager.assertValues(["ENABLE_COGS"]),
+        //   hidden: !clientBuildManager.assertValues(["ENABLE_COGS"]),
+        //   description: "Generate COGS calculator (deprecated)",
+        //   isCustom: false,
+        // },
         {
           text: "COGS",
-          value: ReportType.COGS,
-          t3plus: false,
-          enabled: clientBuildManager.assertValues(["ENABLE_COGS"]),
-          hidden: !clientBuildManager.assertValues(["ENABLE_COGS"]),
-          description: "Generate COGS calculator",
-          isCustom: false,
-        },
-        {
-          text: "COGS V2",
           value: ReportType.COGS_V2,
           t3plus: false,
           enabled: clientBuildManager.assertValues(["ENABLE_COGS"]),
           hidden: !clientBuildManager.assertValues(["ENABLE_COGS"]),
-          description: "Generate COGS V2 calculator",
+          description: "Generate COGS calculator",
           isCustom: false,
         },
         {
@@ -1916,6 +1917,9 @@ export default Vue.extend({
   async created() {},
   async mounted() {
     this.refreshOAuthState({});
+
+    this.$data.masterCostSheetUrl =
+      clientBuildManager.clientConfig!.values!["MASTER_PB_COST_SHEET_URL"];
 
     document.addEventListener("visibilitychange", () => {
       if (document.visibilityState === "visible") {

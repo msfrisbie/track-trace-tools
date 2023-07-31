@@ -1,6 +1,6 @@
 import { IAtomicService, IAuthState } from "@/interfaces";
 import { origin } from "@/modules/environment.module";
-import { customFetch, customTimeoutFetch, retryDefaults } from "@/modules/fetch-manager.module";
+import { customFetch, retryDefaults } from "@/modules/fetch-manager.module";
 import { CsvUpload } from "@/types";
 import { RequestInitRetryParams } from "fetch-retry";
 import { authManager } from "./auth-manager.module";
@@ -611,7 +611,7 @@ export class MetrcRequestManager implements IAtomicService {
   }
 
   async getInactivePackages(body: string) {
-    return customTimeoutFetch(INACTIVE_PACKAGES_URL, {
+    return customFetch(INACTIVE_PACKAGES_URL, {
       ...DEFAULT_FETCH_POST_OPTIONS,
       retries: 10,
       // @ts-ignore
