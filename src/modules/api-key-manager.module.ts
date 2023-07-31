@@ -47,7 +47,7 @@ class ApiKeyManager implements IAtomicService {
 
       const apiKeyHtml: string = await primaryMetrcRequestManager
         .getApiKeyHTML()
-        .then((response) => response.text());
+        .then((response) => response.data);
 
       // { apiKeyData: { apiKey: "..." } }
       let extractedData = extract(ExtractionType.API_KEY_DATA, apiKeyHtml);
@@ -67,7 +67,7 @@ class ApiKeyManager implements IAtomicService {
 
         const generateApiKeyText: string = await primaryMetrcRequestManager
           .generateApiKey()
-          .then((response) => response.text());
+          .then((response) => response.data);
 
         // Key returns with bookend quotes
         if (

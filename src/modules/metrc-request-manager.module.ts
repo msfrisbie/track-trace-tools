@@ -1,8 +1,7 @@
 import { IAtomicService, IAuthState } from "@/interfaces";
 import { origin } from "@/modules/environment.module";
-import { customFetch, retryDefaults } from "@/modules/fetch-manager.module";
+import { customFetch } from "@/modules/fetch-manager.module";
 import { CsvUpload } from "@/types";
-import { RequestInitRetryParams } from "fetch-retry";
 import { authManager } from "./auth-manager.module";
 
 const LOGIN_URL = origin({ divertToNullOrigin: false }) + "/log-in";
@@ -95,12 +94,10 @@ const DATAIMPORT_MOVE_PLANTS_URL = origin() + "/api/dataimport/plants/change/loc
 
 const DEFAULT_FETCH_POST_OPTIONS = {
   method: "POST",
-  ...retryDefaults,
 };
 
 const DEFAULT_FETCH_GET_OPTIONS = {
   method: "GET",
-  ...retryDefaults,
 };
 
 const JSON_HEADERS = {
@@ -500,66 +497,39 @@ export class MetrcRequestManager implements IAtomicService {
     );
   }
 
-  async getVegetativePlants(
-    body: string,
-    retryOptions: RequestInitRetryParams = {},
-    abortTimeout: number = 30000
-  ) {
-    const controller = new AbortController();
-    const signal = controller.signal;
-
+  async getVegetativePlants(body: string) {
     return customFetch(VEGETATIVE_PLANTS_URL, {
       ...DEFAULT_FETCH_POST_OPTIONS,
-      ...retryOptions,
       // @ts-ignore
       headers: {
         ...(await buildAuthenticationHeaders(this.authStateOrError)),
         ...JSON_HEADERS,
       },
       body,
-      signal,
     });
   }
 
-  async getFloweringPlants(
-    body: string,
-    retryOptions: RequestInitRetryParams = {},
-    abortTimeout: number = 30000
-  ) {
-    const controller = new AbortController();
-    const signal = controller.signal;
-
+  async getFloweringPlants(body: string) {
     return customFetch(FLOWERING_PLANTS_URL, {
       ...DEFAULT_FETCH_POST_OPTIONS,
-      ...retryOptions,
       // @ts-ignore
       headers: {
         ...(await buildAuthenticationHeaders(this.authStateOrError)),
         ...JSON_HEADERS,
       },
       body,
-      signal,
     });
   }
 
-  async getInactivePlants(
-    body: string,
-    retryOptions: RequestInitRetryParams = {},
-    abortTimeout: number = 30000
-  ) {
-    const controller = new AbortController();
-    const signal = controller.signal;
-
+  async getInactivePlants(body: string) {
     return customFetch(INACTIVE_PLANTS_URL, {
       ...DEFAULT_FETCH_POST_OPTIONS,
-      ...retryOptions,
       // @ts-ignore
       headers: {
         ...(await buildAuthenticationHeaders(this.authStateOrError)),
         ...JSON_HEADERS,
       },
       body,
-      signal,
     });
   }
 
@@ -587,33 +557,25 @@ export class MetrcRequestManager implements IAtomicService {
     });
   }
 
-  async getActivePackages(
-    body: string,
-    retryOptions: RequestInitRetryParams = {},
-    abortTimeout: number = 30000
-  ) {
-    const controller = new AbortController();
-    const signal = controller.signal;
-
-    setTimeout(() => controller.abort(), abortTimeout);
-
+  async getActivePackages(body: string) {
     return customFetch(ACTIVE_PACKAGES_URL, {
       ...DEFAULT_FETCH_POST_OPTIONS,
-      ...retryOptions,
       // @ts-ignore
       headers: {
         ...(await buildAuthenticationHeaders(this.authStateOrError)),
         ...JSON_HEADERS,
       },
       body,
-      //signal,
     });
   }
 
   async getInactivePackages(body: string) {
     return customFetch(INACTIVE_PACKAGES_URL, {
       ...DEFAULT_FETCH_POST_OPTIONS,
-      retries: 10,
+      timeout: 15000,
+      axiosRetry: {
+        retries: 10,
+      },
       // @ts-ignore
       headers: {
         ...(await buildAuthenticationHeaders(this.authStateOrError)),
@@ -647,49 +609,27 @@ export class MetrcRequestManager implements IAtomicService {
     });
   }
 
-  async getIncomingTransfers(
-    body: string,
-    retryOptions: RequestInitRetryParams = {},
-    abortTimeout: number = 30000
-  ) {
-    const controller = new AbortController();
-    const signal = controller.signal;
-
-    setTimeout(() => controller.abort(), abortTimeout);
-
+  async getIncomingTransfers(body: string) {
     return customFetch(INCOMING_TRANSFERS_URL, {
       ...DEFAULT_FETCH_POST_OPTIONS,
-      ...retryOptions,
       // @ts-ignore
       headers: {
         ...(await buildAuthenticationHeaders(this.authStateOrError)),
         ...JSON_HEADERS,
       },
       body,
-      signal,
     });
   }
 
-  async getIncomingInactiveTransfers(
-    body: string,
-    retryOptions: RequestInitRetryParams = {},
-    abortTimeout: number = 30000
-  ) {
-    const controller = new AbortController();
-    const signal = controller.signal;
-
-    setTimeout(() => controller.abort(), abortTimeout);
-
+  async getIncomingInactiveTransfers(body: string) {
     return customFetch(INCOMING_INACTIVE_TRANSFERS_URL, {
       ...DEFAULT_FETCH_POST_OPTIONS,
-      ...retryOptions,
       // @ts-ignore
       headers: {
         ...(await buildAuthenticationHeaders(this.authStateOrError)),
         ...JSON_HEADERS,
       },
       body,
-      signal,
     });
   }
 

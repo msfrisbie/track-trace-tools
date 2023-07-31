@@ -28,7 +28,7 @@ class ContactDataManager implements IAtomicService {
       phoneNumber = null;
 
     const response = await primaryMetrcRequestManager.getUserProfileHTML();
-    const html: string = await response.text();
+    const html: string = await response.data;
 
     let extractedData = extract(ExtractionType.CONTACT_DATA, html);
 

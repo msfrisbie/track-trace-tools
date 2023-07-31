@@ -46,38 +46,53 @@ class TelemetryManager implements IAtomicService {
     // TODO telemetry when not logged in
 
     const t0_flowering: number = performance.now();
-    primaryMetrcRequestManager.getFloweringPlants(payload, { retries: 0 }).then(
-      async (response) => {
-        this.sendTelemetryAndUpdateMetrcStatus(t0_flowering, true, response.status);
-      },
-      (error) => {
-        this.sendTelemetryAndUpdateMetrcStatus(t0_flowering, false, undefined, error);
-      }
-    );
+    primaryMetrcRequestManager
+      .getFloweringPlants(
+        payload
+        // , { retries: 0 }
+      )
+      .then(
+        async (response) => {
+          this.sendTelemetryAndUpdateMetrcStatus(t0_flowering, true, response.status);
+        },
+        (error) => {
+          this.sendTelemetryAndUpdateMetrcStatus(t0_flowering, false, undefined, error);
+        }
+      );
 
     await timer(3000).toPromise();
 
     const t0_packages: number = performance.now();
-    primaryMetrcRequestManager.getActivePackages(payload, { retries: 0 }).then(
-      (response) => {
-        this.sendTelemetryAndUpdateMetrcStatus(t0_packages, true, response.status);
-      },
-      (error) => {
-        this.sendTelemetryAndUpdateMetrcStatus(t0_packages, false, undefined, error);
-      }
-    );
+    primaryMetrcRequestManager
+      .getActivePackages(
+        payload
+        //, { retries: 0 }
+      )
+      .then(
+        (response) => {
+          this.sendTelemetryAndUpdateMetrcStatus(t0_packages, true, response.status);
+        },
+        (error) => {
+          this.sendTelemetryAndUpdateMetrcStatus(t0_packages, false, undefined, error);
+        }
+      );
 
     await timer(3000).toPromise();
 
     const t0_transfers: number = performance.now();
-    primaryMetrcRequestManager.getIncomingTransfers(payload, { retries: 0 }).then(
-      (response) => {
-        this.sendTelemetryAndUpdateMetrcStatus(t0_transfers, true, response.status);
-      },
-      (error) => {
-        this.sendTelemetryAndUpdateMetrcStatus(t0_transfers, false, undefined, error);
-      }
-    );
+    primaryMetrcRequestManager
+      .getIncomingTransfers(
+        payload
+        // { retries: 0 }
+      )
+      .then(
+        (response) => {
+          this.sendTelemetryAndUpdateMetrcStatus(t0_transfers, true, response.status);
+        },
+        (error) => {
+          this.sendTelemetryAndUpdateMetrcStatus(t0_transfers, false, undefined, error);
+        }
+      );
   }
 
   async maybeCollectAndSendFacilityMetadata() {
