@@ -94,7 +94,7 @@ const DATAIMPORT_MOVE_PLANTS_URL = origin() + "/api/dataimport/plants/change/loc
 
 const DEFAULT_FETCH_POST_READ_OPTIONS = {
   method: "POST",
-  timeout: 15000,
+  timeout: 20000,
 };
 
 const DEFAULT_FETCH_POST_WRITE_OPTIONS = {
@@ -562,7 +562,7 @@ export class MetrcRequestManager implements IAtomicService {
   async getInactivePackages(body: string) {
     return customFetch(INACTIVE_PACKAGES_URL, {
       ...DEFAULT_FETCH_POST_READ_OPTIONS,
-      timeout: 5000,
+      // timeout: 10000,
       axiosRetry: {
         retries: 10,
       },
