@@ -813,9 +813,17 @@ export async function maybeLoadCogsV2ReportData({
             const optimizationMultiplier =
               manifestPkg.ShippedQuantity / initialProductionBatchQuantity[0];
 
-            costEquation = `=${optimizationMultiplier} * VLOOKUP("${getLabelOrError(
-              sourceProductionBatch
-            )}", '${SheetTitles.WORKSHEET}'!B:D, 3, FALSE)`;
+            const vlookupCostExpression = `VLOOKUP("${getLabelOrError(sourceProductionBatch)}", '${
+              SheetTitles.WORKSHEET
+            }'!B:L, 3, FALSE)`;
+
+            const vlookupQuantityAdjustMultiplierExpression = `(${
+              initialProductionBatchQuantity[0]
+            } / VLOOKUP("${getLabelOrError(sourceProductionBatch)}", '${
+              SheetTitles.WORKSHEET
+            }'!B:L, 6, FALSE))`;
+
+            costEquation = `=${optimizationMultiplier} * ${vlookupCostExpression} * ${vlookupQuantityAdjustMultiplierExpression}`;
 
             note = "Used optimization";
             status = "SUCCESS";
@@ -885,12 +893,22 @@ export async function maybeLoadCogsV2ReportData({
               costEquation =
                 "=" +
                 finalBuffer
-                  .map(
-                    ([pkg, multiplier]) =>
-                      `(${multiplier} * VLOOKUP("${getLabelOrError(pkg)}", '${
-                        SheetTitles.WORKSHEET
-                      }'!B:D, 3, FALSE))`
-                  )
+                  .map(([pkg, multiplier]) => {
+                    const initialProductionBatchQuantity =
+                      extractInitialPackageQuantityAndUnitFromHistoryOrError(pkg.history!);
+
+                    const vlookupCostExpression = `VLOOKUP("${getLabelOrError(pkg)}", '${
+                      SheetTitles.WORKSHEET
+                    }'!B:L, 3, FALSE)`;
+
+                    const vlookupQuantityAdjustMultiplierExpression = `(${
+                      initialProductionBatchQuantity[0]
+                    } / VLOOKUP("${getLabelOrError(pkg)}", '${
+                      SheetTitles.WORKSHEET
+                    }'!B:L, 6, FALSE))`;
+
+                    return `(${multiplier} * ${vlookupCostExpression} * ${vlookupQuantityAdjustMultiplierExpression})`;
+                  })
                   .join(" + ");
 
               note = "Walked graph";
@@ -1040,18 +1058,24 @@ export async function createCogsV2SpreadsheetOrError({
       values: [
         [],
         [],
-        [`Date range`, `${departureDateGt}-${readableDepartureDateLt}`],
+        ["", `Date range`, `${departureDateGt}-${readableDepartureDateLt}`],
         [],
-        [`Total Source Production Batches`, `=COUNTUNIQUE('${SheetTitles.WORKSHEET}'!B2:B)`],
+        ["", `Total Source Production Batches`, `=COUNTUNIQUE('${SheetTitles.WORKSHEET}'!B2:B)`],
         [
+          "",
           `Total Source Production Batches w/ $0 cost`,
           `=COUNTIF('${SheetTitles.WORKSHEET}'!D2:D, 0) + COUNTIF('${SheetTitles.WORKSHEET}'!D2:D, "")`,
         ],
         [],
-        [`Total Wholesale Manifests`, `=COUNTUNIQUE('${SheetTitles.MANIFEST_COGS}'!B2:B)`],
-        [`Total Manifest Packages`, `=COUNTUNIQUE('${SheetTitles.MANIFEST_COGS}'!C2:C)`],
-        [`Total Manifest Packages w/ $0 COGS`, `=COUNTIF('${SheetTitles.MANIFEST_COGS}'!H2:H, 0)`],
+        ["", `Total Wholesale Manifests`, `=COUNTUNIQUE('${SheetTitles.MANIFEST_COGS}'!B2:B)`],
+        ["", `Total Manifest Packages`, `=COUNTUNIQUE('${SheetTitles.MANIFEST_COGS}'!C2:C)`],
         [
+          "",
+          `Total Manifest Packages w/ $0 COGS`,
+          `=COUNTIF('${SheetTitles.MANIFEST_COGS}'!H2:H, 0)`,
+        ],
+        [
+          "",
           `Total Manifest Packages w/ FAIL status`,
           `=COUNTIF('${SheetTitles.MANIFEST_COGS}'!J2:J, "FAIL")`,
         ],
