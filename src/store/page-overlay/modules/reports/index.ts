@@ -112,6 +112,7 @@ export const reportsModule = {
         switch (auxTask) {
           case ReportAuxTask.UPDATE_MASTER_COST_SHEET:
             await updateCogsV2MasterCostSheet({ ctx, reportConfig });
+            break;
           default:
             throw new Error(`Bad aux task: ${auxTask}`);
         }

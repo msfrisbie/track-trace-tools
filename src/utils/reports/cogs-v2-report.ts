@@ -30,9 +30,11 @@ import {
 import { getLabelOrError } from "../package";
 import {
   addRowsRequestFactory,
+  alternatingRowStyleRequestFactory,
   autoResizeDimensionsRequestFactory,
   extractSheetIdOrError,
   freezeTopRowRequestFactory,
+  hideColumnsRequestFactory,
   styleTopRowRequestFactory,
 } from "../sheets";
 import { appendSpreadsheetValues, readSpreadsheet, writeDataSheet } from "../sheets-export";
@@ -532,8 +534,6 @@ export async function updateCogsV2MasterCostSheet({
       sheetName: SheetTitles.MASTER_WORKSHEET,
     });
 
-    console.log({ response });
-
     // Ignore header
     const currentSheetLabels = new Set(response.data.result.values.slice(1).map((row) => row[1]));
     const requiredSheetLabels = new Set(
@@ -987,6 +987,7 @@ export async function createCogsV2SpreadsheetOrError({
     }),
     styleTopRowRequestFactory({
       sheetId: sheetTitles.indexOf(SheetTitles.OVERVIEW),
+      horizontalAlignment: "LEFT",
     }),
   ];
 
@@ -1001,10 +1002,13 @@ export async function createCogsV2SpreadsheetOrError({
     addRowsRequestFactory({ sheetId: worksheetSheetId, length: worksheetMatrix.length }),
     styleTopRowRequestFactory({ sheetId: worksheetSheetId }),
     freezeTopRowRequestFactory({ sheetId: worksheetSheetId }),
+    alternatingRowStyleRequestFactory({ sheetId: worksheetSheetId }),
     // Manifest COGS
     addRowsRequestFactory({ sheetId: manifestSheetId, length: cogsMatrix.length }),
     styleTopRowRequestFactory({ sheetId: manifestSheetId }),
     freezeTopRowRequestFactory({ sheetId: manifestSheetId }),
+    alternatingRowStyleRequestFactory({ sheetId: manifestSheetId }),
+    hideColumnsRequestFactory({ sheetId: manifestSheetId, startIndex: 9, endIndex: 11 }),
   ];
 
   await messageBus.sendMessageToBackground(
@@ -1019,6 +1023,10 @@ export async function createCogsV2SpreadsheetOrError({
 
   const [departureDateGt] =
     reportConfig[ReportType.COGS_V2]!.transferFilter.estimatedDepartureDateGt!.split("T")!;
+  // This value is shown in the sheet. Technically the LT date is Lt + 1 since we are using
+  // ISO string comparators, but we should show the date selected in the form
+  const [readableDepartureDateLt] =
+    reportConfig[ReportType.COGS_V2]!.transferFilter.estimatedDepartureDateLt!.split("T")!;
   const [departureDateLt] = getIsoDateFromOffset(
     1,
     reportConfig[ReportType.COGS_V2]!.transferFilter.estimatedDepartureDateLt!
@@ -1032,18 +1040,23 @@ export async function createCogsV2SpreadsheetOrError({
       values: [
         [],
         [],
-        ["", `Date range`, `${departureDateGt}-${departureDateLt}`],
-        ["", `# Manifests`, `=COUNTUNIQUE('Manifest Cogs'!B2:B)`],
-        ["", `# Manifest Packages`, `=COUNTUNIQUE('Manifest Cogs'!C2:C)`],
-        ["", `# Source PBs`, `=COUNTUNIQUE('${SheetTitles.WORKSHEET}'!B2:B)`],
-        ["", `# Packages w/ FAIL status`, `=COUNTIF('Manifest Cogs'!J2:J, "FAIL")`],
-        ["", `# Manifest Packages w/ $0 COGS`, `=COUNTIF('Manifest Cogs'!H2:H, 0)`],
+        [`Date range`, `${departureDateGt}-${readableDepartureDateLt}`],
+        [],
+        [`Total Source Production Batches`, `=COUNTUNIQUE('${SheetTitles.WORKSHEET}'!B2:B)`],
         [
-          "",
-          `# PB Packages w/ $0 cost`,
+          `Total Source Production Batches w/ $0 cost`,
           `=COUNTIF('${SheetTitles.WORKSHEET}'!D2:D, 0) + COUNTIF('${SheetTitles.WORKSHEET}'!D2:D, "")`,
         ],
-        ...Object.entries(auditData).map(([key, value]) => ["", key, JSON.stringify(value)]),
+        [],
+        [`Total Wholesale Manifests`, `=COUNTUNIQUE('${SheetTitles.MANIFEST_COGS}'!B2:B)`],
+        [`Total Manifest Packages`, `=COUNTUNIQUE('${SheetTitles.MANIFEST_COGS}'!C2:C)`],
+        [`Total Manifest Packages w/ $0 COGS`, `=COUNTIF('${SheetTitles.MANIFEST_COGS}'!H2:H, 0)`],
+        [
+          `Total Manifest Packages w/ FAIL status`,
+          `=COUNTIF('${SheetTitles.MANIFEST_COGS}'!J2:J, "FAIL")`,
+        ],
+        [],
+        ...Object.entries(auditData).map(([key, value]) => [key, JSON.stringify(value)]),
       ],
     },
     undefined,

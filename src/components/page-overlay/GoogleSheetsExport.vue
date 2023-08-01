@@ -103,8 +103,13 @@
                 >
               </div>
 
-              <a size="sm" variant="link" class="text-purple-500 underline" href="#" target="_blank"
-                >How to use this tool</a
+              <b-button
+                size="sm"
+                variant="link"
+                class="text-purple-500 underline"
+                :href="cogsYoutubeUrl"
+                target="_blank"
+                >How to use this tool</b-button
               >
 
               <hr />
@@ -153,7 +158,7 @@
                     ></b-form-checkbox-group>
                   </b-form-group>
 
-                  <blob-cache-widget :cachekey="cogsV2key"></blob-cache-widget>
+                  <!-- <blob-cache-widget :cachekey="cogsV2key"></blob-cache-widget> -->
                 </simple-drawer>
 
                 <!-- <b-button
@@ -1453,7 +1458,6 @@ import _ from "lodash-es";
 import Vue from "vue";
 import { mapActions, mapState } from "vuex";
 import ArchiveWidget from "../shared/ArchiveWidget.vue";
-import BlobCacheWidget from "../shared/BlobCacheWidget.vue";
 import SimpleDrawer from "../shared/SimpleDrawer.vue";
 import {
   addEmployeeSamplesReport,
@@ -1477,7 +1481,6 @@ export default Vue.extend({
   props: {},
   components: {
     ArchiveWidget,
-    BlobCacheWidget,
     SimpleDrawer,
   },
   computed: {
@@ -1519,6 +1522,7 @@ export default Vue.extend({
       cogsV2FormFilters: cogsV2FormFiltersFactory(),
       // showCogsV2Advanced: false,
       masterCostSheetUrl: "",
+      cogsYoutubeUrl: "",
       cogsTrackerFormFilters: cogsTrackerFormFiltersFactory(),
       packagesFormFilters: packageFormFiltersFactory(),
       stragglerPackagesFormFilters: stragglerPackagesFormFiltersFactory(),
@@ -1955,6 +1959,8 @@ export default Vue.extend({
 
     this.$data.masterCostSheetUrl =
       clientBuildManager.clientConfig!.values!["MASTER_PB_COST_SHEET_URL"];
+
+    this.$data.cogsYoutubeUrl = clientBuildManager.clientConfig!.values!["COGS_YOUTUBE_URL"];
 
     document.addEventListener("visibilitychange", () => {
       if (document.visibilityState === "visible") {

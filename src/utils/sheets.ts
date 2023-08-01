@@ -373,7 +373,13 @@ export function addColumnsRequestFactory({ sheetId, length }: { sheetId: number;
   };
 }
 
-export function styleTopRowRequestFactory({ sheetId }: { sheetId: number }) {
+export function styleTopRowRequestFactory({
+  sheetId,
+  horizontalAlignment = "CENTER",
+}: {
+  sheetId: number;
+  horizontalAlignment?: "CENTER" | "LEFT";
+}) {
   return {
     repeatCell: {
       range: {
@@ -383,7 +389,7 @@ export function styleTopRowRequestFactory({ sheetId }: { sheetId: number }) {
       },
       cell: {
         userEnteredFormat: {
-          horizontalAlignment: "CENTER",
+          horizontalAlignment,
           backgroundColor: {
             red: 73 / 256,
             green: 39 / 256,
@@ -401,6 +407,56 @@ export function styleTopRowRequestFactory({ sheetId }: { sheetId: number }) {
         },
       },
       fields: "userEnteredFormat(backgroundColor,textFormat,horizontalAlignment)",
+    },
+  };
+}
+
+export function hideColumnsRequestFactory({
+  sheetId,
+  startIndex,
+  endIndex,
+}: {
+  sheetId: number;
+  startIndex: number;
+  endIndex: number;
+}) {
+  return {
+    updateDimensionProperties: {
+      range: {
+        sheetId: sheetId,
+        dimension: "COLUMNS",
+        startIndex,
+        endIndex,
+      },
+      properties: {
+        hiddenByUser: true,
+      },
+      fields: "hiddenByUser",
+    },
+  };
+}
+
+export function alternatingRowStyleRequestFactory({ sheetId }: { sheetId: number }) {
+  return {
+    addBanding: {
+      bandedRange: {
+        range: {
+          sheetId: sheetId,
+          startRowIndex: 1,
+        },
+        rowProperties: {
+          firstBandColor: {
+            red: 1.0,
+            green: 1.0,
+            blue: 1.0,
+          },
+          secondBandColor: {
+            red: 232 / 256,
+            green: 231 / 256,
+            blue: 252 / 256,
+          },
+        },
+      },
     },
   };
 }
