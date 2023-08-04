@@ -1063,7 +1063,7 @@ export async function createCogsV2SpreadsheetOrError({
         [
           "",
           `Total Source Production Batches w/ $0 cost`,
-          `=COUNTIF('${SheetTitles.WORKSHEET}'!D2:D, 0) + COUNTIF('${SheetTitles.WORKSHEET}'!D2:D, "")`,
+          `=COUNTIF('${SheetTitles.WORKSHEET}'!E2:E, 0) + COUNTIF('${SheetTitles.WORKSHEET}'!E2:E, "")`,
         ],
         [],
         ["", `Total Wholesale Manifests`, `=COUNTUNIQUE('${SheetTitles.MANIFEST_COGS}'!B2:B)`],
@@ -1071,12 +1071,12 @@ export async function createCogsV2SpreadsheetOrError({
         [
           "",
           `Total Manifest Packages w/ $0 COGS`,
-          `=COUNTIF('${SheetTitles.MANIFEST_COGS}'!H2:H, 0)`,
+          `=COUNTIF('${SheetTitles.MANIFEST_COGS}'!I2:I, 0)`,
         ],
         [
           "",
           `Total Manifest Packages w/ FAIL status`,
-          `=COUNTIF('${SheetTitles.MANIFEST_COGS}'!J2:J, "FAIL")`,
+          `=COUNTIF('${SheetTitles.MANIFEST_COGS}'!K2:K, "FAIL")`,
         ],
         [],
         ...Object.entries(auditData).map(([key, value]) => [key, JSON.stringify(value)]),
