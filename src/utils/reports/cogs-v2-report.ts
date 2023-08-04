@@ -432,25 +432,6 @@ export async function loadAndCacheCogsV2Data({
             }
           }
         }
-
-        // const sourceProductionBatchNumbers: string[] = matchedSourcePackages.map((pkg) =>
-        //   pkg.ProductionBatchNumber.length > 0
-        //     ? [pkg.ProductionBatchNumber]
-        //     : pkg.SourceProductionBatchNumbers.split(",").map((x) => x.trim())
-        // );
-
-        // const scopedSourceProductionBatchPackages: IIndexedPackageData[] =
-        //   sourceProductionBatchNumbers
-        //     .filter((x) => fullProductionBatchMap.has(x))
-        //     .map((x) => fullProductionBatchMap.get(x)!);
-
-        // // Add to both maps
-        // scopedSourceProductionBatchPackages.map((pkg) =>
-        //   scopedAncestorPackageMap.set(pkg.Label, pkg)
-        // );
-        // scopedSourceProductionBatchPackages.map((pkg) =>
-        //   scopedProductionBatchPackageMap.set(pkg.ProductionBatchNumber, pkg)
-        // );
       }
     }
   }
