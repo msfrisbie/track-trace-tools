@@ -27,7 +27,11 @@ import {
   extractChildPackageTagQuantityUnitSetsFromHistory,
   extractInitialPackageQuantityAndUnitFromHistoryOrError,
 } from "../history";
-import { getLabelOrError } from "../package";
+import {
+  getDelimiterSeparatedValuesOrError,
+  getLabelOrError,
+  getSourcePackageTags,
+} from "../package";
 import {
   addRowsRequestFactory,
   alternatingRowStyleRequestFactory,
@@ -366,9 +370,7 @@ export async function loadAndCacheCogsV2Data({
   for (const transfer of richOutgoingTransfers) {
     for (const destination of transfer.outgoingDestinations || []) {
       for (const manifestPkg of destination.packages || []) {
-        const sourcePackageLabels: string[] = manifestPkg.SourcePackageLabels.split(",").map((x) =>
-          x.trim()
-        );
+        const sourcePackageLabels: string[] = await getSourcePackageTags(manifestPkg);
 
         if (sourcePackageLabels.length !== 1) {
           console.error(`${sourcePackageLabels.length} manifest pkg source packages`);
@@ -396,9 +398,7 @@ export async function loadAndCacheCogsV2Data({
             continue;
           }
 
-          const targetSourcePackageLabels = target.SourcePackageLabels.split(",").map((x) =>
-            x.trim()
-          );
+          const targetSourcePackageLabels = await getSourcePackageTags(target);
 
           for (const label of targetSourcePackageLabels) {
             if (fullPackageLabelMap.has(label)) {
@@ -602,10 +602,10 @@ export async function updateCogsV2MasterCostSheet({
   }
 }
 
-function computeIsConnected(
+async function computeIsConnected(
   pkg: IIndexedPackageData,
   scopedAncestorPackageMap: Map<string, IIndexedPackageData>
-): [boolean, string] {
+): Promise<[boolean, string]> {
   let buffer: IIndexedPackageData[] = [pkg];
 
   while (buffer.length > 0) {
@@ -615,9 +615,7 @@ function computeIsConnected(
       continue;
     }
 
-    const sourcePackageLabels: string[] = target.SourcePackageLabels.split(",").map((x) =>
-      x.trim()
-    );
+    const sourcePackageLabels: string[] = await getSourcePackageTags(target);
 
     for (const label of sourcePackageLabels) {
       if (!scopedAncestorPackageMap.has(label)) {
@@ -642,7 +640,7 @@ function computeIsEligibleForItemOptimization(
   const sourceProductionBatchNumbers: string[] =
     sourcePackage.ProductionBatchNumber.length > 0
       ? [sourcePackage.ProductionBatchNumber]
-      : sourcePackage.SourceProductionBatchNumbers.split(",").map((x) => x.trim());
+      : getDelimiterSeparatedValuesOrError(sourcePackage.SourceProductionBatchNumbers);
 
   if (sourceProductionBatchNumbers.length !== 1) {
     return [false, `Invalid production batch nubmers: ${sourceProductionBatchNumbers}`];
@@ -735,9 +733,7 @@ export async function maybeLoadCogsV2ReportData({
 
     for (const destination of transfer.outgoingDestinations || []) {
       for (const manifestPkg of destination.packages || []) {
-        const sourcePackageLabels: string[] = manifestPkg.SourcePackageLabels.split(",").map((x) =>
-          x.trim()
-        );
+        const sourcePackageLabels: string[] = await getSourcePackageTags(manifestPkg);
 
         if (sourcePackageLabels.length !== 1) {
           cogsMatrix.push([
@@ -782,7 +778,7 @@ export async function maybeLoadCogsV2ReportData({
         let costEquation = `=0`;
         let status = "INITIAL";
 
-        const [isConnected, isConnectedMessage] = computeIsConnected(
+        const [isConnected, isConnectedMessage] = await computeIsConnected(
           sourcePackage,
           scopedAncestorPackageMap
         );
@@ -867,9 +863,7 @@ export async function maybeLoadCogsV2ReportData({
                 finalBuffer.push([target, newMultiplier]);
               } else {
                 // Push back onto queue and recurse
-                const sourcePackageLabels = target.SourcePackageLabels.split(",").map((x) =>
-                  x.trim()
-                );
+                const sourcePackageLabels = await getSourcePackageTags(target);
 
                 for (const label of sourcePackageLabels) {
                   const source = scopedAncestorPackageMap.get(label);

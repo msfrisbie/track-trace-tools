@@ -82,6 +82,48 @@ export function getItemNameOrError(unionPkg: IUnionIndexedPackageData): string {
   throw new Error("Could not extract Item Name");
 }
 
+export function getDelimiterSeparatedValuesOrError(
+  joinedValues: string,
+  options?: { delimiter?: string; regex?: RegExp }
+): string[] {
+  const { delimiter, regex } = {
+    delimiter: ",",
+    ...options,
+  };
+
+  const values = joinedValues
+    .split(delimiter)
+    .map((x) => x.trim())
+    .filter((x) => x.length > 0);
+
+  if (regex) {
+    for (const value of values) {
+      if (!regex.test(value)) {
+        throw new Error(`${value} failed regex`);
+      }
+    }
+  }
+
+  return values;
+}
+
+export async function getSourcePackageTags(target: IUnionIndexedPackageData): Promise<string[]> {
+  try {
+    return getDelimiterSeparatedValuesOrError(target.SourcePackageLabels, {
+      regex: METRC_TAG_REGEX,
+    });
+  } catch (e) {
+    const dataLoader = await getDataLoaderByLicense(target.LicenseNumber);
+
+    await dataLoader.packageHistoryByPackageId(getIdOrError(target)).then((result) => {
+      target.history = result;
+    });
+
+    // Extract source packages from history and return those instead
+    return extractParentPackageLabelsFromHistory(target.history!);
+  }
+}
+
 export function getItemUnitOfMeasureAbbreviationOrError(
   unionPkg: IUnionIndexedPackageData
 ): UnitOfMeasureAbbreviation {
