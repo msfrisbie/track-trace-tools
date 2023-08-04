@@ -1034,7 +1034,7 @@ export async function createCogsV2SpreadsheetOrError({
     styleTopRowRequestFactory({ sheetId: manifestSheetId }),
     freezeTopRowRequestFactory({ sheetId: manifestSheetId }),
     alternatingRowStyleRequestFactory({ sheetId: manifestSheetId }),
-    hideColumnsRequestFactory({ sheetId: manifestSheetId, startIndex: 9, endIndex: 11 }),
+    hideColumnsRequestFactory({ sheetId: manifestSheetId, startIndex: 10, endIndex: 12 }),
   ];
 
   await messageBus.sendMessageToBackground(
