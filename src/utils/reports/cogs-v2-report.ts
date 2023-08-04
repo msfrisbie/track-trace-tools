@@ -1072,7 +1072,7 @@ export async function createCogsV2SpreadsheetOrError({
         [
           "",
           `Total Source Production Batches w/ $0 cost`,
-          `=COUNTIF('${SheetTitles.WORKSHEET}'!E2:E, 0) + COUNTIF('${SheetTitles.WORKSHEET}'!E2:E, "")`,
+          `=COUNTIF('${SheetTitles.WORKSHEET}'!D2:D, 0) + COUNTIF('${SheetTitles.WORKSHEET}'!D2:D, "")`,
         ],
         [],
         ["", `Total Wholesale Manifests`, `=COUNTUNIQUE('${SheetTitles.MANIFEST_COGS}'!B2:B)`],
