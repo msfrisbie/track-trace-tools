@@ -391,6 +391,10 @@ export async function loadAndCacheCogsV2Data({
         while (buffer.length > 0) {
           let target = buffer.pop()!;
 
+          if (!target) {
+            debugger;
+          }
+
           scopedAncestorPackageMap.set(target.Label, target);
 
           if (target.ProductionBatchNumber.length > 0) {
@@ -398,11 +402,29 @@ export async function loadAndCacheCogsV2Data({
             continue;
           }
 
+          const targetSourceProductionBatches = getDelimiterSeparatedValuesOrError(
+            target.SourceProductionBatchNumbers
+          );
+
+          for (const productionBatchNumber of targetSourceProductionBatches) {
+            const productionBatch = fullProductionBatchMap.get(productionBatchNumber);
+            if (productionBatch) {
+              scopedProductionBatchPackageMap.set(productionBatchNumber, productionBatch);
+              scopedAncestorPackageMap.set(productionBatch.Label, productionBatch);
+            } else {
+              console.error(
+                `Unable to match upstream source production batch ${productionBatchNumber} for pkg ${target.Label}`
+              );
+            }
+          }
+
           const targetSourcePackageLabels = await getSourcePackageTags(target);
 
           for (const label of targetSourcePackageLabels) {
-            if (fullPackageLabelMap.has(label)) {
-              buffer.push(fullPackageLabelMap.get(label)!);
+            const pkg = fullPackageLabelMap.get(label);
+
+            if (pkg) {
+              buffer.push(pkg);
             } else {
               console.error(
                 `Unable to match upstream source package label ${label} for pkg ${manifestPkg.PackageLabel}`
@@ -559,6 +581,10 @@ export async function updateCogsV2MasterCostSheet({
         // Approx Cost per Unit
         // Pieces per Unit
 
+        if (!pkg) {
+          debugger;
+        }
+
         rows.push([
           pkg.LicenseNumber,
           pkg.Label,
@@ -599,6 +625,8 @@ export async function updateCogsV2MasterCostSheet({
       toaster: "ttt-toaster",
       solid: true,
     });
+
+    throw e;
   }
 }
 
@@ -643,7 +671,7 @@ function computeIsEligibleForItemOptimization(
       : getDelimiterSeparatedValuesOrError(sourcePackage.SourceProductionBatchNumbers);
 
   if (sourceProductionBatchNumbers.length !== 1) {
-    return [false, `Invalid production batch nubmers: ${sourceProductionBatchNumbers}`];
+    return [false, `Invalid production batch numbers: ${sourceProductionBatchNumbers}`];
   }
 
   const [sourceProductBatchNumber] = sourceProductionBatchNumbers;
