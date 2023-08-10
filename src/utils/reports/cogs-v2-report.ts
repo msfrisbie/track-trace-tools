@@ -611,7 +611,7 @@ export async function updateCogsV2MasterCostSheet({
   }
 }
 
-async function computeIsConnected(
+export async function computeIsConnected(
   pkg: IIndexedPackageData,
   scopedAncestorPackageMap: Map<string, IIndexedPackageData>
 ): Promise<[boolean, string]> {
@@ -640,7 +640,7 @@ async function computeIsConnected(
   return [true, ""];
 }
 
-function computeIsEligibleForItemOptimization(
+export function computeIsEligibleForItemOptimization(
   pkg: IIndexedDestinationPackageData,
   sourcePackage: IIndexedPackageData,
   scopedProductionBatchPackageMap: Map<string, IIndexedPackageData>
@@ -668,6 +668,162 @@ function computeIsEligibleForItemOptimization(
   }
 
   return [true, ``];
+}
+
+export function extractMultiplierFromItemNamesOrError({
+  parentItemName,
+  childItemName,
+}: {
+  parentItemName: string;
+  childItemName: string;
+}): number {
+  const UOM_REGEX_SPLITTER = /(\d+\.?\d+?)\s?(kg|mg|g|lb|oz)/i;
+
+  const parentMatch = parentItemName.match(UOM_REGEX_SPLITTER);
+
+  if (!parentMatch) {
+    throw new Error(`Unable to extract quantity from parent item: ${parentItemName}`);
+  }
+
+  const [parentReadableQuantity, parentQuantity, parentUnitOfMeasure] = parentMatch;
+
+  const childMatch = childItemName.match(UOM_REGEX_SPLITTER);
+
+  if (!childMatch) {
+    throw new Error(`Unable to extract quantity from child item: ${childItemName}`);
+  }
+
+  const [childReadableQuantity, childQuantity, childUnitOfMeasure] = childMatch;
+
+  // Test split match
+  const [parentFirstClause, parentSecondClause, ...parentRemainder] =
+    parentItemName.split(parentReadableQuantity);
+  const [childFirstClause, childSecondClause, ...childRemainder] =
+    childItemName.split(childReadableQuantity);
+
+  if (parentRemainder.length !== 0) {
+    throw new Error("Parent quanttiy match error");
+  }
+
+  if (childRemainder.length !== 0) {
+    throw new Error("Child quanttiy match error");
+  }
+
+  if (parentFirstClause !== childFirstClause) {
+    throw new Error("Unable to match item names: first clause mismatch");
+  }
+
+  if (parentSecondClause !== childSecondClause) {
+    throw new Error("Unable to match item names: second clause mismatch");
+  }
+
+  if (parentUnitOfMeasure !== childUnitOfMeasure) {
+    throw new Error("Unable to match item names: unit of measure mismatch");
+  }
+
+  // Return the multiplier indicating the ratio of units for the same quantity
+  // e.g. 10 mg => 100 mg would be 0.1 since ten source units are producing 1 child unit
+  return parseFloat(parentQuantity) / parseFloat(childQuantity);
+}
+
+export function extractMultiplierFromItemNamesWithPackStrategyOrError({
+  parentItemName,
+  childItemName,
+}: {
+  parentItemName: string;
+  childItemName: string;
+}): number {
+  const PACK_REGEX_SPLITTER = /\s?-\s?(\d+) Pack/i;
+
+  const childMatch = childItemName.match(PACK_REGEX_SPLITTER);
+
+  if (!childMatch) {
+    throw new Error(`Unable to extract pack quantity from child item: ${childItemName}`);
+  }
+
+  const [childReadableQuantity, childPackQuantity] = childMatch;
+
+  if (childItemName.replace(childReadableQuantity, "") !== parentItemName) {
+    throw new Error(`Unable to exgtract pack quantity: child item name is not a superstring`);
+  }
+
+  return 1 / parseFloat(childPackQuantity);
+}
+
+// Similar to ItemOptimization, but must return additional multiplier
+export function computeIsEligibleForItemQuantityRatioOptimization(
+  pkg: IIndexedDestinationPackageData,
+  sourcePackage: IIndexedPackageData,
+  scopedProductionBatchPackageMap: Map<string, IIndexedPackageData>
+): [boolean, number, string] {
+  // sourcePackage might itself be the production batch
+  const sourceProductionBatchNumbers: string[] =
+    sourcePackage.ProductionBatchNumber.length > 0
+      ? [sourcePackage.ProductionBatchNumber]
+      : getDelimiterSeparatedValuesOrError(sourcePackage.SourceProductionBatchNumbers);
+
+  if (sourceProductionBatchNumbers.length !== 1) {
+    return [false, 0, `Invalid production batch numbers: ${sourceProductionBatchNumbers}`];
+  }
+
+  const [sourceProductBatchNumber] = sourceProductionBatchNumbers;
+
+  const sourceProductionBatch = scopedProductionBatchPackageMap.get(sourceProductBatchNumber);
+
+  if (!sourceProductionBatch) {
+    return [false, 0, `${sourcePackage.SourceProductionBatchNumbers} missing from PB map`];
+  }
+
+  try {
+    return [
+      true,
+      extractMultiplierFromItemNamesOrError({
+        parentItemName: sourceProductionBatch.Item.Name,
+        childItemName: pkg.ProductName,
+      }),
+      ``,
+    ];
+  } catch (e) {
+    return [false, 0, `Failed to extract ratio: ${(e as Error).toString()}`];
+  }
+}
+
+// Similar to ItemOptimization, but must return additional multiplier
+export function computeIsEligibleForItemQuantityPackRatioOptimization(
+  pkg: IIndexedDestinationPackageData,
+  sourcePackage: IIndexedPackageData,
+  scopedProductionBatchPackageMap: Map<string, IIndexedPackageData>
+): [boolean, number, string] {
+  // sourcePackage might itself be the production batch
+  const sourceProductionBatchNumbers: string[] =
+    sourcePackage.ProductionBatchNumber.length > 0
+      ? [sourcePackage.ProductionBatchNumber]
+      : getDelimiterSeparatedValuesOrError(sourcePackage.SourceProductionBatchNumbers);
+
+  if (sourceProductionBatchNumbers.length !== 1) {
+    return [false, 0, `Invalid production batch numbers: ${sourceProductionBatchNumbers}`];
+  }
+
+  const [sourceProductBatchNumber] = sourceProductionBatchNumbers;
+
+  const sourceProductionBatch = scopedProductionBatchPackageMap.get(sourceProductBatchNumber);
+
+  if (!sourceProductionBatch) {
+    return [false, 0, `${sourcePackage.SourceProductionBatchNumbers} missing from PB map`];
+  }
+
+  try {
+    return [
+      true,
+      extractMultiplierFromItemNamesWithPackStrategyOrError({
+        parentItemName: sourceProductionBatch.Item.Name,
+        childItemName: pkg.ProductName,
+      }),
+      ``,
+    ];
+  } catch (e) {
+    return [false, 0, `Failed to extract pack ratio: ${(e as Error).toString()}`];
+  }
 }
 
 export async function maybeLoadCogsV2ReportData({
@@ -734,6 +890,7 @@ export async function maybeLoadCogsV2ReportData({
       "Package COGS",
       "Unit COGS",
       "Status",
+      "Debug Note",
       "Note",
     ].map((x) => x.padStart(8).padEnd(8))
   );
@@ -759,6 +916,7 @@ export async function maybeLoadCogsV2ReportData({
             "",
             "FAIL",
             `Invalid src package count: ${sourcePackageLabels.length}`,
+            "Unable to compute COGS: Invalid source package count",
           ]);
           continue;
         }
@@ -779,6 +937,7 @@ export async function maybeLoadCogsV2ReportData({
             "",
             "FAIL",
             `Missing src package: ${sourcePackageLabel}`,
+            "Unable to compute COGS: Missing source packages",
           ]);
           continue;
         }
@@ -786,7 +945,8 @@ export async function maybeLoadCogsV2ReportData({
         const sourcePackage: IIndexedPackageData =
           scopedAncestorPackageMap.get(sourcePackageLabel)!;
 
-        let note = "";
+        let debugNote = "";
+        let publicNote = "";
         let costEquation = `=0`;
         let status = "INITIAL";
 
@@ -801,6 +961,16 @@ export async function maybeLoadCogsV2ReportData({
             scopedProductionBatchPackageMap
           );
 
+        const [
+          isEligibleForItemQuantityRatioOptimization,
+          parentToChildRatio,
+          isEligibleForItemQuantityRatioOptimizationMessage,
+        ] = await computeIsEligibleForItemQuantityRatioOptimization(
+          manifestPkg,
+          sourcePackage,
+          scopedProductionBatchPackageMap
+        );
+
         if (isEligibleForItemOptimization) {
           // If item matches, just perform a direct package comparison
           const sourceProductionBatch: IIndexedPackageData = scopedProductionBatchPackageMap.get(
@@ -811,7 +981,7 @@ export async function maybeLoadCogsV2ReportData({
 
           if (sourceProductionBatch.history === undefined) {
             status = "FAIL";
-            note = `Src PB ${sourceProductionBatch.Label} is missing history`;
+            debugNote = `Src PB ${sourceProductionBatch.Label} is missing history`;
           } else {
             const initialProductionBatchQuantity =
               extractInitialPackageQuantityAndUnitFromHistoryOrError(
@@ -833,7 +1003,7 @@ export async function maybeLoadCogsV2ReportData({
 
             costEquation = `=${optimizationMultiplier} * ${vlookupCostExpression} * ${vlookupQuantityAdjustMultiplierExpression}`;
 
-            note = "Used optimization";
+            debugNote = "Used optimization";
             status = "SUCCESS";
           }
         } else if (isConnected) {
@@ -850,7 +1020,8 @@ export async function maybeLoadCogsV2ReportData({
 
               if (target.history === undefined) {
                 status = "FAIL";
-                note = `${target.Label} is missing history`;
+                debugNote = `${target.Label} is missing history`;
+                publicNote = "Unable to compute COGS: missing package history";
                 break;
               }
 
@@ -863,7 +1034,8 @@ export async function maybeLoadCogsV2ReportData({
 
               if (!childPackageQuantity) {
                 status = "FAIL";
-                note = `Unable to extract ${childLabel} in ${target.Label} history`;
+                debugNote = `Unable to extract ${childLabel} in ${target.Label} history`;
+                publicNote = "Unable to compute COGS: invalid package history";
                 break;
               }
 
@@ -882,7 +1054,8 @@ export async function maybeLoadCogsV2ReportData({
 
                   if (!source) {
                     status = "FAIL";
-                    note = `Unable to find ${label} in scopedAncestorPackageMap`;
+                    debugNote = `Unable to find ${label} in scopedAncestorPackageMap`;
+                    publicNote = "Unable to compute COGS: broken package map";
                     break;
                   }
 
@@ -917,15 +1090,24 @@ export async function maybeLoadCogsV2ReportData({
                   })
                   .join(" + ");
 
-              note = "Walked graph";
+              debugNote = "Walked graph";
               status = "SUCCESS";
             }
           } catch (e) {
-            note = `Failed to walk graph, ${e}`;
+            debugNote = `Failed to walk graph, ${e}`;
+            publicNote = "Unable to compute COGS: broken package graph";
             status = "FAIL";
           }
+        } else if (isEligibleForItemQuantityRatioOptimization) {
+          // TODO
+          // TODO
+          // TODO
+          // TODO
+          // TODO
+          // TODO
         } else {
-          note = `No eligible strategy - ${isEligibleForItemOptimizationMesage} /// ${isConnectedMessage}`;
+          debugNote = `No eligible strategy - ${isEligibleForItemOptimizationMesage} /// ${isConnectedMessage}`;
+          publicNote = "Unable to compute COGS: no eligible strategy";
           status = "FAIL";
         }
 
@@ -957,7 +1139,8 @@ export async function maybeLoadCogsV2ReportData({
           costEquation,
           `=INDIRECT(ADDRESS(ROW(), COLUMN()-1)) / ${manifestPkg.ShippedQuantity}`,
           status,
-          note,
+          debugNote,
+          publicNote,
         ]);
       }
     }
