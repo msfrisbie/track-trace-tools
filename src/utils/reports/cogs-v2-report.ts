@@ -971,6 +971,16 @@ export async function maybeLoadCogsV2ReportData({
           scopedProductionBatchPackageMap
         );
 
+        const [
+          isEligibleForItemQuantityRatioPackStragegyOptimization,
+          parentToChildPackRatio,
+          isEligibleForItemQuantityRatioPackStragetyOptimizationMessage,
+        ] = await computeIsEligibleForItemQuantityPackRatioOptimization(
+          manifestPkg,
+          sourcePackage,
+          scopedProductionBatchPackageMap
+        );
+
         if (isEligibleForItemOptimization) {
           // If item matches, just perform a direct package comparison
           const sourceProductionBatch: IIndexedPackageData = scopedProductionBatchPackageMap.get(
@@ -1003,7 +1013,7 @@ export async function maybeLoadCogsV2ReportData({
 
             costEquation = `=${optimizationMultiplier} * ${vlookupCostExpression} * ${vlookupQuantityAdjustMultiplierExpression}`;
 
-            debugNote = "Used optimization";
+            debugNote = "Used item match optimization";
             status = "SUCCESS";
           }
         } else if (isConnected) {
@@ -1098,13 +1108,55 @@ export async function maybeLoadCogsV2ReportData({
             publicNote = "Unable to compute COGS: broken package graph";
             status = "FAIL";
           }
-        } else if (isEligibleForItemQuantityRatioOptimization) {
-          // TODO
-          // TODO
-          // TODO
-          // TODO
-          // TODO
-          // TODO
+        } else if (
+          isEligibleForItemQuantityRatioOptimization ||
+          isEligibleForItemQuantityRatioPackStragegyOptimization
+        ) {
+          // If item matches, just perform a direct package comparison
+          const sourceProductionBatch: IIndexedPackageData = scopedProductionBatchPackageMap.get(
+            sourcePackage.ProductionBatchNumber.length > 0
+              ? sourcePackage.ProductionBatchNumber
+              : sourcePackage.SourceProductionBatchNumbers
+          )!;
+
+          if (sourceProductionBatch.history === undefined) {
+            status = "FAIL";
+            debugNote = `Src PB ${sourceProductionBatch.Label} is missing history`;
+          } else {
+            const initialProductionBatchQuantity =
+              extractInitialPackageQuantityAndUnitFromHistoryOrError(
+                sourceProductionBatch.history!
+              );
+
+            let optimizationMultiplier =
+              manifestPkg.ShippedQuantity / initialProductionBatchQuantity[0];
+
+            if (isEligibleForItemQuantityRatioOptimization) {
+              optimizationMultiplier = optimizationMultiplier / parentToChildRatio;
+              debugNote = "Used quantity ratio optimization";
+              publicNote = "T3 estimated this cost based on item names. Verify before use.";
+            } else if (isEligibleForItemQuantityRatioPackStragegyOptimization) {
+              optimizationMultiplier = optimizationMultiplier / parentToChildPackRatio;
+              debugNote = "Used pack ratio optimization";
+              publicNote = "T3 estimated this cost based on item names. Verify before use.";
+            } else {
+              throw new Error("Unmatched item ratio optimization critical error");
+            }
+
+            const vlookupCostExpression = `VLOOKUP("${getLabelOrError(sourceProductionBatch)}", '${
+              SheetTitles.WORKSHEET
+            }'!B:L, 3, FALSE)`;
+
+            const vlookupQuantityAdjustMultiplierExpression = `(${
+              initialProductionBatchQuantity[0]
+            } / VLOOKUP("${getLabelOrError(sourceProductionBatch)}", '${
+              SheetTitles.WORKSHEET
+            }'!B:L, 6, FALSE))`;
+
+            costEquation = `=${optimizationMultiplier} * ${vlookupCostExpression} * ${vlookupQuantityAdjustMultiplierExpression}`;
+
+            status = "SUCCESS";
+          }
         } else {
           debugNote = `No eligible strategy - ${isEligibleForItemOptimizationMesage} /// ${isConnectedMessage}`;
           publicNote = "Unable to compute COGS: no eligible strategy";
