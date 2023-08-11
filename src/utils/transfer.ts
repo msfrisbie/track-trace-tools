@@ -220,7 +220,7 @@ export async function createScanSheet(transferId: number, manifestNumber: string
 
   toastManager.openToast("Creating scan sheet...", {
     title: "T3",
-    autoHideDelay: 2000,
+    autoHideDelay: 10000,
     variant: "primary",
     appendToast: true,
     toaster: "ttt-toaster",
