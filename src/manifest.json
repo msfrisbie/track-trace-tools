@@ -36,7 +36,14 @@
     {
       "matches": ["https://*.metrc.com/*", "http://localhost:5000/*"],
       "run_at": "document_start",
-      "js": [],
+      "js": ["js/load-script.js"],
+      "css": []
+    },
+    {
+      "matches": ["https://*.metrc.com/*", "http://localhost:5000/*"],
+      "run_at": "document_idle",
+      "world": "MAIN",
+      "js": ["scripts/main-script.js"],
       "css": []
     }
   ],

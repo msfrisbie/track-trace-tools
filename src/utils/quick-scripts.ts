@@ -5,6 +5,7 @@ import { dynamicConstsManager } from "@/modules/dynamic-consts-manager.module";
 import { pageManager } from "@/modules/page-manager/page-manager.module";
 import { toastManager } from "@/modules/toast-manager.module";
 import _, { zip } from "lodash-es";
+import { setAutocompleteValueOrError, setFormInputValue } from "./metrc-form";
 
 export interface IQuickScript {
   id: string;
@@ -22,6 +23,14 @@ export async function runQuickScript(quickScript: IQuickScript, childOption?: an
 }
 
 export const QUICK_SCRIPTS: IQuickScript[] = [
+  {
+    id: "EXPAND_GROWTH_PHASE_TAGS",
+    name: "Expand Growth Phase Tags",
+    description:
+      "Automatically expand a tag range in the Change Growth Phase window to account for the Metrc tag range bug",
+    contextLink: "https://track-trace-tools.talkyard.net/-71/metrc-bug-package-out-of-order-error",
+    quickScriptFunction: expandGrowthPhaseTags,
+  },
   {
     id: "AUTOFILL_TRANSFER_GROSS_WEIGHTS",
     name: "Autofill Transfer Gross Weight",
@@ -130,13 +139,9 @@ export async function showAllColumns() {
       let form = null;
       const animationContainer = pageManager.getVisibleAnimationContainer("Sort Ascending");
 
-      console.log({ animationContainer });
-
       if (animationContainer) {
         form = animationContainer.querySelector(".k-columns-item");
       }
-
-      console.log({ form });
 
       if (form) {
         for (const checkbox of form.querySelectorAll(
@@ -212,13 +217,9 @@ export async function showOnlyPrimaryColumn() {
       let form = null;
       const animationContainer = pageManager.getVisibleAnimationContainer("Sort Ascending");
 
-      console.log({ animationContainer });
-
       if (animationContainer) {
         form = animationContainer.querySelector(".k-columns-item");
       }
-
-      console.log({ form });
 
       if (form) {
         for (const [idx, checkbox] of [
@@ -267,6 +268,163 @@ export async function showOnlyPrimaryColumn() {
   );
 }
 
+export async function expandGrowthPhaseTags() {
+  // Load existing tags
+
+  const availablePlantTags = await dynamicConstsManager.availablePlantTags();
+
+  // Find first row with >1 plantcount
+
+  function getRowInputByNgModel(
+    row: HTMLElement,
+    ngModelExpression: RowNgModel
+  ): HTMLInputElement | HTMLSelectElement | null {
+    return row.querySelector(`[ng-model="${ngModelExpression}"]`);
+  }
+
+  enum RowNgModel {
+    Id = "line.Id",
+    PlantsCount = "line.PlantsCount",
+    StartingTagId = "line.StartingTagId",
+    GrowthPhase = "line.GrowthPhase",
+    LocationId = "line.LocationId",
+    GrowthDate = "line.GrowthDate",
+  }
+
+  let expandedRowCount = 0;
+  let newRowCount = 0;
+
+  while (true) {
+    const initialRows: HTMLElement[] = [
+      ...document.querySelectorAll(`tr[ng-repeat="line in repeaterLines"]`),
+    ] as HTMLElement[];
+
+    let targetRow: HTMLElement | null = null;
+
+    let targetRowInitialCount: number = 0;
+
+    // Search through existing rows, find the first one that has a plantCount value > 1
+    for (const row of initialRows) {
+      const rowPlantCountInput = getRowInputByNgModel(
+        row,
+        RowNgModel.PlantsCount
+      )! as HTMLInputElement;
+      const rowCountValue = parseInt(rowPlantCountInput.value, 10);
+
+      if (typeof rowCountValue === "number" && rowCountValue > 1) {
+        targetRow = row;
+        targetRowInitialCount = rowCountValue;
+        await setFormInputValue(rowPlantCountInput, "1");
+        break;
+      }
+    }
+
+    if (!targetRow) {
+      break;
+    }
+
+    expandedRowCount++;
+
+    let count = targetRowInitialCount - 1;
+
+    for (let i = 0; i < count; ++i) {
+      const button = pageManager.activeModal?.querySelector(
+        `[ng-click*="addLine(newLinesCount)"]`
+      ) as HTMLButtonElement | null;
+
+      if (button) {
+        button.click();
+      }
+    }
+
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    // Select tag in each
+
+    const addedRows = [...document.querySelectorAll(`tr[ng-repeat="line in repeaterLines"]`)].slice(
+      count * -1
+    ) as HTMLElement[];
+
+    // Acquire tags
+
+    const initialTag = getRowInputByNgModel(targetRow, RowNgModel.StartingTagId)!.value;
+
+    const initialIndex = availablePlantTags.findIndex((x) => x.Label === initialTag);
+
+    const tagRange = availablePlantTags.slice(initialIndex, initialIndex + targetRowInitialCount);
+
+    // Skip first tag since it already exists
+    tagRange.shift();
+
+    if (tagRange.length !== addedRows.length) {
+      // TODO show error for bad tag # and exit
+      toastManager.openToast(
+        `Couldn't allocate enough tags in this range: needed ${addedRows.length}, found ${tagRange.length}`,
+        {
+          title: "Quick Script Error",
+          autoHideDelay: 5000,
+          variant: "danger",
+          appendToast: true,
+          toaster: "ttt-toaster",
+          solid: true,
+        }
+      );
+
+      return;
+    }
+
+    const targetRowPlantId: string = getRowInputByNgModel(targetRow, RowNgModel.Id)!
+      .value as string;
+    const targetRowGrowthPhase: string = getRowInputByNgModel(targetRow, RowNgModel.GrowthPhase)!
+      .value as string;
+    const targetRowGrowthDate: string = getRowInputByNgModel(targetRow, RowNgModel.GrowthDate)!
+      .value as string;
+    const targetRowLocation: string = getRowInputByNgModel(targetRow, RowNgModel.LocationId)!
+      .value as string;
+
+    for (const [idx, row] of addedRows.entries()) {
+      newRowCount++;
+      const tag: string = tagRange[idx].Label;
+
+      await setAutocompleteValueOrError(
+        getRowInputByNgModel(row, RowNgModel.Id)! as HTMLInputElement,
+        targetRowPlantId
+      );
+      setFormInputValue(getRowInputByNgModel(row, RowNgModel.GrowthPhase)!, targetRowGrowthPhase);
+      setFormInputValue(getRowInputByNgModel(row, RowNgModel.PlantsCount)!, "1");
+      await setAutocompleteValueOrError(
+        getRowInputByNgModel(row, RowNgModel.StartingTagId)! as HTMLInputElement,
+        tag
+      );
+      setFormInputValue(getRowInputByNgModel(row, RowNgModel.GrowthDate)!, targetRowGrowthDate);
+      setFormInputValue(getRowInputByNgModel(row, RowNgModel.LocationId)!, targetRowLocation);
+    }
+  }
+
+  if (expandedRowCount === 0) {
+    toastManager.openToast(`Couldn't find a valid input row`, {
+      title: "Quick Script Error",
+      autoHideDelay: 5000,
+      variant: "danger",
+      appendToast: true,
+      toaster: "ttt-toaster",
+      solid: true,
+    });
+  } else {
+    toastManager.openToast(
+      `Expanded ${expandedRowCount} tag ranges into ${newRowCount + expandedRowCount} single tags`,
+      {
+        title: "Quick Script Success",
+        autoHideDelay: 5000,
+        variant: "success",
+        appendToast: true,
+        toaster: "ttt-toaster",
+        solid: true,
+      }
+    );
+  }
+}
+
 export async function fillTransferWeights() {
   const packageRows = [
     ...document.querySelectorAll(`tr[ng-repeat="package in destination.Packages"]`),
@@ -295,11 +453,6 @@ export async function fillTransferWeights() {
       skippedCount++;
       continue;
     }
-
-    // if (!grossWeightInput || !unitOfMeasureSelect) {
-    //   skippedCount++;
-    //   continue;
-    // }
 
     const packageLabel = packageInput.value;
 
@@ -332,11 +485,14 @@ export async function fillTransferWeights() {
           const quantity: number = packageData.Quantity * packageData.Item.UnitWeight;
 
           if (grossWeightInput) {
-            grossWeightInput.value = _.round(quantity, 3).toString();
+            setFormInputValue(grossWeightInput, _.round(quantity, 3).toString());
           }
 
           if (unitOfMeasureSelect) {
-            unitOfMeasureSelect.value = `number:${packageData.Item.UnitWeightUnitOfMeasureId}`;
+            setFormInputValue(
+              unitOfMeasureSelect,
+              `number:${packageData.Item.UnitWeightUnitOfMeasureId}`
+            );
           }
 
           quantities.push(quantity);
@@ -359,19 +515,15 @@ export async function fillTransferWeights() {
         const quantity: number = packageData.Quantity;
 
         if (grossWeightInput) {
-          grossWeightInput.value = _.round(quantity, 3).toString();
+          setFormInputValue(grossWeightInput, _.round(quantity, 3).toString());
         }
 
         if (unitOfMeasureSelect) {
-          unitOfMeasureSelect.value = `number:${packageData.UnitOfMeasureId}`;
+          setFormInputValue(unitOfMeasureSelect, `number:${packageData.UnitOfMeasureId}`);
         }
 
         quantities.push(quantity);
         unitOfWeightIds.push(packageData.UnitOfMeasureId);
-      }
-
-      if (unitOfMeasureSelect) {
-        unitOfMeasureSelect.dispatchEvent(new Event("change"));
       }
 
       successCount++;
@@ -443,12 +595,14 @@ export async function fillTransferWeights() {
       baseUnitOfMeasureId = poundsUnitOfMeasure.Id;
     }
 
-    grossWeightInput.value = _.round(
-      normalizedGrossWeights.reduce((a, b) => a + b, 0),
-      3
-    ).toString();
-    unitOfMeasureSelect.value = `number:${baseUnitOfMeasureId}`;
-    unitOfMeasureSelect.dispatchEvent(new Event("change"));
+    setFormInputValue(
+      grossWeightInput,
+      _.round(
+        normalizedGrossWeights.reduce((a, b) => a + b, 0),
+        3
+      ).toString()
+    );
+    setFormInputValue(unitOfMeasureSelect, `number:${baseUnitOfMeasureId}`);
   }
 
   toastManager.openToast(`Autofilled ${successCount} packages`, {
@@ -497,13 +651,16 @@ export async function sumPackageQuantities() {
       continue;
     }
 
-    output.value = _.round(
-      inputs
-        .map((input) => parseFloat(input.value))
-        .filter((x) => !isNaN(x))
-        .reduce((a, b) => a + b, 0),
-      3
-    ).toString();
+    setFormInputValue(
+      output,
+      _.round(
+        inputs
+          .map((input) => parseFloat(input.value))
+          .filter((x) => !isNaN(x))
+          .reduce((a, b) => a + b, 0),
+        3
+      ).toString()
+    );
   }
 
   toastManager.openToast(`Totaled ${packageSets.length} packages`, {

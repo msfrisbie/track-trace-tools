@@ -27,7 +27,7 @@ class PassivePageAnalyzer implements IAtomicService {
     if (!modal) {
       if (this.lastObservedActiveModalName) {
         analyticsManager.track(MessageType.CLOSED_METRC_MODAL, {});
-        if (store.state.settings.autoRefreshOnModalClose) {
+        if (!store.state.settings.disableAutoRefreshOnModalClose) {
           pageManager.clickRefreshLinks();
         }
       }

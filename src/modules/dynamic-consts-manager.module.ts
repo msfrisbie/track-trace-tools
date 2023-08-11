@@ -10,6 +10,7 @@ import {
   IPlantBatchGrowthPhase,
   IPlantBatchType,
   IRemediatePackageMethod,
+  ITagData,
   IUnitOfMeasure,
   IWasteMethod,
   IWasteReason,
@@ -19,7 +20,7 @@ import { primaryMetrcRequestManager } from "@/modules/metrc-request-manager.modu
 import { mockDataManager } from "@/modules/mock-data-manager.module";
 import store from "@/store/page-overlay/index";
 import { debugLogFactory } from "@/utils/debug";
-import { ExtractionType, extract } from "@/utils/html";
+import { extract, ExtractionType } from "@/utils/html";
 import { AxiosResponse } from "axios";
 import { get, keys, set } from "idb-keyval";
 import _ from "lodash-es";
@@ -53,6 +54,11 @@ interface ICreatePlantingsFromPackageRepeaterData {
 
 interface IChangePlantBatchGrowthPhaseRepeaterData {
   GrowthPhases: IPlantBatchGrowthPhase[];
+  GroupTags: [
+    {
+      Tags: ITagData[];
+    }
+  ];
 }
 
 interface IMovePackageRepeaterData {}
@@ -341,8 +347,10 @@ class DynamicConstsManager implements IAtomicService {
     return this._createPlantingsFromPackagesRepeaterData;
   }
 
-  private async changePlantBatchGrowthPhaseRepeaterData(): Promise<IChangePlantBatchGrowthPhaseRepeaterData> {
-    if (!this._changePlantBatchGrowthPhaseRepeaterData) {
+  private async changePlantBatchGrowthPhaseRepeaterData(
+    allowCache: boolean = true
+  ): Promise<IChangePlantBatchGrowthPhaseRepeaterData> {
+    if (!this._changePlantBatchGrowthPhaseRepeaterData || !allowCache) {
       this._changePlantBatchGrowthPhaseRepeaterData = new Promise(async (resolve, reject) => {
         const subscription = timer(DYNAMIC_CONST_TIMEOUT_MS).subscribe(() =>
           reject("Change plant batch growth phase fetch timed out")
@@ -613,6 +621,17 @@ class DynamicConstsManager implements IAtomicService {
     }
 
     throw new Error("Plant batch types unable to load");
+  }
+
+  async availablePlantTags(): Promise<ITagData[]> {
+    let repeaterData = await this.changePlantBatchGrowthPhaseRepeaterData(false);
+
+    if (repeaterData.GroupTags) {
+      // Force sort, since who knows what Metrc is returning
+      return repeaterData.GroupTags[0].Tags.sort((a, b) => a.Label.localeCompare(b.Label));
+    }
+
+    throw new Error("Growth phase tags unable to load");
   }
 
   async plantBatchGrowthPhases(): Promise<IPlantBatchGrowthPhase[]> {

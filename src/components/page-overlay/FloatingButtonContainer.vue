@@ -66,7 +66,6 @@ export default Vue.extend({
     "settings.licenseKey": {
       immediate: true,
       handler() {
-        console.log("check");
         this.checkT3plus();
       },
     },

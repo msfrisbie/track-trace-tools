@@ -36,11 +36,12 @@ module.exports = {
   pluginOptions: {
     browserExtension: {
       manifestTransformer: (manifest) => {
+        console.log(manifest.content_scripts);
         if (process.env.NODE_ENV === "development") {
           manifest.content_scripts[0].css.pop();
-          manifest.content_scripts.pop();
+          // manifest.content_scripts.pop();
         } else {
-          manifest.content_scripts[1].css.push("css/content-script.css");
+          manifest.content_scripts[0].css.push("css/content-script.css");
         }
 
         return manifest;
@@ -52,7 +53,8 @@ module.exports = {
         contentScripts: {
           entries: {
             "content-script": ["src/content-scripts/content-script.ts"],
-            // "load-script": ["src/content-scripts/load-script.ts"],
+            // "main-script": ["src/content-scripts/main-script.ts"],
+            "load-script": ["src/content-scripts/load-script.ts"],
             // 'worker': [
             //   'src/content-scripts/worker.ts',
             // ],

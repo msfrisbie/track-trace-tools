@@ -342,6 +342,7 @@ export interface ITagData extends ITaggedIResponseObjectData {
   CommissionedDateTime: string;
   DetachedDateTime: string;
 }
+
 export interface IItemData extends IResponseObjectData {
   AdministrationMethod: string;
   ApprovalStatusDateTime: string;

@@ -235,13 +235,13 @@
       </b-form-checkbox> -->
 
           <b-form-checkbox
-            id="checkbox-autoRefreshOnModalClose"
+            id="checkbox-disableAutoRefreshOnModalClose"
             class="mb-2"
-            v-model="settings.autoRefreshOnModalClose"
-            name="checkbox-autoRefreshOnModalClose"
+            v-model="settings.disableAutoRefreshOnModalClose"
+            name="checkbox-disableAutoRefreshOnModalClose"
             @change="onChange()"
           >
-            Auto-refresh Metrc interface after closing modal windows
+            Disable auto-refresh Metrc interface after closing modal windows
           </b-form-checkbox>
 
           <b-form-checkbox
