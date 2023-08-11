@@ -2,8 +2,6 @@
 
 console.log("main-script");
 
-console.log(window["metrc"]);
-
 // Preserve the function
 const _confirm = window["confirm"];
 

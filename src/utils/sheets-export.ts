@@ -69,7 +69,7 @@ export async function appendSpreadsheetValues({
       spreadsheetId,
       range,
       values,
-      valueInputOption
+      valueInputOption,
     },
     undefined,
     SHEETS_API_MESSAGE_TIMEOUT_MS
@@ -653,9 +653,9 @@ export async function createScanSheetOrError(
       values: [
         [
           "Destination",
-          "Package Contents",
-          "Package Tag                                    ",
-          "Scanned Tags                                   ",
+          "    Package Contents    ",
+          "                Package Tag                ",
+          "                Scanned Tags                ",
         ],
         ...manifest.map((x) => [
           (x.destination! || x.incomingTransfer!).RecipientFacilityName + "      ",
@@ -677,6 +677,7 @@ export async function createScanSheetOrError(
     autoResizeDimensionsRequestFactory({
       sheetId,
     }),
+    // First column: turn green if tag appears exactly twice anywhere
     conditionalFormattingRequestFactory({
       sheetId,
       range: {
@@ -687,6 +688,7 @@ export async function createScanSheetOrError(
       customFormula: "=COUNTIF(C$2:D,C2)=2",
       backgroundColor: { green: 1 },
     }),
+    // Second column: turn red if tag appeas exactly once anywhere
     conditionalFormattingRequestFactory({
       sheetId,
       range: {
@@ -697,6 +699,7 @@ export async function createScanSheetOrError(
       customFormula: "=COUNTIF(C$2:D,C2)=1",
       backgroundColor: { red: 1 },
     }),
+    // FIrst column: turn yellow if tag appears more than twice anywhere
     conditionalFormattingRequestFactory({
       sheetId,
       range: {
@@ -707,6 +710,7 @@ export async function createScanSheetOrError(
       customFormula: "=COUNTIF($C$2:D,C2)>2",
       backgroundColor: { red: 1, green: 1 },
     }),
+    // Second column: turn yellow if tag appears more than once in the 2nd column
     conditionalFormattingRequestFactory({
       sheetId,
       range: {
@@ -716,6 +720,17 @@ export async function createScanSheetOrError(
       },
       customFormula: "=COUNTIF($D$2:D,D2)>1",
       backgroundColor: { red: 1, green: 1 },
+    }),
+    // Second column: turn prange if tag appears exactly once anywhere
+    conditionalFormattingRequestFactory({
+      sheetId,
+      range: {
+        startColumnIndex: 3,
+        endColumnIndex: 4,
+        startRowIndex: 1,
+      },
+      customFormula: "=COUNTIF($C$2:D,D2)=1",
+      backgroundColor: { red: 1, green: 0.64 },
     }),
   ];
 
