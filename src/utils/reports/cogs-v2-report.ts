@@ -391,10 +391,6 @@ export async function loadAndCacheCogsV2Data({
         while (buffer.length > 0) {
           let target = buffer.pop()!;
 
-          if (!target) {
-            debugger;
-          }
-
           scopedAncestorPackageMap.set(target.Label, target);
 
           if (target.ProductionBatchNumber.length > 0) {
@@ -561,10 +557,6 @@ export async function updateCogsV2MasterCostSheet({
         // Approx Cost per Piece
         // Approx Cost per Unit
         // Pieces per Unit
-
-        if (!pkg) {
-          debugger;
-        }
 
         rows.push([
           pkg.LicenseNumber,
