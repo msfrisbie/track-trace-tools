@@ -437,7 +437,7 @@ export default Vue.extend({
           packageTotal: this.quantityList.length,
         },
         this.buildCsvFiles(),
-        5
+        1 // This is to address Metrc package allocation bug https://track-trace-tools.talkyard.net/-65/unpack-immature-packages
       );
     },
     buildCsvFiles(): ICsvFile[] {

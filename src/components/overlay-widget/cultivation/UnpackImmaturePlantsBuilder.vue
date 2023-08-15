@@ -214,6 +214,19 @@
             >
 
             <csv-breakout class="opacity-40 mt-4" :csvFiles="csvFiles" />
+
+            <b-button
+              v-if="debugRows.length === 0"
+              class="opacity-40 mt-4"
+              size="md"
+              @click="debugRows = buildRowsImpl()"
+              variant="light"
+              >SHOW DEBUG</b-button
+            >
+
+            <template v-if="debugRows.length > 0">
+              <pre>{{ JSON.stringify(debugRows, null, 2) }}</pre>
+            </template>
           </div>
         </template>
 
@@ -302,7 +315,7 @@ export default Vue.extend({
         action: `Set active step to ${index}`,
       });
     },
-    submit() {
+    buildRowsImpl(): IMetrcUnpackImmaturePlantsPayload[] {
       const rows: IMetrcUnpackImmaturePlantsPayload[] = [];
 
       // @ts-ignore
@@ -332,6 +345,11 @@ export default Vue.extend({
         rows.push(row);
       }
 
+      return rows;
+    },
+    submit() {
+      const rows = this.buildRowsImpl();
+
       builderManager.submitProject(
         rows,
         this.$data.builderType,
@@ -339,7 +357,7 @@ export default Vue.extend({
           plantTotal: this.$data.selectedPackages.length,
         },
         this.buildCsvFiles(),
-        5
+        1 // This is to address Metrc package allocation bug https://track-trace-tools.talkyard.net/-65/unpack-immature-packages
       );
     },
     plantMax() {
@@ -519,6 +537,7 @@ export default Vue.extend({
       showHiddenDetailFields: false,
       patientLicenseNumber: "",
       showTagPicker: false,
+      debugRows: [],
       steps: [
         {
           stepText: "Select packages to plant",
