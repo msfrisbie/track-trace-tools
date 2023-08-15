@@ -2,10 +2,10 @@ import { IPackageData } from "@/interfaces";
 import "@/test/utils/auto-mock-debug";
 import { allocateImmaturePlantCounts } from "./misc";
 
-function buildMockPackage(Quantity: number, UnitOfMeasureName = "Each"): IPackageData {
+function buildMockPackage(Quantity: number, QuantityTypeName = "CountBased"): IPackageData {
   const pkg = {
     Quantity,
-    Item: { UnitOfMeasureName, UnitOfMeasureId: 1 },
+    Item: { UnitOfMeasureId: 1, QuantityTypeName },
   };
 
   // @ts-ignore
@@ -21,7 +21,7 @@ describe("misc.ts", () => {
         count: 3,
         pkg: {
           Item: {
-            UnitOfMeasureName: "Each",
+            QuantityTypeName: "CountBased",
             UnitOfMeasureId: 1,
           },
           Quantity: 90,
@@ -36,7 +36,7 @@ describe("misc.ts", () => {
         count: 90,
         pkg: {
           Item: {
-            UnitOfMeasureName: "Each",
+            QuantityTypeName: "CountBased",
             UnitOfMeasureId: 1,
           },
           Quantity: 90,
@@ -57,7 +57,7 @@ describe("misc.ts", () => {
         count: 3,
         pkg: {
           Item: {
-            UnitOfMeasureName: "Each",
+            QuantityTypeName: "CountBased",
             UnitOfMeasureId: 1,
           },
           Quantity: 900,
@@ -72,7 +72,7 @@ describe("misc.ts", () => {
         count: 100,
         pkg: {
           Item: {
-            UnitOfMeasureName: "Each",
+            QuantityTypeName: "CountBased",
             UnitOfMeasureId: 1,
           },
           Quantity: 900,
@@ -84,7 +84,7 @@ describe("misc.ts", () => {
         count: 100,
         pkg: {
           Item: {
-            UnitOfMeasureName: "Each",
+            QuantityTypeName: "CountBased",
             UnitOfMeasureId: 1,
           },
           Quantity: 900,
@@ -96,7 +96,7 @@ describe("misc.ts", () => {
         count: 2,
         pkg: {
           Item: {
-            UnitOfMeasureName: "Each",
+            QuantityTypeName: "CountBased",
             UnitOfMeasureId: 1,
           },
           Quantity: 900,
@@ -117,7 +117,7 @@ describe("misc.ts", () => {
         count: 3,
         pkg: {
           Item: {
-            UnitOfMeasureName: "Each",
+            QuantityTypeName: "CountBased",
             UnitOfMeasureId: 1,
           },
           Quantity: 50,
@@ -132,7 +132,7 @@ describe("misc.ts", () => {
         count: 50,
         pkg: {
           Item: {
-            UnitOfMeasureName: "Each",
+            QuantityTypeName: "CountBased",
             UnitOfMeasureId: 1,
           },
           Quantity: 50,
@@ -144,7 +144,7 @@ describe("misc.ts", () => {
         count: 100,
         pkg: {
           Item: {
-            UnitOfMeasureName: "Each",
+            QuantityTypeName: "CountBased",
             UnitOfMeasureId: 1,
           },
           Quantity: 100,
@@ -156,7 +156,7 @@ describe("misc.ts", () => {
         count: 50,
         pkg: {
           Item: {
-            UnitOfMeasureName: "Each",
+            QuantityTypeName: "CountBased",
             UnitOfMeasureId: 1,
           },
           Quantity: 150,
@@ -171,7 +171,7 @@ describe("misc.ts", () => {
         count: 50,
         pkg: {
           Item: {
-            UnitOfMeasureName: "Each",
+            QuantityTypeName: "CountBased",
             UnitOfMeasureId: 1,
           },
           Quantity: 50,
@@ -183,7 +183,7 @@ describe("misc.ts", () => {
         count: 100,
         pkg: {
           Item: {
-            UnitOfMeasureName: "Each",
+            QuantityTypeName: "CountBased",
             UnitOfMeasureId: 1,
           },
           Quantity: 100,
@@ -195,7 +195,7 @@ describe("misc.ts", () => {
         count: 100,
         pkg: {
           Item: {
-            UnitOfMeasureName: "Each",
+            QuantityTypeName: "CountBased",
             UnitOfMeasureId: 1,
           },
           Quantity: 150,
@@ -207,7 +207,7 @@ describe("misc.ts", () => {
         count: 50,
         pkg: {
           Item: {
-            UnitOfMeasureName: "Each",
+            QuantityTypeName: "CountBased",
             UnitOfMeasureId: 1,
           },
           Quantity: 150,
@@ -222,64 +222,13 @@ describe("misc.ts", () => {
 
   it("Correctly allocates weight-based plant counts to a single package", () => {
     const mockPackages: IPackageData[] = [50, 100, 150].map((qty) =>
-      buildMockPackage(qty, "Grams")
+      buildMockPackage(qty, "WeightBased")
     );
 
-    expect(allocateImmaturePlantCounts(3, mockPackages)).toEqual([
-      {
-        count: 3,
-        pkg: {
-          Item: {
-            UnitOfMeasureName: "Grams",
-            UnitOfMeasureId: 1,
-          },
-          Quantity: 50,
-        },
-        quantity: 0,
-        unitOfMeasureId: 1,
-      },
-    ]);
+    expect(() => allocateImmaturePlantCounts(3, mockPackages)).toThrowError();
 
-    expect(allocateImmaturePlantCounts(90, mockPackages)).toEqual([
-      {
-        count: 90,
-        pkg: {
-          Item: {
-            UnitOfMeasureName: "Grams",
-            UnitOfMeasureId: 1,
-          },
-          Quantity: 50,
-        },
-        quantity: 0,
-        unitOfMeasureId: 1,
-      },
-    ]);
+    expect(() => allocateImmaturePlantCounts(90, mockPackages)).toThrowError();
 
-    expect(allocateImmaturePlantCounts(110, mockPackages)).toEqual([
-      {
-        count: 100,
-        pkg: {
-          Item: {
-            UnitOfMeasureName: "Grams",
-            UnitOfMeasureId: 1,
-          },
-          Quantity: 50,
-        },
-        quantity: 0,
-        unitOfMeasureId: 1,
-      },
-      {
-        count: 10,
-        pkg: {
-          Item: {
-            UnitOfMeasureName: "Grams",
-            UnitOfMeasureId: 1,
-          },
-          Quantity: 50,
-        },
-        quantity: 0,
-        unitOfMeasureId: 1,
-      },
-    ]);
+    expect(() => allocateImmaturePlantCounts(110, mockPackages)).toThrowError();
   });
 });

@@ -259,6 +259,7 @@ import { analyticsManager } from "@/modules/analytics-manager.module";
 import { builderManager } from "@/modules/builder-manager.module";
 import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
 import { dynamicConstsManager } from "@/modules/dynamic-consts-manager.module";
+import { toastManager } from "@/modules/toast-manager.module";
 import store from "@/store/page-overlay/index";
 import { safeZip } from "@/utils/array";
 import { buildCsvDataOrError, buildNamedCsvFileData, downloadCsvFile } from "@/utils/csv";
@@ -485,10 +486,21 @@ export default Vue.extend({
           return;
         }
 
-        this.$data.plantingData = allocateImmaturePlantCounts(
-          newValue,
-          this.$data.selectedPackages
-        );
+        try {
+          this.$data.plantingData = allocateImmaturePlantCounts(
+            newValue,
+            this.$data.selectedPackages
+          );
+        } catch (e) {
+          toastManager.openToast(`Failed to allocate plants: ${(e as Error).toString()}`, {
+            title: "Plant Allocation Error",
+            autoHideDelay: 5000,
+            variant: "danger",
+            appendToast: true,
+            toaster: "ttt-toaster",
+            solid: true,
+          });
+        }
       },
     },
   },

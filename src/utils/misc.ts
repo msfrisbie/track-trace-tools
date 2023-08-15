@@ -188,7 +188,6 @@ export function allocatePackageQuantities(
   return packageData;
 }
 
-// Weight based packages will adjust by 0
 export function allocateImmaturePlantCounts(
   totalPlantCount: number,
   packages: IPackageData[]
@@ -200,18 +199,21 @@ export function allocateImmaturePlantCounts(
     throw new Error("Mixed units of measure provided");
   }
 
-  const isWeightBased = packages[0].Item.UnitOfMeasureName !== "Each";
+  const isCountBased = packages[0].Item.QuantityTypeName === "CountBased";
+
+  if (!isCountBased) {
+    throw new Error(
+      "T3 detected one or more plant packages is not count based. T3 cannot unpack non-count-based packages. Contact matt@trackandtrace.tools for details."
+    );
+  }
 
   // Sanity check: do we have enough?
-  if (!isWeightBased) {
-    if (totalPlantCount > packages.map((x) => x.Quantity).reduce((a, b) => a + b, 0)) {
-      throw new Error("Not enough source package material to plant");
-    }
+  if (totalPlantCount > packages.map((x) => x.Quantity).reduce((a, b) => a + b, 0)) {
+    throw new Error("Not enough source package material to plant");
   }
 
   let remainingTotal = totalPlantCount;
 
-  debugLog(async () => ["weight based?", isWeightBased]);
   debugLog(async () => ["Tagging", totalPlantCount, "plants from", packages.length]);
 
   let counter = 0;
@@ -228,15 +230,11 @@ export function allocateImmaturePlantCounts(
       throw new Error("Killswitch");
     }
 
-    let batchSize: number = Math.min(remainingTotal, 100);
-    if (!isWeightBased) {
-      batchSize = Math.min(remainingTotal, selectedPackageRemainingPlantCount, 100);
-    }
+    let batchSize: number = Math.min(remainingTotal, selectedPackageRemainingPlantCount, 100);
 
     debugLog(async () => ["Next batch size:", batchSize]);
 
-    // If weight based, adjustment amount is 0
-    const quantity: number = isWeightBased ? 0 : batchSize;
+    const quantity: number = batchSize;
 
     const nextBatch = {
       pkg: selectedPackage,
@@ -249,9 +247,7 @@ export function allocateImmaturePlantCounts(
 
     plantBatchData.push(nextBatch);
 
-    if (!isWeightBased) {
-      selectedPackageRemainingPlantCount -= batchSize;
-    }
+    selectedPackageRemainingPlantCount -= batchSize;
     remainingTotal -= batchSize;
 
     if (selectedPackageRemainingPlantCount < 0) {
