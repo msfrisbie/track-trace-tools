@@ -21,11 +21,10 @@ export function allocatePromotePlantCounts(
   let selectedPlantBatchIndex = 0;
 
   const plantData: IIntermediatePromotePlantBatchData[] = [];
+  let selectedPlantBatch = plantBatches[selectedPlantBatchIndex];
+  let selectedPlantBatchRemainingPlantCount = selectedPlantBatch.UntrackedCount;
 
   while (true) {
-    let selectedPlantBatch = plantBatches[selectedPlantBatchIndex];
-    let selectedPlantBatchRemainingPlantCount = selectedPlantBatch.UntrackedCount;
-
     // killswitch
     if (++counter > 1000) {
       throw new Error("Killswitch");
@@ -64,6 +63,8 @@ export function allocatePromotePlantCounts(
     // This package is empty, move to the next one
     if (selectedPlantBatchRemainingPlantCount === 0) {
       selectedPlantBatchIndex += 1;
+      selectedPlantBatch = plantBatches[selectedPlantBatchIndex];
+      selectedPlantBatchRemainingPlantCount = selectedPlantBatch.UntrackedCount;
     }
 
     if (selectedPlantBatchIndex >= plantBatches.length) {
@@ -137,10 +138,10 @@ export function allocatePackageQuantities(
       quantity: newPackageQuantity,
     };
 
-    while (true) {
-      let selectedPackage = inputPackages[selectedPackageIndex];
-      let selectedPackageRemainingQuantity = selectedPackage.Quantity;
+    let selectedPackage = inputPackages[selectedPackageIndex];
+    let selectedPackageRemainingQuantity = selectedPackage.Quantity;
 
+    while (true) {
       // killswitch
       if (++counter > 1000) {
         throw new Error("Killswitch");
@@ -175,6 +176,8 @@ export function allocatePackageQuantities(
       // This package is empty, move to the next one
       if (selectedPackageRemainingQuantity === 0) {
         selectedPackageIndex += 1;
+        selectedPackage = inputPackages[selectedPackageIndex];
+        selectedPackageRemainingQuantity = selectedPackage.Quantity;
       }
 
       if (selectedPackageIndex >= inputPackages.length) {
@@ -221,10 +224,10 @@ export function allocateImmaturePlantCounts(
 
   const plantBatchData: IIntermediateCreatePlantBatchFromPackageData[] = [];
 
-  while (true) {
-    let selectedPackage = packages[selectedPackageIndex];
-    let selectedPackageRemainingPlantCount = selectedPackage.Quantity;
+  let selectedPackage = packages[selectedPackageIndex];
+  let selectedPackageRemainingPlantCount = selectedPackage.Quantity;
 
+  while (true) {
     // killswitch
     if (++counter > 1000) {
       throw new Error("Killswitch");
@@ -265,6 +268,8 @@ export function allocateImmaturePlantCounts(
     // This package is empty, move to the next one
     if (selectedPackageRemainingPlantCount === 0) {
       selectedPackageIndex += 1;
+      selectedPackage = packages[selectedPackageIndex];
+      selectedPackageRemainingPlantCount = selectedPackage.Quantity;
     }
 
     if (selectedPackageIndex >= packages.length) {
