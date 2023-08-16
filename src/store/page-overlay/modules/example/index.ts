@@ -1,7 +1,7 @@
 import { IPluginState } from "@/interfaces";
 import { ActionContext } from "vuex";
-import { ExampleActions, ExampleGetters, ExampleMutations } from "../package-history";
-import { IExampleState } from "../package-history/interfaces";
+import { ExampleActions, ExampleGetters, ExampleMutations } from "../example/consts";
+import { IExampleState } from "../example/interfaces";
 
 const inMemoryState = {};
 
