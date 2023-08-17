@@ -133,7 +133,7 @@ import { MutationType } from "@/mutation-types";
 import store from "@/store/page-overlay/index";
 import { FlagsActions } from "@/store/page-overlay/modules/flags/consts";
 import { IFlagsState } from "@/store/page-overlay/modules/flags/interfaces";
-import { SettingsMutations } from "@/store/page-overlay/modules/settings/consts";
+import { SettingsActions, SettingsMutations } from "@/store/page-overlay/modules/settings/consts";
 import Vue from "vue";
 import { mapState } from "vuex";
 
@@ -268,7 +268,7 @@ export default Vue.extend({
       modalManager.dispatchModalEvent(ModalType.CSV);
     },
     onChange() {
-      this.$store.commit(`settings/${SettingsMutations.SET_SETTINGS}`, this.settings);
+      this.$store.dispatch(`settings/${SettingsActions.UPDATE_SETTINGS}`, this.settings);
       this.$store.commit(MutationType.SET_DEBUG_MODE, this.debugMode);
       this.$store.commit(MutationType.SET_DEMO_MODE, this.demoMode);
       this.$store.commit(MutationType.SET_MOCK_DATA_MODE, this.mockDataMode);

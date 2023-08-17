@@ -1,5 +1,7 @@
 import { clientConfig } from "@/client/config";
 import { IAtomicService, IClientConfig } from "@/interfaces";
+import store from "@/store/page-overlay/index";
+import { ClientActions } from "@/store/page-overlay/modules/client/consts";
 
 class ClientBuildManager implements IAtomicService {
   private _clientConfig: IClientConfig | null = null;
@@ -14,6 +16,8 @@ class ClientBuildManager implements IAtomicService {
 
   async loadClientConfig() {
     this._clientConfig = Object.freeze(clientConfig());
+
+    store.dispatch(`client/${ClientActions.LOAD_CLIENT_VALUES}`);
   }
 
   assertValues(keys: string[]): boolean {

@@ -550,7 +550,7 @@ import { pageManager } from "@/modules/page-manager/page-manager.module";
 import { toastManager } from "@/modules/toast-manager.module";
 import { MutationType } from "@/mutation-types";
 import store from "@/store/page-overlay/index";
-import { SettingsMutations } from "@/store/page-overlay/modules/settings/consts";
+import { SettingsActions, SettingsMutations } from "@/store/page-overlay/modules/settings/consts";
 import { getMatchingDecryptedDataOrNull } from "@/utils/encryption";
 import { generateThumbnail } from "@/utils/file";
 import Vue from "vue";
@@ -693,7 +693,7 @@ export default Vue.extend({
         settings: JSON.parse(JSON.stringify(this.settings)),
       });
 
-      this.$store.commit(`settings/${SettingsMutations.SET_SETTINGS}`, this.settings);
+      this.$store.dispatch(`settings/${SettingsActions.UPDATE_SETTINGS}`, this.settings);
 
       toastManager.openToast(
         `T3 settings successfully updated. Refresh the page to apply changes.`,

@@ -450,9 +450,9 @@ class DynamicConstsManager implements IAtomicService {
 
   // This should use a shared promise to indicate inflight load
   async transferTemplateHTML(): Promise<string> {
-    if (clientBuildManager.clientConfig?.overrides?.transferTemplateHtmlUrl) {
-      return clientBuildManager.clientConfig.overrides.transferTemplateHtmlUrl;
-    }
+    // if (clientBuildManager.clientConfig?.overrides?.transferTemplateHtmlUrl) {
+    //   return clientBuildManager.clientConfig.overrides.transferTemplateHtmlUrl;
+    // }
 
     return this.newTransferModalRequest();
 

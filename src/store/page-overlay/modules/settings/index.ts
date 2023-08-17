@@ -7,8 +7,10 @@ import {
   TagsTabLabel,
   TransfersTabLabel,
 } from "@/consts";
-import { DarkModeState, SnowflakeState } from "@/interfaces";
-import { SettingsMutations } from "./consts";
+import { DarkModeState, IPluginState, SnowflakeState } from "@/interfaces";
+import { ActionContext } from "vuex";
+import { ClientActions } from "../client/consts";
+import { SettingsActions, SettingsMutations } from "./consts";
 import { ISettingsState } from "./interfaces";
 
 const inMemoryState = {};
@@ -60,7 +62,7 @@ const persistedState: ISettingsState = {
   useLegacyDateFormatForSubmit: false,
   writeSettingsToChromeStorage: false,
   loadDataInParallel: true,
-  usePersistedCache: false
+  usePersistedCache: false,
 };
 
 const defaultState: ISettingsState = {
@@ -71,27 +73,33 @@ const defaultState: ISettingsState = {
 export const settingsModule = {
   state: () => defaultState,
   mutations: {
-    [SettingsMutations.SET_SETTINGS](state: ISettingsState, settings: any) {
-      for (const [key, value] of Object.entries(settings)) {
-        // @ts-ignore
-        state[key] = value;
-      }
-
-      if (state.writeSettingsToChromeStorage) {
-        console.log("Persisting settings");
-        try {
-          chrome.storage.local.set({ [ChromeStorageKeys.SETTINGS]: state });
-        } catch (e) {
-          console.error(e);
-        }
-      }
-    },
     [SettingsMutations.SET_HOME_LICENSE](state: ISettingsState, homeLicense: [string, string]) {
       state.homeLicenses[homeLicense[0]] = homeLicense[1];
     },
   },
   getters: {},
-  actions: {},
+  actions: {
+    [SettingsActions.UPDATE_SETTINGS](
+      ctx: ActionContext<ISettingsState, IPluginState>,
+      settings: any
+    ) {
+      for (const [key, value] of Object.entries(settings)) {
+        // @ts-ignore
+        state[key] = value;
+      }
+
+      if (ctx.state.writeSettingsToChromeStorage) {
+        console.log("Persisting settings");
+        try {
+          chrome.storage.local.set({ [ChromeStorageKeys.SETTINGS]: ctx.state });
+        } catch (e) {
+          console.error(e);
+        }
+      }
+
+      ctx.dispatch(`client/${ClientActions.LOAD_CLIENT_VALUES}`);
+    },
+  },
 };
 
 export const settingsReducer = (state: ISettingsState): ISettingsState => {

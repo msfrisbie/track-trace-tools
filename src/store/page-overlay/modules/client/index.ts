@@ -38,13 +38,11 @@ export const clientModule = {
       ctx: ActionContext<IClientState, IPluginState>,
       data: any
     ) => {
-      const response = await t3RequestManager.loadClientValues(ctx.rootState.settings.licenseKey);
+      const { clientName, values } = await t3RequestManager.loadClientDataOrError(
+        ctx.rootState.settings.licenseKey
+      );
 
-      const { client_name, values } = response.data;
-
-      console.log({ client_name, data });
-
-      ctx.state.clientName = client_name;
+      ctx.state.clientName = clientName;
       ctx.state.values = values;
     },
   },

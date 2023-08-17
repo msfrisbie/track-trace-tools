@@ -36,7 +36,7 @@ import {
 import { reportsModule, reportsReducer } from "./modules/reports";
 import { searchModule, searchReducer } from "./modules/search";
 import { settingsModule, settingsReducer } from "./modules/settings";
-import { SettingsMutations } from "./modules/settings/consts";
+import { SettingsActions, SettingsMutations } from "./modules/settings/consts";
 import {
   splitPackageBuilderModule,
   splitPackageBuilderReducer,
@@ -427,7 +427,7 @@ try {
     const settings = result[ChromeStorageKeys.SETTINGS];
 
     if (settings) {
-      vuexStore.commit(`settings/${SettingsMutations.SET_SETTINGS}`, settings);
+      vuexStore.dispatch(`settings/${SettingsActions.UPDATE_SETTINGS}`, settings);
     }
   });
 } catch (e) {

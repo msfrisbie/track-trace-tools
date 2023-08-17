@@ -1797,9 +1797,9 @@ export interface IClientConfig {
     [key: string]: string;
   };
   // Deprecated
-  overrides?: {
-    transferTemplateHtmlUrl?: string;
-  };
+  // overrides?: {
+  //   transferTemplateHtmlUrl?: string;
+  // };
 }
 
 export interface IClientInfo {
