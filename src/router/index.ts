@@ -19,7 +19,9 @@ import ReplacePlantTagsBuilder from "@/components/overlay-widget/cultivation/Rep
 import UnpackImmaturePlantsBuilder from "@/components/overlay-widget/cultivation/UnpackImmaturePlantsBuilder.vue";
 import MetrcExplorer from "@/components/overlay-widget/explorer/MetrcExplorer.vue";
 import MiscellaneousListView from "@/components/overlay-widget/miscellaneous/MiscellaneousListView.vue";
+import Verify from "@/components/overlay-widget/miscellaneous/Verify.vue";
 import AllocateSamplesBuilder from "@/components/overlay-widget/package/AllocateSamplesBuilder.vue";
+import CreatePackageCsvBuilder from "@/components/overlay-widget/package/CreatePackageCsvBuilder.vue";
 import FinishPackagesBuilder from "@/components/overlay-widget/package/FinishPackagesBuilder.vue";
 import ItemTemplateBuilder from "@/components/overlay-widget/package/ItemTemplateBuilder.vue";
 import MergePackagesBuilder from "@/components/overlay-widget/package/MergePackagesBuilder.vue";
@@ -28,7 +30,6 @@ import PackageBuilderListView from "@/components/overlay-widget/package/PackageB
 import PackageHistory from "@/components/overlay-widget/package/PackageHistory.vue";
 import PackageToolsHelp from "@/components/overlay-widget/package/PackageToolsHelp.vue";
 import SplitPackageBuilder from "@/components/overlay-widget/package/SplitPackageBuilder.vue";
-import CreatePackageCsvBuilder from "@/components/overlay-widget/package/CreatePackageCsvBuilder.vue";
 import TransferBuilder from "@/components/overlay-widget/transfer/TransferBuilder.vue";
 import TransferTemplateBuilder from "@/components/overlay-widget/transfer/TransferTemplateBuilder.vue";
 import TransferToolsHelp from "@/components/overlay-widget/transfer/TransferToolsHelp.vue";
@@ -70,6 +71,11 @@ const routes: Array<RouteConfig> = [
   {
     path: "/active-project",
     component: ActiveProjectView,
+  },
+  {
+    path: "/verify",
+    name: "T3 Verify",
+    component: Verify,
   },
   {
     path: "/cultivator",

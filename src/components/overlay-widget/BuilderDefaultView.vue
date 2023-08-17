@@ -142,6 +142,17 @@ export default Vue.extend({
         },
         {
           backgroundColor: "#2774ae",
+          text: "VERIFY",
+          route: "/verify",
+          icon: "check",
+          enabled: true,
+          visible: false,
+          isBeta: false,
+          isNew: true,
+          // helpRoute: "/help/package",
+        },
+        {
+          backgroundColor: "#2774ae",
           text: "PACKAGE TOOLS",
           route: "/package",
           icon: "box",

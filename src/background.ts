@@ -72,11 +72,31 @@ chrome.runtime.onMessage.addListener((inboundEvent, sender, sendResponse) => {
         }
         break;
       case MessageType.GET_COOKIES:
-        chrome.cookies.getAll({}).then((cookies) => {
-          respondToContentScript(sendResponse, inboundEvent, {
-            cookies,
+        chrome.cookies.getAllCookieStores().then((cookieStores) => {
+          console.log(cookieStores);
+
+          let cookies: chrome.cookies.Cookie[] = [];
+
+          let promises: Promise<any>[] = [];
+
+          cookieStores.map((cookieStore) =>
+            promises.push(
+              chrome.cookies
+                .getAll({
+                  domain: inboundEvent.message.data.domain,
+                  storeId: cookieStore.id,
+                })
+                .then((singleStoreCookies) => (cookies = cookies.concat(singleStoreCookies)))
+            )
+          );
+
+          Promise.allSettled(promises).then(() => {
+            respondToContentScript(sendResponse, inboundEvent, {
+              cookies,
+            });
           });
         });
+
         break;
 
       case MessageType.SET_USER_ID:

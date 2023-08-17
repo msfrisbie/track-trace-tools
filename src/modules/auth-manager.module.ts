@@ -7,6 +7,7 @@ import { PluginAuthActions } from "@/store/page-overlay/modules/plugin-auth/cons
 import { isIdentityAllowedToUseTtt } from "@/utils/access-control";
 import { debugLogFactory } from "@/utils/debug";
 import { extract, ExtractionType } from "@/utils/html";
+import { messageBus } from "./message-bus.module";
 
 // Plugin scripts are sandboxed from the window variables.
 // It would be more efficient to pull them from the window.$.ajaxSettings,
@@ -125,6 +126,14 @@ class AuthManager implements IAtomicService {
     }
 
     return authState;
+  }
+
+  async cookies(): Promise<chrome.cookies.Cookie[]> {
+    return (
+      await messageBus.sendMessageToBackground(MessageType.GET_COOKIES, {
+        domain: window.location.hostname,
+      })
+    ).data.cookies;
   }
 }
 

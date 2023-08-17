@@ -8,7 +8,7 @@ const inMemoryState = {};
 
 const persistedState = {
   clientName: null,
-  values: {}
+  values: {},
 };
 
 const defaultState: IClientState = {
@@ -35,12 +35,14 @@ export const clientModule = {
   },
   actions: {
     [ClientActions.LOAD_CLIENT_VALUES]: async (
-    ctx: ActionContext<IClientState, IPluginState>,
+      ctx: ActionContext<IClientState, IPluginState>,
       data: any
     ) => {
       const response = await t3RequestManager.loadClientValues(ctx.rootState.settings.licenseKey);
 
       const { client_name, values } = response.data;
+
+      console.log({ client_name, data });
 
       ctx.state.clientName = client_name;
       ctx.state.values = values;
