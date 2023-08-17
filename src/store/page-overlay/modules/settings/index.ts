@@ -85,7 +85,7 @@ export const settingsModule = {
     ) {
       for (const [key, value] of Object.entries(settings)) {
         // @ts-ignore
-        state[key] = value;
+        ctx.state[key] = value;
       }
 
       if (ctx.state.writeSettingsToChromeStorage) {
@@ -97,7 +97,11 @@ export const settingsModule = {
         }
       }
 
-      ctx.dispatch(`client/${ClientActions.LOAD_CLIENT_VALUES}`);
+      ctx.dispatch(
+        `client/${ClientActions.UPDATE_CLIENT_VALUES}`,
+        { notify: true },
+        { root: true }
+      );
     },
   },
 };

@@ -6,14 +6,12 @@
           <div class="mb-2 text-gray-400 text-lg">License Key</div>
 
           <template v-if="!!settings.licenseKey">
-            <template v-if="decryptedClientData">
-              <div class="font-bold text-xl text-purple-800">
-                Client: {{ decryptedClientData.clientName }}
-              </div>
+            <template v-if="clientName">
+              <div class="font-bold text-xl text-purple-800">Client: {{ clientName }}</div>
             </template>
-            <template v-else>
+            <!-- <template v-else>
               <div class="font-bold text-red-500">Error: no matching client data</div>
-            </template>
+            </template> -->
 
             <b-input-group class="items-start">
               <b-form-input
@@ -40,7 +38,6 @@
                 placeholder="Paste your license key here"
                 class="mb-2"
                 v-model="unsavedLicenseKey"
-                :state="validKey"
                 name="input-licenseKey"
                 type="text"
                 v-on:keydown.enter.prevent="saveLicenseKey()"
@@ -543,7 +540,7 @@ import {
   TagsTabLabel,
   TransfersTabLabel,
 } from "@/consts";
-import { DarkModeState, SnowflakeState } from "@/interfaces";
+import { DarkModeState, IPluginState, SnowflakeState } from "@/interfaces";
 import { analyticsManager } from "@/modules/analytics-manager.module";
 import { clientBuildManager } from "@/modules/client-build-manager.module";
 import { pageManager } from "@/modules/page-manager/page-manager.module";
@@ -555,6 +552,7 @@ import { SettingsActions, SettingsMutations } from "@/store/page-overlay/modules
 import { getMatchingDecryptedDataOrNull } from "@/utils/encryption";
 import { generateThumbnail } from "@/utils/file";
 import Vue from "vue";
+import { mapState } from "vuex";
 
 export default Vue.extend({
   name: "SettingsForm",
@@ -656,13 +654,10 @@ export default Vue.extend({
     };
   },
   computed: {
-    validKey() {
-      if (!this.$data.unsavedLicenseKey) {
-        return null;
-      }
-
-      return !!getMatchingDecryptedDataOrNull(this.$data.unsavedLicenseKey);
-    },
+    ...mapState<IPluginState>({
+      explorer: (state: IPluginState) => state.explorer,
+      clientName: (state: IPluginState) => state.client.clientName,
+    }),
     decryptedClientData() {
       return getMatchingDecryptedDataOrNull(store.state.settings?.licenseKey);
     },

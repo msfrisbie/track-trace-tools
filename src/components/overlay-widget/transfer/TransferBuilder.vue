@@ -13,7 +13,7 @@
       <template v-if="activeStepIndex === 0">
         <div class="grid grid-cols-2 gap-8 h-full">
           <div class="flex flex-col items-stretch space-y-4 hide-scroll overflow-y-auto px-1">
-            <div v-if="enableEdit">
+            <div v-if="clientValues['ENABLE_TRANSFER_EDIT']">
               <b-form-checkbox size="sm" v-model="editTransfer">
                 <span>Edit existing transfer</span>
               </b-form-checkbox>
@@ -1072,6 +1072,7 @@ export default Vue.extend({
   computed: {
     ...mapState<IPluginState>({
       authState: (state: IPluginState) => state.pluginAuth.authState,
+      clientValues: (state: IPluginState) => state.client.values,
       accountEnabled: (state: IPluginState) => state.accountEnabled,
       weightOptions(): { text: string; unitOfWeight: IUnitOfMeasure }[] {
         // @ts-ignore
@@ -1269,7 +1270,6 @@ export default Vue.extend({
   },
   data() {
     return {
-      enableEdit: false,
       destinationQuery: "",
       transporterQuery: "",
       transferDataLoading: false,
@@ -1304,8 +1304,6 @@ export default Vue.extend({
   },
   async mounted() {
     const authState = await authManager.authStateOrError();
-
-    this.$data.enableEdit = clientBuildManager.assertValues(["ENABLE_TRANSFER_EDIT"]);
 
     dynamicConstsManager.transferTemplateHTML();
 

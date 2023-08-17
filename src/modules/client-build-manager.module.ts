@@ -8,32 +8,7 @@ class ClientBuildManager implements IAtomicService {
   }
 
   async loadClientConfig() {
-    store.dispatch(`client/${ClientActions.LOAD_CLIENT_VALUES}`);
-  }
-
-  assertValues(keys: string[]): boolean {
-    if (!store.state.client.values) {
-      return false;
-    }
-
-    for (const key of keys) {
-      if (!store.state.client.values[key]) {
-        return false;
-      }
-    }
-    return true;
-  }
-
-  validateAndGetValuesOrError(keys: string[]): { [key: string]: any } {
-    if (!store.state.client.values) {
-      throw new Error("Missing values");
-    }
-
-    if (!this.assertValues(keys)) {
-      throw new Error("Missing keys");
-    }
-
-    return store.state.client.values;
+    store.dispatch(`client/${ClientActions.UPDATE_CLIENT_VALUES}`);
   }
 }
 

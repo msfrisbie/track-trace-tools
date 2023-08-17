@@ -522,8 +522,10 @@ export async function updateCogsV2MasterCostSheet({
 
     // Load data sheet
 
-    clientBuildManager.assertValues(["MASTER_PB_COST_SHEET_URL"]);
-
+    if (!store.state.client.values["MASTER_PB_COST_SHEET_URL"]) {
+      return;
+    }
+    
     const spreadsheetId = extractSheetIdOrError(
       store.state.client.values["MASTER_PB_COST_SHEET_URL"]
     );
@@ -856,7 +858,9 @@ export async function maybeLoadCogsV2ReportData({
   const worksheetMatrix: any[][] = [];
   const cogsMatrix: any[][] = [];
 
-  clientBuildManager.assertValues(["MASTER_PB_COST_SHEET_URL"]);
+  if (!store.state.client.values["MASTER_PB_COST_SHEET_URL"]) {
+    return;
+  }
 
   const spreadsheetId = extractSheetIdOrError(
     store.state.client.values["MASTER_PB_COST_SHEET_URL"]

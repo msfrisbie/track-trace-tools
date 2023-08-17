@@ -187,7 +187,7 @@ export default Vue.extend({
           // isBeta: true,
           isNew: false,
           enabled: true, //isCurrentHostAllowed([HOST_WILDCARD]),
-          visible: clientBuildManager.assertValues(["ENABLE_EMPLOYEE_SAMPLE_TOOL"]),
+          visible: store.state.client.values["ENABLE_EMPLOYEE_SAMPLE_TOOL"],
           showDisabledMessage: true,
         },
       ];

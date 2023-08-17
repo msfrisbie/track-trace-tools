@@ -5,7 +5,6 @@ import { debugLogFactory } from "@/utils/debug";
 import { activeMetrcModalOrNull, modalTitleOrError } from "@/utils/metrc-modal";
 import * as Papa from "papaparse";
 import { analyticsManager } from "./analytics-manager.module";
-import { clientBuildManager } from "./client-build-manager.module";
 import { toastManager } from "./toast-manager.module";
 
 const debugLog = debugLogFactory("modules/metrc-modal-analyzer.module.ts");
@@ -37,7 +36,11 @@ class MetrcModalManager implements IAtomicService {
   // each time the DOM changes
   maybeAddWidgetsAndListenersToModal() {
     try {
-      clientBuildManager.validateAndGetValuesOrError(clientKeys);
+      for (const clientKey of clientKeys) {
+        if (!store.state.client.values[clientKey]) {
+          throw new Error(`Missing client key: ${clientKey}`);
+        }
+      }
     } catch (e) {
       return;
     }
@@ -170,7 +173,11 @@ class MetrcModalManager implements IAtomicService {
   async propagateCsv(destination: HTMLElement) {
     analyticsManager.track(MessageType.CSV_AUTOFILL_UPLOAD);
 
-    clientBuildManager.validateAndGetValuesOrError(clientKeys);
+    for (const clientKey of clientKeys) {
+      if (!store.state.client.values[clientKey]) {
+        throw new Error(`Missing client key: ${clientKey}`);
+      }
+    }
 
     const intermediateCsvInput: HTMLInputElement | null = destination.querySelector(
       `input[${store.state.client.values["INTERMEDIATE_CSV_ATTRIBUTE"]}]`
@@ -389,7 +396,11 @@ class MetrcModalManager implements IAtomicService {
   async applyTransferCsvData(destination: HTMLElement) {
     analyticsManager.track(MessageType.CSV_AUTOFILL_FILL);
 
-    clientBuildManager.validateAndGetValuesOrError(clientKeys);
+    for (const clientKey of clientKeys) {
+      if (!store.state.client.values[clientKey]) {
+        throw new Error(`Missing client key: ${clientKey}`);
+      }
+    }
 
     const input: HTMLInputElement | null = destination.querySelector(
       `input[${store.state.client.values["INTERMEDIATE_CSV_ATTRIBUTE"]}]`

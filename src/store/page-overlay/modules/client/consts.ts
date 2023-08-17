@@ -8,5 +8,5 @@ export enum ClientGetters {
 
 export enum ClientActions {
   CLIENT_ACTION = "CLIENT_ACTION",
-  LOAD_CLIENT_VALUES = "LOAD_CLIENT_VALUES"
+  UPDATE_CLIENT_VALUES = "UPDATE_CLIENT_VALUES",
 }

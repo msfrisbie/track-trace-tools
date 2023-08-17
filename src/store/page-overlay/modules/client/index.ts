@@ -1,5 +1,6 @@
 import { IPluginState } from "@/interfaces";
 import { t3RequestManager } from "@/modules/t3-request-manager.module";
+import { toastManager } from "@/modules/toast-manager.module";
 import { ActionContext } from "vuex";
 import { ClientActions, ClientGetters, ClientMutations } from "../client/consts";
 import { IClientState } from "../client/interfaces";
@@ -34,13 +35,30 @@ export const clientModule = {
     },
   },
   actions: {
-    [ClientActions.LOAD_CLIENT_VALUES]: async (
+    [ClientActions.UPDATE_CLIENT_VALUES]: async (
       ctx: ActionContext<IClientState, IPluginState>,
-      data: any
+      data: { notify?: boolean } = {}
     ) => {
+      if (!ctx.rootState.settings.licenseKey) {
+        ctx.state.clientName = null;
+        ctx.state.values = {};
+        return;
+      }
+
       const { clientName, values } = await t3RequestManager.loadClientDataOrError(
         ctx.rootState.settings.licenseKey
       );
+
+      if (data.notify && !clientName) {
+        toastManager.openToast(`This license key is invalid.`, {
+          title: "License Key Error",
+          autoHideDelay: 5000,
+          variant: "danger",
+          appendToast: true,
+          toaster: "ttt-toaster",
+          solid: true,
+        });
+      }
 
       ctx.state.clientName = clientName;
       ctx.state.values = values;

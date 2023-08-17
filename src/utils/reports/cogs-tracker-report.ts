@@ -6,7 +6,6 @@ import {
   ISpreadsheet,
   ITransferFilter,
 } from "@/interfaces";
-import { clientBuildManager } from "@/modules/client-build-manager.module";
 import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
 import { messageBus } from "@/modules/message-bus.module";
 import store from "@/store/page-overlay/index";
@@ -172,8 +171,11 @@ export async function maybeLoadCogsTrackerReportData({
   distRexCogsMatrix.push(srcHeaders.map((x) => x));
   packagedGoodsCogsMatrix.push(packagedHeaders.map((x) => x));
 
-  const values = clientBuildManager.validateAndGetValuesOrError(["PACKAGE_LOCATION_BLACKLIST"]);
-  const locationNameBlacklist = values.PACKAGE_LOCATION_BLACKLIST;
+  if (!store.state.client.values["PACKAGE_LOCATION_BLACKLIST"]) {
+    throw new Error(`Missing client key: PACKAGE_LOCATION_BLACKLIST`);
+  }
+
+  const locationNameBlacklist = store.state.client.values["PACKAGE_LOCATION_BLACKLIST"];
 
   const bulkInfusedPackages = dateFilteredPackages.filter(
     (pkg) =>
