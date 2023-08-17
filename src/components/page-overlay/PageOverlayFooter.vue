@@ -25,7 +25,7 @@ export default Vue.extend({
   computed: mapState(["currentVersion"]),
   methods: {
     onClick(event: any) {
-      this.$store.commit(MutationType.TOGGLE_EXPANDED_OVERLAY);
+      store.commit(MutationType.TOGGLE_EXPANDED_OVERLAY);
       pageManager.setExpandedClass();
     },
   },

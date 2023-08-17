@@ -41,6 +41,7 @@ import { searchManager } from "@/modules/search-manager.module";
 import { TagSearchActions } from "@/store/page-overlay/modules/tag-search/consts";
 import { timer } from "rxjs";
 import { SearchActions } from "@/store/page-overlay/modules/search/consts";
+import store from "@/store/page-overlay/index";
 
 export default Vue.extend({
   name: "TagResultGroups",
@@ -59,7 +60,7 @@ export default Vue.extend({
       return false;
     },
     expandLabelGroup(): boolean {
-      return !!this.$store.state.tagSearch.tagSearchFilters.label;
+      return !!store.state.tagSearch.tagSearchFilters.label;
     },
     allTagsPreviewLength(): number {
       if (this.labelTags.length > 0) {
@@ -70,7 +71,7 @@ export default Vue.extend({
     },
     labelTags(): IIndexedTagData[] {
       const tags = this.tags.filter((tagData) =>
-        tagData.Label.includes(this.$store.state.search.queryString)
+        tagData.Label.includes(store.state.search.queryString)
       );
 
       return tags;

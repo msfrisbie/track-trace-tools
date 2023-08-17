@@ -85,21 +85,21 @@ export default Vue.extend({
       return false;
     },
     expandLabelGroup(): boolean {
-      return !!this.$store.state.plantSearch.plantSearchFilters.label;
+      return !!store.state.plantSearch.plantSearchFilters.label;
     },
     expandStrainNameGroup(): boolean {
       if (this.expandLabelGroup) {
         return false;
       }
 
-      return !!this.$store.state.plantSearch.plantSearchFilters.strainName;
+      return !!store.state.plantSearch.plantSearchFilters.strainName;
     },
     expandLocationNameGroup(): boolean {
       if (this.expandLabelGroup) {
         return false;
       }
 
-      return !!this.$store.state.plantSearch.plantSearchFilters.locationName;
+      return !!store.state.plantSearch.plantSearchFilters.locationName;
     },
     allPlantsPreviewLength(): number {
       // @ts-ignore
@@ -119,25 +119,21 @@ export default Vue.extend({
     },
     labelPlants(): IIndexedPlantData[] {
       const plants = this.plants.filter((plantData) =>
-        plantData.Label.includes(this.$store.state.search.queryString)
+        plantData.Label.includes(store.state.search.queryString)
       );
 
       return plants;
     },
     strainNamePlants(): IIndexedPlantData[] {
       const plants = this.plants.filter((plantData) =>
-        plantData.StrainName?.toUpperCase().includes(
-          this.$store.state.search.queryString.toUpperCase()
-        )
+        plantData.StrainName?.toUpperCase().includes(store.state.search.queryString.toUpperCase())
       );
 
       return plants;
     },
     locationNamePlants(): IIndexedPlantData[] {
       const plants = this.plants.filter((plantData) =>
-        plantData.LocationName?.toUpperCase().includes(
-          this.$store.state.search.queryString.toUpperCase()
-        )
+        plantData.LocationName?.toUpperCase().includes(store.state.search.queryString.toUpperCase())
       );
 
       return plants;
@@ -153,7 +149,7 @@ export default Vue.extend({
     // async setPlantLabelFilter(plant: IIndexedPlantData) {
     //   analyticsManager.track(MessageType.SELECTED_PLANT);
 
-    //   this.$store.dispatch(
+    //   store.dispatch(
     //     `plantSearch/${PlantSearchActions.PARTIAL_UPDATE_PLANT_SEARCH_FILTERS}`,
     //     {
     //       plantState: plant.PlantState,

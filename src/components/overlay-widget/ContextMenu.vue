@@ -401,12 +401,12 @@ export default Vue.extend({
     },
     isIdentityEligibleForSplitToolsImpl(): boolean {
       return isIdentityEligibleForSplitTools({
-        identity: this.$store.state.pluginAuth?.authState?.identity,
+        identity: store.state.pluginAuth.authState?.identity || null,
         hostname: window.location.hostname,
       });
     },
     manifestUrl(): string {
-      return `${window.location.origin}/reports/transfers/${this.$store.state.pluginAuth?.authState?.license}/manifest?id=${this.contextMenuEvent?.manifestNumber}`;
+      return `${window.location.origin}/reports/transfers/${store.state.pluginAuth?.authState?.license}/manifest?id=${this.contextMenuEvent?.manifestNumber}`;
     },
     manifestNumber(): string | undefined {
       return this.contextMenuEvent?.manifestNumber;
@@ -475,7 +475,7 @@ export default Vue.extend({
       analyticsManager.track(MessageType.CONTEXT_MENU_SELECT, { event: "searchTransfer", text });
 
       this.setShowSearchResults({ showSearchResults: true });
-      this.$store.dispatch(`search/${SearchActions.SET_QUERY_STRING}`, { queryString: text });
+      store.dispatch(`search/${SearchActions.SET_QUERY_STRING}`, { queryString: text });
       this.dismiss();
     },
     reset() {

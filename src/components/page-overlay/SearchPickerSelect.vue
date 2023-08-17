@@ -32,7 +32,7 @@ export default Vue.extend({
     }),
     searchType: {
       get(): SearchType {
-        return this.$store.state.search.searchType;
+        return store.state.search.searchType;
       },
       set(searchType: SearchType) {
         this.setSearchType({ searchType });

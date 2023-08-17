@@ -84,7 +84,7 @@ export default Vue.extend({
   },
   async mounted() {
     if (!this.isOnPlantsPage) {
-      // this.$store.dispatch(`plantSearch/${PlantSearchActions.SET_PLANT_SEARCH_FILTERS}`, {});
+      // store.dispatch(`plantSearch/${PlantSearchActions.SET_PLANT_SEARCH_FILTERS}`, {});
     }
   },
 });

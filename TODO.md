@@ -29,10 +29,10 @@ See transfer builder:
 ```
 originFacility: {
     get(): IMetrcFacilityData | null {
-    return this.$store.state.transferBuilder.originFacility;
+    return store.state.transferBuilder.originFacility;
     },
     set(originFacility) {
-    this.$store.dispatch(`transferBuilder/${TransferBuilderActions.UPDATE_TRANSFER_DATA}`, {
+    store.dispatch(`transferBuilder/${TransferBuilderActions.UPDATE_TRANSFER_DATA}`, {
         originFacility,
     });
     },

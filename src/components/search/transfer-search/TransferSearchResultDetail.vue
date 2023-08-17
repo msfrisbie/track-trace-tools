@@ -349,7 +349,7 @@ export default Vue.extend({
       });
 
       analyticsManager.track(MessageType.CLICKED_TOOLKIT_VIEW_MANIFEST_BUTTON);
-      this.$store.commit(`transferSearch/${MutationType.SET_SHOW_TRANSFER_SEARCH_RESULTS}`, false);
+      store.commit(`transferSearch/${MutationType.SET_SHOW_TRANSFER_SEARCH_RESULTS}`, false);
     },
     downloadManifest(transfer: IIndexedTransferData) {
       const manifestUrl = `${window.location.origin}/reports/transfers/${store.state.pluginAuth?.authState?.license}/manifest?id=${transfer.ManifestNumber}`;
@@ -360,7 +360,7 @@ export default Vue.extend({
       });
 
       analyticsManager.track(MessageType.CLICKED_TOOLKIT_DOWNLOAD_BUTTON);
-      this.$store.commit(`transferSearch/${MutationType.SET_SHOW_TRANSFER_SEARCH_RESULTS}`, false);
+      store.commit(`transferSearch/${MutationType.SET_SHOW_TRANSFER_SEARCH_RESULTS}`, false);
     },
     printManifest(transfer: IIndexedTransferData) {
       const manifestUrl = `${window.location.origin}/reports/transfers/${store.state.pluginAuth?.authState?.license}/manifest?id=${transfer.ManifestNumber}`;
@@ -368,14 +368,14 @@ export default Vue.extend({
       printPdfFromUrl({ urls: [manifestUrl], modal: true });
 
       analyticsManager.track(MessageType.CLICKED_TOOLKIT_PRINT_BUTTON);
-      this.$store.commit(`transferSearch/${MutationType.SET_SHOW_TRANSFER_SEARCH_RESULTS}`, false);
+      store.commit(`transferSearch/${MutationType.SET_SHOW_TRANSFER_SEARCH_RESULTS}`, false);
     },
     async createScanSheet(transfer: IIndexedTransferData) {
       analyticsManager.track(MessageType.CLICKED_TOOLKIT_CREATE_SCAN_SHEET_BUTTON);
 
       await createScanSheet(transfer.Id, transfer.ManifestNumber);
 
-      this.$store.commit(`transferSearch/${MutationType.SET_SHOW_TRANSFER_SEARCH_RESULTS}`, false);
+      store.commit(`transferSearch/${MutationType.SET_SHOW_TRANSFER_SEARCH_RESULTS}`, false);
     },
     badgeVariant(transfer: IIndexedTransferData) {
       switch (transfer.TransferState as TransferState) {

@@ -147,8 +147,8 @@ export default Vue.extend({
     },
     filtersApplied() {
       return (
-        Object.values(this.$store.state.plantSearch.plantSearchFilters || {}).filter((x) => !!x)
-          .length > 0
+        Object.values(store.state.plantSearch.plantSearchFilters || {}).filter((x) => !!x).length >
+        0
       );
     },
   },

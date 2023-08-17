@@ -431,9 +431,7 @@ export default Vue.extend({
       );
     },
     errorMessage(): string | null {
-      return (
-        this.errors.find((x: IBuilderComponentError) => true)?.message || null
-      );
+      return this.errors.find((x: IBuilderComponentError) => true)?.message || null;
     },
     errors(): IBuilderComponentError[] {
       return this.calculateErrors();
@@ -447,10 +445,10 @@ export default Vue.extend({
     },
     selectedPlantBatches: {
       get(): IPlantBatchData[] {
-        return this.$store.state.promoteImmaturePlantsBuilder.selectedPlantBatches;
+        return store.state.promoteImmaturePlantsBuilder.selectedPlantBatches;
       },
       set(selectedPlantBatches: IPlantBatchData[]) {
-        this.$store.dispatch(
+        store.dispatch(
           `promoteImmaturePlantsBuilder/${PromoteImmaturePlantsBuilderActions.UPDATE_PROMOTE_IMMATURE_PLANTS_DATA}`,
           { selectedPlantBatches }
         );
@@ -458,10 +456,10 @@ export default Vue.extend({
     },
     growthPhase: {
       get(): string | null {
-        return this.$store.state.promoteImmaturePlantsBuilder.growthPhase;
+        return store.state.promoteImmaturePlantsBuilder.growthPhase as string | null;
       },
       set(growthPhase: string | null) {
-        this.$store.dispatch(
+        store.dispatch(
           `promoteImmaturePlantsBuilder/${PromoteImmaturePlantsBuilderActions.UPDATE_PROMOTE_IMMATURE_PLANTS_DATA}`,
           { growthPhase }
         );
@@ -469,10 +467,10 @@ export default Vue.extend({
     },
     totalPlantCount: {
       get(): number | null {
-        return this.$store.state.promoteImmaturePlantsBuilder.totalPlantCount;
+        return store.state.promoteImmaturePlantsBuilder.totalPlantCount;
       },
       set(totalPlantCount: number | null) {
-        this.$store.dispatch(
+        store.dispatch(
           `promoteImmaturePlantsBuilder/${PromoteImmaturePlantsBuilderActions.UPDATE_PROMOTE_IMMATURE_PLANTS_DATA}`,
           { totalPlantCount }
         );
@@ -480,10 +478,10 @@ export default Vue.extend({
     },
     promoteData: {
       get(): IIntermediatePromotePlantBatchData[] {
-        return this.$store.state.promoteImmaturePlantsBuilder.promoteData;
+        return store.state.promoteImmaturePlantsBuilder.promoteData;
       },
       set(promoteData: IIntermediatePromotePlantBatchData[]) {
-        this.$store.dispatch(
+        store.dispatch(
           `promoteImmaturePlantsBuilder/${PromoteImmaturePlantsBuilderActions.UPDATE_PROMOTE_IMMATURE_PLANTS_DATA}`,
           { promoteData }
         );
@@ -491,10 +489,10 @@ export default Vue.extend({
     },
     plantTags: {
       get(): ITagData[] {
-        return this.$store.state.promoteImmaturePlantsBuilder.plantTags;
+        return store.state.promoteImmaturePlantsBuilder.plantTags;
       },
       set(plantTags: ITagData[]) {
-        this.$store.dispatch(
+        store.dispatch(
           `promoteImmaturePlantsBuilder/${PromoteImmaturePlantsBuilderActions.UPDATE_PROMOTE_IMMATURE_PLANTS_DATA}`,
           { plantTags }
         );
@@ -502,10 +500,10 @@ export default Vue.extend({
     },
     patientLicenseNumber: {
       get(): string {
-        return this.$store.state.promoteImmaturePlantsBuilder.patientLicenseNumber;
+        return store.state.promoteImmaturePlantsBuilder.patientLicenseNumber;
       },
       set(patientLicenseNumber: string) {
-        this.$store.dispatch(
+        store.dispatch(
           `promoteImmaturePlantsBuilder/${PromoteImmaturePlantsBuilderActions.UPDATE_PROMOTE_IMMATURE_PLANTS_DATA}`,
           { patientLicenseNumber }
         );
@@ -513,10 +511,10 @@ export default Vue.extend({
     },
     showTagPicker: {
       get(): boolean {
-        return this.$store.state.promoteImmaturePlantsBuilder.showTagPicker;
+        return store.state.promoteImmaturePlantsBuilder.showTagPicker;
       },
       set(showTagPicker: boolean) {
-        this.$store.dispatch(
+        store.dispatch(
           `promoteImmaturePlantsBuilder/${PromoteImmaturePlantsBuilderActions.UPDATE_PROMOTE_IMMATURE_PLANTS_DATA}`,
           { showTagPicker }
         );
@@ -524,10 +522,10 @@ export default Vue.extend({
     },
     growthIsodate: {
       get(): string {
-        return this.$store.state.promoteImmaturePlantsBuilder.growthIsodate;
+        return store.state.promoteImmaturePlantsBuilder.growthIsodate;
       },
       set(growthIsodate: string) {
-        this.$store.dispatch(
+        store.dispatch(
           `promoteImmaturePlantsBuilder/${PromoteImmaturePlantsBuilderActions.UPDATE_PROMOTE_IMMATURE_PLANTS_DATA}`,
           { growthIsodate }
         );
@@ -535,10 +533,10 @@ export default Vue.extend({
     },
     plantLocation: {
       get(): ILocationData | null {
-        return this.$store.state.promoteImmaturePlantsBuilder.plantLocation;
+        return store.state.promoteImmaturePlantsBuilder.plantLocation;
       },
       set(plantLocation: ILocationData | null) {
-        this.$store.dispatch(
+        store.dispatch(
           `promoteImmaturePlantsBuilder/${PromoteImmaturePlantsBuilderActions.UPDATE_PROMOTE_IMMATURE_PLANTS_DATA}`,
           { plantLocation }
         );
@@ -546,10 +544,10 @@ export default Vue.extend({
     },
     showHiddenDetailFields: {
       get(): boolean {
-        return this.$store.state.promoteImmaturePlantsBuilder.showHiddenDetailFields;
+        return store.state.promoteImmaturePlantsBuilder.showHiddenDetailFields;
       },
       set(showHiddenDetailFields: boolean) {
-        this.$store.dispatch(
+        store.dispatch(
           `promoteImmaturePlantsBuilder/${PromoteImmaturePlantsBuilderActions.UPDATE_PROMOTE_IMMATURE_PLANTS_DATA}`,
           { showHiddenDetailFields }
         );

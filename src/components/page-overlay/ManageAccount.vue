@@ -32,7 +32,7 @@ export default Vue.extend({
   components: {},
   data() {
     return {
-      accountSettings: JSON.parse(JSON.stringify(this.$store.state.accountSettings)),
+      accountSettings: JSON.parse(JSON.stringify(store.state.accountSettings)),
     };
   },
   computed: mapState(["accountEnabled"]),
@@ -44,7 +44,7 @@ export default Vue.extend({
         settings: JSON.parse(JSON.stringify(this.accountSettings)),
       });
 
-      this.$store.commit(MutationType.UPDATE_ACCOUNT_SETTINGS, this.accountSettings);
+      store.commit(MutationType.UPDATE_ACCOUNT_SETTINGS, this.accountSettings);
 
       toastManager.openToast(`T3 account settings successfully updated`, {
         title: "Updated Account Settings",

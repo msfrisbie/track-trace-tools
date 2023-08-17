@@ -123,7 +123,7 @@ export default Vue.extend({
     //   tap((queryString: string) => {
     //     this.$data.queryString = queryString;
     //   }),
-    //   filter((queryString: string) => queryString !== this.$store.state.search.queryString),
+    //   filter((queryString: string) => queryString !== store.state.search.queryString),
     //   debounceTime(500),
     //   tap((queryString: string) => {
     //     if (queryString) {
@@ -141,7 +141,7 @@ export default Vue.extend({
     // combineLatest([
     //   queryString$.pipe(
     //     filter((queryString: string) => !!queryString),
-    //     startWith(this.$store.state.search.queryString || "")
+    //     startWith(store.state.search.queryString || "")
     //   ),
     // ]).subscribe(async ([queryString]: [string]) => {
     //   this.$data.searchInflight = true;
@@ -193,7 +193,7 @@ export default Vue.extend({
     //   ]);
     //   this.$data.searchInflight = false;
     // });
-    // if (this.$store.state.expandSearchOnNextLoad) {
+    // if (store.state.expandSearchOnNextLoad) {
     //   this.setExpandSearchOnNextLoad({
     //     expandSearchOnNextLoad: false,
     //   });
@@ -207,7 +207,7 @@ export default Vue.extend({
     }),
     queryString: {
       get(): string {
-        return this.$store.state.search.queryString;
+        return store.state.search.queryString;
       },
       set(queryString: string) {
         this.setQueryString({

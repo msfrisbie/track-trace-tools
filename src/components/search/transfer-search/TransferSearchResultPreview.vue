@@ -31,6 +31,7 @@ import { analyticsManager } from "@/modules/analytics-manager.module";
 import { pageManager } from "@/modules/page-manager/page-manager.module";
 import { MutationType } from "@/mutation-types";
 import Vue from "vue";
+import store from "@/store/page-overlay/index";
 
 export default Vue.extend({
   name: "TransferSearchResultPreview",
@@ -89,7 +90,7 @@ export default Vue.extend({
         this.$props.transfer.ManifestNumber
       );
 
-      this.$store.commit(`transferSearch/${MutationType.SET_SHOW_TRANSFER_SEARCH_RESULTS}`, false);
+      store.commit(`transferSearch/${MutationType.SET_SHOW_TRANSFER_SEARCH_RESULTS}`, false);
     },
   },
 });

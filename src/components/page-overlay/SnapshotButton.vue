@@ -76,7 +76,7 @@ export default Vue.extend({
   },
   methods: {
     dismissSnapshotPopover() {
-      const trackedInteractions = JSON.parse(JSON.stringify(this.$store.state.trackedInteractions));
+      const trackedInteractions = JSON.parse(JSON.stringify(store.state.trackedInteractions));
 
       trackedInteractions.dismissedSnapshotPopover = true;
 
@@ -85,7 +85,7 @@ export default Vue.extend({
       // @ts-ignore
       this.$refs["snapshot-popover"].$emit("disable");
 
-      this.$store.commit(MutationType.UPDATE_TRACKED_INTERACTIONS, trackedInteractions);
+      store.commit(MutationType.UPDATE_TRACKED_INTERACTIONS, trackedInteractions);
     },
     async openBuilder() {
       modalManager.dispatchModalEvent(ModalType.BUILDER, ModalAction.OPEN, {

@@ -146,8 +146,7 @@ export default Vue.extend({
     },
     filtersApplied(): boolean {
       return (
-        Object.values(this.$store.state.tagSearch.tagSearchFilters || {}).filter((x) => !!x)
-          .length > 0
+        Object.values(store.state.tagSearch.tagSearchFilters || {}).filter((x) => !!x).length > 0
       );
     },
   },

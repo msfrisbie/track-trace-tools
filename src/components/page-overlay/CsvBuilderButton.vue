@@ -55,7 +55,7 @@ export default Vue.extend({
   computed: mapState(["trackedInteractions", "settings"]),
   methods: {
     dismissCsvBuilderPopover() {
-      const trackedInteractions = JSON.parse(JSON.stringify(this.$store.state.trackedInteractions));
+      const trackedInteractions = JSON.parse(JSON.stringify(store.state.trackedInteractions));
 
       trackedInteractions.dismissedCsvBuilderPopover = true;
 
@@ -64,7 +64,7 @@ export default Vue.extend({
       // @ts-ignore
       this.$refs["csv-builder-popover"].$emit("disable");
 
-      this.$store.commit(MutationType.UPDATE_TRACKED_INTERACTIONS, trackedInteractions);
+      store.commit(MutationType.UPDATE_TRACKED_INTERACTIONS, trackedInteractions);
     },
     async openCsvBuilder() {
       // Permissions check disabled

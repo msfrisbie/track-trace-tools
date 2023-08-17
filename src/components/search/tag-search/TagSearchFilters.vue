@@ -81,7 +81,7 @@ export default Vue.extend({
   },
   async mounted() {
     if (!this.isOnTagsPage) {
-      // this.$store.dispatch(`tagSearch/${TagSearchActions.SET_TAG_SEARCH_FILTERS}`, {});
+      // store.dispatch(`tagSearch/${TagSearchActions.SET_TAG_SEARCH_FILTERS}`, {});
     }
   },
 });

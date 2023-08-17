@@ -55,25 +55,25 @@ export default Vue.extend({
         {
           text: "PACKAGES",
           value: SearchType.PACKAGES,
-          count: this.$store.state.packageSearch.packages.length,
+          count: store.state.packageSearch.packages.length,
           enabled: true,
         },
         {
           text: "PLANTS",
           value: SearchType.PLANTS,
-          count: this.$store.state.plantSearch.plants.length,
+          count: store.state.plantSearch.plants.length,
           enabled: true,
         },
         {
           text: "TRANSFERS",
           value: SearchType.TRANSFERS,
-          count: this.$store.state.transferSearch.transfers.length,
+          count: store.state.transferSearch.transfers.length,
           enabled: true,
         },
         {
           text: "TAGS",
           value: SearchType.TAGS,
-          count: this.$store.state.tagSearch.tags.length,
+          count: store.state.tagSearch.tags.length,
           enabled: true,
         },
         {

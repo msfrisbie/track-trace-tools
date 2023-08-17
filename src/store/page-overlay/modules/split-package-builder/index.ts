@@ -20,14 +20,14 @@ const inMemoryState = {
   outputItem: null,
   location: null,
   isDonation: false,
-  isTradeSample: false
+  isTradeSample: false,
 };
 
 const persistedState = {};
 
 const defaultState: ISplitPackageBuilderState = {
   ...persistedState,
-  ...inMemoryState
+  ...inMemoryState,
 };
 
 export const splitPackageBuilderModule = {
@@ -50,7 +50,7 @@ export const splitPackageBuilderModule = {
     },
     [SplitPackageBuilderMutations.RESET_SPLIT_PACKAGE_DATA](state: ISplitPackageBuilderState) {
       Object.assign(state, _.cloneDeep(defaultState));
-    }
+    },
   },
   getters: {},
   actions: {
@@ -70,8 +70,8 @@ export const splitPackageBuilderModule = {
       ctx: ActionContext<ISplitPackageBuilderState, IPluginState>
     ) => {
       ctx.commit(SplitPackageBuilderMutations.RESET_SPLIT_PACKAGE_DATA);
-    }
-  }
+    },
+  },
 };
 
 export const splitPackageBuilderReducer = (
@@ -79,6 +79,6 @@ export const splitPackageBuilderReducer = (
 ): ISplitPackageBuilderState => {
   return {
     ...state,
-    ...inMemoryState
+    ...inMemoryState,
   };
 };

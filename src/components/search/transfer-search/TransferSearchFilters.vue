@@ -38,7 +38,7 @@ export default Vue.extend({
       return window.location.pathname.match(TRANSFER_TAB_REGEX);
     },
     hasManifestNumberFilter() {
-      return !!this.$store.state.transferSearch.transferSearchFilters.manifestNumber;
+      return !!store.state.transferSearch.transferSearchFilters.manifestNumber;
     },
     ...mapState<IPluginState>({
       transferSearchState: (state: IPluginState) => state.transferSearch,
@@ -54,7 +54,7 @@ export default Vue.extend({
   },
   async mounted() {
     if (!this.isOnTransfersPage) {
-      this.$store.commit(`transferSearch/${MutationType.SET_TRANSFER_SEARCH_FILTERS}`, {});
+      store.commit(`transferSearch/${MutationType.SET_TRANSFER_SEARCH_FILTERS}`, {});
     }
   },
 });

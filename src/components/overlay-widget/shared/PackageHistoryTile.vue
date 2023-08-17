@@ -92,7 +92,7 @@ export default Vue.extend({
   computed: {
     ...mapState([]),
     filteredAncestors() {
-      if (this.$store.state.packageHistory.showUnownedPackages) {
+      if (store.state.packageHistory.showUnownedPackages) {
         return this.ancestorTree.ancestors;
       } else {
         return this.ancestorTree.ancestors.filter(
@@ -101,7 +101,7 @@ export default Vue.extend({
       }
     },
     filteredChildren() {
-      if (this.$store.state.packageHistory.showUnownedPackages) {
+      if (store.state.packageHistory.showUnownedPackages) {
         return this.childTree.children;
       } else {
         return this.childTree.children.filter(
@@ -111,12 +111,12 @@ export default Vue.extend({
     },
     maxParentVisibleDepth: {
       get(): number {
-        return this.$store.state.packageHistory.maxParentVisibleDepth;
+        return store.state.packageHistory.maxParentVisibleDepth;
       },
     },
     maxChildVisibleDepth: {
       get(): number | null {
-        return this.$store.state.packageHistory.maxChildVisibleDepth;
+        return store.state.packageHistory.maxChildVisibleDepth;
       },
     },
   },

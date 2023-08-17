@@ -67,7 +67,7 @@ export default Vue.extend({
       await timer(this.$data.delayMs).toPromise();
 
       if (this.$data.hideBeforeScreenshot) {
-        this.$store.commit(MutationType.SET_EXPANDED_OVERLAY, false);
+        store.commit(MutationType.SET_EXPANDED_OVERLAY, false);
         pageManager.setExpandedClass();
         modalManager.dispatchModalEvent(ModalType.BUILDER, ModalAction.CLOSE);
       }
@@ -75,7 +75,7 @@ export default Vue.extend({
       await screenshotManager.takeScreenshot({
         downloadFile: false,
         useBackground: true,
-        useLegacyScreenshot: this.$store.state.settings?.useLegacyScreenshot,
+        useLegacyScreenshot: store.state.settings?.useLegacyScreenshot,
       });
     },
   },

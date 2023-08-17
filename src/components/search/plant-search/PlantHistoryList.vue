@@ -31,7 +31,7 @@ export default Vue.extend({
   store,
   methods: {
     setSearch(queryString: string) {
-      this.$store.dispatch(`search/${SearchActions.SET_QUERY_STRING}`, { queryString });
+      store.dispatch(`search/${SearchActions.SET_QUERY_STRING}`, { queryString });
       analyticsManager.track(MessageType.CLICKED_RECENT_PLANT_QUERY, {
         queryString,
       });

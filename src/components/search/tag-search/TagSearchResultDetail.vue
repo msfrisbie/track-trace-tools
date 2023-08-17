@@ -102,7 +102,7 @@ export default Vue.extend({
     async setTagLabelFilter(tag: IIndexedTagData) {
       analyticsManager.track(MessageType.SELECTED_TAG);
 
-      this.$store.dispatch(`tagSearch/${TagSearchActions.PARTIAL_UPDATE_TAG_SEARCH_FILTERS}`, {
+      store.dispatch(`tagSearch/${TagSearchActions.PARTIAL_UPDATE_TAG_SEARCH_FILTERS}`, {
         tagState: tag.TagState,
         tagSearchFilters: {
           label: tag.Label,

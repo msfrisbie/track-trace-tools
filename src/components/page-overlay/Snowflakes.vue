@@ -68,9 +68,9 @@ export default Vue.extend({
   computed: {
     ...mapState<IPluginState>(["settings"]),
     snowflakeImageStyle(): string {
-      const dimension = imageWidth(this.$store.state.settings.snowflakeSize);
+      const dimension = imageWidth(store.state.settings.snowflakeSize);
 
-      return `width: ${dimension}; height: ${dimension}; background-image: url(${this.$store.state.settings.snowflakeImage});`;
+      return `width: ${dimension}; height: ${dimension}; background-image: url(${store.state.settings.snowflakeImage});`;
     },
   },
   data() {

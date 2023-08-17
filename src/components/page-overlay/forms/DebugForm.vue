@@ -142,13 +142,13 @@ export default Vue.extend({
   store,
   data() {
     return {
-      debugMode: this.$store.state.debugMode,
-      muteAnalytics: this.$store.state.muteAnalytics,
-      demoMode: this.$store.state.demoMode,
-      mockDataMode: this.$store.state.mockDataMode,
-      settings: JSON.parse(JSON.stringify(this.$store.state.settings)),
-      flagsData: this.$store.state.flags,
-      trackedInteractions: JSON.stringify(this.$store.state.trackedInteractions, null, 2),
+      debugMode: store.state.debugMode,
+      muteAnalytics: store.state.muteAnalytics,
+      demoMode: store.state.demoMode,
+      mockDataMode: store.state.mockDataMode,
+      settings: JSON.parse(JSON.stringify(store.state.settings)),
+      flagsData: store.state.flags,
+      trackedInteractions: JSON.stringify(store.state.trackedInteractions, null, 2),
       count: 1,
     };
   },
@@ -181,11 +181,11 @@ export default Vue.extend({
   methods: {
     async toggleDebugMode() {
       window.location.hash = "";
-      this.$store.commit(MutationType.SET_DEBUG_MODE, !this.$store.state.debugMode);
+      store.commit(MutationType.SET_DEBUG_MODE, !store.state.debugMode);
     },
     // async createNoopTasks() {
     //   for (let i = 0; i < 20; ++i) {
-    //     this.$store.commit(
+    //     store.commit(
     //       MutationType.ENQUEUE_TASK,
     //       await createTask(TaskType.NOOP)
     //     );
@@ -193,7 +193,7 @@ export default Vue.extend({
     // },
     // async createNoopNetworkTasks() {
     //   for (let i = 0; i < 20; ++i) {
-    //     this.$store.commit(
+    //     store.commit(
     //       MutationType.ENQUEUE_TASK,
     //       await createTask(TaskType.NOOP_NETWORK)
     //     );
@@ -216,14 +216,14 @@ export default Vue.extend({
       screenshotManager.takeScreenshot({
         downloadFile: false,
         useBackground: true,
-        useLegacyScreenshot: this.$store.state.useLegacyScreenshot,
+        useLegacyScreenshot: store.state.settings.useLegacyScreenshot,
       });
     },
     async resetState() {
-      this.$store.commit(MutationType.RESET_STATE);
+      store.commit(MutationType.RESET_STATE);
     },
     async resetFlags() {
-      this.$store.dispatch(`flags/${FlagsActions.RESET_FLAGS}`);
+      store.dispatch(`flags/${FlagsActions.RESET_FLAGS}`);
 
       toastManager.openToast("Flags reset", {
         title: "T3",
@@ -252,8 +252,8 @@ export default Vue.extend({
       }
     },
     async resetTrackedInteractions() {
-      this.$store.commit(MutationType.RESET_TRACKED_INTERACTIONS);
-      this.trackedInteractions = JSON.stringify(this.$store.state.trackedInteractions, null, 2);
+      store.commit(MutationType.RESET_TRACKED_INTERACTIONS);
+      this.trackedInteractions = JSON.stringify(store.state.trackedInteractions, null, 2);
 
       toastManager.openToast("Tracked interactions reset", {
         title: "T3",
@@ -268,15 +268,15 @@ export default Vue.extend({
       modalManager.dispatchModalEvent(ModalType.CSV);
     },
     onChange() {
-      this.$store.dispatch(`settings/${SettingsActions.UPDATE_SETTINGS}`, this.settings);
-      this.$store.commit(MutationType.SET_DEBUG_MODE, this.debugMode);
-      this.$store.commit(MutationType.SET_DEMO_MODE, this.demoMode);
-      this.$store.commit(MutationType.SET_MOCK_DATA_MODE, this.mockDataMode);
-      this.$store.commit(MutationType.SET_MUTE_ANALYTICS, this.muteAnalytics);
+      store.dispatch(`settings/${SettingsActions.UPDATE_SETTINGS}`, this.settings);
+      store.commit(MutationType.SET_DEBUG_MODE, this.debugMode);
+      store.commit(MutationType.SET_DEMO_MODE, this.demoMode);
+      store.commit(MutationType.SET_MOCK_DATA_MODE, this.mockDataMode);
+      store.commit(MutationType.SET_MUTE_ANALYTICS, this.muteAnalytics);
     },
     async onFlagsChange(updatedFlags: IFlagsState) {
       try {
-        this.$store.dispatch(`flags/${FlagsActions.SET_FLAGS}`, updatedFlags);
+        store.dispatch(`flags/${FlagsActions.SET_FLAGS}`, updatedFlags);
 
         toastManager.openToast("Flags updated", {
           title: "T3",
@@ -296,10 +296,7 @@ export default Vue.extend({
     },
     onTrackedInteractionsChange(trackedInteractionsJSON: string) {
       try {
-        this.$store.commit(
-          MutationType.UPDATE_TRACKED_INTERACTIONS,
-          JSON.parse(trackedInteractionsJSON)
-        );
+        store.commit(MutationType.UPDATE_TRACKED_INTERACTIONS, JSON.parse(trackedInteractionsJSON));
 
         toastManager.openToast("Tracked interactions updated", {
           title: "T3",

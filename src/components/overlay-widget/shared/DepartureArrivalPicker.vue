@@ -148,98 +148,98 @@ export default Vue.extend({
     },
     isLayover: {
       get() {
-        return this.$store.state.transferBuilder.isLayover;
+        return store.state.transferBuilder.isLayover;
       },
       set(isLayover: boolean) {
-        this.$store.dispatch(`transferBuilder/${TransferBuilderActions.UPDATE_TRANSFER_DATA}`, {
+        store.dispatch(`transferBuilder/${TransferBuilderActions.UPDATE_TRANSFER_DATA}`, {
           isLayover,
         });
       },
     } as IComputedGetSet<boolean>,
     departureIsodate: {
       get() {
-        return this.$store.state.transferBuilder.departureIsodate;
+        return store.state.transferBuilder.departureIsodate;
       },
       set(departureIsodate: string) {
-        this.$store.dispatch(`transferBuilder/${TransferBuilderActions.UPDATE_TRANSFER_DATA}`, {
+        store.dispatch(`transferBuilder/${TransferBuilderActions.UPDATE_TRANSFER_DATA}`, {
           departureIsodate,
         });
       },
     } as IComputedGetSet<string>,
     departureIsotime: {
       get() {
-        return isotimeToNaiveTime(this.$store.state.transferBuilder.departureIsotime);
+        return isotimeToNaiveTime(store.state.transferBuilder.departureIsotime);
       },
       set(naiveDepartureTime: string) {
         const departureIsotime = naiveTimeToIsotime(naiveDepartureTime);
 
-        this.$store.dispatch(`transferBuilder/${TransferBuilderActions.UPDATE_TRANSFER_DATA}`, {
+        store.dispatch(`transferBuilder/${TransferBuilderActions.UPDATE_TRANSFER_DATA}`, {
           departureIsotime,
         });
       },
     } as IComputedGetSet<string>,
     arrivalIsodate: {
       get() {
-        return this.$store.state.transferBuilder.arrivalIsodate;
+        return store.state.transferBuilder.arrivalIsodate;
       },
       set(arrivalIsodate: string) {
-        this.$store.dispatch(`transferBuilder/${TransferBuilderActions.UPDATE_TRANSFER_DATA}`, {
+        store.dispatch(`transferBuilder/${TransferBuilderActions.UPDATE_TRANSFER_DATA}`, {
           arrivalIsodate,
         });
       },
     } as IComputedGetSet<string>,
     arrivalIsotime: {
       get() {
-        return isotimeToNaiveTime(this.$store.state.transferBuilder.arrivalIsotime);
+        return isotimeToNaiveTime(store.state.transferBuilder.arrivalIsotime);
       },
       set(naiveArrivalTime: string) {
         const arrivalIsotime = naiveTimeToIsotime(naiveArrivalTime);
 
-        this.$store.dispatch(`transferBuilder/${TransferBuilderActions.UPDATE_TRANSFER_DATA}`, {
+        store.dispatch(`transferBuilder/${TransferBuilderActions.UPDATE_TRANSFER_DATA}`, {
           arrivalIsotime,
         });
       },
     } as IComputedGetSet<string>,
     layoverCheckInIsodate: {
       get() {
-        return this.$store.state.transferBuilder.layoverCheckInIsodate;
+        return store.state.transferBuilder.layoverCheckInIsodate;
       },
       set(layoverCheckInIsodate: string) {
-        this.$store.dispatch(`transferBuilder/${TransferBuilderActions.UPDATE_TRANSFER_DATA}`, {
+        store.dispatch(`transferBuilder/${TransferBuilderActions.UPDATE_TRANSFER_DATA}`, {
           layoverCheckInIsodate,
         });
       },
     } as IComputedGetSet<string>,
     layoverCheckInIsotime: {
       get() {
-        return isotimeToNaiveTime(this.$store.state.transferBuilder.layoverCheckInIsotime);
+        return isotimeToNaiveTime(store.state.transferBuilder.layoverCheckInIsotime);
       },
       set(naiveDepartureTime: string) {
         const layoverCheckInIsotime = naiveTimeToIsotime(naiveDepartureTime);
 
-        this.$store.dispatch(`transferBuilder/${TransferBuilderActions.UPDATE_TRANSFER_DATA}`, {
+        store.dispatch(`transferBuilder/${TransferBuilderActions.UPDATE_TRANSFER_DATA}`, {
           layoverCheckInIsotime,
         });
       },
     } as IComputedGetSet<string>,
     layoverCheckOutIsodate: {
       get() {
-        return this.$store.state.transferBuilder.layoverCheckOutIsodate;
+        return store.state.transferBuilder.layoverCheckOutIsodate;
       },
       set(layoverCheckOutIsodate: string) {
-        this.$store.dispatch(`transferBuilder/${TransferBuilderActions.UPDATE_TRANSFER_DATA}`, {
+        store.dispatch(`transferBuilder/${TransferBuilderActions.UPDATE_TRANSFER_DATA}`, {
           layoverCheckOutIsodate,
         });
       },
     } as IComputedGetSet<string>,
     layoverCheckOutIsotime: {
       get() {
-        return isotimeToNaiveTime(this.$store.state.transferBuilder.layoverCheckOutIsotime);
+        return isotimeToNaiveTime(store.state.transferBuilder.layoverCheckOutIsotime);
       },
       set(naiveArrivalTime: string) {
         const layoverCheckOutIsotime = naiveTimeToIsotime(naiveArrivalTime);
 
-        this.$store.dispatch(`transferBuilder/${TransferBuilderActions.UPDATE_TRANSFER_DATA}`, {
+        store.dispatch(`transferBuilder/${TransferBuilderActions.UPDATE_TRANSFER_DATA}`, {
           layoverCheckOutIsotime,
         });
       },

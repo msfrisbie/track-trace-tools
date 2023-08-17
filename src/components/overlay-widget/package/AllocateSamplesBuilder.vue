@@ -292,10 +292,10 @@ export default Vue.extend({
     }),
     daysInRange: {
       get(): number {
-        return this.$store.state.employeeSamples.daysInRange;
+        return store.state.employeeSamples.daysInRange;
       },
       set(daysInRange: number) {
-        this.$store.state.employeeSamples.daysInRange = daysInRange;
+        store.state.employeeSamples.daysInRange = daysInRange;
       },
     },
     csvFiles(): ICsvFile[] {

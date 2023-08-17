@@ -104,10 +104,10 @@ export default Vue.extend({
         };
 
         if (
-          !this.$store.state.plantSearch.selectedPlantMetadata ||
-          this.$store.state.plantSearch.selectedPlantMetadata.priority >= candidateMetadata.priority
+          !store.state.plantSearch.selectedPlantMetadata ||
+          store.state.plantSearch.selectedPlantMetadata.priority >= candidateMetadata.priority
         ) {
-          this.$store.state.plantSearch.selectedPlantMetadata = candidateMetadata;
+          store.state.plantSearch.selectedPlantMetadata = candidateMetadata;
         }
       },
     },
@@ -151,7 +151,7 @@ export default Vue.extend({
       //   plantData,
       // });
 
-      this.$store.state.plantSearch.selectedPlantMetadata = {
+      store.state.plantSearch.selectedPlantMetadata = {
         plantData,
         sectionName: this.sectionName,
         priority: this.sectionPriority,
@@ -162,14 +162,11 @@ export default Vue.extend({
         return;
       }
 
-      this.$store.dispatch(
-        `plantSearch/${PlantSearchActions.PARTIAL_UPDATE_PLANT_SEARCH_FILTERS}`,
-        {
-          plantSearchFilters: {
-            [this.plantFilterIdentifier]: this.$store.state.search.queryString,
-          },
-        }
-      );
+      store.dispatch(`plantSearch/${PlantSearchActions.PARTIAL_UPDATE_PLANT_SEARCH_FILTERS}`, {
+        plantSearchFilters: {
+          [this.plantFilterIdentifier]: store.state.search.queryString,
+        },
+      });
 
       this.setShowSearchResults({ showSearchResults: false });
     },

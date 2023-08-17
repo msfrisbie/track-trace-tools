@@ -161,70 +161,70 @@ export default Vue.extend({
     }),
     driverName: {
       get() {
-        return this.$store.state.transferBuilder.driverName;
+        return store.state.transferBuilder.driverName;
       },
       set(driverName: string) {
-        this.$store.dispatch(`transferBuilder/${TransferBuilderActions.UPDATE_TRANSFER_DATA}`, {
+        store.dispatch(`transferBuilder/${TransferBuilderActions.UPDATE_TRANSFER_DATA}`, {
           driverName,
         });
       },
     } as IComputedGetSet<string>,
     driverEmployeeId: {
       get() {
-        return this.$store.state.transferBuilder.driverEmployeeId;
+        return store.state.transferBuilder.driverEmployeeId;
       },
       set(driverEmployeeId: string) {
-        this.$store.dispatch(`transferBuilder/${TransferBuilderActions.UPDATE_TRANSFER_DATA}`, {
+        store.dispatch(`transferBuilder/${TransferBuilderActions.UPDATE_TRANSFER_DATA}`, {
           driverEmployeeId,
         });
       },
     } as IComputedGetSet<string>,
     driverLicenseNumber: {
       get() {
-        return this.$store.state.transferBuilder.driverLicenseNumber;
+        return store.state.transferBuilder.driverLicenseNumber;
       },
       set(driverLicenseNumber: string) {
-        this.$store.dispatch(`transferBuilder/${TransferBuilderActions.UPDATE_TRANSFER_DATA}`, {
+        store.dispatch(`transferBuilder/${TransferBuilderActions.UPDATE_TRANSFER_DATA}`, {
           driverLicenseNumber,
         });
       },
     } as IComputedGetSet<string>,
     vehicleMake: {
       get() {
-        return this.$store.state.transferBuilder.vehicleMake;
+        return store.state.transferBuilder.vehicleMake;
       },
       set(vehicleMake: string) {
-        this.$store.dispatch(`transferBuilder/${TransferBuilderActions.UPDATE_TRANSFER_DATA}`, {
+        store.dispatch(`transferBuilder/${TransferBuilderActions.UPDATE_TRANSFER_DATA}`, {
           vehicleMake,
         });
       },
     } as IComputedGetSet<string>,
     vehicleModel: {
       get() {
-        return this.$store.state.transferBuilder.vehicleModel;
+        return store.state.transferBuilder.vehicleModel;
       },
       set(vehicleModel: string) {
-        this.$store.dispatch(`transferBuilder/${TransferBuilderActions.UPDATE_TRANSFER_DATA}`, {
+        store.dispatch(`transferBuilder/${TransferBuilderActions.UPDATE_TRANSFER_DATA}`, {
           vehicleModel,
         });
       },
     } as IComputedGetSet<string>,
     vehicleLicensePlate: {
       get() {
-        return this.$store.state.transferBuilder.vehicleLicensePlate;
+        return store.state.transferBuilder.vehicleLicensePlate;
       },
       set(vehicleLicensePlate: string) {
-        this.$store.dispatch(`transferBuilder/${TransferBuilderActions.UPDATE_TRANSFER_DATA}`, {
+        store.dispatch(`transferBuilder/${TransferBuilderActions.UPDATE_TRANSFER_DATA}`, {
           vehicleLicensePlate,
         });
       },
     } as IComputedGetSet<string>,
     driverLayoverLeg: {
       get() {
-        return this.$store.state.transferBuilder.driverLayoverLeg;
+        return store.state.transferBuilder.driverLayoverLeg;
       },
       set(driverLayoverLeg: string) {
-        this.$store.dispatch(`transferBuilder/${TransferBuilderActions.UPDATE_TRANSFER_DATA}`, {
+        store.dispatch(`transferBuilder/${TransferBuilderActions.UPDATE_TRANSFER_DATA}`, {
           driverLayoverLeg,
         });
       },
@@ -250,7 +250,7 @@ export default Vue.extend({
         return;
       }
 
-      this.$store.dispatch(`transferBuilder/${TransferBuilderActions.UPDATE_TRANSFER_DATA}`, {
+      store.dispatch(`transferBuilder/${TransferBuilderActions.UPDATE_TRANSFER_DATA}`, {
         driverName: driver.DriverName,
         driverEmployeeId: driver.DriverOccupationalLicenseNumber,
         driverLicenseNumber: driver.DriverVehicleLicenseNumber,
@@ -269,7 +269,7 @@ export default Vue.extend({
         return;
       }
 
-      this.$store.dispatch(`transferBuilder/${TransferBuilderActions.UPDATE_TRANSFER_DATA}`, {
+      store.dispatch(`transferBuilder/${TransferBuilderActions.UPDATE_TRANSFER_DATA}`, {
         vehicleMake: vehicle.VehicleMake,
         vehicleModel: vehicle.VehicleModel,
         vehicleLicensePlate: vehicle.VehicleLicensePlateNumber,

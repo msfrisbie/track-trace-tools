@@ -397,9 +397,7 @@ export default Vue.extend({
             {
               FinishDate: "", // Default to do not finish
               PackageId: sourcePackage.Id.toString(),
-              Quantity: (
-                (this.sourcePackageAdjustQuantity as number) / this.quantityList.length
-              ).toString(),
+              Quantity: (this.sourcePackageAdjustQuantity! / this.quantityList.length).toString(),
               UnitOfMeasureId: sourcePackage.Item.UnitOfMeasureId.toString(),
             },
           ],
@@ -467,8 +465,7 @@ export default Vue.extend({
         flattened.push({
           sourceLabel: this.sourcePackage.Label,
           sourceItem: this.sourcePackage.Item.Name,
-          sourceAdjustmentAmount:
-            (this.sourcePackageAdjustQuantity as number) / this.quantityList.length,
+          sourceAdjustmentAmount: this.sourcePackageAdjustQuantity! / this.quantityList.length,
           sourceUnitOfMeasure: this.sourcePackage.Item.UnitOfMeasureName,
           destinationLabel: tagData.Label,
           destinationAdjustmentAmount: quantity,
@@ -580,14 +577,14 @@ export default Vue.extend({
         });
       }
 
-      if (this.sourcePackageAdjustQuantity < 0) {
+      if (this.sourcePackageAdjustQuantity! < 0) {
         errors.push({
           tags: ["page2", "sourcePackageAdjustQuantity"],
           message: "Source package quantity used must be greater than 0",
         });
       }
 
-      if (this.sourcePackage && this.sourcePackageAdjustQuantity > this.sourcePackage.Quantity) {
+      if (this.sourcePackage && this.sourcePackageAdjustQuantity! > this.sourcePackage.Quantity) {
         errors.push({
           tags: ["page2", "sourcePackageAdjustQuantity"],
           message: "Source package quantity used cannot exceed the package quantity",
@@ -707,10 +704,10 @@ export default Vue.extend({
     },
     outputItem: {
       get(): IItemData | null {
-        return this.$store.state.splitPackageBuilder.outputItem;
+        return store.state.splitPackageBuilder.outputItem;
       },
       set(outputItem: IItemData | null) {
-        this.$store.dispatch(
+        store.dispatch(
           `splitPackageBuilder/${SplitPackageBuilderActions.UPDATE_SPLIT_PACKAGE_DATA}`,
           { outputItem }
         );
@@ -718,10 +715,10 @@ export default Vue.extend({
     },
     location: {
       get(): ILocationData | null {
-        return this.$store.state.splitPackageBuilder.location;
+        return store.state.splitPackageBuilder.location;
       },
       set(location: ILocationData | null) {
-        this.$store.dispatch(
+        store.dispatch(
           `splitPackageBuilder/${SplitPackageBuilderActions.UPDATE_SPLIT_PACKAGE_DATA}`,
           { location }
         );
@@ -729,10 +726,10 @@ export default Vue.extend({
     },
     note: {
       get(): string {
-        return this.$store.state.splitPackageBuilder.note;
+        return store.state.splitPackageBuilder.note;
       },
       set(note: string) {
-        this.$store.dispatch(
+        store.dispatch(
           `splitPackageBuilder/${SplitPackageBuilderActions.UPDATE_SPLIT_PACKAGE_DATA}`,
           { note }
         );
@@ -740,10 +737,10 @@ export default Vue.extend({
     },
     productionBatchNumber: {
       get(): string {
-        return this.$store.state.splitPackageBuilder.productionBatchNumber;
+        return store.state.splitPackageBuilder.productionBatchNumber;
       },
       set(productionBatchNumber: string) {
-        this.$store.dispatch(
+        store.dispatch(
           `splitPackageBuilder/${SplitPackageBuilderActions.UPDATE_SPLIT_PACKAGE_DATA}`,
           { productionBatchNumber }
         );
@@ -751,10 +748,10 @@ export default Vue.extend({
     },
     remediationDate: {
       get(): string {
-        return this.$store.state.splitPackageBuilder.remediationDate;
+        return store.state.splitPackageBuilder.remediationDate;
       },
       set(remediationDate: string) {
-        this.$store.dispatch(
+        store.dispatch(
           `splitPackageBuilder/${SplitPackageBuilderActions.UPDATE_SPLIT_PACKAGE_DATA}`,
           { remediationDate }
         );
@@ -762,10 +759,10 @@ export default Vue.extend({
     },
     remediationMethodId: {
       get(): string {
-        return this.$store.state.splitPackageBuilder.remediationMethodId;
+        return store.state.splitPackageBuilder.remediationMethodId;
       },
       set(remediationMethodId: string) {
-        this.$store.dispatch(
+        store.dispatch(
           `splitPackageBuilder/${SplitPackageBuilderActions.UPDATE_SPLIT_PACKAGE_DATA}`,
           { remediationMethodId }
         );
@@ -773,10 +770,10 @@ export default Vue.extend({
     },
     remediationSteps: {
       get(): string {
-        return this.$store.state.splitPackageBuilder.remediationSteps;
+        return store.state.splitPackageBuilder.remediationSteps;
       },
       set(remediationSteps: string) {
-        this.$store.dispatch(
+        store.dispatch(
           `splitPackageBuilder/${SplitPackageBuilderActions.UPDATE_SPLIT_PACKAGE_DATA}`,
           { remediationSteps }
         );
@@ -784,10 +781,10 @@ export default Vue.extend({
     },
     useSameItem: {
       get(): boolean {
-        return this.$store.state.splitPackageBuilder.useSameItem;
+        return store.state.splitPackageBuilder.useSameItem;
       },
       set(useSameItem: boolean) {
-        this.$store.dispatch(
+        store.dispatch(
           `splitPackageBuilder/${SplitPackageBuilderActions.UPDATE_SPLIT_PACKAGE_DATA}`,
           { useSameItem }
         );
@@ -795,10 +792,10 @@ export default Vue.extend({
     },
     isDonation: {
       get(): boolean {
-        return this.$store.state.splitPackageBuilder.isDonation;
+        return store.state.splitPackageBuilder.isDonation;
       },
       set(isDonation: boolean) {
-        this.$store.dispatch(
+        store.dispatch(
           `splitPackageBuilder/${SplitPackageBuilderActions.UPDATE_SPLIT_PACKAGE_DATA}`,
           { isDonation }
         );
@@ -806,10 +803,10 @@ export default Vue.extend({
     },
     isTradeSample: {
       get(): boolean {
-        return this.$store.state.splitPackageBuilder.isTradeSample;
+        return store.state.splitPackageBuilder.isTradeSample;
       },
       set(isTradeSample: boolean) {
-        this.$store.dispatch(
+        store.dispatch(
           `splitPackageBuilder/${SplitPackageBuilderActions.UPDATE_SPLIT_PACKAGE_DATA}`,
           { isTradeSample }
         );
@@ -817,21 +814,21 @@ export default Vue.extend({
     },
     packageIsodate: {
       get(): string {
-        return this.$store.state.splitPackageBuilder.packageIsodate;
+        return store.state.splitPackageBuilder.packageIsodate;
       },
       set(packageIsodate: string) {
-        this.$store.dispatch(
+        store.dispatch(
           `splitPackageBuilder/${SplitPackageBuilderActions.UPDATE_SPLIT_PACKAGE_DATA}`,
           { packageIsodate }
         );
       },
     },
     sourcePackageAdjustQuantity: {
-      get(): number {
-        return this.$store.state.splitPackageBuilder.sourcePackageAdjustQuantity;
+      get(): number | null {
+        return store.state.splitPackageBuilder.sourcePackageAdjustQuantity;
       },
       set(sourcePackageAdjustQuantity: number) {
-        this.$store.dispatch(
+        store.dispatch(
           `splitPackageBuilder/${SplitPackageBuilderActions.UPDATE_SPLIT_PACKAGE_DATA}`,
           { sourcePackageAdjustQuantity }
         );

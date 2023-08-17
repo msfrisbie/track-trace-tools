@@ -399,82 +399,73 @@ export default Vue.extend({
     },
     maxParentLookupDepth: {
       get(): number | null {
-        return this.$store.state.packageHistory.maxParentLookupDepth;
+        return store.state.packageHistory.maxParentLookupDepth;
       },
       set(maxParentLookupDepth: any) {
         maxParentLookupDepth = parseInt(maxParentLookupDepth as string, 10);
-        this.$store.dispatch(
-          `packageHistory/${PackageHistoryActions.SET_MAX_PARENT_LOOKUP_DEPTH}`,
-          {
-            maxParentLookupDepth:
-              typeof maxParentLookupDepth === "number" ? maxParentLookupDepth : null,
-          }
-        );
+        store.dispatch(`packageHistory/${PackageHistoryActions.SET_MAX_PARENT_LOOKUP_DEPTH}`, {
+          maxParentLookupDepth:
+            typeof maxParentLookupDepth === "number" ? maxParentLookupDepth : null,
+        });
       },
     },
     maxChildLookupDepth: {
       get(): number | null {
-        return this.$store.state.packageHistory.maxChildLookupDepth;
+        return store.state.packageHistory.maxChildLookupDepth;
       },
       set(maxChildLookupDepth: any) {
         maxChildLookupDepth = parseInt(maxChildLookupDepth as string, 10);
-        this.$store.dispatch(`packageHistory/${PackageHistoryActions.SET_MAX_CHILD_LOOKUP_DEPTH}`, {
+        store.dispatch(`packageHistory/${PackageHistoryActions.SET_MAX_CHILD_LOOKUP_DEPTH}`, {
           maxChildLookupDepth: typeof maxChildLookupDepth === "number" ? maxChildLookupDepth : null,
         });
       },
     },
     maxParentVisibleDepth: {
       get(): number {
-        return this.$store.state.packageHistory.maxParentVisibleDepth;
+        return store.state.packageHistory.maxParentVisibleDepth;
       },
       set(maxParentVisibleDepth: number) {
-        this.$store.dispatch(
-          `packageHistory/${PackageHistoryActions.SET_MAX_PARENT_VISIBLE_DEPTH}`,
-          {
-            maxParentVisibleDepth,
-          }
-        );
+        store.dispatch(`packageHistory/${PackageHistoryActions.SET_MAX_PARENT_VISIBLE_DEPTH}`, {
+          maxParentVisibleDepth,
+        });
       },
     },
     maxChildVisibleDepth: {
       get(): number {
-        return this.$store.state.packageHistory.maxChildVisibleDepth;
+        return store.state.packageHistory.maxChildVisibleDepth;
       },
       set(maxChildVisibleDepth: number) {
-        this.$store.dispatch(
-          `packageHistory/${PackageHistoryActions.SET_MAX_CHILD_VISIBLE_DEPTH}`,
-          {
-            maxChildVisibleDepth,
-          }
-        );
+        store.dispatch(`packageHistory/${PackageHistoryActions.SET_MAX_CHILD_VISIBLE_DEPTH}`, {
+          maxChildVisibleDepth,
+        });
       },
     },
     parentZoom: {
       get(): number {
-        return this.$store.state.packageHistory.parentZoom;
+        return store.state.packageHistory.parentZoom;
       },
       set(parentZoom: number) {
-        this.$store.dispatch(`packageHistory/${PackageHistoryActions.SET_PARENT_ZOOM}`, {
+        store.dispatch(`packageHistory/${PackageHistoryActions.SET_PARENT_ZOOM}`, {
           parentZoom,
         });
       },
     },
     childZoom: {
       get(): number {
-        return this.$store.state.packageHistory.childZoom;
+        return store.state.packageHistory.childZoom;
       },
       set(childZoom: number) {
-        this.$store.dispatch(`packageHistory/${PackageHistoryActions.SET_CHILD_ZOOM}`, {
+        store.dispatch(`packageHistory/${PackageHistoryActions.SET_CHILD_ZOOM}`, {
           childZoom,
         });
       },
     },
     showUnownedPackages: {
-      get(): number {
-        return this.$store.state.packageHistory.showUnownedPackages;
+      get(): boolean {
+        return store.state.packageHistory.showUnownedPackages;
       },
       set(showUnownedPackages: boolean) {
-        this.$store.dispatch(`packageHistory/${PackageHistoryActions.SET_SHOW_UNOWNED_PACKAGES}`, {
+        store.dispatch(`packageHistory/${PackageHistoryActions.SET_SHOW_UNOWNED_PACKAGES}`, {
           showUnownedPackages,
         });
       },

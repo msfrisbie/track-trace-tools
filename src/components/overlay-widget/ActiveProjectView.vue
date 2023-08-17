@@ -128,9 +128,9 @@ export default Vue.extend({
       builderManager.retryFailedRows();
     },
     openAccountView() {
-      this.$store.commit(MutationType.SET_EXPANDED_OVERLAY, true);
+      store.commit(MutationType.SET_EXPANDED_OVERLAY, true);
       pageManager.setExpandedClass();
-      this.$store.commit(MutationType.SELECT_VIEW, ToolkitView.MANAGE_ACCOUNT);
+      store.commit(MutationType.SELECT_VIEW, ToolkitView.MANAGE_ACCOUNT);
     },
   },
   data() {

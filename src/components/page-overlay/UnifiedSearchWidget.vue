@@ -149,7 +149,7 @@ export default Vue.extend({
     }),
     queryString: {
       get(): string {
-        return this.$store.state.search.queryString;
+        return store.state.search.queryString;
       },
       set(queryString: string): void {
         this.setQueryString({ queryString });

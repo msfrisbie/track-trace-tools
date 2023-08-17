@@ -652,7 +652,7 @@ export default Vue.extend({
         },
       ],
       unsavedLicenseKey: "",
-      settings: JSON.parse(JSON.stringify(this.$store.state.settings)),
+      settings: JSON.parse(JSON.stringify(store.state.settings)),
     };
   },
   computed: {
@@ -664,13 +664,13 @@ export default Vue.extend({
       return !!getMatchingDecryptedDataOrNull(this.$data.unsavedLicenseKey);
     },
     decryptedClientData() {
-      return getMatchingDecryptedDataOrNull(this.$store.state.settings?.licenseKey);
+      return getMatchingDecryptedDataOrNull(store.state.settings?.licenseKey);
     },
   },
   methods: {
     async toggleDebugMode() {
       window.location.hash = "";
-      this.$store.commit(MutationType.SET_DEBUG_MODE, !this.$store.state.debugMode);
+      store.commit(MutationType.SET_DEBUG_MODE, !store.state.debugMode);
     },
     saveLicenseKey() {
       this.$data.settings.licenseKey = this.$data.unsavedLicenseKey;
@@ -694,7 +694,7 @@ export default Vue.extend({
         settings: JSON.parse(JSON.stringify(this.settings)),
       });
 
-      this.$store.dispatch(`settings/${SettingsActions.UPDATE_SETTINGS}`, this.settings);
+      store.dispatch(`settings/${SettingsActions.UPDATE_SETTINGS}`, this.settings);
 
       toastManager.openToast(
         `T3 settings successfully updated. Refresh the page to apply changes.`,

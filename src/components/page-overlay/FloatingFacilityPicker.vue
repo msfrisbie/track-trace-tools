@@ -77,12 +77,12 @@ export default Vue.extend({
   },
   methods: {
     openSettings() {
-      this.$store.commit(MutationType.TOGGLE_EXPANDED_OVERLAY);
+      store.commit(MutationType.TOGGLE_EXPANDED_OVERLAY);
       pageManager.setExpandedClass();
-      this.$store.commit(MutationType.SELECT_VIEW, ToolkitView.SETTINGS);
+      store.commit(MutationType.SELECT_VIEW, ToolkitView.SETTINGS);
     },
     dismissFacilityPopover() {
-      const trackedInteractions = JSON.parse(JSON.stringify(this.$store.state.trackedInteractions));
+      const trackedInteractions = JSON.parse(JSON.stringify(store.state.trackedInteractions));
 
       trackedInteractions.dismissedFacilityPopover = true;
 
@@ -91,7 +91,7 @@ export default Vue.extend({
       // @ts-ignore
       this.$refs["facility-popover"].$emit("disable");
 
-      this.$store.commit(MutationType.UPDATE_TRACKED_INTERACTIONS, trackedInteractions);
+      store.commit(MutationType.UPDATE_TRACKED_INTERACTIONS, trackedInteractions);
     },
   },
 });

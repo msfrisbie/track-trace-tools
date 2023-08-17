@@ -23,7 +23,7 @@ export default Vue.extend({
   },
   data(): { selected: any; options: any } {
     return {
-      selected: this.$store.state.currentView || ToolkitView.SETTINGS,
+      selected: store.state.currentView || ToolkitView.SETTINGS,
       options: [
         {
           text: "What would you like to do?",
@@ -82,7 +82,7 @@ export default Vue.extend({
   },
   methods: {
     onChange(event: ToolkitView) {
-      this.$store.commit(MutationType.SELECT_VIEW, event);
+      store.commit(MutationType.SELECT_VIEW, event);
 
       analyticsManager.track(MessageType.SELECTED_VIEW, {
         view: event,

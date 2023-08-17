@@ -230,7 +230,7 @@ export default Vue.extend({
     },
     isPackageEligibleForTransfer(): boolean {
       return (
-        this.$store.state.packageSearch.selectedPackageMetadata?.packageData.PackageState ===
+        store.state.packageSearch.selectedPackageMetadata?.packageData.PackageState ===
         PackageState.ACTIVE
       );
     },
@@ -241,13 +241,13 @@ export default Vue.extend({
     },
     isPackageEligibleForSplit(): boolean {
       return (
-        this.$store.state.packageSearch.selectedPackageMetadata?.packageData.PackageState ===
+        store.state.packageSearch.selectedPackageMetadata?.packageData.PackageState ===
         PackageState.ACTIVE
       );
     },
     isIdentityEligibleForSplitToolsImpl(): boolean {
       return isIdentityEligibleForSplitTools({
-        identity: this.$store.state.pluginAuth.authState.identity,
+        identity: store.state.pluginAuth.authState?.identity || null,
         hostname: window.location.hostname,
       });
     },
@@ -302,7 +302,7 @@ export default Vue.extend({
     async setPackageLabelFilter(pkg: IIndexedPackageData) {
       analyticsManager.track(MessageType.SELECTED_PACKAGE);
 
-      this.$store.dispatch(
+      store.dispatch(
         `packageSearch/${PackageSearchActions.PARTIAL_UPDATE_PACKAGE_SEARCH_FILTERS}`,
         {
           packageState: pkg.PackageState,

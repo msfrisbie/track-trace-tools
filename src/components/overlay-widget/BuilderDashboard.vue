@@ -227,7 +227,7 @@ export default Vue.extend({
         tabKey,
       });
 
-      const license = this.$store.state.pluginAuth.authState?.license;
+      const license = store.state.pluginAuth.authState?.license;
 
       return `/industry/${license}/${path}?nonce=${Date.now()}#${hash}`;
     },

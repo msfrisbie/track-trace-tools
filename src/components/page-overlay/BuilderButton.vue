@@ -118,7 +118,7 @@ export default Vue.extend({
   },
   methods: {
     dismissBuilderPopover() {
-      const trackedInteractions = JSON.parse(JSON.stringify(this.$store.state.trackedInteractions));
+      const trackedInteractions = JSON.parse(JSON.stringify(store.state.trackedInteractions));
 
       trackedInteractions.dismissedBuilderPopover = true;
       trackedInteractions.dismissedToolboxPopover = true;
@@ -128,7 +128,7 @@ export default Vue.extend({
       // @ts-ignore
       this.$refs["builder-popover"].$emit("disable");
 
-      this.$store.commit(MutationType.UPDATE_TRACKED_INTERACTIONS, trackedInteractions);
+      store.commit(MutationType.UPDATE_TRACKED_INTERACTIONS, trackedInteractions);
     },
     async openBuilder() {
       modalManager.dispatchModalEvent(ModalType.BUILDER);

@@ -172,7 +172,7 @@ export default Vue.extend({
   },
   async mounted() {
     if (!this.isOnPackagesPage) {
-      // this.$store.dispatch(`packageSearch/${PackageSearchActions.SET_PACKAGE_SEARCH_FILTERS}`, {});
+      // store.dispatch(`packageSearch/${PackageSearchActions.SET_PACKAGE_SEARCH_FILTERS}`, {});
     }
   },
 });

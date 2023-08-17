@@ -30,6 +30,7 @@ import { PackageSearchActions } from "@/store/page-overlay/modules/package-searc
 import { SearchActions } from "@/store/page-overlay/modules/search/consts";
 import Vue from "vue";
 import { mapActions } from "vuex";
+import store from "@/store/page-overlay/index";
 
 export default Vue.extend({
   name: "PackageSearchResultPreview",
@@ -51,7 +52,7 @@ export default Vue.extend({
     async setPackageLabelFilter(pkg: IIndexedPackageData) {
       analyticsManager.track(MessageType.SELECTED_PACKAGE);
 
-      this.$store.dispatch(
+      store.dispatch(
         `packageSearch/${PackageSearchActions.PARTIAL_UPDATE_PACKAGE_SEARCH_FILTERS}`,
         {
           packageState: pkg.PackageState,

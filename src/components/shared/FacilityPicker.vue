@@ -152,12 +152,16 @@ export default Vue.extend({
           a.name < b.name ? -1 : a.name > b.name ? 1 : 0
         );
 
-      const homeLicense: string = this.$store.state.settings?.homeLicenses[authState.identity];
+      const homeLicense: string | null = store.state.settings.homeLicenses[authState.identity];
 
-      this.$data.facilities = [
-        ...facilities.filter((x) => x.name.endsWith(homeLicense)),
-        ...facilities.filter((x) => !x.name.endsWith(homeLicense)),
-      ];
+      this.$data.facilities = facilities;
+
+      if (homeLicense) {
+        this.$data.facilities = [
+          ...facilities.filter((x) => x.name.endsWith(homeLicense)),
+          ...facilities.filter((x) => !x.name.endsWith(homeLicense)),
+        ];
+      }
     },
     facilityHit(newFacility: IPageMetrcFacilityData) {
       analyticsManager.track(MessageType.CHANGED_FACILITY, {
@@ -208,7 +212,7 @@ export default Vue.extend({
     async setHomeLicense({ name }: { name: string }) {
       const license = getLicenseFromNameOrError(name);
 
-      this.$store.commit(`settings/${SettingsMutations.SET_HOME_LICENSE}`, [
+      store.commit(`settings/${SettingsMutations.SET_HOME_LICENSE}`, [
         this.$data.identity,
         license,
       ]);
@@ -230,10 +234,7 @@ export default Vue.extend({
       });
     },
     async unsetHomeLicense() {
-      this.$store.commit(`settings/${SettingsMutations.SET_HOME_LICENSE}`, [
-        this.$data.identity,
-        null,
-      ]);
+      store.commit(`settings/${SettingsMutations.SET_HOME_LICENSE}`, [this.$data.identity, null]);
 
       this.updateFacilityList();
 

@@ -192,21 +192,21 @@ export default Vue.extend({
       explorer: (state: IPluginState) => state.explorer,
     }),
     queryString: {
-      get(): ExplorerTarget | null {
-        return this.$store.state.explorer.queryString;
+      get(): string | null {
+        return store.state.explorer.queryString;
       },
       set(queryString: string) {
-        this.$store.dispatch(`explorer/${ExplorerActions.SET_QUERY}`, {
+        store.dispatch(`explorer/${ExplorerActions.SET_QUERY}`, {
           queryString: queryString.trim() || "",
         });
       },
     },
     targetType: {
       get(): ExplorerTargetType {
-        return this.$store.state.explorer.targetType;
+        return store.state.explorer.targetType;
       },
       set(targetType: ExplorerTargetType) {
-        this.$store.dispatch(`explorer/${ExplorerActions.SET_TARGET_TYPE}`, {
+        store.dispatch(`explorer/${ExplorerActions.SET_TARGET_TYPE}`, {
           targetType,
         });
       },

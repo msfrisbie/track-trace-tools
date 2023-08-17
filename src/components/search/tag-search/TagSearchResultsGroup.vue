@@ -103,10 +103,10 @@ export default Vue.extend({
         };
 
         if (
-          !this.$store.state.tagSearch.selectedTagMetadata ||
-          this.$store.state.tagSearch.selectedTagMetadata.priority >= candidateMetadata.priority
+          !store.state.tagSearch.selectedTagMetadata ||
+          store.state.tagSearch.selectedTagMetadata.priority >= candidateMetadata.priority
         ) {
-          this.$store.state.tagSearch.selectedTagMetadata = candidateMetadata;
+          store.state.tagSearch.selectedTagMetadata = candidateMetadata;
         }
 
         // searchManager.selectedTag
@@ -161,7 +161,7 @@ export default Vue.extend({
       setShowSearchResults: `search/${SearchActions.SET_SHOW_SEARCH_RESULTS}`,
     }),
     showTagDetail(tagData: IIndexedTagData) {
-      this.$store.state.tagSearch.selectedTagMetadata = {
+      store.state.tagSearch.selectedTagMetadata = {
         tagData,
         sectionName: this.sectionName,
         priority: this.sectionPriority,
@@ -172,9 +172,9 @@ export default Vue.extend({
         return;
       }
 
-      this.$store.dispatch(`tagSearch/${TagSearchActions.PARTIAL_UPDATE_TAG_SEARCH_FILTERS}`, {
+      store.dispatch(`tagSearch/${TagSearchActions.PARTIAL_UPDATE_TAG_SEARCH_FILTERS}`, {
         tagSearchFilters: {
-          [this.tagFilterIdentifier]: this.$store.state.search.queryString,
+          [this.tagFilterIdentifier]: store.state.search.queryString,
         },
       });
 

@@ -134,7 +134,7 @@ export default Vue.extend({
           backgroundColor: "gray",
           text: "T3+",
           icon: "plus",
-          visible: !this.$store.state.client.values["ENABLE_T3PLUS"],
+          visible: !store.state.client.values["ENABLE_T3PLUS"],
           enabled: true,
           isBeta: false,
           isNew: false,

@@ -25,26 +25,16 @@
           placeholder="1A4400000000000000000010"
         />
 
-        <p class="text-red-400" v-if="endTagInvalid">
-          {{ form.endTag }} is not a valid Metrc tag
-        </p>
+        <p class="text-red-400" v-if="endTagInvalid">{{ form.endTag }} is not a valid Metrc tag</p>
       </b-form-group>
 
-      <p
-        class="text-red-400"
-        v-if="!startTagInvalid && !endTagInvalid && isInvalidTagRange"
-      >
-        This doesn't look like a valid tag range. <br />Make sure the start tag
-        has a lower number than the end tag.
+      <p class="text-red-400" v-if="!startTagInvalid && !endTagInvalid && isInvalidTagRange">
+        This doesn't look like a valid tag range. <br />Make sure the start tag has a lower number
+        than the end tag.
       </p>
 
       <b-form-group id="input-group-3" label="Note:" label-for="input-3">
-        <b-form-textarea
-          id="input-3"
-          v-model="form.note"
-          type="text"
-          required
-        ></b-form-textarea>
+        <b-form-textarea id="input-3" v-model="form.note" type="text" required></b-form-textarea>
       </b-form-group>
 
       <div class="mt-6">
@@ -118,9 +108,7 @@ export default Vue.extend({
   async mounted() {
     await authManager.authStateOrError();
 
-    this.activePackages = (await primaryDataLoader.activePackages()).map(
-      (pkg) => pkg.Label
-    );
+    this.activePackages = (await primaryDataLoader.activePackages()).map((pkg) => pkg.Label);
   },
   data(): { activePackages: any; form: PackageNoteTask } {
     return {
@@ -138,11 +126,8 @@ export default Vue.extend({
 
       evt.preventDefault();
 
-      for (let tag of generateTagRangeOrError(
-        this.form.startTag,
-        this.form.endTag
-      )) {
-        this.$store.commit(
+      for (let tag of generateTagRangeOrError(this.form.startTag, this.form.endTag)) {
+        store.commit(
           MutationType.ENQUEUE_TASK,
           await createTask(TaskType.ADD_PACKAGE_NOTE, {
             tag,
@@ -155,4 +140,3 @@ export default Vue.extend({
   },
 });
 </script>
-

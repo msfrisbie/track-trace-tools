@@ -94,20 +94,20 @@ export default Vue.extend({
 
       return true;
     },
-    ...mapState(["currentView"])
+    ...mapState(["currentView"]),
   },
   async mounted() {
     await authManager.authStateOrError();
 
-    this.availableTags = (await primaryDataLoader.availableTags({})).map(tag => tag.Label);
+    this.availableTags = (await primaryDataLoader.availableTags({})).map((tag) => tag.Label);
   },
   data(): { form: TaskForm; availableTags: any } {
     return {
       availableTags: [],
       form: {
         startTag: "",
-        endTag: ""
-      } as TaskForm
+        endTag: "",
+      } as TaskForm,
     };
   },
   methods: {
@@ -121,15 +121,15 @@ export default Vue.extend({
       analyticsManager.track(MessageType.VOIDED_TAGS);
 
       for (let tag of generateTagRangeOrError(this.form.startTag, this.form.endTag)) {
-        this.$store.commit(
+        store.commit(
           MutationType.ENQUEUE_TASK,
           await createTask(TaskType.VOID_TAGS, {
-            tag
+            tag,
           })
         );
       }
     },
-    onReset(evt: any) {}
-  }
+    onReset(evt: any) {},
+  },
 });
 </script>

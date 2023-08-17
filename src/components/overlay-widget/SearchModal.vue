@@ -48,7 +48,7 @@ export default Vue.extend({
     handleOpen() {
       analyticsManager.track(MessageType.OPENED_SEARCH_MODAL);
 
-      this.$store.state.search.modalSearchOpen = true;
+      store.state.search.modalSearchOpen = true;
 
       // @ts-ignore
       this.$refs.unifiedsearch!.setFocus();
@@ -56,7 +56,7 @@ export default Vue.extend({
     handleClose() {
       analyticsManager.track(MessageType.CLOSED_SEARCH_MODAL);
 
-      this.$store.state.search.modalSearchOpen = false;
+      store.state.search.modalSearchOpen = false;
     },
   },
   async mounted() {},

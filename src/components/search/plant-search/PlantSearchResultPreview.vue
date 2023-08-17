@@ -29,6 +29,7 @@ import { PlantSearchActions } from "@/store/page-overlay/modules/plant-search/co
 import { SearchActions } from "@/store/page-overlay/modules/search/consts";
 import Vue from "vue";
 import { mapActions } from "vuex";
+import store from "@/store/page-overlay/index";
 
 export default Vue.extend({
   name: "PlantSearchResultPreview",
@@ -50,15 +51,12 @@ export default Vue.extend({
     async setPlantLabelFilter(plant: IIndexedPlantData) {
       analyticsManager.track(MessageType.SELECTED_PLANT);
 
-      this.$store.dispatch(
-        `plantSearch/${PlantSearchActions.PARTIAL_UPDATE_PLANT_SEARCH_FILTERS}`,
-        {
-          plantState: plant.PlantState,
-          plantSearchFilters: {
-            label: plant.Label,
-          },
-        }
-      );
+      store.dispatch(`plantSearch/${PlantSearchActions.PARTIAL_UPDATE_PLANT_SEARCH_FILTERS}`, {
+        plantState: plant.PlantState,
+        plantSearchFilters: {
+          label: plant.Label,
+        },
+      });
 
       this.setShowSearchResults({ showSearchResults: false });
     },

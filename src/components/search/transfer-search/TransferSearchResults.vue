@@ -87,9 +87,8 @@ export default Vue.extend({
     ...mapGetters({}),
     filtersApplied() {
       return (
-        Object.values(this.$store.state.transferSearchState.transferSearchFilters || {}).filter(
-          (x) => !!x
-        ).length > 0
+        Object.values(store.state.transferSearch.transferSearchFilters || {}).filter((x) => !!x)
+          .length > 0
       );
     },
   },

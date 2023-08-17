@@ -70,6 +70,7 @@ import { mapState } from "vuex";
 import TransferSearchResultsGroup from "@/components/search/transfer-search/TransferSearchResultsGroup.vue";
 import TransferSearchFiltersVue from "./TransferSearchFilters.vue";
 import { searchManager } from "@/modules/search-manager.module";
+import store from "@/store/page-overlay/index";
 
 export default Vue.extend({
   name: "TransferResultGroups",
@@ -120,7 +121,7 @@ export default Vue.extend({
     },
     deliveryFacilitiesTransfers(): IIndexedTransferData[] {
       const transfers = this.transfers.filter((transferData: IIndexedTransferData) =>
-        transferData.DeliveryFacilities.includes(this.$store.state.search.queryString)
+        transferData.DeliveryFacilities.includes(store.state.search.queryString)
       );
 
       return transfers;
@@ -159,7 +160,7 @@ export default Vue.extend({
         this.$props.transfer.ManifestNumber
       );
 
-      this.$store.commit(`transferSearch/${MutationType.SET_SHOW_TRANSFER_SEARCH_RESULTS}`, false);
+      store.commit(`transferSearch/${MutationType.SET_SHOW_TRANSFER_SEARCH_RESULTS}`, false);
     },
   },
 });

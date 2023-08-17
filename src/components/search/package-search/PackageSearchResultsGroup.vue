@@ -103,11 +103,10 @@ export default Vue.extend({
         };
 
         if (
-          !this.$store.state.packageSearch.selectedPackageMetadata ||
-          this.$store.state.packageSearch.selectedPackageMetadata.priority >=
-            candidateMetadata.priority
+          !store.state.packageSearch.selectedPackageMetadata ||
+          store.state.packageSearch.selectedPackageMetadata.priority >= candidateMetadata.priority
         ) {
-          (this.$store as Store<IPluginState>).state.packageSearch.selectedPackageMetadata =
+          (store as Store<IPluginState>).state.packageSearch.selectedPackageMetadata =
             candidateMetadata;
         }
 
@@ -170,7 +169,7 @@ export default Vue.extend({
       setShowSearchResults: `search/${SearchActions.SET_SHOW_SEARCH_RESULTS}`,
     }),
     showPackageDetail(packageData: IIndexedPackageData) {
-      this.$store.state.packageSearch.selectedPackageMetadata = {
+      store.state.packageSearch.selectedPackageMetadata = {
         packageData,
         sectionName: this.sectionName,
         priority: this.sectionPriority,
@@ -188,11 +187,11 @@ export default Vue.extend({
         return;
       }
 
-      this.$store.dispatch(
+      store.dispatch(
         `packageSearch/${PackageSearchActions.PARTIAL_UPDATE_PACKAGE_SEARCH_FILTERS}`,
         {
           packageSearchFilters: {
-            [this.packageFilterIdentifier]: this.$store.state.search.queryString,
+            [this.packageFilterIdentifier]: store.state.search.queryString,
           },
         }
       );

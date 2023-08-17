@@ -32,7 +32,7 @@ export default Vue.extend({
   },
   methods: {
     toggleOverlay(event: any) {
-      this.$store.commit(MutationType.TOGGLE_EXPANDED_OVERLAY);
+      store.commit(MutationType.TOGGLE_EXPANDED_OVERLAY);
       pageManager.setExpandedClass();
     },
   },

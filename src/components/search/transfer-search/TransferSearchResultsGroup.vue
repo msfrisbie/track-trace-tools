@@ -83,11 +83,10 @@ export default Vue.extend({
         };
 
         if (
-          !this.$store.state.transferSearch.selectedTransferMetadata ||
-          this.$store.state.transferSearch.selectedTransferMetadata.priority >=
-            candidateMetadata.priority
+          !store.state.transferSearch.selectedTransferMetadata ||
+          store.state.transferSearch.selectedTransferMetadata.priority >= candidateMetadata.priority
         ) {
-          this.$store.state.transferSearch.selectedTransferMetadata = candidateMetadata;
+          store.state.transferSearch.selectedTransferMetadata = candidateMetadata;
         }
 
         // searchManager.selectedTransfer
@@ -138,7 +137,7 @@ export default Vue.extend({
       //   priority: this.sectionPriority,
       // });
 
-      this.$store.state.transferSearch.selectedTransferMetadata = {
+      store.state.transferSearch.selectedTransferMetadata = {
         transferData,
         sectionName: this.sectionName,
         priority: this.sectionPriority,

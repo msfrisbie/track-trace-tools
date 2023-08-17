@@ -56,7 +56,7 @@ export default Vue.extend({
   computed: mapState(["trackedInteractions", "settings"]),
   methods: {
     dismissScreenshotPopover() {
-      const trackedInteractions = JSON.parse(JSON.stringify(this.$store.state.trackedInteractions));
+      const trackedInteractions = JSON.parse(JSON.stringify(store.state.trackedInteractions));
 
       trackedInteractions.dismissedScreenshotPopover = true;
 
@@ -65,7 +65,7 @@ export default Vue.extend({
       // @ts-ignore
       this.$refs["screenshot-popover"].$emit("disable");
 
-      this.$store.commit(MutationType.UPDATE_TRACKED_INTERACTIONS, trackedInteractions);
+      store.commit(MutationType.UPDATE_TRACKED_INTERACTIONS, trackedInteractions);
     },
     async takeScreenshot() {
       // if (!(await accountManager.accountEnabled())) {
@@ -81,7 +81,7 @@ export default Vue.extend({
       screenshotManager.takeScreenshot({
         downloadFile: false,
         useBackground: true,
-        useLegacyScreenshot: this.$store.state.settings?.useLegacyScreenshot,
+        useLegacyScreenshot: store.state.settings?.useLegacyScreenshot,
       });
     },
   },

@@ -29,6 +29,7 @@ import { SearchActions } from "@/store/page-overlay/modules/search/consts";
 import { TagSearchActions } from "@/store/page-overlay/modules/tag-search/consts";
 import Vue from "vue";
 import { mapActions } from "vuex";
+import store from "@/store/page-overlay/index";
 
 export default Vue.extend({
   name: "TagSearchResultPreview",
@@ -50,7 +51,7 @@ export default Vue.extend({
     async setTagLabelFilter(tag: IIndexedTagData) {
       analyticsManager.track(MessageType.SELECTED_TAG);
 
-      this.$store.dispatch(`tagSearch/${TagSearchActions.PARTIAL_UPDATE_TAG_SEARCH_FILTERS}`, {
+      store.dispatch(`tagSearch/${TagSearchActions.PARTIAL_UPDATE_TAG_SEARCH_FILTERS}`, {
         tagState: tag.TagState,
         tagSearchFilters: {
           label: tag.Label,

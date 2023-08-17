@@ -78,24 +78,18 @@ export default Vue.extend({
     };
   },
   mounted() {
-    this.$store.commit(MutationType.SET_FINALIZE_SALES_RECEIPTS_READOUT, "");
+    store.commit(MutationType.SET_FINALIZE_SALES_RECEIPTS_READOUT, "");
   },
   computed: {
     ...mapState<IPluginState>(["backgroundTasks"]),
     isBackgroundTaskRunning() {
-      return (
-        this.$store.state.backgroundTasks.finalizeSalesReceiptsState === BackgroundTaskState.RUNNING
-      );
+      return store.state.backgroundTasks.finalizeSalesReceiptsState === BackgroundTaskState.RUNNING;
     },
     isBackgroundTaskSuccess() {
-      return (
-        this.$store.state.backgroundTasks.finalizeSalesReceiptsState === BackgroundTaskState.SUCCESS
-      );
+      return store.state.backgroundTasks.finalizeSalesReceiptsState === BackgroundTaskState.SUCCESS;
     },
     isBackgroundTaskError() {
-      return (
-        this.$store.state.backgroundTasks.finalizeSalesReceiptsState === BackgroundTaskState.ERROR
-      );
+      return store.state.backgroundTasks.finalizeSalesReceiptsState === BackgroundTaskState.ERROR;
     },
   },
   destroyed() {},
@@ -103,7 +97,7 @@ export default Vue.extend({
     setStopIsodate(stopIsodate: string): void {
       console.log(stopIsodate);
 
-      this.$store.commit(MutationType.SET_FINALIZE_SALES_RECEIPTS_STOP_DATE, stopIsodate);
+      store.commit(MutationType.SET_FINALIZE_SALES_RECEIPTS_STOP_DATE, stopIsodate);
     },
     startFinalizer(): void {
       this.$data.runningTotal = 0;

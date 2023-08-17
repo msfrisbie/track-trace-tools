@@ -575,10 +575,9 @@ export default Vue.extend({
 
         this.setShowSearchResults({ showSearchResults: true });
       } else {
-        this.$store.dispatch(
-          `packageSearch/${PackageSearchActions.SET_EXPAND_SEARCH_ON_NEXT_LOAD}`,
-          { expandSearchOnNextLoad: true }
-        );
+        store.dispatch(`packageSearch/${PackageSearchActions.SET_EXPAND_SEARCH_ON_NEXT_LOAD}`, {
+          expandSearchOnNextLoad: true,
+        });
 
         window.location.href = this.packagesUrl;
       }
@@ -1111,124 +1110,124 @@ export default Vue.extend({
       return this.calculateErrors();
     },
     transferBuilderState(): ITransferBuilderState {
-      return this.$store.state.transferBuilder;
+      return store.state.transferBuilder;
     },
     transferType: {
       get(): IMetrcTransferType | null {
-        return this.$store.state.transferBuilder.transferType;
+        return store.state.transferBuilder.transferType;
       },
       set(transferType: IMetrcTransferType | null) {
-        this.$store.dispatch(`transferBuilder/${TransferBuilderActions.UPDATE_TRANSFER_DATA}`, {
+        store.dispatch(`transferBuilder/${TransferBuilderActions.UPDATE_TRANSFER_DATA}`, {
           transferType,
         });
       },
     } as IComputedGetSet<IMetrcTransferType | null>,
     originFacility: {
       get(): IMetrcFacilityData | null {
-        return this.$store.state.transferBuilder.originFacility;
+        return store.state.transferBuilder.originFacility;
       },
       set(originFacility) {
-        this.$store.dispatch(`transferBuilder/${TransferBuilderActions.UPDATE_TRANSFER_DATA}`, {
+        store.dispatch(`transferBuilder/${TransferBuilderActions.UPDATE_TRANSFER_DATA}`, {
           originFacility,
         });
       },
     } as IComputedGetSet<IMetrcFacilityData | null>,
     phoneNumberForQuestions: {
       get(): string {
-        return this.$store.state.transferBuilder.phoneNumberForQuestions;
+        return store.state.transferBuilder.phoneNumberForQuestions;
       },
       set(phoneNumberForQuestions) {
-        this.$store.dispatch(`transferBuilder/${TransferBuilderActions.UPDATE_TRANSFER_DATA}`, {
+        store.dispatch(`transferBuilder/${TransferBuilderActions.UPDATE_TRANSFER_DATA}`, {
           phoneNumberForQuestions,
         });
       },
     } as IComputedGetSet<string>,
     destinationFacility: {
       get(): IMetrcFacilityData | null {
-        return this.$store.state.transferBuilder.destinationFacility;
+        return store.state.transferBuilder.destinationFacility;
       },
       set(destinationFacility) {
-        this.$store.dispatch(`transferBuilder/${TransferBuilderActions.UPDATE_TRANSFER_DATA}`, {
+        store.dispatch(`transferBuilder/${TransferBuilderActions.UPDATE_TRANSFER_DATA}`, {
           destinationFacility,
         });
       },
     } as IComputedGetSet<IMetrcFacilityData | null>,
     transporterFacility: {
       get(): IMetrcFacilityData | null {
-        return this.$store.state.transferBuilder.transporterFacility;
+        return store.state.transferBuilder.transporterFacility;
       },
       set(transporterFacility) {
-        this.$store.dispatch(`transferBuilder/${TransferBuilderActions.UPDATE_TRANSFER_DATA}`, {
+        store.dispatch(`transferBuilder/${TransferBuilderActions.UPDATE_TRANSFER_DATA}`, {
           transporterFacility,
         });
       },
     } as IComputedGetSet<IMetrcFacilityData | null>,
     wholesalePackageValues: {
       get() {
-        return this.$store.state.transferBuilder.wholesalePackageValues;
+        return store.state.transferBuilder.wholesalePackageValues;
       },
       set(wholesalePackageValues) {
-        this.$store.dispatch(`transferBuilder/${TransferBuilderActions.UPDATE_TRANSFER_DATA}`, {
+        store.dispatch(`transferBuilder/${TransferBuilderActions.UPDATE_TRANSFER_DATA}`, {
           wholesalePackageValues,
         });
       },
     } as IComputedGetSet<number[]>,
     packageGrossWeights: {
       get() {
-        return this.$store.state.transferBuilder.packageGrossWeights;
+        return store.state.transferBuilder.packageGrossWeights;
       },
       set(packageGrossWeights) {
-        this.$store.dispatch(`transferBuilder/${TransferBuilderActions.UPDATE_TRANSFER_DATA}`, {
+        store.dispatch(`transferBuilder/${TransferBuilderActions.UPDATE_TRANSFER_DATA}`, {
           packageGrossWeights,
         });
       },
     } as IComputedGetSet<number[]>,
     packageGrossUnitsOfWeight: {
       get() {
-        return this.$store.state.transferBuilder.packageGrossUnitsOfWeight;
+        return store.state.transferBuilder.packageGrossUnitsOfWeight;
       },
       set(packageGrossUnitsOfWeight) {
-        this.$store.dispatch(`transferBuilder/${TransferBuilderActions.UPDATE_TRANSFER_DATA}`, {
+        store.dispatch(`transferBuilder/${TransferBuilderActions.UPDATE_TRANSFER_DATA}`, {
           packageGrossUnitsOfWeight,
         });
       },
     } as IComputedGetSet<IUnitOfMeasure[]>,
     destinationGrossWeight: {
       get() {
-        return this.$store.state.transferBuilder.destinationGrossWeight;
+        return store.state.transferBuilder.destinationGrossWeight;
       },
       set(destinationGrossWeight) {
-        this.$store.dispatch(`transferBuilder/${TransferBuilderActions.UPDATE_TRANSFER_DATA}`, {
+        store.dispatch(`transferBuilder/${TransferBuilderActions.UPDATE_TRANSFER_DATA}`, {
           destinationGrossWeight,
         });
       },
     } as IComputedGetSet<number>,
     destinationGrossUnitOfWeight: {
       get() {
-        return this.$store.state.transferBuilder.destinationGrossUnitOfWeight;
+        return store.state.transferBuilder.destinationGrossUnitOfWeight;
       },
       set(destinationGrossUnitOfWeight) {
-        this.$store.dispatch(`transferBuilder/${TransferBuilderActions.UPDATE_TRANSFER_DATA}`, {
+        store.dispatch(`transferBuilder/${TransferBuilderActions.UPDATE_TRANSFER_DATA}`, {
           destinationGrossUnitOfWeight,
         });
       },
     } as IComputedGetSet<IUnitOfMeasure>,
     isSameSiteTransfer: {
       get(): boolean {
-        return this.$store.state.transferBuilder.isSameSiteTransfer;
+        return store.state.transferBuilder.isSameSiteTransfer;
       },
       set(isSameSiteTransfer) {
-        this.$store.dispatch(`transferBuilder/${TransferBuilderActions.UPDATE_TRANSFER_DATA}`, {
+        store.dispatch(`transferBuilder/${TransferBuilderActions.UPDATE_TRANSFER_DATA}`, {
           isSameSiteTransfer,
         });
       },
     } as IComputedGetSet<boolean>,
     transferForUpdate: {
       get(): IIndexedTransferData | null {
-        return this.$store.state.transferBuilder.transferForUpdate;
+        return store.state.transferBuilder.transferForUpdate;
       },
       set(transferForUpdate) {
-        this.$store.dispatch(`transferBuilder/${TransferBuilderActions.SET_TRANSFER_FOR_UPDATE}`, {
+        store.dispatch(`transferBuilder/${TransferBuilderActions.SET_TRANSFER_FOR_UPDATE}`, {
           transferForUpdate,
         });
       },
@@ -1315,7 +1314,7 @@ export default Vue.extend({
     this.$data.unitsOfWeight = await dynamicConstsManager.unitsOfWeight();
 
     try {
-      // this.$store.dispatch(`transferBuilder/${TransferBuilderActions.REFRESH_PACKAGES}`);
+      // store.dispatch(`transferBuilder/${TransferBuilderActions.REFRESH_PACKAGES}`);
 
       this.$data.transferTypes = await dynamicConstsManager.transferTypes();
       if (!this.transferType) {

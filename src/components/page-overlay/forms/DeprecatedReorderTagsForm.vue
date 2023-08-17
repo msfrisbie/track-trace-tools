@@ -2,12 +2,7 @@
   <div class="flex flex-column-shim flex-col">
     <b-form @submit="onSubmit" @reset="onReset" autocomplete="off">
       <div class="flex flex-row space-x-4">
-        <b-form-group
-          id="input-group-1"
-          label="Plant tags:"
-          label-for="input-1"
-          class="flex-grow"
-        >
+        <b-form-group id="input-group-1" label="Plant tags:" label-for="input-1" class="flex-grow">
           <b-input
             id="input-1"
             v-model="form.plantTagCount"
@@ -33,85 +28,43 @@
             type="number"
             required
           />
-          <b-form-text
-            >Max: {{ maxOrderSizes.maxPackageOrderSize }}</b-form-text
-          >
+          <b-form-text>Max: {{ maxOrderSizes.maxPackageOrderSize }}</b-form-text>
         </b-form-group>
       </div>
 
       <div class="flex flex-row space-x-4">
-        <b-form-group
-          id="input-group-3"
-          label="Contact Name"
-          label-for="input-3"
-        >
-          <b-input
-            id="input-3"
-            v-model="form.contactInfo.contactName"
-            type="text"
-            required
-          />
+        <b-form-group id="input-group-3" label="Contact Name" label-for="input-3">
+          <b-input id="input-3" v-model="form.contactInfo.contactName" type="text" required />
         </b-form-group>
 
         <b-form-group id="input-group-4" label="Phone #" label-for="input-4">
-          <b-input
-            id="input-4"
-            v-model="form.contactInfo.phoneNumber"
-            type="text"
-            required
-          />
+          <b-input id="input-4" v-model="form.contactInfo.phoneNumber" type="text" required />
         </b-form-group>
       </div>
 
       <b-form-group id="input-group-5" label="Address 1" label-for="input-5">
-        <b-input
-          id="input-5"
-          v-model="form.contactInfo.address.address1"
-          type="text"
-          required
-        />
+        <b-input id="input-5" v-model="form.contactInfo.address.address1" type="text" required />
       </b-form-group>
 
       <b-form-group id="input-group-6" label="Address 2" label-for="input-6">
-        <b-input
-          id="input-6"
-          v-model="form.contactInfo.address.address2"
-          type="text"
-        />
+        <b-input id="input-6" v-model="form.contactInfo.address.address2" type="text" />
       </b-form-group>
 
       <div class="flex flex-row space-x-4">
         <b-form-group id="input-group-7" label="City" label-for="input-7">
-          <b-input
-            id="input-7"
-            v-model="form.contactInfo.address.city"
-            type="text"
-            required
-          />
+          <b-input id="input-7" v-model="form.contactInfo.address.city" type="text" required />
         </b-form-group>
 
         <b-form-group id="input-group-8" label="State" label-for="input-8">
-          <b-input
-            id="input-8"
-            v-model="form.contactInfo.address.state"
-            type="text"
-            required
-          />
+          <b-input id="input-8" v-model="form.contactInfo.address.state" type="text" required />
         </b-form-group>
 
         <b-form-group id="input-group-9" label="Zip" label-for="input-9">
-          <b-input
-            id="input-9"
-            v-model="form.contactInfo.address.zip"
-            type="text"
-            required
-          />
+          <b-input id="input-9" v-model="form.contactInfo.address.zip" type="text" required />
         </b-form-group>
       </div>
 
-      <b-button type="submit" variant="primary" class="mt-2"
-        >REORDER TAGS</b-button
-      >
+      <b-button type="submit" variant="primary" class="mt-2">REORDER TAGS</b-button>
     </b-form>
   </div>
 </template>
@@ -144,13 +97,10 @@ export default Vue.extend({
   async mounted() {
     await authManager.authStateOrError();
 
-    const previousTagOrders: Array<ITagOrderData> =
-      await primaryDataLoader.previousTagOrders();
+    const previousTagOrders: Array<ITagOrderData> = await primaryDataLoader.previousTagOrders();
 
     for (let previousTagOrder of previousTagOrders) {
-      this.contactInfos.push(
-        extractIContactInfoFromITagOrderData(previousTagOrder)
-      );
+      this.contactInfos.push(extractIContactInfoFromITagOrderData(previousTagOrder));
     }
 
     const tagOrderData: IExtractedITagOrderData =
@@ -207,12 +157,9 @@ export default Vue.extend({
 
       analyticsManager.track(MessageType.REORDERED_TAGS);
 
-      this.$store.commit(
+      store.commit(
         MutationType.ENQUEUE_TASK,
-        await createTask(
-          TaskType.REORDER_TAGS,
-          JSON.parse(JSON.stringify(this.form))
-        )
+        await createTask(TaskType.REORDER_TAGS, JSON.parse(JSON.stringify(this.form)))
       );
     },
     onReset(evt: any) {},

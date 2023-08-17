@@ -1572,7 +1572,7 @@ export default Vue.extend({
         cogsV2FormFilters: this.cogsV2FormFilters,
       });
 
-      this.$store.dispatch(`reports/${ReportsActions.RUN_AUX_REPORT_TASK}`, {
+      store.dispatch(`reports/${ReportsActions.RUN_AUX_REPORT_TASK}`, {
         auxTask: ReportAuxTask.UPDATE_MASTER_COST_SHEET,
         reportConfig,
       });
