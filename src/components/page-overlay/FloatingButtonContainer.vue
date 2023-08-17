@@ -6,7 +6,7 @@
       <debug-button />
     </template>
 
-    <template v-if="pluginAuth.authState">
+    <template v-if="authState">
       <div class="flex flex-row gap-2 floating-hover-reveal-target">
         <search-button class="floating-shadow"></search-button>
 
@@ -14,7 +14,7 @@
       </div>
 
       <!-- TODO enable when T3+ signup is ready -->
-      <plus-button v-if="false && !hasT3plus" class="floating-shadow" />
+      <plus-button v-if="false && !clientValues['ENABLE_T3PLUS']" class="floating-shadow" />
 
       <builder-button class="floating-shadow" />
     </template>
@@ -34,6 +34,7 @@ import store from "@/store/page-overlay/index";
 import Vue from "vue";
 import { mapState } from "vuex";
 import { clientBuildManager } from "@/modules/client-build-manager.module";
+import { IPluginState } from "@/interfaces";
 
 export default Vue.extend({
   name: "FloatingButtonContainer",
@@ -46,30 +47,20 @@ export default Vue.extend({
     SearchButton,
     PlusButton,
   },
-  async mounted() {
-    this.checkT3plus();
-  },
+  async mounted() {},
   data() {
-    return {
-      hasT3plus: true,
-    };
+    return {};
   },
   computed: {
-    ...mapState(["pluginAuth", "trackedInteractions", "settings", "debugMode"]),
+    ...mapState<IPluginState>({
+      authState: (state: IPluginState) => state.pluginAuth.authState,
+      oAuthState: (state: IPluginState) => state.pluginAuth.oAuthState,
+      clientValues: (state: IPluginState) => state.client.values,
+      debugMode: (state: IPluginState) => state.debugMode,
+    }),
   },
-  methods: {
-    checkT3plus() {
-      this.$data.hasT3plus = clientBuildManager.assertValues(["ENABLE_T3PLUS"]);
-    },
-  },
-  watch: {
-    "settings.licenseKey": {
-      immediate: true,
-      handler() {
-        this.checkT3plus();
-      },
-    },
-  },
+  methods: {},
+  watch: {},
 });
 </script>
 

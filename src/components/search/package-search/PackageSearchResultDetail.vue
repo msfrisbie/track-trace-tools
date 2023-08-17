@@ -255,7 +255,7 @@ export default Vue.extend({
       isPackageInActiveList: `transferBuilder/${TransferBuilderGetters.IS_PACKAGE_IN_ACTIVE_LIST}`,
     }),
     t3plusEnabled() {
-      return clientBuildManager.assertValues(["ENABLE_T3PLUS"]);
+      return store.state.client.values["ENABLE_T3PLUS"];
     },
   },
   watch: {},

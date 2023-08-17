@@ -8,7 +8,7 @@ import {
   IPluginState,
 } from "@/interfaces";
 import { analyticsManager } from "@/modules/analytics-manager.module";
-import { clientBuildManager } from "@/modules/client-build-manager.module";
+import store from "@/store/page-overlay/index";
 import {
   getChildPackageHistoryTree,
   getParentHarvests,
@@ -290,7 +290,7 @@ export const packageHistoryModule = {
     ) => {
       analyticsManager.track(MessageType.GENERATE_PACKAGE_HISTORY, { pkg });
 
-      if (!clientBuildManager.assertValues(["ENABLE_T3PLUS"])) {
+      if (!store.state.client.values["ENABLE_T3PLUS"]) {
         return;
       }
 

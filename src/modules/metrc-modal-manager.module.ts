@@ -1,5 +1,6 @@
 import { DOLLAR_NUMBER_REGEX, MessageType, METRC_TAG_REGEX, WEIGHT_NUMBER_REGEX } from "@/consts";
 import { IAtomicService } from "@/interfaces";
+import store from "@/store/page-overlay/index";
 import { debugLogFactory } from "@/utils/debug";
 import { activeMetrcModalOrNull, modalTitleOrError } from "@/utils/metrc-modal";
 import * as Papa from "papaparse";
@@ -35,14 +36,8 @@ class MetrcModalManager implements IAtomicService {
   // Idempotent method that manages the contents of the modal
   // each time the DOM changes
   maybeAddWidgetsAndListenersToModal() {
-    if (!clientBuildManager.clientConfig) {
-      return;
-    }
-
-    let values;
-
     try {
-      values = clientBuildManager.validateAndGetValuesOrError(clientKeys);
+      clientBuildManager.validateAndGetValuesOrError(clientKeys);
     } catch (e) {
       return;
     }
@@ -60,29 +55,31 @@ class MetrcModalManager implements IAtomicService {
       case NEW_LICENSED_TRANSFER_TITLE:
       case EDIT_LICENSED_TRANSFER_TITLE:
         const destinations: HTMLElement[] = [
-          ...modal.querySelectorAll(values.DESTINATION_SELECTOR),
+          ...modal.querySelectorAll(store.state.client.values["DESTINATION_SELECTOR"]),
         ] as HTMLElement[];
 
         for (const destination of destinations) {
           const csvInputContainer: HTMLElement | null = destination.querySelector(
-            values.CSV_INPUT_CONTAINER_SELECTOR
+            store.state.client.values["CSV_INPUT_CONTAINER_SELECTOR"]
           );
 
           if (!csvInputContainer) {
             throw new Error("Unable to match CSV input container");
           }
 
-          let tttContainer = csvInputContainer.querySelector(`[${values.TTT_CONTAINER_ATTRIBUTE}]`);
+          let tttContainer = csvInputContainer.querySelector(
+            `[${store.state.client.values["TTT_CONTAINER_ATTRIBUTE"]}]`
+          );
 
           if (!tttContainer) {
             tttContainer = document.createElement("div");
-            tttContainer.setAttribute(values.TTT_CONTAINER_ATTRIBUTE, "true");
+            tttContainer.setAttribute(store.state.client.values["TTT_CONTAINER_ATTRIBUTE"], "true");
             tttContainer.classList.add("ttt-modal-container");
             csvInputContainer.appendChild(tttContainer);
           }
 
           const csvInput: HTMLInputElement | null = csvInputContainer.querySelector(
-            values.UPLOAD_CSV_INPUT_SELECTOR
+            store.state.client.values["UPLOAD_CSV_INPUT_SELECTOR"]
           );
 
           if (!csvInput) {
@@ -90,12 +87,15 @@ class MetrcModalManager implements IAtomicService {
           }
 
           let intermediateCsvInput: HTMLInputElement | null = csvInputContainer.querySelector(
-            `input[${values.INTERMEDIATE_CSV_ATTRIBUTE}]`
+            `input[${store.state.client.values["INTERMEDIATE_CSV_ATTRIBUTE"]}]`
           );
 
           if (!intermediateCsvInput) {
             intermediateCsvInput = document.createElement("input");
-            intermediateCsvInput.setAttribute(values.INTERMEDIATE_CSV_ATTRIBUTE, "true");
+            intermediateCsvInput.setAttribute(
+              store.state.client.values["INTERMEDIATE_CSV_ATTRIBUTE"],
+              "true"
+            );
             intermediateCsvInput.setAttribute("type", "file");
             intermediateCsvInput.setAttribute("accept", ".txt,.csv,text/plain,text/csv");
             intermediateCsvInput.setAttribute("multiple", "multiple");
@@ -112,12 +112,12 @@ class MetrcModalManager implements IAtomicService {
           }
 
           let applyBtn: HTMLButtonElement | null = csvInputContainer.querySelector(
-            `button[${values.CSV_APPLY_BUTTON_ATTRIBUTE}]`
+            `button[${store.state.client.values["CSV_APPLY_BUTTON_ATTRIBUTE"]}]`
           );
 
           if (!applyBtn) {
             applyBtn = document.createElement("button");
-            applyBtn.setAttribute(values.CSV_APPLY_BUTTON_ATTRIBUTE, "true");
+            applyBtn.setAttribute(store.state.client.values["CSV_APPLY_BUTTON_ATTRIBUTE"], "true");
             applyBtn.setAttribute("type", "button");
             applyBtn.classList.add("btn", "btn-default", "ttt-modal-btn");
             applyBtn.innerText = "FILL CSV DATA";
@@ -170,10 +170,10 @@ class MetrcModalManager implements IAtomicService {
   async propagateCsv(destination: HTMLElement) {
     analyticsManager.track(MessageType.CSV_AUTOFILL_UPLOAD);
 
-    const values = clientBuildManager.validateAndGetValuesOrError(clientKeys);
+    clientBuildManager.validateAndGetValuesOrError(clientKeys);
 
     const intermediateCsvInput: HTMLInputElement | null = destination.querySelector(
-      `input[${values.INTERMEDIATE_CSV_ATTRIBUTE}]`
+      `input[${store.state.client.values["INTERMEDIATE_CSV_ATTRIBUTE"]}]`
     );
 
     if (!intermediateCsvInput || !intermediateCsvInput.files) {
@@ -181,7 +181,7 @@ class MetrcModalManager implements IAtomicService {
     }
 
     const csvInput: HTMLInputElement | null = destination.querySelector(
-      values.UPLOAD_CSV_INPUT_SELECTOR
+      store.state.client.values["UPLOAD_CSV_INPUT_SELECTOR"]
     );
 
     if (!csvInput) {
@@ -388,10 +388,11 @@ class MetrcModalManager implements IAtomicService {
 
   async applyTransferCsvData(destination: HTMLElement) {
     analyticsManager.track(MessageType.CSV_AUTOFILL_FILL);
-    const values = clientBuildManager.validateAndGetValuesOrError(clientKeys);
+
+    clientBuildManager.validateAndGetValuesOrError(clientKeys);
 
     const input: HTMLInputElement | null = destination.querySelector(
-      `input[${values.INTERMEDIATE_CSV_ATTRIBUTE}]`
+      `input[${store.state.client.values["INTERMEDIATE_CSV_ATTRIBUTE"]}]`
     );
 
     if (!input || !input.files) {
@@ -400,7 +401,9 @@ class MetrcModalManager implements IAtomicService {
 
     const mergedRows: string[][] = await this.getMergedCsvDataOrError(input);
 
-    const packages = [...destination.querySelectorAll(values.PACKAGE_ROW_SELECTOR)];
+    const packages = [
+      ...destination.querySelectorAll(store.state.client.values["PACKAGE_ROW_SELECTOR"]),
+    ];
 
     if (packages.length !== mergedRows.length) {
       toastManager.openToast(
@@ -427,7 +430,7 @@ class MetrcModalManager implements IAtomicService {
       let autofillSuccess = true;
 
       const packageTagInput: HTMLInputElement | null = pkg.querySelector(
-        values.PACKAGE_TAG_INPUT_SELECTOR
+        store.state.client.values["PACKAGE_TAG_INPUT_SELECTOR"]
       );
 
       if (!packageTagInput) {
@@ -471,7 +474,7 @@ class MetrcModalManager implements IAtomicService {
       }
 
       const grossWeightInput: HTMLInputElement | null = pkg.querySelector(
-        values.PACKAGE_GROSS_WEIGHT_INPUT_SELECTOR
+        store.state.client.values["PACKAGE_GROSS_WEIGHT_INPUT_SELECTOR"]
       );
 
       if (grossWeightInput && typeof matchingRow[1] === "string") {
@@ -489,7 +492,7 @@ class MetrcModalManager implements IAtomicService {
       }
 
       const grossUnitOfWeightSelect: HTMLSelectElement | null = pkg.querySelector(
-        values.PACKAGE_GROSS_UNIT_OF_WEIGHT_ID_SELECT_SELECTOR
+        store.state.client.values["PACKAGE_GROSS_UNIT_OF_WEIGHT_ID_SELECT_SELECTOR"]
       );
 
       if (grossUnitOfWeightSelect) {
@@ -524,7 +527,7 @@ class MetrcModalManager implements IAtomicService {
       }
 
       const wholesalePriceInput: HTMLInputElement | null = pkg.querySelector(
-        values.PACKAGE_WHOLESALE_PRICE_INPUT_SELECTOR
+        store.state.client.values["PACKAGE_WHOLESALE_PRICE_INPUT_SELECTOR"]
       );
 
       if (wholesalePriceInput && typeof matchingRow[3] === "string") {

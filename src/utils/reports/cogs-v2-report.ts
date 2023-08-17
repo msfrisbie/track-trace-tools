@@ -525,7 +525,7 @@ export async function updateCogsV2MasterCostSheet({
     clientBuildManager.assertValues(["MASTER_PB_COST_SHEET_URL"]);
 
     const spreadsheetId = extractSheetIdOrError(
-      clientBuildManager.clientConfig!.values!["MASTER_PB_COST_SHEET_URL"]
+      store.state.client.values["MASTER_PB_COST_SHEET_URL"]
     );
 
     const response: { data: { result: { values: any[][] } } } = await readSpreadsheet({
@@ -859,7 +859,7 @@ export async function maybeLoadCogsV2ReportData({
   clientBuildManager.assertValues(["MASTER_PB_COST_SHEET_URL"]);
 
   const spreadsheetId = extractSheetIdOrError(
-    clientBuildManager.clientConfig!.values!["MASTER_PB_COST_SHEET_URL"]
+    store.state.client.values["MASTER_PB_COST_SHEET_URL"]
   );
 
   const response: { data: { result: { values: any[][] } } } = await readSpreadsheet({

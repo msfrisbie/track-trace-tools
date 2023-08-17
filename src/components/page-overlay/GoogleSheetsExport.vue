@@ -24,7 +24,7 @@
                 </div>
               </b-form-checkbox>
 
-              <div class="text-xs text-start text-gray-600" v-if="!enableT3Plus">
+              <div class="text-xs text-start text-gray-600" v-if="!clientValues['ENABLE_T3PLUS']">
                 Get access to advanced reports with
                 <a
                   class="text-purple-500 underline"
@@ -107,7 +107,7 @@
                 size="sm"
                 variant="link"
                 class="text-purple-500 underline"
-                :href="cogsYoutubeUrl"
+                :href="clientValues['COGS_YOUTUBE_URL']"
                 target="_blank"
                 >How to use this tool</b-button
               >
@@ -143,7 +143,7 @@
                   size="sm"
                   variant="link"
                   class="text-purple-500 underline"
-                  :href="masterCostSheetUrl"
+                  :href="clientValues['MASTER_PB_COST_SHEET_URL']"
                   target="_blank"
                   >Master PB Cost Sheet</a
                 >
@@ -271,12 +271,12 @@
                     <span class="leading-6">Include inactive packages</span>
                   </b-form-checkbox>
 
-                  <b-form-checkbox :disabled="!enableT3Plus">
+                  <b-form-checkbox :disabled="!clientValues['ENABLE_T3PLUS']">
                     <div class="flex flex-col items-start">
                       <span class="leading-6"
                         >Include packages transferred out of this facility</span
                       >
-                      <span v-if="!enableT3Plus" class="text-xs text-gray-300"
+                      <span v-if="!clientValues['ENABLE_T3PLUS']" class="text-xs text-gray-300"
                         >Enable this with
                         <a href="https://trackandtrace.tools/plus" target="_blank">T3+</a></span
                       >
@@ -654,13 +654,13 @@
                     <span class="leading-6">Include Inactive Outgoing</span>
                   </b-form-checkbox>
                   <b-form-checkbox
-                    :disabled="!enableT3Plus"
+                    :disabled="!clientValues['ENABLE_T3PLUS']"
                     v-model="outgoingTransfersFormFilters.onlyWholesale"
                   >
                     <div class="flex flex-col items-start">
                       <span class="leading-6">Only Wholesale</span>
                     </div>
-                    <span v-if="!enableT3Plus" class="text-xs text-gray-300"
+                    <span v-if="!clientValues['ENABLE_T3PLUS']" class="text-xs text-gray-300"
                       >Enable this with
                       <a href="https://trackandtrace.tools/plus" target="_blank">T3+</a></span
                     >
@@ -1024,13 +1024,13 @@
                     <span class="leading-6">Include Inactive Outgoing</span>
                   </b-form-checkbox>
                   <b-form-checkbox
-                    :disabled="!enableT3Plus"
+                    :disabled="!clientValues['ENABLE_T3PLUS']"
                     v-model="outgoingTransferManifestsFormFilters.onlyWholesale"
                   >
                     <div class="flex flex-col items-start">
                       <span class="leading-6">Only Wholesale</span>
                     </div>
-                    <span v-if="!enableT3Plus" class="text-xs text-gray-300"
+                    <span v-if="!clientValues['ENABLE_T3PLUS']" class="text-xs text-gray-300"
                       >Enable this with
                       <a href="https://trackandtrace.tools/plus" target="_blank">T3+</a></span
                     >
@@ -1487,6 +1487,7 @@ export default Vue.extend({
     ...mapState<IPluginState>({
       authState: (state: IPluginState) => state.pluginAuth.authState,
       oAuthState: (state: IPluginState) => state.pluginAuth.oAuthState,
+      clientValues: (state: IPluginState) => state.client.values,
       generatedSpreadsheet: (state: IPluginState) => state.reports.generatedSpreadsheet,
       generatedSpreadsheetHistory: (state: IPluginState) =>
         state.reports.generatedSpreadsheetHistory,
@@ -1499,9 +1500,6 @@ export default Vue.extend({
     },
     disabledVisibleReportOptions(): IReportOption[] {
       return this.disabledVisibleReportOptionsImpl();
-    },
-    enableT3Plus(): boolean {
-      return clientBuildManager.assertValues(["ENABLE_T3PLUS"]);
     },
     cogsV2key(): string {
       return getCogsV2CacheKey({
@@ -1521,8 +1519,6 @@ export default Vue.extend({
       cogsFormFilters: cogsFormFiltersFactory(),
       cogsV2FormFilters: cogsV2FormFiltersFactory(),
       // showCogsV2Advanced: false,
-      masterCostSheetUrl: "",
-      cogsYoutubeUrl: "",
       cogsTrackerFormFilters: cogsTrackerFormFiltersFactory(),
       packagesFormFilters: packageFormFiltersFactory(),
       stragglerPackagesFormFilters: stragglerPackagesFormFiltersFactory(),
@@ -1780,7 +1776,7 @@ export default Vue.extend({
         }
 
         if (x.t3plus) {
-          return clientBuildManager.assertValues(["ENABLE_T3PLUS"]);
+          return store.state.client.values["ENABLE_T3PLUS"];
         } else {
           return true;
         }
@@ -1797,7 +1793,7 @@ export default Vue.extend({
         }
 
         if (x.t3plus) {
-          return !clientBuildManager.assertValues(["ENABLE_T3PLUS"]);
+          return !store.state.client.values["ENABLE_T3PLUS"];
         } else {
           return false;
         }
@@ -1956,11 +1952,6 @@ export default Vue.extend({
   async created() {},
   async mounted() {
     this.refreshOAuthState({});
-
-    this.$data.masterCostSheetUrl =
-      clientBuildManager.clientConfig!.values!["MASTER_PB_COST_SHEET_URL"];
-
-    this.$data.cogsYoutubeUrl = clientBuildManager.clientConfig!.values!["COGS_YOUTUBE_URL"];
 
     document.addEventListener("visibilitychange", () => {
       if (document.visibilityState === "visible") {

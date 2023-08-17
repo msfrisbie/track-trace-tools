@@ -116,12 +116,12 @@ export default Vue.extend({
   data() {
     return {
       notAvailableMessage: notAvailableMessage(),
-      enableT3Plus: false,
     };
   },
   computed: {
     ...mapState<IPluginState>({
       pluginAuth: (state: IPluginState) => state.pluginAuth,
+      clientValues: (state: IPluginState) => state.client.values,
       authState: (state: IPluginState) => state.pluginAuth.authState,
       credentials: (state: IPluginState) => state.credentials,
       accountEnabled: (state: IPluginState) => state.accountEnabled,
@@ -134,7 +134,7 @@ export default Vue.extend({
           backgroundColor: "gray",
           text: "T3+",
           icon: "plus",
-          visible: !this.$data.enableT3Plus,
+          visible: !this.$store.state.client.values["ENABLE_T3PLUS"],
           enabled: true,
           isBeta: false,
           isNew: false,
@@ -198,7 +198,7 @@ export default Vue.extend({
           text: "EXPLORER",
           route: "/metrc-explorer",
           icon: "sitemap",
-          visible: this.$data.enableT3Plus,
+          visible: store.state.client.values["ENABLE_T3PLUS"],
           enabled: true,
           isBeta: false,
           isNew: false,
@@ -261,24 +261,12 @@ export default Vue.extend({
           text: "ADMIN",
           route: "/admin",
           icon: "cog",
-          visible: this.$store.state.debugMode,
+          visible: store.state.debugMode,
           enabled: true,
           isBeta: false,
           isNew: false,
         },
       ];
-    },
-    showFeedback() {
-      const identities: string[] = [];
-
-      if (
-        this.$store.state.authState?.identity &&
-        !identities.includes(this.$store.state.authState?.identity)
-      ) {
-        return true;
-      }
-
-      return false;
     },
   },
   methods: {
@@ -316,8 +304,6 @@ export default Vue.extend({
       }
     },
   },
-  async created() {
-    this.$data.enableT3Plus = clientBuildManager.assertValues(["ENABLE_T3PLUS"]);
-  },
+  async created() {},
 });
 </script>

@@ -8,7 +8,6 @@ import {
   ITransferHistoryData,
 } from "@/interfaces";
 import { authManager } from "@/modules/auth-manager.module";
-import { clientBuildManager } from "@/modules/client-build-manager.module";
 import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
 import { dynamicConstsManager } from "@/modules/dynamic-consts-manager.module";
 import { toastManager } from "@/modules/toast-manager.module";
@@ -185,7 +184,7 @@ export async function extractDriversAndVehiclesFromTransferHistory(): Promise<{
 }
 
 export async function createScanSheet(transferId: number, manifestNumber: string) {
-  if (!clientBuildManager.assertValues(["ENABLE_T3PLUS"])) {
+  if (!store.state.client.values["ENABLE_T3PLUS"]) {
     toastManager.openToast(
       "This feature is only availble for T3+ users. Learn more at trackandtrace.tools/plus",
       {

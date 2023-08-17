@@ -1,6 +1,6 @@
 <template>
   <div class="flex flex-col items-stretch w-full">
-    <template v-if="validClient()">
+    <template v-if="clientValues['ENABLE_T3PLUS']">
       <template v-if="!sourcePackage">
         <single-package-picker
           class="mb-4"
@@ -380,6 +380,7 @@ export default Vue.extend({
   },
   computed: {
     ...mapState<IPluginState>({
+      clientValues: (state: IPluginState) => state.client.values,
       sourcePackage: (state: IPluginState) => state.packageHistory.sourcePackage,
       ancestorTree: (state: IPluginState) => state.packageHistory.ancestorTree,
       childTree: (state: IPluginState) => state.packageHistory.childTree,
@@ -543,9 +544,6 @@ export default Vue.extend({
       downloadCsvFile({ csvFile });
     },
     unitOfMeasureNameToAbbreviation,
-    validClient(): boolean {
-      return clientBuildManager.assertValues(["ENABLE_T3PLUS"]);
-    },
     orphan(node: IHistoryTreeNode) {
       return {
         ...node,

@@ -217,8 +217,8 @@ export default Vue.extend({
       return this.$route.name?.toUpperCase();
     },
     clientBuildSuffix() {
-      if (clientBuildManager.clientConfig) {
-        return ` (${clientBuildManager.clientConfig.clientName})`;
+      if (store.state.client.clientName) {
+        return ` (${store.state.client.clientName})`;
       } else {
         return "";
       }

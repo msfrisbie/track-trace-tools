@@ -55,7 +55,9 @@
             >
             <b-dropdown-item
               class="text-lg"
-              @click.stop.prevent="filterPackages({ productionBatchNumber: pkg.ProductionBatchNumber })"
+              @click.stop.prevent="
+                filterPackages({ productionBatchNumber: pkg.ProductionBatchNumber })
+              "
               ><div class="flex flex-row space-x-2 justify-between flex-nowrap">
                 <span>PB #:</span>
                 <span class="font-bold">{{ pkg.ProductionBatchNumber.slice(0, 30) }}</span>
@@ -63,7 +65,9 @@
             >
             <b-dropdown-item
               class="text-lg"
-              @click.stop.prevent="filterPackages({ sourceProductionBatchNumbers: pkg.SourceProductionBatchNumbers })"
+              @click.stop.prevent="
+                filterPackages({ sourceProductionBatchNumbers: pkg.SourceProductionBatchNumbers })
+              "
               ><div class="flex flex-row space-x-2 justify-between flex-nowrap">
                 <span>Source PB #:</span>
                 <span class="font-bold">{{ pkg.SourceProductionBatchNumbers.slice(0, 30) }}</span>
@@ -93,7 +97,7 @@
             </b-button>
           </template>
 
-          <template v-if="t3plusEnabled">
+          <template v-if="clientValues['ENABLE_T3PLUS']">
             <b-button
               variant="outline-primary"
               class=""
@@ -372,6 +376,7 @@ export default Vue.extend({
   components: {},
   computed: {
     ...mapState<IPluginState>({
+      clientValues: (state: IPluginState) => state.client.values,
       authState: (state: IPluginState) => state.pluginAuth.authState,
       oAuthState: (state: IPluginState) => state.pluginAuth.oAuthState,
     }),
@@ -380,7 +385,7 @@ export default Vue.extend({
         return false;
       }
 
-      if (!clientBuildManager.assertValues(["ENABLE_TRANSFER_EDIT"])) {
+      if (!store.state.client.values["ENABLE_TRANSFER_EDIT"]) {
         return false;
       }
 
@@ -405,9 +410,6 @@ export default Vue.extend({
     },
     manifestNumber(): string | undefined {
       return this.contextMenuEvent?.manifestNumber;
-    },
-    t3plusEnabled() {
-      return clientBuildManager.assertValues(["ENABLE_T3PLUS"]);
     },
   },
   data() {
