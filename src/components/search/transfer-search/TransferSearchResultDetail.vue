@@ -298,29 +298,13 @@ export default Vue.extend({
     async setTransferManifestNumberFilter(transfer: IIndexedTransferData) {
       analyticsManager.track(MessageType.SELECTED_TRANSFER);
 
-      switch (transfer.TransferState as TransferState) {
-        case TransferState.INCOMING:
-          await pageManager.clickTabStartingWith(pageManager.transferTabs, "Incoming");
-          break;
-        case TransferState.INCOMING_INACTIVE:
-          await pageManager.clickTabStartingWith(pageManager.transferTabs, "Inactive");
-          break;
-        case TransferState.OUTGOING:
-          await pageManager.clickTabStartingWith(pageManager.transferTabs, "Outgoing");
-          break;
-        case TransferState.REJECTED:
-          await pageManager.clickTabStartingWith(pageManager.transferTabs, "Rejected");
-          break;
-        case TransferState.OUTGOING_INACTIVE:
-          await pageManager.clickTabStartingWith(pageManager.transferTabs, "Inactive", "Rejected");
-          break;
-        default:
-          return null;
-      }
-
-      pageManager.setTransferFilter(
-        TransferFilterIdentifiers.ManifestNumber,
-        transfer.ManifestNumber
+      store.dispatch(
+        `transferSearch/${TransferSearchActions.PARTIAL_UPDATE_TRANSFER_SEARCH_FILTERS}`,
+        {
+          transferSearchFilters: {
+            manifestNumber: transfer.ManifestNumber
+          }
+        }
       );
 
       this.setShowSearchResults({ showSearchResults: false });

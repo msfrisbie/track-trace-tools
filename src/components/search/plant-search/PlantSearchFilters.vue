@@ -82,10 +82,6 @@ export default Vue.extend({
       setPlantSearchFilters: `plantSearch/${PlantSearchActions.SET_PLANT_SEARCH_FILTERS}`,
     }),
   },
-  async mounted() {
-    if (!this.isOnPlantsPage) {
-      // store.dispatch(`plantSearch/${PlantSearchActions.SET_PLANT_SEARCH_FILTERS}`, {});
-    }
-  },
+  async mounted() {},
 });
 </script>

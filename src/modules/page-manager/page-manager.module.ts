@@ -53,9 +53,6 @@ import {
   applyPlantFilterImpl,
   applyTagFilterImpl,
   applyTransferFilterImpl,
-  readPackageFiltersImpl,
-  readTagFiltersImpl,
-  readTransferFiltersImpl,
   resetFilterElementReferencesImpl,
   resetMetrcPackageFiltersImpl,
   resetMetrcPlantFiltersImpl,
@@ -447,7 +444,6 @@ class PageManager implements IAtomicService {
       if (window.location.pathname.match(TRANSFER_TAB_REGEX)) {
         await this.manageTransfersTabs();
         this.acquireTransferFilterElements();
-        this.readTransferFilters();
 
         this.interceptViewManifestButton();
 
@@ -460,7 +456,6 @@ class PageManager implements IAtomicService {
 
       if (window.location.pathname.match(TRANSFER_HUB_REGEX)) {
         this.acquireTransferFilterElements();
-        this.readTransferFilters();
 
         this.interceptViewManifestButton();
 
@@ -477,7 +472,6 @@ class PageManager implements IAtomicService {
       if (window.location.pathname.match(TAG_TAB_REGEX)) {
         await this.manageTagsTabs();
         this.acquireTagFilterElements();
-        this.readTagFilters();
       }
 
       if (window.location.pathname.match(SALES_TAB_REGEX)) {
@@ -621,18 +615,6 @@ class PageManager implements IAtomicService {
 
   async acquireTagFilterElements() {
     return acquirePackageFilterElementsImpl();
-  }
-
-  readPackageFilters() {
-    return readPackageFiltersImpl();
-  }
-
-  readTransferFilters() {
-    return readTransferFiltersImpl();
-  }
-
-  readTagFilters() {
-    return readTagFiltersImpl();
   }
 
   async setPlantFilter(plantFilterIdentifier: PlantFilterIdentifiers, value: string) {

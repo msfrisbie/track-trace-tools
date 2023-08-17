@@ -130,38 +130,6 @@ export default Vue.extend({
       transferSearchState: (state: IPluginState) => state.transferSearch,
     }),
   },
-  methods: {
-    async setTransferManifestNumberFilter() {
-      analyticsManager.track(MessageType.SELECTED_TRANSFER);
-
-      switch (this.$props.transfer.TransferState as TransferState) {
-        case TransferState.INCOMING:
-          await pageManager.clickTabStartingWith(pageManager.transferTabs, "Incoming");
-          break;
-        case TransferState.INCOMING_INACTIVE:
-          await pageManager.clickTabStartingWith(pageManager.transferTabs, "Inactive");
-          break;
-        case TransferState.OUTGOING:
-          await pageManager.clickTabStartingWith(pageManager.transferTabs, "Outgoing");
-          break;
-        case TransferState.REJECTED:
-          await pageManager.clickTabStartingWith(pageManager.transferTabs, "Rejected");
-          break;
-        case TransferState.OUTGOING_INACTIVE:
-          await pageManager.clickTabStartingWith(pageManager.transferTabs, "Inactive", "Rejected");
-          break;
-        default:
-          return null;
-      }
-
-      pageManager.setTransferFilter(
-        TransferFilterIdentifiers.ManifestNumber,
-        // @ts-ignore
-        this.$props.transfer.ManifestNumber
-      );
-
-      store.commit(`transferSearch/${MutationType.SET_SHOW_TRANSFER_SEARCH_RESULTS}`, false);
-    },
-  },
+  methods: {},
 });
 </script>

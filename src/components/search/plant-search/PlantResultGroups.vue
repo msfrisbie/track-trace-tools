@@ -139,28 +139,6 @@ export default Vue.extend({
       return plants;
     },
   },
-  methods: {
-    ...mapActions({
-      setShowSearchResults: `search/${SearchActions.SET_SHOW_SEARCH_RESULTS}`,
-    }),
-    resetFilters() {
-      pageManager.resetMetrcPlantFilters();
-    },
-    // async setPlantLabelFilter(plant: IIndexedPlantData) {
-    //   analyticsManager.track(MessageType.SELECTED_PLANT);
-
-    //   store.dispatch(
-    //     `plantSearch/${PlantSearchActions.PARTIAL_UPDATE_PLANT_SEARCH_FILTERS}`,
-    //     {
-    //       plantState: plant.PlantState,
-    //       plantSearchFilters: {
-    //         label: plant.Label
-    //       }
-    //     }
-    //   );
-
-    //   this.setShowSearchResults({ showSearchResults: false });
-    // }
-  },
+  methods: {},
 });
 </script>

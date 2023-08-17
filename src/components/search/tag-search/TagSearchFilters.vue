@@ -79,10 +79,6 @@ export default Vue.extend({
       setTagSearchFilters: `tagSearch/${TagSearchActions.SET_TAG_SEARCH_FILTERS}`,
     }),
   },
-  async mounted() {
-    if (!this.isOnTagsPage) {
-      // store.dispatch(`tagSearch/${TagSearchActions.SET_TAG_SEARCH_FILTERS}`, {});
-    }
-  },
+  async mounted() {},
 });
 </script>

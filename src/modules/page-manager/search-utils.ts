@@ -5,8 +5,6 @@ import {
   TagFilterIdentifiers,
   TransferFilterIdentifiers,
 } from "@/consts";
-import { IPackageSearchFilters, ITagSearchFilters, ITransferSearchFilters } from "@/interfaces";
-import { MutationType } from "@/mutation-types";
 import store from "@/store/page-overlay/index";
 import { PackageSearchActions } from "@/store/page-overlay/modules/package-search/consts";
 import { PlantSearchActions } from "@/store/page-overlay/modules/plant-search/consts";
@@ -484,81 +482,6 @@ export async function acquireTagFilterElementsImpl() {
     } else {
       console.error("Menu button not found", tagFilterIdentifier);
     }
-  }
-}
-
-export function readPackageFiltersImpl() {
-  const filters: IPackageSearchFilters = {
-    label: null,
-    sourceHarvestName: null,
-    sourcePackageLabel: null,
-    productionBatchNumber: null,
-    sourceProductionBatchNumbers: null,
-    itemName: null,
-    itemStrainName: null,
-    itemProductCategoryName: null,
-    locationName: null,
-  };
-
-  filters.label = pageManager.packageLabelFilterInput?.value || null;
-  filters.sourceHarvestName = pageManager.packageSourceHarvestNameFilterInput?.value || null;
-  filters.sourcePackageLabel = pageManager.packageSourcePackageLabelFilterInput?.value || null;
-  filters.productionBatchNumber =
-    pageManager.packageProductionBatchNumberFilterInput?.value || null;
-  filters.sourceProductionBatchNumbers =
-    pageManager.packageSourceProductionBatchNumbersFilterInput?.value || null;
-  filters.itemName = pageManager.packageItemNameFilterInput?.value || null;
-  filters.itemStrainName = pageManager.packageItemStrainNameFilterInput?.value || null;
-  filters.itemProductCategoryName =
-    pageManager.packageItemProductCategoryNameFilterInput?.value || null;
-  filters.locationName = pageManager.packageLocationNameFilterInput?.value || null;
-
-  store.dispatch(`packageSearch/${PackageSearchActions.SET_PACKAGE_SEARCH_FILTERS}`, {
-    packageSearchFilters: filters,
-  });
-}
-
-export function readTransferFiltersImpl() {
-  const filters: ITransferSearchFilters = {
-    manifestNumber: null,
-    deliveryFacilities: null,
-    shipperFacilityInfo: null,
-  };
-  let updated = false;
-
-  if (pageManager.transferManifestNumberFilterInput) {
-    filters.manifestNumber = pageManager.transferManifestNumberFilterInput.value;
-    updated = true;
-  }
-
-  if (pageManager.transferIncomingShipperFacilityInfoFilterInput) {
-    filters.shipperFacilityInfo = pageManager.transferIncomingShipperFacilityInfoFilterInput.value;
-    updated = true;
-  }
-
-  if (pageManager.transferOutgoingDeliveryFacilitiesFilterInput) {
-    filters.deliveryFacilities = pageManager.transferOutgoingDeliveryFacilitiesFilterInput.value;
-    updated = true;
-  }
-
-  if (updated) {
-    store.commit(`transferSearch/${MutationType.SET_TRANSFER_SEARCH_FILTERS}`, filters);
-  }
-}
-
-export function readTagFiltersImpl() {
-  const filters: ITagSearchFilters = {
-    label: null,
-  };
-  let updated = false;
-
-  if (pageManager.tagNumberFilterInput) {
-    filters.label = pageManager.tagNumberFilterInput.value;
-    updated = true;
-  }
-
-  if (updated) {
-    store.commit(MutationType.SET_TAG_SEARCH_FILTERS, filters);
   }
 }
 

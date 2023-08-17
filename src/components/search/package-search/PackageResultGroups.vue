@@ -1,18 +1,5 @@
 <template>
   <div>
-    <!-- <div
-      v-if="filtersApplied || expandLabelGroup"
-      class="p-4 border-purple-300 border-b"
-    >
-      <b-button
-        style="opacity: 0.6"
-        variant="outline-primary"
-        size="sm"
-        @click.stop.prevent="resetFilters"
-        >CLEAR FILTER</b-button
-      >
-    </div> -->
-
     <template v-if="!filtersApplied || expandLabelGroup">
       <package-search-results-group
         :packages="labelPackages"
@@ -323,28 +310,6 @@ export default Vue.extend({
       return packages;
     },
   },
-  methods: {
-    ...mapActions({
-      setShowSearchResults: `search/${SearchActions.SET_SHOW_SEARCH_RESULTS}`,
-    }),
-    resetFilters() {
-      pageManager.resetMetrcPackageFilters();
-    },
-    async setPackageLabelFilter(pkg: IIndexedPackageData) {
-      analyticsManager.track(MessageType.SELECTED_PACKAGE);
-
-      store.dispatch(
-        `packageSearch/${PackageSearchActions.PARTIAL_UPDATE_PACKAGE_SEARCH_FILTERS}`,
-        {
-          packageState: pkg.PackageState,
-          packageSearchFilters: {
-            label: pkg.Label,
-          },
-        }
-      );
-
-      this.setShowSearchResults({ showSearchResults: false });
-    },
-  },
+  methods: {},
 });
 </script>

@@ -72,7 +72,6 @@ export async function managePlantTabsImpl() {
     // invalid and we need to reacquire the inputs
     if (!!pageManager.selectedPlantTab && activeTab !== pageManager.selectedPlantTab) {
       pageManager.resetMetrcPlantFilters();
-      // pageManager.readPlantFilters();
       await pageManager.clickSettleDelay();
       pageManager.resetFilterElementReferences();
     }
@@ -155,7 +154,6 @@ export async function managePackageTabsImpl() {
     // invalid and we need to reacquire the inputs
     if (!!pageManager.selectedPackageTab && activeTab !== pageManager.selectedPackageTab) {
       pageManager.resetMetrcPackageFilters();
-      // pageManager.readPackageFilters();
       await pageManager.clickSettleDelay();
       pageManager.resetFilterElementReferences();
     }
@@ -197,7 +195,6 @@ export async function manageTransfersTabsImpl() {
     // invalid and we need to reacquire the inputs
     if (!!pageManager.selectedTransferTab && activeTab !== pageManager.selectedTransferTab) {
       pageManager.resetMetrcTransferFilters();
-      pageManager.readTransferFilters();
       await pageManager.clickSettleDelay();
       pageManager.resetFilterElementReferences();
     }
@@ -249,7 +246,6 @@ export async function manageTagsTabsImpl() {
     // invalid and we need to reacquire the inputs
     if (!!pageManager.selectedTagTab && activeTab !== pageManager.selectedTagTab) {
       pageManager.resetMetrcTagFilters();
-      pageManager.readTagFilters();
       await pageManager.clickSettleDelay();
       pageManager.resetFilterElementReferences();
     }
