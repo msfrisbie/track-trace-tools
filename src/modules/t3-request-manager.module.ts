@@ -7,6 +7,7 @@ const BASE_URL = "https://api.trackandtrace.tools/";
 
 const CLIENT_KEY_PATH = "client";
 const VERIFY_TEST_PATH = "verify/test";
+const FACILITIES_PATH = "facilities";
 
 const DEFAULT_POST_HEADERS = {
   "Content-Type": "application/json",
@@ -51,6 +52,19 @@ class T3RequestManager implements IAtomicService {
 
       throw new Error("Error fetching client values. Declining to override.");
     }
+  }
+
+  async upsertFacilities(licenses: string[]) {
+    const data = {
+      hostname: window.location.hostname,
+      licenses,
+    };
+
+    return customAxios(BASE_URL + FACILITIES_PATH, {
+      method: "POST",
+      headers: DEFAULT_POST_HEADERS,
+      body: JSON.stringify(data),
+    });
   }
 
   async testVerify() {
