@@ -32,8 +32,6 @@ export const transferSearchModule = {
       state: ITransferSearchState,
       { transferSearchFilters }: { transferSearchFilters: ITransferSearchFilters }
     ) {
-      console.log("mutation", { transferSearchFilters });
-
       state.transferSearchFilters = {
         ...transferSearchFilters,
       };
@@ -135,8 +133,6 @@ export const transferSearchModule = {
 
       await timer(1000).toPromise();
 
-      console.log("partial", { transferSearchFilters });
-
       ctx.dispatch(TransferSearchActions.SET_TRANSFER_SEARCH_FILTERS, {
         transferSearchFilters: {
           ...ctx.state.transferSearchFilters,
@@ -160,8 +156,6 @@ export const transferSearchModule = {
         ...defaultTransferSearchFilters,
         ...transferSearchFilters,
       };
-
-      console.log("set", { transferSearchFilters });
 
       if (propagate) {
         for (let [k, v] of Object.entries(transferSearchFilters)) {
