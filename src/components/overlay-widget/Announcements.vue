@@ -1,14 +1,20 @@
 <template>
   <div>
-    <div ref="announcementsContainer" class="flex flex-col gap-6">
+    <div ref="announcementsContainer" class="flex flex-col gap-6 px-8">
+      <template v-if="parsedAnnouncements.length === 0">
+        <span class="text-lg text-gray-600 text-center">All caught up!</span>
+        <span class="text-sm text-gray-400 text-center"
+          >Track &amp; Trace Tools announcements will appear here</span
+        >
+      </template>
       <div
         v-for="parsedAnnouncement of parsedAnnouncements"
         v-bind:key="parsedAnnouncement.published_at"
         class="flex flex-col gap-2"
       >
-        <div>{{ parsedAnnouncement.readable_published_at }}</div>
+        <div class="text-sm text-gray-400">{{ parsedAnnouncement.readable_published_at }}</div>
 
-        <div v-html="parsedAnnouncement.html"></div>
+        <div class="flex flex-col gap-4" v-html="parsedAnnouncement.html"></div>
       </div>
     </div>
   </div>
