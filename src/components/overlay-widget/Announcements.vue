@@ -21,7 +21,7 @@ import router from "@/router/index";
 import store from "@/store/page-overlay/index";
 // The marked import structure is causing problems
 // @ts-ignore
-import * as marked from "marked/lib/marked.esm";
+import * as marked from "marked/lib/marked.cjs";
 import { IPluginState } from "@/interfaces";
 import { AnnouncementsActions } from "@/store/page-overlay/modules/announcements/consts";
 import { IAnnouncementData } from "@/store/page-overlay/modules/announcements/interfaces";
@@ -85,8 +85,6 @@ export default Vue.extend({
         threshold: 0, // Trigger the callback when even one pixel is visible
       }
     );
-
-    console.log(this.$refs.announcementsContainer);
 
     // Start observing the target
     observer.observe(this.$refs.announcementsContainer as Element);
