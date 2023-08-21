@@ -1,5 +1,5 @@
 <template>
-  <div class="grid gap-4 text-center">
+  <div class="flex flex-col justify-start items-stretch gap-4 text-center">
     <div class="text-2xl text-gray-400 font-thin">PACKAGES</div>
     <div class="grid grid-cols-3 gap-2">
       <dashboard-card

@@ -7,6 +7,7 @@
         >CREATE NOOP NETWORK TASKS</b-button
       >
       <b-button variant="info" @click="resetState()">RESET STATE</b-button>
+      <b-button variant="info" @click="resetAnnouncements()">RESET ANNOUNCEMENTS</b-button>
       <b-button variant="info" @click="throwError()">THROW ERROR</b-button>
       <b-button variant="info" @click="testToast()">TEST TOAST</b-button>
       <b-button variant="info" @click="takeScreenshot()">TAKE SCREENSHOT</b-button>
@@ -131,6 +132,7 @@ import { screenshotManager } from "@/modules/screenshot-manager.module";
 import { toastManager } from "@/modules/toast-manager.module";
 import { MutationType } from "@/mutation-types";
 import store from "@/store/page-overlay/index";
+import { AnnouncementsActions } from "@/store/page-overlay/modules/announcements/consts";
 import { FlagsActions } from "@/store/page-overlay/modules/flags/consts";
 import { IFlagsState } from "@/store/page-overlay/modules/flags/interfaces";
 import { SettingsActions, SettingsMutations } from "@/store/page-overlay/modules/settings/consts";
@@ -226,6 +228,18 @@ export default Vue.extend({
       store.dispatch(`flags/${FlagsActions.RESET_FLAGS}`);
 
       toastManager.openToast("Flags reset", {
+        title: "T3",
+        autoHideDelay: 5000,
+        variant: "success",
+        appendToast: true,
+        toaster: "ttt-toaster",
+        solid: true,
+      });
+    },
+    async resetAnnouncements() {
+      store.dispatch(`announcements/${AnnouncementsActions.RESET}`);
+
+      toastManager.openToast("Announcements reset", {
         title: "T3",
         autoHideDelay: 5000,
         variant: "success",

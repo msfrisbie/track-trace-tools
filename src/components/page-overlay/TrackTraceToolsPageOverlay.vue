@@ -19,10 +19,10 @@ import FloatingButtonContainer from "@/components/page-overlay/FloatingButtonCon
 import PageOverlayContainer from "@/components/page-overlay/PageOverlayContainer.vue";
 import Snowflakes from "@/components/page-overlay/Snowflakes.vue";
 import { MessageType, VUEX_KEY } from "@/consts";
-// import { queueWrapper } from "@/modules/queue-wrapper.module";
 import { IAuthState } from "@/interfaces";
 import { accountManager } from "@/modules/account-manager.module";
 import { analyticsManager } from "@/modules/analytics-manager.module";
+import { announcementsManager } from "@/modules/announcements-manager.module";
 import { authManager } from "@/modules/auth-manager.module";
 import { backgroundTaskManager } from "@/modules/background-task-manager.module";
 import { builderManager } from "@/modules/builder-manager.module";
@@ -43,6 +43,7 @@ import { modalManager } from "@/modules/modal-manager.module";
 import { pageManager } from "@/modules/page-manager/page-manager.module";
 import { passivePageAnalyzer } from "@/modules/passive-page-analyzer.module";
 import { searchManager } from "@/modules/search-manager.module";
+import { t3RequestManager } from "@/modules/t3-request-manager.module";
 import { telemetryManager } from "@/modules/telemetry-manager.module";
 import { toastManager } from "@/modules/toast-manager.module";
 import { updateManager } from "@/modules/update-manager.module";
@@ -227,6 +228,7 @@ export default Vue.extend({
     clientBuildManager.init();
     expiringCacheManager.init();
     primaryMetrcRequestManager.init();
+    t3RequestManager.init();
     credentialManager.init();
     mockDataManager.init();
     toastManager.init();
@@ -237,8 +239,7 @@ export default Vue.extend({
     integrityManager.init();
     passivePageAnalyzer.init();
     metrcModalManager.init();
-
-    //   scriptContextManager.init();
+    announcementsManager.init();
 
     const authState: IAuthState | null = await authManager.authStateOrNull();
 

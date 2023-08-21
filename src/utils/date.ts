@@ -91,3 +91,11 @@ export function isWeekend(isoDate: string) {
   const dayOfWeek = date.getUTCDay();
   return dayOfWeek === 0 || dayOfWeek === 6;
 }
+
+export function isoDatetimedDifferenceInMinutes(isoTimestamp1: string, isoTimestamp2: string) {
+  const date1 = new Date(isoTimestamp1);
+  const date2 = new Date(isoTimestamp2);
+
+  const differenceInMilliseconds = Math.abs(date2.getTime() - date1.getTime());
+  return differenceInMilliseconds / 1000 / 60;
+}

@@ -1,4 +1,5 @@
 import { IAtomicService } from "@/interfaces";
+import { IAnnouncementData } from "@/store/page-overlay/modules/announcements/interfaces";
 import { AxiosError } from "axios";
 import { authManager } from "./auth-manager.module";
 import { customAxios } from "./fetch-manager.module";
@@ -8,10 +9,12 @@ const BASE_URL = "https://api.trackandtrace.tools/";
 const CLIENT_KEY_PATH = "client";
 const VERIFY_TEST_PATH = "verify/test";
 const FACILITIES_PATH = "facilities";
+const ANNOUNCEMENTS_PATH = "announcements";
 
 const DEFAULT_POST_HEADERS = {
   "Content-Type": "application/json",
 };
+const DEFAULT_GET_HEADERS = {};
 
 class T3RequestManager implements IAtomicService {
   async init() {}
@@ -52,6 +55,15 @@ class T3RequestManager implements IAtomicService {
 
       throw new Error("Error fetching client values. Declining to override.");
     }
+  }
+
+  async loadAnnouncements(): Promise<IAnnouncementData[]> {
+    const response = await customAxios(BASE_URL + ANNOUNCEMENTS_PATH, {
+      method: "GET",
+      headers: DEFAULT_GET_HEADERS,
+    });
+
+    return response.data;
   }
 
   async upsertFacilities(licenses: string[]) {

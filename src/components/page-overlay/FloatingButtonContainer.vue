@@ -16,7 +16,9 @@
       <!-- TODO enable when T3+ signup is ready -->
       <plus-button v-if="false && !clientValues['ENABLE_T3PLUS']" class="floating-shadow" />
 
-      <builder-button class="floating-shadow" />
+      <div>
+        <builder-button class="floating-shadow" />
+      </div>
     </template>
   </div>
 </template>
