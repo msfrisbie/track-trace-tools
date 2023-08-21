@@ -7,12 +7,12 @@ export interface IAnnouncementsState {
   // When loading new announcements, add a notification for each
   // announcement that is AFTER this datetime
   lastAnnouncementsViewedDatetime: string | null;
-
 }
 
 export interface IAnnouncementData {
   markdown: string;
-  html?: string;
   published_at: string;
   show_notification: boolean;
+  html?: string;
+  readable_published_at?: string;
 }

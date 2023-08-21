@@ -1,11 +1,16 @@
 <template>
   <div>
-    <div
-      v-for="parsedAnnouncement of parsedAnnouncements"
-      v-bind:key="parsedAnnouncement.published_at"
-      class="flex flex-col gap-2"
-      v-html="parsedAnnouncement.html"
-    ></div>
+    <div ref="announcementsContainer" class="flex flex-col gap-6">
+      <div
+        v-for="parsedAnnouncement of parsedAnnouncements"
+        v-bind:key="parsedAnnouncement.published_at"
+        class="flex flex-col gap-2"
+      >
+        <div>{{ parsedAnnouncement.readable_published_at }}</div>
+
+        <div v-html="parsedAnnouncement.html"></div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -53,6 +58,7 @@ export default Vue.extend({
     parsedAnnouncements(): IAnnouncementData[] {
       return store.state.announcements.announcements.map((x) => {
         x.html = marked.parse(x.markdown);
+        x.readable_published_at = new Date(x.published_at).toLocaleString();
         return x;
       });
     },
@@ -63,7 +69,27 @@ export default Vue.extend({
   methods: {},
   async created() {},
   async mounted() {
-    store.dispatch(`announcements/${AnnouncementsActions.VIEW_ANNOUNCEMENTS}`);
+    // Create the Intersection Observer
+    let observer = new IntersectionObserver(
+      (entries, observer) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            // If the element is in the viewport
+            store.dispatch(`announcements/${AnnouncementsActions.VIEW_ANNOUNCEMENTS}`);
+          }
+        });
+      },
+      {
+        root: null, // Use the viewport as the container
+        rootMargin: "0px", // No margins
+        threshold: 0, // Trigger the callback when even one pixel is visible
+      }
+    );
+
+    console.log(this.$refs.announcementsContainer);
+
+    // Start observing the target
+    observer.observe(this.$refs.announcementsContainer as Element);
   },
 });
 </script>

@@ -16,8 +16,13 @@
       <!-- TODO enable when T3+ signup is ready -->
       <plus-button v-if="false && !clientValues['ENABLE_T3PLUS']" class="floating-shadow" />
 
-      <div>
+      <div class="relative">
         <builder-button class="floating-shadow" />
+        <div
+          v-if="notificationCount > 0"
+          class="absolute bg-red-500 rounded-full text-white flex flex-col items-center justify-center text-center text-xs border border-white"
+          style="width: 0.6rem; height: 0.6rem; bottom: -0.3rem; left: -0.3rem"
+        ></div>
       </div>
     </template>
   </div>
@@ -59,6 +64,7 @@ export default Vue.extend({
       oAuthState: (state: IPluginState) => state.pluginAuth.oAuthState,
       clientValues: (state: IPluginState) => state.client.values,
       debugMode: (state: IPluginState) => state.debugMode,
+      notificationCount: (state: IPluginState) => state.announcements.notificationCount,
     }),
   },
   methods: {},

@@ -70,17 +70,21 @@ export const announcementsModule = {
       ctx.state.notificationCount = announcements.filter(
         (x) =>
           x.show_notification &&
-          x.published_at > (ctx.state.lastAnnouncementsViewedDatetime ?? new Date().toISOString())
+          // Only show fresh notifications
+          (!ctx.state.lastAnnouncementsViewedDatetime ||
+            x.published_at > ctx.state.lastAnnouncementsViewedDatetime)
       ).length;
     },
     [AnnouncementsActions.VIEW_ANNOUNCEMENTS]: async (
       ctx: ActionContext<IAnnouncementsState, IPluginState>,
       data: any
     ) => {
-      // Save the largest datetime
-      ctx.state.lastAnnouncementsViewedDatetime = ctx.state.announcements
-        .map((x) => x.published_at)
-        .reduce((max, current) => (max > current ? max : current), new Date().toISOString());
+      if (ctx.state.announcements.length === 0) {
+        return;
+      }
+
+      ctx.state.lastAnnouncementsViewedDatetime = ctx.state.announcements[0].published_at;
+      ctx.state.notificationCount = 0;
     },
     [AnnouncementsActions.RESET]: async (
       ctx: ActionContext<IAnnouncementsState, IPluginState>,
