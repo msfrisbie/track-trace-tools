@@ -19,6 +19,7 @@ import { CsvUpload } from "@/types";
 import Vue from "vue";
 import Vuex from "vuex";
 import VuexPersistence from "vuex-persist";
+import { announcementsModule, announcementsReducer } from "./modules/announcements";
 import { clientModule, clientReducer } from "./modules/client";
 import { createPackageCsvModule, createPackageCsvReducer } from "./modules/create-package-csv";
 import { employeeSamplesModule, employeeSamplesReducer } from "./modules/employee-samples";
@@ -63,6 +64,7 @@ const vuexShared = {
     return {
       ...state,
       pluginAuth: pluginAuthReducer(state.pluginAuth),
+      announcements: announcementsReducer(state.announcements),
       client: clientReducer(state.client),
       search: searchReducer(state.search),
       transferBuilder: transferBuilderReducer(state.transferBuilder),
@@ -417,6 +419,10 @@ const vuexStore = new Vuex.Store<IPluginState>({
     client: {
       namespaced: true,
       ...clientModule,
+    },
+    announcements: {
+      namespaced: true,
+      ...announcementsModule,
     },
   },
   plugins: [vuexPersistence.plugin],

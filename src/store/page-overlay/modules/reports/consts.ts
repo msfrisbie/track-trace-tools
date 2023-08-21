@@ -1,17 +1,13 @@
 import { IFieldData } from "./interfaces";
 
 export enum ReportsMutations {
-  EXAMPLE_MUTATION = "EXAMPLE_MUTATION",
   SET_STATUS = "SET_STATUS",
   SET_GENERATED_SPREADSHEET = "SET_GENERATED_SPREADSHEET",
 }
 
-export enum ReportsGetters {
-  EXAMPLE_GETTER = "EXAMPLE_GETTER",
-}
+export enum ReportsGetters {}
 
 export enum ReportsActions {
-  EXAMPLE_ACTION = "EXAMPLE_ACTION",
   RESET = "RESET",
   GENERATE_SPREADSHEET = "GENERATE_SPREADSHEET",
   RUN_AUX_REPORT_TASK = "RUN_AUX_REPORT_TASK",

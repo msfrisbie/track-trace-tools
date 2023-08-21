@@ -4,26 +4,28 @@
   <div>
     <div
       ref="mainmenu"
-      class="w-full grid gap-8 grid-cols-2"
-      style="grid-template-columns: auto 1fr"
+      class="w-full grid gap-8 grid-cols-3"
+      style="grid-template-columns: minmax(280px, auto) 1fr minmax(280px, auto)"
     >
       <div class="flex gap-2 flex-col">
-        <div
+        <!-- <div
           v-for="option of options"
           v-bind:key="option.text"
           class="flex flex-col items-center justify-center space-y-4"
           style="min-width: 300px"
           v-bind:style="{
-            opacity: option.enabled ? 'inherit' : '0.4',
-            display: option.visible ? 'flex' : 'none',
           }"
-        >
-          <!-- <font-awesome-icon size="3x" class="text-gray-500" :icon="option.icon" /> -->
-
+        > -->
+        <!-- <font-awesome-icon size="3x" class="text-gray-500" :icon="option.icon" /> -->
+        <b-button-group vertical class="rounded border border-purple-600 overflow-hidden">
           <b-button
-            class="w-full flex flex-row items-center justify-between space-x-4 opacity-70 hover:opacity-100"
+            v-for="option of options"
+            v-bind:key="option.text"
+            class="w-full flex flex-row items-center justify-between space-x-4 opacity-70 hover:opacity-100 border-0"
             v-bind:style="{
               // 'background-color': option.backgroundColor,
+              opacity: option.enabled ? 'inherit' : '0.4',
+              display: option.visible ? 'flex' : 'none',
             }"
             variant="outline-primary"
             :disabled="!option.enabled"
@@ -52,29 +54,9 @@
               >
             </div>
           </b-button>
-
-          <!-- <div class="text-center" style="height: 1rem; margin-top: 1rem">
-          <template v-if="option.enabled">
-            <template v-if="option.helpRoute">
-              <b-button
-                variant="link"
-                class="text-gray-500 opacity-70 hover:opacity-100"
-                @click.stop.prevent="open({ route: option.helpRoute })"
-                >What is this?</b-button
-              >
-            </template>
-          </template>
-          <template v-else>
-            <span class="text-gray-500 opacity-70"
-              >{{ notAvailableMessage }}
-              <b-button variant="link" @click.stop.prevent="open('/help/unavailable')"
-                >Why?</b-button
-              >
-            </span>
-          </template>
-        </div> -->
-        </div>
+        </b-button-group>
       </div>
+      <announcements></announcements>
       <builder-dashboard></builder-dashboard>
     </div>
   </div>
@@ -82,6 +64,7 @@
 
 <script lang="ts">
 import BuilderDashboard from "@/components/overlay-widget/BuilderDashboard.vue";
+import Announcements from "@/components/overlay-widget/Announcements.vue";
 import { MessageType } from "@/consts";
 import { IPluginState } from "@/interfaces";
 import { analyticsManager } from "@/modules/analytics-manager.module";
@@ -111,6 +94,7 @@ export default Vue.extend({
   router,
   store,
   components: {
+    Announcements,
     BuilderDashboard,
   },
   data() {

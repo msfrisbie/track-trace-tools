@@ -2,14 +2,15 @@
   <b-card
     @click="open()"
     variant="ttt"
-    class="cursor-pointer hover:bg-purple-100 hover:border hover:border-purple-600"
+    class="cursor-pointer hover:bg-purple-100 hover:border hover:border-purple-600 p-2"
+    no-body
   >
     <div>{{ title }}</div>
     <template v-if="loading">
       <b-spinner small variant="ttt" class="mt-4"></b-spinner>
     </template>
     <template v-else>
-      <div class="text-2xl t-4">
+      <div class="text-xl t-4">
         <template v-if="count > 0">
           <span class="ttt-purple">{{ count }}</span>
         </template>

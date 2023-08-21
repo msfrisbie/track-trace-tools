@@ -15,6 +15,7 @@ import {
   TransferState,
 } from "@/consts";
 import { Store } from "vuex";
+import { IAnnouncementsState } from "./store/page-overlay/modules/announcements/interfaces";
 import { IClientState } from "./store/page-overlay/modules/client/interfaces";
 import { ICreatePackageCsvState } from "./store/page-overlay/modules/create-package-csv/interfaces";
 import { IEmployeeSamplesState } from "./store/page-overlay/modules/employee-samples/interfaces";
@@ -201,6 +202,7 @@ export interface IRootState {
 export interface IPluginState extends IRootState {
   // Modules
   pluginAuth: IPluginAuthState;
+  announcements: IAnnouncementsState;
   client: IClientState;
   transferBuilder: ITransferBuilderState;
   packageSearch: IPackageSearchState;

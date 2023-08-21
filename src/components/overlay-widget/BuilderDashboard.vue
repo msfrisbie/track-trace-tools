@@ -1,121 +1,138 @@
 <template>
-  <div class="grid grid-cols-3 gap-4 text-center">
-    <div class="col-span-3 text-2xl text-gray-400 font-thin">PACKAGES</div>
-    <dashboard-card
-      title="ACTIVE"
-      :count="activePackageCount"
-      :loading="activePackageCount === null"
-      :url="activePackagesUrl"
-    ></dashboard-card>
-    <dashboard-card
-      title="INACTIVE"
-      :count="inactivePackageCount"
-      :loading="inactivePackageCount === null"
-      :url="inactivePackagesUrl"
-    ></dashboard-card>
-    <dashboard-card
-      title="IN TRANSIT"
-      :count="intransitPackageCount"
-      :loading="intransitPackageCount === null"
-      :url="intransitPackagesUrl"
-    ></dashboard-card>
-    <div class="col-span-3 text-2xl text-gray-400 font-thin">TRANSFERS</div>
-    <dashboard-card
-      title="INCOMING"
-      :count="incomingTransferCount"
-      :loading="incomingTransferCount === null"
-      :url="incomingTransfersUrl"
-    ></dashboard-card>
-    <dashboard-card
-      title="OUTGOING"
-      :count="outgoingTransferCount"
-      :loading="outgoingTransferCount === null"
-      :url="outgoingTransfersUrl"
-    ></dashboard-card>
-    <dashboard-card
-      title="REJECTED"
-      :count="rejectedTransferCount"
-      :loading="rejectedTransferCount === null"
-      :url="rejectedTransfersUrl"
-    ></dashboard-card>
-    <div class="col-span-3 text-2xl text-gray-400 font-thin">PLANT BATCHES</div>
-    <dashboard-card
-      title="ACTIVE"
-      :count="activePlantBatchCount"
-      :loading="activePlantBatchCount === null"
-      :url="activePlantBatchesUrl"
-    ></dashboard-card>
-    <dashboard-card
-      title="INACTIVE"
-      :count="inactivePlantBatchCount"
-      :loading="inactivePlantBatchCount === null"
-      :url="inactivePlantBatchesUrl"
-    ></dashboard-card>
-    <div class="col-span-3 text-2xl text-gray-400 font-thin">PLANTS</div>
-    <dashboard-card
-      title="VEGETATIVE"
-      :count="vegetativePlantCount"
-      :loading="vegetativePlantCount === null"
-      :url="vegetativePlantsUrl"
-    ></dashboard-card>
-    <dashboard-card
-      title="FLOWERING"
-      :count="floweringPlantCount"
-      :loading="floweringPlantCount === null"
-      :url="floweringPlantsUrl"
-    ></dashboard-card>
-    <dashboard-card
-      title="INACTIVE"
-      :count="inactivePlantCount"
-      :loading="inactivePlantCount === null"
-      :url="inactivePlantsUrl"
-    ></dashboard-card>
-    <div class="col-span-3 text-2xl text-gray-400 font-thin">HARVESTS</div>
-    <dashboard-card
-      title="ACTIVE"
-      :count="activeHarvestCount"
-      :loading="activeHarvestCount === null"
-      :url="activeHarvestsUrl"
-    ></dashboard-card>
-    <dashboard-card
-      title="INACTIVE"
-      :count="inactiveHarvestCount"
-      :loading="inactiveHarvestCount === null"
-      :url="inactiveHarvestsUrl"
-    ></dashboard-card>
+  <div class="grid gap-4 text-center">
+    <div class="text-2xl text-gray-400 font-thin">PACKAGES</div>
+    <div class="grid grid-cols-3 gap-2">
+      <dashboard-card
+        title="ACTIVE"
+        :count="activePackageCount"
+        :loading="activePackageCount === null"
+        :url="activePackagesUrl"
+      ></dashboard-card>
+      <dashboard-card
+        title="INACTIVE"
+        :count="inactivePackageCount"
+        :loading="inactivePackageCount === null"
+        :url="inactivePackagesUrl"
+      ></dashboard-card>
+      <dashboard-card
+        title="IN TRANSIT"
+        :count="intransitPackageCount"
+        :loading="intransitPackageCount === null"
+        :url="intransitPackagesUrl"
+      ></dashboard-card>
+    </div>
+    <div class="text-2xl text-gray-400 font-thin">TRANSFERS</div>
+    <div class="grid grid-cols-3 gap-2">
+      <dashboard-card
+        title="INCOMING"
+        :count="incomingTransferCount"
+        :loading="incomingTransferCount === null"
+        :url="incomingTransfersUrl"
+      ></dashboard-card>
+      <dashboard-card
+        title="OUTGOING"
+        :count="outgoingTransferCount"
+        :loading="outgoingTransferCount === null"
+        :url="outgoingTransfersUrl"
+      ></dashboard-card>
+      <dashboard-card
+        title="REJECTED"
+        :count="rejectedTransferCount"
+        :loading="rejectedTransferCount === null"
+        :url="rejectedTransfersUrl"
+      ></dashboard-card>
+    </div>
+    <div class="text-2xl text-gray-400 font-thin">PLANT BATCHES</div>
+    <div class="grid grid-cols-2 gap-2">
+      <dashboard-card
+        title="ACTIVE"
+        :count="activePlantBatchCount"
+        :loading="activePlantBatchCount === null"
+        :url="activePlantBatchesUrl"
+      ></dashboard-card>
+      <dashboard-card
+        title="INACTIVE"
+        :count="inactivePlantBatchCount"
+        :loading="inactivePlantBatchCount === null"
+        :url="inactivePlantBatchesUrl"
+      ></dashboard-card>
+    </div>
+    <div class="text-2xl text-gray-400 font-thin">PLANTS</div>
 
-    <div class="col-span-3 text-2xl text-gray-400 font-thin">TAGS</div>
-    <dashboard-card
-      title="AVAILABLE"
-      :count="availableTagCount"
-      :loading="availableTagCount === null"
-      :url="availableTagsUrl"
-    ></dashboard-card>
-    <dashboard-card
-      title="USED"
-      :count="usedTagCount"
-      :loading="usedTagCount === null"
-      :url="usedTagsUrl"
-    ></dashboard-card>
-    <dashboard-card
-      title="VOIDED"
-      :count="voidedTagCount"
-      :loading="voidedTagCount === null"
-      :url="voidedTagsUrl"
-    ></dashboard-card>
-    <div class="col-span-3 text-2xl text-gray-400 font-thin">SALES</div>
-    <dashboard-card
-      title="ACTIVE"
-      :count="activeSalesCount"
-      :loading="activeSalesCount === null"
-      :url="activeSalesUrl"
-    ></dashboard-card>
-    <dashboard-card
-      title="INACTIVE"
-      :count="inactiveSalesCount"
-      :loading="inactiveSalesCount === null"
-      :url="inactiveSalesUrl"
-    ></dashboard-card>
+    <div class="grid grid-cols-3 gap-2">
+      <dashboard-card
+        title="VEGETATIVE"
+        :count="vegetativePlantCount"
+        :loading="vegetativePlantCount === null"
+        :url="vegetativePlantsUrl"
+      ></dashboard-card>
+      <dashboard-card
+        title="FLOWERING"
+        :count="floweringPlantCount"
+        :loading="floweringPlantCount === null"
+        :url="floweringPlantsUrl"
+      ></dashboard-card>
+      <dashboard-card
+        title="INACTIVE"
+        :count="inactivePlantCount"
+        :loading="inactivePlantCount === null"
+        :url="inactivePlantsUrl"
+      ></dashboard-card>
+    </div>
+    <div class="text-2xl text-gray-400 font-thin">HARVESTS</div>
+
+    <div class="grid grid-cols-2 gap-2">
+      <dashboard-card
+        title="ACTIVE"
+        :count="activeHarvestCount"
+        :loading="activeHarvestCount === null"
+        :url="activeHarvestsUrl"
+      ></dashboard-card>
+      <dashboard-card
+        title="INACTIVE"
+        :count="inactiveHarvestCount"
+        :loading="inactiveHarvestCount === null"
+        :url="inactiveHarvestsUrl"
+      ></dashboard-card>
+    </div>
+    <div class="text-2xl text-gray-400 font-thin">TAGS</div>
+
+    <div class="grid grid-cols-3 gap-2">
+      <dashboard-card
+        title="AVAILABLE"
+        :count="availableTagCount"
+        :loading="availableTagCount === null"
+        :url="availableTagsUrl"
+      ></dashboard-card>
+      <dashboard-card
+        title="USED"
+        :count="usedTagCount"
+        :loading="usedTagCount === null"
+        :url="usedTagsUrl"
+      ></dashboard-card>
+      <dashboard-card
+        title="VOIDED"
+        :count="voidedTagCount"
+        :loading="voidedTagCount === null"
+        :url="voidedTagsUrl"
+      ></dashboard-card>
+    </div>
+    <div class="text-2xl text-gray-400 font-thin">SALES</div>
+
+    <div class="grid grid-cols-2 gap-2">
+      <dashboard-card
+        title="ACTIVE"
+        :count="activeSalesCount"
+        :loading="activeSalesCount === null"
+        :url="activeSalesUrl"
+      ></dashboard-card>
+      <dashboard-card
+        title="INACTIVE"
+        :count="inactiveSalesCount"
+        :loading="inactiveSalesCount === null"
+        :url="inactiveSalesUrl"
+      ></dashboard-card>
+    </div>
   </div>
 </template>
 
