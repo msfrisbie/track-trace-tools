@@ -57,6 +57,7 @@
     "vue": "^2.6.12",
     "vue-class-component": "^7.2.3",
     "vue-intersection-observer": "^0.1.8",
+    "vue-markdown-render": "^2.0.1",
     "vue-mv3-hot-reload": "github:awardx/vue-extension-mv3-hot-reload",
     "vue-property-decorator": "^8.4.2",
     "vue-router": "^3.5.2",
