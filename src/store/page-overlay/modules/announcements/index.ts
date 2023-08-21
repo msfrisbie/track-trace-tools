@@ -1,4 +1,6 @@
+import { MessageType } from "@/consts";
 import { IPluginState } from "@/interfaces";
+import { analyticsManager } from "@/modules/analytics-manager.module";
 import { t3RequestManager } from "@/modules/t3-request-manager.module";
 import { isoDatetimedDifferenceInMinutes } from "@/utils/date";
 import { ActionContext } from "vuex";
@@ -84,6 +86,9 @@ export const announcementsModule = {
       }
 
       ctx.state.lastAnnouncementsViewedDatetime = ctx.state.announcements[0].published_at;
+      if (ctx.state.notificationCount > 0) {
+        analyticsManager.track(MessageType.VIEWED_UNREAD_ANNOUNCEMENTS);
+      }
       ctx.state.notificationCount = 0;
     },
     [AnnouncementsActions.RESET]: async (
