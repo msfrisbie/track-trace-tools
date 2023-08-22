@@ -3,21 +3,46 @@ import { IPluginState } from "@/interfaces";
 import { analyticsManager } from "@/modules/analytics-manager.module";
 import { t3RequestManager } from "@/modules/t3-request-manager.module";
 import { isoDatetimedDifferenceInMinutes } from "@/utils/date";
+// The marked import structure is causing problems
+// @ts-ignore
+import * as marked from "marked/lib/marked.cjs";
 import { ActionContext } from "vuex";
 import {
   AnnouncementsActions,
   AnnouncementsGetters,
   AnnouncementsMutations,
 } from "../announcements/consts";
-import { IAnnouncementsState } from "../announcements/interfaces";
+import { IAnnouncementData, IAnnouncementsState } from "../announcements/interfaces";
 
-const inMemoryState = {};
+const renderer = {
+  heading(text: string, level: any) {
+    return `<h${level} class="text-${4 - level}xl ttt-purple">${text}</h${level}>`;
+  },
+  link(href: string, title: string, text: string) {
+    if (href === null) {
+      return text;
+    }
+    let out = '<a target="_blank" class="text-purple-500 underline" href="' + href + '"';
+    if (title) {
+      out += ' title="' + title + '"';
+    }
+    out += ">" + text + "</a>";
+    return out;
+  },
+};
+
+marked.use({ renderer });
+
+const inMemoryState = {
+  showDismissed: false,
+};
 
 const persistedState = {
   announcements: [],
   notificationCount: 0,
   lastAnnouncementsCheckDatetime: null,
   lastAnnouncementsViewedDatetime: null,
+  dismissedDatetime: null,
 };
 
 const defaultState: IAnnouncementsState = {
@@ -33,13 +58,73 @@ export const announcementsModule = {
     },
   },
   getters: {
-    [AnnouncementsGetters.ANNOUNCEMENTS_GETTER]: (
+    [AnnouncementsGetters.DISMISSABLE_ANNOUNCEMENTS]: (
       state: IAnnouncementsState,
       getters: any,
       rootState: any,
       rootGetters: any
-    ) => {
-      // return state.data
+    ): IAnnouncementData[] => {
+      return state.announcements
+        .filter((x) => {
+          if (!state.dismissedDatetime) {
+            return true;
+          }
+
+          return x.published_at > state.dismissedDatetime;
+        })
+        .map((x) => {
+          x.html = marked.parse(x.markdown);
+          x.readable_published_at = new Date(x.published_at).toLocaleString();
+          return x;
+        });
+    },
+    [AnnouncementsGetters.VISIBLE_ANNOUNCEMENTS]: (
+      state: IAnnouncementsState,
+      getters: any,
+      rootState: any,
+      rootGetters: any
+    ): IAnnouncementData[] => {
+      return state.announcements
+        .filter((x) => {
+          if (state.showDismissed) {
+            return true;
+          }
+
+          if (!state.dismissedDatetime) {
+            return true;
+          }
+
+          return x.published_at > state.dismissedDatetime;
+        })
+        .map((x) => {
+          x.html = marked.parse(x.markdown);
+          x.readable_published_at = new Date(x.published_at).toLocaleString();
+          return x;
+        });
+    },
+    [AnnouncementsGetters.HIDDEN_ANNOUNCEMENTS]: (
+      state: IAnnouncementsState,
+      getters: any,
+      rootState: any,
+      rootGetters: any
+    ): IAnnouncementData[] => {
+      return state.announcements
+        .filter((x) => {
+          if (state.showDismissed) {
+            return false;
+          }
+
+          if (!state.dismissedDatetime) {
+            return false;
+          }
+
+          return x.published_at <= state.dismissedDatetime;
+        })
+        .map((x) => {
+          x.html = marked.parse(x.markdown);
+          x.readable_published_at = new Date(x.published_at).toLocaleString();
+          return x;
+        });
     },
   },
   actions: {
@@ -91,14 +176,33 @@ export const announcementsModule = {
       }
       ctx.state.notificationCount = 0;
     },
+    [AnnouncementsActions.SHOW_ALL_ANNOUNCEMENTS]: async (
+      ctx: ActionContext<IAnnouncementsState, IPluginState>,
+      data: any
+    ) => {
+      ctx.state.showDismissed = true;
+    },
+    [AnnouncementsActions.DISMISS_ANNOUNCEMENTS]: async (
+      ctx: ActionContext<IAnnouncementsState, IPluginState>,
+      data: any
+    ) => {
+      if (ctx.state.announcements.length === 0) {
+        return;
+      }
+
+      ctx.state.dismissedDatetime = ctx.state.announcements[0].published_at;
+
+      analyticsManager.track(MessageType.DISMISSED_ANNOUNCEMENTS);
+    },
     [AnnouncementsActions.RESET]: async (
       ctx: ActionContext<IAnnouncementsState, IPluginState>,
       data: any
     ) => {
-      ctx.state.lastAnnouncementsCheckDatetime = null;
-      ctx.state.lastAnnouncementsViewedDatetime = null;
       ctx.state.notificationCount = 0;
       ctx.state.announcements = [];
+      ctx.state.lastAnnouncementsCheckDatetime = null;
+      ctx.state.lastAnnouncementsViewedDatetime = null;
+      ctx.state.dismissedDatetime = null;
     },
   },
 };

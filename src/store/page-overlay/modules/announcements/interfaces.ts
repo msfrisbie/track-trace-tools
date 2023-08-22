@@ -7,6 +7,9 @@ export interface IAnnouncementsState {
   // When loading new announcements, add a notification for each
   // announcement that is AFTER this datetime
   lastAnnouncementsViewedDatetime: string | null;
+  // The datetime before which all notifications are dismissed
+  dismissedDatetime: string | null;
+  showDismissed: boolean;
 }
 
 export interface IAnnouncementData {

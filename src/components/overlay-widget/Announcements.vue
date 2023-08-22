@@ -1,20 +1,41 @@
 <template>
   <div>
     <div ref="announcementsContainer" class="flex flex-col gap-6 px-8">
-      <template v-if="parsedAnnouncements.length === 0">
+      <template v-if="visibleAnnouncements.length === 0">
         <span class="text-lg text-gray-600 text-center">All caught up!</span>
         <span class="text-sm text-gray-400 text-center"
           >Track &amp; Trace Tools announcements will appear here</span
         >
       </template>
       <div
-        v-for="parsedAnnouncement of parsedAnnouncements"
-        v-bind:key="parsedAnnouncement.published_at"
+        v-for="visibleAnnouncement of visibleAnnouncements"
+        v-bind:key="visibleAnnouncement.published_at"
         class="flex flex-col gap-2"
       >
-        <div class="text-sm text-gray-400">{{ parsedAnnouncement.readable_published_at }}</div>
+        <div class="text-sm text-gray-400">{{ visibleAnnouncement.readable_published_at }}</div>
 
-        <div class="flex flex-col gap-4" v-html="parsedAnnouncement.html"></div>
+        <div class="flex flex-col gap-4" v-html="visibleAnnouncement.html"></div>
+
+        <hr class="my-6" />
+      </div>
+
+      <div class="flex flex-col items-center justify-center gap-2">
+        <b-button
+          v-if="dismissableAnnouncements.length > 0"
+          @click="dismissAnnouncements()"
+          variant="outline-dark"
+          size="sm"
+          class="opacity-40 hover:opacity-100"
+          >DISMISS</b-button
+        >
+        <b-button
+          v-if="hiddenAnnouncements.length > 0"
+          @click="showAllAnnouncements()"
+          variant="outline-dark"
+          size="sm"
+          class="opacity-40 hover:opacity-100"
+          >SHOW ALL</b-button
+        >
       </div>
     </div>
   </div>
@@ -22,34 +43,15 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { mapState } from "vuex";
+import { mapActions, mapGetters, mapState } from "vuex";
 import router from "@/router/index";
 import store from "@/store/page-overlay/index";
-// The marked import structure is causing problems
-// @ts-ignore
-import * as marked from "marked/lib/marked.cjs";
 import { IPluginState } from "@/interfaces";
-import { AnnouncementsActions } from "@/store/page-overlay/modules/announcements/consts";
+import {
+  AnnouncementsActions,
+  AnnouncementsGetters,
+} from "@/store/page-overlay/modules/announcements/consts";
 import { IAnnouncementData } from "@/store/page-overlay/modules/announcements/interfaces";
-
-const renderer = {
-  heading(text: string, level: any) {
-    return `<h${level} class="text-${4 - level}xl ttt-purple">${text}</h${level}>`;
-  },
-  link(href: string, title: string, text: string) {
-    if (href === null) {
-      return text;
-    }
-    let out = '<a class="text-purple-500 underline" href="' + href + '"';
-    if (title) {
-      out += ' title="' + title + '"';
-    }
-    out += ">" + text + "</a>";
-    return out;
-  },
-};
-
-marked.use({ renderer });
 
 export default Vue.extend({
   name: "Announcements",
@@ -60,14 +62,17 @@ export default Vue.extend({
   computed: {
     ...mapState<IPluginState>({
       announcements: (state: IPluginState) => state.announcements.announcements,
+      showDismissed: (state: IPluginState) => state.announcements.showDismissed,
     }),
-    parsedAnnouncements(): IAnnouncementData[] {
-      return store.state.announcements.announcements.map((x) => {
-        x.html = marked.parse(x.markdown);
-        x.readable_published_at = new Date(x.published_at).toLocaleString();
-        return x;
-      });
-    },
+    ...mapGetters({
+      visibleAnnouncements: `announcements/${AnnouncementsGetters.VISIBLE_ANNOUNCEMENTS}`,
+      hiddenAnnouncements: `announcements/${AnnouncementsGetters.HIDDEN_ANNOUNCEMENTS}`,
+      dismissableAnnouncements: `announcements/${AnnouncementsGetters.DISMISSABLE_ANNOUNCEMENTS}`,
+    }),
+    ...mapActions({
+      dismissAnnouncements: `announcements/${AnnouncementsActions.DISMISS_ANNOUNCEMENTS}`,
+      showAllAnnouncements: `announcements/${AnnouncementsActions.SHOW_ALL_ANNOUNCEMENTS}`,
+    }),
   },
   data() {
     return {};
