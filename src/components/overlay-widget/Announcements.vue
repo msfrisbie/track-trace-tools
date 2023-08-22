@@ -69,15 +69,16 @@ export default Vue.extend({
       hiddenAnnouncements: `announcements/${AnnouncementsGetters.HIDDEN_ANNOUNCEMENTS}`,
       dismissableAnnouncements: `announcements/${AnnouncementsGetters.DISMISSABLE_ANNOUNCEMENTS}`,
     }),
+  },
+  data() {
+    return {};
+  },
+  methods: {
     ...mapActions({
       dismissAnnouncements: `announcements/${AnnouncementsActions.DISMISS_ANNOUNCEMENTS}`,
       showAllAnnouncements: `announcements/${AnnouncementsActions.SHOW_ALL_ANNOUNCEMENTS}`,
     }),
   },
-  data() {
-    return {};
-  },
-  methods: {},
   async created() {},
   async mounted() {
     // Create the Intersection Observer
