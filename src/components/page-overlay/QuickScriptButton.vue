@@ -18,29 +18,39 @@
 
     <b-dd-divider></b-dd-divider>
 
-    <template v-for="quickScript of quickScripts">
-      <b-dd-item
-        v-if="!quickScript.childOptions"
-        v-bind:key="quickScript.id"
-        @click="runQuickScript(quickScript)"
-        >{{ quickScript.name }}</b-dd-item
-      >
+    <template v-for="(quickScript, idx) of quickScripts">
+      <template v-if="!quickScript.childOptions">
+        <b-dd-item
+          v-bind:class="{ 'bg-purple-100': idx % 2 !== 0 }"
+          v-bind:key="quickScript.id"
+          @click="runQuickScript(quickScript)"
+          >{{ quickScript.name }}</b-dd-item
+        >
+      </template>
 
-      <b-dd-item v-if="!!quickScript.childOptions" v-bind:key="quickScript.id">
-        <div class="flex flex-col items-stretch gap-2">
-          <div>{{ quickScript.name }}</div>
-          <div class="grid grid-flow-col auto-cols-max gap-2">
-            <b-button
-              size="sm"
-              variant="outline-dark"
-              v-for="childOption of quickScript.childOptions"
-              v-bind:key="childOption"
-              @click="runQuickScript(quickScript, childOption)"
-              >{{ childOption }}</b-button
-            >
+      <template v-else>
+        <b-dd-item
+          class="hover:bg-purple-200"
+          v-bind:key="quickScript.id"
+          v-bind:class="{ 'bg-purple-100': idx % 2 !== 0 }"
+        >
+          <div class="flex flex-col items-stretch gap-2" style="max-width: 280px">
+            <div>{{ quickScript.name }}</div>
+            <!-- <div class="grid grid-flow-col auto-cols-max gap-2"> -->
+            <div class="flex flex-row flex-wrap gap-2">
+              <b-button
+                size="sm"
+                variant="outline-dark"
+                :title="childOption"
+                v-for="childOption of quickScript.childOptions"
+                v-bind:key="childOption"
+                @click="runQuickScript(quickScript, childOption)"
+                >{{ childOption }}</b-button
+              >
+            </div>
           </div>
-        </div>
-      </b-dd-item>
+        </b-dd-item>
+      </template>
     </template>
 
     <b-popover

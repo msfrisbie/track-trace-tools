@@ -16,8 +16,18 @@ export interface IQuickScript {
   quickScriptFunction: (childOption: any) => void;
 }
 
+export enum ColumnGroups {
+  ALL = "All",
+  MINIMUM = "ID Only",
+  DEFAULT = "Reset",
+  SIMPLE_PACKAGE = "Min Package",
+}
+
 export async function runQuickScript(quickScript: IQuickScript, childOption?: any) {
   analyticsManager.track(MessageType.RAN_QUICK_SCRIPT, { scriptId: quickScript.id });
+
+  // Allow menu to collapse before running quick script
+  await new Promise((resolve) => setTimeout(resolve, 0));
 
   quickScript.quickScriptFunction(childOption);
 }
@@ -66,23 +76,35 @@ export const QUICK_SCRIPTS: IQuickScript[] = [
     quickScriptFunction: addPackageContents,
   },
   {
-    id: "SHOW_ALL_COLUMNS",
-    name: "Show All Columns",
-    description: "Makes all Metrc table columns visible",
-    quickScriptFunction: showAllColumns,
+    id: "SHOW_COLUMNS",
+    name: "Show Columns",
+    description: "Makes certain Metrc table columns visible",
+    quickScriptFunction: showColumns,
+    childOptions: [
+      ColumnGroups.ALL,
+      ColumnGroups.DEFAULT,
+      ColumnGroups.MINIMUM,
+      ColumnGroups.SIMPLE_PACKAGE,
+    ],
   },
-  {
-    id: "SHOW_DEFAULT_COLUMNS",
-    name: "Show Default Columns",
-    description: "Resets Metrc table to default columns",
-    quickScriptFunction: showDefaultColumns,
-  },
-  {
-    id: "SHOW_ONLY_PRIMARY_COLUMN",
-    name: "Show Only Primary Column",
-    description: "Hides all Metrc table columns except for the primary one",
-    quickScriptFunction: showOnlyPrimaryColumn,
-  },
+  // {
+  //   id: "SHOW_ALL_COLUMNS",
+  //   name: "Show All Columns",
+  //   description: "Makes all Metrc table columns visible",
+  //   quickScriptFunction: showAllColumns,
+  // },
+  // {
+  //   id: "SHOW_DEFAULT_COLUMNS",
+  //   name: "Show Default Columns",
+  //   description: "Resets Metrc table to default columns",
+  //   quickScriptFunction: showDefaultColumns,
+  // },
+  // {
+  //   id: "SHOW_ONLY_PRIMARY_COLUMN",
+  //   name: "Show Only Primary Column",
+  //   description: "Hides all Metrc table columns except for the primary one",
+  //   quickScriptFunction: showOnlyPrimaryColumn,
+  // },
 ];
 
 export async function addPackageContents(count: number) {
@@ -126,7 +148,26 @@ export async function checkAllPlantsForHarvestRestore() {
   });
 }
 
-export async function showAllColumns() {
+export async function showColumns(columnGroup: ColumnGroups) {
+  console.log(columnGroup);
+  switch (columnGroup) {
+    case ColumnGroups.MINIMUM:
+      showOnlyPrimaryColumn();
+      break;
+    case ColumnGroups.DEFAULT:
+      showDefaultColumns();
+      break;
+    case ColumnGroups.SIMPLE_PACKAGE:
+      showSimplePackageColumns();
+      break;
+    case ColumnGroups.ALL:
+    default:
+      showAllColumns();
+      break;
+  }
+}
+
+async function showAllColumns() {
   try {
     const menuButton = document.querySelector(`th .k-header-column-menu`) as HTMLElement | null;
 
@@ -184,7 +225,7 @@ export async function showAllColumns() {
   );
 }
 
-export async function showDefaultColumns() {
+async function showDefaultColumns() {
   try {
     [...(document.querySelectorAll(`a[href="#"]`) as NodeListOf<HTMLAnchorElement>)]
       .find((x) => x.innerText.includes("Reset Settings"))!
@@ -204,7 +245,75 @@ export async function showDefaultColumns() {
   }
 }
 
-export async function showOnlyPrimaryColumn() {
+async function showSimplePackageColumns() {
+  const simplePackageDataFields = ["Label", "Item.Name", "Item.ProductCategoryName", "Quantity"];
+
+  try {
+    const menuButton = document.querySelector(`th .k-header-column-menu`) as HTMLElement | null;
+
+    if (menuButton) {
+      pageManager.suppressAnimationContainer();
+
+      // This opens the menu and creates the form
+      menuButton.click();
+
+      let form = null;
+      const animationContainer = pageManager.getVisibleAnimationContainer("Sort Ascending");
+
+      if (animationContainer) {
+        form = animationContainer.querySelector(".k-columns-item");
+      }
+
+      if (form) {
+        for (const checkbox of form.querySelectorAll(
+          `input[type="checkbox"]`
+        ) as NodeListOf<HTMLInputElement>) {
+          if (simplePackageDataFields.includes(checkbox.getAttribute("data-field")!)) {
+            if (!checkbox.checked) {
+              checkbox.click();
+            }
+            continue;
+          } else {
+            if (checkbox.checked) {
+              checkbox.click();
+              continue;
+            }
+          }
+        }
+      }
+
+      // Close the menu
+      if (menuButton) {
+        menuButton.click();
+      }
+
+      toastManager.openToast(`Checked simple package columns`, {
+        title: "Quick Script Success",
+        autoHideDelay: 5000,
+        variant: "success",
+        appendToast: true,
+        toaster: "ttt-toaster",
+        solid: true,
+      });
+
+      return;
+    }
+  } catch {}
+
+  toastManager.openToast(
+    `Couldn't find a Metrc table. This quick script only works on Metrc pages with tables.`,
+    {
+      title: "Quick Script Error",
+      autoHideDelay: 5000,
+      variant: "warning",
+      appendToast: true,
+      toaster: "ttt-toaster",
+      solid: true,
+    }
+  );
+}
+
+async function showOnlyPrimaryColumn() {
   try {
     const menuButton = document.querySelector(`th .k-header-column-menu`) as HTMLElement | null;
 

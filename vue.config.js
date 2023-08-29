@@ -53,7 +53,7 @@ module.exports = {
         contentScripts: {
           entries: {
             "content-script": ["src/content-scripts/content-script.ts"],
-            // "main-script": ["src/content-scripts/main-script.ts"],
+            "main-script": ["src/content-scripts/main-script.ts"],
             "load-script": ["src/content-scripts/load-script.ts"],
             // 'worker': [
             //   'src/content-scripts/worker.ts',
