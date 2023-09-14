@@ -40,6 +40,10 @@ export const clientModule = {
       ctx: ActionContext<IClientState, IPluginState>,
       data: { notify?: boolean } = {}
     ) => {
+      const plusUsers = await t3RequestManager.loadT3plus();
+
+      ctx.state.t3plus = plusUsers.length > 0;
+
       if (!ctx.rootState.settings.licenseKey) {
         ctx.state.clientName = null;
         ctx.state.values = {};
@@ -63,10 +67,6 @@ export const clientModule = {
 
       ctx.state.clientName = clientName;
       ctx.state.values = values;
-
-      const plusUsers = await t3RequestManager.loadT3plus();
-
-      ctx.state.t3plus = plusUsers.length > 0;
     },
   },
 };

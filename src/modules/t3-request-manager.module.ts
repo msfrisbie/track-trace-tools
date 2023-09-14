@@ -27,7 +27,7 @@ class T3RequestManager implements IAtomicService {
     try {
       const response = await customAxios(BASE_URL + CLIENT_KEY_PATH, {
         method: "POST",
-        headers: DEFAULT_POST_HEADERS,
+        headers: DEFAULT_POST_HEADERS, 
         body: JSON.stringify({ client_key: clientKey }),
       });
 
