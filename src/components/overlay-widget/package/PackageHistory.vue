@@ -1,6 +1,6 @@
 <template>
   <div class="flex flex-col items-stretch w-full">
-    <template v-if="clientValues['ENABLE_T3PLUS']">
+    <template v-if="clientValues['ENABLE_T3PLUS'] || t3plus">
       <template v-if="!sourcePackage">
         <single-package-picker
           class="mb-4"
@@ -381,6 +381,7 @@ export default Vue.extend({
   computed: {
     ...mapState<IPluginState>({
       clientValues: (state: IPluginState) => state.client.values,
+      t3plus: (state: IPluginState) => state.client.t3plus,
       sourcePackage: (state: IPluginState) => state.packageHistory.sourcePackage,
       ancestorTree: (state: IPluginState) => state.packageHistory.ancestorTree,
       childTree: (state: IPluginState) => state.packageHistory.childTree,

@@ -3,7 +3,7 @@ export enum ClientMutations {
 }
 
 export enum ClientGetters {
-  CLIENT_GETTER = "CLIENT_GETTER",
+  T3PLUS = "T3PLUS",
 }
 
 export enum ClientActions {

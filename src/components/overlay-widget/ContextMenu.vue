@@ -97,7 +97,7 @@
             </b-button>
           </template>
 
-          <template v-if="clientValues['ENABLE_T3PLUS']">
+          <template v-if="clientValues['ENABLE_T3PLUS'] || t3plus">
             <b-button
               variant="outline-primary"
               class=""
@@ -377,6 +377,7 @@ export default Vue.extend({
   computed: {
     ...mapState<IPluginState>({
       clientValues: (state: IPluginState) => state.client.values,
+      t3plus: (state: IPluginState) => state.client.t3plus,
       authState: (state: IPluginState) => state.pluginAuth.authState,
       oAuthState: (state: IPluginState) => state.pluginAuth.oAuthState,
     }),

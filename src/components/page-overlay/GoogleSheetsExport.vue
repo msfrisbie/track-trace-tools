@@ -24,7 +24,7 @@
                 </div>
               </b-form-checkbox>
 
-              <div class="text-xs text-start text-gray-600" v-if="!clientValues['ENABLE_T3PLUS']">
+              <div class="text-xs text-start text-gray-600" v-if="!clientValues['ENABLE_T3PLUS'] && !t3plus">
                 Get access to advanced reports with
                 <a
                   class="text-purple-500 underline"
@@ -271,12 +271,12 @@
                     <span class="leading-6">Include inactive packages</span>
                   </b-form-checkbox>
 
-                  <b-form-checkbox :disabled="!clientValues['ENABLE_T3PLUS']">
+                  <b-form-checkbox :disabled="!clientValues['ENABLE_T3PLUS'] && !t3plus">
                     <div class="flex flex-col items-start">
                       <span class="leading-6"
                         >Include packages transferred out of this facility</span
                       >
-                      <span v-if="!clientValues['ENABLE_T3PLUS']" class="text-xs text-gray-300"
+                      <span v-if="!clientValues['ENABLE_T3PLUS'] && !t3plus" class="text-xs text-gray-300"
                         >Enable this with
                         <a href="https://trackandtrace.tools/plus" target="_blank">T3+</a></span
                       >
@@ -654,13 +654,13 @@
                     <span class="leading-6">Include Inactive Outgoing</span>
                   </b-form-checkbox>
                   <b-form-checkbox
-                    :disabled="!clientValues['ENABLE_T3PLUS']"
+                    :disabled="!clientValues['ENABLE_T3PLUS'] && !t3plus"
                     v-model="outgoingTransfersFormFilters.onlyWholesale"
                   >
                     <div class="flex flex-col items-start">
                       <span class="leading-6">Only Wholesale</span>
                     </div>
-                    <span v-if="!clientValues['ENABLE_T3PLUS']" class="text-xs text-gray-300"
+                    <span v-if="!clientValues['ENABLE_T3PLUS'] && !t3plus" class="text-xs text-gray-300"
                       >Enable this with
                       <a href="https://trackandtrace.tools/plus" target="_blank">T3+</a></span
                     >
@@ -1024,13 +1024,13 @@
                     <span class="leading-6">Include Inactive Outgoing</span>
                   </b-form-checkbox>
                   <b-form-checkbox
-                    :disabled="!clientValues['ENABLE_T3PLUS']"
+                    :disabled="!clientValues['ENABLE_T3PLUS'] && !t3plus"
                     v-model="outgoingTransferManifestsFormFilters.onlyWholesale"
                   >
                     <div class="flex flex-col items-start">
                       <span class="leading-6">Only Wholesale</span>
                     </div>
-                    <span v-if="!clientValues['ENABLE_T3PLUS']" class="text-xs text-gray-300"
+                    <span v-if="!clientValues['ENABLE_T3PLUS'] && !t3plus" class="text-xs text-gray-300"
                       >Enable this with
                       <a href="https://trackandtrace.tools/plus" target="_blank">T3+</a></span
                     >
@@ -1456,13 +1456,14 @@ import {
 import { addTagsReport, tagsFormFiltersFactory } from "@/utils/reports/tags-report";
 import _ from "lodash-es";
 import Vue from "vue";
-import { mapActions, mapState } from "vuex";
+import { mapActions, mapGetters, mapState } from "vuex";
 import ArchiveWidget from "../shared/ArchiveWidget.vue";
 import SimpleDrawer from "../shared/SimpleDrawer.vue";
 import {
   addEmployeeSamplesReport,
   employeeSamplesFormFiltersFactory,
 } from "@/utils/reports/employee-samples-report";
+import { ClientGetters } from "@/store/page-overlay/modules/client/consts";
 
 interface IReportOption {
   text: string;
@@ -1488,6 +1489,7 @@ export default Vue.extend({
       authState: (state: IPluginState) => state.pluginAuth.authState,
       oAuthState: (state: IPluginState) => state.pluginAuth.oAuthState,
       clientValues: (state: IPluginState) => state.client.values,
+      t3plus: (state: IPluginState) => state.client.t3plus,
       generatedSpreadsheet: (state: IPluginState) => state.reports.generatedSpreadsheet,
       generatedSpreadsheetHistory: (state: IPluginState) =>
         state.reports.generatedSpreadsheetHistory,
@@ -1767,7 +1769,7 @@ export default Vue.extend({
         }
 
         if (x.t3plus) {
-          return store.state.client.values["ENABLE_T3PLUS"];
+          return store.state.client.values["ENABLE_T3PLUS"] || store.state.client.t3plus;
         } else {
           return true;
         }
@@ -1784,7 +1786,7 @@ export default Vue.extend({
         }
 
         if (x.t3plus) {
-          return !store.state.client.values["ENABLE_T3PLUS"];
+          return !store.state.client.values["ENABLE_T3PLUS"] || store.state.client.t3plus;
         } else {
           return false;
         }

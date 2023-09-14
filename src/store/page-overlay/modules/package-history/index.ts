@@ -290,7 +290,7 @@ export const packageHistoryModule = {
     ) => {
       analyticsManager.track(MessageType.GENERATE_PACKAGE_HISTORY, { pkg });
 
-      if (!store.state.client.values["ENABLE_T3PLUS"]) {
+      if (!store.state.client.values["ENABLE_T3PLUS"] && !store.state.client.t3plus) {
         return;
       }
 

@@ -9,6 +9,7 @@ const inMemoryState = {};
 
 const persistedState = {
   clientName: null,
+  t3plus: false,
   values: {},
 };
 
@@ -25,13 +26,13 @@ export const clientModule = {
     },
   },
   getters: {
-    [ClientGetters.CLIENT_GETTER]: (
+    [ClientGetters.T3PLUS]: (
       state: IClientState,
       getters: any,
       rootState: any,
       rootGetters: any
     ) => {
-      // return state.data
+      return state.t3plus || !!state.values["ENABLE_T3PLUS"];
     },
   },
   actions: {
@@ -62,6 +63,10 @@ export const clientModule = {
 
       ctx.state.clientName = clientName;
       ctx.state.values = values;
+
+      const plusUsers = await t3RequestManager.loadT3plus();
+
+      ctx.state.t3plus = plusUsers.length > 0;
     },
   },
 };

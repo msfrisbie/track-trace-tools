@@ -10,6 +10,7 @@ const CLIENT_KEY_PATH = "client";
 const VERIFY_TEST_PATH = "verify/test";
 const FACILITIES_PATH = "facilities";
 const ANNOUNCEMENTS_PATH = "announcements";
+const T3PLUS_PATH = "plus_users/status";
 
 const DEFAULT_POST_HEADERS = {
   "Content-Type": "application/json",
@@ -55,6 +56,18 @@ class T3RequestManager implements IAtomicService {
 
       throw new Error("Error fetching client values. Declining to override.");
     }
+  }
+
+  async loadT3plus():Promise<any[]> {
+    const authState = await authManager.authStateOrError();
+
+    const response = await customAxios(BASE_URL + T3PLUS_PATH, {
+      method: "POST",
+      headers: DEFAULT_POST_HEADERS,
+      body: JSON.stringify({metrc_username: authState.identity})
+    });
+
+    return response.data;
   }
 
   async loadAnnouncements(): Promise<IAnnouncementData[]> {

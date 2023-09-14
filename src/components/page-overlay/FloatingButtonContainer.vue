@@ -14,7 +14,7 @@
       </div>
 
       <!-- TODO enable when T3+ signup is ready -->
-      <plus-button v-if="false && !clientValues['ENABLE_T3PLUS']" class="floating-shadow" />
+      <plus-button v-if="false && !clientValues['ENABLE_T3PLUS'] && !t3plus" class="floating-shadow" />
 
       <div class="relative">
         <builder-button class="floating-shadow" />
@@ -63,6 +63,7 @@ export default Vue.extend({
       authState: (state: IPluginState) => state.pluginAuth.authState,
       oAuthState: (state: IPluginState) => state.pluginAuth.oAuthState,
       clientValues: (state: IPluginState) => state.client.values,
+      t3plus: (state: IPluginState) => state.client.t3plus,
       debugMode: (state: IPluginState) => state.debugMode,
       notificationCount: (state: IPluginState) => state.announcements.notificationCount,
     }),
