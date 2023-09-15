@@ -68,13 +68,33 @@
               Configure your report below. <br />Defaults to active data and all fields.
             </div> -->
           </template>
+          <template v-else>
+            <div class="text-center flex flex-col gap-2">
+              <div class="text-base">
+                Track &amp; Trace Tools can generate reports as CSVs or in Google Sheets.
+              </div>
+
+              <a
+                class="underline text-purple-600"
+                href="https://docs.google.com/spreadsheets/d/1fxBfjBUhFt6Gj7PpbQO8DlT1e76DIDtTwiq_2A5tHCU/edit?usp=sharing"
+                target="_blank"
+                >Example report</a
+              >
+              <a
+                class="underline text-purple-600"
+                href="https://youtu.be/JBR21XSKK3I"
+                target="_blank"
+                >How do I make a report?</a
+              >
+            </div>
+          </template>
 
           <!-- COGS -->
           <template v-if="selectedReports.includes(ReportType.COGS)">
             <div
               class="rounded border border-gray-300 p-2 flex flex-col items-stretch gap-2 overflow-hidden"
             >
-              <div class="font-semibold text-white bg-purple-800 p-2 -m-2">COGS</div>
+              <div class="font-semibold text-white ttt-purple-bg p-2 -m-2">COGS</div>
               <hr />
               <div class="flex flex-col items-stretch gap-4">
                 <div class="flex flex-col items-start gap-1">
@@ -105,7 +125,7 @@
             <div
               class="rounded border border-gray-300 p-2 flex flex-col items-stretch gap-2 overflow-hidden"
             >
-              <div class="font-semibold text-white bg-purple-800 p-2 -m-2">COGS</div>
+              <div class="font-semibold text-white ttt-purple-bg p-2 -m-2">COGS</div>
 
               <div>
                 <span class="font-semibold text-red-500"
@@ -178,7 +198,7 @@
             <div
               class="rounded border border-gray-300 p-2 flex flex-col items-stretch gap-2 overflow-hidden"
             >
-              <div class="font-semibold text-white bg-purple-800 p-2 -m-2">COGS Tracker</div>
+              <div class="font-semibold text-white ttt-purple-bg p-2 -m-2">COGS Tracker</div>
               <hr />
               <div class="flex flex-col items-stretch gap-4">
                 <div class="flex flex-col items-start gap-1">
@@ -209,7 +229,7 @@
             <div
               class="rounded border border-gray-300 p-2 flex flex-col items-stretch gap-2 overflow-hidden"
             >
-              <div class="font-semibold text-white bg-purple-800 p-2 -m-2">Employee Samples</div>
+              <div class="font-semibold text-white ttt-purple-bg p-2 -m-2">Employee Samples</div>
               <hr />
               <div class="flex flex-col items-stretch gap-4">
                 <div class="flex flex-col items-start gap-1">
@@ -257,7 +277,7 @@
             <div
               class="rounded border border-gray-300 p-2 flex flex-col items-stretch gap-2 overflow-hidden"
             >
-              <div class="font-semibold text-white bg-purple-800 p-2 -m-2">Packages</div>
+              <div class="font-semibold text-white ttt-purple-bg p-2 -m-2">Packages</div>
               <hr />
               <div class="flex flex-col items-stretch gap-4">
                 <!-- <b-button
@@ -379,7 +399,7 @@
             <div
               class="rounded border border-gray-300 p-2 flex flex-col items-stretch gap-2 overflow-hidden"
             >
-              <div class="font-semibold text-white bg-purple-800 p-2 -m-2">Harvests</div>
+              <div class="font-semibold text-white ttt-purple-bg p-2 -m-2">Harvests</div>
               <hr />
               <div class="flex flex-col items-stretch gap-4">
                 <!-- <b-button
@@ -479,7 +499,7 @@
             <div
               class="rounded border border-gray-300 p-2 flex flex-col items-stretch gap-2 overflow-hidden"
             >
-              <div class="font-semibold text-white bg-purple-800 p-2 -m-2">Mature Plants</div>
+              <div class="font-semibold text-white ttt-purple-bg p-2 -m-2">Mature Plants</div>
               <hr />
               <div class="flex flex-col items-stretch gap-4">
                 <!-- <b-button
@@ -580,7 +600,7 @@
             <div
               class="rounded border border-gray-300 p-2 flex flex-col items-stretch gap-2 overflow-hidden"
             >
-              <div class="font-semibold text-white bg-purple-800 p-2 -m-2">Immature Plants</div>
+              <div class="font-semibold text-white ttt-purple-bg p-2 -m-2">Immature Plants</div>
               <hr />
               <div class="flex flex-col items-stretch gap-4">
                 <!-- <b-button
@@ -679,7 +699,7 @@
             <div
               class="rounded border border-gray-300 p-2 flex flex-col items-stretch gap-2 overflow-hidden"
             >
-              <div class="font-semibold text-white bg-purple-800 p-2 -m-2">Outgoing Transfers</div>
+              <div class="font-semibold text-white ttt-purple-bg p-2 -m-2">Outgoing Transfers</div>
               <hr />
               <div class="flex flex-col items-stretch gap-4">
                 <!-- <b-button
@@ -797,7 +817,7 @@
             <div
               class="rounded border border-gray-300 p-2 flex flex-col items-stretch gap-2 overflow-hidden"
             >
-              <div class="font-semibold text-white bg-purple-800 p-2 -m-2">Hub Transfers</div>
+              <div class="font-semibold text-white ttt-purple-bg p-2 -m-2">Hub Transfers</div>
               <hr />
               <div class="flex flex-col items-stretch gap-4">
                 <!-- <b-button
@@ -897,7 +917,7 @@
             <div
               class="rounded border border-gray-300 p-2 flex flex-col items-stretch gap-2 overflow-hidden"
             >
-              <div class="font-semibold text-white bg-purple-800 p-2 -m-2">Incoming Transfers</div>
+              <div class="font-semibold text-white ttt-purple-bg p-2 -m-2">Incoming Transfers</div>
               <hr />
               <div class="flex flex-col items-stretch gap-4">
                 <!-- <b-button
@@ -1003,7 +1023,7 @@
             <div
               class="rounded border border-gray-300 p-2 flex flex-col items-stretch gap-2 overflow-hidden"
             >
-              <div class="font-semibold text-white bg-purple-800 p-2 -m-2">Tags</div>
+              <div class="font-semibold text-white ttt-purple-bg p-2 -m-2">Tags</div>
               <hr />
               <div class="flex flex-col items-stretch gap-4">
                 <!-- <b-button
@@ -1074,7 +1094,7 @@
             <div
               class="rounded border border-gray-300 p-2 flex flex-col items-stretch gap-2 overflow-hidden"
             >
-              <div class="font-semibold text-white bg-purple-800 p-2 -m-2">
+              <div class="font-semibold text-white ttt-purple-bg p-2 -m-2">
                 Outgoing Transfer Manifests
               </div>
               <hr />
@@ -1213,7 +1233,7 @@
             <div
               class="rounded border border-gray-300 p-2 flex flex-col items-stretch gap-2 overflow-hidden"
             >
-              <div class="font-semibold text-white bg-purple-800 p-2 -m-2">Straggler Packages</div>
+              <div class="font-semibold text-white ttt-purple-bg p-2 -m-2">Straggler Packages</div>
               <hr />
               <div class="flex flex-col items-stretch gap-4">
                 <!-- <b-button
@@ -1355,10 +1375,24 @@
             <b-button
               variant="primary"
               size="sm"
-              @click="createSpreadsheet()"
-              :disabled="!enableGenerateReportButton"
-              >GENERATE REPORT</b-button
+              @click="generateReports('GOOGLE_SHEETS')"
+              :disabled="!enableGoogleSheetsGenerateButton"
+              >EXPORT TO GOOGLE SHEETS</b-button
             >
+            <template v-if="oAuthState === OAuthState.NOT_AUTHENTICATED">
+              <div class="font-semibold">Sign in to your Google account to export to Sheets.</div>
+              <b-button variant="outline-primary" @click="openOAuthPage()">SIGN IN</b-button>
+            </template>
+            <b-button
+              variant="primary"
+              size="sm"
+              @click="generateReports('CSV')"
+              :disabled="!enableCsvGenerateButton"
+              >EXPORT TO CSV</b-button
+            >
+            <template v-if="!isReportSelectionCsvCompatible">
+              <div class="text-xs">The selected report(s) are not CSV compatible</div>
+            </template>
 
             <template v-if="selectedReports.length === 0">
               <div class="text-red-500 text-center">Select something to include in your report</div>
@@ -1404,7 +1438,11 @@
           </template>
 
           <template v-if="reportStatus === ReportStatus.SUCCESS">
-            <b-button variant="primary" :href="generatedSpreadsheet.spreadsheetUrl" target="_blank"
+            <b-button
+              v-if="generatedSpreadsheet"
+              variant="primary"
+              :href="generatedSpreadsheet.spreadsheetUrl"
+              target="_blank"
               >VIEW REPORT</b-button
             >
             <b-button variant="outline-primary" @click="reset()">START OVER</b-button>
@@ -1580,8 +1618,20 @@ export default Vue.extend({
       reportStatusMessage: (state: IPluginState) => state.reports.statusMessage,
       reportStatusMessageHistory: (state: IPluginState) => state.reports.statusMessageHistory,
     }),
-    enableGenerateReportButton(): boolean {
-      return this.selectedReports.length > 0;
+    enableCsvGenerateButton(): boolean {
+      return (
+        this.selectedReports.length > 0 &&
+        !this.selectedReports.find((x: IReportOption) => !x.isCsvEligible)
+      );
+    },
+    isReportSelectionCsvCompatible(): boolean {
+      return !this.selectedReports.find((x: IReportOption) => !x.isCsvEligible);
+    },
+    enableGoogleSheetsGenerateButton(): boolean {
+      return (
+        this.selectedReports.length > 0 &&
+        store.state.pluginAuth.oAuthState === OAuthState.AUTHENTICATED
+      );
     },
     eligibleReportOptions(): IReportOption[] {
       return this.eligibleReportOptionsImpl();
@@ -1924,9 +1974,10 @@ export default Vue.extend({
         path: "/google-sheets",
       });
     },
-    async createSpreadsheet(): Promise<void> {
+    async generateReports(exportFormat = "GOOGLE_SHEETS"): Promise<void> {
       const reportConfig: IReportConfig = {
         authState: await authManager.authStateOrError(),
+        exportFormat,
       };
 
       if (this.selectedReports.includes(ReportType.COGS)) {

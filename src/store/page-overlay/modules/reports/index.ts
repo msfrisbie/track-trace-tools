@@ -4,6 +4,7 @@ import { analyticsManager } from "@/modules/analytics-manager.module";
 import { maybeLoadCogsReportData } from "@/utils/reports/cogs-report";
 import { maybeLoadCogsTrackerReportData } from "@/utils/reports/cogs-tracker-report";
 import {
+  createCogsV2SpreadsheetOrError,
   maybeLoadCogsV2ReportData,
   updateCogsV2MasterCostSheet,
 } from "@/utils/reports/cogs-v2-report";
@@ -20,7 +21,7 @@ import { maybeLoadStragglerPackageReportData } from "@/utils/reports/straggler-p
 import { maybeLoadTagsReportData } from "@/utils/reports/tags-report";
 import { maybeLoadTransferHubTransfersReportData } from "@/utils/reports/transfer-hub-transfers-report";
 import { getSimpleSpreadsheet } from "@/utils/sheets";
-import { createSpreadsheetOrError } from "@/utils/sheets-export";
+import { createCsvOrError, createSpreadsheetOrError } from "@/utils/sheets-export";
 import { v4 as uuidv4 } from "uuid";
 import { ActionContext } from "vuex";
 import {
@@ -155,14 +156,18 @@ export const reportsModule = {
 
         console.log({ reportData, reportConfig });
 
-        const spreadsheet: ISpreadsheet = await createSpreadsheetOrError({
-          reportData,
-          reportConfig,
-        });
+        if (reportConfig.exportFormat === "CSV") {
+          await createCsvOrError({reportData, reportConfig});
+        } else {
+          const spreadsheet: ISpreadsheet = await createSpreadsheetOrError({
+            reportData,
+            reportConfig,
+          });
 
-        ctx.commit(ReportsMutations.SET_GENERATED_SPREADSHEET, { spreadsheet });
+          ctx.commit(ReportsMutations.SET_GENERATED_SPREADSHEET, { spreadsheet });
 
-        window.open(spreadsheet.spreadsheetUrl, "_blank");
+          window.open(spreadsheet.spreadsheetUrl, "_blank");
+        }
 
         ctx.commit(ReportsMutations.SET_STATUS, {
           status: ReportStatus.SUCCESS,

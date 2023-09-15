@@ -9,7 +9,11 @@ import {
   ITransporterData,
 } from "@/interfaces";
 import { ReportType } from "@/store/page-overlay/modules/reports/consts";
-import { IReportConfig, IReportData } from "@/store/page-overlay/modules/reports/interfaces";
+import {
+  IFieldData,
+  IReportConfig,
+  IReportData,
+} from "@/store/page-overlay/modules/reports/interfaces";
 
 export function shouldGenerateReport({
   reportConfig,
@@ -56,6 +60,25 @@ export function extractNestedData({
     default:
       throw new Error("Bad reportType " + reportType);
   }
+}
+
+export function applyFieldTransformer({
+  fields,
+  values,
+}: {
+  fields: IFieldData[];
+  values: any[];
+}): any[][] {
+  return values.map((row) =>
+    fields.map((fieldData) => {
+      let value = row;
+      for (const subProperty of fieldData.value.split(".")) {
+        // @ts-ignore
+        value = value[subProperty];
+      }
+      return value;
+    })
+  );
 }
 
 export function extractFlattenedData({

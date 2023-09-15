@@ -1,5 +1,6 @@
 import { MessageType, SHEETS_API_MESSAGE_TIMEOUT_MS, SheetTitles } from "@/consts";
 import {
+  ICsvFile,
   IDestinationData,
   IDestinationPackageData,
   IIndexedTransferData,
@@ -9,18 +10,24 @@ import {
 } from "@/interfaces";
 import { messageBus } from "@/modules/message-bus.module";
 import store from "@/store/page-overlay/index";
-import { ReportsMutations, ReportType } from "@/store/page-overlay/modules/reports/consts";
+import {
+  ALL_ELIGIBLE_REPORT_TYPES,
+  ReportsMutations,
+  ReportType,
+} from "@/store/page-overlay/modules/reports/consts";
 import {
   IFieldData,
   IReportConfig,
   IReportData,
 } from "@/store/page-overlay/modules/reports/interfaces";
+import { downloadCsvFile } from "./csv";
 import { todayIsodate } from "./date";
 import { createCogsSpreadsheetOrError } from "./reports/cogs-report";
 import { createCogsTrackerSpreadsheetOrError } from "./reports/cogs-tracker-report";
 import { createCogsV2SpreadsheetOrError } from "./reports/cogs-v2-report";
 import { createEmployeeSamplesSpreadsheetOrError } from "./reports/employee-samples-report";
 import {
+  applyFieldTransformer,
   extractFlattenedData,
   getSheetTitle,
   shouldGenerateReport,
@@ -117,7 +124,7 @@ export async function writeDataSheet<T>({
       {
         spreadsheetId,
         range: `'${spreadsheetTitle}'!1:1`,
-        values: [fields.map((fieldData) => `${fieldData.readableName}     `)],
+        values: [fields.map((fieldData) => `     ${fieldData.readableName}     `)],
       },
       undefined,
       SHEETS_API_MESSAGE_TIMEOUT_MS
@@ -145,16 +152,7 @@ export async function writeDataSheet<T>({
         throw new Error("Must provide fields transformer");
       }
       // @ts-ignore
-      values = values.map((row) =>
-        fields.map((fieldData) => {
-          let value = row;
-          for (const subProperty of fieldData.value.split(".")) {
-            // @ts-ignore
-            value = value[subProperty];
-          }
-          return value;
-        })
-      );
+      values = applyFieldTransformer({ fields, values });
     }
 
     if (mergedOptions.batchWrite) {
@@ -302,6 +300,51 @@ export async function createDebugSheetOrError({
   return response.data;
 }
 
+export async function createCsvOrError({
+  reportData,
+  reportConfig,
+}: {
+  reportData: IReportData;
+  reportConfig: IReportConfig;
+}) {
+  if (!store.state.pluginAuth?.authState?.license) {
+    throw new Error("Invalid authState");
+  }
+
+  const flattenedCache = new Map<ReportType, any[]>();
+
+  //
+  // Check that inputs are well-formed
+  //
+
+  const ELIGIBLE_REPORT_TYPES: ReportType[] = ALL_ELIGIBLE_REPORT_TYPES.filter((reportType) =>
+    shouldGenerateReport({ reportType, reportConfig, reportData })
+  );
+
+  for (const reportType of ELIGIBLE_REPORT_TYPES) {
+    const filename = `${getSheetTitle({ reportType })} - ${
+      store.state.pluginAuth?.authState?.license
+    } - ${todayIsodate()}`;
+
+    const fields: IFieldData[] = reportConfig[reportType]!.fields!;
+
+    const headers: string[] = fields.map((fieldData) => fieldData.readableName);
+
+    const flattenedData: any[] = extractFlattenedData({ flattenedCache, reportType, reportData });
+
+    const matrix = applyFieldTransformer({ fields, values: flattenedData });
+
+    const data: any[][] = [headers, ...matrix];
+
+    const csvFile: ICsvFile = {
+      filename,
+      data,
+    };
+
+    downloadCsvFile({ csvFile, delay: 50 });
+  }
+}
+
 export async function createSpreadsheetOrError({
   reportData,
   reportConfig,
@@ -347,21 +390,9 @@ export async function createSpreadsheetOrError({
   // Check that inputs are well-formed
   //
 
-  const ELIGIBLE_REPORT_TYPES: ReportType[] = [
-    ReportType.PACKAGES,
-    ReportType.STRAGGLER_PACKAGES,
-    ReportType.TAGS,
-    ReportType.HARVESTS,
-    ReportType.IMMATURE_PLANTS,
-    ReportType.MATURE_PLANTS,
-    ReportType.MATURE_PLANTS_QUICKVIEW,
-    ReportType.INCOMING_TRANSFERS,
-    ReportType.OUTGOING_TRANSFERS,
-    ReportType.TRANSFER_HUB_TRANSFERS,
-    ReportType.OUTGOING_TRANSFER_MANIFESTS,
-    ReportType.TRANSFER_HUB_TRANSFER_MANIFESTS,
-    ReportType.POINT_IN_TIME_INVENTORY,
-  ].filter((reportType) => shouldGenerateReport({ reportType, reportConfig, reportData }));
+  const ELIGIBLE_REPORT_TYPES: ReportType[] = ALL_ELIGIBLE_REPORT_TYPES.filter((reportType) =>
+    shouldGenerateReport({ reportType, reportConfig, reportData })
+  );
 
   //
   // Generate Sheets

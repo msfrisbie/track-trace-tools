@@ -45,6 +45,22 @@ export enum ReportAuxTask {
   UPDATE_MASTER_COST_SHEET = "UPDATE_MASTER_COST_SHEET",
 }
 
+export const ALL_ELIGIBLE_REPORT_TYPES: ReportType[] = [
+  ReportType.PACKAGES,
+  ReportType.STRAGGLER_PACKAGES,
+  ReportType.TAGS,
+  ReportType.HARVESTS,
+  ReportType.IMMATURE_PLANTS,
+  ReportType.MATURE_PLANTS,
+  ReportType.MATURE_PLANTS_QUICKVIEW,
+  ReportType.INCOMING_TRANSFERS,
+  ReportType.OUTGOING_TRANSFERS,
+  ReportType.TRANSFER_HUB_TRANSFERS,
+  ReportType.OUTGOING_TRANSFER_MANIFESTS,
+  ReportType.TRANSFER_HUB_TRANSFER_MANIFESTS,
+  ReportType.POINT_IN_TIME_INVENTORY,
+];
+
 const COMMON_PACKAGE_FIELD_DATA: IFieldData[] = [
   {
     value: "Label",
