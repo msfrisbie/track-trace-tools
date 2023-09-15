@@ -69,6 +69,10 @@ export interface IReportConfig {
     packageFilter: IPackageFilter;
     fields: IFieldData[];
   };
+  [ReportType.POINT_IN_TIME_INVENTORY]?: {
+    packageFilter: IPackageFilter;
+    fields: IFieldData[];
+  };
   [ReportType.STRAGGLER_PACKAGES]?: {
     stragglerPackageFilter: IPackageFilter;
     fields: IFieldData[];
@@ -137,6 +141,9 @@ export interface IReportData {
     packagedGoodsCogsMatrix: any[][];
   };
   [ReportType.PACKAGES]?: {
+    packages: IIndexedPackageData[];
+  };
+  [ReportType.POINT_IN_TIME_INVENTORY]?: {
     packages: IIndexedPackageData[];
   };
   [ReportType.EMPLOYEE_SAMPLES]?: {

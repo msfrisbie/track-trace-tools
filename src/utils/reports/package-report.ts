@@ -18,6 +18,7 @@ interface IPackageReportFormFilters {
   includeActive: boolean;
   includeIntransit: boolean;
   includeInactive: boolean;
+  includeTransferHub: boolean;
 }
 
 export const packageFormFiltersFactory: () => IPackageReportFormFilters = () => ({
@@ -28,6 +29,7 @@ export const packageFormFiltersFactory: () => IPackageReportFormFilters = () => 
   includeActive: true,
   includeIntransit: false,
   includeInactive: false,
+  includeTransferHub: false,
 });
 
 export function addPackageReport({
@@ -44,6 +46,7 @@ export function addPackageReport({
   packageFilter.includeActive = packagesFormFilters.includeActive;
   packageFilter.includeIntransit = packagesFormFilters.includeIntransit;
   packageFilter.includeInactive = packagesFormFilters.includeInactive;
+  // packageFilter.includeTransferHub = packagesFormFilters.includeTransferHub;
 
   packageFilter.packagedDateGt = packagesFormFilters.shouldFilterPackagedDateGt
     ? packagesFormFilters.packagedDateGt
@@ -95,6 +98,26 @@ export async function maybeLoadPackageReportData({
         });
       }
     }
+
+    if (packageConfig.packageFilter.includeIntransit) {
+      try {
+        packages = [...packages, ...(await primaryDataLoader.inTransitPackages())];
+      } catch (e) {
+        ctx.commit(ReportsMutations.SET_STATUS, {
+          statusMessage: { text: "Failed to load in transit packages.", level: "warning" },
+        });
+      }
+    }
+
+    // if (packageConfig.packageFilter.includeTransferHub) {
+    //   try {
+    //     packages = [...packages, ...(await primaryDataLoader.transferHubPackages())];
+    //   } catch (e) {
+    //     ctx.commit(ReportsMutations.SET_STATUS, {
+    //       statusMessage: { text: "Failed to load transfer hub packages.", level: "warning" },
+    //     });
+    //   }
+    // }
 
     packages = packages.filter((pkg) => {
       if (packageConfig.packageFilter.packagedDateLt) {

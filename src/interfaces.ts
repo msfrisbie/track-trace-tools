@@ -483,6 +483,7 @@ export interface IPackageFilter {
   includeActive?: boolean;
   includeIntransit?: boolean;
   includeInactive?: boolean;
+  includeTransferHub?: boolean;
   lastModifiedDateGt?: string | null;
   lastModifiedDateEq?: string | null;
   lastModifiedDateLt?: string | null;
@@ -639,6 +640,22 @@ export interface IPackageData extends ITaggedIResponseObjectData {
   UnitOfMeasureAbbreviation: "lb" | "ea" | "g";
   UnitOfMeasureId: number;
   UnitOfMeasureQuantityType: "WeightBased" | "CountBased" | "VolumeBased";
+  SourceHarvestCount: number;
+  SourcePackageCount: number;
+  SourceProcessingJobCount: number;
+  SourceProcessingJobNumbers: string;
+  SourceProcessingJobNames: string;
+  MultiProcessingJob: boolean;
+  ExpirationDate: null | string;
+  SellByDate: null | string;
+  UseByDate: null | string;
+  LabTestResultDocumentFileId: null | number;
+  IsOnTrip: boolean;
+  IsOnRetailerDelivery: boolean;
+  PackageForProductDestruction: null | boolean;
+  Trip: null;
+  HasPartial: boolean;
+  IsPartial: boolean;
 }
 export interface ITagOrderData extends IResponseObjectData {
   FacilityContactName: string;

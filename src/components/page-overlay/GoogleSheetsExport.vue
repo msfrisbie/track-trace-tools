@@ -24,7 +24,10 @@
                 </div>
               </b-form-checkbox>
 
-              <div class="text-xs text-start text-gray-600" v-if="!clientValues['ENABLE_T3PLUS'] && !t3plus">
+              <div
+                class="text-start text-gray-600 pb-2"
+                v-if="!clientValues['ENABLE_T3PLUS'] && !t3plus"
+              >
                 Get access to advanced reports with
                 <a
                   class="text-purple-500 underline"
@@ -157,18 +160,7 @@
                       :options="cogsV2FormFilters.licenseOptions"
                     ></b-form-checkbox-group>
                   </b-form-group>
-
-                  <!-- <blob-cache-widget :cachekey="cogsV2key"></blob-cache-widget> -->
                 </simple-drawer>
-
-                <!-- <b-button
-                  size="sm"
-                  variant="outline-dark"
-                  @click="showCogsV2Advanced = !showCogsV2Advanced"
-                  >ADVANCED</b-button
-                >
-                <template v-if="showCogsV2Advanced">
-                </template> -->
               </div>
             </div>
           </template>
@@ -271,17 +263,27 @@
                     <span class="leading-6">Include inactive packages</span>
                   </b-form-checkbox>
 
-                  <b-form-checkbox :disabled="!clientValues['ENABLE_T3PLUS'] && !t3plus">
+                  <b-form-checkbox v-model="packagesFormFilters.includeInTransit">
+                    <span class="leading-6">Include in-transit packages</span>
+                  </b-form-checkbox>
+
+                  <!-- <b-form-checkbox v-model="packagesFormFilters.includeTransferHub">
+                    <span class="leading-6">Include transfer hub packages</span>
+                  </b-form-checkbox> -->
+
+                  <!-- <b-form-checkbox :disabled="!clientValues['ENABLE_T3PLUS'] && !t3plus">
                     <div class="flex flex-col items-start">
                       <span class="leading-6"
                         >Include packages transferred out of this facility</span
                       >
-                      <span v-if="!clientValues['ENABLE_T3PLUS'] && !t3plus" class="text-xs text-gray-300"
+                      <span
+                        v-if="!clientValues['ENABLE_T3PLUS'] && !t3plus"
+                        class="text-xs text-gray-300"
                         >Enable this with
                         <a href="https://trackandtrace.tools/plus" target="_blank">T3+</a></span
                       >
                     </div>
-                  </b-form-checkbox>
+                  </b-form-checkbox> -->
 
                   <div class="flex flex-col items-start gap-1">
                     <b-form-checkbox v-model="packagesFormFilters.shouldFilterPackagedDateGt">
@@ -310,14 +312,14 @@
                   </div>
                 </template>
 
-                <b-button
+                <!-- <b-button
                   size="sm"
                   variant="outline-primary"
                   @click="toggleFields(ReportType.PACKAGES)"
                   >{{
                     showFields[ReportType.PACKAGES] ? "HIDE COLUMNS" : "CHOOSE COLUMNS"
                   }}</b-button
-                >
+                > -->
                 <template v-if="showFields[ReportType.PACKAGES]">
                   <div class="grid grid-cols-2 gap-2">
                     <b-button
@@ -402,14 +404,14 @@
                   </div>
                 </template>
 
-                <b-button
+                <!-- <b-button
                   size="sm"
                   variant="outline-primary"
                   @click="toggleFields(ReportType.HARVESTS)"
                   >{{
                     showFields[ReportType.HARVESTS] ? "HIDE COLUMNS" : "CHOOSE COLUMNS"
                   }}</b-button
-                >
+                > -->
                 <template v-if="showFields[ReportType.HARVESTS]">
                   <div class="grid grid-cols-2 gap-2">
                     <b-button
@@ -496,15 +498,29 @@
                   </div>
                 </template>
 
-                <b-button
+                <!-- <b-button
                   size="sm"
                   variant="outline-primary"
                   @click="toggleFields(ReportType.MATURE_PLANTS)"
                   >{{
                     showFields[ReportType.MATURE_PLANTS] ? "HIDE FIELDS" : "CHOOSE FIELDS"
                   }}</b-button
-                >
+                > -->
                 <template v-if="showFields[ReportType.MATURE_PLANTS]">
+                  <b-form-checkbox-group
+                    v-model="fields[ReportType.MATURE_PLANTS]"
+                    class="flex flex-col items-start gap-1"
+                  >
+                    <b-form-checkbox
+                      v-for="fieldData of SHEET_FIELDS[ReportType.MATURE_PLANTS]"
+                      v-bind:key="fieldData.value"
+                      :value="fieldData"
+                      :disabled="fieldData.required"
+                    >
+                      <span class="leading-6">{{ fieldData.readableName }}</span>
+                    </b-form-checkbox>
+                  </b-form-checkbox-group>
+
                   <div class="grid grid-cols-2 gap-2">
                     <b-button
                       variant="outline-dark"
@@ -519,20 +535,6 @@
                       >UNCHECK ALL</b-button
                     >
                   </div>
-
-                  <b-form-checkbox-group
-                    v-model="fields[ReportType.MATURE_PLANTS]"
-                    class="flex flex-col items-start gap-1"
-                  >
-                    <b-form-checkbox
-                      v-for="fieldData of SHEET_FIELDS[ReportType.MATURE_PLANTS]"
-                      v-bind:key="fieldData.value"
-                      :value="fieldData"
-                      :disabled="fieldData.required"
-                    >
-                      <span class="leading-6">{{ fieldData.readableName }}</span>
-                    </b-form-checkbox>
-                  </b-form-checkbox-group>
                 </template>
               </div>
             </div>
@@ -587,14 +589,14 @@
                   </div>
                 </template>
 
-                <b-button
+                <!-- <b-button
                   size="sm"
                   variant="outline-primary"
                   @click="toggleFields(ReportType.IMMATURE_PLANTS)"
                   >{{
                     showFields[ReportType.IMMATURE_PLANTS] ? "HIDE FIELDS" : "CHOOSE FIELDS"
                   }}</b-button
-                >
+                > -->
                 <template v-if="showFields[ReportType.IMMATURE_PLANTS]">
                   <div class="grid grid-cols-2 gap-2">
                     <b-button
@@ -660,7 +662,9 @@
                     <div class="flex flex-col items-start">
                       <span class="leading-6">Only Wholesale</span>
                     </div>
-                    <span v-if="!clientValues['ENABLE_T3PLUS'] && !t3plus" class="text-xs text-gray-300"
+                    <span
+                      v-if="!clientValues['ENABLE_T3PLUS'] && !t3plus"
+                      class="text-xs text-gray-300"
                       >Enable this with
                       <a href="https://trackandtrace.tools/plus" target="_blank">T3+</a></span
                     >
@@ -697,14 +701,14 @@
                   </div>
                 </template>
 
-                <b-button
+                <!-- <b-button
                   size="sm"
                   variant="outline-primary"
                   @click="toggleFields(ReportType.OUTGOING_TRANSFERS)"
                   >{{
                     showFields[ReportType.OUTGOING_TRANSFERS] ? "HIDE FIELDS" : "CHOOSE FIELDS"
                   }}</b-button
-                >
+                > -->
                 <template v-if="showFields[ReportType.OUTGOING_TRANSFERS]">
                   <div class="grid grid-cols-2 gap-2">
                     <b-button
@@ -791,14 +795,14 @@
                   </div>
                 </template>
 
-                <b-button
+                <!-- <b-button
                   size="sm"
                   variant="outline-primary"
                   @click="toggleFields(ReportType.TRANSFER_HUB_TRANSFERS)"
                   >{{
                     showFields[ReportType.TRANSFER_HUB_TRANSFERS] ? "HIDE FIELDS" : "CHOOSE FIELDS"
                   }}</b-button
-                >
+                > -->
                 <template v-if="showFields[ReportType.TRANSFER_HUB_TRANSFERS]">
                   <div class="grid grid-cols-2 gap-2">
                     <b-button
@@ -889,14 +893,14 @@
                   </div>
                 </template>
 
-                <b-button
+                <!-- <b-button
                   size="sm"
                   variant="outline-primary"
                   @click="toggleFields(ReportType.INCOMING_TRANSFERS)"
                   >{{
                     showFields[ReportType.INCOMING_TRANSFERS] ? "HIDE FIELDS" : "CHOOSE FIELDS"
                   }}</b-button
-                >
+                > -->
                 <template v-if="showFields[ReportType.INCOMING_TRANSFERS]">
                   <div class="grid grid-cols-2 gap-2">
                     <b-button
@@ -961,12 +965,12 @@
                   </b-form-checkbox>
                 </template>
 
-                <b-button
+                <!-- <b-button
                   size="sm"
                   variant="outline-primary"
                   @click="toggleFields(ReportType.TAGS)"
                   >{{ showFields[ReportType.TAGS] ? "HIDE FIELDS" : "CHOOSE FIELDS" }}</b-button
-                >
+                > -->
                 <template v-if="showFields[ReportType.TAGS]">
                   <div class="grid grid-cols-2 gap-2">
                     <b-button variant="outline-dark" size="sm" @click="checkAll(ReportType.TAGS)"
@@ -1030,7 +1034,9 @@
                     <div class="flex flex-col items-start">
                       <span class="leading-6">Only Wholesale</span>
                     </div>
-                    <span v-if="!clientValues['ENABLE_T3PLUS'] && !t3plus" class="text-xs text-gray-300"
+                    <span
+                      v-if="!clientValues['ENABLE_T3PLUS'] && !t3plus"
+                      class="text-xs text-gray-300"
                       >Enable this with
                       <a href="https://trackandtrace.tools/plus" target="_blank">T3+</a></span
                     >
@@ -1079,7 +1085,7 @@
                   </div>
                 </template>
 
-                <b-button
+                <!-- <b-button
                   size="sm"
                   variant="outline-primary"
                   @click="toggleFields(ReportType.OUTGOING_TRANSFER_MANIFESTS)"
@@ -1088,7 +1094,7 @@
                       ? "HIDE FIELDS"
                       : "CHOOSE FIELDS"
                   }}</b-button
-                >
+                > -->
                 <template v-if="showFields[ReportType.OUTGOING_TRANSFER_MANIFESTS]">
                   <div class="grid grid-cols-2 gap-2">
                     <b-button
@@ -1213,14 +1219,14 @@
                   </div>
                 </template>
 
-                <b-button
+                <!-- <b-button
                   size="sm"
                   variant="outline-primary"
                   @click="toggleFields(ReportType.STRAGGLER_PACKAGES)"
                   >{{
                     showFields[ReportType.STRAGGLER_PACKAGES] ? "HIDE COLUMNS" : "CHOOSE COLUMNS"
                   }}</b-button
-                >
+                > -->
                 <template v-if="showFields[ReportType.STRAGGLER_PACKAGES]">
                   <div class="grid grid-cols-2 gap-2">
                     <b-button
@@ -1263,24 +1269,13 @@
               variant="primary"
               size="sm"
               @click="createSpreadsheet()"
-              :disabled="selectedReports.length === 0"
-              >CREATE REPORT</b-button
+              :disabled="!enableGenerateReportButton"
+              >GENERATE REPORT</b-button
             >
 
             <template v-if="selectedReports.length === 0">
               <div class="text-red-500 text-center">Select something to include in your report</div>
             </template>
-
-            <!-- <b-button
-              size="sm"
-              :disabled="
-                eligibleReportOptions.length === selectedReports.length ||
-                reportStatus !== ReportStatus.INITIAL
-              "
-              variant="outline-primary"
-              @click="snapshotEverything()"
-              >GENERATE ALL REPORTS</b-button
-            > -->
           </template>
 
           <template v-if="reportStatus === ReportStatus.INFLIGHT">
@@ -1463,16 +1458,17 @@ import {
   addEmployeeSamplesReport,
   employeeSamplesFormFiltersFactory,
 } from "@/utils/reports/employee-samples-report";
-import { ClientGetters } from "@/store/page-overlay/modules/client/consts";
 
 interface IReportOption {
   text: string;
   value: ReportType | null;
   t3plus: boolean;
-  isCustom: false;
+  isCustom: false; // Unused
   enabled: boolean;
   hidden?: boolean;
   description: string;
+  isCsvEligible: boolean;
+  isSingleton: boolean;
 }
 
 export default Vue.extend({
@@ -1497,6 +1493,9 @@ export default Vue.extend({
       reportStatusMessage: (state: IPluginState) => state.reports.statusMessage,
       reportStatusMessageHistory: (state: IPluginState) => state.reports.statusMessageHistory,
     }),
+    enableGenerateReportButton(): boolean {
+      return this.selectedReports.length > 0;
+    },
     eligibleReportOptions(): IReportOption[] {
       return this.eligibleReportOptionsImpl();
     },
@@ -1520,7 +1519,6 @@ export default Vue.extend({
       selectedReports: [] as ReportType[],
       cogsFormFilters: cogsFormFiltersFactory(),
       cogsV2FormFilters: cogsV2FormFiltersFactory(),
-      // showCogsV2Advanced: false,
       cogsTrackerFormFilters: cogsTrackerFormFiltersFactory(),
       packagesFormFilters: packageFormFiltersFactory(),
       stragglerPackagesFormFilters: stragglerPackagesFormFiltersFactory(),
@@ -1537,14 +1535,14 @@ export default Vue.extend({
       showFilters: (() => {
         const fields: { [key: string]: boolean } = {};
         Object.keys(SHEET_FIELDS).map((x: any) => {
-          fields[x] = false;
+          fields[x] = true;
         });
         return fields;
       })(),
       showFields: (() => {
         const fields: { [key: string]: boolean } = {};
         Object.keys(SHEET_FIELDS).map((x: any) => {
-          fields[x] = false;
+          fields[x] = true;
         });
         return fields;
       })(),
@@ -1599,26 +1597,42 @@ export default Vue.extend({
         {
           text: "Packages",
           value: ReportType.PACKAGES,
-          t3plus: false,
+          t3plus: true,
           enabled: true,
           description: "Filter by packaged date",
           isCustom: false,
+          isCsvEligible: true,
+          isSingleton: false,
+        },
+        {
+          text: "Point-in-time inventory",
+          value: ReportType.POINT_IN_TIME_INVENTORY,
+          t3plus: true,
+          enabled: false,
+          description: "All active packages on a certain date",
+          isCustom: false,
+          isCsvEligible: true,
+          isSingleton: false,
         },
         {
           text: "Plant Batches",
           value: ReportType.IMMATURE_PLANTS,
-          t3plus: false,
+          t3plus: true,
           enabled: true,
           description: "Filter by planted date",
           isCustom: false,
+          isCsvEligible: true,
+          isSingleton: false,
         },
         {
           text: "Mature Plants",
           value: ReportType.MATURE_PLANTS,
-          t3plus: false,
+          t3plus: true,
           enabled: true,
           description: "Filter by growth phase and planted date",
           isCustom: false,
+          isCsvEligible: true,
+          isSingleton: false,
         },
         {
           text: "Incoming Transfers",
@@ -1627,14 +1641,18 @@ export default Vue.extend({
           enabled: true,
           description: "Filter by wholesale and estimated time of arrival",
           isCustom: false,
+          isCsvEligible: true,
+          isSingleton: false,
         },
         {
           text: "Outgoing Transfers",
           value: ReportType.OUTGOING_TRANSFERS,
-          t3plus: false,
+          t3plus: true,
           enabled: true,
           description: "Filter by wholesale and estimated time of departure",
           isCustom: false,
+          isCsvEligible: true,
+          isSingleton: false,
         },
         // Disabled - Destinations returns 0, more like incoming?
         // {
@@ -1652,14 +1670,18 @@ export default Vue.extend({
           enabled: true,
           description: "Filter by tag type and status",
           isCustom: false,
+          isCsvEligible: true,
+          isSingleton: false,
         },
         {
           text: "Harvests",
           value: ReportType.HARVESTS,
-          t3plus: false,
+          t3plus: true,
           enabled: true,
           description: "Filter by harvest date",
           isCustom: false,
+          isCsvEligible: true,
+          isSingleton: false,
         },
         {
           text: "Outgoing Transfer Manifests",
@@ -1668,6 +1690,8 @@ export default Vue.extend({
           enabled: true,
           description: "Full transfer and package data for all outgoing transfers",
           isCustom: false,
+          isCsvEligible: true,
+          isSingleton: false,
         },
         {
           text: "Straggler Inventory",
@@ -1676,6 +1700,8 @@ export default Vue.extend({
           enabled: true,
           description: "Find straggler inventory so it can be cleared out",
           isCustom: false,
+          isCsvEligible: true,
+          isSingleton: false,
         },
         {
           text: "COGS",
@@ -1685,6 +1711,8 @@ export default Vue.extend({
           hidden: !store.state.client.values["ENABLE_COGS"],
           description: "Generate COGS calculator",
           isCustom: false,
+          isCsvEligible: false,
+          isSingleton: true,
         },
         {
           text: "COGS Tracker",
@@ -1694,6 +1722,8 @@ export default Vue.extend({
           hidden: !store.state.client.values["ENABLE_COGS_TRACKER"],
           description: "Generate COGS Tracker sheets",
           isCustom: false,
+          isCsvEligible: false,
+          isSingleton: true,
         },
         {
           text: "Employee Samples",
@@ -1703,6 +1733,8 @@ export default Vue.extend({
           hidden: !store.state.client.values["ENABLE_EMPLOYEE_SAMPLE_TOOL"],
           description: "Generate summary of employee samples",
           isCustom: false,
+          isCsvEligible: false,
+          isSingleton: true,
         },
         {
           text: "Package Quickview",
@@ -1712,6 +1744,8 @@ export default Vue.extend({
           description:
             "Grouped summary of packages by item, remaining quantity, and testing status",
           isCustom: false,
+          isCsvEligible: true,
+          isSingleton: false,
         },
         {
           text: "Immature Plant Quickview",
@@ -1720,6 +1754,8 @@ export default Vue.extend({
           enabled: false,
           description: "Grouped summary of mature plants by strain, location, and dates",
           isCustom: false,
+          isCsvEligible: true,
+          isSingleton: false,
         },
         {
           text: "Mature Plant Quickview",
@@ -1729,6 +1765,8 @@ export default Vue.extend({
           description:
             "Grouped summary of mature plants by growth phase, strain, location, and dates",
           isCustom: false,
+          isCsvEligible: true,
+          isSingleton: false,
         },
         {
           text: "Transfer Quickview",
@@ -1737,23 +1775,25 @@ export default Vue.extend({
           enabled: false,
           description: "Summary of incoming, outgoing, and rejected packages",
           isCustom: false,
+          isCsvEligible: true,
+          isSingleton: false,
         },
-        {
-          text: "Incoming Inventory",
-          value: null,
-          t3plus: true,
-          enabled: false,
-          description: "See packages not yet recieved",
-          isCustom: false,
-        },
-        {
-          text: "Harvested Plants",
-          value: null,
-          t3plus: true,
-          enabled: false,
-          description: "All plants and associated harvest data within this license",
-          isCustom: false,
-        },
+        // {
+        //   text: "Incoming Inventory",
+        //   value: null,
+        //   t3plus: true,
+        //   enabled: false,
+        //   description: "See packages not yet recieved",
+        //   isCustom: false,
+        // },
+        // {
+        //   text: "Harvested Plants",
+        //   value: null,
+        //   t3plus: true,
+        //   enabled: false,
+        //   description: "All plants and associated harvest data within this license",
+        //   isCustom: false,
+        // },
       ];
 
       return reportOptions.filter((x) => !x.hidden);
@@ -1786,7 +1826,7 @@ export default Vue.extend({
         }
 
         if (x.t3plus) {
-          return !store.state.client.values["ENABLE_T3PLUS"] || store.state.client.t3plus;
+          return !store.state.client.values["ENABLE_T3PLUS"] && !store.state.client.t3plus;
         } else {
           return false;
         }
@@ -1927,6 +1967,7 @@ export default Vue.extend({
     selectedReports: {
       immediate: true,
       handler(newValue, oldValue) {
+        console.log(newValue);
         const singleonReportTypes: ReportType[] = [
           ReportType.COGS,
           ReportType.COGS_V2,

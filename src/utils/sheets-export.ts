@@ -360,6 +360,7 @@ export async function createSpreadsheetOrError({
     ReportType.TRANSFER_HUB_TRANSFERS,
     ReportType.OUTGOING_TRANSFER_MANIFESTS,
     ReportType.TRANSFER_HUB_TRANSFER_MANIFESTS,
+    ReportType.POINT_IN_TIME_INVENTORY,
   ].filter((reportType) => shouldGenerateReport({ reportType, reportConfig, reportData }));
 
   //

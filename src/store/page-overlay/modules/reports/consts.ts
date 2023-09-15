@@ -38,6 +38,7 @@ export enum ReportType {
   STRAGGLER_PACKAGES = "STRAGGLER_PACKAGES",
   MATURE_PLANTS_QUICKVIEW = "MATURE_PLANTS_QUICKVIEW",
   EMPLOYEE_SAMPLES = "EMPLOYEE_SAMPLES",
+  POINT_IN_TIME_INVENTORY = "POINT_IN_TIME_INVENTORY",
 }
 
 export enum ReportAuxTask {
@@ -221,8 +222,23 @@ export const SHEET_FIELDS: { [key: string]: IFieldData[] } = {
       required: true,
     },
     {
+      value: "SourcePackageLabels",
+      readableName: "Source Package Labels",
+      required: false,
+    },
+    {
       value: "Item.Name",
-      readableName: "Package Item",
+      readableName: "Item",
+      required: false,
+    },
+    {
+      value: "Item.ProductCategoryName",
+      readableName: "Item Category",
+      required: false,
+    },
+    {
+      value: "Item.ProductCategoryTypeName",
+      readableName: "Item Category Type",
       required: false,
     },
     {
