@@ -74,7 +74,7 @@
             <div
               class="rounded border border-gray-300 p-2 flex flex-col items-stretch gap-2 overflow-hidden"
             >
-              <div class="font-semibold text-white bg-purple-600 p-2 -m-2">COGS</div>
+              <div class="font-semibold text-white bg-purple-800 p-2 -m-2">COGS</div>
               <hr />
               <div class="flex flex-col items-stretch gap-4">
                 <div class="flex flex-col items-start gap-1">
@@ -105,7 +105,7 @@
             <div
               class="rounded border border-gray-300 p-2 flex flex-col items-stretch gap-2 overflow-hidden"
             >
-              <div class="font-semibold text-white bg-purple-600 p-2 -m-2">COGS</div>
+              <div class="font-semibold text-white bg-purple-800 p-2 -m-2">COGS</div>
 
               <div>
                 <span class="font-semibold text-red-500"
@@ -178,7 +178,7 @@
             <div
               class="rounded border border-gray-300 p-2 flex flex-col items-stretch gap-2 overflow-hidden"
             >
-              <div class="font-semibold text-white bg-purple-600 p-2 -m-2">COGS Tracker</div>
+              <div class="font-semibold text-white bg-purple-800 p-2 -m-2">COGS Tracker</div>
               <hr />
               <div class="flex flex-col items-stretch gap-4">
                 <div class="flex flex-col items-start gap-1">
@@ -209,7 +209,7 @@
             <div
               class="rounded border border-gray-300 p-2 flex flex-col items-stretch gap-2 overflow-hidden"
             >
-              <div class="font-semibold text-white bg-purple-600 p-2 -m-2">Employee Samples</div>
+              <div class="font-semibold text-white bg-purple-800 p-2 -m-2">Employee Samples</div>
               <hr />
               <div class="flex flex-col items-stretch gap-4">
                 <div class="flex flex-col items-start gap-1">
@@ -257,7 +257,7 @@
             <div
               class="rounded border border-gray-300 p-2 flex flex-col items-stretch gap-2 overflow-hidden"
             >
-              <div class="font-semibold text-white bg-purple-600 p-2 -m-2">Packages</div>
+              <div class="font-semibold text-white bg-purple-800 p-2 -m-2">Packages</div>
               <hr />
               <div class="flex flex-col items-stretch gap-4">
                 <!-- <b-button
@@ -379,7 +379,7 @@
             <div
               class="rounded border border-gray-300 p-2 flex flex-col items-stretch gap-2 overflow-hidden"
             >
-              <div class="font-semibold text-white bg-purple-600 p-2 -m-2">Harvests</div>
+              <div class="font-semibold text-white bg-purple-800 p-2 -m-2">Harvests</div>
               <hr />
               <div class="flex flex-col items-stretch gap-4">
                 <!-- <b-button
@@ -479,7 +479,7 @@
             <div
               class="rounded border border-gray-300 p-2 flex flex-col items-stretch gap-2 overflow-hidden"
             >
-              <div class="font-semibold text-white bg-purple-600 p-2 -m-2">Mature Plants</div>
+              <div class="font-semibold text-white bg-purple-800 p-2 -m-2">Mature Plants</div>
               <hr />
               <div class="flex flex-col items-stretch gap-4">
                 <!-- <b-button
@@ -580,7 +580,7 @@
             <div
               class="rounded border border-gray-300 p-2 flex flex-col items-stretch gap-2 overflow-hidden"
             >
-              <div class="font-semibold text-white bg-purple-600 p-2 -m-2">Immature Plants</div>
+              <div class="font-semibold text-white bg-purple-800 p-2 -m-2">Immature Plants</div>
               <hr />
               <div class="flex flex-col items-stretch gap-4">
                 <!-- <b-button
@@ -679,7 +679,7 @@
             <div
               class="rounded border border-gray-300 p-2 flex flex-col items-stretch gap-2 overflow-hidden"
             >
-              <div class="font-semibold text-white bg-purple-600 p-2 -m-2">Outgoing Transfers</div>
+              <div class="font-semibold text-white bg-purple-800 p-2 -m-2">Outgoing Transfers</div>
               <hr />
               <div class="flex flex-col items-stretch gap-4">
                 <!-- <b-button
@@ -797,7 +797,7 @@
             <div
               class="rounded border border-gray-300 p-2 flex flex-col items-stretch gap-2 overflow-hidden"
             >
-              <div class="font-semibold text-white bg-purple-600 p-2 -m-2">Hub Transfers</div>
+              <div class="font-semibold text-white bg-purple-800 p-2 -m-2">Hub Transfers</div>
               <hr />
               <div class="flex flex-col items-stretch gap-4">
                 <!-- <b-button
@@ -897,7 +897,7 @@
             <div
               class="rounded border border-gray-300 p-2 flex flex-col items-stretch gap-2 overflow-hidden"
             >
-              <div class="font-semibold text-white bg-purple-600 p-2 -m-2">Incoming Transfers</div>
+              <div class="font-semibold text-white bg-purple-800 p-2 -m-2">Incoming Transfers</div>
               <hr />
               <div class="flex flex-col items-stretch gap-4">
                 <!-- <b-button
@@ -1003,7 +1003,7 @@
             <div
               class="rounded border border-gray-300 p-2 flex flex-col items-stretch gap-2 overflow-hidden"
             >
-              <div class="font-semibold text-white bg-purple-600 p-2 -m-2">Tags</div>
+              <div class="font-semibold text-white bg-purple-800 p-2 -m-2">Tags</div>
               <hr />
               <div class="flex flex-col items-stretch gap-4">
                 <!-- <b-button
@@ -1074,7 +1074,7 @@
             <div
               class="rounded border border-gray-300 p-2 flex flex-col items-stretch gap-2 overflow-hidden"
             >
-              <div class="font-semibold text-white bg-purple-600 p-2 -m-2">
+              <div class="font-semibold text-white bg-purple-800 p-2 -m-2">
                 Outgoing Transfer Manifests
               </div>
               <hr />
@@ -1213,7 +1213,7 @@
             <div
               class="rounded border border-gray-300 p-2 flex flex-col items-stretch gap-2 overflow-hidden"
             >
-              <div class="font-semibold text-white bg-purple-600 p-2 -m-2">Straggler Packages</div>
+              <div class="font-semibold text-white bg-purple-800 p-2 -m-2">Straggler Packages</div>
               <hr />
               <div class="flex flex-col items-stretch gap-4">
                 <!-- <b-button
