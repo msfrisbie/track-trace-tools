@@ -657,6 +657,7 @@ export interface IPackageData extends ITaggedIResponseObjectData {
   HasPartial: boolean;
   IsPartial: boolean;
 }
+
 export interface ITagOrderData extends IResponseObjectData {
   FacilityContactName: string;
   FacilityAddressStreet1: string;

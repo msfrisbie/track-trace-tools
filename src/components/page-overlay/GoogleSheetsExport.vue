@@ -20,7 +20,7 @@
                 :disabled="reportStatus !== ReportStatus.INITIAL"
                 ><div class="flex flex-col items-start gap-1">
                   <span class="">{{ eligibleReportOption.text }}</span>
-                  <!-- <span class="text-xs text-gray-400">{{ eligibleReportOption.description }}</span> -->
+                  <span class="text-xs text-gray-400">{{ eligibleReportOption.description }}</span>
                 </div>
               </b-form-checkbox>
 
@@ -60,15 +60,21 @@
           class="flex flex-col items-stretch gap-4"
         >
           <template v-if="selectedReports.length > 0">
-            <div class="text-purple-800 text-center">
-              Configure your report below. <br />Defaults to active data and all fields.
+            <div class="pb-2 flex flex-col items-stretch gap-2 text-xl font-semibold ttt-purple">
+              {{ selectedReports.length }} REPORT{{ selectedReports.length > 1 ? "S" : "" }}
+              SELECTED:
             </div>
+            <!-- <div class="ttt-purple text-center">
+              Configure your report below. <br />Defaults to active data and all fields.
+            </div> -->
           </template>
 
           <!-- COGS -->
           <template v-if="selectedReports.includes(ReportType.COGS)">
-            <div class="rounded border border-gray-300 p-2 flex flex-col items-stretch gap-2">
-              <div class="font-semibold text-gray-700">COGS</div>
+            <div
+              class="rounded border border-gray-300 p-2 flex flex-col items-stretch gap-2 overflow-hidden"
+            >
+              <div class="font-semibold text-white bg-purple-600 p-2 -m-2">COGS</div>
               <hr />
               <div class="flex flex-col items-stretch gap-4">
                 <div class="flex flex-col items-start gap-1">
@@ -96,8 +102,10 @@
 
           <!-- COGS V2 -->
           <template v-if="selectedReports.includes(ReportType.COGS_V2)">
-            <div class="rounded border border-gray-300 p-2 flex flex-col items-stretch gap-2">
-              <div class="font-semibold text-gray-700">COGS</div>
+            <div
+              class="rounded border border-gray-300 p-2 flex flex-col items-stretch gap-2 overflow-hidden"
+            >
+              <div class="font-semibold text-white bg-purple-600 p-2 -m-2">COGS</div>
 
               <div>
                 <span class="font-semibold text-red-500"
@@ -167,8 +175,10 @@
 
           <!-- COGS Tracker -->
           <template v-if="selectedReports.includes(ReportType.COGS_TRACKER)">
-            <div class="rounded border border-gray-300 p-2 flex flex-col items-stretch gap-2">
-              <div class="font-semibold text-gray-700">COGS Tracker</div>
+            <div
+              class="rounded border border-gray-300 p-2 flex flex-col items-stretch gap-2 overflow-hidden"
+            >
+              <div class="font-semibold text-white bg-purple-600 p-2 -m-2">COGS Tracker</div>
               <hr />
               <div class="flex flex-col items-stretch gap-4">
                 <div class="flex flex-col items-start gap-1">
@@ -196,8 +206,10 @@
 
           <!-- Employee Samples -->
           <template v-if="selectedReports.includes(ReportType.EMPLOYEE_SAMPLES)">
-            <div class="rounded border border-gray-300 p-2 flex flex-col items-stretch gap-2">
-              <div class="font-semibold text-gray-700">Employee Samples</div>
+            <div
+              class="rounded border border-gray-300 p-2 flex flex-col items-stretch gap-2 overflow-hidden"
+            >
+              <div class="font-semibold text-white bg-purple-600 p-2 -m-2">Employee Samples</div>
               <hr />
               <div class="flex flex-col items-stretch gap-4">
                 <div class="flex flex-col items-start gap-1">
@@ -242,18 +254,22 @@
 
           <!-- Packages -->
           <template v-if="selectedReports.includes(ReportType.PACKAGES)">
-            <div class="rounded border border-gray-300 p-2 flex flex-col items-stretch gap-2">
-              <div class="font-semibold text-gray-700">Packages</div>
+            <div
+              class="rounded border border-gray-300 p-2 flex flex-col items-stretch gap-2 overflow-hidden"
+            >
+              <div class="font-semibold text-white bg-purple-600 p-2 -m-2">Packages</div>
               <hr />
               <div class="flex flex-col items-stretch gap-4">
-                <b-button
+                <!-- <b-button
                   size="sm"
                   variant="outline-primary"
                   @click="toggleFilters(ReportType.PACKAGES)"
                   >{{
                     showFilters[ReportType.PACKAGES] ? "HIDE FILTERS" : "CHOOSE FILTERS"
                   }}</b-button
-                >
+                > -->
+                <div class="font-semibold text-gray-700">Filters:</div>
+
                 <template v-if="showFilters[ReportType.PACKAGES]">
                   <b-form-checkbox v-model="packagesFormFilters.includeActive">
                     <span class="leading-6">Include active packages</span>
@@ -321,20 +337,9 @@
                   }}</b-button
                 > -->
                 <template v-if="showFields[ReportType.PACKAGES]">
-                  <div class="grid grid-cols-2 gap-2">
-                    <b-button
-                      variant="outline-dark"
-                      size="sm"
-                      @click="checkAll(ReportType.PACKAGES)"
-                      >CHECK ALL</b-button
-                    >
-                    <b-button
-                      variant="outline-dark"
-                      size="sm"
-                      @click="uncheckAll(ReportType.PACKAGES)"
-                      >UNCHECK ALL</b-button
-                    >
-                  </div>
+                  <hr />
+
+                  <div class="font-semibold text-gray-700">Columns:</div>
 
                   <b-form-checkbox-group
                     v-model="fields[ReportType.PACKAGES]"
@@ -349,6 +354,21 @@
                       <span class="leading-6">{{ fieldData.readableName }}</span>
                     </b-form-checkbox>
                   </b-form-checkbox-group>
+
+                  <div class="grid grid-cols-2 gap-2">
+                    <b-button
+                      variant="outline-dark"
+                      size="sm"
+                      @click="checkAll(ReportType.PACKAGES)"
+                      >CHECK ALL</b-button
+                    >
+                    <b-button
+                      variant="outline-dark"
+                      size="sm"
+                      @click="uncheckAll(ReportType.PACKAGES)"
+                      >UNCHECK ALL</b-button
+                    >
+                  </div>
                 </template>
               </div>
             </div>
@@ -356,18 +376,22 @@
 
           <!-- Harvests -->
           <template v-if="selectedReports.includes(ReportType.HARVESTS)">
-            <div class="rounded border border-gray-300 p-2 flex flex-col items-stretch gap-2">
-              <div class="font-semibold text-gray-700">Harvests</div>
+            <div
+              class="rounded border border-gray-300 p-2 flex flex-col items-stretch gap-2 overflow-hidden"
+            >
+              <div class="font-semibold text-white bg-purple-600 p-2 -m-2">Harvests</div>
               <hr />
               <div class="flex flex-col items-stretch gap-4">
-                <b-button
+                <!-- <b-button
                   size="sm"
                   variant="outline-primary"
                   @click="toggleFilters(ReportType.HARVESTS)"
                   >{{
                     showFilters[ReportType.HARVESTS] ? "HIDE FILTERS" : "CHOOSE FILTERS"
                   }}</b-button
-                >
+                > -->
+                <div class="font-semibold text-gray-700">Filters:</div>
+
                 <template v-if="showFilters[ReportType.HARVESTS]">
                   <b-form-checkbox v-model="harvestsFormFilters.includeActive">
                     <span class="leading-6">Include active harvests</span>
@@ -413,20 +437,9 @@
                   }}</b-button
                 > -->
                 <template v-if="showFields[ReportType.HARVESTS]">
-                  <div class="grid grid-cols-2 gap-2">
-                    <b-button
-                      variant="outline-dark"
-                      size="sm"
-                      @click="checkAll(ReportType.HARVESTS)"
-                      >CHECK ALL</b-button
-                    >
-                    <b-button
-                      variant="outline-dark"
-                      size="sm"
-                      @click="uncheckAll(ReportType.HARVESTS)"
-                      >UNCHECK ALL</b-button
-                    >
-                  </div>
+                  <hr />
+
+                  <div class="font-semibold text-gray-700">Columns:</div>
 
                   <b-form-checkbox-group
                     v-model="fields[ReportType.HARVESTS]"
@@ -441,6 +454,21 @@
                       <span class="leading-6">{{ fieldData.readableName }}</span>
                     </b-form-checkbox>
                   </b-form-checkbox-group>
+
+                  <div class="grid grid-cols-2 gap-2">
+                    <b-button
+                      variant="outline-dark"
+                      size="sm"
+                      @click="checkAll(ReportType.HARVESTS)"
+                      >CHECK ALL</b-button
+                    >
+                    <b-button
+                      variant="outline-dark"
+                      size="sm"
+                      @click="uncheckAll(ReportType.HARVESTS)"
+                      >UNCHECK ALL</b-button
+                    >
+                  </div>
                 </template>
               </div>
             </div>
@@ -448,18 +476,22 @@
 
           <!-- Mature Plants -->
           <template v-if="selectedReports.includes(ReportType.MATURE_PLANTS)">
-            <div class="rounded border border-gray-300 p-2 flex flex-col items-stretch gap-2">
-              <div class="font-semibold text-gray-700">Mature Plants</div>
+            <div
+              class="rounded border border-gray-300 p-2 flex flex-col items-stretch gap-2 overflow-hidden"
+            >
+              <div class="font-semibold text-white bg-purple-600 p-2 -m-2">Mature Plants</div>
               <hr />
               <div class="flex flex-col items-stretch gap-4">
-                <b-button
+                <!-- <b-button
                   size="sm"
                   variant="outline-primary"
                   @click="toggleFilters(ReportType.MATURE_PLANTS)"
                   >{{
                     showFilters[ReportType.MATURE_PLANTS] ? "HIDE FILTERS" : "CHOOSE FILTERS"
                   }}</b-button
-                >
+                > -->
+                <div class="font-semibold text-gray-700">Filters:</div>
+
                 <template v-if="showFilters[ReportType.MATURE_PLANTS]">
                   <b-form-checkbox v-model="maturePlantsFormFilters.includeVegetative">
                     <span class="leading-6">Include Vegetative</span>
@@ -507,6 +539,9 @@
                   }}</b-button
                 > -->
                 <template v-if="showFields[ReportType.MATURE_PLANTS]">
+                  <hr />
+
+                  <div class="font-semibold text-gray-700">Columns:</div>
                   <b-form-checkbox-group
                     v-model="fields[ReportType.MATURE_PLANTS]"
                     class="flex flex-col items-start gap-1"
@@ -542,18 +577,22 @@
 
           <!-- Immature Plants -->
           <template v-if="selectedReports.includes(ReportType.IMMATURE_PLANTS)">
-            <div class="rounded border border-gray-300 p-2 flex flex-col items-stretch gap-2">
-              <div class="font-semibold text-gray-700">Immature Plants</div>
+            <div
+              class="rounded border border-gray-300 p-2 flex flex-col items-stretch gap-2 overflow-hidden"
+            >
+              <div class="font-semibold text-white bg-purple-600 p-2 -m-2">Immature Plants</div>
               <hr />
               <div class="flex flex-col items-stretch gap-4">
-                <b-button
+                <!-- <b-button
                   size="sm"
                   variant="outline-primary"
                   @click="toggleFilters(ReportType.IMMATURE_PLANTS)"
                   >{{
                     showFilters[ReportType.IMMATURE_PLANTS] ? "HIDE FILTERS" : "CHOOSE FILTERS"
                   }}</b-button
-                >
+                > -->
+                <div class="font-semibold text-gray-700">Filters:</div>
+
                 <template v-if="showFilters[ReportType.IMMATURE_PLANTS]">
                   <b-form-checkbox v-model="immaturePlantsFormFilters.includeActive">
                     <span class="leading-6">Include Active</span>
@@ -598,20 +637,9 @@
                   }}</b-button
                 > -->
                 <template v-if="showFields[ReportType.IMMATURE_PLANTS]">
-                  <div class="grid grid-cols-2 gap-2">
-                    <b-button
-                      variant="outline-dark"
-                      size="sm"
-                      @click="checkAll(ReportType.IMMATURE_PLANTS)"
-                      >CHECK ALL</b-button
-                    >
-                    <b-button
-                      variant="outline-dark"
-                      size="sm"
-                      @click="uncheckAll(ReportType.IMMATURE_PLANTS)"
-                      >UNCHECK ALL</b-button
-                    >
-                  </div>
+                  <hr />
+
+                  <div class="font-semibold text-gray-700">Columns:</div>
 
                   <b-form-checkbox-group
                     v-model="fields[ReportType.IMMATURE_PLANTS]"
@@ -626,6 +654,21 @@
                       <span class="leading-6">{{ fieldData.readableName }}</span>
                     </b-form-checkbox>
                   </b-form-checkbox-group>
+
+                  <div class="grid grid-cols-2 gap-2">
+                    <b-button
+                      variant="outline-dark"
+                      size="sm"
+                      @click="checkAll(ReportType.IMMATURE_PLANTS)"
+                      >CHECK ALL</b-button
+                    >
+                    <b-button
+                      variant="outline-dark"
+                      size="sm"
+                      @click="uncheckAll(ReportType.IMMATURE_PLANTS)"
+                      >UNCHECK ALL</b-button
+                    >
+                  </div>
                 </template>
               </div>
             </div>
@@ -633,18 +676,22 @@
 
           <!-- Outgoing Transfers -->
           <template v-if="selectedReports.includes(ReportType.OUTGOING_TRANSFERS)">
-            <div class="rounded border border-gray-300 p-2 flex flex-col items-stretch gap-2">
-              <div class="font-semibold text-gray-700">Outgoing Transfers</div>
+            <div
+              class="rounded border border-gray-300 p-2 flex flex-col items-stretch gap-2 overflow-hidden"
+            >
+              <div class="font-semibold text-white bg-purple-600 p-2 -m-2">Outgoing Transfers</div>
               <hr />
               <div class="flex flex-col items-stretch gap-4">
-                <b-button
+                <!-- <b-button
                   size="sm"
                   variant="outline-primary"
                   @click="toggleFilters(ReportType.OUTGOING_TRANSFERS)"
                   >{{
                     showFilters[ReportType.OUTGOING_TRANSFERS] ? "HIDE FILTERS" : "CHOOSE FILTERS"
                   }}</b-button
-                >
+                > -->
+                <div class="font-semibold text-gray-700">Filters:</div>
+
                 <template v-if="showFilters[ReportType.OUTGOING_TRANSFERS]">
                   <b-form-checkbox v-model="outgoingTransfersFormFilters.includeOutgoing">
                     <span class="leading-6">Include Active Outgoing</span>
@@ -710,20 +757,8 @@
                   }}</b-button
                 > -->
                 <template v-if="showFields[ReportType.OUTGOING_TRANSFERS]">
-                  <div class="grid grid-cols-2 gap-2">
-                    <b-button
-                      variant="outline-dark"
-                      size="sm"
-                      @click="checkAll(ReportType.OUTGOING_TRANSFERS)"
-                      >CHECK ALL</b-button
-                    >
-                    <b-button
-                      variant="outline-dark"
-                      size="sm"
-                      @click="uncheckAll(ReportType.OUTGOING_TRANSFERS)"
-                      >UNCHECK ALL</b-button
-                    >
-                  </div>
+                  <hr />
+                  <div class="font-semibold text-gray-700">Columns:</div>
 
                   <b-form-checkbox-group
                     v-model="fields[ReportType.OUTGOING_TRANSFERS]"
@@ -738,6 +773,20 @@
                       <span class="leading-6">{{ fieldData.readableName }}</span>
                     </b-form-checkbox>
                   </b-form-checkbox-group>
+                  <div class="grid grid-cols-2 gap-2">
+                    <b-button
+                      variant="outline-dark"
+                      size="sm"
+                      @click="checkAll(ReportType.OUTGOING_TRANSFERS)"
+                      >CHECK ALL</b-button
+                    >
+                    <b-button
+                      variant="outline-dark"
+                      size="sm"
+                      @click="uncheckAll(ReportType.OUTGOING_TRANSFERS)"
+                      >UNCHECK ALL</b-button
+                    >
+                  </div>
                 </template>
               </div>
             </div>
@@ -745,11 +794,13 @@
 
           <!-- Transfer Hub Transfers -->
           <template v-if="selectedReports.includes(ReportType.TRANSFER_HUB_TRANSFERS)">
-            <div class="rounded border border-gray-300 p-2 flex flex-col items-stretch gap-2">
-              <div class="font-semibold text-gray-700">Hub Transfers</div>
+            <div
+              class="rounded border border-gray-300 p-2 flex flex-col items-stretch gap-2 overflow-hidden"
+            >
+              <div class="font-semibold text-white bg-purple-600 p-2 -m-2">Hub Transfers</div>
               <hr />
               <div class="flex flex-col items-stretch gap-4">
-                <b-button
+                <!-- <b-button
                   size="sm"
                   variant="outline-primary"
                   @click="toggleFilters(ReportType.TRANSFER_HUB_TRANSFERS)"
@@ -758,7 +809,8 @@
                       ? "HIDE FILTERS"
                       : "CHOOSE FILTERS"
                   }}</b-button
-                >
+                > -->
+                <div class="font-semibold text-gray-700">Filters:</div>
                 <template v-if="showFilters[ReportType.TRANSFER_HUB_TRANSFERS]">
                   <div class="flex flex-col items-start gap-1">
                     <b-form-checkbox
@@ -804,20 +856,9 @@
                   }}</b-button
                 > -->
                 <template v-if="showFields[ReportType.TRANSFER_HUB_TRANSFERS]">
-                  <div class="grid grid-cols-2 gap-2">
-                    <b-button
-                      variant="outline-dark"
-                      size="sm"
-                      @click="checkAll(ReportType.TRANSFER_HUB_TRANSFERS)"
-                      >CHECK ALL</b-button
-                    >
-                    <b-button
-                      variant="outline-dark"
-                      size="sm"
-                      @click="uncheckAll(ReportType.TRANSFER_HUB_TRANSFERS)"
-                      >UNCHECK ALL</b-button
-                    >
-                  </div>
+                  <hr />
+
+                  <div class="font-semibold text-gray-700">Columns:</div>
 
                   <b-form-checkbox-group
                     v-model="fields[ReportType.TRANSFER_HUB_TRANSFERS]"
@@ -832,6 +873,20 @@
                       <span class="leading-6">{{ fieldData.readableName }}</span>
                     </b-form-checkbox>
                   </b-form-checkbox-group>
+                  <div class="grid grid-cols-2 gap-2">
+                    <b-button
+                      variant="outline-dark"
+                      size="sm"
+                      @click="checkAll(ReportType.TRANSFER_HUB_TRANSFERS)"
+                      >CHECK ALL</b-button
+                    >
+                    <b-button
+                      variant="outline-dark"
+                      size="sm"
+                      @click="uncheckAll(ReportType.TRANSFER_HUB_TRANSFERS)"
+                      >UNCHECK ALL</b-button
+                    >
+                  </div>
                 </template>
               </div>
             </div>
@@ -839,18 +894,22 @@
 
           <!-- Incoming Transfers -->
           <template v-if="selectedReports.includes(ReportType.INCOMING_TRANSFERS)">
-            <div class="rounded border border-gray-300 p-2 flex flex-col items-stretch gap-2">
-              <div class="font-semibold text-gray-700">Incoming Transfers</div>
+            <div
+              class="rounded border border-gray-300 p-2 flex flex-col items-stretch gap-2 overflow-hidden"
+            >
+              <div class="font-semibold text-white bg-purple-600 p-2 -m-2">Incoming Transfers</div>
               <hr />
               <div class="flex flex-col items-stretch gap-4">
-                <b-button
+                <!-- <b-button
                   size="sm"
                   variant="outline-primary"
                   @click="toggleFilters(ReportType.INCOMING_TRANSFERS)"
                   >{{
                     showFilters[ReportType.INCOMING_TRANSFERS] ? "HIDE FILTERS" : "CHOOSE FILTERS"
                   }}</b-button
-                >
+                > -->
+
+                <div class="font-semibold text-gray-700">Filters:</div>
                 <template v-if="showFilters[ReportType.INCOMING_TRANSFERS]">
                   <b-form-checkbox v-model="incomingTransfersFormFilters.includeIncoming">
                     <span class="leading-6">Include Active Incoming</span>
@@ -902,20 +961,9 @@
                   }}</b-button
                 > -->
                 <template v-if="showFields[ReportType.INCOMING_TRANSFERS]">
-                  <div class="grid grid-cols-2 gap-2">
-                    <b-button
-                      variant="outline-dark"
-                      size="sm"
-                      @click="checkAll(ReportType.INCOMING_TRANSFERS)"
-                      >CHECK ALL</b-button
-                    >
-                    <b-button
-                      variant="outline-dark"
-                      size="sm"
-                      @click="uncheckAll(ReportType.INCOMING_TRANSFERS)"
-                      >UNCHECK ALL</b-button
-                    >
-                  </div>
+                  <hr />
+
+                  <div class="font-semibold text-gray-700">Columns:</div>
 
                   <b-form-checkbox-group
                     v-model="fields[ReportType.INCOMING_TRANSFERS]"
@@ -930,6 +978,21 @@
                       <span class="leading-6">{{ fieldData.readableName }}</span>
                     </b-form-checkbox>
                   </b-form-checkbox-group>
+
+                  <div class="grid grid-cols-2 gap-2">
+                    <b-button
+                      variant="outline-dark"
+                      size="sm"
+                      @click="checkAll(ReportType.INCOMING_TRANSFERS)"
+                      >CHECK ALL</b-button
+                    >
+                    <b-button
+                      variant="outline-dark"
+                      size="sm"
+                      @click="uncheckAll(ReportType.INCOMING_TRANSFERS)"
+                      >UNCHECK ALL</b-button
+                    >
+                  </div>
                 </template>
               </div>
             </div>
@@ -937,16 +1000,20 @@
 
           <!-- Tags -->
           <template v-if="selectedReports.includes(ReportType.TAGS)">
-            <div class="rounded border border-gray-300 p-2 flex flex-col items-stretch gap-2">
-              <div class="font-semibold text-gray-700">Tags</div>
+            <div
+              class="rounded border border-gray-300 p-2 flex flex-col items-stretch gap-2 overflow-hidden"
+            >
+              <div class="font-semibold text-white bg-purple-600 p-2 -m-2">Tags</div>
               <hr />
               <div class="flex flex-col items-stretch gap-4">
-                <b-button
+                <!-- <b-button
                   size="sm"
                   variant="outline-primary"
                   @click="toggleFilters(ReportType.TAGS)"
                   >{{ showFilters[ReportType.TAGS] ? "HIDE FILTERS" : "CHOOSE FILTERS" }}</b-button
-                >
+                > -->
+
+                <div class="font-semibold text-gray-700">Filters:</div>
                 <template v-if="showFilters[ReportType.TAGS]">
                   <b-form-checkbox v-model="tagsFormFilters.includePlant">
                     <span class="leading-6">Include Plant Tags</span>
@@ -972,14 +1039,9 @@
                   >{{ showFields[ReportType.TAGS] ? "HIDE FIELDS" : "CHOOSE FIELDS" }}</b-button
                 > -->
                 <template v-if="showFields[ReportType.TAGS]">
-                  <div class="grid grid-cols-2 gap-2">
-                    <b-button variant="outline-dark" size="sm" @click="checkAll(ReportType.TAGS)"
-                      >CHECK ALL</b-button
-                    >
-                    <b-button variant="outline-dark" size="sm" @click="uncheckAll(ReportType.TAGS)"
-                      >UNCHECK ALL</b-button
-                    >
-                  </div>
+                  <hr />
+
+                  <div class="font-semibold text-gray-700">Columns:</div>
 
                   <b-form-checkbox-group
                     v-model="fields[ReportType.TAGS]"
@@ -994,6 +1056,14 @@
                       <span class="leading-6">{{ fieldData.readableName }}</span>
                     </b-form-checkbox>
                   </b-form-checkbox-group>
+                  <div class="grid grid-cols-2 gap-2">
+                    <b-button variant="outline-dark" size="sm" @click="checkAll(ReportType.TAGS)"
+                      >CHECK ALL</b-button
+                    >
+                    <b-button variant="outline-dark" size="sm" @click="uncheckAll(ReportType.TAGS)"
+                      >UNCHECK ALL</b-button
+                    >
+                  </div>
                 </template>
               </div>
             </div>
@@ -1001,11 +1071,15 @@
 
           <!-- Outgoing Transfer Manifests -->
           <template v-if="selectedReports.includes(ReportType.OUTGOING_TRANSFER_MANIFESTS)">
-            <div class="rounded border border-gray-300 p-2 flex flex-col items-stretch gap-2">
-              <div class="font-semibold text-gray-700">Outgoing Transfer Manifests</div>
+            <div
+              class="rounded border border-gray-300 p-2 flex flex-col items-stretch gap-2 overflow-hidden"
+            >
+              <div class="font-semibold text-white bg-purple-600 p-2 -m-2">
+                Outgoing Transfer Manifests
+              </div>
               <hr />
               <div class="flex flex-col items-stretch gap-4">
-                <b-button
+                <!-- <b-button
                   size="sm"
                   variant="outline-primary"
                   @click="toggleFilters(ReportType.OUTGOING_TRANSFER_MANIFESTS)"
@@ -1014,7 +1088,9 @@
                       ? "HIDE FILTERS"
                       : "CHOOSE FILTERS"
                   }}</b-button
-                >
+                > -->
+
+                <div class="font-semibold text-gray-700">Filters:</div>
                 <template v-if="showFilters[ReportType.OUTGOING_TRANSFER_MANIFESTS]">
                   <b-form-checkbox v-model="outgoingTransferManifestsFormFilters.includeOutgoing">
                     <span class="leading-6">Include Active Outgoing</span>
@@ -1096,20 +1172,9 @@
                   }}</b-button
                 > -->
                 <template v-if="showFields[ReportType.OUTGOING_TRANSFER_MANIFESTS]">
-                  <div class="grid grid-cols-2 gap-2">
-                    <b-button
-                      variant="outline-dark"
-                      size="sm"
-                      @click="checkAll(ReportType.OUTGOING_TRANSFER_MANIFESTS)"
-                      >CHECK ALL</b-button
-                    >
-                    <b-button
-                      variant="outline-dark"
-                      size="sm"
-                      @click="uncheckAll(ReportType.OUTGOING_TRANSFER_MANIFESTS)"
-                      >UNCHECK ALL</b-button
-                    >
-                  </div>
+                  <hr />
+
+                  <div class="font-semibold text-gray-700">Columns:</div>
 
                   <b-form-checkbox-group
                     v-model="fields[ReportType.OUTGOING_TRANSFER_MANIFESTS]"
@@ -1124,6 +1189,20 @@
                       <span class="leading-6">{{ fieldData.readableName }}</span>
                     </b-form-checkbox>
                   </b-form-checkbox-group>
+                  <div class="grid grid-cols-2 gap-2">
+                    <b-button
+                      variant="outline-dark"
+                      size="sm"
+                      @click="checkAll(ReportType.OUTGOING_TRANSFER_MANIFESTS)"
+                      >CHECK ALL</b-button
+                    >
+                    <b-button
+                      variant="outline-dark"
+                      size="sm"
+                      @click="uncheckAll(ReportType.OUTGOING_TRANSFER_MANIFESTS)"
+                      >UNCHECK ALL</b-button
+                    >
+                  </div>
                 </template>
               </div>
             </div>
@@ -1131,18 +1210,22 @@
 
           <!-- Straggler Packages -->
           <template v-if="selectedReports.includes(ReportType.STRAGGLER_PACKAGES)">
-            <div class="rounded border border-gray-300 p-2 flex flex-col items-stretch gap-2">
-              <div class="font-semibold text-gray-700">Straggler Packages</div>
+            <div
+              class="rounded border border-gray-300 p-2 flex flex-col items-stretch gap-2 overflow-hidden"
+            >
+              <div class="font-semibold text-white bg-purple-600 p-2 -m-2">Straggler Packages</div>
               <hr />
               <div class="flex flex-col items-stretch gap-4">
-                <b-button
+                <!-- <b-button
                   size="sm"
                   variant="outline-primary"
                   @click="toggleFilters(ReportType.STRAGGLER_PACKAGES)"
                   >{{
                     showFilters[ReportType.STRAGGLER_PACKAGES] ? "HIDE FILTERS" : "CHOOSE FILTERS"
                   }}</b-button
-                >
+                > -->
+                <div class="font-semibold text-gray-700">Filters:</div>
+
                 <template v-if="showFilters[ReportType.STRAGGLER_PACKAGES]">
                   <div class="flex flex-col items-start gap-1">
                     <b-form-checkbox v-model="stragglerPackagesFormFilters.includeNearlyEmpty">
@@ -1228,20 +1311,9 @@
                   }}</b-button
                 > -->
                 <template v-if="showFields[ReportType.STRAGGLER_PACKAGES]">
-                  <div class="grid grid-cols-2 gap-2">
-                    <b-button
-                      variant="outline-dark"
-                      size="sm"
-                      @click="checkAll(ReportType.STRAGGLER_PACKAGES)"
-                      >CHECK ALL</b-button
-                    >
-                    <b-button
-                      variant="outline-dark"
-                      size="sm"
-                      @click="uncheckAll(ReportType.STRAGGLER_PACKAGES)"
-                      >UNCHECK ALL</b-button
-                    >
-                  </div>
+                  <hr />
+
+                  <div class="font-semibold text-gray-700">Columns:</div>
 
                   <b-form-checkbox-group
                     v-model="fields[ReportType.STRAGGLER_PACKAGES]"
@@ -1256,6 +1328,21 @@
                       <span class="leading-6">{{ fieldData.readableName }}</span>
                     </b-form-checkbox>
                   </b-form-checkbox-group>
+
+                  <div class="grid grid-cols-2 gap-2">
+                    <b-button
+                      variant="outline-dark"
+                      size="sm"
+                      @click="checkAll(ReportType.STRAGGLER_PACKAGES)"
+                      >CHECK ALL</b-button
+                    >
+                    <b-button
+                      variant="outline-dark"
+                      size="sm"
+                      @click="uncheckAll(ReportType.STRAGGLER_PACKAGES)"
+                      >UNCHECK ALL</b-button
+                    >
+                  </div>
                 </template>
               </div>
             </div>
@@ -1599,7 +1686,7 @@ export default Vue.extend({
           value: ReportType.PACKAGES,
           t3plus: true,
           enabled: true,
-          description: "Filter by packaged date",
+          description: "All packages. Filter by type and date.",
           isCustom: false,
           isCsvEligible: true,
           isSingleton: false,
@@ -1609,7 +1696,7 @@ export default Vue.extend({
           value: ReportType.POINT_IN_TIME_INVENTORY,
           t3plus: true,
           enabled: false,
-          description: "All active packages on a certain date",
+          description: "All active packages on a certain date.",
           isCustom: false,
           isCsvEligible: true,
           isSingleton: false,
@@ -1619,7 +1706,7 @@ export default Vue.extend({
           value: ReportType.IMMATURE_PLANTS,
           t3plus: true,
           enabled: true,
-          description: "Filter by planted date",
+          description: "All plant batches. Filter by planted date.",
           isCustom: false,
           isCsvEligible: true,
           isSingleton: false,
@@ -1629,7 +1716,7 @@ export default Vue.extend({
           value: ReportType.MATURE_PLANTS,
           t3plus: true,
           enabled: true,
-          description: "Filter by growth phase and planted date",
+          description: "All mature plants. Filter by growth phase and planted date",
           isCustom: false,
           isCsvEligible: true,
           isSingleton: false,
@@ -1639,7 +1726,7 @@ export default Vue.extend({
           value: ReportType.INCOMING_TRANSFERS,
           t3plus: true,
           enabled: true,
-          description: "Filter by wholesale and estimated time of arrival",
+          description: "All incoming transfers. Filter by wholesale and ETA",
           isCustom: false,
           isCsvEligible: true,
           isSingleton: false,
@@ -1649,7 +1736,7 @@ export default Vue.extend({
           value: ReportType.OUTGOING_TRANSFERS,
           t3plus: true,
           enabled: true,
-          description: "Filter by wholesale and estimated time of departure",
+          description: "All outgoing transfers. Filter by wholesale and ETD",
           isCustom: false,
           isCsvEligible: true,
           isSingleton: false,
@@ -1668,7 +1755,7 @@ export default Vue.extend({
           value: ReportType.TAGS,
           t3plus: true,
           enabled: true,
-          description: "Filter by tag type and status",
+          description: "All tags. Filter by status and tag type.",
           isCustom: false,
           isCsvEligible: true,
           isSingleton: false,
@@ -1678,7 +1765,7 @@ export default Vue.extend({
           value: ReportType.HARVESTS,
           t3plus: true,
           enabled: true,
-          description: "Filter by harvest date",
+          description: "All harvests. Filter by status and harvest date.",
           isCustom: false,
           isCsvEligible: true,
           isSingleton: false,
@@ -1688,7 +1775,7 @@ export default Vue.extend({
           value: ReportType.OUTGOING_TRANSFER_MANIFESTS,
           t3plus: true,
           enabled: true,
-          description: "Full transfer and package data for all outgoing transfers",
+          description: "Full transfer and package data for all outgoing transfers.",
           isCustom: false,
           isCsvEligible: true,
           isSingleton: false,
@@ -1698,7 +1785,7 @@ export default Vue.extend({
           value: ReportType.STRAGGLER_PACKAGES,
           t3plus: true,
           enabled: true,
-          description: "Find straggler inventory so it can be cleared out",
+          description: "Find old and empty inventory",
           isCustom: false,
           isCsvEligible: true,
           isSingleton: false,
@@ -1967,17 +2054,15 @@ export default Vue.extend({
     selectedReports: {
       immediate: true,
       handler(newValue, oldValue) {
-        console.log(newValue);
-        const singleonReportTypes: ReportType[] = [
-          ReportType.COGS,
-          ReportType.COGS_V2,
-          ReportType.COGS_TRACKER,
-          ReportType.EMPLOYEE_SAMPLES,
-        ];
+        // console.log(newValue);
+        const singleonReportTypes: ReportType[] = this.reportOptionsImpl()
+          .filter((x: IReportOption) => x.isSingleton)
+          .map((x: IReportOption) => x.value);
 
         for (const reportType of singleonReportTypes) {
           if (newValue.length > 1 && newValue.includes(reportType)) {
             this.selectedReports = [reportType];
+            break;
           }
         }
       },

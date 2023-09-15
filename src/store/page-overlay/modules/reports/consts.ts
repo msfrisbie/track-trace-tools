@@ -45,595 +45,389 @@ export enum ReportAuxTask {
   UPDATE_MASTER_COST_SHEET = "UPDATE_MASTER_COST_SHEET",
 }
 
+const COMMON_PACKAGE_FIELD_DATA: IFieldData[] = [
+  {
+    value: "Label",
+    readableName: "Package Tag",
+    required: true,
+  },
+  {
+    value: "LicenseNumber",
+    readableName: "Current License",
+    required: true,
+  },
+  {
+    value: "PackageState",
+    readableName: "Is Active?",
+    required: true,
+  },
+  {
+    value: "SourcePackageLabels",
+    readableName: "Source Package Labels",
+    required: false,
+  },
+  {
+    value: "Item.Name",
+    readableName: "Item",
+    required: false,
+  },
+  {
+    value: "Item.ProductCategoryName",
+    readableName: "Item Category",
+    required: false,
+  },
+  {
+    value: "Item.ProductCategoryTypeName",
+    readableName: "Item Category Type",
+    required: false,
+  },
+  {
+    value: "Quantity",
+    readableName: "Package Quantity",
+    required: false,
+  },
+  {
+    value: "UnitOfMeasureAbbreviation",
+    readableName: "Unit of Measure",
+    required: false,
+  },
+  {
+    value: "PackagedDate",
+    readableName: "Packaged On",
+    required: false,
+  },
+  {
+    value: "LocationName",
+    readableName: "Location",
+    required: false,
+  },
+  {
+    value: "PackagedByFacilityLicenseNumber",
+    readableName: "Packaged By",
+    required: false,
+  },
+  {
+    value: "LabTestingStateName",
+    readableName: "Testing Status",
+    required: false,
+  },
+  {
+    value: "ProductionBatchNumber",
+    readableName: "Production Batch",
+    required: false,
+  },
+  {
+    value: "SourceProductionBatchNumbers",
+    readableName: "Source Production Batch Numbers",
+    required: false,
+  },
+];
+const COMMON_PLANT_FIELD_DATA: IFieldData[] = [
+  {
+    value: "Label",
+    readableName: "Plant Tag",
+    required: true,
+  },
+  {
+    value: "LicenseNumber",
+    readableName: "Current License",
+    required: true,
+  },
+  {
+    value: "PlantState",
+    readableName: "Growth Phase",
+    required: true,
+  },
+  {
+    value: "PlantedDate",
+    readableName: "Planted Date",
+    required: false,
+  },
+  {
+    value: "VegetativeDate",
+    readableName: "Vegetative Date",
+    required: false,
+  },
+  {
+    value: "FloweringDate",
+    readableName: "Flowering Date",
+    required: false,
+  },
+  {
+    value: "DestroyedDate",
+    readableName: "Destroyed Date",
+    required: false,
+  },
+  {
+    value: "StrainName",
+    readableName: "Strain",
+    required: false,
+  },
+  {
+    value: "LocationName",
+    readableName: "Location",
+    required: false,
+  },
+  {
+    value: "PlantBatchName",
+    readableName: "Source Plant Batch",
+    required: false,
+  },
+  {
+    value: "HarvestCount",
+    readableName: "Harvest Count",
+    required: false,
+  },
+];
+const COMMON_PLANT_BATCH_FIELD_DATA: IFieldData[] = [
+  {
+    value: "Name",
+    readableName: "Plant Tag/Name",
+    required: true,
+  },
+  {
+    value: "LicenseNumber",
+    readableName: "Current License",
+    required: true,
+  },
+  {
+    value: "StrainName",
+    readableName: "Strain",
+    required: false,
+  },
+  {
+    value: "LocationName",
+    readableName: "Location",
+    required: false,
+  },
+  {
+    value: "UntrackedCount",
+    readableName: "# Plants",
+    required: true,
+  },
+  {
+    value: "TrackedCount",
+    readableName: "# Tracked",
+    required: false,
+  },
+  {
+    value: "PackagedCount",
+    readableName: "# Packaged",
+    required: false,
+  },
+  {
+    value: "HarvestedCount",
+    readableName: "# Harvested",
+    required: false,
+  },
+  {
+    value: "DestroyedCount",
+    readableName: "# Destroyed",
+    required: false,
+  },
+];
+const COMMON_INCOMING_TRANSFER_FIELD_DATA: IFieldData[] = [
+  {
+    value: "Transfer.ManifestNumber",
+    readableName: "Manifest #",
+    required: true,
+  },
+  {
+    value: "Transfer.TransferState",
+    readableName: "Transfer Status",
+    required: true,
+  },
+  {
+    value: "Transfer.ShipmentTypeName",
+    readableName: "Transfer Type",
+    required: true,
+  },
+  {
+    value: "Transfer.DeliveryPackageCount",
+    readableName: "Package Count",
+    required: true,
+  },
+  {
+    value: "Transfer.ShipperFacilityName",
+    readableName: "Shipper Name",
+    required: false,
+  },
+  {
+    value: "Transfer.ShipperFacilityLicenseNumber",
+    readableName: "Shipper License",
+    required: false,
+  },
+  {
+    value: "Transfer.RecipientFacilityName",
+    readableName: "Recipient Name",
+    required: false,
+  },
+  {
+    value: "Transfer.RecipientFacilityLicenseNumber",
+    readableName: "Recipient License",
+    required: false,
+  },
+  {
+    value: "Transfer.EstimatedDepartureDateTime",
+    readableName: "ETD",
+    required: false,
+  },
+  {
+    value: "Transfer.EstimatedArrivalDateTime",
+    readableName: "ETA",
+    required: false,
+  },
+];
+const COMMON_OUTGOING_TRANSFER_FIELD_DATA: IFieldData[] = [
+  {
+    value: "Transfer.ManifestNumber",
+    readableName: "Manifest #",
+    required: true,
+  },
+  {
+    value: "Transfer.TransferState",
+    readableName: "Transfer Status",
+    required: true,
+  },
+  {
+    value: "Destination.ShipmentTypeName",
+    readableName: "Transfer Type",
+    required: true,
+  },
+  {
+    value: "Destination.DeliveryPackageCount",
+    readableName: "Package Count",
+    required: true,
+  },
+  {
+    value: "Transfer.ShipperFacilityName",
+    readableName: "Shipper Name",
+    required: false,
+  },
+  {
+    value: "Transfer.ShipperFacilityLicenseNumber",
+    readableName: "Shipper License",
+    required: false,
+  },
+  {
+    value: "Destination.RecipientFacilityName",
+    readableName: "Recipient Name",
+    required: false,
+  },
+  {
+    value: "Destination.RecipientFacilityLicenseNumber",
+    readableName: "Recipient License",
+    required: false,
+  },
+  {
+    value: "Destination.EstimatedDepartureDateTime",
+    readableName: "ETD",
+    required: false,
+  },
+  {
+    value: "Destination.EstimatedArrivalDateTime",
+    readableName: "ETA",
+    required: false,
+  },
+];
+const COMMON_TAG_FIELD_DATA: IFieldData[] = [
+  {
+    value: "Label",
+    readableName: "Tag",
+    required: true,
+  },
+  {
+    value: "LicenseNumber",
+    readableName: "Current License",
+    required: true,
+  },
+  {
+    value: "TagTypeName",
+    readableName: "Tag Type",
+    required: true,
+  },
+  {
+    value: "StatusName",
+    readableName: "Status",
+    required: true,
+  },
+];
+const COMMON_HARVEST_FIELD_DATA: IFieldData[] = [
+  {
+    value: "Name",
+    readableName: "Harvest Batch",
+    required: true,
+  },
+  {
+    value: "LicenseNumber",
+    readableName: "Current License",
+    required: true,
+  },
+  {
+    value: "HarvestState",
+    readableName: "Harvest Status",
+    required: true,
+  },
+  {
+    value: "CurrentWeight",
+    readableName: "Current Weight",
+    required: true,
+  },
+  {
+    value: "HarvestStartDate",
+    readableName: "Harvest Date",
+    required: false,
+  },
+  {
+    value: "HarvestType",
+    readableName: "Harvest Type",
+    required: false,
+  },
+];
+
+const COMMON_OUTGOING_TRANSFER_PACKAGE_DATA: IFieldData[] = [
+  {
+    value: "Package.PackageLabel",
+    readableName: "Package Tag",
+    required: true,
+  },
+  {
+    value: "Package.ProductName",
+    readableName: "Item",
+    required: false,
+  },
+  {
+    value: "Package.ShippedQuantity",
+    readableName: "Quantity",
+    required: false,
+  },
+  {
+    value: "Package.ShippedUnitOfMeasureAbbreviation",
+    readableName: "Unit of Measure",
+    required: false,
+  },
+];
+
 // Used to unpack arrays of objects and auto-generate column headers
 export const SHEET_FIELDS: { [key: string]: IFieldData[] } = {
-  [ReportType.IMMATURE_PLANTS]: [
-    {
-      value: "Name",
-      readableName: "Plant Tag/Name",
-      required: true,
-    },
-    {
-      value: "LicenseNumber",
-      readableName: "Current License",
-      required: true,
-    },
-    {
-      value: "StrainName",
-      readableName: "Strain",
-      required: false,
-    },
-    {
-      value: "LocationName",
-      readableName: "Location",
-      required: false,
-    },
-    {
-      value: "UntrackedCount",
-      readableName: "# Plants",
-      required: true,
-    },
-    {
-      value: "TrackedCount",
-      readableName: "# Tracked",
-      required: false,
-    },
-    {
-      value: "PackagedCount",
-      readableName: "# Packaged",
-      required: false,
-    },
-    {
-      value: "HarvestedCount",
-      readableName: "# Harvested",
-      required: false,
-    },
-    {
-      value: "DestroyedCount",
-      readableName: "# Destroyed",
-      required: false,
-    },
-  ],
-  [ReportType.HARVESTS]: [
-    {
-      value: "Name",
-      readableName: "Harvest Batch",
-      required: true,
-    },
-    {
-      value: "LicenseNumber",
-      readableName: "Current License",
-      required: true,
-    },
-    {
-      value: "HarvestState",
-      readableName: "Harvest Status",
-      required: true,
-    },
-    {
-      value: "CurrentWeight",
-      readableName: "Current Weight",
-      required: true,
-    },
-    {
-      value: "HarvestStartDate",
-      readableName: "Harvest Date",
-      required: false,
-    },
-    {
-      value: "HarvestType",
-      readableName: "Harvest Type",
-      required: false,
-    },
-  ],
-  [ReportType.TAGS]: [
-    {
-      value: "Label",
-      readableName: "Tag",
-      required: true,
-    },
-    {
-      value: "LicenseNumber",
-      readableName: "Current License",
-      required: true,
-    },
-    {
-      value: "TagTypeName",
-      readableName: "Tag Type",
-      required: true,
-    },
-    {
-      value: "StatusName",
-      readableName: "Status",
-      required: true,
-    },
-  ],
-  [ReportType.MATURE_PLANTS]: [
-    {
-      value: "Label",
-      readableName: "Plant Tag",
-      required: true,
-    },
-    {
-      value: "LicenseNumber",
-      readableName: "Current License",
-      required: true,
-    },
-    {
-      value: "PlantState",
-      readableName: "Growth Phase",
-      required: true,
-    },
-    {
-      value: "PlantedDate",
-      readableName: "Planted Date",
-      required: false,
-    },
-    {
-      value: "VegetativeDate",
-      readableName: "Vegetative Date",
-      required: false,
-    },
-    {
-      value: "FloweringDate",
-      readableName: "Flowering Date",
-      required: false,
-    },
-    {
-      value: "DestroyedDate",
-      readableName: "Destroyed Date",
-      required: false,
-    },
-    {
-      value: "StrainName",
-      readableName: "Strain",
-      required: false,
-    },
-    {
-      value: "LocationName",
-      readableName: "Location",
-      required: false,
-    },
-    {
-      value: "PlantBatchName",
-      readableName: "Source Plant Batch",
-      required: false,
-    },
-    {
-      value: "HarvestCount",
-      readableName: "Harvest Count",
-      required: false,
-    },
-  ],
-  [ReportType.PACKAGES]: [
-    {
-      value: "Label",
-      readableName: "Package Tag",
-      required: true,
-    },
-    {
-      value: "LicenseNumber",
-      readableName: "Current License",
-      required: true,
-    },
-    {
-      value: "PackageState",
-      readableName: "Is Active?",
-      required: true,
-    },
-    {
-      value: "SourcePackageLabels",
-      readableName: "Source Package Labels",
-      required: false,
-    },
-    {
-      value: "Item.Name",
-      readableName: "Item",
-      required: false,
-    },
-    {
-      value: "Item.ProductCategoryName",
-      readableName: "Item Category",
-      required: false,
-    },
-    {
-      value: "Item.ProductCategoryTypeName",
-      readableName: "Item Category Type",
-      required: false,
-    },
-    {
-      value: "Quantity",
-      readableName: "Package Quantity",
-      required: false,
-    },
-    {
-      value: "UnitOfMeasureAbbreviation",
-      readableName: "Unit of Measure",
-      required: false,
-    },
-    {
-      value: "PackagedDate",
-      readableName: "Packaged On",
-      required: false,
-    },
-    {
-      value: "LocationName",
-      readableName: "Location",
-      required: false,
-    },
-    {
-      value: "PackagedByFacilityLicenseNumber",
-      readableName: "Packaged By",
-      required: false,
-    },
-    {
-      value: "LabTestingStateName",
-      readableName: "Testing Status",
-      required: false,
-    },
-    {
-      value: "ProductionBatchNumber",
-      readableName: "Production Batch",
-      required: false,
-    },
-    {
-      value: "SourceProductionBatchNumbers",
-      readableName: "Source Production Batch Numbers",
-      required: false,
-    },
-  ],
-  [ReportType.STRAGGLER_PACKAGES]: [
-    {
-      value: "Label",
-      readableName: "Package Tag",
-      required: true,
-    },
-    {
-      value: "LicenseNumber",
-      readableName: "Current License",
-      required: true,
-    },
-    {
-      value: "PackageState",
-      readableName: "Is Active?",
-      required: true,
-    },
-    {
-      value: "Item.Name",
-      readableName: "Package Item",
-      required: false,
-    },
-    {
-      value: "Quantity",
-      readableName: "Package Quantity",
-      required: false,
-    },
-    {
-      value: "UnitOfMeasureAbbreviation",
-      readableName: "Unit of Measure",
-      required: false,
-    },
-    {
-      value: "PackagedDate",
-      readableName: "Packaged On",
-      required: false,
-    },
-    {
-      value: "LocationName",
-      readableName: "Location",
-      required: false,
-    },
-    {
-      value: "PackagedByFacilityLicenseNumber",
-      readableName: "Packaged By",
-      required: false,
-    },
-    {
-      value: "LabTestingStateName",
-      readableName: "Testing Status",
-      required: false,
-    },
-    {
-      value: "ProductionBatchNumber",
-      readableName: "Production Batch",
-      required: false,
-    },
-    {
-      value: "SourceProductionBatchNumbers",
-      readableName: "Source Production Batch Numbers",
-      required: false,
-    },
-  ],
-  // TODO check these:
-  [ReportType.INCOMING_TRANSFERS]: [
-    {
-      value: "Transfer.ManifestNumber",
-      readableName: "Manifest #",
-      required: true,
-    },
-    {
-      value: "Transfer.TransferState",
-      readableName: "Transfer Status",
-      required: true,
-    },
-    {
-      value: "Transfer.ShipmentTypeName",
-      readableName: "Transfer Type",
-      required: true,
-    },
-    {
-      value: "Transfer.DeliveryPackageCount",
-      readableName: "Package Count",
-      required: true,
-    },
-    {
-      value: "Transfer.ShipperFacilityName",
-      readableName: "Shipper Name",
-      required: false,
-    },
-    {
-      value: "Transfer.ShipperFacilityLicenseNumber",
-      readableName: "Shipper License",
-      required: false,
-    },
-    {
-      value: "Transfer.RecipientFacilityName",
-      readableName: "Recipient Name",
-      required: false,
-    },
-    {
-      value: "Transfer.RecipientFacilityLicenseNumber",
-      readableName: "Recipient License",
-      required: false,
-    },
-    {
-      value: "Transfer.EstimatedDepartureDateTime",
-      readableName: "ETD",
-      required: false,
-    },
-    {
-      value: "Transfer.EstimatedArrivalDateTime",
-      readableName: "ETA",
-      required: false,
-    },
-  ],
-  [ReportType.OUTGOING_TRANSFERS]: [
-    {
-      value: "Transfer.ManifestNumber",
-      readableName: "Manifest #",
-      required: true,
-    },
-    {
-      value: "Transfer.TransferState",
-      readableName: "Transfer Status",
-      required: true,
-    },
-    {
-      value: "Destination.ShipmentTypeName",
-      readableName: "Transfer Type",
-      required: true,
-    },
-    {
-      value: "Destination.DeliveryPackageCount",
-      readableName: "Package Count",
-      required: true,
-    },
-    {
-      value: "Transfer.ShipperFacilityName",
-      readableName: "Shipper Name",
-      required: false,
-    },
-    {
-      value: "Transfer.ShipperFacilityLicenseNumber",
-      readableName: "Shipper License",
-      required: false,
-    },
-    {
-      value: "Destination.RecipientFacilityName",
-      readableName: "Recipient Name",
-      required: false,
-    },
-    {
-      value: "Destination.RecipientFacilityLicenseNumber",
-      readableName: "Recipient License",
-      required: false,
-    },
-    {
-      value: "Destination.EstimatedDepartureDateTime",
-      readableName: "ETD",
-      required: false,
-    },
-    {
-      value: "Destination.EstimatedArrivalDateTime",
-      readableName: "ETA",
-      required: false,
-    },
-  ],
-  [ReportType.TRANSFER_HUB_TRANSFERS]: [
-    {
-      value: "Transfer.ManifestNumber",
-      readableName: "Manifest #",
-      required: true,
-    },
-    {
-      value: "Transfer.TransferState",
-      readableName: "Transfer Status",
-      required: true,
-    },
-    {
-      value: "Destination.ShipmentTypeName",
-      readableName: "Transfer Type",
-      required: true,
-    },
-    {
-      value: "Destination.DeliveryPackageCount",
-      readableName: "Package Count",
-      required: true,
-    },
-    {
-      value: "Transfer.ShipperFacilityName",
-      readableName: "Shipper Name",
-      required: false,
-    },
-    {
-      value: "Transfer.ShipperFacilityLicenseNumber",
-      readableName: "Shipper License",
-      required: false,
-    },
-    {
-      value: "Destination.RecipientFacilityName",
-      readableName: "Recipient Name",
-      required: false,
-    },
-    {
-      value: "Destination.RecipientFacilityLicenseNumber",
-      readableName: "Recipient License",
-      required: false,
-    },
-    {
-      value: "Destination.EstimatedDepartureDateTime",
-      readableName: "ETD",
-      required: false,
-    },
-    {
-      value: "Destination.EstimatedArrivalDateTime",
-      readableName: "ETA",
-      required: false,
-    },
-  ],
+  [ReportType.IMMATURE_PLANTS]: [...COMMON_PLANT_BATCH_FIELD_DATA],
+  [ReportType.HARVESTS]: [...COMMON_HARVEST_FIELD_DATA],
+  [ReportType.TAGS]: [...COMMON_TAG_FIELD_DATA],
+  [ReportType.MATURE_PLANTS]: [...COMMON_PLANT_FIELD_DATA],
+  [ReportType.PACKAGES]: [...COMMON_PACKAGE_FIELD_DATA],
+  [ReportType.STRAGGLER_PACKAGES]: [...COMMON_PACKAGE_FIELD_DATA],
+  [ReportType.INCOMING_TRANSFERS]: [...COMMON_INCOMING_TRANSFER_FIELD_DATA],
+  [ReportType.OUTGOING_TRANSFERS]: [...COMMON_OUTGOING_TRANSFER_FIELD_DATA],
+  [ReportType.TRANSFER_HUB_TRANSFERS]: [...COMMON_OUTGOING_TRANSFER_FIELD_DATA],
   [ReportType.OUTGOING_TRANSFER_MANIFESTS]: [
-    {
-      value: "Transfer.ManifestNumber",
-      readableName: "Manifest #",
-      required: true,
-    },
-    {
-      value: "Transfer.TransferState",
-      readableName: "Transfer Status",
-      required: true,
-    },
-    {
-      value: "Destination.ShipmentTypeName",
-      readableName: "Transfer Type",
-      required: true,
-    },
-    {
-      value: "Package.PackageLabel",
-      readableName: "Package Tag",
-      required: true,
-    },
-    {
-      value: "Package.ProductName",
-      readableName: "Item",
-      required: false,
-    },
-    {
-      value: "Package.ShippedQuantity",
-      readableName: "Quantity",
-      required: false,
-    },
-    {
-      value: "Package.ShippedUnitOfMeasureAbbreviation",
-      readableName: "Unit of Measure",
-      required: false,
-    },
-    {
-      value: "Transfer.ShipperFacilityName",
-      readableName: "Shipper Name",
-      required: false,
-    },
-    {
-      value: "Transfer.ShipperFacilityLicenseNumber",
-      readableName: "Shipper License",
-      required: false,
-    },
-    {
-      value: "Destination.RecipientFacilityName",
-      readableName: "Recipient Name",
-      required: false,
-    },
-    {
-      value: "Destination.EstimatedDepartureDateTime",
-      readableName: "ETD",
-      required: false,
-    },
-    {
-      value: "Destination.EstimatedDepartureDateTime",
-      readableName: "ETD",
-      required: false,
-    },
-    {
-      value: "Destination.EstimatedArrivalDateTime",
-      readableName: "ETA",
-      required: false,
-    },
+    ...COMMON_OUTGOING_TRANSFER_FIELD_DATA.slice(0, 4),
+    ...COMMON_OUTGOING_TRANSFER_PACKAGE_DATA,
+    ...COMMON_OUTGOING_TRANSFER_FIELD_DATA.slice(4),
   ],
   [ReportType.TRANSFER_HUB_TRANSFER_MANIFESTS]: [
-    {
-      value: "Transfer.ManifestNumber",
-      readableName: "Manifest #",
-      required: true,
-    },
-    {
-      value: "Transfer.TransferState",
-      readableName: "Transfer Status",
-      required: true,
-    },
-    {
-      value: "Destination.ShipmentTypeName",
-      readableName: "Transfer Type",
-      required: true,
-    },
-    {
-      value: "Package.PackageLabel",
-      readableName: "Package Tag",
-      required: true,
-    },
-    {
-      value: "Package.ProductName",
-      readableName: "Item",
-      required: false,
-    },
-    {
-      value: "Package.ShippedQuantity",
-      readableName: "Quantity",
-      required: false,
-    },
-    {
-      value: "Package.ShippedUnitOfMeasureAbbreviation",
-      readableName: "Unit of Measure",
-      required: false,
-    },
-    {
-      value: "Transfer.ShipperFacilityName",
-      readableName: "Shipper Name",
-      required: false,
-    },
-    {
-      value: "Transfer.ShipperFacilityLicenseNumber",
-      readableName: "Shipper License",
-      required: false,
-    },
-    {
-      value: "Destination.RecipientFacilityName",
-      readableName: "Recipient Name",
-      required: false,
-    },
-    {
-      value: "Destination.EstimatedDepartureDateTime",
-      readableName: "ETD",
-      required: false,
-    },
-    {
-      value: "Destination.EstimatedDepartureDateTime",
-      readableName: "ETD",
-      required: false,
-    },
-    {
-      value: "Destination.EstimatedArrivalDateTime",
-      readableName: "ETA",
-      required: false,
-    },
+    ...COMMON_OUTGOING_TRANSFER_FIELD_DATA.slice(0, 4),
+    ...COMMON_OUTGOING_TRANSFER_PACKAGE_DATA,
+    ...COMMON_OUTGOING_TRANSFER_FIELD_DATA.slice(4),
   ],
 };
 
