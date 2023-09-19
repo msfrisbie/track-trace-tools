@@ -57,6 +57,8 @@ export function extractNestedData({
       return reportData[reportType]!.richTransferHubTransfers!;
     case ReportType.STRAGGLER_PACKAGES:
       return reportData[reportType]!.stragglerPackages!;
+    case ReportType.MATURE_PLANTS_QUICKVIEW:
+      return reportData[reportType]!.maturePlants;
     default:
       throw new Error("Bad reportType " + reportType);
   }
@@ -81,14 +83,80 @@ export function applyFieldTransformer({
   );
 }
 
+export function extractQuickviewData({
+  reportType,
+  reportConfig,
+  reportData,
+}: {
+  reportType: ReportType;
+  reportConfig: IReportConfig;
+  reportData: IReportData;
+}): any[][] {
+  let data: any[][] = [];
+
+  let primaryDimension: string;
+  let secondaryDimension: string | null;
+  let objects: { [key: string]: any }[];
+
+  switch (reportType) {
+    case ReportType.MATURE_PLANTS_QUICKVIEW:
+      primaryDimension = reportConfig[reportType]!.primaryDimension;
+      secondaryDimension = reportConfig[reportType]!.secondaryDimension;
+      objects = reportData[reportType]!.maturePlants;
+      break;
+    default:
+      throw new Error("Bad report type");
+  }
+
+  const indexedDimensionCounts: { [key: string]: { [key: string]: number } } = {};
+
+  const primaryKeys = new Set<string>();
+  const secondaryKeys = new Set<string>();
+
+  for (const object of objects) {
+    const primaryValue = object[primaryDimension];
+    const secondaryValue = secondaryDimension ? object[secondaryDimension] : "*";
+
+    primaryKeys.add(primaryValue);
+    secondaryKeys.add(secondaryValue);
+
+    if (indexedDimensionCounts[primaryValue] === undefined) {
+      indexedDimensionCounts[primaryValue] = {};
+    }
+
+    if (indexedDimensionCounts[primaryValue][secondaryValue] === undefined) {
+      indexedDimensionCounts[primaryValue][secondaryValue] = 0;
+    }
+
+    indexedDimensionCounts[primaryValue][secondaryValue]++;
+  }
+
+  const sortedPrimaryKeys = [...primaryKeys].sort();
+  const sortedSecondaryKeys = [...secondaryKeys].sort();
+
+  data.push(["", ...sortedPrimaryKeys]);
+
+  for (const [i, secondaryKey] of sortedSecondaryKeys.entries()) {
+    const row = [secondaryKey];
+
+    for (const [j, primaryKey] of sortedPrimaryKeys.entries()) {
+      row.push((indexedDimensionCounts[primaryKey][secondaryKey] ?? "0").toString());
+    }
+  }
+
+  return data;
+}
+
 export function extractFlattenedData({
   flattenedCache,
   reportType,
   reportData,
+  reportConfig,
 }: {
   flattenedCache: Map<ReportType, any[]>;
   reportType: ReportType;
   reportData: IReportData;
+  reportConfig: IReportConfig;
 }): any[] {
   if (flattenedCache.has(reportType)) {
     return flattenedCache.get(reportType) as any[];
@@ -182,6 +250,12 @@ export function extractFlattenedData({
           }
         }
         return flattenedOutgoingPackages;
+      case ReportType.MATURE_PLANTS_QUICKVIEW:
+        return extractQuickviewData({
+          reportType,
+          reportConfig,
+          reportData,
+        });
       default:
         throw new Error("Bad reportType " + reportType);
     }

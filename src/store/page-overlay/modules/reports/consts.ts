@@ -9,7 +9,7 @@ export enum ReportsGetters {}
 
 export enum ReportsActions {
   RESET = "RESET",
-  GENERATE_SPREADSHEET = "GENERATE_SPREADSHEET",
+  GENERATE_REPORT = "GENERATE_REPORT",
   RUN_AUX_REPORT_TASK = "RUN_AUX_REPORT_TASK",
 }
 
@@ -60,6 +60,10 @@ export const ALL_ELIGIBLE_REPORT_TYPES: ReportType[] = [
   ReportType.TRANSFER_HUB_TRANSFER_MANIFESTS,
   ReportType.POINT_IN_TIME_INVENTORY,
 ];
+
+export const QUICKVIEW_REPORT_TYPES: ReportType[] = [
+  ReportType.MATURE_PLANTS_QUICKVIEW
+]
 
 const COMMON_PACKAGE_FIELD_DATA: IFieldData[] = [
   {

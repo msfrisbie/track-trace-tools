@@ -12,6 +12,7 @@ import { messageBus } from "@/modules/message-bus.module";
 import store from "@/store/page-overlay/index";
 import {
   ALL_ELIGIBLE_REPORT_TYPES,
+  QUICKVIEW_REPORT_TYPES,
   ReportsMutations,
   ReportType,
 } from "@/store/page-overlay/modules/reports/consts";
@@ -326,15 +327,26 @@ export async function createCsvOrError({
       store.state.pluginAuth?.authState?.license
     } - ${todayIsodate()}`;
 
-    const fields: IFieldData[] = reportConfig[reportType]!.fields!;
+    let data: any[][] = [];
 
-    const headers: string[] = fields.map((fieldData) => fieldData.readableName);
+    if (QUICKVIEW_REPORT_TYPES.includes(reportType)) {
+      data = extractFlattenedData({ flattenedCache, reportType, reportData, reportConfig });
+    } else {
+      const fields: IFieldData[] = reportConfig[reportType]!.fields!;
 
-    const flattenedData: any[] = extractFlattenedData({ flattenedCache, reportType, reportData });
+      const headers: string[] = fields.map((fieldData) => fieldData.readableName);
 
-    const matrix = applyFieldTransformer({ fields, values: flattenedData });
+      const flattenedData: any[] = extractFlattenedData({
+        flattenedCache,
+        reportType,
+        reportData,
+        reportConfig,
+      });
 
-    const data: any[][] = [headers, ...matrix];
+      const matrix = applyFieldTransformer({ fields, values: flattenedData });
+
+      data = [headers, ...matrix];
+    }
 
     const csvFile: ICsvFile = {
       filename,
@@ -446,7 +458,7 @@ export async function createSpreadsheetOrError({
   for (const reportType of ELIGIBLE_REPORT_TYPES) {
     const sheetId: number = sheetTitles.indexOf(getSheetTitle({ reportType }));
     const length = Math.max(
-      extractFlattenedData({ flattenedCache, reportType, reportData }).length,
+      extractFlattenedData({ flattenedCache, reportType, reportData, reportConfig }).length,
       1
     );
 
@@ -481,9 +493,9 @@ export async function createSpreadsheetOrError({
       spreadsheetId: response.data.result.spreadsheetId,
       spreadsheetTitle: getSheetTitle({ reportType }),
       fields: reportConfig[reportType]?.fields as IFieldData[],
-      data: extractFlattenedData({ flattenedCache, reportType, reportData }) as any[],
+      data: extractFlattenedData({ flattenedCache, reportType, reportData, reportConfig }) as any[],
       options: {
-        useFieldTransformer: true,
+        useFieldTransformer: QUICKVIEW_REPORT_TYPES.includes(reportType),
       },
     });
   }

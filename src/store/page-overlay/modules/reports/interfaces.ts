@@ -16,6 +16,7 @@ import {
   ITagFilter,
   ITransferFilter,
 } from "@/interfaces";
+import { MaturePlantQuickviewDimension } from "@/utils/reports/mature-plants-quickview-report";
 import { IStatusMessage, ReportStatus, ReportType } from "./consts";
 
 export interface IReportsState {
@@ -80,8 +81,8 @@ export interface IReportConfig {
   };
   [ReportType.MATURE_PLANTS_QUICKVIEW]?: {
     plantFilter: IPlantFilter;
-    primaryDimension: string;
-    secondaryDimension: string | null;
+    primaryDimension: MaturePlantQuickviewDimension;
+    secondaryDimension: MaturePlantQuickviewDimension | null;
     fields: null;
   };
   [ReportType.MATURE_PLANTS]?: {

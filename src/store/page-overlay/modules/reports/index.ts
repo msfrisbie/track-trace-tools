@@ -4,7 +4,6 @@ import { analyticsManager } from "@/modules/analytics-manager.module";
 import { maybeLoadCogsReportData } from "@/utils/reports/cogs-report";
 import { maybeLoadCogsTrackerReportData } from "@/utils/reports/cogs-tracker-report";
 import {
-  createCogsV2SpreadsheetOrError,
   maybeLoadCogsV2ReportData,
   updateCogsV2MasterCostSheet,
 } from "@/utils/reports/cogs-v2-report";
@@ -123,7 +122,7 @@ export const reportsModule = {
         });
       }
     },
-    [ReportsActions.GENERATE_SPREADSHEET]: async (
+    [ReportsActions.GENERATE_REPORT]: async (
       ctx: ActionContext<IReportsState, IPluginState>,
       { reportConfig }: { reportConfig: IReportConfig }
     ) => {
@@ -149,15 +148,16 @@ export const reportsModule = {
         await maybeLoadTransferHubTransfersReportData({ ctx, reportData, reportConfig });
         await maybeLoadOutgoingTransferManifestsReportData({ ctx, reportData, reportConfig });
         await maybeLoadEmployeeSamplesReportData({ ctx, reportData, reportConfig });
+        await maybeLoadMaturePlantsQuickviewReportData({ ctx, reportData, reportConfig });
 
         ctx.commit(ReportsMutations.SET_STATUS, {
-          statusMessage: { text: "Generating spreadsheet...", level: "success" },
+          statusMessage: { text: "Generating report...", level: "success" },
         });
 
         console.log({ reportData, reportConfig });
 
         if (reportConfig.exportFormat === "CSV") {
-          await createCsvOrError({reportData, reportConfig});
+          await createCsvOrError({ reportData, reportConfig });
         } else {
           const spreadsheet: ISpreadsheet = await createSpreadsheetOrError({
             reportData,
