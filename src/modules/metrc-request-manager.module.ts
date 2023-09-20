@@ -49,6 +49,13 @@ const TRANSFER_DESTINATIONS_URL =
 const TRANSFER_DESTINATION_PACKAGES_URL =
   origin({ divertToNullOrigin: false }) + "/api/transfers/destinations/packages"; // TODO ?id=39
 
+const TRANSFER_DESTINATION_FACILITIES_URL =
+  origin({ divertToNullOrigin: false }) +
+  "/api/facilities/forlookup/forlicensedtransferdestinations";
+const TRANSFER_TRANSPORTER_FACILITIES_URL =
+  origin({ divertToNullOrigin: false }) +
+  "/api/facilities/forlookup/forlicensedtransfertransporters";
+
 const LOCATIONS_URL = origin({ divertToNullOrigin: false }) + "/api/locations";
 const STRAINS_URL = origin({ divertToNullOrigin: false }) + "/api/strains";
 const ITEMS_URL = origin({ divertToNullOrigin: false }) + "/api/items";
@@ -681,6 +688,26 @@ export class MetrcRequestManager implements IAtomicService {
         ...JSON_HEADERS,
       },
       body,
+    });
+  }
+
+  async transferDestinationFacilities() {
+    return customAxios(TRANSFER_DESTINATION_FACILITIES_URL, {
+      ...DEFAULT_FETCH_POST_READ_OPTIONS,
+      headers: {
+        ...(await buildAuthenticationHeaders(this.authStateOrError)),
+        ...JSON_HEADERS,
+      },
+    });
+  }
+
+  async transferTransporterFaciliites() {
+    return customAxios(TRANSFER_DESTINATION_FACILITIES_URL, {
+      ...DEFAULT_FETCH_POST_READ_OPTIONS,
+      headers: {
+        ...(await buildAuthenticationHeaders(this.authStateOrError)),
+        ...JSON_HEADERS,
+      },
     });
   }
 

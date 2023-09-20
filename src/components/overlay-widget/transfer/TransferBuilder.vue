@@ -537,6 +537,7 @@ import {
 } from "@/utils/package";
 import { clientBuildManager } from "@/modules/client-build-manager.module";
 import { SearchActions } from "@/store/page-overlay/modules/search/consts";
+import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
 
 const debugLog = debugLogFactory("TransferBuilder.vue");
 
@@ -1320,8 +1321,10 @@ export default Vue.extend({
       }
 
       this.$data.facilities = await dynamicConstsManager.facilities();
-      this.$data.transporterFacilities = await dynamicConstsManager.transporterFacilities();
-      this.$data.destinationFacilities = await dynamicConstsManager.destinationFacilities();
+      // this.$data.transporterFacilities = await dynamicConstsManager.transporterFacilities();
+      // this.$data.destinationFacilities = await dynamicConstsManager.destinationFacilities();
+      this.$data.transporterFacilities = await primaryDataLoader.transferTransporterFacilities();
+      this.$data.destinationFacilities = await primaryDataLoader.transferDestinationFacilities();
 
       this.$data.defaultPhoneNumberForQuestions =
         await dynamicConstsManager.defaultPhoneNumberForQuestions();

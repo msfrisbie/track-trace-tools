@@ -32,6 +32,7 @@ import {
   IItemData,
   ILocationData,
   IMetrcEmployeeData,
+  IMetrcFacilityData,
   IPackageData,
   IPackageHistoryData,
   IPackageOptions,
@@ -68,8 +69,8 @@ import store from "@/store/page-overlay/index";
 import { CsvUpload } from "@/types";
 import { buildBody, streamFactory } from "@/utils/data-loader";
 import { debugLogFactory } from "@/utils/debug";
-import { ExtractedData, ExtractionType, extract } from "@/utils/html";
-import { StorageKeyType, readDataOrNull, writeData } from "@/utils/storage";
+import { extract, ExtractedData, ExtractionType } from "@/utils/html";
+import { readDataOrNull, StorageKeyType, writeData } from "@/utils/storage";
 import { AxiosResponse } from "axios";
 import { get } from "idb-keyval";
 import { Subject, timer } from "rxjs";
@@ -1984,6 +1985,42 @@ export class DataLoader implements IAtomicService {
     });
   }
 
+  async transferDestinationFacilities(): Promise<IMetrcFacilityData[]> {
+    return new Promise(async (resolve, reject) => {
+      const subscription = timer(DATA_LOAD_FETCH_TIMEOUT_MS).subscribe(() =>
+        reject("Destination facility fetch timed out")
+      );
+
+      try {
+        const facilityData: IMetrcFacilityData[] = await this.loadTransferDestinationFacilities();
+
+        subscription.unsubscribe();
+        resolve(facilityData);
+      } catch (e) {
+        subscription.unsubscribe();
+        reject(e);
+      }
+    });
+  }
+
+  async transferTransporterFacilities(): Promise<IMetrcFacilityData[]> {
+    return new Promise(async (resolve, reject) => {
+      const subscription = timer(DATA_LOAD_FETCH_TIMEOUT_MS).subscribe(() =>
+        reject("Transporter facility fetch timed out")
+      );
+
+      try {
+        const facilityData: IMetrcFacilityData[] = await this.loadTransferTransporterFacilities();
+
+        subscription.unsubscribe();
+        resolve(facilityData);
+      } catch (e) {
+        subscription.unsubscribe();
+        reject(e);
+      }
+    });
+  }
+
   async locations(): Promise<ILocationData[]> {
     if (store.state.mockDataMode && store.state.flags?.mockedFlags.mockLocations.enabled) {
       return mockDataManager.mockLocations();
@@ -2924,6 +2961,38 @@ export class DataLoader implements IAtomicService {
     }
 
     return responseData.Data[0];
+  }
+
+  private async loadTransferDestinationFacilities(): Promise<IMetrcFacilityData[]> {
+    await authManager.authStateOrError();
+
+    store.commit(MutationType.SET_LOADING_MESSAGE, "Loading transfer destination facilities...");
+
+    const response = await this.metrcRequestManagerOrError.transferDestinationFacilities();
+
+    const transferDestinationFacilities: IMetrcFacilityData[] = response.data;
+
+    console.log(`Loaded ${transferDestinationFacilities.length} transferDestinationFacilities`);
+
+    store.commit(MutationType.SET_LOADING_MESSAGE, null);
+
+    return transferDestinationFacilities;
+  }
+
+  private async loadTransferTransporterFacilities(): Promise<IMetrcFacilityData[]> {
+    await authManager.authStateOrError();
+
+    store.commit(MutationType.SET_LOADING_MESSAGE, "Loading transfer transporter facilities...");
+
+    const response = await this.metrcRequestManagerOrError.transferTransporterFaciliites();
+
+    const transferTransporterFaciliites: IMetrcFacilityData[] = response.data;
+
+    console.log(`Loaded ${transferTransporterFaciliites.length} transferTransporterFaciliites`);
+
+    store.commit(MutationType.SET_LOADING_MESSAGE, null);
+
+    return transferTransporterFaciliites;
   }
 
   private async loadActiveHarvestByName(harvestName: string): Promise<IHarvestData> {

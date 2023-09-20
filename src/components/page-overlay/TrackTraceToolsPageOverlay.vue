@@ -27,6 +27,7 @@ import { authManager } from "@/modules/auth-manager.module";
 import { backgroundTaskManager } from "@/modules/background-task-manager.module";
 import { builderManager } from "@/modules/builder-manager.module";
 import { clientBuildManager } from "@/modules/client-build-manager.module";
+import { sandboxManager } from "@/modules/sandbox-manager.module";
 import { contactDataManager } from "@/modules/contact-data-manager.module";
 import { credentialManager } from "@/modules/credential-manager.module";
 import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
@@ -224,6 +225,9 @@ export default Vue.extend({
   async created() {
     console.log(`Mode: ${env()}`);
 
+    sandboxManager.init();
+    await sandboxManager.runsBeforeModuleInit();
+
     // Initialize modules that are not dependent on auth state
     clientBuildManager.init();
     expiringCacheManager.init();
@@ -251,6 +255,8 @@ export default Vue.extend({
 
       // TODO: this changes for most users, deprecate
       analyticsManager.setUserProperties({ license: authState.license });
+
+      await sandboxManager.runsAfterAuthInit();
 
       // Initialize modules that should run only when logged in
       // The order these appear must not be important
