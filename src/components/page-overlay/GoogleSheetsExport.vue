@@ -1162,14 +1162,19 @@
             <div class="flex flex-col items-stretch gap-4">
               <div class="font-semibold text-gray-700">Filters:</div>
 
-              <b-form-select
-                v-model="maturePlantsQuickviewFormFilters.primaryDimension"
-                :options="MATURE_PLANT_QUICKVIEW_DIMENSIONS"
-              ></b-form-select>
-              <b-form-select
-                v-model="maturePlantsQuickviewFormFilters.secondaryDimension"
-                :options="MATURE_PLANT_QUICKVIEW_DIMENSIONS"
-              ></b-form-select>
+              <b-form-group label="Slice plants by:" label-size="sm">
+                <b-form-select
+                  v-model="maturePlantsQuickviewFormFilters.primaryDimension"
+                  :options="MATURE_PLANT_QUICKVIEW_DIMENSIONS"
+                ></b-form-select>
+              </b-form-group>
+
+              <b-form-group label="Slice plants by: (optional)" label-size="sm">
+                <b-form-select
+                  v-model="maturePlantsQuickviewFormFilters.secondaryDimension"
+                  :options="[{ text: 'None', value: null }, ...MATURE_PLANT_QUICKVIEW_DIMENSIONS]"
+                ></b-form-select>
+              </b-form-group>
 
               <b-form-checkbox v-model="maturePlantsQuickviewFormFilters.includeVegetative">
                 <span class="leading-6">Include Vegetative</span>

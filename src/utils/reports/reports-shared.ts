@@ -141,7 +141,12 @@ export function extractQuickviewData({
   const sortedPrimaryKeys = [...primaryKeys].sort();
   const sortedSecondaryKeys = [...secondaryKeys].sort();
 
-  data.push([`${secondaryDimension} / ${primaryDimension}`, ...sortedPrimaryKeys, "", "TOTAL"]);
+  data.push([
+    `${secondaryDimension ?? "*"} / ${primaryDimension}`,
+    ...sortedPrimaryKeys,
+    "",
+    "TOTAL",
+  ]);
 
   const colTotals = Array(sortedPrimaryKeys.length).fill(0);
   let grandTotal: number = 0;
