@@ -495,7 +495,7 @@ export async function createSpreadsheetOrError({
       fields: reportConfig[reportType]?.fields as IFieldData[],
       data: extractFlattenedData({ flattenedCache, reportType, reportData, reportConfig }) as any[],
       options: {
-        useFieldTransformer: QUICKVIEW_REPORT_TYPES.includes(reportType),
+        useFieldTransformer: !QUICKVIEW_REPORT_TYPES.includes(reportType),
       },
     });
   }
