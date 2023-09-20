@@ -14,6 +14,7 @@ import {
   IReportConfig,
   IReportData,
 } from "@/store/page-overlay/modules/reports/interfaces";
+import { extractMaturePlantPropertyFromDimension } from "./mature-plants-quickview-report";
 
 export function shouldGenerateReport({
   reportConfig,
@@ -24,6 +25,10 @@ export function shouldGenerateReport({
   reportData: IReportData;
   reportType: ReportType;
 }): boolean {
+  if (!!reportConfig[reportType] && !reportData[reportType]) {
+    console.error(`Failed to load data for ${reportType}`);
+  }
+
   return !!reportConfig[reportType] && !!reportData[reportType];
 }
 
@@ -97,12 +102,14 @@ export function extractQuickviewData({
   let primaryDimension: string;
   let secondaryDimension: string | null;
   let objects: { [key: string]: any }[];
+  let extractor: (...args: any[]) => any;
 
   switch (reportType) {
     case ReportType.MATURE_PLANTS_QUICKVIEW:
-      primaryDimension = reportConfig[reportType]!.primaryDimension;
-      secondaryDimension = reportConfig[reportType]!.secondaryDimension;
+      primaryDimension = reportConfig[reportType]!.primaryDimension as string;
+      secondaryDimension = reportConfig[reportType]!.secondaryDimension as string | null;
       objects = reportData[reportType]!.maturePlants;
+      extractor = extractMaturePlantPropertyFromDimension;
       break;
     default:
       throw new Error("Bad report type");
@@ -114,8 +121,8 @@ export function extractQuickviewData({
   const secondaryKeys = new Set<string>();
 
   for (const object of objects) {
-    const primaryValue = object[primaryDimension];
-    const secondaryValue = secondaryDimension ? object[secondaryDimension] : "*";
+    const primaryValue = extractor(object, primaryDimension);
+    const secondaryValue = secondaryDimension ? extractor(object, secondaryDimension) : "*";
 
     primaryKeys.add(primaryValue);
     secondaryKeys.add(secondaryValue);
@@ -142,6 +149,8 @@ export function extractQuickviewData({
     for (const [j, primaryKey] of sortedPrimaryKeys.entries()) {
       row.push((indexedDimensionCounts[primaryKey][secondaryKey] ?? "0").toString());
     }
+
+    data.push(row);
   }
 
   return data;

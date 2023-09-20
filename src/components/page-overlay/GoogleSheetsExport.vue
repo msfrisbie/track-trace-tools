@@ -1411,6 +1411,11 @@ import {
   addEmployeeSamplesReport,
   employeeSamplesFormFiltersFactory,
 } from "@/utils/reports/employee-samples-report";
+import {
+  addMaturePlantsQuickviewReport,
+  maturePlantsQuickviewFormFiltersFactory,
+  MATURE_PLANT_QUICKVIEW_DIMENSIONS,
+} from "@/utils/reports/mature-plants-quickview-report";
 
 interface IReportOption {
   text: string;
@@ -1481,6 +1486,7 @@ export default Vue.extend({
       ReportStatus,
       ReportType,
       SHEET_FIELDS,
+      MATURE_PLANT_QUICKVIEW_DIMENSIONS,
       selectedReports: [] as IReportOption[],
       cogsFormFilters: cogsFormFiltersFactory(),
       cogsV2FormFilters: cogsV2FormFiltersFactory(),
@@ -1488,6 +1494,7 @@ export default Vue.extend({
       packagesFormFilters: packageFormFiltersFactory(),
       stragglerPackagesFormFilters: stragglerPackagesFormFiltersFactory(),
       maturePlantsFormFilters: maturePlantsFormFiltersFactory(),
+      maturePlantsQuickviewFormFilters: maturePlantsQuickviewFormFiltersFactory(),
       immaturePlantsFormFilters: immaturePlantsFormFiltersFactory(),
       harvestsFormFilters: harvestsFormFiltersFactory(),
       incomingTransfersFormFilters: incomingTransfersFormFiltersFactory(),
@@ -1971,6 +1978,17 @@ export default Vue.extend({
         //   transferHubTransferManifestsFormFilters: this.transferHubTransferManifestsFormFilters,
         //   fields: this.fields[ReportType.TRANSFER_HUB_TRANSFER_MANIFESTS],
         // });
+      }
+
+      if (
+        this.selectedReports.find(
+          (report: IReportOption) => report.value === ReportType.MATURE_PLANTS_QUICKVIEW
+        )
+      ) {
+        addMaturePlantsQuickviewReport({
+          reportConfig,
+          maturePlantsQuickviewFormFilters: this.maturePlantsQuickviewFormFilters,
+        });
       }
 
       this.generateSpreadsheet({ reportConfig });

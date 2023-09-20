@@ -11,7 +11,7 @@ import { maybeLoadEmployeeSamplesReportData } from "@/utils/reports/employee-sam
 import { maybeLoadHarvestsReportData } from "@/utils/reports/harvests-report";
 import { maybeLoadImmaturePlantsReportData } from "@/utils/reports/immature-plants-report";
 import { maybeLoadIncomingTransfersReportData } from "@/utils/reports/incoming-transfers-report";
-import { maybeLoadMaturePlantsQuickviewReportData } from "@/utils/reports/mature-plant-quickview-report";
+import { maybeLoadMaturePlantsQuickviewReportData } from "@/utils/reports/mature-plants-quickview-report";
 import { maybeLoadMaturePlantsReportData } from "@/utils/reports/mature-plants-report";
 import { maybeLoadOutgoingTransferManifestsReportData } from "@/utils/reports/outgoing-transfer-manifests-report";
 import { maybeLoadOutgoingTransfersReportData } from "@/utils/reports/outgoing-transfers-report";
@@ -148,7 +148,6 @@ export const reportsModule = {
         await maybeLoadTransferHubTransfersReportData({ ctx, reportData, reportConfig });
         await maybeLoadOutgoingTransferManifestsReportData({ ctx, reportData, reportConfig });
         await maybeLoadEmployeeSamplesReportData({ ctx, reportData, reportConfig });
-        await maybeLoadMaturePlantsQuickviewReportData({ ctx, reportData, reportConfig });
 
         ctx.commit(ReportsMutations.SET_STATUS, {
           statusMessage: { text: "Generating report...", level: "success" },

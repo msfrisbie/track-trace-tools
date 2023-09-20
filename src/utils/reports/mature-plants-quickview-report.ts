@@ -2,7 +2,6 @@ import { IIndexedPlantData, IPlantFilter, IPluginState } from "@/interfaces";
 import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
 import { ReportsMutations, ReportType } from "@/store/page-overlay/modules/reports/consts";
 import {
-  IFieldData,
   IReportConfig,
   IReportData,
   IReportsState,
@@ -33,7 +32,7 @@ export const MATURE_PLANT_QUICKVIEW_DIMENSIONS: MaturePlantQuickviewDimension[] 
   MaturePlantQuickviewDimension.FLOWERING_DATE,
 ];
 
-export function extractPropertyFromDimension(
+export function extractMaturePlantPropertyFromDimension(
   plant: IIndexedPlantData,
   dimension: MaturePlantQuickviewDimension
 ) {
@@ -62,37 +61,37 @@ interface IMaturePlantsQuickviewReportFormFilters extends IMaturePlantsReportFor
 
 export const maturePlantsQuickviewFormFiltersFactory: () => IMaturePlantsQuickviewReportFormFilters =
   () => ({
-    primaryDimension: MaturePlantQuickviewDimension.PLANTED_DATE,
+    // @ts-ignore
+    primaryDimension: MaturePlantQuickviewDimension.STRAIN,
+    // @ts-ignore
     secondaryDimension: MaturePlantQuickviewDimension.LOCATION,
     ...maturePlantsFormFiltersFactory(),
   });
 
 export function addMaturePlantsQuickviewReport({
   reportConfig,
-  maturePlantsFormFilters,
-  fields,
+  maturePlantsQuickviewFormFilters,
 }: {
   reportConfig: IReportConfig;
-  maturePlantsFormFilters: IMaturePlantsQuickviewReportFormFilters;
-  fields: IFieldData[];
+  maturePlantsQuickviewFormFilters: IMaturePlantsQuickviewReportFormFilters;
 }) {
   const plantFilter: IPlantFilter = {};
 
-  plantFilter.includeVegetative = maturePlantsFormFilters.includeVegetative;
-  plantFilter.includeFlowering = maturePlantsFormFilters.includeFlowering;
-  plantFilter.includeInactive = maturePlantsFormFilters.includeInactive;
+  plantFilter.includeVegetative = maturePlantsQuickviewFormFilters.includeVegetative;
+  plantFilter.includeFlowering = maturePlantsQuickviewFormFilters.includeFlowering;
+  plantFilter.includeInactive = maturePlantsQuickviewFormFilters.includeInactive;
 
-  plantFilter.plantedDateGt = maturePlantsFormFilters.shouldFilterPlantedDateGt
-    ? maturePlantsFormFilters.plantedDateGt
+  plantFilter.plantedDateGt = maturePlantsQuickviewFormFilters.shouldFilterPlantedDateGt
+    ? maturePlantsQuickviewFormFilters.plantedDateGt
     : null;
 
-  plantFilter.plantedDateLt = maturePlantsFormFilters.shouldFilterPlantedDateLt
-    ? maturePlantsFormFilters.plantedDateLt
+  plantFilter.plantedDateLt = maturePlantsQuickviewFormFilters.shouldFilterPlantedDateLt
+    ? maturePlantsQuickviewFormFilters.plantedDateLt
     : null;
 
   reportConfig[REPORT_TYPE] = {
     plantFilter,
-    ...maturePlantsFormFilters,
+    ...maturePlantsQuickviewFormFilters,
     fields: null,
   };
 }
@@ -107,6 +106,9 @@ export async function maybeLoadMaturePlantsQuickviewReportData({
   reportConfig: IReportConfig;
 }) {
   const maturePlantQuickviewConfig = reportConfig[REPORT_TYPE]!;
+
+  console.log({ maturePlantQuickviewConfig });
+
   ctx.commit(ReportsMutations.SET_STATUS, {
     statusMessage: { text: "Loading plants...", level: "success" },
   });
