@@ -107,8 +107,6 @@ export async function maybeLoadMaturePlantsQuickviewReportData({
 }) {
   const maturePlantQuickviewConfig = reportConfig[REPORT_TYPE]!;
 
-  console.log({ maturePlantQuickviewConfig });
-
   ctx.commit(ReportsMutations.SET_STATUS, {
     statusMessage: { text: "Loading plants...", level: "success" },
   });

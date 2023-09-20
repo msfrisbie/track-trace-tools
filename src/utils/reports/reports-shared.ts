@@ -141,17 +141,31 @@ export function extractQuickviewData({
   const sortedPrimaryKeys = [...primaryKeys].sort();
   const sortedSecondaryKeys = [...secondaryKeys].sort();
 
-  data.push(["", ...sortedPrimaryKeys]);
+  data.push([`${secondaryDimension} / ${primaryDimension}`, ...sortedPrimaryKeys, "", "TOTAL"]);
+
+  const colTotals = Array(sortedPrimaryKeys.length).fill(0);
+  let grandTotal: number = 0;
 
   for (const [i, secondaryKey] of sortedSecondaryKeys.entries()) {
     const row = [secondaryKey];
 
+    let rowTotal = 0;
+
     for (const [j, primaryKey] of sortedPrimaryKeys.entries()) {
-      row.push((indexedDimensionCounts[primaryKey][secondaryKey] ?? "0").toString());
+      const cellSum = indexedDimensionCounts[primaryKey][secondaryKey] ?? 0;
+
+      rowTotal += cellSum;
+      colTotals[j] += cellSum;
+      grandTotal += cellSum;
+
+      row.push(cellSum.toString());
     }
 
-    data.push(row);
+    data.push([...row, "", rowTotal.toString()]);
   }
+
+  data.push([]);
+  data.push(["TOTAL", ...colTotals, "", `GRAND TOTAL: ${grandTotal}`]);
 
   return data;
 }
