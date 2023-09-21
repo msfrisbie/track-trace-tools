@@ -62,6 +62,9 @@ const ICE_CREAM_CAKE_STRAIN: IStrainData = {
 
 const VAPE_CARTRIDGE_ITEM: IItemData = {
   AdministrationMethod: "",
+  ExpirationDateConfiguration: "Off",
+  UseByDateConfiguration: "Off",
+  SellByDateConfiguration: "Off",
   ApprovalStatusDateTime: OLD_DATETIME,
   ApprovalStatusName: "Approved",
   DefaultLabTestingStateName: "NotSubmitted",
@@ -108,6 +111,9 @@ const VAPE_CARTRIDGE_ITEM: IItemData = {
 
 const HARVESTED_FLOWER_ITEM: IItemData = {
   AdministrationMethod: "",
+  ExpirationDateConfiguration: "Off",
+  UseByDateConfiguration: "Off",
+  SellByDateConfiguration: "Off",
   ApprovalStatusDateTime: OLD_DATETIME,
   ApprovalStatusName: "Approved",
   DefaultLabTestingStateName: "NotSubmitted",
@@ -154,6 +160,9 @@ const HARVESTED_FLOWER_ITEM: IItemData = {
 
 const CLONE_ITEM: IItemData = {
   AdministrationMethod: "",
+  ExpirationDateConfiguration: "Off",
+  UseByDateConfiguration: "Off",
+  SellByDateConfiguration: "Off",
   ApprovalStatusDateTime: OLD_DATETIME,
   ApprovalStatusName: "Approved",
   DefaultLabTestingStateName: "NotRequired",
@@ -201,6 +210,9 @@ const CLONE_ITEM: IItemData = {
 const TEMPLATE_ITEMS: IItemData[] = [
   {
     AdministrationMethod: "",
+    ExpirationDateConfiguration: "Off",
+    UseByDateConfiguration: "Off",
+    SellByDateConfiguration: "Off",
     ApprovalStatusDateTime: OLD_DATETIME,
     ApprovalStatusName: "Approved",
     DefaultLabTestingStateName: "NotRequired",
@@ -246,6 +258,9 @@ const TEMPLATE_ITEMS: IItemData[] = [
   },
   {
     AdministrationMethod: "",
+    ExpirationDateConfiguration: "Off",
+    UseByDateConfiguration: "Off",
+    SellByDateConfiguration: "Off",
     ApprovalStatusDateTime: OLD_DATETIME,
     ApprovalStatusName: "Approved",
     DefaultLabTestingStateName: "NotRequired",

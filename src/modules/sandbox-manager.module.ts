@@ -6,7 +6,7 @@ class SandboxManager implements IAtomicService {
 
   async runsBeforeModuleInit() {}
 
-  async runsOnPageload() {}
+  async runsBeforeVueAppMount() {}
 
   async runsAfterAuthInit() {}
 }

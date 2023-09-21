@@ -390,6 +390,9 @@ export interface IItemData extends IResponseObjectData {
   UnitWeight: number | null;
   UnitWeightUnitOfMeasureAbbreviation: string | null;
   UnitWeightUnitOfMeasureId: number | null;
+  ExpirationDateConfiguration: "Off" | "Optional";
+  SellByDateConfiguration: "Off" | "Optional";
+  UseByDateConfiguration: "Off" | "Optional";
 }
 
 // Values that are defined per-request
@@ -1421,7 +1424,7 @@ export interface IMetrcCreatePackagesFromPackagesPayload {
   ItemId: string;
   LocationId?: string;
   Note: string;
-  ProductionBatchNumber?: string;
+  ProductionBatchNumber: string;
   Quantity: string;
   TagId: string;
   UnitOfMeasureId: string;
@@ -1431,6 +1434,7 @@ export interface IMetrcCreatePackagesFromPackagesPayload {
   UseSameItem?: "true" | "false";
   IsDonation?: "true";
   IsFromMotherPlant?: "true";
+  ExpirationDate: string;
   UseByDate: "";
   SellByDate: "";
 }

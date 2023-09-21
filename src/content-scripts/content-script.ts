@@ -6,6 +6,7 @@ import { analyticsManager } from "@/modules/analytics-manager.module";
 import { authManager } from "@/modules/auth-manager.module";
 import { isDevelopment } from "@/modules/environment.module";
 import { messageBus } from "@/modules/message-bus.module";
+import { sandboxManager } from "@/modules/sandbox-manager.module";
 import { storageManager } from "@/modules/storage-manager.module";
 import { tabManager } from "@/modules/tab-manager.module";
 import Vue from "vue";
@@ -71,6 +72,8 @@ async function initializeTooklit() {
   link.setAttribute("rel", "stylesheet");
   link.setAttribute("href", chrome.runtime.getURL("fonts/roboto.css"));
   document.head.appendChild(link);
+
+  sandboxManager.runsBeforeVueAppMount();
 
   /* eslint-disable no-new */
   new Vue({

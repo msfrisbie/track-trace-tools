@@ -411,11 +411,10 @@ export default Vue.extend({
           RemediationSteps: "",
           UseByDate: "",
           SellByDate: "",
+          ExpirationDate: "",
+          ProductionBatchNumber: (this.productionBatchNumber as string) ?? "",
           ...(this.isDonation ? { IsDonation: "true" } : {}),
           ...(this.isTradeSample ? { IsTradeSample: "true" } : {}),
-          ...(this.productionBatchNumber
-            ? { ProductionBatchNumber: this.productionBatchNumber }
-            : {}),
           ...(this.$data.facilityUsesLocationForPackages
             ? {
                 LocationId: this.location!.Id.toString(),
