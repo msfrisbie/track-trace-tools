@@ -59,6 +59,10 @@ export interface IReportConfig {
     licenses: string[];
     fields: null;
   };
+  [ReportType.HARVEST_PACKAGES]?: {
+    harvestFilter: IHarvestFilter;
+    fields: null;
+  };
   [ReportType.COGS_TRACKER]?: {
     packageFilter: IPackageFilter;
     fields: null;
@@ -141,6 +145,9 @@ export interface IReportData {
     bulkInfusedMatrix: any[][];
     distRexCogsMatrix: any[][];
     packagedGoodsCogsMatrix: any[][];
+  };
+  [ReportType.HARVEST_PACKAGES]?: {
+    harvestPackageMatrix: any[][];
   };
   [ReportType.PACKAGES]?: {
     packages: IIndexedPackageData[];
