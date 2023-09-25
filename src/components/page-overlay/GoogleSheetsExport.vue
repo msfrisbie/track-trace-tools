@@ -278,14 +278,6 @@
             <div class="flex flex-col items-stretch gap-4">
               <div class="font-semibold text-gray-700">Filters:</div>
 
-              <b-form-checkbox v-model="harvestsFormFilters.includeActive">
-                <span class="leading-6">Include active harvests</span>
-              </b-form-checkbox>
-
-              <b-form-checkbox v-model="harvestsFormFilters.includeInactive">
-                <span class="leading-6">Include inactive harvests</span>
-              </b-form-checkbox>
-
               <div class="flex flex-col items-start gap-1">
                 <b-form-checkbox v-model="harvestsFormFilters.shouldFilterHarvestDateGt">
                   <span class="leading-6">Harvested on or after:</span>
@@ -310,33 +302,6 @@
                   size="sm"
                   v-model="harvestsFormFilters.harvestDateLt"
                 />
-              </div>
-
-              <hr />
-
-              <div class="font-semibold text-gray-700">Columns:</div>
-
-              <b-form-checkbox-group
-                v-model="fields[ReportType.HARVESTS]"
-                class="flex flex-col items-start gap-1"
-              >
-                <b-form-checkbox
-                  v-for="fieldData of SHEET_FIELDS[ReportType.HARVESTS]"
-                  v-bind:key="fieldData.value"
-                  :value="fieldData"
-                  :disabled="fieldData.required"
-                >
-                  <span class="leading-6">{{ fieldData.readableName }}</span>
-                </b-form-checkbox>
-              </b-form-checkbox-group>
-
-              <div class="grid grid-cols-2 gap-2">
-                <b-button variant="outline-dark" size="sm" @click="checkAll(ReportType.HARVESTS)"
-                  >CHECK ALL</b-button
-                >
-                <b-button variant="outline-dark" size="sm" @click="uncheckAll(ReportType.HARVESTS)"
-                  >UNCHECK ALL</b-button
-                >
               </div>
             </div>
           </div>
@@ -1804,7 +1769,7 @@ export default Vue.extend({
           hidden: !store.state.client.values["ENABLE_HARVEST_PACKAGES"],
           description: "Generate summary of harvest packages",
           isCustom: false,
-          isCsvEligible: false,
+          isCsvEligible: true,
           isSingleton: true,
         },
         {

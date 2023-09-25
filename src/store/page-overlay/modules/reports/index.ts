@@ -8,6 +8,7 @@ import {
   updateCogsV2MasterCostSheet,
 } from "@/utils/reports/cogs-v2-report";
 import { maybeLoadEmployeeSamplesReportData } from "@/utils/reports/employee-samples-report";
+import { maybeLoadHarvestPackagesReportData } from "@/utils/reports/harvest-packages-report";
 import { maybeLoadHarvestsReportData } from "@/utils/reports/harvests-report";
 import { maybeLoadImmaturePlantsReportData } from "@/utils/reports/immature-plants-report";
 import { maybeLoadIncomingTransfersReportData } from "@/utils/reports/incoming-transfers-report";
@@ -148,6 +149,7 @@ export const reportsModule = {
         await maybeLoadTransferHubTransfersReportData({ ctx, reportData, reportConfig });
         await maybeLoadOutgoingTransferManifestsReportData({ ctx, reportData, reportConfig });
         await maybeLoadEmployeeSamplesReportData({ ctx, reportData, reportConfig });
+        await maybeLoadHarvestPackagesReportData({ ctx, reportData, reportConfig });
 
         ctx.commit(ReportsMutations.SET_STATUS, {
           statusMessage: { text: "Generating report...", level: "success" },

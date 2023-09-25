@@ -62,9 +62,7 @@ export const ALL_ELIGIBLE_REPORT_TYPES: ReportType[] = [
   ReportType.POINT_IN_TIME_INVENTORY,
 ];
 
-export const QUICKVIEW_REPORT_TYPES: ReportType[] = [
-  ReportType.MATURE_PLANTS_QUICKVIEW
-]
+export const QUICKVIEW_REPORT_TYPES: ReportType[] = [ReportType.MATURE_PLANTS_QUICKVIEW];
 
 const COMMON_PACKAGE_FIELD_DATA: IFieldData[] = [
   {
