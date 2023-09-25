@@ -279,30 +279,41 @@
               <div class="font-semibold text-gray-700">Filters:</div>
 
               <div class="flex flex-col items-start gap-1">
-                <b-form-checkbox v-model="harvestsFormFilters.shouldFilterHarvestDateGt">
+                <b-form-checkbox v-model="harvestPackagesFormFilters.shouldFilterHarvestDateGt">
                   <span class="leading-6">Harvested on or after:</span>
                 </b-form-checkbox>
                 <b-form-datepicker
-                  v-if="harvestsFormFilters.shouldFilterHarvestDateGt"
-                  :disabled="!harvestsFormFilters.shouldFilterHarvestDateGt"
+                  v-if="harvestPackagesFormFilters.shouldFilterHarvestDateGt"
+                  :disabled="!harvestPackagesFormFilters.shouldFilterHarvestDateGt"
                   initial-date
                   size="sm"
-                  v-model="harvestsFormFilters.harvestDateGt"
+                  v-model="harvestPackagesFormFilters.harvestDateGt"
                 />
               </div>
 
               <div class="flex flex-col items-start gap-1">
-                <b-form-checkbox v-model="harvestsFormFilters.shouldFilterHarvestDateLt">
+                <b-form-checkbox v-model="harvestPackagesFormFilters.shouldFilterHarvestDateLt">
                   <span class="leading-6">Harvested on or before:</span>
                 </b-form-checkbox>
                 <b-form-datepicker
-                  v-if="harvestsFormFilters.shouldFilterHarvestDateLt"
-                  :disabled="!harvestsFormFilters.shouldFilterHarvestDateLt"
+                  v-if="harvestPackagesFormFilters.shouldFilterHarvestDateLt"
+                  :disabled="!harvestPackagesFormFilters.shouldFilterHarvestDateLt"
                   initial-date
                   size="sm"
-                  v-model="harvestsFormFilters.harvestDateLt"
+                  v-model="harvestPackagesFormFilters.harvestDateLt"
                 />
               </div>
+
+              <hr />
+
+              <simple-drawer toggleText="ADVANCED">
+                <b-form-group label="Licenses:">
+                  <b-form-checkbox-group
+                    v-model="harvestPackagesFormFilters.licenses"
+                    :options="harvestPackagesFormFilters.licenseOptions"
+                  ></b-form-checkbox-group>
+                </b-form-group>
+              </simple-drawer>
             </div>
           </div>
         </template>

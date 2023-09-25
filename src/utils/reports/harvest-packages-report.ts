@@ -1,5 +1,6 @@
 import { IHarvestFilter, IIndexedHarvestData, IPluginState } from "@/interfaces";
-import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
+import { DataLoader, getDataLoaderByLicense } from "@/modules/data-loader/data-loader.module";
+import { facilityManager } from "@/modules/facility-manager.module";
 import store from "@/store/page-overlay/index";
 import { ReportsMutations, ReportType } from "@/store/page-overlay/modules/reports/consts";
 import {
@@ -17,6 +18,8 @@ interface IHarvestPackagesReportFormFilters {
   shouldFilterHarvestDateLt: boolean;
   includeActive: boolean;
   includeInactive: boolean;
+  licenseOptions: string[];
+  licenses: string[];
 }
 
 export const harvestPackagesFormFiltersFactory: () => IHarvestPackagesReportFormFilters = () => ({
@@ -26,6 +29,9 @@ export const harvestPackagesFormFiltersFactory: () => IHarvestPackagesReportForm
   shouldFilterHarvestDateLt: false,
   includeActive: true,
   includeInactive: false,
+  licenseOptions: facilityManager.cachedFacilities.map((x) => x.licenseNumber),
+  licenses: facilityManager.cachedFacilities.map((x) => x.licenseNumber),
+  // .filter((x) => x.startsWith("PR-") || x.startsWith("AU-P")),
 });
 
 export function addHarvestPackagesReport({
@@ -36,6 +42,8 @@ export function addHarvestPackagesReport({
   harvestPackagesFormFilters: IHarvestPackagesReportFormFilters;
 }) {
   const harvestFilter: IHarvestFilter = {};
+
+  const licenses: string[] = harvestPackagesFormFilters.licenses;
 
   harvestFilter.includeActive = harvestPackagesFormFilters.includeActive;
   harvestFilter.includeInactive = harvestPackagesFormFilters.includeInactive;
@@ -50,6 +58,7 @@ export function addHarvestPackagesReport({
 
   reportConfig[ReportType.HARVEST_PACKAGES] = {
     harvestFilter,
+    licenses,
     fields: null,
   };
 }
@@ -64,34 +73,41 @@ export async function maybeLoadHarvestPackagesReportData({
   reportConfig: IReportConfig;
 }) {
   const harvestConfig = reportConfig[ReportType.HARVEST_PACKAGES];
+
+  let dataLoader: DataLoader | null = null;
+
   if (harvestConfig?.harvestFilter) {
-    ctx.commit(ReportsMutations.SET_STATUS, {
-      statusMessage: { text: "Loading harvests...", level: "success" },
-    });
+    let harvests: IIndexedHarvestData[] = [];
 
-    let harvestPackages: IIndexedHarvestData[] = [];
+    for (const license of harvestConfig.licenses) {
+      ctx.commit(ReportsMutations.SET_STATUS, {
+        statusMessage: { text: `Loading ${license} harvests...`, level: "success" },
+      });
 
-    if (harvestConfig.harvestFilter.includeActive) {
-      try {
-        harvestPackages = [...harvestPackages, ...(await primaryDataLoader.activeHarvests())];
-      } catch (e) {
-        ctx.commit(ReportsMutations.SET_STATUS, {
-          statusMessage: { text: "Failed to load active harvests.", level: "warning" },
-        });
+      dataLoader = await getDataLoaderByLicense(license);
+
+      if (harvestConfig.harvestFilter.includeActive) {
+        try {
+          harvests = [...harvests, ...(await dataLoader.activeHarvests())];
+        } catch (e) {
+          ctx.commit(ReportsMutations.SET_STATUS, {
+            statusMessage: { text: "Failed to load active harvests.", level: "warning" },
+          });
+        }
+      }
+
+      if (harvestConfig.harvestFilter.includeInactive) {
+        try {
+          harvests = [...harvests, ...(await dataLoader.inactiveHarvests())];
+        } catch (e) {
+          ctx.commit(ReportsMutations.SET_STATUS, {
+            statusMessage: { text: "Failed to load inactive harvests.", level: "warning" },
+          });
+        }
       }
     }
 
-    if (harvestConfig.harvestFilter.includeInactive) {
-      try {
-        harvestPackages = [...harvestPackages, ...(await primaryDataLoader.inactiveHarvests())];
-      } catch (e) {
-        ctx.commit(ReportsMutations.SET_STATUS, {
-          statusMessage: { text: "Failed to load inactive harvests.", level: "warning" },
-        });
-      }
-    }
-
-    harvestPackages = harvestPackages.filter((harvest) => {
+    harvests = harvests.filter((harvest) => {
       if (harvestConfig.harvestFilter.harvestDateLt) {
         if (harvest.HarvestStartDate > harvestConfig.harvestFilter.harvestDateLt) {
           return false;
@@ -109,6 +125,27 @@ export async function maybeLoadHarvestPackagesReportData({
 
     // TODO
     const harvestPackageMatrix: any[][] = [];
+
+    const harvestHistoryPromises: Promise<any>[] = [];
+
+    // For each harvest in the range, load its history
+    harvests.map(async (harvest) => {
+      dataLoader = await getDataLoaderByLicense(harvest.LicenseNumber);
+
+      harvestHistoryPromises.push(
+        dataLoader.harvestHistoryByHarvestId(harvest.Id).then((response) => {
+          harvest.history = response;
+        })
+      );
+    });
+
+    const settledHarvestHistoryPromises = await Promise.allSettled(harvestHistoryPromises);
+
+    if (settledHarvestHistoryPromises.find((x) => x.status === "rejected")) {
+      throw new Error("Harvest history request failed");
+    }
+
+    // TODO parse harvest history for packages
 
     reportData[ReportType.HARVEST_PACKAGES] = {
       harvestPackageMatrix,

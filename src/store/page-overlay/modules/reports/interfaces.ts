@@ -61,6 +61,7 @@ export interface IReportConfig {
   };
   [ReportType.HARVEST_PACKAGES]?: {
     harvestFilter: IHarvestFilter;
+    licenses: string[];
     fields: null;
   };
   [ReportType.COGS_TRACKER]?: {

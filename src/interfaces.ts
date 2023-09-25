@@ -948,6 +948,7 @@ export interface IIndexedHarvestData extends IHarvestData {
   HarvestState: HarvestState;
   LicenseNumber: string;
   TagMatcher: string;
+  history?: IHarvestHistoryData[]
 }
 
 export interface IIndexedTransferData extends ITransferData {
