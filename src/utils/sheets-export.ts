@@ -96,7 +96,6 @@ export async function writeDataSheet<T>({
   fields?: IFieldData[];
   data: T[];
   options?: {
-    // useFieldTransformer?: boolean;
     pageSize?: number;
     maxParallelRequests?: number;
     valueInputOption?: "RAW" | "USER_ENTERED";
@@ -106,7 +105,6 @@ export async function writeDataSheet<T>({
   };
 }) {
   const mergedOptions = {
-    // useFieldTransformer: false,
     pageSize: 10000,
     maxParallelRequests: 10,
     valueInputOption: "USER_ENTERED",
@@ -148,14 +146,6 @@ export async function writeDataSheet<T>({
     }${nextPageRowIdx + nextPage.length - 1}`;
 
     let values = nextPage;
-    // TODO move this into extractFlattenedData
-    // if (mergedOptions.useFieldTransformer) {
-    //   if (!fields) {
-    //     throw new Error("Must provide fields transformer");
-    //   }
-    //   // @ts-ignore
-    //   values = applyFieldTransformer({ fields, values });
-    // }
 
     if (mergedOptions.batchWrite) {
       batchRequests.push({
@@ -332,24 +322,6 @@ export async function createCsvOrError({
       reportConfig,
     });
 
-    // if (QUICKVIEW_REPORT_TYPES.includes(reportType)) {
-    //   data = extractFlattenedData({ flattenedCache, reportType, reportData, reportConfig });
-    // } else if (RAW_REPORT_TYPES.includes(reportType)) {
-    //   data = extractFlattenedData({ flattenedCache, reportType, reportData, reportConfig });
-    // } else {
-    //   const fields: IFieldData[] = reportConfig[reportType]!.fields!;
-
-    //   const headers: string[] = fields.map((fieldData) => fieldData.readableName);
-
-    //   const flattenedData: any[] = extractFlattenedData({
-    //     flattenedCache,
-    //     reportType,
-    //     reportData,
-    //     reportConfig,
-    //   });
-
-    // const matrix = applyFieldTransformer({ fields, values: flattenedData });
-
     if (FIELD_TRANSFORMER_REPORT_TYPES.includes(reportType)) {
       const fields: IFieldData[] = reportConfig[reportType]!.fields!;
 
@@ -508,11 +480,7 @@ export async function createSpreadsheetOrError({
       spreadsheetId: response.data.result.spreadsheetId,
       spreadsheetTitle: getSheetTitle({ reportType }),
       fields: reportConfig[reportType]?.fields as IFieldData[],
-      data: extractFlattenedData({ flattenedCache, reportType, reportData, reportConfig }) as any[],
-      // options: {
-      //   useFieldTransformer:
-      //     !QUICKVIEW_REPORT_TYPES.includes(reportType) && !RAW_REPORT_TYPES.includes(reportType),
-      // },
+      data: extractFlattenedData({ flattenedCache, reportType, reportData, reportConfig }),
     });
   }
 
