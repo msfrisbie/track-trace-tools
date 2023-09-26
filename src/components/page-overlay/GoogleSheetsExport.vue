@@ -1784,6 +1784,17 @@ export default Vue.extend({
           isSingleton: true,
         },
         {
+          text: "Employee History Audit",
+          value: null,
+          t3plus: true,
+          enabled: false,
+          description:
+            "Gather all employee activity that appears in history across Metrc",
+          isCustom: false,
+          isCsvEligible: true,
+          isSingleton: false,
+        },
+        {
           text: "Package Quickview",
           value: null,
           t3plus: true,
