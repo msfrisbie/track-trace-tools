@@ -64,7 +64,7 @@
             </div> -->
         </template>
         <template v-else>
-          <div class="text-center flex flex-col gap-2">
+          <div class="text-center flex flex-col gap-2 border rounded-xl p-4">
             <div class="text-base">
               Track &amp; Trace Tools can generate reports as CSVs or in Google Sheets.
             </div>

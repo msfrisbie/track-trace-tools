@@ -12,8 +12,7 @@ import { messageBus } from "@/modules/message-bus.module";
 import store from "@/store/page-overlay/index";
 import {
   ALL_ELIGIBLE_REPORT_TYPES,
-  QUICKVIEW_REPORT_TYPES,
-  RAW_REPORT_TYPES,
+  FIELD_TRANSFORMER_REPORT_TYPES,
   ReportsMutations,
   ReportType,
 } from "@/store/page-overlay/modules/reports/consts";
@@ -30,7 +29,6 @@ import { createCogsV2SpreadsheetOrError } from "./reports/cogs-v2-report";
 import { createEmployeeSamplesSpreadsheetOrError } from "./reports/employee-samples-report";
 import { createHarvestPackagesReportOrError } from "./reports/harvest-packages-report";
 import {
-  applyFieldTransformer,
   extractFlattenedData,
   getSheetTitle,
   shouldGenerateReport,
@@ -98,7 +96,7 @@ export async function writeDataSheet<T>({
   fields?: IFieldData[];
   data: T[];
   options?: {
-    useFieldTransformer?: boolean;
+    // useFieldTransformer?: boolean;
     pageSize?: number;
     maxParallelRequests?: number;
     valueInputOption?: "RAW" | "USER_ENTERED";
@@ -108,7 +106,7 @@ export async function writeDataSheet<T>({
   };
 }) {
   const mergedOptions = {
-    useFieldTransformer: false,
+    // useFieldTransformer: false,
     pageSize: 10000,
     maxParallelRequests: 10,
     valueInputOption: "USER_ENTERED",
@@ -150,14 +148,14 @@ export async function writeDataSheet<T>({
     }${nextPageRowIdx + nextPage.length - 1}`;
 
     let values = nextPage;
-    // TODO move this into extractFlattenedValues
-    if (mergedOptions.useFieldTransformer) {
-      if (!fields) {
-        throw new Error("Must provide fields transformer");
-      }
-      // @ts-ignore
-      values = applyFieldTransformer({ fields, values });
-    }
+    // TODO move this into extractFlattenedData
+    // if (mergedOptions.useFieldTransformer) {
+    //   if (!fields) {
+    //     throw new Error("Must provide fields transformer");
+    //   }
+    //   // @ts-ignore
+    //   values = applyFieldTransformer({ fields, values });
+    // }
 
     if (mergedOptions.batchWrite) {
       batchRequests.push({
@@ -327,27 +325,35 @@ export async function createCsvOrError({
       store.state.pluginAuth?.authState?.license
     } - ${todayIsodate()}`;
 
-    let data: any[][] = [];
+    let data: any[][] = extractFlattenedData({
+      flattenedCache,
+      reportType,
+      reportData,
+      reportConfig,
+    });
 
-    if (QUICKVIEW_REPORT_TYPES.includes(reportType)) {
-      data = extractFlattenedData({ flattenedCache, reportType, reportData, reportConfig });
-    } else if (RAW_REPORT_TYPES.includes(reportType)) {
-      data = extractFlattenedData({ flattenedCache, reportType, reportData, reportConfig });
-    } else {
+    // if (QUICKVIEW_REPORT_TYPES.includes(reportType)) {
+    //   data = extractFlattenedData({ flattenedCache, reportType, reportData, reportConfig });
+    // } else if (RAW_REPORT_TYPES.includes(reportType)) {
+    //   data = extractFlattenedData({ flattenedCache, reportType, reportData, reportConfig });
+    // } else {
+    //   const fields: IFieldData[] = reportConfig[reportType]!.fields!;
+
+    //   const headers: string[] = fields.map((fieldData) => fieldData.readableName);
+
+    //   const flattenedData: any[] = extractFlattenedData({
+    //     flattenedCache,
+    //     reportType,
+    //     reportData,
+    //     reportConfig,
+    //   });
+
+    // const matrix = applyFieldTransformer({ fields, values: flattenedData });
+
+    if (FIELD_TRANSFORMER_REPORT_TYPES.includes(reportType)) {
       const fields: IFieldData[] = reportConfig[reportType]!.fields!;
 
-      const headers: string[] = fields.map((fieldData) => fieldData.readableName);
-
-      const flattenedData: any[] = extractFlattenedData({
-        flattenedCache,
-        reportType,
-        reportData,
-        reportConfig,
-      });
-
-      const matrix = applyFieldTransformer({ fields, values: flattenedData });
-
-      data = [headers, ...matrix];
+      data = [fields.map((fieldData) => fieldData.readableName), ...data];
     }
 
     const csvFile: ICsvFile = {
@@ -503,9 +509,10 @@ export async function createSpreadsheetOrError({
       spreadsheetTitle: getSheetTitle({ reportType }),
       fields: reportConfig[reportType]?.fields as IFieldData[],
       data: extractFlattenedData({ flattenedCache, reportType, reportData, reportConfig }) as any[],
-      options: {
-        useFieldTransformer: !QUICKVIEW_REPORT_TYPES.includes(reportType) && !RAW_REPORT_TYPES.includes(reportType),
-      },
+      // options: {
+      //   useFieldTransformer:
+      //     !QUICKVIEW_REPORT_TYPES.includes(reportType) && !RAW_REPORT_TYPES.includes(reportType),
+      // },
     });
   }
 

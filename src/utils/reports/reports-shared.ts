@@ -8,7 +8,7 @@ import {
   ITransferData,
   ITransporterData,
 } from "@/interfaces";
-import { ReportType } from "@/store/page-overlay/modules/reports/consts";
+import { FIELD_TRANSFORMER_REPORT_TYPES, ReportType } from "@/store/page-overlay/modules/reports/consts";
 import {
   IFieldData,
   IReportConfig,
@@ -191,7 +191,7 @@ export function extractFlattenedData({
     return flattenedCache.get(reportType) as any[];
   }
 
-  const value = (() => {
+  let values = (() => {
     switch (reportType) {
       case ReportType.PACKAGES:
       case ReportType.STRAGGLER_PACKAGES:
@@ -296,9 +296,14 @@ export function extractFlattenedData({
     }
   })();
 
-  flattenedCache.set(reportType, value);
+  if (FIELD_TRANSFORMER_REPORT_TYPES.includes(reportType)) {
+    // @ts-ignore
+    values = applyFieldTransformer({fields: reportConfig[reportType]!.fields, values})
+  }
 
-  return value;
+  flattenedCache.set(reportType, values);
+
+  return values;
 }
 
 export function getSheetTitle({ reportType }: { reportType: ReportType }): SheetTitles {
