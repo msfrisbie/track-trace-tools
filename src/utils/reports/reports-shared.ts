@@ -14,6 +14,7 @@ import {
   IReportConfig,
   IReportData,
 } from "@/store/page-overlay/modules/reports/interfaces";
+import { extractExmployeeAuditData } from "./employee-audit-report";
 import { extractMaturePlantPropertyFromDimension } from "./mature-plants-quickview-report";
 
 export function shouldGenerateReport({
@@ -278,6 +279,12 @@ export function extractFlattenedData({
           }
         }
         return flattenedOutgoingPackages;
+      case ReportType.EMPLOYEE_AUDIT:
+        return extractExmployeeAuditData({
+          reportType,
+          reportConfig,
+          reportData,
+        });
       case ReportType.MATURE_PLANTS_QUICKVIEW:
         return extractQuickviewData({
           reportType,
@@ -320,6 +327,8 @@ export function getSheetTitle({ reportType }: { reportType: ReportType }): Sheet
       return SheetTitles.TRANSFER_HUB_TRANSFERS;
     case ReportType.TRANSFER_HUB_TRANSFER_MANIFESTS:
       return SheetTitles.TRANSFER_HUB_TRANSFER_MANIFESTS;
+    case ReportType.EMPLOYEE_AUDIT:
+      return SheetTitles.EMPLOYEE_AUDIT;
     default:
       throw new Error("Bad reportType " + reportType);
   }

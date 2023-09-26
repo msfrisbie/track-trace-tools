@@ -429,13 +429,11 @@ export interface ISortOptions {
   plantBatchSort?: IPlantBatchSort;
 }
 
-export type MetrcFilter =
-  | IPlantFilter
-  | IPackageFilter
-  | IPlantBatchFilter
-  | ITransferFilter
-  | IHarvestFilter
-  | ITagFilter;
+export interface IMetrcFilter {
+  lastModifiedDateGt?: string | null;
+  lastModifiedDateEq?: string | null;
+  lastModifiedDateLt?: string | null;
+}
 
 export interface IPlantFilter {
   locationName?: string | null;
@@ -470,7 +468,7 @@ export interface IPlantBatchFilter {
   includeInactive?: boolean;
 }
 
-export interface IPackageFilter {
+export interface IPackageFilter extends IMetrcFilter {
   label?: string | null;
   itemStrainName?: string | null;
   itemStrainNameExact?: boolean | null;
@@ -487,12 +485,9 @@ export interface IPackageFilter {
   includeIntransit?: boolean;
   includeInactive?: boolean;
   includeTransferHub?: boolean;
-  lastModifiedDateGt?: string | null;
-  lastModifiedDateEq?: string | null;
-  lastModifiedDateLt?: string | null;
 }
 
-export interface IHarvestFilter {
+export interface IHarvestFilter extends IMetrcFilter {
   harvestName?: string | null;
   includeActive?: boolean;
   includeInactive?: boolean;
@@ -500,7 +495,7 @@ export interface IHarvestFilter {
   harvestDateLt?: string | null;
 }
 
-export interface ITransferFilter {
+export interface ITransferFilter extends IMetrcFilter {
   manifestNumber?: string | null;
   createdDateGt?: string | null;
   createdDateEq?: string | null;
@@ -517,7 +512,7 @@ export interface ITransferFilter {
   includeOutgoingInactive?: boolean;
 }
 
-export interface ITagFilter {
+export interface ITagFilter extends IMetrcFilter {
   label?: string | null;
   includeAvailable?: boolean;
   includeUsed?: boolean;
@@ -948,13 +943,14 @@ export interface IIndexedHarvestData extends IHarvestData {
   HarvestState: HarvestState;
   LicenseNumber: string;
   TagMatcher: string;
-  history?: IHarvestHistoryData[]
+  history?: IHarvestHistoryData[];
 }
 
 export interface IIndexedTransferData extends ITransferData {
   TransferState: TransferState;
   LicenseNumber: string;
   TagMatcher: string;
+  history?: ITransferHistoryData[]
 }
 
 export interface ITransporterData {

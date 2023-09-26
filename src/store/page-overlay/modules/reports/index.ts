@@ -7,6 +7,7 @@ import {
   maybeLoadCogsV2ReportData,
   updateCogsV2MasterCostSheet,
 } from "@/utils/reports/cogs-v2-report";
+import { maybeLoadEmployeeAuditReportData } from "@/utils/reports/employee-audit-report";
 import { maybeLoadEmployeeSamplesReportData } from "@/utils/reports/employee-samples-report";
 import { maybeLoadHarvestPackagesReportData } from "@/utils/reports/harvest-packages-report";
 import { maybeLoadHarvestsReportData } from "@/utils/reports/harvests-report";
@@ -27,9 +28,9 @@ import { ActionContext } from "vuex";
 import {
   IStatusMessage,
   ReportAuxTask,
+  ReportStatus,
   ReportsActions,
   ReportsMutations,
-  ReportStatus,
 } from "./consts";
 import { IReportConfig, IReportData, IReportsState } from "./interfaces";
 
@@ -150,6 +151,7 @@ export const reportsModule = {
         await maybeLoadOutgoingTransferManifestsReportData({ ctx, reportData, reportConfig });
         await maybeLoadEmployeeSamplesReportData({ ctx, reportData, reportConfig });
         await maybeLoadHarvestPackagesReportData({ ctx, reportData, reportConfig });
+        await maybeLoadEmployeeAuditReportData({ ctx, reportData, reportConfig });
 
         ctx.commit(ReportsMutations.SET_STATUS, {
           statusMessage: { text: "Generating report...", level: "success" },

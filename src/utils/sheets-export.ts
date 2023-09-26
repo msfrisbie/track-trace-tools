@@ -13,6 +13,7 @@ import store from "@/store/page-overlay/index";
 import {
   ALL_ELIGIBLE_REPORT_TYPES,
   QUICKVIEW_REPORT_TYPES,
+  RAW_REPORT_TYPES,
   ReportsMutations,
   ReportType,
 } from "@/store/page-overlay/modules/reports/consts";
@@ -149,6 +150,7 @@ export async function writeDataSheet<T>({
     }${nextPageRowIdx + nextPage.length - 1}`;
 
     let values = nextPage;
+    // TODO move this into extractFlattenedValues
     if (mergedOptions.useFieldTransformer) {
       if (!fields) {
         throw new Error("Must provide fields transformer");
@@ -315,10 +317,7 @@ export async function createCsvOrError({
 
   const flattenedCache = new Map<ReportType, any[]>();
 
-  //
   // Check that inputs are well-formed
-  //
-
   const ELIGIBLE_REPORT_TYPES: ReportType[] = ALL_ELIGIBLE_REPORT_TYPES.filter((reportType) =>
     shouldGenerateReport({ reportType, reportConfig, reportData })
   );
@@ -331,6 +330,8 @@ export async function createCsvOrError({
     let data: any[][] = [];
 
     if (QUICKVIEW_REPORT_TYPES.includes(reportType)) {
+      data = extractFlattenedData({ flattenedCache, reportType, reportData, reportConfig });
+    } else if (RAW_REPORT_TYPES.includes(reportType)) {
       data = extractFlattenedData({ flattenedCache, reportType, reportData, reportConfig });
     } else {
       const fields: IFieldData[] = reportConfig[reportType]!.fields!;
@@ -503,7 +504,7 @@ export async function createSpreadsheetOrError({
       fields: reportConfig[reportType]?.fields as IFieldData[],
       data: extractFlattenedData({ flattenedCache, reportType, reportData, reportConfig }) as any[],
       options: {
-        useFieldTransformer: !QUICKVIEW_REPORT_TYPES.includes(reportType),
+        useFieldTransformer: !QUICKVIEW_REPORT_TYPES.includes(reportType) && !RAW_REPORT_TYPES.includes(reportType),
       },
     });
   }

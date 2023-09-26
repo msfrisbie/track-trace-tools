@@ -1198,6 +1198,72 @@
           </div>
         </template>
 
+        <!-- Employee Audit -->
+        <template
+          v-if="selectedReports.find((report) => report.value === ReportType.EMPLOYEE_AUDIT)"
+        >
+          <div
+            class="rounded border border-gray-300 p-2 flex flex-col items-stretch gap-2 overflow-hidden"
+          >
+            <div class="font-semibold text-white ttt-purple-bg p-2 -m-2">Employee Activity</div>
+            <hr />
+            <div class="flex flex-col items-stretch gap-4">
+              <div class="font-semibold text-gray-700">Filters:</div>
+
+              <div class="flex flex-col items-start gap-1">
+                <b-form-group
+                  label="Employee Name or Username:"
+                  description="Full or partial match, uppercase or lowercase"
+                >
+                  <b-form-input
+                    size="sm"
+                    :state="employeeAuditFormFilters.employeeQuery.length > 3"
+                    v-model="employeeAuditFormFilters.employeeQuery"
+                  >
+                  </b-form-input>
+                </b-form-group>
+              </div>
+
+              <div class="flex flex-col items-start gap-1">
+                <b-form-checkbox v-model="employeeAuditFormFilters.shouldFilterLastModifiedDateGt">
+                  <span class="leading-6">Last modified on or after:</span>
+                </b-form-checkbox>
+                <b-form-datepicker
+                  v-if="employeeAuditFormFilters.shouldFilterLastModifiedDateGt"
+                  :disabled="!employeeAuditFormFilters.shouldFilterLastModifiedDateGt"
+                  initial-date
+                  size="sm"
+                  v-model="employeeAuditFormFilters.lastModifiedDateGt"
+                />
+              </div>
+
+              <div class="flex flex-col items-start gap-1">
+                <b-form-checkbox v-model="employeeAuditFormFilters.shouldFilterLastModifiedDateLt">
+                  <span class="leading-6">Last modified on or before:</span>
+                </b-form-checkbox>
+                <b-form-datepicker
+                  v-if="employeeAuditFormFilters.shouldFilterLastModifiedDateLt"
+                  :disabled="!employeeAuditFormFilters.shouldFilterLastModifiedDateLt"
+                  initial-date
+                  size="sm"
+                  v-model="employeeAuditFormFilters.lastModifiedDateLt"
+                />
+              </div>
+
+              <hr />
+
+              <simple-drawer toggleText="ADVANCED">
+                <b-form-group label="Licenses:">
+                  <b-form-checkbox-group
+                    v-model="employeeAuditFormFilters.licenses"
+                    :options="employeeAuditFormFilters.licenseOptions"
+                  ></b-form-checkbox-group>
+                </b-form-group>
+              </simple-drawer>
+            </div>
+          </div>
+        </template>
+
         <!-- Mature Plants Quickview -->
         <template
           v-if="
@@ -1394,40 +1460,43 @@
 
 <script lang="ts">
 import { MessageType } from "@/consts";
-import {
-  IHarvestFilter,
-  IPackageFilter,
-  IPlantBatchFilter,
-  IPlantFilter,
-  IPluginState,
-  ITagFilter,
-  ITransferFilter,
-} from "@/interfaces";
+import { IPluginState } from "@/interfaces";
 import { authManager } from "@/modules/auth-manager.module";
-import { clientBuildManager } from "@/modules/client-build-manager.module";
 import { messageBus } from "@/modules/message-bus.module";
 import router from "@/router/index";
 import store from "@/store/page-overlay/index";
 import { OAuthState, PluginAuthActions } from "@/store/page-overlay/modules/plugin-auth/consts";
 import {
   ReportAuxTask,
-  ReportsActions,
   ReportStatus,
   ReportType,
+  ReportsActions,
   SHEET_FIELDS,
 } from "@/store/page-overlay/modules/reports/consts";
 import { IReportConfig } from "@/store/page-overlay/modules/reports/interfaces";
-import { getIsoDateFromOffset, todayIsodate } from "@/utils/date";
+import { getIsoDateFromOffset } from "@/utils/date";
 import { addCogsReport, cogsFormFiltersFactory } from "@/utils/reports/cogs-report";
+import {
+  addCogsTrackerReport,
+  cogsTrackerFormFiltersFactory,
+} from "@/utils/reports/cogs-tracker-report";
 import {
   addCogsV2Report,
   cogsV2FormFiltersFactory,
   getCogsV2CacheKey,
 } from "@/utils/reports/cogs-v2-report";
 import {
-  addCogsTrackerReport,
-  cogsTrackerFormFiltersFactory,
-} from "@/utils/reports/cogs-tracker-report";
+  addEmployeeAuditReport,
+  employeeAuditFormFiltersFactory,
+} from "@/utils/reports/employee-audit-report";
+import {
+  addEmployeeSamplesReport,
+  employeeSamplesFormFiltersFactory,
+} from "@/utils/reports/employee-samples-report";
+import {
+  addHarvestPackagesReport,
+  harvestPackagesFormFiltersFactory,
+} from "@/utils/reports/harvest-packages-report";
 import { addHarvestsReport, harvestsFormFiltersFactory } from "@/utils/reports/harvests-report";
 import {
   addImmaturePlantsReport,
@@ -1437,6 +1506,11 @@ import {
   addIncomingTransfersReport,
   incomingTransfersFormFiltersFactory,
 } from "@/utils/reports/incoming-transfers-report";
+import {
+  MATURE_PLANT_QUICKVIEW_DIMENSIONS,
+  addMaturePlantsQuickviewReport,
+  maturePlantsQuickviewFormFiltersFactory,
+} from "@/utils/reports/mature-plants-quickview-report";
 import {
   addMaturePlantsReport,
   maturePlantsFormFiltersFactory,
@@ -1449,34 +1523,21 @@ import {
   addOutgoingTransfersReport,
   outgoingTransfersFormFiltersFactory,
 } from "@/utils/reports/outgoing-transfers-report";
-import {
-  addTransferHubTransfersReport,
-  transferHubTransfersFormFiltersFactory,
-} from "@/utils/reports/transfer-hub-transfers-report";
 import { addPackageReport, packageFormFiltersFactory } from "@/utils/reports/package-report";
 import {
   addStragglerPackagesReport,
   stragglerPackagesFormFiltersFactory,
 } from "@/utils/reports/straggler-package-report";
 import { addTagsReport, tagsFormFiltersFactory } from "@/utils/reports/tags-report";
+import {
+  addTransferHubTransfersReport,
+  transferHubTransfersFormFiltersFactory,
+} from "@/utils/reports/transfer-hub-transfers-report";
 import _ from "lodash-es";
 import Vue from "vue";
-import { mapActions, mapGetters, mapState } from "vuex";
+import { mapActions, mapState } from "vuex";
 import ArchiveWidget from "../shared/ArchiveWidget.vue";
 import SimpleDrawer from "../shared/SimpleDrawer.vue";
-import {
-  addEmployeeSamplesReport,
-  employeeSamplesFormFiltersFactory,
-} from "@/utils/reports/employee-samples-report";
-import {
-  addHarvestPackagesReport,
-  harvestPackagesFormFiltersFactory,
-} from "@/utils/reports/harvest-packages-report";
-import {
-  addMaturePlantsQuickviewReport,
-  maturePlantsQuickviewFormFiltersFactory,
-  MATURE_PLANT_QUICKVIEW_DIMENSIONS,
-} from "@/utils/reports/mature-plants-quickview-report";
 
 interface IReportOption {
   text: string;
@@ -1566,6 +1627,7 @@ export default Vue.extend({
       tagsFormFilters: tagsFormFiltersFactory(),
       employeeSamplesFormFilters: employeeSamplesFormFiltersFactory(),
       harvestPackagesFormFilters: harvestPackagesFormFiltersFactory(),
+      employeeAuditFormFilters: employeeAuditFormFiltersFactory(),
       showFilters: (() => {
         const fields: { [key: string]: boolean } = {};
         Object.keys(SHEET_FIELDS).map((x: any) => {
@@ -1740,6 +1802,16 @@ export default Vue.extend({
           isSingleton: false,
         },
         {
+          text: "Employee Activity",
+          value: ReportType.EMPLOYEE_AUDIT,
+          t3plus: true,
+          enabled: true,
+          description: "View all employee activity in Metrc",
+          isCustom: false,
+          isCsvEligible: true,
+          isSingleton: false,
+        },
+        {
           text: "COGS",
           value: ReportType.COGS_V2,
           t3plus: false,
@@ -1782,17 +1854,6 @@ export default Vue.extend({
           isCustom: false,
           isCsvEligible: true,
           isSingleton: true,
-        },
-        {
-          text: "Employee History Audit",
-          value: null,
-          t3plus: true,
-          enabled: false,
-          description:
-            "Gather all employee activity that appears in history across Metrc",
-          isCustom: false,
-          isCsvEligible: true,
-          isSingleton: false,
         },
         {
           text: "Package Quickview",
@@ -1970,6 +2031,17 @@ export default Vue.extend({
           reportConfig,
           stragglerPackagesFormFilters: this.stragglerPackagesFormFilters,
           fields: this.fields[ReportType.STRAGGLER_PACKAGES],
+        });
+      }
+
+      if (
+        this.selectedReports.find(
+          (report: IReportOption) => report.value === ReportType.EMPLOYEE_AUDIT
+        )
+      ) {
+        addEmployeeAuditReport({
+          reportConfig,
+          employeeAuditFormFilters: this.employeeAuditFormFilters,
         });
       }
 

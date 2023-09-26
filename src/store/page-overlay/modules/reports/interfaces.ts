@@ -84,6 +84,16 @@ export interface IReportConfig {
     stragglerPackageFilter: IPackageFilter;
     fields: IFieldData[];
   };
+  [ReportType.EMPLOYEE_AUDIT]?: {
+    packageFilter: IPackageFilter;
+    transferFilter: ITransferFilter;
+    licenses: string[];
+    // plantFilter: IPlantFilter;
+    // plantBatchFilter: IPlantBatchFilter;
+    // harvestFilter: IHarvestFilter;
+    employeeQuery: string;
+    fields: null;
+  };
   [ReportType.MATURE_PLANTS_QUICKVIEW]?: {
     plantFilter: IPlantFilter;
     primaryDimension: MaturePlantQuickviewDimension;
@@ -149,6 +159,9 @@ export interface IReportData {
   };
   [ReportType.HARVEST_PACKAGES]?: {
     harvestPackageMatrix: any[][];
+  };
+  [ReportType.EMPLOYEE_AUDIT]?: {
+    employeeAuditMatrix: any[][];
   };
   [ReportType.PACKAGES]?: {
     packages: IIndexedPackageData[];
