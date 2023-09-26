@@ -107,60 +107,62 @@ export async function maybeLoadMaturePlantsQuickviewReportData({
 }) {
   const maturePlantQuickviewConfig = reportConfig[REPORT_TYPE]!;
 
-  ctx.commit(ReportsMutations.SET_STATUS, {
-    statusMessage: { text: "Loading plants...", level: "success" },
-  });
+  if (maturePlantQuickviewConfig) {
+    let maturePlants: IIndexedPlantData[] = [];
+    if (maturePlantQuickviewConfig?.plantFilter) {
+      ctx.commit(ReportsMutations.SET_STATUS, {
+        statusMessage: { text: "Loading plants...", level: "success" },
+      });
 
-  let maturePlants: IIndexedPlantData[] = [];
-  if (maturePlantQuickviewConfig?.plantFilter) {
-    if (maturePlantQuickviewConfig?.plantFilter.includeVegetative) {
-      try {
-        maturePlants = [...maturePlants, ...(await primaryDataLoader.vegetativePlants())];
-      } catch (e) {
-        ctx.commit(ReportsMutations.SET_STATUS, {
-          statusMessage: { text: "Failed to load vegetative plants.", level: "warning" },
-        });
+      if (maturePlantQuickviewConfig?.plantFilter.includeVegetative) {
+        try {
+          maturePlants = [...maturePlants, ...(await primaryDataLoader.vegetativePlants())];
+        } catch (e) {
+          ctx.commit(ReportsMutations.SET_STATUS, {
+            statusMessage: { text: "Failed to load vegetative plants.", level: "warning" },
+          });
+        }
+      }
+
+      if (maturePlantQuickviewConfig.plantFilter.includeFlowering) {
+        try {
+          maturePlants = [...maturePlants, ...(await primaryDataLoader.floweringPlants())];
+        } catch (e) {
+          ctx.commit(ReportsMutations.SET_STATUS, {
+            statusMessage: { text: "Failed to load flowering plants.", level: "warning" },
+          });
+        }
+      }
+
+      if (maturePlantQuickviewConfig.plantFilter.includeInactive) {
+        try {
+          maturePlants = [...maturePlants, ...(await primaryDataLoader.inactivePlants({}))];
+        } catch (e) {
+          ctx.commit(ReportsMutations.SET_STATUS, {
+            statusMessage: { text: "Failed to load inactive plants.", level: "warning" },
+          });
+        }
       }
     }
 
-    if (maturePlantQuickviewConfig.plantFilter.includeFlowering) {
-      try {
-        maturePlants = [...maturePlants, ...(await primaryDataLoader.floweringPlants())];
-      } catch (e) {
-        ctx.commit(ReportsMutations.SET_STATUS, {
-          statusMessage: { text: "Failed to load flowering plants.", level: "warning" },
-        });
+    maturePlants = maturePlants.filter((plant) => {
+      if (maturePlantQuickviewConfig.plantFilter.plantedDateLt) {
+        if (plant.PlantedDate > maturePlantQuickviewConfig.plantFilter.plantedDateLt) {
+          return false;
+        }
       }
-    }
 
-    if (maturePlantQuickviewConfig.plantFilter.includeInactive) {
-      try {
-        maturePlants = [...maturePlants, ...(await primaryDataLoader.inactivePlants({}))];
-      } catch (e) {
-        ctx.commit(ReportsMutations.SET_STATUS, {
-          statusMessage: { text: "Failed to load inactive plants.", level: "warning" },
-        });
+      if (maturePlantQuickviewConfig.plantFilter.plantedDateGt) {
+        if (plant.PlantedDate < maturePlantQuickviewConfig.plantFilter.plantedDateGt) {
+          return false;
+        }
       }
-    }
+
+      return true;
+    });
+
+    reportData[REPORT_TYPE] = {
+      maturePlants,
+    };
   }
-
-  maturePlants = maturePlants.filter((plant) => {
-    if (maturePlantQuickviewConfig.plantFilter.plantedDateLt) {
-      if (plant.PlantedDate > maturePlantQuickviewConfig.plantFilter.plantedDateLt) {
-        return false;
-      }
-    }
-
-    if (maturePlantQuickviewConfig.plantFilter.plantedDateGt) {
-      if (plant.PlantedDate < maturePlantQuickviewConfig.plantFilter.plantedDateGt) {
-        return false;
-      }
-    }
-
-    return true;
-  });
-
-  reportData[REPORT_TYPE] = {
-    maturePlants,
-  };
 }

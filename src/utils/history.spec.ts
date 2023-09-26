@@ -3,6 +3,7 @@ import {
   extractChildPackageLabelsFromHistory,
   extractChildPackageTagQuantityPairsFromHistory,
   extractChildPackageTagQuantityUnitSetsFromHistory,
+  extractHarvestChildPackageLabelsFromHistory,
   extractInitialPackageLocationNameFromHistoryOrNull,
   extractInitialPackageQuantityAndUnitFromHistoryOrError,
   extractParentPackageLabelsFromHistory,
@@ -561,5 +562,12 @@ describe("history.ts", () => {
     expect(
       extractInitialPackageLocationNameFromHistoryOrNull(PACKAGE_WITH_CHILD_SENT_FOR_TESTING)
     ).toEqual("Quarantine Room");
+  });
+
+  it("Correctly extracts harvest packages", () => {
+    expect(extractHarvestChildPackageLabelsFromHistory(INACTIVE_HARVEST_HISTORY)).toEqual([
+      "1A4000000000000000111336",
+      "1A4000000000000000111800",
+    ]);
   });
 });

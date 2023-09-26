@@ -52,6 +52,7 @@ export const ALL_ELIGIBLE_REPORT_TYPES: ReportType[] = [
   ReportType.STRAGGLER_PACKAGES,
   ReportType.TAGS,
   ReportType.HARVESTS,
+  ReportType.HARVEST_PACKAGES,
   ReportType.IMMATURE_PLANTS,
   ReportType.MATURE_PLANTS,
   ReportType.MATURE_PLANTS_QUICKVIEW,
@@ -78,7 +79,10 @@ export const FIELD_TRANSFORMER_REPORT_TYPES: ReportType[] = [
   ReportType.TRANSFER_HUB_TRANSFER_MANIFESTS,
 ];
 export const QUICKVIEW_REPORT_TYPES: ReportType[] = [ReportType.MATURE_PLANTS_QUICKVIEW];
-export const RAW_REPORT_TYPES: ReportType[] = [ReportType.EMPLOYEE_AUDIT];
+export const RAW_REPORT_TYPES: ReportType[] = [
+  ReportType.EMPLOYEE_AUDIT,
+  ReportType.HARVEST_PACKAGES,
+];
 
 const COMMON_PACKAGE_FIELD_DATA: IFieldData[] = [
   {

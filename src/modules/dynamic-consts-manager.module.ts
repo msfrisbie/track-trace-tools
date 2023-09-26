@@ -25,10 +25,132 @@ import { AxiosResponse } from "axios";
 import { get, keys, set } from "idb-keyval";
 import _ from "lodash-es";
 import { timer } from "rxjs";
-import { clientBuildManager } from "./client-build-manager.module";
 const DYNAMIC_CONST_TIMEOUT_MS = 30000;
 
 const TRANSFER_MODAL_HTML_EXPIRATION_MS: number = 1000 * 60 * 60 * 24;
+
+const DEFAULT_UNITS_OF_MEASURE: IUnitOfMeasure[] = [
+  {
+    Id: 1,
+    IsBaseUnit: true,
+    QuantityType: "CountBased",
+    Name: "Each",
+    Abbreviation: "ea",
+    FromBaseFactor: 1,
+    ToBaseFactor: 1,
+    IsArchived: false,
+  },
+  {
+    Id: 7,
+    IsBaseUnit: true,
+    QuantityType: "VolumeBased",
+    Name: "Fluid Ounces",
+    Abbreviation: "fl oz",
+    FromBaseFactor: 1,
+    ToBaseFactor: 1,
+    IsArchived: false,
+  },
+  {
+    Id: 8,
+    IsBaseUnit: false,
+    QuantityType: "VolumeBased",
+    Name: "Gallons",
+    Abbreviation: "gal",
+    FromBaseFactor: 0.0078125,
+    ToBaseFactor: 128,
+    IsArchived: false,
+  },
+  {
+    Id: 4,
+    IsBaseUnit: false,
+    QuantityType: "WeightBased",
+    Name: "Grams",
+    Abbreviation: "g",
+    FromBaseFactor: 28.349523125,
+    ToBaseFactor: 0.035273961949580414,
+    IsArchived: false,
+  },
+  {
+    Id: 6,
+    IsBaseUnit: false,
+    QuantityType: "WeightBased",
+    Name: "Kilograms",
+    Abbreviation: "kg",
+    FromBaseFactor: 0.028349523125,
+    ToBaseFactor: 35.27396194958041,
+    IsArchived: false,
+  },
+  {
+    Id: 9,
+    IsBaseUnit: false,
+    QuantityType: "VolumeBased",
+    Name: "Liters",
+    Abbreviation: "l",
+    FromBaseFactor: 0.0295735295625,
+    ToBaseFactor: 33.814022701842994,
+    IsArchived: false,
+  },
+  {
+    Id: 5,
+    IsBaseUnit: false,
+    QuantityType: "WeightBased",
+    Name: "Milligrams",
+    Abbreviation: "mg",
+    FromBaseFactor: 28349.523125,
+    ToBaseFactor: 0.00003527396194958041,
+    IsArchived: false,
+  },
+  {
+    Id: 10,
+    IsBaseUnit: false,
+    QuantityType: "VolumeBased",
+    Name: "Milliliters",
+    Abbreviation: "ml",
+    FromBaseFactor: 29.5735295625,
+    ToBaseFactor: 0.033814022701843,
+    IsArchived: false,
+  },
+  {
+    Id: 2,
+    IsBaseUnit: true,
+    QuantityType: "WeightBased",
+    Name: "Ounces",
+    Abbreviation: "oz",
+    FromBaseFactor: 1,
+    ToBaseFactor: 1,
+    IsArchived: false,
+  },
+  {
+    Id: 11,
+    IsBaseUnit: false,
+    QuantityType: "VolumeBased",
+    Name: "Pints",
+    Abbreviation: "pt",
+    FromBaseFactor: 0.0625,
+    ToBaseFactor: 16,
+    IsArchived: false,
+  },
+  {
+    Id: 3,
+    IsBaseUnit: false,
+    QuantityType: "WeightBased",
+    Name: "Pounds",
+    Abbreviation: "lb",
+    FromBaseFactor: 0.0625,
+    ToBaseFactor: 16,
+    IsArchived: false,
+  },
+  {
+    Id: 12,
+    IsBaseUnit: false,
+    QuantityType: "VolumeBased",
+    Name: "Quarts",
+    Abbreviation: "qt",
+    FromBaseFactor: 0.03125,
+    ToBaseFactor: 32,
+    IsArchived: false,
+  },
+];
 
 interface ICreateItemRepeaterData {
   ItemCategories: IItemCategory[];
@@ -552,10 +674,14 @@ class DynamicConstsManager implements IAtomicService {
       return mockDataManager.mockUnitsOfMeasure();
     }
 
-    let repeaterData = await this.createItemRepeaterData();
+    try {
+      let repeaterData = await this.createItemRepeaterData();
 
-    if (repeaterData.UnitsOfMeasure) {
-      return repeaterData.UnitsOfMeasure;
+      if (repeaterData.UnitsOfMeasure) {
+        return repeaterData.UnitsOfMeasure;
+      }
+    } catch {
+      return DEFAULT_UNITS_OF_MEASURE;
     }
 
     throw new Error("Units of measure unable to load");

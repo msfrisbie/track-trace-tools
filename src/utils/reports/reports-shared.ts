@@ -8,13 +8,17 @@ import {
   ITransferData,
   ITransporterData,
 } from "@/interfaces";
-import { FIELD_TRANSFORMER_REPORT_TYPES, ReportType } from "@/store/page-overlay/modules/reports/consts";
+import {
+  FIELD_TRANSFORMER_REPORT_TYPES,
+  ReportType,
+} from "@/store/page-overlay/modules/reports/consts";
 import {
   IFieldData,
   IReportConfig,
   IReportData,
 } from "@/store/page-overlay/modules/reports/interfaces";
 import { extractExmployeeAuditData } from "./employee-audit-report";
+import { extractHarvestPackagesData } from "./harvest-packages-report";
 import { extractMaturePlantPropertyFromDimension } from "./mature-plants-quickview-report";
 
 export function shouldGenerateReport({
@@ -285,6 +289,12 @@ export function extractFlattenedData({
           reportConfig,
           reportData,
         });
+      case ReportType.HARVEST_PACKAGES:
+        return extractHarvestPackagesData({
+          reportType,
+          reportConfig,
+          reportData,
+        });
       case ReportType.MATURE_PLANTS_QUICKVIEW:
         return extractQuickviewData({
           reportType,
@@ -298,7 +308,7 @@ export function extractFlattenedData({
 
   if (FIELD_TRANSFORMER_REPORT_TYPES.includes(reportType)) {
     // @ts-ignore
-    values = applyFieldTransformer({fields: reportConfig[reportType]!.fields, values})
+    values = applyFieldTransformer({ fields: reportConfig[reportType]!.fields, values });
   }
 
   flattenedCache.set(reportType, values);
@@ -314,6 +324,8 @@ export function getSheetTitle({ reportType }: { reportType: ReportType }): Sheet
       return SheetTitles.STRAGGLER_PACKAGES;
     case ReportType.HARVESTS:
       return SheetTitles.HARVESTS;
+      case ReportType.HARVEST_PACKAGES:
+        return SheetTitles.HARVEST_PACKAGES;
     case ReportType.TAGS:
       return SheetTitles.TAGS;
     case ReportType.IMMATURE_PLANTS:

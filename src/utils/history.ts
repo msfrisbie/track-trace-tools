@@ -3,7 +3,7 @@ import {
   PLANT_BATCH_NAME_REGEX_PATTERN,
   ZERO_PADDED_MANIFEST_NUMBER_REGEX_PATTERN,
 } from "@/consts";
-import { IPackageHistoryData } from "@/interfaces";
+import { IHarvestHistoryData, IPackageHistoryData } from "@/interfaces";
 import _ from "lodash-es";
 
 // Single history entry methods
@@ -131,7 +131,7 @@ export function extractHarvestNameOrNull(description: string): string | null {
 }
 
 export function extractHarvestPackageLabelOrNull(description: string): string | null {
-  const matchers: RegExp[] = [new RegExp(`Package \(?(${METRC_TAG_REGEX_PATTERN})\)?`)];
+  const matchers: RegExp[] = [new RegExp(`Package \\(?(${METRC_TAG_REGEX_PATTERN})\\)?`)];
 
   for (const matcher of matchers) {
     const match = description.match(matcher);
@@ -323,4 +323,22 @@ export function extractInitialPackageLocationNameFromHistoryOrNull(
   }
 
   return null;
+}
+
+export function extractHarvestChildPackageLabelsFromHistory(
+  historyList: IHarvestHistoryData[]
+): string[] {
+  const labels: string[] = [];
+
+  for (const history of historyList) {
+    for (const description of history.Descriptions) {
+      const label = extractHarvestPackageLabelOrNull(description);
+
+      if (label) {
+        labels.push(label);
+      }
+    }
+  }
+
+  return labels;
 }

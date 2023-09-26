@@ -376,12 +376,12 @@ export async function createSpreadsheetOrError({
     });
   }
 
-  if (reportConfig[ReportType.HARVEST_PACKAGES]) {
-    return createHarvestPackagesReportOrError({
-      reportData,
-      reportConfig,
-    });
-  }
+  // if (reportConfig[ReportType.HARVEST_PACKAGES]) {
+  //   return createHarvestPackagesReportOrError({
+  //     reportData,
+  //     reportConfig,
+  //   });
+  // }
 
   const flattenedCache = new Map<ReportType, any[]>();
 
