@@ -681,7 +681,9 @@ export interface ITransferHistoryData extends IMetrcObjectHistoryData {}
 
 export interface IPackageHistoryData extends IMetrcObjectHistoryData {}
 
-export interface IHarvestHistoryData {
+export interface IHarvestHistoryData extends IMetrcObjectHistoryData {}
+
+export interface IPackageSourceHarvestData {
   HarvestStartDate: string; // "2022-09-22"
   HarvestTypeName: string; // "Manicure Batch";
   HarvestedByFacilityLicenseNumber: string; // "EX-000002";
@@ -950,7 +952,7 @@ export interface IIndexedTransferData extends ITransferData {
   TransferState: TransferState;
   LicenseNumber: string;
   TagMatcher: string;
-  history?: ITransferHistoryData[]
+  history?: ITransferHistoryData[];
 }
 
 export interface ITransporterData {

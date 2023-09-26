@@ -129,13 +129,13 @@ export async function maybeLoadHarvestPackagesReportData({
     const harvestHistoryPromises: Promise<any>[] = [];
 
     // For each harvest in the range, load its history
-    harvests.map(async (harvest) => {
-      dataLoader = await getDataLoaderByLicense(harvest.LicenseNumber);
-
+    harvests.map((harvest) => {
       harvestHistoryPromises.push(
-        dataLoader.harvestHistoryByHarvestId(harvest.Id).then((response) => {
-          harvest.history = response;
-        })
+        getDataLoaderByLicense(harvest.LicenseNumber)
+          .then((dataLoader) => dataLoader.harvestHistoryByHarvestId(harvest.Id))
+          .then((history) => {
+            harvest.history = history;
+          })
       );
     });
 
@@ -144,6 +144,8 @@ export async function maybeLoadHarvestPackagesReportData({
     if (settledHarvestHistoryPromises.find((x) => x.status === "rejected")) {
       throw new Error("Harvest history request failed");
     }
+
+    
 
     // TODO parse harvest history for packages
 

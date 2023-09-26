@@ -1,5 +1,4 @@
 import {
-  IHarvestHistoryData,
   IIndexedDestinationPackageData,
   IIndexedHarvestData,
   IIndexedPackageData,
@@ -8,6 +7,7 @@ import {
   IIndexedRichIncomingTransferData,
   IIndexedRichOutgoingTransferData,
   IPackageHistoryData,
+  IPackageSourceHarvestData,
   IPlantBatchHistoryData,
   IPlantHistoryData,
   ITransferHistoryData,
@@ -27,7 +27,7 @@ export type ExplorerTargetHistory =
   | IPackageHistoryData[]
   | IPlantHistoryData[]
   | IPlantBatchHistoryData[]
-  | IHarvestHistoryData[]
+  | IPackageSourceHarvestData[]
   | ITransferHistoryData[];
 
 export interface IExplorerState {
@@ -38,10 +38,10 @@ export interface IExplorerState {
   target: ExplorerTarget | null;
   history: ExplorerTargetHistory | null;
   recent: {
-    queryString: string,
-    targetType: ExplorerTargetType,
-    timestamp: number
-  }[]
+    queryString: string;
+    targetType: ExplorerTargetType;
+    timestamp: number;
+  }[];
   // Parents
   //   parentPackageLabels?: string[];
   //   parentHarvestNames?: string[];

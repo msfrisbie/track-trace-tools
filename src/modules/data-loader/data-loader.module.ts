@@ -36,6 +36,7 @@ import {
   IPackageData,
   IPackageHistoryData,
   IPackageOptions,
+  IPackageSourceHarvestData,
   IPaginationOptions,
   IPlantBatchData,
   IPlantBatchFilter,
@@ -3884,7 +3885,7 @@ export class DataLoader implements IAtomicService {
     return voidedTags;
   }
 
-  async packageHarvestHistoryByPackageId(packageId: number): Promise<IHarvestHistoryData[]> {
+  async packageHarvestHistoryByPackageId(packageId: number): Promise<IPackageSourceHarvestData[]> {
     const page = 0;
     const body = buildBody({ page, pageSize: DATA_LOAD_PAGE_SIZE });
 
@@ -3897,7 +3898,7 @@ export class DataLoader implements IAtomicService {
       throw new Error("Request failed");
     }
 
-    const responseData: ICollectionResponse<IHarvestHistoryData> = await response.data;
+    const responseData: ICollectionResponse<IPackageSourceHarvestData> = await response.data;
 
     return responseData.Data;
   }

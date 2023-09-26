@@ -130,6 +130,20 @@ export function extractHarvestNameOrNull(description: string): string | null {
   return null;
 }
 
+export function extractHarvestPackageLabelOrNull(description: string): string | null {
+  const matchers: RegExp[] = [new RegExp(`Package \(?(${METRC_TAG_REGEX_PATTERN})\)?`)];
+
+  for (const matcher of matchers) {
+    const match = description.match(matcher);
+
+    if (match) {
+      return match[1];
+    }
+  }
+
+  return null;
+}
+
 export function extractChildPackageTagQuantityPairOrNull(
   description: string
 ): [string, number] | null {

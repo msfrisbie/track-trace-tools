@@ -1,10 +1,10 @@
 import { MessageType } from "@/consts";
 import {
-  IHarvestHistoryData,
   IIndexedPackageData,
   IPackageAncestorTreeNode,
   IPackageChildTreeNode,
   IPackageData,
+  IPackageSourceHarvestData,
   IPluginState,
 } from "@/interfaces";
 import { analyticsManager } from "@/modules/analytics-manager.module";
@@ -101,7 +101,7 @@ export const packageHistoryModule = {
       {
         sourceHarvests,
       }: {
-        sourceHarvests: IHarvestHistoryData[];
+        sourceHarvests: IPackageSourceHarvestData[];
       }
     ) {
       state.sourceHarvests = sourceHarvests;

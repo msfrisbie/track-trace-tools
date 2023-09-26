@@ -1,4 +1,4 @@
-import { IPackageHistoryData } from "@/interfaces";
+import { IHarvestHistoryData, IPackageHistoryData } from "@/interfaces";
 import {
   extractChildPackageLabelsFromHistory,
   extractChildPackageTagQuantityPairsFromHistory,
@@ -10,11 +10,283 @@ import {
   extractTestSamplePackageLabelsFromHistory,
 } from "./history";
 
+const INACTIVE_HARVEST_HISTORY: IHarvestHistoryData[] = [
+  {
+    Descriptions: [
+      'Harvest "FOO84 BAR1B BAZHVF1 07.27.23" created in location "FOOBAR"',
+      "- Location Type: Default Location Type",
+    ],
+    UserName: "Foo Bar (FOO123●●●)",
+    ActualDate: "2023-07-27",
+    RecordedDateTime: "2023-07-28T12:51:26.6007211Z",
+    InputSourcesNames: "API",
+    ExternalSourceName: "MediTracker",
+  },
+  {
+    Descriptions: ["Harvested 3,933.5 Grams from Plant 1A4000000000000000111831"],
+    UserName: "Foo Bar (FOO123●●●)",
+    ActualDate: "2023-07-27",
+    RecordedDateTime: "2023-07-28T12:51:26.6007211Z",
+    InputSourcesNames: "API",
+    ExternalSourceName: "MediTracker",
+  },
+  {
+    Descriptions: ["Harvested 4,010 Grams from Plant 1A4000000000000000111832"],
+    UserName: "Foo Bar (FOO123●●●)",
+    ActualDate: "2023-07-27",
+    RecordedDateTime: "2023-07-28T12:51:26.7957065Z",
+    InputSourcesNames: "API",
+    ExternalSourceName: "MediTracker",
+  },
+  {
+    Descriptions: ["Harvested 2,381 Grams from Plant 1A4000000000000000111833"],
+    UserName: "Foo Bar (FOO123●●●)",
+    ActualDate: "2023-07-27",
+    RecordedDateTime: "2023-07-28T12:51:26.9207078Z",
+    InputSourcesNames: "API",
+    ExternalSourceName: "MediTracker",
+  },
+  {
+    Descriptions: ["Harvested 3,857.5 Grams from Plant 1A4000000000000000111834"],
+    UserName: "Foo Bar (FOO123●●●)",
+    ActualDate: "2023-07-27",
+    RecordedDateTime: "2023-07-28T12:51:27.0116529Z",
+    InputSourcesNames: "API",
+    ExternalSourceName: "MediTracker",
+  },
+  {
+    Descriptions: ["Harvested 3,861 Grams from Plant 1A4000000000000000111835"],
+    UserName: "Foo Bar (FOO123●●●)",
+    ActualDate: "2023-07-27",
+    RecordedDateTime: "2023-07-28T12:51:27.1033805Z",
+    InputSourcesNames: "API",
+    ExternalSourceName: "MediTracker",
+  },
+  {
+    Descriptions: ["Harvested 3,887 Grams from Plant 1A4000000000000000111836"],
+    UserName: "Foo Bar (FOO123●●●)",
+    ActualDate: "2023-07-27",
+    RecordedDateTime: "2023-07-28T12:51:27.2135119Z",
+    InputSourcesNames: "API",
+    ExternalSourceName: "MediTracker",
+  },
+  {
+    Descriptions: ["Harvested 4,031 Grams from Plant 1A4000000000000000111838"],
+    UserName: "Foo Bar (FOO123●●●)",
+    ActualDate: "2023-07-27",
+    RecordedDateTime: "2023-07-28T12:51:27.3033845Z",
+    InputSourcesNames: "API",
+    ExternalSourceName: "MediTracker",
+  },
+  {
+    Descriptions: ["Harvested 3,977.5 Grams from Plant 1A4000000000000000111839"],
+    UserName: "Foo Bar (FOO123●●●)",
+    ActualDate: "2023-07-27",
+    RecordedDateTime: "2023-07-28T12:51:27.3933835Z",
+    InputSourcesNames: "API",
+    ExternalSourceName: "MediTracker",
+  },
+  {
+    Descriptions: ["Harvested 4,001.5 Grams from Plant 1A4000000000000000111840"],
+    UserName: "Foo Bar (FOO123●●●)",
+    ActualDate: "2023-07-27",
+    RecordedDateTime: "2023-07-28T12:51:27.5033862Z",
+    InputSourcesNames: "API",
+    ExternalSourceName: "MediTracker",
+  },
+  {
+    Descriptions: ["Harvested 2,561.5 Grams from Plant 1A4000000000000000111842"],
+    UserName: "Foo Bar (FOO123●●●)",
+    ActualDate: "2023-07-27",
+    RecordedDateTime: "2023-07-28T12:51:27.6133868Z",
+    InputSourcesNames: "API",
+    ExternalSourceName: "MediTracker",
+  },
+  {
+    Descriptions: ["Harvested 3,201 Grams from Plant 1A4000000000000000111850"],
+    UserName: "Foo Bar (FOO123●●●)",
+    ActualDate: "2023-07-27",
+    RecordedDateTime: "2023-07-28T12:51:27.7186806Z",
+    InputSourcesNames: "API",
+    ExternalSourceName: "MediTracker",
+  },
+  {
+    Descriptions: ["Harvested 3,913.5 Grams from Plant 1A4000000000000000111852"],
+    UserName: "Foo Bar (FOO123●●●)",
+    ActualDate: "2023-07-27",
+    RecordedDateTime: "2023-07-28T12:51:27.8286957Z",
+    InputSourcesNames: "API",
+    ExternalSourceName: "MediTracker",
+  },
+  {
+    Descriptions: ["Harvested 2,939 Grams from Plant 1A4000000000000000111855"],
+    UserName: "Foo Bar (FOO123●●●)",
+    ActualDate: "2023-07-27",
+    RecordedDateTime: "2023-07-28T12:51:27.9236963Z",
+    InputSourcesNames: "API",
+    ExternalSourceName: "MediTracker",
+  },
+  {
+    Descriptions: ["Harvested 3,739 Grams from Plant 1A4000000000000000111861"],
+    UserName: "Foo Bar (FOO123●●●)",
+    ActualDate: "2023-07-27",
+    RecordedDateTime: "2023-07-28T12:51:28.0320791Z",
+    InputSourcesNames: "API",
+    ExternalSourceName: "MediTracker",
+  },
+  {
+    Descriptions: ["Harvested 3,933 Grams from Plant 1A4000000000000000111862"],
+    UserName: "Foo Bar (FOO123●●●)",
+    ActualDate: "2023-07-27",
+    RecordedDateTime: "2023-07-28T12:51:28.1370797Z",
+    InputSourcesNames: "API",
+    ExternalSourceName: "MediTracker",
+  },
+  {
+    Descriptions: ["Harvested 3,296.5 Grams from Plant 1A4000000000000000111864"],
+    UserName: "Foo Bar (FOO123●●●)",
+    ActualDate: "2023-07-27",
+    RecordedDateTime: "2023-07-28T12:51:28.2370806Z",
+    InputSourcesNames: "API",
+    ExternalSourceName: "MediTracker",
+  },
+  {
+    Descriptions: ["Harvested 3,764.5 Grams from Plant 1A4000000000000000111600"],
+    UserName: "Foo Bar (FOO123●●●)",
+    ActualDate: "2023-07-27",
+    RecordedDateTime: "2023-07-28T12:51:28.3430381Z",
+    InputSourcesNames: "API",
+    ExternalSourceName: "MediTracker",
+  },
+  {
+    Descriptions: ["Harvested 3,800 Grams from Plant 1A4000000000000000017788"],
+    UserName: "Foo Bar (FOO123●●●)",
+    ActualDate: "2023-07-27",
+    RecordedDateTime: "2023-07-28T12:51:28.4630376Z",
+    InputSourcesNames: "API",
+    ExternalSourceName: "MediTracker",
+  },
+  {
+    Descriptions: ["Harvested 3,960.5 Grams from Plant 1A4000000000000000017789"],
+    UserName: "Foo Bar (FOO123●●●)",
+    ActualDate: "2023-07-27",
+    RecordedDateTime: "2023-07-28T12:51:28.5689403Z",
+    InputSourcesNames: "API",
+    ExternalSourceName: "MediTracker",
+  },
+  {
+    Descriptions: ["Harvested 3,740 Grams from Plant 1A4000000000000000017790"],
+    UserName: "Foo Bar (FOO123●●●)",
+    ActualDate: "2023-07-27",
+    RecordedDateTime: "2023-07-28T12:51:28.6539412Z",
+    InputSourcesNames: "API",
+    ExternalSourceName: "MediTracker",
+  },
+  {
+    Descriptions: ["Harvested 3,269 Grams from Plant 1A4000000000000000017791"],
+    UserName: "Foo Bar (FOO123●●●)",
+    ActualDate: "2023-07-27",
+    RecordedDateTime: "2023-07-28T12:51:28.7498685Z",
+    InputSourcesNames: "API",
+    ExternalSourceName: "MediTracker",
+  },
+  {
+    Descriptions: ["Removed 4,860 Grams of waste"],
+    UserName: "Foo Bar (FOO123●●●)",
+    ActualDate: "2023-07-27",
+    RecordedDateTime: "2023-07-28T13:04:19.2562984Z",
+    InputSourcesNames: "User",
+    ExternalSourceName: "",
+  },
+  {
+    Descriptions: ["Removed 2,310 Grams of waste"],
+    UserName: "Foo Bar (FOO123●●●)",
+    ActualDate: "2023-08-05",
+    RecordedDateTime: "2023-08-05T20:39:11.7250086Z",
+    InputSourcesNames: "User",
+    ExternalSourceName: "",
+  },
+  {
+    Descriptions: ["Removed 312 Grams of waste"],
+    UserName: "Foo Bar (FOO123●●●)",
+    ActualDate: "2023-08-05",
+    RecordedDateTime: "2023-08-05T20:40:46.066794Z",
+    InputSourcesNames: "User",
+    ExternalSourceName: "",
+  },
+  {
+    Descriptions: ["Removed 74 Grams of waste"],
+    UserName: "Foo Bar (FOO123●●●)",
+    ActualDate: "2023-08-06",
+    RecordedDateTime: "2023-08-06T21:51:11.1627502Z",
+    InputSourcesNames: "User",
+    ExternalSourceName: "",
+  },
+  {
+    Descriptions: ["Removed 10 Grams of waste"],
+    UserName: "Foo Bar (FOO123●●●)",
+    ActualDate: "2023-08-05",
+    RecordedDateTime: "2023-08-06T21:52:05.4450142Z",
+    InputSourcesNames: "User",
+    ExternalSourceName: "",
+  },
+  {
+    Descriptions: [
+      "Used 12,680 Grams for Package (1A4000000000000000111336) of Unprocessed Flower - Heavy Fog #1",
+    ],
+    UserName: "Foo Bar (FOO123●●●)",
+    ActualDate: "2023-08-07",
+    RecordedDateTime: "2023-08-07T12:43:55.4281569Z",
+    InputSourcesNames: "User",
+    ExternalSourceName: "",
+  },
+  {
+    Descriptions: ["Removed 30 Grams of waste"],
+    UserName: "Foo Bar (FOO123●●●)",
+    ActualDate: "2023-08-06",
+    RecordedDateTime: "2023-08-09T21:51:46.8601343Z",
+    InputSourcesNames: "User",
+    ExternalSourceName: "",
+  },
+  {
+    Descriptions: ["Removed 26 Grams of waste"],
+    UserName: "Foo Bar (FOO123●●●)",
+    ActualDate: "2023-08-09",
+    RecordedDateTime: "2023-08-09T21:53:09.435027Z",
+    InputSourcesNames: "User",
+    ExternalSourceName: "",
+  },
+  {
+    Descriptions: ["Removed 2,280 Grams of waste"],
+    UserName: "Foo Bar (FOO123●●●)",
+    ActualDate: "2023-08-06",
+    RecordedDateTime: "2023-08-09T21:55:15.4451286Z",
+    InputSourcesNames: "User",
+    ExternalSourceName: "",
+  },
+  {
+    Descriptions: ["Used 400 Grams for Package (1A4000000000000000111800) of Floor Nugs"],
+    UserName: "Foo Bar (FOO123●●●)",
+    ActualDate: "2023-08-20",
+    RecordedDateTime: "2023-08-20T14:58:44.6370967Z",
+    InputSourcesNames: "User",
+    ExternalSourceName: "",
+  },
+  {
+    Descriptions: ["Harvest Batch has been finished"],
+    UserName: "Foo Bar (FOO123●●●)",
+    ActualDate: "2023-08-24",
+    RecordedDateTime: "2023-08-24T16:34:30.2629478Z",
+    InputSourcesNames: "User",
+    ExternalSourceName: "",
+  },
+];
+
 const BULK_BIOMASS_ACCEPTED_VIA_TRANSFER: IPackageHistoryData[] = [
   {
     Descriptions: [
       "Packaged 1,003 Pounds of SL Biscotti | Untrimmed Flower from another Package",
-      "- Took 1,003 Pounds of SL Biscotti | Untrimmed Flower from Package 1A4000000000000000002468",
+      "- Took 1,003 Pounds of SL Biscotti | Untrimmed Flower from Package 1A4000000000000000011168",
       "- Package Type: Product",
       "- Location: Building 1",
       "- Location Type: Default Location Type",
@@ -162,7 +434,7 @@ const PACKAGE_WITH_CHILD_SENT_FOR_TESTING: IPackageHistoryData[] = [
 describe("history.ts", () => {
   it("Correctly extracts parent labels from history", () => {
     expect(extractParentPackageLabelsFromHistory(BULK_BIOMASS_ACCEPTED_VIA_TRANSFER)).toEqual([
-      "1A4000000000000000002468",
+      "1A4000000000000000011168",
     ]);
     expect(extractParentPackageLabelsFromHistory(MULTI_PARENT_BIOMASS_PACKAGE)).toEqual([
       "1A4000000000000000000564",
@@ -225,7 +497,7 @@ describe("history.ts", () => {
 
     expect(
       extractParentPackageTagQuantityUnitItemSetsFromHistory(BULK_BIOMASS_ACCEPTED_VIA_TRANSFER)
-    ).toEqual([["1A4000000000000000002468", 1003, "Pounds", "SL Biscotti | Untrimmed Flower"]]);
+    ).toEqual([["1A4000000000000000011168", 1003, "Pounds", "SL Biscotti | Untrimmed Flower"]]);
     expect(
       extractParentPackageTagQuantityUnitItemSetsFromHistory(MULTI_PARENT_BIOMASS_PACKAGE)
     ).toEqual([

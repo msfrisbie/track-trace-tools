@@ -1,10 +1,10 @@
 import { HistoryTreeNodeType, PackageState } from "@/consts";
 import {
-  IHarvestHistoryData,
   IIndexedPackageData,
   IPackageAncestorTreeNode,
   IPackageChildTreeNode,
   IPackageHistoryData,
+  IPackageSourceHarvestData,
   IStrippedIndexedPackage,
 } from "@/interfaces";
 import { authManager } from "@/modules/auth-manager.module";
@@ -392,10 +392,10 @@ export async function getChildPackageHistoryTreeImpl({
   return node;
 }
 
-export async function getParentHarvests(label: string): Promise<IHarvestHistoryData[]> {
+export async function getParentHarvests(label: string): Promise<IPackageSourceHarvestData[]> {
   const pkg = await primaryDataLoader.activePackage(label);
 
-  const harvestHistory: IHarvestHistoryData[] =
+  const harvestHistory: IPackageSourceHarvestData[] =
     await primaryDataLoader.packageHarvestHistoryByPackageId(pkg.Id);
 
   store.dispatch(`packageHistory/${PackageHistoryActions.LOG_EVENT}`, {
