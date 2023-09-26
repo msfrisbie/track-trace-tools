@@ -83,9 +83,7 @@
 
         <!-- COGS -->
         <template v-if="selectedReports.find((report) => report.value === ReportType.COGS)">
-          <div
-            class="rounded border border-gray-300 p-2 flex flex-col items-stretch gap-2 overflow-hidden"
-          >
+          <div class="rounded border border-gray-300 p-2 flex flex-col items-stretch gap-2">
             <div class="font-semibold text-white ttt-purple-bg p-2 -m-2">COGS</div>
             <hr />
             <div class="flex flex-col items-stretch gap-4">
@@ -114,9 +112,7 @@
 
         <!-- COGS V2 -->
         <template v-if="selectedReports.find((report) => report.value === ReportType.COGS_V2)">
-          <div
-            class="rounded border border-gray-300 p-2 flex flex-col items-stretch gap-2 overflow-hidden"
-          >
+          <div class="rounded border border-gray-300 p-2 flex flex-col items-stretch gap-2">
             <div class="font-semibold text-white ttt-purple-bg p-2 -m-2">COGS</div>
 
             <div>
@@ -187,9 +183,7 @@
 
         <!-- COGS Tracker -->
         <template v-if="selectedReports.find((report) => report.value === ReportType.COGS_TRACKER)">
-          <div
-            class="rounded border border-gray-300 p-2 flex flex-col items-stretch gap-2 overflow-hidden"
-          >
+          <div class="rounded border border-gray-300 p-2 flex flex-col items-stretch gap-2">
             <div class="font-semibold text-white ttt-purple-bg p-2 -m-2">COGS Tracker</div>
             <hr />
             <div class="flex flex-col items-stretch gap-4">
@@ -220,9 +214,7 @@
         <template
           v-if="selectedReports.find((report) => report.value === ReportType.EMPLOYEE_SAMPLES)"
         >
-          <div
-            class="rounded border border-gray-300 p-2 flex flex-col items-stretch gap-2 overflow-hidden"
-          >
+          <div class="rounded border border-gray-300 p-2 flex flex-col items-stretch gap-2">
             <div class="font-semibold text-white ttt-purple-bg p-2 -m-2">Employee Samples</div>
             <hr />
             <div class="flex flex-col items-stretch gap-4">
@@ -270,9 +262,7 @@
         <template
           v-if="selectedReports.find((report) => report.value === ReportType.HARVEST_PACKAGES)"
         >
-          <div
-            class="rounded border border-gray-300 p-2 flex flex-col items-stretch gap-2 overflow-hidden"
-          >
+          <div class="rounded border border-gray-300 p-2 flex flex-col items-stretch gap-2">
             <div class="font-semibold text-white ttt-purple-bg p-2 -m-2">Harvest Packages</div>
             <hr />
             <div class="flex flex-col items-stretch gap-4">
@@ -320,9 +310,7 @@
 
         <!-- Packages -->
         <template v-if="selectedReports.find((report) => report.value === ReportType.PACKAGES)">
-          <div
-            class="rounded border border-gray-300 p-2 flex flex-col items-stretch gap-2 overflow-hidden"
-          >
+          <div class="rounded border border-gray-300 p-2 flex flex-col items-stretch gap-2">
             <div class="font-semibold text-white ttt-purple-bg p-2 -m-2">Packages</div>
             <hr />
             <div class="flex flex-col items-stretch gap-4">
@@ -416,9 +404,7 @@
 
         <!-- Harvests -->
         <template v-if="selectedReports.find((report) => report.value === ReportType.HARVESTS)">
-          <div
-            class="rounded border border-gray-300 p-2 flex flex-col items-stretch gap-2 overflow-hidden"
-          >
+          <div class="rounded border border-gray-300 p-2 flex flex-col items-stretch gap-2">
             <div class="font-semibold text-white ttt-purple-bg p-2 -m-2">Harvests</div>
             <hr />
             <div class="flex flex-col items-stretch gap-4">
@@ -492,9 +478,7 @@
         <template
           v-if="selectedReports.find((report) => report.value === ReportType.MATURE_PLANTS)"
         >
-          <div
-            class="rounded border border-gray-300 p-2 flex flex-col items-stretch gap-2 overflow-hidden"
-          >
+          <div class="rounded border border-gray-300 p-2 flex flex-col items-stretch gap-2">
             <div class="font-semibold text-white ttt-purple-bg p-2 -m-2">Mature Plants</div>
             <hr />
             <div class="flex flex-col items-stretch gap-4">
@@ -574,9 +558,7 @@
         <template
           v-if="selectedReports.find((report) => report.value === ReportType.IMMATURE_PLANTS)"
         >
-          <div
-            class="rounded border border-gray-300 p-2 flex flex-col items-stretch gap-2 overflow-hidden"
-          >
+          <div class="rounded border border-gray-300 p-2 flex flex-col items-stretch gap-2">
             <div class="font-semibold text-white ttt-purple-bg p-2 -m-2">Immature Plants</div>
             <hr />
             <div class="flex flex-col items-stretch gap-4">
@@ -655,9 +637,7 @@
         <template
           v-if="selectedReports.find((report) => report.value === ReportType.OUTGOING_TRANSFERS)"
         >
-          <div
-            class="rounded border border-gray-300 p-2 flex flex-col items-stretch gap-2 overflow-hidden"
-          >
+          <div class="rounded border border-gray-300 p-2 flex flex-col items-stretch gap-2">
             <div class="font-semibold text-white ttt-purple-bg p-2 -m-2">Outgoing Transfers</div>
             <hr />
             <div class="flex flex-col items-stretch gap-4">
@@ -754,9 +734,7 @@
             selectedReports.find((report) => report.value === ReportType.TRANSFER_HUB_TRANSFERS)
           "
         >
-          <div
-            class="rounded border border-gray-300 p-2 flex flex-col items-stretch gap-2 overflow-hidden"
-          >
+          <div class="rounded border border-gray-300 p-2 flex flex-col items-stretch gap-2">
             <div class="font-semibold text-white ttt-purple-bg p-2 -m-2">Hub Transfers</div>
             <hr />
             <div class="flex flex-col items-stretch gap-4">
@@ -830,9 +808,7 @@
         <template
           v-if="selectedReports.find((report) => report.value === ReportType.INCOMING_TRANSFERS)"
         >
-          <div
-            class="rounded border border-gray-300 p-2 flex flex-col items-stretch gap-2 overflow-hidden"
-          >
+          <div class="rounded border border-gray-300 p-2 flex flex-col items-stretch gap-2">
             <div class="font-semibold text-white ttt-purple-bg p-2 -m-2">Incoming Transfers</div>
             <hr />
             <div class="flex flex-col items-stretch gap-4">
@@ -915,9 +891,7 @@
 
         <!-- Tags -->
         <template v-if="selectedReports.find((report) => report.value === ReportType.TAGS)">
-          <div
-            class="rounded border border-gray-300 p-2 flex flex-col items-stretch gap-2 overflow-hidden"
-          >
+          <div class="rounded border border-gray-300 p-2 flex flex-col items-stretch gap-2">
             <div class="font-semibold text-white ttt-purple-bg p-2 -m-2">Tags</div>
             <hr />
             <div class="flex flex-col items-stretch gap-4">
@@ -974,9 +948,7 @@
             )
           "
         >
-          <div
-            class="rounded border border-gray-300 p-2 flex flex-col items-stretch gap-2 overflow-hidden"
-          >
+          <div class="rounded border border-gray-300 p-2 flex flex-col items-stretch gap-2">
             <div class="font-semibold text-white ttt-purple-bg p-2 -m-2">
               Outgoing Transfer Manifests
             </div>
@@ -1084,9 +1056,7 @@
         <template
           v-if="selectedReports.find((report) => report.value === ReportType.STRAGGLER_PACKAGES)"
         >
-          <div
-            class="rounded border border-gray-300 p-2 flex flex-col items-stretch gap-2 overflow-hidden"
-          >
+          <div class="rounded border border-gray-300 p-2 flex flex-col items-stretch gap-2">
             <div class="font-semibold text-white ttt-purple-bg p-2 -m-2">Straggler Packages</div>
             <hr />
             <div class="flex flex-col items-stretch gap-4">
@@ -1202,9 +1172,7 @@
         <template
           v-if="selectedReports.find((report) => report.value === ReportType.EMPLOYEE_AUDIT)"
         >
-          <div
-            class="rounded border border-gray-300 p-2 flex flex-col items-stretch gap-2 overflow-hidden"
-          >
+          <div class="rounded border border-gray-300 p-2 flex flex-col items-stretch gap-2">
             <div class="font-semibold text-white ttt-purple-bg p-2 -m-2">Employee Activity</div>
             <hr />
             <div class="flex flex-col items-stretch gap-4">
@@ -1270,9 +1238,7 @@
             selectedReports.find((report) => report.value === ReportType.MATURE_PLANTS_QUICKVIEW)
           "
         >
-          <div
-            class="rounded border border-gray-300 p-2 flex flex-col items-stretch gap-2 overflow-hidden"
-          >
+          <div class="rounded border border-gray-300 p-2 flex flex-col items-stretch gap-2">
             <div class="font-semibold text-white ttt-purple-bg p-2 -m-2">
               Mature Plants Quickview
             </div>
