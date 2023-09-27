@@ -96,7 +96,7 @@ export async function maybeLoadHarvestPackagesReportData({
   let harvests: IIndexedHarvestData[] = [];
   let packages: IIndexedPackageData[] = [];
   let unitsOfMeasure = await dynamicConstsManager.unitsOfMeasure();
-  console.log({ unitsOfMeasure });
+  
   const gramUnitOfMeasure = unitsOfMeasure.find((x) => x.Abbreviation === "g")!;
   const poundUnitOfmeasure = unitsOfMeasure.find((x) => x.Abbreviation === "lb")!;
 

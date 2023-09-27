@@ -144,6 +144,34 @@ export function extractHarvestPackageLabelOrNull(description: string): string | 
   return null;
 }
 
+export function extractPackageAdjustmentSetOrNull(descriptions: string[]): {
+  quantity: number;
+  unitOfMeasure: string;
+  reason: string;
+  note: string;
+} | null {
+  const joinedDescriptions = descriptions.join(" ");
+
+  const matchers: RegExp[] = [
+    new RegExp(`Package adjusted by (-?\d+[\.]?\d*) ([^-]+) - Reason: ([^-]+)- Note: (.*)`),
+  ];
+
+  for (const matcher of matchers) {
+    const match = joinedDescriptions.match(matcher);
+
+    if (match) {
+      return {
+        quantity: parseFloat(match[1]!),
+        unitOfMeasure: match[2]!.trim(),
+        reason: match[3]!.trim(),
+        note: match[4]!.trim(),
+      };
+    }
+  }
+
+  return null;
+}
+
 export function extractChildPackageTagQuantityPairOrNull(
   description: string
 ): [string, number] | null {
@@ -341,4 +369,23 @@ export function extractHarvestChildPackageLabelsFromHistory(
   }
 
   return labels;
+}
+
+export function extractAdjustmentReasonNoteSetsFromHistory(historyList: IPackageHistoryData[]): {
+  quantity: number;
+  unitOfMeasure: string;
+  reason: string;
+  note: string;
+}[] {
+  const sets: {
+    quantity: number;
+    unitOfMeasure: string;
+    reason: string;
+    note: string;
+  }[] = [];
+
+  for (const history of historyList) {
+  }
+
+  return sets;
 }
