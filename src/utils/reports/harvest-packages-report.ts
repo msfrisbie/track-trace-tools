@@ -27,19 +27,28 @@ interface IHarvestPackagesReportFormFilters {
   harvestDateLt: string;
   shouldFilterHarvestDateGt: boolean;
   shouldFilterHarvestDateLt: boolean;
-  includeActive: boolean;
-  includeInactive: boolean;
   licenseOptions: string[];
   licenses: string[];
+}
+
+export function getPackageSegment(pkg: IIndexedPackageData): {materialType: string, stage: string} {
+  if (pkg.IsTestingSample) {
+    // return {
+
+    // }
+  }
+
+  return {
+    materialType: "Unknown",
+    stage: "Unknown"
+  }
 }
 
 export const harvestPackagesFormFiltersFactory: () => IHarvestPackagesReportFormFilters = () => ({
   harvestDateGt: todayIsodate(),
   harvestDateLt: todayIsodate(),
-  shouldFilterHarvestDateGt: false,
-  shouldFilterHarvestDateLt: false,
-  includeActive: true,
-  includeInactive: false,
+  shouldFilterHarvestDateGt: true,
+  shouldFilterHarvestDateLt: true,
   licenseOptions: facilityManager.cachedFacilities.map((x) => x.licenseNumber),
   licenses: facilityManager.cachedFacilities.map((x) => x.licenseNumber),
   // .filter((x) => x.startsWith("PR-") || x.startsWith("AU-P")),
@@ -55,9 +64,6 @@ export function addHarvestPackagesReport({
   const harvestFilter: IHarvestFilter = {};
 
   const licenses: string[] = harvestPackagesFormFilters.licenses;
-
-  harvestFilter.includeActive = harvestPackagesFormFilters.includeActive;
-  harvestFilter.includeInactive = harvestPackagesFormFilters.includeInactive;
 
   harvestFilter.harvestDateGt = harvestPackagesFormFilters.shouldFilterHarvestDateGt
     ? harvestPackagesFormFilters.harvestDateGt
@@ -241,8 +247,10 @@ export async function maybeLoadHarvestPackagesReportData({
 
           harvestPackage.history = await dataLoader.packageHistoryByPackageId(harvestPackage.Id);
 
-          // Also extract waste, moisture loss,
+          // Also extract waste, moisture loss, adjustments
           const childPackageLabels = extractChildPackageLabelsFromHistory(harvestPackage.history);
+
+          console.log({ childPackageLabels });
 
           for (const childPackageLabel of childPackageLabels) {
             const childPackage = packageMap.get(childPackageLabel);

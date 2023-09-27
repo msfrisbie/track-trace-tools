@@ -11,6 +11,399 @@ import {
   extractTestSamplePackageLabelsFromHistory,
 } from "./history";
 
+const HARVEST_PACKAGE_HISTORY: IPackageHistoryData[] = [
+      {
+          "Descriptions": [
+              "Packaged 4,517 Grams of OG Kush Popcorn from another Package",
+              "- Took 4,517 Grams of OG Popcorn from Package 1A4000000000000000020465",
+              "- Package Type: Product",
+              "- Location: Staging Room",
+              "- Location Type: Default Location Type"
+          ],
+          "UserName": "FOO BAR (BAR1●●●)",
+          "ActualDate": "2023-01-26",
+          "RecordedDateTime": "2023-01-26T17:39:36.6530204Z",
+          "InputSourcesNames": "User",
+          "ExternalSourceName": ""
+      },
+      {
+          "Descriptions": [
+              "Moved to location \"Packaging\"",
+              "- Location Type: Default Location Type"
+          ],
+          "UserName": "FOO BAR (BAR●●●)",
+          "ActualDate": "2023-01-27",
+          "RecordedDateTime": "2023-01-27T16:28:31.215767Z",
+          "InputSourcesNames": "User",
+          "ExternalSourceName": ""
+      },
+      {
+          "Descriptions": [
+              "Package adjusted by -14.18 Grams",
+              "- Reason: Waste",
+              "- Note: (hidden)"
+          ],
+          "UserName": "FOO BAR(FOO0●●●)",
+          "ActualDate": "2023-02-18",
+          "RecordedDateTime": "2023-02-18T20:52:10.2028172Z",
+          "InputSourcesNames": "User",
+          "ExternalSourceName": ""
+      },
+      {
+          "Descriptions": [
+              "Used 153.88 Grams for Package 1A4000000000000000024269"
+          ],
+          "UserName": "FOO BAR(FOO0●●●)",
+          "ActualDate": "2023-02-18",
+          "RecordedDateTime": "2023-02-18T20:53:43.0750258Z",
+          "InputSourcesNames": "User",
+          "ExternalSourceName": ""
+      },
+      {
+          "Descriptions": [
+              "Package adjusted by -50.94 Grams",
+              "- Reason: Moisture Weight Change",
+              "- Note: (hidden)"
+          ],
+          "UserName": "FOO BAR(FOO0●●●)",
+          "ActualDate": "2023-02-18",
+          "RecordedDateTime": "2023-02-18T20:54:42.5372668Z",
+          "InputSourcesNames": "User",
+          "ExternalSourceName": ""
+      },
+      {
+          "Descriptions": [
+              "Moved to location \"Finished Product Vault\"",
+              "- Location Type: Default Location Type"
+          ],
+          "UserName": "FOO BAR(FOO0●●●)",
+          "ActualDate": "2023-02-18",
+          "RecordedDateTime": "2023-02-18T20:54:50.4840128Z",
+          "InputSourcesNames": "User",
+          "ExternalSourceName": ""
+      },
+      {
+          "Descriptions": [
+              "Used 140 Grams for Package 1A4000000000000000024270"
+          ],
+          "UserName": "FOO BAR(FOO0●●●)",
+          "ActualDate": "2023-02-18",
+          "RecordedDateTime": "2023-02-18T20:58:39.3481842Z",
+          "InputSourcesNames": "User",
+          "ExternalSourceName": ""
+      },
+      {
+          "Descriptions": [
+              "Used 140 Grams for Package 1A4000000000000000024271"
+          ],
+          "UserName": "FOO BAR(FOO0●●●)",
+          "ActualDate": "2023-02-18",
+          "RecordedDateTime": "2023-02-18T20:58:39.6331846Z",
+          "InputSourcesNames": "User",
+          "ExternalSourceName": ""
+      },
+      {
+          "Descriptions": [
+              "Used 140 Grams for Package 1A4000000000000000024272"
+          ],
+          "UserName": "FOO BAR(FOO0●●●)",
+          "ActualDate": "2023-02-18",
+          "RecordedDateTime": "2023-02-18T20:58:39.7931799Z",
+          "InputSourcesNames": "User",
+          "ExternalSourceName": ""
+      },
+      {
+          "Descriptions": [
+              "Used 140 Grams for Package 1A4000000000000000024273"
+          ],
+          "UserName": "FOO BAR(FOO0●●●)",
+          "ActualDate": "2023-02-18",
+          "RecordedDateTime": "2023-02-18T20:58:39.9492186Z",
+          "InputSourcesNames": "User",
+          "ExternalSourceName": ""
+      },
+      {
+          "Descriptions": [
+              "Used 140 Grams for Package 1A4000000000000000024274"
+          ],
+          "UserName": "FOO BAR(FOO0●●●)",
+          "ActualDate": "2023-02-18",
+          "RecordedDateTime": "2023-02-18T20:58:40.1242214Z",
+          "InputSourcesNames": "User",
+          "ExternalSourceName": ""
+      },
+      {
+          "Descriptions": [
+              "Used 140 Grams for Package 1A4000000000000000024275"
+          ],
+          "UserName": "FOO BAR(FOO0●●●)",
+          "ActualDate": "2023-02-18",
+          "RecordedDateTime": "2023-02-18T20:58:40.2892163Z",
+          "InputSourcesNames": "User",
+          "ExternalSourceName": ""
+      },
+      {
+          "Descriptions": [
+              "Used 140 Grams for Package 1A4000000000000000024276"
+          ],
+          "UserName": "FOO BAR(FOO0●●●)",
+          "ActualDate": "2023-02-18",
+          "RecordedDateTime": "2023-02-18T20:58:40.4297711Z",
+          "InputSourcesNames": "User",
+          "ExternalSourceName": ""
+      },
+      {
+          "Descriptions": [
+              "Used 140 Grams for Package 1A4000000000000000024277"
+          ],
+          "UserName": "FOO BAR(FOO0●●●)",
+          "ActualDate": "2023-02-18",
+          "RecordedDateTime": "2023-02-18T20:58:40.6097677Z",
+          "InputSourcesNames": "User",
+          "ExternalSourceName": ""
+      },
+      {
+          "Descriptions": [
+              "Used 140 Grams for Package 1A4000000000000000024278"
+          ],
+          "UserName": "FOO BAR(FOO0●●●)",
+          "ActualDate": "2023-02-18",
+          "RecordedDateTime": "2023-02-18T20:58:40.7797673Z",
+          "InputSourcesNames": "User",
+          "ExternalSourceName": ""
+      },
+      {
+          "Descriptions": [
+              "Used 140 Grams for Package 1A4000000000000000024279"
+          ],
+          "UserName": "FOO BAR(FOO0●●●)",
+          "ActualDate": "2023-02-18",
+          "RecordedDateTime": "2023-02-18T20:58:40.9508152Z",
+          "InputSourcesNames": "User",
+          "ExternalSourceName": ""
+      },
+      {
+          "Descriptions": [
+              "Used 140 Grams for Package 1A4000000000000000024280"
+          ],
+          "UserName": "FOO BAR(FOO0●●●)",
+          "ActualDate": "2023-02-18",
+          "RecordedDateTime": "2023-02-18T20:58:41.1069128Z",
+          "InputSourcesNames": "User",
+          "ExternalSourceName": ""
+      },
+      {
+          "Descriptions": [
+              "Used 140 Grams for Package 1A4000000000000000024281"
+          ],
+          "UserName": "FOO BAR(FOO0●●●)",
+          "ActualDate": "2023-02-18",
+          "RecordedDateTime": "2023-02-18T20:58:41.3586094Z",
+          "InputSourcesNames": "User",
+          "ExternalSourceName": ""
+      },
+      {
+          "Descriptions": [
+              "Used 140 Grams for Package 1A4000000000000000024282"
+          ],
+          "UserName": "FOO BAR(FOO0●●●)",
+          "ActualDate": "2023-02-18",
+          "RecordedDateTime": "2023-02-18T20:58:41.5749149Z",
+          "InputSourcesNames": "User",
+          "ExternalSourceName": ""
+      },
+      {
+          "Descriptions": [
+              "Used 140 Grams for Package 1A4000000000000000024283"
+          ],
+          "UserName": "FOO BAR(FOO0●●●)",
+          "ActualDate": "2023-02-18",
+          "RecordedDateTime": "2023-02-18T20:58:41.7699126Z",
+          "InputSourcesNames": "User",
+          "ExternalSourceName": ""
+      },
+      {
+          "Descriptions": [
+              "Used 140 Grams for Package 1A4000000000000000024284"
+          ],
+          "UserName": "FOO BAR(FOO0●●●)",
+          "ActualDate": "2023-02-18",
+          "RecordedDateTime": "2023-02-18T20:58:41.9450652Z",
+          "InputSourcesNames": "User",
+          "ExternalSourceName": ""
+      },
+      {
+          "Descriptions": [
+              "Used 140 Grams for Package 1A4000000000000000024285"
+          ],
+          "UserName": "FOO BAR(FOO0●●●)",
+          "ActualDate": "2023-02-18",
+          "RecordedDateTime": "2023-02-18T20:58:42.1550613Z",
+          "InputSourcesNames": "User",
+          "ExternalSourceName": ""
+      },
+      {
+          "Descriptions": [
+              "Used 140 Grams for Package 1A4000000000000000024286"
+          ],
+          "UserName": "FOO BAR(FOO0●●●)",
+          "ActualDate": "2023-02-18",
+          "RecordedDateTime": "2023-02-18T20:58:42.3250633Z",
+          "InputSourcesNames": "User",
+          "ExternalSourceName": ""
+      },
+      {
+          "Descriptions": [
+              "Used 140 Grams for Package 1A4000000000000000024287"
+          ],
+          "UserName": "FOO BAR(FOO0●●●)",
+          "ActualDate": "2023-02-18",
+          "RecordedDateTime": "2023-02-18T20:58:42.5001512Z",
+          "InputSourcesNames": "User",
+          "ExternalSourceName": ""
+      },
+      {
+          "Descriptions": [
+              "Used 140 Grams for Package 1A4000000000000000024288"
+          ],
+          "UserName": "FOO BAR(FOO0●●●)",
+          "ActualDate": "2023-02-18",
+          "RecordedDateTime": "2023-02-18T20:58:42.6954832Z",
+          "InputSourcesNames": "User",
+          "ExternalSourceName": ""
+      },
+      {
+          "Descriptions": [
+              "Used 140 Grams for Package 1A4000000000000000024289"
+          ],
+          "UserName": "FOO BAR(FOO0●●●)",
+          "ActualDate": "2023-02-18",
+          "RecordedDateTime": "2023-02-18T20:58:42.8926749Z",
+          "InputSourcesNames": "User",
+          "ExternalSourceName": ""
+      },
+      {
+          "Descriptions": [
+              "Used 140 Grams for Package 1A4000000000000000024290"
+          ],
+          "UserName": "FOO BAR(FOO0●●●)",
+          "ActualDate": "2023-02-18",
+          "RecordedDateTime": "2023-02-18T20:58:43.0626694Z",
+          "InputSourcesNames": "User",
+          "ExternalSourceName": ""
+      },
+      {
+          "Descriptions": [
+              "Used 140 Grams for Package 1A4000000000000000024291"
+          ],
+          "UserName": "FOO BAR(FOO0●●●)",
+          "ActualDate": "2023-02-18",
+          "RecordedDateTime": "2023-02-18T20:58:43.2526701Z",
+          "InputSourcesNames": "User",
+          "ExternalSourceName": ""
+      },
+      {
+          "Descriptions": [
+              "Used 140 Grams for Package 1A4000000000000000024292"
+          ],
+          "UserName": "FOO BAR(FOO0●●●)",
+          "ActualDate": "2023-02-18",
+          "RecordedDateTime": "2023-02-18T20:58:43.4287644Z",
+          "InputSourcesNames": "User",
+          "ExternalSourceName": ""
+      },
+      {
+          "Descriptions": [
+              "Used 140 Grams for Package 1A4000000000000000024293"
+          ],
+          "UserName": "FOO BAR(FOO0●●●)",
+          "ActualDate": "2023-02-18",
+          "RecordedDateTime": "2023-02-18T20:58:43.6087591Z",
+          "InputSourcesNames": "User",
+          "ExternalSourceName": ""
+      },
+      {
+          "Descriptions": [
+              "Used 140 Grams for Package 1A4000000000000000024294"
+          ],
+          "UserName": "FOO BAR(FOO0●●●)",
+          "ActualDate": "2023-02-18",
+          "RecordedDateTime": "2023-02-18T20:58:43.783759Z",
+          "InputSourcesNames": "User",
+          "ExternalSourceName": ""
+      },
+      {
+          "Descriptions": [
+              "Used 140 Grams for Package 1A4000000000000000024295"
+          ],
+          "UserName": "FOO BAR(FOO0●●●)",
+          "ActualDate": "2023-02-18",
+          "RecordedDateTime": "2023-02-18T20:58:43.9525986Z",
+          "InputSourcesNames": "User",
+          "ExternalSourceName": ""
+      },
+      {
+          "Descriptions": [
+              "Used 140 Grams for Package 1A4000000000000000024296"
+          ],
+          "UserName": "FOO BAR(FOO0●●●)",
+          "ActualDate": "2023-02-18",
+          "RecordedDateTime": "2023-02-18T20:58:44.1426007Z",
+          "InputSourcesNames": "User",
+          "ExternalSourceName": ""
+      },
+      {
+          "Descriptions": [
+              "Used 140 Grams for Package 1A4000000000000000024297"
+          ],
+          "UserName": "FOO BAR(FOO0●●●)",
+          "ActualDate": "2023-02-18",
+          "RecordedDateTime": "2023-02-18T20:58:44.3125961Z",
+          "InputSourcesNames": "User",
+          "ExternalSourceName": ""
+      },
+      {
+          "Descriptions": [
+              "Used 140 Grams for Package 1A4000000000000000024298"
+          ],
+          "UserName": "FOO BAR(FOO0●●●)",
+          "ActualDate": "2023-02-18",
+          "RecordedDateTime": "2023-02-18T20:58:44.4887055Z",
+          "InputSourcesNames": "User",
+          "ExternalSourceName": ""
+      },
+      {
+          "Descriptions": [
+              "Used 140 Grams for Package 1A4000000000000000024299"
+          ],
+          "UserName": "FOO BAR(FOO0●●●)",
+          "ActualDate": "2023-02-18",
+          "RecordedDateTime": "2023-02-18T20:58:44.6837075Z",
+          "InputSourcesNames": "User",
+          "ExternalSourceName": ""
+      },
+      {
+          "Descriptions": [
+              "Used 98 Grams for Package 1A4000000000000000003023"
+          ],
+          "UserName": "FOO BAR(FOO0●●●)",
+          "ActualDate": "2023-03-01",
+          "RecordedDateTime": "2023-03-01T22:52:43.2340572Z",
+          "InputSourcesNames": "User",
+          "ExternalSourceName": ""
+      },
+      {
+          "Descriptions": [
+              "Package finished"
+          ],
+          "UserName": "FOO BAR(FOO0●●●)",
+          "ActualDate": "2023-03-01",
+          "RecordedDateTime": "2023-03-01T22:52:43.5090553Z",
+          "InputSourcesNames": "User",
+          "ExternalSourceName": ""
+      }
+  ];
+
 const INACTIVE_HARVEST_HISTORY: IHarvestHistoryData[] = [
   {
     Descriptions: [
