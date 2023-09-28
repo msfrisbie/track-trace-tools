@@ -27,7 +27,6 @@ import { createCogsSpreadsheetOrError } from "./reports/cogs-report";
 import { createCogsTrackerSpreadsheetOrError } from "./reports/cogs-tracker-report";
 import { createCogsV2SpreadsheetOrError } from "./reports/cogs-v2-report";
 import { createEmployeeSamplesSpreadsheetOrError } from "./reports/employee-samples-report";
-import { createHarvestPackagesReportOrError } from "./reports/harvest-packages-report";
 import {
   extractFlattenedData,
   getSheetTitle,
@@ -375,13 +374,6 @@ export async function createSpreadsheetOrError({
       reportConfig,
     });
   }
-
-  // if (reportConfig[ReportType.HARVEST_PACKAGES]) {
-  //   return createHarvestPackagesReportOrError({
-  //     reportData,
-  //     reportConfig,
-  //   });
-  // }
 
   const flattenedCache = new Map<ReportType, any[]>();
 

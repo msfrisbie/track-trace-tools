@@ -7,7 +7,6 @@ import {
 import { DataLoader, getDataLoaderByLicense } from "@/modules/data-loader/data-loader.module";
 import { dynamicConstsManager } from "@/modules/dynamic-consts-manager.module";
 import { facilityManager } from "@/modules/facility-manager.module";
-import store from "@/store/page-overlay/index";
 import { ReportsMutations, ReportType } from "@/store/page-overlay/modules/reports/consts";
 import {
   IReportConfig,
@@ -31,17 +30,19 @@ interface IHarvestPackagesReportFormFilters {
   licenses: string[];
 }
 
-export function getPackageSegment(pkg: IIndexedPackageData): {materialType: string, stage: string} {
+export function getPackageSegment(pkg: IIndexedPackageData): {
+  materialType: string;
+  stage: string;
+} {
   if (pkg.IsTestingSample) {
     // return {
-
     // }
   }
 
   return {
     materialType: "Unknown",
-    stage: "Unknown"
-  }
+    stage: "Unknown",
+  };
 }
 
 export const harvestPackagesFormFiltersFactory: () => IHarvestPackagesReportFormFilters = () => ({
@@ -96,7 +97,7 @@ export async function maybeLoadHarvestPackagesReportData({
   let harvests: IIndexedHarvestData[] = [];
   let packages: IIndexedPackageData[] = [];
   let unitsOfMeasure = await dynamicConstsManager.unitsOfMeasure();
-  
+
   const gramUnitOfMeasure = unitsOfMeasure.find((x) => x.Abbreviation === "g")!;
   const poundUnitOfmeasure = unitsOfMeasure.find((x) => x.Abbreviation === "lb")!;
 
@@ -221,7 +222,7 @@ export async function maybeLoadHarvestPackagesReportData({
           harvestPackageMatrix.push([
             harvestPackage.LicenseNumber,
             harvest.Name,
-            harvestPackage.Label.slice(-8).replace(/^0+/, ""),
+            harvestPackage.Label, //.slice(-8).replace(/^0+/, ""),
             "",
             strainName,
             "",
@@ -265,7 +266,7 @@ export async function maybeLoadHarvestPackagesReportData({
                 childPackage.LicenseNumber,
                 harvest.Name,
                 "",
-                childPackage.Label.slice(-8).replace(/^0+/, ""),
+                childPackage.Label, //.slice(-8).replace(/^0+/, ""),
                 strainName,
                 "",
                 childPackage.Item.Name, // TODO convert
@@ -284,7 +285,54 @@ export async function maybeLoadHarvestPackagesReportData({
                   poundUnitOfmeasure
                 ),
                 "Denug", // TODO convert
+                "Child"
               ]);
+
+              dataLoader = await getDataLoaderByLicense(childPackage.LicenseNumber);
+
+              childPackage.history = await dataLoader.packageHistoryByPackageId(childPackage.Id);
+
+              const grandchildPackageLabels = extractChildPackageLabelsFromHistory(
+                childPackage.history
+              );
+
+              for (const grandchildPackageLabel of grandchildPackageLabels) {
+
+                  const grandchildPackage = packageMap.get(grandchildPackageLabel);
+      
+                  if (!grandchildPackage) {
+                    harvestPackageMatrix.push([
+                      ...Array(10).fill(""),
+                      `Could not match grandchild package ${grandchildPackageLabel}`,
+                    ]);
+                  } else {
+                    harvestPackageMatrix.push([
+                      grandchildPackage.LicenseNumber,
+                      harvest.Name,
+                      "",
+                      grandchildPackage.Label, //.slice(-8).replace(/^0+/, ""),
+                      strainName,
+                      "",
+                      grandchildPackage.Item.Name, // TODO convert
+                      convertUnits(
+                        grandchildPackage.Quantity,
+                        unitsOfMeasure.find(
+                          (x) => x.Abbreviation === grandchildPackage.UnitOfMeasureAbbreviation
+                        )!,
+                        gramUnitOfMeasure
+                      ),
+                      convertUnits(
+                        grandchildPackage.Quantity,
+                        unitsOfMeasure.find(
+                          (x) => x.Abbreviation === grandchildPackage.UnitOfMeasureAbbreviation
+                        )!,
+                        poundUnitOfmeasure
+                      ),
+                      "Denug", // TODO convert
+                      "Grandchild"
+                    ]);
+                  }
+              })
             }
           }
         }
@@ -308,22 +356,6 @@ export async function maybeLoadHarvestPackagesReportData({
     reportData[ReportType.HARVEST_PACKAGES] = {
       harvestPackageMatrix,
     };
-  }
-}
-
-export async function createHarvestPackagesReportOrError({
-  reportData,
-  reportConfig,
-}: {
-  reportData: IReportData;
-  reportConfig: IReportConfig;
-}): Promise<any> {
-  if (!store.state.pluginAuth?.authState?.license) {
-    throw new Error("Invalid authState");
-  }
-
-  if (!reportData[ReportType.HARVEST_PACKAGES]) {
-    throw new Error("Missing harvest packages data");
   }
 }
 

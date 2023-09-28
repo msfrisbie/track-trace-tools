@@ -153,7 +153,7 @@ export function extractPackageAdjustmentSetOrNull(descriptions: string[]): {
   const joinedDescriptions = descriptions.join(" ");
 
   const matchers: RegExp[] = [
-    new RegExp(`Package adjusted by (-?\d+[\.]?\d*) ([^-]+) - Reason: ([^-]+)- Note: (.*)`),
+    new RegExp(`Package adjusted by (-?\\d+[\\.]?\\d*) ([^-]+) - Reason: ([^-]+)- Note: (.*)`),
   ];
 
   for (const matcher of matchers) {
@@ -385,6 +385,11 @@ export function extractAdjustmentReasonNoteSetsFromHistory(historyList: IPackage
   }[] = [];
 
   for (const history of historyList) {
+    const result = extractPackageAdjustmentSetOrNull(history.Descriptions);
+
+    if (result) {
+      sets.push(result);
+    }
   }
 
   return sets;
