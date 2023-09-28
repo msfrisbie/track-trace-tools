@@ -82,12 +82,12 @@ export default Vue.extend({
           count: 0,
           enabled: true,
         },
-        {
-          text: "TRANSFER TEMPLATES",
-          value: SearchType.TRANSFER_TEMPLATES,
-          count: 0,
-          enabled: false,
-        },
+        // {
+        //   text: "TRANSFER TEMPLATES",
+        //   value: SearchType.TRANSFER_TEMPLATES,
+        //   count: 0,
+        //   enabled: false,
+        // },
         {
           text: "HARVESTS",
           value: SearchType.HARVESTS,

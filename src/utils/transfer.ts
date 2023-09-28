@@ -1,6 +1,7 @@
 import {
   IDestinationData,
   IDestinationPackageData,
+  IIndexedDestinationPackageData,
   IIndexedTransferData,
   IMetrcDriverData,
   IMetrcFacilityData,
@@ -8,7 +9,10 @@ import {
   ITransferHistoryData,
 } from "@/interfaces";
 import { authManager } from "@/modules/auth-manager.module";
-import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
+import {
+  getDataLoaderByLicense,
+  primaryDataLoader,
+} from "@/modules/data-loader/data-loader.module";
 import { dynamicConstsManager } from "@/modules/dynamic-consts-manager.module";
 import { toastManager } from "@/modules/toast-manager.module";
 import store from "@/store/page-overlay/index";
@@ -304,4 +308,49 @@ export async function createScanSheet(transferId: number, manifestNumber: string
       solid: true,
     });
   }
+}
+
+export async function findMatchingTransferPackages({
+  queryString,
+  startDate,
+  licenses,
+}: {
+  queryString: string;
+  startDate?: string;
+  licenses: string[];
+}): Promise<IIndexedDestinationPackageData[]> {
+  const packages: IIndexedDestinationPackageData[] = [];
+
+  for (const license of licenses) {
+    const dataLoader = await getDataLoaderByLicense(license);
+
+    const transfers = [
+      ...(await dataLoader.outgoingInactiveTransfers()),
+      ...(await dataLoader.rejectedTransfers()),
+    ];
+
+    for (const transfer of transfers) {
+      if (startDate && transfer.CreatedDateTime < startDate) {
+        continue;
+      }
+
+      const destinations = await dataLoader.transferDestinations(transfer.Id);
+
+      for (const destination of destinations) {
+        const transferPackages = await dataLoader.destinationPackages(destination.Id);
+
+        for (const transferPackage of transferPackages) {
+          if (
+            transferPackage.PackageLabel.toLocaleLowerCase().includes(
+              queryString.toLocaleLowerCase()
+            )
+          ) {
+            packages.push(transferPackage);
+          }
+        }
+      }
+    }
+  }
+
+  return packages;
 }

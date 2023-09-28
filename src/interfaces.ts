@@ -36,6 +36,7 @@ import {
   DriverLayoverLeg,
   ITransferBuilderState,
 } from "./store/page-overlay/modules/transfer-builder/interfaces";
+import { ITransferPackageSearchState } from "./store/page-overlay/modules/transfer-package-search/interfaces";
 import { ITransferSearchState } from "./store/page-overlay/modules/transfer-search/interfaces";
 import { CsvUpload, CsvUploadStatus } from "./types";
 import { UnitOfMeasureAbbreviation, UnitOfMeasureName } from "./utils/units";
@@ -220,6 +221,7 @@ export interface IPluginState extends IRootState {
   explorer: IExplorerState;
   employeeSamples: IEmployeeSamplesState;
   createPackageCsv: ICreatePackageCsvState;
+  transferPackageSearch: ITransferPackageSearchState;
 }
 
 export type MetrcTagType = "CannabisPlant" | "CannabisPackage" | "MedicalPlant" | "MedicalPackage";

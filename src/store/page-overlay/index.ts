@@ -44,6 +44,7 @@ import {
 } from "./modules/split-package-builder";
 import { tagSearchModule, tagSearchReducer } from "./modules/tag-search";
 import { transferBuilderModule, transferBuilderReducer } from "./modules/transfer-builder/index";
+import { transferPackageSearchModule, transferPackageSearchReducer } from "./modules/transfer-package-search";
 import { transferSearchModule, transferSearchReducer } from "./modules/transfer-search";
 
 // Taken from https://gist.github.com/Myeris/3f13b42f6764ded6640cef693d9d1987
@@ -84,6 +85,7 @@ const vuexShared = {
       reports: reportsReducer(state.reports),
       employeeSamples: employeeSamplesReducer(state.employeeSamples),
       createPackageCsv: createPackageCsvReducer(state.createPackageCsv),
+      transferPackageSearch: transferPackageSearchReducer(state.transferPackageSearch),
     };
   },
 };
@@ -423,6 +425,10 @@ const vuexStore = new Vuex.Store<IPluginState>({
     announcements: {
       namespaced: true,
       ...announcementsModule,
+    },
+    transferPackageSearch: {
+      namespaced: true,
+      ...transferPackageSearchModule,
     },
   },
   plugins: [vuexPersistence.plugin],
