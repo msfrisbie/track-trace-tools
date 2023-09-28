@@ -1,10 +1,11 @@
 import { IPluginState } from "@/interfaces";
 import { ActionContext } from "vuex";
-import { TransferPackageSearchMutations, TransferPackageSearchGetters, TransferPackageSearchActions } from "./consts";
+import { TransferPackageSearchMutations, TransferPackageSearchGetters, TransferPackageSearchActions, TransferPackageSearchState } from "./consts";
 import { ITransferPackageSearchState } from "./interfaces";
 
 const inMemoryState = {
-  startDate: null
+  startDate: null,
+  state: TransferPackageSearchState.INITIAL
 };
 
 const persistedState = {};

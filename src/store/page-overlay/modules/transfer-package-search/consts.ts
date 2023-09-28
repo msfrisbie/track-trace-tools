@@ -1,3 +1,10 @@
+export enum TransferPackageSearchState {
+  INITIAL = "INITIAL",
+  INFLIGHT = "INFLIGHT",
+  SUCCESS = "SUCCESS",
+  ERROR = "ERROR"
+}
+
 export enum TransferPackageSearchMutations {
   TRANSFER_PACKAGE_SEARCH_MUTATION = "TRANSFER_PACKAGE_SEARCH_MUTATION",
 }
