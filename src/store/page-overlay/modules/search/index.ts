@@ -25,7 +25,6 @@ const inMemoryState = {
 };
 
 const persistedState = {
-  expandSearchOnNextLoad: false,
   queryStringHistory: [],
 };
 
@@ -39,12 +38,6 @@ export const searchModule = {
   mutations: {},
   getters: {},
   actions: {
-    [SearchActions.SET_EXPAND_SEARCH_ON_NEXT_LOAD](
-      ctx: ActionContext<ISearchState, IPluginState>,
-      { expandSearchOnNextLoad }: { expandSearchOnNextLoad: boolean }
-    ) {
-      ctx.state.expandSearchOnNextLoad = expandSearchOnNextLoad;
-    },
     [SearchActions.SET_QUERY_STRING](
       ctx: ActionContext<ISearchState, IPluginState>,
       { queryString }: { queryString: string }

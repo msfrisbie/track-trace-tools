@@ -569,20 +569,6 @@ export default Vue.extend({
     getItemUnitOfMeasureNameOrError,
     getItemUnitOfMeasureAbbreviationOrError,
     facilitySummary,
-    maybeNavigateAndOpenPackageSearch() {
-      // Currently unused. Will force open the package search
-      if (window.location.pathname === this.packagesUrl) {
-        modalManager.dispatchModalEvent(ModalType.BUILDER, ModalAction.CLOSE);
-
-        this.setShowSearchResults({ showSearchResults: true });
-      } else {
-        store.dispatch(`packageSearch/${PackageSearchActions.SET_EXPAND_SEARCH_ON_NEXT_LOAD}`, {
-          expandSearchOnNextLoad: true,
-        });
-
-        window.location.href = this.packagesUrl;
-      }
-    },
     selectDestinationFacility(facility: IMetrcFacilityData) {
       this.destinationFacility = null;
 

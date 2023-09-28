@@ -13,6 +13,7 @@ export enum SearchActions {
 
 export enum SearchType {
   PACKAGES = "PACKAGES",
+  TRANSFER_PACKAGES = "TRANSFER_PACKAGES",
   PLANTS = "PLANTS",
   TAGS = "TAGS",
   TRANSFERS = "TRANSFERS",

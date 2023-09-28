@@ -77,6 +77,12 @@ export default Vue.extend({
           enabled: true,
         },
         {
+          text: "TRANSFERRED PACKAGES",
+          value: SearchType.TRANSFER_PACKAGES,
+          count: 0,
+          enabled: true,
+        },
+        {
           text: "TRANSFER TEMPLATES",
           value: SearchType.TRANSFER_TEMPLATES,
           count: 0,

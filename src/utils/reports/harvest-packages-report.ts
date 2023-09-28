@@ -285,7 +285,7 @@ export async function maybeLoadHarvestPackagesReportData({
                   poundUnitOfmeasure
                 ),
                 "Denug", // TODO convert
-                "Child"
+                "Child",
               ]);
 
               dataLoader = await getDataLoaderByLicense(childPackage.LicenseNumber);
@@ -297,42 +297,41 @@ export async function maybeLoadHarvestPackagesReportData({
               );
 
               for (const grandchildPackageLabel of grandchildPackageLabels) {
+                const grandchildPackage = packageMap.get(grandchildPackageLabel);
 
-                  const grandchildPackage = packageMap.get(grandchildPackageLabel);
-      
-                  if (!grandchildPackage) {
-                    harvestPackageMatrix.push([
-                      ...Array(10).fill(""),
-                      `Could not match grandchild package ${grandchildPackageLabel}`,
-                    ]);
-                  } else {
-                    harvestPackageMatrix.push([
-                      grandchildPackage.LicenseNumber,
-                      harvest.Name,
-                      "",
-                      grandchildPackage.Label, //.slice(-8).replace(/^0+/, ""),
-                      strainName,
-                      "",
-                      grandchildPackage.Item.Name, // TODO convert
-                      convertUnits(
-                        grandchildPackage.Quantity,
-                        unitsOfMeasure.find(
-                          (x) => x.Abbreviation === grandchildPackage.UnitOfMeasureAbbreviation
-                        )!,
-                        gramUnitOfMeasure
-                      ),
-                      convertUnits(
-                        grandchildPackage.Quantity,
-                        unitsOfMeasure.find(
-                          (x) => x.Abbreviation === grandchildPackage.UnitOfMeasureAbbreviation
-                        )!,
-                        poundUnitOfmeasure
-                      ),
-                      "Denug", // TODO convert
-                      "Grandchild"
-                    ]);
-                  }
-              })
+                if (!grandchildPackage) {
+                  harvestPackageMatrix.push([
+                    ...Array(10).fill(""),
+                    `Could not match grandchild package ${grandchildPackageLabel}`,
+                  ]);
+                } else {
+                  harvestPackageMatrix.push([
+                    grandchildPackage.LicenseNumber,
+                    harvest.Name,
+                    "",
+                    grandchildPackage.Label, //.slice(-8).replace(/^0+/, ""),
+                    strainName,
+                    "",
+                    grandchildPackage.Item.Name, // TODO convert
+                    convertUnits(
+                      grandchildPackage.Quantity,
+                      unitsOfMeasure.find(
+                        (x) => x.Abbreviation === grandchildPackage.UnitOfMeasureAbbreviation
+                      )!,
+                      gramUnitOfMeasure
+                    ),
+                    convertUnits(
+                      grandchildPackage.Quantity,
+                      unitsOfMeasure.find(
+                        (x) => x.Abbreviation === grandchildPackage.UnitOfMeasureAbbreviation
+                      )!,
+                      poundUnitOfmeasure
+                    ),
+                    "Denug", // TODO convert
+                    "Grandchild",
+                  ]);
+                }
+              }
             }
           }
         }

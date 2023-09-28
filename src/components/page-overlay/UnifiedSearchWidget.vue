@@ -10,26 +10,6 @@
   >
     <div class="flex flex-row space-x-2">
       <div v-on:click.stop.prevent class="flex flex-col flex-grow">
-        <!-- <b-input-group size="md" style=""> -->
-        <!-- <b-input-group-prepend @click="setShowSearchResults({ showSearchResults: true })"
-            ><b-input-group-text class="search-icon">
-              <font-awesome-icon icon="search" />
-            </b-input-group-text>
-
-            <search-picker-select />
-          </b-input-group-prepend> -->
-
-        <!-- <b-form-input
-          v-model="queryString"
-          type="text"
-          placeholder="Packages, plants, tags, transfers"
-          autocomplete="off"
-          @input="setQueryString({ queryString: $event })"
-          @click="setShowSearchResults({ showSearchResults: true })"
-          @focus="setShowSearchResults({ showSearchResults: true })"
-          ref="search"
-        ></b-form-input> -->
-
         <div class="relative">
           <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
             <svg
@@ -77,35 +57,25 @@
               icon="backspace"
             />
           </div>
-          <!-- <button
-            type="submit"
-            class="text-white absolute right-2.5 bottom-2.5 bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-          >
-            Search
-          </button> -->
         </div>
-
-        <!-- <b-input-group-append v-if="searchState.queryString.length > 0">
-            <b-button variant="light" @click="setQueryString({ queryString: '' })"
-              ><font-awesome-icon icon="backspace"
-            /></b-button>
-          </b-input-group-append>
-        </b-input-group> -->
       </div>
     </div>
 
     <template v-if="!searchState.modalSearchOpen || modalSearch">
-      <template v-if="searchType === 'PACKAGES'">
+      <template v-if="searchType === SearchType.PACKAGES">
         <package-search-widget />
       </template>
-      <template v-if="searchType === 'TRANSFERS'">
+      <template v-if="searchType === SearchType.TRANSFERS">
         <transfer-search-widget />
       </template>
-      <template v-if="searchType === 'TAGS'">
+      <template v-if="searchType === SearchType.TAGS">
         <tag-search-widget />
       </template>
-      <template v-if="searchType === 'PLANTS'">
+      <template v-if="searchType === SearchType.PLANTS">
         <plant-search-widget />
+      </template>
+      <template v-if="searchType === SearchType.TRANSFER_PACKAGES">
+        <transfer-package-search-widget />
       </template>
     </template>
   </div>
@@ -119,6 +89,7 @@ import store from "@/store/page-overlay/index";
 import TagSearchWidget from "@/components/search/tag-search/TagSearchWidget.vue";
 import TransferSearchWidget from "@/components/search/transfer-search/TransferSearchWidget.vue";
 import PackageSearchWidget from "@/components/search/package-search/PackageSearchWidget.vue";
+import TransferPackageSearchWidget from "@/components/search/transfer-package-search/TransferPackageSearchWidget.vue";
 import PlantSearchWidget from "@/components/search/plant-search/PlantSearchWidget.vue";
 import { SearchActions, SearchType } from "@/store/page-overlay/modules/search/consts";
 import { IPluginState } from "@/interfaces";
@@ -140,6 +111,7 @@ export default Vue.extend({
     TransferSearchWidget,
     PackageSearchWidget,
     PlantSearchWidget,
+    TransferPackageSearchWidget,
     // SearchPickerSelect,
   },
   computed: {
