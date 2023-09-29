@@ -50,7 +50,12 @@ export default Vue.extend({
       tagSearchState: (state: IPluginState) => state.tagSearch,
       transferSearchState: (state: IPluginState) => state.transferSearch,
     }),
-    searchTypeOptions(): { text: string; value: SearchType; count: number; enabled: boolean }[] {
+    searchTypeOptions(): {
+      text: string;
+      value: SearchType;
+      count: number;
+      enabled: boolean;
+    }[] {
       return [
         {
           text: "PACKAGES",
@@ -77,9 +82,10 @@ export default Vue.extend({
           enabled: true,
         },
         {
-          text: "TRANSFERRED PACKAGES",
+          text: "DEPARTED PACKAGES",
           value: SearchType.TRANSFER_PACKAGES,
-          count: 0,
+          // Not technically a package count, but it should be accurate enough
+          count: store.state.transferPackageSearch.results.length,
           enabled: true,
         },
         // {

@@ -13,39 +13,61 @@
                   <template v-if="searchState.queryString.length > 0">
                     <search-view-selector />
 
-                    <!-- <div
+                    <div
                       class="col-span-6 flex flex-row items-center space-x-2 p-4 border-purple-300 border-b"
                     >
-                      <p class="text-lg text-gray-600">
+                      <template v-if="initial"></template>
+                      <template v-if="inflight"></template>
+                      <template v-if="success"></template>
+                      <template v-if="error"></template>
+                      <!-- <p class="text-lg text-gray-600">
                         <span class="font-bold text-gray-900">{{ searchState.queryString }}</span>
                         matches {{ packages.length
                         }}{{ packages.length === 500 ? "+" : "" }} packages
-                      </p>
+                      </p>-->
 
                       <div class="flex-grow"></div>
 
                       <template v-if="inflight">
                         <b-spinner class="ttt-purple mr-2" />
                       </template>
-                    </div> -->
+                    </div>
                   </template>
 
-                  <!-- <template v-if="searchState.queryString.length > 0">
-                    <div class="flex flex-col overflow-y-auto bg-purple-50 col-span-3">
-                      <package-result-groups :packages="packages" />
+                  <template v-if="searchState.queryString.length > 0">
+                    <div class="flex flex-col overflow-y-auto col-span-6 p-4">
+                      <b-select v-model="algorithm">
+                        <b-select-option :value="TransferPackageSearchAlgorithm.OLD_TO_NEW"
+                          >Oldest first</b-select-option
+                        >
+                        <b-select-option :value="TransferPackageSearchAlgorithm.NEW_TO_OLD"
+                          >Newest first</b-select-option
+                        >
+                      </b-select>
 
-                      <div class="flex-grow bg-purple-50"></div>
+                      <b-form-datepicker v-model="startDate"></b-form-datepicker>
+
+                      {{ transferPackageSearchState.algorithm }}
+                      {{ transferPackageSearchState.startDate }}
+
+                      <b-button @click="executeSearch({})">EXECUTE</b-button>
+
+                      <pre>
+                            {{ JSON.stringify(transferPackageSearchState.results, null, 2) }}
+                        </pre
+                      >
+
+                      <!-- <div class="flex-grow bg-purple-50"></div> -->
                     </div>
 
-                    <div class="flex flex-col overflow-y-auto col-span-3">
+                    <!-- <div class="flex flex-col overflow-y-auto col-span-3">
                       <package-search-result-detail />
-                    </div>
-                  </template> -->
+                    </div> -->
+                  </template>
 
                   <template v-else>
                     <div class="col-span-6">
                       <!-- Top row is sized "auto", so this placeholer is needed -->
-                      Search goes here
                     </div>
 
                     <div class="flex flex-col overflow-y-auto col-span-6">
@@ -78,7 +100,11 @@ import router from "@/router/index";
 import store from "@/store/page-overlay/index";
 import { IPluginState } from "@/interfaces";
 import SearchViewSelector from "@/components/search/shared/SearchViewSelector.vue";
-import { TransferPackageSearchActions } from "@/store/page-overlay/modules/transfer-package-search/consts";
+import {
+  TransferPackageSearchActions,
+  TransferPackageSearchAlgorithm,
+  TransferPackageSearchState,
+} from "@/store/page-overlay/modules/transfer-package-search/consts";
 
 export default Vue.extend({
   name: "TransferPackageSearchWidget",
@@ -93,9 +119,40 @@ export default Vue.extend({
       transferPackageSearchState: (state: IPluginState) => state.transferPackageSearch,
       searchState: (state: IPluginState) => state.search,
     }),
+    initial(): boolean {
+      return store.state.transferPackageSearch.state === TransferPackageSearchState.INITIAL;
+    },
+    inflight(): boolean {
+      return store.state.transferPackageSearch.state === TransferPackageSearchState.INFLIGHT;
+    },
+    success(): boolean {
+      return store.state.transferPackageSearch.state === TransferPackageSearchState.SUCCESS;
+    },
+    error(): boolean {
+      return store.state.transferPackageSearch.state === TransferPackageSearchState.ERROR;
+    },
+    algorithm: {
+      get(): TransferPackageSearchAlgorithm {
+        return store.state.transferPackageSearch.algorithm;
+      },
+      set(algorithm: TransferPackageSearchAlgorithm) {
+        store.state.transferPackageSearch.algorithm = algorithm;
+      },
+    },
+    startDate: {
+      get(): string | null {
+        return store.state.transferPackageSearch.startDate;
+      },
+      set(startDate: string | null) {
+        store.state.transferPackageSearch.startDate = startDate;
+      },
+    },
   },
   data() {
-    return {};
+    return {
+      TransferPackageSearchState,
+      TransferPackageSearchAlgorithm,
+    };
   },
   methods: {
     ...mapActions({
