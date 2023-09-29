@@ -1,17 +1,15 @@
 import {
   IDestinationData,
-  IDestinationPackageData,
-  IIndexedDestinationPackageData,
+  IDestinationPackageData, IIndexedRichOutgoingTransferData,
   IIndexedTransferData,
   IMetrcDriverData,
   IMetrcFacilityData,
-  IMetrcVehicleData,
-  ITransferHistoryData,
+  IMetrcVehicleData, ITransferHistoryData
 } from "@/interfaces";
 import { authManager } from "@/modules/auth-manager.module";
 import {
   getDataLoaderByLicense,
-  primaryDataLoader,
+  primaryDataLoader
 } from "@/modules/data-loader/data-loader.module";
 import { dynamicConstsManager } from "@/modules/dynamic-consts-manager.module";
 import { toastManager } from "@/modules/toast-manager.module";
@@ -314,29 +312,45 @@ export async function findMatchingTransferPackages({
   queryString,
   startDate,
   licenses,
+  signal,
 }: {
   queryString: string;
-  startDate?: string;
+  startDate: string | null;
   licenses: string[];
-}): Promise<IIndexedDestinationPackageData[]> {
-  const packages: IIndexedDestinationPackageData[] = [];
+  signal: AbortSignal;
+}): Promise<IIndexedRichOutgoingTransferData[]> {
+  let richTransfers: IIndexedRichOutgoingTransferData[] = [];
 
   for (const license of licenses) {
+    if (signal.aborted) {
+      break;
+    }
+
     const dataLoader = await getDataLoaderByLicense(license);
 
-    const transfers = [
+    const transfers: IIndexedRichOutgoingTransferData[] = [
       ...(await dataLoader.outgoingInactiveTransfers()),
       ...(await dataLoader.rejectedTransfers()),
     ];
 
     for (const transfer of transfers) {
+      if (signal.aborted) {
+        break;
+      }
+
       if (startDate && transfer.CreatedDateTime < startDate) {
         continue;
       }
 
-      const destinations = await dataLoader.transferDestinations(transfer.Id);
+      transfer.outgoingDestinations = await dataLoader.transferDestinations(transfer.Id);
 
-      for (const destination of destinations) {
+      for (const destination of transfer.outgoingDestinations) {
+        if (signal.aborted) {
+          break;
+        }
+
+        destination.packages = [];
+
         const transferPackages = await dataLoader.destinationPackages(destination.Id);
 
         for (const transferPackage of transferPackages) {
@@ -345,12 +359,16 @@ export async function findMatchingTransferPackages({
               queryString.toLocaleLowerCase()
             )
           ) {
-            packages.push(transferPackage);
+            destination.packages.push(transferPackage)
           }
         }
       }
+
+      transfer.outgoingDestinations = transfer.outgoingDestinations.filter(x => x.packages!.length > 0);
     }
+
+    richTransfers = [...richTransfers, ...transfers.filter(x => x.outgoingDestinations!.length > 0)];
   }
 
-  return packages;
+  return richTransfers;
 }

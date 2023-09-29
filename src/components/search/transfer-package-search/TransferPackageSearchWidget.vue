@@ -45,6 +45,7 @@
                   <template v-else>
                     <div class="col-span-6">
                       <!-- Top row is sized "auto", so this placeholer is needed -->
+                      Search goes here
                     </div>
 
                     <div class="flex flex-col overflow-y-auto col-span-6">
@@ -72,11 +73,12 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { mapState } from "vuex";
+import { mapActions, mapState } from "vuex";
 import router from "@/router/index";
 import store from "@/store/page-overlay/index";
 import { IPluginState } from "@/interfaces";
 import SearchViewSelector from "@/components/search/shared/SearchViewSelector.vue";
+import { TransferPackageSearchActions } from "@/store/page-overlay/modules/transfer-package-search/consts";
 
 export default Vue.extend({
   name: "TransferPackageSearchWidget",
@@ -88,14 +90,21 @@ export default Vue.extend({
   },
   computed: {
     ...mapState<IPluginState>({
-      //   packageSearchState: (state: IPluginState) => state.packageSearch,
+      transferPackageSearchState: (state: IPluginState) => state.transferPackageSearch,
       searchState: (state: IPluginState) => state.search,
     }),
   },
   data() {
     return {};
   },
-  methods: {},
+  methods: {
+    ...mapActions({
+      executeSearch: `transferPackageSearch/${TransferPackageSearchActions.EXECUTE_SEARCH}`,
+      stopSearch: `transferPackageSearch/${TransferPackageSearchActions.STOP_SEARCH}`,
+      resetSearch: `transferPackageSearch/${TransferPackageSearchActions.RESET_SEARCH}`,
+      updateSearchParameters: `transferPackageSearch/${TransferPackageSearchActions.UPDATE_SEARCH_PARAMETERS}`,
+    }),
+  },
   async created() {},
   async mounted() {},
 });
