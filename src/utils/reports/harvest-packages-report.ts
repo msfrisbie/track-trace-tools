@@ -16,8 +16,12 @@ import {
 import { ActionContext } from "vuex";
 import { todayIsodate } from "../date";
 import {
+  extractAdjustmentReasonNoteSetsFromHistory,
   extractChildPackageLabelsFromHistory,
+  extractChildPackageTagQuantityUnitSetsFromHistory,
   extractHarvestChildPackageLabelsFromHistory,
+  extractInitialPackageQuantityAndUnitFromHistoryOrError,
+  extractTestSamplePackageLabelsFromHistory,
 } from "../history";
 import { convertUnits } from "../units";
 
@@ -216,26 +220,370 @@ export async function maybeLoadHarvestPackagesReportData({
             ...Array(10).fill(""),
             `Could not match harvest package ${harvestPackageLabel}`,
           ]);
-        } else {
-          const strainName = harvestPackage.Item.StrainName ?? "Unknown Strain";
+
+          continue;
+        }
+
+        const strainName = harvestPackage.Item.StrainName ?? "Unknown Strain";
+
+        harvestPackageMatrix.push([
+          harvestPackage.LicenseNumber,
+          harvest.Name,
+          harvestPackage.Label.slice(-8).replace(/^0+/, ""),
+          "",
+          strainName,
+          "",
+          "Denug",
+          convertUnits(
+            harvestPackage.Quantity,
+            unitsOfMeasure.find(
+              (x) => x.Abbreviation === harvestPackage.UnitOfMeasureAbbreviation
+            )!,
+            gramUnitOfMeasure
+          ),
+          convertUnits(
+            harvestPackage.Quantity,
+            unitsOfMeasure.find(
+              (x) => x.Abbreviation === harvestPackage.UnitOfMeasureAbbreviation
+            )!,
+            poundUnitOfmeasure
+          ),
+          "Denug",
+        ]);
+
+        dataLoader = await getDataLoaderByLicense(harvestPackage.LicenseNumber);
+
+        harvestPackage.history = await dataLoader.packageHistoryByPackageId(harvestPackage.Id);
+
+        const childPackageLabels = extractChildPackageLabelsFromHistory(harvestPackage.history);
+
+        for (const childPackageLabel of childPackageLabels) {
+          const childPackage = packageMap.get(childPackageLabel);
+
+          if (!childPackage) {
+            harvestPackageMatrix.push([
+              ...Array(10).fill(""),
+              `Could not match child package ${childPackageLabel}`,
+            ]);
+
+            continue;
+          }
+
+          dataLoader = await getDataLoaderByLicense(childPackage.LicenseNumber);
+
+          childPackage.history = await dataLoader.packageHistoryByPackageId(childPackage.Id);
+
+          const [initialChildQuantity, unit] =
+            extractInitialPackageQuantityAndUnitFromHistoryOrError(childPackage.history);
+
+          const childLabTestLabels = extractTestSamplePackageLabelsFromHistory(
+            childPackage.history
+          );
+
+          const childSets = extractChildPackageTagQuantityUnitSetsFromHistory(childPackage.history);
+
+          let totalChildTestQuantity = 0;
+
+          for (const childLabTestLabel of childLabTestLabels) {
+            for (const childSet of childSets) {
+              if (childLabTestLabel === childSet[0]) {
+                totalChildTestQuantity += childSet[1];
+              }
+            }
+          }
+
+          const childAdjustmentReasonNoteSets = extractAdjustmentReasonNoteSetsFromHistory(
+            childPackage.history
+          );
+
+          let childWasteTotal = 0;
+          let childMLOverpackTotal = 0;
+
+          for (const childAdjustmentReasonNote of childAdjustmentReasonNoteSets) {
+            if (childAdjustmentReasonNote.reason.includes("Waste")) {
+              childWasteTotal += childAdjustmentReasonNote.quantity;
+            } else {
+              childMLOverpackTotal += childAdjustmentReasonNote.quantity;
+            }
+          }
+
+          harvestPackageMatrix.push([
+            childPackage.LicenseNumber,
+            harvest.Name,
+            "",
+            childPackage.Label.slice(-8).replace(/^0+/, ""),
+            strainName,
+            "",
+            childPackage.Item.Name, // TODO convert
+            convertUnits(
+              initialChildQuantity,
+              unitsOfMeasure.find(
+                (x) => x.Abbreviation === childPackage.UnitOfMeasureAbbreviation
+              )!,
+              gramUnitOfMeasure
+            ),
+            convertUnits(
+              initialChildQuantity,
+              unitsOfMeasure.find(
+                (x) => x.Abbreviation === childPackage.UnitOfMeasureAbbreviation
+              )!,
+              poundUnitOfmeasure
+            ),
+            "Post QC Batch",
+            "Child",
+          ]);
+
+          harvestPackageMatrix.push([
+            childPackage.LicenseNumber,
+            harvest.Name,
+            "",
+            childPackage.Label.slice(-8).replace(/^0+/, ""),
+            strainName,
+            "",
+            childPackage.Item.Name, // TODO convert
+            convertUnits(
+              totalChildTestQuantity,
+              unitsOfMeasure.find(
+                (x) => x.Abbreviation === childPackage.UnitOfMeasureAbbreviation
+              )!,
+              gramUnitOfMeasure
+            ),
+            convertUnits(
+              totalChildTestQuantity,
+              unitsOfMeasure.find(
+                (x) => x.Abbreviation === childPackage.UnitOfMeasureAbbreviation
+              )!,
+              poundUnitOfmeasure
+            ),
+            "Post QC Lab Testing",
+            "Child",
+          ]);
+
+          const grandchildPackageLabels = extractChildPackageLabelsFromHistory(
+            harvestPackage.history
+          );
+
+          for (const grandchildPackageLabel of grandchildPackageLabels) {
+            const grandchildPackage = packageMap.get(grandchildPackageLabel);
+
+            if (!grandchildPackage) {
+              harvestPackageMatrix.push([
+                ...Array(10).fill(""),
+                `Could not match grandchild package ${grandchildPackageLabel}`,
+              ]);
+
+              continue;
+            }
+
+            dataLoader = await getDataLoaderByLicense(grandchildPackage.LicenseNumber);
+
+            grandchildPackage.history = await dataLoader.packageHistoryByPackageId(
+              grandchildPackage.Id
+            );
+
+            const [initialGrandchildQuantity, unit] =
+              extractInitialPackageQuantityAndUnitFromHistoryOrError(grandchildPackage.history);
+
+            const grandchildLabTestLabels = extractTestSamplePackageLabelsFromHistory(
+              grandchildPackage.history
+            );
+
+            const grandchildSets = extractChildPackageTagQuantityUnitSetsFromHistory(
+              grandchildPackage.history
+            );
+
+            let totalGrandchildTestQuantity = 0;
+
+            for (const grandchildLabTestLabel of grandchildLabTestLabels) {
+              for (const grandchildSet of grandchildSets) {
+                if (grandchildLabTestLabel === grandchildSet[0]) {
+                  totalGrandchildTestQuantity += grandchildSet[1];
+                }
+              }
+            }
+
+            const grandchildAdjustmentReasonNoteSets = extractAdjustmentReasonNoteSetsFromHistory(
+              grandchildPackage.history
+            );
+
+            let grandchildWasteTotal = 0;
+            let grandchildMLOverpackTotal = 0;
+            let grandchildShakeTotal = 0;
+
+            for (const grandchildAdjustmentReasonNote of grandchildAdjustmentReasonNoteSets) {
+              if (grandchildAdjustmentReasonNote.reason.includes("Waste")) {
+                grandchildWasteTotal += grandchildAdjustmentReasonNote.quantity;
+              } else {
+                grandchildMLOverpackTotal += grandchildAdjustmentReasonNote.quantity;
+              }
+            }
+
+            harvestPackageMatrix.push([
+              grandchildPackage.LicenseNumber,
+              harvest.Name,
+              "",
+              grandchildPackage.Label.slice(-8).replace(/^0+/, ""),
+              strainName,
+              "",
+              grandchildPackage.Item.Name, // TODO convert
+              convertUnits(
+                initialGrandchildQuantity,
+                unitsOfMeasure.find(
+                  (x) => x.Abbreviation === grandchildPackage.UnitOfMeasureAbbreviation
+                )!,
+                gramUnitOfMeasure
+              ),
+              convertUnits(
+                initialGrandchildQuantity,
+                unitsOfMeasure.find(
+                  (x) => x.Abbreviation === grandchildPackage.UnitOfMeasureAbbreviation
+                )!,
+                poundUnitOfmeasure
+              ),
+              "Packaging Intake",
+              "Grandchild",
+            ]);
+
+            harvestPackageMatrix.push([
+              grandchildPackage.LicenseNumber,
+              harvest.Name,
+              "",
+              grandchildPackage.Label.slice(-8).replace(/^0+/, ""),
+              strainName,
+              "",
+              grandchildPackage.Item.Name + " - Prepack", // TODO convert
+              convertUnits(
+                initialGrandchildQuantity -
+                  (grandchildMLOverpackTotal + grandchildWasteTotal + grandchildShakeTotal),
+                unitsOfMeasure.find(
+                  (x) => x.Abbreviation === grandchildPackage.UnitOfMeasureAbbreviation
+                )!,
+                gramUnitOfMeasure
+              ),
+              convertUnits(
+                initialGrandchildQuantity -
+                  (grandchildMLOverpackTotal + grandchildWasteTotal + grandchildShakeTotal),
+                unitsOfMeasure.find(
+                  (x) => x.Abbreviation === grandchildPackage.UnitOfMeasureAbbreviation
+                )!,
+                poundUnitOfmeasure
+              ),
+              "Packaging",
+              "Grandchild",
+            ]);
+
+            harvestPackageMatrix.push([
+              grandchildPackage.LicenseNumber,
+              harvest.Name,
+              "",
+              grandchildPackage.Label.slice(-8).replace(/^0+/, ""),
+              strainName,
+              "",
+              "Waste", // TODO convert
+              convertUnits(
+                grandchildWasteTotal,
+                unitsOfMeasure.find(
+                  (x) => x.Abbreviation === grandchildPackage.UnitOfMeasureAbbreviation
+                )!,
+                gramUnitOfMeasure
+              ),
+              convertUnits(
+                grandchildWasteTotal,
+                unitsOfMeasure.find(
+                  (x) => x.Abbreviation === grandchildPackage.UnitOfMeasureAbbreviation
+                )!,
+                poundUnitOfmeasure
+              ),
+              "Packaging - Waste",
+              "Grandchild",
+            ]);
+
+            harvestPackageMatrix.push([
+              grandchildPackage.LicenseNumber,
+              harvest.Name,
+              "",
+              grandchildPackage.Label.slice(-8).replace(/^0+/, ""),
+              strainName,
+              "",
+              "Shake", // TODO convert
+              convertUnits(
+                grandchildShakeTotal, // TODO
+                unitsOfMeasure.find(
+                  (x) => x.Abbreviation === grandchildPackage.UnitOfMeasureAbbreviation
+                )!,
+                gramUnitOfMeasure
+              ),
+              convertUnits(
+                grandchildShakeTotal,
+                unitsOfMeasure.find(
+                  (x) => x.Abbreviation === grandchildPackage.UnitOfMeasureAbbreviation
+                )!,
+                poundUnitOfmeasure
+              ),
+              "Packaging - Sent to Lab",
+              "Grandchild",
+            ]);
+
+            harvestPackageMatrix.push([
+              grandchildPackage.LicenseNumber,
+              harvest.Name,
+              "",
+              grandchildPackage.Label.slice(-8).replace(/^0+/, ""),
+              strainName,
+              "",
+              "Moisture Loss", // TODO convert
+              convertUnits(
+                grandchildMLOverpackTotal,
+                unitsOfMeasure.find(
+                  (x) => x.Abbreviation === grandchildPackage.UnitOfMeasureAbbreviation
+                )!,
+                gramUnitOfMeasure
+              ),
+              convertUnits(
+                grandchildMLOverpackTotal,
+                unitsOfMeasure.find(
+                  (x) => x.Abbreviation === grandchildPackage.UnitOfMeasureAbbreviation
+                )!,
+                poundUnitOfmeasure
+              ),
+              "Packaging ML/Overpack",
+              "Grandchild",
+            ]);
+          }
+        }
+
+        // TODO trim packages too
+
+        const childAdjustmentReasonNoteSets = extractAdjustmentReasonNoteSetsFromHistory(
+          harvestPackage.history
+        );
+
+        for (const childAdjustmentReasonNote of childAdjustmentReasonNoteSets) {
+          let materialType = "Adjustment";
+
+          if (childAdjustmentReasonNote.reason.includes("Waste")) {
+            materialType = "Waste";
+          } else if (childAdjustmentReasonNote.reason.includes("Moisture")) {
+            materialType = "Process Loss";
+          }
 
           harvestPackageMatrix.push([
             harvestPackage.LicenseNumber,
             harvest.Name,
-            harvestPackage.Label, //.slice(-8).replace(/^0+/, ""),
+            harvestPackage.Label.slice(-8).replace(/^0+/, ""),
             "",
             strainName,
             "",
-            "Denug",
+            materialType,
             convertUnits(
-              harvestPackage.Quantity,
+              Math.abs(harvestPackage.Quantity),
               unitsOfMeasure.find(
                 (x) => x.Abbreviation === harvestPackage.UnitOfMeasureAbbreviation
               )!,
               gramUnitOfMeasure
             ),
             convertUnits(
-              harvestPackage.Quantity,
+              Math.abs(harvestPackage.Quantity),
               unitsOfMeasure.find(
                 (x) => x.Abbreviation === harvestPackage.UnitOfMeasureAbbreviation
               )!,
@@ -243,97 +591,6 @@ export async function maybeLoadHarvestPackagesReportData({
             ),
             "Denug",
           ]);
-
-          dataLoader = await getDataLoaderByLicense(harvestPackage.LicenseNumber);
-
-          harvestPackage.history = await dataLoader.packageHistoryByPackageId(harvestPackage.Id);
-
-          // Also extract waste, moisture loss, adjustments
-          const childPackageLabels = extractChildPackageLabelsFromHistory(harvestPackage.history);
-
-          console.log({ childPackageLabels });
-
-          for (const childPackageLabel of childPackageLabels) {
-            const childPackage = packageMap.get(childPackageLabel);
-
-            if (!childPackage) {
-              harvestPackageMatrix.push([
-                ...Array(10).fill(""),
-                `Could not match child package ${childPackageLabel}`,
-              ]);
-            } else {
-              harvestPackageMatrix.push([
-                childPackage.LicenseNumber,
-                harvest.Name,
-                "",
-                childPackage.Label, //.slice(-8).replace(/^0+/, ""),
-                strainName,
-                "",
-                childPackage.Item.Name, // TODO convert
-                convertUnits(
-                  childPackage.Quantity,
-                  unitsOfMeasure.find(
-                    (x) => x.Abbreviation === childPackage.UnitOfMeasureAbbreviation
-                  )!,
-                  gramUnitOfMeasure
-                ),
-                convertUnits(
-                  childPackage.Quantity,
-                  unitsOfMeasure.find(
-                    (x) => x.Abbreviation === childPackage.UnitOfMeasureAbbreviation
-                  )!,
-                  poundUnitOfmeasure
-                ),
-                "Denug", // TODO convert
-                "Child",
-              ]);
-
-              dataLoader = await getDataLoaderByLicense(childPackage.LicenseNumber);
-
-              childPackage.history = await dataLoader.packageHistoryByPackageId(childPackage.Id);
-
-              const grandchildPackageLabels = extractChildPackageLabelsFromHistory(
-                childPackage.history
-              );
-
-              for (const grandchildPackageLabel of grandchildPackageLabels) {
-                const grandchildPackage = packageMap.get(grandchildPackageLabel);
-
-                if (!grandchildPackage) {
-                  harvestPackageMatrix.push([
-                    ...Array(10).fill(""),
-                    `Could not match grandchild package ${grandchildPackageLabel}`,
-                  ]);
-                } else {
-                  harvestPackageMatrix.push([
-                    grandchildPackage.LicenseNumber,
-                    harvest.Name,
-                    "",
-                    grandchildPackage.Label, //.slice(-8).replace(/^0+/, ""),
-                    strainName,
-                    "",
-                    grandchildPackage.Item.Name, // TODO convert
-                    convertUnits(
-                      grandchildPackage.Quantity,
-                      unitsOfMeasure.find(
-                        (x) => x.Abbreviation === grandchildPackage.UnitOfMeasureAbbreviation
-                      )!,
-                      gramUnitOfMeasure
-                    ),
-                    convertUnits(
-                      grandchildPackage.Quantity,
-                      unitsOfMeasure.find(
-                        (x) => x.Abbreviation === grandchildPackage.UnitOfMeasureAbbreviation
-                      )!,
-                      poundUnitOfmeasure
-                    ),
-                    "Denug", // TODO convert
-                    "Grandchild",
-                  ]);
-                }
-              }
-            }
-          }
         }
       }
     }
