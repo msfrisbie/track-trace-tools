@@ -72,6 +72,9 @@ export const transferPackageSearchModule = {
         startDate: ctx.state.startDate,
         licenses: [(await authManager.authStateOrError()).license],
         signal: ctx.state.abortController.signal,
+        updateFn: (matchingTransfers) => {
+          ctx.state.results = matchingTransfers;
+        },
       });
 
       ctx.state.messages.push({

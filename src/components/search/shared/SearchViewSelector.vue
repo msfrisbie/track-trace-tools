@@ -82,7 +82,7 @@ export default Vue.extend({
           enabled: true,
         },
         {
-          text: "DEPARTED PACKAGES",
+          text: "TRANSFERRED PACKAGES",
           value: SearchType.TRANSFER_PACKAGES,
           // Not technically a package count, but it should be accurate enough
           count: store.state.transferPackageSearch.results.length,

@@ -1,15 +1,18 @@
 import {
   IDestinationData,
-  IDestinationPackageData, IIndexedRichOutgoingTransferData,
+  IDestinationPackageData,
+  IIndexedRichOutgoingTransferData,
   IIndexedTransferData,
   IMetrcDriverData,
   IMetrcFacilityData,
-  IMetrcVehicleData, ITransferHistoryData
+  IMetrcVehicleData,
+  IRichDestinationData,
+  ITransferHistoryData,
 } from "@/interfaces";
 import { authManager } from "@/modules/auth-manager.module";
 import {
   getDataLoaderByLicense,
-  primaryDataLoader
+  primaryDataLoader,
 } from "@/modules/data-loader/data-loader.module";
 import { dynamicConstsManager } from "@/modules/dynamic-consts-manager.module";
 import { toastManager } from "@/modules/toast-manager.module";
@@ -313,62 +316,116 @@ export async function findMatchingTransferPackages({
   startDate,
   licenses,
   signal,
+  updateFn,
 }: {
   queryString: string;
   startDate: string | null;
   licenses: string[];
   signal: AbortSignal;
+  updateFn?: (transfers: IIndexedRichOutgoingTransferData[]) => void;
 }): Promise<IIndexedRichOutgoingTransferData[]> {
-  let richTransfers: IIndexedRichOutgoingTransferData[] = [];
+  let allTransfers: IIndexedTransferData[] = [];
+  let matchingRichTransfers: IIndexedRichOutgoingTransferData[] = [];
+
+  let promises: Promise<any>[] = [];
 
   for (const license of licenses) {
     if (signal.aborted) {
-      break;
+      return matchingRichTransfers;
     }
 
     const dataLoader = await getDataLoaderByLicense(license);
 
-    const transfers: IIndexedRichOutgoingTransferData[] = [
-      ...(await dataLoader.outgoingInactiveTransfers()),
-      ...(await dataLoader.rejectedTransfers()),
-    ];
+    promises.push(
+      dataLoader.outgoingInactiveTransfers().then((transfers) => {
+        allTransfers = [...allTransfers, ...transfers];
+      })
+    );
 
-    for (const transfer of transfers) {
-      if (signal.aborted) {
-        break;
-      }
-
-      if (startDate && transfer.CreatedDateTime < startDate) {
-        continue;
-      }
-
-      transfer.outgoingDestinations = await dataLoader.transferDestinations(transfer.Id);
-
-      for (const destination of transfer.outgoingDestinations) {
-        if (signal.aborted) {
-          break;
-        }
-
-        destination.packages = [];
-
-        const transferPackages = await dataLoader.destinationPackages(destination.Id);
-
-        for (const transferPackage of transferPackages) {
-          if (
-            transferPackage.PackageLabel.toLocaleLowerCase().includes(
-              queryString.toLocaleLowerCase()
-            )
-          ) {
-            destination.packages.push(transferPackage)
-          }
-        }
-      }
-
-      transfer.outgoingDestinations = transfer.outgoingDestinations.filter(x => x.packages!.length > 0);
-    }
-
-    richTransfers = [...richTransfers, ...transfers.filter(x => x.outgoingDestinations!.length > 0)];
+    promises.push(
+      dataLoader.rejectedTransfers().then((transfers) => {
+        allTransfers = [...allTransfers, ...transfers];
+      })
+    );
   }
 
-  return richTransfers;
+  await Promise.allSettled(promises);
+
+  promises = [];
+
+  if (startDate) {
+    allTransfers = allTransfers.filter((transfer) => transfer.CreatedDateTime >= startDate);
+  }
+
+  let pageIdx = 0;
+  const PAGE_SIZE = 10;
+
+  while (true) {
+    const richTransferPage: IIndexedRichOutgoingTransferData[] = allTransfers.slice(
+      pageIdx,
+      pageIdx + PAGE_SIZE
+    );
+    if (richTransferPage.length === 0) {
+      break;
+    }
+    pageIdx += PAGE_SIZE;
+
+    for (const transfer of richTransferPage) {
+      if (signal.aborted) {
+        return matchingRichTransfers;
+      }
+
+      const dataLoader = await getDataLoaderByLicense(transfer.LicenseNumber);
+
+      promises.push(
+        dataLoader.transferDestinations(transfer.Id).then((destinations) => {
+          transfer.outgoingDestinations = (destinations as IRichDestinationData[]).map((x) => {
+            x.packages = [];
+            return x;
+          });
+        })
+      );
+    }
+
+    await Promise.allSettled(promises);
+
+    promises = [];
+
+    for (const transfer of richTransferPage) {
+      for (const destination of transfer.outgoingDestinations!) {
+        if (signal.aborted) {
+          return matchingRichTransfers;
+        }
+
+        const dataLoader = await getDataLoaderByLicense(transfer.LicenseNumber);
+
+        promises.push(
+          dataLoader.destinationPackages(destination.Id).then((packages) => {
+            destination.packages = packages.filter((pkg) =>
+              pkg.PackageLabel.toLocaleLowerCase().includes(queryString.toLocaleLowerCase())
+            );
+          })
+        );
+      }
+    }
+
+    await Promise.allSettled(promises);
+
+    for (const transfer of richTransferPage) {
+      transfer.outgoingDestinations = transfer.outgoingDestinations!.filter(
+        (x) => x.packages!.length > 0
+      );
+    }
+
+    matchingRichTransfers = [
+      ...matchingRichTransfers,
+      ...richTransferPage.filter((x) => x.outgoingDestinations!.length > 0),
+    ];
+
+    if (updateFn) {
+      updateFn(matchingRichTransfers);
+    }
+  }
+
+  return matchingRichTransfers;
 }

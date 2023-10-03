@@ -156,17 +156,6 @@ export default Vue.extend({
     // TransferIcon,
     RecursiveJsonTable,
   },
-  // created() {
-  //   searchManager.selectedTransfer
-  //     .asObservable()
-  //     .pipe(takeUntil(this.$data.destroyed$))
-  //     .subscribe(
-  //       (selectedTransferMetatdata: ISelectedTransferMetadata | null) =>
-  //         (this.$data.transfer = selectedTransferMetatdata
-  //           ? selectedTransferMetatdata.transferData
-  //           : null)
-  //     );
-  // },
   computed: {
     ...mapState<IPluginState>({
       transferSearchState: (state: IPluginState) => state.transferSearch,
@@ -199,35 +188,6 @@ export default Vue.extend({
           return `${transfer.DeliveryPackageCount} packages`;
       }
     },
-    // transferStatusDescriptor() {
-    //   const transfer: IIndexedTransferData = this.$data.transfer;
-
-    //   switch (transfer.TransferState) {
-    //     case TransferState.INCOMING:
-    //     case TransferState.OUTGOING:
-    //       if (!!transfer.ActualArrivalDateTime) {
-    //         return "Delivered";
-    //       }
-
-    //       if (!!transfer.ActualDepartureDateTime) {
-    //         return "In Transit";
-    //       }
-
-    //       return "Scheduled";
-    //     case TransferState.REJECTED:
-    //       if (!!transfer.ActualReturnArrivalDateTime) {
-    //         return "Returned";
-    //       }
-
-    //       if (!!transfer.ActualReturnDepartureDateTime) {
-    //         return "In Transit";
-    //       }
-
-    //       return "Scheduled";
-    //     default:
-    //       return "Scheduled";
-    //   }
-    // },
     transferNextCheckpoint() {
       const transfer: IIndexedTransferData = this.$data.transfer;
 
@@ -266,30 +226,9 @@ export default Vue.extend({
           return `Scheduled for transfer`;
       }
     },
-    // transferNextCheckpointTime() {
-    //   const transfer: IIndexedTransferData = this.$data.transfer;
-
-    //   switch (transfer.TransferState) {
-    //     case TransferState.INCOMING:
-    //     case TransferState.OUTGOING:
-    //       return `${transfer.PackageCount} packages`;
-    //     case TransferState.REJECTED:
-    //     default:
-    //       return `${transfer.DeliveryPackageCount} packages`;
-    //   }
-    // },
   },
-  // beforeDestroy() {
-  //   this.$data.destroyed$.next(null);
-  // },
-  data(): {
-    // destroyed$: Subject<void>;
-    // transfer: IIndexedTransferData | null;
-  } {
-    return {
-      // destroyed$: new Subject(),
-      // transfer: null,
-    };
+  data(): {} {
+    return {};
   },
   methods: {
     ...mapActions({
@@ -302,8 +241,8 @@ export default Vue.extend({
         `transferSearch/${TransferSearchActions.PARTIAL_UPDATE_TRANSFER_SEARCH_FILTERS}`,
         {
           transferSearchFilters: {
-            manifestNumber: transfer.ManifestNumber
-          }
+            manifestNumber: transfer.ManifestNumber,
+          },
         }
       );
 
