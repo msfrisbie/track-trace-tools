@@ -105,8 +105,8 @@
                       >
                         <b-card>
                           <template #header>
-                            <div class="flex flex-row space-between">
-                              <div class="text-2xl text-purple-800">
+                            <div class="flex flex-row justify-between items-center">
+                              <div class="text-xl text-purple-800">
                                 Manifest
                                 {{ transfer.ManifestNumber }}
                               </div>

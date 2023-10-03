@@ -14,7 +14,7 @@ import { ITransferPackageSearchState } from "./interfaces";
 const inMemoryState = {
   startDate: null,
   state: TransferPackageSearchState.INITIAL,
-  algorithm: TransferPackageSearchAlgorithm.OLD_TO_NEW,
+  algorithm: TransferPackageSearchAlgorithm.NEW_TO_OLD,
   results: [],
   abortController: new AbortController(),
   messages: [],
