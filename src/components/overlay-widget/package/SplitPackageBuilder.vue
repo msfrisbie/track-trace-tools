@@ -99,6 +99,14 @@
                     :suggestedLocationName="sourcePackage && sourcePackage.LocationName"
                     v-on:update:location="updateSplitPackageData({ location: $event })"
                   />
+
+                  <b-form-group
+                    v-if="outputItem.ExpirationDateConfiguration !== 'Off'"
+                    label="Expiration Date:"
+                    label-size="sm"
+                  >
+                    <b-form-datepicker size="md" v-model="expirationDate" :value="expirationDate" />
+                  </b-form-group>
                 </template>
               </div>
 
@@ -411,7 +419,9 @@ export default Vue.extend({
           RemediationSteps: "",
           UseByDate: "",
           SellByDate: "",
-          ExpirationDate: "",
+          ExpirationDate: this.expirationDate
+            ? submitDateFromIsodate(this.expirationDate as string)
+            : "",
           ProductionBatchNumber: (this.productionBatchNumber as string) ?? "",
           ...(this.isDonation ? { IsDonation: "true" } : {}),
           ...(this.isTradeSample ? { IsTradeSample: "true" } : {}),
@@ -594,6 +604,13 @@ export default Vue.extend({
         errors.push({
           tags: ["page2"],
           message: "Select an item for newly created packages",
+        });
+      }
+
+      if (this.outputItem!.ExpirationDateConfiguration !== "Off" && !this.expirationDate) {
+        errors.push({
+          tags: ["page2"],
+          message: "Select an expiration date",
         });
       }
 
@@ -822,6 +839,17 @@ export default Vue.extend({
         );
       },
     },
+    expirationDate: {
+      get(): string {
+        return store.state.splitPackageBuilder.expirationDate;
+      },
+      set(expirationDate: string) {
+        store.dispatch(
+          `splitPackageBuilder/${SplitPackageBuilderActions.UPDATE_SPLIT_PACKAGE_DATA}`,
+          { expirationDate }
+        );
+      },
+    },
     sourcePackageAdjustQuantity: {
       get(): number | null {
         return store.state.splitPackageBuilder.sourcePackageAdjustQuantity;
@@ -853,6 +881,8 @@ export default Vue.extend({
         if (!this.outputItem && this.sourcePackage) {
           this.outputItem = this.sourcePackage.Item;
         }
+
+        this.expirationDate = this.sourcePackage.ExpirationDate ?? "";
       },
     },
     // useSameItem: {

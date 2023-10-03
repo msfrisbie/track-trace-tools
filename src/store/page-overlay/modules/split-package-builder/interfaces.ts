@@ -16,4 +16,5 @@ export interface ISplitPackageBuilderState {
   isDonation: boolean;
   isTradeSample: boolean;
   location: ILocationData | null;
+  expirationDate: string;
 }

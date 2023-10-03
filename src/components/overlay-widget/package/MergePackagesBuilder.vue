@@ -302,6 +302,12 @@ export default Vue.extend({
       for (let el of zipped) {
         const [tag, newPackageData] = el;
 
+        const lowestExpirationDate: string =
+          newPackageData.ingredients
+            .map((x) => x.pkg.ExpirationDate)
+            .filter((x) => x.length > 0)
+            .sort((a, b) => a.toLowerCase().localeCompare(b.toLowerCase()))[0] ?? "";
+
         const row: IMetrcCreatePackagesFromPackagesPayload = {
           ActualDate: submitDateFromIsodate(this.$data.packageIsodate),
           Ingredients: newPackageData.ingredients.map((ingredient) => ({
@@ -313,7 +319,7 @@ export default Vue.extend({
           ItemId: this.$data.outputItem.Id.toString(),
           Note: this.$data.note,
           ProductionBatchNumber: "",
-          ExpirationDate: "",
+          ExpirationDate: lowestExpirationDate,
           Quantity: newPackageData.quantity.toString(),
           TagId: tag.Id.toString(),
           UnitOfMeasureId: this.$data.outputItem.UnitOfMeasureId.toString(),

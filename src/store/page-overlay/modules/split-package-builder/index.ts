@@ -21,6 +21,7 @@ const inMemoryState = {
   location: null,
   isDonation: false,
   isTradeSample: false,
+  expirationDate: ""
 };
 
 const persistedState = {};
