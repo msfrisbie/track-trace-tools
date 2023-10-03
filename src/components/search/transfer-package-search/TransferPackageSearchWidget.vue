@@ -42,40 +42,43 @@
                     </div>
 
                     <div class="flex flex-col gap-2 overflow-y-auto col-span-2 p-4">
-                      <template v-if="!inflight">
-                        <p class="text-base text-gray-500" v-if="initial">
-                          Set the filters below to return results more quickly
+                      <template v-if="initial">
+                        <p class="text-base text-gray-500">
+                          Set the filters below to get faster results
                         </p>
-                        <b-form-group label="Search order:" size="sm">
-                          <b-select :disabled="!initial" v-model="algorithm" size="sm">
-                            <b-select-option :value="TransferPackageSearchAlgorithm.OLD_TO_NEW"
-                              >Search oldest transfers first</b-select-option
-                            >
-                            <b-select-option :value="TransferPackageSearchAlgorithm.NEW_TO_OLD"
-                              >Search newest transfers first</b-select-option
-                            >
-                          </b-select>
-                        </b-form-group>
-
-                        <b-form-group label="Only search transfers after:" size="sm">
-                          <b-form-datepicker
-                            :disabled="!initial"
-                            size="sm"
-                            v-model="startDate"
-                          ></b-form-datepicker>
-                          <b-button
-                            variant="link"
-                            v-if="startDate && initial"
-                            @click="startDate = null"
-                            size="sm"
-                            >CLEAR</b-button
+                        <hr />
+                      </template>
+                      <b-form-group label="Search order:" size="sm">
+                        <b-select :disabled="!initial" v-model="algorithm" size="sm">
+                          <b-select-option :value="TransferPackageSearchAlgorithm.OLD_TO_NEW"
+                            >Search oldest transfers first</b-select-option
                           >
-                        </b-form-group>
+                          <b-select-option :value="TransferPackageSearchAlgorithm.NEW_TO_OLD"
+                            >Search newest transfers first</b-select-option
+                          >
+                        </b-select>
+                      </b-form-group>
 
+                      <b-form-group label="Only search transfers after:" size="sm">
+                        <b-form-datepicker
+                          :disabled="!initial"
+                          size="sm"
+                          v-model="startDate"
+                        ></b-form-datepicker>
+                        <b-button
+                          variant="link"
+                          v-if="startDate && initial"
+                          @click="startDate = null"
+                          size="sm"
+                          >CLEAR</b-button
+                        >
+                      </b-form-group>
+
+                      <template v-if="initial">
                         <b-button variant="primary" @click="executeSearch({})">SEARCH</b-button>
                       </template>
 
-                      <template v-else>
+                      <template v-if="inflight">
                         <b-button variant="outline-danger" @click="stopSearch({})">STOP</b-button>
                       </template>
 
@@ -98,15 +101,15 @@
                       </div>
                     </div>
 
-                    <div class="flex flex-col col-span-4 p-4 overflow-y-auto">
+                    <div class="flex flex-col col-span-4 p-4 gap-4 overflow-y-auto">
                       <div
                         v-for="transfer of transferPackageSearchState.results"
                         v-bind:key="transfer.Id"
                       >
-                        <b-card>
+                        <b-card no-body>
                           <template #header>
                             <div class="flex flex-row justify-between items-center">
-                              <div class="text-xl text-purple-800">
+                              <div class="text-lg text-purple-800">
                                 Manifest
                                 {{ transfer.ManifestNumber }}
                               </div>
@@ -123,14 +126,14 @@
                             </div>
                           </template>
 
-                          <b-card-body>
+                          <div>
                             <div
                               v-for="destination of transfer.outgoingDestinations"
                               v-bind:key="destination.Id"
                             >
                               <div v-for="pkg of destination.packages" v-bind:key="pkg.Id">
                                 <div
-                                  class="w-full flex flex-row items-center justify-start space-x-4"
+                                  class="py-4 px-2 w-full flex flex-row items-center justify-start space-x-4"
                                 >
                                   <picker-icon
                                     icon="box"
@@ -150,7 +153,7 @@
                                 </div>
                               </div>
                             </div>
-                          </b-card-body>
+                          </div>
                         </b-card>
 
                         <!-- <div
@@ -240,6 +243,7 @@ import {
 } from "@/utils/package";
 import PickerCard from "@/components/overlay-widget/shared/PickerCard.vue";
 import PickerIcon from "@/components/overlay-widget/shared/PickerIcon.vue";
+import HistoryList from "@/components/search/shared/HistoryList.vue";
 
 export default Vue.extend({
   name: "TransferPackageSearchWidget",
@@ -250,6 +254,7 @@ export default Vue.extend({
     SearchViewSelector,
     PickerCard,
     PickerIcon,
+    HistoryList,
   },
   computed: {
     ...mapState<IPluginState>({
@@ -316,9 +321,12 @@ export default Vue.extend({
     async setTransferManifestNumberFilter(transfer: IIndexedTransferData) {
       analyticsManager.track(MessageType.SELECTED_TRANSFER);
 
+      store.dispatch(`transferPackageSearch/${TransferPackageSearchActions.STOP_SEARCH}`, {});
+
       store.dispatch(
         `transferSearch/${TransferSearchActions.PARTIAL_UPDATE_TRANSFER_SEARCH_FILTERS}`,
         {
+          transferState: transfer.TransferState,
           transferSearchFilters: {
             manifestNumber: transfer.ManifestNumber,
           },

@@ -240,6 +240,7 @@ export default Vue.extend({
       store.dispatch(
         `transferSearch/${TransferSearchActions.PARTIAL_UPDATE_TRANSFER_SEARCH_FILTERS}`,
         {
+          transferState: transfer.TransferState,
           transferSearchFilters: {
             manifestNumber: transfer.ManifestNumber,
           },

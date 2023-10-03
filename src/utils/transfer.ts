@@ -18,6 +18,7 @@ import { dynamicConstsManager } from "@/modules/dynamic-consts-manager.module";
 import { toastManager } from "@/modules/toast-manager.module";
 import store from "@/store/page-overlay/index";
 import { OAuthState } from "@/store/page-overlay/modules/plugin-auth/consts";
+import { getItemNameOrError, getLabelOrError } from "./package";
 import { createScanSheetOrError } from "./sheets-export";
 
 const DRIVER_NAME_MATCHER = /^- Driver Name: (.+)$/;
@@ -401,9 +402,19 @@ export async function findMatchingTransferPackages({
 
         promises.push(
           dataLoader.destinationPackages(destination.Id).then((packages) => {
-            destination.packages = packages.filter((pkg) =>
-              pkg.PackageLabel.toLocaleLowerCase().includes(queryString.toLocaleLowerCase())
-            );
+            destination.packages = packages.filter((pkg) => {
+              const normalizedQueryString = queryString.toLocaleLowerCase();
+
+              if (getLabelOrError(pkg).toLocaleLowerCase().includes(normalizedQueryString)) {
+                return true;
+              }
+
+              if (getItemNameOrError(pkg).toLocaleLowerCase().includes(normalizedQueryString)) {
+                return true;
+              }
+
+              return false;
+            });
           })
         );
       }
