@@ -305,8 +305,8 @@ export default Vue.extend({
         const lowestExpirationDate: string =
           newPackageData.ingredients
             .map((x) => x.pkg.ExpirationDate)
-            .filter((x) => x.length > 0)
-            .sort((a, b) => a.toLowerCase().localeCompare(b.toLowerCase()))[0] ?? "";
+            .filter((x) => x && x.length > 0)
+            .sort((a, b) => a!.toLowerCase().localeCompare(b!.toLowerCase()))[0] ?? "";
 
         const row: IMetrcCreatePackagesFromPackagesPayload = {
           ActualDate: submitDateFromIsodate(this.$data.packageIsodate),
