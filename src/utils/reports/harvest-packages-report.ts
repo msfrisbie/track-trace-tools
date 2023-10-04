@@ -218,6 +218,62 @@ export async function maybeLoadHarvestPackagesReportData({
       statusMessage: { text: "Extracting package history...", level: "success" },
     });
 
+    const packageHistoryPromises: Promise<any>[] = [];
+
+    const pkgQueue: [IUnionIndexedPackageData, number][] = [];
+
+    for (const harvest of harvests) {
+      const harvestPackageLabels = extractHarvestChildPackageLabelsFromHistory(harvest.history!);
+
+      for (const harvestPackageLabel of harvestPackageLabels) {
+        const harvestPackage = packageMap.get(harvestPackageLabel);
+
+        if (!harvestPackage) {
+          continue;
+        }
+
+        pkgQueue.push([harvestPackage, 0]);
+      }
+    }
+
+    while (true) {
+      if (pkgQueue.length === 0) {
+        await Promise.allSettled(packageHistoryPromises);
+
+        if (pkgQueue.length === 0) {
+          break;
+        }
+      }
+
+      const [pkg, depth] = pkgQueue.pop()!;
+
+      dataLoader = await getDataLoaderByLicense(pkg.LicenseNumber);
+
+      packageHistoryPromises.push(
+        dataLoader.packageHistoryByPackageId(getIdOrError(pkg)).then((history) => {
+          pkg.history = history;
+
+          if (depth === 2) {
+            return;
+          }
+
+          const childPackageLabels = extractChildPackageLabelsFromHistory(history);
+
+          for (const childPackageLabel of childPackageLabels) {
+            const childPkg = packageMap.get(childPackageLabel);
+
+            if (!childPkg) {
+              continue;
+            }
+
+            pkgQueue.push([childPkg, depth + 1]);
+          }
+        })
+      );
+    }
+
+    await Promise.allSettled(packageHistoryPromises);
+
     for (const harvest of harvests) {
       const harvestPackageLabels = extractHarvestChildPackageLabelsFromHistory(harvest.history!);
 
@@ -235,14 +291,14 @@ export async function maybeLoadHarvestPackagesReportData({
 
         const strainName = getStrainNameOrError(harvestPackage);
 
-        dataLoader = await getDataLoaderByLicense(harvestPackage.LicenseNumber);
+        // dataLoader = await getDataLoaderByLicense(harvestPackage.LicenseNumber);
 
-        harvestPackage.history = await dataLoader.packageHistoryByPackageId(
-          getIdOrError(harvestPackage)
-        );
+        // harvestPackage.history = await dataLoader.packageHistoryByPackageId(
+        //   getIdOrError(harvestPackage)
+        // );
 
         const initailHarvestPackageQuantity =
-          extractInitialPackageQuantityAndUnitFromHistoryOrError(harvestPackage.history);
+          extractInitialPackageQuantityAndUnitFromHistoryOrError(harvestPackage.history!);
 
         harvestPackageMatrix.push([
           harvestPackage.LicenseNumber,
@@ -269,7 +325,7 @@ export async function maybeLoadHarvestPackagesReportData({
           "Denug",
         ]);
 
-        const childPackageLabels = extractChildPackageLabelsFromHistory(harvestPackage.history);
+        const childPackageLabels = extractChildPackageLabelsFromHistory(harvestPackage.history!);
 
         for (const childPackageLabel of childPackageLabels) {
           const childPackage = packageMap.get(childPackageLabel);
@@ -283,24 +339,26 @@ export async function maybeLoadHarvestPackagesReportData({
             continue;
           }
 
-          dataLoader = await getDataLoaderByLicense(childPackage.LicenseNumber);
+          // dataLoader = await getDataLoaderByLicense(childPackage.LicenseNumber);
 
-          childPackage.history = await dataLoader.packageHistoryByPackageId(
-            getIdOrError(childPackage)
-          );
+          // childPackage.history = await dataLoader.packageHistoryByPackageId(
+          //   getIdOrError(childPackage)
+          // );
 
           const [initialChildQuantity, unit] =
-            extractInitialPackageQuantityAndUnitFromHistoryOrError(childPackage.history);
+            extractInitialPackageQuantityAndUnitFromHistoryOrError(childPackage.history!);
 
           if (getItemNameOrError(childPackage).includes("Trim")) {
             continue;
           }
 
           const childLabTestLabels = extractTestSamplePackageLabelsFromHistory(
-            childPackage.history
+            childPackage.history!
           );
 
-          const childSets = extractChildPackageTagQuantityUnitSetsFromHistory(childPackage.history);
+          const childSets = extractChildPackageTagQuantityUnitSetsFromHistory(
+            childPackage.history!
+          );
 
           let totalChildTestQuantity = 0;
 
@@ -313,7 +371,7 @@ export async function maybeLoadHarvestPackagesReportData({
           }
 
           const childAdjustmentReasonNoteSets = extractAdjustmentReasonNoteSetsFromHistory(
-            childPackage.history
+            childPackage.history!
           );
 
           let childWasteTotal = 0;
@@ -380,7 +438,7 @@ export async function maybeLoadHarvestPackagesReportData({
           ]);
 
           const grandchildPackageLabels = extractChildPackageLabelsFromHistory(
-            childPackage.history
+            childPackage.history!
           );
 
           for (const grandchildPackageLabel of grandchildPackageLabels) {
@@ -395,21 +453,21 @@ export async function maybeLoadHarvestPackagesReportData({
               continue;
             }
 
-            dataLoader = await getDataLoaderByLicense(grandchildPackage.LicenseNumber);
+            // dataLoader = await getDataLoaderByLicense(grandchildPackage.LicenseNumber);
 
-            grandchildPackage.history = await dataLoader.packageHistoryByPackageId(
-              getIdOrError(grandchildPackage)
-            );
+            // grandchildPackage.history = await dataLoader.packageHistoryByPackageId(
+            //   getIdOrError(grandchildPackage)
+            // );
 
             const [initialGrandchildQuantity, unit] =
-              extractInitialPackageQuantityAndUnitFromHistoryOrError(grandchildPackage.history);
+              extractInitialPackageQuantityAndUnitFromHistoryOrError(grandchildPackage.history!);
 
             const grandchildLabTestLabels = extractTestSamplePackageLabelsFromHistory(
-              grandchildPackage.history
+              grandchildPackage.history!
             );
 
             const grandchildSets = extractChildPackageTagQuantityUnitSetsFromHistory(
-              grandchildPackage.history
+              grandchildPackage.history!
             );
 
             let totalGrandchildTestQuantity = 0;
@@ -423,7 +481,7 @@ export async function maybeLoadHarvestPackagesReportData({
             }
 
             const grandchildAdjustmentReasonNoteSets = extractAdjustmentReasonNoteSetsFromHistory(
-              grandchildPackage.history
+              grandchildPackage.history!
             );
 
             let grandchildWasteTotal = 0;
@@ -594,14 +652,14 @@ export async function maybeLoadHarvestPackagesReportData({
             continue;
           }
 
-          dataLoader = await getDataLoaderByLicense(childPackage.LicenseNumber);
+          // dataLoader = await getDataLoaderByLicense(childPackage.LicenseNumber);
 
-          childPackage.history = await dataLoader.packageHistoryByPackageId(
-            getIdOrError(childPackage)
-          );
+          // childPackage.history = await dataLoader.packageHistoryByPackageId(
+          //   getIdOrError(childPackage)
+          // );
 
           const [initialChildQuantity, unit] =
-            extractInitialPackageQuantityAndUnitFromHistoryOrError(childPackage.history);
+            extractInitialPackageQuantityAndUnitFromHistoryOrError(childPackage.history!);
 
           if (getItemNameOrError(childPackage).includes("Trim")) {
             harvestPackageMatrix.push([
@@ -632,7 +690,7 @@ export async function maybeLoadHarvestPackagesReportData({
         }
 
         const harvestPackageAdjustmentReasonNoteSets = extractAdjustmentReasonNoteSetsFromHistory(
-          harvestPackage.history
+          harvestPackage.history!
         );
 
         for (const harvestPackageAdjustmentReasonNote of harvestPackageAdjustmentReasonNoteSets) {
