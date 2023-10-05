@@ -447,9 +447,9 @@ export async function maybeLoadHarvestPackagesReportData({
           let totalChildTestQuantity = 0;
 
           for (const childLabTestLabel of childLabTestLabels) {
-            for (const childSet of childSets) {
-              if (childLabTestLabel === childSet[0]) {
-                totalChildTestQuantity += childSet[1];
+            for (const [childLabel, childQty, childUnit] of childSets) {
+              if (childLabTestLabel === childLabel) {
+                totalChildTestQuantity += childQty;
               }
             }
           }
@@ -470,26 +470,26 @@ export async function maybeLoadHarvestPackagesReportData({
           }
 
           harvestPackageMatrix.push([
-            childPackage.LicenseNumber,
+            harvestPackage.LicenseNumber,
             harvest.Name,
             "",
             getLabelOrError(childPackage).slice(-8).replace(/^0+/, ""),
             strainName,
             "",
-            getItemNameOrError(childPackage), // TODO convert
+            normalizeItemNameToMaterialType(getItemNameOrError(childPackage)),
             ...generateUnitsPair(initialChildQuantity, childPackage),
             "Post QC Batch",
             "Child",
           ]);
 
           harvestPackageMatrix.push([
-            childPackage.LicenseNumber,
+            harvestPackage.LicenseNumber,
             harvest.Name,
             "",
             getLabelOrError(childPackage).slice(-8).replace(/^0+/, ""),
             strainName,
             "",
-            getItemNameOrError(childPackage), // TODO convert
+            normalizeItemNameToMaterialType(getItemNameOrError(childPackage)),
             ...generateUnitsPair(totalChildTestQuantity, childPackage),
             "Post QC Lab Testing",
             "Child",
@@ -503,24 +503,6 @@ export async function maybeLoadHarvestPackagesReportData({
             let grandchildPackage = packageMap.get(grandchildPackageLabel);
 
             if (!grandchildPackage) {
-              // const result = await getPackageFromOutboundTransferOrNull(
-              //   grandchildPackageLabel,
-              //   childPackage.LicenseNumber
-              // );
-
-              // if (result) {
-              //   const [transfer, pkg] = result;
-              //   grandchildPackage = pkg;
-              // } else {
-              //   // @ts-ignore
-              //   harvestPackageMatrix.push([
-              //     ...Array(10).fill(""),
-              //     `Could not match grandchild package ${grandchildPackageLabel}`,
-              //   ]);
-
-              //   continue;
-              // }
-
               continue;
             }
 
@@ -545,9 +527,9 @@ export async function maybeLoadHarvestPackagesReportData({
             let totalGrandchildTestQuantity = 0;
 
             for (const grandchildLabTestLabel of grandchildLabTestLabels) {
-              for (const grandchildSet of grandchildSets) {
-                if (grandchildLabTestLabel === grandchildSet[0]) {
-                  totalGrandchildTestQuantity += grandchildSet[1];
+              for (const [grandchildLabel, grandchildQty, grandchildUnit] of grandchildSets) {
+                if (grandchildLabTestLabel === grandchildLabel) {
+                  totalGrandchildTestQuantity += grandchildQty;
                 }
               }
             }
@@ -568,27 +550,44 @@ export async function maybeLoadHarvestPackagesReportData({
               }
             }
 
+            const greatgrandchildPackageLabelSets =
+              extractChildPackageTagQuantityUnitSetsFromHistory(grandchildPackage.history!);
+
+            for (const [
+              greatgrandchildLabel,
+              greatgrandchildQty,
+              greatgrandchildUnit,
+            ] of greatgrandchildPackageLabelSets) {
+              const greatgrandchildPackage = packageMap.get(greatgrandchildLabel);
+
+              if (greatgrandchildPackage) {
+                if (getItemNameOrError(greatgrandchildPackage).includes("Shake")) {
+                  grandchildShakeTotal += greatgrandchildQty;
+                }
+              }
+            }
+
             harvestPackageMatrix.push([
-              grandchildPackage.LicenseNumber,
+              harvestPackage.LicenseNumber,
               harvest.Name,
               "",
               getLabelOrError(grandchildPackage).slice(-8).replace(/^0+/, ""),
               strainName,
               "",
-              getItemNameOrError(grandchildPackage), // TODO convert
+              normalizeItemNameToMaterialType(getItemNameOrError(childPackage)),
               ...generateUnitsPair(initialGrandchildQuantity, grandchildPackage),
               "Packaging Intake",
               "Grandchild",
             ]);
 
             harvestPackageMatrix.push([
-              grandchildPackage.LicenseNumber,
+              harvestPackage.LicenseNumber,
               harvest.Name,
               "",
               getLabelOrError(grandchildPackage).slice(-8).replace(/^0+/, ""),
               strainName,
               "",
-              getItemNameOrError(grandchildPackage) + " - Prepack", // TODO convert
+              normalizeItemNameToMaterialType(getItemNameOrError(childPackage)) + " - Prepack",
               ...generateUnitsPair(
                 initialGrandchildQuantity -
                   (grandchildMLOverpackTotal + grandchildWasteTotal + grandchildShakeTotal),
@@ -599,42 +598,39 @@ export async function maybeLoadHarvestPackagesReportData({
             ]);
 
             harvestPackageMatrix.push([
-              grandchildPackage.LicenseNumber,
+              harvestPackage.LicenseNumber,
               harvest.Name,
               "",
               getLabelOrError(grandchildPackage).slice(-8).replace(/^0+/, ""),
               strainName,
               "",
-              "Waste", // TODO convert
-              ...generateUnitsPair(
-                grandchildWasteTotal,
-                grandchildPackage
-              ),
+              "Waste",
+              ...generateUnitsPair(grandchildWasteTotal, grandchildPackage),
               "Packaging - Waste",
               "Grandchild",
             ]);
 
             harvestPackageMatrix.push([
-              grandchildPackage.LicenseNumber,
+              harvestPackage.LicenseNumber,
               harvest.Name,
               "",
               getLabelOrError(grandchildPackage).slice(-8).replace(/^0+/, ""),
               strainName,
               "",
-              "Shake", // TODO convert
+              "Shake",
               ...generateUnitsPair(grandchildShakeTotal, grandchildPackage),
               "Packaging - Sent to Lab",
               "Grandchild",
             ]);
 
             harvestPackageMatrix.push([
-              grandchildPackage.LicenseNumber,
+              harvestPackage.LicenseNumber,
               harvest.Name,
               "",
               getLabelOrError(grandchildPackage).slice(-8).replace(/^0+/, ""),
               strainName,
               "",
-              "Moisture Loss", // TODO convert
+              "Moisture Loss",
               ...generateUnitsPair(grandchildMLOverpackTotal, grandchildPackage),
               "Packaging ML/Overpack",
               "Grandchild",
@@ -769,4 +765,16 @@ function extractInitialQuantity(pkg: IUnionIndexedPackageData): [number, string]
 
     throw new Error("Invalid package state");
   }
+}
+
+function normalizeItemNameToMaterialType(itemName: string) {
+  if (itemName.includes("Popcorn")) {
+    return "Popcorn";
+  }
+
+  if (itemName.includes("Flower")) {
+    return "Flower";
+  }
+
+  return itemName;
 }
