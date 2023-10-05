@@ -18,6 +18,7 @@ import { dynamicConstsManager } from "@/modules/dynamic-consts-manager.module";
 import { toastManager } from "@/modules/toast-manager.module";
 import store from "@/store/page-overlay/index";
 import { OAuthState } from "@/store/page-overlay/modules/plugin-auth/consts";
+import { TransferPackageSearchAlgorithm } from "@/store/page-overlay/modules/transfer-package-search/consts";
 import { getItemNameOrError, getLabelOrError } from "./package";
 import { createScanSheetOrError } from "./sheets-export";
 
@@ -317,12 +318,14 @@ export async function findMatchingTransferPackages({
   startDate,
   licenses,
   signal,
+  algorithm,
   updateFn,
 }: {
   queryString: string;
   startDate: string | null;
   licenses: string[];
   signal: AbortSignal;
+  algorithm: TransferPackageSearchAlgorithm;
   updateFn?: (transfers: IIndexedRichOutgoingTransferData[]) => void;
 }): Promise<IIndexedRichOutgoingTransferData[]> {
   let allTransfers: IIndexedTransferData[] = [];
@@ -356,6 +359,18 @@ export async function findMatchingTransferPackages({
 
   if (startDate) {
     allTransfers = allTransfers.filter((transfer) => transfer.CreatedDateTime >= startDate);
+  }
+
+  allTransfers.sort((a, b) => a.CreatedDateTime.localeCompare(b.CreatedDateTime));
+
+  switch (algorithm) {
+    case TransferPackageSearchAlgorithm.NEW_TO_OLD:
+      allTransfers.reverse();
+      break;
+    case TransferPackageSearchAlgorithm.OLD_TO_NEW:
+      break;
+    default:
+      break;
   }
 
   let pageIdx = 0;

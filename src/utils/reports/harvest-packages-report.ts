@@ -17,6 +17,7 @@ import {
   IReportData,
   IReportsState,
 } from "@/store/page-overlay/modules/reports/interfaces";
+import { TransferPackageSearchAlgorithm } from "@/store/page-overlay/modules/transfer-package-search/consts";
 import { ActionContext } from "vuex";
 import { todayIsodate } from "../date";
 import {
@@ -213,14 +214,26 @@ export async function maybeLoadHarvestPackagesReportData({
       return true;
     });
 
-    const harvestPackageMatrix: any[][] = [];
+    const harvestPackageMatrix: [
+      string,
+      string,
+      string,
+      string,
+      string,
+      "",
+      string,
+      number,
+      number,
+      string,
+      string?
+    ][] = [];
 
     const packageMap = new Map<string, IUnionIndexedPackageData>(packages.map((x) => [x.Label, x]));
 
     async function getPackageFromOutboundTransferOrNull(
       label: string,
       license: string,
-      parentPackage?: IIndexedPackageData
+      startDate: string
     ): Promise<[IIndexedRichOutgoingTransferData, IIndexedDestinationPackageData] | null> {
       const abortController = new AbortController();
 
@@ -229,9 +242,10 @@ export async function maybeLoadHarvestPackagesReportData({
 
       await findMatchingTransferPackages({
         queryString: label,
-        startDate: parentPackage?.PackagedDate ?? null,
+        startDate,
         licenses: [license],
         signal: abortController.signal,
+        algorithm: TransferPackageSearchAlgorithm.OLD_TO_NEW,
         updateFn: (transfers) => {
           for (const transfer of transfers) {
             for (const destination of transfer.outgoingDestinations!) {
@@ -339,29 +353,35 @@ export async function maybeLoadHarvestPackagesReportData({
       const harvestPackageLabels = extractHarvestChildPackageLabelsFromHistory(harvest.history!);
 
       for (const harvestPackageLabel of harvestPackageLabels) {
-        const harvestPackage = packageMap.get(harvestPackageLabel);
+        let harvestPackage = packageMap.get(harvestPackageLabel);
 
         if (!harvestPackage) {
-          const transferredPackage = await getPackageFromOutboundTransferOrNull(
+          const result = await getPackageFromOutboundTransferOrNull(
             harvestPackageLabel,
-            harvest.LicenseNumber
+            harvest.LicenseNumber,
+            harvest.HarvestStartDate
           );
 
-          if (transferredPackage) {
+          if (result) {
+            const [transfer, pkg] = result;
+
+            harvestPackage = pkg;
           } else {
+            // @ts-ignore
             harvestPackageMatrix.push([
               ...Array(10).fill(""),
               `Could not match harvest package ${harvestPackageLabel}`,
             ]);
-          }
 
-          continue;
+            continue;
+          }
         }
 
         const strainName = getStrainNameOrError(harvestPackage);
 
-        const initailHarvestPackageQuantity =
-          extractInitialPackageQuantityAndUnitFromHistoryOrError(harvestPackage.history!);
+        const initailHarvestPackageQuantity = harvestPackage.history
+          ? extractInitialPackageQuantityAndUnitFromHistoryOrError(harvestPackage.history!)[0]
+          : (harvestPackage as IIndexedDestinationPackageData).ShippedQuantity;
 
         harvestPackageMatrix.push([
           harvestPackage.LicenseNumber,
@@ -371,34 +391,48 @@ export async function maybeLoadHarvestPackagesReportData({
           strainName,
           "",
           "Denug",
-          ...generateUnitsPair(initailHarvestPackageQuantity[0], harvestPackage),
+          ...generateUnitsPair(initailHarvestPackageQuantity, harvestPackage),
           "Denug",
         ]);
+
+        if (!harvestPackage.history) {
+          continue;
+        }
 
         const childPackageLabels = extractChildPackageLabelsFromHistory(harvestPackage.history!);
 
         for (const childPackageLabel of childPackageLabels) {
-          const childPackage = packageMap.get(childPackageLabel);
+          let childPackage = packageMap.get(childPackageLabel);
 
           if (!childPackage) {
-            harvestPackageMatrix.push([
-              ...Array(10).fill(""),
-              `Could not match child package ${childPackageLabel}`,
-            ]);
+            // const result = await getPackageFromOutboundTransferOrNull(
+            //   childPackageLabel,
+            //   harvestPackage.LicenseNumber
+            // );
+
+            // if (result) {
+            //   const [transfer, pkg] = result;
+            //   childPackage = pkg;
+            // } else {
+            //   // @ts-ignore
+            //   harvestPackageMatrix.push([
+            //     ...Array(10).fill(""),
+            //     `Could not match child package ${childPackageLabel}`,
+            //   ]);
+            // }
 
             continue;
           }
 
-          // dataLoader = await getDataLoaderByLicense(childPackage.LicenseNumber);
-
-          // childPackage.history = await dataLoader.packageHistoryByPackageId(
-          //   getIdOrError(childPackage)
-          // );
-
-          const [initialChildQuantity, unit] =
-            extractInitialPackageQuantityAndUnitFromHistoryOrError(childPackage.history!);
+          const initialChildQuantity: number = childPackage.history
+            ? extractInitialPackageQuantityAndUnitFromHistoryOrError(childPackage.history!)[0]
+            : (childPackage as IIndexedDestinationPackageData).ShippedQuantity;
 
           if (getItemNameOrError(childPackage).includes("Trim")) {
+            continue;
+          }
+
+          if (!childPackage.history) {
             continue;
           }
 
@@ -466,25 +500,39 @@ export async function maybeLoadHarvestPackagesReportData({
           );
 
           for (const grandchildPackageLabel of grandchildPackageLabels) {
-            const grandchildPackage = packageMap.get(grandchildPackageLabel);
+            let grandchildPackage = packageMap.get(grandchildPackageLabel);
 
             if (!grandchildPackage) {
-              harvestPackageMatrix.push([
-                ...Array(10).fill(""),
-                `Could not match grandchild package ${grandchildPackageLabel}`,
-              ]);
+              // const result = await getPackageFromOutboundTransferOrNull(
+              //   grandchildPackageLabel,
+              //   childPackage.LicenseNumber
+              // );
+
+              // if (result) {
+              //   const [transfer, pkg] = result;
+              //   grandchildPackage = pkg;
+              // } else {
+              //   // @ts-ignore
+              //   harvestPackageMatrix.push([
+              //     ...Array(10).fill(""),
+              //     `Could not match grandchild package ${grandchildPackageLabel}`,
+              //   ]);
+
+              //   continue;
+              // }
 
               continue;
             }
 
-            // dataLoader = await getDataLoaderByLicense(grandchildPackage.LicenseNumber);
+            const initialGrandchildQuantity: number = grandchildPackage.history
+              ? extractInitialPackageQuantityAndUnitFromHistoryOrError(
+                  grandchildPackage.history!
+                )[0]
+              : (grandchildPackage as IIndexedDestinationPackageData).ShippedQuantity;
 
-            // grandchildPackage.history = await dataLoader.packageHistoryByPackageId(
-            //   getIdOrError(grandchildPackage)
-            // );
-
-            const [initialGrandchildQuantity, unit] =
-              extractInitialPackageQuantityAndUnitFromHistoryOrError(grandchildPackage.history!);
+            if (!grandchildPackage.history) {
+              continue;
+            }
 
             const grandchildLabTestLabels = extractTestSamplePackageLabelsFromHistory(
               grandchildPackage.history!
@@ -596,22 +644,28 @@ export async function maybeLoadHarvestPackagesReportData({
         }
 
         for (const childPackageLabel of childPackageLabels) {
-          const childPackage = packageMap.get(childPackageLabel);
+          let childPackage = packageMap.get(childPackageLabel);
 
           if (!childPackage) {
-            harvestPackageMatrix.push([
-              ...Array(10).fill(""),
-              `Could not match child package ${childPackageLabel}`,
-            ]);
+            const result = await getPackageFromOutboundTransferOrNull(
+              childPackageLabel,
+              harvestPackage.LicenseNumber,
+              harvestPackage.PackagedDate!
+            );
 
-            continue;
+            if (result) {
+              const [transfer, pkg] = result;
+              childPackage = pkg;
+            } else {
+              // @ts-ignore
+              harvestPackageMatrix.push([
+                ...Array(10).fill(""),
+                `Could not match child package ${childPackageLabel}`,
+              ]);
+
+              continue;
+            }
           }
-
-          // dataLoader = await getDataLoaderByLicense(childPackage.LicenseNumber);
-
-          // childPackage.history = await dataLoader.packageHistoryByPackageId(
-          //   getIdOrError(childPackage)
-          // );
 
           const [initialChildQuantity, unit] =
             extractInitialPackageQuantityAndUnitFromHistoryOrError(childPackage.history!);
@@ -665,9 +719,12 @@ export async function maybeLoadHarvestPackagesReportData({
       "Source Tag",
       "Batch Tag",
       "Strain",
+      // @ts-ignore
       "Rename",
       "Material Type",
+      // @ts-ignore
       "Grams",
+      // @ts-ignore
       "Pounds",
       "Stage",
       "Note",
@@ -697,4 +754,20 @@ function convertUnitsImpl(
   toUnitOfMeasure: IUnitOfMeasure
 ): number {
   return Math.abs(convertUnits(quantity, fromUnitOfMeasure, toUnitOfMeasure));
+}
+
+function extractInitialQuantity(pkg: IUnionIndexedPackageData): [number, string] {
+  if (pkg.history) {
+    return extractInitialPackageQuantityAndUnitFromHistoryOrError(pkg.history);
+  } else {
+    // @ts-ignore
+    if (pkg.PackageLabel) {
+      return [
+        (pkg as IIndexedDestinationPackageData).ShippedQuantity,
+        (pkg as IIndexedDestinationPackageData).ShippedUnitOfMeasureAbbreviation,
+      ];
+    }
+
+    throw new Error("Invalid package state");
+  }
 }
