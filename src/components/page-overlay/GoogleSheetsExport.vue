@@ -1346,8 +1346,8 @@
 
           <div class="flex flex-col items-stretch gap-2">
             <div
-              v-for="statusMessageHistoryEntry of reportStatusMessageHistory"
-              v-bind:key="statusMessageHistoryEntry.text"
+              v-for="(statusMessageHistoryEntry, index) in reportStatusMessageHistory"
+              v-bind:key="index"
               class="flex flex-row justify-start items-center gap-2"
             >
               <font-awesome-icon
@@ -1434,9 +1434,9 @@ import store from "@/store/page-overlay/index";
 import { OAuthState, PluginAuthActions } from "@/store/page-overlay/modules/plugin-auth/consts";
 import {
   ReportAuxTask,
+  ReportsActions,
   ReportStatus,
   ReportType,
-  ReportsActions,
   SHEET_FIELDS,
 } from "@/store/page-overlay/modules/reports/consts";
 import { IReportConfig } from "@/store/page-overlay/modules/reports/interfaces";
@@ -1473,9 +1473,9 @@ import {
   incomingTransfersFormFiltersFactory,
 } from "@/utils/reports/incoming-transfers-report";
 import {
-  MATURE_PLANT_QUICKVIEW_DIMENSIONS,
   addMaturePlantsQuickviewReport,
   maturePlantsQuickviewFormFiltersFactory,
+  MATURE_PLANT_QUICKVIEW_DIMENSIONS,
 } from "@/utils/reports/mature-plants-quickview-report";
 import {
   addMaturePlantsReport,
