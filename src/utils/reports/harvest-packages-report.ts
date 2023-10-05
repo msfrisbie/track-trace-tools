@@ -605,10 +605,9 @@ export async function maybeLoadHarvestPackagesReportData({
               getLabelOrError(grandchildPackage).slice(-8).replace(/^0+/, ""),
               strainName,
               "",
-              "Waste", // TODO convert...generateUnitsPair(
+              "Waste", // TODO convert
               ...generateUnitsPair(
-                initialGrandchildQuantity -
-                  (grandchildMLOverpackTotal + grandchildWasteTotal + grandchildShakeTotal),
+                grandchildWasteTotal,
                 grandchildPackage
               ),
               "Packaging - Waste",
@@ -622,7 +621,7 @@ export async function maybeLoadHarvestPackagesReportData({
               getLabelOrError(grandchildPackage).slice(-8).replace(/^0+/, ""),
               strainName,
               "",
-              "Shake", // TODO convert ...generateUnitsPair(
+              "Shake", // TODO convert
               ...generateUnitsPair(grandchildShakeTotal, grandchildPackage),
               "Packaging - Sent to Lab",
               "Grandchild",
