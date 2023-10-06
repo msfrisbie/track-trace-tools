@@ -45,6 +45,7 @@ interface IHarvestPackagesReportFormFilters {
   shouldFilterHarvestDateLt: boolean;
   licenseOptions: string[];
   licenses: string[];
+  debug: false;
 }
 
 export function getPackageSegment(pkg: IIndexedPackageData): {
@@ -69,7 +70,7 @@ export const harvestPackagesFormFiltersFactory: () => IHarvestPackagesReportForm
   shouldFilterHarvestDateLt: true,
   licenseOptions: facilityManager.cachedFacilities.map((x) => x.licenseNumber),
   licenses: facilityManager.cachedFacilities.map((x) => x.licenseNumber),
-  // .filter((x) => x.startsWith("PR-") || x.startsWith("AU-P")),
+  debug: false,
 });
 
 export function addHarvestPackagesReport({
@@ -351,7 +352,7 @@ export async function maybeLoadHarvestPackagesReportData({
             // @ts-ignore
             harvestPackageMatrix.push([
               ...Array(10).fill(""),
-              `Could not match harvest package ${harvestPackageLabel}`,
+              `Could not match harvest package. harvest:${harvest.Name}, label:${harvestPackageLabel}`,
             ]);
 
             continue;
@@ -389,37 +390,20 @@ export async function maybeLoadHarvestPackagesReportData({
 
         let childPackageLabels = extractChildPackageLabelsFromHistory(harvestPackage.history!);
 
-        // TODO check if this package is a passthrough
-        // if (childPackageLabels.length === 1) {
-        //   console.log(`Potential passthrough package: ${childPackageLabels[0]}`);
-        //   const potentialPassthroughPackage = packageMap.get(childPackageLabels[0]);
-
-        //   if (potentialPassthroughPackage && potentialPassthroughPackage.history) {
-        //     const [initialQuantity, unit] = extractInitialPackageQuantityAndUnitFromHistoryOrError(
-        //       potentialPassthroughPackage.history
-        //     );
-
-        //     const [passthroughLabel, passthroughQuantity, passthroughUnit] =
-        //       extractChildPackageTagQuantityUnitSetsFromHistory(
-        //         potentialPassthroughPackage.history
-        //       )[0];
-
-        //     console.log(`Initial/final: ${initialQuantity}/${passthroughQuantity}`);
-
-        //     if (initialQuantity === passthroughQuantity) {
-        //       console.log(`Passthrough package: ${childPackageLabels[0]}`);
-        //       childPackageLabels = extractChildPackageLabelsFromHistory(
-        //         potentialPassthroughPackage.history!
-        //       );
-        //     }
-        //   }
-        // }
-
+        // Add QC and packaging rows
         for (const childPackageLabel of childPackageLabels) {
           let childPackage = packageMap.get(childPackageLabel);
 
           if (!childPackage) {
-            throw new Error(`Could not match child package ${childPackageLabel}`);
+            // @ts-ignore
+            harvestPackageMatrix.push([
+              ...Array(10).fill(""),
+              `Packaging stage: Could not match child package. harvest:${
+                harvest.Name
+              }, harvestPkg:${getLabelOrError(harvestPackage)} label:${childPackageLabel}`,
+            ]);
+            // throw new Error(`Could not match child package ${childPackageLabel}`);
+            continue;
           }
 
           if (!childPackage.history) {
@@ -440,11 +424,25 @@ export async function maybeLoadHarvestPackagesReportData({
           );
 
           if (passthroughTestPackageLabels.length === 0 && passthroughPackageLabels.length === 1) {
-            childPackage = packageMap.get(passthroughPackageLabels[0]);
+            if (packageMap.has(passthroughPackageLabels[0])) {
+              childPackage = packageMap.get(passthroughPackageLabels[0]);
+            } else {
+              const result = await getPackageFromOutboundTransferOrNull(
+                passthroughPackageLabels[0],
+                childPackage.LicenseNumber,
+                childPackage.PackagedDate!
+              );
+
+              if (result) {
+                const [transfer, pkg] = result;
+
+                childPackage = pkg;
+              }
+            }
 
             if (!childPackage) {
               throw new Error(
-                `Passthrough failed: ${childPackageLabel} / ${passthroughPackageLabels[0]}`
+                `Passthrough failed: childLabel:${childPackageLabel} passthroughLabel:${passthroughPackageLabels[0]}`
               );
             }
           }
@@ -485,33 +483,19 @@ export async function maybeLoadHarvestPackagesReportData({
           }
         }
 
+        // Add trailing trim rows
         for (const childPackageLabel of childPackageLabels) {
           let childPackage = packageMap.get(childPackageLabel);
 
           if (!childPackage) {
-            throw new Error(`Could not match child package ${childPackageLabel}`);
+            // This should have been caught earlier in the loop/
+            console.error(`Trim stage: Could not match child package ${childPackageLabel}`);
+            continue;
           }
 
-          // if (!childPackage) {
-          //   const result = await getPackageFromOutboundTransferOrNull(
-          //     childPackageLabel,
-          //     harvestPackage.LicenseNumber,
-          //     harvestPackage.PackagedDate!
-          //   );
-
-          //   if (result) {
-          //     const [transfer, pkg] = result;
-          //     childPackage = pkg;
-          //   } else {
-          //     // @ts-ignore
-          //     harvestPackageMatrix.push([
-          //       ...Array(10).fill(""),
-          //       `Could not match child package ${childPackageLabel}`,
-          //     ]);
-
-          //     continue;
-          //   }
-          // }
+          if (!getItemNameOrError(childPackage).includes("Trim")) {
+            continue;
+          }
 
           recordTrimRow(
             harvest,
@@ -655,7 +639,7 @@ function recordPostQcRows(
     normalizeItemNameToMaterialType(getItemNameOrError(childPackage)),
     ...generateUnitsPair(initialChildQuantity, childPackage, unitsOfMeasure),
     "Post QC Batch",
-    "Child",
+    // "Child",
   ]);
 
   harvestPackageMatrix.push([
@@ -668,7 +652,7 @@ function recordPostQcRows(
     normalizeItemNameToMaterialType(getItemNameOrError(childPackage)),
     ...generateUnitsPair(totalChildTestQuantity, childPackage, unitsOfMeasure),
     "Post QC Lab Testing",
-    "Child",
+    // "Child",
   ]);
 }
 
@@ -754,7 +738,7 @@ function recordPackagingRows(
     normalizeItemNameToMaterialType(getItemNameOrError(childPackage)),
     ...generateUnitsPair(initialGrandchildQuantity, grandchildPackage, unitsOfMeasure),
     "Packaging Intake",
-    "Grandchild",
+    // "Grandchild",
   ]);
 
   harvestPackageMatrix.push([
@@ -772,7 +756,7 @@ function recordPackagingRows(
       unitsOfMeasure
     ),
     "Packaging",
-    "Grandchild",
+    // "Grandchild",
   ]);
 
   harvestPackageMatrix.push([
@@ -785,7 +769,7 @@ function recordPackagingRows(
     "Waste",
     ...generateUnitsPair(grandchildWasteTotal, grandchildPackage, unitsOfMeasure),
     "Packaging - Waste",
-    "Grandchild",
+    // "Grandchild",
   ]);
 
   harvestPackageMatrix.push([
@@ -798,7 +782,7 @@ function recordPackagingRows(
     "Shake",
     ...generateUnitsPair(grandchildShakeTotal, grandchildPackage, unitsOfMeasure),
     "Packaging - Sent to Lab",
-    "Grandchild",
+    // "Grandchild",
   ]);
 
   harvestPackageMatrix.push([
@@ -811,7 +795,7 @@ function recordPackagingRows(
     "Moisture Loss",
     ...generateUnitsPair(grandchildMLOverpackTotal, grandchildPackage, unitsOfMeasure),
     "Packaging ML/Overpack",
-    "Grandchild",
+    // "Grandchild",
   ]);
 }
 
@@ -827,19 +811,17 @@ function recordTrimRow(
     childPackage.history!
   );
 
-  if (getItemNameOrError(childPackage).includes("Trim")) {
-    harvestPackageMatrix.push([
-      harvestPackage.LicenseNumber,
-      harvest.Name,
-      getLabelOrError(harvestPackage).slice(-8).replace(/^0+/, ""),
-      "",
-      strainName,
-      "",
-      "Trim",
-      ...generateUnitsPair(initialChildQuantity, childPackage, unitsOfMeasure),
-      "Post Machine Trim - Sent to Lab",
-    ]);
-  }
+  harvestPackageMatrix.push([
+    harvestPackage.LicenseNumber,
+    harvest.Name,
+    getLabelOrError(harvestPackage).slice(-8).replace(/^0+/, ""),
+    "",
+    strainName,
+    "",
+    "Trim",
+    ...generateUnitsPair(initialChildQuantity, childPackage, unitsOfMeasure),
+    "Post Machine Trim - Sent to Lab",
+  ]);
 }
 
 function recordHarvestPackageAdjustmentRows(

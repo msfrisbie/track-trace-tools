@@ -41,6 +41,7 @@
                 name="input-licenseKey"
                 type="text"
                 v-on:keydown.enter.prevent="saveLicenseKey()"
+                autocomplete="off"
               >
               </b-form-input>
               <b-input-group-append>
@@ -547,8 +548,7 @@ import { pageManager } from "@/modules/page-manager/page-manager.module";
 import { toastManager } from "@/modules/toast-manager.module";
 import { MutationType } from "@/mutation-types";
 import store from "@/store/page-overlay/index";
-import { ClientActions } from "@/store/page-overlay/modules/client/consts";
-import { SettingsActions, SettingsMutations } from "@/store/page-overlay/modules/settings/consts";
+import { SettingsActions } from "@/store/page-overlay/modules/settings/consts";
 import { getMatchingDecryptedDataOrNull } from "@/utils/encryption";
 import { generateThumbnail } from "@/utils/file";
 import Vue from "vue";
