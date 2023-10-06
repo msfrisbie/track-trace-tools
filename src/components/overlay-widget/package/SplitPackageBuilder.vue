@@ -101,7 +101,7 @@
                   />
 
                   <b-form-group
-                    v-if="outputItem.ExpirationDateConfiguration !== 'Off'"
+                    v-if="outputItem?.ExpirationDateConfiguration !== 'Off'"
                     label="Expiration Date:"
                     label-size="sm"
                   >
@@ -607,7 +607,11 @@ export default Vue.extend({
         });
       }
 
-      if (this.outputItem!.ExpirationDateConfiguration !== "Off" && !this.expirationDate) {
+      if (
+        this.outputItem &&
+        this.outputItem!.ExpirationDateConfiguration !== "Off" &&
+        !this.expirationDate
+      ) {
         errors.push({
           tags: ["page2"],
           message: "Select an expiration date",
@@ -882,7 +886,7 @@ export default Vue.extend({
           this.outputItem = this.sourcePackage.Item;
         }
 
-        this.expirationDate = this.sourcePackage.ExpirationDate ?? "";
+        this.expirationDate = this.sourcePackage?.ExpirationDate ?? "";
       },
     },
     // useSameItem: {
