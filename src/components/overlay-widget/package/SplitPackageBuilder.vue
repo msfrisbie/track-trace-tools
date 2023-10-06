@@ -101,7 +101,7 @@
                   />
 
                   <b-form-group
-                    v-if="outputItem?.ExpirationDateConfiguration !== 'Off'"
+                    v-if="outputItem && outputItem.ExpirationDateConfiguration !== 'Off'"
                     label="Expiration Date:"
                     label-size="sm"
                   >
