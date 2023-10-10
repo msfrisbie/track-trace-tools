@@ -18,6 +18,7 @@ import {
   IReportsState,
 } from "@/store/page-overlay/modules/reports/interfaces";
 import { TransferPackageSearchAlgorithm } from "@/store/page-overlay/modules/transfer-package-search/consts";
+import { v4 as uuidv4 } from "uuid";
 import { ActionContext } from "vuex";
 import { todayIsodate } from "../date";
 import {
@@ -359,6 +360,8 @@ export async function maybeLoadHarvestPackagesReportData({
 
   await Promise.allSettled(packageHistoryPromises);
 
+  const temporaryValueMap = new Map<any, any>();
+
   for (const harvest of harvests) {
     const harvestPackageLabels = extractHarvestChildPackageLabelsFromHistory(harvest.history!);
 
@@ -387,7 +390,14 @@ export async function maybeLoadHarvestPackagesReportData({
         }
       }
 
-      const strainName = getStrainNameOrError(harvestPackage);
+      // Assign temporary value to be replaced later
+      let strainName = uuidv4();
+
+      // If a candidate is not found, use this as the fallback
+      let fallbackStrainName = "";
+      try {
+        fallbackStrainName = getStrainNameOrError(harvestPackage);
+      } catch {}
 
       const initailHarvestPackageQuantity = harvestPackage.history
         ? extractInitialPackageQuantityAndUnitFromHistoryOrError(harvestPackage.history!)[0]
@@ -396,6 +406,7 @@ export async function maybeLoadHarvestPackagesReportData({
       let msg = "";
       if (!harvestPackage.history) {
         msg = `Could not load history for harvest package ${harvestPackageLabel}`;
+        console.error(msg);
       }
 
       harvestPackageMatrix.push([
@@ -408,15 +419,16 @@ export async function maybeLoadHarvestPackagesReportData({
         "Denug",
         ...generateUnitsPair(initailHarvestPackageQuantity, harvestPackage, unitsOfMeasure),
         "Denug",
-        msg,
+        harvestConfig.debug ? msg : "",
       ]);
 
       if (!harvestPackage.history) {
-        console.error(`No harvest package history ${harvestPackageLabel}`);
         continue;
       }
 
       let childPackageLabels = extractChildPackageLabelsFromHistory(harvestPackage.history!);
+
+      const trimChildPackages: IUnionIndexedPackageData[] = [];
 
       // Add QC and packaging rows
       for (const childPackageLabel of childPackageLabels) {
@@ -428,9 +440,8 @@ export async function maybeLoadHarvestPackagesReportData({
             ...Array(10).fill(""),
             `Packaging stage: Could not match child package. harvest:${
               harvest.Name
-            }, harvestPkg:${getLabelOrError(harvestPackage)} label:${childPackageLabel}`,
+            }, harvestPkg:${getLabelOrError(harvestPackage)}, label:${childPackageLabel}`,
           ]);
-          // throw new Error(`Could not match child package ${childPackageLabel}`);
           continue;
         }
 
@@ -440,6 +451,7 @@ export async function maybeLoadHarvestPackagesReportData({
 
         // Trim is handled later on
         if (getItemNameOrError(childPackage).includes("Trim")) {
+          trimChildPackages.push(childPackage);
           continue;
         }
 
@@ -475,6 +487,14 @@ export async function maybeLoadHarvestPackagesReportData({
           }
         }
 
+        if (!childPackage.history) {
+          await getDataLoaderByLicense(childPackage.LicenseNumber)
+            .then((dataLoader) => dataLoader.packageHistoryByPackageId(getIdOrError(childPackage!)))
+            .then((history) => {
+              childPackage!.history = history;
+            });
+        }
+
         recordPostQcRows(
           reportConfig,
           harvest,
@@ -494,8 +514,15 @@ export async function maybeLoadHarvestPackagesReportData({
             // Seems this is not needed
             console.error(`Skipping grandchild package ${grandchildPackageLabel}`);
             continue;
-            // throw new Error(`Could not match grandchild package ${grandchildPackageLabel}`);
           }
+
+          try {
+            if (!temporaryValueMap.has(strainName)) {
+              const actualStrainName = getStrainNameOrError(grandchildPackage);
+
+              temporaryValueMap.set(strainName, actualStrainName);
+            }
+          } catch {}
 
           recordPackagingRows(
             reportConfig,
@@ -512,19 +539,7 @@ export async function maybeLoadHarvestPackagesReportData({
       }
 
       // Add trailing trim rows
-      for (const childPackageLabel of childPackageLabels) {
-        let childPackage = packageMap.get(childPackageLabel);
-
-        if (!childPackage) {
-          // This should have been caught earlier in the loop
-          console.error(`Trim stage: Could not match child package ${childPackageLabel}`);
-          continue;
-        }
-
-        if (!getItemNameOrError(childPackage).includes("Trim")) {
-          continue;
-        }
-
+      for (const childPackage of trimChildPackages) {
         recordTrimRow(
           reportConfig,
           harvest,
@@ -544,6 +559,20 @@ export async function maybeLoadHarvestPackagesReportData({
         harvestPackageMatrix,
         unitsOfMeasure
       );
+
+      if (!temporaryValueMap.has(strainName)) {
+        temporaryValueMap.set(strainName, fallbackStrainName);
+        console.error(`Using fallback strain name for harvest package ${harvestPackageLabel}`);
+      }
+    }
+  }
+
+  // Swap out temporary values for actual ones
+  for (const row of harvestPackageMatrix) {
+    for (const [idx, cell] of row.entries()) {
+      if (temporaryValueMap.has(cell)) {
+        row[idx] = temporaryValueMap.get(cell);
+      }
     }
   }
 
@@ -603,6 +632,16 @@ function recordPostQcRows(
   unitsOfMeasure: IUnitOfMeasure[]
 ) {
   const harvestConfig = reportConfig[ReportType.HARVEST_PACKAGES]!;
+
+  if (!childPackage.history) {
+    // @ts-ignore
+    harvestPackageMatrix.push([
+      ...Array(10).fill(""),
+      `Could not match post QC child package. harvest:${harvest.Name}, label:${getLabelOrError(
+        childPackage
+      )}`,
+    ]);
+  }
 
   const initialChildQuantity: number = childPackage.history
     ? extractInitialPackageQuantityAndUnitFromHistoryOrError(childPackage.history!)[0]
