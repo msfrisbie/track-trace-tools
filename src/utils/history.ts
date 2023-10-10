@@ -266,6 +266,22 @@ export function extractChildPackageLabelsFromHistory(historyList: IPackageHistor
   return _.uniq(childPackageLabels);
 }
 
+export function extractChildPackageLabelsFromHistory_Full(historyList: IPackageHistoryData[]): string[] {
+  const childPackageLabels = [];
+
+  for (const history of historyList) {
+    for (const description of history.Descriptions) {
+      const childPackageLabel = extractChildPackageLabelOrNull(description);
+
+      if (childPackageLabel) {
+        childPackageLabels.push(childPackageLabel);
+      }
+    }
+  }
+
+  return _.uniq(childPackageLabels);
+}
+
 export function extractTestSamplePackageLabelsFromHistory(
   historyList: IPackageHistoryData[]
 ): string[] {
@@ -369,6 +385,27 @@ export function extractHarvestChildPackageLabelsFromHistory(
   }
 
   return labels;
+}
+
+export function extractHarvestChildPackageLabelsAndTimestampsFromHistory(
+  historyList: IHarvestHistoryData[]
+): { label: string; timestamp: string }[] {
+  const entries: { label: string; timestamp: string }[] = [];
+
+  for (const history of historyList) {
+    for (const description of history.Descriptions) {
+      const label = extractHarvestPackageLabelOrNull(description);
+
+      if (label) {
+        entries.push({
+          label,
+          timestamp: history.RecordedDateTime,
+        });
+      }
+    }
+  }
+
+  return entries;
 }
 
 export function extractAdjustmentReasonNoteSetsFromHistory(historyList: IPackageHistoryData[]): {

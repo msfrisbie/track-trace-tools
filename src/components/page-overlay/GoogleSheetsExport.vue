@@ -297,6 +297,12 @@
               <hr />
 
               <simple-drawer toggleText="ADVANCED">
+                <b-form-checkbox v-model="harvestPackagesFormFilters.debug">
+                  <span class="leading-6">Debug</span>
+                </b-form-checkbox>
+                <b-form-checkbox v-model="harvestPackagesFormFilters.ignoreMissingPackages">
+                  <span class="leading-6">Ignore missing packages</span>
+                </b-form-checkbox>
                 <b-form-group label="Licenses:">
                   <b-form-checkbox-group
                     v-model="harvestPackagesFormFilters.licenses"
