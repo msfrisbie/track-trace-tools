@@ -266,7 +266,9 @@ export function extractChildPackageLabelsFromHistory(historyList: IPackageHistor
   return _.uniq(childPackageLabels);
 }
 
-export function extractChildPackageLabelsFromHistory_Full(historyList: IPackageHistoryData[]): string[] {
+export function extractChildPackageLabelsFromHistory_Full(
+  historyList: IPackageHistoryData[]
+): { label: string; history: IPackageHistoryData }[] {
   const childPackageLabels = [];
 
   for (const history of historyList) {
@@ -274,12 +276,12 @@ export function extractChildPackageLabelsFromHistory_Full(historyList: IPackageH
       const childPackageLabel = extractChildPackageLabelOrNull(description);
 
       if (childPackageLabel) {
-        childPackageLabels.push(childPackageLabel);
+        childPackageLabels.push({ label: childPackageLabel, history });
       }
     }
   }
 
-  return _.uniq(childPackageLabels);
+  return childPackageLabels;
 }
 
 export function extractTestSamplePackageLabelsFromHistory(

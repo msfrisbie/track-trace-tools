@@ -24,6 +24,7 @@ import { todayIsodate } from "../date";
 import {
   extractAdjustmentReasonNoteSetsFromHistory,
   extractChildPackageLabelsFromHistory,
+  extractChildPackageLabelsFromHistory_Full,
   extractChildPackageTagQuantityUnitSetsFromHistory,
   extractHarvestChildPackageLabelsFromHistory,
   extractInitialPackageQuantityAndUnitFromHistoryOrError,
@@ -369,25 +370,33 @@ export async function maybeLoadHarvestPackagesReportData({
       let harvestPackage = packageMap.get(harvestPackageLabel);
 
       if (!harvestPackage) {
-        const result = await getPackageFromOutboundTransferOrNull(
-          harvestPackageLabel,
-          harvest.LicenseNumber,
-          harvest.HarvestStartDate
-        );
+        // @ts-ignore
+        harvestPackageMatrix.push([
+          ...Array(10).fill(""),
+          `Could not match harvest package. harvest:${harvest.Name}, label:${harvestPackageLabel}`,
+        ]);
 
-        if (result) {
-          const [transfer, pkg] = result;
+        continue;
 
-          harvestPackage = pkg;
-        } else {
-          // @ts-ignore
-          harvestPackageMatrix.push([
-            ...Array(10).fill(""),
-            `Could not match harvest package. harvest:${harvest.Name}, label:${harvestPackageLabel}`,
-          ]);
+        // const result = await getPackageFromOutboundTransferOrNull(
+        //   harvestPackageLabel,
+        //   harvest.LicenseNumber,
+        //   harvest.HarvestStartDate
+        // );
 
-          continue;
-        }
+        // if (result) {
+        //   const [transfer, pkg] = result;
+
+        //   harvestPackage = pkg;
+        // } else {
+        //   // @ts-ignore
+        //   harvestPackageMatrix.push([
+        //     ...Array(10).fill(""),
+        //     `Could not match harvest package. harvest:${harvest.Name}, label:${harvestPackageLabel}`,
+        //   ]);
+
+        //   continue;
+        // }
       }
 
       // Assign temporary value to be replaced later
@@ -455,22 +464,25 @@ export async function maybeLoadHarvestPackagesReportData({
           continue;
         }
 
+        let originalPackage = childPackage;
+
         const passthroughTestPackageLabels = extractTestSamplePackageLabelsFromHistory(
           childPackage.history!
         );
 
-        const passthroughPackageLabels = extractChildPackageLabelsFromHistory(
+        const passthroughPackageLabels = extractChildPackageLabelsFromHistory_Full(
           childPackage.history!
         );
 
         if (passthroughTestPackageLabels.length === 0 && passthroughPackageLabels.length === 1) {
-          if (packageMap.has(passthroughPackageLabels[0])) {
-            childPackage = packageMap.get(passthroughPackageLabels[0]);
+          if (packageMap.has(passthroughPackageLabels[0].label)) {
+            childPackage = packageMap.get(passthroughPackageLabels[0].label);
           } else {
             const result = await getPackageFromOutboundTransferOrNull(
-              passthroughPackageLabels[0],
+              passthroughPackageLabels[0].label,
               childPackage.LicenseNumber,
-              childPackage.PackagedDate!
+              // childPackage.PackagedDate!
+              passthroughPackageLabels[0].history.RecordedDateTime.split("T")[0]
             );
 
             if (result) {
@@ -482,7 +494,13 @@ export async function maybeLoadHarvestPackagesReportData({
 
           if (!childPackage) {
             throw new Error(
-              `Passthrough failed: childLabel:${childPackageLabel} passthroughLabel:${passthroughPackageLabels[0]}`
+              `Passthrough failed: childLabel:${childPackageLabel} passthroughLabel:${passthroughPackageLabels[0].label}`
+            );
+          } else {
+            console.log(
+              `Passthrough matched! Original:${getLabelOrError(
+                originalPackage
+              )} Passthrough:${getLabelOrError(childPackage)}`
             );
           }
         }
@@ -495,15 +513,27 @@ export async function maybeLoadHarvestPackagesReportData({
             });
         }
 
-        recordPostQcRows(
-          reportConfig,
-          harvest,
-          strainName,
-          harvestPackage,
-          childPackage,
-          harvestPackageMatrix,
-          unitsOfMeasure
-        );
+        try {
+          recordPostQcRows(
+            reportConfig,
+            harvest,
+            strainName,
+            harvestPackage,
+            childPackage,
+            harvestPackageMatrix,
+            unitsOfMeasure
+          );
+        } catch (e) {
+          // @ts-ignore
+          harvestPackageMatrix.push([
+            ...Array(10).fill(""),
+            `Could not record QC Rows: ${(e as any).toString()}. harvest:${
+              harvest.Name
+            }, label:${getLabelOrError(childPackage)}`,
+          ]);
+
+          continue;
+        }
 
         const grandchildPackageLabels = extractChildPackageLabelsFromHistory(childPackage.history!);
 
