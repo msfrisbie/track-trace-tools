@@ -27,7 +27,6 @@ import { authManager } from "@/modules/auth-manager.module";
 import { backgroundTaskManager } from "@/modules/background-task-manager.module";
 import { builderManager } from "@/modules/builder-manager.module";
 import { clientBuildManager } from "@/modules/client-build-manager.module";
-import { sandboxManager } from "@/modules/sandbox-manager.module";
 import { contactDataManager } from "@/modules/contact-data-manager.module";
 import { credentialManager } from "@/modules/credential-manager.module";
 import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
@@ -43,6 +42,7 @@ import { mockDataManager } from "@/modules/mock-data-manager.module";
 import { modalManager } from "@/modules/modal-manager.module";
 import { pageManager } from "@/modules/page-manager/page-manager.module";
 import { passivePageAnalyzer } from "@/modules/passive-page-analyzer.module";
+import { sandboxManager } from "@/modules/sandbox-manager.module";
 import { searchManager } from "@/modules/search-manager.module";
 import { t3RequestManager } from "@/modules/t3-request-manager.module";
 import { telemetryManager } from "@/modules/telemetry-manager.module";
@@ -179,6 +179,7 @@ library.add(
   fontawesomeSolid.faPlus,
   fontawesomeSolid.faPlusCircle,
   fontawesomeSolid.faPoll,
+  fontawesomeSolid.faProjectDiagram,
   fontawesomeSolid.faPrint,
   fontawesomeSolid.faPumpMedical,
   fontawesomeSolid.faQuestionCircle,

@@ -63,12 +63,11 @@
 </template>
 
 <script lang="ts">
-import BuilderDashboard from "@/components/overlay-widget/BuilderDashboard.vue";
 import Announcements from "@/components/overlay-widget/Announcements.vue";
+import BuilderDashboard from "@/components/overlay-widget/BuilderDashboard.vue";
 import { MessageType } from "@/consts";
 import { IPluginState } from "@/interfaces";
 import { analyticsManager } from "@/modules/analytics-manager.module";
-import { clientBuildManager } from "@/modules/client-build-manager.module";
 import router from "@/router/index";
 import store from "@/store/page-overlay/index";
 import { isIdentityEligibleForTransferTools } from "@/utils/access-control";
@@ -182,6 +181,16 @@ export default Vue.extend({
           text: "EXPLORER",
           route: "/metrc-explorer",
           icon: "sitemap",
+          visible: store.state.client.values["ENABLE_T3PLUS"] || store.state.client.t3plus,
+          enabled: true,
+          isBeta: false,
+          isNew: false,
+        },
+        {
+          backgroundColor: "#c14747",
+          text: "GRAPH",
+          route: "/graph",
+          icon: "project-diagram",
           visible: store.state.client.values["ENABLE_T3PLUS"] || store.state.client.t3plus,
           enabled: true,
           isBeta: false,

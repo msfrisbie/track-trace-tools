@@ -93,7 +93,7 @@
     <!-- {{ $route }} -->
 
     <!-- Child views should expand to fill the modal -->
-    <router-view class="flex flex-col items-center"></router-view>
+    <router-view class="flex flex-col items-center h-full"></router-view>
   </b-modal>
 </template>
 
@@ -103,7 +103,6 @@ import TrackTraceToolsLogo from "@/components/shared/TrackTraceToolsLogo.vue";
 import { BuilderType, MessageType, ToolkitView } from "@/consts";
 import { analyticsManager } from "@/modules/analytics-manager.module";
 import { builderManager } from "@/modules/builder-manager.module";
-import { clientBuildManager } from "@/modules/client-build-manager.module";
 import { pageManager } from "@/modules/page-manager/page-manager.module";
 import { MutationType } from "@/mutation-types";
 import router from "@/router/index";

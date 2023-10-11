@@ -18,6 +18,7 @@ import ReplacePlantBatchTagsBuilder from "@/components/overlay-widget/cultivatio
 import ReplacePlantTagsBuilder from "@/components/overlay-widget/cultivation/ReplacePlantTagsBuilder.vue";
 import UnpackImmaturePlantsBuilder from "@/components/overlay-widget/cultivation/UnpackImmaturePlantsBuilder.vue";
 import MetrcExplorer from "@/components/overlay-widget/explorer/MetrcExplorer.vue";
+import LicenseGraph from "@/components/overlay-widget/graph/LicenseGraph.vue";
 import MiscellaneousListView from "@/components/overlay-widget/miscellaneous/MiscellaneousListView.vue";
 import Verify from "@/components/overlay-widget/miscellaneous/Verify.vue";
 import AllocateSamplesBuilder from "@/components/overlay-widget/package/AllocateSamplesBuilder.vue";
@@ -127,6 +128,11 @@ const routes: Array<RouteConfig> = [
     path: "/metrc-explorer",
     name: "Metrc Explorer",
     component: MetrcExplorer,
+  },
+  {
+    path: "/graph",
+    name: "License Graph",
+    component: LicenseGraph,
   },
   {
     path: "/package/split-package",
