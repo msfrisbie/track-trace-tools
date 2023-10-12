@@ -1,3 +1,4 @@
+import store from "@/store/page-overlay/index";
 import Graph from "graphology";
 import Sigma from "sigma";
 import { Settings } from "sigma/settings";
@@ -9,44 +10,14 @@ import {
   PlainObject,
 } from "sigma/types";
 
-export interface GraphData {
-  nodes: {
-    key: string;
-    attributes: {
-      size: number;
-      label: string;
-      color: string;
-    };
-  }[];
-  edges: {
-    key: string;
-    source: string;
-    target: string;
-    attributes: { type: "arrow"; label: string; size: number };
-  }[];
-}
-
-// Type and declare internal state:
-export interface State {
-  hoveredNode?: string;
-  searchQuery: string;
-
-  // State derived from query:
-  selectedNode?: string;
-  suggestions?: Set<string>;
-
-  // State derived from hovered node:
-  hoveredNeighbors?: Set<string>;
-}
 // Actions:
 export function setSearchQuery(
-  state: State,
   graph: Graph,
   renderer: Sigma,
   searchInput: HTMLInputElement,
   query: string
 ) {
-  state.searchQuery = query;
+  store.state.graph.searchQuery = query;
 
   if (searchInput.value !== query) {
     searchInput.value = query;
@@ -65,39 +36,42 @@ export function setSearchQuery(
     // we consider the user has selected a node through the datalist
     // autocomplete:
     if (suggestions.length === 1 && suggestions[0].label === query) {
-      state.selectedNode = suggestions[0].id;
-      state.suggestions = undefined;
+      store.state.graph.selectedNode = suggestions[0].id;
+      store.state.graph.suggestions = [];
 
       // Move the camera to center it on the selected node:
-      const nodePosition = renderer.getNodeDisplayData(state.selectedNode) as Coordinates;
+      const nodePosition = renderer.getNodeDisplayData(
+        store.state.graph.selectedNode
+      ) as Coordinates;
       renderer.getCamera().animate(nodePosition, {
         duration: 500,
       });
     }
     // Else, we display the suggestions list:
     else {
-      state.selectedNode = undefined;
-      state.suggestions = new Set(suggestions.map(({ id }: { id: any }) => id));
+      store.state.graph.selectedNode = null;
+      store.state.graph.suggestions = suggestions.map(({ id }: { id: any }) => id);
     }
   }
-  // If the query is empty, then we reset the selectedNode / suggestions state:
+  // If the query is empty, then we reset the selectedNode / suggestions store.state.graph:
   else {
-    state.selectedNode = undefined;
-    state.suggestions = undefined;
+    store.state.graph.selectedNode = null;
+    store.state.graph.suggestions = [];
   }
 
   // Refresh rendering:
   renderer.refresh();
 }
 
-export function setHoveredNode(graph: Graph, state: State, renderer: Sigma, node?: string) {
+export function setHoveredNode(graph: Graph, renderer: Sigma, node?: string) {
   if (node) {
-    state.hoveredNode = node;
-    // @ts-ignore
-    state.hoveredNeighbors = new Set(graph.neighbors(node));
+    store.state.graph.hoveredNode = node;
+    store.state.graph.hoveredNeighbors =
+      // @ts-ignore
+      graph.neighbors(node);
   } else {
-    state.hoveredNode = undefined;
-    state.hoveredNeighbors = undefined;
+    store.state.graph.hoveredNode = null;
+    store.state.graph.hoveredNeighbors = [];
   }
 
   // Refresh rendering:
@@ -212,21 +186,33 @@ export function labelRenderer(
   context.fillText(data.label, data.x + data.size + 3, data.y + size / 3);
 }
 
-// Render nodes accordingly to the internal state:
+// Render nodes accordingly to the internal store.state.graph:
 // 1. If a node is selected, it is highlighted
 // 2. If there is query, all non-matching nodes are greyed
 // 3. If there is a hovered node, all non-neighbor nodes are greyed
-export function nodeReducer(state: State, node: string, data: any) {
+export function nodeReducer(node: string, data: any) {
   const res: Partial<NodeDisplayData> = { ...data };
 
-  if (state.hoveredNeighbors && !state.hoveredNeighbors.has(node) && state.hoveredNode !== node) {
+  //   if (!store.state.graph.hoveredNeighbors.includes) {
+  //     console.log(store.state.graph.hoveredNeighbors);
+  //     debugger;
+  //   }
+
+  if (
+    store.state.graph.hoveredNeighbors.length > 0 &&
+    !store.state.graph.hoveredNeighbors.includes(node) &&
+    store.state.graph.hoveredNode !== node
+  ) {
     res.label = "";
     res.color = "#f6f6f6";
   }
 
-  if (state.selectedNode === node) {
+  if (store.state.graph.selectedNode === node) {
     res.highlighted = true;
-  } else if (state.suggestions && !state.suggestions.has(node)) {
+  } else if (
+    store.state.graph.suggestions.length > 0 &&
+    !store.state.graph.suggestions.includes(node)
+  ) {
     res.label = "";
     res.color = "#f6f6f6";
   }
@@ -234,23 +220,30 @@ export function nodeReducer(state: State, node: string, data: any) {
   return res;
 }
 
-// Render edges accordingly to the internal state:
+// Render edges accordingly to the internal store.state.graph:
 // 1. If a node is hovered, the edge is hidden if it is not connected to the
 //    node
 // 2. If there is a query, the edge is only visible if it connects two
 //    suggestions
-export function edgeReducer(state: State, edge: string, data: any) {
+export function edgeReducer(graph: Graph, edge: string, data: any) {
   const res: Partial<EdgeDisplayData> = { ...data };
 
   // @ts-ignore
-  if (state.hoveredNode && !graph.hasExtremity(edge, state.hoveredNode)) {
+  if (store.state.graph.hoveredNode && !graph.hasExtremity(edge, store.state.graph.hoveredNode)) {
     res.hidden = true;
   }
 
   if (
-    state.suggestions &&
-    // @ts-ignore
-    (!state.suggestions.has(graph.source(edge)) || !state.suggestions.has(graph.target(edge)))
+    (store.state.graph.suggestions.length > 0 &&
+      !store.state.graph.suggestions.includes(
+        // @ts-ignore
+        graph.source(edge)
+      )) ||
+    (store.state.graph.suggestions.length > 0 &&
+      !store.state.graph.suggestions.includes(
+        // @ts-ignore
+        graph.target(edge)
+      ))
   ) {
     res.hidden = true;
   }

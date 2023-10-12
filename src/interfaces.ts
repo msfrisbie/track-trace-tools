@@ -21,6 +21,7 @@ import { ICreatePackageCsvState } from "./store/page-overlay/modules/create-pack
 import { IEmployeeSamplesState } from "./store/page-overlay/modules/employee-samples/interfaces";
 import { IExplorerState } from "./store/page-overlay/modules/explorer/interfaces";
 import { IFlagsState } from "./store/page-overlay/modules/flags/interfaces";
+import { IGraphState } from "./store/page-overlay/modules/graph/interfaces";
 import { IListingState } from "./store/page-overlay/modules/listing/interfaces";
 import { IPackageHistoryState } from "./store/page-overlay/modules/package-history/interfaces";
 import { IPackageSearchState } from "./store/page-overlay/modules/package-search/interfaces";
@@ -222,6 +223,7 @@ export interface IPluginState extends IRootState {
   employeeSamples: IEmployeeSamplesState;
   createPackageCsv: ICreatePackageCsvState;
   transferPackageSearch: ITransferPackageSearchState;
+  graph: IGraphState;
 }
 
 export type MetrcTagType = "CannabisPlant" | "CannabisPackage" | "MedicalPlant" | "MedicalPackage";
