@@ -1,10 +1,9 @@
 import { IIndexedPackageData, IPluginState } from "@/interfaces";
 import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
 import { facilityManager } from "@/modules/facility-manager.module";
+import { toastManager } from "@/modules/toast-manager.module";
 import { todayIsodate } from "@/utils/date";
 import { edgeReducer, hoverRenderer, labelRenderer, nodeReducer } from "@/utils/graph";
-import Graph from "graphology";
-import Sigma from "sigma";
 import { Coordinates } from "sigma/types";
 import { ActionContext } from "vuex";
 import {
@@ -14,7 +13,7 @@ import {
   GraphRenderAlgorithm,
   GraphStatus,
 } from "../graph/consts";
-import { IGraphData, IGraphState } from "../graph/interfaces";
+import { IGraphComponentContext, IGraphData, IGraphState } from "../graph/interfaces";
 
 const inMemoryState = {
   status: GraphStatus.INITIAL,
@@ -61,10 +60,7 @@ export const graphModule = {
     },
   },
   actions: {
-    [GraphActions.LOAD_AND_RENDER]: async (
-      ctx: ActionContext<IGraphState, IPluginState>,
-      data: any
-    ) => {
+    [GraphActions.LOAD_DATA]: async (ctx: ActionContext<IGraphState, IPluginState>, {}: {}) => {
       ctx.state.status = GraphStatus.INFLIGHT;
 
       let packages: IIndexedPackageData[] = [];
@@ -119,61 +115,68 @@ export const graphModule = {
 
       ctx.state.graphData = packageIGraphData;
 
+      ctx.state.status = GraphStatus.SUCCESS;
+    },
+    [GraphActions.RENDER_GRAPH]: async (
+      ctx: ActionContext<IGraphState, IPluginState>,
+      { graphComponentContext }: { graphComponentContext: IGraphComponentContext }
+    ) => {
+      // @ts-ignore
+      graphComponentContext.graph.import(ctx.state.graphData);
+
+      // @ts-ignore
+      graphComponentContext.graph.nodes().forEach((node, i) => {
+        // @ts-ignore
+        graphComponentContext.graph.setNodeAttribute(node, "x", Math.random() * 2);
+        // @ts-ignore
+        graphComponentContext.graph.setNodeAttribute(node, "y", Math.random());
+      });
+    },
+    [GraphActions.INITIALIZE_GRAPH]: async (
+      ctx: ActionContext<IGraphState, IPluginState>,
+      { graphComponentContext }: { graphComponentContext: IGraphComponentContext }
+    ) => {
+      if (!ctx.state.graphData) {
+        toastManager.openToast("No graph data loaded", {
+          title: "Graph Error",
+          autoHideDelay: 5000,
+          variant: "danger",
+          appendToast: true,
+          toaster: "ttt-toaster",
+          solid: true,
+        });
+        return;
+      }
+
       // Taken from https://codesandbox.io/s/github/jacomyal/sigma.js/tree/main/examples/use-reducers
 
       // Examples: https://github.com/jacomyal/sigma.js/#installation
 
-      // Retrieve some useful DOM elements:
-      const container = document.getElementById("sigma-container") as HTMLElement;
-      const searchInput = document.getElementById("search-input") as HTMLInputElement;
-      // const searchSuggestions = document.getElementById("suggestions") as HTMLDataListElement;
-
-      // Instantiate sigma:
-      const graph = new Graph();
-      // @ts-ignore
-      graph.import(packageIGraphData);
-
-      // @ts-ignore
-      graph.nodes().forEach((node, i) => {
-        // @ts-ignore
-        graph.setNodeAttribute(node, "x", Math.random() * 2);
-        // @ts-ignore
-        graph.setNodeAttribute(node, "y", Math.random());
-      });
-
-      const renderer = new Sigma(graph, container);
-
       ctx.state.searchQuery = "";
 
-      ctx.state.status = GraphStatus.SUCCESS;
-
       // Bind search input interactions:
-      searchInput.addEventListener("input", () => {
+      graphComponentContext.searchInput.addEventListener("input", () => {
         ctx.dispatch(GraphActions.SET_SEARCH_QUERY, {
-          graph,
-          renderer,
-          searchInput,
-          query: searchInput.value || "",
+          graphComponentContext,
+          query: graphComponentContext.searchInput.value || "",
         });
       });
-      searchInput.addEventListener("blur", () => {
+      graphComponentContext.searchInput.addEventListener("blur", () => {
         ctx.dispatch(GraphActions.SET_SEARCH_QUERY, {
-          graph,
-          renderer,
-          searchInput,
+          graphComponentContext,
           query: "",
         });
       });
 
       // Bind graph interactions:
-      renderer.on("enterNode", ({ node }) => {
-        ctx.dispatch(GraphActions.SET_HOVERED_NODE, { graph, renderer, node });
+      graphComponentContext.renderer.on("enterNode", ({ node }) => {
+        ctx.dispatch(GraphActions.SET_HOVERED_NODE, { graphComponentContext, node });
       });
-      renderer.on("leaveNode", () => {
-        ctx.dispatch(GraphActions.SET_HOVERED_NODE, { graph, renderer });
+      graphComponentContext.renderer.on("leaveNode", () => {
+        ctx.dispatch(GraphActions.SET_HOVERED_NODE, { graphComponentContext });
       });
 
-      renderer.setSetting("nodeReducer", (node, data) =>
+      graphComponentContext.renderer.setSetting("nodeReducer", (node, data) =>
         nodeReducer({
           node,
           data,
@@ -181,9 +184,9 @@ export const graphModule = {
         })
       );
 
-      renderer.setSetting("edgeReducer", (edge, data) =>
+      graphComponentContext.renderer.setSetting("edgeReducer", (edge, data) =>
         edgeReducer({
-          graph,
+          graphComponentContext,
           edge,
           data,
           graphState: ctx.state,
@@ -195,11 +198,11 @@ export const graphModule = {
 
       // Override options
       // https://github.com/jacomyal/sigma.js/blob/7b3a5ead355f7c54449002e6909a9af2eecae6db/src/settings.ts#L12
-      renderer.setSetting("hoverRenderer", (context, data, settings) =>
+      graphComponentContext.renderer.setSetting("hoverRenderer", (context, data, settings) =>
         hoverRenderer(context, data, settings)
       );
 
-      renderer.setSetting("labelRenderer", (context, data, settings) =>
+      graphComponentContext.renderer.setSetting("labelRenderer", (context, data, settings) =>
         labelRenderer(context, data, settings)
       );
 
@@ -227,17 +230,17 @@ export const graphModule = {
       const stageEvents = ["downStage", "clickStage", "doubleClickStage", "wheelStage"] as const;
 
       nodeEvents.map((eventType) =>
-        renderer.on(eventType, ({ node }) =>
+        graphComponentContext.renderer.on(eventType, ({ node }) =>
           ctx.dispatch(GraphActions.HANDLE_EVENT, { eventType, sourceType: "node", source: node })
         )
       );
       edgeEvents.map((eventType) =>
-        renderer.on(eventType, ({ edge }) =>
+        graphComponentContext.renderer.on(eventType, ({ edge }) =>
           ctx.dispatch(GraphActions.HANDLE_EVENT, { eventType, sourceType: "edge", source: edge })
         )
       );
       stageEvents.map((eventType) =>
-        renderer.on(eventType, (eventType) =>
+        graphComponentContext.renderer.on(eventType, (eventType) =>
           ctx.dispatch(GraphActions.HANDLE_EVENT, { eventType, sourceType: "stage" })
         )
       );
@@ -255,51 +258,58 @@ export const graphModule = {
     },
     [GraphActions.SELECT_NODE]: async (
       ctx: ActionContext<IGraphState, IPluginState>,
-      { renderer, node }: { renderer: Sigma; node: string }
+      {
+        graphComponentContext,
+        node,
+      }: { graphComponentContext: IGraphComponentContext; node: string }
     ) => {
       ctx.state.selectedNode = node;
       ctx.state.suggestions = [];
 
       // Move the camera to center it on the selected node:
-      const nodePosition = renderer.getNodeDisplayData(ctx.state.selectedNode) as Coordinates;
-      renderer.getCamera().animate(nodePosition, {
+      const nodePosition = graphComponentContext.renderer.getNodeDisplayData(
+        ctx.state.selectedNode
+      ) as Coordinates;
+      graphComponentContext.renderer.getCamera().animate(nodePosition, {
         duration: 500,
       });
     },
     [GraphActions.SET_SEARCH_QUERY]: async (
       ctx: ActionContext<IGraphState, IPluginState>,
       {
-        graph,
-        renderer,
-        searchInput,
+        graphComponentContext,
         query,
       }: {
-        graph: Graph;
-        renderer: Sigma;
-        searchInput: HTMLInputElement;
+        graphComponentContext: IGraphComponentContext;
         query: string;
       }
     ) => {
       ctx.state.searchQuery = query;
 
-      if (searchInput.value !== query) {
-        searchInput.value = query;
+      if (graphComponentContext.searchInput.value !== query) {
+        graphComponentContext.searchInput.value = query;
       }
 
       if (query) {
         const lcQuery = query.toLowerCase();
-        const suggestions = graph
+        const suggestions = graphComponentContext.graph
           // @ts-ignore
           .nodes()
-          // @ts-ignore
-          .map((n: any) => ({ id: n, label: graph.getNodeAttribute(n, "label") as string }))
+          .map((n: any) => ({
+            id: n,
+            // @ts-ignore
+            label: graphComponentContext.graph.getNodeAttribute(n, "label") as string,
+          }))
           .filter(({ label }: { label: any }) => label.toLowerCase().includes(lcQuery));
 
         // If we have a single perfect match, them we remove the suggestions, and
         // we consider the user has selected a node through the datalist
         // autocomplete:
         if (suggestions.length === 1 && suggestions[0].label === query) {
-          ctx.dispatch(GraphActions.SELECT_NODE, { renderer, node: suggestions[0].id });
+          ctx.dispatch(GraphActions.SELECT_NODE, {
+            graphComponentContext,
+            node: suggestions[0].id,
+          });
         }
         // Else, we display the suggestions list:
         else {
@@ -314,17 +324,15 @@ export const graphModule = {
       }
 
       // Refresh rendering:
-      renderer.refresh();
+      graphComponentContext.renderer.refresh();
     },
     [GraphActions.SET_HOVERED_NODE]: async (
       ctx: ActionContext<IGraphState, IPluginState>,
       {
-        graph,
-        renderer,
+        graphComponentContext,
         node,
       }: {
-        graph: Graph;
-        renderer: Sigma;
+        graphComponentContext: IGraphComponentContext;
         node?: string;
       }
     ) => {
@@ -332,14 +340,14 @@ export const graphModule = {
         ctx.state.hoveredNode = node;
         ctx.state.hoveredNeighbors =
           // @ts-ignore
-          graph.neighbors(node);
+          graphComponentContext.graph.neighbors(node);
       } else {
         ctx.state.hoveredNode = null;
         ctx.state.hoveredNeighbors = [];
       }
 
       // Refresh rendering:
-      renderer.refresh();
+      graphComponentContext.renderer.refresh();
     },
   },
 };

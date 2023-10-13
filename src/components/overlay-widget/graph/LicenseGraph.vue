@@ -1,7 +1,7 @@
 <template>
   <div>
     <template v-if="graphState.status === GraphStatus.INITIAL">
-      <b-button variant="outline-primary" @click="render()">GO</b-button>
+      <b-button variant="outline-primary" @click="render({ graphComponentContext })">GO</b-button>
     </template>
     <template v-if="graphState.status === GraphStatus.INFLIGHT">
       <div class="absolute top-0 w-full">
@@ -13,7 +13,7 @@
     </template>
     <div id="sigma-container" class="w-full h-full m-0 p-0 overflow-hidden"></div>
     <div
-      v-bind:class="{ display: graphState.status === GraphStatus.INFLIGHT ? 'none' : 'flex' }"
+      v-bind:class="{ display: graphState.status === GraphStatus.SUCCESS ? 'none' : 'flex' }"
       class="absolute right-0 top-0 p-2 flex flex-col items-stretch"
       style="width: 320px"
     >
@@ -44,6 +44,9 @@ import { IPluginState } from "@/interfaces";
 import router from "@/router/index";
 import store from "@/store/page-overlay/index";
 import { GraphActions, GraphStatus } from "@/store/page-overlay/modules/graph/consts";
+import { IGraphComponentContext } from "@/store/page-overlay/modules/graph/interfaces";
+import Graph from "graphology";
+import Sigma from "sigma";
 import Vue from "vue";
 import { mapActions, mapState } from "vuex";
 
@@ -66,14 +69,33 @@ export default Vue.extend({
   },
   methods: {
     ...mapActions({
-      render: `graph/${GraphActions.LOAD_AND_RENDER}`,
+      loadData: `graph/${GraphActions.LOAD_DATA}`,
+      initializeGraph: `graph/${GraphActions.INITIALIZE_GRAPH}`,
     }),
   },
   async created() {},
   async mounted() {
-    // this.$data.graphComponentContext = {
-    //   renderer:
-    // } as IGraphComponentContext
+    const container = document.getElementById("sigma-container") as HTMLElement;
+    const searchInput = document.getElementById("search-input") as HTMLInputElement;
+
+    // Instantiate sigma:
+    const graph = new Graph();
+
+    const renderer = new Sigma(graph, container);
+
+    const graphComponentContext: IGraphComponentContext = {
+      renderer,
+      graph,
+      searchInput,
+      container,
+    };
+
+    this.$data.graphComponentContext = graphComponentContext;
+
+    await store.dispatch(`graph/${GraphActions.LOAD_DATA}`, { graphComponentContext });
+    await store.dispatch(`graph/${GraphActions.INITIALIZE_GRAPH}`, { graphComponentContext });
+    await store.dispatch(`graph/${GraphActions.RENDER_GRAPH}`, { graphComponentContext });
+
   },
 });
 </script>

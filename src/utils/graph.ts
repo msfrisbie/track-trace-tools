@@ -1,5 +1,4 @@
-import { IGraphState } from "@/store/page-overlay/modules/graph/interfaces";
-import Graph from "graphology";
+import { IGraphComponentContext, IGraphState } from "@/store/page-overlay/modules/graph/interfaces";
 import { Settings } from "sigma/settings";
 import { EdgeDisplayData, NodeDisplayData, PartialButFor, PlainObject } from "sigma/types";
 
@@ -151,12 +150,12 @@ export function nodeReducer({
 // 2. If there is a query, the edge is only visible if it connects two
 //    graphState.suggestions
 export function edgeReducer({
-  graph,
+  graphComponentContext,
   edge,
   data,
   graphState,
 }: {
-  graph: Graph;
+  graphComponentContext: IGraphComponentContext;
   edge: string;
   data: any;
 
@@ -164,8 +163,11 @@ export function edgeReducer({
 }) {
   const res: Partial<EdgeDisplayData> = { ...data };
 
-  // @ts-ignore
-  if (graphState.hoveredNode && !graph.hasExtremity(edge, graphState.hoveredNode)) {
+  if (
+    graphState.hoveredNode &&
+    //@ts-ignore
+    !graphComponentContext.graph.hasExtremity(edge, graphState.hoveredNode)
+  ) {
     res.hidden = true;
   }
 
@@ -173,12 +175,12 @@ export function edgeReducer({
     (graphState.suggestions.length > 0 &&
       !graphState.suggestions.includes(
         // @ts-ignore
-        graph.source(edge)
+        graphComponentContext.graph.source(edge)
       )) ||
     (graphState.suggestions.length > 0 &&
       !graphState.suggestions.includes(
         // @ts-ignore
-        graph.target(edge)
+        graphComponentContext.graph.target(edge)
       ))
   ) {
     res.hidden = true;
