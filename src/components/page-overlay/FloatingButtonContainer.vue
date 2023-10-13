@@ -8,13 +8,18 @@
 
     <template v-if="authState">
       <div class="flex flex-row gap-2 floating-hover-reveal-target">
+        <bug-report-button class="floating-shadow" />
+
         <search-button class="floating-shadow"></search-button>
 
         <quick-script-button class="floating-shadow" />
       </div>
 
       <!-- TODO enable when T3+ signup is ready -->
-      <plus-button v-if="false && !clientValues['ENABLE_T3PLUS'] && !t3plus" class="floating-shadow" />
+      <plus-button
+        v-if="false && !clientValues['ENABLE_T3PLUS'] && !t3plus"
+        class="floating-shadow"
+      />
 
       <div class="relative">
         <builder-button class="floating-shadow" />
@@ -29,19 +34,17 @@
 </template>
 
 <script lang="ts">
+import BugReportButton from "@/components/page-overlay/BugReportButton.vue";
 import BuilderButton from "@/components/page-overlay/BuilderButton.vue";
 import DebugButton from "@/components/page-overlay/DebugButton.vue";
-import QuickScriptButton from "@/components/page-overlay/QuickScriptButton.vue";
-import SearchButton from "@/components/page-overlay/SearchButton.vue";
-import ScrollButton from "@/components/page-overlay/ScrollButton.vue";
 import PlusButton from "@/components/page-overlay/PlusButton.vue";
-import { ModalAction, ModalType } from "@/consts";
-import { modalManager } from "@/modules/modal-manager.module";
+import QuickScriptButton from "@/components/page-overlay/QuickScriptButton.vue";
+import ScrollButton from "@/components/page-overlay/ScrollButton.vue";
+import SearchButton from "@/components/page-overlay/SearchButton.vue";
+import { IPluginState } from "@/interfaces";
 import store from "@/store/page-overlay/index";
 import Vue from "vue";
 import { mapState } from "vuex";
-import { clientBuildManager } from "@/modules/client-build-manager.module";
-import { IPluginState } from "@/interfaces";
 
 export default Vue.extend({
   name: "FloatingButtonContainer",
@@ -53,6 +56,7 @@ export default Vue.extend({
     DebugButton,
     SearchButton,
     PlusButton,
+    BugReportButton,
   },
   async mounted() {},
   data() {

@@ -140,6 +140,7 @@ const defaultState: IRootState = {
     dismissedFacilityPopover: false,
     dismissedSearchPopover: false,
     dismissedQuickScriptsPopover: false,
+    dismissedBugReportsPopover: false,
     dismissedSnapshotPopover: false,
   },
   backgroundTasks: {

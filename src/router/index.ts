@@ -37,6 +37,7 @@ import TransferToolsHelp from "@/components/overlay-widget/transfer/TransferTool
 import UnavailablePage from "@/components/overlay-widget/UnavailablePage.vue";
 import FinalizeSalesReceiptsForm from "@/components/page-overlay/forms/FinalizeSalesReceiptsForm.vue";
 import SettingsForm from "@/components/page-overlay/forms/SettingsForm.vue";
+import BugReportForm from "@/components/page-overlay/forms/BugReportForm.vue";
 import VoidTagForm from "@/components/page-overlay/forms/VoidTagForm.vue";
 import GoogleSheetsExport from "@/components/page-overlay/GoogleSheetsExport.vue";
 import ManageAccount from "@/components/page-overlay/ManageAccount.vue";

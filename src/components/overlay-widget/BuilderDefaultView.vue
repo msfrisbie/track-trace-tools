@@ -250,6 +250,16 @@ export default Vue.extend({
           url: "https://track-trace-tools.talkyard.net/",
         },
         {
+          backgroundColor: "gray",
+          text: "REPORT A PROBLEM",
+          icon: "exclamation-triangle",
+          visible: true,
+          enabled: true,
+          isBeta: false,
+          isNew: false,
+          url: "https://docs.google.com/forms/d/e/1FAIpQLSd2hQFwtXyv1Bco9nHN9d4tEqkgbhe3w-WdbZAemBCTD_19VQ/viewform?usp=sf_link",
+        },
+        {
           backgroundColor: "black",
           text: "ADMIN",
           route: "/admin",

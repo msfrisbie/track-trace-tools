@@ -129,6 +129,7 @@ library.add(
   fontawesomeSolid.faBox,
   fontawesomeSolid.faBoxOpen,
   fontawesomeSolid.faBoxes,
+  fontawesomeSolid.faBug,
   fontawesomeSolid.faCalendar,
   fontawesomeSolid.faCamera,
   fontawesomeSolid.faCannabis,
