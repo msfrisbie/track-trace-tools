@@ -1,6 +1,9 @@
 <template>
   <div>
-    <template v-if="graphState.inflight">
+    <template v-if="graphState.status === GraphStatus.INITIAL">
+      <b-button variant="outline-primary" @click="render()">GO</b-button>
+    </template>
+    <template v-if="graphState.status === GraphStatus.INFLIGHT">
       <div class="absolute top-0 w-full">
         <div class="flex flex-row items-center justify-center gap-2 p-4">
           <b-spinner small variant="ttt"></b-spinner>
@@ -10,7 +13,7 @@
     </template>
     <div id="sigma-container" class="w-full h-full m-0 p-0 overflow-hidden"></div>
     <div
-      v-bind:class="{ display: graphState.inflight ? 'none' : 'flex' }"
+      v-bind:class="{ display: graphState.status === GraphStatus.INFLIGHT ? 'none' : 'flex' }"
       class="absolute right-0 top-0 p-2 flex flex-col items-stretch"
       style="width: 320px"
     >
@@ -29,6 +32,9 @@
           :value="node.key"
         ></option>
       </datalist>
+
+      <div>Selected node: {{ graphState.selectedNode }}</div>
+      <div>Hovered node: {{ graphState.hoveredNode }}</div>
     </div>
   </div>
 </template>
@@ -37,9 +43,9 @@
 import { IPluginState } from "@/interfaces";
 import router from "@/router/index";
 import store from "@/store/page-overlay/index";
-import { GraphActions } from "@/store/page-overlay/modules/graph/consts";
+import { GraphActions, GraphStatus } from "@/store/page-overlay/modules/graph/consts";
 import Vue from "vue";
-import { mapState } from "vuex";
+import { mapActions, mapState } from "vuex";
 
 export default Vue.extend({
   name: "LicenseGraph",
@@ -53,12 +59,21 @@ export default Vue.extend({
     }),
   },
   data() {
-    return {};
+    return {
+      GraphStatus,
+      graphComponentContext: null,
+    };
   },
-  methods: {},
+  methods: {
+    ...mapActions({
+      render: `graph/${GraphActions.LOAD_AND_RENDER}`,
+    }),
+  },
   async created() {},
-async mounted() {
-    store.dispatch(`graph/${GraphActions.LOAD_AND_RENDER}`);
+  async mounted() {
+    // this.$data.graphComponentContext = {
+    //   renderer:
+    // } as IGraphComponentContext
   },
 });
 </script>

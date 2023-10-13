@@ -1,82 +1,7 @@
-import store from "@/store/page-overlay/index";
+import { IGraphState } from "@/store/page-overlay/modules/graph/interfaces";
 import Graph from "graphology";
-import Sigma from "sigma";
 import { Settings } from "sigma/settings";
-import {
-  Coordinates,
-  EdgeDisplayData,
-  NodeDisplayData,
-  PartialButFor,
-  PlainObject,
-} from "sigma/types";
-
-// Actions:
-export function setSearchQuery(
-  graph: Graph,
-  renderer: Sigma,
-  searchInput: HTMLInputElement,
-  query: string
-) {
-  store.state.graph.searchQuery = query;
-
-  if (searchInput.value !== query) {
-    searchInput.value = query;
-  }
-
-  if (query) {
-    const lcQuery = query.toLowerCase();
-    const suggestions = graph
-      // @ts-ignore
-      .nodes()
-      // @ts-ignore
-      .map((n: any) => ({ id: n, label: graph.getNodeAttribute(n, "label") as string }))
-      .filter(({ label }: { label: any }) => label.toLowerCase().includes(lcQuery));
-
-    // If we have a single perfect match, them we remove the suggestions, and
-    // we consider the user has selected a node through the datalist
-    // autocomplete:
-    if (suggestions.length === 1 && suggestions[0].label === query) {
-      store.state.graph.selectedNode = suggestions[0].id;
-      store.state.graph.suggestions = [];
-
-      // Move the camera to center it on the selected node:
-      const nodePosition = renderer.getNodeDisplayData(
-        store.state.graph.selectedNode
-      ) as Coordinates;
-      renderer.getCamera().animate(nodePosition, {
-        duration: 500,
-      });
-    }
-    // Else, we display the suggestions list:
-    else {
-      store.state.graph.selectedNode = null;
-      store.state.graph.suggestions = suggestions.map(({ id }: { id: any }) => id);
-    }
-  }
-  // If the query is empty, then we reset the selectedNode / suggestions store.state.graph:
-  else {
-    store.state.graph.selectedNode = null;
-    store.state.graph.suggestions = [];
-  }
-
-  // Refresh rendering:
-  renderer.refresh();
-}
-
-export function setHoveredNode(graph: Graph, renderer: Sigma, node?: string) {
-  if (node) {
-    store.state.graph.hoveredNode = node;
-    store.state.graph.hoveredNeighbors =
-      // @ts-ignore
-      graph.neighbors(node);
-  } else {
-    store.state.graph.hoveredNode = null;
-    store.state.graph.hoveredNeighbors = [];
-  }
-
-  // Refresh rendering:
-  renderer.refresh();
-}
+import { EdgeDisplayData, NodeDisplayData, PartialButFor, PlainObject } from "sigma/types";
 
 const TEXT_COLOR = "#000000";
 
@@ -190,29 +115,29 @@ export function labelRenderer(
 // 1. If a node is selected, it is highlighted
 // 2. If there is query, all non-matching nodes are greyed
 // 3. If there is a hovered node, all non-neighbor nodes are greyed
-export function nodeReducer(node: string, data: any) {
+export function nodeReducer({
+  node,
+  data,
+  graphState,
+}: {
+  node: string;
+  data: any;
+  graphState: IGraphState;
+}) {
   const res: Partial<NodeDisplayData> = { ...data };
 
-  //   if (!store.state.graph.hoveredNeighbors.includes) {
-  //     console.log(store.state.graph.hoveredNeighbors);
-  //     debugger;
-  //   }
-
   if (
-    store.state.graph.hoveredNeighbors.length > 0 &&
-    !store.state.graph.hoveredNeighbors.includes(node) &&
-    store.state.graph.hoveredNode !== node
+    graphState.hoveredNeighbors.length > 0 &&
+    !graphState.hoveredNeighbors.includes(node) &&
+    graphState.hoveredNode !== node
   ) {
     res.label = "";
     res.color = "#f6f6f6";
   }
 
-  if (store.state.graph.selectedNode === node) {
+  if (graphState.selectedNode === node) {
     res.highlighted = true;
-  } else if (
-    store.state.graph.suggestions.length > 0 &&
-    !store.state.graph.suggestions.includes(node)
-  ) {
+  } else if (graphState.suggestions.length > 0 && !graphState.suggestions.includes(node)) {
     res.label = "";
     res.color = "#f6f6f6";
   }
@@ -224,23 +149,34 @@ export function nodeReducer(node: string, data: any) {
 // 1. If a node is hovered, the edge is hidden if it is not connected to the
 //    node
 // 2. If there is a query, the edge is only visible if it connects two
-//    suggestions
-export function edgeReducer(graph: Graph, edge: string, data: any) {
+//    graphState.suggestions
+export function edgeReducer({
+  graph,
+  edge,
+  data,
+  graphState,
+}: {
+  graph: Graph;
+  edge: string;
+  data: any;
+
+  graphState: IGraphState;
+}) {
   const res: Partial<EdgeDisplayData> = { ...data };
 
   // @ts-ignore
-  if (store.state.graph.hoveredNode && !graph.hasExtremity(edge, store.state.graph.hoveredNode)) {
+  if (graphState.hoveredNode && !graph.hasExtremity(edge, graphState.hoveredNode)) {
     res.hidden = true;
   }
 
   if (
-    (store.state.graph.suggestions.length > 0 &&
-      !store.state.graph.suggestions.includes(
+    (graphState.suggestions.length > 0 &&
+      !graphState.suggestions.includes(
         // @ts-ignore
         graph.source(edge)
       )) ||
-    (store.state.graph.suggestions.length > 0 &&
-      !store.state.graph.suggestions.includes(
+    (graphState.suggestions.length > 0 &&
+      !graphState.suggestions.includes(
         // @ts-ignore
         graph.target(edge)
       ))

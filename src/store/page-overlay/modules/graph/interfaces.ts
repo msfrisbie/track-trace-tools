@@ -1,10 +1,18 @@
+import { IIndexedPackageData } from "@/interfaces";
+import Graph from "graphology";
+import Sigma from "sigma";
+import { GraphRenderAlgorithm, GraphStatus } from "./consts";
+
 export interface IGraphState {
-  inflight: boolean;
+  status: GraphStatus;
+  renderAlgorithm: GraphRenderAlgorithm;
+  filterDateGt: boolean;
   dateGt: string;
+  filterDateLt: boolean;
   dateLt: string;
   licenseOptions: string[];
   licenses: string[];
-  graphData: GraphData;
+  graphData: IGraphData;
   hoveredNode: string | null;
   searchQuery: string | null;
   selectedNode: string | null;
@@ -12,16 +20,23 @@ export interface IGraphState {
   hoveredNeighbors: string[];
 }
 
-export interface GraphData {
+export interface IGraphComponentContext {
+  container: HTMLElement;
+  searchInput: HTMLInputElement;
+  graph: Graph;
+  renderer: Sigma;
+}
+
+export interface IGraphData {
   nodes: {
     key: string;
     attributes: {
       size: number;
       label: string;
       color: string;
-      //   obj: {
-      //     pkg?: IIndexedPackageData;
-      //   };
+      obj: {
+        pkg?: IIndexedPackageData;
+      };
     };
   }[];
   edges: {
