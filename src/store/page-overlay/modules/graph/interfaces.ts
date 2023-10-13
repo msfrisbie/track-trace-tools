@@ -13,11 +13,11 @@ export interface IGraphState {
   licenseOptions: string[];
   licenses: string[];
   graphData: IGraphData;
-  hoveredNode: string | null;
+  hoveredNodeId: string | null;
   searchQuery: string | null;
-  selectedNode: string | null;
+  selectedNodeId: string | null;
   suggestions: string[];
-  hoveredNeighbors: string[];
+  hoveredNeighborIds: string[];
 }
 
 export interface IGraphComponentContext {

@@ -1,5 +1,6 @@
-import { PackageState } from "@/consts";
+import { MessageType, PackageState } from "@/consts";
 import { IIndexedPackageData, IPluginState } from "@/interfaces";
+import { analyticsManager } from "@/modules/analytics-manager.module";
 import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
 import { facilityManager } from "@/modules/facility-manager.module";
 import { toastManager } from "@/modules/toast-manager.module";
@@ -29,11 +30,11 @@ const inMemoryState = {
     nodes: [],
     edges: [],
   },
-  hoveredNode: null,
+  hoveredNodeId: null,
   searchQuery: null,
-  selectedNode: null,
+  selectedNodeId: null,
   suggestions: [],
-  hoveredNeighbors: [],
+  hoveredNeighborIds: [],
 };
 
 const persistedState = {};
@@ -146,6 +147,8 @@ export const graphModule = {
       ctx: ActionContext<IGraphState, IPluginState>,
       { graphComponentContext }: { graphComponentContext: IGraphComponentContext }
     ) => {
+      analyticsManager.track(MessageType.GRAPH_RENDER);
+
       // @ts-ignore
       graphComponentContext.graph.import(ctx.state.graphData);
 
@@ -332,18 +335,40 @@ export const graphModule = {
         node,
       }: { graphComponentContext: IGraphComponentContext; node: string }
     ) => {
-      ctx.state.selectedNode = node;
+      ctx.state.selectedNodeId = node;
       ctx.state.suggestions = [];
 
       graphComponentContext.renderer.refresh();
 
       // Move the camera to center it on the selected node:
       const nodePosition: Coordinates = node
-        ? (graphComponentContext.renderer.getNodeDisplayData(ctx.state.selectedNode) as Coordinates)
+        ? (graphComponentContext.renderer.getNodeDisplayData(
+            ctx.state.selectedNodeId
+          ) as Coordinates)
         : { x: 0.5, y: 0.5 };
       graphComponentContext.renderer.getCamera().animate(nodePosition, {
         duration: 500,
       });
+
+      node && analyticsManager.track(MessageType.GRAPH_NODE_SELECT);
+    },
+    [GraphActions.ZOOM]: async (
+      ctx: ActionContext<IGraphState, IPluginState>,
+      {
+        graphComponentContext,
+        operation,
+      }: { graphComponentContext: IGraphComponentContext; operation: string }
+    ) => {
+      switch (operation) {
+        case "zoomIn":
+          graphComponentContext.renderer.getCamera().animatedZoom();
+          break;
+        case "zoomOut":
+          graphComponentContext.renderer.getCamera().animatedUnzoom();
+          break;
+      }
+
+      analyticsManager.track(MessageType.GRAPH_ZOOM);
     },
     [GraphActions.SET_SEARCH_QUERY]: async (
       ctx: ActionContext<IGraphState, IPluginState>,
@@ -355,6 +380,8 @@ export const graphModule = {
         query: string;
       }
     ) => {
+      analyticsManager.track(MessageType.GRAPH_SEARCH_QUERY, { query });
+
       ctx.state.searchQuery = query;
 
       if (graphComponentContext.searchInput.value !== query) {
@@ -384,13 +411,13 @@ export const graphModule = {
         }
         // Else, we display the suggestions list:
         else {
-          ctx.state.selectedNode = null;
+          ctx.state.selectedNodeId = null;
           ctx.state.suggestions = suggestions.map(({ id }: { id: any }) => id);
         }
       }
       // If the query is empty, then we reset the selectedNode / suggestions ctx.state:
       else {
-        ctx.state.selectedNode = null;
+        ctx.state.selectedNodeId = null;
         ctx.state.suggestions = [];
       }
 
@@ -408,13 +435,13 @@ export const graphModule = {
       }
     ) => {
       if (node) {
-        ctx.state.hoveredNode = node;
-        ctx.state.hoveredNeighbors =
+        ctx.state.hoveredNodeId = node;
+        ctx.state.hoveredNeighborIds =
           // @ts-ignore
           graphComponentContext.graph.neighbors(node);
       } else {
-        ctx.state.hoveredNode = null;
-        ctx.state.hoveredNeighbors = [];
+        ctx.state.hoveredNodeId = null;
+        ctx.state.hoveredNeighborIds = [];
       }
 
       // Refresh rendering:

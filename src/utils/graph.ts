@@ -138,29 +138,29 @@ export function nodeReducer({
 }) {
   const res: Partial<NodeDisplayData> = { ...data };
 
-  if (!graphState.hoveredNode && !graphState.selectedNode) {
+  if (!graphState.hoveredNodeId && !graphState.selectedNodeId) {
     // Nothing is hovered or selected
     return res;
   }
 
-  if (graphState.hoveredNode === node) {
+  if (graphState.hoveredNodeId === node) {
     res.highlighted = true;
     return res;
   }
 
-  if (graphState.selectedNode === node) {
+  if (graphState.selectedNodeId === node) {
     res.highlighted = true;
     return res;
   }
 
-  if (graphState.hoveredNeighbors.includes(node)) {
+  if (graphState.hoveredNeighborIds.includes(node)) {
     return res;
   }
 
   if (
-    graphState.selectedNode &&
+    graphState.selectedNodeId &&
     // @ts-ignore
-    graphComponentContext.graph.neighbors(graphState.selectedNode).includes(node)
+    graphComponentContext.graph.neighbors(graphState.selectedNodeId).includes(node)
   ) {
     return res;
   }
@@ -193,23 +193,23 @@ export function edgeReducer({
 }) {
   const res: Partial<EdgeDisplayData> = { ...data };
 
-  if (!graphState.hoveredNode && !graphState.selectedNode) {
+  if (!graphState.hoveredNodeId && !graphState.selectedNodeId) {
     // Nothing is hovered or selected
     res.hidden = true;
     return res;
   }
 
   if (
-    graphState.hoveredNode &&
+    graphState.hoveredNodeId &&
     // @ts-ignore
-    graphComponentContext.graph.hasExtremity(edge, graphState.hoveredNode)
+    graphComponentContext.graph.hasExtremity(edge, graphState.hoveredNodeId)
   ) {
     return res;
   }
   if (
-    graphState.selectedNode &&
+    graphState.selectedNodeId &&
     // @ts-ignore
-    graphComponentContext.graph.hasExtremity(edge, graphState.selectedNode)
+    graphComponentContext.graph.hasExtremity(edge, graphState.selectedNodeId)
   ) {
     return res;
   }

@@ -4,14 +4,43 @@
       <b-button variant="outline-primary">GO</b-button>
     </template>
     <template v-if="graphState.status === GraphStatus.INFLIGHT">
-      <div class="absolute top-0 w-full">
-        <div class="flex flex-row items-center justify-center gap-2 p-4">
-          <b-spinner small variant="ttt"></b-spinner>
-          <span>Loading packages...</span>
-        </div>
+      <div class="flex flex-row items-center justify-center gap-2 p-4">
+        <b-spinner small variant="ttt"></b-spinner>
+        <span>Loading packages...</span>
       </div>
     </template>
-    <div id="sigma-container" class="w-full h-full m-0 p-0 overflow-hidden"></div>
+    <div
+      id="sigma-container"
+      ref="sigma-container"
+      class="absolute top-0 left-0 w-full h-full m-0 p-0 overflow-hidden"
+    ></div>
+    <!-- <div v-if="graphState.status === GraphStatus.ERROR" class="p-2 text-red-500">
+      Something went wrong.
+    </div> -->
+    <template v-if="graphState.status === GraphStatus.SUCCESS">
+      <div class="absolute w-full bottom-0 left-0 p-2 flex flex-row justify-between items-center">
+        <div class="text-sm">
+          <template v-if="!graphState.selectedNodeId">
+            Hover or click a node to view connections and details.
+          </template>
+        </div>
+
+        <b-button-group>
+          <b-button
+            variant="primary"
+            size="sm"
+            @click="zoom({ graphComponentContext, operation: 'zoomIn' })"
+            >+</b-button
+          >
+          <b-button
+            variant="primary"
+            size="sm"
+            @click="zoom({ graphComponentContext, operation: 'zoomOut' })"
+            >-</b-button
+          >
+        </b-button-group>
+      </div>
+    </template>
     <div
       v-bind:class="{
         flex: graphState.status === GraphStatus.SUCCESS,
@@ -25,6 +54,7 @@
         class="p-2 shadow border border-gray-200"
         style="width: initial !important"
         id="search-input"
+        ref="search-input"
         list="suggestions"
         placeholder="Search for a package label..."
       />
@@ -37,7 +67,7 @@
       </datalist>
 
       <div
-        v-if="graphState.selectedNode"
+        v-if="graphState.selectedNodeId"
         class="rounded bg-white shadow p-2 border border-gray-200 flex flex-col gap-2 overflow-auto toolkit-scroll"
       >
         <!-- <div>Node type: {{ selectedNode.attributes.obj.type }}</div>
@@ -58,11 +88,11 @@
           <b-button
             size="sm"
             variant="outline-dark"
-            @click="selectNode({ graphComponentContext, node: sourceNode })"
-            v-for="sourceNode of sourceNodes"
-            v-bind:key="sourceNode"
+            @click="selectNode({ graphComponentContext, node: sourceNodeId })"
+            v-for="sourceNodeId of sourceNodeIds"
+            v-bind:key="sourceNodeId"
           >
-            {{ sourceNode }}
+            {{ sourceNodeId }}
           </b-button>
           <hr />
           <div>Children:</div>
@@ -70,14 +100,14 @@
           <b-button
             size="sm"
             variant="outline-dark"
-            @click="selectNode({ graphComponentContext, node: childNode })"
-            v-for="childNode of childNodes"
-            v-bind:key="childNode"
+            @click="selectNode({ graphComponentContext, node: childNodeId })"
+            v-for="childNodeId of childNodeIds"
+            v-bind:key="childNodeId"
           >
-            {{ childNode }}
+            {{ childNodeId }}
           </b-button>
-          <hr />
-          <div>History:</div>
+          <!-- <hr />
+          <div>History:</div> -->
         </template>
       </div>
     </div>
@@ -106,35 +136,34 @@ export default Vue.extend({
       graphState: (state: IPluginState) => state.graph,
     }),
     selectedNode(): IGraphNode | null {
-      if (store.state.graph.selectedNode) {
+      if (store.state.graph.selectedNodeId) {
         return (
-          store.state.graph.graphData.nodes.find((x) => x.key === store.state.graph.selectedNode) ??
-          null
+          store.state.graph.graphData.nodes.find(
+            (x) => x.key === store.state.graph.selectedNodeId
+          ) ?? null
         );
       }
 
       return null;
     },
-    sourceNodes(): string[] {
-      if (!store.state.graph.selectedNode) {
+    sourceNodeIds(): string[] {
+      if (!store.state.graph.selectedNodeId) {
         return [];
       }
 
-      const sourceNodes = this.$data.graphComponentContext.graph.inboundNeighbors(
-        store.state.graph.selectedNode
+      const sourceNodeIds = this.$data.graphComponentContext.graph.inboundNeighbors(
+        store.state.graph.selectedNodeId
       );
 
-      console.log({ sourceNodes });
-
-      return sourceNodes;
+      return sourceNodeIds;
     },
-    childNodes(): string[] {
-      if (!store.state.graph.selectedNode) {
+    childNodeIds(): string[] {
+      if (!store.state.graph.selectedNodeId) {
         return [];
       }
 
       return this.$data.graphComponentContext.graph.outboundNeighbors(
-        store.state.graph.selectedNode
+        store.state.graph.selectedNodeId
       );
     },
   },
@@ -147,23 +176,24 @@ export default Vue.extend({
   methods: {
     ...mapActions({
       selectNode: `graph/${GraphActions.SELECT_NODE}`,
+      zoom: `graph/${GraphActions.ZOOM}`,
     }),
   },
   async created() {},
   async mounted() {
-    const container = document.getElementById("sigma-container") as HTMLElement;
-    const searchInput = document.getElementById("search-input") as HTMLInputElement;
+    // const container = document.querySelector("#sigma-container") as HTMLElement;
+    // const searchInput = document.querySelector("#search-input") as HTMLInputElement;
 
     // Instantiate sigma:
     const graph = new Graph();
 
-    const renderer = new Sigma(graph, container);
+    const renderer = new Sigma(graph, this.$refs["sigma-container"] as HTMLElement);
 
     const graphComponentContext: IGraphComponentContext = {
       renderer,
       graph,
-      searchInput,
-      container,
+      searchInput: this.$refs["search-input"] as HTMLInputElement,
+      container: this.$refs["sigma-container"] as HTMLElement,
     };
 
     this.$data.graphComponentContext = graphComponentContext;

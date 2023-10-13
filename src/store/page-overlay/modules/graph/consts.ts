@@ -14,6 +14,7 @@ export enum GraphActions {
   SET_HOVERED_NODE = "SET_HOVERED_NODE",
   SELECT_NODE = "SELECT_NODE",
   HANDLE_EVENT = "HANDLE_EVENT",
+  ZOOM = "ZOOM"
 }
 
 export enum GraphRenderAlgorithm {
