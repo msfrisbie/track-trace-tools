@@ -1,3 +1,4 @@
+import { PackageState } from "@/consts";
 import { IIndexedPackageData, IPluginState } from "@/interfaces";
 import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
 import { facilityManager } from "@/modules/facility-manager.module";
@@ -69,35 +70,59 @@ export const graphModule = {
         primaryDataLoader.activePackages().then((result) => {
           packages = [...packages, ...result];
         }),
-        // primaryDataLoader.onHoldPackages().then((result) => {
-        //   packages = [...packages, ...result];
-        // }),
-        // primaryDataLoader.inactivePackages().then((result) => {
-        //   packages = [...packages, ...result];
-        // }),
-        // primaryDataLoader.inTransitPackages().then((result) => {
-        //   packages = [...packages, ...result];
-        // }),
+        primaryDataLoader.onHoldPackages().then((result) => {
+          packages = [...packages, ...result];
+        }),
+        primaryDataLoader.inactivePackages().then((result) => {
+          packages = [...packages, ...result];
+        }),
+        primaryDataLoader.inTransitPackages().then((result) => {
+          packages = [...packages, ...result];
+        }),
       ]);
 
       const packageLabels = new Set(packages.map((x) => x.Label));
 
       const packageIGraphData: IGraphData = {
-        nodes: packages.map((pkg) => ({
-          key: pkg.Label,
-          attributes: {
-            size: 2,
-            label: pkg.Label,
-            color: "#49276a",
-            obj: {
-              pkg,
-            },
-          },
-        })),
+        nodes: [],
         edges: [],
       };
 
       for (const [i, pkg] of packages.entries()) {
+        let color: string = "#333333";
+        // T3: "#49276a"
+
+        switch (pkg.PackageState) {
+          case PackageState.ACTIVE:
+            // green
+            color = "#00CC00";
+            break;
+          case PackageState.ON_HOLD:
+            // orange
+            color = "#FFA500";
+            break;
+          case PackageState.IN_TRANSIT:
+            // blue
+            color = "#0000CC";
+            break;
+          case PackageState.INACTIVE:
+          default:
+            break;
+        }
+
+        packageIGraphData.nodes.push({
+          key: pkg.Label,
+          attributes: {
+            size: 2,
+            label: pkg.Label,
+            color,
+            obj: {
+              type: "package",
+              pkg,
+            },
+          },
+        });
+
         for (const [j, sourcePkgLabel] of pkg.SourcePackageLabels.split(",").entries()) {
           if (packageLabels.has(sourcePkgLabel)) {
             packageIGraphData.edges.push({
@@ -126,10 +151,18 @@ export const graphModule = {
 
       // @ts-ignore
       graphComponentContext.graph.nodes().forEach((node, i) => {
+        const theta = 2 * Math.PI * Math.random(); // Random angle between 0 and 2π
+        const r = Math.sqrt(Math.random()); // Random radius between 0 and 1
+
+        const x = r * Math.cos(theta);
+        const y = r * Math.sin(theta);
+
+        // console.log({ x, y });
+
         // @ts-ignore
-        graphComponentContext.graph.setNodeAttribute(node, "x", Math.random() * 2);
+        graphComponentContext.graph.setNodeAttribute(node, "x", x);
         // @ts-ignore
-        graphComponentContext.graph.setNodeAttribute(node, "y", Math.random());
+        graphComponentContext.graph.setNodeAttribute(node, "y", y);
       });
     },
     [GraphActions.INITIALIZE_GRAPH]: async (
@@ -301,6 +334,8 @@ export const graphModule = {
     ) => {
       ctx.state.selectedNode = node;
       ctx.state.suggestions = [];
+
+      graphComponentContext.renderer.refresh();
 
       // Move the camera to center it on the selected node:
       const nodePosition: Coordinates = node

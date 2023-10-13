@@ -27,18 +27,21 @@ export interface IGraphComponentContext {
   renderer: Sigma;
 }
 
-export interface IGraphData {
-  nodes: {
-    key: string;
-    attributes: {
-      size: number;
-      label: string;
-      color: string;
-      obj: {
-        pkg?: IIndexedPackageData;
-      };
+export interface IGraphNode {
+  key: string;
+  attributes: {
+    size: number;
+    label: string;
+    color: string;
+    obj: {
+      type: string;
+      pkg?: IIndexedPackageData;
     };
-  }[];
+  };
+}
+
+export interface IGraphData {
+  nodes: IGraphNode[];
   edges: {
     key: string;
     source: string;

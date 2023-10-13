@@ -1,7 +1,7 @@
 <template>
   <div>
     <template v-if="graphState.status === GraphStatus.INITIAL">
-      <b-button variant="outline-primary" @click="render({ graphComponentContext })">GO</b-button>
+      <b-button variant="outline-primary">GO</b-button>
     </template>
     <template v-if="graphState.status === GraphStatus.INFLIGHT">
       <div class="absolute top-0 w-full">
@@ -13,17 +13,20 @@
     </template>
     <div id="sigma-container" class="w-full h-full m-0 p-0 overflow-hidden"></div>
     <div
-      v-bind:class="{ display: graphState.status === GraphStatus.SUCCESS ? 'none' : 'flex' }"
-      class="absolute right-0 top-0 p-2 flex flex-col items-stretch"
-      style="width: 320px"
+      v-bind:class="{
+        flex: graphState.status === GraphStatus.SUCCESS,
+        hidden: graphState.status !== GraphStatus.SUCCESS,
+      }"
+      class="absolute right-0 top-0 p-2 flex-col gap-2 items-stretch"
+      style="width: 320px; max-height: 100%"
     >
       <input
         type="search"
-        class="p-2"
+        class="p-2 shadow border border-gray-200"
         style="width: initial !important"
         id="search-input"
         list="suggestions"
-        placeholder="Try searching for a node..."
+        placeholder="Search for a package label..."
       />
       <datalist id="suggestions">
         <option
@@ -33,8 +36,50 @@
         ></option>
       </datalist>
 
-      <div>Selected node: {{ graphState.selectedNode }}</div>
-      <div>Hovered node: {{ graphState.hoveredNode }}</div>
+      <div
+        v-if="graphState.selectedNode"
+        class="rounded bg-white shadow p-2 border border-gray-200 flex flex-col gap-2 overflow-auto toolkit-scroll"
+      >
+        <!-- <div>Node type: {{ selectedNode.attributes.obj.type }}</div>
+        <hr /> -->
+        <template v-if="selectedNode.attributes.obj.pkg">
+          <div class="ttt-purple font-bold font-mono">
+            {{ selectedNode.attributes.obj.pkg.Label }}
+          </div>
+          <hr />
+          <div>Status: {{ selectedNode.attributes.obj.pkg.PackageState }}</div>
+          <div>
+            {{ selectedNode.attributes.obj.pkg.Quantity }}
+            {{ selectedNode.attributes.obj.pkg.UnitOfMeasureAbbreviation }}
+            {{ selectedNode.attributes.obj.pkg.Item.Name }}
+          </div>
+          <hr />
+          <div>Sources:</div>
+          <b-button
+            size="sm"
+            variant="outline-dark"
+            @click="selectNode({ graphComponentContext, node: sourceNode })"
+            v-for="sourceNode of sourceNodes"
+            v-bind:key="sourceNode"
+          >
+            {{ sourceNode }}
+          </b-button>
+          <hr />
+          <div>Children:</div>
+
+          <b-button
+            size="sm"
+            variant="outline-dark"
+            @click="selectNode({ graphComponentContext, node: childNode })"
+            v-for="childNode of childNodes"
+            v-bind:key="childNode"
+          >
+            {{ childNode }}
+          </b-button>
+          <hr />
+          <div>History:</div>
+        </template>
+      </div>
     </div>
   </div>
 </template>
@@ -44,7 +89,7 @@ import { IPluginState } from "@/interfaces";
 import router from "@/router/index";
 import store from "@/store/page-overlay/index";
 import { GraphActions, GraphStatus } from "@/store/page-overlay/modules/graph/consts";
-import { IGraphComponentContext } from "@/store/page-overlay/modules/graph/interfaces";
+import { IGraphComponentContext, IGraphNode } from "@/store/page-overlay/modules/graph/interfaces";
 import Graph from "graphology";
 import Sigma from "sigma";
 import Vue from "vue";
@@ -60,6 +105,38 @@ export default Vue.extend({
     ...mapState<IPluginState>({
       graphState: (state: IPluginState) => state.graph,
     }),
+    selectedNode(): IGraphNode | null {
+      if (store.state.graph.selectedNode) {
+        return (
+          store.state.graph.graphData.nodes.find((x) => x.key === store.state.graph.selectedNode) ??
+          null
+        );
+      }
+
+      return null;
+    },
+    sourceNodes(): string[] {
+      if (!store.state.graph.selectedNode) {
+        return [];
+      }
+
+      const sourceNodes = this.$data.graphComponentContext.graph.inboundNeighbors(
+        store.state.graph.selectedNode
+      );
+
+      console.log({ sourceNodes });
+
+      return sourceNodes;
+    },
+    childNodes(): string[] {
+      if (!store.state.graph.selectedNode) {
+        return [];
+      }
+
+      return this.$data.graphComponentContext.graph.outboundNeighbors(
+        store.state.graph.selectedNode
+      );
+    },
   },
   data() {
     return {
@@ -69,8 +146,7 @@ export default Vue.extend({
   },
   methods: {
     ...mapActions({
-      loadData: `graph/${GraphActions.LOAD_DATA}`,
-      initializeGraph: `graph/${GraphActions.INITIALIZE_GRAPH}`,
+      selectNode: `graph/${GraphActions.SELECT_NODE}`,
     }),
   },
   async created() {},
@@ -95,7 +171,6 @@ export default Vue.extend({
     await store.dispatch(`graph/${GraphActions.LOAD_DATA}`, { graphComponentContext });
     await store.dispatch(`graph/${GraphActions.INITIALIZE_GRAPH}`, { graphComponentContext });
     await store.dispatch(`graph/${GraphActions.RENDER_GRAPH}`, { graphComponentContext });
-
   },
 });
 </script>

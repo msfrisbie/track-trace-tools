@@ -37,16 +37,16 @@ export function hoverRenderer(
   const size = settings.labelSize;
   const font = settings.labelFont;
   const weight = settings.labelWeight;
-  const subLabelSize = size - 2;
+  const upperLabelSize = size - 2;
 
   const label = data.label;
-  const clusterLabel = pkg
+  const lowerLabel = pkg
     ? `${pkg!.Quantity}${pkg!.UnitOfMeasureAbbreviation} ${pkg!.Item.Name}`
     : null;
-  const subLabel = pkg?.Item.ProductCategoryName ?? null;
+  const upperLabel = pkg?.PackageState ?? null;
 
-  //   const subLabel = data.tag !== "unknown" ? data.tag : "";
-  //   const clusterLabel = data.clusterLabel;
+  //   const upperLabel = data.tag !== "unknown" ? data.tag : "";
+  //   const lowerLabel = data.lowerLabel;
 
   // Then we draw the label background
   context.beginPath();
@@ -58,19 +58,19 @@ export function hoverRenderer(
 
   context.font = `${weight} ${size}px ${font}`;
   const labelWidth = context.measureText(label).width;
-  context.font = `${weight} ${subLabelSize}px ${font}`;
-  const subLabelWidth = subLabel ? context.measureText(subLabel).width : 0;
-  context.font = `${weight} ${subLabelSize}px ${font}`;
-  const clusterLabelWidth = clusterLabel ? context.measureText(clusterLabel).width : 0;
+  context.font = `${weight} ${upperLabelSize}px ${font}`;
+  const upperLabelWidth = upperLabel ? context.measureText(upperLabel).width : 0;
+  context.font = `${weight} ${upperLabelSize}px ${font}`;
+  const lowerLabelWidth = lowerLabel ? context.measureText(lowerLabel).width : 0;
 
-  const textWidth = Math.max(labelWidth, subLabelWidth, clusterLabelWidth);
+  const textWidth = Math.max(labelWidth, upperLabelWidth, lowerLabelWidth);
 
   const x = Math.round(data.x);
   const y = Math.round(data.y);
   const w = Math.round(textWidth + size / 2 + data.size + 3);
   const hLabel = Math.round(size / 2 + 4);
-  const hSubLabel = subLabel ? Math.round(subLabelSize / 2 + 9) : 0;
-  const hClusterLabel = Math.round(subLabelSize / 2 + 9);
+  const hSubLabel = upperLabel ? Math.round(upperLabelSize / 2 + 9) : 0;
+  const hClusterLabel = Math.round(upperLabelSize / 2 + 9);
 
   drawRoundRect(context, x, y - hSubLabel - 12, w, hClusterLabel + hLabel + hSubLabel + 12, 5);
   context.closePath();
@@ -85,16 +85,16 @@ export function hoverRenderer(
   context.font = `${weight} ${size}px ${font}`;
   context.fillText(label, data.x + data.size + 3, data.y + size / 3);
 
-  if (subLabel) {
-    context.fillStyle = SECONDARY_TEXT_COLOR;
-    context.font = `${weight} ${subLabelSize}px ${font}`;
-    context.fillText(subLabel, data.x + data.size + 3, data.y - (2 * size) / 3 - 2);
+  if (upperLabel) {
+    context.fillStyle = data.color;
+    context.font = `${weight} ${upperLabelSize}px ${font}`;
+    context.fillText(upperLabel, data.x + data.size + 3, data.y - (2 * size) / 3 - 2);
   }
 
-  if (clusterLabel) {
-    context.fillStyle = data.color;
-    context.font = `${weight} ${subLabelSize}px ${font}`;
-    context.fillText(clusterLabel, data.x + data.size + 3, data.y + size / 3 + 3 + subLabelSize);
+  if (lowerLabel) {
+    context.fillStyle = SECONDARY_TEXT_COLOR;
+    context.font = `${weight} ${upperLabelSize}px ${font}`;
+    context.fillText(lowerLabel, data.x + data.size + 3, data.y + size / 3 + 3 + upperLabelSize);
   }
 }
 
@@ -172,28 +172,6 @@ export function nodeReducer({
   res.label = "";
   res.color = "#f6f6f6";
   return res;
-
-  //   } else if (graphState.hoveredNode === node) {
-  //     res.highlighted = true;
-  //   } else if (graphState.hoveredNeighbors.includes(node)) {
-  //   } else {
-  //   }
-
-  //   if (
-  //     graphState.hoveredNeighbors.length > 0 &&
-  //     !graphState.hoveredNeighbors.includes(node) &&
-  //     graphState.hoveredNode !== node
-  //   ) {
-  //     res.label = "";
-  //     res.color = "#f6f6f6";
-  //   }
-
-  //   if (graphState.selectedNode === node) {
-  //     res.highlighted = true;
-  //   } else if (graphState.suggestions.length > 0 && !graphState.suggestions.includes(node)) {
-  //     res.label = "";
-  //     res.color = "#f6f6f6";
-  //   }
 }
 
 // Render edges accordingly to the internal store.state.graph:
@@ -217,6 +195,7 @@ export function edgeReducer({
 
   if (!graphState.hoveredNode && !graphState.selectedNode) {
     // Nothing is hovered or selected
+    res.hidden = true;
     return res;
   }
 
@@ -254,30 +233,5 @@ export function edgeReducer({
   }
 
   res.hidden = true;
-  return res;
-
-  //   if (
-  //     graphState.hoveredNode &&
-  //     //@ts-ignore
-  //     !graphComponentContext.graph.hasExtremity(edge, graphState.hoveredNode)
-  //   ) {
-  //     res.hidden = true;
-  //   }
-
-  //   if (
-  //     (graphState.suggestions.length > 0 &&
-  //       !graphState.suggestions.includes(
-  //         // @ts-ignore
-  //         graphComponentContext.graph.source(edge)
-  //       )) ||
-  //     (graphState.suggestions.length > 0 &&
-  //       !graphState.suggestions.includes(
-  //         // @ts-ignore
-  //         graphComponentContext.graph.target(edge)
-  //       ))
-  //   ) {
-  //     res.hidden = true;
-  //   }
-
   return res;
 }
