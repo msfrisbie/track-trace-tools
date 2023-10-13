@@ -1,8 +1,10 @@
+import { IIndexedPackageData } from "@/interfaces";
 import { IGraphComponentContext, IGraphState } from "@/store/page-overlay/modules/graph/interfaces";
 import { Settings } from "sigma/settings";
 import { EdgeDisplayData, NodeDisplayData, PartialButFor, PlainObject } from "sigma/types";
 
-const TEXT_COLOR = "#000000";
+const PRIMARY_TEXT_COLOR = "#222222";
+const SECONDARY_TEXT_COLOR = "#555555";
 
 export function drawRoundRect(
   ctx: CanvasRenderingContext2D,
@@ -30,14 +32,21 @@ export function hoverRenderer(
   data: PlainObject,
   settings: PlainObject
 ) {
+  const pkg: IIndexedPackageData | undefined = data.obj.pkg;
+
   const size = settings.labelSize;
   const font = settings.labelFont;
   const weight = settings.labelWeight;
   const subLabelSize = size - 2;
 
   const label = data.label;
-  const subLabel = data.tag !== "unknown" ? data.tag : "";
-  const clusterLabel = data.clusterLabel;
+  const clusterLabel = pkg
+    ? `${pkg!.Quantity}${pkg!.UnitOfMeasureAbbreviation} ${pkg!.Item.Name}`
+    : null;
+  const subLabel = pkg?.Item.ProductCategoryName ?? null;
+
+  //   const subLabel = data.tag !== "unknown" ? data.tag : "";
+  //   const clusterLabel = data.clusterLabel;
 
   // Then we draw the label background
   context.beginPath();
@@ -72,19 +81,21 @@ export function hoverRenderer(
   context.shadowBlur = 0;
 
   // And finally we draw the labels
-  context.fillStyle = TEXT_COLOR;
+  context.fillStyle = PRIMARY_TEXT_COLOR;
   context.font = `${weight} ${size}px ${font}`;
   context.fillText(label, data.x + data.size + 3, data.y + size / 3);
 
   if (subLabel) {
-    context.fillStyle = TEXT_COLOR;
+    context.fillStyle = SECONDARY_TEXT_COLOR;
     context.font = `${weight} ${subLabelSize}px ${font}`;
     context.fillText(subLabel, data.x + data.size + 3, data.y - (2 * size) / 3 - 2);
   }
 
-  context.fillStyle = data.color;
-  context.font = `${weight} ${subLabelSize}px ${font}`;
-  context.fillText(clusterLabel, data.x + data.size + 3, data.y + size / 3 + 3 + subLabelSize);
+  if (clusterLabel) {
+    context.fillStyle = data.color;
+    context.font = `${weight} ${subLabelSize}px ${font}`;
+    context.fillText(clusterLabel, data.x + data.size + 3, data.y + size / 3 + 3 + subLabelSize);
+  }
 }
 
 export function labelRenderer(
@@ -115,33 +126,74 @@ export function labelRenderer(
 // 2. If there is query, all non-matching nodes are greyed
 // 3. If there is a hovered node, all non-neighbor nodes are greyed
 export function nodeReducer({
+  graphComponentContext,
   node,
   data,
   graphState,
 }: {
+  graphComponentContext: IGraphComponentContext;
   node: string;
   data: any;
   graphState: IGraphState;
 }) {
   const res: Partial<NodeDisplayData> = { ...data };
 
-  if (
-    graphState.hoveredNeighbors.length > 0 &&
-    !graphState.hoveredNeighbors.includes(node) &&
-    graphState.hoveredNode !== node
-  ) {
-    res.label = "";
-    res.color = "#f6f6f6";
+  if (!graphState.hoveredNode && !graphState.selectedNode) {
+    // Nothing is hovered or selected
+    return res;
+  }
+
+  if (graphState.hoveredNode === node) {
+    res.highlighted = true;
+    return res;
   }
 
   if (graphState.selectedNode === node) {
     res.highlighted = true;
-  } else if (graphState.suggestions.length > 0 && !graphState.suggestions.includes(node)) {
-    res.label = "";
-    res.color = "#f6f6f6";
+    return res;
   }
 
+  if (graphState.hoveredNeighbors.includes(node)) {
+    return res;
+  }
+
+  if (
+    graphState.selectedNode &&
+    // @ts-ignore
+    graphComponentContext.graph.neighbors(graphState.selectedNode).includes(node)
+  ) {
+    return res;
+  }
+
+  if (graphState.suggestions.includes(node)) {
+    return res;
+  }
+
+  res.label = "";
+  res.color = "#f6f6f6";
   return res;
+
+  //   } else if (graphState.hoveredNode === node) {
+  //     res.highlighted = true;
+  //   } else if (graphState.hoveredNeighbors.includes(node)) {
+  //   } else {
+  //   }
+
+  //   if (
+  //     graphState.hoveredNeighbors.length > 0 &&
+  //     !graphState.hoveredNeighbors.includes(node) &&
+  //     graphState.hoveredNode !== node
+  //   ) {
+  //     res.label = "";
+  //     res.color = "#f6f6f6";
+  //   }
+
+  //   if (graphState.selectedNode === node) {
+  //     res.highlighted = true;
+  //   } else if (graphState.suggestions.length > 0 && !graphState.suggestions.includes(node)) {
+  //     res.label = "";
+  //     res.color = "#f6f6f6";
+  //   }
 }
 
 // Render edges accordingly to the internal store.state.graph:
@@ -163,28 +215,69 @@ export function edgeReducer({
 }) {
   const res: Partial<EdgeDisplayData> = { ...data };
 
-  if (
-    graphState.hoveredNode &&
-    //@ts-ignore
-    !graphComponentContext.graph.hasExtremity(edge, graphState.hoveredNode)
-  ) {
-    res.hidden = true;
+  if (!graphState.hoveredNode && !graphState.selectedNode) {
+    // Nothing is hovered or selected
+    return res;
   }
 
   if (
-    (graphState.suggestions.length > 0 &&
-      !graphState.suggestions.includes(
-        // @ts-ignore
-        graphComponentContext.graph.source(edge)
-      )) ||
-    (graphState.suggestions.length > 0 &&
-      !graphState.suggestions.includes(
-        // @ts-ignore
-        graphComponentContext.graph.target(edge)
-      ))
+    graphState.hoveredNode &&
+    // @ts-ignore
+    graphComponentContext.graph.hasExtremity(edge, graphState.hoveredNode)
   ) {
-    res.hidden = true;
+    return res;
   }
+  if (
+    graphState.selectedNode &&
+    // @ts-ignore
+    graphComponentContext.graph.hasExtremity(edge, graphState.selectedNode)
+  ) {
+    return res;
+  }
+
+  if (
+    graphState.suggestions.includes(
+      // @ts-ignore
+      graphComponentContext.graph.target(edge)
+    )
+  ) {
+    return res;
+  }
+
+  if (
+    graphState.suggestions.includes(
+      // @ts-ignore
+      graphComponentContext.graph.source(edge)
+    )
+  ) {
+    return res;
+  }
+
+  res.hidden = true;
+  return res;
+
+  //   if (
+  //     graphState.hoveredNode &&
+  //     //@ts-ignore
+  //     !graphComponentContext.graph.hasExtremity(edge, graphState.hoveredNode)
+  //   ) {
+  //     res.hidden = true;
+  //   }
+
+  //   if (
+  //     (graphState.suggestions.length > 0 &&
+  //       !graphState.suggestions.includes(
+  //         // @ts-ignore
+  //         graphComponentContext.graph.source(edge)
+  //       )) ||
+  //     (graphState.suggestions.length > 0 &&
+  //       !graphState.suggestions.includes(
+  //         // @ts-ignore
+  //         graphComponentContext.graph.target(edge)
+  //       ))
+  //   ) {
+  //     res.hidden = true;
+  //   }
 
   return res;
 }

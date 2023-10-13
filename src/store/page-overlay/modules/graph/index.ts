@@ -178,6 +178,7 @@ export const graphModule = {
 
       graphComponentContext.renderer.setSetting("nodeReducer", (node, data) =>
         nodeReducer({
+          graphComponentContext,
           node,
           data,
           graphState: ctx.state,
@@ -231,29 +232,64 @@ export const graphModule = {
 
       nodeEvents.map((eventType) =>
         graphComponentContext.renderer.on(eventType, ({ node }) =>
-          ctx.dispatch(GraphActions.HANDLE_EVENT, { eventType, sourceType: "node", source: node })
+          ctx.dispatch(GraphActions.HANDLE_EVENT, {
+            graphComponentContext,
+            eventType,
+            sourceType: "node",
+            source: node,
+          })
         )
       );
       edgeEvents.map((eventType) =>
         graphComponentContext.renderer.on(eventType, ({ edge }) =>
-          ctx.dispatch(GraphActions.HANDLE_EVENT, { eventType, sourceType: "edge", source: edge })
+          ctx.dispatch(GraphActions.HANDLE_EVENT, {
+            graphComponentContext,
+            eventType,
+            sourceType: "edge",
+            source: edge,
+          })
         )
       );
       stageEvents.map((eventType) =>
         graphComponentContext.renderer.on(eventType, (eventType) =>
-          ctx.dispatch(GraphActions.HANDLE_EVENT, { eventType, sourceType: "stage" })
+          ctx.dispatch(GraphActions.HANDLE_EVENT, {
+            graphComponentContext,
+            eventType,
+            sourceType: "stage",
+          })
         )
       );
     },
     [GraphActions.HANDLE_EVENT]: async (
       ctx: ActionContext<IGraphState, IPluginState>,
-      { eventType, sourceType, source }: { eventType: string; sourceType: string; source?: string }
+      {
+        graphComponentContext,
+        eventType,
+        sourceType,
+        source,
+      }: {
+        graphComponentContext: IGraphComponentContext;
+        eventType: string;
+        sourceType: string;
+        source?: string;
+      }
     ) => {
       switch (eventType) {
-        case "hoverNode":
-          ctx.dispatch(GraphActions.SELECT_NODE, {});
+        case "clickNode":
+          ctx.dispatch(GraphActions.SELECT_NODE, {
+            graphComponentContext,
+            node: source,
+          });
           break;
       }
+
+      if (sourceType === "stage") {
+        ctx.dispatch(GraphActions.SELECT_NODE, {
+          graphComponentContext,
+          node: null,
+        });
+      }
+
       console.log({ eventType, sourceType, source });
     },
     [GraphActions.SELECT_NODE]: async (
@@ -267,9 +303,9 @@ export const graphModule = {
       ctx.state.suggestions = [];
 
       // Move the camera to center it on the selected node:
-      const nodePosition = graphComponentContext.renderer.getNodeDisplayData(
-        ctx.state.selectedNode
-      ) as Coordinates;
+      const nodePosition: Coordinates = node
+        ? (graphComponentContext.renderer.getNodeDisplayData(ctx.state.selectedNode) as Coordinates)
+        : { x: 0.5, y: 0.5 };
       graphComponentContext.renderer.getCamera().animate(nodePosition, {
         duration: 500,
       });
