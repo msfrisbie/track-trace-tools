@@ -24,7 +24,7 @@
           style="width: 5rem"
           class="flex-shrink-0"
           :textClass="node.pkg.Quantity === 0 ? 'text-red-500' : ''"
-          :text="`${node.pkg.Quantity} ${node.pkg.UnitOfMeasureAbbreviation}`"
+          :text="getQuantityAndUnitDescription(node.pkg)"
         />
 
         <picker-card class="flex-grow" :title="`${node.pkg.ItemName}`" :label="node.pkg.Label" />
@@ -51,6 +51,7 @@ import { HistoryTreeNodeType, PackageState } from "@/consts";
 import { IHistoryTreeNode } from "@/interfaces";
 import router from "@/router/index";
 import store from "@/store/page-overlay/index";
+import { getQuantityAndUnitDescription } from "@/utils/package";
 import { unitOfMeasureNameToAbbreviation } from "@/utils/units";
 import Vue from "vue";
 import { mapState } from "vuex";
@@ -93,6 +94,7 @@ export default Vue.extend({
           return "light";
       }
     },
+    getQuantityAndUnitDescription,
   },
   async created() {},
   async mounted() {},

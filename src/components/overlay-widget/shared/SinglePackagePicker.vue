@@ -36,7 +36,7 @@
                     style="width: 5rem"
                     class="flex-shrink-0"
                     :textClass="data.Quantity === 0 ? 'text-red-500' : ''"
-                    :text="`${data.Quantity} ${getItemUnitOfMeasureAbbreviationOrError(data)}`"
+                    :text="getQuantityAndUnitDescription(data)"
                   />
 
                   <picker-card
@@ -167,6 +167,7 @@ import {
   getItemNameOrError,
   getItemUnitOfMeasureNameOrError,
   getItemUnitOfMeasureAbbreviationOrError,
+getQuantityAndUnitDescription,
 } from "@/utils/package";
 import _ from "lodash-es";
 import { timer } from "rxjs";
@@ -208,6 +209,7 @@ export default Vue.extend({
     getItemNameOrError,
     getItemUnitOfMeasureNameOrError,
     getItemUnitOfMeasureAbbreviationOrError,
+    getQuantityAndUnitDescription,
     async loadPackages() {
       this.$data.inflight = false;
       this.$data.error = null;

@@ -79,9 +79,7 @@
           <hr />
           <div>Status: {{ selectedNode.attributes.obj.pkg.PackageState }}</div>
           <div>
-            {{ selectedNode.attributes.obj.pkg.Quantity }}
-            {{ selectedNode.attributes.obj.pkg.UnitOfMeasureAbbreviation }}
-            {{ selectedNode.attributes.obj.pkg.Item.Name }}
+            {{ getNormalizedPackageContentsDescription(selectedNode.attributes.obj.pkg) }}
           </div>
           <hr />
           <div>Sources:</div>
@@ -120,6 +118,7 @@ import router from "@/router/index";
 import store from "@/store/page-overlay/index";
 import { GraphActions, GraphStatus } from "@/store/page-overlay/modules/graph/consts";
 import { IGraphComponentContext, IGraphNode } from "@/store/page-overlay/modules/graph/interfaces";
+import { getNormalizedPackageContentsDescription } from "@/utils/package";
 import Graph from "graphology";
 import Sigma from "sigma";
 import Vue from "vue";
@@ -178,6 +177,7 @@ export default Vue.extend({
       selectNode: `graph/${GraphActions.SELECT_NODE}`,
       zoom: `graph/${GraphActions.ZOOM}`,
     }),
+    getNormalizedPackageContentsDescription,
   },
   async created() {},
   async mounted() {

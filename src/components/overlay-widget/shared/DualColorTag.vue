@@ -1,5 +1,5 @@
 <template>
-  <div class="font-mono">
+  <div class="font-mono demo-blur">
     <span class="text-gray-400 text-center">{{ labelPrefix }}</span>
     <span class="text-gray-800 text-center font-bold">{{ labelSuffix }}</span>
   </div>
@@ -27,9 +27,7 @@ export default Vue.extend({
       );
     },
     labelSuffix() {
-      return this.$props.label.slice(
-        sliceOffset + firstNonzeroSuffixIntIndex(this.$props.label)
-      );
+      return this.$props.label.slice(sliceOffset + firstNonzeroSuffixIntIndex(this.$props.label));
     },
   },
 });

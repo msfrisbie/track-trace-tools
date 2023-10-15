@@ -3,8 +3,8 @@
     <div class="flex flex-row justify-between items-center space-x-6 cursor-pointer p-4">
       <picker-card
         class="flex-grow"
-        :title="`${pkg.Quantity} ${pkg.Item.UnitOfMeasureName} ${pkg.Item.Name}`"
-        :label="pkg.Label"
+        :title="getNormalizedPackageContentsDescription(pkg)"
+        :label="getLabelOrError(pkg)"
       />
 
       <b-button
@@ -20,17 +20,9 @@
 
 <script lang="ts">
 import PickerCard from "@/components/overlay-widget/shared/PickerCard.vue";
-import { IIndexedPackageData, IPackageData } from "@/interfaces";
-import { authManager } from "@/modules/auth-manager.module";
-import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
-import { searchManager } from "@/modules/search-manager.module";
-import { MutationType } from "@/mutation-types";
-import {
-  TransferBuilderActions,
-  TRANSFER_BUILDER,
-} from "@/store/page-overlay/modules/transfer-builder/consts";
-import { remove } from "lodash-es";
-import { async } from "rxjs";
+import { IIndexedPackageData } from "@/interfaces";
+import { TransferBuilderActions } from "@/store/page-overlay/modules/transfer-builder/consts";
+import { getLabelOrError, getNormalizedPackageContentsDescription } from "@/utils/package";
 import Vue from "vue";
 import { mapActions, mapState } from "vuex";
 export default Vue.extend({
@@ -39,7 +31,7 @@ export default Vue.extend({
     PickerCard,
   },
   props: {
-    pkg: Object as () => IPackageData,
+    pkg: Object as () => IIndexedPackageData,
   },
   async created() {},
   computed: {
@@ -51,6 +43,8 @@ export default Vue.extend({
     ...mapActions({
       removePackage: `transferBuilder/${TransferBuilderActions.REMOVE_PACKAGE}`,
     }),
+    getNormalizedPackageContentsDescription,
+    getLabelOrError,
   },
 });
 </script>

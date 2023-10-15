@@ -2,6 +2,7 @@ import { IIndexedPackageData } from "@/interfaces";
 import { IGraphComponentContext, IGraphState } from "@/store/page-overlay/modules/graph/interfaces";
 import { Settings } from "sigma/settings";
 import { EdgeDisplayData, NodeDisplayData, PartialButFor, PlainObject } from "sigma/types";
+import { getNormalizedPackageContentsDescription } from "./package";
 
 const PRIMARY_TEXT_COLOR = "#222222";
 const SECONDARY_TEXT_COLOR = "#555555";
@@ -41,7 +42,7 @@ export function hoverRenderer(
 
   const label = data.label;
   const lowerLabel = pkg
-    ? `${pkg!.Quantity}${pkg!.UnitOfMeasureAbbreviation} ${pkg!.Item.Name}`
+    ? getNormalizedPackageContentsDescription(pkg)
     : null;
   const upperLabel = pkg?.PackageState ?? null;
 

@@ -125,10 +125,8 @@
                     :value="pkg"
                   >
                     <picker-card
-                      :title="`${pkg.Quantity} ${getItemUnitOfMeasureNameOrError(
-                        pkg
-                      )} ${getItemNameOrError(pkg)}`"
-                      :label="pkg.Label"
+                      :title="getNormalizedPackageContentsDescription(pkg)"
+                      :label="getLabelOrError(pkg)"
                     />
                   </b-form-checkbox>
 
@@ -231,7 +229,12 @@ import { authManager } from "@/modules/auth-manager.module";
 import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
 import store from "@/store/page-overlay/index";
 import { itemMatchesFilters } from "@/utils/filters";
-import { getItemUnitOfMeasureNameOrError, getItemNameOrError } from "@/utils/package";
+import {
+  getItemNameOrError,
+  getItemUnitOfMeasureNameOrError,
+  getLabelOrError,
+  getNormalizedPackageContentsDescription,
+} from "@/utils/package";
 import { combineLatest, Subject } from "rxjs";
 import { debounceTime, distinctUntilChanged, filter, startWith, tap } from "rxjs/operators";
 import { v4 } from "uuid";
@@ -285,6 +288,8 @@ export default Vue.extend({
   methods: {
     getItemUnitOfMeasureNameOrError,
     getItemNameOrError,
+    getNormalizedPackageContentsDescription,
+    getLabelOrError,
     clear() {
       this.$data.item = null;
       this.$data.location = null;

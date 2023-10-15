@@ -13,8 +13,7 @@
         v-bind:class="{ 'font-bold': selected }"
       >
         <div class="text-xl text-purple-700 demo-blur">
-          {{ pkg.Quantity }}{{ pkg.UnitOfMeasureAbbreviation }}
-          {{ pkg.Item.Name }}
+          {{ getNormalizedPackageContentsDescription(pkg) }}
         </div>
         <div class="text-gray-700 text-lg metrc-tag">{{ pkg.Label }}</div>
       </div>
@@ -31,6 +30,7 @@ import { SearchActions } from "@/store/page-overlay/modules/search/consts";
 import Vue from "vue";
 import { mapActions } from "vuex";
 import store from "@/store/page-overlay/index";
+import { getNormalizedPackageContentsDescription } from "@/utils/package";
 
 export default Vue.extend({
   name: "PackageSearchResultPreview",
@@ -64,6 +64,7 @@ export default Vue.extend({
 
       this.setShowSearchResults({ showSearchResults: false });
     },
+    getNormalizedPackageContentsDescription
   },
 });
 </script>

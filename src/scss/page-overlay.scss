@@ -38,8 +38,9 @@ body.demo-mode {
 
   td,
   div.k-pager-wrap,
-  .demo-blur {
-    color: transparent;
+  .demo-blur,
+  .demo-blur * {
+    color: transparent !important;
     text-shadow: 0 0 8px rgba(0, 0, 0, 0.4);
   }
 

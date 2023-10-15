@@ -107,6 +107,20 @@ export function getDelimiterSeparatedValuesOrError(
   return values;
 }
 
+export function getQuantityAndUnitDescription(pkg: IUnionIndexedPackageData): string {
+  return `${getQuantityOrError(pkg)} ${getItemUnitOfMeasureAbbreviationOrError(
+    pkg
+  )}`;
+}
+
+export function getNormalizedPackageContentsDescription(pkg: IUnionIndexedPackageData): string {
+  return `${getQuantityOrError(pkg)} ${getItemUnitOfMeasureAbbreviationOrError(
+    pkg
+  )} ${getItemNameOrError(pkg)}`;
+}
+
+
+
 export async function getSourcePackageTags(target: IUnionIndexedPackageData): Promise<string[]> {
   try {
     return getDelimiterSeparatedValuesOrError(target.SourcePackageLabels, {

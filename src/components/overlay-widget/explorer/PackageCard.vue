@@ -20,7 +20,7 @@
         style="width: 5rem"
         class="flex-shrink-0"
         :textClass="pkg.Quantity === 0 ? 'text-red-500' : ''"
-        :text="`${pkg.Quantity} ${pkg.UnitOfMeasureAbbreviation}`"
+        :text="getQuantityAndUnitDescription(pkg)"
       />
 
       <picker-card class="flex-grow" :title="`${pkg.Item.Name}`" :label="pkg.Label" />
@@ -48,6 +48,7 @@ import { PackageState } from "@/consts";
 import { IIndexedPackageData } from "@/interfaces";
 import router from "@/router/index";
 import store from "@/store/page-overlay/index";
+import { getQuantityAndUnitDescription } from "@/utils/package";
 import { unitOfMeasureNameToAbbreviation } from "@/utils/units";
 import Vue from "vue";
 import { mapState } from "vuex";
@@ -83,6 +84,7 @@ export default Vue.extend({
           return "light";
       }
     },
+    getQuantityAndUnitDescription
   },
   async created() {},
   async mounted() {},
