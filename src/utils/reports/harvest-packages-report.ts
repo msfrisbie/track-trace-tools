@@ -957,14 +957,16 @@ function generateUnitsPair(
   const poundUnitOfmeasure = unitsOfMeasure.find((x) => x.Abbreviation === "lb")!;
 
   return [
-    Math.abs(
-      convertUnits(
-        quantity,
-        unitsOfMeasure.find(
-          (x) => x.Abbreviation === getItemUnitOfMeasureAbbreviationOrError(pkg)
-        )!,
-        gramUnitOfMeasure
-      )
+    parseFloat(
+      Math.abs(
+        convertUnits(
+          quantity,
+          unitsOfMeasure.find(
+            (x) => x.Abbreviation === getItemUnitOfMeasureAbbreviationOrError(pkg)
+          )!,
+          gramUnitOfMeasure
+        )
+      ).toFixed(3)
     ),
     parseFloat(
       Math.abs(
