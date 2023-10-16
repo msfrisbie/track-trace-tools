@@ -11,7 +11,7 @@ import {
 import { DataLoader, getDataLoaderByLicense } from "@/modules/data-loader/data-loader.module";
 import { dynamicConstsManager } from "@/modules/dynamic-consts-manager.module";
 import { facilityManager } from "@/modules/facility-manager.module";
-import { ReportsMutations, ReportType } from "@/store/page-overlay/modules/reports/consts";
+import { ReportType, ReportsMutations } from "@/store/page-overlay/modules/reports/consts";
 import {
   IReportConfig,
   IReportData,
@@ -966,14 +966,16 @@ function generateUnitsPair(
         gramUnitOfMeasure
       )
     ),
-    Math.abs(
-      convertUnits(
-        quantity,
-        unitsOfMeasure.find(
-          (x) => x.Abbreviation === getItemUnitOfMeasureAbbreviationOrError(pkg)
-        )!,
-        poundUnitOfmeasure
-      )
+    parseFloat(
+      Math.abs(
+        convertUnits(
+          quantity,
+          unitsOfMeasure.find(
+            (x) => x.Abbreviation === getItemUnitOfMeasureAbbreviationOrError(pkg)
+          )!,
+          poundUnitOfmeasure
+        )
+      ).toFixed(3)
     ),
   ];
 }
