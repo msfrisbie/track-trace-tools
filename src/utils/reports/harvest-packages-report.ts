@@ -78,10 +78,10 @@ export const harvestPackagesFormFiltersFactory: () => IHarvestPackagesReportForm
   shouldFilterHarvestDateLt: true,
   licenseOptions: facilityManager.cachedFacilities.map((x) => x.licenseNumber),
   licenses: facilityManager.cachedFacilities.map((x) => x.licenseNumber),
-  displayChecksum: true,
-  displayFullTags: true,
-  addSpacing: true,
-  debug: true,
+  displayChecksum: false,
+  displayFullTags: false,
+  addSpacing: false,
+  debug: false,
 });
 
 export function addHarvestPackagesReport({
