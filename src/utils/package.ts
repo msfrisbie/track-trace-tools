@@ -82,6 +82,29 @@ export function getItemNameOrError(unionPkg: IUnionIndexedPackageData): string {
   throw new Error("Could not extract Item Name");
 }
 
+export function getItemUnitQuantityAndUnitOrError(unionPkg: IUnionIndexedPackageData): {
+  quantity: number;
+  unitOfMeasureAbbreviation: string;
+} {
+  const pkg = unionPkg as any;
+  if (pkg.Item?.UnitWeight && pkg.Item?.UnitWeightUnitOfMeasureAbbreviation) {
+    return {
+      quantity: (pkg as IIndexedPackageData).Item.UnitWeight!,
+      unitOfMeasureAbbreviation: (pkg as IIndexedPackageData).Item
+        .UnitWeightUnitOfMeasureAbbreviation!,
+    };
+  }
+  if (pkg.ItemUnitWeight && pkg.ItemUnitWeightUnitOfMeasureAbbreviation) {
+    return {
+      quantity: (pkg as IDestinationPackageData).ItemUnitWeight!,
+      unitOfMeasureAbbreviation: (pkg as IDestinationPackageData)
+        .ItemUnitWeightUnitOfMeasureAbbreviation!,
+    };
+  }
+  console.log({ pkg });
+  throw new Error("Could not extract Item Quantity");
+}
+
 export function getDelimiterSeparatedValuesOrError(
   joinedValues: string,
   options?: { delimiter?: string; regex?: RegExp }
@@ -108,9 +131,7 @@ export function getDelimiterSeparatedValuesOrError(
 }
 
 export function getQuantityAndUnitDescription(pkg: IUnionIndexedPackageData): string {
-  return `${getQuantityOrError(pkg)} ${getItemUnitOfMeasureAbbreviationOrError(
-    pkg
-  )}`;
+  return `${getQuantityOrError(pkg)} ${getItemUnitOfMeasureAbbreviationOrError(pkg)}`;
 }
 
 export function getNormalizedPackageContentsDescription(pkg: IUnionIndexedPackageData): string {
@@ -118,8 +139,6 @@ export function getNormalizedPackageContentsDescription(pkg: IUnionIndexedPackag
     pkg
   )} ${getItemNameOrError(pkg)}`;
 }
-
-
 
 export async function getSourcePackageTags(target: IUnionIndexedPackageData): Promise<string[]> {
   try {

@@ -34,6 +34,7 @@ import {
   getIdOrError,
   getItemNameOrError,
   getItemUnitOfMeasureAbbreviationOrError,
+  getItemUnitQuantityAndUnitOrError,
   getLabelOrError,
   getStrainNameOrError,
 } from "../package";
@@ -482,11 +483,12 @@ export async function maybeLoadHarvestPackagesReportData({
         }
 
         // If top-level pkg was transferred, assume it is the Post QC - Sent to Lab package
-        if (childPackage.LicenseNumber !== harvest.LicenseNumber) {
-          harvestPostQcPackages.push(childPackage);
+        // TODO I do not undestand this distinction
+        // if (childPackage.LicenseNumber !== harvest.LicenseNumber) {
+        //   harvestPostQcPackages.push(childPackage);
 
-          continue;
-        }
+        //   continue;
+        // }
 
         intakePackages.push(childPackage);
       }
@@ -699,6 +701,10 @@ function normalizeItemNameToMaterialType(itemName: string) {
     return "Popcorn";
   }
 
+  if (itemName.includes("Preroll")) {
+    return "Prerolls";
+  }
+
   if (itemName.includes("Flower")) {
     return "Flower";
   }
@@ -815,6 +821,10 @@ function recordPostQcRows(
     "Post QC Lab Testing",
     harvestConfig.debug ? "" : "",
   ]);
+
+  if (harvestConfig.addSpacing) {
+    harvestPackageMatrix.push(Array(10).fill("") as IStringRow);
+  }
 }
 
 function recordPackagingRows(
@@ -935,7 +945,7 @@ function recordPackagingRows(
     truncateTag(harvestConfig, getLabelOrError(grandchildPackage)),
     strainName,
     "",
-    normalizeItemNameToMaterialType(getItemNameOrError(childPackage)),
+    normalizeItemNameToMaterialType(getItemNameOrError(grandchildPackage)),
     ...packagingIntakeUnitsPair,
     "Packaging Intake",
     harvestConfig.displayChecksum
@@ -950,7 +960,7 @@ function recordPackagingRows(
     truncateTag(harvestConfig, getLabelOrError(grandchildPackage)),
     strainName,
     "",
-    normalizeItemNameToMaterialType(getItemNameOrError(childPackage)) + " - Prepack",
+    normalizeItemNameToMaterialType(getItemNameOrError(grandchildPackage)) + " - Prepack",
     ...packagingUnitsPair,
     "Packaging",
     harvestConfig.debug ? "" : "",
@@ -1070,32 +1080,30 @@ function generateUnitsPair(
   pkg: IUnionIndexedPackageData,
   unitsOfMeasure: IUnitOfMeasure[]
 ): [number, number] {
+  let unitOfMeasure = unitsOfMeasure.find(
+    (x) => x.Abbreviation === getItemUnitOfMeasureAbbreviationOrError(pkg)
+  )!;
+
   const gramUnitOfMeasure = unitsOfMeasure.find((x) => x.Abbreviation === "g")!;
   const poundUnitOfmeasure = unitsOfMeasure.find((x) => x.Abbreviation === "lb")!;
 
+  if (getItemUnitOfMeasureAbbreviationOrError(pkg) === "ea") {
+    try {
+      const itemQuantityAndUnit = getItemUnitQuantityAndUnitOrError(pkg);
+
+      quantity *= itemQuantityAndUnit.quantity;
+      unitOfMeasure = unitsOfMeasure.find(
+        (x) => x.Abbreviation === itemQuantityAndUnit.unitOfMeasureAbbreviation
+      )!;
+    } catch {
+      // Item is count based. No meaningful way to extract an initial weight.
+      return [0, 0];
+    }
+  }
+
   return [
-    parseFloat(
-      Math.abs(
-        convertUnits(
-          quantity,
-          unitsOfMeasure.find(
-            (x) => x.Abbreviation === getItemUnitOfMeasureAbbreviationOrError(pkg)
-          )!,
-          gramUnitOfMeasure
-        )
-      ).toFixed(3)
-    ),
-    parseFloat(
-      Math.abs(
-        convertUnits(
-          quantity,
-          unitsOfMeasure.find(
-            (x) => x.Abbreviation === getItemUnitOfMeasureAbbreviationOrError(pkg)
-          )!,
-          poundUnitOfmeasure
-        )
-      ).toFixed(3)
-    ),
+    parseFloat(Math.abs(convertUnits(quantity, unitOfMeasure, gramUnitOfMeasure)).toFixed(3)),
+    parseFloat(Math.abs(convertUnits(quantity, unitOfMeasure, poundUnitOfmeasure)).toFixed(3)),
   ];
 }
 
