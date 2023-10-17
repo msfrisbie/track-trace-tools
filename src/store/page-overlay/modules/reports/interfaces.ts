@@ -63,7 +63,9 @@ export interface IReportConfig {
     harvestFilter: IHarvestFilter;
     licenses: string[];
     debug: boolean;
-    ignoreMissingPackages: boolean;
+    displayChecksum: boolean;
+    displayFullTags: boolean;
+    addSpacing: boolean;
     fields: null;
   };
   [ReportType.COGS_TRACKER]?: {

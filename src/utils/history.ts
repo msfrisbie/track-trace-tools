@@ -186,12 +186,24 @@ export function extractChildPackageTagQuantityUnitSetOrNull(
   description: string
 ): [string, number, string] | null {
   const pairMatcher = new RegExp(
-    `Used ([0-9,\.]+) ([a-zA-Z\s]+) for Package (${METRC_TAG_REGEX_PATTERN})`
+    `(Used|Restored) ([0-9,\.]+) ([a-zA-Z\s]+) (for|from) Package (${METRC_TAG_REGEX_PATTERN})`
   );
 
   const match = description.match(pairMatcher);
 
-  return match ? [match[3], parseFloat(match[1].replaceAll(",", "")), match[2]] : null;
+  if (!match) {
+    return null;
+  }
+
+  const tag = match[5];
+  let quantity = parseFloat(match[2].replaceAll(",", ""));
+  const unit = match[3];
+
+  if (match[1] === "Restored") {
+    quantity *= -1;
+  }
+
+  return [tag, quantity, unit];
 }
 
 export function extractParentPackageTagQuantityUnitItemSetOrNull(

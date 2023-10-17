@@ -300,8 +300,14 @@
                 <b-form-checkbox v-model="harvestPackagesFormFilters.debug">
                   <span class="leading-6">Debug</span>
                 </b-form-checkbox>
-                <b-form-checkbox v-model="harvestPackagesFormFilters.ignoreMissingPackages">
-                  <span class="leading-6">Ignore missing packages</span>
+                <b-form-checkbox v-model="harvestPackagesFormFilters.displayChecksum">
+                  <span class="leading-6">Display checksum</span>
+                </b-form-checkbox>
+                <b-form-checkbox v-model="harvestPackagesFormFilters.displayFullTags">
+                  <span class="leading-6">Display full package tags</span>
+                </b-form-checkbox>
+                <b-form-checkbox v-model="harvestPackagesFormFilters.addSpacing">
+                  <span class="leading-6">Add spacing</span>
                 </b-form-checkbox>
                 <b-form-group label="Licenses:">
                   <b-form-checkbox-group
