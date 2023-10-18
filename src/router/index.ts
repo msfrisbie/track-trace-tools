@@ -35,9 +35,9 @@ import TransferBuilder from "@/components/overlay-widget/transfer/TransferBuilde
 import TransferTemplateBuilder from "@/components/overlay-widget/transfer/TransferTemplateBuilder.vue";
 import TransferToolsHelp from "@/components/overlay-widget/transfer/TransferToolsHelp.vue";
 import UnavailablePage from "@/components/overlay-widget/UnavailablePage.vue";
+import CheckPermissionsView from "@/components/page-overlay/CheckPermissionsView.vue";
 import FinalizeSalesReceiptsForm from "@/components/page-overlay/forms/FinalizeSalesReceiptsForm.vue";
 import SettingsForm from "@/components/page-overlay/forms/SettingsForm.vue";
-import BugReportForm from "@/components/page-overlay/forms/BugReportForm.vue";
 import VoidTagForm from "@/components/page-overlay/forms/VoidTagForm.vue";
 import GoogleSheetsExport from "@/components/page-overlay/GoogleSheetsExport.vue";
 import ManageAccount from "@/components/page-overlay/ManageAccount.vue";
@@ -234,6 +234,11 @@ const routes: Array<RouteConfig> = [
     path: "/misc",
     name: "T3",
     component: MiscellaneousListView,
+  },
+  {
+    path: "/check-permissions",
+    name: "Check Permissions",
+    component: CheckPermissionsView,
   },
   {
     path: "/screenshot/create-screenshot",

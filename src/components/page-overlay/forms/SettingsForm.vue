@@ -64,6 +64,13 @@
           >
         </b-form-group>
 
+        <b-button
+          class="my-4"
+          variant="outline-primary"
+          @click="navToPermissions('/check-permissions')"
+          >CHECK MY PERMISSIONS</b-button
+        >
+
         <b-form-group>
           <div class="mb-2 text-gray-400 text-lg">Appearance &amp; Behavior</div>
 
@@ -553,10 +560,12 @@ import { getMatchingDecryptedDataOrNull } from "@/utils/encryption";
 import { generateThumbnail } from "@/utils/file";
 import Vue from "vue";
 import { mapState } from "vuex";
+import router from "@/router/index";
 
 export default Vue.extend({
   name: "SettingsForm",
   store,
+  router,
   data() {
     return {
       image: null,
@@ -666,6 +675,9 @@ export default Vue.extend({
     async toggleDebugMode() {
       window.location.hash = "";
       store.commit(MutationType.SET_DEBUG_MODE, !store.state.debugMode);
+    },
+    navToPermissions(route: string) {
+      this.$router.push(route);
     },
     saveLicenseKey() {
       this.$data.settings.licenseKey = this.$data.unsavedLicenseKey;
