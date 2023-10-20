@@ -71,6 +71,11 @@ export default Vue.extend({
                 required: false,
                 defaultDescription: ""
             },
+            {
+                value: CreatePackageCsvColumns.EXPIRATION_DATE,
+                required: false,
+                defaultDescription: "Same as parent package"
+            },
         ]
     };
   },

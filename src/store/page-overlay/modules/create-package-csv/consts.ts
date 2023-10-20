@@ -11,6 +11,7 @@ export enum CreatePackageCsvColumns {
   IS_TRADE_SAMPLE = "Is Trade Sample?",
   SOURCE_PACKAGE_TAG_PREFIX = "Source Package Tag",
   SOURCE_PACKAGE_QUANTITY_PREFIX = "Source Package Quantity",
+  EXPIRATION_DATE = "Expiration Date",
 }
 
 export enum CreatePackageCsvMutations {
@@ -23,4 +24,5 @@ export enum CreatePackageCsvGetters {
 
 export enum CreatePackageCsvActions {
   GENERATE_CSV_TEMPLATE = "GENERATE_CSV_TEMPLATE",
+  IMPORT_CSV = "IMPORT_CSV",
 }
