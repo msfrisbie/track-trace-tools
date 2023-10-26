@@ -243,11 +243,22 @@ export function isCustodiedDatetimeOrError({
     return true;
   }
 
+  const interleaved = interleaveGroupedTransferDatetimes({ arrivalDatetimes, departureDatetimes });
+
   if (!interleavedDatetimesAreValid({ arrivalDatetimes, departureDatetimes }).valid) {
+    const first = interleaved[0];
+    const last = interleaved[interleaved.length - 1];
+    // Badly formatted, but still make an attempt based on start/end
+    if (targetDatetime < first.datetime) {
+      return first.group === TransferGroup.DEPARTURE;
+    }
+
+    if (targetDatetime > last.datetime) {
+      return last.group === TransferGroup.ARRIVAL;
+    }
+
     throw new Error("Interleaved datetimes are invalid");
   }
-
-  const interleaved = interleaveGroupedTransferDatetimes({ arrivalDatetimes, departureDatetimes });
 
   let prev = null;
   let next = interleaved[0];

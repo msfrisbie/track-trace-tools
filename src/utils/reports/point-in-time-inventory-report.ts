@@ -16,7 +16,12 @@ import {
   IReportsState,
 } from "@/store/page-overlay/modules/reports/interfaces";
 import { ActionContext } from "vuex";
-import { getIsoDateFromOffset, isoDatetimeToLocalDate, todayIsodate } from "../date";
+import {
+  getIsoDateFromOffset,
+  isCustodiedDatetimeOrError,
+  isoDatetimeToLocalDate,
+  todayIsodate,
+} from "../date";
 import { extractInitialPackageQuantityAndUnitFromHistoryOrError } from "../history";
 import { getItemNameOrError, getLabelOrError } from "../package";
 
@@ -57,7 +62,8 @@ export interface IPackageDateMetadata {
   arrivalDatetimes: string[];
   departureDatetimes: string[];
   eligible: boolean;
-  message: string | null;
+  message: string;
+  debugMessage: string;
 }
 
 export const pointInTimeInventoryFormFiltersFactory: () => IPointInTimeInventoryReportFormFilters =
@@ -190,7 +196,8 @@ export async function maybeLoadPointInTimeInventoryReportData({
       arrivalDatetimes: [],
       departureDatetimes: [],
       eligible: false,
-      message: null,
+      message: "",
+      debugMessage: "",
     };
   }
 
@@ -390,27 +397,21 @@ export async function maybeLoadPointInTimeInventoryReportData({
       metadata.receivedDate > pointInTimeInventoryReportConfig.targetDate
     ) {
       continue;
-      //   metadata.message += `Received date indicates ineligible: ${metadata.receivedDate}.  `;
     }
 
-    if (metadata.arrivalDatetimes.length === 1) {
-      if (metadata.arrivalDatetimes[0] > pointInTimeInventoryReportConfig.targetDate) {
+    try {
+      const isCustodied = isCustodiedDatetimeOrError({
+        arrivalDatetimes: metadata.arrivalDatetimes,
+        departureDatetimes: metadata.departureDatetimes,
+        targetDatetime: pointInTimeInventoryReportConfig.targetDate,
+      });
+
+      if (!isCustodied) {
         continue;
       }
-    }
-
-    if (metadata.departureDatetimes.length === 1) {
-      if (metadata.departureDatetimes[0] < pointInTimeInventoryReportConfig.targetDate) {
-        continue;
-      }
-    }
-
-    if (metadata.arrivalDatetimes.length > 1) {
-      metadata.message += `Arrival dates: ${metadata.arrivalDatetimes}.  `;
-    }
-
-    if (metadata.departureDatetimes.length > 1) {
-      metadata.message += `Departure dates: ${metadata.departureDatetimes}.  `;
+    } catch {
+      metadata.message += `Unable to determine if this package was in custody.`;
+      metadata.debugMessage += `Transfer datetimes could not be parsed. arrival:${metadata.arrivalDatetimes.join()}/departure:${metadata.departureDatetimes.join()}`;
     }
 
     if (metadata.shipmentPackageState === "Returned") {
@@ -474,10 +475,9 @@ export function extractPointInTimeInventoryData({
 
   const headers = ["Tag", "Item", "Quantity (estimated)", "Unit of Measure", "Note"];
 
-  // console.log(reportConfig[ReportType.POINT_IN_TIME_INVENTORY]);
-
   if (reportConfig[ReportType.POINT_IN_TIME_INVENTORY]!.showDebugColumns) {
     headers.push(
+      "Debug Message",
       "Incoming Manifests",
       "Outgoing Manifests",
       "Tag Used Date",
@@ -510,15 +510,16 @@ export function extractPointInTimeInventoryData({
 
       if (reportConfig[ReportType.POINT_IN_TIME_INVENTORY]!.showDebugColumns) {
         row.push(
-          metadata.incomingManifests.join(),
-          metadata.outgoingManifests.join(),
+          metadata.debugMessage,
+          metadata.incomingManifests.join("|"),
+          metadata.outgoingManifests.join("|"),
           metadata.tagUsedDate,
           metadata.packagedDate,
           metadata.archivedDate,
           metadata.finishedDate,
           metadata.receivedDate,
-          metadata.arrivalDatetimes.join(", "),
-          metadata.departureDatetimes.join(", "),
+          metadata.arrivalDatetimes.join("|"),
+          metadata.departureDatetimes.join("|"),
           metadata.eligible,
           !!metadata.pkg,
           metadata.incomingTransferPackages.length,

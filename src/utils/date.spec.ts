@@ -200,21 +200,49 @@ describe("date.ts", () => {
   });
 
   it("Correctly evaluates custody", () => {
+    // Invalid dates
+
     expect(() =>
       isCustodiedDatetimeOrError({
         arrivalDatetimes: [],
-        departureDatetimes: ["2023-04-05T00:00:00.000Z", "2023-04-05T00:00:00.000Z"],
+        departureDatetimes: ["2023-04-04T00:00:00.000Z", "2023-04-06T00:00:00.000Z"],
         targetDatetime: "2023-04-05T00:00:00.000Z",
       })
     ).toThrowError();
+
+    expect(
+      isCustodiedDatetimeOrError({
+        arrivalDatetimes: [],
+        departureDatetimes: ["2023-04-05T00:00:00.000Z", "2023-04-06T00:00:00.000Z"],
+        targetDatetime: "2023-04-04T00:00:00.000Z",
+      })
+    ).toEqual(true);
+
+    expect(
+      isCustodiedDatetimeOrError({
+        arrivalDatetimes: [],
+        departureDatetimes: ["2023-04-05T00:00:00.000Z", "2023-04-06T00:00:00.000Z"],
+        targetDatetime: "2023-04-07T00:00:00.000Z",
+      })
+    ).toEqual(false);
 
     expect(() =>
       isCustodiedDatetimeOrError({
         arrivalDatetimes: ["2023-04-04T00:00:00.000Z", "2023-04-06T00:00:00.000Z"],
         departureDatetimes: ["2023-04-03T00:00:00.000Z", "2023-04-08T00:00:00.000Z"],
-        targetDatetime: "2023-04-09T00:00:00.000Z",
+        targetDatetime: "2023-04-05T00:00:00.000Z",
       })
     ).toThrowError();
+
+    expect(
+      isCustodiedDatetimeOrError({
+        arrivalDatetimes: ["2023-04-04T00:00:00.000Z", "2023-04-06T00:00:00.000Z"],
+        departureDatetimes: ["2023-04-03T00:00:00.000Z", "2023-04-08T00:00:00.000Z"],
+        targetDatetime: "2023-04-02T00:00:00.000Z",
+      })
+    ).toEqual(true);
+
+    // Valid dates
 
     expect(
       isCustodiedDatetimeOrError({
