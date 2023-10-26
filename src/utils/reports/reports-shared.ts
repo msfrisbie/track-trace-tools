@@ -17,9 +17,11 @@ import {
   IReportConfig,
   IReportData,
 } from "@/store/page-overlay/modules/reports/interfaces";
+import { todayIsodate } from "../date";
 import { extractExmployeeAuditData } from "./employee-audit-report";
 import { extractHarvestPackagesData } from "./harvest-packages-report";
 import { extractMaturePlantPropertyFromDimension } from "./mature-plants-quickview-report";
+import { extractPointInTimeInventoryData } from "./point-in-time-inventory-report";
 
 export function shouldGenerateReport({
   reportConfig,
@@ -295,6 +297,12 @@ export function extractFlattenedData({
           reportConfig,
           reportData,
         });
+      case ReportType.POINT_IN_TIME_INVENTORY:
+        return extractPointInTimeInventoryData({
+          reportType,
+          reportConfig,
+          reportData,
+        });
       case ReportType.MATURE_PLANTS_QUICKVIEW:
         return extractQuickviewData({
           reportType,
@@ -316,7 +324,48 @@ export function extractFlattenedData({
   return values;
 }
 
-export function getSheetTitle({ reportType }: { reportType: ReportType }): SheetTitles {
+// This is
+export function getCsvFilename({
+  reportType,
+  license,
+  reportConfig,
+}: {
+  reportType: ReportType;
+  license: string;
+  reportConfig: IReportConfig;
+}): string {
+  const sheetTitle = getSheetTitle({ reportType, reportConfig });
+
+  let date = todayIsodate();
+
+  switch (reportType) {
+    case ReportType.COGS_V2:
+    case ReportType.HARVEST_PACKAGES:
+    case ReportType.EMPLOYEE_SAMPLES:
+    case ReportType.POINT_IN_TIME_INVENTORY:
+    // TODO these are either not single-license, or should not have todays date
+    default:
+      return `${sheetTitle} - ${license} - ${date}`;
+  }
+}
+
+export function getGoogleSheetName({
+  license,
+  reportConfig,
+}: {
+  license: string;
+  reportConfig: IReportConfig;
+}): string {
+  return `${license} Metrc Report - ${todayIsodate()}`;
+}
+
+export function getSheetTitle({
+  reportType,
+  reportConfig,
+}: {
+  reportType: ReportType;
+  reportConfig: IReportConfig;
+}): string {
   switch (reportType) {
     case ReportType.PACKAGES:
       return SheetTitles.PACKAGES;
@@ -324,8 +373,8 @@ export function getSheetTitle({ reportType }: { reportType: ReportType }): Sheet
       return SheetTitles.STRAGGLER_PACKAGES;
     case ReportType.HARVESTS:
       return SheetTitles.HARVESTS;
-      case ReportType.HARVEST_PACKAGES:
-        return SheetTitles.HARVEST_PACKAGES;
+    case ReportType.HARVEST_PACKAGES:
+      return SheetTitles.HARVEST_PACKAGES;
     case ReportType.TAGS:
       return SheetTitles.TAGS;
     case ReportType.IMMATURE_PLANTS:
@@ -346,6 +395,10 @@ export function getSheetTitle({ reportType }: { reportType: ReportType }): Sheet
       return SheetTitles.TRANSFER_HUB_TRANSFER_MANIFESTS;
     case ReportType.EMPLOYEE_AUDIT:
       return SheetTitles.EMPLOYEE_AUDIT;
+    case ReportType.POINT_IN_TIME_INVENTORY:
+      return `${SheetTitles.POINT_IN_TIME_INVENTORY} ${
+        reportConfig[ReportType.POINT_IN_TIME_INVENTORY]!.targetDate
+      }`;
     default:
       throw new Error("Bad reportType " + reportType);
   }

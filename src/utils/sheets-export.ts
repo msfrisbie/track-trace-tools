@@ -29,6 +29,8 @@ import { createCogsV2SpreadsheetOrError } from "./reports/cogs-v2-report";
 import { createEmployeeSamplesSpreadsheetOrError } from "./reports/employee-samples-report";
 import {
   extractFlattenedData,
+  getCsvFilename,
+  getGoogleSheetName,
   getSheetTitle,
   shouldGenerateReport,
 } from "./reports/reports-shared";
@@ -91,7 +93,7 @@ export async function writeDataSheet<T>({
   options = {},
 }: {
   spreadsheetId: string;
-  spreadsheetTitle: SheetTitles;
+  spreadsheetTitle: string;
   fields?: IFieldData[];
   data: T[];
   options?: {
@@ -310,9 +312,11 @@ export async function createCsvOrError({
   );
 
   for (const reportType of ELIGIBLE_REPORT_TYPES) {
-    const filename = `${getSheetTitle({ reportType })} - ${
-      store.state.pluginAuth?.authState?.license
-    } - ${todayIsodate()}`;
+    const filename = getCsvFilename({
+      reportType,
+      license: store.state.pluginAuth?.authState?.license,
+      reportConfig,
+    });
 
     let data: any[][] = extractFlattenedData({
       flattenedCache,
@@ -389,9 +393,9 @@ export async function createSpreadsheetOrError({
   // Generate Sheets
   //
 
-  const sheetTitles: SheetTitles[] = [
+  const sheetTitles: string[] = [
     SheetTitles.OVERVIEW,
-    ...ELIGIBLE_REPORT_TYPES.map((reportType) => getSheetTitle({ reportType })),
+    ...ELIGIBLE_REPORT_TYPES.map((reportType) => getSheetTitle({ reportType, reportConfig })),
   ];
 
   const response: {
@@ -402,7 +406,10 @@ export async function createSpreadsheetOrError({
   } = await messageBus.sendMessageToBackground(
     MessageType.CREATE_SPREADSHEET,
     {
-      title: `${store.state.pluginAuth?.authState?.license} Metrc Report - ${todayIsodate()}`,
+      title: getGoogleSheetName({
+        license: store.state.pluginAuth?.authState?.license,
+        reportConfig,
+      }),
       sheetTitles,
     },
     undefined,
@@ -429,13 +436,14 @@ export async function createSpreadsheetOrError({
     }),
     styleTopRowRequestFactory({
       sheetId: sheetTitles.indexOf(SheetTitles.OVERVIEW),
+      horizontalAlignment: "LEFT",
     }),
   ];
 
   // TODO report data should be pre-formatted before getting here
 
   for (const reportType of ELIGIBLE_REPORT_TYPES) {
-    const sheetId: number = sheetTitles.indexOf(getSheetTitle({ reportType }));
+    const sheetId: number = sheetTitles.indexOf(getSheetTitle({ reportType, reportConfig }));
     const length = Math.max(
       extractFlattenedData({ flattenedCache, reportType, reportData, reportConfig }).length,
       1
@@ -470,7 +478,7 @@ export async function createSpreadsheetOrError({
 
     await writeDataSheet({
       spreadsheetId: response.data.result.spreadsheetId,
-      spreadsheetTitle: getSheetTitle({ reportType }),
+      spreadsheetTitle: getSheetTitle({ reportType, reportConfig }),
       fields: reportConfig[reportType]?.fields as IFieldData[],
       data: extractFlattenedData({ flattenedCache, reportType, reportData, reportConfig }),
     });
@@ -488,10 +496,13 @@ export async function createSpreadsheetOrError({
 
   for (const reportType of ELIGIBLE_REPORT_TYPES) {
     summaryList.push([
-      `=HYPERLINK("#gid=${sheetTitles.indexOf(getSheetTitle({ reportType }))}","${getSheetTitle({
+      `=HYPERLINK("#gid=${sheetTitles.indexOf(
+        getSheetTitle({ reportType, reportConfig })
+      )}","${getSheetTitle({
         reportType,
+        reportConfig,
       })}")`,
-      `=COUNTA('${getSheetTitle({ reportType })}'!A2:A)`,
+      `=COUNTA('${getSheetTitle({ reportType, reportConfig })}'!A2:A)`,
       // `=COUNTIF('${SheetTitles.PACKAGES}'!C2:C, "ACTIVE")`,
     ]);
   }
@@ -526,7 +537,7 @@ export async function createSpreadsheetOrError({
     resizeRequests = [
       ...resizeRequests,
       autoResizeDimensionsRequestFactory({
-        sheetId: sheetTitles.indexOf(getSheetTitle({ reportType })),
+        sheetId: sheetTitles.indexOf(getSheetTitle({ reportType, reportConfig })),
       }),
     ];
   }
@@ -555,7 +566,7 @@ export async function createSpreadsheetOrError({
     shrinkFontRequests = [
       ...shrinkFontRequests,
       shrinkFontRequestFactory({
-        sheetId: sheetTitles.indexOf(getSheetTitle({ reportType })),
+        sheetId: sheetTitles.indexOf(getSheetTitle({ reportType, reportConfig })),
       }),
     ];
   }

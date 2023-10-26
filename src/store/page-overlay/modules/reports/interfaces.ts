@@ -17,6 +17,10 @@ import {
   ITransferFilter,
 } from "@/interfaces";
 import { MaturePlantQuickviewDimension } from "@/utils/reports/mature-plants-quickview-report";
+import {
+  InventoryStrategy,
+  IPackageDateMetadata,
+} from "@/utils/reports/point-in-time-inventory-report";
 import { IStatusMessage, ReportStatus, ReportType } from "./consts";
 
 export interface IReportsState {
@@ -81,8 +85,12 @@ export interface IReportConfig {
     fields: IFieldData[];
   };
   [ReportType.POINT_IN_TIME_INVENTORY]?: {
-    packageFilter: IPackageFilter;
-    fields: IFieldData[];
+    targetDate: string;
+    inventoryStrategy: InventoryStrategy;
+    useRestrictedWindowOptimization: boolean;
+    restrictedWindowDays: number;
+    showDebugColumns: boolean;
+    fields: null;
   };
   [ReportType.STRAGGLER_PACKAGES]?: {
     stragglerPackageFilter: IPackageFilter;
@@ -171,7 +179,7 @@ export interface IReportData {
     packages: IIndexedPackageData[];
   };
   [ReportType.POINT_IN_TIME_INVENTORY]?: {
-    packages: IIndexedPackageData[];
+    packageMetadataPairs: [string, IPackageDateMetadata][];
   };
   [ReportType.EMPLOYEE_SAMPLES]?: {
     employeeSamplesMatrix: any[][];

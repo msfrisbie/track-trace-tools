@@ -18,6 +18,7 @@ import { maybeLoadMaturePlantsReportData } from "@/utils/reports/mature-plants-r
 import { maybeLoadOutgoingTransferManifestsReportData } from "@/utils/reports/outgoing-transfer-manifests-report";
 import { maybeLoadOutgoingTransfersReportData } from "@/utils/reports/outgoing-transfers-report";
 import { maybeLoadPackageReportData } from "@/utils/reports/package-report";
+import { maybeLoadPointInTimeInventoryReportData } from "@/utils/reports/point-in-time-inventory-report";
 import { maybeLoadStragglerPackageReportData } from "@/utils/reports/straggler-package-report";
 import { maybeLoadTagsReportData } from "@/utils/reports/tags-report";
 import { maybeLoadTransferHubTransfersReportData } from "@/utils/reports/transfer-hub-transfers-report";
@@ -28,9 +29,9 @@ import { ActionContext } from "vuex";
 import {
   IStatusMessage,
   ReportAuxTask,
-  ReportStatus,
   ReportsActions,
   ReportsMutations,
+  ReportStatus,
 } from "./consts";
 import { IReportConfig, IReportData, IReportsState } from "./interfaces";
 
@@ -152,6 +153,7 @@ export const reportsModule = {
         await maybeLoadEmployeeSamplesReportData({ ctx, reportData, reportConfig });
         await maybeLoadHarvestPackagesReportData({ ctx, reportData, reportConfig });
         await maybeLoadEmployeeAuditReportData({ ctx, reportData, reportConfig });
+        await maybeLoadPointInTimeInventoryReportData({ ctx, reportData, reportConfig });
 
         ctx.commit(ReportsMutations.SET_STATUS, {
           statusMessage: { text: "Generating report...", level: "success" },

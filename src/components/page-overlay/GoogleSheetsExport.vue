@@ -320,6 +320,59 @@
           </div>
         </template>
 
+        <!-- Point In Time Inventory -->
+        <template
+          v-if="
+            selectedReports.find((report) => report.value === ReportType.POINT_IN_TIME_INVENTORY)
+          "
+        >
+          <div class="rounded border border-gray-300 p-2 flex flex-col items-stretch gap-2">
+            <div class="font-semibold text-white ttt-purple-bg p-2 -m-2">
+              Point In Time Inventory
+            </div>
+            <hr />
+            <div class="flex flex-col items-stretch gap-4">
+              <div class="font-semibold text-gray-700">Filters:</div>
+
+              <div class="flex flex-col items-start gap-1">
+                <span class="leading-6">Point in time:</span>
+                <b-form-datepicker
+                  initial-date
+                  size="sm"
+                  v-model="pointInTimeInventoryFormFilters.targetDate"
+                />
+              </div>
+              <b-form-group label="Longest amount of time a package is held at this facility:">
+                <b-form-select
+                  :disabled="!pointInTimeInventoryFormFilters.useRestrictedWindowOptimization"
+                  v-model="pointInTimeInventoryFormFilters.restrictedWindowDays"
+                  :options="pointInTimeInventoryFormFilters.restrictedWindowDaysOptions"
+                ></b-form-select>
+              </b-form-group>
+              <hr />
+
+              <simple-drawer toggleText="ADVANCED">
+                <b-form-checkbox
+                  v-model="pointInTimeInventoryFormFilters.useRestrictedWindowOptimization"
+                >
+                  <span class="leading-6">Restrict package window (recommended)</span>
+                </b-form-checkbox>
+
+                <span
+                  v-if="!pointInTimeInventoryFormFilters.useRestrictedWindowOptimization"
+                  class="mb-4 text-xs text-red-500"
+                  >Disabling this will include packages held for any length of time, but report
+                  generation will be significantly slower.</span
+                >
+
+                <b-form-checkbox v-model="pointInTimeInventoryFormFilters.showDebugColumns">
+                  <span class="leading-6">Show debug columns</span>
+                </b-form-checkbox>
+              </simple-drawer>
+            </div>
+          </div>
+        </template>
+
         <!-- Packages -->
         <template v-if="selectedReports.find((report) => report.value === ReportType.PACKAGES)">
           <div class="rounded border border-gray-300 p-2 flex flex-col items-stretch gap-2">
@@ -1503,6 +1556,10 @@ import {
 } from "@/utils/reports/outgoing-transfers-report";
 import { addPackageReport, packageFormFiltersFactory } from "@/utils/reports/package-report";
 import {
+  addPointInTimeInventoryReport,
+  pointInTimeInventoryFormFiltersFactory,
+} from "@/utils/reports/point-in-time-inventory-report";
+import {
   addStragglerPackagesReport,
   stragglerPackagesFormFiltersFactory,
 } from "@/utils/reports/straggler-package-report";
@@ -1601,6 +1658,7 @@ export default Vue.extend({
       outgoingTransfersFormFilters: outgoingTransfersFormFiltersFactory(),
       transferHubTransfersFormFilters: transferHubTransfersFormFiltersFactory(),
       outgoingTransferManifestsFormFilters: outgoingTransferManifestsFormFiltersFactory(),
+      pointInTimeInventoryFormFilters: pointInTimeInventoryFormFiltersFactory(),
       // transferHubTransferManifestsFormFilters: transferHubTransferManifestsFormFiltersFactory(),
       tagsFormFilters: tagsFormFiltersFactory(),
       employeeSamplesFormFilters: employeeSamplesFormFiltersFactory(),
@@ -1684,7 +1742,7 @@ export default Vue.extend({
           text: "Point-in-time inventory",
           value: ReportType.POINT_IN_TIME_INVENTORY,
           t3plus: true,
-          enabled: false,
+          enabled: true,
           description: "All active packages on a certain date.",
           isCustom: false,
           isCsvEligible: true,
@@ -1987,6 +2045,17 @@ export default Vue.extend({
         addHarvestPackagesReport({
           reportConfig,
           harvestPackagesFormFilters: this.harvestPackagesFormFilters,
+        });
+      }
+
+      if (
+        this.selectedReports.find(
+          (report: IReportOption) => report.value === ReportType.POINT_IN_TIME_INVENTORY
+        )
+      ) {
+        addPointInTimeInventoryReport({
+          reportConfig,
+          pointInTimeInventoryFormFilters: this.pointInTimeInventoryFormFilters,
         });
       }
 

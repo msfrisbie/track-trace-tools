@@ -99,3 +99,173 @@ export function isoDatetimedDifferenceInMinutes(isoTimestamp1: string, isoTimest
   const differenceInMilliseconds = Math.abs(date2.getTime() - date1.getTime());
   return differenceInMilliseconds / 1000 / 60;
 }
+
+export function isoDatetimeToLocalDate(isoDateTime: string): string {
+  if (!isoDateTime.includes("T")) {
+    // This is just a date, do not convert from UTC
+    return isoDateTime;
+  }
+
+  const date = new Date(isoDateTime);
+
+  return date.toLocaleDateString("sv");
+}
+
+interface CustodyInterval {
+  start: string | null;
+  end: string | null;
+}
+
+export function custodyDatetimeRangesOrError(
+  arrivalDatetimes: string[],
+  departureDatetimes: string[]
+): CustodyInterval[] {
+  throw new Error("Disabled");
+
+  const sortedArrivalDatetimes = [...arrivalDatetimes].sort();
+  const sortedDepartureDatetimes = [...departureDatetimes].sort();
+
+  if (sortedArrivalDatetimes.length === 0 && sortedDepartureDatetimes.length === 0) {
+    return [];
+  }
+
+  if (Math.abs(sortedArrivalDatetimes.length - sortedDepartureDatetimes.length) > 1) {
+    throw new Error(
+      `Length mismatch: ${sortedArrivalDatetimes.length}/${sortedDepartureDatetimes.length}`
+    );
+  }
+
+  const intervals: CustodyInterval[] = [];
+
+  // If it's well formed, shift() the min value off to generate next set.
+  // Any deviation means an error
+
+  let shiftArrivalNext = true;
+
+  // If there's a start departure, begin with an infinite
+  if (sortedDepartureDatetimes.length > sortedArrivalDatetimes.length) {
+    // Custody begins at packaging?
+    shiftArrivalNext = false;
+
+    // 215064 multiple departure dates
+  }
+
+  while (sortedDepartureDatetimes.length > 0 || sortedArrivalDatetimes.length > 0) {
+    if (sortedArrivalDatetimes.length === 0) {
+      // pop min value, check expected next
+    }
+
+    // intervals.push(nextInterval);
+  }
+
+  return intervals;
+}
+
+enum TransferGroup {
+  ARRIVAL = "ARRIVAL",
+  DEPARTURE = "DEPARTURE",
+}
+
+export function interleaveGroupedTransferDatetimes({
+  arrivalDatetimes,
+  departureDatetimes,
+}: {
+  arrivalDatetimes: string[];
+  departureDatetimes: string[];
+}): { datetime: string; group: TransferGroup }[] {
+  return [
+    ...arrivalDatetimes.map((datetime) => ({
+      datetime,
+      group: TransferGroup.ARRIVAL,
+    })),
+    ...departureDatetimes.map((datetime) => ({
+      datetime,
+      group: TransferGroup.DEPARTURE,
+    })),
+  ].sort((a, b) => a.datetime.localeCompare(b.datetime));
+}
+
+export function interleavedDatetimesAreValid({
+  arrivalDatetimes,
+  departureDatetimes,
+}: {
+  arrivalDatetimes: string[];
+  departureDatetimes: string[];
+}): { valid: boolean; message?: string } {
+  if (arrivalDatetimes.length === 0 && departureDatetimes.length === 0) {
+    // Never left custody
+    return {
+      valid: true,
+    };
+  }
+
+  if (Math.abs(arrivalDatetimes.length - departureDatetimes.length) > 1) {
+    return {
+      valid: false,
+      message: `Length mismatch: ${arrivalDatetimes.length}/${departureDatetimes.length}`,
+    };
+  }
+
+  // Guaranteed to have a length of at least 1
+  const interleavedDatetimes = interleaveGroupedTransferDatetimes({
+    arrivalDatetimes,
+    departureDatetimes,
+  });
+
+  let expectedNextGroup: TransferGroup = interleavedDatetimes[0].group;
+
+  for (const { datetime, group } of interleavedDatetimes) {
+    if (expectedNextGroup !== group) {
+      return {
+        valid: false,
+        message: `Interleaved groups are not alternating. ${datetime}/${group}`,
+      };
+    }
+
+    expectedNextGroup =
+      expectedNextGroup === TransferGroup.ARRIVAL ? TransferGroup.DEPARTURE : TransferGroup.ARRIVAL;
+  }
+
+  return { valid: true };
+}
+
+export function isCustodiedDatetimeOrError({
+  arrivalDatetimes,
+  departureDatetimes,
+  targetDatetime,
+}: {
+  arrivalDatetimes: string[];
+  departureDatetimes: string[];
+  targetDatetime: string;
+}): boolean {
+  if (arrivalDatetimes.length === 0 && departureDatetimes.length === 0) {
+    // If never transferred, package was always owned
+    return true;
+  }
+
+  if (!interleavedDatetimesAreValid({ arrivalDatetimes, departureDatetimes }).valid) {
+    throw new Error("Interleaved datetimes are invalid");
+  }
+
+  const interleaved = interleaveGroupedTransferDatetimes({ arrivalDatetimes, departureDatetimes });
+
+  let prev = null;
+  let next = interleaved[0];
+
+  for (let i = 0; i < interleaved.length + 1; ++i) {
+    if ((!prev || prev.datetime < targetDatetime) && (!next || next.datetime > targetDatetime)) {
+      if (prev && prev.group === TransferGroup.ARRIVAL) {
+        return true;
+      }
+
+      if (next && next.group === TransferGroup.DEPARTURE) {
+        return true;
+      }
+    }
+
+    prev = interleaved[i];
+    next = interleaved[i + 1] ?? null;
+  }
+
+  return false;
+}

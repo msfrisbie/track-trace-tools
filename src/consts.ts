@@ -547,6 +547,7 @@ export enum SheetTitles {
   RECEIVED_SAMPLES = "Received Samples",
   EMPLOYEE_AUDIT = "Employee Audit",
   HARVEST_PACKAGES = "Harvest Packages",
+  POINT_IN_TIME_INVENTORY = "Point In Time Inventory",
 }
 
 // Sheets self-enforced timeout is 180000ms,

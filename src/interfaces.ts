@@ -932,6 +932,10 @@ export interface IOutgoingTransferData extends ITransferData {
 
 export interface IIncomingTransferData extends ITransferData {}
 
+export interface IRichIncomingTransferData extends IIncomingTransferData {
+  packages?: IIndexedDestinationPackageData[];
+}
+
 export interface IVehicleData {
   Id: number;
   Make: string;
