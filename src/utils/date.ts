@@ -111,56 +111,6 @@ export function isoDatetimeToLocalDate(isoDateTime: string): string {
   return date.toLocaleDateString("sv");
 }
 
-interface CustodyInterval {
-  start: string | null;
-  end: string | null;
-}
-
-export function custodyDatetimeRangesOrError(
-  arrivalDatetimes: string[],
-  departureDatetimes: string[]
-): CustodyInterval[] {
-  throw new Error("Disabled");
-
-  const sortedArrivalDatetimes = [...arrivalDatetimes].sort();
-  const sortedDepartureDatetimes = [...departureDatetimes].sort();
-
-  if (sortedArrivalDatetimes.length === 0 && sortedDepartureDatetimes.length === 0) {
-    return [];
-  }
-
-  if (Math.abs(sortedArrivalDatetimes.length - sortedDepartureDatetimes.length) > 1) {
-    throw new Error(
-      `Length mismatch: ${sortedArrivalDatetimes.length}/${sortedDepartureDatetimes.length}`
-    );
-  }
-
-  const intervals: CustodyInterval[] = [];
-
-  // If it's well formed, shift() the min value off to generate next set.
-  // Any deviation means an error
-
-  let shiftArrivalNext = true;
-
-  // If there's a start departure, begin with an infinite
-  if (sortedDepartureDatetimes.length > sortedArrivalDatetimes.length) {
-    // Custody begins at packaging?
-    shiftArrivalNext = false;
-
-    // 215064 multiple departure dates
-  }
-
-  while (sortedDepartureDatetimes.length > 0 || sortedArrivalDatetimes.length > 0) {
-    if (sortedArrivalDatetimes.length === 0) {
-      // pop min value, check expected next
-    }
-
-    // intervals.push(nextInterval);
-  }
-
-  return intervals;
-}
-
 enum TransferGroup {
   ARRIVAL = "ARRIVAL",
   DEPARTURE = "DEPARTURE",
