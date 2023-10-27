@@ -107,6 +107,12 @@ export interface IReportConfig {
     employeeQuery: string;
     fields: null;
   };
+  [ReportType.PACKAGES_QUICKVIEW]?: {
+    packageFilter: IPackageFilter;
+    primaryDimension: PackageQuickviewDimension;
+    secondaryDimension: PackageQuickviewDimension | null;
+    fields: null;
+  };
   [ReportType.IMMATURE_PLANTS_QUICKVIEW]?: {
     plantBatchFilter: IPlantBatchFilter;
     primaryDimension: ImmaturePlantQuickviewDimension;
@@ -200,6 +206,9 @@ export interface IReportData {
   };
   [ReportType.MATURE_PLANTS]?: {
     maturePlants: IIndexedPlantData[];
+  };
+  [ReportType.PACKAGES_QUICKVIEW]?: {
+    packages: IIndexedPackageData[];
   };
   [ReportType.IMMATURE_PLANTS_QUICKVIEW]?: {
     plantBatches: IIndexedPlantBatchData[];

@@ -101,8 +101,6 @@ export async function maybeLoadImmaturePlantsQuickviewReportData({
         statusMessage: { text: "Loading plant batches...", level: "success" },
       });
 
-      debugger;
-
       if (immaturePlantQuickviewConfig?.plantBatchFilter.includeActive) {
         try {
           plantBatches = [...plantBatches, ...(await primaryDataLoader.plantBatches())];
@@ -123,8 +121,6 @@ export async function maybeLoadImmaturePlantsQuickviewReportData({
         }
       }
     }
-
-    debugger;
 
     plantBatches = plantBatches.filter((plantBatch) => {
       if (immaturePlantQuickviewConfig.plantBatchFilter.plantedDateLt) {

@@ -10,7 +10,7 @@ import {
 import { ActionContext } from "vuex";
 import { todayIsodate } from "../date";
 
-interface IPackageReportFormFilters {
+export interface IPackageReportFormFilters {
   packagedDateGt: string;
   packagedDateLt: string;
   shouldFilterPackagedDateGt: boolean;

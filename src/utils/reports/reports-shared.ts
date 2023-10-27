@@ -23,6 +23,7 @@ import { extractExmployeeAuditData } from "./employee-audit-report";
 import { extractHarvestPackagesData } from "./harvest-packages-report";
 import { extractImmaturePlantPropertyFromDimension } from "./immature-plants-quickview-report";
 import { extractMaturePlantPropertyFromDimension } from "./mature-plants-quickview-report";
+import { extractPackagePropertyFromDimension } from "./packages-quickview-report";
 import { extractPointInTimeInventoryData } from "./point-in-time-inventory-report";
 
 export function shouldGenerateReport({
@@ -75,6 +76,8 @@ export function extractNestedData({
       return reportData[reportType]!.maturePlants;
     case ReportType.IMMATURE_PLANTS_QUICKVIEW:
       return reportData[reportType]!.plantBatches;
+    case ReportType.PACKAGES_QUICKVIEW:
+      return reportData[reportType]!.packages;
     default:
       throw new Error("Bad reportType " + reportType);
   }
@@ -129,6 +132,12 @@ export function extractQuickviewData({
       secondaryDimension = reportConfig[reportType]!.secondaryDimension as string | null;
       objects = reportData[reportType]!.maturePlants;
       extractor = extractMaturePlantPropertyFromDimension;
+      break;
+    case ReportType.PACKAGES_QUICKVIEW:
+      primaryDimension = reportConfig[reportType]!.primaryDimension as string;
+      secondaryDimension = reportConfig[reportType]!.secondaryDimension as string | null;
+      objects = reportData[reportType]!.packages;
+      extractor = extractPackagePropertyFromDimension;
       break;
     default:
       throw new Error("Bad report type");
@@ -315,6 +324,7 @@ export function extractFlattenedData({
           reportConfig,
           reportData,
         });
+      case ReportType.PACKAGES_QUICKVIEW:
       case ReportType.IMMATURE_PLANTS_QUICKVIEW:
       case ReportType.MATURE_PLANTS_QUICKVIEW:
         return extractQuickviewData({
@@ -392,6 +402,8 @@ export function getSheetTitle({
       return SheetTitles.TAGS;
     case ReportType.IMMATURE_PLANTS:
       return SheetTitles.IMMATURE_PLANTS;
+    case ReportType.PACKAGES_QUICKVIEW:
+      return SheetTitles.PACKAGES_QUICKVIEW;
     case ReportType.MATURE_PLANTS_QUICKVIEW:
       return SheetTitles.MATURE_PLANTS_QUICKVIEW;
     case ReportType.IMMATURE_PLANTS_QUICKVIEW:

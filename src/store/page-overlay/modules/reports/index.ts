@@ -19,6 +19,7 @@ import { maybeLoadMaturePlantsReportData } from "@/utils/reports/mature-plants-r
 import { maybeLoadOutgoingTransferManifestsReportData } from "@/utils/reports/outgoing-transfer-manifests-report";
 import { maybeLoadOutgoingTransfersReportData } from "@/utils/reports/outgoing-transfers-report";
 import { maybeLoadPackageReportData } from "@/utils/reports/package-report";
+import { maybeLoadPackagesQuickviewReportData } from "@/utils/reports/packages-quickview-report";
 import { maybeLoadPointInTimeInventoryReportData } from "@/utils/reports/point-in-time-inventory-report";
 import { maybeLoadStragglerPackageReportData } from "@/utils/reports/straggler-package-report";
 import { maybeLoadTagsReportData } from "@/utils/reports/tags-report";
@@ -146,6 +147,7 @@ export const reportsModule = {
         await maybeLoadHarvestsReportData({ ctx, reportData, reportConfig });
         await maybeLoadTagsReportData({ ctx, reportData, reportConfig });
         await maybeLoadMaturePlantsReportData({ ctx, reportData, reportConfig });
+        await maybeLoadPackagesQuickviewReportData({ ctx, reportData, reportConfig });
         await maybeLoadMaturePlantsQuickviewReportData({ ctx, reportData, reportConfig });
         await maybeLoadImmaturePlantsQuickviewReportData({ ctx, reportData, reportConfig });
         await maybeLoadIncomingTransfersReportData({ ctx, reportData, reportConfig });
