@@ -56,7 +56,10 @@ describe("date.ts", () => {
   });
 
   it("Converts iso datetimes", () => {
-    expect(isoDatetimeToLocalDate("2023-04-05T00:00:00.000Z")).toEqual("2023-04-04"); // Indicates correct conversion
+    if (new Date().getTimezoneOffset() === 300) {
+      expect(isoDatetimeToLocalDate("2023-04-05T00:00:00.000Z")).toEqual("2023-04-04"); // Indicates correct conversion
+    }
+
     expect(isoDatetimeToLocalDate("2023-04-05T06:00:00.000Z")).toEqual("2023-04-05");
     expect(isoDatetimeToLocalDate("2023-04-05T12:00:00.000Z")).toEqual("2023-04-05");
     expect(isoDatetimeToLocalDate("2023-04-05T18:00:00.000Z")).toEqual("2023-04-05");
