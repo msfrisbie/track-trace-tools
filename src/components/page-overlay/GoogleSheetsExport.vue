@@ -1297,6 +1297,75 @@
           </div>
         </template>
 
+        <!-- Immature Plants Quickview -->
+        <template
+          v-if="
+            selectedReports.find((report) => report.value === ReportType.IMMATURE_PLANTS_QUICKVIEW)
+          "
+        >
+          <div class="rounded border border-gray-300 p-2 flex flex-col items-stretch gap-2">
+            <div class="font-semibold text-white ttt-purple-bg p-2 -m-2">
+              Immature Plants Quickview
+            </div>
+            <hr />
+            <div class="flex flex-col items-stretch gap-4">
+              <div class="font-semibold text-gray-700">Filters:</div>
+
+              <b-form-group label="Slice plants by:" label-size="sm">
+                <b-form-select
+                  v-model="immaturePlantsQuickviewFormFilters.primaryDimension"
+                  :options="IMMATURE_PLANT_QUICKVIEW_DIMENSIONS"
+                ></b-form-select>
+              </b-form-group>
+
+              <b-form-group label="Slice plants by: (optional)" label-size="sm">
+                <b-form-select
+                  v-model="immaturePlantsQuickviewFormFilters.secondaryDimension"
+                  :options="[{ text: 'None', value: null }, ...IMMATURE_PLANT_QUICKVIEW_DIMENSIONS]"
+                ></b-form-select>
+              </b-form-group>
+
+              <b-form-checkbox v-model="immaturePlantsQuickviewFormFilters.includeActive">
+                <span class="leading-6">Include Active</span>
+              </b-form-checkbox>
+
+              <b-form-checkbox v-model="immaturePlantsQuickviewFormFilters.includeInactive">
+                <span class="leading-6">Include Inactive</span>
+              </b-form-checkbox>
+
+              <div class="flex flex-col items-start gap-1">
+                <b-form-checkbox
+                  v-model="immaturePlantsQuickviewFormFilters.shouldFilterPlantedDateGt"
+                >
+                  <span class="leading-6">Planted on or after:</span>
+                </b-form-checkbox>
+                <b-form-datepicker
+                  v-if="immaturePlantsQuickviewFormFilters.shouldFilterPlantedDateGt"
+                  :disabled="!immaturePlantsQuickviewFormFilters.shouldFilterPlantedDateGt"
+                  initial-date
+                  size="sm"
+                  v-model="immaturePlantsQuickviewFormFilters.plantedDateGt"
+                />
+              </div>
+
+              <div class="flex flex-col items-start gap-1">
+                <b-form-checkbox
+                  v-model="maturePlantsQuickviewFormFilters.shouldFilterPlantedDateLt"
+                >
+                  <span class="leading-6">Planted on or before:</span>
+                </b-form-checkbox>
+                <b-form-datepicker
+                  v-if="maturePlantsQuickviewFormFilters.shouldFilterPlantedDateLt"
+                  :disabled="!maturePlantsQuickviewFormFilters.shouldFilterPlantedDateLt"
+                  initial-date
+                  size="sm"
+                  v-model="maturePlantsQuickviewFormFilters.plantedDateLt"
+                />
+              </div>
+            </div>
+          </div>
+        </template>
+
         <!-- Mature Plants Quickview -->
         <template
           v-if="
@@ -1530,6 +1599,11 @@ import {
 } from "@/utils/reports/harvest-packages-report";
 import { addHarvestsReport, harvestsFormFiltersFactory } from "@/utils/reports/harvests-report";
 import {
+  addImmaturePlantsQuickviewReport,
+  immaturePlantsQuickviewFormFiltersFactory,
+  IMMATURE_PLANT_QUICKVIEW_DIMENSIONS,
+} from "@/utils/reports/immature-plants-quickview-report";
+import {
   addImmaturePlantsReport,
   immaturePlantsFormFiltersFactory,
 } from "@/utils/reports/immature-plants-report";
@@ -1644,6 +1718,7 @@ export default Vue.extend({
       ReportType,
       SHEET_FIELDS,
       MATURE_PLANT_QUICKVIEW_DIMENSIONS,
+      IMMATURE_PLANT_QUICKVIEW_DIMENSIONS,
       selectedReports: [] as IReportOption[],
       cogsFormFilters: cogsFormFiltersFactory(),
       cogsV2FormFilters: cogsV2FormFiltersFactory(),
@@ -1652,6 +1727,7 @@ export default Vue.extend({
       stragglerPackagesFormFilters: stragglerPackagesFormFiltersFactory(),
       maturePlantsFormFilters: maturePlantsFormFiltersFactory(),
       maturePlantsQuickviewFormFilters: maturePlantsQuickviewFormFiltersFactory(),
+      immaturePlantsQuickviewFormFilters: immaturePlantsQuickviewFormFiltersFactory(),
       immaturePlantsFormFilters: immaturePlantsFormFiltersFactory(),
       harvestsFormFilters: harvestsFormFiltersFactory(),
       incomingTransfersFormFilters: incomingTransfersFormFiltersFactory(),
@@ -1903,11 +1979,11 @@ export default Vue.extend({
           isSingleton: false,
         },
         {
-          text: "Immature Plant Quickview",
-          value: null,
+          text: "Plant Batch Quickview",
+          value: ReportType.IMMATURE_PLANTS_QUICKVIEW,
           t3plus: true,
-          enabled: false,
-          description: "Grouped summary of mature plants by strain, location, and dates",
+          enabled: true,
+          description: "Grouped summary of plant batches by strain, location, and dates",
           isCustom: false,
           isCsvEligible: true,
           isSingleton: false,
@@ -2192,6 +2268,17 @@ export default Vue.extend({
         //   transferHubTransferManifestsFormFilters: this.transferHubTransferManifestsFormFilters,
         //   fields: this.fields[ReportType.TRANSFER_HUB_TRANSFER_MANIFESTS],
         // });
+      }
+
+      if (
+        this.selectedReports.find(
+          (report: IReportOption) => report.value === ReportType.IMMATURE_PLANTS_QUICKVIEW
+        )
+      ) {
+        addImmaturePlantsQuickviewReport({
+          reportConfig,
+          immaturePlantsQuickviewFormFilters: this.immaturePlantsQuickviewFormFilters,
+        });
       }
 
       if (

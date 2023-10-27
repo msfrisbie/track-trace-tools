@@ -530,6 +530,7 @@ export enum SheetTitles {
   IMMATURE_PLANTS = "Immature Plants",
   MATURE_PLANTS = "Mature Plants",
   MATURE_PLANTS_QUICKVIEW = "Mature Plants Quickview",
+  IMMATURE_PLANTS_QUICKVIEW = "Immature Plants Quickview",
   INCOMING_TRANSFERS = "Incoming Transfers",
   OUTGOING_TRANSFERS = "Outgoing Transfers",
   TRANSFER_HUB_TRANSFERS = "Hub Transfers",

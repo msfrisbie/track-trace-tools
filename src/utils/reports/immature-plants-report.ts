@@ -10,7 +10,7 @@ import {
 import { ActionContext } from "vuex";
 import { todayIsodate } from "../date";
 
-interface IImmaturePlantsReportFormFilters {
+export interface IImmaturePlantsReportFormFilters {
   plantedDateGt: string;
   plantedDateLt: string;
   shouldFilterPlantedDateGt: boolean;

@@ -16,6 +16,7 @@ import {
   ITagFilter,
   ITransferFilter,
 } from "@/interfaces";
+import { ImmaturePlantQuickviewDimension } from "@/utils/reports/immature-plants-quickview-report";
 import { MaturePlantQuickviewDimension } from "@/utils/reports/mature-plants-quickview-report";
 import {
   InventoryStrategy,
@@ -106,6 +107,12 @@ export interface IReportConfig {
     employeeQuery: string;
     fields: null;
   };
+  [ReportType.IMMATURE_PLANTS_QUICKVIEW]?: {
+    plantBatchFilter: IPlantBatchFilter;
+    primaryDimension: ImmaturePlantQuickviewDimension;
+    secondaryDimension: ImmaturePlantQuickviewDimension | null;
+    fields: null;
+  };
   [ReportType.MATURE_PLANTS_QUICKVIEW]?: {
     plantFilter: IPlantFilter;
     primaryDimension: MaturePlantQuickviewDimension;
@@ -193,6 +200,9 @@ export interface IReportData {
   };
   [ReportType.MATURE_PLANTS]?: {
     maturePlants: IIndexedPlantData[];
+  };
+  [ReportType.IMMATURE_PLANTS_QUICKVIEW]?: {
+    plantBatches: IIndexedPlantBatchData[];
   };
   [ReportType.MATURE_PLANTS_QUICKVIEW]?: {
     maturePlants: IIndexedPlantData[];

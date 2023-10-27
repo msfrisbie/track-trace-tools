@@ -2,6 +2,7 @@ import { SheetTitles } from "@/consts";
 import {
   IDestinationData,
   IIndexedDestinationPackageData,
+  IIndexedPlantBatchData,
   IIndexedRichIncomingTransferData,
   IIndexedRichOutgoingTransferData,
   IIndexedTransferData,
@@ -20,6 +21,7 @@ import {
 import { todayIsodate } from "../date";
 import { extractExmployeeAuditData } from "./employee-audit-report";
 import { extractHarvestPackagesData } from "./harvest-packages-report";
+import { extractImmaturePlantPropertyFromDimension } from "./immature-plants-quickview-report";
 import { extractMaturePlantPropertyFromDimension } from "./mature-plants-quickview-report";
 import { extractPointInTimeInventoryData } from "./point-in-time-inventory-report";
 
@@ -71,6 +73,8 @@ export function extractNestedData({
       return reportData[reportType]!.stragglerPackages!;
     case ReportType.MATURE_PLANTS_QUICKVIEW:
       return reportData[reportType]!.maturePlants;
+    case ReportType.IMMATURE_PLANTS_QUICKVIEW:
+      return reportData[reportType]!.plantBatches;
     default:
       throw new Error("Bad reportType " + reportType);
   }
@@ -110,8 +114,16 @@ export function extractQuickviewData({
   let secondaryDimension: string | null;
   let objects: { [key: string]: any }[];
   let extractor: (...args: any[]) => any;
+  let countFn: (object: any) => number = () => 1;
 
   switch (reportType) {
+    case ReportType.IMMATURE_PLANTS_QUICKVIEW:
+      primaryDimension = reportConfig[reportType]!.primaryDimension as string;
+      secondaryDimension = reportConfig[reportType]!.secondaryDimension as string | null;
+      objects = reportData[reportType]!.plantBatches;
+      extractor = extractImmaturePlantPropertyFromDimension;
+      countFn = (plantBatch: IIndexedPlantBatchData) => plantBatch.UntrackedCount;
+      break;
     case ReportType.MATURE_PLANTS_QUICKVIEW:
       primaryDimension = reportConfig[reportType]!.primaryDimension as string;
       secondaryDimension = reportConfig[reportType]!.secondaryDimension as string | null;
@@ -142,7 +154,7 @@ export function extractQuickviewData({
       indexedDimensionCounts[primaryValue][secondaryValue] = 0;
     }
 
-    indexedDimensionCounts[primaryValue][secondaryValue]++;
+    indexedDimensionCounts[primaryValue][secondaryValue] += countFn(object);
   }
 
   const sortedPrimaryKeys = [...primaryKeys].sort();
@@ -303,6 +315,7 @@ export function extractFlattenedData({
           reportConfig,
           reportData,
         });
+      case ReportType.IMMATURE_PLANTS_QUICKVIEW:
       case ReportType.MATURE_PLANTS_QUICKVIEW:
         return extractQuickviewData({
           reportType,
@@ -381,6 +394,8 @@ export function getSheetTitle({
       return SheetTitles.IMMATURE_PLANTS;
     case ReportType.MATURE_PLANTS_QUICKVIEW:
       return SheetTitles.MATURE_PLANTS_QUICKVIEW;
+    case ReportType.IMMATURE_PLANTS_QUICKVIEW:
+      return SheetTitles.IMMATURE_PLANTS_QUICKVIEW;
     case ReportType.MATURE_PLANTS:
       return SheetTitles.MATURE_PLANTS;
     case ReportType.INCOMING_TRANSFERS:
