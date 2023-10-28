@@ -57,8 +57,8 @@
 
 <script lang="ts">
 import { MessageType } from "@/consts";
+import { IPluginState } from "@/interfaces";
 import { analyticsManager } from "@/modules/analytics-manager.module";
-import { clientBuildManager } from "@/modules/client-build-manager.module";
 import { dynamicConstsManager } from "@/modules/dynamic-consts-manager.module";
 import store from "@/store/page-overlay/index";
 import { HOST_WILDCARD, isCurrentHostAllowed } from "@/utils/builder";
@@ -97,9 +97,9 @@ export default Vue.extend({
   },
   async created() {},
   computed: {
-    ...mapState({
-      authState: (state: any) => state.pluginAuth.authState,
-      debugMode: (state: any) => state.debugMode,
+    ...mapState<IPluginState>({
+      authState: (state: IPluginState) => state.pluginAuth.authState,
+      debugMode: (state: IPluginState) => state.debugMode,
     }),
     options() {
       return [
@@ -110,7 +110,7 @@ export default Vue.extend({
           backgroundColor: "#2774ae",
           isBeta: true,
           isNew: false,
-          enabled: false, ///isCurrentHostAllowed([HOST_WILDCARD]),
+          enabled: store.state.client.values["ENABLE_T3PLUS"] || store.state.client.t3plus, ///isCurrentHostAllowed([HOST_WILDCARD]),
           visible: true,
         },
         {
