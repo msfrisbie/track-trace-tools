@@ -56,6 +56,7 @@ describe("date.ts", () => {
   });
 
   it("Converts iso datetimes", () => {
+    // TODO: figure out way to set TZ for jest
     if (new Date().getTimezoneOffset() === 300) {
       expect(isoDatetimeToLocalDate("2023-04-05T00:00:00.000Z")).toEqual("2023-04-04"); // Indicates correct conversion
     }
@@ -63,7 +64,10 @@ describe("date.ts", () => {
     expect(isoDatetimeToLocalDate("2023-04-05T06:00:00.000Z")).toEqual("2023-04-05");
     expect(isoDatetimeToLocalDate("2023-04-05T12:00:00.000Z")).toEqual("2023-04-05");
     expect(isoDatetimeToLocalDate("2023-04-05T18:00:00.000Z")).toEqual("2023-04-05");
-    expect(isoDatetimeToLocalDate("2023-04-06T00:00:00.000Z")).toEqual("2023-04-05"); // Indicates correct conversion
+
+    if (new Date().getTimezoneOffset() === 300) {
+      expect(isoDatetimeToLocalDate("2023-04-06T00:00:00.000Z")).toEqual("2023-04-05"); // Indicates correct conversion
+    }
 
     expect(isoDatetimeToLocalDate("2023-04-04")).toEqual("2023-04-04"); // Indicates fallback
   });
