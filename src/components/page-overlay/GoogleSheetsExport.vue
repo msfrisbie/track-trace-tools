@@ -1297,6 +1297,71 @@
           </div>
         </template>
 
+        <!-- Packages Quickview -->
+        <template
+          v-if="selectedReports.find((report) => report.value === ReportType.PACKAGES_QUICKVIEW)"
+        >
+          <div class="rounded border border-gray-300 p-2 flex flex-col items-stretch gap-2">
+            <div class="font-semibold text-white ttt-purple-bg p-2 -m-2">Packages Quickview</div>
+            <hr />
+            <div class="flex flex-col items-stretch gap-4">
+              <div class="font-semibold text-gray-700">Filters:</div>
+
+              <b-form-group label="Slice packages by:" label-size="sm">
+                <b-form-select
+                  v-model="packagesQuickviewFormFilters.primaryDimension"
+                  :options="PACKAGES_QUICKVIEW_DIMENSIONS"
+                ></b-form-select>
+              </b-form-group>
+
+              <b-form-group label="Slice packages by: (optional)" label-size="sm">
+                <b-form-select
+                  v-model="packagesQuickviewFormFilters.secondaryDimension"
+                  :options="[{ text: 'None', value: null }, ...PACKAGES_QUICKVIEW_DIMENSIONS]"
+                ></b-form-select>
+              </b-form-group>
+
+              <b-form-checkbox v-model="packagesQuickviewFormFilters.includeActive">
+                <span class="leading-6">Include Active</span>
+              </b-form-checkbox>
+
+              <b-form-checkbox v-model="packagesQuickviewFormFilters.includeInTransit">
+                <span class="leading-6">Include In Transit</span>
+              </b-form-checkbox>
+
+              <b-form-checkbox v-model="packagesQuickviewFormFilters.includeInactive">
+                <span class="leading-6">Include Inactive</span>
+              </b-form-checkbox>
+
+              <div class="flex flex-col items-start gap-1">
+                <b-form-checkbox v-model="packagesQuickviewFormFilters.shouldFilterPackagedDateGt">
+                  <span class="leading-6">Packaged on or after:</span>
+                </b-form-checkbox>
+                <b-form-datepicker
+                  v-if="packagesQuickviewFormFilters.shouldFilterPackagedDateGt"
+                  :disabled="!packagesQuickviewFormFilters.shouldFilterPackagedDateGt"
+                  initial-date
+                  size="sm"
+                  v-model="packagesQuickviewFormFilters.packagedDateGt"
+                />
+              </div>
+
+              <div class="flex flex-col items-start gap-1">
+                <b-form-checkbox v-model="packagesQuickviewFormFilters.shouldFilterPackagedDateLt">
+                  <span class="leading-6">Packaged on or before:</span>
+                </b-form-checkbox>
+                <b-form-datepicker
+                  v-if="packagesQuickviewFormFilters.shouldFilterPackagedDateLt"
+                  :disabled="!packagesQuickviewFormFilters.shouldFilterPackagedDateLt"
+                  initial-date
+                  size="sm"
+                  v-model="packagesQuickviewFormFilters.packagedDateLt"
+                />
+              </div>
+            </div>
+          </div>
+        </template>
+
         <!-- Immature Plants Quickview -->
         <template
           v-if="
@@ -1350,16 +1415,16 @@
 
               <div class="flex flex-col items-start gap-1">
                 <b-form-checkbox
-                  v-model="maturePlantsQuickviewFormFilters.shouldFilterPlantedDateLt"
+                  v-model="immaturePlantsQuickviewFormFilters.shouldFilterPlantedDateLt"
                 >
                   <span class="leading-6">Planted on or before:</span>
                 </b-form-checkbox>
                 <b-form-datepicker
-                  v-if="maturePlantsQuickviewFormFilters.shouldFilterPlantedDateLt"
-                  :disabled="!maturePlantsQuickviewFormFilters.shouldFilterPlantedDateLt"
+                  v-if="immaturePlantsQuickviewFormFilters.shouldFilterPlantedDateLt"
+                  :disabled="!immaturePlantsQuickviewFormFilters.shouldFilterPlantedDateLt"
                   initial-date
                   size="sm"
-                  v-model="maturePlantsQuickviewFormFilters.plantedDateLt"
+                  v-model="immaturePlantsQuickviewFormFilters.plantedDateLt"
                 />
               </div>
             </div>
@@ -1630,6 +1695,11 @@ import {
 } from "@/utils/reports/outgoing-transfers-report";
 import { addPackageReport, packageFormFiltersFactory } from "@/utils/reports/package-report";
 import {
+  addPackagesQuickviewReport,
+  packagesQuickviewFormFiltersFactory,
+  PACKAGES_QUICKVIEW_DIMENSIONS,
+} from "@/utils/reports/packages-quickview-report";
+import {
   addPointInTimeInventoryReport,
   pointInTimeInventoryFormFiltersFactory,
 } from "@/utils/reports/point-in-time-inventory-report";
@@ -1719,6 +1789,7 @@ export default Vue.extend({
       SHEET_FIELDS,
       MATURE_PLANT_QUICKVIEW_DIMENSIONS,
       IMMATURE_PLANT_QUICKVIEW_DIMENSIONS,
+      PACKAGES_QUICKVIEW_DIMENSIONS,
       selectedReports: [] as IReportOption[],
       cogsFormFilters: cogsFormFiltersFactory(),
       cogsV2FormFilters: cogsV2FormFiltersFactory(),
@@ -1726,6 +1797,7 @@ export default Vue.extend({
       packagesFormFilters: packageFormFiltersFactory(),
       stragglerPackagesFormFilters: stragglerPackagesFormFiltersFactory(),
       maturePlantsFormFilters: maturePlantsFormFiltersFactory(),
+      packagesQuickviewFormFilters: packagesQuickviewFormFiltersFactory(),
       maturePlantsQuickviewFormFilters: maturePlantsQuickviewFormFiltersFactory(),
       immaturePlantsQuickviewFormFilters: immaturePlantsQuickviewFormFiltersFactory(),
       immaturePlantsFormFilters: immaturePlantsFormFiltersFactory(),
@@ -1968,12 +2040,11 @@ export default Vue.extend({
           isSingleton: true,
         },
         {
-          text: "Package Quickview",
-          value: null,
+          text: "Packages Quickview",
+          value: ReportType.PACKAGES_QUICKVIEW,
           t3plus: true,
-          enabled: false,
-          description:
-            "Grouped summary of packages by item, remaining quantity, and testing status",
+          enabled: true,
+          description: "Grouped summary of packages by item, location, and dates",
           isCustom: false,
           isCsvEligible: true,
           isSingleton: false,
@@ -2268,6 +2339,17 @@ export default Vue.extend({
         //   transferHubTransferManifestsFormFilters: this.transferHubTransferManifestsFormFilters,
         //   fields: this.fields[ReportType.TRANSFER_HUB_TRANSFER_MANIFESTS],
         // });
+      }
+
+      if (
+        this.selectedReports.find(
+          (report: IReportOption) => report.value === ReportType.PACKAGES_QUICKVIEW
+        )
+      ) {
+        addPackagesQuickviewReport({
+          reportConfig,
+          packagesQuickviewFormFilters: this.packagesQuickviewFormFilters,
+        });
       }
 
       if (
