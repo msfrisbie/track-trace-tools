@@ -10,7 +10,7 @@ version: 2.1
 jobs:
   setup: # This job will checkout the code and install dependencies
     docker:
-      - image: cimg/node:18.7
+      - image: cimg/node:16.10
     steps:
       - checkout
       - run: yarn install
@@ -20,7 +20,7 @@ jobs:
             - node_modules
   build:
     docker:
-      - image: cimg/node:18.7
+      - image: cimg/node:16.10
     steps:
       - checkout
       - attach_workspace: # This will fetch the previously saved state (with node_modules)
@@ -28,7 +28,7 @@ jobs:
       - run: yarn build
   lint:
     docker:
-      - image: cimg/node:18.7
+      - image: cimg/node:16.10
     steps:
       - checkout
       - attach_workspace:
@@ -36,7 +36,7 @@ jobs:
       - run: yarn lint
   test:
     docker:
-      - image: cimg/node:18.7
+      - image: cimg/node:16.10
     steps:
       - checkout
       - attach_workspace:
