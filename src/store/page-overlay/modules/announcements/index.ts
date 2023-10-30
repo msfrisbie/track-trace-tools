@@ -1,18 +1,18 @@
-import { MessageType } from "@/consts";
-import { IPluginState } from "@/interfaces";
-import { analyticsManager } from "@/modules/analytics-manager.module";
-import { t3RequestManager } from "@/modules/t3-request-manager.module";
-import { isoDatetimedDifferenceInMinutes } from "@/utils/date";
+import { MessageType } from '@/consts';
+import { IPluginState } from '@/interfaces';
+import { analyticsManager } from '@/modules/analytics-manager.module';
+import { t3RequestManager } from '@/modules/t3-request-manager.module';
+import { isoDatetimedDifferenceInMinutes } from '@/utils/date';
 // The marked import structure is causing problems
 // @ts-ignore
-import * as marked from "marked/lib/marked.cjs";
-import { ActionContext } from "vuex";
+import * as marked from 'marked/lib/marked.cjs';
+import { ActionContext } from 'vuex';
 import {
   AnnouncementsActions,
   AnnouncementsGetters,
   AnnouncementsMutations,
-} from "../announcements/consts";
-import { IAnnouncementData, IAnnouncementsState } from "../announcements/interfaces";
+} from './consts';
+import { IAnnouncementData, IAnnouncementsState } from './interfaces';
 
 const renderer = {
   heading(text: string, level: any) {
@@ -22,11 +22,11 @@ const renderer = {
     if (href === null) {
       return text;
     }
-    let out = '<a target="_blank" class="text-purple-500 underline" href="' + href + '"';
+    let out = `<a target="_blank" class="text-purple-500 underline" href="${href}"`;
     if (title) {
-      out += ' title="' + title + '"';
+      out += ` title="${title}"`;
     }
-    out += ">" + text + "</a>";
+    out += `>${text}</a>`;
     return out;
   },
 };
@@ -62,85 +62,79 @@ export const announcementsModule = {
       state: IAnnouncementsState,
       getters: any,
       rootState: any,
-      rootGetters: any
-    ): IAnnouncementData[] => {
-      return state.announcements
-        .filter((x) => {
-          if (!state.dismissedDatetime) {
-            return true;
-          }
+      rootGetters: any,
+    ): IAnnouncementData[] => state.announcements
+      .filter((x) => {
+        if (!state.dismissedDatetime) {
+          return true;
+        }
 
-          return x.published_at > state.dismissedDatetime;
-        })
-        .map((x) => {
-          x.html = marked.parse(x.markdown);
-          x.readable_published_at = new Date(x.published_at).toLocaleString();
-          return x;
-        });
-    },
+        return x.published_at > state.dismissedDatetime;
+      })
+      .map((x) => {
+        x.html = marked.parse(x.markdown);
+        x.readable_published_at = new Date(x.published_at).toLocaleString();
+        return x;
+      }),
     [AnnouncementsGetters.VISIBLE_ANNOUNCEMENTS]: (
       state: IAnnouncementsState,
       getters: any,
       rootState: any,
-      rootGetters: any
-    ): IAnnouncementData[] => {
-      return state.announcements
-        .filter((x) => {
-          if (state.showDismissed) {
-            return true;
-          }
+      rootGetters: any,
+    ): IAnnouncementData[] => state.announcements
+      .filter((x) => {
+        if (state.showDismissed) {
+          return true;
+        }
 
-          if (!state.dismissedDatetime) {
-            return true;
-          }
+        if (!state.dismissedDatetime) {
+          return true;
+        }
 
-          return x.published_at > state.dismissedDatetime;
-        })
-        .map((x) => {
-          x.html = marked.parse(x.markdown);
-          x.readable_published_at = new Date(x.published_at).toLocaleString();
-          return x;
-        });
-    },
+        return x.published_at > state.dismissedDatetime;
+      })
+      .map((x) => {
+        x.html = marked.parse(x.markdown);
+        x.readable_published_at = new Date(x.published_at).toLocaleString();
+        return x;
+      }),
     [AnnouncementsGetters.HIDDEN_ANNOUNCEMENTS]: (
       state: IAnnouncementsState,
       getters: any,
       rootState: any,
-      rootGetters: any
-    ): IAnnouncementData[] => {
-      return state.announcements
-        .filter((x) => {
-          if (state.showDismissed) {
-            return false;
-          }
+      rootGetters: any,
+    ): IAnnouncementData[] => state.announcements
+      .filter((x) => {
+        if (state.showDismissed) {
+          return false;
+        }
 
-          if (!state.dismissedDatetime) {
-            return false;
-          }
+        if (!state.dismissedDatetime) {
+          return false;
+        }
 
-          return x.published_at <= state.dismissedDatetime;
-        })
-        .map((x) => {
-          x.html = marked.parse(x.markdown);
-          x.readable_published_at = new Date(x.published_at).toLocaleString();
-          return x;
-        });
-    },
+        return x.published_at <= state.dismissedDatetime;
+      })
+      .map((x) => {
+        x.html = marked.parse(x.markdown);
+        x.readable_published_at = new Date(x.published_at).toLocaleString();
+        return x;
+      }),
   },
   actions: {
     [AnnouncementsActions.INTERVAL_LOAD_NOTIFICATIONS]: async (
       ctx: ActionContext<IAnnouncementsState, IPluginState>,
-      data: any
+      data: any,
     ) => {
       // Only load once per minute
       if (
-        !!ctx.state.lastAnnouncementsCheckDatetime &&
-        isoDatetimedDifferenceInMinutes(
+        !!ctx.state.lastAnnouncementsCheckDatetime
+        && isoDatetimedDifferenceInMinutes(
           new Date().toISOString(),
-          ctx.state.lastAnnouncementsCheckDatetime
+          ctx.state.lastAnnouncementsCheckDatetime,
         ) < 1
       ) {
-        console.log("declining to load");
+        console.log('declining to load');
         return;
       }
 
@@ -148,23 +142,22 @@ export const announcementsModule = {
     },
     [AnnouncementsActions.LOAD_NOTIFICATIONS]: async (
       ctx: ActionContext<IAnnouncementsState, IPluginState>,
-      data: any
+      data: any,
     ) => {
       const announcements = await t3RequestManager.loadAnnouncements();
 
       ctx.state.announcements = announcements;
       ctx.state.lastAnnouncementsCheckDatetime = new Date().toISOString();
       ctx.state.notificationCount = announcements.filter(
-        (x) =>
-          x.show_notification &&
+        (x) => x.show_notification
           // Only show fresh notifications
-          (!ctx.state.lastAnnouncementsViewedDatetime ||
-            x.published_at > ctx.state.lastAnnouncementsViewedDatetime)
+          && (!ctx.state.lastAnnouncementsViewedDatetime
+            || x.published_at > ctx.state.lastAnnouncementsViewedDatetime),
       ).length;
     },
     [AnnouncementsActions.VIEW_ANNOUNCEMENTS]: async (
       ctx: ActionContext<IAnnouncementsState, IPluginState>,
-      data: any
+      data: any,
     ) => {
       if (ctx.state.announcements.length === 0) {
         return;
@@ -178,13 +171,13 @@ export const announcementsModule = {
     },
     [AnnouncementsActions.SHOW_ALL_ANNOUNCEMENTS]: async (
       ctx: ActionContext<IAnnouncementsState, IPluginState>,
-      data: any
+      data: any,
     ) => {
       ctx.state.showDismissed = true;
     },
     [AnnouncementsActions.DISMISS_ANNOUNCEMENTS]: async (
       ctx: ActionContext<IAnnouncementsState, IPluginState>,
-      data: any
+      data: any,
     ) => {
       if (ctx.state.announcements.length === 0) {
         return;
@@ -196,7 +189,7 @@ export const announcementsModule = {
     },
     [AnnouncementsActions.RESET]: async (
       ctx: ActionContext<IAnnouncementsState, IPluginState>,
-      data: any
+      data: any,
     ) => {
       ctx.state.notificationCount = 0;
       ctx.state.announcements = [];
@@ -207,9 +200,7 @@ export const announcementsModule = {
   },
 };
 
-export const announcementsReducer = (state: IAnnouncementsState): IAnnouncementsState => {
-  return {
-    ...state,
-    ...inMemoryState,
-  };
-};
+export const announcementsReducer = (state: IAnnouncementsState): IAnnouncementsState => ({
+  ...state,
+  ...inMemoryState,
+});

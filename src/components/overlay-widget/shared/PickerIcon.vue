@@ -7,10 +7,10 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
+import Vue from 'vue';
 
 export default Vue.extend({
-  name: "PickerIcon",
+  name: 'PickerIcon',
   components: {},
   props: {
     icon: String,
@@ -19,7 +19,7 @@ export default Vue.extend({
   },
   computed: {
     mergedTextClass() {
-      return `text-lg text-center text-gray-600 font-bold ${this.textClass || ""}`;
+      return `text-lg text-center text-gray-600 font-bold ${this.textClass || ''}`;
     },
   },
 });

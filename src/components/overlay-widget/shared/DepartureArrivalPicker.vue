@@ -106,21 +106,21 @@
 </template>
 
 <script lang="ts">
-import FacilitySummary from "@/components/overlay-widget/shared/FacilitySummary.vue";
-import StartFinishIcons from "@/components/overlay-widget/shared/StartFinishIcons.vue";
-import { BuilderType, MessageType } from "@/consts";
-import { IComputedGetSet } from "@/interfaces";
-import { analyticsManager } from "@/modules/analytics-manager.module";
-import router from "@/router/index";
-import store from "@/store/page-overlay/index";
-import { TransferBuilderActions } from "@/store/page-overlay/modules/transfer-builder/consts";
-import { todayIsodate } from "@/utils/date";
-import { isotimeToNaiveTime, naiveTimeToIsotime } from "@/utils/time";
-import Vue from "vue";
-import { mapState } from "vuex";
+import FacilitySummary from '@/components/overlay-widget/shared/FacilitySummary.vue';
+import StartFinishIcons from '@/components/overlay-widget/shared/StartFinishIcons.vue';
+import { BuilderType, MessageType } from '@/consts';
+import { IComputedGetSet } from '@/interfaces';
+import { analyticsManager } from '@/modules/analytics-manager.module';
+import router from '@/router/index';
+import store from '@/store/page-overlay/index';
+import { TransferBuilderActions } from '@/store/page-overlay/modules/transfer-builder/consts';
+import { todayIsodate } from '@/utils/date';
+import { isotimeToNaiveTime, naiveTimeToIsotime } from '@/utils/time';
+import Vue from 'vue';
+import { mapState } from 'vuex';
 
 export default Vue.extend({
-  name: "DepartureArrivalPicker",
+  name: 'DepartureArrivalPicker',
   store,
   router,
   components: {
@@ -248,9 +248,9 @@ export default Vue.extend({
   data() {
     return {
       dateFormatOptions: {
-        year: "numeric",
-        month: "numeric",
-        day: "numeric",
+        year: 'numeric',
+        month: 'numeric',
+        day: 'numeric',
       },
     };
   },
@@ -324,9 +324,9 @@ export default Vue.extend({
       // If the layoverCheckOut and layoverCheckIn dates are on the same day,
       // force layoverCheckOut time to be greater or equal to layoverCheckIn time
       if (
-        this.layoverCheckOutIsodate === this.layoverCheckInIsodate &&
-        !!this.layoverCheckInIsotime &&
-        !!this.layoverCheckOutIsotime
+        this.layoverCheckOutIsodate === this.layoverCheckInIsodate
+        && !!this.layoverCheckInIsotime
+        && !!this.layoverCheckOutIsotime
       ) {
         if (this.layoverCheckOutIsotime < this.layoverCheckInIsotime) {
           if (updateDeparture) {
@@ -361,9 +361,9 @@ export default Vue.extend({
       // If the arrival and departure dates are on the same day,
       // force arrival time to be greater or equal to departure time
       if (
-        this.arrivalIsodate === this.departureIsodate &&
-        !!this.departureIsotime &&
-        !!this.arrivalIsotime
+        this.arrivalIsodate === this.departureIsodate
+        && !!this.departureIsotime
+        && !!this.arrivalIsotime
       ) {
         if (this.arrivalIsotime < this.departureIsotime) {
           if (updateDeparture) {

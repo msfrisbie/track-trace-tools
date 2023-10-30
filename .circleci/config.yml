@@ -15,6 +15,12 @@ jobs:
       - checkout
       - run: yarn install
       - run: yarn build
+  lint:
+    docker:
+      - image: cimg/node:16.10
+    steps:
+      - checkout
+      - run: yarn lint
   test:
     docker:
       - image: cimg/node:16.10
@@ -31,6 +37,7 @@ workflows:
     jobs:
       - build
       - test
+      - lint
       # - test:
       #     requires:
       #       - build

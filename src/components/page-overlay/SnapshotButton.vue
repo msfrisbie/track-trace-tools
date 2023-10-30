@@ -48,15 +48,15 @@
 </template>
 
 <script lang="ts">
-import { ModalAction, ModalType } from "@/consts";
-import { modalManager } from "@/modules/modal-manager.module";
-import { MutationType } from "@/mutation-types";
-import store from "@/store/page-overlay/index";
-import Vue from "vue";
-import { mapState } from "vuex";
+import { ModalAction, ModalType } from '@/consts';
+import { modalManager } from '@/modules/modal-manager.module';
+import { MutationType } from '@/mutation-types';
+import store from '@/store/page-overlay/index';
+import Vue from 'vue';
+import { mapState } from 'vuex';
 
 export default Vue.extend({
-  name: "BuilderButton",
+  name: 'BuilderButton',
   store,
   components: {
     // TrackTraceToolsLogo,
@@ -81,15 +81,15 @@ export default Vue.extend({
       trackedInteractions.dismissedSnapshotPopover = true;
 
       // @ts-ignore
-      this.$refs["snapshot-popover"].$emit("close");
+      this.$refs['snapshot-popover'].$emit('close');
       // @ts-ignore
-      this.$refs["snapshot-popover"].$emit("disable");
+      this.$refs['snapshot-popover'].$emit('disable');
 
       store.commit(MutationType.UPDATE_TRACKED_INTERACTIONS, trackedInteractions);
     },
     async openBuilder() {
       modalManager.dispatchModalEvent(ModalType.BUILDER, ModalAction.OPEN, {
-        initialRoute: "/google-sheets-export",
+        initialRoute: '/google-sheets-export',
       });
     },
   },

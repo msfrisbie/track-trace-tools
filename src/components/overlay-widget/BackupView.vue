@@ -16,13 +16,13 @@
 </template>
 
 <script lang="ts">
-import { ICsvFile } from "@/interfaces";
-import store from "@/store/page-overlay/index";
-import { downloadCsvFile } from "@/utils/csv";
-import Vue from "vue";
+import { ICsvFile } from '@/interfaces';
+import store from '@/store/page-overlay/index';
+import { downloadCsvFile } from '@/utils/csv';
+import Vue from 'vue';
 
 export default Vue.extend({
-  name: "BackupView",
+  name: 'BackupView',
   store,
   data() {
     return {

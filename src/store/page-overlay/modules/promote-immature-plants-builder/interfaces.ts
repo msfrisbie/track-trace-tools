@@ -4,7 +4,7 @@ import {
   IPlantBatchData,
   IPlantBatchGrowthPhase,
   ITagData,
-} from "@/interfaces";
+} from '@/interfaces';
 
 export interface IPromoteImmaturePlantsBuilderState {
   selectedPlantBatches: IPlantBatchData[];

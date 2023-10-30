@@ -117,13 +117,13 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import store from "@/store/page-overlay/index";
+import Vue from 'vue';
+import store from '@/store/page-overlay/index';
 import {
   TransferBuilderActions,
   TransferBuilderGetters,
   TRANSFER_BUILDER,
-} from "@/store/page-overlay/modules/transfer-builder/consts";
+} from '@/store/page-overlay/modules/transfer-builder/consts';
 import {
   IPlantData,
   IPlantFilter,
@@ -139,21 +139,22 @@ import {
   ITransferPackageList,
   ITransferData,
   IComputedGetSet,
-} from "@/interfaces";
-import { combineLatest, from, Subject, timer } from "rxjs";
-import { authManager } from "@/modules/auth-manager.module";
-import { dynamicConstsManager } from "@/modules/dynamic-consts-manager.module";
-import { extractDriversAndVehiclesFromTransferHistory } from "@/utils/transfer";
-import _ from "lodash-es";
-import { BuilderType, MessageType } from "@/consts";
-import { analyticsManager } from "@/modules/analytics-manager.module";
-import { mapState } from "vuex";
+} from '@/interfaces';
+import {
+  combineLatest, from, Subject, timer,
+} from 'rxjs';
+import { authManager } from '@/modules/auth-manager.module';
+import { dynamicConstsManager } from '@/modules/dynamic-consts-manager.module';
+import { extractDriversAndVehiclesFromTransferHistory } from '@/utils/transfer';
+import _ from 'lodash-es';
+import { BuilderType, MessageType } from '@/consts';
+import { analyticsManager } from '@/modules/analytics-manager.module';
+import { mapState } from 'vuex';
 
-const dedupObjects = (acc: any[], current: any) =>
-  acc.find((x: any) => _.isEqual(x, current)) ? acc : [...acc, current];
+const dedupObjects = (acc: any[], current: any) => (acc.find((x: any) => _.isEqual(x, current)) ? acc : [...acc, current]);
 
 export default Vue.extend({
-  name: "DriverVehiclePicker",
+  name: 'DriverVehiclePicker',
   store,
   computed: {
     ...mapState<IPluginState>({
@@ -233,9 +234,9 @@ export default Vue.extend({
   data() {
     return {
       layoverLegOptions: [
-        { value: "FromAndToLayover", text: "From And To Layover" },
-        { value: "FromLayover", text: "From Layover" },
-        { value: "ToLayover", text: "To Layover" },
+        { value: 'FromAndToLayover', text: 'From And To Layover' },
+        { value: 'FromLayover', text: 'From Layover' },
+        { value: 'ToLayover', text: 'To Layover' },
       ],
       transferDataLoading: false,
       drivers: [],
@@ -260,7 +261,7 @@ export default Vue.extend({
 
       analyticsManager.track(MessageType.BUILDER_ENGAGEMENT, {
         builder: BuilderType.CREATE_TRANSFER,
-        action: `Selected driver`,
+        action: 'Selected driver',
         driver,
       });
     },
@@ -279,7 +280,7 @@ export default Vue.extend({
 
       analyticsManager.track(MessageType.BUILDER_ENGAGEMENT, {
         builder: BuilderType.CREATE_TRANSFER,
-        action: `Selected vehicle`,
+        action: 'Selected vehicle',
         vehicle,
       });
     },
@@ -287,8 +288,7 @@ export default Vue.extend({
       if (!this.$data.showVehicleSearch) {
         timer(0).subscribe(() =>
           // @ts-ignore
-          this.$refs.vehiclesearch.$el.querySelector("input").focus()
-        );
+          this.$refs.vehiclesearch.$el.querySelector('input').focus());
       }
 
       this.$data.showVehicleSearch = !this.$data.showVehicleSearch;
@@ -302,8 +302,7 @@ export default Vue.extend({
       if (!this.$data.showDriverSearch) {
         timer(0).subscribe(() =>
           // @ts-ignore
-          this.$refs.driversearch.$el.querySelector("input").focus()
-        );
+          this.$refs.driversearch.$el.querySelector('input').focus());
       }
 
       this.$data.showDriverSearch = !this.$data.showDriverSearch;
@@ -322,7 +321,7 @@ export default Vue.extend({
 
     analyticsManager.track(MessageType.BUILDER_EVENT, {
       builder: BuilderType.CREATE_TRANSFER,
-      action: `Started driver and vehicle load`,
+      action: 'Started driver and vehicle load',
     });
 
     try {
@@ -337,12 +336,12 @@ export default Vue.extend({
           }) => {
             this.$data.drivers = [...(await dynamicConstsManager.drivers()), ...drivers].reduce(
               dedupObjects,
-              []
+              [],
             );
 
             this.$data.vehicles = [...(await dynamicConstsManager.vehicles()), ...vehicles].reduce(
               dedupObjects,
-              []
+              [],
             );
 
             analyticsManager.track(MessageType.BUILDER_EVENT, {
@@ -351,25 +350,25 @@ export default Vue.extend({
             });
 
             if (
-              this.$data.drivers.length > 0 &&
-              !this.driverName &&
-              !this.driverEmployeeId &&
-              !this.driverLicenseNumber
+              this.$data.drivers.length > 0
+              && !this.driverName
+              && !this.driverEmployeeId
+              && !this.driverLicenseNumber
             ) {
               this.$data.showDriverSearch = true;
             }
 
             if (
-              this.$data.vehicles.length > 0 &&
-              !this.vehicleMake &&
-              !this.vehicleModel &&
-              !this.vehicleLicensePlate
+              this.$data.vehicles.length > 0
+              && !this.vehicleMake
+              && !this.vehicleModel
+              && !this.vehicleLicensePlate
             ) {
               this.$data.showVehicleSearch = true;
             }
 
             this.$data.transferDataLoading = false;
-          }
+          },
         )
         .catch(() => {
           this.$data.transferDataLoading = false;
@@ -380,7 +379,7 @@ export default Vue.extend({
 
       analyticsManager.track(MessageType.BUILDER_EVENT, {
         builder: BuilderType.CREATE_TRANSFER,
-        action: `Failed loading drivers/vehicles`,
+        action: 'Failed loading drivers/vehicles',
         error: e,
       });
 

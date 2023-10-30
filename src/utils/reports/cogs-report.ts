@@ -1,4 +1,4 @@
-import { MessageType, SHEETS_API_MESSAGE_TIMEOUT_MS, SheetTitles } from "@/consts";
+import { MessageType, SHEETS_API_MESSAGE_TIMEOUT_MS, SheetTitles } from '@/consts';
 import {
   IIndexedRichOutgoingTransferData,
   IMetadataSimplePackageData,
@@ -9,39 +9,39 @@ import {
   ISimpleTransferPackageData,
   ISpreadsheet,
   ITransferFilter,
-} from "@/interfaces";
-import { DataLoader, getDataLoaderByLicense } from "@/modules/data-loader/data-loader.module";
-import { messageBus } from "@/modules/message-bus.module";
-import store from "@/store/page-overlay/index";
-import { ReportsMutations, ReportType } from "@/store/page-overlay/modules/reports/consts";
+} from '@/interfaces';
+import { DataLoader, getDataLoaderByLicense } from '@/modules/data-loader/data-loader.module';
+import { messageBus } from '@/modules/message-bus.module';
+import store from '@/store/page-overlay/index';
+import { ReportsMutations, ReportType } from '@/store/page-overlay/modules/reports/consts';
 import {
   ICogsArchive,
   IReportConfig,
   IReportData,
   IReportsState,
-} from "@/store/page-overlay/modules/reports/interfaces";
-import { ActionContext } from "vuex";
-import { CompressedDataWrapper } from "../compression";
-import { downloadCsvFile } from "../csv";
-import { getIsoDateFromOffset, todayIsodate } from "../date";
+} from '@/store/page-overlay/modules/reports/interfaces';
+import { ActionContext } from 'vuex';
+import { CompressedDataWrapper } from '../compression';
+import { downloadCsvFile } from '../csv';
+import { getIsoDateFromOffset, todayIsodate } from '../date';
 import {
   extractChildPackageTagQuantityPairsFromHistory,
   extractParentPackageLabelsFromHistory,
-} from "../history";
+} from '../history';
 import {
   getParentPackageLabels,
   simplePackageConverter,
   simplePackageNormalizer,
   simpleTransferPackageConverter,
-} from "../package";
+} from '../package';
 import {
   addRowsRequestFactory,
   autoResizeDimensionsRequestFactory,
   freezeTopRowRequestFactory,
   getLetterFromIndex,
   styleTopRowRequestFactory,
-} from "../sheets";
-import { writeDataSheet } from "../sheets-export";
+} from '../sheets';
+import { writeDataSheet } from '../sheets-export';
 
 interface ICogsReportFormFilters {
   cogsDateGt: string;
@@ -95,25 +95,25 @@ export async function maybeLoadCogsReportData({
   // packageFilter and transferFilter will have identical dates
   const { transferFilter } = reportConfig[ReportType.COGS]!;
 
-  const mutableArchiveData = reportConfig[ReportType.COGS]!.mutableArchiveData;
+  const { mutableArchiveData } = reportConfig[ReportType.COGS]!;
 
   const packageWrapper = new CompressedDataWrapper<ISimplePackageData>(
-    "Package",
+    'Package',
     mutableArchiveData.packages,
-    "Label",
-    mutableArchiveData.packagesKeys
+    'Label',
+    mutableArchiveData.packagesKeys,
   );
   const transferWrapper = new CompressedDataWrapper<ISimpleOutgoingTransferData>(
-    "Transfers",
+    'Transfers',
     mutableArchiveData.transfers,
-    "ManifestNumber",
-    mutableArchiveData.transfersKeys
+    'ManifestNumber',
+    mutableArchiveData.transfersKeys,
   );
   const transferPackageWrapper = new CompressedDataWrapper<ISimpleTransferPackageData>(
-    "Transfer Package",
+    'Transfer Package',
     mutableArchiveData.transfersPackages,
-    "Label",
-    mutableArchiveData.transfersPackagesKeys
+    'Label',
+    mutableArchiveData.transfersPackagesKeys,
   );
 
   function mergedFindAndUnpackOrNull(label: string): IMetadataSimplePackageData | null {
@@ -132,7 +132,7 @@ export async function maybeLoadCogsReportData({
 
   for (const license of mutableArchiveData.licenses) {
     ctx.commit(ReportsMutations.SET_STATUS, {
-      statusMessage: { text: `Loading ${license} packages...`, level: "success" },
+      statusMessage: { text: `Loading ${license} packages...`, level: 'success' },
     });
 
     dataLoader = await getDataLoaderByLicense(license);
@@ -143,7 +143,7 @@ export async function maybeLoadCogsReportData({
       });
     } catch (e) {
       ctx.commit(ReportsMutations.SET_STATUS, {
-        statusMessage: { text: `Failed to load active packages. (${license})`, level: "warning" },
+        statusMessage: { text: `Failed to load active packages. (${license})`, level: 'warning' },
       });
     }
 
@@ -153,7 +153,7 @@ export async function maybeLoadCogsReportData({
       (await dataLoader.onHoldPackages()).map(simplePackageConverter);
     } catch (e) {
       ctx.commit(ReportsMutations.SET_STATUS, {
-        statusMessage: { text: `Failed to load on hold packages. (${license})`, level: "warning" },
+        statusMessage: { text: `Failed to load on hold packages. (${license})`, level: 'warning' },
       });
     }
 
@@ -165,7 +165,7 @@ export async function maybeLoadCogsReportData({
       });
     } catch (e) {
       ctx.commit(ReportsMutations.SET_STATUS, {
-        statusMessage: { text: `Failed to load inactive packages. (${license})`, level: "warning" },
+        statusMessage: { text: `Failed to load inactive packages. (${license})`, level: 'warning' },
       });
     }
 
@@ -179,7 +179,7 @@ export async function maybeLoadCogsReportData({
       ctx.commit(ReportsMutations.SET_STATUS, {
         statusMessage: {
           text: `Failed to load in transit packages. (${license})`,
-          level: "warning",
+          level: 'warning',
         },
       });
     }
@@ -191,7 +191,7 @@ export async function maybeLoadCogsReportData({
 
   for (const license of mutableArchiveData.licenses) {
     ctx.commit(ReportsMutations.SET_STATUS, {
-      statusMessage: { text: `Loading ${license} transfers...`, level: "success" },
+      statusMessage: { text: `Loading ${license} transfers...`, level: 'success' },
     });
 
     dataLoader = await getDataLoaderByLicense(license);
@@ -200,7 +200,7 @@ export async function maybeLoadCogsReportData({
       richOutgoingTransfers = [...richOutgoingTransfers, ...outgoingTransfers];
     } catch (e) {
       ctx.commit(ReportsMutations.SET_STATUS, {
-        statusMessage: { text: "Failed to load outgoing transfers.", level: "warning" },
+        statusMessage: { text: 'Failed to load outgoing transfers.', level: 'warning' },
       });
     }
 
@@ -209,7 +209,7 @@ export async function maybeLoadCogsReportData({
       richOutgoingTransfers = [...richOutgoingTransfers, ...rejectedTransfers];
     } catch (e) {
       ctx.commit(ReportsMutations.SET_STATUS, {
-        statusMessage: { text: "Failed to load rejected transfers.", level: "warning" },
+        statusMessage: { text: 'Failed to load rejected transfers.', level: 'warning' },
       });
     }
 
@@ -218,18 +218,18 @@ export async function maybeLoadCogsReportData({
       richOutgoingTransfers = [...richOutgoingTransfers, ...outgoingInactiveTransfers];
     } catch (e) {
       ctx.commit(ReportsMutations.SET_STATUS, {
-        statusMessage: { text: "Failed to load outgoing inactive transfers.", level: "warning" },
+        statusMessage: { text: 'Failed to load outgoing inactive transfers.', level: 'warning' },
       });
     }
   }
 
-  const [departureDateGt] = transferFilter.estimatedDepartureDateGt!.split("T");
+  const [departureDateGt] = transferFilter.estimatedDepartureDateGt!.split('T');
   const [departureDateLt] = getIsoDateFromOffset(1, transferFilter.estimatedDepartureDateLt!).split(
-    "T"
+    'T',
   );
 
   ctx.commit(ReportsMutations.SET_STATUS, {
-    statusMessage: { text: "Loading destinations....", level: "success" },
+    statusMessage: { text: 'Loading destinations....', level: 'success' },
   });
 
   let inflightCount = 0;
@@ -243,14 +243,12 @@ export async function maybeLoadCogsReportData({
 
     inflightCount++;
     richOutgoingTransferDestinationRequests.push(
-      getDataLoaderByLicense(transfer.LicenseNumber).then((dataLoader) =>
-        dataLoader
-          .transferDestinations(transfer.Id)
-          .then((destinations) => {
-            transfer.outgoingDestinations = destinations;
-          })
-          .finally(() => inflightCount--)
-      )
+      getDataLoaderByLicense(transfer.LicenseNumber).then((dataLoader) => dataLoader
+        .transferDestinations(transfer.Id)
+        .then((destinations) => {
+          transfer.outgoingDestinations = destinations;
+        })
+        .finally(() => inflightCount--)),
     );
 
     if (richOutgoingTransferDestinationRequests.length % 250 === 0) {
@@ -259,7 +257,7 @@ export async function maybeLoadCogsReportData({
       ctx.commit(ReportsMutations.SET_STATUS, {
         statusMessage: {
           text: `Loaded ${richOutgoingTransferDestinationRequests.length} destinations....`,
-          level: "success",
+          level: 'success',
         },
         prependMessage: false,
       });
@@ -269,7 +267,7 @@ export async function maybeLoadCogsReportData({
       ctx.commit(ReportsMutations.SET_STATUS, {
         statusMessage: {
           text: `Waiting for ${inflightCount} requests to finish....`,
-          level: "success",
+          level: 'success',
         },
         prependMessage: false,
       });
@@ -282,13 +280,13 @@ export async function maybeLoadCogsReportData({
   ctx.commit(ReportsMutations.SET_STATUS, {
     statusMessage: {
       text: `Loaded ${richOutgoingTransferDestinationRequests.length} destinations`,
-      level: "success",
+      level: 'success',
     },
     prependMessage: false,
   });
 
   ctx.commit(ReportsMutations.SET_STATUS, {
-    statusMessage: { text: "Loading manifest packages...", level: "success" },
+    statusMessage: { text: 'Loading manifest packages...', level: 'success' },
   });
 
   const packageRequests: Promise<any>[] = [];
@@ -302,13 +300,9 @@ export async function maybeLoadCogsReportData({
       }
 
       packageRequests.push(
-        getDataLoaderByLicense(transfer.LicenseNumber).then((dataLoader) =>
-          dataLoader.destinationPackages(destination.Id).then((destinationPackages) => {
-            destinationPackages.map((pkg) =>
-              transferPackageWrapper.add(simpleTransferPackageConverter(transfer, destination, pkg))
-            );
-          })
-        )
+        getDataLoaderByLicense(transfer.LicenseNumber).then((dataLoader) => dataLoader.destinationPackages(destination.Id).then((destinationPackages) => {
+          destinationPackages.map((pkg) => transferPackageWrapper.add(simpleTransferPackageConverter(transfer, destination, pkg)));
+        })),
       );
 
       transferPackageWrapper.flushCounter();
@@ -319,7 +313,7 @@ export async function maybeLoadCogsReportData({
         ctx.commit(ReportsMutations.SET_STATUS, {
           statusMessage: {
             text: `Loaded ${packageRequests.length} manifests....`,
-            level: "success",
+            level: 'success',
           },
           prependMessage: false,
         });
@@ -332,7 +326,7 @@ export async function maybeLoadCogsReportData({
   ctx.commit(ReportsMutations.SET_STATUS, {
     statusMessage: {
       text: `Loaded ${packageRequests.length} manifests`,
-      level: "success",
+      level: 'success',
     },
   });
 
@@ -340,31 +334,30 @@ export async function maybeLoadCogsReportData({
   const testingSampleTransferLabels: Set<string> = new Set();
 
   for (const transferPackage of transferPackageWrapper) {
-    if (transferPackage.Type.includes("Trade Sample Transfer")) {
+    if (transferPackage.Type.includes('Trade Sample Transfer')) {
       tradeSampleTransferLabels.add(transferPackage.Label);
     }
-    if (transferPackage.Type.includes("Testing Transfer")) {
+    if (transferPackage.Type.includes('Testing Transfer')) {
       testingSampleTransferLabels.add(transferPackage.Label);
     }
   }
 
   console.log(
-    `Failed package requests: ${packageResults.filter((x) => x.status !== "fulfilled").length}`
+    `Failed package requests: ${packageResults.filter((x) => x.status !== 'fulfilled').length}`,
   );
 
   // Packages for the final manifest output page
-  const eligibleWholesaleTransferPackageWrapper =
-    new CompressedDataWrapper<ISimpleTransferPackageData>(
-      "Eligible Wholesale Transfer Packages",
-      [],
-      transferPackageWrapper.indexedKey,
-      transferPackageWrapper.keys
-    );
+  const eligibleWholesaleTransferPackageWrapper = new CompressedDataWrapper<ISimpleTransferPackageData>(
+    'Eligible Wholesale Transfer Packages',
+    [],
+    transferPackageWrapper.indexedKey,
+    transferPackageWrapper.keys,
+  );
 
   ctx.commit(ReportsMutations.SET_STATUS, {
     statusMessage: {
-      text: `Locating wholesale packages...`,
-      level: "success",
+      text: 'Locating wholesale packages...',
+      level: 'success',
     },
   });
 
@@ -378,7 +371,7 @@ export async function maybeLoadCogsReportData({
       continue;
     }
 
-    if (!transferPkg.Type.includes("Wholesale")) {
+    if (!transferPkg.Type.includes('Wholesale')) {
       continue;
     }
 
@@ -388,14 +381,14 @@ export async function maybeLoadCogsReportData({
   ctx.commit(ReportsMutations.SET_STATUS, {
     statusMessage: {
       text: `Found ${eligibleWholesaleTransferPackageWrapper.data.length} wholesale packages`,
-      level: "success",
+      level: 'success',
     },
   });
 
   ctx.commit(ReportsMutations.SET_STATUS, {
     statusMessage: {
-      text: `Building package history tree...`,
-      level: "success",
+      text: 'Building package history tree...',
+      level: 'success',
     },
   });
 
@@ -436,22 +429,22 @@ export async function maybeLoadCogsReportData({
   ctx.commit(ReportsMutations.SET_STATUS, {
     statusMessage: {
       text: `${eligibleWholesaleManifestTreeLabels.size} packages in history tree`,
-      level: "success",
+      level: 'success',
     },
   });
 
   ctx.commit(ReportsMutations.SET_STATUS, {
     statusMessage: {
-      text: `Loading remaining history data...`,
-      level: "success",
+      text: 'Loading remaining history data...',
+      level: 'success',
     },
   });
 
   const treePackageWrapper = new CompressedDataWrapper<ISimplePackageData>(
-    "Tree Packages",
+    'Tree Packages',
     [],
     packageWrapper.indexedKey,
-    packageWrapper.keys
+    packageWrapper.keys,
   );
 
   for (const label of eligibleWholesaleManifestTreeLabels) {
@@ -471,21 +464,19 @@ export async function maybeLoadCogsReportData({
     }
 
     packageHistoryRequests.push(
-      getDataLoaderByLicense(pkg.LicenseNumber).then((dataLoader) =>
-        dataLoader.packageHistoryByPackageId(pkg.Id).then((history) => {
-          treePackageWrapper.update(
-            pkg.Label,
-            "parentPackageLabels",
-            extractParentPackageLabelsFromHistory(history)
-          );
+      getDataLoaderByLicense(pkg.LicenseNumber).then((dataLoader) => dataLoader.packageHistoryByPackageId(pkg.Id).then((history) => {
+        treePackageWrapper.update(
+          pkg.Label,
+          'parentPackageLabels',
+          extractParentPackageLabelsFromHistory(history),
+        );
 
-          treePackageWrapper.update(
-            pkg.Label,
-            "childPackageLabelQuantityPairs",
-            extractChildPackageTagQuantityPairsFromHistory(history)
-          );
-        })
-      )
+        treePackageWrapper.update(
+          pkg.Label,
+          'childPackageLabelQuantityPairs',
+          extractChildPackageTagQuantityPairsFromHistory(history),
+        );
+      })),
     );
 
     if (packageHistoryRequests.length % 100 === 0) {
@@ -497,16 +488,16 @@ export async function maybeLoadCogsReportData({
 
   ctx.commit(ReportsMutations.SET_STATUS, {
     statusMessage: {
-      text: `Finished loading history`,
-      level: "success",
+      text: 'Finished loading history',
+      level: 'success',
     },
   });
 
   const treeTransferPackageWrapper = new CompressedDataWrapper<ISimpleTransferPackageData>(
-    "Tree Transfer Packages",
+    'Tree Transfer Packages',
     [],
     transferPackageWrapper.indexedKey,
-    transferPackageWrapper.keys
+    transferPackageWrapper.keys,
   );
 
   for (const label of eligibleWholesaleManifestTreeLabels) {
@@ -519,8 +510,8 @@ export async function maybeLoadCogsReportData({
 
   ctx.commit(ReportsMutations.SET_STATUS, {
     statusMessage: {
-      text: `Calculating cost distribution...`,
-      level: "success",
+      text: 'Calculating cost distribution...',
+      level: 'success',
     },
   });
 
@@ -528,14 +519,14 @@ export async function maybeLoadCogsReportData({
   // history is not available for a package
   const treeChildMap = new Map<string, Set<string>>();
 
-  const FRACTIONAL_COST_KEY = "fractionalCostMultiplierPairs";
+  const FRACTIONAL_COST_KEY = 'fractionalCostMultiplierPairs';
 
   // Merge the two package types to prepare for fractional cost calculation
   const unifiedTreePackageWrapper = new CompressedDataWrapper<IMetadataSimplePackageData>(
-    "Unified Tree Wrapper",
+    'Unified Tree Wrapper',
     [],
     treeTransferPackageWrapper.indexedKey,
-    [...treeTransferPackageWrapper.keys, FRACTIONAL_COST_KEY]
+    [...treeTransferPackageWrapper.keys, FRACTIONAL_COST_KEY],
   );
 
   for (const pkg of treePackageWrapper) {
@@ -549,7 +540,7 @@ export async function maybeLoadCogsReportData({
   for (const treePkg of unifiedTreePackageWrapper) {
     const parentPackageLabels = await getParentPackageLabels(treePkg);
 
-    unifiedTreePackageWrapper.update(treePkg.Label, "parentPackageLabels", parentPackageLabels);
+    unifiedTreePackageWrapper.update(treePkg.Label, 'parentPackageLabels', parentPackageLabels);
 
     for (const parentLabel of parentPackageLabels) {
       if (treeChildMap.has(parentLabel)) {
@@ -568,10 +559,10 @@ export async function maybeLoadCogsReportData({
   let successfulMatchCount = 0;
   let fullInheritanceBackupCount = 0;
   let inexactInheritanceBackupCount = 0;
-  let duplicateLabelCount = 0;
+  const duplicateLabelCount = 0;
   let emptiedChildLabelsCount = 0;
-  let unmatchedChildPackages: string[] = [];
-  let inexactInheritanceBackupLabels: string[] = [];
+  const unmatchedChildPackages: string[] = [];
+  const inexactInheritanceBackupLabels: string[] = [];
   let testOrTradeExcludedCount = 0;
 
   for (const pkg of unifiedTreePackageWrapper) {
@@ -606,7 +597,7 @@ export async function maybeLoadCogsReportData({
           .reduce((a, b) => a + b[1], 0);
 
         const matchingPair = parentPkg.childPackageLabelQuantityPairs.find(
-          (x) => x[0] === pkg.Label
+          (x) => x[0] === pkg.Label,
         );
 
         if (!matchingPair) {
@@ -624,7 +615,7 @@ export async function maybeLoadCogsReportData({
         // Packages that have left the facilitty have no history. If they are a parent package,
         // the a fallback calculation is needed to estimate fractional cost.
         ++usedBackupAlgorithmCount;
-        let childLabels = treeChildMap.get(parentPkg.Label);
+        const childLabels = treeChildMap.get(parentPkg.Label);
 
         if (!childLabels) {
           ++unmatchedChildSetCount;
@@ -667,32 +658,31 @@ export async function maybeLoadCogsReportData({
 
   ctx.commit(ReportsMutations.SET_STATUS, {
     statusMessage: {
-      text: `Completed cost calculation`,
-      level: "success",
+      text: 'Completed cost calculation',
+      level: 'success',
     },
   });
 
   ctx.commit(ReportsMutations.SET_STATUS, {
     statusMessage: {
-      text: `Organizing data for sheets export...`,
-      level: "success",
+      text: 'Organizing data for sheets export...',
+      level: 'success',
     },
   });
 
-  const keyIdx = unifiedTreePackageWrapper.columnIdxOrError("ProductionBatchNumber");
+  const keyIdx = unifiedTreePackageWrapper.columnIdxOrError('ProductionBatchNumber');
   unifiedTreePackageWrapper.sort((a, b) => {
-    const aVal = a[keyIdx] ?? "";
-    const bVal = b[keyIdx] ?? "";
+    const aVal = a[keyIdx] ?? '';
+    const bVal = b[keyIdx] ?? '';
 
-    if (aVal === "" && bVal === "") {
+    if (aVal === '' && bVal === '') {
       return 0;
-    } else if (aVal === "") {
+    } if (aVal === '') {
       return 1;
-    } else if (bVal === "") {
+    } if (bVal === '') {
       return -1;
-    } else {
-      return aVal.localeCompare(bVal);
     }
+    return aVal.localeCompare(bVal);
   });
 
   const auditData = {
@@ -712,7 +702,7 @@ export async function maybeLoadCogsReportData({
 
   const ENABLE_CELL = `'${SheetTitles.OVERVIEW}'!C3`;
 
-  const titles = ["Label", "PB #", "PB Cost", "Computed Cost"];
+  const titles = ['Label', 'PB #', 'PB Cost', 'Computed Cost'];
 
   const inputCostColumnIndex = 2;
   const computedCostColumnIndex = 3;
@@ -733,25 +723,23 @@ export async function maybeLoadCogsReportData({
     }
 
     const expr: string = pkg
-      .fractionalCostMultiplierPairs!.map(([parentLabel, multiplier]) => {
-        return `(${getLetterFromIndex(computedCostColumnIndex)}${decodeLabelToIndex(
-          parentLabel
-        )} * ${multiplier})`;
-      })
-      .join("+");
+      .fractionalCostMultiplierPairs!.map(([parentLabel, multiplier]) => `(${getLetterFromIndex(computedCostColumnIndex)}${decodeLabelToIndex(
+        parentLabel,
+      )} * ${multiplier})`)
+      .join('+');
 
-    const inheritedCostExpression = expr.length > 0 ? `+(${expr})` : "";
+    const inheritedCostExpression = expr.length > 0 ? `+(${expr})` : '';
 
     worksheetMatrix.push([
       pkg.Label,
       pkg.ProductionBatchNumber,
-      (pkg.ProductionBatchNumber ?? "").length === 0 ? `0` : ``,
+      (pkg.ProductionBatchNumber ?? '').length === 0 ? '0' : '',
       `=${getLetterFromIndex(inputCostColumnIndex)}${idx + OFFSET}${inheritedCostExpression}`,
     ]);
   }
 
   const cogsMatrix: any[][] = [
-    ["Manifest #", "Package", "Item", "Quantity", "UOM", "COGS", "Unit COGS"],
+    ['Manifest #', 'Package', 'Item', 'Quantity', 'UOM', 'COGS', 'Unit COGS'],
   ];
 
   let idx = 0;
@@ -764,19 +752,19 @@ export async function maybeLoadCogsReportData({
       pkg.Quantity,
       pkg.UnitOfMeasureAbbreviation,
       `='${SheetTitles.WORKSHEET}'!${getLetterFromIndex(
-        computedCostColumnIndex
+        computedCostColumnIndex,
       )}${decodeLabelToIndex(pkg.Label)}`,
-      pkg.UnitOfMeasureAbbreviation === "ea"
+      pkg.UnitOfMeasureAbbreviation === 'ea'
         ? `=${getLetterFromIndex(5)}${idx + 2}/${getLetterFromIndex(3)}${idx + 2}`
-        : ``,
+        : '',
     ]);
     idx++;
   }
 
   ctx.commit(ReportsMutations.SET_STATUS, {
     statusMessage: {
-      text: `Exporting to Google Sheets...`,
-      level: "success",
+      text: 'Exporting to Google Sheets...',
+      level: 'success',
     },
   });
 
@@ -801,11 +789,11 @@ export async function createCogsSpreadsheetOrError({
   reportConfig: IReportConfig;
 }): Promise<ISpreadsheet> {
   if (!store.state.pluginAuth?.authState?.license) {
-    throw new Error("Invalid authState");
+    throw new Error('Invalid authState');
   }
 
   if (!reportData[ReportType.COGS]) {
-    throw new Error("Missing COGS data");
+    throw new Error('Missing COGS data');
   }
 
   const sheetTitles = [
@@ -827,11 +815,11 @@ export async function createCogsSpreadsheetOrError({
       sheetTitles,
     },
     undefined,
-    SHEETS_API_MESSAGE_TIMEOUT_MS
+    SHEETS_API_MESSAGE_TIMEOUT_MS,
   );
 
   if (!response.data.success) {
-    throw new Error("Unable to create COGS sheet");
+    throw new Error('Unable to create COGS sheet');
   }
 
   let formattingRequests: any = [
@@ -868,7 +856,7 @@ export async function createCogsSpreadsheetOrError({
       requests: formattingRequests,
     },
     undefined,
-    SHEETS_API_MESSAGE_TIMEOUT_MS
+    SHEETS_API_MESSAGE_TIMEOUT_MS,
   );
 
   await messageBus.sendMessageToBackground(
@@ -879,29 +867,29 @@ export async function createCogsSpreadsheetOrError({
       values: [
         [],
         [],
-        [null, "Enable calculator:"],
+        [null, 'Enable calculator:'],
         [],
-        ...Object.entries(auditData).map(([key, value]) => ["", key, JSON.stringify(value)]),
+        ...Object.entries(auditData).map(([key, value]) => ['', key, JSON.stringify(value)]),
       ],
     },
     undefined,
-    SHEETS_API_MESSAGE_TIMEOUT_MS
+    SHEETS_API_MESSAGE_TIMEOUT_MS,
   );
 
   store.commit(`reports/${ReportsMutations.SET_STATUS}`, {
-    statusMessage: { text: `Writing worksheet data...`, level: "success" },
+    statusMessage: { text: 'Writing worksheet data...', level: 'success' },
   });
 
   await downloadCsvFile({
     csvFile: {
-      filename: "worksheet.csv",
+      filename: 'worksheet.csv',
       data: worksheetMatrix,
     },
   });
 
   await downloadCsvFile({
     csvFile: {
-      filename: "cogs.csv",
+      filename: 'cogs.csv',
       data: cogsMatrix,
     },
   });
@@ -913,7 +901,7 @@ export async function createCogsSpreadsheetOrError({
     options: {
       rangeStartColumn: getLetterFromIndex(worksheetMatrix[0].length - 1),
       pageSize: 1000,
-      valueInputOption: "USER_ENTERED",
+      valueInputOption: 'USER_ENTERED',
       // batchWrite: true,
       maxParallelRequests: 50,
     },
@@ -924,13 +912,13 @@ export async function createCogsSpreadsheetOrError({
     spreadsheetTitle: SheetTitles.WORKSHEET,
     data: worksheetMatrix.map((row) => row.slice(0, row.length - 1)),
     options: {
-      valueInputOption: "RAW",
+      valueInputOption: 'RAW',
       batchWrite: true,
     },
   });
 
   store.commit(`reports/${ReportsMutations.SET_STATUS}`, {
-    statusMessage: { text: `Writing manifest data...`, level: "success" },
+    statusMessage: { text: 'Writing manifest data...', level: 'success' },
   });
 
   await writeDataSheet({
@@ -940,7 +928,7 @@ export async function createCogsSpreadsheetOrError({
     options: {
       rangeStartColumn: getLetterFromIndex(cogsMatrix[0].length - 2),
       pageSize: 5000,
-      valueInputOption: "USER_ENTERED",
+      valueInputOption: 'USER_ENTERED',
       // batchWrite: true,
       maxParallelRequests: 10,
     },
@@ -951,19 +939,19 @@ export async function createCogsSpreadsheetOrError({
     spreadsheetTitle: SheetTitles.MANIFEST_COGS,
     data: cogsMatrix.map((row) => row.slice(0, row.length - 2)),
     options: {
-      valueInputOption: "RAW",
+      valueInputOption: 'RAW',
       batchWrite: true,
     },
   });
 
   store.commit(`reports/${ReportsMutations.SET_STATUS}`, {
-    statusMessage: { text: `Resizing sheets...`, level: "success" },
+    statusMessage: { text: 'Resizing sheets...', level: 'success' },
   });
 
   let resizeRequests: any[] = [
     autoResizeDimensionsRequestFactory({
       sheetId: sheetTitles.indexOf(SheetTitles.OVERVIEW),
-      dimension: "COLUMNS",
+      dimension: 'COLUMNS',
     }),
   ];
 
@@ -985,7 +973,7 @@ export async function createCogsSpreadsheetOrError({
       requests: resizeRequests,
     },
     undefined,
-    SHEETS_API_MESSAGE_TIMEOUT_MS
+    SHEETS_API_MESSAGE_TIMEOUT_MS,
   );
 
   await messageBus.sendMessageToBackground(
@@ -996,7 +984,7 @@ export async function createCogsSpreadsheetOrError({
       values: [[`Created with Track & Trace Tools @ ${Date().toString()}`]],
     },
     undefined,
-    SHEETS_API_MESSAGE_TIMEOUT_MS
+    SHEETS_API_MESSAGE_TIMEOUT_MS,
   );
 
   return response.data.result;

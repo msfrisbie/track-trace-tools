@@ -34,26 +34,26 @@
 </template>
 
 <script lang="ts">
-import TransferSearchResultPreview from "@/components/search/transfer-search/TransferSearchResultPreview.vue";
-import { TransferFilterIdentifiers } from "@/consts";
-import { IIndexedTransferData, IPluginState } from "@/interfaces";
-import { searchManager } from "@/modules/search-manager.module";
-import store from "@/store/page-overlay/index";
-import { ISelectedTransferMetadata } from "@/store/page-overlay/modules/transfer-search/interfaces";
-import { Subject } from "rxjs";
-import { take, takeUntil } from "rxjs/operators";
-import Vue from "vue";
-import { mapState } from "vuex";
+import TransferSearchResultPreview from '@/components/search/transfer-search/TransferSearchResultPreview.vue';
+import { TransferFilterIdentifiers } from '@/consts';
+import { IIndexedTransferData, IPluginState } from '@/interfaces';
+import { searchManager } from '@/modules/search-manager.module';
+import store from '@/store/page-overlay/index';
+import { ISelectedTransferMetadata } from '@/store/page-overlay/modules/transfer-search/interfaces';
+import { Subject } from 'rxjs';
+import { take, takeUntil } from 'rxjs/operators';
+import Vue from 'vue';
+import { mapState } from 'vuex';
 
 export default Vue.extend({
-  name: "TransferSearchResultsGroup",
+  name: 'TransferSearchResultsGroup',
   store,
   components: { TransferSearchResultPreview },
   data(): {
     // destroyed$: Subject<void>;
     // selectedTransferMetadata: ISelectedTransferMetadata | null;
     showAll: boolean;
-  } {
+    } {
     return {
       // destroyed$: new Subject(),
       // selectedTransferMetadata: null,
@@ -83,8 +83,8 @@ export default Vue.extend({
         };
 
         if (
-          !store.state.transferSearch.selectedTransferMetadata ||
-          store.state.transferSearch.selectedTransferMetadata.priority >= candidateMetadata.priority
+          !store.state.transferSearch.selectedTransferMetadata
+          || store.state.transferSearch.selectedTransferMetadata.priority >= candidateMetadata.priority
         ) {
           store.state.transferSearch.selectedTransferMetadata = candidateMetadata;
         }
@@ -115,14 +115,14 @@ export default Vue.extend({
     },
     groupIcon() {
       switch (this.sectionName) {
-        case "incoming transfer":
-          return "truck";
-        case "outgoing transfer":
-          return "truck-loading";
-        case "rejected transfer":
-          return "undo";
+        case 'incoming transfer':
+          return 'truck';
+        case 'outgoing transfer':
+          return 'truck-loading';
+        case 'rejected transfer':
+          return 'undo';
         default:
-          return "truck";
+          return 'truck';
       }
     },
     ...mapState<IPluginState>({

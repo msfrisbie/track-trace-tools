@@ -1,8 +1,8 @@
-import { AMPLITUDE_API_KEY, ChromeStorageKeys, MessageType } from "@/consts";
-import { IBusEvent, IBusMessageOptions } from "@/interfaces";
-import { database } from "@/modules/indexeddb.module";
-import amplitude from "amplitude-js";
-import { expireAuthToken, getAuthTokenOrError, getOAuthUserInfoOrError } from "./utils/oauth";
+import { AMPLITUDE_API_KEY, ChromeStorageKeys, MessageType } from '@/consts';
+import { IBusEvent, IBusMessageOptions } from '@/interfaces';
+import { database } from '@/modules/indexeddb.module';
+import amplitude from 'amplitude-js';
+import { expireAuthToken, getAuthTokenOrError, getOAuthUserInfoOrError } from './utils/oauth';
 import {
   appendValues,
   batchUpdate,
@@ -10,9 +10,9 @@ import {
   createSpreadsheet,
   readValues,
   writeValues,
-} from "./utils/sheets";
+} from './utils/sheets';
 
-console.log(`These events are collected only to help us make the plugin more useful for you.`);
+console.log('These events are collected only to help us make the plugin more useful for you.');
 
 // Amplitude Integration
 const amplitudeInstance = amplitude.getInstance();
@@ -47,7 +47,7 @@ function logEvent(event: string, data: any, options: IBusMessageOptions) {
 
 chrome.runtime.onMessage.addListener((inboundEvent, sender, sendResponse) => {
   // This will only show in the background.js console output, so leave in place for debugging
-  console.log("inboundEvent:", inboundEvent);
+  console.log('inboundEvent:', inboundEvent);
 
   // It seems to be the case that async/await is causing problems when used with OAuth.
   // "Unchecked runtime.lastError: The message port closed before a response was received"
@@ -77,7 +77,7 @@ chrome.runtime.onMessage.addListener((inboundEvent, sender, sendResponse) => {
 
           let cookies: chrome.cookies.Cookie[] = [];
 
-          let promises: Promise<any>[] = [];
+          const promises: Promise<any>[] = [];
 
           cookieStores.map((cookieStore) =>
             promises.push(
@@ -86,9 +86,10 @@ chrome.runtime.onMessage.addListener((inboundEvent, sender, sendResponse) => {
                   domain: inboundEvent.message.data.domain,
                   storeId: cookieStore.id,
                 })
-                .then((singleStoreCookies) => (cookies = cookies.concat(singleStoreCookies)))
-            )
-          );
+                .then((singleStoreCookies) => {
+                  cookies = cookies.concat(singleStoreCookies);
+                }),
+            ));
 
           Promise.allSettled(promises).then(() => {
             respondToContentScript(sendResponse, inboundEvent, {
@@ -113,7 +114,7 @@ chrome.runtime.onMessage.addListener((inboundEvent, sender, sendResponse) => {
         logEvent(
           `Visited ${inboundEvent.message.data.pageName}`,
           inboundEvent.message.data.pageData,
-          inboundEvent.message.options
+          inboundEvent.message.options,
         );
         respondToContentScript(sendResponse, inboundEvent, { success: true });
         break;
@@ -124,19 +125,19 @@ chrome.runtime.onMessage.addListener((inboundEvent, sender, sendResponse) => {
         });
         break;
 
-      // case MessageType.SEARCH_PACKAGES:
-      //   // Log the search
-      //   // logEvent(MessageType.REFRESH_PACKAGE_RESULTS, inboundEvent.message.data, inboundEvent.message.options);
+        // case MessageType.SEARCH_PACKAGES:
+        //   // Log the search
+        //   // logEvent(MessageType.REFRESH_PACKAGE_RESULTS, inboundEvent.message.data, inboundEvent.message.options);
 
-      //   // Perform the search
-      //   respondToContentScript(sendResponse, inboundEvent, {
-      //     packages: await database.packageSearch(
-      //       inboundEvent.message.data.query,
-      //       inboundEvent.message.data.license,
-      //       inboundEvent.message.data.filters
-      //     ),
-      //   });
-      //   break;
+        //   // Perform the search
+        //   respondToContentScript(sendResponse, inboundEvent, {
+        //     packages: await database.packageSearch(
+        //       inboundEvent.message.data.query,
+        //       inboundEvent.message.data.license,
+        //       inboundEvent.message.data.filters
+        //     ),
+        //   });
+        //   break;
 
       case MessageType.INDEX_TRANSFERS:
         database.indexTransfers(inboundEvent.message.data.indexedTransfersData).then(() => {
@@ -153,7 +154,7 @@ chrome.runtime.onMessage.addListener((inboundEvent, sender, sendResponse) => {
           .transferSearch(
             inboundEvent.message.data.query,
             inboundEvent.message.data.license,
-            inboundEvent.message.data.filters
+            inboundEvent.message.data.filters,
           )
           .then((transfers) => {
             respondToContentScript(sendResponse, inboundEvent, {
@@ -178,7 +179,7 @@ chrome.runtime.onMessage.addListener((inboundEvent, sender, sendResponse) => {
           .tagSearch(
             inboundEvent.message.data.query,
             inboundEvent.message.data.license,
-            inboundEvent.message.data.filters
+            inboundEvent.message.data.filters,
           )
           .then((tags) => {
             respondToContentScript(sendResponse, inboundEvent, {
@@ -194,21 +195,21 @@ chrome.runtime.onMessage.addListener((inboundEvent, sender, sendResponse) => {
         });
         break;
 
-      // case MessageType.GET_EXTENSION_URL:
-      //   // https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/runtime/getURL
-      //   respondToContentScript(sendResponse, inboundEvent, {
-      //     success: true,
-      //     url: await browser.runtime.getURL(inboundEvent.message.data.path),
-      //   });
-      //   break;
+        // case MessageType.GET_EXTENSION_URL:
+        //   // https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/runtime/getURL
+        //   respondToContentScript(sendResponse, inboundEvent, {
+        //     success: true,
+        //     url: await browser.runtime.getURL(inboundEvent.message.data.path),
+        //   });
+        //   break;
 
-      // case MessageType.CHECK_PERMISSIONS:
-      //   // https://chrome-apps-doc2.appspot.com/extensions/permissions.html
-      //   respondToContentScript(sendResponse, inboundEvent, {
-      //     success: true,
-      //     hasPermissions: await browser.permissions.contains(inboundEvent.message.data),
-      //   });
-      //   break;
+        // case MessageType.CHECK_PERMISSIONS:
+        //   // https://chrome-apps-doc2.appspot.com/extensions/permissions.html
+        //   respondToContentScript(sendResponse, inboundEvent, {
+        //     success: true,
+        //     hasPermissions: await browser.permissions.contains(inboundEvent.message.data),
+        //   });
+        //   break;
 
       //   break;
       case MessageType.CHECK_OAUTH:
@@ -223,8 +224,8 @@ chrome.runtime.onMessage.addListener((inboundEvent, sender, sendResponse) => {
             respondToContentScript(sendResponse, inboundEvent, {
               success: false,
             });
-            console.error("Event error in background", inboundEvent, error);
-          }
+            console.error('Event error in background', inboundEvent, error);
+          },
         );
         break;
       case MessageType.GET_OAUTH_USER_INFO_OR_ERROR:
@@ -239,8 +240,8 @@ chrome.runtime.onMessage.addListener((inboundEvent, sender, sendResponse) => {
             respondToContentScript(sendResponse, inboundEvent, {
               success: false,
             });
-            console.error("Event error in background", inboundEvent, error);
-          }
+            console.error('Event error in background', inboundEvent, error);
+          },
         );
         break;
       case MessageType.EXPIRE_AUTH_TOKEN:
@@ -254,8 +255,8 @@ chrome.runtime.onMessage.addListener((inboundEvent, sender, sendResponse) => {
             respondToContentScript(sendResponse, inboundEvent, {
               success: false,
             });
-            console.error("Event error in background", inboundEvent, error);
-          }
+            console.error('Event error in background', inboundEvent, error);
+          },
         );
 
         break;
@@ -271,8 +272,8 @@ chrome.runtime.onMessage.addListener((inboundEvent, sender, sendResponse) => {
             respondToContentScript(sendResponse, inboundEvent, {
               success: false,
             });
-            console.error("Event error in background", inboundEvent, error);
-          }
+            console.error('Event error in background', inboundEvent, error);
+          },
         );
 
         break;
@@ -289,8 +290,8 @@ chrome.runtime.onMessage.addListener((inboundEvent, sender, sendResponse) => {
             respondToContentScript(sendResponse, inboundEvent, {
               success: false,
             });
-            console.error("Event error in background", inboundEvent, error);
-          }
+            console.error('Event error in background', inboundEvent, error);
+          },
         );
         break;
 
@@ -306,8 +307,8 @@ chrome.runtime.onMessage.addListener((inboundEvent, sender, sendResponse) => {
             respondToContentScript(sendResponse, inboundEvent, {
               success: false,
             });
-            console.error("Event error in background", inboundEvent, error);
-          }
+            console.error('Event error in background', inboundEvent, error);
+          },
         );
 
         break;
@@ -324,8 +325,8 @@ chrome.runtime.onMessage.addListener((inboundEvent, sender, sendResponse) => {
             respondToContentScript(sendResponse, inboundEvent, {
               success: false,
             });
-            console.error("Event error in background", inboundEvent, error);
-          }
+            console.error('Event error in background', inboundEvent, error);
+          },
         );
 
         break;
@@ -342,8 +343,8 @@ chrome.runtime.onMessage.addListener((inboundEvent, sender, sendResponse) => {
             respondToContentScript(sendResponse, inboundEvent, {
               success: false,
             });
-            console.error("Event error in background", inboundEvent, error);
-          }
+            console.error('Event error in background', inboundEvent, error);
+          },
         );
 
         break;
@@ -360,8 +361,8 @@ chrome.runtime.onMessage.addListener((inboundEvent, sender, sendResponse) => {
             respondToContentScript(sendResponse, inboundEvent, {
               success: false,
             });
-            console.error("Event error in background", inboundEvent, error);
-          }
+            console.error('Event error in background', inboundEvent, error);
+          },
         );
         break;
 
@@ -371,12 +372,12 @@ chrome.runtime.onMessage.addListener((inboundEvent, sender, sendResponse) => {
           logEvent(
             inboundEvent.message.data.eventName,
             inboundEvent.message.data.eventData,
-            inboundEvent.message.options
+            inboundEvent.message.options,
           );
 
           respondToContentScript(sendResponse, inboundEvent, { success: true });
         } catch (error) {
-          console.error("Event error in background", inboundEvent, error);
+          console.error('Event error in background', inboundEvent, error);
         }
         break;
     }
@@ -413,19 +414,19 @@ try {
   // - the browser is updated to a new version.
   chrome.runtime.onInstalled.addListener((details) => {
     if (details.reason === chrome.runtime.OnInstalledReason.UPDATE) {
-      logEvent(`UPDATED_VERSION`, {}, {});
+      logEvent('UPDATED_VERSION', {}, {});
     }
     if (details.reason === chrome.runtime.OnInstalledReason.INSTALL) {
-      logEvent(`NEW_INSTALL`, {}, {});
+      logEvent('NEW_INSTALL', {}, {});
 
       // Acquire the welcome page URL
-      let url = chrome.runtime.getURL("index.html");
+      const url = chrome.runtime.getURL('index.html');
 
       // // Open the welcome page in a new tab .
       chrome.tabs.create({ url });
     }
 
-    chrome.runtime.setUninstallURL("https://trackandtrace.tools/uninstall");
+    chrome.runtime.setUninstallURL('https://trackandtrace.tools/uninstall');
   });
 } catch (e) {
   console.error(e);
@@ -433,7 +434,7 @@ try {
 
 chrome.action.onClicked.addListener(() => {
   // Acquire the welcome page URL
-  let url = chrome.runtime.getURL("index.html");
+  const url = chrome.runtime.getURL('index.html');
 
   // // Open the welcome page in a new tab .
   chrome.tabs.create({ url });

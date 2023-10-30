@@ -1,4 +1,3 @@
-
 export const TRANSFER_BUILDER: string = 'transferBuilder';
 
 export enum TransferBuilderMutations {

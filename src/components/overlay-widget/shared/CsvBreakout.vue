@@ -11,23 +11,23 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import { mapState } from "vuex";
-import router from "@/router/index";
-import store from "@/store/page-overlay/index";
-import { downloadCsvFile } from "@/utils/csv";
-import { ICsvFile } from "@/interfaces";
+import Vue from 'vue';
+import { mapState } from 'vuex';
+import router from '@/router/index';
+import store from '@/store/page-overlay/index';
+import { downloadCsvFile } from '@/utils/csv';
+import { ICsvFile } from '@/interfaces';
 
 export default Vue.extend({
-  name: "CsvBreakout",
+  name: 'CsvBreakout',
   store,
   router,
   props: {
-    csvFiles: Array as () => ICsvFile[]
+    csvFiles: Array as () => ICsvFile[],
   },
   components: {},
   computed: {
-    ...mapState([])
+    ...mapState([]),
   },
   data() {
     return {};
@@ -35,10 +35,10 @@ export default Vue.extend({
   methods: {
     download(csvFile: ICsvFile) {
       downloadCsvFile({ csvFile, delay: 500 });
-    }
+    },
   },
   async created() {},
-  async mounted() {}
+  async mounted() {},
 });
 </script>
 

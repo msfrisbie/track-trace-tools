@@ -152,29 +152,29 @@
 </template>
 
 <script lang="ts">
-import AnimatedNumber from "@/components/overlay-widget/shared/AnimatedNumber.vue";
-import ErrorReadout from "@/components/overlay-widget/shared/ErrorReadout.vue";
-import PasteTags from "@/components/overlay-widget/shared/PasteTags.vue";
-import PickerCard from "@/components/overlay-widget/shared/PickerCard.vue";
-import PickerIcon from "@/components/overlay-widget/shared/PickerIcon.vue";
-import { IPackageData } from "@/interfaces";
-import { authManager } from "@/modules/auth-manager.module";
-import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
-import store from "@/store/page-overlay/index";
+import AnimatedNumber from '@/components/overlay-widget/shared/AnimatedNumber.vue';
+import ErrorReadout from '@/components/overlay-widget/shared/ErrorReadout.vue';
+import PasteTags from '@/components/overlay-widget/shared/PasteTags.vue';
+import PickerCard from '@/components/overlay-widget/shared/PickerCard.vue';
+import PickerIcon from '@/components/overlay-widget/shared/PickerIcon.vue';
+import { IPackageData } from '@/interfaces';
+import { authManager } from '@/modules/auth-manager.module';
+import { primaryDataLoader } from '@/modules/data-loader/data-loader.module';
+import store from '@/store/page-overlay/index';
 import {
   getLabelOrError,
   getQuantityOrError,
   getItemNameOrError,
   getItemUnitOfMeasureNameOrError,
   getItemUnitOfMeasureAbbreviationOrError,
-getQuantityAndUnitDescription,
-} from "@/utils/package";
-import _ from "lodash-es";
-import { timer } from "rxjs";
-import Vue from "vue";
+  getQuantityAndUnitDescription,
+} from '@/utils/package';
+import _ from 'lodash-es';
+import { timer } from 'rxjs';
+import Vue from 'vue';
 
 export default Vue.extend({
-  name: "SinglePackagePicker",
+  name: 'SinglePackagePicker',
   store,
   components: {
     ErrorReadout,
@@ -227,22 +227,20 @@ export default Vue.extend({
       this.$data.inflight = false;
     },
     setSourcePackages(pkgs: IPackageData[]) {
-      this.$data.sourcePackages = pkgs.sort((a: IPackageData, b: IPackageData) =>
-        a.Label > b.Label ? 1 : -1
-      );
+      this.$data.sourcePackages = pkgs.sort((a: IPackageData, b: IPackageData) => (a.Label > b.Label ? 1 : -1));
     },
     focus() {
       // @ts-ignore
-      this.$refs.typeahead?.$el.querySelector("input").focus();
+      this.$refs.typeahead?.$el.querySelector('input').focus();
     },
     blur() {
       // @ts-ignore
-      this.$refs.typeahead?.$el.querySelector("input").blur();
+      this.$refs.typeahead?.$el.querySelector('input').blur();
     },
     clear() {
-      this.$data.query = "";
+      this.$data.query = '';
       // @ts-ignore
-      this.$refs.typeahead?.$el.querySelector("input").value = "";
+      this.$refs.typeahead?.$el.querySelector('input').value = '';
 
       // @ts-ignore
       this.blur();
@@ -255,18 +253,18 @@ export default Vue.extend({
     resetPackages() {
       // Spread operator is to take a snapshot of the packages
       // Fixes an odd bug where only half are removed
-      for (let pkg of [...this.selectedPackages]) {
+      for (const pkg of [...this.selectedPackages]) {
         this.removePackage(pkg);
       }
     },
     addPackage(pkg: IPackageData) {
-      this.$emit("addPackage", pkg);
+      this.$emit('addPackage', pkg);
 
       // @ts-ignore
       timer(300).subscribe(() => this.clear());
     },
     removePackage(pkg: IPackageData) {
-      this.$emit("removePackage", pkg);
+      this.$emit('removePackage', pkg);
     },
     updateSourcePackages() {
       // @ts-ignore
@@ -308,13 +306,13 @@ export default Vue.extend({
       return this.$data.sourcePackages.filter(
         (y: IPackageData) =>
           // @ts-ignore
-          !this.$props.selectedPackages.find((x: IPackageData) => x.Label === y.Label)
+          !this.$props.selectedPackages.find((x: IPackageData) => x.Label === y.Label),
       );
     },
   },
   data() {
     return {
-      query: "",
+      query: '',
       sourcePackages: [],
       inflight: false,
       error: null,
@@ -325,7 +323,7 @@ export default Vue.extend({
   watch: {
     pastedTags: {
       immediate: true,
-      handler: async function (newValue, oldValue) {
+      async handler(newValue, oldValue) {
         if (!newValue.length) {
           return;
         }
@@ -345,7 +343,7 @@ export default Vue.extend({
             }
 
             if (matchingPkg) {
-              this.$emit("addPackage", matchingPkg);
+              this.$emit('addPackage', matchingPkg);
             }
           } catch (e) {
             console.error(e);

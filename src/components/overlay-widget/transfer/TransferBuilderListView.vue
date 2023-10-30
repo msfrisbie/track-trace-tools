@@ -41,16 +41,16 @@
 </template>
 
 <script lang="ts">
-import { CALIFORNIA_METRC_HOSTNAME, MessageType } from "@/consts";
-import { analyticsManager } from "@/modules/analytics-manager.module";
-import store from "@/store/page-overlay/index";
-import { isCurrentHostAllowed } from "@/utils/builder";
-import { notAvailableMessage } from "@/utils/text";
-import Vue from "vue";
-import { mapState } from "vuex";
+import { CALIFORNIA_METRC_HOSTNAME, MessageType } from '@/consts';
+import { analyticsManager } from '@/modules/analytics-manager.module';
+import store from '@/store/page-overlay/index';
+import { isCurrentHostAllowed } from '@/utils/builder';
+import { notAvailableMessage } from '@/utils/text';
+import Vue from 'vue';
+import { mapState } from 'vuex';
 
 export default Vue.extend({
-  name: "TransferBuilderListView",
+  name: 'TransferBuilderListView',
   store,
   methods: {
     selectBuilderType({ text, route }: { text: string; route: string }) {
@@ -73,10 +73,10 @@ export default Vue.extend({
       notAvailableMessage: notAvailableMessage(),
       builderOptions: [
         {
-          route: "/transfer/transfer-builder",
-          text: "CREATE/EDIT TRANSFER",
-          icon: "truck-loading",
-          backgroundColor: "#773c77",
+          route: '/transfer/transfer-builder',
+          text: 'CREATE/EDIT TRANSFER',
+          icon: 'truck-loading',
+          backgroundColor: '#773c77',
           enabled: isCurrentHostAllowed([CALIFORNIA_METRC_HOSTNAME]),
           isBeta: true,
         },
@@ -88,10 +88,10 @@ export default Vue.extend({
         //   enabled: isCurrentHostAllowed([]),
         // },
         {
-          route: "/transfer",
-          text: "TRANSFER TRACKING PAGES",
-          icon: "tasks",
-          backgroundColor: "#773c77",
+          route: '/transfer',
+          text: 'TRANSFER TRACKING PAGES',
+          icon: 'tasks',
+          backgroundColor: '#773c77',
           enabled: isCurrentHostAllowed([]),
         },
         // {
@@ -107,7 +107,7 @@ export default Vue.extend({
   async mounted() {},
   async created() {},
   computed: {
-    ...mapState(["trackedInteractions", "settings", "accountEnabled"]),
+    ...mapState(['trackedInteractions', 'settings', 'accountEnabled']),
   },
 });
 </script>

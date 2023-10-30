@@ -9,18 +9,18 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import TitleBanner from "@/components/shared/TitleBanner.vue";
-import FacilityPicker from "@/components/shared/FacilityPicker.vue";
-import store from "@/store/page-overlay/index";
-import { MutationType } from "@/mutation-types";
-import { MessageType } from "@/consts";
-import { analyticsManager } from "@/modules/analytics-manager.module";
-import { pageManager } from "@/modules/page-manager/page-manager.module";
-import _ from "lodash-es";
+import Vue from 'vue';
+import TitleBanner from '@/components/shared/TitleBanner.vue';
+import FacilityPicker from '@/components/shared/FacilityPicker.vue';
+import store from '@/store/page-overlay/index';
+import { MutationType } from '@/mutation-types';
+import { MessageType } from '@/consts';
+import { analyticsManager } from '@/modules/analytics-manager.module';
+import { pageManager } from '@/modules/page-manager/page-manager.module';
+import _ from 'lodash-es';
 
 export default Vue.extend({
-  name: "PageOverlayHeader",
+  name: 'PageOverlayHeader',
   store,
   components: {
     TitleBanner,

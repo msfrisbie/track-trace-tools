@@ -1,17 +1,19 @@
-import Vue from "vue";
-import { analyticsManager } from "~/src/modules/analytics-manager.module";
-import { authManager } from "~/src/modules/auth-manager.module";
-import { isDevelopment } from "~/src/modules/environment.module";
-import { messageBus } from "~/src/modules/message-bus.module";
-import { storageManager } from "~/src/modules/storage-manager.module";
-import { tabManager } from "~/src/modules/tab-manager.module";
-import { DISALLOWED_HOSTNAMES, TTT_ROOT_ELEMENT_SELECTOR } from "../../consts";
-import { renderFacilityPicker } from "./facility-picker";
-import { renderOverlayWidget } from "./overlay-widget";
-import { renderTTTOverlay } from "./ttt-overlay";
-import { renderUnifiedSearch } from "./unified-search";
+/* eslint-disable import/no-unresolved, no-new, import/extensions, import/named */
 
-console.log("Loaded T3");
+import Vue from 'vue';
+import { analyticsManager } from '~/src/modules/analytics-manager.module';
+import { authManager } from '~/src/modules/auth-manager.module';
+import { isDevelopment } from '~/src/modules/environment.module';
+import { messageBus } from '~/src/modules/message-bus.module';
+import { storageManager } from '~/src/modules/storage-manager.module';
+import { tabManager } from '~/src/modules/tab-manager.module';
+import { DISALLOWED_HOSTNAMES, TTT_ROOT_ELEMENT_SELECTOR } from '../../consts';
+import { renderFacilityPicker } from './facility-picker';
+import { renderOverlayWidget } from './overlay-widget';
+import { renderTTTOverlay } from './ttt-overlay';
+import { renderUnifiedSearch } from './unified-search';
+
+console.log('Loaded T3');
 
 storageManager.init();
 
@@ -21,13 +23,13 @@ tabManager.init();
 async function initializeTooklit() {
   if (DISALLOWED_HOSTNAMES.includes(window.location.hostname)) {
     console.info(
-      `The hostname '${window.location.hostname}' matches the disallow list, declining to render T3`
+      `The hostname '${window.location.hostname}' matches the disallow list, declining to render T3`,
     );
     return;
   }
 
-  if (!!document.querySelector(TTT_ROOT_ELEMENT_SELECTOR)) {
-    console.error("Metrc toolkit already exists on page");
+  if (document.querySelector(TTT_ROOT_ELEMENT_SELECTOR)) {
+    console.error('Metrc toolkit already exists on page');
     return;
   }
 

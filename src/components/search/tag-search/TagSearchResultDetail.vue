@@ -39,25 +39,25 @@
 </template>
 
 <script lang="ts">
-import { MessageType, TagState } from "@/consts";
-import { IIndexedTagData, IPluginState } from "@/interfaces";
-import { analyticsManager } from "@/modules/analytics-manager.module";
-import { TAG_TAB_REGEX } from "@/modules/page-manager/consts";
-import { searchManager } from "@/modules/search-manager.module";
-import { toastManager } from "@/modules/toast-manager.module";
-import store from "@/store/page-overlay/index";
-import { TagSearchActions } from "@/store/page-overlay/modules/tag-search/consts";
-import { copyToClipboard } from "@/utils/dom";
-import { Subject } from "rxjs";
-import { takeUntil } from "rxjs/operators";
-import Vue from "vue";
-import { mapActions, mapGetters, mapState } from "vuex";
-import MetrcTag from "@/components/overlay-widget/shared/MetrcTag.vue";
-import RecursiveJsonTable from "@/components/search/shared/RecursiveJsonTable.vue";
-import { SearchActions } from "@/store/page-overlay/modules/search/consts";
+import { MessageType, TagState } from '@/consts';
+import { IIndexedTagData, IPluginState } from '@/interfaces';
+import { analyticsManager } from '@/modules/analytics-manager.module';
+import { TAG_TAB_REGEX } from '@/modules/page-manager/consts';
+import { searchManager } from '@/modules/search-manager.module';
+import { toastManager } from '@/modules/toast-manager.module';
+import store from '@/store/page-overlay/index';
+import { TagSearchActions } from '@/store/page-overlay/modules/tag-search/consts';
+import { copyToClipboard } from '@/utils/dom';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
+import Vue from 'vue';
+import { mapActions, mapGetters, mapState } from 'vuex';
+import MetrcTag from '@/components/overlay-widget/shared/MetrcTag.vue';
+import RecursiveJsonTable from '@/components/search/shared/RecursiveJsonTable.vue';
+import { SearchActions } from '@/store/page-overlay/modules/search/consts';
 
 export default Vue.extend({
-  name: "TagSearchResultDetail",
+  name: 'TagSearchResultDetail',
   store,
   components: { MetrcTag, RecursiveJsonTable },
   // async created() {
@@ -117,11 +117,11 @@ export default Vue.extend({
       copyToClipboard(tag.Label);
 
       toastManager.openToast(`'${tag.Label}' copied to clipboard`, {
-        title: "Copied Tag",
+        title: 'Copied Tag',
         autoHideDelay: 5000,
-        variant: "primary",
+        variant: 'primary',
         appendToast: true,
-        toaster: "ttt-toaster",
+        toaster: 'ttt-toaster',
         solid: true,
       });
     },
@@ -129,17 +129,17 @@ export default Vue.extend({
       // @ts-ignore
       switch (tag.TagState as TagState) {
         case TagState.AVAILABLE:
-          return "success";
+          return 'success';
         case TagState.USED:
-          return "dark";
+          return 'dark';
         case TagState.VOIDED:
-          return "danger";
+          return 'danger';
         default:
           return null;
       }
     },
     displayTagState(tag: IIndexedTagData) {
-      return tag.TagState.replaceAll("_", " ");
+      return tag.TagState.replaceAll('_', ' ');
     },
   },
 });

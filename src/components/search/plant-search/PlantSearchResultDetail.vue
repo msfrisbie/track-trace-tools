@@ -39,26 +39,26 @@
 </template>
 
 <script lang="ts">
-import PlantIcon from "@/components/search/plant-search/PlantIcon.vue";
-import { MessageType, PlantState } from "@/consts";
-import { IIndexedPlantData, IPluginState } from "@/interfaces";
-import { analyticsManager } from "@/modules/analytics-manager.module";
-import { PLANTS_TAB_REGEX } from "@/modules/page-manager/consts";
-import { searchManager } from "@/modules/search-manager.module";
-import { toastManager } from "@/modules/toast-manager.module";
-import store from "@/store/page-overlay/index";
-import { PlantSearchActions } from "@/store/page-overlay/modules/plant-search/consts";
-import { copyToClipboard } from "@/utils/dom";
-import { Subject } from "rxjs";
-import { takeUntil } from "rxjs/operators";
-import Vue from "vue";
-import { mapActions, mapGetters, mapState } from "vuex";
-import MetrcTag from "@/components/overlay-widget/shared/MetrcTag.vue";
-import RecursiveJsonTable from "@/components/search/shared/RecursiveJsonTable.vue";
-import { SearchActions } from "@/store/page-overlay/modules/search/consts";
+import PlantIcon from '@/components/search/plant-search/PlantIcon.vue';
+import { MessageType, PlantState } from '@/consts';
+import { IIndexedPlantData, IPluginState } from '@/interfaces';
+import { analyticsManager } from '@/modules/analytics-manager.module';
+import { PLANTS_TAB_REGEX } from '@/modules/page-manager/consts';
+import { searchManager } from '@/modules/search-manager.module';
+import { toastManager } from '@/modules/toast-manager.module';
+import store from '@/store/page-overlay/index';
+import { PlantSearchActions } from '@/store/page-overlay/modules/plant-search/consts';
+import { copyToClipboard } from '@/utils/dom';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
+import Vue from 'vue';
+import { mapActions, mapGetters, mapState } from 'vuex';
+import MetrcTag from '@/components/overlay-widget/shared/MetrcTag.vue';
+import RecursiveJsonTable from '@/components/search/shared/RecursiveJsonTable.vue';
+import { SearchActions } from '@/store/page-overlay/modules/search/consts';
 
 export default Vue.extend({
-  name: "PlantSearchResultDetail",
+  name: 'PlantSearchResultDetail',
   store,
   components: { MetrcTag, RecursiveJsonTable },
   // async created() {
@@ -118,11 +118,11 @@ export default Vue.extend({
       copyToClipboard(plant.Label);
 
       toastManager.openToast(`'${plant.Label}' copied to clipboard`, {
-        title: "Copied Tag",
+        title: 'Copied Tag',
         autoHideDelay: 5000,
-        variant: "primary",
+        variant: 'primary',
         appendToast: true,
-        toaster: "ttt-toaster",
+        toaster: 'ttt-toaster',
         solid: true,
       });
     },
@@ -131,15 +131,15 @@ export default Vue.extend({
       switch (plant.PlantState as PlantState) {
         case PlantState.VEGETATIVE:
         case PlantState.FLOWERING:
-          return "success";
+          return 'success';
         case PlantState.INACTIVE:
-          return "dark";
+          return 'dark';
         default:
           return null;
       }
     },
     displayPlantState(plant: IIndexedPlantData) {
-      return plant.PlantState.replaceAll("_", " ");
+      return plant.PlantState.replaceAll('_', ' ');
     },
   },
 });

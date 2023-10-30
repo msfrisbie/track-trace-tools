@@ -1,7 +1,7 @@
 // const path = require('path');
 // const GoogleFontsPlugin = require("google-fonts-webpack-plugin");
 
-const UglifyJsPlugin = require("uglifyjs-webpack-plugin");
+const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 
 // https://webpack.js.org/configuration/
 module.exports = {
@@ -10,9 +10,9 @@ module.exports = {
     splitChunks: {
       cacheGroups: {
         vendor: {
-          chunks: "initial",
-          test: path.resolve(process.cwd(), "node_modules"),
-          name: "vendor",
+          chunks: 'initial',
+          test: path.resolve(process.cwd(), 'node_modules'),
+          name: 'vendor',
           enforce: true,
         },
       },
@@ -45,14 +45,14 @@ module.exports = {
   module: {
     plugins: [
       new MiniCssExtractPlugin({
-        filename: "[name].css",
-        chunkFilename: "[id].css",
+        filename: '[name].css',
+        chunkFilename: '[id].css',
       }),
     ],
     rules: [
       {
         test: /\.tsx?$/,
-        loader: "ts-loader",
+        loader: 'ts-loader',
         options: {
           appendTsSuffixTo: [/\.vue$/],
         },
@@ -60,11 +60,11 @@ module.exports = {
       },
       {
         test: /\.vue$/,
-        loader: "vue-loader",
+        loader: 'vue-loader',
       },
       {
         test: /\.css$/i,
-        use: [MiniCssExtractPlugin.loader, "css-loader", "postcss-loader"],
+        use: [MiniCssExtractPlugin.loader, 'css-loader', 'postcss-loader'],
       },
     ],
   },
@@ -74,7 +74,7 @@ module.exports = {
         test: /\.worker\.js$/i,
         use: [
           {
-            loader: "comlink-loader",
+            loader: 'comlink-loader',
             options: {
               singleton: true,
             },
@@ -86,7 +86,7 @@ module.exports = {
   },
   resolve: {
     alias: {
-      "%": path.resolve("test"),
+      '%': path.resolve('test'),
     },
   },
   // https://newbedev.com/how-do-i-add-a-google-font-to-a-vuejs-component

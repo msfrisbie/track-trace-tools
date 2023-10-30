@@ -1,24 +1,24 @@
-import { PackageState } from "@/consts";
-import { IIndexedPackageData, IMetrcEmployeeData, IPluginState } from "@/interfaces";
-import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
-import { LRU } from "@/utils/cache";
-import { getIsoDateFromOffset, isWeekend, normalizeIsodate } from "@/utils/date";
+import { PackageState } from '@/consts';
+import { IIndexedPackageData, IMetrcEmployeeData, IPluginState } from '@/interfaces';
+import { primaryDataLoader } from '@/modules/data-loader/data-loader.module';
+import { LRU } from '@/utils/cache';
+import { getIsoDateFromOffset, isWeekend, normalizeIsodate } from '@/utils/date';
 import {
   canEmployeeAcceptSample,
   getAllocatedSamplesFromPackageHistoryOrError,
   getEstimatedNumberOfSamplesRemaining,
   getSampleAllocationFromAllocationDataOrNull,
   toNormalizedAllocationQuantity,
-} from "@/utils/employee";
-import { v4 as uuidv4 } from "uuid";
-import { ActionContext } from "vuex";
+} from '@/utils/employee';
+import { v4 as uuidv4 } from 'uuid';
+import { ActionContext } from 'vuex';
 import {
   EmployeeSamplesActions,
   EmployeeSamplesGetters,
   EmployeeSamplesMutations,
   EmployeeSamplesState,
-} from "./consts";
-import { IEmployeeSamplesState, IHistoryAllocationData } from "./interfaces";
+} from './consts';
+import { IEmployeeSamplesState, IHistoryAllocationData } from './interfaces';
 
 const inMemoryState = {
   toolState: EmployeeSamplesState.INITIAL,
@@ -32,7 +32,7 @@ const inMemoryState = {
   pendingAllocationBuffer: [],
   pendingAllocationBufferIds: [],
   daysInRange: 0,
-  stateMessage: "",
+  stateMessage: '',
 };
 
 const persistedState = {};
@@ -51,7 +51,7 @@ export const employeeSamplesModule = {
         employees?: IMetrcEmployeeData[];
         availableSamplePackages?: IIndexedPackageData[];
         modifiedSamplePackages?: IIndexedPackageData[];
-      }
+      },
     ) {
       for (const [key, value] of Object.entries(payload)) {
         // @ts-ignore
@@ -64,7 +64,7 @@ export const employeeSamplesModule = {
       state: IEmployeeSamplesState,
       getters: any,
       rootState: any,
-      rootGetters: any
+      rootGetters: any,
     ) => {
       if (state.toolState === EmployeeSamplesState.ALLOCATION_INFLIGHT) {
         return false;
@@ -84,35 +84,25 @@ export const employeeSamplesModule = {
       state: IEmployeeSamplesState,
       getters: any,
       rootState: any,
-      rootGetters: any
-    ) => {
-      return state.employees.filter((x) => state.selectedEmployeeIds.includes(x.Id));
-    },
+      rootGetters: any,
+    ) => state.employees.filter((x) => state.selectedEmployeeIds.includes(x.Id)),
     [EmployeeSamplesGetters.SELECTED_SAMPLE_PACKAGES]: (
       state: IEmployeeSamplesState,
       getters: any,
       rootState: any,
-      rootGetters: any
-    ) => {
-      return state.availableSamplePackages.filter((x) =>
-        state.selectedSamplePackageIds.includes(x.Id)
-      );
-    },
+      rootGetters: any,
+    ) => state.availableSamplePackages.filter((x) => state.selectedSamplePackageIds.includes(x.Id)),
     [EmployeeSamplesGetters.SELECTED_SAMPLE_ALLOCATIONS]: (
       state: IEmployeeSamplesState,
       getters: any,
       rootState: any,
-      rootGetters: any
-    ) => {
-      return state.pendingAllocationBuffer.filter((x) =>
-        state.pendingAllocationBufferIds.includes(x.uuid)
-      );
-    },
+      rootGetters: any,
+    ) => state.pendingAllocationBuffer.filter((x) => state.pendingAllocationBufferIds.includes(x.uuid)),
     [EmployeeSamplesGetters.DATE_GROUPED_AVAILABLE_SAMPLE_PACKAGES]: (
       state: IEmployeeSamplesState,
       getters: any,
       rootState: any,
-      rootGetters: any
+      rootGetters: any,
     ) => {
       const dateGroups: Map<string, IIndexedPackageData[]> = new Map();
 
@@ -131,7 +121,7 @@ export const employeeSamplesModule = {
   actions: {
     [EmployeeSamplesActions.RESET]: async (
       ctx: ActionContext<IEmployeeSamplesState, IPluginState>,
-      data: any
+      data: any,
     ) => {
       ctx.state.toolState = EmployeeSamplesState.INITIAL;
 
@@ -156,7 +146,7 @@ export const employeeSamplesModule = {
         await Promise.allSettled(promises);
 
         // Only consider packages recieved from a separate facility
-        packages = packages.filter((pkg) => (pkg.ReceivedFromManifestNumber ?? "").length > 0);
+        packages = packages.filter((pkg) => (pkg.ReceivedFromManifestNumber ?? '').length > 0);
 
         ctx.state.employees = employees;
         ctx.state.selectedEmployeeIds = employees.map((x) => x.Id);
@@ -167,8 +157,7 @@ export const employeeSamplesModule = {
           // - nonzero quantity
           // - active
           .filter(
-            (pkg) =>
-              pkg.IsTradeSample && pkg.Quantity > 0 && pkg.PackageState === PackageState.ACTIVE
+            (pkg) => pkg.IsTradeSample && pkg.Quantity > 0 && pkg.PackageState === PackageState.ACTIVE,
           )
           // Sorted in received order
           .sort((a, b) => a.ReceivedDateTime!.localeCompare(b.ReceivedDateTime!));
@@ -186,18 +175,18 @@ export const employeeSamplesModule = {
           promises.push(
             primaryDataLoader.packageHistoryByPackageId(pkg.Id).then((history) => {
               pkg.history = history;
-            })
+            }),
           );
         });
 
         await Promise.allSettled(promises);
 
         if (ctx.state.employees.length === 0) {
-          throw new Error("Zero employees found");
+          throw new Error('Zero employees found');
         }
 
         if (ctx.state.availableSamplePackages.length === 0) {
-          throw new Error("Zero sample packages found");
+          throw new Error('Zero sample packages found');
         }
 
         ctx.state.toolState = EmployeeSamplesState.IDLE;
@@ -208,55 +197,49 @@ export const employeeSamplesModule = {
     },
     [EmployeeSamplesActions.TOGGLE_EMPLOYEE]: async (
       ctx: ActionContext<IEmployeeSamplesState, IPluginState>,
-      data: { employeeId: number; remove?: boolean; add?: boolean }
+      data: { employeeId: number; remove?: boolean; add?: boolean },
     ) => {
       if (ctx.state.selectedEmployeeIds.includes(data.employeeId)) {
         if (data.add !== true) {
           ctx.state.selectedEmployeeIds = ctx.state.selectedEmployeeIds.filter(
-            (x) => x !== data.employeeId
+            (x) => x !== data.employeeId,
           );
         }
-      } else {
-        if (data.remove !== true) {
-          ctx.state.selectedEmployeeIds.push(data.employeeId);
-        }
+      } else if (data.remove !== true) {
+        ctx.state.selectedEmployeeIds.push(data.employeeId);
       }
     },
     [EmployeeSamplesActions.TOGGLE_PACKAGE]: async (
       ctx: ActionContext<IEmployeeSamplesState, IPluginState>,
-      data: { packageId: number; remove?: boolean; add?: boolean }
+      data: { packageId: number; remove?: boolean; add?: boolean },
     ) => {
       if (ctx.state.selectedSamplePackageIds.includes(data.packageId)) {
         if (data.add !== true) {
           ctx.state.selectedSamplePackageIds = ctx.state.selectedSamplePackageIds.filter(
-            (x) => x !== data.packageId
+            (x) => x !== data.packageId,
           );
         }
-      } else {
-        if (data.remove !== true) {
-          ctx.state.selectedSamplePackageIds.push(data.packageId);
-        }
+      } else if (data.remove !== true) {
+        ctx.state.selectedSamplePackageIds.push(data.packageId);
       }
     },
     [EmployeeSamplesActions.TOGGLE_SAMPLE_ALLOCATION]: async (
       ctx: ActionContext<IEmployeeSamplesState, IPluginState>,
-      data: { uuid: string; remove?: boolean; add?: boolean }
+      data: { uuid: string; remove?: boolean; add?: boolean },
     ) => {
       if (ctx.state.pendingAllocationBufferIds.includes(data.uuid)) {
         if (data.add !== true) {
           ctx.state.pendingAllocationBufferIds = ctx.state.pendingAllocationBufferIds.filter(
-            (x) => x !== data.uuid
+            (x) => x !== data.uuid,
           );
         }
-      } else {
-        if (data.remove !== true) {
-          ctx.state.pendingAllocationBufferIds.push(data.uuid);
-        }
+      } else if (data.remove !== true) {
+        ctx.state.pendingAllocationBufferIds.push(data.uuid);
       }
     },
     [EmployeeSamplesActions.ALLOCATE_SAMPLES]: async (
       ctx: ActionContext<IEmployeeSamplesState, IPluginState>,
-      data: any
+      data: any,
     ) => {
       try {
         ctx.state.toolState = EmployeeSamplesState.ALLOCATION_INFLIGHT;
@@ -264,7 +247,7 @@ export const employeeSamplesModule = {
         await new Promise((resolve) => setTimeout(resolve, 300));
 
         if (!ctx.state.modifiedSamplePackages.length) {
-          console.error("Zero allocations");
+          console.error('Zero allocations');
         }
 
         ctx.state.availableSamples = [];
@@ -287,13 +270,13 @@ export const employeeSamplesModule = {
         ctx.state.recordedAllocationBuffer = [];
 
         const employeeLRU = new LRU<IMetrcEmployeeData>(
-          ctx.getters[EmployeeSamplesGetters.SELECTED_EMPLOYEES]
+          ctx.getters[EmployeeSamplesGetters.SELECTED_EMPLOYEES],
         );
 
         const allocationDataList: IHistoryAllocationData[] = [];
 
         if (ctx.state.modifiedSamplePackages.length === 0) {
-          console.log("Zero modified packages");
+          console.log('Zero modified packages');
         }
 
         // Parse package history to determine previous allocations
@@ -307,13 +290,12 @@ export const employeeSamplesModule = {
 
         for (const allocationData of allocationDataList) {
           const employee = employeeLRU.elements.find(
-            (x) =>
-              parseInt(x.License.Number, 10) === parseInt(allocationData.employeeLicenseNumber, 10)
+            (x) => parseInt(x.License.Number, 10) === parseInt(allocationData.employeeLicenseNumber, 10),
           );
 
           if (!employee) {
             console.warn(
-              `No match for employee with license # ${allocationData.employeeLicenseNumber} (${allocationData.employeeName}) (${allocationData.packageLabel})`
+              `No match for employee with license # ${allocationData.employeeLicenseNumber} (${allocationData.employeeName}) (${allocationData.packageLabel})`,
             );
             continue;
           }
@@ -323,11 +305,11 @@ export const employeeSamplesModule = {
           const allocation = await getSampleAllocationFromAllocationDataOrNull(
             employeeLRU.elements,
             ctx.state.modifiedSamplePackages,
-            allocationData
+            allocationData,
           );
 
           if (!allocation) {
-            console.error(`Unable to generate allocation`);
+            console.error('Unable to generate allocation');
             continue;
           }
 
@@ -340,7 +322,7 @@ export const employeeSamplesModule = {
         let remainingSamples = [...ctx.state.availableSamples];
 
         for (let daysAgo = ctx.state.daysInRange; daysAgo >= 0; daysAgo--) {
-          let skippedSamples = [];
+          const skippedSamples = [];
 
           const distributionDate = normalizeIsodate(getIsoDateFromOffset(-1 * daysAgo));
 
@@ -360,7 +342,7 @@ export const employeeSamplesModule = {
                   currentSample,
                   distributionDate,
                   ctx.state.recordedAllocationBuffer,
-                  ctx.state.pendingAllocationBuffer
+                  ctx.state.pendingAllocationBuffer,
                 )
               ) {
                 // Record allocation
@@ -401,9 +383,7 @@ export const employeeSamplesModule = {
   },
 };
 
-export const employeeSamplesReducer = (state: IEmployeeSamplesState): IEmployeeSamplesState => {
-  return {
-    ...state,
-    ...inMemoryState,
-  };
-};
+export const employeeSamplesReducer = (state: IEmployeeSamplesState): IEmployeeSamplesState => ({
+  ...state,
+  ...inMemoryState,
+});

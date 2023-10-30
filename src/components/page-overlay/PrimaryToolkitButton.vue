@@ -5,16 +5,16 @@
 </template>
 
 <script lang="ts">
-import TrackTraceToolsLogo from "@/components/shared/TrackTraceToolsLogo.vue";
-import { authManager } from "@/modules/auth-manager.module";
-import { pageManager } from "@/modules/page-manager/page-manager.module";
-import { MutationType } from "@/mutation-types";
-import store from "@/store/page-overlay/index";
-import Vue from "vue";
-import { mapState } from "vuex";
+import TrackTraceToolsLogo from '@/components/shared/TrackTraceToolsLogo.vue';
+import { authManager } from '@/modules/auth-manager.module';
+import { pageManager } from '@/modules/page-manager/page-manager.module';
+import { MutationType } from '@/mutation-types';
+import store from '@/store/page-overlay/index';
+import Vue from 'vue';
+import { mapState } from 'vuex';
 
 export default Vue.extend({
-  name: "PrimaryToolkitButton",
+  name: 'PrimaryToolkitButton',
   store,
   components: {
     TrackTraceToolsLogo,
@@ -28,7 +28,7 @@ export default Vue.extend({
     this.$data.authState = await authManager.authStateOrNull();
   },
   computed: {
-    ...mapState(["trackedInteractions", "settings", "metrcStatusData"]),
+    ...mapState(['trackedInteractions', 'settings', 'metrcStatusData']),
   },
   methods: {
     toggleOverlay(event: any) {

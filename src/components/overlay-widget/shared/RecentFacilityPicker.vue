@@ -19,17 +19,17 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import { mapState } from "vuex";
-import router from "@/router/index";
-import store from "@/store/page-overlay/index";
-import { IMetrcFacilityData } from "@/interfaces";
-import { facilitySummary } from "@/utils/facility";
-import { analyticsManager } from "@/modules/analytics-manager.module";
-import { BuilderType, MessageType } from "@/consts";
+import Vue from 'vue';
+import { mapState } from 'vuex';
+import router from '@/router/index';
+import store from '@/store/page-overlay/index';
+import { IMetrcFacilityData } from '@/interfaces';
+import { facilitySummary } from '@/utils/facility';
+import { analyticsManager } from '@/modules/analytics-manager.module';
+import { BuilderType, MessageType } from '@/consts';
 
 export default Vue.extend({
-  name: "RecentFacilityPicker",
+  name: 'RecentFacilityPicker',
   store,
   router,
   props: {
@@ -44,11 +44,11 @@ export default Vue.extend({
   },
   methods: {
     selectFacility(facility: IMetrcFacilityData | null) {
-      this.$emit("selectFacility", facility);
+      this.$emit('selectFacility', facility);
 
       analyticsManager.track(MessageType.BUILDER_ENGAGEMENT, {
         builderType: BuilderType.CREATE_TRANSFER,
-        action: `Selected a recent facility`,
+        action: 'Selected a recent facility',
         facility,
       });
     },

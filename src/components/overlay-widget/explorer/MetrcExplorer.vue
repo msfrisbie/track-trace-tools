@@ -152,28 +152,28 @@
 </template>
 
 <script lang="ts">
-import { HistoryTreeNodeType } from "@/consts";
-import { IPluginState } from "@/interfaces";
-import router from "@/router/index";
-import store from "@/store/page-overlay/index";
+import { HistoryTreeNodeType } from '@/consts';
+import { IPluginState } from '@/interfaces';
+import router from '@/router/index';
+import store from '@/store/page-overlay/index';
 import {
   ExplorerActions,
   ExplorerStatus,
   ExplorerTargetType,
-} from "@/store/page-overlay/modules/explorer/consts";
-import { ExplorerTarget } from "@/store/page-overlay/modules/explorer/interfaces";
-import Vue from "vue";
-import { mapActions, mapState } from "vuex";
-import OutgoingTransferCard from "./OutgoingTransferCard.vue";
-import PackageCard from "./PackageCard.vue";
-import PlantBatchCard from "./PlantBatchCard.vue";
-import PlantCard from "./PlantCard.vue";
-import HarvestCard from "./HarvestCard.vue";
-import RecentExplorerQueries from "./RecentExplorerQueries.vue";
-import SmartHistory from "./SmartHistory.vue";
+} from '@/store/page-overlay/modules/explorer/consts';
+import { ExplorerTarget } from '@/store/page-overlay/modules/explorer/interfaces';
+import Vue from 'vue';
+import { mapActions, mapState } from 'vuex';
+import OutgoingTransferCard from './OutgoingTransferCard.vue';
+import PackageCard from './PackageCard.vue';
+import PlantBatchCard from './PlantBatchCard.vue';
+import PlantCard from './PlantCard.vue';
+import HarvestCard from './HarvestCard.vue';
+import RecentExplorerQueries from './RecentExplorerQueries.vue';
+import SmartHistory from './SmartHistory.vue';
 
 export default Vue.extend({
-  name: "MetrcExplorer",
+  name: 'MetrcExplorer',
   store,
   router,
   props: {},
@@ -197,7 +197,7 @@ export default Vue.extend({
       },
       set(queryString: string) {
         store.dispatch(`explorer/${ExplorerActions.SET_QUERY}`, {
-          queryString: queryString.trim() || "",
+          queryString: queryString.trim() || '',
         });
       },
     },
@@ -214,19 +214,19 @@ export default Vue.extend({
     queryStringPlaceholder(): string {
       switch (this.targetType) {
         case ExplorerTargetType.PACKAGE:
-          return "Package tag (1A4400005000000000001234)";
+          return 'Package tag (1A4400005000000000001234)';
         // case ExplorerTargetType.INCOMING_TRANSFER:
         case ExplorerTargetType.OUTGOING_TRANSFER:
-          return "Manifest # (0000012345)";
+          return 'Manifest # (0000012345)';
         case ExplorerTargetType.PLANT:
-          return "Plant tag (1A4400005000000000001234)";
+          return 'Plant tag (1A4400005000000000001234)';
         case ExplorerTargetType.PLANT_BATCH:
-          return "Plant batch name/tag";
+          return 'Plant batch name/tag';
         case ExplorerTargetType.HARVEST:
-          return "Harvest name";
+          return 'Harvest name';
         default:
-          console.error("Bad target type for placeholder");
-          return "";
+          console.error('Bad target type for placeholder');
+          return '';
       }
     },
   },
@@ -239,19 +239,19 @@ export default Vue.extend({
       targetTypeOptions: [
         {
           value: ExplorerTargetType.PACKAGE,
-          readableText: "Package",
+          readableText: 'Package',
         },
         {
           value: ExplorerTargetType.PLANT,
-          readableText: "Plant",
+          readableText: 'Plant',
         },
         {
           value: ExplorerTargetType.PLANT_BATCH,
-          readableText: "Plant Batch",
+          readableText: 'Plant Batch',
         },
         {
           value: ExplorerTargetType.HARVEST,
-          readableText: "Harvest",
+          readableText: 'Harvest',
         },
         // {
         //   value: ExplorerTargetType.INCOMING_TRANSFER,
@@ -259,7 +259,7 @@ export default Vue.extend({
         // },
         {
           value: ExplorerTargetType.OUTGOING_TRANSFER,
-          readableText: "Outgoing Transfer",
+          readableText: 'Outgoing Transfer',
         },
       ],
     };

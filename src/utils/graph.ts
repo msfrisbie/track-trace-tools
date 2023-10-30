@@ -1,11 +1,13 @@
-import { IIndexedPackageData } from "@/interfaces";
-import { IGraphComponentContext, IGraphState } from "@/store/page-overlay/modules/graph/interfaces";
-import { Settings } from "sigma/settings";
-import { EdgeDisplayData, NodeDisplayData, PartialButFor, PlainObject } from "sigma/types";
-import { getNormalizedPackageContentsDescription } from "./package";
+import { IIndexedPackageData } from '@/interfaces';
+import { IGraphComponentContext, IGraphState } from '@/store/page-overlay/modules/graph/interfaces';
+import { Settings } from 'sigma/settings';
+import {
+  EdgeDisplayData, NodeDisplayData, PartialButFor, PlainObject,
+} from 'sigma/types';
+import { getNormalizedPackageContentsDescription } from './package';
 
-const PRIMARY_TEXT_COLOR = "#222222";
-const SECONDARY_TEXT_COLOR = "#555555";
+const PRIMARY_TEXT_COLOR = '#222222';
+const SECONDARY_TEXT_COLOR = '#555555';
 
 export function drawRoundRect(
   ctx: CanvasRenderingContext2D,
@@ -13,7 +15,7 @@ export function drawRoundRect(
   y: number,
   width: number,
   height: number,
-  radius: number
+  radius: number,
 ): void {
   ctx.beginPath();
   ctx.moveTo(x + radius, y);
@@ -31,16 +33,16 @@ export function drawRoundRect(
 export function hoverRenderer(
   context: CanvasRenderingContext2D,
   data: PlainObject,
-  settings: PlainObject
+  settings: PlainObject,
 ) {
-  const pkg: IIndexedPackageData | undefined = data.obj.pkg;
+  const { pkg } = data.obj;
 
   const size = settings.labelSize;
   const font = settings.labelFont;
   const weight = settings.labelWeight;
   const upperLabelSize = size - 2;
 
-  const label = data.label;
+  const { label } = data;
   const lowerLabel = pkg
     ? getNormalizedPackageContentsDescription(pkg)
     : null;
@@ -51,11 +53,11 @@ export function hoverRenderer(
 
   // Then we draw the label background
   context.beginPath();
-  context.fillStyle = "#fff";
+  context.fillStyle = '#fff';
   context.shadowOffsetX = 0;
   context.shadowOffsetY = 2;
   context.shadowBlur = 8;
-  context.shadowColor = "#000";
+  context.shadowColor = '#000';
 
   context.font = `${weight} ${size}px ${font}`;
   const labelWidth = context.measureText(label).width;
@@ -101,24 +103,24 @@ export function hoverRenderer(
 
 export function labelRenderer(
   context: CanvasRenderingContext2D,
-  data: PartialButFor<NodeDisplayData, "x" | "y" | "size" | "label" | "color">,
-  settings: Settings
+  data: PartialButFor<NodeDisplayData, 'x' | 'y' | 'size' | 'label' | 'color'>,
+  settings: Settings,
 ) {
   if (!data.label) {
     return;
   }
 
-  const size = settings.labelSize,
-    font = settings.labelFont,
-    weight = settings.labelWeight;
+  const size = settings.labelSize;
+  const font = settings.labelFont;
+  const weight = settings.labelWeight;
 
   context.font = `${weight} ${size}px ${font}`;
   const width = context.measureText(data.label).width + 8;
 
-  context.fillStyle = "#ffffffcc";
+  context.fillStyle = '#ffffffcc';
   context.fillRect(data.x + data.size, data.y + size / 3 - 15, width, 20);
 
-  context.fillStyle = "#000";
+  context.fillStyle = '#000';
   context.fillText(data.label, data.x + data.size + 3, data.y + size / 3);
 }
 
@@ -159,9 +161,9 @@ export function nodeReducer({
   }
 
   if (
-    graphState.selectedNodeId &&
+    graphState.selectedNodeId
     // @ts-ignore
-    graphComponentContext.graph.neighbors(graphState.selectedNodeId).includes(node)
+    && graphComponentContext.graph.neighbors(graphState.selectedNodeId).includes(node)
   ) {
     return res;
   }
@@ -170,8 +172,8 @@ export function nodeReducer({
     return res;
   }
 
-  res.label = "";
-  res.color = "#f6f6f6";
+  res.label = '';
+  res.color = '#f6f6f6';
   return res;
 }
 
@@ -201,16 +203,16 @@ export function edgeReducer({
   }
 
   if (
-    graphState.hoveredNodeId &&
+    graphState.hoveredNodeId
     // @ts-ignore
-    graphComponentContext.graph.hasExtremity(edge, graphState.hoveredNodeId)
+    && graphComponentContext.graph.hasExtremity(edge, graphState.hoveredNodeId)
   ) {
     return res;
   }
   if (
-    graphState.selectedNodeId &&
+    graphState.selectedNodeId
     // @ts-ignore
-    graphComponentContext.graph.hasExtremity(edge, graphState.selectedNodeId)
+    && graphComponentContext.graph.hasExtremity(edge, graphState.selectedNodeId)
   ) {
     return res;
   }
@@ -218,7 +220,7 @@ export function edgeReducer({
   if (
     graphState.suggestions.includes(
       // @ts-ignore
-      graphComponentContext.graph.target(edge)
+      graphComponentContext.graph.target(edge),
     )
   ) {
     return res;
@@ -227,7 +229,7 @@ export function edgeReducer({
   if (
     graphState.suggestions.includes(
       // @ts-ignore
-      graphComponentContext.graph.source(edge)
+      graphComponentContext.graph.source(edge),
     )
   ) {
     return res;

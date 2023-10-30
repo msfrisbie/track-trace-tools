@@ -57,13 +57,13 @@
 </template>
 
 <script lang="ts">
-import store from "@/store/page-overlay/index";
-import { QUICK_SCRIPTS, runQuickScript } from "@/utils/quick-scripts";
-import Vue from "vue";
-import { mapState } from "vuex";
+import store from '@/store/page-overlay/index';
+import { QUICK_SCRIPTS, runQuickScript } from '@/utils/quick-scripts';
+import Vue from 'vue';
+import { mapState } from 'vuex';
 
 export default Vue.extend({
-  name: "QuickScripts",
+  name: 'QuickScripts',
   store,
   data() {
     return {
@@ -72,7 +72,7 @@ export default Vue.extend({
   },
   mounted() {},
   computed: {
-    ...mapState(["backgroundTasks"]),
+    ...mapState(['backgroundTasks']),
   },
   destroyed() {},
   methods: {

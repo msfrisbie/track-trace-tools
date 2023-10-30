@@ -1,7 +1,7 @@
-import { IAtomicService } from "@/interfaces";
-import { customAxios } from "@/modules/fetch-manager.module";
-import * as Sentry from "@sentry/browser";
-import { timer } from "rxjs";
+import { IAtomicService } from '@/interfaces';
+import { customAxios } from '@/modules/fetch-manager.module';
+import * as Sentry from '@sentry/browser';
+import { timer } from 'rxjs';
 
 /**
  * This module was used to re-run the JavaScript needed for quick package/transfer/tpl
@@ -27,49 +27,51 @@ function localModalForm(
   $grid,
   success,
   openHandler,
-  requestType
+  requestType,
 ) {
   // @ts-ignore
-  let metrc = window.metrc as any;
+  const metrc = window.metrc as any;
 
-  if (metrc.kendo.modalWindowOpened) return null;
+  if (metrc.kendo.modalWindowOpened) {
+    return null;
+  }
   metrc.kendo.modalWindowOpened = true;
 
-  title = title || "";
+  title = title || '';
   // formUrl = formUrl || '';
   formQuery = formQuery || {};
-  formSelector = formSelector || "form";
-  submitUrl = submitUrl || "";
+  formSelector = formSelector || 'form';
+  submitUrl = submitUrl || '';
   success = success || function () {};
-  requestType = requestType || "GET";
+  requestType = requestType || 'GET';
 
-  let usingSpinner = metrc.startSpinner(),
-    $element = metrc.$(document.createElement("div")),
-    destroyModalWindow = function () {
-      setTimeout(function () {
-        $element.data("kendoWindow").destroy();
-      }, 1000);
-      delete metrc.kendo.modalWindowOpened;
-    };
+  const usingSpinner = metrc.startSpinner();
+  const $element = metrc.$(document.createElement('div'));
+  const destroyModalWindow = function () {
+    setTimeout(() => {
+      $element.data('kendoWindow').destroy();
+    }, 1000);
+    delete metrc.kendo.modalWindowOpened;
+  };
 
   $element.kendoWindow({
     // config
-    actions: ["Close"],
+    actions: ['Close'],
     draggable: true,
     modal: true,
     resizable: false,
-    title: title,
+    title,
     // events
     open: openHandler,
-    activate: function () {
+    activate() {
       if (usingSpinner) {
         metrc.stopSpinner();
       }
 
       metrc
         .$(formSelector)
-        .find("input[type=text]:not([readonly]),select,textarea:not([readonly])")
-        .filter(":visible:enabled:first")
+        .find('input[type=text]:not([readonly]),select,textarea:not([readonly])')
+        .filter(':visible:enabled:first')
         .focus(); // Set focus to first enabled and visible input in form
     },
     close: destroyModalWindow,
@@ -83,26 +85,26 @@ function localModalForm(
     },
   });
 
-  let kWindow = $element.data("kendoWindow");
+  const kWindow = $element.data('kendoWindow');
 
   $element.html(formContent);
 
   $element.find(formSelector).metrcActivateAjaxForm({
     url: submitUrl,
-    type: "POST",
+    type: 'POST',
     success(e: any) {
       kWindow.close();
       if ($grid instanceof Array) {
         for (let i = 0, icnt = $grid.length; i < icnt; i++) {
-          $grid[i].data("kendoGrid").dataSource.read();
+          $grid[i].data('kendoGrid').dataSource.read();
         }
       } else if ($grid) {
-        $grid.data("kendoGrid").dataSource.read();
+        $grid.data('kendoGrid').dataSource.read();
       }
       success(e);
     },
   });
-  $element.find("#cancel").click(() => kWindow.close());
+  $element.find('#cancel').click(() => kWindow.close());
 
   kWindow.center();
   kWindow.open();
@@ -112,13 +114,15 @@ function localModalForm(
 
 class ScriptContextManager implements IAtomicService {
   private _metrcPromise: Promise<Metrc | null>;
+
   private _metrcResolver: any;
+
   private _metrcRejecter: any;
 
   constructor() {
     this._metrcPromise = new Promise((resolve, reject) => {
       // If script context cant be acquired in 30s, timeout
-      const id = setTimeout(() => reject("Script context timed out"), 30000);
+      const id = setTimeout(() => reject('Script context timed out'), 30000);
 
       this._metrcResolver = (metrc: any) => {
         clearTimeout(id);
@@ -132,7 +136,7 @@ class ScriptContextManager implements IAtomicService {
     });
 
     this._metrcPromise.catch((e) => {
-      console.error("Failed to send message to background:", e);
+      console.error('Failed to send message to background:', e);
 
       Sentry.captureException(e);
     });
@@ -144,7 +148,7 @@ class ScriptContextManager implements IAtomicService {
     await timer(2000).toPromise();
 
     const staticAssetPaths = [];
-    const scriptTags = document.querySelectorAll("script");
+    const scriptTags = document.querySelectorAll('script');
     let authTag = null;
 
     // Override AJAX nonce
@@ -154,16 +158,16 @@ class ScriptContextManager implements IAtomicService {
     // };
 
     for (let i = 0; i < scriptTags.length; ++i) {
-      let scriptTag = scriptTags[i];
-      let srcAttr = scriptTag.getAttribute("src");
+      const scriptTag = scriptTags[i];
+      const srcAttr = scriptTag.getAttribute('src');
 
       if (!srcAttr) {
-        let inlineScriptText = scriptTag.innerText;
+        const inlineScriptText = scriptTag.innerText;
 
-        if (inlineScriptText.indexOf("ApiVerificationToken") > -1) {
+        if (inlineScriptText.indexOf('ApiVerificationToken') > -1) {
           authTag = scriptTag;
         }
-      } else if (srcAttr && srcAttr.startsWith("/Public")) {
+      } else if (srcAttr && srcAttr.startsWith('/Public')) {
         staticAssetPaths.push(srcAttr);
       }
     }
@@ -171,20 +175,20 @@ class ScriptContextManager implements IAtomicService {
     // This fixes the setTimeout context on firefox
     window.setTimeout = window.setTimeout.bind(window);
 
-    for (let path of staticAssetPaths) {
+    for (const path of staticAssetPaths) {
       let response;
       try {
         response = await customAxios(window.location.origin + path, {});
       } catch (e) {
-        console.error("Static asset fetch error:", e);
+        console.error('Static asset fetch error:', e);
         throw e;
       }
 
       try {
         // Angular throws some bullshit error, its Metrc's fault
-        eval(await response.data);
+        // eval(await response.data);
       } catch (e) {
-        console.error("Static asset eval error:", e);
+        console.error('Static asset eval error:', e);
       }
     }
 
@@ -192,29 +196,29 @@ class ScriptContextManager implements IAtomicService {
     if (authTag) {
       try {
         // This loads the authentication data into the local metrc JS objects
-        eval(authTag.innerText);
+        // eval(authTag.innerText);
       } catch (e) {
-        console.error("authTag eval error:", e);
+        console.error('authTag eval error:', e);
         throw e;
       }
     }
 
     // This might not be present in places such as the landing page
     // @ts-ignore
-    if (!!window.metrc?.kendo) {
+    if (window.metrc?.kendo) {
       // @ts-ignore
       window.metrc.kendo.localModalForm = localModalForm;
 
       // @ts-ignore
       this._metrcResolver(window.metrc);
     } else {
-      this._metrcRejecter("No metrc kendo present");
+      this._metrcRejecter('No metrc kendo present');
     }
   }
 
   async metrc(): Promise<Metrc | null> {
-    return await this._metrcPromise;
+    return this._metrcPromise;
   }
 }
 
-export let scriptContextManager = new ScriptContextManager();
+export const scriptContextManager = new ScriptContextManager();

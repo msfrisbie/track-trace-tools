@@ -73,19 +73,19 @@
 
 <script lang="ts">
 // import PlantManifestCartBuilder from "@/components/search/plant-search/PlantManifestCartBuilder.vue";
-import PlantHistoryList from "@/components/search/plant-search/PlantHistoryList.vue";
-import PlantResultGroups from "@/components/search/plant-search/PlantResultGroups.vue";
-import PlantSearchResultDetail from "@/components/search/plant-search/PlantSearchResultDetail.vue";
-import { IIndexedPlantData, IPlantData, IPluginState } from "@/interfaces";
-import store from "@/store/page-overlay/index";
-import { PlantSearchActions } from "@/store/page-overlay/modules/plant-search/consts";
-import Vue from "vue";
-import { mapActions, mapGetters, mapState } from "vuex";
-import HistoryList from "@/components/search/shared/HistoryList.vue";
-import SearchViewSelector from "@/components/search/shared/SearchViewSelector.vue";
+import PlantHistoryList from '@/components/search/plant-search/PlantHistoryList.vue';
+import PlantResultGroups from '@/components/search/plant-search/PlantResultGroups.vue';
+import PlantSearchResultDetail from '@/components/search/plant-search/PlantSearchResultDetail.vue';
+import { IIndexedPlantData, IPlantData, IPluginState } from '@/interfaces';
+import store from '@/store/page-overlay/index';
+import { PlantSearchActions } from '@/store/page-overlay/modules/plant-search/consts';
+import Vue from 'vue';
+import { mapActions, mapGetters, mapState } from 'vuex';
+import HistoryList from '@/components/search/shared/HistoryList.vue';
+import SearchViewSelector from '@/components/search/shared/SearchViewSelector.vue';
 
 export default Vue.extend({
-  name: "PlantSearchResults",
+  name: 'PlantSearchResults',
   store,
   components: {
     PlantSearchResultDetail,
@@ -130,25 +130,24 @@ export default Vue.extend({
     }),
     ...mapGetters({}),
     filteredPlants() {
-      return this.plants.filter((x: IPlantData) => {
-        // if (!!this.plantSearchFilters.strainName) {
-        //   if (!!x.StrainName && !x.StrainName.includes(this.plantSearchFilters.strainName)) {
-        //     return false;
-        //   }
-        // }
-        // if (!!this.plantSearchFilters.locationName) {
-        //   if (!!x.LocationName && !x.LocationName.includes(this.plantSearchFilters.locationName)) {
-        //     return false;
-        //   }
-        // }
+      return this.plants.filter((x: IPlantData) =>
+      // if (!!this.plantSearchFilters.strainName) {
+      //   if (!!x.StrainName && !x.StrainName.includes(this.plantSearchFilters.strainName)) {
+      //     return false;
+      //   }
+      // }
+      // if (!!this.plantSearchFilters.locationName) {
+      //   if (!!x.LocationName && !x.LocationName.includes(this.plantSearchFilters.locationName)) {
+      //     return false;
+      //   }
+      // }
 
-        return true;
-      });
+        true);
     },
     filtersApplied() {
       return (
-        Object.values(store.state.plantSearch.plantSearchFilters || {}).filter((x) => !!x).length >
-        0
+        Object.values(store.state.plantSearch.plantSearchFilters || {}).filter((x) => !!x).length
+        > 0
       );
     },
   },

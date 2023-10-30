@@ -1,6 +1,5 @@
-
-import { IAtomicService } from "@/interfaces";
-import store from "@/store/page-overlay";
+import { IAtomicService } from '@/interfaces';
+import store from '@/store/page-overlay';
 import { Observable, Subject } from 'rxjs';
 
 export interface ToastPayload {
@@ -15,16 +14,16 @@ export class ToastManager implements IAtomicService {
     }
 
     toast$(): Observable<ToastPayload> {
-        return this._toast.asObservable();
+      return this._toast.asObservable();
     }
 
     openToast(text: string, options: any) {
-        if (store.state.settings?.disablePopups) {
-            return;
-        }
-        
-        this._toast.next({ text, options });
+      if (store.state.settings?.disablePopups) {
+        return;
+      }
+
+      this._toast.next({ text, options });
     }
 }
 
-export let toastManager = new ToastManager();
+export const toastManager = new ToastManager();

@@ -1,12 +1,14 @@
-import { MessageType } from "@/consts";
-import { IAuthState, IPluginState } from "@/interfaces";
-import { messageBus } from "@/modules/message-bus.module";
-import { debugLogFactory } from "@/utils/debug";
-import { ActionContext } from "vuex";
-import { OAuthState, PluginAuthActions, PluginAuthGetters, PluginAuthMutations } from "./consts";
-import { IPluginAuthState } from "./interfaces";
+import { MessageType } from '@/consts';
+import { IAuthState, IPluginState } from '@/interfaces';
+import { messageBus } from '@/modules/message-bus.module';
+import { debugLogFactory } from '@/utils/debug';
+import { ActionContext } from 'vuex';
+import {
+  OAuthState, PluginAuthActions, PluginAuthGetters, PluginAuthMutations,
+} from './consts';
+import { IPluginAuthState } from './interfaces';
 
-const debugLog = debugLogFactory("plugin-auth/index.ts");
+const debugLog = debugLogFactory('plugin-auth/index.ts');
 
 const inMemoryState = {
   authState: null,
@@ -31,37 +33,37 @@ export const pluginAuthModule = {
   mutations: {
     [PluginAuthMutations.SET_AUTH](
       state: IPluginAuthState,
-      { authState }: { authState: IAuthState | null }
+      { authState }: { authState: IAuthState | null },
     ) {
       state.authState = authState;
     },
     [PluginAuthMutations.SET_OAUTH_STATE](
       state: IPluginAuthState,
-      { oAuthState }: { oAuthState: OAuthState }
+      { oAuthState }: { oAuthState: OAuthState },
     ) {
       state.oAuthState = oAuthState;
     },
     [PluginAuthMutations.SET_LOGIN_DATA](
       state: IPluginAuthState,
-      { authState, token }: { authState: IAuthState; token: string }
+      { authState, token }: { authState: IAuthState; token: string },
     ) {
       const tokenParts = token.split(/\./);
       const tokenDecoded = JSON.parse(window.atob(tokenParts[1]));
       const tokenExpires = tokenDecoded.exp * 1000;
-      const email = tokenDecoded.email;
+      const { email } = tokenDecoded;
 
       if (!email) {
-        throw new Error("Could not decode email");
+        throw new Error('Could not decode email');
       }
 
       if (!tokenExpires) {
-        throw new Error("Could not decode tokenExpires");
+        throw new Error('Could not decode tokenExpires');
       }
 
       const identity = authState?.identity;
 
       if (!identity) {
-        throw new Error("Could not get identity");
+        throw new Error('Could not get identity');
       }
 
       state.identity = identity;
@@ -77,14 +79,14 @@ export const pluginAuthModule = {
     },
     [PluginAuthMutations.SET_CURRENT_USER_DATA](
       state: IPluginAuthState,
-      { currentUser }: { currentUser: any }
+      { currentUser }: { currentUser: any },
     ) {
       if (!currentUser) {
-        debugLog(async () => ["unable to set current user"]);
-        throw new Error("Unable to set current user");
+        debugLog(async () => ['unable to set current user']);
+        throw new Error('Unable to set current user');
       }
 
-      debugLog(async () => ["successfully set current user"]);
+      debugLog(async () => ['successfully set current user']);
 
       state.currentUser = currentUser;
     },
@@ -97,9 +99,9 @@ export const pluginAuthModule = {
       state: IPluginAuthState,
       getters: any,
       rootState: any,
-      rootGetters: any
+      rootGetters: any,
     ) => {
-      if (rootState.pluginAuth.authState.identity != state.identity) {
+      if (rootState.pluginAuth.authState.identity !== state.identity) {
         // Stored credentials must match current identity
         return false;
       }
@@ -123,31 +125,25 @@ export const pluginAuthModule = {
       state: IPluginAuthState,
       getters: any,
       rootState: any,
-      rootGetters: any
-    ) => {
-      return state.authState || null;
-    },
+      rootGetters: any,
+    ) => state.authState || null,
     [PluginAuthGetters.PACKAGES_URL]: (
       state: IPluginAuthState,
       getters: any,
       rootState: any,
-      rootGetters: any
-    ) => {
-      return state.authState?.license
-      ? `/industry/${state.authState?.license}/packages`
-      : null;
-    },
+      rootGetters: any,
+    ) => (state.authState?.license ? `/industry/${state.authState?.license}/packages` : null),
   },
   actions: {
     [PluginAuthActions.SET_AUTH](
       ctx: ActionContext<IPluginAuthState, IPluginState>,
-      { authState }: { authState: IAuthState | null }
+      { authState }: { authState: IAuthState | null },
     ) {
       ctx.commit(PluginAuthMutations.SET_AUTH, { authState });
     },
     async [PluginAuthActions.REFRESH_OAUTH_STATE](
       ctx: ActionContext<IPluginAuthState, IPluginState>,
-      { }: { }
+      {}: {},
     ) {
       const response: {
         data: {
@@ -159,15 +155,15 @@ export const pluginAuthModule = {
       if (response.data.success && response.data.isAuthenticated) {
         ctx.commit(PluginAuthMutations.SET_OAUTH_STATE, { oAuthState: OAuthState.AUTHENTICATED });
       } else {
-        ctx.commit(PluginAuthMutations.SET_OAUTH_STATE, { oAuthState: OAuthState.NOT_AUTHENTICATED });
+        ctx.commit(PluginAuthMutations.SET_OAUTH_STATE, {
+          oAuthState: OAuthState.NOT_AUTHENTICATED,
+        });
       }
     },
   },
 };
 
-export const pluginAuthReducer = (state: IPluginAuthState): IPluginAuthState => {
-  return {
-    ...state,
-    ...inMemoryState,
-  };
-};
+export const pluginAuthReducer = (state: IPluginAuthState): IPluginAuthState => ({
+  ...state,
+  ...inMemoryState,
+});

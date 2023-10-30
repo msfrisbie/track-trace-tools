@@ -335,39 +335,39 @@
 </template>
 
 <script lang="ts">
-import { MessageType, ModalAction, ModalType, PackageState, TransferState } from "@/consts";
+import {
+  MessageType, ModalAction, ModalType, PackageState, TransferState,
+} from '@/consts';
 import {
   IIndexedPackageData,
   IIndexedTransferData,
   IPackageSearchFilters,
   IPluginState,
-} from "@/interfaces";
-import { analyticsManager } from "@/modules/analytics-manager.module";
-import { clientBuildManager } from "@/modules/client-build-manager.module";
-import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
-import { IContextMenuEvent, modalManager } from "@/modules/modal-manager.module";
-import { searchManager } from "@/modules/search-manager.module";
-import router from "@/router/index";
-import store from "@/store/page-overlay/index";
-import { ExplorerActions } from "@/store/page-overlay/modules/explorer/consts";
-import { PackageHistoryActions } from "@/store/page-overlay/modules/package-history/consts";
-import { PackageSearchActions } from "@/store/page-overlay/modules/package-search/consts";
-import { PluginAuthActions } from "@/store/page-overlay/modules/plugin-auth/consts";
-import { SearchActions } from "@/store/page-overlay/modules/search/consts";
-import { SplitPackageBuilderActions } from "@/store/page-overlay/modules/split-package-builder/consts";
-import { TransferBuilderActions } from "@/store/page-overlay/modules/transfer-builder/consts";
+} from '@/interfaces';
+import { analyticsManager } from '@/modules/analytics-manager.module';
+import { primaryDataLoader } from '@/modules/data-loader/data-loader.module';
+import { IContextMenuEvent, modalManager } from '@/modules/modal-manager.module';
+import router from '@/router/index';
+import store from '@/store/page-overlay/index';
+import { ExplorerActions } from '@/store/page-overlay/modules/explorer/consts';
+import { PackageHistoryActions } from '@/store/page-overlay/modules/package-history/consts';
+import { PackageSearchActions } from '@/store/page-overlay/modules/package-search/consts';
+import { PluginAuthActions } from '@/store/page-overlay/modules/plugin-auth/consts';
+import { SearchActions } from '@/store/page-overlay/modules/search/consts';
+import { SplitPackageBuilderActions } from '@/store/page-overlay/modules/split-package-builder/consts';
+import { TransferBuilderActions } from '@/store/page-overlay/modules/transfer-builder/consts';
 import {
   isIdentityEligibleForSplitTools,
   isIdentityEligibleForTransferTools,
-} from "@/utils/access-control";
-import { downloadFileFromUrl, printPdfFromUrl } from "@/utils/dom";
-import { downloadLabTests, getLabelOrError, getLabTestUrlsFromPackage } from "@/utils/package";
-import { createScanSheet } from "@/utils/transfer";
-import Vue from "vue";
-import { mapActions, mapState } from "vuex";
+} from '@/utils/access-control';
+import { downloadFileFromUrl, printPdfFromUrl } from '@/utils/dom';
+import { downloadLabTests, getLabelOrError, getLabTestUrlsFromPackage } from '@/utils/package';
+import { createScanSheet } from '@/utils/transfer';
+import Vue from 'vue';
+import { mapActions, mapState } from 'vuex';
 
 export default Vue.extend({
-  name: "ContextMenu",
+  name: 'ContextMenu',
   store,
   router,
   props: {
@@ -386,7 +386,7 @@ export default Vue.extend({
         return false;
       }
 
-      if (!store.state.client.values["ENABLE_TRANSFER_EDIT"]) {
+      if (!store.state.client.values.ENABLE_TRANSFER_EDIT) {
         return false;
       }
 
@@ -439,18 +439,18 @@ export default Vue.extend({
     }),
     openPackageHistoryBuilder() {
       analyticsManager.track(MessageType.OPENED_PACKAGE_HISTORY, {
-        source: "CONTEXT_MENU",
+        source: 'CONTEXT_MENU',
       });
       modalManager.dispatchModalEvent(ModalType.BUILDER, ModalAction.OPEN, {
-        initialRoute: "/package/history",
+        initialRoute: '/package/history',
       });
     },
     openMetrcExplorer() {
       analyticsManager.track(MessageType.OPENED_METRC_EXPLORER, {
-        source: "CONTEXT_MENU",
+        source: 'CONTEXT_MENU',
       });
       modalManager.dispatchModalEvent(ModalType.BUILDER, ModalAction.OPEN, {
-        initialRoute: "/metrc-explorer",
+        initialRoute: '/metrc-explorer',
       });
     },
     dismiss() {
@@ -458,7 +458,7 @@ export default Vue.extend({
     },
     filterPackages(packageSearchFilters: IPackageSearchFilters) {
       analyticsManager.track(MessageType.CONTEXT_MENU_SELECT, {
-        event: "filterPackage",
+        event: 'filterPackage',
         packageSearchFilters,
       });
 
@@ -467,13 +467,13 @@ export default Vue.extend({
       this.dismiss();
 
       this.partialUpdatePackageSearchFilters({
-        packageSearchFilters: packageSearchFilters,
+        packageSearchFilters,
       });
 
-      this.setSearchType({ searchType: "PACKAGES" });
+      this.setSearchType({ searchType: 'PACKAGES' });
     },
     searchTransfer(text: string) {
-      analyticsManager.track(MessageType.CONTEXT_MENU_SELECT, { event: "searchTransfer", text });
+      analyticsManager.track(MessageType.CONTEXT_MENU_SELECT, { event: 'searchTransfer', text });
 
       this.setShowSearchResults({ showSearchResults: true });
       store.dispatch(`search/${SearchActions.SET_QUERY_STRING}`, { queryString: text });
@@ -545,29 +545,29 @@ export default Vue.extend({
       }
     },
     transferPackage() {
-      analyticsManager.track(MessageType.CONTEXT_MENU_SELECT, { event: "transferPackage" });
+      analyticsManager.track(MessageType.CONTEXT_MENU_SELECT, { event: 'transferPackage' });
 
       this.addPackageToTransferList({ pkg: this.$data.pkg });
 
       analyticsManager.track(MessageType.STARTED_TRANSFER_FROM_INLINE_BUTTON, {});
       modalManager.dispatchModalEvent(ModalType.BUILDER, ModalAction.OPEN, {
-        initialRoute: "/transfer/transfer-builder",
+        initialRoute: '/transfer/transfer-builder',
       });
       this.dismiss();
     },
     splitPackage() {
-      analyticsManager.track(MessageType.CONTEXT_MENU_SELECT, { event: "splitPackage" });
+      analyticsManager.track(MessageType.CONTEXT_MENU_SELECT, { event: 'splitPackage' });
 
       this.setSplitSourcePackage({ pkg: this.$data.pkg });
 
       analyticsManager.track(MessageType.SPLIT_PACKAGE_FROM_TOOLKIT_SEARCH, {});
       modalManager.dispatchModalEvent(ModalType.BUILDER, ModalAction.OPEN, {
-        initialRoute: "/package/split-package",
+        initialRoute: '/package/split-package',
       });
       this.dismiss();
     },
     viewLabTests() {
-      analyticsManager.track(MessageType.CONTEXT_MENU_SELECT, { event: "viewLabTests" });
+      analyticsManager.track(MessageType.CONTEXT_MENU_SELECT, { event: 'viewLabTests' });
 
       modalManager.dispatchModalEvent(ModalType.DOCUMENT, ModalAction.OPEN, {
         documentUrls: this.$data.labTestUrls,
@@ -576,7 +576,7 @@ export default Vue.extend({
       this.dismiss();
     },
     printLabTests() {
-      analyticsManager.track(MessageType.CONTEXT_MENU_SELECT, { event: "printLabTests" });
+      analyticsManager.track(MessageType.CONTEXT_MENU_SELECT, { event: 'printLabTests' });
 
       printPdfFromUrl({ urls: this.$data.labTestUrls, modal: true });
 
@@ -584,7 +584,7 @@ export default Vue.extend({
       this.dismiss();
     },
     downloadLabTests() {
-      analyticsManager.track(MessageType.CONTEXT_MENU_SELECT, { event: "downloadLabTests" });
+      analyticsManager.track(MessageType.CONTEXT_MENU_SELECT, { event: 'downloadLabTests' });
 
       downloadLabTests({ pkg: this.$data.pkg });
 
@@ -592,19 +592,19 @@ export default Vue.extend({
       this.dismiss();
     },
     async editTransfer() {
-      analyticsManager.track(MessageType.CONTEXT_MENU_SELECT, { event: "editTransfer" });
+      analyticsManager.track(MessageType.CONTEXT_MENU_SELECT, { event: 'editTransfer' });
 
       await this.setTransferForUpdate({ transferForUpdate: this.$data.transfer });
 
       modalManager.dispatchModalEvent(ModalType.BUILDER, ModalAction.OPEN, {
-        initialRoute: "/transfer/transfer-builder",
+        initialRoute: '/transfer/transfer-builder',
       });
 
       analyticsManager.track(MessageType.CLICKED_EDIT_TRANSFER);
       this.dismiss();
     },
     viewManifest() {
-      analyticsManager.track(MessageType.CONTEXT_MENU_SELECT, { event: "viewManifest" });
+      analyticsManager.track(MessageType.CONTEXT_MENU_SELECT, { event: 'viewManifest' });
 
       modalManager.dispatchModalEvent(ModalType.DOCUMENT, ModalAction.OPEN, {
         documentUrls: [this.manifestUrl],
@@ -613,13 +613,13 @@ export default Vue.extend({
       this.dismiss();
     },
     newTabManifest() {
-      analyticsManager.track(MessageType.CONTEXT_MENU_SELECT, { event: "newTabManifest" });
+      analyticsManager.track(MessageType.CONTEXT_MENU_SELECT, { event: 'newTabManifest' });
 
-      window.open(this.manifestUrl, "_blank");
+      window.open(this.manifestUrl, '_blank');
       this.dismiss();
     },
     printManifest() {
-      analyticsManager.track(MessageType.CONTEXT_MENU_SELECT, { event: "printManifest" });
+      analyticsManager.track(MessageType.CONTEXT_MENU_SELECT, { event: 'printManifest' });
 
       printPdfFromUrl({ urls: [this.manifestUrl], modal: true });
 
@@ -627,7 +627,7 @@ export default Vue.extend({
       this.dismiss();
     },
     downloadManifest() {
-      analyticsManager.track(MessageType.CONTEXT_MENU_SELECT, { event: "downloadManifest" });
+      analyticsManager.track(MessageType.CONTEXT_MENU_SELECT, { event: 'downloadManifest' });
 
       downloadFileFromUrl({
         url: this.manifestUrl,
@@ -638,11 +638,11 @@ export default Vue.extend({
       this.dismiss();
     },
     async createScanSheet() {
-      analyticsManager.track(MessageType.CONTEXT_MENU_SELECT, { event: "createScanSheet" });
+      analyticsManager.track(MessageType.CONTEXT_MENU_SELECT, { event: 'createScanSheet' });
 
       await createScanSheet(
-        parseInt(this.contextMenuEvent.manifestNumber!),
-        this.contextMenuEvent.zeroPaddedManifestNumber!
+        parseInt(this.contextMenuEvent.manifestNumber!, 10),
+        this.contextMenuEvent.zeroPaddedManifestNumber!,
       );
 
       this.dismiss();

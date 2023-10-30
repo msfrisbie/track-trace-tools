@@ -43,20 +43,20 @@
 </template>
 
 <script lang="ts">
-import TagPicker from "@/components/overlay-widget/shared/TagPicker.vue";
-import { MessageType } from "@/consts";
-import { ITagData } from "@/interfaces";
-import { analyticsManager } from "@/modules/analytics-manager.module";
-import { authManager } from "@/modules/auth-manager.module";
-import { primaryMetrcRequestManager } from "@/modules/metrc-request-manager.module";
-import store from "@/store/page-overlay/index";
-import { getVoidTagBody } from "@/utils/tags";
-import { timer } from "rxjs";
-import Vue from "vue";
-import { mapState } from "vuex";
+import TagPicker from '@/components/overlay-widget/shared/TagPicker.vue';
+import { MessageType } from '@/consts';
+import { ITagData } from '@/interfaces';
+import { analyticsManager } from '@/modules/analytics-manager.module';
+import { authManager } from '@/modules/auth-manager.module';
+import { primaryMetrcRequestManager } from '@/modules/metrc-request-manager.module';
+import store from '@/store/page-overlay/index';
+import { getVoidTagBody } from '@/utils/tags';
+import { timer } from 'rxjs';
+import Vue from 'vue';
+import { mapState } from 'vuex';
 
 export default Vue.extend({
-  name: "VoidTagForm",
+  name: 'VoidTagForm',
   store,
   components: {
     TagPicker,
@@ -89,14 +89,14 @@ export default Vue.extend({
       analyticsManager.track(MessageType.STARTED_VOID_TAGS_BACKGROUND_JOB);
       this.$data.submitInflight = true;
 
-      for (let tagData of this.$data.selectedPlantTags) {
+      for (const tagData of this.$data.selectedPlantTags) {
         if (!this.$data.submitInflight) {
           return;
         }
         await this.voidTag({ tagData });
       }
 
-      for (let tagData of this.$data.selectedPackageTags) {
+      for (const tagData of this.$data.selectedPackageTags) {
         if (!this.$data.submitInflight) {
           return;
         }

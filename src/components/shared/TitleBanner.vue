@@ -11,18 +11,18 @@
 </template>
 
 <script lang="ts">
-import TrackTraceToolsLogo from "@/components/shared/TrackTraceToolsLogo.vue";
-import store from "@/store/page-overlay/index";
-import Vue from "vue";
-import { mapState } from "vuex";
+import TrackTraceToolsLogo from '@/components/shared/TrackTraceToolsLogo.vue';
+import store from '@/store/page-overlay/index';
+import Vue from 'vue';
+import { mapState } from 'vuex';
 
 export default Vue.extend({
-  name: "TitleBanner",
+  name: 'TitleBanner',
   store,
   components: {
     TrackTraceToolsLogo,
   },
-  computed: mapState(["debugMode"]),
+  computed: mapState(['debugMode']),
   async mounted() {},
 });
 </script>

@@ -19,11 +19,11 @@
 </template>
 
 <script lang="ts">
-import store from "@/store/page-overlay/index";
-import Vue from "vue";
+import store from '@/store/page-overlay/index';
+import Vue from 'vue';
 
 export default Vue.extend({
-  name: "BuilderStepHeader",
+  name: 'BuilderStepHeader',
   store,
   props: {
     stepNumber: Number,

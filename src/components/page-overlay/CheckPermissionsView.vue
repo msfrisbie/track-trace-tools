@@ -45,17 +45,17 @@
 </template>
 
 <script lang="ts">
-import { DataLoader, getDataLoaderByLicense } from "@/modules/data-loader/data-loader.module";
-import { facilityManager } from "@/modules/facility-manager.module";
-import router from "@/router/index";
-import store from "@/store/page-overlay/index";
-import Vue from "vue";
-import { mapState } from "vuex";
+import { DataLoader, getDataLoaderByLicense } from '@/modules/data-loader/data-loader.module';
+import { facilityManager } from '@/modules/facility-manager.module';
+import router from '@/router/index';
+import store from '@/store/page-overlay/index';
+import Vue from 'vue';
+import { mapState } from 'vuex';
 
 enum PermissionState {
-  INITIAL = "INITIAL",
-  GRANTED = "GRANTED",
-  NOT_GRANTED = "NOT GRANTED",
+  INITIAL = 'INITIAL',
+  GRANTED = 'GRANTED',
+  NOT_GRANTED = 'NOT GRANTED',
 }
 
 interface T3Permission {
@@ -66,7 +66,7 @@ interface T3Permission {
 }
 
 export default Vue.extend({
-  name: "CheckPermissionsView",
+  name: 'CheckPermissionsView',
   store,
   router,
   props: {},
@@ -93,7 +93,7 @@ export default Vue.extend({
       assessmentFn: (dataLoader: DataLoader) => Promise<boolean>;
     }[] = [
       {
-        permissionName: "Plants",
+        permissionName: 'Plants',
         assessmentFn: async (dataLoader: DataLoader) => {
           try {
             return (await dataLoader.floweringPlantCount()) !== null;
@@ -103,7 +103,7 @@ export default Vue.extend({
         },
       },
       {
-        permissionName: "Harvests",
+        permissionName: 'Harvests',
         assessmentFn: async (dataLoader: DataLoader) => {
           try {
             return (await dataLoader.activeHarvestCount()) !== null;
@@ -113,7 +113,7 @@ export default Vue.extend({
         },
       },
       {
-        permissionName: "Transfers",
+        permissionName: 'Transfers',
         assessmentFn: async (dataLoader: DataLoader) => {
           try {
             return (await dataLoader.incomingTransferCount()) !== null;
@@ -123,7 +123,7 @@ export default Vue.extend({
         },
       },
       {
-        permissionName: "Packages",
+        permissionName: 'Packages',
         assessmentFn: async (dataLoader: DataLoader) => {
           try {
             return (await dataLoader.activePackageCount()) !== null;
@@ -133,7 +133,7 @@ export default Vue.extend({
         },
       },
       {
-        permissionName: "Strains",
+        permissionName: 'Strains',
         assessmentFn: async (dataLoader: DataLoader) => {
           try {
             await dataLoader.strains();
@@ -144,7 +144,7 @@ export default Vue.extend({
         },
       },
       {
-        permissionName: "Locations",
+        permissionName: 'Locations',
         assessmentFn: async (dataLoader: DataLoader) => {
           try {
             await dataLoader.locations();
@@ -155,7 +155,7 @@ export default Vue.extend({
         },
       },
       {
-        permissionName: "Items",
+        permissionName: 'Items',
         assessmentFn: async (dataLoader: DataLoader) => {
           try {
             await dataLoader.items();
@@ -166,7 +166,7 @@ export default Vue.extend({
         },
       },
       {
-        permissionName: "Tags",
+        permissionName: 'Tags',
         assessmentFn: async (dataLoader: DataLoader) => {
           try {
             return (await dataLoader.availableTagCount()) !== null;
@@ -176,7 +176,7 @@ export default Vue.extend({
         },
       },
       {
-        permissionName: "Sales",
+        permissionName: 'Sales',
         assessmentFn: async (dataLoader: DataLoader) => {
           try {
             return (await dataLoader.activeSalesCount()) !== null;
@@ -200,12 +200,9 @@ export default Vue.extend({
     for (const permission of permissions) {
       const dataLoader = await getDataLoaderByLicense(permission.license);
 
-      permission
-        .assessmentFn(dataLoader)
-        .then(
-          (result: boolean) =>
-            (permission.state = result ? PermissionState.GRANTED : PermissionState.NOT_GRANTED)
-        );
+      permission.assessmentFn(dataLoader).then((result: boolean) => {
+        permission.state = result ? PermissionState.GRANTED : PermissionState.NOT_GRANTED;
+      });
     }
 
     this.$data.permissions = permissions;

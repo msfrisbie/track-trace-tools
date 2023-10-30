@@ -1,12 +1,12 @@
-import { IPluginState } from "@/interfaces";
-import { createPackageCsvTemplateSheetOrError } from "@/utils/sheets-export";
-import { ActionContext } from "vuex";
+import { IPluginState } from '@/interfaces';
+import { createPackageCsvTemplateSheetOrError } from '@/utils/sheets-export';
+import { ActionContext } from 'vuex';
 import {
   CreatePackageCsvActions,
   CreatePackageCsvGetters,
   CreatePackageCsvMutations,
-} from "./consts";
-import { ICreatePackageCsvState } from "./interfaces";
+} from './consts';
+import { ICreatePackageCsvState } from './interfaces';
 
 const inMemoryState = {};
 
@@ -22,7 +22,7 @@ export const createPackageCsvModule = {
   mutations: {
     [CreatePackageCsvMutations.CREATE_PACKAGE_CSV_MUTATION](
       state: ICreatePackageCsvState,
-      data: any
+      data: any,
     ) {
       // state.data = data;
     },
@@ -32,7 +32,7 @@ export const createPackageCsvModule = {
       state: ICreatePackageCsvState,
       getters: any,
       rootState: any,
-      rootGetters: any
+      rootGetters: any,
     ) => {
       // return state.data
     },
@@ -42,16 +42,14 @@ export const createPackageCsvModule = {
       ctx: ActionContext<ICreatePackageCsvState, IPluginState>,
       data: {
         columns: string[]
-      }
+      },
     ) => {
       await createPackageCsvTemplateSheetOrError(data.columns);
     },
   },
 };
 
-export const createPackageCsvReducer = (state: ICreatePackageCsvState): ICreatePackageCsvState => {
-  return {
-    ...state,
-    ...inMemoryState,
-  };
-};
+export const createPackageCsvReducer = (state: ICreatePackageCsvState): ICreatePackageCsvState => ({
+  ...state,
+  ...inMemoryState,
+});

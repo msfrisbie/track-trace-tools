@@ -1,3 +1,3 @@
-import { mockStore } from "./mocks";
+import { mockStore } from './mocks';
 
 mockStore();

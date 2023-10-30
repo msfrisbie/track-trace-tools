@@ -1,4 +1,4 @@
-import { IIndexedTagData, ITagSearchFilters } from "@/interfaces";
+import { IIndexedTagData, ITagSearchFilters } from '@/interfaces';
 
 export interface ISelectedTagMetadata {
   tagData: IIndexedTagData;

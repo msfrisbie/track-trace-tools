@@ -150,46 +150,46 @@
 </template>
 
 <script lang="ts">
-import MetrcTag from "@/components/overlay-widget/shared/MetrcTag.vue";
-import PackageIcon from "@/components/search/package-search/PackageIcon.vue";
+import MetrcTag from '@/components/overlay-widget/shared/MetrcTag.vue';
+import PackageIcon from '@/components/search/package-search/PackageIcon.vue';
 import {
   MessageType,
   METRC_HOSTNAMES_LACKING_LAB_PDFS,
   ModalAction,
   ModalType,
   PackageState,
-} from "@/consts";
-import { IIndexedPackageData, IPluginState, ITransferPackageList } from "@/interfaces";
-import { analyticsManager } from "@/modules/analytics-manager.module";
-import { clientBuildManager } from "@/modules/client-build-manager.module";
-import { modalManager } from "@/modules/modal-manager.module";
-import { PACKAGE_TAB_REGEX } from "@/modules/page-manager/consts";
-import { searchManager } from "@/modules/search-manager.module";
-import { toastManager } from "@/modules/toast-manager.module";
-import store from "@/store/page-overlay/index";
-import { ExplorerActions } from "@/store/page-overlay/modules/explorer/consts";
-import { PackageHistoryActions } from "@/store/page-overlay/modules/package-history/consts";
-import { PackageSearchActions } from "@/store/page-overlay/modules/package-search/consts";
-import { SplitPackageBuilderActions } from "@/store/page-overlay/modules/split-package-builder/consts";
+} from '@/consts';
+import { IIndexedPackageData, IPluginState, ITransferPackageList } from '@/interfaces';
+import { analyticsManager } from '@/modules/analytics-manager.module';
+import { clientBuildManager } from '@/modules/client-build-manager.module';
+import { modalManager } from '@/modules/modal-manager.module';
+import { PACKAGE_TAB_REGEX } from '@/modules/page-manager/consts';
+import { searchManager } from '@/modules/search-manager.module';
+import { toastManager } from '@/modules/toast-manager.module';
+import store from '@/store/page-overlay/index';
+import { ExplorerActions } from '@/store/page-overlay/modules/explorer/consts';
+import { PackageHistoryActions } from '@/store/page-overlay/modules/package-history/consts';
+import { PackageSearchActions } from '@/store/page-overlay/modules/package-search/consts';
+import { SplitPackageBuilderActions } from '@/store/page-overlay/modules/split-package-builder/consts';
 import {
   TransferBuilderActions,
   TransferBuilderGetters,
-} from "@/store/page-overlay/modules/transfer-builder/consts";
+} from '@/store/page-overlay/modules/transfer-builder/consts';
 import {
   isIdentityEligibleForSplitTools,
   isIdentityEligibleForTransferTools,
-} from "@/utils/access-control";
-import { copyToClipboard, printPdfFromUrl } from "@/utils/dom";
-import { downloadLabTests, getLabelOrError, getLabTestUrlsFromPackage } from "@/utils/package";
-import { Subject } from "rxjs";
-import { takeUntil } from "rxjs/operators";
-import Vue from "vue";
-import { mapActions, mapGetters, mapState } from "vuex";
-import RecursiveJsonTable from "@/components/search/shared/RecursiveJsonTable.vue";
-import { SearchActions } from "@/store/page-overlay/modules/search/consts";
+} from '@/utils/access-control';
+import { copyToClipboard, printPdfFromUrl } from '@/utils/dom';
+import { downloadLabTests, getLabelOrError, getLabTestUrlsFromPackage } from '@/utils/package';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
+import Vue from 'vue';
+import { mapActions, mapGetters, mapState } from 'vuex';
+import RecursiveJsonTable from '@/components/search/shared/RecursiveJsonTable.vue';
+import { SearchActions } from '@/store/page-overlay/modules/search/consts';
 
 export default Vue.extend({
-  name: "PackageSearchResultDetail",
+  name: 'PackageSearchResultDetail',
   store,
   components: { MetrcTag, RecursiveJsonTable },
   // async created() {
@@ -209,10 +209,10 @@ export default Vue.extend({
     // destroyed$: Subject<void>;
     // pkg: IIndexedPackageData | null;
     activeTransferPackageList: ITransferPackageList | null;
-  } {
+    } {
     return {
       packageLabTestPdfEligible: !METRC_HOSTNAMES_LACKING_LAB_PDFS.includes(
-        window.location.hostname
+        window.location.hostname,
       ),
       // destroyed$: new Subject(),
       // pkg: null,
@@ -230,8 +230,8 @@ export default Vue.extend({
     },
     isPackageEligibleForTransfer(): boolean {
       return (
-        store.state.packageSearch.selectedPackageMetadata?.packageData.PackageState ===
-        PackageState.ACTIVE
+        store.state.packageSearch.selectedPackageMetadata?.packageData.PackageState
+        === PackageState.ACTIVE
       );
     },
     isIdentityEligibleForTransferToolsImpl(): boolean {
@@ -241,8 +241,8 @@ export default Vue.extend({
     },
     isPackageEligibleForSplit(): boolean {
       return (
-        store.state.packageSearch.selectedPackageMetadata?.packageData.PackageState ===
-        PackageState.ACTIVE
+        store.state.packageSearch.selectedPackageMetadata?.packageData.PackageState
+        === PackageState.ACTIVE
       );
     },
     isIdentityEligibleForSplitToolsImpl(): boolean {
@@ -255,7 +255,7 @@ export default Vue.extend({
       isPackageInActiveList: `transferBuilder/${TransferBuilderGetters.IS_PACKAGE_IN_ACTIVE_LIST}`,
     }),
     t3plusEnabled() {
-      return store.state.client.values["ENABLE_T3PLUS"] || store.state.client.t3plus;
+      return store.state.client.values.ENABLE_T3PLUS || store.state.client.t3plus;
     },
   },
   watch: {},
@@ -273,30 +273,30 @@ export default Vue.extend({
     }),
     openPackageHistoryBuilder() {
       analyticsManager.track(MessageType.OPENED_PACKAGE_HISTORY, {
-        source: "CONTEXT_MENU",
+        source: 'CONTEXT_MENU',
       });
       modalManager.dispatchModalEvent(ModalType.BUILDER, ModalAction.OPEN, {
-        initialRoute: "/package/history",
+        initialRoute: '/package/history',
       });
     },
     openMetrcExplorer() {
       analyticsManager.track(MessageType.OPENED_METRC_EXPLORER, {
-        source: "CONTEXT_MENU",
+        source: 'CONTEXT_MENU',
       });
       modalManager.dispatchModalEvent(ModalType.BUILDER, ModalAction.OPEN, {
-        initialRoute: "/metrc-explorer",
+        initialRoute: '/metrc-explorer',
       });
     },
     openNewTransferBuilder() {
       analyticsManager.track(MessageType.STARTED_TRANSFER_FROM_TOOLKIT_SEARCH, {});
       modalManager.dispatchModalEvent(ModalType.BUILDER, ModalAction.OPEN, {
-        initialRoute: "/transfer/transfer-builder",
+        initialRoute: '/transfer/transfer-builder',
       });
     },
     openSplitPackageBuilder() {
       analyticsManager.track(MessageType.SPLIT_PACKAGE_FROM_TOOLKIT_SEARCH, {});
       modalManager.dispatchModalEvent(ModalType.BUILDER, ModalAction.OPEN, {
-        initialRoute: "/package/split-package",
+        initialRoute: '/package/split-package',
       });
     },
     async setPackageLabelFilter(pkg: IIndexedPackageData) {
@@ -309,7 +309,7 @@ export default Vue.extend({
           packageSearchFilters: {
             label: pkg.Label,
           },
-        }
+        },
       );
 
       this.setShowSearchResults({ showSearchResults: false });
@@ -320,28 +320,28 @@ export default Vue.extend({
       copyToClipboard(pkg.Label);
 
       toastManager.openToast(`'${pkg.Label}' copied to clipboard`, {
-        title: "Copied Tag",
+        title: 'Copied Tag',
         autoHideDelay: 5000,
-        variant: "primary",
+        variant: 'primary',
         appendToast: true,
-        toaster: "ttt-toaster",
+        toaster: 'ttt-toaster',
         solid: true,
       });
     },
     badgeVariant(pkg: IIndexedPackageData) {
       switch (pkg.PackageState) {
         case PackageState.ACTIVE:
-          return "success";
+          return 'success';
         case PackageState.INACTIVE:
-          return "danger";
+          return 'danger';
         case PackageState.IN_TRANSIT:
-          return "dark";
+          return 'dark';
         default:
           return null;
       }
     },
     displayPackageState(pkg: IIndexedPackageData) {
-      return pkg.PackageState.replaceAll("_", " ");
+      return pkg.PackageState.replaceAll('_', ' ');
     },
     async viewLabResult(pkg: IIndexedPackageData) {
       const urls = await getLabTestUrlsFromPackage({ pkg });

@@ -42,24 +42,24 @@ import {
   ISimpleOutgoingTransferData,
   ISimplePackageData,
   ISimpleTransferPackageData,
-} from "@/interfaces";
-import { DataLoader, getDataLoaderByLicense } from "@/modules/data-loader/data-loader.module";
-import { facilityManager } from "@/modules/facility-manager.module";
-import router from "@/router/index";
-import store from "@/store/page-overlay/index";
-import { ICogsArchive } from "@/store/page-overlay/modules/reports/interfaces";
-import { CompressedDataWrapper, compressedDataWrapperFactory } from "@/utils/compression";
-import { readJSONFile } from "@/utils/file";
+} from '@/interfaces';
+import { DataLoader, getDataLoaderByLicense } from '@/modules/data-loader/data-loader.module';
+import { facilityManager } from '@/modules/facility-manager.module';
+import router from '@/router/index';
+import store from '@/store/page-overlay/index';
+import { ICogsArchive } from '@/store/page-overlay/modules/reports/interfaces';
+import { CompressedDataWrapper, compressedDataWrapperFactory } from '@/utils/compression';
+import { readJSONFile } from '@/utils/file';
 import {
   extractParentPackageLabelsFromHistory,
   extractChildPackageTagQuantityPairsFromHistory,
-} from "@/utils/history";
-import { getIdOrError, getItemNameOrError, getLabelOrError } from "@/utils/package";
-import Vue from "vue";
-import { mapState } from "vuex";
+} from '@/utils/history';
+import { getIdOrError, getItemNameOrError, getLabelOrError } from '@/utils/package';
+import Vue from 'vue';
+import { mapState } from 'vuex';
 
 export default Vue.extend({
-  name: "ArchiveWidget",
+  name: 'ArchiveWidget',
   store,
   router,
   props: {},
@@ -96,22 +96,22 @@ export default Vue.extend({
       console.log(data);
 
       const packageWrapper = new CompressedDataWrapper(
-        "Package",
+        'Package',
         data.packages,
-        "Label",
-        data.packagesKeys
+        'Label',
+        data.packagesKeys,
       );
       const transferWrapper = new CompressedDataWrapper(
-        "Transfer",
+        'Transfer',
         data.transfers,
-        "ManifestNumber",
-        data.transfersKeys
+        'ManifestNumber',
+        data.transfersKeys,
       );
       const transferPackageWrapper = new CompressedDataWrapper(
-        "Transfer Package",
+        'Transfer Package',
         data.transfersPackages,
-        "Label",
-        data.transfersPackagesKeys
+        'Label',
+        data.transfersPackagesKeys,
       );
 
       // const packages = new Set<string>(packa);
@@ -135,23 +135,23 @@ export default Vue.extend({
         const archive: ICogsArchive = this.$data.existingArchive
           ? await this.getMutableArchiveData()
           : {
-              licenses: [],
-              packages: [],
-              packagesKeys: [],
-              transfers: [],
-              transfersKeys: [],
-              transfersPackages: [],
-              transfersPackagesKeys: [],
-            };
+            licenses: [],
+            packages: [],
+            packagesKeys: [],
+            transfers: [],
+            transfersKeys: [],
+            transfersPackages: [],
+            transfersPackagesKeys: [],
+          };
 
         archive.licenses = (await facilityManager.ownedFacilitiesOrError()).map(
-          (x) => x.licenseNumber
+          (x) => x.licenseNumber,
         );
 
         let dataLoader: DataLoader | null = null;
 
         if (this.$data.loadInactivePackages) {
-          this.$data.message = "Loading inactive packages...";
+          this.$data.message = 'Loading inactive packages...';
 
           let rawPackages: IIndexedPackageData[] = [];
 
@@ -164,7 +164,7 @@ export default Vue.extend({
           this.$data.message = `Processing ${rawPackages.length} inactive packages...`;
 
           const wrapper = compressedDataWrapperFactory<ISimplePackageData>(
-            "Package",
+            'Package',
             rawPackages.map((pkg) => ({
               LicenseNumber: pkg.LicenseNumber,
               Id: getIdOrError(pkg),
@@ -176,7 +176,7 @@ export default Vue.extend({
               parentPackageLabels: null,
               childPackageLabelQuantityPairs: null,
             })),
-            "Label"
+            'Label',
           );
 
           archive.packages = wrapper.data;
@@ -184,34 +184,32 @@ export default Vue.extend({
         }
 
         if (this.$data.loadInactivePackagesHistory) {
-          this.$data.message = "Loading inactive package history...";
+          this.$data.message = 'Loading inactive package history...';
 
           const packageHistoryRequests: Promise<any>[] = [];
 
           const wrapper = new CompressedDataWrapper<ISimplePackageData>(
-            "Package",
+            'Package',
             archive.packages,
-            "Label",
-            archive.packagesKeys
+            'Label',
+            archive.packagesKeys,
           );
 
           for (const pkg of wrapper) {
             packageHistoryRequests.push(
-              getDataLoaderByLicense(pkg.LicenseNumber).then((dataLoader) =>
-                dataLoader.packageHistoryByPackageId(pkg.Id).then((history) => {
-                  wrapper.update(
-                    pkg.Label,
-                    "parentPackageLabels",
-                    extractParentPackageLabelsFromHistory(history)
-                  );
+              getDataLoaderByLicense(pkg.LicenseNumber).then((dataLoader) => dataLoader.packageHistoryByPackageId(pkg.Id).then((history) => {
+                wrapper.update(
+                  pkg.Label,
+                  'parentPackageLabels',
+                  extractParentPackageLabelsFromHistory(history),
+                );
 
-                  wrapper.update(
-                    pkg.Label,
-                    "childPackageLabelQuantityPairs",
-                    extractChildPackageTagQuantityPairsFromHistory(history)
-                  );
-                })
-              )
+                wrapper.update(
+                  pkg.Label,
+                  'childPackageLabelQuantityPairs',
+                  extractChildPackageTagQuantityPairsFromHistory(history),
+                );
+              })),
             );
 
             if (packageHistoryRequests.length % 250 === 0) {
@@ -224,7 +222,7 @@ export default Vue.extend({
         }
 
         if (this.$data.loadInactiveOutgoingTransfers) {
-          this.$data.message = "Loading inactive outgoing transfers...";
+          this.$data.message = 'Loading inactive outgoing transfers...';
 
           let rawTransfers: IIndexedRichOutgoingTransferData[] = [];
 
@@ -237,7 +235,7 @@ export default Vue.extend({
           this.$data.message = `Processing ${rawTransfers.length} inactive outgoing transfers...`;
 
           const wrapper = compressedDataWrapperFactory<ISimpleOutgoingTransferData>(
-            "Transfers",
+            'Transfers',
             rawTransfers.map((transfer) => ({
               LicenseNumber: transfer.LicenseNumber,
               ManifestNumber: transfer.ManifestNumber,
@@ -245,7 +243,7 @@ export default Vue.extend({
               TransferState: transfer.TransferState,
               Destinations: [],
             })),
-            "ManifestNumber"
+            'ManifestNumber',
           );
 
           archive.transfers = wrapper.data;
@@ -255,19 +253,17 @@ export default Vue.extend({
 
           for (const transfer of wrapper) {
             transferDestinationRequests.push(
-              getDataLoaderByLicense(transfer.LicenseNumber).then((dataLoader) =>
-                dataLoader.transferDestinations(transfer.Id).then((destinations) => {
-                  wrapper.update(
-                    transfer.ManifestNumber,
-                    "Destinations",
-                    destinations.map((destination) => ({
-                      Id: destination.Id,
-                      Type: destination.ShipmentTypeName,
-                      ETD: destination.EstimatedDepartureDateTime,
-                    }))
-                  );
-                })
-              )
+              getDataLoaderByLicense(transfer.LicenseNumber).then((dataLoader) => dataLoader.transferDestinations(transfer.Id).then((destinations) => {
+                wrapper.update(
+                  transfer.ManifestNumber,
+                  'Destinations',
+                  destinations.map((destination) => ({
+                    Id: destination.Id,
+                    Type: destination.ShipmentTypeName,
+                    ETD: destination.EstimatedDepartureDateTime,
+                  })),
+                );
+              })),
             );
 
             if (transferDestinationRequests.length % 250 === 0) {
@@ -280,44 +276,42 @@ export default Vue.extend({
         }
 
         if (this.$data.loadInactiveOutgoingTransfersPackages) {
-          this.$data.message = "Loading inactive outgoing transfer packages...";
+          this.$data.message = 'Loading inactive outgoing transfer packages...';
 
           const packageRequests: Promise<any>[] = [];
 
           const rawTransferPackages: ISimpleTransferPackageData[] = [];
 
           const wrapper = new CompressedDataWrapper<ISimpleOutgoingTransferData>(
-            "Transfers",
+            'Transfers',
             archive.transfers,
-            "ManifestNumber",
-            archive.transfersKeys
+            'ManifestNumber',
+            archive.transfersKeys,
           );
 
           for (const transfer of wrapper) {
             for (const destination of transfer.Destinations) {
               packageRequests.push(
-                getDataLoaderByLicense(transfer.LicenseNumber).then((dataLoader) =>
-                  dataLoader.destinationPackages(destination.Id).then((destinationPackages) => {
-                    for (const pkg of destinationPackages) {
-                      rawTransferPackages.push({
-                        ETD: destination.ETD,
-                        Type: destination.Type,
-                        ManifestNumber: transfer.ManifestNumber,
-                        LicenseNumber: transfer.LicenseNumber,
-                        Id: getIdOrError(pkg),
-                        PackageState: pkg.PackageState,
-                        Label: getLabelOrError(pkg),
-                        ItemName: getItemNameOrError(pkg),
-                        Quantity: pkg.ShippedQuantity,
-                        UnitOfMeasureAbbreviation: pkg.ShippedUnitOfMeasureAbbreviation,
-                        SourcePackageLabels: pkg.SourcePackageLabels,
-                        ProductionBatchNumber: pkg.ProductionBatchNumber,
-                        parentPackageLabels: null,
-                        childPackageLabelQuantityPairs: null,
-                      });
-                    }
-                  })
-                )
+                getDataLoaderByLicense(transfer.LicenseNumber).then((dataLoader) => dataLoader.destinationPackages(destination.Id).then((destinationPackages) => {
+                  for (const pkg of destinationPackages) {
+                    rawTransferPackages.push({
+                      ETD: destination.ETD,
+                      Type: destination.Type,
+                      ManifestNumber: transfer.ManifestNumber,
+                      LicenseNumber: transfer.LicenseNumber,
+                      Id: getIdOrError(pkg),
+                      PackageState: pkg.PackageState,
+                      Label: getLabelOrError(pkg),
+                      ItemName: getItemNameOrError(pkg),
+                      Quantity: pkg.ShippedQuantity,
+                      UnitOfMeasureAbbreviation: pkg.ShippedUnitOfMeasureAbbreviation,
+                      SourcePackageLabels: pkg.SourcePackageLabels,
+                      ProductionBatchNumber: pkg.ProductionBatchNumber,
+                      parentPackageLabels: null,
+                      childPackageLabelQuantityPairs: null,
+                    });
+                  }
+                })),
               );
 
               if (packageRequests.length % 250 === 0) {
@@ -332,18 +326,18 @@ export default Vue.extend({
           this.$data.message = `Processing ${rawTransferPackages.length} manifest packages...`;
 
           const packageWrapper = compressedDataWrapperFactory<ISimpleTransferPackageData>(
-            "Transfer Package",
+            'Transfer Package',
             rawTransferPackages,
-            "Label"
+            'Label',
           );
 
           archive.transfersPackages = packageWrapper.data;
           archive.transfersPackagesKeys = packageWrapper.keys;
         }
 
-        this.$data.message = "Writing archive to file...";
+        this.$data.message = 'Writing archive to file...';
 
-        const blob = new Blob([JSON.stringify(archive)], { type: "application/json" });
+        const blob = new Blob([JSON.stringify(archive)], { type: 'application/json' });
 
         this.$data.archiveFileSize = blob.size;
 

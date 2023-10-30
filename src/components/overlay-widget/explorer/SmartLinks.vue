@@ -10,23 +10,23 @@
 </template>
 
 <script lang="ts">
-import { IPluginState } from "@/interfaces";
-import router from "@/router/index";
-import store from "@/store/page-overlay/index";
-import { ExplorerTargetType } from "@/store/page-overlay/modules/explorer/consts";
+import { IPluginState } from '@/interfaces';
+import router from '@/router/index';
+import store from '@/store/page-overlay/index';
+import { ExplorerTargetType } from '@/store/page-overlay/modules/explorer/consts';
 import {
   extractHarvestNameOrNull,
   extractOutgoingTransferManifestNumberOrNull,
   extractPackageLabelOrNull,
   extractPlantBatchNameOrNull,
   extractPlantLabelOrNull,
-} from "@/utils/history";
-import Vue from "vue";
-import { mapActions, mapState } from "vuex";
-import SmartLink from "./SmartLink.vue";
+} from '@/utils/history';
+import Vue from 'vue';
+import { mapActions, mapState } from 'vuex';
+import SmartLink from './SmartLink.vue';
 
 export default Vue.extend({
-  name: "SmartLinks",
+  name: 'SmartLinks',
   store,
   router,
   props: {
@@ -73,7 +73,7 @@ export default Vue.extend({
       }
 
       const outgoingTransferManifestNumber = extractOutgoingTransferManifestNumberOrNull(
-        this.description
+        this.description,
       );
       if (outgoingTransferManifestNumber) {
         smartLinks.push({

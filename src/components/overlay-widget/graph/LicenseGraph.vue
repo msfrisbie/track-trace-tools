@@ -113,19 +113,19 @@
 </template>
 
 <script lang="ts">
-import { IPluginState } from "@/interfaces";
-import router from "@/router/index";
-import store from "@/store/page-overlay/index";
-import { GraphActions, GraphStatus } from "@/store/page-overlay/modules/graph/consts";
-import { IGraphComponentContext, IGraphNode } from "@/store/page-overlay/modules/graph/interfaces";
-import { getNormalizedPackageContentsDescription } from "@/utils/package";
-import Graph from "graphology";
-import Sigma from "sigma";
-import Vue from "vue";
-import { mapActions, mapState } from "vuex";
+import { IPluginState } from '@/interfaces';
+import router from '@/router/index';
+import store from '@/store/page-overlay/index';
+import { GraphActions, GraphStatus } from '@/store/page-overlay/modules/graph/consts';
+import { IGraphComponentContext, IGraphNode } from '@/store/page-overlay/modules/graph/interfaces';
+import { getNormalizedPackageContentsDescription } from '@/utils/package';
+import Graph from 'graphology';
+import Sigma from 'sigma';
+import Vue from 'vue';
+import { mapActions, mapState } from 'vuex';
 
 export default Vue.extend({
-  name: "LicenseGraph",
+  name: 'LicenseGraph',
   store,
   router,
   props: {},
@@ -138,7 +138,7 @@ export default Vue.extend({
       if (store.state.graph.selectedNodeId) {
         return (
           store.state.graph.graphData.nodes.find(
-            (x) => x.key === store.state.graph.selectedNodeId
+            (x) => x.key === store.state.graph.selectedNodeId,
           ) ?? null
         );
       }
@@ -151,7 +151,7 @@ export default Vue.extend({
       }
 
       const sourceNodeIds = this.$data.graphComponentContext.graph.inboundNeighbors(
-        store.state.graph.selectedNodeId
+        store.state.graph.selectedNodeId,
       );
 
       return sourceNodeIds;
@@ -162,7 +162,7 @@ export default Vue.extend({
       }
 
       return this.$data.graphComponentContext.graph.outboundNeighbors(
-        store.state.graph.selectedNodeId
+        store.state.graph.selectedNodeId,
       );
     },
   },
@@ -187,13 +187,13 @@ export default Vue.extend({
     // Instantiate sigma:
     const graph = new Graph();
 
-    const renderer = new Sigma(graph, this.$refs["sigma-container"] as HTMLElement);
+    const renderer = new Sigma(graph, this.$refs['sigma-container'] as HTMLElement);
 
     const graphComponentContext: IGraphComponentContext = {
       renderer,
       graph,
-      searchInput: this.$refs["search-input"] as HTMLInputElement,
-      container: this.$refs["sigma-container"] as HTMLElement,
+      searchInput: this.$refs['search-input'] as HTMLInputElement,
+      container: this.$refs['sigma-container'] as HTMLElement,
     };
 
     this.$data.graphComponentContext = graphComponentContext;

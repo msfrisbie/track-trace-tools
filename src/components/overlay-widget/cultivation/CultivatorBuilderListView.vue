@@ -48,16 +48,16 @@
 </template>
 
 <script lang="ts">
-import { CALIFORNIA_METRC_HOSTNAME, MessageType, TESTING_AZ_METRC_HOSTNAME } from "@/consts";
-import { analyticsManager } from "@/modules/analytics-manager.module";
-import store from "@/store/page-overlay/index";
-import { HOST_WILDCARD, isCurrentHostAllowed } from "@/utils/builder";
-import { notAvailableMessage } from "@/utils/text";
-import Vue from "vue";
-import { mapState } from "vuex";
+import { CALIFORNIA_METRC_HOSTNAME, MessageType, TESTING_AZ_METRC_HOSTNAME } from '@/consts';
+import { analyticsManager } from '@/modules/analytics-manager.module';
+import store from '@/store/page-overlay/index';
+import { HOST_WILDCARD, isCurrentHostAllowed } from '@/utils/builder';
+import { notAvailableMessage } from '@/utils/text';
+import Vue from 'vue';
+import { mapState } from 'vuex';
 
 export default Vue.extend({
-  name: "CultivatorBuilderListView",
+  name: 'CultivatorBuilderListView',
   store,
   methods: {
     selectBuilderType({ text, route }: { text: string; route: string }) {
@@ -80,83 +80,83 @@ export default Vue.extend({
       notAvailableMessage: notAvailableMessage(),
       builderOptions: [
         {
-          route: "/cultivator/harvest-plants",
-          text: "HARVEST PLANTS",
-          icon: "cut",
-          backgroundColor: "#48b867", //"#c55200",
+          route: '/cultivator/harvest-plants',
+          text: 'HARVEST PLANTS',
+          icon: 'cut',
+          backgroundColor: '#48b867', // "#c55200",
           enabled: isCurrentHostAllowed([HOST_WILDCARD]),
           isBeta: false,
         },
         {
-          route: "/cultivator/manicure-plants",
-          text: "MANICURE PLANTS",
-          icon: "cut",
-          backgroundColor: "#48b867", //"#c55200",
+          route: '/cultivator/manicure-plants',
+          text: 'MANICURE PLANTS',
+          icon: 'cut',
+          backgroundColor: '#48b867', // "#c55200",
           enabled: isCurrentHostAllowed([HOST_WILDCARD]),
           isBeta: false,
         },
         {
-          route: "/cultivator/mother",
-          text: "MOTHER CLONES/SEEDS",
-          icon: "leaf",
-          backgroundColor: "#48b867",
+          route: '/cultivator/mother',
+          text: 'MOTHER CLONES/SEEDS',
+          icon: 'leaf',
+          backgroundColor: '#48b867',
           enabled: isCurrentHostAllowed([HOST_WILDCARD]),
           isBeta: false,
         },
         {
-          route: "/cultivator/destroy-plants",
-          text: "DESTROY PLANTS",
-          icon: "trash-alt",
-          backgroundColor: "#48b867",
+          route: '/cultivator/destroy-plants',
+          text: 'DESTROY PLANTS',
+          icon: 'trash-alt',
+          backgroundColor: '#48b867',
           enabled: isCurrentHostAllowed([HOST_WILDCARD]),
           isBeta: false,
         },
         {
-          route: "/cultivator/move-plants",
-          text: "MOVE PLANTS",
-          icon: "exchange-alt",
-          backgroundColor: "#48b867",
+          route: '/cultivator/move-plants',
+          text: 'MOVE PLANTS',
+          icon: 'exchange-alt',
+          backgroundColor: '#48b867',
           enabled: isCurrentHostAllowed([HOST_WILDCARD]),
           isBeta: false,
         },
         {
-          route: "/cultivator/unpack-immature-plants",
-          text: "UNPACK IMMATURE PLANTS",
-          icon: "box-open",
-          backgroundColor: "#48b867",
+          route: '/cultivator/unpack-immature-plants',
+          text: 'UNPACK IMMATURE PLANTS',
+          icon: 'box-open',
+          backgroundColor: '#48b867',
           enabled: isCurrentHostAllowed([CALIFORNIA_METRC_HOSTNAME, TESTING_AZ_METRC_HOSTNAME]),
           isBeta: false,
         },
         {
-          route: "/cultivator/pack-immature-plants",
-          text: "PACK IMMATURE PLANTS",
-          icon: "box",
-          backgroundColor: "#48b867",
+          route: '/cultivator/pack-immature-plants',
+          text: 'PACK IMMATURE PLANTS',
+          icon: 'box',
+          backgroundColor: '#48b867',
           enabled: isCurrentHostAllowed([HOST_WILDCARD]),
           isBeta: false,
           // isNew: true
         },
         {
-          route: "/cultivator/promote-immature-plants",
-          text: "PROMOTE IMMATURE PLANTS",
-          icon: "seedling",
-          backgroundColor: "#48b867",
+          route: '/cultivator/promote-immature-plants',
+          text: 'PROMOTE IMMATURE PLANTS',
+          icon: 'seedling',
+          backgroundColor: '#48b867',
           enabled: isCurrentHostAllowed([HOST_WILDCARD]),
           isBeta: false,
         },
         {
-          route: "/cultivator/retag-plants",
-          text: "RETAG PLANTS",
-          icon: "tags",
-          backgroundColor: "#48b867",
+          route: '/cultivator/retag-plants',
+          text: 'RETAG PLANTS',
+          icon: 'tags',
+          backgroundColor: '#48b867',
           enabled: isCurrentHostAllowed([HOST_WILDCARD]),
           isBeta: true,
         },
         {
-          route: "/cultivator/retag-plant-batches",
-          text: "RETAG PLANT BATCHES",
-          icon: "tags",
-          backgroundColor: "#48b867",
+          route: '/cultivator/retag-plant-batches',
+          text: 'RETAG PLANT BATCHES',
+          icon: 'tags',
+          backgroundColor: '#48b867',
           enabled: isCurrentHostAllowed([HOST_WILDCARD]),
           isBeta: true,
         },
@@ -174,7 +174,7 @@ export default Vue.extend({
   async mounted() {},
   async created() {},
   computed: {
-    ...mapState(["trackedInteractions", "settings", "accountEnabled"]),
+    ...mapState(['trackedInteractions', 'settings', 'accountEnabled']),
   },
 });
 </script>

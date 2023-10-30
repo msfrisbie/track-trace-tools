@@ -60,23 +60,23 @@
 </template>
 
 <script lang="ts">
-import ErrorReadout from "@/components/overlay-widget/shared/ErrorReadout.vue";
+import ErrorReadout from '@/components/overlay-widget/shared/ErrorReadout.vue';
 import {
   IClientItemFilters,
   IIndexedPackageData,
   IIndexedTransferData,
   IItemData,
   ITransferData,
-} from "@/interfaces";
-import { DataLoadError, DataLoadErrorType } from "@/modules/data-loader/data-loader-error";
-import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
-import store from "@/store/page-overlay/index";
-import { itemMatchesFilters } from "@/utils/filters";
-import _ from "lodash-es";
-import Vue from "vue";
+} from '@/interfaces';
+import { DataLoadError, DataLoadErrorType } from '@/modules/data-loader/data-loader-error';
+import { primaryDataLoader } from '@/modules/data-loader/data-loader.module';
+import store from '@/store/page-overlay/index';
+import { itemMatchesFilters } from '@/utils/filters';
+import _ from 'lodash-es';
+import Vue from 'vue';
 
 export default Vue.extend({
-  name: "TransferPicker",
+  name: 'TransferPicker',
   store,
   components: {
     ErrorReadout,
@@ -88,14 +88,14 @@ export default Vue.extend({
     label: {
       type: String,
       required: false,
-      default: "",
+      default: '',
     },
     transfer: Object as () => IIndexedTransferData,
     zeroResultsErrorSuggestionMessage: String,
   },
   data() {
     return {
-      transferQuery: "",
+      transferQuery: '',
       inflight: false,
       error: null,
       transfers: [],
@@ -125,7 +125,7 @@ export default Vue.extend({
 
         this.$data.transfers = await primaryDataLoader.outgoingTransfers();
       } catch (e) {
-        console.log("error", e);
+        console.log('error', e);
         this.$data.error = e;
         return;
       } finally {
@@ -133,10 +133,10 @@ export default Vue.extend({
       }
 
       if (this.$data.transfers.length === 0) {
-        console.error("Server returned 0 transfers");
+        console.error('Server returned 0 transfers');
         this.$data.error = new DataLoadError(
           DataLoadErrorType.ZERO_RESULTS,
-          "Zero results returned"
+          'Zero results returned',
         );
       }
     },

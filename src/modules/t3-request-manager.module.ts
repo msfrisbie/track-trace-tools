@@ -1,19 +1,19 @@
-import { IAtomicService } from "@/interfaces";
-import { IAnnouncementData } from "@/store/page-overlay/modules/announcements/interfaces";
-import { AxiosError } from "axios";
-import { authManager } from "./auth-manager.module";
-import { customAxios } from "./fetch-manager.module";
+import { IAtomicService } from '@/interfaces';
+import { IAnnouncementData } from '@/store/page-overlay/modules/announcements/interfaces';
+import { AxiosError } from 'axios';
+import { authManager } from './auth-manager.module';
+import { customAxios } from './fetch-manager.module';
 
-const BASE_URL = "https://api.trackandtrace.tools/";
+const BASE_URL = 'https://api.trackandtrace.tools/';
 
-const CLIENT_KEY_PATH = "client";
-const VERIFY_TEST_PATH = "verify/test";
-const FACILITIES_PATH = "facilities";
-const ANNOUNCEMENTS_PATH = "announcements";
-const T3PLUS_PATH = "plus_users/status";
+const CLIENT_KEY_PATH = 'client';
+const VERIFY_TEST_PATH = 'verify/test';
+const FACILITIES_PATH = 'facilities';
+const ANNOUNCEMENTS_PATH = 'announcements';
+const T3PLUS_PATH = 'plus_users/status';
 
 const DEFAULT_POST_HEADERS = {
-  "Content-Type": "application/json",
+  'Content-Type': 'application/json',
 };
 const DEFAULT_GET_HEADERS = {};
 
@@ -26,24 +26,24 @@ class T3RequestManager implements IAtomicService {
   }> {
     try {
       const response = await customAxios(BASE_URL + CLIENT_KEY_PATH, {
-        method: "POST",
-        headers: DEFAULT_POST_HEADERS, 
+        method: 'POST',
+        headers: DEFAULT_POST_HEADERS,
         body: JSON.stringify({ client_key: clientKey }),
       });
 
       const { client_name, values } = response.data;
 
       if (!client_name) {
-        throw new Error("Missing client_name");
+        throw new Error('Missing client_name');
       }
 
       if (!values) {
-        throw new Error("Missing values");
+        throw new Error('Missing values');
       }
 
       return {
         clientName: client_name,
-        values: values,
+        values,
       };
     } catch (e) {
       // Only overwrite values if server explicitly indicates a 401
@@ -54,7 +54,7 @@ class T3RequestManager implements IAtomicService {
         };
       }
 
-      throw new Error("Error fetching client values. Declining to override.");
+      throw new Error('Error fetching client values. Declining to override.');
     }
   }
 
@@ -62,9 +62,9 @@ class T3RequestManager implements IAtomicService {
     const authState = await authManager.authStateOrError();
 
     const response = await customAxios(BASE_URL + T3PLUS_PATH, {
-      method: "POST",
+      method: 'POST',
       headers: DEFAULT_POST_HEADERS,
-      body: JSON.stringify({metrc_username: authState.identity})
+      body: JSON.stringify({ metrc_username: authState.identity }),
     });
 
     return response.data;
@@ -72,7 +72,7 @@ class T3RequestManager implements IAtomicService {
 
   async loadAnnouncements(): Promise<IAnnouncementData[]> {
     const response = await customAxios(BASE_URL + ANNOUNCEMENTS_PATH, {
-      method: "GET",
+      method: 'GET',
       headers: DEFAULT_GET_HEADERS,
     });
 
@@ -86,7 +86,7 @@ class T3RequestManager implements IAtomicService {
     };
 
     return customAxios(BASE_URL + FACILITIES_PATH, {
-      method: "POST",
+      method: 'POST',
       headers: DEFAULT_POST_HEADERS,
       body: JSON.stringify(data),
     });
@@ -103,11 +103,11 @@ class T3RequestManager implements IAtomicService {
     console.log(data);
 
     return customAxios(BASE_URL + VERIFY_TEST_PATH, {
-      method: "POST",
+      method: 'POST',
       headers: DEFAULT_POST_HEADERS,
       body: JSON.stringify(data),
     });
   }
 }
 
-export let t3RequestManager = new T3RequestManager();
+export const t3RequestManager = new T3RequestManager();

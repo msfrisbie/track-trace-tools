@@ -1,4 +1,4 @@
-import { IAtomicService } from "@/interfaces";
+import { IAtomicService } from '@/interfaces';
 
 export interface IDeprecatedFlags {
   enableScreenshot: boolean;
@@ -18,13 +18,13 @@ const DEFAULT_FLAGS: IDeprecatedFlags = {
   enableTransferTools: true,
 };
 
-const FLAG_OVERRIDE_KEY = "mt-flagoverride";
+const FLAG_OVERRIDE_KEY = 'mt-flagoverride';
 
 class DeprecatedFlagManager implements IAtomicService {
   public flags: IDeprecatedFlags;
 
   constructor() {
-    const existingFlagData: string = localStorage.getItem(FLAG_OVERRIDE_KEY) || "{}";
+    const existingFlagData: string = localStorage.getItem(FLAG_OVERRIDE_KEY) || '{}';
 
     const existingFlags: IDeprecatedFlags = JSON.parse(existingFlagData);
 
@@ -47,4 +47,4 @@ class DeprecatedFlagManager implements IAtomicService {
   }
 }
 
-export let flagManager = new DeprecatedFlagManager();
+export const flagManager = new DeprecatedFlagManager();

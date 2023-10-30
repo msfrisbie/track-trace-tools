@@ -1,5 +1,5 @@
-import { ITextFile } from "@/interfaces";
-import { timer } from "rxjs";
+import { ITextFile } from '@/interfaces';
+import { timer } from 'rxjs';
 
 export async function toBase64(file: File) {
   return new Promise((resolve, reject) => {
@@ -13,20 +13,20 @@ export async function toBase64(file: File) {
 export async function generateThumbnail(file: File): Promise<string> {
   // const scaleRatio = Math.min(100, 100) / Math.max(file.width, file.height)
   var reader = new FileReader();
-  var canvas = document.createElement("canvas");
-  var ctx = canvas.getContext("2d");
+  var canvas = document.createElement('canvas');
+  var ctx = canvas.getContext('2d');
 
   return new Promise((resolve, reject) => {
     reader.onload = function (event) {
       var img = new Image();
       img.onload = function () {
         var scaleRatio = Math.min(100, 100) / Math.max(img.width, img.height);
-        let w = img.width * scaleRatio;
-        let h = img.height * scaleRatio;
+        const w = img.width * scaleRatio;
+        const h = img.height * scaleRatio;
         canvas.width = w;
         canvas.height = h;
         ctx?.drawImage(img, 0, 0, w, h);
-        return resolve(canvas.toDataURL("image/png"));
+        return resolve(canvas.toDataURL('image/png'));
       };
       // @ts-ignore
       img.src = event.target.result;
@@ -41,7 +41,7 @@ export async function readJSONFile(file: File): Promise<any> {
   return new Promise((resolve, reject) => {
     reader.onload = function (event) {
       // @ts-ignore
-      resolve(JSON.parse(event.target.result))
+      resolve(JSON.parse(event.target.result));
     };
     reader.readAsText(file);
   });
@@ -54,16 +54,16 @@ export async function downloadTextFile({
   textFile: ITextFile;
   delay?: number;
 }) {
-  let textContent = textFile.data;
+  const textContent = textFile.data;
 
-  let blob = new Blob([textContent], { type: "text/plain;charset=utf-8;" });
+  const blob = new Blob([textContent], { type: 'text/plain;charset=utf-8;' });
 
   // let encodedUri = encodeURI(fileData);
-  let url = URL.createObjectURL(blob);
+  const url = URL.createObjectURL(blob);
 
-  let link = document.createElement("a");
-  link.setAttribute("href", url);
-  link.setAttribute("download", textFile.filename);
+  const link = document.createElement('a');
+  link.setAttribute('href', url);
+  link.setAttribute('download', textFile.filename);
   document.body.appendChild(link); // Required for FF
 
   link.click(); // This will download the data file named "my_data.csv".

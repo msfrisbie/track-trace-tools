@@ -1,5 +1,5 @@
-import { IIndexedPackageData, IMetrcEmployeeData } from "@/interfaces";
-import { EmployeeSamplesState } from "./consts";
+import { IIndexedPackageData, IMetrcEmployeeData } from '@/interfaces';
+import { EmployeeSamplesState } from './consts';
 
 export interface IEmployeeSamplesState {
   toolState: EmployeeSamplesState;

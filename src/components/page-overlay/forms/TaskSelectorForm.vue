@@ -8,31 +8,31 @@
 </template>
 
 <script lang="ts">
-import { MessageType, ToolkitView } from "@/consts";
-import { analyticsManager } from "@/modules/analytics-manager.module";
-import { MutationType } from "@/mutation-types";
-import store from "@/store/page-overlay/index";
-import Vue from "vue";
-import { mapState } from "vuex";
+import { MessageType, ToolkitView } from '@/consts';
+import { analyticsManager } from '@/modules/analytics-manager.module';
+import { MutationType } from '@/mutation-types';
+import store from '@/store/page-overlay/index';
+import Vue from 'vue';
+import { mapState } from 'vuex';
 
 export default Vue.extend({
-  name: "TaskSelector",
+  name: 'TaskSelector',
   store,
   computed: {
-    ...mapState(["currentView"]),
+    ...mapState(['currentView']),
   },
   data(): { selected: any; options: any } {
     return {
       selected: store.state.currentView || ToolkitView.SETTINGS,
       options: [
         {
-          text: "What would you like to do?",
+          text: 'What would you like to do?',
           value: null,
           disabled: true,
         },
         {
           value: ToolkitView.SETTINGS,
-          text: "Edit Toolkit Settings",
+          text: 'Edit Toolkit Settings',
         },
         // {
         //   value: ToolkitView.MANAGE_ACCOUNT,
@@ -40,27 +40,27 @@ export default Vue.extend({
         // },
         {
           value: ToolkitView.SCREENSHOT,
-          text: "Create a Screenshot Share",
+          text: 'Create a Screenshot Share',
         },
         // {
         //   value: ToolkitView.CREATE_CSV,
         //   text: "Generate Metrc CSV files",
         // },
         {
-          label: "Sales",
+          label: 'Sales',
           options: [
             {
               value: ToolkitView.FINALIZE_SALES,
-              text: "Finalize sales",
+              text: 'Finalize sales',
             },
           ],
         },
         {
-          label: "Tags",
+          label: 'Tags',
           options: [
             {
               value: ToolkitView.VOID_TAGS,
-              text: "Void multiple tags",
+              text: 'Void multiple tags',
             },
             // {
             //   value: ToolkitView.REORDER_TAGS,

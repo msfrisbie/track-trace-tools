@@ -1,8 +1,8 @@
-import { IAtomicService, IAuthState, PluginKeyvalCategory } from "@/interfaces";
-import { debugLogFactory } from "@/utils/debug";
-import { expiringCacheManager } from "./expiring-cache-manager.module";
+import { IAtomicService, IAuthState, PluginKeyvalCategory } from '@/interfaces';
+import { debugLogFactory } from '@/utils/debug';
+import { expiringCacheManager } from './expiring-cache-manager.module';
 
-const debugLog = debugLogFactory("upsert-manager.module.ts");
+const debugLog = debugLogFactory('upsert-manager.module.ts');
 
 const ONE_DAY_MS = 24 * 60 * 60 * 1000;
 const ONE_HOUR_MS = 60 * 60 * 1000;
@@ -42,7 +42,7 @@ class KeyFactory {
   async recordSend() {
     expiringCacheManager.set({
       key: await this.generate(),
-      value: "1",
+      value: '1',
       expirationMs: this.sendIntervalMs,
     });
   }
@@ -65,7 +65,7 @@ class UpsertManager implements IAtomicService {
   }) {
     const keyFactory: KeyFactory = new KeyFactory({ key, sendIntervalMs, authState });
 
-    return await keyFactory.shouldSend();
+    return keyFactory.shouldSend();
   }
 
   async maybeSendKeyval({
@@ -78,7 +78,7 @@ class UpsertManager implements IAtomicService {
   }: {
     key: string;
     category: PluginKeyvalCategory;
-    dataType: "json" | "blob";
+    dataType: 'json' | 'blob';
     data: any;
     authState: IAuthState;
     sendIntervalMs?: number;
@@ -87,7 +87,7 @@ class UpsertManager implements IAtomicService {
       const keyFactory: KeyFactory = new KeyFactory({ key, sendIntervalMs, authState });
 
       if (!(await keyFactory.shouldSend())) {
-        debugLog(async () => ["Declining to send", await keyFactory.generate()]);
+        debugLog(async () => ['Declining to send', await keyFactory.generate()]);
         return;
       }
 
@@ -111,4 +111,4 @@ class UpsertManager implements IAtomicService {
   }
 }
 
-export let upsertManager = new UpsertManager();
+export const upsertManager = new UpsertManager();

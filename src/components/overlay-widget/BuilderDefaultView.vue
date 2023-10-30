@@ -63,18 +63,18 @@
 </template>
 
 <script lang="ts">
-import Announcements from "@/components/overlay-widget/Announcements.vue";
-import BuilderDashboard from "@/components/overlay-widget/BuilderDashboard.vue";
-import { MessageType } from "@/consts";
-import { IPluginState } from "@/interfaces";
-import { analyticsManager } from "@/modules/analytics-manager.module";
-import router from "@/router/index";
-import store from "@/store/page-overlay/index";
-import { isIdentityEligibleForTransferTools } from "@/utils/access-control";
-import { HOST_WILDCARD, isCurrentHostAllowed } from "@/utils/builder";
-import { notAvailableMessage } from "@/utils/text";
-import Vue from "vue";
-import { mapActions, mapState } from "vuex";
+import Announcements from '@/components/overlay-widget/Announcements.vue';
+import BuilderDashboard from '@/components/overlay-widget/BuilderDashboard.vue';
+import { MessageType } from '@/consts';
+import { IPluginState } from '@/interfaces';
+import { analyticsManager } from '@/modules/analytics-manager.module';
+import router from '@/router/index';
+import store from '@/store/page-overlay/index';
+import { isIdentityEligibleForTransferTools } from '@/utils/access-control';
+import { HOST_WILDCARD, isCurrentHostAllowed } from '@/utils/builder';
+import { notAvailableMessage } from '@/utils/text';
+import Vue from 'vue';
+import { mapActions, mapState } from 'vuex';
 
 interface IOption {
   backgroundColor: string;
@@ -89,7 +89,7 @@ interface IOption {
 }
 
 export default Vue.extend({
-  name: "BuilderDefaultView",
+  name: 'BuilderDefaultView',
   router,
   store,
   components: {
@@ -114,20 +114,20 @@ export default Vue.extend({
     options() {
       return [
         {
-          backgroundColor: "gray",
-          text: "T3+",
-          icon: "plus",
-          visible: !store.state.client.values["ENABLE_T3PLUS"] && !store.state.client.t3plus,
+          backgroundColor: 'gray',
+          text: 'T3+',
+          icon: 'plus',
+          visible: !store.state.client.values.ENABLE_T3PLUS && !store.state.client.t3plus,
           enabled: true,
           isBeta: false,
           isNew: false,
-          url: "https://www.trackandtrace.tools/plus",
+          url: 'https://www.trackandtrace.tools/plus',
         },
         {
-          backgroundColor: "#2774ae",
-          text: "VERIFY",
-          route: "/verify",
-          icon: "check",
+          backgroundColor: '#2774ae',
+          text: 'VERIFY',
+          route: '/verify',
+          icon: 'check',
           enabled: true,
           visible: false,
           isBeta: false,
@@ -135,135 +135,135 @@ export default Vue.extend({
           // helpRoute: "/help/package",
         },
         {
-          backgroundColor: "#2774ae",
-          text: "PACKAGE TOOLS",
-          route: "/package",
-          icon: "box",
+          backgroundColor: '#2774ae',
+          text: 'PACKAGE TOOLS',
+          route: '/package',
+          icon: 'box',
           enabled: isCurrentHostAllowed([HOST_WILDCARD]),
           visible: true,
           isBeta: false,
           isNew: false,
-          helpRoute: "/help/package",
+          helpRoute: '/help/package',
         },
         {
-          backgroundColor: "#48b867",
-          text: "CULTIVATION TOOLS",
-          route: "/cultivator",
-          icon: "leaf",
+          backgroundColor: '#48b867',
+          text: 'CULTIVATION TOOLS',
+          route: '/cultivator',
+          icon: 'leaf',
           visible: true,
           enabled: isCurrentHostAllowed([HOST_WILDCARD]),
           isBeta: false,
           isNew: false,
-          helpRoute: "/help/cultivator",
+          helpRoute: '/help/cultivator',
         },
         {
-          backgroundColor: "#48b867",
-          text: "QUICK SCRIPTS",
-          route: "/quick-scripts",
-          icon: "bolt",
+          backgroundColor: '#48b867',
+          text: 'QUICK SCRIPTS',
+          route: '/quick-scripts',
+          icon: 'bolt',
           visible: true,
           enabled: true,
           isBeta: false,
           isNew: false,
         },
         {
-          backgroundColor: "#c14747",
-          text: "REPORTS",
-          route: "/google-sheets-export",
-          icon: "table",
+          backgroundColor: '#c14747',
+          text: 'REPORTS',
+          route: '/google-sheets-export',
+          icon: 'table',
           visible: true,
           enabled: true,
           isBeta: false,
           isNew: false,
         },
         {
-          backgroundColor: "#c14747",
-          text: "EXPLORER",
-          route: "/metrc-explorer",
-          icon: "sitemap",
-          visible: store.state.client.values["ENABLE_T3PLUS"] || store.state.client.t3plus,
+          backgroundColor: '#c14747',
+          text: 'EXPLORER',
+          route: '/metrc-explorer',
+          icon: 'sitemap',
+          visible: store.state.client.values.ENABLE_T3PLUS || store.state.client.t3plus,
           enabled: true,
           isBeta: false,
           isNew: false,
         },
         {
-          backgroundColor: "#c14747",
-          text: "GRAPH",
-          route: "/graph",
-          icon: "project-diagram",
-          visible: store.state.client.values["ENABLE_T3PLUS"] || store.state.client.t3plus,
+          backgroundColor: '#c14747',
+          text: 'GRAPH',
+          route: '/graph',
+          icon: 'project-diagram',
+          visible: store.state.client.values.ENABLE_T3PLUS || store.state.client.t3plus,
           enabled: true,
           isBeta: false,
           isNew: false,
         },
         {
-          backgroundColor: "#773c77",
-          text: "TRANSFER BUILDER",
-          route: "/transfer/transfer-builder",
-          icon: "truck-loading",
+          backgroundColor: '#773c77',
+          text: 'TRANSFER BUILDER',
+          route: '/transfer/transfer-builder',
+          icon: 'truck-loading',
           enabled: isIdentityEligibleForTransferTools({
             hostname: window.location.hostname,
           }),
           visible: true,
           isBeta: false,
           isNew: false,
-          helpRoute: "/help/transfer",
+          helpRoute: '/help/transfer',
         },
         {
-          backgroundColor: "#c14747",
-          text: "VOID TAGS",
-          route: "/tags/void-tags",
-          icon: "tags",
+          backgroundColor: '#c14747',
+          text: 'VOID TAGS',
+          route: '/tags/void-tags',
+          icon: 'tags',
           visible: true,
           enabled: true,
           isBeta: false,
           isNew: false,
         },
         {
-          backgroundColor: "orange",
-          text: "FINALIZE SALES",
-          route: "/sales/finalize-sales",
-          icon: "dollar-sign",
+          backgroundColor: 'orange',
+          text: 'FINALIZE SALES',
+          route: '/sales/finalize-sales',
+          icon: 'dollar-sign',
           visible: true,
           enabled: true,
           isBeta: false,
           isNew: false,
         },
         {
-          backgroundColor: "gray",
-          text: "SETTINGS",
-          route: "/settings/all",
-          icon: "sliders-h",
+          backgroundColor: 'gray',
+          text: 'SETTINGS',
+          route: '/settings/all',
+          icon: 'sliders-h',
           visible: true,
           enabled: true,
           isBeta: false,
           isNew: false,
         },
         {
-          backgroundColor: "gray",
-          text: "COMMUNITY",
-          icon: "users",
+          backgroundColor: 'gray',
+          text: 'COMMUNITY',
+          icon: 'users',
           visible: true,
           enabled: true,
           isBeta: false,
           isNew: false,
-          url: "https://track-trace-tools.talkyard.net/",
+          url: 'https://track-trace-tools.talkyard.net/',
         },
         {
-          backgroundColor: "gray",
-          text: "REPORT A PROBLEM",
-          icon: "exclamation-triangle",
+          backgroundColor: 'gray',
+          text: 'REPORT A PROBLEM',
+          icon: 'exclamation-triangle',
           visible: true,
           enabled: true,
           isBeta: false,
           isNew: false,
-          url: "https://docs.google.com/forms/d/e/1FAIpQLSd2hQFwtXyv1Bco9nHN9d4tEqkgbhe3w-WdbZAemBCTD_19VQ/viewform?usp=sf_link",
+          url: 'https://docs.google.com/forms/d/e/1FAIpQLSd2hQFwtXyv1Bco9nHN9d4tEqkgbhe3w-WdbZAemBCTD_19VQ/viewform?usp=sf_link',
         },
         {
-          backgroundColor: "black",
-          text: "ADMIN",
-          route: "/admin",
-          icon: "cog",
+          backgroundColor: 'black',
+          text: 'ADMIN',
+          route: '/admin',
+          icon: 'cog',
           visible: store.state.debugMode,
           enabled: true,
           isBeta: false,
@@ -275,11 +275,11 @@ export default Vue.extend({
   methods: {
     ...mapActions({}),
     badgeWidth(option: any) {
-      return { width: !option.enabled || (!option.isBeta && !option.isNew) ? "0rem" : "" };
+      return { width: !option.enabled || (!option.isBeta && !option.isNew) ? '0rem' : '' };
     },
     open({ route, url, handler }: { route?: string; url?: string; handler?: Function }) {
       if (!route && !url && !handler) {
-        throw new Error("Must provide a route or URL or handler");
+        throw new Error('Must provide a route or URL or handler');
       }
 
       if (route) {
@@ -295,12 +295,12 @@ export default Vue.extend({
           action: `Navigated to ${url}`,
         });
 
-        window.open(url, "_blank");
+        window.open(url, '_blank');
       }
 
       if (handler) {
         analyticsManager.track(MessageType.BUILDER_ENGAGEMENT, {
-          action: `Calling handler`,
+          action: 'Calling handler',
         });
 
         handler();

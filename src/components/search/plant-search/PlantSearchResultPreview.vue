@@ -22,17 +22,17 @@
 </template>
 
 <script lang="ts">
-import { MessageType } from "@/consts";
-import { IIndexedPlantData } from "@/interfaces";
-import { analyticsManager } from "@/modules/analytics-manager.module";
-import { PlantSearchActions } from "@/store/page-overlay/modules/plant-search/consts";
-import { SearchActions } from "@/store/page-overlay/modules/search/consts";
-import Vue from "vue";
-import { mapActions } from "vuex";
-import store from "@/store/page-overlay/index";
+import { MessageType } from '@/consts';
+import { IIndexedPlantData } from '@/interfaces';
+import { analyticsManager } from '@/modules/analytics-manager.module';
+import { PlantSearchActions } from '@/store/page-overlay/modules/plant-search/consts';
+import { SearchActions } from '@/store/page-overlay/modules/search/consts';
+import Vue from 'vue';
+import { mapActions } from 'vuex';
+import store from '@/store/page-overlay/index';
 
 export default Vue.extend({
-  name: "PlantSearchResultPreview",
+  name: 'PlantSearchResultPreview',
   props: {
     sectionName: String,
     plant: Object as () => IIndexedPlantData,
@@ -46,7 +46,7 @@ export default Vue.extend({
       setPlantSearchFilters: `plantSearch/${PlantSearchActions.SET_PLANT_SEARCH_FILTERS}`,
     }),
     selectPlant(plant: IIndexedPlantData) {
-      this.$emit("selected-plant", plant);
+      this.$emit('selected-plant', plant);
     },
     async setPlantLabelFilter(plant: IIndexedPlantData) {
       analyticsManager.track(MessageType.SELECTED_PLANT);

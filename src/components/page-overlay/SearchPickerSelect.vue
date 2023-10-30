@@ -9,19 +9,15 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import { mapState, mapActions } from "vuex";
-import router from "@/router/index";
-import store from "@/store/page-overlay/index";
-import TagSearchWidget from "@/components/search/tag-search/TagSearchWidget.vue";
-import TransferSearchWidget from "@/components/search/transfer-search/TransferSearchWidget.vue";
-import PackageSearchWidget from "@/components/search/package-search/PackageSearchWidget.vue";
-import { SearchActions } from "@/store/page-overlay/modules/search/consts";
-import { SearchType } from "@/store/page-overlay/modules/search/interfaces";
-import { IPluginState } from "@/interfaces";
+import { IPluginState } from '@/interfaces';
+import router from '@/router/index';
+import store from '@/store/page-overlay/index';
+import { SearchActions, SearchType } from '@/store/page-overlay/modules/search/consts';
+import Vue from 'vue';
+import { mapActions, mapState } from 'vuex';
 
 export default Vue.extend({
-  name: "SearchPickerSeelect",
+  name: 'SearchPickerSeelect',
   store,
   router,
   props: {},

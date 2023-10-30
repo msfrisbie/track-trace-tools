@@ -122,28 +122,28 @@
 </template>
 
 <script lang="ts">
-import BuilderStepHeader from "@/components/overlay-widget/shared/BuilderStepHeader.vue";
-import PlantBatchPicker from "@/components/overlay-widget/shared/PlantBatchPicker.vue";
-import TagPicker from "@/components/overlay-widget/shared/TagPicker.vue";
-import { BuilderType, MessageType } from "@/consts";
+import BuilderStepHeader from '@/components/overlay-widget/shared/BuilderStepHeader.vue';
+import PlantBatchPicker from '@/components/overlay-widget/shared/PlantBatchPicker.vue';
+import TagPicker from '@/components/overlay-widget/shared/TagPicker.vue';
+import { BuilderType, MessageType } from '@/consts';
 import {
   ICsvFile,
   IMetrcReplacePlantBatchTagsPayload,
   IPlantBatchData,
   ITagData,
-} from "@/interfaces";
-import { analyticsManager } from "@/modules/analytics-manager.module";
-import { builderManager } from "@/modules/builder-manager.module";
-import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
-import store from "@/store/page-overlay/index";
-import { safeZip } from "@/utils/array";
-import { buildCsvDataOrError, buildNamedCsvFileData, downloadCsvFile } from "@/utils/csv";
-import { submitDateFromIsodate, todayIsodate } from "@/utils/date";
-import { timer } from "rxjs";
-import Vue from "vue";
+} from '@/interfaces';
+import { analyticsManager } from '@/modules/analytics-manager.module';
+import { builderManager } from '@/modules/builder-manager.module';
+import { primaryDataLoader } from '@/modules/data-loader/data-loader.module';
+import store from '@/store/page-overlay/index';
+import { safeZip } from '@/utils/array';
+import { buildCsvDataOrError, buildNamedCsvFileData, downloadCsvFile } from '@/utils/csv';
+import { submitDateFromIsodate, todayIsodate } from '@/utils/date';
+import { timer } from 'rxjs';
+import Vue from 'vue';
 
 export default Vue.extend({
-  name: "ReplacePlantBatchTagsBuilder",
+  name: 'ReplacePlantBatchTagsBuilder',
   store,
   components: {
     BuilderStepHeader,
@@ -165,10 +165,10 @@ export default Vue.extend({
       // @ts-ignore
       const zipped: [ITagData, IPlantBatchData][] = safeZip(
         this.$data.plantBatchTags,
-        this.$data.selectedPlantBatches
+        this.$data.selectedPlantBatches,
       );
 
-      for (let el of zipped) {
+      for (const el of zipped) {
         const tag = el[0];
         const plantBatch = el[1];
 
@@ -188,11 +188,11 @@ export default Vue.extend({
           plantTotal: this.$data.selectedPlantBatches.length,
         },
         this.buildCsvFiles(),
-        5
+        5,
       );
     },
     async downloadAll() {
-      for (let csvFile of this.csvFiles) {
+      for (const csvFile of this.csvFiles) {
         await downloadCsvFile({ csvFile, delay: 500 });
       }
 
@@ -222,7 +222,7 @@ export default Vue.extend({
           {
             isVector: true,
             data: this.$data.selectedPlantBatches.map(
-              (plantBatch: IPlantBatchData) => plantBatch.Name
+              (plantBatch: IPlantBatchData) => plantBatch.Name,
             ),
           },
           {
@@ -234,7 +234,7 @@ export default Vue.extend({
 
         return buildNamedCsvFileData(
           csvData,
-          `Retagging ${this.$data.selectedPlantBatches} plant batches`
+          `Retagging ${this.$data.selectedPlantBatches} plant batches`,
         );
       } catch (e) {
         console.error(e);
@@ -248,8 +248,8 @@ export default Vue.extend({
     },
     tagsSelected() {
       return (
-        this.$data.plantBatchTags.length > 0 &&
-        this.$data.plantBatchTags.length === this.$data.selectedPlantBatches.length
+        this.$data.plantBatchTags.length > 0
+        && this.$data.plantBatchTags.length === this.$data.selectedPlantBatches.length
       );
     },
     csvFiles(): ICsvFile[] {
@@ -267,13 +267,13 @@ export default Vue.extend({
       plantBatchTags: [],
       steps: [
         {
-          stepText: "Select plant batches to retag",
+          stepText: 'Select plant batches to retag',
         },
         {
-          stepText: "Tagging details",
+          stepText: 'Tagging details',
         },
         {
-          stepText: "Submit",
+          stepText: 'Submit',
         },
       ],
     };

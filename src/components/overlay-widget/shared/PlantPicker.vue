@@ -207,31 +207,35 @@
 </template>
 
 <script lang="ts">
-import AnimatedNumber from "@/components/overlay-widget/shared/AnimatedNumber.vue";
-import ErrorReadout from "@/components/overlay-widget/shared/ErrorReadout.vue";
-import LocationPicker from "@/components/overlay-widget/shared/LocationPicker.vue";
-import PickerCard from "@/components/overlay-widget/shared/PickerCard.vue";
-import StrainPicker from "@/components/overlay-widget/shared/StrainPicker.vue";
-import { DATA_LOAD_MAX_COUNT } from "@/consts";
-import { ILocationData, IPlantData, IPlantFilter, IStrainData } from "@/interfaces";
-import { authManager } from "@/modules/auth-manager.module";
-import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
-import store from "@/store/page-overlay/index";
-import { combineLatest, Subject } from "rxjs";
-import { debounceTime, distinctUntilChanged, filter, startWith, tap } from "rxjs/operators";
-import { v4 } from "uuid";
-import Vue from "vue";
-import PasteTags from "./PasteTags.vue";
+import AnimatedNumber from '@/components/overlay-widget/shared/AnimatedNumber.vue';
+import ErrorReadout from '@/components/overlay-widget/shared/ErrorReadout.vue';
+import LocationPicker from '@/components/overlay-widget/shared/LocationPicker.vue';
+import PickerCard from '@/components/overlay-widget/shared/PickerCard.vue';
+import StrainPicker from '@/components/overlay-widget/shared/StrainPicker.vue';
+import { DATA_LOAD_MAX_COUNT } from '@/consts';
+import {
+  ILocationData, IPlantData, IPlantFilter, IStrainData,
+} from '@/interfaces';
+import { authManager } from '@/modules/auth-manager.module';
+import { primaryDataLoader } from '@/modules/data-loader/data-loader.module';
+import store from '@/store/page-overlay/index';
+import { combineLatest, Subject } from 'rxjs';
+import {
+  debounceTime, distinctUntilChanged, filter, startWith, tap,
+} from 'rxjs/operators';
+import { v4 } from 'uuid';
+import Vue from 'vue';
+import PasteTags from './PasteTags.vue';
 
 const PAGE_SIZE = 100;
 
 export enum SelectedMenuState {
-  SELECTION = "Select Plants",
-  PASTED_TAGS = "Paste Plant Tags",
+  SELECTION = 'Select Plants',
+  PASTED_TAGS = 'Paste Plant Tags',
 }
 
 export default Vue.extend({
-  name: "PlantPicker",
+  name: 'PlantPicker',
   store,
   components: {
     LocationPicker,
@@ -297,9 +301,7 @@ export default Vue.extend({
       }
     },
     filterSelectedByPastedTags() {
-      this.$data.selectedPlantsMirror = this.$data.sourcePlants.filter((x: IPlantData) =>
-        this.$data.pastedTags.includes(x.Label)
-      );
+      this.$data.selectedPlantsMirror = this.$data.sourcePlants.filter((x: IPlantData) => this.$data.pastedTags.includes(x.Label));
     },
     selectAll() {
       this.$data.selectedPlantsMirror = this.$data.sourcePlants;
@@ -317,45 +319,45 @@ export default Vue.extend({
 
       if (this.$data.filterDateField && this.$data.filterDateMatch && this.$data.filterDate) {
         // I'm guessing Metrc strips out the time, just match what they're sending
-        const isoDatetime = this.$data.filterDate + "T08:00:00.000Z";
+        const isoDatetime = `${this.$data.filterDate}T08:00:00.000Z`;
 
-        if (this.$data.filterDateField === "PlantedDate") {
+        if (this.$data.filterDateField === 'PlantedDate') {
           switch (this.$data.filterDateMatch) {
-            case "lt":
+            case 'lt':
               filter.plantedDateLt = isoDatetime;
               break;
-            case "eq":
+            case 'eq':
               filter.plantedDateEq = isoDatetime;
               break;
-            case "gt":
+            case 'gt':
               filter.plantedDateGt = isoDatetime;
               break;
           }
         }
 
-        if (this.$data.filterDateField === "VegetativeDate") {
+        if (this.$data.filterDateField === 'VegetativeDate') {
           switch (this.$data.filterDateMatch) {
-            case "lt":
+            case 'lt':
               filter.vegetativeDateLt = isoDatetime;
               break;
-            case "eq":
+            case 'eq':
               filter.vegetativeDateEq = isoDatetime;
               break;
-            case "gt":
+            case 'gt':
               filter.vegetativeDateGt = isoDatetime;
               break;
           }
         }
 
-        if (this.$data.filterDateField === "FloweringDate") {
+        if (this.$data.filterDateField === 'FloweringDate') {
           switch (this.$data.filterDateMatch) {
-            case "lt":
+            case 'lt':
               filter.floweringDateLt = isoDatetime;
               break;
-            case "eq":
+            case 'eq':
               filter.floweringDateEq = isoDatetime;
               break;
-            case "gt":
+            case 'gt':
               filter.floweringDateGt = isoDatetime;
               break;
           }
@@ -370,27 +372,24 @@ export default Vue.extend({
         const lock = v4();
         this.$data.lockUuid = lock;
 
-        const plants =
-          this.$data.growthPhase === "Vegetative"
-            ? await primaryDataLoader.vegetativePlants({
-                filter,
-                maxCount: DATA_LOAD_MAX_COUNT,
-              })
-            : await primaryDataLoader.floweringPlants({
-                filter,
-                maxCount: DATA_LOAD_MAX_COUNT,
-              });
+        const plants = this.$data.growthPhase === 'Vegetative'
+          ? await primaryDataLoader.vegetativePlants({
+            filter,
+            maxCount: DATA_LOAD_MAX_COUNT,
+          })
+          : await primaryDataLoader.floweringPlants({
+            filter,
+            maxCount: DATA_LOAD_MAX_COUNT,
+          });
 
         // If there was a subsequent load, don't overwrite
         if (this.$data.lockUuid === lock) {
-          this.$data.sourcePlants = plants.sort((a: IPlantData, b: IPlantData) =>
-            a.Label > b.Label ? 1 : -1
-          );
+          this.$data.sourcePlants = plants.sort((a: IPlantData, b: IPlantData) => (a.Label > b.Label ? 1 : -1));
 
           // This must perform a shallow clone
           this.$data.selectedPlantsMirror = [...this.$data.sourcePlants];
         } else {
-          console.log("Lock not owned, exiting");
+          console.log('Lock not owned, exiting');
           return;
         }
       } catch (e) {
@@ -449,18 +448,18 @@ export default Vue.extend({
       filterDateField: null,
       filterDateMatch: null,
       filterDateMatchOptions: [
-        { value: "lt", text: "is before" },
-        { value: "eq", text: "is on" },
-        { value: "gt", text: "is after" },
+        { value: 'lt', text: 'is before' },
+        { value: 'eq', text: 'is on' },
+        { value: 'gt', text: 'is after' },
       ],
       filterDateFieldOptions: [
-        { value: null, text: "" },
-        { value: "PlantedDate", text: "Planted date" },
-        { value: "VegetativeDate", text: "Vegetative date" },
-        { value: "FloweringDate", text: "Flowering date" },
+        { value: null, text: '' },
+        { value: 'PlantedDate', text: 'Planted date' },
+        { value: 'VegetativeDate', text: 'Vegetative date' },
+        { value: 'FloweringDate', text: 'Flowering date' },
       ],
-      growthPhase: "Flowering",
-      growthPhaseOptions: ["Vegetative", "Flowering"],
+      growthPhase: 'Flowering',
+      growthPhaseOptions: ['Vegetative', 'Flowering'],
       copyPasteTags: false,
       pastedTags: [],
       selectedMenuState: SelectedMenuState,
@@ -519,7 +518,7 @@ export default Vue.extend({
     selectedPlantsMirror: {
       immediate: true,
       handler(newValue, oldValue) {
-        this.$emit("update:selectedPlants", newValue);
+        this.$emit('update:selectedPlants', newValue);
       },
     },
     pastedTags: {
@@ -539,12 +538,12 @@ export default Vue.extend({
       this.$data.dateFilterData$.pipe(
         debounceTime(500),
         distinctUntilChanged(),
-        startWith([null, null, null])
+        startWith([null, null, null]),
       ),
       this.$data.growthPhase$.pipe(
         debounceTime(500),
         distinctUntilChanged(),
-        startWith(this.$data.growthPhase)
+        startWith(this.$data.growthPhase),
       ),
     ])
       .pipe(
@@ -552,10 +551,8 @@ export default Vue.extend({
           this.$data.plantsPageIndex = 0;
         }),
         filter(
-          ([location, strain, [filterDateField, filterDateMatch, filterDate], growthPhase]) => {
-            return !!location || !!strain || !!filterDate;
-          }
-        )
+          ([location, strain, [filterDateField, filterDateMatch, filterDate], growthPhase]) => !!location || !!strain || !!filterDate,
+        ),
       )
       .subscribe(
         async ([location, strain, [filterDateField, filterDateMatch, filterDate], growthPhase]: [
@@ -572,13 +569,13 @@ export default Vue.extend({
           this.$data.growthPhase = growthPhase;
 
           // Allow parent component to use selected location
-          this.$emit("selectLocation", location);
+          this.$emit('selectLocation', location);
 
           // Allow parent component to use selected strain
-          this.$emit("selectStrain", strain);
+          this.$emit('selectStrain', strain);
 
           this.loadPlants();
-        }
+        },
       );
   },
 });

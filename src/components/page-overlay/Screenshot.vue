@@ -20,17 +20,17 @@
 </template>
 
 <script lang="ts">
-import { ModalAction, ModalType } from "@/consts";
-import { modalManager } from "@/modules/modal-manager.module";
-import { pageManager } from "@/modules/page-manager/page-manager.module";
-import { screenshotManager } from "@/modules/screenshot-manager.module";
-import { MutationType } from "@/mutation-types";
-import store from "@/store/page-overlay/index";
-import { timer } from "rxjs";
-import Vue from "vue";
+import { ModalAction, ModalType } from '@/consts';
+import { modalManager } from '@/modules/modal-manager.module';
+import { pageManager } from '@/modules/page-manager/page-manager.module';
+import { screenshotManager } from '@/modules/screenshot-manager.module';
+import { MutationType } from '@/mutation-types';
+import store from '@/store/page-overlay/index';
+import { timer } from 'rxjs';
+import Vue from 'vue';
 
 export default Vue.extend({
-  name: "Screenshot",
+  name: 'Screenshot',
   store,
   data() {
     return {
@@ -38,15 +38,15 @@ export default Vue.extend({
       delayMs: 0,
       delayMsOptions: [
         {
-          text: "0 seconds",
+          text: '0 seconds',
           value: 0,
         },
         {
-          text: "3 seconds",
+          text: '3 seconds',
           value: 3000,
         },
         {
-          text: "10 seconds",
+          text: '10 seconds',
           value: 100000,
         },
       ],

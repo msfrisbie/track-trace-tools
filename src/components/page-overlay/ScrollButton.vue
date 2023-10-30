@@ -10,15 +10,15 @@
 </template>
 
 <script lang="ts">
-import store from "@/store/page-overlay/index";
-import { merge, Subject } from "rxjs";
-import { debounceTime, throttleTime } from "rxjs/operators";
-import Vue from "vue";
+import store from '@/store/page-overlay/index';
+import { merge, Subject } from 'rxjs';
+import { debounceTime, throttleTime } from 'rxjs/operators';
+import Vue from 'vue';
 
 const TOP_THRESHOLD_PX = 300;
 
 export default Vue.extend({
-  name: "ScrollButton",
+  name: 'ScrollButton',
   store,
   components: {},
   data() {
@@ -28,14 +28,13 @@ export default Vue.extend({
   },
   mounted() {
     const scrollSubject = new Subject<any>();
-    document.addEventListener("scroll", () => scrollSubject.next());
+    document.addEventListener('scroll', () => scrollSubject.next());
 
     merge(scrollSubject.pipe(throttleTime(200)), scrollSubject.pipe(debounceTime(500))).subscribe(
       () => {
-        this.$data.isScrolledDown =
-          document.body.scrollTop > TOP_THRESHOLD_PX ||
-          document.documentElement.scrollTop > TOP_THRESHOLD_PX;
-      }
+        this.$data.isScrolledDown = document.body.scrollTop > TOP_THRESHOLD_PX
+          || document.documentElement.scrollTop > TOP_THRESHOLD_PX;
+      },
     );
   },
   computed: {},
@@ -44,7 +43,7 @@ export default Vue.extend({
       window.scroll({
         top: 0,
         left: 0,
-        behavior: "smooth",
+        behavior: 'smooth',
       });
     },
   },

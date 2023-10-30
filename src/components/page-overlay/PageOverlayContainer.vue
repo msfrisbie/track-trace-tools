@@ -7,18 +7,18 @@
 </template>
 
 <script lang="ts">
-import DefaultOverlayView from "@/components/page-overlay/DefaultOverlayView.vue";
-import Vue from "vue";
+import DefaultOverlayView from '@/components/page-overlay/DefaultOverlayView.vue';
+import Vue from 'vue';
 
 export default Vue.extend({
-  name: "PageOverlayContainer",
+  name: 'PageOverlayContainer',
   mounted() {
     // browser.runtime.sendMessage({});
   },
   computed: {
     defaultText() {
       // return browser.i18n.getMessage("extName");
-      return "T3";
+      return 'T3';
     },
   },
   components: { DefaultOverlayView },

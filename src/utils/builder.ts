@@ -1,9 +1,9 @@
-import { IBuilderProject } from "@/modules/builder-manager.module";
-import store from "@/store/page-overlay";
+import { IBuilderProject } from '@/modules/builder-manager.module';
+import store from '@/store/page-overlay';
 
-export const HOST_WILDCARD = "*";
+export const HOST_WILDCARD = '*';
 
-const DEVELOPMENT_HOSTNAMES = ["localhost:5000"];
+const DEVELOPMENT_HOSTNAMES = ['localhost:5000'];
 
 export function isCurrentHostAllowed(allowedHosts: string[]) {
   if (allowedHosts.includes(HOST_WILDCARD)) {

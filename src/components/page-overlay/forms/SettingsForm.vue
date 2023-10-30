@@ -547,73 +547,73 @@ import {
   SalesTabLabel,
   TagsTabLabel,
   TransfersTabLabel,
-} from "@/consts";
-import { DarkModeState, IPluginState, SnowflakeState } from "@/interfaces";
-import { analyticsManager } from "@/modules/analytics-manager.module";
-import { clientBuildManager } from "@/modules/client-build-manager.module";
-import { pageManager } from "@/modules/page-manager/page-manager.module";
-import { toastManager } from "@/modules/toast-manager.module";
-import { MutationType } from "@/mutation-types";
-import store from "@/store/page-overlay/index";
-import { SettingsActions } from "@/store/page-overlay/modules/settings/consts";
-import { getMatchingDecryptedDataOrNull } from "@/utils/encryption";
-import { generateThumbnail } from "@/utils/file";
-import Vue from "vue";
-import { mapState } from "vuex";
-import router from "@/router/index";
+} from '@/consts';
+import { DarkModeState, IPluginState, SnowflakeState } from '@/interfaces';
+import { analyticsManager } from '@/modules/analytics-manager.module';
+import { clientBuildManager } from '@/modules/client-build-manager.module';
+import { pageManager } from '@/modules/page-manager/page-manager.module';
+import { toastManager } from '@/modules/toast-manager.module';
+import { MutationType } from '@/mutation-types';
+import router from '@/router/index';
+import store from '@/store/page-overlay/index';
+import { SettingsActions } from '@/store/page-overlay/modules/settings/consts';
+import { getMatchingDecryptedDataOrNull } from '@/utils/encryption';
+import { generateThumbnail } from '@/utils/file';
+import Vue from 'vue';
+import { mapState } from 'vuex';
 
 export default Vue.extend({
-  name: "SettingsForm",
+  name: 'SettingsForm',
   store,
   router,
   data() {
     return {
       image: null,
       darkModeStateOptions: [
-        { value: DarkModeState.DISABLED, text: "Disabled" },
-        { value: DarkModeState.ENABLED, text: "Enabled" },
+        { value: DarkModeState.DISABLED, text: 'Disabled' },
+        { value: DarkModeState.ENABLED, text: 'Enabled' },
       ],
       snowflakeStateOptions: [
-        { value: SnowflakeState.DISABLED, text: "Disable all" },
-        { value: SnowflakeState.CSS, text: "Enable CPU-friendly snowflakes" },
-        { value: SnowflakeState.ENABLED, text: "Enabled (Metrc default)" },
+        { value: SnowflakeState.DISABLED, text: 'Disable all' },
+        { value: SnowflakeState.CSS, text: 'Enable CPU-friendly snowflakes' },
+        { value: SnowflakeState.ENABLED, text: 'Enabled (Metrc default)' },
       ],
       snowflakeIconOptions: [
-        "❆",
-        "❅",
-        "❄️",
-        "😀",
-        "💵",
-        "🖕🏼",
-        "☠️",
-        "👽",
-        "👾",
-        "💩",
-        "🥐",
-        "🍆",
-        "🍃",
-        "💨",
-        "🍁",
-        "🌿",
-        "TEXT",
-        "IMAGE",
+        '❆',
+        '❅',
+        '❄️',
+        '😀',
+        '💵',
+        '🖕🏼',
+        '☠️',
+        '👽',
+        '👾',
+        '💩',
+        '🥐',
+        '🍆',
+        '🍃',
+        '💨',
+        '🍁',
+        '🌿',
+        'TEXT',
+        'IMAGE',
       ],
       snowflakeSizeOptions: [
-        "xs",
-        "sm",
-        "md",
-        "lg",
-        "xl",
-        "2xl",
-        "3xl",
-        "4xl",
-        "5xl",
-        "6xl",
-        "7xl",
-        "8xl",
-        "9xl",
+        'xs',
+        'sm',
+        'md',
+        'lg',
+        'xl',
+        '2xl',
+        '3xl',
+        '4xl',
+        '5xl',
+        '6xl',
+        '7xl',
+        '8xl',
+        '9xl',
       ],
-      snowflakeImageCropOptions: ["none", "square", "rounded", "circle"],
+      snowflakeImageCropOptions: ['none', 'square', 'rounded', 'circle'],
       pageSizeOptions: [5, 10, 20, 50, 100, 500].map((x) => ({
         value: x,
         text: x,
@@ -639,26 +639,26 @@ export default Vue.extend({
       landingPageOptions: [
         {
           value: LandingPage.DEFAULT,
-          text: "Do nothing",
+          text: 'Do nothing',
         },
         {
           value: LandingPage.TRANSFERS,
-          text: "Go to Licensed Transfers",
+          text: 'Go to Licensed Transfers',
         },
         {
           value: LandingPage.TRANSFER_HUB,
-          text: "Go to Transfers Hub",
+          text: 'Go to Transfers Hub',
         },
         {
           value: LandingPage.PACKAGES,
-          text: "Go to Packages",
+          text: 'Go to Packages',
         },
         {
           value: LandingPage.PLANTS,
-          text: "Go to Plants",
+          text: 'Go to Plants',
         },
       ],
-      unsavedLicenseKey: "",
+      unsavedLicenseKey: '',
       settings: JSON.parse(JSON.stringify(store.state.settings)),
     };
   },
@@ -673,7 +673,7 @@ export default Vue.extend({
   },
   methods: {
     async toggleDebugMode() {
-      window.location.hash = "";
+      window.location.hash = '';
       store.commit(MutationType.SET_DEBUG_MODE, !store.state.debugMode);
     },
     navToPermissions(route: string) {
@@ -681,15 +681,16 @@ export default Vue.extend({
     },
     saveLicenseKey() {
       this.$data.settings.licenseKey = this.$data.unsavedLicenseKey;
-      this.$data.unsavedLicenseKey = "";
+      this.$data.unsavedLicenseKey = '';
       this.onChange();
       clientBuildManager.loadClientConfig();
     },
     clearLicenseKey() {
-      if (!window.confirm("Are you sure you want to remove your license key?")) {
+      /* eslint-disable-next-line no-alert */
+      if (!window.confirm('Are you sure you want to remove your license key?')) {
         return;
       }
-      this.$data.settings.licenseKey = "";
+      this.$data.settings.licenseKey = '';
       this.onChange();
       clientBuildManager.loadClientConfig();
     },
@@ -704,15 +705,15 @@ export default Vue.extend({
       store.dispatch(`settings/${SettingsActions.UPDATE_SETTINGS}`, this.settings);
 
       toastManager.openToast(
-        `T3 settings successfully updated. Refresh the page to apply changes.`,
+        'T3 settings successfully updated. Refresh the page to apply changes.',
         {
-          title: "Updated Settings",
+          title: 'Updated Settings',
           autoHideDelay: 3000,
-          variant: "primary",
+          variant: 'primary',
           appendToast: true,
-          toaster: "ttt-toaster",
+          toaster: 'ttt-toaster',
           solid: true,
-        }
+        },
       );
     },
   },

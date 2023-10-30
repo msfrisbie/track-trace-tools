@@ -53,14 +53,14 @@
 </template>
 
 <script lang="ts">
-import { MessageType } from "@/consts";
-import { analyticsManager } from "@/modules/analytics-manager.module";
-import { DataLoadError, DataLoadErrorType } from "@/modules/data-loader/data-loader-error";
-import store from "@/store/page-overlay/index";
-import Vue from "vue";
+import { MessageType } from '@/consts';
+import { analyticsManager } from '@/modules/analytics-manager.module';
+import { DataLoadError, DataLoadErrorType } from '@/modules/data-loader/data-loader-error';
+import store from '@/store/page-overlay/index';
+import Vue from 'vue';
 
 export default Vue.extend({
-  name: "ErrorReadout",
+  name: 'ErrorReadout',
   store,
   props: {
     inflight: { type: Boolean, required: true },
@@ -73,7 +73,7 @@ export default Vue.extend({
   },
   methods: {
     emitRetry() {
-      this.$emit("retry");
+      this.$emit('retry');
     },
   },
   watch: {

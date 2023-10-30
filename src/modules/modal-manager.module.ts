@@ -1,6 +1,6 @@
-import { ModalAction, ModalType } from "@/consts";
-import { IAtomicService } from "@/interfaces";
-import { Observable, Subject } from "rxjs";
+import { ModalAction, ModalType } from '@/consts';
+import { IAtomicService } from '@/interfaces';
+import { Observable, Subject } from 'rxjs';
 
 export interface IModalEvent {
   modalType: ModalType;
@@ -18,6 +18,7 @@ export interface IContextMenuEvent {
 
 export class ModalManager implements IAtomicService {
   private _modal: Subject<IModalEvent> = new Subject();
+
   private _hoverMenu: Subject<IContextMenuEvent | null> = new Subject();
 
   async init() {}
@@ -33,7 +34,7 @@ export class ModalManager implements IAtomicService {
   dispatchModalEvent(
     modalType: ModalType,
     modalAction = ModalAction.OPEN,
-    modalEventOptions: any = null
+    modalEventOptions: any = null,
   ) {
     // This could be problematic
     //
@@ -49,4 +50,4 @@ export class ModalManager implements IAtomicService {
   }
 }
 
-export let modalManager = new ModalManager();
+export const modalManager = new ModalManager();

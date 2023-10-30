@@ -1,4 +1,4 @@
-import { HistoryTreeNodeType, PackageState } from "@/consts";
+import { HistoryTreeNodeType, PackageState } from '@/consts';
 import {
   IIndexedPackageData,
   IPackageAncestorTreeNode,
@@ -6,24 +6,24 @@ import {
   IPackageHistoryData,
   IPackageSourceHarvestData,
   IStrippedIndexedPackage,
-} from "@/interfaces";
-import { authManager } from "@/modules/auth-manager.module";
+} from '@/interfaces';
+import { authManager } from '@/modules/auth-manager.module';
 import {
   DataLoader,
   getDataLoader,
   primaryDataLoader,
-} from "@/modules/data-loader/data-loader.module";
-import { facilityManager } from "@/modules/facility-manager.module";
-import store from "@/store/page-overlay/index";
+} from '@/modules/data-loader/data-loader.module';
+import { facilityManager } from '@/modules/facility-manager.module';
+import store from '@/store/page-overlay/index';
 import {
   PackageHistoryActions,
   PackageHistoryStatus,
-} from "@/store/page-overlay/modules/package-history/consts";
-import { LRU } from "./cache";
+} from '@/store/page-overlay/modules/package-history/consts';
+import { LRU } from './cache';
 import {
   extractChildPackageLabelsFromHistory,
   extractParentPackageLabelsFromHistory,
-} from "./history";
+} from './history';
 
 interface IRootAncestorHistoryContext {
   treeNodeCache: Map<string, IPackageAncestorTreeNode>;
@@ -42,7 +42,7 @@ export async function getParentPackageHistoryTree({
 
   const treeNodeCache: Map<string, IPackageAncestorTreeNode> = new Map();
   const ownedLicenses: string[] = (await facilityManager.ownedFacilitiesOrError()).map(
-    (facility) => facility.licenseNumber
+    (facility) => facility.licenseNumber,
   );
   const licenseCache: LRU<string> = new LRU(ownedLicenses);
   const packageStateCache: LRU<PackageState> = new LRU([
@@ -53,7 +53,7 @@ export async function getParentPackageHistoryTree({
   licenseCache.touch((await authManager.authStateOrError()).license);
 
   store.dispatch(`packageHistory/${PackageHistoryActions.LOG_EVENT}`, {
-    event: `License cache: ${licenseCache.elements.join(",\n")}`,
+    event: `License cache: ${licenseCache.elements.join(',\n')}`,
   });
 
   const rootContext: IRootAncestorHistoryContext = {
@@ -114,7 +114,7 @@ export async function getParentPackageHistoryTreeImpl({
           } catch (e) {}
           break;
         default:
-          throw new Error("Invalid package state: " + packageState);
+          throw new Error(`Invalid package state: ${packageState}`);
       }
 
       if (pkg) {
@@ -130,7 +130,7 @@ export async function getParentPackageHistoryTreeImpl({
   }
 
   if (!dataLoader) {
-    throw new Error("Data loader not assigned, exiting");
+    throw new Error('Data loader not assigned, exiting');
   }
 
   if (!pkg) {
@@ -139,9 +139,9 @@ export async function getParentPackageHistoryTreeImpl({
     });
     const node: IPackageAncestorTreeNode = {
       type: HistoryTreeNodeType.UNOWNED_PACKAGE,
-      relationship: "PARENT",
+      relationship: 'PARENT',
       label,
-      pkg: { Label: "STUB_PACKAGE" } as IStrippedIndexedPackage,
+      pkg: { Label: 'STUB_PACKAGE' } as IStrippedIndexedPackage,
       ancestors: [],
     };
     rootContext.treeNodeCache.set(label, node);
@@ -159,12 +159,12 @@ export async function getParentPackageHistoryTreeImpl({
   const parents: IPackageAncestorTreeNode[] = [];
 
   store.dispatch(`packageHistory/${PackageHistoryActions.LOG_EVENT}`, {
-    event: `Parents: ${parentPackageLabels.join(",") || "none"}`,
+    event: `Parents: ${parentPackageLabels.join(',') || 'none'}`,
   });
 
   if (
-    store.state.packageHistory.maxParentLookupDepth === null ||
-    depth <= store.state.packageHistory.maxParentLookupDepth
+    store.state.packageHistory.maxParentLookupDepth === null
+    || depth <= store.state.packageHistory.maxParentLookupDepth
   ) {
     for (const parentPackageLabel of parentPackageLabels) {
       if (store.state.packageHistory.status !== PackageHistoryStatus.INFLIGHT) {
@@ -196,7 +196,7 @@ export async function getParentPackageHistoryTreeImpl({
 
   const node: IPackageAncestorTreeNode = {
     type: HistoryTreeNodeType.OWNED_PACKAGE,
-    relationship: "PARENT",
+    relationship: 'PARENT',
     label,
     pkg: stripPackage(pkg),
     // history,
@@ -225,7 +225,7 @@ export async function getChildPackageHistoryTree({
 
   const treeNodeCache: Map<string, IPackageChildTreeNode> = new Map();
   const ownedLicenses: string[] = (await facilityManager.ownedFacilitiesOrError()).map(
-    (facility) => facility.licenseNumber
+    (facility) => facility.licenseNumber,
   );
   const licenseCache: LRU<string> = new LRU(ownedLicenses);
   const packageStateCache: LRU<PackageState> = new LRU([
@@ -236,7 +236,7 @@ export async function getChildPackageHistoryTree({
   licenseCache.touch((await authManager.authStateOrError()).license);
 
   store.dispatch(`packageHistory/${PackageHistoryActions.LOG_EVENT}`, {
-    event: `License cache: ${licenseCache.elements.join(",\n")}`,
+    event: `License cache: ${licenseCache.elements.join(',\n')}`,
   });
 
   const rootContext: IRootChildPackageHistoryContext = {
@@ -297,7 +297,7 @@ export async function getChildPackageHistoryTreeImpl({
           } catch (e) {}
           break;
         default:
-          throw new Error("Invalid package state: " + packageState);
+          throw new Error(`Invalid package state: ${packageState}`);
       }
 
       if (pkg) {
@@ -313,7 +313,7 @@ export async function getChildPackageHistoryTreeImpl({
   }
 
   if (!dataLoader) {
-    throw new Error("Data loader not assigned, exiting");
+    throw new Error('Data loader not assigned, exiting');
   }
 
   if (!pkg) {
@@ -322,9 +322,9 @@ export async function getChildPackageHistoryTreeImpl({
     });
     const node: IPackageChildTreeNode = {
       type: HistoryTreeNodeType.UNOWNED_PACKAGE,
-      relationship: "CHILD",
+      relationship: 'CHILD',
       label,
-      pkg: { Label: "STUB_PACKAGE" } as IStrippedIndexedPackage,
+      pkg: { Label: 'STUB_PACKAGE' } as IStrippedIndexedPackage,
       children: [],
     };
     rootContext.treeNodeCache.set(label, node);
@@ -344,12 +344,12 @@ export async function getChildPackageHistoryTreeImpl({
   const children: IPackageChildTreeNode[] = [];
 
   store.dispatch(`packageHistory/${PackageHistoryActions.LOG_EVENT}`, {
-    event: `Children: ${childPackageLabels.join(",") || "none"}`,
+    event: `Children: ${childPackageLabels.join(',') || 'none'}`,
   });
 
   if (
-    store.state.packageHistory.maxChildLookupDepth === null ||
-    depth <= store.state.packageHistory.maxChildLookupDepth
+    store.state.packageHistory.maxChildLookupDepth === null
+    || depth <= store.state.packageHistory.maxChildLookupDepth
   ) {
     for (const childPackageLabel of childPackageLabels) {
       if (store.state.packageHistory.status !== PackageHistoryStatus.INFLIGHT) {
@@ -381,7 +381,7 @@ export async function getChildPackageHistoryTreeImpl({
 
   const node: IPackageChildTreeNode = {
     type: HistoryTreeNodeType.OWNED_PACKAGE,
-    relationship: "CHILD",
+    relationship: 'CHILD',
     label,
     pkg: stripPackage(pkg),
     children,
@@ -395,8 +395,7 @@ export async function getChildPackageHistoryTreeImpl({
 export async function getParentHarvests(label: string): Promise<IPackageSourceHarvestData[]> {
   const pkg = await primaryDataLoader.activePackage(label);
 
-  const harvestHistory: IPackageSourceHarvestData[] =
-    await primaryDataLoader.packageHarvestHistoryByPackageId(pkg.Id);
+  const harvestHistory: IPackageSourceHarvestData[] = await primaryDataLoader.packageHarvestHistoryByPackageId(pkg.Id);
 
   store.dispatch(`packageHistory/${PackageHistoryActions.LOG_EVENT}`, {
     event: `Retrieved ${harvestHistory.length} source harvests`,
@@ -414,7 +413,7 @@ export function stripPackage(pkg: IIndexedPackageData): IStrippedIndexedPackage 
     Quantity: pkg.Quantity,
     ItemName: pkg.Item.Name,
     PackagedByFacilityLicenseNumber: pkg.PackagedByFacilityLicenseNumber,
-    ReceivedFromFacilityLicenseNumber: pkg.ReceivedFromFacilityLicenseNumber || "",
+    ReceivedFromFacilityLicenseNumber: pkg.ReceivedFromFacilityLicenseNumber || '',
     UnitOfMeasureAbbreviation: pkg.UnitOfMeasureAbbreviation,
     SourcePackageLabels: pkg.SourcePackageLabels,
   };

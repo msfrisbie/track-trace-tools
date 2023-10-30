@@ -1,23 +1,23 @@
-import { IIndexedPackageData, IPackageFilter, IPluginState } from "@/interfaces";
-import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
-import { ReportsMutations, ReportType } from "@/store/page-overlay/modules/reports/consts";
+import { IIndexedPackageData, IPackageFilter, IPluginState } from '@/interfaces';
+import { primaryDataLoader } from '@/modules/data-loader/data-loader.module';
+import { ReportsMutations, ReportType } from '@/store/page-overlay/modules/reports/consts';
 import {
   IReportConfig,
   IReportData,
   IReportsState,
-} from "@/store/page-overlay/modules/reports/interfaces";
-import { ActionContext } from "vuex";
+} from '@/store/page-overlay/modules/reports/interfaces';
+import { ActionContext } from 'vuex';
 import {
   IPackageReportFormFilters,
   packageFormFiltersFactory,
-} from "./package-report";
+} from './package-report';
 
 const REPORT_TYPE = ReportType.PACKAGES_QUICKVIEW;
 
 export enum PackageQuickviewDimension {
-  ITEM_NAME = "Item",
-  LOCATION = "Location",
-  PACKAGED_DATE = "Packaged Date",
+  ITEM_NAME = 'Item',
+  LOCATION = 'Location',
+  PACKAGED_DATE = 'Packaged Date',
 }
 
 export const PACKAGES_QUICKVIEW_DIMENSIONS: PackageQuickviewDimension[] = [
@@ -28,7 +28,7 @@ export const PACKAGES_QUICKVIEW_DIMENSIONS: PackageQuickviewDimension[] = [
 
 export function extractPackagePropertyFromDimension(
   pkg: IIndexedPackageData,
-  dimension: PackageQuickviewDimension
+  dimension: PackageQuickviewDimension,
 ) {
   switch (dimension) {
     case PackageQuickviewDimension.ITEM_NAME:
@@ -38,7 +38,7 @@ export function extractPackagePropertyFromDimension(
     case PackageQuickviewDimension.PACKAGED_DATE:
       return pkg.PackagedDate;
     default:
-      throw new Error("Bad dimension");
+      throw new Error('Bad dimension');
   }
 }
 
@@ -47,14 +47,13 @@ interface IPackagesQuickviewReportFormFilters extends IPackageReportFormFilters 
   secondaryDimension: PackageQuickviewDimension | null;
 }
 
-export const packagesQuickviewFormFiltersFactory: () => IPackagesQuickviewReportFormFilters =
-  () => ({
-    // @ts-ignore
-    primaryDimension: PackageQuickviewDimension.ITEM_NAME,
-    // @ts-ignore
-    secondaryDimension: PackageQuickviewDimension.LOCATION,
-    ...packageFormFiltersFactory(),
-  });
+export const packagesQuickviewFormFiltersFactory: () => IPackagesQuickviewReportFormFilters = () => ({
+  // @ts-ignore
+  primaryDimension: PackageQuickviewDimension.ITEM_NAME,
+  // @ts-ignore
+  secondaryDimension: PackageQuickviewDimension.LOCATION,
+  ...packageFormFiltersFactory(),
+});
 
 export function addPackagesQuickviewReport({
   reportConfig,
@@ -98,7 +97,7 @@ export async function maybeLoadPackagesQuickviewReportData({
     let packages: IIndexedPackageData[] = [];
     if (packageQuickviewConfig?.packageFilter) {
       ctx.commit(ReportsMutations.SET_STATUS, {
-        statusMessage: { text: "Loading packages...", level: "success" },
+        statusMessage: { text: 'Loading packages...', level: 'success' },
       });
 
       if (packageQuickviewConfig?.packageFilter.includeActive) {
@@ -106,7 +105,7 @@ export async function maybeLoadPackagesQuickviewReportData({
           packages = [...packages, ...(await primaryDataLoader.activePackages())];
         } catch (e) {
           ctx.commit(ReportsMutations.SET_STATUS, {
-            statusMessage: { text: "Failed to load active packages.", level: "warning" },
+            statusMessage: { text: 'Failed to load active packages.', level: 'warning' },
           });
         }
       }
@@ -116,7 +115,7 @@ export async function maybeLoadPackagesQuickviewReportData({
           packages = [...packages, ...(await primaryDataLoader.inTransitPackages())];
         } catch (e) {
           ctx.commit(ReportsMutations.SET_STATUS, {
-            statusMessage: { text: "Failed to load in transit packages.", level: "warning" },
+            statusMessage: { text: 'Failed to load in transit packages.', level: 'warning' },
           });
         }
       }
@@ -126,7 +125,7 @@ export async function maybeLoadPackagesQuickviewReportData({
           packages = [...packages, ...(await primaryDataLoader.inactivePackages())];
         } catch (e) {
           ctx.commit(ReportsMutations.SET_STATUS, {
-            statusMessage: { text: "Failed to load inactive packages.", level: "warning" },
+            statusMessage: { text: 'Failed to load inactive packages.', level: 'warning' },
           });
         }
       }

@@ -1,83 +1,80 @@
-
 import { IAtomicService, Task } from '@/interfaces';
 import { MutationType } from '@/mutation-types';
-import store from "@/store/page-overlay/index";
+import store from '@/store/page-overlay/index';
 import { runTask } from '@/utils/tasks';
 import { authManager } from './auth-manager.module';
 
 // DEPRECATED
 class DeprecatedQueueWrapper implements IAtomicService {
-    private intervalId: number | null = null;
-    inflightTask: Task | null = null;
-    lastCompletedTask: Task | null = null;
+  private intervalId: number | null = null;
 
-    constructor() { }
+  inflightTask: Task | null = null;
 
-    async init() {
-        await authManager.authStateOrError();
+  lastCompletedTask: Task | null = null;
 
-        this.intervalId = setInterval(async () => {
-            if (this.inflightTask) {
-                return;
-            }
+  async init() {
+    await authManager.authStateOrError();
 
-            if (store.state.taskQueuePaused) {
-                return;
-            }
+    this.intervalId = setInterval(async () => {
+      if (this.inflightTask) {
+        return;
+      }
 
-            if (store.state.taskQueue.length > 0) {
-                const task = JSON.parse(JSON.stringify(store.state.taskQueue[0]));
+      if (store.state.taskQueuePaused) {
+        return;
+      }
 
-                this.updateTask(task);
+      if (store.state.taskQueue.length > 0) {
+        const task = JSON.parse(JSON.stringify(store.state.taskQueue[0]));
 
-                let success = false;
+        this.updateTask(task);
 
-                try {
-                    if (!this.inflightTask) {
-                        throw new Error('No task set');
-                    }
+        let success = false;
 
-                    success = await runTask(
-                        this.inflightTask
-                    );
-                } catch (e) {
-                    console.log('Task failed', e);
-                }
+        try {
+          if (!this.inflightTask) {
+            throw new Error('No task set');
+          }
 
-                if (success) {
-                    store.commit(MutationType.DEQUEUE_TASK, (this.inflightTask as any).taskId);
-                    this.lastCompletedTask = task;
-                } else {
-                    // store.commit(MutationType.SET_FLASH_MESSAGE, 'Job failed to complete, queue paused.');
-                    store.commit(MutationType.TOGGLE_PAUSE_TASK_QUEUE);
-                }
+          success = await runTask(this.inflightTask);
+        } catch (e) {
+          console.log('Task failed', e);
+        }
 
-                if (store.state.taskQueue.length === 0) {
-                    // page is stale, refresh
-                    window.location.reload();
-                }
-            }
+        if (success) {
+          store.commit(MutationType.DEQUEUE_TASK, (this.inflightTask as any).taskId);
+          this.lastCompletedTask = task;
+        } else {
+          // store.commit(MutationType.SET_FLASH_MESSAGE, 'Job failed to complete, queue paused.');
+          store.commit(MutationType.TOGGLE_PAUSE_TASK_QUEUE);
+        }
 
-            this.updateTask(null);
-        }, 250) as any;
-    }
+        if (store.state.taskQueue.length === 0) {
+          // page is stale, refresh
+          window.location.reload();
+        }
+      }
 
-    purge() {
-        store.commit(MutationType.PURGE_TASK_QUEUE);
-    }
+      this.updateTask(null);
+    }, 250) as any;
+  }
 
-    togglePause() {
-        store.commit(MutationType.TOGGLE_PAUSE_TASK_QUEUE);
-    }
+  purge() {
+    store.commit(MutationType.PURGE_TASK_QUEUE);
+  }
 
-    updateTask(task: Task | null) {
-        this.inflightTask = task;
-    }
+  togglePause() {
+    store.commit(MutationType.TOGGLE_PAUSE_TASK_QUEUE);
+  }
 
-    teardown() {
-        this.intervalId && clearInterval(this.intervalId);
-        this.intervalId = null;
-    }
+  updateTask(task: Task | null) {
+    this.inflightTask = task;
+  }
+
+  teardown() {
+    this.intervalId && clearInterval(this.intervalId);
+    this.intervalId = null;
+  }
 }
 
-export let queueWrapper = new DeprecatedQueueWrapper();
+export const queueWrapper = new DeprecatedQueueWrapper();

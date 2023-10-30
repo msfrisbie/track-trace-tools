@@ -38,21 +38,21 @@
 </template>
 
 <script lang="ts">
-import { MessageType, ModalType } from "@/consts";
-import { analyticsManager } from "@/modules/analytics-manager.module";
-import { modalManager } from "@/modules/modal-manager.module";
-import { MutationType } from "@/mutation-types";
-import store from "@/store/page-overlay/index";
-import Vue from "vue";
-import { mapState } from "vuex";
+import { MessageType, ModalType } from '@/consts';
+import { analyticsManager } from '@/modules/analytics-manager.module';
+import { modalManager } from '@/modules/modal-manager.module';
+import { MutationType } from '@/mutation-types';
+import store from '@/store/page-overlay/index';
+import Vue from 'vue';
+import { mapState } from 'vuex';
 
 export default Vue.extend({
-  name: "CsvBuilderButton",
+  name: 'CsvBuilderButton',
   store,
   data() {
     return {};
   },
-  computed: mapState(["trackedInteractions", "settings"]),
+  computed: mapState(['trackedInteractions', 'settings']),
   methods: {
     dismissCsvBuilderPopover() {
       const trackedInteractions = JSON.parse(JSON.stringify(store.state.trackedInteractions));
@@ -60,9 +60,9 @@ export default Vue.extend({
       trackedInteractions.dismissedCsvBuilderPopover = true;
 
       // @ts-ignore
-      this.$refs["csv-builder-popover"].$emit("close");
+      this.$refs['csv-builder-popover'].$emit('close');
       // @ts-ignore
-      this.$refs["csv-builder-popover"].$emit("disable");
+      this.$refs['csv-builder-popover'].$emit('disable');
 
       store.commit(MutationType.UPDATE_TRACKED_INTERACTIONS, trackedInteractions);
     },

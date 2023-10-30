@@ -1,14 +1,14 @@
-import { IIndexedPlantData, IPlantFilter, IPluginState } from "@/interfaces";
-import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
-import { ReportsMutations, ReportType } from "@/store/page-overlay/modules/reports/consts";
+import { IIndexedPlantData, IPlantFilter, IPluginState } from '@/interfaces';
+import { primaryDataLoader } from '@/modules/data-loader/data-loader.module';
+import { ReportsMutations, ReportType } from '@/store/page-overlay/modules/reports/consts';
 import {
   IFieldData,
   IReportConfig,
   IReportData,
   IReportsState,
-} from "@/store/page-overlay/modules/reports/interfaces";
-import { ActionContext } from "vuex";
-import { todayIsodate } from "../date";
+} from '@/store/page-overlay/modules/reports/interfaces';
+import { ActionContext } from 'vuex';
+import { todayIsodate } from '../date';
 
 export interface IMaturePlantsReportFormFilters {
   plantedDateGt: string;
@@ -71,7 +71,7 @@ export async function maybeLoadMaturePlantsReportData({
   const maturePlantConfig = reportConfig[ReportType.MATURE_PLANTS];
   if (maturePlantConfig?.plantFilter) {
     ctx.commit(ReportsMutations.SET_STATUS, {
-      statusMessage: { text: "Loading plants...", level: "success" },
+      statusMessage: { text: 'Loading plants...', level: 'success' },
     });
 
     let maturePlants: IIndexedPlantData[] = [];
@@ -81,7 +81,7 @@ export async function maybeLoadMaturePlantsReportData({
         maturePlants = [...maturePlants, ...(await primaryDataLoader.vegetativePlants())];
       } catch (e) {
         ctx.commit(ReportsMutations.SET_STATUS, {
-          statusMessage: { text: "Failed to load vegetative plants.", level: "warning" },
+          statusMessage: { text: 'Failed to load vegetative plants.', level: 'warning' },
         });
       }
     }
@@ -91,7 +91,7 @@ export async function maybeLoadMaturePlantsReportData({
         maturePlants = [...maturePlants, ...(await primaryDataLoader.floweringPlants())];
       } catch (e) {
         ctx.commit(ReportsMutations.SET_STATUS, {
-          statusMessage: { text: "Failed to load flowering plants.", level: "warning" },
+          statusMessage: { text: 'Failed to load flowering plants.', level: 'warning' },
         });
       }
     }
@@ -101,7 +101,7 @@ export async function maybeLoadMaturePlantsReportData({
         maturePlants = [...maturePlants, ...(await primaryDataLoader.inactivePlants({}))];
       } catch (e) {
         ctx.commit(ReportsMutations.SET_STATUS, {
-          statusMessage: { text: "Failed to load inactive plants.", level: "warning" },
+          statusMessage: { text: 'Failed to load inactive plants.', level: 'warning' },
         });
       }
     }

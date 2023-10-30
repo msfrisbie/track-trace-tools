@@ -1,3 +1,3 @@
-import { mockChrome } from "./mocks";
+import { mockChrome } from './mocks';
 
 mockChrome();

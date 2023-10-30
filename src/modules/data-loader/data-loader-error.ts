@@ -9,9 +9,9 @@ export class DataLoadError extends Error {
     errorType: DataLoadErrorType;
 
     constructor(errorType: DataLoadErrorType, message: string) {
-        super(message);
+      super(message);
 
-        this.name = "DataLoadError";
-        this.errorType = errorType
+      this.name = 'DataLoadError';
+      this.errorType = errorType;
     }
 }

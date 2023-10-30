@@ -124,7 +124,7 @@
               <!-- </div> -->
             </template>
             <template v-else>
-              <template v-if="status == PackageHistoryStatus.INFLIGHT">
+              <template v-if="status === PackageHistoryStatus.INFLIGHT">
                 <div class="text-center">History generation in progress...</div>
               </template>
               <template v-else>
@@ -154,7 +154,7 @@
               </div>
             </template>
             <template v-else>
-              <template v-if="status == PackageHistoryStatus.INFLIGHT">
+              <template v-if="status === PackageHistoryStatus.INFLIGHT">
                 <div class="text-center">History generation in progress...</div>
               </template>
               <template v-else>
@@ -280,7 +280,7 @@
                 You stopped the lookup process. The displayed results may not be complete.
               </div>
 
-              <template v-if="status == PackageHistoryStatus.INFLIGHT">
+              <template v-if="status === PackageHistoryStatus.INFLIGHT">
                 <div class="flex flex-row justify-center items-center gap-2">
                   <b-spinner small></b-spinner>
                   <span>Building history, this can take a minute...</span>
@@ -350,25 +350,24 @@
 </template>
 
 <script lang="ts">
-import PackageHistoryTile from "@/components/overlay-widget/shared/PackageHistoryTile.vue";
-import SinglePackagePicker from "@/components/overlay-widget/shared/SinglePackagePicker.vue";
-import { ICsvFile, IHistoryTreeNode, IPluginState } from "@/interfaces";
-import { clientBuildManager } from "@/modules/client-build-manager.module";
-import router from "@/router/index";
-import store from "@/store/page-overlay/index";
+import PackageHistoryTile from '@/components/overlay-widget/shared/PackageHistoryTile.vue';
+import SinglePackagePicker from '@/components/overlay-widget/shared/SinglePackagePicker.vue';
+import { ICsvFile, IHistoryTreeNode, IPluginState } from '@/interfaces';
+import router from '@/router/index';
+import store from '@/store/page-overlay/index';
 import {
   PackageHistoryActions,
   PackageHistoryGetters,
   PackageHistoryStatus,
-} from "@/store/page-overlay/modules/package-history/consts";
-import { getUrl } from "@/utils/assets";
-import { downloadCsvFile } from "@/utils/csv";
-import { unitOfMeasureNameToAbbreviation } from "@/utils/units";
-import Vue from "vue";
-import { mapActions, mapGetters, mapState } from "vuex";
+} from '@/store/page-overlay/modules/package-history/consts';
+import { getUrl } from '@/utils/assets';
+import { downloadCsvFile } from '@/utils/csv';
+import { unitOfMeasureNameToAbbreviation } from '@/utils/units';
+import Vue from 'vue';
+import { mapActions, mapGetters, mapState } from 'vuex';
 
 export default Vue.extend({
-  name: "PackageHistory",
+  name: 'PackageHistory',
   store,
   router,
   props: {},
@@ -406,7 +405,7 @@ export default Vue.extend({
         maxParentLookupDepth = parseInt(maxParentLookupDepth as string, 10);
         store.dispatch(`packageHistory/${PackageHistoryActions.SET_MAX_PARENT_LOOKUP_DEPTH}`, {
           maxParentLookupDepth:
-            typeof maxParentLookupDepth === "number" ? maxParentLookupDepth : null,
+            typeof maxParentLookupDepth === 'number' ? maxParentLookupDepth : null,
         });
       },
     },
@@ -417,7 +416,7 @@ export default Vue.extend({
       set(maxChildLookupDepth: any) {
         maxChildLookupDepth = parseInt(maxChildLookupDepth as string, 10);
         store.dispatch(`packageHistory/${PackageHistoryActions.SET_MAX_CHILD_LOOKUP_DEPTH}`, {
-          maxChildLookupDepth: typeof maxChildLookupDepth === "number" ? maxChildLookupDepth : null,
+          maxChildLookupDepth: typeof maxChildLookupDepth === 'number' ? maxChildLookupDepth : null,
         });
       },
     },
@@ -475,9 +474,9 @@ export default Vue.extend({
   data() {
     return {
       PackageHistoryStatus,
-      demoImageUrl: "",
-      activeView: "Tree",
-      views: ["Tree", "List", "Source Harvests", "Log", "Help"],
+      demoImageUrl: '',
+      activeView: 'Tree',
+      views: ['Tree', 'List', 'Source Harvests', 'Log', 'Help'],
     };
   },
   watch: {
@@ -528,8 +527,7 @@ export default Vue.extend({
               x.pkg?.ItemName,
               x.pkg?.Quantity,
               x.pkg?.UnitOfMeasureAbbreviation,
-            ])
-          )
+            ]))
           .flat(),
       };
 
@@ -544,21 +542,19 @@ export default Vue.extend({
       };
     },
     autofit() {
-      const container = document.querySelector(".builder-body") as HTMLElement;
-      const content = document.querySelector(`#history-tree`) as HTMLElement;
-      const treeNav = document.querySelector(`#tree-nav`) as HTMLElement;
-      const horizontalScroller = document.querySelector(`#horizontal-scroller`) as HTMLElement;
+      const container = document.querySelector('.builder-body') as HTMLElement;
+      const content = document.querySelector('#history-tree') as HTMLElement;
+      const treeNav = document.querySelector('#tree-nav') as HTMLElement;
+      const horizontalScroller = document.querySelector('#horizontal-scroller') as HTMLElement;
 
       const containerCss = getComputedStyle(container);
       const contentCss = getComputedStyle(content);
 
-      const containerWidth =
-        container.clientWidth -
-        (parseFloat(containerCss.paddingLeft) + parseFloat(containerCss.paddingRight));
-      const containerHeight =
-        container.clientHeight -
-        (parseFloat(containerCss.paddingTop) + parseFloat(containerCss.paddingBottom)) -
-        treeNav.clientHeight;
+      const containerWidth = container.clientWidth
+        - (parseFloat(containerCss.paddingLeft) + parseFloat(containerCss.paddingRight));
+      const containerHeight = container.clientHeight
+        - (parseFloat(containerCss.paddingTop) + parseFloat(containerCss.paddingBottom))
+        - treeNav.clientHeight;
 
       const contentWidth = content.clientWidth;
       const contentHeight = content.clientHeight;
@@ -576,7 +572,8 @@ export default Vue.extend({
   },
   async created() {},
   async mounted() {
-    this.$data.demoImageUrl = await getUrl(require("@/assets/images/package-history-demo.png"));
+    /* eslint-disable-next-line global-require */
+    this.$data.demoImageUrl = await getUrl(require('@/assets/images/package-history-demo.png'));
   },
   async destroyed() {},
 });

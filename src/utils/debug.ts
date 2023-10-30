@@ -1,4 +1,4 @@
-import store from "@/store/page-overlay/index";
+import store from '@/store/page-overlay/index';
 
 // These can be used to target/eliminate loggers
 const whitelist: string[] | null = null;
@@ -19,9 +19,9 @@ function textToRGB(text: string): string {
   // This mask ensures the text is sufficiently dark
   // https://stackoverflow.com/questions/596216/formula-to-determine-perceived-brightness-of-rgb-color
   // the human eyeball is most sensitive to green light, less to red and least to blue
-  let c = (hash & 0x00ff0fff).toString(16).toUpperCase();
+  const c = (hash & 0x00ff0fff).toString(16).toUpperCase();
 
-  return "00000".substring(0, 6 - c.length) + c;
+  return '00000'.substring(0, 6 - c.length) + c;
 }
 
 export function debugLogFactory(name: string) {

@@ -4,18 +4,18 @@ import {
   IPackageFilter,
   IPluginState,
   ITransferFilter,
-} from "@/interfaces";
-import { DataLoader, getDataLoaderByLicense } from "@/modules/data-loader/data-loader.module";
-import { facilityManager } from "@/modules/facility-manager.module";
-import store from "@/store/page-overlay/index";
-import { ReportsMutations, ReportType } from "@/store/page-overlay/modules/reports/consts";
+} from '@/interfaces';
+import { DataLoader, getDataLoaderByLicense } from '@/modules/data-loader/data-loader.module';
+import { facilityManager } from '@/modules/facility-manager.module';
+import store from '@/store/page-overlay/index';
+import { ReportsMutations, ReportType } from '@/store/page-overlay/modules/reports/consts';
 import {
   IReportConfig,
   IReportData,
   IReportsState,
-} from "@/store/page-overlay/modules/reports/interfaces";
-import { ActionContext } from "vuex";
-import { todayIsodate } from "../date";
+} from '@/store/page-overlay/modules/reports/interfaces';
+import { ActionContext } from 'vuex';
+import { todayIsodate } from '../date';
 
 interface IEmployeeAuditReportFormFilters {
   lastModifiedDateGt: string;
@@ -30,7 +30,7 @@ interface IEmployeeAuditReportFormFilters {
 export const employeeAuditFormFiltersFactory: () => IEmployeeAuditReportFormFilters = () => ({
   lastModifiedDateGt: todayIsodate(),
   lastModifiedDateLt: todayIsodate(),
-  employeeQuery: "",
+  employeeQuery: '',
   shouldFilterLastModifiedDateGt: true,
   shouldFilterLastModifiedDateLt: true,
   licenseOptions: facilityManager.cachedFacilities.map((x) => x.licenseNumber),
@@ -47,7 +47,7 @@ export function addEmployeeAuditReport({
   const packageFilter: IPackageFilter = {};
   const transferFilter: ITransferFilter = {};
 
-  const licenses: string[] = employeeAuditFormFilters.licenses;
+  const { licenses } = employeeAuditFormFilters;
 
   packageFilter.lastModifiedDateGt = employeeAuditFormFilters.shouldFilterLastModifiedDateGt
     ? employeeAuditFormFilters.lastModifiedDateGt
@@ -91,7 +91,7 @@ export async function maybeLoadEmployeeAuditReportData({
 
     for (const license of config.licenses) {
       ctx.commit(ReportsMutations.SET_STATUS, {
-        statusMessage: { text: `Loading ${license} packages...`, level: "success" },
+        statusMessage: { text: `Loading ${license} packages...`, level: 'success' },
       });
 
       dataLoader = await getDataLoaderByLicense(license);
@@ -100,7 +100,7 @@ export async function maybeLoadEmployeeAuditReportData({
         packages = [...packages, ...(await dataLoader.activePackages())];
       } catch (e) {
         ctx.commit(ReportsMutations.SET_STATUS, {
-          statusMessage: { text: "Failed to load active packages.", level: "warning" },
+          statusMessage: { text: 'Failed to load active packages.', level: 'warning' },
         });
       }
 
@@ -108,7 +108,7 @@ export async function maybeLoadEmployeeAuditReportData({
         packages = [...packages, ...(await dataLoader.onHoldPackages())];
       } catch (e) {
         ctx.commit(ReportsMutations.SET_STATUS, {
-          statusMessage: { text: "Failed to load onhold packages.", level: "warning" },
+          statusMessage: { text: 'Failed to load onhold packages.', level: 'warning' },
         });
       }
 
@@ -116,7 +116,7 @@ export async function maybeLoadEmployeeAuditReportData({
         packages = [...packages, ...(await dataLoader.inTransitPackages())];
       } catch (e) {
         ctx.commit(ReportsMutations.SET_STATUS, {
-          statusMessage: { text: "Failed to load intransit packages.", level: "warning" },
+          statusMessage: { text: 'Failed to load intransit packages.', level: 'warning' },
         });
       }
 
@@ -124,12 +124,12 @@ export async function maybeLoadEmployeeAuditReportData({
         packages = [...packages, ...(await dataLoader.inactivePackages())];
       } catch (e) {
         ctx.commit(ReportsMutations.SET_STATUS, {
-          statusMessage: { text: "Failed to load inactive packages.", level: "warning" },
+          statusMessage: { text: 'Failed to load inactive packages.', level: 'warning' },
         });
       }
 
       ctx.commit(ReportsMutations.SET_STATUS, {
-        statusMessage: { text: `Loading ${license} transfers...`, level: "success" },
+        statusMessage: { text: `Loading ${license} transfers...`, level: 'success' },
       });
 
       // Incoming transfers do not have history
@@ -138,7 +138,7 @@ export async function maybeLoadEmployeeAuditReportData({
         transfers = [...transfers, ...(await dataLoader.outgoingTransfers())];
       } catch (e) {
         ctx.commit(ReportsMutations.SET_STATUS, {
-          statusMessage: { text: "Failed to load outgoing transfers.", level: "warning" },
+          statusMessage: { text: 'Failed to load outgoing transfers.', level: 'warning' },
         });
       }
 
@@ -146,7 +146,7 @@ export async function maybeLoadEmployeeAuditReportData({
         transfers = [...transfers, ...(await dataLoader.outgoingInactiveTransfers())];
       } catch (e) {
         ctx.commit(ReportsMutations.SET_STATUS, {
-          statusMessage: { text: "Failed to load outgoing inactive transfers.", level: "warning" },
+          statusMessage: { text: 'Failed to load outgoing inactive transfers.', level: 'warning' },
         });
       }
 
@@ -154,7 +154,7 @@ export async function maybeLoadEmployeeAuditReportData({
         transfers = [...transfers, ...(await dataLoader.rejectedTransfers())];
       } catch (e) {
         ctx.commit(ReportsMutations.SET_STATUS, {
-          statusMessage: { text: "Failed to load rejected transfers.", level: "warning" },
+          statusMessage: { text: 'Failed to load rejected transfers.', level: 'warning' },
         });
       }
     }
@@ -196,7 +196,7 @@ export async function maybeLoadEmployeeAuditReportData({
     const historyPromises: Promise<any>[] = [];
 
     ctx.commit(ReportsMutations.SET_STATUS, {
-      statusMessage: { text: `Loading history...`, level: "success" },
+      statusMessage: { text: 'Loading history...', level: 'success' },
     });
 
     packages.map((pkg) => {
@@ -205,7 +205,7 @@ export async function maybeLoadEmployeeAuditReportData({
           .then((dataLoader) => dataLoader.packageHistoryByPackageId(pkg.Id))
           .then((response) => {
             pkg.history = response;
-          })
+          }),
       );
     });
 
@@ -215,18 +215,18 @@ export async function maybeLoadEmployeeAuditReportData({
           .then((dataLoader) => dataLoader.transferHistoryByOutGoingTransferId(transfer.Id))
           .then((response) => {
             transfer.history = response;
-          })
+          }),
       );
     });
 
     const settledHistoryPromises = await Promise.allSettled(historyPromises);
 
-    if (settledHistoryPromises.find((x) => x.status === "rejected")) {
-      throw new Error("History request failed");
+    if (settledHistoryPromises.find((x) => x.status === 'rejected')) {
+      throw new Error('History request failed');
     }
 
     ctx.commit(ReportsMutations.SET_STATUS, {
-      statusMessage: { text: `Analyzing history...`, level: "success" },
+      statusMessage: { text: 'Analyzing history...', level: 'success' },
     });
 
     const employeeMatcher = config.employeeQuery.toLocaleLowerCase().slice(0, -3);
@@ -239,7 +239,7 @@ export async function maybeLoadEmployeeAuditReportData({
             pkg.Label,
             history.RecordedDateTime,
             history.UserName,
-            history.Descriptions.join(" / "),
+            history.Descriptions.join(' / '),
           ]);
         }
       }
@@ -253,7 +253,7 @@ export async function maybeLoadEmployeeAuditReportData({
             transfer.ManifestNumber,
             history.RecordedDateTime,
             history.UserName,
-            history.Descriptions.join(" /"),
+            history.Descriptions.join(' /'),
           ]);
         }
       }
@@ -274,7 +274,7 @@ export async function maybeLoadEmployeeAuditReportData({
       return 0;
     });
 
-    employeeAuditMatrix.unshift(["Object Type", "Object ID", "Timestamp", "Employee", "Activity"]);
+    employeeAuditMatrix.unshift(['Object Type', 'Object ID', 'Timestamp', 'Employee', 'Activity']);
 
     reportData[ReportType.EMPLOYEE_AUDIT] = {
       employeeAuditMatrix,
@@ -302,10 +302,10 @@ export async function createEmployeeAuditReportOrError({
   reportConfig: IReportConfig;
 }): Promise<any> {
   if (!store.state.pluginAuth?.authState?.license) {
-    throw new Error("Invalid authState");
+    throw new Error('Invalid authState');
   }
 
   if (!reportData[ReportType.EMPLOYEE_AUDIT]) {
-    throw new Error("Missing harvest packages data");
+    throw new Error('Missing harvest packages data');
   }
 }

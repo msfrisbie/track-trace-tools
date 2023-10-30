@@ -1,6 +1,6 @@
-import axios, { AxiosRequestConfig } from "axios";
-import axiosRetry from "axios-retry";
-import fetchRetry from "fetch-retry";
+import axios, { AxiosRequestConfig } from 'axios';
+import axiosRetry from 'axios-retry';
+import fetchRetry from 'fetch-retry';
 
 const client = axios.create({
   timeout: 180000,
@@ -11,7 +11,7 @@ axiosRetry(client, {
   retries: 5,
   retryDelay: axiosRetry.exponentialDelay,
   retryCondition: (error) => {
-    if (error.code && ["ECONNABORTED", "ERR_CANCELED"].includes(error.code)) {
+    if (error.code && ['ECONNABORTED', 'ERR_CANCELED'].includes(error.code)) {
       return true;
     }
 
@@ -25,12 +25,8 @@ axiosRetry(client, {
 });
 
 client.interceptors.response.use(
-  (response) => {
-    return response;
-  },
-  (error) => {
-    return Promise.reject(error);
-  }
+  (response) => response,
+  (error) => Promise.reject(error),
 );
 
 // Service workers cannot use Axios
@@ -50,7 +46,7 @@ export const customAxios = function (
           retries: number;
         };
       }
-    | undefined
+    | undefined,
 ) {
   const axiosConfig: AxiosRequestConfig = {
     url,
@@ -62,7 +58,7 @@ export const customAxios = function (
     axiosConfig.data = init.body;
     axiosConfig.signal = init.signal;
     axiosConfig.timeout = init.timeout;
-    axiosConfig["axios-retry"] = init.axiosRetry;
+    axiosConfig['axios-retry'] = init.axiosRetry;
   }
   return client.request(axiosConfig);
 };

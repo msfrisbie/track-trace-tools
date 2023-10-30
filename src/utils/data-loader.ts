@@ -1,4 +1,4 @@
-import { DATA_LOAD_MAX_ITERATION_FAILSAFE, DATA_LOAD_PAGE_SIZE } from "@/consts";
+import { DATA_LOAD_MAX_ITERATION_FAILSAFE, DATA_LOAD_PAGE_SIZE } from '@/consts';
 import {
   ICollectionFilters,
   ICollectionRequest,
@@ -8,18 +8,18 @@ import {
   IPaginationOptions,
   ISort,
   ISortOptions,
-} from "@/interfaces";
-import { DataLoadError, DataLoadErrorType } from "@/modules/data-loader/data-loader-error";
-import store from "@/store/page-overlay/index";
-import { debugLogFactory } from "@/utils/debug";
-import { AxiosResponse } from "axios";
-import { Subject } from "rxjs";
+} from '@/interfaces';
+import { DataLoadError, DataLoadErrorType } from '@/modules/data-loader/data-loader-error';
+import store from '@/store/page-overlay/index';
+import { debugLogFactory } from '@/utils/debug';
+import { AxiosResponse } from 'axios';
+import { Subject } from 'rxjs';
 
-const debugLog = debugLogFactory("utils/data-loader.ts");
+const debugLog = debugLogFactory('utils/data-loader.ts');
 
 export function streamFactory<T>(
   { maxCount = Number.POSITIVE_INFINITY, pageSize = DATA_LOAD_PAGE_SIZE }: IDataLoadOptions,
-  responseFactory: (paginationOptions: IPaginationOptions) => Promise<AxiosResponse>
+  responseFactory: (paginationOptions: IPaginationOptions) => Promise<AxiosResponse>,
 ): Subject<ICollectionResponse<T>> {
   const subject: Subject<ICollectionResponse<T>> = new Subject();
   let runningTotal = 0;
@@ -29,29 +29,27 @@ export function streamFactory<T>(
     if (store.state.settings.loadDataInParallel) {
       // Parallelized Load
       const countResponse = await responseFactory({ page: 0, pageSize: 5 }).catch(
-        (error) => error.response
+        (error) => error.response,
       );
       if (countResponse.status !== 200) {
         if (countResponse.status === 401) {
           subject.error(
             new DataLoadError(
               DataLoadErrorType.PERMISSIONS,
-              `Server indicated user is missing permissions for ${countResponse.config.url}`
-            )
+              `Server indicated user is missing permissions for ${countResponse.config.url}`,
+            ),
           );
           return;
-        } else {
-          subject.error(new DataLoadError(DataLoadErrorType.SERVER, "Server returned an error."));
-          return;
         }
+        subject.error(new DataLoadError(DataLoadErrorType.SERVER, 'Server returned an error.'));
+        return;
       }
       const totalCountResponse: ICollectionResponse<T> = await countResponse.data;
       const lastPageIndex = Math.ceil(totalCountResponse.Total / pageSize);
 
       try {
         const responses = Array.from(Array(lastPageIndex).keys()).map((page) =>
-          responseFactory({ page, pageSize })
-        );
+          responseFactory({ page, pageSize }));
 
         Promise.allSettled(responses);
 
@@ -61,26 +59,22 @@ export function streamFactory<T>(
               subject.error(
                 new DataLoadError(
                   DataLoadErrorType.PERMISSIONS,
-                  `Server indicated user is missing permissions for ${response.config.url}`
-                )
-              );
-              return;
-            } else {
-              subject.error(
-                new DataLoadError(DataLoadErrorType.SERVER, "Server returned an error.")
+                  `Server indicated user is missing permissions for ${response.config.url}`,
+                ),
               );
               return;
             }
-          } else {
-            const responseData: ICollectionResponse<T> = await response.data;
-            subject.next(responseData);
-
-            debugLog(async () => ["responseData.Data:", responseData.Data]);
-
-            runningTotal += responseData.Data.length;
-
-            debugLog(async () => ["runningTotal:", runningTotal]);
+            subject.error(new DataLoadError(DataLoadErrorType.SERVER, 'Server returned an error.'));
+            return;
           }
+          const responseData: ICollectionResponse<T> = await response.data;
+          subject.next(responseData);
+
+          debugLog(async () => ['responseData.Data:', responseData.Data]);
+
+          runningTotal += responseData.Data.length;
+
+          debugLog(async () => ['runningTotal:', runningTotal]);
         }
 
         const t1 = performance.now();
@@ -90,7 +84,7 @@ export function streamFactory<T>(
         subject.complete();
       } catch (e: any) {
         subject.error(
-          new DataLoadError(DataLoadErrorType.NETWORK, "Network request unable to complete.")
+          new DataLoadError(DataLoadErrorType.NETWORK, 'Network request unable to complete.'),
         );
       }
     } else {
@@ -100,7 +94,7 @@ export function streamFactory<T>(
       while (true) {
         let response = null;
 
-        debugLog(async () => ["page:", page]);
+        debugLog(async () => ['page:', page]);
 
         try {
           response = await responseFactory({ page, pageSize });
@@ -110,8 +104,9 @@ export function streamFactory<T>(
         } finally {
           if (!response) {
             subject.error(
-              new DataLoadError(DataLoadErrorType.NETWORK, "Network request unable to complete.")
+              new DataLoadError(DataLoadErrorType.NETWORK, 'Network request unable to complete.'),
             );
+            /* eslint-disable-next-line no-unsafe-finally */
             return;
           }
         }
@@ -121,24 +116,23 @@ export function streamFactory<T>(
             subject.error(
               new DataLoadError(
                 DataLoadErrorType.PERMISSIONS,
-                `Server indicated user is missing permissions for ${response.config.url}`
-              )
+                `Server indicated user is missing permissions for ${response.config.url}`,
+              ),
             );
             return;
-          } else {
-            subject.error(new DataLoadError(DataLoadErrorType.SERVER, "Server returned an error."));
-            return;
           }
+          subject.error(new DataLoadError(DataLoadErrorType.SERVER, 'Server returned an error.'));
+          return;
         }
 
         const responseData: ICollectionResponse<T> = await response.data;
         subject.next(responseData);
 
-        debugLog(async () => ["responseData.Data:", responseData.Data]);
+        debugLog(async () => ['responseData.Data:', responseData.Data]);
 
         runningTotal += responseData.Data.length;
 
-        debugLog(async () => ["runningTotal:", runningTotal]);
+        debugLog(async () => ['runningTotal:', runningTotal]);
 
         if (runningTotal >= responseData.Total) {
           break;
@@ -149,7 +143,7 @@ export function streamFactory<T>(
         }
 
         if (page >= DATA_LOAD_MAX_ITERATION_FAILSAFE) {
-          subject.error(new Error("Page exceeded max iteration failsafe"));
+          subject.error(new Error('Page exceeded max iteration failsafe'));
           return;
         }
 
@@ -172,11 +166,12 @@ export function buildBodyFilter(filterOptions: IFilterOptions | null): ICollecti
     return null;
   }
 
-  const { transferFilter, plantFilter, tagFilter, plantBatchFilter, packageFilter, harvestFilter } =
-    filterOptions;
+  const {
+    transferFilter, plantFilter, tagFilter, plantBatchFilter, packageFilter, harvestFilter,
+  } = filterOptions;
 
   const filterSet: ICollectionFilters = {
-    logic: filterOptions.operator || "and",
+    logic: filterOptions.operator || 'and',
     filters: [],
   };
 
@@ -188,9 +183,9 @@ export function buildBodyFilter(filterOptions: IFilterOptions | null): ICollecti
     filterSet.filters = [
       ...filterSet.filters,
       {
-        field: "LocationName",
+        field: 'LocationName',
         // Searching Row 2 should not match Row 20
-        operator: "eq",
+        operator: 'eq',
         value: plantFilter.locationName,
       },
     ];
@@ -200,8 +195,8 @@ export function buildBodyFilter(filterOptions: IFilterOptions | null): ICollecti
     filterSet.filters = [
       ...filterSet.filters,
       {
-        field: "StrainName",
-        operator: "eq",
+        field: 'StrainName',
+        operator: 'eq',
         value: plantFilter.strainName,
       },
     ];
@@ -211,8 +206,8 @@ export function buildBodyFilter(filterOptions: IFilterOptions | null): ICollecti
     filterSet.filters = [
       ...filterSet.filters,
       {
-        field: "VegetativeDate",
-        operator: "gt",
+        field: 'VegetativeDate',
+        operator: 'gt',
         value: plantFilter.vegetativeDateGt,
       },
     ];
@@ -222,8 +217,8 @@ export function buildBodyFilter(filterOptions: IFilterOptions | null): ICollecti
     filterSet.filters = [
       ...filterSet.filters,
       {
-        field: "VegetativeDate",
-        operator: "eq",
+        field: 'VegetativeDate',
+        operator: 'eq',
         value: plantFilter.vegetativeDateEq,
       },
     ];
@@ -233,8 +228,8 @@ export function buildBodyFilter(filterOptions: IFilterOptions | null): ICollecti
     filterSet.filters = [
       ...filterSet.filters,
       {
-        field: "VegetativeDate",
-        operator: "lt",
+        field: 'VegetativeDate',
+        operator: 'lt',
         value: plantFilter.vegetativeDateLt,
       },
     ];
@@ -244,8 +239,8 @@ export function buildBodyFilter(filterOptions: IFilterOptions | null): ICollecti
     filterSet.filters = [
       ...filterSet.filters,
       {
-        field: "FloweringDate",
-        operator: "gt",
+        field: 'FloweringDate',
+        operator: 'gt',
         value: plantFilter.floweringDateGt,
       },
     ];
@@ -255,8 +250,8 @@ export function buildBodyFilter(filterOptions: IFilterOptions | null): ICollecti
     filterSet.filters = [
       ...filterSet.filters,
       {
-        field: "FloweringDate",
-        operator: "eq",
+        field: 'FloweringDate',
+        operator: 'eq',
         value: plantFilter.floweringDateEq,
       },
     ];
@@ -266,8 +261,8 @@ export function buildBodyFilter(filterOptions: IFilterOptions | null): ICollecti
     filterSet.filters = [
       ...filterSet.filters,
       {
-        field: "FloweringDate",
-        operator: "lt",
+        field: 'FloweringDate',
+        operator: 'lt',
         value: plantFilter.floweringDateLt,
       },
     ];
@@ -277,8 +272,8 @@ export function buildBodyFilter(filterOptions: IFilterOptions | null): ICollecti
     filterSet.filters = [
       ...filterSet.filters,
       {
-        field: "PlantedDate",
-        operator: "gt",
+        field: 'PlantedDate',
+        operator: 'gt',
         value: plantFilter.plantedDateGt,
       },
     ];
@@ -288,8 +283,8 @@ export function buildBodyFilter(filterOptions: IFilterOptions | null): ICollecti
     filterSet.filters = [
       ...filterSet.filters,
       {
-        field: "PlantedDate",
-        operator: "eq",
+        field: 'PlantedDate',
+        operator: 'eq',
         value: plantFilter.plantedDateEq,
       },
     ];
@@ -299,8 +294,8 @@ export function buildBodyFilter(filterOptions: IFilterOptions | null): ICollecti
     filterSet.filters = [
       ...filterSet.filters,
       {
-        field: "PlantedDate",
-        operator: "lt",
+        field: 'PlantedDate',
+        operator: 'lt',
         value: plantFilter.plantedDateLt,
       },
     ];
@@ -310,8 +305,8 @@ export function buildBodyFilter(filterOptions: IFilterOptions | null): ICollecti
     filterSet.filters = [
       ...filterSet.filters,
       {
-        field: "Label",
-        operator: "endswith",
+        field: 'Label',
+        operator: 'endswith',
         value: plantFilter.label,
       },
     ];
@@ -325,8 +320,8 @@ export function buildBodyFilter(filterOptions: IFilterOptions | null): ICollecti
     filterSet.filters = [
       ...filterSet.filters,
       {
-        field: "Name",
-        operator: "eq",
+        field: 'Name',
+        operator: 'eq',
         value: plantBatchFilter.name,
       },
     ];
@@ -336,9 +331,9 @@ export function buildBodyFilter(filterOptions: IFilterOptions | null): ICollecti
     filterSet.filters = [
       ...filterSet.filters,
       {
-        field: "LocationName",
+        field: 'LocationName',
         // Searching Row 2 should not match Row 20
-        operator: "eq",
+        operator: 'eq',
         value: plantBatchFilter.locationName,
       },
     ];
@@ -348,8 +343,8 @@ export function buildBodyFilter(filterOptions: IFilterOptions | null): ICollecti
     filterSet.filters = [
       ...filterSet.filters,
       {
-        field: "StrainName",
-        operator: "eq",
+        field: 'StrainName',
+        operator: 'eq',
         value: plantBatchFilter.strainName,
       },
     ];
@@ -363,8 +358,8 @@ export function buildBodyFilter(filterOptions: IFilterOptions | null): ICollecti
     filterSet.filters = [
       ...filterSet.filters,
       {
-        field: "Label",
-        operator: "eq",
+        field: 'Label',
+        operator: 'eq',
         value: tagFilter.label,
       },
     ];
@@ -378,8 +373,8 @@ export function buildBodyFilter(filterOptions: IFilterOptions | null): ICollecti
     filterSet.filters = [
       ...filterSet.filters,
       {
-        field: "Label",
-        operator: "eq",
+        field: 'Label',
+        operator: 'eq',
         value: packageFilter.label,
       },
     ];
@@ -389,8 +384,8 @@ export function buildBodyFilter(filterOptions: IFilterOptions | null): ICollecti
     filterSet.filters = [
       ...filterSet.filters,
       {
-        field: "Item.Name",
-        operator: packageFilter.itemNameExact ? "eq" : "contains",
+        field: 'Item.Name',
+        operator: packageFilter.itemNameExact ? 'eq' : 'contains',
         value: packageFilter.itemName,
       },
     ];
@@ -400,8 +395,8 @@ export function buildBodyFilter(filterOptions: IFilterOptions | null): ICollecti
     filterSet.filters = [
       ...filterSet.filters,
       {
-        field: "Item.StrainName",
-        operator: packageFilter.itemStrainNameExact ? "eq" : "contains",
+        field: 'Item.StrainName',
+        operator: packageFilter.itemStrainNameExact ? 'eq' : 'contains',
         value: packageFilter.itemStrainName,
       },
     ];
@@ -411,19 +406,19 @@ export function buildBodyFilter(filterOptions: IFilterOptions | null): ICollecti
     filterSet.filters = [
       ...filterSet.filters,
       {
-        field: "LocationName",
-        operator: packageFilter.locationNameExact ? "eq" : "contains",
+        field: 'LocationName',
+        operator: packageFilter.locationNameExact ? 'eq' : 'contains',
         value: packageFilter.locationName,
       },
     ];
   }
 
-  if (typeof packageFilter?.isEmpty === "boolean") {
+  if (typeof packageFilter?.isEmpty === 'boolean') {
     filterSet.filters = [
       ...filterSet.filters,
       {
-        field: "Quantity",
-        operator: packageFilter.isEmpty ? "eq" : "gt",
+        field: 'Quantity',
+        operator: packageFilter.isEmpty ? 'eq' : 'gt',
         value: 0,
       },
     ];
@@ -433,8 +428,8 @@ export function buildBodyFilter(filterOptions: IFilterOptions | null): ICollecti
     filterSet.filters = [
       ...filterSet.filters,
       {
-        field: "PackagedDate",
-        operator: "gt",
+        field: 'PackagedDate',
+        operator: 'gt',
         value: packageFilter.packagedDateGt,
       },
     ];
@@ -444,8 +439,8 @@ export function buildBodyFilter(filterOptions: IFilterOptions | null): ICollecti
     filterSet.filters = [
       ...filterSet.filters,
       {
-        field: "PackagedDate",
-        operator: "eq",
+        field: 'PackagedDate',
+        operator: 'eq',
         value: packageFilter.packagedDateEq,
       },
     ];
@@ -455,8 +450,8 @@ export function buildBodyFilter(filterOptions: IFilterOptions | null): ICollecti
     filterSet.filters = [
       ...filterSet.filters,
       {
-        field: "PackagedDate",
-        operator: "lt",
+        field: 'PackagedDate',
+        operator: 'lt',
         value: packageFilter.packagedDateLt,
       },
     ];
@@ -470,8 +465,8 @@ export function buildBodyFilter(filterOptions: IFilterOptions | null): ICollecti
     filterSet.filters = [
       ...filterSet.filters,
       {
-        field: "ManifestNumber",
-        operator: "contains",
+        field: 'ManifestNumber',
+        operator: 'contains',
         value: transferFilter.manifestNumber,
       },
     ];
@@ -481,8 +476,8 @@ export function buildBodyFilter(filterOptions: IFilterOptions | null): ICollecti
     filterSet.filters = [
       ...filterSet.filters,
       {
-        field: "CreatedDateTime",
-        operator: "lt",
+        field: 'CreatedDateTime',
+        operator: 'lt',
         value: transferFilter.createdDateLt,
       },
     ];
@@ -492,8 +487,8 @@ export function buildBodyFilter(filterOptions: IFilterOptions | null): ICollecti
     filterSet.filters = [
       ...filterSet.filters,
       {
-        field: "CreatedDateTime",
-        operator: "eq",
+        field: 'CreatedDateTime',
+        operator: 'eq',
         value: transferFilter.createdDateEq,
       },
     ];
@@ -503,8 +498,8 @@ export function buildBodyFilter(filterOptions: IFilterOptions | null): ICollecti
     filterSet.filters = [
       ...filterSet.filters,
       {
-        field: "CreatedDateTime",
-        operator: "gt",
+        field: 'CreatedDateTime',
+        operator: 'gt',
         value: transferFilter.createdDateGt,
       },
     ];
@@ -518,8 +513,8 @@ export function buildBodyFilter(filterOptions: IFilterOptions | null): ICollecti
     filterSet.filters = [
       ...filterSet.filters,
       {
-        field: "Name",
-        operator: "eq",
+        field: 'Name',
+        operator: 'eq',
         value: harvestFilter.harvestName,
       },
     ];
@@ -545,8 +540,8 @@ export function buildBodySort(sortOptions: ISortOptions | null) {
     sortSet = [
       ...sortSet,
       {
-        field: "RecordedDateTime",
-        dir: "asc",
+        field: 'RecordedDateTime',
+        dir: 'asc',
       },
     ];
   }
@@ -555,8 +550,8 @@ export function buildBodySort(sortOptions: ISortOptions | null) {
     sortSet = [
       ...sortSet,
       {
-        field: "Label",
-        dir: "asc",
+        field: 'Label',
+        dir: 'asc',
       },
     ];
   }
@@ -565,8 +560,8 @@ export function buildBodySort(sortOptions: ISortOptions | null) {
     sortSet = [
       ...sortSet,
       {
-        field: "Name",
-        dir: "asc",
+        field: 'Name',
+        dir: 'asc',
       },
     ];
   }
@@ -588,7 +583,7 @@ export function buildBodySort(sortOptions: ISortOptions | null) {
 export function buildBody(
   { page, pageSize }: IPaginationOptions,
   filterOptions: IFilterOptions | null = null,
-  sortOptions: ISortOptions | null = null
+  sortOptions: ISortOptions | null = null,
 ): string {
   const body: ICollectionRequest = {
     request: {

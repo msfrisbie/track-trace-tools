@@ -1,26 +1,26 @@
-import { IIndexedPlantData, IPlantFilter, IPluginState } from "@/interfaces";
-import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
-import { ReportsMutations, ReportType } from "@/store/page-overlay/modules/reports/consts";
+import { IIndexedPlantData, IPlantFilter, IPluginState } from '@/interfaces';
+import { primaryDataLoader } from '@/modules/data-loader/data-loader.module';
+import { ReportsMutations, ReportType } from '@/store/page-overlay/modules/reports/consts';
 import {
   IReportConfig,
   IReportData,
   IReportsState,
-} from "@/store/page-overlay/modules/reports/interfaces";
-import { ActionContext } from "vuex";
+} from '@/store/page-overlay/modules/reports/interfaces';
+import { ActionContext } from 'vuex';
 import {
   IMaturePlantsReportFormFilters,
   maturePlantsFormFiltersFactory,
-} from "./mature-plants-report";
+} from './mature-plants-report';
 
 const REPORT_TYPE = ReportType.MATURE_PLANTS_QUICKVIEW;
 
 export enum MaturePlantQuickviewDimension {
-  STRAIN = "Strain",
-  GROWTH_PHASE = "Growth Phase",
-  LOCATION = "Location",
-  PLANTED_DATE = "Planted Date",
-  VEGETATIVE_DATE = "Vegetative Date",
-  FLOWERING_DATE = "Flowering Date",
+  STRAIN = 'Strain',
+  GROWTH_PHASE = 'Growth Phase',
+  LOCATION = 'Location',
+  PLANTED_DATE = 'Planted Date',
+  VEGETATIVE_DATE = 'Vegetative Date',
+  FLOWERING_DATE = 'Flowering Date',
 }
 
 export const MATURE_PLANT_QUICKVIEW_DIMENSIONS: MaturePlantQuickviewDimension[] = [
@@ -34,7 +34,7 @@ export const MATURE_PLANT_QUICKVIEW_DIMENSIONS: MaturePlantQuickviewDimension[] 
 
 export function extractMaturePlantPropertyFromDimension(
   plant: IIndexedPlantData,
-  dimension: MaturePlantQuickviewDimension
+  dimension: MaturePlantQuickviewDimension,
 ) {
   switch (dimension) {
     case MaturePlantQuickviewDimension.STRAIN:
@@ -50,7 +50,7 @@ export function extractMaturePlantPropertyFromDimension(
     case MaturePlantQuickviewDimension.FLOWERING_DATE:
       return plant.FloweringDate;
     default:
-      throw new Error("Bad dimension");
+      throw new Error('Bad dimension');
   }
 }
 
@@ -59,14 +59,13 @@ interface IMaturePlantsQuickviewReportFormFilters extends IMaturePlantsReportFor
   secondaryDimension: MaturePlantQuickviewDimension | null;
 }
 
-export const maturePlantsQuickviewFormFiltersFactory: () => IMaturePlantsQuickviewReportFormFilters =
-  () => ({
-    // @ts-ignore
-    primaryDimension: MaturePlantQuickviewDimension.STRAIN,
-    // @ts-ignore
-    secondaryDimension: MaturePlantQuickviewDimension.LOCATION,
-    ...maturePlantsFormFiltersFactory(),
-  });
+export const maturePlantsQuickviewFormFiltersFactory: () => IMaturePlantsQuickviewReportFormFilters = () => ({
+  // @ts-ignore
+  primaryDimension: MaturePlantQuickviewDimension.STRAIN,
+  // @ts-ignore
+  secondaryDimension: MaturePlantQuickviewDimension.LOCATION,
+  ...maturePlantsFormFiltersFactory(),
+});
 
 export function addMaturePlantsQuickviewReport({
   reportConfig,
@@ -111,7 +110,7 @@ export async function maybeLoadMaturePlantsQuickviewReportData({
     let maturePlants: IIndexedPlantData[] = [];
     if (maturePlantQuickviewConfig?.plantFilter) {
       ctx.commit(ReportsMutations.SET_STATUS, {
-        statusMessage: { text: "Loading plants...", level: "success" },
+        statusMessage: { text: 'Loading plants...', level: 'success' },
       });
 
       if (maturePlantQuickviewConfig?.plantFilter.includeVegetative) {
@@ -119,7 +118,7 @@ export async function maybeLoadMaturePlantsQuickviewReportData({
           maturePlants = [...maturePlants, ...(await primaryDataLoader.vegetativePlants())];
         } catch (e) {
           ctx.commit(ReportsMutations.SET_STATUS, {
-            statusMessage: { text: "Failed to load vegetative plants.", level: "warning" },
+            statusMessage: { text: 'Failed to load vegetative plants.', level: 'warning' },
           });
         }
       }
@@ -129,7 +128,7 @@ export async function maybeLoadMaturePlantsQuickviewReportData({
           maturePlants = [...maturePlants, ...(await primaryDataLoader.floweringPlants())];
         } catch (e) {
           ctx.commit(ReportsMutations.SET_STATUS, {
-            statusMessage: { text: "Failed to load flowering plants.", level: "warning" },
+            statusMessage: { text: 'Failed to load flowering plants.', level: 'warning' },
           });
         }
       }
@@ -139,7 +138,7 @@ export async function maybeLoadMaturePlantsQuickviewReportData({
           maturePlants = [...maturePlants, ...(await primaryDataLoader.inactivePlants({}))];
         } catch (e) {
           ctx.commit(ReportsMutations.SET_STATUS, {
-            statusMessage: { text: "Failed to load inactive plants.", level: "warning" },
+            statusMessage: { text: 'Failed to load inactive plants.', level: 'warning' },
           });
         }
       }

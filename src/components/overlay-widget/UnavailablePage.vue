@@ -15,12 +15,12 @@
 </template>
 
 <script lang="ts">
-import router from "@/router/index";
-import store from "@/store/page-overlay/index";
-import Vue from "vue";
+import router from '@/router/index';
+import store from '@/store/page-overlay/index';
+import Vue from 'vue';
 
 export default Vue.extend({
-  name: "UnavailablePage",
+  name: 'UnavailablePage',
   store,
   router,
   components: {},

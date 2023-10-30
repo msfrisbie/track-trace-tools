@@ -53,27 +53,27 @@
 </template>
 
 <script lang="ts">
-import PackageSearchResultPreview from "@/components/search/package-search/PackageSearchResultPreview.vue";
-import { IIndexedPackageData, IPluginState } from "@/interfaces";
-import { PACKAGE_TAB_REGEX } from "@/modules/page-manager/consts";
-import store from "@/store/page-overlay/index";
-import { PackageSearchActions } from "@/store/page-overlay/modules/package-search/consts";
-import { ISelectedPackageMetadata } from "@/store/page-overlay/modules/package-search/interfaces";
-import { SearchActions } from "@/store/page-overlay/modules/search/consts";
-import { Subject } from "rxjs";
-import { take, takeUntil } from "rxjs/operators";
-import Vue from "vue";
-import { mapActions, mapState, Store } from "vuex";
+import PackageSearchResultPreview from '@/components/search/package-search/PackageSearchResultPreview.vue';
+import { IIndexedPackageData, IPluginState } from '@/interfaces';
+import { PACKAGE_TAB_REGEX } from '@/modules/page-manager/consts';
+import store from '@/store/page-overlay/index';
+import { PackageSearchActions } from '@/store/page-overlay/modules/package-search/consts';
+import { ISelectedPackageMetadata } from '@/store/page-overlay/modules/package-search/interfaces';
+import { SearchActions } from '@/store/page-overlay/modules/search/consts';
+import { Subject } from 'rxjs';
+import { take, takeUntil } from 'rxjs/operators';
+import Vue from 'vue';
+import { mapActions, mapState, Store } from 'vuex';
 
 export default Vue.extend({
-  name: "PackageSearchResultsGroup",
+  name: 'PackageSearchResultsGroup',
   store,
   components: { PackageSearchResultPreview },
   data(): {
     // destroyed$: Subject<void>;
     // selectedPackageMetadata: ISelectedPackageMetadata | null;
     showAll: boolean;
-  } {
+    } {
     return {
       // destroyed$: new Subject(),
       // selectedPackageMetadata: null,
@@ -103,11 +103,10 @@ export default Vue.extend({
         };
 
         if (
-          !store.state.packageSearch.selectedPackageMetadata ||
-          store.state.packageSearch.selectedPackageMetadata.priority >= candidateMetadata.priority
+          !store.state.packageSearch.selectedPackageMetadata
+          || store.state.packageSearch.selectedPackageMetadata.priority >= candidateMetadata.priority
         ) {
-          (store as Store<IPluginState>).state.packageSearch.selectedPackageMetadata =
-            candidateMetadata;
+          (store as Store<IPluginState>).state.packageSearch.selectedPackageMetadata = candidateMetadata;
         }
 
         // searchManager.selectedPackage
@@ -139,25 +138,25 @@ export default Vue.extend({
     },
     groupIcon(): string {
       switch (this.packageFilterIdentifier) {
-        case "label":
-        case "sourcePackageLabel":
-          return "tags";
-        case "sourceHarvestName":
-          return "cut";
-        case "itemStrainName":
-          return "cannabis";
-        case "locationName":
-          return "map-marker-alt";
-        case "itemName":
-        case "itemProductCategoryName":
-        case "productionBatchNumber":
-        case "sourceProductionBatchNumbers":
+        case 'label':
+        case 'sourcePackageLabel':
+          return 'tags';
+        case 'sourceHarvestName':
+          return 'cut';
+        case 'itemStrainName':
+          return 'cannabis';
+        case 'locationName':
+          return 'map-marker-alt';
+        case 'itemName':
+        case 'itemProductCategoryName':
+        case 'productionBatchNumber':
+        case 'sourceProductionBatchNumbers':
         default:
-          return "boxes";
+          return 'boxes';
       }
     },
     disableFilter(): boolean {
-      return !this.packageFilterIdentifier || this.packageFilterIdentifier === "label";
+      return !this.packageFilterIdentifier || this.packageFilterIdentifier === 'label';
     },
     ...mapState<IPluginState>({
       queryString: (state: IPluginState) => state.search.queryString,
@@ -193,7 +192,7 @@ export default Vue.extend({
           packageSearchFilters: {
             [this.packageFilterIdentifier]: store.state.search.queryString,
           },
-        }
+        },
       );
 
       this.setShowSearchResults({ showSearchResults: false });

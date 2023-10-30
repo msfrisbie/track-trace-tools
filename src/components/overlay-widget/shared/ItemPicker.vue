@@ -59,17 +59,17 @@
 </template>
 
 <script lang="ts">
-import ErrorReadout from "@/components/overlay-widget/shared/ErrorReadout.vue";
-import { IClientItemFilters, IIndexedPackageData, IItemData } from "@/interfaces";
-import { DataLoadError, DataLoadErrorType } from "@/modules/data-loader/data-loader-error";
-import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
-import store from "@/store/page-overlay/index";
-import { itemMatchesFilters } from "@/utils/filters";
-import _ from "lodash-es";
-import Vue from "vue";
+import ErrorReadout from '@/components/overlay-widget/shared/ErrorReadout.vue';
+import { IClientItemFilters, IIndexedPackageData, IItemData } from '@/interfaces';
+import { DataLoadError, DataLoadErrorType } from '@/modules/data-loader/data-loader-error';
+import { primaryDataLoader } from '@/modules/data-loader/data-loader.module';
+import store from '@/store/page-overlay/index';
+import { itemMatchesFilters } from '@/utils/filters';
+import _ from 'lodash-es';
+import Vue from 'vue';
 
 export default Vue.extend({
-  name: "ItemPicker",
+  name: 'ItemPicker',
   store,
   components: {
     ErrorReadout,
@@ -90,7 +90,7 @@ export default Vue.extend({
   },
   data() {
     return {
-      itemQuery: "",
+      itemQuery: '',
       inflight: false,
       error: null,
       items: [],
@@ -116,7 +116,7 @@ export default Vue.extend({
       immediate: true,
       handler(newValue, oldValue) {
         // @ts-ignore
-        this.$data.itemQuery = newValue?.Name || "";
+        this.$data.itemQuery = newValue?.Name || '';
       },
     },
   },
@@ -145,7 +145,7 @@ export default Vue.extend({
           ).map((x: IIndexedPackageData) => x.Item);
         }
 
-        for (let item of items) {
+        for (const item of items) {
           if (itemMatchesFilters(item, this.$props.itemFilters)) {
             itemMap.set(item.Id, item);
           }
@@ -153,7 +153,7 @@ export default Vue.extend({
 
         this.$data.items = [...itemMap.values()];
       } catch (e) {
-        console.log("error", e);
+        console.log('error', e);
         this.$data.error = e;
         return;
       } finally {
@@ -161,10 +161,10 @@ export default Vue.extend({
       }
 
       if (this.$data.items.length === 0) {
-        console.error("Server returned 0 items");
+        console.error('Server returned 0 items');
         this.$data.error = new DataLoadError(
           DataLoadErrorType.ZERO_RESULTS,
-          "Zero results returned"
+          'Zero results returned',
         );
       }
     },

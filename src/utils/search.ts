@@ -6,7 +6,7 @@ export function maybePushOntoUniqueStack(value: any | null, stack: Array<string>
   const formattedValue = value.toString();
 
   // Remove from stack if it exists
-  stack = stack.filter(x => x !== formattedValue);
+  stack = stack.filter((x) => x !== formattedValue);
 
   // Push onto beginning
   stack.unshift(formattedValue);
@@ -19,5 +19,5 @@ export function maybePushOntoUniqueStack(value: any | null, stack: Array<string>
 
 // export function collectionTransformer<T>(objects: T[], groupConfigs: ): {
 //   objects,
-//   groups: 
+//   groups:
 // }

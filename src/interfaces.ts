@@ -13,38 +13,38 @@ import {
   TaskType,
   ToolkitView,
   TransferState,
-} from "@/consts";
-import { Store } from "vuex";
-import { IAnnouncementsState } from "./store/page-overlay/modules/announcements/interfaces";
-import { IClientState } from "./store/page-overlay/modules/client/interfaces";
-import { ICreatePackageCsvState } from "./store/page-overlay/modules/create-package-csv/interfaces";
-import { IEmployeeSamplesState } from "./store/page-overlay/modules/employee-samples/interfaces";
-import { IExplorerState } from "./store/page-overlay/modules/explorer/interfaces";
-import { IFlagsState } from "./store/page-overlay/modules/flags/interfaces";
-import { IGraphState } from "./store/page-overlay/modules/graph/interfaces";
-import { IListingState } from "./store/page-overlay/modules/listing/interfaces";
-import { IPackageHistoryState } from "./store/page-overlay/modules/package-history/interfaces";
-import { IPackageSearchState } from "./store/page-overlay/modules/package-search/interfaces";
-import { IPlantSearchState } from "./store/page-overlay/modules/plant-search/interfaces";
-import { IPluginAuthState } from "./store/page-overlay/modules/plugin-auth/interfaces";
-import { IPromoteImmaturePlantsBuilderState } from "./store/page-overlay/modules/promote-immature-plants-builder/interfaces";
-import { IReportsState } from "./store/page-overlay/modules/reports/interfaces";
-import { ISearchState } from "./store/page-overlay/modules/search/interfaces";
-import { ISettingsState } from "./store/page-overlay/modules/settings/interfaces";
-import { ISplitPackageBuilderState } from "./store/page-overlay/modules/split-package-builder/interfaces";
-import { ITagSearchState } from "./store/page-overlay/modules/tag-search/interfaces";
+} from '@/consts';
+import { Store } from 'vuex';
+import { IAnnouncementsState } from './store/page-overlay/modules/announcements/interfaces';
+import { IClientState } from './store/page-overlay/modules/client/interfaces';
+import { ICreatePackageCsvState } from './store/page-overlay/modules/create-package-csv/interfaces';
+import { IEmployeeSamplesState } from './store/page-overlay/modules/employee-samples/interfaces';
+import { IExplorerState } from './store/page-overlay/modules/explorer/interfaces';
+import { IFlagsState } from './store/page-overlay/modules/flags/interfaces';
+import { IGraphState } from './store/page-overlay/modules/graph/interfaces';
+import { IListingState } from './store/page-overlay/modules/listing/interfaces';
+import { IPackageHistoryState } from './store/page-overlay/modules/package-history/interfaces';
+import { IPackageSearchState } from './store/page-overlay/modules/package-search/interfaces';
+import { IPlantSearchState } from './store/page-overlay/modules/plant-search/interfaces';
+import { IPluginAuthState } from './store/page-overlay/modules/plugin-auth/interfaces';
+import { IPromoteImmaturePlantsBuilderState } from './store/page-overlay/modules/promote-immature-plants-builder/interfaces';
+import { IReportsState } from './store/page-overlay/modules/reports/interfaces';
+import { ISearchState } from './store/page-overlay/modules/search/interfaces';
+import { ISettingsState } from './store/page-overlay/modules/settings/interfaces';
+import { ISplitPackageBuilderState } from './store/page-overlay/modules/split-package-builder/interfaces';
+import { ITagSearchState } from './store/page-overlay/modules/tag-search/interfaces';
 import {
   DriverLayoverLeg,
   ITransferBuilderState,
-} from "./store/page-overlay/modules/transfer-builder/interfaces";
-import { ITransferPackageSearchState } from "./store/page-overlay/modules/transfer-package-search/interfaces";
-import { ITransferSearchState } from "./store/page-overlay/modules/transfer-search/interfaces";
-import { CsvUpload, CsvUploadStatus } from "./types";
-import { UnitOfMeasureAbbreviation, UnitOfMeasureName } from "./utils/units";
+} from './store/page-overlay/modules/transfer-builder/interfaces';
+import { ITransferPackageSearchState } from './store/page-overlay/modules/transfer-package-search/interfaces';
+import { ITransferSearchState } from './store/page-overlay/modules/transfer-search/interfaces';
+import { CsvUpload, CsvUploadStatus } from './types';
+import { UnitOfMeasureAbbreviation, UnitOfMeasureName } from './utils/units';
 
-export type PlantBatchTypeName = "Clone" | "Seed";
-export type PlantGrowthPhase = "Vegetative" | "Flowering";
-export type HarvestType = "WholePlant" | "Manicure";
+export type PlantBatchTypeName = 'Clone' | 'Seed';
+export type PlantGrowthPhase = 'Vegetative' | 'Flowering';
+export type HarvestType = 'WholePlant' | 'Manicure';
 
 export interface IComputedGetSet<T> {
   get: () => T;
@@ -63,14 +63,14 @@ export interface IAtomicService {
 }
 
 export enum DarkModeState {
-  ENABLED = "ENABLED",
-  DISABLED = "DISABLED",
+  ENABLED = 'ENABLED',
+  DISABLED = 'DISABLED',
 }
 
 export enum SnowflakeState {
-  ENABLED = "ENABLED",
-  CSS = "CSS",
-  DISABLED = "DISABLED",
+  ENABLED = 'ENABLED',
+  CSS = 'CSS',
+  DISABLED = 'DISABLED',
 }
 
 export interface IAccountSettings {
@@ -92,17 +92,17 @@ export interface ITrackedInteractions {
 
 export interface IFilter {
   field: string;
-  operator: "eq" | "contains" | "endswith" | "gt" | "lt";
+  operator: 'eq' | 'contains' | 'endswith' | 'gt' | 'lt';
   value: string | number;
 }
 
 export interface ISort {
   field: string;
-  dir: "asc";
+  dir: 'asc';
 }
 
 export interface ICollectionFilters {
-  logic: "and" | "or";
+  logic: 'and' | 'or';
   filters: IFilter[];
 }
 
@@ -227,7 +227,7 @@ export interface IPluginState extends IRootState {
   graph: IGraphState;
 }
 
-export type MetrcTagType = "CannabisPlant" | "CannabisPackage" | "MedicalPlant" | "MedicalPackage";
+export type MetrcTagType = 'CannabisPlant' | 'CannabisPackage' | 'MedicalPlant' | 'MedicalPackage';
 
 export interface IAddress {
   address1: string;
@@ -279,7 +279,7 @@ export interface ITagOrderParams {
 
 export interface IMetrcShippingData {
   Address: {
-    AddressValidationOverridden?: "true" | "false";
+    AddressValidationOverridden?: 'true' | 'false';
     City: string;
     PostalCode: string;
     State: string;
@@ -345,7 +345,7 @@ export interface ITagData extends ITaggedIResponseObjectData {
   IsArchived: boolean;
   IsUsed: boolean;
   LastModified: string;
-  StatusName: "Received" | "Used" | "Voided";
+  StatusName: 'Received' | 'Used' | 'Voided';
   TagTypeName: MetrcTagType;
   UsedDateTime: string;
   CommissionedDateTime: string;
@@ -355,8 +355,8 @@ export interface ITagData extends ITaggedIResponseObjectData {
 export interface IItemData extends IResponseObjectData {
   AdministrationMethod: string;
   ApprovalStatusDateTime: string;
-  ApprovalStatusName: "Approved";
-  DefaultLabTestingStateName: "NotRequired" | "NotSubmitted";
+  ApprovalStatusName: 'Approved';
+  DefaultLabTestingStateName: 'NotRequired' | 'NotSubmitted';
   Description: string;
   FacilityLicenseNumber: string | null;
   FacilityName: string | null;
@@ -372,7 +372,7 @@ export interface IItemData extends IResponseObjectData {
   ProductCategoryTypeName: string;
   ProductImages: any[];
   PublicIngredients: string;
-  QuantityTypeName: "WeightBased" | "CountBased" | "VolumeBased";
+  QuantityTypeName: 'WeightBased' | 'CountBased' | 'VolumeBased';
   ServingSize: string;
   StrainName: string | null;
   SupplyDurationDays: number | null;
@@ -395,9 +395,9 @@ export interface IItemData extends IResponseObjectData {
   UnitWeight: number | null;
   UnitWeightUnitOfMeasureAbbreviation: string | null;
   UnitWeightUnitOfMeasureId: number | null;
-  ExpirationDateConfiguration: "Off" | "Optional";
-  SellByDateConfiguration: "Off" | "Optional";
-  UseByDateConfiguration: "Off" | "Optional";
+  ExpirationDateConfiguration: 'Off' | 'Optional';
+  SellByDateConfiguration: 'Off' | 'Optional';
+  UseByDateConfiguration: 'Off' | 'Optional';
 }
 
 // Values that are defined per-request
@@ -419,7 +419,7 @@ export interface IPlantOptions extends IDataLoadOptions {
 }
 
 export interface IFilterOptions {
-  operator?: "and" | "or";
+  operator?: 'and' | 'or';
   plantFilter?: IPlantFilter;
   tagFilter?: ITagFilter;
   plantBatchFilter?: IPlantBatchFilter;
@@ -527,15 +527,15 @@ export interface ITagFilter extends IMetrcFilter {
 }
 
 export interface ISalesReceiptSort {
-  RecordedDateTime: "asc";
+  RecordedDateTime: 'asc';
 }
 
 export interface IPlantSort {
-  Label: "asc";
+  Label: 'asc';
 }
 
 export interface IPlantBatchSort {
-  Name: "asc";
+  Name: 'asc';
 }
 
 export interface IPlantBatchData {
@@ -593,7 +593,7 @@ export interface IPackageData extends ITaggedIResponseObjectData {
   FacilityLicenseNumber: string | null;
   FacilityName: string | null;
   FinishedDate: string | null;
-  InitialLabTestingState: "NotRequired" | "TestPassed" | "NotSubmitted";
+  InitialLabTestingState: 'NotRequired' | 'TestPassed' | 'NotSubmitted';
   IsArchived: boolean;
   IsDonation: boolean;
   IsDonationPersistent: boolean;
@@ -618,7 +618,7 @@ export interface IPackageData extends ITaggedIResponseObjectData {
   MultiPackage: boolean;
   MultiProductionBatch: boolean;
   Note: string;
-  PackageType: "ImmaturePlant" | "Product";
+  PackageType: 'ImmaturePlant' | 'Product';
   PackagedByFacilityLicenseNumber: string;
   PackagedByFacilityName: string;
   PackagedDate: string;
@@ -640,9 +640,9 @@ export interface IPackageData extends ITaggedIResponseObjectData {
   TradeSampleFacilityLicenseNumber: string | null;
   TransferManifestNumber: string;
   TransferPackageStateName: string | null;
-  UnitOfMeasureAbbreviation: "lb" | "ea" | "g";
+  UnitOfMeasureAbbreviation: 'lb' | 'ea' | 'g';
   UnitOfMeasureId: number;
-  UnitOfMeasureQuantityType: "WeightBased" | "CountBased" | "VolumeBased";
+  UnitOfMeasureQuantityType: 'WeightBased' | 'CountBased' | 'VolumeBased';
   SourceHarvestCount: number;
   SourcePackageCount: number;
   SourceProcessingJobCount: number;
@@ -695,13 +695,12 @@ export interface IPackageSourceHarvestData {
   HarvestedByFacilityName: string; // "Example, LLC";
   IsOnHold: false;
   LabTestingStateDate: null;
-  LabTestingStateName: "NotSubmitted";
+  LabTestingStateName: 'NotSubmitted';
   Name: string; // "Birthday Cake 10.21"
 }
 
 export interface IPlantHistoryData {}
 export interface IPlantBatchHistoryData {}
-export interface ITransferHistoryData {}
 
 export interface ITestResultData {
   IsRevoked: boolean;
@@ -768,7 +767,7 @@ export interface IDestinationPackageData {
   IsTradeSample: boolean;
   IsTradeSamplePersistent: boolean;
   ItemBrandName: null;
-  ItemServingSize: "";
+  ItemServingSize: '';
   ItemStrainName: null;
   ItemSupplyDurationDays: null;
   ItemUnitCbdContent: null;
@@ -787,7 +786,7 @@ export interface IDestinationPackageData {
   ItemUnitVolumeUnitOfMeasureAbbreviation: null;
   ItemUnitWeight: number | null;
   ItemUnitWeightUnitOfMeasureAbbreviation: string; // "g";
-  LabTestingStateName: string; //"TestPassed";
+  LabTestingStateName: string; // "TestPassed";
   MultiHarvest: true;
   MultiPackage: boolean;
   PackageId: number;
@@ -975,7 +974,7 @@ export interface ITransporterData {
   EstimatedArrivalDateTime: string | null;
   EstimatedDepartureDateTime: string | null;
   IsLayover: boolean;
-  TransporterDirectionName: "Outbound";
+  TransporterDirectionName: 'Outbound';
   TransporterFacilityLicenseNumber: string;
   TransporterFacilityName: string;
   VehicleLicensePlateNumber: string;
@@ -1006,13 +1005,13 @@ export interface IDestinationData {
   RecipientFacilityName: string;
   RejectedPackagesReturned: boolean;
   ShipmentTransactionTypeName: string;
-  ShipmentTypeName: "Transfer";
+  ShipmentTypeName: 'Transfer';
 }
 
 export interface ITransferTransporterDetails {
   ShipmentPlanId: number;
   ShipmentDeliveryId: number;
-  TransporterDirection: "Outbound";
+  TransporterDirection: 'Outbound';
   TransporterFacilityId: number;
   LineNumber: number;
   DriverName: string;
@@ -1154,7 +1153,7 @@ export interface DateCsvGroup {
 }
 
 export interface PatientIdCsvGroup {
-  patientId: "X00001";
+  patientId: 'X00001';
 }
 
 export interface CsvPlantLocationGroup
@@ -1204,7 +1203,7 @@ export interface ILocationData {
   Id: number;
   IsArchived: boolean;
   LocationTypeId: number;
-  LocationTypeName: "Default Location Type";
+  LocationTypeName: 'Default Location Type';
   Name: string;
 }
 
@@ -1224,13 +1223,13 @@ export interface IHarvestData {
   ArchivedDate: string | null;
   CurrentWeight: number;
   DryingLocationName: string;
-  DryingLocationTypeName: "Default Location Type";
+  DryingLocationTypeName: 'Default Location Type';
   FacilityLicenseNumber: string | null;
   FacilityName: string | null;
   FinishedDate: string | null;
   HarvestStartDate: string;
   HarvestType: HarvestType;
-  HarvestTypeName: "Harvest Batch";
+  HarvestTypeName: 'Harvest Batch';
   Id: number;
   IsArchived: boolean;
   IsFinished: boolean;
@@ -1439,12 +1438,12 @@ export interface IMetrcCreatePackagesFromPackagesPayload {
   RemediationDate: string;
   RemediationMethodId: string;
   RemediationSteps: string;
-  UseSameItem?: "true" | "false";
-  IsDonation?: "true";
-  IsFromMotherPlant?: "true";
+  UseSameItem?: 'true' | 'false';
+  IsDonation?: 'true';
+  IsFromMotherPlant?: 'true';
   ExpirationDate: string;
-  UseByDate: "";
-  SellByDate: "";
+  UseByDate: '';
+  SellByDate: '';
 }
 
 export interface IMetrcFinishPackagesPayload {
@@ -1494,8 +1493,8 @@ export interface IMetrcCreatePlantBatchPackagesFromMotherPlantBatchPayload {
   ActualDate: string;
   LocationId?: string;
   Count: string;
-  IsDonation?: "true";
-  IsFromMotherPlant?: "true";
+  IsDonation?: 'true';
+  IsFromMotherPlant?: 'true';
   ItemId: string;
   Note: string;
   PlantBatchId: string;
@@ -1700,7 +1699,7 @@ export interface IUnitOfMeasure {
   IsArchived: boolean;
   IsBaseUnit: boolean;
   Name: UnitOfMeasureName;
-  QuantityType: "WeightBased" | "VolumeBased" | "CountBased";
+  QuantityType: 'WeightBased' | 'VolumeBased' | 'CountBased';
   // (weight in oz) * ToBaseFactor = (weight in g)
   ToBaseFactor: number; // g is 0.035273961949580414
 }
@@ -1809,14 +1808,14 @@ export interface IMetrcVehicleData {
 }
 
 export type PluginKeyvalCategory =
-  | "GENERIC"
-  | "FACILITIES"
-  | "TRANSFER_TYPES"
-  | "TRANSFER_BLOB"
-  | "PAGE_DUMP"
-  | "MODAL_FIELDS"
-  | "FACILITY_METADATA"
-  | "REPEATER_DATA_KEYS";
+  | 'GENERIC'
+  | 'FACILITIES'
+  | 'TRANSFER_TYPES'
+  | 'TRANSFER_BLOB'
+  | 'PAGE_DUMP'
+  | 'MODAL_FIELDS'
+  | 'FACILITY_METADATA'
+  | 'REPEATER_DATA_KEYS';
 
 export interface IBuilderComponentError {
   tags: string[];
@@ -1854,7 +1853,7 @@ export interface IStrippedIndexedPackage {
 
 export interface IHistoryTreeNode {
   type: HistoryTreeNodeType;
-  relationship: "PARENT" | "CHILD";
+  relationship: 'PARENT' | 'CHILD';
   label: string;
   pkg: IStrippedIndexedPackage;
 }
@@ -1875,7 +1874,7 @@ export interface IGoogleOAuthOAuthUserInfo {
   given_name: string; // First Name
   family_name: string; // Last Name
   picture: string; // "https://lh3.googleusercontent.com/a/..."
-  locale: string; //"en"
+  locale: string; // "en"
 }
 
 export interface ISimpleSpreadsheet {
@@ -1927,7 +1926,7 @@ export type ISheetValues = any[][];
 
 export interface IValueRange {
   range: string;
-  majorDimension: "ROWS";
+  majorDimension: 'ROWS';
   values: ISheetValues;
 }
 
@@ -1938,19 +1937,19 @@ export interface IMetrcEmployeeData {
   FullName: string; // Matt Frisbie
   License: {
     Number: string; // "12345"
-    Status: "Active";
+    Status: 'Active';
     StartDate: null;
     EndDate: null;
     MainPhoneNumber: string; // "1231231234"
-    MobilePhoneNumber: "";
-    LicenseType: "Unlicensed";
+    MobilePhoneNumber: '';
+    LicenseType: 'Unlicensed';
   };
   SelectedFacilityEmployee: {
     FacilityId: number;
     HireDate: string; // "2023-01-01";
     TerminationDate: null;
     CanLogIn: boolean;
-    HomePage: "Packages";
+    HomePage: 'Packages';
     IsBlocked: boolean;
     IsIndustryAdmin: boolean;
     IsOwner: boolean;
@@ -1965,11 +1964,11 @@ export interface IMetrcEmployeeData {
   User: {
     Id: number; // same as UserId
     Username: string; // "12345"
-    UserType: "Industry";
+    UserType: 'Industry';
     Name: string; // Matt Frisbie
     Email: string;
     UseSingleSignOn: boolean;
-    HomePage: "";
+    HomePage: '';
     UserRoleId: null;
     UserRoleName: null;
     DatabaseQueryRoleName: null;

@@ -1,4 +1,4 @@
-import { zip } from "lodash-es";
+import { zip } from 'lodash-es';
 
 interface CollectionValidator<T> {
   fn: (arr: T[]) => boolean;
@@ -23,10 +23,10 @@ export function arrayIsValid<T>(
   {
     collectionValidators,
     rowValidators,
-  }: { collectionValidators?: CollectionValidator<T>[]; rowValidators?: RowValidator<T>[] }
+  }: { collectionValidators?: CollectionValidator<T>[]; rowValidators?: RowValidator<T>[] },
 ): ArrayStatus<T> {
   if (collectionValidators) {
-    for (let collectionValidator of collectionValidators) {
+    for (const collectionValidator of collectionValidators) {
       const valid = collectionValidator.fn(arr);
 
       if (!valid) {
@@ -42,8 +42,8 @@ export function arrayIsValid<T>(
   }
 
   if (rowValidators) {
-    for (let rowValidator of rowValidators) {
-      for (let row of arr) {
+    for (const rowValidator of rowValidators) {
+      for (const row of arr) {
         const valid = rowValidator.fn(row);
 
         if (!valid) {
@@ -65,7 +65,7 @@ export function arrayIsValid<T>(
 }
 
 export function splitMax(value: number, max: number | null): number[] {
-  let row = [];
+  const row = [];
 
   if (!max) {
     max = Number.POSITIVE_INFINITY;
@@ -74,7 +74,7 @@ export function splitMax(value: number, max: number | null): number[] {
   let remaining = value;
 
   while (remaining > 0) {
-    let next = Math.min(remaining, max);
+    const next = Math.min(remaining, max);
     row.push(next);
     remaining -= next;
   }
@@ -93,7 +93,7 @@ export function sameLength(...arrs: any[][]): boolean {
  */
 export function safeZip(...arrs: any[][]) {
   if (!sameLength(...arrs)) {
-    throw new Error("Array length mismatch");
+    throw new Error('Array length mismatch');
   }
 
   return zip(...arrs);

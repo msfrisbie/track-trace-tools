@@ -1,11 +1,11 @@
-import { IPackageData } from "@/interfaces";
-import "@/test/utils/auto-mock-debug";
-import { allocateImmaturePlantCounts } from "./misc";
+import { IPackageData } from '@/interfaces';
+import '@/test/utils/auto-mock-debug';
+import { allocateImmaturePlantCounts } from './misc';
 
 function buildMockPackage(
   Id: number,
   Quantity: number,
-  QuantityTypeName = "CountBased"
+  QuantityTypeName = 'CountBased',
 ): IPackageData {
   const pkg = {
     Id,
@@ -17,8 +17,8 @@ function buildMockPackage(
   return pkg as IPackageData;
 }
 
-describe("misc.ts", () => {
-  it("Correctly allocates plant counts to a single small package", () => {
+describe('misc.ts', () => {
+  it('Correctly allocates plant counts to a single small package', () => {
     const mockPackages: IPackageData[] = [90].map((qty, idx) => buildMockPackage(idx + 1, qty));
 
     expect(allocateImmaturePlantCounts(3, mockPackages)).toEqual([
@@ -27,7 +27,7 @@ describe("misc.ts", () => {
         pkg: {
           Id: 1,
           Item: {
-            QuantityTypeName: "CountBased",
+            QuantityTypeName: 'CountBased',
             UnitOfMeasureId: 1,
           },
           Quantity: 90,
@@ -43,7 +43,7 @@ describe("misc.ts", () => {
         pkg: {
           Id: 1,
           Item: {
-            QuantityTypeName: "CountBased",
+            QuantityTypeName: 'CountBased',
             UnitOfMeasureId: 1,
           },
           Quantity: 90,
@@ -56,7 +56,7 @@ describe("misc.ts", () => {
     expect(() => allocateImmaturePlantCounts(110, mockPackages)).toThrowError();
   });
 
-  it("Correctly allocates plant counts to a single large package", () => {
+  it('Correctly allocates plant counts to a single large package', () => {
     const mockPackages: IPackageData[] = [900].map((qty, idx) => buildMockPackage(idx + 1, qty));
 
     expect(allocateImmaturePlantCounts(3, mockPackages)).toEqual([
@@ -65,7 +65,7 @@ describe("misc.ts", () => {
         pkg: {
           Id: 1,
           Item: {
-            QuantityTypeName: "CountBased",
+            QuantityTypeName: 'CountBased',
             UnitOfMeasureId: 1,
           },
           Quantity: 900,
@@ -81,7 +81,7 @@ describe("misc.ts", () => {
         pkg: {
           Id: 1,
           Item: {
-            QuantityTypeName: "CountBased",
+            QuantityTypeName: 'CountBased',
             UnitOfMeasureId: 1,
           },
           Quantity: 900,
@@ -94,7 +94,7 @@ describe("misc.ts", () => {
         pkg: {
           Id: 1,
           Item: {
-            QuantityTypeName: "CountBased",
+            QuantityTypeName: 'CountBased',
             UnitOfMeasureId: 1,
           },
           Quantity: 900,
@@ -107,7 +107,7 @@ describe("misc.ts", () => {
         pkg: {
           Id: 1,
           Item: {
-            QuantityTypeName: "CountBased",
+            QuantityTypeName: 'CountBased',
             UnitOfMeasureId: 1,
           },
           Quantity: 900,
@@ -120,13 +120,9 @@ describe("misc.ts", () => {
     expect(() => allocateImmaturePlantCounts(1000, mockPackages)).toThrowError();
   });
 
-  it("Correctly allocates plant counts to multiple packages", () => {
-    const mockPackages: IPackageData[] = [50, 100, 150].map((qty, idx) =>
-      buildMockPackage(idx + 1, qty)
-    );
-    const mockPackages2: IPackageData[] = [250, 100, 150].map((qty, idx) =>
-      buildMockPackage(idx + 1, qty)
-    );
+  it('Correctly allocates plant counts to multiple packages', () => {
+    const mockPackages: IPackageData[] = [50, 100, 150].map((qty, idx) => buildMockPackage(idx + 1, qty));
+    const mockPackages2: IPackageData[] = [250, 100, 150].map((qty, idx) => buildMockPackage(idx + 1, qty));
 
     expect(allocateImmaturePlantCounts(3, mockPackages)).toEqual([
       {
@@ -134,7 +130,7 @@ describe("misc.ts", () => {
         pkg: {
           Id: 1,
           Item: {
-            QuantityTypeName: "CountBased",
+            QuantityTypeName: 'CountBased',
             UnitOfMeasureId: 1,
           },
           Quantity: 50,
@@ -149,7 +145,7 @@ describe("misc.ts", () => {
         pkg: {
           Id: 1,
           Item: {
-            QuantityTypeName: "CountBased",
+            QuantityTypeName: 'CountBased',
             UnitOfMeasureId: 1,
           },
           Quantity: 250,
@@ -165,7 +161,7 @@ describe("misc.ts", () => {
         pkg: {
           Id: 1,
           Item: {
-            QuantityTypeName: "CountBased",
+            QuantityTypeName: 'CountBased',
             UnitOfMeasureId: 1,
           },
           Quantity: 50,
@@ -178,7 +174,7 @@ describe("misc.ts", () => {
         pkg: {
           Id: 2,
           Item: {
-            QuantityTypeName: "CountBased",
+            QuantityTypeName: 'CountBased',
             UnitOfMeasureId: 1,
           },
           Quantity: 100,
@@ -191,7 +187,7 @@ describe("misc.ts", () => {
         pkg: {
           Id: 3,
           Item: {
-            QuantityTypeName: "CountBased",
+            QuantityTypeName: 'CountBased',
             UnitOfMeasureId: 1,
           },
           Quantity: 150,
@@ -206,7 +202,7 @@ describe("misc.ts", () => {
         pkg: {
           Id: 1,
           Item: {
-            QuantityTypeName: "CountBased",
+            QuantityTypeName: 'CountBased',
             UnitOfMeasureId: 1,
           },
           Quantity: 250,
@@ -219,7 +215,7 @@ describe("misc.ts", () => {
         pkg: {
           Id: 1,
           Item: {
-            QuantityTypeName: "CountBased",
+            QuantityTypeName: 'CountBased',
             UnitOfMeasureId: 1,
           },
           Quantity: 250,
@@ -235,7 +231,7 @@ describe("misc.ts", () => {
         pkg: {
           Id: 1,
           Item: {
-            QuantityTypeName: "CountBased",
+            QuantityTypeName: 'CountBased',
             UnitOfMeasureId: 1,
           },
           Quantity: 50,
@@ -248,7 +244,7 @@ describe("misc.ts", () => {
         pkg: {
           Id: 2,
           Item: {
-            QuantityTypeName: "CountBased",
+            QuantityTypeName: 'CountBased',
             UnitOfMeasureId: 1,
           },
           Quantity: 100,
@@ -261,7 +257,7 @@ describe("misc.ts", () => {
         pkg: {
           Id: 3,
           Item: {
-            QuantityTypeName: "CountBased",
+            QuantityTypeName: 'CountBased',
             UnitOfMeasureId: 1,
           },
           Quantity: 150,
@@ -274,7 +270,7 @@ describe("misc.ts", () => {
         pkg: {
           Id: 3,
           Item: {
-            QuantityTypeName: "CountBased",
+            QuantityTypeName: 'CountBased',
             UnitOfMeasureId: 1,
           },
           Quantity: 150,
@@ -289,7 +285,7 @@ describe("misc.ts", () => {
         pkg: {
           Id: 1,
           Item: {
-            QuantityTypeName: "CountBased",
+            QuantityTypeName: 'CountBased',
             UnitOfMeasureId: 1,
           },
           Quantity: 250,
@@ -302,7 +298,7 @@ describe("misc.ts", () => {
         pkg: {
           Id: 1,
           Item: {
-            QuantityTypeName: "CountBased",
+            QuantityTypeName: 'CountBased',
             UnitOfMeasureId: 1,
           },
           Quantity: 250,
@@ -315,7 +311,7 @@ describe("misc.ts", () => {
         pkg: {
           Id: 1,
           Item: {
-            QuantityTypeName: "CountBased",
+            QuantityTypeName: 'CountBased',
             UnitOfMeasureId: 1,
           },
           Quantity: 250,
@@ -328,7 +324,7 @@ describe("misc.ts", () => {
         pkg: {
           Id: 2,
           Item: {
-            QuantityTypeName: "CountBased",
+            QuantityTypeName: 'CountBased',
             UnitOfMeasureId: 1,
           },
           Quantity: 100,
@@ -342,10 +338,8 @@ describe("misc.ts", () => {
     expect(() => allocateImmaturePlantCounts(601, mockPackages2)).toThrowError();
   });
 
-  it("Correctly allocates weight-based plant counts to a single package", () => {
-    const mockPackages: IPackageData[] = [50, 100, 150].map((qty, idx) =>
-      buildMockPackage(idx + 1, qty, "WeightBased")
-    );
+  it('Correctly allocates weight-based plant counts to a single package', () => {
+    const mockPackages: IPackageData[] = [50, 100, 150].map((qty, idx) => buildMockPackage(idx + 1, qty, 'WeightBased'));
 
     expect(() => allocateImmaturePlantCounts(3, mockPackages)).toThrowError();
 

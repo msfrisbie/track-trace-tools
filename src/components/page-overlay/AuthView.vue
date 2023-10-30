@@ -14,13 +14,13 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import store from "@/store/page-overlay/index";
-import { MutationType } from "@/mutation-types";
-import { mapState } from "vuex";
+import Vue from 'vue';
+import store from '@/store/page-overlay/index';
+import { MutationType } from '@/mutation-types';
+import { mapState } from 'vuex';
 
 export default Vue.extend({
-  name: "AuthView",
+  name: 'AuthView',
   store,
 });
 </script>

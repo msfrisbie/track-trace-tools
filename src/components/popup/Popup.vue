@@ -34,29 +34,29 @@
 </template>
 
 <script lang="ts">
-import OAuthLogin from "@/components/shared/OAuthLogin.vue";
-import TitleBanner from "@/components/shared/TitleBanner.vue";
-import { TRACK_TRACE_TOOLS_STANDALONE_PAGE } from "@/consts";
-import { messageBus } from "@/modules/message-bus.module";
-import { version } from "@/modules/version";
-import { library } from "@fortawesome/fontawesome-svg-core";
-import * as fontawesomeSolid from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
-import { BootstrapVue } from "bootstrap-vue";
-import Vue from "vue";
+import OAuthLogin from '@/components/shared/OAuthLogin.vue';
+import TitleBanner from '@/components/shared/TitleBanner.vue';
+import { TRACK_TRACE_TOOLS_STANDALONE_PAGE } from '@/consts';
+import { messageBus } from '@/modules/message-bus.module';
+import { version } from '@/modules/version';
+import { library } from '@fortawesome/fontawesome-svg-core';
+import * as fontawesomeSolid from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import { BootstrapVue } from 'bootstrap-vue';
+import Vue from 'vue';
 
 Vue.use(BootstrapVue);
 
-Vue.component("font-awesome-icon", FontAwesomeIcon);
+Vue.component('font-awesome-icon', FontAwesomeIcon);
 library.add(
   // @ts-ignore
   fontawesomeSolid.faInfoCircle,
   fontawesomeSolid.faPlusCircle,
-  fontawesomeSolid.faSignOutAlt
+  fontawesomeSolid.faSignOutAlt,
 );
 
 export default Vue.extend({
-  name: "Popup",
+  name: 'Popup',
   components: {
     TitleBanner,
     OAuthLogin,
@@ -70,8 +70,8 @@ export default Vue.extend({
     messageBus.init();
   },
   methods: {
-    async openOptions(path = "") {
-      window.open(await chrome.runtime.getURL(TRACK_TRACE_TOOLS_STANDALONE_PAGE + path), "_blank");
+    async openOptions(path = '') {
+      window.open(await chrome.runtime.getURL(TRACK_TRACE_TOOLS_STANDALONE_PAGE + path), '_blank');
     },
   },
 });

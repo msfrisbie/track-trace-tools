@@ -20,53 +20,53 @@
 </template>
 
 <script lang="ts">
-import { IPluginState } from "@/interfaces";
-import router from "@/router/index";
-import store from "@/store/page-overlay/index";
-import Vue from "vue";
-import { mapState } from "vuex";
+import { IPluginState } from '@/interfaces';
+import router from '@/router/index';
+import store from '@/store/page-overlay/index';
+import Vue from 'vue';
+import { mapState } from 'vuex';
 
 function imageWidth(snowflakeSize: string) {
   switch (snowflakeSize) {
-    case "xs":
-      return "12px";
-    case "sm":
-      return "18px";
-    case "md":
-      return "24px";
-    case "lg":
-      return "32px";
-    case "xl":
-      return "40px";
-    case "2xl":
-      return "48px";
-    case "3xl":
-      return "56px";
-    case "4xl":
-      return "64px";
-    case "5xl":
-      return "72px";
-    case "6xl":
-      return "80px";
-    case "7xl":
-      return "88px";
-    case "8xl":
-      return "96px";
-    case "9xl":
-      return "100px";
+    case 'xs':
+      return '12px';
+    case 'sm':
+      return '18px';
+    case 'md':
+      return '24px';
+    case 'lg':
+      return '32px';
+    case 'xl':
+      return '40px';
+    case '2xl':
+      return '48px';
+    case '3xl':
+      return '56px';
+    case '4xl':
+      return '64px';
+    case '5xl':
+      return '72px';
+    case '6xl':
+      return '80px';
+    case '7xl':
+      return '88px';
+    case '8xl':
+      return '96px';
+    case '9xl':
+      return '100px';
     default:
-      return "24px";
+      return '24px';
   }
 }
 
 export default Vue.extend({
-  name: "Snowflakes",
+  name: 'Snowflakes',
   store,
   router,
   props: {},
   components: {},
   computed: {
-    ...mapState<IPluginState>(["settings"]),
+    ...mapState<IPluginState>(['settings']),
     snowflakeImageStyle(): string {
       const dimension = imageWidth(store.state.settings.snowflakeSize);
 
@@ -75,7 +75,7 @@ export default Vue.extend({
   },
   data() {
     return {
-      arr: Array(12).fill(""),
+      arr: Array(12).fill(''),
     };
   },
   methods: {},

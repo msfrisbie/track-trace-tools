@@ -23,15 +23,15 @@
 </template>
 
 <script lang="ts">
-import { MessageType } from "@/consts";
-import { analyticsManager } from "@/modules/analytics-manager.module";
-import router from "@/router/index";
-import store from "@/store/page-overlay/index";
-import Vue from "vue";
-import { mapState } from "vuex";
+import { MessageType } from '@/consts';
+import { analyticsManager } from '@/modules/analytics-manager.module';
+import router from '@/router/index';
+import store from '@/store/page-overlay/index';
+import Vue from 'vue';
+import { mapState } from 'vuex';
 
 export default Vue.extend({
-  name: "DashboardCard",
+  name: 'DashboardCard',
   store,
   router,
   props: {
@@ -52,7 +52,7 @@ export default Vue.extend({
       try {
         analyticsManager.track(
           MessageType.CLICKED_DASHBOARD_CARD_LINK,
-          JSON.parse(decodeURI(this.$props.url.split("#")[1]))
+          JSON.parse(decodeURI(this.$props.url.split('#')[1])),
         );
       } catch (e) {}
       window.location.href = this.$props.url;

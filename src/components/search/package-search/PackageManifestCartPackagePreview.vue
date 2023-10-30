@@ -19,14 +19,15 @@
 </template>
 
 <script lang="ts">
-import PickerCard from "@/components/overlay-widget/shared/PickerCard.vue";
-import { IIndexedPackageData } from "@/interfaces";
-import { TransferBuilderActions } from "@/store/page-overlay/modules/transfer-builder/consts";
-import { getLabelOrError, getNormalizedPackageContentsDescription } from "@/utils/package";
-import Vue from "vue";
-import { mapActions, mapState } from "vuex";
+import PickerCard from '@/components/overlay-widget/shared/PickerCard.vue';
+import { IIndexedPackageData } from '@/interfaces';
+import { TransferBuilderActions } from '@/store/page-overlay/modules/transfer-builder/consts';
+import { getLabelOrError, getNormalizedPackageContentsDescription } from '@/utils/package';
+import Vue from 'vue';
+import { mapActions, mapState } from 'vuex';
+
 export default Vue.extend({
-  name: "PackageManifestCartPackagePreview",
+  name: 'PackageManifestCartPackagePreview',
   components: {
     PickerCard,
   },

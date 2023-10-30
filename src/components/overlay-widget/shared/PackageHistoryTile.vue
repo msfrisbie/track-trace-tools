@@ -57,17 +57,17 @@
 </template>
 
 <script lang="ts">
-import PackageHistoryCard from "@/components/overlay-widget/shared/PackageHistoryCard.vue";
-import { HistoryTreeNodeType, PackageState } from "@/consts";
-import { IPackageAncestorTreeNode, IPackageChildTreeNode } from "@/interfaces";
-import router from "@/router/index";
-import store from "@/store/page-overlay/index";
-import { unitOfMeasureNameToAbbreviation } from "@/utils/units";
-import Vue from "vue";
-import { mapState } from "vuex";
+import PackageHistoryCard from '@/components/overlay-widget/shared/PackageHistoryCard.vue';
+import { HistoryTreeNodeType, PackageState } from '@/consts';
+import { IPackageAncestorTreeNode, IPackageChildTreeNode } from '@/interfaces';
+import router from '@/router/index';
+import store from '@/store/page-overlay/index';
+import { unitOfMeasureNameToAbbreviation } from '@/utils/units';
+import Vue from 'vue';
+import { mapState } from 'vuex';
 
 export default Vue.extend({
-  name: "PackageHistoryTile",
+  name: 'PackageHistoryTile',
   store,
   router,
   props: {
@@ -94,20 +94,18 @@ export default Vue.extend({
     filteredAncestors() {
       if (store.state.packageHistory.showUnownedPackages) {
         return this.ancestorTree.ancestors;
-      } else {
-        return this.ancestorTree.ancestors.filter(
-          (node) => node.type === HistoryTreeNodeType.OWNED_PACKAGE
-        );
       }
+      return this.ancestorTree.ancestors.filter(
+        (node) => node.type === HistoryTreeNodeType.OWNED_PACKAGE,
+      );
     },
     filteredChildren() {
       if (store.state.packageHistory.showUnownedPackages) {
         return this.childTree.children;
-      } else {
-        return this.childTree.children.filter(
-          (node) => node.type === HistoryTreeNodeType.OWNED_PACKAGE
-        );
       }
+      return this.childTree.children.filter(
+        (node) => node.type === HistoryTreeNodeType.OWNED_PACKAGE,
+      );
     },
     maxParentVisibleDepth: {
       get(): number {
@@ -130,13 +128,13 @@ export default Vue.extend({
     getBadgeVariant(packageState: PackageState): string {
       switch (packageState) {
         case PackageState.ACTIVE:
-          return "success";
+          return 'success';
         case PackageState.INACTIVE:
-          return "danger";
+          return 'danger';
         case PackageState.IN_TRANSIT:
-          return "dark";
+          return 'dark';
         default:
-          return "light";
+          return 'light';
       }
     },
   },

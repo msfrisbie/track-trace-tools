@@ -3,8 +3,8 @@ import {
   IPackageChildTreeNode,
   IPackageData,
   IPackageSourceHarvestData,
-} from "@/interfaces";
-import { PackageHistoryStatus } from "./consts";
+} from '@/interfaces';
+import { PackageHistoryStatus } from './consts';
 
 export interface IPackageHistoryState {
   status: PackageHistoryStatus;

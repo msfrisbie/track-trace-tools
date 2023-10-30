@@ -41,19 +41,19 @@
 </template>
 
 <script lang="ts">
-import { screenshotManager } from "@/modules/screenshot-manager.module";
-import { MutationType } from "@/mutation-types";
-import store from "@/store/page-overlay/index";
-import Vue from "vue";
-import { mapState } from "vuex";
+import { screenshotManager } from '@/modules/screenshot-manager.module';
+import { MutationType } from '@/mutation-types';
+import store from '@/store/page-overlay/index';
+import Vue from 'vue';
+import { mapState } from 'vuex';
 
 export default Vue.extend({
-  name: "ScreenshotButton",
+  name: 'ScreenshotButton',
   store,
   data() {
     return {};
   },
-  computed: mapState(["trackedInteractions", "settings"]),
+  computed: mapState(['trackedInteractions', 'settings']),
   methods: {
     dismissScreenshotPopover() {
       const trackedInteractions = JSON.parse(JSON.stringify(store.state.trackedInteractions));
@@ -61,9 +61,9 @@ export default Vue.extend({
       trackedInteractions.dismissedScreenshotPopover = true;
 
       // @ts-ignore
-      this.$refs["screenshot-popover"].$emit("close");
+      this.$refs['screenshot-popover'].$emit('close');
       // @ts-ignore
-      this.$refs["screenshot-popover"].$emit("disable");
+      this.$refs['screenshot-popover'].$emit('disable');
 
       store.commit(MutationType.UPDATE_TRACKED_INTERACTIONS, trackedInteractions);
     },

@@ -1,4 +1,4 @@
-import { MessageType, SHEETS_API_MESSAGE_TIMEOUT_MS, SheetTitles } from "@/consts";
+import { MessageType, SHEETS_API_MESSAGE_TIMEOUT_MS, SheetTitles } from '@/consts';
 import {
   ICsvFile,
   IDestinationData,
@@ -7,33 +7,33 @@ import {
   ISheetValues,
   ISpreadsheet,
   IValueRange,
-} from "@/interfaces";
-import { messageBus } from "@/modules/message-bus.module";
-import store from "@/store/page-overlay/index";
+} from '@/interfaces';
+import { messageBus } from '@/modules/message-bus.module';
+import store from '@/store/page-overlay/index';
 import {
   ALL_ELIGIBLE_REPORT_TYPES,
   FIELD_TRANSFORMER_REPORT_TYPES,
   ReportsMutations,
   ReportType,
-} from "@/store/page-overlay/modules/reports/consts";
+} from '@/store/page-overlay/modules/reports/consts';
 import {
   IFieldData,
   IReportConfig,
   IReportData,
-} from "@/store/page-overlay/modules/reports/interfaces";
-import { downloadCsvFile } from "./csv";
-import { todayIsodate } from "./date";
-import { createCogsSpreadsheetOrError } from "./reports/cogs-report";
-import { createCogsTrackerSpreadsheetOrError } from "./reports/cogs-tracker-report";
-import { createCogsV2SpreadsheetOrError } from "./reports/cogs-v2-report";
-import { createEmployeeSamplesSpreadsheetOrError } from "./reports/employee-samples-report";
+} from '@/store/page-overlay/modules/reports/interfaces';
+import { downloadCsvFile } from './csv';
+import { todayIsodate } from './date';
+import { createCogsSpreadsheetOrError } from './reports/cogs-report';
+import { createCogsTrackerSpreadsheetOrError } from './reports/cogs-tracker-report';
+import { createCogsV2SpreadsheetOrError } from './reports/cogs-v2-report';
+import { createEmployeeSamplesSpreadsheetOrError } from './reports/employee-samples-report';
 import {
   extractFlattenedData,
   getCsvFilename,
   getGoogleSheetName,
   getSheetTitle,
   shouldGenerateReport,
-} from "./reports/reports-shared";
+} from './reports/reports-shared';
 import {
   addRowsRequestFactory,
   autoResizeDimensionsRequestFactory,
@@ -41,7 +41,7 @@ import {
   freezeTopRowRequestFactory,
   shrinkFontRequestFactory,
   styleTopRowRequestFactory,
-} from "./sheets";
+} from './sheets';
 
 export async function readSpreadsheet({
   spreadsheetId,
@@ -57,7 +57,7 @@ export async function readSpreadsheet({
       sheetName,
     },
     undefined,
-    SHEETS_API_MESSAGE_TIMEOUT_MS
+    SHEETS_API_MESSAGE_TIMEOUT_MS,
   );
 }
 
@@ -70,7 +70,7 @@ export async function appendSpreadsheetValues({
   spreadsheetId: string;
   range: string;
   values: ISheetValues;
-  valueInputOption?: "RAW" | "USER_ENTERED";
+  valueInputOption?: 'RAW' | 'USER_ENTERED';
 }) {
   await messageBus.sendMessageToBackground(
     MessageType.APPEND_SPREADSHEET_VALUES,
@@ -81,7 +81,7 @@ export async function appendSpreadsheetValues({
       valueInputOption,
     },
     undefined,
-    SHEETS_API_MESSAGE_TIMEOUT_MS
+    SHEETS_API_MESSAGE_TIMEOUT_MS,
   );
 }
 
@@ -99,7 +99,7 @@ export async function writeDataSheet<T>({
   options?: {
     pageSize?: number;
     maxParallelRequests?: number;
-    valueInputOption?: "RAW" | "USER_ENTERED";
+    valueInputOption?: 'RAW' | 'USER_ENTERED';
     rangeStartColumn?: string;
     rangeEndColumn?: string;
     batchWrite?: boolean;
@@ -108,9 +108,9 @@ export async function writeDataSheet<T>({
   const mergedOptions = {
     pageSize: 10000,
     maxParallelRequests: 10,
-    valueInputOption: "USER_ENTERED",
-    rangeStartColumn: "A",
-    rangeEndColumn: "",
+    valueInputOption: 'USER_ENTERED',
+    rangeStartColumn: 'A',
+    rangeEndColumn: '',
     batchWrite: false,
     ...options,
   };
@@ -127,7 +127,7 @@ export async function writeDataSheet<T>({
         values: [fields.map((fieldData) => `     ${fieldData.readableName}     `)],
       },
       undefined,
-      SHEETS_API_MESSAGE_TIMEOUT_MS
+      SHEETS_API_MESSAGE_TIMEOUT_MS,
     );
 
     nextPageRowIdx += 1;
@@ -146,12 +146,12 @@ export async function writeDataSheet<T>({
       mergedOptions.rangeEndColumn
     }${nextPageRowIdx + nextPage.length - 1}`;
 
-    let values = nextPage;
+    const values = nextPage;
 
     if (mergedOptions.batchWrite) {
       batchRequests.push({
         range,
-        majorDimension: "ROWS",
+        majorDimension: 'ROWS',
         // @ts-ignore
         values,
       });
@@ -166,8 +166,8 @@ export async function writeDataSheet<T>({
             valueInputOption: mergedOptions.valueInputOption,
           },
           undefined,
-          SHEETS_API_MESSAGE_TIMEOUT_MS
-        )
+          SHEETS_API_MESSAGE_TIMEOUT_MS,
+        ),
       );
     }
 
@@ -175,8 +175,8 @@ export async function writeDataSheet<T>({
     nextPageRowIdx += nextPage.length;
 
     if (
-      (promises.length > 0 && promises.length % mergedOptions.maxParallelRequests === 0) ||
-      (batchRequests.length > 0 && batchRequests.length % mergedOptions.maxParallelRequests === 0)
+      (promises.length > 0 && promises.length % mergedOptions.maxParallelRequests === 0)
+      || (batchRequests.length > 0 && batchRequests.length % mergedOptions.maxParallelRequests === 0)
     ) {
       if (mergedOptions.batchWrite) {
         promises.push(
@@ -188,14 +188,14 @@ export async function writeDataSheet<T>({
               valueInputOption: mergedOptions.valueInputOption,
             },
             undefined,
-            SHEETS_API_MESSAGE_TIMEOUT_MS
-          )
+            SHEETS_API_MESSAGE_TIMEOUT_MS,
+          ),
         );
       }
 
       for (const result of await Promise.allSettled(promises)) {
-        if (result.status === "rejected") {
-          throw new Error("Write failed");
+        if (result.status === 'rejected') {
+          throw new Error('Write failed');
         }
       }
 
@@ -216,14 +216,14 @@ export async function writeDataSheet<T>({
           valueInputOption: mergedOptions.valueInputOption,
         },
         undefined,
-        SHEETS_API_MESSAGE_TIMEOUT_MS
-      )
+        SHEETS_API_MESSAGE_TIMEOUT_MS,
+      ),
     );
   }
 
   for (const result of await Promise.allSettled(promises)) {
-    if (result.status === "rejected") {
-      throw new Error("Write failed");
+    if (result.status === 'rejected') {
+      throw new Error('Write failed');
     }
   }
 }
@@ -238,7 +238,7 @@ export async function createDebugSheetOrError({
   sheetDataMatrixes: any[][][];
 }) {
   if (sheetTitles.length !== sheetDataMatrixes.length) {
-    throw new Error("Sheet size mismatch");
+    throw new Error('Sheet size mismatch');
   }
 
   const response: {
@@ -253,15 +253,15 @@ export async function createDebugSheetOrError({
       sheetTitles,
     },
     undefined,
-    SHEETS_API_MESSAGE_TIMEOUT_MS
+    SHEETS_API_MESSAGE_TIMEOUT_MS,
   );
 
   if (!response.data.success) {
-    throw new Error("Unable to create debug sheet");
+    throw new Error('Unable to create debug sheet');
   }
 
   for (const [idx, sheetTitle] of sheetTitles.entries()) {
-    let formattingRequests: any = [
+    const formattingRequests: any = [
       addRowsRequestFactory({
         sheetId: idx,
         length: sheetDataMatrixes[idx].length,
@@ -275,7 +275,7 @@ export async function createDebugSheetOrError({
         requests: formattingRequests,
       },
       undefined,
-      SHEETS_API_MESSAGE_TIMEOUT_MS
+      SHEETS_API_MESSAGE_TIMEOUT_MS,
     );
 
     await writeDataSheet({
@@ -283,7 +283,7 @@ export async function createDebugSheetOrError({
       spreadsheetTitle: sheetTitle as SheetTitles,
       data: sheetDataMatrixes[idx],
       options: {
-        valueInputOption: "RAW",
+        valueInputOption: 'RAW',
       },
     });
   }
@@ -301,15 +301,13 @@ export async function createCsvOrError({
   reportConfig: IReportConfig;
 }) {
   if (!store.state.pluginAuth?.authState?.license) {
-    throw new Error("Invalid authState");
+    throw new Error('Invalid authState');
   }
 
   const flattenedCache = new Map<ReportType, any[]>();
 
   // Check that inputs are well-formed
-  const ELIGIBLE_REPORT_TYPES: ReportType[] = ALL_ELIGIBLE_REPORT_TYPES.filter((reportType) =>
-    shouldGenerateReport({ reportType, reportConfig, reportData })
-  );
+  const ELIGIBLE_REPORT_TYPES: ReportType[] = ALL_ELIGIBLE_REPORT_TYPES.filter((reportType) => shouldGenerateReport({ reportType, reportConfig, reportData }));
 
   for (const reportType of ELIGIBLE_REPORT_TYPES) {
     const filename = getCsvFilename({
@@ -348,7 +346,7 @@ export async function createSpreadsheetOrError({
   reportConfig: IReportConfig;
 }): Promise<ISpreadsheet> {
   if (!store.state.pluginAuth?.authState?.license) {
-    throw new Error("Invalid authState");
+    throw new Error('Invalid authState');
   }
 
   // Handle special cases
@@ -385,9 +383,7 @@ export async function createSpreadsheetOrError({
   // Check that inputs are well-formed
   //
 
-  const ELIGIBLE_REPORT_TYPES: ReportType[] = ALL_ELIGIBLE_REPORT_TYPES.filter((reportType) =>
-    shouldGenerateReport({ reportType, reportConfig, reportData })
-  );
+  const ELIGIBLE_REPORT_TYPES: ReportType[] = ALL_ELIGIBLE_REPORT_TYPES.filter((reportType) => shouldGenerateReport({ reportType, reportConfig, reportData }));
 
   //
   // Generate Sheets
@@ -413,11 +409,11 @@ export async function createSpreadsheetOrError({
       sheetTitles,
     },
     undefined,
-    SHEETS_API_MESSAGE_TIMEOUT_MS
+    SHEETS_API_MESSAGE_TIMEOUT_MS,
   );
 
   if (!response.data.success) {
-    throw new Error("Unable to create export sheet");
+    throw new Error('Unable to create export sheet');
   }
 
   //
@@ -426,7 +422,7 @@ export async function createSpreadsheetOrError({
   //
 
   store.commit(`reports/${ReportsMutations.SET_STATUS}`, {
-    statusMessage: { text: "Formatting spreadsheet...", level: "success" },
+    statusMessage: { text: 'Formatting spreadsheet...', level: 'success' },
   });
 
   let formattingRequests: any = [
@@ -436,7 +432,7 @@ export async function createSpreadsheetOrError({
     }),
     styleTopRowRequestFactory({
       sheetId: sheetTitles.indexOf(SheetTitles.OVERVIEW),
-      horizontalAlignment: "LEFT",
+      horizontalAlignment: 'LEFT',
     }),
   ];
 
@@ -445,8 +441,10 @@ export async function createSpreadsheetOrError({
   for (const reportType of ELIGIBLE_REPORT_TYPES) {
     const sheetId: number = sheetTitles.indexOf(getSheetTitle({ reportType, reportConfig }));
     const length = Math.max(
-      extractFlattenedData({ flattenedCache, reportType, reportData, reportConfig }).length,
-      1
+      extractFlattenedData({
+        flattenedCache, reportType, reportData, reportConfig,
+      }).length,
+      1,
     );
 
     formattingRequests = [
@@ -464,7 +462,7 @@ export async function createSpreadsheetOrError({
       requests: formattingRequests,
     },
     undefined,
-    SHEETS_API_MESSAGE_TIMEOUT_MS
+    SHEETS_API_MESSAGE_TIMEOUT_MS,
   );
 
   //
@@ -473,14 +471,16 @@ export async function createSpreadsheetOrError({
 
   for (const reportType of ELIGIBLE_REPORT_TYPES) {
     store.commit(`reports/${ReportsMutations.SET_STATUS}`, {
-      statusMessage: { text: `Writing ${reportType}...`, level: "success" },
+      statusMessage: { text: `Writing ${reportType}...`, level: 'success' },
     });
 
     await writeDataSheet({
       spreadsheetId: response.data.result.spreadsheetId,
       spreadsheetTitle: getSheetTitle({ reportType, reportConfig }),
       fields: reportConfig[reportType]?.fields as IFieldData[],
-      data: extractFlattenedData({ flattenedCache, reportType, reportData, reportConfig }),
+      data: extractFlattenedData({
+        flattenedCache, reportType, reportData, reportConfig,
+      }),
     });
   }
 
@@ -489,7 +489,7 @@ export async function createSpreadsheetOrError({
   //
 
   store.commit(`reports/${ReportsMutations.SET_STATUS}`, {
-    statusMessage: { text: `Generating summary...`, level: "success" },
+    statusMessage: { text: 'Generating summary...', level: 'success' },
   });
 
   const summaryList = [];
@@ -497,7 +497,7 @@ export async function createSpreadsheetOrError({
   for (const reportType of ELIGIBLE_REPORT_TYPES) {
     summaryList.push([
       `=HYPERLINK("#gid=${sheetTitles.indexOf(
-        getSheetTitle({ reportType, reportConfig })
+        getSheetTitle({ reportType, reportConfig }),
       )}","${getSheetTitle({
         reportType,
         reportConfig,
@@ -515,7 +515,7 @@ export async function createSpreadsheetOrError({
       values: [[], [], ...summaryList],
     },
     undefined,
-    SHEETS_API_MESSAGE_TIMEOUT_MS
+    SHEETS_API_MESSAGE_TIMEOUT_MS,
   );
 
   //
@@ -523,13 +523,13 @@ export async function createSpreadsheetOrError({
   //
 
   store.commit(`reports/${ReportsMutations.SET_STATUS}`, {
-    statusMessage: { text: `Resizing sheets...`, level: "success" },
+    statusMessage: { text: 'Resizing sheets...', level: 'success' },
   });
 
   let resizeRequests: any[] = [
     autoResizeDimensionsRequestFactory({
       sheetId: sheetTitles.indexOf(SheetTitles.OVERVIEW),
-      dimension: "COLUMNS",
+      dimension: 'COLUMNS',
     }),
   ];
 
@@ -550,14 +550,14 @@ export async function createSpreadsheetOrError({
       requests: resizeRequests,
     },
     undefined,
-    SHEETS_API_MESSAGE_TIMEOUT_MS
+    SHEETS_API_MESSAGE_TIMEOUT_MS,
   );
 
   // 3000ms grace period for all sheets
   await new Promise((resolve) => setTimeout(resolve, 3000));
 
   store.commit(`reports/${ReportsMutations.SET_STATUS}`, {
-    statusMessage: { text: `Cleaning up...`, level: "success" },
+    statusMessage: { text: 'Cleaning up...', level: 'success' },
   });
 
   let shrinkFontRequests: any[] = [];
@@ -578,7 +578,7 @@ export async function createSpreadsheetOrError({
       requests: shrinkFontRequests,
     },
     undefined,
-    SHEETS_API_MESSAGE_TIMEOUT_MS
+    SHEETS_API_MESSAGE_TIMEOUT_MS,
   );
 
   await messageBus.sendMessageToBackground(
@@ -589,16 +589,16 @@ export async function createSpreadsheetOrError({
       values: [[`Created with Track & Trace Tools @ ${Date().toString()}`]],
     },
     undefined,
-    SHEETS_API_MESSAGE_TIMEOUT_MS
+    SHEETS_API_MESSAGE_TIMEOUT_MS,
   );
 
   return response.data.result;
 }
 
 export async function createPackageCsvTemplateSheetOrError(
-  columns: string[]
+  columns: string[],
 ): Promise<ISpreadsheet> {
-  const SHEET_TITLE = `Create Packages`;
+  const SHEET_TITLE = 'Create Packages';
 
   const response: {
     data: {
@@ -608,11 +608,11 @@ export async function createPackageCsvTemplateSheetOrError(
   } = await messageBus.sendMessageToBackground(
     MessageType.CREATE_SPREADSHEET,
     {
-      title: `Create Package CSV Template`,
+      title: 'Create Package CSV Template',
       sheetTitles: [SHEET_TITLE],
     },
     undefined,
-    SHEETS_API_MESSAGE_TIMEOUT_MS
+    SHEETS_API_MESSAGE_TIMEOUT_MS,
   );
 
   await messageBus.sendMessageToBackground(
@@ -623,7 +623,7 @@ export async function createPackageCsvTemplateSheetOrError(
       values: [columns],
     },
     undefined,
-    SHEETS_API_MESSAGE_TIMEOUT_MS
+    SHEETS_API_MESSAGE_TIMEOUT_MS,
   );
 
   const sheetId = 0;
@@ -644,7 +644,7 @@ export async function createPackageCsvTemplateSheetOrError(
       requests: formattingRequests,
     },
     undefined,
-    SHEETS_API_MESSAGE_TIMEOUT_MS
+    SHEETS_API_MESSAGE_TIMEOUT_MS,
   );
 
   return response.data.result;
@@ -657,7 +657,7 @@ export async function createScanSheetOrError(
     pkg: IDestinationPackageData;
     destination?: IDestinationData;
     incomingTransfer?: IIndexedTransferData;
-  }[]
+  }[],
 ): Promise<ISpreadsheet> {
   const SHEET_TITLE = `${manifestNumber} Scan Sheet`;
 
@@ -673,7 +673,7 @@ export async function createScanSheetOrError(
       sheetTitles: [SHEET_TITLE],
     },
     undefined,
-    SHEETS_API_MESSAGE_TIMEOUT_MS
+    SHEETS_API_MESSAGE_TIMEOUT_MS,
   );
 
   await messageBus.sendMessageToBackground(
@@ -683,20 +683,20 @@ export async function createScanSheetOrError(
       range: `'${SHEET_TITLE}'`,
       values: [
         [
-          "Destination",
-          "    Package Contents    ",
-          "                Package Tag                ",
-          "                Scanned Tags                ",
+          'Destination',
+          '    Package Contents    ',
+          '                Package Tag                ',
+          '                Scanned Tags                ',
         ],
         ...manifest.map((x) => [
-          (x.destination! || x.incomingTransfer!).RecipientFacilityName + "      ",
+          `${(x.destination! || x.incomingTransfer!).RecipientFacilityName}      `,
           `${x.pkg.ShippedQuantity} ${x.pkg.ShippedUnitOfMeasureAbbreviation} ${x.pkg.ProductName}      `,
           x.pkg.PackageLabel,
         ]),
       ],
     },
     undefined,
-    SHEETS_API_MESSAGE_TIMEOUT_MS
+    SHEETS_API_MESSAGE_TIMEOUT_MS,
   );
 
   const sheetId = 0;
@@ -716,7 +716,7 @@ export async function createScanSheetOrError(
         endColumnIndex: 3,
         startRowIndex: 1,
       },
-      customFormula: "=COUNTIF(C$2:D,C2)=2",
+      customFormula: '=COUNTIF(C$2:D,C2)=2',
       backgroundColor: { green: 1 },
     }),
     // Second column: turn red if tag appeas exactly once anywhere
@@ -727,7 +727,7 @@ export async function createScanSheetOrError(
         endColumnIndex: 3,
         startRowIndex: 1,
       },
-      customFormula: "=COUNTIF(C$2:D,C2)=1",
+      customFormula: '=COUNTIF(C$2:D,C2)=1',
       backgroundColor: { red: 1 },
     }),
     // FIrst column: turn yellow if tag appears more than twice anywhere
@@ -738,7 +738,7 @@ export async function createScanSheetOrError(
         endColumnIndex: 3,
         startRowIndex: 1,
       },
-      customFormula: "=COUNTIF($C$2:D,C2)>2",
+      customFormula: '=COUNTIF($C$2:D,C2)>2',
       backgroundColor: { red: 1, green: 1 },
     }),
     // Second column: turn yellow if tag appears more than once in the 2nd column
@@ -749,7 +749,7 @@ export async function createScanSheetOrError(
         endColumnIndex: 4,
         startRowIndex: 1,
       },
-      customFormula: "=COUNTIF($D$2:D,D2)>1",
+      customFormula: '=COUNTIF($D$2:D,D2)>1',
       backgroundColor: { red: 1, green: 1 },
     }),
     // Second column: turn prange if tag appears exactly once anywhere
@@ -760,7 +760,7 @@ export async function createScanSheetOrError(
         endColumnIndex: 4,
         startRowIndex: 1,
       },
-      customFormula: "=COUNTIF($C$2:D,D2)=1",
+      customFormula: '=COUNTIF($C$2:D,D2)=1',
       backgroundColor: { red: 1, green: 0.64 },
     }),
   ];
@@ -772,7 +772,7 @@ export async function createScanSheetOrError(
       requests: formattingRequests,
     },
     undefined,
-    SHEETS_API_MESSAGE_TIMEOUT_MS
+    SHEETS_API_MESSAGE_TIMEOUT_MS,
   );
 
   await messageBus.sendMessageToBackground(
@@ -783,7 +783,7 @@ export async function createScanSheetOrError(
       values: [[`Created with Track & Trace Tools @ ${Date().toString()}`]],
     },
     undefined,
-    SHEETS_API_MESSAGE_TIMEOUT_MS
+    SHEETS_API_MESSAGE_TIMEOUT_MS,
   );
 
   return response.data.result;

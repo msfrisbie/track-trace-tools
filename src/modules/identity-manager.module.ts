@@ -1,44 +1,44 @@
 import { IAtomicService, IIdentityState } from '@/interfaces';
 
-
 class IdentityManager implements IAtomicService {
-    private _identityStatePromise: Promise<IIdentityState | null>;
-    private _identityStateResolver: any;
+  private _identityStatePromise: Promise<IIdentityState | null>;
 
-    // Assumes that the identity can be in exactly one state per page load
-    constructor() {
-        this._identityStatePromise = new Promise((resolve, reject) => {
-            // If identity state cant be acquired in 10s, timeout
-            const id = setTimeout(() => reject('Identity state timed out'), 10000);
+  private _identityStateResolver: any;
 
-            this._identityStateResolver = (identityState: any) => {
-                clearTimeout(id);
-                resolve(identityState);
-            };
-        });
+  // Assumes that the identity can be in exactly one state per page load
+  constructor() {
+    this._identityStatePromise = new Promise((resolve, reject) => {
+      // If identity state cant be acquired in 10s, timeout
+      const id = setTimeout(() => reject('Identity state timed out'), 10000);
 
-        this.extractIdentityState();
+      this._identityStateResolver = (identityState: any) => {
+        clearTimeout(id);
+        resolve(identityState);
+      };
+    });
+
+    this.extractIdentityState();
+  }
+
+  async init() {}
+
+  private extractIdentityState() {}
+
+  async identityState(): Promise<IIdentityState | null> {
+    return this._identityStatePromise;
+  }
+
+  async identityStateOrError(
+    errorMessage: string = 'Missing identity state',
+  ): Promise<IIdentityState> {
+    const identityState = await this.identityState();
+
+    if (!identityState) {
+      throw new Error(errorMessage);
     }
 
-    async init() { }
-
-    private extractIdentityState() {
-
-    }
-
-    async identityState(): Promise<IIdentityState | null> {
-        return await this._identityStatePromise;
-    }
-
-    async identityStateOrError(errorMessage: string = 'Missing identity state'): Promise<IIdentityState> {
-        const identityState = await this.identityState();
-
-        if (!identityState) {
-            throw new Error(errorMessage);
-        }
-
-        return identityState;
-    }
+    return identityState;
+  }
 }
 
-export let identityManager = new IdentityManager();
+export const identityManager = new IdentityManager();

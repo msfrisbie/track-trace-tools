@@ -60,17 +60,17 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import store from "@/store/page-overlay/index";
-import { backgroundTaskManager } from "@/modules/background-task-manager.module";
-import { BackgroundTaskState } from "@/consts";
-import { MutationType } from "@/mutation-types";
-import { mapState } from "vuex";
-import { IPluginAuthState } from "@/store/page-overlay/modules/plugin-auth/interfaces";
-import { IPluginState } from "@/interfaces";
+import Vue from 'vue';
+import store from '@/store/page-overlay/index';
+import { backgroundTaskManager } from '@/modules/background-task-manager.module';
+import { BackgroundTaskState } from '@/consts';
+import { MutationType } from '@/mutation-types';
+import { mapState } from 'vuex';
+import { IPluginAuthState } from '@/store/page-overlay/modules/plugin-auth/interfaces';
+import { IPluginState } from '@/interfaces';
 
 export default Vue.extend({
-  name: "FinalizeSalesReceiptsForm",
+  name: 'FinalizeSalesReceiptsForm',
   store,
   data() {
     return {
@@ -78,10 +78,10 @@ export default Vue.extend({
     };
   },
   mounted() {
-    store.commit(MutationType.SET_FINALIZE_SALES_RECEIPTS_READOUT, "");
+    store.commit(MutationType.SET_FINALIZE_SALES_RECEIPTS_READOUT, '');
   },
   computed: {
-    ...mapState<IPluginState>(["backgroundTasks"]),
+    ...mapState<IPluginState>(['backgroundTasks']),
     isBackgroundTaskRunning() {
       return store.state.backgroundTasks.finalizeSalesReceiptsState === BackgroundTaskState.RUNNING;
     },

@@ -1,9 +1,9 @@
-import { IAtomicService, ICsvFile } from "@/interfaces";
-import { serialize } from "@/utils/csv";
+import { IAtomicService, ICsvFile } from '@/interfaces';
+import { serialize } from '@/utils/csv';
 import { get } from 'idb-keyval';
-import { BehaviorSubject, timer } from "rxjs";
-import { authManager } from "./auth-manager.module";
-import { primaryDataLoader } from "./data-loader/data-loader.module";
+import { BehaviorSubject, timer } from 'rxjs';
+import { authManager } from './auth-manager.module';
+import { primaryDataLoader } from './data-loader/data-loader.module';
 
 enum CsvSubmitState {
     CHECK_SUBMIT_QUEUE,
@@ -18,8 +18,8 @@ enum MetrcCsvType {
 enum CsvSubmitStatus {
     PENDING,
     SUCCESS,
-    REJECTED,  // Metrc did not attempt to import these
-    IMPORT_ERROR,  // Metrc accepted the file but it failed to import
+    REJECTED, // Metrc did not attempt to import these
+    IMPORT_ERROR, // Metrc accepted the file but it failed to import
 }
 
 interface ICsvSubmit { status: CsvSubmitStatus, startIdx: number, endIdx: number }
@@ -42,25 +42,25 @@ class CsvManager implements IAtomicService {
     activeCsvProject: ICsvProject | null = null;
 
     async init() {
-        const project: string | null | undefined = await get(CSV_PROJECT_IDB_KEY);
+      const project: string | null | undefined = await get(CSV_PROJECT_IDB_KEY);
 
-        if (project) {
-            this.activeCsvProject = JSON.parse(project);
-        }
+      if (project) {
+        this.activeCsvProject = JSON.parse(project);
+      }
 
-        primaryDataLoader.loadAllCsvUploads("PlantsHarvest");
-        // primaryDataLoader.loadLocations();
+      primaryDataLoader.loadAllCsvUploads('PlantsHarvest');
+      // primaryDataLoader.loadLocations();
 
-        // Can only submit on dataimport page
-        if (!this.isUserOnDataImportPage) {
-            return;
-        }
+      // Can only submit on dataimport page
+      if (!this.isUserOnDataImportPage) {
+        return;
+      }
 
-        this.initializeCsvSubmitStateMachine();
+      this.initializeCsvSubmitStateMachine();
     }
 
     isUserOnDataImportPage(): boolean {
-        return window.location.pathname.endsWith('/dataimport');
+      return window.location.pathname.endsWith('/dataimport');
     }
 
     async updateProjectQueue() {
@@ -72,53 +72,51 @@ class CsvManager implements IAtomicService {
     }
 
     async navigateToDataImport() {
-        const authState = await authManager.authStateOrError();
+      const authState = await authManager.authStateOrError();
 
-        window.location.href = `/industry/${authState.license}/dataimport`;
+      window.location.href = `/industry/${authState.license}/dataimport`;
     }
 
     private initializeCsvSubmitStateMachine() {
-        this.csvSubmitState.subscribe((csvSubmitState: CsvSubmitState) => {
-            switch (csvSubmitState) {
-                case CsvSubmitState.CHECK_SUBMIT_QUEUE:
-                    // Select tab
-                    // start submit
-                    // set submit as active
-                    // Page shows current one is empty, successful, or failed
-                    break;
-                case CsvSubmitState.SUBMIT_INFLIGHT:
-                    // Check if submission is complete
-                    timer(1000).subscribe(() => {
-                        //
-                        this.csvSubmitState.next(CsvSubmitState.CHECK_SUBMIT_QUEUE);
-                    });
-                    break;
-                default:
-                    throw new Error('bad CSV state');
-            }
-        })
+      this.csvSubmitState.subscribe((csvSubmitState: CsvSubmitState) => {
+        switch (csvSubmitState) {
+          case CsvSubmitState.CHECK_SUBMIT_QUEUE:
+            // Select tab
+            // start submit
+            // set submit as active
+            // Page shows current one is empty, successful, or failed
+            break;
+          case CsvSubmitState.SUBMIT_INFLIGHT:
+            // Check if submission is complete
+            timer(1000).subscribe(() => {
+              //
+              this.csvSubmitState.next(CsvSubmitState.CHECK_SUBMIT_QUEUE);
+            });
+            break;
+          default:
+            throw new Error('bad CSV state');
+        }
+      });
     }
 
     private maybeSelectTabContaining(text: string) {
-        const tabs = document.querySelectorAll('li.k-item');
+      const tabs = document.querySelectorAll('li.k-item');
 
-        for (let tab of tabs) {
+      for (const tab of tabs) {
+        // @ts-ignore
+        if (tab.innerText === text) {
+          if (!tab.classList.contains('k-state-active')) {
             // @ts-ignore
-            if (tab.innerText === text) {
-                if (!tab.classList.contains('k-state-active')) {
+            tab.click();
+          }
 
-                    // @ts-ignore
-                    tab.click();
-                }
-
-                break;
-            }
+          break;
         }
+      }
     }
 
     submitMovePlantsCsv(csvFile: ICsvFile) {
-        return this.submitCsvImpl(csvFile, 'PlantsLocation', 'input[data-type="PlantsChangeLocation"]')
-
+      return this.submitCsvImpl(csvFile, 'PlantsLocation', 'input[data-type="PlantsChangeLocation"]');
     }
 
     submitHarvestPlantsCsv(csvFile: ICsvFile) {
@@ -126,37 +124,37 @@ class CsvManager implements IAtomicService {
     }
 
     submitCsvImpl(csvFile: ICsvFile, tabText: string, inputSelector: string) {
-        this.maybeSelectTabContaining(tabText);
+      this.maybeSelectTabContaining(tabText);
 
-        const input: HTMLInputElement | null = document.querySelector(inputSelector)
+      const input: HTMLInputElement | null = document.querySelector(inputSelector);
 
-        if (!input) {
-            throw new Error('Cannot find input');
-        }
+      if (!input) {
+        throw new Error('Cannot find input');
+      }
 
-        // Firefox < 62 workaround exploiting https://bugzilla.mozilla.org/show_bug.cgi?id=1422655
-        const dt = new ClipboardEvent('').clipboardData || new DataTransfer(); // specs compliant (as of March 2018 only Chrome)
+      // Firefox < 62 workaround exploiting https://bugzilla.mozilla.org/show_bug.cgi?id=1422655
+      const dt = new ClipboardEvent('').clipboardData || new DataTransfer(); // specs compliant (as of March 2018 only Chrome)
 
-        const file = new File([serialize(csvFile.data)], csvFile.filename, {
-            type: "text/csv",
-        });
+      const file = new File([serialize(csvFile.data)], csvFile.filename, {
+        type: 'text/csv',
+      });
 
-        dt.items.add(file);
+      dt.items.add(file);
 
-        input.files = dt.files;
+      input.files = dt.files;
 
-        input.dispatchEvent(new Event('change'));
+      input.dispatchEvent(new Event('change'));
 
-        const uploadButton: HTMLButtonElement | null = document.querySelector('button.k-upload-selected');
+      const uploadButton: HTMLButtonElement | null = document.querySelector('button.k-upload-selected');
 
-        if (!uploadButton) {
-            throw new Error('Cannot find upload button');
-        }
+      if (!uploadButton) {
+        throw new Error('Cannot find upload button');
+      }
 
-        uploadButton.click();
+      uploadButton.click();
 
-        // document.querySelectorAll('li.k-file-success .k-file-name')[0].innerText
+      // document.querySelectorAll('li.k-file-success .k-file-name')[0].innerText
     }
 }
 
-export let csvManager = new CsvManager();
+export const csvManager = new CsvManager();

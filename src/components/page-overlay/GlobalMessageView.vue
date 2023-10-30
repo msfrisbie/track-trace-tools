@@ -18,15 +18,15 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import store from "@/store/page-overlay/index";
-import { mapState } from "vuex";
-import { MutationType } from "@/mutation-types";
+import Vue from 'vue';
+import store from '@/store/page-overlay/index';
+import { mapState } from 'vuex';
+import { MutationType } from '@/mutation-types';
 
 export default Vue.extend({
-  name: "GlobalMessageView",
+  name: 'GlobalMessageView',
   store,
-  computed: mapState(["loadingMessage", "errorMessage", "flashMessage"]),
+  computed: mapState(['loadingMessage', 'errorMessage', 'flashMessage']),
   mounted() {
     store.commit(MutationType.SET_LOADING_MESSAGE, null);
     store.commit(MutationType.SET_ERROR_MESSAGE, null);

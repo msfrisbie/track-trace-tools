@@ -28,18 +28,18 @@
 </template>
 
 <script lang="ts">
-import PickerCard from "@/components/overlay-widget/shared/PickerCard.vue";
-import PickerIcon from "@/components/overlay-widget/shared/PickerIcon.vue";
-import { TransferState } from "@/consts";
-import { IIndexedTransferData } from "@/interfaces";
-import router from "@/router/index";
-import store from "@/store/page-overlay/index";
-import { unitOfMeasureNameToAbbreviation } from "@/utils/units";
-import Vue from "vue";
-import { mapState } from "vuex";
+import PickerCard from '@/components/overlay-widget/shared/PickerCard.vue';
+import PickerIcon from '@/components/overlay-widget/shared/PickerIcon.vue';
+import { TransferState } from '@/consts';
+import { IIndexedTransferData } from '@/interfaces';
+import router from '@/router/index';
+import store from '@/store/page-overlay/index';
+import { unitOfMeasureNameToAbbreviation } from '@/utils/units';
+import Vue from 'vue';
+import { mapState } from 'vuex';
 
 export default Vue.extend({
-  name: "IncomingTransferCard",
+  name: 'IncomingTransferCard',
   store,
   router,
   props: {
@@ -60,11 +60,11 @@ export default Vue.extend({
     getBadgeVariant(incomingTransferState: TransferState): string {
       switch (incomingTransferState) {
         case TransferState.INCOMING:
-          return "success";
+          return 'success';
         case TransferState.INCOMING_INACTIVE:
-          return "danger";
+          return 'danger';
         default:
-          return "light";
+          return 'light';
       }
     },
   },

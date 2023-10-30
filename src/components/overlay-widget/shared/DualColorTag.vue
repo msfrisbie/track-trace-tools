@@ -6,7 +6,7 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
+import Vue from 'vue';
 
 function firstNonzeroSuffixIntIndex(value: string): number {
   return value.slice(sliceOffset).match(/[1-9]/)?.index || 0;
@@ -15,7 +15,7 @@ function firstNonzeroSuffixIntIndex(value: string): number {
 const sliceOffset: number = 16;
 
 export default Vue.extend({
-  name: "DualColorTag",
+  name: 'DualColorTag',
   props: {
     label: String,
   },
@@ -23,7 +23,7 @@ export default Vue.extend({
     labelPrefix() {
       return this.$props.label.slice(
         0,
-        sliceOffset + firstNonzeroSuffixIntIndex(this.$props.label)
+        sliceOffset + firstNonzeroSuffixIntIndex(this.$props.label),
       );
     },
     labelSuffix() {
