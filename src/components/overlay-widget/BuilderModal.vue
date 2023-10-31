@@ -78,7 +78,7 @@
         >
           <track-trace-tools-logo fill="#49276a" :inverted="true" />
 
-          <span class="sans-serif font-extralight tracking-widest text-3xl">T3</span>
+          <span class="sans-serif font-extralight tracking-widest text-3xl">T3{{ suffix }}</span>
         </div>
 
         <div class="col-span-3">
@@ -211,12 +211,18 @@ export default Vue.extend({
     });
   },
   computed: {
+    suffix(): string {
+      return store.state.client.t3plus ? "+" : "";
+    },
     builderTitle() {
       return this.$route.name?.toUpperCase();
     },
     clientBuildSuffix() {
       if (store.state.client.clientName) {
         return ` (${store.state.client.clientName})`;
+      }
+      if (store.state.client.t3plus) {
+        return "+";
       }
       return "";
     },

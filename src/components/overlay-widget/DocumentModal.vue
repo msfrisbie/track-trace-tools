@@ -22,7 +22,7 @@
         >
           <track-trace-tools-logo fill="#49276a" :inverted="true" />
 
-          <span class="sans-serif font-extralight tracking-widest text-3xl">T3</span>
+          <span class="sans-serif font-extralight tracking-widest text-3xl">T3{{ suffix }}</span>
         </div>
 
         <template v-if="documentUrls.length > 1">
@@ -61,6 +61,7 @@ import { analyticsManager } from "@/modules/analytics-manager.module";
 import { toastManager } from "@/modules/toast-manager.module";
 import { debugLogFactory } from "@/utils/debug";
 import Vue from "vue";
+import store from "@/store/page-overlay/index";
 
 const debugLog = debugLogFactory("DocumentModal.vue");
 
@@ -70,6 +71,11 @@ export default Vue.extend({
   name: "DocumentModal",
   components: {
     TrackTraceToolsLogo,
+  },
+  computed: {
+    suffix(): string {
+      return store.state.client.t3plus ? '+' : '';
+    }
   },
   data() {
     return {

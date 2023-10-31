@@ -5,7 +5,7 @@
         <track-trace-tools-logo :inverted="true" fill="#49276a" />
       </a>
 
-      <span class="text-gray-600 font-extralight tracking-widest text-4xl">T3</span>
+      <span class="text-gray-600 font-extralight tracking-widest text-4xl">{{ title }}</span>
     </div>
   </div>
 </template>
@@ -22,7 +22,12 @@ export default Vue.extend({
   components: {
     TrackTraceToolsLogo,
   },
-  computed: mapState(["debugMode"]),
+  computed: {
+    ...mapState(["debugMode"]),
+    title(): string {
+      return store.state.client.t3plus ? "T3+" : "T3";
+    },
+  },
   async mounted() {},
 });
 </script>

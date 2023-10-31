@@ -363,176 +363,146 @@
         </b-form-group>
       </div>
 
-      <div class="flex flex-col justify-start">
-        <b-form-group>
-          <div class="mb-2 text-gray-400 text-lg">Packages</div>
+      <div class="grid grid-cols-2 items-center justify-start gap-2">
+        <div class="col-span-2 text-gray-400 text-lg">Packages</div>
 
-          <div class="mb-2 flex flex-row items-center gap-2">
-            <b-form-checkbox
-              id="checkbox-autoOpenActivePackages"
-              v-model="settings.autoOpenActivePackages"
-              name="checkbox-autoOpenActivePackages"
-              @change="onChange()"
-            >
-            </b-form-checkbox>
+        <b-form-checkbox
+          id="checkbox-autoOpenActivePackages"
+          v-model="settings.autoOpenActivePackages"
+          name="checkbox-autoOpenActivePackages"
+          @change="onChange()"
+        >
+          Auto-open Packages tab
+        </b-form-checkbox>
 
-            <span>Auto-open Packages tab</span>
+        <b-form-select
+          v-model="settings.autoOpenPackageTab"
+          :options="packageTabOptions"
+          @change="onChange()"
+          v-if="settings.autoOpenActivePackages"
+        ></b-form-select>
 
-            <b-form-select
-              class="w-40"
-              v-model="settings.autoOpenPackageTab"
-              :options="packageTabOptions"
-              @change="onChange()"
-              v-if="settings.autoOpenActivePackages"
-            ></b-form-select>
-          </div>
+        <span>Viewing # Packages:</span>
 
-          <b-form-group label-cols="6" content-cols="6" label="Viewing # Packages:">
-            <b-form-select
-              v-model="settings.packageDefaultPageSize"
-              :options="pageSizeOptions"
-              @change="onChange()"
-            ></b-form-select>
-          </b-form-group>
-        </b-form-group>
+        <b-form-select
+          v-model="settings.packageDefaultPageSize"
+          :options="pageSizeOptions"
+          @change="onChange()"
+        ></b-form-select>
 
-        <b-form-group>
-          <div class="mt-4 mb-2 text-gray-400 text-lg">Transfers</div>
+        <div class="col-span-2 text-gray-400 text-lg py-4">Transfers</div>
 
-          <b-form-checkbox
-            id="checkbox-enableManifestDocumentViewer"
-            class="mb-2"
-            v-model="settings.enableManifestDocumentViewer"
-            name="checkbox-enableManifestDocumentViewer"
-            @change="onChange()"
-          >
-            Always use T3 PDF viewer for manifests
-          </b-form-checkbox>
+        <b-form-checkbox
+          id="checkbox-enableManifestDocumentViewer"
+          class="col-span-2"
+          v-model="settings.enableManifestDocumentViewer"
+          name="checkbox-enableManifestDocumentViewer"
+          @change="onChange()"
+        >
+          Always use T3 PDF viewer for manifests
+        </b-form-checkbox>
 
-          <div class="mb-2 flex flex-row items-center gap-2">
-            <b-form-checkbox
-              id="checkbox-autoOpenIncomingTransfers"
-              v-model="settings.autoOpenIncomingTransfers"
-              name="checkbox-autoOpenIncomingTransfers"
-              @change="onChange()"
-            >
-            </b-form-checkbox>
+        <b-form-checkbox
+          id="checkbox-autoOpenIncomingTransfers"
+          v-model="settings.autoOpenIncomingTransfers"
+          name="checkbox-autoOpenIncomingTransfers"
+          @change="onChange()"
+        >
+          Auto-open Transfers tab
+        </b-form-checkbox>
 
-            <span>Auto-open Transfers tab</span>
+        <b-form-select
+          v-model="settings.autoOpenTransfersTab"
+          :options="transfersTabOptions"
+          @change="onChange()"
+          v-if="settings.autoOpenIncomingTransfers"
+        ></b-form-select>
 
-            <b-form-select
-              class="w-40"
-              v-model="settings.autoOpenTransfersTab"
-              :options="transfersTabOptions"
-              @change="onChange()"
-              v-if="settings.autoOpenIncomingTransfers"
-            ></b-form-select>
-          </div>
+        <span>Viewing # Transfers:</span>
 
-          <b-form-group label-cols="6" content-cols="6" label="Viewing # Transfers:">
-            <b-form-select
-              v-model="settings.transferDefaultPageSize"
-              :options="pageSizeOptions"
-              @change="onChange()"
-            ></b-form-select>
-          </b-form-group>
-        </b-form-group>
+        <b-form-select
+          v-model="settings.transferDefaultPageSize"
+          :options="pageSizeOptions"
+          @change="onChange()"
+        ></b-form-select>
 
-        <b-form-group>
-          <div class="mt-4 mb-2 text-gray-400 text-lg">Sales</div>
+        <div class="col-span-2 text-gray-400 text-lg py-4">Sales</div>
 
-          <div class="mb-2 flex flex-row items-center gap-2">
-            <b-form-checkbox
-              id="checkbox-autoOpenActiveSales"
-              v-model="settings.autoOpenActiveSales"
-              name="checkbox-autoOpenActiveSales"
-              @change="onChange()"
-            >
-            </b-form-checkbox>
+        <b-form-checkbox
+          id="checkbox-autoOpenActiveSales"
+          v-model="settings.autoOpenActiveSales"
+          name="checkbox-autoOpenActiveSales"
+          @change="onChange()"
+        >
+          Auto-open Sales tab
+        </b-form-checkbox>
 
-            <span>Auto-open Sales tab</span>
+        <b-form-select
+          v-model="settings.autoOpenSalesTab"
+          :options="salesTabOptions"
+          @change="onChange()"
+          v-if="settings.autoOpenActiveSales"
+        ></b-form-select>
 
-            <b-form-select
-              class="w-40"
-              v-model="settings.autoOpenSalesTab"
-              :options="salesTabOptions"
-              @change="onChange()"
-              v-if="settings.autoOpenActiveSales"
-            ></b-form-select>
-          </div>
+        <span>Viewing # Sales:</span>
 
-          <b-form-group label-cols="6" content-cols="6" label="Viewing # Sales:">
-            <b-form-select
-              v-model="settings.salesDefaultPageSize"
-              :options="pageSizeOptions"
-              @change="onChange()"
-            ></b-form-select>
-          </b-form-group>
-        </b-form-group>
+        <b-form-select
+          v-model="settings.salesDefaultPageSize"
+          :options="pageSizeOptions"
+          @change="onChange()"
+        ></b-form-select>
 
-        <b-form-group>
-          <div class="mt-4 mb-2 text-gray-400 text-lg">Tags</div>
+        <div class="col-span-2 text-gray-400 text-lg py-4">Tags</div>
 
-          <div class="mb-2 flex flex-row items-center gap-2">
-            <b-form-checkbox
-              id="checkbox-autoOpenAvailableTags"
-              v-model="settings.autoOpenAvailableTags"
-              name="checkbox-autoOpenAvailableTags"
-              @change="onChange()"
-            >
-            </b-form-checkbox>
+        <b-form-checkbox
+          id="checkbox-autoOpenAvailableTags"
+          v-model="settings.autoOpenAvailableTags"
+          name="checkbox-autoOpenAvailableTags"
+          @change="onChange()"
+        >
+          Auto-open Tags tab
+        </b-form-checkbox>
 
-            <span>Auto-open Tags tab</span>
+        <b-form-select
+          v-model="settings.autoOpenTagsTab"
+          :options="tagsTabOptions"
+          @change="onChange()"
+          v-if="settings.autoOpenAvailableTags"
+        ></b-form-select>
 
-            <b-form-select
-              class="w-40"
-              v-model="settings.autoOpenTagsTab"
-              :options="tagsTabOptions"
-              @change="onChange()"
-              v-if="settings.autoOpenAvailableTags"
-            ></b-form-select>
-          </div>
+        <span>Viewing # Tags:</span>
 
-          <b-form-group label-cols="6" content-cols="6" label="Viewing # Tags:">
-            <b-form-select
-              v-model="settings.tagDefaultPageSize"
-              :options="pageSizeOptions"
-              @change="onChange()"
-            ></b-form-select>
-          </b-form-group>
-        </b-form-group>
+        <b-form-select
+          v-model="settings.tagDefaultPageSize"
+          :options="pageSizeOptions"
+          @change="onChange()"
+        ></b-form-select>
 
-        <b-form-group>
-          <div class="mt-4 mb-2 text-gray-400 text-lg">Plants</div>
+        <div class="col-span-2 text-gray-400 text-lg py-4">Plants</div>
 
-          <div class="mb-2 flex flex-row items-center gap-2">
-            <b-form-checkbox
-              id="checkbox-autoOpenFloweringPlants"
-              v-model="settings.autoOpenFloweringPlants"
-              name="checkbox-autoOpenFloweringPlants"
-              @change="onChange()"
-            >
-            </b-form-checkbox>
+        <b-form-checkbox
+          id="checkbox-autoOpenFloweringPlants"
+          v-model="settings.autoOpenFloweringPlants"
+          name="checkbox-autoOpenFloweringPlants"
+          @change="onChange()"
+        >
+          Auto-open Plants tab
+        </b-form-checkbox>
 
-            <span>Auto-open Plants tab</span>
+        <b-form-select
+          v-model="settings.autoOpenPlantsTab"
+          :options="plantsTabOptions"
+          @change="onChange()"
+          v-if="settings.autoOpenFloweringPlants"
+        ></b-form-select>
 
-            <b-form-select
-              class="w-40"
-              v-model="settings.autoOpenPlantsTab"
-              :options="plantsTabOptions"
-              @change="onChange()"
-              v-if="settings.autoOpenFloweringPlants"
-            ></b-form-select>
-          </div>
+        <span>Viewing # Plants:</span>
 
-          <b-form-group label-cols="6" content-cols="6" label="Viewing # Plants:">
-            <b-form-select
-              v-model="settings.plantDefaultPageSize"
-              :options="pageSizeOptions"
-              @change="onChange()"
-            ></b-form-select>
-          </b-form-group>
-        </b-form-group>
+        <b-form-select
+          v-model="settings.plantDefaultPageSize"
+          :options="pageSizeOptions"
+          @change="onChange()"
+        ></b-form-select>
       </div>
     </b-form>
   </div>
