@@ -25,14 +25,15 @@ export function downloadFileFromUrl({ url, filename }: { url: string; filename: 
   a.dispatchEvent(new MouseEvent("click"));
 }
 
-export function printPdfFromUrl({ urls, modal = false }: { urls: string[], modal?: boolean }) {
+export function printPdfFromUrl({ urls, modal = false }: { urls: string[]; modal?: boolean }) {
   if (modal) {
-    modalManager.dispatchModalEvent(ModalType.DOCUMENT, ModalAction.OPEN, { documentUrls: urls, print: true })
-
+    modalManager.dispatchModalEvent(ModalType.DOCUMENT, ModalAction.OPEN, {
+      documentUrls: urls,
+      print: true,
+    });
   } else {
-
-    for (let url of urls) {
-      var w = window.open(url, "_blank");
+    for (const url of urls) {
+      const w = window.open(url, "_blank");
 
       if (!w) {
         return;
@@ -50,5 +51,4 @@ export function printPdfFromUrl({ urls, modal = false }: { urls: string[], modal
       // }
     }
   }
-
 }

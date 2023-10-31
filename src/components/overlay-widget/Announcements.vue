@@ -82,7 +82,7 @@ export default Vue.extend({
   async created() {},
   async mounted() {
     // Create the Intersection Observer
-    let observer = new IntersectionObserver(
+    const observer = new IntersectionObserver(
       (entries, observer) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {

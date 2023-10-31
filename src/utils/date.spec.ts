@@ -214,8 +214,7 @@ describe("date.ts", () => {
         arrivalDatetimes: [],
         departureDatetimes: ["2023-04-04T00:00:00.000Z", "2023-04-06T00:00:00.000Z"],
         targetDatetime: "2023-04-05T00:00:00.000Z",
-      })
-    ).toThrowError();
+      })).toThrowError();
 
     expect(
       isCustodiedDatetimeOrError({
@@ -238,8 +237,7 @@ describe("date.ts", () => {
         arrivalDatetimes: ["2023-04-04T00:00:00.000Z", "2023-04-06T00:00:00.000Z"],
         departureDatetimes: ["2023-04-03T00:00:00.000Z", "2023-04-08T00:00:00.000Z"],
         targetDatetime: "2023-04-05T00:00:00.000Z",
-      })
-    ).toThrowError();
+      })).toThrowError();
 
     expect(
       isCustodiedDatetimeOrError({

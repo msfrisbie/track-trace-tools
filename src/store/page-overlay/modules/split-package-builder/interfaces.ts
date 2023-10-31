@@ -1,4 +1,6 @@
-import { IItemData, ILocationData, IPackageData, ITagData } from "@/interfaces";
+import {
+  IItemData, ILocationData, IPackageData, ITagData
+} from "@/interfaces";
 
 export interface ISplitPackageBuilderState {
   sourcePackage: IPackageData | null;

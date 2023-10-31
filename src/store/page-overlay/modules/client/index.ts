@@ -2,8 +2,8 @@ import { IPluginState } from "@/interfaces";
 import { t3RequestManager } from "@/modules/t3-request-manager.module";
 import { toastManager } from "@/modules/toast-manager.module";
 import { ActionContext } from "vuex";
-import { ClientActions, ClientGetters, ClientMutations } from "../client/consts";
-import { IClientState } from "../client/interfaces";
+import { ClientActions, ClientGetters, ClientMutations } from "./consts";
+import { IClientState } from "./interfaces";
 
 const inMemoryState = {};
 
@@ -31,9 +31,7 @@ export const clientModule = {
       getters: any,
       rootState: any,
       rootGetters: any
-    ) => {
-      return state.t3plus || !!state.values["ENABLE_T3PLUS"];
-    },
+    ) => state.t3plus || !!state.values.ENABLE_T3PLUS,
   },
   actions: {
     [ClientActions.UPDATE_CLIENT_VALUES]: async (
@@ -71,9 +69,7 @@ export const clientModule = {
   },
 };
 
-export const clientReducer = (state: IClientState): IClientState => {
-  return {
-    ...state,
-    ...inMemoryState,
-  };
-};
+export const clientReducer = (state: IClientState): IClientState => ({
+  ...state,
+  ...inMemoryState,
+});

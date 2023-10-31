@@ -114,7 +114,7 @@ export async function getParentPackageHistoryTreeImpl({
           } catch (e) {}
           break;
         default:
-          throw new Error("Invalid package state: " + packageState);
+          throw new Error(`Invalid package state: ${packageState}`);
       }
 
       if (pkg) {
@@ -297,7 +297,7 @@ export async function getChildPackageHistoryTreeImpl({
           } catch (e) {}
           break;
         default:
-          throw new Error("Invalid package state: " + packageState);
+          throw new Error(`Invalid package state: ${packageState}`);
       }
 
       if (pkg) {

@@ -263,9 +263,8 @@ async function defaultRemediatePackageMethod(): Promise<string> {
 
     if (filteredMethods.length === 0) {
       return methods[0].Id.toString();
-    } else {
-      return filteredMethods[0].Id.toString();
     }
+    return filteredMethods[0].Id.toString();
   } catch (e) {
     return "0";
   }
@@ -299,7 +298,7 @@ export default Vue.extend({
         this.$data.newPackageData
       );
 
-      for (let el of zipped) {
+      for (const el of zipped) {
         const [tag, newPackageData] = el;
 
         const lowestExpirationDate: string =
@@ -324,14 +323,14 @@ export default Vue.extend({
           TagId: tag.Id.toString(),
           UnitOfMeasureId: this.$data.outputItem.UnitOfMeasureId.toString(),
           RemediationDate: "",
-          RemediationMethodId: "0", //await defaultRemediatePackageMethod(),
+          RemediationMethodId: "0", // await defaultRemediatePackageMethod(),
           RemediationSteps: "",
           UseByDate: "",
           SellByDate: "",
           ...(this.$data.facilityUsesLocationForPackages
             ? {
-                LocationId: this.$data.location.Id.toString(),
-              }
+              LocationId: this.$data.location.Id.toString(),
+            }
             : {}),
           // UseSameItem: "false", // default to false and just provide the item id anyway
         };
@@ -379,8 +378,8 @@ export default Vue.extend({
       const flattened = [];
 
       // zipped contains nested lists, so we need to flatten into a 2d matrix
-      for (let [tagData, newPackageData] of zipped) {
-        for (let ingredient of newPackageData.ingredients) {
+      for (const [tagData, newPackageData] of zipped) {
+        for (const ingredient of newPackageData.ingredients) {
           flattened.push({
             sourceLabel: ingredient.pkg.Label,
             sourceItem: ingredient.pkg.Item.Name,

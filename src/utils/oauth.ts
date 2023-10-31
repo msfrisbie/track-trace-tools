@@ -53,7 +53,6 @@ export async function expireAuthToken() {
     chrome.storage.local.remove(ChromeStorageKeys.OAUTH_USER_DATA);
   } catch (e) {
     console.error(e);
-    return;
   }
 }
 
@@ -73,7 +72,7 @@ export async function getOAuthUserInfoOrError({
           // @ts-ignore
           async: true,
           headers: {
-            Authorization: "Bearer " + token,
+            Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
           },
           contentType: "json",

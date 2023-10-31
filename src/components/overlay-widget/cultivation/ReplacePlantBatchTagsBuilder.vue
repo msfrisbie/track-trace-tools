@@ -168,7 +168,7 @@ export default Vue.extend({
         this.$data.selectedPlantBatches
       );
 
-      for (let el of zipped) {
+      for (const el of zipped) {
         const tag = el[0];
         const plantBatch = el[1];
 
@@ -192,7 +192,7 @@ export default Vue.extend({
       );
     },
     async downloadAll() {
-      for (let csvFile of this.csvFiles) {
+      for (const csvFile of this.csvFiles) {
         await downloadCsvFile({ csvFile, delay: 500 });
       }
 

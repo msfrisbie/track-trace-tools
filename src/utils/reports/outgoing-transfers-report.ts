@@ -162,9 +162,7 @@ export async function maybeLoadOutgoingTransfersReportData({
       });
     }
 
-    richOutgoingTransfers = richOutgoingTransfers.filter((transfer) => {
-      return true;
-    });
+    richOutgoingTransfers = richOutgoingTransfers.filter((transfer) => true);
 
     reportData[ReportType.OUTGOING_TRANSFERS] = {
       outgoingTransfers: richOutgoingTransfers,

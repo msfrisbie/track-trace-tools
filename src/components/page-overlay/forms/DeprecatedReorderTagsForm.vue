@@ -70,23 +70,22 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import store from "@/store/page-overlay/index";
-import { TaskType, METRC_TAG_REGEX, MessageType } from "@/consts";
-import { mapState } from "vuex";
-import { MutationType } from "@/mutation-types";
-import { createTask } from "@/utils/tasks";
-import { analyticsManager } from "@/modules/analytics-manager.module";
-import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
-import { primaryMetrcRequestManager } from "@/modules/metrc-request-manager.module";
-import { extractIContactInfoFromITagOrderData } from "@/utils/address";
+import { MessageType, TaskType } from "@/consts";
 import {
   IContactInfo,
   IExtractedITagOrderData,
-  ITagOrderData,
   IReorderTagsFormData,
+  ITagOrderData,
 } from "@/interfaces";
+import { analyticsManager } from "@/modules/analytics-manager.module";
 import { authManager } from "@/modules/auth-manager.module";
+import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
+import { MutationType } from "@/mutation-types";
+import store from "@/store/page-overlay/index";
+import { extractIContactInfoFromITagOrderData } from "@/utils/address";
+import { createTask } from "@/utils/tasks";
+import Vue from "vue";
+import { mapState } from "vuex";
 
 export default Vue.extend({
   name: "ReorderTagsForm",
@@ -99,7 +98,7 @@ export default Vue.extend({
 
     const previousTagOrders: Array<ITagOrderData> = await primaryDataLoader.previousTagOrders();
 
-    for (let previousTagOrder of previousTagOrders) {
+    for (const previousTagOrder of previousTagOrders) {
       this.contactInfos.push(extractIContactInfoFromITagOrderData(previousTagOrder));
     }
 
@@ -123,7 +122,7 @@ export default Vue.extend({
     form: IReorderTagsFormData;
     contactInfos: Array<IContactInfo>;
     maxOrderSizes: { maxPlantOrderSize: number; maxPackageOrderSize: number };
-  } {
+    } {
     return {
       contactInfos: [],
       maxOrderSizes: {
@@ -151,6 +150,7 @@ export default Vue.extend({
     async onSubmit(evt: any) {
       evt.preventDefault();
 
+      /* eslint-disable-next-line no-alert */
       if (!window.confirm("Are you sure you wish to place this tag order?")) {
         return;
       }

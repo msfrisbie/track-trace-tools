@@ -1,3 +1,5 @@
+/* eslint-disable import/no-unresolved, no-new, import/extensions, import/named */
+
 import Vue from "vue";
 import { analyticsManager } from "~/src/modules/analytics-manager.module";
 import { authManager } from "~/src/modules/auth-manager.module";
@@ -26,7 +28,7 @@ async function initializeTooklit() {
     return;
   }
 
-  if (!!document.querySelector(TTT_ROOT_ELEMENT_SELECTOR)) {
+  if (document.querySelector(TTT_ROOT_ELEMENT_SELECTOR)) {
     console.error("Metrc toolkit already exists on page");
     return;
   }

@@ -129,13 +129,13 @@ export async function maybeLoadHarvestPackagesReportData({
 
   let harvests: IIndexedHarvestData[] = [];
   let packages: IIndexedPackageData[] = [];
-  let unitsOfMeasure = await dynamicConstsManager.unitsOfMeasure();
+  const unitsOfMeasure = await dynamicConstsManager.unitsOfMeasure();
 
   if (!harvestConfig?.harvestFilter) {
     return;
   }
 
-  let promises: Promise<any>[] = [];
+  const promises: Promise<any>[] = [];
 
   for (const license of harvestConfig.licenses) {
     ctx.commit(ReportsMutations.SET_STATUS, {
@@ -383,7 +383,7 @@ export async function maybeLoadHarvestPackagesReportData({
     const harvestPackageLabels = extractHarvestChildPackageLabelsFromHistory(harvest.history!);
 
     for (const harvestPackageLabel of harvestPackageLabels) {
-      let harvestPackage = packageMap.get(harvestPackageLabel);
+      const harvestPackage = packageMap.get(harvestPackageLabel);
 
       if (!harvestPackage) {
         harvestPackageMatrix.push([
@@ -414,7 +414,7 @@ export async function maybeLoadHarvestPackagesReportData({
       }
 
       // Assign temporary value to be replaced later
-      let strainName = uuidv4();
+      const strainName = uuidv4();
 
       // If a candidate is not found, use this as the fallback
       let fallbackStrainName = "";
@@ -450,7 +450,7 @@ export async function maybeLoadHarvestPackagesReportData({
         continue;
       }
 
-      let childPackageLabels = extractChildPackageLabelsFromHistory(harvestPackage.history!);
+      const childPackageLabels = extractChildPackageLabelsFromHistory(harvestPackage.history!);
 
       const trimChildPackages: IUnionIndexedPackageData[] = [];
       const harvestPostQcPackages: IUnionIndexedPackageData[] = [];
@@ -458,7 +458,7 @@ export async function maybeLoadHarvestPackagesReportData({
 
       // Add QC and packaging rows
       for (const childPackageLabel of childPackageLabels) {
-        let childPackage = packageMap.get(childPackageLabel);
+        const childPackage = packageMap.get(childPackageLabel);
 
         if (!childPackage) {
           harvestPackageMatrix.push([
@@ -507,7 +507,7 @@ export async function maybeLoadHarvestPackagesReportData({
       }
 
       for (let childPackage of intakePackages) {
-        let originalPackage = childPackage;
+        const originalPackage = childPackage;
 
         const passthroughTestPackageLabels = extractTestSamplePackageLabelsFromHistory(
           childPackage.history!
@@ -585,7 +585,7 @@ export async function maybeLoadHarvestPackagesReportData({
         const grandchildPackageLabels = extractChildPackageLabelsFromHistory(childPackage.history!);
 
         for (const grandchildPackageLabel of grandchildPackageLabels) {
-          let grandchildPackage = packageMap.get(grandchildPackageLabel);
+          const grandchildPackage = packageMap.get(grandchildPackageLabel);
 
           if (!grandchildPackage) {
             // Seems this is not needed
@@ -960,7 +960,7 @@ function recordPackagingRows(
     truncateTag(harvestConfig, getLabelOrError(grandchildPackage)),
     strainName,
     "",
-    normalizeItemNameToMaterialType(getItemNameOrError(grandchildPackage)) + " - Prepack",
+    `${normalizeItemNameToMaterialType(getItemNameOrError(grandchildPackage))} - Prepack`,
     ...packagingUnitsPair,
     "Packaging",
     harvestConfig.debug ? "" : "",

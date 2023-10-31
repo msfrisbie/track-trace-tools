@@ -118,12 +118,11 @@ export async function maybeLoadEmployeeSamplesReportData({
   const historyPromises: Promise<any>[] = filteredPackages.map((pkg) =>
     primaryDataLoader.packageHistoryByPackageId(pkg.Id).then((history) => {
       pkg.history = history;
-    })
-  );
+    }));
 
   await Promise.allSettled(historyPromises);
 
-  let employeeSamplesMatrix: any[][] = [
+  const employeeSamplesMatrix: any[][] = [
     [
       "Employee Name",
       "Employee ID",
@@ -138,7 +137,7 @@ export async function maybeLoadEmployeeSamplesReportData({
     ],
   ];
 
-  let employeeData: Map<string, any[]> = new Map();
+  const employeeData: Map<string, any[]> = new Map();
 
   for (const pkg of filteredPackages) {
     for (const allocationData of getAllocatedSamplesFromPackageHistoryOrError(pkg)) {

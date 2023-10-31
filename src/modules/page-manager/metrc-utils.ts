@@ -134,7 +134,7 @@ export async function setPaginationImpl() {
     return;
   }
 
-  if (!!pageManager.paginationOptions.length) {
+  if (pageManager.paginationOptions.length) {
     // Pagination has already been set
     return;
   }
@@ -187,8 +187,6 @@ export async function setPaginationImpl() {
         break;
       }
     }
-
-    return;
   }
 }
 
@@ -199,7 +197,6 @@ export async function clickLogoutDismissImpl() {
     getComputedStyle(pageManager.sessionTimeoutAlert).display !== "none"
   ) {
     pageManager.extendButton.click();
-    return;
   }
 }
 

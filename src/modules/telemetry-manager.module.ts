@@ -66,7 +66,7 @@ class TelemetryManager implements IAtomicService {
     primaryMetrcRequestManager
       .getActivePackages(
         payload
-        //, { retries: 0 }
+        // , { retries: 0 }
       )
       .then(
         (response) => {
@@ -103,7 +103,7 @@ class TelemetryManager implements IAtomicService {
 
     const facilities = await facilityManager.ownedFacilitiesOrError();
 
-    for (let facility of facilities) {
+    for (const facility of facilities) {
       debugLog(async () => ["Evaluating", facility.licenseNumber]);
       const spoofedAuthState: IAuthState = {
         ...authState,
@@ -299,4 +299,4 @@ class TelemetryManager implements IAtomicService {
   ) {}
 }
 
-export let telemetryManager = new TelemetryManager();
+export const telemetryManager = new TelemetryManager();

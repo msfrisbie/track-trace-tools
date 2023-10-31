@@ -118,9 +118,7 @@ export const searchModule = {
   },
 };
 
-export const searchReducer = (state: ISearchState): ISearchState => {
-  return {
-    ...state,
-    ...inMemoryState,
-  };
-};
+export const searchReducer = (state: ISearchState): ISearchState => ({
+  ...state,
+  ...inMemoryState,
+});

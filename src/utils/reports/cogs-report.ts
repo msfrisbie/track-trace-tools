@@ -249,8 +249,7 @@ export async function maybeLoadCogsReportData({
           .then((destinations) => {
             transfer.outgoingDestinations = destinations;
           })
-          .finally(() => inflightCount--)
-      )
+          .finally(() => inflightCount--))
     );
 
     if (richOutgoingTransferDestinationRequests.length % 250 === 0) {
@@ -305,10 +304,8 @@ export async function maybeLoadCogsReportData({
         getDataLoaderByLicense(transfer.LicenseNumber).then((dataLoader) =>
           dataLoader.destinationPackages(destination.Id).then((destinationPackages) => {
             destinationPackages.map((pkg) =>
-              transferPackageWrapper.add(simpleTransferPackageConverter(transfer, destination, pkg))
-            );
-          })
-        )
+              transferPackageWrapper.add(simpleTransferPackageConverter(transfer, destination, pkg)));
+          }))
       );
 
       transferPackageWrapper.flushCounter();
@@ -484,8 +481,7 @@ export async function maybeLoadCogsReportData({
             "childPackageLabelQuantityPairs",
             extractChildPackageTagQuantityPairsFromHistory(history)
           );
-        })
-      )
+        }))
     );
 
     if (packageHistoryRequests.length % 100 === 0) {
@@ -568,10 +564,10 @@ export async function maybeLoadCogsReportData({
   let successfulMatchCount = 0;
   let fullInheritanceBackupCount = 0;
   let inexactInheritanceBackupCount = 0;
-  let duplicateLabelCount = 0;
+  const duplicateLabelCount = 0;
   let emptiedChildLabelsCount = 0;
-  let unmatchedChildPackages: string[] = [];
-  let inexactInheritanceBackupLabels: string[] = [];
+  const unmatchedChildPackages: string[] = [];
+  const inexactInheritanceBackupLabels: string[] = [];
   let testOrTradeExcludedCount = 0;
 
   for (const pkg of unifiedTreePackageWrapper) {
@@ -624,7 +620,7 @@ export async function maybeLoadCogsReportData({
         // Packages that have left the facilitty have no history. If they are a parent package,
         // the a fallback calculation is needed to estimate fractional cost.
         ++usedBackupAlgorithmCount;
-        let childLabels = treeChildMap.get(parentPkg.Label);
+        const childLabels = treeChildMap.get(parentPkg.Label);
 
         if (!childLabels) {
           ++unmatchedChildSetCount;
@@ -686,13 +682,12 @@ export async function maybeLoadCogsReportData({
 
     if (aVal === "" && bVal === "") {
       return 0;
-    } else if (aVal === "") {
+    } if (aVal === "") {
       return 1;
-    } else if (bVal === "") {
+    } if (bVal === "") {
       return -1;
-    } else {
-      return aVal.localeCompare(bVal);
     }
+    return aVal.localeCompare(bVal);
   });
 
   const auditData = {
@@ -733,11 +728,9 @@ export async function maybeLoadCogsReportData({
     }
 
     const expr: string = pkg
-      .fractionalCostMultiplierPairs!.map(([parentLabel, multiplier]) => {
-        return `(${getLetterFromIndex(computedCostColumnIndex)}${decodeLabelToIndex(
-          parentLabel
-        )} * ${multiplier})`;
-      })
+      .fractionalCostMultiplierPairs!.map(([parentLabel, multiplier]) => `(${getLetterFromIndex(computedCostColumnIndex)}${decodeLabelToIndex(
+        parentLabel
+      )} * ${multiplier})`)
       .join("+");
 
     const inheritedCostExpression = expr.length > 0 ? `+(${expr})` : "";

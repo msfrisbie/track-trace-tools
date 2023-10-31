@@ -104,7 +104,7 @@ class BackgroundTaskManager implements IAtomicService {
 
     if (isodate) {
       receipts = receipts.filter(
-        receipt => getIsoDateStringFromIsoDatetime(receipt.RecordedDateTime) < isodate
+        (receipt) => getIsoDateStringFromIsoDatetime(receipt.RecordedDateTime) < isodate
       );
     }
 
@@ -119,7 +119,7 @@ class BackgroundTaskManager implements IAtomicService {
 
     for (let i = 0; ; ++i) {
       try {
-        const receiptPayload = receipts.map(x => ({ Id: x.Id.toString() }));
+        const receiptPayload = receipts.map((x) => ({ Id: x.Id.toString() }));
 
         const response = await primaryMetrcRequestManager.finalizeSalesReceipts(
           JSON.stringify(receiptPayload)
@@ -230,7 +230,7 @@ class BackgroundTaskManager implements IAtomicService {
 
     let currentTag: string | null = store.state.backgroundTasks.voidTagsStartTag;
 
-    if (!!store.state.backgroundTasks.voidTagsLastAttemptedTag) {
+    if (store.state.backgroundTasks.voidTagsLastAttemptedTag) {
       currentTag = getTagFromOffset(store.state.backgroundTasks.voidTagsLastAttemptedTag, 1);
     }
 
@@ -326,4 +326,4 @@ class BackgroundTaskManager implements IAtomicService {
   }
 }
 
-export let backgroundTaskManager = new BackgroundTaskManager();
+export const backgroundTaskManager = new BackgroundTaskManager();

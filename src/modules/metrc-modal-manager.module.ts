@@ -1,4 +1,6 @@
-import { DOLLAR_NUMBER_REGEX, MessageType, METRC_TAG_REGEX, WEIGHT_NUMBER_REGEX } from "@/consts";
+import {
+  DOLLAR_NUMBER_REGEX, MessageType, METRC_TAG_REGEX, WEIGHT_NUMBER_REGEX
+} from "@/consts";
 import { IAtomicService } from "@/interfaces";
 import store from "@/store/page-overlay/index";
 import { debugLogFactory } from "@/utils/debug";
@@ -58,12 +60,12 @@ class MetrcModalManager implements IAtomicService {
       case NEW_LICENSED_TRANSFER_TITLE:
       case EDIT_LICENSED_TRANSFER_TITLE:
         const destinations: HTMLElement[] = [
-          ...modal.querySelectorAll(store.state.client.values["DESTINATION_SELECTOR"]),
+          ...modal.querySelectorAll(store.state.client.values.DESTINATION_SELECTOR),
         ] as HTMLElement[];
 
         for (const destination of destinations) {
           const csvInputContainer: HTMLElement | null = destination.querySelector(
-            store.state.client.values["CSV_INPUT_CONTAINER_SELECTOR"]
+            store.state.client.values.CSV_INPUT_CONTAINER_SELECTOR
           );
 
           if (!csvInputContainer) {
@@ -71,18 +73,18 @@ class MetrcModalManager implements IAtomicService {
           }
 
           let tttContainer = csvInputContainer.querySelector(
-            `[${store.state.client.values["TTT_CONTAINER_ATTRIBUTE"]}]`
+            `[${store.state.client.values.TTT_CONTAINER_ATTRIBUTE}]`
           );
 
           if (!tttContainer) {
             tttContainer = document.createElement("div");
-            tttContainer.setAttribute(store.state.client.values["TTT_CONTAINER_ATTRIBUTE"], "true");
+            tttContainer.setAttribute(store.state.client.values.TTT_CONTAINER_ATTRIBUTE, "true");
             tttContainer.classList.add("ttt-modal-container");
             csvInputContainer.appendChild(tttContainer);
           }
 
           const csvInput: HTMLInputElement | null = csvInputContainer.querySelector(
-            store.state.client.values["UPLOAD_CSV_INPUT_SELECTOR"]
+            store.state.client.values.UPLOAD_CSV_INPUT_SELECTOR
           );
 
           if (!csvInput) {
@@ -90,13 +92,13 @@ class MetrcModalManager implements IAtomicService {
           }
 
           let intermediateCsvInput: HTMLInputElement | null = csvInputContainer.querySelector(
-            `input[${store.state.client.values["INTERMEDIATE_CSV_ATTRIBUTE"]}]`
+            `input[${store.state.client.values.INTERMEDIATE_CSV_ATTRIBUTE}]`
           );
 
           if (!intermediateCsvInput) {
             intermediateCsvInput = document.createElement("input");
             intermediateCsvInput.setAttribute(
-              store.state.client.values["INTERMEDIATE_CSV_ATTRIBUTE"],
+              store.state.client.values.INTERMEDIATE_CSV_ATTRIBUTE,
               "true"
             );
             intermediateCsvInput.setAttribute("type", "file");
@@ -115,12 +117,12 @@ class MetrcModalManager implements IAtomicService {
           }
 
           let applyBtn: HTMLButtonElement | null = csvInputContainer.querySelector(
-            `button[${store.state.client.values["CSV_APPLY_BUTTON_ATTRIBUTE"]}]`
+            `button[${store.state.client.values.CSV_APPLY_BUTTON_ATTRIBUTE}]`
           );
 
           if (!applyBtn) {
             applyBtn = document.createElement("button");
-            applyBtn.setAttribute(store.state.client.values["CSV_APPLY_BUTTON_ATTRIBUTE"], "true");
+            applyBtn.setAttribute(store.state.client.values.CSV_APPLY_BUTTON_ATTRIBUTE, "true");
             applyBtn.setAttribute("type", "button");
             applyBtn.classList.add("btn", "btn-default", "ttt-modal-btn");
             applyBtn.innerText = "FILL CSV DATA";
@@ -149,7 +151,7 @@ class MetrcModalManager implements IAtomicService {
 
     const mergedRows: string[][] = [];
 
-    for (let f of input.files) {
+    for (const f of input.files) {
       const rows: string[][] = await new Promise((resolve, reject) => {
         Papa.parse(f, {
           header: false,
@@ -180,7 +182,7 @@ class MetrcModalManager implements IAtomicService {
     }
 
     const intermediateCsvInput: HTMLInputElement | null = destination.querySelector(
-      `input[${store.state.client.values["INTERMEDIATE_CSV_ATTRIBUTE"]}]`
+      `input[${store.state.client.values.INTERMEDIATE_CSV_ATTRIBUTE}]`
     );
 
     if (!intermediateCsvInput || !intermediateCsvInput.files) {
@@ -188,7 +190,7 @@ class MetrcModalManager implements IAtomicService {
     }
 
     const csvInput: HTMLInputElement | null = destination.querySelector(
-      store.state.client.values["UPLOAD_CSV_INPUT_SELECTOR"]
+      store.state.client.values.UPLOAD_CSV_INPUT_SELECTOR
     );
 
     if (!csvInput) {
@@ -230,25 +232,23 @@ class MetrcModalManager implements IAtomicService {
           );
         }
         formattingErrorCount++;
-      } else {
-        if (!row[0].match(METRC_TAG_REGEX)) {
-          if (formattingErrorCount < 5) {
-            toastManager.openToast(
-              `Row ${idx} does not have a valid tag
+      } else if (!row[0].match(METRC_TAG_REGEX)) {
+        if (formattingErrorCount < 5) {
+          toastManager.openToast(
+            `Row ${idx} does not have a valid tag
           
           ${JSON.stringify(row)}`,
-              {
-                title: "CSV Formatting Error",
-                autoHideDelay: 5000,
-                variant: "danger",
-                appendToast: true,
-                toaster: "ttt-toaster",
-                solid: true,
-              }
-            );
-          }
-          formattingErrorCount++;
+            {
+              title: "CSV Formatting Error",
+              autoHideDelay: 5000,
+              variant: "danger",
+              appendToast: true,
+              toaster: "ttt-toaster",
+              solid: true,
+            }
+          );
         }
+        formattingErrorCount++;
       }
 
       if (!row[1]) {
@@ -268,25 +268,23 @@ class MetrcModalManager implements IAtomicService {
           );
         }
         formattingErrorCount++;
-      } else {
-        if (!row[1].match(WEIGHT_NUMBER_REGEX)) {
-          if (formattingErrorCount < 5) {
-            toastManager.openToast(
-              `Row ${idx} does not have a valid weight
+      } else if (!row[1].match(WEIGHT_NUMBER_REGEX)) {
+        if (formattingErrorCount < 5) {
+          toastManager.openToast(
+            `Row ${idx} does not have a valid weight
           
           ${JSON.stringify(row)}`,
-              {
-                title: "CSV Formatting Error",
-                autoHideDelay: 5000,
-                variant: "warning",
-                appendToast: true,
-                toaster: "ttt-toaster",
-                solid: true,
-              }
-            );
-          }
-          formattingErrorCount++;
+            {
+              title: "CSV Formatting Error",
+              autoHideDelay: 5000,
+              variant: "warning",
+              appendToast: true,
+              toaster: "ttt-toaster",
+              solid: true,
+            }
+          );
         }
+        formattingErrorCount++;
       }
 
       if (!row[2]) {
@@ -306,29 +304,27 @@ class MetrcModalManager implements IAtomicService {
           );
         }
         formattingErrorCount++;
-      } else {
-        if (
-          !["Pounds", "Grams", "Kilograms", "Ounces"]
-            .map((x) => x.toLocaleLowerCase())
-            .includes(row[2].toLocaleLowerCase())
-        ) {
-          if (formattingErrorCount < 5) {
-            toastManager.openToast(
-              `Row ${idx} does not have a valid weight
+      } else if (
+        !["Pounds", "Grams", "Kilograms", "Ounces"]
+          .map((x) => x.toLocaleLowerCase())
+          .includes(row[2].toLocaleLowerCase())
+      ) {
+        if (formattingErrorCount < 5) {
+          toastManager.openToast(
+            `Row ${idx} does not have a valid weight
           
           ${JSON.stringify(row)}`,
-              {
-                title: "CSV Formatting Error",
-                autoHideDelay: 5000,
-                variant: "warning",
-                appendToast: true,
-                toaster: "ttt-toaster",
-                solid: true,
-              }
-            );
-          }
-          formattingErrorCount++;
+            {
+              title: "CSV Formatting Error",
+              autoHideDelay: 5000,
+              variant: "warning",
+              appendToast: true,
+              toaster: "ttt-toaster",
+              solid: true,
+            }
+          );
         }
+        formattingErrorCount++;
       }
 
       if (!row[3]) {
@@ -348,25 +344,23 @@ class MetrcModalManager implements IAtomicService {
           );
         }
         formattingErrorCount++;
-      } else {
-        if (!row[3].match(DOLLAR_NUMBER_REGEX)) {
-          if (formattingErrorCount < 5) {
-            toastManager.openToast(
-              `Row ${idx} does not have a valid wholesale dollar amount
+      } else if (!row[3].match(DOLLAR_NUMBER_REGEX)) {
+        if (formattingErrorCount < 5) {
+          toastManager.openToast(
+            `Row ${idx} does not have a valid wholesale dollar amount
           
           ${JSON.stringify(row)}`,
-              {
-                title: "CSV Formatting Error",
-                autoHideDelay: 5000,
-                variant: "warning",
-                appendToast: true,
-                toaster: "ttt-toaster",
-                solid: true,
-              }
-            );
-          }
-          formattingErrorCount++;
+            {
+              title: "CSV Formatting Error",
+              autoHideDelay: 5000,
+              variant: "warning",
+              appendToast: true,
+              toaster: "ttt-toaster",
+              solid: true,
+            }
+          );
         }
+        formattingErrorCount++;
       }
     }
 
@@ -403,7 +397,7 @@ class MetrcModalManager implements IAtomicService {
     }
 
     const input: HTMLInputElement | null = destination.querySelector(
-      `input[${store.state.client.values["INTERMEDIATE_CSV_ATTRIBUTE"]}]`
+      `input[${store.state.client.values.INTERMEDIATE_CSV_ATTRIBUTE}]`
     );
 
     if (!input || !input.files) {
@@ -413,7 +407,7 @@ class MetrcModalManager implements IAtomicService {
     const mergedRows: string[][] = await this.getMergedCsvDataOrError(input);
 
     const packages = [
-      ...destination.querySelectorAll(store.state.client.values["PACKAGE_ROW_SELECTOR"]),
+      ...destination.querySelectorAll(store.state.client.values.PACKAGE_ROW_SELECTOR),
     ];
 
     if (packages.length !== mergedRows.length) {
@@ -441,7 +435,7 @@ class MetrcModalManager implements IAtomicService {
       let autofillSuccess = true;
 
       const packageTagInput: HTMLInputElement | null = pkg.querySelector(
-        store.state.client.values["PACKAGE_TAG_INPUT_SELECTOR"]
+        store.state.client.values.PACKAGE_TAG_INPUT_SELECTOR
       );
 
       if (!packageTagInput) {
@@ -463,7 +457,7 @@ class MetrcModalManager implements IAtomicService {
       }
 
       let matchingRow = null;
-      for (let row of mergedRows) {
+      for (const row of mergedRows) {
         if (row[0] === packageTagInput.value) {
           matchingRow = row;
           break;
@@ -485,7 +479,7 @@ class MetrcModalManager implements IAtomicService {
       }
 
       const grossWeightInput: HTMLInputElement | null = pkg.querySelector(
-        store.state.client.values["PACKAGE_GROSS_WEIGHT_INPUT_SELECTOR"]
+        store.state.client.values.PACKAGE_GROSS_WEIGHT_INPUT_SELECTOR
       );
 
       if (grossWeightInput && typeof matchingRow[1] === "string") {
@@ -503,7 +497,7 @@ class MetrcModalManager implements IAtomicService {
       }
 
       const grossUnitOfWeightSelect: HTMLSelectElement | null = pkg.querySelector(
-        store.state.client.values["PACKAGE_GROSS_UNIT_OF_WEIGHT_ID_SELECT_SELECTOR"]
+        store.state.client.values.PACKAGE_GROSS_UNIT_OF_WEIGHT_ID_SELECT_SELECTOR
       );
 
       if (grossUnitOfWeightSelect) {
@@ -538,7 +532,7 @@ class MetrcModalManager implements IAtomicService {
       }
 
       const wholesalePriceInput: HTMLInputElement | null = pkg.querySelector(
-        store.state.client.values["PACKAGE_WHOLESALE_PRICE_INPUT_SELECTOR"]
+        store.state.client.values.PACKAGE_WHOLESALE_PRICE_INPUT_SELECTOR
       );
 
       if (wholesalePriceInput && typeof matchingRow[3] === "string") {
@@ -588,4 +582,4 @@ class MetrcModalManager implements IAtomicService {
   }
 }
 
-export let metrcModalManager = new MetrcModalManager();
+export const metrcModalManager = new MetrcModalManager();

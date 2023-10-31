@@ -1,4 +1,3 @@
-
 import "@/test/utils/auto-mock-chrome";
 import "@/test/utils/auto-mock-fetch";
 import { mockDataManager } from "@/modules/mock-data-manager.module";
@@ -8,7 +7,7 @@ import { shallowMount, Wrapper } from "@vue/test-utils";
 import Vuex, { Store } from "vuex";
 import HarvestBuilder from "./HarvestBuilder.vue";
 
-let localVue = mockVuex();
+const localVue = mockVuex();
 
 describe("HarvestBuilder.vue", () => {
   let wrapper: Wrapper<any>;

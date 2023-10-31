@@ -85,8 +85,8 @@ class ScreenshotManager implements IAtomicService {
     }: { downloadFile: boolean; useBackground: boolean; useLegacyScreenshot: boolean },
     screenshotUploadData: IBackgroundScriptScreenshotUploadData
   ) {
-    let canvas = await this.getPaintedCanvas(useLegacyScreenshot);
-    let blob = await this.getBlobFromCanvas(canvas);
+    const canvas = await this.getPaintedCanvas(useLegacyScreenshot);
+    const blob = await this.getBlobFromCanvas(canvas);
 
     if (downloadFile) {
       // TODO: does this work in bg?
@@ -94,18 +94,17 @@ class ScreenshotManager implements IAtomicService {
     }
 
     // if (useBackground) {
-    return await this.sendImageToServerFromBackgroundScript(blob, screenshotUploadData);
+    return this.sendImageToServerFromBackgroundScript(blob, screenshotUploadData);
     // } else {
-    // return await this.sendImageToServerFromContentScript(blob, screenshotUploadData);
+    // return this.sendImageToServerFromContentScript(blob, screenshotUploadData);
     // }
   }
 
   private async getPaintedCanvas(useLegacyScreenshot: boolean): Promise<HTMLCanvasElement> {
     if (useLegacyScreenshot) {
-      return await this.htmlScreenshot();
-    } else {
-      return await this.displayMediaScreenshot();
+      return this.htmlScreenshot();
     }
+    return this.displayMediaScreenshot();
   }
 
   // @ts-ignore
@@ -239,7 +238,7 @@ class ScreenshotManager implements IAtomicService {
     const a = document.createElement("a");
     document.body.appendChild(a);
     a.style.display = "none";
-    let url = window.URL.createObjectURL(blob);
+    const url = window.URL.createObjectURL(blob);
     a.href = url;
     a.download = "screenshot.jpeg";
     a.click();
@@ -280,4 +279,4 @@ class ScreenshotManager implements IAtomicService {
   }
 }
 
-export let screenshotManager = new ScreenshotManager();
+export const screenshotManager = new ScreenshotManager();

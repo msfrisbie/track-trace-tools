@@ -136,8 +136,7 @@ export default Vue.extend({
 
       timer(0).subscribe(() =>
         // @ts-ignore
-        this.$refs.typeahead.$el.querySelector("input").focus()
-      );
+        this.$refs.typeahead.$el.querySelector("input").focus());
     },
     blur() {
       // @ts-ignore
@@ -149,8 +148,7 @@ export default Vue.extend({
       const facilities = (await facilityManager.ownedFacilitiesOrError())
         // Initialize to alphabetical order
         .sort((a: IPageMetrcFacilityData, b: IPageMetrcFacilityData) =>
-          a.name < b.name ? -1 : a.name > b.name ? 1 : 0
-        );
+          a.name.localeCompare(b.name));
 
       const homeLicense: string | null = store.state.settings.homeLicenses[authState.identity];
 
@@ -172,7 +170,7 @@ export default Vue.extend({
     },
     openFacilityInNewTab(facility: IPageMetrcFacilityData) {
       // @ts-ignore
-      window.open(facility?.link, "_blank"); //.blur();
+      window.open(facility?.link, "_blank"); // .blur();
       // window.focus();
 
       analyticsManager.track(MessageType.FACILITY_PICKER_ENGAGEMENT, {

@@ -222,7 +222,7 @@ export default Vue.extend({
     },
     clear() {
       this.$data.selectedTagsMirror = [];
-      //@ts-ignore
+      // @ts-ignore
       this.$refs.pasteTags.clearForm();
     },
     addBefore(index: number) {
@@ -251,8 +251,7 @@ export default Vue.extend({
     },
     filterSelectedByPastedTags() {
       this.$data.selectedTagsMirror = this.$data.sourceTags.filter((x: ITagData) =>
-        this.$data.pastedTags.includes(x.Label)
-      );
+        this.$data.pastedTags.includes(x.Label));
     },
     selectAll() {
       this.$data.selectedTagsMirror = this.$data.sourceTags;
@@ -266,14 +265,12 @@ export default Vue.extend({
         this.$data.lockUuid = lock;
 
         const tags = (await primaryDataLoader.availableTags({ useCache: false })).filter((tag) =>
-          this.$props.tagTypeNames.includes(tag.TagTypeName)
-        );
+          this.$props.tagTypeNames.includes(tag.TagTypeName));
 
         // If there was a subsequent load, don't overwrite
         if (this.$data.lockUuid === lock) {
           this.$data.sourceTags = tags.sort((a: ITagData, b: ITagData) =>
-            a.Label > b.Label ? 1 : -1
-          );
+            (a.Label > b.Label ? 1 : -1));
 
           // This must perform a shallow clone
           this.$data.selectedTagsMirror = [...this.$data.sourceTags].slice(0, this.tagCount);

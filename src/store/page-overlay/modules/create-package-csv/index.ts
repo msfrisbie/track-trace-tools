@@ -49,9 +49,7 @@ export const createPackageCsvModule = {
   },
 };
 
-export const createPackageCsvReducer = (state: ICreatePackageCsvState): ICreatePackageCsvState => {
-  return {
-    ...state,
-    ...inMemoryState,
-  };
-};
+export const createPackageCsvReducer = (state: ICreatePackageCsvState): ICreatePackageCsvState => ({
+  ...state,
+  ...inMemoryState,
+});

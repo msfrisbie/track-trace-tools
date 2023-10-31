@@ -4,7 +4,6 @@ import { customAxios } from "@/modules/fetch-manager.module";
 import store from "@/store/page-overlay/index";
 import { debugLogFactory } from "@/utils/debug";
 import { t3RequestManager } from "./t3-request-manager.module";
-import { upsertManager } from "./upsert-manager.module";
 
 const debugLog = debugLogFactory("facility-manager.module.ts");
 
@@ -14,7 +13,7 @@ class FacilityManager implements IAtomicService {
   async init() {
     const facilities = await this.ownedFacilitiesOrError();
 
-    t3RequestManager.upsertFacilities(facilities.map(x => x.licenseNumber))
+    t3RequestManager.upsertFacilities(facilities.map((x) => x.licenseNumber));
   }
 
   async activeFacilityOrError(): Promise<IPageMetrcFacilityData> {
@@ -27,8 +26,7 @@ class FacilityManager implements IAtomicService {
     }
 
     const activeFacility = ownedFacilities.find((facility) =>
-      facility.name.includes(authState.license)
-    );
+      facility.name.includes(authState.license));
 
     if (!activeFacility) {
       throw new Error("Cannot find active facility");
@@ -160,7 +158,7 @@ class FacilityManager implements IAtomicService {
   //         return html;
   //     }
 
-  //     return await primaryMetrcRequestManager.getNewTransferHTML().then((response: AxiosResponse) => response.text());
+  //     return primaryMetrcRequestManager.getNewTransferHTML().then((response: AxiosResponse) => response.text());
   // }
 
   // async allFacilities() {
@@ -169,4 +167,4 @@ class FacilityManager implements IAtomicService {
   // }
 }
 
-export let facilityManager = new FacilityManager();
+export const facilityManager = new FacilityManager();

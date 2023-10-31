@@ -18,8 +18,10 @@ import { DataLoader, getDataLoader } from "@/modules/data-loader/data-loader.mod
 import { facilityManager } from "@/modules/facility-manager.module";
 import { LRU } from "@/utils/cache";
 import { ActionContext } from "vuex";
-import { ExplorerTarget, ExplorerTargetHistory, IExplorerState } from "../explorer/interfaces";
-import { ExplorerActions, ExplorerMutations, ExplorerStatus, ExplorerTargetType } from "./consts";
+import { ExplorerTarget, ExplorerTargetHistory, IExplorerState } from "./interfaces";
+import {
+  ExplorerActions, ExplorerMutations, ExplorerStatus, ExplorerTargetType
+} from "./consts";
 
 const inMemoryState = {
   status: ExplorerStatus.INITIAL,
@@ -142,7 +144,6 @@ export const explorerModule = {
           queryString: packageLabel,
           targetType: ExplorerTargetType.PACKAGE,
         });
-        return;
       }
     },
     [ExplorerActions.SET_QUERY]: async (
@@ -576,100 +577,100 @@ export const explorerModule = {
 
             break;
 
-          // INCOMING TRANSFER
-          // case ExplorerTargetType.INCOMING_TRANSFER:
-          //   let incomingTransfer: IIndexedTransferData | null = null;
+            // INCOMING TRANSFER
+            // case ExplorerTargetType.INCOMING_TRANSFER:
+            //   let incomingTransfer: IIndexedTransferData | null = null;
 
-          //   for (const license of licenseCache.elements) {
-          //     const authState = {
-          //       ...(await authManager.authStateOrError()),
-          //       license,
-          //     };
+            //   for (const license of licenseCache.elements) {
+            //     const authState = {
+            //       ...(await authManager.authStateOrError()),
+            //       license,
+            //     };
 
-          //     dataLoader = await getDataLoader(authState);
+            //     dataLoader = await getDataLoader(authState);
 
-          //     try {
-          //       // @ts-ignore
-          //       incomingTransfer = await Promise.any([
-          //         dataLoader.incomingTransfer(ctx.state.queryString!),
-          //         dataLoader.incomingInactiveTransfer(ctx.state.queryString!),
-          //       ]);
-          //     } catch (e) {
-          //       console.error(e);
-          //     }
-          //     if (incomingTransfer) {
-          //       break;
-          //     }
-          //   }
+            //     try {
+            //       // @ts-ignore
+            //       incomingTransfer = await Promise.any([
+            //         dataLoader.incomingTransfer(ctx.state.queryString!),
+            //         dataLoader.incomingInactiveTransfer(ctx.state.queryString!),
+            //       ]);
+            //     } catch (e) {
+            //       console.error(e);
+            //     }
+            //     if (incomingTransfer) {
+            //       break;
+            //     }
+            //   }
 
-          //   if (!incomingTransfer) {
-          //     ctx.commit(ExplorerMutations.SET_STATUS, {
-          //       status: ExplorerStatus.ERROR,
-          //       statusMessage: "Unable to match incoming transfer",
-          //     });
+            //   if (!incomingTransfer) {
+            //     ctx.commit(ExplorerMutations.SET_STATUS, {
+            //       status: ExplorerStatus.ERROR,
+            //       statusMessage: "Unable to match incoming transfer",
+            //     });
 
-          //     analyticsManager.track(MessageType.EXPLORER_ERROR, {
-          //       queryString,
-          //       targetType,
-          //       statusMessage: ctx.state.statusMessage,
-          //     });
+            //     analyticsManager.track(MessageType.EXPLORER_ERROR, {
+            //       queryString,
+            //       targetType,
+            //       statusMessage: ctx.state.statusMessage,
+            //     });
 
-          //     return;
-          //   }
+            //     return;
+            //   }
 
-          //   ctx.commit(ExplorerMutations.SET_TARGET, {
-          //     target: incomingTransfer,
-          //   });
+            //   ctx.commit(ExplorerMutations.SET_TARGET, {
+            //     target: incomingTransfer,
+            //   });
 
-          //   let incomingTransferHistory: ITransferHistoryData[] | null = null;
+            //   let incomingTransferHistory: ITransferHistoryData[] | null = null;
 
-          //   for (const license of licenseCache.elements) {
-          //     const authState = {
-          //       ...(await authManager.authStateOrError()),
-          //       license,
-          //     };
+            //   for (const license of licenseCache.elements) {
+            //     const authState = {
+            //       ...(await authManager.authStateOrError()),
+            //       license,
+            //     };
 
-          //     dataLoader = await getDataLoader(authState);
+            //     dataLoader = await getDataLoader(authState);
 
-          //     try {
-          //       incomingTransferHistory = await dataLoader.transferHistoryByOutGoingTransferId(
-          //         incomingTransfer.DeliveryId
-          //       );
-          //     } catch (e) {
-          //       console.error(e);
-          //     }
+            //     try {
+            //       incomingTransferHistory = await dataLoader.transferHistoryByOutGoingTransferId(
+            //         incomingTransfer.DeliveryId
+            //       );
+            //     } catch (e) {
+            //       console.error(e);
+            //     }
 
-          //     // A license mismatch will return 200 w/ 0 entries
-          //     if (incomingTransferHistory && incomingTransferHistory.length > 0) {
-          //       break;
-          //     }
-          //   }
+            //     // A license mismatch will return 200 w/ 0 entries
+            //     if (incomingTransferHistory && incomingTransferHistory.length > 0) {
+            //       break;
+            //     }
+            //   }
 
-          //   if (!incomingTransferHistory) {
-          //     ctx.commit(ExplorerMutations.SET_STATUS, {
-          //       status: ExplorerStatus.ERROR,
-          //       statusMessage: "Unable to match incoming transfer history",
-          //     });
+            //   if (!incomingTransferHistory) {
+            //     ctx.commit(ExplorerMutations.SET_STATUS, {
+            //       status: ExplorerStatus.ERROR,
+            //       statusMessage: "Unable to match incoming transfer history",
+            //     });
 
-          //     analyticsManager.track(MessageType.EXPLORER_ERROR, {
-          //       queryString,
-          //       targetType,
-          //       statusMessage: ctx.state.statusMessage,
-          //     });
+            //     analyticsManager.track(MessageType.EXPLORER_ERROR, {
+            //       queryString,
+            //       targetType,
+            //       statusMessage: ctx.state.statusMessage,
+            //     });
 
-          //     return;
-          //   }
+            //     return;
+            //   }
 
-          //   ctx.commit(ExplorerMutations.SET_HISTORY, {
-          //     targetHistory: incomingTransferHistory,
-          //   });
+            //   ctx.commit(ExplorerMutations.SET_HISTORY, {
+            //     targetHistory: incomingTransferHistory,
+            //   });
 
-          //   ctx.commit(ExplorerMutations.SET_STATUS, {
-          //     status: ExplorerStatus.SUCCESS,
-          //     statusMessage: "",
-          //   });
+            //   ctx.commit(ExplorerMutations.SET_STATUS, {
+            //     status: ExplorerStatus.SUCCESS,
+            //     statusMessage: "",
+            //   });
 
-          //   break;
+            //   break;
 
           // OUTGOING TRANSFER
           case ExplorerTargetType.OUTGOING_TRANSFER:
@@ -791,9 +792,7 @@ export const explorerModule = {
   },
 };
 
-export const explorerReducer = (state: IExplorerState): IExplorerState => {
-  return {
-    ...state,
-    ...inMemoryState,
-  };
-};
+export const explorerReducer = (state: IExplorerState): IExplorerState => ({
+  ...state,
+  ...inMemoryState,
+});

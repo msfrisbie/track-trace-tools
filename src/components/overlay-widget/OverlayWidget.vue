@@ -143,9 +143,9 @@ export default Vue.extend({
         }
 
         // @ts-ignore
-        this.$refs.popovercontainer.style.left = e.x + 10 + "px";
+        this.$refs.popovercontainer.style.left = `${e.x + 10}px`;
         // @ts-ignore
-        this.$refs.popovercontainer.style.top = e.y + "px";
+        this.$refs.popovercontainer.style.top = `${e.y}px`;
 
         this.$root.$emit("bv::show::popover", "context-menu-popover");
       });

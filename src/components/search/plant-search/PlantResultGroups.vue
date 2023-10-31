@@ -58,13 +58,13 @@ import { toastManager } from "@/modules/toast-manager.module";
 import { copyToClipboard } from "@/utils/dom";
 import { mapActions, mapState } from "vuex";
 import PlantSearchResultsGroup from "@/components/search/plant-search/PlantSearchResultsGroup.vue";
-import PlantSearchFiltersVue from "./PlantSearchFilters.vue";
 import { searchManager } from "@/modules/search-manager.module";
 import { PlantSearchActions } from "@/store/page-overlay/modules/plant-search/consts";
 import { timer } from "rxjs";
 import { SearchActions } from "@/store/page-overlay/modules/search/consts";
 import { IPlantSearchState } from "@/store/page-overlay/modules/plant-search/interfaces";
 import store from "@/store/page-overlay/index";
+import PlantSearchFiltersVue from "./PlantSearchFilters.vue";
 
 export default Vue.extend({
   name: "PlantResultGroups",
@@ -119,22 +119,19 @@ export default Vue.extend({
     },
     labelPlants(): IIndexedPlantData[] {
       const plants = this.plants.filter((plantData) =>
-        plantData.Label.includes(store.state.search.queryString)
-      );
+        plantData.Label.includes(store.state.search.queryString));
 
       return plants;
     },
     strainNamePlants(): IIndexedPlantData[] {
       const plants = this.plants.filter((plantData) =>
-        plantData.StrainName?.toUpperCase().includes(store.state.search.queryString.toUpperCase())
-      );
+        plantData.StrainName?.toUpperCase().includes(store.state.search.queryString.toUpperCase()));
 
       return plants;
     },
     locationNamePlants(): IIndexedPlantData[] {
       const plants = this.plants.filter((plantData) =>
-        plantData.LocationName?.toUpperCase().includes(store.state.search.queryString.toUpperCase())
-      );
+        plantData.LocationName?.toUpperCase().includes(store.state.search.queryString.toUpperCase()));
 
       return plants;
     },

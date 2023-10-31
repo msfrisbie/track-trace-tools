@@ -286,7 +286,7 @@ export default Vue.extend({
         flattenedPlantCounts
       );
 
-      for (let el of zipped) {
+      for (const el of zipped) {
         const tag = el[0];
         const motherPlant = el[1];
         const childCount = el[2];
@@ -302,8 +302,8 @@ export default Vue.extend({
           TagId: tag.Id.toString(),
           ...(this.$data.facilityUsesLocationForPackages
             ? {
-                LocationId: this.$data.location.Id.toString(),
-              }
+              LocationId: this.$data.location.Id.toString(),
+            }
             : {}),
         };
 
@@ -325,7 +325,7 @@ export default Vue.extend({
       );
     },
     async downloadAll() {
-      for (let csvFile of this.csvFiles) {
+      for (const csvFile of this.csvFiles) {
         await downloadCsvFile({ csvFile, delay: 500 });
       }
 
@@ -359,8 +359,7 @@ export default Vue.extend({
 
       const flattenedPlantLabels = this.$data.childPackageData
         .map((x: IIntermediateCreatePackageFromMotherPlantData) =>
-          x.counts.map(() => x.plant.Label)
-        )
+          x.counts.map(() => x.plant.Label))
         .flat();
       const flattenedPlantCounts = this.$data.childPackageData
         .map((x: IIntermediateCreatePackageFromMotherPlantData) => x.counts)
@@ -416,9 +415,9 @@ export default Vue.extend({
 
         return buildNamedCsvFileData(
           csvData,
-          `Taking ${this.totalChildCountImpl()} ${
-            this.$data.plantBatchType.Name.toLocaleLowerCase() + "s"
-          } from ${this.$data.selectedPlants.length} mothers`
+          `Taking ${this.totalChildCountImpl()} ${`${this.$data.plantBatchType.Name.toLocaleLowerCase()}s`} from ${
+            this.$data.selectedPlants.length
+          } mothers`
         );
       } catch (e) {
         console.error(e);
@@ -429,9 +428,7 @@ export default Vue.extend({
       const result = arrayIsValid(this.$data.childMatrix, {
         collectionValidators: [
           {
-            fn: (rows: any[]): boolean => {
-              return rows.length === this.$data.selectedPlants.length;
-            },
+            fn: (rows: any[]): boolean => rows.length === this.$data.selectedPlants.length,
             message: "Collection must be same size as plants",
           },
         ],
@@ -441,13 +438,11 @@ export default Vue.extend({
         return false;
       }
 
-      for (let row of this.$data.childMatrix) {
+      for (const row of this.$data.childMatrix) {
         const result = arrayIsValid(row, {
           rowValidators: [
             {
-              fn: (x: any): boolean => {
-                return Number.isInteger(x) && x > 0;
-              },
+              fn: (x: any): boolean => Number.isInteger(x) && x > 0,
               message: "All values must be an integer greater than 0",
             },
           ],
@@ -482,8 +477,7 @@ export default Vue.extend({
     totalChildCountImpl(): number {
       return sum(
         this.$data.childPackageData.map((x: IIntermediateCreatePackageFromMotherPlantData) =>
-          sum(x.counts)
-        )
+          sum(x.counts))
       );
     },
   },
@@ -662,14 +656,14 @@ export default Vue.extend({
       handler(newValue: number[][], oldValue) {
         this.$data.childPackageData = [];
 
-        if (this.$data.selectedPlants.length != newValue.length) {
+        if (this.$data.selectedPlants.length !== newValue.length) {
           console.error("length mismatch");
           return;
         }
 
         const zipped = safeZip(this.$data.selectedPlants, newValue);
 
-        for (let [plant, counts] of zipped) {
+        for (const [plant, counts] of zipped) {
           // @ts-ignore
           this.$data.childPackageData.push({
             plant,
@@ -726,7 +720,7 @@ export default Vue.extend({
       await dynamicConstsManager.facilityUsesLocationForPackages();
 
     this.$data.plantBatchTypeOptions = (await dynamicConstsManager.plantBatchTypes()).map(
-      (x: IPlantBatchType) => ({ text: x.Name + "s", value: x })
+      (x: IPlantBatchType) => ({ text: `${x.Name}s`, value: x })
     );
     this.$data.plantBatchType = this.$data.plantBatchTypeOptions[0].value;
   },

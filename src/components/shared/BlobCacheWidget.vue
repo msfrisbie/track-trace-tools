@@ -6,12 +6,12 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import { mapState } from "vuex";
+import { toastManager } from "@/modules/toast-manager.module";
 import router from "@/router/index";
 import store from "@/store/page-overlay/index";
 import { readJSONFile } from "@/utils/file";
-import { toastManager } from "@/modules/toast-manager.module";
+import Vue from "vue";
+import { mapState } from "vuex";
 
 export default Vue.extend({
   name: "BlobCacheWidget",
@@ -43,11 +43,12 @@ export default Vue.extend({
         });
       }
 
-      var dataStr =
-        "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(cachedValue));
-      var downloadAnchorNode = document.createElement("a");
+      const dataStr = `data:text/json;charset=utf-8,${encodeURIComponent(
+        JSON.stringify(cachedValue)
+      )}`;
+      const downloadAnchorNode = document.createElement("a");
       downloadAnchorNode.setAttribute("href", dataStr);
-      downloadAnchorNode.setAttribute("download", this.$props.cachekey + ".json");
+      downloadAnchorNode.setAttribute("download", `${this.$props.cachekey}.json`);
       document.body.appendChild(downloadAnchorNode); // required for firefox
       downloadAnchorNode.click();
       downloadAnchorNode.remove();

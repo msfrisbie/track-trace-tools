@@ -1,4 +1,6 @@
-import { PackageTabLabel, PlantsTabLabel, TabKey, TagsTabLabel, TransfersTabLabel } from "@/consts";
+import {
+  PackageTabLabel, PlantsTabLabel, TabKey, TagsTabLabel, TransfersTabLabel
+} from "@/consts";
 import store from "@/store/page-overlay/index";
 import { hashObjectValueOrNull } from "@/utils/url";
 import { pageManager } from "./page-manager.module";
@@ -39,7 +41,7 @@ export async function clickTabStartingWithImpl(
     throw new Error("previousTabTextOffset must be a positive integer");
   }
 
-  let seenTabs: string[] = [];
+  const seenTabs: string[] = [];
   for (let i = 0; i < tabList.length; ++i) {
     const tab = tabList[i] as HTMLElement;
 
@@ -80,7 +82,7 @@ export async function managePlantTabsImpl() {
     return;
   }
 
-  let tabKey = hashObjectValueOrNull("tabKey");
+  const tabKey = hashObjectValueOrNull("tabKey");
 
   switch (tabKey) {
     case TabKey.PLANTS_PLANTBATCHES_ACTIVE:
@@ -162,7 +164,7 @@ export async function managePackageTabsImpl() {
     return;
   }
 
-  let tabKey = hashObjectValueOrNull("tabKey");
+  const tabKey = hashObjectValueOrNull("tabKey");
 
   switch (tabKey) {
     case TabKey.PACKAGES_ACTIVE:
@@ -203,7 +205,7 @@ export async function manageTransfersTabsImpl() {
     return;
   }
 
-  let tabKey = hashObjectValueOrNull("tabKey");
+  const tabKey = hashObjectValueOrNull("tabKey");
 
   switch (tabKey) {
     case TabKey.TRANSFERS_INCOMING:
@@ -254,7 +256,7 @@ export async function manageTagsTabsImpl() {
     return;
   }
 
-  let tabKey = hashObjectValueOrNull("tabKey");
+  const tabKey = hashObjectValueOrNull("tabKey");
 
   switch (tabKey) {
     case TabKey.TAGS_AVAILABLE:

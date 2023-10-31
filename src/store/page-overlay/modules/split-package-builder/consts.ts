@@ -1,4 +1,3 @@
-
 export const SPLIT_PACKAGE_BUILDER: string = 'splitPackageBuilder';
 
 export enum SplitPackageBuilderMutations {

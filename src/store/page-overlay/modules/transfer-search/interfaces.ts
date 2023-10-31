@@ -6,7 +6,6 @@ export interface ISelectedTransferMetadata {
   priority: number;
 }
 
-
 export interface ITransferSearchState {
   searchInflight: boolean;
   transferSearchFilters: ITransferSearchFilters;

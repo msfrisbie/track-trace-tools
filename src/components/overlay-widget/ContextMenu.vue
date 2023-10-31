@@ -335,7 +335,9 @@
 </template>
 
 <script lang="ts">
-import { MessageType, ModalAction, ModalType, PackageState, TransferState } from "@/consts";
+import {
+  MessageType, ModalAction, ModalType, PackageState, TransferState
+} from "@/consts";
 import {
   IIndexedPackageData,
   IIndexedTransferData,
@@ -343,10 +345,8 @@ import {
   IPluginState,
 } from "@/interfaces";
 import { analyticsManager } from "@/modules/analytics-manager.module";
-import { clientBuildManager } from "@/modules/client-build-manager.module";
 import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
 import { IContextMenuEvent, modalManager } from "@/modules/modal-manager.module";
-import { searchManager } from "@/modules/search-manager.module";
 import router from "@/router/index";
 import store from "@/store/page-overlay/index";
 import { ExplorerActions } from "@/store/page-overlay/modules/explorer/consts";
@@ -386,7 +386,7 @@ export default Vue.extend({
         return false;
       }
 
-      if (!store.state.client.values["ENABLE_TRANSFER_EDIT"]) {
+      if (!store.state.client.values.ENABLE_TRANSFER_EDIT) {
         return false;
       }
 
@@ -467,7 +467,7 @@ export default Vue.extend({
       this.dismiss();
 
       this.partialUpdatePackageSearchFilters({
-        packageSearchFilters: packageSearchFilters,
+        packageSearchFilters,
       });
 
       this.setSearchType({ searchType: "PACKAGES" });
@@ -641,7 +641,7 @@ export default Vue.extend({
       analyticsManager.track(MessageType.CONTEXT_MENU_SELECT, { event: "createScanSheet" });
 
       await createScanSheet(
-        parseInt(this.contextMenuEvent.manifestNumber!),
+        parseInt(this.contextMenuEvent.manifestNumber!, 10),
         this.contextMenuEvent.zeroPaddedManifestNumber!
       );
 

@@ -26,6 +26,7 @@ import store from "@/store/page-overlay/index";
 import { SearchActions } from "@/store/page-overlay/modules/search/consts";
 import Vue from "vue";
 import { mapState } from "vuex";
+
 export default Vue.extend({
   name: "PackageHistoryList",
   store,

@@ -47,8 +47,12 @@ import { searchManager } from "@/modules/search-manager.module";
 import store from "@/store/page-overlay/index";
 import { SearchActions } from "@/store/page-overlay/modules/search/consts";
 import { TagSearchActions } from "@/store/page-overlay/modules/tag-search/consts";
-import { combineLatest, Observable, of, timer } from "rxjs";
-import { debounceTime, filter, startWith, tap } from "rxjs/operators";
+import {
+  combineLatest, Observable, of, timer
+} from "rxjs";
+import {
+  debounceTime, filter, startWith, tap
+} from "rxjs/operators";
 import Vue from "vue";
 import { mapActions, mapState } from "vuex";
 
@@ -96,8 +100,7 @@ export default Vue.extend({
         if (newValue) {
           timer(500).subscribe(() =>
             // @ts-ignore
-            this.$refs.search?.$el.focus()
-          );
+            this.$refs.search?.$el.focus());
         }
       },
     },

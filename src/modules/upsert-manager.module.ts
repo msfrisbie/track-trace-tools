@@ -65,7 +65,7 @@ class UpsertManager implements IAtomicService {
   }) {
     const keyFactory: KeyFactory = new KeyFactory({ key, sendIntervalMs, authState });
 
-    return await keyFactory.shouldSend();
+    return keyFactory.shouldSend();
   }
 
   async maybeSendKeyval({
@@ -111,4 +111,4 @@ class UpsertManager implements IAtomicService {
   }
 }
 
-export let upsertManager = new UpsertManager();
+export const upsertManager = new UpsertManager();

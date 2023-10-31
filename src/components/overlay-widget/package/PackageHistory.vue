@@ -124,7 +124,7 @@
               <!-- </div> -->
             </template>
             <template v-else>
-              <template v-if="status == PackageHistoryStatus.INFLIGHT">
+              <template v-if="status === PackageHistoryStatus.INFLIGHT">
                 <div class="text-center">History generation in progress...</div>
               </template>
               <template v-else>
@@ -154,7 +154,7 @@
               </div>
             </template>
             <template v-else>
-              <template v-if="status == PackageHistoryStatus.INFLIGHT">
+              <template v-if="status === PackageHistoryStatus.INFLIGHT">
                 <div class="text-center">History generation in progress...</div>
               </template>
               <template v-else>
@@ -280,7 +280,7 @@
                 You stopped the lookup process. The displayed results may not be complete.
               </div>
 
-              <template v-if="status == PackageHistoryStatus.INFLIGHT">
+              <template v-if="status === PackageHistoryStatus.INFLIGHT">
                 <div class="flex flex-row justify-center items-center gap-2">
                   <b-spinner small></b-spinner>
                   <span>Building history, this can take a minute...</span>
@@ -353,7 +353,6 @@
 import PackageHistoryTile from "@/components/overlay-widget/shared/PackageHistoryTile.vue";
 import SinglePackagePicker from "@/components/overlay-widget/shared/SinglePackagePicker.vue";
 import { ICsvFile, IHistoryTreeNode, IPluginState } from "@/interfaces";
-import { clientBuildManager } from "@/modules/client-build-manager.module";
 import router from "@/router/index";
 import store from "@/store/page-overlay/index";
 import {
@@ -528,8 +527,7 @@ export default Vue.extend({
               x.pkg?.ItemName,
               x.pkg?.Quantity,
               x.pkg?.UnitOfMeasureAbbreviation,
-            ])
-          )
+            ]))
           .flat(),
       };
 
@@ -576,6 +574,7 @@ export default Vue.extend({
   },
   async created() {},
   async mounted() {
+    /* eslint-disable-next-line global-require */
     this.$data.demoImageUrl = await getUrl(require("@/assets/images/package-history-demo.png"));
   },
   async destroyed() {},

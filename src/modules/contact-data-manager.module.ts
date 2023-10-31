@@ -24,13 +24,13 @@ class ContactDataManager implements IAtomicService {
       return;
     }
 
-    let email = null,
-      phoneNumber = null;
+    let email = null;
+    let phoneNumber = null;
 
     const response = await primaryMetrcRequestManager.getUserProfileHTML();
     const html: string = await response.data;
 
-    let extractedData = extract(ExtractionType.CONTACT_DATA, html);
+    const extractedData = extract(ExtractionType.CONTACT_DATA, html);
 
     if (extractedData && extractedData.contactData) {
       ({ email, phoneNumber } = extractedData.contactData);
@@ -58,4 +58,4 @@ class ContactDataManager implements IAtomicService {
   }
 }
 
-export let contactDataManager = new ContactDataManager();
+export const contactDataManager = new ContactDataManager();

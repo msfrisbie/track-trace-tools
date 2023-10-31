@@ -47,4 +47,4 @@ class DeprecatedFlagManager implements IAtomicService {
   }
 }
 
-export let flagManager = new DeprecatedFlagManager();
+export const flagManager = new DeprecatedFlagManager();

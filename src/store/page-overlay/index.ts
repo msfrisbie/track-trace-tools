@@ -65,34 +65,32 @@ const vuexLocal = {
 // };
 
 const vuexShared = {
-  reducer: (state: IPluginState) => {
-    return {
-      ...state,
-      pluginAuth: pluginAuthReducer(state.pluginAuth),
-      announcements: announcementsReducer(state.announcements),
-      client: clientReducer(state.client),
-      search: searchReducer(state.search),
-      transferBuilder: transferBuilderReducer(state.transferBuilder),
-      packageSearch: packageSearchReducer(state.packageSearch),
-      explorer: explorerReducer(state.explorer),
-      plantSearch: plantSearchReducer(state.plantSearch),
-      transferSearch: transferSearchReducer(state.transferSearch),
-      tagSearch: tagSearchReducer(state.tagSearch),
-      flags: flagsReducer(state.flags),
-      splitPackageBuilder: splitPackageBuilderReducer(state.splitPackageBuilder),
-      promoteImmaturePlantsBuilder: promoteImmaturePlantsBuilderReducer(
-        state.promoteImmaturePlantsBuilder
-      ),
-      listing: listingReducer(state.listing),
-      settings: settingsReducer(state.settings),
-      packageHistory: packageHistoryReducer(state.packageHistory),
-      reports: reportsReducer(state.reports),
-      employeeSamples: employeeSamplesReducer(state.employeeSamples),
-      createPackageCsv: createPackageCsvReducer(state.createPackageCsv),
-      transferPackageSearch: transferPackageSearchReducer(state.transferPackageSearch),
-      graph: graphReducer(state.graph),
-    };
-  },
+  reducer: (state: IPluginState) => ({
+    ...state,
+    pluginAuth: pluginAuthReducer(state.pluginAuth),
+    announcements: announcementsReducer(state.announcements),
+    client: clientReducer(state.client),
+    search: searchReducer(state.search),
+    transferBuilder: transferBuilderReducer(state.transferBuilder),
+    packageSearch: packageSearchReducer(state.packageSearch),
+    explorer: explorerReducer(state.explorer),
+    plantSearch: plantSearchReducer(state.plantSearch),
+    transferSearch: transferSearchReducer(state.transferSearch),
+    tagSearch: tagSearchReducer(state.tagSearch),
+    flags: flagsReducer(state.flags),
+    splitPackageBuilder: splitPackageBuilderReducer(state.splitPackageBuilder),
+    promoteImmaturePlantsBuilder: promoteImmaturePlantsBuilderReducer(
+      state.promoteImmaturePlantsBuilder
+    ),
+    listing: listingReducer(state.listing),
+    settings: settingsReducer(state.settings),
+    packageHistory: packageHistoryReducer(state.packageHistory),
+    reports: reportsReducer(state.reports),
+    employeeSamples: employeeSamplesReducer(state.employeeSamples),
+    createPackageCsv: createPackageCsvReducer(state.createPackageCsv),
+    transferPackageSearch: transferPackageSearchReducer(state.transferPackageSearch),
+    graph: graphReducer(state.graph),
+  }),
 };
 
 const vuexPersistence = new VuexPersistence({

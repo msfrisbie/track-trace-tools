@@ -89,14 +89,14 @@ export default Vue.extend({
       analyticsManager.track(MessageType.STARTED_VOID_TAGS_BACKGROUND_JOB);
       this.$data.submitInflight = true;
 
-      for (let tagData of this.$data.selectedPlantTags) {
+      for (const tagData of this.$data.selectedPlantTags) {
         if (!this.$data.submitInflight) {
           return;
         }
         await this.voidTag({ tagData });
       }
 
-      for (let tagData of this.$data.selectedPackageTags) {
+      for (const tagData of this.$data.selectedPackageTags) {
         if (!this.$data.submitInflight) {
           return;
         }

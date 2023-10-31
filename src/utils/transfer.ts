@@ -45,7 +45,7 @@ const VEHICLE_MATCHER = /^- Vehicle Make Model \(Lic. No.\): (.+) \((.+)\)$/;
 
 export async function extractRecentDestinationFacilitiesFromTransfers(): Promise<
   IMetrcFacilityData[]
-> {
+  > {
   const outgoingTransfers = await primaryDataLoader.outgoingTransfers();
 
   const facilityMap: Map<string, IMetrcFacilityData> = await dynamicConstsManager.facilityMap();
@@ -54,7 +54,7 @@ export async function extractRecentDestinationFacilitiesFromTransfers(): Promise
 
   const recentDestinationFacilitiesSet = new Set<string>();
 
-  for (let outgoingTransfer of outgoingTransfers) {
+  for (const outgoingTransfer of outgoingTransfers) {
     // DeliveryFacilities: "CCL20-0002194 (QCSC, LLC)"
     const destinationFacilityLicenseMatch = outgoingTransfer.DeliveryFacilities.match(/^[^\s]+/);
 
@@ -81,7 +81,7 @@ export async function extractRecentDestinationFacilitiesFromTransfers(): Promise
 
 export async function extractRecentTransporterFacilitiesFromTransfers(): Promise<
   IMetrcFacilityData[]
-> {
+  > {
   const outgoingTransfers = await primaryDataLoader.outgoingTransfers();
 
   const facilityMap: Map<string, IMetrcFacilityData> = await dynamicConstsManager.facilityMap();
@@ -90,7 +90,7 @@ export async function extractRecentTransporterFacilitiesFromTransfers(): Promise
 
   const recentTransporterFacilitiesSet = new Set<string>();
 
-  for (let outgoingTransfer of outgoingTransfers) {
+  for (const outgoingTransfer of outgoingTransfers) {
     // ShipperFacilityLicenseNumber: "C12-0000020-LIC"
     const transporterFacilityLicenseMatch =
       outgoingTransfer.ShipperFacilityLicenseNumber.match(/^[^\s]+/);
@@ -128,7 +128,7 @@ export async function extractDriversAndVehiclesFromTransferHistory(): Promise<{
   const vehicles: IMetrcVehicleData[] = [];
 
   // Limit this to 25 requests
-  for (let transfer of outgoingTransfers.slice(0, 25)) {
+  for (const transfer of outgoingTransfers.slice(0, 25)) {
     const historyList: ITransferHistoryData[] =
       await primaryDataLoader.transferHistoryByOutGoingTransferId(transfer.Id);
 
@@ -191,7 +191,7 @@ export async function extractDriversAndVehiclesFromTransferHistory(): Promise<{
 }
 
 export async function createScanSheet(transferId: number, manifestNumber: string) {
-  if (!store.state.client.values["ENABLE_T3PLUS"] && !store.state.client.t3plus) {
+  if (!store.state.client.values.ENABLE_T3PLUS && !store.state.client.t3plus) {
     toastManager.openToast(
       "This feature is only availble for T3+ users. Learn more at trackandtrace.tools/plus",
       {

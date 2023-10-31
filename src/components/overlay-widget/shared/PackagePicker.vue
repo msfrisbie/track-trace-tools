@@ -236,7 +236,9 @@ import {
   getNormalizedPackageContentsDescription,
 } from "@/utils/package";
 import { combineLatest, Subject } from "rxjs";
-import { debounceTime, distinctUntilChanged, filter, startWith, tap } from "rxjs/operators";
+import {
+  debounceTime, distinctUntilChanged, filter, startWith, tap
+} from "rxjs/operators";
 import { v4 } from "uuid";
 import Vue from "vue";
 
@@ -334,8 +336,7 @@ export default Vue.extend({
     },
     filterSelectedByPastedTags() {
       this.$data.selectedPackagesMirror = this.$data.sourcePackages.filter((x: IPackageData) =>
-        this.$data.pastedTags.includes(x.Label)
-      );
+        this.$data.pastedTags.includes(x.Label));
     },
     selectAll() {
       this.$data.selectedPackagesMirror = this.$data.sourcePackages;
@@ -349,7 +350,7 @@ export default Vue.extend({
         const lock = v4();
         this.$data.lockUuid = lock;
 
-        let allPackages = await primaryDataLoader.onDemandPackageFilter({
+        const allPackages = await primaryDataLoader.onDemandPackageFilter({
           itemName: this.$data.item?.Name || null,
           locationName: this.$data.location?.Name || null,
           isEmpty: this.$props.packageFilters.isEmpty,
@@ -397,8 +398,7 @@ export default Vue.extend({
           });
 
           this.$data.sourcePackages = filteredPackages.sort((a: IPackageData, b: IPackageData) =>
-            a.Label > b.Label ? 1 : -1
-          );
+            (a.Label > b.Label ? 1 : -1));
 
           // This must perform a shallow clone
           this.$data.selectedPackagesMirror = [...this.$data.sourcePackages];
@@ -501,9 +501,7 @@ export default Vue.extend({
         tap((_: any) => {
           this.$data.packagesPageIndex = 0;
         }),
-        filter(([item, location]) => {
-          return !!item || !!location;
-        })
+        filter(([item, location]) => !!item || !!location)
       )
       .subscribe(async ([item, location]: [IItemData, ILocationData]) => {
         this.$data.item = item;

@@ -1,10 +1,8 @@
-
 import "@/test/utils/auto-mock-chrome";
 import "@/test/utils/auto-mock-fetch";
 
 import { METRC_TAG_REGEX } from "@/consts";
 import { getDelimiterSeparatedValuesOrError } from "./package";
-
 
 describe("package.ts", () => {
   it("Extracts delimiter separated values", () => {
@@ -21,13 +19,10 @@ describe("package.ts", () => {
     expect(() =>
       getDelimiterSeparatedValuesOrError("1A4000000000000000001234, 1A400000000000...", {
         regex: METRC_TAG_REGEX,
-      })
-    ).toThrowError();
+      })).toThrowError();
     expect(() =>
-      getDelimiterSeparatedValuesOrError("foobar", { regex: METRC_TAG_REGEX })
-    ).toThrowError();
+      getDelimiterSeparatedValuesOrError("foobar", { regex: METRC_TAG_REGEX })).toThrowError();
     expect(() =>
-      getDelimiterSeparatedValuesOrError("foobar,foobarbaz", { regex: METRC_TAG_REGEX })
-    ).toThrowError();
+      getDelimiterSeparatedValuesOrError("foobar,foobarbaz", { regex: METRC_TAG_REGEX })).toThrowError();
   });
 });

@@ -27,7 +27,7 @@ class T3RequestManager implements IAtomicService {
     try {
       const response = await customAxios(BASE_URL + CLIENT_KEY_PATH, {
         method: "POST",
-        headers: DEFAULT_POST_HEADERS, 
+        headers: DEFAULT_POST_HEADERS,
         body: JSON.stringify({ client_key: clientKey }),
       });
 
@@ -43,7 +43,7 @@ class T3RequestManager implements IAtomicService {
 
       return {
         clientName: client_name,
-        values: values,
+        values,
       };
     } catch (e) {
       // Only overwrite values if server explicitly indicates a 401
@@ -64,7 +64,7 @@ class T3RequestManager implements IAtomicService {
     const response = await customAxios(BASE_URL + T3PLUS_PATH, {
       method: "POST",
       headers: DEFAULT_POST_HEADERS,
-      body: JSON.stringify({metrc_username: authState.identity})
+      body: JSON.stringify({ metrc_username: authState.identity })
     });
 
     return response.data;
@@ -110,4 +110,4 @@ class T3RequestManager implements IAtomicService {
   }
 }
 
-export let t3RequestManager = new T3RequestManager();
+export const t3RequestManager = new T3RequestManager();

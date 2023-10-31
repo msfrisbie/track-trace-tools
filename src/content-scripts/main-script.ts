@@ -3,7 +3,7 @@
 console.log("main-script");
 
 // Preserve the function
-const _confirm = window["confirm"];
+const _confirm = window.confirm;
 
 const BYPASS_CONFIRM_FRAGMENT_LIST: string[] = [
   "Select again on this line?",
@@ -22,4 +22,4 @@ const confirmShim = function (message: string): boolean {
 };
 
 // @ts-ignore
-window["confirm"] = confirmShim;
+window.confirm = confirmShim;

@@ -115,8 +115,7 @@ export async function maybeLoadCogsTrackerReportData({
   const historyPromises: Promise<any>[] = dateFilteredPackages.map((pkg) =>
     primaryDataLoader.packageHistoryByPackageId(pkg.Id).then((history) => {
       pkg.history = history;
-    })
-  );
+    }));
 
   await Promise.allSettled(historyPromises);
 
@@ -171,11 +170,11 @@ export async function maybeLoadCogsTrackerReportData({
   distRexCogsMatrix.push(srcHeaders.map((x) => x));
   packagedGoodsCogsMatrix.push(packagedHeaders.map((x) => x));
 
-  if (!store.state.client.values["PACKAGE_LOCATION_BLACKLIST"]) {
+  if (!store.state.client.values.PACKAGE_LOCATION_BLACKLIST) {
     throw new Error(`Missing client key: PACKAGE_LOCATION_BLACKLIST`);
   }
 
-  const locationNameBlacklist = store.state.client.values["PACKAGE_LOCATION_BLACKLIST"];
+  const locationNameBlacklist = store.state.client.values.PACKAGE_LOCATION_BLACKLIST;
 
   const bulkInfusedPackages = dateFilteredPackages.filter(
     (pkg) =>
@@ -215,9 +214,7 @@ export async function maybeLoadCogsTrackerReportData({
       .reduce((a, b) => a + b, 0);
 
     const sourceValues: [string, string, number, string][] = parentTagQuantityUnitItemSets.map(
-      ([label, quantity, unit, itemName]) => {
-        return [label, itemName, quantity, ""];
-      }
+      ([label, quantity, unit, itemName]) => [label, itemName, quantity, ""]
     );
 
     return [
@@ -262,8 +259,7 @@ export async function maybeLoadCogsTrackerReportData({
   bulkInfusedPackages.map((pkg) => bulkInfusedMatrix.push(cogsTrackerInputRowFactory(pkg)));
   distRexCogsPackages.map((pkg) => distRexCogsMatrix.push(cogsTrackerInputRowFactory(pkg)));
   packagedGoodsCogsPackages.map((pkg) =>
-    packagedGoodsCogsMatrix.push(cogsTrackerOutputRowFactory(pkg))
-  );
+    packagedGoodsCogsMatrix.push(cogsTrackerOutputRowFactory(pkg)));
 
   reportData[ReportType.COGS_TRACKER] = {
     bulkInfusedMatrix,

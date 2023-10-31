@@ -21,8 +21,8 @@ import {
   PackageHistoryGetters,
   PackageHistoryMutations,
   PackageHistoryStatus,
-} from "../package-history/consts";
-import { IPackageHistoryState } from "../package-history/interfaces";
+} from "./consts";
+import { IPackageHistoryState } from "./interfaces";
 
 const inMemoryState = {
   sourcePackage: null,
@@ -290,7 +290,7 @@ export const packageHistoryModule = {
     ) => {
       analyticsManager.track(MessageType.GENERATE_PACKAGE_HISTORY, { pkg });
 
-      if (!store.state.client.values["ENABLE_T3PLUS"] && !store.state.client.t3plus) {
+      if (!store.state.client.values.ENABLE_T3PLUS && !store.state.client.t3plus) {
         return;
       }
 
@@ -433,9 +433,7 @@ export const packageHistoryModule = {
   },
 };
 
-export const packageHistoryReducer = (state: IPackageHistoryState): IPackageHistoryState => {
-  return {
-    ...state,
-    ...inMemoryState,
-  };
-};
+export const packageHistoryReducer = (state: IPackageHistoryState): IPackageHistoryState => ({
+  ...state,
+  ...inMemoryState,
+});

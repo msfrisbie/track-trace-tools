@@ -116,4 +116,4 @@ class PassivePageAnalyzer implements IAtomicService {
   }
 }
 
-export let passivePageAnalyzer = new PassivePageAnalyzer();
+export const passivePageAnalyzer = new PassivePageAnalyzer();

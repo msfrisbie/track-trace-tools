@@ -2,7 +2,6 @@
   <font-awesome-icon :icon="icon" v-bind:style="{ color: iconColor }" />
 </template>
 
-
 <script lang="ts">
 import { IIndexedTransferData } from "@/interfaces";
 import Vue from "vue";

@@ -1,5 +1,7 @@
 import { TaskType } from "@/consts";
-import { IContactInfo, IMetrcAddPackageNoteData, IReorderTagsPayload, Task } from "@/interfaces";
+import {
+  IContactInfo, IMetrcAddPackageNoteData, IReorderTagsPayload, Task
+} from "@/interfaces";
 import { authManager } from "@/modules/auth-manager.module";
 import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
 import { primaryMetrcRequestManager } from "@/modules/metrc-request-manager.module";
@@ -13,8 +15,8 @@ const TASK_TYPES_REQUIRING_FORM_DATA = [
 ];
 
 export async function createTask(taskType: TaskType, formData: any = null): Promise<Task> {
-  let taskId = v4();
-  let taskName = "Task " + taskId;
+  const taskId = v4();
+  let taskName = `Task ${taskId}`;
   let body = null;
 
   if (TASK_TYPES_REQUIRING_FORM_DATA.includes(taskType) && !formData) {
@@ -101,7 +103,7 @@ export async function createTask(taskType: TaskType, formData: any = null): Prom
       throw new Error("Bad task type");
   }
 
-  let taskData = {
+  const taskData = {
     body
   };
 

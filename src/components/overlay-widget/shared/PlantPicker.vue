@@ -213,12 +213,16 @@ import LocationPicker from "@/components/overlay-widget/shared/LocationPicker.vu
 import PickerCard from "@/components/overlay-widget/shared/PickerCard.vue";
 import StrainPicker from "@/components/overlay-widget/shared/StrainPicker.vue";
 import { DATA_LOAD_MAX_COUNT } from "@/consts";
-import { ILocationData, IPlantData, IPlantFilter, IStrainData } from "@/interfaces";
+import {
+  ILocationData, IPlantData, IPlantFilter, IStrainData
+} from "@/interfaces";
 import { authManager } from "@/modules/auth-manager.module";
 import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
 import store from "@/store/page-overlay/index";
 import { combineLatest, Subject } from "rxjs";
-import { debounceTime, distinctUntilChanged, filter, startWith, tap } from "rxjs/operators";
+import {
+  debounceTime, distinctUntilChanged, filter, startWith, tap
+} from "rxjs/operators";
 import { v4 } from "uuid";
 import Vue from "vue";
 import PasteTags from "./PasteTags.vue";
@@ -298,8 +302,7 @@ export default Vue.extend({
     },
     filterSelectedByPastedTags() {
       this.$data.selectedPlantsMirror = this.$data.sourcePlants.filter((x: IPlantData) =>
-        this.$data.pastedTags.includes(x.Label)
-      );
+        this.$data.pastedTags.includes(x.Label));
     },
     selectAll() {
       this.$data.selectedPlantsMirror = this.$data.sourcePlants;
@@ -317,7 +320,7 @@ export default Vue.extend({
 
       if (this.$data.filterDateField && this.$data.filterDateMatch && this.$data.filterDate) {
         // I'm guessing Metrc strips out the time, just match what they're sending
-        const isoDatetime = this.$data.filterDate + "T08:00:00.000Z";
+        const isoDatetime = `${this.$data.filterDate}T08:00:00.000Z`;
 
         if (this.$data.filterDateField === "PlantedDate") {
           switch (this.$data.filterDateMatch) {
@@ -373,19 +376,18 @@ export default Vue.extend({
         const plants =
           this.$data.growthPhase === "Vegetative"
             ? await primaryDataLoader.vegetativePlants({
-                filter,
-                maxCount: DATA_LOAD_MAX_COUNT,
-              })
+              filter,
+              maxCount: DATA_LOAD_MAX_COUNT,
+            })
             : await primaryDataLoader.floweringPlants({
-                filter,
-                maxCount: DATA_LOAD_MAX_COUNT,
-              });
+              filter,
+              maxCount: DATA_LOAD_MAX_COUNT,
+            });
 
         // If there was a subsequent load, don't overwrite
         if (this.$data.lockUuid === lock) {
           this.$data.sourcePlants = plants.sort((a: IPlantData, b: IPlantData) =>
-            a.Label > b.Label ? 1 : -1
-          );
+            (a.Label > b.Label ? 1 : -1));
 
           // This must perform a shallow clone
           this.$data.selectedPlantsMirror = [...this.$data.sourcePlants];
@@ -552,9 +554,7 @@ export default Vue.extend({
           this.$data.plantsPageIndex = 0;
         }),
         filter(
-          ([location, strain, [filterDateField, filterDateMatch, filterDate], growthPhase]) => {
-            return !!location || !!strain || !!filterDate;
-          }
+          ([location, strain, [filterDateField, filterDateMatch, filterDate], growthPhase]) => !!location || !!strain || !!filterDate
         )
       )
       .subscribe(

@@ -30,8 +30,8 @@ import { IIndexedTransferData } from "@/interfaces";
 import { analyticsManager } from "@/modules/analytics-manager.module";
 import { pageManager } from "@/modules/page-manager/page-manager.module";
 import { MutationType } from "@/mutation-types";
-import Vue from "vue";
 import store from "@/store/page-overlay/index";
+import Vue from "vue";
 
 export default Vue.extend({
   name: "TransferSearchResultPreview",
@@ -81,7 +81,7 @@ export default Vue.extend({
           await pageManager.clickTabStartingWith(pageManager.transferTabs, "Rejected");
           break;
         default:
-          return null;
+          return;
       }
 
       pageManager.setTransferFilter(

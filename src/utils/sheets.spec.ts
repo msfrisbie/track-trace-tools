@@ -1,9 +1,9 @@
 import { enableFetchMocks } from "jest-fetch-mock";
 
+import { buildSheetsApiURL, extractSheetIdOrError } from "./sheets";
+
 // Stub before remaining imports
 enableFetchMocks();
-
-import { buildSheetsApiURL, extractSheetIdOrError } from "./sheets";
 
 describe("sheets.ts", () => {
   it("Correctly builds a sheets API URL", () => {

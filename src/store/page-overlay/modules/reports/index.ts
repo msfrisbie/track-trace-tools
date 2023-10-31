@@ -136,7 +136,7 @@ export const reportsModule = {
       ctx.commit(ReportsMutations.SET_STATUS, { status: ReportStatus.INFLIGHT });
 
       try {
-        let reportData: IReportData = {};
+        const reportData: IReportData = {};
 
         await maybeLoadPackageReportData({ ctx, reportData, reportConfig });
         await maybeLoadCogsReportData({ ctx, reportData, reportConfig });
@@ -203,9 +203,7 @@ export const reportsModule = {
   },
 };
 
-export const reportsReducer = (state: IReportsState): IReportsState => {
-  return {
-    ...state,
-    ...inMemoryState,
-  };
-};
+export const reportsReducer = (state: IReportsState): IReportsState => ({
+  ...state,
+  ...inMemoryState,
+});

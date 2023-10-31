@@ -1,4 +1,6 @@
-import { MessageType, PackageState, TagState, TransferState } from "@/consts";
+import {
+  MessageType, PackageState, TagState, TransferState
+} from "@/consts";
 import {
   IAtomicService,
   IIndexedPackageData,
@@ -170,4 +172,4 @@ class DatabaseInterface implements IAtomicService {
   }
 }
 
-export let databaseInterface = new DatabaseInterface();
+export const databaseInterface = new DatabaseInterface();

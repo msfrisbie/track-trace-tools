@@ -1,3 +1,5 @@
+/* eslint-disable import/no-unresolved, no-new, import/extensions, import/named */
+
 import Vue from "vue";
 import TrackTraceToolsPageOverlay from "~/src/components/page-overlay/TrackTraceToolsPageOverlay.vue";
 import { TTT_ROOT_ELEMENT_ID } from "~/src/consts";

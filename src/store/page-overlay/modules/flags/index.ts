@@ -190,9 +190,7 @@ export const flagsModule = {
   }
 };
 
-export const flagsReducer = (state: IFlagsState): IFlagsState => {
-  return {
-    ...state,
-    ...inMemoryState
-  };
-};
+export const flagsReducer = (state: IFlagsState): IFlagsState => ({
+  ...state,
+  ...inMemoryState
+});

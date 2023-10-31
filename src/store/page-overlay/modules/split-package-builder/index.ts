@@ -77,9 +77,7 @@ export const splitPackageBuilderModule = {
 
 export const splitPackageBuilderReducer = (
   state: ISplitPackageBuilderState
-): ISplitPackageBuilderState => {
-  return {
-    ...state,
-    ...inMemoryState,
-  };
-};
+): ISplitPackageBuilderState => ({
+  ...state,
+  ...inMemoryState,
+});

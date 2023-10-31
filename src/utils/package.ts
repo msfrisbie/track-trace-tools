@@ -182,19 +182,16 @@ export function getItemUnitOfMeasureNameOrError(
 export async function getParentPackageLabelsDeprecated(pkg: ISimpleCogsPackageData) {
   if (!pkg.SourcePackageLabels.endsWith("...")) {
     return pkg.SourcePackageLabels.split(",").map((x) => x.trim());
-  } else {
-    // Source package labels may have been truncated
-    if (pkg.parentPackageLabels) {
-      return pkg.parentPackageLabels;
-    } else {
-      console.warn(`${pkg.Label} falling back to parent label history fetch`);
-      const history = await getDataLoaderByLicense(pkg.LicenseNumber).then((dataLoader) =>
-        dataLoader.packageHistoryByPackageId(pkg.Id)
-      );
-
-      return extractParentPackageLabelsFromHistory(history);
-    }
   }
+  // Source package labels may have been truncated
+  if (pkg.parentPackageLabels) {
+    return pkg.parentPackageLabels;
+  }
+  console.warn(`${pkg.Label} falling back to parent label history fetch`);
+  const history = await getDataLoaderByLicense(pkg.LicenseNumber).then((dataLoader) =>
+    dataLoader.packageHistoryByPackageId(pkg.Id));
+
+  return extractParentPackageLabelsFromHistory(history);
 }
 
 export async function getParentPackageLabels(pkg: ISimpleTransferPackageData | ISimplePackageData) {
@@ -206,17 +203,15 @@ export async function getParentPackageLabels(pkg: ISimpleTransferPackageData | I
     // Source package labels may have been truncated
     if (pkg.parentPackageLabels) {
       return pkg.parentPackageLabels;
-    } else {
-      if (pkg.PackageState !== PackageState.DEPARTED_FACILITY) {
-        const history = await getDataLoaderByLicense(pkg.LicenseNumber).then((dataLoader) =>
-          dataLoader.packageHistoryByPackageId(pkg.Id)
-        );
+    }
+    if (pkg.PackageState !== PackageState.DEPARTED_FACILITY) {
+      const history = await getDataLoaderByLicense(pkg.LicenseNumber).then((dataLoader) =>
+        dataLoader.packageHistoryByPackageId(pkg.Id));
 
-        const historyParsedLabels = extractParentPackageLabelsFromHistory(history);
+      const historyParsedLabels = extractParentPackageLabelsFromHistory(history);
 
-        if (historyParsedLabels.length > 0) {
-          return historyParsedLabels;
-        }
+      if (historyParsedLabels.length > 0) {
+        return historyParsedLabels;
       }
     }
   }
@@ -235,15 +230,15 @@ export async function getLabTestUrlsFromPackage({
 
   const testResults = await primaryDataLoader.testResultsByPackageId(pkg.Id);
 
-  let fileIds = new Set<number>();
+  const fileIds = new Set<number>();
 
-  for (let testResult of testResults) {
+  for (const testResult of testResults) {
     if (testResult.LabTestResultDocumentFileId) {
       fileIds.add(testResult.LabTestResultDocumentFileId);
     }
   }
 
-  if (fileIds.size == 0 && showZeroResultsError) {
+  if (fileIds.size === 0 && showZeroResultsError) {
     setTimeout(() => {
       toastManager.openToast(`Metrc did not return any lab PDFs for this package.`, {
         title: "Missing Lab Results",
@@ -275,7 +270,7 @@ export async function getLabTestUrlsFromPackage({
 export async function downloadLabTests({ pkg }: { pkg: IPackageData }) {
   const fileUrls = await getLabTestUrlsFromPackage({ pkg });
 
-  for (let url of fileUrls) {
+  for (const url of fileUrls) {
     console.log(url);
 
     downloadFileFromUrl({ url, filename: `${pkg.Label}.pdf` });
@@ -293,7 +288,7 @@ export async function downloadLabTests({ pkg }: { pkg: IPackageData }) {
   //     }
   // }
 
-  // if (fileIds.size == 0) {
+  // if (fileIds.size === 0) {
   //     setTimeout(() => {
   //         toastManager.openToast(
   //             `Metrc did not return any lab PDFs for this package.`,

@@ -1,13 +1,13 @@
 <template>
   <div>
-    <settings-form v-if="!currentView || currentView == settings" />
-    <csv-links v-if="currentView == createCsv" />
-    <screenshot v-if="currentView == screenshot" />
-    <void-tag-form v-if="currentView == voidTags" />
-    <package-note-form v-if="currentView == packageNote" />
-    <reorder-tags-form v-if="currentView == reorderTags" />
-    <finalize-sales-receipts-form v-if="currentView == finalizeSales" />
-    <manage-account v-if="currentView == manageAccount" />
+    <settings-form v-if="!currentView || currentView === settings" />
+    <csv-links v-if="currentView === createCsv" />
+    <screenshot v-if="currentView === screenshot" />
+    <void-tag-form v-if="currentView === voidTags" />
+    <package-note-form v-if="currentView === packageNote" />
+    <reorder-tags-form v-if="currentView === reorderTags" />
+    <finalize-sales-receipts-form v-if="currentView === finalizeSales" />
+    <manage-account v-if="currentView === manageAccount" />
   </div>
 </template>
 

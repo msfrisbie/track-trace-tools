@@ -141,7 +141,7 @@ export default Vue.extend({
         return;
       }
 
-      if (!!(this as any).location) {
+      if ((this as any).location) {
         return;
       }
 

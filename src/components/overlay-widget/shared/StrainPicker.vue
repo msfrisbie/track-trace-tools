@@ -253,9 +253,8 @@ export default Vue.extend({
         (this as any).$data.newStrainIndicaPercent !== 0
       ) {
         return "% Indica";
-      } else {
-        return `% Indica, ${100 - (this as any).$data.newStrainIndicaPercent}% Sativa`;
       }
+      return `% Indica, ${100 - (this as any).$data.newStrainIndicaPercent}% Sativa`;
     }
   },
   watch: {
@@ -301,7 +300,7 @@ export default Vue.extend({
       }
     },
     maybeSetStrainDefault() {
-      if (!!this.$data.strains) {
+      if (this.$data.strains) {
         return;
       }
 
@@ -309,7 +308,7 @@ export default Vue.extend({
         return;
       }
 
-      if (!!(this as any).strain) {
+      if ((this as any).strain) {
         return;
       }
 
@@ -331,9 +330,8 @@ export default Vue.extend({
       function numberStringOrEmptyString(val: number | null | undefined | ""): string {
         if (!val && val !== 0) {
           return "";
-        } else {
-          return "" + val;
         }
+        return `${val}`;
       }
 
       const rows: IMetrcCreateStrainsPayload[] = [

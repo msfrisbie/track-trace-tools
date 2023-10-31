@@ -227,7 +227,7 @@ export async function loadAndCacheCogsV2Data({
       }
     }
 
-    let filter1initial = richOutgoingTransfers.length;
+    const filter1initial = richOutgoingTransfers.length;
 
     // Apply wide filter to transfers before loading destinations
     // createdAt < LT, and lastModified > GT
@@ -250,8 +250,7 @@ export async function loadAndCacheCogsV2Data({
         getDataLoaderByLicense(transfer.LicenseNumber).then((dataLoader) =>
           dataLoader.transferDestinations(transfer.Id).then((destinations) => {
             transfer.outgoingDestinations = destinations;
-          })
-        )
+          }))
       );
 
       if (richOutgoingTransferDestinationRequests.length % 250 === 0) {
@@ -277,8 +276,8 @@ export async function loadAndCacheCogsV2Data({
       prependMessage: false,
     });
 
-    let filter2initial = richOutgoingTransfers.length;
-    let filter2initialSubcount = richOutgoingTransfers
+    const filter2initial = richOutgoingTransfers.length;
+    const filter2initialSubcount = richOutgoingTransfers
       .map((x) => (x.outgoingDestinations || []).length)
       .reduce((a, b) => a + b, 0);
 
@@ -319,8 +318,7 @@ export async function loadAndCacheCogsV2Data({
           getDataLoaderByLicense(transfer.LicenseNumber).then((dataLoader) =>
             dataLoader.destinationPackages(destination.Id).then((destinationPackages) => {
               destination.packages = destinationPackages;
-            })
-          )
+            }))
         );
 
         if (packageRequests.length % 50 === 0) {
@@ -343,8 +341,7 @@ export async function loadAndCacheCogsV2Data({
           .map((x) =>
             (x.outgoingDestinations || [])
               .map((x) => x.packages?.length || 0)
-              .reduce((a, b) => a + b, 0)
-          )
+              .reduce((a, b) => a + b, 0))
           .flat()
           .reduce((a, b) => a + b, 0)} packages`,
         level: "success",
@@ -389,7 +386,7 @@ export async function loadAndCacheCogsV2Data({
         }
 
         while (buffer.length > 0) {
-          let target = buffer.pop()!;
+          const target = buffer.pop()!;
 
           scopedAncestorPackageMap.set(target.Label, target);
 
@@ -507,7 +504,7 @@ export async function updateCogsV2MasterCostSheet({
       transferFilter.estimatedDepartureDateLt!
     ).split("T");
 
-    let {
+    const {
       richOutgoingTransfers,
       scopedAncestorPackageMap,
       fullPackageLabelMap,
@@ -522,12 +519,12 @@ export async function updateCogsV2MasterCostSheet({
 
     // Load data sheet
 
-    if (!store.state.client.values["MASTER_PB_COST_SHEET_URL"]) {
+    if (!store.state.client.values.MASTER_PB_COST_SHEET_URL) {
       return;
     }
-    
+
     const spreadsheetId = extractSheetIdOrError(
-      store.state.client.values["MASTER_PB_COST_SHEET_URL"]
+      store.state.client.values.MASTER_PB_COST_SHEET_URL
     );
 
     const response: { data: { result: { values: any[][] } } } = await readSpreadsheet({
@@ -609,7 +606,7 @@ export async function computeIsConnected(
   pkg: IIndexedPackageData,
   scopedAncestorPackageMap: Map<string, IIndexedPackageData>
 ): Promise<[boolean, string]> {
-  let buffer: IIndexedPackageData[] = [pkg];
+  const buffer: IIndexedPackageData[] = [pkg];
 
   while (buffer.length > 0) {
     const target = buffer.pop()!;
@@ -841,7 +838,7 @@ export async function maybeLoadCogsV2ReportData({
     "T"
   );
 
-  let {
+  const {
     richOutgoingTransfers,
     scopedAncestorPackageMap,
     scopedProductionBatchPackageMap,
@@ -858,12 +855,12 @@ export async function maybeLoadCogsV2ReportData({
   const worksheetMatrix: any[][] = [];
   const cogsMatrix: any[][] = [];
 
-  if (!store.state.client.values["MASTER_PB_COST_SHEET_URL"]) {
+  if (!store.state.client.values.MASTER_PB_COST_SHEET_URL) {
     return;
   }
 
   const spreadsheetId = extractSheetIdOrError(
-    store.state.client.values["MASTER_PB_COST_SHEET_URL"]
+    store.state.client.values.MASTER_PB_COST_SHEET_URL
   );
 
   const response: { data: { result: { values: any[][] } } } = await readSpreadsheet({
@@ -1016,10 +1013,10 @@ export async function maybeLoadCogsV2ReportData({
           // Is connected, walk up package tree recursively
 
           try {
-            let connectedMultiplierBuffer: [IIndexedPackageData, string, number][] = [
+            const connectedMultiplierBuffer: [IIndexedPackageData, string, number][] = [
               [sourcePackage, manifestPkg.PackageLabel, 1],
             ];
-            let finalBuffer: [IIndexedPackageData, number][] = [];
+            const finalBuffer: [IIndexedPackageData, number][] = [];
 
             while (connectedMultiplierBuffer.length > 0) {
               const [target, childLabel, currentMultiplier] = connectedMultiplierBuffer.pop()!;
@@ -1076,25 +1073,25 @@ export async function maybeLoadCogsV2ReportData({
 
             if (status === "INITIAL") {
               costEquation =
-                "=" +
-                finalBuffer
-                  .map(([pkg, multiplier]) => {
-                    const initialProductionBatchQuantity =
+                `=${
+                  finalBuffer
+                    .map(([pkg, multiplier]) => {
+                      const initialProductionBatchQuantity =
                       extractInitialPackageQuantityAndUnitFromHistoryOrError(pkg.history!);
 
-                    const vlookupCostExpression = `VLOOKUP("${getLabelOrError(pkg)}", '${
-                      SheetTitles.WORKSHEET
-                    }'!B:L, 3, FALSE)`;
+                      const vlookupCostExpression = `VLOOKUP("${getLabelOrError(pkg)}", '${
+                        SheetTitles.WORKSHEET
+                      }'!B:L, 3, FALSE)`;
 
-                    const vlookupQuantityAdjustMultiplierExpression = `(${
-                      initialProductionBatchQuantity[0]
-                    } / VLOOKUP("${getLabelOrError(pkg)}", '${
-                      SheetTitles.WORKSHEET
-                    }'!B:L, 6, FALSE))`;
+                      const vlookupQuantityAdjustMultiplierExpression = `(${
+                        initialProductionBatchQuantity[0]
+                      } / VLOOKUP("${getLabelOrError(pkg)}", '${
+                        SheetTitles.WORKSHEET
+                      }'!B:L, 6, FALSE))`;
 
-                    return `(${multiplier} * ${vlookupCostExpression} * ${vlookupQuantityAdjustMultiplierExpression})`;
-                  })
-                  .join(" + ");
+                      return `(${multiplier} * ${vlookupCostExpression} * ${vlookupQuantityAdjustMultiplierExpression})`;
+                    })
+                    .join(" + ")}`;
 
               debugNote = "Walked graph";
               status = "SUCCESS";
@@ -1128,11 +1125,11 @@ export async function maybeLoadCogsV2ReportData({
               manifestPkg.ShippedQuantity / initialProductionBatchQuantity[0];
 
             if (isEligibleForItemQuantityRatioOptimization) {
-              optimizationMultiplier = optimizationMultiplier / parentToChildRatio;
+              optimizationMultiplier /= parentToChildRatio;
               debugNote = "Used quantity ratio optimization";
               publicNote = "T3 estimated this cost based on item names. Verify before use.";
             } else if (isEligibleForItemQuantityRatioPackStragegyOptimization) {
-              optimizationMultiplier = optimizationMultiplier / parentToChildPackRatio;
+              optimizationMultiplier /= parentToChildPackRatio;
               debugNote = "Used pack ratio optimization";
               publicNote = "T3 estimated this cost based on item names. Verify before use.";
             } else {

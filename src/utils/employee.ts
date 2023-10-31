@@ -48,8 +48,7 @@ export function getAllocatedSampleFromPackageHistoryEntryOrNull(
   let employeeLicenseNumber: string | null = null;
 
   const [adjustmentLineMatch] = historyEntry.Descriptions.map((x) =>
-    x.match(ADJUSTMENT_REGEX)
-  ).filter((x) => !!x);
+    x.match(ADJUSTMENT_REGEX)).filter((x) => !!x);
   const [employeeLineMatch] = historyEntry.Descriptions.map((x) => x.match(EMPLOYEE_REGEX)).filter(
     (x) => !!x
   );

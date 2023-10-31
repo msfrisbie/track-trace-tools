@@ -11,4 +11,4 @@ class SandboxManager implements IAtomicService {
   async runsAfterAuthInit() {}
 }
 
-export let sandboxManager = new SandboxManager();
+export const sandboxManager = new SandboxManager();

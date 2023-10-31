@@ -234,8 +234,7 @@ export default Vue.extend({
     },
     labelPackages(): IIndexedPackageData[] {
       const packages = this.packages.filter((packageData) =>
-        packageData.Label.includes(store.state.search.queryString)
-      );
+        packageData.Label.includes(store.state.search.queryString));
 
       return packages;
     },
@@ -243,8 +242,7 @@ export default Vue.extend({
       const packages = this.packages.filter((packageData) =>
         packageData.SourceHarvestNames?.toUpperCase().includes(
           store.state.search.queryString.toUpperCase()
-        )
-      );
+        ));
 
       return packages;
     },
@@ -252,8 +250,7 @@ export default Vue.extend({
       const packages = this.packages.filter((packageData) =>
         packageData.SourcePackageLabels?.toUpperCase().includes(
           store.state.search.queryString.toUpperCase()
-        )
-      );
+        ));
 
       return packages;
     },
@@ -261,8 +258,7 @@ export default Vue.extend({
       const packages = this.packages.filter((packageData) =>
         packageData.ProductionBatchNumber?.toUpperCase().includes(
           store.state.search.queryString.toUpperCase()
-        )
-      );
+        ));
 
       return packages;
     },
@@ -270,15 +266,13 @@ export default Vue.extend({
       const packages = this.packages.filter((packageData) =>
         packageData.SourceProductionBatchNumbers?.toUpperCase().includes(
           store.state.search.queryString.toUpperCase()
-        )
-      );
+        ));
 
       return packages;
     },
     itemNamePackages(): IIndexedPackageData[] {
       const packages = this.packages.filter((packageData) =>
-        packageData.Item?.Name?.toUpperCase().includes(store.state.search.queryString.toUpperCase())
-      );
+        packageData.Item?.Name?.toUpperCase().includes(store.state.search.queryString.toUpperCase()));
 
       return packages;
     },
@@ -286,8 +280,7 @@ export default Vue.extend({
       const packages = this.packages.filter((packageData) =>
         packageData.Item.StrainName?.toUpperCase().includes(
           store.state.search.queryString.toUpperCase()
-        )
-      );
+        ));
 
       return packages;
     },
@@ -295,8 +288,7 @@ export default Vue.extend({
       const packages = this.packages.filter((packageData) =>
         packageData.LocationName?.toUpperCase().includes(
           store.state.search.queryString.toUpperCase()
-        )
-      );
+        ));
 
       return packages;
     },
@@ -304,8 +296,7 @@ export default Vue.extend({
       const packages = this.packages.filter((packageData) =>
         packageData.Item.ProductCategoryName?.toUpperCase().includes(
           store.state.search.queryString.toUpperCase()
-        )
-      );
+        ));
 
       return packages;
     },

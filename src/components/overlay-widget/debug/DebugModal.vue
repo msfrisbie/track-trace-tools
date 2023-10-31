@@ -36,7 +36,7 @@ export default Vue.extend({
     },
     toggle() {
       // @ts-ignore
-      this.$refs["debug"].toggle();
+      this.$refs.debug.toggle();
     },
   },
   async mounted() {},

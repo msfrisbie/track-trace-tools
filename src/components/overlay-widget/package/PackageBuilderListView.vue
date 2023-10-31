@@ -110,7 +110,7 @@ export default Vue.extend({
           backgroundColor: "#2774ae",
           isBeta: true,
           isNew: false,
-          enabled: false, ///isCurrentHostAllowed([HOST_WILDCARD]),
+          enabled: false, /// isCurrentHostAllowed([HOST_WILDCARD]),
           visible: true,
         },
         {
@@ -175,7 +175,7 @@ export default Vue.extend({
           backgroundColor: "#2774ae",
           // isBeta: true,
           isNew: false,
-          enabled: false, //isCurrentHostAllowed([HOST_WILDCARD]),
+          enabled: false, // isCurrentHostAllowed([HOST_WILDCARD]),
           visible: false,
           showDisabledMessage: true,
         },
@@ -186,8 +186,8 @@ export default Vue.extend({
           backgroundColor: "#2774ae",
           // isBeta: true,
           isNew: false,
-          enabled: true, //isCurrentHostAllowed([HOST_WILDCARD]),
-          visible: store.state.client.values["ENABLE_EMPLOYEE_SAMPLE_TOOL"],
+          enabled: true, // isCurrentHostAllowed([HOST_WILDCARD]),
+          visible: store.state.client.values.ENABLE_EMPLOYEE_SAMPLE_TOOL,
           showDisabledMessage: true,
         },
       ];

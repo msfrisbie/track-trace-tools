@@ -137,7 +137,6 @@ export default Vue.extend({
 
       if (modalEventOptions?.initialRoute && this.$route.path !== modalEventOptions?.initialRoute) {
         this.$router.push(modalEventOptions.initialRoute);
-        return;
       }
     },
     async hide() {
@@ -145,7 +144,7 @@ export default Vue.extend({
     },
     toggle() {
       // @ts-ignore
-      this.$refs["builder"].toggle();
+      this.$refs.builder.toggle();
     },
     toggleFullscreen() {
       if (this.$data.isFullscreen) {
@@ -218,9 +217,8 @@ export default Vue.extend({
     clientBuildSuffix() {
       if (store.state.client.clientName) {
         return ` (${store.state.client.clientName})`;
-      } else {
-        return "";
       }
+      return "";
     },
     ...mapState([
       "trackedInteractions",

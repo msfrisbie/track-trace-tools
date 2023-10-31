@@ -298,7 +298,7 @@ export default Vue.extend({
       );
     },
     async downloadAll(): Promise<void> {
-      for (let csvFile of this.csvFiles) {
+      for (const csvFile of this.csvFiles) {
         await downloadCsvFile({ csvFile, delay: 500 });
       }
 

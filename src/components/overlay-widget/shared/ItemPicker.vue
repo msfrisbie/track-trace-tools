@@ -145,7 +145,7 @@ export default Vue.extend({
           ).map((x: IIndexedPackageData) => x.Item);
         }
 
-        for (let item of items) {
+        for (const item of items) {
           if (itemMatchesFilters(item, this.$props.itemFilters)) {
             itemMap.set(item.Id, item);
           }

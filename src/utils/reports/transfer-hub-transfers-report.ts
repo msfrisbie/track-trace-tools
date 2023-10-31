@@ -128,9 +128,7 @@ export async function maybeLoadTransferHubTransfersReportData({
       });
     }
 
-    richTransferHubTransfers = richTransferHubTransfers.filter((transfer) => {
-      return true;
-    });
+    richTransferHubTransfers = richTransferHubTransfers.filter((transfer) => true);
 
     reportData[ReportType.TRANSFER_HUB_TRANSFERS] = {
       transferHubTransfers: richTransferHubTransfers,

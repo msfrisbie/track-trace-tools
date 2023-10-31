@@ -58,6 +58,8 @@ module.exports = {
     quotes: "off",
     "operator-linebreak": "off",
     "comma-dangle": "off",
+    "no-cond-assign": "warn",
+    "no-return-assign": "warn"
   },
 
   extends: ["plugin:vue/essential", "@vue/typescript", "@vue/airbnb"],

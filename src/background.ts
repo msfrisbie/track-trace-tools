@@ -77,7 +77,7 @@ chrome.runtime.onMessage.addListener((inboundEvent, sender, sendResponse) => {
 
           let cookies: chrome.cookies.Cookie[] = [];
 
-          let promises: Promise<any>[] = [];
+          const promises: Promise<any>[] = [];
 
           cookieStores.map((cookieStore) =>
             promises.push(
@@ -87,8 +87,7 @@ chrome.runtime.onMessage.addListener((inboundEvent, sender, sendResponse) => {
                   storeId: cookieStore.id,
                 })
                 .then((singleStoreCookies) => (cookies = cookies.concat(singleStoreCookies)))
-            )
-          );
+            ));
 
           Promise.allSettled(promises).then(() => {
             respondToContentScript(sendResponse, inboundEvent, {
@@ -124,19 +123,19 @@ chrome.runtime.onMessage.addListener((inboundEvent, sender, sendResponse) => {
         });
         break;
 
-      // case MessageType.SEARCH_PACKAGES:
-      //   // Log the search
-      //   // logEvent(MessageType.REFRESH_PACKAGE_RESULTS, inboundEvent.message.data, inboundEvent.message.options);
+        // case MessageType.SEARCH_PACKAGES:
+        //   // Log the search
+        //   // logEvent(MessageType.REFRESH_PACKAGE_RESULTS, inboundEvent.message.data, inboundEvent.message.options);
 
-      //   // Perform the search
-      //   respondToContentScript(sendResponse, inboundEvent, {
-      //     packages: await database.packageSearch(
-      //       inboundEvent.message.data.query,
-      //       inboundEvent.message.data.license,
-      //       inboundEvent.message.data.filters
-      //     ),
-      //   });
-      //   break;
+        //   // Perform the search
+        //   respondToContentScript(sendResponse, inboundEvent, {
+        //     packages: await database.packageSearch(
+        //       inboundEvent.message.data.query,
+        //       inboundEvent.message.data.license,
+        //       inboundEvent.message.data.filters
+        //     ),
+        //   });
+        //   break;
 
       case MessageType.INDEX_TRANSFERS:
         database.indexTransfers(inboundEvent.message.data.indexedTransfersData).then(() => {
@@ -194,21 +193,21 @@ chrome.runtime.onMessage.addListener((inboundEvent, sender, sendResponse) => {
         });
         break;
 
-      // case MessageType.GET_EXTENSION_URL:
-      //   // https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/runtime/getURL
-      //   respondToContentScript(sendResponse, inboundEvent, {
-      //     success: true,
-      //     url: await browser.runtime.getURL(inboundEvent.message.data.path),
-      //   });
-      //   break;
+        // case MessageType.GET_EXTENSION_URL:
+        //   // https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/runtime/getURL
+        //   respondToContentScript(sendResponse, inboundEvent, {
+        //     success: true,
+        //     url: await browser.runtime.getURL(inboundEvent.message.data.path),
+        //   });
+        //   break;
 
-      // case MessageType.CHECK_PERMISSIONS:
-      //   // https://chrome-apps-doc2.appspot.com/extensions/permissions.html
-      //   respondToContentScript(sendResponse, inboundEvent, {
-      //     success: true,
-      //     hasPermissions: await browser.permissions.contains(inboundEvent.message.data),
-      //   });
-      //   break;
+        // case MessageType.CHECK_PERMISSIONS:
+        //   // https://chrome-apps-doc2.appspot.com/extensions/permissions.html
+        //   respondToContentScript(sendResponse, inboundEvent, {
+        //     success: true,
+        //     hasPermissions: await browser.permissions.contains(inboundEvent.message.data),
+        //   });
+        //   break;
 
       //   break;
       case MessageType.CHECK_OAUTH:
@@ -419,7 +418,7 @@ try {
       logEvent(`NEW_INSTALL`, {}, {});
 
       // Acquire the welcome page URL
-      let url = chrome.runtime.getURL("index.html");
+      const url = chrome.runtime.getURL("index.html");
 
       // // Open the welcome page in a new tab .
       chrome.tabs.create({ url });
@@ -433,7 +432,7 @@ try {
 
 chrome.action.onClicked.addListener(() => {
   // Acquire the welcome page URL
-  let url = chrome.runtime.getURL("index.html");
+  const url = chrome.runtime.getURL("index.html");
 
   // // Open the welcome page in a new tab .
   chrome.tabs.create({ url });

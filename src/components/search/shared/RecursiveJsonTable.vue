@@ -48,7 +48,7 @@ export default Vue.extend({
         const result = {};
 
         function recurse(current: any, path = "") {
-          for (let key in current) {
+          for (const key in current) {
             const newPath = path ? `${path}${key}` : key;
             if (typeof current[key] === "object") {
               recurse(current[key], newPath);

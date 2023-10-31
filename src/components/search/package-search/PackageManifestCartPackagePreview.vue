@@ -25,6 +25,7 @@ import { TransferBuilderActions } from "@/store/page-overlay/modules/transfer-bu
 import { getLabelOrError, getNormalizedPackageContentsDescription } from "@/utils/package";
 import Vue from "vue";
 import { mapActions, mapState } from "vuex";
+
 export default Vue.extend({
   name: "PackageManifestCartPackagePreview",
   components: {

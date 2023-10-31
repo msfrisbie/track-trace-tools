@@ -39,7 +39,7 @@ export default Vue.extend({
     },
     toggle() {
       // @ts-ignore
-      this.$refs["promo"].toggle();
+      this.$refs.promo.toggle();
     },
   },
   async mounted() {},

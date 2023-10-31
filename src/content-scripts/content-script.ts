@@ -1,3 +1,5 @@
+/* eslint-disable import/no-unresolved, no-new, import/extensions, import/named */
+
 import OverlayWidget from "@/components/overlay-widget/OverlayWidget.vue";
 import FloatingFacilityPicker from "@/components/page-overlay/FloatingFacilityPicker.vue";
 import TrackTraceToolsPageOverlay from "@/components/page-overlay/TrackTraceToolsPageOverlay.vue";
@@ -57,7 +59,7 @@ async function initializeTooklit() {
     return;
   }
 
-  if (!!document.querySelector(TRACK_TRACE_TOOLS_ROOT_ELEMENT_SELECTOR)) {
+  if (document.querySelector(TRACK_TRACE_TOOLS_ROOT_ELEMENT_SELECTOR)) {
     console.error("Metrc toolkit already exists on page");
     return;
   }

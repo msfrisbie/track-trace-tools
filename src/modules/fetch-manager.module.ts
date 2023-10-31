@@ -25,12 +25,8 @@ axiosRetry(client, {
 });
 
 client.interceptors.response.use(
-  (response) => {
-    return response;
-  },
-  (error) => {
-    return Promise.reject(error);
-  }
+  (response) => response,
+  (error) => Promise.reject(error)
 );
 
 // Service workers cannot use Axios

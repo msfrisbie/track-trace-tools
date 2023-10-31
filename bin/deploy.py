@@ -139,7 +139,7 @@ Commit the release:
         wait_for_enter()
 
 
-if __name__ == "__main__":
+if __name__ === "__main__":
     # context = {"username": sys.argv[1]}
     context = {}
 

@@ -153,8 +153,7 @@ export const transferBuilderModule = {
       // currentList.packages.sort((a, b) => (getLabelOrError(a) > getLabelOrError(b) ? 1 : -1));
 
       state.transferPackageList = packages.sort((a, b) =>
-        getLabelOrError(a) > getLabelOrError(b) ? 1 : -1
-      );
+        (getLabelOrError(a) > getLabelOrError(b) ? 1 : -1));
     },
     [TransferBuilderMutations.UPDATE_TRANSFER_DATA](
       state: ITransferBuilderState,
@@ -182,39 +181,38 @@ export const transferBuilderModule = {
       getters: any,
       rootState: any,
       rootGetters: any
-    ) => {
-      return state.transferPackageList;
-      // if (!rootGetters.authState) {
-      //   throw new Error("Missing identity/license");
-      // }
+    ) =>
+      state.transferPackageList, // if (!rootGetters.authState) {
+    //   throw new Error("Missing identity/license");
+    // }
 
-      // const { identity, license } = rootGetters.authState;
+    // const { identity, license } = rootGetters.authState;
 
-      // return (
-      //   getActiveTransferPackageListOrNull({ state, identity, license }) || {
-      //     license,
-      //     identity,
-      //     packages: [],
-      //   }
-      // );
-    },
+    // return (
+    //   getActiveTransferPackageListOrNull({ state, identity, license }) || {
+    //     license,
+    //     identity,
+    //     packages: [],
+    //   }
+    // );
+
     [TransferBuilderGetters.IS_PACKAGE_IN_ACTIVE_LIST]:
       (state: ITransferBuilderState, getters: any, rootState: any, rootGetters: any) =>
-      ({ pkg }: { pkg: IUnionIndexedPackageData }): boolean => {
-        if (!rootGetters.authState) {
-          throw new Error("Missing identity/license");
-        }
+        ({ pkg }: { pkg: IUnionIndexedPackageData }): boolean => {
+          if (!rootGetters.authState) {
+            throw new Error("Missing identity/license");
+          }
 
-        // const { identity, license } = rootGetters.authState;
+          // const { identity, license } = rootGetters.authState;
 
-        // const activeList = getActiveTransferPackageListOrNull({ state, identity, license });
+          // const activeList = getActiveTransferPackageListOrNull({ state, identity, license });
 
-        // if (!activeList) {
-        //   return false;
-        // }
+          // if (!activeList) {
+          //   return false;
+          // }
 
-        return !!state.transferPackageList.find((x) => getLabelOrError(x) === getLabelOrError(pkg));
-      },
+          return !!state.transferPackageList.find((x) => getLabelOrError(x) === getLabelOrError(pkg));
+        },
   },
 
   actions: {
@@ -258,7 +256,7 @@ export const transferBuilderModule = {
       const refreshedPackages: IPackageData[] = [];
 
       // Removing and adding all packages will preserve order
-      for (let pkg of ctx.getters[TransferBuilderGetters.ACTIVE_PACKAGE_LIST]) {
+      for (const pkg of ctx.getters[TransferBuilderGetters.ACTIVE_PACKAGE_LIST]) {
         // const match = packageMap.get(pkg.Label);
         try {
           const matchedPkg = await primaryDataLoader.activePackage(pkg.Label);
@@ -397,8 +395,7 @@ export const transferBuilderModule = {
 
       const packages = await destinationPackages;
       destinationPackages.map((pkg) =>
-        inTransitPackages.find((transitPkg) => transitPkg.Label === pkg.PackageLabel)
-      );
+        inTransitPackages.find((transitPkg) => transitPkg.Label === pkg.PackageLabel));
 
       for (const pkg of packages) {
         await ctx.dispatch(TransferBuilderActions.ADD_PACKAGE, { pkg });
@@ -417,8 +414,8 @@ export const transferBuilderModule = {
           : undefined,
         destinationFacility: destination
           ? destinationFacilities.find(
-              (x) => x.LicenseNumber === destination.RecipientFacilityLicenseNumber
-            )
+            (x) => x.LicenseNumber === destination.RecipientFacilityLicenseNumber
+          )
           : undefined,
         transferType,
         departureIsodate,
@@ -469,9 +466,7 @@ export const transferBuilderModule = {
   },
 };
 
-export const transferBuilderReducer = (state: ITransferBuilderState): ITransferBuilderState => {
-  return {
-    ...state,
-    ...inMemoryState,
-  };
-};
+export const transferBuilderReducer = (state: ITransferBuilderState): ITransferBuilderState => ({
+  ...state,
+  ...inMemoryState,
+});

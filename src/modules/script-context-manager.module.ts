@@ -30,7 +30,7 @@ function localModalForm(
   requestType
 ) {
   // @ts-ignore
-  let metrc = window.metrc as any;
+  const metrc = window.metrc as any;
 
   if (metrc.kendo.modalWindowOpened) return null;
   metrc.kendo.modalWindowOpened = true;
@@ -43,14 +43,14 @@ function localModalForm(
   success = success || function () {};
   requestType = requestType || "GET";
 
-  let usingSpinner = metrc.startSpinner(),
-    $element = metrc.$(document.createElement("div")),
-    destroyModalWindow = function () {
-      setTimeout(function () {
-        $element.data("kendoWindow").destroy();
-      }, 1000);
-      delete metrc.kendo.modalWindowOpened;
-    };
+  const usingSpinner = metrc.startSpinner();
+  const $element = metrc.$(document.createElement("div"));
+  const destroyModalWindow = function () {
+    setTimeout(() => {
+      $element.data("kendoWindow").destroy();
+    }, 1000);
+    delete metrc.kendo.modalWindowOpened;
+  };
 
   $element.kendoWindow({
     // config
@@ -58,10 +58,10 @@ function localModalForm(
     draggable: true,
     modal: true,
     resizable: false,
-    title: title,
+    title,
     // events
     open: openHandler,
-    activate: function () {
+    activate() {
       if (usingSpinner) {
         metrc.stopSpinner();
       }
@@ -83,7 +83,7 @@ function localModalForm(
     },
   });
 
-  let kWindow = $element.data("kendoWindow");
+  const kWindow = $element.data("kendoWindow");
 
   $element.html(formContent);
 
@@ -112,7 +112,9 @@ function localModalForm(
 
 class ScriptContextManager implements IAtomicService {
   private _metrcPromise: Promise<Metrc | null>;
+
   private _metrcResolver: any;
+
   private _metrcRejecter: any;
 
   constructor() {
@@ -154,11 +156,11 @@ class ScriptContextManager implements IAtomicService {
     // };
 
     for (let i = 0; i < scriptTags.length; ++i) {
-      let scriptTag = scriptTags[i];
-      let srcAttr = scriptTag.getAttribute("src");
+      const scriptTag = scriptTags[i];
+      const srcAttr = scriptTag.getAttribute("src");
 
       if (!srcAttr) {
-        let inlineScriptText = scriptTag.innerText;
+        const inlineScriptText = scriptTag.innerText;
 
         if (inlineScriptText.indexOf("ApiVerificationToken") > -1) {
           authTag = scriptTag;
@@ -171,7 +173,7 @@ class ScriptContextManager implements IAtomicService {
     // This fixes the setTimeout context on firefox
     window.setTimeout = window.setTimeout.bind(window);
 
-    for (let path of staticAssetPaths) {
+    for (const path of staticAssetPaths) {
       let response;
       try {
         response = await customAxios(window.location.origin + path, {});
@@ -182,7 +184,7 @@ class ScriptContextManager implements IAtomicService {
 
       try {
         // Angular throws some bullshit error, its Metrc's fault
-        eval(await response.data);
+        // eval(await response.data);
       } catch (e) {
         console.error("Static asset eval error:", e);
       }
@@ -192,7 +194,7 @@ class ScriptContextManager implements IAtomicService {
     if (authTag) {
       try {
         // This loads the authentication data into the local metrc JS objects
-        eval(authTag.innerText);
+        // eval(authTag.innerText);
       } catch (e) {
         console.error("authTag eval error:", e);
         throw e;
@@ -201,7 +203,7 @@ class ScriptContextManager implements IAtomicService {
 
     // This might not be present in places such as the landing page
     // @ts-ignore
-    if (!!window.metrc?.kendo) {
+    if (window.metrc?.kendo) {
       // @ts-ignore
       window.metrc.kendo.localModalForm = localModalForm;
 
@@ -213,8 +215,8 @@ class ScriptContextManager implements IAtomicService {
   }
 
   async metrc(): Promise<Metrc | null> {
-    return await this._metrcPromise;
+    return this._metrcPromise;
   }
 }
 
-export let scriptContextManager = new ScriptContextManager();
+export const scriptContextManager = new ScriptContextManager();

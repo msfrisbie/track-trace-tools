@@ -119,7 +119,7 @@ export const plantSearchModule = {
       };
 
       if (propagate) {
-        for (let [k, v] of Object.entries(plantSearchFilters)) {
+        for (const [k, v] of Object.entries(plantSearchFilters)) {
           // @ts-ignore
           if (ctx.state.plantSearchFilters[k] !== v) {
             switch (k) {
@@ -144,9 +144,7 @@ export const plantSearchModule = {
   },
 };
 
-export const plantSearchReducer = (state: IPlantSearchState): IPlantSearchState => {
-  return {
-    ...state,
-    ...inMemoryState,
-  };
-};
+export const plantSearchReducer = (state: IPlantSearchState): IPlantSearchState => ({
+  ...state,
+  ...inMemoryState,
+});

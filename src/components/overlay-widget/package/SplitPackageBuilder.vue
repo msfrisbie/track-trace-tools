@@ -348,9 +348,8 @@ async function defaultRemediatePackageMethod(): Promise<string> {
 
     if (filteredMethods.length === 0) {
       return methods[0].Id.toString();
-    } else {
-      return filteredMethods[0].Id.toString();
     }
+    return filteredMethods[0].Id.toString();
   } catch (e) {
     return "0";
   }
@@ -396,7 +395,7 @@ export default Vue.extend({
 
       const newPackageItem: IItemData = this.outputItem as IItemData;
 
-      for (let el of zipped) {
+      for (const el of zipped) {
         const [tag, quantity] = el;
 
         const row: IMetrcCreatePackagesFromPackagesPayload = {
@@ -415,7 +414,7 @@ export default Vue.extend({
           TagId: tag.Id.toString(),
           UnitOfMeasureId: newPackageItem.UnitOfMeasureId.toString(),
           RemediationDate: "",
-          RemediationMethodId: "0", //await defaultRemediatePackageMethod(),
+          RemediationMethodId: "0", // await defaultRemediatePackageMethod(),
           RemediationSteps: "",
           UseByDate: "",
           SellByDate: "",
@@ -427,8 +426,8 @@ export default Vue.extend({
           ...(this.isTradeSample ? { IsTradeSample: "true" } : {}),
           ...(this.$data.facilityUsesLocationForPackages
             ? {
-                LocationId: this.location!.Id.toString(),
-              }
+              LocationId: this.location!.Id.toString(),
+            }
             : {}),
           // UseSameItem: "false", // default to false and just provide the item id anyway
         };
@@ -470,7 +469,7 @@ export default Vue.extend({
       const flattened = [];
 
       // zipped contains nested lists, so we need to flatten into a 2d matrix
-      for (let [tagData, quantity] of zipped) {
+      for (const [tagData, quantity] of zipped) {
         flattened.push({
           sourceLabel: this.sourcePackage.Label,
           sourceItem: this.sourcePackage.Item.Name,
@@ -712,8 +711,7 @@ export default Vue.extend({
     sourcePackageAdjustQuantityErrorMessage(): string | null {
       return (
         this.errors.find((x: IBuilderComponentError) =>
-          x.tags.includes("sourcePackageAdjustQuantity")
-        )?.message || null
+          x.tags.includes("sourcePackageAdjustQuantity"))?.message || null
       );
     },
     errorMessage(): string | null {

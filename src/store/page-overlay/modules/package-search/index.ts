@@ -131,7 +131,7 @@ export const packageSearchModule = {
       };
 
       if (propagate) {
-        for (let [k, v] of Object.entries(packageSearchFilters)) {
+        for (const [k, v] of Object.entries(packageSearchFilters)) {
           // @ts-ignore
           if (ctx.state.packageSearchFilters[k] !== v) {
             switch (k) {
@@ -177,9 +177,7 @@ export const packageSearchModule = {
   },
 };
 
-export const packageSearchReducer = (state: IPackageSearchState): IPackageSearchState => {
-  return {
-    ...state,
-    ...inMemoryState,
-  };
-};
+export const packageSearchReducer = (state: IPackageSearchState): IPackageSearchState => ({
+  ...state,
+  ...inMemoryState,
+});

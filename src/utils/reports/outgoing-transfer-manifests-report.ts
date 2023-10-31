@@ -168,9 +168,7 @@ export async function maybeLoadOutgoingTransferManifestsReportData({
       });
     }
 
-    richOutgoingTransfers = richOutgoingTransfers.filter((transfer) => {
-      return true;
-    });
+    richOutgoingTransfers = richOutgoingTransfers.filter((transfer) => true);
 
     reportData[ReportType.OUTGOING_TRANSFER_MANIFESTS] = {
       richOutgoingTransfers,

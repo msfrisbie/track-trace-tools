@@ -121,7 +121,9 @@ import BuilderStepHeader from "@/components/overlay-widget/shared/BuilderStepHea
 import PlantPicker from "@/components/overlay-widget/shared/PlantPicker.vue";
 import TagPicker from "@/components/overlay-widget/shared/TagPicker.vue";
 import { BuilderType, MessageType } from "@/consts";
-import { ICsvFile, IMetrcReplacePlantTagsPayload, IPlantData, ITagData } from "@/interfaces";
+import {
+  ICsvFile, IMetrcReplacePlantTagsPayload, IPlantData, ITagData
+} from "@/interfaces";
 import { analyticsManager } from "@/modules/analytics-manager.module";
 import { builderManager } from "@/modules/builder-manager.module";
 import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
@@ -158,7 +160,7 @@ export default Vue.extend({
         this.$data.selectedPlants
       );
 
-      for (let el of zipped) {
+      for (const el of zipped) {
         const tag = el[0];
         const plant = el[1];
 
@@ -182,7 +184,7 @@ export default Vue.extend({
       );
     },
     async downloadAll() {
-      for (let csvFile of this.csvFiles) {
+      for (const csvFile of this.csvFiles) {
         await downloadCsvFile({ csvFile, delay: 500 });
       }
 

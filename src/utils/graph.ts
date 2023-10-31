@@ -1,7 +1,9 @@
 import { IIndexedPackageData } from "@/interfaces";
 import { IGraphComponentContext, IGraphState } from "@/store/page-overlay/modules/graph/interfaces";
 import { Settings } from "sigma/settings";
-import { EdgeDisplayData, NodeDisplayData, PartialButFor, PlainObject } from "sigma/types";
+import {
+  EdgeDisplayData, NodeDisplayData, PartialButFor, PlainObject
+} from "sigma/types";
 import { getNormalizedPackageContentsDescription } from "./package";
 
 const PRIMARY_TEXT_COLOR = "#222222";
@@ -108,9 +110,9 @@ export function labelRenderer(
     return;
   }
 
-  const size = settings.labelSize,
-    font = settings.labelFont,
-    weight = settings.labelWeight;
+  const size = settings.labelSize;
+  const font = settings.labelFont;
+  const weight = settings.labelWeight;
 
   context.font = `${weight} ${size}px ${font}`;
   const width = context.measureText(data.label).width + 8;

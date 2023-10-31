@@ -419,10 +419,15 @@ class MockDataManager implements IAtomicService {
   // Plants and plant batches are generated on demand based on server side filters
   // These are only for cached values
   private _mockLocations: ILocationData[] = [];
+
   private _mockStrains: IStrainData[] = [];
+
   private _mockItems: IItemData[] = [];
+
   private _mockHarvests: IIndexedHarvestData[] = [];
+
   private _mockPackages: IIndexedPackageData[] = [];
+
   private _mockTags: IIndexedTagData[] = [];
 
   async init() {}
@@ -1292,4 +1297,4 @@ class MockDataManager implements IAtomicService {
   }
 }
 
-export let mockDataManager = new MockDataManager();
+export const mockDataManager = new MockDataManager();

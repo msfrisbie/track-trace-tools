@@ -26,9 +26,8 @@ class StorageManager implements IAtomicService {
   get keepalivePath(): string {
     if (window.location.pathname.startsWith("/industry")) {
       return window.location.pathname.split("/").slice(1, 3).join("/");
-    } else {
-      return window.location.pathname.slice(1);
     }
+    return window.location.pathname.slice(1);
   }
 
   private testWrite() {
@@ -50,7 +49,7 @@ class StorageManager implements IAtomicService {
         errorMessage.includes("quota has been exceeded")
       ) {
         console.error("Purging keys");
-        for (let key of this.storageKeys(localStorage)) {
+        for (const key of this.storageKeys(localStorage)) {
           if (key !== VUEX_KEY) {
             localStorage.removeItem(key);
           }
@@ -71,7 +70,7 @@ class StorageManager implements IAtomicService {
   }
 
   private destroyExpiredKeys() {
-    for (let key of this.storageKeys(localStorage)) {
+    for (const key of this.storageKeys(localStorage)) {
       if (!key.startsWith(KEEPALIVE_PREFIX)) {
         continue;
       }
@@ -150,7 +149,7 @@ class StorageManager implements IAtomicService {
   private storageSize(storage: Storage): number {
     let size = 0;
 
-    for (let key of this.storageKeys(storage)) {
+    for (const key of this.storageKeys(storage)) {
       size += storage.getItem(key)?.length || 0;
     }
 
@@ -158,4 +157,4 @@ class StorageManager implements IAtomicService {
   }
 }
 
-export let storageManager = new StorageManager();
+export const storageManager = new StorageManager();

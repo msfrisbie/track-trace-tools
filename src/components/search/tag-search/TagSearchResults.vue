@@ -129,20 +129,19 @@ export default Vue.extend({
     }),
     ...mapGetters({}),
     filteredTags(): IIndexedTagData[] {
-      return this.tags.filter((x: IIndexedTagData) => {
-        // if (!!this.tagSearchFilters.strainName) {
-        //   if (!!x.StrainName && !x.StrainName.includes(this.tagSearchFilters.strainName)) {
-        //     return false;
-        //   }
-        // }
-        // if (!!this.tagSearchFilters.locationName) {
-        //   if (!!x.LocationName && !x.LocationName.includes(this.tagSearchFilters.locationName)) {
-        //     return false;
-        //   }
-        // }
+      return this.tags.filter((x: IIndexedTagData) =>
+      // if (!!this.tagSearchFilters.strainName) {
+      //   if (!!x.StrainName && !x.StrainName.includes(this.tagSearchFilters.strainName)) {
+      //     return false;
+      //   }
+      // }
+      // if (!!this.tagSearchFilters.locationName) {
+      //   if (!!x.LocationName && !x.LocationName.includes(this.tagSearchFilters.locationName)) {
+      //     return false;
+      //   }
+      // }
 
-        return true;
-      });
+        true);
     },
     filtersApplied(): boolean {
       return (

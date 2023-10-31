@@ -325,7 +325,7 @@ export default Vue.extend({
       const adjustmentReasons = await dynamicConstsManager.adjustPackageReasons();
       const unitsOfMeasure = await dynamicConstsManager.unitsOfMeasure();
 
-      for (let sampleAllocation of this.selectedSampleAllocations) {
+      for (const sampleAllocation of this.selectedSampleAllocations) {
         const row = {
           AdjustmentDate: submitDateFromIsodate(todayIsodate()),
           AdjustmentQuantity: (-1 * sampleAllocation.adjustmentQuantity).toString(),
@@ -385,8 +385,7 @@ export default Vue.extend({
           {
             isVector: false,
             data: this.$data.adjustmentReasons.find((x: IAdjustPackageReason) =>
-              x.Name.includes("Trade Sample")
-            )!.Name,
+              x.Name.includes("Trade Sample"))!.Name,
           },
           {
             isVector: true,
@@ -417,7 +416,7 @@ export default Vue.extend({
       }
     },
     async downloadAll() {
-      for (let csvFile of this.csvFiles) {
+      for (const csvFile of this.csvFiles) {
         await downloadCsvFile({ csvFile, delay: 500 });
       }
 

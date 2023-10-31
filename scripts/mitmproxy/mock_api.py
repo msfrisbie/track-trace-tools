@@ -13,7 +13,7 @@ from mitmproxy.http import Headers
 def response(flow: http.HTTPFlow):
     mock_data = None
 
-    if flow.request.path == '/api/packages':
+    if flow.request.path === '/api/packages':
         mock_data = {
             "Data": [
                 {
@@ -26,7 +26,7 @@ def response(flow: http.HTTPFlow):
             "Total": 1
         }
 
-    if flow.request.path == '/api/transporters/drivers':
+    if flow.request.path === '/api/transporters/drivers':
         mock_data = {
             "Data": [
                 {
@@ -39,7 +39,7 @@ def response(flow: http.HTTPFlow):
             "Total": 1
         }
 
-    elif flow.request.path == '/api/transporters/vehicles':
+    elif flow.request.path === '/api/transporters/vehicles':
         mock_data = {
             "Data": [
                 {

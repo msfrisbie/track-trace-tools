@@ -13,6 +13,7 @@ const inputEvents = ["change", "keyup", "blur"];
 
 class CredentialManager implements IAtomicService {
   private usernameInput: HTMLInputElement | null = null;
+
   private passwordInput: HTMLInputElement | null = null;
 
   async init() {
@@ -39,7 +40,7 @@ class CredentialManager implements IAtomicService {
 
     const handler = _.debounce(() => this.updateCredentials(), 50);
 
-    for (let e of inputEvents) {
+    for (const e of inputEvents) {
       this.usernameInput.addEventListener(e, handler);
       this.passwordInput.addEventListener(e, handler);
     }
@@ -74,4 +75,4 @@ class CredentialManager implements IAtomicService {
   }
 }
 
-export let credentialManager = new CredentialManager();
+export const credentialManager = new CredentialManager();

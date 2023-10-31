@@ -11,8 +11,8 @@ import {
   AnnouncementsActions,
   AnnouncementsGetters,
   AnnouncementsMutations,
-} from "../announcements/consts";
-import { IAnnouncementData, IAnnouncementsState } from "../announcements/interfaces";
+} from "./consts";
+import { IAnnouncementData, IAnnouncementsState } from "./interfaces";
 
 const renderer = {
   heading(text: string, level: any) {
@@ -22,11 +22,11 @@ const renderer = {
     if (href === null) {
       return text;
     }
-    let out = '<a target="_blank" class="text-purple-500 underline" href="' + href + '"';
+    let out = `<a target="_blank" class="text-purple-500 underline" href="${href}"`;
     if (title) {
-      out += ' title="' + title + '"';
+      out += ` title="${title}"`;
     }
-    out += ">" + text + "</a>";
+    out += `>${text}</a>`;
     return out;
   },
 };
@@ -63,69 +63,63 @@ export const announcementsModule = {
       getters: any,
       rootState: any,
       rootGetters: any
-    ): IAnnouncementData[] => {
-      return state.announcements
-        .filter((x) => {
-          if (!state.dismissedDatetime) {
-            return true;
-          }
+    ): IAnnouncementData[] => state.announcements
+      .filter((x) => {
+        if (!state.dismissedDatetime) {
+          return true;
+        }
 
-          return x.published_at > state.dismissedDatetime;
-        })
-        .map((x) => {
-          x.html = marked.parse(x.markdown);
-          x.readable_published_at = new Date(x.published_at).toLocaleString();
-          return x;
-        });
-    },
+        return x.published_at > state.dismissedDatetime;
+      })
+      .map((x) => {
+        x.html = marked.parse(x.markdown);
+        x.readable_published_at = new Date(x.published_at).toLocaleString();
+        return x;
+      }),
     [AnnouncementsGetters.VISIBLE_ANNOUNCEMENTS]: (
       state: IAnnouncementsState,
       getters: any,
       rootState: any,
       rootGetters: any
-    ): IAnnouncementData[] => {
-      return state.announcements
-        .filter((x) => {
-          if (state.showDismissed) {
-            return true;
-          }
+    ): IAnnouncementData[] => state.announcements
+      .filter((x) => {
+        if (state.showDismissed) {
+          return true;
+        }
 
-          if (!state.dismissedDatetime) {
-            return true;
-          }
+        if (!state.dismissedDatetime) {
+          return true;
+        }
 
-          return x.published_at > state.dismissedDatetime;
-        })
-        .map((x) => {
-          x.html = marked.parse(x.markdown);
-          x.readable_published_at = new Date(x.published_at).toLocaleString();
-          return x;
-        });
-    },
+        return x.published_at > state.dismissedDatetime;
+      })
+      .map((x) => {
+        x.html = marked.parse(x.markdown);
+        x.readable_published_at = new Date(x.published_at).toLocaleString();
+        return x;
+      }),
     [AnnouncementsGetters.HIDDEN_ANNOUNCEMENTS]: (
       state: IAnnouncementsState,
       getters: any,
       rootState: any,
       rootGetters: any
-    ): IAnnouncementData[] => {
-      return state.announcements
-        .filter((x) => {
-          if (state.showDismissed) {
-            return false;
-          }
+    ): IAnnouncementData[] => state.announcements
+      .filter((x) => {
+        if (state.showDismissed) {
+          return false;
+        }
 
-          if (!state.dismissedDatetime) {
-            return false;
-          }
+        if (!state.dismissedDatetime) {
+          return false;
+        }
 
-          return x.published_at <= state.dismissedDatetime;
-        })
-        .map((x) => {
-          x.html = marked.parse(x.markdown);
-          x.readable_published_at = new Date(x.published_at).toLocaleString();
-          return x;
-        });
-    },
+        return x.published_at <= state.dismissedDatetime;
+      })
+      .map((x) => {
+        x.html = marked.parse(x.markdown);
+        x.readable_published_at = new Date(x.published_at).toLocaleString();
+        return x;
+      }),
   },
   actions: {
     [AnnouncementsActions.INTERVAL_LOAD_NOTIFICATIONS]: async (
@@ -207,9 +201,7 @@ export const announcementsModule = {
   },
 };
 
-export const announcementsReducer = (state: IAnnouncementsState): IAnnouncementsState => {
-  return {
-    ...state,
-    ...inMemoryState,
-  };
-};
+export const announcementsReducer = (state: IAnnouncementsState): IAnnouncementsState => ({
+  ...state,
+  ...inMemoryState,
+});

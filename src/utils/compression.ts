@@ -44,7 +44,7 @@ export class CompressedMetrcTags implements ICompressedMetrcTagRanges {
         const tag = tagExtractor(data);
         const maskedData = propertyMask(data);
 
-        let parsed: IFormattedTagData = {
+        const parsed: IFormattedTagData = {
           tag,
           maskedData,
         };
@@ -101,13 +101,11 @@ export class CompressedMetrcTags implements ICompressedMetrcTagRanges {
   }
 
   find(tag: string): ICompressedMetrcTagRange[] {
-    return this._compressedTagRanges.filter((compressedTagRange: ICompressedMetrcTagRange) => {
-      return isTagInsidePair({
-        startTag: compressedTagRange.startTag,
-        endTag: compressedTagRange.endTag,
-        targetTag: tag,
-      });
-    });
+    return this._compressedTagRanges.filter((compressedTagRange: ICompressedMetrcTagRange) => isTagInsidePair({
+      startTag: compressedTagRange.startTag,
+      endTag: compressedTagRange.endTag,
+      targetTag: tag,
+    }));
   }
 
   // TODO
@@ -155,10 +153,15 @@ export function compressedDataWrapperFactory<T>(
 
 export class CompressedDataWrapper<T> {
   name: string;
+
   data: any[][];
+
   keys: string[];
+
   indexedKey: string;
+
   index: Map<any, number>;
+
   duplicateCounter: number = 0;
 
   constructor(name: string, data: any[][], indexedKey: string, keys: string[]) {
@@ -189,7 +192,7 @@ export class CompressedDataWrapper<T> {
     }
   }
 
-  *[Symbol.iterator](): Generator<T> {
+  * [Symbol.iterator](): Generator<T> {
     for (const x of this.data) {
       yield this.unpack(x);
     }

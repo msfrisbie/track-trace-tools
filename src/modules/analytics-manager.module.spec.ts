@@ -27,7 +27,7 @@ describe("analytics-manager.module.ts", () => {
       ["CDPH-10004665", "/admin/tagorders"],
     ];
 
-    for (let [url, data] of zip(matchUrls, matchData) as [string, string[]][]) {
+    for (const [url, data] of zip(matchUrls, matchData) as [string, string[]][]) {
       const match = url.match(METRC_INDUSTRY_LICENSE_PATH_REGEX);
 
       if (!match) {
@@ -38,7 +38,7 @@ describe("analytics-manager.module.ts", () => {
       expect(match[2]).toEqual(data[1]);
     }
 
-    for (let url of nonMatchUrls) {
+    for (const url of nonMatchUrls) {
       expect(url.match(METRC_INDUSTRY_LICENSE_PATH_REGEX)).toBeNull();
     }
   });

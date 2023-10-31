@@ -119,9 +119,7 @@ export const transferPackageSearchModule = {
 
 export const transferPackageSearchReducer = (
   state: ITransferPackageSearchState
-): ITransferPackageSearchState => {
-  return {
-    ...state,
-    ...inMemoryState,
-  };
-};
+): ITransferPackageSearchState => ({
+  ...state,
+  ...inMemoryState,
+});

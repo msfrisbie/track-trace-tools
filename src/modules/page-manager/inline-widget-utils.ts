@@ -1,3 +1,5 @@
+/* eslint-disable global-require */
+
 import { MessageType, METRC_TAG_REGEX, TTT_TABLEGROUP_ATTRIBUTE } from "@/consts";
 import { getUrl } from "@/utils/assets";
 import { analyticsManager } from "../analytics-manager.module";

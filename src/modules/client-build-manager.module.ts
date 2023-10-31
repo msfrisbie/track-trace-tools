@@ -12,4 +12,4 @@ class ClientBuildManager implements IAtomicService {
   }
 }
 
-export let clientBuildManager = new ClientBuildManager();
+export const clientBuildManager = new ClientBuildManager();

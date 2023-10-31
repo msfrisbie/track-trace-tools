@@ -140,7 +140,7 @@ export default Vue.extend({
     },
     toggle() {
       // @ts-ignore
-      this.$refs["document"].toggle();
+      this.$refs.document.toggle();
     },
     async show({ documentUrls, print = false }: { documentUrls: string[]; print?: boolean }) {
       this.resetLoadHandler();

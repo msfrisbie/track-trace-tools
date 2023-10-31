@@ -25,6 +25,7 @@ import { AxiosResponse } from "axios";
 import { get, keys, set } from "idb-keyval";
 import _ from "lodash-es";
 import { timer } from "rxjs";
+
 const DYNAMIC_CONST_TIMEOUT_MS = 30000;
 
 const TRANSFER_MODAL_HTML_EXPIRATION_MS: number = 1000 * 60 * 60 * 24;
@@ -204,22 +205,35 @@ const debugLog = debugLogFactory("dynamic-consts-manager.module.ts");
 
 class DynamicConstsManager implements IAtomicService {
   private _newTransferModalText: Promise<string> | null = null;
+
   private _newPackageModalText: Promise<string> | null = null;
 
   private _movePackageRepeaterdata: Promise<any> | null = null;
+
   private _createItemRepeaterData: Promise<any> | null = null;
+
   private _createStrainRepeaterData: Promise<any> | null = null;
+
   private _wasteByLocationRepeaterData: Promise<any> | null = null;
+
   private _adjustPackageRepeaterData: Promise<any> | null = null;
+
   private _remediatePackageRepeaterData: Promise<any> | null = null;
+
   private _createPlantingsFromPackagesRepeaterData: Promise<any> | null = null;
+
   private _changePlantBatchGrowthPhaseRepeaterData: Promise<any> | null = null;
+
   private _newTransferRepeaterData: Promise<any> | null = null;
 
   private _cachedParsedTemplateRepeaterData: any = null;
+
   private _cachedFacilities: IMetrcFacilityData[] | null = null;
+
   private _cachedFacilityMap: Map<string, IMetrcFacilityData> | null = null;
+
   private _cachedDestinationFacilities: IMetrcFacilityData[] | null = null;
+
   private _cachedTransportFacilities: IMetrcFacilityData[] | null = null;
 
   async init() {
@@ -240,8 +254,7 @@ class DynamicConstsManager implements IAtomicService {
     if (!this._movePackageRepeaterdata) {
       this._movePackageRepeaterdata = new Promise(async (resolve, reject) => {
         const subscription = timer(DYNAMIC_CONST_TIMEOUT_MS).subscribe(() =>
-          reject("Item categories fetch timed out")
-        );
+          reject("Item categories fetch timed out"));
 
         try {
           const html = await primaryMetrcRequestManager
@@ -273,8 +286,7 @@ class DynamicConstsManager implements IAtomicService {
     if (!this._createItemRepeaterData) {
       this._createItemRepeaterData = new Promise(async (resolve, reject) => {
         const subscription = timer(DYNAMIC_CONST_TIMEOUT_MS).subscribe(() =>
-          reject("Item categories fetch timed out")
-        );
+          reject("Item categories fetch timed out"));
 
         try {
           const html = await primaryMetrcRequestManager
@@ -306,8 +318,7 @@ class DynamicConstsManager implements IAtomicService {
     if (!this._createStrainRepeaterData) {
       this._createStrainRepeaterData = new Promise(async (resolve, reject) => {
         const subscription = timer(DYNAMIC_CONST_TIMEOUT_MS).subscribe(() =>
-          reject("Strain categories fetch timed out")
-        );
+          reject("Strain categories fetch timed out"));
 
         try {
           const html = await primaryMetrcRequestManager
@@ -339,8 +350,7 @@ class DynamicConstsManager implements IAtomicService {
     if (!this._wasteByLocationRepeaterData) {
       this._wasteByLocationRepeaterData = new Promise(async (resolve, reject) => {
         const subscription = timer(DYNAMIC_CONST_TIMEOUT_MS).subscribe(() =>
-          reject("Item categories fetch timed out")
-        );
+          reject("Item categories fetch timed out"));
 
         try {
           const html = await primaryMetrcRequestManager
@@ -372,8 +382,7 @@ class DynamicConstsManager implements IAtomicService {
     if (!this._adjustPackageRepeaterData) {
       this._adjustPackageRepeaterData = new Promise(async (resolve, reject) => {
         const subscription = timer(DYNAMIC_CONST_TIMEOUT_MS).subscribe(() =>
-          reject("Adjust package fetch timed out")
-        );
+          reject("Adjust package fetch timed out"));
 
         try {
           const html = await primaryMetrcRequestManager
@@ -405,8 +414,7 @@ class DynamicConstsManager implements IAtomicService {
     if (!this._remediatePackageRepeaterData) {
       this._remediatePackageRepeaterData = new Promise(async (resolve, reject) => {
         const subscription = timer(DYNAMIC_CONST_TIMEOUT_MS).subscribe(() =>
-          reject("Remediate package fetch timed out")
-        );
+          reject("Remediate package fetch timed out"));
 
         try {
           const html = await primaryMetrcRequestManager
@@ -438,8 +446,7 @@ class DynamicConstsManager implements IAtomicService {
     if (!this._createPlantingsFromPackagesRepeaterData) {
       this._createPlantingsFromPackagesRepeaterData = new Promise(async (resolve, reject) => {
         const subscription = timer(DYNAMIC_CONST_TIMEOUT_MS).subscribe(() =>
-          reject("Create plantings fetch timed out")
-        );
+          reject("Create plantings fetch timed out"));
 
         try {
           const html = await primaryMetrcRequestManager
@@ -475,8 +482,7 @@ class DynamicConstsManager implements IAtomicService {
     if (!this._changePlantBatchGrowthPhaseRepeaterData || !allowCache) {
       this._changePlantBatchGrowthPhaseRepeaterData = new Promise(async (resolve, reject) => {
         const subscription = timer(DYNAMIC_CONST_TIMEOUT_MS).subscribe(() =>
-          reject("Change plant batch growth phase fetch timed out")
-        );
+          reject("Change plant batch growth phase fetch timed out"));
 
         try {
           const html = await primaryMetrcRequestManager
@@ -596,7 +602,7 @@ class DynamicConstsManager implements IAtomicService {
   private async refreshNewTransferModalCacheIfExpired() {
     if (await this.isNewTransferModalCacheExpired()) {
       // Trigger a refresh, but don't wait for it
-      return this.refreshTransferTemplateHTMLCache();
+      this.refreshTransferTemplateHTMLCache();
     }
   }
 
@@ -621,8 +627,7 @@ class DynamicConstsManager implements IAtomicService {
       this._newTransferRepeaterData = new Promise(async (resolve, reject) => {
         // This payload is huge, double the allowed timeout
         const subscription = timer(DYNAMIC_CONST_TIMEOUT_MS * 2).subscribe(() =>
-          reject("New transfer fetch timed out")
-        );
+          reject("New transfer fetch timed out"));
 
         try {
           let parsedRepeaterData;
@@ -660,7 +665,7 @@ class DynamicConstsManager implements IAtomicService {
   }
 
   async itemCategories(): Promise<IItemCategory[]> {
-    let repeaterData = await this.createItemRepeaterData();
+    const repeaterData = await this.createItemRepeaterData();
 
     if (repeaterData.ItemCategories) {
       return repeaterData.ItemCategories;
@@ -675,7 +680,7 @@ class DynamicConstsManager implements IAtomicService {
     }
 
     try {
-      let repeaterData = await this.createItemRepeaterData();
+      const repeaterData = await this.createItemRepeaterData();
 
       if (repeaterData.UnitsOfMeasure) {
         return repeaterData.UnitsOfMeasure;
@@ -690,13 +695,12 @@ class DynamicConstsManager implements IAtomicService {
   async unitsOfWeight(): Promise<IUnitOfMeasure[]> {
     return (await this.unitsOfMeasure())
       .filter((unitOfMeasure) =>
-        ["Pounds", "Grams", "Kilograms", "Milligrams", "Ounces"].includes(unitOfMeasure.Name)
-      )
+        ["Pounds", "Grams", "Kilograms", "Milligrams", "Ounces"].includes(unitOfMeasure.Name))
       .sort((a, b) => (a.Name === "Pounds" ? -1 : 1));
   }
 
   async wasteReasons(): Promise<IWasteReason[]> {
-    let repeaterData = await this.wasteByLocationRepeaterData();
+    const repeaterData = await this.wasteByLocationRepeaterData();
 
     if (repeaterData.ActionReasons) {
       return repeaterData.ActionReasons;
@@ -706,7 +710,7 @@ class DynamicConstsManager implements IAtomicService {
   }
 
   async wasteMethods(): Promise<IWasteMethod[]> {
-    let repeaterData = await this.wasteByLocationRepeaterData();
+    const repeaterData = await this.wasteByLocationRepeaterData();
 
     if (repeaterData.PlantWasteMethods) {
       return repeaterData.PlantWasteMethods;
@@ -716,7 +720,7 @@ class DynamicConstsManager implements IAtomicService {
   }
 
   async adjustPackageReasons(): Promise<IAdjustPackageReason[]> {
-    let repeaterData = await this.adjustPackageRepeaterData();
+    const repeaterData = await this.adjustPackageRepeaterData();
 
     if (repeaterData.ActionReasons) {
       return repeaterData.ActionReasons;
@@ -726,7 +730,7 @@ class DynamicConstsManager implements IAtomicService {
   }
 
   async remediatePackageMethods(): Promise<IRemediatePackageMethod[]> {
-    let repeaterData = await this.remediatePackageRepeaterData();
+    const repeaterData = await this.remediatePackageRepeaterData();
 
     if (repeaterData.RemediationMethods) {
       return repeaterData.RemediationMethods;
@@ -740,7 +744,7 @@ class DynamicConstsManager implements IAtomicService {
       return mockDataManager.mockPlantBatchTypes();
     }
 
-    let repeaterData = await this.createPlantingsFromPackageRepeaterData();
+    const repeaterData = await this.createPlantingsFromPackageRepeaterData();
 
     if (repeaterData.PlantBatchTypes) {
       return repeaterData.PlantBatchTypes;
@@ -750,7 +754,7 @@ class DynamicConstsManager implements IAtomicService {
   }
 
   async availablePlantTags(): Promise<ITagData[]> {
-    let repeaterData = await this.changePlantBatchGrowthPhaseRepeaterData(false);
+    const repeaterData = await this.changePlantBatchGrowthPhaseRepeaterData(false);
 
     if (repeaterData.GroupTags) {
       // Force sort, since who knows what Metrc is returning
@@ -768,7 +772,7 @@ class DynamicConstsManager implements IAtomicService {
       return mockDataManager.mockPlantBatchGrowthPhases();
     }
 
-    let repeaterData = await this.changePlantBatchGrowthPhaseRepeaterData();
+    const repeaterData = await this.changePlantBatchGrowthPhaseRepeaterData();
 
     if (repeaterData.GrowthPhases) {
       return repeaterData.GrowthPhases;
@@ -785,7 +789,7 @@ class DynamicConstsManager implements IAtomicService {
       return mockDataManager.mockDefaultPhoneNumberForQuestions();
     }
 
-    let repeaterData = await this.newTransferRepeaterData();
+    const repeaterData = await this.newTransferRepeaterData();
 
     // If it's not present, that's OK - just return an empty string
     return repeaterData.DefaultPhoneNumberForQuestions || "";
@@ -835,7 +839,7 @@ class DynamicConstsManager implements IAtomicService {
     }
 
     if (!this._cachedFacilities) {
-      let repeaterData = await this.newTransferRepeaterData();
+      const repeaterData = await this.newTransferRepeaterData();
 
       if (repeaterData.Facilities) {
         this._cachedFacilities = Object.values(repeaterData.Facilities);
@@ -868,7 +872,7 @@ class DynamicConstsManager implements IAtomicService {
     }
 
     if (!this._cachedDestinationFacilities) {
-      let repeaterData = await this.newTransferRepeaterData();
+      const repeaterData = await this.newTransferRepeaterData();
 
       if (repeaterData.Facilities) {
         const destinationIds: Set<number> = new Set(repeaterData.DestinationFacilities);
@@ -893,7 +897,7 @@ class DynamicConstsManager implements IAtomicService {
     }
 
     if (!this._cachedTransportFacilities) {
-      let repeaterData = await this.newTransferRepeaterData();
+      const repeaterData = await this.newTransferRepeaterData();
 
       if (repeaterData.Facilities) {
         const transporterIds: Set<number> = new Set(repeaterData.TransporterFacilities);
@@ -914,7 +918,7 @@ class DynamicConstsManager implements IAtomicService {
       return mockDataManager.mockTransferTypes();
     }
 
-    let repeaterData = await this.newTransferRepeaterData();
+    const repeaterData = await this.newTransferRepeaterData();
 
     if (repeaterData.TransferTypes) {
       return repeaterData.TransferTypes;
@@ -928,7 +932,7 @@ class DynamicConstsManager implements IAtomicService {
       return mockDataManager.mockDrivers();
     }
 
-    let repeaterData = await this.newTransferRepeaterData();
+    const repeaterData = await this.newTransferRepeaterData();
 
     if (repeaterData.Drivers) {
       return repeaterData.Drivers;
@@ -936,12 +940,13 @@ class DynamicConstsManager implements IAtomicService {
 
     throw new Error("Drivers unable to load");
   }
+
   async vehicles(): Promise<IMetrcVehicleData[]> {
     if (store.state.mockDataMode && store.state.flags?.mockedFlags.mockVehicles.enabled) {
       return mockDataManager.mockVehicles();
     }
 
-    let repeaterData = await this.newTransferRepeaterData();
+    const repeaterData = await this.newTransferRepeaterData();
 
     if (repeaterData.Vehicles) {
       return repeaterData.Vehicles;
@@ -951,4 +956,4 @@ class DynamicConstsManager implements IAtomicService {
   }
 }
 
-export let dynamicConstsManager = new DynamicConstsManager();
+export const dynamicConstsManager = new DynamicConstsManager();

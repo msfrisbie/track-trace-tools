@@ -167,7 +167,7 @@ import {
   getItemNameOrError,
   getItemUnitOfMeasureNameOrError,
   getItemUnitOfMeasureAbbreviationOrError,
-getQuantityAndUnitDescription,
+  getQuantityAndUnitDescription,
 } from "@/utils/package";
 import _ from "lodash-es";
 import { timer } from "rxjs";
@@ -228,8 +228,7 @@ export default Vue.extend({
     },
     setSourcePackages(pkgs: IPackageData[]) {
       this.$data.sourcePackages = pkgs.sort((a: IPackageData, b: IPackageData) =>
-        a.Label > b.Label ? 1 : -1
-      );
+        (a.Label > b.Label ? 1 : -1));
     },
     focus() {
       // @ts-ignore
@@ -255,7 +254,7 @@ export default Vue.extend({
     resetPackages() {
       // Spread operator is to take a snapshot of the packages
       // Fixes an odd bug where only half are removed
-      for (let pkg of [...this.selectedPackages]) {
+      for (const pkg of [...this.selectedPackages]) {
         this.removePackage(pkg);
       }
     },
@@ -325,7 +324,7 @@ export default Vue.extend({
   watch: {
     pastedTags: {
       immediate: true,
-      handler: async function (newValue, oldValue) {
+      async handler(newValue, oldValue) {
         if (!newValue.length) {
           return;
         }

@@ -57,6 +57,7 @@ import {
   ITransferHistoryData,
   ITransferTransporterDetails,
   ITransporterData,
+  IPackageFilter
 } from "@/interfaces";
 import { authManager } from "@/modules/auth-manager.module";
 import { databaseInterface } from "@/modules/database-interface.module";
@@ -76,7 +77,6 @@ import { AxiosResponse } from "axios";
 import { get } from "idb-keyval";
 import { Subject, timer } from "rxjs";
 import { map, take } from "rxjs/operators";
-import { IPackageFilter } from "../../interfaces";
 import { DataLoadError, DataLoadErrorType } from "./data-loader-error";
 
 const debugLog = debugLogFactory("data-loader.module.ts");
@@ -97,41 +97,57 @@ export async function getDataLoader(
 ): Promise<DataLoader> {
   if (spoofedAuthState?.license && dataLoaderCache.has(spoofedAuthState.license)) {
     return dataLoaderCache.get(spoofedAuthState.license) as DataLoader;
-  } else {
-    const dataLoader = new DataLoader();
-    const authState: IAuthState = spoofedAuthState || (await authManager.authStateOrError());
-    dataLoader.init(authState);
-
-    dataLoaderCache.set(authState.license, dataLoader);
-
-    return dataLoader;
   }
+  const dataLoader = new DataLoader();
+  const authState: IAuthState = spoofedAuthState || (await authManager.authStateOrError());
+  dataLoader.init(authState);
+
+  dataLoaderCache.set(authState.license, dataLoader);
+
+  return dataLoader;
 }
 
 export class DataLoader implements IAtomicService {
   private _employees: Promise<IMetrcEmployeeData[]> | null = null;
+
   private _availableTags: Promise<IIndexedTagData[]> | null = null;
+
   private _usedTags: Promise<IIndexedTagData[]> | null = null;
+
   private _voidedTags: Promise<IIndexedTagData[]> | null = null;
+
   // private _activePackages: Promise<IIndexedPackageData[]> | null = null;
   // private _inactivePackages: Promise<IIndexedPackageData[]> | null = null;
   private _inTransitPackages: Promise<IIndexedPackageData[]> | null = null;
+
   private _previousTagOrders: Promise<ITagOrderData[]> | null = null;
+
   private _incomingTransfers: Promise<IIndexedTransferData[]> | null = null;
+
   private _incomingInactiveTransfers: Promise<IIndexedTransferData[]> | null = null;
+
   private _outgoingTransfers: Promise<IIndexedTransferData[]> | null = null;
+
   private _outgoingInactiveTransfers: Promise<IIndexedTransferData[]> | null = null;
+
   private _rejectedTransfers: Promise<IIndexedTransferData[]> | null = null;
+
   private _layoverTransfers: Promise<IIndexedTransferData[]> | null = null;
+
   private _locations: Promise<ILocationData[]> | null = null;
+
   private _strains: Promise<IStrainData[]> | null = null;
+
   private _items: Promise<IItemData[]> | null = null;
+
   private _activeHarvests: Promise<IIndexedHarvestData[]> | null = null;
+
   private _inactiveHarvests: Promise<IIndexedHarvestData[]> | null = null;
 
   private _countPayload: string = buildBody({ page: 0, pageSize: 5 });
 
   private _authState: IAuthState | null = null;
+
   private _metrcRequestManager: MetrcRequestManager | null = null;
 
   /**
@@ -272,9 +288,11 @@ export class DataLoader implements IAtomicService {
       this.metrcRequestManagerOrError.getAvailableTags(this._countPayload)
     );
   }
+
   async usedTagCount(): Promise<number | null> {
     return this.extractTotalOrNull(this.metrcRequestManagerOrError.getUsedTags(this._countPayload));
   }
+
   async voidedTagCount(): Promise<number | null> {
     return this.extractTotalOrNull(
       this.metrcRequestManagerOrError.getVoidedTags(this._countPayload)
@@ -286,11 +304,13 @@ export class DataLoader implements IAtomicService {
       this.metrcRequestManagerOrError.getActivePackages(this._countPayload)
     );
   }
+
   async inactivePackageCount(): Promise<number | null> {
     return this.extractTotalOrNull(
       this.metrcRequestManagerOrError.getInactivePackages(this._countPayload)
     );
   }
+
   async intransitPackageCount(): Promise<number | null> {
     return this.extractTotalOrNull(
       this.metrcRequestManagerOrError.getInTransitPackages(this._countPayload)
@@ -302,11 +322,13 @@ export class DataLoader implements IAtomicService {
       this.metrcRequestManagerOrError.getIncomingTransfers(this._countPayload)
     );
   }
+
   async outgoingTransferCount(): Promise<number | null> {
     return this.extractTotalOrNull(
       this.metrcRequestManagerOrError.getOutgoingTransfers(this._countPayload)
     );
   }
+
   async rejectedTransferCount(): Promise<number | null> {
     return this.extractTotalOrNull(
       this.metrcRequestManagerOrError.getRejectedTransfers(this._countPayload)
@@ -316,11 +338,13 @@ export class DataLoader implements IAtomicService {
   async itemCount(): Promise<number | null> {
     return this.extractTotalOrNull(this.metrcRequestManagerOrError.getItems(this._countPayload));
   }
+
   async locationCount(): Promise<number | null> {
     return this.extractTotalOrNull(
       this.metrcRequestManagerOrError.getLocations(this._countPayload)
     );
   }
+
   async strainCount(): Promise<number | null> {
     return this.extractTotalOrNull(this.metrcRequestManagerOrError.getStrains(this._countPayload));
   }
@@ -330,6 +354,7 @@ export class DataLoader implements IAtomicService {
       this.metrcRequestManagerOrError.getPlantBatches(this._countPayload)
     );
   }
+
   async inactivePlantBatchCount(): Promise<number | null> {
     return this.extractTotalOrNull(
       this.metrcRequestManagerOrError.getInactivePlantBatches(this._countPayload)
@@ -341,11 +366,13 @@ export class DataLoader implements IAtomicService {
       this.metrcRequestManagerOrError.getVegetativePlants(this._countPayload)
     );
   }
+
   async floweringPlantCount(): Promise<number | null> {
     return this.extractTotalOrNull(
       this.metrcRequestManagerOrError.getFloweringPlants(this._countPayload)
     );
   }
+
   async inactivePlantCount(): Promise<number | null> {
     return this.extractTotalOrNull(
       this.metrcRequestManagerOrError.getInactivePlants(this._countPayload)
@@ -357,6 +384,7 @@ export class DataLoader implements IAtomicService {
       this.metrcRequestManagerOrError.getActiveHarvests(this._countPayload)
     );
   }
+
   async inactiveHarvestCount(): Promise<number | null> {
     return this.extractTotalOrNull(
       this.metrcRequestManagerOrError.getInactiveHarvests(this._countPayload)
@@ -368,6 +396,7 @@ export class DataLoader implements IAtomicService {
       this.metrcRequestManagerOrError.getActiveSalesReceipts(this._countPayload)
     );
   }
+
   async inactiveSalesCount(): Promise<number | null> {
     return this.extractTotalOrNull(
       this.metrcRequestManagerOrError.getInactiveSalesReceipts(this._countPayload)
@@ -384,8 +413,7 @@ export class DataLoader implements IAtomicService {
     if (!this._employees) {
       this._employees = new Promise(async (resolve, reject) => {
         const subscription = timer(DATA_LOAD_FETCH_TIMEOUT_MS).subscribe(() =>
-          reject("Available employee timed out")
-        );
+          reject("Available employee timed out"));
 
         try {
           const employees: IMetrcEmployeeData[] = await this.loadEmployees();
@@ -413,8 +441,7 @@ export class DataLoader implements IAtomicService {
     if (!this._availableTags || !useCache) {
       this._availableTags = new Promise(async (resolve, reject) => {
         const subscription = timer(DATA_LOAD_FETCH_TIMEOUT_MS).subscribe(() =>
-          reject("Available tag fetch timed out")
-        );
+          reject("Available tag fetch timed out"));
 
         try {
           const tags: IIndexedTagData[] = (await this.loadAvailableTags()).map((tag) => ({
@@ -446,8 +473,7 @@ export class DataLoader implements IAtomicService {
 
     return new Promise(async (resolve, reject) => {
       const subscription = timer(DATA_LOAD_FETCH_TIMEOUT_MS).subscribe(() =>
-        reject("Available tag fetch timed out")
-      );
+        reject("Available tag fetch timed out"));
 
       try {
         const tagData: IIndexedTagData = {
@@ -470,8 +496,7 @@ export class DataLoader implements IAtomicService {
     if (!this._usedTags) {
       this._usedTags = new Promise(async (resolve, reject) => {
         const subscription = timer(DATA_LOAD_FETCH_TIMEOUT_MS).subscribe(() =>
-          reject("Used tag fetch timed out")
-        );
+          reject("Used tag fetch timed out"));
 
         try {
           const tags: IIndexedTagData[] = (await this.loadUsedTags()).map((tag) => ({
@@ -500,8 +525,7 @@ export class DataLoader implements IAtomicService {
     if (!this._voidedTags) {
       this._voidedTags = new Promise(async (resolve, reject) => {
         const subscription = timer(DATA_LOAD_FETCH_TIMEOUT_MS).subscribe(() =>
-          reject("Voided tag fetch timed out")
-        );
+          reject("Voided tag fetch timed out"));
 
         try {
           const tags: IIndexedTagData[] = (await this.loadVoidedTags()).map((tag) => ({
@@ -535,8 +559,7 @@ export class DataLoader implements IAtomicService {
     // This does NOT cache the result
     return new Promise(async (resolve, reject) => {
       const subscription = timer(DATA_LOAD_FETCH_TIMEOUT_MS).subscribe(() =>
-        reject("Vegetative plant fetch timed out")
-      );
+        reject("Vegetative plant fetch timed out"));
 
       try {
         const plants = (await this.loadVegetativePlants(options)).map((x) => ({
@@ -564,8 +587,7 @@ export class DataLoader implements IAtomicService {
 
     return new Promise(async (resolve, reject) => {
       const subscription = timer(DATA_LOAD_FETCH_TIMEOUT_MS).subscribe(() =>
-        reject("Vegetative plant fetch timed out")
-      );
+        reject("Vegetative plant fetch timed out"));
 
       try {
         const plantData: IIndexedPlantData = {
@@ -593,8 +615,7 @@ export class DataLoader implements IAtomicService {
     // This does NOT cache the result
     return new Promise(async (resolve, reject) => {
       const subscription = timer(DATA_LOAD_FETCH_TIMEOUT_MS).subscribe(() =>
-        reject("Flowering plant fetch timed out")
-      );
+        reject("Flowering plant fetch timed out"));
 
       try {
         const plants = (await this.loadFloweringPlants(options)).map((x) => ({
@@ -622,8 +643,7 @@ export class DataLoader implements IAtomicService {
 
     return new Promise(async (resolve, reject) => {
       const subscription = timer(DATA_LOAD_FETCH_TIMEOUT_MS).subscribe(() =>
-        reject("Flowering plant fetch timed out")
-      );
+        reject("Flowering plant fetch timed out"));
 
       try {
         const plantData: IIndexedPlantData = {
@@ -653,8 +673,7 @@ export class DataLoader implements IAtomicService {
     // This does NOT cache the result
     return new Promise(async (resolve, reject) => {
       const subscription = timer(DATA_LOAD_FETCH_TIMEOUT_MS).subscribe(() =>
-        reject("Inactive plant fetch timed out")
-      );
+        reject("Inactive plant fetch timed out"));
 
       try {
         const plants = (await this.loadInactivePlants(options)).map((x) => ({
@@ -682,8 +701,7 @@ export class DataLoader implements IAtomicService {
 
     return new Promise(async (resolve, reject) => {
       const subscription = timer(DATA_LOAD_FETCH_TIMEOUT_MS).subscribe(() =>
-        reject("Inactive plant fetch timed out")
-      );
+        reject("Inactive plant fetch timed out"));
 
       try {
         const plantData: IIndexedPlantData = {
@@ -711,8 +729,7 @@ export class DataLoader implements IAtomicService {
     // This does NOT cache the result
     return new Promise(async (resolve, reject) => {
       const subscription = timer(DATA_LOAD_FETCH_TIMEOUT_MS).subscribe(() =>
-        reject("Plant batch fetch timed out")
-      );
+        reject("Plant batch fetch timed out"));
 
       try {
         const plantBatches = (await this.loadPlantBatches(options)).map((x) => ({
@@ -740,8 +757,7 @@ export class DataLoader implements IAtomicService {
 
     return new Promise(async (resolve, reject) => {
       const subscription = timer(DATA_LOAD_FETCH_TIMEOUT_MS).subscribe(() =>
-        reject("Plant batch fetch timed out")
-      );
+        reject("Plant batch fetch timed out"));
 
       try {
         const packageData: IIndexedPlantBatchData = {
@@ -769,8 +785,7 @@ export class DataLoader implements IAtomicService {
     // This does NOT cache the result
     return new Promise(async (resolve, reject) => {
       const subscription = timer(DATA_LOAD_FETCH_TIMEOUT_MS).subscribe(() =>
-        reject("Plant batch fetch timed out")
-      );
+        reject("Plant batch fetch timed out"));
 
       try {
         const plantBatches = (await this.loadInactivePlantBatches(options)).map((x) => ({
@@ -800,8 +815,7 @@ export class DataLoader implements IAtomicService {
 
     return new Promise(async (resolve, reject) => {
       const subscription = timer(DATA_LOAD_FETCH_TIMEOUT_MS).subscribe(() =>
-        reject("Inactive plant batch fetch timed out")
-      );
+        reject("Inactive plant batch fetch timed out"));
 
       try {
         const packageData: IIndexedPlantBatchData = {
@@ -854,7 +868,7 @@ export class DataLoader implements IAtomicService {
     if (activePackagesResponse.status === 200) {
       const responseData: ICollectionResponse<IPackageData> = await activePackagesResponse.data;
 
-      const activePackages: IIndexedPackageData[] = responseData["Data"].map((x) => ({
+      const activePackages: IIndexedPackageData[] = responseData.Data.map((x) => ({
         ...x,
         PackageState: PackageState.ACTIVE,
         TagMatcher: "",
@@ -943,7 +957,7 @@ export class DataLoader implements IAtomicService {
     if (floweringPlantsResponse.status === 200) {
       const responseData: ICollectionResponse<IPlantData> = await floweringPlantsResponse.data;
 
-      const floweringPlants: IIndexedPlantData[] = responseData["Data"].map((x) => ({
+      const floweringPlants: IIndexedPlantData[] = responseData.Data.map((x) => ({
         ...x,
         PlantState: PlantState.FLOWERING,
         TagMatcher: "",
@@ -976,7 +990,7 @@ export class DataLoader implements IAtomicService {
     if (vegetativePlantsResponse.status === 200) {
       const responseData: ICollectionResponse<IPlantData> = await vegetativePlantsResponse.data;
 
-      const vegetativePlants: IIndexedPlantData[] = responseData["Data"].map((x) => ({
+      const vegetativePlants: IIndexedPlantData[] = responseData.Data.map((x) => ({
         ...x,
         PlantState: PlantState.VEGETATIVE,
         TagMatcher: "",
@@ -1008,7 +1022,7 @@ export class DataLoader implements IAtomicService {
     if (inactivePlantsResponse.status === 200) {
       const responseData: ICollectionResponse<IPlantData> = inactivePlantsResponse.data;
 
-      const inactivePlants: IIndexedPlantData[] = responseData["Data"].map((x) => ({
+      const inactivePlants: IIndexedPlantData[] = responseData.Data.map((x) => ({
         ...x,
         PlantState: PlantState.INACTIVE,
         TagMatcher: "",
@@ -1053,7 +1067,7 @@ export class DataLoader implements IAtomicService {
     if (activePackagesResponse.status === 200) {
       const responseData: ICollectionResponse<IPackageData> = await activePackagesResponse.data;
 
-      const activePackages: IIndexedPackageData[] = responseData["Data"].map((x) => ({
+      const activePackages: IIndexedPackageData[] = responseData.Data.map((x) => ({
         ...x,
         PackageState: PackageState.ACTIVE,
         TagMatcher: "",
@@ -1112,7 +1126,7 @@ export class DataLoader implements IAtomicService {
     if (activePackagesResponse.status === 200) {
       const responseData: ICollectionResponse<IPackageData> = await activePackagesResponse.data;
 
-      const activePackages: IIndexedPackageData[] = responseData["Data"].map((x) => ({
+      const activePackages: IIndexedPackageData[] = responseData.Data.map((x) => ({
         ...x,
         PackageState: PackageState.ACTIVE,
         TagMatcher: "",
@@ -1145,7 +1159,7 @@ export class DataLoader implements IAtomicService {
     if (inactivePackagesResponse.status === 200) {
       const responseData: ICollectionResponse<IPackageData> = await inactivePackagesResponse.data;
 
-      const activePackages: IIndexedPackageData[] = responseData["Data"].map((x) => ({
+      const activePackages: IIndexedPackageData[] = responseData.Data.map((x) => ({
         ...x,
         PackageState: PackageState.INACTIVE,
         TagMatcher: "",
@@ -1178,7 +1192,7 @@ export class DataLoader implements IAtomicService {
     if (inTransitPackagesResponse.status === 200) {
       const responseData: ICollectionResponse<IPackageData> = await inTransitPackagesResponse.data;
 
-      const activePackages: IIndexedPackageData[] = responseData["Data"].map((x) => ({
+      const activePackages: IIndexedPackageData[] = responseData.Data.map((x) => ({
         ...x,
         PackageState: PackageState.IN_TRANSIT,
         TagMatcher: "",
@@ -1220,8 +1234,7 @@ export class DataLoader implements IAtomicService {
 
     const freshData = new Promise<IIndexedPackageData[]>(async (resolve, reject) => {
       const subscription = timer(DATA_LOAD_FETCH_TIMEOUT_MS).subscribe(() =>
-        reject("Active package fetch timed out")
-      );
+        reject("Active package fetch timed out"));
 
       try {
         const activePackages = (await this.loadActivePackages()).map((pkg) => ({
@@ -1257,8 +1270,7 @@ export class DataLoader implements IAtomicService {
 
     return new Promise(async (resolve, reject) => {
       const subscription = timer(DATA_LOAD_FETCH_TIMEOUT_MS).subscribe(() =>
-        reject("Active package fetch timed out")
-      );
+        reject("Active package fetch timed out"));
 
       try {
         const packageData: IIndexedPackageData = {
@@ -1300,8 +1312,7 @@ export class DataLoader implements IAtomicService {
 
     const freshData = new Promise<IIndexedPackageData[]>(async (resolve, reject) => {
       const subscription = timer(DATA_LOAD_FETCH_TIMEOUT_MS).subscribe(() =>
-        reject("Inactive package fetch timed out")
-      );
+        reject("Inactive package fetch timed out"));
 
       try {
         const inactivePackages: IIndexedPackageData[] = (await this.loadInactivePackages()).map(
@@ -1333,8 +1344,7 @@ export class DataLoader implements IAtomicService {
   async destinationTransporters(destinationId: number): Promise<ITransporterData[]> {
     return new Promise(async (resolve, reject) => {
       const subscription = timer(DATA_LOAD_FETCH_TIMEOUT_MS).subscribe(() =>
-        reject("Destination transporters fetch timed out")
-      );
+        reject("Destination transporters fetch timed out"));
 
       try {
         const destinationTransporters: ITransporterData[] = await this.loadDestinationTransporters(
@@ -1353,8 +1363,7 @@ export class DataLoader implements IAtomicService {
   async transferDestinations(transferId: number): Promise<IDestinationData[]> {
     return new Promise(async (resolve, reject) => {
       const subscription = timer(DATA_LOAD_FETCH_TIMEOUT_MS).subscribe(() =>
-        reject("Destination fetch timed out")
-      );
+        reject("Destination fetch timed out"));
 
       try {
         const transferDestinations: IDestinationData[] = await this.loadTransferDestinations(
@@ -1373,8 +1382,7 @@ export class DataLoader implements IAtomicService {
   async transferTransporterDetails(transferId: number): Promise<ITransferTransporterDetails[]> {
     return new Promise(async (resolve, reject) => {
       const subscription = timer(DATA_LOAD_FETCH_TIMEOUT_MS).subscribe(() =>
-        reject("Transporter details fetch timed out")
-      );
+        reject("Transporter details fetch timed out"));
 
       try {
         const transferTransporterDetails: ITransferTransporterDetails[] =
@@ -1392,8 +1400,7 @@ export class DataLoader implements IAtomicService {
   async destinationPackages(destinationId: number): Promise<IIndexedDestinationPackageData[]> {
     return new Promise(async (resolve, reject) => {
       const subscription = timer(DATA_LOAD_FETCH_TIMEOUT_MS).subscribe(() =>
-        reject("Destination packages fetch timed out")
-      );
+        reject("Destination packages fetch timed out"));
 
       try {
         const destinationPackages: IIndexedDestinationPackageData[] = (
@@ -1423,8 +1430,7 @@ export class DataLoader implements IAtomicService {
 
     return new Promise(async (resolve, reject) => {
       const subscription = timer(DATA_LOAD_FETCH_TIMEOUT_MS).subscribe(() =>
-        reject("Inactive package fetch timed out")
-      );
+        reject("Inactive package fetch timed out"));
 
       try {
         const packageData: IIndexedPackageData = {
@@ -1446,8 +1452,7 @@ export class DataLoader implements IAtomicService {
   async onHoldPackages(): Promise<IIndexedPackageData[]> {
     return new Promise(async (resolve, reject) => {
       const subscription = timer(DATA_LOAD_FETCH_TIMEOUT_MS).subscribe(() =>
-        reject("On hold package fetch timed out")
-      );
+        reject("On hold package fetch timed out"));
 
       try {
         const onHoldPackages: IIndexedPackageData[] = (await this.loadOnHoldPackages()).map(
@@ -1476,8 +1481,7 @@ export class DataLoader implements IAtomicService {
     if (!this._inTransitPackages) {
       this._inTransitPackages = new Promise(async (resolve, reject) => {
         const subscription = timer(DATA_LOAD_FETCH_TIMEOUT_MS).subscribe(() =>
-          reject("In transit package fetch timed out")
-        );
+          reject("In transit package fetch timed out"));
 
         try {
           const inTransitPackages: IIndexedPackageData[] = (await this.loadInTransitPackages()).map(
@@ -1524,8 +1528,7 @@ export class DataLoader implements IAtomicService {
 
     return new Promise(async (resolve, reject) => {
       const subscription = timer(DATA_LOAD_FETCH_TIMEOUT_MS).subscribe(() =>
-        reject("In Transit package fetch timed out")
-      );
+        reject("In Transit package fetch timed out"));
 
       try {
         const packageData: IIndexedPackageData = {
@@ -1579,7 +1582,7 @@ export class DataLoader implements IAtomicService {
     if (transferResponse.status === 200) {
       const responseData: ICollectionResponse<ITransferData> = await transferResponse.data;
 
-      transfers = responseData["Data"].map((x) => ({
+      transfers = responseData.Data.map((x) => ({
         ...x,
         TransferState: transferState,
         TagMatcher: "",
@@ -1621,7 +1624,7 @@ export class DataLoader implements IAtomicService {
     if (tagResponse.status === 200) {
       const responseData: ICollectionResponse<ITagData> = await tagResponse.data;
 
-      tags = responseData["Data"].map((x) => ({
+      tags = responseData.Data.map((x) => ({
         ...x,
         TagState: tagState,
         TagMatcher: "",
@@ -1642,8 +1645,7 @@ export class DataLoader implements IAtomicService {
     if (!this._incomingTransfers) {
       this._incomingTransfers = new Promise(async (resolve, reject) => {
         const subscription = timer(DATA_LOAD_FETCH_TIMEOUT_MS).subscribe(() =>
-          reject("Incoming transfer fetch timed out")
-        );
+          reject("Incoming transfer fetch timed out"));
 
         try {
           const incomingTransfers: IIndexedTransferData[] = (
@@ -1678,8 +1680,7 @@ export class DataLoader implements IAtomicService {
     if (!this._incomingInactiveTransfers) {
       this._incomingInactiveTransfers = new Promise(async (resolve, reject) => {
         const subscription = timer(DATA_LOAD_FETCH_TIMEOUT_MS).subscribe(() =>
-          reject("Incoming transfer fetch timed out")
-        );
+          reject("Incoming transfer fetch timed out"));
 
         try {
           const incomingTransfers: IIndexedTransferData[] = (
@@ -1709,8 +1710,7 @@ export class DataLoader implements IAtomicService {
   async incomingTransfer(manifestNumber: string): Promise<IIndexedTransferData> {
     return new Promise(async (resolve, reject) => {
       const subscription = timer(DATA_LOAD_FETCH_TIMEOUT_MS).subscribe(() =>
-        reject("Transfer fetch timed out")
-      );
+        reject("Transfer fetch timed out"));
 
       try {
         const transferData: IIndexedTransferData = {
@@ -1732,8 +1732,7 @@ export class DataLoader implements IAtomicService {
   async incomingInactiveTransfer(manifestNumber: string): Promise<IIndexedTransferData> {
     return new Promise(async (resolve, reject) => {
       const subscription = timer(DATA_LOAD_FETCH_TIMEOUT_MS).subscribe(() =>
-        reject("Incoming inactive transfer fetch timed out")
-      );
+        reject("Incoming inactive transfer fetch timed out"));
 
       try {
         const transferData: IIndexedTransferData = {
@@ -1760,8 +1759,7 @@ export class DataLoader implements IAtomicService {
     if (!this._outgoingTransfers) {
       this._outgoingTransfers = new Promise(async (resolve, reject) => {
         const subscription = timer(DATA_LOAD_FETCH_TIMEOUT_MS).subscribe(() =>
-          reject("Outgoing transfer fetch timed out")
-        );
+          reject("Outgoing transfer fetch timed out"));
 
         try {
           const outgoingTransfers: IIndexedTransferData[] = (
@@ -1796,8 +1794,7 @@ export class DataLoader implements IAtomicService {
     if (!this._outgoingInactiveTransfers) {
       this._outgoingInactiveTransfers = new Promise(async (resolve, reject) => {
         const subscription = timer(DATA_LOAD_FETCH_TIMEOUT_MS).subscribe(() =>
-          reject("Outgoing transfer fetch timed out")
-        );
+          reject("Outgoing transfer fetch timed out"));
 
         try {
           const outgoingTransfers: IIndexedTransferData[] = (
@@ -1827,8 +1824,7 @@ export class DataLoader implements IAtomicService {
   async outgoingTransfer(manifestNumber: string): Promise<IIndexedTransferData> {
     return new Promise(async (resolve, reject) => {
       const subscription = timer(DATA_LOAD_FETCH_TIMEOUT_MS).subscribe(() =>
-        reject("Transfer fetch timed out")
-      );
+        reject("Transfer fetch timed out"));
 
       try {
         const transferData: IIndexedTransferData = {
@@ -1850,8 +1846,7 @@ export class DataLoader implements IAtomicService {
   async outgoingInactiveTransfer(manifestNumber: string): Promise<IIndexedTransferData> {
     return new Promise(async (resolve, reject) => {
       const subscription = timer(DATA_LOAD_FETCH_TIMEOUT_MS).subscribe(() =>
-        reject("Outgoing inactive transfer fetch timed out")
-      );
+        reject("Outgoing inactive transfer fetch timed out"));
 
       try {
         const transferData: IIndexedTransferData = {
@@ -1878,8 +1873,7 @@ export class DataLoader implements IAtomicService {
     if (!this._rejectedTransfers) {
       this._rejectedTransfers = new Promise(async (resolve, reject) => {
         const subscription = timer(DATA_LOAD_FETCH_TIMEOUT_MS).subscribe(() =>
-          reject("Return transfer fetch timed out")
-        );
+          reject("Return transfer fetch timed out"));
 
         try {
           const rejectedTransfers: IIndexedTransferData[] = (
@@ -1909,8 +1903,7 @@ export class DataLoader implements IAtomicService {
   async rejectedTransfer(manifestNumber: string): Promise<IIndexedTransferData> {
     return new Promise(async (resolve, reject) => {
       const subscription = timer(DATA_LOAD_FETCH_TIMEOUT_MS).subscribe(() =>
-        reject("Transfer fetch timed out")
-      );
+        reject("Transfer fetch timed out"));
 
       try {
         const transferData: IIndexedTransferData = {
@@ -1937,8 +1930,7 @@ export class DataLoader implements IAtomicService {
     if (!this._layoverTransfers) {
       this._layoverTransfers = new Promise(async (resolve, reject) => {
         const subscription = timer(DATA_LOAD_FETCH_TIMEOUT_MS).subscribe(() =>
-          reject("Layover transfer fetch timed out")
-        );
+          reject("Layover transfer fetch timed out"));
 
         try {
           const layoverTransfers: IIndexedTransferData[] = (await this.loadLayoverTransfers()).map(
@@ -1966,8 +1958,7 @@ export class DataLoader implements IAtomicService {
   async layoverTransfer(manifestNumber: string): Promise<IIndexedTransferData> {
     return new Promise(async (resolve, reject) => {
       const subscription = timer(DATA_LOAD_FETCH_TIMEOUT_MS).subscribe(() =>
-        reject("Transfer fetch timed out")
-      );
+        reject("Transfer fetch timed out"));
 
       try {
         const transferData: IIndexedTransferData = {
@@ -1989,8 +1980,7 @@ export class DataLoader implements IAtomicService {
   async transferDestinationFacilities(): Promise<IMetrcFacilityData[]> {
     return new Promise(async (resolve, reject) => {
       const subscription = timer(DATA_LOAD_FETCH_TIMEOUT_MS).subscribe(() =>
-        reject("Destination facility fetch timed out")
-      );
+        reject("Destination facility fetch timed out"));
 
       try {
         const facilityData: IMetrcFacilityData[] = await this.loadTransferDestinationFacilities();
@@ -2007,8 +1997,7 @@ export class DataLoader implements IAtomicService {
   async transferTransporterFacilities(): Promise<IMetrcFacilityData[]> {
     return new Promise(async (resolve, reject) => {
       const subscription = timer(DATA_LOAD_FETCH_TIMEOUT_MS).subscribe(() =>
-        reject("Transporter facility fetch timed out")
-      );
+        reject("Transporter facility fetch timed out"));
 
       try {
         const facilityData: IMetrcFacilityData[] = await this.loadTransferTransporterFacilities();
@@ -2030,8 +2019,7 @@ export class DataLoader implements IAtomicService {
     if (!this._locations) {
       this._locations = new Promise(async (resolve, reject) => {
         const subscription = timer(DATA_LOAD_FETCH_TIMEOUT_MS).subscribe(() =>
-          reject("Location fetch timed out")
-        );
+          reject("Location fetch timed out"));
 
         try {
           const locations = await this.loadLocations();
@@ -2061,8 +2049,7 @@ export class DataLoader implements IAtomicService {
     if (!this._strains) {
       this._strains = new Promise(async (resolve, reject) => {
         const subscription = timer(DATA_LOAD_FETCH_TIMEOUT_MS).subscribe(() =>
-          reject("Strain fetch timed out")
-        );
+          reject("Strain fetch timed out"));
 
         try {
           const strains = await this.loadStrains();
@@ -2088,8 +2075,7 @@ export class DataLoader implements IAtomicService {
     if (!this._items) {
       this._items = new Promise(async (resolve, reject) => {
         const subscription = timer(DATA_LOAD_FETCH_TIMEOUT_MS).subscribe(() =>
-          reject("Item fetch timed out")
-        );
+          reject("Item fetch timed out"));
 
         try {
           const items = await this.loadItems();
@@ -2110,8 +2096,7 @@ export class DataLoader implements IAtomicService {
   async activeHarvestByName(name: string): Promise<IIndexedHarvestData> {
     return new Promise(async (resolve, reject) => {
       const subscription = timer(DATA_LOAD_FETCH_TIMEOUT_MS).subscribe(() =>
-        reject("Active harvest fetch timed out")
-      );
+        reject("Active harvest fetch timed out"));
 
       try {
         const harvestData: IIndexedHarvestData = {
@@ -2133,8 +2118,7 @@ export class DataLoader implements IAtomicService {
   async inactiveHarvestByName(name: string): Promise<IIndexedHarvestData> {
     return new Promise(async (resolve, reject) => {
       const subscription = timer(DATA_LOAD_FETCH_TIMEOUT_MS).subscribe(() =>
-        reject("Active harvest fetch timed out")
-      );
+        reject("Active harvest fetch timed out"));
 
       try {
         const harvestData: IIndexedHarvestData = {
@@ -2161,8 +2145,7 @@ export class DataLoader implements IAtomicService {
     if (!this._activeHarvests) {
       this._activeHarvests = new Promise(async (resolve, reject) => {
         const subscription = timer(DATA_LOAD_FETCH_TIMEOUT_MS).subscribe(() =>
-          reject("Harvest fetch timed out")
-        );
+          reject("Harvest fetch timed out"));
 
         try {
           const harvests: IIndexedHarvestData[] = (await this.loadActiveHarvests()).map(
@@ -2195,8 +2178,7 @@ export class DataLoader implements IAtomicService {
     if (!this._inactiveHarvests) {
       this._inactiveHarvests = new Promise(async (resolve, reject) => {
         const subscription = timer(DATA_LOAD_FETCH_TIMEOUT_MS).subscribe(() =>
-          reject("Inactive harvest fetch timed out")
-        );
+          reject("Inactive harvest fetch timed out"));
 
         try {
           const harvests: IIndexedHarvestData[] = (await this.loadInactiveHarvests()).map(
@@ -2225,8 +2207,7 @@ export class DataLoader implements IAtomicService {
     const activeSalesReceipts: Promise<ISalesReceiptData[]> = new Promise(
       async (resolve, reject) => {
         const subscription = timer(DATA_LOAD_FETCH_TIMEOUT_MS).subscribe(() =>
-          reject("Active sales receipt fetch timed out")
-        );
+          reject("Active sales receipt fetch timed out"));
 
         try {
           const activeSalesReceipts = await this.loadActiveSalesReceipts();
@@ -2262,8 +2243,7 @@ export class DataLoader implements IAtomicService {
     if (!this._previousTagOrders) {
       this._previousTagOrders = new Promise(async (resolve, reject) => {
         const subscription = timer(DATA_LOAD_FETCH_TIMEOUT_MS).subscribe(() =>
-          reject("Tag orders fetch timed out")
-        );
+          reject("Tag orders fetch timed out"));
 
         try {
           subscription.unsubscribe();
@@ -2280,7 +2260,7 @@ export class DataLoader implements IAtomicService {
   }
 
   async lookupTagId(tag: string) {
-    for (let tagData of await this.availableTags({})) {
+    for (const tagData of await this.availableTags({})) {
       if (tag === tagData.Label) {
         return tagData.Id;
       }
@@ -4045,4 +4025,4 @@ export class DataLoader implements IAtomicService {
    */
 }
 
-export let primaryDataLoader = new DataLoader();
+export const primaryDataLoader = new DataLoader();

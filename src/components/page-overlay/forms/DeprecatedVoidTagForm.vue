@@ -76,8 +76,6 @@ export default Vue.extend({
       } catch (e) {
         return [];
       }
-
-      return [];
     },
     isInvalidTagRange(): boolean {
       if (!isValidTag(this.form.startTag) || !isValidTag(this.form.endTag)) {
@@ -91,8 +89,6 @@ export default Vue.extend({
       } catch (e) {
         return true;
       }
-
-      return true;
     },
     ...mapState(["currentView"]),
   },
@@ -114,13 +110,14 @@ export default Vue.extend({
     async onSubmit(evt: any) {
       evt.preventDefault();
 
+      /* eslint-disable-next-line no-alert */
       if (!window.confirm("Are you sure you wish to void these tags?")) {
         return;
       }
 
       analyticsManager.track(MessageType.VOIDED_TAGS);
 
-      for (let tag of generateTagRangeOrError(this.form.startTag, this.form.endTag)) {
+      for (const tag of generateTagRangeOrError(this.form.startTag, this.form.endTag)) {
         store.commit(
           MutationType.ENQUEUE_TASK,
           await createTask(TaskType.VOID_TAGS, {

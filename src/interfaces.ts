@@ -701,7 +701,6 @@ export interface IPackageSourceHarvestData {
 
 export interface IPlantHistoryData {}
 export interface IPlantBatchHistoryData {}
-export interface ITransferHistoryData {}
 
 export interface ITestResultData {
   IsRevoked: boolean;
@@ -787,7 +786,7 @@ export interface IDestinationPackageData {
   ItemUnitVolumeUnitOfMeasureAbbreviation: null;
   ItemUnitWeight: number | null;
   ItemUnitWeightUnitOfMeasureAbbreviation: string; // "g";
-  LabTestingStateName: string; //"TestPassed";
+  LabTestingStateName: string; // "TestPassed";
   MultiHarvest: true;
   MultiPackage: boolean;
   PackageId: number;
@@ -1875,7 +1874,7 @@ export interface IGoogleOAuthOAuthUserInfo {
   given_name: string; // First Name
   family_name: string; // Last Name
   picture: string; // "https://lh3.googleusercontent.com/a/..."
-  locale: string; //"en"
+  locale: string; // "en"
 }
 
 export interface ISimpleSpreadsheet {

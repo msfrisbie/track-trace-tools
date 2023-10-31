@@ -197,12 +197,16 @@ import LocationPicker from "@/components/overlay-widget/shared/LocationPicker.vu
 import PickerCard from "@/components/overlay-widget/shared/PickerCard.vue";
 import StrainPicker from "@/components/overlay-widget/shared/StrainPicker.vue";
 import { DATA_LOAD_MAX_COUNT } from "@/consts";
-import { ILocationData, IPlantBatchData, IPlantBatchFilter, IStrainData } from "@/interfaces";
+import {
+  ILocationData, IPlantBatchData, IPlantBatchFilter, IStrainData
+} from "@/interfaces";
 import { authManager } from "@/modules/auth-manager.module";
 import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
 import store from "@/store/page-overlay/index";
 import { combineLatest, Subject } from "rxjs";
-import { debounceTime, distinctUntilChanged, startWith, tap } from "rxjs/operators";
+import {
+  debounceTime, distinctUntilChanged, startWith, tap
+} from "rxjs/operators";
 import { v4 } from "uuid";
 import Vue from "vue";
 import PasteTags from "./PasteTags.vue";

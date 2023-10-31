@@ -8,4 +8,4 @@ class AnnouncementsManager implements IAtomicService {
   }
 }
 
-export let announcementsManager = new AnnouncementsManager();
+export const announcementsManager = new AnnouncementsManager();

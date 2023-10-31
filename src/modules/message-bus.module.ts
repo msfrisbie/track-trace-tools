@@ -12,6 +12,7 @@ class MessageBus implements IAtomicService {
 
   async init() {}
 
+  /* eslint-disable-next-line consistent-return */
   async sendMessageToBackground<T>(
     type: MessageType,
     data: any = [],
@@ -66,7 +67,7 @@ class MessageBus implements IAtomicService {
   }
 
   private handleResponseFromBackground(event: IBusEvent) {
-    if (!!event.uuid) {
+    if (event.uuid) {
       const handler = this.handlers.get(event.uuid);
 
       if (handler) {
@@ -78,4 +79,4 @@ class MessageBus implements IAtomicService {
   }
 }
 
-export let messageBus = new MessageBus();
+export const messageBus = new MessageBus();

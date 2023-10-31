@@ -18,6 +18,7 @@ import {
   IMetrcReplacePlantTagsPayload,
   IMetrcUnpackImmaturePlantsPayload,
   IMetrcUpdateTransferPayload,
+  IMetrcCreateTransferPayload
 } from "@/interfaces";
 import { primaryMetrcRequestManager } from "@/modules/metrc-request-manager.module";
 import store from "@/store/page-overlay/index";
@@ -27,7 +28,6 @@ import { debugLogFactory } from "@/utils/debug";
 import { AxiosResponse } from "axios";
 import _ from "lodash-es";
 import { Subject, timer } from "rxjs";
-import { IMetrcCreateTransferPayload } from "../interfaces";
 import { TransferBuilderActions } from "../store/page-overlay/modules/transfer-builder/consts";
 import { analyticsManager } from "./analytics-manager.module";
 import { authManager } from "./auth-manager.module";
@@ -80,6 +80,7 @@ class BuilderManager implements IAtomicService {
 
   // TODO move this to Vuex
   activeBuilderProject: IBuilderProject | null = null;
+
   activeBuilderProjectUpdate: Subject<any> = new Subject<any>();
 
   async init() {
@@ -142,7 +143,7 @@ class BuilderManager implements IAtomicService {
     csvFiles: ICsvFile[],
     pageSize: number
   ) {
-    if (!!this.activeBuilderProject) {
+    if (this.activeBuilderProject) {
       throw new Error("Cannot overwrite existing project");
     }
 
@@ -260,7 +261,7 @@ class BuilderManager implements IAtomicService {
         }
         let errorMessage = data;
         try {
-          errorMessage = JSON.parse(data)["Message"] ?? data;
+          errorMessage = JSON.parse(data).Message ?? data;
         } catch {}
         toastManager.openToast(errorMessage, {
           title: "T3 Submit Error",
@@ -387,7 +388,7 @@ class BuilderManager implements IAtomicService {
         response = await primaryMetrcRequestManager.replacePlantBatchTags(JSON.stringify(rows));
         break;
       default:
-        throw new Error("Bad builder type: " + builderType);
+        throw new Error(`Bad builder type: ${builderType}`);
     }
 
     if (!response) {
@@ -398,4 +399,4 @@ class BuilderManager implements IAtomicService {
   }
 }
 
-export let builderManager = new BuilderManager();
+export const builderManager = new BuilderManager();

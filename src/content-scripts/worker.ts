@@ -1,1 +1,1 @@
-console.log('Web worker started!')
+console.log('Web worker started!');

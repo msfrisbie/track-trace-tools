@@ -83,7 +83,7 @@ export function divideTagsIntoRanges(tags: ITagData[], counts: number[]): ITagDa
   const tagRanges: ITagData[][] = [];
   let acc = 0;
 
-  for (let count of counts) {
+  for (const count of counts) {
     tagRanges.push(tags.slice(acc, acc + count));
     acc += count;
   }
@@ -102,7 +102,7 @@ export function flattenTagsAndPlantBatches({
 
   let tagIdx = 0;
 
-  for (let promoteData of promoteDataList) {
+  for (const promoteData of promoteDataList) {
     for (let i = 0; i < promoteData.count; ++i) {
       const tag = tags[tagIdx];
       tagIdx++;
@@ -124,16 +124,16 @@ export function allocatePackageQuantities(
   outputQuantities: number[],
   inputPackages: IPackageData[]
 ): IIntermediateCreatePackageFromPackagesData[] {
-  let packageData: IIntermediateCreatePackageFromPackagesData[] = [];
+  const packageData: IIntermediateCreatePackageFromPackagesData[] = [];
 
   let selectedPackageIndex = 0;
 
-  for (let newPackageQuantity of outputQuantities) {
+  for (const newPackageQuantity of outputQuantities) {
     let remainingTotal = newPackageQuantity;
 
     let counter = 0;
 
-    let outputPackageData: IIntermediateCreatePackageFromPackagesData = {
+    const outputPackageData: IIntermediateCreatePackageFromPackagesData = {
       ingredients: [],
       quantity: newPackageQuantity,
     };
@@ -233,7 +233,7 @@ export function allocateImmaturePlantCounts(
       throw new Error("Killswitch");
     }
 
-    let batchSize: number = Math.min(remainingTotal, selectedPackageRemainingPlantCount, 100);
+    const batchSize: number = Math.min(remainingTotal, selectedPackageRemainingPlantCount, 100);
 
     debugLog(async () => ["Next batch size:", batchSize]);
 

@@ -2,7 +2,7 @@ import { IIndexedPlantBatchData, IPlantBatchFilter, IPluginState } from "@/inter
 import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
 import { ReportsMutations, ReportType } from "@/store/page-overlay/modules/reports/consts";
 import {
-    IFieldData,
+  IFieldData,
   IReportConfig,
   IReportData,
   IReportsState,

@@ -8,7 +8,7 @@ class BackupManager implements IAtomicService {
   async backupCsvData(builderType: BuilderType, csvFiles: ICsvFile[]) {
     const pluginUserData = await accountManager.pluginUserDataOrError();
 
-    for (let csvFile of csvFiles) {
+    for (const csvFile of csvFiles) {
       const pluginCsvData: IPluginCsvData = {
         ...pluginUserData,
         dataType: builderType,
@@ -22,4 +22,4 @@ class BackupManager implements IAtomicService {
   }
 }
 
-export let backupManager = new BackupManager();
+export const backupManager = new BackupManager();

@@ -18,6 +18,7 @@ export interface IContextMenuEvent {
 
 export class ModalManager implements IAtomicService {
   private _modal: Subject<IModalEvent> = new Subject();
+
   private _hoverMenu: Subject<IContextMenuEvent | null> = new Subject();
 
   async init() {}
@@ -49,4 +50,4 @@ export class ModalManager implements IAtomicService {
   }
 }
 
-export let modalManager = new ModalManager();
+export const modalManager = new ModalManager();

@@ -68,9 +68,9 @@ import { toastManager } from "@/modules/toast-manager.module";
 import { copyToClipboard } from "@/utils/dom";
 import { mapState } from "vuex";
 import TransferSearchResultsGroup from "@/components/search/transfer-search/TransferSearchResultsGroup.vue";
-import TransferSearchFiltersVue from "./TransferSearchFilters.vue";
 import { searchManager } from "@/modules/search-manager.module";
 import store from "@/store/page-overlay/index";
+import TransferSearchFiltersVue from "./TransferSearchFilters.vue";
 
 export default Vue.extend({
   name: "TransferResultGroups",
@@ -121,8 +121,7 @@ export default Vue.extend({
     },
     deliveryFacilitiesTransfers(): IIndexedTransferData[] {
       const transfers = this.transfers.filter((transferData: IIndexedTransferData) =>
-        transferData.DeliveryFacilities.includes(store.state.search.queryString)
-      );
+        transferData.DeliveryFacilities.includes(store.state.search.queryString));
 
       return transfers;
     },

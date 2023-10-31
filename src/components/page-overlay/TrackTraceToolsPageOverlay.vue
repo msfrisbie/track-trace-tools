@@ -84,7 +84,7 @@ setTimeout(() => {
       }),
     ],
     beforeSend(event, hint) {
-      for (let blacklistEntry of [
+      for (const blacklistEntry of [
         `timed out`,
         `Setting the value of 'vuex' exceeded the quota`,
         `No metrc kendo present`,

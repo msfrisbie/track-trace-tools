@@ -32,7 +32,6 @@ export default Vue.extend({
 });
 </script>
 
-
 <style type="text/scss" lang="scss">
 // Override metrc bootstrap
 #popover-container {

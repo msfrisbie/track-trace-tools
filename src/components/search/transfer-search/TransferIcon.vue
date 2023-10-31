@@ -2,7 +2,6 @@
   <font-awesome-icon :icon="icon" v-bind:style="{ color: iconColor }" />
 </template>
 
-
 <script lang="ts">
 import { TransferState } from "@/consts";
 import { IIndexedTransferData } from "@/interfaces";
@@ -20,7 +19,7 @@ export default Vue.extend({
           return "truck";
         case TransferState.OUTGOING:
           return "truck-loading";
-        case TransferState.INCOMING:
+        case TransferState.REJECTED:
           return "undo";
       }
 

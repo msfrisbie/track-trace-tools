@@ -73,7 +73,7 @@ export default Vue.extend({
     // destroyed$: Subject<void>;
     // selectedTagMetadata: ISelectedTagMetadata | null;
     showAll: boolean;
-  } {
+    } {
     return {
       // destroyed$: new Subject(),
       // selectedTagMetadata: null,

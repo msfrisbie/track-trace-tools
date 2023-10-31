@@ -98,8 +98,12 @@ import { mapState } from "vuex";
 import BuilderStepHeader from "@/components/overlay-widget/shared/BuilderStepHeader.vue";
 import { isValidTag, generateTagRangeOrError, getTagFromOffset } from "@/utils/tags";
 import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
-import { combineLatest, from, Subject, timer } from "rxjs";
-import { debounceTime, distinctUntilChanged, filter, startWith, tap } from "rxjs/operators";
+import {
+  combineLatest, from, Subject, timer
+} from "rxjs";
+import {
+  debounceTime, distinctUntilChanged, filter, startWith, tap
+} from "rxjs/operators";
 import {
   IPackageData,
   IPlantFilter,
@@ -148,7 +152,7 @@ export default Vue.extend({
     async submit() {
       const rows: IMetrcFinishPackagesPayload[] = [];
 
-      for (let pkg of this.$data.selectedPackages) {
+      for (const pkg of this.$data.selectedPackages) {
         const row = {
           ActualDate: submitDateFromIsodate(this.$data.finishIsodate),
           Id: pkg.Id.toString()

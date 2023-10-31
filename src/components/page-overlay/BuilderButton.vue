@@ -98,9 +98,8 @@ export default Vue.extend({
       if (pendingOrInflightRowCount(this.$data.activeProject) > 0) {
         if (failedRowCount(this.$data.activeProject) > 0) {
           return "warning";
-        } else {
-          return "primary";
         }
+        return "primary";
       }
 
       // This means there are no pending rows

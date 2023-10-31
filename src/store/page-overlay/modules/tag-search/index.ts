@@ -123,7 +123,7 @@ export const tagSearchModule = {
       };
 
       if (propagate) {
-        for (let [k, v] of Object.entries(tagSearchFilters)) {
+        for (const [k, v] of Object.entries(tagSearchFilters)) {
           // @ts-ignore
           if (ctx.state.tagSearchFilters[k] !== v) {
             switch (k) {
@@ -142,9 +142,7 @@ export const tagSearchModule = {
   },
 };
 
-export const tagSearchReducer = (state: ITagSearchState): ITagSearchState => {
-  return {
-    ...state,
-    ...inMemoryState,
-  };
-};
+export const tagSearchReducer = (state: ITagSearchState): ITagSearchState => ({
+  ...state,
+  ...inMemoryState,
+});

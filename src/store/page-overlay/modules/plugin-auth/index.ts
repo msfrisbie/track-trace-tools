@@ -3,7 +3,9 @@ import { IAuthState, IPluginState } from "@/interfaces";
 import { messageBus } from "@/modules/message-bus.module";
 import { debugLogFactory } from "@/utils/debug";
 import { ActionContext } from "vuex";
-import { OAuthState, PluginAuthActions, PluginAuthGetters, PluginAuthMutations } from "./consts";
+import {
+  OAuthState, PluginAuthActions, PluginAuthGetters, PluginAuthMutations
+} from "./consts";
 import { IPluginAuthState } from "./interfaces";
 
 const debugLog = debugLogFactory("plugin-auth/index.ts");
@@ -99,7 +101,7 @@ export const pluginAuthModule = {
       rootState: any,
       rootGetters: any
     ) => {
-      if (rootState.pluginAuth.authState.identity != state.identity) {
+      if (rootState.pluginAuth.authState.identity !== state.identity) {
         // Stored credentials must match current identity
         return false;
       }
@@ -124,19 +126,13 @@ export const pluginAuthModule = {
       getters: any,
       rootState: any,
       rootGetters: any
-    ) => {
-      return state.authState || null;
-    },
+    ) => state.authState || null,
     [PluginAuthGetters.PACKAGES_URL]: (
       state: IPluginAuthState,
       getters: any,
       rootState: any,
       rootGetters: any
-    ) => {
-      return state.authState?.license
-      ? `/industry/${state.authState?.license}/packages`
-      : null;
-    },
+    ) => (state.authState?.license ? `/industry/${state.authState?.license}/packages` : null),
   },
   actions: {
     [PluginAuthActions.SET_AUTH](
@@ -147,7 +143,7 @@ export const pluginAuthModule = {
     },
     async [PluginAuthActions.REFRESH_OAUTH_STATE](
       ctx: ActionContext<IPluginAuthState, IPluginState>,
-      { }: { }
+      {}: {}
     ) {
       const response: {
         data: {
@@ -159,15 +155,15 @@ export const pluginAuthModule = {
       if (response.data.success && response.data.isAuthenticated) {
         ctx.commit(PluginAuthMutations.SET_OAUTH_STATE, { oAuthState: OAuthState.AUTHENTICATED });
       } else {
-        ctx.commit(PluginAuthMutations.SET_OAUTH_STATE, { oAuthState: OAuthState.NOT_AUTHENTICATED });
+        ctx.commit(PluginAuthMutations.SET_OAUTH_STATE, {
+          oAuthState: OAuthState.NOT_AUTHENTICATED,
+        });
       }
     },
   },
 };
 
-export const pluginAuthReducer = (state: IPluginAuthState): IPluginAuthState => {
-  return {
-    ...state,
-    ...inMemoryState,
-  };
-};
+export const pluginAuthReducer = (state: IPluginAuthState): IPluginAuthState => ({
+  ...state,
+  ...inMemoryState,
+});

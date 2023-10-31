@@ -209,7 +209,7 @@ export default Vue.extend({
     // destroyed$: Subject<void>;
     // pkg: IIndexedPackageData | null;
     activeTransferPackageList: ITransferPackageList | null;
-  } {
+    } {
     return {
       packageLabTestPdfEligible: !METRC_HOSTNAMES_LACKING_LAB_PDFS.includes(
         window.location.hostname
@@ -255,7 +255,7 @@ export default Vue.extend({
       isPackageInActiveList: `transferBuilder/${TransferBuilderGetters.IS_PACKAGE_IN_ACTIVE_LIST}`,
     }),
     t3plusEnabled() {
-      return store.state.client.values["ENABLE_T3PLUS"] || store.state.client.t3plus;
+      return store.state.client.values.ENABLE_T3PLUS || store.state.client.t3plus;
     },
   },
   watch: {},

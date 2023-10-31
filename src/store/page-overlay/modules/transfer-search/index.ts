@@ -158,7 +158,7 @@ export const transferSearchModule = {
       };
 
       if (propagate) {
-        for (let [k, v] of Object.entries(transferSearchFilters)) {
+        for (const [k, v] of Object.entries(transferSearchFilters)) {
           // @ts-ignore
           if (ctx.state.transferSearchFilters[k] !== v) {
             switch (k) {
@@ -183,9 +183,7 @@ export const transferSearchModule = {
   },
 };
 
-export const transferSearchReducer = (state: ITransferSearchState): ITransferSearchState => {
-  return {
-    ...state,
-    ...inMemoryState,
-  };
-};
+export const transferSearchReducer = (state: ITransferSearchState): ITransferSearchState => ({
+  ...state,
+  ...inMemoryState,
+});

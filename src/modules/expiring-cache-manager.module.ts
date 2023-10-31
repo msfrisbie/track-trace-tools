@@ -64,7 +64,7 @@ class ExpiringCacheManager implements IAtomicService {
   lazyFlushExpiredValues() {
     let count = 0;
 
-    for (let k of this.managedKeys()) {
+    for (const k of this.managedKeys()) {
       const { expiration } = extractKeyValues(k);
 
       if (expiration < Date.now()) {
@@ -85,6 +85,8 @@ class ExpiringCacheManager implements IAtomicService {
         return this.inMemoryCache[k] || this.persistedCache.getItem(k);
       }
     }
+
+    return null;
   }
 
   set({
@@ -114,4 +116,4 @@ class ExpiringCacheManager implements IAtomicService {
   }
 }
 
-export let expiringCacheManager = new ExpiringCacheManager();
+export const expiringCacheManager = new ExpiringCacheManager();

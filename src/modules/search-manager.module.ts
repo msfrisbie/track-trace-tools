@@ -187,4 +187,4 @@ class SearchManager implements IAtomicService {
   // }
 }
 
-export let searchManager = new SearchManager();
+export const searchManager = new SearchManager();

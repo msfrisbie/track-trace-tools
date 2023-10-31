@@ -1,7 +1,7 @@
 import { IPluginState } from "@/interfaces";
 import { ActionContext } from "vuex";
-import { ExampleActions, ExampleGetters, ExampleMutations } from "../example/consts";
-import { IExampleState } from "../example/interfaces";
+import { ExampleActions, ExampleGetters, ExampleMutations } from "./consts";
+import { IExampleState } from "./interfaces";
 
 const inMemoryState = {};
 
@@ -39,9 +39,7 @@ export const exampleModule = {
   },
 };
 
-export const exampleReducer = (state: IExampleState): IExampleState => {
-  return {
-    ...state,
-    ...inMemoryState,
-  };
-};
+export const exampleReducer = (state: IExampleState): IExampleState => ({
+  ...state,
+  ...inMemoryState,
+});

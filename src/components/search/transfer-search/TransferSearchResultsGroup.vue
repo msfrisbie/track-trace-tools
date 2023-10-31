@@ -53,7 +53,7 @@ export default Vue.extend({
     // destroyed$: Subject<void>;
     // selectedTransferMetadata: ISelectedTransferMetadata | null;
     showAll: boolean;
-  } {
+    } {
     return {
       // destroyed$: new Subject(),
       // selectedTransferMetadata: null,

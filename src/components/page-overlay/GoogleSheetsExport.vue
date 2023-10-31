@@ -1999,8 +1999,8 @@ export default Vue.extend({
           text: "COGS",
           value: ReportType.COGS_V2,
           t3plus: false,
-          enabled: !!store.state.client.values["ENABLE_COGS"],
-          hidden: !store.state.client.values["ENABLE_COGS"],
+          enabled: !!store.state.client.values.ENABLE_COGS,
+          hidden: !store.state.client.values.ENABLE_COGS,
           description: "Generate COGS calculator",
           isCustom: false,
           isCsvEligible: false,
@@ -2010,8 +2010,8 @@ export default Vue.extend({
           text: "COGS Tracker",
           value: ReportType.COGS_TRACKER,
           t3plus: false,
-          enabled: !!store.state.client.values["ENABLE_COGS_TRACKER"],
-          hidden: !store.state.client.values["ENABLE_COGS_TRACKER"],
+          enabled: !!store.state.client.values.ENABLE_COGS_TRACKER,
+          hidden: !store.state.client.values.ENABLE_COGS_TRACKER,
           description: "Generate COGS Tracker sheets",
           isCustom: false,
           isCsvEligible: false,
@@ -2021,8 +2021,8 @@ export default Vue.extend({
           text: "Employee Samples",
           value: ReportType.EMPLOYEE_SAMPLES,
           t3plus: false,
-          enabled: !!store.state.client.values["ENABLE_EMPLOYEE_SAMPLE_TOOL"],
-          hidden: !store.state.client.values["ENABLE_EMPLOYEE_SAMPLE_TOOL"],
+          enabled: !!store.state.client.values.ENABLE_EMPLOYEE_SAMPLE_TOOL,
+          hidden: !store.state.client.values.ENABLE_EMPLOYEE_SAMPLE_TOOL,
           description: "Generate summary of employee samples",
           isCustom: false,
           isCsvEligible: false,
@@ -2032,8 +2032,8 @@ export default Vue.extend({
           text: "Harvest Packages",
           value: ReportType.HARVEST_PACKAGES,
           t3plus: false,
-          enabled: !!store.state.client.values["ENABLE_HARVEST_PACKAGES"],
-          hidden: !store.state.client.values["ENABLE_HARVEST_PACKAGES"],
+          enabled: !!store.state.client.values.ENABLE_HARVEST_PACKAGES,
+          hidden: !store.state.client.values.ENABLE_HARVEST_PACKAGES,
           description: "Generate summary of harvest packages",
           isCustom: false,
           isCsvEligible: true,
@@ -2111,10 +2111,9 @@ export default Vue.extend({
         }
 
         if (x.t3plus) {
-          return store.state.client.values["ENABLE_T3PLUS"] || store.state.client.t3plus;
-        } else {
-          return true;
+          return store.state.client.values.ENABLE_T3PLUS || store.state.client.t3plus;
         }
+        return true;
       });
     },
     disabledVisibleReportOptionsImpl(): IReportOption[] {
@@ -2128,10 +2127,9 @@ export default Vue.extend({
         }
 
         if (x.t3plus) {
-          return !store.state.client.values["ENABLE_T3PLUS"] && !store.state.client.t3plus;
-        } else {
-          return false;
+          return !store.state.client.values.ENABLE_T3PLUS && !store.state.client.t3plus;
         }
+        return false;
       });
     },
     openOAuthPage(): void {
@@ -2149,7 +2147,7 @@ export default Vue.extend({
         addCogsReport({
           reportConfig,
           cogsFormFilters: this.cogsFormFilters,
-          mutableArchiveData: await this.$refs["archive"].getMutableArchiveData(),
+          mutableArchiveData: await this.$refs.archive.getMutableArchiveData(),
         });
       }
 

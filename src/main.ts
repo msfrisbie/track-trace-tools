@@ -1,11 +1,11 @@
+/* eslint-disable import/no-unresolved, no-new, import/extensions, import/named */
+
 // import router from '@/router/page-overlay';
 import store from "@/store/page-overlay";
 import App from "App.vue";
 import Vue from "vue";
 
 Vue.config.productionTip = false;
-
-
 
 new Vue({
   store,

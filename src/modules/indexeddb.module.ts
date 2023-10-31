@@ -20,7 +20,9 @@ import Dexie from "dexie";
 
 class TrackTraceToolsDatabase extends Dexie {
   packages: Dexie.Table<IIndexedPackageData, number>;
+
   transfers: Dexie.Table<IIndexedTransferData, number>;
+
   tags: Dexie.Table<IIndexedTagData, number>;
 
   constructor(databaseName: string, databaseVersion: number) {
@@ -53,15 +55,15 @@ class Database {
   }
 
   async indexPackages(indexedPackagesData: Array<IIndexedPackageData>) {
-    return await this._db.packages.bulkPut(indexedPackagesData);
+    return this._db.packages.bulkPut(indexedPackagesData);
   }
 
   async indexTransfers(indexedTransfersData: IIndexedTransferData[]) {
-    return await this._db.transfers.bulkPut(indexedTransfersData);
+    return this._db.transfers.bulkPut(indexedTransfersData);
   }
 
   async indexTags(indexedTagsData: IIndexedTagData[]) {
-    return await this._db.tags.bulkPut(indexedTagsData);
+    return this._db.tags.bulkPut(indexedTagsData);
   }
 
   async packageSearch(
@@ -74,9 +76,7 @@ class Database {
     const result = await this._db.packages
       .where("License")
       .equals(license)
-      .filter((packageData) => {
-        return packageData.TagMatcher.includes(formattedQuery);
-      })
+      .filter((packageData) => packageData.TagMatcher.includes(formattedQuery))
       .toArray();
 
     // This uses the implicit enum alphabetical ordering to sort
@@ -90,12 +90,10 @@ class Database {
   ): Promise<IIndexedTransferData[]> {
     const formattedQuery = queryString.toUpperCase();
 
-    return await this._db.transfers
+    return this._db.transfers
       .where("License")
       .equals(license)
-      .filter((transferData) => {
-        return transferData.TagMatcher.includes(formattedQuery);
-      })
+      .filter((transferData) => transferData.TagMatcher.includes(formattedQuery))
       .toArray();
   }
 
@@ -106,14 +104,12 @@ class Database {
   ): Promise<IIndexedTagData[]> {
     const formattedQuery = queryString.toUpperCase();
 
-    return await this._db.tags
+    return this._db.tags
       .where("License")
       .equals(license)
-      .filter((tagData) => {
-        return tagData.TagMatcher.includes(formattedQuery);
-      })
+      .filter((tagData) => tagData.TagMatcher.includes(formattedQuery))
       .toArray();
   }
 }
 
-export let database = new Database();
+export const database = new Database();

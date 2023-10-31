@@ -16,7 +16,7 @@
         <a
           role="button"
           tabindex="0"
-          href="mailto:matt@trackandtrace.tools?subject=Interest in T3 Plus&amp;body=I'm interested in getting access to T3 Plus. 
+          href="mailto:matt@trackandtrace.tools?subject=Interest in T3 Plus&amp;body=I'm interested in getting access to T3 Plus.
 
 Please let me know next steps!"
           class="ttt-purple-bg btn btn-primary mb-12"

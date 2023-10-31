@@ -98,7 +98,9 @@ import BuilderStepHeader from "@/components/overlay-widget/shared/BuilderStepHea
 import { isValidTag, generateTagRangeOrError } from "@/utils/tags";
 import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
 import { combineLatest, from, Subject } from "rxjs";
-import { debounceTime, distinctUntilChanged, filter, startWith, tap } from "rxjs/operators";
+import {
+  debounceTime, distinctUntilChanged, filter, startWith, tap
+} from "rxjs/operators";
 import {
   IPackageData,
   IPackageFilter,
@@ -136,7 +138,7 @@ export default Vue.extend({
     submit() {
       const rows: IMetrcMovePackagesPayload[] = [];
 
-      for (let pkg of this.$data.selectedPackages) {
+      for (const pkg of this.$data.selectedPackages) {
         rows.push({
           ActualDate: submitDateFromIsodate(this.$data.moveIsodate),
           LocationId: this.$data.newLocation.Id.toString(),
@@ -155,7 +157,7 @@ export default Vue.extend({
       );
     },
     async downloadAll() {
-      for (let csvFile of this.csvFiles) {
+      for (const csvFile of this.csvFiles) {
         await downloadCsvFile({ csvFile, delay: 500 });
       }
 

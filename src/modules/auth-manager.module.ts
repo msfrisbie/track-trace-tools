@@ -22,6 +22,7 @@ const debugLog = debugLogFactory("auth-manager.module.ts");
 
 class AuthManager implements IAtomicService {
   private _authStatePromise: Promise<IAuthState | null>;
+
   private _authStateResolver: any;
 
   constructor() {
@@ -53,9 +54,9 @@ class AuthManager implements IAtomicService {
     // - Authstate is not visible in the page, auth in state.
     //       Send test request to find if authenticated.
 
-    let identity: string | null = null,
-      license: string | null = null,
-      apiVerificationToken: string | null = null;
+    let identity: string | null = null;
+    let license: string | null = null;
+    let apiVerificationToken: string | null = null;
 
     let extractedAuthData = extract(ExtractionType.AUTH_DATA, document.body.innerHTML);
 
@@ -79,7 +80,7 @@ class AuthManager implements IAtomicService {
     }
 
     // Check if identity matches blacklist. Identity matching will only work in CA
-    if (!!identity) {
+    if (identity) {
       if (!isIdentityAllowedToUseTtt({ identity, hostname: window.location.hostname })) {
         analyticsManager.track(MessageType.MATCHED_BLACKLIST_HOSTNAME, {
           identity,
@@ -112,7 +113,7 @@ class AuthManager implements IAtomicService {
 
   async authStateOrNull(): Promise<IAuthState | null> {
     try {
-      return await this._authStatePromise;
+      return this._authStatePromise;
     } catch (e) {
       return null;
     }
@@ -137,4 +138,4 @@ class AuthManager implements IAtomicService {
   }
 }
 
-export let authManager = new AuthManager();
+export const authManager = new AuthManager();

@@ -5,7 +5,9 @@ import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
 import { facilityManager } from "@/modules/facility-manager.module";
 import { toastManager } from "@/modules/toast-manager.module";
 import { todayIsodate } from "@/utils/date";
-import { edgeReducer, hoverRenderer, labelRenderer, nodeReducer } from "@/utils/graph";
+import {
+  edgeReducer, hoverRenderer, labelRenderer, nodeReducer
+} from "@/utils/graph";
 import { Coordinates } from "sigma/types";
 import { ActionContext } from "vuex";
 import {
@@ -14,8 +16,8 @@ import {
   GraphMutations,
   GraphRenderAlgorithm,
   GraphStatus,
-} from "../graph/consts";
-import { IGraphComponentContext, IGraphData, IGraphState } from "../graph/interfaces";
+} from "./consts";
+import { IGraphComponentContext, IGraphData, IGraphState } from "./interfaces";
 
 const inMemoryState = {
   status: GraphStatus.INITIAL,
@@ -218,8 +220,7 @@ export const graphModule = {
           node,
           data,
           graphState: ctx.state,
-        })
-      );
+        }));
 
       graphComponentContext.renderer.setSetting("edgeReducer", (edge, data) =>
         edgeReducer({
@@ -227,8 +228,7 @@ export const graphModule = {
           edge,
           data,
           graphState: ctx.state,
-        })
-      );
+        }));
 
       // Examples of override functions
       // https://github.com/jacomyal/sigma.js/blob/7b3a5ead355f7c54449002e6909a9af2eecae6db/demo/src/canvas-utils.ts#L34
@@ -236,12 +236,10 @@ export const graphModule = {
       // Override options
       // https://github.com/jacomyal/sigma.js/blob/7b3a5ead355f7c54449002e6909a9af2eecae6db/src/settings.ts#L12
       graphComponentContext.renderer.setSetting("hoverRenderer", (context, data, settings) =>
-        hoverRenderer(context, data, settings)
-      );
+        hoverRenderer(context, data, settings));
 
       graphComponentContext.renderer.setSetting("labelRenderer", (context, data, settings) =>
-        labelRenderer(context, data, settings)
-      );
+        labelRenderer(context, data, settings));
 
       // https://github.com/jacomyal/sigma.js/blob/main/examples/custom-rendering/index.ts
       // renderer.setSetting("nodeProgramClasses", {
@@ -273,9 +271,7 @@ export const graphModule = {
             eventType,
             sourceType: "node",
             source: node,
-          })
-        )
-      );
+          })));
       edgeEvents.map((eventType) =>
         graphComponentContext.renderer.on(eventType, ({ edge }) =>
           ctx.dispatch(GraphActions.HANDLE_EVENT, {
@@ -283,18 +279,14 @@ export const graphModule = {
             eventType,
             sourceType: "edge",
             source: edge,
-          })
-        )
-      );
+          })));
       stageEvents.map((eventType) =>
         graphComponentContext.renderer.on(eventType, (eventType) =>
           ctx.dispatch(GraphActions.HANDLE_EVENT, {
             graphComponentContext,
             eventType,
             sourceType: "stage",
-          })
-        )
-      );
+          })));
     },
     [GraphActions.HANDLE_EVENT]: async (
       ctx: ActionContext<IGraphState, IPluginState>,
@@ -343,8 +335,8 @@ export const graphModule = {
       // Move the camera to center it on the selected node:
       const nodePosition: Coordinates = node
         ? (graphComponentContext.renderer.getNodeDisplayData(
-            ctx.state.selectedNodeId
-          ) as Coordinates)
+          ctx.state.selectedNodeId
+        ) as Coordinates)
         : { x: 0.5, y: 0.5 };
       graphComponentContext.renderer.getCamera().animate(nodePosition, {
         duration: 500,
@@ -450,9 +442,7 @@ export const graphModule = {
   },
 };
 
-export const graphReducer = (state: IGraphState): IGraphState => {
-  return {
-    ...state,
-    ...inMemoryState,
-  };
-};
+export const graphReducer = (state: IGraphState): IGraphState => ({
+  ...state,
+  ...inMemoryState,
+});

@@ -40,18 +40,16 @@ export function streamFactory<T>(
             )
           );
           return;
-        } else {
-          subject.error(new DataLoadError(DataLoadErrorType.SERVER, "Server returned an error."));
-          return;
         }
+        subject.error(new DataLoadError(DataLoadErrorType.SERVER, "Server returned an error."));
+        return;
       }
       const totalCountResponse: ICollectionResponse<T> = await countResponse.data;
       const lastPageIndex = Math.ceil(totalCountResponse.Total / pageSize);
 
       try {
         const responses = Array.from(Array(lastPageIndex).keys()).map((page) =>
-          responseFactory({ page, pageSize })
-        );
+          responseFactory({ page, pageSize }));
 
         Promise.allSettled(responses);
 
@@ -65,22 +63,18 @@ export function streamFactory<T>(
                 )
               );
               return;
-            } else {
-              subject.error(
-                new DataLoadError(DataLoadErrorType.SERVER, "Server returned an error.")
-              );
-              return;
             }
-          } else {
-            const responseData: ICollectionResponse<T> = await response.data;
-            subject.next(responseData);
-
-            debugLog(async () => ["responseData.Data:", responseData.Data]);
-
-            runningTotal += responseData.Data.length;
-
-            debugLog(async () => ["runningTotal:", runningTotal]);
+            subject.error(new DataLoadError(DataLoadErrorType.SERVER, "Server returned an error."));
+            return;
           }
+          const responseData: ICollectionResponse<T> = await response.data;
+          subject.next(responseData);
+
+          debugLog(async () => ["responseData.Data:", responseData.Data]);
+
+          runningTotal += responseData.Data.length;
+
+          debugLog(async () => ["runningTotal:", runningTotal]);
         }
 
         const t1 = performance.now();
@@ -112,6 +106,7 @@ export function streamFactory<T>(
             subject.error(
               new DataLoadError(DataLoadErrorType.NETWORK, "Network request unable to complete.")
             );
+            /* eslint-disable-next-line no-unsafe-finally */
             return;
           }
         }
@@ -125,10 +120,9 @@ export function streamFactory<T>(
               )
             );
             return;
-          } else {
-            subject.error(new DataLoadError(DataLoadErrorType.SERVER, "Server returned an error."));
-            return;
           }
+          subject.error(new DataLoadError(DataLoadErrorType.SERVER, "Server returned an error."));
+          return;
         }
 
         const responseData: ICollectionResponse<T> = await response.data;
@@ -172,7 +166,9 @@ export function buildBodyFilter(filterOptions: IFilterOptions | null): ICollecti
     return null;
   }
 
-  const { transferFilter, plantFilter, tagFilter, plantBatchFilter, packageFilter, harvestFilter } =
+  const {
+    transferFilter, plantFilter, tagFilter, plantBatchFilter, packageFilter, harvestFilter
+  } =
     filterOptions;
 
   const filterSet: ICollectionFilters = {

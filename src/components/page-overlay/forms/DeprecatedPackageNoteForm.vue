@@ -85,8 +85,6 @@ export default Vue.extend({
       } catch (e) {
         return [];
       }
-
-      return [];
     },
     isInvalidTagRange(): boolean {
       if (!isValidTag(this.form.startTag) || !isValidTag(this.form.endTag)) {
@@ -100,8 +98,6 @@ export default Vue.extend({
       } catch (e) {
         return true;
       }
-
-      return true;
     },
     ...mapState(["currentView"]),
   },
@@ -126,7 +122,7 @@ export default Vue.extend({
 
       evt.preventDefault();
 
-      for (let tag of generateTagRangeOrError(this.form.startTag, this.form.endTag)) {
+      for (const tag of generateTagRangeOrError(this.form.startTag, this.form.endTag)) {
         store.commit(
           MutationType.ENQUEUE_TASK,
           await createTask(TaskType.ADD_PACKAGE_NOTE, {

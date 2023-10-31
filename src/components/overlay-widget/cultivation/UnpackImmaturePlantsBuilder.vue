@@ -324,7 +324,7 @@ export default Vue.extend({
         this.$data.plantingData
       );
 
-      for (let el of zipped) {
+      for (const el of zipped) {
         const tag = el[0];
         const plantingData = el[1];
 
@@ -364,7 +364,7 @@ export default Vue.extend({
       this.$data.totalPlantCount = totalPlantsAvailableOrNull(this.$data.selectedPackages);
     },
     async downloadAll() {
-      for (let csvFile of this.csvFiles) {
+      for (const csvFile of this.csvFiles) {
         await downloadCsvFile({ csvFile, delay: 500 });
       }
 
@@ -561,7 +561,7 @@ export default Vue.extend({
     timer(1000).subscribe(() => primaryDataLoader.availableTags({}));
 
     this.$data.plantBatchTypeOptions = (await dynamicConstsManager.plantBatchTypes()).map(
-      (x: IPlantBatchType) => ({ text: x.Name + "s", value: x })
+      (x: IPlantBatchType) => ({ text: `${x.Name}s`, value: x })
     );
     this.$data.plantBatchType = this.$data.plantBatchTypeOptions[0].value;
   },

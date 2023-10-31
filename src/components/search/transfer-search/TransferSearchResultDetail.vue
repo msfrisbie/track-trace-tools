@@ -144,9 +144,8 @@ function deliveryTimeDescriptor(isodate: string | null): string {
 
   if (isToday) {
     return `today at ${timeDescriptor}`;
-  } else {
-    return `${dateDescriptor} at ${timeDescriptor}`;
   }
+  return `${dateDescriptor} at ${timeDescriptor}`;
 }
 
 export default Vue.extend({
@@ -193,11 +192,11 @@ export default Vue.extend({
 
       switch (transfer.TransferState) {
         case TransferState.INCOMING:
-          if (!!transfer.ReceivedDateTime) {
+          if (transfer.ReceivedDateTime) {
             return `Received ${deliveryTimeDescriptor(transfer.ReceivedDateTime)}`;
           }
 
-          if (!!transfer.EstimatedArrivalDateTime) {
+          if (transfer.EstimatedArrivalDateTime) {
             return `Scheduled for delivery ${deliveryTimeDescriptor(
               transfer.EstimatedArrivalDateTime
             )}`;
@@ -205,17 +204,17 @@ export default Vue.extend({
 
           return "Scheduled for delivery";
         case TransferState.OUTGOING:
-          if (!!transfer.CreatedDateTime) {
+          if (transfer.CreatedDateTime) {
             return `Created ${deliveryTimeDescriptor(transfer.CreatedDateTime)}`;
           }
 
           return "Scheduled for delivery";
         case TransferState.REJECTED:
-          if (!!transfer.ReceivedDateTime) {
+          if (transfer.ReceivedDateTime) {
             return `Return received ${deliveryTimeDescriptor(transfer.ReceivedDateTime)}`;
           }
 
-          if (!!transfer.EstimatedReturnDepartureDateTime) {
+          if (transfer.EstimatedReturnDepartureDateTime) {
             return `Scheduled for return ${deliveryTimeDescriptor(
               transfer.EstimatedReturnDepartureDateTime
             )}`;

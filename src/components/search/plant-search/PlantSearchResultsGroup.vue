@@ -74,7 +74,7 @@ export default Vue.extend({
     // destroyed$: Subject<void>;
     // selectedPlantMetadata: ISelectedPlantMetadata | null;
     showAll: boolean;
-  } {
+    } {
     return {
       // destroyed$: new Subject(),
       // selectedPlantMetadata: null,

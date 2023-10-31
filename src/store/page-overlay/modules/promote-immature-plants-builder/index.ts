@@ -64,9 +64,7 @@ export const promoteImmaturePlantsBuilderModule = {
 
 export const promoteImmaturePlantsBuilderReducer = (
   state: IPromoteImmaturePlantsBuilderState
-): IPromoteImmaturePlantsBuilderState => {
-  return {
-    ...state,
-    ...inMemoryState,
-  };
-};
+): IPromoteImmaturePlantsBuilderState => ({
+  ...state,
+  ...inMemoryState,
+});

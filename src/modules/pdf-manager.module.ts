@@ -1,36 +1,33 @@
-
 import { IAtomicService } from "@/interfaces";
 // import pdfJs from "pdfjs-dist/build/pdf.js";
-
 
 // UNUSED
 class PdfManager implements IAtomicService {
     initialized: boolean = false;
 
     async init() {
-        // Retrieving the worker script is a major pain. 
-        // This needs to be resolved before pdf.js is realistic
+      // Retrieving the worker script is a major pain.
+      // This needs to be resolved before pdf.js is realistic
 
-        // if (this.initialized) {
-        //     return;
-        // }
+      // if (this.initialized) {
+      //     return;
+      // }
 
-        // this.initialized = true;
+      // this.initialized = true;
 
-        // const workerSrc = await getUrl(
-        //     require("@/assets/scripts/pdf.worker.js")
-        // );
+      // const workerSrc = await getUrl(
+      //     require("@/assets/scripts/pdf.worker.js")
+      // );
 
-        // pdfJs.GlobalWorkerOptions.workerSrc = workerSrc;
+      // pdfJs.GlobalWorkerOptions.workerSrc = workerSrc;
     }
 
-    // async getDocument(url: string) {
-    //     return pdfJs.getDocument(url);
-    // }
+  // async getDocument(url: string) {
+  //     return pdfJs.getDocument(url);
+  // }
 }
 
-export let pdfManager = new PdfManager();
-
+export const pdfManager = new PdfManager();
 
 // // Example
 // // https://codesandbox.io/s/f6qss?file=/src/components/PdfViewer.vue:265-284

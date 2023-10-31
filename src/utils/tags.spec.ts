@@ -127,8 +127,7 @@ describe("tags.ts", () => {
       getOffsetFromTag({ referenceTag: SAMPLE_VALID_TAG, newTag: "1AFF00000000000000001235" })
     ).toEqual(1);
     expect(() =>
-      getOffsetFromTag({ referenceTag: SAMPLE_VALID_TAG, newTag: "1AFF00000000000000001233" })
-    ).toThrowError();
+      getOffsetFromTag({ referenceTag: SAMPLE_VALID_TAG, newTag: "1AFF00000000000000001233" })).toThrowError();
   });
 
   it("correctly extracts duplicates", () => {

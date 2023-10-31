@@ -164,9 +164,8 @@ export default Vue.extend({
       if (pendingOrInflightRowCount(this.$data.activeProject) > 0) {
         if (failedRowCount(this.$data.activeProject) > 0) {
           return "warning";
-        } else {
-          return "primary";
         }
+        return "primary";
       }
 
       // This means there are no pending rows
@@ -181,7 +180,6 @@ export default Vue.extend({
         case BuilderType.UNPACK_IMMATURE_PLANTS:
         case BuilderType.CREATE_IMMATURE_PLANTS_FROM_MOTHER:
         case BuilderType.PROMOTE_IMMATURE_PLANTS:
-        case BuilderType.UNPACK_IMMATURE_PLANTS:
           return "plant batches";
         case BuilderType.CREATE_ITEMS:
           return "items";

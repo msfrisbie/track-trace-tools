@@ -5,7 +5,6 @@ import { extract, ExtractionType } from "@/utils/html";
 import { BehaviorSubject, timer } from "rxjs";
 import { filter, map, take } from "rxjs/operators";
 import { analyticsManager } from "./analytics-manager.module";
-import { authManager } from "./auth-manager.module";
 import { primaryMetrcRequestManager } from "./metrc-request-manager.module";
 
 const debugLog = debugLogFactory("api-key-manager.module.ts");
@@ -23,20 +22,21 @@ const debugLog = debugLogFactory("api-key-manager.module.ts");
 class ApiKeyManager implements IAtomicService {
   private _apiKeyStateSubject: BehaviorSubject<Promise<IApiKeyState | null> | null | undefined> =
     new BehaviorSubject<Promise<IApiKeyState | null> | null | undefined>(undefined);
+
   private _apiKeyState: Promise<IApiKeyState | null> | null = null;
 
   public async init() {
     throw new Error("This module is causing bugs, do not use");
 
-    await authManager.authStateOrError();
+    // await authManager.authStateOrError();
 
-    if (!this._apiKeyState) {
-      this.getApiKeyState();
-    }
+    // if (!this._apiKeyState) {
+    //   this.getApiKeyState();
+    // }
 
-    this._apiKeyStateSubject.next(this._apiKeyState);
+    // this._apiKeyStateSubject.next(this._apiKeyState);
 
-    debugLog(async () => ["API key state", await this._apiKeyState]);
+    // debugLog(async () => ["API key state", await this._apiKeyState]);
   }
 
   private async getApiKeyState() {
@@ -50,7 +50,7 @@ class ApiKeyManager implements IAtomicService {
         .then((response) => response.data);
 
       // { apiKeyData: { apiKey: "..." } }
-      let extractedData = extract(ExtractionType.API_KEY_DATA, apiKeyHtml);
+      const extractedData = extract(ExtractionType.API_KEY_DATA, apiKeyHtml);
 
       const apiKey = extractedData?.apiKeyData?.apiKey;
 
@@ -120,4 +120,4 @@ class ApiKeyManager implements IAtomicService {
   }
 }
 
-export let apiKeyManager = new ApiKeyManager();
+export const apiKeyManager = new ApiKeyManager();

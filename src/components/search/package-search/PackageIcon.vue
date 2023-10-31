@@ -60,9 +60,8 @@ export default Vue.extend({
     iconColor() {
       if (this.pkg.Quantity === 0) {
         return "rgba(0,0,0,0.3)";
-      } else {
-        return "#49276a";
       }
+      return "#49276a";
     }
   }
 });

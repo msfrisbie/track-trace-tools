@@ -35,14 +35,12 @@ describe("cogs-v2-report.ts", () => {
       extractMultiplierFromItemNamesOrError({
         parentItemName: "100 mg bar",
         childItemName: "mg bar",
-      })
-    ).toThrowError();
+      })).toThrowError();
     expect(() =>
       extractMultiplierFromItemNamesOrError({
         parentItemName: "10 mg bar",
         childItemName: "foo mg bar",
-      })
-    ).toThrowError();
+      })).toThrowError();
 
     expect(
       extractMultiplierFromItemNamesWithPackStrategyOrError({
@@ -55,8 +53,7 @@ describe("cogs-v2-report.ts", () => {
       extractMultiplierFromItemNamesWithPackStrategyOrError({
         parentItemName: "foo bar - 2 Pack",
         childItemName: "foo bar - 8 Pack",
-      })
-    ).toThrowError();
+      })).toThrowError();
 
     expect(
       extractMultiplierFromItemNamesWithPackStrategyOrError({
@@ -76,7 +73,6 @@ describe("cogs-v2-report.ts", () => {
       extractMultiplierFromItemNamesWithPackStrategyOrError({
         parentItemName: "foo bar baz",
         childItemName: "foo bar 10mg",
-      })
-    ).toThrowError();
+      })).toThrowError();
   });
 });

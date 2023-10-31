@@ -43,7 +43,7 @@ export default Vue.extend({
     },
     toggle() {
       // @ts-ignore
-      this.$refs["search"].toggle();
+      this.$refs.search.toggle();
     },
     handleOpen() {
       analyticsManager.track(MessageType.OPENED_SEARCH_MODAL);

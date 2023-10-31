@@ -273,11 +273,9 @@ async function showSimplePackageColumns() {
               checkbox.click();
             }
             continue;
-          } else {
-            if (checkbox.checked) {
-              checkbox.click();
-              continue;
-            }
+          } else if (checkbox.checked) {
+            checkbox.click();
+            continue;
           }
         }
       }
@@ -338,10 +336,8 @@ async function showOnlyPrimaryColumn() {
             if (!checkbox.checked) {
               checkbox.click();
             }
-          } else {
-            if (checkbox.checked) {
-              checkbox.click();
-            }
+          } else if (checkbox.checked) {
+            checkbox.click();
           }
         }
       }
@@ -434,7 +430,7 @@ export async function expandGrowthPhaseTags() {
 
     expandedRowCount++;
 
-    let count = targetRowInitialCount - 1;
+    const count = targetRowInitialCount - 1;
 
     for (let i = 0; i < count; ++i) {
       const button = pageManager.activeModal?.querySelector(
@@ -765,7 +761,7 @@ export async function sumPackageQuantities() {
       _.round(
         inputs
           .map((input) => parseFloat(input.value))
-          .filter((x) => !isNaN(x))
+          .filter((x) => !Number.isNaN(x))
           .reduce((a, b) => a + b, 0),
         3
       ).toString()

@@ -79,7 +79,7 @@ export function extractNestedData({
     case ReportType.PACKAGES_QUICKVIEW:
       return reportData[reportType]!.packages;
     default:
-      throw new Error("Bad reportType " + reportType);
+      throw new Error(`Bad reportType ${reportType}`);
   }
 }
 
@@ -98,8 +98,7 @@ export function applyFieldTransformer({
         value = value[subProperty];
       }
       return value;
-    })
-  );
+    }));
 }
 
 export function extractQuickviewData({
@@ -111,7 +110,7 @@ export function extractQuickviewData({
   reportConfig: IReportConfig;
   reportData: IReportData;
 }): any[][] {
-  let data: any[][] = [];
+  const data: any[][] = [];
 
   let primaryDimension: string;
   let secondaryDimension: string | null;
@@ -228,7 +227,7 @@ export function extractFlattenedData({
       case ReportType.TAGS:
         return extractNestedData({ reportType, reportData });
       case ReportType.INCOMING_TRANSFERS:
-        let flattenedIncomingTransfers: {
+        const flattenedIncomingTransfers: {
           Transporter: ITransporterData;
           Transfer: IIndexedTransferData;
         }[] = [];
@@ -247,7 +246,7 @@ export function extractFlattenedData({
 
         return flattenedIncomingTransfers;
       case ReportType.OUTGOING_TRANSFERS:
-        let flattenedOutgoingTransfers: {
+        const flattenedOutgoingTransfers: {
           Destination: IDestinationData;
           Transfer: ITransferData;
         }[] = [];
@@ -266,7 +265,7 @@ export function extractFlattenedData({
 
         return flattenedOutgoingTransfers;
       case ReportType.TRANSFER_HUB_TRANSFERS:
-        let flattenedTransferHubTransfers: {
+        const flattenedTransferHubTransfers: {
           Destination: IDestinationData;
           Transfer: ITransferData;
         }[] = [];
@@ -285,7 +284,7 @@ export function extractFlattenedData({
 
         return flattenedTransferHubTransfers;
       case ReportType.OUTGOING_TRANSFER_MANIFESTS:
-        let flattenedOutgoingPackages: {
+        const flattenedOutgoingPackages: {
           Package: IIndexedDestinationPackageData;
           Destination: IDestinationData;
           Transfer: ITransferData;
@@ -333,7 +332,7 @@ export function extractFlattenedData({
           reportData,
         });
       default:
-        throw new Error("Bad reportType " + reportType);
+        throw new Error(`Bad reportType ${reportType}`);
     }
   })();
 
@@ -359,7 +358,7 @@ export function getCsvFilename({
 }): string {
   const sheetTitle = getSheetTitle({ reportType, reportConfig });
 
-  let date = todayIsodate();
+  const date = todayIsodate();
 
   switch (reportType) {
     case ReportType.COGS_V2:
@@ -367,6 +366,8 @@ export function getCsvFilename({
     case ReportType.EMPLOYEE_SAMPLES:
     case ReportType.POINT_IN_TIME_INVENTORY:
     // TODO these are either not single-license, or should not have todays date
+
+    /* eslint-disable-next-line no-fallthrough */
     default:
       return `${sheetTitle} - ${license} - ${date}`;
   }
@@ -427,6 +428,6 @@ export function getSheetTitle({
         reportConfig[ReportType.POINT_IN_TIME_INVENTORY]!.targetDate
       }`;
     default:
-      throw new Error("Bad reportType " + reportType);
+      throw new Error(`Bad reportType ${reportType}`);
   }
 }

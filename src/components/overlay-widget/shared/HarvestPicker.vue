@@ -160,9 +160,9 @@ export default Vue.extend({
         this.$data.inflight = true;
         this.$data.activeHarvests = (await primaryDataLoader.activeHarvests()).filter(
           (harvestData: IHarvestData) =>
-            this.$props.filterWholePlant
+            (this.$props.filterWholePlant
               ? harvestData.HarvestType === "WholePlant"
-              : harvestData.HarvestType !== "WholePlant"
+              : harvestData.HarvestType !== "WholePlant")
         );
       } catch (e) {
         this.$data.error = e;

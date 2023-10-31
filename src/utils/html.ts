@@ -49,7 +49,7 @@ function checkITagOrderModalData(data: ITagOrderModalData) {
 }
 
 function extractMaxTagOrderSize(data: ITagOrderModalData, tagType: MetrcTagType): number {
-  for (let orderParam of data.Details) {
+  for (const orderParam of data.Details) {
     if (orderParam.TagType === tagType) {
       return orderParam.MaxOrderQuantity;
     }
@@ -61,9 +61,7 @@ function extractMaxTagOrderSize(data: ITagOrderModalData, tagType: MetrcTagType)
 
 function decodeData(data: string): string {
   // Taken from https://stackoverflow.com/questions/31715030/javascript-hex-escape-character-decoding
-  return data.replace(/\\x([0-9A-F]{2})/gi, (...args) => {
-    return String.fromCharCode(parseInt(args[1], 16));
-  });
+  return data.replace(/\\x([0-9A-F]{2})/gi, (...args) => String.fromCharCode(parseInt(args[1], 16)));
 }
 
 // export function getAuthDataScriptTextOrNull(): string | null {
@@ -157,7 +155,7 @@ function extractAuthData(html: string) {
 
   let authDataScriptText = null;
 
-  for (let script of scripts) {
+  for (const script of scripts) {
     const match = script.textContent.match(AJAX_SETUP_REGEX);
 
     if (match && match[1]) {
@@ -172,7 +170,7 @@ function extractAuthData(html: string) {
   let extractedIdentityArray = null;
 
   if (authDataScriptText) {
-    let authMatch = authDataScriptText.match(AJAX_SETUP_REGEX);
+    const authMatch = authDataScriptText.match(AJAX_SETUP_REGEX);
 
     if (authMatch && authMatch[1]) {
       let authJson = authMatch[1];
@@ -186,7 +184,7 @@ function extractAuthData(html: string) {
       console.error("Could not match auth data regex");
     }
 
-    let identityMatch = authDataScriptText.match(INITIALIZE_DO_NOT_SHOW_REGEX);
+    const identityMatch = authDataScriptText.match(INITIALIZE_DO_NOT_SHOW_REGEX);
 
     if (identityMatch && identityMatch[1]) {
       const identityString = identityMatch[1];
@@ -204,7 +202,7 @@ function extractAuthData(html: string) {
   if (!!extractedAuthDataDict && !!extractedIdentityArray) {
     authData = {
       license: extractedAuthDataDict.headers["X-Metrc-LicenseNumber"],
-      apiVerificationToken: extractedAuthDataDict.headers["ApiVerificationToken"],
+      apiVerificationToken: extractedAuthDataDict.headers.ApiVerificationToken,
       identity: extractedIdentityArray[0],
     };
 
@@ -220,17 +218,16 @@ function extractAuthData(html: string) {
 
   if (!authData) {
     return null;
-  } else {
-    return { authData };
   }
+  return { authData };
 }
 
 function extractTagOrderData(html: string) {
-  let tagOrderMatch = html.match(TAG_MAX_REGEX);
+  const tagOrderMatch = html.match(TAG_MAX_REGEX);
 
   if (tagOrderMatch && tagOrderMatch[1]) {
     try {
-      let tagOrderData = JSON.parse(decodeData(tagOrderMatch[1]));
+      const tagOrderData = JSON.parse(decodeData(tagOrderMatch[1]));
 
       checkITagOrderModalData(tagOrderData);
 
@@ -292,7 +289,7 @@ function extractDataImportApiKey(html: string) {
 
   const lines = html.split("\n");
 
-  for (let line of lines) {
+  for (const line of lines) {
     if (line.includes(`xhr.setRequestHeader('ApiVerificationToken'`)) {
       const regex = /',\s'(.*)'/;
       const match = line.match(regex);

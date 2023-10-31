@@ -70,7 +70,7 @@ class AnalyticsManager implements IAtomicService {
 
       let footerText;
       // @ts-ignore
-      if (!!(footerText = metrcFooter?.innerText)) {
+      if (footerText = metrcFooter?.innerText) {
         let pieces;
         if ((pieces = footerText.split("|")).length === 2) {
           metrcVersion = pieces[1].trim();
@@ -78,7 +78,9 @@ class AnalyticsManager implements IAtomicService {
       }
     } catch (e) {}
 
-    let pageData = { url, path, version, hostname, license, metrcVersion };
+    const pageData = {
+      url, path, version, hostname, license, metrcVersion
+    };
 
     sendAnalyticsMessage(MessageType.PAGELOAD, { pageName, pageData });
   }
@@ -98,4 +100,4 @@ class AnalyticsManager implements IAtomicService {
   }
 }
 
-export let analyticsManager = new AnalyticsManager();
+export const analyticsManager = new AnalyticsManager();

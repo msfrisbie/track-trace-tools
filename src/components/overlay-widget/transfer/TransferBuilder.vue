@@ -478,7 +478,9 @@ import RoutePicker from "@/components/overlay-widget/shared/RoutePicker.vue";
 import SinglePackagePicker from "@/components/overlay-widget/shared/SinglePackagePicker.vue";
 import TransferPicker from "@/components/overlay-widget/shared/TransferPicker.vue";
 import StartFinishIcons from "@/components/overlay-widget/shared/StartFinishIcons.vue";
-import { BuilderType, MessageType, ModalAction, ModalType } from "@/consts";
+import {
+  BuilderType, MessageType, ModalAction, ModalType
+} from "@/consts";
 import {
   IBuilderComponentError,
   IComputedGetSet,
@@ -526,7 +528,9 @@ import {
 import _ from "lodash-es";
 import { timer } from "rxjs";
 import Vue from "vue";
-import { mapActions, mapGetters, mapState, Store } from "vuex";
+import {
+  mapActions, mapGetters, mapState, Store
+} from "vuex";
 import {
   getLabelOrError,
   getQuantityOrError,
@@ -636,15 +640,15 @@ export default Vue.extend({
       const estimatedDepartureDateTime: string = this.isSameSiteTransfer
         ? isoNowDatetime
         : combineTimeAndDate({
-            isodate: this.transferBuilderState.departureIsodate,
-            isotime: this.transferBuilderState.departureIsotime,
-          });
+          isodate: this.transferBuilderState.departureIsodate,
+          isotime: this.transferBuilderState.departureIsotime,
+        });
       const estimatedArrivalDateTime: string = this.isSameSiteTransfer
         ? isoNowDatetime
         : combineTimeAndDate({
-            isodate: this.transferBuilderState.arrivalIsodate,
-            isotime: this.transferBuilderState.arrivalIsotime,
-          });
+          isodate: this.transferBuilderState.arrivalIsodate,
+          isotime: this.transferBuilderState.arrivalIsotime,
+        });
 
       const driverName: string = this.isSameSiteTransfer
         ? "N/A"
@@ -692,25 +696,25 @@ export default Vue.extend({
 
       const layoverTransporterMixin = this.transferBuilderState.isLayover
         ? {
-            IsLayover: "true",
-            EstimatedDepartureDateTime: combineTimeAndDate({
-              isodate: this.transferBuilderState.layoverCheckOutIsodate,
-              isotime: this.transferBuilderState.layoverCheckOutIsotime,
-            }),
-            EstimatedArrivalDateTime: combineTimeAndDate({
-              isodate: this.transferBuilderState.layoverCheckInIsodate,
-              isotime: this.transferBuilderState.layoverCheckInIsotime,
-            }),
-          }
+          IsLayover: "true",
+          EstimatedDepartureDateTime: combineTimeAndDate({
+            isodate: this.transferBuilderState.layoverCheckOutIsodate,
+            isotime: this.transferBuilderState.layoverCheckOutIsotime,
+          }),
+          EstimatedArrivalDateTime: combineTimeAndDate({
+            isodate: this.transferBuilderState.layoverCheckInIsodate,
+            isotime: this.transferBuilderState.layoverCheckInIsotime,
+          }),
+        }
         : {};
 
       const layoverDriverMixin = this.transferBuilderState.isLayover
         ? {
-            DriverLayoverLeg: this.transferBuilderState.driverLayoverLeg,
-          }
+          DriverLayoverLeg: this.transferBuilderState.driverLayoverLeg,
+        }
         : {
-            DriverLayoverLeg: "" as DriverLayoverLeg,
-          };
+          DriverLayoverLeg: "" as DriverLayoverLeg,
+        };
 
       const transporters: IMetrcTransferTransporterData[] = [
         {
@@ -739,14 +743,14 @@ export default Vue.extend({
 
       const destinationGrossWeightMixin = this.isTransferSubmittedWithDestinationGrossWeight
         ? {
-            GrossWeight: this.transferBuilderState.destinationGrossWeight!.toString(),
-            GrossUnitOfWeightId:
+          GrossWeight: this.transferBuilderState.destinationGrossWeight!.toString(),
+          GrossUnitOfWeightId:
               this.transferBuilderState.destinationGrossUnitOfWeight!.Id.toString(),
-          }
+        }
         : {
-            GrossWeight: "",
-            GrossUnitOfWeightId: "",
-          };
+          GrossWeight: "",
+          GrossUnitOfWeightId: "",
+        };
 
       const transferData: IMetrcCreateTransferPayload | IMetrcUpdateTransferPayload = {
         ShipmentLicenseType: "Licensed",
@@ -766,7 +770,7 @@ export default Vue.extend({
         ],
       };
 
-      let rows: IMetrcCreateTransferPayload[] | IMetrcUpdateTransferPayload[] = [transferData];
+      const rows: IMetrcCreateTransferPayload[] | IMetrcUpdateTransferPayload[] = [transferData];
 
       if (rows[0].Destinations.length === 0) {
         analyticsManager.track(MessageType.BUILDER_DATA_ERROR, {
@@ -829,8 +833,7 @@ export default Vue.extend({
           {
             isVector: true,
             data: this.transferPackages.map((packageData: IUnionIndexedPackageData) =>
-              getLabelOrError(packageData)
-            ),
+              getLabelOrError(packageData)),
           },
           {
             isVector: false,
@@ -985,7 +988,7 @@ export default Vue.extend({
       function isNumber(x: any) {
         const n = parseFloat(x);
 
-        if (isNaN(n)) {
+        if (Number.isNaN(n)) {
           return false;
         }
 

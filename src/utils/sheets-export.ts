@@ -146,7 +146,7 @@ export async function writeDataSheet<T>({
       mergedOptions.rangeEndColumn
     }${nextPageRowIdx + nextPage.length - 1}`;
 
-    let values = nextPage;
+    const values = nextPage;
 
     if (mergedOptions.batchWrite) {
       batchRequests.push({
@@ -261,7 +261,7 @@ export async function createDebugSheetOrError({
   }
 
   for (const [idx, sheetTitle] of sheetTitles.entries()) {
-    let formattingRequests: any = [
+    const formattingRequests: any = [
       addRowsRequestFactory({
         sheetId: idx,
         length: sheetDataMatrixes[idx].length,
@@ -308,8 +308,7 @@ export async function createCsvOrError({
 
   // Check that inputs are well-formed
   const ELIGIBLE_REPORT_TYPES: ReportType[] = ALL_ELIGIBLE_REPORT_TYPES.filter((reportType) =>
-    shouldGenerateReport({ reportType, reportConfig, reportData })
-  );
+    shouldGenerateReport({ reportType, reportConfig, reportData }));
 
   for (const reportType of ELIGIBLE_REPORT_TYPES) {
     const filename = getCsvFilename({
@@ -386,8 +385,7 @@ export async function createSpreadsheetOrError({
   //
 
   const ELIGIBLE_REPORT_TYPES: ReportType[] = ALL_ELIGIBLE_REPORT_TYPES.filter((reportType) =>
-    shouldGenerateReport({ reportType, reportConfig, reportData })
-  );
+    shouldGenerateReport({ reportType, reportConfig, reportData }));
 
   //
   // Generate Sheets
@@ -445,7 +443,9 @@ export async function createSpreadsheetOrError({
   for (const reportType of ELIGIBLE_REPORT_TYPES) {
     const sheetId: number = sheetTitles.indexOf(getSheetTitle({ reportType, reportConfig }));
     const length = Math.max(
-      extractFlattenedData({ flattenedCache, reportType, reportData, reportConfig }).length,
+      extractFlattenedData({
+        flattenedCache, reportType, reportData, reportConfig
+      }).length,
       1
     );
 
@@ -480,7 +480,9 @@ export async function createSpreadsheetOrError({
       spreadsheetId: response.data.result.spreadsheetId,
       spreadsheetTitle: getSheetTitle({ reportType, reportConfig }),
       fields: reportConfig[reportType]?.fields as IFieldData[],
-      data: extractFlattenedData({ flattenedCache, reportType, reportData, reportConfig }),
+      data: extractFlattenedData({
+        flattenedCache, reportType, reportData, reportConfig
+      }),
     });
   }
 
@@ -689,7 +691,7 @@ export async function createScanSheetOrError(
           "                Scanned Tags                ",
         ],
         ...manifest.map((x) => [
-          (x.destination! || x.incomingTransfer!).RecipientFacilityName + "      ",
+          `${(x.destination! || x.incomingTransfer!).RecipientFacilityName}      `,
           `${x.pkg.ShippedQuantity} ${x.pkg.ShippedUnitOfMeasureAbbreviation} ${x.pkg.ProductName}      `,
           x.pkg.PackageLabel,
         ]),

@@ -30,7 +30,9 @@ export const data: IMetrcCreateTransferPayload[] = [
             ],
           },
         ],
-        Packages: [{ Id: "64", WholesalePrice: "", GrossWeight: "", GrossUnitOfWeightId: "" }],
+        Packages: [{
+          Id: "64", WholesalePrice: "", GrossWeight: "", GrossUnitOfWeightId: ""
+        }],
       },
     ],
   },

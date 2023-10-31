@@ -132,7 +132,7 @@ export default Vue.extend({
 
       _this.$data.showMapsIframe = true;
 
-      let response: any = null;
+      const response: any = null;
       try {
         // response = await stubRequestManager.directions(
         //   _this.originAddress,

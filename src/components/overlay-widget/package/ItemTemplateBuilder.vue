@@ -187,8 +187,7 @@ export default Vue.extend({
       this.$data.duplicateItems = this.$data.items.filter((item: IItemData) =>
         this.$data.preExistingItems.some(
           (preExistingItem: IItemData) => preExistingItem.Name === item.Name
-        )
-      );
+        ));
     },
     removeDuplicateItems() {
       this.populateDuplicateItems();
@@ -245,8 +244,7 @@ export default Vue.extend({
             Category: this.$data.otherConcentrateWeightCategory,
             UnitOfMeasureId: this.unitOfMeasureGrams.Id,
             UnitOfMeasureName: this.unitOfMeasureGrams.Name,
-          })
-        );
+          }));
       }
 
       if (this.$data.wasteCategory && this.unitOfMeasureGrams) {
@@ -354,8 +352,7 @@ export default Vue.extend({
           {
             isVector: true,
             data: this.$data.items.map((item: IItemTemplate) =>
-              item.StrainId ? item.StrainId.toString() : ""
-            ),
+              (item.StrainId ? item.StrainId.toString() : "")),
           },
           {
             isVector: true,
@@ -368,14 +365,12 @@ export default Vue.extend({
           {
             isVector: true,
             data: this.$data.items.map((item: IItemTemplate) =>
-              item.UnitWeight ? item.UnitWeight.toString() : ""
-            ),
+              (item.UnitWeight ? item.UnitWeight.toString() : "")),
           },
           {
             isVector: true,
             data: this.$data.items.map((item: IItemTemplate) =>
-              item.UnitWeightUnitOfMeasureId ? item.UnitWeightUnitOfMeasureId.toString() : ""
-            ),
+              (item.UnitWeightUnitOfMeasureId ? item.UnitWeightUnitOfMeasureId.toString() : "")),
           },
           { isVector: false, data: this.$data.strain.Name },
           { isVector: false, data: this.formattedStrainName },
@@ -493,8 +488,7 @@ export default Vue.extend({
       return (
         // @ts-ignore
         this.errors.find((x: IBuilderComponentError) =>
-          x.tags.includes("missingItemCategoriesError")
-        )?.message || null
+          x.tags.includes("missingItemCategoriesError"))?.message || null
       );
     },
     duplicateItemsErrorMessage(): string | null {

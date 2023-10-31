@@ -18,7 +18,6 @@ export enum PluginAuthActions {
   REFRESH_OAUTH_STATE = "REFRESH_OAUTH_STATE"
 }
 
-
 export enum OAuthState {
   INITIAL,
   AUTHENTICATED,

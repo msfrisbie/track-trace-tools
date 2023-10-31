@@ -140,7 +140,9 @@ import {
   ITransferData,
   IComputedGetSet,
 } from "@/interfaces";
-import { combineLatest, from, Subject, timer } from "rxjs";
+import {
+  combineLatest, from, Subject, timer
+} from "rxjs";
 import { authManager } from "@/modules/auth-manager.module";
 import { dynamicConstsManager } from "@/modules/dynamic-consts-manager.module";
 import { extractDriversAndVehiclesFromTransferHistory } from "@/utils/transfer";
@@ -150,7 +152,7 @@ import { analyticsManager } from "@/modules/analytics-manager.module";
 import { mapState } from "vuex";
 
 const dedupObjects = (acc: any[], current: any) =>
-  acc.find((x: any) => _.isEqual(x, current)) ? acc : [...acc, current];
+  (acc.find((x: any) => _.isEqual(x, current)) ? acc : [...acc, current]);
 
 export default Vue.extend({
   name: "DriverVehiclePicker",
@@ -287,8 +289,7 @@ export default Vue.extend({
       if (!this.$data.showVehicleSearch) {
         timer(0).subscribe(() =>
           // @ts-ignore
-          this.$refs.vehiclesearch.$el.querySelector("input").focus()
-        );
+          this.$refs.vehiclesearch.$el.querySelector("input").focus());
       }
 
       this.$data.showVehicleSearch = !this.$data.showVehicleSearch;
@@ -302,8 +303,7 @@ export default Vue.extend({
       if (!this.$data.showDriverSearch) {
         timer(0).subscribe(() =>
           // @ts-ignore
-          this.$refs.driversearch.$el.querySelector("input").focus()
-        );
+          this.$refs.driversearch.$el.querySelector("input").focus());
       }
 
       this.$data.showDriverSearch = !this.$data.showDriverSearch;

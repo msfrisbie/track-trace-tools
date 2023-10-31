@@ -94,20 +94,18 @@ export default Vue.extend({
     filteredAncestors() {
       if (store.state.packageHistory.showUnownedPackages) {
         return this.ancestorTree.ancestors;
-      } else {
-        return this.ancestorTree.ancestors.filter(
-          (node) => node.type === HistoryTreeNodeType.OWNED_PACKAGE
-        );
       }
+      return this.ancestorTree.ancestors.filter(
+        (node) => node.type === HistoryTreeNodeType.OWNED_PACKAGE
+      );
     },
     filteredChildren() {
       if (store.state.packageHistory.showUnownedPackages) {
         return this.childTree.children;
-      } else {
-        return this.childTree.children.filter(
-          (node) => node.type === HistoryTreeNodeType.OWNED_PACKAGE
-        );
       }
+      return this.childTree.children.filter(
+        (node) => node.type === HistoryTreeNodeType.OWNED_PACKAGE
+      );
     },
     maxParentVisibleDepth: {
       get(): number {

@@ -7,7 +7,7 @@ export function todayIsodate(): string {
 }
 
 export function nowIsotime(): string {
-  return new Date().toLocaleTimeString("sv") + ".000Z";
+  return `${new Date().toLocaleTimeString("sv")}.000Z`;
 }
 
 export function submitDateFromIsodate(isodate: string): string {
@@ -79,9 +79,9 @@ export function normalizeIsodate(x: string): string {
 
 export function isWeekend(isoDate: string) {
   const dateParts = normalizeIsodate(isoDate).split("-");
-  const year = parseInt(dateParts[0]);
-  const month = parseInt(dateParts[1]) - 1; // Month is zero-based
-  const day = parseInt(dateParts[2]);
+  const year = parseInt(dateParts[0], 10);
+  const month = parseInt(dateParts[1], 10) - 1; // Month is zero-based
+  const day = parseInt(dateParts[2], 10);
 
   const date = new Date();
   date.setUTCFullYear(year);

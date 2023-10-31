@@ -130,20 +130,19 @@ export default Vue.extend({
     }),
     ...mapGetters({}),
     filteredPlants() {
-      return this.plants.filter((x: IPlantData) => {
-        // if (!!this.plantSearchFilters.strainName) {
-        //   if (!!x.StrainName && !x.StrainName.includes(this.plantSearchFilters.strainName)) {
-        //     return false;
-        //   }
-        // }
-        // if (!!this.plantSearchFilters.locationName) {
-        //   if (!!x.LocationName && !x.LocationName.includes(this.plantSearchFilters.locationName)) {
-        //     return false;
-        //   }
-        // }
+      return this.plants.filter((x: IPlantData) =>
+      // if (!!this.plantSearchFilters.strainName) {
+      //   if (!!x.StrainName && !x.StrainName.includes(this.plantSearchFilters.strainName)) {
+      //     return false;
+      //   }
+      // }
+      // if (!!this.plantSearchFilters.locationName) {
+      //   if (!!x.LocationName && !x.LocationName.includes(this.plantSearchFilters.locationName)) {
+      //     return false;
+      //   }
+      // }
 
-        return true;
-      });
+        true);
     },
     filtersApplied() {
       return (

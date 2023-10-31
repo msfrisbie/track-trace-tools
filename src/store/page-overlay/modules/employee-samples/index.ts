@@ -85,29 +85,21 @@ export const employeeSamplesModule = {
       getters: any,
       rootState: any,
       rootGetters: any
-    ) => {
-      return state.employees.filter((x) => state.selectedEmployeeIds.includes(x.Id));
-    },
+    ) => state.employees.filter((x) => state.selectedEmployeeIds.includes(x.Id)),
     [EmployeeSamplesGetters.SELECTED_SAMPLE_PACKAGES]: (
       state: IEmployeeSamplesState,
       getters: any,
       rootState: any,
       rootGetters: any
-    ) => {
-      return state.availableSamplePackages.filter((x) =>
-        state.selectedSamplePackageIds.includes(x.Id)
-      );
-    },
+    ) => state.availableSamplePackages.filter((x) =>
+      state.selectedSamplePackageIds.includes(x.Id)),
     [EmployeeSamplesGetters.SELECTED_SAMPLE_ALLOCATIONS]: (
       state: IEmployeeSamplesState,
       getters: any,
       rootState: any,
       rootGetters: any
-    ) => {
-      return state.pendingAllocationBuffer.filter((x) =>
-        state.pendingAllocationBufferIds.includes(x.uuid)
-      );
-    },
+    ) => state.pendingAllocationBuffer.filter((x) =>
+      state.pendingAllocationBufferIds.includes(x.uuid)),
     [EmployeeSamplesGetters.DATE_GROUPED_AVAILABLE_SAMPLE_PACKAGES]: (
       state: IEmployeeSamplesState,
       getters: any,
@@ -216,10 +208,8 @@ export const employeeSamplesModule = {
             (x) => x !== data.employeeId
           );
         }
-      } else {
-        if (data.remove !== true) {
-          ctx.state.selectedEmployeeIds.push(data.employeeId);
-        }
+      } else if (data.remove !== true) {
+        ctx.state.selectedEmployeeIds.push(data.employeeId);
       }
     },
     [EmployeeSamplesActions.TOGGLE_PACKAGE]: async (
@@ -232,10 +222,8 @@ export const employeeSamplesModule = {
             (x) => x !== data.packageId
           );
         }
-      } else {
-        if (data.remove !== true) {
-          ctx.state.selectedSamplePackageIds.push(data.packageId);
-        }
+      } else if (data.remove !== true) {
+        ctx.state.selectedSamplePackageIds.push(data.packageId);
       }
     },
     [EmployeeSamplesActions.TOGGLE_SAMPLE_ALLOCATION]: async (
@@ -248,10 +236,8 @@ export const employeeSamplesModule = {
             (x) => x !== data.uuid
           );
         }
-      } else {
-        if (data.remove !== true) {
-          ctx.state.pendingAllocationBufferIds.push(data.uuid);
-        }
+      } else if (data.remove !== true) {
+        ctx.state.pendingAllocationBufferIds.push(data.uuid);
       }
     },
     [EmployeeSamplesActions.ALLOCATE_SAMPLES]: async (
@@ -340,7 +326,7 @@ export const employeeSamplesModule = {
         let remainingSamples = [...ctx.state.availableSamples];
 
         for (let daysAgo = ctx.state.daysInRange; daysAgo >= 0; daysAgo--) {
-          let skippedSamples = [];
+          const skippedSamples = [];
 
           const distributionDate = normalizeIsodate(getIsoDateFromOffset(-1 * daysAgo));
 
@@ -401,9 +387,7 @@ export const employeeSamplesModule = {
   },
 };
 
-export const employeeSamplesReducer = (state: IEmployeeSamplesState): IEmployeeSamplesState => {
-  return {
-    ...state,
-    ...inMemoryState,
-  };
-};
+export const employeeSamplesReducer = (state: IEmployeeSamplesState): IEmployeeSamplesState => ({
+  ...state,
+  ...inMemoryState,
+});

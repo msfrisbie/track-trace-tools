@@ -122,11 +122,9 @@ describe("misc.ts", () => {
 
   it("Correctly allocates plant counts to multiple packages", () => {
     const mockPackages: IPackageData[] = [50, 100, 150].map((qty, idx) =>
-      buildMockPackage(idx + 1, qty)
-    );
+      buildMockPackage(idx + 1, qty));
     const mockPackages2: IPackageData[] = [250, 100, 150].map((qty, idx) =>
-      buildMockPackage(idx + 1, qty)
-    );
+      buildMockPackage(idx + 1, qty));
 
     expect(allocateImmaturePlantCounts(3, mockPackages)).toEqual([
       {
@@ -344,8 +342,7 @@ describe("misc.ts", () => {
 
   it("Correctly allocates weight-based plant counts to a single package", () => {
     const mockPackages: IPackageData[] = [50, 100, 150].map((qty, idx) =>
-      buildMockPackage(idx + 1, qty, "WeightBased")
-    );
+      buildMockPackage(idx + 1, qty, "WeightBased"));
 
     expect(() => allocateImmaturePlantCounts(3, mockPackages)).toThrowError();
 

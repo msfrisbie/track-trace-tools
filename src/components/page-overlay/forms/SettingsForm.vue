@@ -554,13 +554,13 @@ import { clientBuildManager } from "@/modules/client-build-manager.module";
 import { pageManager } from "@/modules/page-manager/page-manager.module";
 import { toastManager } from "@/modules/toast-manager.module";
 import { MutationType } from "@/mutation-types";
+import router from "@/router/index";
 import store from "@/store/page-overlay/index";
 import { SettingsActions } from "@/store/page-overlay/modules/settings/consts";
 import { getMatchingDecryptedDataOrNull } from "@/utils/encryption";
 import { generateThumbnail } from "@/utils/file";
 import Vue from "vue";
 import { mapState } from "vuex";
-import router from "@/router/index";
 
 export default Vue.extend({
   name: "SettingsForm",
@@ -686,6 +686,7 @@ export default Vue.extend({
       clientBuildManager.loadClientConfig();
     },
     clearLicenseKey() {
+      /* eslint-disable-next-line no-alert */
       if (!window.confirm("Are you sure you want to remove your license key?")) {
         return;
       }

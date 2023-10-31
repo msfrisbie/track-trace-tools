@@ -106,9 +106,7 @@ export const settingsModule = {
   },
 };
 
-export const settingsReducer = (state: ISettingsState): ISettingsState => {
-  return {
-    ...state,
-    ...inMemoryState,
-  };
-};
+export const settingsReducer = (state: ISettingsState): ISettingsState => ({
+  ...state,
+  ...inMemoryState,
+});

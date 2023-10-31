@@ -135,14 +135,14 @@ export default Vue.extend({
         const archive: ICogsArchive = this.$data.existingArchive
           ? await this.getMutableArchiveData()
           : {
-              licenses: [],
-              packages: [],
-              packagesKeys: [],
-              transfers: [],
-              transfersKeys: [],
-              transfersPackages: [],
-              transfersPackagesKeys: [],
-            };
+            licenses: [],
+            packages: [],
+            packagesKeys: [],
+            transfers: [],
+            transfersKeys: [],
+            transfersPackages: [],
+            transfersPackagesKeys: [],
+          };
 
         archive.licenses = (await facilityManager.ownedFacilitiesOrError()).map(
           (x) => x.licenseNumber
@@ -210,8 +210,7 @@ export default Vue.extend({
                     "childPackageLabelQuantityPairs",
                     extractChildPackageTagQuantityPairsFromHistory(history)
                   );
-                })
-              )
+                }))
             );
 
             if (packageHistoryRequests.length % 250 === 0) {
@@ -266,8 +265,7 @@ export default Vue.extend({
                       ETD: destination.EstimatedDepartureDateTime,
                     }))
                   );
-                })
-              )
+                }))
             );
 
             if (transferDestinationRequests.length % 250 === 0) {
@@ -316,8 +314,7 @@ export default Vue.extend({
                         childPackageLabelQuantityPairs: null,
                       });
                     }
-                  })
-                )
+                  }))
               );
 
               if (packageRequests.length % 250 === 0) {

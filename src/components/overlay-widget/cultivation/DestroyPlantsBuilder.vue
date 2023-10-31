@@ -250,7 +250,7 @@ export default Vue.extend({
       );
     },
     async downloadAll() {
-      for (let csvFile of this.csvFiles) {
+      for (const csvFile of this.csvFiles) {
         await downloadCsvFile({ csvFile, delay: 500 });
       }
 
@@ -295,17 +295,13 @@ export default Vue.extend({
       return arrayIsValid(this.$data.destroyedWeights, {
         rowValidators: [
           {
-            fn: (row: any): boolean => {
-              return typeof row === "number" && row > 0;
-            },
+            fn: (row: any): boolean => typeof row === "number" && row > 0,
             message: "All values must be a number greater than 0",
           },
         ],
         collectionValidators: [
           {
-            fn: (rows: any[]): boolean => {
-              return rows.length === this.$data.selectedPlants.length;
-            },
+            fn: (rows: any[]): boolean => rows.length === this.$data.selectedPlants.length,
             message: "Collection must be same size as plants",
           },
           {

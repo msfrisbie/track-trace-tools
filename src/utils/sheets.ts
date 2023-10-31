@@ -35,7 +35,7 @@ export function extractSheetIdOrError(sheetUrl: string): string {
 }
 
 export function buildSheetsApiURL(path: string, params?: { [key: string]: string }): string {
-  if (path[0] != "/") {
+  if (path[0] !== "/") {
     throw new Error("Must prepend slash to path");
   }
 
@@ -423,7 +423,7 @@ export function hideColumnsRequestFactory({
   return {
     updateDimensionProperties: {
       range: {
-        sheetId: sheetId,
+        sheetId,
         dimension: "COLUMNS",
         startIndex,
         endIndex,
@@ -441,7 +441,7 @@ export function alternatingRowStyleRequestFactory({ sheetId }: { sheetId: number
     addBanding: {
       bandedRange: {
         range: {
-          sheetId: sheetId,
+          sheetId,
           startRowIndex: 1,
         },
         rowProperties: {

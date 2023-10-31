@@ -28,7 +28,6 @@ class AccountManager implements IAtomicService {
     const { username, password } = JSON.parse(atob(credentials));
     if (!username || !password) {
       debugLog(async () => ["unable to extract credentials", { username, password }]);
-      return;
     }
   }
 
@@ -48,4 +47,4 @@ class AccountManager implements IAtomicService {
   }
 }
 
-export let accountManager = new AccountManager();
+export const accountManager = new AccountManager();

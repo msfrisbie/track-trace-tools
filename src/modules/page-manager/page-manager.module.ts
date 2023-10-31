@@ -88,35 +88,55 @@ class PageManager implements IAtomicService {
   suppressAnimationContainerTimeout: any = null;
 
   plantsTabs: NodeList = [] as any;
+
   selectedPlantTab: HTMLElement | null = null;
 
   packageTabs: NodeList = [] as any;
+
   selectedPackageTab: HTMLElement | null = null;
 
   transferTabs: NodeList = [] as any;
+
   selectedTransferTab: HTMLElement | null = null;
 
   salesTabs: NodeList = [] as any;
 
   tagTabs: NodeList = [] as any;
+
   selectedTagTab: HTMLElement | null = null;
 
   paginationOptions: NodeList = [] as any;
+
   extendButton: HTMLElement | null = null;
+
   snowflakeCanvas: HTMLElement | null = null;
+
   sessionTimeoutAlert: HTMLElement | null = null;
+
   sessionTimeoutBar: HTMLElement | null = null;
+
   tttTransferButton: HTMLElement | null = null;
+
   tttNewPackageButton: HTMLElement | null = null;
+
   quickTransferButton: HTMLElement | null = null;
+
   quickTransferTemplateButton: HTMLElement | null = null;
+
   quickPackageButton: HTMLElement | null = null;
+
   packageToolsButton: HTMLElement | null = null;
+
   reportToolsButton: HTMLElement | null = null;
+
   transferToolsButton: HTMLElement | null = null;
+
   plantToolsButton: HTMLElement | null = null;
+
   visiblePaginationSizeSelector: HTMLElement | null = null;
+
   viewManifestButton: HTMLElement | null = null;
+
   replacementManifestButton: HTMLElement | null = null;
 
   animationContainers: HTMLElement[] = [];
@@ -126,7 +146,9 @@ class PageManager implements IAtomicService {
   // Transfer Modal
 
   addMoreButton: HTMLElement | null = null;
+
   addMoreInput: HTMLElement | null = null;
+
   packageTagInputContainer: HTMLElement | null = null;
 
   // Plant Search
@@ -134,13 +156,17 @@ class PageManager implements IAtomicService {
   plantSearchComponent: HTMLElement | null = null;
 
   plantLabelFilterInput: HTMLInputElement | null = null;
+
   plantLabelFilterSelect: HTMLElement | null = null;
+
   plantLabelApplyFiltersButton: HTMLButtonElement | null = null;
 
   plantStrainNameFilterInput: HTMLInputElement | null = null;
+
   plantStrainNameApplyFiltersButton: HTMLButtonElement | null = null;
 
   plantLocationNameFilterInput: HTMLInputElement | null = null;
+
   plantLocationNameApplyFiltersButton: HTMLButtonElement | null = null;
 
   plantClearFiltersButton: HTMLButtonElement | null = null;
@@ -150,31 +176,41 @@ class PageManager implements IAtomicService {
   packageSearchComponent: HTMLElement | null = null;
 
   packageLabelFilterInput: HTMLInputElement | null = null;
+
   packageLabelFilterSelect: HTMLElement | null = null;
+
   packageLabelApplyFiltersButton: HTMLButtonElement | null = null;
 
   packageSourceHarvestNameFilterInput: HTMLInputElement | null = null;
+
   packageSourceHarvestNameApplyFiltersButton: HTMLButtonElement | null = null;
 
   packageSourcePackageLabelFilterInput: HTMLInputElement | null = null;
+
   packageSourcePackageLabelApplyFiltersButton: HTMLButtonElement | null = null;
 
   packageProductionBatchNumberFilterInput: HTMLInputElement | null = null;
+
   packageProductionBatchNumberApplyFiltersButton: HTMLButtonElement | null = null;
 
   packageSourceProductionBatchNumbersFilterInput: HTMLInputElement | null = null;
+
   packageSourceProductionBatchNumbersApplyFiltersButton: HTMLButtonElement | null = null;
 
   packageItemNameFilterInput: HTMLInputElement | null = null;
+
   packageItemNameApplyFiltersButton: HTMLButtonElement | null = null;
 
   packageItemStrainNameFilterInput: HTMLInputElement | null = null;
+
   packageItemStrainNameApplyFiltersButton: HTMLButtonElement | null = null;
 
   packageItemProductCategoryNameFilterInput: HTMLInputElement | null = null;
+
   packageItemProductCategoryNameApplyFiltersButton: HTMLButtonElement | null = null;
 
   packageLocationNameFilterInput: HTMLInputElement | null = null;
+
   packageLocationNameApplyFiltersButton: HTMLButtonElement | null = null;
 
   packageClearFiltersButton: HTMLButtonElement | null = null;
@@ -182,13 +218,17 @@ class PageManager implements IAtomicService {
   // Transfer Search
 
   transferManifestNumberFilterInput: HTMLInputElement | null = null;
+
   transferManifestNumberFilterSelect: HTMLElement | null = null;
+
   transferManifestNumberApplyFiltersButton: HTMLButtonElement | null = null;
 
   transferIncomingShipperFacilityInfoFilterInput: HTMLInputElement | null = null;
+
   transferIncomingShipperFacilityInfoApplyFiltersButton: HTMLButtonElement | null = null;
 
   transferOutgoingDeliveryFacilitiesFilterInput: HTMLInputElement | null = null;
+
   transferOutgoingDeliveryFacilitiesApplyFiltersButton: HTMLButtonElement | null = null;
 
   transferClearFiltersButton: HTMLButtonElement | null = null;
@@ -196,7 +236,9 @@ class PageManager implements IAtomicService {
   // Tag Search
 
   tagNumberFilterInput: HTMLInputElement | null = null;
+
   tagNumberFilterSelect: HTMLElement | null = null;
+
   tagNumberApplyFiltersButton: HTMLButtonElement | null = null;
 
   tagClearFiltersButton: HTMLButtonElement | null = null;
@@ -205,6 +247,7 @@ class PageManager implements IAtomicService {
   paused: boolean = false;
 
   refresh: Promise<void> = Promise.resolve();
+
   refreshResolve: any;
 
   async init() {
@@ -300,11 +343,10 @@ class PageManager implements IAtomicService {
 
       if (currentDebugAttribute === currentDebugState) {
         // No change
-        return;
+
       } else if (!["true", "false"].includes(currentDebugAttribute || "")) {
         // Attribute has not yet been set
         document.body.setAttribute(DEBUG_ATTRIBUTE, currentDebugState);
-        return;
       } else {
         // Update state from attribute
         store.commit(MutationType.SET_DEBUG_MODE, currentDebugAttribute === "true");
@@ -333,10 +375,10 @@ class PageManager implements IAtomicService {
         try {
           let targetText = null;
           let targetClassName = null;
-          let clientX = e.clientX;
-          let clientY = e.clientY;
-          let windowWidth = window.innerWidth;
-          let windowHeight = window.innerHeight;
+          const clientX = e.clientX;
+          const clientY = e.clientY;
+          const windowWidth = window.innerWidth;
+          const windowHeight = window.innerHeight;
 
           // Don't allow large strings
           try {
@@ -772,4 +814,4 @@ class PageManager implements IAtomicService {
   }
 }
 
-export let pageManager = new PageManager();
+export const pageManager = new PageManager();

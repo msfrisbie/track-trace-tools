@@ -243,8 +243,8 @@ export default Vue.extend({
           TagId: tag.Id.toString(),
           ...(this.$data.facilityUsesLocationForPackages
             ? {
-                LocationId: this.$data.location.Id.toString(),
-              }
+              LocationId: this.$data.location.Id.toString(),
+            }
             : {}),
         };
         rows.push(row);
@@ -274,7 +274,7 @@ export default Vue.extend({
       );
     },
     async downloadAll() {
-      for (let csvFile of this.csvFiles) {
+      for (const csvFile of this.csvFiles) {
         await downloadCsvFile({ csvFile, delay: 500 });
       }
 

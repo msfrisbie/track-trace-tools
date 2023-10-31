@@ -53,7 +53,7 @@ export function generateTagRangeOrError(startTag: string, endTag: string): strin
     throw new Error("More than 100000 tags in this range");
   }
 
-  let tagList = [];
+  const tagList = [];
 
   for (let i = 0; ; ++i) {
     const nextTag = getTagFromOffset(startTag, i);
