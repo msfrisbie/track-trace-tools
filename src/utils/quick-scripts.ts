@@ -1,10 +1,12 @@
 import { MessageType } from "@/consts";
 import { analyticsManager } from "@/modules/analytics-manager.module";
+import { authManager } from "@/modules/auth-manager.module";
 import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
 import { dynamicConstsManager } from "@/modules/dynamic-consts-manager.module";
 import { pageManager } from "@/modules/page-manager/page-manager.module";
 import { toastManager } from "@/modules/toast-manager.module";
 import _, { zip } from "lodash-es";
+import { copyToClipboard } from "./dom";
 import { setAutocompleteValueOrError, setFormInputValue } from "./metrc-form";
 
 export interface IQuickScript {
@@ -87,6 +89,13 @@ export const QUICK_SCRIPTS: IQuickScript[] = [
       ColumnGroups.SIMPLE_PACKAGE,
     ],
   },
+  {
+    id: "COPY_USERNAME",
+    name: "Copy Username",
+    description: "Copy my username to the clipboard for easy T3+ signup",
+    quickScriptFunction: copyUsername,
+
+  },
   // {
   //   id: "SHOW_ALL_COLUMNS",
   //   name: "Show All Columns",
@@ -139,6 +148,21 @@ export async function checkAllPlantsForHarvestRestore() {
   restoreHarvestCheckboxes.map((input) => input.click());
 
   toastManager.openToast(`Checked ${restoreHarvestCheckboxes.length} boxes`, {
+    title: "Quick Script Success",
+    autoHideDelay: 5000,
+    variant: "success",
+    appendToast: true,
+    toaster: "ttt-toaster",
+    solid: true,
+  });
+}
+
+export async function copyUsername() {
+  const { identity } = await authManager.authStateOrError();
+
+  copyToClipboard(identity);
+
+  toastManager.openToast(`Copied ${identity} to clipboard`, {
     title: "Quick Script Success",
     autoHideDelay: 5000,
     variant: "success",
