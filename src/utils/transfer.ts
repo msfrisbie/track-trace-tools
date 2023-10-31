@@ -191,7 +191,6 @@ export async function extractDriversAndVehiclesFromTransferHistory(): Promise<{
 }
 
 export async function createScanSheet(transferId: number, manifestNumber: string) {
-  debugger; /* eslint-disable-line no-debugger */
   if (!store.state.client.values.ENABLE_T3PLUS && !store.state.client.t3plus) {
     toastManager.openToast(
       "This feature is only availble for T3+ users. Learn more at trackandtrace.tools/plus",
