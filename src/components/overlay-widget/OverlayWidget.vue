@@ -19,7 +19,7 @@
             </template>
 
             <template v-if="contextMenuEvent.manifestNumber">
-              <span class="demo-blur"
+              <span
                 >Manifest {{ contextMenuEvent.zeroPaddedManifestNumber }}</span
               >
             </template>

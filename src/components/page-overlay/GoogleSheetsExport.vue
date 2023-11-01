@@ -389,7 +389,7 @@
                 <span class="leading-6">Include inactive packages</span>
               </b-form-checkbox>
 
-              <b-form-checkbox v-model="packagesFormFilters.includeInTransit">
+              <b-form-checkbox v-model="packagesFormFilters.includeIntransit">
                 <span class="leading-6">Include in-transit packages</span>
               </b-form-checkbox>
 
@@ -437,6 +437,10 @@
                 />
               </div>
 
+              <b-form-checkbox v-model="packagesFormFilters.onlyProductionBatches">
+                <span class="leading-6">ONLY include production batches</span>
+              </b-form-checkbox>
+
               <hr />
 
               <div class="font-semibold text-gray-700">Columns:</div>
@@ -445,14 +449,22 @@
                 v-model="fields[ReportType.PACKAGES]"
                 class="flex flex-col items-start gap-1"
               >
-                <b-form-checkbox
+                <div
                   v-for="fieldData of SHEET_FIELDS[ReportType.PACKAGES]"
                   v-bind:key="fieldData.value"
-                  :value="fieldData"
-                  :disabled="fieldData.required"
+                  class="flex flex-col gap-1 items-start"
                 >
-                  <span class="leading-6">{{ fieldData.readableName }}</span>
-                </b-form-checkbox>
+                  <b-form-checkbox :value="fieldData" :disabled="fieldData.required">
+                    <span class="leading-6">{{ fieldData.readableName }}</span>
+                  </b-form-checkbox>
+                  <template
+                    v-if="
+                      fieldData.checkedMessage && fields[ReportType.PACKAGES].includes(fieldData)
+                    "
+                  >
+                    <span class="text-red-500 text-xs">{{ fieldData.checkedMessage }}</span>
+                  </template>
+                </div>
               </b-form-checkbox-group>
 
               <div class="grid grid-cols-2 gap-2">
@@ -1325,7 +1337,7 @@
                 <span class="leading-6">Include Active</span>
               </b-form-checkbox>
 
-              <b-form-checkbox v-model="packagesQuickviewFormFilters.includeInTransit">
+              <b-form-checkbox v-model="packagesQuickviewFormFilters.includeIntransit">
                 <span class="leading-6">Include In Transit</span>
               </b-form-checkbox>
 
@@ -1826,7 +1838,18 @@ export default Vue.extend({
         });
         return fields;
       })(),
-      fields: _.cloneDeep(SHEET_FIELDS),
+      // These are only the selected fields
+      fields: (() => {
+        const fields = _.cloneDeep(SHEET_FIELDS);
+
+        for (const key in fields) {
+          if (Array.isArray(fields[key])) {
+            fields[key] = fields[key].filter((x) => x.initiallyChecked);
+          }
+        }
+
+        return fields;
+      })(),
       showAllRecent: false,
     };
   },

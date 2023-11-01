@@ -1,5 +1,5 @@
 import { IIndexedPackageData, IPackageFilter, IPluginState } from "@/interfaces";
-import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
+import { DataLoader, getDataLoaderByLicense, primaryDataLoader } from "@/modules/data-loader/data-loader.module";
 import { ReportsMutations, ReportType } from "@/store/page-overlay/modules/reports/consts";
 import {
   IFieldData,
@@ -9,6 +9,7 @@ import {
 } from "@/store/page-overlay/modules/reports/interfaces";
 import { ActionContext } from "vuex";
 import { todayIsodate } from "../date";
+import { extractInitialPackageQuantityAndUnitFromHistoryOrError, extractParentPackageTagQuantityUnitItemSetsFromHistory } from "../history";
 
 export interface IPackageReportFormFilters {
   packagedDateGt: string;
@@ -19,6 +20,7 @@ export interface IPackageReportFormFilters {
   includeIntransit: boolean;
   includeInactive: boolean;
   includeTransferHub: boolean;
+  onlyProductionBatches: boolean;
 }
 
 export const packageFormFiltersFactory: () => IPackageReportFormFilters = () => ({
@@ -30,6 +32,7 @@ export const packageFormFiltersFactory: () => IPackageReportFormFilters = () => 
   includeIntransit: false,
   includeInactive: false,
   includeTransferHub: false,
+  onlyProductionBatches: false,
 });
 
 export function addPackageReport({
@@ -58,6 +61,7 @@ export function addPackageReport({
 
   reportConfig[ReportType.PACKAGES] = {
     packageFilter,
+    onlyProductionBatches: packagesFormFilters.onlyProductionBatches,
     fields,
   };
 }
@@ -138,8 +142,57 @@ export async function maybeLoadPackageReportData({
         }
       }
 
+      if (packageConfig.onlyProductionBatches) {
+        if (pkg.ProductionBatchNumber.length === 0) {
+          return false;
+        }
+      }
+
       return true;
     });
+
+    if (packageConfig.fields.find((x) => [
+      'initialQuantity',
+      'initialQuantityUnitOfMeasure',
+      'totalInputQuantity',
+      'totalInputQuantityUnitOfMeasure'
+    ].includes(x.value))) {
+      const promises: Promise<any>[] = [];
+
+      let dataLoader: DataLoader;
+
+      for (const pkg of packages) {
+        dataLoader = await getDataLoaderByLicense(pkg.LicenseNumber);
+
+        promises.push(dataLoader.packageHistoryByPackageId(pkg.Id).then((history) => { pkg.history = history; }));
+
+        if (promises.length % 100 === 0) {
+          await Promise.allSettled(promises);
+        }
+      }
+
+      await Promise.allSettled(promises);
+
+      for (const pkg of packages) {
+        try {
+          const [initialQuantity, unitOfMeasure] = extractInitialPackageQuantityAndUnitFromHistoryOrError(pkg.history!);
+
+          pkg.initialQuantity = initialQuantity;
+          pkg.initialQuantityUnitOfMeasure = unitOfMeasure;
+
+          const inputQuantitySet = extractParentPackageTagQuantityUnitItemSetsFromHistory(pkg.history!);
+
+          const unitsOfMeasure = new Set(inputQuantitySet.map(([tag, quantity, unit, itemName]) => unit));
+
+          if (unitsOfMeasure.size === 1) {
+            pkg.totalInputQuantity = inputQuantitySet.map(([tag, quantity, unit, itemName]) => quantity).reduce((a, b) => a + b, 0);
+            pkg.totalInputQuantityUnitOfMeasure = [...unitsOfMeasure][0];
+          }
+        } catch {
+          console.error(`Could not extract initial/total quantity from pkg ${pkg.Label}`);
+        }
+      }
+    }
 
     reportData[ReportType.PACKAGES] = {
       packages,

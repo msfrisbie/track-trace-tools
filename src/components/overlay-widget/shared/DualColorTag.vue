@@ -1,5 +1,5 @@
 <template>
-  <div class="font-mono demo-blur">
+  <div class="font-mono">
     <span class="text-gray-400 text-center">{{ labelPrefix }}</span>
     <span class="text-gray-800 text-center font-bold">{{ labelSuffix }}</span>
   </div>

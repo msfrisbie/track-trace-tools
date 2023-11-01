@@ -1,7 +1,7 @@
 import {
   METRC_TAG_REGEX_PATTERN,
   PLANT_BATCH_NAME_REGEX_PATTERN,
-  ZERO_PADDED_MANIFEST_NUMBER_REGEX_PATTERN,
+  ZERO_PADDED_MANIFEST_NUMBER_REGEX_PATTERN
 } from "@/consts";
 import { IHarvestHistoryData, IPackageHistoryData } from "@/interfaces";
 import _ from "lodash-es";
@@ -87,6 +87,7 @@ export function extractPackageLabelOrNull(description: string): string | null {
     new RegExp(`Plant Batch: "${PLANT_BATCH_NAME_REGEX_PATTERN}" > (${METRC_TAG_REGEX_PATTERN})`),
     new RegExp(`Related Package's \\((${METRC_TAG_REGEX_PATTERN})\\) Lab Testing set to`),
     new RegExp(`for Package (${METRC_TAG_REGEX_PATTERN})`),
+    new RegExp(`for Package \\((${METRC_TAG_REGEX_PATTERN})\\)`),
     new RegExp(`from Package (${METRC_TAG_REGEX_PATTERN})`),
     new RegExp(`Packaged into (${METRC_TAG_REGEX_PATTERN})`),
     new RegExp(`Package (${METRC_TAG_REGEX_PATTERN})`),

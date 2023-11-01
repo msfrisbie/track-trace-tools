@@ -744,6 +744,10 @@ export interface IIndexedPackageData extends IPackageData {
   LicenseNumber: string;
   TagMatcher: string;
   history?: IPackageHistoryData[];
+  initialQuantity?: number;
+  initialQuantityUnitOfMeasure?: string;
+  totalInputQuantity?: number;
+  totalInputQuantityUnitOfMeasure?: string;
 }
 
 export interface IRichIndexedPackageData extends IIndexedPackageData {

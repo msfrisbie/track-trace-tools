@@ -14,13 +14,13 @@ import {
   ISimpleSpreadsheet,
   ISpreadsheet,
   ITagFilter,
-  ITransferFilter,
+  ITransferFilter
 } from "@/interfaces";
 import { ImmaturePlantQuickviewDimension } from "@/utils/reports/immature-plants-quickview-report";
 import { MaturePlantQuickviewDimension } from "@/utils/reports/mature-plants-quickview-report";
 import {
   InventoryStrategy,
-  IPackageDateMetadata,
+  IPackageDateMetadata
 } from "@/utils/reports/point-in-time-inventory-report";
 import { IStatusMessage, ReportStatus, ReportType } from "./consts";
 
@@ -83,6 +83,7 @@ export interface IReportConfig {
   };
   [ReportType.PACKAGES]?: {
     packageFilter: IPackageFilter;
+    onlyProductionBatches: boolean;
     fields: IFieldData[];
   };
   [ReportType.POINT_IN_TIME_INVENTORY]?: {
@@ -243,6 +244,8 @@ export interface IFieldData {
   value: string;
   readableName: string;
   required: boolean;
+  initiallyChecked: boolean;
+  checkedMessage?: string;
 }
 
 export interface ICogsArchive {

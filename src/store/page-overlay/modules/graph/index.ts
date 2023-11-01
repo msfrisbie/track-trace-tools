@@ -8,6 +8,7 @@ import { todayIsodate } from "@/utils/date";
 import {
   edgeReducer, hoverRenderer, labelRenderer, nodeReducer
 } from "@/utils/graph";
+import { scrambleTag } from "@/utils/tags";
 import { Coordinates } from "sigma/types";
 import { ActionContext } from "vuex";
 import {
@@ -15,7 +16,7 @@ import {
   GraphGetters,
   GraphMutations,
   GraphRenderAlgorithm,
-  GraphStatus,
+  GraphStatus
 } from "./consts";
 import { IGraphComponentContext, IGraphData, IGraphState } from "./interfaces";
 
@@ -69,6 +70,8 @@ export const graphModule = {
 
       let packages: IIndexedPackageData[] = [];
 
+      const nodeWrapperFn: (x: string) => string = ctx.rootState.demoMode ? scrambleTag : (x) => x;
+
       await Promise.allSettled([
         primaryDataLoader.activePackages().then((result) => {
           packages = [...packages, ...result];
@@ -84,7 +87,7 @@ export const graphModule = {
         }),
       ]);
 
-      const packageLabels = new Set(packages.map((x) => x.Label));
+      const packageLabels = new Set(packages.map((x) => nodeWrapperFn(x.Label)));
 
       const packageIGraphData: IGraphData = {
         nodes: [],
@@ -114,10 +117,10 @@ export const graphModule = {
         }
 
         packageIGraphData.nodes.push({
-          key: pkg.Label,
+          key: nodeWrapperFn(pkg.Label),
           attributes: {
             size: 2,
-            label: pkg.Label,
+            label: nodeWrapperFn(pkg.Label),
             color,
             obj: {
               type: "package",
@@ -127,11 +130,11 @@ export const graphModule = {
         });
 
         for (const [j, sourcePkgLabel] of pkg.SourcePackageLabels.split(",").entries()) {
-          if (packageLabels.has(sourcePkgLabel)) {
+          if (packageLabels.has(nodeWrapperFn(sourcePkgLabel))) {
             packageIGraphData.edges.push({
-              key: `${pkg.Label}::${j}`,
-              source: sourcePkgLabel,
-              target: pkg.Label,
+              key: `${nodeWrapperFn(pkg.Label)}::${j}`,
+              source: nodeWrapperFn(sourcePkgLabel),
+              target: nodeWrapperFn(pkg.Label),
               attributes: {
                 size: 1,
                 type: "arrow",

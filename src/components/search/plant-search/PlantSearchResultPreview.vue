@@ -12,7 +12,7 @@
         class="flex flex-column-shim flex-col space-y-2"
         v-bind:class="{ 'font-bold': selected }"
       >
-        <div class="text-xl text-purple-700 demo-blur">
+        <div class="text-xl text-purple-700">
           {{ plant.StrainName }}
         </div>
         <div class="text-gray-700 text-lg metrc-tag">{{ plant.Label }}</div>

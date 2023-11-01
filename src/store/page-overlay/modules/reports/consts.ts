@@ -97,76 +97,109 @@ const COMMON_PACKAGE_FIELD_DATA: IFieldData[] = [
     value: "Label",
     readableName: "Package Tag",
     required: true,
+    initiallyChecked: true,
   },
   {
     value: "LicenseNumber",
     readableName: "Current License",
     required: true,
+    initiallyChecked: true,
   },
   {
     value: "PackageState",
     readableName: "Is Active?",
     required: true,
+    initiallyChecked: true,
   },
   {
     value: "SourcePackageLabels",
     readableName: "Source Package Labels",
     required: false,
+    initiallyChecked: true,
   },
   {
     value: "Item.Name",
     readableName: "Item",
     required: false,
+    initiallyChecked: true,
   },
   {
     value: "Item.ProductCategoryName",
     readableName: "Item Category",
     required: false,
+    initiallyChecked: false,
   },
   {
     value: "Item.ProductCategoryTypeName",
     readableName: "Item Category Type",
     required: false,
+    initiallyChecked: false,
+  },
+  {
+    value: "Item.UnitWeight",
+    readableName: "Unit Weight",
+    required: false,
+    initiallyChecked: false,
+  },
+  {
+    value: "Item.UnitWeightUnitOfMeasureAbbreviation",
+    readableName: "Unit Weight Unit of Measure",
+    required: false,
+    initiallyChecked: false,
   },
   {
     value: "Quantity",
-    readableName: "Package Quantity",
+    readableName: "Current Quantity",
     required: false,
+    initiallyChecked: true,
   },
   {
     value: "UnitOfMeasureAbbreviation",
     readableName: "Unit of Measure",
     required: false,
+    initiallyChecked: true,
   },
   {
     value: "PackagedDate",
     readableName: "Packaged On",
     required: false,
+    initiallyChecked: true,
   },
   {
     value: "LocationName",
     readableName: "Location",
     required: false,
+    initiallyChecked: true,
   },
   {
     value: "PackagedByFacilityLicenseNumber",
     readableName: "Packaged By",
     required: false,
+    initiallyChecked: true,
   },
   {
     value: "LabTestingStateName",
     readableName: "Testing Status",
     required: false,
+    initiallyChecked: true,
   },
   {
     value: "ProductionBatchNumber",
     readableName: "Production Batch",
     required: false,
+    initiallyChecked: true,
   },
   {
     value: "SourceProductionBatchNumbers",
     readableName: "Source Production Batch Numbers",
     required: false,
+    initiallyChecked: true,
+  },
+  {
+    value: "Note",
+    readableName: "Note",
+    required: false,
+    initiallyChecked: true,
   },
 ];
 const COMMON_PLANT_FIELD_DATA: IFieldData[] = [
@@ -174,56 +207,67 @@ const COMMON_PLANT_FIELD_DATA: IFieldData[] = [
     value: "Label",
     readableName: "Plant Tag",
     required: true,
+    initiallyChecked: true,
   },
   {
     value: "LicenseNumber",
     readableName: "Current License",
     required: true,
+    initiallyChecked: true,
   },
   {
     value: "PlantState",
     readableName: "Growth Phase",
     required: true,
+    initiallyChecked: true,
   },
   {
     value: "PlantedDate",
     readableName: "Planted Date",
     required: false,
+    initiallyChecked: true,
   },
   {
     value: "VegetativeDate",
     readableName: "Vegetative Date",
     required: false,
+    initiallyChecked: true,
   },
   {
     value: "FloweringDate",
     readableName: "Flowering Date",
     required: false,
+    initiallyChecked: true,
   },
   {
     value: "DestroyedDate",
     readableName: "Destroyed Date",
     required: false,
+    initiallyChecked: true,
   },
   {
     value: "StrainName",
     readableName: "Strain",
     required: false,
+    initiallyChecked: true,
   },
   {
     value: "LocationName",
     readableName: "Location",
     required: false,
+    initiallyChecked: true,
   },
   {
     value: "PlantBatchName",
     readableName: "Source Plant Batch",
     required: false,
+    initiallyChecked: true,
   },
   {
     value: "HarvestCount",
     readableName: "Harvest Count",
     required: false,
+    initiallyChecked: true,
   },
 ];
 const COMMON_PLANT_BATCH_FIELD_DATA: IFieldData[] = [
@@ -231,46 +275,55 @@ const COMMON_PLANT_BATCH_FIELD_DATA: IFieldData[] = [
     value: "Name",
     readableName: "Plant Tag/Name",
     required: true,
+    initiallyChecked: true,
   },
   {
     value: "LicenseNumber",
     readableName: "Current License",
     required: true,
+    initiallyChecked: true,
   },
   {
     value: "StrainName",
     readableName: "Strain",
     required: false,
+    initiallyChecked: true,
   },
   {
     value: "LocationName",
     readableName: "Location",
     required: false,
+    initiallyChecked: true,
   },
   {
     value: "UntrackedCount",
     readableName: "# Plants",
     required: true,
+    initiallyChecked: true,
   },
   {
     value: "TrackedCount",
     readableName: "# Tracked",
     required: false,
+    initiallyChecked: true,
   },
   {
     value: "PackagedCount",
     readableName: "# Packaged",
     required: false,
+    initiallyChecked: true,
   },
   {
     value: "HarvestedCount",
     readableName: "# Harvested",
     required: false,
+    initiallyChecked: true,
   },
   {
     value: "DestroyedCount",
     readableName: "# Destroyed",
     required: false,
+    initiallyChecked: true,
   },
 ];
 const COMMON_INCOMING_TRANSFER_FIELD_DATA: IFieldData[] = [
@@ -278,51 +331,61 @@ const COMMON_INCOMING_TRANSFER_FIELD_DATA: IFieldData[] = [
     value: "Transfer.ManifestNumber",
     readableName: "Manifest #",
     required: true,
+    initiallyChecked: true,
   },
   {
     value: "Transfer.TransferState",
     readableName: "Transfer Status",
     required: true,
+    initiallyChecked: true,
   },
   {
     value: "Transfer.ShipmentTypeName",
     readableName: "Transfer Type",
     required: true,
+    initiallyChecked: true,
   },
   {
     value: "Transfer.DeliveryPackageCount",
     readableName: "Package Count",
     required: true,
+    initiallyChecked: true,
   },
   {
     value: "Transfer.ShipperFacilityName",
     readableName: "Shipper Name",
     required: false,
+    initiallyChecked: true,
   },
   {
     value: "Transfer.ShipperFacilityLicenseNumber",
     readableName: "Shipper License",
     required: false,
+    initiallyChecked: true,
   },
   {
     value: "Transfer.RecipientFacilityName",
     readableName: "Recipient Name",
     required: false,
+    initiallyChecked: true,
   },
   {
     value: "Transfer.RecipientFacilityLicenseNumber",
     readableName: "Recipient License",
     required: false,
+    initiallyChecked: true,
   },
   {
     value: "Transfer.EstimatedDepartureDateTime",
     readableName: "ETD",
     required: false,
+    initiallyChecked: true,
   },
   {
     value: "Transfer.EstimatedArrivalDateTime",
     readableName: "ETA",
     required: false,
+    initiallyChecked: true,
   },
 ];
 const COMMON_OUTGOING_TRANSFER_FIELD_DATA: IFieldData[] = [
@@ -330,51 +393,61 @@ const COMMON_OUTGOING_TRANSFER_FIELD_DATA: IFieldData[] = [
     value: "Transfer.ManifestNumber",
     readableName: "Manifest #",
     required: true,
+    initiallyChecked: true,
   },
   {
     value: "Transfer.TransferState",
     readableName: "Transfer Status",
     required: true,
+    initiallyChecked: true,
   },
   {
     value: "Destination.ShipmentTypeName",
     readableName: "Transfer Type",
     required: true,
+    initiallyChecked: true,
   },
   {
     value: "Destination.DeliveryPackageCount",
     readableName: "Package Count",
     required: true,
+    initiallyChecked: true,
   },
   {
     value: "Transfer.ShipperFacilityName",
     readableName: "Shipper Name",
     required: false,
+    initiallyChecked: true,
   },
   {
     value: "Transfer.ShipperFacilityLicenseNumber",
     readableName: "Shipper License",
     required: false,
+    initiallyChecked: true,
   },
   {
     value: "Destination.RecipientFacilityName",
     readableName: "Recipient Name",
     required: false,
+    initiallyChecked: true,
   },
   {
     value: "Destination.RecipientFacilityLicenseNumber",
     readableName: "Recipient License",
     required: false,
+    initiallyChecked: true,
   },
   {
     value: "Destination.EstimatedDepartureDateTime",
     readableName: "ETD",
     required: false,
+    initiallyChecked: true,
   },
   {
     value: "Destination.EstimatedArrivalDateTime",
     readableName: "ETA",
     required: false,
+    initiallyChecked: true,
   },
 ];
 const COMMON_TAG_FIELD_DATA: IFieldData[] = [
@@ -382,21 +455,25 @@ const COMMON_TAG_FIELD_DATA: IFieldData[] = [
     value: "Label",
     readableName: "Tag",
     required: true,
+    initiallyChecked: true,
   },
   {
     value: "LicenseNumber",
     readableName: "Current License",
     required: true,
+    initiallyChecked: true,
   },
   {
     value: "TagTypeName",
     readableName: "Tag Type",
     required: true,
+    initiallyChecked: true,
   },
   {
     value: "StatusName",
     readableName: "Status",
     required: true,
+    initiallyChecked: true,
   },
 ];
 const COMMON_HARVEST_FIELD_DATA: IFieldData[] = [
@@ -404,31 +481,37 @@ const COMMON_HARVEST_FIELD_DATA: IFieldData[] = [
     value: "Name",
     readableName: "Harvest Batch",
     required: true,
+    initiallyChecked: true,
   },
   {
     value: "LicenseNumber",
     readableName: "Current License",
     required: true,
+    initiallyChecked: true,
   },
   {
     value: "HarvestState",
     readableName: "Harvest Status",
     required: true,
+    initiallyChecked: true,
   },
   {
     value: "CurrentWeight",
     readableName: "Current Weight",
     required: true,
+    initiallyChecked: true,
   },
   {
     value: "HarvestStartDate",
     readableName: "Harvest Date",
     required: false,
+    initiallyChecked: true,
   },
   {
     value: "HarvestType",
     readableName: "Harvest Type",
     required: false,
+    initiallyChecked: true,
   },
 ];
 
@@ -437,21 +520,25 @@ const COMMON_OUTGOING_TRANSFER_PACKAGE_DATA: IFieldData[] = [
     value: "Package.PackageLabel",
     readableName: "Package Tag",
     required: true,
+    initiallyChecked: true,
   },
   {
     value: "Package.ProductName",
     readableName: "Item",
     required: false,
+    initiallyChecked: true,
   },
   {
     value: "Package.ShippedQuantity",
     readableName: "Quantity",
     required: false,
+    initiallyChecked: true,
   },
   {
     value: "Package.ShippedUnitOfMeasureAbbreviation",
     readableName: "Unit of Measure",
     required: false,
+    initiallyChecked: true,
   },
 ];
 
@@ -461,7 +548,36 @@ export const SHEET_FIELDS: { [key: string]: IFieldData[] } = {
   [ReportType.HARVESTS]: [...COMMON_HARVEST_FIELD_DATA],
   [ReportType.TAGS]: [...COMMON_TAG_FIELD_DATA],
   [ReportType.MATURE_PLANTS]: [...COMMON_PLANT_FIELD_DATA],
-  [ReportType.PACKAGES]: [...COMMON_PACKAGE_FIELD_DATA],
+  [ReportType.PACKAGES]: [...COMMON_PACKAGE_FIELD_DATA,
+    {
+      value: "initialQuantity",
+      readableName: "Initial Quantity",
+      required: false,
+      initiallyChecked: false,
+      checkedMessage: "This column requires additional data to load, report generation may be slower"
+    },
+    {
+      value: "initialQuantityUnitOfMeasure",
+      readableName: "Initial Quantity Unit of Measure",
+      required: false,
+      initiallyChecked: false,
+      checkedMessage: "This column requires additional data to load, report generation may be slower"
+    },
+    {
+      value: "totalInputQuantity",
+      readableName: "Total Input Quantity",
+      required: false,
+      initiallyChecked: false,
+      checkedMessage: "This column requires additional data to load, report generation may be slower"
+    },
+    {
+      value: "totalInputQuantityUnitOfMeasure",
+      readableName: "Total Input Quantity Unit of Measure",
+      required: false,
+      initiallyChecked: false,
+      checkedMessage: "This column requires additional data to load, report generation may be slower"
+    },
+  ],
   [ReportType.STRAGGLER_PACKAGES]: [...COMMON_PACKAGE_FIELD_DATA],
   [ReportType.INCOMING_TRANSFERS]: [...COMMON_INCOMING_TRANSFER_FIELD_DATA],
   [ReportType.OUTGOING_TRANSFERS]: [...COMMON_OUTGOING_TRANSFER_FIELD_DATA],

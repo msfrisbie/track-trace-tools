@@ -1,4 +1,5 @@
 import { METRC_INT_SUFFIX_CHARCOUNT, METRC_TAG_REGEX } from "@/consts";
+import CryptoJS from "crypto-js";
 
 export function isValidTag(tag: string): boolean {
   if (!tag || tag.length === 0) {
@@ -172,4 +173,11 @@ export function getDuplicates(tags: string[]) {
   });
 
   return [...duplicates].sort();
+}
+
+export function scrambleTag(tag: string): string {
+  const hash = CryptoJS.MD5(tag).toString();
+
+  // Taking the first 24 characters of the 32-character hash to get the desired length
+  return `1A44${hash.slice(0, 20).toLocaleUpperCase()}`;
 }

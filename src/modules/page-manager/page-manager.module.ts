@@ -7,7 +7,7 @@ import {
   PlantFilterIdentifiers,
   TagFilterIdentifiers,
   TransferFilterIdentifiers,
-  TTT_TABLEGROUP_ATTRIBUTE,
+  TTT_TABLEGROUP_ATTRIBUTE
 } from "@/consts";
 import { DarkModeState, IAtomicService, SnowflakeState } from "@/interfaces";
 import { toastManager } from "@/modules/toast-manager.module";
@@ -29,12 +29,12 @@ import {
   TAG_TAB_REGEX,
   TRANSFER_HUB_REGEX,
   TRANSFER_TAB_REGEX,
-  TRANSFER_TEMPLATE_TAB_REGEX,
+  TRANSFER_TEMPLATE_TAB_REGEX
 } from "./consts";
 import {
   addButtonsToPackageTableImpl,
   addButtonsToTransferTableImpl,
-  modifyTransferModalImpl,
+  modifyTransferModalImpl
 } from "./inline-widget-utils";
 import {
   clickLogoutDismissImpl,
@@ -43,7 +43,7 @@ import {
   getVisibleAnimationContainerImpl,
   interceptViewManifestButtonImpl,
   setPaginationImpl,
-  suppressAnimationContainerImpl,
+  suppressAnimationContainerImpl
 } from "./metrc-utils";
 import {
   acquirePackageFilterElementsImpl,
@@ -61,13 +61,13 @@ import {
   setPackageFilterImpl,
   setPlantFilterImpl,
   setTagFilterImpl,
-  setTransferFilterImpl,
+  setTransferFilterImpl
 } from "./search-utils";
 import {
   controlDarkModeImpl,
   controlLogoutBarImpl,
   setExpandedClassImpl,
-  togglePageVisibilityClassesImpl,
+  togglePageVisibilityClassesImpl
 } from "./style-utils";
 import {
   activeTabOrNullImpl,
@@ -77,7 +77,7 @@ import {
   managePlantTabsImpl,
   manageSalesTabsImpl,
   manageTagsTabsImpl,
-  manageTransfersTabsImpl,
+  manageTransfersTabsImpl
 } from "./tab-utils";
 
 const debugLog = debugLogFactory("page-manager.module.ts");
@@ -297,6 +297,38 @@ class PageManager implements IAtomicService {
           console.error(err);
         }
       }
+    }
+
+    if (store.state.demoMode) {
+      document.addEventListener('mousemove', (e) => {
+        if (!e.altKey || !e.target) {
+          return;
+        }
+
+        const element = e.target as HTMLElement;
+
+        if (element.childNodes.length === 1 && element.firstChild?.nodeType === 3) {
+          const txt = element.firstChild!.nodeValue!.split('');
+
+          for (const [idx, char] of txt.entries()) {
+            if (/\d/.test(char)) {
+              txt[idx] = Math.floor(Math.random() * 10).toString();
+            }
+          }
+
+          console.log(txt);
+
+          element.firstChild!.nodeValue = txt.join('');
+
+          // console.log("Original Text:", element.firstChild?.nodeValue); // Log the original text
+          // element.firstChild!.nodeValue = 'foobar'; // Replace text node value with 'foobar'
+        }
+
+        // // @ts-ignore
+        // e.target?.classList.add('demo-blur');
+        // e.preventDefault();
+        // e.stopPropagation();
+      });
     }
   }
 

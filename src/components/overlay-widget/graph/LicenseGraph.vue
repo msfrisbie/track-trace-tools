@@ -74,7 +74,7 @@
         <hr /> -->
         <template v-if="selectedNode.attributes.obj.pkg">
           <div class="ttt-purple font-bold font-mono">
-            {{ selectedNode.attributes.obj.pkg.Label }}
+            {{ selectedNode.key }}
           </div>
           <hr />
           <div>Status: {{ selectedNode.attributes.obj.pkg.PackageState }}</div>
@@ -133,6 +133,7 @@ export default Vue.extend({
   computed: {
     ...mapState<IPluginState>({
       graphState: (state: IPluginState) => state.graph,
+      // demoMode: (state: IPluginState) => state.demoMode,
     }),
     selectedNode(): IGraphNode | null {
       if (store.state.graph.selectedNodeId) {
