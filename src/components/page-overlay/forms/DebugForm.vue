@@ -222,7 +222,8 @@ export default Vue.extend({
       });
     },
     async resetState() {
-      store.commit(MutationType.RESET_STATE);
+      // store.commit(MutationType.RESET_STATE);
+      store.dispatch(`settings/${SettingsActions.RESET_SETTINGS}`);
     },
     async resetFlags() {
       store.dispatch(`flags/${FlagsActions.RESET_FLAGS}`);

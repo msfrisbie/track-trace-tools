@@ -5,5 +5,6 @@ export enum SettingsMutations {
 export enum SettingsGetters {}
 
 export enum SettingsActions {
+  RESET_SETTINGS = "RESET_SETTINGS",
   UPDATE_SETTINGS = "UPDATE_SETTINGS",
 }

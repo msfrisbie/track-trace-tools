@@ -5,7 +5,7 @@ import {
   PlantsTabLabel,
   SalesTabLabel,
   TagsTabLabel,
-  TransfersTabLabel,
+  TransfersTabLabel
 } from "@/consts";
 import { DarkModeState, IPluginState, SnowflakeState } from "@/interfaces";
 import { ActionContext } from "vuex";
@@ -79,6 +79,11 @@ export const settingsModule = {
   },
   getters: {},
   actions: {
+    [SettingsActions.RESET_SETTINGS](
+      ctx: ActionContext<ISettingsState, IPluginState>
+    ) {
+      ctx.dispatch(SettingsActions.UPDATE_SETTINGS, defaultState);
+    },
     [SettingsActions.UPDATE_SETTINGS](
       ctx: ActionContext<ISettingsState, IPluginState>,
       settings: any
@@ -88,13 +93,11 @@ export const settingsModule = {
         ctx.state[key] = value;
       }
 
-      if (ctx.state.writeSettingsToChromeStorage) {
-        console.log("Persisting settings");
-        try {
-          chrome.storage.local.set({ [ChromeStorageKeys.SETTINGS]: ctx.state });
-        } catch (e) {
-          console.error(e);
-        }
+      // Always write
+      try {
+        chrome.storage.local.set({ [ChromeStorageKeys.SETTINGS]: ctx.state });
+      } catch (e) {
+        console.error(e);
       }
 
       ctx.dispatch(

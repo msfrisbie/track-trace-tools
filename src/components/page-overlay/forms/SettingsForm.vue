@@ -64,13 +64,6 @@
           >
         </b-form-group>
 
-        <b-button
-          class="my-4"
-          variant="outline-primary"
-          @click="navToPermissions('/check-permissions')"
-          >CHECK MY PERMISSIONS</b-button
-        >
-
         <b-form-group>
           <div class="mb-2 text-gray-400 text-lg">Appearance &amp; Behavior</div>
 
@@ -364,6 +357,18 @@
       </div>
 
       <div class="grid grid-cols-2 items-center justify-start gap-2">
+        <b-button-group vertical class="col-span-2 mb-4">
+          <b-button variant="outline-primary" size="sm" @click="resetSettings()"
+            >RESET SETTINGS</b-button
+          >
+          <b-button
+            variant="outline-primary"
+            size="sm"
+            @click="navToPermissions('/check-permissions')"
+            >CHECK MY PERMISSIONS</b-button
+          >
+        </b-button-group>
+
         <div class="col-span-2 text-gray-400 text-lg">Packages</div>
 
         <b-form-checkbox
@@ -648,6 +653,14 @@ export default Vue.extend({
     },
     navToPermissions(route: string) {
       this.$router.push(route);
+    },
+    resetSettings() {
+      /* eslint-disable-next-line no-alert */
+      if (window.confirm("Are you sure you want to reset your settings?")) {
+        // store.commit(MutationType.RESET_STATE);
+
+        store.dispatch(`settings/${SettingsActions.RESET_SETTINGS}`);
+      }
     },
     saveLicenseKey() {
       this.$data.settings.licenseKey = this.$data.unsavedLicenseKey;
