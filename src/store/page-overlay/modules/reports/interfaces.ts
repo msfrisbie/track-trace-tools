@@ -71,6 +71,7 @@ export interface IReportConfig {
     displayChecksum: boolean;
     displayFullTags: boolean;
     addSpacing: boolean;
+    removeFloorNugs: boolean;
     fields: null;
   };
   [ReportType.COGS_TRACKER]?: {

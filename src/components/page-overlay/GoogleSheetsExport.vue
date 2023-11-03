@@ -294,6 +294,10 @@
                 />
               </div>
 
+              <b-form-checkbox v-model="harvestPackagesFormFilters.removeFloorNugs">
+                <span class="leading-6">Remove "Floor Nugs" harvests</span>
+              </b-form-checkbox>
+
               <hr />
 
               <simple-drawer toggleText="ADVANCED">
