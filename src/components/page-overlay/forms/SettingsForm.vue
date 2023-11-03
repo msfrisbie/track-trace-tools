@@ -3,68 +3,6 @@
     <b-form class="grid grid-cols-2 gap-8">
       <div class="flex flex-col justify-start">
         <b-form-group>
-          <div class="mb-2 text-gray-400 text-lg">License Key</div>
-
-          <template v-if="!!settings.licenseKey">
-            <template v-if="clientName">
-              <div class="font-bold text-xl text-purple-800">Client: {{ clientName }}</div>
-            </template>
-            <!-- <template v-else>
-              <div class="font-bold text-red-500">Error: no matching client data</div>
-            </template> -->
-
-            <b-input-group class="items-start">
-              <b-form-input
-                id="input-licenseKey"
-                class="mb-2"
-                v-model="settings.licenseKey"
-                name="input-licenseKey"
-                disabled="disabled"
-              >
-              </b-form-input>
-
-              <b-input-group-append>
-                <b-button size="md" @click="clearLicenseKey()" variant="outline-danger"
-                  >CLEAR</b-button
-                >
-              </b-input-group-append>
-            </b-input-group>
-          </template>
-
-          <template v-else>
-            <b-input-group class="items-start">
-              <b-form-input
-                id="input-licenseKey"
-                placeholder="Paste your license key here"
-                class="mb-2"
-                v-model="unsavedLicenseKey"
-                name="input-licenseKey"
-                type="text"
-                v-on:keydown.enter.prevent="saveLicenseKey()"
-                autocomplete="off"
-              >
-              </b-form-input>
-              <b-input-group-append>
-                <b-button
-                  :disabled="!unsavedLicenseKey"
-                  size="md"
-                  @click="saveLicenseKey()"
-                  variant="outline-success"
-                  >SAVE</b-button
-                >
-              </b-input-group-append>
-            </b-input-group>
-          </template>
-
-          <a
-            class="text-purple-600 underline"
-            href="https://www.trackandtrace.tools/solutions"
-            target="_blank"
-            >What is this?</a
-          >
-        </b-form-group>
-
-        <b-form-group>
           <div class="mb-2 text-gray-400 text-lg">Appearance &amp; Behavior</div>
 
           <b-form-checkbox
@@ -357,14 +295,69 @@
       </div>
 
       <div class="grid grid-cols-2 items-center justify-start gap-2">
-        <b-button-group vertical class="col-span-2 mb-4">
-          <b-button variant="outline-primary" size="sm" @click="resetSettings()"
-            >RESET SETTINGS</b-button
+        <b-form-group class="col-span-2">
+          <template v-if="!!settings.licenseKey">
+            <template v-if="clientName">
+              <div class="font-bold text-xl text-purple-800">Client: {{ clientName }}</div>
+            </template>
+            <!-- <template v-else>
+              <div class="font-bold text-red-500">Error: no matching client data</div>
+            </template> -->
+
+            <b-input-group class="items-start">
+              <b-form-input
+                id="input-licenseKey"
+                class="mb-2"
+                v-model="settings.licenseKey"
+                name="input-licenseKey"
+                disabled="disabled"
+              >
+              </b-form-input>
+
+              <b-input-group-append>
+                <b-button size="md" @click="clearLicenseKey()" variant="outline-danger"
+                  >CLEAR</b-button
+                >
+              </b-input-group-append>
+            </b-input-group>
+          </template>
+
+          <template v-else>
+            <b-input-group class="items-start">
+              <b-form-input
+                id="input-licenseKey"
+                placeholder="Paste your license key here"
+                class="mb-2"
+                v-model="unsavedLicenseKey"
+                name="input-licenseKey"
+                type="text"
+                v-on:keydown.enter.prevent="saveLicenseKey()"
+                autocomplete="off"
+              >
+              </b-form-input>
+              <b-input-group-append>
+                <b-button
+                  :disabled="!unsavedLicenseKey"
+                  size="md"
+                  @click="saveLicenseKey()"
+                  variant="outline-success"
+                  >SAVE</b-button
+                >
+              </b-input-group-append>
+            </b-input-group>
+          </template>
+
+          <a
+            class="text-purple-600 underline"
+            href="https://www.trackandtrace.tools/solutions"
+            target="_blank"
+            >What is this?</a
           >
-          <b-button
-            variant="outline-primary"
-            size="sm"
-            @click="navToPermissions('/check-permissions')"
+        </b-form-group>
+
+        <b-button-group vertical class="col-span-2 mb-4">
+          <b-button variant="outline-primary" @click="resetSettings()">RESET SETTINGS</b-button>
+          <b-button variant="outline-primary" @click="navToPermissions('/check-permissions')"
             >CHECK MY PERMISSIONS</b-button
           >
         </b-button-group>
