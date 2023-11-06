@@ -651,7 +651,6 @@ export async function maybeLoadHarvestPackagesReportData({
           } catch {}
 
           if (getItemNameOrError(grandchildPackage).includes("Shake")) {
-            // debugger; /* eslint-disable-line no-debugger */
             shakePackages.push(grandchildPackage);
           } else {
             standardPackages.push(grandchildPackage);
@@ -1226,7 +1225,7 @@ function maybeRecordPostQCWasteRow(
     }
   }
 
-  if (childWasteTotal > 0) {
+  if (childWasteTotal !== 0) {
     harvestPackageRowData.push(rowDataFactory({
       License: harvestPackage.LicenseNumber,
       HarvestID: harvest.Name,
