@@ -535,7 +535,6 @@ import {
   getLabelOrError,
   getQuantityOrError,
   getItemNameOrError,
-  getItemUnitOfMeasureNameOrError,
   getItemUnitOfMeasureAbbreviationOrError,
   getIdOrError,
 } from "@/utils/package";
@@ -570,7 +569,6 @@ export default Vue.extend({
     getLabelOrError,
     getQuantityOrError,
     getItemNameOrError,
-    getItemUnitOfMeasureNameOrError,
     getItemUnitOfMeasureAbbreviationOrError,
     facilitySummary,
     selectDestinationFacility(facility: IMetrcFacilityData) {

@@ -17,7 +17,7 @@
                 (pkg) =>
                   `${getLabelOrError(pkg)} ${getQuantityOrError(
                     pkg
-                  )} ${getItemUnitOfMeasureNameOrError(pkg)} ${getItemNameOrError(pkg)}`
+                  )} ${getUnitOfMeasureNameOrError(pkg)} ${getItemNameOrError(pkg)}`
               "
               :minMatchingChars="0"
               :showOnFocus="true"
@@ -107,7 +107,7 @@
                   style="width: 5rem"
                   class="flex-shrink-0"
                   :textClass="getQuantityOrError(pkg) === 0 ? 'text-red-500' : ''"
-                  :text="`${getQuantityOrError(pkg)} ${getItemUnitOfMeasureAbbreviationOrError(
+                  :text="`${getQuantityOrError(pkg)} ${getUnitOfMeasureAbbreviationOrError(
                     pkg
                   )}`"
                 />
@@ -165,8 +165,8 @@ import {
   getLabelOrError,
   getQuantityOrError,
   getItemNameOrError,
-  getItemUnitOfMeasureNameOrError,
-  getItemUnitOfMeasureAbbreviationOrError,
+  getUnitOfMeasureNameOrError,
+  getUnitOfMeasureAbbreviationOrError,
   getQuantityAndUnitDescription,
 } from "@/utils/package";
 import _ from "lodash-es";
@@ -207,8 +207,8 @@ export default Vue.extend({
     getLabelOrError,
     getQuantityOrError,
     getItemNameOrError,
-    getItemUnitOfMeasureNameOrError,
-    getItemUnitOfMeasureAbbreviationOrError,
+    getUnitOfMeasureNameOrError,
+    getUnitOfMeasureAbbreviationOrError,
     getQuantityAndUnitDescription,
     async loadPackages() {
       this.$data.inflight = false;

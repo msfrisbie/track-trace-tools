@@ -238,7 +238,6 @@ import {
   getLabelOrError,
   getQuantityOrError,
   getItemNameOrError,
-  getItemUnitOfMeasureNameOrError,
   getItemUnitOfMeasureAbbreviationOrError,
 } from "@/utils/package";
 import PickerCard from "@/components/overlay-widget/shared/PickerCard.vue";
@@ -313,7 +312,6 @@ export default Vue.extend({
     getLabelOrError,
     getQuantityOrError,
     getItemNameOrError,
-    getItemUnitOfMeasureNameOrError,
     getItemUnitOfMeasureAbbreviationOrError,
     displayTransferState(transfer: IIndexedTransferData) {
       return transfer.TransferState.replaceAll("_", " ");

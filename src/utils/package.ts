@@ -156,10 +156,31 @@ export async function getSourcePackageTags(target: IUnionIndexedPackageData): Pr
   }
 }
 
+export function getUnitOfMeasureAbbreviationOrError(
+  unionPkg: IUnionIndexedPackageData
+): UnitOfMeasureAbbreviation {
+  return unitOfMeasureNameToAbbreviation(getUnitOfMeasureNameOrError(unionPkg));
+}
+
 export function getItemUnitOfMeasureAbbreviationOrError(
   unionPkg: IUnionIndexedPackageData
 ): UnitOfMeasureAbbreviation {
   return unitOfMeasureNameToAbbreviation(getItemUnitOfMeasureNameOrError(unionPkg));
+}
+
+export function getUnitOfMeasureNameOrError(
+  unionPkg: IUnionIndexedPackageData
+): UnitOfMeasureName {
+  const pkg = unionPkg as any;
+  if ('UnitOfMeasureAbbreviation' in pkg) {
+    return unitOfMeasureAbbreviationToName((pkg as IIndexedPackageData).UnitOfMeasureAbbreviation);
+  }
+  if ('ShippedUnitOfMeasureAbbreviation' in pkg) {
+    return unitOfMeasureAbbreviationToName(
+      (pkg as IDestinationPackageData).ShippedUnitOfMeasureAbbreviation as UnitOfMeasureAbbreviation
+    );
+  }
+  throw new Error("Could not extract UnitOfMeasureName");
 }
 
 export function getItemUnitOfMeasureNameOrError(
@@ -169,9 +190,9 @@ export function getItemUnitOfMeasureNameOrError(
   if (pkg.Item && 'UnitOfMeasureName' in pkg.Item) {
     return (pkg as IIndexedPackageData).Item.UnitOfMeasureName as UnitOfMeasureName;
   }
-  if ('ShippedUnitOfMeasureAbbreviation' in pkg) {
+  if ('ItemUnitQuantityUnitOfMeasureAbbreviation' in pkg) {
     return unitOfMeasureAbbreviationToName(
-      (pkg as IDestinationPackageData).ShippedUnitOfMeasureAbbreviation as UnitOfMeasureAbbreviation
+      (pkg as IDestinationPackageData).ItemUnitQuantityUnitOfMeasureAbbreviation as UnitOfMeasureAbbreviation
     );
   }
   throw new Error("Could not extract Item UnitOfMeasureName");

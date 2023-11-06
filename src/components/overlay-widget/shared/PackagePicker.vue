@@ -231,7 +231,6 @@ import store from "@/store/page-overlay/index";
 import { itemMatchesFilters } from "@/utils/filters";
 import {
   getItemNameOrError,
-  getItemUnitOfMeasureNameOrError,
   getLabelOrError,
   getNormalizedPackageContentsDescription,
 } from "@/utils/package";
@@ -288,7 +287,6 @@ export default Vue.extend({
     locationFilterZeroResultsErrorSuggestionMessage: String,
   },
   methods: {
-    getItemUnitOfMeasureNameOrError,
     getItemNameOrError,
     getNormalizedPackageContentsDescription,
     getLabelOrError,

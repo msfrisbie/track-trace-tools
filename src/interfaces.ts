@@ -780,7 +780,7 @@ export interface IDestinationPackageData {
   ItemUnitCbdContentUnitOfMeasureAbbreviation: null;
   ItemUnitCbdPercent: null;
   ItemUnitQuantity: null;
-  ItemUnitQuantityUnitOfMeasureAbbreviation: null;
+  ItemUnitQuantityUnitOfMeasureAbbreviation: string | null;
   ItemUnitThcContent: null;
   ItemUnitThcContentDose: null;
   ItemUnitThcContentDoseUnitOfMeasureAbbreviation: null;
