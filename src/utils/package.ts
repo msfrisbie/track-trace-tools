@@ -166,10 +166,10 @@ export function getItemUnitOfMeasureNameOrError(
   unionPkg: IUnionIndexedPackageData
 ): UnitOfMeasureName {
   const pkg = unionPkg as any;
-  if (pkg.Item?.UnitOfMeasureName) {
+  if (pkg.Item && 'UnitOfMeasureName' in pkg.Item) {
     return (pkg as IIndexedPackageData).Item.UnitOfMeasureName as UnitOfMeasureName;
   }
-  if (pkg.ProductName) {
+  if ('ShippedUnitOfMeasureAbbreviation' in pkg) {
     return unitOfMeasureAbbreviationToName(
       (pkg as IDestinationPackageData).ShippedUnitOfMeasureAbbreviation as UnitOfMeasureAbbreviation
     );

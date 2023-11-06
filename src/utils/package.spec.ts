@@ -2,7 +2,7 @@ import { METRC_TAG_REGEX } from "@/consts";
 import "@/test/utils/auto-mock-chrome";
 import "@/test/utils/auto-mock-fetch";
 import {
-  getDelimiterSeparatedValuesOrError, getIdOrError, getItemNameOrError, getItemUnitQuantityAndUnitOrError, getLabelOrError, getQuantityOrError, getStrainNameOrError
+  getDelimiterSeparatedValuesOrError, getIdOrError, getItemNameOrError, getItemUnitOfMeasureNameOrError, getItemUnitQuantityAndUnitOrError, getLabelOrError, getQuantityOrError, getStrainNameOrError
 } from "./package";
 
 describe("package.ts", () => {
@@ -15,6 +15,7 @@ describe("package.ts", () => {
         StrainName: 'baz',
         Name: 'beep',
         UnitWeight: 20,
+        UnitOfMeasureName: 'Grams',
         UnitWeightUnitOfMeasureAbbreviation: 'g'
       },
     } as any;
@@ -23,6 +24,7 @@ describe("package.ts", () => {
       PackageId: 5,
       PackageLabel: 'bar',
       ShippedQuantity: 12,
+      ShippedUnitOfMeasureAbbreviation: 'lb',
       ProductName: 'boop',
       ItemStrainName: 'qux',
       ItemUnitWeight: 30,
@@ -61,6 +63,10 @@ describe("package.ts", () => {
       unitOfMeasureAbbreviation: 'lb'
     });
     expect(() => getItemUnitQuantityAndUnitOrError(emptyPkg)).toThrowError();
+
+    expect(getItemUnitOfMeasureNameOrError(pkg)).toEqual('Grams');
+    expect(getItemUnitOfMeasureNameOrError(transferPkg)).toEqual('Pounds');
+    expect(() => getItemUnitOfMeasureNameOrError(emptyPkg)).toThrowError();
   });
 
   it("Extracts delimiter separated values", () => {
