@@ -10,12 +10,12 @@ import {
   ISimpleCogsPackageData,
   ISimplePackageData,
   ISimpleTransferPackageData,
-  IUnionIndexedPackageData,
+  IUnionIndexedPackageData
 } from "@/interfaces";
 import { authManager } from "@/modules/auth-manager.module";
 import {
   getDataLoaderByLicense,
-  primaryDataLoader,
+  primaryDataLoader
 } from "@/modules/data-loader/data-loader.module";
 import { toastManager } from "@/modules/toast-manager.module";
 import { downloadFileFromUrl } from "./dom";
@@ -24,15 +24,15 @@ import {
   UnitOfMeasureAbbreviation,
   unitOfMeasureAbbreviationToName,
   UnitOfMeasureName,
-  unitOfMeasureNameToAbbreviation,
+  unitOfMeasureNameToAbbreviation
 } from "./units";
 
 export function getIdOrError(unionPkg: IUnionIndexedPackageData): number {
   const pkg = unionPkg as any;
-  if (pkg.Id) {
+  if ('Id' in pkg) {
     return (pkg as IIndexedPackageData).Id;
   }
-  if (pkg.PackageId) {
+  if ('PackageId' in pkg) {
     return (pkg as IDestinationPackageData).PackageId;
   }
   throw new Error("Could not extract ID");
@@ -40,10 +40,10 @@ export function getIdOrError(unionPkg: IUnionIndexedPackageData): number {
 
 export function getLabelOrError(unionPkg: IUnionIndexedPackageData): string {
   const pkg = unionPkg as any;
-  if (pkg.Label) {
+  if ('Label' in pkg) {
     return (pkg as IIndexedPackageData).Label;
   }
-  if (pkg.PackageLabel) {
+  if ('PackageLabel' in pkg) {
     return (pkg as IDestinationPackageData).PackageLabel;
   }
   throw new Error("Could not extract Label");
@@ -51,21 +51,21 @@ export function getLabelOrError(unionPkg: IUnionIndexedPackageData): string {
 
 export function getQuantityOrError(unionPkg: IUnionIndexedPackageData): number {
   const pkg = unionPkg as any;
-  if (pkg.Item?.Name) {
+  if ('Quantity' in pkg) {
     return (pkg as IIndexedPackageData).Quantity;
   }
-  if (pkg.ProductName) {
+  if ('ShippedQuantity' in pkg) {
     return (pkg as IDestinationPackageData).ShippedQuantity;
   }
-  throw new Error("Could not extract Item Name");
+  throw new Error("Could not extract Quantity");
 }
 
 export function getStrainNameOrError(unionPkg: IUnionIndexedPackageData): string {
   const pkg = unionPkg as any;
-  if (pkg.Item?.StrainName) {
+  if (pkg.Item && 'StrainName' in pkg.Item) {
     return (pkg as IIndexedPackageData).Item.StrainName ?? "";
   }
-  if (pkg.ProductName) {
+  if ('ItemStrainName' in pkg) {
     return (pkg as IDestinationPackageData).ItemStrainName ?? "";
   }
   throw new Error("Could not extract Strain Name");
@@ -73,10 +73,10 @@ export function getStrainNameOrError(unionPkg: IUnionIndexedPackageData): string
 
 export function getItemNameOrError(unionPkg: IUnionIndexedPackageData): string {
   const pkg = unionPkg as any;
-  if (pkg.Item?.Name) {
+  if (pkg.Item && 'Name' in pkg.Item) {
     return (pkg as IIndexedPackageData).Item.Name;
   }
-  if (pkg.ProductName) {
+  if ('ProductName' in pkg) {
     return (pkg as IDestinationPackageData).ProductName;
   }
   throw new Error("Could not extract Item Name");
@@ -87,21 +87,20 @@ export function getItemUnitQuantityAndUnitOrError(unionPkg: IUnionIndexedPackage
   unitOfMeasureAbbreviation: string;
 } {
   const pkg = unionPkg as any;
-  if (pkg.Item?.UnitWeight && pkg.Item?.UnitWeightUnitOfMeasureAbbreviation) {
+  if (pkg.Item && 'UnitWeight' in pkg.Item && 'UnitWeightUnitOfMeasureAbbreviation' in pkg.Item) {
     return {
       quantity: (pkg as IIndexedPackageData).Item.UnitWeight!,
       unitOfMeasureAbbreviation: (pkg as IIndexedPackageData).Item
         .UnitWeightUnitOfMeasureAbbreviation!,
     };
   }
-  if (pkg.ItemUnitWeight && pkg.ItemUnitWeightUnitOfMeasureAbbreviation) {
+  if ('ItemUnitWeight' in pkg && 'ItemUnitWeightUnitOfMeasureAbbreviation' in pkg) {
     return {
       quantity: (pkg as IDestinationPackageData).ItemUnitWeight!,
       unitOfMeasureAbbreviation: (pkg as IDestinationPackageData)
         .ItemUnitWeightUnitOfMeasureAbbreviation!,
     };
   }
-  console.log({ pkg });
   throw new Error("Could not extract Item Quantity");
 }
 
