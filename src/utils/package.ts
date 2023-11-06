@@ -130,11 +130,11 @@ export function getDelimiterSeparatedValuesOrError(
 }
 
 export function getQuantityAndUnitDescription(pkg: IUnionIndexedPackageData): string {
-  return `${getQuantityOrError(pkg)} ${getItemUnitOfMeasureAbbreviationOrError(pkg)}`;
+  return `${getQuantityOrError(pkg)} ${getUnitOfMeasureAbbreviationOrError(pkg)}`;
 }
 
 export function getNormalizedPackageContentsDescription(pkg: IUnionIndexedPackageData): string {
-  return `${getQuantityOrError(pkg)} ${getItemUnitOfMeasureAbbreviationOrError(
+  return `${getQuantityOrError(pkg)} ${getUnitOfMeasureAbbreviationOrError(
     pkg
   )} ${getItemNameOrError(pkg)}`;
 }

@@ -287,7 +287,7 @@
                   <div class="font-bold">{{ getLabelOrError(pkg) }}</div>
                   <div>
                     {{
-                      `${getQuantityOrError(pkg)} ${getItemUnitOfMeasureAbbreviationOrError(
+                      `${getQuantityOrError(pkg)} ${getUnitOfMeasureAbbreviationOrError(
                         pkg
                       )} ${getItemNameOrError(pkg)}`
                     }}
@@ -535,7 +535,7 @@ import {
   getLabelOrError,
   getQuantityOrError,
   getItemNameOrError,
-  getItemUnitOfMeasureAbbreviationOrError,
+  getUnitOfMeasureAbbreviationOrError,
   getIdOrError,
 } from "@/utils/package";
 import { clientBuildManager } from "@/modules/client-build-manager.module";
@@ -569,7 +569,7 @@ export default Vue.extend({
     getLabelOrError,
     getQuantityOrError,
     getItemNameOrError,
-    getItemUnitOfMeasureAbbreviationOrError,
+    getUnitOfMeasureAbbreviationOrError,
     facilitySummary,
     selectDestinationFacility(facility: IMetrcFacilityData) {
       this.destinationFacility = null;

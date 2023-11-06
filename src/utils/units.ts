@@ -64,6 +64,8 @@ export function unitOfMeasureNameToAbbreviation(
       return "ea";
     case "Milliliters":
       return "ml";
+    case 'Units':
+      return 'ea';
     default:
       // If it's unexpected, just return the original value
       return "units";

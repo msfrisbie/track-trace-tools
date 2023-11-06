@@ -142,7 +142,7 @@
                                     :textClass="getQuantityOrError(pkg) === 0 ? 'text-red-500' : ''"
                                     :text="`${getQuantityOrError(
                                       pkg
-                                    )} ${getItemUnitOfMeasureAbbreviationOrError(pkg)}`"
+                                    )} ${getUnitOfMeasureAbbreviationOrError(pkg)}`"
                                   />
 
                                   <picker-card
@@ -238,7 +238,7 @@ import {
   getLabelOrError,
   getQuantityOrError,
   getItemNameOrError,
-  getItemUnitOfMeasureAbbreviationOrError,
+  getUnitOfMeasureAbbreviationOrError,
 } from "@/utils/package";
 import PickerCard from "@/components/overlay-widget/shared/PickerCard.vue";
 import PickerIcon from "@/components/overlay-widget/shared/PickerIcon.vue";
@@ -312,7 +312,7 @@ export default Vue.extend({
     getLabelOrError,
     getQuantityOrError,
     getItemNameOrError,
-    getItemUnitOfMeasureAbbreviationOrError,
+    getUnitOfMeasureAbbreviationOrError,
     displayTransferState(transfer: IIndexedTransferData) {
       return transfer.TransferState.replaceAll("_", " ");
     },
