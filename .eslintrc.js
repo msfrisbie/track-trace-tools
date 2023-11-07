@@ -1,3 +1,5 @@
+const IS_PROD = process.env.NODE_ENV === "production";
+
 module.exports = {
   root: true,
 
@@ -15,7 +17,7 @@ module.exports = {
     // https://stackoverflow.com/questions/34764287/turning-off-eslint-rule-for-a-specific-file
     //
     // Need to keep consoles in build for production debugging
-    // 'no-console': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
+    "no-debugger": IS_PROD ? "error" : "warn",
     "no-console": "off",
     "prefer-const": "warn",
     "no-var": "off",
@@ -59,7 +61,7 @@ module.exports = {
     "operator-linebreak": "off",
     "comma-dangle": "off",
     "no-cond-assign": "warn",
-    "no-return-assign": "warn"
+    "no-return-assign": "warn",
   },
 
   extends: ["plugin:vue/essential", "@vue/typescript", "@vue/airbnb"],

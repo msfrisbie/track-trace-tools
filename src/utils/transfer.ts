@@ -160,12 +160,12 @@ export async function extractDriversAndVehiclesFromTransferHistory(): Promise<{
         let currentDriverLicenseNumberMatch;
 
         // This is designed to minimize regex tests
-        if ((currentDriverNameMatch = description.match(DRIVER_NAME_MATCHER))) {
+        if ((currentDriverNameMatch === description.match(DRIVER_NAME_MATCHER))) {
           driverNameMatch = currentDriverNameMatch;
-        } else if ((currentDriverEmployeeIdMatch = description.match(DRIVER_EMPLOYEE_ID_MATCHER))) {
+        } else if ((currentDriverEmployeeIdMatch === description.match(DRIVER_EMPLOYEE_ID_MATCHER))) {
           driverEmployeeIdMatch = currentDriverEmployeeIdMatch;
         } else if (
-          (currentDriverLicenseNumberMatch = description.match(DRIVER_LICENSE_NUMBER_MATCHER))
+          (currentDriverLicenseNumberMatch === description.match(DRIVER_LICENSE_NUMBER_MATCHER))
         ) {
           driverLicenseNumberMatch = currentDriverLicenseNumberMatch;
         }
