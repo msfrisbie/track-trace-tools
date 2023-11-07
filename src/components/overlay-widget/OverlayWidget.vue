@@ -19,9 +19,7 @@
             </template>
 
             <template v-if="contextMenuEvent.manifestNumber">
-              <span
-                >Manifest {{ contextMenuEvent.zeroPaddedManifestNumber }}</span
-              >
+              <span>Manifest {{ contextMenuEvent.zeroPaddedManifestNumber }}</span>
             </template>
           </div>
         </template>
@@ -97,18 +95,15 @@ export default Vue.extend({
         (this.$refs.buildermodal as any)?.hide();
         (this.$refs.debugmodal as any)?.toggle();
         (this.$refs.searchmodal as any)?.hide();
-      }
-
-      // † is the macOS alt value
-      else if (e.altKey && (e.key === "†" || e.key === "t")) {
+      } else if (e.altKey && (e.key === "†" || e.key === "t")) {
+        // † is the macOS alt value
         (this.$refs.documentmodal as any)?.hide();
         (this.$refs.debugmodal as any)?.hide();
         (this.$refs.promomodal as any)?.hide();
         (this.$refs.buildermodal as any)?.toggle();
         (this.$refs.searchmodal as any)?.hide();
-
-        // ß is the macOS alt value
       } else if (e.altKey && (e.key === "ß" || e.key === "s")) {
+        // ß is the macOS alt value
         (this.$refs.documentmodal as any)?.hide();
         (this.$refs.debugmodal as any)?.hide();
         (this.$refs.promomodal as any)?.hide();

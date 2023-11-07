@@ -403,15 +403,12 @@ export const graphModule = {
             graphComponentContext,
             node: suggestions[0].id,
           });
-        }
-        // Else, we display the suggestions list:
-        else {
+        } else {
+          // Else, we display the suggestions list:
           ctx.state.selectedNodeId = null;
           ctx.state.suggestions = suggestions.map(({ id }: { id: any }) => id);
         }
-      }
-      // If the query is empty, then we reset the selectedNode / suggestions ctx.state:
-      else {
+      } else { // If the query is empty, then we reset the selectedNode / suggestions ctx.state:
         ctx.state.selectedNodeId = null;
         ctx.state.suggestions = [];
       }

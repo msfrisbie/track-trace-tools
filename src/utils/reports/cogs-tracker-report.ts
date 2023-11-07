@@ -101,14 +101,16 @@ export async function maybeLoadCogsTrackerReportData({
         allPackages = [...allPackages, ...result];
 
         // Backwards compat - possibly redundant
-        return allPackages; }),
+        return allPackages;
+      }),
     primaryDataLoader
       .inactivePackages()
       .then((result) => {
         allPackages = [...allPackages, ...result];
 
         // Backwards compat - possibly redundant
-        return allPackages; }),
+        return allPackages;
+      }),
   ];
 
   await Promise.allSettled(promises);

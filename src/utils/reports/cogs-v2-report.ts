@@ -159,7 +159,8 @@ export async function loadAndCacheCogsV2Data({
           packages = packages.concat(pkgs);
 
           // Backwards compat - possibly redundant
-          return packages; },
+          return packages;
+        },
         (e) => {
           ctx.commit(ReportsMutations.SET_STATUS, {
             statusMessage: {
@@ -176,7 +177,8 @@ export async function loadAndCacheCogsV2Data({
           packages = packages.concat(pkgs);
 
           // Backwards compat - possibly redundant
-          return packages; },
+          return packages;
+        },
         (e) => {
           ctx.commit(ReportsMutations.SET_STATUS, {
             statusMessage: {
@@ -193,7 +195,8 @@ export async function loadAndCacheCogsV2Data({
           packages = packages.concat(pkgs);
 
           // Backwards compat - possibly redundant
-          return packages; },
+          return packages;
+        },
         (e) => {
           ctx.commit(ReportsMutations.SET_STATUS, {
             statusMessage: {

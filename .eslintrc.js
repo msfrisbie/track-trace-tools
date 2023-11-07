@@ -54,7 +54,6 @@ module.exports = {
     "no-empty-function": "off",
     "implicit-arrow-linebreak": "off",
     "guard-for-in": "off",
-    "brace-style": "off",
     "no-throw-literal": "off",
     quotes: "off",
     "operator-linebreak": "off",

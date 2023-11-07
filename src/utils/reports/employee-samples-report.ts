@@ -85,7 +85,8 @@ export async function maybeLoadEmployeeSamplesReportData({
         allPackages = [...allPackages, ...result];
 
         // Backwards compat - possibly redundant
-        return allPackages; }),
+        return allPackages;
+      }),
     primaryDataLoader
       .onHoldPackages()
       .then((result) => {
