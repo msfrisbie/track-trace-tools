@@ -20,7 +20,6 @@ module.exports = {
     "no-debugger": IS_PROD ? "error" : "warn",
     "no-console": "off",
     "prefer-const": "warn",
-    "no-var": "off",
     "no-await-in-loop": "off",
     "no-loop-func": "off",
     "import/prefer-default-export": "off",

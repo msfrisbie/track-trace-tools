@@ -12,15 +12,15 @@ export async function toBase64(file: File) {
 
 export async function generateThumbnail(file: File): Promise<string> {
   // const scaleRatio = Math.min(100, 100) / Math.max(file.width, file.height)
-  var reader = new FileReader();
-  var canvas = document.createElement("canvas");
-  var ctx = canvas.getContext("2d");
+  const reader = new FileReader();
+  const canvas = document.createElement("canvas");
+  const ctx = canvas.getContext("2d");
 
   return new Promise((resolve, reject) => {
     reader.onload = function (event) {
-      var img = new Image();
+      const img = new Image();
       img.onload = function () {
-        var scaleRatio = Math.min(100, 100) / Math.max(img.width, img.height);
+        const scaleRatio = Math.min(100, 100) / Math.max(img.width, img.height);
         const w = img.width * scaleRatio;
         const h = img.height * scaleRatio;
         canvas.width = w;
@@ -36,7 +36,7 @@ export async function generateThumbnail(file: File): Promise<string> {
 }
 
 export async function readJSONFile(file: File): Promise<any> {
-  var reader = new FileReader();
+  const reader = new FileReader();
 
   return new Promise((resolve, reject) => {
     reader.onload = function (event) {
