@@ -41,26 +41,26 @@
 </template>
 
 <script lang="ts">
-import { MessageType } from "@/consts";
-import { analyticsManager } from "@/modules/analytics-manager.module";
-import { messageBus } from "@/modules/message-bus.module";
-import router from "@/router/index";
-import store from "@/store/page-overlay/index";
-import Vue from "vue";
-import { mapState } from "vuex";
+import { MessageType } from '@/consts';
+import { analyticsManager } from '@/modules/analytics-manager.module';
+import { messageBus } from '@/modules/message-bus.module';
+import router from '@/router/index';
+import store from '@/store/page-overlay/index';
+import Vue from 'vue';
+import { mapState } from 'vuex';
 
-require("@/assets/images/google.svg");
+require('@/assets/images/google.svg');
 // require("@/assets/images/btn_google_signin_light_normal_web@2x.png");
 // require("@/assets/images/btn_google_light_normal_ios.svg");
 
 export default Vue.extend({
-  name: "OAuthLogin",
+  name: 'OAuthLogin',
   store,
   router,
   props: {},
   components: {},
   computed: {
-    ...mapState(["debugMode"]),
+    ...mapState(['debugMode']),
     isAuthenticated() {
       // @ts-ignore
       return !!this.$data.oauthUserInfo;
@@ -112,8 +112,8 @@ export default Vue.extend({
       this.$data.initial = false;
     }
 
-    document.addEventListener("visibilitychange", () => {
-      if (document.visibilityState === "visible") {
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') {
         // @ts-ignore
         this.loginOrError();
       }

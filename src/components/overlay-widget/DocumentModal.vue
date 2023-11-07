@@ -55,20 +55,20 @@
 </template>
 
 <script lang="ts">
-import TrackTraceToolsLogo from "@/components/shared/TrackTraceToolsLogo.vue";
-import { MessageType } from "@/consts";
-import { analyticsManager } from "@/modules/analytics-manager.module";
-import { toastManager } from "@/modules/toast-manager.module";
-import { debugLogFactory } from "@/utils/debug";
-import Vue from "vue";
-import store from "@/store/page-overlay/index";
+import TrackTraceToolsLogo from '@/components/shared/TrackTraceToolsLogo.vue';
+import { MessageType } from '@/consts';
+import { analyticsManager } from '@/modules/analytics-manager.module';
+import { toastManager } from '@/modules/toast-manager.module';
+import { debugLogFactory } from '@/utils/debug';
+import Vue from 'vue';
+import store from '@/store/page-overlay/index';
 
-const debugLog = debugLogFactory("DocumentModal.vue");
+const debugLog = debugLogFactory('DocumentModal.vue');
 
 const blobUrlCache: Map<string, string> = new Map();
 
 export default Vue.extend({
-  name: "DocumentModal",
+  name: 'DocumentModal',
   components: {
     TrackTraceToolsLogo,
   },
@@ -97,7 +97,7 @@ export default Vue.extend({
     resetLoadHandler() {
       if (this.$data.loadHandler) {
         // @ts-ignore
-        this.$refs.iframe.removeEventListener("load", this.$data.loadHandler);
+        this.$refs.iframe.removeEventListener('load', this.$data.loadHandler);
         this.$data.loadHandler = null;
       }
     },
@@ -111,12 +111,12 @@ export default Vue.extend({
       }
 
       if (!blobUrl) {
-        toastManager.openToast("Opening file...", {
-          title: "T3",
+        toastManager.openToast('Opening file...', {
+          title: 'T3',
           autoHideDelay: 2000,
-          variant: "primary",
+          variant: 'primary',
           appendToast: true,
-          toaster: "ttt-toaster",
+          toaster: 'ttt-toaster',
           solid: true,
         });
 
@@ -127,7 +127,7 @@ export default Vue.extend({
         // Lab PDF is returned as application/octed, which the browser is downloading
         // https://stackoverflow.com/questions/18998543/set-content-type-on-blob/50875615
         // https://stackoverflow.com/questions/20508788/do-i-need-content-type-application-octet-stream-for-file-download
-        blob = blob.slice(0, blob.size, "application/pdf");
+        blob = blob.slice(0, blob.size, 'application/pdf');
 
         blobUrl = URL.createObjectURL(blob);
 
@@ -142,7 +142,7 @@ export default Vue.extend({
       // const apiKeyState = await apiKeyManager.apiKeyStateOrNull();
     },
     hide() {
-      this.$bvModal.hide("document-modal");
+      this.$bvModal.hide('document-modal');
     },
     toggle() {
       // @ts-ignore
@@ -164,7 +164,7 @@ export default Vue.extend({
           // @ts-ignore
           const iframeUrl = this.$refs.iframe.contentWindow.location.href;
 
-          if (!iframeUrl.includes("http")) {
+          if (!iframeUrl.includes('http')) {
             // Is a null url like about:blank
             return;
           }
@@ -173,7 +173,7 @@ export default Vue.extend({
             return;
           }
 
-          debugLog(async () => ["printing on load", iframeUrl]);
+          debugLog(async () => ['printing on load', iframeUrl]);
 
           // @ts-ignore
           this.$refs.iframe.contentWindow.print();
@@ -182,12 +182,12 @@ export default Vue.extend({
         };
 
         // @ts-ignore
-        this.$refs.iframe.addEventListener("load", this.$data.loadHandler);
+        this.$refs.iframe.addEventListener('load', this.$data.loadHandler);
       }
 
       this.showDocument(documentUrls[0], print);
 
-      this.$bvModal.show("document-modal");
+      this.$bvModal.show('document-modal');
 
       analyticsManager.track(MessageType.VIEWED_DOCUMENTS, {
         documentUrls,

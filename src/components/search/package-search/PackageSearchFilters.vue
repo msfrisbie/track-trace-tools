@@ -137,17 +137,17 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import store from "@/store/page-overlay/index";
-import { IPackageSearchFilters, IPluginState } from "@/interfaces";
-import { PACKAGE_TAB_REGEX } from "@/modules/page-manager/consts";
-import { mapActions, mapState } from "vuex";
-import { PackageFilterIdentifiers } from "@/consts";
-import { MutationType } from "@/mutation-types";
-import { PackageSearchActions } from "@/store/page-overlay/modules/package-search/consts";
+import Vue from 'vue';
+import store from '@/store/page-overlay/index';
+import { IPackageSearchFilters, IPluginState } from '@/interfaces';
+import { PACKAGE_TAB_REGEX } from '@/modules/page-manager/consts';
+import { mapActions, mapState } from 'vuex';
+import { PackageFilterIdentifiers } from '@/consts';
+import { MutationType } from '@/mutation-types';
+import { PackageSearchActions } from '@/store/page-overlay/modules/package-search/consts';
 
 export default Vue.extend({
-  name: "PackageSearchFilters",
+  name: 'PackageSearchFilters',
   store,
   computed: {
     ...mapState<IPluginState>({

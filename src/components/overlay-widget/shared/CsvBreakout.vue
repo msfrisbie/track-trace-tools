@@ -11,15 +11,15 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import { mapState } from "vuex";
-import router from "@/router/index";
-import store from "@/store/page-overlay/index";
-import { downloadCsvFile } from "@/utils/csv";
-import { ICsvFile } from "@/interfaces";
+import Vue from 'vue';
+import { mapState } from 'vuex';
+import router from '@/router/index';
+import store from '@/store/page-overlay/index';
+import { downloadCsvFile } from '@/utils/csv';
+import { ICsvFile } from '@/interfaces';
 
 export default Vue.extend({
-  name: "CsvBreakout",
+  name: 'CsvBreakout',
   store,
   router,
   props: {

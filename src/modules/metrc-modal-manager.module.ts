@@ -1,32 +1,32 @@
 import {
   DOLLAR_NUMBER_REGEX, MessageType, METRC_TAG_REGEX, WEIGHT_NUMBER_REGEX
-} from "@/consts";
-import { IAtomicService } from "@/interfaces";
-import store from "@/store/page-overlay/index";
-import { debugLogFactory } from "@/utils/debug";
-import { activeMetrcModalOrNull, modalTitleOrError } from "@/utils/metrc-modal";
-import * as Papa from "papaparse";
-import { analyticsManager } from "./analytics-manager.module";
-import { toastManager } from "./toast-manager.module";
+} from '@/consts';
+import { IAtomicService } from '@/interfaces';
+import store from '@/store/page-overlay/index';
+import { debugLogFactory } from '@/utils/debug';
+import { activeMetrcModalOrNull, modalTitleOrError } from '@/utils/metrc-modal';
+import * as Papa from 'papaparse';
+import { analyticsManager } from './analytics-manager.module';
+import { toastManager } from './toast-manager.module';
 
-const debugLog = debugLogFactory("modules/metrc-modal-analyzer.module.ts");
+const debugLog = debugLogFactory('modules/metrc-modal-analyzer.module.ts');
 
-const NEW_TRANSFER_TITLE: string = "New Transfer";
-const NEW_LICENSED_TRANSFER_TITLE: string = "New Licensed Transfer";
-const EDIT_LICENSED_TRANSFER_TITLE: string = "Edit Licensed Transfer";
+const NEW_TRANSFER_TITLE: string = 'New Transfer';
+const NEW_LICENSED_TRANSFER_TITLE: string = 'New Licensed Transfer';
+const EDIT_LICENSED_TRANSFER_TITLE: string = 'Edit Licensed Transfer';
 
 const clientKeys: string[] = [
-  "CSV_APPLY_BUTTON_ATTRIBUTE",
-  "INTERMEDIATE_CSV_ATTRIBUTE",
-  "TTT_CONTAINER_ATTRIBUTE",
-  "DESTINATION_SELECTOR",
-  "PACKAGE_ROW_SELECTOR",
-  "UPLOAD_CSV_INPUT_SELECTOR",
-  "CSV_INPUT_CONTAINER_SELECTOR",
-  "PACKAGE_TAG_INPUT_SELECTOR",
-  "PACKAGE_GROSS_WEIGHT_INPUT_SELECTOR",
-  "PACKAGE_GROSS_UNIT_OF_WEIGHT_ID_SELECT_SELECTOR",
-  "PACKAGE_WHOLESALE_PRICE_INPUT_SELECTOR",
+  'CSV_APPLY_BUTTON_ATTRIBUTE',
+  'INTERMEDIATE_CSV_ATTRIBUTE',
+  'TTT_CONTAINER_ATTRIBUTE',
+  'DESTINATION_SELECTOR',
+  'PACKAGE_ROW_SELECTOR',
+  'UPLOAD_CSV_INPUT_SELECTOR',
+  'CSV_INPUT_CONTAINER_SELECTOR',
+  'PACKAGE_TAG_INPUT_SELECTOR',
+  'PACKAGE_GROSS_WEIGHT_INPUT_SELECTOR',
+  'PACKAGE_GROSS_UNIT_OF_WEIGHT_ID_SELECT_SELECTOR',
+  'PACKAGE_WHOLESALE_PRICE_INPUT_SELECTOR',
 ];
 
 class MetrcModalManager implements IAtomicService {
@@ -69,7 +69,7 @@ class MetrcModalManager implements IAtomicService {
           );
 
           if (!csvInputContainer) {
-            throw new Error("Unable to match CSV input container");
+            throw new Error('Unable to match CSV input container');
           }
 
           let tttContainer = csvInputContainer.querySelector(
@@ -77,9 +77,9 @@ class MetrcModalManager implements IAtomicService {
           );
 
           if (!tttContainer) {
-            tttContainer = document.createElement("div");
-            tttContainer.setAttribute(store.state.client.values.TTT_CONTAINER_ATTRIBUTE, "true");
-            tttContainer.classList.add("ttt-modal-container");
+            tttContainer = document.createElement('div');
+            tttContainer.setAttribute(store.state.client.values.TTT_CONTAINER_ATTRIBUTE, 'true');
+            tttContainer.classList.add('ttt-modal-container');
             csvInputContainer.appendChild(tttContainer);
           }
 
@@ -88,7 +88,7 @@ class MetrcModalManager implements IAtomicService {
           );
 
           if (!csvInput) {
-            throw new Error("Unable to match CSV input");
+            throw new Error('Unable to match CSV input');
           }
 
           let intermediateCsvInput: HTMLInputElement | null = csvInputContainer.querySelector(
@@ -96,20 +96,20 @@ class MetrcModalManager implements IAtomicService {
           );
 
           if (!intermediateCsvInput) {
-            intermediateCsvInput = document.createElement("input");
+            intermediateCsvInput = document.createElement('input');
             intermediateCsvInput.setAttribute(
               store.state.client.values.INTERMEDIATE_CSV_ATTRIBUTE,
-              "true"
+              'true'
             );
-            intermediateCsvInput.setAttribute("type", "file");
-            intermediateCsvInput.setAttribute("accept", ".txt,.csv,text/plain,text/csv");
-            intermediateCsvInput.setAttribute("multiple", "multiple");
-            intermediateCsvInput.style.display = "none";
-            intermediateCsvInput.addEventListener("change", () => this.propagateCsv(destination));
+            intermediateCsvInput.setAttribute('type', 'file');
+            intermediateCsvInput.setAttribute('accept', '.txt,.csv,text/plain,text/csv');
+            intermediateCsvInput.setAttribute('multiple', 'multiple');
+            intermediateCsvInput.style.display = 'none';
+            intermediateCsvInput.addEventListener('change', () => this.propagateCsv(destination));
 
-            const label = document.createElement("label");
-            label.innerText = "SELECT CSVs";
-            label.classList.add("btn", "btn-default", "ttt-modal-btn");
+            const label = document.createElement('label');
+            label.innerText = 'SELECT CSVs';
+            label.classList.add('btn', 'btn-default', 'ttt-modal-btn');
 
             label.appendChild(intermediateCsvInput);
 
@@ -121,20 +121,20 @@ class MetrcModalManager implements IAtomicService {
           );
 
           if (!applyBtn) {
-            applyBtn = document.createElement("button");
-            applyBtn.setAttribute(store.state.client.values.CSV_APPLY_BUTTON_ATTRIBUTE, "true");
-            applyBtn.setAttribute("type", "button");
-            applyBtn.classList.add("btn", "btn-default", "ttt-modal-btn");
-            applyBtn.innerText = "FILL CSV DATA";
-            applyBtn.addEventListener("click", (e) => this.applyTransferCsvData(destination));
+            applyBtn = document.createElement('button');
+            applyBtn.setAttribute(store.state.client.values.CSV_APPLY_BUTTON_ATTRIBUTE, 'true');
+            applyBtn.setAttribute('type', 'button');
+            applyBtn.classList.add('btn', 'btn-default', 'ttt-modal-btn');
+            applyBtn.innerText = 'FILL CSV DATA';
+            applyBtn.addEventListener('click', (e) => this.applyTransferCsvData(destination));
 
             tttContainer.appendChild(applyBtn);
           }
 
-          applyBtn.style.display = "none";
+          applyBtn.style.display = 'none';
 
           if (csvInput.files?.length) {
-            applyBtn.style.removeProperty("display");
+            applyBtn.style.removeProperty('display');
           }
         }
 
@@ -146,7 +146,7 @@ class MetrcModalManager implements IAtomicService {
 
   async getMergedCsvDataOrError(input: HTMLInputElement): Promise<string[][]> {
     if (!input.files) {
-      throw new Error("Bad files");
+      throw new Error('Bad files');
     }
 
     const mergedRows: string[][] = [];
@@ -186,7 +186,7 @@ class MetrcModalManager implements IAtomicService {
     );
 
     if (!intermediateCsvInput || !intermediateCsvInput.files) {
-      throw new Error("Cannot find intermediate input");
+      throw new Error('Cannot find intermediate input');
     }
 
     const csvInput: HTMLInputElement | null = destination.querySelector(
@@ -194,18 +194,18 @@ class MetrcModalManager implements IAtomicService {
     );
 
     if (!csvInput) {
-      throw new Error("Unable to match CSV input");
+      throw new Error('Unable to match CSV input');
     }
 
     const mergedRows: string[][] = await this.getMergedCsvDataOrError(intermediateCsvInput);
 
     if (!mergedRows.length) {
-      toastManager.openToast(`The CSVs you added are empty.`, {
-        title: "CSV Formatting Error",
+      toastManager.openToast('The CSVs you added are empty.', {
+        title: 'CSV Formatting Error',
         autoHideDelay: 5000,
-        variant: "danger",
+        variant: 'danger',
         appendToast: true,
-        toaster: "ttt-toaster",
+        toaster: 'ttt-toaster',
         solid: true,
       });
 
@@ -222,11 +222,11 @@ class MetrcModalManager implements IAtomicService {
           
           ${JSON.stringify(row)}`,
             {
-              title: "CSV Formatting Error",
+              title: 'CSV Formatting Error',
               autoHideDelay: 5000,
-              variant: "warning",
+              variant: 'warning',
               appendToast: true,
-              toaster: "ttt-toaster",
+              toaster: 'ttt-toaster',
               solid: true,
             }
           );
@@ -239,11 +239,11 @@ class MetrcModalManager implements IAtomicService {
           
           ${JSON.stringify(row)}`,
             {
-              title: "CSV Formatting Error",
+              title: 'CSV Formatting Error',
               autoHideDelay: 5000,
-              variant: "danger",
+              variant: 'danger',
               appendToast: true,
-              toaster: "ttt-toaster",
+              toaster: 'ttt-toaster',
               solid: true,
             }
           );
@@ -258,11 +258,11 @@ class MetrcModalManager implements IAtomicService {
           
           ${JSON.stringify(row)}`,
             {
-              title: "CSV Formatting Error",
+              title: 'CSV Formatting Error',
               autoHideDelay: 5000,
-              variant: "warning",
+              variant: 'warning',
               appendToast: true,
-              toaster: "ttt-toaster",
+              toaster: 'ttt-toaster',
               solid: true,
             }
           );
@@ -275,11 +275,11 @@ class MetrcModalManager implements IAtomicService {
           
           ${JSON.stringify(row)}`,
             {
-              title: "CSV Formatting Error",
+              title: 'CSV Formatting Error',
               autoHideDelay: 5000,
-              variant: "warning",
+              variant: 'warning',
               appendToast: true,
-              toaster: "ttt-toaster",
+              toaster: 'ttt-toaster',
               solid: true,
             }
           );
@@ -294,18 +294,18 @@ class MetrcModalManager implements IAtomicService {
           
           ${JSON.stringify(row)}`,
             {
-              title: "CSV Formatting Error",
+              title: 'CSV Formatting Error',
               autoHideDelay: 5000,
-              variant: "warning",
+              variant: 'warning',
               appendToast: true,
-              toaster: "ttt-toaster",
+              toaster: 'ttt-toaster',
               solid: true,
             }
           );
         }
         formattingErrorCount++;
       } else if (
-        !["Pounds", "Grams", "Kilograms", "Ounces"]
+        !['Pounds', 'Grams', 'Kilograms', 'Ounces']
           .map((x) => x.toLocaleLowerCase())
           .includes(row[2].toLocaleLowerCase())
       ) {
@@ -315,11 +315,11 @@ class MetrcModalManager implements IAtomicService {
           
           ${JSON.stringify(row)}`,
             {
-              title: "CSV Formatting Error",
+              title: 'CSV Formatting Error',
               autoHideDelay: 5000,
-              variant: "warning",
+              variant: 'warning',
               appendToast: true,
-              toaster: "ttt-toaster",
+              toaster: 'ttt-toaster',
               solid: true,
             }
           );
@@ -334,11 +334,11 @@ class MetrcModalManager implements IAtomicService {
           
           ${JSON.stringify(row)}`,
             {
-              title: "CSV Formatting Error",
+              title: 'CSV Formatting Error',
               autoHideDelay: 5000,
-              variant: "warning",
+              variant: 'warning',
               appendToast: true,
-              toaster: "ttt-toaster",
+              toaster: 'ttt-toaster',
               solid: true,
             }
           );
@@ -351,11 +351,11 @@ class MetrcModalManager implements IAtomicService {
           
           ${JSON.stringify(row)}`,
             {
-              title: "CSV Formatting Error",
+              title: 'CSV Formatting Error',
               autoHideDelay: 5000,
-              variant: "warning",
+              variant: 'warning',
               appendToast: true,
-              toaster: "ttt-toaster",
+              toaster: 'ttt-toaster',
               solid: true,
             }
           );
@@ -366,25 +366,25 @@ class MetrcModalManager implements IAtomicService {
 
     if (formattingErrorCount > 0) {
       toastManager.openToast(`Detected ${formattingErrorCount} CSV formatting errors`, {
-        title: "CSV Formatting Error",
+        title: 'CSV Formatting Error',
         autoHideDelay: 5000,
-        variant: "warning",
+        variant: 'warning',
         appendToast: true,
-        toaster: "ttt-toaster",
+        toaster: 'ttt-toaster',
         solid: true,
       });
     }
 
-    const blob = new Blob([mergedRows.map((row) => row[0]).join("\n")], {
-      type: "text/csv",
+    const blob = new Blob([mergedRows.map((row) => row[0]).join('\n')], {
+      type: 'text/csv',
     });
 
     const dT = new DataTransfer();
-    dT.items.add(new File([blob], "output.csv"));
+    dT.items.add(new File([blob], 'output.csv'));
 
     csvInput.files = dT.files;
 
-    csvInput.dispatchEvent(new Event("change"));
+    csvInput.dispatchEvent(new Event('change'));
   }
 
   async applyTransferCsvData(destination: HTMLElement) {
@@ -401,7 +401,7 @@ class MetrcModalManager implements IAtomicService {
     );
 
     if (!input || !input.files) {
-      throw new Error("Bad input");
+      throw new Error('Bad input');
     }
 
     const mergedRows: string[][] = await this.getMergedCsvDataOrError(input);
@@ -419,11 +419,11 @@ class MetrcModalManager implements IAtomicService {
       
         This can occur when a package tag in the CSV is not eligible for transfer`,
         {
-          title: "CSV Row Count Error",
+          title: 'CSV Row Count Error',
           autoHideDelay: 5000,
-          variant: "warning",
+          variant: 'warning',
           appendToast: true,
-          toaster: "ttt-toaster",
+          toaster: 'ttt-toaster',
           solid: true,
         }
       );
@@ -439,17 +439,17 @@ class MetrcModalManager implements IAtomicService {
       );
 
       if (!packageTagInput) {
-        toastManager.openToast(`Unable to autofill package tag input`, {
-          title: "CSV Autofill Error",
+        toastManager.openToast('Unable to autofill package tag input', {
+          title: 'CSV Autofill Error',
           autoHideDelay: 5000,
-          variant: "danger",
+          variant: 'danger',
           appendToast: true,
-          toaster: "ttt-toaster",
+          toaster: 'ttt-toaster',
           solid: true,
         });
         autofillSuccess = false;
 
-        throw new Error("Could not locate package tag input");
+        throw new Error('Could not locate package tag input');
       }
 
       if (!packageTagInput.value) {
@@ -466,11 +466,11 @@ class MetrcModalManager implements IAtomicService {
 
       if (!matchingRow) {
         toastManager.openToast(`Could not match row for ${packageTagInput.value}`, {
-          title: "CSV Autofill Error",
+          title: 'CSV Autofill Error',
           autoHideDelay: 5000,
-          variant: "danger",
+          variant: 'danger',
           appendToast: true,
-          toaster: "ttt-toaster",
+          toaster: 'ttt-toaster',
           solid: true,
         });
         autofillSuccess = false;
@@ -482,15 +482,15 @@ class MetrcModalManager implements IAtomicService {
         store.state.client.values.PACKAGE_GROSS_WEIGHT_INPUT_SELECTOR
       );
 
-      if (grossWeightInput && typeof matchingRow[1] === "string") {
-        grossWeightInput.value = matchingRow[1].replace(",", "");
+      if (grossWeightInput && typeof matchingRow[1] === 'string') {
+        grossWeightInput.value = matchingRow[1].replace(',', '');
       } else {
         toastManager.openToast(`Could not autofill gross weight input: ${matchingRow[1]}`, {
-          title: "CSV Autofill Error",
+          title: 'CSV Autofill Error',
           autoHideDelay: 5000,
-          variant: "danger",
+          variant: 'danger',
           appendToast: true,
-          toaster: "ttt-toaster",
+          toaster: 'ttt-toaster',
           solid: true,
         });
         autofillSuccess = false;
@@ -501,33 +501,33 @@ class MetrcModalManager implements IAtomicService {
       );
 
       if (grossUnitOfWeightSelect) {
-        const options = [...grossUnitOfWeightSelect.querySelectorAll("option")];
+        const options = [...grossUnitOfWeightSelect.querySelectorAll('option')];
         let matchingOption = null;
         for (const option of options) {
           if (!matchingRow[2]) {
             break;
           }
           if (
-            option.getAttribute("label")?.toLocaleLowerCase() === matchingRow[2].toLocaleLowerCase()
+            option.getAttribute('label')?.toLocaleLowerCase() === matchingRow[2].toLocaleLowerCase()
           ) {
             matchingOption = option;
             grossUnitOfWeightSelect.value = option.value;
-            grossUnitOfWeightSelect.dispatchEvent(new Event("change"));
+            grossUnitOfWeightSelect.dispatchEvent(new Event('change'));
             break;
           }
         }
 
         if (!matchingOption) {
           toastManager.openToast(`Could not autofill unit of measure: ${matchingRow[2]}`, {
-            title: "CSV Autofill Error",
+            title: 'CSV Autofill Error',
             autoHideDelay: 5000,
-            variant: "danger",
+            variant: 'danger',
             appendToast: true,
-            toaster: "ttt-toaster",
+            toaster: 'ttt-toaster',
             solid: true,
           });
           autofillSuccess = false;
-          console.error("Unable to match");
+          console.error('Unable to match');
         }
       }
 
@@ -535,15 +535,15 @@ class MetrcModalManager implements IAtomicService {
         store.state.client.values.PACKAGE_WHOLESALE_PRICE_INPUT_SELECTOR
       );
 
-      if (wholesalePriceInput && typeof matchingRow[3] === "string") {
-        wholesalePriceInput.value = matchingRow[3].replace("$", "").replace(",", "");
+      if (wholesalePriceInput && typeof matchingRow[3] === 'string') {
+        wholesalePriceInput.value = matchingRow[3].replace('$', '').replace(',', '');
       } else {
         toastManager.openToast(`Could not autofill wholesale value: ${matchingRow[3]}`, {
-          title: "CSV Autofill Error",
+          title: 'CSV Autofill Error',
           autoHideDelay: 5000,
-          variant: "danger",
+          variant: 'danger',
           appendToast: true,
-          toaster: "ttt-toaster",
+          toaster: 'ttt-toaster',
           solid: true,
         });
         autofillSuccess = false;
@@ -558,11 +558,11 @@ class MetrcModalManager implements IAtomicService {
       toastManager.openToast(
         `Successfully autofilled ${successRowCount} of ${mergedRows.length} rows`,
         {
-          title: "CSV Autofill Finished",
+          title: 'CSV Autofill Finished',
           autoHideDelay: 5000,
-          variant: "success",
+          variant: 'success',
           appendToast: true,
-          toaster: "ttt-toaster",
+          toaster: 'ttt-toaster',
           solid: true,
         }
       );
@@ -570,11 +570,11 @@ class MetrcModalManager implements IAtomicService {
       toastManager.openToast(
         `Partially autofilled ${successRowCount} of ${mergedRows.length} rows`,
         {
-          title: "CSV Autofill Finished",
+          title: 'CSV Autofill Finished',
           autoHideDelay: 5000,
-          variant: "warning",
+          variant: 'warning',
           appendToast: true,
-          toaster: "ttt-toaster",
+          toaster: 'ttt-toaster',
           solid: true,
         }
       );

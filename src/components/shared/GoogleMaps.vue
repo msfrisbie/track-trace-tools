@@ -4,14 +4,14 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import { mapState } from "vuex";
-import router from "@/router/index";
-import store from "@/store/page-overlay/index";
-import { googleMapsApiKey } from "@/modules/environment.module";
+import Vue from 'vue';
+import { mapState } from 'vuex';
+import router from '@/router/index';
+import store from '@/store/page-overlay/index';
+import { googleMapsApiKey } from '@/modules/environment.module';
 
 export default Vue.extend({
-  name: "GoogleMaps",
+  name: 'GoogleMaps',
   store,
   router,
   props: {
@@ -33,16 +33,16 @@ export default Vue.extend({
     ...mapState([]),
     src(): string {
       switch (this.$props.mapMode) {
-        case "place":
+        case 'place':
           return `https://www.google.com/maps/embed/v1/place?key=${googleMapsApiKey()}&q=${encodeURIComponent(
             this.$props.destination
           )}`;
-        case "directions":
+        case 'directions':
           return `https://www.google.com/maps/embed/v1/directions?key=${googleMapsApiKey()}&destination=${encodeURIComponent(
             this.$props.destination
           )}&origin=${encodeURIComponent(this.$props.origin)}`;
         default:
-          return "";
+          return '';
       }
     },
   },

@@ -9,15 +9,15 @@
 </template>
 
 <script lang="ts">
-import { IPluginState } from "@/interfaces";
-import router from "@/router/index";
-import store from "@/store/page-overlay/index";
-import { SearchActions, SearchType } from "@/store/page-overlay/modules/search/consts";
-import Vue from "vue";
-import { mapActions, mapState } from "vuex";
+import { IPluginState } from '@/interfaces';
+import router from '@/router/index';
+import store from '@/store/page-overlay/index';
+import { SearchActions, SearchType } from '@/store/page-overlay/modules/search/consts';
+import Vue from 'vue';
+import { mapActions, mapState } from 'vuex';
 
 export default Vue.extend({
-  name: "SearchPickerSeelect",
+  name: 'SearchPickerSeelect',
   store,
   router,
   props: {},

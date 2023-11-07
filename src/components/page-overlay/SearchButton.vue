@@ -49,20 +49,20 @@
 </template>
 
 <script lang="ts">
-import { ModalType } from "@/consts";
-import { modalManager } from "@/modules/modal-manager.module";
-import { MutationType } from "@/mutation-types";
-import store from "@/store/page-overlay/index";
-import Vue from "vue";
-import { mapState } from "vuex";
+import { ModalType } from '@/consts';
+import { modalManager } from '@/modules/modal-manager.module';
+import { MutationType } from '@/mutation-types';
+import store from '@/store/page-overlay/index';
+import Vue from 'vue';
+import { mapState } from 'vuex';
 
 export default Vue.extend({
-  name: "SearchButton",
+  name: 'SearchButton',
   store,
   data() {
     return {};
   },
-  computed: mapState(["trackedInteractions", "settings"]),
+  computed: mapState(['trackedInteractions', 'settings']),
   methods: {
     dismissSearchPopover() {
       const trackedInteractions = JSON.parse(JSON.stringify(store.state.trackedInteractions));
@@ -70,9 +70,9 @@ export default Vue.extend({
       trackedInteractions.dismissedSearchPopover = true;
 
       // @ts-ignore
-      this.$refs["search-popover"].$emit("close");
+      this.$refs['search-popover'].$emit('close');
       // @ts-ignore
-      this.$refs["search-popover"].$emit("disable");
+      this.$refs['search-popover'].$emit('disable');
 
       store.commit(MutationType.UPDATE_TRACKED_INTERACTIONS, trackedInteractions);
     },

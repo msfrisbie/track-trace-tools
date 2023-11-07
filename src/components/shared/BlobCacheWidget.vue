@@ -6,15 +6,15 @@
 </template>
 
 <script lang="ts">
-import { toastManager } from "@/modules/toast-manager.module";
-import router from "@/router/index";
-import store from "@/store/page-overlay/index";
-import { readJSONFile } from "@/utils/file";
-import Vue from "vue";
-import { mapState } from "vuex";
+import { toastManager } from '@/modules/toast-manager.module';
+import router from '@/router/index';
+import store from '@/store/page-overlay/index';
+import { readJSONFile } from '@/utils/file';
+import Vue from 'vue';
+import { mapState } from 'vuex';
 
 export default Vue.extend({
-  name: "BlobCacheWidget",
+  name: 'BlobCacheWidget',
   store,
   router,
   props: {
@@ -33,12 +33,12 @@ export default Vue.extend({
       const cachedValue = globalThis[this.$props.cachekey];
 
       if (cachedValue === undefined) {
-        toastManager.openToast(`Global blob cache is not set`, {
-          title: "Download error",
+        toastManager.openToast('Global blob cache is not set', {
+          title: 'Download error',
           autoHideDelay: 5000,
-          variant: "success",
+          variant: 'success',
           appendToast: true,
-          toaster: "ttt-toaster",
+          toaster: 'ttt-toaster',
           solid: true,
         });
       }
@@ -46,9 +46,9 @@ export default Vue.extend({
       const dataStr = `data:text/json;charset=utf-8,${encodeURIComponent(
         JSON.stringify(cachedValue)
       )}`;
-      const downloadAnchorNode = document.createElement("a");
-      downloadAnchorNode.setAttribute("href", dataStr);
-      downloadAnchorNode.setAttribute("download", `${this.$props.cachekey}.json`);
+      const downloadAnchorNode = document.createElement('a');
+      downloadAnchorNode.setAttribute('href', dataStr);
+      downloadAnchorNode.setAttribute('download', `${this.$props.cachekey}.json`);
       document.body.appendChild(downloadAnchorNode); // required for firefox
       downloadAnchorNode.click();
       downloadAnchorNode.remove();
@@ -65,12 +65,12 @@ export default Vue.extend({
       // @ts-ignore
       globalThis[this.$props.cachekey] = data;
 
-      toastManager.openToast(`Set global blob cache`, {
-        title: "Upload success",
+      toastManager.openToast('Set global blob cache', {
+        title: 'Upload success',
         autoHideDelay: 5000,
-        variant: "success",
+        variant: 'success',
         appendToast: true,
-        toaster: "ttt-toaster",
+        toaster: 'ttt-toaster',
         solid: true,
       });
     },

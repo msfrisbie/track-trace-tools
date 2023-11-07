@@ -1,16 +1,16 @@
-import store from "@/store/page-overlay/index";
+import store from '@/store/page-overlay/index';
 
 type StorageKey = string;
 
 export enum StorageKeyType {
-  ACTIVE_PACKAGES = "ACTIVE_PACKAGES",
-  INACTIVE_PACKAGES = "INACTIVE_PACKAGES",
+  ACTIVE_PACKAGES = 'ACTIVE_PACKAGES',
+  INACTIVE_PACKAGES = 'INACTIVE_PACKAGES',
 }
 
 export function storageKeyFactory(values: {
   license: string;
   keyType: string;
-  keyProperty: "timestamp" | "data";
+  keyProperty: 'timestamp' | 'data';
 }): StorageKey {
   return `${values.license}::${values.keyType}::${values.keyProperty}`;
 }
@@ -27,7 +27,7 @@ export async function writeData({
   const dataStorageKey: StorageKey = storageKeyFactory({
     license,
     keyType,
-    keyProperty: "data",
+    keyProperty: 'data',
   });
 
   await simpleSet(dataStorageKey, data);
@@ -35,7 +35,7 @@ export async function writeData({
   const timestampStorageKey: StorageKey = storageKeyFactory({
     license,
     keyType,
-    keyProperty: "timestamp",
+    keyProperty: 'timestamp',
   });
 
   await simpleSet(timestampStorageKey, Date.now());
@@ -68,7 +68,7 @@ export async function readDataOrNull<T>({
   const timestampStorageKey: StorageKey = storageKeyFactory({
     license,
     keyType,
-    keyProperty: "timestamp",
+    keyProperty: 'timestamp',
   });
 
   const timestamp = await simpleGet<number | null>(timestampStorageKey);
@@ -86,7 +86,7 @@ export async function readDataOrNull<T>({
   const dataStorageKey: StorageKey = storageKeyFactory({
     license,
     keyType,
-    keyProperty: "data",
+    keyProperty: 'data',
   });
 
   const data = await simpleGet<T>(dataStorageKey);
@@ -97,7 +97,7 @@ export async function readDataOrNull<T>({
   }
 
   if (validatorFn && !validatorFn(data)) {
-    console.log(`Data failed validation`);
+    console.log('Data failed validation');
     return null;
   }
 

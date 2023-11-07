@@ -1,11 +1,11 @@
-import { TransferFilterIdentifiers, TransferState } from "@/consts";
-import { IPluginState, ITransferSearchFilters } from "@/interfaces";
-import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
-import { pageManager } from "@/modules/page-manager/page-manager.module";
-import { timer } from "rxjs";
-import { ActionContext } from "vuex";
-import { TransferSearchActions, TransferSearchMutations } from "./consts";
-import { ITransferSearchState } from "./interfaces";
+import { TransferFilterIdentifiers, TransferState } from '@/consts';
+import { IPluginState, ITransferSearchFilters } from '@/interfaces';
+import { primaryDataLoader } from '@/modules/data-loader/data-loader.module';
+import { pageManager } from '@/modules/page-manager/page-manager.module';
+import { timer } from 'rxjs';
+import { ActionContext } from 'vuex';
+import { TransferSearchActions, TransferSearchMutations } from './consts';
+import { ITransferSearchState } from './interfaces';
 
 const inMemoryState = {
   searchInflight: false,
@@ -108,22 +108,22 @@ export const transferSearchModule = {
       if (transferState) {
         switch (transferState as TransferState) {
           case TransferState.INCOMING:
-            await pageManager.clickTabStartingWith(pageManager.transferTabs, "Incoming");
+            await pageManager.clickTabStartingWith(pageManager.transferTabs, 'Incoming');
             break;
           case TransferState.INCOMING_INACTIVE:
-            await pageManager.clickTabStartingWith(pageManager.transferTabs, "Inactive");
+            await pageManager.clickTabStartingWith(pageManager.transferTabs, 'Inactive');
             break;
           case TransferState.OUTGOING:
-            await pageManager.clickTabStartingWith(pageManager.transferTabs, "Outgoing");
+            await pageManager.clickTabStartingWith(pageManager.transferTabs, 'Outgoing');
             break;
           case TransferState.REJECTED:
-            await pageManager.clickTabStartingWith(pageManager.transferTabs, "Rejected");
+            await pageManager.clickTabStartingWith(pageManager.transferTabs, 'Rejected');
             break;
           case TransferState.OUTGOING_INACTIVE:
             await pageManager.clickTabStartingWith(
               pageManager.transferTabs,
-              "Inactive",
-              "Rejected"
+              'Inactive',
+              'Rejected'
             );
             break;
           default:
@@ -162,13 +162,13 @@ export const transferSearchModule = {
           // @ts-ignore
           if (ctx.state.transferSearchFilters[k] !== v) {
             switch (k) {
-              case "manifestNumber":
+              case 'manifestNumber':
                 pageManager.setTransferFilter(TransferFilterIdentifiers.ManifestNumber, v);
                 break;
-              case "destinationFacilities":
+              case 'destinationFacilities':
                 pageManager.setTransferFilter(TransferFilterIdentifiers.DeliveryFacilities, v);
                 break;
-              case "shipperFacilityInfo":
+              case 'shipperFacilityInfo':
                 pageManager.setTransferFilter(TransferFilterIdentifiers.ShipperFacilityInfo, v);
                 break;
               default:

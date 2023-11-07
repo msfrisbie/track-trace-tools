@@ -1,4 +1,4 @@
-import { IAtomicService } from "@/interfaces";
+import { IAtomicService } from '@/interfaces';
 // import pdfJs from "pdfjs-dist/build/pdf.js";
 
 // UNUSED

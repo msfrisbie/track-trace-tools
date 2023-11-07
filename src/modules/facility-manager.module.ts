@@ -1,11 +1,11 @@
-import { IAtomicService, IPageMetrcFacilityData } from "@/interfaces";
-import { authManager } from "@/modules/auth-manager.module";
-import { customAxios } from "@/modules/fetch-manager.module";
-import store from "@/store/page-overlay/index";
-import { debugLogFactory } from "@/utils/debug";
-import { t3RequestManager } from "./t3-request-manager.module";
+import { IAtomicService, IPageMetrcFacilityData } from '@/interfaces';
+import { authManager } from '@/modules/auth-manager.module';
+import { customAxios } from '@/modules/fetch-manager.module';
+import store from '@/store/page-overlay/index';
+import { debugLogFactory } from '@/utils/debug';
+import { t3RequestManager } from './t3-request-manager.module';
 
-const debugLog = debugLogFactory("facility-manager.module.ts");
+const debugLog = debugLogFactory('facility-manager.module.ts');
 
 class FacilityManager implements IAtomicService {
   cachedFacilities: IPageMetrcFacilityData[] = [];
@@ -29,10 +29,10 @@ class FacilityManager implements IAtomicService {
       facility.name.includes(authState.license));
 
     if (!activeFacility) {
-      throw new Error("Cannot find active facility");
+      throw new Error('Cannot find active facility');
     }
 
-    debugLog(async () => ["Active facility", activeFacility]);
+    debugLog(async () => ['Active facility', activeFacility]);
 
     return activeFacility;
   }
@@ -43,40 +43,40 @@ class FacilityManager implements IAtomicService {
     if (store.state.mockDataMode) {
       return [
         {
-          name: "Metrc Direct - Microbusiness 01 | 4b-X0002",
-          link: "?",
-          licenseName: "Metrc Direct - Microbusiness 01",
-          licenseNumber: "4b-X0002",
+          name: 'Metrc Direct - Microbusiness 01 | 4b-X0002',
+          link: '?',
+          licenseName: 'Metrc Direct - Microbusiness 01',
+          licenseNumber: '4b-X0002',
         },
         {
-          name: "Metrc Direct - Cultivation 02 | LIC-0000002",
-          link: "?",
-          licenseName: "Metrc Direct - Cultivation 02",
-          licenseNumber: "LIC-0000002",
+          name: 'Metrc Direct - Cultivation 02 | LIC-0000002',
+          link: '?',
+          licenseName: 'Metrc Direct - Cultivation 02',
+          licenseNumber: 'LIC-0000002',
         },
         {
-          name: "Metrc Direct - Lab 03 | LIC-0000003",
-          link: "?",
-          licenseName: "Metrc Direct - Lab 03",
-          licenseNumber: "LIC-0000003",
+          name: 'Metrc Direct - Lab 03 | LIC-0000003',
+          link: '?',
+          licenseName: 'Metrc Direct - Lab 03',
+          licenseNumber: 'LIC-0000003',
         },
         {
-          name: "Metrc Direct - Processor 04 | LIC-0000004",
-          link: "?",
-          licenseName: "Metrc Direct - Processor 04",
-          licenseNumber: "LIC-0000004",
+          name: 'Metrc Direct - Processor 04 | LIC-0000004',
+          link: '?',
+          licenseName: 'Metrc Direct - Processor 04',
+          licenseNumber: 'LIC-0000004',
         },
         {
-          name: "Metrc Direct - Transporter 05 | LIC-0000005",
-          link: "?",
-          licenseName: "Metrc Direct - Transporter 05",
-          licenseNumber: "LIC-0000005",
+          name: 'Metrc Direct - Transporter 05 | LIC-0000005',
+          link: '?',
+          licenseName: 'Metrc Direct - Transporter 05',
+          licenseNumber: 'LIC-0000005',
         },
         {
-          name: "Metrc Direct - Dispensary 06 | LIC-0000006",
-          link: "?",
-          licenseName: "Metrc Direct - Dispensary 06",
-          licenseNumber: "LIC-0000006",
+          name: 'Metrc Direct - Dispensary 06 | LIC-0000006',
+          link: '?',
+          licenseName: 'Metrc Direct - Dispensary 06',
+          licenseNumber: 'LIC-0000006',
         },
       ];
     }
@@ -96,10 +96,10 @@ class FacilityManager implements IAtomicService {
       )[0];
 
       if (!facilitiesDropdownHTML) {
-        throw new Error("Could not extract facilities html");
+        throw new Error('Could not extract facilities html');
       }
 
-      const el = document.createElement("div");
+      const el = document.createElement('div');
       el.innerHTML = facilitiesDropdownHTML;
 
       facilityLinks = this.extractFacilityLinks(el);
@@ -110,12 +110,12 @@ class FacilityManager implements IAtomicService {
     for (let i = 0; i < facilityLinks.length; ++i) {
       const facilityLink = facilityLinks[i];
 
-      const link = facilityLink.getAttribute("href");
-      const licenseNumber = facilityLink.querySelector("small")?.innerText.trim();
-      const licenseName = facilityLink.querySelector("strong")?.innerText.trim();
+      const link = facilityLink.getAttribute('href');
+      const licenseNumber = facilityLink.querySelector('small')?.innerText.trim();
+      const licenseName = facilityLink.querySelector('strong')?.innerText.trim();
 
       if (!link || !licenseName || !licenseNumber) {
-        throw new Error("Could not extract facilities");
+        throw new Error('Could not extract facilities');
       }
 
       ownedFacilities.push({
@@ -127,7 +127,7 @@ class FacilityManager implements IAtomicService {
       });
     }
 
-    debugLog(async () => ["Owned facilities", ownedFacilities]);
+    debugLog(async () => ['Owned facilities', ownedFacilities]);
 
     this.cachedFacilities = ownedFacilities;
 
@@ -135,7 +135,7 @@ class FacilityManager implements IAtomicService {
   }
 
   private extractFacilityLinks(element: Document | HTMLElement) {
-    return element.querySelectorAll(".facilities-dropdown ul.dropdown-menu li > a");
+    return element.querySelectorAll('.facilities-dropdown ul.dropdown-menu li > a');
   }
 
   // private async cacheFacilities() {

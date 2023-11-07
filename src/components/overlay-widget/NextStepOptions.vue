@@ -17,13 +17,13 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import { BuilderType } from "@/consts";
-import router from "@/router/index";
-import { builderManager } from "@/modules/builder-manager.module";
+import Vue from 'vue';
+import { BuilderType } from '@/consts';
+import router from '@/router/index';
+import { builderManager } from '@/modules/builder-manager.module';
 
 export default Vue.extend({
-  name: "NextStepOptions",
+  name: 'NextStepOptions',
   router,
   props: {
     builderType: String as () => BuilderType

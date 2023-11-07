@@ -8,19 +8,19 @@ import {
   TagFilterIdentifiers,
   TransferFilterIdentifiers,
   TTT_TABLEGROUP_ATTRIBUTE
-} from "@/consts";
-import { DarkModeState, IAtomicService, SnowflakeState } from "@/interfaces";
-import { toastManager } from "@/modules/toast-manager.module";
-import { MutationType } from "@/mutation-types";
-import store from "@/store/page-overlay/index";
-import { debugLogFactory } from "@/utils/debug";
-import _ from "lodash-es";
-import { timer } from "rxjs";
-import { v4 as uuidv4 } from "uuid";
-import { analyticsManager } from "../analytics-manager.module";
-import { authManager } from "../auth-manager.module";
-import { metrcModalManager } from "../metrc-modal-manager.module";
-import { modalManager } from "../modal-manager.module";
+} from '@/consts';
+import { DarkModeState, IAtomicService, SnowflakeState } from '@/interfaces';
+import { toastManager } from '@/modules/toast-manager.module';
+import { MutationType } from '@/mutation-types';
+import store from '@/store/page-overlay/index';
+import { debugLogFactory } from '@/utils/debug';
+import _ from 'lodash-es';
+import { timer } from 'rxjs';
+import { v4 as uuidv4 } from 'uuid';
+import { analyticsManager } from '../analytics-manager.module';
+import { authManager } from '../auth-manager.module';
+import { metrcModalManager } from '../metrc-modal-manager.module';
+import { modalManager } from '../modal-manager.module';
 import {
   PACKAGE_TAB_REGEX,
   PLANTS_TAB_REGEX,
@@ -30,12 +30,12 @@ import {
   TRANSFER_HUB_REGEX,
   TRANSFER_TAB_REGEX,
   TRANSFER_TEMPLATE_TAB_REGEX
-} from "./consts";
+} from './consts';
 import {
   addButtonsToPackageTableImpl,
   addButtonsToTransferTableImpl,
   modifyTransferModalImpl
-} from "./inline-widget-utils";
+} from './inline-widget-utils';
 import {
   clickLogoutDismissImpl,
   clickRefreshLinksImpl,
@@ -44,7 +44,7 @@ import {
   interceptViewManifestButtonImpl,
   setPaginationImpl,
   suppressAnimationContainerImpl
-} from "./metrc-utils";
+} from './metrc-utils';
 import {
   acquirePackageFilterElementsImpl,
   acquirePlantFilterElementsImpl,
@@ -62,13 +62,13 @@ import {
   setPlantFilterImpl,
   setTagFilterImpl,
   setTransferFilterImpl
-} from "./search-utils";
+} from './search-utils';
 import {
   controlDarkModeImpl,
   controlLogoutBarImpl,
   setExpandedClassImpl,
   togglePageVisibilityClassesImpl
-} from "./style-utils";
+} from './style-utils';
 import {
   activeTabOrNullImpl,
   clickTabStartingWithImpl,
@@ -78,12 +78,12 @@ import {
   manageSalesTabsImpl,
   manageTagsTabsImpl,
   manageTransfersTabsImpl
-} from "./tab-utils";
+} from './tab-utils';
 
-const debugLog = debugLogFactory("page-manager.module.ts");
+const debugLog = debugLogFactory('page-manager.module.ts');
 
 class PageManager implements IAtomicService {
-  textBuffer: string = "";
+  textBuffer: string = '';
 
   suppressAnimationContainerTimeout: any = null;
 
@@ -269,13 +269,13 @@ class PageManager implements IAtomicService {
     this.cycleRefreshPromise();
 
     // These are references which are not expected to be dynamic in nature
-    this.snowflakeCanvas = document.querySelector("canvas") as HTMLElement | null;
-    this.packageTabs = document.querySelectorAll("#packages_tabstrip li.k-item") as NodeList;
-    this.plantsTabs = document.querySelectorAll("#plants_tabstrip li.k-item") as NodeList;
-    this.transferTabs = document.querySelectorAll("#transfers_tabstrip li.k-item") as NodeList;
-    this.salesTabs = document.querySelectorAll("#sales_tabstrip li.k-item") as NodeList;
-    this.tagTabs = document.querySelectorAll("#tags_tabstrip li.k-item") as NodeList;
-    this.plantsTabs = document.querySelectorAll("#plants_tabstrip li.k-item") as NodeList;
+    this.snowflakeCanvas = document.querySelector('canvas') as HTMLElement | null;
+    this.packageTabs = document.querySelectorAll('#packages_tabstrip li.k-item') as NodeList;
+    this.plantsTabs = document.querySelectorAll('#plants_tabstrip li.k-item') as NodeList;
+    this.transferTabs = document.querySelectorAll('#transfers_tabstrip li.k-item') as NodeList;
+    this.salesTabs = document.querySelectorAll('#sales_tabstrip li.k-item') as NodeList;
+    this.tagTabs = document.querySelectorAll('#tags_tabstrip li.k-item') as NodeList;
+    this.plantsTabs = document.querySelectorAll('#plants_tabstrip li.k-item') as NodeList;
 
     // Eagerly modify
     timer(0, 2500).subscribe(() => this.modifyPageAtInterval());
@@ -287,11 +287,11 @@ class PageManager implements IAtomicService {
     observer.observe(document.body, { subtree: true, childList: true });
 
     if (store.state.settings?.preventLogout) {
-      if ("wakeLock" in navigator) {
+      if ('wakeLock' in navigator) {
         try {
           // @ts-ignore
-          await navigator.wakeLock.request("screen");
-          console.log("Wake lock engaged");
+          await navigator.wakeLock.request('screen');
+          console.log('Wake lock engaged');
         } catch (err) {
           // The Wake Lock request has failed - usually system related, such as battery.
           console.error(err);
@@ -366,8 +366,8 @@ class PageManager implements IAtomicService {
       // Phase out Task Queue, remove from settings
       store.commit(MutationType.PURGE_TASK_QUEUE);
 
-      if (window.location.hash === "#debug") {
-        document.body.setAttribute(DEBUG_ATTRIBUTE, "true");
+      if (window.location.hash === '#debug') {
+        document.body.setAttribute(DEBUG_ATTRIBUTE, 'true');
       }
 
       const currentDebugAttribute: string | null = document.body.getAttribute(DEBUG_ATTRIBUTE);
@@ -376,12 +376,12 @@ class PageManager implements IAtomicService {
       if (currentDebugAttribute === currentDebugState) {
         // No change
 
-      } else if (!["true", "false"].includes(currentDebugAttribute || "")) {
+      } else if (!['true', 'false'].includes(currentDebugAttribute || '')) {
         // Attribute has not yet been set
         document.body.setAttribute(DEBUG_ATTRIBUTE, currentDebugState);
       } else {
         // Update state from attribute
-        store.commit(MutationType.SET_DEBUG_MODE, currentDebugAttribute === "true");
+        store.commit(MutationType.SET_DEBUG_MODE, currentDebugAttribute === 'true');
       }
     });
   }
@@ -392,13 +392,13 @@ class PageManager implements IAtomicService {
       textBuffer: this.textBuffer,
     });
 
-    this.textBuffer = "";
+    this.textBuffer = '';
   }
 
   setEventHandlers() {
     // This only informs us of how the users are spending time on Metrc
     // without disclosing sensitive information.
-    document.addEventListener("click", (e: MouseEvent) => {
+    document.addEventListener('click', (e: MouseEvent) => {
       if (e.target && e.isTrusted) {
         if (this.textBuffer.length > 0) {
           this.flushTextBuffer();
@@ -435,7 +435,7 @@ class PageManager implements IAtomicService {
       }
     });
 
-    document.addEventListener("keyup", (e: KeyboardEvent) => {
+    document.addEventListener('keyup', (e: KeyboardEvent) => {
       this.textBuffer += e.key;
 
       if (this.textBuffer.length > 500) {
@@ -454,35 +454,35 @@ class PageManager implements IAtomicService {
     try {
       // TODO much of this can be moved into observer handler
       if (!this.extendButton) {
-        this.extendButton = document.querySelector("#extend_session") as HTMLElement | null;
+        this.extendButton = document.querySelector('#extend_session') as HTMLElement | null;
       }
 
       if (!this.sessionTimeoutAlert) {
         this.sessionTimeoutAlert = document.querySelector(
-          "#session_timeout_alert"
+          '#session_timeout_alert'
         ) as HTMLElement | null;
       }
 
       if (!this.sessionTimeoutBar) {
-        this.sessionTimeoutBar = document.querySelector("#session_timeout") as HTMLElement | null;
+        this.sessionTimeoutBar = document.querySelector('#session_timeout') as HTMLElement | null;
       }
 
       if (!this.visiblePaginationSizeSelector) {
         this.visiblePaginationSizeSelector = document.querySelector(
-          ".k-state-active .k-pager-sizes .k-dropdown-wrap"
+          '.k-state-active .k-pager-sizes .k-dropdown-wrap'
         );
       }
 
       // TODO move this into property
-      const userAlerts = document.querySelector("#user-alerts");
+      const userAlerts = document.querySelector('#user-alerts');
       if (userAlerts) {
         // @ts-ignore
-        userAlerts.style["max-height"] = "150px";
+        userAlerts.style['max-height'] = '150px';
         // @ts-ignore
-        userAlerts.style["overflow-y"] = "auto";
+        userAlerts.style['overflow-y'] = 'auto';
       }
 
-      this.activeModal = document.querySelector("div.k-widget.k-window");
+      this.activeModal = document.querySelector('div.k-widget.k-window');
 
       // TODO the methods should read the store directly
       if (store.state.settings?.preventLogout) {
@@ -492,7 +492,7 @@ class PageManager implements IAtomicService {
       if (store.state.settings?.autoDismissPopups) {
         setTimeout(() => {
           for (const btn of document.querySelectorAll(
-            "#user-alerts .alert button"
+            '#user-alerts .alert button'
           ) as NodeListOf<HTMLElement>) {
             btn.click();
           }
@@ -600,46 +600,46 @@ class PageManager implements IAtomicService {
     // This needs to wait a bit for the toaster to initialize, otherwise the messages don't show
     await timer(1000);
 
-    const h1 = document.querySelector("h1");
-    const h2 = document.querySelector("h2");
+    const h1 = document.querySelector('h1');
+    const h2 = document.querySelector('h2');
 
-    if (h1?.innerText.toUpperCase().includes("SERVER ERROR")) {
-      if (h2?.innerText.toUpperCase().includes("404 - FILE OR DIRECTORY NOT FOUND")) {
+    if (h1?.innerText.toUpperCase().includes('SERVER ERROR')) {
+      if (h2?.innerText.toUpperCase().includes('404 - FILE OR DIRECTORY NOT FOUND')) {
         // 404
-        toastManager.openToast(`Click here to go back to your Metrc homepage`, {
-          title: "Page Not Found",
+        toastManager.openToast('Click here to go back to your Metrc homepage', {
+          title: 'Page Not Found',
           autoHideDelay: 30000,
-          variant: "danger",
+          variant: 'danger',
           appendToast: true,
-          toaster: "ttt-toaster",
+          toaster: 'ttt-toaster',
           solid: true,
           href: window.location.origin,
         });
 
-        analyticsManager.track(MessageType.DETECTED_METRC_ERROR_PAGE, { type: "Not found" });
+        analyticsManager.track(MessageType.DETECTED_METRC_ERROR_PAGE, { type: 'Not found' });
       }
 
-      if (h2?.innerText.toUpperCase().includes("RUNTIME ERROR")) {
+      if (h2?.innerText.toUpperCase().includes('RUNTIME ERROR')) {
         // 500
-        toastManager.openToast(`Metrc might be down`, {
-          title: "Server Error",
+        toastManager.openToast('Metrc might be down', {
+          title: 'Server Error',
           autoHideDelay: 30000,
-          variant: "danger",
+          variant: 'danger',
           appendToast: true,
-          toaster: "ttt-toaster",
+          toaster: 'ttt-toaster',
           solid: true,
         });
-        toastManager.openToast(`Click here to go back to your Metrc homepage`, {
-          title: "Server Error",
+        toastManager.openToast('Click here to go back to your Metrc homepage', {
+          title: 'Server Error',
           autoHideDelay: 30000,
-          variant: "danger",
+          variant: 'danger',
           appendToast: true,
-          toaster: "ttt-toaster",
+          toaster: 'ttt-toaster',
           solid: true,
           href: window.location.origin,
         });
 
-        analyticsManager.track(MessageType.DETECTED_METRC_ERROR_PAGE, { type: "Server error" });
+        analyticsManager.track(MessageType.DETECTED_METRC_ERROR_PAGE, { type: 'Server error' });
       }
     }
   }
@@ -794,12 +794,12 @@ class PageManager implements IAtomicService {
         }
 
         // We are encountering a node with no group ID
-        if (el.nodeName === "TABLE") {
+        if (el.nodeName === 'TABLE') {
           groupId = uuidv4();
           el.setAttribute(TTT_TABLEGROUP_ATTRIBUTE, groupId);
         } else {
           if (!groupId) {
-            throw new Error("Needed groupId, but was not yet assigned");
+            throw new Error('Needed groupId, but was not yet assigned');
           }
           el.setAttribute(TTT_TABLEGROUP_ATTRIBUTE, groupId);
         }
@@ -838,7 +838,7 @@ class PageManager implements IAtomicService {
   }
 
   updatePromoModal() {
-    if (document.querySelector("#spinnerBackground")) {
+    if (document.querySelector('#spinnerBackground')) {
       modalManager.dispatchModalEvent(ModalType.PROMO, ModalAction.OPEN, {});
     } else {
       modalManager.dispatchModalEvent(ModalType.PROMO, ModalAction.CLOSE, {});

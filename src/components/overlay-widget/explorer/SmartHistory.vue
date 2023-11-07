@@ -28,16 +28,16 @@
 </template>
 
 <script lang="ts">
-import { IPluginState } from "@/interfaces";
-import router from "@/router/index";
-import store from "@/store/page-overlay/index";
-import { ExplorerTargetType } from "@/store/page-overlay/modules/explorer/consts";
-import Vue from "vue";
-import { mapState } from "vuex";
-import SmartLinks from "./SmartLinks.vue";
+import { IPluginState } from '@/interfaces';
+import router from '@/router/index';
+import store from '@/store/page-overlay/index';
+import { ExplorerTargetType } from '@/store/page-overlay/modules/explorer/consts';
+import Vue from 'vue';
+import { mapState } from 'vuex';
+import SmartLinks from './SmartLinks.vue';
 
 export default Vue.extend({
-  name: "SmartHistory",
+  name: 'SmartHistory',
   store,
   router,
   props: {},

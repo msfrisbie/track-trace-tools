@@ -1,4 +1,4 @@
-import { IIndexedTransferData, ITransferSearchFilters } from "@/interfaces";
+import { IIndexedTransferData, ITransferSearchFilters } from '@/interfaces';
 
 export interface ISelectedTransferMetadata {
   transferData: IIndexedTransferData;

@@ -7,11 +7,11 @@ import {
   IExtractedRepeaterData,
   ITagOrderModalData,
   MetrcTagType,
-} from "@/interfaces";
-import { extractIContactInfoFromITagOrderModalData } from "./address";
-import { debugLogFactory } from "./debug";
+} from '@/interfaces';
+import { extractIContactInfoFromITagOrderModalData } from './address';
+import { debugLogFactory } from './debug';
 
-const debugLog = debugLogFactory("utils/html.ts");
+const debugLog = debugLogFactory('utils/html.ts');
 
 export interface ExtractedData {
   authData?: IExtractedAuthData;
@@ -23,28 +23,28 @@ export interface ExtractedData {
 }
 
 // NOTE: For capture groups to work, "g" flag cannot be used
-const TAG_MAX_REGEX = new RegExp(/repeaterData: JSON\.parse\('(.*)'\),$/, "m");
-const AJAX_SETUP_REGEX = new RegExp(/\$\.ajaxSetup\(([^;]*)\)\;/, "s");
-const INITIALIZE_DO_NOT_SHOW_REGEX = new RegExp(/metrc\.initializeDoNotShow\(([^;]*)\)\;/, "s");
+const TAG_MAX_REGEX = new RegExp(/repeaterData: JSON\.parse\('(.*)'\),$/, 'm');
+const AJAX_SETUP_REGEX = new RegExp(/\$\.ajaxSetup\(([^;]*)\)\;/, 's');
+const INITIALIZE_DO_NOT_SHOW_REGEX = new RegExp(/metrc\.initializeDoNotShow\(([^;]*)\)\;/, 's');
 const IDENTIY_HREF_REGEX = new RegExp(/.user.profile.licenseNumber=(.*)/);
 const REPEATER_DATA_REGEX = new RegExp(/repeaterData: (.*),/);
 
 export enum ExtractionType {
-  AUTH_DATA = "AUTH_DATA",
-  DATAIMPORT_API_VERIFICATION_TOKEN = "DATAIMPORT_API_VERIFICATION_TOKEN",
-  TAG_ORDER_DATA = "TAG_ORDER_DATA",
-  CONTACT_DATA = "CONTACT_DATA",
-  API_KEY_DATA = "API_KEY_DATA",
-  REPEATER_DATA = "REPEATER_DATA",
+  AUTH_DATA = 'AUTH_DATA',
+  DATAIMPORT_API_VERIFICATION_TOKEN = 'DATAIMPORT_API_VERIFICATION_TOKEN',
+  TAG_ORDER_DATA = 'TAG_ORDER_DATA',
+  CONTACT_DATA = 'CONTACT_DATA',
+  API_KEY_DATA = 'API_KEY_DATA',
+  REPEATER_DATA = 'REPEATER_DATA',
 }
 
 function checkITagOrderModalData(data: ITagOrderModalData) {
-  if (typeof data.Details[0].MaxOrderQuantity !== "number") {
-    throw new Error("Bad tag order modal data (order qty)");
+  if (typeof data.Details[0].MaxOrderQuantity !== 'number') {
+    throw new Error('Bad tag order modal data (order qty)');
   }
 
-  if (typeof data.Shipping.Address.Street1 !== "string") {
-    throw new Error("Bad tag order modal data (address)");
+  if (typeof data.Shipping.Address.Street1 !== 'string') {
+    throw new Error('Bad tag order modal data (address)');
   }
 }
 
@@ -55,7 +55,7 @@ function extractMaxTagOrderSize(data: ITagOrderModalData, tagType: MetrcTagType)
     }
   }
 
-  console.error("Could not find max order size");
+  console.error('Could not find max order size');
   return 0;
 }
 
@@ -144,13 +144,13 @@ function decodeData(data: string): string {
 // }
 
 function extractAuthData(html: string) {
-  const container = document.createElement("div");
+  const container = document.createElement('div');
   container.innerHTML = html;
 
   const scripts = container.querySelectorAll(
     // Diffing OR and CA source reveals that the script tags
     // may or may not have the [type='text/javascript'] attribute.
-    "script"
+    'script'
   ) as any;
 
   let authDataScriptText = null;
@@ -175,13 +175,13 @@ function extractAuthData(html: string) {
     if (authMatch && authMatch[1]) {
       let authJson = authMatch[1];
 
-      authJson = authJson.replaceAll("headers", '"headers"');
+      authJson = authJson.replaceAll('headers', '"headers"');
 
       authJson = authJson.replaceAll("'", '"');
 
       extractedAuthDataDict = JSON.parse(authJson);
     } else {
-      console.error("Could not match auth data regex");
+      console.error('Could not match auth data regex');
     }
 
     const identityMatch = authDataScriptText.match(INITIALIZE_DO_NOT_SHOW_REGEX);
@@ -195,13 +195,13 @@ function extractAuthData(html: string) {
 
       extractedIdentityArray = JSON.parse(identityJson);
     } else {
-      console.error("Could not match identity data regex");
+      console.error('Could not match identity data regex');
     }
   }
 
   if (!!extractedAuthDataDict && !!extractedIdentityArray) {
     authData = {
-      license: extractedAuthDataDict.headers["X-Metrc-LicenseNumber"],
+      license: extractedAuthDataDict.headers['X-Metrc-LicenseNumber'],
       apiVerificationToken: extractedAuthDataDict.headers.ApiVerificationToken,
       identity: extractedIdentityArray[0],
     };
@@ -209,7 +209,7 @@ function extractAuthData(html: string) {
     // Sanity check
     if (extractedIdentityArray[1] !== authData.license) {
       console.error(
-        "Unexpected license mismatch:",
+        'Unexpected license mismatch:',
         extractedIdentityArray[1],
         extractedAuthDataDict.license
       );
@@ -233,30 +233,28 @@ function extractTagOrderData(html: string) {
 
       return {
         tagOrderData: {
-          maxPlantOrderSize: extractMaxTagOrderSize(tagOrderData, "CannabisPlant"),
-          maxPackageOrderSize: extractMaxTagOrderSize(tagOrderData, "CannabisPackage"),
+          maxPlantOrderSize: extractMaxTagOrderSize(tagOrderData, 'CannabisPlant'),
+          maxPackageOrderSize: extractMaxTagOrderSize(tagOrderData, 'CannabisPackage'),
           contactInfo: extractIContactInfoFromITagOrderModalData(tagOrderData),
         } as IExtractedITagOrderData,
       };
     } catch (e) {
-      console.error("Error extracting max tags");
+      console.error('Error extracting max tags');
     }
   }
 
-  console.error("Could not find max tags");
+  console.error('Could not find max tags');
 
   return null;
 }
 
 function extractContactData(html: string): { contactData: IExtractedContactData } {
-  const container = document.createElement("div");
+  const container = document.createElement('div');
   container.innerHTML = html;
 
-  const email: string | null =
-    container.querySelector("input#email")?.getAttribute("value") || null;
+  const email: string | null = container.querySelector('input#email')?.getAttribute('value') || null;
 
-  const phoneNumber: string | null =
-    container.querySelector('input[name="model[PhoneNumber]"]')?.getAttribute("value") || null;
+  const phoneNumber: string | null = container.querySelector('input[name="model[PhoneNumber]"]')?.getAttribute('value') || null;
 
   return {
     contactData: {
@@ -267,10 +265,10 @@ function extractContactData(html: string): { contactData: IExtractedContactData 
 }
 
 function extractApiKeyData(html: string) {
-  const container = document.createElement("div");
+  const container = document.createElement('div');
   container.innerHTML = html;
 
-  const apiKey = container.querySelector("#current_apikey")?.getAttribute("value");
+  const apiKey = container.querySelector('#current_apikey')?.getAttribute('value');
 
   if (!apiKey) {
     return null;
@@ -284,13 +282,13 @@ function extractApiKeyData(html: string) {
 }
 
 function extractDataImportApiKey(html: string) {
-  const container = document.createElement("div");
+  const container = document.createElement('div');
   container.innerHTML = html;
 
-  const lines = html.split("\n");
+  const lines = html.split('\n');
 
   for (const line of lines) {
-    if (line.includes(`xhr.setRequestHeader('ApiVerificationToken'`)) {
+    if (line.includes('xhr.setRequestHeader(\'ApiVerificationToken\'')) {
       const regex = /',\s'(.*)'/;
       const match = line.match(regex);
 
@@ -316,12 +314,12 @@ function extractRepeaterData(html: string) {
     // This is a bullshit hack
     // const sliced = matchResult[1].slice(29, -3);
 
-    const sliced = match.slice(match.indexOf(`'`) + 1, match.lastIndexOf(`'`));
+    const sliced = match.slice(match.indexOf('\'') + 1, match.lastIndexOf('\''));
 
     // Metrc includes a blob of escaped JSON
     // (This is manifest v3 incompatible)
     // const parsedRepeaterData = eval(matchResult[1]);
-    const parsedRepeaterData = JSON.parse(decodeURIComponent(sliced.replaceAll("\\x", "%")));
+    const parsedRepeaterData = JSON.parse(decodeURIComponent(sliced.replaceAll('\\x', '%')));
 
     debugLog(async () => [Object.keys(parsedRepeaterData)]);
     // debugLog(async () => [parsedRepeaterData])
@@ -338,7 +336,7 @@ function extractRepeaterData(html: string) {
 
 export function extract(extractionType: ExtractionType, plaintext: string): ExtractedData | null {
   if (!plaintext) {
-    throw new Error("Must provide HTML for this extraction type");
+    throw new Error('Must provide HTML for this extraction type');
   }
 
   let data = null;
@@ -369,7 +367,7 @@ export function extract(extractionType: ExtractionType, plaintext: string): Extr
       break;
 
     default:
-      throw new Error("Bad extraction type");
+      throw new Error('Bad extraction type');
   }
 
   return data;

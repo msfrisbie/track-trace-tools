@@ -25,16 +25,16 @@
 </template>
 
 <script lang="ts">
-import { MessageType, TransferFilterIdentifiers, TransferState } from "@/consts";
-import { IIndexedTransferData } from "@/interfaces";
-import { analyticsManager } from "@/modules/analytics-manager.module";
-import { pageManager } from "@/modules/page-manager/page-manager.module";
-import { MutationType } from "@/mutation-types";
-import store from "@/store/page-overlay/index";
-import Vue from "vue";
+import { MessageType, TransferFilterIdentifiers, TransferState } from '@/consts';
+import { IIndexedTransferData } from '@/interfaces';
+import { analyticsManager } from '@/modules/analytics-manager.module';
+import { pageManager } from '@/modules/page-manager/page-manager.module';
+import { MutationType } from '@/mutation-types';
+import store from '@/store/page-overlay/index';
+import Vue from 'vue';
 
 export default Vue.extend({
-  name: "TransferSearchResultPreview",
+  name: 'TransferSearchResultPreview',
   props: {
     transfer: Object as () => IIndexedTransferData,
     selected: Boolean,
@@ -49,7 +49,7 @@ export default Vue.extend({
         case TransferState.REJECTED:
           return this.transfer.DeliveryFacilities;
         default:
-          return "Metrc Transfer";
+          return 'Metrc Transfer';
       }
     },
     transferPackageSummary() {
@@ -65,20 +65,20 @@ export default Vue.extend({
   },
   methods: {
     selectTransfer(transfer: IIndexedTransferData) {
-      this.$emit("selected-transfer", transfer);
+      this.$emit('selected-transfer', transfer);
     },
     async setTransferManifestNumberFilter() {
       analyticsManager.track(MessageType.SELECTED_TRANSFER);
 
       switch (this.$props.transfer.TransferState as TransferState) {
         case TransferState.INCOMING:
-          await pageManager.clickTabStartingWith(pageManager.transferTabs, "Incoming");
+          await pageManager.clickTabStartingWith(pageManager.transferTabs, 'Incoming');
           break;
         case TransferState.OUTGOING:
-          await pageManager.clickTabStartingWith(pageManager.transferTabs, "Outgoing");
+          await pageManager.clickTabStartingWith(pageManager.transferTabs, 'Outgoing');
           break;
         case TransferState.REJECTED:
-          await pageManager.clickTabStartingWith(pageManager.transferTabs, "Rejected");
+          await pageManager.clickTabStartingWith(pageManager.transferTabs, 'Rejected');
           break;
         default:
           return;

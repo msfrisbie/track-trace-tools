@@ -1,4 +1,4 @@
-import { MessageType } from "@/consts";
+import { MessageType } from '@/consts';
 import {
   IHarvestHistoryData,
   IIndexedHarvestData,
@@ -11,22 +11,22 @@ import {
   IPlantHistoryData,
   IPluginState,
   ITransferHistoryData,
-} from "@/interfaces";
-import { analyticsManager } from "@/modules/analytics-manager.module";
-import { authManager } from "@/modules/auth-manager.module";
-import { DataLoader, getDataLoader } from "@/modules/data-loader/data-loader.module";
-import { facilityManager } from "@/modules/facility-manager.module";
-import { LRU } from "@/utils/cache";
-import { ActionContext } from "vuex";
-import { ExplorerTarget, ExplorerTargetHistory, IExplorerState } from "./interfaces";
+} from '@/interfaces';
+import { analyticsManager } from '@/modules/analytics-manager.module';
+import { authManager } from '@/modules/auth-manager.module';
+import { DataLoader, getDataLoader } from '@/modules/data-loader/data-loader.module';
+import { facilityManager } from '@/modules/facility-manager.module';
+import { LRU } from '@/utils/cache';
+import { ActionContext } from 'vuex';
+import { ExplorerTarget, ExplorerTargetHistory, IExplorerState } from './interfaces';
 import {
   ExplorerActions, ExplorerMutations, ExplorerStatus, ExplorerTargetType
-} from "./consts";
+} from './consts';
 
 const inMemoryState = {
   status: ExplorerStatus.INITIAL,
-  statusMessage: "",
-  queryString: "",
+  statusMessage: '',
+  queryString: '',
   target: null,
   targetType: ExplorerTargetType.PACKAGE,
   history: null,
@@ -56,7 +56,7 @@ export const explorerModule = {
 
       if (!target) {
         state.status = ExplorerStatus.INITIAL;
-        state.statusMessage = "";
+        state.statusMessage = '';
         state.history = null;
       }
     },
@@ -187,7 +187,7 @@ export const explorerModule = {
         }
 
         if (!ctx.state.queryString) {
-          throw new Error("Must provide query string");
+          throw new Error('Must provide query string');
         }
 
         ctx.commit(ExplorerMutations.SET_STATUS, {
@@ -233,7 +233,7 @@ export const explorerModule = {
             if (!pkg) {
               ctx.commit(ExplorerMutations.SET_STATUS, {
                 status: ExplorerStatus.ERROR,
-                statusMessage: "Unable to match package",
+                statusMessage: 'Unable to match package',
               });
 
               analyticsManager.track(MessageType.EXPLORER_ERROR, {
@@ -274,7 +274,7 @@ export const explorerModule = {
             if (!pkgHistory) {
               ctx.commit(ExplorerMutations.SET_STATUS, {
                 status: ExplorerStatus.ERROR,
-                statusMessage: "Unable to match package history",
+                statusMessage: 'Unable to match package history',
               });
 
               analyticsManager.track(MessageType.EXPLORER_ERROR, {
@@ -292,7 +292,7 @@ export const explorerModule = {
 
             ctx.commit(ExplorerMutations.SET_STATUS, {
               status: ExplorerStatus.SUCCESS,
-              statusMessage: "",
+              statusMessage: '',
             });
 
             break;
@@ -326,7 +326,7 @@ export const explorerModule = {
             if (!harvest) {
               ctx.commit(ExplorerMutations.SET_STATUS, {
                 status: ExplorerStatus.ERROR,
-                statusMessage: "Unable to match harvest",
+                statusMessage: 'Unable to match harvest',
               });
 
               analyticsManager.track(MessageType.EXPLORER_ERROR, {
@@ -367,7 +367,7 @@ export const explorerModule = {
             if (!harvestHistory) {
               ctx.commit(ExplorerMutations.SET_STATUS, {
                 status: ExplorerStatus.ERROR,
-                statusMessage: "Unable to match harvest history",
+                statusMessage: 'Unable to match harvest history',
               });
 
               analyticsManager.track(MessageType.EXPLORER_ERROR, {
@@ -385,7 +385,7 @@ export const explorerModule = {
 
             ctx.commit(ExplorerMutations.SET_STATUS, {
               status: ExplorerStatus.SUCCESS,
-              statusMessage: "",
+              statusMessage: '',
             });
 
             break;
@@ -420,7 +420,7 @@ export const explorerModule = {
             if (!plant) {
               ctx.commit(ExplorerMutations.SET_STATUS, {
                 status: ExplorerStatus.ERROR,
-                statusMessage: "Unable to match plant",
+                statusMessage: 'Unable to match plant',
               });
 
               analyticsManager.track(MessageType.EXPLORER_ERROR, {
@@ -461,7 +461,7 @@ export const explorerModule = {
             if (!plantHistory) {
               ctx.commit(ExplorerMutations.SET_STATUS, {
                 status: ExplorerStatus.ERROR,
-                statusMessage: "Unable to match plant history",
+                statusMessage: 'Unable to match plant history',
               });
 
               analyticsManager.track(MessageType.EXPLORER_ERROR, {
@@ -479,7 +479,7 @@ export const explorerModule = {
 
             ctx.commit(ExplorerMutations.SET_STATUS, {
               status: ExplorerStatus.SUCCESS,
-              statusMessage: "",
+              statusMessage: '',
             });
 
             break;
@@ -513,7 +513,7 @@ export const explorerModule = {
             if (!plantBatch) {
               ctx.commit(ExplorerMutations.SET_STATUS, {
                 status: ExplorerStatus.ERROR,
-                statusMessage: "Unable to match plant batch",
+                statusMessage: 'Unable to match plant batch',
               });
 
               analyticsManager.track(MessageType.EXPLORER_ERROR, {
@@ -554,7 +554,7 @@ export const explorerModule = {
             if (!plantBatchHistory) {
               ctx.commit(ExplorerMutations.SET_STATUS, {
                 status: ExplorerStatus.ERROR,
-                statusMessage: "Unable to match plant batch history",
+                statusMessage: 'Unable to match plant batch history',
               });
 
               analyticsManager.track(MessageType.EXPLORER_ERROR, {
@@ -572,7 +572,7 @@ export const explorerModule = {
 
             ctx.commit(ExplorerMutations.SET_STATUS, {
               status: ExplorerStatus.SUCCESS,
-              statusMessage: "",
+              statusMessage: '',
             });
 
             break;
@@ -702,7 +702,7 @@ export const explorerModule = {
             if (!outgoingTransfer) {
               ctx.commit(ExplorerMutations.SET_STATUS, {
                 status: ExplorerStatus.ERROR,
-                statusMessage: "Unable to match outgoing transfer",
+                statusMessage: 'Unable to match outgoing transfer',
               });
 
               analyticsManager.track(MessageType.EXPLORER_ERROR, {
@@ -745,7 +745,7 @@ export const explorerModule = {
             if (!outgoingTransferHistory) {
               ctx.commit(ExplorerMutations.SET_STATUS, {
                 status: ExplorerStatus.ERROR,
-                statusMessage: "Unable to match outgoing transfer history",
+                statusMessage: 'Unable to match outgoing transfer history',
               });
 
               analyticsManager.track(MessageType.EXPLORER_ERROR, {
@@ -763,13 +763,13 @@ export const explorerModule = {
 
             ctx.commit(ExplorerMutations.SET_STATUS, {
               status: ExplorerStatus.SUCCESS,
-              statusMessage: "",
+              statusMessage: '',
             });
 
             break;
 
           default:
-            throw new Error("Bad target type");
+            throw new Error('Bad target type');
         }
 
         analyticsManager.track(MessageType.EXPLORER_SUCCESS, {

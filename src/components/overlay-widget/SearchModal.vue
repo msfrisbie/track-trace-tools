@@ -21,14 +21,14 @@
 </template>
 
 <script lang="ts">
-import store from "@/store/page-overlay/index";
-import Vue from "vue";
-import UnifiedSearchWidget from "@/components/page-overlay/UnifiedSearchWidget.vue";
-import { MessageType } from "@/consts";
-import { analyticsManager } from "@/modules/analytics-manager.module";
+import store from '@/store/page-overlay/index';
+import Vue from 'vue';
+import UnifiedSearchWidget from '@/components/page-overlay/UnifiedSearchWidget.vue';
+import { MessageType } from '@/consts';
+import { analyticsManager } from '@/modules/analytics-manager.module';
 
 export default Vue.extend({
-  name: "SearchModal",
+  name: 'SearchModal',
   store,
   computed: {},
   components: {
@@ -36,10 +36,10 @@ export default Vue.extend({
   },
   methods: {
     show() {
-      this.$bvModal.show("search-modal");
+      this.$bvModal.show('search-modal');
     },
     hide() {
-      this.$bvModal.hide("search-modal");
+      this.$bvModal.hide('search-modal');
     },
     toggle() {
       // @ts-ignore

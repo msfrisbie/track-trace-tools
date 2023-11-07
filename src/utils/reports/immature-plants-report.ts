@@ -1,14 +1,14 @@
-import { IIndexedPlantBatchData, IPlantBatchFilter, IPluginState } from "@/interfaces";
-import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
-import { ReportsMutations, ReportType } from "@/store/page-overlay/modules/reports/consts";
+import { IIndexedPlantBatchData, IPlantBatchFilter, IPluginState } from '@/interfaces';
+import { primaryDataLoader } from '@/modules/data-loader/data-loader.module';
+import { ReportsMutations, ReportType } from '@/store/page-overlay/modules/reports/consts';
 import {
   IFieldData,
   IReportConfig,
   IReportData,
   IReportsState,
-} from "@/store/page-overlay/modules/reports/interfaces";
-import { ActionContext } from "vuex";
-import { todayIsodate } from "../date";
+} from '@/store/page-overlay/modules/reports/interfaces';
+import { ActionContext } from 'vuex';
+import { todayIsodate } from '../date';
 
 export interface IImmaturePlantsReportFormFilters {
   plantedDateGt: string;
@@ -68,7 +68,7 @@ export async function maybeLoadImmaturePlantsReportData({
   const immaturePlantConfig = reportConfig[ReportType.IMMATURE_PLANTS];
   if (immaturePlantConfig?.immaturePlantFilter) {
     ctx.commit(ReportsMutations.SET_STATUS, {
-      statusMessage: { text: "Loading plant batches...", level: "success" },
+      statusMessage: { text: 'Loading plant batches...', level: 'success' },
     });
 
     let immaturePlants: IIndexedPlantBatchData[] = [];
@@ -78,7 +78,7 @@ export async function maybeLoadImmaturePlantsReportData({
         immaturePlants = [...immaturePlants, ...(await primaryDataLoader.plantBatches({}))];
       } catch (e) {
         ctx.commit(ReportsMutations.SET_STATUS, {
-          statusMessage: { text: "Failed to load active plant batches.", level: "warning" },
+          statusMessage: { text: 'Failed to load active plant batches.', level: 'warning' },
         });
       }
     }
@@ -88,7 +88,7 @@ export async function maybeLoadImmaturePlantsReportData({
         immaturePlants = [...immaturePlants, ...(await primaryDataLoader.inactivePlantBatches())];
       } catch (e) {
         ctx.commit(ReportsMutations.SET_STATUS, {
-          statusMessage: { text: "Failed to load inactive plant batches.", level: "warning" },
+          statusMessage: { text: 'Failed to load inactive plant batches.', level: 'warning' },
         });
       }
     }

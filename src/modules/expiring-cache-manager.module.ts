@@ -1,10 +1,10 @@
-import { IAtomicService } from "@/interfaces";
-import { debugLogFactory } from "@/utils/debug";
-import { timer } from "rxjs";
+import { IAtomicService } from '@/interfaces';
+import { debugLogFactory } from '@/utils/debug';
+import { timer } from 'rxjs';
 
-const debugLog = debugLogFactory("modules/expiring-cache-manager.module.ts");
+const debugLog = debugLogFactory('modules/expiring-cache-manager.module.ts');
 
-const EXPIRING_CACHE_KEY_PREFIX = "tttexpcachekeypfx";
+const EXPIRING_CACHE_KEY_PREFIX = 'tttexpcachekeypfx';
 
 function keyFactory({
   keyPiece,
@@ -13,8 +13,8 @@ function keyFactory({
   keyPiece: string;
   expirationMs: number;
 }): string {
-  if (keyPiece.includes(":")) {
-    throw new Error("Invalid cache key piece");
+  if (keyPiece.includes(':')) {
+    throw new Error('Invalid cache key piece');
   }
 
   return `${EXPIRING_CACHE_KEY_PREFIX}::${keyPiece}::${Date.now() + expirationMs}`;
@@ -24,7 +24,7 @@ function extractKeyValues(key: string): { keyPiece: string; expiration: number }
   const match = key.match(/[^:]+::([^:]+)::(\d+)/);
 
   if (!match) {
-    throw new Error("Could not extract");
+    throw new Error('Could not extract');
   }
 
   return { keyPiece: match[1], expiration: parseInt(match[2], 10) };
@@ -33,7 +33,7 @@ function extractKeyValues(key: string): { keyPiece: string; expiration: number }
 class ExpiringCacheManager implements IAtomicService {
   async init() {
     this.inMemoryCache = {};
-    this.persistedCache.setItem(EXPIRING_CACHE_KEY_PREFIX, "{}");
+    this.persistedCache.setItem(EXPIRING_CACHE_KEY_PREFIX, '{}');
 
     timer(10000).subscribe(() => this.lazyFlushExpiredValues());
   }
@@ -56,7 +56,7 @@ class ExpiringCacheManager implements IAtomicService {
     return [
       ...new Set(
         ...Object.keys(this.inMemoryCache || {}),
-        ...Object.keys(JSON.parse(this.persistedCache.getItem(EXPIRING_CACHE_KEY_PREFIX) || "{}"))
+        ...Object.keys(JSON.parse(this.persistedCache.getItem(EXPIRING_CACHE_KEY_PREFIX) || '{}'))
       ),
     ];
   }

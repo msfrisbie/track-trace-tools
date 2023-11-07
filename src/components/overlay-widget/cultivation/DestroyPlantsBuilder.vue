@@ -178,27 +178,27 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import store from "@/store/page-overlay/index";
-import { mapState } from "vuex";
-import BuilderStepHeader from "@/components/overlay-widget/shared/BuilderStepHeader.vue";
-import { normalDistribution } from "@/utils/math";
-import { arrayIsValid } from "@/utils/array";
-import { IPlantData, ICsvFile, IMetrcDestroyPlantsPayload } from "@/interfaces";
-import { downloadCsvFile, buildCsvDataOrError, buildNamedCsvFileData } from "@/utils/csv";
+import Vue from 'vue';
+import store from '@/store/page-overlay/index';
+import { mapState } from 'vuex';
+import BuilderStepHeader from '@/components/overlay-widget/shared/BuilderStepHeader.vue';
+import { normalDistribution } from '@/utils/math';
+import { arrayIsValid } from '@/utils/array';
+import { IPlantData, ICsvFile, IMetrcDestroyPlantsPayload } from '@/interfaces';
+import { downloadCsvFile, buildCsvDataOrError, buildNamedCsvFileData } from '@/utils/csv';
 
-import { todayIsodate, submitDateFromIsodate } from "@/utils/date";
-import { analyticsManager } from "@/modules/analytics-manager.module";
-import { BuilderType, MessageType } from "@/consts";
-import { builderManager } from "@/modules/builder-manager.module";
-import PlantPicker from "@/components/overlay-widget/shared/PlantPicker.vue";
-import PlantWeightPicker from "@/components/overlay-widget/shared/PlantWeightPicker.vue";
-import CsvBreakout from "@/components/overlay-widget/shared/CsvBreakout.vue";
-import { sum } from "lodash-es";
-import { dynamicConstsManager } from "@/modules/dynamic-consts-manager.module";
+import { todayIsodate, submitDateFromIsodate } from '@/utils/date';
+import { analyticsManager } from '@/modules/analytics-manager.module';
+import { BuilderType, MessageType } from '@/consts';
+import { builderManager } from '@/modules/builder-manager.module';
+import PlantPicker from '@/components/overlay-widget/shared/PlantPicker.vue';
+import PlantWeightPicker from '@/components/overlay-widget/shared/PlantWeightPicker.vue';
+import CsvBreakout from '@/components/overlay-widget/shared/CsvBreakout.vue';
+import { sum } from 'lodash-es';
+import { dynamicConstsManager } from '@/modules/dynamic-consts-manager.module';
 
 export default Vue.extend({
-  name: "DestroyPlantsBuilder",
+  name: 'DestroyPlantsBuilder',
   store,
   components: {
     BuilderStepHeader,
@@ -295,14 +295,14 @@ export default Vue.extend({
       return arrayIsValid(this.$data.destroyedWeights, {
         rowValidators: [
           {
-            fn: (row: any): boolean => typeof row === "number" && row > 0,
-            message: "All values must be a number greater than 0",
+            fn: (row: any): boolean => typeof row === 'number' && row > 0,
+            message: 'All values must be a number greater than 0',
           },
         ],
         collectionValidators: [
           {
             fn: (rows: any[]): boolean => rows.length === this.$data.selectedPlants.length,
-            message: "Collection must be same size as plants",
+            message: 'Collection must be same size as plants',
           },
           {
             fn: (rows: any[]): boolean => {
@@ -312,7 +312,7 @@ export default Vue.extend({
                 return false;
               }
             },
-            message: "Collection must sum to a positive number",
+            message: 'Collection must sum to a positive number',
           },
         ],
       }).valid;
@@ -347,12 +347,12 @@ export default Vue.extend({
     },
     showWeightEntry(): boolean {
       return (
-        !!this.$data.wasteMethod &&
-        !!this.$data.wasteReason &&
-        !!this.$data.unitOfWeight &&
-        !!this.$data.destroyPlantsIsodate &&
-        !!this.$data.reasonNote &&
-        !!this.$data.wasteMaterialMixed
+        !!this.$data.wasteMethod
+        && !!this.$data.wasteReason
+        && !!this.$data.unitOfWeight
+        && !!this.$data.destroyPlantsIsodate
+        && !!this.$data.reasonNote
+        && !!this.$data.wasteMaterialMixed
       );
     },
     allPlantsHaveValidWeight(): boolean {
@@ -360,13 +360,13 @@ export default Vue.extend({
     },
     allDetailsProvided(): boolean {
       return (
-        !!this.$data.wasteMethod &&
-        !!this.$data.wasteReason &&
-        !!this.$data.unitOfWeight &&
-        !!this.$data.destroyPlantsIsodate &&
-        this.allPlantsHaveValidWeightImpl() &&
-        !!this.$data.reasonNote &&
-        !!this.$data.wasteMaterialMixed
+        !!this.$data.wasteMethod
+        && !!this.$data.wasteReason
+        && !!this.$data.unitOfWeight
+        && !!this.$data.destroyPlantsIsodate
+        && this.allPlantsHaveValidWeightImpl()
+        && !!this.$data.reasonNote
+        && !!this.$data.wasteMaterialMixed
       );
     },
     csvFiles(): ICsvFile[] {
@@ -387,17 +387,17 @@ export default Vue.extend({
       unitOfWeight: null,
       wasteMethod: null,
       wasteReason: null,
-      wasteMaterialMixed: "NA",
+      wasteMaterialMixed: 'NA',
       reasonNote: null,
       steps: [
         {
-          stepText: "Select plants to destroy",
+          stepText: 'Select plants to destroy',
         },
         {
-          stepText: "Destroy details",
+          stepText: 'Destroy details',
         },
         {
-          stepText: "Submit",
+          stepText: 'Submit',
         },
       ],
       unitsOfWeight: [],

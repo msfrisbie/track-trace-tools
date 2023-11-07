@@ -52,16 +52,16 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import store from "@/store/page-overlay/index";
-import { TaskType, METRC_TAG_REGEX, MessageType } from "@/consts";
-import { isValidTag, generateTagRangeOrError } from "@/utils/tags";
-import { createTask } from "@/utils/tasks";
-import { mapState } from "vuex";
-import { MutationType } from "@/mutation-types";
-import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
-import { analyticsManager } from "@/modules/analytics-manager.module";
-import { authManager } from "@/modules/auth-manager.module";
+import Vue from 'vue';
+import store from '@/store/page-overlay/index';
+import { TaskType, METRC_TAG_REGEX, MessageType } from '@/consts';
+import { isValidTag, generateTagRangeOrError } from '@/utils/tags';
+import { createTask } from '@/utils/tasks';
+import { mapState } from 'vuex';
+import { MutationType } from '@/mutation-types';
+import { primaryDataLoader } from '@/modules/data-loader/data-loader.module';
+import { analyticsManager } from '@/modules/analytics-manager.module';
+import { authManager } from '@/modules/auth-manager.module';
 
 interface PackageNoteTask {
   startTag: string;
@@ -70,7 +70,7 @@ interface PackageNoteTask {
 }
 
 export default Vue.extend({
-  name: "PackageNoteForm",
+  name: 'PackageNoteForm',
   store,
   computed: {
     startTagInvalid(): boolean {
@@ -99,7 +99,7 @@ export default Vue.extend({
         return true;
       }
     },
-    ...mapState(["currentView"]),
+    ...mapState(['currentView']),
   },
   async mounted() {
     await authManager.authStateOrError();
@@ -110,9 +110,9 @@ export default Vue.extend({
     return {
       activePackages: [],
       form: {
-        startTag: "",
-        endTag: "",
-        note: "",
+        startTag: '',
+        endTag: '',
+        note: '',
       } as PackageNoteTask,
     };
   },

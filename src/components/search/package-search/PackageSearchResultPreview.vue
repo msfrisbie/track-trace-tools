@@ -22,18 +22,18 @@
 </template>
 
 <script lang="ts">
-import { MessageType } from "@/consts";
-import { IIndexedPackageData } from "@/interfaces";
-import { analyticsManager } from "@/modules/analytics-manager.module";
-import { PackageSearchActions } from "@/store/page-overlay/modules/package-search/consts";
-import { SearchActions } from "@/store/page-overlay/modules/search/consts";
-import Vue from "vue";
-import { mapActions } from "vuex";
-import store from "@/store/page-overlay/index";
-import { getNormalizedPackageContentsDescription } from "@/utils/package";
+import { MessageType } from '@/consts';
+import { IIndexedPackageData } from '@/interfaces';
+import { analyticsManager } from '@/modules/analytics-manager.module';
+import { PackageSearchActions } from '@/store/page-overlay/modules/package-search/consts';
+import { SearchActions } from '@/store/page-overlay/modules/search/consts';
+import Vue from 'vue';
+import { mapActions } from 'vuex';
+import store from '@/store/page-overlay/index';
+import { getNormalizedPackageContentsDescription } from '@/utils/package';
 
 export default Vue.extend({
-  name: "PackageSearchResultPreview",
+  name: 'PackageSearchResultPreview',
   props: {
     sectionName: String,
     pkg: Object as () => IIndexedPackageData,
@@ -47,7 +47,7 @@ export default Vue.extend({
       setPackageSearchFilters: `packageSearch/${PackageSearchActions.SET_PACKAGE_SEARCH_FILTERS}`,
     }),
     selectPackage(pkg: IIndexedPackageData) {
-      this.$emit("selected-package", pkg);
+      this.$emit('selected-package', pkg);
     },
     async setPackageLabelFilter(pkg: IIndexedPackageData) {
       analyticsManager.track(MessageType.SELECTED_PACKAGE);

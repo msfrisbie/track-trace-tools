@@ -58,22 +58,22 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import { MutationType } from "@/mutation-types";
-import { IIndexedTransferData, IPluginState } from "@/interfaces";
-import { MessageType, TransferFilterIdentifiers, TransferState } from "@/consts";
-import { analyticsManager } from "@/modules/analytics-manager.module";
-import { pageManager } from "@/modules/page-manager/page-manager.module";
-import { toastManager } from "@/modules/toast-manager.module";
-import { copyToClipboard } from "@/utils/dom";
-import { mapState } from "vuex";
-import TransferSearchResultsGroup from "@/components/search/transfer-search/TransferSearchResultsGroup.vue";
-import { searchManager } from "@/modules/search-manager.module";
-import store from "@/store/page-overlay/index";
-import TransferSearchFiltersVue from "./TransferSearchFilters.vue";
+import Vue from 'vue';
+import { MutationType } from '@/mutation-types';
+import { IIndexedTransferData, IPluginState } from '@/interfaces';
+import { MessageType, TransferFilterIdentifiers, TransferState } from '@/consts';
+import { analyticsManager } from '@/modules/analytics-manager.module';
+import { pageManager } from '@/modules/page-manager/page-manager.module';
+import { toastManager } from '@/modules/toast-manager.module';
+import { copyToClipboard } from '@/utils/dom';
+import { mapState } from 'vuex';
+import TransferSearchResultsGroup from '@/components/search/transfer-search/TransferSearchResultsGroup.vue';
+import { searchManager } from '@/modules/search-manager.module';
+import store from '@/store/page-overlay/index';
+import TransferSearchFiltersVue from './TransferSearchFilters.vue';
 
 export default Vue.extend({
-  name: "TransferResultGroups",
+  name: 'TransferResultGroups',
   props: {
     transfers: Array as () => IIndexedTransferData[],
   },

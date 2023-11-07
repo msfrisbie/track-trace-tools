@@ -18,17 +18,17 @@
 </template>
 
 <script lang="ts">
-import { MessageType } from "@/consts";
-import { IPluginState } from "@/interfaces";
-import { analyticsManager } from "@/modules/analytics-manager.module";
-import { searchManager } from "@/modules/search-manager.module";
-import store from "@/store/page-overlay/index";
-import { SearchActions } from "@/store/page-overlay/modules/search/consts";
-import Vue from "vue";
-import { mapState } from "vuex";
+import { MessageType } from '@/consts';
+import { IPluginState } from '@/interfaces';
+import { analyticsManager } from '@/modules/analytics-manager.module';
+import { searchManager } from '@/modules/search-manager.module';
+import store from '@/store/page-overlay/index';
+import { SearchActions } from '@/store/page-overlay/modules/search/consts';
+import Vue from 'vue';
+import { mapState } from 'vuex';
 
 export default Vue.extend({
-  name: "HistoryList",
+  name: 'HistoryList',
   store,
   methods: {
     setSearch(queryString: string) {

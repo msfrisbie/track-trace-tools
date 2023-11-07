@@ -1,15 +1,15 @@
-import { IPluginState } from "@/interfaces";
-import { authManager } from "@/modules/auth-manager.module";
-import { findMatchingTransferPackages } from "@/utils/transfer";
-import { ActionContext } from "vuex";
+import { IPluginState } from '@/interfaces';
+import { authManager } from '@/modules/auth-manager.module';
+import { findMatchingTransferPackages } from '@/utils/transfer';
+import { ActionContext } from 'vuex';
 import {
   TransferPackageSearchActions,
   TransferPackageSearchAlgorithm,
   TransferPackageSearchGetters,
   TransferPackageSearchMutations,
   TransferPackageSearchState,
-} from "./consts";
-import { ITransferPackageSearchState } from "./interfaces";
+} from './consts';
+import { ITransferPackageSearchState } from './interfaces';
 
 const inMemoryState = {
   startDate: null,
@@ -62,8 +62,8 @@ export const transferPackageSearchModule = {
       ctx.state.abortController = new AbortController();
 
       ctx.state.messages.push({
-        message: "Searching outgoing transfers for packages...",
-        variant: "primary",
+        message: 'Searching outgoing transfers for packages...',
+        variant: 'primary',
         timestamp: Date.now(),
       });
 
@@ -80,7 +80,7 @@ export const transferPackageSearchModule = {
 
       ctx.state.messages.push({
         message: `Found ${ctx.state.results.length} matching transfers`,
-        variant: "primary",
+        variant: 'primary',
         timestamp: Date.now(),
       });
     },
@@ -91,8 +91,8 @@ export const transferPackageSearchModule = {
       ctx.state.abortController.abort();
       ctx.state.state = TransferPackageSearchState.SUCCESS;
       ctx.state.messages.push({
-        message: "Search terminated, results may be incomplete",
-        variant: "warning",
+        message: 'Search terminated, results may be incomplete',
+        variant: 'warning',
         timestamp: Date.now(),
       });
     },

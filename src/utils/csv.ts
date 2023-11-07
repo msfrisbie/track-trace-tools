@@ -1,8 +1,8 @@
-import { ICsvFile } from "@/interfaces";
-import { timer } from "rxjs";
+import { ICsvFile } from '@/interfaces';
+import { timer } from 'rxjs';
 
 export function serialize(csvData: any[][]) {
-  return csvData.map((e) => e.join(",")).join("\n");
+  return csvData.map((e) => e.join(',')).join('\n');
 }
 
 export async function downloadCsvFile({
@@ -14,35 +14,35 @@ export async function downloadCsvFile({
 }) {
   // https://stackoverflow.com/questions/14964035/how-to-export-javascript-array-info-to-csv-on-client-side
   // let csvContent = "data:text/csv;charset=utf-8,";
-  let csvContent = "";
+  let csvContent = '';
 
   // Convert the 2D array to a comma-separated string with commas escaped and quotes added where necessary
   csvFile.data.forEach((rowArray) => {
     const row = rowArray
       .map((cell) => {
-        if (typeof cell !== "string") {
+        if (typeof cell !== 'string') {
           return cell;
         }
 
         // If the cell contains a comma or a double quote, add double quotes around the cell contents and escape any double quotes
-        if (cell.includes(",") || cell.includes('"')) {
+        if (cell.includes(',') || cell.includes('"')) {
           cell = `"${cell.replace(/"/g, '""')}"`;
         }
         return cell;
       })
-      .join(",");
+      .join(',');
     csvContent += `${row}\r\n`;
   });
 
   // let fileData: string = "data:text/csv;charset=utf-8," + serialize(csvFile.data);
-  const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
 
   // let encodedUri = encodeURI(fileData);
   const url = URL.createObjectURL(blob);
 
-  const link = document.createElement("a");
-  link.setAttribute("href", url);
-  link.setAttribute("download", csvFile.filename);
+  const link = document.createElement('a');
+  link.setAttribute('href', url);
+  link.setAttribute('download', csvFile.filename);
   document.body.appendChild(link); // Required for FF
 
   link.click(); // This will download the data file named "my_data.csv".
@@ -61,25 +61,25 @@ export function buildCsvDataOrError(columns: CsvColumnData[]) {
   for (const column of columns) {
     if (column.isVector) {
       if (!(column.data instanceof Array)) {
-        throw new Error("Vector data must be an array");
+        throw new Error('Vector data must be an array');
       }
 
       if (column.data.length === 0) {
-        throw new Error("Vector data must have nonzero length");
+        throw new Error('Vector data must have nonzero length');
       }
 
       if (!expectedRowCount) {
         expectedRowCount = column.data.length;
       } else if (column.data.length !== expectedRowCount) {
-        throw new Error("Vector length mismatch");
+        throw new Error('Vector length mismatch');
       }
     } else if (column.data instanceof Array) {
-      throw new Error("Non-vector data must NOT be an array");
+      throw new Error('Non-vector data must NOT be an array');
     }
   }
 
   if (!expectedRowCount) {
-    throw new Error("Must provide at least one vector");
+    throw new Error('Must provide at least one vector');
   }
 
   const rows = [];
@@ -110,7 +110,7 @@ export function buildNamedCsvFileData(
   const files: ICsvFile[] = [];
 
   const regex = /[^a-zA-Z0-9]+/gi;
-  const parsedFilenameSeed = filenameSeed.replace(regex, "_");
+  const parsedFilenameSeed = filenameSeed.replace(regex, '_');
 
   const timestamp = Date.now().toString();
 

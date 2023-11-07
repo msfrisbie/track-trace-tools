@@ -3,12 +3,12 @@
 </template>
 
 <script lang="ts">
-import { TransferState } from "@/consts";
-import { IIndexedTransferData } from "@/interfaces";
-import Vue from "vue";
+import { TransferState } from '@/consts';
+import { IIndexedTransferData } from '@/interfaces';
+import Vue from 'vue';
 
 export default Vue.extend({
-  name: "TransferIcon",
+  name: 'TransferIcon',
   props: {
     transfer: Object as () => IIndexedTransferData,
   },
@@ -16,14 +16,14 @@ export default Vue.extend({
     icon() {
       switch (this.transfer.TransferState) {
         case TransferState.INCOMING:
-          return "truck";
+          return 'truck';
         case TransferState.OUTGOING:
-          return "truck-loading";
+          return 'truck-loading';
         case TransferState.REJECTED:
-          return "undo";
+          return 'undo';
       }
 
-      return "truck";
+      return 'truck';
       //   const category = this.pkg.Item.ProductCategoryName;
 
       //   if (category.includes("Flower") || category.includes("Shake")) {
@@ -73,7 +73,7 @@ export default Vue.extend({
       //   return "box";
     },
     iconColor() {
-      return "#49276a";
+      return '#49276a';
       //   if (this.pkg.Quantity === 0) {
       //     return "rgba(0,0,0,0.3)";
       //   } else {

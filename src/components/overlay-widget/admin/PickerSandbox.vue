@@ -40,21 +40,21 @@
 </template>
 
 <script lang="ts">
-import HarvestPicker from "@/components/overlay-widget/shared/HarvestPicker.vue";
-import ItemPicker from "@/components/overlay-widget/shared/ItemPicker.vue";
-import LocationPicker from "@/components/overlay-widget/shared/LocationPicker.vue";
-import PackagePicker from "@/components/overlay-widget/shared/PackagePicker.vue";
-import PlantBatchPicker from "@/components/overlay-widget/shared/PlantBatchPicker.vue";
-import PlantPicker from "@/components/overlay-widget/shared/PlantPicker.vue";
-import StrainPicker from "@/components/overlay-widget/shared/StrainPicker.vue";
-import TagPicker from "@/components/overlay-widget/shared/TagPicker.vue";
-import router from "@/router/index";
-import store from "@/store/page-overlay/index";
-import Vue from "vue";
-import { mapState } from "vuex";
+import HarvestPicker from '@/components/overlay-widget/shared/HarvestPicker.vue';
+import ItemPicker from '@/components/overlay-widget/shared/ItemPicker.vue';
+import LocationPicker from '@/components/overlay-widget/shared/LocationPicker.vue';
+import PackagePicker from '@/components/overlay-widget/shared/PackagePicker.vue';
+import PlantBatchPicker from '@/components/overlay-widget/shared/PlantBatchPicker.vue';
+import PlantPicker from '@/components/overlay-widget/shared/PlantPicker.vue';
+import StrainPicker from '@/components/overlay-widget/shared/StrainPicker.vue';
+import TagPicker from '@/components/overlay-widget/shared/TagPicker.vue';
+import router from '@/router/index';
+import store from '@/store/page-overlay/index';
+import Vue from 'vue';
+import { mapState } from 'vuex';
 
 export default Vue.extend({
-  name: "PickerSandbox",
+  name: 'PickerSandbox',
   store,
   router,
   props: {},

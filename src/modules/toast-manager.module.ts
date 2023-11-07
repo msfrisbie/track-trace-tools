@@ -1,5 +1,5 @@
-import { IAtomicService } from "@/interfaces";
-import store from "@/store/page-overlay";
+import { IAtomicService } from '@/interfaces';
+import store from '@/store/page-overlay';
 import { Observable, Subject } from 'rxjs';
 
 export interface ToastPayload {

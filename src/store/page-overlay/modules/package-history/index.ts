@@ -1,4 +1,4 @@
-import { MessageType } from "@/consts";
+import { MessageType } from '@/consts';
 import {
   IIndexedPackageData,
   IPackageAncestorTreeNode,
@@ -6,23 +6,23 @@ import {
   IPackageData,
   IPackageSourceHarvestData,
   IPluginState,
-} from "@/interfaces";
-import { analyticsManager } from "@/modules/analytics-manager.module";
-import store from "@/store/page-overlay/index";
+} from '@/interfaces';
+import { analyticsManager } from '@/modules/analytics-manager.module';
+import store from '@/store/page-overlay/index';
 import {
   getChildPackageHistoryTree,
   getParentHarvests,
   getParentPackageHistoryTree,
-} from "@/utils/package-history";
-import _ from "lodash-es";
-import { ActionContext } from "vuex";
+} from '@/utils/package-history';
+import _ from 'lodash-es';
+import { ActionContext } from 'vuex';
 import {
   PackageHistoryActions,
   PackageHistoryGetters,
   PackageHistoryMutations,
   PackageHistoryStatus,
-} from "./consts";
-import { IPackageHistoryState } from "./interfaces";
+} from './consts';
+import { IPackageHistoryState } from './interfaces';
 
 const inMemoryState = {
   sourcePackage: null,
@@ -178,7 +178,7 @@ export const packageHistoryModule = {
         node.ancestors.map((ancestor) => stack.push([ancestor, depth + 1]));
       }
 
-      return _.orderBy([...packageMap.values()], ["pkg.LicenseNumber", "label"], ["asc", "asc"]);
+      return _.orderBy([...packageMap.values()], ['pkg.LicenseNumber', 'label'], ['asc', 'asc']);
     },
     [PackageHistoryGetters.ANCESTOR_GENERATIONS]: (
       state: IPackageHistoryState,
@@ -201,7 +201,7 @@ export const packageHistoryModule = {
           continue;
         }
 
-        if (typeof generations[depth] !== "object") {
+        if (typeof generations[depth] !== 'object') {
           generations[depth] = [];
         }
 
@@ -244,7 +244,7 @@ export const packageHistoryModule = {
         node.children.map((child) => stack.push([child, depth + 1]));
       }
 
-      return _.orderBy([...packageMap.values()], ["pkg.LicenseNumber", "label"], ["asc", "asc"]);
+      return _.orderBy([...packageMap.values()], ['pkg.LicenseNumber', 'label'], ['asc', 'asc']);
     },
     [PackageHistoryGetters.CHILD_GENERATIONS]: (
       state: IPackageHistoryState,
@@ -267,7 +267,7 @@ export const packageHistoryModule = {
           continue;
         }
 
-        if (typeof generations[depth] !== "object") {
+        if (typeof generations[depth] !== 'object') {
           generations[depth] = [];
         }
 
@@ -333,7 +333,7 @@ export const packageHistoryModule = {
               sourceHarvests: await getParentHarvests(pkg.Label),
             });
           } catch (e: any) {
-            console.error("Cannot load source harvests", e);
+            console.error('Cannot load source harvests', e);
           }
           ctx.commit(PackageHistoryMutations.SET_ANCESTORS, {
             ancestorTree: await getParentPackageHistoryTree({
@@ -368,7 +368,7 @@ export const packageHistoryModule = {
       { maxParentLookupDepth }: { maxParentLookupDepth: number | null }
     ) => {
       ctx.commit(PackageHistoryMutations.SET_MAX_PARENT_LOOKUP_DEPTH, { maxParentLookupDepth });
-      if (typeof maxParentLookupDepth === "number") {
+      if (typeof maxParentLookupDepth === 'number') {
         ctx.commit(PackageHistoryMutations.SET_MAX_PARENT_VISIBLE_DEPTH, {
           maxParentVisibleDepth: maxParentLookupDepth,
         });
@@ -379,7 +379,7 @@ export const packageHistoryModule = {
       { maxChildLookupDepth }: { maxChildLookupDepth: number | null }
     ) => {
       ctx.commit(PackageHistoryMutations.SET_MAX_CHILD_LOOKUP_DEPTH, { maxChildLookupDepth });
-      if (typeof maxChildLookupDepth === "number") {
+      if (typeof maxChildLookupDepth === 'number') {
         ctx.commit(PackageHistoryMutations.SET_MAX_CHILD_VISIBLE_DEPTH, {
           maxChildVisibleDepth: maxChildLookupDepth,
         });

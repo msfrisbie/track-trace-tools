@@ -102,21 +102,21 @@
 </template>
 
 <script lang="ts">
-import { IPlantData } from "@/interfaces";
-import { dynamicConstsManager } from "@/modules/dynamic-consts-manager.module";
-import store from "@/store/page-overlay/index";
-import { evenDistribution, normalDistribution } from "@/utils/math";
-import Vue from "vue";
+import { IPlantData } from '@/interfaces';
+import { dynamicConstsManager } from '@/modules/dynamic-consts-manager.module';
+import store from '@/store/page-overlay/index';
+import { evenDistribution, normalDistribution } from '@/utils/math';
+import Vue from 'vue';
 
 const PAGE_SIZE = 100;
 
 enum WeightMode {
-  BULK = "BULK",
-  INDIVIDUAL = "INDIVIDUAL",
+  BULK = 'BULK',
+  INDIVIDUAL = 'INDIVIDUAL',
 }
 
 export default Vue.extend({
-  name: "PlantWeightPicker",
+  name: 'PlantWeightPicker',
   store,
   props: {
     selectedPlants: {
@@ -151,7 +151,7 @@ export default Vue.extend({
         );
       }
 
-      this.$emit("update:plantWeights", weights);
+      this.$emit('update:plantWeights', weights);
     },
   },
   computed: {
@@ -200,20 +200,20 @@ export default Vue.extend({
       error: null,
       unitsOfWeight: [],
       precision: 2,
-      randomize: localStorage.getItem("plantWeightPickerRandomize") === "true",
+      randomize: localStorage.getItem('plantWeightPickerRandomize') === 'true',
     };
   },
   watch: {
     plantWeights: {
       immediate: true,
       handler(newValue, oldValue) {
-        this.$emit("update:plantWeights", newValue);
+        this.$emit('update:plantWeights', newValue);
       },
     },
     unitOfWeight: {
       immediate: true,
       handler(newValue, oldValue) {
-        this.$emit("update:unitOfWeight", newValue);
+        this.$emit('update:unitOfWeight', newValue);
       },
     },
     totalWeight: {
@@ -240,7 +240,7 @@ export default Vue.extend({
       immediate: true,
       handler(newValue, oldValue) {
         console.log(newValue);
-        localStorage.setItem("plantWeightPickerRandomize", newValue);
+        localStorage.setItem('plantWeightPickerRandomize', newValue);
 
         this.updatePlantWeights();
       },

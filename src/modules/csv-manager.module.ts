@@ -1,9 +1,9 @@
-import { IAtomicService, ICsvFile } from "@/interfaces";
-import { serialize } from "@/utils/csv";
+import { IAtomicService, ICsvFile } from '@/interfaces';
+import { serialize } from '@/utils/csv';
 import { get } from 'idb-keyval';
-import { BehaviorSubject, timer } from "rxjs";
-import { authManager } from "./auth-manager.module";
-import { primaryDataLoader } from "./data-loader/data-loader.module";
+import { BehaviorSubject, timer } from 'rxjs';
+import { authManager } from './auth-manager.module';
+import { primaryDataLoader } from './data-loader/data-loader.module';
 
 enum CsvSubmitState {
     CHECK_SUBMIT_QUEUE,
@@ -48,7 +48,7 @@ class CsvManager implements IAtomicService {
         this.activeCsvProject = JSON.parse(project);
       }
 
-      primaryDataLoader.loadAllCsvUploads("PlantsHarvest");
+      primaryDataLoader.loadAllCsvUploads('PlantsHarvest');
       // primaryDataLoader.loadLocations();
 
       // Can only submit on dataimport page
@@ -136,7 +136,7 @@ class CsvManager implements IAtomicService {
       const dt = new ClipboardEvent('').clipboardData || new DataTransfer(); // specs compliant (as of March 2018 only Chrome)
 
       const file = new File([serialize(csvFile.data)], csvFile.filename, {
-        type: "text/csv",
+        type: 'text/csv',
       });
 
       dt.items.add(file);

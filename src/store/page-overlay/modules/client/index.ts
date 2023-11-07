@@ -1,9 +1,9 @@
-import { IPluginState } from "@/interfaces";
-import { t3RequestManager } from "@/modules/t3-request-manager.module";
-import { toastManager } from "@/modules/toast-manager.module";
-import { ActionContext } from "vuex";
-import { ClientActions, ClientGetters, ClientMutations } from "./consts";
-import { IClientState } from "./interfaces";
+import { IPluginState } from '@/interfaces';
+import { t3RequestManager } from '@/modules/t3-request-manager.module';
+import { toastManager } from '@/modules/toast-manager.module';
+import { ActionContext } from 'vuex';
+import { ClientActions, ClientGetters, ClientMutations } from './consts';
+import { IClientState } from './interfaces';
 
 const inMemoryState = {};
 
@@ -53,12 +53,12 @@ export const clientModule = {
       );
 
       if (data.notify && !clientName) {
-        toastManager.openToast(`This license key is invalid.`, {
-          title: "License Key Error",
+        toastManager.openToast('This license key is invalid.', {
+          title: 'License Key Error',
           autoHideDelay: 5000,
-          variant: "danger",
+          variant: 'danger',
           appendToast: true,
-          toaster: "ttt-toaster",
+          toaster: 'ttt-toaster',
           solid: true,
         });
       }

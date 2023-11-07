@@ -139,10 +139,10 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import store from "@/store/page-overlay/index";
-import { mapActions, mapState } from "vuex";
-import BuilderStepHeader from "@/components/overlay-widget/shared/BuilderStepHeader.vue";
+import Vue from 'vue';
+import store from '@/store/page-overlay/index';
+import { mapActions, mapState } from 'vuex';
+import BuilderStepHeader from '@/components/overlay-widget/shared/BuilderStepHeader.vue';
 import {
   IMetrcCreateItemsPayload,
   IItemTemplate,
@@ -151,22 +151,22 @@ import {
   IUnitOfMeasure,
   IItemCategory,
   IItemData,
-} from "@/interfaces";
-import { buildCsvDataOrError, buildNamedCsvFileData } from "@/utils/csv";
-import { BuilderType, MessageType } from "@/consts";
-import { analyticsManager } from "@/modules/analytics-manager.module";
-import { builderManager } from "@/modules/builder-manager.module";
-import ItemDataList from "@/components/overlay-widget/shared/ItemDataList.vue";
-import StrainPicker from "@/components/overlay-widget/shared/StrainPicker.vue";
-import { dynamicConstsManager } from "@/modules/dynamic-consts-manager.module";
-import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
-import { unitOfMeasureNameToAbbreviation } from "@/utils/units";
-import { abbreviateString } from "@/utils/abbreviate";
-import { round } from "@/utils/math";
-import _ from "lodash-es";
+} from '@/interfaces';
+import { buildCsvDataOrError, buildNamedCsvFileData } from '@/utils/csv';
+import { BuilderType, MessageType } from '@/consts';
+import { analyticsManager } from '@/modules/analytics-manager.module';
+import { builderManager } from '@/modules/builder-manager.module';
+import ItemDataList from '@/components/overlay-widget/shared/ItemDataList.vue';
+import StrainPicker from '@/components/overlay-widget/shared/StrainPicker.vue';
+import { dynamicConstsManager } from '@/modules/dynamic-consts-manager.module';
+import { primaryDataLoader } from '@/modules/data-loader/data-loader.module';
+import { unitOfMeasureNameToAbbreviation } from '@/utils/units';
+import { abbreviateString } from '@/utils/abbreviate';
+import { round } from '@/utils/math';
+import _ from 'lodash-es';
 
 export default Vue.extend({
-  name: "ItemTemplateBuilder",
+  name: 'ItemTemplateBuilder',
   store,
   components: {
     BuilderStepHeader,
@@ -203,33 +203,33 @@ export default Vue.extend({
     },
     populateItems() {
       const otherConcentrateWeightCategoryItemNames: string[] = [
-        "hash grade A",
-        "hash grade B",
-        "hash grade C",
-        "hash grade D",
-        "hash grade E",
-        "bulk rosin grade A - press 1",
-        "bulk rosin grade A - press 2",
-        "bulk rosin grade B - press 1",
-        "bulk rosin grade B - press 2",
-        "bulk rosin grade C - press 1",
-        "bulk rosin grade C - press 2",
-        "bulk rosin grade D - press 1",
-        "bulk rosin grade D - press 2",
-        "bulk rosin grade E - press 1",
-        "bulk rosin grade E - press 2",
-        "pressed bags",
-        "bulk rosin infusion - crude",
-        "bulk rosin infusion - decarbed",
-        "washed flower",
-        "bulk rosin 90-149um",
+        'hash grade A',
+        'hash grade B',
+        'hash grade C',
+        'hash grade D',
+        'hash grade E',
+        'bulk rosin grade A - press 1',
+        'bulk rosin grade A - press 2',
+        'bulk rosin grade B - press 1',
+        'bulk rosin grade B - press 2',
+        'bulk rosin grade C - press 1',
+        'bulk rosin grade C - press 2',
+        'bulk rosin grade D - press 1',
+        'bulk rosin grade D - press 2',
+        'bulk rosin grade E - press 1',
+        'bulk rosin grade E - press 2',
+        'pressed bags',
+        'bulk rosin infusion - crude',
+        'bulk rosin infusion - decarbed',
+        'washed flower',
+        'bulk rosin 90-149um',
       ];
 
       this.$data.items = [];
 
       if (this.$data.freshCannabisPlantCategory && this.unitOfMeasureGrams) {
         this.$data.items.push({
-          Name: `${this.$data.batchNumber} (${this.formattedStrainName}) ${"fresh frozen"}`,
+          Name: `${this.$data.batchNumber} (${this.formattedStrainName}) ${'fresh frozen'}`,
           StrainId: this.$data.strain.Id,
           Category: this.$data.freshCannabisPlantCategory,
           UnitOfMeasureId: this.unitOfMeasureGrams.Id,
@@ -249,7 +249,7 @@ export default Vue.extend({
 
       if (this.$data.wasteCategory && this.unitOfMeasureGrams) {
         this.$data.items.push({
-          Name: `${this.$data.batchNumber} (${this.formattedStrainName}) ${"Waste"}`,
+          Name: `${this.$data.batchNumber} (${this.formattedStrainName}) ${'Waste'}`,
           Category: this.$data.wasteCategory,
           UnitOfMeasureId: this.unitOfMeasureGrams.Id,
           UnitOfMeasureName: this.unitOfMeasureGrams.Name,
@@ -257,9 +257,9 @@ export default Vue.extend({
       }
 
       if (
-        this.$data.otherConcentrateWeightEachCategory &&
-        this.unitOfMeasureEach &&
-        this.unitOfMeasureGrams
+        this.$data.otherConcentrateWeightEachCategory
+        && this.unitOfMeasureEach
+        && this.unitOfMeasureGrams
       ) {
         this.$data.items.push({
           Name: `Cold Cured Live Rosin - ${this.formattedStrainName}`,
@@ -273,9 +273,9 @@ export default Vue.extend({
       }
 
       if (
-        this.$data.vapeCartridgeWeightEachCategory &&
-        this.unitOfMeasureEach &&
-        this.unitOfMeasureGrams
+        this.$data.vapeCartridgeWeightEachCategory
+        && this.unitOfMeasureEach
+        && this.unitOfMeasureGrams
       ) {
         this.$data.items.push({
           Name: `Live Rosin Vape Cart - ${this.formattedStrainName}`,
@@ -295,33 +295,33 @@ export default Vue.extend({
     round,
     async submit() {
       const rows: IMetrcCreateItemsPayload[] = this.$data.items.map((item: IItemTemplate) => ({
-        AdministrationMethod: "",
-        Description: "",
-        ItemBrandId: "",
+        AdministrationMethod: '',
+        Description: '',
+        ItemBrandId: '',
         Name: item.Name,
-        NumberOfDoses: "",
-        ProductCategoryId: item.Category.Id ? item.Category.Id.toString() : "",
-        PublicIngredients: "",
-        ServingSize: "",
-        StrainId: item.StrainId ? item.StrainId.toString() : "",
-        SupplyDurationDays: "",
-        UnitCbdContent: "",
-        UnitCbdContentDose: "",
-        UnitCbdContentDoseUoMId: "",
-        UnitCbdContentUoMId: "",
-        UnitCbdPercent: "",
-        UnitOfMeasureId: item.UnitOfMeasureId ? item.UnitOfMeasureId.toString() : "",
-        UnitThcContent: "",
-        UnitThcContentDose: "",
-        UnitThcContentDoseUoMId: "",
-        UnitThcContentUoMId: "",
-        UnitThcPercent: "",
-        UnitVolume: "",
-        UnitVolumeUoMId: "",
-        UnitWeight: item.UnitWeight ? item.UnitWeight.toString() : "",
+        NumberOfDoses: '',
+        ProductCategoryId: item.Category.Id ? item.Category.Id.toString() : '',
+        PublicIngredients: '',
+        ServingSize: '',
+        StrainId: item.StrainId ? item.StrainId.toString() : '',
+        SupplyDurationDays: '',
+        UnitCbdContent: '',
+        UnitCbdContentDose: '',
+        UnitCbdContentDoseUoMId: '',
+        UnitCbdContentUoMId: '',
+        UnitCbdPercent: '',
+        UnitOfMeasureId: item.UnitOfMeasureId ? item.UnitOfMeasureId.toString() : '',
+        UnitThcContent: '',
+        UnitThcContentDose: '',
+        UnitThcContentDoseUoMId: '',
+        UnitThcContentUoMId: '',
+        UnitThcPercent: '',
+        UnitVolume: '',
+        UnitVolumeUoMId: '',
+        UnitWeight: item.UnitWeight ? item.UnitWeight.toString() : '',
         UnitWeightUoMId: item.UnitWeightUnitOfMeasureId
           ? item.UnitWeightUnitOfMeasureId.toString()
-          : "",
+          : '',
       }));
 
       builderManager.submitProject(
@@ -352,7 +352,7 @@ export default Vue.extend({
           {
             isVector: true,
             data: this.$data.items.map((item: IItemTemplate) =>
-              (item.StrainId ? item.StrainId.toString() : "")),
+              (item.StrainId ? item.StrainId.toString() : '')),
           },
           {
             isVector: true,
@@ -365,12 +365,12 @@ export default Vue.extend({
           {
             isVector: true,
             data: this.$data.items.map((item: IItemTemplate) =>
-              (item.UnitWeight ? item.UnitWeight.toString() : "")),
+              (item.UnitWeight ? item.UnitWeight.toString() : '')),
           },
           {
             isVector: true,
             data: this.$data.items.map((item: IItemTemplate) =>
-              (item.UnitWeightUnitOfMeasureId ? item.UnitWeightUnitOfMeasureId.toString() : "")),
+              (item.UnitWeightUnitOfMeasureId ? item.UnitWeightUnitOfMeasureId.toString() : '')),
           },
           { isVector: false, data: this.$data.strain.Name },
           { isVector: false, data: this.formattedStrainName },
@@ -384,52 +384,52 @@ export default Vue.extend({
     },
     calculateErrors(): IBuilderComponentError[] {
       const errors: IBuilderComponentError[] = [];
-      const itemDetailsMsg: string = "Please enter item details in previous step to continue";
+      const itemDetailsMsg: string = 'Please enter item details in previous step to continue';
 
       if (!this.$data.strain && !this.$data.batchNumber) {
         errors.push({
-          tags: ["noItemsCreatedError"],
+          tags: ['noItemsCreatedError'],
           message: itemDetailsMsg,
         });
       }
 
       if (this.removedItemsCount === this.expectedItemCount) {
         errors.push({
-          tags: ["allItemsRemovedError"],
+          tags: ['allItemsRemovedError'],
           message: itemDetailsMsg,
         });
       }
 
       if (this.duplicateItemsExist) {
         errors.push({
-          tags: ["duplicateItemsError"],
-          message: "Pre-existing items could not be created",
+          tags: ['duplicateItemsError'],
+          message: 'Pre-existing items could not be created',
         });
       }
 
       if (
-        !this.$data.freshCannabisPlantCategory ||
-        !this.$data.otherConcentrateWeightCategory ||
-        !this.$data.wasteCategory ||
-        !this.$data.otherConcentrateWeightEachCategory ||
-        !this.$data.vapeCartridgeWeightEachCategory
+        !this.$data.freshCannabisPlantCategory
+        || !this.$data.otherConcentrateWeightCategory
+        || !this.$data.wasteCategory
+        || !this.$data.otherConcentrateWeightEachCategory
+        || !this.$data.vapeCartridgeWeightEachCategory
       ) {
         errors.push({
-          tags: ["missingItemCategoriesError"],
-          message: `This license is missing item categories`,
+          tags: ['missingItemCategoriesError'],
+          message: 'This license is missing item categories',
         });
       }
 
       if (!this.$data.items || this.$data.items.length === 0) {
         errors.push({
-          tags: ["page3"],
-          message: "No items to submit",
+          tags: ['page3'],
+          message: 'No items to submit',
         });
       }
 
       if (this.catalogError) {
         errors.push({
-          tags: ["catalogError"],
+          tags: ['catalogError'],
           message: `${this.removedItemsCount} item(s) excluded`,
         });
       }
@@ -442,10 +442,10 @@ export default Vue.extend({
       authState: (state: any) => state.pluginAuth.authState,
     }),
     unitOfMeasureGrams(): IUnitOfMeasure {
-      return this.$data.unitsOfMeasure.find((x: IUnitOfMeasure) => x.Name === "Grams") || null;
+      return this.$data.unitsOfMeasure.find((x: IUnitOfMeasure) => x.Name === 'Grams') || null;
     },
     unitOfMeasureEach(): IUnitOfMeasure {
-      return this.$data.unitsOfMeasure.find((x: IUnitOfMeasure) => x.Name === "Each") || null;
+      return this.$data.unitsOfMeasure.find((x: IUnitOfMeasure) => x.Name === 'Each') || null;
     },
     formattedStrainName(): string {
       // Per request from Yoni
@@ -459,7 +459,7 @@ export default Vue.extend({
       return this.$data.duplicateItems.length > 0;
     },
     catalogVariant(): string {
-      return this.catalogError ? "danger" : "success";
+      return this.catalogError ? 'danger' : 'success';
     },
     catalogError(): boolean {
       return this.$data.items.length !== this.$data.expectedItemCount;
@@ -467,42 +467,42 @@ export default Vue.extend({
     noItemsCreatedErrorMessage(): string | null {
       return (
         // @ts-ignore
-        this.errors.find((x: IBuilderComponentError) => x.tags.includes("noItemsCreatedError"))
+        this.errors.find((x: IBuilderComponentError) => x.tags.includes('noItemsCreatedError'))
           ?.message || null
       );
     },
     allItemsRemovedErrorMessage(): string | null {
       return (
         // @ts-ignore
-        this.errors.find((x: IBuilderComponentError) => x.tags.includes("allItemsRemovedError"))
+        this.errors.find((x: IBuilderComponentError) => x.tags.includes('allItemsRemovedError'))
           ?.message || null
       );
     },
     pageThreeErrorMessage(): string | null {
       return (
         // @ts-ignore
-        this.errors.find((x: IBuilderComponentError) => x.tags.includes("page3"))?.message || null
+        this.errors.find((x: IBuilderComponentError) => x.tags.includes('page3'))?.message || null
       );
     },
     missingItemCategoriesErrorMessage(): string | null {
       return (
         // @ts-ignore
         this.errors.find((x: IBuilderComponentError) =>
-          x.tags.includes("missingItemCategoriesError"))?.message || null
+          x.tags.includes('missingItemCategoriesError'))?.message || null
       );
     },
     duplicateItemsErrorMessage(): string | null {
       return (
         // @ts-ignore
-        this.errors.find((x: IBuilderComponentError) => x.tags.includes("duplicateItemsError"))
+        this.errors.find((x: IBuilderComponentError) => x.tags.includes('duplicateItemsError'))
           ?.message || null
       );
     },
     catalogErrorMessage(): string | null {
       return (
         // @ts-ignore
-        this.errors.find((x: IBuilderComponentError) => x.tags.includes("catalogError"))?.message ||
-        null
+        this.errors.find((x: IBuilderComponentError) => x.tags.includes('catalogError'))?.message
+        || null
       );
     },
     errors(): IBuilderComponentError[] {
@@ -519,7 +519,7 @@ export default Vue.extend({
       immediate: true,
       handler(newValue) {
         // @ts-ignore
-        this.$emit("update:strain", newValue);
+        this.$emit('update:strain', newValue);
 
         if (this.$data.strain && this.$data.batchNumber) {
           this.populateItems();
@@ -530,7 +530,7 @@ export default Vue.extend({
       immediate: true,
       handler(newValue) {
         // @ts-ignore
-        this.$emit("update:batchNumber", newValue);
+        this.$emit('update:batchNumber', newValue);
 
         if (this.$data.strain && this.$data.batchNumber) {
           this.populateItems();
@@ -544,18 +544,18 @@ export default Vue.extend({
       activeStepIndex: 0,
       steps: [
         {
-          stepText: "Enter item details",
+          stepText: 'Enter item details',
         },
         {
-          stepText: "Item details",
+          stepText: 'Item details',
         },
         {
-          stepText: "Submit",
+          stepText: 'Submit',
         },
       ],
       strain: null,
       items: [],
-      batchNumber: "",
+      batchNumber: '',
       expectedItemCount: 24,
       unitsOfMeasure: [],
       unitsOfWeight: [],
@@ -574,21 +574,16 @@ export default Vue.extend({
     this.$data.categories = await dynamicConstsManager.itemCategories();
     this.$data.unitsOfMeasure = await dynamicConstsManager.unitsOfMeasure();
 
-    this.$data.freshCannabisPlantCategory =
-      this.$data.categories.find((x: IItemCategory) => x.Name === "Fresh Cannabis Plant") || null;
-    this.$data.otherConcentrateWeightCategory =
-      this.$data.categories.find((x: IItemCategory) => x.Name === "Other Concentrate (weight)") ||
-      null;
-    this.$data.wasteCategory =
-      this.$data.categories.find((x: IItemCategory) => x.Name === "Waste") || null;
-    this.$data.otherConcentrateWeightEachCategory =
-      this.$data.categories.find(
-        (x: IItemCategory) => x.Name === "Other Concentrate (weight - each)"
-      ) || null;
-    this.$data.vapeCartridgeWeightEachCategory =
-      this.$data.categories.find(
-        (x: IItemCategory) => x.Name === "Vape Cartridge (weight - each)"
-      ) || null;
+    this.$data.freshCannabisPlantCategory = this.$data.categories.find((x: IItemCategory) => x.Name === 'Fresh Cannabis Plant') || null;
+    this.$data.otherConcentrateWeightCategory = this.$data.categories.find((x: IItemCategory) => x.Name === 'Other Concentrate (weight)')
+      || null;
+    this.$data.wasteCategory = this.$data.categories.find((x: IItemCategory) => x.Name === 'Waste') || null;
+    this.$data.otherConcentrateWeightEachCategory = this.$data.categories.find(
+      (x: IItemCategory) => x.Name === 'Other Concentrate (weight - each)'
+    ) || null;
+    this.$data.vapeCartridgeWeightEachCategory = this.$data.categories.find(
+      (x: IItemCategory) => x.Name === 'Vape Cartridge (weight - each)'
+    ) || null;
   },
   async created() {},
   destroyed() {},

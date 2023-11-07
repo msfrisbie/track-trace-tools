@@ -1,13 +1,13 @@
 // Webpack freaks out about not being run in an extension context
 
-console.log("main-script");
+console.log('main-script');
 
 // Preserve the function
 const _confirm = window.confirm;
 
 const BYPASS_CONFIRM_FRAGMENT_LIST: string[] = [
-  "Select again on this line?",
-  "Are you sure you wish to remove line",
+  'Select again on this line?',
+  'Are you sure you wish to remove line',
 ];
 
 const confirmShim = function (message: string): boolean {

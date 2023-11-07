@@ -7,7 +7,7 @@ import {
   DEXIE_TAG_TABLE_NAME,
   DEXIE_TRANSFER_SCHEMA,
   DEXIE_TRANSFER_TABLE_NAME,
-} from "@/consts";
+} from '@/consts';
 import {
   IIndexedPackageData,
   IIndexedPackageFilters,
@@ -15,8 +15,8 @@ import {
   IIndexedTagFilters,
   IIndexedTransferData,
   IIndexedTransferFilters,
-} from "@/interfaces";
-import Dexie from "dexie";
+} from '@/interfaces';
+import Dexie from 'dexie';
 
 class TrackTraceToolsDatabase extends Dexie {
   packages: Dexie.Table<IIndexedPackageData, number>;
@@ -74,7 +74,7 @@ class Database {
     const formattedQuery = queryString.toUpperCase();
 
     const result = await this._db.packages
-      .where("License")
+      .where('License')
       .equals(license)
       .filter((packageData) => packageData.TagMatcher.includes(formattedQuery))
       .toArray();
@@ -91,7 +91,7 @@ class Database {
     const formattedQuery = queryString.toUpperCase();
 
     return this._db.transfers
-      .where("License")
+      .where('License')
       .equals(license)
       .filter((transferData) => transferData.TagMatcher.includes(formattedQuery))
       .toArray();
@@ -105,7 +105,7 @@ class Database {
     const formattedQuery = queryString.toUpperCase();
 
     return this._db.tags
-      .where("License")
+      .where('License')
       .equals(license)
       .filter((tagData) => tagData.TagMatcher.includes(formattedQuery))
       .toArray();

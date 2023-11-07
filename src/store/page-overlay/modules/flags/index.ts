@@ -1,6 +1,6 @@
-import { IPluginState } from "@/interfaces";
-import { ActionContext } from "vuex";
-import { FlagsActions, FlagsMutations } from "./consts";
+import { IPluginState } from '@/interfaces';
+import { ActionContext } from 'vuex';
+import { FlagsActions, FlagsMutations } from './consts';
 import {
   IFlagsState,
   IMockDefaultPhoneNumberForQuestions,
@@ -41,7 +41,7 @@ import {
   IMockUnitsOfMeasure,
   IMockUnitsOfMeasureBehavior,
   IMockVehicles
-} from "./interfaces";
+} from './interfaces';
 
 const inMemoryState = {};
 

@@ -1,5 +1,5 @@
-import { ModalAction, ModalType } from "@/consts";
-import { modalManager } from "@/modules/modal-manager.module";
+import { ModalAction, ModalType } from '@/consts';
+import { modalManager } from '@/modules/modal-manager.module';
 
 export function copyToClipboard(value: string): void {
   // Deprecated implementation
@@ -18,11 +18,11 @@ export function copyToClipboard(value: string): void {
 }
 
 export function downloadFileFromUrl({ url, filename }: { url: string; filename: string }): void {
-  const a = document.createElement("a");
+  const a = document.createElement('a');
   a.href = url;
   a.download = filename;
-  a.target = "_blank";
-  a.dispatchEvent(new MouseEvent("click"));
+  a.target = '_blank';
+  a.dispatchEvent(new MouseEvent('click'));
 }
 
 export function printPdfFromUrl({ urls, modal = false }: { urls: string[]; modal?: boolean }) {
@@ -33,7 +33,7 @@ export function printPdfFromUrl({ urls, modal = false }: { urls: string[]; modal
     });
   } else {
     for (const url of urls) {
-      const w = window.open(url, "_blank");
+      const w = window.open(url, '_blank');
 
       if (!w) {
         return;

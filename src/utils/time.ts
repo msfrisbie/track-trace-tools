@@ -28,8 +28,8 @@ export function localDateTimeIso(d: Date = new Date()): string {
   // .toISOString() returns UTC, which messes up date selection
 
   const year = d.getFullYear();
-  const paddedMonth = (d.getMonth() + 1).toString().padStart(2, "0");
-  const paddedDay = d.getDate().toString().padStart(2, "0");
+  const paddedMonth = (d.getMonth() + 1).toString().padStart(2, '0');
+  const paddedDay = d.getDate().toString().padStart(2, '0');
 
   return `${year}-${paddedMonth}-${paddedDay}`;
 }

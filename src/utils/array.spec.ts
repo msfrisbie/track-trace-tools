@@ -1,4 +1,4 @@
-import { safeZip, sameLength } from "./array";
+import { safeZip, sameLength } from './array';
 
 describe('array.ts', () => {
   it('sameLength performs correct length evaluations', () => {

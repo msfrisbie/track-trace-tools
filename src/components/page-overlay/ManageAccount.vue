@@ -17,17 +17,17 @@
 </template>
 
 <script lang="ts">
-import { MessageType } from "@/consts";
-import { analyticsManager } from "@/modules/analytics-manager.module";
-import { pageManager } from "@/modules/page-manager/page-manager.module";
-import { toastManager } from "@/modules/toast-manager.module";
-import { MutationType } from "@/mutation-types";
-import store from "@/store/page-overlay/index";
-import Vue from "vue";
-import { mapState } from "vuex";
+import { MessageType } from '@/consts';
+import { analyticsManager } from '@/modules/analytics-manager.module';
+import { pageManager } from '@/modules/page-manager/page-manager.module';
+import { toastManager } from '@/modules/toast-manager.module';
+import { MutationType } from '@/mutation-types';
+import store from '@/store/page-overlay/index';
+import Vue from 'vue';
+import { mapState } from 'vuex';
 
 export default Vue.extend({
-  name: "ManageAccount",
+  name: 'ManageAccount',
   store,
   components: {},
   data() {
@@ -35,7 +35,7 @@ export default Vue.extend({
       accountSettings: JSON.parse(JSON.stringify(store.state.accountSettings)),
     };
   },
-  computed: mapState(["accountEnabled"]),
+  computed: mapState(['accountEnabled']),
   methods: {
     onChange() {
       pageManager.pauseFor(3000);
@@ -46,12 +46,12 @@ export default Vue.extend({
 
       store.commit(MutationType.UPDATE_ACCOUNT_SETTINGS, this.accountSettings);
 
-      toastManager.openToast(`T3 account settings successfully updated`, {
-        title: "Updated Account Settings",
+      toastManager.openToast('T3 account settings successfully updated', {
+        title: 'Updated Account Settings',
         autoHideDelay: 3000,
-        variant: "primary",
+        variant: 'primary',
         appendToast: true,
-        toaster: "ttt-toaster",
+        toaster: 'ttt-toaster',
         solid: true,
       });
     },

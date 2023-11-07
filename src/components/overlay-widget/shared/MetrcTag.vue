@@ -11,15 +11,15 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import { mapState } from "vuex";
-import router from "@/router/index";
-import store from "@/store/page-overlay/index";
-import DualColorTag from "@/components/overlay-widget/shared/DualColorTag.vue";
-import JsBarcode from "jsbarcode";
+import Vue from 'vue';
+import { mapState } from 'vuex';
+import router from '@/router/index';
+import store from '@/store/page-overlay/index';
+import DualColorTag from '@/components/overlay-widget/shared/DualColorTag.vue';
+import JsBarcode from 'jsbarcode';
 
 export default Vue.extend({
-  name: "MetrcTag",
+  name: 'MetrcTag',
   store,
   router,
   props: {
@@ -39,7 +39,7 @@ export default Vue.extend({
   async created() {},
   async mounted() {
     JsBarcode(`#barcode-${this.$props.label}`, this.$props.label, {
-      background: "transparent",
+      background: 'transparent',
       width: 1.3,
       height: 56,
       displayValue: false,

@@ -26,25 +26,25 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import { MutationType } from "@/mutation-types";
-import { IIndexedTagData, IPluginState } from "@/interfaces";
-import { MessageType, TagFilterIdentifiers, TagState } from "@/consts";
-import { analyticsManager } from "@/modules/analytics-manager.module";
-import { pageManager } from "@/modules/page-manager/page-manager.module";
-import { toastManager } from "@/modules/toast-manager.module";
-import { copyToClipboard } from "@/utils/dom";
-import { mapActions, mapState } from "vuex";
-import TagSearchResultsGroup from "@/components/search/tag-search/TagSearchResultsGroup.vue";
-import { searchManager } from "@/modules/search-manager.module";
-import { TagSearchActions } from "@/store/page-overlay/modules/tag-search/consts";
-import { timer } from "rxjs";
-import { SearchActions } from "@/store/page-overlay/modules/search/consts";
-import store from "@/store/page-overlay/index";
-import TagSearchFiltersVue from "./TagSearchFilters.vue";
+import Vue from 'vue';
+import { MutationType } from '@/mutation-types';
+import { IIndexedTagData, IPluginState } from '@/interfaces';
+import { MessageType, TagFilterIdentifiers, TagState } from '@/consts';
+import { analyticsManager } from '@/modules/analytics-manager.module';
+import { pageManager } from '@/modules/page-manager/page-manager.module';
+import { toastManager } from '@/modules/toast-manager.module';
+import { copyToClipboard } from '@/utils/dom';
+import { mapActions, mapState } from 'vuex';
+import TagSearchResultsGroup from '@/components/search/tag-search/TagSearchResultsGroup.vue';
+import { searchManager } from '@/modules/search-manager.module';
+import { TagSearchActions } from '@/store/page-overlay/modules/tag-search/consts';
+import { timer } from 'rxjs';
+import { SearchActions } from '@/store/page-overlay/modules/search/consts';
+import store from '@/store/page-overlay/index';
+import TagSearchFiltersVue from './TagSearchFilters.vue';
 
 export default Vue.extend({
-  name: "TagResultGroups",
+  name: 'TagResultGroups',
   props: {
     tags: Array as () => IIndexedTagData[],
   },

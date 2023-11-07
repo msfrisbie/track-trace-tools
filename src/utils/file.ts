@@ -1,5 +1,5 @@
-import { ITextFile } from "@/interfaces";
-import { timer } from "rxjs";
+import { ITextFile } from '@/interfaces';
+import { timer } from 'rxjs';
 
 export async function toBase64(file: File) {
   return new Promise((resolve, reject) => {
@@ -13,8 +13,8 @@ export async function toBase64(file: File) {
 export async function generateThumbnail(file: File): Promise<string> {
   // const scaleRatio = Math.min(100, 100) / Math.max(file.width, file.height)
   const reader = new FileReader();
-  const canvas = document.createElement("canvas");
-  const ctx = canvas.getContext("2d");
+  const canvas = document.createElement('canvas');
+  const ctx = canvas.getContext('2d');
 
   return new Promise((resolve, reject) => {
     reader.onload = function (event) {
@@ -26,7 +26,7 @@ export async function generateThumbnail(file: File): Promise<string> {
         canvas.width = w;
         canvas.height = h;
         ctx?.drawImage(img, 0, 0, w, h);
-        return resolve(canvas.toDataURL("image/png"));
+        return resolve(canvas.toDataURL('image/png'));
       };
       // @ts-ignore
       img.src = event.target.result;
@@ -56,14 +56,14 @@ export async function downloadTextFile({
 }) {
   const textContent = textFile.data;
 
-  const blob = new Blob([textContent], { type: "text/plain;charset=utf-8;" });
+  const blob = new Blob([textContent], { type: 'text/plain;charset=utf-8;' });
 
   // let encodedUri = encodeURI(fileData);
   const url = URL.createObjectURL(blob);
 
-  const link = document.createElement("a");
-  link.setAttribute("href", url);
-  link.setAttribute("download", textFile.filename);
+  const link = document.createElement('a');
+  link.setAttribute('href', url);
+  link.setAttribute('download', textFile.filename);
   document.body.appendChild(link); // Required for FF
 
   link.click(); // This will download the data file named "my_data.csv".

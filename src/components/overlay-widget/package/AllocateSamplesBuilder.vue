@@ -244,15 +244,15 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import { mapActions, mapGetters, mapState } from "vuex";
-import router from "@/router/index";
-import store from "@/store/page-overlay/index";
+import Vue from 'vue';
+import { mapActions, mapGetters, mapState } from 'vuex';
+import router from '@/router/index';
+import store from '@/store/page-overlay/index';
 import {
   EmployeeSamplesActions,
   EmployeeSamplesGetters,
   EmployeeSamplesState,
-} from "@/store/page-overlay/modules/employee-samples/consts";
+} from '@/store/page-overlay/modules/employee-samples/consts';
 import {
   IAdjustPackageReason,
   ICsvFile,
@@ -262,19 +262,19 @@ import {
   IPackageData,
   IPluginState,
   IUnitOfMeasure,
-} from "@/interfaces";
-import { builderManager } from "@/modules/builder-manager.module";
-import { buildCsvDataOrError, buildNamedCsvFileData, downloadCsvFile } from "@/utils/csv";
-import { submitDateFromIsodate, todayIsodate } from "@/utils/date";
-import { BuilderType, MessageType } from "@/consts";
-import { dynamicConstsManager } from "@/modules/dynamic-consts-manager.module";
-import { ISampleAllocation } from "@/store/page-overlay/modules/employee-samples/interfaces";
-import { analyticsManager } from "@/modules/analytics-manager.module";
-import { sum } from "lodash-es";
-import { downloadTextFile } from "@/utils/file";
+} from '@/interfaces';
+import { builderManager } from '@/modules/builder-manager.module';
+import { buildCsvDataOrError, buildNamedCsvFileData, downloadCsvFile } from '@/utils/csv';
+import { submitDateFromIsodate, todayIsodate } from '@/utils/date';
+import { BuilderType, MessageType } from '@/consts';
+import { dynamicConstsManager } from '@/modules/dynamic-consts-manager.module';
+import { ISampleAllocation } from '@/store/page-overlay/modules/employee-samples/interfaces';
+import { analyticsManager } from '@/modules/analytics-manager.module';
+import { sum } from 'lodash-es';
+import { downloadTextFile } from '@/utils/file';
 
 export default Vue.extend({
-  name: "AllocateSamplesBuilder",
+  name: 'AllocateSamplesBuilder',
   store,
   router,
   props: {},
@@ -330,7 +330,7 @@ export default Vue.extend({
           AdjustmentDate: submitDateFromIsodate(todayIsodate()),
           AdjustmentQuantity: (-1 * sampleAllocation.adjustmentQuantity).toString(),
           AdjustmentReasonId: adjustmentReasons
-            .find((x) => x.Name.includes("Trade Sample"))!
+            .find((x) => x.Name.includes('Trade Sample'))!
             .Id.toString(),
           Id: sampleAllocation.pkg.Id.toString(),
           AdjustmentUnitOfMeasureId: sampleAllocation.pkg.UnitOfMeasureId.toString(),
@@ -338,7 +338,7 @@ export default Vue.extend({
           CurrentQuantityUom: unitsOfMeasure.find(
             (x) => x.Id === sampleAllocation.pkg.UnitOfMeasureId
           )!.Name,
-          FinishDate: "",
+          FinishDate: '',
           NewQuantity: (
             sampleAllocation.pkg.Quantity - sampleAllocation.adjustmentQuantity
           ).toString(),
@@ -385,7 +385,7 @@ export default Vue.extend({
           {
             isVector: false,
             data: this.$data.adjustmentReasons.find((x: IAdjustPackageReason) =>
-              x.Name.includes("Trade Sample"))!.Name,
+              x.Name.includes('Trade Sample'))!.Name,
           },
           {
             isVector: true,

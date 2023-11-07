@@ -1,12 +1,12 @@
-import { IPluginState, ITagData } from "@/interfaces";
-import { todayIsodate } from "@/utils/date";
-import _ from "lodash-es";
-import { ActionContext } from "vuex";
+import { IPluginState, ITagData } from '@/interfaces';
+import { todayIsodate } from '@/utils/date';
+import _ from 'lodash-es';
+import { ActionContext } from 'vuex';
 import {
   PromoteImmaturePlantsBuilderActions,
   PromoteImmaturePlantsBuilderMutations,
-} from "./consts";
-import { IPromoteImmaturePlantsBuilderState } from "./interfaces";
+} from './consts';
+import { IPromoteImmaturePlantsBuilderState } from './interfaces';
 
 const inMemoryState = {
   selectedPlantBatches: [],
@@ -14,7 +14,7 @@ const inMemoryState = {
   totalPlantCount: 0,
   promoteData: [],
   plantTags: [],
-  patientLicenseNumber: "",
+  patientLicenseNumber: '',
   showTagPicker: false,
   growthIsodate: todayIsodate(),
   plantLocation: null,

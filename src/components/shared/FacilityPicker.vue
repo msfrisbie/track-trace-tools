@@ -85,34 +85,34 @@
 </template>
 
 <script lang="ts">
-import { MessageType } from "@/consts";
-import { IPageMetrcFacilityData } from "@/interfaces";
-import { analyticsManager } from "@/modules/analytics-manager.module";
-import { authManager } from "@/modules/auth-manager.module";
-import { facilityManager } from "@/modules/facility-manager.module";
-import { toastManager } from "@/modules/toast-manager.module";
-import store from "@/store/page-overlay/index";
-import { SettingsMutations } from "@/store/page-overlay/modules/settings/consts";
-import { copyToClipboard } from "@/utils/dom";
-import { getLicenseFromNameOrError } from "@/utils/facility";
-import { timer } from "rxjs";
-import Vue from "vue";
-import { mapState } from "vuex";
+import { MessageType } from '@/consts';
+import { IPageMetrcFacilityData } from '@/interfaces';
+import { analyticsManager } from '@/modules/analytics-manager.module';
+import { authManager } from '@/modules/auth-manager.module';
+import { facilityManager } from '@/modules/facility-manager.module';
+import { toastManager } from '@/modules/toast-manager.module';
+import store from '@/store/page-overlay/index';
+import { SettingsMutations } from '@/store/page-overlay/modules/settings/consts';
+import { copyToClipboard } from '@/utils/dom';
+import { getLicenseFromNameOrError } from '@/utils/facility';
+import { timer } from 'rxjs';
+import Vue from 'vue';
+import { mapState } from 'vuex';
 
 export default Vue.extend({
-  name: "FacilityPicker",
+  name: 'FacilityPicker',
   store,
   components: {},
   data() {
     return {
       activeFacilityName: null,
-      query: "",
+      query: '',
       facilities: [],
       identity: null,
     };
   },
   computed: {
-    ...mapState(["settings"]),
+    ...mapState(['settings']),
   },
   async mounted() {
     const authState = await authManager.authStateOrError();
@@ -125,7 +125,7 @@ export default Vue.extend({
   },
   methods: {
     clear() {
-      this.$data.query = "";
+      this.$data.query = '';
 
       this.focus();
     },
@@ -136,11 +136,11 @@ export default Vue.extend({
 
       timer(0).subscribe(() =>
         // @ts-ignore
-        this.$refs.typeahead.$el.querySelector("input").focus());
+        this.$refs.typeahead.$el.querySelector('input').focus());
     },
     blur() {
       // @ts-ignore
-      this.$refs.typeahead.$el.querySelector("input").blur();
+      this.$refs.typeahead.$el.querySelector('input').blur();
     },
     async updateFacilityList() {
       const authState = await authManager.authStateOrError();
@@ -170,11 +170,11 @@ export default Vue.extend({
     },
     openFacilityInNewTab(facility: IPageMetrcFacilityData) {
       // @ts-ignore
-      window.open(facility?.link, "_blank"); // .blur();
+      window.open(facility?.link, '_blank'); // .blur();
       // window.focus();
 
       analyticsManager.track(MessageType.FACILITY_PICKER_ENGAGEMENT, {
-        action: "openInNewTab",
+        action: 'openInNewTab',
         value: facility.name,
       });
     },
@@ -194,16 +194,16 @@ export default Vue.extend({
       });
 
       toastManager.openToast(`'${license}' copied to clipboard`, {
-        title: "Copied License",
+        title: 'Copied License',
         autoHideDelay: 5000,
-        variant: "primary",
+        variant: 'primary',
         appendToast: true,
-        toaster: "ttt-toaster",
+        toaster: 'ttt-toaster',
         solid: true,
       });
 
       analyticsManager.track(MessageType.FACILITY_PICKER_ENGAGEMENT, {
-        action: "copyToClipboard",
+        action: 'copyToClipboard',
         value: license,
       });
     },
@@ -218,16 +218,16 @@ export default Vue.extend({
       this.updateFacilityList();
 
       toastManager.openToast(`Set your pinned facility to ${license}.`, {
-        title: "Pinned Facility",
+        title: 'Pinned Facility',
         autoHideDelay: 5000,
-        variant: "primary",
+        variant: 'primary',
         appendToast: true,
-        toaster: "ttt-toaster",
+        toaster: 'ttt-toaster',
         solid: true,
       });
 
       analyticsManager.track(MessageType.FACILITY_PICKER_ENGAGEMENT, {
-        action: "setHomeLicense",
+        action: 'setHomeLicense',
         value: license,
       });
     },
@@ -236,17 +236,17 @@ export default Vue.extend({
 
       this.updateFacilityList();
 
-      toastManager.openToast(`Pinned facility was removed.`, {
-        title: "Unpinned Facility",
+      toastManager.openToast('Pinned facility was removed.', {
+        title: 'Unpinned Facility',
         autoHideDelay: 5000,
-        variant: "primary",
+        variant: 'primary',
         appendToast: true,
-        toaster: "ttt-toaster",
+        toaster: 'ttt-toaster',
         solid: true,
       });
 
       analyticsManager.track(MessageType.FACILITY_PICKER_ENGAGEMENT, {
-        action: "setHomeLicense",
+        action: 'setHomeLicense',
         value: null,
       });
     },

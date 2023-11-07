@@ -1,7 +1,7 @@
-import { IAtomicService } from "@/interfaces";
-import { customAxios } from "@/modules/fetch-manager.module";
-import * as Sentry from "@sentry/browser";
-import { timer } from "rxjs";
+import { IAtomicService } from '@/interfaces';
+import { customAxios } from '@/modules/fetch-manager.module';
+import * as Sentry from '@sentry/browser';
+import { timer } from 'rxjs';
 
 /**
  * This module was used to re-run the JavaScript needed for quick package/transfer/tpl
@@ -35,26 +35,26 @@ function localModalForm(
   if (metrc.kendo.modalWindowOpened) return null;
   metrc.kendo.modalWindowOpened = true;
 
-  title = title || "";
+  title = title || '';
   // formUrl = formUrl || '';
   formQuery = formQuery || {};
-  formSelector = formSelector || "form";
-  submitUrl = submitUrl || "";
+  formSelector = formSelector || 'form';
+  submitUrl = submitUrl || '';
   success = success || function () {};
-  requestType = requestType || "GET";
+  requestType = requestType || 'GET';
 
   const usingSpinner = metrc.startSpinner();
-  const $element = metrc.$(document.createElement("div"));
+  const $element = metrc.$(document.createElement('div'));
   const destroyModalWindow = function () {
     setTimeout(() => {
-      $element.data("kendoWindow").destroy();
+      $element.data('kendoWindow').destroy();
     }, 1000);
     delete metrc.kendo.modalWindowOpened;
   };
 
   $element.kendoWindow({
     // config
-    actions: ["Close"],
+    actions: ['Close'],
     draggable: true,
     modal: true,
     resizable: false,
@@ -68,8 +68,8 @@ function localModalForm(
 
       metrc
         .$(formSelector)
-        .find("input[type=text]:not([readonly]),select,textarea:not([readonly])")
-        .filter(":visible:enabled:first")
+        .find('input[type=text]:not([readonly]),select,textarea:not([readonly])')
+        .filter(':visible:enabled:first')
         .focus(); // Set focus to first enabled and visible input in form
     },
     close: destroyModalWindow,
@@ -83,26 +83,26 @@ function localModalForm(
     },
   });
 
-  const kWindow = $element.data("kendoWindow");
+  const kWindow = $element.data('kendoWindow');
 
   $element.html(formContent);
 
   $element.find(formSelector).metrcActivateAjaxForm({
     url: submitUrl,
-    type: "POST",
+    type: 'POST',
     success(e: any) {
       kWindow.close();
       if ($grid instanceof Array) {
         for (let i = 0, icnt = $grid.length; i < icnt; i++) {
-          $grid[i].data("kendoGrid").dataSource.read();
+          $grid[i].data('kendoGrid').dataSource.read();
         }
       } else if ($grid) {
-        $grid.data("kendoGrid").dataSource.read();
+        $grid.data('kendoGrid').dataSource.read();
       }
       success(e);
     },
   });
-  $element.find("#cancel").click(() => kWindow.close());
+  $element.find('#cancel').click(() => kWindow.close());
 
   kWindow.center();
   kWindow.open();
@@ -120,7 +120,7 @@ class ScriptContextManager implements IAtomicService {
   constructor() {
     this._metrcPromise = new Promise((resolve, reject) => {
       // If script context cant be acquired in 30s, timeout
-      const id = setTimeout(() => reject("Script context timed out"), 30000);
+      const id = setTimeout(() => reject('Script context timed out'), 30000);
 
       this._metrcResolver = (metrc: any) => {
         clearTimeout(id);
@@ -134,7 +134,7 @@ class ScriptContextManager implements IAtomicService {
     });
 
     this._metrcPromise.catch((e) => {
-      console.error("Failed to send message to background:", e);
+      console.error('Failed to send message to background:', e);
 
       Sentry.captureException(e);
     });
@@ -146,7 +146,7 @@ class ScriptContextManager implements IAtomicService {
     await timer(2000).toPromise();
 
     const staticAssetPaths = [];
-    const scriptTags = document.querySelectorAll("script");
+    const scriptTags = document.querySelectorAll('script');
     let authTag = null;
 
     // Override AJAX nonce
@@ -157,15 +157,15 @@ class ScriptContextManager implements IAtomicService {
 
     for (let i = 0; i < scriptTags.length; ++i) {
       const scriptTag = scriptTags[i];
-      const srcAttr = scriptTag.getAttribute("src");
+      const srcAttr = scriptTag.getAttribute('src');
 
       if (!srcAttr) {
         const inlineScriptText = scriptTag.innerText;
 
-        if (inlineScriptText.indexOf("ApiVerificationToken") > -1) {
+        if (inlineScriptText.indexOf('ApiVerificationToken') > -1) {
           authTag = scriptTag;
         }
-      } else if (srcAttr && srcAttr.startsWith("/Public")) {
+      } else if (srcAttr && srcAttr.startsWith('/Public')) {
         staticAssetPaths.push(srcAttr);
       }
     }
@@ -178,7 +178,7 @@ class ScriptContextManager implements IAtomicService {
       try {
         response = await customAxios(window.location.origin + path, {});
       } catch (e) {
-        console.error("Static asset fetch error:", e);
+        console.error('Static asset fetch error:', e);
         throw e;
       }
 
@@ -186,7 +186,7 @@ class ScriptContextManager implements IAtomicService {
         // Angular throws some bullshit error, its Metrc's fault
         // eval(await response.data);
       } catch (e) {
-        console.error("Static asset eval error:", e);
+        console.error('Static asset eval error:', e);
       }
     }
 
@@ -196,7 +196,7 @@ class ScriptContextManager implements IAtomicService {
         // This loads the authentication data into the local metrc JS objects
         // eval(authTag.innerText);
       } catch (e) {
-        console.error("authTag eval error:", e);
+        console.error('authTag eval error:', e);
         throw e;
       }
     }
@@ -210,7 +210,7 @@ class ScriptContextManager implements IAtomicService {
       // @ts-ignore
       this._metrcResolver(window.metrc);
     } else {
-      this._metrcRejecter("No metrc kendo present");
+      this._metrcRejecter('No metrc kendo present');
     }
   }
 

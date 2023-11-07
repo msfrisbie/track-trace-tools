@@ -30,14 +30,14 @@
 </template>
 
 <script lang="ts">
-import OAuthLogin from "@/components/shared/OAuthLogin.vue";
-import router from "@/router/index";
-import store from "@/store/page-overlay/index";
-import Vue from "vue";
-import { mapState } from "vuex";
+import OAuthLogin from '@/components/shared/OAuthLogin.vue';
+import router from '@/router/index';
+import store from '@/store/page-overlay/index';
+import Vue from 'vue';
+import { mapState } from 'vuex';
 
 export default Vue.extend({
-  name: "GoogleSheets",
+  name: 'GoogleSheets',
   store,
   router,
   props: {

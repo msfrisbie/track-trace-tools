@@ -1,24 +1,24 @@
-import { PackageState } from "@/consts";
-import { IIndexedPackageData, IMetrcEmployeeData, IPluginState } from "@/interfaces";
-import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
-import { LRU } from "@/utils/cache";
-import { getIsoDateFromOffset, isWeekend, normalizeIsodate } from "@/utils/date";
+import { PackageState } from '@/consts';
+import { IIndexedPackageData, IMetrcEmployeeData, IPluginState } from '@/interfaces';
+import { primaryDataLoader } from '@/modules/data-loader/data-loader.module';
+import { LRU } from '@/utils/cache';
+import { getIsoDateFromOffset, isWeekend, normalizeIsodate } from '@/utils/date';
 import {
   canEmployeeAcceptSample,
   getAllocatedSamplesFromPackageHistoryOrError,
   getEstimatedNumberOfSamplesRemaining,
   getSampleAllocationFromAllocationDataOrNull,
   toNormalizedAllocationQuantity,
-} from "@/utils/employee";
-import { v4 as uuidv4 } from "uuid";
-import { ActionContext } from "vuex";
+} from '@/utils/employee';
+import { v4 as uuidv4 } from 'uuid';
+import { ActionContext } from 'vuex';
 import {
   EmployeeSamplesActions,
   EmployeeSamplesGetters,
   EmployeeSamplesMutations,
   EmployeeSamplesState,
-} from "./consts";
-import { IEmployeeSamplesState, IHistoryAllocationData } from "./interfaces";
+} from './consts';
+import { IEmployeeSamplesState, IHistoryAllocationData } from './interfaces';
 
 const inMemoryState = {
   toolState: EmployeeSamplesState.INITIAL,
@@ -32,7 +32,7 @@ const inMemoryState = {
   pendingAllocationBuffer: [],
   pendingAllocationBufferIds: [],
   daysInRange: 0,
-  stateMessage: "",
+  stateMessage: '',
 };
 
 const persistedState = {};
@@ -148,7 +148,7 @@ export const employeeSamplesModule = {
         await Promise.allSettled(promises);
 
         // Only consider packages recieved from a separate facility
-        packages = packages.filter((pkg) => (pkg.ReceivedFromManifestNumber ?? "").length > 0);
+        packages = packages.filter((pkg) => (pkg.ReceivedFromManifestNumber ?? '').length > 0);
 
         ctx.state.employees = employees;
         ctx.state.selectedEmployeeIds = employees.map((x) => x.Id);
@@ -185,11 +185,11 @@ export const employeeSamplesModule = {
         await Promise.allSettled(promises);
 
         if (ctx.state.employees.length === 0) {
-          throw new Error("Zero employees found");
+          throw new Error('Zero employees found');
         }
 
         if (ctx.state.availableSamplePackages.length === 0) {
-          throw new Error("Zero sample packages found");
+          throw new Error('Zero sample packages found');
         }
 
         ctx.state.toolState = EmployeeSamplesState.IDLE;
@@ -250,7 +250,7 @@ export const employeeSamplesModule = {
         await new Promise((resolve) => setTimeout(resolve, 300));
 
         if (!ctx.state.modifiedSamplePackages.length) {
-          console.error("Zero allocations");
+          console.error('Zero allocations');
         }
 
         ctx.state.availableSamples = [];
@@ -279,7 +279,7 @@ export const employeeSamplesModule = {
         const allocationDataList: IHistoryAllocationData[] = [];
 
         if (ctx.state.modifiedSamplePackages.length === 0) {
-          console.log("Zero modified packages");
+          console.log('Zero modified packages');
         }
 
         // Parse package history to determine previous allocations
@@ -313,7 +313,7 @@ export const employeeSamplesModule = {
           );
 
           if (!allocation) {
-            console.error(`Unable to generate allocation`);
+            console.error('Unable to generate allocation');
             continue;
           }
 

@@ -92,49 +92,49 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import store from "@/store/page-overlay/index";
-import { mapState } from "vuex";
-import BuilderStepHeader from "@/components/overlay-widget/shared/BuilderStepHeader.vue";
-import { isValidTag, generateTagRangeOrError, getTagFromOffset } from "@/utils/tags";
-import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
+import Vue from 'vue';
+import store from '@/store/page-overlay/index';
+import { mapState } from 'vuex';
+import BuilderStepHeader from '@/components/overlay-widget/shared/BuilderStepHeader.vue';
+import { isValidTag, generateTagRangeOrError, getTagFromOffset } from '@/utils/tags';
+import { primaryDataLoader } from '@/modules/data-loader/data-loader.module';
 import {
   combineLatest, from, Subject, timer
-} from "rxjs";
+} from 'rxjs';
 import {
   debounceTime, distinctUntilChanged, filter, startWith, tap
-} from "rxjs/operators";
+} from 'rxjs/operators';
 import {
   IPackageData,
   IPlantFilter,
   ICsvFile,
   ILocationData,
   IMetrcFinishPackagesPayload
-} from "@/interfaces";
-import { downloadCsvFile, buildCsvDataOrError, buildNamedCsvFileData } from "@/utils/csv";
-import { todayIsodate, submitDateFromIsodate } from "@/utils/date";
-import { primaryMetrcRequestManager } from "@/modules/metrc-request-manager.module";
-import { authManager } from "@/modules/auth-manager.module";
+} from '@/interfaces';
+import { downloadCsvFile, buildCsvDataOrError, buildNamedCsvFileData } from '@/utils/csv';
+import { todayIsodate, submitDateFromIsodate } from '@/utils/date';
+import { primaryMetrcRequestManager } from '@/modules/metrc-request-manager.module';
+import { authManager } from '@/modules/auth-manager.module';
 import {
   BuilderType,
   MessageType,
   PLANTABLE_ITEM_CATEGORY_NAMES,
   PLANT_BATCH_TYPES
-} from "@/consts";
-import { analyticsManager } from "@/modules/analytics-manager.module";
-import { builderManager } from "@/modules/builder-manager.module";
-import PackagePicker from "@/components/overlay-widget/shared/PackagePicker.vue";
-import LocationPicker from "@/components/overlay-widget/shared/LocationPicker.vue";
-import StrainPicker from "@/components/overlay-widget/shared/StrainPicker.vue";
-import TagPicker from "@/components/overlay-widget/shared/TagPicker.vue";
-import ItemPicker from "@/components/overlay-widget/shared/ItemPicker.vue";
-import PickerCard from "@/components/overlay-widget/shared/PickerCard.vue";
-import { allocatePackageQuantities } from "@/utils/misc";
-import { dynamicConstsManager } from "@/modules/dynamic-consts-manager.module";
-import { safeZip } from "@/utils/array";
+} from '@/consts';
+import { analyticsManager } from '@/modules/analytics-manager.module';
+import { builderManager } from '@/modules/builder-manager.module';
+import PackagePicker from '@/components/overlay-widget/shared/PackagePicker.vue';
+import LocationPicker from '@/components/overlay-widget/shared/LocationPicker.vue';
+import StrainPicker from '@/components/overlay-widget/shared/StrainPicker.vue';
+import TagPicker from '@/components/overlay-widget/shared/TagPicker.vue';
+import ItemPicker from '@/components/overlay-widget/shared/ItemPicker.vue';
+import PickerCard from '@/components/overlay-widget/shared/PickerCard.vue';
+import { allocatePackageQuantities } from '@/utils/misc';
+import { dynamicConstsManager } from '@/modules/dynamic-consts-manager.module';
+import { safeZip } from '@/utils/array';
 
 export default Vue.extend({
-  name: "FinishPackagesBuilder",
+  name: 'FinishPackagesBuilder',
   store,
   components: {
     BuilderStepHeader,
@@ -218,13 +218,13 @@ export default Vue.extend({
       showHiddenDetailFields: false,
       steps: [
         {
-          stepText: "Select empty packages to finish"
+          stepText: 'Select empty packages to finish'
         },
         {
-          stepText: "Finish details"
+          stepText: 'Finish details'
         },
         {
-          stepText: "Submit"
+          stepText: 'Submit'
         }
       ]
     };

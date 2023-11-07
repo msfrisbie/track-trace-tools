@@ -114,19 +114,19 @@
 </template>
 
 <script lang="ts">
-import PackageSearchResultsGroup from "@/components/search/package-search/PackageSearchResultsGroup.vue";
-import { MessageType } from "@/consts";
-import { IIndexedPackageData, IPluginState } from "@/interfaces";
-import { analyticsManager } from "@/modules/analytics-manager.module";
-import { pageManager } from "@/modules/page-manager/page-manager.module";
-import { PackageSearchActions } from "@/store/page-overlay/modules/package-search/consts";
-import { SearchActions } from "@/store/page-overlay/modules/search/consts";
-import Vue from "vue";
-import { mapActions, mapState } from "vuex";
-import store from "@/store/page-overlay/index";
+import PackageSearchResultsGroup from '@/components/search/package-search/PackageSearchResultsGroup.vue';
+import { MessageType } from '@/consts';
+import { IIndexedPackageData, IPluginState } from '@/interfaces';
+import { analyticsManager } from '@/modules/analytics-manager.module';
+import { pageManager } from '@/modules/page-manager/page-manager.module';
+import { PackageSearchActions } from '@/store/page-overlay/modules/package-search/consts';
+import { SearchActions } from '@/store/page-overlay/modules/search/consts';
+import Vue from 'vue';
+import { mapActions, mapState } from 'vuex';
+import store from '@/store/page-overlay/index';
 
 export default Vue.extend({
-  name: "PackageResultGroups",
+  name: 'PackageResultGroups',
   props: {
     packages: Array as () => IIndexedPackageData[],
   },

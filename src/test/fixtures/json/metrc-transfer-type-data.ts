@@ -1,19 +1,19 @@
-import { IMetrcTransferType } from "@/interfaces";
+import { IMetrcTransferType } from '@/interfaces';
 
 export const data: IMetrcTransferType = {
   Id: 111,
-  Name: "Wholesale Manifest",
-  TransactionType: "Wholesale",
-  TransactionTypeName: "Wholesale",
+  Name: 'Wholesale Manifest',
+  TransactionType: 'Wholesale',
+  TransactionTypeName: 'Wholesale',
   ForLicensedShipments: true,
   ForExternalIncomingShipments: true,
   ShipperLicenseNumberFieldEnabled: true,
-  ShipperLicenseNumberFieldLabel: "Origin Temp. Lic. No.",
+  ShipperLicenseNumberFieldLabel: 'Origin Temp. Lic. No.',
   ShipperLicenseNameFieldEnabled: true,
   ShipperAddressFieldsEnabled: true,
   ForExternalOutgoingShipments: true,
   RecipientLicenseNumberFieldEnabled: true,
-  RecipientLicenseNumberFieldLabel: "Destination Temp. Lic. No.",
+  RecipientLicenseNumberFieldLabel: 'Destination Temp. Lic. No.',
   RecipientLicenseNameFieldEnabled: true,
   RecipientAddressFieldsEnabled: true,
   TransporterFieldsEnabled: true,
@@ -24,7 +24,7 @@ export const data: IMetrcTransferType = {
   FacilityTypes: [
     {
       FacilityTypeId: 209,
-      FacilityTypeName: "Cannabis - Microbusiness License",
+      FacilityTypeName: 'Cannabis - Microbusiness License',
     },
   ],
 };

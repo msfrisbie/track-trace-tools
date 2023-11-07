@@ -70,28 +70,28 @@
 </template>
 
 <script lang="ts">
-import { MessageType, TaskType } from "@/consts";
+import { MessageType, TaskType } from '@/consts';
 import {
   IContactInfo,
   IExtractedITagOrderData,
   IReorderTagsFormData,
   ITagOrderData,
-} from "@/interfaces";
-import { analyticsManager } from "@/modules/analytics-manager.module";
-import { authManager } from "@/modules/auth-manager.module";
-import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
-import { MutationType } from "@/mutation-types";
-import store from "@/store/page-overlay/index";
-import { extractIContactInfoFromITagOrderData } from "@/utils/address";
-import { createTask } from "@/utils/tasks";
-import Vue from "vue";
-import { mapState } from "vuex";
+} from '@/interfaces';
+import { analyticsManager } from '@/modules/analytics-manager.module';
+import { authManager } from '@/modules/auth-manager.module';
+import { primaryDataLoader } from '@/modules/data-loader/data-loader.module';
+import { MutationType } from '@/mutation-types';
+import store from '@/store/page-overlay/index';
+import { extractIContactInfoFromITagOrderData } from '@/utils/address';
+import { createTask } from '@/utils/tasks';
+import Vue from 'vue';
+import { mapState } from 'vuex';
 
 export default Vue.extend({
-  name: "ReorderTagsForm",
+  name: 'ReorderTagsForm',
   store,
   computed: {
-    ...mapState(["currentView"]),
+    ...mapState(['currentView']),
   },
   async mounted() {
     await authManager.authStateOrError();
@@ -102,8 +102,7 @@ export default Vue.extend({
       this.contactInfos.push(extractIContactInfoFromITagOrderData(previousTagOrder));
     }
 
-    const tagOrderData: IExtractedITagOrderData =
-      await primaryDataLoader.getExtractedITagOrderModalData();
+    const tagOrderData: IExtractedITagOrderData = await primaryDataLoader.getExtractedITagOrderModalData();
 
     // We aggregate multiple addresses, but the 0th one in this array is the most recent order
     this.contactInfos.push(tagOrderData.contactInfo);
@@ -133,14 +132,14 @@ export default Vue.extend({
         plantTagCount: 0,
         packageTagCount: 0,
         contactInfo: {
-          contactName: "",
-          phoneNumber: "",
+          contactName: '',
+          phoneNumber: '',
           address: {
-            address1: "",
-            address2: "",
-            city: "",
-            state: "",
-            zip: "",
+            address1: '',
+            address2: '',
+            city: '',
+            state: '',
+            zip: '',
           },
         },
       },
@@ -151,7 +150,7 @@ export default Vue.extend({
       evt.preventDefault();
 
       /* eslint-disable-next-line no-alert */
-      if (!window.confirm("Are you sure you wish to place this tag order?")) {
+      if (!window.confirm('Are you sure you wish to place this tag order?')) {
         return;
       }
 

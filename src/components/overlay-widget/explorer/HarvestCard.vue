@@ -34,18 +34,18 @@
 </template>
 
 <script lang="ts">
-import PickerCard from "@/components/overlay-widget/shared/PickerCard.vue";
-import PickerIcon from "@/components/overlay-widget/shared/PickerIcon.vue";
-import { HarvestState, TransferState } from "@/consts";
-import { IIndexedHarvestData, IIndexedTransferData } from "@/interfaces";
-import router from "@/router/index";
-import store from "@/store/page-overlay/index";
-import { unitOfMeasureNameToAbbreviation } from "@/utils/units";
-import Vue from "vue";
-import { mapState } from "vuex";
+import PickerCard from '@/components/overlay-widget/shared/PickerCard.vue';
+import PickerIcon from '@/components/overlay-widget/shared/PickerIcon.vue';
+import { HarvestState, TransferState } from '@/consts';
+import { IIndexedHarvestData, IIndexedTransferData } from '@/interfaces';
+import router from '@/router/index';
+import store from '@/store/page-overlay/index';
+import { unitOfMeasureNameToAbbreviation } from '@/utils/units';
+import Vue from 'vue';
+import { mapState } from 'vuex';
 
 export default Vue.extend({
-  name: "HarvestCard",
+  name: 'HarvestCard',
   store,
   router,
   props: {
@@ -66,11 +66,11 @@ export default Vue.extend({
     getBadgeVariant(harvestState: HarvestState): string {
       switch (harvestState) {
         case HarvestState.ACTIVE:
-          return "success";
+          return 'success';
         case HarvestState.INACTIVE:
-          return "danger";
+          return 'danger';
         default:
-          return "light";
+          return 'light';
       }
     },
   },

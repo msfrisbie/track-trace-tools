@@ -34,20 +34,20 @@
 </template>
 
 <script lang="ts">
-import GoogleMaps from "@/components/shared/GoogleMaps.vue";
-import { MessageType } from "@/consts";
-import { analyticsManager } from "@/modules/analytics-manager.module";
-import store from "@/store/page-overlay/index";
-import { TransferBuilderActions } from "@/store/page-overlay/modules/transfer-builder/consts";
-import { debugLogFactory } from "@/utils/debug";
-import { extractTextDirections, IGoogleMapsDirections, isStubAddress } from "@/utils/google-maps";
-import _ from "lodash-es";
-import Vue from "vue";
+import GoogleMaps from '@/components/shared/GoogleMaps.vue';
+import { MessageType } from '@/consts';
+import { analyticsManager } from '@/modules/analytics-manager.module';
+import store from '@/store/page-overlay/index';
+import { TransferBuilderActions } from '@/store/page-overlay/modules/transfer-builder/consts';
+import { debugLogFactory } from '@/utils/debug';
+import { extractTextDirections, IGoogleMapsDirections, isStubAddress } from '@/utils/google-maps';
+import _ from 'lodash-es';
+import Vue from 'vue';
 
-const debugLog = debugLogFactory("RoutePicker.vue");
+const debugLog = debugLogFactory('RoutePicker.vue');
 
 export default Vue.extend({
-  name: "RoutePicker",
+  name: 'RoutePicker',
   // TODO adding props causes a typescript store error.
   // adding an entry to shims-vue.d.ts caues a different error.
   props: {
@@ -127,7 +127,7 @@ export default Vue.extend({
       }
 
       analyticsManager.track(MessageType.BUILDER_EVENT, {
-        action: `Started update directions`,
+        action: 'Started update directions',
       });
 
       _this.$data.showMapsIframe = true;
@@ -140,17 +140,17 @@ export default Vue.extend({
         // );
       } catch (e) {
         analyticsManager.track(MessageType.BUILDER_EVENT, {
-          action: `Failed to load directions`,
+          action: 'Failed to load directions',
         });
       }
 
       _this.$data.directionDataLoading = false;
 
       if (!response || !response.valid) {
-        debugLog(async () => ["directions response", response]);
+        debugLog(async () => ['directions response', response]);
 
         analyticsManager.track(MessageType.BUILDER_EVENT, {
-          action: `Directions response was invalid`,
+          action: 'Directions response was invalid',
         });
 
         return;
@@ -162,7 +162,7 @@ export default Vue.extend({
       _this.plannedRoute = extractTextDirections(directions[0]);
 
       analyticsManager.track(MessageType.BUILDER_EVENT, {
-        action: `Received directions response`,
+        action: 'Received directions response',
         directionsResponse: response,
       });
     }, 500),

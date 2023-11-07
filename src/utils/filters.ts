@@ -1,4 +1,4 @@
-import { IClientItemFilters, IItemData } from "@/interfaces";
+import { IClientItemFilters, IItemData } from '@/interfaces';
 
 export function itemMatchesFilters(item: IItemData, itemFilters: IClientItemFilters): boolean {
   if (itemFilters.itemCategory) {

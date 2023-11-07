@@ -3,19 +3,19 @@ import {
   IPackageData,
   IPluginState,
   IUnionIndexedPackageData,
-} from "@/interfaces";
-import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
-import { dynamicConstsManager } from "@/modules/dynamic-consts-manager.module";
-import { toastManager } from "@/modules/toast-manager.module";
-import { todayIsodate } from "@/utils/date";
-import { getLabelOrError } from "@/utils/package";
+} from '@/interfaces';
+import { primaryDataLoader } from '@/modules/data-loader/data-loader.module';
+import { dynamicConstsManager } from '@/modules/dynamic-consts-manager.module';
+import { toastManager } from '@/modules/toast-manager.module';
+import { todayIsodate } from '@/utils/date';
+import { getLabelOrError } from '@/utils/package';
 // import { getActiveTransferPackageListOrNull } from "@/utils/transfer";
-import _ from "lodash-es";
-import { ActionContext } from "vuex";
-import { BuilderType, MessageType } from "../../../../consts";
-import { analyticsManager } from "../../../../modules/analytics-manager.module";
-import { TransferBuilderActions, TransferBuilderGetters, TransferBuilderMutations } from "./consts";
-import { DriverLayoverLeg, ITransferBuilderState, ITransferBuilderUpdateData } from "./interfaces";
+import _ from 'lodash-es';
+import { ActionContext } from 'vuex';
+import { BuilderType, MessageType } from '../../../../consts';
+import { analyticsManager } from '../../../../modules/analytics-manager.module';
+import { TransferBuilderActions, TransferBuilderGetters, TransferBuilderMutations } from './consts';
+import { DriverLayoverLeg, ITransferBuilderState, ITransferBuilderUpdateData } from './interfaces';
 
 const inMemoryState = {
   originFacility: null,
@@ -28,22 +28,22 @@ const inMemoryState = {
   destinationGrossWeight: null,
   destinationGrossUnitOfWeight: null,
   departureIsodate: todayIsodate(),
-  departureIsotime: "10:00:00.000",
+  departureIsotime: '10:00:00.000',
   arrivalIsodate: todayIsodate(),
-  arrivalIsotime: "14:00:00.000",
+  arrivalIsotime: '14:00:00.000',
   layoverCheckInIsodate: todayIsodate(),
-  layoverCheckInIsotime: "10:00:00.000",
+  layoverCheckInIsotime: '10:00:00.000',
   layoverCheckOutIsodate: todayIsodate(),
-  layoverCheckOutIsotime: "14:00:00.000",
-  plannedRoute: "",
-  driverName: "",
-  driverEmployeeId: "",
-  driverLicenseNumber: "",
-  driverLayoverLeg: "FromAndToLayover" as DriverLayoverLeg,
-  vehicleMake: "",
-  vehicleModel: "",
-  vehicleLicensePlate: "",
-  phoneNumberForQuestions: "",
+  layoverCheckOutIsotime: '14:00:00.000',
+  plannedRoute: '',
+  driverName: '',
+  driverEmployeeId: '',
+  driverLicenseNumber: '',
+  driverLayoverLeg: 'FromAndToLayover' as DriverLayoverLeg,
+  vehicleMake: '',
+  vehicleModel: '',
+  vehicleLicensePlate: '',
+  phoneNumberForQuestions: '',
   isSameSiteTransfer: false,
   isLayover: false,
   transferForUpdate: null,
@@ -69,7 +69,7 @@ export const transferBuilderModule = {
       }: { license: string; identity: string; pkg: IUnionIndexedPackageData }
     ) {
       if (!identity || !license) {
-        throw new Error("Missing identity/license");
+        throw new Error('Missing identity/license');
       }
 
       // let currentList = getActiveTransferPackageListOrNull({ state, identity, license });
@@ -200,7 +200,7 @@ export const transferBuilderModule = {
       (state: ITransferBuilderState, getters: any, rootState: any, rootGetters: any) =>
         ({ pkg }: { pkg: IUnionIndexedPackageData }): boolean => {
           if (!rootGetters.authState) {
-            throw new Error("Missing identity/license");
+            throw new Error('Missing identity/license');
           }
 
           // const { identity, license } = rootGetters.authState;
@@ -226,7 +226,7 @@ export const transferBuilderModule = {
 
       analyticsManager.track(MessageType.BUILDER_EVENT, {
         builder: BuilderType.CREATE_TRANSFER,
-        action: `Added a package to transfer list`,
+        action: 'Added a package to transfer list',
         pkg,
       });
     },
@@ -240,7 +240,7 @@ export const transferBuilderModule = {
 
       analyticsManager.track(MessageType.BUILDER_EVENT, {
         builder: BuilderType.CREATE_TRANSFER,
-        action: `Removed a package from the transfer list`,
+        action: 'Removed a package from the transfer list',
         pkg,
       });
     },
@@ -275,7 +275,7 @@ export const transferBuilderModule = {
 
       analyticsManager.track(MessageType.BUILDER_EVENT, {
         builder: BuilderType.CREATE_TRANSFER,
-        action: `Finished resetting packages`,
+        action: 'Finished resetting packages',
       });
     },
     [TransferBuilderActions.UPDATE_TRANSFER_DATA]: async (
@@ -286,7 +286,7 @@ export const transferBuilderModule = {
 
       analyticsManager.track(MessageType.BUILDER_EVENT, {
         builder: BuilderType.CREATE_TRANSFER,
-        action: `Update transfer data`,
+        action: 'Update transfer data',
         payload,
       });
     },
@@ -317,18 +317,17 @@ export const transferBuilderModule = {
       const transporterDetails = await primaryDataLoader.transferTransporterDetails(
         transferForUpdate.Id
       );
-      const transporterDetail =
-        transporterDetails.length > 0 ? transporterDetails[transporterDetails.length - 1] : null;
+      const transporterDetail = transporterDetails.length > 0 ? transporterDetails[transporterDetails.length - 1] : null;
 
       if (destinations.length > 1) {
         toastManager.openToast(
           `Unable to populate transfer data: ${destinations.length} destinations found`,
           {
-            title: "Edit Transfer Error",
+            title: 'Edit Transfer Error',
             autoHideDelay: 10000,
-            variant: "danger",
+            variant: 'danger',
             appendToast: true,
-            toaster: "ttt-toaster",
+            toaster: 'ttt-toaster',
             solid: true,
           }
         );
@@ -346,11 +345,11 @@ export const transferBuilderModule = {
         toastManager.openToast(
           `Unable to populate transfer data: ${transporters.length} transporters found`,
           {
-            title: "Edit Transfer Error",
+            title: 'Edit Transfer Error',
             autoHideDelay: 10000,
-            variant: "danger",
+            variant: 'danger',
             appendToast: true,
-            toaster: "ttt-toaster",
+            toaster: 'ttt-toaster',
             solid: true,
           }
         );
@@ -375,19 +374,18 @@ export const transferBuilderModule = {
       const isLayover = !!transporterDetail?.DriverLayoverLeg;
 
       const [departureIsodate, departureIsotime] = destination?.EstimatedDepartureDateTime
-        ? destination.EstimatedDepartureDateTime.split("T")
+        ? destination.EstimatedDepartureDateTime.split('T')
         : [undefined, undefined];
       const [arrivalIsodate, arrivalIsotime] = destination?.EstimatedArrivalDateTime
-        ? destination.EstimatedArrivalDateTime.split("T")
+        ? destination.EstimatedArrivalDateTime.split('T')
         : [undefined, undefined];
 
       const [layoverCheckInIsodate, layoverCheckInIsotime] = transporter?.EstimatedArrivalDateTime
-        ? transporter.EstimatedArrivalDateTime.split("T")
+        ? transporter.EstimatedArrivalDateTime.split('T')
         : [undefined, undefined];
-      const [layoverCheckOutIsodate, layoverCheckOutIsotime] =
-        transporter?.EstimatedDepartureDateTime
-          ? transporter.EstimatedDepartureDateTime.split("T")
-          : [undefined, undefined];
+      const [layoverCheckOutIsodate, layoverCheckOutIsotime] = transporter?.EstimatedDepartureDateTime
+        ? transporter.EstimatedDepartureDateTime.split('T')
+        : [undefined, undefined];
 
       const destinationPackages = destination
         ? await primaryDataLoader.destinationPackages(destination.Id)
@@ -431,7 +429,7 @@ export const transferBuilderModule = {
         driverName: transporterDetail?.DriverName,
         driverEmployeeId: transporterDetail?.DriverOccupationalLicenseNumber,
         driverLicenseNumber: transporterDetail?.DriverVehicleLicenseNumber,
-        driverLayoverLeg: transporterDetail?.DriverLayoverLeg ?? ("" as DriverLayoverLeg),
+        driverLayoverLeg: transporterDetail?.DriverLayoverLeg ?? ('' as DriverLayoverLeg),
         vehicleMake: transporterDetail?.VehicleMake,
         vehicleModel: transporterDetail?.VehicleModel,
         vehicleLicensePlate: transporterDetail?.VehicleLicensePlateNumber,
@@ -449,7 +447,7 @@ export const transferBuilderModule = {
 
       analyticsManager.track(MessageType.BUILDER_EVENT, {
         builder: BuilderType.UPDATE_TRANSFER,
-        action: `Select transfer for update`,
+        action: 'Select transfer for update',
         payload,
       });
     },
@@ -460,7 +458,7 @@ export const transferBuilderModule = {
 
       analyticsManager.track(MessageType.BUILDER_EVENT, {
         builder: BuilderType.CREATE_TRANSFER,
-        action: `Reset transfer data`,
+        action: 'Reset transfer data',
       });
     },
   },

@@ -253,13 +253,13 @@
 </template>
 
 <script lang="ts">
-import BuilderStepHeader from "@/components/overlay-widget/shared/BuilderStepHeader.vue";
-import CsvBreakout from "@/components/overlay-widget/shared/CsvBreakout.vue";
-import LocationPicker from "@/components/overlay-widget/shared/LocationPicker.vue";
-import PackagePicker from "@/components/overlay-widget/shared/PackagePicker.vue";
-import StrainPicker from "@/components/overlay-widget/shared/StrainPicker.vue";
-import TagPicker from "@/components/overlay-widget/shared/TagPicker.vue";
-import { BuilderType, MessageType, PLANTABLE_ITEM_CATEGORY_NAMES } from "@/consts";
+import BuilderStepHeader from '@/components/overlay-widget/shared/BuilderStepHeader.vue';
+import CsvBreakout from '@/components/overlay-widget/shared/CsvBreakout.vue';
+import LocationPicker from '@/components/overlay-widget/shared/LocationPicker.vue';
+import PackagePicker from '@/components/overlay-widget/shared/PackagePicker.vue';
+import StrainPicker from '@/components/overlay-widget/shared/StrainPicker.vue';
+import TagPicker from '@/components/overlay-widget/shared/TagPicker.vue';
+import { BuilderType, MessageType, PLANTABLE_ITEM_CATEGORY_NAMES } from '@/consts';
 import {
   ICsvFile,
   IIntermediateCreatePlantBatchFromPackageData,
@@ -267,26 +267,26 @@ import {
   IPackageData,
   IPlantBatchType,
   ITagData,
-} from "@/interfaces";
-import { analyticsManager } from "@/modules/analytics-manager.module";
-import { builderManager } from "@/modules/builder-manager.module";
-import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
-import { dynamicConstsManager } from "@/modules/dynamic-consts-manager.module";
-import { toastManager } from "@/modules/toast-manager.module";
-import store from "@/store/page-overlay/index";
-import { safeZip } from "@/utils/array";
-import { buildCsvDataOrError, buildNamedCsvFileData, downloadCsvFile } from "@/utils/csv";
-import { submitDateFromIsodate, todayIsodate } from "@/utils/date";
-import { allocateImmaturePlantCounts } from "@/utils/misc";
-import { timer } from "rxjs";
-import Vue from "vue";
+} from '@/interfaces';
+import { analyticsManager } from '@/modules/analytics-manager.module';
+import { builderManager } from '@/modules/builder-manager.module';
+import { primaryDataLoader } from '@/modules/data-loader/data-loader.module';
+import { dynamicConstsManager } from '@/modules/dynamic-consts-manager.module';
+import { toastManager } from '@/modules/toast-manager.module';
+import store from '@/store/page-overlay/index';
+import { safeZip } from '@/utils/array';
+import { buildCsvDataOrError, buildNamedCsvFileData, downloadCsvFile } from '@/utils/csv';
+import { submitDateFromIsodate, todayIsodate } from '@/utils/date';
+import { allocateImmaturePlantCounts } from '@/utils/misc';
+import { timer } from 'rxjs';
+import Vue from 'vue';
 
 function totalPlantsAvailableOrNull(packages: IPackageData[]): number | null {
   if (!packages.length) {
     return null;
   }
 
-  if (packages[0].Item.UnitOfMeasureName !== "Each") {
+  if (packages[0].Item.UnitOfMeasureName !== 'Each') {
     return null;
   }
 
@@ -296,7 +296,7 @@ function totalPlantsAvailableOrNull(packages: IPackageData[]): number | null {
 }
 
 export default Vue.extend({
-  name: "UnpackImmaturePlantsBuilder",
+  name: 'UnpackImmaturePlantsBuilder',
   store,
   components: {
     BuilderStepHeader,
@@ -457,20 +457,20 @@ export default Vue.extend({
   computed: {
     allDetailsProvided() {
       return (
-        this.$data.selectedPackages.length > 0 &&
-        this.$data.plantingData.length > 0 &&
-        !!this.$data.totalPlantCount &&
-        this.$data.totalPlantCount > 0 &&
-        !!this.$data.plantingLocation &&
-        !!this.$data.strain &&
-        !!this.$data.plantingIsodate &&
-        !!this.$data.actualIsodate
+        this.$data.selectedPackages.length > 0
+        && this.$data.plantingData.length > 0
+        && !!this.$data.totalPlantCount
+        && this.$data.totalPlantCount > 0
+        && !!this.$data.plantingLocation
+        && !!this.$data.strain
+        && !!this.$data.plantingIsodate
+        && !!this.$data.actualIsodate
       );
     },
     tagsSelected() {
       return (
-        this.$data.plantBatchTags.length > 0 &&
-        this.$data.plantBatchTags.length === this.$data.plantingData.length
+        this.$data.plantBatchTags.length > 0
+        && this.$data.plantBatchTags.length === this.$data.plantingData.length
       );
     },
     csvFiles(): ICsvFile[] {
@@ -511,11 +511,11 @@ export default Vue.extend({
           );
         } catch (e) {
           toastManager.openToast(`Failed to allocate plants: ${(e as Error).toString()}`, {
-            title: "Plant Allocation Error",
+            title: 'Plant Allocation Error',
             autoHideDelay: 5000,
-            variant: "danger",
+            variant: 'danger',
             appendToast: true,
-            toaster: "ttt-toaster",
+            toaster: 'ttt-toaster',
             solid: true,
           });
         }
@@ -535,18 +535,18 @@ export default Vue.extend({
       plantBatchTags: [],
       strain: null,
       showHiddenDetailFields: false,
-      patientLicenseNumber: "",
+      patientLicenseNumber: '',
       showTagPicker: false,
       debugRows: [],
       steps: [
         {
-          stepText: "Select packages to plant",
+          stepText: 'Select packages to plant',
         },
         {
-          stepText: "Planting details",
+          stepText: 'Planting details',
         },
         {
-          stepText: "Submit",
+          stepText: 'Submit',
         },
       ],
       itemFilters: {

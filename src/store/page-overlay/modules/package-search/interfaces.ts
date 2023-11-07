@@ -1,4 +1,4 @@
-import { IIndexedPackageData, IPackageSearchFilters } from "@/interfaces";
+import { IIndexedPackageData, IPackageSearchFilters } from '@/interfaces';
 
 export interface ISelectedPackageMetadata {
   packageData: IIndexedPackageData;

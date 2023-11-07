@@ -1,6 +1,6 @@
-import { pageManager } from "./page-manager.module";
+import { pageManager } from './page-manager.module';
 
-export function noScrollEventFactory(eventName = "click"): Event {
+export function noScrollEventFactory(eventName = 'click'): Event {
   const e = new Event(eventName);
   e.preventDefault();
   return e;

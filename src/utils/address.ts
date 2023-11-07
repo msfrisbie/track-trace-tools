@@ -1,6 +1,6 @@
 import {
   IContactInfo, IMetrcFacilityData, ITagOrderData, ITagOrderModalData
-} from "@/interfaces";
+} from '@/interfaces';
 
 export function extractIContactInfoFromITagOrderData(tagOrderData: ITagOrderData): IContactInfo {
   return {
@@ -13,8 +13,8 @@ export function extractIContactInfoFromITagOrderData(tagOrderData: ITagOrderData
         tagOrderData.FacilityAddressStreet3,
         tagOrderData.FacilityAddressStreet4,
       ]
-        .filter((x) => x !== "")
-        .join(", "),
+        .filter((x) => x !== '')
+        .join(', '),
       city: tagOrderData.FacilityAddressCity,
       state: tagOrderData.FacilityAddressState,
       zip: tagOrderData.FacilityAddressPostalCode,
@@ -49,7 +49,7 @@ export function flattenFacilityAddressOrNull(facility: IMetrcFacilityData): stri
     return null;
   }
 
-  return addressList.filter((x) => !!x).join(" ");
+  return addressList.filter((x) => !!x).join(' ');
 }
 
 export function facilityReadableAddressLinesOrNull(facility: IMetrcFacilityData): string[] | null {
@@ -70,7 +70,7 @@ export function facilityReadableAddressLinesOrNull(facility: IMetrcFacilityData)
     facility.PhysicalAddress.Street4,
   ]
     .filter((x) => !!x)
-    .join(" ");
+    .join(' ');
 
   if (address2) {
     addressLines.push(address2);
@@ -82,7 +82,7 @@ export function facilityReadableAddressLinesOrNull(facility: IMetrcFacilityData)
     facility.PhysicalAddress.PostalCode.slice(0, 5),
   ]
     .filter((x) => !!x)
-    .join(" ");
+    .join(' ');
 
   if (address3) {
     addressLines.push(address3);

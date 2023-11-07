@@ -1,6 +1,6 @@
 import {
   IItemData, ILocationData, IPackageData, ITagData
-} from "@/interfaces";
+} from '@/interfaces';
 
 export interface ISplitPackageBuilderState {
   sourcePackage: IPackageData | null;

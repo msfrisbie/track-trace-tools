@@ -1,12 +1,12 @@
 import {
   PackageTabLabel, PlantsTabLabel, TabKey, TagsTabLabel, TransfersTabLabel
-} from "@/consts";
-import store from "@/store/page-overlay/index";
-import { hashObjectValueOrNull } from "@/utils/url";
-import { pageManager } from "./page-manager.module";
+} from '@/consts';
+import store from '@/store/page-overlay/index';
+import { hashObjectValueOrNull } from '@/utils/url';
+import { pageManager } from './page-manager.module';
 
 export function isTabActiveImpl(tab: any) {
-  return tab.getAttribute("aria-selected") === "true";
+  return tab.getAttribute('aria-selected') === 'true';
 }
 
 export function activeTabOrNullImpl(tabList: NodeList) {
@@ -33,12 +33,12 @@ export async function clickTabStartingWithImpl(
    */
   previousTabTextOffset: number | null = null
 ) {
-  if (typeof previousTabTextOffset === "number" && !previousTabText) {
-    throw new Error("Must provide previousTabText");
+  if (typeof previousTabTextOffset === 'number' && !previousTabText) {
+    throw new Error('Must provide previousTabText');
   }
 
-  if (typeof previousTabTextOffset === "number" && previousTabTextOffset < 1) {
-    throw new Error("previousTabTextOffset must be a positive integer");
+  if (typeof previousTabTextOffset === 'number' && previousTabTextOffset < 1) {
+    throw new Error('previousTabTextOffset must be a positive integer');
   }
 
   const seenTabs: string[] = [];
@@ -46,14 +46,14 @@ export async function clickTabStartingWithImpl(
     const tab = tabList[i] as HTMLElement;
 
     if (
-      tab &&
+      tab
       // Check current match
-      tab.innerText.startsWith(tabText) &&
+      && tab.innerText.startsWith(tabText)
       // Check if text was previously seen
-      (!previousTabText || seenTabs.find((x: string) => x.includes(previousTabText))) &&
+      && (!previousTabText || seenTabs.find((x: string) => x.includes(previousTabText)))
       // Check that offset matches
-      (!previousTabTextOffset ||
-        seenTabs[seenTabs.length - previousTabTextOffset] === previousTabText)
+      && (!previousTabTextOffset
+        || seenTabs[seenTabs.length - previousTabTextOffset] === previousTabText)
     ) {
       tab.click();
       await pageManager.clickSettleDelay();
@@ -82,7 +82,7 @@ export async function managePlantTabsImpl() {
     return;
   }
 
-  const tabKey = hashObjectValueOrNull("tabKey");
+  const tabKey = hashObjectValueOrNull('tabKey');
 
   switch (tabKey) {
     case TabKey.PLANTS_PLANTBATCHES_ACTIVE:
@@ -164,7 +164,7 @@ export async function managePackageTabsImpl() {
     return;
   }
 
-  const tabKey = hashObjectValueOrNull("tabKey");
+  const tabKey = hashObjectValueOrNull('tabKey');
 
   switch (tabKey) {
     case TabKey.PACKAGES_ACTIVE:
@@ -205,7 +205,7 @@ export async function manageTransfersTabsImpl() {
     return;
   }
 
-  const tabKey = hashObjectValueOrNull("tabKey");
+  const tabKey = hashObjectValueOrNull('tabKey');
 
   switch (tabKey) {
     case TabKey.TRANSFERS_INCOMING:
@@ -256,7 +256,7 @@ export async function manageTagsTabsImpl() {
     return;
   }
 
-  const tabKey = hashObjectValueOrNull("tabKey");
+  const tabKey = hashObjectValueOrNull('tabKey');
 
   switch (tabKey) {
     case TabKey.TAGS_AVAILABLE:

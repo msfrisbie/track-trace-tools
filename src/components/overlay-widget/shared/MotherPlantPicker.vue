@@ -112,23 +112,23 @@
 </template>
 
 <script lang="ts">
-import DualColorTag from "@/components/overlay-widget/shared/DualColorTag.vue";
-import { IPlantBatchData, IPlantBatchType, IPlantData } from "@/interfaces";
-import store from "@/store/page-overlay/index";
-import { splitMax } from "@/utils/array";
-import { evenIntegerDistribution } from "@/utils/math";
-import { sum } from "lodash-es";
-import Vue from "vue";
+import DualColorTag from '@/components/overlay-widget/shared/DualColorTag.vue';
+import { IPlantBatchData, IPlantBatchType, IPlantData } from '@/interfaces';
+import store from '@/store/page-overlay/index';
+import { splitMax } from '@/utils/array';
+import { evenIntegerDistribution } from '@/utils/math';
+import { sum } from 'lodash-es';
+import Vue from 'vue';
 
 const PAGE_SIZE = 100;
 
 enum CountMode {
-  BULK = "BULK",
-  INDIVIDUAL = "INDIVIDUAL",
+  BULK = 'BULK',
+  INDIVIDUAL = 'INDIVIDUAL',
 }
 
 export default Vue.extend({
-  name: "MotherPlantPicker",
+  name: 'MotherPlantPicker',
   store,
   components: {
     DualColorTag,
@@ -151,7 +151,7 @@ export default Vue.extend({
       this.$refs.page.scrollTop = 0;
     },
     updateChildMatrix(matrix: number[][]) {
-      this.$emit("update:childMatrix", matrix);
+      this.$emit('update:childMatrix', matrix);
     },
   },
   computed: {
@@ -236,7 +236,7 @@ export default Vue.extend({
     plantBatchType: {
       immediate: true,
       handler(newValue, oldValue) {
-        this.$emit("update:plantBatchType", newValue);
+        this.$emit('update:plantBatchType', newValue);
       },
     },
     totalCount: {

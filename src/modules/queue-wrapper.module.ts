@@ -1,6 +1,6 @@
 import { IAtomicService, Task } from '@/interfaces';
 import { MutationType } from '@/mutation-types';
-import store from "@/store/page-overlay/index";
+import store from '@/store/page-overlay/index';
 import { runTask } from '@/utils/tasks';
 import { authManager } from './auth-manager.module';
 

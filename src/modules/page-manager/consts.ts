@@ -1,7 +1,7 @@
 // https://stackoverflow.com/questions/12036038/is-there-unicode-glyph-symbol-to-represent-search
 // color: #49276a;
-export const SEARCH_ICON_MARKUP = `<div class="inline-search-icon">&#9906;</div>`;
-export const ARROW_ICON_MARKUP = `<div>&#8599;</div>`;
+export const SEARCH_ICON_MARKUP = '<div class="inline-search-icon">&#9906;</div>';
+export const ARROW_ICON_MARKUP = '<div>&#8599;</div>';
 
 export const t0 = performance.now();
 export const INLINE_TABLE_BUTTON_RENDER_DELAY = 500;

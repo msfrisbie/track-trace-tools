@@ -1,4 +1,4 @@
-import { IIndexedPlantData, IPlantSearchFilters } from "@/interfaces";
+import { IIndexedPlantData, IPlantSearchFilters } from '@/interfaces';
 
 export interface ISelectedPlantMetadata {
   plantData: IIndexedPlantData;

@@ -122,28 +122,28 @@
 </template>
 
 <script lang="ts">
-import BuilderStepHeader from "@/components/overlay-widget/shared/BuilderStepHeader.vue";
-import PlantBatchPicker from "@/components/overlay-widget/shared/PlantBatchPicker.vue";
-import TagPicker from "@/components/overlay-widget/shared/TagPicker.vue";
-import { BuilderType, MessageType } from "@/consts";
+import BuilderStepHeader from '@/components/overlay-widget/shared/BuilderStepHeader.vue';
+import PlantBatchPicker from '@/components/overlay-widget/shared/PlantBatchPicker.vue';
+import TagPicker from '@/components/overlay-widget/shared/TagPicker.vue';
+import { BuilderType, MessageType } from '@/consts';
 import {
   ICsvFile,
   IMetrcReplacePlantBatchTagsPayload,
   IPlantBatchData,
   ITagData,
-} from "@/interfaces";
-import { analyticsManager } from "@/modules/analytics-manager.module";
-import { builderManager } from "@/modules/builder-manager.module";
-import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
-import store from "@/store/page-overlay/index";
-import { safeZip } from "@/utils/array";
-import { buildCsvDataOrError, buildNamedCsvFileData, downloadCsvFile } from "@/utils/csv";
-import { submitDateFromIsodate, todayIsodate } from "@/utils/date";
-import { timer } from "rxjs";
-import Vue from "vue";
+} from '@/interfaces';
+import { analyticsManager } from '@/modules/analytics-manager.module';
+import { builderManager } from '@/modules/builder-manager.module';
+import { primaryDataLoader } from '@/modules/data-loader/data-loader.module';
+import store from '@/store/page-overlay/index';
+import { safeZip } from '@/utils/array';
+import { buildCsvDataOrError, buildNamedCsvFileData, downloadCsvFile } from '@/utils/csv';
+import { submitDateFromIsodate, todayIsodate } from '@/utils/date';
+import { timer } from 'rxjs';
+import Vue from 'vue';
 
 export default Vue.extend({
-  name: "ReplacePlantBatchTagsBuilder",
+  name: 'ReplacePlantBatchTagsBuilder',
   store,
   components: {
     BuilderStepHeader,
@@ -248,8 +248,8 @@ export default Vue.extend({
     },
     tagsSelected() {
       return (
-        this.$data.plantBatchTags.length > 0 &&
-        this.$data.plantBatchTags.length === this.$data.selectedPlantBatches.length
+        this.$data.plantBatchTags.length > 0
+        && this.$data.plantBatchTags.length === this.$data.selectedPlantBatches.length
       );
     },
     csvFiles(): ICsvFile[] {
@@ -267,13 +267,13 @@ export default Vue.extend({
       plantBatchTags: [],
       steps: [
         {
-          stepText: "Select plant batches to retag",
+          stepText: 'Select plant batches to retag',
         },
         {
-          stepText: "Tagging details",
+          stepText: 'Tagging details',
         },
         {
-          stepText: "Submit",
+          stepText: 'Submit',
         },
       ],
     };

@@ -12,20 +12,20 @@
 </template>
 
 <script lang="ts">
-import PackageNoteForm from "@/components/page-overlay/forms/DeprecatedPackageNoteForm.vue";
-import ReorderTagsForm from "@/components/page-overlay/forms/DeprecatedReorderTagsForm.vue";
-import FinalizeSalesReceiptsForm from "@/components/page-overlay/forms/FinalizeSalesReceiptsForm.vue";
-import SettingsForm from "@/components/page-overlay/forms/SettingsForm.vue";
-import VoidTagForm from "@/components/page-overlay/forms/VoidTagForm.vue";
-import ManageAccount from "@/components/page-overlay/ManageAccount.vue";
-import Screenshot from "@/components/page-overlay/Screenshot.vue";
-import { ToolkitView } from "@/consts";
-import Vue from "vue";
-import { mapState } from "vuex";
+import PackageNoteForm from '@/components/page-overlay/forms/DeprecatedPackageNoteForm.vue';
+import ReorderTagsForm from '@/components/page-overlay/forms/DeprecatedReorderTagsForm.vue';
+import FinalizeSalesReceiptsForm from '@/components/page-overlay/forms/FinalizeSalesReceiptsForm.vue';
+import SettingsForm from '@/components/page-overlay/forms/SettingsForm.vue';
+import VoidTagForm from '@/components/page-overlay/forms/VoidTagForm.vue';
+import ManageAccount from '@/components/page-overlay/ManageAccount.vue';
+import Screenshot from '@/components/page-overlay/Screenshot.vue';
+import { ToolkitView } from '@/consts';
+import Vue from 'vue';
+import { mapState } from 'vuex';
 
 export default Vue.extend({
-  name: "TaskFormManifold",
-  computed: mapState(["currentView"]),
+  name: 'TaskFormManifold',
+  computed: mapState(['currentView']),
   data() {
     return {
       settings: ToolkitView.SETTINGS,

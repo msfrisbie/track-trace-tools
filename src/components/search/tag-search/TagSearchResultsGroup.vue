@@ -53,20 +53,20 @@
 </template>
 
 <script lang="ts">
-import TagSearchResultPreview from "@/components/search/tag-search/TagSearchResultPreview.vue";
-import { IIndexedTagData, IPluginState } from "@/interfaces";
-import { TAG_TAB_REGEX } from "@/modules/page-manager/consts";
-import store from "@/store/page-overlay/index";
-import { SearchActions } from "@/store/page-overlay/modules/search/consts";
-import { TagSearchActions } from "@/store/page-overlay/modules/tag-search/consts";
-import { ISelectedTagMetadata } from "@/store/page-overlay/modules/tag-search/interfaces";
-import { Subject } from "rxjs";
-import { take, takeUntil } from "rxjs/operators";
-import Vue from "vue";
-import { mapActions, mapState } from "vuex";
+import TagSearchResultPreview from '@/components/search/tag-search/TagSearchResultPreview.vue';
+import { IIndexedTagData, IPluginState } from '@/interfaces';
+import { TAG_TAB_REGEX } from '@/modules/page-manager/consts';
+import store from '@/store/page-overlay/index';
+import { SearchActions } from '@/store/page-overlay/modules/search/consts';
+import { TagSearchActions } from '@/store/page-overlay/modules/tag-search/consts';
+import { ISelectedTagMetadata } from '@/store/page-overlay/modules/tag-search/interfaces';
+import { Subject } from 'rxjs';
+import { take, takeUntil } from 'rxjs/operators';
+import Vue from 'vue';
+import { mapActions, mapState } from 'vuex';
 
 export default Vue.extend({
-  name: "TagSearchResultsGroup",
+  name: 'TagSearchResultsGroup',
   store,
   components: { TagSearchResultPreview },
   data(): {
@@ -103,8 +103,8 @@ export default Vue.extend({
         };
 
         if (
-          !store.state.tagSearch.selectedTagMetadata ||
-          store.state.tagSearch.selectedTagMetadata.priority >= candidateMetadata.priority
+          !store.state.tagSearch.selectedTagMetadata
+          || store.state.tagSearch.selectedTagMetadata.priority >= candidateMetadata.priority
         ) {
           store.state.tagSearch.selectedTagMetadata = candidateMetadata;
         }
@@ -142,18 +142,18 @@ export default Vue.extend({
     },
     groupIcon(): string {
       switch (this.tagFilterIdentifier) {
-        case "label":
-          return "tags";
-        case "strainName":
-          return "cannabis";
-        case "locationName":
-          return "map-marker-alt";
+        case 'label':
+          return 'tags';
+        case 'strainName':
+          return 'cannabis';
+        case 'locationName':
+          return 'map-marker-alt';
         default:
-          return "boxes";
+          return 'boxes';
       }
     },
     disableFilter(): boolean {
-      return !this.tagFilterIdentifier || this.tagFilterIdentifier === "label";
+      return !this.tagFilterIdentifier || this.tagFilterIdentifier === 'label';
     },
   },
   methods: {

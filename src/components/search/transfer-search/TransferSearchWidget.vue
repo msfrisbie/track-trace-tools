@@ -34,29 +34,29 @@
 </template>
 
 <script lang="ts">
-import SearchPickerSelect from "@/components/page-overlay/SearchPickerSelect.vue";
-import TransferSearchFilters from "@/components/search/transfer-search/TransferSearchFilters.vue";
-import TransferSearchResults from "@/components/search/transfer-search/TransferSearchResults.vue";
-import { MessageType, TransferState } from "@/consts";
-import { IPluginState } from "@/interfaces";
-import { analyticsManager } from "@/modules/analytics-manager.module";
-import { authManager } from "@/modules/auth-manager.module";
-import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
-import { databaseInterface } from "@/modules/database-interface.module";
-import { searchManager } from "@/modules/search-manager.module";
-import { MutationType } from "@/mutation-types";
-import store from "@/store/page-overlay/index";
-import { SearchActions } from "@/store/page-overlay/modules/search/consts";
-import { TransferSearchActions } from "@/store/page-overlay/modules/transfer-search/consts";
-import { combineLatest, Observable, timer } from "rxjs";
+import SearchPickerSelect from '@/components/page-overlay/SearchPickerSelect.vue';
+import TransferSearchFilters from '@/components/search/transfer-search/TransferSearchFilters.vue';
+import TransferSearchResults from '@/components/search/transfer-search/TransferSearchResults.vue';
+import { MessageType, TransferState } from '@/consts';
+import { IPluginState } from '@/interfaces';
+import { analyticsManager } from '@/modules/analytics-manager.module';
+import { authManager } from '@/modules/auth-manager.module';
+import { primaryDataLoader } from '@/modules/data-loader/data-loader.module';
+import { databaseInterface } from '@/modules/database-interface.module';
+import { searchManager } from '@/modules/search-manager.module';
+import { MutationType } from '@/mutation-types';
+import store from '@/store/page-overlay/index';
+import { SearchActions } from '@/store/page-overlay/modules/search/consts';
+import { TransferSearchActions } from '@/store/page-overlay/modules/transfer-search/consts';
+import { combineLatest, Observable, timer } from 'rxjs';
 import {
   debounceTime, filter, startWith, tap
-} from "rxjs/operators";
-import Vue from "vue";
-import { mapActions, mapState } from "vuex";
+} from 'rxjs/operators';
+import Vue from 'vue';
+import { mapActions, mapState } from 'vuex';
 
 export default Vue.extend({
-  name: "TransferSearchWidget",
+  name: 'TransferSearchWidget',
   store,
   components: {
     TransferSearchResults,
@@ -96,11 +96,11 @@ export default Vue.extend({
       this.setQueryString({ queryString });
     },
     clearSearchField() {
-      this.setQueryString({ queryString: "" });
+      this.setQueryString({ queryString: '' });
     },
   },
   watch: {
-    "searchState.showSearchResults": {
+    'searchState.showSearchResults': {
       immediate: true,
       handler(newValue, oldValue) {
         if (newValue) {

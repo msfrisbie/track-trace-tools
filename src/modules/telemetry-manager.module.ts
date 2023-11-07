@@ -1,15 +1,15 @@
-import { IAtomicService, IAuthState } from "@/interfaces";
-import { buildBody } from "@/utils/data-loader";
-import { todayIsodate } from "@/utils/date";
-import { debugLogFactory } from "@/utils/debug";
-import { timer } from "rxjs";
-import { take } from "rxjs/operators";
-import { authManager } from "./auth-manager.module";
-import { DataLoader } from "./data-loader/data-loader.module";
-import { facilityManager } from "./facility-manager.module";
-import { primaryMetrcRequestManager } from "./metrc-request-manager.module";
+import { IAtomicService, IAuthState } from '@/interfaces';
+import { buildBody } from '@/utils/data-loader';
+import { todayIsodate } from '@/utils/date';
+import { debugLogFactory } from '@/utils/debug';
+import { timer } from 'rxjs';
+import { take } from 'rxjs/operators';
+import { authManager } from './auth-manager.module';
+import { DataLoader } from './data-loader/data-loader.module';
+import { facilityManager } from './facility-manager.module';
+import { primaryMetrcRequestManager } from './metrc-request-manager.module';
 
-const debugLog = debugLogFactory("telemetry-manager.module.ts");
+const debugLog = debugLogFactory('telemetry-manager.module.ts');
 
 const HEALTHY_RESPONSE_CODES = [200];
 
@@ -27,7 +27,7 @@ class TelemetryManager implements IAtomicService {
       .pipe(take(5))
       .subscribe(async () => {
         if (!(await authManager.authStateOrNull())) {
-          console.log("No auth state, exiting");
+          console.log('No auth state, exiting');
           return;
         }
 
@@ -104,7 +104,7 @@ class TelemetryManager implements IAtomicService {
     const facilities = await facilityManager.ownedFacilitiesOrError();
 
     for (const facility of facilities) {
-      debugLog(async () => ["Evaluating", facility.licenseNumber]);
+      debugLog(async () => ['Evaluating', facility.licenseNumber]);
       const spoofedAuthState: IAuthState = {
         ...authState,
         license: facility.licenseNumber,

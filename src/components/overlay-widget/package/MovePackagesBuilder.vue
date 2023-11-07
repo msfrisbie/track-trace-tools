@@ -91,35 +91,35 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import store from "@/store/page-overlay/index";
-import { mapState } from "vuex";
-import BuilderStepHeader from "@/components/overlay-widget/shared/BuilderStepHeader.vue";
-import { isValidTag, generateTagRangeOrError } from "@/utils/tags";
-import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
-import { combineLatest, from, Subject } from "rxjs";
+import Vue from 'vue';
+import store from '@/store/page-overlay/index';
+import { mapState } from 'vuex';
+import BuilderStepHeader from '@/components/overlay-widget/shared/BuilderStepHeader.vue';
+import { isValidTag, generateTagRangeOrError } from '@/utils/tags';
+import { primaryDataLoader } from '@/modules/data-loader/data-loader.module';
+import { combineLatest, from, Subject } from 'rxjs';
 import {
   debounceTime, distinctUntilChanged, filter, startWith, tap
-} from "rxjs/operators";
+} from 'rxjs/operators';
 import {
   IPackageData,
   IPackageFilter,
   ICsvFile,
   ILocationData,
   IMetrcMovePackagesPayload
-} from "@/interfaces";
-import { downloadCsvFile, buildCsvDataOrError, buildNamedCsvFileData } from "@/utils/csv";
-import { todayIsodate, submitDateFromIsodate } from "@/utils/date";
-import { primaryMetrcRequestManager } from "@/modules/metrc-request-manager.module";
-import { authManager } from "@/modules/auth-manager.module";
-import { BuilderType, MessageType } from "@/consts";
-import { analyticsManager } from "@/modules/analytics-manager.module";
-import { builderManager } from "@/modules/builder-manager.module";
-import PackagePicker from "@/components/overlay-widget/shared/PackagePicker.vue";
-import LocationPicker from "@/components/overlay-widget/shared/LocationPicker.vue";
+} from '@/interfaces';
+import { downloadCsvFile, buildCsvDataOrError, buildNamedCsvFileData } from '@/utils/csv';
+import { todayIsodate, submitDateFromIsodate } from '@/utils/date';
+import { primaryMetrcRequestManager } from '@/modules/metrc-request-manager.module';
+import { authManager } from '@/modules/auth-manager.module';
+import { BuilderType, MessageType } from '@/consts';
+import { analyticsManager } from '@/modules/analytics-manager.module';
+import { builderManager } from '@/modules/builder-manager.module';
+import PackagePicker from '@/components/overlay-widget/shared/PackagePicker.vue';
+import LocationPicker from '@/components/overlay-widget/shared/LocationPicker.vue';
 
 export default Vue.extend({
-  name: "MovePackagesBuilder",
+  name: 'MovePackagesBuilder',
   store,
   components: {
     BuilderStepHeader,
@@ -194,9 +194,9 @@ export default Vue.extend({
   computed: {
     allDetailsProvided() {
       return (
-        this.$data.selectedPackages.length > 0 &&
-        !!this.$data.newLocation &&
-        !!this.$data.moveIsodate
+        this.$data.selectedPackages.length > 0
+        && !!this.$data.newLocation
+        && !!this.$data.moveIsodate
       );
     },
     csvFiles(): ICsvFile[] {
@@ -213,13 +213,13 @@ export default Vue.extend({
       moveIsodate: todayIsodate(),
       steps: [
         {
-          stepText: "Select packages to move"
+          stepText: 'Select packages to move'
         },
         {
-          stepText: "Move details"
+          stepText: 'Move details'
         },
         {
-          stepText: "Submit"
+          stepText: 'Submit'
         }
       ]
     };

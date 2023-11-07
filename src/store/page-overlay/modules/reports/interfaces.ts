@@ -15,14 +15,14 @@ import {
   ISpreadsheet,
   ITagFilter,
   ITransferFilter
-} from "@/interfaces";
-import { ImmaturePlantQuickviewDimension } from "@/utils/reports/immature-plants-quickview-report";
-import { MaturePlantQuickviewDimension } from "@/utils/reports/mature-plants-quickview-report";
+} from '@/interfaces';
+import { ImmaturePlantQuickviewDimension } from '@/utils/reports/immature-plants-quickview-report';
+import { MaturePlantQuickviewDimension } from '@/utils/reports/mature-plants-quickview-report';
 import {
   InventoryStrategy,
   IPackageDateMetadata
-} from "@/utils/reports/point-in-time-inventory-report";
-import { IStatusMessage, ReportStatus, ReportType } from "./consts";
+} from '@/utils/reports/point-in-time-inventory-report';
+import { IStatusMessage, ReportStatus, ReportType } from './consts';
 
 export interface IReportsState {
   status: ReportStatus;
@@ -47,7 +47,7 @@ export interface IReportsState {
 
 export interface IReportConfig {
   authState: IAuthState;
-  exportFormat?: "CSV" | "GOOGLE_SHEETS";
+  exportFormat?: 'CSV' | 'GOOGLE_SHEETS';
   [ReportType.TEST]?: {
     exampleFilter: any;
     fields: IFieldData[];

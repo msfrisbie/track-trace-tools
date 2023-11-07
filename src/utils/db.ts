@@ -3,7 +3,7 @@ export function dataObjectToIndexableTags(data: Object): Array<string> {
   let tags: Array<string> = [];
 
   const VALUES_SKIPLIST = [
-    "",
+    '',
     undefined,
     null,
     false,

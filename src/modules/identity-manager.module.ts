@@ -1,4 +1,4 @@
-import { IAtomicService, IIdentityState } from "@/interfaces";
+import { IAtomicService, IIdentityState } from '@/interfaces';
 
 class IdentityManager implements IAtomicService {
   private _identityStatePromise: Promise<IIdentityState | null>;
@@ -9,7 +9,7 @@ class IdentityManager implements IAtomicService {
   constructor() {
     this._identityStatePromise = new Promise((resolve, reject) => {
       // If identity state cant be acquired in 10s, timeout
-      const id = setTimeout(() => reject("Identity state timed out"), 10000);
+      const id = setTimeout(() => reject('Identity state timed out'), 10000);
 
       this._identityStateResolver = (identityState: any) => {
         clearTimeout(id);
@@ -29,7 +29,7 @@ class IdentityManager implements IAtomicService {
   }
 
   async identityStateOrError(
-    errorMessage: string = "Missing identity state"
+    errorMessage: string = 'Missing identity state'
   ): Promise<IIdentityState> {
     const identityState = await this.identityState();
 

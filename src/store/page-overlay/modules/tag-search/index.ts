@@ -1,11 +1,11 @@
-import { TagFilterIdentifiers, TagState } from "@/consts";
-import { IPluginState, ITagSearchFilters } from "@/interfaces";
-import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
-import { pageManager } from "@/modules/page-manager/page-manager.module";
-import { timer } from "rxjs";
-import { ActionContext } from "vuex";
-import { TagSearchActions, TagSearchMutations } from "./consts";
-import { ITagSearchState } from "./interfaces";
+import { TagFilterIdentifiers, TagState } from '@/consts';
+import { IPluginState, ITagSearchFilters } from '@/interfaces';
+import { primaryDataLoader } from '@/modules/data-loader/data-loader.module';
+import { pageManager } from '@/modules/page-manager/page-manager.module';
+import { timer } from 'rxjs';
+import { ActionContext } from 'vuex';
+import { TagSearchActions, TagSearchMutations } from './consts';
+import { ITagSearchState } from './interfaces';
 
 const inMemoryState = {
   searchInflight: false,
@@ -83,13 +83,13 @@ export const tagSearchModule = {
       if (tagState) {
         switch (tagState as TagState) {
           case TagState.AVAILABLE:
-            await pageManager.clickTabStartingWith(pageManager.tagTabs, "Available");
+            await pageManager.clickTabStartingWith(pageManager.tagTabs, 'Available');
             break;
           case TagState.USED:
-            await pageManager.clickTabStartingWith(pageManager.tagTabs, "Used");
+            await pageManager.clickTabStartingWith(pageManager.tagTabs, 'Used');
             break;
           case TagState.VOIDED:
-            await pageManager.clickTabStartingWith(pageManager.tagTabs, "Void");
+            await pageManager.clickTabStartingWith(pageManager.tagTabs, 'Void');
             break;
           default:
             break;
@@ -127,7 +127,7 @@ export const tagSearchModule = {
           // @ts-ignore
           if (ctx.state.tagSearchFilters[k] !== v) {
             switch (k) {
-              case "label":
+              case 'label':
                 pageManager.setTagFilter(TagFilterIdentifiers.Label, v);
                 break;
               default:

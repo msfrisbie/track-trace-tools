@@ -56,18 +56,18 @@
 </template>
 
 <script lang="ts">
-import { MessageType } from "@/consts";
-import { analyticsManager } from "@/modules/analytics-manager.module";
-import { clientBuildManager } from "@/modules/client-build-manager.module";
-import { dynamicConstsManager } from "@/modules/dynamic-consts-manager.module";
-import store from "@/store/page-overlay/index";
-import { HOST_WILDCARD, isCurrentHostAllowed } from "@/utils/builder";
-import { notAvailableMessage } from "@/utils/text";
-import Vue from "vue";
-import { mapState } from "vuex";
+import { MessageType } from '@/consts';
+import { analyticsManager } from '@/modules/analytics-manager.module';
+import { clientBuildManager } from '@/modules/client-build-manager.module';
+import { dynamicConstsManager } from '@/modules/dynamic-consts-manager.module';
+import store from '@/store/page-overlay/index';
+import { HOST_WILDCARD, isCurrentHostAllowed } from '@/utils/builder';
+import { notAvailableMessage } from '@/utils/text';
+import Vue from 'vue';
+import { mapState } from 'vuex';
 
 export default Vue.extend({
-  name: "PackageBuilderListView",
+  name: 'PackageBuilderListView',
   store,
   methods: {
     selectBuilderType({ text, route }: { text: string; route: string }) {
@@ -92,8 +92,7 @@ export default Vue.extend({
     };
   },
   async mounted() {
-    this.$data.facilityUsesLocationForPackages =
-      await dynamicConstsManager.facilityUsesLocationForPackages();
+    this.$data.facilityUsesLocationForPackages = await dynamicConstsManager.facilityUsesLocationForPackages();
   },
   async created() {},
   computed: {
@@ -104,30 +103,30 @@ export default Vue.extend({
     options() {
       return [
         {
-          route: "/package/create-package-csv",
-          text: "CSV PACKAGES",
-          icon: "file-csv",
-          backgroundColor: "#2774ae",
+          route: '/package/create-package-csv',
+          text: 'CSV PACKAGES',
+          icon: 'file-csv',
+          backgroundColor: '#2774ae',
           isBeta: true,
           isNew: false,
           enabled: false, /// isCurrentHostAllowed([HOST_WILDCARD]),
           visible: true,
         },
         {
-          route: "/package/history",
-          text: "PACKAGE HISTORY",
-          icon: "sitemap",
-          backgroundColor: "#2774ae",
+          route: '/package/history',
+          text: 'PACKAGE HISTORY',
+          icon: 'sitemap',
+          backgroundColor: '#2774ae',
           // isBeta: true,
           isNew: false,
           enabled: isCurrentHostAllowed([HOST_WILDCARD]),
           visible: true,
         },
         {
-          route: "/package/split-package",
-          text: "SPLIT PACKAGE",
-          icon: "expand-alt",
-          backgroundColor: "#2774ae",
+          route: '/package/split-package',
+          text: 'SPLIT PACKAGE',
+          icon: 'expand-alt',
+          backgroundColor: '#2774ae',
           // isBeta: true,
           isNew: false,
           enabled: isCurrentHostAllowed([HOST_WILDCARD]),
@@ -135,33 +134,33 @@ export default Vue.extend({
           showDisabledMessage: true,
         },
         {
-          route: "/package/move-packages",
-          text: "MOVE PACKAGES",
-          icon: "exchange-alt",
+          route: '/package/move-packages',
+          text: 'MOVE PACKAGES',
+          icon: 'exchange-alt',
           isBeta: false,
           // isNew: true,
-          backgroundColor: "#2774ae",
+          backgroundColor: '#2774ae',
           enabled:
             isCurrentHostAllowed([HOST_WILDCARD]) && this.$data.facilityUsesLocationForPackages,
           visible: true,
           showDisabledMessage: false,
         },
         {
-          route: "/package/merge-packages",
-          text: "MERGE PACKAGES",
-          icon: "compress-arrows-alt",
+          route: '/package/merge-packages',
+          text: 'MERGE PACKAGES',
+          icon: 'compress-arrows-alt',
           isBeta: false,
           isNew: false,
-          backgroundColor: "#2774ae",
+          backgroundColor: '#2774ae',
           enabled: isCurrentHostAllowed([HOST_WILDCARD]),
           visible: true,
           showDisabledMessage: true,
         },
         {
-          route: "/package/finish-packages",
-          text: "FINISH PACKAGES",
-          icon: "check-square",
-          backgroundColor: "#2774ae",
+          route: '/package/finish-packages',
+          text: 'FINISH PACKAGES',
+          icon: 'check-square',
+          backgroundColor: '#2774ae',
           isBeta: false,
           isNew: false,
           enabled: isCurrentHostAllowed([HOST_WILDCARD]),
@@ -169,10 +168,10 @@ export default Vue.extend({
           showDisabledMessage: true,
         },
         {
-          route: "/package/add-item-group",
-          text: "ADD ITEM GROUP",
-          icon: "boxes",
-          backgroundColor: "#2774ae",
+          route: '/package/add-item-group',
+          text: 'ADD ITEM GROUP',
+          icon: 'boxes',
+          backgroundColor: '#2774ae',
           // isBeta: true,
           isNew: false,
           enabled: false, // isCurrentHostAllowed([HOST_WILDCARD]),
@@ -180,10 +179,10 @@ export default Vue.extend({
           showDisabledMessage: true,
         },
         {
-          route: "/package/allocate-samples",
-          text: "ALLOCATE SAMPLES",
-          icon: "boxes",
-          backgroundColor: "#2774ae",
+          route: '/package/allocate-samples',
+          text: 'ALLOCATE SAMPLES',
+          icon: 'boxes',
+          backgroundColor: '#2774ae',
           // isBeta: true,
           isNew: false,
           enabled: true, // isCurrentHostAllowed([HOST_WILDCARD]),

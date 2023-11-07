@@ -10,13 +10,13 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import store from "@/store/page-overlay/index";
-import { modalManager } from "@/modules/modal-manager.module";
-import { ModalType } from "@/consts";
+import Vue from 'vue';
+import store from '@/store/page-overlay/index';
+import { modalManager } from '@/modules/modal-manager.module';
+import { ModalType } from '@/consts';
 
 export default Vue.extend({
-  name: "DebugButton",
+  name: 'DebugButton',
   store,
   components: {},
   data() {

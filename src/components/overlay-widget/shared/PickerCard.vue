@@ -7,11 +7,11 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import DualColorTag from "@/components/overlay-widget/shared/DualColorTag.vue";
+import Vue from 'vue';
+import DualColorTag from '@/components/overlay-widget/shared/DualColorTag.vue';
 
 export default Vue.extend({
-  name: "PickerCard",
+  name: 'PickerCard',
   components: {
     DualColorTag
   },

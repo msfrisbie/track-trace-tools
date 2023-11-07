@@ -117,25 +117,25 @@
 </template>
 
 <script lang="ts">
-import BuilderStepHeader from "@/components/overlay-widget/shared/BuilderStepHeader.vue";
-import PlantPicker from "@/components/overlay-widget/shared/PlantPicker.vue";
-import TagPicker from "@/components/overlay-widget/shared/TagPicker.vue";
-import { BuilderType, MessageType } from "@/consts";
+import BuilderStepHeader from '@/components/overlay-widget/shared/BuilderStepHeader.vue';
+import PlantPicker from '@/components/overlay-widget/shared/PlantPicker.vue';
+import TagPicker from '@/components/overlay-widget/shared/TagPicker.vue';
+import { BuilderType, MessageType } from '@/consts';
 import {
   ICsvFile, IMetrcReplacePlantTagsPayload, IPlantData, ITagData
-} from "@/interfaces";
-import { analyticsManager } from "@/modules/analytics-manager.module";
-import { builderManager } from "@/modules/builder-manager.module";
-import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
-import store from "@/store/page-overlay/index";
-import { safeZip } from "@/utils/array";
-import { buildCsvDataOrError, buildNamedCsvFileData, downloadCsvFile } from "@/utils/csv";
-import { submitDateFromIsodate, todayIsodate } from "@/utils/date";
-import { timer } from "rxjs";
-import Vue from "vue";
+} from '@/interfaces';
+import { analyticsManager } from '@/modules/analytics-manager.module';
+import { builderManager } from '@/modules/builder-manager.module';
+import { primaryDataLoader } from '@/modules/data-loader/data-loader.module';
+import store from '@/store/page-overlay/index';
+import { safeZip } from '@/utils/array';
+import { buildCsvDataOrError, buildNamedCsvFileData, downloadCsvFile } from '@/utils/csv';
+import { submitDateFromIsodate, todayIsodate } from '@/utils/date';
+import { timer } from 'rxjs';
+import Vue from 'vue';
 
 export default Vue.extend({
-  name: "ReplacePlantTagsBuilder",
+  name: 'ReplacePlantTagsBuilder',
   store,
   components: {
     BuilderStepHeader,
@@ -235,8 +235,8 @@ export default Vue.extend({
     },
     tagsSelected() {
       return (
-        this.$data.plantTags.length > 0 &&
-        this.$data.plantTags.length === this.$data.selectedPlants.length
+        this.$data.plantTags.length > 0
+        && this.$data.plantTags.length === this.$data.selectedPlants.length
       );
     },
     csvFiles(): ICsvFile[] {
@@ -254,13 +254,13 @@ export default Vue.extend({
       plantTags: [],
       steps: [
         {
-          stepText: "Select plants to retag",
+          stepText: 'Select plants to retag',
         },
         {
-          stepText: "Tagging details",
+          stepText: 'Tagging details',
         },
         {
-          stepText: "Submit",
+          stepText: 'Submit',
         },
       ],
     };

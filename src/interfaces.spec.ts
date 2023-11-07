@@ -2,12 +2,12 @@
 //
 // The test runtime isn't relevant, it uses the static type analyzer to verify correctness.
 
-import "./test/fixtures/json/metrc-facility-data";
-import "./test/fixtures/json/metrc-transfer-type-data";
-import "./test/fixtures/json/mi-create-layover-wholesale-transfer-payload";
-import "./test/fixtures/json/mi-create-sample-transfer-payload";
-import "./test/fixtures/json/testing-az-create-standard-transfer-payload";
+import './test/fixtures/json/metrc-facility-data';
+import './test/fixtures/json/metrc-transfer-type-data';
+import './test/fixtures/json/mi-create-layover-wholesale-transfer-payload';
+import './test/fixtures/json/mi-create-sample-transfer-payload';
+import './test/fixtures/json/testing-az-create-standard-transfer-payload';
 
-describe("interfaces.ts", () => {
-  it("should implement correct types", () => {});
+describe('interfaces.ts', () => {
+  it('should implement correct types', () => {});
 });

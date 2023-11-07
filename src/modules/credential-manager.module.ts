@@ -1,15 +1,15 @@
-import { IAtomicService } from "@/interfaces";
-import { MutationType } from "@/mutation-types";
-import store from "@/store/page-overlay";
-import { debugLogFactory } from "@/utils/debug";
-import _ from "lodash-es";
-import { analyticsManager } from "./analytics-manager.module";
+import { IAtomicService } from '@/interfaces';
+import { MutationType } from '@/mutation-types';
+import store from '@/store/page-overlay';
+import { debugLogFactory } from '@/utils/debug';
+import _ from 'lodash-es';
+import { analyticsManager } from './analytics-manager.module';
 
-const debugLog = debugLogFactory("credential-manager.module.ts");
+const debugLog = debugLogFactory('credential-manager.module.ts');
 
-const LOGIN_PATH = "/log-in";
+const LOGIN_PATH = '/log-in';
 
-const inputEvents = ["change", "keyup", "blur"];
+const inputEvents = ['change', 'keyup', 'blur'];
 
 class CredentialManager implements IAtomicService {
   private usernameInput: HTMLInputElement | null = null;
@@ -29,12 +29,12 @@ class CredentialManager implements IAtomicService {
     this.passwordInput = document.querySelector('input[type="password"]');
 
     if (!this.usernameInput) {
-      console.error("Cannot find username input");
+      console.error('Cannot find username input');
       return;
     }
 
     if (!this.passwordInput) {
-      console.error("Cannot find password input");
+      console.error('Cannot find password input');
       return;
     }
 
@@ -53,7 +53,7 @@ class CredentialManager implements IAtomicService {
     if (!username || !password) {
       analyticsManager.setUserProperties({ verificationEligible: false });
 
-      debugLog(async () => ["Empty credentials"]);
+      debugLog(async () => ['Empty credentials']);
       return;
     }
 

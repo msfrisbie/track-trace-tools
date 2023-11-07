@@ -22,17 +22,17 @@
 </template>
 
 <script lang="ts">
-import { MessageType } from "@/consts";
-import { IIndexedTagData } from "@/interfaces";
-import { analyticsManager } from "@/modules/analytics-manager.module";
-import store from "@/store/page-overlay/index";
-import { SearchActions } from "@/store/page-overlay/modules/search/consts";
-import { TagSearchActions } from "@/store/page-overlay/modules/tag-search/consts";
-import Vue from "vue";
-import { mapActions } from "vuex";
+import { MessageType } from '@/consts';
+import { IIndexedTagData } from '@/interfaces';
+import { analyticsManager } from '@/modules/analytics-manager.module';
+import store from '@/store/page-overlay/index';
+import { SearchActions } from '@/store/page-overlay/modules/search/consts';
+import { TagSearchActions } from '@/store/page-overlay/modules/tag-search/consts';
+import Vue from 'vue';
+import { mapActions } from 'vuex';
 
 export default Vue.extend({
-  name: "TagSearchResultPreview",
+  name: 'TagSearchResultPreview',
   props: {
     sectionName: String,
     tag: Object as () => IIndexedTagData,
@@ -46,7 +46,7 @@ export default Vue.extend({
       setTagSearchFilters: `tagSearch/${TagSearchActions.SET_TAG_SEARCH_FILTERS}`,
     }),
     selectTag(tag: IIndexedTagData) {
-      this.$emit("selected-tag", tag);
+      this.$emit('selected-tag', tag);
     },
     async setTagLabelFilter(tag: IIndexedTagData) {
       analyticsManager.track(MessageType.SELECTED_TAG);

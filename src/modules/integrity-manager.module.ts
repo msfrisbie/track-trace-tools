@@ -1,7 +1,7 @@
-import { MessageType } from "@/consts";
-import { IAtomicService } from "@/interfaces";
-import { analyticsManager } from "./analytics-manager.module";
-import { authManager } from "./auth-manager.module";
+import { MessageType } from '@/consts';
+import { IAtomicService } from '@/interfaces';
+import { analyticsManager } from './analytics-manager.module';
+import { authManager } from './auth-manager.module';
 
 // Checks for plugin health
 class IntegrityManager implements IAtomicService {

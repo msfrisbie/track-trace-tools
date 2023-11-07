@@ -11,16 +11,16 @@ import {
   ISimpleSpreadsheet,
   ISpreadsheet,
   IValueRange,
-} from "@/interfaces";
-import { customFetch } from "@/modules/fetch-manager.module";
-import { getAuthTokenOrError } from "./oauth";
+} from '@/interfaces';
+import { customFetch } from '@/modules/fetch-manager.module';
+import { getAuthTokenOrError } from './oauth';
 
 async function headersFactory() {
   const token = await getAuthTokenOrError();
 
   return {
     Authorization: `Bearer ${token}`,
-    "Content-Type": "application/json",
+    'Content-Type': 'application/json',
   };
 }
 
@@ -31,12 +31,12 @@ export function extractSheetIdOrError(sheetUrl: string): string {
     return match[1];
   }
 
-  throw new Error("Unmatched sheet ID");
+  throw new Error('Unmatched sheet ID');
 }
 
 export function buildSheetsApiURL(path: string, params?: { [key: string]: string }): string {
-  if (path[0] !== "/") {
-    throw new Error("Must prepend slash to path");
+  if (path[0] !== '/') {
+    throw new Error('Must prepend slash to path');
   }
 
   const url = new URL(`https://sheets.googleapis.com/v4/spreadsheets${path}`);
@@ -81,7 +81,7 @@ export async function createSpreadsheet({
   title: string;
   sheetTitles: string[];
 }): Promise<ISpreadsheet> {
-  const url = buildSheetsApiURL(`/`);
+  const url = buildSheetsApiURL('/');
 
   const headers = await headersFactory();
 
@@ -92,7 +92,7 @@ export async function createSpreadsheet({
     sheets: sheetTitles.map((sheetTitle, idx) => [
       {
         properties: {
-          sheetType: "GRID",
+          sheetType: 'GRID',
           sheetId: idx,
           title: sheetTitle,
           gridProperties: {
@@ -105,7 +105,7 @@ export async function createSpreadsheet({
   };
 
   return customFetch(url, {
-    method: "POST",
+    method: 'POST',
     headers,
     body: JSON.stringify(payload),
   }).then((response) => response.json());
@@ -214,14 +214,14 @@ export async function createSpreadsheet({
 export async function getSheetProperties({ spreadsheetId }: { spreadsheetId: string }): Promise<{
   sheets: ISheet[];
 }> {
-  const url = buildSheetsApiURL(`/${spreadsheetId}`, { fields: "sheets.properties" });
+  const url = buildSheetsApiURL(`/${spreadsheetId}`, { fields: 'sheets.properties' });
 
   const headers = await headersFactory();
 
   // GET /v4/spreadsheets/spreadsheetId?fields=sheets.properties(sheetId,title,sheetType,gridProperties)
 
   return customFetch(url, {
-    method: "GET",
+    method: 'GET',
     headers,
   }).then((response) => response.json());
 }
@@ -235,22 +235,22 @@ export async function writeValues({
   spreadsheetId: string;
   range: string;
   values: ISheetValues;
-  valueInputOption?: "RAW" | "USER_ENTERED";
+  valueInputOption?: 'RAW' | 'USER_ENTERED';
 }) {
   const url = buildSheetsApiURL(`/${spreadsheetId}/values/${range}`, {
-    valueInputOption: valueInputOption ?? "USER_ENTERED",
+    valueInputOption: valueInputOption ?? 'USER_ENTERED',
   });
 
   const headers = await headersFactory();
 
   const payload: IValueRange = {
     range,
-    majorDimension: "ROWS",
+    majorDimension: 'ROWS',
     values,
   };
 
   return customFetch(url, {
-    method: "PUT",
+    method: 'PUT',
     headers,
     body: JSON.stringify(payload),
   });
@@ -268,7 +268,7 @@ export async function readValues({
   const headers = await headersFactory();
 
   return customFetch(url, {
-    method: "GET",
+    method: 'GET',
     headers,
   }).then((response) => response.json());
 }
@@ -282,23 +282,23 @@ export async function appendValues({
   spreadsheetId: string;
   range: string;
   values: ISheetValues;
-  valueInputOption?: "RAW" | "USER_ENTERED";
+  valueInputOption?: 'RAW' | 'USER_ENTERED';
 }) {
   // https://developers.google.com/sheets/api/reference/rest/v4/spreadsheets.values/append
   const url = buildSheetsApiURL(`/${spreadsheetId}/values/${range}:append`, {
-    valueInputOption: valueInputOption ?? "USER_ENTERED",
+    valueInputOption: valueInputOption ?? 'USER_ENTERED',
   });
 
   const headers = await headersFactory();
 
   const payload: IValueRange = {
     range,
-    majorDimension: "ROWS",
+    majorDimension: 'ROWS',
     values,
   };
 
   return customFetch(url, {
-    method: "POST",
+    method: 'POST',
     headers,
     body: JSON.stringify(payload),
   });
@@ -318,7 +318,7 @@ export async function batchUpdate({
   const headers = await headersFactory();
 
   return customFetch(url, {
-    method: "POST",
+    method: 'POST',
     headers,
     body: JSON.stringify({
       requests,
@@ -333,7 +333,7 @@ export async function batchUpdateValues({
 }: {
   spreadsheetId: string;
   data: IValueRange[];
-  valueInputOption?: "RAW" | "USER_ENTERED";
+  valueInputOption?: 'RAW' | 'USER_ENTERED';
 }) {
   // https://developers.google.com/sheets/api/reference/rest/v4/spreadsheets.values/batchUpdate
   // https://sheets.googleapis.com/v4/spreadsheets/{spreadsheetId}/values:batchUpdate
@@ -342,11 +342,11 @@ export async function batchUpdateValues({
   const headers = await headersFactory();
 
   return customFetch(url, {
-    method: "POST",
+    method: 'POST',
     headers,
     body: JSON.stringify({
       data,
-      valueInputOption: valueInputOption ?? "USER_ENTERED",
+      valueInputOption: valueInputOption ?? 'USER_ENTERED',
     }),
   });
 }
@@ -354,7 +354,7 @@ export async function batchUpdateValues({
 export function addRowsRequestFactory({ sheetId, length }: { sheetId: number; length: number }) {
   return {
     appendDimension: {
-      dimension: "ROWS",
+      dimension: 'ROWS',
       // Adding 0 rows causes the Sheets API to 500
       length: Math.max(length, 1),
       sheetId,
@@ -365,7 +365,7 @@ export function addRowsRequestFactory({ sheetId, length }: { sheetId: number; le
 export function addColumnsRequestFactory({ sheetId, length }: { sheetId: number; length: number }) {
   return {
     appendDimension: {
-      dimension: "COLUMNS",
+      dimension: 'COLUMNS',
       // Adding 0 columns causes the Sheets API to 500
       length: Math.max(length, 1),
       sheetId,
@@ -375,10 +375,10 @@ export function addColumnsRequestFactory({ sheetId, length }: { sheetId: number;
 
 export function styleTopRowRequestFactory({
   sheetId,
-  horizontalAlignment = "CENTER",
+  horizontalAlignment = 'CENTER',
 }: {
   sheetId: number;
-  horizontalAlignment?: "CENTER" | "LEFT";
+  horizontalAlignment?: 'CENTER' | 'LEFT';
 }) {
   return {
     repeatCell: {
@@ -406,7 +406,7 @@ export function styleTopRowRequestFactory({
           },
         },
       },
-      fields: "userEnteredFormat(backgroundColor,textFormat,horizontalAlignment)",
+      fields: 'userEnteredFormat(backgroundColor,textFormat,horizontalAlignment)',
     },
   };
 }
@@ -424,14 +424,14 @@ export function hideColumnsRequestFactory({
     updateDimensionProperties: {
       range: {
         sheetId,
-        dimension: "COLUMNS",
+        dimension: 'COLUMNS',
         startIndex,
         endIndex,
       },
       properties: {
         hiddenByUser: true,
       },
-      fields: "hiddenByUser",
+      fields: 'hiddenByUser',
     },
   };
 }
@@ -471,8 +471,8 @@ export function numberColumnRequestFactory({
   sheetId: number;
   columnIndex: number;
   endColumnIndex?: number;
-  numberFormatType: "CURRENCY" | "NUMBER";
-  numberFormatPattern: `$#,##0.00` | "0.00";
+  numberFormatType: 'CURRENCY' | 'NUMBER';
+  numberFormatPattern: '$#,##0.00' | '0.00';
 }) {
   return {
     repeatCell: {
@@ -489,7 +489,7 @@ export function numberColumnRequestFactory({
           },
         },
       },
-      fields: "userEnteredFormat.numberFormat",
+      fields: 'userEnteredFormat.numberFormat',
     },
   };
 }
@@ -504,8 +504,8 @@ export function alignColumnRequestFactory({
   sheetId: number;
   columnIndex: number;
   endColumnIndex?: number;
-  horizontalAlignment: "CENTER";
-  verticalAlignment: "MIDDLE";
+  horizontalAlignment: 'CENTER';
+  verticalAlignment: 'MIDDLE';
 }) {
   return {
     repeatCell: {
@@ -520,7 +520,7 @@ export function alignColumnRequestFactory({
           verticalAlignment,
         },
       },
-      fields: "userEnteredFormat(horizontalAlignment,verticalAlignment)",
+      fields: 'userEnteredFormat(horizontalAlignment,verticalAlignment)',
     },
   };
 }
@@ -539,7 +539,7 @@ export function shrinkFontRequestFactory({ sheetId }: { sheetId: number }) {
           },
         },
       },
-      fields: "userEnteredFormat(textFormat)",
+      fields: 'userEnteredFormat(textFormat)',
     },
   };
 }
@@ -553,19 +553,19 @@ export function freezeTopRowRequestFactory({ sheetId }: { sheetId: number }) {
           frozenRowCount: 1,
         },
       },
-      fields: "gridProperties.frozenRowCount",
+      fields: 'gridProperties.frozenRowCount',
     },
   };
 }
 
 export function autoResizeDimensionsRequestFactory({
   sheetId,
-  dimension = "COLUMNS",
+  dimension = 'COLUMNS',
   startIndex,
   endIndex,
 }: {
   sheetId: number;
-  dimension?: "COLUMNS" | "ROWS";
+  dimension?: 'COLUMNS' | 'ROWS';
   startIndex?: number;
   endIndex?: number;
 }) {
@@ -608,7 +608,7 @@ export function conditionalFormattingRequestFactory({
         ],
         booleanRule: {
           condition: {
-            type: "CUSTOM_FORMULA",
+            type: 'CUSTOM_FORMULA',
             values: [
               {
                 userEnteredValue: customFormula,

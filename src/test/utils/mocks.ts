@@ -1,11 +1,11 @@
-import { createLocalVue } from "@vue/test-utils";
-import { BootstrapVue } from "bootstrap-vue";
-import { chrome } from "jest-chrome";
-import Vuex from "vuex";
+import { createLocalVue } from '@vue/test-utils';
+import { BootstrapVue } from 'bootstrap-vue';
+import { chrome } from 'jest-chrome';
+import Vuex from 'vuex';
 
 export function mockConsts() {
-  jest.mock("@/consts", () => {
-    const originalModule = jest.requireActual("@/consts");
+  jest.mock('@/consts', () => {
+    const originalModule = jest.requireActual('@/consts');
 
     return {
       __esModule: true,
@@ -16,9 +16,9 @@ export function mockConsts() {
 
 export function mockChrome() {
   const manifest: chrome.runtime.Manifest = {
-    name: "my chrome extension",
+    name: 'my chrome extension',
     manifest_version: 3,
-    version: "1.0.0",
+    version: '1.0.0',
   };
 
   chrome.runtime.getManifest.mockImplementation(() => manifest);
@@ -29,7 +29,7 @@ export function mockChrome() {
 
 export function mockDebugUtils() {
   // Mock out a single function from the imported module
-  jest.mock("@/utils/debug", () =>
+  jest.mock('@/utils/debug', () =>
   // const originalModule = jest.requireActual('../foo-bar-baz');
 
     // Mock the default export and named export 'foo'
@@ -41,27 +41,27 @@ export function mockDebugUtils() {
 }
 
 export function mockStore() {
-  jest.mock("@/store/page-overlay/index", () => ({
+  jest.mock('@/store/page-overlay/index', () => ({
     __esModule: true,
   }));
 }
 
 export function mockAuthManager() {
-  jest.mock("@/modules/auth-manager.module", () => ({
+  jest.mock('@/modules/auth-manager.module', () => ({
     __esModule: true,
     authManager: jest.fn(),
   }));
 }
 
 export function mockAnalyticsManager() {
-  jest.mock("@/modules/analytics-manager.module", () => ({
+  jest.mock('@/modules/analytics-manager.module', () => ({
     __esModule: true,
     analyticsManager: jest.fn(),
   }));
 }
 
 export function mockFetchManager() {
-  jest.mock("@/modules/fetch-manager.module", () => ({
+  jest.mock('@/modules/fetch-manager.module', () => ({
     __esModule: true,
     fetchManager: jest.fn(),
   }));

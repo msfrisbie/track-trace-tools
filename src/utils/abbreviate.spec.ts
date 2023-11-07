@@ -1,6 +1,6 @@
-import { abbreviateString } from "@/utils/abbreviate";
+import { abbreviateString } from '@/utils/abbreviate';
 
-describe("abbreviate.ts", () => {
+describe('abbreviate.ts', () => {
   it('abbreviateString returns correct first three characters from string', () => {
     expect(abbreviateString('5%-ax4 mars', 0, 3)).toBe('5%a');
     expect(abbreviateString('A-E-4 DeathMonkey', 0, 3)).toBe('AE4');

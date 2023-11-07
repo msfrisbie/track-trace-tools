@@ -1,6 +1,6 @@
-import { ModalAction, ModalType } from "@/consts";
-import { IAtomicService } from "@/interfaces";
-import { Observable, Subject } from "rxjs";
+import { ModalAction, ModalType } from '@/consts';
+import { IAtomicService } from '@/interfaces';
+import { Observable, Subject } from 'rxjs';
 
 export interface IModalEvent {
   modalType: ModalType;

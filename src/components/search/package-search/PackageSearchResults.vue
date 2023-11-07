@@ -45,20 +45,20 @@
 </template>
 
 <script lang="ts">
-import PackageHistoryList from "@/components/search/package-search/PackageHistoryList.vue";
-import PackageResultGroups from "@/components/search/package-search/PackageResultGroups.vue";
-import PackageSearchResultDetail from "@/components/search/package-search/PackageSearchResultDetail.vue";
-import { IIndexedPackageData, IPackageData, IPluginState } from "@/interfaces";
-import store from "@/store/page-overlay/index";
-import { PackageSearchActions } from "@/store/page-overlay/modules/package-search/consts";
-import { TransferBuilderGetters } from "@/store/page-overlay/modules/transfer-builder/consts";
-import Vue from "vue";
-import { mapActions, mapGetters, mapState } from "vuex";
-import HistoryList from "@/components/search/shared/HistoryList.vue";
-import SearchViewSelector from "@/components/search/shared/SearchViewSelector.vue";
+import PackageHistoryList from '@/components/search/package-search/PackageHistoryList.vue';
+import PackageResultGroups from '@/components/search/package-search/PackageResultGroups.vue';
+import PackageSearchResultDetail from '@/components/search/package-search/PackageSearchResultDetail.vue';
+import { IIndexedPackageData, IPackageData, IPluginState } from '@/interfaces';
+import store from '@/store/page-overlay/index';
+import { PackageSearchActions } from '@/store/page-overlay/modules/package-search/consts';
+import { TransferBuilderGetters } from '@/store/page-overlay/modules/transfer-builder/consts';
+import Vue from 'vue';
+import { mapActions, mapGetters, mapState } from 'vuex';
+import HistoryList from '@/components/search/shared/HistoryList.vue';
+import SearchViewSelector from '@/components/search/shared/SearchViewSelector.vue';
 
 export default Vue.extend({
-  name: "PackageSearchResults",
+  name: 'PackageSearchResults',
   store,
   components: {
     PackageSearchResultDetail,

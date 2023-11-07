@@ -98,22 +98,22 @@
 </template>
 
 <script lang="ts">
-import PromoSlideshow from "@/components/overlay-widget/PromoSlideshow.vue";
-import TrackTraceToolsLogo from "@/components/shared/TrackTraceToolsLogo.vue";
-import { BuilderType, MessageType, ToolkitView } from "@/consts";
-import { analyticsManager } from "@/modules/analytics-manager.module";
-import { builderManager } from "@/modules/builder-manager.module";
-import { pageManager } from "@/modules/page-manager/page-manager.module";
-import { MutationType } from "@/mutation-types";
-import router from "@/router/index";
-import store from "@/store/page-overlay/index";
-import Vue from "vue";
-import { mapState } from "vuex";
+import PromoSlideshow from '@/components/overlay-widget/PromoSlideshow.vue';
+import TrackTraceToolsLogo from '@/components/shared/TrackTraceToolsLogo.vue';
+import { BuilderType, MessageType, ToolkitView } from '@/consts';
+import { analyticsManager } from '@/modules/analytics-manager.module';
+import { builderManager } from '@/modules/builder-manager.module';
+import { pageManager } from '@/modules/page-manager/page-manager.module';
+import { MutationType } from '@/mutation-types';
+import router from '@/router/index';
+import store from '@/store/page-overlay/index';
+import Vue from 'vue';
+import { mapState } from 'vuex';
 
-const activeProjectPath = "/active-project";
+const activeProjectPath = '/active-project';
 
 export default Vue.extend({
-  name: "BuilderModal",
+  name: 'BuilderModal',
   store,
   router,
   components: {
@@ -128,7 +128,7 @@ export default Vue.extend({
       //   this.$data.builderType = null;
       // }
 
-      this.$bvModal.show("builder-modal");
+      this.$bvModal.show('builder-modal');
 
       if (this.$data.activeProject && this.$route.path !== activeProjectPath) {
         this.$router.push(activeProjectPath);
@@ -140,7 +140,7 @@ export default Vue.extend({
       }
     },
     async hide() {
-      this.$bvModal.hide("builder-modal");
+      this.$bvModal.hide('builder-modal');
     },
     toggle() {
       // @ts-ignore
@@ -150,7 +150,7 @@ export default Vue.extend({
       if (this.$data.isFullscreen) {
         document.exitFullscreen();
       } else {
-        document.querySelector("#builder-modal .modal-content")?.requestFullscreen();
+        document.querySelector('#builder-modal .modal-content')?.requestFullscreen();
       }
     },
     handleOpen() {
@@ -163,7 +163,7 @@ export default Vue.extend({
       this.$router.go(-1);
 
       analyticsManager.track(MessageType.BUILDER_ENGAGEMENT, {
-        action: `Exited`,
+        action: 'Exited',
       });
     },
     goHome() {
@@ -172,7 +172,7 @@ export default Vue.extend({
       }
 
       analyticsManager.track(MessageType.BUILDER_ENGAGEMENT, {
-        action: `Clicked home`,
+        action: 'Clicked home',
       });
     },
     openAccountView() {
@@ -188,7 +188,7 @@ export default Vue.extend({
     };
   },
   async mounted() {
-    document.addEventListener("fullscreenchange", () => {
+    document.addEventListener('fullscreenchange', () => {
       this.$data.isFullscreen = !this.$data.isFullscreen;
     });
   },
@@ -199,7 +199,7 @@ export default Vue.extend({
     if (this.$data.activeProject) {
       this.$router.push(activeProjectPath);
     } else {
-      this.$router.push("/");
+      this.$router.push('/');
     }
 
     builderManager.activeBuilderProjectUpdate.subscribe(() => {
@@ -212,7 +212,7 @@ export default Vue.extend({
   },
   computed: {
     suffix(): string {
-      return store.state.client.t3plus ? "+" : "";
+      return store.state.client.t3plus ? '+' : '';
     },
     builderTitle() {
       return this.$route.name?.toUpperCase();
@@ -222,16 +222,16 @@ export default Vue.extend({
         return ` (${store.state.client.clientName})`;
       }
       if (store.state.client.t3plus) {
-        return "+";
+        return '+';
       }
-      return "";
+      return '';
     },
     ...mapState([
-      "trackedInteractions",
-      "settings",
-      "accountEnabled",
-      "currentVersion",
-      "pluginAuth",
+      'trackedInteractions',
+      'settings',
+      'accountEnabled',
+      'currentVersion',
+      'pluginAuth',
     ]),
   },
 });

@@ -95,24 +95,24 @@
 </template>
 
 <script lang="ts">
-import NextStepOptions from "@/components/overlay-widget/NextStepOptions.vue";
-import { BuilderType, ToolkitView } from "@/consts";
-import { builderManager, IBuilderProject } from "@/modules/builder-manager.module";
-import { pageManager } from "@/modules/page-manager/page-manager.module";
-import { MutationType } from "@/mutation-types";
-import router from "@/router/index";
-import store from "@/store/page-overlay/index";
+import NextStepOptions from '@/components/overlay-widget/NextStepOptions.vue';
+import { BuilderType, ToolkitView } from '@/consts';
+import { builderManager, IBuilderProject } from '@/modules/builder-manager.module';
+import { pageManager } from '@/modules/page-manager/page-manager.module';
+import { MutationType } from '@/mutation-types';
+import router from '@/router/index';
+import store from '@/store/page-overlay/index';
 import {
   failedRowCount,
   pendingOrInflightRowCount,
   successRowCount,
   totalRowCount,
-} from "@/utils/builder";
-import Vue from "vue";
-import { mapState } from "vuex";
+} from '@/utils/builder';
+import Vue from 'vue';
+import { mapState } from 'vuex';
 
 export default Vue.extend({
-  name: "ActiveProjectView",
+  name: 'ActiveProjectView',
   store,
   router,
   components: {
@@ -147,7 +147,7 @@ export default Vue.extend({
     });
   },
   computed: {
-    ...mapState(["trackedInteractions", "settings", "accountEnabled"]),
+    ...mapState(['trackedInteractions', 'settings', 'accountEnabled']),
     pendingOrInflightRowCount() {
       return pendingOrInflightRowCount(this.$data.activeProject);
     },
@@ -163,26 +163,26 @@ export default Vue.extend({
     progressVariant() {
       if (pendingOrInflightRowCount(this.$data.activeProject) > 0) {
         if (failedRowCount(this.$data.activeProject) > 0) {
-          return "warning";
+          return 'warning';
         }
-        return "primary";
+        return 'primary';
       }
 
       // This means there are no pending rows
       if (failedRowCount(this.$data.activeProject) > 0) {
-        return "danger";
+        return 'danger';
       }
 
-      return "success";
+      return 'success';
     },
     pluralRowDescriptor() {
       switch (this.$data.activeProject.builderType) {
         case BuilderType.UNPACK_IMMATURE_PLANTS:
         case BuilderType.CREATE_IMMATURE_PLANTS_FROM_MOTHER:
         case BuilderType.PROMOTE_IMMATURE_PLANTS:
-          return "plant batches";
+          return 'plant batches';
         case BuilderType.CREATE_ITEMS:
-          return "items";
+          return 'items';
         case BuilderType.ADJUST_PACKAGE:
         case BuilderType.CREATE_HARVEST_PACKAGE:
         case BuilderType.CREATE_IMMATURE_PLANT_PACKAGES_FROM_MOTHER_PLANT:
@@ -193,27 +193,27 @@ export default Vue.extend({
         case BuilderType.SPLIT_PACKAGE:
         case BuilderType.PACK_IMMATURE_PLANTS:
         case BuilderType.MOVE_PACKAGES:
-          return "packages";
+          return 'packages';
         case BuilderType.CREATE_TRANSFER:
         case BuilderType.UPDATE_TRANSFER:
         case BuilderType.CREATE_TRANSFER_TEMPLATE:
-          return "transfers";
+          return 'transfers';
         case BuilderType.DESTROY_PLANTS:
         case BuilderType.HARVEST_PLANTS:
         case BuilderType.MANICURE_PLANTS:
         case BuilderType.MOVE_PLANTS:
-          return "plants";
+          return 'plants';
         default:
-          return "entries";
+          return 'entries';
       }
     },
     isHarvestProject() {
       const project: IBuilderProject = this.$data.activeProject;
 
       return (
-        project &&
-        (project.builderType === BuilderType.HARVEST_PLANTS ||
-          project.builderType === BuilderType.MANICURE_PLANTS)
+        project
+        && (project.builderType === BuilderType.HARVEST_PLANTS
+          || project.builderType === BuilderType.MANICURE_PLANTS)
       );
     },
   },

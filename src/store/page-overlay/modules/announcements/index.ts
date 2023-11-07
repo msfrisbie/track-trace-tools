@@ -1,18 +1,18 @@
-import { MessageType } from "@/consts";
-import { IPluginState } from "@/interfaces";
-import { analyticsManager } from "@/modules/analytics-manager.module";
-import { t3RequestManager } from "@/modules/t3-request-manager.module";
-import { isoDatetimedDifferenceInMinutes } from "@/utils/date";
+import { MessageType } from '@/consts';
+import { IPluginState } from '@/interfaces';
+import { analyticsManager } from '@/modules/analytics-manager.module';
+import { t3RequestManager } from '@/modules/t3-request-manager.module';
+import { isoDatetimedDifferenceInMinutes } from '@/utils/date';
 // The marked import structure is causing problems
 // @ts-ignore
-import * as marked from "marked/lib/marked.cjs";
-import { ActionContext } from "vuex";
+import * as marked from 'marked/lib/marked.cjs';
+import { ActionContext } from 'vuex';
 import {
   AnnouncementsActions,
   AnnouncementsGetters,
   AnnouncementsMutations,
-} from "./consts";
-import { IAnnouncementData, IAnnouncementsState } from "./interfaces";
+} from './consts';
+import { IAnnouncementData, IAnnouncementsState } from './interfaces';
 
 const renderer = {
   heading(text: string, level: any) {
@@ -128,13 +128,13 @@ export const announcementsModule = {
     ) => {
       // Only load once per minute
       if (
-        !!ctx.state.lastAnnouncementsCheckDatetime &&
-        isoDatetimedDifferenceInMinutes(
+        !!ctx.state.lastAnnouncementsCheckDatetime
+        && isoDatetimedDifferenceInMinutes(
           new Date().toISOString(),
           ctx.state.lastAnnouncementsCheckDatetime
         ) < 1
       ) {
-        console.log("declining to load");
+        console.log('declining to load');
         return;
       }
 
@@ -150,10 +150,10 @@ export const announcementsModule = {
       ctx.state.lastAnnouncementsCheckDatetime = new Date().toISOString();
       ctx.state.notificationCount = announcements.filter(
         (x) =>
-          x.show_notification &&
+          x.show_notification
           // Only show fresh notifications
-          (!ctx.state.lastAnnouncementsViewedDatetime ||
-            x.published_at > ctx.state.lastAnnouncementsViewedDatetime)
+          && (!ctx.state.lastAnnouncementsViewedDatetime
+            || x.published_at > ctx.state.lastAnnouncementsViewedDatetime)
       ).length;
     },
     [AnnouncementsActions.VIEW_ANNOUNCEMENTS]: async (

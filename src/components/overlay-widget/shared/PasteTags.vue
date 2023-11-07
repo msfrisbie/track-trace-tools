@@ -84,18 +84,18 @@
 </template>
 
 <script lang="ts">
-import store from "@/store/page-overlay/index";
+import store from '@/store/page-overlay/index';
 import {
   generateTagRangeOrError,
   getDuplicates,
   isValidTag,
   numTagsInRange,
   validTagPairOrError,
-} from "@/utils/tags";
-import Vue from "vue";
+} from '@/utils/tags';
+import Vue from 'vue';
 
 export default Vue.extend({
-  name: "PlantPicker",
+  name: 'PlantPicker',
   store,
   components: {},
   props: {
@@ -104,13 +104,13 @@ export default Vue.extend({
   methods: {
     updateTags() {
       // @ts-ignore
-      this.$emit("update:tags", this.validTagsImpl());
+      this.$emit('update:tags', this.validTagsImpl());
     },
     setTags() {
       // @ts-ignore
-      this.$data.tagsText = this.tagRangeImpl().join("\n");
-      this.$data.startTag = "";
-      this.$data.endTag = "";
+      this.$data.tagsText = this.tagRangeImpl().join('\n');
+      this.$data.startTag = '';
+      this.$data.endTag = '';
       // @ts-ignore
       this.updateTags();
     },
@@ -146,7 +146,7 @@ export default Vue.extend({
       }
     },
     clearForm() {
-      this.$data.tagsText = "";
+      this.$data.tagsText = '';
     },
   },
   computed: {
@@ -169,14 +169,14 @@ export default Vue.extend({
         // @ts-ignore
         return `${numTagsInRange(this.$data.startTag, this.$data.endTag)} tags in this range`;
       } catch (e) {
-        return "";
+        return '';
       }
     },
     invalidFeedback(): string {
       try {
         // @ts-ignore
         validTagPairOrError(this.$data.startTag, this.$data.endTag);
-        return "";
+        return '';
       } catch (e) {
         return (e as Error).toString();
       }
@@ -232,9 +232,9 @@ export default Vue.extend({
   },
   data() {
     return {
-      startTag: "",
-      endTag: "",
-      tagsText: "",
+      startTag: '',
+      endTag: '',
+      tagsText: '',
       showBadTags: false,
     };
   },

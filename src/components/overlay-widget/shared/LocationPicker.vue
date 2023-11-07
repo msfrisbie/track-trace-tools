@@ -54,15 +54,15 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import store from "@/store/page-overlay/index";
-import { ILocationData } from "@/interfaces";
-import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
-import ErrorReadout from "@/components/overlay-widget/shared/ErrorReadout.vue";
-import { DataLoadError, DataLoadErrorType } from "@/modules/data-loader/data-loader-error";
+import Vue from 'vue';
+import store from '@/store/page-overlay/index';
+import { ILocationData } from '@/interfaces';
+import { primaryDataLoader } from '@/modules/data-loader/data-loader.module';
+import ErrorReadout from '@/components/overlay-widget/shared/ErrorReadout.vue';
+import { DataLoadError, DataLoadErrorType } from '@/modules/data-loader/data-loader-error';
 
 export default Vue.extend({
-  name: "LocationPicker",
+  name: 'LocationPicker',
   store,
   components: {
     ErrorReadout
@@ -77,7 +77,7 @@ export default Vue.extend({
   },
   data() {
     return {
-      locationNameQuery: "",
+      locationNameQuery: '',
       inflight: false,
       error: null,
       locations: []
@@ -124,11 +124,11 @@ export default Vue.extend({
       }
 
       if (this.$data.locations.length === 0) {
-        console.error("Server returned 0 locations");
+        console.error('Server returned 0 locations');
 
         this.$data.error = new DataLoadError(
           DataLoadErrorType.ZERO_RESULTS,
-          "Zero results returned"
+          'Zero results returned'
         );
       }
     },
@@ -150,7 +150,7 @@ export default Vue.extend({
       );
 
       if (matchingLocation) {
-        this.$emit("update:location", matchingLocation);
+        this.$emit('update:location', matchingLocation);
       }
     }
   }

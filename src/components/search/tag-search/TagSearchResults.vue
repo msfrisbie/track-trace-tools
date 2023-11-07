@@ -74,19 +74,19 @@
 
 <script lang="ts">
 // import TagManifestCartBuilder from "@/components/search/tag-search/TagManifestCartBuilder.vue";
-import TagHistoryList from "@/components/search/tag-search/TagHistoryList.vue";
-import TagResultGroups from "@/components/search/tag-search/TagResultGroups.vue";
-import TagSearchResultDetail from "@/components/search/tag-search/TagSearchResultDetail.vue";
-import { IIndexedTagData, IPluginState, ITagData } from "@/interfaces";
-import store from "@/store/page-overlay/index";
-import { TagSearchActions } from "@/store/page-overlay/modules/tag-search/consts";
-import Vue from "vue";
-import { mapActions, mapGetters, mapState } from "vuex";
-import HistoryList from "@/components/search/shared/HistoryList.vue";
-import SearchViewSelector from "@/components/search/shared/SearchViewSelector.vue";
+import TagHistoryList from '@/components/search/tag-search/TagHistoryList.vue';
+import TagResultGroups from '@/components/search/tag-search/TagResultGroups.vue';
+import TagSearchResultDetail from '@/components/search/tag-search/TagSearchResultDetail.vue';
+import { IIndexedTagData, IPluginState, ITagData } from '@/interfaces';
+import store from '@/store/page-overlay/index';
+import { TagSearchActions } from '@/store/page-overlay/modules/tag-search/consts';
+import Vue from 'vue';
+import { mapActions, mapGetters, mapState } from 'vuex';
+import HistoryList from '@/components/search/shared/HistoryList.vue';
+import SearchViewSelector from '@/components/search/shared/SearchViewSelector.vue';
 
 export default Vue.extend({
-  name: "TagSearchResults",
+  name: 'TagSearchResults',
   store,
   components: {
     TagSearchResultDetail,

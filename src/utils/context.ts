@@ -1,3 +1,3 @@
 export function isBackgroundExecutionContext() {
-  return typeof window === "undefined";
+  return typeof window === 'undefined';
 }

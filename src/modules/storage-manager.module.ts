@@ -1,11 +1,11 @@
-import { VUEX_KEY } from "@/consts";
-import { IAtomicService } from "@/interfaces";
-import { debugLogFactory } from "@/utils/debug";
-import { interval } from "rxjs";
+import { VUEX_KEY } from '@/consts';
+import { IAtomicService } from '@/interfaces';
+import { debugLogFactory } from '@/utils/debug';
+import { interval } from 'rxjs';
 
-const debugLog = debugLogFactory("storage-manager.module");
+const debugLog = debugLogFactory('storage-manager.module');
 
-const KEEPALIVE_PREFIX = "tttkeepalive::";
+const KEEPALIVE_PREFIX = 'tttkeepalive::';
 const KEEPALIVE_EXPIRATION_MS = 30 * 1000;
 
 // Metrc leaves a bunch of bullshit in localStorage and doesn't clear it.
@@ -24,8 +24,8 @@ class StorageManager implements IAtomicService {
   }
 
   get keepalivePath(): string {
-    if (window.location.pathname.startsWith("/industry")) {
-      return window.location.pathname.split("/").slice(1, 3).join("/");
+    if (window.location.pathname.startsWith('/industry')) {
+      return window.location.pathname.split('/').slice(1, 3).join('/');
     }
     return window.location.pathname.slice(1);
   }
@@ -34,8 +34,8 @@ class StorageManager implements IAtomicService {
     // Test enter a blob of text roughly the size of the settings JSON.
     // If an error is thrown, wipe out the entire localstorage
     try {
-      const testKey = "foo";
-      const testValue = "x".repeat(5000);
+      const testKey = 'foo';
+      const testValue = 'x'.repeat(5000);
 
       localStorage.setItem(testKey, testValue);
       localStorage.removeItem(testKey);
@@ -44,11 +44,11 @@ class StorageManager implements IAtomicService {
       const errorMessage = (e as Error).toString();
 
       if (
-        errorMessage.includes("QuotaExceededError") ||
-        errorMessage.includes("exceeded the quota") ||
-        errorMessage.includes("quota has been exceeded")
+        errorMessage.includes('QuotaExceededError')
+        || errorMessage.includes('exceeded the quota')
+        || errorMessage.includes('quota has been exceeded')
       ) {
-        console.error("Purging keys");
+        console.error('Purging keys');
         for (const key of this.storageKeys(localStorage)) {
           if (key !== VUEX_KEY) {
             localStorage.removeItem(key);
@@ -84,7 +84,7 @@ class StorageManager implements IAtomicService {
       const expirationTime = parseInt(value, 10);
 
       if (Date.now() > expirationTime) {
-        debugLog(async () => ["Removing expired", key]);
+        debugLog(async () => ['Removing expired', key]);
 
         localStorage.removeItem(key);
       }
@@ -92,7 +92,7 @@ class StorageManager implements IAtomicService {
   }
 
   private destroyExpiredBlobs() {
-    debugLog(async () => ["LocalStorage size:", this.storageSize(localStorage)]);
+    debugLog(async () => ['LocalStorage size:', this.storageSize(localStorage)]);
 
     // The active data blobs that should remain will have this prefix
     const WHITELISTED_PREFIXES: string[] = this.whitelistedPrefixes();
@@ -102,7 +102,7 @@ class StorageManager implements IAtomicService {
         continue;
       }
 
-      if (!key.startsWith("industry/")) {
+      if (!key.startsWith('industry/')) {
         continue;
       }
 
@@ -120,7 +120,7 @@ class StorageManager implements IAtomicService {
       localStorage.removeItem(key);
     }
 
-    debugLog(async () => ["LocalStorage size:", this.storageSize(localStorage)]);
+    debugLog(async () => ['LocalStorage size:', this.storageSize(localStorage)]);
   }
 
   private whitelistedPrefixes() {

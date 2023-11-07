@@ -22,13 +22,13 @@
 </template>
 
 <script lang="ts">
-import router from "@/router/index";
-import store from "@/store/page-overlay/index";
-import Vue from "vue";
-import { mapState } from "vuex";
+import router from '@/router/index';
+import store from '@/store/page-overlay/index';
+import Vue from 'vue';
+import { mapState } from 'vuex';
 
 export default Vue.extend({
-  name: "LayoutSandbox",
+  name: 'LayoutSandbox',
   store,
   router,
   props: {},

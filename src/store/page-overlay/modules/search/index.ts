@@ -1,24 +1,24 @@
-import { MessageType } from "@/consts";
-import { IPluginState } from "@/interfaces";
-import { analyticsManager } from "@/modules/analytics-manager.module";
+import { MessageType } from '@/consts';
+import { IPluginState } from '@/interfaces';
+import { analyticsManager } from '@/modules/analytics-manager.module';
 import {
   PACKAGE_TAB_REGEX,
   PLANTS_TAB_REGEX,
   TAG_TAB_REGEX,
   TRANSFER_TAB_REGEX,
-} from "@/modules/page-manager/consts";
-import { maybePushOntoUniqueStack } from "@/utils/search";
-import _ from "lodash-es";
-import { ActionContext } from "vuex";
-import { PackageSearchActions } from "../package-search/consts";
-import { PlantSearchActions } from "../plant-search/consts";
-import { TagSearchActions } from "../tag-search/consts";
-import { TransferSearchActions } from "../transfer-search/consts";
-import { SearchActions, SearchType } from "./consts";
-import { ISearchState } from "./interfaces";
+} from '@/modules/page-manager/consts';
+import { maybePushOntoUniqueStack } from '@/utils/search';
+import _ from 'lodash-es';
+import { ActionContext } from 'vuex';
+import { PackageSearchActions } from '../package-search/consts';
+import { PlantSearchActions } from '../plant-search/consts';
+import { TagSearchActions } from '../tag-search/consts';
+import { TransferSearchActions } from '../transfer-search/consts';
+import { SearchActions, SearchType } from './consts';
+import { ISearchState } from './interfaces';
 
 const inMemoryState = {
-  queryString: "",
+  queryString: '',
   searchType: SearchType.PACKAGES,
   showSearchResults: false,
   modalSearchOpen: false,

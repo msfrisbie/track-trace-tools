@@ -1,41 +1,41 @@
-import { MessageType } from "@/consts";
-import { IPluginState, ISpreadsheet } from "@/interfaces";
-import { analyticsManager } from "@/modules/analytics-manager.module";
-import { maybeLoadCogsReportData } from "@/utils/reports/cogs-report";
-import { maybeLoadCogsTrackerReportData } from "@/utils/reports/cogs-tracker-report";
+import { MessageType } from '@/consts';
+import { IPluginState, ISpreadsheet } from '@/interfaces';
+import { analyticsManager } from '@/modules/analytics-manager.module';
+import { maybeLoadCogsReportData } from '@/utils/reports/cogs-report';
+import { maybeLoadCogsTrackerReportData } from '@/utils/reports/cogs-tracker-report';
 import {
   maybeLoadCogsV2ReportData,
   updateCogsV2MasterCostSheet,
-} from "@/utils/reports/cogs-v2-report";
-import { maybeLoadEmployeeAuditReportData } from "@/utils/reports/employee-audit-report";
-import { maybeLoadEmployeeSamplesReportData } from "@/utils/reports/employee-samples-report";
-import { maybeLoadHarvestPackagesReportData } from "@/utils/reports/harvest-packages-report";
-import { maybeLoadHarvestsReportData } from "@/utils/reports/harvests-report";
-import { maybeLoadImmaturePlantsQuickviewReportData } from "@/utils/reports/immature-plants-quickview-report";
-import { maybeLoadImmaturePlantsReportData } from "@/utils/reports/immature-plants-report";
-import { maybeLoadIncomingTransfersReportData } from "@/utils/reports/incoming-transfers-report";
-import { maybeLoadMaturePlantsQuickviewReportData } from "@/utils/reports/mature-plants-quickview-report";
-import { maybeLoadMaturePlantsReportData } from "@/utils/reports/mature-plants-report";
-import { maybeLoadOutgoingTransferManifestsReportData } from "@/utils/reports/outgoing-transfer-manifests-report";
-import { maybeLoadOutgoingTransfersReportData } from "@/utils/reports/outgoing-transfers-report";
-import { maybeLoadPackageReportData } from "@/utils/reports/package-report";
-import { maybeLoadPackagesQuickviewReportData } from "@/utils/reports/packages-quickview-report";
-import { maybeLoadPointInTimeInventoryReportData } from "@/utils/reports/point-in-time-inventory-report";
-import { maybeLoadStragglerPackageReportData } from "@/utils/reports/straggler-package-report";
-import { maybeLoadTagsReportData } from "@/utils/reports/tags-report";
-import { maybeLoadTransferHubTransfersReportData } from "@/utils/reports/transfer-hub-transfers-report";
-import { getSimpleSpreadsheet } from "@/utils/sheets";
-import { createCsvOrError, createSpreadsheetOrError } from "@/utils/sheets-export";
-import { v4 as uuidv4 } from "uuid";
-import { ActionContext } from "vuex";
+} from '@/utils/reports/cogs-v2-report';
+import { maybeLoadEmployeeAuditReportData } from '@/utils/reports/employee-audit-report';
+import { maybeLoadEmployeeSamplesReportData } from '@/utils/reports/employee-samples-report';
+import { maybeLoadHarvestPackagesReportData } from '@/utils/reports/harvest-packages-report';
+import { maybeLoadHarvestsReportData } from '@/utils/reports/harvests-report';
+import { maybeLoadImmaturePlantsQuickviewReportData } from '@/utils/reports/immature-plants-quickview-report';
+import { maybeLoadImmaturePlantsReportData } from '@/utils/reports/immature-plants-report';
+import { maybeLoadIncomingTransfersReportData } from '@/utils/reports/incoming-transfers-report';
+import { maybeLoadMaturePlantsQuickviewReportData } from '@/utils/reports/mature-plants-quickview-report';
+import { maybeLoadMaturePlantsReportData } from '@/utils/reports/mature-plants-report';
+import { maybeLoadOutgoingTransferManifestsReportData } from '@/utils/reports/outgoing-transfer-manifests-report';
+import { maybeLoadOutgoingTransfersReportData } from '@/utils/reports/outgoing-transfers-report';
+import { maybeLoadPackageReportData } from '@/utils/reports/package-report';
+import { maybeLoadPackagesQuickviewReportData } from '@/utils/reports/packages-quickview-report';
+import { maybeLoadPointInTimeInventoryReportData } from '@/utils/reports/point-in-time-inventory-report';
+import { maybeLoadStragglerPackageReportData } from '@/utils/reports/straggler-package-report';
+import { maybeLoadTagsReportData } from '@/utils/reports/tags-report';
+import { maybeLoadTransferHubTransfersReportData } from '@/utils/reports/transfer-hub-transfers-report';
+import { getSimpleSpreadsheet } from '@/utils/sheets';
+import { createCsvOrError, createSpreadsheetOrError } from '@/utils/sheets-export';
+import { v4 as uuidv4 } from 'uuid';
+import { ActionContext } from 'vuex';
 import {
   IStatusMessage,
   ReportAuxTask,
   ReportsActions,
   ReportsMutations,
   ReportStatus,
-} from "./consts";
-import { IReportConfig, IReportData, IReportsState } from "./interfaces";
+} from './consts';
+import { IReportConfig, IReportData, IReportsState } from './interfaces';
 
 const inMemoryState = {
   status: ReportStatus.INITIAL,
@@ -160,12 +160,12 @@ export const reportsModule = {
         await maybeLoadPointInTimeInventoryReportData({ ctx, reportData, reportConfig });
 
         ctx.commit(ReportsMutations.SET_STATUS, {
-          statusMessage: { text: "Generating report...", level: "success" },
+          statusMessage: { text: 'Generating report...', level: 'success' },
         });
 
         console.log({ reportData, reportConfig });
 
-        if (reportConfig.exportFormat === "CSV") {
+        if (reportConfig.exportFormat === 'CSV') {
           await createCsvOrError({ reportData, reportConfig });
         } else {
           const spreadsheet: ISpreadsheet = await createSpreadsheetOrError({
@@ -175,7 +175,7 @@ export const reportsModule = {
 
           ctx.commit(ReportsMutations.SET_GENERATED_SPREADSHEET, { spreadsheet });
 
-          window.open(spreadsheet.spreadsheetUrl, "_blank");
+          window.open(spreadsheet.spreadsheetUrl, '_blank');
         }
 
         ctx.commit(ReportsMutations.SET_STATUS, {

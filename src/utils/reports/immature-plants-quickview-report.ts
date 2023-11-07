@@ -1,23 +1,23 @@
-import { IIndexedPlantBatchData, IPlantBatchFilter, IPluginState } from "@/interfaces";
-import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
-import { ReportsMutations, ReportType } from "@/store/page-overlay/modules/reports/consts";
+import { IIndexedPlantBatchData, IPlantBatchFilter, IPluginState } from '@/interfaces';
+import { primaryDataLoader } from '@/modules/data-loader/data-loader.module';
+import { ReportsMutations, ReportType } from '@/store/page-overlay/modules/reports/consts';
 import {
   IReportConfig,
   IReportData,
   IReportsState,
-} from "@/store/page-overlay/modules/reports/interfaces";
-import { ActionContext } from "vuex";
+} from '@/store/page-overlay/modules/reports/interfaces';
+import { ActionContext } from 'vuex';
 import {
   IImmaturePlantsReportFormFilters,
   immaturePlantsFormFiltersFactory,
-} from "./immature-plants-report";
+} from './immature-plants-report';
 
 const REPORT_TYPE = ReportType.IMMATURE_PLANTS_QUICKVIEW;
 
 export enum ImmaturePlantQuickviewDimension {
-  STRAIN = "Strain",
-  LOCATION = "Location",
-  PLANTED_DATE = "Planted Date",
+  STRAIN = 'Strain',
+  LOCATION = 'Location',
+  PLANTED_DATE = 'Planted Date',
 }
 
 export const IMMATURE_PLANT_QUICKVIEW_DIMENSIONS: ImmaturePlantQuickviewDimension[] = [
@@ -38,7 +38,7 @@ export function extractImmaturePlantPropertyFromDimension(
     case ImmaturePlantQuickviewDimension.PLANTED_DATE:
       return plantBatch.PlantedDate;
     default:
-      throw new Error("Bad dimension");
+      throw new Error('Bad dimension');
   }
 }
 
@@ -47,14 +47,13 @@ interface IImmaturePlantsQuickviewReportFormFilters extends IImmaturePlantsRepor
   secondaryDimension: ImmaturePlantQuickviewDimension | null;
 }
 
-export const immaturePlantsQuickviewFormFiltersFactory: () => IImmaturePlantsQuickviewReportFormFilters =
-  () => ({
-    // @ts-ignore
-    primaryDimension: ImmaturePlantQuickviewDimension.STRAIN,
-    // @ts-ignore
-    secondaryDimension: ImmaturePlantQuickviewDimension.LOCATION,
-    ...immaturePlantsFormFiltersFactory(),
-  });
+export const immaturePlantsQuickviewFormFiltersFactory: () => IImmaturePlantsQuickviewReportFormFilters = () => ({
+  // @ts-ignore
+  primaryDimension: ImmaturePlantQuickviewDimension.STRAIN,
+  // @ts-ignore
+  secondaryDimension: ImmaturePlantQuickviewDimension.LOCATION,
+  ...immaturePlantsFormFiltersFactory(),
+});
 
 export function addImmaturePlantsQuickviewReport({
   reportConfig,
@@ -98,7 +97,7 @@ export async function maybeLoadImmaturePlantsQuickviewReportData({
     let plantBatches: IIndexedPlantBatchData[] = [];
     if (immaturePlantQuickviewConfig?.plantBatchFilter) {
       ctx.commit(ReportsMutations.SET_STATUS, {
-        statusMessage: { text: "Loading plant batches...", level: "success" },
+        statusMessage: { text: 'Loading plant batches...', level: 'success' },
       });
 
       if (immaturePlantQuickviewConfig?.plantBatchFilter.includeActive) {
@@ -106,7 +105,7 @@ export async function maybeLoadImmaturePlantsQuickviewReportData({
           plantBatches = [...plantBatches, ...(await primaryDataLoader.plantBatches())];
         } catch (e) {
           ctx.commit(ReportsMutations.SET_STATUS, {
-            statusMessage: { text: "Failed to load active plant batches.", level: "warning" },
+            statusMessage: { text: 'Failed to load active plant batches.', level: 'warning' },
           });
         }
       }
@@ -116,7 +115,7 @@ export async function maybeLoadImmaturePlantsQuickviewReportData({
           plantBatches = [...plantBatches, ...(await primaryDataLoader.inactivePlantBatches({}))];
         } catch (e) {
           ctx.commit(ReportsMutations.SET_STATUS, {
-            statusMessage: { text: "Failed to load inactive plant batches.", level: "warning" },
+            statusMessage: { text: 'Failed to load inactive plant batches.', level: 'warning' },
           });
         }
       }

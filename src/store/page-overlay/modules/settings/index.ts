@@ -6,12 +6,12 @@ import {
   SalesTabLabel,
   TagsTabLabel,
   TransfersTabLabel
-} from "@/consts";
-import { DarkModeState, IPluginState, SnowflakeState } from "@/interfaces";
-import { ActionContext } from "vuex";
-import { ClientActions } from "../client/consts";
-import { SettingsActions, SettingsMutations } from "./consts";
-import { ISettingsState } from "./interfaces";
+} from '@/consts';
+import { DarkModeState, IPluginState, SnowflakeState } from '@/interfaces';
+import { ActionContext } from 'vuex';
+import { ClientActions } from '../client/consts';
+import { SettingsActions, SettingsMutations } from './consts';
+import { ISettingsState } from './interfaces';
 
 const inMemoryState = {};
 
@@ -36,7 +36,7 @@ const persistedState: ISettingsState = {
   hideScreenshotButton: false,
   hideTransferSearch: false,
   landingPage: LandingPage.PACKAGES,
-  licenseKey: "",
+  licenseKey: '',
   homeLicenses: {},
   packageDefaultPageSize: 20,
   plantDefaultPageSize: 20,
@@ -46,11 +46,11 @@ const persistedState: ISettingsState = {
   autoDismissPopups: true,
   salesDefaultPageSize: 20,
   snowflakeState: SnowflakeState.DISABLED,
-  snowflakeCharacter: "❅",
-  snowflakeImageCrop: "none",
-  snowflakeSize: "md",
-  snowflakeImage: "",
-  snowflakeText: "LET IT SNOW",
+  snowflakeCharacter: '❅',
+  snowflakeImageCrop: 'none',
+  snowflakeSize: 'md',
+  snowflakeImage: '',
+  snowflakeText: 'LET IT SNOW',
   tagDefaultPageSize: 20,
   transferDefaultPageSize: 20,
   useLegacyScreenshot: false,

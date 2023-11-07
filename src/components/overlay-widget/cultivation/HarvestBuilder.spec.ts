@@ -1,15 +1,15 @@
-import "@/test/utils/auto-mock-chrome";
-import "@/test/utils/auto-mock-fetch";
-import { mockDataManager } from "@/modules/mock-data-manager.module";
-import { mockVuex } from "@/test/utils/mocks";
-import { todayIsodate } from "@/utils/date";
-import { shallowMount, Wrapper } from "@vue/test-utils";
-import Vuex, { Store } from "vuex";
-import HarvestBuilder from "./HarvestBuilder.vue";
+import '@/test/utils/auto-mock-chrome';
+import '@/test/utils/auto-mock-fetch';
+import { mockDataManager } from '@/modules/mock-data-manager.module';
+import { mockVuex } from '@/test/utils/mocks';
+import { todayIsodate } from '@/utils/date';
+import { shallowMount, Wrapper } from '@vue/test-utils';
+import Vuex, { Store } from 'vuex';
+import HarvestBuilder from './HarvestBuilder.vue';
 
 const localVue = mockVuex();
 
-describe("HarvestBuilder.vue", () => {
+describe('HarvestBuilder.vue', () => {
   let wrapper: Wrapper<any>;
   let store: Store<any>;
 
@@ -22,38 +22,38 @@ describe("HarvestBuilder.vue", () => {
     });
   });
 
-  it("Renders harvest builder", () => {
+  it('Renders harvest builder', () => {
     expect(wrapper.exists()).toEqual(true);
   });
 
-  it("Initializes harvest builder data", () => {
+  it('Initializes harvest builder data', () => {
     expect(wrapper.vm.$data).toEqual({
       activeStepIndex: 0,
-      builderType: "HARVEST_PLANTS",
+      builderType: 'HARVEST_PLANTS',
       dryingLocation: null,
       harvestIsodate: todayIsodate(),
-      harvestName: "",
+      harvestName: '',
       harvestedWeights: [],
-      patientLicenseNumber: "",
+      patientLicenseNumber: '',
       previousHarvestDataKey: null,
       selectedPlants: [],
       showHiddenDetailFields: false,
       steps: [
         {
-          stepText: "Select plants to harvest",
+          stepText: 'Select plants to harvest',
         },
         {
-          stepText: "Harvest details",
+          stepText: 'Harvest details',
         },
         {
-          stepText: "Submit",
+          stepText: 'Submit',
         },
       ],
       unitOfWeight: null,
     });
   });
 
-  it("Re-initializes the harvest weights with new plants", () => {
+  it('Re-initializes the harvest weights with new plants', () => {
     const previousWeights = [1, 2, 3];
     const newPlants = mockDataManager.mockPlants({ filter: {} }).slice(0, 5);
 

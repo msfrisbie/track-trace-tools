@@ -1,14 +1,14 @@
-import { MessageType, METRC_INDUSTRY_LICENSE_PATH_REGEX } from "@/consts";
-import { IAtomicService, IAuthState } from "@/interfaces";
-import { messageBus } from "@/modules/message-bus.module";
-import { version } from "@/modules/version";
-import { debugLogFactory } from "@/utils/debug";
+import { MessageType, METRC_INDUSTRY_LICENSE_PATH_REGEX } from '@/consts';
+import { IAtomicService, IAuthState } from '@/interfaces';
+import { messageBus } from '@/modules/message-bus.module';
+import { version } from '@/modules/version';
+import { debugLogFactory } from '@/utils/debug';
 
 const hostname: string = window.location.hostname;
 const path: string = window.location.pathname;
 const url: string = window.location.href;
 
-const debugLog = debugLogFactory("analytics-manager.module.ts");
+const debugLog = debugLogFactory('analytics-manager.module.ts');
 
 function sendAnalyticsMessage(backgroundMessageType: MessageType, data: any) {
   debugLog(async () => [backgroundMessageType, data]);
@@ -66,11 +66,11 @@ class AnalyticsManager implements IAtomicService {
 
     let metrcVersion = null;
     try {
-      const metrcFooter: HTMLElement | null = document.querySelector("#footer_center");
+      const metrcFooter: HTMLElement | null = document.querySelector('#footer_center');
 
       const footerText = metrcFooter?.innerText;
       if (footerText) {
-        const pieces = footerText.split("|");
+        const pieces = footerText.split('|');
         if (pieces.length === 2) {
           metrcVersion = pieces[1].trim();
         }

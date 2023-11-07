@@ -5,11 +5,11 @@ import {
   IPackageData,
   IPlantBatchData,
   ITagData,
-} from "@/interfaces";
-import { debugLogFactory } from "@/utils/debug";
-import { fStrip } from "./math";
+} from '@/interfaces';
+import { debugLogFactory } from '@/utils/debug';
+import { fStrip } from './math';
 
-const debugLog = debugLogFactory("utils/misc.ts");
+const debugLog = debugLogFactory('utils/misc.ts');
 
 export function allocatePromotePlantCounts(
   totalPlantCount: number,
@@ -27,12 +27,12 @@ export function allocatePromotePlantCounts(
   while (true) {
     // killswitch
     if (++counter > 1000) {
-      throw new Error("Killswitch");
+      throw new Error('Killswitch');
     }
 
     const batchSize: number = Math.min(remainingTotal, selectedPlantBatchRemainingPlantCount, 100);
 
-    debugLog(async () => ["Next batch size:", batchSize]);
+    debugLog(async () => ['Next batch size:', batchSize]);
 
     const nextBatch = {
       plantBatch: selectedPlantBatch,
@@ -49,10 +49,10 @@ export function allocatePromotePlantCounts(
     remainingTotal = fStrip(remainingTotal - batchSize);
 
     if (selectedPlantBatchRemainingPlantCount < 0) {
-      throw new Error("Negative selectedPlantBatchRemainingPlantCount");
+      throw new Error('Negative selectedPlantBatchRemainingPlantCount');
     }
     if (remainingTotal < 0) {
-      throw new Error("Negative remainingTotal");
+      throw new Error('Negative remainingTotal');
     }
 
     // Successfully finished, exit
@@ -68,7 +68,7 @@ export function allocatePromotePlantCounts(
     }
 
     if (selectedPlantBatchIndex >= plantBatches.length) {
-      throw new Error("Ran out of packages to pack from");
+      throw new Error('Ran out of packages to pack from');
     }
   }
 
@@ -144,12 +144,12 @@ export function allocatePackageQuantities(
     while (true) {
       // killswitch
       if (++counter > 1000) {
-        throw new Error("Killswitch");
+        throw new Error('Killswitch');
       }
 
       const batchSize: number = Math.min(remainingTotal, selectedPackageRemainingQuantity);
 
-      debugLog(async () => ["Next batch size:", batchSize]);
+      debugLog(async () => ['Next batch size:', batchSize]);
 
       outputPackageData.ingredients.push({
         pkg: selectedPackage,
@@ -162,10 +162,10 @@ export function allocatePackageQuantities(
       remainingTotal = fStrip(remainingTotal - batchSize);
 
       if (selectedPackageRemainingQuantity < 0) {
-        throw new Error("Negative selectedPackageRemainingQuantity");
+        throw new Error('Negative selectedPackageRemainingQuantity');
       }
       if (remainingTotal < 0) {
-        throw new Error("Negative remainingTotal");
+        throw new Error('Negative remainingTotal');
       }
 
       // Successfully finished, exit
@@ -181,7 +181,7 @@ export function allocatePackageQuantities(
       }
 
       if (selectedPackageIndex >= inputPackages.length) {
-        throw new Error("Ran out of packages to pack from");
+        throw new Error('Ran out of packages to pack from');
       }
     }
 
@@ -199,25 +199,25 @@ export function allocateImmaturePlantCounts(
   const unitOfMeasureSet = new Set();
   packages.map((pkg) => unitOfMeasureSet.add(pkg.Item.UnitOfMeasureName));
   if (unitOfMeasureSet.size !== 1) {
-    throw new Error("Mixed units of measure provided");
+    throw new Error('Mixed units of measure provided');
   }
 
-  const isCountBased = packages[0].Item.QuantityTypeName === "CountBased";
+  const isCountBased = packages[0].Item.QuantityTypeName === 'CountBased';
 
   if (!isCountBased) {
     throw new Error(
-      "T3 detected one or more plant packages is not count based. T3 cannot unpack non-count-based packages. Contact matt@trackandtrace.tools for details."
+      'T3 detected one or more plant packages is not count based. T3 cannot unpack non-count-based packages. Contact matt@trackandtrace.tools for details.'
     );
   }
 
   // Sanity check: do we have enough?
   if (totalPlantCount > packages.map((x) => x.Quantity).reduce((a, b) => a + b, 0)) {
-    throw new Error("Not enough source package material to plant");
+    throw new Error('Not enough source package material to plant');
   }
 
   let remainingTotal = totalPlantCount;
 
-  debugLog(async () => ["Tagging", totalPlantCount, "plants from", packages.length]);
+  debugLog(async () => ['Tagging', totalPlantCount, 'plants from', packages.length]);
 
   let counter = 0;
   let selectedPackageIndex = 0;
@@ -230,12 +230,12 @@ export function allocateImmaturePlantCounts(
   while (true) {
     // killswitch
     if (++counter > 1000) {
-      throw new Error("Killswitch");
+      throw new Error('Killswitch');
     }
 
     const batchSize: number = Math.min(remainingTotal, selectedPackageRemainingPlantCount, 100);
 
-    debugLog(async () => ["Next batch size:", batchSize]);
+    debugLog(async () => ['Next batch size:', batchSize]);
 
     const quantity: number = batchSize;
 
@@ -254,10 +254,10 @@ export function allocateImmaturePlantCounts(
     remainingTotal -= batchSize;
 
     if (selectedPackageRemainingPlantCount < 0) {
-      throw new Error("Negative selectedPackageRemainingPlantCount");
+      throw new Error('Negative selectedPackageRemainingPlantCount');
     }
     if (remainingTotal < 0) {
-      throw new Error("Negative remainingTotal");
+      throw new Error('Negative remainingTotal');
     }
 
     // Successfully finished, exit
@@ -273,7 +273,7 @@ export function allocateImmaturePlantCounts(
     }
 
     if (selectedPackageIndex >= packages.length) {
-      throw new Error("Ran out of packages to pack from");
+      throw new Error('Ran out of packages to pack from');
     }
   }
 
@@ -281,5 +281,5 @@ export function allocateImmaturePlantCounts(
 }
 
 export function pad(x: string, len: number): string {
-  return `${" ".repeat(len)}${x}${" ".repeat(len)}`;
+  return `${' '.repeat(len)}${x}${' '.repeat(len)}`;
 }

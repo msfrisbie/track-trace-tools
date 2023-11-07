@@ -1,4 +1,4 @@
-import { SheetTitles } from "@/consts";
+import { SheetTitles } from '@/consts';
 import {
   IDestinationData,
   IIndexedDestinationPackageData,
@@ -8,23 +8,23 @@ import {
   IIndexedTransferData,
   ITransferData,
   ITransporterData,
-} from "@/interfaces";
+} from '@/interfaces';
 import {
   FIELD_TRANSFORMER_REPORT_TYPES,
   ReportType,
-} from "@/store/page-overlay/modules/reports/consts";
+} from '@/store/page-overlay/modules/reports/consts';
 import {
   IFieldData,
   IReportConfig,
   IReportData,
-} from "@/store/page-overlay/modules/reports/interfaces";
-import { todayIsodate } from "../date";
-import { extractExmployeeAuditData } from "./employee-audit-report";
-import { extractHarvestPackagesData } from "./harvest-packages-report";
-import { extractImmaturePlantPropertyFromDimension } from "./immature-plants-quickview-report";
-import { extractMaturePlantPropertyFromDimension } from "./mature-plants-quickview-report";
-import { extractPackagePropertyFromDimension } from "./packages-quickview-report";
-import { extractPointInTimeInventoryData } from "./point-in-time-inventory-report";
+} from '@/store/page-overlay/modules/reports/interfaces';
+import { todayIsodate } from '../date';
+import { extractExmployeeAuditData } from './employee-audit-report';
+import { extractHarvestPackagesData } from './harvest-packages-report';
+import { extractImmaturePlantPropertyFromDimension } from './immature-plants-quickview-report';
+import { extractMaturePlantPropertyFromDimension } from './mature-plants-quickview-report';
+import { extractPackagePropertyFromDimension } from './packages-quickview-report';
+import { extractPointInTimeInventoryData } from './point-in-time-inventory-report';
 
 export function shouldGenerateReport({
   reportConfig,
@@ -93,7 +93,7 @@ export function applyFieldTransformer({
   return values.map((row) =>
     fields.map((fieldData) => {
       let value = row;
-      for (const subProperty of fieldData.value.split(".")) {
+      for (const subProperty of fieldData.value.split('.')) {
         // @ts-ignore
         value = value[subProperty];
       }
@@ -139,7 +139,7 @@ export function extractQuickviewData({
       extractor = extractPackagePropertyFromDimension;
       break;
     default:
-      throw new Error("Bad report type");
+      throw new Error('Bad report type');
   }
 
   const indexedDimensionCounts: { [key: string]: { [key: string]: number } } = {};
@@ -149,7 +149,7 @@ export function extractQuickviewData({
 
   for (const object of objects) {
     const primaryValue = extractor(object, primaryDimension);
-    const secondaryValue = secondaryDimension ? extractor(object, secondaryDimension) : "*";
+    const secondaryValue = secondaryDimension ? extractor(object, secondaryDimension) : '*';
 
     primaryKeys.add(primaryValue);
     secondaryKeys.add(secondaryValue);
@@ -169,10 +169,10 @@ export function extractQuickviewData({
   const sortedSecondaryKeys = [...secondaryKeys].sort();
 
   data.push([
-    `${secondaryDimension ?? "*"} / ${primaryDimension}`,
+    `${secondaryDimension ?? '*'} / ${primaryDimension}`,
     ...sortedPrimaryKeys,
-    "",
-    "TOTAL",
+    '',
+    'TOTAL',
   ]);
 
   const colTotals = Array(sortedPrimaryKeys.length).fill(0);
@@ -193,11 +193,11 @@ export function extractQuickviewData({
       row.push(cellSum.toString());
     }
 
-    data.push([...row, "", rowTotal.toString()]);
+    data.push([...row, '', rowTotal.toString()]);
   }
 
   data.push([]);
-  data.push(["TOTAL", ...colTotals, "", `GRAND TOTAL: ${grandTotal}`]);
+  data.push(['TOTAL', ...colTotals, '', `GRAND TOTAL: ${grandTotal}`]);
 
   return data;
 }

@@ -3,17 +3,17 @@ import {
   IPluginState,
   ITransferFilter,
   ITransporterData,
-} from "@/interfaces";
-import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
-import { ReportsMutations, ReportType } from "@/store/page-overlay/modules/reports/consts";
+} from '@/interfaces';
+import { primaryDataLoader } from '@/modules/data-loader/data-loader.module';
+import { ReportsMutations, ReportType } from '@/store/page-overlay/modules/reports/consts';
 import {
   IFieldData,
   IReportConfig,
   IReportData,
   IReportsState,
-} from "@/store/page-overlay/modules/reports/interfaces";
-import { ActionContext } from "vuex";
-import { todayIsodate } from "../date";
+} from '@/store/page-overlay/modules/reports/interfaces';
+import { ActionContext } from 'vuex';
+import { todayIsodate } from '../date';
 
 interface IIncomingTransfersReportFormFilters {
   estimatedArrivalDateLt: string;
@@ -25,16 +25,15 @@ interface IIncomingTransfersReportFormFilters {
   includeIncomingInactive: boolean;
 }
 
-export const incomingTransfersFormFiltersFactory: () => IIncomingTransfersReportFormFilters =
-  () => ({
-    estimatedArrivalDateLt: todayIsodate(),
-    estimatedArrivalDateGt: todayIsodate(),
-    shouldFilterEstimatedArrivalDateLt: false,
-    shouldFilterEstimatedArrivalDateGt: false,
-    onlyWholesale: false,
-    includeIncoming: true,
-    includeIncomingInactive: false,
-  });
+export const incomingTransfersFormFiltersFactory: () => IIncomingTransfersReportFormFilters = () => ({
+  estimatedArrivalDateLt: todayIsodate(),
+  estimatedArrivalDateGt: todayIsodate(),
+  shouldFilterEstimatedArrivalDateLt: false,
+  shouldFilterEstimatedArrivalDateGt: false,
+  onlyWholesale: false,
+  includeIncoming: true,
+  includeIncomingInactive: false,
+});
 
 export function addIncomingTransfersReport({
   reportConfig,
@@ -51,15 +50,13 @@ export function addIncomingTransfersReport({
   transferFilter.includeIncoming = incomingTransfersFormFilters.includeIncoming;
   transferFilter.includeIncomingInactive = incomingTransfersFormFilters.includeIncomingInactive;
 
-  transferFilter.estimatedArrivalDateGt =
-    incomingTransfersFormFilters.shouldFilterEstimatedArrivalDateGt
-      ? incomingTransfersFormFilters.estimatedArrivalDateGt
-      : null;
+  transferFilter.estimatedArrivalDateGt = incomingTransfersFormFilters.shouldFilterEstimatedArrivalDateGt
+    ? incomingTransfersFormFilters.estimatedArrivalDateGt
+    : null;
 
-  transferFilter.estimatedArrivalDateLt =
-    incomingTransfersFormFilters.shouldFilterEstimatedArrivalDateLt
-      ? incomingTransfersFormFilters.estimatedArrivalDateLt
-      : null;
+  transferFilter.estimatedArrivalDateLt = incomingTransfersFormFilters.shouldFilterEstimatedArrivalDateLt
+    ? incomingTransfersFormFilters.estimatedArrivalDateLt
+    : null;
 
   reportConfig[ReportType.INCOMING_TRANSFERS] = {
     transferFilter,
@@ -79,7 +76,7 @@ export async function maybeLoadIncomingTransfersReportData({
   const incomingTransferConfig = reportConfig[ReportType.INCOMING_TRANSFERS];
   if (incomingTransferConfig?.transferFilter) {
     ctx.commit(ReportsMutations.SET_STATUS, {
-      statusMessage: { text: "Loading incoming transfers...", level: "success" },
+      statusMessage: { text: 'Loading incoming transfers...', level: 'success' },
     });
 
     let richIncomingTransfers: IIndexedRichIncomingTransferData[] = [];
@@ -100,15 +97,15 @@ export async function maybeLoadIncomingTransfersReportData({
 
     richIncomingTransfers = richIncomingTransfers.filter((transfer) => {
       if (incomingTransferConfig.transferFilter.onlyWholesale) {
-        if (!transfer.ShipmentTypeName.includes("Wholesale")) {
+        if (!transfer.ShipmentTypeName.includes('Wholesale')) {
           return false;
         }
       }
 
       if (incomingTransferConfig.transferFilter.estimatedArrivalDateLt) {
         if (
-          transfer.EstimatedDepartureDateTime >
-          incomingTransferConfig.transferFilter.estimatedArrivalDateLt
+          transfer.EstimatedDepartureDateTime
+          > incomingTransferConfig.transferFilter.estimatedArrivalDateLt
         ) {
           return false;
         }
@@ -116,8 +113,8 @@ export async function maybeLoadIncomingTransfersReportData({
 
       if (incomingTransferConfig.transferFilter.estimatedArrivalDateGt) {
         if (
-          transfer.EstimatedDepartureDateTime <
-          incomingTransferConfig.transferFilter.estimatedArrivalDateGt
+          transfer.EstimatedDepartureDateTime
+          < incomingTransferConfig.transferFilter.estimatedArrivalDateGt
         ) {
           return false;
         }

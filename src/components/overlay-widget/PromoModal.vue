@@ -19,23 +19,23 @@
 </template>
 
 <script lang="ts">
-import PromoSlideshow from "@/components/overlay-widget/PromoSlideshow.vue";
-import Vue from "vue";
+import PromoSlideshow from '@/components/overlay-widget/PromoSlideshow.vue';
+import Vue from 'vue';
 
 export default Vue.extend({
   components: {
     PromoSlideshow,
   },
-  name: "PromoModal",
+  name: 'PromoModal',
   data() {
     return {};
   },
   methods: {
     show() {
-      this.$bvModal.show("promo-modal");
+      this.$bvModal.show('promo-modal');
     },
     hide() {
-      this.$bvModal.hide("promo-modal");
+      this.$bvModal.hide('promo-modal');
     },
     toggle() {
       // @ts-ignore

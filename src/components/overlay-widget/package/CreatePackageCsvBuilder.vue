@@ -3,14 +3,14 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import { mapState } from "vuex";
-import router from "@/router/index";
-import store from "@/store/page-overlay/index";
-import { CreatePackageCsvColumns } from "@/store/page-overlay/modules/create-package-csv/consts";
+import Vue from 'vue';
+import { mapState } from 'vuex';
+import router from '@/router/index';
+import store from '@/store/page-overlay/index';
+import { CreatePackageCsvColumns } from '@/store/page-overlay/modules/create-package-csv/consts';
 
 export default Vue.extend({
-  name: "CreatePackageCsvBuilder",
+  name: 'CreatePackageCsvBuilder',
   store,
   router,
   props: {},
@@ -24,57 +24,57 @@ export default Vue.extend({
         {
           value: CreatePackageCsvColumns.NEW_PACKAGE_TAG,
           required: true,
-          defaultDescription: ""
+          defaultDescription: ''
         },
         {
           value: CreatePackageCsvColumns.LOCATION_NAME,
           required: false,
-          defaultDescription: "Same location as 1st parent package"
+          defaultDescription: 'Same location as 1st parent package'
         },
         {
           value: CreatePackageCsvColumns.ITEM_NAME,
           required: false,
-          defaultDescription: "Same item as 1st parent package"
+          defaultDescription: 'Same item as 1st parent package'
         },
         {
           value: CreatePackageCsvColumns.NEW_PACKAGE_QUANTITY,
           required: false,
-          defaultDescription: "Sum of parent quantities"
+          defaultDescription: 'Sum of parent quantities'
         },
         {
           value: CreatePackageCsvColumns.NEW_PACKAGE_UNIT,
           required: false,
-          defaultDescription: "Same unit as parent package"
+          defaultDescription: 'Same unit as parent package'
         },
         {
           value: CreatePackageCsvColumns.PACKAGED_DATE,
           required: false,
-          defaultDescription: "Today"
+          defaultDescription: 'Today'
         },
         {
           value: CreatePackageCsvColumns.NOTE,
           required: false,
-          defaultDescription: ""
+          defaultDescription: ''
         },
         {
           value: CreatePackageCsvColumns.PRODUCTION_BATCH_NUMBER,
           required: false,
-          defaultDescription: ""
+          defaultDescription: ''
         },
         {
           value: CreatePackageCsvColumns.IS_DONATION,
           required: false,
-          defaultDescription: ""
+          defaultDescription: ''
         },
         {
           value: CreatePackageCsvColumns.IS_TRADE_SAMPLE,
           required: false,
-          defaultDescription: ""
+          defaultDescription: ''
         },
         {
           value: CreatePackageCsvColumns.EXPIRATION_DATE,
           required: false,
-          defaultDescription: "Same as parent package"
+          defaultDescription: 'Same as parent package'
         },
       ]
     };

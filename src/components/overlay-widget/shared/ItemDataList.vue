@@ -48,17 +48,17 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import { mapState } from "vuex";
-import router from "@/router/index";
-import store from "@/store/page-overlay/index";
-import { IItemTemplate } from "@/interfaces";
-import { UnitOfMeasureName, unitOfMeasureNameToAbbreviation } from "@/utils/units";
-import PickerIcon from "./PickerIcon.vue";
-import ItemCard from "./ItemCard.vue";
+import Vue from 'vue';
+import { mapState } from 'vuex';
+import router from '@/router/index';
+import store from '@/store/page-overlay/index';
+import { IItemTemplate } from '@/interfaces';
+import { UnitOfMeasureName, unitOfMeasureNameToAbbreviation } from '@/utils/units';
+import PickerIcon from './PickerIcon.vue';
+import ItemCard from './ItemCard.vue';
 
 export default Vue.extend({
-  name: "ItemDataList",
+  name: 'ItemDataList',
   store,
   router,
   props: {
@@ -73,7 +73,7 @@ export default Vue.extend({
   },
   methods: {
     removeItem(item: IItemTemplate) {
-      this.$emit("update:items", this.items.filter((x: IItemTemplate) => x !== item));
+      this.$emit('update:items', this.items.filter((x: IItemTemplate) => x !== item));
     },
     unitOfMeasureNameToAbbreviation,
     unitOfMeasureAndWeight(item: IItemTemplate): string {

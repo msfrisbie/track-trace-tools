@@ -1,6 +1,6 @@
-import { BuilderType } from "@/consts";
-import { IAtomicService, ICsvFile, IPluginCsvData } from "@/interfaces";
-import { accountManager } from "./account-manager.module";
+import { BuilderType } from '@/consts';
+import { IAtomicService, ICsvFile, IPluginCsvData } from '@/interfaces';
+import { accountManager } from './account-manager.module';
 
 class BackupManager implements IAtomicService {
   async init() {}

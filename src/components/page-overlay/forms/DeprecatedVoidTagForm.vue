@@ -44,16 +44,16 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import store from "@/store/page-overlay/index";
-import { TaskType, METRC_TAG_REGEX, MessageType } from "@/consts";
-import { isValidTag, generateTagRangeOrError } from "@/utils/tags";
-import { mapState } from "vuex";
-import { MutationType } from "@/mutation-types";
-import { createTask } from "@/utils/tasks";
-import { analyticsManager } from "@/modules/analytics-manager.module";
-import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
-import { authManager } from "@/modules/auth-manager.module";
+import Vue from 'vue';
+import store from '@/store/page-overlay/index';
+import { TaskType, METRC_TAG_REGEX, MessageType } from '@/consts';
+import { isValidTag, generateTagRangeOrError } from '@/utils/tags';
+import { mapState } from 'vuex';
+import { MutationType } from '@/mutation-types';
+import { createTask } from '@/utils/tasks';
+import { analyticsManager } from '@/modules/analytics-manager.module';
+import { primaryDataLoader } from '@/modules/data-loader/data-loader.module';
+import { authManager } from '@/modules/auth-manager.module';
 
 interface TaskForm {
   startTag: string;
@@ -61,7 +61,7 @@ interface TaskForm {
 }
 
 export default Vue.extend({
-  name: "DeprecatedVoidTagForm",
+  name: 'DeprecatedVoidTagForm',
   store,
   computed: {
     startTagInvalid(): boolean {
@@ -90,7 +90,7 @@ export default Vue.extend({
         return true;
       }
     },
-    ...mapState(["currentView"]),
+    ...mapState(['currentView']),
   },
   async mounted() {
     await authManager.authStateOrError();
@@ -101,8 +101,8 @@ export default Vue.extend({
     return {
       availableTags: [],
       form: {
-        startTag: "",
-        endTag: "",
+        startTag: '',
+        endTag: '',
       } as TaskForm,
     };
   },
@@ -111,7 +111,7 @@ export default Vue.extend({
       evt.preventDefault();
 
       /* eslint-disable-next-line no-alert */
-      if (!window.confirm("Are you sure you wish to void these tags?")) {
+      if (!window.confirm('Are you sure you wish to void these tags?')) {
         return;
       }
 

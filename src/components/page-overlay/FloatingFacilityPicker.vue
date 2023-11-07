@@ -47,18 +47,18 @@
 </template>
 
 <script lang="ts">
-import FacilityPicker from "@/components/shared/FacilityPicker.vue";
-import TrackTraceToolsLogo from "@/components/shared/TrackTraceToolsLogo.vue";
-import { ToolkitView } from "@/consts";
-import { authManager } from "@/modules/auth-manager.module";
-import { pageManager } from "@/modules/page-manager/page-manager.module";
-import { MutationType } from "@/mutation-types";
-import store from "@/store/page-overlay/index";
-import Vue from "vue";
-import { mapState } from "vuex";
+import FacilityPicker from '@/components/shared/FacilityPicker.vue';
+import TrackTraceToolsLogo from '@/components/shared/TrackTraceToolsLogo.vue';
+import { ToolkitView } from '@/consts';
+import { authManager } from '@/modules/auth-manager.module';
+import { pageManager } from '@/modules/page-manager/page-manager.module';
+import { MutationType } from '@/mutation-types';
+import store from '@/store/page-overlay/index';
+import Vue from 'vue';
+import { mapState } from 'vuex';
 
 export default Vue.extend({
-  name: "FloatingFacilityPicker",
+  name: 'FloatingFacilityPicker',
   store,
   components: {
     FacilityPicker,
@@ -70,7 +70,7 @@ export default Vue.extend({
     };
   },
   computed: {
-    ...mapState(["trackedInteractions", "settings"]),
+    ...mapState(['trackedInteractions', 'settings']),
   },
   async mounted() {
     this.$data.authState = await authManager.authStateOrNull();
@@ -87,9 +87,9 @@ export default Vue.extend({
       trackedInteractions.dismissedFacilityPopover = true;
 
       // @ts-ignore
-      this.$refs["facility-popover"].$emit("close");
+      this.$refs['facility-popover'].$emit('close');
       // @ts-ignore
-      this.$refs["facility-popover"].$emit("disable");
+      this.$refs['facility-popover'].$emit('disable');
 
       store.commit(MutationType.UPDATE_TRACKED_INTERACTIONS, trackedInteractions);
     },

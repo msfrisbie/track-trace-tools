@@ -13,11 +13,11 @@ export interface IGoogleMapsDirections {
 }
 
 function stripHtmlTags(value: string): string {
-  return value.replace(/<[^>]*>?/gm, '').replace(/&nbsp;/gm, " ");
+  return value.replace(/<[^>]*>?/gm, '').replace(/&nbsp;/gm, ' ');
 }
 
 function splitMultiStep(value: string): string[] {
-  return value.split(`<div style="font-size:0.9em">`);
+  return value.split('<div style="font-size:0.9em">');
 }
 
 export function extractTextDirections(directions: IGoogleMapsDirections): string {

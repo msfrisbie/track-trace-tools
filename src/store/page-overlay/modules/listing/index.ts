@@ -1,7 +1,7 @@
-import { IPluginState } from "@/interfaces";
-import { ActionContext } from "vuex";
-import { ListingActions, ListingMutations } from "./consts";
-import { IListingState } from "./interfaces";
+import { IPluginState } from '@/interfaces';
+import { ActionContext } from 'vuex';
+import { ListingActions, ListingMutations } from './consts';
+import { IListingState } from './interfaces';
 
 const inMemoryState = {
   packageData: null,

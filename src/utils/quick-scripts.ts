@@ -1,13 +1,13 @@
-import { MessageType } from "@/consts";
-import { analyticsManager } from "@/modules/analytics-manager.module";
-import { authManager } from "@/modules/auth-manager.module";
-import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
-import { dynamicConstsManager } from "@/modules/dynamic-consts-manager.module";
-import { pageManager } from "@/modules/page-manager/page-manager.module";
-import { toastManager } from "@/modules/toast-manager.module";
-import _, { zip } from "lodash-es";
-import { copyToClipboard } from "./dom";
-import { setAutocompleteValueOrError, setFormInputValue } from "./metrc-form";
+import { MessageType } from '@/consts';
+import { analyticsManager } from '@/modules/analytics-manager.module';
+import { authManager } from '@/modules/auth-manager.module';
+import { primaryDataLoader } from '@/modules/data-loader/data-loader.module';
+import { dynamicConstsManager } from '@/modules/dynamic-consts-manager.module';
+import { pageManager } from '@/modules/page-manager/page-manager.module';
+import { toastManager } from '@/modules/toast-manager.module';
+import _, { zip } from 'lodash-es';
+import { copyToClipboard } from './dom';
+import { setAutocompleteValueOrError, setFormInputValue } from './metrc-form';
 
 export interface IQuickScript {
   id: string;
@@ -19,10 +19,10 @@ export interface IQuickScript {
 }
 
 export enum ColumnGroups {
-  ALL = "All",
-  MINIMUM = "ID Only",
-  DEFAULT = "Reset",
-  SIMPLE_PACKAGE = "Min Package",
+  ALL = 'All',
+  MINIMUM = 'ID Only',
+  DEFAULT = 'Reset',
+  SIMPLE_PACKAGE = 'Min Package',
 }
 
 export async function runQuickScript(quickScript: IQuickScript, childOption?: any) {
@@ -36,51 +36,51 @@ export async function runQuickScript(quickScript: IQuickScript, childOption?: an
 
 export const QUICK_SCRIPTS: IQuickScript[] = [
   {
-    id: "EXPAND_GROWTH_PHASE_TAGS",
-    name: "Expand Growth Phase Tags",
+    id: 'EXPAND_GROWTH_PHASE_TAGS',
+    name: 'Expand Growth Phase Tags',
     description:
-      "Automatically expand a tag range in the Change Growth Phase window to account for the Metrc tag range bug",
-    contextLink: "https://track-trace-tools.talkyard.net/-71/metrc-bug-package-out-of-order-error",
+      'Automatically expand a tag range in the Change Growth Phase window to account for the Metrc tag range bug',
+    contextLink: 'https://track-trace-tools.talkyard.net/-71/metrc-bug-package-out-of-order-error',
     quickScriptFunction: expandGrowthPhaseTags,
   },
   {
-    id: "AUTOFILL_TRANSFER_GROSS_WEIGHTS",
-    name: "Autofill Transfer Gross Weight",
+    id: 'AUTOFILL_TRANSFER_GROSS_WEIGHTS',
+    name: 'Autofill Transfer Gross Weight',
     description:
-      "Automatically fills the Gross Weight and unit of measure fields for the current transfer",
+      'Automatically fills the Gross Weight and unit of measure fields for the current transfer',
     contextLink:
-      "https://track-trace-tools.talkyard.net/-33/feature-request-auto-populate-gross-weights-in-a-transfer-template",
+      'https://track-trace-tools.talkyard.net/-33/feature-request-auto-populate-gross-weights-in-a-transfer-template',
     quickScriptFunction: fillTransferWeights,
   },
   {
-    id: "SUM_PACKAGE_QUANTITIES",
-    name: "Autosum Package Quantities",
+    id: 'SUM_PACKAGE_QUANTITIES',
+    name: 'Autosum Package Quantities',
     description:
-      "Automatically totals all the source package quantities in the New Packages window and enters it into the new package Quantity input",
+      'Automatically totals all the source package quantities in the New Packages window and enters it into the new package Quantity input',
     contextLink:
-      "https://track-trace-tools.talkyard.net/-27/would-it-be-possible-to-add-a-sum-all-button-for-creating-new-packages",
+      'https://track-trace-tools.talkyard.net/-27/would-it-be-possible-to-add-a-sum-all-button-for-creating-new-packages',
     quickScriptFunction: sumPackageQuantities,
   },
   {
-    id: "CHECK_ALL_PLANTS_FOR_HARVEST_RESTORE",
-    name: "Check All Plants For Harvest Restore",
+    id: 'CHECK_ALL_PLANTS_FOR_HARVEST_RESTORE',
+    name: 'Check All Plants For Harvest Restore',
     description:
-      "Automatically checks all the plant checkboxes in the Restore Harvested Plants window",
+      'Automatically checks all the plant checkboxes in the Restore Harvested Plants window',
     contextLink:
-      "https://track-trace-tools.talkyard.net/-28/auto-click-checkboxes-for-restore-harvest",
+      'https://track-trace-tools.talkyard.net/-28/auto-click-checkboxes-for-restore-harvest',
     quickScriptFunction: checkAllPlantsForHarvestRestore,
   },
   {
-    id: "ADD_PACKAGE_CONTENTS",
-    name: "Add Package Contents Fields",
-    description: "Bulk add package content fields in the New Package window",
+    id: 'ADD_PACKAGE_CONTENTS',
+    name: 'Add Package Contents Fields',
+    description: 'Bulk add package content fields in the New Package window',
     childOptions: [5, 10, 15, 20, 25],
     quickScriptFunction: addPackageContents,
   },
   {
-    id: "SHOW_COLUMNS",
-    name: "Show Columns",
-    description: "Makes certain Metrc table columns visible",
+    id: 'SHOW_COLUMNS',
+    name: 'Show Columns',
+    description: 'Makes certain Metrc table columns visible',
     quickScriptFunction: showColumns,
     childOptions: [
       ColumnGroups.ALL,
@@ -90,9 +90,9 @@ export const QUICK_SCRIPTS: IQuickScript[] = [
     ],
   },
   {
-    id: "COPY_USERNAME",
-    name: "Copy Username",
-    description: "Copy my username to the clipboard for easy T3+ signup",
+    id: 'COPY_USERNAME',
+    name: 'Copy Username',
+    description: 'Copy my username to the clipboard for easy T3+ signup',
     quickScriptFunction: copyUsername,
 
   },
@@ -121,7 +121,7 @@ export async function addPackageContents(count: number) {
 
   for (let i = 0; i < count; ++i) {
     const button = pageManager.activeModal?.querySelector(
-      `[ng-click*="addLine(null, line.Ingredients)"]`
+      '[ng-click*="addLine(null, line.Ingredients)"]'
     ) as HTMLButtonElement | null;
 
     if (button) {
@@ -131,11 +131,11 @@ export async function addPackageContents(count: number) {
   }
 
   toastManager.openToast(`Added ${clicks} package fields`, {
-    title: "Quick Script Success",
+    title: 'Quick Script Success',
     autoHideDelay: 5000,
-    variant: "success",
+    variant: 'success',
     appendToast: true,
-    toaster: "ttt-toaster",
+    toaster: 'ttt-toaster',
     solid: true,
   });
 }
@@ -148,11 +148,11 @@ export async function checkAllPlantsForHarvestRestore() {
   restoreHarvestCheckboxes.map((input) => input.click());
 
   toastManager.openToast(`Checked ${restoreHarvestCheckboxes.length} boxes`, {
-    title: "Quick Script Success",
+    title: 'Quick Script Success',
     autoHideDelay: 5000,
-    variant: "success",
+    variant: 'success',
     appendToast: true,
-    toaster: "ttt-toaster",
+    toaster: 'ttt-toaster',
     solid: true,
   });
 }
@@ -163,11 +163,11 @@ export async function copyUsername() {
   copyToClipboard(identity);
 
   toastManager.openToast(`Copied ${identity} to clipboard`, {
-    title: "Quick Script Success",
+    title: 'Quick Script Success',
     autoHideDelay: 5000,
-    variant: "success",
+    variant: 'success',
     appendToast: true,
-    toaster: "ttt-toaster",
+    toaster: 'ttt-toaster',
     solid: true,
   });
 }
@@ -193,7 +193,7 @@ export async function showColumns(columnGroup: ColumnGroups) {
 
 async function showAllColumns() {
   try {
-    const menuButton = document.querySelector(`th .k-header-column-menu`) as HTMLElement | null;
+    const menuButton = document.querySelector('th .k-header-column-menu') as HTMLElement | null;
 
     if (menuButton) {
       pageManager.suppressAnimationContainer();
@@ -202,15 +202,15 @@ async function showAllColumns() {
       menuButton.click();
 
       let form = null;
-      const animationContainer = pageManager.getVisibleAnimationContainer("Sort Ascending");
+      const animationContainer = pageManager.getVisibleAnimationContainer('Sort Ascending');
 
       if (animationContainer) {
-        form = animationContainer.querySelector(".k-columns-item");
+        form = animationContainer.querySelector('.k-columns-item');
       }
 
       if (form) {
         for (const checkbox of form.querySelectorAll(
-          `input[type="checkbox"]`
+          'input[type="checkbox"]'
         ) as NodeListOf<HTMLInputElement>) {
           if (!checkbox.checked) {
             checkbox.click();
@@ -223,12 +223,12 @@ async function showAllColumns() {
         menuButton.click();
       }
 
-      toastManager.openToast(`Checked all columns`, {
-        title: "Quick Script Success",
+      toastManager.openToast('Checked all columns', {
+        title: 'Quick Script Success',
         autoHideDelay: 5000,
-        variant: "success",
+        variant: 'success',
         appendToast: true,
-        toaster: "ttt-toaster",
+        toaster: 'ttt-toaster',
         solid: true,
       });
 
@@ -237,13 +237,13 @@ async function showAllColumns() {
   } catch {}
 
   toastManager.openToast(
-    `Couldn't find a Metrc table. This quick script only works on Metrc pages with tables.`,
+    'Couldn\'t find a Metrc table. This quick script only works on Metrc pages with tables.',
     {
-      title: "Quick Script Error",
+      title: 'Quick Script Error',
       autoHideDelay: 5000,
-      variant: "warning",
+      variant: 'warning',
       appendToast: true,
-      toaster: "ttt-toaster",
+      toaster: 'ttt-toaster',
       solid: true,
     }
   );
@@ -251,18 +251,18 @@ async function showAllColumns() {
 
 async function showDefaultColumns() {
   try {
-    [...(document.querySelectorAll(`a[href="#"]`) as NodeListOf<HTMLAnchorElement>)]
-      .find((x) => x.innerText.includes("Reset Settings"))!
+    [...(document.querySelectorAll('a[href="#"]') as NodeListOf<HTMLAnchorElement>)]
+      .find((x) => x.innerText.includes('Reset Settings'))!
       .click();
   } catch {
     toastManager.openToast(
-      `Couldn't find a Metrc table. This quick script only works on Metrc pages with tables.`,
+      'Couldn\'t find a Metrc table. This quick script only works on Metrc pages with tables.',
       {
-        title: "Quick Script Error",
+        title: 'Quick Script Error',
         autoHideDelay: 5000,
-        variant: "warning",
+        variant: 'warning',
         appendToast: true,
-        toaster: "ttt-toaster",
+        toaster: 'ttt-toaster',
         solid: true,
       }
     );
@@ -270,10 +270,10 @@ async function showDefaultColumns() {
 }
 
 async function showSimplePackageColumns() {
-  const simplePackageDataFields = ["Label", "Item.Name", "Item.ProductCategoryName", "Quantity"];
+  const simplePackageDataFields = ['Label', 'Item.Name', 'Item.ProductCategoryName', 'Quantity'];
 
   try {
-    const menuButton = document.querySelector(`th .k-header-column-menu`) as HTMLElement | null;
+    const menuButton = document.querySelector('th .k-header-column-menu') as HTMLElement | null;
 
     if (menuButton) {
       pageManager.suppressAnimationContainer();
@@ -282,17 +282,17 @@ async function showSimplePackageColumns() {
       menuButton.click();
 
       let form = null;
-      const animationContainer = pageManager.getVisibleAnimationContainer("Sort Ascending");
+      const animationContainer = pageManager.getVisibleAnimationContainer('Sort Ascending');
 
       if (animationContainer) {
-        form = animationContainer.querySelector(".k-columns-item");
+        form = animationContainer.querySelector('.k-columns-item');
       }
 
       if (form) {
         for (const checkbox of form.querySelectorAll(
-          `input[type="checkbox"]`
+          'input[type="checkbox"]'
         ) as NodeListOf<HTMLInputElement>) {
-          if (simplePackageDataFields.includes(checkbox.getAttribute("data-field")!)) {
+          if (simplePackageDataFields.includes(checkbox.getAttribute('data-field')!)) {
             if (!checkbox.checked) {
               checkbox.click();
             }
@@ -309,12 +309,12 @@ async function showSimplePackageColumns() {
         menuButton.click();
       }
 
-      toastManager.openToast(`Checked simple package columns`, {
-        title: "Quick Script Success",
+      toastManager.openToast('Checked simple package columns', {
+        title: 'Quick Script Success',
         autoHideDelay: 5000,
-        variant: "success",
+        variant: 'success',
         appendToast: true,
-        toaster: "ttt-toaster",
+        toaster: 'ttt-toaster',
         solid: true,
       });
 
@@ -323,13 +323,13 @@ async function showSimplePackageColumns() {
   } catch {}
 
   toastManager.openToast(
-    `Couldn't find a Metrc table. This quick script only works on Metrc pages with tables.`,
+    'Couldn\'t find a Metrc table. This quick script only works on Metrc pages with tables.',
     {
-      title: "Quick Script Error",
+      title: 'Quick Script Error',
       autoHideDelay: 5000,
-      variant: "warning",
+      variant: 'warning',
       appendToast: true,
-      toaster: "ttt-toaster",
+      toaster: 'ttt-toaster',
       solid: true,
     }
   );
@@ -337,7 +337,7 @@ async function showSimplePackageColumns() {
 
 async function showOnlyPrimaryColumn() {
   try {
-    const menuButton = document.querySelector(`th .k-header-column-menu`) as HTMLElement | null;
+    const menuButton = document.querySelector('th .k-header-column-menu') as HTMLElement | null;
 
     if (menuButton) {
       pageManager.suppressAnimationContainer();
@@ -346,15 +346,15 @@ async function showOnlyPrimaryColumn() {
       menuButton.click();
 
       let form = null;
-      const animationContainer = pageManager.getVisibleAnimationContainer("Sort Ascending");
+      const animationContainer = pageManager.getVisibleAnimationContainer('Sort Ascending');
 
       if (animationContainer) {
-        form = animationContainer.querySelector(".k-columns-item");
+        form = animationContainer.querySelector('.k-columns-item');
       }
 
       if (form) {
         for (const [idx, checkbox] of [
-          ...(form.querySelectorAll(`input[type="checkbox"]`) as NodeListOf<HTMLInputElement>),
+          ...(form.querySelectorAll('input[type="checkbox"]') as NodeListOf<HTMLInputElement>),
         ].entries()) {
           if (idx === 0) {
             if (!checkbox.checked) {
@@ -371,12 +371,12 @@ async function showOnlyPrimaryColumn() {
         menuButton.click();
       }
 
-      toastManager.openToast(`Unchecked all columns`, {
-        title: "Quick Script Success",
+      toastManager.openToast('Unchecked all columns', {
+        title: 'Quick Script Success',
         autoHideDelay: 5000,
-        variant: "success",
+        variant: 'success',
         appendToast: true,
-        toaster: "ttt-toaster",
+        toaster: 'ttt-toaster',
         solid: true,
       });
 
@@ -385,13 +385,13 @@ async function showOnlyPrimaryColumn() {
   } catch {}
 
   toastManager.openToast(
-    `Couldn't find a Metrc table. This quick script only works on Metrc pages with tables.`,
+    'Couldn\'t find a Metrc table. This quick script only works on Metrc pages with tables.',
     {
-      title: "Quick Script Error",
+      title: 'Quick Script Error',
       autoHideDelay: 5000,
-      variant: "warning",
+      variant: 'warning',
       appendToast: true,
-      toaster: "ttt-toaster",
+      toaster: 'ttt-toaster',
       solid: true,
     }
   );
@@ -412,12 +412,12 @@ export async function expandGrowthPhaseTags() {
   }
 
   enum RowNgModel {
-    Id = "line.Id",
-    PlantsCount = "line.PlantsCount",
-    StartingTagId = "line.StartingTagId",
-    GrowthPhase = "line.GrowthPhase",
-    LocationId = "line.LocationId",
-    GrowthDate = "line.GrowthDate",
+    Id = 'line.Id',
+    PlantsCount = 'line.PlantsCount',
+    StartingTagId = 'line.StartingTagId',
+    GrowthPhase = 'line.GrowthPhase',
+    LocationId = 'line.LocationId',
+    GrowthDate = 'line.GrowthDate',
   }
 
   let expandedRowCount = 0;
@@ -425,7 +425,7 @@ export async function expandGrowthPhaseTags() {
 
   while (true) {
     const initialRows: HTMLElement[] = [
-      ...document.querySelectorAll(`tr[ng-repeat="line in repeaterLines"]`),
+      ...document.querySelectorAll('tr[ng-repeat="line in repeaterLines"]'),
     ] as HTMLElement[];
 
     let targetRow: HTMLElement | null = null;
@@ -440,10 +440,10 @@ export async function expandGrowthPhaseTags() {
       )! as HTMLInputElement;
       const rowCountValue = parseInt(rowPlantCountInput.value, 10);
 
-      if (typeof rowCountValue === "number" && rowCountValue > 1) {
+      if (typeof rowCountValue === 'number' && rowCountValue > 1) {
         targetRow = row;
         targetRowInitialCount = rowCountValue;
-        await setFormInputValue(rowPlantCountInput, "1");
+        await setFormInputValue(rowPlantCountInput, '1');
         break;
       }
     }
@@ -458,7 +458,7 @@ export async function expandGrowthPhaseTags() {
 
     for (let i = 0; i < count; ++i) {
       const button = pageManager.activeModal?.querySelector(
-        `[ng-click*="addLine(newLinesCount)"]`
+        '[ng-click*="addLine(newLinesCount)"]'
       ) as HTMLButtonElement | null;
 
       if (button) {
@@ -470,7 +470,7 @@ export async function expandGrowthPhaseTags() {
 
     // Select tag in each
 
-    const addedRows = [...document.querySelectorAll(`tr[ng-repeat="line in repeaterLines"]`)].slice(
+    const addedRows = [...document.querySelectorAll('tr[ng-repeat="line in repeaterLines"]')].slice(
       count * -1
     ) as HTMLElement[];
 
@@ -490,11 +490,11 @@ export async function expandGrowthPhaseTags() {
       toastManager.openToast(
         `Couldn't allocate enough tags in this range: needed ${addedRows.length}, found ${tagRange.length}`,
         {
-          title: "Quick Script Error",
+          title: 'Quick Script Error',
           autoHideDelay: 5000,
-          variant: "danger",
+          variant: 'danger',
           appendToast: true,
-          toaster: "ttt-toaster",
+          toaster: 'ttt-toaster',
           solid: true,
         }
       );
@@ -520,7 +520,7 @@ export async function expandGrowthPhaseTags() {
         targetRowPlantId
       );
       setFormInputValue(getRowInputByNgModel(row, RowNgModel.GrowthPhase)!, targetRowGrowthPhase);
-      setFormInputValue(getRowInputByNgModel(row, RowNgModel.PlantsCount)!, "1");
+      setFormInputValue(getRowInputByNgModel(row, RowNgModel.PlantsCount)!, '1');
       await setAutocompleteValueOrError(
         getRowInputByNgModel(row, RowNgModel.StartingTagId)! as HTMLInputElement,
         tag
@@ -531,23 +531,23 @@ export async function expandGrowthPhaseTags() {
   }
 
   if (expandedRowCount === 0) {
-    toastManager.openToast(`Couldn't find a valid input row`, {
-      title: "Quick Script Error",
+    toastManager.openToast('Couldn\'t find a valid input row', {
+      title: 'Quick Script Error',
       autoHideDelay: 5000,
-      variant: "danger",
+      variant: 'danger',
       appendToast: true,
-      toaster: "ttt-toaster",
+      toaster: 'ttt-toaster',
       solid: true,
     });
   } else {
     toastManager.openToast(
       `Expanded ${expandedRowCount} tag ranges into ${newRowCount + expandedRowCount} single tags`,
       {
-        title: "Quick Script Success",
+        title: 'Quick Script Success',
         autoHideDelay: 5000,
-        variant: "success",
+        variant: 'success',
         appendToast: true,
-        toaster: "ttt-toaster",
+        toaster: 'ttt-toaster',
         solid: true,
       }
     );
@@ -556,7 +556,7 @@ export async function expandGrowthPhaseTags() {
 
 export async function fillTransferWeights() {
   const packageRows = [
-    ...document.querySelectorAll(`tr[ng-repeat="package in destination.Packages"]`),
+    ...document.querySelectorAll('tr[ng-repeat="package in destination.Packages"]'),
   ];
 
   let successCount = 0;
@@ -569,13 +569,13 @@ export async function fillTransferWeights() {
 
   for (const packageRow of packageRows) {
     const packageInput = packageRow.querySelector(
-      `input[ng-model="package.Id"]`
+      'input[ng-model="package.Id"]'
     ) as HTMLInputElement | null;
     const grossWeightInput = packageRow.querySelector(
-      `input[ng-model="package.GrossWeight"]`
+      'input[ng-model="package.GrossWeight"]'
     ) as HTMLInputElement | null;
     const unitOfMeasureSelect = packageRow.querySelector(
-      `select[ng-model="package.GrossUnitOfWeightId"]`
+      'select[ng-model="package.GrossUnitOfWeightId"]'
     ) as HTMLSelectElement | null;
 
     if (!packageInput) {
@@ -593,23 +593,23 @@ export async function fillTransferWeights() {
     try {
       const packageData = await primaryDataLoader.activePackage(packageLabel);
 
-      if (packageData.UnitOfMeasureQuantityType === "VolumeBased") {
+      if (packageData.UnitOfMeasureQuantityType === 'VolumeBased') {
         skippedCount++;
 
         toastManager.openToast(
           `Couldn't calculate a weight for package ${packageData.Label} because it is Volume Based`,
           {
-            title: "Quick Script Warning",
+            title: 'Quick Script Warning',
             autoHideDelay: 5000,
-            variant: "warning",
+            variant: 'warning',
             appendToast: true,
-            toaster: "ttt-toaster",
+            toaster: 'ttt-toaster',
             solid: true,
           }
         );
 
         continue;
-      } else if (packageData.UnitOfMeasureQuantityType === "CountBased") {
+      } else if (packageData.UnitOfMeasureQuantityType === 'CountBased') {
         if (packageData.Item?.UnitWeight && packageData.Item?.UnitWeightUnitOfMeasureId) {
           const quantity: number = packageData.Quantity * packageData.Item.UnitWeight;
 
@@ -630,11 +630,11 @@ export async function fillTransferWeights() {
           skippedCount++;
 
           toastManager.openToast(`Couldn't calculate a weight for package ${packageData.Label}`, {
-            title: "Quick Script Warning",
+            title: 'Quick Script Warning',
             autoHideDelay: 5000,
-            variant: "warning",
+            variant: 'warning',
             appendToast: true,
-            toaster: "ttt-toaster",
+            toaster: 'ttt-toaster',
             solid: true,
           });
 
@@ -662,40 +662,40 @@ export async function fillTransferWeights() {
   }
 
   const grossWeightInput = document.querySelector(
-    `input[ng-model="destination.GrossWeight"]`
+    'input[ng-model="destination.GrossWeight"]'
   ) as HTMLInputElement | null;
   const unitOfMeasureSelect = document.querySelector(
-    `select[ng-model="destination.GrossUnitOfWeightId"]`
+    'select[ng-model="destination.GrossUnitOfWeightId"]'
   ) as HTMLSelectElement | null;
 
   if (!grossWeightInput || !unitOfMeasureSelect) {
-    toastManager.openToast(`Couldn't autofill the destination gross weight: inputs missing`, {
-      title: "Quick Script Error",
+    toastManager.openToast('Couldn\'t autofill the destination gross weight: inputs missing', {
+      title: 'Quick Script Error',
       autoHideDelay: 5000,
-      variant: "danger",
+      variant: 'danger',
       appendToast: true,
-      toaster: "ttt-toaster",
+      toaster: 'ttt-toaster',
       solid: true,
     });
   } else {
     let normalizedGrossWeights: number[] = [];
     let baseUnitOfMeasureId: number = unitsOfMeasure.find(
-      (x) => x.IsBaseUnit && x.QuantityType === "WeightBased"
+      (x) => x.IsBaseUnit && x.QuantityType === 'WeightBased'
     )!.Id;
 
     if (
-      quantities.length !== unitOfWeightIds.length ||
-      quantities.length === 0 ||
-      unitOfWeightIds.length === 0
+      quantities.length !== unitOfWeightIds.length
+      || quantities.length === 0
+      || unitOfWeightIds.length === 0
     ) {
       toastManager.openToast(
-        `Couldn't autofill the destination gross weight: mismatched extracted data`,
+        'Couldn\'t autofill the destination gross weight: mismatched extracted data',
         {
-          title: "Quick Script Error",
+          title: 'Quick Script Error',
           autoHideDelay: 5000,
-          variant: "danger",
+          variant: 'danger',
           appendToast: true,
-          toaster: "ttt-toaster",
+          toaster: 'ttt-toaster',
           solid: true,
         }
       );
@@ -716,7 +716,7 @@ export async function fillTransferWeights() {
     }
 
     // Attempt conversion to Pounds
-    const poundsUnitOfMeasure = unitsOfMeasure.find((x) => x.Name === "Pounds");
+    const poundsUnitOfMeasure = unitsOfMeasure.find((x) => x.Name === 'Pounds');
     if (poundsUnitOfMeasure) {
       normalizedGrossWeights = normalizedGrossWeights.map(
         (x) => x * poundsUnitOfMeasure.FromBaseFactor
@@ -735,11 +735,11 @@ export async function fillTransferWeights() {
   }
 
   toastManager.openToast(`Autofilled ${successCount} packages`, {
-    title: "Quick Script Success",
+    title: 'Quick Script Success',
     autoHideDelay: 5000,
-    variant: "success",
+    variant: 'success',
     appendToast: true,
-    toaster: "ttt-toaster",
+    toaster: 'ttt-toaster',
     solid: true,
   });
 
@@ -747,11 +747,11 @@ export async function fillTransferWeights() {
     toastManager.openToast(
       `Skipped ${skippedCount} packages. This usually happens if a package input is empty, or the selected package does not have a weight unit of measure.`,
       {
-        title: "Quick Script Warning",
+        title: 'Quick Script Warning',
         autoHideDelay: 5000,
-        variant: "warning",
+        variant: 'warning',
         appendToast: true,
-        toaster: "ttt-toaster",
+        toaster: 'ttt-toaster',
         solid: true,
       }
     );
@@ -760,21 +760,21 @@ export async function fillTransferWeights() {
 
 export async function sumPackageQuantities() {
   const packageSets: HTMLElement[] = [
-    ...document.querySelectorAll(`[ng-repeat="line in repeaterLines"]`),
+    ...document.querySelectorAll('[ng-repeat="line in repeaterLines"]'),
   ] as HTMLElement[];
 
   for (const packageSet of packageSets) {
     const [output, ...inputs] = [
-      ...packageSet.querySelectorAll(`input[name*="[Quantity]"]`),
+      ...packageSet.querySelectorAll('input[name*="[Quantity]"]'),
     ] as HTMLInputElement[];
 
     if (!inputs.length) {
-      toastManager.openToast(`0 source packages were found for a package`, {
-        title: "Quick Script error",
+      toastManager.openToast('0 source packages were found for a package', {
+        title: 'Quick Script error',
         autoHideDelay: 5000,
-        variant: "danger",
+        variant: 'danger',
         appendToast: true,
-        toaster: "ttt-toaster",
+        toaster: 'ttt-toaster',
         solid: true,
       });
       continue;
@@ -793,11 +793,11 @@ export async function sumPackageQuantities() {
   }
 
   toastManager.openToast(`Totaled ${packageSets.length} packages`, {
-    title: "Quick Script Success",
+    title: 'Quick Script Success',
     autoHideDelay: 5000,
-    variant: "success",
+    variant: 'success',
     appendToast: true,
-    toaster: "ttt-toaster",
+    toaster: 'ttt-toaster',
     solid: true,
   });
 }

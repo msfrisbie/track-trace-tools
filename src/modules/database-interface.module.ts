@@ -1,6 +1,6 @@
 import {
   MessageType, PackageState, TagState, TransferState
-} from "@/consts";
+} from '@/consts';
 import {
   IAtomicService,
   IIndexedPackageData,
@@ -12,13 +12,13 @@ import {
   IPackageData,
   ITagData,
   ITransferData,
-} from "@/interfaces";
-import { authManager } from "@/modules/auth-manager.module";
-import { messageBus } from "@/modules/message-bus.module";
-import { MutationType } from "@/mutation-types";
-import store from "@/store/page-overlay/index";
-import { dataObjectToIndexableTags } from "@/utils/db";
-import { toastManager } from "./toast-manager.module";
+} from '@/interfaces';
+import { authManager } from '@/modules/auth-manager.module';
+import { messageBus } from '@/modules/message-bus.module';
+import { MutationType } from '@/mutation-types';
+import store from '@/store/page-overlay/index';
+import { dataObjectToIndexableTags } from '@/utils/db';
+import { toastManager } from './toast-manager.module';
 
 function setError(errorMessage: string | null) {
   store.commit(MutationType.SET_ERROR_MESSAGE, errorMessage);
@@ -29,11 +29,11 @@ function setError(errorMessage: string | null) {
     }
 
     toastManager.openToast(errorMessage, {
-      title: "Error",
+      title: 'Error',
       autoHideDelay: 5000,
-      variant: "danger",
+      variant: 'danger',
       appendToast: true,
-      toaster: "ttt-toaster",
+      toaster: 'ttt-toaster',
       solid: true,
     });
   }
@@ -43,10 +43,10 @@ class DatabaseInterface implements IAtomicService {
   async init() {}
 
   async indexPackages(packagesData: IPackageData[], packageState: PackageState) {
-    const authState = await authManager.authStateOrError("User is not authenticated");
+    const authState = await authManager.authStateOrError('User is not authenticated');
 
     const indexedPackagesData = packagesData.map((packageData) => {
-      const tagMatcher = dataObjectToIndexableTags(packageData).join(" ");
+      const tagMatcher = dataObjectToIndexableTags(packageData).join(' ');
 
       return {
         ...packageData,
@@ -62,10 +62,10 @@ class DatabaseInterface implements IAtomicService {
   }
 
   async indexTransfers(transfersData: ITransferData[], transferState: TransferState) {
-    const authState = await authManager.authStateOrError("User is not authenticated");
+    const authState = await authManager.authStateOrError('User is not authenticated');
 
     const indexedTransfersData = transfersData.map((transferData) => {
-      const tagMatcher = dataObjectToIndexableTags(transferData).join(" ");
+      const tagMatcher = dataObjectToIndexableTags(transferData).join(' ');
 
       return {
         ...transferData,
@@ -81,10 +81,10 @@ class DatabaseInterface implements IAtomicService {
   }
 
   async indexTags(tagData: ITagData[], tagState: TagState) {
-    const authState = await authManager.authStateOrError("User is not authenticated");
+    const authState = await authManager.authStateOrError('User is not authenticated');
 
     const indexedTagsData = tagData.map((tagData) => {
-      const tagMatcher = dataObjectToIndexableTags(tagData).join(" ");
+      const tagMatcher = dataObjectToIndexableTags(tagData).join(' ');
 
       return {
         ...tagData,
@@ -103,7 +103,7 @@ class DatabaseInterface implements IAtomicService {
     queryString: string,
     filters: IIndexedPackageFilters
   ): Promise<IIndexedPackageData[]> {
-    const authState = await authManager.authStateOrError("User is not authenticated");
+    const authState = await authManager.authStateOrError('User is not authenticated');
 
     const formattedQuery = queryString.toUpperCase();
 
@@ -114,9 +114,9 @@ class DatabaseInterface implements IAtomicService {
     });
 
     if (!response || !response.data) {
-      setError("Package search failed. Try refreshing the page.");
+      setError('Package search failed. Try refreshing the page.');
 
-      throw new Error("Package search failed");
+      throw new Error('Package search failed');
     } else {
       setError(null);
     }
@@ -128,7 +128,7 @@ class DatabaseInterface implements IAtomicService {
     queryString: string,
     filters: IIndexedTransferFilters
   ): Promise<IIndexedTransferData[]> {
-    const authState = await authManager.authStateOrError("User is not authenticated");
+    const authState = await authManager.authStateOrError('User is not authenticated');
 
     const formattedQuery = queryString.toUpperCase();
 
@@ -139,9 +139,9 @@ class DatabaseInterface implements IAtomicService {
     });
 
     if (!response || !response.data) {
-      setError("Transfer search failed. Try refreshing the page.");
+      setError('Transfer search failed. Try refreshing the page.');
 
-      throw new Error("Transfer search failed");
+      throw new Error('Transfer search failed');
     } else {
       setError(null);
     }
@@ -150,7 +150,7 @@ class DatabaseInterface implements IAtomicService {
   }
 
   async tagSearch(queryString: string, filters: IIndexedTagFilters): Promise<IIndexedTagData[]> {
-    const authState = await authManager.authStateOrError("User is not authenticated");
+    const authState = await authManager.authStateOrError('User is not authenticated');
 
     const formattedQuery = queryString.toUpperCase();
 
@@ -161,9 +161,9 @@ class DatabaseInterface implements IAtomicService {
     });
 
     if (!response || !response.data) {
-      setError("Tag search failed. Try refreshing the page.");
+      setError('Tag search failed. Try refreshing the page.');
 
-      throw new Error("Tag search failed");
+      throw new Error('Tag search failed');
     } else {
       setError(null);
     }

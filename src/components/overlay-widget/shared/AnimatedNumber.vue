@@ -4,10 +4,10 @@
 
 <script lang="ts">
 // Adapted from https://stackoverflow.com/questions/35531629/vuejs-animate-number-changes
-import Vue from "vue";
+import Vue from 'vue';
 
 export default Vue.extend({
-  name: "AnimatedNumber",
+  name: 'AnimatedNumber',
   props: {
     number: Number,
   },

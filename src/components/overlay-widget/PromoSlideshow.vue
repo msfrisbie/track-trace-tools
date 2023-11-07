@@ -266,18 +266,18 @@
 </template>
 
 <script lang="ts">
-import router from "@/router/index";
-import store from "@/store/page-overlay/index";
-import _ from "lodash-es";
-import Vue from "vue";
-import { mapState } from "vuex";
+import router from '@/router/index';
+import store from '@/store/page-overlay/index';
+import _ from 'lodash-es';
+import Vue from 'vue';
+import { mapState } from 'vuex';
 
-const shareUrl = `https://www.trackandtrace.tools?utm_source=ttt`;
-const shareTitle = `Track and Trace Tools`;
-const shareSummary = `Supercharge your Metrc workflow`;
+const shareUrl = 'https://www.trackandtrace.tools?utm_source=ttt';
+const shareTitle = 'Track and Trace Tools';
+const shareSummary = 'Supercharge your Metrc workflow';
 
 export default Vue.extend({
-  name: "PromoSlideshow",
+  name: 'PromoSlideshow',
   store,
   router,
   props: {
@@ -298,27 +298,27 @@ export default Vue.extend({
       linkedinShareUrl: `https://www.linkedin.com/shareArticle?url=${shareUrl}&title=${shareTitle}&summary=${shareSummary}`,
       emailShareUrl: `mailto:?subject=${shareTitle}&body=${shareUrl}`,
       facebookShareUrl: `https://www.facebook.com/sharer/sharer.php?u=${shareUrl}`,
-      donateUrl: `https://buy.stripe.com/fZe9BB7Ua56yaHefYY`,
+      donateUrl: 'https://buy.stripe.com/fZe9BB7Ua56yaHefYY',
       slide: 0,
       sliding: null,
       slides: _.shuffle([
-        "plus",
-        "review",
-        "finalize",
-        "tagvoid",
-        "shortcuts",
-        "settings",
-        "forum",
-        "clickme",
-        "solutions",
-        "opensource",
-        "snowflakes",
-        "csv",
-        "harvest",
-        "logout",
-        "share",
+        'plus',
+        'review',
+        'finalize',
+        'tagvoid',
+        'shortcuts',
+        'settings',
+        'forum',
+        'clickme',
+        'solutions',
+        'opensource',
+        'snowflakes',
+        'csv',
+        'harvest',
+        'logout',
+        'share',
         // "donate",
-        "googlesheets",
+        'googlesheets',
         // "searchsurvey",
       ]),
     };

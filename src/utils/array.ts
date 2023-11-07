@@ -1,4 +1,4 @@
-import { zip } from "lodash-es";
+import { zip } from 'lodash-es';
 
 interface CollectionValidator<T> {
   fn: (arr: T[]) => boolean;
@@ -93,7 +93,7 @@ export function sameLength(...arrs: any[][]): boolean {
  */
 export function safeZip(...arrs: any[][]) {
   if (!sameLength(...arrs)) {
-    throw new Error("Array length mismatch");
+    throw new Error('Array length mismatch');
   }
 
   return zip(...arrs);

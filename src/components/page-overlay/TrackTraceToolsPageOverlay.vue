@@ -15,61 +15,61 @@
 </template>
 
 <script lang="ts">
-import FloatingButtonContainer from "@/components/page-overlay/FloatingButtonContainer.vue";
-import PageOverlayContainer from "@/components/page-overlay/PageOverlayContainer.vue";
-import Snowflakes from "@/components/page-overlay/Snowflakes.vue";
-import { MessageType, VUEX_KEY } from "@/consts";
-import { IAuthState } from "@/interfaces";
-import { accountManager } from "@/modules/account-manager.module";
-import { analyticsManager } from "@/modules/analytics-manager.module";
-import { announcementsManager } from "@/modules/announcements-manager.module";
-import { authManager } from "@/modules/auth-manager.module";
-import { backgroundTaskManager } from "@/modules/background-task-manager.module";
-import { builderManager } from "@/modules/builder-manager.module";
-import { clientBuildManager } from "@/modules/client-build-manager.module";
-import { contactDataManager } from "@/modules/contact-data-manager.module";
-import { credentialManager } from "@/modules/credential-manager.module";
-import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
-import { dynamicConstsManager } from "@/modules/dynamic-consts-manager.module";
-import { env, isDevelopment } from "@/modules/environment.module";
-import { expiringCacheManager } from "@/modules/expiring-cache-manager.module";
-import { facilityManager } from "@/modules/facility-manager.module";
-import { integrityManager } from "@/modules/integrity-manager.module";
-import { messageBus } from "@/modules/message-bus.module";
-import { metrcModalManager } from "@/modules/metrc-modal-manager.module";
-import { primaryMetrcRequestManager } from "@/modules/metrc-request-manager.module";
-import { mockDataManager } from "@/modules/mock-data-manager.module";
-import { modalManager } from "@/modules/modal-manager.module";
-import { pageManager } from "@/modules/page-manager/page-manager.module";
-import { passivePageAnalyzer } from "@/modules/passive-page-analyzer.module";
-import { sandboxManager } from "@/modules/sandbox-manager.module";
-import { searchManager } from "@/modules/search-manager.module";
-import { t3RequestManager } from "@/modules/t3-request-manager.module";
-import { telemetryManager } from "@/modules/telemetry-manager.module";
-import { toastManager } from "@/modules/toast-manager.module";
-import { updateManager } from "@/modules/update-manager.module";
-import store from "@/store/page-overlay/index";
-import { library } from "@fortawesome/fontawesome-svg-core";
-import * as fontawesomeBrands from "@fortawesome/free-brands-svg-icons";
-import * as fontawesomeRegular from "@fortawesome/free-regular-svg-icons";
-import * as fontawesomeSolid from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
-import * as Sentry from "@sentry/browser";
-import * as Integrations from "@sentry/integrations";
-import { BootstrapVue } from "bootstrap-vue";
-import Vue from "vue";
-import VueRouter from "vue-router";
-import VueSlider from "vue-slider-component";
-import "vue-slider-component/theme/default.css";
-import VueTypeaheadBootstrap from "vue-typeahead-bootstrap";
-import { mapState } from "vuex";
+import FloatingButtonContainer from '@/components/page-overlay/FloatingButtonContainer.vue';
+import PageOverlayContainer from '@/components/page-overlay/PageOverlayContainer.vue';
+import Snowflakes from '@/components/page-overlay/Snowflakes.vue';
+import { MessageType, VUEX_KEY } from '@/consts';
+import { IAuthState } from '@/interfaces';
+import { accountManager } from '@/modules/account-manager.module';
+import { analyticsManager } from '@/modules/analytics-manager.module';
+import { announcementsManager } from '@/modules/announcements-manager.module';
+import { authManager } from '@/modules/auth-manager.module';
+import { backgroundTaskManager } from '@/modules/background-task-manager.module';
+import { builderManager } from '@/modules/builder-manager.module';
+import { clientBuildManager } from '@/modules/client-build-manager.module';
+import { contactDataManager } from '@/modules/contact-data-manager.module';
+import { credentialManager } from '@/modules/credential-manager.module';
+import { primaryDataLoader } from '@/modules/data-loader/data-loader.module';
+import { dynamicConstsManager } from '@/modules/dynamic-consts-manager.module';
+import { env, isDevelopment } from '@/modules/environment.module';
+import { expiringCacheManager } from '@/modules/expiring-cache-manager.module';
+import { facilityManager } from '@/modules/facility-manager.module';
+import { integrityManager } from '@/modules/integrity-manager.module';
+import { messageBus } from '@/modules/message-bus.module';
+import { metrcModalManager } from '@/modules/metrc-modal-manager.module';
+import { primaryMetrcRequestManager } from '@/modules/metrc-request-manager.module';
+import { mockDataManager } from '@/modules/mock-data-manager.module';
+import { modalManager } from '@/modules/modal-manager.module';
+import { pageManager } from '@/modules/page-manager/page-manager.module';
+import { passivePageAnalyzer } from '@/modules/passive-page-analyzer.module';
+import { sandboxManager } from '@/modules/sandbox-manager.module';
+import { searchManager } from '@/modules/search-manager.module';
+import { t3RequestManager } from '@/modules/t3-request-manager.module';
+import { telemetryManager } from '@/modules/telemetry-manager.module';
+import { toastManager } from '@/modules/toast-manager.module';
+import { updateManager } from '@/modules/update-manager.module';
+import store from '@/store/page-overlay/index';
+import { library } from '@fortawesome/fontawesome-svg-core';
+import * as fontawesomeBrands from '@fortawesome/free-brands-svg-icons';
+import * as fontawesomeRegular from '@fortawesome/free-regular-svg-icons';
+import * as fontawesomeSolid from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import * as Sentry from '@sentry/browser';
+import * as Integrations from '@sentry/integrations';
+import { BootstrapVue } from 'bootstrap-vue';
+import Vue from 'vue';
+import VueRouter from 'vue-router';
+import VueSlider from 'vue-slider-component';
+import 'vue-slider-component/theme/default.css';
+import VueTypeaheadBootstrap from 'vue-typeahead-bootstrap';
+import { mapState } from 'vuex';
 
 // TODO this allows firefox to render, but errors are uncollected.
 setTimeout(() => {
   // Don't send error tracking on local
   const dsn = isDevelopment()
     ? null
-    : "https://cbcb096c827249a099008253b508f74b@o241482.ingest.sentry.io/5559932";
+    : 'https://cbcb096c827249a099008253b508f74b@o241482.ingest.sentry.io/5559932';
 
   // https://github.com/getsentry/sentry-javascript/blob/master/MIGRATION.md#how-to-use-sentryintegrations
   Sentry.init({
@@ -85,9 +85,9 @@ setTimeout(() => {
     ],
     beforeSend(event, hint) {
       for (const blacklistEntry of [
-        `timed out`,
-        `Setting the value of 'vuex' exceeded the quota`,
-        `No metrc kendo present`,
+        'timed out',
+        'Setting the value of \'vuex\' exceeded the quota',
+        'No metrc kendo present',
       ]) {
         if (hint && hint?.originalException?.toString().includes(blacklistEntry)) {
           if (Math.random() > 0.001) {
@@ -105,9 +105,9 @@ setTimeout(() => {
 Vue.use(VueRouter);
 Vue.use(BootstrapVue);
 
-Vue.component("VueSlider", VueSlider);
-Vue.component("vue-typeahead-bootstrap", VueTypeaheadBootstrap);
-Vue.component("font-awesome-icon", FontAwesomeIcon);
+Vue.component('VueSlider', VueSlider);
+Vue.component('vue-typeahead-bootstrap', VueTypeaheadBootstrap);
+Vue.component('font-awesome-icon', FontAwesomeIcon);
 
 library.add(
   // @ts-ignore
@@ -214,7 +214,7 @@ library.add(
  * This is the top-level component rendered on the page
  */
 export default Vue.extend({
-  name: "TrackTraceToolsPageOverlay",
+  name: 'TrackTraceToolsPageOverlay',
   store,
   components: {
     PageOverlayContainer,
@@ -222,7 +222,7 @@ export default Vue.extend({
     Snowflakes,
   },
   computed: {
-    ...mapState(["expanded", "settings"]),
+    ...mapState(['expanded', 'settings']),
   },
   async created() {
     console.log(`Mode: ${env()}`);
@@ -282,8 +282,8 @@ export default Vue.extend({
         totalFacilities: (await facilityManager.ownedFacilitiesOrError()).length,
         facilities: (await facilityManager.ownedFacilitiesOrError())
           .map((x) => x.licenseNumber)
-          .join(","),
-        vuexBlobSize: (localStorage.getItem(VUEX_KEY) || "").length,
+          .join(','),
+        vuexBlobSize: (localStorage.getItem(VUEX_KEY) || '').length,
       });
     } else {
       // User is not logged in. Collect what we can.

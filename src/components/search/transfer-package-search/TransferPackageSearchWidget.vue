@@ -218,34 +218,34 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import { mapActions, mapState } from "vuex";
-import router from "@/router/index";
-import store from "@/store/page-overlay/index";
-import { IIndexedTagData, IIndexedTransferData, IPluginState } from "@/interfaces";
-import SearchViewSelector from "@/components/search/shared/SearchViewSelector.vue";
+import Vue from 'vue';
+import { mapActions, mapState } from 'vuex';
+import router from '@/router/index';
+import store from '@/store/page-overlay/index';
+import { IIndexedTagData, IIndexedTransferData, IPluginState } from '@/interfaces';
+import SearchViewSelector from '@/components/search/shared/SearchViewSelector.vue';
 import {
   TransferPackageSearchActions,
   TransferPackageSearchAlgorithm,
   TransferPackageSearchState,
-} from "@/store/page-overlay/modules/transfer-package-search/consts";
-import { TRANSFER_TAB_REGEX } from "@/modules/page-manager/consts";
-import { MessageType, TagState, TransferState } from "@/consts";
-import { analyticsManager } from "@/modules/analytics-manager.module";
-import { SearchActions } from "@/store/page-overlay/modules/search/consts";
-import { TransferSearchActions } from "@/store/page-overlay/modules/transfer-search/consts";
+} from '@/store/page-overlay/modules/transfer-package-search/consts';
+import { TRANSFER_TAB_REGEX } from '@/modules/page-manager/consts';
+import { MessageType, TagState, TransferState } from '@/consts';
+import { analyticsManager } from '@/modules/analytics-manager.module';
+import { SearchActions } from '@/store/page-overlay/modules/search/consts';
+import { TransferSearchActions } from '@/store/page-overlay/modules/transfer-search/consts';
 import {
   getLabelOrError,
   getQuantityOrError,
   getItemNameOrError,
   getUnitOfMeasureAbbreviationOrError,
-} from "@/utils/package";
-import PickerCard from "@/components/overlay-widget/shared/PickerCard.vue";
-import PickerIcon from "@/components/overlay-widget/shared/PickerIcon.vue";
-import HistoryList from "@/components/search/shared/HistoryList.vue";
+} from '@/utils/package';
+import PickerCard from '@/components/overlay-widget/shared/PickerCard.vue';
+import PickerIcon from '@/components/overlay-widget/shared/PickerIcon.vue';
+import HistoryList from '@/components/search/shared/HistoryList.vue';
 
 export default Vue.extend({
-  name: "TransferPackageSearchWidget",
+  name: 'TransferPackageSearchWidget',
   store,
   router,
   props: {},
@@ -314,7 +314,7 @@ export default Vue.extend({
     getItemNameOrError,
     getUnitOfMeasureAbbreviationOrError,
     displayTransferState(transfer: IIndexedTransferData) {
-      return transfer.TransferState.replaceAll("_", " ");
+      return transfer.TransferState.replaceAll('_', ' ');
     },
     async setTransferManifestNumberFilter(transfer: IIndexedTransferData) {
       analyticsManager.track(MessageType.SELECTED_TRANSFER);

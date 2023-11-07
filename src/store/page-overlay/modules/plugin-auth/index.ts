@@ -1,14 +1,14 @@
-import { MessageType } from "@/consts";
-import { IAuthState, IPluginState } from "@/interfaces";
-import { messageBus } from "@/modules/message-bus.module";
-import { debugLogFactory } from "@/utils/debug";
-import { ActionContext } from "vuex";
+import { MessageType } from '@/consts';
+import { IAuthState, IPluginState } from '@/interfaces';
+import { messageBus } from '@/modules/message-bus.module';
+import { debugLogFactory } from '@/utils/debug';
+import { ActionContext } from 'vuex';
 import {
   OAuthState, PluginAuthActions, PluginAuthGetters, PluginAuthMutations
-} from "./consts";
-import { IPluginAuthState } from "./interfaces";
+} from './consts';
+import { IPluginAuthState } from './interfaces';
 
-const debugLog = debugLogFactory("plugin-auth/index.ts");
+const debugLog = debugLogFactory('plugin-auth/index.ts');
 
 const inMemoryState = {
   authState: null,
@@ -53,17 +53,17 @@ export const pluginAuthModule = {
       const email = tokenDecoded.email;
 
       if (!email) {
-        throw new Error("Could not decode email");
+        throw new Error('Could not decode email');
       }
 
       if (!tokenExpires) {
-        throw new Error("Could not decode tokenExpires");
+        throw new Error('Could not decode tokenExpires');
       }
 
       const identity = authState?.identity;
 
       if (!identity) {
-        throw new Error("Could not get identity");
+        throw new Error('Could not get identity');
       }
 
       state.identity = identity;
@@ -82,11 +82,11 @@ export const pluginAuthModule = {
       { currentUser }: { currentUser: any }
     ) {
       if (!currentUser) {
-        debugLog(async () => ["unable to set current user"]);
-        throw new Error("Unable to set current user");
+        debugLog(async () => ['unable to set current user']);
+        throw new Error('Unable to set current user');
       }
 
-      debugLog(async () => ["successfully set current user"]);
+      debugLog(async () => ['successfully set current user']);
 
       state.currentUser = currentUser;
     },

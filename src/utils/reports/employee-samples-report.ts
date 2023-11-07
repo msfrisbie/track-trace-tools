@@ -1,34 +1,34 @@
-import { MessageType, SHEETS_API_MESSAGE_TIMEOUT_MS, SheetTitles } from "@/consts";
+import { MessageType, SHEETS_API_MESSAGE_TIMEOUT_MS, SheetTitles } from '@/consts';
 import {
   IIndexedPackageData,
   IMetrcEmployeeData,
   IPackageFilter,
   IPluginState,
   ISpreadsheet
-} from "@/interfaces";
-import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
-import { messageBus } from "@/modules/message-bus.module";
-import store from "@/store/page-overlay/index";
-import { ReportsMutations, ReportType } from "@/store/page-overlay/modules/reports/consts";
+} from '@/interfaces';
+import { primaryDataLoader } from '@/modules/data-loader/data-loader.module';
+import { messageBus } from '@/modules/message-bus.module';
+import store from '@/store/page-overlay/index';
+import { ReportsMutations, ReportType } from '@/store/page-overlay/modules/reports/consts';
 import {
   IReportConfig,
   IReportData,
   IReportsState
-} from "@/store/page-overlay/modules/reports/interfaces";
-import { ActionContext } from "vuex";
-import { normalizeIsodate, todayIsodate } from "../date";
+} from '@/store/page-overlay/modules/reports/interfaces';
+import { ActionContext } from 'vuex';
+import { normalizeIsodate, todayIsodate } from '../date';
 import {
   getAllocatedSamplesFromPackageHistoryOrError,
   toNormalizedAllocationQuantity
-} from "../employee";
-import { extractInitialPackageQuantityAndUnitFromHistoryOrError } from "../history";
+} from '../employee';
+import { extractInitialPackageQuantityAndUnitFromHistoryOrError } from '../history';
 import {
   addRowsRequestFactory,
   autoResizeDimensionsRequestFactory,
   freezeTopRowRequestFactory,
   styleTopRowRequestFactory
-} from "../sheets";
-import { writeDataSheet } from "../sheets-export";
+} from '../sheets';
+import { writeDataSheet } from '../sheets-export';
 
 interface IEmployeeSamplesReportFormFilters {
   employeeSamplesDateGt: string;
@@ -72,7 +72,7 @@ export async function maybeLoadEmployeeSamplesReportData({
   }
 
   store.commit(`reports/${ReportsMutations.SET_STATUS}`, {
-    statusMessage: { text: `Loading package data...`, level: "success" },
+    statusMessage: { text: 'Loading package data...', level: 'success' },
   });
 
   let allPackages: IIndexedPackageData[] = [];
@@ -139,16 +139,16 @@ export async function maybeLoadEmployeeSamplesReportData({
 
   const employeeSamplesMatrix: any[][] = [
     [
-      "Employee Name",
-      "Employee ID",
-      "Adjustment Date",
-      "Package Label",
-      "Item",
-      "Adjustment Quantity",
-      "Units",
-      "Flower allocation (g)",
-      "Concentrate allocation (g)",
-      "Infused allocation (mg)",
+      'Employee Name',
+      'Employee ID',
+      'Adjustment Date',
+      'Package Label',
+      'Item',
+      'Adjustment Quantity',
+      'Units',
+      'Flower allocation (g)',
+      'Concentrate allocation (g)',
+      'Infused allocation (mg)',
     ],
   ];
 
@@ -191,13 +191,13 @@ export async function maybeLoadEmployeeSamplesReportData({
 
     employeeSamplesMatrix.push(
       [
-        "",
-        "",
-        "",
-        "",
-        "",
-        "",
-        "",
+        '',
+        '',
+        '',
+        '',
+        '',
+        '',
+        '',
         `=SUM(H${employeeSamplesMatrix.length - rows.length + 1}:H${employeeSamplesMatrix.length})`,
         `=SUM(I${employeeSamplesMatrix.length - rows.length + 1}:I${employeeSamplesMatrix.length})`,
         `=SUM(J${employeeSamplesMatrix.length - rows.length + 1}:J${employeeSamplesMatrix.length})`,
@@ -214,15 +214,15 @@ export async function maybeLoadEmployeeSamplesReportData({
     }
 
     if (
-      pkg.ReceivedDateTime <
-      reportConfig[ReportType.EMPLOYEE_SAMPLES]!.packageFilter.packagedDateGt!
+      pkg.ReceivedDateTime
+      < reportConfig[ReportType.EMPLOYEE_SAMPLES]!.packageFilter.packagedDateGt!
     ) {
       continue;
     }
 
     if (
-      pkg.ReceivedDateTime >
-      reportConfig[ReportType.EMPLOYEE_SAMPLES]!.packageFilter.packagedDateLt!
+      pkg.ReceivedDateTime
+      > reportConfig[ReportType.EMPLOYEE_SAMPLES]!.packageFilter.packagedDateLt!
     ) {
       continue;
     }
@@ -238,7 +238,7 @@ export async function maybeLoadEmployeeSamplesReportData({
   receivedSamplesMatrix.sort((a, b) => a[0].localeCompare(b[0]));
 
   receivedSamplesMatrix = [
-    ["Received Date", "Package Label", "Item", "Quantity", "Units"],
+    ['Received Date', 'Package Label', 'Item', 'Quantity', 'Units'],
     ...receivedSamplesMatrix,
   ];
 
@@ -256,11 +256,11 @@ export async function createEmployeeSamplesSpreadsheetOrError({
   reportConfig: IReportConfig;
 }): Promise<ISpreadsheet> {
   if (!store.state.pluginAuth?.authState?.license) {
-    throw new Error("Invalid authState");
+    throw new Error('Invalid authState');
   }
 
   if (!reportData[ReportType.EMPLOYEE_SAMPLES]) {
-    throw new Error("Missing employee samples data");
+    throw new Error('Missing employee samples data');
   }
 
   const sheetTitles = [
@@ -285,7 +285,7 @@ export async function createEmployeeSamplesSpreadsheetOrError({
   );
 
   if (!response.data.success) {
-    throw new Error("Unable to create employee samples sheet");
+    throw new Error('Unable to create employee samples sheet');
   }
 
   let formattingRequests: any = [
@@ -339,12 +339,12 @@ export async function createEmployeeSamplesSpreadsheetOrError({
         [],
         [
           null,
-          `Start date:`,
+          'Start date:',
           reportConfig[ReportType.EMPLOYEE_SAMPLES]?.packageFilter.packagedDateGt,
         ],
         [
           null,
-          `End date:`,
+          'End date:',
           reportConfig[ReportType.EMPLOYEE_SAMPLES]?.packageFilter.packagedDateLt,
         ],
       ],
@@ -354,7 +354,7 @@ export async function createEmployeeSamplesSpreadsheetOrError({
   );
 
   store.commit(`reports/${ReportsMutations.SET_STATUS}`, {
-    statusMessage: { text: `Writing report data...`, level: "success" },
+    statusMessage: { text: 'Writing report data...', level: 'success' },
   });
 
   await writeDataSheet({
@@ -363,7 +363,7 @@ export async function createEmployeeSamplesSpreadsheetOrError({
     data: employeeSamplesMatrix,
     options: {
       pageSize: 5000,
-      valueInputOption: "USER_ENTERED",
+      valueInputOption: 'USER_ENTERED',
       maxParallelRequests: 10,
     },
   });
@@ -374,13 +374,13 @@ export async function createEmployeeSamplesSpreadsheetOrError({
     data: receivedSamplesMatrix,
     options: {
       pageSize: 5000,
-      valueInputOption: "USER_ENTERED",
+      valueInputOption: 'USER_ENTERED',
       maxParallelRequests: 10,
     },
   });
 
   store.commit(`reports/${ReportsMutations.SET_STATUS}`, {
-    statusMessage: { text: `Resizing sheets...`, level: "success" },
+    statusMessage: { text: 'Resizing sheets...', level: 'success' },
   });
 
   let resizeRequests: any[] = [];

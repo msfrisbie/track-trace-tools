@@ -469,18 +469,18 @@
 </template>
 
 <script lang="ts">
-import BuilderStepHeader from "@/components/overlay-widget/shared/BuilderStepHeader.vue";
-import DepartureArrivalPicker from "@/components/overlay-widget/shared/DepartureArrivalPicker.vue";
-import DriverVehiclePicker from "@/components/overlay-widget/shared/DriverVehiclePicker.vue";
-import FacilitySummary from "@/components/overlay-widget/shared/FacilitySummary.vue";
-import RecentFacilityPicker from "@/components/overlay-widget/shared/RecentFacilityPicker.vue";
-import RoutePicker from "@/components/overlay-widget/shared/RoutePicker.vue";
-import SinglePackagePicker from "@/components/overlay-widget/shared/SinglePackagePicker.vue";
-import TransferPicker from "@/components/overlay-widget/shared/TransferPicker.vue";
-import StartFinishIcons from "@/components/overlay-widget/shared/StartFinishIcons.vue";
+import BuilderStepHeader from '@/components/overlay-widget/shared/BuilderStepHeader.vue';
+import DepartureArrivalPicker from '@/components/overlay-widget/shared/DepartureArrivalPicker.vue';
+import DriverVehiclePicker from '@/components/overlay-widget/shared/DriverVehiclePicker.vue';
+import FacilitySummary from '@/components/overlay-widget/shared/FacilitySummary.vue';
+import RecentFacilityPicker from '@/components/overlay-widget/shared/RecentFacilityPicker.vue';
+import RoutePicker from '@/components/overlay-widget/shared/RoutePicker.vue';
+import SinglePackagePicker from '@/components/overlay-widget/shared/SinglePackagePicker.vue';
+import TransferPicker from '@/components/overlay-widget/shared/TransferPicker.vue';
+import StartFinishIcons from '@/components/overlay-widget/shared/StartFinishIcons.vue';
 import {
   BuilderType, MessageType, ModalAction, ModalType
-} from "@/consts";
+} from '@/consts';
 import {
   IBuilderComponentError,
   IComputedGetSet,
@@ -497,55 +497,55 @@ import {
   ITransferData,
   IUnionIndexedPackageData,
   IUnitOfMeasure,
-} from "@/interfaces";
-import { analyticsManager } from "@/modules/analytics-manager.module";
-import { authManager } from "@/modules/auth-manager.module";
-import { builderManager } from "@/modules/builder-manager.module";
-import { dynamicConstsManager } from "@/modules/dynamic-consts-manager.module";
-import { modalManager } from "@/modules/modal-manager.module";
-import { searchManager } from "@/modules/search-manager.module";
-import { toastManager } from "@/modules/toast-manager.module";
-import store from "@/store/page-overlay/index";
-import { PackageSearchActions } from "@/store/page-overlay/modules/package-search/consts";
-import { PluginAuthGetters } from "@/store/page-overlay/modules/plugin-auth/consts";
+} from '@/interfaces';
+import { analyticsManager } from '@/modules/analytics-manager.module';
+import { authManager } from '@/modules/auth-manager.module';
+import { builderManager } from '@/modules/builder-manager.module';
+import { dynamicConstsManager } from '@/modules/dynamic-consts-manager.module';
+import { modalManager } from '@/modules/modal-manager.module';
+import { searchManager } from '@/modules/search-manager.module';
+import { toastManager } from '@/modules/toast-manager.module';
+import store from '@/store/page-overlay/index';
+import { PackageSearchActions } from '@/store/page-overlay/modules/package-search/consts';
+import { PluginAuthGetters } from '@/store/page-overlay/modules/plugin-auth/consts';
 import {
   TransferBuilderActions,
   TransferBuilderGetters,
-} from "@/store/page-overlay/modules/transfer-builder/consts";
+} from '@/store/page-overlay/modules/transfer-builder/consts';
 import {
   DriverLayoverLeg,
   ITransferBuilderState,
-} from "@/store/page-overlay/modules/transfer-builder/interfaces";
-import { facilityReadableAddressLinesOrNull } from "@/utils/address";
-import { buildCsvDataOrError, buildNamedCsvFileData } from "@/utils/csv";
-import { nowIsotime, todayIsodate } from "@/utils/date";
-import { debugLogFactory } from "@/utils/debug";
-import { facilitySummary } from "@/utils/facility";
+} from '@/store/page-overlay/modules/transfer-builder/interfaces';
+import { facilityReadableAddressLinesOrNull } from '@/utils/address';
+import { buildCsvDataOrError, buildNamedCsvFileData } from '@/utils/csv';
+import { nowIsotime, todayIsodate } from '@/utils/date';
+import { debugLogFactory } from '@/utils/debug';
+import { facilitySummary } from '@/utils/facility';
 import {
   extractRecentDestinationFacilitiesFromTransfers,
   extractRecentTransporterFacilitiesFromTransfers,
-} from "@/utils/transfer";
-import _ from "lodash-es";
-import { timer } from "rxjs";
-import Vue from "vue";
+} from '@/utils/transfer';
+import _ from 'lodash-es';
+import { timer } from 'rxjs';
+import Vue from 'vue';
 import {
   mapActions, mapGetters, mapState, Store
-} from "vuex";
+} from 'vuex';
 import {
   getLabelOrError,
   getQuantityOrError,
   getItemNameOrError,
   getUnitOfMeasureAbbreviationOrError,
   getIdOrError,
-} from "@/utils/package";
-import { clientBuildManager } from "@/modules/client-build-manager.module";
-import { SearchActions } from "@/store/page-overlay/modules/search/consts";
-import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
+} from '@/utils/package';
+import { clientBuildManager } from '@/modules/client-build-manager.module';
+import { SearchActions } from '@/store/page-overlay/modules/search/consts';
+import { primaryDataLoader } from '@/modules/data-loader/data-loader.module';
 
-const debugLog = debugLogFactory("TransferBuilder.vue");
+const debugLog = debugLogFactory('TransferBuilder.vue');
 
 export default Vue.extend({
-  name: "TransferBuilder",
+  name: 'TransferBuilder',
   store,
   components: {
     BuilderStepHeader,
@@ -578,12 +578,12 @@ export default Vue.extend({
         this.destinationFacility = facility;
         this.$data.destinationQuery = facilitySummary(facility);
         this.$data.destinationAddress = (facilityReadableAddressLinesOrNull(facility) || []).join(
-          "\n"
+          '\n'
         );
 
         if (
-          this.$data.destinationAddress === this.$data.originAddress &&
-          this.$data.destinationAddress.trim().length > 0
+          this.$data.destinationAddress === this.$data.originAddress
+          && this.$data.destinationAddress.trim().length > 0
         ) {
           this.isSameSiteTransfer = true;
         }
@@ -624,7 +624,7 @@ export default Vue.extend({
         isodate: string;
       }): string {
         // Probably not necessary, but this will exactly match what metrc sends
-        return `${isodate}T${isotime.replace(/(\.\d{3}){1,}Z?/, "")}`;
+        return `${isodate}T${isotime.replace(/(\.\d{3}){1,}Z?/, '')}`;
       }
 
       const isoNowDatetime: string = combineTimeAndDate({
@@ -633,7 +633,7 @@ export default Vue.extend({
       });
 
       const plannedRoute: string = this.isSameSiteTransfer
-        ? "N/A"
+        ? 'N/A'
         : this.transferBuilderState.plannedRoute;
       const estimatedDepartureDateTime: string = this.isSameSiteTransfer
         ? isoNowDatetime
@@ -649,31 +649,31 @@ export default Vue.extend({
         });
 
       const driverName: string = this.isSameSiteTransfer
-        ? "N/A"
+        ? 'N/A'
         : this.transferBuilderState.driverName;
       const driverEmployeeId: string = this.isSameSiteTransfer
-        ? "N/A"
+        ? 'N/A'
         : this.transferBuilderState.driverEmployeeId;
       const driverLicenseNumber: string = this.isSameSiteTransfer
-        ? "N/A"
+        ? 'N/A'
         : this.transferBuilderState.driverLicenseNumber;
 
       const vehicleMake: string = this.isSameSiteTransfer
-        ? "N/A"
+        ? 'N/A'
         : this.transferBuilderState.vehicleMake;
       const vehicleModel: string = this.isSameSiteTransfer
-        ? "N/A"
+        ? 'N/A'
         : this.transferBuilderState.vehicleModel;
       const vehicleLicensePlate: string = this.isSameSiteTransfer
-        ? "N/A"
+        ? 'N/A'
         : this.transferBuilderState.vehicleLicensePlate;
 
       const packages: IMetrcTransferPackageData[] = [];
 
       for (const [idx, pkg] of this.transferPackages.entries()) {
-        let WholesalePrice: string = "";
-        let GrossWeight: string = "";
-        let GrossUnitOfWeightId: string = "";
+        let WholesalePrice: string = '';
+        let GrossWeight: string = '';
+        let GrossUnitOfWeightId: string = '';
 
         if (this.isTransferSubmittedWithWholesalePrice) {
           WholesalePrice = this.wholesalePackageValues[idx].toString();
@@ -694,7 +694,7 @@ export default Vue.extend({
 
       const layoverTransporterMixin = this.transferBuilderState.isLayover
         ? {
-          IsLayover: "true",
+          IsLayover: 'true',
           EstimatedDepartureDateTime: combineTimeAndDate({
             isodate: this.transferBuilderState.layoverCheckOutIsodate,
             isotime: this.transferBuilderState.layoverCheckOutIsotime,
@@ -711,7 +711,7 @@ export default Vue.extend({
           DriverLayoverLeg: this.transferBuilderState.driverLayoverLeg,
         }
         : {
-          DriverLayoverLeg: "" as DriverLayoverLeg,
+          DriverLayoverLeg: '' as DriverLayoverLeg,
         };
 
       const transporters: IMetrcTransferTransporterData[] = [
@@ -746,16 +746,16 @@ export default Vue.extend({
               this.transferBuilderState.destinationGrossUnitOfWeight!.Id.toString(),
         }
         : {
-          GrossWeight: "",
-          GrossUnitOfWeightId: "",
+          GrossWeight: '',
+          GrossUnitOfWeightId: '',
         };
 
       const transferData: IMetrcCreateTransferPayload | IMetrcUpdateTransferPayload = {
-        ShipmentLicenseType: "Licensed",
+        ShipmentLicenseType: 'Licensed',
         ...IdMixin,
         Destinations: [
           {
-            ShipmentLicenseType: "Licensed",
+            ShipmentLicenseType: 'Licensed',
             RecipientId: (this.destinationFacility as IMetrcFacilityData).Id.toString(),
             PlannedRoute: plannedRoute,
             TransferTypeId: (this.transferType as IMetrcTransferType).Id.toString(),
@@ -773,18 +773,18 @@ export default Vue.extend({
       if (rows[0].Destinations.length === 0) {
         analyticsManager.track(MessageType.BUILDER_DATA_ERROR, {
           builder: BuilderType.CREATE_TRANSFER,
-          action: `Destinations is empty`,
+          action: 'Destinations is empty',
           payload: JSON.stringify(rows),
         });
 
         toastManager.openToast(
           "Unable to submit transfer. T3 team has been notified, we'll be in touch.",
           {
-            title: "T3 Error",
+            title: 'T3 Error',
             autoHideDelay: 10000,
-            variant: "danger",
+            variant: 'danger',
             appendToast: true,
-            toaster: "ttt-toaster",
+            toaster: 'ttt-toaster',
             solid: true,
           }
         );
@@ -808,13 +808,13 @@ export default Vue.extend({
       if (this.transferForUpdate) {
         analyticsManager.track(MessageType.BUILDER_EVENT, {
           builder: BuilderType.UPDATE_TRANSFER,
-          action: `Updated transfer`,
+          action: 'Updated transfer',
           payload: JSON.stringify(rows),
         });
       } else {
         analyticsManager.track(MessageType.BUILDER_EVENT, {
           builder: BuilderType.CREATE_TRANSFER,
-          action: `Created transfer`,
+          action: 'Created transfer',
           payload: JSON.stringify(rows),
         });
       }
@@ -885,100 +885,100 @@ export default Vue.extend({
 
       if (this.transferPackages.length === 0) {
         errors.push({
-          tags: ["page2"],
-          message: "Select at least one package to transfer",
+          tags: ['page2'],
+          message: 'Select at least one package to transfer',
         });
       }
 
       if (!this.destinationFacility) {
         errors.push({
-          tags: ["page1"],
-          message: "Select a destination facility",
+          tags: ['page1'],
+          message: 'Select a destination facility',
         });
       }
 
       if (!this.transferType) {
         errors.push({
-          tags: ["page3"],
-          message: "Select a transfer type",
+          tags: ['page3'],
+          message: 'Select a transfer type',
         });
       }
 
       if (!this.isTransferSubmittedWithoutTransporter) {
         if (!this.transporterFacility) {
           errors.push({
-            tags: ["page3"],
-            message: "Select a transporter facility",
+            tags: ['page3'],
+            message: 'Select a transporter facility',
           });
         }
 
         if (!this.phoneNumberForQuestions) {
           errors.push({
-            tags: ["page3"],
-            message: "Enter a phone number for questions",
+            tags: ['page3'],
+            message: 'Enter a phone number for questions',
           });
         }
       }
 
       if (!this.transferType) {
-        errors.push({ tags: ["page3"], message: "Select a transfer type" });
+        errors.push({ tags: ['page3'], message: 'Select a transfer type' });
       }
 
       if (!this.isSameSiteTransfer && !this.isTransferSubmittedWithoutTransporter) {
         if (!this.transferBuilderState.plannedRoute) {
-          errors.push({ tags: ["page1"], message: "Enter a planned route" });
+          errors.push({ tags: ['page1'], message: 'Enter a planned route' });
         }
         if (!this.transferBuilderState.departureIsodate) {
-          errors.push({ tags: ["page3"], message: "Select a departure date" });
+          errors.push({ tags: ['page3'], message: 'Select a departure date' });
         }
         if (!this.transferBuilderState.departureIsotime) {
-          errors.push({ tags: ["page3"], message: "Select a departure time" });
+          errors.push({ tags: ['page3'], message: 'Select a departure time' });
         }
         if (!this.transferBuilderState.arrivalIsodate) {
-          errors.push({ tags: ["page3"], message: "Select an arrivaal date" });
+          errors.push({ tags: ['page3'], message: 'Select an arrivaal date' });
         }
         if (!this.transferBuilderState.arrivalIsotime) {
-          errors.push({ tags: ["page3"], message: "Select an arrival time" });
+          errors.push({ tags: ['page3'], message: 'Select an arrival time' });
         }
         if (this.transferBuilderState.isLayover) {
           if (!this.transferBuilderState.layoverCheckInIsodate) {
-            errors.push({ tags: ["page3"], message: "Select a layover check in date" });
+            errors.push({ tags: ['page3'], message: 'Select a layover check in date' });
           }
           if (!this.transferBuilderState.layoverCheckInIsotime) {
-            errors.push({ tags: ["page3"], message: "Select a layover check in time" });
+            errors.push({ tags: ['page3'], message: 'Select a layover check in time' });
           }
           if (!this.transferBuilderState.layoverCheckOutIsodate) {
-            errors.push({ tags: ["page3"], message: "Select a layover check out date" });
+            errors.push({ tags: ['page3'], message: 'Select a layover check out date' });
           }
           if (!this.transferBuilderState.layoverCheckOutIsotime) {
-            errors.push({ tags: ["page3"], message: "Select a layover check out time" });
+            errors.push({ tags: ['page3'], message: 'Select a layover check out time' });
           }
         }
         if (!this.transferBuilderState.driverName) {
-          errors.push({ tags: ["page3"], message: "Enter a driver name" });
+          errors.push({ tags: ['page3'], message: 'Enter a driver name' });
         }
         if (!this.transferBuilderState.driverEmployeeId) {
           errors.push({
-            tags: ["page3"],
-            message: "Enter a driver employee ID",
+            tags: ['page3'],
+            message: 'Enter a driver employee ID',
           });
         }
         if (!this.transferBuilderState.driverLicenseNumber) {
           errors.push({
-            tags: ["page3"],
-            message: "Enter a driver license number",
+            tags: ['page3'],
+            message: 'Enter a driver license number',
           });
         }
         if (!this.transferBuilderState.vehicleMake) {
-          errors.push({ tags: ["page3"], message: "Enter a vehicle make" });
+          errors.push({ tags: ['page3'], message: 'Enter a vehicle make' });
         }
         if (!this.transferBuilderState.vehicleModel) {
-          errors.push({ tags: ["page3"], message: "Enter a vehicle model" });
+          errors.push({ tags: ['page3'], message: 'Enter a vehicle model' });
         }
         if (!this.transferBuilderState.vehicleLicensePlate) {
           errors.push({
-            tags: ["page3"],
-            message: "Enter a vehicle license plate",
+            tags: ['page3'],
+            message: 'Enter a vehicle license plate',
           });
         }
       }
@@ -990,26 +990,26 @@ export default Vue.extend({
           return false;
         }
 
-        return typeof n === "number";
+        return typeof n === 'number';
       }
 
       if (this.isTransferSubmittedWithDestinationGrossWeight) {
         const grossWeight = parseFloat(
-          (this.transferBuilderState.destinationGrossWeight ?? "").toString()
+          (this.transferBuilderState.destinationGrossWeight ?? '').toString()
         );
         const unitOfMeasure = this.transferBuilderState.destinationGrossUnitOfWeight;
 
         if (!isNumber(grossWeight)) {
           errors.push({
-            tags: ["page3"],
-            message: "Destination must have a gross weight",
+            tags: ['page3'],
+            message: 'Destination must have a gross weight',
           });
         }
 
         if (!unitOfMeasure) {
           errors.push({
-            tags: ["page3"],
-            message: "Destination must have a gross unit of weight",
+            tags: ['page3'],
+            message: 'Destination must have a gross unit of weight',
           });
         }
       }
@@ -1020,8 +1020,8 @@ export default Vue.extend({
 
           if (!isNumber(wholesalePrice)) {
             errors.push({
-              tags: ["page3"],
-              message: "Each package must have a wholesale price",
+              tags: ['page3'],
+              message: 'Each package must have a wholesale price',
             });
           }
         }
@@ -1032,15 +1032,15 @@ export default Vue.extend({
 
           if (!isNumber(grossWeight)) {
             errors.push({
-              tags: ["page3"],
-              message: "Each package must have a gross weight",
+              tags: ['page3'],
+              message: 'Each package must have a gross weight',
             });
           }
 
           if (!unitOfMeasure) {
             errors.push({
-              tags: ["page3"],
-              message: "Each package must have a gross unit of weight",
+              tags: ['page3'],
+              message: 'Each package must have a gross unit of weight',
             });
           }
         }
@@ -1079,17 +1079,17 @@ export default Vue.extend({
     },
     pageOneErrorMessage(): string | null {
       return (
-        this.errors.find((x: IBuilderComponentError) => x.tags.includes("page1"))?.message || null
+        this.errors.find((x: IBuilderComponentError) => x.tags.includes('page1'))?.message || null
       );
     },
     pageTwoErrorMessage(): string | null {
       return (
-        this.errors.find((x: IBuilderComponentError) => x.tags.includes("page2"))?.message || null
+        this.errors.find((x: IBuilderComponentError) => x.tags.includes('page2'))?.message || null
       );
     },
     pageThreeErrorMessage(): string | null {
       return (
-        this.errors.find((x: IBuilderComponentError) => x.tags.includes("page3"))?.message || null
+        this.errors.find((x: IBuilderComponentError) => x.tags.includes('page3'))?.message || null
       );
     },
     errorMessage(): string | null {
@@ -1223,18 +1223,18 @@ export default Vue.extend({
     } as IComputedGetSet<IIndexedTransferData | null>,
     isTransferSubmittedWithoutTransporter(): boolean {
       return (
-        this.transferType?.Name === "State Authorized" &&
-        window.location.hostname === "ca.metrc.com"
+        this.transferType?.Name === 'State Authorized'
+        && window.location.hostname === 'ca.metrc.com'
       );
     },
     isTransferSubmittedWithDestinationGrossWeight(): boolean {
-      return window.location.hostname === "mi.metrc.com";
+      return window.location.hostname === 'mi.metrc.com';
     },
     isTransferSubmittedWithPackageGrossWeight(): boolean {
       return false;
     },
     isTransferSubmittedWithWholesalePrice(): boolean {
-      return this.transferType?.Name?.includes("Wholesale") ?? false;
+      return this.transferType?.Name?.includes('Wholesale') ?? false;
     },
     transferTypeOptions(): { value: IMetrcTransferType; text: string; disabled: boolean }[] {
       return this.$data.transferTypes
@@ -1243,7 +1243,7 @@ export default Vue.extend({
 
           return {
             value: transferType,
-            text: transferType.Name.toLocaleUpperCase() + (enabled ? "" : " (not yet available)"),
+            text: transferType.Name.toLocaleUpperCase() + (enabled ? '' : ' (not yet available)'),
             disabled: !enabled,
           };
         })
@@ -1258,8 +1258,8 @@ export default Vue.extend({
   },
   data() {
     return {
-      destinationQuery: "",
-      transporterQuery: "",
+      destinationQuery: '',
+      transporterQuery: '',
       transferDataLoading: false,
       showPhoneNumberInput: false,
       activePackages: [],
@@ -1270,22 +1270,22 @@ export default Vue.extend({
       destinationFacilities: [],
       recentTransporterFacilities: [],
       recentDestinationFacilities: [],
-      defaultPhoneNumberForQuestions: "",
-      destinationAddress: "",
-      originAddress: "",
+      defaultPhoneNumberForQuestions: '',
+      destinationAddress: '',
+      originAddress: '',
       showMapsIframe: false,
       unitsOfWeight: [],
       showInitializationError: false,
       editTransfer: false,
       steps: [
         {
-          stepText: "Destination details",
+          stepText: 'Destination details',
         },
         {
-          stepText: "Select packages to transfer",
+          stepText: 'Select packages to transfer',
         },
         {
-          stepText: "Transport details",
+          stepText: 'Transport details',
         },
       ],
     };
@@ -1313,8 +1313,7 @@ export default Vue.extend({
       this.$data.transporterFacilities = await primaryDataLoader.transferTransporterFacilities();
       this.$data.destinationFacilities = await primaryDataLoader.transferDestinationFacilities();
 
-      this.$data.defaultPhoneNumberForQuestions =
-        await dynamicConstsManager.defaultPhoneNumberForQuestions();
+      this.$data.defaultPhoneNumberForQuestions = await dynamicConstsManager.defaultPhoneNumberForQuestions();
 
       extractRecentDestinationFacilitiesFromTransfers().then(
         (recentDestinationFacilities: IMetrcFacilityData[]) => {
@@ -1335,7 +1334,7 @@ export default Vue.extend({
 
         this.$data.originAddress = (
           facilityReadableAddressLinesOrNull(this.originFacility as IMetrcFacilityData) || []
-        ).join("\n");
+        ).join('\n');
       });
     } catch (e) {
       console.error(e);
@@ -1343,7 +1342,7 @@ export default Vue.extend({
       this.$data.showInitializationError = true;
 
       analyticsManager.track(MessageType.BUILDER_ERROR_READOUT, {
-        errorMessage: `Transfer builder initialization error`,
+        errorMessage: 'Transfer builder initialization error',
         error: (e as Error)?.toString(),
       });
     }

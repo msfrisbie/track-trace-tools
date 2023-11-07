@@ -1,14 +1,14 @@
-import { IHarvestFilter, IIndexedHarvestData, IPluginState } from "@/interfaces";
-import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
-import { ReportsMutations, ReportType } from "@/store/page-overlay/modules/reports/consts";
+import { IHarvestFilter, IIndexedHarvestData, IPluginState } from '@/interfaces';
+import { primaryDataLoader } from '@/modules/data-loader/data-loader.module';
+import { ReportsMutations, ReportType } from '@/store/page-overlay/modules/reports/consts';
 import {
   IFieldData,
   IReportConfig,
   IReportData,
   IReportsState,
-} from "@/store/page-overlay/modules/reports/interfaces";
-import { ActionContext } from "vuex";
-import { todayIsodate } from "../date";
+} from '@/store/page-overlay/modules/reports/interfaces';
+import { ActionContext } from 'vuex';
+import { todayIsodate } from '../date';
 
 interface IHarvestsReportFormFilters {
   harvestDateGt: string;
@@ -68,7 +68,7 @@ export async function maybeLoadHarvestsReportData({
   const harvestConfig = reportConfig[ReportType.HARVESTS];
   if (harvestConfig?.harvestFilter) {
     ctx.commit(ReportsMutations.SET_STATUS, {
-      statusMessage: { text: "Loading harvests...", level: "success" },
+      statusMessage: { text: 'Loading harvests...', level: 'success' },
     });
 
     let harvests: IIndexedHarvestData[] = [];
@@ -78,7 +78,7 @@ export async function maybeLoadHarvestsReportData({
         harvests = [...harvests, ...(await primaryDataLoader.activeHarvests())];
       } catch (e) {
         ctx.commit(ReportsMutations.SET_STATUS, {
-          statusMessage: { text: "Failed to load active harvests.", level: "warning" },
+          statusMessage: { text: 'Failed to load active harvests.', level: 'warning' },
         });
       }
     }
@@ -88,7 +88,7 @@ export async function maybeLoadHarvestsReportData({
         harvests = [...harvests, ...(await primaryDataLoader.inactiveHarvests())];
       } catch (e) {
         ctx.commit(ReportsMutations.SET_STATUS, {
-          statusMessage: { text: "Failed to load inactive harvests.", level: "warning" },
+          statusMessage: { text: 'Failed to load inactive harvests.', level: 'warning' },
         });
       }
     }

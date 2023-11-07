@@ -1,30 +1,30 @@
-import { MessageType, SHEETS_API_MESSAGE_TIMEOUT_MS, SheetTitles } from "@/consts";
+import { MessageType, SHEETS_API_MESSAGE_TIMEOUT_MS, SheetTitles } from '@/consts';
 import {
   IIndexedPackageData,
   IPackageFilter,
   IPluginState,
   ISpreadsheet,
   ITransferFilter
-} from "@/interfaces";
-import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
-import { messageBus } from "@/modules/message-bus.module";
-import store from "@/store/page-overlay/index";
-import { ReportsMutations, ReportType } from "@/store/page-overlay/modules/reports/consts";
+} from '@/interfaces';
+import { primaryDataLoader } from '@/modules/data-loader/data-loader.module';
+import { messageBus } from '@/modules/message-bus.module';
+import store from '@/store/page-overlay/index';
+import { ReportsMutations, ReportType } from '@/store/page-overlay/modules/reports/consts';
 import {
   IReportConfig,
   IReportData,
   IReportsState
-} from "@/store/page-overlay/modules/reports/interfaces";
-import { ActionContext } from "vuex";
-import { isodateToSlashDate, todayIsodate } from "../date";
+} from '@/store/page-overlay/modules/reports/interfaces';
+import { ActionContext } from 'vuex';
+import { isodateToSlashDate, todayIsodate } from '../date';
 import {
   extractChildPackageTagQuantityUnitSetsFromHistory,
   extractInitialPackageLocationNameFromHistoryOrNull,
   extractInitialPackageQuantityAndUnitFromHistoryOrError,
   extractParentPackageTagQuantityUnitItemSetsFromHistory,
   extractTestSamplePackageLabelsFromHistory
-} from "../history";
-import { pad } from "../misc";
+} from '../history';
+import { pad } from '../misc';
 import {
   addColumnsRequestFactory,
   addRowsRequestFactory,
@@ -33,15 +33,15 @@ import {
   freezeTopRowRequestFactory,
   numberColumnRequestFactory,
   styleTopRowRequestFactory
-} from "../sheets";
-import { writeDataSheet } from "../sheets-export";
+} from '../sheets';
+import { writeDataSheet } from '../sheets-export';
 
 interface ICogsTrackerReportFormFilters {
   cogsTrackerDateGt: string;
   cogsTrackerDateLt: string;
 }
 
-const ORDINALS = ["1st", "2nd", "3rd", "4th", "5th", "6th", "7th", "8th"];
+const ORDINALS = ['1st', '2nd', '3rd', '4th', '5th', '6th', '7th', '8th'];
 
 export const cogsTrackerFormFiltersFactory: () => ICogsTrackerReportFormFilters = () => ({
   cogsTrackerDateGt: todayIsodate(),
@@ -81,7 +81,7 @@ export async function maybeLoadCogsTrackerReportData({
   }
 
   store.commit(`reports/${ReportsMutations.SET_STATUS}`, {
-    statusMessage: { text: `Loading package data...`, level: "success" },
+    statusMessage: { text: 'Loading package data...', level: 'success' },
   });
 
   let allPackages: IIndexedPackageData[] = [];
@@ -148,37 +148,37 @@ export async function maybeLoadCogsTrackerReportData({
     .map((x) => pad(x, 8));
 
   const srcHeaders = [
-    "Item", // 0
-    "Tag",
-    "Source Packages",
-    "JV/CM", // 3
-    "Production Batch Number",
-    "Category", // 5
-    "Packaged Date",
-    "Source Harvests",
-    "Starting Quantity", // 8
-    "Input Material COGS",
-    "Number of Test Samples Pulled", // 10
-    "Weight Post Test If Applicable",
-    "Test Cost",
-    "Tested $/G",
-    "Cost Basis Value for Package",
-    "Notes", // 15
+    'Item', // 0
+    'Tag',
+    'Source Packages',
+    'JV/CM', // 3
+    'Production Batch Number',
+    'Category', // 5
+    'Packaged Date',
+    'Source Harvests',
+    'Starting Quantity', // 8
+    'Input Material COGS',
+    'Number of Test Samples Pulled', // 10
+    'Weight Post Test If Applicable',
+    'Test Cost',
+    'Tested $/G',
+    'Cost Basis Value for Package',
+    'Notes', // 15
     ...ordinalHeaders,
   ].map((x) => pad(x, 8));
 
   const packagedHeaders = [
-    "Tag",
-    "Item",
-    "Category",
-    "Sub-Category",
-    "JV/CM/Int",
-    "Packaged Date",
-    "Starting Quantity (ea)",
-    "Cost Basis of Whole Lot",
-    "Tag of Bulk Input",
-    "Tested $/G From Bulk Tag",
-    "gram weight / unit of finished goods",
+    'Tag',
+    'Item',
+    'Category',
+    'Sub-Category',
+    'JV/CM/Int',
+    'Packaged Date',
+    'Starting Quantity (ea)',
+    'Cost Basis of Whole Lot',
+    'Tag of Bulk Input',
+    'Tested $/G From Bulk Tag',
+    'gram weight / unit of finished goods',
   ].map((x) => pad(x, 8));
 
   bulkInfusedMatrix.push(srcHeaders.map((x) => x));
@@ -186,27 +186,27 @@ export async function maybeLoadCogsTrackerReportData({
   packagedGoodsCogsMatrix.push(packagedHeaders.map((x) => x));
 
   if (!store.state.client.values.PACKAGE_LOCATION_BLACKLIST) {
-    throw new Error(`Missing client key: PACKAGE_LOCATION_BLACKLIST`);
+    throw new Error('Missing client key: PACKAGE_LOCATION_BLACKLIST');
   }
 
   const locationNameBlacklist = store.state.client.values.PACKAGE_LOCATION_BLACKLIST;
 
   const bulkInfusedPackages = dateFilteredPackages.filter(
     (pkg) =>
-      pkg.Item.ProductCategoryName.includes("Bulk") &&
-      !pkg.Item.ProductCategoryName.includes("Shake/Trim") &&
-      !pkg.Item.ProductCategoryName.includes("Bulk Flower")
+      pkg.Item.ProductCategoryName.includes('Bulk')
+      && !pkg.Item.ProductCategoryName.includes('Shake/Trim')
+      && !pkg.Item.ProductCategoryName.includes('Bulk Flower')
   );
   const distRexCogsPackages = dateFilteredPackages.filter(
     (pkg) =>
-      pkg.Item.ProductCategoryName.includes("Bulk") &&
-      !pkg.Item.ProductCategoryName.includes("Shake/Trim") &&
-      !pkg.Item.ProductCategoryName.includes("Bulk Flower")
+      pkg.Item.ProductCategoryName.includes('Bulk')
+      && !pkg.Item.ProductCategoryName.includes('Shake/Trim')
+      && !pkg.Item.ProductCategoryName.includes('Bulk Flower')
   );
   const packagedGoodsCogsPackages = dateFilteredPackages.filter(
     (pkg) =>
-      pkg.UnitOfMeasureQuantityType === "CountBased" &&
-      !locationNameBlacklist.includes(
+      pkg.UnitOfMeasureQuantityType === 'CountBased'
+      && !locationNameBlacklist.includes(
         extractInitialPackageLocationNameFromHistoryOrNull(pkg.history!)
       )
   );
@@ -229,26 +229,26 @@ export async function maybeLoadCogsTrackerReportData({
       .reduce((a, b) => a + b, 0);
 
     const sourceValues: [string, string, number, string][] = parentTagQuantityUnitItemSets.map(
-      ([label, quantity, unit, itemName]) => [label, itemName, quantity, ""]
+      ([label, quantity, unit, itemName]) => [label, itemName, quantity, '']
     );
 
     return [
       pkg.Item.Name,
       pkg.Label,
       pkg.SourcePackageLabels,
-      "",
+      '',
       pkg.ProductionBatchNumber,
       pkg.Item.ProductCategoryName,
       isodateToSlashDate(pkg.PackagedDate),
       pkg.SourceHarvestNames,
       initialWeightData[0], // starting quantity
-      "", // input material COGS
+      '', // input material COGS
       testLabels.length,
-      testMaterialWeightSum > 0 ? initialWeightData[0] - testMaterialWeightSum : "", // Weight post test if applicable
-      "", // test costs
-      "", // tested $/g
-      "", // cost basis value
-      "", // notes
+      testMaterialWeightSum > 0 ? initialWeightData[0] - testMaterialWeightSum : '', // Weight post test if applicable
+      '', // test costs
+      '', // tested $/g
+      '', // cost basis value
+      '', // notes
       ...sourceValues.flat(),
     ];
   }
@@ -260,13 +260,13 @@ export async function maybeLoadCogsTrackerReportData({
       pkg.Label,
       pkg.Item.Name,
       pkg.Item.ProductCategoryName,
-      "",
-      "",
+      '',
+      '',
       isodateToSlashDate(pkg.PackagedDate),
       initialWeightData[0],
-      "",
+      '',
       pkg.SourcePackageLabels,
-      "",
+      '',
       pkg.Item.UnitWeight,
     ];
   }
@@ -291,11 +291,11 @@ export async function createCogsTrackerSpreadsheetOrError({
   reportConfig: IReportConfig;
 }): Promise<ISpreadsheet> {
   if (!store.state.pluginAuth?.authState?.license) {
-    throw new Error("Invalid authState");
+    throw new Error('Invalid authState');
   }
 
   if (!reportData[ReportType.COGS_TRACKER]) {
-    throw new Error("Missing COGS data");
+    throw new Error('Missing COGS data');
   }
 
   const sheetTitles = [
@@ -321,7 +321,7 @@ export async function createCogsTrackerSpreadsheetOrError({
   );
 
   if (!response.data.success) {
-    throw new Error("Unable to create COGS tracker sheet");
+    throw new Error('Unable to create COGS tracker sheet');
   }
 
   let formattingRequests: any = [
@@ -334,8 +334,7 @@ export async function createCogsTrackerSpreadsheetOrError({
     }),
   ];
 
-  const { bulkInfusedMatrix, distRexCogsMatrix, packagedGoodsCogsMatrix } =
-    reportData[ReportType.COGS_TRACKER]!;
+  const { bulkInfusedMatrix, distRexCogsMatrix, packagedGoodsCogsMatrix } = reportData[ReportType.COGS_TRACKER]!;
 
   const bulkInfusedSheetId = sheetTitles.indexOf(SheetTitles.BULK_INFUSED_GOODS_COGS);
   const distRexCogsSheetId = sheetTitles.indexOf(SheetTitles.DIST_REX_COGS);
@@ -350,44 +349,44 @@ export async function createCogsTrackerSpreadsheetOrError({
       numberColumnRequestFactory({
         sheetId,
         columnIndex: 8,
-        numberFormatType: "NUMBER",
-        numberFormatPattern: `0.00`,
+        numberFormatType: 'NUMBER',
+        numberFormatPattern: '0.00',
       }),
       // Input COGS
       numberColumnRequestFactory({
         sheetId,
         columnIndex: 9,
-        numberFormatType: "CURRENCY",
-        numberFormatPattern: `$#,##0.00`,
+        numberFormatType: 'CURRENCY',
+        numberFormatPattern: '$#,##0.00',
       }),
       // Weight post test
       numberColumnRequestFactory({
         sheetId,
         columnIndex: 11,
-        numberFormatType: "NUMBER",
-        numberFormatPattern: `0.00`,
+        numberFormatType: 'NUMBER',
+        numberFormatPattern: '0.00',
       }),
       // Test Cost - Cost Basis
       numberColumnRequestFactory({
         sheetId,
         columnIndex: 12,
         endColumnIndex: 15,
-        numberFormatType: "CURRENCY",
-        numberFormatPattern: `$#,##0.00`,
+        numberFormatType: 'CURRENCY',
+        numberFormatPattern: '$#,##0.00',
       }),
       alignColumnRequestFactory({
         sheetId,
         columnIndex: 4,
         endColumnIndex: 7,
-        horizontalAlignment: "CENTER",
-        verticalAlignment: "MIDDLE",
+        horizontalAlignment: 'CENTER',
+        verticalAlignment: 'MIDDLE',
       }),
       alignColumnRequestFactory({
         sheetId,
         columnIndex: 8,
         endColumnIndex: 15,
-        horizontalAlignment: "CENTER",
-        verticalAlignment: "MIDDLE",
+        horizontalAlignment: 'CENTER',
+        verticalAlignment: 'MIDDLE',
       }),
       // Ordinal Headers
       ...Array.from(Array(ORDINALS.length).keys())
@@ -398,21 +397,21 @@ export async function createCogsTrackerSpreadsheetOrError({
             numberColumnRequestFactory({
               sheetId,
               columnIndex: idx + 2,
-              numberFormatType: "NUMBER",
-              numberFormatPattern: `0.00`,
+              numberFormatType: 'NUMBER',
+              numberFormatPattern: '0.00',
             }),
             numberColumnRequestFactory({
               sheetId,
               columnIndex: idx + 3,
-              numberFormatType: "CURRENCY",
-              numberFormatPattern: `$#,##0.00`,
+              numberFormatType: 'CURRENCY',
+              numberFormatPattern: '$#,##0.00',
             }),
             alignColumnRequestFactory({
               sheetId,
               columnIndex: idx + 2,
               endColumnIndex: idx + 4,
-              horizontalAlignment: "CENTER",
-              verticalAlignment: "MIDDLE",
+              horizontalAlignment: 'CENTER',
+              verticalAlignment: 'MIDDLE',
             }),
           ];
         })
@@ -445,39 +444,39 @@ export async function createCogsTrackerSpreadsheetOrError({
       sheetId: packagedGoodsCogsSheetId,
       columnIndex: 3,
       endColumnIndex: 8,
-      horizontalAlignment: "CENTER",
-      verticalAlignment: "MIDDLE",
+      horizontalAlignment: 'CENTER',
+      verticalAlignment: 'MIDDLE',
     }),
     alignColumnRequestFactory({
       sheetId: packagedGoodsCogsSheetId,
       columnIndex: 9,
       endColumnIndex: 11,
-      horizontalAlignment: "CENTER",
-      verticalAlignment: "MIDDLE",
+      horizontalAlignment: 'CENTER',
+      verticalAlignment: 'MIDDLE',
     }),
     numberColumnRequestFactory({
       sheetId: packagedGoodsCogsSheetId,
       columnIndex: 6, // Starting Quantity
-      numberFormatType: "NUMBER",
-      numberFormatPattern: `0.00`,
+      numberFormatType: 'NUMBER',
+      numberFormatPattern: '0.00',
     }),
     numberColumnRequestFactory({
       sheetId: packagedGoodsCogsSheetId,
       columnIndex: 7, // Cost Basis
-      numberFormatType: "CURRENCY",
-      numberFormatPattern: `$#,##0.00`,
+      numberFormatType: 'CURRENCY',
+      numberFormatPattern: '$#,##0.00',
     }),
     numberColumnRequestFactory({
       sheetId: packagedGoodsCogsSheetId,
       columnIndex: 9, // Tested $/g
-      numberFormatType: "CURRENCY",
-      numberFormatPattern: `$#,##0.00`,
+      numberFormatType: 'CURRENCY',
+      numberFormatPattern: '$#,##0.00',
     }),
     numberColumnRequestFactory({
       sheetId: packagedGoodsCogsSheetId,
       columnIndex: 10, // gram wt / unit
-      numberFormatType: "NUMBER",
-      numberFormatPattern: `0.00`,
+      numberFormatType: 'NUMBER',
+      numberFormatPattern: '0.00',
     }),
   ];
 
@@ -499,8 +498,8 @@ export async function createCogsTrackerSpreadsheetOrError({
       values: [
         [],
         [],
-        [null, `Start date:`, reportConfig[ReportType.COGS_TRACKER]?.packageFilter.packagedDateGt],
-        [null, `End date:`, reportConfig[ReportType.COGS_TRACKER]?.packageFilter.packagedDateLt],
+        [null, 'Start date:', reportConfig[ReportType.COGS_TRACKER]?.packageFilter.packagedDateGt],
+        [null, 'End date:', reportConfig[ReportType.COGS_TRACKER]?.packageFilter.packagedDateLt],
       ],
     },
     undefined,
@@ -508,7 +507,7 @@ export async function createCogsTrackerSpreadsheetOrError({
   );
 
   store.commit(`reports/${ReportsMutations.SET_STATUS}`, {
-    statusMessage: { text: `Writing report data...`, level: "success" },
+    statusMessage: { text: 'Writing report data...', level: 'success' },
   });
 
   await writeDataSheet({
@@ -517,7 +516,7 @@ export async function createCogsTrackerSpreadsheetOrError({
     data: bulkInfusedMatrix,
     options: {
       pageSize: 5000,
-      valueInputOption: "USER_ENTERED",
+      valueInputOption: 'USER_ENTERED',
       maxParallelRequests: 10,
     },
   });
@@ -528,7 +527,7 @@ export async function createCogsTrackerSpreadsheetOrError({
     data: distRexCogsMatrix,
     options: {
       pageSize: 5000,
-      valueInputOption: "USER_ENTERED",
+      valueInputOption: 'USER_ENTERED',
       maxParallelRequests: 10,
     },
   });
@@ -539,19 +538,19 @@ export async function createCogsTrackerSpreadsheetOrError({
     data: packagedGoodsCogsMatrix,
     options: {
       pageSize: 5000,
-      valueInputOption: "USER_ENTERED",
+      valueInputOption: 'USER_ENTERED',
       maxParallelRequests: 10,
     },
   });
 
   store.commit(`reports/${ReportsMutations.SET_STATUS}`, {
-    statusMessage: { text: `Resizing sheets...`, level: "success" },
+    statusMessage: { text: 'Resizing sheets...', level: 'success' },
   });
 
   let resizeRequests: any[] = [
     autoResizeDimensionsRequestFactory({
       sheetId: sheetTitles.indexOf(SheetTitles.OVERVIEW),
-      dimension: "COLUMNS",
+      dimension: 'COLUMNS',
     }),
   ];
 

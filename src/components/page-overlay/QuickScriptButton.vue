@@ -85,15 +85,15 @@
 </template>
 
 <script lang="ts">
-import TrackTraceToolsLogo from "@/components/shared/TrackTraceToolsLogo.vue";
-import { MutationType } from "@/mutation-types";
-import store from "@/store/page-overlay/index";
-import { QUICK_SCRIPTS, runQuickScript } from "@/utils/quick-scripts";
-import Vue from "vue";
-import { mapState } from "vuex";
+import TrackTraceToolsLogo from '@/components/shared/TrackTraceToolsLogo.vue';
+import { MutationType } from '@/mutation-types';
+import store from '@/store/page-overlay/index';
+import { QUICK_SCRIPTS, runQuickScript } from '@/utils/quick-scripts';
+import Vue from 'vue';
+import { mapState } from 'vuex';
 
 export default Vue.extend({
-  name: "QuickScriptButton",
+  name: 'QuickScriptButton',
   store,
   components: {
     TrackTraceToolsLogo,
@@ -119,9 +119,9 @@ export default Vue.extend({
       trackedInteractions.dismissedQuickScriptsPopover = true;
 
       // @ts-ignore
-      this.$refs["quick-script-popover"].$emit("close");
+      this.$refs['quick-script-popover'].$emit('close');
       // @ts-ignore
-      this.$refs["quick-script-popover"].$emit("disable");
+      this.$refs['quick-script-popover'].$emit('disable');
 
       store.commit(MutationType.UPDATE_TRACKED_INTERACTIONS, trackedInteractions);
     },

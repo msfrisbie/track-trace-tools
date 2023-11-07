@@ -1,14 +1,14 @@
-import { BackgroundTaskState, MessageType } from "@/consts";
-import { IAtomicService, ISalesReceiptData, ITagData } from "@/interfaces";
-import { MutationType } from "@/mutation-types";
-import store from "@/store/page-overlay/index";
-import { getIsoDateStringFromIsoDatetime } from "@/utils/date";
-import { getTagFromOffset, getVoidTagBody } from "@/utils/tags";
-import { timer } from "rxjs";
-import { analyticsManager } from "./analytics-manager.module";
-import { authManager } from "./auth-manager.module";
-import { primaryDataLoader } from "./data-loader/data-loader.module";
-import { primaryMetrcRequestManager } from "./metrc-request-manager.module";
+import { BackgroundTaskState, MessageType } from '@/consts';
+import { IAtomicService, ISalesReceiptData, ITagData } from '@/interfaces';
+import { MutationType } from '@/mutation-types';
+import store from '@/store/page-overlay/index';
+import { getIsoDateStringFromIsoDatetime } from '@/utils/date';
+import { getTagFromOffset, getVoidTagBody } from '@/utils/tags';
+import { timer } from 'rxjs';
+import { analyticsManager } from './analytics-manager.module';
+import { authManager } from './auth-manager.module';
+import { primaryDataLoader } from './data-loader/data-loader.module';
+import { primaryMetrcRequestManager } from './metrc-request-manager.module';
 
 class BackgroundTaskManager implements IAtomicService {
   async init() {
@@ -64,7 +64,7 @@ class BackgroundTaskManager implements IAtomicService {
     const authState = await authManager.authStateOrError();
 
     if (store.state.backgroundTasks.finalizeSalesReceiptsLicense !== authState.license) {
-      this.finalizeError("The job stopped because you changed licenses.");
+      this.finalizeError('The job stopped because you changed licenses.');
     }
 
     if (store.state.backgroundTasks.finalizeSalesReceiptsState !== BackgroundTaskState.RUNNING) {
@@ -72,7 +72,7 @@ class BackgroundTaskManager implements IAtomicService {
       return;
     }
 
-    this.setFinalizeReadout("Loading sales receipts...");
+    this.setFinalizeReadout('Loading sales receipts...');
 
     let receipts: ISalesReceiptData[] = [];
 
@@ -86,7 +86,7 @@ class BackgroundTaskManager implements IAtomicService {
         console.error(e);
         if (i > 20) {
           this.finalizeError(
-            "Metrc returned an error when trying to load sales receipts. Try again."
+            'Metrc returned an error when trying to load sales receipts. Try again.'
           );
           return;
         }
@@ -126,7 +126,7 @@ class BackgroundTaskManager implements IAtomicService {
         );
 
         if (response.status !== 200) {
-          throw new Error("Failed to finalize sales receipts");
+          throw new Error('Failed to finalize sales receipts');
         }
 
         break;
@@ -135,7 +135,7 @@ class BackgroundTaskManager implements IAtomicService {
         console.error(e);
         if (i > 20) {
           this.finalizeError(
-            "Metrc returned an error when trying to finalize sales receipts. Try again."
+            'Metrc returned an error when trying to finalize sales receipts. Try again.'
           );
           return;
         }
@@ -220,7 +220,7 @@ class BackgroundTaskManager implements IAtomicService {
     const authState = await authManager.authStateOrError();
 
     if (store.state.backgroundTasks.voidTagsLicense !== authState.license) {
-      this.voidError("The job stopped because you changed licenses.");
+      this.voidError('The job stopped because you changed licenses.');
     }
 
     if (store.state.backgroundTasks.voidTagsState !== BackgroundTaskState.RUNNING) {
@@ -235,7 +235,7 @@ class BackgroundTaskManager implements IAtomicService {
     }
 
     if (!currentTag) {
-      this.voidError("Failed to generate tag");
+      this.voidError('Failed to generate tag');
       return;
     }
 
@@ -280,7 +280,7 @@ class BackgroundTaskManager implements IAtomicService {
         const response = await primaryMetrcRequestManager.voidTag(getVoidTagBody(tagData.Id));
 
         if (response.status !== 200) {
-          throw new Error("Failed to void tag");
+          throw new Error('Failed to void tag');
         }
 
         break;

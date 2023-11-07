@@ -1,13 +1,13 @@
-import store from "@/store/page-overlay/index";
+import store from '@/store/page-overlay/index';
 
 export function todayIsodate(): string {
   // get today's date in the user's timezone but formatted as ISO8601 (YYYY-MM-DD)
   // This works because the Sweden locale uses the ISO 8601 format.
-  return new Date().toLocaleDateString("sv");
+  return new Date().toLocaleDateString('sv');
 }
 
 export function nowIsotime(): string {
-  return `${new Date().toLocaleTimeString("sv")}.000Z`;
+  return `${new Date().toLocaleTimeString('sv')}.000Z`;
 }
 
 export function submitDateFromIsodate(isodate: string): string {
@@ -16,22 +16,22 @@ export function submitDateFromIsodate(isodate: string): string {
   }
 
   // 2021-06-05
-  const [year, month, day] = isodate.split("-");
+  const [year, month, day] = isodate.split('-');
 
   return `${month}/${day}/${year}`;
 }
 
 export function getIsoDateStringFromIsoDatetime(isoDatetime: string): string {
-  if (!isoDatetime.includes("T")) {
-    throw new Error("This does not look like an isoDatetime");
+  if (!isoDatetime.includes('T')) {
+    throw new Error('This does not look like an isoDatetime');
   }
 
   return normalizeIsodate(isoDatetime);
 }
 
 export function getIsoTimeStringFromIsoDatetime(isoDatetime: string): string {
-  if (!isoDatetime.includes("T")) {
-    throw new Error("This does not look like an isoDatetime");
+  if (!isoDatetime.includes('T')) {
+    throw new Error('This does not look like an isoDatetime');
   }
 
   return normalizeIsodate(isoDatetime);
@@ -49,7 +49,7 @@ export function getDatesInRange(startDate: string, endDate: string): string[] {
   const dates: string[] = [];
 
   if (startDate > endDate) {
-    throw new Error("Invalid startDate/endDate pair");
+    throw new Error('Invalid startDate/endDate pair');
   }
 
   let nextDate = startDate;
@@ -68,17 +68,17 @@ export function getDatesInRange(startDate: string, endDate: string): string[] {
 }
 
 export function isodateToSlashDate(isodate: string): string {
-  const [year, month, day] = isodate.split("-");
+  const [year, month, day] = isodate.split('-');
   return `${month}/${day}/${year}`;
 }
 
 // Might be date, or datetime. Idempotent date return.
 export function normalizeIsodate(x: string): string {
-  return x.split("T")[0];
+  return x.split('T')[0];
 }
 
 export function isWeekend(isoDate: string) {
-  const dateParts = normalizeIsodate(isoDate).split("-");
+  const dateParts = normalizeIsodate(isoDate).split('-');
   const year = parseInt(dateParts[0], 10);
   const month = parseInt(dateParts[1], 10) - 1; // Month is zero-based
   const day = parseInt(dateParts[2], 10);
@@ -101,19 +101,19 @@ export function isoDatetimedDifferenceInMinutes(isoTimestamp1: string, isoTimest
 }
 
 export function isoDatetimeToLocalDate(isoDateTime: string): string {
-  if (!isoDateTime.includes("T")) {
+  if (!isoDateTime.includes('T')) {
     // This is just a date, do not convert from UTC
     return isoDateTime;
   }
 
   const date = new Date(isoDateTime);
 
-  return date.toLocaleDateString("sv");
+  return date.toLocaleDateString('sv');
 }
 
 enum TransferGroup {
-  ARRIVAL = "ARRIVAL",
-  DEPARTURE = "DEPARTURE",
+  ARRIVAL = 'ARRIVAL',
+  DEPARTURE = 'DEPARTURE',
 }
 
 export function interleaveGroupedTransferDatetimes({
@@ -172,8 +172,7 @@ export function interleavedDatetimesAreValid({
       };
     }
 
-    expectedNextGroup =
-      expectedNextGroup === TransferGroup.ARRIVAL ? TransferGroup.DEPARTURE : TransferGroup.ARRIVAL;
+    expectedNextGroup = expectedNextGroup === TransferGroup.ARRIVAL ? TransferGroup.DEPARTURE : TransferGroup.ARRIVAL;
   }
 
   return { valid: true };
@@ -207,7 +206,7 @@ export function isCustodiedDatetimeOrError({
       return last.group === TransferGroup.ARRIVAL;
     }
 
-    throw new Error("Interleaved datetimes are invalid");
+    throw new Error('Interleaved datetimes are invalid');
   }
 
   let prev = null;

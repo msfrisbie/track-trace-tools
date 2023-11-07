@@ -1,15 +1,15 @@
-import { IIndexedPackageData, IPackageFilter, IPluginState } from "@/interfaces";
-import { DataLoader, getDataLoaderByLicense, primaryDataLoader } from "@/modules/data-loader/data-loader.module";
-import { ReportsMutations, ReportType } from "@/store/page-overlay/modules/reports/consts";
+import { IIndexedPackageData, IPackageFilter, IPluginState } from '@/interfaces';
+import { DataLoader, getDataLoaderByLicense, primaryDataLoader } from '@/modules/data-loader/data-loader.module';
+import { ReportsMutations, ReportType } from '@/store/page-overlay/modules/reports/consts';
 import {
   IFieldData,
   IReportConfig,
   IReportData,
   IReportsState
-} from "@/store/page-overlay/modules/reports/interfaces";
-import { ActionContext } from "vuex";
-import { todayIsodate } from "../date";
-import { extractInitialPackageQuantityAndUnitFromHistoryOrError, extractParentPackageTagQuantityUnitItemSetsFromHistory } from "../history";
+} from '@/store/page-overlay/modules/reports/interfaces';
+import { ActionContext } from 'vuex';
+import { todayIsodate } from '../date';
+import { extractInitialPackageQuantityAndUnitFromHistoryOrError, extractParentPackageTagQuantityUnitItemSetsFromHistory } from '../history';
 
 export interface IPackageReportFormFilters {
   packagedDateGt: string;
@@ -78,7 +78,7 @@ export async function maybeLoadPackageReportData({
   const packageConfig = reportConfig[ReportType.PACKAGES];
   if (packageConfig?.packageFilter) {
     ctx.commit(ReportsMutations.SET_STATUS, {
-      statusMessage: { text: "Loading packages...", level: "success" },
+      statusMessage: { text: 'Loading packages...', level: 'success' },
     });
 
     let packages: IIndexedPackageData[] = [];
@@ -88,7 +88,7 @@ export async function maybeLoadPackageReportData({
         packages = [...packages, ...(await primaryDataLoader.activePackages())];
       } catch (e) {
         ctx.commit(ReportsMutations.SET_STATUS, {
-          statusMessage: { text: "Failed to load active packages.", level: "warning" },
+          statusMessage: { text: 'Failed to load active packages.', level: 'warning' },
         });
       }
     }
@@ -98,7 +98,7 @@ export async function maybeLoadPackageReportData({
         packages = [...packages, ...(await primaryDataLoader.inactivePackages())];
       } catch (e) {
         ctx.commit(ReportsMutations.SET_STATUS, {
-          statusMessage: { text: "Failed to load inactive packages.", level: "warning" },
+          statusMessage: { text: 'Failed to load inactive packages.', level: 'warning' },
         });
       }
     }
@@ -108,7 +108,7 @@ export async function maybeLoadPackageReportData({
         packages = [...packages, ...(await primaryDataLoader.inTransitPackages())];
       } catch (e) {
         ctx.commit(ReportsMutations.SET_STATUS, {
-          statusMessage: { text: "Failed to load in transit packages.", level: "warning" },
+          statusMessage: { text: 'Failed to load in transit packages.', level: 'warning' },
         });
       }
     }

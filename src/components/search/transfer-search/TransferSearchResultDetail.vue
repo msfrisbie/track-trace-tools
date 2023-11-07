@@ -97,30 +97,30 @@
 </template>
 
 <script lang="ts">
-import RecursiveJsonTable from "@/components/search/shared/RecursiveJsonTable.vue";
+import RecursiveJsonTable from '@/components/search/shared/RecursiveJsonTable.vue';
 import {
   MessageType,
   ModalAction,
   ModalType,
   TransferFilterIdentifiers,
   TransferState,
-} from "@/consts";
-import { IIndexedTransferData, IPluginState } from "@/interfaces";
-import { analyticsManager } from "@/modules/analytics-manager.module";
-import { modalManager } from "@/modules/modal-manager.module";
-import { pageManager } from "@/modules/page-manager/page-manager.module";
-import { TRANSFER_TAB_REGEX } from "@/modules/page-manager/consts";
-import { toastManager } from "@/modules/toast-manager.module";
-import { MutationType } from "@/mutation-types";
-import store from "@/store/page-overlay/index";
-import { copyToClipboard, downloadFileFromUrl, printPdfFromUrl } from "@/utils/dom";
-import { createScanSheet } from "@/utils/transfer";
-import { Subject } from "rxjs";
-import { takeUntil } from "rxjs/operators";
-import Vue from "vue";
-import { TransferSearchActions } from "@/store/page-overlay/modules/transfer-search/consts";
-import { mapActions, mapState } from "vuex";
-import { SearchActions } from "@/store/page-overlay/modules/search/consts";
+} from '@/consts';
+import { IIndexedTransferData, IPluginState } from '@/interfaces';
+import { analyticsManager } from '@/modules/analytics-manager.module';
+import { modalManager } from '@/modules/modal-manager.module';
+import { pageManager } from '@/modules/page-manager/page-manager.module';
+import { TRANSFER_TAB_REGEX } from '@/modules/page-manager/consts';
+import { toastManager } from '@/modules/toast-manager.module';
+import { MutationType } from '@/mutation-types';
+import store from '@/store/page-overlay/index';
+import { copyToClipboard, downloadFileFromUrl, printPdfFromUrl } from '@/utils/dom';
+import { createScanSheet } from '@/utils/transfer';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
+import Vue from 'vue';
+import { TransferSearchActions } from '@/store/page-overlay/modules/transfer-search/consts';
+import { mapActions, mapState } from 'vuex';
+import { SearchActions } from '@/store/page-overlay/modules/search/consts';
 
 function isIsoDateToday(isodate: string): boolean {
   if (!isodate) {
@@ -132,7 +132,7 @@ function isIsoDateToday(isodate: string): boolean {
 
 function deliveryTimeDescriptor(isodate: string | null): string {
   if (!isodate) {
-    return "";
+    return '';
   }
 
   const isToday: boolean = isIsoDateToday(isodate);
@@ -149,7 +149,7 @@ function deliveryTimeDescriptor(isodate: string | null): string {
 }
 
 export default Vue.extend({
-  name: "TransferSearchResultDetail",
+  name: 'TransferSearchResultDetail',
   store,
   components: {
     // TransferIcon,
@@ -172,7 +172,7 @@ export default Vue.extend({
         case TransferState.REJECTED:
           return transfer.DeliveryFacilities;
         default:
-          return "Metrc Transfer";
+          return 'Metrc Transfer';
       }
     },
     transferPackageSummary() {
@@ -202,13 +202,13 @@ export default Vue.extend({
             )}`;
           }
 
-          return "Scheduled for delivery";
+          return 'Scheduled for delivery';
         case TransferState.OUTGOING:
           if (transfer.CreatedDateTime) {
             return `Created ${deliveryTimeDescriptor(transfer.CreatedDateTime)}`;
           }
 
-          return "Scheduled for delivery";
+          return 'Scheduled for delivery';
         case TransferState.REJECTED:
           if (transfer.ReceivedDateTime) {
             return `Return received ${deliveryTimeDescriptor(transfer.ReceivedDateTime)}`;
@@ -220,9 +220,9 @@ export default Vue.extend({
             )}`;
           }
 
-          return "Scheduled for return";
+          return 'Scheduled for return';
         default:
-          return `Scheduled for transfer`;
+          return 'Scheduled for transfer';
       }
     },
   },
@@ -256,11 +256,11 @@ export default Vue.extend({
       copyToClipboard(transfer.ManifestNumber);
 
       toastManager.openToast(`'${transfer.ManifestNumber}' copied to clipboard`, {
-        title: "Copied Manifest #",
+        title: 'Copied Manifest #',
         autoHideDelay: 5000,
-        variant: "primary",
+        variant: 'primary',
         appendToast: true,
-        toaster: "ttt-toaster",
+        toaster: 'ttt-toaster',
         solid: true,
       });
     },
@@ -303,20 +303,20 @@ export default Vue.extend({
     badgeVariant(transfer: IIndexedTransferData) {
       switch (transfer.TransferState as TransferState) {
         case TransferState.INCOMING:
-          return "success";
+          return 'success';
         case TransferState.OUTGOING:
-          return "primary";
+          return 'primary';
         case TransferState.REJECTED:
-          return "danger";
+          return 'danger';
         case TransferState.OUTGOING_INACTIVE:
         case TransferState.INCOMING_INACTIVE:
-          return "light";
+          return 'light';
         default:
           return null;
       }
     },
     displayTransferState(transfer: IIndexedTransferData) {
-      return transfer.TransferState.replaceAll("_", " ");
+      return transfer.TransferState.replaceAll('_', ' ');
     },
   },
 });

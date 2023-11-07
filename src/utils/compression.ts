@@ -1,6 +1,6 @@
-import { ICompressedMetrcTagRange, ICompressedMetrcTagRanges } from "@/interfaces";
-import _ from "lodash-es";
-import { getOffsetFromTag, isTagInsidePair } from "./tags";
+import { ICompressedMetrcTagRange, ICompressedMetrcTagRanges } from '@/interfaces';
+import _ from 'lodash-es';
+import { getOffsetFromTag, isTagInsidePair } from './tags';
 
 interface IFormattedTagData {
   tag: string;
@@ -129,9 +129,9 @@ export function compressedDataWrapperFactory<T>(
   keys?: string[]
 ): CompressedDataWrapper<T> {
   if (expanded.length === 0) {
-    console.error("Compressing empty array");
+    console.error('Compressing empty array');
     console.trace();
-    return new CompressedDataWrapper<T>("Empty", [], "", []);
+    return new CompressedDataWrapper<T>('Empty', [], '', []);
   }
 
   if (!keys) {

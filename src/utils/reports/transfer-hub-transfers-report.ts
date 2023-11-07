@@ -3,17 +3,17 @@ import {
   IPluginState,
   IRichDestinationData,
   ITransferFilter,
-} from "@/interfaces";
-import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
-import { ReportsMutations, ReportType } from "@/store/page-overlay/modules/reports/consts";
+} from '@/interfaces';
+import { primaryDataLoader } from '@/modules/data-loader/data-loader.module';
+import { ReportsMutations, ReportType } from '@/store/page-overlay/modules/reports/consts';
 import {
   IFieldData,
   IReportConfig,
   IReportData,
   IReportsState,
-} from "@/store/page-overlay/modules/reports/interfaces";
-import { ActionContext } from "vuex";
-import { todayIsodate } from "../date";
+} from '@/store/page-overlay/modules/reports/interfaces';
+import { ActionContext } from 'vuex';
+import { todayIsodate } from '../date';
 
 interface ITransferHubTransfersReportFormFilters {
   estimatedDepartureDateLt: string;
@@ -22,13 +22,12 @@ interface ITransferHubTransfersReportFormFilters {
   shouldFilterEstimatedDepartureDateGt: boolean;
 }
 
-export const transferHubTransfersFormFiltersFactory: () => ITransferHubTransfersReportFormFilters =
-  () => ({
-    estimatedDepartureDateLt: todayIsodate(),
-    estimatedDepartureDateGt: todayIsodate(),
-    shouldFilterEstimatedDepartureDateLt: false,
-    shouldFilterEstimatedDepartureDateGt: false,
-  });
+export const transferHubTransfersFormFiltersFactory: () => ITransferHubTransfersReportFormFilters = () => ({
+  estimatedDepartureDateLt: todayIsodate(),
+  estimatedDepartureDateGt: todayIsodate(),
+  shouldFilterEstimatedDepartureDateLt: false,
+  shouldFilterEstimatedDepartureDateGt: false,
+});
 
 export function addTransferHubTransfersReport({
   reportConfig,
@@ -41,15 +40,13 @@ export function addTransferHubTransfersReport({
 }) {
   const transferFilter: ITransferFilter = {};
 
-  transferFilter.estimatedDepartureDateGt =
-    transferHubTransfersFormFilters.shouldFilterEstimatedDepartureDateGt
-      ? (transferHubTransfersFormFilters.estimatedDepartureDateGt as string)
-      : null;
+  transferFilter.estimatedDepartureDateGt = transferHubTransfersFormFilters.shouldFilterEstimatedDepartureDateGt
+    ? (transferHubTransfersFormFilters.estimatedDepartureDateGt as string)
+    : null;
 
-  transferFilter.estimatedDepartureDateLt =
-    transferHubTransfersFormFilters.shouldFilterEstimatedDepartureDateLt
-      ? transferHubTransfersFormFilters.estimatedDepartureDateLt
-      : null;
+  transferFilter.estimatedDepartureDateLt = transferHubTransfersFormFilters.shouldFilterEstimatedDepartureDateLt
+    ? transferHubTransfersFormFilters.estimatedDepartureDateLt
+    : null;
 
   reportConfig[ReportType.TRANSFER_HUB_TRANSFERS] = {
     transferFilter,
@@ -69,7 +66,7 @@ export async function maybeLoadTransferHubTransfersReportData({
   const transferHubTransferConfig = reportConfig[ReportType.TRANSFER_HUB_TRANSFERS];
   if (transferHubTransferConfig?.transferFilter) {
     ctx.commit(ReportsMutations.SET_STATUS, {
-      statusMessage: { text: "Loading layover transfers...", level: "success" },
+      statusMessage: { text: 'Loading layover transfers...', level: 'success' },
     });
 
     let richTransferHubTransfers: IIndexedRichOutgoingTransferData[] = [];
@@ -82,8 +79,8 @@ export async function maybeLoadTransferHubTransfersReportData({
     richTransferHubTransfers = richTransferHubTransfers.filter((transfer) => {
       if (transferHubTransferConfig.transferFilter.estimatedDepartureDateLt) {
         if (
-          transfer.CreatedDateTime >
-          transferHubTransferConfig.transferFilter.estimatedDepartureDateLt
+          transfer.CreatedDateTime
+          > transferHubTransferConfig.transferFilter.estimatedDepartureDateLt
         ) {
           return false;
         }
@@ -108,8 +105,8 @@ export async function maybeLoadTransferHubTransfersReportData({
       transfer.outgoingDestinations = destinations.filter((destination) => {
         if (transferHubTransferConfig.transferFilter.estimatedDepartureDateLt) {
           if (
-            destination.EstimatedDepartureDateTime >
-            transferHubTransferConfig.transferFilter.estimatedDepartureDateLt
+            destination.EstimatedDepartureDateTime
+            > transferHubTransferConfig.transferFilter.estimatedDepartureDateLt
           ) {
             return false;
           }
@@ -117,8 +114,8 @@ export async function maybeLoadTransferHubTransfersReportData({
 
         if (transferHubTransferConfig.transferFilter.estimatedDepartureDateGt) {
           if (
-            destination.EstimatedDepartureDateTime <
-            transferHubTransferConfig.transferFilter.estimatedDepartureDateGt
+            destination.EstimatedDepartureDateTime
+            < transferHubTransferConfig.transferFilter.estimatedDepartureDateGt
           ) {
             return false;
           }

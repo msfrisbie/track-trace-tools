@@ -11,8 +11,8 @@ import {
   IPlantBatchHistoryData,
   IPlantHistoryData,
   ITransferHistoryData,
-} from "@/interfaces";
-import { ExplorerStatus, ExplorerTargetType } from "./consts";
+} from '@/interfaces';
+import { ExplorerStatus, ExplorerTargetType } from './consts';
 
 export type ExplorerTarget =
   | IIndexedPackageData

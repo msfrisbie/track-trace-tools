@@ -1,13 +1,13 @@
-import { MessageType } from "@/consts";
-import { IApiKeyState, IAtomicService } from "@/interfaces";
-import { debugLogFactory } from "@/utils/debug";
-import { extract, ExtractionType } from "@/utils/html";
-import { BehaviorSubject, timer } from "rxjs";
-import { filter, map, take } from "rxjs/operators";
-import { analyticsManager } from "./analytics-manager.module";
-import { primaryMetrcRequestManager } from "./metrc-request-manager.module";
+import { MessageType } from '@/consts';
+import { IApiKeyState, IAtomicService } from '@/interfaces';
+import { debugLogFactory } from '@/utils/debug';
+import { extract, ExtractionType } from '@/utils/html';
+import { BehaviorSubject, timer } from 'rxjs';
+import { filter, map, take } from 'rxjs/operators';
+import { analyticsManager } from './analytics-manager.module';
+import { primaryMetrcRequestManager } from './metrc-request-manager.module';
 
-const debugLog = debugLogFactory("api-key-manager.module.ts");
+const debugLog = debugLogFactory('api-key-manager.module.ts');
 
 /**
  * This module operates as if permissions can be added or revoked at any time
@@ -26,7 +26,7 @@ class ApiKeyManager implements IAtomicService {
   private _apiKeyState: Promise<IApiKeyState | null> | null = null;
 
   public async init() {
-    throw new Error("This module is causing bugs, do not use");
+    throw new Error('This module is causing bugs, do not use');
 
     // await authManager.authStateOrError();
 
@@ -40,10 +40,10 @@ class ApiKeyManager implements IAtomicService {
   }
 
   private async getApiKeyState() {
-    debugLog(async () => ["getApiKeyState"]);
+    debugLog(async () => ['getApiKeyState']);
 
     this._apiKeyState = new Promise(async (resolve, reject) => {
-      const rejectSubscription = timer(10000).subscribe(() => reject("API key state timed out"));
+      const rejectSubscription = timer(10000).subscribe(() => reject('API key state timed out'));
 
       const apiKeyHtml: string = await primaryMetrcRequestManager
         .getApiKeyHTML()
@@ -54,7 +54,7 @@ class ApiKeyManager implements IAtomicService {
 
       const apiKey = extractedData?.apiKeyData?.apiKey;
 
-      debugLog(async () => ["apiKey", apiKey]);
+      debugLog(async () => ['apiKey', apiKey]);
 
       let apiKeyState: IApiKeyState | null = null;
 
@@ -63,7 +63,7 @@ class ApiKeyManager implements IAtomicService {
         apiKeyState = { metrcApiKey: apiKey };
       } else {
         // There is no API key, generate it for them
-        debugLog(async () => ["generating API key"]);
+        debugLog(async () => ['generating API key']);
 
         const generateApiKeyText: string = await primaryMetrcRequestManager
           .generateApiKey()
@@ -71,8 +71,8 @@ class ApiKeyManager implements IAtomicService {
 
         // Key returns with bookend quotes
         if (
-          generateApiKeyText[0] === '"' &&
-          generateApiKeyText[generateApiKeyText.length - 1] === '"'
+          generateApiKeyText[0] === '"'
+          && generateApiKeyText[generateApiKeyText.length - 1] === '"'
         ) {
           apiKeyState = { metrcApiKey: generateApiKeyText.slice(1, -1) };
         } else {
@@ -80,14 +80,14 @@ class ApiKeyManager implements IAtomicService {
         }
 
         analyticsManager.track(MessageType.TTT_MANAGEMENT_EVENT, {
-          description: "Automatically generated API key",
+          description: 'Automatically generated API key',
         });
       }
 
       if (apiKeyState) {
         resolve(apiKeyState);
       } else {
-        reject("Could not obtain API key");
+        reject('Could not obtain API key');
 
         this._apiKeyState = null;
       }
@@ -97,7 +97,7 @@ class ApiKeyManager implements IAtomicService {
   }
 
   async apiKeyStateOrNull(): Promise<IApiKeyState | null> {
-    debugLog(async () => ["apiKeyStateOrNull"]);
+    debugLog(async () => ['apiKeyStateOrNull']);
 
     return this._apiKeyStateSubject
       .pipe(
@@ -109,7 +109,7 @@ class ApiKeyManager implements IAtomicService {
       .toPromise();
   }
 
-  async apiKeyStateOrError(errorMessage: string = "Missing apiKey state"): Promise<IApiKeyState> {
+  async apiKeyStateOrError(errorMessage: string = 'Missing apiKey state'): Promise<IApiKeyState> {
     const apiKeyState = await this.apiKeyStateOrNull();
 
     if (!apiKeyState) {

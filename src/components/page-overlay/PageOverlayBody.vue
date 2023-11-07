@@ -11,14 +11,14 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import TaskSelectorForm from "@/components/page-overlay/forms/TaskSelectorForm.vue";
-import TaskFormManifold from "@/components/page-overlay/TaskFormManifold.vue";
-import { mapState } from "vuex";
-import QueueView from "@/components/page-overlay/QueueView.vue";
+import Vue from 'vue';
+import TaskSelectorForm from '@/components/page-overlay/forms/TaskSelectorForm.vue';
+import TaskFormManifold from '@/components/page-overlay/TaskFormManifold.vue';
+import { mapState } from 'vuex';
+import QueueView from '@/components/page-overlay/QueueView.vue';
 
 export default Vue.extend({
-  name: "PageOverlayBody",
+  name: 'PageOverlayBody',
   components: {
     TaskSelectorForm,
     TaskFormManifold,

@@ -8,19 +8,19 @@ import {
   IMetrcVehicleData,
   IRichDestinationData,
   ITransferHistoryData
-} from "@/interfaces";
-import { authManager } from "@/modules/auth-manager.module";
+} from '@/interfaces';
+import { authManager } from '@/modules/auth-manager.module';
 import {
   getDataLoaderByLicense,
   primaryDataLoader
-} from "@/modules/data-loader/data-loader.module";
-import { dynamicConstsManager } from "@/modules/dynamic-consts-manager.module";
-import { toastManager } from "@/modules/toast-manager.module";
-import store from "@/store/page-overlay/index";
-import { OAuthState } from "@/store/page-overlay/modules/plugin-auth/consts";
-import { TransferPackageSearchAlgorithm } from "@/store/page-overlay/modules/transfer-package-search/consts";
-import { getItemNameOrError, getLabelOrError } from "./package";
-import { createScanSheetOrError } from "./sheets-export";
+} from '@/modules/data-loader/data-loader.module';
+import { dynamicConstsManager } from '@/modules/dynamic-consts-manager.module';
+import { toastManager } from '@/modules/toast-manager.module';
+import store from '@/store/page-overlay/index';
+import { OAuthState } from '@/store/page-overlay/modules/plugin-auth/consts';
+import { TransferPackageSearchAlgorithm } from '@/store/page-overlay/modules/transfer-package-search/consts';
+import { getItemNameOrError, getLabelOrError } from './package';
+import { createScanSheetOrError } from './sheets-export';
 
 const DRIVER_NAME_MATCHER = /^- Driver Name: (.+)$/;
 const DRIVER_EMPLOYEE_ID_MATCHER = /^- Driver Employee ID: (.+)$/;
@@ -62,7 +62,7 @@ export async function extractRecentDestinationFacilitiesFromTransfers(): Promise
       const destinationFacilityLicense: string = destinationFacilityLicenseMatch[0];
 
       if (!destinationFacilityLicense) {
-        console.error("outgoingTransfer.DeliveryFacilities", outgoingTransfer.DeliveryFacilities);
+        console.error('outgoingTransfer.DeliveryFacilities', outgoingTransfer.DeliveryFacilities);
         continue;
       }
 
@@ -92,14 +92,13 @@ export async function extractRecentTransporterFacilitiesFromTransfers(): Promise
 
   for (const outgoingTransfer of outgoingTransfers) {
     // ShipperFacilityLicenseNumber: "C12-0000020-LIC"
-    const transporterFacilityLicenseMatch =
-      outgoingTransfer.ShipperFacilityLicenseNumber.match(/^[^\s]+/);
+    const transporterFacilityLicenseMatch = outgoingTransfer.ShipperFacilityLicenseNumber.match(/^[^\s]+/);
     if (transporterFacilityLicenseMatch) {
       const transporterFacilityLicense: string = transporterFacilityLicenseMatch[0];
 
       if (!transporterFacilityLicense) {
         console.error(
-          "outgoingTransfer.ShipperFacilityLicenseNumber",
+          'outgoingTransfer.ShipperFacilityLicenseNumber',
           outgoingTransfer.ShipperFacilityLicenseNumber
         );
         continue;
@@ -129,8 +128,7 @@ export async function extractDriversAndVehiclesFromTransferHistory(): Promise<{
 
   // Limit this to 25 requests
   for (const transfer of outgoingTransfers.slice(0, 25)) {
-    const historyList: ITransferHistoryData[] =
-      await primaryDataLoader.transferHistoryByOutGoingTransferId(transfer.Id);
+    const historyList: ITransferHistoryData[] = await primaryDataLoader.transferHistoryByOutGoingTransferId(transfer.Id);
 
     for (const history of historyList) {
       let vehicleMatch = null;
@@ -146,7 +144,7 @@ export async function extractDriversAndVehiclesFromTransferHistory(): Promise<{
 
           vehicles.push({
             VehicleMake,
-            VehicleModel: model.join(" "),
+            VehicleModel: model.join(' '),
             VehicleLicensePlateNumber: vehicleMatch[2],
           });
 
@@ -193,15 +191,15 @@ export async function extractDriversAndVehiclesFromTransferHistory(): Promise<{
 export async function createScanSheet(transferId: number, manifestNumber: string) {
   if (!store.state.client.values.ENABLE_T3PLUS && !store.state.client.t3plus) {
     toastManager.openToast(
-      "This feature is only availble for T3+ users. Learn more at trackandtrace.tools/plus",
+      'This feature is only availble for T3+ users. Learn more at trackandtrace.tools/plus',
       {
-        title: "T3+ Required",
+        title: 'T3+ Required',
         autoHideDelay: 5000,
-        variant: "warning",
+        variant: 'warning',
         appendToast: true,
-        toaster: "ttt-toaster",
+        toaster: 'ttt-toaster',
         solid: true,
-        href: "https://trackandtrace.tools/plus",
+        href: 'https://trackandtrace.tools/plus',
       }
     );
 
@@ -210,13 +208,13 @@ export async function createScanSheet(transferId: number, manifestNumber: string
 
   if (store.state.pluginAuth.oAuthState !== OAuthState.AUTHENTICATED) {
     toastManager.openToast(
-      "You must sign in to your Google account to create scan sheets. Click the Track & Trace Tools icon in the browser toolbar to log in.",
+      'You must sign in to your Google account to create scan sheets. Click the Track & Trace Tools icon in the browser toolbar to log in.',
       {
-        title: "Google Sign-in Required",
+        title: 'Google Sign-in Required',
         autoHideDelay: 5000,
-        variant: "warning",
+        variant: 'warning',
         appendToast: true,
-        toaster: "ttt-toaster",
+        toaster: 'ttt-toaster',
         solid: true,
       }
     );
@@ -224,12 +222,12 @@ export async function createScanSheet(transferId: number, manifestNumber: string
     return;
   }
 
-  toastManager.openToast("Creating scan sheet...", {
-    title: "T3",
+  toastManager.openToast('Creating scan sheet...', {
+    title: 'T3',
     autoHideDelay: 10000,
-    variant: "primary",
+    variant: 'primary',
     appendToast: true,
-    toaster: "ttt-toaster",
+    toaster: 'ttt-toaster',
     solid: true,
   });
 
@@ -262,7 +260,7 @@ export async function createScanSheet(transferId: number, manifestNumber: string
         ]);
 
         if (!incomingTransfer) {
-          throw new Error("Unable to match incoming transfer");
+          throw new Error('Unable to match incoming transfer');
         }
 
         packages = packages.concat(
@@ -289,7 +287,7 @@ export async function createScanSheet(transferId: number, manifestNumber: string
     });
 
     if (manifest.find((x) => !x.destination && !x.incomingTransfer)) {
-      throw new Error("Cannot generate scan sheet with no destination information");
+      throw new Error('Cannot generate scan sheet with no destination information');
     }
 
     const spreadsheet = await createScanSheetOrError(
@@ -300,14 +298,14 @@ export async function createScanSheet(transferId: number, manifestNumber: string
       manifest
     );
 
-    window.open(spreadsheet.spreadsheetUrl, "_blank");
+    window.open(spreadsheet.spreadsheetUrl, '_blank');
   } catch (e) {
     toastManager.openToast((e as Error).toString(), {
-      title: "Failed to create scan sheet",
+      title: 'Failed to create scan sheet',
       autoHideDelay: 2000,
-      variant: "primary",
+      variant: 'primary',
       appendToast: true,
-      toaster: "ttt-toaster",
+      toaster: 'ttt-toaster',
       solid: true,
     });
   }

@@ -2,19 +2,19 @@ import {
   METRC_TAG_REGEX_PATTERN,
   PLANT_BATCH_NAME_REGEX_PATTERN,
   ZERO_PADDED_MANIFEST_NUMBER_REGEX_PATTERN
-} from "@/consts";
-import { IHarvestHistoryData, IPackageHistoryData } from "@/interfaces";
-import _ from "lodash-es";
+} from '@/consts';
+import { IHarvestHistoryData, IPackageHistoryData } from '@/interfaces';
+import _ from 'lodash-es';
 
 // Single history entry methods
 
 export function extractInitialPackageQuantityAndUnitOrNull(
   description: string
 ): [number, string] | null {
-  const matcher = new RegExp(`^Packaged ([0-9,\.]+) ([a-zA-Z\s]+) of`);
+  const matcher = new RegExp('^Packaged ([0-9,\.]+) ([a-zA-Z\s]+) of');
   const match = description.match(matcher);
 
-  return match ? [parseFloat(match[1].replaceAll(",", "")), match[2]] : null;
+  return match ? [parseFloat(match[1].replaceAll(',', '')), match[2]] : null;
 }
 
 export function extractParentPackageLabelOrNull(description: string): string | null {
@@ -119,7 +119,7 @@ export function extractOutgoingTransferManifestNumberOrNull(description: string)
 }
 
 export function extractHarvestNameOrNull(description: string): string | null {
-  const matchers: RegExp[] = [new RegExp(`Harvest "([^"]+)"`)];
+  const matchers: RegExp[] = [new RegExp('Harvest "([^"]+)"')];
   for (const matcher of matchers) {
     const match = description.match(matcher);
 
@@ -151,10 +151,10 @@ export function extractPackageAdjustmentSetOrNull(descriptions: string[]): {
   reason: string;
   note: string;
 } | null {
-  const joinedDescriptions = descriptions.join(" ");
+  const joinedDescriptions = descriptions.join(' ');
 
   const matchers: RegExp[] = [
-    new RegExp(`Package adjusted by (-?\\d+[\\.]?\\d*) ([^-]+) - Reason: ([^-]+)- Note: (.*)`),
+    new RegExp('Package adjusted by (-?\\d+[\\.]?\\d*) ([^-]+) - Reason: ([^-]+)- Note: (.*)'),
   ];
 
   for (const matcher of matchers) {
@@ -180,7 +180,7 @@ export function extractChildPackageTagQuantityPairOrNull(
 
   const match = description.match(pairMatcher);
 
-  return match ? [match[2] as string, parseFloat(match[1].replaceAll(",", ""))] : null;
+  return match ? [match[2] as string, parseFloat(match[1].replaceAll(',', ''))] : null;
 }
 
 export function extractChildPackageTagQuantityUnitSetOrNull(
@@ -197,10 +197,10 @@ export function extractChildPackageTagQuantityUnitSetOrNull(
   }
 
   const tag = match[5];
-  let quantity = parseFloat(match[2].replaceAll(",", ""));
+  let quantity = parseFloat(match[2].replaceAll(',', ''));
   const unit = match[3];
 
-  if (match[1] === "Restored") {
+  if (match[1] === 'Restored') {
     quantity *= -1;
   }
 
@@ -216,11 +216,11 @@ export function extractParentPackageTagQuantityUnitItemSetOrNull(
 
   const match = description.match(pairMatcher);
 
-  return match ? [match[4], parseFloat(match[1].replaceAll(",", "")), match[2], match[3]] : null;
+  return match ? [match[4], parseFloat(match[1].replaceAll(',', '')), match[2], match[3]] : null;
 }
 
 export function extractLocationNameOrNull(description: string): string | null {
-  const matcher = new RegExp(`- Location: (.*)`);
+  const matcher = new RegExp('- Location: (.*)');
 
   const match = description.match(matcher);
 
@@ -242,7 +242,7 @@ export function extractInitialPackageQuantityAndUnitFromHistoryOrError(
     }
   }
 
-  throw new Error("Could not locate initial quantity");
+  throw new Error('Could not locate initial quantity');
 }
 
 export function extractParentPackageLabelsFromHistory(

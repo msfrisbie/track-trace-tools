@@ -7,29 +7,29 @@ import {
   IIndexedTransferData,
   IPluginState,
   IRichIncomingTransferData
-} from "@/interfaces";
-import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
-import { ReportsMutations, ReportType } from "@/store/page-overlay/modules/reports/consts";
+} from '@/interfaces';
+import { primaryDataLoader } from '@/modules/data-loader/data-loader.module';
+import { ReportsMutations, ReportType } from '@/store/page-overlay/modules/reports/consts';
 import {
   IReportConfig,
   IReportData,
   IReportsState
-} from "@/store/page-overlay/modules/reports/interfaces";
-import { ActionContext } from "vuex";
+} from '@/store/page-overlay/modules/reports/interfaces';
+import { ActionContext } from 'vuex';
 import {
   getIsoDateFromOffset,
   isCustodiedDatetimeOrError,
   isoDatetimeToLocalDate,
   todayIsodate
-} from "../date";
-import { extractInitialPackageQuantityAndUnitFromHistoryOrError } from "../history";
-import { getItemNameOrError, getLabelOrError } from "../package";
+} from '../date';
+import { extractInitialPackageQuantityAndUnitFromHistoryOrError } from '../history';
+import { getItemNameOrError, getLabelOrError } from '../package';
 
 export enum InventoryStrategy {
-  SLICE_START_OF_DAY = "Only include inventory that was in custody at the start of the day",
-  SLICE_END_OF_DAY = "Only include inventory that was in custody at the end of the day",
-  FULL_DAY = "Only include inventory that was in custody for the full day",
-  PARTIAL_DAY = "Only include inventory that was in custody at any point on this day",
+  SLICE_START_OF_DAY = 'Only include inventory that was in custody at the start of the day',
+  SLICE_END_OF_DAY = 'Only include inventory that was in custody at the end of the day',
+  FULL_DAY = 'Only include inventory that was in custody for the full day',
+  PARTIAL_DAY = 'Only include inventory that was in custody at any point on this day',
 }
 
 interface IPointInTimeInventoryReportFormFilters {
@@ -66,22 +66,21 @@ export interface IPackageDateMetadata {
   debugMessage: string;
 }
 
-export const pointInTimeInventoryFormFiltersFactory: () => IPointInTimeInventoryReportFormFilters =
-  () => ({
-    targetDate: todayIsodate(),
-    useRestrictedWindowOptimization: true,
-    restrictedWindowDays: 365,
-    restrictedWindowDaysOptions: [
-      { value: Math.floor(365 / 2), text: "Within 6 months" },
-      { value: 365, text: "Within 1 year" },
-      { value: Math.floor(365 * 1.5), text: "Within 18 months" },
-      { value: 365 * 2, text: "Within 2 years" },
-    ],
-    showDebugColumns: false,
-    // licenseOptions: facilityManager.cachedFacilities.map((x) => x.licenseNumber),
-    // licenses: facilityManager.cachedFacilities.map((x) => x.licenseNumber),
-    inventoryStrategy: InventoryStrategy.SLICE_START_OF_DAY,
-  });
+export const pointInTimeInventoryFormFiltersFactory: () => IPointInTimeInventoryReportFormFilters = () => ({
+  targetDate: todayIsodate(),
+  useRestrictedWindowOptimization: true,
+  restrictedWindowDays: 365,
+  restrictedWindowDaysOptions: [
+    { value: Math.floor(365 / 2), text: 'Within 6 months' },
+    { value: 365, text: 'Within 1 year' },
+    { value: Math.floor(365 * 1.5), text: 'Within 18 months' },
+    { value: 365 * 2, text: 'Within 2 years' },
+  ],
+  showDebugColumns: false,
+  // licenseOptions: facilityManager.cachedFacilities.map((x) => x.licenseNumber),
+  // licenses: facilityManager.cachedFacilities.map((x) => x.licenseNumber),
+  inventoryStrategy: InventoryStrategy.SLICE_START_OF_DAY,
+});
 
 export function addPointInTimeInventoryReport({
   reportConfig,
@@ -117,27 +116,27 @@ export async function maybeLoadPointInTimeInventoryReportData({
   }
 
   if (!pointInTimeInventoryReportConfig?.targetDate) {
-    throw new Error("Must provide target date");
+    throw new Error('Must provide target date');
   }
 
   if (pointInTimeInventoryReportConfig?.targetDate > todayIsodate()) {
-    throw new Error("Cannot select a date in the future");
+    throw new Error('Cannot select a date in the future');
   }
 
   if ((await primaryDataLoader.activePackageCount()) === null) {
-    throw new Error("This report type requires package permissions");
+    throw new Error('This report type requires package permissions');
   }
 
   if ((await primaryDataLoader.outgoingTransferCount()) === null) {
-    throw new Error("This report type requires transfer permissions");
+    throw new Error('This report type requires transfer permissions');
   }
 
   if ((await primaryDataLoader.availableTagCount()) === null) {
-    throw new Error("This report type requires tag permissions");
+    throw new Error('This report type requires tag permissions');
   }
 
   ctx.commit(ReportsMutations.SET_STATUS, {
-    statusMessage: { text: "Loading package data...", level: "success" },
+    statusMessage: { text: 'Loading package data...', level: 'success' },
   });
 
   const packageMetadataMap: Map<string, IPackageDateMetadata> = new Map();
@@ -208,8 +207,8 @@ export async function maybeLoadPointInTimeInventoryReportData({
       arrivalDatetimes: [],
       departureDatetimes: [],
       eligible: false,
-      message: "",
-      debugMessage: "",
+      message: '',
+      debugMessage: '',
     };
   }
 
@@ -239,18 +238,17 @@ export async function maybeLoadPointInTimeInventoryReportData({
 
   // TODO for each packaged that is received, load history and enter date ranges
 
-  const filteredIncomingTransfers: IRichIncomingTransferData[] =
-    allInactiveIncomingTransfers.filter((transfer) => {
-      if (transfer.LastModified < minDate) {
-        return false;
-      }
+  const filteredIncomingTransfers: IRichIncomingTransferData[] = allInactiveIncomingTransfers.filter((transfer) => {
+    if (transfer.LastModified < minDate) {
+      return false;
+    }
 
-      if (transfer.CreatedDateTime > maxDate) {
-        return false;
-      }
+    if (transfer.CreatedDateTime > maxDate) {
+      return false;
+    }
 
-      return true;
-    });
+    return true;
+  });
 
   // Load incoming packages in parallel
   for (const incomingTransfer of filteredIncomingTransfers) {
@@ -270,18 +268,17 @@ export async function maybeLoadPointInTimeInventoryReportData({
     }
   }
 
-  const filteredOutgoingTransfers: IIndexedRichOutgoingTransferData[] =
-    allInactiveOutgoingTransfers.filter((transfer) => {
-      if (transfer.LastModified < minDate) {
-        return false;
-      }
+  const filteredOutgoingTransfers: IIndexedRichOutgoingTransferData[] = allInactiveOutgoingTransfers.filter((transfer) => {
+    if (transfer.LastModified < minDate) {
+      return false;
+    }
 
-      if (transfer.CreatedDateTime > maxDate) {
-        return false;
-      }
+    if (transfer.CreatedDateTime > maxDate) {
+      return false;
+    }
 
-      return true;
-    });
+    return true;
+  });
 
   // Load destinations in parallel
   for (const outgoingTransfer of filteredOutgoingTransfers) {
@@ -388,40 +385,40 @@ export async function maybeLoadPointInTimeInventoryReportData({
   for (const [label, metadata] of packageMetadataMap.entries()) {
     // Ineligible if packaged after target date
     if (
-      metadata.packagedDate &&
-      metadata.packagedDate > pointInTimeInventoryReportConfig.targetDate
+      metadata.packagedDate
+      && metadata.packagedDate > pointInTimeInventoryReportConfig.targetDate
     ) {
       continue;
     }
 
     // Ineligible if archived before target date
     if (
-      metadata.archivedDate &&
-      metadata.archivedDate < pointInTimeInventoryReportConfig.targetDate
+      metadata.archivedDate
+      && metadata.archivedDate < pointInTimeInventoryReportConfig.targetDate
     ) {
       continue;
     }
 
     // Ineligible if finished before target date
     if (
-      metadata.finishedDate &&
-      metadata.finishedDate < pointInTimeInventoryReportConfig.targetDate
+      metadata.finishedDate
+      && metadata.finishedDate < pointInTimeInventoryReportConfig.targetDate
     ) {
       continue;
     }
 
     // Ineligible if tag used date after target date
     if (
-      metadata.tagUsedDate &&
-      metadata.tagUsedDate > pointInTimeInventoryReportConfig.targetDate
+      metadata.tagUsedDate
+      && metadata.tagUsedDate > pointInTimeInventoryReportConfig.targetDate
     ) {
       continue;
     }
 
     // Record received date
     if (
-      metadata.receivedDate &&
-      metadata.receivedDate > pointInTimeInventoryReportConfig.targetDate
+      metadata.receivedDate
+      && metadata.receivedDate > pointInTimeInventoryReportConfig.targetDate
     ) {
       continue;
     }
@@ -437,11 +434,11 @@ export async function maybeLoadPointInTimeInventoryReportData({
         continue;
       }
     } catch {
-      metadata.message += `Unable to determine if this package was in custody.`;
+      metadata.message += 'Unable to determine if this package was in custody.';
       metadata.debugMessage += `Transfer datetimes could not be parsed. arrival:${metadata.arrivalDatetimes.join()}/departure:${metadata.departureDatetimes.join()}`;
     }
 
-    if (metadata.shipmentPackageState === "Returned") {
+    if (metadata.shipmentPackageState === 'Returned') {
       // Only 'Accepted' is allowed
       continue;
     }
@@ -500,24 +497,24 @@ export function extractPointInTimeInventoryData({
 }): any[][] {
   const matrix: any[][] = [];
 
-  const headers = ["Tag", "Item", "Quantity (estimated)", "Unit of Measure", "Note"];
+  const headers = ['Tag', 'Item', 'Quantity (estimated)', 'Unit of Measure', 'Note'];
 
   if (reportConfig[ReportType.POINT_IN_TIME_INVENTORY]!.showDebugColumns) {
     headers.push(
-      "Debug Message",
-      "Incoming Manifests",
-      "Outgoing Manifests",
-      "Tag Used Date",
-      "Packaged Date",
-      "Archived Date",
-      "Finished Date",
-      "Received Date",
-      "Arrival Dates",
-      "Departure Dates",
-      "Eligible?",
-      "Has Package",
-      "Incomging Package Count",
-      "Outgoing Package Count"
+      'Debug Message',
+      'Incoming Manifests',
+      'Outgoing Manifests',
+      'Tag Used Date',
+      'Packaged Date',
+      'Archived Date',
+      'Finished Date',
+      'Received Date',
+      'Arrival Dates',
+      'Departure Dates',
+      'Eligible?',
+      'Has Package',
+      'Incomging Package Count',
+      'Outgoing Package Count'
     );
   }
 
@@ -538,15 +535,15 @@ export function extractPointInTimeInventoryData({
       if (reportConfig[ReportType.POINT_IN_TIME_INVENTORY]!.showDebugColumns) {
         row.push(
           metadata.debugMessage,
-          metadata.incomingManifests.join("|"),
-          metadata.outgoingManifests.join("|"),
+          metadata.incomingManifests.join('|'),
+          metadata.outgoingManifests.join('|'),
           metadata.tagUsedDate,
           metadata.packagedDate,
           metadata.archivedDate,
           metadata.finishedDate,
           metadata.receivedDate,
-          metadata.arrivalDatetimes.join("|"),
-          metadata.departureDatetimes.join("|"),
+          metadata.arrivalDatetimes.join('|'),
+          metadata.departureDatetimes.join('|'),
           metadata.eligible,
           !!metadata.pkg,
           metadata.incomingTransferPackages.length,

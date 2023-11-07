@@ -23,16 +23,16 @@
 </template>
 
 <script lang="ts">
-import { MessageType } from "@/consts";
-import { messageBus } from "@/modules/message-bus.module";
-import router from "@/router/index";
-import store from "@/store/page-overlay/index";
-import { appendValues, createSpreadsheet, getSheetProperties } from "@/utils/sheets";
-import Vue from "vue";
-import { mapState } from "vuex";
+import { MessageType } from '@/consts';
+import { messageBus } from '@/modules/message-bus.module';
+import router from '@/router/index';
+import store from '@/store/page-overlay/index';
+import { appendValues, createSpreadsheet, getSheetProperties } from '@/utils/sheets';
+import Vue from 'vue';
+import { mapState } from 'vuex';
 
 export default Vue.extend({
-  name: "GoogleSheetsDeprecated",
+  name: 'GoogleSheetsDeprecated',
   store,
   router,
   props: {
@@ -40,7 +40,7 @@ export default Vue.extend({
   },
   components: {},
   computed: {
-    ...mapState(["debugMode"]),
+    ...mapState(['debugMode']),
     isAuthenticated() {
       // @ts-ignore
       return !!this.$data.oauthUserInfo;
@@ -66,19 +66,19 @@ export default Vue.extend({
     },
 
     async getSheetData() {
-      const spreadsheetId = "1U6iMT4sVqNDw6kduMqtkayjVFC3-ZRLIRpSjeqJ57cI";
+      const spreadsheetId = '1U6iMT4sVqNDw6kduMqtkayjVFC3-ZRLIRpSjeqJ57cI';
 
       console.log(await getSheetProperties({ spreadsheetId }));
     },
 
     async write() {
-      const spreadsheetId = "1U6iMT4sVqNDw6kduMqtkayjVFC3-ZRLIRpSjeqJ57cI";
-      const range = "Sheet1!A1:D10";
+      const spreadsheetId = '1U6iMT4sVqNDw6kduMqtkayjVFC3-ZRLIRpSjeqJ57cI';
+      const range = 'Sheet1!A1:D10';
       const values = [
-        ["Item", "Cost", "Stocked", "Ship Date"],
-        ["Wheel", "$20.50", "4", "3/1/2016"],
-        ["Door", "$15", "2", "3/15/2016"],
-        ["Engine", "$100", "1", "3/20/2016"],
+        ['Item', 'Cost', 'Stocked', 'Ship Date'],
+        ['Wheel', '$20.50', '4', '3/1/2016'],
+        ['Door', '$15', '2', '3/15/2016'],
+        ['Engine', '$100', '1', '3/20/2016'],
       ];
 
       appendValues({

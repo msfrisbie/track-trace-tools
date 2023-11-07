@@ -1,9 +1,9 @@
-import { ChromeStorageKeys } from "@/consts";
-import { IGoogleOAuthOAuthUserInfo } from "@/interfaces";
-import { isBackgroundExecutionContext } from "./context";
+import { ChromeStorageKeys } from '@/consts';
+import { IGoogleOAuthOAuthUserInfo } from '@/interfaces';
+import { isBackgroundExecutionContext } from './context';
 
 if (!isBackgroundExecutionContext) {
-  throw new Error("This should only be used in the background!");
+  throw new Error('This should only be used in the background!');
 }
 
 export async function getAuthTokenOrError({
@@ -20,7 +20,7 @@ export async function getAuthTokenOrError({
         if (token) {
           resolve(token);
         } else {
-          reject("Coult not obtain OAuth token");
+          reject('Coult not obtain OAuth token');
         }
       }
     );
@@ -31,11 +31,11 @@ export async function getAuthTokenOrError({
 export async function getProfileUserInfoOrError(): Promise<chrome.identity.UserInfo> {
   return new Promise((resolve, reject) => {
     // @ts-ignore
-    chrome.identity.getProfileUserInfo({ accountStatus: "ANY" }, (userInfo) => {
+    chrome.identity.getProfileUserInfo({ accountStatus: 'ANY' }, (userInfo) => {
       if (userInfo) {
         resolve(userInfo);
       } else {
-        reject("Coult not obtain OAuth user info");
+        reject('Coult not obtain OAuth user info');
       }
     });
   });
@@ -68,14 +68,14 @@ export async function getOAuthUserInfoOrError({
       const result = await fetch(
         `https://www.googleapis.com/oauth2/v2/userinfo?access_token="${token}`,
         {
-          method: "GET",
+          method: 'GET',
           // @ts-ignore
           async: true,
           headers: {
             Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
           },
-          contentType: "json",
+          contentType: 'json',
         }
       ).then((response) => response.json());
 

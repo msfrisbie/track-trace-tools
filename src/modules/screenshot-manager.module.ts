@@ -1,8 +1,8 @@
-import { MessageType } from "@/consts";
-import { IAtomicService, IAuthState, IBackgroundScriptScreenshotUploadData } from "@/interfaces";
-import html2canvas from "html2canvas";
-import { analyticsManager } from "./analytics-manager.module";
-import { authManager } from "./auth-manager.module";
+import { MessageType } from '@/consts';
+import { IAtomicService, IAuthState, IBackgroundScriptScreenshotUploadData } from '@/interfaces';
+import html2canvas from 'html2canvas';
+import { analyticsManager } from './analytics-manager.module';
+import { authManager } from './auth-manager.module';
 
 class ScreenshotManager implements IAtomicService {
   async init() {}
@@ -73,7 +73,7 @@ class ScreenshotManager implements IAtomicService {
       //     });
       //   }
     } else {
-      console.error("Cannot upload, Missing authstate");
+      console.error('Cannot upload, Missing authstate');
     }
   }
 
@@ -109,14 +109,14 @@ class ScreenshotManager implements IAtomicService {
 
   // @ts-ignore
   private async htmlScreenshot(): Promise<HTMLCanvasElement> {
-    document.body.classList.add("screenshot");
+    document.body.classList.add('screenshot');
 
     await new Promise((resolve) => setTimeout(resolve, 100));
 
     // https://ourcodeworld.com/articles/read/415/how-to-create-a-screenshot-of-your-website-with-javascript-using-html2canvas
     const canvas = await html2canvas(document.body);
 
-    document.body.classList.remove("screenshot");
+    document.body.classList.remove('screenshot');
 
     return canvas;
   }
@@ -137,8 +137,8 @@ class ScreenshotManager implements IAtomicService {
     // @ts-ignore
     const stream = await navigator.mediaDevices.getDisplayMedia(getDisplayMediaConstraints);
     const track = stream.getVideoTracks()[0];
-    const canvas = document.createElement("canvas");
-    const video = document.createElement("video");
+    const canvas = document.createElement('canvas');
+    const video = document.createElement('video');
 
     video.srcObject = stream;
     video.play();
@@ -151,7 +151,7 @@ class ScreenshotManager implements IAtomicService {
 
     // @ts-ignore
     canvas
-      .getContext("2d")
+      .getContext('2d')
       .drawImage(
         video,
         0,
@@ -194,12 +194,12 @@ class ScreenshotManager implements IAtomicService {
 
     const imageBitmap = await imageCapture.grabFrame();
 
-    const canvas = document.createElement("canvas");
+    const canvas = document.createElement('canvas');
     canvas.width = imageBitmap.width;
     canvas.height = imageBitmap.height;
     // @ts-ignore
     canvas
-      .getContext("2d")
+      .getContext('2d')
       .drawImage(
         imageBitmap,
         0,
@@ -224,10 +224,10 @@ class ScreenshotManager implements IAtomicService {
           if (blob) {
             resolve(blob);
           } else {
-            reject("Bad blob");
+            reject('Bad blob');
           }
         },
-        "image/jpeg",
+        'image/jpeg',
         0.85
       );
     });
@@ -235,12 +235,12 @@ class ScreenshotManager implements IAtomicService {
 
   private async saveBlobAsImage(blob: Blob) {
     // https://stackoverflow.com/questions/19327749/javascript-blob-filename-without-link
-    const a = document.createElement("a");
+    const a = document.createElement('a');
     document.body.appendChild(a);
-    a.style.display = "none";
+    a.style.display = 'none';
     const url = window.URL.createObjectURL(blob);
     a.href = url;
-    a.download = "screenshot.jpeg";
+    a.download = 'screenshot.jpeg';
     a.click();
     // window.URL.revokeObjectURL(url);
   }
