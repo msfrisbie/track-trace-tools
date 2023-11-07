@@ -66,13 +66,12 @@ class AnalyticsManager implements IAtomicService {
 
     let metrcVersion = null;
     try {
-      const metrcFooter = document.querySelector("#footer_center");
+      const metrcFooter: HTMLElement | null = document.querySelector("#footer_center");
 
-      let footerText;
-      // @ts-ignore
-      if (footerText = metrcFooter?.innerText) {
-        let pieces;
-        if ((pieces = footerText.split("|")).length === 2) {
+      const footerText = metrcFooter?.innerText;
+      if (footerText) {
+        const pieces = footerText.split("|");
+        if (pieces.length === 2) {
           metrcVersion = pieces[1].trim();
         }
       }

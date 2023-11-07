@@ -4,7 +4,7 @@ import {
   IPackageFilter,
   IPluginState,
   ISpreadsheet,
-  ITransferFilter,
+  ITransferFilter
 } from "@/interfaces";
 import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
 import { messageBus } from "@/modules/message-bus.module";
@@ -13,7 +13,7 @@ import { ReportsMutations, ReportType } from "@/store/page-overlay/modules/repor
 import {
   IReportConfig,
   IReportData,
-  IReportsState,
+  IReportsState
 } from "@/store/page-overlay/modules/reports/interfaces";
 import { ActionContext } from "vuex";
 import { isodateToSlashDate, todayIsodate } from "../date";
@@ -22,7 +22,7 @@ import {
   extractInitialPackageLocationNameFromHistoryOrNull,
   extractInitialPackageQuantityAndUnitFromHistoryOrError,
   extractParentPackageTagQuantityUnitItemSetsFromHistory,
-  extractTestSamplePackageLabelsFromHistory,
+  extractTestSamplePackageLabelsFromHistory
 } from "../history";
 import { pad } from "../misc";
 import {
@@ -32,7 +32,7 @@ import {
   autoResizeDimensionsRequestFactory,
   freezeTopRowRequestFactory,
   numberColumnRequestFactory,
-  styleTopRowRequestFactory,
+  styleTopRowRequestFactory
 } from "../sheets";
 import { writeDataSheet } from "../sheets-export";
 
@@ -89,13 +89,26 @@ export async function maybeLoadCogsTrackerReportData({
   const promises: Promise<any>[] = [
     primaryDataLoader
       .activePackages()
-      .then((result) => (allPackages = [...allPackages, ...result])),
+      .then((result) => {
+        allPackages = [...allPackages, ...result];
+
+        // Backwards compat - possibly redundant
+        return allPackages;
+      }),
     primaryDataLoader
       .onHoldPackages()
-      .then((result) => (allPackages = [...allPackages, ...result])),
+      .then((result) => {
+        allPackages = [...allPackages, ...result];
+
+        // Backwards compat - possibly redundant
+        return allPackages; }),
     primaryDataLoader
       .inactivePackages()
-      .then((result) => (allPackages = [...allPackages, ...result])),
+      .then((result) => {
+        allPackages = [...allPackages, ...result];
+
+        // Backwards compat - possibly redundant
+        return allPackages; }),
   ];
 
   await Promise.allSettled(promises);

@@ -335,7 +335,7 @@ class PageManager implements IAtomicService {
   pauseFor(pauseMs: number) {
     this.paused = true;
 
-    setTimeout(() => (this.paused = false), pauseMs);
+    setTimeout(() => { this.paused = false; }, pauseMs);
   }
 
   cycleRefreshPromise(): void {

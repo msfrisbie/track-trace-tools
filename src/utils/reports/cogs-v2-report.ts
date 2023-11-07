@@ -7,9 +7,8 @@ import {
   IPluginState,
   IRichDestinationData,
   ISpreadsheet,
-  ITransferFilter,
+  ITransferFilter
 } from "@/interfaces";
-import { clientBuildManager } from "@/modules/client-build-manager.module";
 import { DataLoader, getDataLoaderByLicense } from "@/modules/data-loader/data-loader.module";
 import { facilityManager } from "@/modules/facility-manager.module";
 import { messageBus } from "@/modules/message-bus.module";
@@ -19,18 +18,18 @@ import { ReportsMutations, ReportType } from "@/store/page-overlay/modules/repor
 import {
   IReportConfig,
   IReportData,
-  IReportsState,
+  IReportsState
 } from "@/store/page-overlay/modules/reports/interfaces";
 import { ActionContext } from "vuex";
 import { getIsoDateFromOffset, todayIsodate } from "../date";
 import {
   extractChildPackageTagQuantityUnitSetsFromHistory,
-  extractInitialPackageQuantityAndUnitFromHistoryOrError,
+  extractInitialPackageQuantityAndUnitFromHistoryOrError
 } from "../history";
 import {
   getDelimiterSeparatedValuesOrError,
   getLabelOrError,
-  getSourcePackageTags,
+  getSourcePackageTags
 } from "../package";
 import {
   addRowsRequestFactory,
@@ -39,7 +38,7 @@ import {
   extractSheetIdOrError,
   freezeTopRowRequestFactory,
   hideColumnsRequestFactory,
-  styleTopRowRequestFactory,
+  styleTopRowRequestFactory
 } from "../sheets";
 import { appendSpreadsheetValues, readSpreadsheet, writeDataSheet } from "../sheets-export";
 
@@ -138,7 +137,12 @@ export async function loadAndCacheCogsV2Data({
       dataLoader = await getDataLoaderByLicense(license);
 
       await dataLoader.activePackages().then(
-        (pkgs) => (packages = packages.concat(pkgs)),
+        (pkgs) => {
+          packages = packages.concat(pkgs);
+
+          // Backwards compat - possibly redundant
+          return packages;
+        },
         (e) => {
           ctx.commit(ReportsMutations.SET_STATUS, {
             statusMessage: {
@@ -151,7 +155,11 @@ export async function loadAndCacheCogsV2Data({
       );
 
       await dataLoader.onHoldPackages().then(
-        (pkgs) => (packages = packages.concat(pkgs)),
+        (pkgs) => {
+          packages = packages.concat(pkgs);
+
+          // Backwards compat - possibly redundant
+          return packages; },
         (e) => {
           ctx.commit(ReportsMutations.SET_STATUS, {
             statusMessage: {
@@ -164,7 +172,11 @@ export async function loadAndCacheCogsV2Data({
       );
 
       await dataLoader.inactivePackages().then(
-        (pkgs) => (packages = packages.concat(pkgs)),
+        (pkgs) => {
+          packages = packages.concat(pkgs);
+
+          // Backwards compat - possibly redundant
+          return packages; },
         (e) => {
           ctx.commit(ReportsMutations.SET_STATUS, {
             statusMessage: {
@@ -177,7 +189,11 @@ export async function loadAndCacheCogsV2Data({
       );
 
       await dataLoader.inTransitPackages().then(
-        (pkgs) => (packages = packages.concat(pkgs)),
+        (pkgs) => {
+          packages = packages.concat(pkgs);
+
+          // Backwards compat - possibly redundant
+          return packages; },
         (e) => {
           ctx.commit(ReportsMutations.SET_STATUS, {
             statusMessage: {

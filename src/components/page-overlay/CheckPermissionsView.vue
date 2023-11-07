@@ -200,12 +200,11 @@ export default Vue.extend({
     for (const permission of permissions) {
       const dataLoader = await getDataLoaderByLicense(permission.license);
 
-      permission
-        .assessmentFn(dataLoader)
-        .then(
-          (result: boolean) =>
-            (permission.state = result ? PermissionState.GRANTED : PermissionState.NOT_GRANTED)
-        );
+      permission.assessmentFn(dataLoader).then((result: boolean) => {
+        permission.state = result ? PermissionState.GRANTED : PermissionState.NOT_GRANTED;
+
+        return permission.state;
+      });
     }
 
     this.$data.permissions = permissions;

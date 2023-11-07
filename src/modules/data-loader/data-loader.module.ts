@@ -8,7 +8,7 @@ import {
   PlantState,
   SEARCH_LOAD_PAGE_SIZE,
   TagState,
-  TransferState,
+  TransferState
 } from "@/consts";
 import {
   IAtomicService,
@@ -33,8 +33,7 @@ import {
   ILocationData,
   IMetrcEmployeeData,
   IMetrcFacilityData,
-  IPackageData,
-  IPackageHistoryData,
+  IPackageData, IPackageFilter, IPackageHistoryData,
   IPackageOptions,
   IPackageSourceHarvestData,
   IPaginationOptions,
@@ -56,14 +55,13 @@ import {
   ITransferFilter,
   ITransferHistoryData,
   ITransferTransporterDetails,
-  ITransporterData,
-  IPackageFilter
+  ITransporterData
 } from "@/interfaces";
 import { authManager } from "@/modules/auth-manager.module";
 import { databaseInterface } from "@/modules/database-interface.module";
 import {
   MetrcRequestManager,
-  primaryMetrcRequestManager,
+  primaryMetrcRequestManager
 } from "@/modules/metrc-request-manager.module";
 import { mockDataManager } from "@/modules/mock-data-manager.module";
 import { MutationType } from "@/mutation-types";
@@ -3739,7 +3737,12 @@ export class DataLoader implements IAtomicService {
     await this.activeSalesReceiptsStream()
       .pipe(
         take(1),
-        map((next) => (salesReceipts = next.Data))
+        map((next) => {
+          salesReceipts = next.Data;
+
+          // Backwards compat - possibly redundant
+          return salesReceipts;
+        })
       )
       .toPromise();
 

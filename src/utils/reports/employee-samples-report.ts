@@ -4,7 +4,7 @@ import {
   IMetrcEmployeeData,
   IPackageFilter,
   IPluginState,
-  ISpreadsheet,
+  ISpreadsheet
 } from "@/interfaces";
 import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
 import { messageBus } from "@/modules/message-bus.module";
@@ -13,20 +13,20 @@ import { ReportsMutations, ReportType } from "@/store/page-overlay/modules/repor
 import {
   IReportConfig,
   IReportData,
-  IReportsState,
+  IReportsState
 } from "@/store/page-overlay/modules/reports/interfaces";
 import { ActionContext } from "vuex";
 import { normalizeIsodate, todayIsodate } from "../date";
 import {
   getAllocatedSamplesFromPackageHistoryOrError,
-  toNormalizedAllocationQuantity,
+  toNormalizedAllocationQuantity
 } from "../employee";
 import { extractInitialPackageQuantityAndUnitFromHistoryOrError } from "../history";
 import {
   addRowsRequestFactory,
   autoResizeDimensionsRequestFactory,
   freezeTopRowRequestFactory,
-  styleTopRowRequestFactory,
+  styleTopRowRequestFactory
 } from "../sheets";
 import { writeDataSheet } from "../sheets-export";
 
@@ -81,13 +81,27 @@ export async function maybeLoadEmployeeSamplesReportData({
   const promises: Promise<any>[] = [
     primaryDataLoader
       .activePackages()
-      .then((result) => (allPackages = [...allPackages, ...result])),
+      .then((result) => {
+        allPackages = [...allPackages, ...result];
+
+        // Backwards compat - possibly redundant
+        return allPackages; }),
     primaryDataLoader
       .onHoldPackages()
-      .then((result) => (allPackages = [...allPackages, ...result])),
+      .then((result) => {
+        allPackages = [...allPackages, ...result];
+
+        // Backwards compat - possibly redundant
+        return allPackages;
+      }),
     primaryDataLoader
       .inactivePackages()
-      .then((result) => (allPackages = [...allPackages, ...result])),
+      .then((result) => {
+        allPackages = [...allPackages, ...result];
+
+        // Backwards compat - possibly redundant
+        return allPackages;
+      }),
     primaryDataLoader.employees().then((result) => {
       employees = result;
     }),

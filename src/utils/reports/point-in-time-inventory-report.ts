@@ -6,21 +6,21 @@ import {
   IIndexedTagData,
   IIndexedTransferData,
   IPluginState,
-  IRichIncomingTransferData,
+  IRichIncomingTransferData
 } from "@/interfaces";
 import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
 import { ReportsMutations, ReportType } from "@/store/page-overlay/modules/reports/consts";
 import {
   IReportConfig,
   IReportData,
-  IReportsState,
+  IReportsState
 } from "@/store/page-overlay/modules/reports/interfaces";
 import { ActionContext } from "vuex";
 import {
   getIsoDateFromOffset,
   isCustodiedDatetimeOrError,
   isoDatetimeToLocalDate,
-  todayIsodate,
+  todayIsodate
 } from "../date";
 import { extractInitialPackageQuantityAndUnitFromHistoryOrError } from "../history";
 import { getItemNameOrError, getLabelOrError } from "../package";
@@ -153,15 +153,27 @@ export async function maybeLoadPointInTimeInventoryReportData({
   promises.push(
     primaryDataLoader.activePackages().then((result) => {
       allPackages = [...allPackages, ...result];
+
+      // Backwards compat - possibly redundant
+      return allPackages;
     }),
     primaryDataLoader.onHoldPackages().then((result) => {
       allPackages = [...allPackages, ...result];
+
+      // Backwards compat - possibly redundant
+      return allPackages;
     }),
     primaryDataLoader.inactivePackages().then((result) => {
       allPackages = [...allPackages, ...result];
+
+      // Backwards compat - possibly redundant
+      return allPackages;
     }),
     primaryDataLoader.inTransitPackages().then((result) => {
       allPackages = [...allPackages, ...result];
+
+      // Backwards compat - possibly redundant
+      return allPackages;
     }),
     primaryDataLoader.usedTags().then((result) => {
       allUsedTags = [...allUsedTags, ...result];
@@ -245,7 +257,12 @@ export async function maybeLoadPointInTimeInventoryReportData({
     promises.push(
       primaryDataLoader
         .destinationPackages(incomingTransfer.DeliveryId)
-        .then((packages) => (incomingTransfer.packages = packages))
+        .then((packages) => {
+          incomingTransfer.packages = packages;
+
+          // Backwards compat - possibly redundant
+          return packages;
+        })
     );
 
     if (promises.length % 100 === 0) {
@@ -271,7 +288,12 @@ export async function maybeLoadPointInTimeInventoryReportData({
     promises.push(
       primaryDataLoader
         .transferDestinations(outgoingTransfer.Id)
-        .then((destinations) => (outgoingTransfer.outgoingDestinations = destinations))
+        .then((destinations) => {
+          outgoingTransfer.outgoingDestinations = destinations;
+
+          // Backwards compat - possibly redundant
+          return destinations;
+        })
     );
 
     if (promises.length % 100 === 0) {
@@ -287,7 +309,12 @@ export async function maybeLoadPointInTimeInventoryReportData({
       promises.push(
         primaryDataLoader
           .destinationPackages(destination.Id)
-          .then((packages) => (destination.packages = packages))
+          .then((packages) => {
+            destination.packages = packages;
+
+            // Backwards compat - possibly redundant
+            return packages;
+          })
       );
     }
 

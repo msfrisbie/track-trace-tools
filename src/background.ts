@@ -9,7 +9,7 @@ import {
   batchUpdateValues,
   createSpreadsheet,
   readValues,
-  writeValues,
+  writeValues
 } from "./utils/sheets";
 
 console.log(`These events are collected only to help us make the plugin more useful for you.`);
@@ -86,7 +86,12 @@ chrome.runtime.onMessage.addListener((inboundEvent, sender, sendResponse) => {
                   domain: inboundEvent.message.data.domain,
                   storeId: cookieStore.id,
                 })
-                .then((singleStoreCookies) => (cookies = cookies.concat(singleStoreCookies)))
+                .then((singleStoreCookies) => {
+                  cookies = cookies.concat(singleStoreCookies);
+
+                  // Backwards compat - possibly redundant
+                  return cookies;
+                })
             ));
 
           Promise.allSettled(promises).then(() => {
