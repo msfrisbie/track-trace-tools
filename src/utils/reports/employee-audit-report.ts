@@ -191,8 +191,6 @@ export async function maybeLoadEmployeeAuditReportData({
       return true;
     });
 
-    // debugger; /* eslint-disable-line no-debugger */
-
     const employeeAuditMatrix: any[][] = [];
 
     const historyPromises: Promise<any>[] = [];
