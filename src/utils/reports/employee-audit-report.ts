@@ -191,14 +191,14 @@ export async function maybeLoadEmployeeAuditReportData({
       return true;
     });
 
-    console.log('post-filter', { transfers, packages });
+    // debugger; /* eslint-disable-line no-debugger */
 
     const employeeAuditMatrix: any[][] = [];
 
     const historyPromises: Promise<any>[] = [];
 
     ctx.commit(ReportsMutations.SET_STATUS, {
-      statusMessage: { text: `Loading history...`, level: "success" },
+      statusMessage: { text: `Loading history for ${packages.length} packages...`, level: "success" },
     });
 
     for (const pkg of packages) {
@@ -210,10 +210,17 @@ export async function maybeLoadEmployeeAuditReportData({
           })
       );
       if (historyPromises.length % 100 === 0) {
-        Promise.allSettled(historyPromises);
+        await Promise.allSettled(historyPromises);
+        ctx.commit(ReportsMutations.SET_STATUS, {
+          statusMessage: { text: `${historyPromises.length}/${packages.length} packages loaded...`, level: "success" }, prependMessage: false,
+        });
       }
     }
-    Promise.allSettled(historyPromises);
+    await Promise.allSettled(historyPromises);
+
+    ctx.commit(ReportsMutations.SET_STATUS, {
+      statusMessage: { text: `Loading history for ${transfers.length} transfers...`, level: "success" },
+    });
 
     for (const transfer of transfers) {
       historyPromises.push(
@@ -225,7 +232,10 @@ export async function maybeLoadEmployeeAuditReportData({
       );
 
       if (historyPromises.length % 100 === 0) {
-        Promise.allSettled(historyPromises);
+        await Promise.allSettled(historyPromises);
+        ctx.commit(ReportsMutations.SET_STATUS, {
+          statusMessage: { text: `${historyPromises.length - packages.length}/${transfers.length} transfers loaded...`, level: "success" }, prependMessage: false,
+        });
       }
     }
 
@@ -245,6 +255,7 @@ export async function maybeLoadEmployeeAuditReportData({
       for (const history of pkg.history!) {
         if (history.UserName.toLocaleLowerCase().includes(employeeMatcher)) {
           employeeAuditMatrix.push([
+            pkg.LicenseNumber,
             `${pkg.PackageState} Package`,
             pkg.Label,
             history.RecordedDateTime,
@@ -259,6 +270,7 @@ export async function maybeLoadEmployeeAuditReportData({
       for (const history of transfer.history!) {
         if (history.UserName.toLocaleLowerCase().includes(employeeMatcher)) {
           employeeAuditMatrix.push([
+            transfer.LicenseNumber,
             `${transfer.TransferState} Transfer`,
             transfer.ManifestNumber,
             history.RecordedDateTime,
@@ -270,7 +282,7 @@ export async function maybeLoadEmployeeAuditReportData({
     }
 
     // Sort by date
-    const sortIndex = 2;
+    const sortIndex = 3;
 
     employeeAuditMatrix.sort((a, b) => {
       const stringA = a[sortIndex].toLowerCase();
@@ -284,7 +296,7 @@ export async function maybeLoadEmployeeAuditReportData({
       return 0;
     });
 
-    employeeAuditMatrix.unshift(["Object Type", "Object ID", "Timestamp", "Employee", "Activity"]);
+    employeeAuditMatrix.unshift(["License", "Object Type", "Object ID", "Timestamp", "Employee", "Activity"]);
 
     reportData[ReportType.EMPLOYEE_AUDIT] = {
       employeeAuditMatrix,

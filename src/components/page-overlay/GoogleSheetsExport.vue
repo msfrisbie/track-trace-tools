@@ -1257,6 +1257,12 @@
             <div class="font-semibold text-white ttt-purple-bg p-2 -m-2">Employee Activity</div>
             <hr />
             <div class="flex flex-col items-stretch gap-4">
+              <div class="text-red-500 text-xs">
+                This report loads a significant amount of data from Metrc. For multi-license
+                operators with many packages or transfers, it's recommended you limit audit periods
+                to one month or less.
+              </div>
+
               <div class="font-semibold text-gray-700">Filters:</div>
 
               <div class="flex flex-col items-start gap-1">
