@@ -62,7 +62,7 @@ export const reportsModule = {
         status,
         statusMessage,
         prependMessage = true,
-      }: { status?: ReportStatus; statusMessage?: IStatusMessage; prependMessage?: boolean }
+      }: { status?: ReportStatus; statusMessage?: IStatusMessage; prependMessage?: boolean },
     ) {
       if (status) {
         state.status = status;
@@ -82,7 +82,7 @@ export const reportsModule = {
     },
     [ReportsMutations.SET_GENERATED_SPREADSHEET](
       state: IReportsState,
-      { spreadsheet }: { spreadsheet: ISpreadsheet | null }
+      { spreadsheet }: { spreadsheet: ISpreadsheet | null },
     ) {
       state.generatedSpreadsheet = spreadsheet;
 
@@ -109,7 +109,7 @@ export const reportsModule = {
     },
     [ReportsActions.RUN_AUX_REPORT_TASK]: async (
       ctx: ActionContext<IReportsState, IPluginState>,
-      { auxTask, reportConfig }: { auxTask: ReportAuxTask; reportConfig: IReportConfig }
+      { auxTask, reportConfig }: { auxTask: ReportAuxTask; reportConfig: IReportConfig },
     ) => {
       ctx.commit(ReportsMutations.SET_STATUS, { status: ReportStatus.INFLIGHT });
 
@@ -129,7 +129,7 @@ export const reportsModule = {
     },
     [ReportsActions.GENERATE_REPORT]: async (
       ctx: ActionContext<IReportsState, IPluginState>,
-      { reportConfig }: { reportConfig: IReportConfig }
+      { reportConfig }: { reportConfig: IReportConfig },
     ) => {
       analyticsManager.track(MessageType.GENERATED_SPREADSHEET, reportConfig);
 

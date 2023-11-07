@@ -8,7 +8,7 @@ import {
   PlantState,
   SEARCH_LOAD_PAGE_SIZE,
   TagState,
-  TransferState
+  TransferState,
 } from '@/consts';
 import {
   IAtomicService,
@@ -55,13 +55,13 @@ import {
   ITransferFilter,
   ITransferHistoryData,
   ITransferTransporterDetails,
-  ITransporterData
+  ITransporterData,
 } from '@/interfaces';
 import { authManager } from '@/modules/auth-manager.module';
 import { databaseInterface } from '@/modules/database-interface.module';
 import {
   MetrcRequestManager,
-  primaryMetrcRequestManager
+  primaryMetrcRequestManager,
 } from '@/modules/metrc-request-manager.module';
 import { mockDataManager } from '@/modules/mock-data-manager.module';
 import { MutationType } from '@/mutation-types';
@@ -91,7 +91,7 @@ export async function getDataLoaderByLicense(license: string) {
 }
 
 export async function getDataLoader(
-  spoofedAuthState: IAuthState | null = null
+  spoofedAuthState: IAuthState | null = null,
 ): Promise<DataLoader> {
   if (spoofedAuthState?.license && dataLoaderCache.has(spoofedAuthState.license)) {
     return dataLoaderCache.get(spoofedAuthState.license) as DataLoader;
@@ -262,7 +262,7 @@ export class DataLoader implements IAtomicService {
    */
 
   private async extractTotalOrNull(
-    responsePromise: Promise<AxiosResponse>
+    responsePromise: Promise<AxiosResponse>,
   ): Promise<number | null> {
     let total: number | null = null;
 
@@ -283,7 +283,7 @@ export class DataLoader implements IAtomicService {
 
   async availableTagCount(): Promise<number | null> {
     return this.extractTotalOrNull(
-      this.metrcRequestManagerOrError.getAvailableTags(this._countPayload)
+      this.metrcRequestManagerOrError.getAvailableTags(this._countPayload),
     );
   }
 
@@ -293,43 +293,43 @@ export class DataLoader implements IAtomicService {
 
   async voidedTagCount(): Promise<number | null> {
     return this.extractTotalOrNull(
-      this.metrcRequestManagerOrError.getVoidedTags(this._countPayload)
+      this.metrcRequestManagerOrError.getVoidedTags(this._countPayload),
     );
   }
 
   async activePackageCount(): Promise<number | null> {
     return this.extractTotalOrNull(
-      this.metrcRequestManagerOrError.getActivePackages(this._countPayload)
+      this.metrcRequestManagerOrError.getActivePackages(this._countPayload),
     );
   }
 
   async inactivePackageCount(): Promise<number | null> {
     return this.extractTotalOrNull(
-      this.metrcRequestManagerOrError.getInactivePackages(this._countPayload)
+      this.metrcRequestManagerOrError.getInactivePackages(this._countPayload),
     );
   }
 
   async intransitPackageCount(): Promise<number | null> {
     return this.extractTotalOrNull(
-      this.metrcRequestManagerOrError.getInTransitPackages(this._countPayload)
+      this.metrcRequestManagerOrError.getInTransitPackages(this._countPayload),
     );
   }
 
   async incomingTransferCount(): Promise<number | null> {
     return this.extractTotalOrNull(
-      this.metrcRequestManagerOrError.getIncomingTransfers(this._countPayload)
+      this.metrcRequestManagerOrError.getIncomingTransfers(this._countPayload),
     );
   }
 
   async outgoingTransferCount(): Promise<number | null> {
     return this.extractTotalOrNull(
-      this.metrcRequestManagerOrError.getOutgoingTransfers(this._countPayload)
+      this.metrcRequestManagerOrError.getOutgoingTransfers(this._countPayload),
     );
   }
 
   async rejectedTransferCount(): Promise<number | null> {
     return this.extractTotalOrNull(
-      this.metrcRequestManagerOrError.getRejectedTransfers(this._countPayload)
+      this.metrcRequestManagerOrError.getRejectedTransfers(this._countPayload),
     );
   }
 
@@ -339,7 +339,7 @@ export class DataLoader implements IAtomicService {
 
   async locationCount(): Promise<number | null> {
     return this.extractTotalOrNull(
-      this.metrcRequestManagerOrError.getLocations(this._countPayload)
+      this.metrcRequestManagerOrError.getLocations(this._countPayload),
     );
   }
 
@@ -349,55 +349,55 @@ export class DataLoader implements IAtomicService {
 
   async activePlantBatchCount(): Promise<number | null> {
     return this.extractTotalOrNull(
-      this.metrcRequestManagerOrError.getPlantBatches(this._countPayload)
+      this.metrcRequestManagerOrError.getPlantBatches(this._countPayload),
     );
   }
 
   async inactivePlantBatchCount(): Promise<number | null> {
     return this.extractTotalOrNull(
-      this.metrcRequestManagerOrError.getInactivePlantBatches(this._countPayload)
+      this.metrcRequestManagerOrError.getInactivePlantBatches(this._countPayload),
     );
   }
 
   async vegetativePlantCount(): Promise<number | null> {
     return this.extractTotalOrNull(
-      this.metrcRequestManagerOrError.getVegetativePlants(this._countPayload)
+      this.metrcRequestManagerOrError.getVegetativePlants(this._countPayload),
     );
   }
 
   async floweringPlantCount(): Promise<number | null> {
     return this.extractTotalOrNull(
-      this.metrcRequestManagerOrError.getFloweringPlants(this._countPayload)
+      this.metrcRequestManagerOrError.getFloweringPlants(this._countPayload),
     );
   }
 
   async inactivePlantCount(): Promise<number | null> {
     return this.extractTotalOrNull(
-      this.metrcRequestManagerOrError.getInactivePlants(this._countPayload)
+      this.metrcRequestManagerOrError.getInactivePlants(this._countPayload),
     );
   }
 
   async activeHarvestCount(): Promise<number | null> {
     return this.extractTotalOrNull(
-      this.metrcRequestManagerOrError.getActiveHarvests(this._countPayload)
+      this.metrcRequestManagerOrError.getActiveHarvests(this._countPayload),
     );
   }
 
   async inactiveHarvestCount(): Promise<number | null> {
     return this.extractTotalOrNull(
-      this.metrcRequestManagerOrError.getInactiveHarvests(this._countPayload)
+      this.metrcRequestManagerOrError.getInactiveHarvests(this._countPayload),
     );
   }
 
   async activeSalesCount(): Promise<number | null> {
     return this.extractTotalOrNull(
-      this.metrcRequestManagerOrError.getActiveSalesReceipts(this._countPayload)
+      this.metrcRequestManagerOrError.getActiveSalesReceipts(this._countPayload),
     );
   }
 
   async inactiveSalesCount(): Promise<number | null> {
     return this.extractTotalOrNull(
-      this.metrcRequestManagerOrError.getInactiveSalesReceipts(this._countPayload)
+      this.metrcRequestManagerOrError.getInactiveSalesReceipts(this._countPayload),
     );
   }
 
@@ -804,7 +804,7 @@ export class DataLoader implements IAtomicService {
 
   async inactivePlantBatch(name: string): Promise<IIndexedPlantBatchData> {
     const match = (await this.inactivePlantBatches()).find(
-      (plantBatch) => plantBatch.Name === name
+      (plantBatch) => plantBatch.Name === name,
     );
 
     if (match) {
@@ -858,7 +858,7 @@ export class DataLoader implements IAtomicService {
       },
       {
         packageFilter,
-      }
+      },
     );
 
     const activePackagesResponse = await primaryMetrcRequestManager.getActivePackages(body);
@@ -1057,7 +1057,7 @@ export class DataLoader implements IAtomicService {
           itemStrainName: queryString,
           itemName: queryString,
         },
-      }
+      },
     );
 
     const activePackagesResponse = await primaryMetrcRequestManager.getActivePackages(body);
@@ -1207,7 +1207,7 @@ export class DataLoader implements IAtomicService {
 
   async activePackages(
     ttlMs: number = 0,
-    hitNetworkOnCacheMiss: boolean = true
+    hitNetworkOnCacheMiss: boolean = true,
   ): Promise<IIndexedPackageData[]> {
     const keyType = StorageKeyType.ACTIVE_PACKAGES;
 
@@ -1289,7 +1289,7 @@ export class DataLoader implements IAtomicService {
 
   async inactivePackages(
     ttlMs: number = 0,
-    hitNetworkOnCacheMiss: boolean = true
+    hitNetworkOnCacheMiss: boolean = true,
   ): Promise<IIndexedPackageData[]> {
     const keyType = StorageKeyType.INACTIVE_PACKAGES;
 
@@ -1319,7 +1319,7 @@ export class DataLoader implements IAtomicService {
             PackageState: PackageState.INACTIVE,
             TagMatcher: '',
             LicenseNumber: this._authState!.license,
-          })
+          }),
         );
 
         resolve(inactivePackages);
@@ -1346,7 +1346,7 @@ export class DataLoader implements IAtomicService {
 
       try {
         const destinationTransporters: ITransporterData[] = await this.loadDestinationTransporters(
-          destinationId
+          destinationId,
         );
 
         subscription.unsubscribe();
@@ -1365,7 +1365,7 @@ export class DataLoader implements IAtomicService {
 
       try {
         const transferDestinations: IDestinationData[] = await this.loadTransferDestinations(
-          transferId
+          transferId,
         );
 
         subscription.unsubscribe();
@@ -1458,7 +1458,7 @@ export class DataLoader implements IAtomicService {
             PackageState: PackageState.ON_HOLD,
             TagMatcher: '',
             LicenseNumber: this._authState!.license,
-          })
+          }),
         );
 
         subscription.unsubscribe();
@@ -1487,7 +1487,7 @@ export class DataLoader implements IAtomicService {
               PackageState: PackageState.IN_TRANSIT,
               TagMatcher: '',
               LicenseNumber: this._authState!.license,
-            })
+            }),
           );
 
           // databaseInterface.indexPackages(inTransitPackages, PackageState.IN_TRANSIT);
@@ -1507,7 +1507,7 @@ export class DataLoader implements IAtomicService {
 
   async inTransitPackage(
     label: string,
-    options: { useCache?: boolean } = {}
+    options: { useCache?: boolean } = {},
   ): Promise<IIndexedPackageData> {
     if (options.useCache) {
       if (!this._inTransitPackages) {
@@ -1936,7 +1936,7 @@ export class DataLoader implements IAtomicService {
               TransferState: TransferState.LAYOVER,
               TagMatcher: '',
               LicenseNumber: this._authState!.license,
-            })
+            }),
           );
 
           subscription.unsubscribe();
@@ -2151,7 +2151,7 @@ export class DataLoader implements IAtomicService {
               HarvestState: HarvestState.ACTIVE,
               TagMatcher: '',
               LicenseNumber: this._authState!.license,
-            })
+            }),
           );
 
           subscription.unsubscribe();
@@ -2184,7 +2184,7 @@ export class DataLoader implements IAtomicService {
               HarvestState: HarvestState.INACTIVE,
               TagMatcher: '',
               LicenseNumber: this._authState!.license,
-            })
+            }),
           );
 
           subscription.unsubscribe();
@@ -2215,7 +2215,7 @@ export class DataLoader implements IAtomicService {
           subscription.unsubscribe();
           reject(e);
         }
-      }
+      },
     );
 
     return activeSalesReceipts;
@@ -2311,7 +2311,7 @@ export class DataLoader implements IAtomicService {
 
   destinationTransportersStream(
     dataLoadOptions: IDataLoadOptions = {},
-    destinationId: number
+    destinationId: number,
   ): Subject<ICollectionResponse<ITransporterData>> {
     const responseFactory = (paginationOptions: IPaginationOptions): Promise<AxiosResponse> => {
       const body = buildBody(paginationOptions);
@@ -2324,7 +2324,7 @@ export class DataLoader implements IAtomicService {
 
   transferDestinationStream(
     dataLoadOptions: IDataLoadOptions = {},
-    transferId: number
+    transferId: number,
   ): Subject<ICollectionResponse<IDestinationData>> {
     const responseFactory = (paginationOptions: IPaginationOptions): Promise<AxiosResponse> => {
       const body = buildBody(paginationOptions);
@@ -2337,7 +2337,7 @@ export class DataLoader implements IAtomicService {
 
   transferTransporterDetailsStream(
     dataLoadOptions: IDataLoadOptions = {},
-    transferId: number
+    transferId: number,
   ): Subject<ICollectionResponse<ITransferTransporterDetails>> {
     const responseFactory = (paginationOptions: IPaginationOptions): Promise<AxiosResponse> => {
       const body = buildBody(paginationOptions);
@@ -2350,7 +2350,7 @@ export class DataLoader implements IAtomicService {
 
   destinationPackagesStream(
     dataLoadOptions: IDataLoadOptions = {},
-    destinationId: number
+    destinationId: number,
   ): Subject<ICollectionResponse<IDestinationPackageData>> {
     const responseFactory = (paginationOptions: IPaginationOptions): Promise<AxiosResponse> => {
       const body = buildBody(paginationOptions);
@@ -2372,7 +2372,7 @@ export class DataLoader implements IAtomicService {
   }
 
   inactivePackagesStream(
-    options: IPackageOptions = {}
+    options: IPackageOptions = {},
   ): Subject<ICollectionResponse<IPackageData>> {
     const responseFactory = (paginationOptions: IPaginationOptions): Promise<AxiosResponse> => {
       const body = buildBody(paginationOptions);
@@ -2394,7 +2394,7 @@ export class DataLoader implements IAtomicService {
   }
 
   inTransitPackagesStream(
-    options: IPackageOptions = {}
+    options: IPackageOptions = {},
   ): Subject<ICollectionResponse<IPackageData>> {
     const responseFactory = (paginationOptions: IPaginationOptions): Promise<AxiosResponse> => {
       const body = buildBody(paginationOptions);
@@ -2410,7 +2410,7 @@ export class DataLoader implements IAtomicService {
       const body = buildBody(
         paginationOptions,
         { plantFilter: options.filter },
-        { plantSort: { Label: 'asc' } }
+        { plantSort: { Label: 'asc' } },
       );
 
       return this.metrcRequestManagerOrError.getVegetativePlants(body);
@@ -2424,7 +2424,7 @@ export class DataLoader implements IAtomicService {
       const body = buildBody(
         paginationOptions,
         { plantFilter: options.filter },
-        { plantSort: { Label: 'asc' } }
+        { plantSort: { Label: 'asc' } },
       );
 
       return this.metrcRequestManagerOrError.getFloweringPlants(body);
@@ -2438,7 +2438,7 @@ export class DataLoader implements IAtomicService {
       const body = buildBody(
         paginationOptions,
         { plantFilter: options.filter },
-        { plantSort: { Label: 'asc' } }
+        { plantSort: { Label: 'asc' } },
       );
 
       return this.metrcRequestManagerOrError.getInactivePlants(body);
@@ -2448,7 +2448,7 @@ export class DataLoader implements IAtomicService {
   }
 
   activeHarvestsStream(
-    dataLoadOptions: IDataLoadOptions = {}
+    dataLoadOptions: IDataLoadOptions = {},
   ): Subject<ICollectionResponse<IHarvestData>> {
     const responseFactory = (paginationOptions: IPaginationOptions): Promise<AxiosResponse> => {
       const body = buildBody(paginationOptions);
@@ -2460,7 +2460,7 @@ export class DataLoader implements IAtomicService {
   }
 
   inactiveHarvestsStream(
-    dataLoadOptions: IDataLoadOptions = {}
+    dataLoadOptions: IDataLoadOptions = {},
   ): Subject<ICollectionResponse<IHarvestData>> {
     const responseFactory = (paginationOptions: IPaginationOptions): Promise<AxiosResponse> => {
       const body = buildBody(paginationOptions);
@@ -2472,7 +2472,7 @@ export class DataLoader implements IAtomicService {
   }
 
   incomingTransfersStream(
-    dataLoadOptions: IDataLoadOptions = {}
+    dataLoadOptions: IDataLoadOptions = {},
   ): Subject<ICollectionResponse<ITransferData>> {
     const responseFactory = (paginationOptions: IPaginationOptions): Promise<AxiosResponse> => {
       const body = buildBody(paginationOptions);
@@ -2484,7 +2484,7 @@ export class DataLoader implements IAtomicService {
   }
 
   incomingInactiveTransfersStream(
-    dataLoadOptions: IDataLoadOptions = {}
+    dataLoadOptions: IDataLoadOptions = {},
   ): Subject<ICollectionResponse<ITransferData>> {
     const responseFactory = (paginationOptions: IPaginationOptions): Promise<AxiosResponse> => {
       const body = buildBody(paginationOptions);
@@ -2496,7 +2496,7 @@ export class DataLoader implements IAtomicService {
   }
 
   outgoingTransfersStream(
-    dataLoadOptions: IDataLoadOptions = {}
+    dataLoadOptions: IDataLoadOptions = {},
   ): Subject<ICollectionResponse<ITransferData>> {
     const responseFactory = (paginationOptions: IPaginationOptions): Promise<AxiosResponse> => {
       const body = buildBody(paginationOptions);
@@ -2508,7 +2508,7 @@ export class DataLoader implements IAtomicService {
   }
 
   outgoingInactiveTransfersStream(
-    dataLoadOptions: IDataLoadOptions = {}
+    dataLoadOptions: IDataLoadOptions = {},
   ): Subject<ICollectionResponse<ITransferData>> {
     const responseFactory = (paginationOptions: IPaginationOptions): Promise<AxiosResponse> => {
       const body = buildBody(paginationOptions);
@@ -2520,7 +2520,7 @@ export class DataLoader implements IAtomicService {
   }
 
   rejectedTransfersStream(
-    dataLoadOptions: IDataLoadOptions = {}
+    dataLoadOptions: IDataLoadOptions = {},
   ): Subject<ICollectionResponse<ITransferData>> {
     const responseFactory = (paginationOptions: IPaginationOptions): Promise<AxiosResponse> => {
       const body = buildBody(paginationOptions);
@@ -2532,7 +2532,7 @@ export class DataLoader implements IAtomicService {
   }
 
   layoverTransfersStream(
-    dataLoadOptions: IDataLoadOptions = {}
+    dataLoadOptions: IDataLoadOptions = {},
   ): Subject<ICollectionResponse<ITransferData>> {
     const responseFactory = (paginationOptions: IPaginationOptions): Promise<AxiosResponse> => {
       const body = buildBody(paginationOptions);
@@ -2544,7 +2544,7 @@ export class DataLoader implements IAtomicService {
   }
 
   employeesStream(
-    dataLoadOptions: IDataLoadOptions = {}
+    dataLoadOptions: IDataLoadOptions = {},
   ): Subject<ICollectionResponse<IMetrcEmployeeData>> {
     const responseFactory = (paginationOptions: IPaginationOptions): Promise<AxiosResponse> => {
       const body = buildBody(paginationOptions);
@@ -2556,7 +2556,7 @@ export class DataLoader implements IAtomicService {
   }
 
   availableTagsStream(
-    dataLoadOptions: IDataLoadOptions = {}
+    dataLoadOptions: IDataLoadOptions = {},
   ): Subject<ICollectionResponse<ITagData>> {
     const responseFactory = (paginationOptions: IPaginationOptions): Promise<AxiosResponse> => {
       const body = buildBody(paginationOptions);
@@ -2592,7 +2592,7 @@ export class DataLoader implements IAtomicService {
       const body = buildBody(
         paginationOptions,
         { plantBatchFilter: options.filter },
-        { plantBatchSort: { Name: 'asc' } }
+        { plantBatchSort: { Name: 'asc' } },
       );
 
       return this.metrcRequestManagerOrError.getPlantBatches(body);
@@ -2602,13 +2602,13 @@ export class DataLoader implements IAtomicService {
   }
 
   inactivePlantBatchesStream(
-    options: IPlantBatchOptions
+    options: IPlantBatchOptions,
   ): Subject<ICollectionResponse<IPlantBatchData>> {
     const responseFactory = (paginationOptions: IPaginationOptions): Promise<AxiosResponse> => {
       const body = buildBody(
         paginationOptions,
         { plantBatchFilter: options.filter },
-        { plantBatchSort: { Name: 'asc' } }
+        { plantBatchSort: { Name: 'asc' } },
       );
 
       return this.metrcRequestManagerOrError.getInactivePlantBatches(body);
@@ -2618,7 +2618,7 @@ export class DataLoader implements IAtomicService {
   }
 
   activeSalesReceiptsStream(
-    dataLoadOptions: IDataLoadOptions = { pageSize: DATA_LOAD_PAGE_SIZE }
+    dataLoadOptions: IDataLoadOptions = { pageSize: DATA_LOAD_PAGE_SIZE },
   ): Subject<ICollectionResponse<ISalesReceiptData>> {
     const responseFactory = (paginationOptions: IPaginationOptions): Promise<AxiosResponse> => {
       const body = buildBody(paginationOptions, null, {
@@ -2647,7 +2647,7 @@ export class DataLoader implements IAtomicService {
     await this.destinationTransportersStream({}, destinationId).forEach(
       (next: ICollectionResponse<ITransporterData>) => {
         destinationTransporters = [...destinationTransporters, ...next.Data];
-      }
+      },
     );
 
     console.log(`Loaded ${destinationTransporters.length} destinationTransporters`);
@@ -2667,7 +2667,7 @@ export class DataLoader implements IAtomicService {
     await this.transferDestinationStream({}, transferId).forEach(
       (next: ICollectionResponse<IDestinationData>) => {
         transferDestinations = [...transferDestinations, ...next.Data];
-      }
+      },
     );
 
     console.log(`Loaded ${transferDestinations.length} transferDestinations`);
@@ -2678,7 +2678,7 @@ export class DataLoader implements IAtomicService {
   }
 
   private async loadTransferTransporterDetails(
-    transferId: number
+    transferId: number,
   ): Promise<ITransferTransporterDetails[]> {
     await authManager.authStateOrError();
 
@@ -2689,7 +2689,7 @@ export class DataLoader implements IAtomicService {
     await this.transferTransporterDetailsStream({}, transferId).forEach(
       (next: ICollectionResponse<ITransferTransporterDetails>) => {
         transferDestinations = [...transferDestinations, ...next.Data];
-      }
+      },
     );
 
     console.log(`Loaded ${transferDestinations.length} transfer transporter details`);
@@ -2709,7 +2709,7 @@ export class DataLoader implements IAtomicService {
     await this.destinationPackagesStream({}, destinationId).forEach(
       (next: ICollectionResponse<IDestinationPackageData>) => {
         destinationPackages = [...destinationPackages, ...next.Data];
-      }
+      },
     );
 
     console.log(`Loaded ${destinationPackages.length} destinationPackages`);
@@ -2746,7 +2746,7 @@ export class DataLoader implements IAtomicService {
       if (responseData.Data.length === 0) {
         throw new DataLoadError(
           DataLoadErrorType.ZERO_RESULTS,
-          `Metrc indicated ${manifestNumber} is not available`
+          `Metrc indicated ${manifestNumber} is not available`,
         );
       } else {
         throw new Error('Returned multiple transfers');
@@ -2783,7 +2783,7 @@ export class DataLoader implements IAtomicService {
       if (responseData.Data.length === 0) {
         throw new DataLoadError(
           DataLoadErrorType.ZERO_RESULTS,
-          `Metrc indicated ${manifestNumber} is not available`
+          `Metrc indicated ${manifestNumber} is not available`,
         );
       } else {
         throw new Error('Returned multiple transfers');
@@ -2820,7 +2820,7 @@ export class DataLoader implements IAtomicService {
       if (responseData.Data.length === 0) {
         throw new DataLoadError(
           DataLoadErrorType.ZERO_RESULTS,
-          `Metrc indicated ${manifestNumber} is not available`
+          `Metrc indicated ${manifestNumber} is not available`,
         );
       } else {
         throw new Error('Returned multiple transfers');
@@ -2857,7 +2857,7 @@ export class DataLoader implements IAtomicService {
       if (responseData.Data.length === 0) {
         throw new DataLoadError(
           DataLoadErrorType.ZERO_RESULTS,
-          `Metrc indicated ${manifestNumber} is not available`
+          `Metrc indicated ${manifestNumber} is not available`,
         );
       } else {
         throw new Error('Returned multiple transfers');
@@ -2895,7 +2895,7 @@ export class DataLoader implements IAtomicService {
       if (responseData.Data.length === 0) {
         throw new DataLoadError(
           DataLoadErrorType.ZERO_RESULTS,
-          `Metrc indicated ${manifestNumber} is not available`
+          `Metrc indicated ${manifestNumber} is not available`,
         );
       } else {
         throw new Error('Returned multiple transfers');
@@ -2931,7 +2931,7 @@ export class DataLoader implements IAtomicService {
       if (responseData.Data.length === 0) {
         throw new DataLoadError(
           DataLoadErrorType.ZERO_RESULTS,
-          `Metrc indicated ${manifestNumber} is not available`
+          `Metrc indicated ${manifestNumber} is not available`,
         );
       } else {
         throw new Error('Returned multiple transfers');
@@ -2999,7 +2999,7 @@ export class DataLoader implements IAtomicService {
       if (responseData.Data.length === 0) {
         throw new DataLoadError(
           DataLoadErrorType.ZERO_RESULTS,
-          `Metrc indicated ${harvestName} is not available`
+          `Metrc indicated ${harvestName} is not available`,
         );
       } else {
         throw new Error('Returned multiple harvests');
@@ -3035,7 +3035,7 @@ export class DataLoader implements IAtomicService {
       if (responseData.Data.length === 0) {
         throw new DataLoadError(
           DataLoadErrorType.ZERO_RESULTS,
-          `Metrc indicated ${harvestName} is not available`
+          `Metrc indicated ${harvestName} is not available`,
         );
       } else {
         throw new Error('Returned multiple harvests');
@@ -3073,7 +3073,7 @@ export class DataLoader implements IAtomicService {
       if (responseData.Data.length === 0) {
         throw new DataLoadError(
           DataLoadErrorType.ZERO_RESULTS,
-          `Metrc indicated ${label} is not available`
+          `Metrc indicated ${label} is not available`,
         );
       } else {
         throw new Error('Returned multiple packages');
@@ -3129,7 +3129,7 @@ export class DataLoader implements IAtomicService {
       if (responseData.Data.length === 0) {
         throw new DataLoadError(
           DataLoadErrorType.ZERO_RESULTS,
-          `Metrc indicated ${label} is not available`
+          `Metrc indicated ${label} is not available`,
         );
       } else {
         throw new Error('Returned multiple packages');
@@ -3187,7 +3187,7 @@ export class DataLoader implements IAtomicService {
       if (responseData.Data.length === 0) {
         throw new DataLoadError(
           DataLoadErrorType.ZERO_RESULTS,
-          `Metrc indicated ${label} is not available`
+          `Metrc indicated ${label} is not available`,
         );
       } else {
         throw new Error('Returned multiple packages');
@@ -3261,7 +3261,7 @@ export class DataLoader implements IAtomicService {
     await this.incomingInactiveTransfersStream().forEach(
       (next: ICollectionResponse<ITransferData>) => {
         incomingInactiveTransfers = [...incomingInactiveTransfers, ...next.Data];
-      }
+      },
     );
 
     console.log(`Loaded ${incomingInactiveTransfers.length} incomingInactiveTransfers`);
@@ -3299,7 +3299,7 @@ export class DataLoader implements IAtomicService {
     await this.outgoingInactiveTransfersStream().forEach(
       (next: ICollectionResponse<ITransferData>) => {
         outgoingTransfers = [...outgoingTransfers, ...next.Data];
-      }
+      },
     );
 
     console.log(`Loaded ${outgoingTransfers.length} outgoingInactiveTransfers`);
@@ -3485,7 +3485,7 @@ export class DataLoader implements IAtomicService {
       if (responseData.Data.length === 0) {
         throw new DataLoadError(
           DataLoadErrorType.ZERO_RESULTS,
-          `Metrc indicated ${label} is not available`
+          `Metrc indicated ${label} is not available`,
         );
       } else {
         throw new Error('Returned multiple plants');
@@ -3539,7 +3539,7 @@ export class DataLoader implements IAtomicService {
       if (responseData.Data.length === 0) {
         throw new DataLoadError(
           DataLoadErrorType.ZERO_RESULTS,
-          `Metrc indicated ${label} is not available`
+          `Metrc indicated ${label} is not available`,
         );
       } else {
         throw new Error('Returned multiple plants');
@@ -3593,7 +3593,7 @@ export class DataLoader implements IAtomicService {
       if (responseData.Data.length === 0) {
         throw new DataLoadError(
           DataLoadErrorType.ZERO_RESULTS,
-          `Metrc indicated ${label} is not available`
+          `Metrc indicated ${label} is not available`,
         );
       } else {
         throw new Error('Returned multiple plants');
@@ -3662,7 +3662,7 @@ export class DataLoader implements IAtomicService {
       if (responseData.Data.length === 0) {
         throw new DataLoadError(
           DataLoadErrorType.ZERO_RESULTS,
-          `Metrc indicated ${name} is not available`
+          `Metrc indicated ${name} is not available`,
         );
       } else {
         throw new Error('Returned multiple plant batches');
@@ -3682,7 +3682,7 @@ export class DataLoader implements IAtomicService {
     await this.inactivePlantBatchesStream(options).forEach(
       (next: ICollectionResponse<IPlantBatchData>) => {
         plantBatches = [...plantBatches, ...next.Data];
-      }
+      },
     );
 
     console.log(`Loaded ${plantBatches.length} inactive plant batches`);
@@ -3715,7 +3715,7 @@ export class DataLoader implements IAtomicService {
       if (responseData.Data.length === 0) {
         throw new DataLoadError(
           DataLoadErrorType.ZERO_RESULTS,
-          `Metrc indicated ${name} is not available`
+          `Metrc indicated ${name} is not available`,
         );
       } else {
         throw new Error('Returned multiple plant batches');
@@ -3741,7 +3741,7 @@ export class DataLoader implements IAtomicService {
 
           // Backwards compat - possibly redundant
           return salesReceipts;
-        })
+        }),
       )
       .toPromise();
 
@@ -3779,7 +3779,7 @@ export class DataLoader implements IAtomicService {
       if (responseData.Data.length === 0) {
         throw new DataLoadError(
           DataLoadErrorType.ZERO_RESULTS,
-          `Metrc indicated ${label} is not available`
+          `Metrc indicated ${label} is not available`,
         );
       } else {
         throw new Error('Returned multiple tags');
@@ -3790,7 +3790,7 @@ export class DataLoader implements IAtomicService {
   }
 
   private async loadEmployees(
-    dataLoadOptions: IDataLoadOptions = {}
+    dataLoadOptions: IDataLoadOptions = {},
   ): Promise<IMetrcEmployeeData[]> {
     await authManager.authStateOrError();
 
@@ -3801,7 +3801,7 @@ export class DataLoader implements IAtomicService {
     await this.employeesStream(dataLoadOptions).forEach(
       (next: ICollectionResponse<IMetrcEmployeeData>) => {
         employees = [...employees, ...next.Data];
-      }
+      },
     );
 
     console.log(`Loaded ${employees.length} employees`);
@@ -3821,7 +3821,7 @@ export class DataLoader implements IAtomicService {
     await this.availableTagsStream(dataLoadOptions).forEach(
       (next: ICollectionResponse<ITagData>) => {
         availableTags = [...availableTags, ...next.Data];
-      }
+      },
     );
 
     console.log(`Loaded ${availableTags.length} availableTags`);
@@ -3873,7 +3873,7 @@ export class DataLoader implements IAtomicService {
 
     const response = await this.metrcRequestManagerOrError.getPackageHarvestHistory(
       body,
-      packageId
+      packageId,
     );
 
     if (response.status !== 200) {
@@ -3931,7 +3931,7 @@ export class DataLoader implements IAtomicService {
   }
 
   async transferHistoryByOutGoingTransferId(
-    manifestNumber: number
+    manifestNumber: number,
   ): Promise<ITransferHistoryData[]> {
     const page = 0;
     const body = buildBody({ page, pageSize: DATA_LOAD_PAGE_SIZE });

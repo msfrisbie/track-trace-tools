@@ -52,43 +52,43 @@ export const packageHistoryModule = {
   mutations: {
     [PackageHistoryMutations.SET_SOURCE_PACKAGE](
       state: IPackageHistoryState,
-      { pkg }: { pkg: IPackageData | null }
+      { pkg }: { pkg: IPackageData | null },
     ) {
       state.sourcePackage = pkg;
     },
     [PackageHistoryMutations.SET_MAX_PARENT_LOOKUP_DEPTH](
       state: IPackageHistoryState,
-      { maxParentLookupDepth }: { maxParentLookupDepth: number | null }
+      { maxParentLookupDepth }: { maxParentLookupDepth: number | null },
     ) {
       state.maxParentLookupDepth = maxParentLookupDepth;
     },
     [PackageHistoryMutations.SET_MAX_CHILD_LOOKUP_DEPTH](
       state: IPackageHistoryState,
-      { maxChildLookupDepth }: { maxChildLookupDepth: number | null }
+      { maxChildLookupDepth }: { maxChildLookupDepth: number | null },
     ) {
       state.maxChildLookupDepth = maxChildLookupDepth;
     },
     [PackageHistoryMutations.SET_MAX_PARENT_VISIBLE_DEPTH](
       state: IPackageHistoryState,
-      { maxParentVisibleDepth }: { maxParentVisibleDepth: number }
+      { maxParentVisibleDepth }: { maxParentVisibleDepth: number },
     ) {
       state.maxParentVisibleDepth = maxParentVisibleDepth;
     },
     [PackageHistoryMutations.SET_MAX_CHILD_VISIBLE_DEPTH](
       state: IPackageHistoryState,
-      { maxChildVisibleDepth }: { maxChildVisibleDepth: number }
+      { maxChildVisibleDepth }: { maxChildVisibleDepth: number },
     ) {
       state.maxChildVisibleDepth = maxChildVisibleDepth;
     },
     [PackageHistoryMutations.SET_PARENT_ZOOM](
       state: IPackageHistoryState,
-      { parentZoom }: { parentZoom: number }
+      { parentZoom }: { parentZoom: number },
     ) {
       state.parentZoom = parentZoom;
     },
     [PackageHistoryMutations.SET_CHILD_ZOOM](
       state: IPackageHistoryState,
-      { childZoom }: { childZoom: number }
+      { childZoom }: { childZoom: number },
     ) {
       state.childZoom = childZoom;
     },
@@ -102,7 +102,7 @@ export const packageHistoryModule = {
         sourceHarvests,
       }: {
         sourceHarvests: IPackageSourceHarvestData[];
-      }
+      },
     ) {
       state.sourceHarvests = sourceHarvests;
     },
@@ -112,7 +112,7 @@ export const packageHistoryModule = {
         ancestorTree,
       }: {
         ancestorTree: IPackageAncestorTreeNode;
-      }
+      },
     ) {
       state.ancestorTree = ancestorTree;
     },
@@ -122,7 +122,7 @@ export const packageHistoryModule = {
         childTree,
       }: {
         childTree: IPackageChildTreeNode;
-      }
+      },
     ) {
       state.childTree = childTree;
     },
@@ -132,13 +132,13 @@ export const packageHistoryModule = {
         showUnownedPackages,
       }: {
         showUnownedPackages: boolean;
-      }
+      },
     ) {
       state.showUnownedPackages = showUnownedPackages;
     },
     [PackageHistoryMutations.SET_STATUS](
       state: IPackageHistoryState,
-      { status }: { status: PackageHistoryStatus }
+      { status }: { status: PackageHistoryStatus },
     ) {
       state.status = status;
       if (status === PackageHistoryStatus.INITIAL) {
@@ -154,7 +154,7 @@ export const packageHistoryModule = {
       state: IPackageHistoryState,
       getters: any,
       rootState: any,
-      rootGetters: any
+      rootGetters: any,
     ): IPackageAncestorTreeNode[] => {
       if (!state.ancestorTree) {
         return [];
@@ -184,7 +184,7 @@ export const packageHistoryModule = {
       state: IPackageHistoryState,
       getters: any,
       rootState: any,
-      rootGetters: any
+      rootGetters: any,
     ): IPackageAncestorTreeNode[][] => {
       const generations: IPackageAncestorTreeNode[][] = [];
 
@@ -220,7 +220,7 @@ export const packageHistoryModule = {
       state: IPackageHistoryState,
       getters: any,
       rootState: any,
-      rootGetters: any
+      rootGetters: any,
     ): IPackageChildTreeNode[] => {
       if (!state.childTree) {
         return [];
@@ -250,7 +250,7 @@ export const packageHistoryModule = {
       state: IPackageHistoryState,
       getters: any,
       rootState: any,
-      rootGetters: any
+      rootGetters: any,
     ): IPackageChildTreeNode[][] => {
       const generations: IPackageChildTreeNode[][] = [];
 
@@ -286,7 +286,7 @@ export const packageHistoryModule = {
   actions: {
     [PackageHistoryActions.SET_SOURCE_PACKAGE]: async (
       ctx: ActionContext<IPackageHistoryState, IPluginState>,
-      { pkg }: { pkg: IIndexedPackageData | null }
+      { pkg }: { pkg: IIndexedPackageData | null },
     ) => {
       analyticsManager.track(MessageType.GENERATE_PACKAGE_HISTORY, { pkg });
 
@@ -365,7 +365,7 @@ export const packageHistoryModule = {
     },
     [PackageHistoryActions.SET_MAX_PARENT_LOOKUP_DEPTH]: async (
       ctx: ActionContext<IPackageHistoryState, IPluginState>,
-      { maxParentLookupDepth }: { maxParentLookupDepth: number | null }
+      { maxParentLookupDepth }: { maxParentLookupDepth: number | null },
     ) => {
       ctx.commit(PackageHistoryMutations.SET_MAX_PARENT_LOOKUP_DEPTH, { maxParentLookupDepth });
       if (typeof maxParentLookupDepth === 'number') {
@@ -376,7 +376,7 @@ export const packageHistoryModule = {
     },
     [PackageHistoryActions.SET_MAX_CHILD_LOOKUP_DEPTH]: async (
       ctx: ActionContext<IPackageHistoryState, IPluginState>,
-      { maxChildLookupDepth }: { maxChildLookupDepth: number | null }
+      { maxChildLookupDepth }: { maxChildLookupDepth: number | null },
     ) => {
       ctx.commit(PackageHistoryMutations.SET_MAX_CHILD_LOOKUP_DEPTH, { maxChildLookupDepth });
       if (typeof maxChildLookupDepth === 'number') {
@@ -388,43 +388,43 @@ export const packageHistoryModule = {
 
     [PackageHistoryActions.SET_MAX_PARENT_VISIBLE_DEPTH]: async (
       ctx: ActionContext<IPackageHistoryState, IPluginState>,
-      { maxParentVisibleDepth }: { maxParentVisibleDepth: number }
+      { maxParentVisibleDepth }: { maxParentVisibleDepth: number },
     ) => {
       ctx.commit(PackageHistoryMutations.SET_MAX_PARENT_VISIBLE_DEPTH, { maxParentVisibleDepth });
     },
     [PackageHistoryActions.SET_MAX_CHILD_VISIBLE_DEPTH]: async (
       ctx: ActionContext<IPackageHistoryState, IPluginState>,
-      { maxChildVisibleDepth }: { maxChildVisibleDepth: number }
+      { maxChildVisibleDepth }: { maxChildVisibleDepth: number },
     ) => {
       ctx.commit(PackageHistoryMutations.SET_MAX_CHILD_VISIBLE_DEPTH, { maxChildVisibleDepth });
     },
     [PackageHistoryActions.SET_PARENT_ZOOM]: async (
       ctx: ActionContext<IPackageHistoryState, IPluginState>,
-      { parentZoom }: { parentZoom: number }
+      { parentZoom }: { parentZoom: number },
     ) => {
       ctx.commit(PackageHistoryMutations.SET_PARENT_ZOOM, { parentZoom });
     },
     [PackageHistoryActions.SET_CHILD_ZOOM]: async (
       ctx: ActionContext<IPackageHistoryState, IPluginState>,
-      { childZoom }: { childZoom: number }
+      { childZoom }: { childZoom: number },
     ) => {
       ctx.commit(PackageHistoryMutations.SET_CHILD_ZOOM, { childZoom });
     },
     [PackageHistoryActions.SET_SHOW_UNOWNED_PACKAGES]: async (
       ctx: ActionContext<IPackageHistoryState, IPluginState>,
-      { showUnownedPackages }: { showUnownedPackages: boolean }
+      { showUnownedPackages }: { showUnownedPackages: boolean },
     ) => {
       ctx.commit(PackageHistoryMutations.SET_SHOW_UNOWNED_PACKAGES, { showUnownedPackages });
     },
     [PackageHistoryActions.LOG_EVENT]: async (
       ctx: ActionContext<IPackageHistoryState, IPluginState>,
-      { event }: { event: string }
+      { event }: { event: string },
     ) => {
       ctx.commit(PackageHistoryMutations.LOG_EVENT, { event });
     },
     [PackageHistoryActions.HALT]: async (
       ctx: ActionContext<IPackageHistoryState, IPluginState>,
-      {}
+      {},
     ) => {
       ctx.commit(PackageHistoryMutations.SET_STATUS, {
         status: PackageHistoryStatus.HALTED,

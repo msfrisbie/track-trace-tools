@@ -48,7 +48,7 @@ export function normalizeToGrams(quantity: number, unitOfMeasureName: UnitOfMeas
 }
 
 export function unitOfMeasureNameToAbbreviation(
-  unitOfMeasureName: UnitOfMeasureName
+  unitOfMeasureName: UnitOfMeasureName,
 ): UnitOfMeasureAbbreviation {
   switch (unitOfMeasureName) {
     case 'Grams':
@@ -72,7 +72,7 @@ export function unitOfMeasureNameToAbbreviation(
   }
 }
 export function unitOfMeasureAbbreviationToName(
-  unitOfMeasureAbbreviation: UnitOfMeasureAbbreviation
+  unitOfMeasureAbbreviation: UnitOfMeasureAbbreviation,
 ): UnitOfMeasureName {
   switch (unitOfMeasureAbbreviation) {
     case 'g':
@@ -96,7 +96,7 @@ export function unitOfMeasureAbbreviationToName(
 export function convertUnits(
   quantity: number,
   fromUnitOfMeasure: IUnitOfMeasure,
-  toUnitOfMeasure: IUnitOfMeasure
+  toUnitOfMeasure: IUnitOfMeasure,
 ): number {
   return quantity * fromUnitOfMeasure.ToBaseFactor * toUnitOfMeasure.FromBaseFactor;
 }

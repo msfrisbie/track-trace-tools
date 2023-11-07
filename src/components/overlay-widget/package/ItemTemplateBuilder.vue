@@ -186,7 +186,7 @@ export default Vue.extend({
       this.$data.duplicateItems = [];
       this.$data.duplicateItems = this.$data.items.filter((item: IItemData) =>
         this.$data.preExistingItems.some(
-          (preExistingItem: IItemData) => preExistingItem.Name === item.Name
+          (preExistingItem: IItemData) => preExistingItem.Name === item.Name,
         ));
     },
     removeDuplicateItems() {
@@ -196,8 +196,8 @@ export default Vue.extend({
         this.$data.items = this.$data.items.filter(
           (item: IItemData) =>
             !this.$data.duplicateItems.some(
-              (duplicateItem: IItemData) => duplicateItem.Name === item.Name
-            )
+              (duplicateItem: IItemData) => duplicateItem.Name === item.Name,
+            ),
         );
       }
     },
@@ -332,7 +332,7 @@ export default Vue.extend({
         },
         // @ts-ignore
         this.buildCsvFiles(),
-        5
+        5,
       );
     },
     buildCsvFiles(): ICsvFile[] {
@@ -579,10 +579,10 @@ export default Vue.extend({
       || null;
     this.$data.wasteCategory = this.$data.categories.find((x: IItemCategory) => x.Name === 'Waste') || null;
     this.$data.otherConcentrateWeightEachCategory = this.$data.categories.find(
-      (x: IItemCategory) => x.Name === 'Other Concentrate (weight - each)'
+      (x: IItemCategory) => x.Name === 'Other Concentrate (weight - each)',
     ) || null;
     this.$data.vapeCartridgeWeightEachCategory = this.$data.categories.find(
-      (x: IItemCategory) => x.Name === 'Vape Cartridge (weight - each)'
+      (x: IItemCategory) => x.Name === 'Vape Cartridge (weight - each)',
     ) || null;
   },
   async created() {},

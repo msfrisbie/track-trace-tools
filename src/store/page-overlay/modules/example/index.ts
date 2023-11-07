@@ -24,7 +24,7 @@ export const exampleModule = {
       state: IExampleState,
       getters: any,
       rootState: any,
-      rootGetters: any
+      rootGetters: any,
     ) => {
       // return state.data
     },
@@ -32,7 +32,7 @@ export const exampleModule = {
   actions: {
     [ExampleActions.EXAMPLE_ACTION]: async (
       ctx: ActionContext<IExampleState, IPluginState>,
-      data: any
+      data: any,
     ) => {
       ctx.commit(ExampleMutations.EXAMPLE_MUTATION, data);
     },

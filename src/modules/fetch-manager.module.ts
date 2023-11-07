@@ -26,7 +26,7 @@ axiosRetry(client, {
 
 client.interceptors.response.use(
   (response) => response,
-  (error) => Promise.reject(error)
+  (error) => Promise.reject(error),
 );
 
 // Service workers cannot use Axios
@@ -46,7 +46,7 @@ export const customAxios = function (
           retries: number;
         };
       }
-    | undefined
+    | undefined,
 ) {
   const axiosConfig: AxiosRequestConfig = {
     url,

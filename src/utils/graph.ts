@@ -2,7 +2,7 @@ import { IIndexedPackageData } from '@/interfaces';
 import { IGraphComponentContext, IGraphState } from '@/store/page-overlay/modules/graph/interfaces';
 import { Settings } from 'sigma/settings';
 import {
-  EdgeDisplayData, NodeDisplayData, PartialButFor, PlainObject
+  EdgeDisplayData, NodeDisplayData, PartialButFor, PlainObject,
 } from 'sigma/types';
 import { getNormalizedPackageContentsDescription } from './package';
 
@@ -15,7 +15,7 @@ export function drawRoundRect(
   y: number,
   width: number,
   height: number,
-  radius: number
+  radius: number,
 ): void {
   ctx.beginPath();
   ctx.moveTo(x + radius, y);
@@ -33,7 +33,7 @@ export function drawRoundRect(
 export function hoverRenderer(
   context: CanvasRenderingContext2D,
   data: PlainObject,
-  settings: PlainObject
+  settings: PlainObject,
 ) {
   const pkg: IIndexedPackageData | undefined = data.obj.pkg;
 
@@ -104,7 +104,7 @@ export function hoverRenderer(
 export function labelRenderer(
   context: CanvasRenderingContext2D,
   data: PartialButFor<NodeDisplayData, 'x' | 'y' | 'size' | 'label' | 'color'>,
-  settings: Settings
+  settings: Settings,
 ) {
   if (!data.label) {
     return;
@@ -220,7 +220,7 @@ export function edgeReducer({
   if (
     graphState.suggestions.includes(
       // @ts-ignore
-      graphComponentContext.graph.target(edge)
+      graphComponentContext.graph.target(edge),
     )
   ) {
     return res;
@@ -229,7 +229,7 @@ export function edgeReducer({
   if (
     graphState.suggestions.includes(
       // @ts-ignore
-      graphComponentContext.graph.source(edge)
+      graphComponentContext.graph.source(edge),
     )
   ) {
     return res;

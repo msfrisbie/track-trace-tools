@@ -28,7 +28,7 @@ export const IMMATURE_PLANT_QUICKVIEW_DIMENSIONS: ImmaturePlantQuickviewDimensio
 
 export function extractImmaturePlantPropertyFromDimension(
   plantBatch: IIndexedPlantBatchData,
-  dimension: ImmaturePlantQuickviewDimension
+  dimension: ImmaturePlantQuickviewDimension,
 ) {
   switch (dimension) {
     case ImmaturePlantQuickviewDimension.STRAIN:

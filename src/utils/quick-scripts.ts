@@ -121,7 +121,7 @@ export async function addPackageContents(count: number) {
 
   for (let i = 0; i < count; ++i) {
     const button = pageManager.activeModal?.querySelector(
-      '[ng-click*="addLine(null, line.Ingredients)"]'
+      '[ng-click*="addLine(null, line.Ingredients)"]',
     ) as HTMLButtonElement | null;
 
     if (button) {
@@ -210,7 +210,7 @@ async function showAllColumns() {
 
       if (form) {
         for (const checkbox of form.querySelectorAll(
-          'input[type="checkbox"]'
+          'input[type="checkbox"]',
         ) as NodeListOf<HTMLInputElement>) {
           if (!checkbox.checked) {
             checkbox.click();
@@ -245,7 +245,7 @@ async function showAllColumns() {
       appendToast: true,
       toaster: 'ttt-toaster',
       solid: true,
-    }
+    },
   );
 }
 
@@ -264,7 +264,7 @@ async function showDefaultColumns() {
         appendToast: true,
         toaster: 'ttt-toaster',
         solid: true,
-      }
+      },
     );
   }
 }
@@ -290,7 +290,7 @@ async function showSimplePackageColumns() {
 
       if (form) {
         for (const checkbox of form.querySelectorAll(
-          'input[type="checkbox"]'
+          'input[type="checkbox"]',
         ) as NodeListOf<HTMLInputElement>) {
           if (simplePackageDataFields.includes(checkbox.getAttribute('data-field')!)) {
             if (!checkbox.checked) {
@@ -331,7 +331,7 @@ async function showSimplePackageColumns() {
       appendToast: true,
       toaster: 'ttt-toaster',
       solid: true,
-    }
+    },
   );
 }
 
@@ -393,7 +393,7 @@ async function showOnlyPrimaryColumn() {
       appendToast: true,
       toaster: 'ttt-toaster',
       solid: true,
-    }
+    },
   );
 }
 
@@ -406,7 +406,7 @@ export async function expandGrowthPhaseTags() {
 
   function getRowInputByNgModel(
     row: HTMLElement,
-    ngModelExpression: RowNgModel
+    ngModelExpression: RowNgModel,
   ): HTMLInputElement | HTMLSelectElement | null {
     return row.querySelector(`[ng-model="${ngModelExpression}"]`);
   }
@@ -436,7 +436,7 @@ export async function expandGrowthPhaseTags() {
     for (const row of initialRows) {
       const rowPlantCountInput = getRowInputByNgModel(
         row,
-        RowNgModel.PlantsCount
+        RowNgModel.PlantsCount,
       )! as HTMLInputElement;
       const rowCountValue = parseInt(rowPlantCountInput.value, 10);
 
@@ -458,7 +458,7 @@ export async function expandGrowthPhaseTags() {
 
     for (let i = 0; i < count; ++i) {
       const button = pageManager.activeModal?.querySelector(
-        '[ng-click*="addLine(newLinesCount)"]'
+        '[ng-click*="addLine(newLinesCount)"]',
       ) as HTMLButtonElement | null;
 
       if (button) {
@@ -471,7 +471,7 @@ export async function expandGrowthPhaseTags() {
     // Select tag in each
 
     const addedRows = [...document.querySelectorAll('tr[ng-repeat="line in repeaterLines"]')].slice(
-      count * -1
+      count * -1,
     ) as HTMLElement[];
 
     // Acquire tags
@@ -496,7 +496,7 @@ export async function expandGrowthPhaseTags() {
           appendToast: true,
           toaster: 'ttt-toaster',
           solid: true,
-        }
+        },
       );
 
       return;
@@ -517,13 +517,13 @@ export async function expandGrowthPhaseTags() {
 
       await setAutocompleteValueOrError(
         getRowInputByNgModel(row, RowNgModel.Id)! as HTMLInputElement,
-        targetRowPlantId
+        targetRowPlantId,
       );
       setFormInputValue(getRowInputByNgModel(row, RowNgModel.GrowthPhase)!, targetRowGrowthPhase);
       setFormInputValue(getRowInputByNgModel(row, RowNgModel.PlantsCount)!, '1');
       await setAutocompleteValueOrError(
         getRowInputByNgModel(row, RowNgModel.StartingTagId)! as HTMLInputElement,
-        tag
+        tag,
       );
       setFormInputValue(getRowInputByNgModel(row, RowNgModel.GrowthDate)!, targetRowGrowthDate);
       setFormInputValue(getRowInputByNgModel(row, RowNgModel.LocationId)!, targetRowLocation);
@@ -549,7 +549,7 @@ export async function expandGrowthPhaseTags() {
         appendToast: true,
         toaster: 'ttt-toaster',
         solid: true,
-      }
+      },
     );
   }
 }
@@ -569,13 +569,13 @@ export async function fillTransferWeights() {
 
   for (const packageRow of packageRows) {
     const packageInput = packageRow.querySelector(
-      'input[ng-model="package.Id"]'
+      'input[ng-model="package.Id"]',
     ) as HTMLInputElement | null;
     const grossWeightInput = packageRow.querySelector(
-      'input[ng-model="package.GrossWeight"]'
+      'input[ng-model="package.GrossWeight"]',
     ) as HTMLInputElement | null;
     const unitOfMeasureSelect = packageRow.querySelector(
-      'select[ng-model="package.GrossUnitOfWeightId"]'
+      'select[ng-model="package.GrossUnitOfWeightId"]',
     ) as HTMLSelectElement | null;
 
     if (!packageInput) {
@@ -605,7 +605,7 @@ export async function fillTransferWeights() {
             appendToast: true,
             toaster: 'ttt-toaster',
             solid: true,
-          }
+          },
         );
 
         continue;
@@ -620,7 +620,7 @@ export async function fillTransferWeights() {
           if (unitOfMeasureSelect) {
             setFormInputValue(
               unitOfMeasureSelect,
-              `number:${packageData.Item.UnitWeightUnitOfMeasureId}`
+              `number:${packageData.Item.UnitWeightUnitOfMeasureId}`,
             );
           }
 
@@ -662,10 +662,10 @@ export async function fillTransferWeights() {
   }
 
   const grossWeightInput = document.querySelector(
-    'input[ng-model="destination.GrossWeight"]'
+    'input[ng-model="destination.GrossWeight"]',
   ) as HTMLInputElement | null;
   const unitOfMeasureSelect = document.querySelector(
-    'select[ng-model="destination.GrossUnitOfWeightId"]'
+    'select[ng-model="destination.GrossUnitOfWeightId"]',
   ) as HTMLSelectElement | null;
 
   if (!grossWeightInput || !unitOfMeasureSelect) {
@@ -680,7 +680,7 @@ export async function fillTransferWeights() {
   } else {
     let normalizedGrossWeights: number[] = [];
     let baseUnitOfMeasureId: number = unitsOfMeasure.find(
-      (x) => x.IsBaseUnit && x.QuantityType === 'WeightBased'
+      (x) => x.IsBaseUnit && x.QuantityType === 'WeightBased',
     )!.Id;
 
     if (
@@ -697,7 +697,7 @@ export async function fillTransferWeights() {
           appendToast: true,
           toaster: 'ttt-toaster',
           solid: true,
-        }
+        },
       );
     } else {
       for (const [quantity, unitOfWeightId] of zip(quantities, unitOfWeightIds) as [
@@ -719,7 +719,7 @@ export async function fillTransferWeights() {
     const poundsUnitOfMeasure = unitsOfMeasure.find((x) => x.Name === 'Pounds');
     if (poundsUnitOfMeasure) {
       normalizedGrossWeights = normalizedGrossWeights.map(
-        (x) => x * poundsUnitOfMeasure.FromBaseFactor
+        (x) => x * poundsUnitOfMeasure.FromBaseFactor,
       );
       baseUnitOfMeasureId = poundsUnitOfMeasure.Id;
     }
@@ -728,8 +728,8 @@ export async function fillTransferWeights() {
       grossWeightInput,
       _.round(
         normalizedGrossWeights.reduce((a, b) => a + b, 0),
-        3
-      ).toString()
+        3,
+      ).toString(),
     );
     setFormInputValue(unitOfMeasureSelect, `number:${baseUnitOfMeasureId}`);
   }
@@ -753,7 +753,7 @@ export async function fillTransferWeights() {
         appendToast: true,
         toaster: 'ttt-toaster',
         solid: true,
-      }
+      },
     );
   }
 }
@@ -787,8 +787,8 @@ export async function sumPackageQuantities() {
           .map((input) => parseFloat(input.value))
           .filter((x) => !Number.isNaN(x))
           .reduce((a, b) => a + b, 0),
-        3
-      ).toString()
+        3,
+      ).toString(),
     );
   }
 

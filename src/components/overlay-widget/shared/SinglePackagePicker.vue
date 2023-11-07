@@ -307,7 +307,7 @@ export default Vue.extend({
       return this.$data.sourcePackages.filter(
         (y: IPackageData) =>
           // @ts-ignore
-          !this.$props.selectedPackages.find((x: IPackageData) => x.Label === y.Label)
+          !this.$props.selectedPackages.find((x: IPackageData) => x.Label === y.Label),
       );
     },
   },

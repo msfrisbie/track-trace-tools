@@ -1,5 +1,5 @@
 import {
-  PackageTabLabel, PlantsTabLabel, TabKey, TagsTabLabel, TransfersTabLabel
+  PackageTabLabel, PlantsTabLabel, TabKey, TagsTabLabel, TransfersTabLabel,
 } from '@/consts';
 import store from '@/store/page-overlay/index';
 import { hashObjectValueOrNull } from '@/utils/url';
@@ -31,7 +31,7 @@ export async function clickTabStartingWithImpl(
    * 1 means it must be the previously seen node
    * 2 means it was seen two nodes ago
    */
-  previousTabTextOffset: number | null = null
+  previousTabTextOffset: number | null = null,
 ) {
   if (typeof previousTabTextOffset === 'number' && !previousTabText) {
     throw new Error('Must provide previousTabText');
@@ -92,7 +92,7 @@ export async function managePlantTabsImpl() {
       await pageManager.clickTabStartingWith(
         pageManager.plantsTabs,
         PlantsTabLabel.INACTIVE,
-        PlantsTabLabel.IMMATURE
+        PlantsTabLabel.IMMATURE,
       );
       return;
     case TabKey.PlANTS_PLANTS_VEGETATIVE:
@@ -105,14 +105,14 @@ export async function managePlantTabsImpl() {
       await pageManager.clickTabStartingWith(
         pageManager.plantsTabs,
         PlantsTabLabel.ON_HOLD,
-        PlantsTabLabel.FLOWERING
+        PlantsTabLabel.FLOWERING,
       );
       return;
     case TabKey.PlANTS_PLANTS_INACTIVE:
       await pageManager.clickTabStartingWith(
         pageManager.plantsTabs,
         PlantsTabLabel.INACTIVE,
-        PlantsTabLabel.FLOWERING
+        PlantsTabLabel.FLOWERING,
       );
       return;
     case TabKey.PlANTS_PLANTS_ADDITIVE:
@@ -128,14 +128,14 @@ export async function managePlantTabsImpl() {
       await pageManager.clickTabStartingWith(
         pageManager.plantsTabs,
         PlantsTabLabel.ON_HOLD,
-        PlantsTabLabel.HARVESTED
+        PlantsTabLabel.HARVESTED,
       );
       return;
     case TabKey.PlANTS_HARVESTED_INACTIVE:
       await pageManager.clickTabStartingWith(
         pageManager.plantsTabs,
         PlantsTabLabel.INACTIVE,
-        PlantsTabLabel.HARVESTED
+        PlantsTabLabel.HARVESTED,
       );
       return;
   }
@@ -143,7 +143,7 @@ export async function managePlantTabsImpl() {
   if (store.state.settings?.autoOpenFloweringPlants) {
     await pageManager.clickTabStartingWith(
       pageManager.plantsTabs,
-      store.state.settings?.autoOpenPlantsTab
+      store.state.settings?.autoOpenPlantsTab,
     );
   }
 }
@@ -184,7 +184,7 @@ export async function managePackageTabsImpl() {
   if (store.state.settings?.autoOpenActivePackages) {
     await pageManager.clickTabStartingWith(
       pageManager.packageTabs,
-      store.state.settings?.autoOpenPackageTab
+      store.state.settings?.autoOpenPackageTab,
     );
   }
 }
@@ -222,7 +222,7 @@ export async function manageTransfersTabsImpl() {
   if (store.state.settings?.autoOpenIncomingTransfers) {
     await pageManager.clickTabStartingWith(
       pageManager.transferTabs,
-      store.state.settings?.autoOpenTransfersTab
+      store.state.settings?.autoOpenTransfersTab,
     );
   }
 }
@@ -235,7 +235,7 @@ export async function manageSalesTabsImpl() {
   if (store.state.settings?.autoOpenActiveSales) {
     await pageManager.clickTabStartingWith(
       pageManager.salesTabs,
-      store.state.settings?.autoOpenSalesTab
+      store.state.settings?.autoOpenSalesTab,
     );
   }
 }
@@ -273,7 +273,7 @@ export async function manageTagsTabsImpl() {
   if (store.state.settings?.autoOpenAvailableTags) {
     await pageManager.clickTabStartingWith(
       pageManager.tagTabs,
-      store.state.settings?.autoOpenTagsTab
+      store.state.settings?.autoOpenTagsTab,
     );
   }
 }

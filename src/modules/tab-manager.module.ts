@@ -12,7 +12,7 @@ class TabManager implements IAtomicService {
 
     isVisible$(): Observable<boolean> {
       return this._isVisible.asObservable().pipe(
-        distinctUntilChanged()
+        distinctUntilChanged(),
       );
     }
 }

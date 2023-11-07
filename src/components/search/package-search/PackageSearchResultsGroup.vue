@@ -192,7 +192,7 @@ export default Vue.extend({
           packageSearchFilters: {
             [this.packageFilterIdentifier]: store.state.search.queryString,
           },
-        }
+        },
       );
 
       this.setShowSearchResults({ showSearchResults: false });

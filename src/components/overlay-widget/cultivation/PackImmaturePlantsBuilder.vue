@@ -255,7 +255,7 @@ export default Vue.extend({
         this.$data.builderType,
         {
           plantBatchName: this.$data.selectedPlantBatches.map(
-            (batch: IPlantBatchData) => batch.Name
+            (batch: IPlantBatchData) => batch.Name,
           ),
           itemName: this.$data.item.Name,
           tag: this.$data.packageTags.map((tag: ITagData) => tag.Label),
@@ -264,13 +264,13 @@ export default Vue.extend({
           tradeSample: this.$data.isTradeSample,
           donation: this.$data.isDonation,
           plantCount: this.$data.selectedPlantBatches.map(
-            (batch: IPlantBatchData) => batch.UntrackedCount
+            (batch: IPlantBatchData) => batch.UntrackedCount,
           ),
           location: this.$data.facilityUsesLocationForPackages ? this.$data.location.Name : '',
           actualDate: this.$data.packageDate,
         },
         this.buildCsvFiles(),
-        5
+        5,
       );
     },
     async downloadAll() {
@@ -282,7 +282,7 @@ export default Vue.extend({
         builderType: this.$data.builderType,
         csvData: {
           plantBatchName: this.$data.selectedPlantBatches.map(
-            (batch: IPlantBatchData) => batch.Name
+            (batch: IPlantBatchData) => batch.Name,
           ),
           itemName: this.$data.item.Name,
           tag: this.$data.packageTags.map((tag: ITagData) => tag.Label),
@@ -291,7 +291,7 @@ export default Vue.extend({
           tradeSample: this.$data.isTradeSample,
           donation: this.$data.isDonation,
           plantCount: this.$data.selectedPlantBatches.map(
-            (batch: IPlantBatchData) => batch.UntrackedCount
+            (batch: IPlantBatchData) => batch.UntrackedCount,
           ),
           location: this.$data.facilityUsesLocationForPackages ? this.$data.location.Name : '',
           actualDate: this.$data.packageDate,
@@ -347,7 +347,7 @@ export default Vue.extend({
           {
             isVector: true,
             data: this.$data.selectedPlantBatches.map(
-              (batch: IPlantBatchData) => batch.UntrackedCount
+              (batch: IPlantBatchData) => batch.UntrackedCount,
             ),
           },
           {
@@ -362,7 +362,7 @@ export default Vue.extend({
 
         return buildNamedCsvFileData(
           csvData,
-          `Packaging ${this.selectedPlantBatchesCount} immature plant batches`
+          `Packaging ${this.selectedPlantBatchesCount} immature plant batches`,
         );
       } catch (e) {
         console.error(e);
@@ -382,7 +382,7 @@ export default Vue.extend({
     pageTwoPreTagErrorMessage(): string | null {
       return (
         this.errors.find(
-          (x: IBuilderComponentError) => x.tags.includes('page2') && !x.tags.includes('tagging')
+          (x: IBuilderComponentError) => x.tags.includes('page2') && !x.tags.includes('tagging'),
         )?.message || null
       );
     },

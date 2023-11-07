@@ -388,7 +388,7 @@ export default Vue.extend({
       // @ts-ignore
       const zipped: [ITagData, IIntermediateCreatePackageFromPackagesData][] = safeZip(
         this.packageTags,
-        this.quantityList
+        this.quantityList,
       );
 
       const sourcePackage = this.sourcePackage as IPackageData;
@@ -443,7 +443,7 @@ export default Vue.extend({
           packageTotal: this.quantityList.length,
         },
         this.buildCsvFiles(),
-        1 // This is to address Metrc package allocation bug https://track-trace-tools.talkyard.net/-65/unpack-immature-packages
+        1, // This is to address Metrc package allocation bug https://track-trace-tools.talkyard.net/-65/unpack-immature-packages
       );
     },
     buildCsvFiles(): ICsvFile[] {
@@ -463,7 +463,7 @@ export default Vue.extend({
       // @ts-ignore
       const zipped: [ITagData, IIntermediateCreatePackageFromPackagesData][] = safeZip(
         this.packageTags,
-        this.quantityList
+        this.quantityList,
       );
 
       const flattened = [];
@@ -522,7 +522,7 @@ export default Vue.extend({
 
         return buildNamedCsvFileData(
           csvData,
-          `Create ${this.quantityList.length} packages from ${this.sourcePackage.Label}`
+          `Create ${this.quantityList.length} packages from ${this.sourcePackage.Label}`,
         );
       } catch (e) {
         console.error(e);
@@ -649,7 +649,7 @@ export default Vue.extend({
         if (this.outputItem?.Id === this.sourcePackage.Item.Id) {
           this.sourcePackageAdjustQuantity = round(
             quantityList.reduce((a, b) => a + b, 0),
-            4
+            4,
           );
         }
       }
@@ -668,7 +668,7 @@ export default Vue.extend({
     }),
     sourceUnitAbbreviation(): string {
       return unitOfMeasureNameToAbbreviation(
-        this.sourcePackage?.Item.UnitOfMeasureName || ''
+        this.sourcePackage?.Item.UnitOfMeasureName || '',
       ).toLocaleLowerCase();
     },
     outputUnitAbbreviation(): string {
@@ -678,7 +678,7 @@ export default Vue.extend({
 
       return unitOfMeasureNameToAbbreviation(
         // @ts-ignore
-        this.outputItem?.UnitOfMeasureName || ''
+        this.outputItem?.UnitOfMeasureName || '',
       ).toLocaleLowerCase();
     },
     pageOneErrorMessage(): string | null {
@@ -727,7 +727,7 @@ export default Vue.extend({
       set(outputItem: IItemData | null) {
         store.dispatch(
           `splitPackageBuilder/${SplitPackageBuilderActions.UPDATE_SPLIT_PACKAGE_DATA}`,
-          { outputItem }
+          { outputItem },
         );
       },
     },
@@ -738,7 +738,7 @@ export default Vue.extend({
       set(location: ILocationData | null) {
         store.dispatch(
           `splitPackageBuilder/${SplitPackageBuilderActions.UPDATE_SPLIT_PACKAGE_DATA}`,
-          { location }
+          { location },
         );
       },
     },
@@ -749,7 +749,7 @@ export default Vue.extend({
       set(note: string) {
         store.dispatch(
           `splitPackageBuilder/${SplitPackageBuilderActions.UPDATE_SPLIT_PACKAGE_DATA}`,
-          { note }
+          { note },
         );
       },
     },
@@ -760,7 +760,7 @@ export default Vue.extend({
       set(productionBatchNumber: string) {
         store.dispatch(
           `splitPackageBuilder/${SplitPackageBuilderActions.UPDATE_SPLIT_PACKAGE_DATA}`,
-          { productionBatchNumber }
+          { productionBatchNumber },
         );
       },
     },
@@ -771,7 +771,7 @@ export default Vue.extend({
       set(remediationDate: string) {
         store.dispatch(
           `splitPackageBuilder/${SplitPackageBuilderActions.UPDATE_SPLIT_PACKAGE_DATA}`,
-          { remediationDate }
+          { remediationDate },
         );
       },
     },
@@ -782,7 +782,7 @@ export default Vue.extend({
       set(remediationMethodId: string) {
         store.dispatch(
           `splitPackageBuilder/${SplitPackageBuilderActions.UPDATE_SPLIT_PACKAGE_DATA}`,
-          { remediationMethodId }
+          { remediationMethodId },
         );
       },
     },
@@ -793,7 +793,7 @@ export default Vue.extend({
       set(remediationSteps: string) {
         store.dispatch(
           `splitPackageBuilder/${SplitPackageBuilderActions.UPDATE_SPLIT_PACKAGE_DATA}`,
-          { remediationSteps }
+          { remediationSteps },
         );
       },
     },
@@ -804,7 +804,7 @@ export default Vue.extend({
       set(useSameItem: boolean) {
         store.dispatch(
           `splitPackageBuilder/${SplitPackageBuilderActions.UPDATE_SPLIT_PACKAGE_DATA}`,
-          { useSameItem }
+          { useSameItem },
         );
       },
     },
@@ -815,7 +815,7 @@ export default Vue.extend({
       set(isDonation: boolean) {
         store.dispatch(
           `splitPackageBuilder/${SplitPackageBuilderActions.UPDATE_SPLIT_PACKAGE_DATA}`,
-          { isDonation }
+          { isDonation },
         );
       },
     },
@@ -826,7 +826,7 @@ export default Vue.extend({
       set(isTradeSample: boolean) {
         store.dispatch(
           `splitPackageBuilder/${SplitPackageBuilderActions.UPDATE_SPLIT_PACKAGE_DATA}`,
-          { isTradeSample }
+          { isTradeSample },
         );
       },
     },
@@ -837,7 +837,7 @@ export default Vue.extend({
       set(packageIsodate: string) {
         store.dispatch(
           `splitPackageBuilder/${SplitPackageBuilderActions.UPDATE_SPLIT_PACKAGE_DATA}`,
-          { packageIsodate }
+          { packageIsodate },
         );
       },
     },
@@ -848,7 +848,7 @@ export default Vue.extend({
       set(expirationDate: string) {
         store.dispatch(
           `splitPackageBuilder/${SplitPackageBuilderActions.UPDATE_SPLIT_PACKAGE_DATA}`,
-          { expirationDate }
+          { expirationDate },
         );
       },
     },
@@ -859,7 +859,7 @@ export default Vue.extend({
       set(sourcePackageAdjustQuantity: number) {
         store.dispatch(
           `splitPackageBuilder/${SplitPackageBuilderActions.UPDATE_SPLIT_PACKAGE_DATA}`,
-          { sourcePackageAdjustQuantity }
+          { sourcePackageAdjustQuantity },
         );
       },
     },

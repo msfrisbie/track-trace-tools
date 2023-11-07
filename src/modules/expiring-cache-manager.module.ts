@@ -56,7 +56,7 @@ class ExpiringCacheManager implements IAtomicService {
     return [
       ...new Set(
         ...Object.keys(this.inMemoryCache || {}),
-        ...Object.keys(JSON.parse(this.persistedCache.getItem(EXPIRING_CACHE_KEY_PREFIX) || '{}'))
+        ...Object.keys(JSON.parse(this.persistedCache.getItem(EXPIRING_CACHE_KEY_PREFIX) || '{}')),
       ),
     ];
   }

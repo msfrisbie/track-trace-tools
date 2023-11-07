@@ -41,7 +41,7 @@ Vue.use(BootstrapVue);
 Vue.component('font-awesome-icon', FontAwesomeIcon);
 library.add(
   // @ts-ignore
-  fontawesomeSolid.faSignOutAlt
+  fontawesomeSolid.faSignOutAlt,
 );
 
 export default Vue.extend({

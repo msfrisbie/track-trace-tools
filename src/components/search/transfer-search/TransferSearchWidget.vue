@@ -50,7 +50,7 @@ import { SearchActions } from '@/store/page-overlay/modules/search/consts';
 import { TransferSearchActions } from '@/store/page-overlay/modules/transfer-search/consts';
 import { combineLatest, Observable, timer } from 'rxjs';
 import {
-  debounceTime, filter, startWith, tap
+  debounceTime, filter, startWith, tap,
 } from 'rxjs/operators';
 import Vue from 'vue';
 import { mapActions, mapState } from 'vuex';

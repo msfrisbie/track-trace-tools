@@ -30,7 +30,7 @@ export const tagSearchModule = {
   mutations: {
     [TagSearchMutations.SET_TAG_SEARCH_FILTERS](
       state: ITagSearchState,
-      { tagSearchFilters }: { tagSearchFilters: ITagSearchFilters }
+      { tagSearchFilters }: { tagSearchFilters: ITagSearchFilters },
     ) {
       state.tagSearchFilters = {
         ...tagSearchFilters,
@@ -41,7 +41,7 @@ export const tagSearchModule = {
   actions: {
     [TagSearchActions.EXECUTE_QUERY]: async (
       ctx: ActionContext<ITagSearchState, IPluginState>,
-      { queryString }: { queryString: string }
+      { queryString }: { queryString: string },
     ) => {
       ctx.state.tags = [];
       ctx.state.selectedTagMetadata = null;
@@ -78,7 +78,7 @@ export const tagSearchModule = {
         tagSearchFilters: ITagSearchFilters;
         propagate?: boolean;
         tagState?: TagState | null;
-      }
+      },
     ) => {
       if (tagState) {
         switch (tagState as TagState) {
@@ -111,7 +111,7 @@ export const tagSearchModule = {
       {
         tagSearchFilters,
         propagate = true,
-      }: { tagSearchFilters: ITagSearchFilters; propagate?: boolean }
+      }: { tagSearchFilters: ITagSearchFilters; propagate?: boolean },
     ) {
       const defaultTagSearchFilters = {
         label: null,

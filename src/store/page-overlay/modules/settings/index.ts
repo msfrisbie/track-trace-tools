@@ -5,7 +5,7 @@ import {
   PlantsTabLabel,
   SalesTabLabel,
   TagsTabLabel,
-  TransfersTabLabel
+  TransfersTabLabel,
 } from '@/consts';
 import { DarkModeState, IPluginState, SnowflakeState } from '@/interfaces';
 import { ActionContext } from 'vuex';
@@ -80,13 +80,13 @@ export const settingsModule = {
   getters: {},
   actions: {
     [SettingsActions.RESET_SETTINGS](
-      ctx: ActionContext<ISettingsState, IPluginState>
+      ctx: ActionContext<ISettingsState, IPluginState>,
     ) {
       ctx.dispatch(SettingsActions.UPDATE_SETTINGS, defaultState);
     },
     [SettingsActions.UPDATE_SETTINGS](
       ctx: ActionContext<ISettingsState, IPluginState>,
-      settings: any
+      settings: any,
     ) {
       for (const [key, value] of Object.entries(settings)) {
         // @ts-ignore
@@ -103,7 +103,7 @@ export const settingsModule = {
       ctx.dispatch(
         `client/${ClientActions.UPDATE_CLIENT_VALUES}`,
         { notify: true },
-        { root: true }
+        { root: true },
       );
     },
   },

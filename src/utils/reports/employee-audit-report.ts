@@ -3,7 +3,7 @@ import {
   IIndexedTransferData,
   IPackageFilter,
   IPluginState,
-  ITransferFilter
+  ITransferFilter,
 } from '@/interfaces';
 import { DataLoader, getDataLoaderByLicense } from '@/modules/data-loader/data-loader.module';
 import { facilityManager } from '@/modules/facility-manager.module';
@@ -12,7 +12,7 @@ import { ReportsMutations, ReportType } from '@/store/page-overlay/modules/repor
 import {
   IReportConfig,
   IReportData,
-  IReportsState
+  IReportsState,
 } from '@/store/page-overlay/modules/reports/interfaces';
 import { ActionContext } from 'vuex';
 import { todayIsodate } from '../date';
@@ -205,7 +205,7 @@ export async function maybeLoadEmployeeAuditReportData({
           .then((dataLoader) => dataLoader.packageHistoryByPackageId(pkg.Id))
           .then((response) => {
             pkg.history = response;
-          })
+          }),
       );
       if (historyPromises.length % 100 === 0) {
         await Promise.allSettled(historyPromises);
@@ -226,7 +226,7 @@ export async function maybeLoadEmployeeAuditReportData({
           .then((dataLoader) => dataLoader.transferHistoryByOutGoingTransferId(transfer.Id))
           .then((response) => {
             transfer.history = response;
-          })
+          }),
       );
 
       if (historyPromises.length % 100 === 0) {

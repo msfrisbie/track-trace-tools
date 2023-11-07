@@ -17,7 +17,7 @@ class MessageBus implements IAtomicService {
     type: MessageType,
     data: any = [],
     options: IBusMessageOptions = {},
-    timeout: number = 5000
+    timeout: number = 5000,
   ): Promise<any> {
     // Options are collected here for *all* message types
     options.muteAnalytics = store.state.muteAnalytics;

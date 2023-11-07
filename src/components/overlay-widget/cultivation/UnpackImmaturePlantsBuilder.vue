@@ -321,7 +321,7 @@ export default Vue.extend({
       // @ts-ignore
       const zipped: [ITagData, IIntermediateCreatePlantBatchFromPackageData][] = safeZip(
         this.$data.plantBatchTags,
-        this.$data.plantingData
+        this.$data.plantingData,
       );
 
       for (const el of zipped) {
@@ -357,7 +357,7 @@ export default Vue.extend({
           plantTotal: this.$data.selectedPackages.length,
         },
         this.buildCsvFiles(),
-        1 // This is to address Metrc package allocation bug https://track-trace-tools.talkyard.net/-65/unpack-immature-packages
+        1, // This is to address Metrc package allocation bug https://track-trace-tools.talkyard.net/-65/unpack-immature-packages
       );
     },
     plantMax() {
@@ -398,20 +398,20 @@ export default Vue.extend({
           {
             isVector: true,
             data: this.$data.plantingData.map(
-              (plantingData: IIntermediateCreatePlantBatchFromPackageData) => plantingData.pkg.Label
+              (plantingData: IIntermediateCreatePlantBatchFromPackageData) => plantingData.pkg.Label,
             ),
           },
           {
             isVector: true,
             data: this.$data.plantingData.map(
-              (plantingData: IIntermediateCreatePlantBatchFromPackageData) => plantingData.quantity
+              (plantingData: IIntermediateCreatePlantBatchFromPackageData) => plantingData.quantity,
             ),
           },
           {
             isVector: true,
             data: this.$data.plantingData.map(
               (plantingData: IIntermediateCreatePlantBatchFromPackageData) =>
-                plantingData.pkg.Item.UnitOfMeasureName
+                plantingData.pkg.Item.UnitOfMeasureName,
             ),
           },
           {
@@ -425,7 +425,7 @@ export default Vue.extend({
           {
             isVector: true,
             data: this.$data.plantingData.map(
-              (plantingData: IIntermediateCreatePlantBatchFromPackageData) => plantingData.count
+              (plantingData: IIntermediateCreatePlantBatchFromPackageData) => plantingData.count,
             ),
           },
           {
@@ -446,7 +446,7 @@ export default Vue.extend({
 
         return buildNamedCsvFileData(
           csvData,
-          `Planting ${this.$data.totalPlantCount} ${this.$data.strain.Name} plants from ${this.$data.selectedPackages.length} packages`
+          `Planting ${this.$data.totalPlantCount} ${this.$data.strain.Name} plants from ${this.$data.selectedPackages.length} packages`,
         );
       } catch (e) {
         console.error(e);
@@ -507,7 +507,7 @@ export default Vue.extend({
         try {
           this.$data.plantingData = allocateImmaturePlantCounts(
             newValue,
-            this.$data.selectedPackages
+            this.$data.selectedPackages,
           );
         } catch (e) {
           toastManager.openToast(`Failed to allocate plants: ${(e as Error).toString()}`, {
@@ -561,7 +561,7 @@ export default Vue.extend({
     timer(1000).subscribe(() => primaryDataLoader.availableTags({}));
 
     this.$data.plantBatchTypeOptions = (await dynamicConstsManager.plantBatchTypes()).map(
-      (x: IPlantBatchType) => ({ text: `${x.Name}s`, value: x })
+      (x: IPlantBatchType) => ({ text: `${x.Name}s`, value: x }),
     );
     this.$data.plantBatchType = this.$data.plantBatchTypeOptions[0].value;
   },

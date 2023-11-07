@@ -25,7 +25,7 @@ export function downloadHarvestJSON(csvFile: ICsvFile) {
       DryingLocation: row[3],
       HarvestName: row[4],
       PatientLicenseNumber: row[5],
-      ActualDate: row[6]
+      ActualDate: row[6],
     });
   }
 

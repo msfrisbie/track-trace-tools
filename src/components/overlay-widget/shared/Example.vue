@@ -15,14 +15,14 @@ export default Vue.extend({
   props: {},
   components: {},
   computed: {
-    ...mapState([])
+    ...mapState([]),
   },
   data() {
     return {};
   },
   methods: {},
   async created() {},
-  async mounted() {}
+  async mounted() {},
 });
 </script>
 

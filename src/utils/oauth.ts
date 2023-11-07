@@ -22,7 +22,7 @@ export async function getAuthTokenOrError({
         } else {
           reject('Coult not obtain OAuth token');
         }
-      }
+      },
     );
   });
 }
@@ -76,7 +76,7 @@ export async function getOAuthUserInfoOrError({
             'Content-Type': 'application/json',
           },
           contentType: 'json',
-        }
+        },
       ).then((response) => response.json());
 
       chrome.storage.local.set({ [ChromeStorageKeys.OAUTH_USER_DATA]: result });

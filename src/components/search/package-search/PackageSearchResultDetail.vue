@@ -212,7 +212,7 @@ export default Vue.extend({
     } {
     return {
       packageLabTestPdfEligible: !METRC_HOSTNAMES_LACKING_LAB_PDFS.includes(
-        window.location.hostname
+        window.location.hostname,
       ),
       // destroyed$: new Subject(),
       // pkg: null,
@@ -309,7 +309,7 @@ export default Vue.extend({
           packageSearchFilters: {
             label: pkg.Label,
           },
-        }
+        },
       );
 
       this.setShowSearchResults({ showSearchResults: false });

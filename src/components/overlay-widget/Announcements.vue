@@ -95,7 +95,7 @@ export default Vue.extend({
         root: null, // Use the viewport as the container
         rootMargin: '0px', // No margins
         threshold: 0, // Trigger the callback when even one pixel is visible
-      }
+      },
     );
 
     // Start observing the target

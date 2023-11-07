@@ -33,7 +33,7 @@ export async function acquirePlantFilterElementsImpl() {
       pageManager.plantStrainNameFilterInput,
       pageManager.plantStrainNameApplyFiltersButton,
       pageManager.plantLocationNameFilterInput,
-      pageManager.plantLocationNameApplyFiltersButton
+      pageManager.plantLocationNameApplyFiltersButton,
     )
   ) {
     return;
@@ -49,7 +49,7 @@ export async function acquirePlantFilterElementsImpl() {
 
   for (const plantFilterIdentifier of plantFilterIdentifiers) {
     menuButton = document.querySelector(
-      `.k-state-active th[data-field="${plantFilterIdentifier}"] .k-header-column-menu`
+      `.k-state-active th[data-field="${plantFilterIdentifier}"] .k-header-column-menu`,
     ) as HTMLElement | null;
 
     if (menuButton) {
@@ -67,11 +67,11 @@ export async function acquirePlantFilterElementsImpl() {
 
       if (form) {
         const input = form.querySelector(
-          'input[title="Filter Criteria"]'
+          'input[title="Filter Criteria"]',
         ) as HTMLInputElement | null;
         const button = form.querySelector('button[type="submit"]') as HTMLButtonElement | null;
         const select = animationContainer?.querySelector(
-          '.k-list-scroller ul'
+          '.k-list-scroller ul',
         ) as HTMLElement | null;
 
         if (input) {
@@ -81,7 +81,7 @@ export async function acquirePlantFilterElementsImpl() {
               input.addEventListener('input', (e: any) =>
                 store.dispatch(
                   `plantSearch/${PlantSearchActions.PARTIAL_UPDATE_PLANT_SEARCH_FILTERS}`,
-                  { plantSearchFilters: { label: e.target.value }, propagate: false }
+                  { plantSearchFilters: { label: e.target.value }, propagate: false },
                 ));
               pageManager.plantLabelFilterSelect = select;
               pageManager.plantLabelApplyFiltersButton = button;
@@ -91,7 +91,7 @@ export async function acquirePlantFilterElementsImpl() {
               input.addEventListener('input', (e: any) =>
                 store.dispatch(
                   `plantSearch/${PlantSearchActions.PARTIAL_UPDATE_PLANT_SEARCH_FILTERS}`,
-                  { plantSearchFilters: { strainName: e.target.value }, propagate: false }
+                  { plantSearchFilters: { strainName: e.target.value }, propagate: false },
                 ));
               pageManager.plantStrainNameApplyFiltersButton = button;
               break;
@@ -100,7 +100,7 @@ export async function acquirePlantFilterElementsImpl() {
               input.addEventListener('input', (e: any) =>
                 store.dispatch(
                   `plantSearch/${PlantSearchActions.PARTIAL_UPDATE_PLANT_SEARCH_FILTERS}`,
-                  { plantSearchFilters: { locationName: e.target.value }, propagate: false }
+                  { plantSearchFilters: { locationName: e.target.value }, propagate: false },
                 ));
               pageManager.plantLocationNameApplyFiltersButton = button;
               break;
@@ -147,7 +147,7 @@ export async function acquirePackageFilterElementsImpl() {
       pageManager.packageItemProductCategoryNameFilterInput,
       pageManager.packageItemProductCategoryNameApplyFiltersButton,
       pageManager.packageLocationNameFilterInput,
-      pageManager.packageLocationNameApplyFiltersButton
+      pageManager.packageLocationNameApplyFiltersButton,
     )
   ) {
     return;
@@ -169,7 +169,7 @@ export async function acquirePackageFilterElementsImpl() {
 
   for (const packageFilterIdentifier of packageFilterIdentifiers) {
     menuButton = document.querySelector(
-      `.k-state-active th[data-field="${packageFilterIdentifier}"] .k-header-column-menu`
+      `.k-state-active th[data-field="${packageFilterIdentifier}"] .k-header-column-menu`,
     ) as HTMLElement | null;
 
     if (menuButton) {
@@ -187,11 +187,11 @@ export async function acquirePackageFilterElementsImpl() {
 
       if (form) {
         const input = form.querySelector(
-          'input[title="Filter Criteria"]'
+          'input[title="Filter Criteria"]',
         ) as HTMLInputElement | null;
         const button = form.querySelector('button[type="submit"]') as HTMLButtonElement | null;
         const select = animationContainer?.querySelector(
-          '.k-list-scroller ul'
+          '.k-list-scroller ul',
         ) as HTMLElement | null;
 
         if (input) {
@@ -201,7 +201,7 @@ export async function acquirePackageFilterElementsImpl() {
               input.addEventListener('input', (e: any) =>
                 store.dispatch(
                   `packageSearch/${PackageSearchActions.PARTIAL_UPDATE_PACKAGE_SEARCH_FILTERS}`,
-                  { packageSearchFilters: { label: e.target.value }, propagate: false }
+                  { packageSearchFilters: { label: e.target.value }, propagate: false },
                 ));
               pageManager.packageLabelFilterSelect = select;
               pageManager.packageLabelApplyFiltersButton = button;
@@ -214,7 +214,7 @@ export async function acquirePackageFilterElementsImpl() {
                   {
                     packageSearchFilters: { sourceHarvestName: e.target.value },
                     propagate: false,
-                  }
+                  },
                 ));
               pageManager.packageSourceHarvestNameApplyFiltersButton = button;
               break;
@@ -226,7 +226,7 @@ export async function acquirePackageFilterElementsImpl() {
                   {
                     packageSearchFilters: { sourcePackageLabel: e.target.value },
                     propagate: false,
-                  }
+                  },
                 ));
               pageManager.packageSourcePackageLabelApplyFiltersButton = button;
               break;
@@ -238,7 +238,7 @@ export async function acquirePackageFilterElementsImpl() {
                   {
                     packageSearchFilters: { productionBatchNumber: e.target.value },
                     propagate: false,
-                  }
+                  },
                 ));
               pageManager.packageProductionBatchNumberApplyFiltersButton = button;
               break;
@@ -250,7 +250,7 @@ export async function acquirePackageFilterElementsImpl() {
                   {
                     packageSearchFilters: { sourceProductionBatchNumbers: e.target.value },
                     propagate: false,
-                  }
+                  },
                 ));
               pageManager.packageSourceProductionBatchNumbersApplyFiltersButton = button;
               break;
@@ -259,7 +259,7 @@ export async function acquirePackageFilterElementsImpl() {
               input.addEventListener('input', (e: any) =>
                 store.dispatch(
                   `packageSearch/${PackageSearchActions.PARTIAL_UPDATE_PACKAGE_SEARCH_FILTERS}`,
-                  { packageSearchFilters: { itemName: e.target.value }, propagate: false }
+                  { packageSearchFilters: { itemName: e.target.value }, propagate: false },
                 ));
               pageManager.packageItemNameApplyFiltersButton = button;
               break;
@@ -268,7 +268,7 @@ export async function acquirePackageFilterElementsImpl() {
               input.addEventListener('input', (e: any) =>
                 store.dispatch(
                   `packageSearch/${PackageSearchActions.PARTIAL_UPDATE_PACKAGE_SEARCH_FILTERS}`,
-                  { packageSearchFilters: { itemStrainName: e.target.value }, propagate: false }
+                  { packageSearchFilters: { itemStrainName: e.target.value }, propagate: false },
                 ));
               pageManager.packageItemStrainNameApplyFiltersButton = button;
               break;
@@ -280,7 +280,7 @@ export async function acquirePackageFilterElementsImpl() {
                   {
                     packageSearchFilters: { itemProductCategoryName: e.target.value },
                     propagate: false,
-                  }
+                  },
                 ));
               pageManager.packageItemProductCategoryNameApplyFiltersButton = button;
               break;
@@ -289,7 +289,7 @@ export async function acquirePackageFilterElementsImpl() {
               input.addEventListener('input', (e: any) =>
                 store.dispatch(
                   `packageSearch/${PackageSearchActions.PARTIAL_UPDATE_PACKAGE_SEARCH_FILTERS}`,
-                  { packageSearchFilters: { locationName: e.target.value }, propagate: false }
+                  { packageSearchFilters: { locationName: e.target.value }, propagate: false },
                 ));
               pageManager.packageLocationNameApplyFiltersButton = button;
               break;
@@ -328,7 +328,7 @@ export async function acquireTransferFilterElementsImpl() {
       pageManager.transferOutgoingDeliveryFacilitiesFilterInput,
       pageManager.transferOutgoingDeliveryFacilitiesApplyFiltersButton,
       pageManager.transferIncomingShipperFacilityInfoFilterInput,
-      pageManager.transferIncomingShipperFacilityInfoApplyFiltersButton
+      pageManager.transferIncomingShipperFacilityInfoApplyFiltersButton,
     )
   ) {
     return;
@@ -344,7 +344,7 @@ export async function acquireTransferFilterElementsImpl() {
 
   for (const transferFilterIdentifier of transferFilterIdentifiers) {
     menuButton = document.querySelector(
-      `.k-state-active th[data-field="${transferFilterIdentifier}"] .k-header-column-menu`
+      `.k-state-active th[data-field="${transferFilterIdentifier}"] .k-header-column-menu`,
     ) as HTMLElement | null;
 
     if (menuButton) {
@@ -362,11 +362,11 @@ export async function acquireTransferFilterElementsImpl() {
 
       if (form) {
         const input = form.querySelector(
-          'input[title="Filter Criteria"]'
+          'input[title="Filter Criteria"]',
         ) as HTMLInputElement | null;
         const button = form.querySelector('button[type="submit"]') as HTMLButtonElement | null;
         const select = animationContainer?.querySelector(
-          '.k-list-scroller ul'
+          '.k-list-scroller ul',
         ) as HTMLElement | null;
 
         if (input) {
@@ -415,7 +415,7 @@ export async function acquireTagFilterElementsImpl() {
     atLeastOneIsTruthy(
       pageManager.tagNumberFilterInput,
       pageManager.tagNumberFilterSelect,
-      pageManager.tagNumberApplyFiltersButton
+      pageManager.tagNumberApplyFiltersButton,
     )
   ) {
     return;
@@ -427,7 +427,7 @@ export async function acquireTagFilterElementsImpl() {
 
   for (const tagFilterIdentifier of tagFilterIdentifiers) {
     menuButton = document.querySelector(
-      `.k-state-active th[data-field="${tagFilterIdentifier}"] .k-header-column-menu`
+      `.k-state-active th[data-field="${tagFilterIdentifier}"] .k-header-column-menu`,
     ) as HTMLElement | null;
 
     if (menuButton) {
@@ -445,11 +445,11 @@ export async function acquireTagFilterElementsImpl() {
 
       if (form) {
         const input = form.querySelector(
-          'input[title="Filter Criteria"]'
+          'input[title="Filter Criteria"]',
         ) as HTMLInputElement | null;
         const button = form.querySelector('button[type="submit"]') as HTMLButtonElement | null;
         const select = animationContainer?.querySelector(
-          '.k-list-scroller ul'
+          '.k-list-scroller ul',
         ) as HTMLElement | null;
 
         if (input) {
@@ -475,7 +475,7 @@ export async function acquireTagFilterElementsImpl() {
 
 export async function setPlantFilterImpl(
   plantFilterIdentifier: PlantFilterIdentifiers,
-  value: string
+  value: string,
 ) {
   await pageManager.refresh;
 
@@ -513,7 +513,7 @@ export async function setPlantFilterImpl(
 
 export async function setPackageFilterImpl(
   packageFilterIdentifier: PackageFilterIdentifiers,
-  value: string
+  value: string,
 ) {
   await pageManager.refresh;
 
@@ -569,7 +569,7 @@ export async function setPackageFilterImpl(
 
 export async function setTransferFilterImpl(
   transferFilterIdentifier: TransferFilterIdentifiers,
-  value: string
+  value: string,
 ) {
   await pageManager.refresh;
 

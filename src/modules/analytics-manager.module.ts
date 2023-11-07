@@ -78,7 +78,7 @@ class AnalyticsManager implements IAtomicService {
     } catch (e) {}
 
     const pageData = {
-      url, path, version, hostname, license, metrcVersion
+      url, path, version, hostname, license, metrcVersion,
     };
 
     sendAnalyticsMessage(MessageType.PAGELOAD, { pageName, pageData });

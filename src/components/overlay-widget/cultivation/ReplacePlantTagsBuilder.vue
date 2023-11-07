@@ -122,7 +122,7 @@ import PlantPicker from '@/components/overlay-widget/shared/PlantPicker.vue';
 import TagPicker from '@/components/overlay-widget/shared/TagPicker.vue';
 import { BuilderType, MessageType } from '@/consts';
 import {
-  ICsvFile, IMetrcReplacePlantTagsPayload, IPlantData, ITagData
+  ICsvFile, IMetrcReplacePlantTagsPayload, IPlantData, ITagData,
 } from '@/interfaces';
 import { analyticsManager } from '@/modules/analytics-manager.module';
 import { builderManager } from '@/modules/builder-manager.module';
@@ -157,7 +157,7 @@ export default Vue.extend({
       // @ts-ignore
       const zipped: [ITagData, IPlantData][] = safeZip(
         this.$data.plantTags,
-        this.$data.selectedPlants
+        this.$data.selectedPlants,
       );
 
       for (const el of zipped) {
@@ -180,7 +180,7 @@ export default Vue.extend({
           plantTotal: this.$data.selectedPlants.length,
         },
         this.buildCsvFiles(),
-        5
+        5,
       );
     },
     async downloadAll() {

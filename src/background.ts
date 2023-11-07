@@ -9,7 +9,7 @@ import {
   batchUpdateValues,
   createSpreadsheet,
   readValues,
-  writeValues
+  writeValues,
 } from './utils/sheets';
 
 console.log('These events are collected only to help us make the plugin more useful for you.');
@@ -91,7 +91,7 @@ chrome.runtime.onMessage.addListener((inboundEvent, sender, sendResponse) => {
 
                   // Backwards compat - possibly redundant
                   return cookies;
-                })
+                }),
             ));
 
           Promise.allSettled(promises).then(() => {
@@ -117,7 +117,7 @@ chrome.runtime.onMessage.addListener((inboundEvent, sender, sendResponse) => {
         logEvent(
           `Visited ${inboundEvent.message.data.pageName}`,
           inboundEvent.message.data.pageData,
-          inboundEvent.message.options
+          inboundEvent.message.options,
         );
         respondToContentScript(sendResponse, inboundEvent, { success: true });
         break;
@@ -157,7 +157,7 @@ chrome.runtime.onMessage.addListener((inboundEvent, sender, sendResponse) => {
           .transferSearch(
             inboundEvent.message.data.query,
             inboundEvent.message.data.license,
-            inboundEvent.message.data.filters
+            inboundEvent.message.data.filters,
           )
           .then((transfers) => {
             respondToContentScript(sendResponse, inboundEvent, {
@@ -182,7 +182,7 @@ chrome.runtime.onMessage.addListener((inboundEvent, sender, sendResponse) => {
           .tagSearch(
             inboundEvent.message.data.query,
             inboundEvent.message.data.license,
-            inboundEvent.message.data.filters
+            inboundEvent.message.data.filters,
           )
           .then((tags) => {
             respondToContentScript(sendResponse, inboundEvent, {
@@ -228,7 +228,7 @@ chrome.runtime.onMessage.addListener((inboundEvent, sender, sendResponse) => {
               success: false,
             });
             console.error('Event error in background', inboundEvent, error);
-          }
+          },
         );
         break;
       case MessageType.GET_OAUTH_USER_INFO_OR_ERROR:
@@ -244,7 +244,7 @@ chrome.runtime.onMessage.addListener((inboundEvent, sender, sendResponse) => {
               success: false,
             });
             console.error('Event error in background', inboundEvent, error);
-          }
+          },
         );
         break;
       case MessageType.EXPIRE_AUTH_TOKEN:
@@ -259,7 +259,7 @@ chrome.runtime.onMessage.addListener((inboundEvent, sender, sendResponse) => {
               success: false,
             });
             console.error('Event error in background', inboundEvent, error);
-          }
+          },
         );
 
         break;
@@ -276,7 +276,7 @@ chrome.runtime.onMessage.addListener((inboundEvent, sender, sendResponse) => {
               success: false,
             });
             console.error('Event error in background', inboundEvent, error);
-          }
+          },
         );
 
         break;
@@ -294,7 +294,7 @@ chrome.runtime.onMessage.addListener((inboundEvent, sender, sendResponse) => {
               success: false,
             });
             console.error('Event error in background', inboundEvent, error);
-          }
+          },
         );
         break;
 
@@ -311,7 +311,7 @@ chrome.runtime.onMessage.addListener((inboundEvent, sender, sendResponse) => {
               success: false,
             });
             console.error('Event error in background', inboundEvent, error);
-          }
+          },
         );
 
         break;
@@ -329,7 +329,7 @@ chrome.runtime.onMessage.addListener((inboundEvent, sender, sendResponse) => {
               success: false,
             });
             console.error('Event error in background', inboundEvent, error);
-          }
+          },
         );
 
         break;
@@ -347,7 +347,7 @@ chrome.runtime.onMessage.addListener((inboundEvent, sender, sendResponse) => {
               success: false,
             });
             console.error('Event error in background', inboundEvent, error);
-          }
+          },
         );
 
         break;
@@ -365,7 +365,7 @@ chrome.runtime.onMessage.addListener((inboundEvent, sender, sendResponse) => {
               success: false,
             });
             console.error('Event error in background', inboundEvent, error);
-          }
+          },
         );
         break;
 
@@ -375,7 +375,7 @@ chrome.runtime.onMessage.addListener((inboundEvent, sender, sendResponse) => {
           logEvent(
             inboundEvent.message.data.eventName,
             inboundEvent.message.data.eventData,
-            inboundEvent.message.options
+            inboundEvent.message.options,
           );
 
           respondToContentScript(sendResponse, inboundEvent, { success: true });

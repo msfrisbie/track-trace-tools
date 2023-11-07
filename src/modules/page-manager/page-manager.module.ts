@@ -7,7 +7,7 @@ import {
   PlantFilterIdentifiers,
   TagFilterIdentifiers,
   TransferFilterIdentifiers,
-  TTT_TABLEGROUP_ATTRIBUTE
+  TTT_TABLEGROUP_ATTRIBUTE,
 } from '@/consts';
 import { DarkModeState, IAtomicService, SnowflakeState } from '@/interfaces';
 import { toastManager } from '@/modules/toast-manager.module';
@@ -29,12 +29,12 @@ import {
   TAG_TAB_REGEX,
   TRANSFER_HUB_REGEX,
   TRANSFER_TAB_REGEX,
-  TRANSFER_TEMPLATE_TAB_REGEX
+  TRANSFER_TEMPLATE_TAB_REGEX,
 } from './consts';
 import {
   addButtonsToPackageTableImpl,
   addButtonsToTransferTableImpl,
-  modifyTransferModalImpl
+  modifyTransferModalImpl,
 } from './inline-widget-utils';
 import {
   clickLogoutDismissImpl,
@@ -43,7 +43,7 @@ import {
   getVisibleAnimationContainerImpl,
   interceptViewManifestButtonImpl,
   setPaginationImpl,
-  suppressAnimationContainerImpl
+  suppressAnimationContainerImpl,
 } from './metrc-utils';
 import {
   acquirePackageFilterElementsImpl,
@@ -61,13 +61,13 @@ import {
   setPackageFilterImpl,
   setPlantFilterImpl,
   setTagFilterImpl,
-  setTransferFilterImpl
+  setTransferFilterImpl,
 } from './search-utils';
 import {
   controlDarkModeImpl,
   controlLogoutBarImpl,
   setExpandedClassImpl,
-  togglePageVisibilityClassesImpl
+  togglePageVisibilityClassesImpl,
 } from './style-utils';
 import {
   activeTabOrNullImpl,
@@ -77,7 +77,7 @@ import {
   managePlantTabsImpl,
   manageSalesTabsImpl,
   manageTagsTabsImpl,
-  manageTransfersTabsImpl
+  manageTransfersTabsImpl,
 } from './tab-utils';
 
 const debugLog = debugLogFactory('page-manager.module.ts');
@@ -459,7 +459,7 @@ class PageManager implements IAtomicService {
 
       if (!this.sessionTimeoutAlert) {
         this.sessionTimeoutAlert = document.querySelector(
-          '#session_timeout_alert'
+          '#session_timeout_alert',
         ) as HTMLElement | null;
       }
 
@@ -469,7 +469,7 @@ class PageManager implements IAtomicService {
 
       if (!this.visiblePaginationSizeSelector) {
         this.visiblePaginationSizeSelector = document.querySelector(
-          '.k-state-active .k-pager-sizes .k-dropdown-wrap'
+          '.k-state-active .k-pager-sizes .k-dropdown-wrap',
         );
       }
 
@@ -492,7 +492,7 @@ class PageManager implements IAtomicService {
       if (store.state.settings?.autoDismissPopups) {
         setTimeout(() => {
           for (const btn of document.querySelectorAll(
-            '#user-alerts .alert button'
+            '#user-alerts .alert button',
           ) as NodeListOf<HTMLElement>) {
             btn.click();
           }
@@ -670,7 +670,7 @@ class PageManager implements IAtomicService {
      * 1 means it must be the previously seen node
      * 2 means it was seen two nodes ago
      */
-    previousTabTextOffset: number | null = null
+    previousTabTextOffset: number | null = null,
   ) {
     return clickTabStartingWithImpl(tabList, tabText, previousTabText, previousTabTextOffset);
   }
@@ -783,7 +783,7 @@ class PageManager implements IAtomicService {
         `table[role="treegrid"], 
         table[role="treegrid"] tr:not([${TTT_TABLEGROUP_ATTRIBUTE}]),
         table[role="grid"], 
-        table[role="grid"] tr:not([${TTT_TABLEGROUP_ATTRIBUTE}])`
+        table[role="grid"] tr:not([${TTT_TABLEGROUP_ATTRIBUTE}])`,
       );
 
       let groupId = null;

@@ -37,7 +37,7 @@ export class CompressedMetrcTags implements ICompressedMetrcTagRanges {
       propertyMask: (rawData: Object) => Object;
       rawCollection: any[];
     },
-    includeRawData: boolean = true
+    includeRawData: boolean = true,
   ) {
     const sortedMaskedCollection: IFormattedTagData[] = rawCollection
       .map((data) => {
@@ -126,7 +126,7 @@ export function compressedDataWrapperFactory<T>(
   name: string,
   expanded: T[],
   indexedKey: string,
-  keys?: string[]
+  keys?: string[],
 ): CompressedDataWrapper<T> {
   if (expanded.length === 0) {
     console.error('Compressing empty array');

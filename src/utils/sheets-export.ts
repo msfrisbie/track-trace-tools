@@ -57,7 +57,7 @@ export async function readSpreadsheet({
       sheetName,
     },
     undefined,
-    SHEETS_API_MESSAGE_TIMEOUT_MS
+    SHEETS_API_MESSAGE_TIMEOUT_MS,
   );
 }
 
@@ -81,7 +81,7 @@ export async function appendSpreadsheetValues({
       valueInputOption,
     },
     undefined,
-    SHEETS_API_MESSAGE_TIMEOUT_MS
+    SHEETS_API_MESSAGE_TIMEOUT_MS,
   );
 }
 
@@ -127,7 +127,7 @@ export async function writeDataSheet<T>({
         values: [fields.map((fieldData) => `     ${fieldData.readableName}     `)],
       },
       undefined,
-      SHEETS_API_MESSAGE_TIMEOUT_MS
+      SHEETS_API_MESSAGE_TIMEOUT_MS,
     );
 
     nextPageRowIdx += 1;
@@ -166,8 +166,8 @@ export async function writeDataSheet<T>({
             valueInputOption: mergedOptions.valueInputOption,
           },
           undefined,
-          SHEETS_API_MESSAGE_TIMEOUT_MS
-        )
+          SHEETS_API_MESSAGE_TIMEOUT_MS,
+        ),
       );
     }
 
@@ -188,8 +188,8 @@ export async function writeDataSheet<T>({
               valueInputOption: mergedOptions.valueInputOption,
             },
             undefined,
-            SHEETS_API_MESSAGE_TIMEOUT_MS
-          )
+            SHEETS_API_MESSAGE_TIMEOUT_MS,
+          ),
         );
       }
 
@@ -216,8 +216,8 @@ export async function writeDataSheet<T>({
           valueInputOption: mergedOptions.valueInputOption,
         },
         undefined,
-        SHEETS_API_MESSAGE_TIMEOUT_MS
-      )
+        SHEETS_API_MESSAGE_TIMEOUT_MS,
+      ),
     );
   }
 
@@ -253,7 +253,7 @@ export async function createDebugSheetOrError({
       sheetTitles,
     },
     undefined,
-    SHEETS_API_MESSAGE_TIMEOUT_MS
+    SHEETS_API_MESSAGE_TIMEOUT_MS,
   );
 
   if (!response.data.success) {
@@ -275,7 +275,7 @@ export async function createDebugSheetOrError({
         requests: formattingRequests,
       },
       undefined,
-      SHEETS_API_MESSAGE_TIMEOUT_MS
+      SHEETS_API_MESSAGE_TIMEOUT_MS,
     );
 
     await writeDataSheet({
@@ -411,7 +411,7 @@ export async function createSpreadsheetOrError({
       sheetTitles,
     },
     undefined,
-    SHEETS_API_MESSAGE_TIMEOUT_MS
+    SHEETS_API_MESSAGE_TIMEOUT_MS,
   );
 
   if (!response.data.success) {
@@ -444,9 +444,9 @@ export async function createSpreadsheetOrError({
     const sheetId: number = sheetTitles.indexOf(getSheetTitle({ reportType, reportConfig }));
     const length = Math.max(
       extractFlattenedData({
-        flattenedCache, reportType, reportData, reportConfig
+        flattenedCache, reportType, reportData, reportConfig,
       }).length,
-      1
+      1,
     );
 
     formattingRequests = [
@@ -464,7 +464,7 @@ export async function createSpreadsheetOrError({
       requests: formattingRequests,
     },
     undefined,
-    SHEETS_API_MESSAGE_TIMEOUT_MS
+    SHEETS_API_MESSAGE_TIMEOUT_MS,
   );
 
   //
@@ -481,7 +481,7 @@ export async function createSpreadsheetOrError({
       spreadsheetTitle: getSheetTitle({ reportType, reportConfig }),
       fields: reportConfig[reportType]?.fields as IFieldData[],
       data: extractFlattenedData({
-        flattenedCache, reportType, reportData, reportConfig
+        flattenedCache, reportType, reportData, reportConfig,
       }),
     });
   }
@@ -499,7 +499,7 @@ export async function createSpreadsheetOrError({
   for (const reportType of ELIGIBLE_REPORT_TYPES) {
     summaryList.push([
       `=HYPERLINK("#gid=${sheetTitles.indexOf(
-        getSheetTitle({ reportType, reportConfig })
+        getSheetTitle({ reportType, reportConfig }),
       )}","${getSheetTitle({
         reportType,
         reportConfig,
@@ -517,7 +517,7 @@ export async function createSpreadsheetOrError({
       values: [[], [], ...summaryList],
     },
     undefined,
-    SHEETS_API_MESSAGE_TIMEOUT_MS
+    SHEETS_API_MESSAGE_TIMEOUT_MS,
   );
 
   //
@@ -552,7 +552,7 @@ export async function createSpreadsheetOrError({
       requests: resizeRequests,
     },
     undefined,
-    SHEETS_API_MESSAGE_TIMEOUT_MS
+    SHEETS_API_MESSAGE_TIMEOUT_MS,
   );
 
   // 3000ms grace period for all sheets
@@ -580,7 +580,7 @@ export async function createSpreadsheetOrError({
       requests: shrinkFontRequests,
     },
     undefined,
-    SHEETS_API_MESSAGE_TIMEOUT_MS
+    SHEETS_API_MESSAGE_TIMEOUT_MS,
   );
 
   await messageBus.sendMessageToBackground(
@@ -591,14 +591,14 @@ export async function createSpreadsheetOrError({
       values: [[`Created with Track & Trace Tools @ ${Date().toString()}`]],
     },
     undefined,
-    SHEETS_API_MESSAGE_TIMEOUT_MS
+    SHEETS_API_MESSAGE_TIMEOUT_MS,
   );
 
   return response.data.result;
 }
 
 export async function createPackageCsvTemplateSheetOrError(
-  columns: string[]
+  columns: string[],
 ): Promise<ISpreadsheet> {
   const SHEET_TITLE = 'Create Packages';
 
@@ -614,7 +614,7 @@ export async function createPackageCsvTemplateSheetOrError(
       sheetTitles: [SHEET_TITLE],
     },
     undefined,
-    SHEETS_API_MESSAGE_TIMEOUT_MS
+    SHEETS_API_MESSAGE_TIMEOUT_MS,
   );
 
   await messageBus.sendMessageToBackground(
@@ -625,7 +625,7 @@ export async function createPackageCsvTemplateSheetOrError(
       values: [columns],
     },
     undefined,
-    SHEETS_API_MESSAGE_TIMEOUT_MS
+    SHEETS_API_MESSAGE_TIMEOUT_MS,
   );
 
   const sheetId = 0;
@@ -646,7 +646,7 @@ export async function createPackageCsvTemplateSheetOrError(
       requests: formattingRequests,
     },
     undefined,
-    SHEETS_API_MESSAGE_TIMEOUT_MS
+    SHEETS_API_MESSAGE_TIMEOUT_MS,
   );
 
   return response.data.result;
@@ -659,7 +659,7 @@ export async function createScanSheetOrError(
     pkg: IDestinationPackageData;
     destination?: IDestinationData;
     incomingTransfer?: IIndexedTransferData;
-  }[]
+  }[],
 ): Promise<ISpreadsheet> {
   const SHEET_TITLE = `${manifestNumber} Scan Sheet`;
 
@@ -675,7 +675,7 @@ export async function createScanSheetOrError(
       sheetTitles: [SHEET_TITLE],
     },
     undefined,
-    SHEETS_API_MESSAGE_TIMEOUT_MS
+    SHEETS_API_MESSAGE_TIMEOUT_MS,
   );
 
   await messageBus.sendMessageToBackground(
@@ -698,7 +698,7 @@ export async function createScanSheetOrError(
       ],
     },
     undefined,
-    SHEETS_API_MESSAGE_TIMEOUT_MS
+    SHEETS_API_MESSAGE_TIMEOUT_MS,
   );
 
   const sheetId = 0;
@@ -774,7 +774,7 @@ export async function createScanSheetOrError(
       requests: formattingRequests,
     },
     undefined,
-    SHEETS_API_MESSAGE_TIMEOUT_MS
+    SHEETS_API_MESSAGE_TIMEOUT_MS,
   );
 
   await messageBus.sendMessageToBackground(
@@ -785,7 +785,7 @@ export async function createScanSheetOrError(
       values: [[`Created with Track & Trace Tools @ ${Date().toString()}`]],
     },
     undefined,
-    SHEETS_API_MESSAGE_TIMEOUT_MS
+    SHEETS_API_MESSAGE_TIMEOUT_MS,
   );
 
   return response.data.result;

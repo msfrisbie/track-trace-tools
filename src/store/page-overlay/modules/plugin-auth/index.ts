@@ -4,7 +4,7 @@ import { messageBus } from '@/modules/message-bus.module';
 import { debugLogFactory } from '@/utils/debug';
 import { ActionContext } from 'vuex';
 import {
-  OAuthState, PluginAuthActions, PluginAuthGetters, PluginAuthMutations
+  OAuthState, PluginAuthActions, PluginAuthGetters, PluginAuthMutations,
 } from './consts';
 import { IPluginAuthState } from './interfaces';
 
@@ -33,19 +33,19 @@ export const pluginAuthModule = {
   mutations: {
     [PluginAuthMutations.SET_AUTH](
       state: IPluginAuthState,
-      { authState }: { authState: IAuthState | null }
+      { authState }: { authState: IAuthState | null },
     ) {
       state.authState = authState;
     },
     [PluginAuthMutations.SET_OAUTH_STATE](
       state: IPluginAuthState,
-      { oAuthState }: { oAuthState: OAuthState }
+      { oAuthState }: { oAuthState: OAuthState },
     ) {
       state.oAuthState = oAuthState;
     },
     [PluginAuthMutations.SET_LOGIN_DATA](
       state: IPluginAuthState,
-      { authState, token }: { authState: IAuthState; token: string }
+      { authState, token }: { authState: IAuthState; token: string },
     ) {
       const tokenParts = token.split(/\./);
       const tokenDecoded = JSON.parse(window.atob(tokenParts[1]));
@@ -79,7 +79,7 @@ export const pluginAuthModule = {
     },
     [PluginAuthMutations.SET_CURRENT_USER_DATA](
       state: IPluginAuthState,
-      { currentUser }: { currentUser: any }
+      { currentUser }: { currentUser: any },
     ) {
       if (!currentUser) {
         debugLog(async () => ['unable to set current user']);
@@ -99,7 +99,7 @@ export const pluginAuthModule = {
       state: IPluginAuthState,
       getters: any,
       rootState: any,
-      rootGetters: any
+      rootGetters: any,
     ) => {
       if (rootState.pluginAuth.authState.identity !== state.identity) {
         // Stored credentials must match current identity
@@ -125,25 +125,25 @@ export const pluginAuthModule = {
       state: IPluginAuthState,
       getters: any,
       rootState: any,
-      rootGetters: any
+      rootGetters: any,
     ) => state.authState || null,
     [PluginAuthGetters.PACKAGES_URL]: (
       state: IPluginAuthState,
       getters: any,
       rootState: any,
-      rootGetters: any
+      rootGetters: any,
     ) => (state.authState?.license ? `/industry/${state.authState?.license}/packages` : null),
   },
   actions: {
     [PluginAuthActions.SET_AUTH](
       ctx: ActionContext<IPluginAuthState, IPluginState>,
-      { authState }: { authState: IAuthState | null }
+      { authState }: { authState: IAuthState | null },
     ) {
       ctx.commit(PluginAuthMutations.SET_AUTH, { authState });
     },
     async [PluginAuthActions.REFRESH_OAUTH_STATE](
       ctx: ActionContext<IPluginAuthState, IPluginState>,
-      {}: {}
+      {}: {},
     ) {
       const response: {
         data: {

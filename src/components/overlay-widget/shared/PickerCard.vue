@@ -13,11 +13,11 @@ import DualColorTag from '@/components/overlay-widget/shared/DualColorTag.vue';
 export default Vue.extend({
   name: 'PickerCard',
   components: {
-    DualColorTag
+    DualColorTag,
   },
   props: {
     title: String,
-    label: String
-  }
+    label: String,
+  },
 });
 </script>

@@ -96,7 +96,7 @@ export default Vue.extend({
         return this.ancestorTree.ancestors;
       }
       return this.ancestorTree.ancestors.filter(
-        (node) => node.type === HistoryTreeNodeType.OWNED_PACKAGE
+        (node) => node.type === HistoryTreeNodeType.OWNED_PACKAGE,
       );
     },
     filteredChildren() {
@@ -104,7 +104,7 @@ export default Vue.extend({
         return this.childTree.children;
       }
       return this.childTree.children.filter(
-        (node) => node.type === HistoryTreeNodeType.OWNED_PACKAGE
+        (node) => node.type === HistoryTreeNodeType.OWNED_PACKAGE,
       );
     },
     maxParentVisibleDepth: {

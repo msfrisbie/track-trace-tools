@@ -9,7 +9,7 @@ import Vue from 'vue';
 export default Vue.extend({
   name: 'PackageIcon',
   props: {
-    pkg: Object as () => IIndexedPackageData
+    pkg: Object as () => IIndexedPackageData,
   },
   computed: {
     icon() {
@@ -62,7 +62,7 @@ export default Vue.extend({
         return 'rgba(0,0,0,0.3)';
       }
       return '#49276a';
-    }
-  }
+    },
+  },
 });
 </script>

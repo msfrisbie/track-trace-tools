@@ -20,7 +20,7 @@ import { LRU } from '@/utils/cache';
 import { ActionContext } from 'vuex';
 import { ExplorerTarget, ExplorerTargetHistory, IExplorerState } from './interfaces';
 import {
-  ExplorerActions, ExplorerMutations, ExplorerStatus, ExplorerTargetType
+  ExplorerActions, ExplorerMutations, ExplorerStatus, ExplorerTargetType,
 } from './consts';
 
 const inMemoryState = {
@@ -50,7 +50,7 @@ export const explorerModule = {
         target,
       }: {
         target: ExplorerTarget | null;
-      }
+      },
     ) {
       state.target = target;
 
@@ -66,7 +66,7 @@ export const explorerModule = {
         targetHistory,
       }: {
         targetHistory: ExplorerTargetHistory | null;
-      }
+      },
     ) {
       state.history = targetHistory;
     },
@@ -78,7 +78,7 @@ export const explorerModule = {
       }: {
         status?: ExplorerStatus;
         statusMessage?: string;
-      }
+      },
     ) {
       if (status) {
         state.status = status;
@@ -94,7 +94,7 @@ export const explorerModule = {
         queryString,
       }: {
         queryString: string;
-      }
+      },
     ) {
       state.queryString = queryString.trim();
     },
@@ -104,7 +104,7 @@ export const explorerModule = {
         targetType,
       }: {
         targetType: ExplorerTargetType;
-      }
+      },
     ) {
       state.targetType = targetType;
     },
@@ -137,7 +137,7 @@ export const explorerModule = {
     },
     [ExplorerActions.SET_EXPLORER_DATA]: async (
       ctx: ActionContext<IExplorerState, IPluginState>,
-      { packageLabel }: { packageLabel?: string }
+      { packageLabel }: { packageLabel?: string },
     ) => {
       if (packageLabel) {
         ctx.dispatch(ExplorerActions.SUBMIT_QUERY, {
@@ -148,7 +148,7 @@ export const explorerModule = {
     },
     [ExplorerActions.SET_QUERY]: async (
       ctx: ActionContext<IExplorerState, IPluginState>,
-      { queryString }: { queryString: string }
+      { queryString }: { queryString: string },
     ) => {
       ctx.commit(ExplorerMutations.SET_QUERY, {
         queryString,
@@ -156,7 +156,7 @@ export const explorerModule = {
     },
     [ExplorerActions.SET_TARGET_TYPE]: async (
       ctx: ActionContext<IExplorerState, IPluginState>,
-      { targetType }: { targetType: ExplorerTargetType }
+      { targetType }: { targetType: ExplorerTargetType },
     ) => {
       ctx.commit(ExplorerMutations.SET_TARGET_TYPE, {
         targetType,
@@ -170,7 +170,7 @@ export const explorerModule = {
       }: {
         queryString?: string;
         targetType?: ExplorerTargetType;
-      } = {}
+      } = {},
     ) => {
       analyticsManager.track(MessageType.EXPLORER_QUERY, {
         queryString,
@@ -197,7 +197,7 @@ export const explorerModule = {
         ctx.commit(ExplorerMutations.ADD_QUERY, {});
 
         const ownedLicenses: string[] = (await facilityManager.ownedFacilitiesOrError()).map(
-          (facility) => facility.licenseNumber
+          (facility) => facility.licenseNumber,
         );
         const licenseCache: LRU<string> = new LRU(ownedLicenses);
         let dataLoader: DataLoader | null = null;
@@ -730,7 +730,7 @@ export const explorerModule = {
 
               try {
                 outgoingTransferHistory = await dataLoader.transferHistoryByOutGoingTransferId(
-                  outgoingTransfer.Id
+                  outgoingTransfer.Id,
                 );
               } catch (e) {
                 console.error(e);

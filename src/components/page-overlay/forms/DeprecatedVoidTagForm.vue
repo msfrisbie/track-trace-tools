@@ -122,7 +122,7 @@ export default Vue.extend({
           MutationType.ENQUEUE_TASK,
           await createTask(TaskType.VOID_TAGS, {
             tag,
-          })
+          }),
         );
       }
     },

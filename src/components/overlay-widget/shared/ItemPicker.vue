@@ -164,7 +164,7 @@ export default Vue.extend({
         console.error('Server returned 0 items');
         this.$data.error = new DataLoadError(
           DataLoadErrorType.ZERO_RESULTS,
-          'Zero results returned'
+          'Zero results returned',
         );
       }
     },

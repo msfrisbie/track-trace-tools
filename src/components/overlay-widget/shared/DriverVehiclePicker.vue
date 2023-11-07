@@ -141,7 +141,7 @@ import {
   IComputedGetSet,
 } from '@/interfaces';
 import {
-  combineLatest, from, Subject, timer
+  combineLatest, from, Subject, timer,
 } from 'rxjs';
 import { authManager } from '@/modules/auth-manager.module';
 import { dynamicConstsManager } from '@/modules/dynamic-consts-manager.module';
@@ -337,12 +337,12 @@ export default Vue.extend({
           }) => {
             this.$data.drivers = [...(await dynamicConstsManager.drivers()), ...drivers].reduce(
               dedupObjects,
-              []
+              [],
             );
 
             this.$data.vehicles = [...(await dynamicConstsManager.vehicles()), ...vehicles].reduce(
               dedupObjects,
-              []
+              [],
             );
 
             analyticsManager.track(MessageType.BUILDER_EVENT, {
@@ -369,7 +369,7 @@ export default Vue.extend({
             }
 
             this.$data.transferDataLoading = false;
-          }
+          },
         )
         .catch(() => {
           this.$data.transferDataLoading = false;

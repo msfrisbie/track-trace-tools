@@ -11,14 +11,14 @@ describe('array.ts', () => {
   it('safeZip throws errors on bad zips', () => {
     expect(() => safeZip(
       [1, 2],
-      ['a', 'b', 'c']
+      ['a', 'b', 'c'],
     )).toThrowError();
   });
 
   it('safeZip correctly zips', () => {
     expect(safeZip(
       [1, 2, 3],
-      ['a', 'b', 'c']
+      ['a', 'b', 'c'],
     )).toEqual([
       [1, 'a'],
       [2, 'b'],

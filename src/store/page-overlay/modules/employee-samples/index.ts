@@ -51,7 +51,7 @@ export const employeeSamplesModule = {
         employees?: IMetrcEmployeeData[];
         availableSamplePackages?: IIndexedPackageData[];
         modifiedSamplePackages?: IIndexedPackageData[];
-      }
+      },
     ) {
       for (const [key, value] of Object.entries(payload)) {
         // @ts-ignore
@@ -64,7 +64,7 @@ export const employeeSamplesModule = {
       state: IEmployeeSamplesState,
       getters: any,
       rootState: any,
-      rootGetters: any
+      rootGetters: any,
     ) => {
       if (state.toolState === EmployeeSamplesState.ALLOCATION_INFLIGHT) {
         return false;
@@ -84,27 +84,27 @@ export const employeeSamplesModule = {
       state: IEmployeeSamplesState,
       getters: any,
       rootState: any,
-      rootGetters: any
+      rootGetters: any,
     ) => state.employees.filter((x) => state.selectedEmployeeIds.includes(x.Id)),
     [EmployeeSamplesGetters.SELECTED_SAMPLE_PACKAGES]: (
       state: IEmployeeSamplesState,
       getters: any,
       rootState: any,
-      rootGetters: any
+      rootGetters: any,
     ) => state.availableSamplePackages.filter((x) =>
       state.selectedSamplePackageIds.includes(x.Id)),
     [EmployeeSamplesGetters.SELECTED_SAMPLE_ALLOCATIONS]: (
       state: IEmployeeSamplesState,
       getters: any,
       rootState: any,
-      rootGetters: any
+      rootGetters: any,
     ) => state.pendingAllocationBuffer.filter((x) =>
       state.pendingAllocationBufferIds.includes(x.uuid)),
     [EmployeeSamplesGetters.DATE_GROUPED_AVAILABLE_SAMPLE_PACKAGES]: (
       state: IEmployeeSamplesState,
       getters: any,
       rootState: any,
-      rootGetters: any
+      rootGetters: any,
     ) => {
       const dateGroups: Map<string, IIndexedPackageData[]> = new Map();
 
@@ -123,7 +123,7 @@ export const employeeSamplesModule = {
   actions: {
     [EmployeeSamplesActions.RESET]: async (
       ctx: ActionContext<IEmployeeSamplesState, IPluginState>,
-      data: any
+      data: any,
     ) => {
       ctx.state.toolState = EmployeeSamplesState.INITIAL;
 
@@ -160,7 +160,7 @@ export const employeeSamplesModule = {
           // - active
           .filter(
             (pkg) =>
-              pkg.IsTradeSample && pkg.Quantity > 0 && pkg.PackageState === PackageState.ACTIVE
+              pkg.IsTradeSample && pkg.Quantity > 0 && pkg.PackageState === PackageState.ACTIVE,
           )
           // Sorted in received order
           .sort((a, b) => a.ReceivedDateTime!.localeCompare(b.ReceivedDateTime!));
@@ -178,7 +178,7 @@ export const employeeSamplesModule = {
           promises.push(
             primaryDataLoader.packageHistoryByPackageId(pkg.Id).then((history) => {
               pkg.history = history;
-            })
+            }),
           );
         });
 
@@ -200,12 +200,12 @@ export const employeeSamplesModule = {
     },
     [EmployeeSamplesActions.TOGGLE_EMPLOYEE]: async (
       ctx: ActionContext<IEmployeeSamplesState, IPluginState>,
-      data: { employeeId: number; remove?: boolean; add?: boolean }
+      data: { employeeId: number; remove?: boolean; add?: boolean },
     ) => {
       if (ctx.state.selectedEmployeeIds.includes(data.employeeId)) {
         if (data.add !== true) {
           ctx.state.selectedEmployeeIds = ctx.state.selectedEmployeeIds.filter(
-            (x) => x !== data.employeeId
+            (x) => x !== data.employeeId,
           );
         }
       } else if (data.remove !== true) {
@@ -214,12 +214,12 @@ export const employeeSamplesModule = {
     },
     [EmployeeSamplesActions.TOGGLE_PACKAGE]: async (
       ctx: ActionContext<IEmployeeSamplesState, IPluginState>,
-      data: { packageId: number; remove?: boolean; add?: boolean }
+      data: { packageId: number; remove?: boolean; add?: boolean },
     ) => {
       if (ctx.state.selectedSamplePackageIds.includes(data.packageId)) {
         if (data.add !== true) {
           ctx.state.selectedSamplePackageIds = ctx.state.selectedSamplePackageIds.filter(
-            (x) => x !== data.packageId
+            (x) => x !== data.packageId,
           );
         }
       } else if (data.remove !== true) {
@@ -228,12 +228,12 @@ export const employeeSamplesModule = {
     },
     [EmployeeSamplesActions.TOGGLE_SAMPLE_ALLOCATION]: async (
       ctx: ActionContext<IEmployeeSamplesState, IPluginState>,
-      data: { uuid: string; remove?: boolean; add?: boolean }
+      data: { uuid: string; remove?: boolean; add?: boolean },
     ) => {
       if (ctx.state.pendingAllocationBufferIds.includes(data.uuid)) {
         if (data.add !== true) {
           ctx.state.pendingAllocationBufferIds = ctx.state.pendingAllocationBufferIds.filter(
-            (x) => x !== data.uuid
+            (x) => x !== data.uuid,
           );
         }
       } else if (data.remove !== true) {
@@ -242,7 +242,7 @@ export const employeeSamplesModule = {
     },
     [EmployeeSamplesActions.ALLOCATE_SAMPLES]: async (
       ctx: ActionContext<IEmployeeSamplesState, IPluginState>,
-      data: any
+      data: any,
     ) => {
       try {
         ctx.state.toolState = EmployeeSamplesState.ALLOCATION_INFLIGHT;
@@ -273,7 +273,7 @@ export const employeeSamplesModule = {
         ctx.state.recordedAllocationBuffer = [];
 
         const employeeLRU = new LRU<IMetrcEmployeeData>(
-          ctx.getters[EmployeeSamplesGetters.SELECTED_EMPLOYEES]
+          ctx.getters[EmployeeSamplesGetters.SELECTED_EMPLOYEES],
         );
 
         const allocationDataList: IHistoryAllocationData[] = [];
@@ -294,12 +294,12 @@ export const employeeSamplesModule = {
         for (const allocationData of allocationDataList) {
           const employee = employeeLRU.elements.find(
             (x) =>
-              parseInt(x.License.Number, 10) === parseInt(allocationData.employeeLicenseNumber, 10)
+              parseInt(x.License.Number, 10) === parseInt(allocationData.employeeLicenseNumber, 10),
           );
 
           if (!employee) {
             console.warn(
-              `No match for employee with license # ${allocationData.employeeLicenseNumber} (${allocationData.employeeName}) (${allocationData.packageLabel})`
+              `No match for employee with license # ${allocationData.employeeLicenseNumber} (${allocationData.employeeName}) (${allocationData.packageLabel})`,
             );
             continue;
           }
@@ -309,7 +309,7 @@ export const employeeSamplesModule = {
           const allocation = await getSampleAllocationFromAllocationDataOrNull(
             employeeLRU.elements,
             ctx.state.modifiedSamplePackages,
-            allocationData
+            allocationData,
           );
 
           if (!allocation) {
@@ -346,7 +346,7 @@ export const employeeSamplesModule = {
                   currentSample,
                   distributionDate,
                   ctx.state.recordedAllocationBuffer,
-                  ctx.state.pendingAllocationBuffer
+                  ctx.state.pendingAllocationBuffer,
                 )
               ) {
                 // Record allocation

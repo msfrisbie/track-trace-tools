@@ -62,7 +62,7 @@ export const announcementsModule = {
       state: IAnnouncementsState,
       getters: any,
       rootState: any,
-      rootGetters: any
+      rootGetters: any,
     ): IAnnouncementData[] => state.announcements
       .filter((x) => {
         if (!state.dismissedDatetime) {
@@ -80,7 +80,7 @@ export const announcementsModule = {
       state: IAnnouncementsState,
       getters: any,
       rootState: any,
-      rootGetters: any
+      rootGetters: any,
     ): IAnnouncementData[] => state.announcements
       .filter((x) => {
         if (state.showDismissed) {
@@ -102,7 +102,7 @@ export const announcementsModule = {
       state: IAnnouncementsState,
       getters: any,
       rootState: any,
-      rootGetters: any
+      rootGetters: any,
     ): IAnnouncementData[] => state.announcements
       .filter((x) => {
         if (state.showDismissed) {
@@ -124,14 +124,14 @@ export const announcementsModule = {
   actions: {
     [AnnouncementsActions.INTERVAL_LOAD_NOTIFICATIONS]: async (
       ctx: ActionContext<IAnnouncementsState, IPluginState>,
-      data: any
+      data: any,
     ) => {
       // Only load once per minute
       if (
         !!ctx.state.lastAnnouncementsCheckDatetime
         && isoDatetimedDifferenceInMinutes(
           new Date().toISOString(),
-          ctx.state.lastAnnouncementsCheckDatetime
+          ctx.state.lastAnnouncementsCheckDatetime,
         ) < 1
       ) {
         console.log('declining to load');
@@ -142,7 +142,7 @@ export const announcementsModule = {
     },
     [AnnouncementsActions.LOAD_NOTIFICATIONS]: async (
       ctx: ActionContext<IAnnouncementsState, IPluginState>,
-      data: any
+      data: any,
     ) => {
       const announcements = await t3RequestManager.loadAnnouncements();
 
@@ -153,12 +153,12 @@ export const announcementsModule = {
           x.show_notification
           // Only show fresh notifications
           && (!ctx.state.lastAnnouncementsViewedDatetime
-            || x.published_at > ctx.state.lastAnnouncementsViewedDatetime)
+            || x.published_at > ctx.state.lastAnnouncementsViewedDatetime),
       ).length;
     },
     [AnnouncementsActions.VIEW_ANNOUNCEMENTS]: async (
       ctx: ActionContext<IAnnouncementsState, IPluginState>,
-      data: any
+      data: any,
     ) => {
       if (ctx.state.announcements.length === 0) {
         return;
@@ -172,13 +172,13 @@ export const announcementsModule = {
     },
     [AnnouncementsActions.SHOW_ALL_ANNOUNCEMENTS]: async (
       ctx: ActionContext<IAnnouncementsState, IPluginState>,
-      data: any
+      data: any,
     ) => {
       ctx.state.showDismissed = true;
     },
     [AnnouncementsActions.DISMISS_ANNOUNCEMENTS]: async (
       ctx: ActionContext<IAnnouncementsState, IPluginState>,
-      data: any
+      data: any,
     ) => {
       if (ctx.state.announcements.length === 0) {
         return;
@@ -190,7 +190,7 @@ export const announcementsModule = {
     },
     [AnnouncementsActions.RESET]: async (
       ctx: ActionContext<IAnnouncementsState, IPluginState>,
-      data: any
+      data: any,
     ) => {
       ctx.state.notificationCount = 0;
       ctx.state.announcements = [];

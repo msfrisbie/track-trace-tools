@@ -241,7 +241,7 @@ export default Vue.extend({
     sourceHarvestNamePackages(): IIndexedPackageData[] {
       const packages = this.packages.filter((packageData) =>
         packageData.SourceHarvestNames?.toUpperCase().includes(
-          store.state.search.queryString.toUpperCase()
+          store.state.search.queryString.toUpperCase(),
         ));
 
       return packages;
@@ -249,7 +249,7 @@ export default Vue.extend({
     sourcePackageLabelPackages(): IIndexedPackageData[] {
       const packages = this.packages.filter((packageData) =>
         packageData.SourcePackageLabels?.toUpperCase().includes(
-          store.state.search.queryString.toUpperCase()
+          store.state.search.queryString.toUpperCase(),
         ));
 
       return packages;
@@ -257,7 +257,7 @@ export default Vue.extend({
     productionBatchNumberPackages(): IIndexedPackageData[] {
       const packages = this.packages.filter((packageData) =>
         packageData.ProductionBatchNumber?.toUpperCase().includes(
-          store.state.search.queryString.toUpperCase()
+          store.state.search.queryString.toUpperCase(),
         ));
 
       return packages;
@@ -265,7 +265,7 @@ export default Vue.extend({
     sourceProductionBatchNumbersPackages(): IIndexedPackageData[] {
       const packages = this.packages.filter((packageData) =>
         packageData.SourceProductionBatchNumbers?.toUpperCase().includes(
-          store.state.search.queryString.toUpperCase()
+          store.state.search.queryString.toUpperCase(),
         ));
 
       return packages;
@@ -279,7 +279,7 @@ export default Vue.extend({
     itemStrainNamePackages(): IIndexedPackageData[] {
       const packages = this.packages.filter((packageData) =>
         packageData.Item.StrainName?.toUpperCase().includes(
-          store.state.search.queryString.toUpperCase()
+          store.state.search.queryString.toUpperCase(),
         ));
 
       return packages;
@@ -287,7 +287,7 @@ export default Vue.extend({
     locationNamePackages(): IIndexedPackageData[] {
       const packages = this.packages.filter((packageData) =>
         packageData.LocationName?.toUpperCase().includes(
-          store.state.search.queryString.toUpperCase()
+          store.state.search.queryString.toUpperCase(),
         ));
 
       return packages;
@@ -295,7 +295,7 @@ export default Vue.extend({
     itemProductCategoryNamePackages(): IIndexedPackageData[] {
       const packages = this.packages.filter((packageData) =>
         packageData.Item.ProductCategoryName?.toUpperCase().includes(
-          store.state.search.queryString.toUpperCase()
+          store.state.search.queryString.toUpperCase(),
         ));
 
       return packages;

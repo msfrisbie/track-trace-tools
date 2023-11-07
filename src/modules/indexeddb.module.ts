@@ -43,7 +43,7 @@ class TrackTraceToolsDatabase extends Dexie {
 class Database {
   private _db: TrackTraceToolsDatabase = new TrackTraceToolsDatabase(
     DEXIE_DB_NAME,
-    DEXIE_DB_VERSION
+    DEXIE_DB_VERSION,
   );
 
   constructor() {
@@ -69,7 +69,7 @@ class Database {
   async packageSearch(
     queryString: string,
     license: string,
-    filters: IIndexedPackageFilters
+    filters: IIndexedPackageFilters,
   ): Promise<IIndexedPackageData[]> {
     const formattedQuery = queryString.toUpperCase();
 
@@ -86,7 +86,7 @@ class Database {
   async transferSearch(
     queryString: string,
     license: string,
-    filters: IIndexedTransferFilters
+    filters: IIndexedTransferFilters,
   ): Promise<IIndexedTransferData[]> {
     const formattedQuery = queryString.toUpperCase();
 
@@ -100,7 +100,7 @@ class Database {
   async tagSearch(
     queryString: string,
     license: string,
-    filters: IIndexedTagFilters
+    filters: IIndexedTagFilters,
   ): Promise<IIndexedTagData[]> {
     const formattedQuery = queryString.toUpperCase();
 

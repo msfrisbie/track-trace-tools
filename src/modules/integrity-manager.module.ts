@@ -11,7 +11,7 @@ class IntegrityManager implements IAtomicService {
         await authManager.authStateOrError();
       } catch (e) {
         analyticsManager.track(MessageType.INTEGRITY_ERROR, {
-          context: 'Auth state failed on a path including /packages'
+          context: 'Auth state failed on a path including /packages',
         });
       }
     }

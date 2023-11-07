@@ -27,7 +27,7 @@ export default Vue.extend({
   props: {},
   components: {},
   computed: {
-    ...mapState([])
+    ...mapState([]),
   },
   data() {
     return {};
@@ -35,14 +35,14 @@ export default Vue.extend({
   methods: {
     open(route: string) {
       analyticsManager.track(MessageType.BUILDER_ENGAGEMENT, {
-        action: `Navigated to ${route}`
+        action: `Navigated to ${route}`,
       });
 
       this.$router.push(route);
-    }
+    },
   },
   async created() {},
-  async mounted() {}
+  async mounted() {},
 });
 </script>
 

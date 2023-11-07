@@ -3,7 +3,7 @@ import {
   ChromeStorageKeys,
   DEBUG_ATTRIBUTE,
   ToolkitView,
-  VUEX_KEY
+  VUEX_KEY,
 } from '@/consts';
 import {
   IAccountSettings,
@@ -11,7 +11,7 @@ import {
   IMetrcStatusData,
   IPluginState,
   IRootState,
-  ITrackedInteractions
+  ITrackedInteractions,
 } from '@/interfaces';
 import { isDevelopment } from '@/modules/environment.module';
 import { MutationType } from '@/mutation-types';
@@ -33,7 +33,7 @@ import { plantSearchModule, plantSearchReducer } from './modules/plant-search';
 import { pluginAuthModule, pluginAuthReducer } from './modules/plugin-auth/index';
 import {
   promoteImmaturePlantsBuilderModule,
-  promoteImmaturePlantsBuilderReducer
+  promoteImmaturePlantsBuilderReducer,
 } from './modules/promote-immature-plants-builder';
 import { reportsModule, reportsReducer } from './modules/reports';
 import { searchModule, searchReducer } from './modules/search';
@@ -41,13 +41,13 @@ import { settingsModule, settingsReducer } from './modules/settings';
 import { SettingsActions } from './modules/settings/consts';
 import {
   splitPackageBuilderModule,
-  splitPackageBuilderReducer
+  splitPackageBuilderReducer,
 } from './modules/split-package-builder';
 import { tagSearchModule, tagSearchReducer } from './modules/tag-search';
 import { transferBuilderModule, transferBuilderReducer } from './modules/transfer-builder/index';
 import {
   transferPackageSearchModule,
-  transferPackageSearchReducer
+  transferPackageSearchReducer,
 } from './modules/transfer-package-search';
 import { transferSearchModule, transferSearchReducer } from './modules/transfer-search';
 
@@ -80,7 +80,7 @@ const vuexShared = {
     flags: flagsReducer(state.flags),
     splitPackageBuilder: splitPackageBuilderReducer(state.splitPackageBuilder),
     promoteImmaturePlantsBuilder: promoteImmaturePlantsBuilderReducer(
-      state.promoteImmaturePlantsBuilder
+      state.promoteImmaturePlantsBuilder,
     ),
     listing: listingReducer(state.listing),
     settings: settingsReducer(state.settings),
@@ -190,7 +190,7 @@ const vuexStore = new Vuex.Store<IPluginState>({
     },
     [MutationType.UPDATE_TRACKED_INTERACTIONS](
       state: IRootState,
-      trackedInteractions: ITrackedInteractions
+      trackedInteractions: ITrackedInteractions,
     ) {
       state.trackedInteractions = {
         ...trackedInteractions,
@@ -260,43 +260,43 @@ const vuexStore = new Vuex.Store<IPluginState>({
     },
     [MutationType.SET_BUILDER_MODAL_DISPLAY_STATE](
       state: IRootState,
-      builderModalOpen: CsvUpload | null
+      builderModalOpen: CsvUpload | null,
     ) {
       state.builderModalOpen = builderModalOpen;
     },
     [MutationType.SET_FINALIZE_SALES_RECEIPTS_STATE](
       state: IRootState,
-      finalizeSalesReceiptsState: BackgroundTaskState
+      finalizeSalesReceiptsState: BackgroundTaskState,
     ) {
       state.backgroundTasks.finalizeSalesReceiptsState = finalizeSalesReceiptsState;
     },
     [MutationType.SET_FINALIZE_SALES_RECEIPTS_LICENSE](
       state: IRootState,
-      finalizeSalesReceiptsLicense: string
+      finalizeSalesReceiptsLicense: string,
     ) {
       state.backgroundTasks.finalizeSalesReceiptsLicense = finalizeSalesReceiptsLicense;
     },
     [MutationType.SET_FINALIZE_SALES_RECEIPTS_STOP_DATE](
       state: IRootState,
-      finalizeSalesReceiptsStopIsodate: string | null
+      finalizeSalesReceiptsStopIsodate: string | null,
     ) {
       state.backgroundTasks.finalizeSalesReceiptsStopIsodate = finalizeSalesReceiptsStopIsodate;
     },
     [MutationType.SET_FINALIZE_SALES_RECEIPTS_READOUT](
       state: IRootState,
-      finalizeSalesReceiptsReadout: string | null
+      finalizeSalesReceiptsReadout: string | null,
     ) {
       state.backgroundTasks.finalizeSalesReceiptsReadout = finalizeSalesReceiptsReadout;
     },
     [MutationType.SET_FINALIZE_SALES_RECEIPTS_RUNNING_TOTAL](
       state: IRootState,
-      finalizeSalesReceiptsRunningTotal: number
+      finalizeSalesReceiptsRunningTotal: number,
     ) {
       state.backgroundTasks.finalizeSalesReceiptsRunningTotal = finalizeSalesReceiptsRunningTotal;
     },
     [MutationType.SET_VOID_TAGS_CONSECUTIVE_ERROR_TOTAL](
       state: IRootState,
-      finalizeSalesReceiptsConsecutiveErrorTotal: number
+      finalizeSalesReceiptsConsecutiveErrorTotal: number,
     ) {
       state.backgroundTasks.finalizeSalesReceiptsConsecutiveErrorTotal = finalizeSalesReceiptsConsecutiveErrorTotal;
     },
@@ -312,7 +312,7 @@ const vuexStore = new Vuex.Store<IPluginState>({
         startTag = null,
         endTag = null,
         lastAttemptedTag = null,
-      }: { startTag: string | null; endTag: string | null; lastAttemptedTag: null }
+      }: { startTag: string | null; endTag: string | null; lastAttemptedTag: null },
     ) {
       state.backgroundTasks.voidTagsStartTag = startTag;
       state.backgroundTasks.voidTagsEndTag = endTag;
@@ -326,7 +326,7 @@ const vuexStore = new Vuex.Store<IPluginState>({
     },
     [MutationType.SET_VOID_TAGS_CONSECUTIVE_ERROR_TOTAL](
       state: IRootState,
-      voidTagsConsecutiveErrorTotal: number
+      voidTagsConsecutiveErrorTotal: number,
     ) {
       state.backgroundTasks.voidTagsConsecutiveErrorTotal = voidTagsConsecutiveErrorTotal;
     },
@@ -335,7 +335,7 @@ const vuexStore = new Vuex.Store<IPluginState>({
     },
     [MutationType.UPDATE_METRC_STATUS_DATA](
       state: IRootState,
-      metrcStatusData: IMetrcStatusData | null
+      metrcStatusData: IMetrcStatusData | null,
     ) {
       state.metrcStatusData = metrcStatusData;
     },

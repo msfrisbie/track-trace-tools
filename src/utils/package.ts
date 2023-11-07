@@ -10,12 +10,12 @@ import {
   ISimpleCogsPackageData,
   ISimplePackageData,
   ISimpleTransferPackageData,
-  IUnionIndexedPackageData
+  IUnionIndexedPackageData,
 } from '@/interfaces';
 import { authManager } from '@/modules/auth-manager.module';
 import {
   getDataLoaderByLicense,
-  primaryDataLoader
+  primaryDataLoader,
 } from '@/modules/data-loader/data-loader.module';
 import { toastManager } from '@/modules/toast-manager.module';
 import { downloadFileFromUrl } from './dom';
@@ -24,7 +24,7 @@ import {
   UnitOfMeasureAbbreviation,
   unitOfMeasureAbbreviationToName,
   UnitOfMeasureName,
-  unitOfMeasureNameToAbbreviation
+  unitOfMeasureNameToAbbreviation,
 } from './units';
 
 export function getIdOrError(unionPkg: IUnionIndexedPackageData): number {
@@ -106,7 +106,7 @@ export function getItemUnitQuantityAndUnitOrError(unionPkg: IUnionIndexedPackage
 
 export function getDelimiterSeparatedValuesOrError(
   joinedValues: string,
-  options?: { delimiter?: string; regex?: RegExp }
+  options?: { delimiter?: string; regex?: RegExp },
 ): string[] {
   const { delimiter, regex } = {
     delimiter: ',',
@@ -135,7 +135,7 @@ export function getQuantityAndUnitDescription(pkg: IUnionIndexedPackageData): st
 
 export function getNormalizedPackageContentsDescription(pkg: IUnionIndexedPackageData): string {
   return `${getQuantityOrError(pkg)} ${getUnitOfMeasureAbbreviationOrError(
-    pkg
+    pkg,
   )} ${getItemNameOrError(pkg)}`;
 }
 
@@ -157,19 +157,19 @@ export async function getSourcePackageTags(target: IUnionIndexedPackageData): Pr
 }
 
 export function getUnitOfMeasureAbbreviationOrError(
-  unionPkg: IUnionIndexedPackageData
+  unionPkg: IUnionIndexedPackageData,
 ): UnitOfMeasureAbbreviation {
   return unitOfMeasureNameToAbbreviation(getUnitOfMeasureNameOrError(unionPkg));
 }
 
 export function getItemUnitOfMeasureAbbreviationOrError(
-  unionPkg: IUnionIndexedPackageData
+  unionPkg: IUnionIndexedPackageData,
 ): UnitOfMeasureAbbreviation {
   return unitOfMeasureNameToAbbreviation(getItemUnitOfMeasureNameOrError(unionPkg));
 }
 
 export function getUnitOfMeasureNameOrError(
-  unionPkg: IUnionIndexedPackageData
+  unionPkg: IUnionIndexedPackageData,
 ): UnitOfMeasureName {
   const pkg = unionPkg as any;
   if ('UnitOfMeasureAbbreviation' in pkg) {
@@ -177,14 +177,14 @@ export function getUnitOfMeasureNameOrError(
   }
   if ('ShippedUnitOfMeasureAbbreviation' in pkg) {
     return unitOfMeasureAbbreviationToName(
-      (pkg as IDestinationPackageData).ShippedUnitOfMeasureAbbreviation as UnitOfMeasureAbbreviation
+      (pkg as IDestinationPackageData).ShippedUnitOfMeasureAbbreviation as UnitOfMeasureAbbreviation,
     );
   }
   throw new Error('Could not extract UnitOfMeasureName');
 }
 
 export function getItemUnitOfMeasureNameOrError(
-  unionPkg: IUnionIndexedPackageData
+  unionPkg: IUnionIndexedPackageData,
 ): UnitOfMeasureName {
   const pkg = unionPkg as any;
   if (pkg.Item && 'UnitOfMeasureName' in pkg.Item) {
@@ -192,7 +192,7 @@ export function getItemUnitOfMeasureNameOrError(
   }
   if ('ItemUnitQuantityUnitOfMeasureAbbreviation' in pkg) {
     return unitOfMeasureAbbreviationToName(
-      (pkg as IDestinationPackageData).ItemUnitQuantityUnitOfMeasureAbbreviation as UnitOfMeasureAbbreviation
+      (pkg as IDestinationPackageData).ItemUnitQuantityUnitOfMeasureAbbreviation as UnitOfMeasureAbbreviation,
     );
   }
   throw new Error('Could not extract Item UnitOfMeasureName');
@@ -275,7 +275,7 @@ export async function getLabTestUrlsFromPackage({
 
   return [...fileIds].map(
     (fileId) =>
-      `${window.location.origin}/filesystem/${authState.license}/download/labtest/result/document?packageId=${getIdOrError(pkg)}&labTestResultDocumentFileId=${fileId}`
+      `${window.location.origin}/filesystem/${authState.license}/download/labtest/result/document?packageId=${getIdOrError(pkg)}&labTestResultDocumentFileId=${fileId}`,
   );
 
   // for (let fileId of fileIds) {
@@ -345,7 +345,7 @@ function splitSearchResultMatch(queryString: string, text: string): string[] | n
 export function packageFieldMatch(
   queryString: string,
   pkg: IPackageData,
-  packageFilterIdentifier: PackageFilterIdentifiers
+  packageFilterIdentifier: PackageFilterIdentifiers,
 ): string[] | null {
   return null;
 }
@@ -367,7 +367,7 @@ export function simplePackageConverter(pkg: IIndexedPackageData): ISimplePackage
 export function simpleTransferPackageConverter(
   transfer: IIndexedTransferData,
   destination: IDestinationData,
-  pkg: IIndexedDestinationPackageData
+  pkg: IIndexedDestinationPackageData,
 ): ISimpleTransferPackageData {
   return {
     ETD: destination.EstimatedDepartureDateTime,
@@ -388,7 +388,7 @@ export function simpleTransferPackageConverter(
 }
 
 export function simplePackageNormalizer(
-  pkg: ISimplePackageData | ISimpleTransferPackageData | IMetadataSimplePackageData
+  pkg: ISimplePackageData | ISimpleTransferPackageData | IMetadataSimplePackageData,
 ): IMetadataSimplePackageData {
   return {
     Type: '',

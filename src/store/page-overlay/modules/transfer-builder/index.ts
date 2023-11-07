@@ -66,7 +66,7 @@ export const transferBuilderModule = {
         license,
         identity,
         pkg,
-      }: { license: string; identity: string; pkg: IUnionIndexedPackageData }
+      }: { license: string; identity: string; pkg: IUnionIndexedPackageData },
     ) {
       if (!identity || !license) {
         throw new Error('Missing identity/license');
@@ -85,7 +85,7 @@ export const transferBuilderModule = {
       // }
 
       const existingPackageIndex = state.transferPackageList.findIndex(
-        (x) => getLabelOrError(x) === getLabelOrError(pkg)
+        (x) => getLabelOrError(x) === getLabelOrError(pkg),
       );
 
       if (existingPackageIndex >= 0) {
@@ -101,7 +101,7 @@ export const transferBuilderModule = {
         license,
         identity,
         pkg,
-      }: { license: string; identity: string; pkg: IUnionIndexedPackageData }
+      }: { license: string; identity: string; pkg: IUnionIndexedPackageData },
     ) {
       // if (!identity || !license) {
       //   throw new Error("Missing identity/license");
@@ -114,7 +114,7 @@ export const transferBuilderModule = {
       // }
 
       const existingPackageIndex = state.transferPackageList.findIndex(
-        (x) => getLabelOrError(x) === getLabelOrError(pkg)
+        (x) => getLabelOrError(x) === getLabelOrError(pkg),
       );
 
       if (existingPackageIndex >= 0) {
@@ -130,7 +130,7 @@ export const transferBuilderModule = {
         license,
         identity,
         packages,
-      }: { license: string; identity: string; packages: IUnionIndexedPackageData[] }
+      }: { license: string; identity: string; packages: IUnionIndexedPackageData[] },
     ) {
       // if (!identity || !license) {
       //   throw new Error("Missing identity/license");
@@ -157,7 +157,7 @@ export const transferBuilderModule = {
     },
     [TransferBuilderMutations.UPDATE_TRANSFER_DATA](
       state: ITransferBuilderState,
-      transferBuilderUpdateData: ITransferBuilderUpdateData
+      transferBuilderUpdateData: ITransferBuilderUpdateData,
     ) {
       for (const [key, value] of Object.entries(transferBuilderUpdateData)) {
         // @ts-ignore
@@ -166,7 +166,7 @@ export const transferBuilderModule = {
     },
     [TransferBuilderMutations.SET_TRANSFER_FOR_UPDATE](
       state: ITransferBuilderState,
-      { transferForUpdate }: { transferForUpdate: IIndexedTransferData | null }
+      { transferForUpdate }: { transferForUpdate: IIndexedTransferData | null },
     ) {
       state.transferForUpdate = transferForUpdate;
     },
@@ -180,7 +180,7 @@ export const transferBuilderModule = {
       state: ITransferBuilderState,
       getters: any,
       rootState: any,
-      rootGetters: any
+      rootGetters: any,
     ) =>
       state.transferPackageList, // if (!rootGetters.authState) {
     //   throw new Error("Missing identity/license");
@@ -218,7 +218,7 @@ export const transferBuilderModule = {
   actions: {
     [TransferBuilderActions.ADD_PACKAGE]: async (
       ctx: ActionContext<ITransferBuilderState, IPluginState>,
-      { pkg }: { pkg: IPackageData }
+      { pkg }: { pkg: IPackageData },
     ) => {
       const { identity, license } = ctx.rootGetters.authState;
 
@@ -232,7 +232,7 @@ export const transferBuilderModule = {
     },
     [TransferBuilderActions.REMOVE_PACKAGE]: async (
       ctx: ActionContext<ITransferBuilderState, IPluginState>,
-      { pkg }: { pkg: IPackageData }
+      { pkg }: { pkg: IPackageData },
     ) => {
       const { identity, license } = ctx.rootGetters.authState;
 
@@ -245,7 +245,7 @@ export const transferBuilderModule = {
       });
     },
     [TransferBuilderActions.REFRESH_PACKAGES]: async (
-      ctx: ActionContext<ITransferBuilderState, IPluginState>
+      ctx: ActionContext<ITransferBuilderState, IPluginState>,
     ) => {
       const { identity, license } = ctx.rootGetters.authState;
 
@@ -280,7 +280,7 @@ export const transferBuilderModule = {
     },
     [TransferBuilderActions.UPDATE_TRANSFER_DATA]: async (
       ctx: ActionContext<ITransferBuilderState, IPluginState>,
-      payload: ITransferBuilderUpdateData
+      payload: ITransferBuilderUpdateData,
     ) => {
       ctx.commit(TransferBuilderMutations.UPDATE_TRANSFER_DATA, payload);
 
@@ -294,7 +294,7 @@ export const transferBuilderModule = {
       ctx: ActionContext<ITransferBuilderState, IPluginState>,
       payload: {
         transferForUpdate: IIndexedTransferData | null;
-      }
+      },
     ) => {
       await ctx.dispatch(TransferBuilderActions.RESET_TRANSFER_DATA);
 
@@ -315,7 +315,7 @@ export const transferBuilderModule = {
       const transporter = transporters.length > 0 ? transporters[0] : null;
 
       const transporterDetails = await primaryDataLoader.transferTransporterDetails(
-        transferForUpdate.Id
+        transferForUpdate.Id,
       );
       const transporterDetail = transporterDetails.length > 0 ? transporterDetails[transporterDetails.length - 1] : null;
 
@@ -329,7 +329,7 @@ export const transferBuilderModule = {
             appendToast: true,
             toaster: 'ttt-toaster',
             solid: true,
-          }
+          },
         );
 
         analyticsManager.track(MessageType.BUILDER_EVENT, {
@@ -351,7 +351,7 @@ export const transferBuilderModule = {
             appendToast: true,
             toaster: 'ttt-toaster',
             solid: true,
-          }
+          },
         );
 
         analyticsManager.track(MessageType.BUILDER_EVENT, {
@@ -405,14 +405,14 @@ export const transferBuilderModule = {
 
       const transferData: ITransferBuilderUpdateData = {
         originFacility: facilities.find(
-          (x) => x.LicenseNumber === ctx.rootState.pluginAuth.authState?.license
+          (x) => x.LicenseNumber === ctx.rootState.pluginAuth.authState?.license,
         ),
         transporterFacility: transporterDetail
           ? transporterFacilities.find((x) => x.Id === transporterDetail.TransporterFacilityId)
           : undefined,
         destinationFacility: destination
           ? destinationFacilities.find(
-            (x) => x.LicenseNumber === destination.RecipientFacilityLicenseNumber
+            (x) => x.LicenseNumber === destination.RecipientFacilityLicenseNumber,
           )
           : undefined,
         transferType,
@@ -439,7 +439,7 @@ export const transferBuilderModule = {
           unitsOfWeight.find((x) => x.Id === destination?.GrossUnitOfWeightId) ?? null,
         packageGrossWeights: destinationPackages.map((x) => x.GrossWeight) as number[],
         packageGrossUnitsOfWeight: destinationPackages.map(
-          (pkg) => unitsOfWeight.find((x) => x.Abbreviation === pkg.GrossUnitOfWeightAbbreviation)!
+          (pkg) => unitsOfWeight.find((x) => x.Abbreviation === pkg.GrossUnitOfWeightAbbreviation)!,
         ),
       };
 
@@ -452,7 +452,7 @@ export const transferBuilderModule = {
       });
     },
     [TransferBuilderActions.RESET_TRANSFER_DATA]: async (
-      ctx: ActionContext<ITransferBuilderState, IPluginState>
+      ctx: ActionContext<ITransferBuilderState, IPluginState>,
     ) => {
       ctx.commit(TransferBuilderMutations.RESET_TRANSFER_DATA);
 

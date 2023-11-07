@@ -87,44 +87,44 @@ describe('tags.ts', () => {
         startTag: SAMPLE_VALID_TAG,
         endTag: SAMPLE_VALID_TAG,
         targetTag: SAMPLE_VALID_TAG,
-      })
+      }),
     ).toEqual(true);
     expect(
       isTagInsidePair({
         startTag: SAMPLE_VALID_TAG,
         endTag: '1AFF00000000000000001243',
         targetTag: SAMPLE_VALID_TAG,
-      })
+      }),
     ).toEqual(true);
     expect(
       isTagInsidePair({
         startTag: SAMPLE_VALID_TAG,
         endTag: '1AFF00000000000000001243',
         targetTag: '1AFF00000000000000001235',
-      })
+      }),
     ).toEqual(true);
     expect(
       isTagInsidePair({
         startTag: SAMPLE_VALID_TAG,
         endTag: '1AFF00000000000000001236',
         targetTag: '1AFF00000000000000001237',
-      })
+      }),
     ).toEqual(false);
     expect(
       isTagInsidePair({
         startTag: SAMPLE_VALID_TAG,
         endTag: '1AFF00000000000000001236',
         targetTag: '1AFF00000000000000001220',
-      })
+      }),
     ).toEqual(false);
   });
 
   it('correctly calculates offset', () => {
     expect(getOffsetFromTag({ referenceTag: SAMPLE_VALID_TAG, newTag: SAMPLE_VALID_TAG })).toEqual(
-      0
+      0,
     );
     expect(
-      getOffsetFromTag({ referenceTag: SAMPLE_VALID_TAG, newTag: '1AFF00000000000000001235' })
+      getOffsetFromTag({ referenceTag: SAMPLE_VALID_TAG, newTag: '1AFF00000000000000001235' }),
     ).toEqual(1);
     expect(() =>
       getOffsetFromTag({ referenceTag: SAMPLE_VALID_TAG, newTag: '1AFF00000000000000001233' })).toThrowError();

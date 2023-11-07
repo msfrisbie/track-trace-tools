@@ -14,13 +14,13 @@ import {
   ISimpleSpreadsheet,
   ISpreadsheet,
   ITagFilter,
-  ITransferFilter
+  ITransferFilter,
 } from '@/interfaces';
 import { ImmaturePlantQuickviewDimension } from '@/utils/reports/immature-plants-quickview-report';
 import { MaturePlantQuickviewDimension } from '@/utils/reports/mature-plants-quickview-report';
 import {
   InventoryStrategy,
-  IPackageDateMetadata
+  IPackageDateMetadata,
 } from '@/utils/reports/point-in-time-inventory-report';
 import { IStatusMessage, ReportStatus, ReportType } from './consts';
 

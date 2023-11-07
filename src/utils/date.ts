@@ -39,7 +39,7 @@ export function getIsoTimeStringFromIsoDatetime(isoDatetime: string): string {
 
 export function getIsoDateFromOffset(
   offset: number,
-  isoDatetime: string = new Date().toISOString()
+  isoDatetime: string = new Date().toISOString(),
 ): string {
   const d = new Date(isoDatetime);
   return new Date(d.setDate(d.getDate() + offset)).toISOString();

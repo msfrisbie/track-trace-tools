@@ -1457,7 +1457,7 @@ describe('history.ts', () => {
 
   it('Correctly extracts test sample labels from history', () => {
     expect(extractTestSamplePackageLabelsFromHistory(BULK_BIOMASS_ACCEPTED_VIA_TRANSFER)).toEqual(
-      []
+      [],
     );
     expect(extractTestSamplePackageLabelsFromHistory(MULTI_PARENT_BIOMASS_PACKAGE)).toEqual([]);
     expect(extractTestSamplePackageLabelsFromHistory(PACKAGE_WITH_CHILD_SENT_FOR_TESTING)).toEqual([
@@ -1467,7 +1467,7 @@ describe('history.ts', () => {
 
   it('Correctly extracts tag-quantity pairs and sets from history', () => {
     expect(
-      extractChildPackageTagQuantityPairsFromHistory(BULK_BIOMASS_ACCEPTED_VIA_TRANSFER)
+      extractChildPackageTagQuantityPairsFromHistory(BULK_BIOMASS_ACCEPTED_VIA_TRANSFER),
     ).toEqual([]);
     expect(extractChildPackageTagQuantityPairsFromHistory(MULTI_PARENT_BIOMASS_PACKAGE)).toEqual([
       ['1A4000000000000000005001', 172507],
@@ -1475,17 +1475,17 @@ describe('history.ts', () => {
       ['1A4000000000000000005003', 34220],
     ]);
     expect(
-      extractChildPackageTagQuantityPairsFromHistory(PACKAGE_WITH_CHILD_SENT_FOR_TESTING)
+      extractChildPackageTagQuantityPairsFromHistory(PACKAGE_WITH_CHILD_SENT_FOR_TESTING),
     ).toEqual([
       ['1A4000000000000000183917', 196],
       ['1A4000000000000000213863', 36],
     ]);
 
     expect(
-      extractParentPackageTagQuantityUnitItemSetsFromHistory(BULK_BIOMASS_ACCEPTED_VIA_TRANSFER)
+      extractParentPackageTagQuantityUnitItemSetsFromHistory(BULK_BIOMASS_ACCEPTED_VIA_TRANSFER),
     ).toEqual([['1A4000000000000000011168', 1003, 'Pounds', 'SL Biscotti | Untrimmed Flower']]);
     expect(
-      extractParentPackageTagQuantityUnitItemSetsFromHistory(MULTI_PARENT_BIOMASS_PACKAGE)
+      extractParentPackageTagQuantityUnitItemSetsFromHistory(MULTI_PARENT_BIOMASS_PACKAGE),
     ).toEqual([
       ['1A4000000000000000000564', 250, 'Pounds', 'Hello Biomass'],
       ['1A4000000000000000000565', 250, 'Pounds', 'Hello Biomass'],
@@ -1501,24 +1501,24 @@ describe('history.ts', () => {
       ['1A4000000000000000000620', 250, 'Pounds', 'Hello Biomass'],
     ]);
     expect(
-      extractParentPackageTagQuantityUnitItemSetsFromHistory(PACKAGE_WITH_CHILD_SENT_FOR_TESTING)
+      extractParentPackageTagQuantityUnitItemSetsFromHistory(PACKAGE_WITH_CHILD_SENT_FOR_TESTING),
     ).toEqual([
       ['1A4000000000000000216887', 5555, 'Each', 'Gummies - Super Sour Lemon - 20mg'],
       ['1A4000000000000000216266', 5180, 'Grams', 'THC Distillate - Distilled in VTA'],
     ]);
 
     expect(
-      extractChildPackageTagQuantityUnitSetsFromHistory(BULK_BIOMASS_ACCEPTED_VIA_TRANSFER)
+      extractChildPackageTagQuantityUnitSetsFromHistory(BULK_BIOMASS_ACCEPTED_VIA_TRANSFER),
     ).toEqual([]);
     expect(extractChildPackageTagQuantityUnitSetsFromHistory(MULTI_PARENT_BIOMASS_PACKAGE)).toEqual(
       [
         ['1A4000000000000000005001', 172507, 'Grams'],
         ['1A4000000000000000005002', 1154050.116, 'Grams'],
         ['1A4000000000000000005003', 34220, 'Grams'],
-      ]
+      ],
     );
     expect(
-      extractChildPackageTagQuantityUnitSetsFromHistory(PACKAGE_WITH_CHILD_SENT_FOR_TESTING)
+      extractChildPackageTagQuantityUnitSetsFromHistory(PACKAGE_WITH_CHILD_SENT_FOR_TESTING),
     ).toEqual([
       ['1A4000000000000000183917', 196, 'Each'],
       ['1A4000000000000000213863', 36, 'Each'],
@@ -1527,25 +1527,25 @@ describe('history.ts', () => {
 
   it('Correctly extracts initial quantity', () => {
     expect(
-      extractInitialPackageQuantityAndUnitFromHistoryOrError(BULK_BIOMASS_ACCEPTED_VIA_TRANSFER)
+      extractInitialPackageQuantityAndUnitFromHistoryOrError(BULK_BIOMASS_ACCEPTED_VIA_TRANSFER),
     ).toEqual([1003, 'Pounds']);
     expect(
-      extractInitialPackageQuantityAndUnitFromHistoryOrError(MULTI_PARENT_BIOMASS_PACKAGE)
+      extractInitialPackageQuantityAndUnitFromHistoryOrError(MULTI_PARENT_BIOMASS_PACKAGE),
     ).toEqual([1360777.116, 'Grams']);
     expect(
-      extractInitialPackageQuantityAndUnitFromHistoryOrError(PACKAGE_WITH_CHILD_SENT_FOR_TESTING)
+      extractInitialPackageQuantityAndUnitFromHistoryOrError(PACKAGE_WITH_CHILD_SENT_FOR_TESTING),
     ).toEqual([225849, 'Each']);
   });
 
   it('Correctly extracts the initial location name', () => {
     expect(
-      extractInitialPackageLocationNameFromHistoryOrNull(BULK_BIOMASS_ACCEPTED_VIA_TRANSFER)
+      extractInitialPackageLocationNameFromHistoryOrNull(BULK_BIOMASS_ACCEPTED_VIA_TRANSFER),
     ).toEqual('Building 1');
     expect(
-      extractInitialPackageLocationNameFromHistoryOrNull(MULTI_PARENT_BIOMASS_PACKAGE)
+      extractInitialPackageLocationNameFromHistoryOrNull(MULTI_PARENT_BIOMASS_PACKAGE),
     ).toEqual('Biomass Storage');
     expect(
-      extractInitialPackageLocationNameFromHistoryOrNull(PACKAGE_WITH_CHILD_SENT_FOR_TESTING)
+      extractInitialPackageLocationNameFromHistoryOrNull(PACKAGE_WITH_CHILD_SENT_FOR_TESTING),
     ).toEqual('Quarantine Room');
   });
 
@@ -1573,7 +1573,7 @@ describe('history.ts', () => {
 
   it('Correctly extracts child package quantities with negative restores', () => {
     expect(
-      extractChildPackageTagQuantityUnitSetsFromHistory(RESTORED_HARVEST_PACKAGE_HISTORY)
+      extractChildPackageTagQuantityUnitSetsFromHistory(RESTORED_HARVEST_PACKAGE_HISTORY),
     ).toEqual([
       ['1A4000000000000000023329', 72.3, 'Grams'],
       ['1A4000000000000000023330', 112, 'Grams'],
@@ -1606,7 +1606,7 @@ describe('history.ts', () => {
 
   it('Correctly extracts initial quantity', () => {
     expect(extractInitialPackageQuantityAndUnitFromHistoryOrError(PREROLL_PACKAGE_HISTORY)).toEqual(
-      [2590, 'Each']
+      [2590, 'Each'],
     );
   });
 });

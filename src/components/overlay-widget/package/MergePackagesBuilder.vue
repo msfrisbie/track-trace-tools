@@ -295,7 +295,7 @@ export default Vue.extend({
       // @ts-ignore
       const zipped: [ITagData, IIntermediateCreatePackageFromPackagesData][] = safeZip(
         this.$data.packageTags,
-        this.$data.newPackageData
+        this.$data.newPackageData,
       );
 
       for (const el of zipped) {
@@ -346,12 +346,12 @@ export default Vue.extend({
           unitOfMeasure: this.$data.outputItem.UnitOfMeasureName,
         },
         this.buildCsvFiles(),
-        5
+        5,
       );
     },
     useMax() {
       this.$data.totalPackageQuantity = totalPackageQuantityAvailableOrNull(
-        this.$data.selectedPackages
+        this.$data.selectedPackages,
       );
     },
     buildCsvFiles(): ICsvFile[] {
@@ -371,7 +371,7 @@ export default Vue.extend({
       // @ts-ignore
       const zipped: [ITagData, IIntermediateCreatePackageFromPackagesData][] = safeZip(
         this.$data.packageTags,
-        this.$data.newPackageData
+        this.$data.newPackageData,
       );
 
       const flattened = [];
@@ -432,7 +432,7 @@ export default Vue.extend({
 
         return buildNamedCsvFileData(
           csvData,
-          `Merging ${this.$data.totalPackageQuantity} ${this.$data.outputItem.UnitOfMeasureName} ${this.$data.outputItem.Name} from ${this.$data.selectedPackages.length} packages`
+          `Merging ${this.$data.totalPackageQuantity} ${this.$data.outputItem.UnitOfMeasureName} ${this.$data.outputItem.Name} from ${this.$data.selectedPackages.length} packages`,
         );
       } catch (e) {
         console.error(e);
@@ -475,7 +475,7 @@ export default Vue.extend({
 
         this.$data.newPackageData = allocatePackageQuantities(
           [newValue],
-          this.$data.selectedPackages
+          this.$data.selectedPackages,
         );
       },
     },

@@ -52,7 +52,7 @@ library.add(
   // @ts-ignore
   fontawesomeSolid.faInfoCircle,
   fontawesomeSolid.faPlusCircle,
-  fontawesomeSolid.faSignOutAlt
+  fontawesomeSolid.faSignOutAlt,
 );
 
 export default Vue.extend({

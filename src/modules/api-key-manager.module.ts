@@ -104,7 +104,7 @@ class ApiKeyManager implements IAtomicService {
         // Typing isn't smart enough to fix the types
         filter((x: Promise<IApiKeyState | null> | null | undefined) => x !== undefined),
         map((x) => x as Promise<IApiKeyState | null> | null),
-        take(1)
+        take(1),
       )
       .toPromise();
   }

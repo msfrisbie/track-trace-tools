@@ -139,7 +139,7 @@ export default Vue.extend({
       if (store.state.graph.selectedNodeId) {
         return (
           store.state.graph.graphData.nodes.find(
-            (x) => x.key === store.state.graph.selectedNodeId
+            (x) => x.key === store.state.graph.selectedNodeId,
           ) ?? null
         );
       }
@@ -152,7 +152,7 @@ export default Vue.extend({
       }
 
       const sourceNodeIds = this.$data.graphComponentContext.graph.inboundNeighbors(
-        store.state.graph.selectedNodeId
+        store.state.graph.selectedNodeId,
       );
 
       return sourceNodeIds;
@@ -163,7 +163,7 @@ export default Vue.extend({
       }
 
       return this.$data.graphComponentContext.graph.outboundNeighbors(
-        store.state.graph.selectedNodeId
+        store.state.graph.selectedNodeId,
       );
     },
   },

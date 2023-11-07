@@ -459,7 +459,7 @@ class DynamicConstsManager implements IAtomicService {
 
           if (!parsedRepeaterData) {
             throw new Error(
-              'createPlantingsFromPackageRepeaterData: Failed to extract repeaterData'
+              'createPlantingsFromPackageRepeaterData: Failed to extract repeaterData',
             );
           }
 
@@ -477,7 +477,7 @@ class DynamicConstsManager implements IAtomicService {
   }
 
   private async changePlantBatchGrowthPhaseRepeaterData(
-    allowCache: boolean = true
+    allowCache: boolean = true,
   ): Promise<IChangePlantBatchGrowthPhaseRepeaterData> {
     if (!this._changePlantBatchGrowthPhaseRepeaterData || !allowCache) {
       this._changePlantBatchGrowthPhaseRepeaterData = new Promise(async (resolve, reject) => {
@@ -495,7 +495,7 @@ class DynamicConstsManager implements IAtomicService {
 
           if (!parsedRepeaterData) {
             throw new Error(
-              'changePlantBatchGrowthPhaseRepeaterData: Failed to extract repeaterData'
+              'changePlantBatchGrowthPhaseRepeaterData: Failed to extract repeaterData',
             );
           }
 
@@ -855,7 +855,7 @@ class DynamicConstsManager implements IAtomicService {
       const facilities = await this.facilities();
 
       this._cachedFacilityMap = new Map<string, IMetrcFacilityData>(
-        facilities.map((facility) => [facility.LicenseNumber, facility])
+        facilities.map((facility) => [facility.LicenseNumber, facility]),
       );
     }
 
@@ -877,7 +877,7 @@ class DynamicConstsManager implements IAtomicService {
         const destinationIds: Set<number> = new Set(repeaterData.DestinationFacilities);
 
         this._cachedDestinationFacilities = (await this.facilities()).filter(
-          (facilityData: IMetrcFacilityData) => destinationIds.has(facilityData.Id)
+          (facilityData: IMetrcFacilityData) => destinationIds.has(facilityData.Id),
         );
       } else {
         throw new Error('Destination facilities unable to load');
@@ -902,7 +902,7 @@ class DynamicConstsManager implements IAtomicService {
         const transporterIds: Set<number> = new Set(repeaterData.TransporterFacilities);
 
         this._cachedTransportFacilities = (await this.facilities()).filter(
-          (facilityData: IMetrcFacilityData) => transporterIds.has(facilityData.Id)
+          (facilityData: IMetrcFacilityData) => transporterIds.has(facilityData.Id),
         );
       } else {
         throw new Error('Transporter facilities unable to load');

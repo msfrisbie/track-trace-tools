@@ -521,7 +521,7 @@ class MockDataManager implements IAtomicService {
   // These are filtered post-load, so generate a few of each kind every time
   mockPackages(): IIndexedPackageData[] {
     const packageSum: number = sum(
-      Object.values(store.state.flags?.mockedFlags.mockPackages.behavior!).map(Number)
+      Object.values(store.state.flags?.mockedFlags.mockPackages.behavior!).map(Number),
     );
     const packageDistribution: number[] = evenIntegerDistribution(packageSum, 4);
 

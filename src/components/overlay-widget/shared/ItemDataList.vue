@@ -66,7 +66,7 @@ export default Vue.extend({
   },
   components: { PickerIcon, ItemCard },
   computed: {
-    ...mapState([])
+    ...mapState([]),
   },
   data() {
     return {};
@@ -83,7 +83,7 @@ export default Vue.extend({
     },
   },
   async created() {},
-  async mounted() {}
+  async mounted() {},
 });
 </script>
 

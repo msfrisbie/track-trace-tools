@@ -128,7 +128,7 @@ export default Vue.extend({
           await createTask(TaskType.ADD_PACKAGE_NOTE, {
             tag,
             note: this.form.note,
-          })
+          }),
         );
       }
     },

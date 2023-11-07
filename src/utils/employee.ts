@@ -31,7 +31,7 @@ export function getEstimatedNumberOfSamplesRemaining(pkg: IIndexedPackageData): 
 
 export function getAllocatedSampleFromPackageHistoryEntryOrNull(
   packageLabel: string,
-  historyEntry: IPackageHistoryData
+  historyEntry: IPackageHistoryData,
 ): IHistoryAllocationData | null {
   if (!historyEntry.Descriptions.find((x) => x.includes('Reason: Trade Sample'))) {
     return null;
@@ -50,7 +50,7 @@ export function getAllocatedSampleFromPackageHistoryEntryOrNull(
   const [adjustmentLineMatch] = historyEntry.Descriptions.map((x) =>
     x.match(ADJUSTMENT_REGEX)).filter((x) => !!x);
   const [employeeLineMatch] = historyEntry.Descriptions.map((x) => x.match(EMPLOYEE_REGEX)).filter(
-    (x) => !!x
+    (x) => !!x,
   );
 
   if (!adjustmentLineMatch || !employeeLineMatch) {
@@ -74,7 +74,7 @@ export function getAllocatedSampleFromPackageHistoryEntryOrNull(
 }
 
 export function getAllocatedSamplesFromPackageHistoryOrError(
-  pkg: IIndexedPackageData
+  pkg: IIndexedPackageData,
 ): IHistoryAllocationData[] {
   if (!pkg.history) {
     throw new Error('Package is missing history');
@@ -96,10 +96,10 @@ export function getAllocatedSamplesFromPackageHistoryOrError(
 export async function getSampleAllocationFromAllocationDataOrNull(
   employees: IMetrcEmployeeData[],
   packages: IIndexedPackageData[],
-  allocationData: IHistoryAllocationData
+  allocationData: IHistoryAllocationData,
 ): Promise<ISampleAllocation | null> {
   const employee = employees.find(
-    (x) => parseInt(x.License.Number, 10) === parseInt(allocationData.employeeLicenseNumber, 10)
+    (x) => parseInt(x.License.Number, 10) === parseInt(allocationData.employeeLicenseNumber, 10),
   );
 
   if (!employee) {
@@ -129,7 +129,7 @@ export function canEmployeeAcceptSample(
   sample: { quantity: number; pkg: IIndexedPackageData; allocation: INormalizedAllocation },
   distributionDate: string,
   recordedAllocationBuffer: ISampleAllocation[],
-  pendingAllocationBuffer: ISampleAllocation[]
+  pendingAllocationBuffer: ISampleAllocation[],
 ): boolean {
   // Cannot give out if distribution date is before received date
   if (normalizeIsodate(sample.pkg.ReceivedDateTime!) > distributionDate) {
@@ -159,13 +159,13 @@ export function canEmployeeAcceptSample(
       (x) =>
         x.distributionDate >= startDate
         && x.distributionDate <= currentDate
-        && x.employee.Id === employee.Id
+        && x.employee.Id === employee.Id,
     ),
     ...pendingAllocationBuffer.filter(
       (x) =>
         x.distributionDate >= startDate
         && x.distributionDate <= currentDate
-        && x.employee.Id === employee.Id
+        && x.employee.Id === employee.Id,
     ),
   ];
 
@@ -174,13 +174,13 @@ export function canEmployeeAcceptSample(
       (x) =>
         x.distributionDate >= currentDate
         && x.distributionDate <= endDate
-        && x.employee.Id === employee.Id
+        && x.employee.Id === employee.Id,
     ),
     ...pendingAllocationBuffer.filter(
       (x) =>
         x.distributionDate >= currentDate
         && x.distributionDate <= endDate
-        && x.employee.Id === employee.Id
+        && x.employee.Id === employee.Id,
     ),
   ];
 
@@ -255,7 +255,7 @@ export function canEmployeeAcceptSample(
 
 export async function toNormalizedAllocationQuantity(
   pkg: IIndexedPackageData,
-  sampleQuantity: number
+  sampleQuantity: number,
 ): Promise<INormalizedAllocation> {
   const FALLBACK_ALLOCATION = {
     flowerAllocationGrams: 0,

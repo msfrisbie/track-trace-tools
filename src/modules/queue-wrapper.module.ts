@@ -37,7 +37,7 @@ class DeprecatedQueueWrapper implements IAtomicService {
             }
 
             success = await runTask(
-              this.inflightTask
+              this.inflightTask,
             );
           } catch (e) {
             console.log('Task failed', e);

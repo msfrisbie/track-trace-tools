@@ -87,12 +87,12 @@ class FacilityManager implements IAtomicService {
     if (!facilityLinks || facilityLinks.length === 0) {
       // Fall back to network request
       const loadedHTML = await customAxios(window.location.origin).then(
-        (response) => response.data
+        (response) => response.data,
       );
 
       // @ts-ignore
       const facilitiesDropdownHTML: string | null = loadedHTML.match(
-        /(<div class="btn-group facilities-dropdown">.*)/
+        /(<div class="btn-group facilities-dropdown">.*)/,
       )[0];
 
       if (!facilitiesDropdownHTML) {

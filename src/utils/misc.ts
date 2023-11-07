@@ -13,7 +13,7 @@ const debugLog = debugLogFactory('utils/misc.ts');
 
 export function allocatePromotePlantCounts(
   totalPlantCount: number,
-  plantBatches: IPlantBatchData[]
+  plantBatches: IPlantBatchData[],
 ): IIntermediatePromotePlantBatchData[] {
   let remainingTotal = totalPlantCount;
 
@@ -44,7 +44,7 @@ export function allocatePromotePlantCounts(
     plantData.push(nextBatch);
 
     selectedPlantBatchRemainingPlantCount = fStrip(
-      selectedPlantBatchRemainingPlantCount - batchSize
+      selectedPlantBatchRemainingPlantCount - batchSize,
     );
     remainingTotal = fStrip(remainingTotal - batchSize);
 
@@ -122,7 +122,7 @@ export function flattenTagsAndPlantBatches({
  */
 export function allocatePackageQuantities(
   outputQuantities: number[],
-  inputPackages: IPackageData[]
+  inputPackages: IPackageData[],
 ): IIntermediateCreatePackageFromPackagesData[] {
   const packageData: IIntermediateCreatePackageFromPackagesData[] = [];
 
@@ -193,7 +193,7 @@ export function allocatePackageQuantities(
 
 export function allocateImmaturePlantCounts(
   totalPlantCount: number,
-  packages: IPackageData[]
+  packages: IPackageData[],
 ): IIntermediateCreatePlantBatchFromPackageData[] {
   // Sanity check: is mixed?
   const unitOfMeasureSet = new Set();
@@ -206,7 +206,7 @@ export function allocateImmaturePlantCounts(
 
   if (!isCountBased) {
     throw new Error(
-      'T3 detected one or more plant packages is not count based. T3 cannot unpack non-count-based packages. Contact matt@trackandtrace.tools for details.'
+      'T3 detected one or more plant packages is not count based. T3 cannot unpack non-count-based packages. Contact matt@trackandtrace.tools for details.',
     );
   }
 

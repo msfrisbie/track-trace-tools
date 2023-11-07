@@ -1,6 +1,6 @@
 import { TaskType } from '@/consts';
 import {
-  IContactInfo, IMetrcAddPackageNoteData, IReorderTagsPayload, Task
+  IContactInfo, IMetrcAddPackageNoteData, IReorderTagsPayload, Task,
 } from '@/interfaces';
 import { authManager } from '@/modules/auth-manager.module';
 import { primaryDataLoader } from '@/modules/data-loader/data-loader.module';
@@ -11,7 +11,7 @@ import { getVoidTagBody } from './tags';
 const TASK_TYPES_REQUIRING_FORM_DATA = [
   TaskType.ADD_PACKAGE_NOTE,
   TaskType.VOID_TAGS,
-  TaskType.REORDER_TAGS
+  TaskType.REORDER_TAGS,
 ];
 
 export async function createTask(taskType: TaskType, formData: any = null): Promise<Task> {
@@ -75,12 +75,12 @@ export async function createTask(taskType: TaskType, formData: any = null): Prom
         Details: [
           {
             TagType: 'CannabisPlant',
-            Quantity: formData.plantTagCount.toString()
+            Quantity: formData.plantTagCount.toString(),
           },
           {
             TagType: 'CannabisPackage',
-            Quantity: formData.packageTagCount.toString()
-          }
+            Quantity: formData.packageTagCount.toString(),
+          },
         ],
         Shipping: {
           ContactName: contactInfo.contactName,
@@ -91,9 +91,9 @@ export async function createTask(taskType: TaskType, formData: any = null): Prom
             Street2: contactInfo.address.address2,
             City: contactInfo.address.city,
             State: contactInfo.address.state,
-            PostalCode: contactInfo.address.zip
-          }
-        }
+            PostalCode: contactInfo.address.zip,
+          },
+        },
       };
 
       body = JSON.stringify(reorderTagsPayload);
@@ -104,14 +104,14 @@ export async function createTask(taskType: TaskType, formData: any = null): Prom
   }
 
   const taskData = {
-    body
+    body,
   };
 
   return {
     taskId,
     taskType,
     taskName,
-    taskData
+    taskData,
   };
 }
 

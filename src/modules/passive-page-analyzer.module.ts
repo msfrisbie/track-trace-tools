@@ -72,7 +72,7 @@ class PassivePageAnalyzer implements IAtomicService {
         ngModelElements
           .map((x: HTMLElement) => x.getAttribute('ng-model'))
           .filter((x) => !!x)
-          .sort()
+          .sort(),
       ),
     ] as string[];
 
@@ -106,7 +106,7 @@ class PassivePageAnalyzer implements IAtomicService {
             return match[1];
           })
           .filter((x) => !!x)
-          .sort()
+          .sort(),
       ),
     ] as string[];
 

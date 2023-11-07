@@ -479,7 +479,7 @@ import SinglePackagePicker from '@/components/overlay-widget/shared/SinglePackag
 import TransferPicker from '@/components/overlay-widget/shared/TransferPicker.vue';
 import StartFinishIcons from '@/components/overlay-widget/shared/StartFinishIcons.vue';
 import {
-  BuilderType, MessageType, ModalAction, ModalType
+  BuilderType, MessageType, ModalAction, ModalType,
 } from '@/consts';
 import {
   IBuilderComponentError,
@@ -529,7 +529,7 @@ import _ from 'lodash-es';
 import { timer } from 'rxjs';
 import Vue from 'vue';
 import {
-  mapActions, mapGetters, mapState, Store
+  mapActions, mapGetters, mapState, Store,
 } from 'vuex';
 import {
   getLabelOrError,
@@ -578,7 +578,7 @@ export default Vue.extend({
         this.destinationFacility = facility;
         this.$data.destinationQuery = facilitySummary(facility);
         this.$data.destinationAddress = (facilityReadableAddressLinesOrNull(facility) || []).join(
-          '\n'
+          '\n',
         );
 
         if (
@@ -786,7 +786,7 @@ export default Vue.extend({
             appendToast: true,
             toaster: 'ttt-toaster',
             solid: true,
-          }
+          },
         );
 
         return;
@@ -802,7 +802,7 @@ export default Vue.extend({
           transporter: this.transporterFacility,
         },
         this.buildCsvFiles(),
-        5
+        5,
       );
 
       if (this.transferForUpdate) {
@@ -873,7 +873,7 @@ export default Vue.extend({
 
         return buildNamedCsvFileData(
           csvData,
-          `Transfer ${this.transferPackages.length} packages from ${originFacility.LicenseNumber} to ${destinationFacility.LicenseNumber} via ${transporterFacility.LicenseNumber}`
+          `Transfer ${this.transferPackages.length} packages from ${originFacility.LicenseNumber} to ${destinationFacility.LicenseNumber} via ${transporterFacility.LicenseNumber}`,
         );
       } catch (e) {
         console.error(e);
@@ -995,7 +995,7 @@ export default Vue.extend({
 
       if (this.isTransferSubmittedWithDestinationGrossWeight) {
         const grossWeight = parseFloat(
-          (this.transferBuilderState.destinationGrossWeight ?? '').toString()
+          (this.transferBuilderState.destinationGrossWeight ?? '').toString(),
         );
         const unitOfMeasure = this.transferBuilderState.destinationGrossUnitOfWeight;
 
@@ -1318,12 +1318,12 @@ export default Vue.extend({
       extractRecentDestinationFacilitiesFromTransfers().then(
         (recentDestinationFacilities: IMetrcFacilityData[]) => {
           this.$data.recentDestinationFacilities = recentDestinationFacilities;
-        }
+        },
       );
       extractRecentTransporterFacilitiesFromTransfers().then(
         (recentTransporterFacilities: IMetrcFacilityData[]) => {
           this.$data.recentTransporterFacilities = recentTransporterFacilities;
-        }
+        },
       );
 
       // Set state defaults

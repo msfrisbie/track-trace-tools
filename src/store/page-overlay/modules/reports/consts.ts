@@ -554,28 +554,28 @@ export const SHEET_FIELDS: { [key: string]: IFieldData[] } = {
       readableName: 'Initial Quantity',
       required: false,
       initiallyChecked: false,
-      checkedMessage: 'This column requires additional data to load, report generation may be slower'
+      checkedMessage: 'This column requires additional data to load, report generation may be slower',
     },
     {
       value: 'initialQuantityUnitOfMeasure',
       readableName: 'Initial Quantity Unit of Measure',
       required: false,
       initiallyChecked: false,
-      checkedMessage: 'This column requires additional data to load, report generation may be slower'
+      checkedMessage: 'This column requires additional data to load, report generation may be slower',
     },
     {
       value: 'totalInputQuantity',
       readableName: 'Total Input Quantity',
       required: false,
       initiallyChecked: false,
-      checkedMessage: 'This column requires additional data to load, report generation may be slower'
+      checkedMessage: 'This column requires additional data to load, report generation may be slower',
     },
     {
       value: 'totalInputQuantityUnitOfMeasure',
       readableName: 'Total Input Quantity Unit of Measure',
       required: false,
       initiallyChecked: false,
-      checkedMessage: 'This column requires additional data to load, report generation may be slower'
+      checkedMessage: 'This column requires additional data to load, report generation may be slower',
     },
   ],
   [ReportType.STRAGGLER_PACKAGES]: [...COMMON_PACKAGE_FIELD_DATA],

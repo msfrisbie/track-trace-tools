@@ -6,7 +6,7 @@ import { facilityManager } from '@/modules/facility-manager.module';
 import { toastManager } from '@/modules/toast-manager.module';
 import { todayIsodate } from '@/utils/date';
 import {
-  edgeReducer, hoverRenderer, labelRenderer, nodeReducer
+  edgeReducer, hoverRenderer, labelRenderer, nodeReducer,
 } from '@/utils/graph';
 import { scrambleTag } from '@/utils/tags';
 import { Coordinates } from 'sigma/types';
@@ -16,7 +16,7 @@ import {
   GraphGetters,
   GraphMutations,
   GraphRenderAlgorithm,
-  GraphStatus
+  GraphStatus,
 } from './consts';
 import { IGraphComponentContext, IGraphData, IGraphState } from './interfaces';
 
@@ -59,7 +59,7 @@ export const graphModule = {
       state: IGraphState,
       getters: any,
       rootState: any,
-      rootGetters: any
+      rootGetters: any,
     ) => {
       // return state.data
     },
@@ -150,7 +150,7 @@ export const graphModule = {
     },
     [GraphActions.RENDER_GRAPH]: async (
       ctx: ActionContext<IGraphState, IPluginState>,
-      { graphComponentContext }: { graphComponentContext: IGraphComponentContext }
+      { graphComponentContext }: { graphComponentContext: IGraphComponentContext },
     ) => {
       analyticsManager.track(MessageType.GRAPH_RENDER);
 
@@ -175,7 +175,7 @@ export const graphModule = {
     },
     [GraphActions.INITIALIZE_GRAPH]: async (
       ctx: ActionContext<IGraphState, IPluginState>,
-      { graphComponentContext }: { graphComponentContext: IGraphComponentContext }
+      { graphComponentContext }: { graphComponentContext: IGraphComponentContext },
     ) => {
       if (!ctx.state.graphData) {
         toastManager.openToast('No graph data loaded', {
@@ -303,7 +303,7 @@ export const graphModule = {
         eventType: string;
         sourceType: string;
         source?: string;
-      }
+      },
     ) => {
       switch (eventType) {
         case 'clickNode':
@@ -328,7 +328,7 @@ export const graphModule = {
       {
         graphComponentContext,
         node,
-      }: { graphComponentContext: IGraphComponentContext; node: string }
+      }: { graphComponentContext: IGraphComponentContext; node: string },
     ) => {
       ctx.state.selectedNodeId = node;
       ctx.state.suggestions = [];
@@ -338,7 +338,7 @@ export const graphModule = {
       // Move the camera to center it on the selected node:
       const nodePosition: Coordinates = node
         ? (graphComponentContext.renderer.getNodeDisplayData(
-          ctx.state.selectedNodeId
+          ctx.state.selectedNodeId,
         ) as Coordinates)
         : { x: 0.5, y: 0.5 };
       graphComponentContext.renderer.getCamera().animate(nodePosition, {
@@ -352,7 +352,7 @@ export const graphModule = {
       {
         graphComponentContext,
         operation,
-      }: { graphComponentContext: IGraphComponentContext; operation: string }
+      }: { graphComponentContext: IGraphComponentContext; operation: string },
     ) => {
       switch (operation) {
         case 'zoomIn':
@@ -373,7 +373,7 @@ export const graphModule = {
       }: {
         graphComponentContext: IGraphComponentContext;
         query: string;
-      }
+      },
     ) => {
       analyticsManager.track(MessageType.GRAPH_SEARCH_QUERY, { query });
 
@@ -424,7 +424,7 @@ export const graphModule = {
       }: {
         graphComponentContext: IGraphComponentContext;
         node?: string;
-      }
+      },
     ) => {
       if (node) {
         ctx.state.hoveredNodeId = node;

@@ -6,21 +6,21 @@ import {
   IIndexedTagData,
   IIndexedTransferData,
   IPluginState,
-  IRichIncomingTransferData
+  IRichIncomingTransferData,
 } from '@/interfaces';
 import { primaryDataLoader } from '@/modules/data-loader/data-loader.module';
 import { ReportsMutations, ReportType } from '@/store/page-overlay/modules/reports/consts';
 import {
   IReportConfig,
   IReportData,
-  IReportsState
+  IReportsState,
 } from '@/store/page-overlay/modules/reports/interfaces';
 import { ActionContext } from 'vuex';
 import {
   getIsoDateFromOffset,
   isCustodiedDatetimeOrError,
   isoDatetimeToLocalDate,
-  todayIsodate
+  todayIsodate,
 } from '../date';
 import { extractInitialPackageQuantityAndUnitFromHistoryOrError } from '../history';
 import { getItemNameOrError, getLabelOrError } from '../package';
@@ -182,7 +182,7 @@ export async function maybeLoadPointInTimeInventoryReportData({
     }),
     primaryDataLoader.outgoingInactiveTransfers().then((result) => {
       allInactiveOutgoingTransfers = [...allInactiveOutgoingTransfers, ...result];
-    })
+    }),
   );
 
   await Promise.allSettled(promises);
@@ -260,7 +260,7 @@ export async function maybeLoadPointInTimeInventoryReportData({
 
           // Backwards compat - possibly redundant
           return packages;
-        })
+        }),
     );
 
     if (promises.length % 100 === 0) {
@@ -290,7 +290,7 @@ export async function maybeLoadPointInTimeInventoryReportData({
 
           // Backwards compat - possibly redundant
           return destinations;
-        })
+        }),
     );
 
     if (promises.length % 100 === 0) {
@@ -311,7 +311,7 @@ export async function maybeLoadPointInTimeInventoryReportData({
 
             // Backwards compat - possibly redundant
             return packages;
-          })
+          }),
       );
     }
 
@@ -458,7 +458,7 @@ export async function maybeLoadPointInTimeInventoryReportData({
     promises.push(
       primaryDataLoader.packageHistoryByPackageId(metadata.pkg.Id).then((history) => {
         metadata.pkg!.history = history;
-      })
+      }),
     );
 
     if (promises.length % 100 === 0) {
@@ -474,7 +474,7 @@ export async function maybeLoadPointInTimeInventoryReportData({
     }
 
     const [quantity, unitOfMeasure] = extractInitialPackageQuantityAndUnitFromHistoryOrError(
-      metadata.pkg!.history!
+      metadata.pkg!.history!,
     );
 
     metadata.quantity = quantity;
@@ -514,7 +514,7 @@ export function extractPointInTimeInventoryData({
       'Eligible?',
       'Has Package',
       'Incomging Package Count',
-      'Outgoing Package Count'
+      'Outgoing Package Count',
     );
   }
 
@@ -547,7 +547,7 @@ export function extractPointInTimeInventoryData({
           metadata.eligible,
           !!metadata.pkg,
           metadata.incomingTransferPackages.length,
-          metadata.outgoingDestinationPackages.length
+          metadata.outgoingDestinationPackages.length,
         );
       }
 

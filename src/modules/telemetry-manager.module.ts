@@ -48,7 +48,7 @@ class TelemetryManager implements IAtomicService {
     const t0_flowering: number = performance.now();
     primaryMetrcRequestManager
       .getFloweringPlants(
-        payload
+        payload,
         // , { retries: 0 }
       )
       .then(
@@ -57,7 +57,7 @@ class TelemetryManager implements IAtomicService {
         },
         (error) => {
           this.sendTelemetryAndUpdateMetrcStatus(t0_flowering, false, undefined, error);
-        }
+        },
       );
 
     await timer(3000).toPromise();
@@ -65,7 +65,7 @@ class TelemetryManager implements IAtomicService {
     const t0_packages: number = performance.now();
     primaryMetrcRequestManager
       .getActivePackages(
-        payload
+        payload,
         // , { retries: 0 }
       )
       .then(
@@ -74,7 +74,7 @@ class TelemetryManager implements IAtomicService {
         },
         (error) => {
           this.sendTelemetryAndUpdateMetrcStatus(t0_packages, false, undefined, error);
-        }
+        },
       );
 
     await timer(3000).toPromise();
@@ -82,7 +82,7 @@ class TelemetryManager implements IAtomicService {
     const t0_transfers: number = performance.now();
     primaryMetrcRequestManager
       .getIncomingTransfers(
-        payload
+        payload,
         // { retries: 0 }
       )
       .then(
@@ -91,7 +91,7 @@ class TelemetryManager implements IAtomicService {
         },
         (error) => {
           this.sendTelemetryAndUpdateMetrcStatus(t0_transfers, false, undefined, error);
-        }
+        },
       );
   }
 
@@ -295,7 +295,7 @@ class TelemetryManager implements IAtomicService {
     t0: number,
     success: boolean,
     statusCode: number | undefined = undefined,
-    errorMessage: string | undefined = undefined
+    errorMessage: string | undefined = undefined,
   ) {}
 }
 

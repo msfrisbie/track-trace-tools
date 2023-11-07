@@ -75,7 +75,7 @@ export default Vue.extend({
   computed: {
     suffix(): string {
       return store.state.client.t3plus ? '+' : '';
-    }
+    },
   },
   data() {
     return {

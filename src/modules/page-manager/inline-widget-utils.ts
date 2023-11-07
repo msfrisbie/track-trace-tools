@@ -23,7 +23,7 @@ export async function addButtonsToTransferTableImpl() {
     const groupId = grid.getAttribute(TTT_TABLEGROUP_ATTRIBUTE);
 
     const transferHeaderCell = grid.querySelector(
-      `[${TTT_TABLEGROUP_ATTRIBUTE}="${groupId}"] th[data-field="ManifestNumber"]`
+      `[${TTT_TABLEGROUP_ATTRIBUTE}="${groupId}"] th[data-field="ManifestNumber"]`,
     );
 
     if (!transferHeaderCell) {
@@ -32,7 +32,7 @@ export async function addButtonsToTransferTableImpl() {
     }
 
     for (const row of grid.querySelectorAll(
-      `[role="row"][${TTT_TABLEGROUP_ATTRIBUTE}="${groupId}"]:not([mesinline="1"])`
+      `[role="row"][${TTT_TABLEGROUP_ATTRIBUTE}="${groupId}"]:not([mesinline="1"])`,
     )) {
       rows.push(row);
     }
@@ -117,7 +117,7 @@ export async function addButtonsToPackageTableImpl() {
     const packageHeaderCell = grid.querySelector(
       // TODO: this might select plants too?
       `[${TTT_TABLEGROUP_ATTRIBUTE}="${groupId}"] th[data-field="Label"],
-      [${TTT_TABLEGROUP_ATTRIBUTE}="${groupId}"] th[data-field="PackageLabel"]`
+      [${TTT_TABLEGROUP_ATTRIBUTE}="${groupId}"] th[data-field="PackageLabel"]`,
     );
 
     if (!packageHeaderCell) {
@@ -126,7 +126,7 @@ export async function addButtonsToPackageTableImpl() {
     }
 
     for (const row of grid.querySelectorAll(
-      `[role="row"][${TTT_TABLEGROUP_ATTRIBUTE}="${groupId}"]:not([mesinline="1"])`
+      `[role="row"][${TTT_TABLEGROUP_ATTRIBUTE}="${groupId}"]:not([mesinline="1"])`,
     )) {
       rows.push(row);
     }

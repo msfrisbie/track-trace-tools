@@ -2195,7 +2195,7 @@ export default Vue.extend({
 
       if (
         this.selectedReports.find(
-          (report: IReportOption) => report.value === ReportType.COGS_TRACKER
+          (report: IReportOption) => report.value === ReportType.COGS_TRACKER,
         )
       ) {
         addCogsTrackerReport({
@@ -2206,7 +2206,7 @@ export default Vue.extend({
 
       if (
         this.selectedReports.find(
-          (report: IReportOption) => report.value === ReportType.EMPLOYEE_SAMPLES
+          (report: IReportOption) => report.value === ReportType.EMPLOYEE_SAMPLES,
         )
       ) {
         addEmployeeSamplesReport({
@@ -2217,7 +2217,7 @@ export default Vue.extend({
 
       if (
         this.selectedReports.find(
-          (report: IReportOption) => report.value === ReportType.HARVEST_PACKAGES
+          (report: IReportOption) => report.value === ReportType.HARVEST_PACKAGES,
         )
       ) {
         addHarvestPackagesReport({
@@ -2228,7 +2228,7 @@ export default Vue.extend({
 
       if (
         this.selectedReports.find(
-          (report: IReportOption) => report.value === ReportType.POINT_IN_TIME_INVENTORY
+          (report: IReportOption) => report.value === ReportType.POINT_IN_TIME_INVENTORY,
         )
       ) {
         addPointInTimeInventoryReport({
@@ -2249,7 +2249,7 @@ export default Vue.extend({
 
       if (
         this.selectedReports.find(
-          (report: IReportOption) => report.value === ReportType.STRAGGLER_PACKAGES
+          (report: IReportOption) => report.value === ReportType.STRAGGLER_PACKAGES,
         )
       ) {
         addStragglerPackagesReport({
@@ -2261,7 +2261,7 @@ export default Vue.extend({
 
       if (
         this.selectedReports.find(
-          (report: IReportOption) => report.value === ReportType.EMPLOYEE_AUDIT
+          (report: IReportOption) => report.value === ReportType.EMPLOYEE_AUDIT,
         )
       ) {
         addEmployeeAuditReport({
@@ -2272,7 +2272,7 @@ export default Vue.extend({
 
       if (
         this.selectedReports.find(
-          (report: IReportOption) => report.value === ReportType.MATURE_PLANTS
+          (report: IReportOption) => report.value === ReportType.MATURE_PLANTS,
         )
       ) {
         addMaturePlantsReport({
@@ -2284,7 +2284,7 @@ export default Vue.extend({
 
       if (
         this.selectedReports.find(
-          (report: IReportOption) => report.value === ReportType.INCOMING_TRANSFERS
+          (report: IReportOption) => report.value === ReportType.INCOMING_TRANSFERS,
         )
       ) {
         addIncomingTransfersReport({
@@ -2296,7 +2296,7 @@ export default Vue.extend({
 
       if (
         this.selectedReports.find(
-          (report: IReportOption) => report.value === ReportType.OUTGOING_TRANSFERS
+          (report: IReportOption) => report.value === ReportType.OUTGOING_TRANSFERS,
         )
       ) {
         addOutgoingTransfersReport({
@@ -2308,7 +2308,7 @@ export default Vue.extend({
 
       if (
         this.selectedReports.find(
-          (report: IReportOption) => report.value === ReportType.TRANSFER_HUB_TRANSFERS
+          (report: IReportOption) => report.value === ReportType.TRANSFER_HUB_TRANSFERS,
         )
       ) {
         addTransferHubTransfersReport({
@@ -2338,7 +2338,7 @@ export default Vue.extend({
 
       if (
         this.selectedReports.find(
-          (report: IReportOption) => report.value === ReportType.IMMATURE_PLANTS
+          (report: IReportOption) => report.value === ReportType.IMMATURE_PLANTS,
         )
       ) {
         addImmaturePlantsReport({
@@ -2350,7 +2350,7 @@ export default Vue.extend({
 
       if (
         this.selectedReports.find(
-          (report: IReportOption) => report.value === ReportType.OUTGOING_TRANSFER_MANIFESTS
+          (report: IReportOption) => report.value === ReportType.OUTGOING_TRANSFER_MANIFESTS,
         )
       ) {
         addOutgoingTransferManifestsReport({
@@ -2362,7 +2362,7 @@ export default Vue.extend({
 
       if (
         this.selectedReports.find(
-          (report: IReportOption) => report.value === ReportType.TRANSFER_HUB_TRANSFER_MANIFESTS
+          (report: IReportOption) => report.value === ReportType.TRANSFER_HUB_TRANSFER_MANIFESTS,
         )
       ) {
         // addTransferHubTransferManifestsReport({
@@ -2374,7 +2374,7 @@ export default Vue.extend({
 
       if (
         this.selectedReports.find(
-          (report: IReportOption) => report.value === ReportType.PACKAGES_QUICKVIEW
+          (report: IReportOption) => report.value === ReportType.PACKAGES_QUICKVIEW,
         )
       ) {
         addPackagesQuickviewReport({
@@ -2385,7 +2385,7 @@ export default Vue.extend({
 
       if (
         this.selectedReports.find(
-          (report: IReportOption) => report.value === ReportType.IMMATURE_PLANTS_QUICKVIEW
+          (report: IReportOption) => report.value === ReportType.IMMATURE_PLANTS_QUICKVIEW,
         )
       ) {
         addImmaturePlantsQuickviewReport({
@@ -2396,7 +2396,7 @@ export default Vue.extend({
 
       if (
         this.selectedReports.find(
-          (report: IReportOption) => report.value === ReportType.MATURE_PLANTS_QUICKVIEW
+          (report: IReportOption) => report.value === ReportType.MATURE_PLANTS_QUICKVIEW,
         )
       ) {
         addMaturePlantsQuickviewReport({
@@ -2420,7 +2420,7 @@ export default Vue.extend({
 
         for (const reportType of singleonReportTypes) {
           const firstSelectedSingleton = newValue.find(
-            (report: IReportOption) => report.value === reportType
+            (report: IReportOption) => report.value === reportType,
           );
 
           if (newValue.length > 1 && firstSelectedSingleton) {

@@ -5,7 +5,7 @@ import { IListingState } from './interfaces';
 
 const inMemoryState = {
   packageData: null,
-  packageHistory: []
+  packageHistory: [],
 };
 
 const persistedState = {
@@ -14,7 +14,7 @@ const persistedState = {
 
 const defaultState: IListingState = {
   ...inMemoryState,
-  ...persistedState
+  ...persistedState,
 };
 
 export const listingModule = {
@@ -46,5 +46,5 @@ export const listingModule = {
 
 export const listingReducer = (state: IListingState): IListingState => ({
   ...state,
-  ...inMemoryState
+  ...inMemoryState,
 });

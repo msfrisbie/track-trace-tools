@@ -168,15 +168,15 @@ export default Vue.extend({
   name: 'StrainPicker',
   store,
   components: {
-    ErrorReadout
+    ErrorReadout,
   },
   props: {
     strain: Object as () => IStrainData,
     suggestedStrainName: String,
     enableHotStrainCreate: {
       type: Boolean,
-      default: false
-    }
+      default: false,
+    },
   },
   data() {
     return {
@@ -193,14 +193,14 @@ export default Vue.extend({
       newStrainCbdPercent: null,
       newStrainIndicaPercent: 100,
       createStrainInflight: false,
-      createStrainError: null
+      createStrainError: null,
     };
   },
   computed: {
     strainOptions() {
       return this.$data.strains.map((strain: IStrainData) => ({
         text: strain.Name,
-        value: strain
+        value: strain,
       }));
     },
     isNewStrainName() {
@@ -219,7 +219,7 @@ export default Vue.extend({
         strainNameQuery,
         newStrainThcPercent,
         newStrainCbdPercent,
-        newStrainIndicaPercent
+        newStrainIndicaPercent,
       } = (this as any).$data;
 
       if (!strainNameQuery) {
@@ -255,7 +255,7 @@ export default Vue.extend({
         return '% Indica';
       }
       return `% Indica, ${100 - (this as any).$data.newStrainIndicaPercent}% Sativa`;
-    }
+    },
   },
   watch: {
     strain: {
@@ -264,14 +264,14 @@ export default Vue.extend({
         if (newValue) {
           (this as any).$data.strainNameQuery = newValue?.Name;
         }
-      }
+      },
     },
     suggestedStrainName: {
       immediate: true,
       handler() {
         (this as any).maybeSetStrainDefault();
-      }
-    }
+      },
+    },
   },
   methods: {
     async loadStrains() {
@@ -295,7 +295,7 @@ export default Vue.extend({
 
         this.$data.error = new DataLoadError(
           DataLoadErrorType.ZERO_RESULTS,
-          'Zero results returned'
+          'Zero results returned',
         );
       }
     },
@@ -313,7 +313,7 @@ export default Vue.extend({
       }
 
       const matchingStrain = this.$data.strains.find(
-        (x: IStrainData) => x.Name === (this as any).suggestedStrainName
+        (x: IStrainData) => x.Name === (this as any).suggestedStrainName,
       );
 
       if (matchingStrain) {
@@ -341,8 +341,8 @@ export default Vue.extend({
           Name: this.$data.strainNameQuery,
           SativaPercentage: numberStringOrEmptyString(100 - this.$data.newStrainIndicaPercent),
           TestingStatus: this.$data.newStrainTestingStatus,
-          ThcLevel: numberStringOrEmptyString(100 - this.$data.newStrainThcPercent)
-        }
+          ThcLevel: numberStringOrEmptyString(100 - this.$data.newStrainThcPercent),
+        },
       ];
 
       try {
@@ -352,7 +352,7 @@ export default Vue.extend({
           this.$data.strains = await primaryDataLoader.strains(true);
 
           const matchingNewStrain = this.$data.strains.find(
-            (x: IStrainData) => x.Name === this.$data.strainNameQuery
+            (x: IStrainData) => x.Name === this.$data.strainNameQuery,
           );
 
           if (matchingNewStrain) {
@@ -370,7 +370,7 @@ export default Vue.extend({
       } finally {
         this.$data.createStrainInflight = false;
       }
-    }
+    },
   },
   async mounted() {
     // @ts-ignore
@@ -380,6 +380,6 @@ export default Vue.extend({
     this.$data.newStrainTestingStatusOptions = STRAIN_TESTING_STATUS_OPTIONS;
     // @ts-ignore
     this.$data.newStrainTestingStatus = this.$data.newStrainTestingStatusOptions[0].value;
-  }
+  },
 });
 </script>

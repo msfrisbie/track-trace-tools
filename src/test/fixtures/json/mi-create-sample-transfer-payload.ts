@@ -25,20 +25,20 @@ export const data: IMetrcCreateTransferPayload[] = [
                 DriverLayoverLeg: '',
                 VehicleMake: 'asdf',
                 VehicleModel: 'asdf',
-                VehicleLicensePlateNumber: 'asdf'
-              }
-            ]
-          }
+                VehicleLicensePlateNumber: 'asdf',
+              },
+            ],
+          },
         ],
         Packages: [
           {
             Id: '2107182',
             WholesalePrice: '',
             GrossWeight: '',
-            GrossUnitOfWeightId: ''
-          }
-        ]
-      }
-    ]
-  }
+            GrossUnitOfWeightId: '',
+          },
+        ],
+      },
+    ],
+  },
 ];

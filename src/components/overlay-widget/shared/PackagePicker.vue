@@ -236,7 +236,7 @@ import {
 } from '@/utils/package';
 import { combineLatest, Subject } from 'rxjs';
 import {
-  debounceTime, distinctUntilChanged, filter, startWith, tap
+  debounceTime, distinctUntilChanged, filter, startWith, tap,
 } from 'rxjs/operators';
 import { v4 } from 'uuid';
 import Vue from 'vue';
@@ -499,7 +499,7 @@ export default Vue.extend({
         tap((_: any) => {
           this.$data.packagesPageIndex = 0;
         }),
-        filter(([item, location]) => !!item || !!location)
+        filter(([item, location]) => !!item || !!location),
       )
       .subscribe(async ([item, location]: [IItemData, ILocationData]) => {
         this.$data.item = item;

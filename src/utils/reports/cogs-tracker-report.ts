@@ -4,7 +4,7 @@ import {
   IPackageFilter,
   IPluginState,
   ISpreadsheet,
-  ITransferFilter
+  ITransferFilter,
 } from '@/interfaces';
 import { primaryDataLoader } from '@/modules/data-loader/data-loader.module';
 import { messageBus } from '@/modules/message-bus.module';
@@ -13,7 +13,7 @@ import { ReportsMutations, ReportType } from '@/store/page-overlay/modules/repor
 import {
   IReportConfig,
   IReportData,
-  IReportsState
+  IReportsState,
 } from '@/store/page-overlay/modules/reports/interfaces';
 import { ActionContext } from 'vuex';
 import { isodateToSlashDate, todayIsodate } from '../date';
@@ -22,7 +22,7 @@ import {
   extractInitialPackageLocationNameFromHistoryOrNull,
   extractInitialPackageQuantityAndUnitFromHistoryOrError,
   extractParentPackageTagQuantityUnitItemSetsFromHistory,
-  extractTestSamplePackageLabelsFromHistory
+  extractTestSamplePackageLabelsFromHistory,
 } from '../history';
 import { pad } from '../misc';
 import {
@@ -32,7 +32,7 @@ import {
   autoResizeDimensionsRequestFactory,
   freezeTopRowRequestFactory,
   numberColumnRequestFactory,
-  styleTopRowRequestFactory
+  styleTopRowRequestFactory,
 } from '../sheets';
 import { writeDataSheet } from '../sheets-export';
 
@@ -195,41 +195,41 @@ export async function maybeLoadCogsTrackerReportData({
     (pkg) =>
       pkg.Item.ProductCategoryName.includes('Bulk')
       && !pkg.Item.ProductCategoryName.includes('Shake/Trim')
-      && !pkg.Item.ProductCategoryName.includes('Bulk Flower')
+      && !pkg.Item.ProductCategoryName.includes('Bulk Flower'),
   );
   const distRexCogsPackages = dateFilteredPackages.filter(
     (pkg) =>
       pkg.Item.ProductCategoryName.includes('Bulk')
       && !pkg.Item.ProductCategoryName.includes('Shake/Trim')
-      && !pkg.Item.ProductCategoryName.includes('Bulk Flower')
+      && !pkg.Item.ProductCategoryName.includes('Bulk Flower'),
   );
   const packagedGoodsCogsPackages = dateFilteredPackages.filter(
     (pkg) =>
       pkg.UnitOfMeasureQuantityType === 'CountBased'
       && !locationNameBlacklist.includes(
-        extractInitialPackageLocationNameFromHistoryOrNull(pkg.history!)
-      )
+        extractInitialPackageLocationNameFromHistoryOrNull(pkg.history!),
+      ),
   );
 
   function cogsTrackerInputRowFactory(pkg: IIndexedPackageData): any[] {
     const initialWeightData = extractInitialPackageQuantityAndUnitFromHistoryOrError(pkg.history!);
     const testLabels = extractTestSamplePackageLabelsFromHistory(pkg.history!);
     const parentTagQuantityUnitItemSets = extractParentPackageTagQuantityUnitItemSetsFromHistory(
-      pkg.history!
+      pkg.history!,
     );
     const childTagQuantityUnitItemSets = extractChildPackageTagQuantityUnitSetsFromHistory(
-      pkg.history!
+      pkg.history!,
     );
 
     const testMaterialWeightSum = testLabels
       .map(
         (testLabel) =>
-          (childTagQuantityUnitItemSets.find((x) => x[0] === testLabel) ?? [null, 0, null])[1]
+          (childTagQuantityUnitItemSets.find((x) => x[0] === testLabel) ?? [null, 0, null])[1],
       )
       .reduce((a, b) => a + b, 0);
 
     const sourceValues: [string, string, number, string][] = parentTagQuantityUnitItemSets.map(
-      ([label, quantity, unit, itemName]) => [label, itemName, quantity, '']
+      ([label, quantity, unit, itemName]) => [label, itemName, quantity, ''],
     );
 
     return [
@@ -317,7 +317,7 @@ export async function createCogsTrackerSpreadsheetOrError({
       sheetTitles,
     },
     undefined,
-    SHEETS_API_MESSAGE_TIMEOUT_MS
+    SHEETS_API_MESSAGE_TIMEOUT_MS,
   );
 
   if (!response.data.success) {
@@ -487,7 +487,7 @@ export async function createCogsTrackerSpreadsheetOrError({
       requests: formattingRequests,
     },
     undefined,
-    SHEETS_API_MESSAGE_TIMEOUT_MS
+    SHEETS_API_MESSAGE_TIMEOUT_MS,
   );
 
   await messageBus.sendMessageToBackground(
@@ -503,7 +503,7 @@ export async function createCogsTrackerSpreadsheetOrError({
       ],
     },
     undefined,
-    SHEETS_API_MESSAGE_TIMEOUT_MS
+    SHEETS_API_MESSAGE_TIMEOUT_MS,
   );
 
   store.commit(`reports/${ReportsMutations.SET_STATUS}`, {
@@ -575,7 +575,7 @@ export async function createCogsTrackerSpreadsheetOrError({
       requests: resizeRequests,
     },
     undefined,
-    SHEETS_API_MESSAGE_TIMEOUT_MS
+    SHEETS_API_MESSAGE_TIMEOUT_MS,
   );
 
   await messageBus.sendMessageToBackground(
@@ -586,7 +586,7 @@ export async function createCogsTrackerSpreadsheetOrError({
       values: [[`Created with Track & Trace Tools @ ${Date().toString()}`]],
     },
     undefined,
-    SHEETS_API_MESSAGE_TIMEOUT_MS
+    SHEETS_API_MESSAGE_TIMEOUT_MS,
   );
 
   return response.data.result;

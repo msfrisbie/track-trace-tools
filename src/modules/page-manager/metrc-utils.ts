@@ -37,7 +37,7 @@ export function suppressAnimationContainerImpl() {
 
   pageManager.suppressAnimationContainerTimeout = setTimeout(
     () => document.body.classList.remove('suppress-animation-container'),
-    1000
+    1000,
   );
 }
 
@@ -82,7 +82,7 @@ export async function interceptViewManifestButtonImpl() {
   button.addEventListener('click', () => {
     try {
       let selectedRow = document.querySelector(
-        '.k-content > * > * > * >.k-master-row.k-state-selected'
+        '.k-content > * > * > * >.k-master-row.k-state-selected',
       );
 
       if (!selectedRow) {

@@ -146,7 +146,7 @@ enum UrlType {
 async function buildDynamicUrl(
   authState: IAuthState,
   urlType: UrlType,
-  options: any = {}
+  options: any = {},
 ): Promise<string> {
   switch (urlType) {
     case UrlType.REORDER_TAGS_MODAL:
@@ -483,7 +483,7 @@ export class MetrcRequestManager implements IAtomicService {
           ...JSON_HEADERS,
         },
         body,
-      }
+      },
     );
   }
 
@@ -732,7 +732,7 @@ export class MetrcRequestManager implements IAtomicService {
           ...JSON_HEADERS,
         },
         body,
-      }
+      },
     );
   }
 
@@ -743,7 +743,7 @@ export class MetrcRequestManager implements IAtomicService {
         UrlType.DESTINATION_TRANSPORTERS_BY_DESTINATION_ID,
         {
           destinationId,
-        }
+        },
       ),
       {
         ...DEFAULT_FETCH_POST_READ_OPTIONS,
@@ -752,7 +752,7 @@ export class MetrcRequestManager implements IAtomicService {
           ...JSON_HEADERS,
         },
         body,
-      }
+      },
     );
   }
 
@@ -768,7 +768,7 @@ export class MetrcRequestManager implements IAtomicService {
           ...JSON_HEADERS,
         },
         body,
-      }
+      },
     );
   }
 
@@ -779,7 +779,7 @@ export class MetrcRequestManager implements IAtomicService {
         UrlType.TRANSFER_TRANSPORTER_DETAILS_BY_TRANSFER_ID,
         {
           transferId,
-        }
+        },
       ),
       {
         ...DEFAULT_FETCH_POST_READ_OPTIONS,
@@ -788,7 +788,7 @@ export class MetrcRequestManager implements IAtomicService {
           ...JSON_HEADERS,
         },
         body,
-      }
+      },
     );
   }
 
@@ -804,7 +804,7 @@ export class MetrcRequestManager implements IAtomicService {
           ...JSON_HEADERS,
         },
         body,
-      }
+      },
     );
   }
 
@@ -820,7 +820,7 @@ export class MetrcRequestManager implements IAtomicService {
           ...JSON_HEADERS,
         },
         body,
-      }
+      },
     );
   }
 
@@ -836,7 +836,7 @@ export class MetrcRequestManager implements IAtomicService {
           ...JSON_HEADERS,
         },
         body,
-      }
+      },
     );
   }
 
@@ -852,7 +852,7 @@ export class MetrcRequestManager implements IAtomicService {
           ...JSON_HEADERS,
         },
         body,
-      }
+      },
     );
   }
 
@@ -868,7 +868,7 @@ export class MetrcRequestManager implements IAtomicService {
           ...JSON_HEADERS,
         },
         body,
-      }
+      },
     );
   }
 
@@ -884,7 +884,7 @@ export class MetrcRequestManager implements IAtomicService {
           ...JSON_HEADERS,
         },
         body,
-      }
+      },
     );
   }
 
@@ -909,7 +909,7 @@ export class MetrcRequestManager implements IAtomicService {
           ...JSON_HEADERS,
         },
         body,
-      }
+      },
     );
   }
 
@@ -1311,7 +1311,7 @@ export class MetrcRequestManager implements IAtomicService {
           ...(await buildAuthenticationHeaders(this.authStateOrError)),
           Accept: 'text/html, */*; q=0.01',
         },
-      }
+      },
     );
   }
 
@@ -1324,7 +1324,7 @@ export class MetrcRequestManager implements IAtomicService {
           ...(await buildAuthenticationHeaders(this.authStateOrError)),
           Accept: 'text/html, */*; q=0.01',
         },
-      }
+      },
     );
   }
 
@@ -1347,7 +1347,7 @@ export class MetrcRequestManager implements IAtomicService {
           ...(await buildAuthenticationHeaders(this.authStateOrError)),
           Accept: 'text/html, */*; q=0.01',
         },
-      }
+      },
     );
   }
 }

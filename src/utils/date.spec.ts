@@ -32,7 +32,7 @@ describe('date.ts', () => {
   it('Correctly calculates date offset', () => {
     expect(getIsoDateFromOffset(3, '2023-04-02T17:58:25.496Z')).toEqual('2023-04-05T17:58:25.496Z');
     expect(getIsoDateFromOffset(-3, '2023-04-02T17:58:25.496Z')).toEqual(
-      '2023-03-30T17:58:25.496Z'
+      '2023-03-30T17:58:25.496Z',
     );
 
     expect(getIsoDateFromOffset(3, '2023-04-02')).toEqual('2023-04-05T00:00:00.000Z');
@@ -77,14 +77,14 @@ describe('date.ts', () => {
       interleaveGroupedTransferDatetimes({
         arrivalDatetimes: [],
         departureDatetimes: [],
-      })
+      }),
     ).toEqual([]);
 
     expect(
       interleaveGroupedTransferDatetimes({
         arrivalDatetimes: ['2023-04-05T06:00:00.000Z'],
         departureDatetimes: [],
-      })
+      }),
     ).toEqual([
       {
         group: 'ARRIVAL',
@@ -96,7 +96,7 @@ describe('date.ts', () => {
       interleaveGroupedTransferDatetimes({
         arrivalDatetimes: [],
         departureDatetimes: ['2023-04-05T06:00:00.000Z'],
-      })
+      }),
     ).toEqual([
       {
         group: 'DEPARTURE',
@@ -108,7 +108,7 @@ describe('date.ts', () => {
       interleaveGroupedTransferDatetimes({
         arrivalDatetimes: ['2023-04-05T00:00:00.000Z'],
         departureDatetimes: ['2023-04-05T06:00:00.000Z'],
-      })
+      }),
     ).toEqual([
       {
         group: 'ARRIVAL',
@@ -124,7 +124,7 @@ describe('date.ts', () => {
       interleaveGroupedTransferDatetimes({
         arrivalDatetimes: ['2023-04-05T00:00:00.000Z'],
         departureDatetimes: ['2023-04-05T06:00:00.000Z'],
-      })
+      }),
     ).toEqual([
       {
         group: 'ARRIVAL',
@@ -140,7 +140,7 @@ describe('date.ts', () => {
       interleaveGroupedTransferDatetimes({
         arrivalDatetimes: ['2023-04-05T00:00:00.000Z', '2023-04-05T12:00:00.000Z'],
         departureDatetimes: ['2023-04-05T06:00:00.000Z'],
-      })
+      }),
     ).toEqual([
       {
         group: 'ARRIVAL',
@@ -177,28 +177,28 @@ describe('date.ts', () => {
       interleavedDatetimesAreValid({
         arrivalDatetimes: [],
         departureDatetimes: [],
-      }).valid
+      }).valid,
     ).toEqual(true);
 
     expect(
       interleavedDatetimesAreValid({
         arrivalDatetimes: ['2023-04-05T00:00:00.000Z', '2023-04-05T12:00:00.000Z'],
         departureDatetimes: ['2023-04-05T06:00:00.000Z'],
-      }).valid
+      }).valid,
     ).toEqual(true);
 
     expect(
       interleavedDatetimesAreValid({
         arrivalDatetimes: ['2023-04-05T00:00:00.000Z', '2023-04-05T12:00:00.000Z'],
         departureDatetimes: [],
-      }).valid
+      }).valid,
     ).toEqual(false);
 
     expect(
       interleavedDatetimesAreValid({
         arrivalDatetimes: [],
         departureDatetimes: ['2023-04-05T00:00:00.000Z', '2023-04-05T12:00:00.000Z'],
-      }).valid
+      }).valid,
     ).toEqual(false);
 
     expect(interleavedDatetimesAreValid(invalidDatetimes_AAD).valid).toEqual(false);
@@ -221,7 +221,7 @@ describe('date.ts', () => {
         arrivalDatetimes: [],
         departureDatetimes: ['2023-04-05T00:00:00.000Z', '2023-04-06T00:00:00.000Z'],
         targetDatetime: '2023-04-04T00:00:00.000Z',
-      })
+      }),
     ).toEqual(true);
 
     expect(
@@ -229,7 +229,7 @@ describe('date.ts', () => {
         arrivalDatetimes: [],
         departureDatetimes: ['2023-04-05T00:00:00.000Z', '2023-04-06T00:00:00.000Z'],
         targetDatetime: '2023-04-07T00:00:00.000Z',
-      })
+      }),
     ).toEqual(false);
 
     expect(() =>
@@ -244,7 +244,7 @@ describe('date.ts', () => {
         arrivalDatetimes: ['2023-04-04T00:00:00.000Z', '2023-04-06T00:00:00.000Z'],
         departureDatetimes: ['2023-04-03T00:00:00.000Z', '2023-04-08T00:00:00.000Z'],
         targetDatetime: '2023-04-02T00:00:00.000Z',
-      })
+      }),
     ).toEqual(true);
 
     // Valid dates
@@ -254,7 +254,7 @@ describe('date.ts', () => {
         arrivalDatetimes: [],
         departureDatetimes: [],
         targetDatetime: '2023-04-05T00:00:00.000Z',
-      })
+      }),
     ).toEqual(true);
 
     expect(
@@ -262,7 +262,7 @@ describe('date.ts', () => {
         arrivalDatetimes: ['2023-04-04T00:00:00.000Z'],
         departureDatetimes: [],
         targetDatetime: '2023-04-05T00:00:00.000Z',
-      })
+      }),
     ).toEqual(true);
 
     expect(
@@ -270,7 +270,7 @@ describe('date.ts', () => {
         arrivalDatetimes: ['2023-04-06T00:00:00.000Z'],
         departureDatetimes: [],
         targetDatetime: '2023-04-05T00:00:00.000Z',
-      })
+      }),
     ).toEqual(false);
 
     expect(
@@ -278,7 +278,7 @@ describe('date.ts', () => {
         arrivalDatetimes: [],
         departureDatetimes: ['2023-04-06T00:00:00.000Z'],
         targetDatetime: '2023-04-05T00:00:00.000Z',
-      })
+      }),
     ).toEqual(true);
 
     expect(
@@ -286,7 +286,7 @@ describe('date.ts', () => {
         arrivalDatetimes: [],
         departureDatetimes: ['2023-04-04T00:00:00.000Z'],
         targetDatetime: '2023-04-05T00:00:00.000Z',
-      })
+      }),
     ).toEqual(false);
 
     const twoDate = {
@@ -298,21 +298,21 @@ describe('date.ts', () => {
       isCustodiedDatetimeOrError({
         ...twoDate,
         targetDatetime: '2023-04-03T00:00:00.000Z',
-      })
+      }),
     ).toEqual(false);
 
     expect(
       isCustodiedDatetimeOrError({
         ...twoDate,
         targetDatetime: '2023-04-05T00:00:00.000Z',
-      })
+      }),
     ).toEqual(true);
 
     expect(
       isCustodiedDatetimeOrError({
         ...twoDate,
         targetDatetime: '2023-04-07T00:00:00.000Z',
-      })
+      }),
     ).toEqual(false);
 
     const threeDate = {
@@ -324,28 +324,28 @@ describe('date.ts', () => {
       isCustodiedDatetimeOrError({
         ...threeDate,
         targetDatetime: '2023-04-03T00:00:00.000Z',
-      })
+      }),
     ).toEqual(false);
 
     expect(
       isCustodiedDatetimeOrError({
         ...threeDate,
         targetDatetime: '2023-04-05T00:00:00.000Z',
-      })
+      }),
     ).toEqual(true);
 
     expect(
       isCustodiedDatetimeOrError({
         ...threeDate,
         targetDatetime: '2023-04-07T00:00:00.000Z',
-      })
+      }),
     ).toEqual(false);
 
     expect(
       isCustodiedDatetimeOrError({
         ...threeDate,
         targetDatetime: '2023-04-09T00:00:00.000Z',
-      })
+      }),
     ).toEqual(true);
 
     const fourDate = {
@@ -357,35 +357,35 @@ describe('date.ts', () => {
       isCustodiedDatetimeOrError({
         ...fourDate,
         targetDatetime: '2023-04-02T00:00:00.000Z',
-      })
+      }),
     ).toEqual(true);
 
     expect(
       isCustodiedDatetimeOrError({
         ...fourDate,
         targetDatetime: '2023-04-04T00:00:00.000Z',
-      })
+      }),
     ).toEqual(false);
 
     expect(
       isCustodiedDatetimeOrError({
         ...fourDate,
         targetDatetime: '2023-04-06T00:00:00.000Z',
-      })
+      }),
     ).toEqual(true);
 
     expect(
       isCustodiedDatetimeOrError({
         ...fourDate,
         targetDatetime: '2023-04-08T00:00:00.000Z',
-      })
+      }),
     ).toEqual(false);
 
     expect(
       isCustodiedDatetimeOrError({
         ...fourDate,
         targetDatetime: '2023-04-10T00:00:00.000Z',
-      })
+      }),
     ).toEqual(true);
   });
 });

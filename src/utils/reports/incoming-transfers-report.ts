@@ -125,7 +125,7 @@ export async function maybeLoadIncomingTransfersReportData({
 
     for (const transfer of richIncomingTransfers) {
       const transporters: ITransporterData[] = await primaryDataLoader.destinationTransporters(
-        transfer.DeliveryId
+        transfer.DeliveryId,
       );
 
       transfer.incomingTransporters = transporters;

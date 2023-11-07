@@ -36,7 +36,7 @@ export const packageSearchModule = {
   mutations: {
     [PackageSearchMutations.SET_PACKAGE_SEARCH_FILTERS](
       state: IPackageSearchState,
-      { packageSearchFilters }: { packageSearchFilters: IPackageSearchFilters }
+      { packageSearchFilters }: { packageSearchFilters: IPackageSearchFilters },
     ) {
       state.packageSearchFilters = {
         ...packageSearchFilters,
@@ -47,7 +47,7 @@ export const packageSearchModule = {
   actions: {
     [PackageSearchActions.EXECUTE_QUERY]: async (
       ctx: ActionContext<IPackageSearchState, IPluginState>,
-      { queryString }: { queryString: string }
+      { queryString }: { queryString: string },
     ) => {
       ctx.state.packages = [];
       ctx.state.selectedPackageMetadata = null;
@@ -78,7 +78,7 @@ export const packageSearchModule = {
         packageSearchFilters: IPackageSearchFilters;
         propagate?: boolean;
         packageState?: PackageState | null;
-      }
+      },
     ) => {
       if (packageState) {
         switch (packageState as PackageState) {
@@ -111,7 +111,7 @@ export const packageSearchModule = {
       {
         packageSearchFilters,
         propagate = true,
-      }: { packageSearchFilters: IPackageSearchFilters; propagate?: boolean }
+      }: { packageSearchFilters: IPackageSearchFilters; propagate?: boolean },
     ) {
       const defaultPackageSearchFilters = {
         label: null,
@@ -150,7 +150,7 @@ export const packageSearchModule = {
               case 'sourceProductionBatchNumbers':
                 pageManager.setPackageFilter(
                   PackageFilterIdentifiers.SourceProductionBatchNumbers,
-                  v
+                  v,
                 );
                 break;
               case 'itemName':

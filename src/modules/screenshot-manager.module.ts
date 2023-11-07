@@ -83,7 +83,7 @@ class ScreenshotManager implements IAtomicService {
       useBackground,
       useLegacyScreenshot,
     }: { downloadFile: boolean; useBackground: boolean; useLegacyScreenshot: boolean },
-    screenshotUploadData: IBackgroundScriptScreenshotUploadData
+    screenshotUploadData: IBackgroundScriptScreenshotUploadData,
   ) {
     const canvas = await this.getPaintedCanvas(useLegacyScreenshot);
     const blob = await this.getBlobFromCanvas(canvas);
@@ -161,7 +161,7 @@ class ScreenshotManager implements IAtomicService {
         0,
         0,
         track.getSettings().width!,
-        track.getSettings().height!
+        track.getSettings().height!,
       );
 
     track.stop();
@@ -209,7 +209,7 @@ class ScreenshotManager implements IAtomicService {
         0,
         0,
         imageBitmap.width,
-        imageBitmap.height
+        imageBitmap.height,
       );
 
     track.stop();
@@ -228,7 +228,7 @@ class ScreenshotManager implements IAtomicService {
           }
         },
         'image/jpeg',
-        0.85
+        0.85,
       );
     });
   }
@@ -268,7 +268,7 @@ class ScreenshotManager implements IAtomicService {
 
   private async sendImageToServerFromBackgroundScript(
     blob: Blob,
-    partialScreenshotUploadData: IBackgroundScriptScreenshotUploadData
+    partialScreenshotUploadData: IBackgroundScriptScreenshotUploadData,
   ) {
     // const screenshotUploadData: IContentScriptScreenshotUploadData = {
     //     blobUrl: window.URL.createObjectURL(blob),

@@ -54,7 +54,7 @@ tabManager.init();
 async function initializeTooklit() {
   if (DISALLOWED_HOSTNAMES.includes(window.location.hostname)) {
     console.info(
-      `The hostname '${window.location.hostname}' matches the disallow list, declining to render T3`
+      `The hostname '${window.location.hostname}' matches the disallow list, declining to render T3`,
     );
     return;
   }

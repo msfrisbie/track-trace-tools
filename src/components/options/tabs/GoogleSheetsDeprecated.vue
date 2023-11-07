@@ -55,7 +55,7 @@ export default Vue.extend({
   methods: {
     async login() {
       this.$data.oauthUserInfo = await messageBus.sendMessageToBackground(
-        MessageType.GET_OAUTH_USER_INFO_OR_ERROR
+        MessageType.GET_OAUTH_USER_INFO_OR_ERROR,
       );
     },
 

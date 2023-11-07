@@ -29,7 +29,7 @@ class IdentityManager implements IAtomicService {
   }
 
   async identityStateOrError(
-    errorMessage: string = 'Missing identity state'
+    errorMessage: string = 'Missing identity state',
   ): Promise<IIdentityState> {
     const identityState = await this.identityState();
 

@@ -26,7 +26,7 @@ export default Vue.extend({
   name: 'NextStepOptions',
   router,
   props: {
-    builderType: String as () => BuilderType
+    builderType: String as () => BuilderType,
   },
   methods: {
     visit(path: string) {
@@ -34,7 +34,7 @@ export default Vue.extend({
 
       // Don't return to the project view on a back click
       this.$router.replace(path);
-    }
+    },
   },
   computed: {
     showFinishPackages() {
@@ -53,7 +53,7 @@ export default Vue.extend({
         default:
           return false;
       }
-    }
-  }
+    },
+  },
 });
 </script>

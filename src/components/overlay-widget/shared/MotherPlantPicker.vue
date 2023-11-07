@@ -158,8 +158,8 @@ export default Vue.extend({
     totalPackagesCreated(): number {
       return sum(
         this.$props.childMatrix.map(
-          (x: (number | null)[]) => x.filter((x: number | null) => x !== null).length
-        )
+          (x: (number | null)[]) => x.filter((x: number | null) => x !== null).length,
+        ),
       );
     },
     totalChildCount() {
@@ -227,7 +227,7 @@ export default Vue.extend({
       handler(newValue, oldValue) {
         const matrix: number[][] = evenIntegerDistribution(
           this.$data.totalCount,
-          this.selectedMothers.length
+          this.selectedMothers.length,
         ).map((x) => splitMax(x, newValue));
 
         this.updateChildMatrix(matrix);
@@ -248,7 +248,7 @@ export default Vue.extend({
 
         const matrix: number[][] = evenIntegerDistribution(
           newValue,
-          this.selectedMothers.length
+          this.selectedMothers.length,
         ).map((x) => splitMax(x, this.$data.maximumPerBatch));
 
         this.updateChildMatrix(matrix);

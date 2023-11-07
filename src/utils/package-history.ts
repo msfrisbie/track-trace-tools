@@ -42,7 +42,7 @@ export async function getParentPackageHistoryTree({
 
   const treeNodeCache: Map<string, IPackageAncestorTreeNode> = new Map();
   const ownedLicenses: string[] = (await facilityManager.ownedFacilitiesOrError()).map(
-    (facility) => facility.licenseNumber
+    (facility) => facility.licenseNumber,
   );
   const licenseCache: LRU<string> = new LRU(ownedLicenses);
   const packageStateCache: LRU<PackageState> = new LRU([
@@ -225,7 +225,7 @@ export async function getChildPackageHistoryTree({
 
   const treeNodeCache: Map<string, IPackageChildTreeNode> = new Map();
   const ownedLicenses: string[] = (await facilityManager.ownedFacilitiesOrError()).map(
-    (facility) => facility.licenseNumber
+    (facility) => facility.licenseNumber,
   );
   const licenseCache: LRU<string> = new LRU(ownedLicenses);
   const packageStateCache: LRU<PackageState> = new LRU([

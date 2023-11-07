@@ -87,7 +87,7 @@ export default Vue.extend({
       pageManager.setTransferFilter(
         TransferFilterIdentifiers.ManifestNumber,
         // @ts-ignore
-        this.$props.transfer.ManifestNumber
+        this.$props.transfer.ManifestNumber,
       );
 
       store.commit(`transferSearch/${MutationType.SET_SHOW_TRANSFER_SEARCH_RESULTS}`, false);

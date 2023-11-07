@@ -4,7 +4,7 @@ import {
   IMetrcEmployeeData,
   IPackageFilter,
   IPluginState,
-  ISpreadsheet
+  ISpreadsheet,
 } from '@/interfaces';
 import { primaryDataLoader } from '@/modules/data-loader/data-loader.module';
 import { messageBus } from '@/modules/message-bus.module';
@@ -13,20 +13,20 @@ import { ReportsMutations, ReportType } from '@/store/page-overlay/modules/repor
 import {
   IReportConfig,
   IReportData,
-  IReportsState
+  IReportsState,
 } from '@/store/page-overlay/modules/reports/interfaces';
 import { ActionContext } from 'vuex';
 import { normalizeIsodate, todayIsodate } from '../date';
 import {
   getAllocatedSamplesFromPackageHistoryOrError,
-  toNormalizedAllocationQuantity
+  toNormalizedAllocationQuantity,
 } from '../employee';
 import { extractInitialPackageQuantityAndUnitFromHistoryOrError } from '../history';
 import {
   addRowsRequestFactory,
   autoResizeDimensionsRequestFactory,
   freezeTopRowRequestFactory,
-  styleTopRowRequestFactory
+  styleTopRowRequestFactory,
 } from '../sheets';
 import { writeDataSheet } from '../sheets-export';
 
@@ -158,7 +158,7 @@ export async function maybeLoadEmployeeSamplesReportData({
     for (const allocationData of getAllocatedSamplesFromPackageHistoryOrError(pkg)) {
       const normalizedAllocationQuantity = await toNormalizedAllocationQuantity(
         pkg,
-        allocationData.quantity
+        allocationData.quantity,
       );
 
       if (!employeeData.has(allocationData.employeeName)) {
@@ -202,7 +202,7 @@ export async function maybeLoadEmployeeSamplesReportData({
         `=SUM(I${employeeSamplesMatrix.length - rows.length + 1}:I${employeeSamplesMatrix.length})`,
         `=SUM(J${employeeSamplesMatrix.length - rows.length + 1}:J${employeeSamplesMatrix.length})`,
       ],
-      []
+      [],
     );
   }
 
@@ -281,7 +281,7 @@ export async function createEmployeeSamplesSpreadsheetOrError({
       sheetTitles,
     },
     undefined,
-    SHEETS_API_MESSAGE_TIMEOUT_MS
+    SHEETS_API_MESSAGE_TIMEOUT_MS,
   );
 
   if (!response.data.success) {
@@ -326,7 +326,7 @@ export async function createEmployeeSamplesSpreadsheetOrError({
       requests: formattingRequests,
     },
     undefined,
-    SHEETS_API_MESSAGE_TIMEOUT_MS
+    SHEETS_API_MESSAGE_TIMEOUT_MS,
   );
 
   await messageBus.sendMessageToBackground(
@@ -350,7 +350,7 @@ export async function createEmployeeSamplesSpreadsheetOrError({
       ],
     },
     undefined,
-    SHEETS_API_MESSAGE_TIMEOUT_MS
+    SHEETS_API_MESSAGE_TIMEOUT_MS,
   );
 
   store.commit(`reports/${ReportsMutations.SET_STATUS}`, {
@@ -403,7 +403,7 @@ export async function createEmployeeSamplesSpreadsheetOrError({
       requests: resizeRequests,
     },
     undefined,
-    SHEETS_API_MESSAGE_TIMEOUT_MS
+    SHEETS_API_MESSAGE_TIMEOUT_MS,
   );
 
   await messageBus.sendMessageToBackground(
@@ -414,7 +414,7 @@ export async function createEmployeeSamplesSpreadsheetOrError({
       values: [[`Created with Track & Trace Tools @ ${Date().toString()}`]],
     },
     undefined,
-    SHEETS_API_MESSAGE_TIMEOUT_MS
+    SHEETS_API_MESSAGE_TIMEOUT_MS,
   );
 
   return response.data.result;

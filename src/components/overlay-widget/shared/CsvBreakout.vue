@@ -23,11 +23,11 @@ export default Vue.extend({
   store,
   router,
   props: {
-    csvFiles: Array as () => ICsvFile[]
+    csvFiles: Array as () => ICsvFile[],
   },
   components: {},
   computed: {
-    ...mapState([])
+    ...mapState([]),
   },
   data() {
     return {};
@@ -35,10 +35,10 @@ export default Vue.extend({
   methods: {
     download(csvFile: ICsvFile) {
       downloadCsvFile({ csvFile, delay: 500 });
-    }
+    },
   },
   async created() {},
-  async mounted() {}
+  async mounted() {},
 });
 </script>
 

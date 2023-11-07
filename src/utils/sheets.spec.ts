@@ -8,10 +8,10 @@ enableFetchMocks();
 describe('sheets.ts', () => {
   it('Correctly builds a sheets API URL', () => {
     expect(buildSheetsApiURL('/foobar')).toEqual(
-      'https://sheets.googleapis.com/v4/spreadsheets/foobar'
+      'https://sheets.googleapis.com/v4/spreadsheets/foobar',
     );
     expect(buildSheetsApiURL('/foobar', { foo: 'bar' })).toEqual(
-      'https://sheets.googleapis.com/v4/spreadsheets/foobar?foo=bar'
+      'https://sheets.googleapis.com/v4/spreadsheets/foobar?foo=bar',
     );
   });
 
@@ -19,7 +19,7 @@ describe('sheets.ts', () => {
     const spreadsheetId = '13e1XNpC9CSs7oAkbUlI3B-So9_-UN6vU3XOE7zxzJT4';
 
     expect(
-      extractSheetIdOrError(`https://docs.google.com/spreadsheets/d/${spreadsheetId}/edit#gid=0`)
+      extractSheetIdOrError(`https://docs.google.com/spreadsheets/d/${spreadsheetId}/edit#gid=0`),
     ).toEqual(spreadsheetId);
 
     expect(() => extractSheetIdOrError('foobar')).toThrowError();

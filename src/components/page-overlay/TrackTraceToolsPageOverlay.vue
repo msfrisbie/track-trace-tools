@@ -207,7 +207,7 @@ library.add(
   fontawesomeSolid.faUser,
   fontawesomeSolid.faUsers,
   fontawesomeSolid.faVial,
-  fontawesomeSolid.faWeight
+  fontawesomeSolid.faWeight,
 );
 
 /**

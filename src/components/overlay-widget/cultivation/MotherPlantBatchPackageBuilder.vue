@@ -283,7 +283,7 @@ export default Vue.extend({
       const zipped: [ITagData[], IPlantBatchData[], number[]] = safeZip(
         this.$data.packageTags,
         flattenedPlantBatches,
-        flattenedPlantCounts
+        flattenedPlantCounts,
       );
 
       for (const el of zipped) {
@@ -320,7 +320,7 @@ export default Vue.extend({
           actualIsodate: this.$data.actualIsodate,
         },
         this.buildCsvFiles(),
-        5
+        5,
       );
     },
     async downloadAll() {
@@ -411,7 +411,7 @@ export default Vue.extend({
           csvData,
           `Taking ${this.totalChildCountImpl()} ${`${this.$data.plantBatchType.Name.toLocaleLowerCase()}s`} from ${
             this.$data.selectedPlantBatches.length
-          } mothers`
+          } mothers`,
         );
       } catch (e) {
         console.error(e);
@@ -464,14 +464,14 @@ export default Vue.extend({
     newPackageCountImpl(): number {
       return sum(
         this.$data.childPackageData.map(
-          (x: IIntermediateCreatePackageFromMotherPlantBatchData) => x.counts.length
-        )
+          (x: IIntermediateCreatePackageFromMotherPlantBatchData) => x.counts.length,
+        ),
       );
     },
     totalChildCountImpl(): number {
       return sum(
         this.$data.childPackageData.map((x: IIntermediateCreatePackageFromMotherPlantBatchData) =>
-          sum(x.counts))
+          sum(x.counts)),
       );
     },
   },
@@ -503,7 +503,7 @@ export default Vue.extend({
       return (
         // @ts-ignore
         this.errors.find(
-          (x: IBuilderComponentError) => x.tags.includes('page2') && !x.tags.includes('tagging')
+          (x: IBuilderComponentError) => x.tags.includes('page2') && !x.tags.includes('tagging'),
         )?.message || null
       );
     },
@@ -568,7 +568,7 @@ export default Vue.extend({
       // }
 
       const emptyChildLists: number = (this as any).childMatrix.filter(
-        (x: number[]) => x.length === 0
+        (x: number[]) => x.length === 0,
       ).length;
 
       if (emptyChildLists === this.childMatrix.length) {
@@ -713,7 +713,7 @@ export default Vue.extend({
     this.$data.facilityUsesLocationForPackages = await dynamicConstsManager.facilityUsesLocationForPackages();
 
     this.$data.plantBatchTypeOptions = (await dynamicConstsManager.plantBatchTypes()).map(
-      (x: IPlantBatchType) => ({ text: `${x.Name}s`, value: x })
+      (x: IPlantBatchType) => ({ text: `${x.Name}s`, value: x }),
     );
     this.$data.plantBatchType = this.$data.plantBatchTypeOptions[0].value;
   },

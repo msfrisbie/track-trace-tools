@@ -328,7 +328,7 @@ export default Vue.extend({
           transferSearchFilters: {
             manifestNumber: transfer.ManifestNumber,
           },
-        }
+        },
       );
 
       this.setShowSearchResults({ showSearchResults: false });

@@ -224,7 +224,7 @@ describe('compression.ts', () => {
       'name',
       expandedData.map((x) => wrapperA.pack(x)),
       'foo',
-      ['foo', 'bar']
+      ['foo', 'bar'],
     );
 
     for (const wrapper of [wrapperA, wrapperB]) {

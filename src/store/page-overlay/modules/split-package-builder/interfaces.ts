@@ -1,5 +1,5 @@
 import {
-  IItemData, ILocationData, IPackageData, ITagData
+  IItemData, ILocationData, IPackageData, ITagData,
 } from '@/interfaces';
 
 export interface ISplitPackageBuilderState {

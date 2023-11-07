@@ -198,7 +198,7 @@ export default Vue.extend({
 
           if (transfer.EstimatedArrivalDateTime) {
             return `Scheduled for delivery ${deliveryTimeDescriptor(
-              transfer.EstimatedArrivalDateTime
+              transfer.EstimatedArrivalDateTime,
             )}`;
           }
 
@@ -216,7 +216,7 @@ export default Vue.extend({
 
           if (transfer.EstimatedReturnDepartureDateTime) {
             return `Scheduled for return ${deliveryTimeDescriptor(
-              transfer.EstimatedReturnDepartureDateTime
+              transfer.EstimatedReturnDepartureDateTime,
             )}`;
           }
 
@@ -243,7 +243,7 @@ export default Vue.extend({
           transferSearchFilters: {
             manifestNumber: transfer.ManifestNumber,
           },
-        }
+        },
       );
 
       this.setShowSearchResults({ showSearchResults: false });

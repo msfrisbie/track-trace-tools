@@ -40,7 +40,7 @@ export default Vue.extend({
     showTooBigError() {
       const gramsPerPlant = normalizeToGrams(
         this.$props.totalQuantity,
-        this.$props.unitOfMeasureName
+        this.$props.unitOfMeasureName,
       ) / this.$props.plantCount;
 
       // Maximum: 5 lb
@@ -53,7 +53,7 @@ export default Vue.extend({
     showTooSmallError() {
       const gramsPerPlant = normalizeToGrams(
         this.$props.totalQuantity,
-        this.$props.unitOfMeasureName
+        this.$props.unitOfMeasureName,
       ) / this.$props.plantCount;
 
       // Minimum: 0.1 lb

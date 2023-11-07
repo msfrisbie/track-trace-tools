@@ -30,7 +30,7 @@ export const plantSearchModule = {
   mutations: {
     [PlantSearchMutations.SET_PLANT_SEARCH_FILTERS](
       state: IPlantSearchState,
-      { plantSearchFilters }: { plantSearchFilters: IPlantSearchFilters }
+      { plantSearchFilters }: { plantSearchFilters: IPlantSearchFilters },
     ) {
       state.plantSearchFilters = {
         ...plantSearchFilters,
@@ -41,7 +41,7 @@ export const plantSearchModule = {
   actions: {
     [PlantSearchActions.EXECUTE_QUERY]: async (
       ctx: ActionContext<IPlantSearchState, IPluginState>,
-      { queryString }: { queryString: string }
+      { queryString }: { queryString: string },
     ) => {
       ctx.state.plants = [];
       ctx.state.selectedPlantMetadata = null;
@@ -72,7 +72,7 @@ export const plantSearchModule = {
         plantSearchFilters: IPlantSearchFilters;
         propagate?: boolean;
         plantState?: PlantState | null;
-      }
+      },
     ) => {
       if (plantState) {
         switch (plantState as PlantState) {
@@ -105,7 +105,7 @@ export const plantSearchModule = {
       {
         plantSearchFilters,
         propagate = true,
-      }: { plantSearchFilters: IPlantSearchFilters; propagate?: boolean }
+      }: { plantSearchFilters: IPlantSearchFilters; propagate?: boolean },
     ) {
       const defaultPlantSearchFilters = {
         label: null,

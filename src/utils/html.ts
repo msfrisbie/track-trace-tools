@@ -150,7 +150,7 @@ function extractAuthData(html: string) {
   const scripts = container.querySelectorAll(
     // Diffing OR and CA source reveals that the script tags
     // may or may not have the [type='text/javascript'] attribute.
-    'script'
+    'script',
   ) as any;
 
   let authDataScriptText = null;
@@ -211,7 +211,7 @@ function extractAuthData(html: string) {
       console.error(
         'Unexpected license mismatch:',
         extractedIdentityArray[1],
-        extractedAuthDataDict.license
+        extractedAuthDataDict.license,
       );
     }
   }

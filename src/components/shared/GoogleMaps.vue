@@ -35,11 +35,11 @@ export default Vue.extend({
       switch (this.$props.mapMode) {
         case 'place':
           return `https://www.google.com/maps/embed/v1/place?key=${googleMapsApiKey()}&q=${encodeURIComponent(
-            this.$props.destination
+            this.$props.destination,
           )}`;
         case 'directions':
           return `https://www.google.com/maps/embed/v1/directions?key=${googleMapsApiKey()}&destination=${encodeURIComponent(
-            this.$props.destination
+            this.$props.destination,
           )}&origin=${encodeURIComponent(this.$props.origin)}`;
         default:
           return '';

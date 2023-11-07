@@ -140,14 +140,14 @@ export default Vue.extend({
       let weights = evenDistribution(
         this.$data.totalWeight,
         this.selectedPlants.length,
-        this.$data.precision
+        this.$data.precision,
       );
 
       if (this.$data.randomize) {
         weights = normalDistribution(
           this.$data.totalWeight,
           this.selectedPlants.length,
-          this.$data.precision
+          this.$data.precision,
         );
       }
 

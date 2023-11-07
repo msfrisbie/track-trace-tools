@@ -34,7 +34,7 @@ export default Vue.extend({
       () => {
         this.$data.isScrolledDown = document.body.scrollTop > TOP_THRESHOLD_PX
           || document.documentElement.scrollTop > TOP_THRESHOLD_PX;
-      }
+      },
     );
   },
   computed: {},

@@ -7,12 +7,12 @@ import {
   IMetrcFacilityData,
   IMetrcVehicleData,
   IRichDestinationData,
-  ITransferHistoryData
+  ITransferHistoryData,
 } from '@/interfaces';
 import { authManager } from '@/modules/auth-manager.module';
 import {
   getDataLoaderByLicense,
-  primaryDataLoader
+  primaryDataLoader,
 } from '@/modules/data-loader/data-loader.module';
 import { dynamicConstsManager } from '@/modules/dynamic-consts-manager.module';
 import { toastManager } from '@/modules/toast-manager.module';
@@ -99,7 +99,7 @@ export async function extractRecentTransporterFacilitiesFromTransfers(): Promise
       if (!transporterFacilityLicense) {
         console.error(
           'outgoingTransfer.ShipperFacilityLicenseNumber',
-          outgoingTransfer.ShipperFacilityLicenseNumber
+          outgoingTransfer.ShipperFacilityLicenseNumber,
         );
         continue;
       }
@@ -200,7 +200,7 @@ export async function createScanSheet(transferId: number, manifestNumber: string
         toaster: 'ttt-toaster',
         solid: true,
         href: 'https://trackandtrace.tools/plus',
-      }
+      },
     );
 
     return;
@@ -216,7 +216,7 @@ export async function createScanSheet(transferId: number, manifestNumber: string
         appendToast: true,
         toaster: 'ttt-toaster',
         solid: true,
-      }
+      },
     );
 
     return;
@@ -269,8 +269,8 @@ export async function createScanSheet(transferId: number, manifestNumber: string
             (pkg) => ({
               pkg,
               incomingTransfer: incomingTransfer!,
-            })
-          )
+            }),
+          ),
         );
       } else {
         for (const destination of destinations) {
@@ -278,7 +278,7 @@ export async function createScanSheet(transferId: number, manifestNumber: string
             (await primaryDataLoader.destinationPackages(destination.Id)).map((pkg) => ({
               pkg,
               destination,
-            }))
+            })),
           );
         }
       }
@@ -295,7 +295,7 @@ export async function createScanSheet(transferId: number, manifestNumber: string
       (
         await authManager.authStateOrError()
       ).license,
-      manifest
+      manifest,
     );
 
     window.open(spreadsheet.spreadsheetUrl, '_blank');
@@ -341,13 +341,13 @@ export async function findMatchingTransferPackages({
     promises.push(
       dataLoader.outgoingInactiveTransfers().then((transfers) => {
         allTransfers = [...allTransfers, ...transfers];
-      })
+      }),
     );
 
     promises.push(
       dataLoader.rejectedTransfers().then((transfers) => {
         allTransfers = [...allTransfers, ...transfers];
-      })
+      }),
     );
   }
 
@@ -377,7 +377,7 @@ export async function findMatchingTransferPackages({
   while (true) {
     const richTransferPage: IIndexedRichOutgoingTransferData[] = allTransfers.slice(
       pageIdx,
-      pageIdx + PAGE_SIZE
+      pageIdx + PAGE_SIZE,
     );
     if (richTransferPage.length === 0) {
       break;
@@ -397,7 +397,7 @@ export async function findMatchingTransferPackages({
             x.packages = [];
             return x;
           });
-        })
+        }),
       );
     }
 
@@ -428,7 +428,7 @@ export async function findMatchingTransferPackages({
 
               return false;
             });
-          })
+          }),
         );
       }
     }
@@ -437,7 +437,7 @@ export async function findMatchingTransferPackages({
 
     for (const transfer of richTransferPage) {
       transfer.outgoingDestinations = transfer.outgoingDestinations!.filter(
-        (x) => x.packages!.length > 0
+        (x) => x.packages!.length > 0,
       );
     }
 

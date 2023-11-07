@@ -689,7 +689,7 @@ export default Vue.extend({
           appendToast: true,
           toaster: 'ttt-toaster',
           solid: true,
-        }
+        },
       );
     },
   },

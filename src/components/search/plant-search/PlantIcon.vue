@@ -9,7 +9,7 @@ import Vue from 'vue';
 export default Vue.extend({
   name: 'PlantIcon',
   props: {
-    plant: Object as () => IIndexedPlantData
+    plant: Object as () => IIndexedPlantData,
   },
   computed: {
     icon() {
@@ -17,7 +17,7 @@ export default Vue.extend({
     },
     iconColor() {
       return '#49276a';
-    }
-  }
+    },
+  },
 });
 </script>

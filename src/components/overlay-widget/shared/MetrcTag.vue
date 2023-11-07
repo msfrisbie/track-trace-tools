@@ -24,7 +24,7 @@ export default Vue.extend({
   router,
   props: {
     label: String,
-    sideText: String
+    sideText: String,
   },
   components: {
     DualColorTag,

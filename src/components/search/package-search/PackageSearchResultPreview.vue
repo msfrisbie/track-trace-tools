@@ -59,12 +59,12 @@ export default Vue.extend({
           packageSearchFilters: {
             label: pkg.Label,
           },
-        }
+        },
       );
 
       this.setShowSearchResults({ showSearchResults: false });
     },
-    getNormalizedPackageContentsDescription
+    getNormalizedPackageContentsDescription,
   },
 });
 </script>

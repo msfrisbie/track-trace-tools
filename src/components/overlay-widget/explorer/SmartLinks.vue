@@ -73,7 +73,7 @@ export default Vue.extend({
       }
 
       const outgoingTransferManifestNumber = extractOutgoingTransferManifestNumberOrNull(
-        this.description
+        this.description,
       );
       if (outgoingTransferManifestNumber) {
         smartLinks.push({

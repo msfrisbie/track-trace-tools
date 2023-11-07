@@ -134,7 +134,7 @@ export default Vue.extend({
     },
     nonmatchingTagsImpl(): string[] {
       return this.potentialTagsImpl().filter(
-        (x: string) => isValidTag(x) && !this.$props.sourceLabels.includes(x)
+        (x: string) => isValidTag(x) && !this.$props.sourceLabels.includes(x),
       ).sort();
     },
     tagRangeImpl(): string[] {

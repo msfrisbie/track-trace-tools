@@ -32,7 +32,7 @@ export const transferPackageSearchModule = {
   mutations: {
     [TransferPackageSearchMutations.TRANSFER_PACKAGE_SEARCH_MUTATION](
       state: ITransferPackageSearchState,
-      data: any
+      data: any,
     ) {
       // state.data = data;
     },
@@ -42,7 +42,7 @@ export const transferPackageSearchModule = {
       state: ITransferPackageSearchState,
       getters: any,
       rootState: any,
-      rootGetters: any
+      rootGetters: any,
     ) => {
       // return state.data
     },
@@ -56,7 +56,7 @@ export const transferPackageSearchModule = {
     // },
     [TransferPackageSearchActions.EXECUTE_SEARCH]: async (
       ctx: ActionContext<ITransferPackageSearchState, IPluginState>,
-      data: any
+      data: any,
     ) => {
       ctx.state.state = TransferPackageSearchState.INFLIGHT;
       ctx.state.abortController = new AbortController();
@@ -86,7 +86,7 @@ export const transferPackageSearchModule = {
     },
     [TransferPackageSearchActions.STOP_SEARCH]: async (
       ctx: ActionContext<ITransferPackageSearchState, IPluginState>,
-      data: any
+      data: any,
     ) => {
       ctx.state.abortController.abort();
       ctx.state.state = TransferPackageSearchState.SUCCESS;
@@ -98,7 +98,7 @@ export const transferPackageSearchModule = {
     },
     [TransferPackageSearchActions.RESET_SEARCH]: async (
       ctx: ActionContext<ITransferPackageSearchState, IPluginState>,
-      data: any
+      data: any,
     ) => {
       ctx.state.algorithm = TransferPackageSearchAlgorithm.OLD_TO_NEW;
       ctx.state.startDate = null;
@@ -109,7 +109,7 @@ export const transferPackageSearchModule = {
     },
     [TransferPackageSearchActions.UPDATE_SEARCH_PARAMETERS]: async (
       ctx: ActionContext<ITransferPackageSearchState, IPluginState>,
-      searchParameters: { startDate: string | null; algorithm: TransferPackageSearchAlgorithm }
+      searchParameters: { startDate: string | null; algorithm: TransferPackageSearchAlgorithm },
     ) => {
       ctx.state.algorithm = searchParameters.algorithm;
       ctx.state.startDate = searchParameters.startDate;
@@ -118,7 +118,7 @@ export const transferPackageSearchModule = {
 };
 
 export const transferPackageSearchReducer = (
-  state: ITransferPackageSearchState
+  state: ITransferPackageSearchState,
 ): ITransferPackageSearchState => ({
   ...state,
   ...inMemoryState,

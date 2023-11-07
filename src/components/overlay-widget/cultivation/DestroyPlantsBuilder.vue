@@ -246,7 +246,7 @@ export default Vue.extend({
           unitOfWeight: this.$data.unitOfWeight.Name,
         },
         this.buildCsvFiles(),
-        25
+        25,
       );
     },
     async downloadAll() {
@@ -284,7 +284,7 @@ export default Vue.extend({
           csvData,
           `Waste ${sum(this.$data.destroyedWeights)} ${this.$data.unitOfWeight.Name} from ${
             this.$data.selectedPlants.length
-          } plants`
+          } plants`,
         );
       } catch (e) {
         console.error(e);
@@ -342,7 +342,7 @@ export default Vue.extend({
     },
     averagePerPlantWaste() {
       return parseFloat(
-        (sum(this.$data.destroyedWeights) / this.$data.selectedPlants.length).toFixed(3)
+        (sum(this.$data.destroyedWeights) / this.$data.selectedPlants.length).toFixed(3),
       );
     },
     showWeightEntry(): boolean {

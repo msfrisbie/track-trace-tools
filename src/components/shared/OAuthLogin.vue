@@ -76,7 +76,7 @@ export default Vue.extend({
     async loginOrError({ interactive = false }: { interactive?: boolean } = {}) {
       const response = await messageBus.sendMessageToBackground(
         MessageType.GET_OAUTH_USER_INFO_OR_ERROR,
-        { interactive }
+        { interactive },
       );
       this.$data.oauthUserInfo = response.data.result;
       if (response.data.success) {

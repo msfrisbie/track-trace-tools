@@ -34,7 +34,7 @@ export const MATURE_PLANT_QUICKVIEW_DIMENSIONS: MaturePlantQuickviewDimension[] 
 
 export function extractMaturePlantPropertyFromDimension(
   plant: IIndexedPlantData,
-  dimension: MaturePlantQuickviewDimension
+  dimension: MaturePlantQuickviewDimension,
 ) {
   switch (dimension) {
     case MaturePlantQuickviewDimension.STRAIN:

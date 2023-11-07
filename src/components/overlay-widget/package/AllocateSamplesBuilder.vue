@@ -336,7 +336,7 @@ export default Vue.extend({
           AdjustmentUnitOfMeasureId: sampleAllocation.pkg.UnitOfMeasureId.toString(),
           CurrentQuantity: sampleAllocation.pkg.Quantity.toString(),
           CurrentQuantityUom: unitsOfMeasure.find(
-            (x) => x.Id === sampleAllocation.pkg.UnitOfMeasureId
+            (x) => x.Id === sampleAllocation.pkg.UnitOfMeasureId,
           )!.Name,
           FinishDate: '',
           NewQuantity: (
@@ -357,7 +357,7 @@ export default Vue.extend({
           sampleTotal: this.selectedSampleAllocations.length,
         },
         this.buildCsvFiles(),
-        1
+        1,
       );
     },
     buildCsvFiles(): ICsvFile[] {
@@ -370,7 +370,7 @@ export default Vue.extend({
           {
             isVector: true,
             data: (this.selectedSampleAllocations as ISampleAllocation[]).map(
-              (x) => -1 * x.adjustmentQuantity
+              (x) => -1 * x.adjustmentQuantity,
             ),
           },
           {
@@ -378,8 +378,8 @@ export default Vue.extend({
             data: (this.selectedSampleAllocations as ISampleAllocation[]).map(
               (x) =>
                 this.$data.unitsOfMeasure.find(
-                  (y: IUnitOfMeasure) => y.Id === x.pkg.UnitOfMeasureId
-                )!.Name
+                  (y: IUnitOfMeasure) => y.Id === x.pkg.UnitOfMeasureId,
+                )!.Name,
             ),
           },
           {
@@ -391,7 +391,7 @@ export default Vue.extend({
             isVector: true,
             data: (this.selectedSampleAllocations as ISampleAllocation[]).map(
               (x) =>
-                `${x.employee.FullName} ${x.employee.License.Number} ${x.adjustmentQuantity} ${x.pkg.UnitOfMeasureAbbreviation}`
+                `${x.employee.FullName} ${x.employee.License.Number} ${x.adjustmentQuantity} ${x.pkg.UnitOfMeasureAbbreviation}`,
             ),
           },
           {
@@ -401,14 +401,14 @@ export default Vue.extend({
           {
             isVector: true,
             data: (this.selectedSampleAllocations as ISampleAllocation[]).map(
-              (x) => x.employee.License.Number
+              (x) => x.employee.License.Number,
             ),
           },
         ]);
 
         return buildNamedCsvFileData(
           csvData,
-          `Adjust ${this.selectedSampleAllocations.length} samples`
+          `Adjust ${this.selectedSampleAllocations.length} samples`,
         );
       } catch (e) {
         console.error(e);
@@ -449,9 +449,9 @@ export default Vue.extend({
           data += `[${sampleAllocation.distributionDate}] ${
             sampleAllocation.pkg.Label
           } - ${sampleAllocation.flowerAllocationGrams.toFixed(
-            2
+            2,
           )}/${sampleAllocation.concentrateAllocationGrams.toFixed(
-            2
+            2,
           )}/${sampleAllocation.infusedAllocationGrams.toFixed(2)} - ${
             sampleAllocation.pkg.Item.Name
           } (${sampleAllocation.adjustmentQuantity}${

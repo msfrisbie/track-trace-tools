@@ -30,13 +30,13 @@ export const clientModule = {
       state: IClientState,
       getters: any,
       rootState: any,
-      rootGetters: any
+      rootGetters: any,
     ) => state.t3plus || !!state.values.ENABLE_T3PLUS,
   },
   actions: {
     [ClientActions.UPDATE_CLIENT_VALUES]: async (
       ctx: ActionContext<IClientState, IPluginState>,
-      data: { notify?: boolean } = {}
+      data: { notify?: boolean } = {},
     ) => {
       const plusUsers = await t3RequestManager.loadT3plus();
 
@@ -49,7 +49,7 @@ export const clientModule = {
       }
 
       const { clientName, values } = await t3RequestManager.loadClientDataOrError(
-        ctx.rootState.settings.licenseKey
+        ctx.rootState.settings.licenseKey,
       );
 
       if (data.notify && !clientName) {

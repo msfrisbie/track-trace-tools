@@ -84,7 +84,7 @@ export default Vue.extend({
           return 'light';
       }
     },
-    getQuantityAndUnitDescription
+    getQuantityAndUnitDescription,
   },
   async created() {},
   async mounted() {},

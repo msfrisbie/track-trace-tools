@@ -1,5 +1,5 @@
 import {
-  IContactInfo, IMetrcFacilityData, ITagOrderData, ITagOrderModalData
+  IContactInfo, IMetrcFacilityData, ITagOrderData, ITagOrderModalData,
 } from '@/interfaces';
 
 export function extractIContactInfoFromITagOrderData(tagOrderData: ITagOrderData): IContactInfo {
@@ -23,7 +23,7 @@ export function extractIContactInfoFromITagOrderData(tagOrderData: ITagOrderData
 }
 
 export function extractIContactInfoFromITagOrderModalData(
-  tagOrderModalData: ITagOrderModalData
+  tagOrderModalData: ITagOrderModalData,
 ): IContactInfo {
   return {
     contactName: tagOrderModalData.Shipping.ContactName,

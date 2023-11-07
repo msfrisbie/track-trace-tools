@@ -5,7 +5,7 @@ import { allocateImmaturePlantCounts } from './misc';
 function buildMockPackage(
   Id: number,
   Quantity: number,
-  QuantityTypeName = 'CountBased'
+  QuantityTypeName = 'CountBased',
 ): IPackageData {
   const pkg = {
     Id,

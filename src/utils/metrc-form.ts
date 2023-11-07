@@ -1,7 +1,7 @@
 export async function setFormInputValue(
   input: HTMLInputElement | HTMLSelectElement,
   value: string,
-  eventType: string = 'change'
+  eventType: string = 'change',
 ) {
   input.value = value;
   input.dispatchEvent(new Event(eventType));

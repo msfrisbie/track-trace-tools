@@ -28,7 +28,7 @@ export const PACKAGES_QUICKVIEW_DIMENSIONS: PackageQuickviewDimension[] = [
 
 export function extractPackagePropertyFromDimension(
   pkg: IIndexedPackageData,
-  dimension: PackageQuickviewDimension
+  dimension: PackageQuickviewDimension,
 ) {
   switch (dimension) {
     case PackageQuickviewDimension.ITEM_NAME:

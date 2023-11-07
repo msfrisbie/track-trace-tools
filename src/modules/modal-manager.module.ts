@@ -34,7 +34,7 @@ export class ModalManager implements IAtomicService {
   dispatchModalEvent(
     modalType: ModalType,
     modalAction = ModalAction.OPEN,
-    modalEventOptions: any = null
+    modalEventOptions: any = null,
   ) {
     // This could be problematic
     //

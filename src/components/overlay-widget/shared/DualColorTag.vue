@@ -23,7 +23,7 @@ export default Vue.extend({
     labelPrefix() {
       return this.$props.label.slice(
         0,
-        sliceOffset + firstNonzeroSuffixIntIndex(this.$props.label)
+        sliceOffset + firstNonzeroSuffixIntIndex(this.$props.label),
       );
     },
     labelSuffix() {

@@ -42,14 +42,14 @@ describe('employee.ts', () => {
     expect(
       getAllocatedSampleFromPackageHistoryEntryOrNull(
         '1A4F00000000000000001234',
-        ignoredHistoryEntry
-      )
+        ignoredHistoryEntry,
+      ),
     ).toEqual(null);
     expect(
       getAllocatedSampleFromPackageHistoryEntryOrNull(
         '1A4F00000000000000001234',
-        sampleHistoryEntryEach
-      )
+        sampleHistoryEntryEach,
+      ),
     ).toEqual({
       packageLabel: '1A4F00000000000000001234',
       employeeLicenseNumber: '0123456789',
@@ -61,8 +61,8 @@ describe('employee.ts', () => {
     expect(
       getAllocatedSampleFromPackageHistoryEntryOrNull(
         '1A4F00000000000000001234',
-        sampleHistoryEntryGrams
-      )
+        sampleHistoryEntryGrams,
+      ),
     ).toEqual({
       packageLabel: '1A4F00000000000000001234',
       employeeLicenseNumber: '0123456789',

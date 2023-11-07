@@ -65,7 +65,7 @@ export default Vue.extend({
   name: 'LocationPicker',
   store,
   components: {
-    ErrorReadout
+    ErrorReadout,
   },
   async mounted() {
     // @ts-ignore
@@ -73,23 +73,23 @@ export default Vue.extend({
   },
   props: {
     location: Object as () => ILocationData,
-    suggestedLocationName: String
+    suggestedLocationName: String,
   },
   data() {
     return {
       locationNameQuery: '',
       inflight: false,
       error: null,
-      locations: []
+      locations: [],
     };
   },
   computed: {
     locationOptions() {
       return this.$data.locations.map((location: ILocationData) => ({
         text: location.Name,
-        value: location
+        value: location,
       }));
-    }
+    },
   },
   watch: {
     location: {
@@ -97,14 +97,14 @@ export default Vue.extend({
       handler(newValue, oldValue) {
         // @ts-ignore
         this.$data.locationNameQuery = newValue?.Name;
-      }
+      },
     },
     suggestedLocationName: {
       immediate: true,
       handler() {
         (this as any).maybeSetLocationDefault();
-      }
-    }
+      },
+    },
   },
   methods: {
     async loadLocations() {
@@ -128,7 +128,7 @@ export default Vue.extend({
 
         this.$data.error = new DataLoadError(
           DataLoadErrorType.ZERO_RESULTS,
-          'Zero results returned'
+          'Zero results returned',
         );
       }
     },
@@ -146,13 +146,13 @@ export default Vue.extend({
       }
 
       const matchingLocation = this.$data.locations.find(
-        (x: ILocationData) => x.Name === (this as any).suggestedLocationName
+        (x: ILocationData) => x.Name === (this as any).suggestedLocationName,
       );
 
       if (matchingLocation) {
         this.$emit('update:location', matchingLocation);
       }
-    }
-  }
+    },
+  },
 });
 </script>

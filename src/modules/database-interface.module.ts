@@ -1,5 +1,5 @@
 import {
-  MessageType, PackageState, TagState, TransferState
+  MessageType, PackageState, TagState, TransferState,
 } from '@/consts';
 import {
   IAtomicService,
@@ -101,7 +101,7 @@ class DatabaseInterface implements IAtomicService {
 
   async packageSearch(
     queryString: string,
-    filters: IIndexedPackageFilters
+    filters: IIndexedPackageFilters,
   ): Promise<IIndexedPackageData[]> {
     const authState = await authManager.authStateOrError('User is not authenticated');
 
@@ -126,7 +126,7 @@ class DatabaseInterface implements IAtomicService {
 
   async transferSearch(
     queryString: string,
-    filters: IIndexedTransferFilters
+    filters: IIndexedTransferFilters,
   ): Promise<IIndexedTransferData[]> {
     const authState = await authManager.authStateOrError('User is not authenticated');
 

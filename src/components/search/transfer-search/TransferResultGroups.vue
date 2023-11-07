@@ -82,7 +82,7 @@ export default Vue.extend({
     incomingTransfers(): IIndexedTransferData[] {
       const transfers = this.transfers.filter(
         (transferData: IIndexedTransferData) =>
-          transferData.TransferState === TransferState.INCOMING
+          transferData.TransferState === TransferState.INCOMING,
       );
 
       return transfers;
@@ -90,7 +90,7 @@ export default Vue.extend({
     outgoingTransfers(): IIndexedTransferData[] {
       const transfers = this.transfers.filter(
         (transferData: IIndexedTransferData) =>
-          transferData.TransferState === TransferState.OUTGOING
+          transferData.TransferState === TransferState.OUTGOING,
       );
 
       return transfers;
@@ -98,7 +98,7 @@ export default Vue.extend({
     incomingInactiveTransfers(): IIndexedTransferData[] {
       const transfers = this.transfers.filter(
         (transferData: IIndexedTransferData) =>
-          transferData.TransferState === TransferState.INCOMING_INACTIVE
+          transferData.TransferState === TransferState.INCOMING_INACTIVE,
       );
 
       return transfers;
@@ -106,7 +106,7 @@ export default Vue.extend({
     outgoingInactiveTransfers(): IIndexedTransferData[] {
       const transfers = this.transfers.filter(
         (transferData: IIndexedTransferData) =>
-          transferData.TransferState === TransferState.OUTGOING_INACTIVE
+          transferData.TransferState === TransferState.OUTGOING_INACTIVE,
       );
 
       return transfers;
@@ -114,7 +114,7 @@ export default Vue.extend({
     rejectedTransfers(): IIndexedTransferData[] {
       const transfers = this.transfers.filter(
         (transferData: IIndexedTransferData) =>
-          transferData.TransferState === TransferState.REJECTED
+          transferData.TransferState === TransferState.REJECTED,
       );
 
       return transfers;

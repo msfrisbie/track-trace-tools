@@ -18,7 +18,7 @@ import {
   IMetrcReplacePlantTagsPayload,
   IMetrcUnpackImmaturePlantsPayload,
   IMetrcUpdateTransferPayload,
-  IMetrcCreateTransferPayload
+  IMetrcCreateTransferPayload,
 } from '@/interfaces';
 import { primaryMetrcRequestManager } from '@/modules/metrc-request-manager.module';
 import store from '@/store/page-overlay/index';
@@ -124,7 +124,7 @@ class BuilderManager implements IAtomicService {
     builderType: BuilderType,
     summary: Object,
     csvFiles: ICsvFile[],
-    pageSize: number = DEFAULT_SUBMIT_PAGE_SIZE
+    pageSize: number = DEFAULT_SUBMIT_PAGE_SIZE,
   ): void {
     // Vue might be passing in Observers, collapse them into regular objects
     this.submitProjectImpl(
@@ -132,7 +132,7 @@ class BuilderManager implements IAtomicService {
       builderType,
       _.cloneDeep(summary),
       _.cloneDeep(csvFiles),
-      pageSize
+      pageSize,
     );
   }
 
@@ -141,7 +141,7 @@ class BuilderManager implements IAtomicService {
     builderType: BuilderType,
     summary: Object,
     csvFiles: ICsvFile[],
-    pageSize: number
+    pageSize: number,
   ) {
     if (this.activeBuilderProject) {
       throw new Error('Cannot overwrite existing project');
@@ -174,7 +174,7 @@ class BuilderManager implements IAtomicService {
     }
 
     this.activeBuilderProject.pendingRows.push(
-      ...this.activeBuilderProject.failedRows.splice(0, this.activeBuilderProject.failedRows.length)
+      ...this.activeBuilderProject.failedRows.splice(0, this.activeBuilderProject.failedRows.length),
     );
     this.updateProject(this.activeBuilderProject);
 
@@ -198,12 +198,12 @@ class BuilderManager implements IAtomicService {
           break;
         case BuilderType.PROMOTE_IMMATURE_PLANTS:
           store.dispatch(
-            `promoteImmaturePlantsBuilder/${PromoteImmaturePlantsBuilderActions.RESET_PROMOTE_IMMATURE_PLANTS_DATA}`
+            `promoteImmaturePlantsBuilder/${PromoteImmaturePlantsBuilderActions.RESET_PROMOTE_IMMATURE_PLANTS_DATA}`,
           );
           break;
         case BuilderType.SPLIT_PACKAGE:
           store.dispatch(
-            `splitPackageBuilder/${SplitPackageBuilderActions.RESET_SPLIT_PACKAGE_DATA}`
+            `splitPackageBuilder/${SplitPackageBuilderActions.RESET_SPLIT_PACKAGE_DATA}`,
           );
           break;
         default:
@@ -234,7 +234,7 @@ class BuilderManager implements IAtomicService {
 
     this.activeBuilderProject.inflightRows = this.activeBuilderProject.pendingRows.splice(
       0,
-      this.activeBuilderProject.pageSize
+      this.activeBuilderProject.pageSize,
     );
 
     if (this.activeBuilderProject.inflightRows.length === 0) {
@@ -250,7 +250,7 @@ class BuilderManager implements IAtomicService {
     try {
       const response = await this.submitRows(
         this.activeBuilderProject.inflightRows,
-        this.activeBuilderProject.builderType
+        this.activeBuilderProject.builderType,
       );
       success = response.status === 200;
       if (!success) {
@@ -364,12 +364,12 @@ class BuilderManager implements IAtomicService {
         break;
       case BuilderType.CREATE_IMMATURE_PLANT_PACKAGES_FROM_MOTHER_PLANT:
         response = await primaryMetrcRequestManager.immaturePlantPackagesFromMotherPlant(
-          JSON.stringify(rows)
+          JSON.stringify(rows),
         );
         break;
       case BuilderType.CREATE_IMMATURE_PLANT_PACKAGES_FROM_MOTHER_PLANT_BATCH:
         response = await primaryMetrcRequestManager.immaturePlantPackagesFromMotherPlantBatch(
-          JSON.stringify(rows)
+          JSON.stringify(rows),
         );
         break;
       case BuilderType.CREATE_TRANSFER:

@@ -69,7 +69,7 @@ class AuthManager implements IAtomicService {
       // Data was not found in the page.
       // Piggyback on browser cookies/redirect and load the initial logged in page, which should have credentials
       const loadedHTML = await customAxios(window.location.origin).then(
-        (response) => response.data
+        (response) => response.data,
       );
 
       extractedAuthData = extract(ExtractionType.AUTH_DATA, loadedHTML);

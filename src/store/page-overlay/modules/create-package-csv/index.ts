@@ -22,7 +22,7 @@ export const createPackageCsvModule = {
   mutations: {
     [CreatePackageCsvMutations.CREATE_PACKAGE_CSV_MUTATION](
       state: ICreatePackageCsvState,
-      data: any
+      data: any,
     ) {
       // state.data = data;
     },
@@ -32,7 +32,7 @@ export const createPackageCsvModule = {
       state: ICreatePackageCsvState,
       getters: any,
       rootState: any,
-      rootGetters: any
+      rootGetters: any,
     ) => {
       // return state.data
     },
@@ -42,7 +42,7 @@ export const createPackageCsvModule = {
       ctx: ActionContext<ICreatePackageCsvState, IPluginState>,
       data: {
         columns: string[]
-      }
+      },
     ) => {
       await createPackageCsvTemplateSheetOrError(data.columns);
     },

@@ -196,7 +196,7 @@ import { arrayIsValid } from '@/utils/array';
 import { primaryDataLoader } from '@/modules/data-loader/data-loader.module';
 import { combineLatest, from, Subject } from 'rxjs';
 import {
-  debounceTime, distinctUntilChanged, filter, startWith, tap
+  debounceTime, distinctUntilChanged, filter, startWith, tap,
 } from 'rxjs/operators';
 import {
   IPlantData,
@@ -273,7 +273,7 @@ export default Vue.extend({
           unitOfWeight: this.$data.unitOfWeight.Name,
         },
         this.buildCsvFiles(),
-        25
+        25,
       );
     },
     fillPreviousHarvestData() {
@@ -307,7 +307,7 @@ export default Vue.extend({
             unitOfWeight: this.$data.unitOfWeight,
             harvestName: this.$data.harvestName,
             harvestIsodate: this.$data.harvestIsodate,
-          })
+          }),
         );
       } catch (e) {
         console.error(e);
@@ -349,7 +349,7 @@ export default Vue.extend({
           csvData,
           `${this.$data.harvestName} harvest ${sum(this.$data.harvestedWeights)} ${
             this.$data.unitOfWeight.Name
-          } from ${this.$data.selectedPlants.length} plants`
+          } from ${this.$data.selectedPlants.length} plants`,
         );
       } catch (e) {
         console.error(e);
@@ -389,7 +389,7 @@ export default Vue.extend({
     },
     averagePerPlantYield() {
       return parseFloat(
-        (sum(this.$data.harvestedWeights) / this.$data.selectedPlants.length).toFixed(3)
+        (sum(this.$data.harvestedWeights) / this.$data.selectedPlants.length).toFixed(3),
       );
     },
     showWeightEntry(): boolean {

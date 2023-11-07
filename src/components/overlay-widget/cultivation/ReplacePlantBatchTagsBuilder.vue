@@ -165,7 +165,7 @@ export default Vue.extend({
       // @ts-ignore
       const zipped: [ITagData, IPlantBatchData][] = safeZip(
         this.$data.plantBatchTags,
-        this.$data.selectedPlantBatches
+        this.$data.selectedPlantBatches,
       );
 
       for (const el of zipped) {
@@ -188,7 +188,7 @@ export default Vue.extend({
           plantTotal: this.$data.selectedPlantBatches.length,
         },
         this.buildCsvFiles(),
-        5
+        5,
       );
     },
     async downloadAll() {
@@ -222,7 +222,7 @@ export default Vue.extend({
           {
             isVector: true,
             data: this.$data.selectedPlantBatches.map(
-              (plantBatch: IPlantBatchData) => plantBatch.Name
+              (plantBatch: IPlantBatchData) => plantBatch.Name,
             ),
           },
           {
@@ -234,7 +234,7 @@ export default Vue.extend({
 
         return buildNamedCsvFileData(
           csvData,
-          `Retagging ${this.$data.selectedPlantBatches} plant batches`
+          `Retagging ${this.$data.selectedPlantBatches} plant batches`,
         );
       } catch (e) {
         console.error(e);

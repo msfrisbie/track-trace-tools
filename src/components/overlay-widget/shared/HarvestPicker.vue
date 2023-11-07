@@ -162,7 +162,7 @@ export default Vue.extend({
           (harvestData: IHarvestData) =>
             (this.$props.filterWholePlant
               ? harvestData.HarvestType === 'WholePlant'
-              : harvestData.HarvestType !== 'WholePlant')
+              : harvestData.HarvestType !== 'WholePlant'),
         );
       } catch (e) {
         this.$data.error = e;
@@ -179,7 +179,7 @@ export default Vue.extend({
 
       // @ts-ignore
       const matchingHarvests = (await primaryDataLoader.activeHarvests()).filter(
-        (harvest: IHarvestData) => harvest.Name === this.$props.harvestName
+        (harvest: IHarvestData) => harvest.Name === this.$props.harvestName,
       );
 
       if (matchingHarvests.length === 0) {
@@ -214,7 +214,7 @@ export default Vue.extend({
           const responseData = await (
             await primaryMetrcRequestManager.getHarvestHistory(
               JSON.stringify({}),
-              matchingHarvest.Id
+              matchingHarvest.Id,
             )
           ).data;
 

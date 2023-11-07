@@ -23,7 +23,7 @@ export function arrayIsValid<T>(
   {
     collectionValidators,
     rowValidators,
-  }: { collectionValidators?: CollectionValidator<T>[]; rowValidators?: RowValidator<T>[] }
+  }: { collectionValidators?: CollectionValidator<T>[]; rowValidators?: RowValidator<T>[] },
 ): ArrayStatus<T> {
   if (collectionValidators) {
     for (const collectionValidator of collectionValidators) {

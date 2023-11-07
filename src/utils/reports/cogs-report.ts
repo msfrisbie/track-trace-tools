@@ -101,19 +101,19 @@ export async function maybeLoadCogsReportData({
     'Package',
     mutableArchiveData.packages,
     'Label',
-    mutableArchiveData.packagesKeys
+    mutableArchiveData.packagesKeys,
   );
   const transferWrapper = new CompressedDataWrapper<ISimpleOutgoingTransferData>(
     'Transfers',
     mutableArchiveData.transfers,
     'ManifestNumber',
-    mutableArchiveData.transfersKeys
+    mutableArchiveData.transfersKeys,
   );
   const transferPackageWrapper = new CompressedDataWrapper<ISimpleTransferPackageData>(
     'Transfer Package',
     mutableArchiveData.transfersPackages,
     'Label',
-    mutableArchiveData.transfersPackagesKeys
+    mutableArchiveData.transfersPackagesKeys,
   );
 
   function mergedFindAndUnpackOrNull(label: string): IMetadataSimplePackageData | null {
@@ -225,7 +225,7 @@ export async function maybeLoadCogsReportData({
 
   const [departureDateGt] = transferFilter.estimatedDepartureDateGt!.split('T');
   const [departureDateLt] = getIsoDateFromOffset(1, transferFilter.estimatedDepartureDateLt!).split(
-    'T'
+    'T',
   );
 
   ctx.commit(ReportsMutations.SET_STATUS, {
@@ -249,7 +249,7 @@ export async function maybeLoadCogsReportData({
           .then((destinations) => {
             transfer.outgoingDestinations = destinations;
           })
-          .finally(() => inflightCount--))
+          .finally(() => inflightCount--)),
     );
 
     if (richOutgoingTransferDestinationRequests.length % 250 === 0) {
@@ -305,7 +305,7 @@ export async function maybeLoadCogsReportData({
           dataLoader.destinationPackages(destination.Id).then((destinationPackages) => {
             destinationPackages.map((pkg) =>
               transferPackageWrapper.add(simpleTransferPackageConverter(transfer, destination, pkg)));
-          }))
+          })),
       );
 
       transferPackageWrapper.flushCounter();
@@ -346,7 +346,7 @@ export async function maybeLoadCogsReportData({
   }
 
   console.log(
-    `Failed package requests: ${packageResults.filter((x) => x.status !== 'fulfilled').length}`
+    `Failed package requests: ${packageResults.filter((x) => x.status !== 'fulfilled').length}`,
   );
 
   // Packages for the final manifest output page
@@ -354,7 +354,7 @@ export async function maybeLoadCogsReportData({
     'Eligible Wholesale Transfer Packages',
     [],
     transferPackageWrapper.indexedKey,
-    transferPackageWrapper.keys
+    transferPackageWrapper.keys,
   );
 
   ctx.commit(ReportsMutations.SET_STATUS, {
@@ -447,7 +447,7 @@ export async function maybeLoadCogsReportData({
     'Tree Packages',
     [],
     packageWrapper.indexedKey,
-    packageWrapper.keys
+    packageWrapper.keys,
   );
 
   for (const label of eligibleWholesaleManifestTreeLabels) {
@@ -472,15 +472,15 @@ export async function maybeLoadCogsReportData({
           treePackageWrapper.update(
             pkg.Label,
             'parentPackageLabels',
-            extractParentPackageLabelsFromHistory(history)
+            extractParentPackageLabelsFromHistory(history),
           );
 
           treePackageWrapper.update(
             pkg.Label,
             'childPackageLabelQuantityPairs',
-            extractChildPackageTagQuantityPairsFromHistory(history)
+            extractChildPackageTagQuantityPairsFromHistory(history),
           );
-        }))
+        })),
     );
 
     if (packageHistoryRequests.length % 100 === 0) {
@@ -501,7 +501,7 @@ export async function maybeLoadCogsReportData({
     'Tree Transfer Packages',
     [],
     transferPackageWrapper.indexedKey,
-    transferPackageWrapper.keys
+    transferPackageWrapper.keys,
   );
 
   for (const label of eligibleWholesaleManifestTreeLabels) {
@@ -530,7 +530,7 @@ export async function maybeLoadCogsReportData({
     'Unified Tree Wrapper',
     [],
     treeTransferPackageWrapper.indexedKey,
-    [...treeTransferPackageWrapper.keys, FRACTIONAL_COST_KEY]
+    [...treeTransferPackageWrapper.keys, FRACTIONAL_COST_KEY],
   );
 
   for (const pkg of treePackageWrapper) {
@@ -601,7 +601,7 @@ export async function maybeLoadCogsReportData({
           .reduce((a, b) => a + b[1], 0);
 
         const matchingPair = parentPkg.childPackageLabelQuantityPairs.find(
-          (x) => x[0] === pkg.Label
+          (x) => x[0] === pkg.Label,
         );
 
         if (!matchingPair) {
@@ -728,7 +728,7 @@ export async function maybeLoadCogsReportData({
 
     const expr: string = pkg
       .fractionalCostMultiplierPairs!.map(([parentLabel, multiplier]) => `(${getLetterFromIndex(computedCostColumnIndex)}${decodeLabelToIndex(
-        parentLabel
+        parentLabel,
       )} * ${multiplier})`)
       .join('+');
 
@@ -756,7 +756,7 @@ export async function maybeLoadCogsReportData({
       pkg.Quantity,
       pkg.UnitOfMeasureAbbreviation,
       `='${SheetTitles.WORKSHEET}'!${getLetterFromIndex(
-        computedCostColumnIndex
+        computedCostColumnIndex,
       )}${decodeLabelToIndex(pkg.Label)}`,
       pkg.UnitOfMeasureAbbreviation === 'ea'
         ? `=${getLetterFromIndex(5)}${idx + 2}/${getLetterFromIndex(3)}${idx + 2}`
@@ -819,7 +819,7 @@ export async function createCogsSpreadsheetOrError({
       sheetTitles,
     },
     undefined,
-    SHEETS_API_MESSAGE_TIMEOUT_MS
+    SHEETS_API_MESSAGE_TIMEOUT_MS,
   );
 
   if (!response.data.success) {
@@ -860,7 +860,7 @@ export async function createCogsSpreadsheetOrError({
       requests: formattingRequests,
     },
     undefined,
-    SHEETS_API_MESSAGE_TIMEOUT_MS
+    SHEETS_API_MESSAGE_TIMEOUT_MS,
   );
 
   await messageBus.sendMessageToBackground(
@@ -877,7 +877,7 @@ export async function createCogsSpreadsheetOrError({
       ],
     },
     undefined,
-    SHEETS_API_MESSAGE_TIMEOUT_MS
+    SHEETS_API_MESSAGE_TIMEOUT_MS,
   );
 
   store.commit(`reports/${ReportsMutations.SET_STATUS}`, {
@@ -977,7 +977,7 @@ export async function createCogsSpreadsheetOrError({
       requests: resizeRequests,
     },
     undefined,
-    SHEETS_API_MESSAGE_TIMEOUT_MS
+    SHEETS_API_MESSAGE_TIMEOUT_MS,
   );
 
   await messageBus.sendMessageToBackground(
@@ -988,7 +988,7 @@ export async function createCogsSpreadsheetOrError({
       values: [[`Created with Track & Trace Tools @ ${Date().toString()}`]],
     },
     undefined,
-    SHEETS_API_MESSAGE_TIMEOUT_MS
+    SHEETS_API_MESSAGE_TIMEOUT_MS,
   );
 
   return response.data.result;

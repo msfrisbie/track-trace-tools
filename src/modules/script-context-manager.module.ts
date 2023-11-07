@@ -27,7 +27,7 @@ function localModalForm(
   $grid,
   success,
   openHandler,
-  requestType
+  requestType,
 ) {
   // @ts-ignore
   const metrc = window.metrc as any;

@@ -40,7 +40,7 @@ export const searchModule = {
   actions: {
     [SearchActions.SET_QUERY_STRING](
       ctx: ActionContext<ISearchState, IPluginState>,
-      { queryString }: { queryString: string }
+      { queryString }: { queryString: string },
     ) {
       ctx.state.queryString = queryString;
 
@@ -48,13 +48,13 @@ export const searchModule = {
     },
     [SearchActions.SET_SHOW_SEARCH_RESULTS](
       ctx: ActionContext<ISearchState, IPluginState>,
-      { showSearchResults }: { showSearchResults: boolean }
+      { showSearchResults }: { showSearchResults: boolean },
     ) {
       ctx.state.showSearchResults = showSearchResults;
     },
     [SearchActions.SET_SEARCH_TYPE](
       ctx: ActionContext<ISearchState, IPluginState>,
-      { searchType }: { searchType: SearchType }
+      { searchType }: { searchType: SearchType },
     ) {
       ctx.state.searchType = searchType;
     },
@@ -72,7 +72,7 @@ export const searchModule = {
     [SearchActions.EXECUTE_QUERY]: _.debounce(
       (
         ctx: ActionContext<ISearchState, IPluginState>,
-        { queryString }: { queryString: string }
+        { queryString }: { queryString: string },
       ) => {
         if (!queryString.length) {
           return;
@@ -84,7 +84,7 @@ export const searchModule = {
 
         ctx.state.queryStringHistory = maybePushOntoUniqueStack(
           queryString,
-          ctx.state.queryStringHistory
+          ctx.state.queryStringHistory,
         );
 
         // searchManager.selectedPackage.next(null);
@@ -95,25 +95,25 @@ export const searchModule = {
         ctx.dispatch(
           `packageSearch/${PackageSearchActions.EXECUTE_QUERY}`,
           { queryString },
-          { root: true }
+          { root: true },
         );
         ctx.dispatch(
           `plantSearch/${PlantSearchActions.EXECUTE_QUERY}`,
           { queryString },
-          { root: true }
+          { root: true },
         );
         ctx.dispatch(
           `tagSearch/${TagSearchActions.EXECUTE_QUERY}`,
           { queryString },
-          { root: true }
+          { root: true },
         );
         ctx.dispatch(
           `transferSearch/${TransferSearchActions.EXECUTE_QUERY}`,
           { queryString },
-          { root: true }
+          { root: true },
         );
       },
-      500
+      500,
     ),
   },
 };

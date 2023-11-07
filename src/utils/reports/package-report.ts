@@ -5,7 +5,7 @@ import {
   IFieldData,
   IReportConfig,
   IReportData,
-  IReportsState
+  IReportsState,
 } from '@/store/page-overlay/modules/reports/interfaces';
 import { ActionContext } from 'vuex';
 import { todayIsodate } from '../date';
@@ -155,7 +155,7 @@ export async function maybeLoadPackageReportData({
       'initialQuantity',
       'initialQuantityUnitOfMeasure',
       'totalInputQuantity',
-      'totalInputQuantityUnitOfMeasure'
+      'totalInputQuantityUnitOfMeasure',
     ].includes(x.value))) {
       const promises: Promise<any>[] = [];
 

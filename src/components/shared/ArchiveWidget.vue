@@ -99,19 +99,19 @@ export default Vue.extend({
         'Package',
         data.packages,
         'Label',
-        data.packagesKeys
+        data.packagesKeys,
       );
       const transferWrapper = new CompressedDataWrapper(
         'Transfer',
         data.transfers,
         'ManifestNumber',
-        data.transfersKeys
+        data.transfersKeys,
       );
       const transferPackageWrapper = new CompressedDataWrapper(
         'Transfer Package',
         data.transfersPackages,
         'Label',
-        data.transfersPackagesKeys
+        data.transfersPackagesKeys,
       );
 
       // const packages = new Set<string>(packa);
@@ -145,7 +145,7 @@ export default Vue.extend({
           };
 
         archive.licenses = (await facilityManager.ownedFacilitiesOrError()).map(
-          (x) => x.licenseNumber
+          (x) => x.licenseNumber,
         );
 
         let dataLoader: DataLoader | null = null;
@@ -176,7 +176,7 @@ export default Vue.extend({
               parentPackageLabels: null,
               childPackageLabelQuantityPairs: null,
             })),
-            'Label'
+            'Label',
           );
 
           archive.packages = wrapper.data;
@@ -192,7 +192,7 @@ export default Vue.extend({
             'Package',
             archive.packages,
             'Label',
-            archive.packagesKeys
+            archive.packagesKeys,
           );
 
           for (const pkg of wrapper) {
@@ -202,15 +202,15 @@ export default Vue.extend({
                   wrapper.update(
                     pkg.Label,
                     'parentPackageLabels',
-                    extractParentPackageLabelsFromHistory(history)
+                    extractParentPackageLabelsFromHistory(history),
                   );
 
                   wrapper.update(
                     pkg.Label,
                     'childPackageLabelQuantityPairs',
-                    extractChildPackageTagQuantityPairsFromHistory(history)
+                    extractChildPackageTagQuantityPairsFromHistory(history),
                   );
-                }))
+                })),
             );
 
             if (packageHistoryRequests.length % 250 === 0) {
@@ -244,7 +244,7 @@ export default Vue.extend({
               TransferState: transfer.TransferState,
               Destinations: [],
             })),
-            'ManifestNumber'
+            'ManifestNumber',
           );
 
           archive.transfers = wrapper.data;
@@ -263,9 +263,9 @@ export default Vue.extend({
                       Id: destination.Id,
                       Type: destination.ShipmentTypeName,
                       ETD: destination.EstimatedDepartureDateTime,
-                    }))
+                    })),
                   );
-                }))
+                })),
             );
 
             if (transferDestinationRequests.length % 250 === 0) {
@@ -288,7 +288,7 @@ export default Vue.extend({
             'Transfers',
             archive.transfers,
             'ManifestNumber',
-            archive.transfersKeys
+            archive.transfersKeys,
           );
 
           for (const transfer of wrapper) {
@@ -314,7 +314,7 @@ export default Vue.extend({
                         childPackageLabelQuantityPairs: null,
                       });
                     }
-                  }))
+                  })),
               );
 
               if (packageRequests.length % 250 === 0) {
@@ -331,7 +331,7 @@ export default Vue.extend({
           const packageWrapper = compressedDataWrapperFactory<ISimpleTransferPackageData>(
             'Transfer Package',
             rawTransferPackages,
-            'Label'
+            'Label',
           );
 
           archive.transfersPackages = packageWrapper.data;

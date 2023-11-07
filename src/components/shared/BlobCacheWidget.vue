@@ -44,7 +44,7 @@ export default Vue.extend({
       }
 
       const dataStr = `data:text/json;charset=utf-8,${encodeURIComponent(
-        JSON.stringify(cachedValue)
+        JSON.stringify(cachedValue),
       )}`;
       const downloadAnchorNode = document.createElement('a');
       downloadAnchorNode.setAttribute('href', dataStr);

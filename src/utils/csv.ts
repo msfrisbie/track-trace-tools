@@ -103,7 +103,7 @@ export function buildCsvDataOrError(columns: CsvColumnData[]) {
 export function buildNamedCsvFileData(
   csvData: any[][],
   filenameSeed: string,
-  chunkSize: number = 500
+  chunkSize: number = 500,
 ) {
   const chunkCount: number = Math.ceil(csvData.length / chunkSize);
 

@@ -264,7 +264,7 @@ export default Vue.extend({
       for (const { tag, plantBatch } of flattened) {
         const row: IMetrcPromoteImmaturePlantsPayload = {
           GrowthDate: submitDateFromIsodate(
-            (this as PromoteImmaturePlantsBuilderVuexCoupler).growthIsodate
+            (this as PromoteImmaturePlantsBuilderVuexCoupler).growthIsodate,
           ),
           NewLocationId: (
             this as PromoteImmaturePlantsBuilderVuexCoupler
@@ -289,12 +289,12 @@ export default Vue.extend({
           plantTotal: (this as PromoteImmaturePlantsBuilderVuexCoupler).plantTags.length,
         },
         this.buildCsvFiles(),
-        25
+        25,
       );
     },
     promoteMax(): void {
       this.totalPlantCount = totalPlantsAvailableOrNull(
-        (this as PromoteImmaturePlantsBuilderVuexCoupler).selectedPlantBatches
+        (this as PromoteImmaturePlantsBuilderVuexCoupler).selectedPlantBatches,
       );
     },
     async downloadAll(): Promise<void> {
@@ -371,7 +371,7 @@ export default Vue.extend({
           csvData,
           `Promoting ${this.totalPlantCount} plants to ${
             (this as PromoteImmaturePlantsBuilderVuexCoupler).growthPhase?.Display as string
-          }`
+          }`,
         );
       } catch (e) {
         console.error(e);
@@ -450,7 +450,7 @@ export default Vue.extend({
       set(selectedPlantBatches: IPlantBatchData[]) {
         store.dispatch(
           `promoteImmaturePlantsBuilder/${PromoteImmaturePlantsBuilderActions.UPDATE_PROMOTE_IMMATURE_PLANTS_DATA}`,
-          { selectedPlantBatches }
+          { selectedPlantBatches },
         );
       },
     },
@@ -461,7 +461,7 @@ export default Vue.extend({
       set(growthPhase: string | null) {
         store.dispatch(
           `promoteImmaturePlantsBuilder/${PromoteImmaturePlantsBuilderActions.UPDATE_PROMOTE_IMMATURE_PLANTS_DATA}`,
-          { growthPhase }
+          { growthPhase },
         );
       },
     },
@@ -472,7 +472,7 @@ export default Vue.extend({
       set(totalPlantCount: number | null) {
         store.dispatch(
           `promoteImmaturePlantsBuilder/${PromoteImmaturePlantsBuilderActions.UPDATE_PROMOTE_IMMATURE_PLANTS_DATA}`,
-          { totalPlantCount }
+          { totalPlantCount },
         );
       },
     },
@@ -483,7 +483,7 @@ export default Vue.extend({
       set(promoteData: IIntermediatePromotePlantBatchData[]) {
         store.dispatch(
           `promoteImmaturePlantsBuilder/${PromoteImmaturePlantsBuilderActions.UPDATE_PROMOTE_IMMATURE_PLANTS_DATA}`,
-          { promoteData }
+          { promoteData },
         );
       },
     },
@@ -494,7 +494,7 @@ export default Vue.extend({
       set(plantTags: ITagData[]) {
         store.dispatch(
           `promoteImmaturePlantsBuilder/${PromoteImmaturePlantsBuilderActions.UPDATE_PROMOTE_IMMATURE_PLANTS_DATA}`,
-          { plantTags }
+          { plantTags },
         );
       },
     },
@@ -505,7 +505,7 @@ export default Vue.extend({
       set(patientLicenseNumber: string) {
         store.dispatch(
           `promoteImmaturePlantsBuilder/${PromoteImmaturePlantsBuilderActions.UPDATE_PROMOTE_IMMATURE_PLANTS_DATA}`,
-          { patientLicenseNumber }
+          { patientLicenseNumber },
         );
       },
     },
@@ -516,7 +516,7 @@ export default Vue.extend({
       set(showTagPicker: boolean) {
         store.dispatch(
           `promoteImmaturePlantsBuilder/${PromoteImmaturePlantsBuilderActions.UPDATE_PROMOTE_IMMATURE_PLANTS_DATA}`,
-          { showTagPicker }
+          { showTagPicker },
         );
       },
     },
@@ -527,7 +527,7 @@ export default Vue.extend({
       set(growthIsodate: string) {
         store.dispatch(
           `promoteImmaturePlantsBuilder/${PromoteImmaturePlantsBuilderActions.UPDATE_PROMOTE_IMMATURE_PLANTS_DATA}`,
-          { growthIsodate }
+          { growthIsodate },
         );
       },
     },
@@ -538,7 +538,7 @@ export default Vue.extend({
       set(plantLocation: ILocationData | null) {
         store.dispatch(
           `promoteImmaturePlantsBuilder/${PromoteImmaturePlantsBuilderActions.UPDATE_PROMOTE_IMMATURE_PLANTS_DATA}`,
-          { plantLocation }
+          { plantLocation },
         );
       },
     },
@@ -549,7 +549,7 @@ export default Vue.extend({
       set(showHiddenDetailFields: boolean) {
         store.dispatch(
           `promoteImmaturePlantsBuilder/${PromoteImmaturePlantsBuilderActions.UPDATE_PROMOTE_IMMATURE_PLANTS_DATA}`,
-          { showHiddenDetailFields }
+          { showHiddenDetailFields },
         );
       },
     },
@@ -564,7 +564,7 @@ export default Vue.extend({
     },
     maximumTotalPlantCount(): number | null {
       return totalPlantsAvailableOrNull(
-        (this as PromoteImmaturePlantsBuilderVuexCoupler).selectedPlantBatches
+        (this as PromoteImmaturePlantsBuilderVuexCoupler).selectedPlantBatches,
       );
     },
   },
@@ -582,7 +582,7 @@ export default Vue.extend({
 
         this.promoteData = allocatePromotePlantCounts(
           newValue,
-          (this as PromoteImmaturePlantsBuilderVuexCoupler).selectedPlantBatches
+          (this as PromoteImmaturePlantsBuilderVuexCoupler).selectedPlantBatches,
         );
       },
     },
@@ -610,7 +610,7 @@ export default Vue.extend({
     timer(1000).subscribe(() => primaryDataLoader.availableTags({}));
 
     this.$data.growthPhaseOptions = (await dynamicConstsManager.plantBatchGrowthPhases()).map(
-      (x: any) => ({ text: x.Display, value: x })
+      (x: any) => ({ text: x.Display, value: x }),
     );
     this.growthPhase = this.$data.growthPhaseOptions[0].value;
   },

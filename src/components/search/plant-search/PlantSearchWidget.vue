@@ -48,10 +48,10 @@ import store from '@/store/page-overlay/index';
 import { PlantSearchActions } from '@/store/page-overlay/modules/plant-search/consts';
 import { SearchActions } from '@/store/page-overlay/modules/search/consts';
 import {
-  combineLatest, Observable, of, timer
+  combineLatest, Observable, of, timer,
 } from 'rxjs';
 import {
-  debounceTime, filter, startWith, tap
+  debounceTime, filter, startWith, tap,
 } from 'rxjs/operators';
 import Vue from 'vue';
 import { mapActions, mapState } from 'vuex';

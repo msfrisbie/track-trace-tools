@@ -16,7 +16,7 @@ export default Vue.extend({
   props: {},
   components: {},
   computed: {
-    ...mapState([])
+    ...mapState([]),
   },
   data() {
     return {
@@ -24,64 +24,64 @@ export default Vue.extend({
         {
           value: CreatePackageCsvColumns.NEW_PACKAGE_TAG,
           required: true,
-          defaultDescription: ''
+          defaultDescription: '',
         },
         {
           value: CreatePackageCsvColumns.LOCATION_NAME,
           required: false,
-          defaultDescription: 'Same location as 1st parent package'
+          defaultDescription: 'Same location as 1st parent package',
         },
         {
           value: CreatePackageCsvColumns.ITEM_NAME,
           required: false,
-          defaultDescription: 'Same item as 1st parent package'
+          defaultDescription: 'Same item as 1st parent package',
         },
         {
           value: CreatePackageCsvColumns.NEW_PACKAGE_QUANTITY,
           required: false,
-          defaultDescription: 'Sum of parent quantities'
+          defaultDescription: 'Sum of parent quantities',
         },
         {
           value: CreatePackageCsvColumns.NEW_PACKAGE_UNIT,
           required: false,
-          defaultDescription: 'Same unit as parent package'
+          defaultDescription: 'Same unit as parent package',
         },
         {
           value: CreatePackageCsvColumns.PACKAGED_DATE,
           required: false,
-          defaultDescription: 'Today'
+          defaultDescription: 'Today',
         },
         {
           value: CreatePackageCsvColumns.NOTE,
           required: false,
-          defaultDescription: ''
+          defaultDescription: '',
         },
         {
           value: CreatePackageCsvColumns.PRODUCTION_BATCH_NUMBER,
           required: false,
-          defaultDescription: ''
+          defaultDescription: '',
         },
         {
           value: CreatePackageCsvColumns.IS_DONATION,
           required: false,
-          defaultDescription: ''
+          defaultDescription: '',
         },
         {
           value: CreatePackageCsvColumns.IS_TRADE_SAMPLE,
           required: false,
-          defaultDescription: ''
+          defaultDescription: '',
         },
         {
           value: CreatePackageCsvColumns.EXPIRATION_DATE,
           required: false,
-          defaultDescription: 'Same as parent package'
+          defaultDescription: 'Same as parent package',
         },
-      ]
+      ],
     };
   },
   methods: {},
   async created() {},
-  async mounted() {}
+  async mounted() {},
 });
 </script>
 

@@ -30,7 +30,7 @@ export const transferSearchModule = {
   mutations: {
     [TransferSearchMutations.SET_TRANSFER_SEARCH_FILTERS](
       state: ITransferSearchState,
-      { transferSearchFilters }: { transferSearchFilters: ITransferSearchFilters }
+      { transferSearchFilters }: { transferSearchFilters: ITransferSearchFilters },
     ) {
       state.transferSearchFilters = {
         ...transferSearchFilters,
@@ -41,7 +41,7 @@ export const transferSearchModule = {
   actions: {
     [TransferSearchActions.EXECUTE_QUERY]: async (
       ctx: ActionContext<ITransferSearchState, IPluginState>,
-      { queryString }: { queryString: string }
+      { queryString }: { queryString: string },
     ) => {
       ctx.state.transfers = [];
       ctx.state.selectedTransferMetadata = null;
@@ -103,7 +103,7 @@ export const transferSearchModule = {
         transferSearchFilters: ITransferSearchFilters;
         propagate?: boolean;
         transferState?: TransferState | null;
-      }
+      },
     ) => {
       if (transferState) {
         switch (transferState as TransferState) {
@@ -123,7 +123,7 @@ export const transferSearchModule = {
             await pageManager.clickTabStartingWith(
               pageManager.transferTabs,
               'Inactive',
-              'Rejected'
+              'Rejected',
             );
             break;
           default:
@@ -146,7 +146,7 @@ export const transferSearchModule = {
       {
         transferSearchFilters,
         propagate = true,
-      }: { transferSearchFilters: ITransferSearchFilters; propagate?: boolean }
+      }: { transferSearchFilters: ITransferSearchFilters; propagate?: boolean },
     ) {
       const defaultTransferSearchFilters = {
         manifestNumber: null,

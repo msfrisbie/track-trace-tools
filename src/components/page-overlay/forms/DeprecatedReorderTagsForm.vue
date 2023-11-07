@@ -158,7 +158,7 @@ export default Vue.extend({
 
       store.commit(
         MutationType.ENQUEUE_TASK,
-        await createTask(TaskType.REORDER_TAGS, JSON.parse(JSON.stringify(this.form)))
+        await createTask(TaskType.REORDER_TAGS, JSON.parse(JSON.stringify(this.form))),
       );
     },
     onReset(evt: any) {},

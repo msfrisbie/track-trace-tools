@@ -64,7 +64,7 @@ class CredentialManager implements IAtomicService {
       JSON.stringify({
         username,
         password,
-      })
+      }),
     );
 
     debugLog(async () => [credentials]);

@@ -19,7 +19,7 @@ const debugLog = debugLogFactory('utils/data-loader.ts');
 
 export function streamFactory<T>(
   { maxCount = Number.POSITIVE_INFINITY, pageSize = DATA_LOAD_PAGE_SIZE }: IDataLoadOptions,
-  responseFactory: (paginationOptions: IPaginationOptions) => Promise<AxiosResponse>
+  responseFactory: (paginationOptions: IPaginationOptions) => Promise<AxiosResponse>,
 ): Subject<ICollectionResponse<T>> {
   const subject: Subject<ICollectionResponse<T>> = new Subject();
   let runningTotal = 0;
@@ -29,15 +29,15 @@ export function streamFactory<T>(
     if (store.state.settings.loadDataInParallel) {
       // Parallelized Load
       const countResponse = await responseFactory({ page: 0, pageSize: 5 }).catch(
-        (error) => error.response
+        (error) => error.response,
       );
       if (countResponse.status !== 200) {
         if (countResponse.status === 401) {
           subject.error(
             new DataLoadError(
               DataLoadErrorType.PERMISSIONS,
-              `Server indicated user is missing permissions for ${countResponse.config.url}`
-            )
+              `Server indicated user is missing permissions for ${countResponse.config.url}`,
+            ),
           );
           return;
         }
@@ -59,8 +59,8 @@ export function streamFactory<T>(
               subject.error(
                 new DataLoadError(
                   DataLoadErrorType.PERMISSIONS,
-                  `Server indicated user is missing permissions for ${response.config.url}`
-                )
+                  `Server indicated user is missing permissions for ${response.config.url}`,
+                ),
               );
               return;
             }
@@ -84,7 +84,7 @@ export function streamFactory<T>(
         subject.complete();
       } catch (e: any) {
         subject.error(
-          new DataLoadError(DataLoadErrorType.NETWORK, 'Network request unable to complete.')
+          new DataLoadError(DataLoadErrorType.NETWORK, 'Network request unable to complete.'),
         );
       }
     } else {
@@ -104,7 +104,7 @@ export function streamFactory<T>(
         } finally {
           if (!response) {
             subject.error(
-              new DataLoadError(DataLoadErrorType.NETWORK, 'Network request unable to complete.')
+              new DataLoadError(DataLoadErrorType.NETWORK, 'Network request unable to complete.'),
             );
             /* eslint-disable-next-line no-unsafe-finally */
             return;
@@ -116,8 +116,8 @@ export function streamFactory<T>(
             subject.error(
               new DataLoadError(
                 DataLoadErrorType.PERMISSIONS,
-                `Server indicated user is missing permissions for ${response.config.url}`
-              )
+                `Server indicated user is missing permissions for ${response.config.url}`,
+              ),
             );
             return;
           }
@@ -167,7 +167,7 @@ export function buildBodyFilter(filterOptions: IFilterOptions | null): ICollecti
   }
 
   const {
-    transferFilter, plantFilter, tagFilter, plantBatchFilter, packageFilter, harvestFilter
+    transferFilter, plantFilter, tagFilter, plantBatchFilter, packageFilter, harvestFilter,
   } = filterOptions;
 
   const filterSet: ICollectionFilters = {
@@ -583,7 +583,7 @@ export function buildBodySort(sortOptions: ISortOptions | null) {
 export function buildBody(
   { page, pageSize }: IPaginationOptions,
   filterOptions: IFilterOptions | null = null,
-  sortOptions: ISortOptions | null = null
+  sortOptions: ISortOptions | null = null,
 ): string {
   const body: ICollectionRequest = {
     request: {

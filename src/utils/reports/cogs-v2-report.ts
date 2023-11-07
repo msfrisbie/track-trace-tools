@@ -7,7 +7,7 @@ import {
   IPluginState,
   IRichDestinationData,
   ISpreadsheet,
-  ITransferFilter
+  ITransferFilter,
 } from '@/interfaces';
 import { DataLoader, getDataLoaderByLicense } from '@/modules/data-loader/data-loader.module';
 import { facilityManager } from '@/modules/facility-manager.module';
@@ -18,18 +18,18 @@ import { ReportsMutations, ReportType } from '@/store/page-overlay/modules/repor
 import {
   IReportConfig,
   IReportData,
-  IReportsState
+  IReportsState,
 } from '@/store/page-overlay/modules/reports/interfaces';
 import { ActionContext } from 'vuex';
 import { getIsoDateFromOffset, todayIsodate } from '../date';
 import {
   extractChildPackageTagQuantityUnitSetsFromHistory,
-  extractInitialPackageQuantityAndUnitFromHistoryOrError
+  extractInitialPackageQuantityAndUnitFromHistoryOrError,
 } from '../history';
 import {
   getDelimiterSeparatedValuesOrError,
   getLabelOrError,
-  getSourcePackageTags
+  getSourcePackageTags,
 } from '../package';
 import {
   addRowsRequestFactory,
@@ -38,7 +38,7 @@ import {
   extractSheetIdOrError,
   freezeTopRowRequestFactory,
   hideColumnsRequestFactory,
-  styleTopRowRequestFactory
+  styleTopRowRequestFactory,
 } from '../sheets';
 import { appendSpreadsheetValues, readSpreadsheet, writeDataSheet } from '../sheets-export';
 
@@ -151,7 +151,7 @@ export async function loadAndCacheCogsV2Data({
             },
           });
           throw e;
-        }
+        },
       );
 
       await dataLoader.onHoldPackages().then(
@@ -169,7 +169,7 @@ export async function loadAndCacheCogsV2Data({
             },
           });
           throw e;
-        }
+        },
       );
 
       await dataLoader.inactivePackages().then(
@@ -187,7 +187,7 @@ export async function loadAndCacheCogsV2Data({
             },
           });
           throw e;
-        }
+        },
       );
 
       await dataLoader.inTransitPackages().then(
@@ -205,7 +205,7 @@ export async function loadAndCacheCogsV2Data({
             },
           });
           throw e;
-        }
+        },
       );
     }
 
@@ -251,11 +251,11 @@ export async function loadAndCacheCogsV2Data({
     // Apply wide filter to transfers before loading destinations
     // createdAt < LT, and lastModified > GT
     richOutgoingTransfers = richOutgoingTransfers.filter(
-      (x) => x.LastModified > departureDateGt && x.CreatedDateTime < departureDateLt
+      (x) => x.LastModified > departureDateGt && x.CreatedDateTime < departureDateLt,
     );
 
     console.log(
-      `Filtered out ${filter1initial - richOutgoingTransfers.length} transfers on first filter`
+      `Filtered out ${filter1initial - richOutgoingTransfers.length} transfers on first filter`,
     );
 
     ctx.commit(ReportsMutations.SET_STATUS, {
@@ -269,7 +269,7 @@ export async function loadAndCacheCogsV2Data({
         getDataLoaderByLicense(transfer.LicenseNumber).then((dataLoader) =>
           dataLoader.transferDestinations(transfer.Id).then((destinations) => {
             transfer.outgoingDestinations = destinations;
-          }))
+          })),
       );
 
       if (richOutgoingTransferDestinationRequests.length % 250 === 0) {
@@ -308,7 +308,7 @@ export async function loadAndCacheCogsV2Data({
           (y) =>
             y.ShipmentTypeName.includes('Wholesale')
             && y.EstimatedArrivalDateTime >= departureDateGt
-            && y.EstimatedArrivalDateTime <= departureDateLt
+            && y.EstimatedArrivalDateTime <= departureDateLt,
         );
 
         return x;
@@ -321,7 +321,7 @@ export async function loadAndCacheCogsV2Data({
         - richOutgoingTransfers
           .map((x) => (x.outgoingDestinations || []).length)
           .reduce((a, b) => a + b, 0)
-      } destinations on second filter`
+      } destinations on second filter`,
     );
 
     ctx.commit(ReportsMutations.SET_STATUS, {
@@ -337,7 +337,7 @@ export async function loadAndCacheCogsV2Data({
           getDataLoaderByLicense(transfer.LicenseNumber).then((dataLoader) =>
             dataLoader.destinationPackages(destination.Id).then((destinationPackages) => {
               destination.packages = destinationPackages;
-            }))
+            })),
         );
 
         if (packageRequests.length % 50 === 0) {
@@ -369,12 +369,12 @@ export async function loadAndCacheCogsV2Data({
   }
 
   const fullPackageLabelMap = new Map<string, IIndexedPackageData>(
-    packages.map((pkg) => [pkg.Label, pkg])
+    packages.map((pkg) => [pkg.Label, pkg]),
   );
   const fullProductionBatchMap = new Map<string, IIndexedPackageData>(
     packages
       .filter((pkg) => !!pkg.ProductionBatchNumber)
-      .map((pkg) => [pkg.ProductionBatchNumber, pkg])
+      .map((pkg) => [pkg.ProductionBatchNumber, pkg]),
   );
 
   // Keyed by label
@@ -399,7 +399,7 @@ export async function loadAndCacheCogsV2Data({
             buffer.push(fullPackageLabelMap.get(label)!);
           } else {
             console.error(
-              `Unable to match source package label ${label} for manifest pkg ${manifestPkg.PackageLabel}`
+              `Unable to match source package label ${label} for manifest pkg ${manifestPkg.PackageLabel}`,
             );
           }
         }
@@ -415,7 +415,7 @@ export async function loadAndCacheCogsV2Data({
           }
 
           const targetSourceProductionBatches = getDelimiterSeparatedValuesOrError(
-            target.SourceProductionBatchNumbers
+            target.SourceProductionBatchNumbers,
           );
 
           for (const productionBatchNumber of targetSourceProductionBatches) {
@@ -425,7 +425,7 @@ export async function loadAndCacheCogsV2Data({
               scopedAncestorPackageMap.set(productionBatch.Label, productionBatch);
             } else {
               console.error(
-                `Unable to match upstream source production batch ${productionBatchNumber} for pkg ${target.Label}`
+                `Unable to match upstream source production batch ${productionBatchNumber} for pkg ${target.Label}`,
               );
             }
           }
@@ -439,7 +439,7 @@ export async function loadAndCacheCogsV2Data({
               buffer.push(pkg);
             } else {
               console.error(
-                `Unable to match upstream source package label ${label} for pkg ${manifestPkg.PackageLabel}`
+                `Unable to match upstream source package label ${label} for pkg ${manifestPkg.PackageLabel}`,
               );
             }
           }
@@ -460,7 +460,7 @@ export async function loadAndCacheCogsV2Data({
     historyPromises.push(
       dataLoader.packageHistoryByPackageId(pkg.Id).then((result) => {
         pkg.history = result;
-      })
+      }),
     );
 
     if (historyPromises.length % 100 === 0) {
@@ -520,7 +520,7 @@ export async function updateCogsV2MasterCostSheet({
     const [departureDateGt] = transferFilter.estimatedDepartureDateGt!.split('T');
     const [departureDateLt] = getIsoDateFromOffset(
       1,
-      transferFilter.estimatedDepartureDateLt!
+      transferFilter.estimatedDepartureDateLt!,
     ).split('T');
 
     const {
@@ -543,7 +543,7 @@ export async function updateCogsV2MasterCostSheet({
     }
 
     const spreadsheetId = extractSheetIdOrError(
-      store.state.client.values.MASTER_PB_COST_SHEET_URL
+      store.state.client.values.MASTER_PB_COST_SHEET_URL,
     );
 
     const response: { data: { result: { values: any[][] } } } = await readSpreadsheet({
@@ -554,7 +554,7 @@ export async function updateCogsV2MasterCostSheet({
     // Ignore header
     const currentSheetLabels = new Set(response.data.result.values.slice(1).map((row) => row[1]));
     const requiredSheetLabels = new Set(
-      [...scopedProductionBatchPackageMap.values()].map((pkg) => getLabelOrError(pkg))
+      [...scopedProductionBatchPackageMap.values()].map((pkg) => getLabelOrError(pkg)),
     );
 
     const rows = [];
@@ -605,7 +605,7 @@ export async function updateCogsV2MasterCostSheet({
         appendToast: true,
         toaster: 'ttt-toaster',
         solid: true,
-      }
+      },
     );
   } catch (e) {
     toastManager.openToast((e as Error).toString(), {
@@ -623,7 +623,7 @@ export async function updateCogsV2MasterCostSheet({
 
 export async function computeIsConnected(
   pkg: IIndexedPackageData,
-  scopedAncestorPackageMap: Map<string, IIndexedPackageData>
+  scopedAncestorPackageMap: Map<string, IIndexedPackageData>,
 ): Promise<[boolean, string]> {
   const buffer: IIndexedPackageData[] = [pkg];
 
@@ -653,7 +653,7 @@ export async function computeIsConnected(
 export function computeIsEligibleForItemOptimization(
   pkg: IIndexedDestinationPackageData,
   sourcePackage: IIndexedPackageData,
-  scopedProductionBatchPackageMap: Map<string, IIndexedPackageData>
+  scopedProductionBatchPackageMap: Map<string, IIndexedPackageData>,
 ): [boolean, string] {
   // sourcePackage might itself be the production batch
   const sourceProductionBatchNumbers: string[] = sourcePackage.ProductionBatchNumber.length > 0
@@ -761,7 +761,7 @@ export function extractMultiplierFromItemNamesWithPackStrategyOrError({
 export function computeIsEligibleForItemQuantityRatioOptimization(
   pkg: IIndexedDestinationPackageData,
   sourcePackage: IIndexedPackageData,
-  scopedProductionBatchPackageMap: Map<string, IIndexedPackageData>
+  scopedProductionBatchPackageMap: Map<string, IIndexedPackageData>,
 ): [boolean, number, string] {
   // sourcePackage might itself be the production batch
   const sourceProductionBatchNumbers: string[] = sourcePackage.ProductionBatchNumber.length > 0
@@ -798,7 +798,7 @@ export function computeIsEligibleForItemQuantityRatioOptimization(
 export function computeIsEligibleForItemQuantityPackRatioOptimization(
   pkg: IIndexedDestinationPackageData,
   sourcePackage: IIndexedPackageData,
-  scopedProductionBatchPackageMap: Map<string, IIndexedPackageData>
+  scopedProductionBatchPackageMap: Map<string, IIndexedPackageData>,
 ): [boolean, number, string] {
   // sourcePackage might itself be the production batch
   const sourceProductionBatchNumbers: string[] = sourcePackage.ProductionBatchNumber.length > 0
@@ -849,7 +849,7 @@ export async function maybeLoadCogsV2ReportData({
 
   const [departureDateGt] = transferFilter.estimatedDepartureDateGt!.split('T');
   const [departureDateLt] = getIsoDateFromOffset(1, transferFilter.estimatedDepartureDateLt!).split(
-    'T'
+    'T',
   );
 
   const {
@@ -874,7 +874,7 @@ export async function maybeLoadCogsV2ReportData({
   }
 
   const spreadsheetId = extractSheetIdOrError(
-    store.state.client.values.MASTER_PB_COST_SHEET_URL
+    store.state.client.values.MASTER_PB_COST_SHEET_URL,
   );
 
   const response: { data: { result: { values: any[][] } } } = await readSpreadsheet({
@@ -899,7 +899,7 @@ export async function maybeLoadCogsV2ReportData({
       'Status',
       'Debug Note',
       'Note',
-    ].map((x) => x.padStart(8).padEnd(8))
+    ].map((x) => x.padStart(8).padEnd(8)),
   );
 
   for (const transfer of richOutgoingTransfers) {
@@ -958,12 +958,12 @@ export async function maybeLoadCogsV2ReportData({
 
         const [isConnected, isConnectedMessage] = await computeIsConnected(
           sourcePackage,
-          scopedAncestorPackageMap
+          scopedAncestorPackageMap,
         );
         const [isEligibleForItemOptimization, isEligibleForItemOptimizationMesage] = computeIsEligibleForItemOptimization(
           manifestPkg,
           sourcePackage,
-          scopedProductionBatchPackageMap
+          scopedProductionBatchPackageMap,
         );
 
         const [
@@ -973,7 +973,7 @@ export async function maybeLoadCogsV2ReportData({
         ] = await computeIsEligibleForItemQuantityRatioOptimization(
           manifestPkg,
           sourcePackage,
-          scopedProductionBatchPackageMap
+          scopedProductionBatchPackageMap,
         );
 
         const [
@@ -983,7 +983,7 @@ export async function maybeLoadCogsV2ReportData({
         ] = await computeIsEligibleForItemQuantityPackRatioOptimization(
           manifestPkg,
           sourcePackage,
-          scopedProductionBatchPackageMap
+          scopedProductionBatchPackageMap,
         );
 
         if (isEligibleForItemOptimization) {
@@ -991,7 +991,7 @@ export async function maybeLoadCogsV2ReportData({
           const sourceProductionBatch: IIndexedPackageData = scopedProductionBatchPackageMap.get(
             sourcePackage.ProductionBatchNumber.length > 0
               ? sourcePackage.ProductionBatchNumber
-              : sourcePackage.SourceProductionBatchNumbers
+              : sourcePackage.SourceProductionBatchNumbers,
           )!;
 
           if (sourceProductionBatch.history === undefined) {
@@ -999,7 +999,7 @@ export async function maybeLoadCogsV2ReportData({
             debugNote = `Src PB ${sourceProductionBatch.Label} is missing history`;
           } else {
             const initialProductionBatchQuantity = extractInitialPackageQuantityAndUnitFromHistoryOrError(
-                sourceProductionBatch.history!
+                sourceProductionBatch.history!,
             );
 
             const optimizationMultiplier = manifestPkg.ShippedQuantity / initialProductionBatchQuantity[0];
@@ -1041,7 +1041,7 @@ export async function maybeLoadCogsV2ReportData({
               const initialProductionBatchQuantity = extractInitialPackageQuantityAndUnitFromHistoryOrError(target.history!);
 
               const childPackageQuantity = extractChildPackageTagQuantityUnitSetsFromHistory(
-                target.history!
+                target.history!,
               ).find((x) => x[0] === childLabel);
 
               if (!childPackageQuantity) {
@@ -1115,7 +1115,7 @@ export async function maybeLoadCogsV2ReportData({
           const sourceProductionBatch: IIndexedPackageData = scopedProductionBatchPackageMap.get(
             sourcePackage.ProductionBatchNumber.length > 0
               ? sourcePackage.ProductionBatchNumber
-              : sourcePackage.SourceProductionBatchNumbers
+              : sourcePackage.SourceProductionBatchNumbers,
           )!;
 
           if (sourceProductionBatch.history === undefined) {
@@ -1123,7 +1123,7 @@ export async function maybeLoadCogsV2ReportData({
             debugNote = `Src PB ${sourceProductionBatch.Label} is missing history`;
           } else {
             const initialProductionBatchQuantity = extractInitialPackageQuantityAndUnitFromHistoryOrError(
-                sourceProductionBatch.history!
+                sourceProductionBatch.history!,
             );
 
             let optimizationMultiplier = manifestPkg.ShippedQuantity / initialProductionBatchQuantity[0];
@@ -1230,7 +1230,7 @@ export async function createCogsV2SpreadsheetOrError({
       sheetTitles,
     },
     undefined,
-    SHEETS_API_MESSAGE_TIMEOUT_MS
+    SHEETS_API_MESSAGE_TIMEOUT_MS,
   );
 
   if (!response.data.success) {
@@ -1275,7 +1275,7 @@ export async function createCogsV2SpreadsheetOrError({
       requests: formattingRequests,
     },
     undefined,
-    SHEETS_API_MESSAGE_TIMEOUT_MS
+    SHEETS_API_MESSAGE_TIMEOUT_MS,
   );
 
   const [departureDateGt] = reportConfig[ReportType.COGS_V2]!.transferFilter.estimatedDepartureDateGt!.split('T')!;
@@ -1284,7 +1284,7 @@ export async function createCogsV2SpreadsheetOrError({
   const [readableDepartureDateLt] = reportConfig[ReportType.COGS_V2]!.transferFilter.estimatedDepartureDateLt!.split('T')!;
   const [departureDateLt] = getIsoDateFromOffset(
     1,
-    reportConfig[ReportType.COGS_V2]!.transferFilter.estimatedDepartureDateLt!
+    reportConfig[ReportType.COGS_V2]!.transferFilter.estimatedDepartureDateLt!,
   ).split('T');
 
   await messageBus.sendMessageToBackground(
@@ -1321,7 +1321,7 @@ export async function createCogsV2SpreadsheetOrError({
       ],
     },
     undefined,
-    SHEETS_API_MESSAGE_TIMEOUT_MS
+    SHEETS_API_MESSAGE_TIMEOUT_MS,
   );
 
   store.commit(`reports/${ReportsMutations.SET_STATUS}`, {
@@ -1383,7 +1383,7 @@ export async function createCogsV2SpreadsheetOrError({
       requests: resizeRequests,
     },
     undefined,
-    SHEETS_API_MESSAGE_TIMEOUT_MS
+    SHEETS_API_MESSAGE_TIMEOUT_MS,
   );
 
   await messageBus.sendMessageToBackground(
@@ -1394,7 +1394,7 @@ export async function createCogsV2SpreadsheetOrError({
       values: [[`Created with Track & Trace Tools @ ${Date().toString()}`]],
     },
     undefined,
-    SHEETS_API_MESSAGE_TIMEOUT_MS
+    SHEETS_API_MESSAGE_TIMEOUT_MS,
   );
 
   return response.data.result;

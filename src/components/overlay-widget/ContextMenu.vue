@@ -351,7 +351,7 @@
 
 <script lang="ts">
 import {
-  MessageType, ModalAction, ModalType, PackageState, TransferState
+  MessageType, ModalAction, ModalType, PackageState, TransferState,
 } from '@/consts';
 import {
   IDestinationPackageData,
@@ -720,7 +720,7 @@ export default Vue.extend({
 
       await createScanSheet(
         parseInt(this.contextMenuEvent.manifestNumber!, 10),
-        this.contextMenuEvent.zeroPaddedManifestNumber!
+        this.contextMenuEvent.zeroPaddedManifestNumber!,
       );
 
       this.dismiss();

@@ -48,10 +48,10 @@ import store from '@/store/page-overlay/index';
 import { SearchActions } from '@/store/page-overlay/modules/search/consts';
 import { TagSearchActions } from '@/store/page-overlay/modules/tag-search/consts';
 import {
-  combineLatest, Observable, of, timer
+  combineLatest, Observable, of, timer,
 } from 'rxjs';
 import {
-  debounceTime, filter, startWith, tap
+  debounceTime, filter, startWith, tap,
 } from 'rxjs/operators';
 import Vue from 'vue';
 import { mapActions, mapState } from 'vuex';

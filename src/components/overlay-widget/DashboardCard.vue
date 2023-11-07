@@ -52,7 +52,7 @@ export default Vue.extend({
       try {
         analyticsManager.track(
           MessageType.CLICKED_DASHBOARD_CARD_LINK,
-          JSON.parse(decodeURI(this.$props.url.split('#')[1]))
+          JSON.parse(decodeURI(this.$props.url.split('#')[1])),
         );
       } catch (e) {}
       window.location.href = this.$props.url;
