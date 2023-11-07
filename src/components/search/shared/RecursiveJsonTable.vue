@@ -48,7 +48,7 @@ export default Vue.extend({
         const result = {};
 
         function recurse(current: any, path = '') {
-          for (const key in current) {
+          for (const key in current) { /* eslint-disable-line guard-for-in */
             const newPath = path ? `${path}${key}` : key;
             if (typeof current[key] === 'object') {
               recurse(current[key], newPath);

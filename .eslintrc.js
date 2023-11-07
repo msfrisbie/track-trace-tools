@@ -53,7 +53,6 @@ module.exports = {
     'class-methods-use-this': 'off',
     'no-empty-function': 'off',
     'implicit-arrow-linebreak': 'off',
-    'guard-for-in': 'off',
     'comma-dangle': 'off',
     'no-cond-assign': 'warn',
     'no-return-assign': 'warn',
