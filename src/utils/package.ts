@@ -243,12 +243,12 @@ export async function getLabTestUrlsFromPackage({
   pkg,
   showZeroResultsError = true,
 }: {
-  pkg: IPackageData;
+  pkg: IUnionIndexedPackageData;
   showZeroResultsError?: boolean;
 }): Promise<string[]> {
   const authState = await authManager.authStateOrError();
 
-  const testResults = await primaryDataLoader.testResultsByPackageId(pkg.Id);
+  const testResults = await primaryDataLoader.testResultsByPackageId(getIdOrError(pkg));
 
   const fileIds = new Set<number>();
 
@@ -275,7 +275,7 @@ export async function getLabTestUrlsFromPackage({
 
   return [...fileIds].map(
     (fileId) =>
-      `${window.location.origin}/filesystem/${authState.license}/download/labtest/result/document?packageId=${pkg.Id}&labTestResultDocumentFileId=${fileId}`
+      `${window.location.origin}/filesystem/${authState.license}/download/labtest/result/document?packageId=${getIdOrError(pkg)}&labTestResultDocumentFileId=${fileId}`
   );
 
   // for (let fileId of fileIds) {
@@ -287,13 +287,11 @@ export async function getLabTestUrlsFromPackage({
   // }
 }
 
-export async function downloadLabTests({ pkg }: { pkg: IPackageData }) {
+export async function downloadLabTests({ pkg }: { pkg: IUnionIndexedPackageData }) {
   const fileUrls = await getLabTestUrlsFromPackage({ pkg });
 
   for (const url of fileUrls) {
-    console.log(url);
-
-    downloadFileFromUrl({ url, filename: `${pkg.Label}.pdf` });
+    downloadFileFromUrl({ url, filename: `${getLabelOrError(pkg)}.pdf` });
   }
 
   // const authState = await authManager.authStateOrError();

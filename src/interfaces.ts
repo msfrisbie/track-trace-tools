@@ -12,7 +12,7 @@ import {
   TagState,
   TaskType,
   ToolkitView,
-  TransferState,
+  TransferState
 } from "@/consts";
 import { Store } from "vuex";
 import { IAnnouncementsState } from "./store/page-overlay/modules/announcements/interfaces";
@@ -35,7 +35,7 @@ import { ISplitPackageBuilderState } from "./store/page-overlay/modules/split-pa
 import { ITagSearchState } from "./store/page-overlay/modules/tag-search/interfaces";
 import {
   DriverLayoverLeg,
-  ITransferBuilderState,
+  ITransferBuilderState
 } from "./store/page-overlay/modules/transfer-builder/interfaces";
 import { ITransferPackageSearchState } from "./store/page-overlay/modules/transfer-package-search/interfaces";
 import { ITransferSearchState } from "./store/page-overlay/modules/transfer-search/interfaces";
@@ -825,6 +825,7 @@ export interface IIndexedDestinationPackageData extends IDestinationPackageData 
   fractionalCostData?: IFractionalCostData[];
 }
 
+export type IUnionPackageData = IPackageData | IDestinationPackageData;
 export type IUnionIndexedPackageData = IIndexedPackageData | IIndexedDestinationPackageData;
 export type IUnionRichIndexedPackageData =
   | IRichIndexedPackageData

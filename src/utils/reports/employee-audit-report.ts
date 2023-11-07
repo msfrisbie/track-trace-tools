@@ -3,7 +3,7 @@ import {
   IIndexedTransferData,
   IPackageFilter,
   IPluginState,
-  ITransferFilter,
+  ITransferFilter
 } from "@/interfaces";
 import { DataLoader, getDataLoaderByLicense } from "@/modules/data-loader/data-loader.module";
 import { facilityManager } from "@/modules/facility-manager.module";
@@ -12,7 +12,7 @@ import { ReportsMutations, ReportType } from "@/store/page-overlay/modules/repor
 import {
   IReportConfig,
   IReportData,
-  IReportsState,
+  IReportsState
 } from "@/store/page-overlay/modules/reports/interfaces";
 import { ActionContext } from "vuex";
 import { todayIsodate } from "../date";
@@ -191,6 +191,8 @@ export async function maybeLoadEmployeeAuditReportData({
       return true;
     });
 
+    console.log('post-filter', { transfers, packages });
+
     const employeeAuditMatrix: any[][] = [];
 
     const historyPromises: Promise<any>[] = [];
@@ -199,7 +201,7 @@ export async function maybeLoadEmployeeAuditReportData({
       statusMessage: { text: `Loading history...`, level: "success" },
     });
 
-    packages.map((pkg) => {
+    for (const pkg of packages) {
       historyPromises.push(
         getDataLoaderByLicense(pkg.LicenseNumber)
           .then((dataLoader) => dataLoader.packageHistoryByPackageId(pkg.Id))
@@ -207,9 +209,13 @@ export async function maybeLoadEmployeeAuditReportData({
             pkg.history = response;
           })
       );
-    });
+      if (historyPromises.length % 100 === 0) {
+        Promise.allSettled(historyPromises);
+      }
+    }
+    Promise.allSettled(historyPromises);
 
-    transfers.map((transfer) => {
+    for (const transfer of transfers) {
       historyPromises.push(
         getDataLoaderByLicense(transfer.LicenseNumber)
           .then((dataLoader) => dataLoader.transferHistoryByOutGoingTransferId(transfer.Id))
@@ -217,7 +223,11 @@ export async function maybeLoadEmployeeAuditReportData({
             transfer.history = response;
           })
       );
-    });
+
+      if (historyPromises.length % 100 === 0) {
+        Promise.allSettled(historyPromises);
+      }
+    }
 
     const settledHistoryPromises = await Promise.allSettled(historyPromises);
 

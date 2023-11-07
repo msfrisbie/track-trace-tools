@@ -247,6 +247,21 @@
           </div>
         </b-button>
 
+        <!-- <b-button
+          :disabled="!transfer || (!clientValues['ENABLE_T3PLUS'] && !t3plus)"
+          variant="outline-primary"
+          class=""
+          @click.stop.prevent="downloadAllLabTests()"
+          ><div
+            class="grid grid-cols-2 place-items-center"
+            style="grid-template-columns: auto 1fr auto"
+          >
+            <span>DOWNLOAD ALL LAB TESTS</span>
+            <div></div>
+            <div class=""><font-awesome-icon icon="file-download" /></div>
+          </div>
+        </b-button> -->
+
         <b-button variant="outline-primary" class="" @click.stop.prevent="createScanSheet()"
           ><div
             class="grid grid-cols-2 place-items-center"
@@ -339,6 +354,8 @@ import {
   MessageType, ModalAction, ModalType, PackageState, TransferState
 } from "@/consts";
 import {
+  IDestinationPackageData,
+  IIndexedDestinationPackageData,
   IIndexedPackageData,
   IIndexedTransferData,
   IPackageSearchFilters,
@@ -347,6 +364,7 @@ import {
 import { analyticsManager } from "@/modules/analytics-manager.module";
 import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
 import { IContextMenuEvent, modalManager } from "@/modules/modal-manager.module";
+import { toastManager } from "@/modules/toast-manager.module";
 import router from "@/router/index";
 import store from "@/store/page-overlay/index";
 import { ExplorerActions } from "@/store/page-overlay/modules/explorer/consts";
@@ -635,6 +653,66 @@ export default Vue.extend({
       });
 
       analyticsManager.track(MessageType.CLICKED_DOWNLOAD_MANIFEST_BUTTON);
+      this.dismiss();
+    },
+    async downloadAllLabTests() {
+      // Show message immediately inflight...
+      analyticsManager.track(MessageType.CONTEXT_MENU_SELECT, { event: "downloadAllLabTests" });
+
+      toastManager.openToast(`Downloading all available COAs from this transfer...`, {
+        title: "Download in progress",
+        autoHideDelay: 3000,
+        variant: "primary",
+        appendToast: true,
+        toaster: "ttt-toaster",
+        solid: true,
+      });
+
+      const transfer: IIndexedTransferData = this.$data.transfer;
+
+      const packages: IIndexedDestinationPackageData[] = [];
+
+      switch (this.$data.transfer.TransferState as TransferState) {
+        case TransferState.INCOMING:
+        case TransferState.INCOMING_INACTIVE:
+          packages.concat(await primaryDataLoader.destinationPackages(transfer.DeliveryId));
+          break;
+        case TransferState.OUTGOING:
+        case TransferState.REJECTED:
+          const destinations = await primaryDataLoader.transferDestinations(transfer.Id);
+          for (const destination of destinations) {
+            packages.concat(await primaryDataLoader.destinationPackages(destination.Id));
+          }
+          // Need to load destinations, then packages
+          break;
+        case TransferState.OUTGOING_INACTIVE:
+        case TransferState.LAYOVER:
+        default:
+          toastManager.openToast(`This transfer type is ineligible for COA download`, {
+            title: "Download Error",
+            autoHideDelay: 3000,
+            variant: "danger",
+            appendToast: true,
+            toaster: "ttt-toaster",
+            solid: true,
+          });
+          // Show error message and exit
+          return;
+      }
+
+      for (const pkg of packages) {
+        downloadLabTests({ pkg });
+      }
+
+      toastManager.openToast(`Finished downloading all COAs`, {
+        title: "Success",
+        autoHideDelay: 3000,
+        variant: "primary",
+        appendToast: true,
+        toaster: "ttt-toaster",
+        solid: true,
+      });
+
       this.dismiss();
     },
     async createScanSheet() {
