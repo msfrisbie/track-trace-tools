@@ -2263,7 +2263,7 @@ export class DataLoader implements IAtomicService {
       }
     }
 
-    throw `Tag ${tag} not found`;
+    throw new Error(`Tag ${tag} not found`);
   }
 
   async lookupPackageId(tag: string) {
@@ -2273,7 +2273,7 @@ export class DataLoader implements IAtomicService {
     //   }
     // }
 
-    throw `Package ${tag} not found`;
+    throw new Error(`Package ${tag} not found`);
   }
 
   async getExtractedITagOrderModalData(): Promise<IExtractedITagOrderData> {
