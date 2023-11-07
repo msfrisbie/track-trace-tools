@@ -53,8 +53,6 @@ module.exports = {
     'class-methods-use-this': 'off',
     'no-empty-function': 'off',
     'implicit-arrow-linebreak': 'off',
-    'no-cond-assign': 'warn',
-    'no-return-assign': 'warn',
   },
 
   extends: ['plugin:vue/essential', '@vue/typescript', '@vue/airbnb'],
