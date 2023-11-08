@@ -7,7 +7,9 @@ import {
   TagsTabLabel,
   TransfersTabLabel,
 } from '@/consts';
-import { DarkModeState, IPluginState, SnowflakeState } from '@/interfaces';
+import {
+  BackgroundState, DarkModeState, IPluginState, SnowflakeState,
+} from '@/interfaces';
 import { ActionContext } from 'vuex';
 import { ClientActions } from '../client/consts';
 import { SettingsActions, SettingsMutations } from './consts';
@@ -45,6 +47,11 @@ const persistedState: ISettingsState = {
   efficientSpacing: false,
   autoDismissPopups: true,
   salesDefaultPageSize: 20,
+  backgroundState: BackgroundState.DEFAULT,
+  backgroundColor: '#49276a',
+  backgroundGradientStartColor: '#49276a',
+  backgroundGradientEndColor: '#ffffff',
+  backgroundImage: '',
   snowflakeState: SnowflakeState.DISABLED,
   snowflakeCharacter: '❅',
   snowflakeImageCrop: 'none',

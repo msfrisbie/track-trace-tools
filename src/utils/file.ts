@@ -10,7 +10,7 @@ export async function toBase64(file: File) {
   });
 }
 
-export async function generateThumbnail(file: File): Promise<string> {
+export async function generateThumbnail(file: File, size: number = 100): Promise<string> {
   // const scaleRatio = Math.min(100, 100) / Math.max(file.width, file.height)
   const reader = new FileReader();
   const canvas = document.createElement('canvas');
@@ -20,13 +20,13 @@ export async function generateThumbnail(file: File): Promise<string> {
     reader.onload = function (event) {
       const img = new Image();
       img.onload = function () {
-        const scaleRatio = Math.min(100, 100) / Math.max(img.width, img.height);
+        const scaleRatio = Math.min(size, size) / Math.max(img.width, img.height);
         const w = img.width * scaleRatio;
         const h = img.height * scaleRatio;
         canvas.width = w;
         canvas.height = h;
         ctx?.drawImage(img, 0, 0, w, h);
-        return resolve(canvas.toDataURL('image/png'));
+        return resolve(canvas.toDataURL('image/png', 0.7));
       };
       // @ts-ignore
       img.src = event.target.result;

@@ -4,6 +4,10 @@ export const AMPLITUDE_API_KEY = '13b63639e3682c360d938c2ebb900252';
 export const TTT_LIGHT_MODE = 'ttt-light-mode';
 export const TTT_DARK_MODE = 'ttt-dark-mode';
 export const TTT_SNOWFLAKES = 'ttt-snowflakes';
+export const TTT_BACKGROUND_DEFAULT = 'ttt-bg-default';
+export const TTT_BACKGROUND_COLOR = 'ttt-bg-color';
+export const TTT_BACKGROUND_GRADIENT = 'ttt-bg-gradient';
+export const TTT_BACKGROUND_IMAGE = 'ttt-bg-image';
 
 export enum ChromeStorageKeys {
   OAUTH_USER_DATA = 'OAUTH_USER_DATA',

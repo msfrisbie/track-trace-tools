@@ -62,6 +62,13 @@ export interface IAtomicService {
   init: () => Promise<void>;
 }
 
+export enum BackgroundState {
+  DEFAULT = 'DEFAULT',
+  COLOR = 'COLOR',
+  GRADIENT = 'GRADIENT',
+  IMAGE = 'IMAGE',
+}
+
 export enum DarkModeState {
   ENABLED = 'ENABLED',
   DISABLED = 'DISABLED',

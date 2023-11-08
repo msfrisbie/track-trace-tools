@@ -290,10 +290,9 @@ export async function maybeLoadEmployeeAuditReportData({
     });
 
     // TODO: IDs only partially show. how to resolve?
-    // TODO regex
     for (const substring of config.employeeQuery.split(',').map((x) => x.trim())) {
       // Employee IDs
-      const employeeMatcher = substring.toLocaleLowerCase(); // .slice(0, -3);
+      const employeeMatcher = substring.toLocaleLowerCase();
 
       for (const pkg of packages) {
         for (const history of pkg.history!) {

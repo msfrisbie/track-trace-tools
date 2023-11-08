@@ -9,7 +9,9 @@ import {
   TransferFilterIdentifiers,
   TTT_TABLEGROUP_ATTRIBUTE,
 } from '@/consts';
-import { DarkModeState, IAtomicService, SnowflakeState } from '@/interfaces';
+import {
+  BackgroundState, DarkModeState, IAtomicService, SnowflakeState,
+} from '@/interfaces';
 import { toastManager } from '@/modules/toast-manager.module';
 import { MutationType } from '@/mutation-types';
 import store from '@/store/page-overlay/index';
@@ -64,6 +66,7 @@ import {
   setTransferFilterImpl,
 } from './search-utils';
 import {
+  controlBackgroundImpl,
   controlDarkModeImpl,
   controlLogoutBarImpl,
   setExpandedClassImpl,
@@ -503,6 +506,7 @@ class PageManager implements IAtomicService {
         this.controlLogoutBar(store.state.settings.preventLogout);
         this.controlSnowflakeAnimation(store.state.settings.snowflakeState);
         this.controlDarkMode(store.state.settings.darkModeState);
+        this.controlBackground(store.state.settings.backgroundState);
       }
       this.togglePageVisibilityClasses();
 
@@ -763,6 +767,10 @@ class PageManager implements IAtomicService {
 
   controlDarkMode(state: DarkModeState) {
     return controlDarkModeImpl(state);
+  }
+
+  controlBackground(state: BackgroundState) {
+    return controlBackgroundImpl(state);
   }
 
   togglePageVisibilityClasses() {

@@ -6,7 +6,7 @@ import {
   TagsTabLabel,
   TransfersTabLabel,
 } from '@/consts';
-import { DarkModeState, SnowflakeState } from '@/interfaces';
+import { BackgroundState, DarkModeState, SnowflakeState } from '@/interfaces';
 
 export interface ISettingsState {
   autoOpenActivePackages: boolean;
@@ -38,6 +38,11 @@ export interface ISettingsState {
   efficientSpacing: boolean;
   autoDismissPopups: boolean;
   salesDefaultPageSize: number;
+  backgroundState: BackgroundState;
+  backgroundColor: string;
+  backgroundGradientStartColor: string;
+  backgroundGradientEndColor: string;
+  backgroundImage: string;
   snowflakeState: SnowflakeState;
   snowflakeCharacter: string;
   snowflakeSize: string;
