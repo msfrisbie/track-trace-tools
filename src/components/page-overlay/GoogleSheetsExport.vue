@@ -1267,8 +1267,8 @@
 
               <div class="flex flex-col items-start gap-1">
                 <b-form-group
-                  label="Employee Name or Username:"
-                  description="Full or partial match, uppercase or lowercase"
+                  label="Employee Names or Usernames:"
+                  description="Full or partial match, uppercase or lowercase, separated by commas"
                 >
                   <b-form-input
                     size="sm"
@@ -1279,29 +1279,37 @@
                 </b-form-group>
               </div>
 
+              <b-form-checkbox v-model="employeeAuditFormFilters.includePackages">
+                <span class="leading-6">Include package activity</span>
+              </b-form-checkbox>
+
+              <b-form-checkbox v-model="employeeAuditFormFilters.includeTransfers">
+                <span class="leading-6">Include transfer activity</span>
+              </b-form-checkbox>
+
               <div class="flex flex-col items-start gap-1">
-                <b-form-checkbox v-model="employeeAuditFormFilters.shouldFilterLastModifiedDateGt">
-                  <span class="leading-6">Last modified on or after:</span>
+                <b-form-checkbox v-model="employeeAuditFormFilters.shouldFilterActivityDateGt">
+                  <span class="leading-6">Activity on or after:</span>
                 </b-form-checkbox>
                 <b-form-datepicker
-                  v-if="employeeAuditFormFilters.shouldFilterLastModifiedDateGt"
-                  :disabled="!employeeAuditFormFilters.shouldFilterLastModifiedDateGt"
+                  v-if="employeeAuditFormFilters.shouldFilterActivityDateGt"
+                  :disabled="!employeeAuditFormFilters.shouldFilterActivityDateGt"
                   initial-date
                   size="sm"
-                  v-model="employeeAuditFormFilters.lastModifiedDateGt"
+                  v-model="employeeAuditFormFilters.activityDateGt"
                 />
               </div>
 
               <div class="flex flex-col items-start gap-1">
-                <b-form-checkbox v-model="employeeAuditFormFilters.shouldFilterLastModifiedDateLt">
-                  <span class="leading-6">Last modified on or before:</span>
+                <b-form-checkbox v-model="employeeAuditFormFilters.shouldFilterActivityDateLt">
+                  <span class="leading-6">Activity on or before:</span>
                 </b-form-checkbox>
                 <b-form-datepicker
-                  v-if="employeeAuditFormFilters.shouldFilterLastModifiedDateLt"
-                  :disabled="!employeeAuditFormFilters.shouldFilterLastModifiedDateLt"
+                  v-if="employeeAuditFormFilters.shouldFilterActivityDateLt"
+                  :disabled="!employeeAuditFormFilters.shouldFilterActivityDateLt"
                   initial-date
                   size="sm"
-                  v-model="employeeAuditFormFilters.lastModifiedDateLt"
+                  v-model="employeeAuditFormFilters.activityDateLt"
                 />
               </div>
 

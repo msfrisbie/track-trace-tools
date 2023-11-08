@@ -18,6 +18,7 @@ import {
 } from '@/interfaces';
 import { ImmaturePlantQuickviewDimension } from '@/utils/reports/immature-plants-quickview-report';
 import { MaturePlantQuickviewDimension } from '@/utils/reports/mature-plants-quickview-report';
+import { PackageQuickviewDimension } from '@/utils/reports/packages-quickview-report';
 import {
   InventoryStrategy,
   IPackageDateMetadata,
@@ -100,6 +101,10 @@ export interface IReportConfig {
     fields: IFieldData[];
   };
   [ReportType.EMPLOYEE_AUDIT]?: {
+    activityDateGt: string | null;
+    activityDateLt: string | null;
+    includePackages: boolean;
+    includeTransfers: boolean;
     packageFilter: IPackageFilter;
     transferFilter: ITransferFilter;
     licenses: string[];

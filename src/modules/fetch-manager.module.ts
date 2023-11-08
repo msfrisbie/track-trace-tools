@@ -8,7 +8,7 @@ const client = axios.create({
 
 axiosRetry(client, {
   shouldResetTimeout: true,
-  retries: 5,
+  retries: 10,
   retryDelay: axiosRetry.exponentialDelay,
   retryCondition: (error) => {
     if (error.code && ['ECONNABORTED', 'ERR_CANCELED'].includes(error.code)) {

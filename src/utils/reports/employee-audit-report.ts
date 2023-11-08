@@ -18,21 +18,25 @@ import { ActionContext } from 'vuex';
 import { todayIsodate } from '../date';
 
 interface IEmployeeAuditReportFormFilters {
-  lastModifiedDateGt: string;
-  lastModifiedDateLt: string;
+  activityDateGt: string;
+  activityDateLt: string;
   employeeQuery: string;
-  shouldFilterLastModifiedDateGt: boolean;
-  shouldFilterLastModifiedDateLt: boolean;
+  shouldFilterActivityDateGt: boolean;
+  shouldFilterActivityDateLt: boolean;
+  includePackages: boolean;
+  includeTransfers: boolean;
   licenseOptions: string[];
   licenses: string[];
 }
 
 export const employeeAuditFormFiltersFactory: () => IEmployeeAuditReportFormFilters = () => ({
-  lastModifiedDateGt: todayIsodate(),
-  lastModifiedDateLt: todayIsodate(),
+  activityDateGt: todayIsodate(),
+  activityDateLt: todayIsodate(),
   employeeQuery: '',
-  shouldFilterLastModifiedDateGt: true,
-  shouldFilterLastModifiedDateLt: true,
+  shouldFilterActivityDateGt: true,
+  shouldFilterActivityDateLt: true,
+  includePackages: true,
+  includeTransfers: true,
   licenseOptions: facilityManager.cachedFacilities.map((x) => x.licenseNumber),
   licenses: facilityManager.cachedFacilities.map((x) => x.licenseNumber),
 });
@@ -49,23 +53,29 @@ export function addEmployeeAuditReport({
 
   const licenses: string[] = employeeAuditFormFilters.licenses;
 
-  packageFilter.lastModifiedDateGt = employeeAuditFormFilters.shouldFilterLastModifiedDateGt
-    ? employeeAuditFormFilters.lastModifiedDateGt
-    : null;
-  transferFilter.lastModifiedDateGt = employeeAuditFormFilters.shouldFilterLastModifiedDateGt
-    ? employeeAuditFormFilters.lastModifiedDateGt
+  const activityDateGt = employeeAuditFormFilters.shouldFilterActivityDateGt
+    ? employeeAuditFormFilters.activityDateGt
     : null;
 
-  packageFilter.lastModifiedDateLt = employeeAuditFormFilters.shouldFilterLastModifiedDateLt
-    ? employeeAuditFormFilters.lastModifiedDateLt
+  const activityDateLt = employeeAuditFormFilters.shouldFilterActivityDateLt
+    ? employeeAuditFormFilters.activityDateLt
     : null;
-  transferFilter.lastModifiedDateLt = employeeAuditFormFilters.shouldFilterLastModifiedDateLt
-    ? employeeAuditFormFilters.lastModifiedDateLt
-    : null;
+
+  // If created after end time, it cannot contain relevant events
+  packageFilter.packagedDateLt = activityDateLt;
+  transferFilter.createdDateLt = activityDateLt;
+
+  // If last modified before start time, it cannot contain relevant events
+  packageFilter.lastModifiedDateGt = activityDateGt;
+  transferFilter.lastModifiedDateGt = activityDateGt;
 
   reportConfig[ReportType.EMPLOYEE_AUDIT] = {
+    activityDateGt,
+    activityDateLt,
     packageFilter,
     transferFilter,
+    includePackages: employeeAuditFormFilters.includePackages,
+    includeTransfers: employeeAuditFormFilters.includeTransfers,
     employeeQuery: employeeAuditFormFilters.employeeQuery,
     licenses,
     fields: null,
@@ -90,84 +100,88 @@ export async function maybeLoadEmployeeAuditReportData({
     let transfers: IIndexedTransferData[] = [];
 
     for (const license of config.licenses) {
-      ctx.commit(ReportsMutations.SET_STATUS, {
-        statusMessage: { text: `Loading ${license} packages...`, level: 'success' },
-      });
-
       dataLoader = await getDataLoaderByLicense(license);
 
-      try {
-        packages = [...packages, ...(await dataLoader.activePackages())];
-      } catch (e) {
+      if (config.includePackages) {
         ctx.commit(ReportsMutations.SET_STATUS, {
-          statusMessage: { text: 'Failed to load active packages.', level: 'warning' },
+          statusMessage: { text: `Loading ${license} packages...`, level: 'success' },
         });
+
+        try {
+          packages = [...packages, ...(await dataLoader.activePackages())];
+        } catch (e) {
+          ctx.commit(ReportsMutations.SET_STATUS, {
+            statusMessage: { text: 'Failed to load active packages.', level: 'warning' },
+          });
+        }
+
+        try {
+          packages = [...packages, ...(await dataLoader.onHoldPackages())];
+        } catch (e) {
+          ctx.commit(ReportsMutations.SET_STATUS, {
+            statusMessage: { text: 'Failed to load onhold packages.', level: 'warning' },
+          });
+        }
+
+        try {
+          packages = [...packages, ...(await dataLoader.inTransitPackages())];
+        } catch (e) {
+          ctx.commit(ReportsMutations.SET_STATUS, {
+            statusMessage: { text: 'Failed to load intransit packages.', level: 'warning' },
+          });
+        }
+
+        try {
+          packages = [...packages, ...(await dataLoader.inactivePackages())];
+        } catch (e) {
+          ctx.commit(ReportsMutations.SET_STATUS, {
+            statusMessage: { text: 'Failed to load inactive packages.', level: 'warning' },
+          });
+        }
       }
 
-      try {
-        packages = [...packages, ...(await dataLoader.onHoldPackages())];
-      } catch (e) {
+      if (config.includeTransfers) {
         ctx.commit(ReportsMutations.SET_STATUS, {
-          statusMessage: { text: 'Failed to load onhold packages.', level: 'warning' },
+          statusMessage: { text: `Loading ${license} transfers...`, level: 'success' },
         });
-      }
 
-      try {
-        packages = [...packages, ...(await dataLoader.inTransitPackages())];
-      } catch (e) {
-        ctx.commit(ReportsMutations.SET_STATUS, {
-          statusMessage: { text: 'Failed to load intransit packages.', level: 'warning' },
-        });
-      }
+        // Incoming transfers do not have history
 
-      try {
-        packages = [...packages, ...(await dataLoader.inactivePackages())];
-      } catch (e) {
-        ctx.commit(ReportsMutations.SET_STATUS, {
-          statusMessage: { text: 'Failed to load inactive packages.', level: 'warning' },
-        });
-      }
+        try {
+          transfers = [...transfers, ...(await dataLoader.outgoingTransfers())];
+        } catch (e) {
+          ctx.commit(ReportsMutations.SET_STATUS, {
+            statusMessage: { text: 'Failed to load outgoing transfers.', level: 'warning' },
+          });
+        }
 
-      ctx.commit(ReportsMutations.SET_STATUS, {
-        statusMessage: { text: `Loading ${license} transfers...`, level: 'success' },
-      });
+        try {
+          transfers = [...transfers, ...(await dataLoader.outgoingInactiveTransfers())];
+        } catch (e) {
+          ctx.commit(ReportsMutations.SET_STATUS, {
+            statusMessage: { text: 'Failed to load outgoing inactive transfers.', level: 'warning' },
+          });
+        }
 
-      // Incoming transfers do not have history
-
-      try {
-        transfers = [...transfers, ...(await dataLoader.outgoingTransfers())];
-      } catch (e) {
-        ctx.commit(ReportsMutations.SET_STATUS, {
-          statusMessage: { text: 'Failed to load outgoing transfers.', level: 'warning' },
-        });
-      }
-
-      try {
-        transfers = [...transfers, ...(await dataLoader.outgoingInactiveTransfers())];
-      } catch (e) {
-        ctx.commit(ReportsMutations.SET_STATUS, {
-          statusMessage: { text: 'Failed to load outgoing inactive transfers.', level: 'warning' },
-        });
-      }
-
-      try {
-        transfers = [...transfers, ...(await dataLoader.rejectedTransfers())];
-      } catch (e) {
-        ctx.commit(ReportsMutations.SET_STATUS, {
-          statusMessage: { text: 'Failed to load rejected transfers.', level: 'warning' },
-        });
+        try {
+          transfers = [...transfers, ...(await dataLoader.rejectedTransfers())];
+        } catch (e) {
+          ctx.commit(ReportsMutations.SET_STATUS, {
+            statusMessage: { text: 'Failed to load rejected transfers.', level: 'warning' },
+          });
+        }
       }
     }
 
     packages = packages.filter((pkg) => {
-      if (config.packageFilter.lastModifiedDateGt) {
-        if (pkg.LastModified < config.packageFilter.lastModifiedDateGt) {
+      if (config.packageFilter.packagedDateLt) {
+        if (pkg.PackagedDate > config.packageFilter.packagedDateLt) {
           return false;
         }
       }
 
-      if (config.packageFilter.lastModifiedDateLt) {
-        if (pkg.LastModified > config.packageFilter.lastModifiedDateLt) {
+      if (config.packageFilter.lastModifiedDateGt) {
+        if (pkg.LastModified < config.packageFilter.lastModifiedDateGt) {
           return false;
         }
       }
@@ -176,14 +190,14 @@ export async function maybeLoadEmployeeAuditReportData({
     });
 
     transfers = transfers.filter((transfer) => {
-      if (config.transferFilter.lastModifiedDateGt) {
-        if (transfer.LastModified < config.transferFilter.lastModifiedDateGt) {
+      if (config.transferFilter.createdDateLt) {
+        if (transfer.CreatedDateTime > config.transferFilter.createdDateLt) {
           return false;
         }
       }
 
-      if (config.transferFilter.lastModifiedDateLt) {
-        if (transfer.LastModified > config.transferFilter.lastModifiedDateLt) {
+      if (config.transferFilter.lastModifiedDateGt) {
+        if (transfer.LastModified < config.transferFilter.lastModifiedDateGt) {
           return false;
         }
       }
@@ -195,9 +209,15 @@ export async function maybeLoadEmployeeAuditReportData({
 
     const historyPromises: Promise<any>[] = [];
 
-    ctx.commit(ReportsMutations.SET_STATUS, {
-      statusMessage: { text: `Loading history for ${packages.length} packages...`, level: 'success' },
-    });
+    // ctx.commit(ReportsMutations.SET_STATUS, {
+    //   statusMessage: { text: `Loading history for ${packages.length} packages...`, level: 'success' },
+    // });
+
+    let pageSize = 32;
+    const MAX_PAGE_SIZE = 256;
+    const MIN_PAGE_SIZE = 1;
+    const FAST_RESPONSE_THRESHOLD_MS = 1000;
+    const SLOW_REPONSE_THRESHOLD_MS = 10000;
 
     for (const pkg of packages) {
       historyPromises.push(
@@ -207,8 +227,19 @@ export async function maybeLoadEmployeeAuditReportData({
             pkg.history = response;
           }),
       );
-      if (historyPromises.length % 100 === 0) {
+      if (historyPromises.length % pageSize === 0) {
+        const t0 = performance.now();
         await Promise.allSettled(historyPromises);
+        const t1 = performance.now();
+
+        if ((t1 - t0) < FAST_RESPONSE_THRESHOLD_MS) {
+          pageSize = Math.min(MAX_PAGE_SIZE, pageSize + 4);
+        }
+
+        if ((t1 - t0) > SLOW_REPONSE_THRESHOLD_MS) {
+          pageSize = Math.max(MIN_PAGE_SIZE, pageSize / 2);
+        }
+
         ctx.commit(ReportsMutations.SET_STATUS, {
           statusMessage: { text: `${historyPromises.length}/${packages.length} packages loaded...`, level: 'success' }, prependMessage: false,
         });
@@ -216,9 +247,9 @@ export async function maybeLoadEmployeeAuditReportData({
     }
     await Promise.allSettled(historyPromises);
 
-    ctx.commit(ReportsMutations.SET_STATUS, {
-      statusMessage: { text: `Loading history for ${transfers.length} transfers...`, level: 'success' },
-    });
+    // ctx.commit(ReportsMutations.SET_STATUS, {
+    //   statusMessage: { text: `Loading history for ${transfers.length} transfers...`, level: 'success' },
+    // });
 
     for (const transfer of transfers) {
       historyPromises.push(
@@ -229,8 +260,19 @@ export async function maybeLoadEmployeeAuditReportData({
           }),
       );
 
-      if (historyPromises.length % 100 === 0) {
+      if (historyPromises.length % pageSize === 0) {
+        const t0 = performance.now();
         await Promise.allSettled(historyPromises);
+        const t1 = performance.now();
+
+        if ((t1 - t0) < FAST_RESPONSE_THRESHOLD_MS) {
+          pageSize = Math.min(MAX_PAGE_SIZE, pageSize + 4);
+        }
+
+        if ((t1 - t0) > SLOW_REPONSE_THRESHOLD_MS) {
+          pageSize = Math.max(MIN_PAGE_SIZE, pageSize / 2);
+        }
+
         ctx.commit(ReportsMutations.SET_STATUS, {
           statusMessage: { text: `${historyPromises.length - packages.length}/${transfers.length} transfers loaded...`, level: 'success' }, prependMessage: false,
         });
@@ -247,34 +289,55 @@ export async function maybeLoadEmployeeAuditReportData({
       statusMessage: { text: 'Analyzing history...', level: 'success' },
     });
 
-    const employeeMatcher = config.employeeQuery.toLocaleLowerCase().slice(0, -3);
+    // TODO: IDs only partially show. how to resolve?
+    // TODO regex
+    for (const substring of config.employeeQuery.split(',').map((x) => x.trim())) {
+      // Employee IDs
+      const employeeMatcher = substring.toLocaleLowerCase(); // .slice(0, -3);
 
-    for (const pkg of packages) {
-      for (const history of pkg.history!) {
-        if (history.UserName.toLocaleLowerCase().includes(employeeMatcher)) {
-          employeeAuditMatrix.push([
-            pkg.LicenseNumber,
-            `${pkg.PackageState} Package`,
-            pkg.Label,
-            history.RecordedDateTime,
-            history.UserName,
-            history.Descriptions.join(' / '),
-          ]);
+      for (const pkg of packages) {
+        for (const history of pkg.history!) {
+          if (config.activityDateGt && history.RecordedDateTime < config.activityDateGt) {
+            continue;
+          }
+
+          if (config.activityDateLt && history.RecordedDateTime > config.activityDateLt) {
+            continue;
+          }
+
+          if (history.UserName.toLocaleLowerCase().includes(employeeMatcher)) {
+            employeeAuditMatrix.push([
+              pkg.LicenseNumber,
+              `${pkg.PackageState} Package`,
+              pkg.Label,
+              history.RecordedDateTime,
+              history.UserName,
+              history.Descriptions.join(' / '),
+            ]);
+          }
         }
       }
-    }
 
-    for (const transfer of transfers) {
-      for (const history of transfer.history!) {
-        if (history.UserName.toLocaleLowerCase().includes(employeeMatcher)) {
-          employeeAuditMatrix.push([
-            transfer.LicenseNumber,
-            `${transfer.TransferState} Transfer`,
-            transfer.ManifestNumber,
-            history.RecordedDateTime,
-            history.UserName,
-            history.Descriptions.join(' /'),
-          ]);
+      for (const transfer of transfers) {
+        for (const history of transfer.history!) {
+          if (config.activityDateGt && history.RecordedDateTime < config.activityDateGt) {
+            continue;
+          }
+
+          if (config.activityDateLt && history.RecordedDateTime > config.activityDateLt) {
+            continue;
+          }
+
+          if (history.UserName.toLocaleLowerCase().includes(employeeMatcher)) {
+            employeeAuditMatrix.push([
+              transfer.LicenseNumber,
+              `${transfer.TransferState} Transfer`,
+              transfer.ManifestNumber,
+              history.RecordedDateTime,
+              history.UserName,
+              history.Descriptions.join(' /'),
+            ]);
+          }
         }
       }
     }
