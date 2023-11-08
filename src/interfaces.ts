@@ -751,6 +751,7 @@ export interface IIndexedPackageData extends IPackageData {
   LicenseNumber: string;
   TagMatcher: string;
   history?: IPackageHistoryData[];
+  testResults?: ITestResultData[];
   initialQuantity?: number;
   initialQuantityUnitOfMeasure?: string;
   totalInputQuantity?: number;
@@ -829,6 +830,7 @@ export interface IIndexedDestinationPackageData extends IDestinationPackageData 
   LicenseNumber: string;
   TagMatcher: string;
   history?: IPackageHistoryData[];
+  testResults?: ITestResultData[];
   fractionalCostData?: IFractionalCostData[];
 }
 

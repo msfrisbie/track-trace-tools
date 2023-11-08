@@ -151,7 +151,7 @@
 
 <script lang="ts">
 import MetrcTag from '@/components/overlay-widget/shared/MetrcTag.vue';
-import PackageIcon from '@/components/search/package-search/PackageIcon.vue';
+import RecursiveJsonTable from '@/components/search/shared/RecursiveJsonTable.vue';
 import {
   MessageType,
   METRC_HOSTNAMES_LACKING_LAB_PDFS,
@@ -161,15 +161,14 @@ import {
 } from '@/consts';
 import { IIndexedPackageData, IPluginState, ITransferPackageList } from '@/interfaces';
 import { analyticsManager } from '@/modules/analytics-manager.module';
-import { clientBuildManager } from '@/modules/client-build-manager.module';
 import { modalManager } from '@/modules/modal-manager.module';
 import { PACKAGE_TAB_REGEX } from '@/modules/page-manager/consts';
-import { searchManager } from '@/modules/search-manager.module';
 import { toastManager } from '@/modules/toast-manager.module';
 import store from '@/store/page-overlay/index';
 import { ExplorerActions } from '@/store/page-overlay/modules/explorer/consts';
 import { PackageHistoryActions } from '@/store/page-overlay/modules/package-history/consts';
 import { PackageSearchActions } from '@/store/page-overlay/modules/package-search/consts';
+import { SearchActions } from '@/store/page-overlay/modules/search/consts';
 import { SplitPackageBuilderActions } from '@/store/page-overlay/modules/split-package-builder/consts';
 import {
   TransferBuilderActions,
@@ -180,13 +179,11 @@ import {
   isIdentityEligibleForTransferTools,
 } from '@/utils/access-control';
 import { copyToClipboard, printPdfFromUrl } from '@/utils/dom';
-import { downloadLabTests, getLabelOrError, getLabTestUrlsFromPackage } from '@/utils/package';
-import { Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import {
+  downloadLabTestPdfs, generatePackageTestResultData, getLabelOrError,
+} from '@/utils/package';
 import Vue from 'vue';
 import { mapActions, mapGetters, mapState } from 'vuex';
-import RecursiveJsonTable from '@/components/search/shared/RecursiveJsonTable.vue';
-import { SearchActions } from '@/store/page-overlay/modules/search/consts';
 
 export default Vue.extend({
   name: 'PackageSearchResultDetail',
@@ -344,33 +341,33 @@ export default Vue.extend({
       return pkg.PackageState.replaceAll('_', ' ');
     },
     async viewLabResult(pkg: IIndexedPackageData) {
-      const urls = await getLabTestUrlsFromPackage({ pkg });
+      const { testResultPdfUrls } = await generatePackageTestResultData({ pkg });
 
-      if (!urls[0]) {
+      if (!testResultPdfUrls[0]) {
         return;
       }
 
       modalManager.dispatchModalEvent(ModalType.DOCUMENT, ModalAction.OPEN, {
-        documentUrls: urls,
+        documentUrls: testResultPdfUrls,
       });
 
       analyticsManager.track(MessageType.CLICKED_TOOLKIT_VIEW_LAB_TEST_BUTTON);
       this.setShowSearchResults({ showSearchResults: false });
     },
     async printLabResult(pkg: IIndexedPackageData) {
-      const urls = await getLabTestUrlsFromPackage({ pkg });
+      const { testResultPdfUrls } = await generatePackageTestResultData({ pkg });
 
-      if (!urls[0]) {
+      if (!testResultPdfUrls[0]) {
         return;
       }
 
-      printPdfFromUrl({ urls, modal: true });
+      printPdfFromUrl({ urls: testResultPdfUrls, modal: true });
 
       analyticsManager.track(MessageType.CLICKED_TOOLKIT_PRINT_LAB_TEST_BUTTON);
       this.setShowSearchResults({ showSearchResults: false });
     },
     async downloadLabResult(pkg: IIndexedPackageData) {
-      downloadLabTests({ pkg });
+      downloadLabTestPdfs({ pkg });
 
       analyticsManager.track(MessageType.CLICKED_TOOLKIT_DOWNLOAD_LAB_TEST_BUTTON);
       this.setShowSearchResults({ showSearchResults: false });

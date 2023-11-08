@@ -85,7 +85,7 @@
           </b-dropdown>
 
           <template v-if="isIdentityEligibleForTransferToolsImpl">
-            <b-button variant="outline-primary" class="" @click.stop.prevent="transferPackage()"
+            <b-button variant="outline-primary" @click.stop.prevent="transferPackage()"
               ><div
                 class="grid grid-cols-2 place-items-center"
                 style="grid-template-columns: auto 1fr auto"
@@ -132,7 +132,7 @@
           </template>
 
           <template v-if="isIdentityEligibleForSplitToolsImpl && isPackageEligibleForSplit">
-            <b-button variant="outline-primary" class="" @click.stop.prevent="splitPackage()"
+            <b-button variant="outline-primary" @click.stop.prevent="splitPackage()"
               ><div
                 class="grid grid-cols-2 place-items-center"
                 style="grid-template-columns: auto 1fr auto"
@@ -144,8 +144,8 @@
             </b-button>
           </template>
 
-          <template v-if="labTestUrls.length > 0">
-            <b-button variant="outline-primary" class="" @click.stop.prevent="viewLabTests()"
+          <template v-if="packageLabResultData && packageLabResultData.testResultPdfUrls.length > 0">
+            <b-button variant="outline-primary" @click.stop.prevent="viewLabTests()"
               ><div
                 class="grid grid-cols-2 place-items-center"
                 style="grid-template-columns: auto 1fr auto"
@@ -156,7 +156,7 @@
               </div>
             </b-button>
 
-            <b-button variant="outline-primary" class="" @click.stop.prevent="printLabTests()"
+            <b-button variant="outline-primary" @click.stop.prevent="printLabTests()"
               ><div
                 class="grid grid-cols-2 place-items-center"
                 style="grid-template-columns: auto 1fr auto"
@@ -167,7 +167,7 @@
               </div>
             </b-button>
 
-            <b-button variant="outline-primary" class="" @click.stop.prevent="downloadLabTests()"
+            <b-button variant="outline-primary" @click.stop.prevent="downloadLabTestPdfs()"
               ><div
                 class="grid grid-cols-2 place-items-center"
                 style="grid-template-columns: auto 1fr auto"
@@ -178,6 +178,17 @@
               </div>
             </b-button>
           </template>
+
+          <b-button :disabled="!packageLabResultData || packageLabResultData.testResults.length === 0" variant="outline-primary" @click.stop.prevent="downloadLabTestCsv()"
+            ><div
+              class="grid grid-cols-2 place-items-center"
+              style="grid-template-columns: auto 1fr auto"
+            >
+              <span>DOWNLOAD LAB TEST CSV</span>
+              <div></div>
+              <div class=""><font-awesome-icon icon="file-download" /></div>
+            </div>
+          </b-button>
         </template>
 
         <template v-if="!pkg && !packageLoadError">
@@ -203,7 +214,7 @@
           </div>
         </b-button>
 
-        <b-button variant="outline-primary" class="" @click.stop.prevent="viewManifest()"
+        <b-button variant="outline-primary" @click.stop.prevent="viewManifest()"
           ><div
             class="grid grid-cols-2 place-items-center"
             style="grid-template-columns: auto 1fr auto"
@@ -214,7 +225,7 @@
           </div>
         </b-button>
 
-        <b-button variant="outline-primary" class="" @click.stop.prevent="newTabManifest()"
+        <b-button variant="outline-primary" @click.stop.prevent="newTabManifest()"
           ><div
             class="grid grid-cols-2 place-items-center"
             style="grid-template-columns: auto 1fr auto"
@@ -225,7 +236,7 @@
           </div>
         </b-button>
 
-        <b-button variant="outline-primary" class="" @click.stop.prevent="printManifest()"
+        <b-button variant="outline-primary" @click.stop.prevent="printManifest()"
           ><div
             class="grid grid-cols-2 place-items-center"
             style="grid-template-columns: auto 1fr auto"
@@ -236,7 +247,7 @@
           </div>
         </b-button>
 
-        <b-button variant="outline-primary" class="" @click.stop.prevent="downloadManifest()"
+        <b-button variant="outline-primary" @click.stop.prevent="downloadManifest()"
           ><div
             class="grid grid-cols-2 place-items-center"
             style="grid-template-columns: auto 1fr auto"
@@ -247,7 +258,7 @@
           </div>
         </b-button>
 
-        <!-- <b-button
+        <b-button
           :disabled="!transfer || (!clientValues['ENABLE_T3PLUS'] && !t3plus)"
           variant="outline-primary"
           class=""
@@ -260,9 +271,9 @@
             <div></div>
             <div class=""><font-awesome-icon icon="file-download" /></div>
           </div>
-        </b-button> -->
+        </b-button>
 
-        <b-button variant="outline-primary" class="" @click.stop.prevent="createScanSheet()"
+        <b-button variant="outline-primary" @click.stop.prevent="createScanSheet()"
           ><div
             class="grid grid-cols-2 place-items-center"
             style="grid-template-columns: auto 1fr auto"
@@ -354,7 +365,6 @@ import {
   MessageType, ModalAction, ModalType, PackageState, TransferState,
 } from '@/consts';
 import {
-  IDestinationPackageData,
   IIndexedDestinationPackageData,
   IIndexedPackageData,
   IIndexedTransferData,
@@ -379,7 +389,10 @@ import {
   isIdentityEligibleForTransferTools,
 } from '@/utils/access-control';
 import { downloadFileFromUrl, printPdfFromUrl } from '@/utils/dom';
-import { downloadLabTests, getLabelOrError, getLabTestUrlsFromPackage } from '@/utils/package';
+import {
+  downloadLabTestCsv,
+  downloadLabTestPdfs, generatePackageTestResultData, getLabelOrError,
+} from '@/utils/package';
 import { createScanSheet } from '@/utils/transfer';
 import Vue from 'vue';
 import { mapActions, mapState } from 'vuex';
@@ -434,9 +447,9 @@ export default Vue.extend({
   data() {
     return {
       pkg: null as IIndexedPackageData | null,
+      packageLabResultData: null,
       transfer: null as IIndexedTransferData | null,
       transferState: null,
-      labTestUrls: [],
       packageLoadError: false,
       transferLoadError: false,
     };
@@ -499,14 +512,15 @@ export default Vue.extend({
     },
     reset() {
       this.$data.pkg = null;
+      this.$data.packageLabResultData = null;
       this.$data.transfer = null;
       this.$data.packageLoadError = false;
       this.$data.transferLoadError = false;
     },
     async updatePackage() {
+      console.log('update package', this.contextMenuEvent);
       this.reset();
 
-      this.$data.labTestUrls = [];
       if (this.contextMenuEvent?.packageTag) {
         const promises: Promise<any>[] = [
           primaryDataLoader.activePackage(this.contextMenuEvent.packageTag).then((pkg) => {
@@ -522,11 +536,11 @@ export default Vue.extend({
 
         await Promise.allSettled(promises);
 
+        console.log(this.$data.pkg);
+
         if (this.$data.pkg) {
-          this.$data.labTestUrls = await getLabTestUrlsFromPackage({
-            pkg: this.$data.pkg,
-            showZeroResultsError: false,
-          });
+          this.$data.packageLabResultData = await generatePackageTestResultData({ pkg: this.$data.pkg });
+          console.log(this.$data.packageLabResultData);
         } else {
           this.$data.packageLoadError = true;
         }
@@ -584,27 +598,39 @@ export default Vue.extend({
       });
       this.dismiss();
     },
-    viewLabTests() {
+    async viewLabTests() {
       analyticsManager.track(MessageType.CONTEXT_MENU_SELECT, { event: 'viewLabTests' });
 
+      const labTestData = await generatePackageTestResultData({ pkg: this.$data.pkg });
+
       modalManager.dispatchModalEvent(ModalType.DOCUMENT, ModalAction.OPEN, {
-        documentUrls: this.$data.labTestUrls,
+        documentUrls: labTestData.testResultPdfUrls,
       });
       analyticsManager.track(MessageType.CLICKED_VIEW_LAB_TEST_BUTTON);
       this.dismiss();
     },
-    printLabTests() {
+    async printLabTests() {
       analyticsManager.track(MessageType.CONTEXT_MENU_SELECT, { event: 'printLabTests' });
 
-      printPdfFromUrl({ urls: this.$data.labTestUrls, modal: true });
+      const labTestData = await generatePackageTestResultData({ pkg: this.$data.pkg });
+
+      printPdfFromUrl({ urls: labTestData.testResultPdfUrls, modal: true });
 
       analyticsManager.track(MessageType.CLICKED_PRINT_LAB_TEST_BUTTON);
       this.dismiss();
     },
-    downloadLabTests() {
-      analyticsManager.track(MessageType.CONTEXT_MENU_SELECT, { event: 'downloadLabTests' });
+    downloadLabTestPdfs() {
+      analyticsManager.track(MessageType.CONTEXT_MENU_SELECT, { event: 'downloadLabTestPdfs' });
 
-      downloadLabTests({ pkg: this.$data.pkg });
+      downloadLabTestPdfs({ pkg: this.$data.pkg });
+
+      analyticsManager.track(MessageType.CLICKED_DOWNLOAD_LAB_TEST_BUTTON);
+      this.dismiss();
+    },
+    downloadLabTestCsv() {
+      analyticsManager.track(MessageType.CONTEXT_MENU_SELECT, { event: 'downloadLabTestCsv' });
+
+      downloadLabTestCsv({ pkg: this.$data.pkg });
 
       analyticsManager.track(MessageType.CLICKED_DOWNLOAD_LAB_TEST_BUTTON);
       this.dismiss();
@@ -659,6 +685,26 @@ export default Vue.extend({
       // Show message immediately inflight...
       analyticsManager.track(MessageType.CONTEXT_MENU_SELECT, { event: 'downloadAllLabTests' });
 
+      const transfer: IIndexedTransferData = this.$data.transfer;
+
+      const packages: IIndexedDestinationPackageData[] = [];
+
+      if ([
+        TransferState.OUTGOING_INACTIVE,
+        TransferState.LAYOVER,
+      ].includes(this.$data.transfer.TransferState)) {
+        toastManager.openToast(`This transfer type (${this.$data.transfer.TransferState}) is ineligible for COA download`, {
+          title: 'Download Error',
+          autoHideDelay: 3000,
+          variant: 'danger',
+          appendToast: true,
+          toaster: 'ttt-toaster',
+          solid: true,
+        });
+
+        return;
+      }
+
       toastManager.openToast('Downloading all available COAs from this transfer...', {
         title: 'Download in progress',
         autoHideDelay: 3000,
@@ -667,10 +713,6 @@ export default Vue.extend({
         toaster: 'ttt-toaster',
         solid: true,
       });
-
-      const transfer: IIndexedTransferData = this.$data.transfer;
-
-      const packages: IIndexedDestinationPackageData[] = [];
 
       switch (this.$data.transfer.TransferState as TransferState) {
         case TransferState.INCOMING:
@@ -688,23 +730,27 @@ export default Vue.extend({
         case TransferState.OUTGOING_INACTIVE:
         case TransferState.LAYOVER:
         default:
-          toastManager.openToast('This transfer type is ineligible for COA download', {
-            title: 'Download Error',
-            autoHideDelay: 3000,
-            variant: 'danger',
-            appendToast: true,
-            toaster: 'ttt-toaster',
-            solid: true,
-          });
-          // Show error message and exit
           return;
       }
 
+      const urls: Set<string> = new Set();
+
       for (const pkg of packages) {
-        downloadLabTests({ pkg });
+        const testResults = await generatePackageTestResultData({ pkg });
+        testResults.testResultPdfUrls.map((x) => urls.add(x));
+
+        await downloadLabTestPdfs({ pkg });
       }
 
-      toastManager.openToast('Finished downloading all COAs', {
+      // for (const pkg of packages) {
+      //   urls.push(...(await getLabTestPdfUrlsFromPackage({ pkg })));
+
+      //   downloadLabTestPdfs({ pkg });
+      // }
+
+      // console.log(urls);
+
+      toastManager.openToast(`Finished downloading ${urls.size} COAs`, {
         title: 'Success',
         autoHideDelay: 3000,
         variant: 'primary',

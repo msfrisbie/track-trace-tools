@@ -1,15 +1,15 @@
-import { METRC_TAG_REGEX, PackageFilterIdentifiers, PackageState } from '@/consts';
+import { METRC_TAG_REGEX, PackageState } from '@/consts';
 import {
+  ICsvFile,
   IDestinationData,
   IDestinationPackageData,
   IIndexedDestinationPackageData,
   IIndexedPackageData,
   IIndexedTransferData,
-  IMetadataSimplePackageData,
-  IPackageData,
-  ISimpleCogsPackageData,
+  IMetadataSimplePackageData, ISimpleCogsPackageData,
   ISimplePackageData,
   ISimpleTransferPackageData,
+  ITestResultData,
   IUnionIndexedPackageData,
 } from '@/interfaces';
 import { authManager } from '@/modules/auth-manager.module';
@@ -18,6 +18,7 @@ import {
   primaryDataLoader,
 } from '@/modules/data-loader/data-loader.module';
 import { toastManager } from '@/modules/toast-manager.module';
+import { downloadCsvFile } from './csv';
 import { downloadFileFromUrl } from './dom';
 import { extractParentPackageLabelsFromHistory } from './history';
 import {
@@ -239,16 +240,16 @@ export async function getParentPackageLabels(pkg: ISimpleTransferPackageData | I
   return stringParsedPackageLabels;
 }
 
-export async function getLabTestUrlsFromPackage({
+export async function getLabTestResultsFromPackage({
   pkg,
-  showZeroResultsError = true,
-}: {
-  pkg: IUnionIndexedPackageData;
-  showZeroResultsError?: boolean;
-}): Promise<string[]> {
-  const authState = await authManager.authStateOrError();
+}: {pkg:IUnionIndexedPackageData}): Promise<ITestResultData[]> {
+  return primaryDataLoader.testResultsByPackageId(getIdOrError(pkg));
+}
 
-  const testResults = await primaryDataLoader.testResultsByPackageId(getIdOrError(pkg));
+export async function getLabTestFileIdsFromPackage({
+  pkg,
+}: {pkg:IUnionIndexedPackageData}): Promise<number[]> {
+  const testResults = await getLabTestResultsFromPackage({ pkg });
 
   const fileIds = new Set<number>();
 
@@ -258,7 +259,57 @@ export async function getLabTestUrlsFromPackage({
     }
   }
 
-  if (fileIds.size === 0 && showZeroResultsError) {
+  return [...fileIds];
+}
+
+export async function generatePackageTestResultData({ pkg }: {pkg: IUnionIndexedPackageData}): Promise<{
+  testResults: ITestResultData[],
+  testResultPdfUrls: string[]
+}> {
+  const authState = await authManager.authStateOrError();
+
+  const capabilities: {
+    testResults: ITestResultData[],
+    testResultPdfUrls: string[]
+  } = {
+    testResults: [],
+    testResultPdfUrls: [],
+  };
+
+  if (!pkg.testResults) {
+    pkg.testResults = await getLabTestResultsFromPackage({ pkg });
+  }
+
+  capabilities.testResults = pkg.testResults;
+
+  const fileIds = new Set<number>();
+
+  for (const testResult of pkg.testResults) {
+    if (testResult.LabTestResultDocumentFileId) {
+      fileIds.add(testResult.LabTestResultDocumentFileId);
+    }
+  }
+
+  capabilities.testResultPdfUrls = [...fileIds].map(
+    (fileId) =>
+      `${window.location.origin}/filesystem/${authState.license}/download/labtest/result/document?packageId=${getIdOrError(pkg)}&labTestResultDocumentFileId=${fileId}`,
+  );
+
+  return capabilities;
+}
+
+export async function getLabTestPdfUrlsFromPackage({
+  pkg,
+  showZeroResultsError = true,
+}: {
+  pkg: IUnionIndexedPackageData;
+  showZeroResultsError?: boolean;
+}): Promise<string[]> {
+  const authState = await authManager.authStateOrError();
+
+  const fileIds = await getLabTestFileIdsFromPackage({ pkg });
+
+  if (fileIds.length === 0 && showZeroResultsError) {
     setTimeout(() => {
       toastManager.openToast('Metrc did not return any lab PDFs for this package.', {
         title: 'Missing Lab Results',
@@ -273,81 +324,59 @@ export async function getLabTestUrlsFromPackage({
     return [];
   }
 
-  return [...fileIds].map(
+  return fileIds.map(
     (fileId) =>
       `${window.location.origin}/filesystem/${authState.license}/download/labtest/result/document?packageId=${getIdOrError(pkg)}&labTestResultDocumentFileId=${fileId}`,
   );
-
-  // for (let fileId of fileIds) {
-  //     const url = ;
-
-  //     console.log(url);
-
-  //     downloadFileFromUrl({ url, filename: `${pkg.Label}.pdf` });
-  // }
 }
 
-export async function downloadLabTests({ pkg }: { pkg: IUnionIndexedPackageData }) {
-  const fileUrls = await getLabTestUrlsFromPackage({ pkg });
+export async function downloadLabTestPdfs({ pkg }: { pkg: IUnionIndexedPackageData }) {
+  const testResultData = await generatePackageTestResultData({ pkg });
 
-  for (const url of fileUrls) {
+  for (const url of testResultData.testResultPdfUrls) {
     downloadFileFromUrl({ url, filename: `${getLabelOrError(pkg)}.pdf` });
   }
-
-  // const authState = await authManager.authStateOrError();
-
-  // const testResults = await primaryDataLoader.testResultsByPackageId(pkg.Id);
-
-  // let fileIds = new Set<number>();
-
-  // for (let testResult of testResults) {
-  //     if (testResult.LabTestResultDocumentFileId) {
-  //         fileIds.add(testResult.LabTestResultDocumentFileId);
-  //     }
-  // }
-
-  // if (fileIds.size === 0) {
-  //     setTimeout(() => {
-  //         toastManager.openToast(
-  //             `Metrc did not return any lab PDFs for this package.`,
-  //             {
-  //                 title: "Missing Lab Results",
-  //                 autoHideDelay: 5000,
-  //                 variant: "danger",
-  //                 appendToast: true,
-  //                 toaster: "ttt-toaster",
-  //                 solid: true,
-  //             }
-  //         );
-  //     }, 500);
-
-  //     return;
-  // }
-
-  // for (let fileId of fileIds) {
-  //     const url = `${window.location.origin}/filesystem/${authState.license}/download/labtest/result/document?packageId=${pkg.Id}&labTestResultDocumentFileId=${fileId}`;
-
-  //     console.log(url);
-
-  //     downloadFileFromUrl({ url, filename: `${pkg.Label}.pdf` });
-  // }
 }
 
-// Assume a single match, return an array of length 3
-//
-// 'foo', '
-//
-// []
-function splitSearchResultMatch(queryString: string, text: string): string[] | null {
-  return null;
-}
+export async function downloadLabTestCsv({ pkg }: { pkg: IUnionIndexedPackageData }) {
+  const testResultData = await generatePackageTestResultData({ pkg });
 
-export function packageFieldMatch(
-  queryString: string,
-  pkg: IPackageData,
-  packageFilterIdentifier: PackageFilterIdentifiers,
-): string[] | null {
-  return null;
+  const matrix: any[][] = [[
+    'Test Date',
+    'Test Name',
+    'Overall Passed?',
+    'Result',
+    'Notes',
+    'Released Date',
+    'Sample Package',
+    'Item',
+    'Category',
+    'Lab Facility License Number',
+    'Lab Facility Name',
+  ]];
+
+  for (const testResult of testResultData.testResults) {
+    matrix.push([
+      testResult.TestPerformedDate,
+      testResult.TestTypeName,
+      testResult.OverallPassed,
+      testResult.TestResultLevel,
+      testResult.TestComment,
+      testResult.ResultReleaseDateTime,
+      testResult.SourcePackageLabel,
+      testResult.ProductName,
+      testResult.ProductCategoryName,
+      testResult.LabFacilityLicenseNumber,
+      testResult.LabFacilityName,
+    ]);
+  }
+
+  const csvFile: ICsvFile = {
+    filename: `lab-results-${getLabelOrError(pkg)}.csv`,
+    data: matrix,
+  };
+
+  await downloadCsvFile({ csvFile, delay: 500 });
 }
 
 export function simplePackageConverter(pkg: IIndexedPackageData): ISimplePackageData {
