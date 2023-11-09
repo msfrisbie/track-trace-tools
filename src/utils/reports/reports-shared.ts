@@ -1,25 +1,25 @@
 import { SheetTitles } from '@/consts';
 import {
-  IDestinationData,
-  IIndexedDestinationPackageData,
-  IIndexedPlantBatchData,
-  IIndexedRichIncomingTransferData,
-  IIndexedRichOutgoingTransferData,
-  IIndexedTransferData,
-  ITransferData,
-  ITransporterData,
+    IDestinationData,
+    IIndexedDestinationPackageData,
+    IIndexedPlantBatchData,
+    IIndexedRichIncomingTransferData,
+    IIndexedRichOutgoingTransferData,
+    IIndexedTransferData,
+    ITransferData,
+    ITransporterData
 } from '@/interfaces';
 import {
-  FIELD_TRANSFORMER_REPORT_TYPES,
-  ReportType,
+    FIELD_TRANSFORMER_REPORT_TYPES,
+    ReportType
 } from '@/store/page-overlay/modules/reports/consts';
 import {
-  IFieldData,
-  IReportConfig,
-  IReportData,
+    IFieldData,
+    IReportConfig,
+    IReportData
 } from '@/store/page-overlay/modules/reports/interfaces';
 import { todayIsodate } from '../date';
-import { extractExmployeeAuditData } from './employee-audit-report';
+import { extractEmployeeAuditData } from './employee-audit-report';
 import { extractHarvestPackagesData } from './harvest-packages-report';
 import { extractImmaturePlantPropertyFromDimension } from './immature-plants-quickview-report';
 import { extractMaturePlantPropertyFromDimension } from './mature-plants-quickview-report';
@@ -306,7 +306,7 @@ export function extractFlattenedData({
         }
         return flattenedOutgoingPackages;
       case ReportType.EMPLOYEE_AUDIT:
-        return extractExmployeeAuditData({
+        return extractEmployeeAuditData({
           reportType,
           reportConfig,
           reportData,

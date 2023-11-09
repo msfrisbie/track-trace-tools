@@ -3,7 +3,7 @@ import {
   IIndexedTransferData,
   IPackageFilter,
   IPluginState,
-  ITransferFilter,
+  ITransferFilter
 } from '@/interfaces';
 import { DataLoader, getDataLoaderByLicense } from '@/modules/data-loader/data-loader.module';
 import { facilityManager } from '@/modules/facility-manager.module';
@@ -12,7 +12,7 @@ import { ReportsMutations, ReportType } from '@/store/page-overlay/modules/repor
 import {
   IReportConfig,
   IReportData,
-  IReportsState,
+  IReportsState
 } from '@/store/page-overlay/modules/reports/interfaces';
 import { ActionContext } from 'vuex';
 import { todayIsodate } from '../date';
@@ -364,7 +364,7 @@ export async function maybeLoadEmployeeAuditReportData({
   }
 }
 
-export function extractExmployeeAuditData({
+export function extractEmployeeAuditData({
   reportType,
   reportConfig,
   reportData,

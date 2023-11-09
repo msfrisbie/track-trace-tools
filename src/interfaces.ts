@@ -2001,7 +2001,7 @@ export interface PackageMetadata {
 }
 
 export interface ITransferMetadata {
-  destinations: IDestinationData[];
+  destinations: IRichDestinationData[];
   packages: IIndexedDestinationPackageData[];
   packagesTestResults: {
     pkg: IIndexedDestinationPackageData;

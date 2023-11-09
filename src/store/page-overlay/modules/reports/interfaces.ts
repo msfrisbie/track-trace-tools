@@ -1,27 +1,24 @@
 import {
-  IAuthState,
-  IHarvestFilter,
+  IAuthState, IHarvestFilter,
   IIndexedHarvestData,
   IIndexedPackageData,
   IIndexedPlantBatchData,
   IIndexedPlantData,
   IIndexedRichIncomingTransferData,
   IIndexedRichOutgoingTransferData,
-  IIndexedTagData,
-  IPackageFilter,
+  IIndexedTagData, IPackageFilter,
   IPlantBatchFilter,
-  IPlantFilter,
-  ISimpleSpreadsheet,
+  IPlantFilter, ISimpleSpreadsheet,
   ISpreadsheet,
   ITagFilter,
-  ITransferFilter,
+  ITransferFilter
 } from '@/interfaces';
 import { ImmaturePlantQuickviewDimension } from '@/utils/reports/immature-plants-quickview-report';
 import { MaturePlantQuickviewDimension } from '@/utils/reports/mature-plants-quickview-report';
 import { PackageQuickviewDimension } from '@/utils/reports/packages-quickview-report';
 import {
   InventoryStrategy,
-  IPackageDateMetadata,
+  IPackageDateMetadata
 } from '@/utils/reports/point-in-time-inventory-report';
 import { IStatusMessage, ReportStatus, ReportType } from './consts';
 
@@ -114,6 +111,10 @@ export interface IReportConfig {
     employeeQuery: string;
     fields: null;
   };
+  [ReportType.SINGLE_TRANSFER]?: {
+    manifestNumber: string;
+    fields: null;
+  },
   [ReportType.PACKAGES_QUICKVIEW]?: {
     packageFilter: IPackageFilter;
     primaryDimension: PackageQuickviewDimension;
@@ -244,6 +245,9 @@ export interface IReportData {
   [ReportType.TRANSFER_HUB_TRANSFER_MANIFESTS]?: {
     richTransferHubTransfers?: IIndexedRichOutgoingTransferData[];
   };
+  [ReportType.SINGLE_TRANSFER]?: {
+    singleTransferMatrix: any[][];
+  }
 }
 
 export interface IFieldData {

@@ -478,18 +478,21 @@ export async function generateTransferMetadata({
   switch (transfer.TransferState) {
     case TransferState.INCOMING:
     case TransferState.INCOMING_INACTIVE:
-      transferMetadata.packages.push(
-        ...(await primaryDataLoader.destinationPackages(transfer.DeliveryId))
-      );
+      const packages = await primaryDataLoader.destinationPackages(transfer.DeliveryId);
+
+      transferMetadata.packages.push(...packages);
       break;
     case TransferState.OUTGOING:
     case TransferState.REJECTED:
     case TransferState.OUTGOING_INACTIVE:
       transferMetadata.destinations = await primaryDataLoader.transferDestinations(transfer.Id);
       for (const destination of transferMetadata.destinations) {
-        transferMetadata.packages.push(
-          ...(await primaryDataLoader.destinationPackages(destination.Id))
-        );
+        const packages = await primaryDataLoader.destinationPackages(destination.Id);
+
+        destination.packages = packages;
+        destination.transporters = await primaryDataLoader.destinationTransporters(destination.Id);
+
+        transferMetadata.packages.push(...packages);
       }
       break;
     case TransferState.LAYOVER:
@@ -500,10 +503,6 @@ export async function generateTransferMetadata({
   const fileIds = new Set<number>();
 
   for (const pkg of transferMetadata.packages) {
-    // if (!pkg.testResults) {
-    //   pkg.testResults = [];
-    // }
-
     promises.push(
       getLabTestResultsFromPackage({ pkg }).then((response) => { pkg.testResults = response; })
     );
@@ -533,8 +532,6 @@ export async function generateTransferMetadata({
       testResultPdfUrls,
     });
   }
-
-  console.log({ transferMetadata });
 
   return transferMetadata;
 }

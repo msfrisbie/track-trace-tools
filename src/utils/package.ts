@@ -11,12 +11,12 @@ import {
   ISimpleTransferPackageData,
   ITestResultData,
   IUnionIndexedPackageData,
-  PackageMetadata,
+  PackageMetadata
 } from '@/interfaces';
 import { authManager } from '@/modules/auth-manager.module';
 import {
   getDataLoaderByLicense,
-  primaryDataLoader,
+  primaryDataLoader
 } from '@/modules/data-loader/data-loader.module';
 import { toastManager } from '@/modules/toast-manager.module';
 import { downloadCsvFile } from './csv';
@@ -26,7 +26,7 @@ import {
   UnitOfMeasureAbbreviation,
   unitOfMeasureAbbreviationToName,
   UnitOfMeasureName,
-  unitOfMeasureNameToAbbreviation,
+  unitOfMeasureNameToAbbreviation
 } from './units';
 
 export function getIdOrError(unionPkg: IUnionIndexedPackageData): number {
@@ -71,6 +71,28 @@ export function getStrainNameOrError(unionPkg: IUnionIndexedPackageData): string
     return (pkg as IDestinationPackageData).ItemStrainName ?? '';
   }
   throw new Error('Could not extract Strain Name');
+}
+
+export function getSourceHarvestNamesOrError(unionPkg: IUnionIndexedPackageData): string {
+  const pkg = unionPkg as any;
+  if ('SourceHarvestNames' in pkg) {
+    return (pkg as IIndexedPackageData).SourceHarvestNames;
+  }
+  if ('SourceHarvestNames' in pkg) {
+    return (pkg as IDestinationPackageData).SourceHarvestNames;
+  }
+  throw new Error('Could not extract Harvest Names');
+}
+
+export function getSourcePackageTagsOrError(unionPkg: IUnionIndexedPackageData): string {
+  const pkg = unionPkg as any;
+  if ('SourcePackageLabels' in pkg) {
+    return (pkg as IIndexedPackageData).SourcePackageLabels;
+  }
+  if ('SourcePackageLabels' in pkg) {
+    return (pkg as IDestinationPackageData).SourcePackageLabels;
+  }
+  throw new Error('Could not extract Source Pakcage Tags');
 }
 
 export function getItemNameOrError(unionPkg: IUnionIndexedPackageData): string {
