@@ -60,8 +60,10 @@ import { BootstrapVue } from 'bootstrap-vue';
 import { debounceTime } from 'rxjs/operators';
 import Vue from 'vue';
 import VueTypeaheadBootstrap from 'vue-typeahead-bootstrap';
+import Fragment from 'vue-fragment';
 
 Vue.use(BootstrapVue);
+Vue.use(Fragment.Plugin);
 Vue.component('vue-typeahead-bootstrap', VueTypeaheadBootstrap);
 Vue.component('font-awesome-icon', FontAwesomeIcon);
 

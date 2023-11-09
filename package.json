@@ -53,6 +53,7 @@
     "uuid": "^8.3.1",
     "uuidv4": "^6.2.5",
     "vue": "^2.6.12",
+    "vue-fragment": "^1.6.0",
     "vue-intersection-observer": "^0.1.8",
     "vue-markdown-render": "^2.0.1",
     "vue-mv3-hot-reload": "github:awardx/vue-extension-mv3-hot-reload",
