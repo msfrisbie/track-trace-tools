@@ -57,7 +57,7 @@
         size="sm"
         variant="outline-primary"
         disabled
-        class="flex flex-row items-center gap-2"
+        class="flex flex-row items-center justify-center gap-2"
       >
         <b-spinner small /> <span> Loading package test data...</span>
       </b-button>
@@ -108,8 +108,8 @@
 </template>
 
 <script lang="ts">
-import { MessageType, ModalAction, ModalType, PackageState, TransferState } from "@/consts";
-import { IIndexedTransferData, IPluginState, IUnionIndexedPackageData } from "@/interfaces";
+import { MessageType, ModalAction, ModalType, PackageState } from "@/consts";
+import { IPluginState, IUnionIndexedPackageData } from "@/interfaces";
 import { analyticsManager } from "@/modules/analytics-manager.module";
 import { modalManager } from "@/modules/modal-manager.module";
 import router from "@/router/index";
@@ -165,24 +165,13 @@ export default Vue.extend({
 
       return this.$data.packageMetadata.testResultPdfUrls.length > 0;
     },
-    enableEditTransferButton(): boolean {
-      if ((this.$data.transfer as IIndexedTransferData)?.TransferState !== TransferState.OUTGOING) {
-        return false;
-      }
-
-      if (!store.state.client.values.ENABLE_TRANSFER_EDIT) {
-        return false;
-      }
-
-      return true;
-    },
     isIdentityEligibleForTransferToolsImpl(): boolean {
       return isIdentityEligibleForTransferTools({
         hostname: window.location.hostname,
       });
     },
     isPackageEligibleForSplit(): boolean {
-      return this.$data.pkg?.PackageState === PackageState.ACTIVE;
+      return this.$props.pkg?.PackageState === PackageState.ACTIVE;
     },
     isIdentityEligibleForSplitToolsImpl(): boolean {
       return isIdentityEligibleForSplitTools({
@@ -228,7 +217,7 @@ export default Vue.extend({
     transferPackage() {
       analyticsManager.track(MessageType.CONTEXT_MENU_SELECT, { event: "transferPackage" });
 
-      this.addPackageToTransferList({ pkg: this.$data.pkg });
+      this.addPackageToTransferList({ pkg: this.$props.pkg });
 
       analyticsManager.track(MessageType.STARTED_TRANSFER_FROM_INLINE_BUTTON, {});
       modalManager.dispatchModalEvent(ModalType.BUILDER, ModalAction.OPEN, {
@@ -239,7 +228,7 @@ export default Vue.extend({
     splitPackage() {
       analyticsManager.track(MessageType.CONTEXT_MENU_SELECT, { event: "splitPackage" });
 
-      this.setSplitSourcePackage({ pkg: this.$data.pkg });
+      this.setSplitSourcePackage({ pkg: this.$props.pkg });
 
       analyticsManager.track(MessageType.SPLIT_PACKAGE_FROM_TOOLKIT_SEARCH, {});
       modalManager.dispatchModalEvent(ModalType.BUILDER, ModalAction.OPEN, {
@@ -250,7 +239,7 @@ export default Vue.extend({
     async viewLabTests() {
       analyticsManager.track(MessageType.CONTEXT_MENU_SELECT, { event: "viewLabTests" });
 
-      const labTestData = await generatePackageMetadata({ pkg: this.$data.pkg });
+      const labTestData = await generatePackageMetadata({ pkg: this.$props.pkg });
 
       modalManager.dispatchModalEvent(ModalType.DOCUMENT, ModalAction.OPEN, {
         documentUrls: labTestData.testResultPdfUrls,
@@ -261,7 +250,7 @@ export default Vue.extend({
     async printLabTests() {
       analyticsManager.track(MessageType.CONTEXT_MENU_SELECT, { event: "printLabTests" });
 
-      const labTestData = await generatePackageMetadata({ pkg: this.$data.pkg });
+      const labTestData = await generatePackageMetadata({ pkg: this.$props.pkg });
 
       printPdfFromUrl({ urls: labTestData.testResultPdfUrls, modal: true });
 
@@ -271,7 +260,7 @@ export default Vue.extend({
     downloadLabTestPdfs() {
       analyticsManager.track(MessageType.CONTEXT_MENU_SELECT, { event: "downloadLabTestPdfs" });
 
-      downloadLabTestPdfs({ pkg: this.$data.pkg });
+      downloadLabTestPdfs({ pkg: this.$props.pkg });
 
       analyticsManager.track(MessageType.CLICKED_DOWNLOAD_LAB_TEST_BUTTON);
       this.dismiss();
@@ -279,7 +268,7 @@ export default Vue.extend({
     downloadLabTestCsv() {
       analyticsManager.track(MessageType.CONTEXT_MENU_SELECT, { event: "downloadLabTestCsv" });
 
-      downloadLabTestCsv({ pkg: this.$data.pkg });
+      downloadLabTestCsv({ pkg: this.$props.pkg });
 
       analyticsManager.track(MessageType.CLICKED_DOWNLOAD_LAB_TEST_BUTTON);
       this.dismiss();
@@ -289,6 +278,7 @@ export default Vue.extend({
     pkg: {
       immediate: true,
       async handler(newValue, oldValue) {
+        this.$data.packageMetadata = null;
         if (newValue) {
           this.$data.packageMetadata = await generatePackageMetadata({ pkg: newValue });
         }

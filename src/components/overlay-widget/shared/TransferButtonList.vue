@@ -48,20 +48,6 @@
       </div>
     </b-button>
 
-    <b-button
-      size="sm"
-      :disabled="!transfer || (!clientValues['ENABLE_T3PLUS'] && !t3plus)"
-      variant="outline-primary"
-      @click.stop.prevent="downloadAllLabTests()"
-      ><div class="w-full grid grid-cols-2 gap-2" style="grid-template-columns: 1fr auto">
-        <span>DOWNLOAD ALL LAB TESTS</span>
-
-        <div class="aspect-square grid place-items-center">
-          <font-awesome-icon icon="file-download" />
-        </div>
-      </div>
-    </b-button>
-
     <b-button size="sm" variant="outline-primary" @click.stop.prevent="createScanSheet()"
       ><div class="w-full grid grid-cols-2 gap-2" style="grid-template-columns: 1fr auto">
         <span>CREATE SCAN SHEET</span>
@@ -71,14 +57,58 @@
         </div>
       </div>
     </b-button>
+
+    <template v-if="!transferMetadataLoaded">
+      <b-button
+        size="sm"
+        variant="outline-primary"
+        disabled
+        class="flex flex-row items-center justify-center gap-2"
+      >
+        <b-spinner small /> <span> Loading transfer test data...</span>
+      </b-button>
+    </template>
+
+    <template v-if="transferMetadataLoaded">
+      <template v-if="displayTransferLabTestPdfOptions">
+        <b-button
+          size="sm"
+          :disabled="!transfer || (!clientValues['ENABLE_T3PLUS'] && !t3plus)"
+          variant="outline-primary"
+          @click.stop.prevent="downloadAllLabTestPdfs()"
+          ><div class="w-full grid grid-cols-2 gap-2" style="grid-template-columns: 1fr auto">
+            <span>DOWNLOAD ALL LAB TEST PDFS</span>
+
+            <div class="aspect-square grid place-items-center">
+              <font-awesome-icon icon="file-download" />
+            </div>
+          </div>
+        </b-button>
+      </template>
+
+      <template v-if="displayTransferLabTestCsvOptions">
+        <b-button
+          size="sm"
+          :disabled="!transfer || (!clientValues['ENABLE_T3PLUS'] && !t3plus)"
+          variant="outline-primary"
+          @click.stop.prevent="downloadAllLabTestCsvs()"
+          ><div class="w-full grid grid-cols-2 gap-2" style="grid-template-columns: 1fr auto">
+            <span>DOWNLOAD ALL LAB TEST RESULT CSVS</span>
+
+            <div class="aspect-square grid place-items-center">
+              <font-awesome-icon icon="file-csv" />
+            </div>
+          </div>
+        </b-button>
+      </template>
+    </template>
   </fragment>
 </template>
 
 <script lang="ts">
 import { MessageType, ModalAction, ModalType, TransferState } from "@/consts";
-import { IIndexedDestinationPackageData, IIndexedTransferData, IPluginState } from "@/interfaces";
+import { IIndexedTransferData, IPluginState, ITransferMetadata } from "@/interfaces";
 import { analyticsManager } from "@/modules/analytics-manager.module";
-import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
 import { modalManager } from "@/modules/modal-manager.module";
 import { toastManager } from "@/modules/toast-manager.module";
 import router from "@/router/index";
@@ -91,8 +121,8 @@ import { SearchActions } from "@/store/page-overlay/modules/search/consts";
 import { SplitPackageBuilderActions } from "@/store/page-overlay/modules/split-package-builder/consts";
 import { TransferBuilderActions } from "@/store/page-overlay/modules/transfer-builder/consts";
 import { downloadFileFromUrl, printPdfFromUrl } from "@/utils/dom";
-import { downloadLabTestPdfs, generatePackageMetadata, getLabelOrError } from "@/utils/package";
-import { createScanSheet } from "@/utils/transfer";
+import { downloadLabTestCsv, downloadLabTestPdfs, getLabelOrError } from "@/utils/package";
+import { createScanSheet, generateTransferMetadata } from "@/utils/transfer";
 import Vue from "vue";
 import { mapActions, mapState } from "vuex";
 
@@ -111,6 +141,19 @@ export default Vue.extend({
       authState: (state: IPluginState) => state.pluginAuth.authState,
       oAuthState: (state: IPluginState) => state.pluginAuth.oAuthState,
     }),
+    transferMetadataLoaded(): boolean {
+      return !!this.$data.transferMetadata;
+    },
+    displayTransferLabTestPdfOptions(): boolean {
+      return !!(this.$data.transferMetadata as ITransferMetadata)?.packagesTestResults.find(
+        (x) => x.testResultPdfUrls.length > 0
+      );
+    },
+    displayTransferLabTestCsvOptions(): boolean {
+      return !!(this.$data.transferMetadata as ITransferMetadata)?.packagesTestResults.find(
+        (x) => x.testResults.length > 0
+      );
+    },
     enableEditTransferButton(): boolean {
       if (
         (this.$props.transfer as IIndexedTransferData)?.TransferState !== TransferState.OUTGOING
@@ -130,7 +173,7 @@ export default Vue.extend({
   },
   data() {
     return {
-      transferLabResultData: null,
+      transferMetadata: null,
     };
   },
   methods: {
@@ -196,33 +239,41 @@ export default Vue.extend({
       analyticsManager.track(MessageType.CLICKED_DOWNLOAD_MANIFEST_BUTTON);
       this.dismiss();
     },
-    async downloadAllLabTests() {
+    async downloadAllLabTestCsvs() {
       // Show message immediately inflight...
-      analyticsManager.track(MessageType.CONTEXT_MENU_SELECT, { event: "downloadAllLabTests" });
+      analyticsManager.track(MessageType.CONTEXT_MENU_SELECT, { event: "downloadAllLabTestCsvs" });
 
-      const transfer: IIndexedTransferData = this.$props.transfer;
+      toastManager.openToast("Downloading all available lab results from this transfer...", {
+        title: "Download in progress",
+        autoHideDelay: 3000,
+        variant: "primary",
+        appendToast: true,
+        toaster: "ttt-toaster",
+        solid: true,
+      });
 
-      const packages: IIndexedDestinationPackageData[] = [];
-
-      if (
-        [TransferState.OUTGOING_INACTIVE, TransferState.LAYOVER].includes(
-          this.$props.transfer.TransferState
-        )
-      ) {
-        toastManager.openToast(
-          `This transfer type (${this.$props.transfer.TransferState}) is ineligible for COA download`,
-          {
-            title: "Download Error",
-            autoHideDelay: 3000,
-            variant: "danger",
-            appendToast: true,
-            toaster: "ttt-toaster",
-            solid: true,
-          }
-        );
-
-        return;
+      for (const pkg of (this.$data.transferMetadata as ITransferMetadata).packages) {
+        await downloadLabTestCsv({ pkg });
       }
+
+      const testedPackageCount: number = (
+        this.$data.transferMetadata as ITransferMetadata
+      ).packagesTestResults.filter((x) => x.testResults.length > 0).length;
+
+      toastManager.openToast(`Finished downloading ${testedPackageCount} test result CSVs`, {
+        title: "Success",
+        autoHideDelay: 3000,
+        variant: "primary",
+        appendToast: true,
+        toaster: "ttt-toaster",
+        solid: true,
+      });
+
+      this.dismiss();
+    },
+    async downloadAllLabTestPdfs() {
+      // Show message immediately inflight...
+      analyticsManager.track(MessageType.CONTEXT_MENU_SELECT, { event: "downloadAllLabTestPdfs" });
 
       toastManager.openToast("Downloading all available COAs from this transfer...", {
         title: "Download in progress",
@@ -233,43 +284,19 @@ export default Vue.extend({
         solid: true,
       });
 
-      switch (this.$props.transfer.TransferState as TransferState) {
-        case TransferState.INCOMING:
-        case TransferState.INCOMING_INACTIVE:
-          packages.concat(await primaryDataLoader.destinationPackages(transfer.DeliveryId));
-          break;
-        case TransferState.OUTGOING:
-        case TransferState.REJECTED:
-          const destinations = await primaryDataLoader.transferDestinations(transfer.Id);
-          for (const destination of destinations) {
-            packages.concat(await primaryDataLoader.destinationPackages(destination.Id));
-          }
-          // Need to load destinations, then packages
-          break;
-        case TransferState.OUTGOING_INACTIVE:
-        case TransferState.LAYOVER:
-        default:
-          return;
-      }
-
-      const urls: Set<string> = new Set();
-
-      for (const pkg of packages) {
-        const testResults = await generatePackageMetadata({ pkg });
-        testResults.testResultPdfUrls.map((x) => urls.add(x));
-
+      for (const pkg of (this.$data.transferMetadata as ITransferMetadata).packages) {
         await downloadLabTestPdfs({ pkg });
       }
 
-      // for (const pkg of packages) {
-      //   urls.push(...(await getLabTestPdfUrlsFromPackage({ pkg })));
+      const mergedPdfs: string[] = [
+        ...new Set(
+          (this.$data.transferMetadata as ITransferMetadata).packagesTestResults.map(
+            (x) => x.testResultPdfUrls
+          )
+        ),
+      ].flat();
 
-      //   downloadLabTestPdfs({ pkg });
-      // }
-
-      // console.log(urls);
-
-      toastManager.openToast(`Finished downloading ${urls.size} COAs`, {
+      toastManager.openToast(`Finished downloading ${mergedPdfs.length} COAs`, {
         title: "Success",
         autoHideDelay: 3000,
         variant: "primary",
@@ -295,9 +322,9 @@ export default Vue.extend({
     transfer: {
       immediate: true,
       async handler(newValue, oldValue) {
+        this.$data.transferMetadata = null;
         if (newValue) {
-          // TODO
-          //   this.$data.packageLabResultData = await generatePackageMetadata({ pkg: newValue });
+          this.$data.transferMetadata = await generateTransferMetadata({ transfer: newValue });
         }
       },
     },
