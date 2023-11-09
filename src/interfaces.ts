@@ -1994,3 +1994,8 @@ export interface IMetrcEmployeeData {
     StoreGridConfigRemotely: boolean;
   };
 }
+
+export interface PackageMetadata {
+  testResults: ITestResultData[],
+  testResultPdfUrls: string[]
+}

@@ -11,6 +11,7 @@ import {
   ISimpleTransferPackageData,
   ITestResultData,
   IUnionIndexedPackageData,
+  PackageMetadata,
 } from '@/interfaces';
 import { authManager } from '@/modules/auth-manager.module';
 import {
@@ -262,16 +263,10 @@ export async function getLabTestFileIdsFromPackage({
   return [...fileIds];
 }
 
-export async function generatePackageTestResultData({ pkg }: {pkg: IUnionIndexedPackageData}): Promise<{
-  testResults: ITestResultData[],
-  testResultPdfUrls: string[]
-}> {
+export async function generatePackageMetadata({ pkg }: {pkg: IUnionIndexedPackageData}): Promise<PackageMetadata> {
   const authState = await authManager.authStateOrError();
 
-  const capabilities: {
-    testResults: ITestResultData[],
-    testResultPdfUrls: string[]
-  } = {
+  const packageMetadata: PackageMetadata = {
     testResults: [],
     testResultPdfUrls: [],
   };
@@ -280,7 +275,7 @@ export async function generatePackageTestResultData({ pkg }: {pkg: IUnionIndexed
     pkg.testResults = await getLabTestResultsFromPackage({ pkg });
   }
 
-  capabilities.testResults = pkg.testResults;
+  packageMetadata.testResults = pkg.testResults;
 
   const fileIds = new Set<number>();
 
@@ -290,12 +285,12 @@ export async function generatePackageTestResultData({ pkg }: {pkg: IUnionIndexed
     }
   }
 
-  capabilities.testResultPdfUrls = [...fileIds].map(
+  packageMetadata.testResultPdfUrls = [...fileIds].map(
     (fileId) =>
       `${window.location.origin}/filesystem/${authState.license}/download/labtest/result/document?packageId=${getIdOrError(pkg)}&labTestResultDocumentFileId=${fileId}`,
   );
 
-  return capabilities;
+  return packageMetadata;
 }
 
 export async function getLabTestPdfUrlsFromPackage({
@@ -331,7 +326,7 @@ export async function getLabTestPdfUrlsFromPackage({
 }
 
 export async function downloadLabTestPdfs({ pkg }: { pkg: IUnionIndexedPackageData }) {
-  const testResultData = await generatePackageTestResultData({ pkg });
+  const testResultData = await generatePackageMetadata({ pkg });
 
   for (const url of testResultData.testResultPdfUrls) {
     downloadFileFromUrl({ url, filename: `${getLabelOrError(pkg)}.pdf` });
@@ -339,7 +334,7 @@ export async function downloadLabTestPdfs({ pkg }: { pkg: IUnionIndexedPackageDa
 }
 
 export async function downloadLabTestCsv({ pkg }: { pkg: IUnionIndexedPackageData }) {
-  const testResultData = await generatePackageTestResultData({ pkg });
+  const testResultData = await generatePackageMetadata({ pkg });
 
   const matrix: any[][] = [[
     'Test Date',
