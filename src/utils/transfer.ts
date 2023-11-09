@@ -462,8 +462,10 @@ export async function findMatchingTransferPackages({
 
 export async function generateTransferMetadata({
   transfer,
+  loadPackageTestData
 }: {
   transfer: IIndexedTransferData;
+  loadPackageTestData: boolean;
 }): Promise<ITransferMetadata> {
   const authState = await authManager.authStateOrError();
 
@@ -500,37 +502,39 @@ export async function generateTransferMetadata({
       return transferMetadata;
   }
 
-  const fileIds = new Set<number>();
+  if (loadPackageTestData) {
+    const fileIds = new Set<number>();
 
-  for (const pkg of transferMetadata.packages) {
-    promises.push(
-      getLabTestResultsFromPackage({ pkg }).then((response) => { pkg.testResults = response; })
-    );
-  }
-
-  await Promise.allSettled(promises);
-
-  for (const pkg of transferMetadata.packages) {
-    for (const testResult of pkg.testResults!) {
-      if (testResult.LabTestResultDocumentFileId) {
-        fileIds.add(testResult.LabTestResultDocumentFileId);
-      }
+    for (const pkg of transferMetadata.packages) {
+      promises.push(
+        getLabTestResultsFromPackage({ pkg }).then((response) => { pkg.testResults = response; })
+      );
     }
 
-    const testResultPdfUrls: string[] = [...fileIds].map(
-      (fileId) =>
-        `${window.location.origin}/filesystem/${
-          authState.license
-        }/download/labtest/result/document?packageId=${getIdOrError(
-          pkg
-        )}&labTestResultDocumentFileId=${fileId}`
-    );
+    await Promise.allSettled(promises);
 
-    transferMetadata.packagesTestResults.push({
-      pkg,
-      testResults: pkg.testResults!,
-      testResultPdfUrls,
-    });
+    for (const pkg of transferMetadata.packages) {
+      for (const testResult of pkg.testResults!) {
+        if (testResult.LabTestResultDocumentFileId) {
+          fileIds.add(testResult.LabTestResultDocumentFileId);
+        }
+      }
+
+      const testResultPdfUrls: string[] = [...fileIds].map(
+        (fileId) =>
+          `${window.location.origin}/filesystem/${
+            authState.license
+          }/download/labtest/result/document?packageId=${getIdOrError(
+            pkg
+          )}&labTestResultDocumentFileId=${fileId}`
+      );
+
+      transferMetadata.packagesTestResults.push({
+        pkg,
+        testResults: pkg.testResults!,
+        testResultPdfUrls,
+      });
+    }
   }
 
   return transferMetadata;

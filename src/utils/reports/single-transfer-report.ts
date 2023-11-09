@@ -1,6 +1,7 @@
 import { TransferState } from "@/consts";
 import { IIndexedTransferData, IPluginState } from "@/interfaces";
 import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
+import { toastManager } from "@/modules/toast-manager.module";
 import store from '@/store/page-overlay/index';
 import { ReportType } from "@/store/page-overlay/modules/reports/consts";
 import { IReportConfig, IReportData, IReportsState } from "@/store/page-overlay/modules/reports/interfaces";
@@ -23,7 +24,8 @@ export async function maybeLoadSingleTransferReportData({
     let matchedTransfer: IIndexedTransferData | null = null;
 
     const handler = (transfer: IIndexedTransferData) => {
-      if (transfer) {
+      console.log({ transfer });
+      if (transfer && !matchedTransfer) {
         matchedTransfer = transfer;
       }
     };
@@ -38,11 +40,15 @@ export async function maybeLoadSingleTransferReportData({
         .outgoingInactiveTransfer(config.manifestNumber)
         .then(handler),
       primaryDataLoader.rejectedTransfer(config.manifestNumber).then(handler),
-      primaryDataLoader.layoverTransfer(config.manifestNumber).then(handler),
     ]);
 
+    // For some reason
     if (!matchedTransfer) {
-      // TODO error
+      await primaryDataLoader.layoverTransfer(config.manifestNumber).then(handler);
+    }
+
+    if (!matchedTransfer) {
+      toastManager.error('Could not match manifest number');
       return;
     }
 
@@ -51,7 +57,7 @@ export async function maybeLoadSingleTransferReportData({
 
     const singleTransferMatrix: any[][] = [];
 
-    const transferMetadata = await generateTransferMetadata({ transfer });
+    const transferMetadata = await generateTransferMetadata({ transfer, loadPackageTestData: false });
 
     switch (transfer.TransferState) {
       case TransferState.INCOMING:
@@ -153,7 +159,7 @@ export async function maybeLoadSingleTransferReportData({
         break;
       case TransferState.LAYOVER:
       default:
-        throw new Error('Bad transfer type');
+        throw new Error(`Bad transfer type: ${transfer.TransferState}`);
     }
 
     reportData[ReportType.SINGLE_TRANSFER] = {

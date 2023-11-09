@@ -48,6 +48,16 @@
       </div>
     </b-button>
 
+    <b-button size="sm" variant="outline-primary" @click.stop.prevent="downloadSummary()"
+      ><div class="w-full grid grid-cols-2 gap-2" style="grid-template-columns: 1fr auto">
+        <span>DOWNLOAD SUMMARY</span>
+
+        <div class="aspect-square grid place-items-center">
+          <font-awesome-icon icon="file-csv" />
+        </div>
+      </div>
+    </b-button>
+
     <b-button size="sm" variant="outline-primary" @click.stop.prevent="createScanSheet()"
       ><div class="w-full grid grid-cols-2 gap-2" style="grid-template-columns: 1fr auto">
         <span>CREATE SCAN SHEET</span>
@@ -109,6 +119,7 @@
 import { MessageType, ModalAction, ModalType, TransferState } from "@/consts";
 import { IIndexedTransferData, IPluginState, ITransferMetadata } from "@/interfaces";
 import { analyticsManager } from "@/modules/analytics-manager.module";
+import { authManager } from "@/modules/auth-manager.module";
 import { modalManager } from "@/modules/modal-manager.module";
 import { toastManager } from "@/modules/toast-manager.module";
 import router from "@/router/index";
@@ -117,6 +128,8 @@ import { ExplorerActions } from "@/store/page-overlay/modules/explorer/consts";
 import { PackageHistoryActions } from "@/store/page-overlay/modules/package-history/consts";
 import { PackageSearchActions } from "@/store/page-overlay/modules/package-search/consts";
 import { PluginAuthActions } from "@/store/page-overlay/modules/plugin-auth/consts";
+import { ReportsActions, ReportType } from "@/store/page-overlay/modules/reports/consts";
+import { IReportConfig } from "@/store/page-overlay/modules/reports/interfaces";
 import { SearchActions } from "@/store/page-overlay/modules/search/consts";
 import { SplitPackageBuilderActions } from "@/store/page-overlay/modules/split-package-builder/consts";
 import { TransferBuilderActions } from "@/store/page-overlay/modules/transfer-builder/consts";
@@ -239,6 +252,24 @@ export default Vue.extend({
       analyticsManager.track(MessageType.CLICKED_DOWNLOAD_MANIFEST_BUTTON);
       this.dismiss();
     },
+    async downloadSummary() {
+      analyticsManager.track(MessageType.CONTEXT_MENU_SELECT, { event: "downloadSummary" });
+
+      toastManager.info("Generating transfer summary CSV...");
+
+      const reportConfig: IReportConfig = {
+        authState: await authManager.authStateOrError(),
+        exportFormat: "CSV",
+        [ReportType.SINGLE_TRANSFER]: {
+          manifestNumber: this.$props.transfer.ManifestNumber as string,
+          fields: null,
+        },
+      };
+
+      store.dispatch(`reports/${ReportsActions.GENERATE_REPORT}`, { reportConfig });
+
+      this.dismiss();
+    },
     async downloadAllLabTestCsvs() {
       // Show message immediately inflight...
       analyticsManager.track(MessageType.CONTEXT_MENU_SELECT, { event: "downloadAllLabTestCsvs" });
@@ -324,7 +355,10 @@ export default Vue.extend({
       async handler(newValue, oldValue) {
         this.$data.transferMetadata = null;
         if (newValue) {
-          this.$data.transferMetadata = await generateTransferMetadata({ transfer: newValue });
+          this.$data.transferMetadata = await generateTransferMetadata({
+            transfer: newValue,
+            loadPackageTestData: true,
+          });
         }
       },
     },

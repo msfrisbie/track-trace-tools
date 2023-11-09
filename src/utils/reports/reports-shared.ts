@@ -1,22 +1,22 @@
 import { SheetTitles } from '@/consts';
 import {
-    IDestinationData,
-    IIndexedDestinationPackageData,
-    IIndexedPlantBatchData,
-    IIndexedRichIncomingTransferData,
-    IIndexedRichOutgoingTransferData,
-    IIndexedTransferData,
-    ITransferData,
-    ITransporterData
+  IDestinationData,
+  IIndexedDestinationPackageData,
+  IIndexedPlantBatchData,
+  IIndexedRichIncomingTransferData,
+  IIndexedRichOutgoingTransferData,
+  IIndexedTransferData,
+  ITransferData,
+  ITransporterData
 } from '@/interfaces';
 import {
-    FIELD_TRANSFORMER_REPORT_TYPES,
-    ReportType
+  FIELD_TRANSFORMER_REPORT_TYPES,
+  ReportType
 } from '@/store/page-overlay/modules/reports/consts';
 import {
-    IFieldData,
-    IReportConfig,
-    IReportData
+  IFieldData,
+  IReportConfig,
+  IReportData
 } from '@/store/page-overlay/modules/reports/interfaces';
 import { todayIsodate } from '../date';
 import { extractEmployeeAuditData } from './employee-audit-report';
@@ -25,6 +25,7 @@ import { extractImmaturePlantPropertyFromDimension } from './immature-plants-qui
 import { extractMaturePlantPropertyFromDimension } from './mature-plants-quickview-report';
 import { extractPackagePropertyFromDimension } from './packages-quickview-report';
 import { extractPointInTimeInventoryData } from './point-in-time-inventory-report';
+import { extractSingleTransferData } from './single-transfer-report';
 
 export function shouldGenerateReport({
   reportConfig,
@@ -323,6 +324,12 @@ export function extractFlattenedData({
           reportConfig,
           reportData,
         });
+      case ReportType.SINGLE_TRANSFER:
+        return extractSingleTransferData({
+          reportType,
+          reportConfig,
+          reportData,
+        });
       case ReportType.PACKAGES_QUICKVIEW:
       case ReportType.IMMATURE_PLANTS_QUICKVIEW:
       case ReportType.MATURE_PLANTS_QUICKVIEW:
@@ -423,6 +430,8 @@ export function getSheetTitle({
       return SheetTitles.TRANSFER_HUB_TRANSFER_MANIFESTS;
     case ReportType.EMPLOYEE_AUDIT:
       return SheetTitles.EMPLOYEE_AUDIT;
+    case ReportType.SINGLE_TRANSFER:
+      return SheetTitles.SINGLE_TRANSFER;
     case ReportType.POINT_IN_TIME_INVENTORY:
       return `${SheetTitles.POINT_IN_TIME_INVENTORY} ${
         reportConfig[ReportType.POINT_IN_TIME_INVENTORY]!.targetDate

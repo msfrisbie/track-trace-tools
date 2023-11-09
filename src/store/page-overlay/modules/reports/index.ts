@@ -5,7 +5,7 @@ import { maybeLoadCogsReportData } from '@/utils/reports/cogs-report';
 import { maybeLoadCogsTrackerReportData } from '@/utils/reports/cogs-tracker-report';
 import {
   maybeLoadCogsV2ReportData,
-  updateCogsV2MasterCostSheet,
+  updateCogsV2MasterCostSheet
 } from '@/utils/reports/cogs-v2-report';
 import { maybeLoadEmployeeAuditReportData } from '@/utils/reports/employee-audit-report';
 import { maybeLoadEmployeeSamplesReportData } from '@/utils/reports/employee-samples-report';
@@ -21,6 +21,7 @@ import { maybeLoadOutgoingTransfersReportData } from '@/utils/reports/outgoing-t
 import { maybeLoadPackageReportData } from '@/utils/reports/package-report';
 import { maybeLoadPackagesQuickviewReportData } from '@/utils/reports/packages-quickview-report';
 import { maybeLoadPointInTimeInventoryReportData } from '@/utils/reports/point-in-time-inventory-report';
+import { maybeLoadSingleTransferReportData } from '@/utils/reports/single-transfer-report';
 import { maybeLoadStragglerPackageReportData } from '@/utils/reports/straggler-package-report';
 import { maybeLoadTagsReportData } from '@/utils/reports/tags-report';
 import { maybeLoadTransferHubTransfersReportData } from '@/utils/reports/transfer-hub-transfers-report';
@@ -33,7 +34,7 @@ import {
   ReportAuxTask,
   ReportsActions,
   ReportsMutations,
-  ReportStatus,
+  ReportStatus
 } from './consts';
 import { IReportConfig, IReportData, IReportsState } from './interfaces';
 
@@ -158,6 +159,7 @@ export const reportsModule = {
         await maybeLoadHarvestPackagesReportData({ ctx, reportData, reportConfig });
         await maybeLoadEmployeeAuditReportData({ ctx, reportData, reportConfig });
         await maybeLoadPointInTimeInventoryReportData({ ctx, reportData, reportConfig });
+        await maybeLoadSingleTransferReportData({ ctx, reportData, reportConfig });
 
         ctx.commit(ReportsMutations.SET_STATUS, {
           statusMessage: { text: 'Generating report...', level: 'success' },

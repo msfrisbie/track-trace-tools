@@ -68,6 +68,7 @@ export const ALL_ELIGIBLE_REPORT_TYPES: ReportType[] = [
   ReportType.TRANSFER_HUB_TRANSFER_MANIFESTS,
   ReportType.POINT_IN_TIME_INVENTORY,
   ReportType.EMPLOYEE_AUDIT,
+  ReportType.SINGLE_TRANSFER
 ];
 
 export const FIELD_TRANSFORMER_REPORT_TYPES: ReportType[] = [
