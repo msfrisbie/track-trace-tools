@@ -9,6 +9,7 @@ import {
   ITransferData,
   ITransporterData
 } from '@/interfaces';
+import store from "@/store/page-overlay/index";
 import {
   FIELD_TRANSFORMER_REPORT_TYPES,
   ReportType
@@ -16,7 +17,8 @@ import {
 import {
   IFieldData,
   IReportConfig,
-  IReportData
+  IReportData,
+  IReportOption
 } from '@/store/page-overlay/modules/reports/interfaces';
 import { todayIsodate } from '../date';
 import { extractEmployeeAuditData } from './employee-audit-report';
@@ -441,4 +443,232 @@ export function getSheetTitle({
     default:
       throw new Error(`Bad reportType ${reportType}`);
   }
+}
+
+export function reportOptionsImpl(): IReportOption[] {
+  const reportOptions: IReportOption[] = [
+    {
+      text: "Packages",
+      value: ReportType.PACKAGES,
+      t3plus: true,
+      enabled: true,
+      description: "All packages. Filter by type and date.",
+      isCustom: false,
+      isCsvEligible: true,
+      isSingleton: false,
+    },
+    {
+      text: "Point-in-time inventory",
+      value: ReportType.POINT_IN_TIME_INVENTORY,
+      t3plus: true,
+      enabled: true,
+      description: "All active packages on a certain date.",
+      isCustom: false,
+      isCsvEligible: true,
+      isSingleton: false,
+    },
+    {
+      text: "Plant Batches",
+      value: ReportType.IMMATURE_PLANTS,
+      t3plus: true,
+      enabled: true,
+      description: "All plant batches. Filter by planted date.",
+      isCustom: false,
+      isCsvEligible: true,
+      isSingleton: false,
+    },
+    {
+      text: "Mature Plants",
+      value: ReportType.MATURE_PLANTS,
+      t3plus: true,
+      enabled: true,
+      description: "All mature plants. Filter by growth phase and planted date",
+      isCustom: false,
+      isCsvEligible: true,
+      isSingleton: false,
+    },
+    {
+      text: "Incoming Transfers",
+      value: ReportType.INCOMING_TRANSFERS,
+      t3plus: true,
+      enabled: true,
+      description: "All incoming transfers. Filter by wholesale and ETA",
+      isCustom: false,
+      isCsvEligible: true,
+      isSingleton: false,
+    },
+    {
+      text: "Outgoing Transfers",
+      value: ReportType.OUTGOING_TRANSFERS,
+      t3plus: true,
+      enabled: true,
+      description: "All outgoing transfers. Filter by wholesale and ETD",
+      isCustom: false,
+      isCsvEligible: true,
+      isSingleton: false,
+    },
+    // Disabled - Destinations returns 0, more like incoming?
+    // {
+    //   text: "Hub Transfers",
+    //   value: ReportType.TRANSFER_HUB_TRANSFERS,
+    //   t3plus: false,
+    //   enabled: true,
+    //   description: "Filter by estimated time of departure",
+    //   isCustom: false,
+    // },
+    {
+      text: "Tags",
+      value: ReportType.TAGS,
+      t3plus: true,
+      enabled: true,
+      description: "All tags. Filter by status and tag type.",
+      isCustom: false,
+      isCsvEligible: true,
+      isSingleton: false,
+    },
+    {
+      text: "Harvests",
+      value: ReportType.HARVESTS,
+      t3plus: true,
+      enabled: true,
+      description: "All harvests. Filter by status and harvest date.",
+      isCustom: false,
+      isCsvEligible: true,
+      isSingleton: false,
+    },
+    {
+      text: "Outgoing Transfer Manifests",
+      value: ReportType.OUTGOING_TRANSFER_MANIFESTS,
+      t3plus: true,
+      enabled: true,
+      description: "Full transfer and package data for all outgoing transfers.",
+      isCustom: false,
+      isCsvEligible: true,
+      isSingleton: false,
+    },
+    {
+      text: "Straggler Inventory",
+      value: ReportType.STRAGGLER_PACKAGES,
+      t3plus: true,
+      enabled: true,
+      description: "Find old and empty inventory",
+      isCustom: false,
+      isCsvEligible: true,
+      isSingleton: false,
+    },
+    {
+      text: "Employee Activity",
+      value: ReportType.EMPLOYEE_AUDIT,
+      t3plus: true,
+      enabled: true,
+      description: "View all employee activity in Metrc",
+      isCustom: false,
+      isCsvEligible: true,
+      isSingleton: false,
+    },
+    {
+      text: "COGS",
+      value: ReportType.COGS_V2,
+      t3plus: false,
+      enabled: !!store.state.client.values.ENABLE_COGS,
+      hidden: !store.state.client.values.ENABLE_COGS,
+      description: "Generate COGS calculator",
+      isCustom: false,
+      isCsvEligible: false,
+      isSingleton: true,
+    },
+    {
+      text: "COGS Tracker",
+      value: ReportType.COGS_TRACKER,
+      t3plus: false,
+      enabled: !!store.state.client.values.ENABLE_COGS_TRACKER,
+      hidden: !store.state.client.values.ENABLE_COGS_TRACKER,
+      description: "Generate COGS Tracker sheets",
+      isCustom: false,
+      isCsvEligible: false,
+      isSingleton: true,
+    },
+    {
+      text: "Employee Samples",
+      value: ReportType.EMPLOYEE_SAMPLES,
+      t3plus: false,
+      enabled: !!store.state.client.values.ENABLE_EMPLOYEE_SAMPLE_TOOL,
+      hidden: !store.state.client.values.ENABLE_EMPLOYEE_SAMPLE_TOOL,
+      description: "Generate summary of employee samples",
+      isCustom: false,
+      isCsvEligible: false,
+      isSingleton: true,
+    },
+    {
+      text: "Harvest Packages",
+      value: ReportType.HARVEST_PACKAGES,
+      t3plus: false,
+      enabled: !!store.state.client.values.ENABLE_HARVEST_PACKAGES,
+      hidden: !store.state.client.values.ENABLE_HARVEST_PACKAGES,
+      description: "Generate summary of harvest packages",
+      isCustom: false,
+      isCsvEligible: true,
+      isSingleton: true,
+    },
+    {
+      text: "Packages Quickview",
+      value: ReportType.PACKAGES_QUICKVIEW,
+      t3plus: true,
+      enabled: true,
+      description: "Grouped summary of packages by item, location, and dates",
+      isCustom: false,
+      isCsvEligible: true,
+      isSingleton: false,
+    },
+    {
+      text: "Plant Batch Quickview",
+      value: ReportType.IMMATURE_PLANTS_QUICKVIEW,
+      t3plus: true,
+      enabled: true,
+      description: "Grouped summary of plant batches by strain, location, and dates",
+      isCustom: false,
+      isCsvEligible: true,
+      isSingleton: false,
+    },
+    {
+      text: "Mature Plants Quickview",
+      value: ReportType.MATURE_PLANTS_QUICKVIEW,
+      t3plus: true,
+      enabled: true,
+      description:
+        "Grouped summary of mature plants by growth phase, strain, location, and dates",
+      isCustom: false,
+      isCsvEligible: true,
+      isSingleton: false,
+    },
+    // TODO
+    // {
+    //   text: "Transfer Quickview",
+    //   value: ReportType.TRANSFER_QUICKVIEW,
+    //   t3plus: true,
+    //   enabled: false,
+    //   description: "Summary of incoming, outgoing, and rejected packages",
+    //   isCustom: false,
+    //   isCsvEligible: true,
+    //   isSingleton: false,
+    // },
+    // {
+    //   text: "Incoming Inventory",
+    //   value: null,
+    //   t3plus: true,
+    //   enabled: false,
+    //   description: "See packages not yet recieved",
+    //   isCustom: false,
+    // },
+    // {
+    //   text: "Harvested Plants",
+    //   value: null,
+    //   t3plus: true,
+    //   enabled: false,
+    //   description: "All plants and associated harvest data within this license",
+    //   isCustom: false,
+    // },
+  ];
+
+  return reportOptions.filter((x) => !x.hidden);
 }

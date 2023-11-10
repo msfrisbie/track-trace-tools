@@ -267,3 +267,15 @@ export interface ICogsArchive {
   transfersPackages: any[];
   transfersPackagesKeys: string[];
 }
+
+export interface IReportOption {
+  text: string;
+  value: ReportType;
+  t3plus: boolean;
+  isCustom: false; // Unused
+  enabled: boolean;
+  hidden?: boolean;
+  description: string;
+  isCsvEligible: boolean;
+  isSingleton: boolean;
+}

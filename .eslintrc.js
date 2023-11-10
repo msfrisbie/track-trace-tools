@@ -57,6 +57,7 @@ module.exports = {
     quotes: "off",
     "object-curly-newline": "off",
     "comma-dangle": "off",
+    "operator-linebreak": "off",
   },
 
   extends: ["plugin:vue/essential", "@vue/typescript", "@vue/airbnb"],
