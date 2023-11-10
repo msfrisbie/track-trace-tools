@@ -353,7 +353,7 @@ export function extractFlattenedData({
   return values;
 }
 
-// This is
+// This is only for adding license and date boilerplate
 export function getCsvFilename({
   reportType,
   license,
@@ -371,12 +371,9 @@ export function getCsvFilename({
     case ReportType.COGS_V2:
     case ReportType.HARVEST_PACKAGES:
     case ReportType.EMPLOYEE_SAMPLES:
-    case ReportType.POINT_IN_TIME_INVENTORY:
-    // TODO these are either not single-license, or should not have todays date
-
-    /* eslint-disable-next-line no-fallthrough */
+      return `${sheetTitle} [Generated ${date}]`;
     default:
-      return `${sheetTitle} - ${license} - ${date}`;
+      return `${sheetTitle} - ${license} [Generated ${date}]`;
   }
 }
 
@@ -387,9 +384,12 @@ export function getGoogleSheetName({
   license: string;
   reportConfig: IReportConfig;
 }): string {
-  return `${license} Metrc Report - ${todayIsodate()}`;
+  const date = todayIsodate();
+
+  return `${license} Metrc Report [Generated ${date}]`;
 }
 
+// This is for adding specific info like date ranges
 export function getSheetTitle({
   reportType,
   reportConfig,
@@ -431,7 +431,9 @@ export function getSheetTitle({
     case ReportType.EMPLOYEE_AUDIT:
       return SheetTitles.EMPLOYEE_AUDIT;
     case ReportType.SINGLE_TRANSFER:
-      return SheetTitles.SINGLE_TRANSFER;
+      return `${SheetTitles.SINGLE_TRANSFER} ${
+        reportConfig[ReportType.SINGLE_TRANSFER]!.manifestNumber
+      }`;
     case ReportType.POINT_IN_TIME_INVENTORY:
       return `${SheetTitles.POINT_IN_TIME_INVENTORY} ${
         reportConfig[ReportType.POINT_IN_TIME_INVENTORY]!.targetDate
