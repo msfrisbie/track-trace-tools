@@ -13,7 +13,7 @@ import {
   ITagData,
   IUnitOfMeasure,
   IWasteMethod,
-  IWasteReason,
+  IWasteReason
 } from '@/interfaces';
 import { authManager } from '@/modules/auth-manager.module';
 import { primaryMetrcRequestManager } from '@/modules/metrc-request-manager.module';
@@ -674,21 +674,26 @@ class DynamicConstsManager implements IAtomicService {
   }
 
   async unitsOfMeasure(): Promise<IUnitOfMeasure[]> {
-    if (store.state.mockDataMode && store.state.flags?.mockedFlags.mockUnitsOfMeasure.enabled) {
-      return mockDataManager.mockUnitsOfMeasure();
-    }
+    // This is extremely unlikely to change
+    return DEFAULT_UNITS_OF_MEASURE;
 
-    try {
-      const repeaterData = await this.createItemRepeaterData();
+    // if (store.state.mockDataMode && store.state.flags?.mockedFlags.mockUnitsOfMeasure.enabled) {
+    //   return mockDataManager.mockUnitsOfMeasure();
+    // }
 
-      if (repeaterData.UnitsOfMeasure) {
-        return repeaterData.UnitsOfMeasure;
-      }
-    } catch {
-      return DEFAULT_UNITS_OF_MEASURE;
-    }
+    // try {
+    //   const repeaterData = await this.createItemRepeaterData();
 
-    throw new Error('Units of measure unable to load');
+    //   console.log({ repeaterData });
+
+    //   if (repeaterData.UnitsOfMeasure) {
+    //     return repeaterData.UnitsOfMeasure;
+    //   }
+    // } catch {
+    //   return DEFAULT_UNITS_OF_MEASURE;
+    // }
+
+    // throw new Error('Units of measure unable to load');
   }
 
   async unitsOfWeight(): Promise<IUnitOfMeasure[]> {
