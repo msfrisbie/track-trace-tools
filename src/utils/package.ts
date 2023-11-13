@@ -106,6 +106,61 @@ export function getItemNameOrError(unionPkg: IUnionIndexedPackageData): string {
   throw new Error('Could not extract Item Name');
 }
 
+export function getItemCategoryOrError(unionPkg: IUnionIndexedPackageData): string {
+  const pkg = unionPkg as any;
+  if (pkg.Item && 'ProductCategoryName' in pkg.Item) {
+    return (pkg as IIndexedPackageData).Item.ProductCategoryName;
+  }
+  if ('ProductCategoryName' in pkg) {
+    return (pkg as IDestinationPackageData).ProductCategoryName;
+  }
+  throw new Error('Could not extract Item Category');
+}
+
+export function getItemStrainOrError(unionPkg: IUnionIndexedPackageData): string {
+  const pkg = unionPkg as any;
+  if (pkg.Item && 'StrainName' in pkg.Item) {
+    return (pkg as IIndexedPackageData).Item.StrainName ?? '';
+  }
+  if ('ItemStrainName' in pkg) {
+    return (pkg as IDestinationPackageData).ItemStrainName ?? '';
+  }
+  throw new Error('Could not extract Item Strain');
+}
+
+export function getLabTestingStateOrError(unionPkg: IUnionIndexedPackageData): string {
+  const pkg = unionPkg as any;
+  if ('LabTestingStateName' in pkg) {
+    return (pkg as IIndexedPackageData).LabTestingStateName;
+  }
+  if ('LabTestingStateName' in pkg) {
+    return (pkg as IDestinationPackageData).LabTestingStateName;
+  }
+  throw new Error('Could not extract Lab Testing State');
+}
+
+export function getGrossWeightOrError(unionPkg: IUnionIndexedPackageData): number | null {
+  const pkg = unionPkg as any;
+  if ('Item' in pkg) {
+    return null;
+  }
+  if ('GrossWeight' in pkg) {
+    return (pkg as IDestinationPackageData).GrossWeight;
+  }
+  throw new Error('Could not extract Gross Weight');
+}
+
+export function getWholesalePriceOrError(unionPkg: IUnionIndexedPackageData): number | null {
+  const pkg = unionPkg as any;
+  if ('Item' in pkg) {
+    return null;
+  }
+  if ('ShipperWholesalePrice' in pkg) {
+    return (pkg as IDestinationPackageData).ShipperWholesalePrice;
+  }
+  throw new Error('Could not extract Wholesale Price');
+}
+
 export function getItemUnitQuantityAndUnitOrError(unionPkg: IUnionIndexedPackageData): {
   quantity: number;
   unitOfMeasureAbbreviation: string;

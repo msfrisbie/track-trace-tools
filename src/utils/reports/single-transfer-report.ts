@@ -6,7 +6,7 @@ import store from '@/store/page-overlay/index';
 import { ReportType } from "@/store/page-overlay/modules/reports/consts";
 import { IReportConfig, IReportData, IReportsState } from "@/store/page-overlay/modules/reports/interfaces";
 import { ActionContext } from "vuex";
-import { getItemNameOrError, getLabelOrError, getQuantityOrError, getSourceHarvestNamesOrError, getSourcePackageTagsOrError, getUnitOfMeasureAbbreviationOrError } from "../package";
+import { getGrossWeightOrError, getItemCategoryOrError, getItemNameOrError, getItemStrainOrError, getLabelOrError, getLabTestingStateOrError, getQuantityOrError, getSourceHarvestNamesOrError, getSourcePackageTagsOrError, getUnitOfMeasureAbbreviationOrError, getWholesalePriceOrError } from "../package";
 import { generateTransferMetadata } from "../transfer";
 
 export async function maybeLoadSingleTransferReportData({
@@ -91,8 +91,13 @@ export async function maybeLoadSingleTransferReportData({
             "Source Harvest(s)",
             "Source Package(s)",
             "Item Name",
+            "Item Category",
+            "Item Strain",
+            "Lab Testing State",
             "Quantity",
             "Unit of Measure",
+            "Gross Weight",
+            "Wholesale Price",
           ]
         );
 
@@ -103,8 +108,13 @@ export async function maybeLoadSingleTransferReportData({
             getSourceHarvestNamesOrError(pkg),
             getSourcePackageTagsOrError(pkg),
             getItemNameOrError(pkg),
+            getItemCategoryOrError(pkg),
+            getItemStrainOrError(pkg),
+            getLabTestingStateOrError(pkg),
             getQuantityOrError(pkg),
             getUnitOfMeasureAbbreviationOrError(pkg),
+            getGrossWeightOrError(pkg),
+            getWholesalePriceOrError(pkg),
           ]);
         }
 
@@ -137,8 +147,13 @@ export async function maybeLoadSingleTransferReportData({
             "Source Harvest(s)",
             "Source Package(s)",
             "Item Name",
+            "Item Category",
+            "Item Strain",
+            "Lab Testing State",
             "Quantity",
             "Unit of Measure",
+            "Gross Weight",
+            "Wholesale Price",
           ]
         );
 
@@ -151,8 +166,13 @@ export async function maybeLoadSingleTransferReportData({
               getSourceHarvestNamesOrError(pkg),
               getSourcePackageTagsOrError(pkg),
               getItemNameOrError(pkg),
+              getItemCategoryOrError(pkg),
+              getItemStrainOrError(pkg),
+              getLabTestingStateOrError(pkg),
               getQuantityOrError(pkg),
               getUnitOfMeasureAbbreviationOrError(pkg),
+              getGrossWeightOrError(pkg),
+              getWholesalePriceOrError(pkg),
             ]);
           }
         }

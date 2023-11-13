@@ -2,7 +2,7 @@ import { METRC_TAG_REGEX } from '@/consts';
 import '@/test/utils/auto-mock-chrome';
 import '@/test/utils/auto-mock-fetch';
 import {
-  getDelimiterSeparatedValuesOrError, getIdOrError, getItemNameOrError, getItemUnitOfMeasureNameOrError, getItemUnitQuantityAndUnitOrError, getLabelOrError, getQuantityOrError, getStrainNameOrError, getUnitOfMeasureNameOrError,
+  getDelimiterSeparatedValuesOrError, getGrossWeightOrError, getIdOrError, getItemCategoryOrError, getItemNameOrError, getItemUnitOfMeasureNameOrError, getItemUnitQuantityAndUnitOrError, getLabelOrError, getLabTestingStateOrError, getQuantityOrError, getStrainNameOrError, getUnitOfMeasureNameOrError, getWholesalePriceOrError
 } from './package';
 
 describe('package.ts', () => {
@@ -18,7 +18,9 @@ describe('package.ts', () => {
         UnitWeight: 20,
         UnitOfMeasureName: 'Grams',
         UnitWeightUnitOfMeasureAbbreviation: 'g',
+        ProductCategoryName: 'Flower',
       },
+      LabTestingStateName: 'NotRequired'
     } as any;
 
     const transferPkg = {
@@ -31,6 +33,10 @@ describe('package.ts', () => {
       ItemUnitWeight: 30,
       ItemUnitWeightUnitOfMeasureAbbreviation: 'lb',
       ItemUnitQuantityUnitOfMeasureAbbreviation: 'lb',
+      ProductCategoryName: 'Flower',
+      LabTestingStateName: 'NotRequired',
+      GrossWeight: 3,
+      ShipperWholesalePrice: 6,
     } as any;
 
     const emptyPkg = {} as any;
@@ -54,6 +60,26 @@ describe('package.ts', () => {
     expect(getItemNameOrError(pkg)).toEqual('beep');
     expect(getItemNameOrError(transferPkg)).toEqual('boop');
     expect(() => getItemNameOrError(emptyPkg)).toThrowError();
+
+    expect(getStrainNameOrError(pkg)).toEqual('baz');
+    expect(getStrainNameOrError(transferPkg)).toEqual('qux');
+    expect(() => getStrainNameOrError(emptyPkg)).toThrowError();
+
+    expect(getItemCategoryOrError(pkg)).toEqual('Flower');
+    expect(getItemCategoryOrError(transferPkg)).toEqual('Flower');
+    expect(() => getItemCategoryOrError(emptyPkg)).toThrowError();
+
+    expect(getLabTestingStateOrError(pkg)).toEqual('NotRequired');
+    expect(getLabTestingStateOrError(transferPkg)).toEqual('NotRequired');
+    expect(() => getLabTestingStateOrError(emptyPkg)).toThrowError();
+
+    expect(getGrossWeightOrError(pkg)).toEqual(null);
+    expect(getGrossWeightOrError(transferPkg)).toEqual(3);
+    expect(() => getGrossWeightOrError(emptyPkg)).toThrowError();
+
+    expect(getGrossWeightOrError(pkg)).toEqual(null);
+    expect(getWholesalePriceOrError(transferPkg)).toEqual(6);
+    expect(() => getWholesalePriceOrError(emptyPkg)).toThrowError();
 
     expect(getItemUnitQuantityAndUnitOrError(pkg)).toEqual({
       quantity: 20,
