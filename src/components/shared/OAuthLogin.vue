@@ -6,9 +6,9 @@
           Signed in as <span class="font-bold ttt-purple">{{ oauthUserInfo.email }}</span>
         </div>
 
-        <a href="https://youtu.be/JBR21XSKK3I" class="underline text-purple-600" target="_blank"
+        <!-- <a href="https://youtu.be/JBR21XSKK3I" class="underline text-purple-600" target="_blank"
           >How do I make a report?</a
-        >
+        > -->
 
         <b-button
           variant="outline-primary"
@@ -41,26 +41,26 @@
 </template>
 
 <script lang="ts">
-import { MessageType } from '@/consts';
-import { analyticsManager } from '@/modules/analytics-manager.module';
-import { messageBus } from '@/modules/message-bus.module';
-import router from '@/router/index';
-import store from '@/store/page-overlay/index';
-import Vue from 'vue';
-import { mapState } from 'vuex';
+import { MessageType } from "@/consts";
+import { analyticsManager } from "@/modules/analytics-manager.module";
+import { messageBus } from "@/modules/message-bus.module";
+import router from "@/router/index";
+import store from "@/store/page-overlay/index";
+import Vue from "vue";
+import { mapState } from "vuex";
 
-require('@/assets/images/google.svg');
+require("@/assets/images/google.svg");
 // require("@/assets/images/btn_google_signin_light_normal_web@2x.png");
 // require("@/assets/images/btn_google_light_normal_ios.svg");
 
 export default Vue.extend({
-  name: 'OAuthLogin',
+  name: "OAuthLogin",
   store,
   router,
   props: {},
   components: {},
   computed: {
-    ...mapState(['debugMode']),
+    ...mapState(["debugMode"]),
     isAuthenticated() {
       // @ts-ignore
       return !!this.$data.oauthUserInfo;
@@ -76,7 +76,7 @@ export default Vue.extend({
     async loginOrError({ interactive = false }: { interactive?: boolean } = {}) {
       const response = await messageBus.sendMessageToBackground(
         MessageType.GET_OAUTH_USER_INFO_OR_ERROR,
-        { interactive },
+        { interactive }
       );
       this.$data.oauthUserInfo = response.data.result;
       if (response.data.success) {
@@ -112,8 +112,8 @@ export default Vue.extend({
       this.$data.initial = false;
     }
 
-    document.addEventListener('visibilitychange', () => {
-      if (document.visibilityState === 'visible') {
+    document.addEventListener("visibilitychange", () => {
+      if (document.visibilityState === "visible") {
         // @ts-ignore
         this.loginOrError();
       }

@@ -16,10 +16,7 @@
       </div>
 
       <!-- TODO enable when T3+ signup is ready -->
-      <plus-button
-        v-if="false && !clientValues['ENABLE_T3PLUS'] && !t3plus"
-        class="floating-shadow"
-      />
+      <plus-button v-if="!t3plus" class="floating-shadow" />
 
       <div class="relative">
         <builder-button class="floating-shadow" />
@@ -34,20 +31,20 @@
 </template>
 
 <script lang="ts">
-import BugReportButton from '@/components/page-overlay/BugReportButton.vue';
-import BuilderButton from '@/components/page-overlay/BuilderButton.vue';
-import DebugButton from '@/components/page-overlay/DebugButton.vue';
-import PlusButton from '@/components/page-overlay/PlusButton.vue';
-import QuickScriptButton from '@/components/page-overlay/QuickScriptButton.vue';
-import ScrollButton from '@/components/page-overlay/ScrollButton.vue';
-import SearchButton from '@/components/page-overlay/SearchButton.vue';
-import { IPluginState } from '@/interfaces';
-import store from '@/store/page-overlay/index';
-import Vue from 'vue';
-import { mapState } from 'vuex';
+import BugReportButton from "@/components/page-overlay/BugReportButton.vue";
+import BuilderButton from "@/components/page-overlay/BuilderButton.vue";
+import DebugButton from "@/components/page-overlay/DebugButton.vue";
+import PlusButton from "@/components/page-overlay/PlusButton.vue";
+import QuickScriptButton from "@/components/page-overlay/QuickScriptButton.vue";
+import ScrollButton from "@/components/page-overlay/ScrollButton.vue";
+import SearchButton from "@/components/page-overlay/SearchButton.vue";
+import { IPluginState } from "@/interfaces";
+import store from "@/store/page-overlay/index";
+import Vue from "vue";
+import { mapState } from "vuex";
 
 export default Vue.extend({
-  name: 'FloatingButtonContainer',
+  name: "FloatingButtonContainer",
   store,
   components: {
     BuilderButton,

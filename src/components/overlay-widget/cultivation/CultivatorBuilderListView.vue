@@ -36,26 +36,37 @@
           <div class="w-full text-gray-500 text-center" style="height: 1rem; margin-top: 1rem">
             <template v-if="!builderOption.enabled">
               <template v-if="builderOption.isPremium && !clientState.t3plus">
-                <span class="text-xs flex flex-row items-center">
-                  This feature is enabled with
-                  <b-button size="sm" variant="link" @click.stop.prevent="open('/plus')"
-                    >T3+</b-button
+                <span class="text-xs flex flex-row items-center justify-center">
+                  This tool is enabled with T3+.
+                  <b-button
+                    size="sm"
+                    variant="link"
+                    class="underline"
+                    @click.stop.prevent="open('/plus')"
+                    >Learn&nbsp;more</b-button
                   >
                 </span>
               </template>
-              <template v-if="!builderOption.isPremium"></template>
-              {{ notAvailableMessage }}
-              <b-button variant="link" @click.stop.prevent="open('/help/unavailable')"
-                >Why?</b-button
-              >
+              <template v-if="!builderOption.isPremium">
+                <span class="text-xs flex flex-row items-center justify-center">
+                  {{ notAvailableMessage }}
+                  <b-button variant="link" size="sm" @click.stop.prevent="open('/help/unavailable')"
+                    >Why?</b-button
+                  >
+                </span>
+              </template>
             </template>
             <template
               v-if="builderOption.enabled && builderOption.isPremium && !clientState.t3plus"
             >
-              <span class="text-xs flex flex-row items-center">
-                Effective 12/1, this feature will only be available with
-                <b-button size="sm" variant="link" @click.stop.prevent="open('/plus')"
-                  >T3+</b-button
+              <span class="text-xs flex flex-row items-center justify-center">
+                Effective 12/1, this tool is only enabled with T3+.
+                <b-button
+                  size="sm"
+                  variant="link"
+                  class="underline"
+                  @click.stop.prevent="open('/plus')"
+                  >Learn&nbsp;more</b-button
                 >
               </span>
             </template>
@@ -192,7 +203,7 @@ export default Vue.extend({
           backgroundColor: "#48b867",
           enabled: true,
           isPremium: false,
-          isBeta: true,
+          isBeta: false,
         },
         // {
         //   route: "/cultivator/create-harvest-package",

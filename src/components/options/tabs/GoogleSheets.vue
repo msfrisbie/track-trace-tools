@@ -5,7 +5,7 @@
         Track &amp; Trace Tools can export directly to Google Sheets.
       </div>
       <div class="text-md text-gray-600 text-center">
-        Sign in to your Google account to enable this feature.
+        Sign in to your Google account to enable this feature. Only available with T3+.
       </div>
 
       <div class="flex flex-col items-center">
@@ -30,14 +30,14 @@
 </template>
 
 <script lang="ts">
-import OAuthLogin from '@/components/shared/OAuthLogin.vue';
-import router from '@/router/index';
-import store from '@/store/page-overlay/index';
-import Vue from 'vue';
-import { mapState } from 'vuex';
+import OAuthLogin from "@/components/shared/OAuthLogin.vue";
+import router from "@/router/index";
+import store from "@/store/page-overlay/index";
+import Vue from "vue";
+import { mapState } from "vuex";
 
 export default Vue.extend({
-  name: 'GoogleSheets',
+  name: "GoogleSheets",
   store,
   router,
   props: {

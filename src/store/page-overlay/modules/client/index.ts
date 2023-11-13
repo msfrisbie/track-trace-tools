@@ -50,30 +50,31 @@ export const clientModule = {
       if (!ctx.rootState.settings.licenseKey) {
         ctx.state.clientName = null;
         ctx.state.values = {};
-        return;
+      } else {
+        const { clientName, values } = await t3RequestManager.loadClientDataOrError(
+          ctx.rootState.settings.licenseKey,
+        );
+
+        if (data.notify && !clientName) {
+          toastManager.openToast('This license key is invalid.', {
+            title: 'License Key Error',
+            autoHideDelay: 5000,
+            variant: 'danger',
+            appendToast: true,
+            toaster: 'ttt-toaster',
+            solid: true,
+          });
+        }
+
+        ctx.state.clientName = clientName;
+        ctx.state.values = values;
       }
-
-      const { clientName, values } = await t3RequestManager.loadClientDataOrError(
-        ctx.rootState.settings.licenseKey,
-      );
-
-      if (data.notify && !clientName) {
-        toastManager.openToast('This license key is invalid.', {
-          title: 'License Key Error',
-          autoHideDelay: 5000,
-          variant: 'danger',
-          appendToast: true,
-          toaster: 'ttt-toaster',
-          solid: true,
-        });
-      }
-
-      ctx.state.clientName = clientName;
-      ctx.state.values = values;
 
       const flags = await t3RequestManager.loadFlags();
 
       ctx.state.flags = flags;
+
+      console.log({ flags });
     },
   },
 };
