@@ -11,6 +11,7 @@ const VERIFY_TEST_PATH = 'verify/test';
 const FACILITIES_PATH = 'facilities';
 const ANNOUNCEMENTS_PATH = 'announcements';
 const T3PLUS_PATH = 'plus_users/status';
+const FLAGS_PATH = 'flags';
 
 const DEFAULT_POST_HEADERS = {
   'Content-Type': 'application/json',
@@ -65,6 +66,15 @@ class T3RequestManager implements IAtomicService {
       method: 'POST',
       headers: DEFAULT_POST_HEADERS,
       body: JSON.stringify({ metrc_username: authState.identity }),
+    });
+
+    return response.data;
+  }
+
+  async loadFlags():Promise<{[key: string]: string}> {
+    const response = await customAxios(BASE_URL + FLAGS_PATH, {
+      method: 'POST',
+      headers: DEFAULT_POST_HEADERS,
     });
 
     return response.data;

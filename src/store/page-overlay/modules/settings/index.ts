@@ -5,10 +5,10 @@ import {
   PlantsTabLabel,
   SalesTabLabel,
   TagsTabLabel,
-  TransfersTabLabel,
+  TransfersTabLabel
 } from '@/consts';
 import {
-  BackgroundState, DarkModeState, IPluginState, SnowflakeState,
+  BackgroundState, DarkModeState, IPluginState, SnowflakeState
 } from '@/interfaces';
 import { ActionContext } from 'vuex';
 import { ClientActions } from '../client/consts';
@@ -70,6 +70,7 @@ const persistedState: ISettingsState = {
   writeSettingsToChromeStorage: false,
   loadDataInParallel: true,
   usePersistedCache: false,
+  persistTimestamp: 0
 };
 
 const defaultState: ISettingsState = {
@@ -91,18 +92,21 @@ export const settingsModule = {
     ) {
       ctx.dispatch(SettingsActions.UPDATE_SETTINGS, defaultState);
     },
-    [SettingsActions.UPDATE_SETTINGS](
+    async [SettingsActions.UPDATE_SETTINGS](
       ctx: ActionContext<ISettingsState, IPluginState>,
       settings: any,
     ) {
+      console.log('updating settings');
+
       for (const [key, value] of Object.entries(settings)) {
         // @ts-ignore
         ctx.state[key] = value;
       }
+      ctx.state.persistTimestamp = Date.now();
 
       // Always write
       try {
-        chrome.storage.local.set({ [ChromeStorageKeys.SETTINGS]: ctx.state });
+        await chrome.storage.local.set({ [ChromeStorageKeys.SETTINGS]: ctx.state });
       } catch (e) {
         console.error(e);
       }

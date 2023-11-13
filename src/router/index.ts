@@ -21,6 +21,7 @@ import MetrcExplorer from '@/components/overlay-widget/explorer/MetrcExplorer.vu
 import LicenseGraph from '@/components/overlay-widget/graph/LicenseGraph.vue';
 import MiscellaneousListView from '@/components/overlay-widget/miscellaneous/MiscellaneousListView.vue';
 import Verify from '@/components/overlay-widget/miscellaneous/Verify.vue';
+import Plus from '@/components/overlay-widget/miscellaneous/Plus.vue';
 import AllocateSamplesBuilder from '@/components/overlay-widget/package/AllocateSamplesBuilder.vue';
 import CreatePackageCsvBuilder from '@/components/overlay-widget/package/CreatePackageCsvBuilder.vue';
 import FinishPackagesBuilder from '@/components/overlay-widget/package/FinishPackagesBuilder.vue';
@@ -78,6 +79,11 @@ const routes: Array<RouteConfig> = [
     path: '/verify',
     name: 'T3 Verify',
     component: Verify,
+  },
+  {
+    path: '/plus',
+    name: 'T3+',
+    component: Plus,
   },
   {
     path: '/cultivator',

@@ -61,4 +61,5 @@ export interface ISettingsState {
   writeSettingsToChromeStorage: boolean;
   loadDataInParallel: boolean;
   usePersistedCache: boolean;
+  persistTimestamp: number;
 }

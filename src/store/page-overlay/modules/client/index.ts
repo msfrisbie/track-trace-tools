@@ -11,6 +11,7 @@ const persistedState = {
   clientName: null,
   t3plus: false,
   values: {},
+  flags: {}
 };
 
 const defaultState: IClientState = {
@@ -40,7 +41,11 @@ export const clientModule = {
     ) => {
       const plusUsers = await t3RequestManager.loadT3plus();
 
-      ctx.state.t3plus = plusUsers.length > 0;
+      const t3plus = plusUsers.length > 0;
+
+      ctx.state.t3plus = t3plus;
+
+      console.log({ t3plus });
 
       if (!ctx.rootState.settings.licenseKey) {
         ctx.state.clientName = null;
@@ -65,6 +70,10 @@ export const clientModule = {
 
       ctx.state.clientName = clientName;
       ctx.state.values = values;
+
+      const flags = await t3RequestManager.loadFlags();
+
+      ctx.state.flags = flags;
     },
   },
 };

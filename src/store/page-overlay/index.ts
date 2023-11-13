@@ -3,7 +3,7 @@ import {
   ChromeStorageKeys,
   DEBUG_ATTRIBUTE,
   ToolkitView,
-  VUEX_KEY,
+  VUEX_KEY
 } from '@/consts';
 import {
   IAccountSettings,
@@ -11,7 +11,7 @@ import {
   IMetrcStatusData,
   IPluginState,
   IRootState,
-  ITrackedInteractions,
+  ITrackedInteractions
 } from '@/interfaces';
 import { isDevelopment } from '@/modules/environment.module';
 import { MutationType } from '@/mutation-types';
@@ -33,7 +33,7 @@ import { plantSearchModule, plantSearchReducer } from './modules/plant-search';
 import { pluginAuthModule, pluginAuthReducer } from './modules/plugin-auth/index';
 import {
   promoteImmaturePlantsBuilderModule,
-  promoteImmaturePlantsBuilderReducer,
+  promoteImmaturePlantsBuilderReducer
 } from './modules/promote-immature-plants-builder';
 import { reportsModule, reportsReducer } from './modules/reports';
 import { searchModule, searchReducer } from './modules/search';
@@ -41,13 +41,13 @@ import { settingsModule, settingsReducer } from './modules/settings';
 import { SettingsActions } from './modules/settings/consts';
 import {
   splitPackageBuilderModule,
-  splitPackageBuilderReducer,
+  splitPackageBuilderReducer
 } from './modules/split-package-builder';
 import { tagSearchModule, tagSearchReducer } from './modules/tag-search';
 import { transferBuilderModule, transferBuilderReducer } from './modules/transfer-builder/index';
 import {
   transferPackageSearchModule,
-  transferPackageSearchReducer,
+  transferPackageSearchReducer
 } from './modules/transfer-package-search';
 import { transferSearchModule, transferSearchReducer } from './modules/transfer-search';
 
@@ -443,12 +443,29 @@ const vuexStore = new Vuex.Store<IPluginState>({
 
 try {
   chrome.storage.local.get(ChromeStorageKeys.SETTINGS).then((result) => {
-    const settings = result[ChromeStorageKeys.SETTINGS];
+    const persistedSettings = result[ChromeStorageKeys.SETTINGS];
 
-    // Only load if the flag is set
-    if (settings && vuexStore.state.settings.writeSettingsToChromeStorage) {
-      vuexStore.dispatch(`settings/${SettingsActions.UPDATE_SETTINGS}`, settings);
+    console.log({ persistedSettings });
+
+    if (!persistedSettings) {
+      return;
     }
+
+    // If persisted settings are older, don't bother using
+    if (vuexStore.state.settings.persistTimestamp > persistedSettings.persistTimestamp) {
+      console.log('Persisted settings too old');
+      return;
+    }
+
+    // Only load if the STORED flag is set
+    if (!persistedSettings.writeSettingsToChromeStorage) {
+      console.log('Persist disabled');
+      return;
+    }
+
+    console.log('Inserting persisted settings');
+
+    vuexStore.dispatch(`settings/${SettingsActions.UPDATE_SETTINGS}`, persistedSettings);
   });
 } catch (e) {
   console.error(e);
