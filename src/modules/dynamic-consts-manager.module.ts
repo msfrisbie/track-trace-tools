@@ -674,24 +674,21 @@ class DynamicConstsManager implements IAtomicService {
   }
 
   async unitsOfMeasure(): Promise<IUnitOfMeasure[]> {
-    // This is extremely unlikely to change
-    return DEFAULT_UNITS_OF_MEASURE;
+    if (store.state.mockDataMode && store.state.flags?.mockedFlags.mockUnitsOfMeasure.enabled) {
+      return mockDataManager.mockUnitsOfMeasure();
+    }
 
-    // if (store.state.mockDataMode && store.state.flags?.mockedFlags.mockUnitsOfMeasure.enabled) {
-    //   return mockDataManager.mockUnitsOfMeasure();
-    // }
+    try {
+      const repeaterData = await this.createItemRepeaterData();
 
-    // try {
-    //   const repeaterData = await this.createItemRepeaterData();
+      if (repeaterData.UnitsOfMeasure) {
+        return repeaterData.UnitsOfMeasure;
+      }
 
-    //   console.log({ repeaterData });
-
-    //   if (repeaterData.UnitsOfMeasure) {
-    //     return repeaterData.UnitsOfMeasure;
-    //   }
-    // } catch {
-    //   return DEFAULT_UNITS_OF_MEASURE;
-    // }
+      throw new Error('Unable to match units');
+    } catch {
+      return DEFAULT_UNITS_OF_MEASURE;
+    }
 
     // throw new Error('Units of measure unable to load');
   }
