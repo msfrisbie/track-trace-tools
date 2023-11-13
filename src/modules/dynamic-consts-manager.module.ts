@@ -13,7 +13,7 @@ import {
   ITagData,
   IUnitOfMeasure,
   IWasteMethod,
-  IWasteReason,
+  IWasteReason
 } from '@/interfaces';
 import { authManager } from '@/modules/auth-manager.module';
 import { primaryMetrcRequestManager } from '@/modules/metrc-request-manager.module';
@@ -684,11 +684,13 @@ class DynamicConstsManager implements IAtomicService {
       if (repeaterData.UnitsOfMeasure) {
         return repeaterData.UnitsOfMeasure;
       }
+
+      throw new Error('Unable to match units');
     } catch {
       return DEFAULT_UNITS_OF_MEASURE;
     }
 
-    throw new Error('Units of measure unable to load');
+    // throw new Error('Units of measure unable to load');
   }
 
   async unitsOfWeight(): Promise<IUnitOfMeasure[]> {
