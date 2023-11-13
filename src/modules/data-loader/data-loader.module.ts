@@ -8,7 +8,7 @@ import {
   PlantState,
   SEARCH_LOAD_PAGE_SIZE,
   TagState,
-  TransferState,
+  TransferState
 } from '@/consts';
 import {
   IAtomicService,
@@ -55,13 +55,13 @@ import {
   ITransferFilter,
   ITransferHistoryData,
   ITransferTransporterDetails,
-  ITransporterData,
+  ITransporterData
 } from '@/interfaces';
 import { authManager } from '@/modules/auth-manager.module';
 import { databaseInterface } from '@/modules/database-interface.module';
 import {
   MetrcRequestManager,
-  primaryMetrcRequestManager,
+  primaryMetrcRequestManager
 } from '@/modules/metrc-request-manager.module';
 import { mockDataManager } from '@/modules/mock-data-manager.module';
 import { MutationType } from '@/mutation-types';
@@ -1974,13 +1974,13 @@ export class DataLoader implements IAtomicService {
     });
   }
 
-  async transferDestinationFacilities(): Promise<IMetrcFacilityData[]> {
+  async transferDestinationFacilities(query: string): Promise<IMetrcFacilityData[]> {
     return new Promise(async (resolve, reject) => {
       const subscription = timer(DATA_LOAD_FETCH_TIMEOUT_MS).subscribe(() =>
         reject('Destination facility fetch timed out'));
 
       try {
-        const facilityData: IMetrcFacilityData[] = await this.loadTransferDestinationFacilities();
+        const facilityData: IMetrcFacilityData[] = await this.loadTransferDestinationFacilities(query);
 
         subscription.unsubscribe();
         resolve(facilityData);
@@ -1991,13 +1991,47 @@ export class DataLoader implements IAtomicService {
     });
   }
 
-  async transferTransporterFacilities(): Promise<IMetrcFacilityData[]> {
+  async transferTransporterFacilities(query: string): Promise<IMetrcFacilityData[]> {
     return new Promise(async (resolve, reject) => {
       const subscription = timer(DATA_LOAD_FETCH_TIMEOUT_MS).subscribe(() =>
         reject('Transporter facility fetch timed out'));
 
       try {
-        const facilityData: IMetrcFacilityData[] = await this.loadTransferTransporterFacilities();
+        const facilityData: IMetrcFacilityData[] = await this.loadTransferTransporterFacilities(query);
+
+        subscription.unsubscribe();
+        resolve(facilityData);
+      } catch (e) {
+        subscription.unsubscribe();
+        reject(e);
+      }
+    });
+  }
+
+  async transferDestinationFacilitiesDeprecated(): Promise<IMetrcFacilityData[]> {
+    return new Promise(async (resolve, reject) => {
+      const subscription = timer(DATA_LOAD_FETCH_TIMEOUT_MS).subscribe(() =>
+        reject('Destination facility fetch timed out'));
+
+      try {
+        const facilityData: IMetrcFacilityData[] = await this.loadTransferDestinationFacilitiesDeprecated();
+
+        subscription.unsubscribe();
+        resolve(facilityData);
+      } catch (e) {
+        subscription.unsubscribe();
+        reject(e);
+      }
+    });
+  }
+
+  async transferTransporterFacilitiesDeprecated(): Promise<IMetrcFacilityData[]> {
+    return new Promise(async (resolve, reject) => {
+      const subscription = timer(DATA_LOAD_FETCH_TIMEOUT_MS).subscribe(() =>
+        reject('Transporter facility fetch timed out'));
+
+      try {
+        const facilityData: IMetrcFacilityData[] = await this.loadTransferTransporterFacilitiesDeprecated();
 
         subscription.unsubscribe();
         resolve(facilityData);
@@ -2941,12 +2975,44 @@ export class DataLoader implements IAtomicService {
     return responseData.Data[0];
   }
 
-  private async loadTransferDestinationFacilities(): Promise<IMetrcFacilityData[]> {
+  private async loadTransferDestinationFacilities(query: string): Promise<IMetrcFacilityData[]> {
     await authManager.authStateOrError();
 
     store.commit(MutationType.SET_LOADING_MESSAGE, 'Loading transfer destination facilities...');
 
-    const response = await this.metrcRequestManagerOrError.transferDestinationFacilities();
+    const response = await this.metrcRequestManagerOrError.transferDestinationFacilities(query);
+
+    const transferDestinationFacilities: IMetrcFacilityData[] = response.data.Data;
+
+    console.log(`Loaded ${transferDestinationFacilities.length} transferDestinationFacilities`);
+
+    store.commit(MutationType.SET_LOADING_MESSAGE, null);
+
+    return transferDestinationFacilities;
+  }
+
+  private async loadTransferTransporterFacilities(query:string): Promise<IMetrcFacilityData[]> {
+    await authManager.authStateOrError();
+
+    store.commit(MutationType.SET_LOADING_MESSAGE, 'Loading transfer transporter facilities...');
+
+    const response = await this.metrcRequestManagerOrError.transferTransporterFaciliites(query);
+
+    const transferTransporterFaciliites: IMetrcFacilityData[] = response.data.Data;
+
+    console.log(`Loaded ${transferTransporterFaciliites.length} transferTransporterFaciliites`);
+
+    store.commit(MutationType.SET_LOADING_MESSAGE, null);
+
+    return transferTransporterFaciliites;
+  }
+
+  private async loadTransferDestinationFacilitiesDeprecated(): Promise<IMetrcFacilityData[]> {
+    await authManager.authStateOrError();
+
+    store.commit(MutationType.SET_LOADING_MESSAGE, 'Loading transfer destination facilities...');
+
+    const response = await this.metrcRequestManagerOrError.transferDestinationFacilitiesDeprecated();
 
     const transferDestinationFacilities: IMetrcFacilityData[] = response.data;
 
@@ -2957,12 +3023,12 @@ export class DataLoader implements IAtomicService {
     return transferDestinationFacilities;
   }
 
-  private async loadTransferTransporterFacilities(): Promise<IMetrcFacilityData[]> {
+  private async loadTransferTransporterFacilitiesDeprecated(): Promise<IMetrcFacilityData[]> {
     await authManager.authStateOrError();
 
     store.commit(MutationType.SET_LOADING_MESSAGE, 'Loading transfer transporter facilities...');
 
-    const response = await this.metrcRequestManagerOrError.transferTransporterFaciliites();
+    const response = await this.metrcRequestManagerOrError.transferTransporterFaciliitesDeprecated();
 
     const transferTransporterFaciliites: IMetrcFacilityData[] = response.data;
 

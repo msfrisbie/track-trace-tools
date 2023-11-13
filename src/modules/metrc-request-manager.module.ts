@@ -678,7 +678,7 @@ export class MetrcRequestManager implements IAtomicService {
     });
   }
 
-  async transferDestinationFacilities() {
+  async transferDestinationFacilitiesDeprecated() {
     return customAxios(TRANSFER_DESTINATION_FACILITIES_URL, {
       ...DEFAULT_FETCH_POST_READ_OPTIONS,
       headers: {
@@ -688,13 +688,37 @@ export class MetrcRequestManager implements IAtomicService {
     });
   }
 
-  async transferTransporterFaciliites() {
+  async transferTransporterFaciliitesDeprecated() {
     return customAxios(TRANSFER_DESTINATION_FACILITIES_URL, {
       ...DEFAULT_FETCH_POST_READ_OPTIONS,
       headers: {
         ...(await buildAuthenticationHeaders(this.authStateOrError)),
         ...JSON_HEADERS,
       },
+    });
+  }
+
+  async transferDestinationFacilities(query: string) {
+    return customAxios(TRANSFER_DESTINATION_FACILITIES_URL, {
+      ...DEFAULT_FETCH_POST_READ_OPTIONS,
+      headers: {
+        ...(await buildAuthenticationHeaders(this.authStateOrError)),
+        'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+        Accept: '*/*',
+      },
+      body: `request%5BTake%5D=10&request%5BFilter%5D%5BLogic%5D=or&request%5BFilter%5D%5BFilters%5D%5B0%5D%5BField%5D=LicenseNumber&request%5BFilter%5D%5BFilters%5D%5B0%5D%5BOperator%5D=contains&request%5BFilter%5D%5BFilters%5D%5B0%5D%5BValue%5D=${query}&request%5BFilter%5D%5BFilters%5D%5B1%5D%5BField%5D=FacilityName&request%5BFilter%5D%5BFilters%5D%5B1%5D%5BOperator%5D=contains&request%5BFilter%5D%5BFilters%5D%5B1%5D%5BValue%5D=${query}`
+    });
+  }
+
+  async transferTransporterFaciliites(query: string) {
+    return customAxios(TRANSFER_DESTINATION_FACILITIES_URL, {
+      ...DEFAULT_FETCH_POST_READ_OPTIONS,
+      headers: {
+        ...(await buildAuthenticationHeaders(this.authStateOrError)),
+        'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+        Accept: '*/*',
+      },
+      body: `request%5BTake%5D=10&request%5BFilter%5D%5BLogic%5D=or&request%5BFilter%5D%5BFilters%5D%5B0%5D%5BField%5D=LicenseNumber&request%5BFilter%5D%5BFilters%5D%5B0%5D%5BOperator%5D=contains&request%5BFilter%5D%5BFilters%5D%5B0%5D%5BValue%5D=${query}&request%5BFilter%5D%5BFilters%5D%5B1%5D%5BField%5D=FacilityName&request%5BFilter%5D%5BFilters%5D%5B1%5D%5BOperator%5D=contains&request%5BFilter%5D%5BFilters%5D%5B1%5D%5BValue%5D=${query}`
     });
   }
 
