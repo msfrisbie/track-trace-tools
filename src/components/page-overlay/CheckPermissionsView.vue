@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="flex flex-col items-center">
     <table class="text-center">
       <thead>
         <tr>
@@ -41,21 +41,34 @@
         </template>
       </tbody>
     </table>
+    <simple-drawer toggleText="What is this?" class="w-80 my-8">
+      <div class="flex flex-col gap-2 py-4">
+        <div class="font-semibold">
+          This page shows what T3 "sees" as the current user's Metrc permissions.
+        </div>
+        <div>
+          Unless you're a facility manager, Metrc users don't have a way to check their own
+          permissions. T3 tests the permissions by trying to load a small number of each of these
+          objects, and this permissions page shows the success/fail result.
+        </div>
+      </div>
+    </simple-drawer>
   </div>
 </template>
 
 <script lang="ts">
-import { DataLoader, getDataLoaderByLicense } from '@/modules/data-loader/data-loader.module';
-import { facilityManager } from '@/modules/facility-manager.module';
-import router from '@/router/index';
-import store from '@/store/page-overlay/index';
-import Vue from 'vue';
-import { mapState } from 'vuex';
+import { DataLoader, getDataLoaderByLicense } from "@/modules/data-loader/data-loader.module";
+import { facilityManager } from "@/modules/facility-manager.module";
+import router from "@/router/index";
+import store from "@/store/page-overlay/index";
+import Vue from "vue";
+import { mapState } from "vuex";
+import SimpleDrawer from "../shared/SimpleDrawer.vue";
 
 enum PermissionState {
-  INITIAL = 'INITIAL',
-  GRANTED = 'GRANTED',
-  NOT_GRANTED = 'NOT GRANTED',
+  INITIAL = "INITIAL",
+  GRANTED = "GRANTED",
+  NOT_GRANTED = "NOT GRANTED",
 }
 
 interface T3Permission {
@@ -66,11 +79,13 @@ interface T3Permission {
 }
 
 export default Vue.extend({
-  name: 'CheckPermissionsView',
+  name: "CheckPermissionsView",
   store,
   router,
   props: {},
-  components: {},
+  components: {
+    SimpleDrawer,
+  },
   computed: {
     ...mapState([]),
   },
@@ -93,7 +108,7 @@ export default Vue.extend({
       assessmentFn: (dataLoader: DataLoader) => Promise<boolean>;
     }[] = [
       {
-        permissionName: 'Plants',
+        permissionName: "Plants",
         assessmentFn: async (dataLoader: DataLoader) => {
           try {
             return (await dataLoader.floweringPlantCount()) !== null;
@@ -103,7 +118,7 @@ export default Vue.extend({
         },
       },
       {
-        permissionName: 'Harvests',
+        permissionName: "Harvests",
         assessmentFn: async (dataLoader: DataLoader) => {
           try {
             return (await dataLoader.activeHarvestCount()) !== null;
@@ -113,7 +128,7 @@ export default Vue.extend({
         },
       },
       {
-        permissionName: 'Transfers',
+        permissionName: "Transfers",
         assessmentFn: async (dataLoader: DataLoader) => {
           try {
             return (await dataLoader.incomingTransferCount()) !== null;
@@ -123,7 +138,7 @@ export default Vue.extend({
         },
       },
       {
-        permissionName: 'Packages',
+        permissionName: "Packages",
         assessmentFn: async (dataLoader: DataLoader) => {
           try {
             return (await dataLoader.activePackageCount()) !== null;
@@ -133,7 +148,7 @@ export default Vue.extend({
         },
       },
       {
-        permissionName: 'Strains',
+        permissionName: "Strains",
         assessmentFn: async (dataLoader: DataLoader) => {
           try {
             await dataLoader.strains();
@@ -144,7 +159,7 @@ export default Vue.extend({
         },
       },
       {
-        permissionName: 'Locations',
+        permissionName: "Locations",
         assessmentFn: async (dataLoader: DataLoader) => {
           try {
             await dataLoader.locations();
@@ -155,7 +170,7 @@ export default Vue.extend({
         },
       },
       {
-        permissionName: 'Items',
+        permissionName: "Items",
         assessmentFn: async (dataLoader: DataLoader) => {
           try {
             await dataLoader.items();
@@ -166,7 +181,7 @@ export default Vue.extend({
         },
       },
       {
-        permissionName: 'Tags',
+        permissionName: "Tags",
         assessmentFn: async (dataLoader: DataLoader) => {
           try {
             return (await dataLoader.availableTagCount()) !== null;
@@ -176,7 +191,7 @@ export default Vue.extend({
         },
       },
       {
-        permissionName: 'Sales',
+        permissionName: "Sales",
         assessmentFn: async (dataLoader: DataLoader) => {
           try {
             return (await dataLoader.activeSalesCount()) !== null;

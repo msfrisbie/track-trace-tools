@@ -45,8 +45,6 @@ export const clientModule = {
 
       ctx.state.t3plus = t3plus;
 
-      console.log({ t3plus });
-
       if (!ctx.rootState.settings.licenseKey) {
         ctx.state.clientName = null;
         ctx.state.values = {};
@@ -73,8 +71,6 @@ export const clientModule = {
       const flags = await t3RequestManager.loadFlags();
 
       ctx.state.flags = flags;
-
-      console.log({ flags });
     },
   },
 };

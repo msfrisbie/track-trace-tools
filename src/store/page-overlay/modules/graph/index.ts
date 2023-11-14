@@ -6,7 +6,7 @@ import { facilityManager } from '@/modules/facility-manager.module';
 import { toastManager } from '@/modules/toast-manager.module';
 import { todayIsodate } from '@/utils/date';
 import {
-  edgeReducer, hoverRenderer, labelRenderer, nodeReducer,
+  edgeReducer, hoverRenderer, labelRenderer, nodeReducer
 } from '@/utils/graph';
 import { scrambleTag } from '@/utils/tags';
 import { Coordinates } from 'sigma/types';
@@ -16,7 +16,7 @@ import {
   GraphGetters,
   GraphMutations,
   GraphRenderAlgorithm,
-  GraphStatus,
+  GraphStatus
 } from './consts';
 import { IGraphComponentContext, IGraphData, IGraphState } from './interfaces';
 

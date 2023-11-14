@@ -1,49 +1,79 @@
 <template>
   <fragment>
-    <template v-if="isIdentityEligibleForTransferToolsImpl">
-      <b-button size="sm" variant="outline-primary" @click.stop.prevent="transferPackage()"
-        ><div class="w-full grid grid-cols-2 gap-2" style="grid-template-columns: 1fr auto">
-          <span>TRANSFER PACKAGE</span>
-          <div class="aspect-square grid place-items-center">
-            <font-awesome-icon icon="truck" />
-          </div>
+    <b-button
+      size="sm"
+      variant="outline-primary"
+      @click.stop.prevent="transferPackage()"
+      :disabled="!hasPlus"
+      ><div class="w-full grid grid-cols-3 gap-2" style="grid-template-columns: 2rem 1fr auto">
+        <div class="aspect-square grid place-items-center">
+          <b-badge variant="primary">T3+</b-badge>
         </div>
-      </b-button>
-    </template>
+        <span>TRANSFER PACKAGE</span>
+        <div class="aspect-square grid place-items-center">
+          <font-awesome-icon icon="truck" />
+        </div>
+      </div>
+    </b-button>
 
-    <template v-if="clientValues['ENABLE_T3PLUS'] || t3plus">
+    <b-button
+      v-if="clientValues.ENABLE_PACKAGE_HISTORY"
+      size="sm"
+      variant="outline-primary"
+      @click.stop.prevent="setPackageHistorySourcePackage({ pkg }) && openPackageHistoryBuilder()"
+      ><div class="w-full grid grid-cols-3 gap-2" style="grid-template-columns: 2rem 1fr auto">
+        <div></div>
+        <span>PACKAGE HISTORY</span>
+        <div class="aspect-square grid place-items-center">
+          <font-awesome-icon icon="sitemap" />
+        </div>
+      </div>
+    </b-button>
+
+    <!-- <b-button
+      size="sm"
+      variant="outline-primary"
+      @click.stop.prevent="openPackageGraph(getLabelOrError(pkg))"
+      :disabled="!hasPlus"
+      ><div class="w-full grid grid-cols-3 gap-2" style="grid-template-columns: 2rem 1fr auto">
+        <div class="aspect-square grid place-items-center">
+          <b-badge variant="primary">T3+</b-badge>
+        </div>
+        <span>PACKAGE GRAPH</span>
+        <div class="aspect-square grid place-items-center">
+          <font-awesome-icon icon="project-diagram" />
+        </div>
+      </div>
+    </b-button> -->
+
+    <b-button
+      size="sm"
+      variant="outline-primary"
+      :disabled="!hasPlus"
+      @click.stop.prevent="
+        setExplorerData({ packageLabel: getLabelOrError(pkg) }) && openMetrcExplorer()
+      "
+      ><div class="w-full grid grid-cols-3 gap-2" style="grid-template-columns: 2rem 1fr auto">
+        <div class="aspect-square grid place-items-center">
+          <b-badge variant="primary">T3+</b-badge>
+        </div>
+        <span>OPEN IN EXPLORER</span>
+        <div class="aspect-square grid place-items-center">
+          <font-awesome-icon icon="sitemap" />
+        </div>
+      </div>
+    </b-button>
+
+    <template v-if="isPackageEligibleForSplit">
       <b-button
         size="sm"
         variant="outline-primary"
-        class="aspect-square grid place-items-center"
-        @click.stop.prevent="setPackageHistorySourcePackage({ pkg }) && openPackageHistoryBuilder()"
-        ><div class="w-full grid grid-cols-2 gap-2" style="grid-template-columns: 1fr auto">
-          <span>PACKAGE HISTORY</span>
+        @click.stop.prevent="splitPackage()"
+        :disabled="!hasPlus"
+        ><div class="w-full grid grid-cols-3 gap-2" style="grid-template-columns: 2rem 1fr auto">
           <div class="aspect-square grid place-items-center">
-            <font-awesome-icon icon="sitemap" />
+            <b-badge variant="primary">T3+</b-badge>
           </div>
-        </div>
-      </b-button>
-
-      <b-button
-        size="sm"
-        variant="outline-primary"
-        class="aspect-square grid place-items-center"
-        @click.stop.prevent="
-          setExplorerData({ packageLabel: getLabelOrError(pkg) }) && openMetrcExplorer()
-        "
-        ><div class="w-full grid grid-cols-2 gap-2" style="grid-template-columns: 1fr auto">
-          <span>OPEN IN EXPLORER</span>
-          <div class="aspect-square grid place-items-center">
-            <font-awesome-icon icon="sitemap" />
-          </div>
-        </div>
-      </b-button>
-    </template>
-
-    <template v-if="isIdentityEligibleForSplitToolsImpl && isPackageEligibleForSplit">
-      <b-button size="sm" variant="outline-primary" @click.stop.prevent="splitPackage()"
-        ><div class="w-full grid grid-cols-2 gap-2" style="grid-template-columns: 1fr auto">
           <span>SPLIT PACKAGE</span>
           <div class="aspect-square grid place-items-center">
             <font-awesome-icon icon="expand-alt" />
@@ -67,7 +97,11 @@
       <template v-if="displayPackageLabTestOptions">
         <template v-if="displayPackageLabTestPDFOptions">
           <b-button size="sm" variant="outline-primary" @click.stop.prevent="viewLabTests()"
-            ><div class="w-full grid grid-cols-2 gap-2" style="grid-template-columns: 1fr auto">
+            ><div
+              class="w-full grid grid-cols-3 gap-2"
+              style="grid-template-columns: 2rem 1fr auto"
+            >
+              <div></div>
               <span>VIEW LAB TEST PDFS</span>
               <div class="aspect-square grid place-items-center">
                 <font-awesome-icon icon="file" />
@@ -76,7 +110,11 @@
           </b-button>
 
           <b-button size="sm" variant="outline-primary" @click.stop.prevent="printLabTests()"
-            ><div class="w-full grid grid-cols-2 gap-2" style="grid-template-columns: 1fr auto">
+            ><div
+              class="w-full grid grid-cols-3 gap-2"
+              style="grid-template-columns: 2rem 1fr auto"
+            >
+              <div></div>
               <span>PRINT LAB TEST PDFS</span>
               <div class="aspect-square grid place-items-center">
                 <font-awesome-icon icon="print" />
@@ -85,7 +123,11 @@
           </b-button>
 
           <b-button size="sm" variant="outline-primary" @click.stop.prevent="downloadLabTestPdfs()"
-            ><div class="w-full grid grid-cols-2 gap-2" style="grid-template-columns: 1fr auto">
+            ><div
+              class="w-full grid grid-cols-3 gap-2"
+              style="grid-template-columns: 2rem 1fr auto"
+            >
+              <div></div>
               <span>DOWNLOAD LAB TEST PDFS</span>
               <div class="aspect-square grid place-items-center">
                 <font-awesome-icon icon="file-download" />
@@ -95,7 +137,8 @@
         </template>
 
         <b-button size="sm" variant="outline-primary" @click.stop.prevent="downloadLabTestCsv()"
-          ><div class="w-full grid grid-cols-2 gap-2" style="grid-template-columns: 1fr auto">
+          ><div class="w-full grid grid-cols-3 gap-2" style="grid-template-columns: 2rem 1fr auto">
+            <div></div>
             <span>DOWNLOAD LAB RESULTS CSV</span>
             <div class="aspect-square grid place-items-center">
               <font-awesome-icon icon="file-csv" />
@@ -119,10 +162,6 @@ import { PackageHistoryActions } from "@/store/page-overlay/modules/package-hist
 import { PluginAuthActions } from "@/store/page-overlay/modules/plugin-auth/consts";
 import { SplitPackageBuilderActions } from "@/store/page-overlay/modules/split-package-builder/consts";
 import { TransferBuilderActions } from "@/store/page-overlay/modules/transfer-builder/consts";
-import {
-  isIdentityEligibleForSplitTools,
-  isIdentityEligibleForTransferTools,
-} from "@/utils/access-control";
 import { printPdfFromUrl } from "@/utils/dom";
 import {
   downloadLabTestCsv,
@@ -130,6 +169,7 @@ import {
   generatePackageMetadata,
   getLabelOrError,
 } from "@/utils/package";
+import { hasPlusImpl } from "@/utils/plus";
 import Vue from "vue";
 import { mapActions, mapState } from "vuex";
 
@@ -148,6 +188,9 @@ export default Vue.extend({
       authState: (state: IPluginState) => state.pluginAuth.authState,
       oAuthState: (state: IPluginState) => state.pluginAuth.oAuthState,
     }),
+    hasPlus(): boolean {
+      return hasPlusImpl();
+    },
     packageMetadataLoaded(): boolean {
       return !!this.$data.packageMetadata;
     },
@@ -165,19 +208,8 @@ export default Vue.extend({
 
       return this.$data.packageMetadata.testResultPdfUrls.length > 0;
     },
-    isIdentityEligibleForTransferToolsImpl(): boolean {
-      return isIdentityEligibleForTransferTools({
-        hostname: window.location.hostname,
-      });
-    },
     isPackageEligibleForSplit(): boolean {
       return this.$props.pkg?.PackageState === PackageState.ACTIVE;
-    },
-    isIdentityEligibleForSplitToolsImpl(): boolean {
-      return isIdentityEligibleForSplitTools({
-        identity: store.state.pluginAuth.authState?.identity || null,
-        hostname: window.location.hostname,
-      });
     },
   },
   data() {
@@ -210,6 +242,18 @@ export default Vue.extend({
       modalManager.dispatchModalEvent(ModalType.BUILDER, ModalAction.OPEN, {
         initialRoute: "/metrc-explorer",
       });
+    },
+    openPackageGraph(query: string) {
+      analyticsManager.track(MessageType.OPENED_GRAPH, {
+        source: "CONTEXT_MENU",
+      });
+
+      modalManager.dispatchModalEvent(ModalType.BUILDER, ModalAction.OPEN, {
+        initialRoute: "/graph",
+      });
+
+      // store.dispatch(`graph/${GraphActions.SET_SEARCH_QUERY}`, { query });
+      this.dismiss();
     },
     dismiss() {
       modalManager.dispatchContextMenuEvent(null);

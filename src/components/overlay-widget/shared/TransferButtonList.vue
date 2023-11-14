@@ -5,7 +5,8 @@
       v-if="enableEditTransferButton"
       variant="outline-primary"
       @click.stop.prevent="editTransfer()"
-      ><div class="w-full grid grid-cols-2 gap-2" style="grid-template-columns: 1fr auto">
+      ><div class="w-full grid grid-cols-3 gap-2" style="grid-template-columns: 2rem 1fr auto">
+        <div></div>
         <span>EDIT TRANSFER</span>
 
         <div class="aspect-square grid place-items-center"><font-awesome-icon icon="edit" /></div>
@@ -13,7 +14,8 @@
     </b-button>
 
     <b-button size="sm" variant="outline-primary" @click.stop.prevent="viewManifest()"
-      ><div class="w-full grid grid-cols-2 gap-2" style="grid-template-columns: 1fr auto">
+      ><div class="w-full grid grid-cols-3 gap-2" style="grid-template-columns: 2rem 1fr auto">
+        <div></div>
         <span>VIEW MANIFEST</span>
 
         <div class="aspect-square grid place-items-center"><font-awesome-icon icon="file" /></div>
@@ -21,7 +23,8 @@
     </b-button>
 
     <b-button size="sm" variant="outline-primary" @click.stop.prevent="newTabManifest()"
-      ><div class="w-full grid grid-cols-2 gap-2" style="grid-template-columns: 1fr auto">
+      ><div class="w-full grid grid-cols-3 gap-2" style="grid-template-columns: 2rem 1fr auto">
+        <div></div>
         <span>MANIFEST IN NEW TAB</span>
 
         <div class="aspect-square grid place-items-center">
@@ -31,7 +34,8 @@
     </b-button>
 
     <b-button size="sm" variant="outline-primary" @click.stop.prevent="printManifest()"
-      ><div class="w-full grid grid-cols-2 gap-2" style="grid-template-columns: 1fr auto">
+      ><div class="w-full grid grid-cols-3 gap-2" style="grid-template-columns: 2rem 1fr auto">
+        <div></div>
         <span>PRINT MANIFEST</span>
 
         <div class="aspect-square grid place-items-center"><font-awesome-icon icon="print" /></div>
@@ -39,7 +43,8 @@
     </b-button>
 
     <b-button size="sm" variant="outline-primary" @click.stop.prevent="downloadManifest()"
-      ><div class="w-full grid grid-cols-2 gap-2" style="grid-template-columns: 1fr auto">
+      ><div class="w-full grid grid-cols-3 gap-2" style="grid-template-columns: 2rem 1fr auto">
+        <div></div>
         <span>DOWNLOAD MANIFEST</span>
 
         <div class="aspect-square grid place-items-center">
@@ -49,7 +54,8 @@
     </b-button>
 
     <b-button size="sm" variant="outline-primary" @click.stop.prevent="downloadSummary()"
-      ><div class="w-full grid grid-cols-2 gap-2" style="grid-template-columns: 1fr auto">
+      ><div class="w-full grid grid-cols-3 gap-2" style="grid-template-columns: 2rem 1fr auto">
+        <div></div>
         <span>DOWNLOAD SUMMARY</span>
 
         <div class="aspect-square grid place-items-center">
@@ -58,8 +64,15 @@
       </div>
     </b-button>
 
-    <b-button size="sm" variant="outline-primary" @click.stop.prevent="createScanSheet()"
-      ><div class="w-full grid grid-cols-2 gap-2" style="grid-template-columns: 1fr auto">
+    <b-button
+      size="sm"
+      variant="outline-primary"
+      @click.stop.prevent="createScanSheet()"
+      :disabled="!hasPlus"
+      ><div class="w-full grid grid-cols-3 gap-2" style="grid-template-columns: 2rem 1fr auto">
+        <div>
+          <b-badge variant="primary">T3+</b-badge>
+        </div>
         <span>CREATE SCAN SHEET</span>
 
         <div class="aspect-square grid place-items-center">
@@ -83,10 +96,13 @@
       <template v-if="displayTransferLabTestPdfOptions">
         <b-button
           size="sm"
-          :disabled="!transfer || (!clientValues['ENABLE_T3PLUS'] && !t3plus)"
+          :disabled="!transfer || !hasPlus"
           variant="outline-primary"
           @click.stop.prevent="downloadAllLabTestPdfs()"
-          ><div class="w-full grid grid-cols-2 gap-2" style="grid-template-columns: 1fr auto">
+          ><div class="w-full grid grid-cols-3 gap-2" style="grid-template-columns: 2rem 1fr auto">
+            <div>
+              <b-badge variant="primary">T3+</b-badge>
+            </div>
             <span>DOWNLOAD ALL LAB TEST PDFS</span>
 
             <div class="aspect-square grid place-items-center">
@@ -99,10 +115,13 @@
       <template v-if="displayTransferLabTestCsvOptions">
         <b-button
           size="sm"
-          :disabled="!transfer || (!clientValues['ENABLE_T3PLUS'] && !t3plus)"
+          :disabled="!transfer || !hasPlus"
           variant="outline-primary"
           @click.stop.prevent="downloadAllLabTestCsvs()"
-          ><div class="w-full grid grid-cols-2 gap-2" style="grid-template-columns: 1fr auto">
+          ><div class="w-full grid grid-cols-3 gap-2" style="grid-template-columns: 2rem 1fr auto">
+            <div>
+              <b-badge variant="primary">T3+</b-badge>
+            </div>
             <span>DOWNLOAD ALL LAB TEST RESULT CSVS</span>
 
             <div class="aspect-square grid place-items-center">
@@ -135,6 +154,7 @@ import { SplitPackageBuilderActions } from "@/store/page-overlay/modules/split-p
 import { TransferBuilderActions } from "@/store/page-overlay/modules/transfer-builder/consts";
 import { downloadFileFromUrl, printPdfFromUrl } from "@/utils/dom";
 import { downloadLabTestCsv, downloadLabTestPdfs, getLabelOrError } from "@/utils/package";
+import { hasPlusImpl } from "@/utils/plus";
 import { createScanSheet, generateTransferMetadata } from "@/utils/transfer";
 import Vue from "vue";
 import { mapActions, mapState } from "vuex";
@@ -149,11 +169,13 @@ export default Vue.extend({
   components: {},
   computed: {
     ...mapState<IPluginState>({
-      clientValues: (state: IPluginState) => state.client.values,
-      t3plus: (state: IPluginState) => state.client.t3plus,
+      clientState: (state: IPluginState) => state.client,
       authState: (state: IPluginState) => state.pluginAuth.authState,
       oAuthState: (state: IPluginState) => state.pluginAuth.oAuthState,
     }),
+    hasPlus(): boolean {
+      return hasPlusImpl();
+    },
     transferMetadataLoaded(): boolean {
       return !!this.$data.transferMetadata;
     },

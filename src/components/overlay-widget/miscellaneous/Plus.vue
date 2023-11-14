@@ -10,7 +10,7 @@
         v-for="entry of entries"
         v-bind:key="entry.id"
         class="flex flex-col gap-4"
-        v-html="entry.html"
+        v-html="entry.answerHtml"
       ></div>
     </div>
   </div>
@@ -19,6 +19,8 @@
 <script lang="ts">
 import router from "@/router/index";
 import store from "@/store/page-overlay/index";
+// The marked import structure is causing problems
+// @ts-ignore
 import * as marked from "marked/lib/marked.cjs";
 import Vue from "vue";
 import { mapState } from "vuex";

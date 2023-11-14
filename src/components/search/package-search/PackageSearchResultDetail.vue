@@ -37,7 +37,9 @@
     </div>
 
     <div class="grid grid-cols-2 gap-2">
-      <package-button-list :pkg="packageSearchState.selectedPackageMetadata.packageData"></package-button-list>
+      <package-button-list
+        :pkg="packageSearchState.selectedPackageMetadata.packageData"
+      ></package-button-list>
     </div>
 
     <recursive-json-table
@@ -47,51 +49,47 @@
 </template>
 
 <script lang="ts">
-import MetrcTag from '@/components/overlay-widget/shared/MetrcTag.vue';
-import PackageButtonList from '@/components/overlay-widget/shared/PackageButtonList.vue';
-import RecursiveJsonTable from '@/components/search/shared/RecursiveJsonTable.vue';
+import MetrcTag from "@/components/overlay-widget/shared/MetrcTag.vue";
+import PackageButtonList from "@/components/overlay-widget/shared/PackageButtonList.vue";
+import RecursiveJsonTable from "@/components/search/shared/RecursiveJsonTable.vue";
 import {
   MessageType,
   METRC_HOSTNAMES_LACKING_LAB_PDFS,
   ModalAction,
   ModalType,
   PackageState,
-} from '@/consts';
-import { IIndexedPackageData, IPluginState, ITransferPackageList } from '@/interfaces';
-import { analyticsManager } from '@/modules/analytics-manager.module';
-import { modalManager } from '@/modules/modal-manager.module';
-import { PACKAGE_TAB_REGEX } from '@/modules/page-manager/consts';
-import { toastManager } from '@/modules/toast-manager.module';
-import store from '@/store/page-overlay/index';
-import { ExplorerActions } from '@/store/page-overlay/modules/explorer/consts';
-import { PackageHistoryActions } from '@/store/page-overlay/modules/package-history/consts';
-import { PackageSearchActions } from '@/store/page-overlay/modules/package-search/consts';
-import { SearchActions } from '@/store/page-overlay/modules/search/consts';
-import { SplitPackageBuilderActions } from '@/store/page-overlay/modules/split-package-builder/consts';
+} from "@/consts";
+import { IIndexedPackageData, IPluginState, ITransferPackageList } from "@/interfaces";
+import { analyticsManager } from "@/modules/analytics-manager.module";
+import { modalManager } from "@/modules/modal-manager.module";
+import { PACKAGE_TAB_REGEX } from "@/modules/page-manager/consts";
+import { toastManager } from "@/modules/toast-manager.module";
+import store from "@/store/page-overlay/index";
+import { ExplorerActions } from "@/store/page-overlay/modules/explorer/consts";
+import { PackageHistoryActions } from "@/store/page-overlay/modules/package-history/consts";
+import { PackageSearchActions } from "@/store/page-overlay/modules/package-search/consts";
+import { SearchActions } from "@/store/page-overlay/modules/search/consts";
+import { SplitPackageBuilderActions } from "@/store/page-overlay/modules/split-package-builder/consts";
 import {
   TransferBuilderActions,
   TransferBuilderGetters,
-} from '@/store/page-overlay/modules/transfer-builder/consts';
-import {
-  isIdentityEligibleForSplitTools,
-  isIdentityEligibleForTransferTools,
-} from '@/utils/access-control';
-import { copyToClipboard } from '@/utils/dom';
-import { getLabelOrError } from '@/utils/package';
-import Vue from 'vue';
-import { mapActions, mapGetters, mapState } from 'vuex';
+} from "@/store/page-overlay/modules/transfer-builder/consts";
+import { copyToClipboard } from "@/utils/dom";
+import { getLabelOrError } from "@/utils/package";
+import Vue from "vue";
+import { mapActions, mapGetters, mapState } from "vuex";
 
 export default Vue.extend({
-  name: 'PackageSearchResultDetail',
+  name: "PackageSearchResultDetail",
   store,
   components: { MetrcTag, RecursiveJsonTable, PackageButtonList },
   data(): {
     packageLabTestPdfEligible: boolean;
     activeTransferPackageList: ITransferPackageList | null;
-    } {
+  } {
     return {
       packageLabTestPdfEligible: !METRC_HOSTNAMES_LACKING_LAB_PDFS.includes(
-        window.location.hostname,
+        window.location.hostname
       ),
       activeTransferPackageList: null,
     };
@@ -104,17 +102,6 @@ export default Vue.extend({
     }),
     isOnPackagesPage() {
       return window.location.pathname.match(PACKAGE_TAB_REGEX);
-    },
-    isIdentityEligibleForTransferToolsImpl(): boolean {
-      return isIdentityEligibleForTransferTools({
-        hostname: window.location.hostname,
-      });
-    },
-    isIdentityEligibleForSplitToolsImpl(): boolean {
-      return isIdentityEligibleForSplitTools({
-        identity: store.state.pluginAuth.authState?.identity || null,
-        hostname: window.location.hostname,
-      });
     },
     ...mapGetters({
       isPackageInActiveList: `transferBuilder/${TransferBuilderGetters.IS_PACKAGE_IN_ACTIVE_LIST}`,
@@ -139,7 +126,7 @@ export default Vue.extend({
     openNewTransferBuilder() {
       analyticsManager.track(MessageType.STARTED_TRANSFER_FROM_TOOLKIT_SEARCH, {});
       modalManager.dispatchModalEvent(ModalType.BUILDER, ModalAction.OPEN, {
-        initialRoute: '/transfer/transfer-builder',
+        initialRoute: "/transfer/transfer-builder",
       });
     },
     async setPackageLabelFilter(pkg: IIndexedPackageData) {
@@ -152,7 +139,7 @@ export default Vue.extend({
           packageSearchFilters: {
             label: pkg.Label,
           },
-        },
+        }
       );
 
       this.setShowSearchResults({ showSearchResults: false });
@@ -163,28 +150,28 @@ export default Vue.extend({
       copyToClipboard(pkg.Label);
 
       toastManager.openToast(`'${pkg.Label}' copied to clipboard`, {
-        title: 'Copied Tag',
+        title: "Copied Tag",
         autoHideDelay: 5000,
-        variant: 'primary',
+        variant: "primary",
         appendToast: true,
-        toaster: 'ttt-toaster',
+        toaster: "ttt-toaster",
         solid: true,
       });
     },
     badgeVariant(pkg: IIndexedPackageData) {
       switch (pkg.PackageState) {
         case PackageState.ACTIVE:
-          return 'success';
+          return "success";
         case PackageState.INACTIVE:
-          return 'danger';
+          return "danger";
         case PackageState.IN_TRANSIT:
-          return 'dark';
+          return "dark";
         default:
           return null;
       }
     },
     displayPackageState(pkg: IIndexedPackageData) {
-      return pkg.PackageState.replaceAll('_', ' ');
+      return pkg.PackageState.replaceAll("_", " ");
     },
   },
 });

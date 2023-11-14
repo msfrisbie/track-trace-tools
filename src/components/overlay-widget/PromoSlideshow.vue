@@ -130,12 +130,12 @@
             <div>Track & Trace Tools removes the Metrc snowflakes.</div>
           </div>
         </template>
-        <template v-if="slide === 'settings'">
+        <!-- <template v-if="slide === 'settings'">
           <div class="text-gray-700 flex flex-col justify-around gap-2">
             <div class="font-semibold ttt-purple">Customize Track &amp; Trace Tools</div>
             <div>Control and configure how T3 interacts with Metrc in Settings.</div>
           </div>
-        </template>
+        </template> -->
         <template v-if="slide === 'csv'">
           <div class="text-gray-700 flex flex-col justify-around gap-2">
             <div class="font-semibold ttt-purple">Generate CSVs</div>
@@ -149,10 +149,23 @@
               Get access to advanced Track &amp; Trace Tools features with
               <a
                 class="text-purple-500 hover:text-purple-500 underline"
-                href="https://trackandtrace.tools/plus"
-                target="_blank"
-                @click.stop
+                href="#"
+                @click.stop="openRoute('/plus')"
                 >T3+</a
+              >
+            </div>
+          </div>
+        </template>
+        <template v-if="slide === 'settings'">
+          <div class="text-gray-700 flex flex-col justify-around gap-2">
+            <div class="font-semibold ttt-purple">Customise Metrc Appearance</div>
+            <div>
+              Change the look and feel of Metrc in
+              <a
+                class="text-purple-500 hover:text-purple-500 underline"
+                href="#"
+                @click.stop="openRoute('/settings/all')"
+                >Settings</a
               >
             </div>
           </div>
@@ -266,6 +279,8 @@
 </template>
 
 <script lang="ts">
+import { ModalAction, ModalType } from "@/consts";
+import { modalManager } from "@/modules/modal-manager.module";
 import router from "@/router/index";
 import store from "@/store/page-overlay/index";
 import _ from "lodash-es";
@@ -307,7 +322,6 @@ export default Vue.extend({
         "finalize",
         "tagvoid",
         "shortcuts",
-        "settings",
         "forum",
         "clickme",
         "solutions",
@@ -319,6 +333,7 @@ export default Vue.extend({
         "share",
         // "donate",
         "googlesheets",
+        "settings",
         // "searchsurvey",
       ]),
     };
@@ -333,6 +348,11 @@ export default Vue.extend({
     },
     onSlideEnd(slide: any) {
       this.$data.sliding = false;
+    },
+    openRoute(initialRoute: string) {
+      modalManager.dispatchModalEvent(ModalType.BUILDER, ModalAction.OPEN, {
+        initialRoute,
+      });
     },
   },
   async created() {},

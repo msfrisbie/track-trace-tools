@@ -5,7 +5,11 @@
         <template v-if="pkg">
           <b-dropdown variant="outline-primary" size="sm" no-caret>
             <template #button-content>
-              <div class="w-full grid grid-cols-2 gap-2" style="grid-template-columns: 1fr auto">
+              <div
+                class="w-full grid grid-cols-3 gap-2"
+                style="grid-template-columns: 2rem 1fr auto"
+              >
+                <div></div>
                 <span>FILTER...</span>
                 <div class="aspect-square grid place-items-center">
                   <font-awesome-icon icon="filter" />
@@ -95,7 +99,8 @@
       <template v-if="contextMenuEvent && contextMenuEvent.manifestNumber">
         <b-dropdown variant="outline-primary" no-caret size="sm" :disabled="!transfer">
           <template #button-content>
-            <div class="w-full grid grid-cols-2 gap-2" style="grid-template-columns: 1fr auto">
+            <div class="w-full grid grid-cols-3 gap-2" style="grid-template-columns: 2rem 1fr auto">
+              <div></div>
               <span>FILTER...</span>
               <div class="aspect-square grid place-items-center">
                 <font-awesome-icon icon="filter" />
