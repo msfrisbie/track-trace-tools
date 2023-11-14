@@ -445,8 +445,6 @@ try {
   chrome.storage.local.get(ChromeStorageKeys.SETTINGS).then((result) => {
     const persistedSettings = result[ChromeStorageKeys.SETTINGS];
 
-    console.log({ persistedSettings });
-
     if (!persistedSettings) {
       return;
     }
