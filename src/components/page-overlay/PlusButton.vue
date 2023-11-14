@@ -1,18 +1,12 @@
 <template>
-  <b-button
-    variant="primary"
+  <div
     title="T3+"
-    style="padding: 0"
     @click="openBuilder($event)"
-    target="_blank"
+    class="cursor-pointer rounded bg-gradient-to-r from-purple-800 hover:from-purple-900 to-purple-400 hover:to-purple-500 flex flex-col items-center justify-center text-xl font-semibold text-white text-center"
+    style="width: 52px; height: 52px; border: 1px solid white"
   >
-    <div
-      class="flex flex-col items-center justify-center text-xl font-semibold"
-      style="width: 52px; height: 52px"
-    >
-      <span>T3+</span>
-    </div>
-  </b-button>
+    <span>T3+</span>
+  </div>
 </template>
 
 <script lang="ts">

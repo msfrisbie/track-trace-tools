@@ -77,9 +77,11 @@ T3+ gives you access to additional tools and is available as a monthly subscript
         {
           question: "What is changing?",
           answerMarkdown: `
-**Track & Trace Tools will still be free to use.**
+**Users now have the option to subscribe to T3+.**
 
 T3+ makes Track & Trace Tools even more powerful by adding new features such as advanced reports, a Metrc history explorer, scan sheet generator, and more.
+
+Track & Trace Tools will not require a subscription to use basic features.
 
 A small number of existing tools are being moved to T3+. These tools will be available as part of the free plan until 12/1/2023.
 
@@ -91,6 +93,10 @@ A small number of existing tools are being moved to T3+. These tools will be ava
         {
           question: "What is included with T3+?",
           answerMarkdown: `
+**T3+ gives you access to a large set of new tools specially designed for cannabis businesses of all types and sizes.**
+
+T3+ will continue to get new tools over time for no additional cost. T3+ users will also be granted early access to [OpenTag](https://trackandtrace.tools/scan) once it is ready.
+
 [Read more about all the T3+ features](https://dash.trackandtrace.tools/features)
 `,
           answerHtml: "",
@@ -164,8 +170,11 @@ Reach out to [matt@trackandtrace.tools](mailto:matt@trackandtrace.tools)
 
       this.$data.selectedEntry = entry;
 
-      this.$refs
-        .answers!.querySelector(`#${entry.id}`)
+      // @ts-ignore
+      const answers: HTMLElement = this.$refs.answers!;
+
+      answers
+        .querySelector(`#${entry.id}`)!
         .scrollIntoView({ behavior: "smooth", block: "start", inline: "start" });
     },
   },
