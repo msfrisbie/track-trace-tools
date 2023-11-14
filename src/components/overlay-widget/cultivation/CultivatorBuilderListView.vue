@@ -189,7 +189,7 @@ export default Vue.extend({
           backgroundColor: "#48b867",
           enabled: true,
           isPlus: false,
-          isBeta: true,
+          isBeta: false,
         },
         {
           route: "/cultivator/retag-plant-batches",

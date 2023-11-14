@@ -4,7 +4,7 @@
       size="sm"
       variant="outline-primary"
       @click.stop.prevent="transferPackage()"
-      :disabled="!hasPlus"
+      :disabled="!hasPlus && !clientState.flags.enable_t3plus_free_tools"
       ><div class="w-full grid grid-cols-3 gap-2" style="grid-template-columns: 2rem 1fr auto">
         <div class="aspect-square grid place-items-center">
           <b-badge variant="primary">T3+</b-badge>
@@ -17,7 +17,7 @@
     </b-button>
 
     <b-button
-      v-if="clientValues.ENABLE_PACKAGE_HISTORY"
+      v-if="clientState.values.ENABLE_PACKAGE_HISTORY"
       size="sm"
       variant="outline-primary"
       @click.stop.prevent="setPackageHistorySourcePackage({ pkg }) && openPackageHistoryBuilder()"
@@ -69,7 +69,7 @@
         size="sm"
         variant="outline-primary"
         @click.stop.prevent="splitPackage()"
-        :disabled="!hasPlus"
+        :disabled="!hasPlus && !clientState.flags.enable_t3plus_free_tools"
         ><div class="w-full grid grid-cols-3 gap-2" style="grid-template-columns: 2rem 1fr auto">
           <div class="aspect-square grid place-items-center">
             <b-badge variant="primary">T3+</b-badge>
@@ -183,7 +183,7 @@ export default Vue.extend({
   components: {},
   computed: {
     ...mapState<IPluginState>({
-      clientValues: (state: IPluginState) => state.client.values,
+      clientState: (state: IPluginState) => state.client,
       t3plus: (state: IPluginState) => state.client.t3plus,
       authState: (state: IPluginState) => state.pluginAuth.authState,
       oAuthState: (state: IPluginState) => state.pluginAuth.oAuthState,
