@@ -6,7 +6,7 @@ import {
   IIndexedRichOutgoingTransferData,
   IPluginState,
   IUnionIndexedPackageData,
-  IUnitOfMeasure,
+  IUnitOfMeasure
 } from '@/interfaces';
 import { DataLoader, getDataLoaderByLicense } from '@/modules/data-loader/data-loader.module';
 import { dynamicConstsManager } from '@/modules/dynamic-consts-manager.module';
@@ -15,7 +15,7 @@ import { ReportsMutations, ReportType } from '@/store/page-overlay/modules/repor
 import {
   IReportConfig,
   IReportData,
-  IReportsState,
+  IReportsState
 } from '@/store/page-overlay/modules/reports/interfaces';
 import { TransferPackageSearchAlgorithm } from '@/store/page-overlay/modules/transfer-package-search/consts';
 import { v4 as uuidv4 } from 'uuid';
@@ -29,7 +29,7 @@ import {
   extractHarvestChildPackageLabelsFromHistory,
   extractInitialPackageQuantityAndUnitFromHistoryOrError,
   extractParentPackageTagQuantityUnitItemSetsFromHistory,
-  extractTestSamplePackageLabelsFromHistory,
+  extractTestSamplePackageLabelsFromHistory
 } from '../history';
 import {
   getIdOrError,
@@ -37,7 +37,7 @@ import {
   getItemUnitOfMeasureAbbreviationOrError,
   getItemUnitQuantityAndUnitOrError,
   getLabelOrError,
-  getStrainNameOrError,
+  getStrainNameOrError
 } from '../package';
 import { findMatchingTransferPackages } from '../transfer';
 import { convertUnits } from '../units';
@@ -54,6 +54,8 @@ interface IHarvestPackagesReportFormFilters {
   displayFullTags: boolean;
   addSpacing: boolean;
   debug: boolean;
+  enableHarvestMatchFilter: boolean;
+  harvestMatchFilter: string;
 }
 
 type IHarvestPackageRowData = {
@@ -118,6 +120,8 @@ export const harvestPackagesFormFiltersFactory: () => IHarvestPackagesReportForm
   displayFullTags: false,
   addSpacing: false,
   debug: false,
+  enableHarvestMatchFilter: false,
+  harvestMatchFilter: ""
 });
 
 export function addHarvestPackagesReport({
@@ -147,6 +151,8 @@ export function addHarvestPackagesReport({
     displayFullTags: harvestPackagesFormFilters.displayFullTags,
     addSpacing: harvestPackagesFormFilters.addSpacing,
     removeFloorNugs: harvestPackagesFormFilters.removeFloorNugs,
+    harvestMatchFilter: harvestPackagesFormFilters.harvestMatchFilter,
+    enableHarvestMatchFilter: harvestPackagesFormFilters.enableHarvestMatchFilter,
     fields: null,
   };
 }
@@ -269,6 +275,12 @@ export async function maybeLoadHarvestPackagesReportData({
   await Promise.allSettled(promises);
 
   harvests = harvests.filter((harvest) => {
+    if (harvestConfig.enableHarvestMatchFilter) {
+      if (!harvest.Name.includes(harvestConfig.harvestMatchFilter)) {
+        return false;
+      }
+    }
+
     if (harvestConfig.harvestFilter.harvestDateLt) {
       if (harvest.HarvestStartDate > harvestConfig.harvestFilter.harvestDateLt) {
         return false;
@@ -522,14 +534,22 @@ export async function maybeLoadHarvestPackagesReportData({
           throw new Error(`Could not load history for child package ${childPackageLabel}`);
         }
 
+        // If top-level pkg was transferred, assume it is the Post QC - Sent to Lab package
+        if (childPackage.LicenseNumber !== harvest.LicenseNumber) {
+          harvestPostQcPackages.push(childPackage);
+          continue;
+        }
+
+        const childItemName = getItemNameOrError(childPackage);
+
         // Trim is handled later on
-        if (getItemNameOrError(childPackage).includes('Trim')) {
+        if (stringMatch(childItemName, ['Trim']) && !stringMatch(childItemName, ['Popcorn', 'Flower'])) {
           trimChildPackages.push(childPackage);
           continue;
         }
 
         // Shake is handled later on
-        if (getItemNameOrError(childPackage).includes('Shake')) {
+        if (stringMatch(childItemName, ['Shake'])) {
           shakeChildPackages.push(childPackage);
           continue;
         }
@@ -537,7 +557,6 @@ export async function maybeLoadHarvestPackagesReportData({
         intakePackages.push(childPackage);
       }
 
-      TODO this variable is never set
       for (const childPackage of harvestPostQcPackages) {
         recordHarvestPostQcRow(
           reportConfig,
@@ -651,7 +670,7 @@ export async function maybeLoadHarvestPackagesReportData({
             }
           } catch {}
 
-          if (getItemNameOrError(grandchildPackage).includes('Shake')) {
+          if (stringMatch(getItemNameOrError(grandchildPackage), ['Shake'])) {
             shakePackages.push(grandchildPackage);
           } else {
             standardPackages.push(grandchildPackage);
@@ -828,15 +847,15 @@ export function extractHarvestPackagesData({
 }
 
 function normalizeItemNameToMaterialType(itemName: string) {
-  if (itemName.includes('Popcorn')) {
+  if (stringMatch(itemName, ['Popcorn'])) {
     return 'Popcorn';
   }
 
-  if (itemName.includes('Preroll')) {
+  if (stringMatch(itemName, ['Preroll'])) {
     return 'Prerolls';
   }
 
-  if (itemName.includes('Flower')) {
+  if (stringMatch(itemName, ['Flower'])) {
     return 'Flower';
   }
 
@@ -921,7 +940,7 @@ function recordPostQcRows(
   let childMLOverpackTotal = 0;
 
   for (const childAdjustmentReasonNote of childAdjustmentReasonNoteSets) {
-    if (childAdjustmentReasonNote.reason.includes('Waste')) {
+    if (stringMatch(childAdjustmentReasonNote.reason, ['Waste'])) {
       childWasteTotal += childAdjustmentReasonNote.quantity;
     } else {
       childMLOverpackTotal += childAdjustmentReasonNote.quantity;
@@ -1020,7 +1039,7 @@ function recordPackagingRows(
   let grandchildShakeTotal = 0;
 
   for (const grandchildAdjustmentReasonNote of grandchildAdjustmentReasonNoteSets) {
-    if (grandchildAdjustmentReasonNote.reason.includes('Waste')) {
+    if (stringMatch(grandchildAdjustmentReasonNote.reason, ['Waste'])) {
       grandchildWasteTotal += grandchildAdjustmentReasonNote.quantity;
     } else {
       grandchildMLOverpackTotal += grandchildAdjustmentReasonNote.quantity;
@@ -1038,7 +1057,7 @@ function recordPackagingRows(
   ] of greatgrandchildPackageLabelSets) {
     const greatgrandchildPackage = packageMap.get(greatgrandchildLabel);
 
-    if (greatgrandchildPackage && getItemNameOrError(greatgrandchildPackage).includes('Shake')) {
+    if (greatgrandchildPackage && stringMatch(getItemNameOrError(greatgrandchildPackage), ['Shake'])) {
       grandchildShakeTotal += greatgrandchildQty;
     } else {
       grandchildPackagedTotal += greatgrandchildQty;
@@ -1220,7 +1239,7 @@ function maybeRecordPostQCWasteRow(
   let childWasteTotal = 0;
 
   for (const childAdjustmentReasonNote of childAdjustmentReasonNoteSets) {
-    if (childAdjustmentReasonNote.reason.includes('Waste')) {
+    if (stringMatch(childAdjustmentReasonNote.reason, ['Waste'])) {
       childWasteTotal += childAdjustmentReasonNote.quantity;
     }
   }
@@ -1283,9 +1302,9 @@ function recordHarvestPackageAdjustmentRows(
   for (const harvestPackageAdjustmentReasonNote of harvestPackageAdjustmentReasonNoteSets) {
     let materialType = 'Adjustment';
 
-    if (harvestPackageAdjustmentReasonNote.reason.includes('Waste')) {
+    if (stringMatch(harvestPackageAdjustmentReasonNote.reason, ['Waste'])) {
       materialType = 'Waste';
-    } else if (harvestPackageAdjustmentReasonNote.reason.includes('Moisture')) {
+    } else if (stringMatch(harvestPackageAdjustmentReasonNote.reason, ['Moisture'])) {
       materialType = 'Process Loss';
     }
 
@@ -1351,4 +1370,19 @@ function truncateTag(
   tag: string,
 ): string {
   return harvestConfig!.displayFullTags ? tag : tag.slice(-8).replace(/^0+/, '');
+}
+
+function stringMatch(src: string, tokens: string[]): boolean {
+  const normalizedStringPieces: string[] = src.toLocaleLowerCase().trim().split(/\s+/);
+  const normalizedTokens: string[] = tokens.map((x) => x.toLocaleLowerCase().trim());
+
+  for (const normalizedStringPiece of normalizedStringPieces) {
+    for (const normalizedToken of normalizedTokens) {
+      if (normalizedStringPiece === normalizedToken) {
+        return true;
+      }
+    }
+  }
+
+  return false;
 }

@@ -308,6 +308,19 @@
                 <b-form-checkbox v-model="harvestPackagesFormFilters.addSpacing">
                   <span class="leading-6">Add spacing</span>
                 </b-form-checkbox>
+                <b-form-checkbox v-model="harvestPackagesFormFilters.enableHarvestMatchFilter">
+                  <span class="leading-6">Use harvest match filter</span>
+                </b-form-checkbox>
+                <b-form-group
+                  v-if="harvestPackagesFormFilters.enableHarvestMatchFilter"
+                  label="Only include harvest names matching:"
+                >
+                  <b-form-input
+                    placeholder="Full or partial harvest name"
+                    v-model="harvestPackagesFormFilters.harvestMatchFilter"
+                  >
+                  </b-form-input>
+                </b-form-group>
                 <b-form-group label="Licenses:">
                   <b-form-checkbox-group
                     v-model="harvestPackagesFormFilters.licenses"

@@ -1,3 +1,5 @@
+import { IIndexedHarvestData, IIndexedPackageData, IIndexedPlantBatchData, IIndexedPlantData, IIndexedTransferData } from "@/interfaces";
+
 export function maybePushOntoUniqueStack(value: any | null, stack: Array<string>): Array<string> {
   if (!value) {
     return stack;
@@ -17,7 +19,15 @@ export function maybePushOntoUniqueStack(value: any | null, stack: Array<string>
   return stack;
 }
 
-// export function collectionTransformer<T>(objects: T[], groupConfigs: ): {
-//   objects,
-//   groups:
-// }
+export async function sloppyObjectSearch(queryString: string): Promise<{
+  pkg?: IIndexedPackageData,
+  plant?: IIndexedPlantData,
+  plantBatch?: IIndexedPlantBatchData,
+  harvest?: IIndexedHarvestData,
+  incomingTransfer?: IIndexedTransferData
+  outgoingTransfer?: IIndexedTransferData
+}> {
+  const match = {};
+
+  return match;
+}

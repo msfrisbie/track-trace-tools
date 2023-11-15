@@ -70,6 +70,8 @@ export interface IReportConfig {
     displayFullTags: boolean;
     addSpacing: boolean;
     removeFloorNugs: boolean;
+    harvestMatchFilter: string;
+    enableHarvestMatchFilter: boolean;
     fields: null;
   };
   [ReportType.COGS_TRACKER]?: {
