@@ -537,6 +537,7 @@ export async function maybeLoadHarvestPackagesReportData({
         intakePackages.push(childPackage);
       }
 
+      TODO this variable is never set
       for (const childPackage of harvestPostQcPackages) {
         recordHarvestPostQcRow(
           reportConfig,
