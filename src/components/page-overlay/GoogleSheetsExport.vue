@@ -6,40 +6,29 @@
         class="flex flex-col gap-2 items-stretch"
         v-bind:class="{ 'opacity-50': reportStatus !== ReportStatus.INITIAL }"
       >
+        <div class="text-start text-gray-600 pb-2" v-if="!clientValues['ENABLE_T3PLUS'] && !t3plus">
+          Get access to advanced reports with
+          <a class="text-purple-500 underline" href="#" @click="$router.push('/plus')">T3+</a>
+        </div>
+
         <b-form-group>
           <b-form-checkbox-group v-model="selectedReports" class="flex flex-col gap-1">
-            <b-form-checkbox
-              v-for="eligibleReportOption of eligibleReportOptions"
-              v-bind:key="eligibleReportOption.value"
-              :value="eligibleReportOption"
-              :disabled="reportStatus !== ReportStatus.INITIAL"
-              ><div class="flex flex-col items-start gap-1">
-                <span class="">{{ eligibleReportOption.text }}</span>
-                <span class="text-xs text-gray-400">{{ eligibleReportOption.description }}</span>
-              </div>
-            </b-form-checkbox>
-
-            <div
-              class="text-start text-gray-600 pb-2"
-              v-if="!clientValues['ENABLE_T3PLUS'] && !t3plus"
-            >
-              Get access to advanced reports with
-              <a class="text-purple-500 underline" href="#" @click="$router.push('/plus')">T3+</a>
-            </div>
-
-            <b-form-checkbox
-              class="opacity-50"
-              v-for="disabledVisibleReportOption of disabledVisibleReportOptions"
-              v-bind:key="disabledVisibleReportOption.value"
-              :value="disabledVisibleReportOption.value"
-              :disabled="true"
-              ><div class="flex flex-col items-start gap-1">
-                <span class="">{{ disabledVisibleReportOption.text }}</span>
-                <!-- <span class="text-xs text-gray-400">{{
-                    disabledVisibleReportOption.description
-                  }}</span> -->
-              </div>
-            </b-form-checkbox>
+            <report-checkbox-section
+              title="CUSTOM"
+              :reportOptions="reportOptions.filter((x) => x.isCustom)"
+            ></report-checkbox-section>
+            <report-checkbox-section
+              title="QUICKVIEW"
+              :reportOptions="reportOptions.filter((x) => x.isQuickview)"
+            ></report-checkbox-section>
+            <report-checkbox-section
+              title="CATALOG"
+              :reportOptions="reportOptions.filter((x) => x.isCatalog)"
+            ></report-checkbox-section>
+            <report-checkbox-section
+              title="ADVANCED"
+              :reportOptions="reportOptions.filter((x) => x.isSpecialty)"
+            ></report-checkbox-section>
           </b-form-checkbox-group>
         </b-form-group>
       </div>
@@ -1579,7 +1568,7 @@
             :disabled="!enableCsvGenerateButton"
             >EXPORT TO CSV</b-button
           >
-          <template v-if="!isReportSelectionCsvCompatible">
+          <template v-if="!enableCsvGenerateButton">
             <div class="text-xs">The selected report(s) are not CSV compatible</div>
           </template>
 
@@ -1675,6 +1664,7 @@
 </template>
 
 <script lang="ts">
+import ReportCheckboxSection from "@/components/overlay-widget/shared/ReportCheckboxSection.vue";
 import ReportLicensePicker from "@/components/overlay-widget/shared/ReportLicensePicker.vue";
 import { MessageType } from "@/consts";
 import { IPluginState } from "@/interfaces";
@@ -1690,7 +1680,7 @@ import {
   ReportType,
   SHEET_FIELDS,
 } from "@/store/page-overlay/modules/reports/consts";
-import { IReportConfig } from "@/store/page-overlay/modules/reports/interfaces";
+import { IReportConfig, IReportOption } from "@/store/page-overlay/modules/reports/interfaces";
 import { getIsoDateFromOffset } from "@/utils/date";
 import { addCogsReport, cogsFormFiltersFactory } from "@/utils/reports/cogs-report";
 import {
@@ -1755,6 +1745,7 @@ import {
   addPointInTimeInventoryReport,
   pointInTimeInventoryFormFiltersFactory,
 } from "@/utils/reports/point-in-time-inventory-report";
+import { reportCatalogFactory } from "@/utils/reports/reports-shared";
 import {
   addStragglerPackagesReport,
   stragglerPackagesFormFiltersFactory,
@@ -1770,18 +1761,6 @@ import { mapActions, mapState } from "vuex";
 import ArchiveWidget from "../shared/ArchiveWidget.vue";
 import SimpleDrawer from "../shared/SimpleDrawer.vue";
 
-interface IReportOption {
-  text: string;
-  value: ReportType | null;
-  t3plus: boolean;
-  isCustom: false; // Unused
-  enabled: boolean;
-  hidden?: boolean;
-  description: string;
-  isCsvEligible: boolean;
-  isSingleton: boolean;
-}
-
 export default Vue.extend({
   name: "GoogleSheetsExport",
   store,
@@ -1791,6 +1770,7 @@ export default Vue.extend({
     ArchiveWidget,
     SimpleDrawer,
     ReportLicensePicker,
+    ReportCheckboxSection,
   },
   computed: {
     ...mapState<IPluginState>({
@@ -1808,11 +1788,9 @@ export default Vue.extend({
     enableCsvGenerateButton(): boolean {
       return (
         this.selectedReports.length > 0 &&
-        !this.selectedReports.find((x: IReportOption) => !x.isCsvEligible)
+        this.selectedReports.filter((x: IReportOption) => x.usesFormulas || x.isMultiSheet)
+          .length === 0
       );
-    },
-    isReportSelectionCsvCompatible(): boolean {
-      return !this.selectedReports.find((x: IReportOption) => !x.isCsvEligible);
     },
     enableGoogleSheetsGenerateButton(): boolean {
       return (
@@ -1820,12 +1798,15 @@ export default Vue.extend({
         store.state.pluginAuth.oAuthState === OAuthState.AUTHENTICATED
       );
     },
-    eligibleReportOptions(): IReportOption[] {
-      return this.eligibleReportOptionsImpl();
+    reportOptions(): IReportOption[] {
+      return reportCatalogFactory();
     },
-    disabledVisibleReportOptions(): IReportOption[] {
-      return this.disabledVisibleReportOptionsImpl();
-    },
+    // eligibleReportOptions(): IReportOption[] {
+    //   return this.eligibleReportOptionsImpl();
+    // },
+    // disabledVisibleReportOptions(): IReportOption[] {
+    //   return this.disabledVisibleReportOptionsImpl();
+    // },
     cogsV2key(): string {
       return getCogsV2CacheKey({
         licenses: this.$data.cogsV2FormFilters.licenses,
@@ -1935,267 +1916,38 @@ export default Vue.extend({
     uncheckAll(reportType: ReportType): void {
       this.fields[reportType] = _.cloneDeep(SHEET_FIELDS[reportType]).filter((x) => x.required);
     },
-    // snapshotEverything(): void {
-    //   this.selectedReports = this.eligibleReportOptions.map((x: IReportOption) => x.value);
+    // eligibleReportOptionsImpl(): IReportOption[] {
+    //   return this.reportCatalogFactory().filter((x: IReportOption) => {
+    //     if (x.hidden) {
+    //       return false;
+    //     }
+
+    //     if (!x.enabled) {
+    //       return false;
+    //     }
+
+    //     if (x.t3plus) {
+    //       return store.state.client.values.ENABLE_T3PLUS || store.state.client.t3plus;
+    //     }
+    //     return true;
+    //   });
     // },
-    reportOptionsImpl(): IReportOption[] {
-      const reportOptions: IReportOption[] = [
-        {
-          text: "Packages",
-          value: ReportType.PACKAGES,
-          t3plus: true,
-          enabled: true,
-          description: "All packages. Filter by type and date.",
-          isCustom: false,
-          isCsvEligible: true,
-          isSingleton: false,
-        },
-        {
-          text: "Point-in-time inventory",
-          value: ReportType.POINT_IN_TIME_INVENTORY,
-          t3plus: true,
-          enabled: true,
-          description: "All active packages on a certain date.",
-          isCustom: false,
-          isCsvEligible: true,
-          isSingleton: false,
-        },
-        {
-          text: "Plant Batches",
-          value: ReportType.IMMATURE_PLANTS,
-          t3plus: true,
-          enabled: true,
-          description: "All plant batches. Filter by planted date.",
-          isCustom: false,
-          isCsvEligible: true,
-          isSingleton: false,
-        },
-        {
-          text: "Mature Plants",
-          value: ReportType.MATURE_PLANTS,
-          t3plus: true,
-          enabled: true,
-          description: "All mature plants. Filter by growth phase and planted date",
-          isCustom: false,
-          isCsvEligible: true,
-          isSingleton: false,
-        },
-        {
-          text: "Incoming Transfers",
-          value: ReportType.INCOMING_TRANSFERS,
-          t3plus: true,
-          enabled: true,
-          description: "All incoming transfers. Filter by wholesale and ETA",
-          isCustom: false,
-          isCsvEligible: true,
-          isSingleton: false,
-        },
-        {
-          text: "Outgoing Transfers",
-          value: ReportType.OUTGOING_TRANSFERS,
-          t3plus: true,
-          enabled: true,
-          description: "All outgoing transfers. Filter by wholesale and ETD",
-          isCustom: false,
-          isCsvEligible: true,
-          isSingleton: false,
-        },
-        // Disabled - Destinations returns 0, more like incoming?
-        // {
-        //   text: "Hub Transfers",
-        //   value: ReportType.TRANSFER_HUB_TRANSFERS,
-        //   t3plus: false,
-        //   enabled: true,
-        //   description: "Filter by estimated time of departure",
-        //   isCustom: false,
-        // },
-        {
-          text: "Tags",
-          value: ReportType.TAGS,
-          t3plus: true,
-          enabled: true,
-          description: "All tags. Filter by status and tag type.",
-          isCustom: false,
-          isCsvEligible: true,
-          isSingleton: false,
-        },
-        {
-          text: "Harvests",
-          value: ReportType.HARVESTS,
-          t3plus: true,
-          enabled: true,
-          description: "All harvests. Filter by status and harvest date.",
-          isCustom: false,
-          isCsvEligible: true,
-          isSingleton: false,
-        },
-        {
-          text: "Outgoing Transfer Manifests",
-          value: ReportType.OUTGOING_TRANSFER_MANIFESTS,
-          t3plus: true,
-          enabled: true,
-          description: "Full transfer and package data for all outgoing transfers.",
-          isCustom: false,
-          isCsvEligible: true,
-          isSingleton: false,
-        },
-        {
-          text: "Straggler Inventory",
-          value: ReportType.STRAGGLER_PACKAGES,
-          t3plus: true,
-          enabled: true,
-          description: "Find old and empty inventory",
-          isCustom: false,
-          isCsvEligible: true,
-          isSingleton: false,
-        },
-        {
-          text: "Employee Activity",
-          value: ReportType.EMPLOYEE_AUDIT,
-          t3plus: true,
-          enabled: true,
-          description: "View all employee activity in Metrc",
-          isCustom: false,
-          isCsvEligible: true,
-          isSingleton: false,
-        },
-        {
-          text: "COGS",
-          value: ReportType.COGS_V2,
-          t3plus: false,
-          enabled: !!store.state.client.values.ENABLE_COGS,
-          hidden: !store.state.client.values.ENABLE_COGS,
-          description: "Generate COGS calculator",
-          isCustom: false,
-          isCsvEligible: false,
-          isSingleton: true,
-        },
-        {
-          text: "COGS Tracker",
-          value: ReportType.COGS_TRACKER,
-          t3plus: false,
-          enabled: !!store.state.client.values.ENABLE_COGS_TRACKER,
-          hidden: !store.state.client.values.ENABLE_COGS_TRACKER,
-          description: "Generate COGS Tracker sheets",
-          isCustom: false,
-          isCsvEligible: false,
-          isSingleton: true,
-        },
-        {
-          text: "Employee Samples",
-          value: ReportType.EMPLOYEE_SAMPLES,
-          t3plus: false,
-          enabled: !!store.state.client.values.ENABLE_EMPLOYEE_SAMPLE_TOOL,
-          hidden: !store.state.client.values.ENABLE_EMPLOYEE_SAMPLE_TOOL,
-          description: "Generate summary of employee samples",
-          isCustom: false,
-          isCsvEligible: false,
-          isSingleton: true,
-        },
-        {
-          text: "Harvest Packages",
-          value: ReportType.HARVEST_PACKAGES,
-          t3plus: false,
-          enabled: !!store.state.client.values.ENABLE_HARVEST_PACKAGES,
-          hidden: !store.state.client.values.ENABLE_HARVEST_PACKAGES,
-          description: "Generate summary of harvest packages",
-          isCustom: false,
-          isCsvEligible: true,
-          isSingleton: true,
-        },
-        {
-          text: "Packages Quickview",
-          value: ReportType.PACKAGES_QUICKVIEW,
-          t3plus: true,
-          enabled: true,
-          description: "Grouped summary of packages by item, location, and dates",
-          isCustom: false,
-          isCsvEligible: true,
-          isSingleton: false,
-        },
-        {
-          text: "Plant Batch Quickview",
-          value: ReportType.IMMATURE_PLANTS_QUICKVIEW,
-          t3plus: true,
-          enabled: true,
-          description: "Grouped summary of plant batches by strain, location, and dates",
-          isCustom: false,
-          isCsvEligible: true,
-          isSingleton: false,
-        },
-        {
-          text: "Mature Plants Quickview",
-          value: ReportType.MATURE_PLANTS_QUICKVIEW,
-          t3plus: true,
-          enabled: true,
-          description:
-            "Grouped summary of mature plants by growth phase, strain, location, and dates",
-          isCustom: false,
-          isCsvEligible: true,
-          isSingleton: false,
-        },
-        {
-          text: "Transfer Quickview",
-          value: null,
-          t3plus: true,
-          enabled: false,
-          description: "Summary of incoming, outgoing, and rejected packages",
-          isCustom: false,
-          isCsvEligible: true,
-          isSingleton: false,
-        },
-        // {
-        //   text: "Incoming Inventory",
-        //   value: null,
-        //   t3plus: true,
-        //   enabled: false,
-        //   description: "See packages not yet recieved",
-        //   isCustom: false,
-        // },
-        // {
-        //   text: "Harvested Plants",
-        //   value: null,
-        //   t3plus: true,
-        //   enabled: false,
-        //   description: "All plants and associated harvest data within this license",
-        //   isCustom: false,
-        // },
-      ];
+    // disabledVisibleReportOptionsImpl(): IReportOption[] {
+    //   return this.reportCatalogFactory().filter((x: IReportOption) => {
+    //     if (x.hidden) {
+    //       return false;
+    //     }
 
-      return reportOptions.filter((x) => !x.hidden);
-    },
-    eligibleReportOptionsImpl(): IReportOption[] {
-      return this.reportOptionsImpl().filter((x: IReportOption) => {
-        if (x.hidden) {
-          return false;
-        }
+    //     if (!x.enabled) {
+    //       return true;
+    //     }
 
-        if (!x.enabled) {
-          return false;
-        }
-
-        if (x.t3plus) {
-          return store.state.client.values.ENABLE_T3PLUS || store.state.client.t3plus;
-        }
-        return true;
-      });
-    },
-    disabledVisibleReportOptionsImpl(): IReportOption[] {
-      return this.reportOptionsImpl().filter((x: IReportOption) => {
-        if (x.hidden) {
-          return false;
-        }
-
-        if (!x.enabled) {
-          return true;
-        }
-
-        if (x.t3plus) {
-          return !store.state.client.values.ENABLE_T3PLUS && !store.state.client.t3plus;
-        }
-        return false;
-      });
-    },
+    //     if (x.t3plus) {
+    //       return !store.state.client.values.ENABLE_T3PLUS && !store.state.client.t3plus;
+    //     }
+    //     return false;
+    //   });
+    // },
     openOAuthPage(): void {
       messageBus.sendMessageToBackground(MessageType.OPEN_OPTIONS_PAGE, {
         path: "/google-sheets",
@@ -2445,8 +2197,8 @@ export default Vue.extend({
       immediate: true,
       handler(newValue: IReportOption[], oldValue) {
         // console.log(newValue);
-        const singleonReportTypes: ReportType[] = this.reportOptionsImpl()
-          .filter((x: IReportOption) => x.isSingleton)
+        const singleonReportTypes: ReportType[] = this.reportCatalogFactory()
+          .filter((x: IReportOption) => x.isMultiSheet)
           .map((x: IReportOption) => x.value);
 
         for (const reportType of singleonReportTypes) {

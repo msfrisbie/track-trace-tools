@@ -68,9 +68,10 @@ export const ALL_ELIGIBLE_REPORT_TYPES: ReportType[] = [
   ReportType.TRANSFER_HUB_TRANSFER_MANIFESTS,
   ReportType.POINT_IN_TIME_INVENTORY,
   ReportType.EMPLOYEE_AUDIT,
-  ReportType.SINGLE_TRANSFER
+  ReportType.SINGLE_TRANSFER,
 ];
 
+// Reports with automatically generated header names
 export const FIELD_TRANSFORMER_REPORT_TYPES: ReportType[] = [
   ReportType.PACKAGES,
   ReportType.STRAGGLER_PACKAGES,
@@ -84,14 +85,52 @@ export const FIELD_TRANSFORMER_REPORT_TYPES: ReportType[] = [
   ReportType.OUTGOING_TRANSFER_MANIFESTS,
   ReportType.TRANSFER_HUB_TRANSFER_MANIFESTS,
 ];
+
+// These reports will generate multiple sheets and
+// so cannot be paired with other report types or
+// generated in CSV
+export const SINGLETON_REPORT_TYPES: ReportType[] = [
+  ReportType.COGS,
+  ReportType.COGS_V2,
+  ReportType.COGS_TRACKER,
+  ReportType.EMPLOYEE_SAMPLES,
+];
+
+export const SPECIALTY_REPORT_TYPES: ReportType[] = [
+  ReportType.POINT_IN_TIME_INVENTORY,
+  ReportType.EMPLOYEE_AUDIT,
+  ReportType.STRAGGLER_PACKAGES,
+];
+
+export const CATALOG_REPORT_TYPES: ReportType[] = [
+  ReportType.PACKAGES,
+  ReportType.TAGS,
+  ReportType.HARVESTS,
+  ReportType.IMMATURE_PLANTS,
+  ReportType.MATURE_PLANTS,
+  ReportType.INCOMING_TRANSFERS,
+  ReportType.OUTGOING_TRANSFERS,
+  ReportType.TRANSFER_HUB_TRANSFERS,
+  ReportType.OUTGOING_TRANSFER_MANIFESTS,
+  ReportType.TRANSFER_HUB_TRANSFER_MANIFESTS,
+];
+
 export const QUICKVIEW_REPORT_TYPES: ReportType[] = [
   ReportType.PACKAGES_QUICKVIEW,
   ReportType.IMMATURE_PLANTS_QUICKVIEW,
   ReportType.MATURE_PLANTS_QUICKVIEW,
 ];
-export const RAW_REPORT_TYPES: ReportType[] = [
-  ReportType.EMPLOYEE_AUDIT,
+
+export const CUSTOM_REPORT_TYPES: ReportType[] = [
+  ReportType.COGS,
+  ReportType.COGS_V2,
+  ReportType.COGS_TRACKER,
+  ReportType.EMPLOYEE_SAMPLES,
   ReportType.HARVEST_PACKAGES,
+];
+
+export const HEADLESS_REPORT_TYPES: ReportType[] = [
+  ReportType.SINGLE_TRANSFER,
 ];
 
 const COMMON_FIELD_DATA: IFieldData[] = [

@@ -276,3 +276,18 @@ export interface ICogsArchive {
   transfersPackages: any[];
   transfersPackagesKeys: string[];
 }
+
+export interface IReportOption {
+  text: string;
+  value: ReportType | null;
+  enabled: boolean;
+  visible: boolean;
+  description: string;
+  usesFieldTransformer: boolean;
+  usesFormulas: boolean;
+  isMultiSheet: boolean;
+  isCustom: boolean;
+  isSpecialty: boolean;
+  isCatalog: boolean;
+  isQuickview: boolean;
+}
