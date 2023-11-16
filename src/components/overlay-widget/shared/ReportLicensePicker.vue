@@ -8,19 +8,28 @@
     </b-form-group>
     <b-button-group>
       <b-button variant="outline-primary" size="sm" @click="formFilters.licenses = []"
-        >SELECT NONE</b-button
+        >NONE</b-button
+      >
+      <b-button
+        variant="outline-primary"
+        size="sm"
+        @click="
+          formFilters.licenses = formFilters.licenseOptions.filter((x) => x === currentLicense)
+        "
+        >CURRENT</b-button
       >
       <b-button
         variant="outline-primary"
         size="sm"
         @click="formFilters.licenses = [...formFilters.licenseOptions]"
-        >SELECT ALL</b-button
+        >ALL</b-button
       >
     </b-button-group>
   </div>
 </template>
 
 <script lang="ts">
+import { authManager } from "@/modules/auth-manager.module";
 import router from "@/router/index";
 import store from "@/store/page-overlay/index";
 import Vue from "vue";
@@ -41,11 +50,15 @@ export default Vue.extend({
     ...mapState([]),
   },
   data() {
-    return {};
+    return {
+      currentLicense: "",
+    };
   },
   methods: {},
   async created() {},
-  async mounted() {},
+  async mounted() {
+    this.$data.currentLicense = (await authManager.authStateOrError()).license;
+  },
 });
 </script>
 

@@ -6,6 +6,7 @@ import {
   IIndexedRichIncomingTransferData,
   IIndexedRichOutgoingTransferData,
   IIndexedTransferData,
+  ILicenseFormFilters,
   ITransferData,
   ITransporterData
 } from '@/interfaces';
@@ -442,12 +443,30 @@ export function getSheetTitle({
   }
 }
 
-export function licenseFilterFactory(): {
-  licenseOptions: string[],
-  licenses: string[]
-} {
+export function licenseFilterFactory(initial: 'all' | 'current' | 'none' = 'current'): ILicenseFormFilters {
+  let licenses: string[] = [];
+  const currentLicense: string | null = facilityManager.cachedActiveFacility?.licenseNumber ?? null;
+  const allLicenses: string[] = facilityManager.cachedFacilities.map((x) => x.licenseNumber);
+
+  switch (initial) {
+    case 'none':
+      break;
+    case 'current':
+      licenses = currentLicense ? [currentLicense] : [];
+      break;
+    case 'all':
+      licenses = allLicenses;
+      break;
+  }
+
   return {
-    licenseOptions: facilityManager.cachedFacilities.map((x) => x.licenseNumber),
-    licenses: facilityManager.cachedFacilities.map((x) => x.licenseNumber),
+    licenseOptions: allLicenses,
+    licenses,
+  };
+}
+
+export function extractLicenseFields(formFilters: ILicenseFormFilters): {licenses: string[]} {
+  return {
+    licenses: formFilters.licenses
   };
 }

@@ -12,7 +12,7 @@ import {
   TagState,
   TaskType,
   ToolkitView,
-  TransferState,
+  TransferState
 } from "@/consts";
 import { Store } from "vuex";
 import { IAnnouncementsState } from "./store/page-overlay/modules/announcements/interfaces";
@@ -35,7 +35,7 @@ import { ISplitPackageBuilderState } from "./store/page-overlay/modules/split-pa
 import { ITagSearchState } from "./store/page-overlay/modules/tag-search/interfaces";
 import {
   DriverLayoverLeg,
-  ITransferBuilderState,
+  ITransferBuilderState
 } from "./store/page-overlay/modules/transfer-builder/interfaces";
 import { ITransferPackageSearchState } from "./store/page-overlay/modules/transfer-package-search/interfaces";
 import { ITransferSearchState } from "./store/page-overlay/modules/transfer-search/interfaces";
@@ -937,13 +937,13 @@ export interface ITransferData {
   VehicleModel: string;
 }
 
-export interface IOutgoingTransferData extends ITransferData {
+export interface IOutgoingTransferData extends IIndexedTransferData {
   DeliveryId: 0;
   DeliveryPackageCount: 0;
   DeliveryReceivedPackageCount: 0;
 }
 
-export interface IIncomingTransferData extends ITransferData {}
+export interface IIncomingTransferData extends IIndexedTransferData {}
 
 export interface IRichIncomingTransferData extends IIncomingTransferData {
   packages?: IIndexedDestinationPackageData[];
@@ -2008,4 +2008,9 @@ export interface ITransferMetadata {
     testResults: ITestResultData[];
     testResultPdfUrls: string[];
   }[];
+}
+
+export interface ILicenseFormFilters {
+    licenses: string[];
+    licenseOptions: string[];
 }

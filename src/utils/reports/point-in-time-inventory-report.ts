@@ -5,25 +5,27 @@ import {
   IIndexedRichOutgoingTransferData,
   IIndexedTagData,
   IIndexedTransferData,
+  ILicenseFormFilters,
   IPluginState,
-  IRichIncomingTransferData,
+  IRichIncomingTransferData
 } from '@/interfaces';
-import { primaryDataLoader } from '@/modules/data-loader/data-loader.module';
+import { DataLoader, getDataLoaderByLicense } from '@/modules/data-loader/data-loader.module';
 import { ReportsMutations, ReportType } from '@/store/page-overlay/modules/reports/consts';
 import {
   IReportConfig,
   IReportData,
-  IReportsState,
+  IReportsState
 } from '@/store/page-overlay/modules/reports/interfaces';
 import { ActionContext } from 'vuex';
 import {
   getIsoDateFromOffset,
   isCustodiedDatetimeOrError,
   isoDatetimeToLocalDate,
-  todayIsodate,
+  todayIsodate
 } from '../date';
 import { extractInitialPackageQuantityAndUnitFromHistoryOrError } from '../history';
 import { getItemNameOrError, getLabelOrError } from '../package';
+import { extractLicenseFields, licenseFilterFactory } from './reports-shared';
 
 export enum InventoryStrategy {
   SLICE_START_OF_DAY = 'Only include inventory that was in custody at the start of the day',
@@ -32,14 +34,12 @@ export enum InventoryStrategy {
   PARTIAL_DAY = 'Only include inventory that was in custody at any point on this day',
 }
 
-interface IPointInTimeInventoryReportFormFilters {
+interface IPointInTimeInventoryReportFormFilters extends ILicenseFormFilters {
   targetDate: string;
   useRestrictedWindowOptimization: boolean;
   restrictedWindowDays: number;
   restrictedWindowDaysOptions: { value: number; text: string }[];
   showDebugColumns: boolean;
-  //   licenses: string[];
-  //   licenseOptions: string[];
   inventoryStrategy: InventoryStrategy;
 }
 
@@ -78,6 +78,7 @@ export const pointInTimeInventoryFormFiltersFactory: () => IPointInTimeInventory
   ],
   showDebugColumns: false,
   inventoryStrategy: InventoryStrategy.SLICE_START_OF_DAY,
+  ...licenseFilterFactory()
 });
 
 export function addPointInTimeInventoryReport({
@@ -94,6 +95,7 @@ export function addPointInTimeInventoryReport({
       pointInTimeInventoryFormFilters.useRestrictedWindowOptimization,
     restrictedWindowDays: pointInTimeInventoryFormFilters.restrictedWindowDays,
     showDebugColumns: pointInTimeInventoryFormFilters.showDebugColumns,
+    ...extractLicenseFields(pointInTimeInventoryFormFilters),
     fields: null,
   };
 }
@@ -121,16 +123,20 @@ export async function maybeLoadPointInTimeInventoryReportData({
     throw new Error('Cannot select a date in the future');
   }
 
-  if ((await primaryDataLoader.activePackageCount()) === null) {
-    throw new Error('This report type requires package permissions');
-  }
+  for (const license of pointInTimeInventoryReportConfig.licenses) {
+    const dataLoader: DataLoader = await getDataLoaderByLicense(license);
 
-  if ((await primaryDataLoader.outgoingTransferCount()) === null) {
-    throw new Error('This report type requires transfer permissions');
-  }
+    if ((await dataLoader.activePackageCount()) === null) {
+      throw new Error(`This report type requires package permissions for ${license}`);
+    }
 
-  if ((await primaryDataLoader.availableTagCount()) === null) {
-    throw new Error('This report type requires tag permissions');
+    if ((await dataLoader.outgoingTransferCount()) === null) {
+      throw new Error(`This report type requires transfer permissions for ${license}`);
+    }
+
+    if ((await dataLoader.availableTagCount()) === null) {
+      throw new Error(`This report type requires tag permissions for ${license}`);
+    }
   }
 
   ctx.commit(ReportsMutations.SET_STATUS, {
@@ -147,43 +153,47 @@ export async function maybeLoadPointInTimeInventoryReportData({
   let allInactiveIncomingTransfers: IIncomingTransferData[] = [];
   let allInactiveOutgoingTransfers: IIndexedTransferData[] = [];
 
-  promises.push(
-    primaryDataLoader.activePackages().then((result) => {
-      allPackages = [...allPackages, ...result];
+  for (const license of pointInTimeInventoryReportConfig.licenses) {
+    const dataLoader: DataLoader = await getDataLoaderByLicense(license);
 
-      // Backwards compat - possibly redundant
-      return allPackages;
-    }),
-    primaryDataLoader.onHoldPackages().then((result) => {
-      allPackages = [...allPackages, ...result];
+    promises.push(
+      dataLoader.activePackages().then((result) => {
+        allPackages = [...allPackages, ...result];
 
-      // Backwards compat - possibly redundant
-      return allPackages;
-    }),
-    primaryDataLoader.inactivePackages().then((result) => {
-      allPackages = [...allPackages, ...result];
+        // Backwards compat - possibly redundant
+        return allPackages;
+      }),
+      dataLoader.onHoldPackages().then((result) => {
+        allPackages = [...allPackages, ...result];
 
-      // Backwards compat - possibly redundant
-      return allPackages;
-    }),
-    primaryDataLoader.inTransitPackages().then((result) => {
-      allPackages = [...allPackages, ...result];
+        // Backwards compat - possibly redundant
+        return allPackages;
+      }),
+      dataLoader.inactivePackages().then((result) => {
+        allPackages = [...allPackages, ...result];
 
-      // Backwards compat - possibly redundant
-      return allPackages;
-    }),
-    primaryDataLoader.usedTags().then((result) => {
-      allUsedTags = [...allUsedTags, ...result];
-    }),
-    primaryDataLoader.incomingInactiveTransfers().then((result) => {
-      allInactiveIncomingTransfers = [...allInactiveIncomingTransfers, ...result];
-    }),
-    primaryDataLoader.outgoingInactiveTransfers().then((result) => {
-      allInactiveOutgoingTransfers = [...allInactiveOutgoingTransfers, ...result];
-    }),
-  );
+        // Backwards compat - possibly redundant
+        return allPackages;
+      }),
+      dataLoader.inTransitPackages().then((result) => {
+        allPackages = [...allPackages, ...result];
 
-  await Promise.allSettled(promises);
+        // Backwards compat - possibly redundant
+        return allPackages;
+      }),
+      dataLoader.usedTags().then((result) => {
+        allUsedTags = [...allUsedTags, ...result];
+      }),
+      dataLoader.incomingInactiveTransfers().then((result) => {
+        allInactiveIncomingTransfers = [...allInactiveIncomingTransfers, ...result];
+      }),
+      dataLoader.outgoingInactiveTransfers().then((result) => {
+        allInactiveOutgoingTransfers = [...allInactiveOutgoingTransfers, ...result];
+      }),
+    );
+
+    await Promise.allSettled(promises);
+  }
 
   function metadataFactory(): IPackageDateMetadata {
     return {
@@ -234,8 +244,6 @@ export async function maybeLoadPointInTimeInventoryReportData({
       : null;
   }
 
-  // TODO for each packaged that is received, load history and enter date ranges
-
   const filteredIncomingTransfers: IRichIncomingTransferData[] = allInactiveIncomingTransfers.filter((transfer) => {
     if (transfer.LastModified < minDate) {
       return false;
@@ -250,8 +258,10 @@ export async function maybeLoadPointInTimeInventoryReportData({
 
   // Load incoming packages in parallel
   for (const incomingTransfer of filteredIncomingTransfers) {
+    const dataLoader = await getDataLoaderByLicense(incomingTransfer.LicenseNumber);
+
     promises.push(
-      primaryDataLoader
+      dataLoader
         .destinationPackages(incomingTransfer.DeliveryId)
         .then((packages) => {
           incomingTransfer.packages = packages;
@@ -280,8 +290,10 @@ export async function maybeLoadPointInTimeInventoryReportData({
 
   // Load destinations in parallel
   for (const outgoingTransfer of filteredOutgoingTransfers) {
+    const dataLoader = await getDataLoaderByLicense(outgoingTransfer.LicenseNumber);
+
     promises.push(
-      primaryDataLoader
+      dataLoader
         .transferDestinations(outgoingTransfer.Id)
         .then((destinations) => {
           outgoingTransfer.outgoingDestinations = destinations;
@@ -300,9 +312,11 @@ export async function maybeLoadPointInTimeInventoryReportData({
 
   // Load packages in parallel
   for (const outgoingTransfer of filteredOutgoingTransfers) {
+    const dataLoader = await getDataLoaderByLicense(outgoingTransfer.LicenseNumber);
+
     for (const destination of outgoingTransfer.outgoingDestinations!) {
       promises.push(
-        primaryDataLoader
+        dataLoader
           .destinationPackages(destination.Id)
           .then((packages) => {
             destination.packages = packages;
@@ -453,8 +467,10 @@ export async function maybeLoadPointInTimeInventoryReportData({
       continue;
     }
 
+    const dataLoader = await getDataLoaderByLicense(metadata.pkg.LicenseNumber);
+
     promises.push(
-      primaryDataLoader.packageHistoryByPackageId(metadata.pkg.Id).then((history) => {
+      dataLoader.packageHistoryByPackageId(metadata.pkg.Id).then((history) => {
         metadata.pkg!.history = history;
       }),
     );
@@ -495,7 +511,7 @@ export function extractPointInTimeInventoryData({
 }): any[][] {
   const matrix: any[][] = [];
 
-  const headers = ['Tag', 'Item', 'Quantity (estimated)', 'Unit of Measure', 'Note'];
+  const headers = ['License', 'Tag', 'Item', 'Quantity (estimated)', 'Unit of Measure', 'Note'];
 
   if (reportConfig[ReportType.POINT_IN_TIME_INVENTORY]!.showDebugColumns) {
     headers.push(
@@ -523,6 +539,7 @@ export function extractPointInTimeInventoryData({
   for (const [label, metadata] of pairs) {
     if (metadata.eligible) {
       const row: any[] = [
+        metadata.pkg?.LicenseNumber,
         label,
         metadata.itemName,
         metadata.quantity,

@@ -94,7 +94,17 @@ export const RAW_REPORT_TYPES: ReportType[] = [
   ReportType.HARVEST_PACKAGES,
 ];
 
+const COMMON_FIELD_DATA: IFieldData[] = [
+  {
+    value: 'LicenseNumber',
+    readableName: 'License',
+    required: true,
+    initiallyChecked: true,
+  },
+];
+
 const COMMON_PACKAGE_FIELD_DATA: IFieldData[] = [
+  ...COMMON_FIELD_DATA,
   {
     value: 'Label',
     readableName: 'Package Tag',
@@ -205,6 +215,7 @@ const COMMON_PACKAGE_FIELD_DATA: IFieldData[] = [
   },
 ];
 const COMMON_PLANT_FIELD_DATA: IFieldData[] = [
+  ...COMMON_FIELD_DATA,
   {
     value: 'Label',
     readableName: 'Plant Tag',
@@ -273,6 +284,7 @@ const COMMON_PLANT_FIELD_DATA: IFieldData[] = [
   },
 ];
 const COMMON_PLANT_BATCH_FIELD_DATA: IFieldData[] = [
+  ...COMMON_FIELD_DATA,
   {
     value: 'Name',
     readableName: 'Plant Tag/Name',
@@ -329,6 +341,7 @@ const COMMON_PLANT_BATCH_FIELD_DATA: IFieldData[] = [
   },
 ];
 const COMMON_INCOMING_TRANSFER_FIELD_DATA: IFieldData[] = [
+  ...COMMON_FIELD_DATA,
   {
     value: 'Transfer.ManifestNumber',
     readableName: 'Manifest #',
@@ -391,6 +404,7 @@ const COMMON_INCOMING_TRANSFER_FIELD_DATA: IFieldData[] = [
   },
 ];
 const COMMON_OUTGOING_TRANSFER_FIELD_DATA: IFieldData[] = [
+  ...COMMON_FIELD_DATA,
   {
     value: 'Transfer.ManifestNumber',
     readableName: 'Manifest #',
@@ -453,6 +467,7 @@ const COMMON_OUTGOING_TRANSFER_FIELD_DATA: IFieldData[] = [
   },
 ];
 const COMMON_TAG_FIELD_DATA: IFieldData[] = [
+  ...COMMON_FIELD_DATA,
   {
     value: 'Label',
     readableName: 'Tag',
@@ -479,6 +494,7 @@ const COMMON_TAG_FIELD_DATA: IFieldData[] = [
   },
 ];
 const COMMON_HARVEST_FIELD_DATA: IFieldData[] = [
+  ...COMMON_FIELD_DATA,
   {
     value: 'Name',
     readableName: 'Harvest Batch',
@@ -518,6 +534,7 @@ const COMMON_HARVEST_FIELD_DATA: IFieldData[] = [
 ];
 
 const COMMON_OUTGOING_TRANSFER_PACKAGE_DATA: IFieldData[] = [
+  ...COMMON_FIELD_DATA,
   {
     value: 'Package.PackageLabel',
     readableName: 'Package Tag',
@@ -585,14 +602,14 @@ export const SHEET_FIELDS: { [key: string]: IFieldData[] } = {
   [ReportType.OUTGOING_TRANSFERS]: [...COMMON_OUTGOING_TRANSFER_FIELD_DATA],
   [ReportType.TRANSFER_HUB_TRANSFERS]: [...COMMON_OUTGOING_TRANSFER_FIELD_DATA],
   [ReportType.OUTGOING_TRANSFER_MANIFESTS]: [
-    ...COMMON_OUTGOING_TRANSFER_FIELD_DATA.slice(0, 4),
+    ...COMMON_OUTGOING_TRANSFER_FIELD_DATA.slice(0, 5),
     ...COMMON_OUTGOING_TRANSFER_PACKAGE_DATA,
-    ...COMMON_OUTGOING_TRANSFER_FIELD_DATA.slice(4),
+    ...COMMON_OUTGOING_TRANSFER_FIELD_DATA.slice(5),
   ],
   [ReportType.TRANSFER_HUB_TRANSFER_MANIFESTS]: [
-    ...COMMON_OUTGOING_TRANSFER_FIELD_DATA.slice(0, 4),
+    ...COMMON_OUTGOING_TRANSFER_FIELD_DATA.slice(0, 5),
     ...COMMON_OUTGOING_TRANSFER_PACKAGE_DATA,
-    ...COMMON_OUTGOING_TRANSFER_FIELD_DATA.slice(4),
+    ...COMMON_OUTGOING_TRANSFER_FIELD_DATA.slice(5),
   ],
 };
 

@@ -8,6 +8,8 @@ import { t3RequestManager } from './t3-request-manager.module';
 const debugLog = debugLogFactory('facility-manager.module.ts');
 
 class FacilityManager implements IAtomicService {
+  cachedActiveFacility: IPageMetrcFacilityData | null = null;
+
   cachedFacilities: IPageMetrcFacilityData[] = [];
 
   async init() {
@@ -130,6 +132,7 @@ class FacilityManager implements IAtomicService {
     debugLog(async () => ['Owned facilities', ownedFacilities]);
 
     this.cachedFacilities = ownedFacilities;
+    this.cachedActiveFacility = ownedFacilities.filter((x) => x.licenseNumber === authState.license)[0];
 
     return ownedFacilities;
   }

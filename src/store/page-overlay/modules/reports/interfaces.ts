@@ -93,6 +93,7 @@ export interface IReportConfig {
     useRestrictedWindowOptimization: boolean;
     restrictedWindowDays: number;
     showDebugColumns: boolean;
+    licenses: string[];
     fields: null;
   };
   [ReportType.STRAGGLER_PACKAGES]?: {

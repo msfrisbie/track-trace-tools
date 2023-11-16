@@ -356,6 +356,11 @@
               <hr />
 
               <simple-drawer toggleText="ADVANCED">
+
+                <report-license-picker
+                  :formFilters="pointInTimeInventoryFormFilters"
+                ></report-license-picker>
+
                 <b-form-checkbox
                   v-model="pointInTimeInventoryFormFilters.useRestrictedWindowOptimization"
                 >
