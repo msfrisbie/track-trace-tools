@@ -1,26 +1,29 @@
 import { IIndexedPlantBatchData, IPlantBatchFilter, IPluginState } from '@/interfaces';
-import { primaryDataLoader } from '@/modules/data-loader/data-loader.module';
+import { getDataLoaderByLicense } from '@/modules/data-loader/data-loader.module';
 import { ReportsMutations, ReportType } from '@/store/page-overlay/modules/reports/consts';
 import {
   IReportConfig,
   IReportData,
-  IReportsState,
+  IReportsState
 } from '@/store/page-overlay/modules/reports/interfaces';
 import { ActionContext } from 'vuex';
 import {
   IImmaturePlantsReportFormFilters,
-  immaturePlantsFormFiltersFactory,
+  immaturePlantsFormFiltersFactory
 } from './immature-plants-report';
+import { extractLicenseFields } from './reports-shared';
 
 const REPORT_TYPE = ReportType.IMMATURE_PLANTS_QUICKVIEW;
 
 export enum ImmaturePlantQuickviewDimension {
+  LICENSE = 'License',
   STRAIN = 'Strain',
   LOCATION = 'Location',
   PLANTED_DATE = 'Planted Date',
 }
 
 export const IMMATURE_PLANT_QUICKVIEW_DIMENSIONS: ImmaturePlantQuickviewDimension[] = [
+  ImmaturePlantQuickviewDimension.LICENSE,
   ImmaturePlantQuickviewDimension.STRAIN,
   ImmaturePlantQuickviewDimension.LOCATION,
   ImmaturePlantQuickviewDimension.PLANTED_DATE,
@@ -31,6 +34,8 @@ export function extractImmaturePlantPropertyFromDimension(
   dimension: ImmaturePlantQuickviewDimension,
 ) {
   switch (dimension) {
+    case ImmaturePlantQuickviewDimension.LICENSE:
+      return plantBatch.LicenseNumber;
     case ImmaturePlantQuickviewDimension.STRAIN:
       return plantBatch.StrainName;
     case ImmaturePlantQuickviewDimension.LOCATION:
@@ -78,6 +83,7 @@ export function addImmaturePlantsQuickviewReport({
   reportConfig[REPORT_TYPE] = {
     plantBatchFilter,
     ...immaturePlantsQuickviewFormFilters,
+    ...extractLicenseFields(immaturePlantsQuickviewFormFilters),
     fields: null,
   };
 }
@@ -95,28 +101,33 @@ export async function maybeLoadImmaturePlantsQuickviewReportData({
 
   if (immaturePlantQuickviewConfig) {
     let plantBatches: IIndexedPlantBatchData[] = [];
+
     if (immaturePlantQuickviewConfig?.plantBatchFilter) {
       ctx.commit(ReportsMutations.SET_STATUS, {
         statusMessage: { text: 'Loading plant batches...', level: 'success' },
       });
 
-      if (immaturePlantQuickviewConfig?.plantBatchFilter.includeActive) {
-        try {
-          plantBatches = [...plantBatches, ...(await primaryDataLoader.plantBatches())];
-        } catch (e) {
-          ctx.commit(ReportsMutations.SET_STATUS, {
-            statusMessage: { text: 'Failed to load active plant batches.', level: 'warning' },
-          });
-        }
-      }
+      for (const license of immaturePlantQuickviewConfig.licenses) {
+        const dataLoader = await getDataLoaderByLicense(license);
 
-      if (immaturePlantQuickviewConfig.plantBatchFilter.includeInactive) {
-        try {
-          plantBatches = [...plantBatches, ...(await primaryDataLoader.inactivePlantBatches({}))];
-        } catch (e) {
-          ctx.commit(ReportsMutations.SET_STATUS, {
-            statusMessage: { text: 'Failed to load inactive plant batches.', level: 'warning' },
-          });
+        if (immaturePlantQuickviewConfig?.plantBatchFilter.includeActive) {
+          try {
+            plantBatches = [...plantBatches, ...(await dataLoader.plantBatches())];
+          } catch (e) {
+            ctx.commit(ReportsMutations.SET_STATUS, {
+              statusMessage: { text: 'Failed to load active plant batches.', level: 'warning' },
+            });
+          }
+        }
+
+        if (immaturePlantQuickviewConfig.plantBatchFilter.includeInactive) {
+          try {
+            plantBatches = [...plantBatches, ...(await dataLoader.inactivePlantBatches({}))];
+          } catch (e) {
+            ctx.commit(ReportsMutations.SET_STATUS, {
+              statusMessage: { text: 'Failed to load inactive plant batches.', level: 'warning' },
+            });
+          }
         }
       }
     }

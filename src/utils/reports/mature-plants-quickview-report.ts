@@ -1,20 +1,22 @@
 import { IIndexedPlantData, IPlantFilter, IPluginState } from '@/interfaces';
-import { primaryDataLoader } from '@/modules/data-loader/data-loader.module';
+import { getDataLoaderByLicense } from '@/modules/data-loader/data-loader.module';
 import { ReportsMutations, ReportType } from '@/store/page-overlay/modules/reports/consts';
 import {
   IReportConfig,
   IReportData,
-  IReportsState,
+  IReportsState
 } from '@/store/page-overlay/modules/reports/interfaces';
 import { ActionContext } from 'vuex';
 import {
   IMaturePlantsReportFormFilters,
-  maturePlantsFormFiltersFactory,
+  maturePlantsFormFiltersFactory
 } from './mature-plants-report';
+import { extractLicenseFields } from './reports-shared';
 
 const REPORT_TYPE = ReportType.MATURE_PLANTS_QUICKVIEW;
 
 export enum MaturePlantQuickviewDimension {
+  LICENSE = 'License',
   STRAIN = 'Strain',
   GROWTH_PHASE = 'Growth Phase',
   LOCATION = 'Location',
@@ -24,6 +26,7 @@ export enum MaturePlantQuickviewDimension {
 }
 
 export const MATURE_PLANT_QUICKVIEW_DIMENSIONS: MaturePlantQuickviewDimension[] = [
+  MaturePlantQuickviewDimension.LICENSE,
   MaturePlantQuickviewDimension.STRAIN,
   MaturePlantQuickviewDimension.GROWTH_PHASE,
   MaturePlantQuickviewDimension.LOCATION,
@@ -37,6 +40,8 @@ export function extractMaturePlantPropertyFromDimension(
   dimension: MaturePlantQuickviewDimension,
 ) {
   switch (dimension) {
+    case MaturePlantQuickviewDimension.LICENSE:
+      return plant.LicenseNumber;
     case MaturePlantQuickviewDimension.STRAIN:
       return plant.StrainName;
     case MaturePlantQuickviewDimension.GROWTH_PHASE:
@@ -91,6 +96,7 @@ export function addMaturePlantsQuickviewReport({
   reportConfig[REPORT_TYPE] = {
     plantFilter,
     ...maturePlantsQuickviewFormFilters,
+    ...extractLicenseFields(maturePlantsQuickviewFormFilters),
     fields: null,
   };
 }
@@ -108,38 +114,43 @@ export async function maybeLoadMaturePlantsQuickviewReportData({
 
   if (maturePlantQuickviewConfig) {
     let maturePlants: IIndexedPlantData[] = [];
+
     if (maturePlantQuickviewConfig?.plantFilter) {
       ctx.commit(ReportsMutations.SET_STATUS, {
         statusMessage: { text: 'Loading plants...', level: 'success' },
       });
 
-      if (maturePlantQuickviewConfig?.plantFilter.includeVegetative) {
-        try {
-          maturePlants = [...maturePlants, ...(await primaryDataLoader.vegetativePlants())];
-        } catch (e) {
-          ctx.commit(ReportsMutations.SET_STATUS, {
-            statusMessage: { text: 'Failed to load vegetative plants.', level: 'warning' },
-          });
-        }
-      }
+      for (const license of maturePlantQuickviewConfig.licenses) {
+        const dataLoader = await getDataLoaderByLicense(license);
 
-      if (maturePlantQuickviewConfig.plantFilter.includeFlowering) {
-        try {
-          maturePlants = [...maturePlants, ...(await primaryDataLoader.floweringPlants())];
-        } catch (e) {
-          ctx.commit(ReportsMutations.SET_STATUS, {
-            statusMessage: { text: 'Failed to load flowering plants.', level: 'warning' },
-          });
+        if (maturePlantQuickviewConfig?.plantFilter.includeVegetative) {
+          try {
+            maturePlants = [...maturePlants, ...(await dataLoader.vegetativePlants())];
+          } catch (e) {
+            ctx.commit(ReportsMutations.SET_STATUS, {
+              statusMessage: { text: 'Failed to load vegetative plants.', level: 'warning' },
+            });
+          }
         }
-      }
 
-      if (maturePlantQuickviewConfig.plantFilter.includeInactive) {
-        try {
-          maturePlants = [...maturePlants, ...(await primaryDataLoader.inactivePlants({}))];
-        } catch (e) {
-          ctx.commit(ReportsMutations.SET_STATUS, {
-            statusMessage: { text: 'Failed to load inactive plants.', level: 'warning' },
-          });
+        if (maturePlantQuickviewConfig.plantFilter.includeFlowering) {
+          try {
+            maturePlants = [...maturePlants, ...(await dataLoader.floweringPlants())];
+          } catch (e) {
+            ctx.commit(ReportsMutations.SET_STATUS, {
+              statusMessage: { text: 'Failed to load flowering plants.', level: 'warning' },
+            });
+          }
+        }
+
+        if (maturePlantQuickviewConfig.plantFilter.includeInactive) {
+          try {
+            maturePlants = [...maturePlants, ...(await dataLoader.inactivePlants({}))];
+          } catch (e) {
+            ctx.commit(ReportsMutations.SET_STATUS, {
+              statusMessage: { text: 'Failed to load inactive plants.', level: 'warning' },
+            });
+          }
         }
       }
     }

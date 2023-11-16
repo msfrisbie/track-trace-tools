@@ -608,6 +608,13 @@
                   v-model="maturePlantsFormFilters.plantedDateLt"
                 />
               </div>
+
+              <simple-drawer toggleText="ADVANCED">
+                <report-license-picker
+                  :formFilters="maturePlantsFormFilters"
+                ></report-license-picker>
+              </simple-drawer>
+
               <hr />
 
               <div class="font-semibold text-gray-700">Columns:</div>
@@ -685,6 +692,12 @@
                   v-model="immaturePlantsFormFilters.plantedDateLt"
                 />
               </div>
+
+              <simple-drawer toggleText="ADVANCED">
+                <report-license-picker
+                  :formFilters="immaturePlantsFormFilters"
+                ></report-license-picker>
+              </simple-drawer>
 
               <hr />
 
@@ -1453,6 +1466,12 @@
                   v-model="immaturePlantsQuickviewFormFilters.plantedDateLt"
                 />
               </div>
+
+              <simple-drawer toggleText="ADVANCED">
+                <report-license-picker
+                  :formFilters="immaturePlantsQuickviewFormFilters"
+                ></report-license-picker>
+              </simple-drawer>
             </div>
           </div>
         </template>
@@ -1524,6 +1543,12 @@
                   v-model="maturePlantsQuickviewFormFilters.plantedDateLt"
                 />
               </div>
+
+              <simple-drawer toggleText="ADVANCED">
+                <report-license-picker
+                  :formFilters="maturePlantsQuickviewFormFilters"
+                ></report-license-picker>
+              </simple-drawer>
             </div>
           </div>
         </template>

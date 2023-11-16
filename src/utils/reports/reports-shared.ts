@@ -355,7 +355,6 @@ export function extractFlattenedData({
   return values;
 }
 
-// This is
 export function getCsvFilename({
   reportType,
   license,
@@ -369,17 +368,7 @@ export function getCsvFilename({
 
   const date = todayIsodate();
 
-  switch (reportType) {
-    case ReportType.COGS_V2:
-    case ReportType.HARVEST_PACKAGES:
-    case ReportType.EMPLOYEE_SAMPLES:
-    case ReportType.POINT_IN_TIME_INVENTORY:
-    // TODO these are either not single-license, or should not have todays date
-
-    /* eslint-disable-next-line no-fallthrough */
-    default:
-      return `${sheetTitle} - ${license} - ${date}`;
-  }
+  return `${sheetTitle} [Generated ${date}]`;
 }
 
 export function getGoogleSheetName({
@@ -389,7 +378,9 @@ export function getGoogleSheetName({
   license: string;
   reportConfig: IReportConfig;
 }): string {
-  return `${license} Metrc Report - ${todayIsodate()}`;
+  const date = todayIsodate();
+
+  return `T3 Metrc Report [Generated ${date}]`;
 }
 
 export function getSheetTitle({
@@ -399,48 +390,81 @@ export function getSheetTitle({
   reportType: ReportType;
   reportConfig: IReportConfig;
 }): string {
+  let title: string;
+
   switch (reportType) {
     case ReportType.PACKAGES:
-      return SheetTitles.PACKAGES;
+      title = SheetTitles.PACKAGES;
+      break;
     case ReportType.STRAGGLER_PACKAGES:
-      return SheetTitles.STRAGGLER_PACKAGES;
+      title = SheetTitles.STRAGGLER_PACKAGES;
+      break;
     case ReportType.HARVESTS:
-      return SheetTitles.HARVESTS;
+      title = SheetTitles.HARVESTS;
+      break;
     case ReportType.HARVEST_PACKAGES:
-      return SheetTitles.HARVEST_PACKAGES;
+      title = SheetTitles.HARVEST_PACKAGES;
+      break;
     case ReportType.TAGS:
-      return SheetTitles.TAGS;
+      title = SheetTitles.TAGS;
+      break;
     case ReportType.IMMATURE_PLANTS:
-      return SheetTitles.IMMATURE_PLANTS;
+      title = SheetTitles.IMMATURE_PLANTS;
+      break;
     case ReportType.PACKAGES_QUICKVIEW:
-      return SheetTitles.PACKAGES_QUICKVIEW;
+      title = SheetTitles.PACKAGES_QUICKVIEW;
+      break;
     case ReportType.MATURE_PLANTS_QUICKVIEW:
-      return SheetTitles.MATURE_PLANTS_QUICKVIEW;
+      title = SheetTitles.MATURE_PLANTS_QUICKVIEW;
+      break;
     case ReportType.IMMATURE_PLANTS_QUICKVIEW:
-      return SheetTitles.IMMATURE_PLANTS_QUICKVIEW;
+      title = SheetTitles.IMMATURE_PLANTS_QUICKVIEW;
+      break;
     case ReportType.MATURE_PLANTS:
-      return SheetTitles.MATURE_PLANTS;
+      title = SheetTitles.MATURE_PLANTS;
+      break;
     case ReportType.INCOMING_TRANSFERS:
-      return SheetTitles.INCOMING_TRANSFERS;
+      title = SheetTitles.INCOMING_TRANSFERS;
+      break;
     case ReportType.OUTGOING_TRANSFERS:
-      return SheetTitles.OUTGOING_TRANSFERS;
+      title = SheetTitles.OUTGOING_TRANSFERS;
+      break;
     case ReportType.OUTGOING_TRANSFER_MANIFESTS:
-      return SheetTitles.OUTGOING_TRANSFER_MANIFESTS;
+      title = SheetTitles.OUTGOING_TRANSFER_MANIFESTS;
+      break;
     case ReportType.TRANSFER_HUB_TRANSFERS:
-      return SheetTitles.TRANSFER_HUB_TRANSFERS;
+      title = SheetTitles.TRANSFER_HUB_TRANSFERS;
+      break;
     case ReportType.TRANSFER_HUB_TRANSFER_MANIFESTS:
-      return SheetTitles.TRANSFER_HUB_TRANSFER_MANIFESTS;
+      title = SheetTitles.TRANSFER_HUB_TRANSFER_MANIFESTS;
+      break;
     case ReportType.EMPLOYEE_AUDIT:
-      return SheetTitles.EMPLOYEE_AUDIT;
+      title = SheetTitles.EMPLOYEE_AUDIT;
+      break;
     case ReportType.SINGLE_TRANSFER:
-      return SheetTitles.SINGLE_TRANSFER;
+      title = SheetTitles.SINGLE_TRANSFER;
+      break;
     case ReportType.POINT_IN_TIME_INVENTORY:
-      return `${SheetTitles.POINT_IN_TIME_INVENTORY} ${
+      title = `${SheetTitles.POINT_IN_TIME_INVENTORY} ${
         reportConfig[ReportType.POINT_IN_TIME_INVENTORY]!.targetDate
       }`;
+      break;
     default:
       throw new Error(`Bad reportType ${reportType}`);
   }
+
+  const NO_LICENSE_TYPES = [
+    ReportType.COGS_V2,
+    ReportType.HARVEST_PACKAGES,
+    ReportType.EMPLOYEE_SAMPLES,
+  ];
+
+  if (!NO_LICENSE_TYPES.includes(reportType) && 'licenses' in reportConfig[reportType]!) {
+    // @ts-ignore
+    title += ` (${reportConfig[reportType]!.licenses.join(',')})`;
+  }
+
+  return title;
 }
 
 export function licenseFilterFactory(initial: 'all' | 'current' | 'none' = 'current'): ILicenseFormFilters {

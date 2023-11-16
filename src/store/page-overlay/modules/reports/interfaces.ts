@@ -130,16 +130,19 @@ export interface IReportConfig {
     plantBatchFilter: IPlantBatchFilter;
     primaryDimension: ImmaturePlantQuickviewDimension;
     secondaryDimension: ImmaturePlantQuickviewDimension | null;
+    licenses: string[];
     fields: null;
   };
   [ReportType.MATURE_PLANTS_QUICKVIEW]?: {
     plantFilter: IPlantFilter;
     primaryDimension: MaturePlantQuickviewDimension;
     secondaryDimension: MaturePlantQuickviewDimension | null;
+    licenses: string[];
     fields: null;
   };
   [ReportType.MATURE_PLANTS]?: {
     plantFilter: IPlantFilter;
+    licenses: string[];
     fields: IFieldData[];
   };
   [ReportType.OUTGOING_TRANSFERS]?: {
@@ -168,6 +171,7 @@ export interface IReportConfig {
   };
   [ReportType.IMMATURE_PLANTS]?: {
     immaturePlantFilter: IPlantBatchFilter;
+    licenses: string[];
     fields: IFieldData[];
   };
   [ReportType.TAGS]?: {

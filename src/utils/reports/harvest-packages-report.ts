@@ -120,7 +120,7 @@ export const harvestPackagesFormFiltersFactory: () => IHarvestPackagesReportForm
   debug: false,
   enableHarvestMatchFilter: false,
   harvestMatchFilter: "",
-  ...licenseFilterFactory()
+  ...licenseFilterFactory('all')
 });
 
 export function addHarvestPackagesReport({

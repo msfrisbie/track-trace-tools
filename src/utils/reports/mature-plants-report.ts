@@ -1,16 +1,17 @@
-import { IIndexedPlantData, IPlantFilter, IPluginState } from '@/interfaces';
-import { primaryDataLoader } from '@/modules/data-loader/data-loader.module';
+import { IIndexedPlantData, ILicenseFormFilters, IPlantFilter, IPluginState } from '@/interfaces';
+import { getDataLoaderByLicense } from '@/modules/data-loader/data-loader.module';
 import { ReportsMutations, ReportType } from '@/store/page-overlay/modules/reports/consts';
 import {
   IFieldData,
   IReportConfig,
   IReportData,
-  IReportsState,
+  IReportsState
 } from '@/store/page-overlay/modules/reports/interfaces';
 import { ActionContext } from 'vuex';
 import { todayIsodate } from '../date';
+import { extractLicenseFields, licenseFilterFactory } from './reports-shared';
 
-export interface IMaturePlantsReportFormFilters {
+export interface IMaturePlantsReportFormFilters extends ILicenseFormFilters {
   plantedDateGt: string;
   plantedDateLt: string;
   includeVegetative: boolean;
@@ -28,6 +29,7 @@ export const maturePlantsFormFiltersFactory: () => IMaturePlantsReportFormFilter
   includeInactive: false,
   shouldFilterPlantedDateGt: false,
   shouldFilterPlantedDateLt: false,
+  ...licenseFilterFactory()
 });
 
 export function addMaturePlantsReport({
@@ -55,6 +57,7 @@ export function addMaturePlantsReport({
 
   reportConfig[ReportType.MATURE_PLANTS] = {
     plantFilter,
+    ...extractLicenseFields(maturePlantsFormFilters),
     fields,
   };
 }
@@ -69,6 +72,7 @@ export async function maybeLoadMaturePlantsReportData({
   reportConfig: IReportConfig;
 }) {
   const maturePlantConfig = reportConfig[ReportType.MATURE_PLANTS];
+
   if (maturePlantConfig?.plantFilter) {
     ctx.commit(ReportsMutations.SET_STATUS, {
       statusMessage: { text: 'Loading plants...', level: 'success' },
@@ -76,33 +80,37 @@ export async function maybeLoadMaturePlantsReportData({
 
     let maturePlants: IIndexedPlantData[] = [];
 
-    if (maturePlantConfig.plantFilter.includeVegetative) {
-      try {
-        maturePlants = [...maturePlants, ...(await primaryDataLoader.vegetativePlants())];
-      } catch (e) {
-        ctx.commit(ReportsMutations.SET_STATUS, {
-          statusMessage: { text: 'Failed to load vegetative plants.', level: 'warning' },
-        });
-      }
-    }
+    for (const license of maturePlantConfig.licenses) {
+      const dataLoader = await getDataLoaderByLicense(license);
 
-    if (maturePlantConfig.plantFilter.includeFlowering) {
-      try {
-        maturePlants = [...maturePlants, ...(await primaryDataLoader.floweringPlants())];
-      } catch (e) {
-        ctx.commit(ReportsMutations.SET_STATUS, {
-          statusMessage: { text: 'Failed to load flowering plants.', level: 'warning' },
-        });
+      if (maturePlantConfig.plantFilter.includeVegetative) {
+        try {
+          maturePlants = [...maturePlants, ...(await dataLoader.vegetativePlants())];
+        } catch (e) {
+          ctx.commit(ReportsMutations.SET_STATUS, {
+            statusMessage: { text: 'Failed to load vegetative plants.', level: 'warning' },
+          });
+        }
       }
-    }
 
-    if (maturePlantConfig.plantFilter.includeInactive) {
-      try {
-        maturePlants = [...maturePlants, ...(await primaryDataLoader.inactivePlants({}))];
-      } catch (e) {
-        ctx.commit(ReportsMutations.SET_STATUS, {
-          statusMessage: { text: 'Failed to load inactive plants.', level: 'warning' },
-        });
+      if (maturePlantConfig.plantFilter.includeFlowering) {
+        try {
+          maturePlants = [...maturePlants, ...(await dataLoader.floweringPlants())];
+        } catch (e) {
+          ctx.commit(ReportsMutations.SET_STATUS, {
+            statusMessage: { text: 'Failed to load flowering plants.', level: 'warning' },
+          });
+        }
+      }
+
+      if (maturePlantConfig.plantFilter.includeInactive) {
+        try {
+          maturePlants = [...maturePlants, ...(await dataLoader.inactivePlants({}))];
+        } catch (e) {
+          ctx.commit(ReportsMutations.SET_STATUS, {
+            statusMessage: { text: 'Failed to load inactive plants.', level: 'warning' },
+          });
+        }
       }
     }
 

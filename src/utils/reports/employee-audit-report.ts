@@ -38,7 +38,7 @@ export const employeeAuditFormFiltersFactory: () => IEmployeeAuditReportFormFilt
   shouldFilterActivityDateLt: true,
   includePackages: true,
   includeTransfers: true,
-  ...licenseFilterFactory()
+  ...licenseFilterFactory('all')
 });
 
 export function addEmployeeAuditReport({

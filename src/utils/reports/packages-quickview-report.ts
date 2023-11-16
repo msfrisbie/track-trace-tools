@@ -101,6 +101,7 @@ export async function maybeLoadPackagesQuickviewReportData({
 
   if (packageQuickviewConfig) {
     let packages: IIndexedPackageData[] = [];
+
     if (packageQuickviewConfig?.packageFilter) {
       ctx.commit(ReportsMutations.SET_STATUS, {
         statusMessage: { text: 'Loading packages...', level: 'success' },
