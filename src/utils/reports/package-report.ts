@@ -1,17 +1,18 @@
-import { IIndexedPackageData, IPackageFilter, IPluginState } from '@/interfaces';
-import { DataLoader, getDataLoaderByLicense, primaryDataLoader } from '@/modules/data-loader/data-loader.module';
+import { IIndexedPackageData, ILicenseFormFilters, IPackageFilter, IPluginState } from '@/interfaces';
+import { DataLoader, getDataLoaderByLicense } from '@/modules/data-loader/data-loader.module';
 import { ReportsMutations, ReportType } from '@/store/page-overlay/modules/reports/consts';
 import {
   IFieldData,
   IReportConfig,
   IReportData,
-  IReportsState,
+  IReportsState
 } from '@/store/page-overlay/modules/reports/interfaces';
 import { ActionContext } from 'vuex';
 import { todayIsodate } from '../date';
 import { extractInitialPackageQuantityAndUnitFromHistoryOrError, extractParentPackageTagQuantityUnitItemSetsFromHistory } from '../history';
+import { extractLicenseFields, licenseFilterFactory } from './reports-shared';
 
-export interface IPackageReportFormFilters {
+export interface IPackageReportFormFilters extends ILicenseFormFilters {
   packagedDateGt: string;
   packagedDateLt: string;
   shouldFilterPackagedDateGt: boolean;
@@ -33,6 +34,7 @@ export const packageFormFiltersFactory: () => IPackageReportFormFilters = () => 
   includeInactive: false,
   includeTransferHub: false,
   onlyProductionBatches: false,
+  ...licenseFilterFactory()
 });
 
 export function addPackageReport({
@@ -62,6 +64,7 @@ export function addPackageReport({
   reportConfig[ReportType.PACKAGES] = {
     packageFilter,
     onlyProductionBatches: packagesFormFilters.onlyProductionBatches,
+    ...extractLicenseFields(packagesFormFilters),
     fields,
   };
 }
@@ -76,6 +79,7 @@ export async function maybeLoadPackageReportData({
   reportConfig: IReportConfig;
 }) {
   const packageConfig = reportConfig[ReportType.PACKAGES];
+
   if (packageConfig?.packageFilter) {
     ctx.commit(ReportsMutations.SET_STATUS, {
       statusMessage: { text: 'Loading packages...', level: 'success' },
@@ -83,9 +87,12 @@ export async function maybeLoadPackageReportData({
 
     let packages: IIndexedPackageData[] = [];
 
+    for (const license of packageConfig.licenses) {
+      const dataLoader = await getDataLoaderByLicense(license);
+
     if (packageConfig.packageFilter.includeActive) {
       try {
-        packages = [...packages, ...(await primaryDataLoader.activePackages())];
+        packages = [...packages, ...(await dataLoader.activePackages())];
       } catch (e) {
         ctx.commit(ReportsMutations.SET_STATUS, {
           statusMessage: { text: 'Failed to load active packages.', level: 'warning' },
@@ -95,7 +102,7 @@ export async function maybeLoadPackageReportData({
 
     if (packageConfig.packageFilter.includeInactive) {
       try {
-        packages = [...packages, ...(await primaryDataLoader.inactivePackages())];
+        packages = [...packages, ...(await dataLoader.inactivePackages())];
       } catch (e) {
         ctx.commit(ReportsMutations.SET_STATUS, {
           statusMessage: { text: 'Failed to load inactive packages.', level: 'warning' },
@@ -105,23 +112,23 @@ export async function maybeLoadPackageReportData({
 
     if (packageConfig.packageFilter.includeIntransit) {
       try {
-        packages = [...packages, ...(await primaryDataLoader.inTransitPackages())];
+        packages = [...packages, ...(await dataLoader.inTransitPackages())];
       } catch (e) {
         ctx.commit(ReportsMutations.SET_STATUS, {
           statusMessage: { text: 'Failed to load in transit packages.', level: 'warning' },
         });
       }
     }
-
     // if (packageConfig.packageFilter.includeTransferHub) {
     //   try {
-    //     packages = [...packages, ...(await primaryDataLoader.transferHubPackages())];
+    //     packages = [...packages, ...(await dataLoader.transferHubPackages())];
     //   } catch (e) {
     //     ctx.commit(ReportsMutations.SET_STATUS, {
     //       statusMessage: { text: "Failed to load transfer hub packages.", level: "warning" },
     //     });
     //   }
     // }
+  }
 
     packages = packages.filter((pkg) => {
       if (packageConfig.packageFilter.packagedDateLt) {

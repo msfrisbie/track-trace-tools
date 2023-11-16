@@ -1,26 +1,29 @@
-import { IIndexedPackageData, IPackageFilter, IPluginState } from '@/interfaces';
-import { primaryDataLoader } from '@/modules/data-loader/data-loader.module';
+import { IIndexedPackageData, ILicenseFormFilters, IPackageFilter, IPluginState } from '@/interfaces';
+import { getDataLoaderByLicense } from '@/modules/data-loader/data-loader.module';
 import { ReportsMutations, ReportType } from '@/store/page-overlay/modules/reports/consts';
 import {
   IReportConfig,
   IReportData,
-  IReportsState,
+  IReportsState
 } from '@/store/page-overlay/modules/reports/interfaces';
 import { ActionContext } from 'vuex';
 import {
   IPackageReportFormFilters,
-  packageFormFiltersFactory,
+  packageFormFiltersFactory
 } from './package-report';
+import { extractLicenseFields } from './reports-shared';
 
 const REPORT_TYPE = ReportType.PACKAGES_QUICKVIEW;
 
 export enum PackageQuickviewDimension {
+  LICENSE = 'License',
   ITEM_NAME = 'Item',
   LOCATION = 'Location',
   PACKAGED_DATE = 'Packaged Date',
 }
 
 export const PACKAGES_QUICKVIEW_DIMENSIONS: PackageQuickviewDimension[] = [
+  PackageQuickviewDimension.LICENSE,
   PackageQuickviewDimension.ITEM_NAME,
   PackageQuickviewDimension.LOCATION,
   PackageQuickviewDimension.PACKAGED_DATE,
@@ -31,6 +34,8 @@ export function extractPackagePropertyFromDimension(
   dimension: PackageQuickviewDimension,
 ) {
   switch (dimension) {
+    case PackageQuickviewDimension.LICENSE:
+      return pkg.LicenseNumber;
     case PackageQuickviewDimension.ITEM_NAME:
       return pkg.Item.Name;
     case PackageQuickviewDimension.LOCATION:
@@ -42,7 +47,7 @@ export function extractPackagePropertyFromDimension(
   }
 }
 
-interface IPackagesQuickviewReportFormFilters extends IPackageReportFormFilters {
+interface IPackagesQuickviewReportFormFilters extends IPackageReportFormFilters, ILicenseFormFilters {
   primaryDimension: PackageQuickviewDimension;
   secondaryDimension: PackageQuickviewDimension | null;
 }
@@ -78,6 +83,7 @@ export function addPackagesQuickviewReport({
   reportConfig[REPORT_TYPE] = {
     packageFilter,
     ...packagesQuickviewFormFilters,
+    ...extractLicenseFields(packagesQuickviewFormFilters),
     fields: null,
   };
 }
@@ -100,33 +106,37 @@ export async function maybeLoadPackagesQuickviewReportData({
         statusMessage: { text: 'Loading packages...', level: 'success' },
       });
 
-      if (packageQuickviewConfig?.packageFilter.includeActive) {
-        try {
-          packages = [...packages, ...(await primaryDataLoader.activePackages())];
-        } catch (e) {
-          ctx.commit(ReportsMutations.SET_STATUS, {
-            statusMessage: { text: 'Failed to load active packages.', level: 'warning' },
-          });
-        }
-      }
+      for (const license of packageQuickviewConfig.licenses) {
+        const dataLoader = await getDataLoaderByLicense(license);
 
-      if (packageQuickviewConfig.packageFilter.includeIntransit) {
-        try {
-          packages = [...packages, ...(await primaryDataLoader.inTransitPackages())];
-        } catch (e) {
-          ctx.commit(ReportsMutations.SET_STATUS, {
-            statusMessage: { text: 'Failed to load in transit packages.', level: 'warning' },
-          });
+        if (packageQuickviewConfig?.packageFilter.includeActive) {
+          try {
+            packages = [...packages, ...(await dataLoader.activePackages())];
+          } catch (e) {
+            ctx.commit(ReportsMutations.SET_STATUS, {
+              statusMessage: { text: 'Failed to load active packages.', level: 'warning' },
+            });
+          }
         }
-      }
 
-      if (packageQuickviewConfig.packageFilter.includeInactive) {
-        try {
-          packages = [...packages, ...(await primaryDataLoader.inactivePackages())];
-        } catch (e) {
-          ctx.commit(ReportsMutations.SET_STATUS, {
-            statusMessage: { text: 'Failed to load inactive packages.', level: 'warning' },
-          });
+        if (packageQuickviewConfig.packageFilter.includeIntransit) {
+          try {
+            packages = [...packages, ...(await dataLoader.inTransitPackages())];
+          } catch (e) {
+            ctx.commit(ReportsMutations.SET_STATUS, {
+              statusMessage: { text: 'Failed to load in transit packages.', level: 'warning' },
+            });
+          }
+        }
+
+        if (packageQuickviewConfig.packageFilter.includeInactive) {
+          try {
+            packages = [...packages, ...(await dataLoader.inactivePackages())];
+          } catch (e) {
+            ctx.commit(ReportsMutations.SET_STATUS, {
+              statusMessage: { text: 'Failed to load inactive packages.', level: 'warning' },
+            });
+          }
         }
       }
     }

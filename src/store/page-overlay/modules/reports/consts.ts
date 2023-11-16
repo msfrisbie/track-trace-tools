@@ -97,7 +97,7 @@ export const RAW_REPORT_TYPES: ReportType[] = [
 const COMMON_FIELD_DATA: IFieldData[] = [
   {
     value: 'LicenseNumber',
-    readableName: 'License',
+    readableName: 'Current License',
     required: true,
     initiallyChecked: true,
   },
@@ -108,12 +108,6 @@ const COMMON_PACKAGE_FIELD_DATA: IFieldData[] = [
   {
     value: 'Label',
     readableName: 'Package Tag',
-    required: true,
-    initiallyChecked: true,
-  },
-  {
-    value: 'LicenseNumber',
-    readableName: 'Current License',
     required: true,
     initiallyChecked: true,
   },
@@ -223,12 +217,6 @@ const COMMON_PLANT_FIELD_DATA: IFieldData[] = [
     initiallyChecked: true,
   },
   {
-    value: 'LicenseNumber',
-    readableName: 'Current License',
-    required: true,
-    initiallyChecked: true,
-  },
-  {
     value: 'PlantState',
     readableName: 'Growth Phase',
     required: true,
@@ -288,12 +276,6 @@ const COMMON_PLANT_BATCH_FIELD_DATA: IFieldData[] = [
   {
     value: 'Name',
     readableName: 'Plant Tag/Name',
-    required: true,
-    initiallyChecked: true,
-  },
-  {
-    value: 'LicenseNumber',
-    readableName: 'Current License',
     required: true,
     initiallyChecked: true,
   },
@@ -475,12 +457,6 @@ const COMMON_TAG_FIELD_DATA: IFieldData[] = [
     initiallyChecked: true,
   },
   {
-    value: 'LicenseNumber',
-    readableName: 'Current License',
-    required: true,
-    initiallyChecked: true,
-  },
-  {
     value: 'TagTypeName',
     readableName: 'Tag Type',
     required: true,
@@ -498,12 +474,6 @@ const COMMON_HARVEST_FIELD_DATA: IFieldData[] = [
   {
     value: 'Name',
     readableName: 'Harvest Batch',
-    required: true,
-    initiallyChecked: true,
-  },
-  {
-    value: 'LicenseNumber',
-    readableName: 'Current License',
     required: true,
     initiallyChecked: true,
   },

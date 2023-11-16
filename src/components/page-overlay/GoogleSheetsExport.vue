@@ -356,7 +356,6 @@
               <hr />
 
               <simple-drawer toggleText="ADVANCED">
-
                 <report-license-picker
                   :formFilters="pointInTimeInventoryFormFilters"
                 ></report-license-picker>
@@ -449,6 +448,10 @@
               <b-form-checkbox v-model="packagesFormFilters.onlyProductionBatches">
                 <span class="leading-6">ONLY include production batches</span>
               </b-form-checkbox>
+
+              <simple-drawer toggleText="ADVANCED">
+                <report-license-picker :formFilters="packagesFormFilters"></report-license-picker>
+              </simple-drawer>
 
               <hr />
 
@@ -1375,6 +1378,12 @@
                   v-model="packagesQuickviewFormFilters.packagedDateLt"
                 />
               </div>
+
+              <simple-drawer toggleText="ADVANCED">
+                <report-license-picker
+                  :formFilters="packagesQuickviewFormFilters"
+                ></report-license-picker>
+              </simple-drawer>
             </div>
           </div>
         </template>

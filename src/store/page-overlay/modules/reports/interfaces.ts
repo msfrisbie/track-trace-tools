@@ -85,6 +85,7 @@ export interface IReportConfig {
   [ReportType.PACKAGES]?: {
     packageFilter: IPackageFilter;
     onlyProductionBatches: boolean;
+    licenses: string[];
     fields: IFieldData[];
   };
   [ReportType.POINT_IN_TIME_INVENTORY]?: {
@@ -122,6 +123,7 @@ export interface IReportConfig {
     packageFilter: IPackageFilter;
     primaryDimension: PackageQuickviewDimension;
     secondaryDimension: PackageQuickviewDimension | null;
+    licenses: string[];
     fields: null;
   };
   [ReportType.IMMATURE_PLANTS_QUICKVIEW]?: {
