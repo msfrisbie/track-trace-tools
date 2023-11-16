@@ -6,20 +6,18 @@ import {
   IIndexedTransferData,
   ISheetValues,
   ISpreadsheet,
-  IValueRange,
+  IValueRange
 } from '@/interfaces';
 import { messageBus } from '@/modules/message-bus.module';
 import store from '@/store/page-overlay/index';
 import {
-  ALL_ELIGIBLE_REPORT_TYPES,
-  FIELD_TRANSFORMER_REPORT_TYPES,
   ReportsMutations,
-  ReportType,
+  ReportType
 } from '@/store/page-overlay/modules/reports/consts';
 import {
   IFieldData,
   IReportConfig,
-  IReportData,
+  IReportData
 } from '@/store/page-overlay/modules/reports/interfaces';
 import { downloadCsvFile } from './csv';
 import { todayIsodate } from './date';
@@ -32,7 +30,8 @@ import {
   getCsvFilename,
   getGoogleSheetName,
   getSheetTitle,
-  shouldGenerateReport,
+  reportCatalogFactory,
+  shouldGenerateReport
 } from './reports/reports-shared';
 import {
   addRowsRequestFactory,
@@ -40,7 +39,7 @@ import {
   conditionalFormattingRequestFactory,
   freezeTopRowRequestFactory,
   shrinkFontRequestFactory,
-  styleTopRowRequestFactory,
+  styleTopRowRequestFactory
 } from './sheets';
 
 export async function readSpreadsheet({
@@ -307,7 +306,7 @@ export async function createCsvOrError({
   const flattenedCache = new Map<ReportType, any[]>();
 
   // Check that inputs are well-formed
-  const ELIGIBLE_REPORT_TYPES: ReportType[] = ALL_ELIGIBLE_REPORT_TYPES.filter((reportType) =>
+  const ELIGIBLE_REPORT_TYPES: ReportType[] = reportCatalogFactory().filter((x) => x.value && x.enabled && x.visible).map((x) => x.value as ReportType).filter((reportType) =>
     shouldGenerateReport({ reportType, reportConfig, reportData }));
 
   for (const reportType of ELIGIBLE_REPORT_TYPES) {
@@ -324,7 +323,7 @@ export async function createCsvOrError({
       reportConfig,
     });
 
-    if (FIELD_TRANSFORMER_REPORT_TYPES.includes(reportType)) {
+    if (reportCatalogFactory().find((x) => x.value === reportType)!.usesFieldTransformer) {
       const fields: IFieldData[] = reportConfig[reportType]!.fields!;
 
       data = [fields.map((fieldData) => fieldData.readableName), ...data];
@@ -384,8 +383,10 @@ export async function createSpreadsheetOrError({
   // Check that inputs are well-formed
   //
 
-  const ELIGIBLE_REPORT_TYPES: ReportType[] = ALL_ELIGIBLE_REPORT_TYPES.filter((reportType) =>
-    shouldGenerateReport({ reportType, reportConfig, reportData }));
+  const ELIGIBLE_REPORT_TYPES: ReportType[] = reportCatalogFactory()
+    .filter((x) => x.value && x.enabled && x.visible)
+    .map((x) => x.value as ReportType)
+    .filter((reportType) => shouldGenerateReport({ reportType, reportConfig, reportData }));
 
   //
   // Generate Sheets

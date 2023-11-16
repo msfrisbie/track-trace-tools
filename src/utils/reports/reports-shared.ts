@@ -12,7 +12,6 @@ import {
 import { facilityManager } from '@/modules/facility-manager.module';
 import store from "@/store/page-overlay/index";
 import {
-  FIELD_TRANSFORMER_REPORT_TYPES,
   ReportType
 } from '@/store/page-overlay/modules/reports/consts';
 import {
@@ -35,6 +34,21 @@ export function reportCatalogFactory(): IReportOption[] {
 
   const reportOptions: IReportOption[] = [
     {
+      text: "Test",
+      value: ReportType.TEST,
+      enabled: hasPlus,
+      visible: false,
+      description: "Test report",
+      isCustom: false,
+      usesFormulas: false,
+      isMultiSheet: false,
+      usesFieldTransformer: false,
+      isSpecialty: false,
+      isCatalog: false,
+      isQuickview: false,
+      isHeadless: false
+    },
+    {
       text: "Packages",
       value: ReportType.PACKAGES,
       enabled: hasPlus,
@@ -47,6 +61,7 @@ export function reportCatalogFactory(): IReportOption[] {
       isSpecialty: false,
       isCatalog: true,
       isQuickview: false,
+      isHeadless: false
     },
     {
       text: "Point-in-time inventory",
@@ -61,6 +76,7 @@ export function reportCatalogFactory(): IReportOption[] {
       isSpecialty: true,
       isCatalog: false,
       isQuickview: false,
+      isHeadless: false
     },
     {
       text: "Plant Batches",
@@ -75,6 +91,7 @@ export function reportCatalogFactory(): IReportOption[] {
       isSpecialty: false,
       isCatalog: true,
       isQuickview: false,
+      isHeadless: false
     },
     {
       text: "Mature Plants",
@@ -89,6 +106,7 @@ export function reportCatalogFactory(): IReportOption[] {
       isSpecialty: false,
       isCatalog: true,
       isQuickview: false,
+      isHeadless: false
     },
     {
       text: "Incoming Transfers",
@@ -103,6 +121,7 @@ export function reportCatalogFactory(): IReportOption[] {
       isSpecialty: false,
       isCatalog: true,
       isQuickview: false,
+      isHeadless: false
     },
     {
       text: "Outgoing Transfers",
@@ -117,6 +136,7 @@ export function reportCatalogFactory(): IReportOption[] {
       isSpecialty: false,
       isCatalog: true,
       isQuickview: false,
+      isHeadless: false
     },
     // Disabled - Destinations returns 0, more like incoming?
     // {
@@ -140,6 +160,7 @@ export function reportCatalogFactory(): IReportOption[] {
       isSpecialty: false,
       isCatalog: true,
       isQuickview: false,
+      isHeadless: false
     },
     {
       text: "Harvests",
@@ -154,6 +175,7 @@ export function reportCatalogFactory(): IReportOption[] {
       isSpecialty: false,
       isCatalog: true,
       isQuickview: false,
+      isHeadless: false
     },
     {
       text: "Outgoing Transfer Manifests",
@@ -168,6 +190,7 @@ export function reportCatalogFactory(): IReportOption[] {
       isSpecialty: true,
       isCatalog: false,
       isQuickview: false,
+      isHeadless: false
     },
     {
       text: "Straggler Inventory",
@@ -182,6 +205,7 @@ export function reportCatalogFactory(): IReportOption[] {
       isSpecialty: true,
       isCatalog: false,
       isQuickview: false,
+      isHeadless: false
     },
     {
       text: "Employee Activity",
@@ -196,6 +220,7 @@ export function reportCatalogFactory(): IReportOption[] {
       isSpecialty: true,
       isCatalog: false,
       isQuickview: false,
+      isHeadless: false
     },
     {
       text: "COGS",
@@ -210,6 +235,7 @@ export function reportCatalogFactory(): IReportOption[] {
       isSpecialty: false,
       isCatalog: false,
       isQuickview: false,
+      isHeadless: false
     },
     {
       text: "COGS Tracker",
@@ -224,6 +250,7 @@ export function reportCatalogFactory(): IReportOption[] {
       isSpecialty: false,
       isCatalog: false,
       isQuickview: false,
+      isHeadless: false
     },
     {
       text: "Employee Samples",
@@ -238,6 +265,7 @@ export function reportCatalogFactory(): IReportOption[] {
       isSpecialty: false,
       isCatalog: false,
       isQuickview: false,
+      isHeadless: false
     },
     {
       text: "Harvest Packages",
@@ -246,12 +274,13 @@ export function reportCatalogFactory(): IReportOption[] {
       visible: !!store.state.client.values.ENABLE_HARVEST_PACKAGES,
       description: "Generate summary of harvest packages",
       usesFieldTransformer: false,
-      usesFormulas: true,
+      usesFormulas: false,
       isMultiSheet: false,
       isCustom: true,
       isSpecialty: false,
       isCatalog: false,
       isQuickview: false,
+      isHeadless: false
     },
     {
       text: "Packages Quickview",
@@ -260,12 +289,13 @@ export function reportCatalogFactory(): IReportOption[] {
       visible: true,
       description: "Grouped summary of packages by item, location, and dates",
       isCustom: false,
-      usesFormulas: true,
+      usesFormulas: false,
       isMultiSheet: false,
       usesFieldTransformer: false,
       isSpecialty: false,
       isCatalog: false,
       isQuickview: true,
+      isHeadless: false
     },
     {
       text: "Plant Batch Quickview",
@@ -274,12 +304,13 @@ export function reportCatalogFactory(): IReportOption[] {
       visible: true,
       description: "Grouped summary of plant batches by strain, location, and dates",
       isCustom: false,
-      usesFormulas: true,
+      usesFormulas: false,
       isMultiSheet: false,
       usesFieldTransformer: false,
       isSpecialty: false,
       isCatalog: false,
       isQuickview: true,
+      isHeadless: false
     },
     {
       text: "Mature Plants Quickview",
@@ -289,12 +320,13 @@ export function reportCatalogFactory(): IReportOption[] {
       description:
         "Grouped summary of mature plants by growth phase, strain, location, and dates",
       isCustom: false,
-      usesFormulas: true,
+      usesFormulas: false,
       isMultiSheet: false,
       usesFieldTransformer: false,
       isSpecialty: false,
       isCatalog: false,
       isQuickview: true,
+      isHeadless: false
     },
     {
       text: "Transfer Quickview",
@@ -303,12 +335,13 @@ export function reportCatalogFactory(): IReportOption[] {
       visible: true,
       description: "Summary of incoming, outgoing, and rejected packages",
       isCustom: false,
-      usesFormulas: true,
+      usesFormulas: false,
       isMultiSheet: false,
       usesFieldTransformer: false,
       isSpecialty: false,
       isCatalog: false,
       isQuickview: true,
+      isHeadless: false
     },
     // {
     //   text: "Incoming Inventory",
@@ -326,6 +359,21 @@ export function reportCatalogFactory(): IReportOption[] {
     //   description: "All plants and associated harvest data within this license",
     //   isCustom: false,
     // },
+    {
+      text: "Single Transfer",
+      value: ReportType.SINGLE_TRANSFER,
+      enabled: hasPlus,
+      visible: false,
+      description: "Single transfer",
+      isCustom: false,
+      usesFormulas: false,
+      isMultiSheet: false,
+      usesFieldTransformer: false,
+      isSpecialty: false,
+      isCatalog: false,
+      isQuickview: false,
+      isHeadless: false
+    },
   ];
 
   return reportOptions;
@@ -647,7 +695,7 @@ export function extractFlattenedData({
     }
   })();
 
-  if (FIELD_TRANSFORMER_REPORT_TYPES.includes(reportType)) {
+  if (reportCatalogFactory().find((x) => x.value === reportType)!.usesFieldTransformer) {
     // @ts-ignore
     values = applyFieldTransformer({ fields: reportConfig[reportType]!.fields, values });
   }

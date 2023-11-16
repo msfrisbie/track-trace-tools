@@ -290,4 +290,5 @@ export interface IReportOption {
   isSpecialty: boolean;
   isCatalog: boolean;
   isQuickview: boolean;
+  isHeadless: boolean;
 }
