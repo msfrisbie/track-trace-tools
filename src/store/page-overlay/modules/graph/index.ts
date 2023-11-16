@@ -8,6 +8,7 @@ import { todayIsodate } from '@/utils/date';
 import {
   edgeReducer, hoverRenderer, labelRenderer, nodeReducer
 } from '@/utils/graph';
+import { licenseFilterFactory } from '@/utils/reports/reports-shared';
 import { scrambleTag } from '@/utils/tags';
 import { Coordinates } from 'sigma/types';
 import { ActionContext } from 'vuex';
@@ -27,8 +28,6 @@ const inMemoryState = {
   dateGt: todayIsodate(),
   filterDateLt: false,
   dateLt: todayIsodate(),
-  licenseOptions: facilityManager.cachedFacilities.map((x) => x.licenseNumber),
-  licenses: facilityManager.cachedFacilities.map((x) => x.licenseNumber),
   graphData: {
     nodes: [],
     edges: [],
@@ -38,6 +37,7 @@ const inMemoryState = {
   selectedNodeId: null,
   suggestions: [],
   hoveredNeighborIds: [],
+  ...licenseFilterFactory()
 };
 
 const persistedState = {};

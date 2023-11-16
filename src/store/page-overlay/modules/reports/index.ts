@@ -136,6 +136,10 @@ export const reportsModule = {
 
       ctx.commit(ReportsMutations.SET_STATUS, { status: ReportStatus.INFLIGHT });
 
+      ctx.commit(ReportsMutations.SET_STATUS, {
+        statusMessage: { text: 'Setting things up...', level: 'success' },
+      });
+
       try {
         const reportData: IReportData = {};
 

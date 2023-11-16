@@ -16,6 +16,7 @@ import {
 } from '@/store/page-overlay/modules/reports/interfaces';
 import { ActionContext } from 'vuex';
 import { todayIsodate } from '../date';
+import { licenseFilterFactory } from './reports-shared';
 
 interface IEmployeeAuditReportFormFilters {
   activityDateGt: string;
@@ -37,8 +38,7 @@ export const employeeAuditFormFiltersFactory: () => IEmployeeAuditReportFormFilt
   shouldFilterActivityDateLt: true,
   includePackages: true,
   includeTransfers: true,
-  licenseOptions: facilityManager.cachedFacilities.map((x) => x.licenseNumber),
-  licenses: facilityManager.cachedFacilities.map((x) => x.licenseNumber),
+  ...licenseFilterFactory()
 });
 
 export function addEmployeeAuditReport({

@@ -77,8 +77,6 @@ export const pointInTimeInventoryFormFiltersFactory: () => IPointInTimeInventory
     { value: 365 * 2, text: 'Within 2 years' },
   ],
   showDebugColumns: false,
-  // licenseOptions: facilityManager.cachedFacilities.map((x) => x.licenseNumber),
-  // licenses: facilityManager.cachedFacilities.map((x) => x.licenseNumber),
   inventoryStrategy: InventoryStrategy.SLICE_START_OF_DAY,
 });
 

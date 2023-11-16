@@ -10,7 +10,6 @@ import {
 } from '@/interfaces';
 import { DataLoader, getDataLoaderByLicense } from '@/modules/data-loader/data-loader.module';
 import { dynamicConstsManager } from '@/modules/dynamic-consts-manager.module';
-import { facilityManager } from '@/modules/facility-manager.module';
 import { ReportsMutations, ReportType } from '@/store/page-overlay/modules/reports/consts';
 import {
   IReportConfig,
@@ -41,6 +40,7 @@ import {
 } from '../package';
 import { findMatchingTransferPackages } from '../transfer';
 import { convertUnits } from '../units';
+import { licenseFilterFactory } from './reports-shared';
 
 interface IHarvestPackagesReportFormFilters {
   harvestDateGt: string;
@@ -114,14 +114,13 @@ export const harvestPackagesFormFiltersFactory: () => IHarvestPackagesReportForm
   shouldFilterHarvestDateGt: true,
   shouldFilterHarvestDateLt: true,
   removeFloorNugs: true,
-  licenseOptions: facilityManager.cachedFacilities.map((x) => x.licenseNumber),
-  licenses: facilityManager.cachedFacilities.map((x) => x.licenseNumber),
   displayChecksum: false,
   displayFullTags: false,
   addSpacing: false,
   debug: false,
   enableHarvestMatchFilter: false,
-  harvestMatchFilter: ""
+  harvestMatchFilter: "",
+  ...licenseFilterFactory()
 });
 
 export function addHarvestPackagesReport({

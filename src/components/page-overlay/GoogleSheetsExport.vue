@@ -165,12 +165,7 @@
               <hr />
 
               <simple-drawer toggleText="ADVANCED">
-                <b-form-group label="Licenses:">
-                  <b-form-checkbox-group
-                    v-model="cogsV2FormFilters.licenses"
-                    :options="cogsV2FormFilters.licenseOptions"
-                  ></b-form-checkbox-group>
-                </b-form-group>
+                <report-license-picker :formFilters="cogsV2FormFilters"></report-license-picker>
               </simple-drawer>
             </div>
           </div>
@@ -321,12 +316,9 @@
                   >
                   </b-form-input>
                 </b-form-group>
-                <b-form-group label="Licenses:">
-                  <b-form-checkbox-group
-                    v-model="harvestPackagesFormFilters.licenses"
-                    :options="harvestPackagesFormFilters.licenseOptions"
-                  ></b-form-checkbox-group>
-                </b-form-group>
+                <report-license-picker
+                  :formFilters="harvestPackagesFormFilters"
+                ></report-license-picker>
               </simple-drawer>
             </div>
           </div>
@@ -1309,12 +1301,9 @@
               <hr />
 
               <simple-drawer toggleText="ADVANCED">
-                <b-form-group label="Licenses:">
-                  <b-form-checkbox-group
-                    v-model="employeeAuditFormFilters.licenses"
-                    :options="employeeAuditFormFilters.licenseOptions"
-                  ></b-form-checkbox-group>
-                </b-form-group>
+                <report-license-picker
+                  :formFilters="employeeAuditFormFilters"
+                ></report-license-picker>
               </simple-drawer>
             </div>
           </div>
@@ -1647,6 +1636,7 @@
 </template>
 
 <script lang="ts">
+import ReportLicensePicker from "@/components/overlay-widget/shared/ReportLicensePicker.vue";
 import { MessageType } from "@/consts";
 import { IPluginState } from "@/interfaces";
 import { authManager } from "@/modules/auth-manager.module";
@@ -1761,6 +1751,7 @@ export default Vue.extend({
   components: {
     ArchiveWidget,
     SimpleDrawer,
+    ReportLicensePicker,
   },
   computed: {
     ...mapState<IPluginState>({

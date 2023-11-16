@@ -9,6 +9,7 @@ import {
   ITransferData,
   ITransporterData
 } from '@/interfaces';
+import { facilityManager } from '@/modules/facility-manager.module';
 import {
   FIELD_TRANSFORMER_REPORT_TYPES,
   ReportType
@@ -439,4 +440,14 @@ export function getSheetTitle({
     default:
       throw new Error(`Bad reportType ${reportType}`);
   }
+}
+
+export function licenseFilterFactory(): {
+  licenseOptions: string[],
+  licenses: string[]
+} {
+  return {
+    licenseOptions: facilityManager.cachedFacilities.map((x) => x.licenseNumber),
+    licenses: facilityManager.cachedFacilities.map((x) => x.licenseNumber),
+  };
 }
