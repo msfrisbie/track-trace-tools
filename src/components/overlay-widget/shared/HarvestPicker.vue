@@ -69,12 +69,12 @@
 </template>
 
 <script lang="ts">
-import ErrorReadout from "@/components/overlay-widget/shared/ErrorReadout.vue";
-import { IHarvestData } from "@/interfaces";
-import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
-import { primaryMetrcRequestManager } from "@/modules/metrc-request-manager.module";
-import store from "@/store/page-overlay/index";
-import Vue from "vue";
+import ErrorReadout from '@/components/overlay-widget/shared/ErrorReadout.vue';
+import { IHarvestData } from '@/interfaces';
+import { primaryDataLoader } from '@/modules/data-loader/data-loader.module';
+import { primaryMetrcRequestManager } from '@/modules/metrc-request-manager.module';
+import store from '@/store/page-overlay/index';
+import Vue from 'vue';
 
 function msAgo(isodate: string): number {
   const now: number = Date.now();
@@ -88,7 +88,7 @@ function msAgo(isodate: string): number {
 const HARVEST_EXPIRATION_MS = 1000 * 60 * 60 * 24;
 
 export default Vue.extend({
-  name: "HarvestPicker",
+  name: 'HarvestPicker',
   store,
   components: {
     ErrorReadout,
@@ -135,7 +135,7 @@ export default Vue.extend({
       immediate: true,
       handler(newValue, oldValue) {
         // @ts-ignore
-        this.$emit("update:harvestName", newValue);
+        this.$emit('update:harvestName', newValue);
       },
     },
   },
@@ -160,9 +160,9 @@ export default Vue.extend({
         this.$data.inflight = true;
         this.$data.activeHarvests = (await primaryDataLoader.activeHarvests()).filter(
           (harvestData: IHarvestData) =>
-            this.$props.filterWholePlant
-              ? harvestData.HarvestType === "WholePlant"
-              : harvestData.HarvestType !== "WholePlant"
+            (this.$props.filterWholePlant
+              ? harvestData.HarvestType === 'WholePlant'
+              : harvestData.HarvestType !== 'WholePlant'),
         );
       } catch (e) {
         this.$data.error = e;
@@ -179,7 +179,7 @@ export default Vue.extend({
 
       // @ts-ignore
       const matchingHarvests = (await primaryDataLoader.activeHarvests()).filter(
-        (harvest: IHarvestData) => harvest.Name === this.$props.harvestName
+        (harvest: IHarvestData) => harvest.Name === this.$props.harvestName,
       );
 
       if (matchingHarvests.length === 0) {
@@ -193,8 +193,8 @@ export default Vue.extend({
 
         // If the harvest type is a mismatch, show that error first
         if (
-          (matchingHarvest.HarvestType === "WholePlant" && !this.$props.filterWholePlant) ||
-          (matchingHarvest.HarvestType !== "WholePlant" && this.$props.filterWholePlant)
+          (matchingHarvest.HarvestType === 'WholePlant' && !this.$props.filterWholePlant)
+          || (matchingHarvest.HarvestType !== 'WholePlant' && this.$props.filterWholePlant)
         ) {
           this.$data.harvestNameCheckInflight = false;
           this.$data.harvestTypeMismatch = true;
@@ -214,7 +214,7 @@ export default Vue.extend({
           const responseData = await (
             await primaryMetrcRequestManager.getHarvestHistory(
               JSON.stringify({}),
-              matchingHarvest.Id
+              matchingHarvest.Id,
             )
           ).data;
 

@@ -31,18 +31,18 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import PageOverlayHeader from "@/components/page-overlay/PageOverlayHeader.vue";
-import PageOverlayBody from "@/components/page-overlay/PageOverlayBody.vue";
-import PageOverlayFooter from "@/components/page-overlay/PageOverlayFooter.vue";
-import GlobalMessageView from "@/components/page-overlay/GlobalMessageView.vue";
-import { mapState } from "vuex";
-import DebugForm from "@/components/page-overlay/forms/DebugForm.vue";
-import { MutationType } from "@/mutation-types";
-import { authManager } from "@/modules/auth-manager.module";
+import Vue from 'vue';
+import PageOverlayHeader from '@/components/page-overlay/PageOverlayHeader.vue';
+import PageOverlayBody from '@/components/page-overlay/PageOverlayBody.vue';
+import PageOverlayFooter from '@/components/page-overlay/PageOverlayFooter.vue';
+import GlobalMessageView from '@/components/page-overlay/GlobalMessageView.vue';
+import { mapState } from 'vuex';
+import DebugForm from '@/components/page-overlay/forms/DebugForm.vue';
+import { MutationType } from '@/mutation-types';
+import { authManager } from '@/modules/auth-manager.module';
 
 export default Vue.extend({
-  name: "DefaultOverlayView",
+  name: 'DefaultOverlayView',
   data() {
     return {
       authState: null,
@@ -60,4 +60,3 @@ export default Vue.extend({
   },
 });
 </script>
-

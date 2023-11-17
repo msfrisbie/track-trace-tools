@@ -1,6 +1,6 @@
-import { ICompressedMetrcTagRange, ICompressedMetrcTagRanges } from "@/interfaces";
-import _ from "lodash-es";
-import { getOffsetFromTag, isTagInsidePair } from "./tags";
+import { ICompressedMetrcTagRange, ICompressedMetrcTagRanges } from '@/interfaces';
+import _ from 'lodash-es';
+import { getOffsetFromTag, isTagInsidePair } from './tags';
 
 interface IFormattedTagData {
   tag: string;
@@ -37,14 +37,14 @@ export class CompressedMetrcTags implements ICompressedMetrcTagRanges {
       propertyMask: (rawData: Object) => Object;
       rawCollection: any[];
     },
-    includeRawData: boolean = true
+    includeRawData: boolean = true,
   ) {
     const sortedMaskedCollection: IFormattedTagData[] = rawCollection
       .map((data) => {
         const tag = tagExtractor(data);
         const maskedData = propertyMask(data);
 
-        let parsed: IFormattedTagData = {
+        const parsed: IFormattedTagData = {
           tag,
           maskedData,
         };
@@ -101,13 +101,11 @@ export class CompressedMetrcTags implements ICompressedMetrcTagRanges {
   }
 
   find(tag: string): ICompressedMetrcTagRange[] {
-    return this._compressedTagRanges.filter((compressedTagRange: ICompressedMetrcTagRange) => {
-      return isTagInsidePair({
-        startTag: compressedTagRange.startTag,
-        endTag: compressedTagRange.endTag,
-        targetTag: tag,
-      });
-    });
+    return this._compressedTagRanges.filter((compressedTagRange: ICompressedMetrcTagRange) => isTagInsidePair({
+      startTag: compressedTagRange.startTag,
+      endTag: compressedTagRange.endTag,
+      targetTag: tag,
+    }));
   }
 
   // TODO
@@ -128,12 +126,12 @@ export function compressedDataWrapperFactory<T>(
   name: string,
   expanded: T[],
   indexedKey: string,
-  keys?: string[]
+  keys?: string[],
 ): CompressedDataWrapper<T> {
   if (expanded.length === 0) {
-    console.error("Compressing empty array");
+    console.error('Compressing empty array');
     console.trace();
-    return new CompressedDataWrapper<T>("Empty", [], "", []);
+    return new CompressedDataWrapper<T>('Empty', [], '', []);
   }
 
   if (!keys) {
@@ -155,10 +153,15 @@ export function compressedDataWrapperFactory<T>(
 
 export class CompressedDataWrapper<T> {
   name: string;
+
   data: any[][];
+
   keys: string[];
+
   indexedKey: string;
+
   index: Map<any, number>;
+
   duplicateCounter: number = 0;
 
   constructor(name: string, data: any[][], indexedKey: string, keys: string[]) {
@@ -189,7 +192,7 @@ export class CompressedDataWrapper<T> {
     }
   }
 
-  *[Symbol.iterator](): Generator<T> {
+  * [Symbol.iterator](): Generator<T> {
     for (const x of this.data) {
       yield this.unpack(x);
     }

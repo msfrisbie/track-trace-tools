@@ -1,5 +1,5 @@
-import { IIndexedRichOutgoingTransferData } from "@/interfaces";
-import { TransferPackageSearchAlgorithm, TransferPackageSearchState } from "./consts";
+import { IIndexedRichOutgoingTransferData } from '@/interfaces';
+import { TransferPackageSearchAlgorithm, TransferPackageSearchState } from './consts';
 
 export interface ITransferPackageSearchState {
   startDate: string | null;
@@ -7,5 +7,5 @@ export interface ITransferPackageSearchState {
   state: TransferPackageSearchState;
   results: IIndexedRichOutgoingTransferData[];
   abortController: AbortController;
-  messages: { message: string; variant: "primary" | "error" | "warning"; timestamp: number }[];
+  messages: { message: string; variant: 'primary' | 'error' | 'warning'; timestamp: number }[];
 }

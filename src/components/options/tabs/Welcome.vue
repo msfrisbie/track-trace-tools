@@ -41,16 +41,16 @@
 </template>
 
 <script lang="ts">
-import TrackTraceToolsLogo from "@/components/shared/TrackTraceToolsLogo.vue";
-import router from "@/router/index";
-import store from "@/store/page-overlay/index";
-import Vue from "vue";
-import { mapState } from "vuex";
+import TrackTraceToolsLogo from '@/components/shared/TrackTraceToolsLogo.vue';
+import router from '@/router/index';
+import store from '@/store/page-overlay/index';
+import Vue from 'vue';
+import { mapState } from 'vuex';
 
-require("@/assets/images/metrc-background.svg");
+require('@/assets/images/metrc-background.svg');
 
 export default Vue.extend({
-  name: "Welcome",
+  name: 'Welcome',
   store,
   router,
   props: {},

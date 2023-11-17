@@ -1,6 +1,6 @@
-import { encryptedData } from "@/client/data/encrypted-data";
-import { IClientConfig } from "@/interfaces";
-import CryptoJS from "crypto-js";
+import { encryptedData } from '@/client/data/encrypted-data';
+import { IClientConfig } from '@/interfaces';
+import CryptoJS from 'crypto-js';
 
 export function encrypt({
   data,
@@ -25,7 +25,7 @@ export function decrypt({
 
 export function getMatchingDecryptedDataOrNull(secretKey: string): IClientConfig | null {
   if (!secretKey) {
-    console.log("No secret key provided");
+    console.log('No secret key provided');
     return null;
   }
 
@@ -38,7 +38,7 @@ export function getMatchingDecryptedDataOrNull(secretKey: string): IClientConfig
     }
   }
 
-  console.error("No match for provided secret key");
+  console.error('No match for provided secret key');
 
   return null;
 }

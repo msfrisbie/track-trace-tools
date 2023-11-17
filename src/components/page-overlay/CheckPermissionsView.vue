@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="flex flex-col items-center">
     <table class="text-center">
       <thead>
         <tr>
@@ -41,6 +41,18 @@
         </template>
       </tbody>
     </table>
+    <simple-drawer toggleText="What is this?" class="w-80 my-8">
+      <div class="flex flex-col gap-2 py-4">
+        <div class="font-semibold">
+          This page shows what T3 "sees" as the current user's Metrc permissions.
+        </div>
+        <div>
+          Unless you're a facility manager, Metrc users don't have a way to check their own
+          permissions. T3 tests the permissions by trying to load a small number of each of these
+          objects, and this permissions page shows the success/fail result.
+        </div>
+      </div>
+    </simple-drawer>
   </div>
 </template>
 
@@ -51,6 +63,7 @@ import router from "@/router/index";
 import store from "@/store/page-overlay/index";
 import Vue from "vue";
 import { mapState } from "vuex";
+import SimpleDrawer from "../shared/SimpleDrawer.vue";
 
 enum PermissionState {
   INITIAL = "INITIAL",
@@ -70,7 +83,9 @@ export default Vue.extend({
   store,
   router,
   props: {},
-  components: {},
+  components: {
+    SimpleDrawer,
+  },
   computed: {
     ...mapState([]),
   },
@@ -200,12 +215,11 @@ export default Vue.extend({
     for (const permission of permissions) {
       const dataLoader = await getDataLoaderByLicense(permission.license);
 
-      permission
-        .assessmentFn(dataLoader)
-        .then(
-          (result: boolean) =>
-            (permission.state = result ? PermissionState.GRANTED : PermissionState.NOT_GRANTED)
-        );
+      permission.assessmentFn(dataLoader).then((result: boolean) => {
+        permission.state = result ? PermissionState.GRANTED : PermissionState.NOT_GRANTED;
+
+        return permission.state;
+      });
     }
 
     this.$data.permissions = permissions;

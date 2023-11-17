@@ -112,23 +112,23 @@
 </template>
 
 <script lang="ts">
-import DualColorTag from "@/components/overlay-widget/shared/DualColorTag.vue";
-import { IPlantBatchData, IPlantBatchType, IPlantData } from "@/interfaces";
-import store from "@/store/page-overlay/index";
-import { splitMax } from "@/utils/array";
-import { evenIntegerDistribution } from "@/utils/math";
-import { sum } from "lodash-es";
-import Vue from "vue";
+import DualColorTag from '@/components/overlay-widget/shared/DualColorTag.vue';
+import { IPlantBatchData, IPlantBatchType, IPlantData } from '@/interfaces';
+import store from '@/store/page-overlay/index';
+import { splitMax } from '@/utils/array';
+import { evenIntegerDistribution } from '@/utils/math';
+import { sum } from 'lodash-es';
+import Vue from 'vue';
 
 const PAGE_SIZE = 100;
 
 enum CountMode {
-  BULK = "BULK",
-  INDIVIDUAL = "INDIVIDUAL",
+  BULK = 'BULK',
+  INDIVIDUAL = 'INDIVIDUAL',
 }
 
 export default Vue.extend({
-  name: "MotherPlantPicker",
+  name: 'MotherPlantPicker',
   store,
   components: {
     DualColorTag,
@@ -151,15 +151,15 @@ export default Vue.extend({
       this.$refs.page.scrollTop = 0;
     },
     updateChildMatrix(matrix: number[][]) {
-      this.$emit("update:childMatrix", matrix);
+      this.$emit('update:childMatrix', matrix);
     },
   },
   computed: {
     totalPackagesCreated(): number {
       return sum(
         this.$props.childMatrix.map(
-          (x: (number | null)[]) => x.filter((x: number | null) => x !== null).length
-        )
+          (x: (number | null)[]) => x.filter((x: number | null) => x !== null).length,
+        ),
       );
     },
     totalChildCount() {
@@ -227,7 +227,7 @@ export default Vue.extend({
       handler(newValue, oldValue) {
         const matrix: number[][] = evenIntegerDistribution(
           this.$data.totalCount,
-          this.selectedMothers.length
+          this.selectedMothers.length,
         ).map((x) => splitMax(x, newValue));
 
         this.updateChildMatrix(matrix);
@@ -236,7 +236,7 @@ export default Vue.extend({
     plantBatchType: {
       immediate: true,
       handler(newValue, oldValue) {
-        this.$emit("update:plantBatchType", newValue);
+        this.$emit('update:plantBatchType', newValue);
       },
     },
     totalCount: {
@@ -248,7 +248,7 @@ export default Vue.extend({
 
         const matrix: number[][] = evenIntegerDistribution(
           newValue,
-          this.selectedMothers.length
+          this.selectedMothers.length,
         ).map((x) => splitMax(x, this.$data.maximumPerBatch));
 
         this.updateChildMatrix(matrix);

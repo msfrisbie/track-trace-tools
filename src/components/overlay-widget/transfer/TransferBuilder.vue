@@ -287,7 +287,7 @@
                   <div class="font-bold">{{ getLabelOrError(pkg) }}</div>
                   <div>
                     {{
-                      `${getQuantityOrError(pkg)} ${getItemUnitOfMeasureAbbreviationOrError(
+                      `${getQuantityOrError(pkg)} ${getUnitOfMeasureAbbreviationOrError(
                         pkg
                       )} ${getItemNameOrError(pkg)}`
                     }}
@@ -476,13 +476,12 @@ import FacilitySummary from "@/components/overlay-widget/shared/FacilitySummary.
 import RecentFacilityPicker from "@/components/overlay-widget/shared/RecentFacilityPicker.vue";
 import RoutePicker from "@/components/overlay-widget/shared/RoutePicker.vue";
 import SinglePackagePicker from "@/components/overlay-widget/shared/SinglePackagePicker.vue";
-import TransferPicker from "@/components/overlay-widget/shared/TransferPicker.vue";
 import StartFinishIcons from "@/components/overlay-widget/shared/StartFinishIcons.vue";
-import { BuilderType, MessageType, ModalAction, ModalType } from "@/consts";
+import TransferPicker from "@/components/overlay-widget/shared/TransferPicker.vue";
+import { BuilderType, MessageType } from "@/consts";
 import {
   IBuilderComponentError,
   IComputedGetSet,
-  IComputedGetSetMismatched,
   ICsvFile,
   IIndexedTransferData,
   IMetrcCreateTransferPayload,
@@ -492,20 +491,18 @@ import {
   IMetrcTransferType,
   IMetrcUpdateTransferPayload,
   IPluginState,
-  ITransferData,
   IUnionIndexedPackageData,
   IUnitOfMeasure,
 } from "@/interfaces";
 import { analyticsManager } from "@/modules/analytics-manager.module";
 import { authManager } from "@/modules/auth-manager.module";
 import { builderManager } from "@/modules/builder-manager.module";
+import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
 import { dynamicConstsManager } from "@/modules/dynamic-consts-manager.module";
-import { modalManager } from "@/modules/modal-manager.module";
-import { searchManager } from "@/modules/search-manager.module";
 import { toastManager } from "@/modules/toast-manager.module";
 import store from "@/store/page-overlay/index";
-import { PackageSearchActions } from "@/store/page-overlay/modules/package-search/consts";
 import { PluginAuthGetters } from "@/store/page-overlay/modules/plugin-auth/consts";
+import { SearchActions } from "@/store/page-overlay/modules/search/consts";
 import {
   TransferBuilderActions,
   TransferBuilderGetters,
@@ -520,24 +517,19 @@ import { nowIsotime, todayIsodate } from "@/utils/date";
 import { debugLogFactory } from "@/utils/debug";
 import { facilitySummary } from "@/utils/facility";
 import {
+  getIdOrError,
+  getItemNameOrError,
+  getLabelOrError,
+  getQuantityOrError,
+  getUnitOfMeasureAbbreviationOrError,
+} from "@/utils/package";
+import {
   extractRecentDestinationFacilitiesFromTransfers,
   extractRecentTransporterFacilitiesFromTransfers,
 } from "@/utils/transfer";
-import _ from "lodash-es";
 import { timer } from "rxjs";
 import Vue from "vue";
-import { mapActions, mapGetters, mapState, Store } from "vuex";
-import {
-  getLabelOrError,
-  getQuantityOrError,
-  getItemNameOrError,
-  getItemUnitOfMeasureNameOrError,
-  getItemUnitOfMeasureAbbreviationOrError,
-  getIdOrError,
-} from "@/utils/package";
-import { clientBuildManager } from "@/modules/client-build-manager.module";
-import { SearchActions } from "@/store/page-overlay/modules/search/consts";
-import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
+import { mapActions, mapGetters, mapState } from "vuex";
 
 const debugLog = debugLogFactory("TransferBuilder.vue");
 
@@ -566,8 +558,7 @@ export default Vue.extend({
     getLabelOrError,
     getQuantityOrError,
     getItemNameOrError,
-    getItemUnitOfMeasureNameOrError,
-    getItemUnitOfMeasureAbbreviationOrError,
+    getUnitOfMeasureAbbreviationOrError,
     facilitySummary,
     selectDestinationFacility(facility: IMetrcFacilityData) {
       this.destinationFacility = null;
@@ -766,12 +757,12 @@ export default Vue.extend({
         ],
       };
 
-      let rows: IMetrcCreateTransferPayload[] | IMetrcUpdateTransferPayload[] = [transferData];
+      const rows: IMetrcCreateTransferPayload[] | IMetrcUpdateTransferPayload[] = [transferData];
 
       if (rows[0].Destinations.length === 0) {
         analyticsManager.track(MessageType.BUILDER_DATA_ERROR, {
           builder: BuilderType.CREATE_TRANSFER,
-          action: `Destinations is empty`,
+          action: "Destinations is empty",
           payload: JSON.stringify(rows),
         });
 
@@ -806,13 +797,13 @@ export default Vue.extend({
       if (this.transferForUpdate) {
         analyticsManager.track(MessageType.BUILDER_EVENT, {
           builder: BuilderType.UPDATE_TRANSFER,
-          action: `Updated transfer`,
+          action: "Updated transfer",
           payload: JSON.stringify(rows),
         });
       } else {
         analyticsManager.track(MessageType.BUILDER_EVENT, {
           builder: BuilderType.CREATE_TRANSFER,
-          action: `Created transfer`,
+          action: "Created transfer",
           payload: JSON.stringify(rows),
         });
       }
@@ -985,7 +976,7 @@ export default Vue.extend({
       function isNumber(x: any) {
         const n = parseFloat(x);
 
-        if (isNaN(n)) {
+        if (Number.isNaN(n)) {
           return false;
         }
 
@@ -1053,6 +1044,42 @@ export default Vue.extend({
       immediate: true,
       handler(newValue, oldValue) {
         this.$data.editTransfer = !!this.transferForUpdate;
+      },
+    },
+    transporterQuery: {
+      immediate: true,
+      async handler(newValue, oldValue) {
+        if (newValue.length < 3) {
+          return;
+        }
+
+        this.$data.transferDataLoading = true;
+        primaryDataLoader
+          .transferTransporterFacilities(newValue)
+          .then((transporterFacilities) => {
+            this.$data.transporterFacilities = transporterFacilities;
+          })
+          .finally(() => {
+            this.$data.transferDataLoading = false;
+          });
+      },
+    },
+    destinationQuery: {
+      immediate: true,
+      async handler(newValue, oldValue) {
+        if (newValue.length < 3) {
+          return;
+        }
+
+        this.$data.transferDataLoading = true;
+        primaryDataLoader
+          .transferDestinationFacilities(newValue)
+          .then((destinationFacilities) => {
+            this.$data.destinationFacilities = destinationFacilities;
+          })
+          .finally(() => {
+            this.$data.transferDataLoading = false;
+          });
       },
     },
   },
@@ -1309,8 +1336,10 @@ export default Vue.extend({
       this.$data.facilities = await dynamicConstsManager.facilities();
       // this.$data.transporterFacilities = await dynamicConstsManager.transporterFacilities();
       // this.$data.destinationFacilities = await dynamicConstsManager.destinationFacilities();
-      this.$data.transporterFacilities = await primaryDataLoader.transferTransporterFacilities();
-      this.$data.destinationFacilities = await primaryDataLoader.transferDestinationFacilities();
+      // this.$data.transporterFacilities =
+      //   await primaryDataLoader.transferTransporterFacilitiesDeprecated();
+      // this.$data.destinationFacilities =
+      //   await primaryDataLoader.transferDestinationFacilitiesDeprecated();
 
       this.$data.defaultPhoneNumberForQuestions =
         await dynamicConstsManager.defaultPhoneNumberForQuestions();
@@ -1342,7 +1371,7 @@ export default Vue.extend({
       this.$data.showInitializationError = true;
 
       analyticsManager.track(MessageType.BUILDER_ERROR_READOUT, {
-        errorMessage: `Transfer builder initialization error`,
+        errorMessage: "Transfer builder initialization error",
         error: (e as Error)?.toString(),
       });
     }

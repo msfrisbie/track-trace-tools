@@ -46,21 +46,21 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import store from "@/store/page-overlay/index";
-import { ITagSearchFilters } from "@/interfaces";
-import { TAG_TAB_REGEX } from "@/modules/page-manager/consts";
-import { mapActions, mapState } from "vuex";
-import { TagFilterIdentifiers } from "@/consts";
-import { MutationType } from "@/mutation-types";
-import { TagSearchActions } from "@/store/page-overlay/modules/tag-search/consts";
+import Vue from 'vue';
+import store from '@/store/page-overlay/index';
+import { ITagSearchFilters } from '@/interfaces';
+import { TAG_TAB_REGEX } from '@/modules/page-manager/consts';
+import { mapActions, mapState } from 'vuex';
+import { TagFilterIdentifiers } from '@/consts';
+import { MutationType } from '@/mutation-types';
+import { TagSearchActions } from '@/store/page-overlay/modules/tag-search/consts';
 
 interface ComponentData {
   tagSearchFilters: ITagSearchFilters;
 }
 
 export default Vue.extend({
-  name: "TagSearchFilters",
+  name: 'TagSearchFilters',
   store,
   computed: {
     ...mapState({

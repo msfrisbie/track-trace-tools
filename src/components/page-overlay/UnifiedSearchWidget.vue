@@ -82,21 +82,21 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import { mapState, mapActions } from "vuex";
-import router from "@/router/index";
-import store from "@/store/page-overlay/index";
-import TagSearchWidget from "@/components/search/tag-search/TagSearchWidget.vue";
-import TransferSearchWidget from "@/components/search/transfer-search/TransferSearchWidget.vue";
-import PackageSearchWidget from "@/components/search/package-search/PackageSearchWidget.vue";
-import TransferPackageSearchWidget from "@/components/search/transfer-package-search/TransferPackageSearchWidget.vue";
-import PlantSearchWidget from "@/components/search/plant-search/PlantSearchWidget.vue";
-import { SearchActions, SearchType } from "@/store/page-overlay/modules/search/consts";
-import { IPluginState } from "@/interfaces";
-import SearchPickerSelect from "@/components/page-overlay/SearchPickerSelect.vue";
+import Vue from 'vue';
+import { mapState, mapActions } from 'vuex';
+import router from '@/router/index';
+import store from '@/store/page-overlay/index';
+import TagSearchWidget from '@/components/search/tag-search/TagSearchWidget.vue';
+import TransferSearchWidget from '@/components/search/transfer-search/TransferSearchWidget.vue';
+import PackageSearchWidget from '@/components/search/package-search/PackageSearchWidget.vue';
+import TransferPackageSearchWidget from '@/components/search/transfer-package-search/TransferPackageSearchWidget.vue';
+import PlantSearchWidget from '@/components/search/plant-search/PlantSearchWidget.vue';
+import { SearchActions, SearchType } from '@/store/page-overlay/modules/search/consts';
+import { IPluginState } from '@/interfaces';
+import SearchPickerSelect from '@/components/page-overlay/SearchPickerSelect.vue';
 
 export default Vue.extend({
-  name: "UnifiedSearchWidget",
+  name: 'UnifiedSearchWidget',
   store,
   router,
   props: {
@@ -147,7 +147,7 @@ export default Vue.extend({
     },
   },
   watch: {
-    "searchState.showSearchResults": {
+    'searchState.showSearchResults': {
       immediate: true,
       handler(newValue: boolean, oldValue: boolean) {
         if (newValue) {

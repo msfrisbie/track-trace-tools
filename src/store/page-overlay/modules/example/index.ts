@@ -1,7 +1,7 @@
-import { IPluginState } from "@/interfaces";
-import { ActionContext } from "vuex";
-import { ExampleActions, ExampleGetters, ExampleMutations } from "../example/consts";
-import { IExampleState } from "../example/interfaces";
+import { IPluginState } from '@/interfaces';
+import { ActionContext } from 'vuex';
+import { ExampleActions, ExampleGetters, ExampleMutations } from './consts';
+import { IExampleState } from './interfaces';
 
 const inMemoryState = {};
 
@@ -24,7 +24,7 @@ export const exampleModule = {
       state: IExampleState,
       getters: any,
       rootState: any,
-      rootGetters: any
+      rootGetters: any,
     ) => {
       // return state.data
     },
@@ -32,16 +32,14 @@ export const exampleModule = {
   actions: {
     [ExampleActions.EXAMPLE_ACTION]: async (
       ctx: ActionContext<IExampleState, IPluginState>,
-      data: any
+      data: any,
     ) => {
       ctx.commit(ExampleMutations.EXAMPLE_MUTATION, data);
     },
   },
 };
 
-export const exampleReducer = (state: IExampleState): IExampleState => {
-  return {
-    ...state,
-    ...inMemoryState,
-  };
-};
+export const exampleReducer = (state: IExampleState): IExampleState => ({
+  ...state,
+  ...inMemoryState,
+});

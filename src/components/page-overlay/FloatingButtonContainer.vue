@@ -16,17 +16,14 @@
       </div>
 
       <!-- TODO enable when T3+ signup is ready -->
-      <plus-button
-        v-if="false && !clientValues['ENABLE_T3PLUS'] && !t3plus"
-        class="floating-shadow"
-      />
+      <plus-button v-if="!t3plus" class="floating-shadow" />
 
       <div class="relative">
         <builder-button class="floating-shadow" />
         <div
           v-if="notificationCount > 0"
-          class="absolute bg-red-500 rounded-full text-white flex flex-col items-center justify-center text-center text-xs border border-white"
-          style="width: 0.6rem; height: 0.6rem; bottom: -0.3rem; left: -0.3rem"
+          class="absolute rounded-full text-white flex flex-col items-center justify-center text-center text-xs border border-white notification-breathe"
+          style="width: 0.8rem; height: 0.8rem; bottom: -0.3rem; left: -0.3rem"
         ></div>
       </div>
     </template>
@@ -105,5 +102,21 @@ export default Vue.extend({
   max-width: 100vw;
   z-index: 0;
   transition-delay: 0s;
+}
+
+@keyframes colorAndSizeChange {
+  0%,
+  100% {
+    background-color: rgb(255, 0, 0);
+    transform: scale(1);
+  }
+  50% {
+    background-color: rgb(255, 98, 50);
+    transform: scale(1.2);
+  }
+}
+
+.notification-breathe {
+  animation: colorAndSizeChange 4s infinite;
 }
 </style>

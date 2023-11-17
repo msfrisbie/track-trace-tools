@@ -27,21 +27,23 @@
 
 .toolkit-scroll::-webkit-scrollbar,
 .vbt-autcomplete-list::-webkit-scrollbar {
-  width: 11px;
+  width: 7px;
 }
 .toolkit-scroll,
 .vbt-autcomplete-list {
   scrollbar-width: thin;
-  scrollbar-color: $light-purple $light-gray;
+  scrollbar-color: $extra-light-purple $light-gray;
+  border-radius: 3px;
 }
 .toolkit-scroll::-webkit-scrollbar-track,
 .vbt-autcomplete-list::-webkit-scrollbar-track {
-  background: $light-purple;
+  background: $extra-light-purple;
+  border-radius: 3px;
 }
 .toolkit-scroll::-webkit-scrollbar-thumb,
 .vbt-autcomplete-list::-webkit-scrollbar-thumb {
-  background-color: $dark-purple;
-  border-radius: 6px;
+  background-color: $light-purple;
+  border-radius: 3px;
 }
 
 /* Hide scrollbar for Chrome, Safari and Opera */
@@ -54,4 +56,3 @@
   -ms-overflow-style: none; /* IE and Edge */
   scrollbar-width: none; /* Firefox */
 }
-

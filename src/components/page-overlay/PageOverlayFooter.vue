@@ -13,16 +13,16 @@
 </template>
 
 <script lang="ts">
-import { pageManager } from "@/modules/page-manager/page-manager.module";
-import { MutationType } from "@/mutation-types";
-import store from "@/store/page-overlay/index";
-import Vue from "vue";
-import { mapState } from "vuex";
+import { pageManager } from '@/modules/page-manager/page-manager.module';
+import { MutationType } from '@/mutation-types';
+import store from '@/store/page-overlay/index';
+import Vue from 'vue';
+import { mapState } from 'vuex';
 
 export default Vue.extend({
-  name: "PageOverlayFooter",
+  name: 'PageOverlayFooter',
   store,
-  computed: mapState(["currentVersion"]),
+  computed: mapState(['currentVersion']),
   methods: {
     onClick(event: any) {
       store.commit(MutationType.TOGGLE_EXPANDED_OVERLAY);

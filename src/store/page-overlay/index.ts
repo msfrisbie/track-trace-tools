@@ -3,53 +3,53 @@ import {
   ChromeStorageKeys,
   DEBUG_ATTRIBUTE,
   ToolkitView,
-  VUEX_KEY,
-} from "@/consts";
+  VUEX_KEY
+} from '@/consts';
 import {
   IAccountSettings,
   IContactData,
   IMetrcStatusData,
   IPluginState,
   IRootState,
-  ITrackedInteractions,
-} from "@/interfaces";
-import { isDevelopment } from "@/modules/environment.module";
-import { MutationType } from "@/mutation-types";
-import { CsvUpload } from "@/types";
-import Vue from "vue";
-import Vuex from "vuex";
-import VuexPersistence from "vuex-persist";
-import { announcementsModule, announcementsReducer } from "./modules/announcements";
-import { clientModule, clientReducer } from "./modules/client";
-import { createPackageCsvModule, createPackageCsvReducer } from "./modules/create-package-csv";
-import { employeeSamplesModule, employeeSamplesReducer } from "./modules/employee-samples";
-import { explorerModule, explorerReducer } from "./modules/explorer";
-import { flagsModule, flagsReducer } from "./modules/flags/index";
-import { graphModule, graphReducer } from "./modules/graph";
-import { listingModule, listingReducer } from "./modules/listing";
-import { packageHistoryModule, packageHistoryReducer } from "./modules/package-history";
-import { packageSearchModule, packageSearchReducer } from "./modules/package-search";
-import { plantSearchModule, plantSearchReducer } from "./modules/plant-search";
-import { pluginAuthModule, pluginAuthReducer } from "./modules/plugin-auth/index";
+  ITrackedInteractions
+} from '@/interfaces';
+import { isDevelopment } from '@/modules/environment.module';
+import { MutationType } from '@/mutation-types';
+import { CsvUpload } from '@/types';
+import Vue from 'vue';
+import Vuex from 'vuex';
+import VuexPersistence from 'vuex-persist';
+import { announcementsModule, announcementsReducer } from './modules/announcements';
+import { clientModule, clientReducer } from './modules/client';
+import { createPackageCsvModule, createPackageCsvReducer } from './modules/create-package-csv';
+import { employeeSamplesModule, employeeSamplesReducer } from './modules/employee-samples';
+import { explorerModule, explorerReducer } from './modules/explorer';
+import { flagsModule, flagsReducer } from './modules/flags/index';
+import { graphModule, graphReducer } from './modules/graph';
+import { listingModule, listingReducer } from './modules/listing';
+import { packageHistoryModule, packageHistoryReducer } from './modules/package-history';
+import { packageSearchModule, packageSearchReducer } from './modules/package-search';
+import { plantSearchModule, plantSearchReducer } from './modules/plant-search';
+import { pluginAuthModule, pluginAuthReducer } from './modules/plugin-auth/index';
 import {
   promoteImmaturePlantsBuilderModule,
-  promoteImmaturePlantsBuilderReducer,
-} from "./modules/promote-immature-plants-builder";
-import { reportsModule, reportsReducer } from "./modules/reports";
-import { searchModule, searchReducer } from "./modules/search";
-import { settingsModule, settingsReducer } from "./modules/settings";
-import { SettingsActions } from "./modules/settings/consts";
+  promoteImmaturePlantsBuilderReducer
+} from './modules/promote-immature-plants-builder';
+import { reportsModule, reportsReducer } from './modules/reports';
+import { searchModule, searchReducer } from './modules/search';
+import { settingsModule, settingsReducer } from './modules/settings';
+import { SettingsActions } from './modules/settings/consts';
 import {
   splitPackageBuilderModule,
-  splitPackageBuilderReducer,
-} from "./modules/split-package-builder";
-import { tagSearchModule, tagSearchReducer } from "./modules/tag-search";
-import { transferBuilderModule, transferBuilderReducer } from "./modules/transfer-builder/index";
+  splitPackageBuilderReducer
+} from './modules/split-package-builder';
+import { tagSearchModule, tagSearchReducer } from './modules/tag-search';
+import { transferBuilderModule, transferBuilderReducer } from './modules/transfer-builder/index';
 import {
   transferPackageSearchModule,
-  transferPackageSearchReducer,
-} from "./modules/transfer-package-search";
-import { transferSearchModule, transferSearchReducer } from "./modules/transfer-search";
+  transferPackageSearchReducer
+} from './modules/transfer-package-search';
+import { transferSearchModule, transferSearchReducer } from './modules/transfer-search';
 
 // Taken from https://gist.github.com/Myeris/3f13b42f6764ded6640cef693d9d1987
 const vuexLocal = {
@@ -65,34 +65,32 @@ const vuexLocal = {
 // };
 
 const vuexShared = {
-  reducer: (state: IPluginState) => {
-    return {
-      ...state,
-      pluginAuth: pluginAuthReducer(state.pluginAuth),
-      announcements: announcementsReducer(state.announcements),
-      client: clientReducer(state.client),
-      search: searchReducer(state.search),
-      transferBuilder: transferBuilderReducer(state.transferBuilder),
-      packageSearch: packageSearchReducer(state.packageSearch),
-      explorer: explorerReducer(state.explorer),
-      plantSearch: plantSearchReducer(state.plantSearch),
-      transferSearch: transferSearchReducer(state.transferSearch),
-      tagSearch: tagSearchReducer(state.tagSearch),
-      flags: flagsReducer(state.flags),
-      splitPackageBuilder: splitPackageBuilderReducer(state.splitPackageBuilder),
-      promoteImmaturePlantsBuilder: promoteImmaturePlantsBuilderReducer(
-        state.promoteImmaturePlantsBuilder
-      ),
-      listing: listingReducer(state.listing),
-      settings: settingsReducer(state.settings),
-      packageHistory: packageHistoryReducer(state.packageHistory),
-      reports: reportsReducer(state.reports),
-      employeeSamples: employeeSamplesReducer(state.employeeSamples),
-      createPackageCsv: createPackageCsvReducer(state.createPackageCsv),
-      transferPackageSearch: transferPackageSearchReducer(state.transferPackageSearch),
-      graph: graphReducer(state.graph),
-    };
-  },
+  reducer: (state: IPluginState) => ({
+    ...state,
+    pluginAuth: pluginAuthReducer(state.pluginAuth),
+    announcements: announcementsReducer(state.announcements),
+    client: clientReducer(state.client),
+    search: searchReducer(state.search),
+    transferBuilder: transferBuilderReducer(state.transferBuilder),
+    packageSearch: packageSearchReducer(state.packageSearch),
+    explorer: explorerReducer(state.explorer),
+    plantSearch: plantSearchReducer(state.plantSearch),
+    transferSearch: transferSearchReducer(state.transferSearch),
+    tagSearch: tagSearchReducer(state.tagSearch),
+    flags: flagsReducer(state.flags),
+    splitPackageBuilder: splitPackageBuilderReducer(state.splitPackageBuilder),
+    promoteImmaturePlantsBuilder: promoteImmaturePlantsBuilderReducer(
+      state.promoteImmaturePlantsBuilder,
+    ),
+    listing: listingReducer(state.listing),
+    settings: settingsReducer(state.settings),
+    packageHistory: packageHistoryReducer(state.packageHistory),
+    reports: reportsReducer(state.reports),
+    employeeSamples: employeeSamplesReducer(state.employeeSamples),
+    createPackageCsv: createPackageCsvReducer(state.createPackageCsv),
+    transferPackageSearch: transferPackageSearchReducer(state.transferPackageSearch),
+    graph: graphReducer(state.graph),
+  }),
 };
 
 const vuexPersistence = new VuexPersistence({
@@ -165,9 +163,9 @@ const vuexStore = new Vuex.Store<IPluginState>({
   // Modules will set their own default state
   state: defaultState as IPluginState,
   mutations: {
-    [MutationType.RESET_STATE](state: IRootState) {
-      Object.assign(state, defaultState);
-    },
+    // [MutationType.RESET_STATE](state: IRootState) {
+    //   Object.assign(state, defaultState);
+    // },
     [MutationType.SET_CURRENT_VERSION](state: IRootState, version: string) {
       state.currentVersion = version;
     },
@@ -192,7 +190,7 @@ const vuexStore = new Vuex.Store<IPluginState>({
     },
     [MutationType.UPDATE_TRACKED_INTERACTIONS](
       state: IRootState,
-      trackedInteractions: ITrackedInteractions
+      trackedInteractions: ITrackedInteractions,
     ) {
       state.trackedInteractions = {
         ...trackedInteractions,
@@ -221,7 +219,7 @@ const vuexStore = new Vuex.Store<IPluginState>({
     //   state.taskQueuePaused = !state.taskQueuePaused
     // },
     [MutationType.TOGGLE_DEBUG_MODE](state: IRootState) {
-      console.error("DEPRECATED! do not call this!");
+      console.error('DEPRECATED! do not call this!');
       // state.debugMode = !state.debugMode;
     },
     [MutationType.SET_DEMO_MODE](state: IRootState, demoMode: boolean) {
@@ -262,46 +260,45 @@ const vuexStore = new Vuex.Store<IPluginState>({
     },
     [MutationType.SET_BUILDER_MODAL_DISPLAY_STATE](
       state: IRootState,
-      builderModalOpen: CsvUpload | null
+      builderModalOpen: CsvUpload | null,
     ) {
       state.builderModalOpen = builderModalOpen;
     },
     [MutationType.SET_FINALIZE_SALES_RECEIPTS_STATE](
       state: IRootState,
-      finalizeSalesReceiptsState: BackgroundTaskState
+      finalizeSalesReceiptsState: BackgroundTaskState,
     ) {
       state.backgroundTasks.finalizeSalesReceiptsState = finalizeSalesReceiptsState;
     },
     [MutationType.SET_FINALIZE_SALES_RECEIPTS_LICENSE](
       state: IRootState,
-      finalizeSalesReceiptsLicense: string
+      finalizeSalesReceiptsLicense: string,
     ) {
       state.backgroundTasks.finalizeSalesReceiptsLicense = finalizeSalesReceiptsLicense;
     },
     [MutationType.SET_FINALIZE_SALES_RECEIPTS_STOP_DATE](
       state: IRootState,
-      finalizeSalesReceiptsStopIsodate: string | null
+      finalizeSalesReceiptsStopIsodate: string | null,
     ) {
       state.backgroundTasks.finalizeSalesReceiptsStopIsodate = finalizeSalesReceiptsStopIsodate;
     },
     [MutationType.SET_FINALIZE_SALES_RECEIPTS_READOUT](
       state: IRootState,
-      finalizeSalesReceiptsReadout: string | null
+      finalizeSalesReceiptsReadout: string | null,
     ) {
       state.backgroundTasks.finalizeSalesReceiptsReadout = finalizeSalesReceiptsReadout;
     },
     [MutationType.SET_FINALIZE_SALES_RECEIPTS_RUNNING_TOTAL](
       state: IRootState,
-      finalizeSalesReceiptsRunningTotal: number
+      finalizeSalesReceiptsRunningTotal: number,
     ) {
       state.backgroundTasks.finalizeSalesReceiptsRunningTotal = finalizeSalesReceiptsRunningTotal;
     },
     [MutationType.SET_VOID_TAGS_CONSECUTIVE_ERROR_TOTAL](
       state: IRootState,
-      finalizeSalesReceiptsConsecutiveErrorTotal: number
+      finalizeSalesReceiptsConsecutiveErrorTotal: number,
     ) {
-      state.backgroundTasks.finalizeSalesReceiptsConsecutiveErrorTotal =
-        finalizeSalesReceiptsConsecutiveErrorTotal;
+      state.backgroundTasks.finalizeSalesReceiptsConsecutiveErrorTotal = finalizeSalesReceiptsConsecutiveErrorTotal;
     },
     [MutationType.SET_VOID_TAGS_STATE](state: IRootState, voidTagsState: BackgroundTaskState) {
       state.backgroundTasks.voidTagsState = voidTagsState;
@@ -315,7 +312,7 @@ const vuexStore = new Vuex.Store<IPluginState>({
         startTag = null,
         endTag = null,
         lastAttemptedTag = null,
-      }: { startTag: string | null; endTag: string | null; lastAttemptedTag: null }
+      }: { startTag: string | null; endTag: string | null; lastAttemptedTag: null },
     ) {
       state.backgroundTasks.voidTagsStartTag = startTag;
       state.backgroundTasks.voidTagsEndTag = endTag;
@@ -329,7 +326,7 @@ const vuexStore = new Vuex.Store<IPluginState>({
     },
     [MutationType.SET_VOID_TAGS_CONSECUTIVE_ERROR_TOTAL](
       state: IRootState,
-      voidTagsConsecutiveErrorTotal: number
+      voidTagsConsecutiveErrorTotal: number,
     ) {
       state.backgroundTasks.voidTagsConsecutiveErrorTotal = voidTagsConsecutiveErrorTotal;
     },
@@ -338,7 +335,7 @@ const vuexStore = new Vuex.Store<IPluginState>({
     },
     [MutationType.UPDATE_METRC_STATUS_DATA](
       state: IRootState,
-      metrcStatusData: IMetrcStatusData | null
+      metrcStatusData: IMetrcStatusData | null,
     ) {
       state.metrcStatusData = metrcStatusData;
     },
@@ -446,11 +443,27 @@ const vuexStore = new Vuex.Store<IPluginState>({
 
 try {
   chrome.storage.local.get(ChromeStorageKeys.SETTINGS).then((result) => {
-    const settings = result[ChromeStorageKeys.SETTINGS];
+    const persistedSettings = result[ChromeStorageKeys.SETTINGS];
 
-    if (settings) {
-      vuexStore.dispatch(`settings/${SettingsActions.UPDATE_SETTINGS}`, settings);
+    if (!persistedSettings) {
+      return;
     }
+
+    // If persisted settings are older, don't bother using
+    if (vuexStore.state.settings.persistTimestamp > persistedSettings.persistTimestamp) {
+      console.log('Persisted settings too old');
+      return;
+    }
+
+    // Only load if the STORED flag is set
+    if (!persistedSettings.writeSettingsToChromeStorage) {
+      console.log('Persist disabled');
+      return;
+    }
+
+    console.log('Inserting persisted settings');
+
+    vuexStore.dispatch(`settings/${SettingsActions.UPDATE_SETTINGS}`, persistedSettings);
   });
 } catch (e) {
   console.error(e);

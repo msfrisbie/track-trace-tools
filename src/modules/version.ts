@@ -1,1 +1,1 @@
-export let version: string = chrome.runtime.getManifest().version;
+export const version: string = chrome.runtime.getManifest().version;

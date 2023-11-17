@@ -22,18 +22,18 @@
 </template>
 
 <script lang="ts">
-import PickerCard from "@/components/overlay-widget/shared/PickerCard.vue";
-import PickerIcon from "@/components/overlay-widget/shared/PickerIcon.vue";
-import { PlantState } from "@/consts";
-import { IIndexedPlantBatchData, IIndexedPlantData } from "@/interfaces";
-import router from "@/router/index";
-import store from "@/store/page-overlay/index";
-import { unitOfMeasureNameToAbbreviation } from "@/utils/units";
-import Vue from "vue";
-import { mapState } from "vuex";
+import PickerCard from '@/components/overlay-widget/shared/PickerCard.vue';
+import PickerIcon from '@/components/overlay-widget/shared/PickerIcon.vue';
+import { PlantState } from '@/consts';
+import { IIndexedPlantBatchData, IIndexedPlantData } from '@/interfaces';
+import router from '@/router/index';
+import store from '@/store/page-overlay/index';
+import { unitOfMeasureNameToAbbreviation } from '@/utils/units';
+import Vue from 'vue';
+import { mapState } from 'vuex';
 
 export default Vue.extend({
-  name: "PlantCard",
+  name: 'PlantCard',
   store,
   router,
   props: {
@@ -54,13 +54,13 @@ export default Vue.extend({
     getBadgeVariant(plantState: PlantState): string {
       switch (plantState) {
         case PlantState.FLOWERING:
-          return "success";
+          return 'success';
         case PlantState.VEGETATIVE:
-          return "info";
+          return 'info';
         case PlantState.INACTIVE:
-          return "danger";
+          return 'danger';
         default:
-          return "light";
+          return 'light';
       }
     },
   },

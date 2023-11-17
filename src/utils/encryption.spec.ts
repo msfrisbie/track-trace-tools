@@ -1,8 +1,8 @@
-import { decrypt, encrypt } from "./encryption";
+import { decrypt, encrypt } from './encryption';
 
-describe("encryption.ts", () => {
-  it("encrypts and decrypts successfully", () => {
-    const secretKey = "abcdefg";
+describe('encryption.ts', () => {
+  it('encrypts and decrypts successfully', () => {
+    const secretKey = 'abcdefg';
     const data = [{ id: 123 }, { id: 456 }];
 
     const ciphertext = encrypt({ data, secretKey });
@@ -12,12 +12,12 @@ describe("encryption.ts", () => {
     expect(result).toEqual(data);
   });
 
-  it("fails to decrypt with bad key", () => {
-    const secretKey = "abcdefg";
+  it('fails to decrypt with bad key', () => {
+    const secretKey = 'abcdefg';
     const data = [{ id: 123 }, { id: 456 }];
 
     const ciphertext = encrypt({ data, secretKey });
 
-    expect(() => decrypt({ ciphertext, secretKey: "badkey" })).toThrowError();
+    expect(() => decrypt({ ciphertext, secretKey: 'badkey' })).toThrowError();
   });
 });

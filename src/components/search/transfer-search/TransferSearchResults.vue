@@ -45,19 +45,19 @@
 </template>
 
 <script lang="ts">
-import TransferHistoryList from "@/components/search/transfer-search/TransferHistoryList.vue";
-import TransferResultGroups from "@/components/search/transfer-search/TransferResultGroups.vue";
-import TransferSearchResultDetail from "@/components/search/transfer-search/TransferSearchResultDetail.vue";
-import { IIndexedTransferData, ITransferData, IPluginState } from "@/interfaces";
-import store from "@/store/page-overlay/index";
-import { TransferSearchActions } from "@/store/page-overlay/modules/transfer-search/consts";
-import Vue from "vue";
-import { mapActions, mapGetters, mapState } from "vuex";
-import HistoryList from "@/components/search/shared/HistoryList.vue";
-import SearchViewSelector from "@/components/search/shared/SearchViewSelector.vue";
+import TransferHistoryList from '@/components/search/transfer-search/TransferHistoryList.vue';
+import TransferResultGroups from '@/components/search/transfer-search/TransferResultGroups.vue';
+import TransferSearchResultDetail from '@/components/search/transfer-search/TransferSearchResultDetail.vue';
+import { IIndexedTransferData, ITransferData, IPluginState } from '@/interfaces';
+import store from '@/store/page-overlay/index';
+import { TransferSearchActions } from '@/store/page-overlay/modules/transfer-search/consts';
+import Vue from 'vue';
+import { mapActions, mapGetters, mapState } from 'vuex';
+import HistoryList from '@/components/search/shared/HistoryList.vue';
+import SearchViewSelector from '@/components/search/shared/SearchViewSelector.vue';
 
 export default Vue.extend({
-  name: "TransferSearchResults",
+  name: 'TransferSearchResults',
   store,
   components: {
     TransferSearchResultDetail,

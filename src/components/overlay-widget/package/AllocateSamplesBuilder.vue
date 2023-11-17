@@ -244,15 +244,15 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import { mapActions, mapGetters, mapState } from "vuex";
-import router from "@/router/index";
-import store from "@/store/page-overlay/index";
+import Vue from 'vue';
+import { mapActions, mapGetters, mapState } from 'vuex';
+import router from '@/router/index';
+import store from '@/store/page-overlay/index';
 import {
   EmployeeSamplesActions,
   EmployeeSamplesGetters,
   EmployeeSamplesState,
-} from "@/store/page-overlay/modules/employee-samples/consts";
+} from '@/store/page-overlay/modules/employee-samples/consts';
 import {
   IAdjustPackageReason,
   ICsvFile,
@@ -262,19 +262,19 @@ import {
   IPackageData,
   IPluginState,
   IUnitOfMeasure,
-} from "@/interfaces";
-import { builderManager } from "@/modules/builder-manager.module";
-import { buildCsvDataOrError, buildNamedCsvFileData, downloadCsvFile } from "@/utils/csv";
-import { submitDateFromIsodate, todayIsodate } from "@/utils/date";
-import { BuilderType, MessageType } from "@/consts";
-import { dynamicConstsManager } from "@/modules/dynamic-consts-manager.module";
-import { ISampleAllocation } from "@/store/page-overlay/modules/employee-samples/interfaces";
-import { analyticsManager } from "@/modules/analytics-manager.module";
-import { sum } from "lodash-es";
-import { downloadTextFile } from "@/utils/file";
+} from '@/interfaces';
+import { builderManager } from '@/modules/builder-manager.module';
+import { buildCsvDataOrError, buildNamedCsvFileData, downloadCsvFile } from '@/utils/csv';
+import { submitDateFromIsodate, todayIsodate } from '@/utils/date';
+import { BuilderType, MessageType } from '@/consts';
+import { dynamicConstsManager } from '@/modules/dynamic-consts-manager.module';
+import { ISampleAllocation } from '@/store/page-overlay/modules/employee-samples/interfaces';
+import { analyticsManager } from '@/modules/analytics-manager.module';
+import { sum } from 'lodash-es';
+import { downloadTextFile } from '@/utils/file';
 
 export default Vue.extend({
-  name: "AllocateSamplesBuilder",
+  name: 'AllocateSamplesBuilder',
   store,
   router,
   props: {},
@@ -325,20 +325,20 @@ export default Vue.extend({
       const adjustmentReasons = await dynamicConstsManager.adjustPackageReasons();
       const unitsOfMeasure = await dynamicConstsManager.unitsOfMeasure();
 
-      for (let sampleAllocation of this.selectedSampleAllocations) {
+      for (const sampleAllocation of this.selectedSampleAllocations) {
         const row = {
           AdjustmentDate: submitDateFromIsodate(todayIsodate()),
           AdjustmentQuantity: (-1 * sampleAllocation.adjustmentQuantity).toString(),
           AdjustmentReasonId: adjustmentReasons
-            .find((x) => x.Name.includes("Trade Sample"))!
+            .find((x) => x.Name.includes('Trade Sample'))!
             .Id.toString(),
           Id: sampleAllocation.pkg.Id.toString(),
           AdjustmentUnitOfMeasureId: sampleAllocation.pkg.UnitOfMeasureId.toString(),
           CurrentQuantity: sampleAllocation.pkg.Quantity.toString(),
           CurrentQuantityUom: unitsOfMeasure.find(
-            (x) => x.Id === sampleAllocation.pkg.UnitOfMeasureId
+            (x) => x.Id === sampleAllocation.pkg.UnitOfMeasureId,
           )!.Name,
-          FinishDate: "",
+          FinishDate: '',
           NewQuantity: (
             sampleAllocation.pkg.Quantity - sampleAllocation.adjustmentQuantity
           ).toString(),
@@ -357,7 +357,7 @@ export default Vue.extend({
           sampleTotal: this.selectedSampleAllocations.length,
         },
         this.buildCsvFiles(),
-        1
+        1,
       );
     },
     buildCsvFiles(): ICsvFile[] {
@@ -370,7 +370,7 @@ export default Vue.extend({
           {
             isVector: true,
             data: (this.selectedSampleAllocations as ISampleAllocation[]).map(
-              (x) => -1 * x.adjustmentQuantity
+              (x) => -1 * x.adjustmentQuantity,
             ),
           },
           {
@@ -378,21 +378,20 @@ export default Vue.extend({
             data: (this.selectedSampleAllocations as ISampleAllocation[]).map(
               (x) =>
                 this.$data.unitsOfMeasure.find(
-                  (y: IUnitOfMeasure) => y.Id === x.pkg.UnitOfMeasureId
-                )!.Name
+                  (y: IUnitOfMeasure) => y.Id === x.pkg.UnitOfMeasureId,
+                )!.Name,
             ),
           },
           {
             isVector: false,
             data: this.$data.adjustmentReasons.find((x: IAdjustPackageReason) =>
-              x.Name.includes("Trade Sample")
-            )!.Name,
+              x.Name.includes('Trade Sample'))!.Name,
           },
           {
             isVector: true,
             data: (this.selectedSampleAllocations as ISampleAllocation[]).map(
               (x) =>
-                `${x.employee.FullName} ${x.employee.License.Number} ${x.adjustmentQuantity} ${x.pkg.UnitOfMeasureAbbreviation}`
+                `${x.employee.FullName} ${x.employee.License.Number} ${x.adjustmentQuantity} ${x.pkg.UnitOfMeasureAbbreviation}`,
             ),
           },
           {
@@ -402,14 +401,14 @@ export default Vue.extend({
           {
             isVector: true,
             data: (this.selectedSampleAllocations as ISampleAllocation[]).map(
-              (x) => x.employee.License.Number
+              (x) => x.employee.License.Number,
             ),
           },
         ]);
 
         return buildNamedCsvFileData(
           csvData,
-          `Adjust ${this.selectedSampleAllocations.length} samples`
+          `Adjust ${this.selectedSampleAllocations.length} samples`,
         );
       } catch (e) {
         console.error(e);
@@ -417,7 +416,7 @@ export default Vue.extend({
       }
     },
     async downloadAll() {
-      for (let csvFile of this.csvFiles) {
+      for (const csvFile of this.csvFiles) {
         await downloadCsvFile({ csvFile, delay: 500 });
       }
 
@@ -450,9 +449,9 @@ export default Vue.extend({
           data += `[${sampleAllocation.distributionDate}] ${
             sampleAllocation.pkg.Label
           } - ${sampleAllocation.flowerAllocationGrams.toFixed(
-            2
+            2,
           )}/${sampleAllocation.concentrateAllocationGrams.toFixed(
-            2
+            2,
           )}/${sampleAllocation.infusedAllocationGrams.toFixed(2)} - ${
             sampleAllocation.pkg.Item.Name
           } (${sampleAllocation.adjustmentQuantity}${

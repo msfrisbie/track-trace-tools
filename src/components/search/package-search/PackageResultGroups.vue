@@ -114,19 +114,19 @@
 </template>
 
 <script lang="ts">
-import PackageSearchResultsGroup from "@/components/search/package-search/PackageSearchResultsGroup.vue";
-import { MessageType } from "@/consts";
-import { IIndexedPackageData, IPluginState } from "@/interfaces";
-import { analyticsManager } from "@/modules/analytics-manager.module";
-import { pageManager } from "@/modules/page-manager/page-manager.module";
-import { PackageSearchActions } from "@/store/page-overlay/modules/package-search/consts";
-import { SearchActions } from "@/store/page-overlay/modules/search/consts";
-import Vue from "vue";
-import { mapActions, mapState } from "vuex";
-import store from "@/store/page-overlay/index";
+import PackageSearchResultsGroup from '@/components/search/package-search/PackageSearchResultsGroup.vue';
+import { MessageType } from '@/consts';
+import { IIndexedPackageData, IPluginState } from '@/interfaces';
+import { analyticsManager } from '@/modules/analytics-manager.module';
+import { pageManager } from '@/modules/page-manager/page-manager.module';
+import { PackageSearchActions } from '@/store/page-overlay/modules/package-search/consts';
+import { SearchActions } from '@/store/page-overlay/modules/search/consts';
+import Vue from 'vue';
+import { mapActions, mapState } from 'vuex';
+import store from '@/store/page-overlay/index';
 
 export default Vue.extend({
-  name: "PackageResultGroups",
+  name: 'PackageResultGroups',
   props: {
     packages: Array as () => IIndexedPackageData[],
   },
@@ -234,78 +234,69 @@ export default Vue.extend({
     },
     labelPackages(): IIndexedPackageData[] {
       const packages = this.packages.filter((packageData) =>
-        packageData.Label.includes(store.state.search.queryString)
-      );
+        packageData.Label.includes(store.state.search.queryString));
 
       return packages;
     },
     sourceHarvestNamePackages(): IIndexedPackageData[] {
       const packages = this.packages.filter((packageData) =>
         packageData.SourceHarvestNames?.toUpperCase().includes(
-          store.state.search.queryString.toUpperCase()
-        )
-      );
+          store.state.search.queryString.toUpperCase(),
+        ));
 
       return packages;
     },
     sourcePackageLabelPackages(): IIndexedPackageData[] {
       const packages = this.packages.filter((packageData) =>
         packageData.SourcePackageLabels?.toUpperCase().includes(
-          store.state.search.queryString.toUpperCase()
-        )
-      );
+          store.state.search.queryString.toUpperCase(),
+        ));
 
       return packages;
     },
     productionBatchNumberPackages(): IIndexedPackageData[] {
       const packages = this.packages.filter((packageData) =>
         packageData.ProductionBatchNumber?.toUpperCase().includes(
-          store.state.search.queryString.toUpperCase()
-        )
-      );
+          store.state.search.queryString.toUpperCase(),
+        ));
 
       return packages;
     },
     sourceProductionBatchNumbersPackages(): IIndexedPackageData[] {
       const packages = this.packages.filter((packageData) =>
         packageData.SourceProductionBatchNumbers?.toUpperCase().includes(
-          store.state.search.queryString.toUpperCase()
-        )
-      );
+          store.state.search.queryString.toUpperCase(),
+        ));
 
       return packages;
     },
     itemNamePackages(): IIndexedPackageData[] {
       const packages = this.packages.filter((packageData) =>
-        packageData.Item?.Name?.toUpperCase().includes(store.state.search.queryString.toUpperCase())
-      );
+        packageData.Item?.Name?.toUpperCase().includes(store.state.search.queryString.toUpperCase()));
 
       return packages;
     },
     itemStrainNamePackages(): IIndexedPackageData[] {
       const packages = this.packages.filter((packageData) =>
         packageData.Item.StrainName?.toUpperCase().includes(
-          store.state.search.queryString.toUpperCase()
-        )
-      );
+          store.state.search.queryString.toUpperCase(),
+        ));
 
       return packages;
     },
     locationNamePackages(): IIndexedPackageData[] {
       const packages = this.packages.filter((packageData) =>
         packageData.LocationName?.toUpperCase().includes(
-          store.state.search.queryString.toUpperCase()
-        )
-      );
+          store.state.search.queryString.toUpperCase(),
+        ));
 
       return packages;
     },
     itemProductCategoryNamePackages(): IIndexedPackageData[] {
       const packages = this.packages.filter((packageData) =>
         packageData.Item.ProductCategoryName?.toUpperCase().includes(
-          store.state.search.queryString.toUpperCase()
-        )
-      );
+          store.state.search.queryString.toUpperCase(),
+        ));
 
       return packages;
     },

@@ -1,11 +1,11 @@
-import { MessageType } from "@/consts";
-import { IAtomicService } from "@/interfaces";
-import { MutationType } from "@/mutation-types";
-import store from "@/store/page-overlay/index";
-import { extract, ExtractionType } from "@/utils/html";
-import { analyticsManager } from "./analytics-manager.module";
-import { authManager } from "./auth-manager.module";
-import { primaryMetrcRequestManager } from "./metrc-request-manager.module";
+import { MessageType } from '@/consts';
+import { IAtomicService } from '@/interfaces';
+import { MutationType } from '@/mutation-types';
+import store from '@/store/page-overlay/index';
+import { extract, ExtractionType } from '@/utils/html';
+import { analyticsManager } from './analytics-manager.module';
+import { authManager } from './auth-manager.module';
+import { primaryMetrcRequestManager } from './metrc-request-manager.module';
 
 // 30 seconds
 const CONTACT_DATA_FETCH_INTERVAL_MS = 1000 * 30;
@@ -17,20 +17,20 @@ class ContactDataManager implements IAtomicService {
     const now = Date.now();
 
     if (
-      !!store.state.contactData &&
-      now - store.state.contactData.lastSuccessfulContactDataFetch < CONTACT_DATA_FETCH_INTERVAL_MS
+      !!store.state.contactData
+      && now - store.state.contactData.lastSuccessfulContactDataFetch < CONTACT_DATA_FETCH_INTERVAL_MS
     ) {
-      console.log("User data is up to date");
+      console.log('User data is up to date');
       return;
     }
 
-    let email = null,
-      phoneNumber = null;
+    let email = null;
+    let phoneNumber = null;
 
     const response = await primaryMetrcRequestManager.getUserProfileHTML();
     const html: string = await response.data;
 
-    let extractedData = extract(ExtractionType.CONTACT_DATA, html);
+    const extractedData = extract(ExtractionType.CONTACT_DATA, html);
 
     if (extractedData && extractedData.contactData) {
       ({ email, phoneNumber } = extractedData.contactData);
@@ -58,4 +58,4 @@ class ContactDataManager implements IAtomicService {
   }
 }
 
-export let contactDataManager = new ContactDataManager();
+export const contactDataManager = new ContactDataManager();

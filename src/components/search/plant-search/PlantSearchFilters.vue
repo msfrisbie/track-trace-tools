@@ -49,21 +49,21 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import store from "@/store/page-overlay/index";
-import { IPlantSearchFilters } from "@/interfaces";
-import { PLANTS_TAB_REGEX } from "@/modules/page-manager/consts";
-import { mapActions, mapState } from "vuex";
-import { PlantFilterIdentifiers } from "@/consts";
-import { MutationType } from "@/mutation-types";
-import { PlantSearchActions } from "@/store/page-overlay/modules/plant-search/consts";
+import Vue from 'vue';
+import store from '@/store/page-overlay/index';
+import { IPlantSearchFilters } from '@/interfaces';
+import { PLANTS_TAB_REGEX } from '@/modules/page-manager/consts';
+import { mapActions, mapState } from 'vuex';
+import { PlantFilterIdentifiers } from '@/consts';
+import { MutationType } from '@/mutation-types';
+import { PlantSearchActions } from '@/store/page-overlay/modules/plant-search/consts';
 
 interface ComponentData {
   plantSearchFilters: IPlantSearchFilters;
 }
 
 export default Vue.extend({
-  name: "PlantSearchFilters",
+  name: 'PlantSearchFilters',
   store,
   computed: {
     ...mapState({

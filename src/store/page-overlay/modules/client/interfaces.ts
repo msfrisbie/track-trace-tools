@@ -4,4 +4,7 @@ export interface IClientState {
   values: {
     [key: string]: any;
   };
+  flags: {
+    [key: string]: string;
+  }
 }

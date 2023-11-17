@@ -91,38 +91,40 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import store from "@/store/page-overlay/index";
-import { mapState } from "vuex";
-import BuilderStepHeader from "@/components/overlay-widget/shared/BuilderStepHeader.vue";
-import { isValidTag, generateTagRangeOrError } from "@/utils/tags";
-import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
-import { combineLatest, from, Subject } from "rxjs";
-import { debounceTime, distinctUntilChanged, filter, startWith, tap } from "rxjs/operators";
+import Vue from 'vue';
+import store from '@/store/page-overlay/index';
+import { mapState } from 'vuex';
+import BuilderStepHeader from '@/components/overlay-widget/shared/BuilderStepHeader.vue';
+import { isValidTag, generateTagRangeOrError } from '@/utils/tags';
+import { primaryDataLoader } from '@/modules/data-loader/data-loader.module';
+import { combineLatest, from, Subject } from 'rxjs';
+import {
+  debounceTime, distinctUntilChanged, filter, startWith, tap,
+} from 'rxjs/operators';
 import {
   IPackageData,
   IPackageFilter,
   ICsvFile,
   ILocationData,
-  IMetrcMovePackagesPayload
-} from "@/interfaces";
-import { downloadCsvFile, buildCsvDataOrError, buildNamedCsvFileData } from "@/utils/csv";
-import { todayIsodate, submitDateFromIsodate } from "@/utils/date";
-import { primaryMetrcRequestManager } from "@/modules/metrc-request-manager.module";
-import { authManager } from "@/modules/auth-manager.module";
-import { BuilderType, MessageType } from "@/consts";
-import { analyticsManager } from "@/modules/analytics-manager.module";
-import { builderManager } from "@/modules/builder-manager.module";
-import PackagePicker from "@/components/overlay-widget/shared/PackagePicker.vue";
-import LocationPicker from "@/components/overlay-widget/shared/LocationPicker.vue";
+  IMetrcMovePackagesPayload,
+} from '@/interfaces';
+import { downloadCsvFile, buildCsvDataOrError, buildNamedCsvFileData } from '@/utils/csv';
+import { todayIsodate, submitDateFromIsodate } from '@/utils/date';
+import { primaryMetrcRequestManager } from '@/modules/metrc-request-manager.module';
+import { authManager } from '@/modules/auth-manager.module';
+import { BuilderType, MessageType } from '@/consts';
+import { analyticsManager } from '@/modules/analytics-manager.module';
+import { builderManager } from '@/modules/builder-manager.module';
+import PackagePicker from '@/components/overlay-widget/shared/PackagePicker.vue';
+import LocationPicker from '@/components/overlay-widget/shared/LocationPicker.vue';
 
 export default Vue.extend({
-  name: "MovePackagesBuilder",
+  name: 'MovePackagesBuilder',
   store,
   components: {
     BuilderStepHeader,
     LocationPicker,
-    PackagePicker
+    PackagePicker,
   },
   methods: {
     setActiveStepIndex(index: number) {
@@ -130,17 +132,17 @@ export default Vue.extend({
 
       analyticsManager.track(MessageType.BUILDER_ENGAGEMENT, {
         builder: this.$data.builderType,
-        action: `Set active step to ${index}`
+        action: `Set active step to ${index}`,
       });
     },
     submit() {
       const rows: IMetrcMovePackagesPayload[] = [];
 
-      for (let pkg of this.$data.selectedPackages) {
+      for (const pkg of this.$data.selectedPackages) {
         rows.push({
           ActualDate: submitDateFromIsodate(this.$data.moveIsodate),
           LocationId: this.$data.newLocation.Id.toString(),
-          Id: pkg.Id.toString()
+          Id: pkg.Id.toString(),
         });
       }
 
@@ -148,14 +150,14 @@ export default Vue.extend({
         rows,
         this.$data.builderType,
         {
-          pkgTotal: this.$data.selectedPackages.length
+          pkgTotal: this.$data.selectedPackages.length,
         },
         this.buildCsvFiles(),
-        25
+        25,
       );
     },
     async downloadAll() {
-      for (let csvFile of this.csvFiles) {
+      for (const csvFile of this.csvFiles) {
         await downloadCsvFile({ csvFile, delay: 500 });
       }
 
@@ -164,8 +166,8 @@ export default Vue.extend({
         csvData: {
           tagCount: this.$data.selectedPackages.length,
           newLocationName: this.$data.newLocation.Name,
-          moveIsodate: this.$data.moveIsodate
-        }
+          moveIsodate: this.$data.moveIsodate,
+        },
       });
     },
     buildCsvFiles(): ICsvFile[] {
@@ -173,34 +175,34 @@ export default Vue.extend({
         const csvData = buildCsvDataOrError([
           {
             isVector: true,
-            data: this.$data.selectedPackages.map((pkgData: IPackageData) => pkgData.Label)
+            data: this.$data.selectedPackages.map((pkgData: IPackageData) => pkgData.Label),
           },
           { isVector: false, data: this.$data.newLocation.Name },
-          { isVector: false, data: this.$data.moveIsodate }
+          { isVector: false, data: this.$data.moveIsodate },
         ]);
 
         return buildNamedCsvFileData(
           csvData,
-          `Move ${this.$data.selectedPackages.length} packages to ${this.$data.newLocation.Name}`
+          `Move ${this.$data.selectedPackages.length} packages to ${this.$data.newLocation.Name}`,
         );
       } catch (e) {
         console.error(e);
         return [];
       }
-    }
+    },
   },
   computed: {
     allDetailsProvided() {
       return (
-        this.$data.selectedPackages.length > 0 &&
-        !!this.$data.newLocation &&
-        !!this.$data.moveIsodate
+        this.$data.selectedPackages.length > 0
+        && !!this.$data.newLocation
+        && !!this.$data.moveIsodate
       );
     },
     csvFiles(): ICsvFile[] {
       // @ts-ignore
       return this.buildCsvFiles();
-    }
+    },
   },
   data() {
     return {
@@ -211,22 +213,22 @@ export default Vue.extend({
       moveIsodate: todayIsodate(),
       steps: [
         {
-          stepText: "Select packages to move"
+          stepText: 'Select packages to move',
         },
         {
-          stepText: "Move details"
+          stepText: 'Move details',
         },
         {
-          stepText: "Submit"
-        }
-      ]
+          stepText: 'Submit',
+        },
+      ],
     };
   },
   async mounted() {},
   async created() {},
   destroyed() {
     // Looks like modal is not actually destroyed
-  }
+  },
 });
 </script>
 

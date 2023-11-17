@@ -1,3 +1,3 @@
-import { mockFetchManager } from "./mocks";
+import { mockFetchManager } from './mocks';
 
 mockFetchManager();

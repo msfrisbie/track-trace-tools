@@ -53,28 +53,28 @@
 </template>
 
 <script lang="ts">
-import PlantSearchResultPreview from "@/components/search/plant-search/PlantSearchResultPreview.vue";
-import { IIndexedPlantData, IPluginState } from "@/interfaces";
-import { PLANTS_TAB_REGEX } from "@/modules/page-manager/consts";
-import store from "@/store/page-overlay/index";
-import { PlantSearchActions } from "@/store/page-overlay/modules/plant-search/consts";
-import { ISelectedPlantMetadata } from "@/store/page-overlay/modules/plant-search/interfaces";
-import { IPluginAuthState } from "@/store/page-overlay/modules/plugin-auth/interfaces";
-import { SearchActions } from "@/store/page-overlay/modules/search/consts";
-import { Subject } from "rxjs";
-import { take, takeUntil } from "rxjs/operators";
-import Vue from "vue";
-import { mapActions, mapState } from "vuex";
+import PlantSearchResultPreview from '@/components/search/plant-search/PlantSearchResultPreview.vue';
+import { IIndexedPlantData, IPluginState } from '@/interfaces';
+import { PLANTS_TAB_REGEX } from '@/modules/page-manager/consts';
+import store from '@/store/page-overlay/index';
+import { PlantSearchActions } from '@/store/page-overlay/modules/plant-search/consts';
+import { ISelectedPlantMetadata } from '@/store/page-overlay/modules/plant-search/interfaces';
+import { IPluginAuthState } from '@/store/page-overlay/modules/plugin-auth/interfaces';
+import { SearchActions } from '@/store/page-overlay/modules/search/consts';
+import { Subject } from 'rxjs';
+import { take, takeUntil } from 'rxjs/operators';
+import Vue from 'vue';
+import { mapActions, mapState } from 'vuex';
 
 export default Vue.extend({
-  name: "PlantSearchResultsGroup",
+  name: 'PlantSearchResultsGroup',
   store,
   components: { PlantSearchResultPreview },
   data(): {
     // destroyed$: Subject<void>;
     // selectedPlantMetadata: ISelectedPlantMetadata | null;
     showAll: boolean;
-  } {
+    } {
     return {
       // destroyed$: new Subject(),
       // selectedPlantMetadata: null,
@@ -104,8 +104,8 @@ export default Vue.extend({
         };
 
         if (
-          !store.state.plantSearch.selectedPlantMetadata ||
-          store.state.plantSearch.selectedPlantMetadata.priority >= candidateMetadata.priority
+          !store.state.plantSearch.selectedPlantMetadata
+          || store.state.plantSearch.selectedPlantMetadata.priority >= candidateMetadata.priority
         ) {
           store.state.plantSearch.selectedPlantMetadata = candidateMetadata;
         }
@@ -127,18 +127,18 @@ export default Vue.extend({
     },
     groupIcon(): string {
       switch (this.plantFilterIdentifier) {
-        case "label":
-          return "tags";
-        case "strainName":
-          return "cannabis";
-        case "locationName":
-          return "map-marker-alt";
+        case 'label':
+          return 'tags';
+        case 'strainName':
+          return 'cannabis';
+        case 'locationName':
+          return 'map-marker-alt';
         default:
-          return "boxes";
+          return 'boxes';
       }
     },
     disableFilter(): boolean {
-      return !this.plantFilterIdentifier || this.plantFilterIdentifier === "label";
+      return !this.plantFilterIdentifier || this.plantFilterIdentifier === 'label';
     },
   },
   methods: {

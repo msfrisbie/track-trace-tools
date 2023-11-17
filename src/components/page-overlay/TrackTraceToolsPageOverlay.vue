@@ -84,10 +84,10 @@ setTimeout(() => {
       }),
     ],
     beforeSend(event, hint) {
-      for (let blacklistEntry of [
-        `timed out`,
-        `Setting the value of 'vuex' exceeded the quota`,
-        `No metrc kendo present`,
+      for (const blacklistEntry of [
+        "timed out",
+        "Setting the value of 'vuex' exceeded the quota",
+        "No metrc kendo present",
       ]) {
         if (hint && hint?.originalException?.toString().includes(blacklistEntry)) {
           if (Math.random() > 0.001) {
@@ -112,6 +112,7 @@ Vue.component("font-awesome-icon", FontAwesomeIcon);
 library.add(
   // @ts-ignore
   fontawesomeBrands.faFacebook,
+  fontawesomeBrands.faGoogle,
   fontawesomeBrands.faLinkedin,
   fontawesomeBrands.faTwitter,
   fontawesomeBrands.faReddit,

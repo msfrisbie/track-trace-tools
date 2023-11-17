@@ -1,11 +1,11 @@
-import { PackageFilterIdentifiers, PackageState } from "@/consts";
-import { IPackageSearchFilters, IPluginState } from "@/interfaces";
-import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
-import { pageManager } from "@/modules/page-manager/page-manager.module";
-import { timer } from "rxjs";
-import { ActionContext } from "vuex";
-import { PackageSearchActions, PackageSearchMutations } from "./consts";
-import { IPackageSearchState } from "./interfaces";
+import { PackageFilterIdentifiers, PackageState } from '@/consts';
+import { IPackageSearchFilters, IPluginState } from '@/interfaces';
+import { primaryDataLoader } from '@/modules/data-loader/data-loader.module';
+import { pageManager } from '@/modules/page-manager/page-manager.module';
+import { timer } from 'rxjs';
+import { ActionContext } from 'vuex';
+import { PackageSearchActions, PackageSearchMutations } from './consts';
+import { IPackageSearchState } from './interfaces';
 
 const inMemoryState = {
   searchInflight: false,
@@ -36,7 +36,7 @@ export const packageSearchModule = {
   mutations: {
     [PackageSearchMutations.SET_PACKAGE_SEARCH_FILTERS](
       state: IPackageSearchState,
-      { packageSearchFilters }: { packageSearchFilters: IPackageSearchFilters }
+      { packageSearchFilters }: { packageSearchFilters: IPackageSearchFilters },
     ) {
       state.packageSearchFilters = {
         ...packageSearchFilters,
@@ -47,7 +47,7 @@ export const packageSearchModule = {
   actions: {
     [PackageSearchActions.EXECUTE_QUERY]: async (
       ctx: ActionContext<IPackageSearchState, IPluginState>,
-      { queryString }: { queryString: string }
+      { queryString }: { queryString: string },
     ) => {
       ctx.state.packages = [];
       ctx.state.selectedPackageMetadata = null;
@@ -78,18 +78,18 @@ export const packageSearchModule = {
         packageSearchFilters: IPackageSearchFilters;
         propagate?: boolean;
         packageState?: PackageState | null;
-      }
+      },
     ) => {
       if (packageState) {
         switch (packageState as PackageState) {
           case PackageState.ACTIVE:
-            await pageManager.clickTabStartingWith(pageManager.packageTabs, "Active");
+            await pageManager.clickTabStartingWith(pageManager.packageTabs, 'Active');
             break;
           case PackageState.INACTIVE:
-            await pageManager.clickTabStartingWith(pageManager.packageTabs, "Inactive");
+            await pageManager.clickTabStartingWith(pageManager.packageTabs, 'Inactive');
             break;
           case PackageState.IN_TRANSIT:
-            await pageManager.clickTabStartingWith(pageManager.packageTabs, "In Transit");
+            await pageManager.clickTabStartingWith(pageManager.packageTabs, 'In Transit');
             break;
           default:
             break;
@@ -111,7 +111,7 @@ export const packageSearchModule = {
       {
         packageSearchFilters,
         propagate = true,
-      }: { packageSearchFilters: IPackageSearchFilters; propagate?: boolean }
+      }: { packageSearchFilters: IPackageSearchFilters; propagate?: boolean },
     ) {
       const defaultPackageSearchFilters = {
         label: null,
@@ -131,38 +131,38 @@ export const packageSearchModule = {
       };
 
       if (propagate) {
-        for (let [k, v] of Object.entries(packageSearchFilters)) {
+        for (const [k, v] of Object.entries(packageSearchFilters)) {
           // @ts-ignore
           if (ctx.state.packageSearchFilters[k] !== v) {
             switch (k) {
-              case "label":
+              case 'label':
                 pageManager.setPackageFilter(PackageFilterIdentifiers.Label, v);
                 break;
-              case "sourceHarvestName":
+              case 'sourceHarvestName':
                 pageManager.setPackageFilter(PackageFilterIdentifiers.SourceHarvestNames, v);
                 break;
-              case "sourcePackageLabel":
+              case 'sourcePackageLabel':
                 pageManager.setPackageFilter(PackageFilterIdentifiers.SourcePackageLabels, v);
                 break;
-              case "productionBatchNumber":
+              case 'productionBatchNumber':
                 pageManager.setPackageFilter(PackageFilterIdentifiers.ProductionBatchNumber, v);
                 break;
-              case "sourceProductionBatchNumbers":
+              case 'sourceProductionBatchNumbers':
                 pageManager.setPackageFilter(
                   PackageFilterIdentifiers.SourceProductionBatchNumbers,
-                  v
+                  v,
                 );
                 break;
-              case "itemName":
+              case 'itemName':
                 pageManager.setPackageFilter(PackageFilterIdentifiers.ItemName, v);
                 break;
-              case "itemStrainName":
+              case 'itemStrainName':
                 pageManager.setPackageFilter(PackageFilterIdentifiers.ItemStrainName, v);
                 break;
-              case "itemProductCategoryName":
+              case 'itemProductCategoryName':
                 pageManager.setPackageFilter(PackageFilterIdentifiers.ItemProductCategoryName, v);
                 break;
-              case "locationName":
+              case 'locationName':
                 pageManager.setPackageFilter(PackageFilterIdentifiers.LocationName, v);
                 break;
               default:
@@ -177,9 +177,7 @@ export const packageSearchModule = {
   },
 };
 
-export const packageSearchReducer = (state: IPackageSearchState): IPackageSearchState => {
-  return {
-    ...state,
-    ...inMemoryState,
-  };
-};
+export const packageSearchReducer = (state: IPackageSearchState): IPackageSearchState => ({
+  ...state,
+  ...inMemoryState,
+});

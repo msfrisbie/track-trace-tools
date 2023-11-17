@@ -3,26 +3,29 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import { mapState } from "vuex";
-import router from "@/router/index";
-import store from "@/store/page-overlay/index";
+import Vue from 'vue';
+import { mapState } from 'vuex';
+import router from '@/router/index';
+import store from '@/store/page-overlay/index';
+import { IPluginState } from '@/interfaces';
 
 export default Vue.extend({
-  name: "Example",
+  name: 'Example',
   store,
   router,
   props: {},
   components: {},
   computed: {
-    ...mapState([])
+    ...mapState<IPluginState>({
+      authState: (state: IPluginState) => state.pluginAuth.authState,
+    }),
   },
   data() {
     return {};
   },
   methods: {},
   async created() {},
-  async mounted() {}
+  async mounted() {},
 });
 </script>
 

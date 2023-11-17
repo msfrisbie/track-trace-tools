@@ -5,7 +5,7 @@
         Track &amp; Trace Tools can export directly to Google Sheets.
       </div>
       <div class="text-md text-gray-600 text-center">
-        Sign in to your Google account to enable this feature.
+        Sign in to your Google account to enable this feature. Only available with T3+.
       </div>
 
       <div class="flex flex-col items-center">

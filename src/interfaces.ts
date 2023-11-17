@@ -12,7 +12,7 @@ import {
   TagState,
   TaskType,
   ToolkitView,
-  TransferState,
+  TransferState
 } from "@/consts";
 import { Store } from "vuex";
 import { IAnnouncementsState } from "./store/page-overlay/modules/announcements/interfaces";
@@ -35,7 +35,7 @@ import { ISplitPackageBuilderState } from "./store/page-overlay/modules/split-pa
 import { ITagSearchState } from "./store/page-overlay/modules/tag-search/interfaces";
 import {
   DriverLayoverLeg,
-  ITransferBuilderState,
+  ITransferBuilderState
 } from "./store/page-overlay/modules/transfer-builder/interfaces";
 import { ITransferPackageSearchState } from "./store/page-overlay/modules/transfer-package-search/interfaces";
 import { ITransferSearchState } from "./store/page-overlay/modules/transfer-search/interfaces";
@@ -60,6 +60,13 @@ export interface IComputedGetSetMismatched<T, U> {
 
 export interface IAtomicService {
   init: () => Promise<void>;
+}
+
+export enum BackgroundState {
+  DEFAULT = "DEFAULT",
+  COLOR = "COLOR",
+  GRADIENT = "GRADIENT",
+  IMAGE = "IMAGE",
 }
 
 export enum DarkModeState {
@@ -701,7 +708,6 @@ export interface IPackageSourceHarvestData {
 
 export interface IPlantHistoryData {}
 export interface IPlantBatchHistoryData {}
-export interface ITransferHistoryData {}
 
 export interface ITestResultData {
   IsRevoked: boolean;
@@ -745,6 +751,11 @@ export interface IIndexedPackageData extends IPackageData {
   LicenseNumber: string;
   TagMatcher: string;
   history?: IPackageHistoryData[];
+  testResults?: ITestResultData[];
+  initialQuantity?: number;
+  initialQuantityUnitOfMeasure?: string;
+  totalInputQuantity?: number;
+  totalInputQuantityUnitOfMeasure?: string;
 }
 
 export interface IRichIndexedPackageData extends IIndexedPackageData {
@@ -777,7 +788,7 @@ export interface IDestinationPackageData {
   ItemUnitCbdContentUnitOfMeasureAbbreviation: null;
   ItemUnitCbdPercent: null;
   ItemUnitQuantity: null;
-  ItemUnitQuantityUnitOfMeasureAbbreviation: null;
+  ItemUnitQuantityUnitOfMeasureAbbreviation: string | null;
   ItemUnitThcContent: null;
   ItemUnitThcContentDose: null;
   ItemUnitThcContentDoseUnitOfMeasureAbbreviation: null;
@@ -787,7 +798,7 @@ export interface IDestinationPackageData {
   ItemUnitVolumeUnitOfMeasureAbbreviation: null;
   ItemUnitWeight: number | null;
   ItemUnitWeightUnitOfMeasureAbbreviation: string; // "g";
-  LabTestingStateName: string; //"TestPassed";
+  LabTestingStateName: string; // "TestPassed";
   MultiHarvest: true;
   MultiPackage: boolean;
   PackageId: number;
@@ -819,9 +830,11 @@ export interface IIndexedDestinationPackageData extends IDestinationPackageData 
   LicenseNumber: string;
   TagMatcher: string;
   history?: IPackageHistoryData[];
+  testResults?: ITestResultData[];
   fractionalCostData?: IFractionalCostData[];
 }
 
+export type IUnionPackageData = IPackageData | IDestinationPackageData;
 export type IUnionIndexedPackageData = IIndexedPackageData | IIndexedDestinationPackageData;
 export type IUnionRichIndexedPackageData =
   | IRichIndexedPackageData
@@ -924,13 +937,13 @@ export interface ITransferData {
   VehicleModel: string;
 }
 
-export interface IOutgoingTransferData extends ITransferData {
+export interface IOutgoingTransferData extends IIndexedTransferData {
   DeliveryId: 0;
   DeliveryPackageCount: 0;
   DeliveryReceivedPackageCount: 0;
 }
 
-export interface IIncomingTransferData extends ITransferData {}
+export interface IIncomingTransferData extends IIndexedTransferData {}
 
 export interface IRichIncomingTransferData extends IIncomingTransferData {
   packages?: IIndexedDestinationPackageData[];
@@ -1875,7 +1888,7 @@ export interface IGoogleOAuthOAuthUserInfo {
   given_name: string; // First Name
   family_name: string; // Last Name
   picture: string; // "https://lh3.googleusercontent.com/a/..."
-  locale: string; //"en"
+  locale: string; // "en"
 }
 
 export interface ISimpleSpreadsheet {
@@ -1980,4 +1993,24 @@ export interface IMetrcEmployeeData {
     AcceptedLicenseDateTime: string;
     StoreGridConfigRemotely: boolean;
   };
+}
+
+export interface PackageMetadata {
+  testResults: ITestResultData[];
+  testResultPdfUrls: string[];
+}
+
+export interface ITransferMetadata {
+  destinations: IRichDestinationData[];
+  packages: IIndexedDestinationPackageData[];
+  packagesTestResults: {
+    pkg: IIndexedDestinationPackageData;
+    testResults: ITestResultData[];
+    testResultPdfUrls: string[];
+  }[];
+}
+
+export interface ILicenseFormFilters {
+    licenses: string[];
+    licenseOptions: string[];
 }

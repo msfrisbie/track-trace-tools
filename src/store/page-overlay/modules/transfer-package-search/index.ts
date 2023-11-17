@@ -1,15 +1,15 @@
-import { IPluginState } from "@/interfaces";
-import { authManager } from "@/modules/auth-manager.module";
-import { findMatchingTransferPackages } from "@/utils/transfer";
-import { ActionContext } from "vuex";
+import { IPluginState } from '@/interfaces';
+import { authManager } from '@/modules/auth-manager.module';
+import { findMatchingTransferPackages } from '@/utils/transfer';
+import { ActionContext } from 'vuex';
 import {
   TransferPackageSearchActions,
   TransferPackageSearchAlgorithm,
   TransferPackageSearchGetters,
   TransferPackageSearchMutations,
   TransferPackageSearchState,
-} from "./consts";
-import { ITransferPackageSearchState } from "./interfaces";
+} from './consts';
+import { ITransferPackageSearchState } from './interfaces';
 
 const inMemoryState = {
   startDate: null,
@@ -32,7 +32,7 @@ export const transferPackageSearchModule = {
   mutations: {
     [TransferPackageSearchMutations.TRANSFER_PACKAGE_SEARCH_MUTATION](
       state: ITransferPackageSearchState,
-      data: any
+      data: any,
     ) {
       // state.data = data;
     },
@@ -42,7 +42,7 @@ export const transferPackageSearchModule = {
       state: ITransferPackageSearchState,
       getters: any,
       rootState: any,
-      rootGetters: any
+      rootGetters: any,
     ) => {
       // return state.data
     },
@@ -56,14 +56,14 @@ export const transferPackageSearchModule = {
     // },
     [TransferPackageSearchActions.EXECUTE_SEARCH]: async (
       ctx: ActionContext<ITransferPackageSearchState, IPluginState>,
-      data: any
+      data: any,
     ) => {
       ctx.state.state = TransferPackageSearchState.INFLIGHT;
       ctx.state.abortController = new AbortController();
 
       ctx.state.messages.push({
-        message: "Searching outgoing transfers for packages...",
-        variant: "primary",
+        message: 'Searching outgoing transfers for packages...',
+        variant: 'primary',
         timestamp: Date.now(),
       });
 
@@ -80,25 +80,25 @@ export const transferPackageSearchModule = {
 
       ctx.state.messages.push({
         message: `Found ${ctx.state.results.length} matching transfers`,
-        variant: "primary",
+        variant: 'primary',
         timestamp: Date.now(),
       });
     },
     [TransferPackageSearchActions.STOP_SEARCH]: async (
       ctx: ActionContext<ITransferPackageSearchState, IPluginState>,
-      data: any
+      data: any,
     ) => {
       ctx.state.abortController.abort();
       ctx.state.state = TransferPackageSearchState.SUCCESS;
       ctx.state.messages.push({
-        message: "Search terminated, results may be incomplete",
-        variant: "warning",
+        message: 'Search terminated, results may be incomplete',
+        variant: 'warning',
         timestamp: Date.now(),
       });
     },
     [TransferPackageSearchActions.RESET_SEARCH]: async (
       ctx: ActionContext<ITransferPackageSearchState, IPluginState>,
-      data: any
+      data: any,
     ) => {
       ctx.state.algorithm = TransferPackageSearchAlgorithm.OLD_TO_NEW;
       ctx.state.startDate = null;
@@ -109,7 +109,7 @@ export const transferPackageSearchModule = {
     },
     [TransferPackageSearchActions.UPDATE_SEARCH_PARAMETERS]: async (
       ctx: ActionContext<ITransferPackageSearchState, IPluginState>,
-      searchParameters: { startDate: string | null; algorithm: TransferPackageSearchAlgorithm }
+      searchParameters: { startDate: string | null; algorithm: TransferPackageSearchAlgorithm },
     ) => {
       ctx.state.algorithm = searchParameters.algorithm;
       ctx.state.startDate = searchParameters.startDate;
@@ -118,10 +118,8 @@ export const transferPackageSearchModule = {
 };
 
 export const transferPackageSearchReducer = (
-  state: ITransferPackageSearchState
-): ITransferPackageSearchState => {
-  return {
-    ...state,
-    ...inMemoryState,
-  };
-};
+  state: ITransferPackageSearchState,
+): ITransferPackageSearchState => ({
+  ...state,
+  ...inMemoryState,
+});

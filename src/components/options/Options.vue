@@ -9,8 +9,12 @@
         <b-navbar-nav>
           <b-nav-item href="#/">Welcome</b-nav-item>
           <b-nav-item href="#/faq">FAQ</b-nav-item>
-          <b-nav-item href="#/plus">T3+</b-nav-item>
-          <b-nav-item href="#/changelog">Changelog</b-nav-item>
+          <b-nav-item href="https://dash.trackandtrace.tools" target="_blank">T3+</b-nav-item>
+          <b-nav-item
+            href="https://github.com/msfrisbie/track-trace-tools/commits/master"
+            target="_blank"
+            >Changelog</b-nav-item
+          >
           <b-nav-item href="#/google-sheets">Google Sheets</b-nav-item>
           <b-nav-item href="#/custom-features">Custom Features</b-nav-item>
           <b-nav-item href="#/license">License</b-nav-item>

@@ -2,19 +2,18 @@
   <font-awesome-icon :icon="icon" v-bind:style="{ color: iconColor }" />
 </template>
 
-
 <script lang="ts">
-import { IIndexedTransferData } from "@/interfaces";
-import Vue from "vue";
+import { IIndexedTransferData } from '@/interfaces';
+import Vue from 'vue';
 
 export default Vue.extend({
-  name: "TransferIcon",
+  name: 'TransferIcon',
   props: {
     transfer: Object as () => IIndexedTransferData,
   },
   computed: {
     icon() {
-      return "box";
+      return 'box';
       //   const category = this.pkg.Item.ProductCategoryName;
 
       //   if (category.includes("Flower") || category.includes("Shake")) {
@@ -64,7 +63,7 @@ export default Vue.extend({
       //   return "box";
     },
     iconColor() {
-      return "#49276a";
+      return '#49276a';
       //   if (this.pkg.Quantity === 0) {
       //     return "rgba(0,0,0,0.3)";
       //   } else {

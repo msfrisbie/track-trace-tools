@@ -1,4 +1,4 @@
-import { IdbKeyPiece } from "@/consts";
+import { IdbKeyPiece } from '@/consts';
 import {
   IAdjustPackageReason,
   IAtomicService,
@@ -13,18 +13,19 @@ import {
   ITagData,
   IUnitOfMeasure,
   IWasteMethod,
-  IWasteReason,
-} from "@/interfaces";
-import { authManager } from "@/modules/auth-manager.module";
-import { primaryMetrcRequestManager } from "@/modules/metrc-request-manager.module";
-import { mockDataManager } from "@/modules/mock-data-manager.module";
-import store from "@/store/page-overlay/index";
-import { debugLogFactory } from "@/utils/debug";
-import { extract, ExtractionType } from "@/utils/html";
-import { AxiosResponse } from "axios";
-import { get, keys, set } from "idb-keyval";
-import _ from "lodash-es";
-import { timer } from "rxjs";
+  IWasteReason
+} from '@/interfaces';
+import { authManager } from '@/modules/auth-manager.module';
+import { primaryMetrcRequestManager } from '@/modules/metrc-request-manager.module';
+import { mockDataManager } from '@/modules/mock-data-manager.module';
+import store from '@/store/page-overlay/index';
+import { debugLogFactory } from '@/utils/debug';
+import { extract, ExtractionType } from '@/utils/html';
+import { AxiosResponse } from 'axios';
+import { get, keys, set } from 'idb-keyval';
+import _ from 'lodash-es';
+import { timer } from 'rxjs';
+
 const DYNAMIC_CONST_TIMEOUT_MS = 30000;
 
 const TRANSFER_MODAL_HTML_EXPIRATION_MS: number = 1000 * 60 * 60 * 24;
@@ -33,9 +34,9 @@ const DEFAULT_UNITS_OF_MEASURE: IUnitOfMeasure[] = [
   {
     Id: 1,
     IsBaseUnit: true,
-    QuantityType: "CountBased",
-    Name: "Each",
-    Abbreviation: "ea",
+    QuantityType: 'CountBased',
+    Name: 'Each',
+    Abbreviation: 'ea',
     FromBaseFactor: 1,
     ToBaseFactor: 1,
     IsArchived: false,
@@ -43,9 +44,9 @@ const DEFAULT_UNITS_OF_MEASURE: IUnitOfMeasure[] = [
   {
     Id: 7,
     IsBaseUnit: true,
-    QuantityType: "VolumeBased",
-    Name: "Fluid Ounces",
-    Abbreviation: "fl oz",
+    QuantityType: 'VolumeBased',
+    Name: 'Fluid Ounces',
+    Abbreviation: 'fl oz',
     FromBaseFactor: 1,
     ToBaseFactor: 1,
     IsArchived: false,
@@ -53,9 +54,9 @@ const DEFAULT_UNITS_OF_MEASURE: IUnitOfMeasure[] = [
   {
     Id: 8,
     IsBaseUnit: false,
-    QuantityType: "VolumeBased",
-    Name: "Gallons",
-    Abbreviation: "gal",
+    QuantityType: 'VolumeBased',
+    Name: 'Gallons',
+    Abbreviation: 'gal',
     FromBaseFactor: 0.0078125,
     ToBaseFactor: 128,
     IsArchived: false,
@@ -63,9 +64,9 @@ const DEFAULT_UNITS_OF_MEASURE: IUnitOfMeasure[] = [
   {
     Id: 4,
     IsBaseUnit: false,
-    QuantityType: "WeightBased",
-    Name: "Grams",
-    Abbreviation: "g",
+    QuantityType: 'WeightBased',
+    Name: 'Grams',
+    Abbreviation: 'g',
     FromBaseFactor: 28.349523125,
     ToBaseFactor: 0.035273961949580414,
     IsArchived: false,
@@ -73,9 +74,9 @@ const DEFAULT_UNITS_OF_MEASURE: IUnitOfMeasure[] = [
   {
     Id: 6,
     IsBaseUnit: false,
-    QuantityType: "WeightBased",
-    Name: "Kilograms",
-    Abbreviation: "kg",
+    QuantityType: 'WeightBased',
+    Name: 'Kilograms',
+    Abbreviation: 'kg',
     FromBaseFactor: 0.028349523125,
     ToBaseFactor: 35.27396194958041,
     IsArchived: false,
@@ -83,9 +84,9 @@ const DEFAULT_UNITS_OF_MEASURE: IUnitOfMeasure[] = [
   {
     Id: 9,
     IsBaseUnit: false,
-    QuantityType: "VolumeBased",
-    Name: "Liters",
-    Abbreviation: "l",
+    QuantityType: 'VolumeBased',
+    Name: 'Liters',
+    Abbreviation: 'l',
     FromBaseFactor: 0.0295735295625,
     ToBaseFactor: 33.814022701842994,
     IsArchived: false,
@@ -93,9 +94,9 @@ const DEFAULT_UNITS_OF_MEASURE: IUnitOfMeasure[] = [
   {
     Id: 5,
     IsBaseUnit: false,
-    QuantityType: "WeightBased",
-    Name: "Milligrams",
-    Abbreviation: "mg",
+    QuantityType: 'WeightBased',
+    Name: 'Milligrams',
+    Abbreviation: 'mg',
     FromBaseFactor: 28349.523125,
     ToBaseFactor: 0.00003527396194958041,
     IsArchived: false,
@@ -103,9 +104,9 @@ const DEFAULT_UNITS_OF_MEASURE: IUnitOfMeasure[] = [
   {
     Id: 10,
     IsBaseUnit: false,
-    QuantityType: "VolumeBased",
-    Name: "Milliliters",
-    Abbreviation: "ml",
+    QuantityType: 'VolumeBased',
+    Name: 'Milliliters',
+    Abbreviation: 'ml',
     FromBaseFactor: 29.5735295625,
     ToBaseFactor: 0.033814022701843,
     IsArchived: false,
@@ -113,9 +114,9 @@ const DEFAULT_UNITS_OF_MEASURE: IUnitOfMeasure[] = [
   {
     Id: 2,
     IsBaseUnit: true,
-    QuantityType: "WeightBased",
-    Name: "Ounces",
-    Abbreviation: "oz",
+    QuantityType: 'WeightBased',
+    Name: 'Ounces',
+    Abbreviation: 'oz',
     FromBaseFactor: 1,
     ToBaseFactor: 1,
     IsArchived: false,
@@ -123,9 +124,9 @@ const DEFAULT_UNITS_OF_MEASURE: IUnitOfMeasure[] = [
   {
     Id: 11,
     IsBaseUnit: false,
-    QuantityType: "VolumeBased",
-    Name: "Pints",
-    Abbreviation: "pt",
+    QuantityType: 'VolumeBased',
+    Name: 'Pints',
+    Abbreviation: 'pt',
     FromBaseFactor: 0.0625,
     ToBaseFactor: 16,
     IsArchived: false,
@@ -133,9 +134,9 @@ const DEFAULT_UNITS_OF_MEASURE: IUnitOfMeasure[] = [
   {
     Id: 3,
     IsBaseUnit: false,
-    QuantityType: "WeightBased",
-    Name: "Pounds",
-    Abbreviation: "lb",
+    QuantityType: 'WeightBased',
+    Name: 'Pounds',
+    Abbreviation: 'lb',
     FromBaseFactor: 0.0625,
     ToBaseFactor: 16,
     IsArchived: false,
@@ -143,9 +144,9 @@ const DEFAULT_UNITS_OF_MEASURE: IUnitOfMeasure[] = [
   {
     Id: 12,
     IsBaseUnit: false,
-    QuantityType: "VolumeBased",
-    Name: "Quarts",
-    Abbreviation: "qt",
+    QuantityType: 'VolumeBased',
+    Name: 'Quarts',
+    Abbreviation: 'qt',
     FromBaseFactor: 0.03125,
     ToBaseFactor: 32,
     IsArchived: false,
@@ -200,26 +201,39 @@ interface INewTransferRepeaterData {
   TransferTypes: IMetrcTransferType[];
 }
 
-const debugLog = debugLogFactory("dynamic-consts-manager.module.ts");
+const debugLog = debugLogFactory('dynamic-consts-manager.module.ts');
 
 class DynamicConstsManager implements IAtomicService {
   private _newTransferModalText: Promise<string> | null = null;
+
   private _newPackageModalText: Promise<string> | null = null;
 
   private _movePackageRepeaterdata: Promise<any> | null = null;
+
   private _createItemRepeaterData: Promise<any> | null = null;
+
   private _createStrainRepeaterData: Promise<any> | null = null;
+
   private _wasteByLocationRepeaterData: Promise<any> | null = null;
+
   private _adjustPackageRepeaterData: Promise<any> | null = null;
+
   private _remediatePackageRepeaterData: Promise<any> | null = null;
+
   private _createPlantingsFromPackagesRepeaterData: Promise<any> | null = null;
+
   private _changePlantBatchGrowthPhaseRepeaterData: Promise<any> | null = null;
+
   private _newTransferRepeaterData: Promise<any> | null = null;
 
   private _cachedParsedTemplateRepeaterData: any = null;
+
   private _cachedFacilities: IMetrcFacilityData[] | null = null;
+
   private _cachedFacilityMap: Map<string, IMetrcFacilityData> | null = null;
+
   private _cachedDestinationFacilities: IMetrcFacilityData[] | null = null;
+
   private _cachedTransportFacilities: IMetrcFacilityData[] | null = null;
 
   async init() {
@@ -240,8 +254,7 @@ class DynamicConstsManager implements IAtomicService {
     if (!this._movePackageRepeaterdata) {
       this._movePackageRepeaterdata = new Promise(async (resolve, reject) => {
         const subscription = timer(DYNAMIC_CONST_TIMEOUT_MS).subscribe(() =>
-          reject("Item categories fetch timed out")
-        );
+          reject('Item categories fetch timed out'));
 
         try {
           const html = await primaryMetrcRequestManager
@@ -253,7 +266,7 @@ class DynamicConstsManager implements IAtomicService {
           const parsedRepeaterData = extractedData?.repeaterData?.parsedRepeaterData;
 
           if (!parsedRepeaterData) {
-            throw new Error("movePackageRepeaterdata: Failed to extract repeaterData");
+            throw new Error('movePackageRepeaterdata: Failed to extract repeaterData');
           }
 
           subscription.unsubscribe();
@@ -273,8 +286,7 @@ class DynamicConstsManager implements IAtomicService {
     if (!this._createItemRepeaterData) {
       this._createItemRepeaterData = new Promise(async (resolve, reject) => {
         const subscription = timer(DYNAMIC_CONST_TIMEOUT_MS).subscribe(() =>
-          reject("Item categories fetch timed out")
-        );
+          reject('Item categories fetch timed out'));
 
         try {
           const html = await primaryMetrcRequestManager
@@ -286,7 +298,7 @@ class DynamicConstsManager implements IAtomicService {
           const parsedRepeaterData = extractedData?.repeaterData?.parsedRepeaterData;
 
           if (!parsedRepeaterData) {
-            throw new Error("createItemRepeaterData: Failed to extract repeaterData");
+            throw new Error('createItemRepeaterData: Failed to extract repeaterData');
           }
 
           subscription.unsubscribe();
@@ -306,8 +318,7 @@ class DynamicConstsManager implements IAtomicService {
     if (!this._createStrainRepeaterData) {
       this._createStrainRepeaterData = new Promise(async (resolve, reject) => {
         const subscription = timer(DYNAMIC_CONST_TIMEOUT_MS).subscribe(() =>
-          reject("Strain categories fetch timed out")
-        );
+          reject('Strain categories fetch timed out'));
 
         try {
           const html = await primaryMetrcRequestManager
@@ -319,7 +330,7 @@ class DynamicConstsManager implements IAtomicService {
           const parsedRepeaterData = extractedData?.repeaterData?.parsedRepeaterData;
 
           if (!parsedRepeaterData) {
-            throw new Error("createStrainRepeaterData: Failed to extract repeaterData");
+            throw new Error('createStrainRepeaterData: Failed to extract repeaterData');
           }
 
           subscription.unsubscribe();
@@ -339,8 +350,7 @@ class DynamicConstsManager implements IAtomicService {
     if (!this._wasteByLocationRepeaterData) {
       this._wasteByLocationRepeaterData = new Promise(async (resolve, reject) => {
         const subscription = timer(DYNAMIC_CONST_TIMEOUT_MS).subscribe(() =>
-          reject("Item categories fetch timed out")
-        );
+          reject('Item categories fetch timed out'));
 
         try {
           const html = await primaryMetrcRequestManager
@@ -352,7 +362,7 @@ class DynamicConstsManager implements IAtomicService {
           const parsedRepeaterData = extractedData?.repeaterData?.parsedRepeaterData;
 
           if (!parsedRepeaterData) {
-            throw new Error("wasteByLocationRepeaterData: Failed to extract repeaterData");
+            throw new Error('wasteByLocationRepeaterData: Failed to extract repeaterData');
           }
 
           subscription.unsubscribe();
@@ -372,8 +382,7 @@ class DynamicConstsManager implements IAtomicService {
     if (!this._adjustPackageRepeaterData) {
       this._adjustPackageRepeaterData = new Promise(async (resolve, reject) => {
         const subscription = timer(DYNAMIC_CONST_TIMEOUT_MS).subscribe(() =>
-          reject("Adjust package fetch timed out")
-        );
+          reject('Adjust package fetch timed out'));
 
         try {
           const html = await primaryMetrcRequestManager
@@ -385,7 +394,7 @@ class DynamicConstsManager implements IAtomicService {
           const parsedRepeaterData = extractedData?.repeaterData?.parsedRepeaterData;
 
           if (!parsedRepeaterData) {
-            throw new Error("adjustPackageRepeaterData: Failed to extract repeaterData");
+            throw new Error('adjustPackageRepeaterData: Failed to extract repeaterData');
           }
 
           subscription.unsubscribe();
@@ -405,8 +414,7 @@ class DynamicConstsManager implements IAtomicService {
     if (!this._remediatePackageRepeaterData) {
       this._remediatePackageRepeaterData = new Promise(async (resolve, reject) => {
         const subscription = timer(DYNAMIC_CONST_TIMEOUT_MS).subscribe(() =>
-          reject("Remediate package fetch timed out")
-        );
+          reject('Remediate package fetch timed out'));
 
         try {
           const html = await primaryMetrcRequestManager
@@ -418,7 +426,7 @@ class DynamicConstsManager implements IAtomicService {
           const parsedRepeaterData = extractedData?.repeaterData?.parsedRepeaterData;
 
           if (!parsedRepeaterData) {
-            throw new Error("remediatePackageRepeaterData: Failed to extract repeaterData");
+            throw new Error('remediatePackageRepeaterData: Failed to extract repeaterData');
           }
 
           subscription.unsubscribe();
@@ -438,8 +446,7 @@ class DynamicConstsManager implements IAtomicService {
     if (!this._createPlantingsFromPackagesRepeaterData) {
       this._createPlantingsFromPackagesRepeaterData = new Promise(async (resolve, reject) => {
         const subscription = timer(DYNAMIC_CONST_TIMEOUT_MS).subscribe(() =>
-          reject("Create plantings fetch timed out")
-        );
+          reject('Create plantings fetch timed out'));
 
         try {
           const html = await primaryMetrcRequestManager
@@ -452,7 +459,7 @@ class DynamicConstsManager implements IAtomicService {
 
           if (!parsedRepeaterData) {
             throw new Error(
-              "createPlantingsFromPackageRepeaterData: Failed to extract repeaterData"
+              'createPlantingsFromPackageRepeaterData: Failed to extract repeaterData',
             );
           }
 
@@ -470,13 +477,12 @@ class DynamicConstsManager implements IAtomicService {
   }
 
   private async changePlantBatchGrowthPhaseRepeaterData(
-    allowCache: boolean = true
+    allowCache: boolean = true,
   ): Promise<IChangePlantBatchGrowthPhaseRepeaterData> {
     if (!this._changePlantBatchGrowthPhaseRepeaterData || !allowCache) {
       this._changePlantBatchGrowthPhaseRepeaterData = new Promise(async (resolve, reject) => {
         const subscription = timer(DYNAMIC_CONST_TIMEOUT_MS).subscribe(() =>
-          reject("Change plant batch growth phase fetch timed out")
-        );
+          reject('Change plant batch growth phase fetch timed out'));
 
         try {
           const html = await primaryMetrcRequestManager
@@ -489,7 +495,7 @@ class DynamicConstsManager implements IAtomicService {
 
           if (!parsedRepeaterData) {
             throw new Error(
-              "changePlantBatchGrowthPhaseRepeaterData: Failed to extract repeaterData"
+              'changePlantBatchGrowthPhaseRepeaterData: Failed to extract repeaterData',
             );
           }
 
@@ -513,7 +519,7 @@ class DynamicConstsManager implements IAtomicService {
 
     const isCached = currentKeys.includes(htmlKey);
 
-    debugLog(async () => ["isCached", isCached]);
+    debugLog(async () => ['isCached', isCached]);
 
     return isCached;
   }
@@ -525,10 +531,9 @@ class DynamicConstsManager implements IAtomicService {
 
     const transferTimestamp: number = (await get(expirationKey)) as number;
 
-    const isExpired =
-      !transferTimestamp || now - transferTimestamp > TRANSFER_MODAL_HTML_EXPIRATION_MS;
+    const isExpired = !transferTimestamp || now - transferTimestamp > TRANSFER_MODAL_HTML_EXPIRATION_MS;
 
-    debugLog(async () => ["isExpired", isExpired]);
+    debugLog(async () => ['isExpired', isExpired]);
 
     return isExpired;
   }
@@ -536,7 +541,7 @@ class DynamicConstsManager implements IAtomicService {
   // There should only ever be a single request.
   private async newTransferModalRequest() {
     if (!this._newTransferModalText) {
-      debugLog(async () => ["Sending transfer modal request"]);
+      debugLog(async () => ['Sending transfer modal request']);
 
       // toastManager.openToast(
       //   "T3 is storing the New Transfer form so it can be reused. The page may be slow for a few seconds.",
@@ -561,7 +566,7 @@ class DynamicConstsManager implements IAtomicService {
   // There should only ever be a single request.
   private async newPackageModalRequest() {
     if (!this._newPackageModalText) {
-      debugLog(async () => ["Sending package modal request"]);
+      debugLog(async () => ['Sending package modal request']);
       this._newPackageModalText = primaryMetrcRequestManager
         .getNewPackageHTML()
         .then((response: AxiosResponse) => response.data);
@@ -596,12 +601,12 @@ class DynamicConstsManager implements IAtomicService {
   private async refreshNewTransferModalCacheIfExpired() {
     if (await this.isNewTransferModalCacheExpired()) {
       // Trigger a refresh, but don't wait for it
-      return this.refreshTransferTemplateHTMLCache();
+      this.refreshTransferTemplateHTMLCache();
     }
   }
 
   private async refreshTransferTemplateHTMLCache() {
-    debugLog(async () => ["refreshing cache"]);
+    debugLog(async () => ['refreshing cache']);
 
     const html = await this.newTransferModalRequest();
 
@@ -621,8 +626,7 @@ class DynamicConstsManager implements IAtomicService {
       this._newTransferRepeaterData = new Promise(async (resolve, reject) => {
         // This payload is huge, double the allowed timeout
         const subscription = timer(DYNAMIC_CONST_TIMEOUT_MS * 2).subscribe(() =>
-          reject("New transfer fetch timed out")
-        );
+          reject('New transfer fetch timed out'));
 
         try {
           let parsedRepeaterData;
@@ -643,7 +647,7 @@ class DynamicConstsManager implements IAtomicService {
           }
 
           if (!parsedRepeaterData) {
-            throw new Error("newTransferRepeaterData: Failed to extract repeaterData");
+            throw new Error('newTransferRepeaterData: Failed to extract repeaterData');
           }
 
           subscription.unsubscribe();
@@ -660,13 +664,13 @@ class DynamicConstsManager implements IAtomicService {
   }
 
   async itemCategories(): Promise<IItemCategory[]> {
-    let repeaterData = await this.createItemRepeaterData();
+    const repeaterData = await this.createItemRepeaterData();
 
     if (repeaterData.ItemCategories) {
       return repeaterData.ItemCategories;
     }
 
-    throw new Error("Item categories unable to load");
+    throw new Error('Item categories unable to load');
   }
 
   async unitsOfMeasure(): Promise<IUnitOfMeasure[]> {
@@ -675,64 +679,65 @@ class DynamicConstsManager implements IAtomicService {
     }
 
     try {
-      let repeaterData = await this.createItemRepeaterData();
+      const repeaterData = await this.createItemRepeaterData();
 
       if (repeaterData.UnitsOfMeasure) {
         return repeaterData.UnitsOfMeasure;
       }
+
+      throw new Error('Unable to match units');
     } catch {
       return DEFAULT_UNITS_OF_MEASURE;
     }
 
-    throw new Error("Units of measure unable to load");
+    // throw new Error('Units of measure unable to load');
   }
 
   async unitsOfWeight(): Promise<IUnitOfMeasure[]> {
     return (await this.unitsOfMeasure())
       .filter((unitOfMeasure) =>
-        ["Pounds", "Grams", "Kilograms", "Milligrams", "Ounces"].includes(unitOfMeasure.Name)
-      )
-      .sort((a, b) => (a.Name === "Pounds" ? -1 : 1));
+        ['Pounds', 'Grams', 'Kilograms', 'Milligrams', 'Ounces'].includes(unitOfMeasure.Name))
+      .sort((a, b) => (a.Name === 'Pounds' ? -1 : 1));
   }
 
   async wasteReasons(): Promise<IWasteReason[]> {
-    let repeaterData = await this.wasteByLocationRepeaterData();
+    const repeaterData = await this.wasteByLocationRepeaterData();
 
     if (repeaterData.ActionReasons) {
       return repeaterData.ActionReasons;
     }
 
-    throw new Error("Waste reasons unable to load");
+    throw new Error('Waste reasons unable to load');
   }
 
   async wasteMethods(): Promise<IWasteMethod[]> {
-    let repeaterData = await this.wasteByLocationRepeaterData();
+    const repeaterData = await this.wasteByLocationRepeaterData();
 
     if (repeaterData.PlantWasteMethods) {
       return repeaterData.PlantWasteMethods;
     }
 
-    throw new Error("Waste methods unable to load");
+    throw new Error('Waste methods unable to load');
   }
 
   async adjustPackageReasons(): Promise<IAdjustPackageReason[]> {
-    let repeaterData = await this.adjustPackageRepeaterData();
+    const repeaterData = await this.adjustPackageRepeaterData();
 
     if (repeaterData.ActionReasons) {
       return repeaterData.ActionReasons;
     }
 
-    throw new Error("Adjust package reasons unable to load");
+    throw new Error('Adjust package reasons unable to load');
   }
 
   async remediatePackageMethods(): Promise<IRemediatePackageMethod[]> {
-    let repeaterData = await this.remediatePackageRepeaterData();
+    const repeaterData = await this.remediatePackageRepeaterData();
 
     if (repeaterData.RemediationMethods) {
       return repeaterData.RemediationMethods;
     }
 
-    throw new Error("Remediate package methods unable to load");
+    throw new Error('Remediate package methods unable to load');
   }
 
   async plantBatchTypes(): Promise<IPlantBatchType[]> {
@@ -740,61 +745,61 @@ class DynamicConstsManager implements IAtomicService {
       return mockDataManager.mockPlantBatchTypes();
     }
 
-    let repeaterData = await this.createPlantingsFromPackageRepeaterData();
+    const repeaterData = await this.createPlantingsFromPackageRepeaterData();
 
     if (repeaterData.PlantBatchTypes) {
       return repeaterData.PlantBatchTypes;
     }
 
-    throw new Error("Plant batch types unable to load");
+    throw new Error('Plant batch types unable to load');
   }
 
   async availablePlantTags(): Promise<ITagData[]> {
-    let repeaterData = await this.changePlantBatchGrowthPhaseRepeaterData(false);
+    const repeaterData = await this.changePlantBatchGrowthPhaseRepeaterData(false);
 
     if (repeaterData.GroupTags) {
       // Force sort, since who knows what Metrc is returning
       return repeaterData.GroupTags[0].Tags.sort((a, b) => a.Label.localeCompare(b.Label));
     }
 
-    throw new Error("Growth phase tags unable to load");
+    throw new Error('Growth phase tags unable to load');
   }
 
   async plantBatchGrowthPhases(): Promise<IPlantBatchGrowthPhase[]> {
     if (
-      store.state.mockDataMode &&
-      store.state.flags?.mockedFlags.mockPlantBatchGrowthPhases.enabled
+      store.state.mockDataMode
+      && store.state.flags?.mockedFlags.mockPlantBatchGrowthPhases.enabled
     ) {
       return mockDataManager.mockPlantBatchGrowthPhases();
     }
 
-    let repeaterData = await this.changePlantBatchGrowthPhaseRepeaterData();
+    const repeaterData = await this.changePlantBatchGrowthPhaseRepeaterData();
 
     if (repeaterData.GrowthPhases) {
       return repeaterData.GrowthPhases;
     }
 
-    throw new Error("Plant batch growth phases unable to load");
+    throw new Error('Plant batch growth phases unable to load');
   }
 
   async defaultPhoneNumberForQuestions(): Promise<string> {
     if (
-      store.state.mockDataMode &&
-      store.state.flags?.mockedFlags.mockDefaultPhoneNumberForQuestions.enabled
+      store.state.mockDataMode
+      && store.state.flags?.mockedFlags.mockDefaultPhoneNumberForQuestions.enabled
     ) {
       return mockDataManager.mockDefaultPhoneNumberForQuestions();
     }
 
-    let repeaterData = await this.newTransferRepeaterData();
+    const repeaterData = await this.newTransferRepeaterData();
 
     // If it's not present, that's OK - just return an empty string
-    return repeaterData.DefaultPhoneNumberForQuestions || "";
+    return repeaterData.DefaultPhoneNumberForQuestions || '';
   }
 
   async facilityUsesLocationForPackages(): Promise<boolean> {
     if (
-      store.state.mockDataMode &&
-      store.state.flags?.mockedFlags.mockFacilityUsesLocationForPackages.enabled
+      store.state.mockDataMode
+      && store.state.flags?.mockedFlags.mockFacilityUsesLocationForPackages.enabled
     ) {
       return mockDataManager.mockFacilityUsesLocationForPackages();
     }
@@ -803,7 +808,7 @@ class DynamicConstsManager implements IAtomicService {
       return primaryMetrcRequestManager
         .getPackagesHTML()
         .then((response) => response.data)
-        .then((body: string) => body.includes("Change Locations"));
+        .then((body: string) => body.includes('Change Locations'));
     } catch (e) {
       console.error(e);
       // Worst case, we show the location picker when it's not needed.
@@ -835,12 +840,12 @@ class DynamicConstsManager implements IAtomicService {
     }
 
     if (!this._cachedFacilities) {
-      let repeaterData = await this.newTransferRepeaterData();
+      const repeaterData = await this.newTransferRepeaterData();
 
       if (repeaterData.Facilities) {
         this._cachedFacilities = Object.values(repeaterData.Facilities);
       } else {
-        throw new Error("Facilities unable to load");
+        throw new Error('Facilities unable to load');
       }
     }
 
@@ -852,7 +857,7 @@ class DynamicConstsManager implements IAtomicService {
       const facilities = await this.facilities();
 
       this._cachedFacilityMap = new Map<string, IMetrcFacilityData>(
-        facilities.map((facility) => [facility.LicenseNumber, facility])
+        facilities.map((facility) => [facility.LicenseNumber, facility]),
       );
     }
 
@@ -861,23 +866,23 @@ class DynamicConstsManager implements IAtomicService {
 
   async destinationFacilities(): Promise<IMetrcFacilityData[]> {
     if (
-      store.state.mockDataMode &&
-      store.state.flags?.mockedFlags.mockDestinationFacilities.enabled
+      store.state.mockDataMode
+      && store.state.flags?.mockedFlags.mockDestinationFacilities.enabled
     ) {
       return mockDataManager.mockDestinationFacilities();
     }
 
     if (!this._cachedDestinationFacilities) {
-      let repeaterData = await this.newTransferRepeaterData();
+      const repeaterData = await this.newTransferRepeaterData();
 
       if (repeaterData.Facilities) {
         const destinationIds: Set<number> = new Set(repeaterData.DestinationFacilities);
 
         this._cachedDestinationFacilities = (await this.facilities()).filter(
-          (facilityData: IMetrcFacilityData) => destinationIds.has(facilityData.Id)
+          (facilityData: IMetrcFacilityData) => destinationIds.has(facilityData.Id),
         );
       } else {
-        throw new Error("Destination facilities unable to load");
+        throw new Error('Destination facilities unable to load');
       }
     }
 
@@ -886,23 +891,23 @@ class DynamicConstsManager implements IAtomicService {
 
   async transporterFacilities(): Promise<IMetrcFacilityData[]> {
     if (
-      store.state.mockDataMode &&
-      store.state.flags?.mockedFlags.mockTransporterFacilities.enabled
+      store.state.mockDataMode
+      && store.state.flags?.mockedFlags.mockTransporterFacilities.enabled
     ) {
       return mockDataManager.mockTransporterFacilities();
     }
 
     if (!this._cachedTransportFacilities) {
-      let repeaterData = await this.newTransferRepeaterData();
+      const repeaterData = await this.newTransferRepeaterData();
 
       if (repeaterData.Facilities) {
         const transporterIds: Set<number> = new Set(repeaterData.TransporterFacilities);
 
         this._cachedTransportFacilities = (await this.facilities()).filter(
-          (facilityData: IMetrcFacilityData) => transporterIds.has(facilityData.Id)
+          (facilityData: IMetrcFacilityData) => transporterIds.has(facilityData.Id),
         );
       } else {
-        throw new Error("Transporter facilities unable to load");
+        throw new Error('Transporter facilities unable to load');
       }
     }
 
@@ -914,13 +919,13 @@ class DynamicConstsManager implements IAtomicService {
       return mockDataManager.mockTransferTypes();
     }
 
-    let repeaterData = await this.newTransferRepeaterData();
+    const repeaterData = await this.newTransferRepeaterData();
 
     if (repeaterData.TransferTypes) {
       return repeaterData.TransferTypes;
     }
 
-    throw new Error("Transfer types unable to load");
+    throw new Error('Transfer types unable to load');
   }
 
   async drivers(): Promise<IMetrcDriverData[]> {
@@ -928,27 +933,28 @@ class DynamicConstsManager implements IAtomicService {
       return mockDataManager.mockDrivers();
     }
 
-    let repeaterData = await this.newTransferRepeaterData();
+    const repeaterData = await this.newTransferRepeaterData();
 
     if (repeaterData.Drivers) {
       return repeaterData.Drivers;
     }
 
-    throw new Error("Drivers unable to load");
+    throw new Error('Drivers unable to load');
   }
+
   async vehicles(): Promise<IMetrcVehicleData[]> {
     if (store.state.mockDataMode && store.state.flags?.mockedFlags.mockVehicles.enabled) {
       return mockDataManager.mockVehicles();
     }
 
-    let repeaterData = await this.newTransferRepeaterData();
+    const repeaterData = await this.newTransferRepeaterData();
 
     if (repeaterData.Vehicles) {
       return repeaterData.Vehicles;
     }
 
-    throw new Error("Vehicles unable to load");
+    throw new Error('Vehicles unable to load');
   }
 }
 
-export let dynamicConstsManager = new DynamicConstsManager();
+export const dynamicConstsManager = new DynamicConstsManager();

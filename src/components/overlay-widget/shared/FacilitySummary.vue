@@ -19,15 +19,15 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import { mapState } from "vuex";
-import router from "@/router/index";
-import store from "@/store/page-overlay/index";
-import { IMetrcFacilityData } from "@/interfaces";
-import { facilityReadableAddressLinesOrNull } from "@/utils/address";
+import Vue from 'vue';
+import { mapState } from 'vuex';
+import router from '@/router/index';
+import store from '@/store/page-overlay/index';
+import { IMetrcFacilityData } from '@/interfaces';
+import { facilityReadableAddressLinesOrNull } from '@/utils/address';
 
 export default Vue.extend({
-  name: "FacilitySummary",
+  name: 'FacilitySummary',
   store,
   router,
   props: {

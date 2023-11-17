@@ -1,14 +1,14 @@
-import { IIndexedPackageData, IPackageFilter, IPluginState } from "@/interfaces";
-import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
-import { ReportsMutations, ReportType } from "@/store/page-overlay/modules/reports/consts";
+import { IIndexedPackageData, IPackageFilter, IPluginState } from '@/interfaces';
+import { primaryDataLoader } from '@/modules/data-loader/data-loader.module';
+import { ReportsMutations, ReportType } from '@/store/page-overlay/modules/reports/consts';
 import {
   IFieldData,
   IReportConfig,
   IReportData,
   IReportsState,
-} from "@/store/page-overlay/modules/reports/interfaces";
-import { ActionContext } from "vuex";
-import { todayIsodate } from "../date";
+} from '@/store/page-overlay/modules/reports/interfaces';
+import { ActionContext } from 'vuex';
+import { todayIsodate } from '../date';
 
 interface IStragglerPackageReportFormFilters {
   packagedDateGt: string;
@@ -23,19 +23,18 @@ interface IStragglerPackageReportFormFilters {
   shouldFilterLastModifiedDateLt: boolean;
 }
 
-export const stragglerPackagesFormFiltersFactory: () => IStragglerPackageReportFormFilters =
-  () => ({
-    packagedDateGt: todayIsodate(),
-    packagedDateLt: todayIsodate(),
-    shouldFilterPackagedDateGt: false,
-    shouldFilterPackagedDateLt: false,
-    includeNearlyEmpty: false,
-    quantityLt: 5,
-    lastModifiedDateGt: todayIsodate(),
-    lastModifiedDateLt: todayIsodate(),
-    shouldFilterLastModifiedDateGt: false,
-    shouldFilterLastModifiedDateLt: false,
-  });
+export const stragglerPackagesFormFiltersFactory: () => IStragglerPackageReportFormFilters = () => ({
+  packagedDateGt: todayIsodate(),
+  packagedDateLt: todayIsodate(),
+  shouldFilterPackagedDateGt: false,
+  shouldFilterPackagedDateLt: false,
+  includeNearlyEmpty: false,
+  quantityLt: 5,
+  lastModifiedDateGt: todayIsodate(),
+  lastModifiedDateLt: todayIsodate(),
+  shouldFilterLastModifiedDateGt: false,
+  shouldFilterLastModifiedDateLt: false,
+});
 
 export function addStragglerPackagesReport({
   reportConfig,
@@ -62,15 +61,13 @@ export function addStragglerPackagesReport({
     ? stragglerPackagesFormFilters.packagedDateLt
     : null;
 
-  stragglerPackageFilter.lastModifiedDateGt =
-    stragglerPackagesFormFilters.shouldFilterLastModifiedDateGt
-      ? stragglerPackagesFormFilters.lastModifiedDateGt
-      : null;
+  stragglerPackageFilter.lastModifiedDateGt = stragglerPackagesFormFilters.shouldFilterLastModifiedDateGt
+    ? stragglerPackagesFormFilters.lastModifiedDateGt
+    : null;
 
-  stragglerPackageFilter.lastModifiedDateLt =
-    stragglerPackagesFormFilters.shouldFilterLastModifiedDateLt
-      ? stragglerPackagesFormFilters.lastModifiedDateLt
-      : null;
+  stragglerPackageFilter.lastModifiedDateLt = stragglerPackagesFormFilters.shouldFilterLastModifiedDateLt
+    ? stragglerPackagesFormFilters.lastModifiedDateLt
+    : null;
 
   reportConfig[ReportType.STRAGGLER_PACKAGES] = {
     stragglerPackageFilter,
@@ -90,7 +87,7 @@ export async function maybeLoadStragglerPackageReportData({
   const stragglerPackageConfig = reportConfig[ReportType.STRAGGLER_PACKAGES];
   if (stragglerPackageConfig?.stragglerPackageFilter) {
     ctx.commit(ReportsMutations.SET_STATUS, {
-      statusMessage: { text: "Loading straggler packages...", level: "success" },
+      statusMessage: { text: 'Loading straggler packages...', level: 'success' },
     });
 
     let stragglerPackages: IIndexedPackageData[] = [];
@@ -99,7 +96,7 @@ export async function maybeLoadStragglerPackageReportData({
       stragglerPackages = [...stragglerPackages, ...(await primaryDataLoader.activePackages())];
     } catch (e) {
       ctx.commit(ReportsMutations.SET_STATUS, {
-        statusMessage: { text: "Failed to load active packages.", level: "warning" },
+        statusMessage: { text: 'Failed to load active packages.', level: 'warning' },
       });
     }
 

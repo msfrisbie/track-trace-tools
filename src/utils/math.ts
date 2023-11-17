@@ -3,7 +3,7 @@
 // 0.1 + 0.2 = 0.30000000000000004
 //
 
-import _ from "lodash-es";
+import _ from 'lodash-es';
 
 // fStrip(0.1 + 0.2) = 0.3
 export function fStrip(x: number): number {
@@ -17,9 +17,9 @@ export function fStrip(x: number): number {
 
 // Returns a value between 0 and 1 in a normal distribution
 function randn_bm(): number {
-  let u = 0,
-    v = 0;
-  while (u === 0) u = Math.random(); //Converting [0,1) to (0,1)
+  let u = 0;
+  let v = 0;
+  while (u === 0) u = Math.random(); // Converting [0,1) to (0,1)
   while (v === 0) v = Math.random();
   let num = Math.sqrt(-2.0 * Math.log(u)) * Math.cos(2.0 * Math.PI * v);
   num = num / 10.0 + 0.5; // Translate to 0 -> 1

@@ -180,28 +180,28 @@
 </template>
 
 <script lang="ts">
-import AnimatedNumber from "@/components/overlay-widget/shared/AnimatedNumber.vue";
-import ErrorReadout from "@/components/overlay-widget/shared/ErrorReadout.vue";
-import PickerCard from "@/components/overlay-widget/shared/PickerCard.vue";
-import { DATA_LOAD_MAX_COUNT } from "@/consts";
-import { ITagData, MetrcTagType } from "@/interfaces";
-import { authManager } from "@/modules/auth-manager.module";
-import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
-import { isValidTag } from "@/utils/tags";
-import _ from "lodash-es";
-import { v4 } from "uuid";
-import Vue from "vue";
-import PasteTags from "./PasteTags.vue";
+import AnimatedNumber from '@/components/overlay-widget/shared/AnimatedNumber.vue';
+import ErrorReadout from '@/components/overlay-widget/shared/ErrorReadout.vue';
+import PickerCard from '@/components/overlay-widget/shared/PickerCard.vue';
+import { DATA_LOAD_MAX_COUNT } from '@/consts';
+import { ITagData, MetrcTagType } from '@/interfaces';
+import { authManager } from '@/modules/auth-manager.module';
+import { primaryDataLoader } from '@/modules/data-loader/data-loader.module';
+import { isValidTag } from '@/utils/tags';
+import _ from 'lodash-es';
+import { v4 } from 'uuid';
+import Vue from 'vue';
+import PasteTags from './PasteTags.vue';
 
 const PAGE_SIZE = 25;
 
 export enum SelectedMenuState {
-  SELECTION = "Select Tags",
-  PASTED_TAGS = "Paste Tags",
+  SELECTION = 'Select Tags',
+  PASTED_TAGS = 'Paste Tags',
 }
 
 export default Vue.extend({
-  name: "TagPicker",
+  name: 'TagPicker',
   components: {
     PickerCard,
     ErrorReadout,
@@ -222,7 +222,7 @@ export default Vue.extend({
     },
     clear() {
       this.$data.selectedTagsMirror = [];
-      //@ts-ignore
+      // @ts-ignore
       this.$refs.pasteTags.clearForm();
     },
     addBefore(index: number) {
@@ -251,8 +251,7 @@ export default Vue.extend({
     },
     filterSelectedByPastedTags() {
       this.$data.selectedTagsMirror = this.$data.sourceTags.filter((x: ITagData) =>
-        this.$data.pastedTags.includes(x.Label)
-      );
+        this.$data.pastedTags.includes(x.Label));
     },
     selectAll() {
       this.$data.selectedTagsMirror = this.$data.sourceTags;
@@ -266,19 +265,17 @@ export default Vue.extend({
         this.$data.lockUuid = lock;
 
         const tags = (await primaryDataLoader.availableTags({ useCache: false })).filter((tag) =>
-          this.$props.tagTypeNames.includes(tag.TagTypeName)
-        );
+          this.$props.tagTypeNames.includes(tag.TagTypeName));
 
         // If there was a subsequent load, don't overwrite
         if (this.$data.lockUuid === lock) {
           this.$data.sourceTags = tags.sort((a: ITagData, b: ITagData) =>
-            a.Label > b.Label ? 1 : -1
-          );
+            (a.Label > b.Label ? 1 : -1));
 
           // This must perform a shallow clone
           this.$data.selectedTagsMirror = [...this.$data.sourceTags].slice(0, this.tagCount);
         } else {
-          console.log("Lock not owned, exiting");
+          console.log('Lock not owned, exiting');
           return;
         }
       } catch (e) {
@@ -345,7 +342,7 @@ export default Vue.extend({
     selectedTagsMirror: {
       immediate: true,
       handler(newValue, oldValue) {
-        this.$emit("update:selectedTags", _.orderBy(newValue, "Label", "asc"));
+        this.$emit('update:selectedTags', _.orderBy(newValue, 'Label', 'asc'));
       },
     },
     pastedTags: {

@@ -1,4 +1,4 @@
-import { SearchType } from "./consts";
+import { SearchType } from './consts';
 
 export interface ISearchState {
   showSearchResults: boolean;

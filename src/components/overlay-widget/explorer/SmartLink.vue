@@ -18,15 +18,15 @@
 </template>
 
 <script lang="ts">
-import { IPluginState } from "@/interfaces";
-import router from "@/router/index";
-import store from "@/store/page-overlay/index";
-import { ExplorerActions, ExplorerTargetType } from "@/store/page-overlay/modules/explorer/consts";
-import Vue from "vue";
-import { mapActions, mapState } from "vuex";
+import { IPluginState } from '@/interfaces';
+import router from '@/router/index';
+import store from '@/store/page-overlay/index';
+import { ExplorerActions, ExplorerTargetType } from '@/store/page-overlay/modules/explorer/consts';
+import Vue from 'vue';
+import { mapActions, mapState } from 'vuex';
 
 export default Vue.extend({
-  name: "SmartLink",
+  name: 'SmartLink',
   store,
   router,
   props: {
@@ -41,18 +41,18 @@ export default Vue.extend({
     icon(): string {
       switch (this.targetType) {
         case ExplorerTargetType.PLANT_BATCH:
-          return "seedling";
+          return 'seedling';
         case ExplorerTargetType.PLANT:
-          return "leaf";
+          return 'leaf';
         case ExplorerTargetType.PACKAGE:
-          return "box";
+          return 'box';
         case ExplorerTargetType.HARVEST:
-          return "cut";
+          return 'cut';
         // case ExplorerTargetType.INCOMING_TRANSFER:
         case ExplorerTargetType.OUTGOING_TRANSFER:
-          return "truck";
+          return 'truck';
         default:
-          return "";
+          return '';
       }
     },
   },

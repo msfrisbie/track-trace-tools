@@ -92,49 +92,53 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import store from "@/store/page-overlay/index";
-import { mapState } from "vuex";
-import BuilderStepHeader from "@/components/overlay-widget/shared/BuilderStepHeader.vue";
-import { isValidTag, generateTagRangeOrError, getTagFromOffset } from "@/utils/tags";
-import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
-import { combineLatest, from, Subject, timer } from "rxjs";
-import { debounceTime, distinctUntilChanged, filter, startWith, tap } from "rxjs/operators";
+import Vue from 'vue';
+import store from '@/store/page-overlay/index';
+import { mapState } from 'vuex';
+import BuilderStepHeader from '@/components/overlay-widget/shared/BuilderStepHeader.vue';
+import { isValidTag, generateTagRangeOrError, getTagFromOffset } from '@/utils/tags';
+import { primaryDataLoader } from '@/modules/data-loader/data-loader.module';
+import {
+  combineLatest, from, Subject, timer,
+} from 'rxjs';
+import {
+  debounceTime, distinctUntilChanged, filter, startWith, tap,
+} from 'rxjs/operators';
 import {
   IPackageData,
   IPlantFilter,
   ICsvFile,
   ILocationData,
-  IMetrcFinishPackagesPayload
-} from "@/interfaces";
-import { downloadCsvFile, buildCsvDataOrError, buildNamedCsvFileData } from "@/utils/csv";
-import { todayIsodate, submitDateFromIsodate } from "@/utils/date";
-import { primaryMetrcRequestManager } from "@/modules/metrc-request-manager.module";
-import { authManager } from "@/modules/auth-manager.module";
+  IMetrcFinishPackagesPayload,
+} from '@/interfaces';
+import { downloadCsvFile, buildCsvDataOrError, buildNamedCsvFileData } from '@/utils/csv';
+import { todayIsodate, submitDateFromIsodate } from '@/utils/date';
+import { primaryMetrcRequestManager } from '@/modules/metrc-request-manager.module';
+import { authManager } from '@/modules/auth-manager.module';
 import {
   BuilderType,
   MessageType,
   PLANTABLE_ITEM_CATEGORY_NAMES,
-  PLANT_BATCH_TYPES
-} from "@/consts";
-import { analyticsManager } from "@/modules/analytics-manager.module";
-import { builderManager } from "@/modules/builder-manager.module";
-import PackagePicker from "@/components/overlay-widget/shared/PackagePicker.vue";
-import LocationPicker from "@/components/overlay-widget/shared/LocationPicker.vue";
-import StrainPicker from "@/components/overlay-widget/shared/StrainPicker.vue";
-import TagPicker from "@/components/overlay-widget/shared/TagPicker.vue";
-import ItemPicker from "@/components/overlay-widget/shared/ItemPicker.vue";
-import PickerCard from "@/components/overlay-widget/shared/PickerCard.vue";
-import { allocatePackageQuantities } from "@/utils/misc";
-import { dynamicConstsManager } from "@/modules/dynamic-consts-manager.module";
-import { safeZip } from "@/utils/array";
+  PLANT_BATCH_TYPES,
+} from '@/consts';
+import { analyticsManager } from '@/modules/analytics-manager.module';
+import { builderManager } from '@/modules/builder-manager.module';
+import PackagePicker from '@/components/overlay-widget/shared/PackagePicker.vue';
+import LocationPicker from '@/components/overlay-widget/shared/LocationPicker.vue';
+import StrainPicker from '@/components/overlay-widget/shared/StrainPicker.vue';
+import TagPicker from '@/components/overlay-widget/shared/TagPicker.vue';
+import ItemPicker from '@/components/overlay-widget/shared/ItemPicker.vue';
+import PickerCard from '@/components/overlay-widget/shared/PickerCard.vue';
+import { allocatePackageQuantities } from '@/utils/misc';
+import { dynamicConstsManager } from '@/modules/dynamic-consts-manager.module';
+import { safeZip } from '@/utils/array';
 
 export default Vue.extend({
-  name: "FinishPackagesBuilder",
+  name: 'FinishPackagesBuilder',
   store,
   components: {
     BuilderStepHeader,
-    PackagePicker
+    PackagePicker,
   },
   methods: {
     setActiveStepIndex(index: number) {
@@ -142,16 +146,16 @@ export default Vue.extend({
 
       analyticsManager.track(MessageType.BUILDER_ENGAGEMENT, {
         builder: this.$data.builderType,
-        action: `Set active step to ${index}`
+        action: `Set active step to ${index}`,
       });
     },
     async submit() {
       const rows: IMetrcFinishPackagesPayload[] = [];
 
-      for (let pkg of this.$data.selectedPackages) {
+      for (const pkg of this.$data.selectedPackages) {
         const row = {
           ActualDate: submitDateFromIsodate(this.$data.finishIsodate),
-          Id: pkg.Id.toString()
+          Id: pkg.Id.toString(),
         };
 
         rows.push(row);
@@ -161,10 +165,10 @@ export default Vue.extend({
         rows,
         this.$data.builderType,
         {
-          packageTotal: this.$data.selectedPackages.length
+          packageTotal: this.$data.selectedPackages.length,
         },
         this.buildCsvFiles(),
-        25
+        25,
       );
     },
     buildCsvFiles(): ICsvFile[] {
@@ -178,23 +182,23 @@ export default Vue.extend({
         const csvData = buildCsvDataOrError([
           {
             isVector: true,
-            data: this.$data.selectedPackages.map((x: IPackageData) => x.Label)
+            data: this.$data.selectedPackages.map((x: IPackageData) => x.Label),
           },
           {
             isVector: false,
-            data: this.$data.finishIsodate
-          }
+            data: this.$data.finishIsodate,
+          },
         ]);
 
         return buildNamedCsvFileData(
           csvData,
-          `Finish ${this.$data.selectedPackages.length} packages`
+          `Finish ${this.$data.selectedPackages.length} packages`,
         );
       } catch (e) {
         console.error(e);
         return [];
       }
-    }
+    },
   },
   computed: {
     allDetailsProvided() {
@@ -203,7 +207,7 @@ export default Vue.extend({
     csvFiles(): ICsvFile[] {
       // @ts-ignore
       return this.buildCsvFiles();
-    }
+    },
   },
   data() {
     return {
@@ -214,21 +218,21 @@ export default Vue.extend({
       showHiddenDetailFields: false,
       steps: [
         {
-          stepText: "Select empty packages to finish"
+          stepText: 'Select empty packages to finish',
         },
         {
-          stepText: "Finish details"
+          stepText: 'Finish details',
         },
         {
-          stepText: "Submit"
-        }
-      ]
+          stepText: 'Submit',
+        },
+      ],
     };
   },
   async created() {},
   destroyed() {
     // Looks like modal is not actually destroyed
-  }
+  },
 });
 </script>
 

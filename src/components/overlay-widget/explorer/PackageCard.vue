@@ -42,19 +42,19 @@
 </template>
 
 <script lang="ts">
-import PickerCard from "@/components/overlay-widget/shared/PickerCard.vue";
-import PickerIcon from "@/components/overlay-widget/shared/PickerIcon.vue";
-import { PackageState } from "@/consts";
-import { IIndexedPackageData } from "@/interfaces";
-import router from "@/router/index";
-import store from "@/store/page-overlay/index";
-import { getQuantityAndUnitDescription } from "@/utils/package";
-import { unitOfMeasureNameToAbbreviation } from "@/utils/units";
-import Vue from "vue";
-import { mapState } from "vuex";
+import PickerCard from '@/components/overlay-widget/shared/PickerCard.vue';
+import PickerIcon from '@/components/overlay-widget/shared/PickerIcon.vue';
+import { PackageState } from '@/consts';
+import { IIndexedPackageData } from '@/interfaces';
+import router from '@/router/index';
+import store from '@/store/page-overlay/index';
+import { getQuantityAndUnitDescription } from '@/utils/package';
+import { unitOfMeasureNameToAbbreviation } from '@/utils/units';
+import Vue from 'vue';
+import { mapState } from 'vuex';
 
 export default Vue.extend({
-  name: "PackageCard",
+  name: 'PackageCard',
   store,
   router,
   props: {
@@ -75,16 +75,16 @@ export default Vue.extend({
     getBadgeVariant(packageState: PackageState): string {
       switch (packageState) {
         case PackageState.ACTIVE:
-          return "success";
+          return 'success';
         case PackageState.INACTIVE:
-          return "danger";
+          return 'danger';
         case PackageState.IN_TRANSIT:
-          return "dark";
+          return 'dark';
         default:
-          return "light";
+          return 'light';
       }
     },
-    getQuantityAndUnitDescription
+    getQuantityAndUnitDescription,
   },
   async created() {},
   async mounted() {},

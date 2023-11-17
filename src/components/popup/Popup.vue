@@ -8,13 +8,13 @@
     <o-auth-login></o-auth-login>
 
     <div class="p-2 flex flex-col items-stretch gap-2">
-      <b-button
+      <!-- <b-button
         variant="outline-primary"
         @click="openOptions('#/plus')"
         class="flex flex-row gap-2 justify-center items-center"
       >
         <font-awesome-icon icon="plus-circle"></font-awesome-icon><span>T3+</span>
-      </b-button>
+      </b-button> -->
 
       <b-button
         variant="outline-primary"

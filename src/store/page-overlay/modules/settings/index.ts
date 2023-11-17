@@ -5,13 +5,15 @@ import {
   PlantsTabLabel,
   SalesTabLabel,
   TagsTabLabel,
-  TransfersTabLabel,
-} from "@/consts";
-import { DarkModeState, IPluginState, SnowflakeState } from "@/interfaces";
-import { ActionContext } from "vuex";
-import { ClientActions } from "../client/consts";
-import { SettingsActions, SettingsMutations } from "./consts";
-import { ISettingsState } from "./interfaces";
+  TransfersTabLabel
+} from '@/consts';
+import {
+  BackgroundState, DarkModeState, IPluginState, SnowflakeState
+} from '@/interfaces';
+import { ActionContext } from 'vuex';
+import { ClientActions } from '../client/consts';
+import { SettingsActions, SettingsMutations } from './consts';
+import { ISettingsState } from './interfaces';
 
 const inMemoryState = {};
 
@@ -36,7 +38,7 @@ const persistedState: ISettingsState = {
   hideScreenshotButton: false,
   hideTransferSearch: false,
   landingPage: LandingPage.PACKAGES,
-  licenseKey: "",
+  licenseKey: '',
   homeLicenses: {},
   packageDefaultPageSize: 20,
   plantDefaultPageSize: 20,
@@ -45,12 +47,17 @@ const persistedState: ISettingsState = {
   efficientSpacing: false,
   autoDismissPopups: true,
   salesDefaultPageSize: 20,
+  backgroundState: BackgroundState.DEFAULT,
+  backgroundColor: '#49276a',
+  backgroundGradientStartColor: '#49276a',
+  backgroundGradientEndColor: '#ffffff',
+  backgroundImage: '',
   snowflakeState: SnowflakeState.DISABLED,
-  snowflakeCharacter: "❅",
-  snowflakeImageCrop: "none",
-  snowflakeSize: "md",
-  snowflakeImage: "",
-  snowflakeText: "LET IT SNOW",
+  snowflakeCharacter: '❅',
+  snowflakeImageCrop: 'none',
+  snowflakeSize: 'md',
+  snowflakeImage: '',
+  snowflakeText: 'LET IT SNOW',
   tagDefaultPageSize: 20,
   transferDefaultPageSize: 20,
   useLegacyScreenshot: false,
@@ -63,6 +70,7 @@ const persistedState: ISettingsState = {
   writeSettingsToChromeStorage: false,
   loadDataInParallel: true,
   usePersistedCache: false,
+  persistTimestamp: 0
 };
 
 const defaultState: ISettingsState = {
@@ -79,36 +87,40 @@ export const settingsModule = {
   },
   getters: {},
   actions: {
-    [SettingsActions.UPDATE_SETTINGS](
+    [SettingsActions.RESET_SETTINGS](
       ctx: ActionContext<ISettingsState, IPluginState>,
-      settings: any
     ) {
+      ctx.dispatch(SettingsActions.UPDATE_SETTINGS, defaultState);
+    },
+    async [SettingsActions.UPDATE_SETTINGS](
+      ctx: ActionContext<ISettingsState, IPluginState>,
+      settings: any,
+    ) {
+      console.log('updating settings');
+
       for (const [key, value] of Object.entries(settings)) {
         // @ts-ignore
         ctx.state[key] = value;
       }
+      ctx.state.persistTimestamp = Date.now();
 
-      if (ctx.state.writeSettingsToChromeStorage) {
-        console.log("Persisting settings");
-        try {
-          chrome.storage.local.set({ [ChromeStorageKeys.SETTINGS]: ctx.state });
-        } catch (e) {
-          console.error(e);
-        }
+      // Always write
+      try {
+        await chrome.storage.local.set({ [ChromeStorageKeys.SETTINGS]: ctx.state });
+      } catch (e) {
+        console.error(e);
       }
 
       ctx.dispatch(
         `client/${ClientActions.UPDATE_CLIENT_VALUES}`,
         { notify: true },
-        { root: true }
+        { root: true },
       );
     },
   },
 };
 
-export const settingsReducer = (state: ISettingsState): ISettingsState => {
-  return {
-    ...state,
-    ...inMemoryState,
-  };
-};
+export const settingsReducer = (state: ISettingsState): ISettingsState => ({
+  ...state,
+  ...inMemoryState,
+});

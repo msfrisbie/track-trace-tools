@@ -1,18 +1,18 @@
-export function env(): "production" | "development" {
+export function env(): 'production' | 'development' {
   // Unit tests are unhappy with this type
   // @ts-ignore
   return process.env.NODE_ENV;
 }
 
 export function isDevelopment(): boolean {
-  return env() === "development";
+  return env() === 'development';
 }
 
 export function origin({ divertToNullOrigin = true }: { divertToNullOrigin?: boolean } = {}) {
   if (isDevelopment()) {
     if (divertToNullOrigin) {
       // return '//localhost:0';
-      return "//httpbin.org/status/200,200,200,200,500?path=";
+      return '//httpbin.org/status/200,200,200,200,500?path=';
     }
   }
 
@@ -20,5 +20,5 @@ export function origin({ divertToNullOrigin = true }: { divertToNullOrigin?: boo
 }
 
 export function googleMapsApiKey(): string {
-  return "";
+  return '';
 }

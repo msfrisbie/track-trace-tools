@@ -1,6 +1,6 @@
-import { IAtomicService } from "@/interfaces";
-import store from "@/store/page-overlay/index";
-import { SearchActions } from "@/store/page-overlay/modules/search/consts";
+import { IAtomicService } from '@/interfaces';
+import store from '@/store/page-overlay/index';
+import { SearchActions } from '@/store/page-overlay/modules/search/consts';
 
 // export interface ISelectedPlantMetadata {
 //   plantData: IIndexedPlantData;
@@ -56,15 +56,15 @@ class SearchManager implements IAtomicService {
   // }>({ showSearchResults: false });
 
   async init() {
-    document.addEventListener("keyup", (e) => {
-      if (e.isTrusted && e.key === "Escape") {
+    document.addEventListener('keyup', (e) => {
+      if (e.isTrusted && e.key === 'Escape') {
         store.dispatch(`search/${SearchActions.SET_SHOW_SEARCH_RESULTS}`, {
           showSearchResults: false,
         });
       }
     });
 
-    document.addEventListener("click", (e) => {
+    document.addEventListener('click', (e) => {
       if (e.isTrusted) {
         store.dispatch(`search/${SearchActions.SET_SHOW_SEARCH_RESULTS}`, {
           showSearchResults: false,
@@ -187,4 +187,4 @@ class SearchManager implements IAtomicService {
   // }
 }
 
-export let searchManager = new SearchManager();
+export const searchManager = new SearchManager();

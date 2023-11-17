@@ -1,7 +1,7 @@
-import { IIndexedPackageData } from "@/interfaces";
-import Graph from "graphology";
-import Sigma from "sigma";
-import { GraphRenderAlgorithm, GraphStatus } from "./consts";
+import { IIndexedPackageData } from '@/interfaces';
+import Graph from 'graphology';
+import Sigma from 'sigma';
+import { GraphRenderAlgorithm, GraphStatus } from './consts';
 
 export interface IGraphState {
   status: GraphStatus;
@@ -46,6 +46,6 @@ export interface IGraphData {
     key: string;
     source: string;
     target: string;
-    attributes: { type: "arrow"; size: number };
+    attributes: { type: 'arrow'; size: number };
   }[];
 }

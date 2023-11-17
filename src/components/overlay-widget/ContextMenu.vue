@@ -3,15 +3,17 @@
     <b-button-group vertical>
       <template v-if="contextMenuEvent && contextMenuEvent.packageTag">
         <template v-if="pkg">
-          <b-dropdown variant="outline-primary" no-caret>
+          <b-dropdown variant="outline-primary" size="sm" no-caret>
             <template #button-content>
               <div
-                class="grid grid-cols-2 place-items-center"
-                style="grid-template-columns: auto 1fr auto"
+                class="w-full grid grid-cols-3 gap-2"
+                style="grid-template-columns: 2rem 1fr auto"
               >
-                <span>FILTER...</span>
                 <div></div>
-                <div class=""><font-awesome-icon icon="filter" /></div>
+                <span>FILTER...</span>
+                <div class="aspect-square grid place-items-center">
+                  <font-awesome-icon icon="filter" />
+                </div>
               </div>
             </template>
 
@@ -84,100 +86,7 @@
             >
           </b-dropdown>
 
-          <template v-if="isIdentityEligibleForTransferToolsImpl">
-            <b-button variant="outline-primary" class="" @click.stop.prevent="transferPackage()"
-              ><div
-                class="grid grid-cols-2 place-items-center"
-                style="grid-template-columns: auto 1fr auto"
-              >
-                <span>TRANSFER PACKAGE</span>
-                <div></div>
-                <div class=""><font-awesome-icon icon="truck" /></div>
-              </div>
-            </b-button>
-          </template>
-
-          <template v-if="clientValues['ENABLE_T3PLUS'] || t3plus">
-            <b-button
-              variant="outline-primary"
-              class=""
-              @click.stop.prevent="
-                setPackageHistorySourcePackage({ pkg }) && openPackageHistoryBuilder()
-              "
-              ><div
-                class="grid grid-cols-2 place-items-center"
-                style="grid-template-columns: auto 1fr auto"
-              >
-                <span>PACKAGE HISTORY</span>
-                <div></div>
-                <div class=""><font-awesome-icon icon="sitemap" /></div>
-              </div>
-            </b-button>
-
-            <b-button
-              variant="outline-primary"
-              class=""
-              @click.stop.prevent="
-                setExplorerData({ packageLabel: getLabelOrError(pkg) }) && openMetrcExplorer()
-              "
-              ><div
-                class="grid grid-cols-2 place-items-center"
-                style="grid-template-columns: auto 1fr auto"
-              >
-                <span>OPEN IN EXPLORER</span>
-                <div></div>
-                <div class=""><font-awesome-icon icon="sitemap" /></div>
-              </div>
-            </b-button>
-          </template>
-
-          <template v-if="isIdentityEligibleForSplitToolsImpl && isPackageEligibleForSplit">
-            <b-button variant="outline-primary" class="" @click.stop.prevent="splitPackage()"
-              ><div
-                class="grid grid-cols-2 place-items-center"
-                style="grid-template-columns: auto 1fr auto"
-              >
-                <span>SPLIT PACKAGE</span>
-                <div></div>
-                <div class=""><font-awesome-icon icon="expand-alt" /></div>
-              </div>
-            </b-button>
-          </template>
-
-          <template v-if="labTestUrls.length > 0">
-            <b-button variant="outline-primary" class="" @click.stop.prevent="viewLabTests()"
-              ><div
-                class="grid grid-cols-2 place-items-center"
-                style="grid-template-columns: auto 1fr auto"
-              >
-                <span>VIEW LAB TESTS</span>
-                <div></div>
-                <div class=""><font-awesome-icon icon="file" /></div>
-              </div>
-            </b-button>
-
-            <b-button variant="outline-primary" class="" @click.stop.prevent="printLabTests()"
-              ><div
-                class="grid grid-cols-2 place-items-center"
-                style="grid-template-columns: auto 1fr auto"
-              >
-                <span>PRINT LAB TESTS</span>
-                <div></div>
-                <div class=""><font-awesome-icon icon="print" /></div>
-              </div>
-            </b-button>
-
-            <b-button variant="outline-primary" class="" @click.stop.prevent="downloadLabTests()"
-              ><div
-                class="grid grid-cols-2 place-items-center"
-                style="grid-template-columns: auto 1fr auto"
-              >
-                <span>DOWNLOAD LAB TESTS</span>
-                <div></div>
-                <div class=""><font-awesome-icon icon="file-download" /></div>
-              </div>
-            </b-button>
-          </template>
+          <package-button-list :pkg="pkg"></package-button-list>
         </template>
 
         <template v-if="!pkg && !packageLoadError">
@@ -188,85 +97,14 @@
       </template>
 
       <template v-if="contextMenuEvent && contextMenuEvent.manifestNumber">
-        <b-button
-          v-if="enableEditTransferButton"
-          variant="outline-primary"
-          class=""
-          @click.stop.prevent="editTransfer()"
-          ><div
-            class="grid grid-cols-2 place-items-center"
-            style="grid-template-columns: auto 1fr auto"
-          >
-            <span>EDIT TRANSFER</span>
-            <div></div>
-            <div class=""><font-awesome-icon icon="edit" /></div>
-          </div>
-        </b-button>
-
-        <b-button variant="outline-primary" class="" @click.stop.prevent="viewManifest()"
-          ><div
-            class="grid grid-cols-2 place-items-center"
-            style="grid-template-columns: auto 1fr auto"
-          >
-            <span>VIEW MANIFEST</span>
-            <div></div>
-            <div class=""><font-awesome-icon icon="file" /></div>
-          </div>
-        </b-button>
-
-        <b-button variant="outline-primary" class="" @click.stop.prevent="newTabManifest()"
-          ><div
-            class="grid grid-cols-2 place-items-center"
-            style="grid-template-columns: auto 1fr auto"
-          >
-            <span>MANIFEST IN NEW TAB</span>
-            <div></div>
-            <div class=""><font-awesome-icon icon="external-link-alt" /></div>
-          </div>
-        </b-button>
-
-        <b-button variant="outline-primary" class="" @click.stop.prevent="printManifest()"
-          ><div
-            class="grid grid-cols-2 place-items-center"
-            style="grid-template-columns: auto 1fr auto"
-          >
-            <span>PRINT MANIFEST</span>
-            <div></div>
-            <div class=""><font-awesome-icon icon="print" /></div>
-          </div>
-        </b-button>
-
-        <b-button variant="outline-primary" class="" @click.stop.prevent="downloadManifest()"
-          ><div
-            class="grid grid-cols-2 place-items-center"
-            style="grid-template-columns: auto 1fr auto"
-          >
-            <span>DOWNLOAD MANIFEST</span>
-            <div></div>
-            <div class=""><font-awesome-icon icon="file-download" /></div>
-          </div>
-        </b-button>
-
-        <b-button variant="outline-primary" class="" @click.stop.prevent="createScanSheet()"
-          ><div
-            class="grid grid-cols-2 place-items-center"
-            style="grid-template-columns: auto 1fr auto"
-          >
-            <span>CREATE SCAN SHEET</span>
-            <div></div>
-            <div class=""><font-awesome-icon icon="barcode" /></div>
-          </div>
-        </b-button>
-
-        <b-dropdown variant="outline-primary" no-caret :disabled="!transfer">
+        <b-dropdown variant="outline-primary" no-caret size="sm" :disabled="!transfer">
           <template #button-content>
-            <div
-              class="grid grid-cols-2 place-items-center"
-              style="grid-template-columns: auto 1fr auto"
-            >
-              <span>SEARCH...</span>
+            <div class="w-full grid grid-cols-3 gap-2" style="grid-template-columns: 2rem 1fr auto">
               <div></div>
-              <div class=""><font-awesome-icon icon="search" /></div>
+              <span>FILTER...</span>
+              <div class="aspect-square grid place-items-center">
+                <font-awesome-icon icon="filter" />
+              </div>
             </div>
           </template>
 
@@ -321,6 +159,8 @@
             >
           </template>
         </b-dropdown>
+
+        <transfer-button-list :transfer="transfer"></transfer-button-list>
       </template>
     </b-button-group>
 
@@ -335,7 +175,9 @@
 </template>
 
 <script lang="ts">
-import { MessageType, ModalAction, ModalType, PackageState, TransferState } from "@/consts";
+import PackageButtonList from "@/components/overlay-widget/shared/PackageButtonList.vue";
+import TransferButtonList from "@/components/overlay-widget/shared/TransferButtonList.vue";
+import { MessageType } from "@/consts";
 import {
   IIndexedPackageData,
   IIndexedTransferData,
@@ -343,10 +185,8 @@ import {
   IPluginState,
 } from "@/interfaces";
 import { analyticsManager } from "@/modules/analytics-manager.module";
-import { clientBuildManager } from "@/modules/client-build-manager.module";
 import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
 import { IContextMenuEvent, modalManager } from "@/modules/modal-manager.module";
-import { searchManager } from "@/modules/search-manager.module";
 import router from "@/router/index";
 import store from "@/store/page-overlay/index";
 import { ExplorerActions } from "@/store/page-overlay/modules/explorer/consts";
@@ -356,13 +196,7 @@ import { PluginAuthActions } from "@/store/page-overlay/modules/plugin-auth/cons
 import { SearchActions } from "@/store/page-overlay/modules/search/consts";
 import { SplitPackageBuilderActions } from "@/store/page-overlay/modules/split-package-builder/consts";
 import { TransferBuilderActions } from "@/store/page-overlay/modules/transfer-builder/consts";
-import {
-  isIdentityEligibleForSplitTools,
-  isIdentityEligibleForTransferTools,
-} from "@/utils/access-control";
-import { downloadFileFromUrl, printPdfFromUrl } from "@/utils/dom";
-import { downloadLabTests, getLabelOrError, getLabTestUrlsFromPackage } from "@/utils/package";
-import { createScanSheet } from "@/utils/transfer";
+import { generatePackageMetadata, getLabelOrError } from "@/utils/package";
 import Vue from "vue";
 import { mapActions, mapState } from "vuex";
 
@@ -373,7 +207,10 @@ export default Vue.extend({
   props: {
     contextMenuEvent: Object as () => IContextMenuEvent,
   },
-  components: {},
+  components: {
+    PackageButtonList,
+    TransferButtonList,
+  },
   computed: {
     ...mapState<IPluginState>({
       clientValues: (state: IPluginState) => state.client.values,
@@ -381,34 +218,6 @@ export default Vue.extend({
       authState: (state: IPluginState) => state.pluginAuth.authState,
       oAuthState: (state: IPluginState) => state.pluginAuth.oAuthState,
     }),
-    enableEditTransferButton() {
-      if ((this.$data.transfer as IIndexedTransferData)?.TransferState !== TransferState.OUTGOING) {
-        return false;
-      }
-
-      if (!store.state.client.values["ENABLE_TRANSFER_EDIT"]) {
-        return false;
-      }
-
-      return true;
-    },
-    isIdentityEligibleForTransferToolsImpl(): boolean {
-      return isIdentityEligibleForTransferTools({
-        hostname: window.location.hostname,
-      });
-    },
-    isPackageEligibleForSplit(): boolean {
-      return this.$data.pkg?.PackageState === PackageState.ACTIVE;
-    },
-    isIdentityEligibleForSplitToolsImpl(): boolean {
-      return isIdentityEligibleForSplitTools({
-        identity: store.state.pluginAuth.authState?.identity || null,
-        hostname: window.location.hostname,
-      });
-    },
-    manifestUrl(): string {
-      return `${window.location.origin}/reports/transfers/${store.state.pluginAuth?.authState?.license}/manifest?id=${this.contextMenuEvent?.manifestNumber}`;
-    },
     manifestNumber(): string | undefined {
       return this.contextMenuEvent?.manifestNumber;
     },
@@ -418,7 +227,6 @@ export default Vue.extend({
       pkg: null as IIndexedPackageData | null,
       transfer: null as IIndexedTransferData | null,
       transferState: null,
-      labTestUrls: [],
       packageLoadError: false,
       transferLoadError: false,
     };
@@ -437,22 +245,6 @@ export default Vue.extend({
       refreshOAuthState: `pluginAuth/${PluginAuthActions.REFRESH_OAUTH_STATE}`,
       setTransferForUpdate: `transferBuilder/${TransferBuilderActions.SET_TRANSFER_FOR_UPDATE}`,
     }),
-    openPackageHistoryBuilder() {
-      analyticsManager.track(MessageType.OPENED_PACKAGE_HISTORY, {
-        source: "CONTEXT_MENU",
-      });
-      modalManager.dispatchModalEvent(ModalType.BUILDER, ModalAction.OPEN, {
-        initialRoute: "/package/history",
-      });
-    },
-    openMetrcExplorer() {
-      analyticsManager.track(MessageType.OPENED_METRC_EXPLORER, {
-        source: "CONTEXT_MENU",
-      });
-      modalManager.dispatchModalEvent(ModalType.BUILDER, ModalAction.OPEN, {
-        initialRoute: "/metrc-explorer",
-      });
-    },
     dismiss() {
       modalManager.dispatchContextMenuEvent(null);
     },
@@ -467,7 +259,7 @@ export default Vue.extend({
       this.dismiss();
 
       this.partialUpdatePackageSearchFilters({
-        packageSearchFilters: packageSearchFilters,
+        packageSearchFilters,
       });
 
       this.setSearchType({ searchType: "PACKAGES" });
@@ -488,7 +280,6 @@ export default Vue.extend({
     async updatePackage() {
       this.reset();
 
-      this.$data.labTestUrls = [];
       if (this.contextMenuEvent?.packageTag) {
         const promises: Promise<any>[] = [
           primaryDataLoader.activePackage(this.contextMenuEvent.packageTag).then((pkg) => {
@@ -505,9 +296,8 @@ export default Vue.extend({
         await Promise.allSettled(promises);
 
         if (this.$data.pkg) {
-          this.$data.labTestUrls = await getLabTestUrlsFromPackage({
+          this.$data.packageLabResultData = await generatePackageMetadata({
             pkg: this.$data.pkg,
-            showZeroResultsError: false,
           });
         } else {
           this.$data.packageLoadError = true;
@@ -543,109 +333,6 @@ export default Vue.extend({
           this.$data.transferLoadError = true;
         }
       }
-    },
-    transferPackage() {
-      analyticsManager.track(MessageType.CONTEXT_MENU_SELECT, { event: "transferPackage" });
-
-      this.addPackageToTransferList({ pkg: this.$data.pkg });
-
-      analyticsManager.track(MessageType.STARTED_TRANSFER_FROM_INLINE_BUTTON, {});
-      modalManager.dispatchModalEvent(ModalType.BUILDER, ModalAction.OPEN, {
-        initialRoute: "/transfer/transfer-builder",
-      });
-      this.dismiss();
-    },
-    splitPackage() {
-      analyticsManager.track(MessageType.CONTEXT_MENU_SELECT, { event: "splitPackage" });
-
-      this.setSplitSourcePackage({ pkg: this.$data.pkg });
-
-      analyticsManager.track(MessageType.SPLIT_PACKAGE_FROM_TOOLKIT_SEARCH, {});
-      modalManager.dispatchModalEvent(ModalType.BUILDER, ModalAction.OPEN, {
-        initialRoute: "/package/split-package",
-      });
-      this.dismiss();
-    },
-    viewLabTests() {
-      analyticsManager.track(MessageType.CONTEXT_MENU_SELECT, { event: "viewLabTests" });
-
-      modalManager.dispatchModalEvent(ModalType.DOCUMENT, ModalAction.OPEN, {
-        documentUrls: this.$data.labTestUrls,
-      });
-      analyticsManager.track(MessageType.CLICKED_VIEW_LAB_TEST_BUTTON);
-      this.dismiss();
-    },
-    printLabTests() {
-      analyticsManager.track(MessageType.CONTEXT_MENU_SELECT, { event: "printLabTests" });
-
-      printPdfFromUrl({ urls: this.$data.labTestUrls, modal: true });
-
-      analyticsManager.track(MessageType.CLICKED_PRINT_LAB_TEST_BUTTON);
-      this.dismiss();
-    },
-    downloadLabTests() {
-      analyticsManager.track(MessageType.CONTEXT_MENU_SELECT, { event: "downloadLabTests" });
-
-      downloadLabTests({ pkg: this.$data.pkg });
-
-      analyticsManager.track(MessageType.CLICKED_DOWNLOAD_LAB_TEST_BUTTON);
-      this.dismiss();
-    },
-    async editTransfer() {
-      analyticsManager.track(MessageType.CONTEXT_MENU_SELECT, { event: "editTransfer" });
-
-      await this.setTransferForUpdate({ transferForUpdate: this.$data.transfer });
-
-      modalManager.dispatchModalEvent(ModalType.BUILDER, ModalAction.OPEN, {
-        initialRoute: "/transfer/transfer-builder",
-      });
-
-      analyticsManager.track(MessageType.CLICKED_EDIT_TRANSFER);
-      this.dismiss();
-    },
-    viewManifest() {
-      analyticsManager.track(MessageType.CONTEXT_MENU_SELECT, { event: "viewManifest" });
-
-      modalManager.dispatchModalEvent(ModalType.DOCUMENT, ModalAction.OPEN, {
-        documentUrls: [this.manifestUrl],
-      });
-      analyticsManager.track(MessageType.CLICKED_VIEW_MANIFEST_BUTTON);
-      this.dismiss();
-    },
-    newTabManifest() {
-      analyticsManager.track(MessageType.CONTEXT_MENU_SELECT, { event: "newTabManifest" });
-
-      window.open(this.manifestUrl, "_blank");
-      this.dismiss();
-    },
-    printManifest() {
-      analyticsManager.track(MessageType.CONTEXT_MENU_SELECT, { event: "printManifest" });
-
-      printPdfFromUrl({ urls: [this.manifestUrl], modal: true });
-
-      analyticsManager.track(MessageType.CLICKED_PRINT_MANIFEST_BUTTON);
-      this.dismiss();
-    },
-    downloadManifest() {
-      analyticsManager.track(MessageType.CONTEXT_MENU_SELECT, { event: "downloadManifest" });
-
-      downloadFileFromUrl({
-        url: this.manifestUrl,
-        filename: `Manifest_${this.contextMenuEvent.manifestNumber}.pdf`,
-      });
-
-      analyticsManager.track(MessageType.CLICKED_DOWNLOAD_MANIFEST_BUTTON);
-      this.dismiss();
-    },
-    async createScanSheet() {
-      analyticsManager.track(MessageType.CONTEXT_MENU_SELECT, { event: "createScanSheet" });
-
-      await createScanSheet(
-        parseInt(this.contextMenuEvent.manifestNumber!),
-        this.contextMenuEvent.zeroPaddedManifestNumber!
-      );
-
-      this.dismiss();
     },
   },
   watch: {

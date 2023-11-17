@@ -1,6 +1,6 @@
 <template>
-  <div 
-    class="flex flex-col space-y-4 col-span-2" 
+  <div
+    class="flex flex-col space-y-4 col-span-2"
     style="height: 25vh; margin-bottom: 4vh;"
   >
     <div class="flex flex-col row-span-2 toolkit-scroll overflow-y-auto p-1">
@@ -48,43 +48,42 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import { mapState } from "vuex";
-import router from "@/router/index";
-import store from "@/store/page-overlay/index";
-import PickerIcon from "./PickerIcon.vue";
-import ItemCard from "./ItemCard.vue";
-import { IItemTemplate } from "@/interfaces";
-import { UnitOfMeasureName, unitOfMeasureNameToAbbreviation } from "@/utils/units";
+import Vue from 'vue';
+import { mapState } from 'vuex';
+import router from '@/router/index';
+import store from '@/store/page-overlay/index';
+import { IItemTemplate } from '@/interfaces';
+import { UnitOfMeasureName, unitOfMeasureNameToAbbreviation } from '@/utils/units';
+import PickerIcon from './PickerIcon.vue';
+import ItemCard from './ItemCard.vue';
 
 export default Vue.extend({
-  name: "ItemDataList",
+  name: 'ItemDataList',
   store,
   router,
   props: {
     items: Array as () => IItemTemplate[],
   },
-  components: {PickerIcon, ItemCard},
+  components: { PickerIcon, ItemCard },
   computed: {
-    ...mapState([])    
+    ...mapState([]),
   },
   data() {
     return {};
   },
   methods: {
     removeItem(item: IItemTemplate) {
-      this.$emit("update:items", this.items.filter((x: IItemTemplate) => x !== item));
+      this.$emit('update:items', this.items.filter((x: IItemTemplate) => x !== item));
     },
     unitOfMeasureNameToAbbreviation,
     unitOfMeasureAndWeight(item: IItemTemplate): string {
       let unitOfMeasureAndWeight: string = '';
-      if(item.UnitWeightUnitOfMeasureName)
-        unitOfMeasureAndWeight = `${item.UnitWeight} ${unitOfMeasureNameToAbbreviation(item.UnitWeightUnitOfMeasureName as UnitOfMeasureName || '')}`;
+      if (item.UnitWeightUnitOfMeasureName) unitOfMeasureAndWeight = `${item.UnitWeight} ${unitOfMeasureNameToAbbreviation(item.UnitWeightUnitOfMeasureName as UnitOfMeasureName || '')}`;
       return unitOfMeasureAndWeight;
     },
   },
   async created() {},
-  async mounted() {}
+  async mounted() {},
 });
 </script>
 

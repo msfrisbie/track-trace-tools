@@ -1,10 +1,12 @@
-import { PackageTabLabel, PlantsTabLabel, TabKey, TagsTabLabel, TransfersTabLabel } from "@/consts";
-import store from "@/store/page-overlay/index";
-import { hashObjectValueOrNull } from "@/utils/url";
-import { pageManager } from "./page-manager.module";
+import {
+  PackageTabLabel, PlantsTabLabel, TabKey, TagsTabLabel, TransfersTabLabel,
+} from '@/consts';
+import store from '@/store/page-overlay/index';
+import { hashObjectValueOrNull } from '@/utils/url';
+import { pageManager } from './page-manager.module';
 
 export function isTabActiveImpl(tab: any) {
-  return tab.getAttribute("aria-selected") === "true";
+  return tab.getAttribute('aria-selected') === 'true';
 }
 
 export function activeTabOrNullImpl(tabList: NodeList) {
@@ -29,29 +31,29 @@ export async function clickTabStartingWithImpl(
    * 1 means it must be the previously seen node
    * 2 means it was seen two nodes ago
    */
-  previousTabTextOffset: number | null = null
+  previousTabTextOffset: number | null = null,
 ) {
-  if (typeof previousTabTextOffset === "number" && !previousTabText) {
-    throw new Error("Must provide previousTabText");
+  if (typeof previousTabTextOffset === 'number' && !previousTabText) {
+    throw new Error('Must provide previousTabText');
   }
 
-  if (typeof previousTabTextOffset === "number" && previousTabTextOffset < 1) {
-    throw new Error("previousTabTextOffset must be a positive integer");
+  if (typeof previousTabTextOffset === 'number' && previousTabTextOffset < 1) {
+    throw new Error('previousTabTextOffset must be a positive integer');
   }
 
-  let seenTabs: string[] = [];
+  const seenTabs: string[] = [];
   for (let i = 0; i < tabList.length; ++i) {
     const tab = tabList[i] as HTMLElement;
 
     if (
-      tab &&
+      tab
       // Check current match
-      tab.innerText.startsWith(tabText) &&
+      && tab.innerText.startsWith(tabText)
       // Check if text was previously seen
-      (!previousTabText || seenTabs.find((x: string) => x.includes(previousTabText))) &&
+      && (!previousTabText || seenTabs.find((x: string) => x.includes(previousTabText)))
       // Check that offset matches
-      (!previousTabTextOffset ||
-        seenTabs[seenTabs.length - previousTabTextOffset] === previousTabText)
+      && (!previousTabTextOffset
+        || seenTabs[seenTabs.length - previousTabTextOffset] === previousTabText)
     ) {
       tab.click();
       await pageManager.clickSettleDelay();
@@ -80,7 +82,7 @@ export async function managePlantTabsImpl() {
     return;
   }
 
-  let tabKey = hashObjectValueOrNull("tabKey");
+  const tabKey = hashObjectValueOrNull('tabKey');
 
   switch (tabKey) {
     case TabKey.PLANTS_PLANTBATCHES_ACTIVE:
@@ -90,7 +92,7 @@ export async function managePlantTabsImpl() {
       await pageManager.clickTabStartingWith(
         pageManager.plantsTabs,
         PlantsTabLabel.INACTIVE,
-        PlantsTabLabel.IMMATURE
+        PlantsTabLabel.IMMATURE,
       );
       return;
     case TabKey.PlANTS_PLANTS_VEGETATIVE:
@@ -103,14 +105,14 @@ export async function managePlantTabsImpl() {
       await pageManager.clickTabStartingWith(
         pageManager.plantsTabs,
         PlantsTabLabel.ON_HOLD,
-        PlantsTabLabel.FLOWERING
+        PlantsTabLabel.FLOWERING,
       );
       return;
     case TabKey.PlANTS_PLANTS_INACTIVE:
       await pageManager.clickTabStartingWith(
         pageManager.plantsTabs,
         PlantsTabLabel.INACTIVE,
-        PlantsTabLabel.FLOWERING
+        PlantsTabLabel.FLOWERING,
       );
       return;
     case TabKey.PlANTS_PLANTS_ADDITIVE:
@@ -126,14 +128,14 @@ export async function managePlantTabsImpl() {
       await pageManager.clickTabStartingWith(
         pageManager.plantsTabs,
         PlantsTabLabel.ON_HOLD,
-        PlantsTabLabel.HARVESTED
+        PlantsTabLabel.HARVESTED,
       );
       return;
     case TabKey.PlANTS_HARVESTED_INACTIVE:
       await pageManager.clickTabStartingWith(
         pageManager.plantsTabs,
         PlantsTabLabel.INACTIVE,
-        PlantsTabLabel.HARVESTED
+        PlantsTabLabel.HARVESTED,
       );
       return;
   }
@@ -141,7 +143,7 @@ export async function managePlantTabsImpl() {
   if (store.state.settings?.autoOpenFloweringPlants) {
     await pageManager.clickTabStartingWith(
       pageManager.plantsTabs,
-      store.state.settings?.autoOpenPlantsTab
+      store.state.settings?.autoOpenPlantsTab,
     );
   }
 }
@@ -162,7 +164,7 @@ export async function managePackageTabsImpl() {
     return;
   }
 
-  let tabKey = hashObjectValueOrNull("tabKey");
+  const tabKey = hashObjectValueOrNull('tabKey');
 
   switch (tabKey) {
     case TabKey.PACKAGES_ACTIVE:
@@ -182,7 +184,7 @@ export async function managePackageTabsImpl() {
   if (store.state.settings?.autoOpenActivePackages) {
     await pageManager.clickTabStartingWith(
       pageManager.packageTabs,
-      store.state.settings?.autoOpenPackageTab
+      store.state.settings?.autoOpenPackageTab,
     );
   }
 }
@@ -203,7 +205,7 @@ export async function manageTransfersTabsImpl() {
     return;
   }
 
-  let tabKey = hashObjectValueOrNull("tabKey");
+  const tabKey = hashObjectValueOrNull('tabKey');
 
   switch (tabKey) {
     case TabKey.TRANSFERS_INCOMING:
@@ -220,7 +222,7 @@ export async function manageTransfersTabsImpl() {
   if (store.state.settings?.autoOpenIncomingTransfers) {
     await pageManager.clickTabStartingWith(
       pageManager.transferTabs,
-      store.state.settings?.autoOpenTransfersTab
+      store.state.settings?.autoOpenTransfersTab,
     );
   }
 }
@@ -233,7 +235,7 @@ export async function manageSalesTabsImpl() {
   if (store.state.settings?.autoOpenActiveSales) {
     await pageManager.clickTabStartingWith(
       pageManager.salesTabs,
-      store.state.settings?.autoOpenSalesTab
+      store.state.settings?.autoOpenSalesTab,
     );
   }
 }
@@ -254,7 +256,7 @@ export async function manageTagsTabsImpl() {
     return;
   }
 
-  let tabKey = hashObjectValueOrNull("tabKey");
+  const tabKey = hashObjectValueOrNull('tabKey');
 
   switch (tabKey) {
     case TabKey.TAGS_AVAILABLE:
@@ -271,7 +273,7 @@ export async function manageTagsTabsImpl() {
   if (store.state.settings?.autoOpenAvailableTags) {
     await pageManager.clickTabStartingWith(
       pageManager.tagTabs,
-      store.state.settings?.autoOpenTagsTab
+      store.state.settings?.autoOpenTagsTab,
     );
   }
 }

@@ -126,21 +126,21 @@
 </template>
 
 <script lang="ts">
-import { ModalType } from "@/consts";
-import { modalManager } from "@/modules/modal-manager.module";
-import { screenshotManager } from "@/modules/screenshot-manager.module";
-import { toastManager } from "@/modules/toast-manager.module";
-import { MutationType } from "@/mutation-types";
-import store from "@/store/page-overlay/index";
-import { AnnouncementsActions } from "@/store/page-overlay/modules/announcements/consts";
-import { FlagsActions } from "@/store/page-overlay/modules/flags/consts";
-import { IFlagsState } from "@/store/page-overlay/modules/flags/interfaces";
-import { SettingsActions, SettingsMutations } from "@/store/page-overlay/modules/settings/consts";
-import Vue from "vue";
-import { mapState } from "vuex";
+import { ModalType } from '@/consts';
+import { modalManager } from '@/modules/modal-manager.module';
+import { screenshotManager } from '@/modules/screenshot-manager.module';
+import { toastManager } from '@/modules/toast-manager.module';
+import { MutationType } from '@/mutation-types';
+import store from '@/store/page-overlay/index';
+import { AnnouncementsActions } from '@/store/page-overlay/modules/announcements/consts';
+import { FlagsActions } from '@/store/page-overlay/modules/flags/consts';
+import { IFlagsState } from '@/store/page-overlay/modules/flags/interfaces';
+import { SettingsActions, SettingsMutations } from '@/store/page-overlay/modules/settings/consts';
+import Vue from 'vue';
+import { mapState } from 'vuex';
 
 export default Vue.extend({
-  name: "DebugForm",
+  name: 'DebugForm',
   store,
   data() {
     return {
@@ -167,7 +167,7 @@ export default Vue.extend({
     }
   },
   computed: {
-    ...mapState(["flags"]),
+    ...mapState(['flags']),
     mockedFlagExists(): boolean {
       return Object.values(this.$data.flagsData.mockedFlags).some((x: any) => x.enabled === true);
     },
@@ -182,7 +182,7 @@ export default Vue.extend({
   },
   methods: {
     async toggleDebugMode() {
-      window.location.hash = "";
+      window.location.hash = '';
       store.commit(MutationType.SET_DEBUG_MODE, !store.state.debugMode);
     },
     // async createNoopTasks() {
@@ -202,15 +202,15 @@ export default Vue.extend({
     //   }
     // },
     async throwError() {
-      throw new Error("Test error");
+      throw new Error('Test error');
     },
     async testToast() {
       toastManager.openToast(`This is toast number ${this.count++}`, {
-        title: "T3",
+        title: 'T3',
         autoHideDelay: 5000,
-        variant: "primary",
+        variant: 'primary',
         appendToast: true,
-        toaster: "ttt-toaster",
+        toaster: 'ttt-toaster',
         solid: true,
       });
     },
@@ -222,29 +222,30 @@ export default Vue.extend({
       });
     },
     async resetState() {
-      store.commit(MutationType.RESET_STATE);
+      // store.commit(MutationType.RESET_STATE);
+      store.dispatch(`settings/${SettingsActions.RESET_SETTINGS}`);
     },
     async resetFlags() {
       store.dispatch(`flags/${FlagsActions.RESET_FLAGS}`);
 
-      toastManager.openToast("Flags reset", {
-        title: "T3",
+      toastManager.openToast('Flags reset', {
+        title: 'T3',
         autoHideDelay: 5000,
-        variant: "success",
+        variant: 'success',
         appendToast: true,
-        toaster: "ttt-toaster",
+        toaster: 'ttt-toaster',
         solid: true,
       });
     },
     async resetAnnouncements() {
       store.dispatch(`announcements/${AnnouncementsActions.RESET}`);
 
-      toastManager.openToast("Announcements reset", {
-        title: "T3",
+      toastManager.openToast('Announcements reset', {
+        title: 'T3',
         autoHideDelay: 5000,
-        variant: "success",
+        variant: 'success',
         appendToast: true,
-        toaster: "ttt-toaster",
+        toaster: 'ttt-toaster',
         solid: true,
       });
     },
@@ -269,12 +270,12 @@ export default Vue.extend({
       store.commit(MutationType.RESET_TRACKED_INTERACTIONS);
       this.trackedInteractions = JSON.stringify(store.state.trackedInteractions, null, 2);
 
-      toastManager.openToast("Tracked interactions reset", {
-        title: "T3",
+      toastManager.openToast('Tracked interactions reset', {
+        title: 'T3',
         autoHideDelay: 5000,
-        variant: "success",
+        variant: 'success',
         appendToast: true,
-        toaster: "ttt-toaster",
+        toaster: 'ttt-toaster',
         solid: true,
       });
     },
@@ -292,12 +293,12 @@ export default Vue.extend({
       try {
         store.dispatch(`flags/${FlagsActions.SET_FLAGS}`, updatedFlags);
 
-        toastManager.openToast("Flags updated", {
-          title: "T3",
+        toastManager.openToast('Flags updated', {
+          title: 'T3',
           autoHideDelay: 5000,
-          variant: "success",
+          variant: 'success',
           appendToast: true,
-          toaster: "ttt-toaster",
+          toaster: 'ttt-toaster',
           solid: true,
         });
       } catch (e) {
@@ -312,12 +313,12 @@ export default Vue.extend({
       try {
         store.commit(MutationType.UPDATE_TRACKED_INTERACTIONS, JSON.parse(trackedInteractionsJSON));
 
-        toastManager.openToast("Tracked interactions updated", {
-          title: "T3",
+        toastManager.openToast('Tracked interactions updated', {
+          title: 'T3',
           autoHideDelay: 5000,
-          variant: "success",
+          variant: 'success',
           appendToast: true,
-          toaster: "ttt-toaster",
+          toaster: 'ttt-toaster',
           solid: true,
         });
       } catch (e) {

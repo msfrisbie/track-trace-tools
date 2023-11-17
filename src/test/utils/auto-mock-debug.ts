@@ -1,3 +1,3 @@
-import { mockDebugUtils } from "./mocks";
+import { mockDebugUtils } from './mocks';
 
 mockDebugUtils();

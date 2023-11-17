@@ -1,12 +1,12 @@
-import { IPluginState } from "@/interfaces";
-import { ReportsMutations, ReportType } from "@/store/page-overlay/modules/reports/consts";
+import { IPluginState } from '@/interfaces';
+import { ReportsMutations, ReportType } from '@/store/page-overlay/modules/reports/consts';
 import {
   IFieldData,
   IReportConfig,
   IReportData,
   IReportsState,
-} from "@/store/page-overlay/modules/reports/interfaces";
-import { ActionContext } from "vuex";
+} from '@/store/page-overlay/modules/reports/interfaces';
+import { ActionContext } from 'vuex';
 
 interface IExampleReportFormFilters {
   // plantedDateGt: string;
@@ -64,7 +64,7 @@ export async function maybeLoadExampleReportData({
   const exampleConfig = reportConfig[ReportType.TEST];
   if (exampleConfig?.exampleFilter) {
     ctx.commit(ReportsMutations.SET_STATUS, {
-      statusMessage: { text: "Loading example data...", level: "success" },
+      statusMessage: { text: 'Loading example data...', level: 'success' },
     });
 
     let exampleData: any[] = [];

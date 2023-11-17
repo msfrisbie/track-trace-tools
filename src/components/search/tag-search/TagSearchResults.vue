@@ -74,19 +74,19 @@
 
 <script lang="ts">
 // import TagManifestCartBuilder from "@/components/search/tag-search/TagManifestCartBuilder.vue";
-import TagHistoryList from "@/components/search/tag-search/TagHistoryList.vue";
-import TagResultGroups from "@/components/search/tag-search/TagResultGroups.vue";
-import TagSearchResultDetail from "@/components/search/tag-search/TagSearchResultDetail.vue";
-import { IIndexedTagData, IPluginState, ITagData } from "@/interfaces";
-import store from "@/store/page-overlay/index";
-import { TagSearchActions } from "@/store/page-overlay/modules/tag-search/consts";
-import Vue from "vue";
-import { mapActions, mapGetters, mapState } from "vuex";
-import HistoryList from "@/components/search/shared/HistoryList.vue";
-import SearchViewSelector from "@/components/search/shared/SearchViewSelector.vue";
+import TagHistoryList from '@/components/search/tag-search/TagHistoryList.vue';
+import TagResultGroups from '@/components/search/tag-search/TagResultGroups.vue';
+import TagSearchResultDetail from '@/components/search/tag-search/TagSearchResultDetail.vue';
+import { IIndexedTagData, IPluginState, ITagData } from '@/interfaces';
+import store from '@/store/page-overlay/index';
+import { TagSearchActions } from '@/store/page-overlay/modules/tag-search/consts';
+import Vue from 'vue';
+import { mapActions, mapGetters, mapState } from 'vuex';
+import HistoryList from '@/components/search/shared/HistoryList.vue';
+import SearchViewSelector from '@/components/search/shared/SearchViewSelector.vue';
 
 export default Vue.extend({
-  name: "TagSearchResults",
+  name: 'TagSearchResults',
   store,
   components: {
     TagSearchResultDetail,
@@ -129,20 +129,19 @@ export default Vue.extend({
     }),
     ...mapGetters({}),
     filteredTags(): IIndexedTagData[] {
-      return this.tags.filter((x: IIndexedTagData) => {
-        // if (!!this.tagSearchFilters.strainName) {
-        //   if (!!x.StrainName && !x.StrainName.includes(this.tagSearchFilters.strainName)) {
-        //     return false;
-        //   }
-        // }
-        // if (!!this.tagSearchFilters.locationName) {
-        //   if (!!x.LocationName && !x.LocationName.includes(this.tagSearchFilters.locationName)) {
-        //     return false;
-        //   }
-        // }
+      return this.tags.filter((x: IIndexedTagData) =>
+      // if (!!this.tagSearchFilters.strainName) {
+      //   if (!!x.StrainName && !x.StrainName.includes(this.tagSearchFilters.strainName)) {
+      //     return false;
+      //   }
+      // }
+      // if (!!this.tagSearchFilters.locationName) {
+      //   if (!!x.LocationName && !x.LocationName.includes(this.tagSearchFilters.locationName)) {
+      //     return false;
+      //   }
+      // }
 
-        return true;
-      });
+        true);
     },
     filtersApplied(): boolean {
       return (

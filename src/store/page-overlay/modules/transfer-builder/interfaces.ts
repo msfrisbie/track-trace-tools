@@ -4,9 +4,9 @@ import {
   IMetrcTransferType,
   IUnionIndexedPackageData,
   IUnitOfMeasure,
-} from "@/interfaces";
+} from '@/interfaces';
 
-export type DriverLayoverLeg = "" | "FromLayover" | "ToLayover" | "FromAndToLayover";
+export type DriverLayoverLeg = '' | 'FromLayover' | 'ToLayover' | 'FromAndToLayover';
 
 export interface ITransferBuilderState {
   transferPackageList: IUnionIndexedPackageData[];

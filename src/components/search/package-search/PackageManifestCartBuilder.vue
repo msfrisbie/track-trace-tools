@@ -36,16 +36,16 @@
 </template>
 
 <script lang="ts">
-import PackageManifestCartPackagePreview from "@/components/search/package-search/PackageManifestCartPackagePreview.vue";
-import { MessageType, ModalAction, ModalType } from "@/consts";
-import { analyticsManager } from "@/modules/analytics-manager.module";
-import { modalManager } from "@/modules/modal-manager.module";
-import { TransferBuilderGetters } from "@/store/page-overlay/modules/transfer-builder/consts";
-import Vue from "vue";
-import { mapGetters, mapState } from "vuex";
+import PackageManifestCartPackagePreview from '@/components/search/package-search/PackageManifestCartPackagePreview.vue';
+import { MessageType, ModalAction, ModalType } from '@/consts';
+import { analyticsManager } from '@/modules/analytics-manager.module';
+import { modalManager } from '@/modules/modal-manager.module';
+import { TransferBuilderGetters } from '@/store/page-overlay/modules/transfer-builder/consts';
+import Vue from 'vue';
+import { mapGetters, mapState } from 'vuex';
 
 export default Vue.extend({
-  name: "PackageManifestCart",
+  name: 'PackageManifestCart',
   components: { PackageManifestCartPackagePreview },
   data() {
     return {};
@@ -62,7 +62,7 @@ export default Vue.extend({
     startTransfer() {
       analyticsManager.track(MessageType.STARTED_TRANSFER_FROM_TOOLKIT_SEARCH, {});
       modalManager.dispatchModalEvent(ModalType.BUILDER, ModalAction.OPEN, {
-        initialRoute: "/transfer/transfer-builder",
+        initialRoute: '/transfer/transfer-builder',
       });
     },
   },

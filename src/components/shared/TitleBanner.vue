@@ -5,24 +5,29 @@
         <track-trace-tools-logo :inverted="true" fill="#49276a" />
       </a>
 
-      <span class="text-gray-600 font-extralight tracking-widest text-4xl">T3</span>
+      <span class="text-gray-600 font-extralight tracking-widest text-4xl">{{ title }}</span>
     </div>
   </div>
 </template>
 
 <script lang="ts">
-import TrackTraceToolsLogo from "@/components/shared/TrackTraceToolsLogo.vue";
-import store from "@/store/page-overlay/index";
-import Vue from "vue";
-import { mapState } from "vuex";
+import TrackTraceToolsLogo from '@/components/shared/TrackTraceToolsLogo.vue';
+import store from '@/store/page-overlay/index';
+import Vue from 'vue';
+import { mapState } from 'vuex';
 
 export default Vue.extend({
-  name: "TitleBanner",
+  name: 'TitleBanner',
   store,
   components: {
     TrackTraceToolsLogo,
   },
-  computed: mapState(["debugMode"]),
+  computed: {
+    ...mapState(['debugMode']),
+    title(): string {
+      return store.state.client.t3plus ? 'T3+' : 'T3';
+    },
+  },
   async mounted() {},
 });
 </script>

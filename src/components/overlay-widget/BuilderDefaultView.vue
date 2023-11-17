@@ -31,11 +31,23 @@
             :disabled="!option.enabled"
             @click.stop.prevent="open(option)"
           >
-            <font-awesome-icon :icon="option.icon" />
-            <span>{{ option.text }}</span>
-            <div v-bind:style="badgeWidth(option)">
-              <template v-if="option.enabled">
-                <template v-if="option.isBeta">
+            <div class="w-full grid grid-cols-3 gap-2" style="grid-template-columns: 2rem 1fr 2rem">
+              <div class="aspect-square grid place-items-center">
+                <font-awesome-icon :icon="option.icon" />
+              </div>
+
+              <span>{{ option.text }}</span>
+
+              <div class="aspect-square grid place-items-center">
+                <template v-if="option.isPlus">
+                  <!-- flex struggles to vertical align the badge for some reason -->
+                  <b-badge
+                    style="padding-top: 0.3rem; margin-top: 0.1rem; line-height: initial"
+                    variant="primary"
+                    >T3+</b-badge
+                  ></template
+                >
+                <template v-else-if="option.isBeta">
                   <!-- flex struggles to vertical align the badge for some reason -->
                   <b-badge
                     style="padding-top: 0.3rem; margin-top: 0.1rem; line-height: initial"
@@ -43,15 +55,15 @@
                     >BETA</b-badge
                   ></template
                 >
-                <template v-if="option.isNew">
+                <template v-else-if="option.isNew">
                   <!-- flex struggles to vertical align the badge for some reason -->
                   <b-badge
                     style="padding-top: 0.3rem; margin-top: 0.1rem; line-height: initial"
                     variant="primary"
                     >NEW!</b-badge
                   ></template
-                ></template
-              >
+                >
+              </div>
             </div>
           </b-button>
         </b-button-group>
@@ -70,8 +82,7 @@ import { IPluginState } from "@/interfaces";
 import { analyticsManager } from "@/modules/analytics-manager.module";
 import router from "@/router/index";
 import store from "@/store/page-overlay/index";
-import { isIdentityEligibleForTransferTools } from "@/utils/access-control";
-import { HOST_WILDCARD, isCurrentHostAllowed } from "@/utils/builder";
+import { hasPlusImpl } from "@/utils/plus";
 import { notAvailableMessage } from "@/utils/text";
 import Vue from "vue";
 import { mapActions, mapState } from "vuex";
@@ -111,18 +122,23 @@ export default Vue.extend({
       flags: (state: IPluginState) => state.flags,
       debugMode: (state: IPluginState) => state.debugMode,
     }),
+    hasPlus(): boolean {
+      return hasPlusImpl();
+    },
     options() {
       return [
-        {
-          backgroundColor: "gray",
-          text: "T3+",
-          icon: "plus",
-          visible: !store.state.client.values["ENABLE_T3PLUS"] && !store.state.client.t3plus,
-          enabled: true,
-          isBeta: false,
-          isNew: false,
-          url: "https://www.trackandtrace.tools/plus",
-        },
+        // {
+        //   backgroundColor: "gray",
+        //   text: "T3+",
+        //   icon: "plus",
+        //   visible: !store.state.client.values.ENABLE_T3PLUS && !store.state.client.t3plus,
+        //   enabled: true,
+        //   isBeta: false,
+        //   isNew: false,
+        //   route: "/plus",
+        //   isPlus: false
+        //   // url: 'https://www.trackandtrace.tools/plus',
+        // },
         {
           backgroundColor: "#2774ae",
           text: "VERIFY",
@@ -132,6 +148,7 @@ export default Vue.extend({
           visible: false,
           isBeta: false,
           isNew: true,
+          isPlus: false,
           // helpRoute: "/help/package",
         },
         {
@@ -139,7 +156,7 @@ export default Vue.extend({
           text: "PACKAGE TOOLS",
           route: "/package",
           icon: "box",
-          enabled: isCurrentHostAllowed([HOST_WILDCARD]),
+          enabled: true,
           visible: true,
           isBeta: false,
           isNew: false,
@@ -151,7 +168,7 @@ export default Vue.extend({
           route: "/cultivator",
           icon: "leaf",
           visible: true,
-          enabled: isCurrentHostAllowed([HOST_WILDCARD]),
+          enabled: true,
           isBeta: false,
           isNew: false,
           helpRoute: "/help/cultivator",
@@ -175,38 +192,40 @@ export default Vue.extend({
           enabled: true,
           isBeta: false,
           isNew: false,
+          isPlus: true,
         },
         {
           backgroundColor: "#c14747",
           text: "EXPLORER",
           route: "/metrc-explorer",
           icon: "sitemap",
-          visible: store.state.client.values["ENABLE_T3PLUS"] || store.state.client.t3plus,
-          enabled: true,
+          visible: true,
+          enabled: store.state.client.values.ENABLE_T3PLUS || store.state.client.t3plus,
           isBeta: false,
           isNew: false,
+          isPlus: true,
         },
         {
           backgroundColor: "#c14747",
           text: "GRAPH",
           route: "/graph",
           icon: "project-diagram",
-          visible: store.state.client.values["ENABLE_T3PLUS"] || store.state.client.t3plus,
-          enabled: true,
+          visible: true,
+          enabled: store.state.client.values.ENABLE_T3PLUS || store.state.client.t3plus,
           isBeta: false,
           isNew: false,
+          isPlus: true,
         },
         {
           backgroundColor: "#773c77",
           text: "TRANSFER BUILDER",
           route: "/transfer/transfer-builder",
           icon: "truck-loading",
-          enabled: isIdentityEligibleForTransferTools({
-            hostname: window.location.hostname,
-          }),
+          enabled: store.state.client.values.ENABLE_T3PLUS || store.state.client.t3plus,
           visible: true,
           isBeta: false,
           isNew: false,
+          isPlus: true,
           helpRoute: "/help/transfer",
         },
         {
@@ -274,9 +293,6 @@ export default Vue.extend({
   },
   methods: {
     ...mapActions({}),
-    badgeWidth(option: any) {
-      return { width: !option.enabled || (!option.isBeta && !option.isNew) ? "0rem" : "" };
-    },
     open({ route, url, handler }: { route?: string; url?: string; handler?: Function }) {
       if (!route && !url && !handler) {
         throw new Error("Must provide a route or URL or handler");
@@ -300,7 +316,7 @@ export default Vue.extend({
 
       if (handler) {
         analyticsManager.track(MessageType.BUILDER_ENGAGEMENT, {
-          action: `Calling handler`,
+          action: "Calling handler",
         });
 
         handler();

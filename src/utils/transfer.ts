@@ -1,3 +1,4 @@
+import { TransferState } from "@/consts";
 import {
   IDestinationData,
   IDestinationPackageData,
@@ -6,20 +7,25 @@ import {
   IMetrcDriverData,
   IMetrcFacilityData,
   IMetrcVehicleData,
-  IRichDestinationData,
-  ITransferHistoryData,
+  IRichDestinationData, ITransferHistoryData,
+  ITransferMetadata
 } from "@/interfaces";
 import { authManager } from "@/modules/auth-manager.module";
 import {
   getDataLoaderByLicense,
-  primaryDataLoader,
+  primaryDataLoader
 } from "@/modules/data-loader/data-loader.module";
 import { dynamicConstsManager } from "@/modules/dynamic-consts-manager.module";
 import { toastManager } from "@/modules/toast-manager.module";
 import store from "@/store/page-overlay/index";
 import { OAuthState } from "@/store/page-overlay/modules/plugin-auth/consts";
 import { TransferPackageSearchAlgorithm } from "@/store/page-overlay/modules/transfer-package-search/consts";
-import { getItemNameOrError, getLabelOrError } from "./package";
+import {
+  getIdOrError,
+  getItemNameOrError,
+  getLabelOrError,
+  getLabTestResultsFromPackage
+} from "./package";
 import { createScanSheetOrError } from "./sheets-export";
 
 const DRIVER_NAME_MATCHER = /^- Driver Name: (.+)$/;
@@ -45,7 +51,7 @@ const VEHICLE_MATCHER = /^- Vehicle Make Model \(Lic. No.\): (.+) \((.+)\)$/;
 
 export async function extractRecentDestinationFacilitiesFromTransfers(): Promise<
   IMetrcFacilityData[]
-> {
+  > {
   const outgoingTransfers = await primaryDataLoader.outgoingTransfers();
 
   const facilityMap: Map<string, IMetrcFacilityData> = await dynamicConstsManager.facilityMap();
@@ -54,7 +60,7 @@ export async function extractRecentDestinationFacilitiesFromTransfers(): Promise
 
   const recentDestinationFacilitiesSet = new Set<string>();
 
-  for (let outgoingTransfer of outgoingTransfers) {
+  for (const outgoingTransfer of outgoingTransfers) {
     // DeliveryFacilities: "CCL20-0002194 (QCSC, LLC)"
     const destinationFacilityLicenseMatch = outgoingTransfer.DeliveryFacilities.match(/^[^\s]+/);
 
@@ -81,7 +87,7 @@ export async function extractRecentDestinationFacilitiesFromTransfers(): Promise
 
 export async function extractRecentTransporterFacilitiesFromTransfers(): Promise<
   IMetrcFacilityData[]
-> {
+  > {
   const outgoingTransfers = await primaryDataLoader.outgoingTransfers();
 
   const facilityMap: Map<string, IMetrcFacilityData> = await dynamicConstsManager.facilityMap();
@@ -90,10 +96,9 @@ export async function extractRecentTransporterFacilitiesFromTransfers(): Promise
 
   const recentTransporterFacilitiesSet = new Set<string>();
 
-  for (let outgoingTransfer of outgoingTransfers) {
+  for (const outgoingTransfer of outgoingTransfers) {
     // ShipperFacilityLicenseNumber: "C12-0000020-LIC"
-    const transporterFacilityLicenseMatch =
-      outgoingTransfer.ShipperFacilityLicenseNumber.match(/^[^\s]+/);
+    const transporterFacilityLicenseMatch = outgoingTransfer.ShipperFacilityLicenseNumber.match(/^[^\s]+/);
     if (transporterFacilityLicenseMatch) {
       const transporterFacilityLicense: string = transporterFacilityLicenseMatch[0];
 
@@ -128,9 +133,8 @@ export async function extractDriversAndVehiclesFromTransferHistory(): Promise<{
   const vehicles: IMetrcVehicleData[] = [];
 
   // Limit this to 25 requests
-  for (let transfer of outgoingTransfers.slice(0, 25)) {
-    const historyList: ITransferHistoryData[] =
-      await primaryDataLoader.transferHistoryByOutGoingTransferId(transfer.Id);
+  for (const transfer of outgoingTransfers.slice(0, 25)) {
+    const historyList: ITransferHistoryData[] = await primaryDataLoader.transferHistoryByOutGoingTransferId(transfer.Id);
 
     for (const history of historyList) {
       let vehicleMatch = null;
@@ -160,12 +164,12 @@ export async function extractDriversAndVehiclesFromTransferHistory(): Promise<{
         let currentDriverLicenseNumberMatch;
 
         // This is designed to minimize regex tests
-        if ((currentDriverNameMatch = description.match(DRIVER_NAME_MATCHER))) {
+        if (currentDriverNameMatch === description.match(DRIVER_NAME_MATCHER)) {
           driverNameMatch = currentDriverNameMatch;
-        } else if ((currentDriverEmployeeIdMatch = description.match(DRIVER_EMPLOYEE_ID_MATCHER))) {
+        } else if (currentDriverEmployeeIdMatch === description.match(DRIVER_EMPLOYEE_ID_MATCHER)) {
           driverEmployeeIdMatch = currentDriverEmployeeIdMatch;
         } else if (
-          (currentDriverLicenseNumberMatch = description.match(DRIVER_LICENSE_NUMBER_MATCHER))
+          currentDriverLicenseNumberMatch === description.match(DRIVER_LICENSE_NUMBER_MATCHER)
         ) {
           driverLicenseNumberMatch = currentDriverLicenseNumberMatch;
         }
@@ -191,11 +195,11 @@ export async function extractDriversAndVehiclesFromTransferHistory(): Promise<{
 }
 
 export async function createScanSheet(transferId: number, manifestNumber: string) {
-  if (!store.state.client.values["ENABLE_T3PLUS"] && !store.state.client.t3plus) {
+  if (!store.state.client.values.ENABLE_T3PLUS && !store.state.client.t3plus) {
     toastManager.openToast(
-      "This feature is only availble for T3+ users. Learn more at trackandtrace.tools/plus",
+      "This feature is only availble for T3+ users. Click here to learn more.",
       {
-        title: "T3+ Required",
+        title: "T3+",
         autoHideDelay: 5000,
         variant: "warning",
         appendToast: true,
@@ -454,4 +458,84 @@ export async function findMatchingTransferPackages({
   }
 
   return matchingRichTransfers;
+}
+
+export async function generateTransferMetadata({
+  transfer,
+  loadPackageTestData
+}: {
+  transfer: IIndexedTransferData;
+  loadPackageTestData: boolean;
+}): Promise<ITransferMetadata> {
+  const authState = await authManager.authStateOrError();
+
+  const promises: Promise<any>[] = [];
+
+  const transferMetadata: ITransferMetadata = {
+    destinations: [],
+    packages: [],
+    packagesTestResults: [],
+  };
+
+  switch (transfer.TransferState) {
+    case TransferState.INCOMING:
+    case TransferState.INCOMING_INACTIVE:
+      const packages = await primaryDataLoader.destinationPackages(transfer.DeliveryId);
+
+      transferMetadata.packages.push(...packages);
+      break;
+    case TransferState.OUTGOING:
+    case TransferState.REJECTED:
+    case TransferState.OUTGOING_INACTIVE:
+      transferMetadata.destinations = await primaryDataLoader.transferDestinations(transfer.Id);
+      for (const destination of transferMetadata.destinations) {
+        const packages = await primaryDataLoader.destinationPackages(destination.Id);
+
+        destination.packages = packages;
+        destination.transporters = await primaryDataLoader.destinationTransporters(destination.Id);
+
+        transferMetadata.packages.push(...packages);
+      }
+      break;
+    case TransferState.LAYOVER:
+    default:
+      return transferMetadata;
+  }
+
+  if (loadPackageTestData) {
+    const fileIds = new Set<number>();
+
+    for (const pkg of transferMetadata.packages) {
+      promises.push(
+        getLabTestResultsFromPackage({ pkg }).then((response) => { pkg.testResults = response; })
+      );
+    }
+
+    await Promise.allSettled(promises);
+
+    for (const pkg of transferMetadata.packages) {
+      for (const testResult of pkg.testResults!) {
+        if (testResult.LabTestResultDocumentFileId) {
+          fileIds.add(testResult.LabTestResultDocumentFileId);
+        }
+      }
+
+      const testResultPdfUrls: string[] = [...fileIds].map(
+        (fileId) =>
+          `${window.location.origin}/filesystem/${
+            authState.license
+          }/download/labtest/result/document?packageId=${getIdOrError(
+            pkg
+          )}&labTestResultDocumentFileId=${fileId}`
+      );
+
+      transferMetadata.packagesTestResults.push({
+        pkg,
+        testResults: pkg.testResults!,
+        testResultPdfUrls,
+      });
+    }
+  }
+
+  return transferMetadata;
 }

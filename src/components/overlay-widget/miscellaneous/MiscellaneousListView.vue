@@ -55,15 +55,15 @@
 </template>
 
 <script lang="ts">
-import { MessageType } from "@/consts";
-import { analyticsManager } from "@/modules/analytics-manager.module";
-import store from "@/store/page-overlay/index";
-import { notAvailableMessage } from "@/utils/text";
-import Vue from "vue";
-import { mapState } from "vuex";
+import { MessageType } from '@/consts';
+import { analyticsManager } from '@/modules/analytics-manager.module';
+import store from '@/store/page-overlay/index';
+import { notAvailableMessage } from '@/utils/text';
+import Vue from 'vue';
+import { mapState } from 'vuex';
 
 export default Vue.extend({
-  name: "MiscellaneousListView",
+  name: 'MiscellaneousListView',
   store,
   methods: {
     selectBuilderType({ text, route }: { text: string; route: string }) {
@@ -104,10 +104,10 @@ export default Vue.extend({
         //   isNew: false
         // },
         {
-          backgroundColor: "gray",
-          text: "FINALIZE SALES",
-          route: "/sales/finalize-sales",
-          icon: "dollar-sign",
+          backgroundColor: 'gray',
+          text: 'FINALIZE SALES',
+          route: '/sales/finalize-sales',
+          icon: 'dollar-sign',
           enabled: true,
           isBeta: false,
           isNew: false,
@@ -131,10 +131,10 @@ export default Vue.extend({
         //   isNew: false
         // },
         {
-          backgroundColor: "gray",
-          text: "SETTINGS",
-          route: "/settings/all",
-          icon: "sliders-h",
+          backgroundColor: 'gray',
+          text: 'SETTINGS',
+          route: '/settings/all',
+          icon: 'sliders-h',
           enabled: true,
           isBeta: false,
           isNew: false,

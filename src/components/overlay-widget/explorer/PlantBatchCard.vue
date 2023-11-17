@@ -30,18 +30,18 @@
 </template>
 
 <script lang="ts">
-import PickerCard from "@/components/overlay-widget/shared/PickerCard.vue";
-import PickerIcon from "@/components/overlay-widget/shared/PickerIcon.vue";
-import { PlantBatchState } from "@/consts";
-import { IIndexedPlantBatchData } from "@/interfaces";
-import router from "@/router/index";
-import store from "@/store/page-overlay/index";
-import { unitOfMeasureNameToAbbreviation } from "@/utils/units";
-import Vue from "vue";
-import { mapState } from "vuex";
+import PickerCard from '@/components/overlay-widget/shared/PickerCard.vue';
+import PickerIcon from '@/components/overlay-widget/shared/PickerIcon.vue';
+import { PlantBatchState } from '@/consts';
+import { IIndexedPlantBatchData } from '@/interfaces';
+import router from '@/router/index';
+import store from '@/store/page-overlay/index';
+import { unitOfMeasureNameToAbbreviation } from '@/utils/units';
+import Vue from 'vue';
+import { mapState } from 'vuex';
 
 export default Vue.extend({
-  name: "PlantBatchCard",
+  name: 'PlantBatchCard',
   store,
   router,
   props: {
@@ -62,11 +62,11 @@ export default Vue.extend({
     getBadgeVariant(plantBatchState: PlantBatchState): string {
       switch (plantBatchState) {
         case PlantBatchState.ACTIVE:
-          return "success";
+          return 'success';
         case PlantBatchState.INACTIVE:
-          return "danger";
+          return 'danger';
         default:
-          return "light";
+          return 'light';
       }
     },
   },

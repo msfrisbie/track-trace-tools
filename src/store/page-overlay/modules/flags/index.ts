@@ -1,6 +1,6 @@
-import { IPluginState } from "@/interfaces";
-import { ActionContext } from "vuex";
-import { FlagsActions, FlagsMutations } from "./consts";
+import { IPluginState } from '@/interfaces';
+import { ActionContext } from 'vuex';
+import { FlagsActions, FlagsMutations } from './consts';
 import {
   IFlagsState,
   IMockDefaultPhoneNumberForQuestions,
@@ -40,8 +40,8 @@ import {
   IMockTransporterFacilitiesBehavior,
   IMockUnitsOfMeasure,
   IMockUnitsOfMeasureBehavior,
-  IMockVehicles
-} from "./interfaces";
+  IMockVehicles,
+} from './interfaces';
 
 const inMemoryState = {};
 
@@ -52,40 +52,40 @@ const persistedState = {
     mockPlants: {
       enabled: false,
       behavior: {
-        plantCount: 250
-      } as IMockPlantsBehavior
+        plantCount: 250,
+      } as IMockPlantsBehavior,
     } as IMockPlants,
     mockPlantBatches: {
       enabled: false,
       behavior: {
-        plantBatchCount: 250
-      } as IMockPlantBatchesBehavior
+        plantBatchCount: 250,
+      } as IMockPlantBatchesBehavior,
     } as IMockPlantBatches,
     mockHarvests: {
       enabled: false,
-      behavior: {} as IMockHarvestsBehavior
+      behavior: {} as IMockHarvestsBehavior,
     } as IMockHarvests,
     mockPackages: {
       enabled: false,
       behavior: {
-        packageCount: 250
-      } as IMockPackagesBehavior
+        packageCount: 250,
+      } as IMockPackagesBehavior,
     } as IMockPackages,
     mockItems: {
       enabled: false,
-      behavior: {} as IMockItemsBehavior
+      behavior: {} as IMockItemsBehavior,
     } as IMockItems,
     mockLocations: {
       enabled: false,
-      behavior: {} as IMockLocationsBehavior
+      behavior: {} as IMockLocationsBehavior,
     } as IMockLocations,
     mockStrains: {
       enabled: false,
-      behavior: {} as IMockStrainsBehavior
+      behavior: {} as IMockStrainsBehavior,
     } as IMockStrains,
     mockTags: {
       enabled: false,
-      behavior: {} as IMockTagsBehavior
+      behavior: {} as IMockTagsBehavior,
     } as IMockTags,
     // mockItemCategories: {
     //     enabled: false,
@@ -93,7 +93,7 @@ const persistedState = {
     // } as IMockItemCategories,
     mockUnitsOfMeasure: {
       enabled: false,
-      behavior: {} as IMockUnitsOfMeasureBehavior
+      behavior: {} as IMockUnitsOfMeasureBehavior,
     } as IMockUnitsOfMeasure,
     // mockUnitsOfWeight: {
     //     enabled: false,
@@ -117,50 +117,50 @@ const persistedState = {
     // } as IMockRemediatePackageMethods,
     mockPlantBatchTypes: {
       enabled: false,
-      behavior: {} as IMockPlantBatchTypesBehavior
+      behavior: {} as IMockPlantBatchTypesBehavior,
     } as IMockPlantBatchTypes,
     mockPlantBatchGrowthPhases: {
       enabled: false,
-      behavior: {} as IMockPlantBatchGrowthPhasesBehavior
+      behavior: {} as IMockPlantBatchGrowthPhasesBehavior,
     } as IMockPlantBatchGrowthPhases,
     mockDefaultPhoneNumberForQuestions: {
       enabled: false,
-      behavior: {} as IMockDefaultPhoneNumberForQuestionsBehavior
+      behavior: {} as IMockDefaultPhoneNumberForQuestionsBehavior,
     } as IMockDefaultPhoneNumberForQuestions,
     mockFacilities: {
       enabled: false,
-      behavior: {} as IMockFacilitiesBehavior
+      behavior: {} as IMockFacilitiesBehavior,
     } as IMockFacilities,
     mockFacilityUsesLocationForPackages: {
       enabled: false,
-      behavior: {} as IMockFacilityUsesLocationForPackagesBehavior
+      behavior: {} as IMockFacilityUsesLocationForPackagesBehavior,
     } as IMockFacilityUsesLocationForPackages,
     mockDestinationFacilities: {
       enabled: false,
-      behavior: {} as IMockDesinationFacilitiesBehavior
+      behavior: {} as IMockDesinationFacilitiesBehavior,
     } as IMockDesinationFacilities,
     mockTransporterFacilities: {
       enabled: false,
-      behavior: {} as IMockTransporterFacilitiesBehavior
+      behavior: {} as IMockTransporterFacilitiesBehavior,
     } as IMockTransporterFacilities,
     mockTransferTypes: {
       enabled: false,
-      behavior: {} as IMockTransferTypesBehavior
+      behavior: {} as IMockTransferTypesBehavior,
     } as IMockTransferTypes,
     mockDrivers: {
       enabled: false,
-      behavior: {} as IMockDriversBehavior
+      behavior: {} as IMockDriversBehavior,
     } as IMockDrivers,
     mockVehicles: {
       enabled: false,
-      behavior: {} as IMockDriversBehavior
-    } as IMockVehicles
-  } as IMockFlags
+      behavior: {} as IMockDriversBehavior,
+    } as IMockVehicles,
+  } as IMockFlags,
 };
 
 const defaultState: IFlagsState = {
   ...inMemoryState,
-  ...persistedState
+  ...persistedState,
 };
 
 export const flagsModule = {
@@ -177,7 +177,7 @@ export const flagsModule = {
         // @ts-ignore
         state[key] = value;
       }
-    }
+    },
   },
   getters: {},
   actions: {
@@ -186,13 +186,11 @@ export const flagsModule = {
     },
     [FlagsActions.RESET_FLAGS](ctx: ActionContext<IFlagsState, IPluginState>) {
       ctx.commit(FlagsMutations.RESET_FLAGS);
-    }
-  }
+    },
+  },
 };
 
-export const flagsReducer = (state: IFlagsState): IFlagsState => {
-  return {
-    ...state,
-    ...inMemoryState
-  };
-};
+export const flagsReducer = (state: IFlagsState): IFlagsState => ({
+  ...state,
+  ...inMemoryState,
+});

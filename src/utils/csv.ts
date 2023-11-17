@@ -17,30 +17,30 @@ export async function downloadCsvFile({
   let csvContent = "";
 
   // Convert the 2D array to a comma-separated string with commas escaped and quotes added where necessary
-  csvFile.data.forEach(function (rowArray) {
-    let row = rowArray
-      .map(function (cell) {
+  csvFile.data.forEach((rowArray) => {
+    const row = rowArray
+      .map((cell) => {
         if (typeof cell !== "string") {
           return cell;
         }
 
         // If the cell contains a comma or a double quote, add double quotes around the cell contents and escape any double quotes
         if (cell.includes(",") || cell.includes('"')) {
-          cell = '"' + cell.replace(/"/g, '""') + '"';
+          cell = `"${cell.replace(/"/g, '""')}"`;
         }
         return cell;
       })
       .join(",");
-    csvContent += row + "\r\n";
+    csvContent += `${row}\r\n`;
   });
 
   // let fileData: string = "data:text/csv;charset=utf-8," + serialize(csvFile.data);
-  let blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+  const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
 
   // let encodedUri = encodeURI(fileData);
-  let url = URL.createObjectURL(blob);
+  const url = URL.createObjectURL(blob);
 
-  let link = document.createElement("a");
+  const link = document.createElement("a");
   link.setAttribute("href", url);
   link.setAttribute("download", csvFile.filename);
   document.body.appendChild(link); // Required for FF
@@ -58,7 +58,7 @@ interface CsvColumnData {
 export function buildCsvDataOrError(columns: CsvColumnData[]) {
   let expectedRowCount: number | null = null;
 
-  for (let column of columns) {
+  for (const column of columns) {
     if (column.isVector) {
       if (!(column.data instanceof Array)) {
         throw new Error("Vector data must be an array");
@@ -70,15 +70,11 @@ export function buildCsvDataOrError(columns: CsvColumnData[]) {
 
       if (!expectedRowCount) {
         expectedRowCount = column.data.length;
-      } else {
-        if (column.data.length !== expectedRowCount) {
-          throw new Error("Vector length mismatch");
-        }
+      } else if (column.data.length !== expectedRowCount) {
+        throw new Error("Vector length mismatch");
       }
-    } else {
-      if (column.data instanceof Array) {
-        throw new Error("Non-vector data must NOT be an array");
-      }
+    } else if (column.data instanceof Array) {
+      throw new Error("Non-vector data must NOT be an array");
     }
   }
 
@@ -91,7 +87,7 @@ export function buildCsvDataOrError(columns: CsvColumnData[]) {
   for (let rowIndex = 0; rowIndex < expectedRowCount; ++rowIndex) {
     const row = [];
 
-    for (let column of columns) {
+    for (const column of columns) {
       // @ts-ignore
       const val = column.isVector ? column.data[rowIndex] : column.data;
 

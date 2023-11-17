@@ -1,13 +1,13 @@
-import { IIndexedTagData, IPluginState, ITagFilter } from "@/interfaces";
-import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
-import { ReportsMutations, ReportType } from "@/store/page-overlay/modules/reports/consts";
+import { IIndexedTagData, IPluginState, ITagFilter } from '@/interfaces';
+import { primaryDataLoader } from '@/modules/data-loader/data-loader.module';
+import { ReportsMutations, ReportType } from '@/store/page-overlay/modules/reports/consts';
 import {
   IFieldData,
   IReportConfig,
   IReportData,
   IReportsState,
-} from "@/store/page-overlay/modules/reports/interfaces";
-import { ActionContext } from "vuex";
+} from '@/store/page-overlay/modules/reports/interfaces';
+import { ActionContext } from 'vuex';
 
 interface ITagsReportFormFilters {
   includeAvailable: boolean;
@@ -60,7 +60,7 @@ export async function maybeLoadTagsReportData({
   const tagConfig = reportConfig[ReportType.TAGS];
   if (tagConfig?.tagFilter) {
     ctx.commit(ReportsMutations.SET_STATUS, {
-      statusMessage: { text: "Loading tags...", level: "success" },
+      statusMessage: { text: 'Loading tags...', level: 'success' },
     });
 
     let tags: IIndexedTagData[] = [];
@@ -70,7 +70,7 @@ export async function maybeLoadTagsReportData({
         tags = [...tags, ...(await primaryDataLoader.availableTags())];
       } catch (e) {
         ctx.commit(ReportsMutations.SET_STATUS, {
-          statusMessage: { text: "Failed to load active tags.", level: "warning" },
+          statusMessage: { text: 'Failed to load active tags.', level: 'warning' },
         });
       }
     }
@@ -80,7 +80,7 @@ export async function maybeLoadTagsReportData({
         tags = [...tags, ...(await primaryDataLoader.usedTags())];
       } catch (e) {
         ctx.commit(ReportsMutations.SET_STATUS, {
-          statusMessage: { text: "Failed to load used tags.", level: "warning" },
+          statusMessage: { text: 'Failed to load used tags.', level: 'warning' },
         });
       }
     }
@@ -90,7 +90,7 @@ export async function maybeLoadTagsReportData({
         tags = [...tags, ...(await primaryDataLoader.voidedTags())];
       } catch (e) {
         ctx.commit(ReportsMutations.SET_STATUS, {
-          statusMessage: { text: "Failed to load voided tags.", level: "warning" },
+          statusMessage: { text: 'Failed to load voided tags.', level: 'warning' },
         });
       }
     }
@@ -99,13 +99,13 @@ export async function maybeLoadTagsReportData({
     if (!tagConfig.tagFilter.includePlant || !tagConfig.tagFilter.includePackage) {
       tags = tags.filter((tag) => {
         if (!tagConfig.tagFilter.includePlant) {
-          if (tag.TagTypeName.includes("Plant")) {
+          if (tag.TagTypeName.includes('Plant')) {
             return false;
           }
         }
 
         if (!tagConfig.tagFilter.includePackage) {
-          if (tag.TagTypeName.includes("Package")) {
+          if (tag.TagTypeName.includes('Package')) {
             return false;
           }
         }

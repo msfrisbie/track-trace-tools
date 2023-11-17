@@ -1,6 +1,6 @@
-import { IAtomicService } from "@/interfaces";
-import store from "@/store/page-overlay/index";
-import { ClientActions } from "@/store/page-overlay/modules/client/consts";
+import { IAtomicService } from '@/interfaces';
+import store from '@/store/page-overlay/index';
+import { ClientActions } from '@/store/page-overlay/modules/client/consts';
 
 class ClientBuildManager implements IAtomicService {
   async init() {
@@ -12,4 +12,4 @@ class ClientBuildManager implements IAtomicService {
   }
 }
 
-export let clientBuildManager = new ClientBuildManager();
+export const clientBuildManager = new ClientBuildManager();

@@ -13,16 +13,16 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import { mapState } from "vuex";
-import router from "@/router/index";
-import store from "@/store/page-overlay/index";
-import { normalizeToGrams } from "@/utils/units";
+import Vue from 'vue';
+import { mapState } from 'vuex';
+import router from '@/router/index';
+import store from '@/store/page-overlay/index';
+import { normalizeToGrams } from '@/utils/units';
 
 const GRAMS_PER_POUND = 453.592;
 
 export default Vue.extend({
-  name: "HarvestYieldChecker",
+  name: 'HarvestYieldChecker',
   store,
   props: {
     unitOfMeasureName: { type: String, required: true },
@@ -38,11 +38,10 @@ export default Vue.extend({
       return `${yieldAmount} ${props.unitOfMeasureName}`;
     },
     showTooBigError() {
-      const gramsPerPlant =
-        normalizeToGrams(
-          this.$props.totalQuantity,
-          this.$props.unitOfMeasureName
-        ) / this.$props.plantCount;
+      const gramsPerPlant = normalizeToGrams(
+        this.$props.totalQuantity,
+        this.$props.unitOfMeasureName,
+      ) / this.$props.plantCount;
 
       // Maximum: 5 lb
       if (gramsPerPlant > GRAMS_PER_POUND * 5) {
@@ -52,11 +51,10 @@ export default Vue.extend({
       return false;
     },
     showTooSmallError() {
-      const gramsPerPlant =
-        normalizeToGrams(
-          this.$props.totalQuantity,
-          this.$props.unitOfMeasureName
-        ) / this.$props.plantCount;
+      const gramsPerPlant = normalizeToGrams(
+        this.$props.totalQuantity,
+        this.$props.unitOfMeasureName,
+      ) / this.$props.plantCount;
 
       // Minimum: 0.1 lb
       if (gramsPerPlant < GRAMS_PER_POUND * 0.05) {

@@ -1,22 +1,21 @@
 /**
- * @param collection 
- * @param properties 
+ * @param collection
+ * @param properties
  */
 export function groupByProperties(collection: any[], properties: string[]): any[] {
-    // const groupedData = {};
+  // const groupedData = {};
 
-    // for (let item of collection) {
-    //     let ptr = groupedData;
+  // for (let item of collection) {
+  //     let ptr = groupedData;
 
-    //     for (let prop of properties) {
-    //         if (!ptr[prop]) {
-    //             ptr[prop] = {};
-    //         }
+  //     for (let prop of properties) {
+  //         if (!ptr[prop]) {
+  //             ptr[prop] = {};
+  //         }
 
-    //         ptr = ptr[prop]
-    //     }
+  //         ptr = ptr[prop]
+  //     }
 
-
-    // }
-    return [];
+  // }
+  return [];
 }

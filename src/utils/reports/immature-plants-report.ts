@@ -1,16 +1,17 @@
-import { IIndexedPlantBatchData, IPlantBatchFilter, IPluginState } from "@/interfaces";
-import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
-import { ReportsMutations, ReportType } from "@/store/page-overlay/modules/reports/consts";
+import { IIndexedPlantBatchData, ILicenseFormFilters, IPlantBatchFilter, IPluginState } from '@/interfaces';
+import { getDataLoaderByLicense, primaryDataLoader } from '@/modules/data-loader/data-loader.module';
+import { ReportsMutations, ReportType } from '@/store/page-overlay/modules/reports/consts';
 import {
-    IFieldData,
+  IFieldData,
   IReportConfig,
   IReportData,
-  IReportsState,
-} from "@/store/page-overlay/modules/reports/interfaces";
-import { ActionContext } from "vuex";
-import { todayIsodate } from "../date";
+  IReportsState
+} from '@/store/page-overlay/modules/reports/interfaces';
+import { ActionContext } from 'vuex';
+import { todayIsodate } from '../date';
+import { extractLicenseFields, licenseFilterFactory } from './reports-shared';
 
-export interface IImmaturePlantsReportFormFilters {
+export interface IImmaturePlantsReportFormFilters extends ILicenseFormFilters {
   plantedDateGt: string;
   plantedDateLt: string;
   shouldFilterPlantedDateGt: boolean;
@@ -26,6 +27,7 @@ export const immaturePlantsFormFiltersFactory: () => IImmaturePlantsReportFormFi
   shouldFilterPlantedDateLt: false,
   includeActive: true,
   includeInactive: false,
+  ...licenseFilterFactory()
 });
 
 export function addImmaturePlantsReport({
@@ -52,6 +54,7 @@ export function addImmaturePlantsReport({
 
   reportConfig[ReportType.IMMATURE_PLANTS] = {
     immaturePlantFilter,
+    ...extractLicenseFields(immaturePlantsFormFilters),
     fields,
   };
 }
@@ -66,30 +69,35 @@ export async function maybeLoadImmaturePlantsReportData({
   reportConfig: IReportConfig;
 }) {
   const immaturePlantConfig = reportConfig[ReportType.IMMATURE_PLANTS];
+
   if (immaturePlantConfig?.immaturePlantFilter) {
     ctx.commit(ReportsMutations.SET_STATUS, {
-      statusMessage: { text: "Loading plant batches...", level: "success" },
+      statusMessage: { text: 'Loading plant batches...', level: 'success' },
     });
 
     let immaturePlants: IIndexedPlantBatchData[] = [];
 
-    if (immaturePlantConfig.immaturePlantFilter.includeActive) {
-      try {
-        immaturePlants = [...immaturePlants, ...(await primaryDataLoader.plantBatches({}))];
-      } catch (e) {
-        ctx.commit(ReportsMutations.SET_STATUS, {
-          statusMessage: { text: "Failed to load active plant batches.", level: "warning" },
-        });
-      }
-    }
+    for (const license of immaturePlantConfig.licenses) {
+      const dataLoader = await getDataLoaderByLicense(license);
 
-    if (immaturePlantConfig.immaturePlantFilter.includeInactive) {
-      try {
-        immaturePlants = [...immaturePlants, ...(await primaryDataLoader.inactivePlantBatches())];
-      } catch (e) {
-        ctx.commit(ReportsMutations.SET_STATUS, {
-          statusMessage: { text: "Failed to load inactive plant batches.", level: "warning" },
-        });
+      if (immaturePlantConfig.immaturePlantFilter.includeActive) {
+        try {
+          immaturePlants = [...immaturePlants, ...(await dataLoader.plantBatches({}))];
+        } catch (e) {
+          ctx.commit(ReportsMutations.SET_STATUS, {
+            statusMessage: { text: 'Failed to load active plant batches.', level: 'warning' },
+          });
+        }
+      }
+
+      if (immaturePlantConfig.immaturePlantFilter.includeInactive) {
+        try {
+          immaturePlants = [...immaturePlants, ...(await dataLoader.inactivePlantBatches())];
+        } catch (e) {
+          ctx.commit(ReportsMutations.SET_STATUS, {
+            statusMessage: { text: 'Failed to load inactive plant batches.', level: 'warning' },
+          });
+        }
       }
     }
 

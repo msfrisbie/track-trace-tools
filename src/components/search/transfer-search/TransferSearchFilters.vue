@@ -21,17 +21,17 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import store from "@/store/page-overlay/index";
-import { IPluginState, ITransferSearchFilters } from "@/interfaces";
-import { TRANSFER_TAB_REGEX } from "@/modules/page-manager/consts";
-import { mapState } from "vuex";
-import { TransferFilterIdentifiers } from "@/consts";
-import { MutationType } from "@/mutation-types";
-import { pageManager } from "@/modules/page-manager/page-manager.module";
+import Vue from 'vue';
+import store from '@/store/page-overlay/index';
+import { IPluginState, ITransferSearchFilters } from '@/interfaces';
+import { TRANSFER_TAB_REGEX } from '@/modules/page-manager/consts';
+import { mapState } from 'vuex';
+import { TransferFilterIdentifiers } from '@/consts';
+import { MutationType } from '@/mutation-types';
+import { pageManager } from '@/modules/page-manager/page-manager.module';
 
 export default Vue.extend({
-  name: "TransferSearchFilters",
+  name: 'TransferSearchFilters',
   store,
   computed: {
     ...mapState<IPluginState>({
@@ -43,7 +43,7 @@ export default Vue.extend({
   },
   methods: {
     clearTransferManifestNumberFilter() {
-      pageManager.setTransferFilter(TransferFilterIdentifiers.ManifestNumber, "");
+      pageManager.setTransferFilter(TransferFilterIdentifiers.ManifestNumber, '');
     },
     clearMetrcSearch() {
       pageManager.resetMetrcTransferFilters();

@@ -1,28 +1,26 @@
 import {
-  IAuthState,
-  IHarvestFilter,
+  IAuthState, IHarvestFilter,
   IIndexedHarvestData,
   IIndexedPackageData,
   IIndexedPlantBatchData,
   IIndexedPlantData,
   IIndexedRichIncomingTransferData,
   IIndexedRichOutgoingTransferData,
-  IIndexedTagData,
-  IPackageFilter,
+  IIndexedTagData, IPackageFilter,
   IPlantBatchFilter,
-  IPlantFilter,
-  ISimpleSpreadsheet,
+  IPlantFilter, ISimpleSpreadsheet,
   ISpreadsheet,
   ITagFilter,
-  ITransferFilter,
-} from "@/interfaces";
-import { ImmaturePlantQuickviewDimension } from "@/utils/reports/immature-plants-quickview-report";
-import { MaturePlantQuickviewDimension } from "@/utils/reports/mature-plants-quickview-report";
+  ITransferFilter
+} from '@/interfaces';
+import { ImmaturePlantQuickviewDimension } from '@/utils/reports/immature-plants-quickview-report';
+import { MaturePlantQuickviewDimension } from '@/utils/reports/mature-plants-quickview-report';
+import { PackageQuickviewDimension } from '@/utils/reports/packages-quickview-report';
 import {
   InventoryStrategy,
-  IPackageDateMetadata,
-} from "@/utils/reports/point-in-time-inventory-report";
-import { IStatusMessage, ReportStatus, ReportType } from "./consts";
+  IPackageDateMetadata
+} from '@/utils/reports/point-in-time-inventory-report';
+import { IStatusMessage, ReportStatus, ReportType } from './consts';
 
 export interface IReportsState {
   status: ReportStatus;
@@ -47,7 +45,7 @@ export interface IReportsState {
 
 export interface IReportConfig {
   authState: IAuthState;
-  exportFormat?: "CSV" | "GOOGLE_SHEETS";
+  exportFormat?: 'CSV' | 'GOOGLE_SHEETS';
   [ReportType.TEST]?: {
     exampleFilter: any;
     fields: IFieldData[];
@@ -71,6 +69,9 @@ export interface IReportConfig {
     displayChecksum: boolean;
     displayFullTags: boolean;
     addSpacing: boolean;
+    removeFloorNugs: boolean;
+    harvestMatchFilter: string;
+    enableHarvestMatchFilter: boolean;
     fields: null;
   };
   [ReportType.COGS_TRACKER]?: {
@@ -83,6 +84,8 @@ export interface IReportConfig {
   };
   [ReportType.PACKAGES]?: {
     packageFilter: IPackageFilter;
+    onlyProductionBatches: boolean;
+    licenses: string[];
     fields: IFieldData[];
   };
   [ReportType.POINT_IN_TIME_INVENTORY]?: {
@@ -91,6 +94,7 @@ export interface IReportConfig {
     useRestrictedWindowOptimization: boolean;
     restrictedWindowDays: number;
     showDebugColumns: boolean;
+    licenses: string[];
     fields: null;
   };
   [ReportType.STRAGGLER_PACKAGES]?: {
@@ -98,6 +102,10 @@ export interface IReportConfig {
     fields: IFieldData[];
   };
   [ReportType.EMPLOYEE_AUDIT]?: {
+    activityDateGt: string | null;
+    activityDateLt: string | null;
+    includePackages: boolean;
+    includeTransfers: boolean;
     packageFilter: IPackageFilter;
     transferFilter: ITransferFilter;
     licenses: string[];
@@ -107,26 +115,34 @@ export interface IReportConfig {
     employeeQuery: string;
     fields: null;
   };
+  [ReportType.SINGLE_TRANSFER]?: {
+    manifestNumber: string;
+    fields: null;
+  },
   [ReportType.PACKAGES_QUICKVIEW]?: {
     packageFilter: IPackageFilter;
     primaryDimension: PackageQuickviewDimension;
     secondaryDimension: PackageQuickviewDimension | null;
+    licenses: string[];
     fields: null;
   };
   [ReportType.IMMATURE_PLANTS_QUICKVIEW]?: {
     plantBatchFilter: IPlantBatchFilter;
     primaryDimension: ImmaturePlantQuickviewDimension;
     secondaryDimension: ImmaturePlantQuickviewDimension | null;
+    licenses: string[];
     fields: null;
   };
   [ReportType.MATURE_PLANTS_QUICKVIEW]?: {
     plantFilter: IPlantFilter;
     primaryDimension: MaturePlantQuickviewDimension;
     secondaryDimension: MaturePlantQuickviewDimension | null;
+    licenses: string[];
     fields: null;
   };
   [ReportType.MATURE_PLANTS]?: {
     plantFilter: IPlantFilter;
+    licenses: string[];
     fields: IFieldData[];
   };
   [ReportType.OUTGOING_TRANSFERS]?: {
@@ -155,6 +171,7 @@ export interface IReportConfig {
   };
   [ReportType.IMMATURE_PLANTS]?: {
     immaturePlantFilter: IPlantBatchFilter;
+    licenses: string[];
     fields: IFieldData[];
   };
   [ReportType.TAGS]?: {
@@ -237,12 +254,17 @@ export interface IReportData {
   [ReportType.TRANSFER_HUB_TRANSFER_MANIFESTS]?: {
     richTransferHubTransfers?: IIndexedRichOutgoingTransferData[];
   };
+  [ReportType.SINGLE_TRANSFER]?: {
+    singleTransferMatrix: any[][];
+  }
 }
 
 export interface IFieldData {
   value: string;
   readableName: string;
   required: boolean;
+  initiallyChecked: boolean;
+  checkedMessage?: string;
 }
 
 export interface ICogsArchive {
@@ -253,4 +275,20 @@ export interface ICogsArchive {
   transfersKeys: string[];
   transfersPackages: any[];
   transfersPackagesKeys: string[];
+}
+
+export interface IReportOption {
+  text: string;
+  value: ReportType | null;
+  enabled: boolean;
+  visible: boolean;
+  description: string;
+  usesFieldTransformer: boolean;
+  usesFormulas: boolean;
+  isMultiSheet: boolean;
+  isCustom: boolean;
+  isSpecialty: boolean;
+  isCatalog: boolean;
+  isQuickview: boolean;
+  isHeadless: boolean;
 }

@@ -6,45 +6,29 @@
         class="flex flex-col gap-2 items-stretch"
         v-bind:class="{ 'opacity-50': reportStatus !== ReportStatus.INITIAL }"
       >
+        <div class="text-start text-gray-600 pb-2" v-if="!clientValues['ENABLE_T3PLUS'] && !t3plus">
+          Get access to advanced reports with
+          <a class="text-purple-500 underline" href="#" @click="$router.push('/plus')">T3+</a>
+        </div>
+
         <b-form-group>
           <b-form-checkbox-group v-model="selectedReports" class="flex flex-col gap-1">
-            <b-form-checkbox
-              v-for="eligibleReportOption of eligibleReportOptions"
-              v-bind:key="eligibleReportOption.value"
-              :value="eligibleReportOption"
-              :disabled="reportStatus !== ReportStatus.INITIAL"
-              ><div class="flex flex-col items-start gap-1">
-                <span class="">{{ eligibleReportOption.text }}</span>
-                <span class="text-xs text-gray-400">{{ eligibleReportOption.description }}</span>
-              </div>
-            </b-form-checkbox>
-
-            <div
-              class="text-start text-gray-600 pb-2"
-              v-if="!clientValues['ENABLE_T3PLUS'] && !t3plus"
-            >
-              Get access to advanced reports with
-              <a
-                class="text-purple-500 underline"
-                href="https://trackandtrace.tools/plus"
-                target="_blank"
-                >T3+</a
-              >
-            </div>
-
-            <b-form-checkbox
-              class="opacity-50"
-              v-for="disabledVisibleReportOption of disabledVisibleReportOptions"
-              v-bind:key="disabledVisibleReportOption.value"
-              :value="disabledVisibleReportOption.value"
-              :disabled="true"
-              ><div class="flex flex-col items-start gap-1">
-                <span class="">{{ disabledVisibleReportOption.text }}</span>
-                <!-- <span class="text-xs text-gray-400">{{
-                    disabledVisibleReportOption.description
-                  }}</span> -->
-              </div>
-            </b-form-checkbox>
+            <report-checkbox-section
+              title="CUSTOM"
+              :reportOptions="reportOptions.filter((x) => x.isCustom)"
+            ></report-checkbox-section>
+            <report-checkbox-section
+              title="QUICKVIEW"
+              :reportOptions="reportOptions.filter((x) => x.isQuickview)"
+            ></report-checkbox-section>
+            <report-checkbox-section
+              title="CATALOG"
+              :reportOptions="reportOptions.filter((x) => x.isCatalog)"
+            ></report-checkbox-section>
+            <report-checkbox-section
+              title="ADVANCED"
+              :reportOptions="reportOptions.filter((x) => x.isSpecialty)"
+            ></report-checkbox-section>
           </b-form-checkbox-group>
         </b-form-group>
       </div>
@@ -83,7 +67,9 @@
 
         <!-- COGS -->
         <template v-if="selectedReports.find((report) => report.value === ReportType.COGS)">
-          <div class="rounded border border-gray-300 p-2 flex flex-col items-stretch gap-2">
+          <div
+            class="overflow-hidden rounded border border-gray-300 p-2 flex flex-col items-stretch gap-2"
+          >
             <div class="font-semibold text-white ttt-purple-bg p-2 -m-2">COGS</div>
             <hr />
             <div class="flex flex-col items-stretch gap-4">
@@ -112,7 +98,9 @@
 
         <!-- COGS V2 -->
         <template v-if="selectedReports.find((report) => report.value === ReportType.COGS_V2)">
-          <div class="rounded border border-gray-300 p-2 flex flex-col items-stretch gap-2">
+          <div
+            class="overflow-hidden rounded border border-gray-300 p-2 flex flex-col items-stretch gap-2"
+          >
             <div class="font-semibold text-white ttt-purple-bg p-2 -m-2">COGS</div>
 
             <div>
@@ -170,12 +158,7 @@
               <hr />
 
               <simple-drawer toggleText="ADVANCED">
-                <b-form-group label="Licenses:">
-                  <b-form-checkbox-group
-                    v-model="cogsV2FormFilters.licenses"
-                    :options="cogsV2FormFilters.licenseOptions"
-                  ></b-form-checkbox-group>
-                </b-form-group>
+                <report-license-picker :formFilters="cogsV2FormFilters"></report-license-picker>
               </simple-drawer>
             </div>
           </div>
@@ -183,7 +166,9 @@
 
         <!-- COGS Tracker -->
         <template v-if="selectedReports.find((report) => report.value === ReportType.COGS_TRACKER)">
-          <div class="rounded border border-gray-300 p-2 flex flex-col items-stretch gap-2">
+          <div
+            class="overflow-hidden rounded border border-gray-300 p-2 flex flex-col items-stretch gap-2"
+          >
             <div class="font-semibold text-white ttt-purple-bg p-2 -m-2">COGS Tracker</div>
             <hr />
             <div class="flex flex-col items-stretch gap-4">
@@ -214,7 +199,9 @@
         <template
           v-if="selectedReports.find((report) => report.value === ReportType.EMPLOYEE_SAMPLES)"
         >
-          <div class="rounded border border-gray-300 p-2 flex flex-col items-stretch gap-2">
+          <div
+            class="overflow-hidden rounded border border-gray-300 p-2 flex flex-col items-stretch gap-2"
+          >
             <div class="font-semibold text-white ttt-purple-bg p-2 -m-2">Employee Samples</div>
             <hr />
             <div class="flex flex-col items-stretch gap-4">
@@ -262,7 +249,9 @@
         <template
           v-if="selectedReports.find((report) => report.value === ReportType.HARVEST_PACKAGES)"
         >
-          <div class="rounded border border-gray-300 p-2 flex flex-col items-stretch gap-2">
+          <div
+            class="overflow-hidden rounded border border-gray-300 p-2 flex flex-col items-stretch gap-2"
+          >
             <div class="font-semibold text-white ttt-purple-bg p-2 -m-2">Harvest Packages</div>
             <hr />
             <div class="flex flex-col items-stretch gap-4">
@@ -294,6 +283,10 @@
                 />
               </div>
 
+              <b-form-checkbox v-model="harvestPackagesFormFilters.removeFloorNugs">
+                <span class="leading-6">Remove "Floor Nugs" harvests</span>
+              </b-form-checkbox>
+
               <hr />
 
               <simple-drawer toggleText="ADVANCED">
@@ -309,12 +302,22 @@
                 <b-form-checkbox v-model="harvestPackagesFormFilters.addSpacing">
                   <span class="leading-6">Add spacing</span>
                 </b-form-checkbox>
-                <b-form-group label="Licenses:">
-                  <b-form-checkbox-group
-                    v-model="harvestPackagesFormFilters.licenses"
-                    :options="harvestPackagesFormFilters.licenseOptions"
-                  ></b-form-checkbox-group>
+                <b-form-checkbox v-model="harvestPackagesFormFilters.enableHarvestMatchFilter">
+                  <span class="leading-6">Use harvest match filter</span>
+                </b-form-checkbox>
+                <b-form-group
+                  v-if="harvestPackagesFormFilters.enableHarvestMatchFilter"
+                  label="Only include harvest names matching:"
+                >
+                  <b-form-input
+                    placeholder="Full or partial harvest name"
+                    v-model="harvestPackagesFormFilters.harvestMatchFilter"
+                  >
+                  </b-form-input>
                 </b-form-group>
+                <report-license-picker
+                  :formFilters="harvestPackagesFormFilters"
+                ></report-license-picker>
               </simple-drawer>
             </div>
           </div>
@@ -326,7 +329,9 @@
             selectedReports.find((report) => report.value === ReportType.POINT_IN_TIME_INVENTORY)
           "
         >
-          <div class="rounded border border-gray-300 p-2 flex flex-col items-stretch gap-2">
+          <div
+            class="overflow-hidden rounded border border-gray-300 p-2 flex flex-col items-stretch gap-2"
+          >
             <div class="font-semibold text-white ttt-purple-bg p-2 -m-2">
               Point In Time Inventory
             </div>
@@ -352,6 +357,10 @@
               <hr />
 
               <simple-drawer toggleText="ADVANCED">
+                <report-license-picker
+                  :formFilters="pointInTimeInventoryFormFilters"
+                ></report-license-picker>
+
                 <b-form-checkbox
                   v-model="pointInTimeInventoryFormFilters.useRestrictedWindowOptimization"
                 >
@@ -375,7 +384,9 @@
 
         <!-- Packages -->
         <template v-if="selectedReports.find((report) => report.value === ReportType.PACKAGES)">
-          <div class="rounded border border-gray-300 p-2 flex flex-col items-stretch gap-2">
+          <div
+            class="overflow-hidden rounded border border-gray-300 p-2 flex flex-col items-stretch gap-2"
+          >
             <div class="font-semibold text-white ttt-purple-bg p-2 -m-2">Packages</div>
             <hr />
             <div class="flex flex-col items-stretch gap-4">
@@ -389,7 +400,7 @@
                 <span class="leading-6">Include inactive packages</span>
               </b-form-checkbox>
 
-              <b-form-checkbox v-model="packagesFormFilters.includeInTransit">
+              <b-form-checkbox v-model="packagesFormFilters.includeIntransit">
                 <span class="leading-6">Include in-transit packages</span>
               </b-form-checkbox>
 
@@ -437,6 +448,14 @@
                 />
               </div>
 
+              <b-form-checkbox v-model="packagesFormFilters.onlyProductionBatches">
+                <span class="leading-6">ONLY include production batches</span>
+              </b-form-checkbox>
+
+              <simple-drawer toggleText="ADVANCED">
+                <report-license-picker :formFilters="packagesFormFilters"></report-license-picker>
+              </simple-drawer>
+
               <hr />
 
               <div class="font-semibold text-gray-700">Columns:</div>
@@ -445,14 +464,22 @@
                 v-model="fields[ReportType.PACKAGES]"
                 class="flex flex-col items-start gap-1"
               >
-                <b-form-checkbox
+                <div
                   v-for="fieldData of SHEET_FIELDS[ReportType.PACKAGES]"
                   v-bind:key="fieldData.value"
-                  :value="fieldData"
-                  :disabled="fieldData.required"
+                  class="flex flex-col gap-1 items-start"
                 >
-                  <span class="leading-6">{{ fieldData.readableName }}</span>
-                </b-form-checkbox>
+                  <b-form-checkbox :value="fieldData" :disabled="fieldData.required">
+                    <span class="leading-6">{{ fieldData.readableName }}</span>
+                  </b-form-checkbox>
+                  <template
+                    v-if="
+                      fieldData.checkedMessage && fields[ReportType.PACKAGES].includes(fieldData)
+                    "
+                  >
+                    <span class="text-red-500 text-xs">{{ fieldData.checkedMessage }}</span>
+                  </template>
+                </div>
               </b-form-checkbox-group>
 
               <div class="grid grid-cols-2 gap-2">
@@ -469,7 +496,9 @@
 
         <!-- Harvests -->
         <template v-if="selectedReports.find((report) => report.value === ReportType.HARVESTS)">
-          <div class="rounded border border-gray-300 p-2 flex flex-col items-stretch gap-2">
+          <div
+            class="overflow-hidden rounded border border-gray-300 p-2 flex flex-col items-stretch gap-2"
+          >
             <div class="font-semibold text-white ttt-purple-bg p-2 -m-2">Harvests</div>
             <hr />
             <div class="flex flex-col items-stretch gap-4">
@@ -543,7 +572,9 @@
         <template
           v-if="selectedReports.find((report) => report.value === ReportType.MATURE_PLANTS)"
         >
-          <div class="rounded border border-gray-300 p-2 flex flex-col items-stretch gap-2">
+          <div
+            class="overflow-hidden rounded border border-gray-300 p-2 flex flex-col items-stretch gap-2"
+          >
             <div class="font-semibold text-white ttt-purple-bg p-2 -m-2">Mature Plants</div>
             <hr />
             <div class="flex flex-col items-stretch gap-4">
@@ -584,6 +615,13 @@
                   v-model="maturePlantsFormFilters.plantedDateLt"
                 />
               </div>
+
+              <simple-drawer toggleText="ADVANCED">
+                <report-license-picker
+                  :formFilters="maturePlantsFormFilters"
+                ></report-license-picker>
+              </simple-drawer>
+
               <hr />
 
               <div class="font-semibold text-gray-700">Columns:</div>
@@ -623,7 +661,9 @@
         <template
           v-if="selectedReports.find((report) => report.value === ReportType.IMMATURE_PLANTS)"
         >
-          <div class="rounded border border-gray-300 p-2 flex flex-col items-stretch gap-2">
+          <div
+            class="overflow-hidden rounded border border-gray-300 p-2 flex flex-col items-stretch gap-2"
+          >
             <div class="font-semibold text-white ttt-purple-bg p-2 -m-2">Immature Plants</div>
             <hr />
             <div class="flex flex-col items-stretch gap-4">
@@ -661,6 +701,12 @@
                   v-model="immaturePlantsFormFilters.plantedDateLt"
                 />
               </div>
+
+              <simple-drawer toggleText="ADVANCED">
+                <report-license-picker
+                  :formFilters="immaturePlantsFormFilters"
+                ></report-license-picker>
+              </simple-drawer>
 
               <hr />
 
@@ -702,7 +748,9 @@
         <template
           v-if="selectedReports.find((report) => report.value === ReportType.OUTGOING_TRANSFERS)"
         >
-          <div class="rounded border border-gray-300 p-2 flex flex-col items-stretch gap-2">
+          <div
+            class="overflow-hidden rounded border border-gray-300 p-2 flex flex-col items-stretch gap-2"
+          >
             <div class="font-semibold text-white ttt-purple-bg p-2 -m-2">Outgoing Transfers</div>
             <hr />
             <div class="flex flex-col items-stretch gap-4">
@@ -717,17 +765,8 @@
               <b-form-checkbox v-model="outgoingTransfersFormFilters.includeOutgoingInactive">
                 <span class="leading-6">Include Inactive Outgoing</span>
               </b-form-checkbox>
-              <b-form-checkbox
-                :disabled="!clientValues['ENABLE_T3PLUS'] && !t3plus"
-                v-model="outgoingTransfersFormFilters.onlyWholesale"
-              >
-                <div class="flex flex-col items-start">
-                  <span class="leading-6">Only Wholesale</span>
-                </div>
-                <span v-if="!clientValues['ENABLE_T3PLUS'] && !t3plus" class="text-xs text-gray-300"
-                  >Enable this with
-                  <a href="https://trackandtrace.tools/plus" target="_blank">T3+</a></span
-                >
+              <b-form-checkbox v-model="outgoingTransfersFormFilters.onlyWholesale">
+                <span class="leading-6">Only Wholesale</span>
               </b-form-checkbox>
 
               <div class="flex flex-col items-start gap-1">
@@ -799,7 +838,9 @@
             selectedReports.find((report) => report.value === ReportType.TRANSFER_HUB_TRANSFERS)
           "
         >
-          <div class="rounded border border-gray-300 p-2 flex flex-col items-stretch gap-2">
+          <div
+            class="overflow-hidden rounded border border-gray-300 p-2 flex flex-col items-stretch gap-2"
+          >
             <div class="font-semibold text-white ttt-purple-bg p-2 -m-2">Hub Transfers</div>
             <hr />
             <div class="flex flex-col items-stretch gap-4">
@@ -873,7 +914,9 @@
         <template
           v-if="selectedReports.find((report) => report.value === ReportType.INCOMING_TRANSFERS)"
         >
-          <div class="rounded border border-gray-300 p-2 flex flex-col items-stretch gap-2">
+          <div
+            class="overflow-hidden rounded border border-gray-300 p-2 flex flex-col items-stretch gap-2"
+          >
             <div class="font-semibold text-white ttt-purple-bg p-2 -m-2">Incoming Transfers</div>
             <hr />
             <div class="flex flex-col items-stretch gap-4">
@@ -956,7 +999,9 @@
 
         <!-- Tags -->
         <template v-if="selectedReports.find((report) => report.value === ReportType.TAGS)">
-          <div class="rounded border border-gray-300 p-2 flex flex-col items-stretch gap-2">
+          <div
+            class="overflow-hidden rounded border border-gray-300 p-2 flex flex-col items-stretch gap-2"
+          >
             <div class="font-semibold text-white ttt-purple-bg p-2 -m-2">Tags</div>
             <hr />
             <div class="flex flex-col items-stretch gap-4">
@@ -1013,7 +1058,9 @@
             )
           "
         >
-          <div class="rounded border border-gray-300 p-2 flex flex-col items-stretch gap-2">
+          <div
+            class="overflow-hidden rounded border border-gray-300 p-2 flex flex-col items-stretch gap-2"
+          >
             <div class="font-semibold text-white ttt-purple-bg p-2 -m-2">
               Outgoing Transfer Manifests
             </div>
@@ -1035,13 +1082,7 @@
                 :disabled="!clientValues['ENABLE_T3PLUS'] && !t3plus"
                 v-model="outgoingTransferManifestsFormFilters.onlyWholesale"
               >
-                <div class="flex flex-col items-start">
-                  <span class="leading-6">Only Wholesale</span>
-                </div>
-                <span v-if="!clientValues['ENABLE_T3PLUS'] && !t3plus" class="text-xs text-gray-300"
-                  >Enable this with
-                  <a href="https://trackandtrace.tools/plus" target="_blank">T3+</a></span
-                >
+                <span class="leading-6">Only Wholesale</span>
               </b-form-checkbox>
 
               <div class="flex flex-col items-start gap-1">
@@ -1121,7 +1162,9 @@
         <template
           v-if="selectedReports.find((report) => report.value === ReportType.STRAGGLER_PACKAGES)"
         >
-          <div class="rounded border border-gray-300 p-2 flex flex-col items-stretch gap-2">
+          <div
+            class="overflow-hidden rounded border border-gray-300 p-2 flex flex-col items-stretch gap-2"
+          >
             <div class="font-semibold text-white ttt-purple-bg p-2 -m-2">Straggler Packages</div>
             <hr />
             <div class="flex flex-col items-stretch gap-4">
@@ -1237,16 +1280,24 @@
         <template
           v-if="selectedReports.find((report) => report.value === ReportType.EMPLOYEE_AUDIT)"
         >
-          <div class="rounded border border-gray-300 p-2 flex flex-col items-stretch gap-2">
+          <div
+            class="overflow-hidden rounded border border-gray-300 p-2 flex flex-col items-stretch gap-2"
+          >
             <div class="font-semibold text-white ttt-purple-bg p-2 -m-2">Employee Activity</div>
             <hr />
             <div class="flex flex-col items-stretch gap-4">
+              <div class="text-red-500 text-xs">
+                This report loads a significant amount of data from Metrc. For multi-license
+                operators with many packages or transfers, it's recommended you limit audit periods
+                to one month or less.
+              </div>
+
               <div class="font-semibold text-gray-700">Filters:</div>
 
               <div class="flex flex-col items-start gap-1">
                 <b-form-group
-                  label="Employee Name or Username:"
-                  description="Full or partial match, uppercase or lowercase"
+                  label="Employee Names or Usernames:"
+                  description="Full or partial match, uppercase or lowercase, separated by commas"
                 >
                   <b-form-input
                     size="sm"
@@ -1257,41 +1308,46 @@
                 </b-form-group>
               </div>
 
+              <b-form-checkbox v-model="employeeAuditFormFilters.includePackages">
+                <span class="leading-6">Include package activity</span>
+              </b-form-checkbox>
+
+              <b-form-checkbox v-model="employeeAuditFormFilters.includeTransfers">
+                <span class="leading-6">Include transfer activity</span>
+              </b-form-checkbox>
+
               <div class="flex flex-col items-start gap-1">
-                <b-form-checkbox v-model="employeeAuditFormFilters.shouldFilterLastModifiedDateGt">
-                  <span class="leading-6">Last modified on or after:</span>
+                <b-form-checkbox v-model="employeeAuditFormFilters.shouldFilterActivityDateGt">
+                  <span class="leading-6">Activity on or after:</span>
                 </b-form-checkbox>
                 <b-form-datepicker
-                  v-if="employeeAuditFormFilters.shouldFilterLastModifiedDateGt"
-                  :disabled="!employeeAuditFormFilters.shouldFilterLastModifiedDateGt"
+                  v-if="employeeAuditFormFilters.shouldFilterActivityDateGt"
+                  :disabled="!employeeAuditFormFilters.shouldFilterActivityDateGt"
                   initial-date
                   size="sm"
-                  v-model="employeeAuditFormFilters.lastModifiedDateGt"
+                  v-model="employeeAuditFormFilters.activityDateGt"
                 />
               </div>
 
               <div class="flex flex-col items-start gap-1">
-                <b-form-checkbox v-model="employeeAuditFormFilters.shouldFilterLastModifiedDateLt">
-                  <span class="leading-6">Last modified on or before:</span>
+                <b-form-checkbox v-model="employeeAuditFormFilters.shouldFilterActivityDateLt">
+                  <span class="leading-6">Activity on or before:</span>
                 </b-form-checkbox>
                 <b-form-datepicker
-                  v-if="employeeAuditFormFilters.shouldFilterLastModifiedDateLt"
-                  :disabled="!employeeAuditFormFilters.shouldFilterLastModifiedDateLt"
+                  v-if="employeeAuditFormFilters.shouldFilterActivityDateLt"
+                  :disabled="!employeeAuditFormFilters.shouldFilterActivityDateLt"
                   initial-date
                   size="sm"
-                  v-model="employeeAuditFormFilters.lastModifiedDateLt"
+                  v-model="employeeAuditFormFilters.activityDateLt"
                 />
               </div>
 
               <hr />
 
               <simple-drawer toggleText="ADVANCED">
-                <b-form-group label="Licenses:">
-                  <b-form-checkbox-group
-                    v-model="employeeAuditFormFilters.licenses"
-                    :options="employeeAuditFormFilters.licenseOptions"
-                  ></b-form-checkbox-group>
-                </b-form-group>
+                <report-license-picker
+                  :formFilters="employeeAuditFormFilters"
+                ></report-license-picker>
               </simple-drawer>
             </div>
           </div>
@@ -1301,7 +1357,9 @@
         <template
           v-if="selectedReports.find((report) => report.value === ReportType.PACKAGES_QUICKVIEW)"
         >
-          <div class="rounded border border-gray-300 p-2 flex flex-col items-stretch gap-2">
+          <div
+            class="overflow-hidden rounded border border-gray-300 p-2 flex flex-col items-stretch gap-2"
+          >
             <div class="font-semibold text-white ttt-purple-bg p-2 -m-2">Packages Quickview</div>
             <hr />
             <div class="flex flex-col items-stretch gap-4">
@@ -1325,7 +1383,7 @@
                 <span class="leading-6">Include Active</span>
               </b-form-checkbox>
 
-              <b-form-checkbox v-model="packagesQuickviewFormFilters.includeInTransit">
+              <b-form-checkbox v-model="packagesQuickviewFormFilters.includeIntransit">
                 <span class="leading-6">Include In Transit</span>
               </b-form-checkbox>
 
@@ -1358,6 +1416,12 @@
                   v-model="packagesQuickviewFormFilters.packagedDateLt"
                 />
               </div>
+
+              <simple-drawer toggleText="ADVANCED">
+                <report-license-picker
+                  :formFilters="packagesQuickviewFormFilters"
+                ></report-license-picker>
+              </simple-drawer>
             </div>
           </div>
         </template>
@@ -1368,7 +1432,9 @@
             selectedReports.find((report) => report.value === ReportType.IMMATURE_PLANTS_QUICKVIEW)
           "
         >
-          <div class="rounded border border-gray-300 p-2 flex flex-col items-stretch gap-2">
+          <div
+            class="overflow-hidden rounded border border-gray-300 p-2 flex flex-col items-stretch gap-2"
+          >
             <div class="font-semibold text-white ttt-purple-bg p-2 -m-2">
               Immature Plants Quickview
             </div>
@@ -1427,6 +1493,12 @@
                   v-model="immaturePlantsQuickviewFormFilters.plantedDateLt"
                 />
               </div>
+
+              <simple-drawer toggleText="ADVANCED">
+                <report-license-picker
+                  :formFilters="immaturePlantsQuickviewFormFilters"
+                ></report-license-picker>
+              </simple-drawer>
             </div>
           </div>
         </template>
@@ -1437,7 +1509,9 @@
             selectedReports.find((report) => report.value === ReportType.MATURE_PLANTS_QUICKVIEW)
           "
         >
-          <div class="rounded border border-gray-300 p-2 flex flex-col items-stretch gap-2">
+          <div
+            class="overflow-hidden rounded border border-gray-300 p-2 flex flex-col items-stretch gap-2"
+          >
             <div class="font-semibold text-white ttt-purple-bg p-2 -m-2">
               Mature Plants Quickview
             </div>
@@ -1498,6 +1572,12 @@
                   v-model="maturePlantsQuickviewFormFilters.plantedDateLt"
                 />
               </div>
+
+              <simple-drawer toggleText="ADVANCED">
+                <report-license-picker
+                  :formFilters="maturePlantsQuickviewFormFilters"
+                ></report-license-picker>
+              </simple-drawer>
             </div>
           </div>
         </template>
@@ -1528,7 +1608,7 @@
             :disabled="!enableCsvGenerateButton"
             >EXPORT TO CSV</b-button
           >
-          <template v-if="!isReportSelectionCsvCompatible">
+          <template v-if="!enableCsvGenerateButton && selectedReports.length > 0">
             <div class="text-xs">The selected report(s) are not CSV compatible</div>
           </template>
 
@@ -1624,6 +1704,8 @@
 </template>
 
 <script lang="ts">
+import ReportCheckboxSection from "@/components/overlay-widget/shared/ReportCheckboxSection.vue";
+import ReportLicensePicker from "@/components/overlay-widget/shared/ReportLicensePicker.vue";
 import { MessageType } from "@/consts";
 import { IPluginState } from "@/interfaces";
 import { authManager } from "@/modules/auth-manager.module";
@@ -1638,7 +1720,7 @@ import {
   ReportType,
   SHEET_FIELDS,
 } from "@/store/page-overlay/modules/reports/consts";
-import { IReportConfig } from "@/store/page-overlay/modules/reports/interfaces";
+import { IReportConfig, IReportOption } from "@/store/page-overlay/modules/reports/interfaces";
 import { getIsoDateFromOffset } from "@/utils/date";
 import { addCogsReport, cogsFormFiltersFactory } from "@/utils/reports/cogs-report";
 import {
@@ -1703,6 +1785,7 @@ import {
   addPointInTimeInventoryReport,
   pointInTimeInventoryFormFiltersFactory,
 } from "@/utils/reports/point-in-time-inventory-report";
+import { reportCatalogFactory } from "@/utils/reports/reports-shared";
 import {
   addStragglerPackagesReport,
   stragglerPackagesFormFiltersFactory,
@@ -1718,18 +1801,6 @@ import { mapActions, mapState } from "vuex";
 import ArchiveWidget from "../shared/ArchiveWidget.vue";
 import SimpleDrawer from "../shared/SimpleDrawer.vue";
 
-interface IReportOption {
-  text: string;
-  value: ReportType | null;
-  t3plus: boolean;
-  isCustom: false; // Unused
-  enabled: boolean;
-  hidden?: boolean;
-  description: string;
-  isCsvEligible: boolean;
-  isSingleton: boolean;
-}
-
 export default Vue.extend({
   name: "GoogleSheetsExport",
   store,
@@ -1738,6 +1809,8 @@ export default Vue.extend({
   components: {
     ArchiveWidget,
     SimpleDrawer,
+    ReportLicensePicker,
+    ReportCheckboxSection,
   },
   computed: {
     ...mapState<IPluginState>({
@@ -1755,11 +1828,9 @@ export default Vue.extend({
     enableCsvGenerateButton(): boolean {
       return (
         this.selectedReports.length > 0 &&
-        !this.selectedReports.find((x: IReportOption) => !x.isCsvEligible)
+        this.selectedReports.filter((x: IReportOption) => x.usesFormulas || x.isMultiSheet)
+          .length === 0
       );
-    },
-    isReportSelectionCsvCompatible(): boolean {
-      return !this.selectedReports.find((x: IReportOption) => !x.isCsvEligible);
     },
     enableGoogleSheetsGenerateButton(): boolean {
       return (
@@ -1767,12 +1838,15 @@ export default Vue.extend({
         store.state.pluginAuth.oAuthState === OAuthState.AUTHENTICATED
       );
     },
-    eligibleReportOptions(): IReportOption[] {
-      return this.eligibleReportOptionsImpl();
+    reportOptions(): IReportOption[] {
+      return reportCatalogFactory();
     },
-    disabledVisibleReportOptions(): IReportOption[] {
-      return this.disabledVisibleReportOptionsImpl();
-    },
+    // eligibleReportOptions(): IReportOption[] {
+    //   return this.eligibleReportOptionsImpl();
+    // },
+    // disabledVisibleReportOptions(): IReportOption[] {
+    //   return this.disabledVisibleReportOptionsImpl();
+    // },
     cogsV2key(): string {
       return getCogsV2CacheKey({
         licenses: this.$data.cogsV2FormFilters.licenses,
@@ -1826,7 +1900,18 @@ export default Vue.extend({
         });
         return fields;
       })(),
-      fields: _.cloneDeep(SHEET_FIELDS),
+      // These are only the selected fields
+      fields: (() => {
+        const fields = _.cloneDeep(SHEET_FIELDS);
+
+        for (const key in fields) {
+          if (Array.isArray(fields[key])) {
+            fields[key] = fields[key].filter((x) => x.initiallyChecked);
+          }
+        }
+
+        return fields;
+      })(),
       showAllRecent: false,
     };
   },
@@ -1871,269 +1956,38 @@ export default Vue.extend({
     uncheckAll(reportType: ReportType): void {
       this.fields[reportType] = _.cloneDeep(SHEET_FIELDS[reportType]).filter((x) => x.required);
     },
-    // snapshotEverything(): void {
-    //   this.selectedReports = this.eligibleReportOptions.map((x: IReportOption) => x.value);
+    // eligibleReportOptionsImpl(): IReportOption[] {
+    //   return this.reportCatalogFactory().filter((x: IReportOption) => {
+    //     if (x.hidden) {
+    //       return false;
+    //     }
+
+    //     if (!x.enabled) {
+    //       return false;
+    //     }
+
+    //     if (x.t3plus) {
+    //       return store.state.client.values.ENABLE_T3PLUS || store.state.client.t3plus;
+    //     }
+    //     return true;
+    //   });
     // },
-    reportOptionsImpl(): IReportOption[] {
-      const reportOptions: IReportOption[] = [
-        {
-          text: "Packages",
-          value: ReportType.PACKAGES,
-          t3plus: true,
-          enabled: true,
-          description: "All packages. Filter by type and date.",
-          isCustom: false,
-          isCsvEligible: true,
-          isSingleton: false,
-        },
-        {
-          text: "Point-in-time inventory",
-          value: ReportType.POINT_IN_TIME_INVENTORY,
-          t3plus: true,
-          enabled: true,
-          description: "All active packages on a certain date.",
-          isCustom: false,
-          isCsvEligible: true,
-          isSingleton: false,
-        },
-        {
-          text: "Plant Batches",
-          value: ReportType.IMMATURE_PLANTS,
-          t3plus: true,
-          enabled: true,
-          description: "All plant batches. Filter by planted date.",
-          isCustom: false,
-          isCsvEligible: true,
-          isSingleton: false,
-        },
-        {
-          text: "Mature Plants",
-          value: ReportType.MATURE_PLANTS,
-          t3plus: true,
-          enabled: true,
-          description: "All mature plants. Filter by growth phase and planted date",
-          isCustom: false,
-          isCsvEligible: true,
-          isSingleton: false,
-        },
-        {
-          text: "Incoming Transfers",
-          value: ReportType.INCOMING_TRANSFERS,
-          t3plus: true,
-          enabled: true,
-          description: "All incoming transfers. Filter by wholesale and ETA",
-          isCustom: false,
-          isCsvEligible: true,
-          isSingleton: false,
-        },
-        {
-          text: "Outgoing Transfers",
-          value: ReportType.OUTGOING_TRANSFERS,
-          t3plus: true,
-          enabled: true,
-          description: "All outgoing transfers. Filter by wholesale and ETD",
-          isCustom: false,
-          isCsvEligible: true,
-          isSingleton: false,
-        },
-        // Disabled - Destinations returns 0, more like incoming?
-        // {
-        //   text: "Hub Transfers",
-        //   value: ReportType.TRANSFER_HUB_TRANSFERS,
-        //   t3plus: false,
-        //   enabled: true,
-        //   description: "Filter by estimated time of departure",
-        //   isCustom: false,
-        // },
-        {
-          text: "Tags",
-          value: ReportType.TAGS,
-          t3plus: true,
-          enabled: true,
-          description: "All tags. Filter by status and tag type.",
-          isCustom: false,
-          isCsvEligible: true,
-          isSingleton: false,
-        },
-        {
-          text: "Harvests",
-          value: ReportType.HARVESTS,
-          t3plus: true,
-          enabled: true,
-          description: "All harvests. Filter by status and harvest date.",
-          isCustom: false,
-          isCsvEligible: true,
-          isSingleton: false,
-        },
-        {
-          text: "Outgoing Transfer Manifests",
-          value: ReportType.OUTGOING_TRANSFER_MANIFESTS,
-          t3plus: true,
-          enabled: true,
-          description: "Full transfer and package data for all outgoing transfers.",
-          isCustom: false,
-          isCsvEligible: true,
-          isSingleton: false,
-        },
-        {
-          text: "Straggler Inventory",
-          value: ReportType.STRAGGLER_PACKAGES,
-          t3plus: true,
-          enabled: true,
-          description: "Find old and empty inventory",
-          isCustom: false,
-          isCsvEligible: true,
-          isSingleton: false,
-        },
-        {
-          text: "Employee Activity",
-          value: ReportType.EMPLOYEE_AUDIT,
-          t3plus: true,
-          enabled: true,
-          description: "View all employee activity in Metrc",
-          isCustom: false,
-          isCsvEligible: true,
-          isSingleton: false,
-        },
-        {
-          text: "COGS",
-          value: ReportType.COGS_V2,
-          t3plus: false,
-          enabled: !!store.state.client.values["ENABLE_COGS"],
-          hidden: !store.state.client.values["ENABLE_COGS"],
-          description: "Generate COGS calculator",
-          isCustom: false,
-          isCsvEligible: false,
-          isSingleton: true,
-        },
-        {
-          text: "COGS Tracker",
-          value: ReportType.COGS_TRACKER,
-          t3plus: false,
-          enabled: !!store.state.client.values["ENABLE_COGS_TRACKER"],
-          hidden: !store.state.client.values["ENABLE_COGS_TRACKER"],
-          description: "Generate COGS Tracker sheets",
-          isCustom: false,
-          isCsvEligible: false,
-          isSingleton: true,
-        },
-        {
-          text: "Employee Samples",
-          value: ReportType.EMPLOYEE_SAMPLES,
-          t3plus: false,
-          enabled: !!store.state.client.values["ENABLE_EMPLOYEE_SAMPLE_TOOL"],
-          hidden: !store.state.client.values["ENABLE_EMPLOYEE_SAMPLE_TOOL"],
-          description: "Generate summary of employee samples",
-          isCustom: false,
-          isCsvEligible: false,
-          isSingleton: true,
-        },
-        {
-          text: "Harvest Packages",
-          value: ReportType.HARVEST_PACKAGES,
-          t3plus: false,
-          enabled: !!store.state.client.values["ENABLE_HARVEST_PACKAGES"],
-          hidden: !store.state.client.values["ENABLE_HARVEST_PACKAGES"],
-          description: "Generate summary of harvest packages",
-          isCustom: false,
-          isCsvEligible: true,
-          isSingleton: true,
-        },
-        {
-          text: "Packages Quickview",
-          value: ReportType.PACKAGES_QUICKVIEW,
-          t3plus: true,
-          enabled: true,
-          description: "Grouped summary of packages by item, location, and dates",
-          isCustom: false,
-          isCsvEligible: true,
-          isSingleton: false,
-        },
-        {
-          text: "Plant Batch Quickview",
-          value: ReportType.IMMATURE_PLANTS_QUICKVIEW,
-          t3plus: true,
-          enabled: true,
-          description: "Grouped summary of plant batches by strain, location, and dates",
-          isCustom: false,
-          isCsvEligible: true,
-          isSingleton: false,
-        },
-        {
-          text: "Mature Plants Quickview",
-          value: ReportType.MATURE_PLANTS_QUICKVIEW,
-          t3plus: true,
-          enabled: true,
-          description:
-            "Grouped summary of mature plants by growth phase, strain, location, and dates",
-          isCustom: false,
-          isCsvEligible: true,
-          isSingleton: false,
-        },
-        {
-          text: "Transfer Quickview",
-          value: null,
-          t3plus: true,
-          enabled: false,
-          description: "Summary of incoming, outgoing, and rejected packages",
-          isCustom: false,
-          isCsvEligible: true,
-          isSingleton: false,
-        },
-        // {
-        //   text: "Incoming Inventory",
-        //   value: null,
-        //   t3plus: true,
-        //   enabled: false,
-        //   description: "See packages not yet recieved",
-        //   isCustom: false,
-        // },
-        // {
-        //   text: "Harvested Plants",
-        //   value: null,
-        //   t3plus: true,
-        //   enabled: false,
-        //   description: "All plants and associated harvest data within this license",
-        //   isCustom: false,
-        // },
-      ];
+    // disabledVisibleReportOptionsImpl(): IReportOption[] {
+    //   return this.reportCatalogFactory().filter((x: IReportOption) => {
+    //     if (x.hidden) {
+    //       return false;
+    //     }
 
-      return reportOptions.filter((x) => !x.hidden);
-    },
-    eligibleReportOptionsImpl(): IReportOption[] {
-      return this.reportOptionsImpl().filter((x: IReportOption) => {
-        if (x.hidden) {
-          return false;
-        }
+    //     if (!x.enabled) {
+    //       return true;
+    //     }
 
-        if (!x.enabled) {
-          return false;
-        }
-
-        if (x.t3plus) {
-          return store.state.client.values["ENABLE_T3PLUS"] || store.state.client.t3plus;
-        } else {
-          return true;
-        }
-      });
-    },
-    disabledVisibleReportOptionsImpl(): IReportOption[] {
-      return this.reportOptionsImpl().filter((x: IReportOption) => {
-        if (x.hidden) {
-          return false;
-        }
-
-        if (!x.enabled) {
-          return true;
-        }
-
-        if (x.t3plus) {
-          return !store.state.client.values["ENABLE_T3PLUS"] && !store.state.client.t3plus;
-        } else {
-          return false;
-        }
-      });
-    },
+    //     if (x.t3plus) {
+    //       return !store.state.client.values.ENABLE_T3PLUS && !store.state.client.t3plus;
+    //     }
+    //     return false;
+    //   });
+    // },
     openOAuthPage(): void {
       messageBus.sendMessageToBackground(MessageType.OPEN_OPTIONS_PAGE, {
         path: "/google-sheets",
@@ -2149,7 +2003,7 @@ export default Vue.extend({
         addCogsReport({
           reportConfig,
           cogsFormFilters: this.cogsFormFilters,
-          mutableArchiveData: await this.$refs["archive"].getMutableArchiveData(),
+          mutableArchiveData: await this.$refs.archive.getMutableArchiveData(),
         });
       }
 
@@ -2383,9 +2237,10 @@ export default Vue.extend({
       immediate: true,
       handler(newValue: IReportOption[], oldValue) {
         // console.log(newValue);
-        const singleonReportTypes: ReportType[] = this.reportOptionsImpl()
-          .filter((x: IReportOption) => x.isSingleton)
-          .map((x: IReportOption) => x.value);
+
+        const singleonReportTypes: ReportType[] = reportCatalogFactory()
+          .filter((x: IReportOption) => x.isMultiSheet)
+          .map((x: IReportOption) => x.value) as ReportType[];
 
         for (const reportType of singleonReportTypes) {
           const firstSelectedSingleton = newValue.find(

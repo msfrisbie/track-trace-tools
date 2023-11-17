@@ -5,8 +5,8 @@ import {
   SalesTabLabel,
   TagsTabLabel,
   TransfersTabLabel,
-} from "@/consts";
-import { DarkModeState, SnowflakeState } from "@/interfaces";
+} from '@/consts';
+import { BackgroundState, DarkModeState, SnowflakeState } from '@/interfaces';
 
 export interface ISettingsState {
   autoOpenActivePackages: boolean;
@@ -38,11 +38,16 @@ export interface ISettingsState {
   efficientSpacing: boolean;
   autoDismissPopups: boolean;
   salesDefaultPageSize: number;
+  backgroundState: BackgroundState;
+  backgroundColor: string;
+  backgroundGradientStartColor: string;
+  backgroundGradientEndColor: string;
+  backgroundImage: string;
   snowflakeState: SnowflakeState;
   snowflakeCharacter: string;
   snowflakeSize: string;
   snowflakeImage: string;
-  snowflakeImageCrop: "none" | "square" | "circle" | "rounded";
+  snowflakeImageCrop: 'none' | 'square' | 'circle' | 'rounded';
   snowflakeText: string;
   tagDefaultPageSize: number;
   transferDefaultPageSize: number;
@@ -56,4 +61,5 @@ export interface ISettingsState {
   writeSettingsToChromeStorage: boolean;
   loadDataInParallel: boolean;
   usePersistedCache: boolean;
+  persistTimestamp: number;
 }

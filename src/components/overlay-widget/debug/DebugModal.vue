@@ -18,25 +18,25 @@
 </template>
 
 <script lang="ts">
-import DebugForm from "@/components/page-overlay/forms/DebugForm.vue";
-import Vue from "vue";
+import DebugForm from '@/components/page-overlay/forms/DebugForm.vue';
+import Vue from 'vue';
 
 export default Vue.extend({
   components: { DebugForm },
-  name: "DebugModal",
+  name: 'DebugModal',
   data() {
     return {};
   },
   methods: {
     show() {
-      this.$bvModal.show("debug-modal");
+      this.$bvModal.show('debug-modal');
     },
     hide() {
-      this.$bvModal.hide("debug-modal");
+      this.$bvModal.hide('debug-modal');
     },
     toggle() {
       // @ts-ignore
-      this.$refs["debug"].toggle();
+      this.$refs.debug.toggle();
     },
   },
   async mounted() {},

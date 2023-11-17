@@ -3,114 +3,25 @@
     <b-form class="grid grid-cols-2 gap-8">
       <div class="flex flex-col justify-start">
         <b-form-group>
-          <div class="mb-2 text-gray-400 text-lg">License Key</div>
-
-          <template v-if="!!settings.licenseKey">
-            <template v-if="clientName">
-              <div class="font-bold text-xl text-purple-800">Client: {{ clientName }}</div>
-            </template>
-            <!-- <template v-else>
-              <div class="font-bold text-red-500">Error: no matching client data</div>
-            </template> -->
-
-            <b-input-group class="items-start">
-              <b-form-input
-                id="input-licenseKey"
-                class="mb-2"
-                v-model="settings.licenseKey"
-                name="input-licenseKey"
-                disabled="disabled"
-              >
-              </b-form-input>
-
-              <b-input-group-append>
-                <b-button size="md" @click="clearLicenseKey()" variant="outline-danger"
-                  >CLEAR</b-button
-                >
-              </b-input-group-append>
-            </b-input-group>
-          </template>
-
-          <template v-else>
-            <b-input-group class="items-start">
-              <b-form-input
-                id="input-licenseKey"
-                placeholder="Paste your license key here"
-                class="mb-2"
-                v-model="unsavedLicenseKey"
-                name="input-licenseKey"
-                type="text"
-                v-on:keydown.enter.prevent="saveLicenseKey()"
-                autocomplete="off"
-              >
-              </b-form-input>
-              <b-input-group-append>
-                <b-button
-                  :disabled="!unsavedLicenseKey"
-                  size="md"
-                  @click="saveLicenseKey()"
-                  variant="outline-success"
-                  >SAVE</b-button
-                >
-              </b-input-group-append>
-            </b-input-group>
-          </template>
-
-          <a
-            class="text-purple-600 underline"
-            href="https://www.trackandtrace.tools/solutions"
-            target="_blank"
-            >What is this?</a
-          >
-        </b-form-group>
-
-        <b-button
-          class="my-4"
-          variant="outline-primary"
-          @click="navToPermissions('/check-permissions')"
-          >CHECK MY PERMISSIONS</b-button
-        >
-
-        <b-form-group>
           <div class="mb-2 text-gray-400 text-lg">Appearance &amp; Behavior</div>
 
-          <b-form-checkbox
-            id="checkbox-preventLogout"
-            class="mb-2"
-            v-model="settings.preventLogout"
-            name="checkbox-preventLogout"
-            @change="onChange()"
-          >
+          <b-form-checkbox id="checkbox-preventLogout" class="mb-2" v-model="settings.preventLogout"
+            name="checkbox-preventLogout" @change="onChange()">
             Prevent Metrc from logging me out
           </b-form-checkbox>
 
-          <b-form-checkbox
-            id="checkbox-autoDismissPopups"
-            class="mb-2"
-            v-model="settings.autoDismissPopups"
-            name="checkbox-autoDismissPopups"
-            @change="onChange()"
-          >
+          <b-form-checkbox id="checkbox-autoDismissPopups" class="mb-2" v-model="settings.autoDismissPopups"
+            name="checkbox-autoDismissPopups" @change="onChange()">
             Auto-dismiss Metrc banners
           </b-form-checkbox>
 
-          <b-form-checkbox
-            id="checkbox-fixMetrcStyling"
-            class="mb-2"
-            v-model="settings.fixMetrcStyling"
-            name="checkbox-fixMetrcStyling"
-            @change="onChange()"
-          >
+          <b-form-checkbox id="checkbox-fixMetrcStyling" class="mb-2" v-model="settings.fixMetrcStyling"
+            name="checkbox-fixMetrcStyling" @change="onChange()">
             Fix Metrc styling
           </b-form-checkbox>
 
-          <b-form-checkbox
-            id="checkbox-efficientSpacing"
-            class="mb-2"
-            v-model="settings.efficientSpacing"
-            name="checkbox-efficientSpacing"
-            @change="onChange()"
-          >
+          <b-form-checkbox id="checkbox-efficientSpacing" class="mb-2" v-model="settings.efficientSpacing"
+            name="checkbox-efficientSpacing" @change="onChange()">
             Enable high-density Metrc UI
           </b-form-checkbox>
 
@@ -125,62 +36,72 @@
           </b-form-checkbox> -->
 
           <b-form-group label="Dark mode (beta)">
-            <b-form-select
-              :options="darkModeStateOptions"
-              @change="onChange()"
-              v-model="settings.darkModeState"
-            ></b-form-select>
+            <b-form-select :options="darkModeStateOptions" @change="onChange()"
+              v-model="settings.darkModeState"></b-form-select>
           </b-form-group>
 
+          <b-form-group label="Metrc Background">
+            <b-form-select :options="backgroundOptions" @change="onChange()"
+              v-model="settings.backgroundState"></b-form-select>
+          </b-form-group>
+
+          <template v-if="settings.backgroundState === 'COLOR'">
+            <b-form-group label="Background color">
+              <input type="color" v-model="settings.backgroundColor" @change="onChange()"/>
+            </b-form-group>
+          </template>
+
+          <template v-if="settings.backgroundState === 'GRADIENT'">
+            <b-form-group label="Background gradient start color">
+              <input type="color" v-model="settings.backgroundGradientStartColor" @change="onChange()"/>
+            </b-form-group>
+
+            <b-form-group label="Background gradient end color">
+              <input type="color" v-model="settings.backgroundGradientEndColor" @change="onChange()"/>
+            </b-form-group>
+          </template>
+
+          <template v-if="settings.backgroundState === 'IMAGE'">
+            <b-form-group label="Custom background image">
+              <b-form-file v-model="backgroundImage" accept="image/*"></b-form-file>
+            </b-form-group>
+
+            <template v-if="settings.backgroundImage">
+              <div class="grid grid-cols-2 gap-2">
+                <img :src="settings.backgroundImage" />
+              </div>
+            </template>
+          </template>
+
           <b-form-group label="Snowflakes">
-            <!-- style="flex-basis: 75%" -->
-            <b-form-select
-              :options="snowflakeStateOptions"
-              @change="onChange()"
-              v-model="settings.snowflakeState"
-            ></b-form-select>
+            <b-form-select :options="snowflakeStateOptions" @change="onChange()"
+              v-model="settings.snowflakeState"></b-form-select>
           </b-form-group>
 
           <b-form-group label="Snowflake appearance" v-if="settings.snowflakeState === 'CSS'">
             <b-input-group>
-              <b-form-select
-                :options="snowflakeIconOptions"
-                @change="onChange()"
-                v-model="settings.snowflakeCharacter"
-              ></b-form-select>
-              <b-form-select
-                :options="snowflakeSizeOptions"
-                @change="onChange()"
-                v-model="settings.snowflakeSize"
-              ></b-form-select>
+              <b-form-select :options="snowflakeIconOptions" @change="onChange()"
+                v-model="settings.snowflakeCharacter"></b-form-select>
+              <b-form-select :options="snowflakeSizeOptions" @change="onChange()"
+                v-model="settings.snowflakeSize"></b-form-select>
             </b-input-group>
           </b-form-group>
           <template v-if="settings.snowflakeState === 'CSS'">
-            <b-form-group
-              label="Custom snowflake text"
-              v-if="settings.snowflakeCharacter === 'TEXT'"
-            >
-              <b-form-textarea
-                rows="3"
-                v-model="settings.snowflakeText"
-                @input="onChange()"
-              ></b-form-textarea>
+            <b-form-group label="Custom snowflake text" v-if="settings.snowflakeCharacter === 'TEXT'">
+              <b-form-textarea rows="3" v-model="settings.snowflakeText" @input="onChange()"></b-form-textarea>
             </b-form-group>
 
             <template v-if="settings.snowflakeCharacter === 'IMAGE'">
               <b-form-group label="Custom snowflake image">
-                <b-form-file v-model="image" accept="image/*"></b-form-file>
+                <b-form-file v-model="snowflakeImage" accept="image/*"></b-form-file>
               </b-form-group>
 
               <template v-if="settings.snowflakeImage">
                 <div class="grid grid-cols-2 gap-2">
                   <img :src="settings.snowflakeImage" />
-                  <b-form-group label="Crop">
-                    <b-form-select
-                      :options="snowflakeImageCropOptions"
-                      @change="onChange()"
-                      v-model="settings.snowflakeImageCrop"
-                    ></b-form-select>
+                  <b-form-group label="Crop">:
+                    <b-form-select :options="snowflakeImageCropOptions" @change="onChange()"
+                      v-model="settings.snowflakeImageCrop"></b-form-select>
                   </b-form-group>
                 </div>
               </template>
@@ -239,73 +160,42 @@
         Hide quick action buttons
       </b-form-checkbox> -->
 
-          <b-form-checkbox
-            id="checkbox-disableAutoRefreshOnModalClose"
-            class="mb-2"
-            v-model="settings.disableAutoRefreshOnModalClose"
-            name="checkbox-disableAutoRefreshOnModalClose"
-            @change="onChange()"
-          >
+          <b-form-checkbox id="checkbox-disableAutoRefreshOnModalClose" class="mb-2"
+            v-model="settings.disableAutoRefreshOnModalClose" name="checkbox-disableAutoRefreshOnModalClose"
+            @change="onChange()">
             Disable auto-refresh Metrc interface after closing modal windows
           </b-form-checkbox>
 
-          <b-form-checkbox
-            id="checkbox-preventActiveProjectPageLeave"
-            class="mb-2"
-            v-model="settings.preventActiveProjectPageLeave"
-            name="checkbox-preventActiveProjectPageLeave"
-            @change="onChange()"
-          >
+          <b-form-checkbox id="checkbox-preventActiveProjectPageLeave" class="mb-2"
+            v-model="settings.preventActiveProjectPageLeave" name="checkbox-preventActiveProjectPageLeave"
+            @change="onChange()">
             Stop me from leaving the page when T3 submit is in progress
           </b-form-checkbox>
 
-          <b-form-checkbox
-            id="checkbox-loadDataInParallel"
-            class="mb-2"
-            v-model="settings.loadDataInParallel"
-            name="checkbox-loadDataInParallel"
-            @change="onChange()"
-          >
+          <b-form-checkbox id="checkbox-loadDataInParallel" class="mb-2" v-model="settings.loadDataInParallel"
+            name="checkbox-loadDataInParallel" @change="onChange()">
             Load Metrc data in parallel
           </b-form-checkbox>
 
-          <b-form-checkbox
-            id="checkbox-useLegacyDateFormatForSubmit"
-            class="mb-2"
-            v-model="settings.useLegacyDateFormatForSubmit"
-            name="checkbox-useLegacyDateFormatForSubmit"
-            @change="onChange()"
-          >
+          <b-form-checkbox id="checkbox-useLegacyDateFormatForSubmit" class="mb-2"
+            v-model="settings.useLegacyDateFormatForSubmit" name="checkbox-useLegacyDateFormatForSubmit"
+            @change="onChange()">
             Use legacy format when submitting dates
           </b-form-checkbox>
 
-          <b-form-checkbox
-            id="checkbox-writeSettingsToChromeStorage"
-            class="mb-2"
-            v-model="settings.writeSettingsToChromeStorage"
-            name="checkbox-writeSettingsToChromeStorage"
-            @change="onChange()"
-          >
+          <b-form-checkbox id="checkbox-writeSettingsToChromeStorage" class="mb-2"
+            v-model="settings.writeSettingsToChromeStorage" name="checkbox-writeSettingsToChromeStorage"
+            @change="onChange()">
             Persist T3 to Chrome storage
           </b-form-checkbox>
 
-          <b-form-checkbox
-            id="checkbox-usePersistedCache"
-            class="mb-2"
-            v-model="settings.usePersistedCache"
-            name="checkbox-usePersistedCache"
-            @change="onChange()"
-          >
+          <b-form-checkbox id="checkbox-usePersistedCache" class="mb-2" v-model="settings.usePersistedCache"
+            name="checkbox-usePersistedCache" @change="onChange()">
             Use persisted cache
           </b-form-checkbox>
 
-          <b-form-checkbox
-            id="checkbox-disablePopups"
-            class="mb-2"
-            v-model="settings.disablePopups"
-            name="checkbox-disablePopups"
-            @change="onChange()"
-          >
+          <b-form-checkbox id="checkbox-disablePopups" class="mb-2" v-model="settings.disablePopups"
+            name="checkbox-disablePopups" @change="onChange()">
             Disable overlay messages (not recommended)
           </b-form-checkbox>
 
@@ -329,23 +219,13 @@
             Use legacy screenshot (slower, not recommended)
           </b-form-checkbox> -->
 
-          <b-form-checkbox
-            id="checkbox-hideInlineTransferButtons"
-            class="mb-2"
-            v-model="settings.hideInlineTransferButtons"
-            name="checkbox-hideInlineTransferButtons"
-            @change="onChange()"
-          >
+          <b-form-checkbox id="checkbox-hideInlineTransferButtons" class="mb-2"
+            v-model="settings.hideInlineTransferButtons" name="checkbox-hideInlineTransferButtons" @change="onChange()">
             Hide inline table buttons
           </b-form-checkbox>
 
-          <b-form-checkbox
-            id="checkbox-hideFacilityPicker"
-            class="mb-2"
-            v-model="settings.hideFacilityPicker"
-            name="checkbox-hideFacilityPicker"
-            @change="onChange()"
-          >
+          <b-form-checkbox id="checkbox-hideFacilityPicker" class="mb-2" v-model="settings.hideFacilityPicker"
+            name="checkbox-hideFacilityPicker" @change="onChange()">
             Use default Metrc facility picker
           </b-form-checkbox>
 
@@ -363,176 +243,130 @@
         </b-form-group>
       </div>
 
-      <div class="flex flex-col justify-start">
-        <b-form-group>
-          <div class="mb-2 text-gray-400 text-lg">Packages</div>
+      <div class="grid grid-cols-2 items-center justify-start gap-2">
+        <b-form-group class="col-span-2">
+          <template v-if="!!settings.licenseKey">
+            <template v-if="clientName">
+              <div class="font-bold text-xl text-purple-800">Client: {{ clientName }}</div>
+            </template>
+            <!-- <template v-else>
+              <div class="font-bold text-red-500">Error: no matching client data</div>
+            </template> -->
 
-          <div class="mb-2 flex flex-row items-center gap-2">
-            <b-form-checkbox
-              id="checkbox-autoOpenActivePackages"
-              v-model="settings.autoOpenActivePackages"
-              name="checkbox-autoOpenActivePackages"
-              @change="onChange()"
-            >
-            </b-form-checkbox>
+            <b-input-group class="items-start">
+              <b-form-input id="input-licenseKey" class="mb-2" v-model="settings.licenseKey" name="input-licenseKey"
+                disabled="disabled">
+              </b-form-input>
 
-            <span>Auto-open Packages tab</span>
+              <b-input-group-append>
+                <b-button size="md" @click="clearLicenseKey()" variant="outline-danger">CLEAR</b-button>
+              </b-input-group-append>
+            </b-input-group>
+          </template>
 
-            <b-form-select
-              class="w-40"
-              v-model="settings.autoOpenPackageTab"
-              :options="packageTabOptions"
-              @change="onChange()"
-              v-if="settings.autoOpenActivePackages"
-            ></b-form-select>
-          </div>
+          <template v-else>
+            <b-input-group class="items-start">
+              <b-form-input id="input-licenseKey" placeholder="Paste your license key here" class="mb-2"
+                v-model="unsavedLicenseKey" name="input-licenseKey" type="text"
+                v-on:keydown.enter.prevent="saveLicenseKey()" autocomplete="off">
+              </b-form-input>
+              <b-input-group-append>
+                <b-button :disabled="!unsavedLicenseKey" size="md" @click="saveLicenseKey()"
+                  variant="outline-success">SAVE</b-button>
+              </b-input-group-append>
+            </b-input-group>
+          </template>
 
-          <b-form-group label-cols="6" content-cols="6" label="Viewing # Packages:">
-            <b-form-select
-              v-model="settings.packageDefaultPageSize"
-              :options="pageSizeOptions"
-              @change="onChange()"
-            ></b-form-select>
-          </b-form-group>
+          <a class="text-purple-600 underline" href="https://www.trackandtrace.tools/solutions" target="_blank">What is
+            this?</a>
         </b-form-group>
 
-        <b-form-group>
-          <div class="mt-4 mb-2 text-gray-400 text-lg">Transfers</div>
+        <b-button-group vertical class="col-span-2 mb-4">
+          <b-button variant="outline-primary" @click="resetSettings()">RESET SETTINGS</b-button>
+          <b-button variant="outline-primary" @click="navToPermissions('/check-permissions')">CHECK MY
+            PERMISSIONS</b-button>
+        </b-button-group>
 
-          <b-form-checkbox
-            id="checkbox-enableManifestDocumentViewer"
-            class="mb-2"
-            v-model="settings.enableManifestDocumentViewer"
-            name="checkbox-enableManifestDocumentViewer"
-            @change="onChange()"
-          >
-            Always use T3 PDF viewer for manifests
-          </b-form-checkbox>
+        <div class="col-span-2 text-gray-400 text-lg">Packages</div>
 
-          <div class="mb-2 flex flex-row items-center gap-2">
-            <b-form-checkbox
-              id="checkbox-autoOpenIncomingTransfers"
-              v-model="settings.autoOpenIncomingTransfers"
-              name="checkbox-autoOpenIncomingTransfers"
-              @change="onChange()"
-            >
-            </b-form-checkbox>
+        <b-form-checkbox id="checkbox-autoOpenActivePackages" v-model="settings.autoOpenActivePackages"
+          name="checkbox-autoOpenActivePackages" @change="onChange()">
+          Auto-open Packages tab
+        </b-form-checkbox>
 
-            <span>Auto-open Transfers tab</span>
+        <b-form-select v-model="settings.autoOpenPackageTab" :options="packageTabOptions" @change="onChange()"
+          v-if="settings.autoOpenActivePackages"></b-form-select>
 
-            <b-form-select
-              class="w-40"
-              v-model="settings.autoOpenTransfersTab"
-              :options="transfersTabOptions"
-              @change="onChange()"
-              v-if="settings.autoOpenIncomingTransfers"
-            ></b-form-select>
-          </div>
+        <span>Viewing # Packages:</span>
 
-          <b-form-group label-cols="6" content-cols="6" label="Viewing # Transfers:">
-            <b-form-select
-              v-model="settings.transferDefaultPageSize"
-              :options="pageSizeOptions"
-              @change="onChange()"
-            ></b-form-select>
-          </b-form-group>
-        </b-form-group>
+        <b-form-select v-model="settings.packageDefaultPageSize" :options="pageSizeOptions"
+          @change="onChange()"></b-form-select>
 
-        <b-form-group>
-          <div class="mt-4 mb-2 text-gray-400 text-lg">Sales</div>
+        <div class="col-span-2 text-gray-400 text-lg py-4">Transfers</div>
 
-          <div class="mb-2 flex flex-row items-center gap-2">
-            <b-form-checkbox
-              id="checkbox-autoOpenActiveSales"
-              v-model="settings.autoOpenActiveSales"
-              name="checkbox-autoOpenActiveSales"
-              @change="onChange()"
-            >
-            </b-form-checkbox>
+        <b-form-checkbox id="checkbox-enableManifestDocumentViewer" class="col-span-2"
+          v-model="settings.enableManifestDocumentViewer" name="checkbox-enableManifestDocumentViewer"
+          @change="onChange()">
+          Always use T3 PDF viewer for manifests
+        </b-form-checkbox>
 
-            <span>Auto-open Sales tab</span>
+        <b-form-checkbox id="checkbox-autoOpenIncomingTransfers" v-model="settings.autoOpenIncomingTransfers"
+          name="checkbox-autoOpenIncomingTransfers" @change="onChange()">
+          Auto-open Transfers tab
+        </b-form-checkbox>
 
-            <b-form-select
-              class="w-40"
-              v-model="settings.autoOpenSalesTab"
-              :options="salesTabOptions"
-              @change="onChange()"
-              v-if="settings.autoOpenActiveSales"
-            ></b-form-select>
-          </div>
+        <b-form-select v-model="settings.autoOpenTransfersTab" :options="transfersTabOptions" @change="onChange()"
+          v-if="settings.autoOpenIncomingTransfers"></b-form-select>
 
-          <b-form-group label-cols="6" content-cols="6" label="Viewing # Sales:">
-            <b-form-select
-              v-model="settings.salesDefaultPageSize"
-              :options="pageSizeOptions"
-              @change="onChange()"
-            ></b-form-select>
-          </b-form-group>
-        </b-form-group>
+        <span>Viewing # Transfers:</span>
 
-        <b-form-group>
-          <div class="mt-4 mb-2 text-gray-400 text-lg">Tags</div>
+        <b-form-select v-model="settings.transferDefaultPageSize" :options="pageSizeOptions"
+          @change="onChange()"></b-form-select>
 
-          <div class="mb-2 flex flex-row items-center gap-2">
-            <b-form-checkbox
-              id="checkbox-autoOpenAvailableTags"
-              v-model="settings.autoOpenAvailableTags"
-              name="checkbox-autoOpenAvailableTags"
-              @change="onChange()"
-            >
-            </b-form-checkbox>
+        <div class="col-span-2 text-gray-400 text-lg py-4">Sales</div>
 
-            <span>Auto-open Tags tab</span>
+        <b-form-checkbox id="checkbox-autoOpenActiveSales" v-model="settings.autoOpenActiveSales"
+          name="checkbox-autoOpenActiveSales" @change="onChange()">
+          Auto-open Sales tab
+        </b-form-checkbox>
 
-            <b-form-select
-              class="w-40"
-              v-model="settings.autoOpenTagsTab"
-              :options="tagsTabOptions"
-              @change="onChange()"
-              v-if="settings.autoOpenAvailableTags"
-            ></b-form-select>
-          </div>
+        <b-form-select v-model="settings.autoOpenSalesTab" :options="salesTabOptions" @change="onChange()"
+          v-if="settings.autoOpenActiveSales"></b-form-select>
 
-          <b-form-group label-cols="6" content-cols="6" label="Viewing # Tags:">
-            <b-form-select
-              v-model="settings.tagDefaultPageSize"
-              :options="pageSizeOptions"
-              @change="onChange()"
-            ></b-form-select>
-          </b-form-group>
-        </b-form-group>
+        <span>Viewing # Sales:</span>
 
-        <b-form-group>
-          <div class="mt-4 mb-2 text-gray-400 text-lg">Plants</div>
+        <b-form-select v-model="settings.salesDefaultPageSize" :options="pageSizeOptions"
+          @change="onChange()"></b-form-select>
 
-          <div class="mb-2 flex flex-row items-center gap-2">
-            <b-form-checkbox
-              id="checkbox-autoOpenFloweringPlants"
-              v-model="settings.autoOpenFloweringPlants"
-              name="checkbox-autoOpenFloweringPlants"
-              @change="onChange()"
-            >
-            </b-form-checkbox>
+        <div class="col-span-2 text-gray-400 text-lg py-4">Tags</div>
 
-            <span>Auto-open Plants tab</span>
+        <b-form-checkbox id="checkbox-autoOpenAvailableTags" v-model="settings.autoOpenAvailableTags"
+          name="checkbox-autoOpenAvailableTags" @change="onChange()">
+          Auto-open Tags tab
+        </b-form-checkbox>
 
-            <b-form-select
-              class="w-40"
-              v-model="settings.autoOpenPlantsTab"
-              :options="plantsTabOptions"
-              @change="onChange()"
-              v-if="settings.autoOpenFloweringPlants"
-            ></b-form-select>
-          </div>
+        <b-form-select v-model="settings.autoOpenTagsTab" :options="tagsTabOptions" @change="onChange()"
+          v-if="settings.autoOpenAvailableTags"></b-form-select>
 
-          <b-form-group label-cols="6" content-cols="6" label="Viewing # Plants:">
-            <b-form-select
-              v-model="settings.plantDefaultPageSize"
-              :options="pageSizeOptions"
-              @change="onChange()"
-            ></b-form-select>
-          </b-form-group>
-        </b-form-group>
+        <span>Viewing # Tags:</span>
+
+        <b-form-select v-model="settings.tagDefaultPageSize" :options="pageSizeOptions"
+          @change="onChange()"></b-form-select>
+
+        <div class="col-span-2 text-gray-400 text-lg py-4">Plants</div>
+
+        <b-form-checkbox id="checkbox-autoOpenFloweringPlants" v-model="settings.autoOpenFloweringPlants"
+          name="checkbox-autoOpenFloweringPlants" @change="onChange()">
+          Auto-open Plants tab
+        </b-form-checkbox>
+
+        <b-form-select v-model="settings.autoOpenPlantsTab" :options="plantsTabOptions" @change="onChange()"
+          v-if="settings.autoOpenFloweringPlants"></b-form-select>
+
+        <span>Viewing # Plants:</span>
+
+        <b-form-select v-model="settings.plantDefaultPageSize" :options="pageSizeOptions"
+          @change="onChange()"></b-form-select>
       </div>
     </b-form>
   </div>
@@ -547,73 +381,82 @@ import {
   SalesTabLabel,
   TagsTabLabel,
   TransfersTabLabel,
-} from "@/consts";
-import { DarkModeState, IPluginState, SnowflakeState } from "@/interfaces";
-import { analyticsManager } from "@/modules/analytics-manager.module";
-import { clientBuildManager } from "@/modules/client-build-manager.module";
-import { pageManager } from "@/modules/page-manager/page-manager.module";
-import { toastManager } from "@/modules/toast-manager.module";
-import { MutationType } from "@/mutation-types";
-import store from "@/store/page-overlay/index";
-import { SettingsActions } from "@/store/page-overlay/modules/settings/consts";
-import { getMatchingDecryptedDataOrNull } from "@/utils/encryption";
-import { generateThumbnail } from "@/utils/file";
-import Vue from "vue";
-import { mapState } from "vuex";
-import router from "@/router/index";
+} from '@/consts';
+import {
+  BackgroundState, DarkModeState, IPluginState, SnowflakeState,
+} from '@/interfaces';
+import { analyticsManager } from '@/modules/analytics-manager.module';
+import { clientBuildManager } from '@/modules/client-build-manager.module';
+import { pageManager } from '@/modules/page-manager/page-manager.module';
+import { toastManager } from '@/modules/toast-manager.module';
+import { MutationType } from '@/mutation-types';
+import router from '@/router/index';
+import store from '@/store/page-overlay/index';
+import { SettingsActions } from '@/store/page-overlay/modules/settings/consts';
+import { getMatchingDecryptedDataOrNull } from '@/utils/encryption';
+import { generateThumbnail } from '@/utils/file';
+import Vue from 'vue';
+import { mapState } from 'vuex';
 
 export default Vue.extend({
-  name: "SettingsForm",
+  name: 'SettingsForm',
   store,
   router,
   data() {
     return {
-      image: null,
+      snowflakeImage: null,
+      backgroundImage: null,
       darkModeStateOptions: [
-        { value: DarkModeState.DISABLED, text: "Disabled" },
-        { value: DarkModeState.ENABLED, text: "Enabled" },
+        { value: DarkModeState.DISABLED, text: 'Disabled' },
+        { value: DarkModeState.ENABLED, text: 'Enabled' },
       ],
       snowflakeStateOptions: [
-        { value: SnowflakeState.DISABLED, text: "Disable all" },
-        { value: SnowflakeState.CSS, text: "Enable CPU-friendly snowflakes" },
-        { value: SnowflakeState.ENABLED, text: "Enabled (Metrc default)" },
+        { value: SnowflakeState.DISABLED, text: 'Disable all' },
+        { value: SnowflakeState.CSS, text: 'Enable CPU-friendly snowflakes' },
+        { value: SnowflakeState.ENABLED, text: 'Enabled (Metrc default)' },
       ],
       snowflakeIconOptions: [
-        "❆",
-        "❅",
-        "❄️",
-        "😀",
-        "💵",
-        "🖕🏼",
-        "☠️",
-        "👽",
-        "👾",
-        "💩",
-        "🥐",
-        "🍆",
-        "🍃",
-        "💨",
-        "🍁",
-        "🌿",
-        "TEXT",
-        "IMAGE",
+        '❆',
+        '❅',
+        '❄️',
+        '😀',
+        '💵',
+        '🖕🏼',
+        '☠️',
+        '👽',
+        '👾',
+        '💩',
+        '🥐',
+        '🍆',
+        '🍃',
+        '💨',
+        '🍁',
+        '🌿',
+        'TEXT',
+        'IMAGE',
       ],
       snowflakeSizeOptions: [
-        "xs",
-        "sm",
-        "md",
-        "lg",
-        "xl",
-        "2xl",
-        "3xl",
-        "4xl",
-        "5xl",
-        "6xl",
-        "7xl",
-        "8xl",
-        "9xl",
+        'xs',
+        'sm',
+        'md',
+        'lg',
+        'xl',
+        '2xl',
+        '3xl',
+        '4xl',
+        '5xl',
+        '6xl',
+        '7xl',
+        '8xl',
+        '9xl',
       ],
-      snowflakeImageCropOptions: ["none", "square", "rounded", "circle"],
+      backgroundOptions: [
+        { value: BackgroundState.DEFAULT, text: 'Metrc green mosaic (default)' },
+        { value: BackgroundState.COLOR, text: 'Custom color' },
+        { value: BackgroundState.GRADIENT, text: 'Custom color gradient' },
+        { value: BackgroundState.IMAGE, text: 'Custom image' },
+      ],
+      snowflakeImageCropOptions: ['none', 'square', 'rounded', 'circle'],
       pageSizeOptions: [5, 10, 20, 50, 100, 500].map((x) => ({
         value: x,
         text: x,
@@ -639,26 +482,26 @@ export default Vue.extend({
       landingPageOptions: [
         {
           value: LandingPage.DEFAULT,
-          text: "Do nothing",
+          text: 'Do nothing',
         },
         {
           value: LandingPage.TRANSFERS,
-          text: "Go to Licensed Transfers",
+          text: 'Go to Licensed Transfers',
         },
         {
           value: LandingPage.TRANSFER_HUB,
-          text: "Go to Transfers Hub",
+          text: 'Go to Transfers Hub',
         },
         {
           value: LandingPage.PACKAGES,
-          text: "Go to Packages",
+          text: 'Go to Packages',
         },
         {
           value: LandingPage.PLANTS,
-          text: "Go to Plants",
+          text: 'Go to Plants',
         },
       ],
-      unsavedLicenseKey: "",
+      unsavedLicenseKey: '',
       settings: JSON.parse(JSON.stringify(store.state.settings)),
     };
   },
@@ -673,27 +516,36 @@ export default Vue.extend({
   },
   methods: {
     async toggleDebugMode() {
-      window.location.hash = "";
+      window.location.hash = '';
       store.commit(MutationType.SET_DEBUG_MODE, !store.state.debugMode);
     },
     navToPermissions(route: string) {
       this.$router.push(route);
     },
+    resetSettings() {
+      /* eslint-disable-next-line no-alert */
+      if (window.confirm('Are you sure you want to reset your settings?')) {
+        // store.commit(MutationType.RESET_STATE);
+
+        store.dispatch(`settings/${SettingsActions.RESET_SETTINGS}`);
+      }
+    },
     saveLicenseKey() {
       this.$data.settings.licenseKey = this.$data.unsavedLicenseKey;
-      this.$data.unsavedLicenseKey = "";
+      this.$data.unsavedLicenseKey = '';
       this.onChange();
       clientBuildManager.loadClientConfig();
     },
     clearLicenseKey() {
-      if (!window.confirm("Are you sure you want to remove your license key?")) {
+      /* eslint-disable-next-line no-alert */
+      if (!window.confirm('Are you sure you want to remove your license key?')) {
         return;
       }
-      this.$data.settings.licenseKey = "";
+      this.$data.settings.licenseKey = '';
       this.onChange();
       clientBuildManager.loadClientConfig();
     },
-    onImageChange() {},
+    onImageChange() { },
     onChange() {
       pageManager.pauseFor(3000);
 
@@ -704,20 +556,20 @@ export default Vue.extend({
       store.dispatch(`settings/${SettingsActions.UPDATE_SETTINGS}`, this.settings);
 
       toastManager.openToast(
-        `T3 settings successfully updated. Refresh the page to apply changes.`,
+        'T3 settings successfully updated. Refresh the page to apply changes.',
         {
-          title: "Updated Settings",
+          title: 'Updated Settings',
           autoHideDelay: 3000,
-          variant: "primary",
+          variant: 'primary',
           appendToast: true,
-          toaster: "ttt-toaster",
+          toaster: 'ttt-toaster',
           solid: true,
-        }
+        },
       );
     },
   },
   watch: {
-    image: {
+    snowflakeImage: {
       immediate: true,
       handler(newValue, oldValue) {
         if (!newValue) {
@@ -726,6 +578,20 @@ export default Vue.extend({
 
         generateThumbnail(newValue).then((b64image: string) => {
           this.$data.settings.snowflakeImage = b64image;
+
+          this.onChange();
+        });
+      },
+    },
+    backgroundImage: {
+      immediate: true,
+      handler(newValue, oldValue) {
+        if (!newValue) {
+          return;
+        }
+
+        generateThumbnail(newValue, 1080).then((b64image: string) => {
+          this.$data.settings.backgroundImage = b64image;
 
           this.onChange();
         });

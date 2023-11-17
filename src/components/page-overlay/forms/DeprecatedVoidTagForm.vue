@@ -44,16 +44,16 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import store from "@/store/page-overlay/index";
-import { TaskType, METRC_TAG_REGEX, MessageType } from "@/consts";
-import { isValidTag, generateTagRangeOrError } from "@/utils/tags";
-import { mapState } from "vuex";
-import { MutationType } from "@/mutation-types";
-import { createTask } from "@/utils/tasks";
-import { analyticsManager } from "@/modules/analytics-manager.module";
-import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
-import { authManager } from "@/modules/auth-manager.module";
+import Vue from 'vue';
+import store from '@/store/page-overlay/index';
+import { TaskType, METRC_TAG_REGEX, MessageType } from '@/consts';
+import { isValidTag, generateTagRangeOrError } from '@/utils/tags';
+import { mapState } from 'vuex';
+import { MutationType } from '@/mutation-types';
+import { createTask } from '@/utils/tasks';
+import { analyticsManager } from '@/modules/analytics-manager.module';
+import { primaryDataLoader } from '@/modules/data-loader/data-loader.module';
+import { authManager } from '@/modules/auth-manager.module';
 
 interface TaskForm {
   startTag: string;
@@ -61,7 +61,7 @@ interface TaskForm {
 }
 
 export default Vue.extend({
-  name: "DeprecatedVoidTagForm",
+  name: 'DeprecatedVoidTagForm',
   store,
   computed: {
     startTagInvalid(): boolean {
@@ -76,8 +76,6 @@ export default Vue.extend({
       } catch (e) {
         return [];
       }
-
-      return [];
     },
     isInvalidTagRange(): boolean {
       if (!isValidTag(this.form.startTag) || !isValidTag(this.form.endTag)) {
@@ -91,10 +89,8 @@ export default Vue.extend({
       } catch (e) {
         return true;
       }
-
-      return true;
     },
-    ...mapState(["currentView"]),
+    ...mapState(['currentView']),
   },
   async mounted() {
     await authManager.authStateOrError();
@@ -105,8 +101,8 @@ export default Vue.extend({
     return {
       availableTags: [],
       form: {
-        startTag: "",
-        endTag: "",
+        startTag: '',
+        endTag: '',
       } as TaskForm,
     };
   },
@@ -114,18 +110,19 @@ export default Vue.extend({
     async onSubmit(evt: any) {
       evt.preventDefault();
 
-      if (!window.confirm("Are you sure you wish to void these tags?")) {
+      /* eslint-disable-next-line no-alert */
+      if (!window.confirm('Are you sure you wish to void these tags?')) {
         return;
       }
 
       analyticsManager.track(MessageType.VOIDED_TAGS);
 
-      for (let tag of generateTagRangeOrError(this.form.startTag, this.form.endTag)) {
+      for (const tag of generateTagRangeOrError(this.form.startTag, this.form.endTag)) {
         store.commit(
           MutationType.ENQUEUE_TASK,
           await createTask(TaskType.VOID_TAGS, {
             tag,
-          })
+          }),
         );
       }
     },

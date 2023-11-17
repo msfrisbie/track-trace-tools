@@ -26,18 +26,18 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import { mapState, mapActions } from "vuex";
-import router from "@/router/index";
-import store from "@/store/page-overlay/index";
-import TagSearchWidget from "@/components/search/tag-search/TagSearchWidget.vue";
-import TransferSearchWidget from "@/components/search/transfer-search/TransferSearchWidget.vue";
-import PackageSearchWidget from "@/components/search/package-search/PackageSearchWidget.vue";
-import { SearchActions, SearchType } from "@/store/page-overlay/modules/search/consts";
-import { IPluginState } from "@/interfaces";
+import Vue from 'vue';
+import { mapState, mapActions } from 'vuex';
+import router from '@/router/index';
+import store from '@/store/page-overlay/index';
+import TagSearchWidget from '@/components/search/tag-search/TagSearchWidget.vue';
+import TransferSearchWidget from '@/components/search/transfer-search/TransferSearchWidget.vue';
+import PackageSearchWidget from '@/components/search/package-search/PackageSearchWidget.vue';
+import { SearchActions, SearchType } from '@/store/page-overlay/modules/search/consts';
+import { IPluginState } from '@/interfaces';
 
 export default Vue.extend({
-  name: "SearchViewSelector",
+  name: 'SearchViewSelector',
   store,
   router,
   props: {},
@@ -58,31 +58,31 @@ export default Vue.extend({
     }[] {
       return [
         {
-          text: "PACKAGES",
+          text: 'PACKAGES',
           value: SearchType.PACKAGES,
           count: store.state.packageSearch.packages.length,
           enabled: true,
         },
         {
-          text: "PLANTS",
+          text: 'PLANTS',
           value: SearchType.PLANTS,
           count: store.state.plantSearch.plants.length,
           enabled: true,
         },
         {
-          text: "TRANSFERS",
+          text: 'TRANSFERS',
           value: SearchType.TRANSFERS,
           count: store.state.transferSearch.transfers.length,
           enabled: true,
         },
         {
-          text: "TAGS",
+          text: 'TAGS',
           value: SearchType.TAGS,
           count: store.state.tagSearch.tags.length,
           enabled: true,
         },
         {
-          text: "TRANSFERRED PACKAGES",
+          text: 'TRANSFERRED PACKAGES',
           value: SearchType.TRANSFER_PACKAGES,
           // Not technically a package count, but it should be accurate enough
           count: store.state.transferPackageSearch.results.length,
@@ -95,19 +95,19 @@ export default Vue.extend({
         //   enabled: false,
         // },
         {
-          text: "HARVESTS",
+          text: 'HARVESTS',
           value: SearchType.HARVESTS,
           count: 0,
           enabled: false,
         },
         {
-          text: "PLANT BATCHES",
+          text: 'PLANT BATCHES',
           value: SearchType.PLANT_BATCHES,
           count: 0,
           enabled: false,
         },
         {
-          text: "SALES",
+          text: 'SALES',
           value: SearchType.SALES,
           count: 0,
           enabled: false,

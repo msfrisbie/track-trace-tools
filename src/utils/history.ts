@@ -2,19 +2,19 @@ import {
   METRC_TAG_REGEX_PATTERN,
   PLANT_BATCH_NAME_REGEX_PATTERN,
   ZERO_PADDED_MANIFEST_NUMBER_REGEX_PATTERN,
-} from "@/consts";
-import { IHarvestHistoryData, IPackageHistoryData } from "@/interfaces";
-import _ from "lodash-es";
+} from '@/consts';
+import { IHarvestHistoryData, IPackageHistoryData } from '@/interfaces';
+import _ from 'lodash-es';
 
 // Single history entry methods
 
 export function extractInitialPackageQuantityAndUnitOrNull(
-  description: string
+  description: string,
 ): [number, string] | null {
-  const matcher = new RegExp(`^Packaged ([0-9,\.]+) ([a-zA-Z\s]+) of`);
+  const matcher = new RegExp('^Packaged ([0-9,\.]+) ([a-zA-Z\s]+) of');
   const match = description.match(matcher);
 
-  return match ? [parseFloat(match[1].replaceAll(",", "")), match[2]] : null;
+  return match ? [parseFloat(match[1].replaceAll(',', '')), match[2]] : null;
 }
 
 export function extractParentPackageLabelOrNull(description: string): string | null {
@@ -33,7 +33,7 @@ export function extractChildPackageLabelOrNull(description: string): string | nu
 
 export function extractTestSamplePackageLabelOrNull(description: string): string | null {
   const testSampleMatcher = new RegExp(
-    `Related Package's \\((${METRC_TAG_REGEX_PATTERN})\\) Lab Testing set to`
+    `Related Package's \\((${METRC_TAG_REGEX_PATTERN})\\) Lab Testing set to`,
   );
   const match = description.match(testSampleMatcher);
 
@@ -87,6 +87,7 @@ export function extractPackageLabelOrNull(description: string): string | null {
     new RegExp(`Plant Batch: "${PLANT_BATCH_NAME_REGEX_PATTERN}" > (${METRC_TAG_REGEX_PATTERN})`),
     new RegExp(`Related Package's \\((${METRC_TAG_REGEX_PATTERN})\\) Lab Testing set to`),
     new RegExp(`for Package (${METRC_TAG_REGEX_PATTERN})`),
+    new RegExp(`for Package \\((${METRC_TAG_REGEX_PATTERN})\\)`),
     new RegExp(`from Package (${METRC_TAG_REGEX_PATTERN})`),
     new RegExp(`Packaged into (${METRC_TAG_REGEX_PATTERN})`),
     new RegExp(`Package (${METRC_TAG_REGEX_PATTERN})`),
@@ -118,7 +119,7 @@ export function extractOutgoingTransferManifestNumberOrNull(description: string)
 }
 
 export function extractHarvestNameOrNull(description: string): string | null {
-  const matchers: RegExp[] = [new RegExp(`Harvest "([^"]+)"`)];
+  const matchers: RegExp[] = [new RegExp('Harvest "([^"]+)"')];
   for (const matcher of matchers) {
     const match = description.match(matcher);
 
@@ -150,10 +151,10 @@ export function extractPackageAdjustmentSetOrNull(descriptions: string[]): {
   reason: string;
   note: string;
 } | null {
-  const joinedDescriptions = descriptions.join(" ");
+  const joinedDescriptions = descriptions.join(' ');
 
   const matchers: RegExp[] = [
-    new RegExp(`Package adjusted by (-?\\d+[\\.]?\\d*) ([^-]+) - Reason: ([^-]+)- Note: (.*)`),
+    new RegExp('Package adjusted by (-?\\d+[\\.]?\\d*) ([^-]+) - Reason: ([^-]+)- Note: (.*)'),
   ];
 
   for (const matcher of matchers) {
@@ -173,20 +174,20 @@ export function extractPackageAdjustmentSetOrNull(descriptions: string[]): {
 }
 
 export function extractChildPackageTagQuantityPairOrNull(
-  description: string
+  description: string,
 ): [string, number] | null {
   const pairMatcher = new RegExp(`Used ([\\d,\\.]+) .* for Package (${METRC_TAG_REGEX_PATTERN})`);
 
   const match = description.match(pairMatcher);
 
-  return match ? [match[2] as string, parseFloat(match[1].replaceAll(",", ""))] : null;
+  return match ? [match[2] as string, parseFloat(match[1].replaceAll(',', ''))] : null;
 }
 
 export function extractChildPackageTagQuantityUnitSetOrNull(
-  description: string
+  description: string,
 ): [string, number, string] | null {
   const pairMatcher = new RegExp(
-    `(Used|Restored) ([0-9,\.]+) ([a-zA-Z\s]+) (for|from) Package (${METRC_TAG_REGEX_PATTERN})`
+    `(Used|Restored) ([0-9,\.]+) ([a-zA-Z\s]+) (for|from) Package (${METRC_TAG_REGEX_PATTERN})`,
   );
 
   const match = description.match(pairMatcher);
@@ -196,10 +197,10 @@ export function extractChildPackageTagQuantityUnitSetOrNull(
   }
 
   const tag = match[5];
-  let quantity = parseFloat(match[2].replaceAll(",", ""));
+  let quantity = parseFloat(match[2].replaceAll(',', ''));
   const unit = match[3];
 
-  if (match[1] === "Restored") {
+  if (match[1] === 'Restored') {
     quantity *= -1;
   }
 
@@ -207,19 +208,19 @@ export function extractChildPackageTagQuantityUnitSetOrNull(
 }
 
 export function extractParentPackageTagQuantityUnitItemSetOrNull(
-  description: string
+  description: string,
 ): [string, number, string, string] | null {
   const pairMatcher = new RegExp(
-    `Took ([0-9,\.]+) ([a-zA-Z\s]+) of (.*) from Package (${METRC_TAG_REGEX_PATTERN})`
+    `Took ([0-9,\.]+) ([a-zA-Z\s]+) of (.*) from Package (${METRC_TAG_REGEX_PATTERN})`,
   );
 
   const match = description.match(pairMatcher);
 
-  return match ? [match[4], parseFloat(match[1].replaceAll(",", "")), match[2], match[3]] : null;
+  return match ? [match[4], parseFloat(match[1].replaceAll(',', '')), match[2], match[3]] : null;
 }
 
 export function extractLocationNameOrNull(description: string): string | null {
-  const matcher = new RegExp(`- Location: (.*)`);
+  const matcher = new RegExp('- Location: (.*)');
 
   const match = description.match(matcher);
 
@@ -229,7 +230,7 @@ export function extractLocationNameOrNull(description: string): string | null {
 // Full history methods
 
 export function extractInitialPackageQuantityAndUnitFromHistoryOrError(
-  historyList: IPackageHistoryData[]
+  historyList: IPackageHistoryData[],
 ): [number, string] {
   for (const history of historyList) {
     for (const description of history.Descriptions) {
@@ -241,11 +242,11 @@ export function extractInitialPackageQuantityAndUnitFromHistoryOrError(
     }
   }
 
-  throw new Error("Could not locate initial quantity");
+  throw new Error('Could not locate initial quantity');
 }
 
 export function extractParentPackageLabelsFromHistory(
-  historyList: IPackageHistoryData[]
+  historyList: IPackageHistoryData[],
 ): string[] {
   const parentPackageLabels = [];
 
@@ -279,7 +280,7 @@ export function extractChildPackageLabelsFromHistory(historyList: IPackageHistor
 }
 
 export function extractChildPackageLabelsFromHistory_Full(
-  historyList: IPackageHistoryData[]
+  historyList: IPackageHistoryData[],
 ): { label: string; history: IPackageHistoryData }[] {
   const childPackageLabels = [];
 
@@ -297,7 +298,7 @@ export function extractChildPackageLabelsFromHistory_Full(
 }
 
 export function extractTestSamplePackageLabelsFromHistory(
-  historyList: IPackageHistoryData[]
+  historyList: IPackageHistoryData[],
 ): string[] {
   const testSamplePackageLabels = [];
 
@@ -316,7 +317,7 @@ export function extractTestSamplePackageLabelsFromHistory(
 
 // This is used by COGS, technically should be replaced with extractChildPackageTagQuantityUnitSetsFromHistory
 export function extractChildPackageTagQuantityPairsFromHistory(
-  historyList: IPackageHistoryData[]
+  historyList: IPackageHistoryData[],
 ): [string, number][] {
   const pairs: [string, number][] = [];
 
@@ -334,7 +335,7 @@ export function extractChildPackageTagQuantityPairsFromHistory(
 }
 
 export function extractChildPackageTagQuantityUnitSetsFromHistory(
-  historyList: IPackageHistoryData[]
+  historyList: IPackageHistoryData[],
 ): [string, number, string][] {
   const sets: [string, number, string][] = [];
 
@@ -352,7 +353,7 @@ export function extractChildPackageTagQuantityUnitSetsFromHistory(
 }
 
 export function extractParentPackageTagQuantityUnitItemSetsFromHistory(
-  historyList: IPackageHistoryData[]
+  historyList: IPackageHistoryData[],
 ): [string, number, string, string][] {
   const sets: [string, number, string, string][] = [];
 
@@ -370,7 +371,7 @@ export function extractParentPackageTagQuantityUnitItemSetsFromHistory(
 }
 
 export function extractInitialPackageLocationNameFromHistoryOrNull(
-  historyList: IPackageHistoryData[]
+  historyList: IPackageHistoryData[],
 ): string | null {
   for (const description of historyList[0].Descriptions) {
     const result = extractLocationNameOrNull(description);
@@ -384,7 +385,7 @@ export function extractInitialPackageLocationNameFromHistoryOrNull(
 }
 
 export function extractHarvestChildPackageLabelsFromHistory(
-  historyList: IHarvestHistoryData[]
+  historyList: IHarvestHistoryData[],
 ): string[] {
   const labels: string[] = [];
 
@@ -402,7 +403,7 @@ export function extractHarvestChildPackageLabelsFromHistory(
 }
 
 export function extractHarvestChildPackageLabelsAndTimestampsFromHistory(
-  historyList: IHarvestHistoryData[]
+  historyList: IHarvestHistoryData[],
 ): { label: string; timestamp: string }[] {
   const entries: { label: string; timestamp: string }[] = [];
 

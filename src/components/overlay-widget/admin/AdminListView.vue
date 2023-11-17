@@ -55,15 +55,15 @@
 </template>
 
 <script lang="ts">
-import { MessageType } from "@/consts";
-import { analyticsManager } from "@/modules/analytics-manager.module";
-import store from "@/store/page-overlay/index";
-import { notAvailableMessage } from "@/utils/text";
-import Vue from "vue";
-import { mapState } from "vuex";
+import { MessageType } from '@/consts';
+import { analyticsManager } from '@/modules/analytics-manager.module';
+import store from '@/store/page-overlay/index';
+import { notAvailableMessage } from '@/utils/text';
+import Vue from 'vue';
+import { mapState } from 'vuex';
 
 export default Vue.extend({
-  name: "AdminListView",
+  name: 'AdminListView',
   store,
   methods: {
     selectBuilderType({ text, route }: { text: string; route: string }) {
@@ -95,28 +95,28 @@ export default Vue.extend({
     options() {
       return [
         {
-          backgroundColor: "black",
-          text: "DEBUG LAYOUT",
-          route: "/admin/debug-layout",
-          icon: "cog",
+          backgroundColor: 'black',
+          text: 'DEBUG LAYOUT',
+          route: '/admin/debug-layout',
+          icon: 'cog',
           enabled: true,
           isBeta: false,
           isNew: false,
         },
         {
-          backgroundColor: "black",
-          text: "LISTING SANDBOX",
-          route: "/admin/listing-sandbox",
-          icon: "cog",
+          backgroundColor: 'black',
+          text: 'LISTING SANDBOX',
+          route: '/admin/listing-sandbox',
+          icon: 'cog',
           enabled: true,
           isBeta: false,
           isNew: false,
         },
         {
-          backgroundColor: "black",
-          text: "PICKER SANDBOX",
-          route: "/admin/picker-sandbox",
-          icon: "cog",
+          backgroundColor: 'black',
+          text: 'PICKER SANDBOX',
+          route: '/admin/picker-sandbox',
+          icon: 'cog',
           enabled: true,
           isBeta: false,
           isNew: false,

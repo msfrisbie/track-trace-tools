@@ -21,32 +21,77 @@
             }"
             :disabled="!option.enabled"
             @click.stop.prevent="selectBuilderType(option)"
-            ><span>{{ option.text }}</span>
+          >
+            <div class="w-full grid grid-cols-3 gap-2" style="grid-template-columns: 2rem 1fr 2rem">
+              <div class="aspect-square grid place-items-center">
+                <!-- <font-awesome-icon :icon="option.icon" /> -->
+              </div>
 
-            <template v-if="option.isBeta">
-              <!-- flex struggles to vertical align the badge for some reason -->
-              <b-badge
-                style="padding-top: 0.3rem; margin-top: 0.1rem; line-height: initial"
-                variant="light"
-                >BETA</b-badge
-              ></template
-            >
-            <template v-if="option.isNew">
-              <!-- flex struggles to vertical align the badge for some reason -->
-              <b-badge
-                style="padding-top: 0.3rem; margin-top: 0.1rem; line-height: initial"
-                variant="light"
-                >NEW!</b-badge
-              ></template
-            >
+              <span>{{ option.text }}</span>
+
+              <div class="aspect-square grid place-items-center">
+                <template v-if="option.isPlus">
+                  <!-- flex struggles to vertical align the badge for some reason -->
+                  <b-badge
+                    style="padding-top: 0.3rem; margin-top: 0.1rem; line-height: initial"
+                    variant="light"
+                    >T3+</b-badge
+                  ></template
+                >
+                <template v-else-if="option.isBeta">
+                  <!-- flex struggles to vertical align the badge for some reason -->
+                  <b-badge
+                    style="padding-top: 0.3rem; margin-top: 0.1rem; line-height: initial"
+                    variant="light"
+                    >BETA</b-badge
+                  ></template
+                >
+                <template v-else-if="option.isNew">
+                  <!-- flex struggles to vertical align the badge for some reason -->
+                  <b-badge
+                    style="padding-top: 0.3rem; margin-top: 0.1rem; line-height: initial"
+                    variant="light"
+                    >NEW!</b-badge
+                  ></template
+                >
+              </div>
+            </div>
           </b-button>
 
           <div class="w-full text-gray-500 text-center" style="height: 1rem; margin-top: 1rem">
-            <template v-if="!option.enabled && option.showDisabledMessage">
-              {{ notAvailableMessage }}
-              <b-button variant="link" @click.stop.prevent="open('/help/unavailable')"
-                >Why?</b-button
-              >
+            <template v-if="!option.enabled">
+              <template v-if="option.isPlus && !clientState.t3plus">
+                <span class="text-xs flex flex-row items-center justify-center">
+                  This tool is enabled with T3+.
+                  <b-button
+                    size="sm"
+                    variant="link"
+                    class="underline"
+                    @click.stop.prevent="open('/plus')"
+                    >Learn&nbsp;more</b-button
+                  >
+                </span>
+              </template>
+              <template v-if="!option.isPlus">
+                <span class="text-xs flex flex-row items-center justify-center">
+                  {{ notAvailableMessage }}
+                  <b-button variant="link" size="sm" @click.stop.prevent="open('/help/unavailable')"
+                    >Why?</b-button
+                  >
+                </span>
+              </template>
+            </template>
+            <template v-if="option.enabled && option.isPlus && !clientState.t3plus">
+              <span class="text-xs flex flex-row items-center justify-center">
+                This tool is becoming part of T3+.
+                <b-button
+                  size="sm"
+                  variant="link"
+                  class="underline"
+                  @click.stop.prevent="open('/plus')"
+                  >Learn&nbsp;more</b-button
+                >
+              </span>
             </template>
           </div>
         </div>
@@ -62,6 +107,7 @@ import { analyticsManager } from "@/modules/analytics-manager.module";
 import { dynamicConstsManager } from "@/modules/dynamic-consts-manager.module";
 import store from "@/store/page-overlay/index";
 import { HOST_WILDCARD, isCurrentHostAllowed } from "@/utils/builder";
+import { hasPlusImpl } from "@/utils/plus";
 import { notAvailableMessage } from "@/utils/text";
 import Vue from "vue";
 import { mapState } from "vuex";
@@ -100,7 +146,11 @@ export default Vue.extend({
     ...mapState<IPluginState>({
       authState: (state: IPluginState) => state.pluginAuth.authState,
       debugMode: (state: IPluginState) => state.debugMode,
+      clientState: (state: IPluginState) => state.client,
     }),
+    hasPlus(): boolean {
+      return hasPlusImpl();
+    },
     options() {
       return [
         {
@@ -108,43 +158,23 @@ export default Vue.extend({
           text: "CSV PACKAGES",
           icon: "file-csv",
           backgroundColor: "#2774ae",
-          isBeta: true,
+          isBeta: false,
           isNew: false,
-          enabled: store.state.client.values["ENABLE_T3PLUS"] || store.state.client.t3plus, ///isCurrentHostAllowed([HOST_WILDCARD]),
+          enabled: false,
           visible: true,
-        },
-        {
-          route: "/package/history",
-          text: "PACKAGE HISTORY",
-          icon: "sitemap",
-          backgroundColor: "#2774ae",
-          // isBeta: true,
-          isNew: false,
-          enabled: isCurrentHostAllowed([HOST_WILDCARD]),
-          visible: true,
+          isPlus: true,
         },
         {
           route: "/package/split-package",
           text: "SPLIT PACKAGE",
           icon: "expand-alt",
           backgroundColor: "#2774ae",
-          // isBeta: true,
+          isBeta: false,
           isNew: false,
-          enabled: isCurrentHostAllowed([HOST_WILDCARD]),
+          enabled: hasPlusImpl() || store.state.client.flags.enable_t3plus_free_tools === "true",
           visible: true,
           showDisabledMessage: true,
-        },
-        {
-          route: "/package/move-packages",
-          text: "MOVE PACKAGES",
-          icon: "exchange-alt",
-          isBeta: false,
-          // isNew: true,
-          backgroundColor: "#2774ae",
-          enabled:
-            isCurrentHostAllowed([HOST_WILDCARD]) && this.$data.facilityUsesLocationForPackages,
-          visible: true,
-          showDisabledMessage: false,
+          isPlus: true,
         },
         {
           route: "/package/merge-packages",
@@ -153,9 +183,22 @@ export default Vue.extend({
           isBeta: false,
           isNew: false,
           backgroundColor: "#2774ae",
-          enabled: isCurrentHostAllowed([HOST_WILDCARD]),
+          enabled: hasPlusImpl() || store.state.client.flags.enable_t3plus_free_tools === "true",
           visible: true,
           showDisabledMessage: true,
+          isPlus: true,
+        },
+        {
+          route: "/package/move-packages",
+          text: "MOVE PACKAGES",
+          icon: "exchange-alt",
+          isBeta: false,
+          isNew: false,
+          backgroundColor: "#2774ae",
+          enabled: true,
+          visible: true,
+          showDisabledMessage: false,
+          isPlus: false,
         },
         {
           route: "/package/finish-packages",
@@ -164,31 +207,45 @@ export default Vue.extend({
           backgroundColor: "#2774ae",
           isBeta: false,
           isNew: false,
-          enabled: isCurrentHostAllowed([HOST_WILDCARD]),
+          enabled: true,
           visible: true,
           showDisabledMessage: true,
+          isPlus: false,
         },
         {
           route: "/package/add-item-group",
           text: "ADD ITEM GROUP",
           icon: "boxes",
           backgroundColor: "#2774ae",
-          // isBeta: true,
+          isBeta: false,
           isNew: false,
-          enabled: false, //isCurrentHostAllowed([HOST_WILDCARD]),
+          enabled: false,
           visible: false,
           showDisabledMessage: true,
+          isPlus: false,
         },
         {
           route: "/package/allocate-samples",
           text: "ALLOCATE SAMPLES",
           icon: "boxes",
           backgroundColor: "#2774ae",
-          // isBeta: true,
+          isBeta: false,
           isNew: false,
-          enabled: true, //isCurrentHostAllowed([HOST_WILDCARD]),
-          visible: store.state.client.values["ENABLE_EMPLOYEE_SAMPLE_TOOL"],
+          enabled: true,
+          visible: store.state.client.values.ENABLE_EMPLOYEE_SAMPLE_TOOL,
           showDisabledMessage: true,
+          isPlus: false,
+        },
+        {
+          route: "/package/history",
+          text: "PACKAGE HISTORY",
+          icon: "sitemap",
+          backgroundColor: "#2774ae",
+          isBeta: false,
+          isNew: false,
+          enabled: isCurrentHostAllowed([HOST_WILDCARD]),
+          visible: store.state.client.values.ENABLE_PACKAGE_HISTORY,
+          isPlus: false,
         },
       ];
     },

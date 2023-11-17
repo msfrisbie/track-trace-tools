@@ -6,9 +6,9 @@
           Signed in as <span class="font-bold ttt-purple">{{ oauthUserInfo.email }}</span>
         </div>
 
-        <a href="https://youtu.be/JBR21XSKK3I" class="underline text-purple-600" target="_blank"
+        <!-- <a href="https://youtu.be/JBR21XSKK3I" class="underline text-purple-600" target="_blank"
           >How do I make a report?</a
-        >
+        > -->
 
         <b-button
           variant="outline-primary"

@@ -1,4 +1,5 @@
-import { METRC_INT_SUFFIX_CHARCOUNT, METRC_TAG_REGEX } from "@/consts";
+import { METRC_INT_SUFFIX_CHARCOUNT, METRC_TAG_REGEX } from '@/consts';
+import CryptoJS from 'crypto-js';
 
 export function isValidTag(tag: string): boolean {
   if (!tag || tag.length === 0) {
@@ -11,8 +12,8 @@ export function isValidTag(tag: string): boolean {
 }
 
 export function validTagPairOrError(startTag: string, endTag: string) {
-  validTagOrError(startTag, "Invalid start tag");
-  validTagOrError(endTag, "Invalid end tag");
+  validTagOrError(startTag, 'Invalid start tag');
+  validTagOrError(endTag, 'Invalid end tag');
   tagsInSameRangeOrError(startTag, endTag);
   startTagLessThanOrEqualToEndTagOrError(startTag, endTag);
 }
@@ -23,11 +24,11 @@ export function areTagsInSameRange(tag1: string, tag2: string): boolean {
 
 export function tagsInSameRangeOrError(tag1: string, tag2: string) {
   if (!areTagsInSameRange(tag1, tag2)) {
-    throw new Error("Tags not in same range");
+    throw new Error('Tags not in same range');
   }
 }
 
-export function validTagOrError(tag: string, errorMessage = "Invalid tag") {
+export function validTagOrError(tag: string, errorMessage = 'Invalid tag') {
   if (!isValidTag(tag)) {
     throw new Error(errorMessage);
   }
@@ -42,7 +43,7 @@ export function startTagLessThanOrEqualToEndTag(startTag: string, endTag: string
 
 export function startTagLessThanOrEqualToEndTagOrError(startTag: string, endTag: string) {
   if (!startTagLessThanOrEqualToEndTag(startTag, endTag)) {
-    throw new Error("Start tag is not less than end tag");
+    throw new Error('Start tag is not less than end tag');
   }
 }
 
@@ -50,10 +51,10 @@ export function generateTagRangeOrError(startTag: string, endTag: string): strin
   validTagPairOrError(startTag, endTag);
 
   if (numTagsInRange(startTag, endTag) > 1e5) {
-    throw new Error("More than 100000 tags in this range");
+    throw new Error('More than 100000 tags in this range');
   }
 
-  let tagList = [];
+  const tagList = [];
 
   for (let i = 0; ; ++i) {
     const nextTag = getTagFromOffset(startTag, i);
@@ -65,7 +66,7 @@ export function generateTagRangeOrError(startTag: string, endTag: string): strin
     }
 
     if (i > 1e5) {
-      throw new Error("Exceeded tag upper bound");
+      throw new Error('Exceeded tag upper bound');
     }
   }
 
@@ -92,7 +93,7 @@ export function getTagFromOffset(tag: string, offset: number): string {
 
   const offsetSuffixInt = suffixInt + offset;
 
-  const offsetSuffix = offsetSuffixInt.toString().padStart(METRC_INT_SUFFIX_CHARCOUNT, "0");
+  const offsetSuffix = offsetSuffixInt.toString().padStart(METRC_INT_SUFFIX_CHARCOUNT, '0');
 
   return prefix + offsetSuffix;
 }
@@ -172,4 +173,11 @@ export function getDuplicates(tags: string[]) {
   });
 
   return [...duplicates].sort();
+}
+
+export function scrambleTag(tag: string): string {
+  const hash = CryptoJS.MD5(tag).toString();
+
+  // Taking the first 24 characters of the 32-character hash to get the desired length
+  return `1A44${hash.slice(0, 20).toLocaleUpperCase()}`;
 }

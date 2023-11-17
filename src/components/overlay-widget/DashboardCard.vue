@@ -7,10 +7,12 @@
   >
     <div>{{ title }}</div>
     <template v-if="loading">
-      <b-spinner small variant="ttt" class="mt-4"></b-spinner>
+      <div class="flex flex-row items-center justify-center">
+        <b-spinner small variant="ttt" class="mt-2"></b-spinner>
+      </div>
     </template>
     <template v-else>
-      <div class="text-xl t-4">
+      <div class="text-xl">
         <template v-if="count > 0">
           <span class="ttt-purple">{{ count }}</span>
         </template>

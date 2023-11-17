@@ -137,14 +137,14 @@
 </template>
 
 <script lang="ts">
-import { TabKey } from "@/consts";
-import { authManager } from "@/modules/auth-manager.module";
-import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
-import router from "@/router/index";
-import store from "@/store/page-overlay/index";
-import Vue from "vue";
-import { mapState } from "vuex";
-import DashboardCard from "./DashboardCard.vue";
+import { TabKey } from '@/consts';
+import { authManager } from '@/modules/auth-manager.module';
+import { primaryDataLoader } from '@/modules/data-loader/data-loader.module';
+import router from '@/router/index';
+import store from '@/store/page-overlay/index';
+import Vue from 'vue';
+import { mapState } from 'vuex';
+import DashboardCard from './DashboardCard.vue';
 
 const initialState = {
   activePlantBatchCount: null,
@@ -168,7 +168,7 @@ const initialState = {
 };
 
 export default Vue.extend({
-  name: "BuilderDashboard",
+  name: 'BuilderDashboard',
   store,
   router,
   props: {},
@@ -176,60 +176,60 @@ export default Vue.extend({
     DashboardCard,
   },
   computed: {
-    ...mapState(["authState"]),
+    ...mapState(['authState']),
     activePlantBatchesUrl(): string {
-      return this.tabKeyUrl("plants", TabKey.PLANTS_PLANTBATCHES_ACTIVE);
+      return this.tabKeyUrl('plants', TabKey.PLANTS_PLANTBATCHES_ACTIVE);
     },
     inactivePlantBatchesUrl(): string {
-      return this.tabKeyUrl("plants", TabKey.PLANTS_PLANTBATCHES_INACTIVE);
+      return this.tabKeyUrl('plants', TabKey.PLANTS_PLANTBATCHES_INACTIVE);
     },
     vegetativePlantsUrl(): string {
-      return this.tabKeyUrl("plants", TabKey.PlANTS_PLANTS_VEGETATIVE);
+      return this.tabKeyUrl('plants', TabKey.PlANTS_PLANTS_VEGETATIVE);
     },
     floweringPlantsUrl(): string {
-      return this.tabKeyUrl("plants", TabKey.PlANTS_PLANTS_FLOWERING);
+      return this.tabKeyUrl('plants', TabKey.PlANTS_PLANTS_FLOWERING);
     },
     inactivePlantsUrl(): string {
-      return this.tabKeyUrl("plants", TabKey.PlANTS_PLANTS_INACTIVE);
+      return this.tabKeyUrl('plants', TabKey.PlANTS_PLANTS_INACTIVE);
     },
     activeHarvestsUrl(): string {
-      return this.tabKeyUrl("plants", TabKey.PlANTS_HARVESTED_ACTIVE);
+      return this.tabKeyUrl('plants', TabKey.PlANTS_HARVESTED_ACTIVE);
     },
     inactiveHarvestsUrl(): string {
-      return this.tabKeyUrl("plants", TabKey.PlANTS_HARVESTED_INACTIVE);
+      return this.tabKeyUrl('plants', TabKey.PlANTS_HARVESTED_INACTIVE);
     },
     activePackagesUrl(): string {
-      return this.tabKeyUrl("packages", TabKey.PACKAGES_ACTIVE);
+      return this.tabKeyUrl('packages', TabKey.PACKAGES_ACTIVE);
     },
     inactivePackagesUrl(): string {
-      return this.tabKeyUrl("packages", TabKey.PACKAGES_INACTIVE);
+      return this.tabKeyUrl('packages', TabKey.PACKAGES_INACTIVE);
     },
     intransitPackagesUrl(): string {
-      return this.tabKeyUrl("packages", TabKey.PACKAGES_INTRANSIT);
+      return this.tabKeyUrl('packages', TabKey.PACKAGES_INTRANSIT);
     },
     incomingTransfersUrl(): string {
-      return this.tabKeyUrl("transfers/licensed", TabKey.TRANSFERS_INCOMING);
+      return this.tabKeyUrl('transfers/licensed', TabKey.TRANSFERS_INCOMING);
     },
     outgoingTransfersUrl(): string {
-      return this.tabKeyUrl("transfers/licensed", TabKey.TRANSFERS_OUTGOING);
+      return this.tabKeyUrl('transfers/licensed', TabKey.TRANSFERS_OUTGOING);
     },
     rejectedTransfersUrl(): string {
-      return this.tabKeyUrl("transfers/licensed", TabKey.TRANSFERS_REJECTED);
+      return this.tabKeyUrl('transfers/licensed', TabKey.TRANSFERS_REJECTED);
     },
     availableTagsUrl(): string {
-      return this.tabKeyUrl("admin/tags", TabKey.TAGS_AVAILABLE);
+      return this.tabKeyUrl('admin/tags', TabKey.TAGS_AVAILABLE);
     },
     usedTagsUrl(): string {
-      return this.tabKeyUrl("admin/tags", TabKey.TAGS_USED);
+      return this.tabKeyUrl('admin/tags', TabKey.TAGS_USED);
     },
     voidedTagsUrl(): string {
-      return this.tabKeyUrl("admin/tags", TabKey.TAGS_VOIDED);
+      return this.tabKeyUrl('admin/tags', TabKey.TAGS_VOIDED);
     },
     activeSalesUrl(): string {
-      return this.tabKeyUrl("sales/receipts", TabKey.SALES_ACTIVE);
+      return this.tabKeyUrl('sales/receipts', TabKey.SALES_ACTIVE);
     },
     inactiveSalesUrl(): string {
-      return this.tabKeyUrl("sales/receipts", TabKey.SALES_INACTIVE);
+      return this.tabKeyUrl('sales/receipts', TabKey.SALES_INACTIVE);
     },
   },
   data() {

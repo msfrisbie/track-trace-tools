@@ -3,21 +3,21 @@
 </template>
 
 <script lang="ts">
-import { IIndexedPlantData } from "@/interfaces";
-import Vue from "vue";
+import { IIndexedPlantData } from '@/interfaces';
+import Vue from 'vue';
 
 export default Vue.extend({
-  name: "PlantIcon",
+  name: 'PlantIcon',
   props: {
-    plant: Object as () => IIndexedPlantData
+    plant: Object as () => IIndexedPlantData,
   },
   computed: {
     icon() {
-      return "leaf";
+      return 'leaf';
     },
     iconColor() {
-      return "#49276a";
-    }
-  }
+      return '#49276a';
+    },
+  },
 });
 </script>

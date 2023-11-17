@@ -13007,6 +13007,11 @@ vue-eslint-parser@^7.0.0:
     lodash "^4.17.21"
     semver "^6.3.0"
 
+vue-fragment@^1.6.0:
+  version "1.6.0"
+  resolved "https://registry.yarnpkg.com/vue-fragment/-/vue-fragment-1.6.0.tgz#2ac0ff656b74fa87d049a003b5dcd5befe9185cc"
+  integrity sha512-a5T8ZZZK/EQzgVShEl374HbobUJ0a7v12BzOzS6Z/wd/5EE/5SffcyHC+7bf9hP3L7Yc0hhY/GhMdwFQ25O/8A==
+
 vue-functional-data-merge@^3.1.0:
   version "3.1.0"
   resolved "https://registry.npmjs.org/vue-functional-data-merge/-/vue-functional-data-merge-3.1.0.tgz"

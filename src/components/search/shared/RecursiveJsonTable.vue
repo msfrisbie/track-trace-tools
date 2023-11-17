@@ -24,18 +24,18 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import { mapState } from "vuex";
-import router from "@/router/index";
-import store from "@/store/page-overlay/index";
-import { copyToClipboard } from "@/utils/dom";
-import { MessageType } from "@/consts";
-import { IIndexedTransferData } from "@/interfaces";
-import { analyticsManager } from "@/modules/analytics-manager.module";
-import { toastManager } from "@/modules/toast-manager.module";
+import Vue from 'vue';
+import { mapState } from 'vuex';
+import router from '@/router/index';
+import store from '@/store/page-overlay/index';
+import { copyToClipboard } from '@/utils/dom';
+import { MessageType } from '@/consts';
+import { IIndexedTransferData } from '@/interfaces';
+import { analyticsManager } from '@/modules/analytics-manager.module';
+import { toastManager } from '@/modules/toast-manager.module';
 
 export default Vue.extend({
-  name: "RecursiveJsonTable",
+  name: 'RecursiveJsonTable',
   store,
   router,
   props: {
@@ -47,10 +47,10 @@ export default Vue.extend({
       function flattenObject(obj: Object) {
         const result = {};
 
-        function recurse(current: any, path = "") {
-          for (let key in current) {
+        function recurse(current: any, path = '') {
+          for (const key in current) { /* eslint-disable-line guard-for-in */
             const newPath = path ? `${path}${key}` : key;
-            if (typeof current[key] === "object") {
+            if (typeof current[key] === 'object') {
               recurse(current[key], newPath);
             } else {
               // @ts-ignore
@@ -67,13 +67,13 @@ export default Vue.extend({
       const pairs = Object.entries(flattenObject(this.$props.jsonObject)) as [string, any][];
 
       return pairs
-        .filter(([k, v]) => this.$data.showEmptyValues || (v !== null && v !== ""))
+        .filter(([k, v]) => this.$data.showEmptyValues || (v !== null && v !== ''))
         .map(([k, v]) => [
           k
-            .replace(/([A-Z])/g, " $1")
-            .split(" ")
-            .filter((word) => word !== "")
-            .join(" "),
+            .replace(/([A-Z])/g, ' $1')
+            .split(' ')
+            .filter((word) => word !== '')
+            .join(' '),
           v,
         ]);
     },
@@ -93,11 +93,11 @@ export default Vue.extend({
       copyToClipboard(text);
 
       toastManager.openToast(`'${text}' copied to clipboard`, {
-        title: "Copied Text",
+        title: 'Copied Text',
         autoHideDelay: 5000,
-        variant: "primary",
+        variant: 'primary',
         appendToast: true,
-        toaster: "ttt-toaster",
+        toaster: 'ttt-toaster',
         solid: true,
       });
     },

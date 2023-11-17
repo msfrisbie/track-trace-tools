@@ -33,25 +33,27 @@
 </template>
 
 <script lang="ts">
-import PackageSearchFilters from "@/components/search/package-search/PackageSearchFilters.vue";
-import PackageSearchResults from "@/components/search/package-search/PackageSearchResults.vue";
-import SearchPickerSelect from "@/components/page-overlay/SearchPickerSelect.vue";
-import { MessageType } from "@/consts";
-import { IPluginState } from "@/interfaces";
-import { analyticsManager } from "@/modules/analytics-manager.module";
-import { authManager } from "@/modules/auth-manager.module";
-import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
-import { searchManager } from "@/modules/search-manager.module";
-import store from "@/store/page-overlay/index";
-import { PackageSearchActions } from "@/store/page-overlay/modules/package-search/consts";
-import { combineLatest, Observable, timer } from "rxjs";
-import { debounceTime, filter, startWith, tap } from "rxjs/operators";
-import Vue from "vue";
-import { mapActions, mapState } from "vuex";
-import { SearchActions } from "@/store/page-overlay/modules/search/consts";
+import PackageSearchFilters from '@/components/search/package-search/PackageSearchFilters.vue';
+import PackageSearchResults from '@/components/search/package-search/PackageSearchResults.vue';
+import SearchPickerSelect from '@/components/page-overlay/SearchPickerSelect.vue';
+import { MessageType } from '@/consts';
+import { IPluginState } from '@/interfaces';
+import { analyticsManager } from '@/modules/analytics-manager.module';
+import { authManager } from '@/modules/auth-manager.module';
+import { primaryDataLoader } from '@/modules/data-loader/data-loader.module';
+import { searchManager } from '@/modules/search-manager.module';
+import store from '@/store/page-overlay/index';
+import { PackageSearchActions } from '@/store/page-overlay/modules/package-search/consts';
+import { combineLatest, Observable, timer } from 'rxjs';
+import {
+  debounceTime, filter, startWith, tap,
+} from 'rxjs/operators';
+import Vue from 'vue';
+import { mapActions, mapState } from 'vuex';
+import { SearchActions } from '@/store/page-overlay/modules/search/consts';
 
 export default Vue.extend({
-  name: "PackageSearchWidget",
+  name: 'PackageSearchWidget',
   store,
   components: {
     PackageSearchResults,
@@ -71,14 +73,13 @@ export default Vue.extend({
     ...mapActions({}),
   },
   watch: {
-    "searchState.showSearchResults": {
+    'searchState.showSearchResults': {
       immediate: true,
       handler(newValue: boolean, oldValue: boolean) {
         if (newValue) {
           timer(500).subscribe(() =>
             // @ts-ignore
-            this.$refs.search?.$el.focus()
-          );
+            this.$refs.search?.$el.focus());
         }
       },
     },

@@ -1,7 +1,7 @@
 const ALLOW_TRANSFER_TOOL_ACCESS_HOSTNAMES: string[] = [
-  "ca.metrc.com",
-  "mi.metrc.com",
-  "testing-az.metrc.com",
+  'ca.metrc.com',
+  'mi.metrc.com',
+  'testing-az.metrc.com',
 ];
 const DENY_TRANSFER_TOOL_ACCESS_REGEXPS: RegExp[] = [];
 
@@ -32,7 +32,7 @@ function regExpMatchOrNull({
   ];
 
   if (mergedRegExps.length === 0) {
-    throw new Error("Must match against at least one RegExp");
+    throw new Error('Must match against at least one RegExp');
   }
 
   for (const regExp of mergedRegExps) {

@@ -37,57 +37,9 @@
     </div>
 
     <div class="grid grid-cols-2 gap-2">
-      <b-button
-        variant="outline-primary"
-        size="sm"
-        style="width: 100%"
-        @click.stop.prevent="
-          viewManifest(transferSearchState.selectedTransferMetadata.transferData)
-        "
-        class="flex flex-row items-center justify-between space-x-4"
-      >
-        <span>VIEW MANIFEST</span>
-        <font-awesome-icon icon="file" />
-      </b-button>
-
-      <b-button
-        variant="outline-primary"
-        size="sm"
-        style="width: 100%"
-        @click.stop.prevent="
-          downloadManifest(transferSearchState.selectedTransferMetadata.transferData)
-        "
-        class="flex flex-row items-center justify-between space-x-4"
-      >
-        <span>DOWNLOAD MANIFEST</span>
-        <font-awesome-icon icon="file-download" />
-      </b-button>
-
-      <b-button
-        variant="outline-primary"
-        size="sm"
-        style="width: 100%"
-        @click.stop.prevent="
-          printManifest(transferSearchState.selectedTransferMetadata.transferData)
-        "
-        class="flex flex-row items-center justify-between space-x-4"
-      >
-        <span>PRINT MANIFEST</span>
-        <font-awesome-icon icon="print" />
-      </b-button>
-
-      <b-button
-        variant="outline-primary"
-        size="sm"
-        style="width: 100%"
-        @click.stop.prevent="
-          createScanSheet(transferSearchState.selectedTransferMetadata.transferData)
-        "
-        class="flex flex-row items-center justify-between space-x-4"
-      >
-        <span>CREATE SCAN SHEET</span>
-        <font-awesome-icon icon="barcode" />
-      </b-button>
+      <transfer-button-list
+        :transfer="transferSearchState.selectedTransferMetadata.transferData"
+      ></transfer-button-list>
     </div>
 
     <recursive-json-table
@@ -97,30 +49,19 @@
 </template>
 
 <script lang="ts">
+import TransferButtonList from "@/components/overlay-widget/shared/TransferButtonList.vue";
 import RecursiveJsonTable from "@/components/search/shared/RecursiveJsonTable.vue";
-import {
-  MessageType,
-  ModalAction,
-  ModalType,
-  TransferFilterIdentifiers,
-  TransferState,
-} from "@/consts";
+import { MessageType, TransferState } from "@/consts";
 import { IIndexedTransferData, IPluginState } from "@/interfaces";
 import { analyticsManager } from "@/modules/analytics-manager.module";
-import { modalManager } from "@/modules/modal-manager.module";
-import { pageManager } from "@/modules/page-manager/page-manager.module";
 import { TRANSFER_TAB_REGEX } from "@/modules/page-manager/consts";
 import { toastManager } from "@/modules/toast-manager.module";
-import { MutationType } from "@/mutation-types";
 import store from "@/store/page-overlay/index";
-import { copyToClipboard, downloadFileFromUrl, printPdfFromUrl } from "@/utils/dom";
-import { createScanSheet } from "@/utils/transfer";
-import { Subject } from "rxjs";
-import { takeUntil } from "rxjs/operators";
-import Vue from "vue";
-import { TransferSearchActions } from "@/store/page-overlay/modules/transfer-search/consts";
-import { mapActions, mapState } from "vuex";
 import { SearchActions } from "@/store/page-overlay/modules/search/consts";
+import { TransferSearchActions } from "@/store/page-overlay/modules/transfer-search/consts";
+import { copyToClipboard } from "@/utils/dom";
+import Vue from "vue";
+import { mapActions, mapState } from "vuex";
 
 function isIsoDateToday(isodate: string): boolean {
   if (!isodate) {
@@ -144,9 +85,8 @@ function deliveryTimeDescriptor(isodate: string | null): string {
 
   if (isToday) {
     return `today at ${timeDescriptor}`;
-  } else {
-    return `${dateDescriptor} at ${timeDescriptor}`;
   }
+  return `${dateDescriptor} at ${timeDescriptor}`;
 }
 
 export default Vue.extend({
@@ -155,6 +95,7 @@ export default Vue.extend({
   components: {
     // TransferIcon,
     RecursiveJsonTable,
+    TransferButtonList,
   },
   computed: {
     ...mapState<IPluginState>({
@@ -193,11 +134,11 @@ export default Vue.extend({
 
       switch (transfer.TransferState) {
         case TransferState.INCOMING:
-          if (!!transfer.ReceivedDateTime) {
+          if (transfer.ReceivedDateTime) {
             return `Received ${deliveryTimeDescriptor(transfer.ReceivedDateTime)}`;
           }
 
-          if (!!transfer.EstimatedArrivalDateTime) {
+          if (transfer.EstimatedArrivalDateTime) {
             return `Scheduled for delivery ${deliveryTimeDescriptor(
               transfer.EstimatedArrivalDateTime
             )}`;
@@ -205,17 +146,17 @@ export default Vue.extend({
 
           return "Scheduled for delivery";
         case TransferState.OUTGOING:
-          if (!!transfer.CreatedDateTime) {
+          if (transfer.CreatedDateTime) {
             return `Created ${deliveryTimeDescriptor(transfer.CreatedDateTime)}`;
           }
 
           return "Scheduled for delivery";
         case TransferState.REJECTED:
-          if (!!transfer.ReceivedDateTime) {
+          if (transfer.ReceivedDateTime) {
             return `Return received ${deliveryTimeDescriptor(transfer.ReceivedDateTime)}`;
           }
 
-          if (!!transfer.EstimatedReturnDepartureDateTime) {
+          if (transfer.EstimatedReturnDepartureDateTime) {
             return `Scheduled for return ${deliveryTimeDescriptor(
               transfer.EstimatedReturnDepartureDateTime
             )}`;
@@ -223,7 +164,7 @@ export default Vue.extend({
 
           return "Scheduled for return";
         default:
-          return `Scheduled for transfer`;
+          return "Scheduled for transfer";
       }
     },
   },
@@ -264,42 +205,6 @@ export default Vue.extend({
         toaster: "ttt-toaster",
         solid: true,
       });
-    },
-    viewManifest(transfer: IIndexedTransferData) {
-      const manifestUrl = `${window.location.origin}/reports/transfers/${store.state.pluginAuth?.authState?.license}/manifest?id=${transfer.ManifestNumber}`;
-
-      modalManager.dispatchModalEvent(ModalType.DOCUMENT, ModalAction.OPEN, {
-        documentUrls: [manifestUrl],
-      });
-
-      analyticsManager.track(MessageType.CLICKED_TOOLKIT_VIEW_MANIFEST_BUTTON);
-      store.commit(`transferSearch/${MutationType.SET_SHOW_TRANSFER_SEARCH_RESULTS}`, false);
-    },
-    downloadManifest(transfer: IIndexedTransferData) {
-      const manifestUrl = `${window.location.origin}/reports/transfers/${store.state.pluginAuth?.authState?.license}/manifest?id=${transfer.ManifestNumber}`;
-
-      downloadFileFromUrl({
-        url: manifestUrl,
-        filename: `Manifest_${transfer.ManifestNumber}.pdf`,
-      });
-
-      analyticsManager.track(MessageType.CLICKED_TOOLKIT_DOWNLOAD_BUTTON);
-      store.commit(`transferSearch/${MutationType.SET_SHOW_TRANSFER_SEARCH_RESULTS}`, false);
-    },
-    printManifest(transfer: IIndexedTransferData) {
-      const manifestUrl = `${window.location.origin}/reports/transfers/${store.state.pluginAuth?.authState?.license}/manifest?id=${transfer.ManifestNumber}`;
-
-      printPdfFromUrl({ urls: [manifestUrl], modal: true });
-
-      analyticsManager.track(MessageType.CLICKED_TOOLKIT_PRINT_BUTTON);
-      store.commit(`transferSearch/${MutationType.SET_SHOW_TRANSFER_SEARCH_RESULTS}`, false);
-    },
-    async createScanSheet(transfer: IIndexedTransferData) {
-      analyticsManager.track(MessageType.CLICKED_TOOLKIT_CREATE_SCAN_SHEET_BUTTON);
-
-      await createScanSheet(transfer.Id, transfer.ManifestNumber);
-
-      store.commit(`transferSearch/${MutationType.SET_SHOW_TRANSFER_SEARCH_RESULTS}`, false);
     },
     badgeVariant(transfer: IIndexedTransferData) {
       switch (transfer.TransferState as TransferState) {

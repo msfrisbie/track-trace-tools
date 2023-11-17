@@ -70,41 +70,39 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import store from "@/store/page-overlay/index";
-import { TaskType, METRC_TAG_REGEX, MessageType } from "@/consts";
-import { mapState } from "vuex";
-import { MutationType } from "@/mutation-types";
-import { createTask } from "@/utils/tasks";
-import { analyticsManager } from "@/modules/analytics-manager.module";
-import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
-import { primaryMetrcRequestManager } from "@/modules/metrc-request-manager.module";
-import { extractIContactInfoFromITagOrderData } from "@/utils/address";
+import { MessageType, TaskType } from '@/consts';
 import {
   IContactInfo,
   IExtractedITagOrderData,
-  ITagOrderData,
   IReorderTagsFormData,
-} from "@/interfaces";
-import { authManager } from "@/modules/auth-manager.module";
+  ITagOrderData,
+} from '@/interfaces';
+import { analyticsManager } from '@/modules/analytics-manager.module';
+import { authManager } from '@/modules/auth-manager.module';
+import { primaryDataLoader } from '@/modules/data-loader/data-loader.module';
+import { MutationType } from '@/mutation-types';
+import store from '@/store/page-overlay/index';
+import { extractIContactInfoFromITagOrderData } from '@/utils/address';
+import { createTask } from '@/utils/tasks';
+import Vue from 'vue';
+import { mapState } from 'vuex';
 
 export default Vue.extend({
-  name: "ReorderTagsForm",
+  name: 'ReorderTagsForm',
   store,
   computed: {
-    ...mapState(["currentView"]),
+    ...mapState(['currentView']),
   },
   async mounted() {
     await authManager.authStateOrError();
 
     const previousTagOrders: Array<ITagOrderData> = await primaryDataLoader.previousTagOrders();
 
-    for (let previousTagOrder of previousTagOrders) {
+    for (const previousTagOrder of previousTagOrders) {
       this.contactInfos.push(extractIContactInfoFromITagOrderData(previousTagOrder));
     }
 
-    const tagOrderData: IExtractedITagOrderData =
-      await primaryDataLoader.getExtractedITagOrderModalData();
+    const tagOrderData: IExtractedITagOrderData = await primaryDataLoader.getExtractedITagOrderModalData();
 
     // We aggregate multiple addresses, but the 0th one in this array is the most recent order
     this.contactInfos.push(tagOrderData.contactInfo);
@@ -123,7 +121,7 @@ export default Vue.extend({
     form: IReorderTagsFormData;
     contactInfos: Array<IContactInfo>;
     maxOrderSizes: { maxPlantOrderSize: number; maxPackageOrderSize: number };
-  } {
+    } {
     return {
       contactInfos: [],
       maxOrderSizes: {
@@ -134,14 +132,14 @@ export default Vue.extend({
         plantTagCount: 0,
         packageTagCount: 0,
         contactInfo: {
-          contactName: "",
-          phoneNumber: "",
+          contactName: '',
+          phoneNumber: '',
           address: {
-            address1: "",
-            address2: "",
-            city: "",
-            state: "",
-            zip: "",
+            address1: '',
+            address2: '',
+            city: '',
+            state: '',
+            zip: '',
           },
         },
       },
@@ -151,7 +149,8 @@ export default Vue.extend({
     async onSubmit(evt: any) {
       evt.preventDefault();
 
-      if (!window.confirm("Are you sure you wish to place this tag order?")) {
+      /* eslint-disable-next-line no-alert */
+      if (!window.confirm('Are you sure you wish to place this tag order?')) {
         return;
       }
 
@@ -159,7 +158,7 @@ export default Vue.extend({
 
       store.commit(
         MutationType.ENQUEUE_TASK,
-        await createTask(TaskType.REORDER_TAGS, JSON.parse(JSON.stringify(this.form)))
+        await createTask(TaskType.REORDER_TAGS, JSON.parse(JSON.stringify(this.form))),
       );
     },
     onReset(evt: any) {},

@@ -216,30 +216,30 @@
 </template>
 
 <script lang="ts">
-import BuilderStepHeader from "@/components/overlay-widget/shared/BuilderStepHeader.vue";
-import ItemPicker from "@/components/overlay-widget/shared/ItemPicker.vue";
-import LocationPicker from "@/components/overlay-widget/shared/LocationPicker.vue";
-import PackagePicker from "@/components/overlay-widget/shared/PackagePicker.vue";
-import TagPicker from "@/components/overlay-widget/shared/TagPicker.vue";
-import { BuilderType, MessageType } from "@/consts";
+import BuilderStepHeader from '@/components/overlay-widget/shared/BuilderStepHeader.vue';
+import ItemPicker from '@/components/overlay-widget/shared/ItemPicker.vue';
+import LocationPicker from '@/components/overlay-widget/shared/LocationPicker.vue';
+import PackagePicker from '@/components/overlay-widget/shared/PackagePicker.vue';
+import TagPicker from '@/components/overlay-widget/shared/TagPicker.vue';
+import { BuilderType, MessageType } from '@/consts';
 import {
   ICsvFile,
   IIntermediateCreatePackageFromPackagesData,
   IMetrcCreatePackagesFromPackagesPayload,
   IPackageData,
   ITagData,
-} from "@/interfaces";
-import { analyticsManager } from "@/modules/analytics-manager.module";
-import { builderManager } from "@/modules/builder-manager.module";
-import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
-import { dynamicConstsManager } from "@/modules/dynamic-consts-manager.module";
-import store from "@/store/page-overlay/index";
-import { safeZip } from "@/utils/array";
-import { buildCsvDataOrError, buildNamedCsvFileData } from "@/utils/csv";
-import { submitDateFromIsodate, todayIsodate } from "@/utils/date";
-import { allocatePackageQuantities } from "@/utils/misc";
-import { timer } from "rxjs";
-import Vue from "vue";
+} from '@/interfaces';
+import { analyticsManager } from '@/modules/analytics-manager.module';
+import { builderManager } from '@/modules/builder-manager.module';
+import { primaryDataLoader } from '@/modules/data-loader/data-loader.module';
+import { dynamicConstsManager } from '@/modules/dynamic-consts-manager.module';
+import store from '@/store/page-overlay/index';
+import { safeZip } from '@/utils/array';
+import { buildCsvDataOrError, buildNamedCsvFileData } from '@/utils/csv';
+import { submitDateFromIsodate, todayIsodate } from '@/utils/date';
+import { allocatePackageQuantities } from '@/utils/misc';
+import { timer } from 'rxjs';
+import Vue from 'vue';
 
 function totalPackageQuantityAvailableOrNull(packages: IPackageData[]): number | null {
   if (!packages.length) {
@@ -259,20 +259,19 @@ async function defaultRemediatePackageMethod(): Promise<string> {
   try {
     const methods = await dynamicConstsManager.remediatePackageMethods();
 
-    const filteredMethods = methods.filter((x) => x.Id.toString() === "0");
+    const filteredMethods = methods.filter((x) => x.Id.toString() === '0');
 
     if (filteredMethods.length === 0) {
       return methods[0].Id.toString();
-    } else {
-      return filteredMethods[0].Id.toString();
     }
+    return filteredMethods[0].Id.toString();
   } catch (e) {
-    return "0";
+    return '0';
   }
 }
 
 export default Vue.extend({
-  name: "MergePackagesBuilder",
+  name: 'MergePackagesBuilder',
   store,
   components: {
     BuilderStepHeader,
@@ -296,42 +295,41 @@ export default Vue.extend({
       // @ts-ignore
       const zipped: [ITagData, IIntermediateCreatePackageFromPackagesData][] = safeZip(
         this.$data.packageTags,
-        this.$data.newPackageData
+        this.$data.newPackageData,
       );
 
-      for (let el of zipped) {
+      for (const el of zipped) {
         const [tag, newPackageData] = el;
 
-        const lowestExpirationDate: string =
-          newPackageData.ingredients
-            .map((x) => x.pkg.ExpirationDate)
-            .filter((x) => x && x.length > 0)
-            .sort((a, b) => a!.toLowerCase().localeCompare(b!.toLowerCase()))[0] ?? "";
+        const lowestExpirationDate: string = newPackageData.ingredients
+          .map((x) => x.pkg.ExpirationDate)
+          .filter((x) => x && x.length > 0)
+          .sort((a, b) => a!.toLowerCase().localeCompare(b!.toLowerCase()))[0] ?? '';
 
         const row: IMetrcCreatePackagesFromPackagesPayload = {
           ActualDate: submitDateFromIsodate(this.$data.packageIsodate),
           Ingredients: newPackageData.ingredients.map((ingredient) => ({
-            FinishDate: "", // Default to do not finish
+            FinishDate: '', // Default to do not finish
             PackageId: ingredient.pkg.Id.toString(),
             Quantity: ingredient.quantity.toString(),
             UnitOfMeasureId: ingredient.pkg.Item.UnitOfMeasureId.toString(),
           })),
           ItemId: this.$data.outputItem.Id.toString(),
           Note: this.$data.note,
-          ProductionBatchNumber: "",
+          ProductionBatchNumber: '',
           ExpirationDate: lowestExpirationDate,
           Quantity: newPackageData.quantity.toString(),
           TagId: tag.Id.toString(),
           UnitOfMeasureId: this.$data.outputItem.UnitOfMeasureId.toString(),
-          RemediationDate: "",
-          RemediationMethodId: "0", //await defaultRemediatePackageMethod(),
-          RemediationSteps: "",
-          UseByDate: "",
-          SellByDate: "",
+          RemediationDate: '',
+          RemediationMethodId: '0', // await defaultRemediatePackageMethod(),
+          RemediationSteps: '',
+          UseByDate: '',
+          SellByDate: '',
           ...(this.$data.facilityUsesLocationForPackages
             ? {
-                LocationId: this.$data.location.Id.toString(),
-              }
+              LocationId: this.$data.location.Id.toString(),
+            }
             : {}),
           // UseSameItem: "false", // default to false and just provide the item id anyway
         };
@@ -348,12 +346,12 @@ export default Vue.extend({
           unitOfMeasure: this.$data.outputItem.UnitOfMeasureName,
         },
         this.buildCsvFiles(),
-        5
+        5,
       );
     },
     useMax() {
       this.$data.totalPackageQuantity = totalPackageQuantityAvailableOrNull(
-        this.$data.selectedPackages
+        this.$data.selectedPackages,
       );
     },
     buildCsvFiles(): ICsvFile[] {
@@ -373,14 +371,14 @@ export default Vue.extend({
       // @ts-ignore
       const zipped: [ITagData, IIntermediateCreatePackageFromPackagesData][] = safeZip(
         this.$data.packageTags,
-        this.$data.newPackageData
+        this.$data.newPackageData,
       );
 
       const flattened = [];
 
       // zipped contains nested lists, so we need to flatten into a 2d matrix
-      for (let [tagData, newPackageData] of zipped) {
-        for (let ingredient of newPackageData.ingredients) {
+      for (const [tagData, newPackageData] of zipped) {
+        for (const ingredient of newPackageData.ingredients) {
           flattened.push({
             sourceLabel: ingredient.pkg.Label,
             sourceItem: ingredient.pkg.Item.Name,
@@ -434,7 +432,7 @@ export default Vue.extend({
 
         return buildNamedCsvFileData(
           csvData,
-          `Merging ${this.$data.totalPackageQuantity} ${this.$data.outputItem.UnitOfMeasureName} ${this.$data.outputItem.Name} from ${this.$data.selectedPackages.length} packages`
+          `Merging ${this.$data.totalPackageQuantity} ${this.$data.outputItem.UnitOfMeasureName} ${this.$data.outputItem.Name} from ${this.$data.selectedPackages.length} packages`,
         );
       } catch (e) {
         console.error(e);
@@ -445,17 +443,17 @@ export default Vue.extend({
   computed: {
     allDetailsProvided() {
       return (
-        this.$data.selectedPackages.length > 0 &&
-        this.$data.newPackageData.length > 0 &&
-        !!this.$data.totalPackageQuantity &&
-        this.$data.totalPackageQuantity > 0 &&
-        (this.$data.location || !this.$data.facilityUsesLocationForPackages)
+        this.$data.selectedPackages.length > 0
+        && this.$data.newPackageData.length > 0
+        && !!this.$data.totalPackageQuantity
+        && this.$data.totalPackageQuantity > 0
+        && (this.$data.location || !this.$data.facilityUsesLocationForPackages)
       );
     },
     tagsSelected() {
       return (
-        this.$data.packageTags.length > 0 &&
-        this.$data.packageTags.length === this.$data.newPackageData.length
+        this.$data.packageTags.length > 0
+        && this.$data.packageTags.length === this.$data.newPackageData.length
       );
     },
     csvFiles(): ICsvFile[] {
@@ -477,7 +475,7 @@ export default Vue.extend({
 
         this.$data.newPackageData = allocatePackageQuantities(
           [newValue],
-          this.$data.selectedPackages
+          this.$data.selectedPackages,
         );
       },
     },
@@ -488,7 +486,7 @@ export default Vue.extend({
       activeStepIndex: 0,
       selectedPackages: [],
       packageIsodate: todayIsodate(),
-      note: "",
+      note: '',
       totalPackageQuantity: 0,
       newPackageData: [],
       packageTags: [],
@@ -501,13 +499,13 @@ export default Vue.extend({
       facilityUsesLocationForPackages: false,
       steps: [
         {
-          stepText: "Select packages to merge",
+          stepText: 'Select packages to merge',
         },
         {
-          stepText: "Merge details",
+          stepText: 'Merge details',
         },
         {
-          stepText: "Submit",
+          stepText: 'Submit',
         },
       ],
     };
@@ -517,8 +515,7 @@ export default Vue.extend({
     timer(1000).subscribe(() => primaryDataLoader.availableTags({}));
     timer(1000).subscribe(() => dynamicConstsManager.remediatePackageMethods());
 
-    this.$data.facilityUsesLocationForPackages =
-      await dynamicConstsManager.facilityUsesLocationForPackages();
+    this.$data.facilityUsesLocationForPackages = await dynamicConstsManager.facilityUsesLocationForPackages();
   },
   destroyed() {
     // Looks like modal is not actually destroyed

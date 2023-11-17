@@ -6,14 +6,14 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import { mapState } from "vuex";
-import router from "@/router/index";
-import store from "@/store/page-overlay/index";
-import { t3RequestManager } from "@/modules/t3-request-manager.module";
+import Vue from 'vue';
+import { mapState } from 'vuex';
+import router from '@/router/index';
+import store from '@/store/page-overlay/index';
+import { t3RequestManager } from '@/modules/t3-request-manager.module';
 
 export default Vue.extend({
-  name: "Verify",
+  name: 'Verify',
   store,
   router,
   props: {},

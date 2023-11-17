@@ -1,5 +1,5 @@
-import { IAuthState, ICurrentUser } from "@/interfaces";
-import { OAuthState } from "./consts";
+import { IAuthState, ICurrentUser } from '@/interfaces';
+import { OAuthState } from './consts';
 
 export interface IPluginAuthState {
   authState: IAuthState | null;
