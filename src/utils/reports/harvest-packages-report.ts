@@ -778,7 +778,6 @@ export async function maybeLoadHarvestPackagesReportData({
 
   const harvestPackageMatrix: any[][] = harvestPackageRowData.filter((row) => {
     if (harvestConfig.removeFloorNugs) {
-      // if (row[]) TODO
       if (row.Strain === 'Floor Nugs') {
         return false;
       }

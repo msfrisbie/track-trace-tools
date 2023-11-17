@@ -254,7 +254,6 @@ class PageManager implements IAtomicService {
   refreshResolve: any;
 
   async init() {
-    // this.manageLoginRedirect();
     this.manageRecoveryLinks();
 
     this.setEventHandlers();
@@ -455,7 +454,6 @@ class PageManager implements IAtomicService {
     this.paused = true;
 
     try {
-      // TODO much of this can be moved into observer handler
       if (!this.extendButton) {
         this.extendButton = document.querySelector('#extend_session') as HTMLElement | null;
       }
@@ -476,7 +474,6 @@ class PageManager implements IAtomicService {
         );
       }
 
-      // TODO move this into property
       const userAlerts = document.querySelector('#user-alerts');
       if (userAlerts) {
         // @ts-ignore
@@ -487,7 +484,6 @@ class PageManager implements IAtomicService {
 
       this.activeModal = document.querySelector('div.k-widget.k-window');
 
-      // TODO the methods should read the store directly
       if (store.state.settings?.preventLogout) {
         await this.clickLogoutDismiss();
       }

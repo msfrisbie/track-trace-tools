@@ -56,6 +56,7 @@ describe('date.ts', () => {
   });
 
   it('Converts iso datetimes', () => {
+    /* eslint-disable-next-line no-warning-comments */
     // TODO: figure out way to set TZ for jest
     if (new Date().getTimezoneOffset() === 300) {
       expect(isoDatetimeToLocalDate('2023-04-05T00:00:00.000Z')).toEqual('2023-04-04'); // Indicates correct conversion

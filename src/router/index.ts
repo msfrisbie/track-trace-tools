@@ -20,8 +20,8 @@ import UnpackImmaturePlantsBuilder from '@/components/overlay-widget/cultivation
 import MetrcExplorer from '@/components/overlay-widget/explorer/MetrcExplorer.vue';
 import LicenseGraph from '@/components/overlay-widget/graph/LicenseGraph.vue';
 import MiscellaneousListView from '@/components/overlay-widget/miscellaneous/MiscellaneousListView.vue';
-import Verify from '@/components/overlay-widget/miscellaneous/Verify.vue';
 import Plus from '@/components/overlay-widget/miscellaneous/Plus.vue';
+import Verify from '@/components/overlay-widget/miscellaneous/Verify.vue';
 import AllocateSamplesBuilder from '@/components/overlay-widget/package/AllocateSamplesBuilder.vue';
 import CreatePackageCsvBuilder from '@/components/overlay-widget/package/CreatePackageCsvBuilder.vue';
 import FinishPackagesBuilder from '@/components/overlay-widget/package/FinishPackagesBuilder.vue';
@@ -33,7 +33,6 @@ import PackageHistory from '@/components/overlay-widget/package/PackageHistory.v
 import PackageToolsHelp from '@/components/overlay-widget/package/PackageToolsHelp.vue';
 import SplitPackageBuilder from '@/components/overlay-widget/package/SplitPackageBuilder.vue';
 import TransferBuilder from '@/components/overlay-widget/transfer/TransferBuilder.vue';
-import TransferTemplateBuilder from '@/components/overlay-widget/transfer/TransferTemplateBuilder.vue';
 import TransferToolsHelp from '@/components/overlay-widget/transfer/TransferToolsHelp.vue';
 import UnavailablePage from '@/components/overlay-widget/UnavailablePage.vue';
 import CheckPermissionsView from '@/components/page-overlay/CheckPermissionsView.vue';
@@ -220,11 +219,6 @@ const routes: Array<RouteConfig> = [
     path: '/transfer/transfer-builder',
     name: 'Transfer Builder',
     component: TransferBuilder,
-  },
-  {
-    path: '/transfer/transfer-builder-template',
-    name: 'Create Transfer Template',
-    component: TransferTemplateBuilder,
   },
   {
     path: '/admin/debug-layout',

@@ -173,13 +173,6 @@ export default Vue.extend({
         sectionName: this.sectionName,
         priority: this.sectionPriority,
       };
-      // }
-      // // TODO debounce this to improve mouseover accuracy
-      // searchManager.selectedPackage.next({
-      //   packageData,
-      //   sectionName: this.sectionName,
-      //   priority: this.sectionPriority,
-      // });
     },
     applyFilter() {
       if (this.disableFilter) {

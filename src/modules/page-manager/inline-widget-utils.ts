@@ -115,7 +115,6 @@ export async function addButtonsToPackageTableImpl() {
     const groupId = grid.getAttribute(TTT_TABLEGROUP_ATTRIBUTE);
 
     const packageHeaderCell = grid.querySelector(
-      // TODO: this might select plants too?
       `[${TTT_TABLEGROUP_ATTRIBUTE}="${groupId}"] th[data-field="Label"],
       [${TTT_TABLEGROUP_ATTRIBUTE}="${groupId}"] th[data-field="PackageLabel"]`,
     );

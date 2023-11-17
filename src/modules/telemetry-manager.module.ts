@@ -43,8 +43,6 @@ class TelemetryManager implements IAtomicService {
 
     const payload = buildBody({ page: 0, pageSize: 20 });
 
-    // TODO telemetry when not logged in
-
     const t0_flowering: number = performance.now();
     primaryMetrcRequestManager
       .getFloweringPlants(

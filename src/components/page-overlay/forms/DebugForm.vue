@@ -24,7 +24,6 @@
         Debug mode
       </b-form-checkbox>
 
-      <!-- TODO migrate these to flags -->
       <b-form-checkbox
         id="checkbox-toggleMuteAnalytics"
         v-model="muteAnalytics"

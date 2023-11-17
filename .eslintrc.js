@@ -53,6 +53,7 @@ module.exports = {
     "class-methods-use-this": "off",
     "no-empty-function": "off",
     "implicit-arrow-linebreak": "off",
+    "no-warning-comments": IS_PROD ? "error" : "warn",
     // These rules fight with prettier
     quotes: "off",
     "object-curly-newline": "off",

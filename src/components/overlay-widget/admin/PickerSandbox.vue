@@ -8,7 +8,6 @@
         one = null;
       "
     >
-      <!-- TODO not all of these work properly yet -->
       <b-tab lazy title="Plant Picker">
         <plant-picker :enableVegetative="true" :selectedPlants.sync="many" />
       </b-tab>

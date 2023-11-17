@@ -344,7 +344,6 @@ const vuexStore = new Vuex.Store<IPluginState>({
     },
   },
   getters: {
-    // Used in transfer builder TODO fix
     authState: (state) => state.pluginAuth?.authState || null,
     // packagesUrl: (state) =>
     //   state.pluginAuth?.authState?.license

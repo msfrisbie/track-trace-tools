@@ -1,4 +1,4 @@
-# TODO
+# TO-DO
 
 ## Typing Vue components
 

@@ -78,7 +78,6 @@ const MOCK_PERCENT_FAILURE = 0;
 class BuilderManager implements IAtomicService {
   builderSubmitState: BuilderSubmitState = BuilderSubmitState.SUBMIT_PROJECT_QUEUE;
 
-  // TODO move this to Vuex
   activeBuilderProject: IBuilderProject | null = null;
 
   activeBuilderProjectUpdate: Subject<any> = new Subject<any>();
@@ -87,7 +86,6 @@ class BuilderManager implements IAtomicService {
     await authManager.authStateOrError();
 
     // This persistence causes problems between tabs/licenses
-    // TODO: rethink
     //
     // const persistedProjectData: string | null | undefined = await get(BUILDER_PROJECT_IDB_KEY);
 
@@ -184,7 +182,6 @@ class BuilderManager implements IAtomicService {
   destroyProject() {
     this.pause();
 
-    // TODO check that the project is complete
     if (
       this.activeBuilderProject?.failedRows.length === 0
       && this.activeBuilderProject?.inflightRows.length === 0

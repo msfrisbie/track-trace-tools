@@ -39,8 +39,8 @@ const OUTGOING_INACTIVE_TRANSFERS_URL = `${origin({ divertToNullOrigin: false })
 const REJECTED_TRANSFERS_URL = `${origin({ divertToNullOrigin: false })}/api/transfers/rejected`;
 const LAYOVER_TRANSFERS_URL = `${origin({ divertToNullOrigin: false })}/api/transfers/layovers`;
 
-const TRANSFER_DESTINATIONS_URL = `${origin({ divertToNullOrigin: false })}/api/transfers/destinations`; // TODO ?id=39
-const TRANSFER_DESTINATION_PACKAGES_URL = `${origin({ divertToNullOrigin: false })}/api/transfers/destinations/packages`; // TODO ?id=39
+const TRANSFER_DESTINATIONS_URL = `${origin({ divertToNullOrigin: false })}/api/transfers/destinations`; // ?id=39
+const TRANSFER_DESTINATION_PACKAGES_URL = `${origin({ divertToNullOrigin: false })}/api/transfers/destinations/packages`; // ?id=39
 
 const TRANSFER_DESTINATION_FACILITIES_URL = `${origin({ divertToNullOrigin: false })
 }/api/facilities/forlookup/forlicensedtransferdestinations`;

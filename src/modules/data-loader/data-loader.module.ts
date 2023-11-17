@@ -465,10 +465,6 @@ export class DataLoader implements IAtomicService {
   }
 
   async availableTag(tag: string): Promise<IIndexedTagData> {
-    if (store.state.mockDataMode) {
-      // TODO
-    }
-
     return new Promise(async (resolve, reject) => {
       const subscription = timer(DATA_LOAD_FETCH_TIMEOUT_MS).subscribe(() =>
         reject('Available tag fetch timed out'));
@@ -2754,10 +2750,6 @@ export class DataLoader implements IAtomicService {
   }
 
   private async loadIncomingTransfer(manifestNumber: string): Promise<ITransferData> {
-    if (store.state.mockDataMode) {
-      // TODO
-    }
-
     await authManager.authStateOrError();
 
     const page = 0;
@@ -2791,10 +2783,6 @@ export class DataLoader implements IAtomicService {
   }
 
   private async loadOutgoingTransfer(manifestNumber: string): Promise<ITransferData> {
-    if (store.state.mockDataMode) {
-      // TODO
-    }
-
     await authManager.authStateOrError();
 
     const page = 0;
@@ -2828,10 +2816,6 @@ export class DataLoader implements IAtomicService {
   }
 
   private async loadOutgoingInactiveTransfer(manifestNumber: string): Promise<ITransferData> {
-    if (store.state.mockDataMode) {
-      // TODO
-    }
-
     await authManager.authStateOrError();
 
     const page = 0;
@@ -2865,10 +2849,6 @@ export class DataLoader implements IAtomicService {
   }
 
   private async loadIncomingInactiveTransfer(manifestNumber: string): Promise<ITransferData> {
-    if (store.state.mockDataMode) {
-      // TODO
-    }
-
     await authManager.authStateOrError();
 
     const page = 0;
@@ -2902,11 +2882,6 @@ export class DataLoader implements IAtomicService {
   }
 
   private async loadRejectedTransfer(manifestNumber: string): Promise<ITransferData> {
-    if (store.state.mockDataMode) {
-      // TODO
-      // return mockDataManager.mockTags().filter(tagData => tagData.Label === label)[0];
-    }
-
     await authManager.authStateOrError();
 
     const page = 0;
@@ -3112,11 +3087,6 @@ export class DataLoader implements IAtomicService {
   }
 
   private async loadActivePackage(label: string): Promise<IPackageData> {
-    if (store.state.mockDataMode) {
-      // TODO
-      // return mockDataManager.mockTags().filter(tagData => tagData.Label === label)[0];
-    }
-
     await authManager.authStateOrError();
 
     const page = 0;
@@ -3168,11 +3138,6 @@ export class DataLoader implements IAtomicService {
   }
 
   private async loadInactivePackage(label: string): Promise<IPackageData> {
-    if (store.state.mockDataMode) {
-      // TODO
-      // return mockDataManager.mockTags().filter(tagData => tagData.Label === label)[0];
-    }
-
     await authManager.authStateOrError();
 
     const page = 0;
@@ -3226,11 +3191,6 @@ export class DataLoader implements IAtomicService {
   }
 
   private async loadInTransitPackage(label: string): Promise<IPackageData> {
-    if (store.state.mockDataMode) {
-      // TODO
-      // return mockDataManager.mockTags().filter(tagData => tagData.Label === label)[0];
-    }
-
     await authManager.authStateOrError();
 
     const page = 0;

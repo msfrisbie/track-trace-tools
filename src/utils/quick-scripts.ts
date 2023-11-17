@@ -486,7 +486,6 @@ export async function expandGrowthPhaseTags() {
     tagRange.shift();
 
     if (tagRange.length !== addedRows.length) {
-      // TODO show error for bad tag # and exit
       toastManager.openToast(
         `Couldn't allocate enough tags in this range: needed ${addedRows.length}, found ${tagRange.length}`,
         {

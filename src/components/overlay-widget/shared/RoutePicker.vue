@@ -48,8 +48,6 @@ const debugLog = debugLogFactory('RoutePicker.vue');
 
 export default Vue.extend({
   name: 'RoutePicker',
-  // TODO adding props causes a typescript store error.
-  // adding an entry to shims-vue.d.ts caues a different error.
   props: {
     originAddress: String,
     destinationAddress: String,

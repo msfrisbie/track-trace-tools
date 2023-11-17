@@ -638,7 +638,6 @@ class DynamicConstsManager implements IAtomicService {
           } else {
             const html = await this.transferTemplateHTML();
 
-            // TODO move this to background thread?
             const extractedData = extract(ExtractionType.REPEATER_DATA, html);
 
             parsedRepeaterData = _.cloneDeep(extractedData?.repeaterData?.parsedRepeaterData);

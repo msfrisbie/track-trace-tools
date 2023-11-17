@@ -15,7 +15,6 @@
         <quick-script-button class="floating-shadow" />
       </div>
 
-      <!-- TODO enable when T3+ signup is ready -->
       <plus-button v-if="!t3plus" class="floating-shadow" />
 
       <div class="relative">

@@ -89,7 +89,6 @@ class ScreenshotManager implements IAtomicService {
     const blob = await this.getBlobFromCanvas(canvas);
 
     if (downloadFile) {
-      // TODO: does this work in bg?
       await this.saveBlobAsImage(blob);
     }
 

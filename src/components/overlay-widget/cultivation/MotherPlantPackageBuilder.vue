@@ -492,7 +492,6 @@ export default Vue.extend({
     },
     showChildCountEntry(): boolean {
       return (
-        // TODO
         !!this.$data.actualIsodate && !!this.$data.item
       );
     },

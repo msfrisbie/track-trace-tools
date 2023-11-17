@@ -146,11 +146,6 @@ export default Vue.extend({
       setShowSearchResults: `search/${SearchActions.SET_SHOW_SEARCH_RESULTS}`,
     }),
     showPlantDetail(plantData: IIndexedPlantData) {
-      // TODO debounce this to improve mouseover accuracy
-      // searchManager.selectedPlant.next({
-      //   plantData,
-      // });
-
       store.state.plantSearch.selectedPlantMetadata = {
         plantData,
         sectionName: this.sectionName,

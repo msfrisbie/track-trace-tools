@@ -606,7 +606,7 @@ export async function maybeLoadCogsReportData({
 
         if (!matchingPair) {
           // Child package indicated it came from a parent, but the parent's
-          // contribution to the child could not be extracted. TODO investigate
+          // contribution to the child could not be extracted.
           unmatchedChildLabelCount++;
           unmatchedChildPackages.push(pkg.Label);
           continue;
@@ -748,7 +748,6 @@ export async function maybeLoadCogsReportData({
 
   let idx = 0;
   for (const pkg of eligibleWholesaleTransferPackageWrapper) {
-    // TODO figure out grouping for manifest coloring
     cogsMatrix.push([
       pkg.ManifestNumber,
       pkg.Label,

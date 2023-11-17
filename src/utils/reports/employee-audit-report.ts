@@ -289,7 +289,6 @@ export async function maybeLoadEmployeeAuditReportData({
       statusMessage: { text: 'Analyzing history...', level: 'success' },
     });
 
-    // TODO: IDs only partially show. how to resolve?
     for (const substring of config.employeeQuery.split(',').map((x) => x.trim())) {
       // Employee IDs
       const employeeMatcher = substring.toLocaleLowerCase();

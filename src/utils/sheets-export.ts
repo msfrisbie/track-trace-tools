@@ -439,8 +439,6 @@ export async function createSpreadsheetOrError({
     }),
   ];
 
-  // TODO report data should be pre-formatted before getting here
-
   for (const reportType of ELIGIBLE_REPORT_TYPES) {
     const sheetId: number = sheetTitles.indexOf(getSheetTitle({ reportType, reportConfig }));
     const length = Math.max(

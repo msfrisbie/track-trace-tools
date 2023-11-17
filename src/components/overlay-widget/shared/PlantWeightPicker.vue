@@ -9,7 +9,6 @@
       >
     </b-button-group>
 
-    <!-- TODO check if it's only one plant which makes this irrelevant -->
     <template v-if="bulk">
       <b-form-group class="w-full" label="Total weight:" label-size="sm">
         <b-input-group>

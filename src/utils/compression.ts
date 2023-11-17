@@ -107,19 +107,6 @@ export class CompressedMetrcTags implements ICompressedMetrcTagRanges {
       targetTag: tag,
     }));
   }
-
-  // TODO
-  // Binary search for lookup
-
-  // Request order:
-  //
-  // Flowering plants
-  // Active packages
-  // Unused tags
-
-  // constructor() {
-
-  // }
 }
 
 export function compressedDataWrapperFactory<T>(

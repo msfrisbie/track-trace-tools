@@ -195,9 +195,6 @@ describe('compression.ts', () => {
     ]);
   });
 
-  // TODO different maps
-  // TODO duplicate tags
-
   it('Compresses data correctly', () => {
     const expandedData = [
       {

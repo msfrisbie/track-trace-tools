@@ -64,7 +64,7 @@ import "vue-slider-component/theme/default.css";
 import VueTypeaheadBootstrap from "vue-typeahead-bootstrap";
 import { mapState } from "vuex";
 
-// TODO this allows firefox to render, but errors are uncollected.
+// This allows firefox to render, but errors are uncollected.
 setTimeout(() => {
   // Don't send error tracking on local
   const dsn = isDevelopment()
@@ -256,7 +256,7 @@ export default Vue.extend({
       // User is logged in
       analyticsManager.identify(authState.identity);
 
-      // TODO: this changes for most users, deprecate
+      // This changes for many users between pageloads as they change licenses
       analyticsManager.setUserProperties({ license: authState.license });
 
       await sandboxManager.runsAfterAuthInit();
