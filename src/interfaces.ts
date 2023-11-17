@@ -2011,6 +2011,19 @@ export interface ITransferMetadata {
 }
 
 export interface ILicenseFormFilters {
-    licenses: string[];
-    licenseOptions: string[];
+  licenses: string[];
+  licenseOptions: string[];
+}
+
+export interface IBuilderListOption {
+    route: string,
+    text: string,
+    icon: string,
+    backgroundColor: string,
+    isBeta: boolean,
+    isNew: boolean,
+    enabled: boolean,
+    visible: boolean,
+    isPlus: boolean,
+    showDisabledMessage: boolean,
 }
