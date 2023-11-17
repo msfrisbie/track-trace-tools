@@ -5,10 +5,16 @@ import {
   CreatePackageCsvActions,
   CreatePackageCsvGetters,
   CreatePackageCsvMutations,
+  PackageCsvStatus,
 } from './consts';
 import { ICreatePackageCsvState } from './interfaces';
 
-const inMemoryState = {};
+const inMemoryState = {
+  status: PackageCsvStatus.INITIAL,
+  statusMessage: null,
+  rows: [],
+  csvData: null
+};
 
 const persistedState = {};
 
@@ -44,7 +50,7 @@ export const createPackageCsvModule = {
         columns: string[]
       },
     ) => {
-      await createPackageCsvTemplateSheetOrError(data.columns);
+      // await createPackageCsvTemplateSheetOrError(data.columns);
     },
   },
 };
