@@ -18,7 +18,7 @@
         @click.stop.prevent="setSearchType({ searchType: searchTypeOption.value })"
         >{{ searchTypeOption.text }}
         <template v-if="searchTypeOption.enabled">({{ searchTypeOption.count }})</template>
-        <b-badge v-if="searchTypeOption.plus" variant="primary">T3+</b-badge>
+        <b-badge class="ml-2" v-if="searchTypeOption.plus" variant="primary">T3+</b-badge>
       </b-button>
     </b-button-group>
   </div>
