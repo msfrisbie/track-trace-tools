@@ -19,7 +19,11 @@ export function maybePushOntoUniqueStack(value: any | null, stack: Array<string>
   return stack;
 }
 
-export async function sloppyObjectSearch(queryString: string): Promise<{
+// Search the primary key
+export async function sloppyObjectSearch(queryString: string, options?: {
+  performFallbackSearch?: boolean,
+  objectType?: 'package' | 'plant' | 'plantbatch' | 'harvest' | 'transfer'
+}): Promise<{
   pkg?: IIndexedPackageData,
   plant?: IIndexedPlantData,
   plantBatch?: IIndexedPlantBatchData,
