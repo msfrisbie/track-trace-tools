@@ -6,61 +6,55 @@
       variant="outline-primary"
       @click.stop.prevent="editTransfer()"
       ><div class="w-full grid grid-cols-3 gap-2" style="grid-template-columns: 2rem 1fr auto">
-        <div></div>
-        <span>EDIT TRANSFER</span>
-
         <div class="aspect-square grid place-items-center"><font-awesome-icon icon="edit" /></div>
+        <span>EDIT TRANSFER</span>
+        <div style="width: 30px"></div>
       </div>
     </b-button>
 
     <b-button size="sm" variant="outline-primary" @click.stop.prevent="viewManifest()"
       ><div class="w-full grid grid-cols-3 gap-2" style="grid-template-columns: 2rem 1fr auto">
-        <div></div>
-        <span>VIEW MANIFEST</span>
-
         <div class="aspect-square grid place-items-center"><font-awesome-icon icon="file" /></div>
+        <span>VIEW MANIFEST</span>
+        <div style="width: 30px"></div>
       </div>
     </b-button>
 
     <b-button size="sm" variant="outline-primary" @click.stop.prevent="newTabManifest()"
       ><div class="w-full grid grid-cols-3 gap-2" style="grid-template-columns: 2rem 1fr auto">
-        <div></div>
-        <span>MANIFEST IN NEW TAB</span>
-
         <div class="aspect-square grid place-items-center">
           <font-awesome-icon icon="external-link-alt" />
         </div>
+        <span>MANIFEST IN NEW TAB</span>
+        <div style="width: 30px"></div>
       </div>
     </b-button>
 
     <b-button size="sm" variant="outline-primary" @click.stop.prevent="printManifest()"
       ><div class="w-full grid grid-cols-3 gap-2" style="grid-template-columns: 2rem 1fr auto">
-        <div></div>
-        <span>PRINT MANIFEST</span>
-
         <div class="aspect-square grid place-items-center"><font-awesome-icon icon="print" /></div>
+        <span>PRINT MANIFEST</span>
+        <div style="width: 30px"></div>
       </div>
     </b-button>
 
     <b-button size="sm" variant="outline-primary" @click.stop.prevent="downloadManifest()"
       ><div class="w-full grid grid-cols-3 gap-2" style="grid-template-columns: 2rem 1fr auto">
-        <div></div>
-        <span>DOWNLOAD MANIFEST</span>
-
         <div class="aspect-square grid place-items-center">
           <font-awesome-icon icon="file-download" />
         </div>
+        <span>DOWNLOAD MANIFEST</span>
+        <div style="width: 30px"></div>
       </div>
     </b-button>
 
     <b-button size="sm" variant="outline-primary" @click.stop.prevent="downloadSummary()"
       ><div class="w-full grid grid-cols-3 gap-2" style="grid-template-columns: 2rem 1fr auto">
-        <div></div>
-        <span>DOWNLOAD SUMMARY</span>
-
         <div class="aspect-square grid place-items-center">
           <font-awesome-icon icon="file-csv" />
         </div>
+        <span>DOWNLOAD SUMMARY</span>
+        <div style="width: 30px"></div>
       </div>
     </b-button>
 
@@ -70,13 +64,12 @@
       @click.stop.prevent="createScanSheet()"
       :disabled="!hasPlus"
       ><div class="w-full grid grid-cols-3 gap-2" style="grid-template-columns: 2rem 1fr auto">
-        <div>
-          <b-badge variant="primary">T3+</b-badge>
-        </div>
-        <span>CREATE SCAN SHEET</span>
-
         <div class="aspect-square grid place-items-center">
           <font-awesome-icon icon="barcode" />
+        </div>
+        <span>CREATE SCAN SHEET</span>
+        <div>
+          <b-badge variant="primary">T3+</b-badge>
         </div>
       </div>
     </b-button>
@@ -100,13 +93,13 @@
           variant="outline-primary"
           @click.stop.prevent="downloadAllLabTestPdfs()"
           ><div class="w-full grid grid-cols-3 gap-2" style="grid-template-columns: 2rem 1fr auto">
-            <div>
-              <b-badge variant="primary">T3+</b-badge>
+            <div class="aspect-square grid place-items-center">
+              <font-awesome-icon icon="file-download" />
             </div>
             <span>DOWNLOAD ALL LAB TEST PDFS</span>
 
-            <div class="aspect-square grid place-items-center">
-              <font-awesome-icon icon="file-download" />
+            <div>
+              <b-badge variant="primary">T3+</b-badge>
             </div>
           </div>
         </b-button>
@@ -119,13 +112,13 @@
           variant="outline-primary"
           @click.stop.prevent="downloadAllLabTestCsvs()"
           ><div class="w-full grid grid-cols-3 gap-2" style="grid-template-columns: 2rem 1fr auto">
-            <div>
-              <b-badge variant="primary">T3+</b-badge>
+            <div class="aspect-square grid place-items-center">
+              <font-awesome-icon icon="file-csv" />
             </div>
             <span>DOWNLOAD ALL LAB TEST RESULT CSVS</span>
 
-            <div class="aspect-square grid place-items-center">
-              <font-awesome-icon icon="file-csv" />
+            <div>
+              <b-badge variant="primary">T3+</b-badge>
             </div>
           </div>
         </b-button>
