@@ -1886,20 +1886,6 @@ export default Vue.extend({
       employeeSamplesFormFilters: employeeSamplesFormFiltersFactory(),
       harvestPackagesFormFilters: harvestPackagesFormFiltersFactory(),
       employeeAuditFormFilters: employeeAuditFormFiltersFactory(),
-      showFilters: (() => {
-        const fields: { [key: string]: boolean } = {};
-        Object.keys(SHEET_FIELDS).map((x: any) => {
-          fields[x] = true;
-        });
-        return fields;
-      })(),
-      showFields: (() => {
-        const fields: { [key: string]: boolean } = {};
-        Object.keys(SHEET_FIELDS).map((x: any) => {
-          fields[x] = true;
-        });
-        return fields;
-      })(),
       // These are only the selected fields
       fields: (() => {
         const fields = _.cloneDeep(SHEET_FIELDS);
@@ -1943,12 +1929,6 @@ export default Vue.extend({
         auxTask: ReportAuxTask.UPDATE_MASTER_COST_SHEET,
         reportConfig,
       });
-    },
-    toggleFilters(reportType: ReportType): void {
-      this.showFilters[reportType] = !this.showFilters[reportType];
-    },
-    toggleFields(reportType: ReportType): void {
-      this.showFields[reportType] = !this.showFields[reportType];
     },
     checkAll(reportType: ReportType): void {
       this.fields[reportType] = _.cloneDeep(SHEET_FIELDS[reportType]);
