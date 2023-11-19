@@ -10,5 +10,5 @@ export interface ICreatePackageCsvState {
     status: PackageCsvStatus,
     statusMessage: string | null,
     rows: CreatePackageCsvRow[],
-    csvData: string | null
+    csvData: string[][] | null
 }

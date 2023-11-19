@@ -1,11 +1,13 @@
-import { IPluginState } from '@/interfaces';
-import { createPackageCsvTemplateSheetOrError } from '@/utils/sheets-export';
+import { ICsvFile, IPluginState } from '@/interfaces';
+import { downloadCsvFile } from '@/utils/csv';
+import { readCsvFile } from '@/utils/file';
 import { ActionContext } from 'vuex';
 import {
   CreatePackageCsvActions,
   CreatePackageCsvGetters,
   CreatePackageCsvMutations,
-  PackageCsvStatus,
+  CREATE_PACKAGE_CSV_COLUMNS,
+  PackageCsvStatus
 } from './consts';
 import { ICreatePackageCsvState } from './interfaces';
 
@@ -44,13 +46,26 @@ export const createPackageCsvModule = {
     },
   },
   actions: {
+    [CreatePackageCsvActions.IMPORT_CSV]: async (
+      ctx: ActionContext<ICreatePackageCsvState, IPluginState>,
+      data: {
+        file: File
+      },
+    ) => {
+      ctx.state.csvData = await readCsvFile(data.file);
+    },
     [CreatePackageCsvActions.GENERATE_CSV_TEMPLATE]: async (
       ctx: ActionContext<ICreatePackageCsvState, IPluginState>,
       data: {
-        columns: string[]
       },
     ) => {
       // await createPackageCsvTemplateSheetOrError(data.columns);
+      const csvFile: ICsvFile = {
+        filename: 't3_create_package_csv_template',
+        data: [CREATE_PACKAGE_CSV_COLUMNS.map((x) => x.value)]
+      };
+
+      downloadCsvFile({ csvFile });
     },
   },
 };

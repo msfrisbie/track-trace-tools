@@ -1,4 +1,5 @@
 import { ITextFile } from '@/interfaces';
+import * as Papa from 'papaparse';
 import { timer } from 'rxjs';
 
 export async function toBase64(file: File) {
@@ -44,6 +45,22 @@ export async function readJSONFile(file: File): Promise<any> {
       resolve(JSON.parse(event.target.result));
     };
     reader.readAsText(file);
+  });
+}
+
+export async function readCsvFile(file: File): Promise<string[][]> {
+  return new Promise((resolve, reject) => {
+    Papa.parse(file, {
+      header: false,
+      complete: (results: Papa.ParseResult<string[]>) => {
+        const rows: string[][] = results.data.map((x) => x.map((y) => y.trim()));
+
+        resolve(rows);
+      },
+      error(e) {
+        reject(e);
+      },
+    });
   });
 }
 
