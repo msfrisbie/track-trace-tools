@@ -24,11 +24,19 @@
       </template>
 
       <div style="min-width: 200px" class="flex flex-col space-y-2 text-base">
-        <p>You're using the free version of Track &amp; Trace Tools.</p>
+        <p class="font-semibold text-purple-600">
+          You're using the free version of Track &amp; Trace Tools.
+        </p>
 
-        <p>Subscribe to T3+ to gain access to advanced tools and hide this button.</p>
+        <p class="font-bold">Why subscribe to T3+?</p>
 
-        <p>Click the T3+ button below to learn more.</p>
+        <ul class="list-disc pl-3 pb-4">
+          <li>Enable advanced reports and tools</li>
+          <li>Support the open source project</li>
+          <li>Hide the bottom right T3+ badge</li>
+        </ul>
+
+        <b-button variant="primary" @click="openBuilder($event)">LEARN MORE</b-button>
       </div>
     </b-popover>
   </div>
