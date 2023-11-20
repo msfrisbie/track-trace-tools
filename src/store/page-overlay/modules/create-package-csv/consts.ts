@@ -25,11 +25,13 @@ export enum CreatePackageCsvGetters {
 export enum CreatePackageCsvActions {
   GENERATE_CSV_TEMPLATE = 'GENERATE_CSV_TEMPLATE',
   IMPORT_CSV = 'IMPORT_CSV',
+  RESET = 'RESET',
 }
 
 export enum PackageCsvStatus {
   INITIAL = "INITIAL",
-  READY_FOR_SUBMIT = "READY_FOR_SUBMIT",
+  INFLIGHT = "INFLIGHT",
+  PARSED = "PARSED",
   ERROR = "ERROR",
   SUCCESS = "SUCCESS"
 }

@@ -46,13 +46,26 @@ export const createPackageCsvModule = {
     },
   },
   actions: {
+    [CreatePackageCsvActions.RESET]: async (
+      ctx: ActionContext<ICreatePackageCsvState, IPluginState>,
+      data: {
+        file: File
+      },
+    ) => {
+      ctx.state.status = PackageCsvStatus.INITIAL;
+      ctx.state.csvData = null;
+    },
     [CreatePackageCsvActions.IMPORT_CSV]: async (
       ctx: ActionContext<ICreatePackageCsvState, IPluginState>,
       data: {
         file: File
       },
     ) => {
+      ctx.state.status = PackageCsvStatus.INFLIGHT;
+
       ctx.state.csvData = await readCsvFile(data.file);
+
+      ctx.state.status = PackageCsvStatus.PARSED;
     },
     [CreatePackageCsvActions.GENERATE_CSV_TEMPLATE]: async (
       ctx: ActionContext<ICreatePackageCsvState, IPluginState>,
