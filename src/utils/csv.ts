@@ -1,5 +1,7 @@
 import { ICsvFile } from "@/interfaces";
+import _ from "lodash-es";
 import { timer } from "rxjs";
+import { safeZip } from "./array";
 
 export function serialize(csvData: any[][]) {
   return csvData.map((e) => e.join(",")).join("\n");
@@ -124,4 +126,30 @@ export function buildNamedCsvFileData(
   }
 
   return files;
+}
+
+export function getIndexOfHeaderRowOrError({ headerRow, matrix }:{headerRow: string[], matrix: any[][]}) {
+  for (const [idx, row] of matrix.entries()) {
+    if (_.isEqual(headerRow, row)) {
+      return idx;
+    }
+  }
+
+  throw new Error('Unable to match header row.');
+}
+
+export function convertMatrixIntoKeyValRows<T>({ matrix, columns }: {matrix: string[][], columns: string[]}): T[] {
+  const keyvalRows: T[] = [];
+
+  for (const dataRow of matrix) {
+    // @ts-ignore
+    const keyvalRow:T = {};
+    for (const [value, column] of safeZip(dataRow, columns)) {
+      // @ts-ignore
+      keyvalRow[column] = value;
+    }
+    keyvalRows.push(keyvalRow);
+  }
+
+  return keyvalRows;
 }

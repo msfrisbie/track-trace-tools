@@ -1,10 +1,11 @@
 <template>
   <div class="grid grid-cols-4 gap-8">
     <div class="h-full">
+      <div>{{ createPackageCsvState.status }}</div>
       <b-button-group vertical>
         <b-button @click="generateCsvTemplate()">DOWNLOAD TEMPLATE</b-button>
         <b-button
-          v-if="createPackageCsvState.status === PackageCsvStatus.PARSED"
+          v-if="createPackageCsvState.status !== PackageCsvStatus.INITIAL"
           @click="reset()"
           variant="warning"
           >RESET</b-button
@@ -18,10 +19,16 @@
           UPLOAD CSV
         </label>
       </b-button-group>
+
+      <div>{{ createPackageCsvState.statusMessage }}</div>
     </div>
     <div class="col-span-3 h-full">
+      <template v-if="!createPackageCsvState.csvData"> Upload a CSV </template>
       <template v-if="createPackageCsvState.csvData">
-        {{ createPackageCsvState.csvData }}
+        <div>{{ createPackageCsvState.csvData }}</div>
+      </template>
+      <template v-if="createPackageCsvState.rowGroups">
+        <div>{{ createPackageCsvState.rowGroups }}</div>
       </template>
     </div>
   </div>
