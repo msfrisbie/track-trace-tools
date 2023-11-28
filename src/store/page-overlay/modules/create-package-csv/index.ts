@@ -1,23 +1,38 @@
-import { ICsvFile, IIndexedPackageData, IIndexedTagData, IItemData, ILocationData, IPluginState } from '@/interfaces';
-import { primaryDataLoader } from '@/modules/data-loader/data-loader.module';
-import { convertMatrixIntoKeyValRows, downloadCsvFile, getIndexOfHeaderRowOrError } from '@/utils/csv';
-import { readCsvFile } from '@/utils/file';
-import { ActionContext } from 'vuex';
 import {
+  ICsvFile,
+  IIndexedPackageData,
+  IIndexedTagData,
+  IItemData,
+  ILocationData,
+  IPluginState,
+} from "@/interfaces";
+import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
+import {
+  convertMatrixIntoKeyValRows,
+  downloadCsvFile,
+  getIndexOfHeaderRowOrError,
+} from "@/utils/csv";
+import { readCsvFile } from "@/utils/file";
+import { ActionContext } from "vuex";
+import {
+  CREATE_PACKAGE_CSV_COLUMNS,
   CreatePackageCsvActions,
   CreatePackageCsvColumns,
   CreatePackageCsvGetters,
   CreatePackageCsvMutations,
-  CREATE_PACKAGE_CSV_COLUMNS,
-  PackageCsvStatus
-} from './consts';
-import { ICreatePackageCsvRow, ICreatePackageCsvState } from './interfaces';
+  PackageCsvStatus,
+} from "./consts";
+import {
+  ICreatePackageCsvRow,
+  ICreatePackageCsvRowGroup,
+  ICreatePackageCsvState,
+} from "./interfaces";
 
 const inMemoryState = {
   status: PackageCsvStatus.INITIAL,
   statusMessage: null,
   rowGroups: [],
-  csvData: null
+  csvData: null,
 };
 
 const persistedState = {};
@@ -32,7 +47,7 @@ export const createPackageCsvModule = {
   mutations: {
     [CreatePackageCsvMutations.CREATE_PACKAGE_CSV_MUTATION](
       state: ICreatePackageCsvState,
-      data: any,
+      data: any
     ) {
       // state.data = data;
     },
@@ -42,7 +57,7 @@ export const createPackageCsvModule = {
       state: ICreatePackageCsvState,
       getters: any,
       rootState: any,
-      rootGetters: any,
+      rootGetters: any
     ) => {
       // return state.data
     },
@@ -51,8 +66,8 @@ export const createPackageCsvModule = {
     [CreatePackageCsvActions.RESET]: async (
       ctx: ActionContext<ICreatePackageCsvState, IPluginState>,
       data: {
-        file: File
-      },
+        file: File;
+      }
     ) => {
       ctx.state.status = PackageCsvStatus.INITIAL;
       ctx.state.csvData = null;
@@ -61,8 +76,8 @@ export const createPackageCsvModule = {
     [CreatePackageCsvActions.IMPORT_CSV]: async (
       ctx: ActionContext<ICreatePackageCsvState, IPluginState>,
       data: {
-        file: File
-      },
+        file: File;
+      }
     ) => {
       ctx.state.status = PackageCsvStatus.INFLIGHT;
 
@@ -78,11 +93,10 @@ export const createPackageCsvModule = {
     },
     [CreatePackageCsvActions.PARSE_CSV_DATA]: async (
       ctx: ActionContext<ICreatePackageCsvState, IPluginState>,
-      data: {
-      },
+      data: {}
     ) => {
       if (!ctx.state.csvData) {
-        throw new Error('Cannot parse null CSV data');
+        throw new Error("Cannot parse null CSV data");
       }
 
       let packages: IIndexedPackageData[];
@@ -90,13 +104,14 @@ export const createPackageCsvModule = {
       let items: IItemData[];
       let locations: ILocationData[];
 
-      ctx.state.statusMessage = 'Loading data...';
+      ctx.state.statusMessage = "Loading data...";
 
       try {
         packages = await primaryDataLoader.activePackages();
       } catch {
         ctx.state.status = PackageCsvStatus.ERROR;
-        ctx.state.statusMessage = 'Unable to load packages. Ensure this Metrc account has package permissions.';
+        ctx.state.statusMessage =
+          "Unable to load packages. Ensure this Metrc account has package permissions.";
         return;
       }
 
@@ -104,7 +119,8 @@ export const createPackageCsvModule = {
         tags = await primaryDataLoader.availableTags();
       } catch {
         ctx.state.status = PackageCsvStatus.ERROR;
-        ctx.state.statusMessage = 'Unable to load tags. Ensure this Metrc account has tag permissions.';
+        ctx.state.statusMessage =
+          "Unable to load tags. Ensure this Metrc account has tag permissions.";
         return;
       }
 
@@ -112,7 +128,8 @@ export const createPackageCsvModule = {
         locations = await primaryDataLoader.locations();
       } catch {
         ctx.state.status = PackageCsvStatus.ERROR;
-        ctx.state.statusMessage = 'Unable to load locations. Ensure this Metrc account has location permissions.';
+        ctx.state.statusMessage =
+          "Unable to load locations. Ensure this Metrc account has location permissions.";
         return;
       }
 
@@ -120,7 +137,8 @@ export const createPackageCsvModule = {
         items = await primaryDataLoader.items();
       } catch {
         ctx.state.status = PackageCsvStatus.ERROR;
-        ctx.state.statusMessage = 'Unable to load items. Ensure this Metrc account has item permissions.';
+        ctx.state.statusMessage =
+          "Unable to load items. Ensure this Metrc account has item permissions.";
         return;
       }
 
@@ -130,7 +148,7 @@ export const createPackageCsvModule = {
         // Check for header row
         headerRowIndex = getIndexOfHeaderRowOrError({
           headerRow: CREATE_PACKAGE_CSV_COLUMNS.map((x) => x.value),
-          matrix: ctx.state.csvData!
+          matrix: ctx.state.csvData!,
         });
       } catch (e) {
         ctx.state.status = PackageCsvStatus.ERROR;
@@ -144,7 +162,7 @@ export const createPackageCsvModule = {
       const keyvalRows: ICreatePackageCsvRow[] = convertMatrixIntoKeyValRows<ICreatePackageCsvRow>({
         // Chop off everything that is not data and has nonzero length
         matrix: ctx.state.csvData.slice(headerRowIndex + 1).filter((x) => x.length > 0),
-        columns: CREATE_PACKAGE_CSV_COLUMNS.map((x) => x.value)
+        columns: CREATE_PACKAGE_CSV_COLUMNS.map((x) => x.value),
       });
 
       // Group all rows that dump into the same package
@@ -157,16 +175,42 @@ export const createPackageCsvModule = {
         }
       }
 
-      const rowGroups = [...destinationRowMap.entries()].map(([destinationLabel, dataRows]) => ({
-        dataRows,
-        messages: [],
-        warnings: [],
-        errors: [],
-      }));
+      const rowGroups: ICreatePackageCsvRowGroup[] = [...destinationRowMap.entries()].map(
+        ([destinationLabel, dataRows]) => ({
+          destinationLabel,
+          dataRows,
+          messages: [],
+          warnings: [],
+          errors: [],
+          parsedData: null,
+        })
+      );
 
       // Validate each rowgroup
       for (const rowGroup of rowGroups) {
+        // Check that dates match
+        const uniquePackagedDates = new Set(
+          rowGroup.dataRows.map((x) => x[CreatePackageCsvColumns.PACKAGED_DATE])
+        );
+        if (uniquePackagedDates.size !== 1) {
+          rowGroup.errors.push(
+            `Packaged dates for output package ${rowGroup.destinationLabel} do not match: ${[
+              ...uniquePackagedDates,
+            ].join()}`
+          );
+        }
 
+        const packageDate = [...uniquePackagedDates][0];
+
+        if (rowGroup.errors.length > 0) {
+          continue;
+        }
+        // If no errors, generate parsed data
+        const ActualDate = packageDate;
+
+        // rowGroup.parsedData = {
+        //   ActualDate
+        // }
       }
 
       ctx.state.rowGroups = rowGroups;
@@ -175,13 +219,12 @@ export const createPackageCsvModule = {
     },
     [CreatePackageCsvActions.GENERATE_CSV_TEMPLATE]: async (
       ctx: ActionContext<ICreatePackageCsvState, IPluginState>,
-      data: {
-      },
+      data: {}
     ) => {
       // await createPackageCsvTemplateSheetOrError(data.columns);
       const csvFile: ICsvFile = {
-        filename: 't3_create_package_csv_template',
-        data: [CREATE_PACKAGE_CSV_COLUMNS.map((x) => x.value)]
+        filename: "t3_create_package_csv_template",
+        data: [CREATE_PACKAGE_CSV_COLUMNS.map((x) => x.value)],
       };
 
       downloadCsvFile({ csvFile });
