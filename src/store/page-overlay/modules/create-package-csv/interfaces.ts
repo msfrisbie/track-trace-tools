@@ -31,9 +31,18 @@ export interface ICreatePackageCsvRowGroup {
   // Corresponds to a single create package request
   destinationLabel: string;
   dataRows: ICreatePackageCsvRow[];
-  messages: string[];
-  warnings: string[];
-  errors: string[];
+  messages: {
+    text: string,
+    cellCoordinates: {rowIndex: number, columnIndex: number}[]
+  }[];
+  warnings: {
+    text: string,
+    cellCoordinates: {rowIndex: number, columnIndex: number}[]
+  }[];
+  errors: {
+    text: string,
+    cellCoordinates: {rowIndex: number, columnIndex: number}[]
+  }[];
   parsedData: IParsedRowGroupData | null;
 }
 
