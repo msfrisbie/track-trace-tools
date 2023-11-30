@@ -109,6 +109,7 @@ export const createPackageCsvModule = {
 
       ctx.state.statusMessage = "Loading data...";
 
+      // TODO fallback to not checking tags, locations, items
       try {
         packages = await primaryDataLoader.activePackages();
       } catch {
@@ -441,7 +442,12 @@ export const createPackageCsvModule = {
             CreatePackageCsvColumns.SOURCE_PACKAGE_QUANTITY_UNIT_OF_MEASURE
           );
 
-          if (!(await fuzzyUnitsMatch(srcPackageItem.Name, sourcePackageQuantityUnitOfMeasure))) {
+          if (
+            !(await fuzzyUnitsMatch(
+              srcPackageItem.UnitOfMeasureName,
+              sourcePackageQuantityUnitOfMeasure
+            ))
+          ) {
             rowGroup.errors.push({
               text: `Source item unit and quantity used unit do not match`,
               cellCoordinates: [
@@ -457,17 +463,30 @@ export const createPackageCsvModule = {
         // SET DEFAULT
         // Output quantity unit of measure
         for (const dataRow of rowGroup.dataRows) {
+          const pkg = packageMap.get(
+            dataRow[CreatePackageCsvColumns.SOURCE_PACKAGE_QUANTITY_UNIT_OF_MEASURE]
+          );
           const item = itemMap.get(dataRow[CreatePackageCsvColumns.ITEM_NAME]);
 
-          if (!item) {
+          let defaultUnitOfMeasure: string | null = null;
+
+          if (item) {
+            defaultUnitOfMeasure = item?.UnitOfMeasureName ?? null;
+          }
+
+          if (!defaultUnitOfMeasure && pkg) {
+            defaultUnitOfMeasure = pkg.UnitOfMeasureAbbreviation;
+          }
+
+          if (!defaultUnitOfMeasure) {
             continue;
           }
 
           const key = CreatePackageCsvColumns.NEW_PACKAGE_UNIT_OF_MEASURE;
           if (!dataRow[key]) {
-            dataRow[key] = item.Name;
+            dataRow[key] = defaultUnitOfMeasure;
             rowGroup.messages.push({
-              text: `Used default value for item: ${item.Name}`,
+              text: `Used default value for unit of measure: ${defaultUnitOfMeasure}`,
               cellCoordinates: [
                 {
                   rowIndex: dataRow.Index,

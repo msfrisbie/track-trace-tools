@@ -154,11 +154,18 @@ export function convertMatrixIntoKeyValRows<T>({
 }): T[] {
   const keyvalRows: T[] = [];
 
-  // Chop off everything that is not data and has nonzero length
-  for (const [idx, dataRow] of matrix
-    .slice(headerRowIndex + 1)
-    .filter((x) => x.length > 0)
-    .entries()) {
+  // Chop off everything that is not data
+  for (const [idx, dataRow] of matrix.slice(headerRowIndex + 1).entries()) {
+    // Skip if the row is empty
+    if (dataRow.length === 0) {
+      continue;
+    }
+
+    // Skip if the row is only empty strings or whitespace
+    if (dataRow.every((x) => x.trim() === "")) {
+      continue;
+    }
+
     // @ts-ignore
     const keyvalRow: T = {};
     for (const [value, column] of _.zip(dataRow, columns)) {

@@ -36,20 +36,30 @@
               <template v-for="rowGroup of createPackageCsvState.rowGroups">
                 <fragment v-bind:key="rowGroup.destinationLabel">
                   <div class="flex flex-col gap-2">
+                    <div>
+                      {{ rowGroup.dataRows.length }} Package{{
+                        rowGroup.dataRows.length > 0 ? "s" : ""
+                      }}
+                    </div>
                     <div
-                      class="flex flex-row gap-4"
+                      class="flex flex-col gap-4 p-2 rounded border-1 border-gray-200"
                       v-for="[idx, dataRow] of rowGroup.dataRows.entries()"
                       v-bind:key="dataRow.Index + '_' + idx"
                     >
-                      {{ dataRow[CreatePackageCsvColumns.SOURCE_PACKAGE_TAG] }}
-                      ({{
-                        dataRow[CreatePackageCsvColumns.SOURCE_PACKAGE_QUANTITY_USED] ||
-                        "[QTY MISSING]"
-                      }}
-                      {{
-                        dataRow[CreatePackageCsvColumns.SOURCE_PACKAGE_QUANTITY_UNIT_OF_MEASURE] ||
-                        "[UNIT MISSING]"
-                      }})
+                      <div class="font-mono font-semibold">
+                        {{ dataRow[CreatePackageCsvColumns.SOURCE_PACKAGE_TAG] }}
+                      </div>
+                      <div>
+                        {{
+                          dataRow[CreatePackageCsvColumns.SOURCE_PACKAGE_QUANTITY_USED] ||
+                          "[QTY MISSING]"
+                        }}
+                        {{
+                          dataRow[
+                            CreatePackageCsvColumns.SOURCE_PACKAGE_QUANTITY_UNIT_OF_MEASURE
+                          ] || "[UNIT MISSING]"
+                        }}
+                      </div>
                     </div>
                   </div>
 
@@ -67,21 +77,21 @@
                         v-for="[idx, error] of rowGroup.errors.entries()"
                         v-bind:key="'error' + idx"
                       >
-                        {{ error }}
+                        {{ error.text }}
                       </div>
                       <div
                         class="text-orange-500"
-                        v-for="[idx, warnings] of rowGroup.warnings.entries()"
+                        v-for="[idx, warning] of rowGroup.warnings.entries()"
                         v-bind:key="'warning' + idx"
                       >
-                        {{ warnings }}
+                        {{ warning.text }}
                       </div>
                       <div
                         class="text-blue-500"
                         v-for="[idx, message] of rowGroup.messages.entries()"
                         v-bind:key="'message' + idx"
                       >
-                        {{ message }}
+                        {{ message.text }}
                       </div>
                     </div>
                   </div>

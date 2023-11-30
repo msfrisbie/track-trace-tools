@@ -102,14 +102,10 @@ export function convertUnits(
   return quantity * fromUnitOfMeasure.ToBaseFactor * toUnitOfMeasure.FromBaseFactor;
 }
 
-export async function fuzzyUnitsMatchOrError(
-  a: string | number,
-  b: string | number
-): Promise<boolean> {
+export async function fuzzyUnitOrError(a: string | number): Promise<IUnitOfMeasure> {
   const unitsOfMeasure = await dynamicConstsManager.unitsOfMeasure();
 
   let unitA: IUnitOfMeasure | null = null;
-  let unitB: IUnitOfMeasure | null = null;
 
   unitA =
     unitsOfMeasure.find((x) => x.Name.toLocaleLowerCase() === a.toString().toLocaleLowerCase()) ??
@@ -127,27 +123,27 @@ export async function fuzzyUnitsMatchOrError(
   }
 
   if (unitA === null) {
-    throw new Error(`Unit A value invalid: ${a}`);
+    throw new Error(`Unit value invalid: ${a}`);
   }
 
-  unitB =
-    unitsOfMeasure.find((x) => x.Name.toLocaleLowerCase() === b.toString().toLocaleLowerCase()) ??
-    null;
+  return unitA;
+}
 
-  if (!unitB) {
-    unitB = unitsOfMeasure.find((x) => x.Id.toString() === b.toString()) ?? null;
+export async function fuzzyUnitOrNull(a: string | number): Promise<IUnitOfMeasure | null> {
+  try {
+    return await fuzzyUnitOrError(a);
+  } catch {
+    return null;
   }
+}
 
-  if (!unitB) {
-    unitB =
-      unitsOfMeasure.find(
-        (x) => x.Abbreviation.toLocaleLowerCase() === b.toString().toLocaleLowerCase()
-      ) ?? null;
-  }
+export async function fuzzyUnitsMatchOrError(
+  a: string | number,
+  b: string | number
+): Promise<boolean> {
+  let unitA: IUnitOfMeasure = await fuzzyUnitOrError(a);
+  let unitB: IUnitOfMeasure = await fuzzyUnitOrError(b);
 
-  if (unitB === null) {
-    throw new Error(`Unit B value invalid: ${b}`);
-  }
   return unitA.Id === unitB.Id;
 }
 
