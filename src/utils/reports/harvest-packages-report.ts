@@ -6,20 +6,20 @@ import {
   IIndexedRichOutgoingTransferData,
   IPluginState,
   IUnionIndexedPackageData,
-  IUnitOfMeasure
-} from '@/interfaces';
-import { DataLoader, getDataLoaderByLicense } from '@/modules/data-loader/data-loader.module';
-import { dynamicConstsManager } from '@/modules/dynamic-consts-manager.module';
-import { ReportsMutations, ReportType } from '@/store/page-overlay/modules/reports/consts';
+  IUnitOfMeasure,
+} from "@/interfaces";
+import { DataLoader, getDataLoaderByLicense } from "@/modules/data-loader/data-loader.module";
+import { dynamicConstsManager } from "@/modules/dynamic-consts-manager.module";
+import { ReportType, ReportsMutations } from "@/store/page-overlay/modules/reports/consts";
 import {
   IReportConfig,
   IReportData,
-  IReportsState
-} from '@/store/page-overlay/modules/reports/interfaces';
-import { TransferPackageSearchAlgorithm } from '@/store/page-overlay/modules/transfer-package-search/consts';
-import { v4 as uuidv4 } from 'uuid';
-import { ActionContext } from 'vuex';
-import { todayIsodate } from '../date';
+  IReportsState,
+} from "@/store/page-overlay/modules/reports/interfaces";
+import { TransferPackageSearchAlgorithm } from "@/store/page-overlay/modules/transfer-package-search/consts";
+import { v4 as uuidv4 } from "uuid";
+import { ActionContext } from "vuex";
+import { todayIsodate } from "../date";
 import {
   extractAdjustmentReasonNoteSetsFromHistory,
   extractChildPackageLabelsFromHistory,
@@ -28,19 +28,19 @@ import {
   extractHarvestChildPackageLabelsFromHistory,
   extractInitialPackageQuantityAndUnitFromHistoryOrError,
   extractParentPackageTagQuantityUnitItemSetsFromHistory,
-  extractTestSamplePackageLabelsFromHistory
-} from '../history';
+  extractTestSamplePackageLabelsFromHistory,
+} from "../history";
 import {
   getIdOrError,
   getItemNameOrError,
   getItemUnitOfMeasureAbbreviationOrError,
   getItemUnitQuantityAndUnitOrError,
   getLabelOrError,
-  getStrainNameOrError
-} from '../package';
-import { findMatchingTransferPackages } from '../transfer';
-import { convertUnits } from '../units';
-import { licenseFilterFactory } from './reports-shared';
+  getStrainNameOrError,
+} from "../package";
+import { findMatchingTransferPackages } from "../transfer";
+import { convertUnits } from "../units";
+import { licenseFilterFactory } from "./reports-shared";
 
 interface IHarvestPackagesReportFormFilters {
   harvestDateGt: string;
@@ -59,47 +59,47 @@ interface IHarvestPackagesReportFormFilters {
 }
 
 type IHarvestPackageRowData = {
-  License: string,
-  HarvestID: string,
-  SourceTag: string,
-  BatchTag: string,
-  Strain: string,
-  Rename: string,
-  MaterialType: string,
-  Grams: number | null,
-  Pounds: number | null,
-  Stage: string,
-  Note: string,
-  RowSource: string
-}
+  License: string;
+  HarvestID: string;
+  SourceTag: string;
+  BatchTag: string;
+  Strain: string;
+  Rename: string;
+  MaterialType: string;
+  Grams: number | null;
+  Pounds: number | null;
+  Stage: string;
+  Note: string;
+  RowSource: string;
+};
 
 function rowDataFactory(rowData: {
-  License?: string,
-  HarvestID?: string,
-  SourceTag?: string,
-  BatchTag?: string,
-  Strain?: string,
-  Rename?: string,
-  MaterialType?: string,
-  Grams?: number | null,
-  Pounds?: number | null,
-  Stage?: string,
-  Note?: string,
-  RowSource?: string
+  License?: string;
+  HarvestID?: string;
+  SourceTag?: string;
+  BatchTag?: string;
+  Strain?: string;
+  Rename?: string;
+  MaterialType?: string;
+  Grams?: number | null;
+  Pounds?: number | null;
+  Stage?: string;
+  Note?: string;
+  RowSource?: string;
 }): IHarvestPackageRowData {
   const defaultRowData: IHarvestPackageRowData = {
-    License: '',
-    HarvestID: '',
-    SourceTag: '',
-    BatchTag: '',
-    Strain: '',
-    Rename: '',
-    MaterialType: '',
+    License: "",
+    HarvestID: "",
+    SourceTag: "",
+    BatchTag: "",
+    Strain: "",
+    Rename: "",
+    MaterialType: "",
     Grams: null,
     Pounds: null,
-    Stage: '',
-    Note: '',
-    RowSource: '',
+    Stage: "",
+    Note: "",
+    RowSource: "",
   };
 
   return {
@@ -120,7 +120,7 @@ export const harvestPackagesFormFiltersFactory: () => IHarvestPackagesReportForm
   debug: false,
   enableHarvestMatchFilter: false,
   harvestMatchFilter: "",
-  ...licenseFilterFactory('all')
+  ...licenseFilterFactory("all"),
 });
 
 export function addHarvestPackagesReport({
@@ -181,7 +181,7 @@ export async function maybeLoadHarvestPackagesReportData({
 
   for (const license of harvestConfig.licenses) {
     ctx.commit(ReportsMutations.SET_STATUS, {
-      statusMessage: { text: `Loading ${license} harvests...`, level: 'success' },
+      statusMessage: { text: `Loading ${license} harvests...`, level: "success" },
     });
 
     dataLoader = await getDataLoaderByLicense(license);
@@ -193,10 +193,10 @@ export async function maybeLoadHarvestPackagesReportData({
         },
         (err) => {
           ctx.commit(ReportsMutations.SET_STATUS, {
-            statusMessage: { text: 'Failed to load active harvests.', level: 'warning' },
+            statusMessage: { text: "Failed to load active harvests.", level: "warning" },
           });
-        },
-      ),
+        }
+      )
     );
 
     promises.push(
@@ -206,14 +206,14 @@ export async function maybeLoadHarvestPackagesReportData({
         },
         (err) => {
           ctx.commit(ReportsMutations.SET_STATUS, {
-            statusMessage: { text: 'Failed to load inactive harvests.', level: 'warning' },
+            statusMessage: { text: "Failed to load inactive harvests.", level: "warning" },
           });
-        },
-      ),
+        }
+      )
     );
 
     ctx.commit(ReportsMutations.SET_STATUS, {
-      statusMessage: { text: `Loading ${license} packages...`, level: 'success' },
+      statusMessage: { text: `Loading ${license} packages...`, level: "success" },
     });
 
     promises.push(
@@ -223,10 +223,10 @@ export async function maybeLoadHarvestPackagesReportData({
         },
         (err) => {
           ctx.commit(ReportsMutations.SET_STATUS, {
-            statusMessage: { text: 'Failed to load active packages.', level: 'warning' },
+            statusMessage: { text: "Failed to load active packages.", level: "warning" },
           });
-        },
-      ),
+        }
+      )
     );
 
     promises.push(
@@ -236,10 +236,10 @@ export async function maybeLoadHarvestPackagesReportData({
         },
         (err) => {
           ctx.commit(ReportsMutations.SET_STATUS, {
-            statusMessage: { text: 'Failed to load onhold packages.', level: 'warning' },
+            statusMessage: { text: "Failed to load onhold packages.", level: "warning" },
           });
-        },
-      ),
+        }
+      )
     );
 
     promises.push(
@@ -249,10 +249,10 @@ export async function maybeLoadHarvestPackagesReportData({
         },
         (err) => {
           ctx.commit(ReportsMutations.SET_STATUS, {
-            statusMessage: { text: 'Failed to load in transit packages.', level: 'warning' },
+            statusMessage: { text: "Failed to load in transit packages.", level: "warning" },
           });
-        },
-      ),
+        }
+      )
     );
 
     promises.push(
@@ -262,10 +262,10 @@ export async function maybeLoadHarvestPackagesReportData({
         },
         (err) => {
           ctx.commit(ReportsMutations.SET_STATUS, {
-            statusMessage: { text: 'Failed to load inactive packages.', level: 'warning' },
+            statusMessage: { text: "Failed to load inactive packages.", level: "warning" },
           });
-        },
-      ),
+        }
+      )
     );
 
     await Promise.allSettled(promises);
@@ -302,7 +302,7 @@ export async function maybeLoadHarvestPackagesReportData({
   async function getPackageFromOutboundTransferOrNull(
     label: string,
     license: string,
-    startDate: string,
+    startDate: string
   ): Promise<[IIndexedRichOutgoingTransferData, IIndexedDestinationPackageData] | null> {
     const abortController = new AbortController();
 
@@ -348,18 +348,18 @@ export async function maybeLoadHarvestPackagesReportData({
         .then((dataLoader) => dataLoader.harvestHistoryByHarvestId(harvest.Id))
         .then((history) => {
           harvest.history = history;
-        }),
+        })
     );
   });
 
   const settledHarvestHistoryPromises = await Promise.allSettled(harvestHistoryPromises);
 
-  if (settledHarvestHistoryPromises.find((x) => x.status === 'rejected')) {
-    throw new Error('Harvest history request failed');
+  if (settledHarvestHistoryPromises.find((x) => x.status === "rejected")) {
+    throw new Error("Harvest history request failed");
   }
 
   ctx.commit(ReportsMutations.SET_STATUS, {
-    statusMessage: { text: 'Extracting package history...', level: 'success' },
+    statusMessage: { text: "Extracting package history...", level: "success" },
   });
 
   const packageHistoryPromises: Promise<any>[] = [];
@@ -375,9 +375,7 @@ export async function maybeLoadHarvestPackagesReportData({
       if (!harvestPackage) {
         const msg = `Missing harvest package. license:${harvest.LicenseNumber} harvest:${harvest.Name} pkg:${harvestPackageLabel}`;
         console.error(msg);
-        harvestPackageRowData.push(
-
-        );
+        harvestPackageRowData.push();
 
         continue;
       }
@@ -421,7 +419,7 @@ export async function maybeLoadHarvestPackagesReportData({
 
           pkgQueue.push([childPkg, depth + 1]);
         }
-      }),
+      })
     );
   }
 
@@ -439,8 +437,8 @@ export async function maybeLoadHarvestPackagesReportData({
         harvestPackageRowData.push(
           rowDataFactory({
             Note: `Could not match harvest package. license:${harvest.LicenseNumber} harvest:${harvest.Name}, label:${harvestPackageLabel}`,
-            RowSource: '2',
-          }),
+            RowSource: "2",
+          })
         );
 
         continue;
@@ -469,7 +467,7 @@ export async function maybeLoadHarvestPackagesReportData({
       const strainName = uuidv4();
 
       // If a candidate is not found, use this as the fallback
-      let fallbackStrainName = '';
+      let fallbackStrainName = "";
       try {
         fallbackStrainName = getStrainNameOrError(harvestPackage);
       } catch {}
@@ -478,7 +476,7 @@ export async function maybeLoadHarvestPackagesReportData({
         ? extractInitialPackageQuantityAndUnitFromHistoryOrError(harvestPackage.history!)[0]
         : (harvestPackage as IIndexedDestinationPackageData).ShippedQuantity;
 
-      let msg = '';
+      let msg = "";
       if (!harvestPackage.history) {
         msg = `Could not load history for harvest package ${harvestPackageLabel}`;
         console.error(msg);
@@ -491,12 +489,12 @@ export async function maybeLoadHarvestPackagesReportData({
           HarvestID: harvest.Name,
           SourceTag: truncateTag(harvestConfig, getLabelOrError(harvestPackage)),
           Strain: strainName,
-          MaterialType: 'Denug',
+          MaterialType: "Denug",
           ...generateUnitsPair(initailHarvestPackageQuantity, harvestPackage, unitsOfMeasure),
-          Stage: 'Denug',
-          Note: harvestConfig.debug ? msg : '',
-          RowSource: '3',
-        }),
+          Stage: "Denug",
+          Note: harvestConfig.debug ? msg : "",
+          RowSource: "3",
+        })
       );
 
       if (!harvestPackage.history) {
@@ -520,10 +518,10 @@ export async function maybeLoadHarvestPackagesReportData({
               Note: `Packaging stage: Could not match child package. license:${
                 harvest.LicenseNumber
               } harvest:${harvest.Name}, harvestPkg:${getLabelOrError(
-                harvestPackage,
+                harvestPackage
               )}, label:${childPackageLabel}`,
-              RowSource: '4',
-            }),
+              RowSource: "4",
+            })
           );
 
           continue;
@@ -534,21 +532,26 @@ export async function maybeLoadHarvestPackagesReportData({
         }
 
         // If top-level pkg was transferred, assume it is the Post QC - Sent to Lab package
-        if (childPackage.LicenseNumber !== harvest.LicenseNumber) {
-          harvestPostQcPackages.push(childPackage);
-          continue;
-        }
+        //
+        // Per request, disable this rule
+        // if (childPackage.LicenseNumber !== harvest.LicenseNumber) {
+        //   harvestPostQcPackages.push(childPackage);
+        //   continue;
+        // }
 
         const childItemName = getItemNameOrError(childPackage);
 
         // Trim is handled later on
-        if (stringMatch(childItemName, ['Trim']) && !stringMatch(childItemName, ['Popcorn', 'Flower'])) {
+        if (
+          stringMatch(childItemName, ["Trim"]) &&
+          !stringMatch(childItemName, ["Popcorn", "Flower"])
+        ) {
           trimChildPackages.push(childPackage);
           continue;
         }
 
         // Shake is handled later on
-        if (stringMatch(childItemName, ['Shake'])) {
+        if (stringMatch(childItemName, ["Shake"])) {
           shakeChildPackages.push(childPackage);
           continue;
         }
@@ -565,7 +568,7 @@ export async function maybeLoadHarvestPackagesReportData({
           childPackage,
           harvestPackageRowData,
           unitsOfMeasure,
-          '',
+          ""
         );
       }
 
@@ -573,14 +576,14 @@ export async function maybeLoadHarvestPackagesReportData({
         const originalPackage = childPackage;
 
         const passthroughTestPackageLabels = extractTestSamplePackageLabelsFromHistory(
-          childPackage.history!,
+          childPackage.history!
         );
 
         const passthroughPackageLabels = extractChildPackageLabelsFromHistory_Full(
-          childPackage.history!,
+          childPackage.history!
         );
 
-        let passthroughMsg: string = '';
+        let passthroughMsg: string = "";
 
         if (passthroughTestPackageLabels.length === 0 && passthroughPackageLabels.length === 1) {
           if (packageMap.has(passthroughPackageLabels[0].label)) {
@@ -590,7 +593,7 @@ export async function maybeLoadHarvestPackagesReportData({
               passthroughPackageLabels[0].label,
               childPackage.LicenseNumber,
               // childPackage.PackagedDate!
-              passthroughPackageLabels[0].history.RecordedDateTime.split('T')[0],
+              passthroughPackageLabels[0].history.RecordedDateTime.split("T")[0]
             );
 
             if (result) {
@@ -604,11 +607,11 @@ export async function maybeLoadHarvestPackagesReportData({
             throw new Error(
               `Passthrough failed: childLabel:${getLabelOrError(childPackage)} passthroughLabel:${
                 passthroughPackageLabels[0].label
-              }`,
+              }`
             );
           } else {
             passthroughMsg = `Passthrough matched! Original:${getLabelOrError(
-              originalPackage,
+              originalPackage
             )} Passthrough:${getLabelOrError(childPackage)}`;
             console.log(passthroughMsg);
           }
@@ -632,7 +635,7 @@ export async function maybeLoadHarvestPackagesReportData({
             childPackage,
             harvestPackageRowData,
             unitsOfMeasure,
-            passthroughMsg,
+            passthroughMsg
           );
         } catch (e) {
           harvestPackageRowData.push(
@@ -640,8 +643,8 @@ export async function maybeLoadHarvestPackagesReportData({
               Note: `Could not record QC Rows: ${(e as any).toString()}. license:${
                 childPackage.LicenseNumber
               } harvest:${harvest.Name}, label:${getLabelOrError(childPackage)}`,
-              RowSource: '5',
-            }),
+              RowSource: "5",
+            })
           );
 
           continue;
@@ -669,7 +672,7 @@ export async function maybeLoadHarvestPackagesReportData({
             }
           } catch {}
 
-          if (stringMatch(getItemNameOrError(grandchildPackage), ['Shake'])) {
+          if (stringMatch(getItemNameOrError(grandchildPackage), ["Shake"])) {
             shakePackages.push(grandchildPackage);
           } else {
             standardPackages.push(grandchildPackage);
@@ -686,12 +689,12 @@ export async function maybeLoadHarvestPackagesReportData({
               harvestPackageRowData,
               unitsOfMeasure,
               pkg,
-              'Post QC - Sent to Lab',
+              "Post QC - Sent to Lab"
             );
           }
 
           if (harvestConfig.addSpacing) {
-            harvestPackageRowData.push(rowDataFactory({ RowSource: '6' }));
+            harvestPackageRowData.push(rowDataFactory({ RowSource: "6" }));
           }
         }
 
@@ -705,12 +708,12 @@ export async function maybeLoadHarvestPackagesReportData({
               pkg,
               harvestPackageRowData,
               unitsOfMeasure,
-              packageMap,
+              packageMap
             );
           }
 
           if (harvestConfig.addSpacing) {
-            harvestPackageRowData.push(rowDataFactory({ RowSource: '7' }));
+            harvestPackageRowData.push(rowDataFactory({ RowSource: "7" }));
           }
         }
       }
@@ -725,7 +728,7 @@ export async function maybeLoadHarvestPackagesReportData({
           harvestPackageRowData,
           unitsOfMeasure,
           childPackage,
-          'Denug - Sent to Lab',
+          "Denug - Sent to Lab"
         );
       }
 
@@ -738,7 +741,7 @@ export async function maybeLoadHarvestPackagesReportData({
           harvestPackage,
           harvestPackageRowData,
           unitsOfMeasure,
-          childPackage,
+          childPackage
         );
       }
 
@@ -748,7 +751,7 @@ export async function maybeLoadHarvestPackagesReportData({
         strainName,
         harvestPackage,
         harvestPackageRowData,
-        unitsOfMeasure,
+        unitsOfMeasure
       );
 
       if (!temporaryValueMap.has(strainName)) {
@@ -762,7 +765,7 @@ export async function maybeLoadHarvestPackagesReportData({
     }
 
     if (harvestConfig.addSpacing) {
-      harvestPackageRowData.push(rowDataFactory({ RowSource: '9' }));
+      harvestPackageRowData.push(rowDataFactory({ RowSource: "9" }));
     }
   }
 
@@ -776,55 +779,59 @@ export async function maybeLoadHarvestPackagesReportData({
     }
   }
 
-  const harvestPackageMatrix: any[][] = harvestPackageRowData.filter((row) => {
-    if (harvestConfig.removeFloorNugs) {
-      if (row.Strain === 'Floor Nugs') {
-        return false;
+  const harvestPackageMatrix: any[][] = harvestPackageRowData
+    .filter((row) => {
+      if (harvestConfig.removeFloorNugs) {
+        if (row.Strain === "Floor Nugs") {
+          return false;
+        }
       }
-    }
 
-    return true;
-  }).map(({
-    License,
-    HarvestID,
-    SourceTag,
-    BatchTag,
-    Strain,
-    Rename,
-    MaterialType,
-    Grams,
-    Pounds,
-    Stage,
-    Note,
-    RowSource,
-  }) => [
-    License,
-    HarvestID,
-    SourceTag,
-    BatchTag,
-    Strain,
-    Rename,
-    MaterialType,
-    Grams,
-    Pounds,
-    Stage,
-    Note,
-    RowSource,
-  ]);
+      return true;
+    })
+    .map(
+      ({
+        License,
+        HarvestID,
+        SourceTag,
+        BatchTag,
+        Strain,
+        Rename,
+        MaterialType,
+        Grams,
+        Pounds,
+        Stage,
+        Note,
+        RowSource,
+      }) => [
+        License,
+        HarvestID,
+        SourceTag,
+        BatchTag,
+        Strain,
+        Rename,
+        MaterialType,
+        Grams,
+        Pounds,
+        Stage,
+        Note,
+        RowSource,
+      ]
+    );
 
   harvestPackageMatrix.unshift([
-    'License',
-    'Harvest ID',
-    'Source Tag',
-    'Batch Tag',
-    'Strain',
-    'Rename',
-    'Material Type',
-    'Grams',
-    'Pounds',
-    'Stage',
-    harvestConfig.debug || harvestConfig.displayChecksum ? 'Note' : '',
-    harvestConfig.debug ? 'RowSource' : '',
+    "License",
+    "Harvest ID",
+    "Source Tag",
+    "Batch Tag",
+    "Strain",
+    "Rename",
+    "Material Type",
+    "Grams",
+    "Pounds",
+    "Stage",
+    harvestConfig.debug || harvestConfig.displayChecksum ? "Note" : "",
+    harvestConfig.debug ? "RowSource" : "",
   ]);
 
   reportData[ReportType.HARVEST_PACKAGES] = {
@@ -845,16 +852,16 @@ export function extractHarvestPackagesData({
 }
 
 function normalizeItemNameToMaterialType(itemName: string) {
-  if (stringMatch(itemName, ['Popcorn'])) {
-    return 'Popcorn';
+  if (stringMatch(itemName, ["Popcorn"])) {
+    return "Popcorn";
   }
 
-  if (stringMatch(itemName, ['Preroll'])) {
-    return 'Prerolls';
+  if (stringMatch(itemName, ["Preroll"])) {
+    return "Prerolls";
   }
 
-  if (stringMatch(itemName, ['Flower'])) {
-    return 'Flower';
+  if (stringMatch(itemName, ["Flower"])) {
+    return "Flower";
   }
 
   return itemName;
@@ -868,7 +875,7 @@ function recordHarvestPostQcRow(
   childPackage: IUnionIndexedPackageData,
   harvestPackageRowData: IHarvestPackageRowData[],
   unitsOfMeasure: IUnitOfMeasure[],
-  msg: string,
+  msg: string
 ) {
   const harvestConfig = reportConfig[ReportType.HARVEST_PACKAGES]!;
 
@@ -884,10 +891,10 @@ function recordHarvestPostQcRow(
       Strain: strainName,
       MaterialType: normalizeItemNameToMaterialType(getItemNameOrError(childPackage)),
       ...generateUnitsPair(initialChildQuantity, childPackage, unitsOfMeasure),
-      Stage: 'Post QC  - Sent to Lab',
-      Note: harvestConfig.debug ? msg : '',
-      RowSource: '10',
-    }),
+      Stage: "Post QC  - Sent to Lab",
+      Note: harvestConfig.debug ? msg : "",
+      RowSource: "10",
+    })
   );
 }
 
@@ -899,17 +906,19 @@ function recordPostQcRows(
   childPackage: IUnionIndexedPackageData,
   harvestPackageRowData: IHarvestPackageRowData[],
   unitsOfMeasure: IUnitOfMeasure[],
-  msg: string,
+  msg: string
 ) {
   const harvestConfig = reportConfig[ReportType.HARVEST_PACKAGES]!;
 
   if (!childPackage.history) {
-    harvestPackageRowData.push(rowDataFactory({
-      Note: `Could not match post QC child package. harvest:${harvest.Name}, label:${getLabelOrError(
-        childPackage,
-      )}`,
-      RowSource: '11',
-    }));
+    harvestPackageRowData.push(
+      rowDataFactory({
+        Note: `Could not match post QC child package. harvest:${
+          harvest.Name
+        }, label:${getLabelOrError(childPackage)}`,
+        RowSource: "11",
+      })
+    );
   }
 
   const initialChildQuantity: number = childPackage.history
@@ -931,14 +940,14 @@ function recordPostQcRows(
   }
 
   const childAdjustmentReasonNoteSets = extractAdjustmentReasonNoteSetsFromHistory(
-    childPackage.history!,
+    childPackage.history!
   );
 
   let childWasteTotal = 0;
   let childMLOverpackTotal = 0;
 
   for (const childAdjustmentReasonNote of childAdjustmentReasonNoteSets) {
-    if (stringMatch(childAdjustmentReasonNote.reason, ['Waste'])) {
+    if (stringMatch(childAdjustmentReasonNote.reason, ["Waste"])) {
       childWasteTotal += childAdjustmentReasonNote.quantity;
     } else {
       childMLOverpackTotal += childAdjustmentReasonNote.quantity;
@@ -953,10 +962,10 @@ function recordPostQcRows(
       Strain: strainName,
       MaterialType: normalizeItemNameToMaterialType(getItemNameOrError(childPackage)),
       ...generateUnitsPair(initialChildQuantity, childPackage, unitsOfMeasure),
-      Stage: 'Post QC Batch',
-      Note: harvestConfig.debug ? msg : '',
-      RowSource: '12',
-    }),
+      Stage: "Post QC Batch",
+      Note: harvestConfig.debug ? msg : "",
+      RowSource: "12",
+    })
   );
 
   harvestPackageRowData.push(
@@ -967,9 +976,9 @@ function recordPostQcRows(
       Strain: strainName,
       MaterialType: normalizeItemNameToMaterialType(getItemNameOrError(childPackage)),
       ...generateUnitsPair(totalChildTestQuantity, childPackage, unitsOfMeasure),
-      Stage: 'Post QC Lab Testing',
-      RowSource: '13',
-    }),
+      Stage: "Post QC Lab Testing",
+      RowSource: "13",
+    })
   );
 
   maybeRecordPostQCWasteRow(
@@ -979,7 +988,7 @@ function recordPostQcRows(
     harvestPackage,
     harvestPackageRowData,
     unitsOfMeasure,
-    childPackage,
+    childPackage
   );
 
   // if (harvestConfig.addSpacing) {
@@ -995,7 +1004,7 @@ function recordPackagingRows(
   grandchildPackage: IUnionIndexedPackageData,
   harvestPackageRowData: IHarvestPackageRowData[],
   unitsOfMeasure: IUnitOfMeasure[],
-  packageMap: Map<string, IUnionIndexedPackageData>,
+  packageMap: Map<string, IUnionIndexedPackageData>
 ) {
   const harvestConfig = reportConfig[ReportType.HARVEST_PACKAGES]!;
 
@@ -1005,16 +1014,16 @@ function recordPackagingRows(
 
   if (!grandchildPackage.history) {
     throw new Error(
-      `Could not load history for grandchild package ${getLabelOrError(grandchildPackage)}`,
+      `Could not load history for grandchild package ${getLabelOrError(grandchildPackage)}`
     );
   }
 
   const grandchildLabTestLabels = extractTestSamplePackageLabelsFromHistory(
-    grandchildPackage.history!,
+    grandchildPackage.history!
   );
 
   const grandchildSets = extractChildPackageTagQuantityUnitSetsFromHistory(
-    grandchildPackage.history!,
+    grandchildPackage.history!
   );
 
   let totalGrandchildTestQuantity = 0;
@@ -1028,7 +1037,7 @@ function recordPackagingRows(
   }
 
   const grandchildAdjustmentReasonNoteSets = extractAdjustmentReasonNoteSetsFromHistory(
-    grandchildPackage.history!,
+    grandchildPackage.history!
   );
 
   let grandchildPackagedTotal = 0;
@@ -1037,7 +1046,7 @@ function recordPackagingRows(
   let grandchildShakeTotal = 0;
 
   for (const grandchildAdjustmentReasonNote of grandchildAdjustmentReasonNoteSets) {
-    if (stringMatch(grandchildAdjustmentReasonNote.reason, ['Waste'])) {
+    if (stringMatch(grandchildAdjustmentReasonNote.reason, ["Waste"])) {
       grandchildWasteTotal += grandchildAdjustmentReasonNote.quantity;
     } else {
       grandchildMLOverpackTotal += grandchildAdjustmentReasonNote.quantity;
@@ -1045,7 +1054,7 @@ function recordPackagingRows(
   }
 
   const greatgrandchildPackageLabelSets = extractChildPackageTagQuantityUnitSetsFromHistory(
-    grandchildPackage.history!,
+    grandchildPackage.history!
   );
 
   for (const [
@@ -1055,7 +1064,10 @@ function recordPackagingRows(
   ] of greatgrandchildPackageLabelSets) {
     const greatgrandchildPackage = packageMap.get(greatgrandchildLabel);
 
-    if (greatgrandchildPackage && stringMatch(getItemNameOrError(greatgrandchildPackage), ['Shake'])) {
+    if (
+      greatgrandchildPackage &&
+      stringMatch(getItemNameOrError(greatgrandchildPackage), ["Shake"])
+    ) {
       grandchildShakeTotal += greatgrandchildQty;
     } else {
       grandchildPackagedTotal += greatgrandchildQty;
@@ -1064,13 +1076,16 @@ function recordPackagingRows(
 
   // Prerolls and other count-based should use the intake quantity,
   // NOT the calculated initial quantity
-  const grandchildPackageIsCountBased = getItemUnitOfMeasureAbbreviationOrError(grandchildPackage) === 'ea';
+  const grandchildPackageIsCountBased =
+    getItemUnitOfMeasureAbbreviationOrError(grandchildPackage) === "ea";
 
   let intakeQuantityIsWellFormed = true;
   let totalIntakeQuantity: number = 0;
   let intakeQuantityUnit: string | null = null;
 
-  for (const [tag, quantity, unit, item] of extractParentPackageTagQuantityUnitItemSetsFromHistory(grandchildPackage.history)) {
+  for (const [tag, quantity, unit, item] of extractParentPackageTagQuantityUnitItemSetsFromHistory(
+    grandchildPackage.history
+  )) {
     if (intakeQuantityUnit === null) {
       intakeQuantityUnit = unit;
     } else if (intakeQuantityUnit !== unit) {
@@ -1087,108 +1102,117 @@ function recordPackagingRows(
 
   const intakeUnit = unitsOfMeasure.find((x) => x.Name === intakeQuantityUnit);
 
-  const shouldOverrideInitialQuantity = grandchildPackageIsCountBased && intakeQuantityIsWellFormed && !!intakeUnit;
+  const shouldOverrideInitialQuantity =
+    grandchildPackageIsCountBased && intakeQuantityIsWellFormed && !!intakeUnit;
 
   const packagingIntakeUnitsPair = shouldOverrideInitialQuantity
-    ? normalizeUnitsPair(
-      totalIntakeQuantity,
-      intakeUnit,
-      unitsOfMeasure,
-    ) : generateUnitsPair(
-      initialGrandchildQuantity,
-      grandchildPackage,
-      unitsOfMeasure,
-    );
+    ? normalizeUnitsPair(totalIntakeQuantity, intakeUnit, unitsOfMeasure)
+    : generateUnitsPair(initialGrandchildQuantity, grandchildPackage, unitsOfMeasure);
   const packagingUnitsPair = generateUnitsPair(
     grandchildPackagedTotal,
     grandchildPackage,
-    unitsOfMeasure,
+    unitsOfMeasure
   );
   const packagingWasteUnitsPair = generateUnitsPair(
     grandchildWasteTotal,
     grandchildPackage,
-    unitsOfMeasure,
+    unitsOfMeasure
   );
   const packagingShakeUnitsPair = generateUnitsPair(
     grandchildShakeTotal,
     grandchildPackage,
-    unitsOfMeasure,
+    unitsOfMeasure
   );
   const packagingMoistureUnitsPair = generateUnitsPair(
     grandchildMLOverpackTotal,
     grandchildPackage,
-    unitsOfMeasure,
+    unitsOfMeasure
   );
 
   const expectedSum = packagingIntakeUnitsPair.Grams;
-  const actualSum = packagingUnitsPair.Grams
-    + packagingWasteUnitsPair.Grams
-    + packagingShakeUnitsPair.Grams
-    + packagingMoistureUnitsPair.Grams;
+  const actualSum =
+    packagingUnitsPair.Grams +
+    packagingWasteUnitsPair.Grams +
+    packagingShakeUnitsPair.Grams +
+    packagingMoistureUnitsPair.Grams;
 
   const passChecksum = Math.abs(1 - expectedSum / actualSum) < 0.01;
 
-  harvestPackageRowData.push(rowDataFactory({
-    License: harvestPackage.LicenseNumber,
-    HarvestID: harvest.Name,
-    BatchTag: truncateTag(harvestConfig, getLabelOrError(grandchildPackage)),
-    Strain: strainName,
-    MaterialType: normalizeItemNameToMaterialType(getItemNameOrError(grandchildPackage)),
-    ...packagingIntakeUnitsPair,
-    Stage: 'Packaging Intake',
-    Note: harvestConfig.displayChecksum
-      ? `Checksum ${passChecksum ? 'PASS' : 'FAIL'} - expected:${expectedSum}g actual:${actualSum}g`
-      : '',
-    RowSource: '15',
-  }));
+  harvestPackageRowData.push(
+    rowDataFactory({
+      License: harvestPackage.LicenseNumber,
+      HarvestID: harvest.Name,
+      BatchTag: truncateTag(harvestConfig, getLabelOrError(grandchildPackage)),
+      Strain: strainName,
+      MaterialType: normalizeItemNameToMaterialType(getItemNameOrError(grandchildPackage)),
+      ...packagingIntakeUnitsPair,
+      Stage: "Packaging Intake",
+      Note: harvestConfig.displayChecksum
+        ? `Checksum ${
+            passChecksum ? "PASS" : "FAIL"
+          } - expected:${expectedSum}g actual:${actualSum}g`
+        : "",
+      RowSource: "15",
+    })
+  );
 
-  harvestPackageRowData.push(rowDataFactory({
-    License: harvestPackage.LicenseNumber,
-    HarvestID: harvest.Name,
+  harvestPackageRowData.push(
+    rowDataFactory({
+      License: harvestPackage.LicenseNumber,
+      HarvestID: harvest.Name,
 
-    BatchTag: truncateTag(harvestConfig, getLabelOrError(grandchildPackage)),
-    Strain: strainName,
+      BatchTag: truncateTag(harvestConfig, getLabelOrError(grandchildPackage)),
+      Strain: strainName,
 
-    MaterialType: `${normalizeItemNameToMaterialType(getItemNameOrError(grandchildPackage))} - Prepack`,
-    ...packagingUnitsPair,
-    Stage: 'Packaging',
-    Note: harvestConfig.debug ? '' : '',
-    RowSource: '16',
-  }));
+      MaterialType: `${normalizeItemNameToMaterialType(
+        getItemNameOrError(grandchildPackage)
+      )} - Prepack`,
+      ...packagingUnitsPair,
+      Stage: "Packaging",
+      Note: harvestConfig.debug ? "" : "",
+      RowSource: "16",
+    })
+  );
 
-  harvestPackageRowData.push(rowDataFactory({
-    License: harvestPackage.LicenseNumber,
-    HarvestID: harvest.Name,
-    BatchTag: truncateTag(harvestConfig, getLabelOrError(grandchildPackage)),
-    Strain: strainName,
-    MaterialType: 'Waste',
-    ...packagingWasteUnitsPair,
-    Stage: 'Packaging - Waste',
-    RowSource: '17',
-  }));
+  harvestPackageRowData.push(
+    rowDataFactory({
+      License: harvestPackage.LicenseNumber,
+      HarvestID: harvest.Name,
+      BatchTag: truncateTag(harvestConfig, getLabelOrError(grandchildPackage)),
+      Strain: strainName,
+      MaterialType: "Waste",
+      ...packagingWasteUnitsPair,
+      Stage: "Packaging - Waste",
+      RowSource: "17",
+    })
+  );
 
-  harvestPackageRowData.push(rowDataFactory({
-    License: harvestPackage.LicenseNumber,
-    HarvestID: harvest.Name,
-    BatchTag: truncateTag(harvestConfig, getLabelOrError(grandchildPackage)),
-    Strain: strainName,
-    MaterialType: 'Shake',
-    ...packagingShakeUnitsPair,
-    Stage: 'Packaging - Sent to Lab',
-    Note: harvestConfig.debug ? '' : '',
-    RowSource: '18',
-  }));
+  harvestPackageRowData.push(
+    rowDataFactory({
+      License: harvestPackage.LicenseNumber,
+      HarvestID: harvest.Name,
+      BatchTag: truncateTag(harvestConfig, getLabelOrError(grandchildPackage)),
+      Strain: strainName,
+      MaterialType: "Shake",
+      ...packagingShakeUnitsPair,
+      Stage: "Packaging - Sent to Lab",
+      Note: harvestConfig.debug ? "" : "",
+      RowSource: "18",
+    })
+  );
 
-  harvestPackageRowData.push(rowDataFactory({
-    License: harvestPackage.LicenseNumber,
-    HarvestID: harvest.Name,
-    BatchTag: truncateTag(harvestConfig, getLabelOrError(grandchildPackage)),
-    Strain: strainName,
-    MaterialType: 'Moisture Loss',
-    ...packagingMoistureUnitsPair,
-    Stage: 'Packaging ML/Overpack',
-    RowSource: '19',
-  }));
+  harvestPackageRowData.push(
+    rowDataFactory({
+      License: harvestPackage.LicenseNumber,
+      HarvestID: harvest.Name,
+      BatchTag: truncateTag(harvestConfig, getLabelOrError(grandchildPackage)),
+      Strain: strainName,
+      MaterialType: "Moisture Loss",
+      ...packagingMoistureUnitsPair,
+      Stage: "Packaging ML/Overpack",
+      RowSource: "19",
+    })
+  );
 }
 
 function recordShakeRow(
@@ -1199,24 +1223,26 @@ function recordShakeRow(
   harvestPackageRowData: IHarvestPackageRowData[],
   unitsOfMeasure: IUnitOfMeasure[],
   childPackage: IUnionIndexedPackageData,
-  stage: string,
+  stage: string
 ) {
   const harvestConfig = reportConfig[ReportType.HARVEST_PACKAGES]!;
 
   const [initialChildQuantity, unit] = extractInitialPackageQuantityAndUnitFromHistoryOrError(
-    childPackage.history!,
+    childPackage.history!
   );
 
-  harvestPackageRowData.push(rowDataFactory({
-    License: harvestPackage.LicenseNumber,
-    HarvestID: harvest.Name,
-    BatchTag: truncateTag(harvestConfig, getLabelOrError(childPackage)),
-    Strain: strainName,
-    MaterialType: 'Shake',
-    ...generateUnitsPair(initialChildQuantity, childPackage, unitsOfMeasure),
-    Stage: stage,
-    RowSource: '20',
-  }));
+  harvestPackageRowData.push(
+    rowDataFactory({
+      License: harvestPackage.LicenseNumber,
+      HarvestID: harvest.Name,
+      BatchTag: truncateTag(harvestConfig, getLabelOrError(childPackage)),
+      Strain: strainName,
+      MaterialType: "Shake",
+      ...generateUnitsPair(initialChildQuantity, childPackage, unitsOfMeasure),
+      Stage: stage,
+      RowSource: "20",
+    })
+  );
 }
 
 function maybeRecordPostQCWasteRow(
@@ -1226,33 +1252,35 @@ function maybeRecordPostQCWasteRow(
   harvestPackage: IUnionIndexedPackageData,
   harvestPackageRowData: IHarvestPackageRowData[],
   unitsOfMeasure: IUnitOfMeasure[],
-  childPackage: IUnionIndexedPackageData,
+  childPackage: IUnionIndexedPackageData
 ) {
   const harvestConfig = reportConfig[ReportType.HARVEST_PACKAGES]!;
 
   const childAdjustmentReasonNoteSets = extractAdjustmentReasonNoteSetsFromHistory(
-    childPackage.history!,
+    childPackage.history!
   );
 
   let childWasteTotal = 0;
 
   for (const childAdjustmentReasonNote of childAdjustmentReasonNoteSets) {
-    if (stringMatch(childAdjustmentReasonNote.reason, ['Waste'])) {
+    if (stringMatch(childAdjustmentReasonNote.reason, ["Waste"])) {
       childWasteTotal += childAdjustmentReasonNote.quantity;
     }
   }
 
   if (childWasteTotal !== 0) {
-    harvestPackageRowData.push(rowDataFactory({
-      License: harvestPackage.LicenseNumber,
-      HarvestID: harvest.Name,
-      BatchTag: truncateTag(harvestConfig, getLabelOrError(childPackage)),
-      Strain: strainName,
-      MaterialType: 'Waste',
-      ...generateUnitsPair(childWasteTotal, childPackage, unitsOfMeasure),
-      Stage: 'Post QC - Waste',
-      RowSource: '21',
-    }));
+    harvestPackageRowData.push(
+      rowDataFactory({
+        License: harvestPackage.LicenseNumber,
+        HarvestID: harvest.Name,
+        BatchTag: truncateTag(harvestConfig, getLabelOrError(childPackage)),
+        Strain: strainName,
+        MaterialType: "Waste",
+        ...generateUnitsPair(childWasteTotal, childPackage, unitsOfMeasure),
+        Stage: "Post QC - Waste",
+        RowSource: "21",
+      })
+    );
   }
 }
 
@@ -1263,24 +1291,26 @@ function recordTrimRow(
   harvestPackage: IUnionIndexedPackageData,
   harvestPackageRowData: IHarvestPackageRowData[],
   unitsOfMeasure: IUnitOfMeasure[],
-  childPackage: IUnionIndexedPackageData,
+  childPackage: IUnionIndexedPackageData
 ) {
   const harvestConfig = reportConfig[ReportType.HARVEST_PACKAGES]!;
 
   const [initialChildQuantity, unit] = extractInitialPackageQuantityAndUnitFromHistoryOrError(
-    childPackage.history!,
+    childPackage.history!
   );
 
-  harvestPackageRowData.push(rowDataFactory({
-    License: harvestPackage.LicenseNumber,
-    HarvestID: harvest.Name,
-    SourceTag: truncateTag(harvestConfig, getLabelOrError(harvestPackage)),
-    Strain: strainName,
-    MaterialType: 'Trim',
-    ...generateUnitsPair(initialChildQuantity, childPackage, unitsOfMeasure),
-    Stage: 'Post Machine Trim - Sent to Lab',
-    RowSource: '22',
-  }));
+  harvestPackageRowData.push(
+    rowDataFactory({
+      License: harvestPackage.LicenseNumber,
+      HarvestID: harvest.Name,
+      SourceTag: truncateTag(harvestConfig, getLabelOrError(harvestPackage)),
+      Strain: strainName,
+      MaterialType: "Trim",
+      ...generateUnitsPair(initialChildQuantity, childPackage, unitsOfMeasure),
+      Stage: "Post Machine Trim - Sent to Lab",
+      RowSource: "22",
+    })
+  );
 }
 
 function recordHarvestPackageAdjustmentRows(
@@ -1289,56 +1319,58 @@ function recordHarvestPackageAdjustmentRows(
   strainName: string,
   harvestPackage: IUnionIndexedPackageData,
   harvestPackageRowData: IHarvestPackageRowData[],
-  unitsOfMeasure: IUnitOfMeasure[],
+  unitsOfMeasure: IUnitOfMeasure[]
 ) {
   const harvestConfig = reportConfig[ReportType.HARVEST_PACKAGES]!;
 
   const harvestPackageAdjustmentReasonNoteSets = extractAdjustmentReasonNoteSetsFromHistory(
-    harvestPackage.history!,
+    harvestPackage.history!
   );
 
   for (const harvestPackageAdjustmentReasonNote of harvestPackageAdjustmentReasonNoteSets) {
-    let materialType = 'Adjustment';
+    let materialType = "Adjustment";
 
-    if (stringMatch(harvestPackageAdjustmentReasonNote.reason, ['Waste'])) {
-      materialType = 'Waste';
-    } else if (stringMatch(harvestPackageAdjustmentReasonNote.reason, ['Moisture'])) {
-      materialType = 'Process Loss';
+    if (stringMatch(harvestPackageAdjustmentReasonNote.reason, ["Waste"])) {
+      materialType = "Waste";
+    } else if (stringMatch(harvestPackageAdjustmentReasonNote.reason, ["Moisture"])) {
+      materialType = "Process Loss";
     }
 
-    harvestPackageRowData.push(rowDataFactory({
-      License: harvestPackage.LicenseNumber,
-      HarvestID: harvest.Name,
-      SourceTag: truncateTag(harvestConfig, getLabelOrError(harvestPackage)),
-      Strain: strainName,
-      MaterialType: materialType,
-      ...generateUnitsPair(
-        harvestPackageAdjustmentReasonNote.quantity,
-        harvestPackage,
-        unitsOfMeasure,
-      ),
-      Stage: 'Denug',
-      RowSource: '23',
-    }));
+    harvestPackageRowData.push(
+      rowDataFactory({
+        License: harvestPackage.LicenseNumber,
+        HarvestID: harvest.Name,
+        SourceTag: truncateTag(harvestConfig, getLabelOrError(harvestPackage)),
+        Strain: strainName,
+        MaterialType: materialType,
+        ...generateUnitsPair(
+          harvestPackageAdjustmentReasonNote.quantity,
+          harvestPackage,
+          unitsOfMeasure
+        ),
+        Stage: "Denug",
+        RowSource: "23",
+      })
+    );
   }
 }
 
 function generateUnitsPair(
   quantity: number,
   pkg: IUnionIndexedPackageData,
-  unitsOfMeasure: IUnitOfMeasure[],
-): {Grams: number, Pounds: number} {
+  unitsOfMeasure: IUnitOfMeasure[]
+): { Grams: number; Pounds: number } {
   let unitOfMeasure = unitsOfMeasure.find(
-    (x) => x.Abbreviation === getItemUnitOfMeasureAbbreviationOrError(pkg),
+    (x) => x.Abbreviation === getItemUnitOfMeasureAbbreviationOrError(pkg)
   )!;
 
-  if (getItemUnitOfMeasureAbbreviationOrError(pkg) === 'ea') {
+  if (getItemUnitOfMeasureAbbreviationOrError(pkg) === "ea") {
     try {
       const itemQuantityAndUnit = getItemUnitQuantityAndUnitOrError(pkg);
 
       quantity *= itemQuantityAndUnit.quantity;
       unitOfMeasure = unitsOfMeasure.find(
-        (x) => x.Abbreviation === itemQuantityAndUnit.unitOfMeasureAbbreviation,
+        (x) => x.Abbreviation === itemQuantityAndUnit.unitOfMeasureAbbreviation
       )!;
     } catch {
       // Item is count based. No meaningful way to extract an initial weight.
@@ -1352,22 +1384,26 @@ function generateUnitsPair(
 function normalizeUnitsPair(
   quantity: number,
   unitOfMeasure: IUnitOfMeasure,
-  unitsOfMeasure: IUnitOfMeasure[],
-):{Grams: number, Pounds: number} {
-  const gramUnitOfMeasure = unitsOfMeasure.find((x) => x.Abbreviation === 'g')!;
-  const poundUnitOfmeasure = unitsOfMeasure.find((x) => x.Abbreviation === 'lb')!;
+  unitsOfMeasure: IUnitOfMeasure[]
+): { Grams: number; Pounds: number } {
+  const gramUnitOfMeasure = unitsOfMeasure.find((x) => x.Abbreviation === "g")!;
+  const poundUnitOfmeasure = unitsOfMeasure.find((x) => x.Abbreviation === "lb")!;
 
   return {
-    Grams: parseFloat(Math.abs(convertUnits(quantity, unitOfMeasure, gramUnitOfMeasure)).toFixed(3)),
-    Pounds: parseFloat(Math.abs(convertUnits(quantity, unitOfMeasure, poundUnitOfmeasure)).toFixed(3)),
+    Grams: parseFloat(
+      Math.abs(convertUnits(quantity, unitOfMeasure, gramUnitOfMeasure)).toFixed(3)
+    ),
+    Pounds: parseFloat(
+      Math.abs(convertUnits(quantity, unitOfMeasure, poundUnitOfmeasure)).toFixed(3)
+    ),
   };
 }
 
 function truncateTag(
   harvestConfig: IReportConfig[ReportType.HARVEST_PACKAGES],
-  tag: string,
+  tag: string
 ): string {
-  return harvestConfig!.displayFullTags ? tag : tag.slice(-8).replace(/^0+/, '');
+  return harvestConfig!.displayFullTags ? tag : tag.slice(-8).replace(/^0+/, "");
 }
 
 function stringMatch(src: string, tokens: string[]): boolean {
