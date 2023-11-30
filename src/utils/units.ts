@@ -150,3 +150,11 @@ export async function fuzzyUnitsMatchOrError(
   }
   return unitA.Id === unitB.Id;
 }
+
+export async function fuzzyUnitsMatch(a: string | number, b: string | number): Promise<boolean> {
+  try {
+    return await fuzzyUnitsMatchOrError(a, b);
+  } catch {
+    return false;
+  }
+}

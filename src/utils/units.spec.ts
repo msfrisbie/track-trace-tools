@@ -1,7 +1,7 @@
 import { IUnitOfMeasure } from "@/interfaces";
 import "@/test/utils/auto-mock-chrome";
 import "@/test/utils/auto-mock-fetch";
-import { convertUnits, fuzzyUnitsMatchOrError } from "./units";
+import { convertUnits, fuzzyUnitsMatch, fuzzyUnitsMatchOrError } from "./units";
 
 const unitsOfMeasure: IUnitOfMeasure[] = [
   {
@@ -145,5 +145,7 @@ describe("units.ts", () => {
     expect(await fuzzyUnitsMatchOrError(4, "g")).toEqual(true);
     expect(await fuzzyUnitsMatchOrError("g", 4)).toEqual(true);
     expect(fuzzyUnitsMatchOrError("foo", "g")).rejects.toEqual(Error(`Unit A value invalid: foo`));
+    expect(await fuzzyUnitsMatch("foo", "g")).toEqual(false);
+    expect(await fuzzyUnitsMatch("", "g")).toEqual(false);
   });
 });

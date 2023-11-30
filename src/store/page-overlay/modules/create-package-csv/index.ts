@@ -16,7 +16,7 @@ import {
 } from "@/utils/csv";
 import { todayIsodate } from "@/utils/date";
 import { readCsvFile } from "@/utils/file";
-import { fuzzyUnitsMatchOrError } from "@/utils/units";
+import { fuzzyUnitsMatch } from "@/utils/units";
 import { ActionContext } from "vuex";
 import {
   CREATE_PACKAGE_CSV_COLUMNS,
@@ -264,7 +264,11 @@ export const createPackageCsvModule = {
           const newTag = dataRow[CreatePackageCsvColumns.NEW_PACKAGE_TAG];
           const columnIndex = COLUMNS.indexOf(CreatePackageCsvColumns.NEW_PACKAGE_TAG);
 
-          const tag = tagMap.get(newTag)!;
+          const tag = tagMap.get(newTag);
+
+          if (!tag) {
+            continue;
+          }
 
           if (!tag.TagTypeName.includes("Package")) {
             rowGroup.errors.push({
@@ -326,7 +330,11 @@ export const createPackageCsvModule = {
         // SET DEFAULT
         // Item
         for (const dataRow of rowGroup.dataRows) {
-          const pkg = packageMap.get(dataRow[CreatePackageCsvColumns.SOURCE_PACKAGE_TAG])!;
+          const pkg = packageMap.get(dataRow[CreatePackageCsvColumns.SOURCE_PACKAGE_TAG]);
+
+          if (!pkg) {
+            continue;
+          }
 
           const key = CreatePackageCsvColumns.ITEM_NAME;
           if (!dataRow[key]) {
@@ -349,7 +357,7 @@ export const createPackageCsvModule = {
           const itemName = dataRow[CreatePackageCsvColumns.ITEM_NAME];
           const columnIndex = COLUMNS.indexOf(CreatePackageCsvColumns.ITEM_NAME);
 
-          if (!itemMap.get(itemName)) {
+          if (!itemMap.has(itemName)) {
             rowGroup.errors.push({
               text: `Item ${itemName} does not match an active item`,
               cellCoordinates: [{ rowIndex: dataRow.Index, columnIndex }],
@@ -360,7 +368,11 @@ export const createPackageCsvModule = {
         // SET DEFAULT
         // Location
         for (const dataRow of rowGroup.dataRows) {
-          const pkg = packageMap.get(dataRow[CreatePackageCsvColumns.SOURCE_PACKAGE_TAG])!;
+          const pkg = packageMap.get(dataRow[CreatePackageCsvColumns.SOURCE_PACKAGE_TAG]);
+
+          if (!pkg) {
+            continue;
+          }
 
           const key = CreatePackageCsvColumns.LOCATION_NAME;
           if (!dataRow[key]) {
@@ -394,7 +406,11 @@ export const createPackageCsvModule = {
         // SET DEFAULT
         // Source package quantity unit of measure
         for (const dataRow of rowGroup.dataRows) {
-          const pkg = packageMap.get(dataRow[CreatePackageCsvColumns.SOURCE_PACKAGE_TAG])!;
+          const pkg = packageMap.get(dataRow[CreatePackageCsvColumns.SOURCE_PACKAGE_TAG]);
+
+          if (!pkg) {
+            continue;
+          }
 
           const key = CreatePackageCsvColumns.SOURCE_PACKAGE_QUANTITY_UNIT_OF_MEASURE;
           if (!dataRow[key]) {
@@ -415,20 +431,19 @@ export const createPackageCsvModule = {
         // Source package item unit of measure matches quantity used unit of measure
         for (const dataRow of rowGroup.dataRows) {
           const srcPackageTag = dataRow[CreatePackageCsvColumns.SOURCE_PACKAGE_TAG];
-          const SOURCE_PACKAGE_QUANTITY_UNIT_OF_MEASURE =
+          const sourcePackageQuantityUnitOfMeasure =
             dataRow[CreatePackageCsvColumns.SOURCE_PACKAGE_QUANTITY_UNIT_OF_MEASURE];
+
+          if (!packageMap.get(srcPackageTag)) {
+            continue;
+          }
 
           const srcPackageItem = packageMap.get(srcPackageTag)!.Item;
           const columnIndex = COLUMNS.indexOf(
             CreatePackageCsvColumns.SOURCE_PACKAGE_QUANTITY_UNIT_OF_MEASURE
           );
 
-          if (
-            !(await fuzzyUnitsMatchOrError(
-              srcPackageItem.Name,
-              SOURCE_PACKAGE_QUANTITY_UNIT_OF_MEASURE
-            ))
-          ) {
+          if (!(await fuzzyUnitsMatch(srcPackageItem.Name, sourcePackageQuantityUnitOfMeasure))) {
             rowGroup.errors.push({
               text: `Source item unit and quantity used unit do not match`,
               cellCoordinates: [
@@ -444,7 +459,11 @@ export const createPackageCsvModule = {
         // SET DEFAULT
         // Output quantity unit of measure
         for (const dataRow of rowGroup.dataRows) {
-          const item = itemMap.get(dataRow[CreatePackageCsvColumns.ITEM_NAME])!;
+          const item = itemMap.get(dataRow[CreatePackageCsvColumns.ITEM_NAME]);
+
+          if (!item) {
+            continue;
+          }
 
           const key = CreatePackageCsvColumns.NEW_PACKAGE_UNIT_OF_MEASURE;
           if (!dataRow[key]) {
@@ -464,10 +483,14 @@ export const createPackageCsvModule = {
         // CHECK
         // Output item unit matches output quantity unit
         for (const dataRow of rowGroup.dataRows) {
-          const item = itemMap.get(dataRow[CreatePackageCsvColumns.ITEM_NAME])!;
+          const item = itemMap.get(dataRow[CreatePackageCsvColumns.ITEM_NAME]);
+
+          if (!item) {
+            continue;
+          }
 
           if (
-            !(await fuzzyUnitsMatchOrError(
+            !(await fuzzyUnitsMatch(
               item.UnitOfMeasureName,
               dataRow[CreatePackageCsvColumns.NEW_PACKAGE_UNIT_OF_MEASURE]
             ))
@@ -495,7 +518,7 @@ export const createPackageCsvModule = {
 
           // If unit of measure does not match, fall through
           if (
-            !(await fuzzyUnitsMatchOrError(
+            !(await fuzzyUnitsMatch(
               dataRow[CreatePackageCsvColumns.SOURCE_PACKAGE_QUANTITY_UNIT_OF_MEASURE],
               dataRow[CreatePackageCsvColumns.NEW_PACKAGE_UNIT_OF_MEASURE]
             ))
@@ -530,7 +553,7 @@ export const createPackageCsvModule = {
 
           // If unit of measure does not match, fall through
           if (
-            !(await fuzzyUnitsMatchOrError(
+            !(await fuzzyUnitsMatch(
               dataRow[CreatePackageCsvColumns.SOURCE_PACKAGE_QUANTITY_UNIT_OF_MEASURE],
               dataRow[CreatePackageCsvColumns.NEW_PACKAGE_UNIT_OF_MEASURE]
             ))
@@ -579,7 +602,7 @@ export const createPackageCsvModule = {
         // TODO flood fill empty values
 
         // CHECK
-        // For each group, all output package values must match
+        // For each group, all output package values must match and be non-empty
         for (const dataRow of rowGroup.dataRows) {
           const keys: CreatePackageCsvColumns[] = [
             CreatePackageCsvColumns.NEW_PACKAGE_TAG,
