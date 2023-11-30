@@ -141,8 +141,8 @@ export async function fuzzyUnitsMatchOrError(
   a: string | number,
   b: string | number
 ): Promise<boolean> {
-  let unitA: IUnitOfMeasure = await fuzzyUnitOrError(a);
-  let unitB: IUnitOfMeasure = await fuzzyUnitOrError(b);
+  const unitA: IUnitOfMeasure = await fuzzyUnitOrError(a);
+  const unitB: IUnitOfMeasure = await fuzzyUnitOrError(b);
 
   return unitA.Id === unitB.Id;
 }

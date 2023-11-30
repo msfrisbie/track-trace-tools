@@ -109,6 +109,7 @@ export const createPackageCsvModule = {
 
       ctx.state.statusMessage = "Loading data...";
 
+      /* eslint-disable-next-line no-warning-comments */
       // TODO fallback to not checking tags, locations, items
       try {
         packages = await primaryDataLoader.activePackages(10 * 60 * 1000);
@@ -188,6 +189,7 @@ export const createPackageCsvModule = {
           messages: [],
           warnings: [],
           errors: [],
+          /* eslint-disable-next-line no-warning-comments */
           // TODO this might not be necessary
           parsedData: null,
         })
@@ -616,6 +618,7 @@ export const createPackageCsvModule = {
           }
         }
 
+        /* eslint-disable-next-line no-warning-comments */
         // TODO flood fill empty values
 
         // CHECK
@@ -639,6 +642,7 @@ export const createPackageCsvModule = {
             const set = new Set(rowGroup.dataRows.map((x) => x[key]));
 
             if (set.size > 1) {
+              /* eslint-disable-next-line no-warning-comments */
               // TODO
             }
           }
@@ -648,6 +652,7 @@ export const createPackageCsvModule = {
       ctx.state.rowGroups = rowGroups;
 
       // Parsed just means finished with no critical errors.
+      /* eslint-disable-next-line no-warning-comments */
       // TODO: check that all error fields are empty before enabling
       // a submit button.
       ctx.state.status = PackageCsvStatus.PARSED;
