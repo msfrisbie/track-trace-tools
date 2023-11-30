@@ -305,7 +305,9 @@ export async function maybeLoadEmployeeAuditReportData({
 
     const TAG_TOKEN_MATCHER = new RegExp(METRC_TAG_REGEX_PATTERN, "ig");
     const QUANTITY_TOKEN_MATCHER = new RegExp(
-      `$[0-9,\.]+\s+${(await dynamicConstsManager.unitsOfMeasure()).map((x) => x.Name).join("|")}`,
+      `[0-9,\\.]+\\s+(${(await dynamicConstsManager.unitsOfMeasure())
+        .map((x) => x.Name)
+        .join("|")})`,
       "ig"
     );
 
