@@ -111,7 +111,7 @@ export const createPackageCsvModule = {
 
       // TODO fallback to not checking tags, locations, items
       try {
-        packages = await primaryDataLoader.activePackages();
+        packages = await primaryDataLoader.activePackages(10 * 60 * 1000);
       } catch {
         ctx.state.status = PackageCsvStatus.ERROR;
         ctx.state.statusMessage =

@@ -1,5 +1,5 @@
 <template>
-  <div class="grid grid-cols-4 gap-8">
+  <div class="grid grid-cols-2 gap-8" style="grid-template-columns: auto 1fr">
     <div class="h-full">
       <div>{{ createPackageCsvState.status }}</div>
       <b-button-group vertical>
@@ -22,20 +22,20 @@
 
       <div>{{ createPackageCsvState.statusMessage }}</div>
     </div>
-    <div class="col-span-3 h-full">
+
+    <div class="h-full">
       <template v-if="!createPackageCsvState.csvData"> Upload a CSV </template>
 
       <b-tabs>
-        <b-tab title="Package Template" active>
+        <b-tab title="Summary" active>
           <template v-if="createPackageCsvState.rowGroups">
             <div class="grid grid-cols-3 gap-8">
-              <div>Input</div>
-              <div>Output</div>
-              <div>Status</div>
-
-              <template v-for="rowGroup of createPackageCsvState.rowGroups">
+              <template v-for="[idx, rowGroup] of createPackageCsvState.rowGroups.entries()">
                 <fragment v-bind:key="rowGroup.destinationLabel">
-                  <div class="flex flex-col gap-2">
+                  <div
+                    class="flex flex-col gap-2"
+                    v-bind:class="{ 'bg-purple-100': idx % 2 === 0 }"
+                  >
                     <div>
                       {{ rowGroup.dataRows.length }} Package{{
                         rowGroup.dataRows.length > 0 ? "s" : ""
@@ -64,10 +64,11 @@
                   </div>
 
                   <!-- assumes that all values are identical -->
-                  <div class="flex flex-col gap-2">
-                    <div v-for="outputField of outputFields" v-bind:key="outputField">
-                      {{ outputField }}: {{ rowGroup.dataRows[0][outputField] }}
-                    </div>
+                  <div class="grid grid-cols-2 gap-2" style="grid-template-columns: auto 1fr">
+                    <fragment v-for="outputField of outputFields" v-bind:key="outputField">
+                      <div>{{ outputField }}</div>
+                      <div>{{ rowGroup.dataRows[0][outputField] }}</div>
+                    </fragment>
                   </div>
 
                   <div>
@@ -102,16 +103,27 @@
         </b-tab>
 
         <b-tab title="Data Table">
-          <template v-if="createPackageCsvState.csvData">
+          <template v-if="createPackageCsvState.rowGroups">
             <b-table-simple>
-              <b-tr
-                v-for="[rowIdx, row] of createPackageCsvState.csvData.entries()"
-                v-bind:key="rowIdx"
-              >
-                <b-td v-for="[colIdx, col] of row.entries()" v-bind:key="colIdx">
-                  {{ col }}
-                </b-td>
+              <b-tr>
+                <b-th v-for="column of CREATE_PACKAGE_CSV_COLUMNS" v-bind:key="column.value">
+                  {{ column.value }}
+                </b-th>
               </b-tr>
+
+              <template v-for="rowGroup of createPackageCsvState.rowGroups">
+                <b-tr
+                  v-for="dataRow of rowGroup.dataRows"
+                  v-bind:key="rowGroup.destinationLabel + dataRow.Index"
+                >
+                  <b-td
+                    v-for="column of CREATE_PACKAGE_CSV_COLUMNS"
+                    v-bind:key="dataRow.Index + column.value"
+                  >
+                    {{ dataRow[column.value] }}
+                  </b-td>
+                </b-tr>
+              </template>
             </b-table-simple>
           </template>
         </b-tab>
@@ -131,6 +143,7 @@ import { IPluginState } from "@/interfaces";
 import router from "@/router/index";
 import store from "@/store/page-overlay/index";
 import {
+  CREATE_PACKAGE_CSV_COLUMNS,
   CreatePackageCsvActions,
   CreatePackageCsvColumns,
   PackageCsvStatus,
@@ -155,6 +168,7 @@ export default Vue.extend({
       CreatePackageCsvColumns,
       PackageCsvStatus,
       csvFile: null,
+      CREATE_PACKAGE_CSV_COLUMNS,
       outputFields: [
         CreatePackageCsvColumns.NEW_PACKAGE_TAG,
         CreatePackageCsvColumns.LOCATION_NAME,
