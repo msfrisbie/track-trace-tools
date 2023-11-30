@@ -1,35 +1,33 @@
 export enum CreatePackageCsvColumns {
-  NEW_PACKAGE_TAG = 'New Package Tag',
-  SOURCE_PACKAGE_TAG = 'Source Package Tag',
-  SOURCE_PACKAGE_QUANTITY_USED = 'Source Package Quantity Used',
-  SOURCE_PACKAGE_QUANTITY_UNIT_OF_MEASURE = 'Source Package Quantity Unit of Measure',
-  LOCATION_NAME = 'Location Name',
-  ITEM_NAME = 'Item Name',
-  NEW_PACKAGE_QUANTITY = 'New Package Quantity',
-  NEW_PACKAGE_UNIT = 'New Package Unit',
-  PACKAGED_DATE = 'Packaged Date',
-  NOTE = 'Note',
-  PRODUCTION_BATCH_NUMBER = 'Production Batch Number',
-  IS_DONATION = 'Is Donation?',
-  IS_TRADE_SAMPLE = 'Is Trade Sample?',
-  SOURCE_PACKAGE_TAG_PREFIX = 'Source Package Tag',
-  SOURCE_PACKAGE_QUANTITY_PREFIX = 'Source Package Quantity',
-  EXPIRATION_DATE = 'Expiration Date',
+  NEW_PACKAGE_TAG = "New Package Tag",
+  SOURCE_PACKAGE_TAG = "Source Package Tag",
+  SOURCE_PACKAGE_QUANTITY_USED = "Source Package Quantity Used",
+  SOURCE_PACKAGE_QUANTITY_UNIT_OF_MEASURE = "Source Package Quantity Unit of Measure",
+  LOCATION_NAME = "Location Name",
+  ITEM_NAME = "Item Name",
+  NEW_PACKAGE_QUANTITY = "New Package Quantity",
+  NEW_PACKAGE_UNIT_OF_MEASURE = "New Package Unit",
+  PACKAGED_DATE = "Packaged Date",
+  NOTE = "Note",
+  PRODUCTION_BATCH_NUMBER = "Production Batch Number",
+  IS_DONATION = "Is Donation?",
+  IS_TRADE_SAMPLE = "Is Trade Sample?",
+  EXPIRATION_DATE = "Expiration Date",
 }
 
 export enum CreatePackageCsvMutations {
-  CREATE_PACKAGE_CSV_MUTATION = 'CREATE_PACKAGE_CSV_MUTATION',
+  CREATE_PACKAGE_CSV_MUTATION = "CREATE_PACKAGE_CSV_MUTATION",
 }
 
 export enum CreatePackageCsvGetters {
-  CREATE_PACKAGE_CSV_GETTER = 'CREATE_PACKAGE_CSV_GETTER',
+  CREATE_PACKAGE_CSV_GETTER = "CREATE_PACKAGE_CSV_GETTER",
 }
 
 export enum CreatePackageCsvActions {
-  GENERATE_CSV_TEMPLATE = 'GENERATE_CSV_TEMPLATE',
-  IMPORT_CSV = 'IMPORT_CSV',
-  PARSE_CSV_DATA = 'PARSE_CSV_DATA',
-  RESET = 'RESET',
+  GENERATE_CSV_TEMPLATE = "GENERATE_CSV_TEMPLATE",
+  IMPORT_CSV = "IMPORT_CSV",
+  PARSE_CSV_DATA = "PARSE_CSV_DATA",
+  RESET = "RESET",
 }
 
 export enum PackageCsvStatus {
@@ -37,10 +35,14 @@ export enum PackageCsvStatus {
   INFLIGHT = "INFLIGHT",
   PARSED = "PARSED",
   ERROR = "ERROR",
-  SUCCESS = "SUCCESS"
+  SUCCESS = "SUCCESS",
 }
 
-export const CREATE_PACKAGE_CSV_COLUMNS: {value: CreatePackageCsvColumns, required: boolean, defaultDescription: string}[] = [
+export const CREATE_PACKAGE_CSV_COLUMNS: {
+  value: CreatePackageCsvColumns;
+  required: boolean;
+  defaultDescription: string;
+}[] = [
   {
     value: CreatePackageCsvColumns.SOURCE_PACKAGE_TAG,
     required: true,
@@ -77,7 +79,7 @@ export const CREATE_PACKAGE_CSV_COLUMNS: {value: CreatePackageCsvColumns, requir
     defaultDescription: "Sum of source quantities",
   },
   {
-    value: CreatePackageCsvColumns.NEW_PACKAGE_UNIT,
+    value: CreatePackageCsvColumns.NEW_PACKAGE_UNIT_OF_MEASURE,
     required: false,
     defaultDescription: "Same unit as source package",
   },

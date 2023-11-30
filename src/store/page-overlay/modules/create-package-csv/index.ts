@@ -14,7 +14,9 @@ import {
   downloadCsvFile,
   getIndexOfHeaderRowOrError,
 } from "@/utils/csv";
+import { todayIsodate } from "@/utils/date";
 import { readCsvFile } from "@/utils/file";
+import { fuzzyUnitsMatchOrError } from "@/utils/units";
 import { ActionContext } from "vuex";
 import {
   CREATE_PACKAGE_CSV_COLUMNS,
@@ -187,12 +189,13 @@ export const createPackageCsvModule = {
           messages: [],
           warnings: [],
           errors: [],
+          // TODO this might not be necessary
           parsedData: null,
         })
       );
 
       // Preprocess values between rowGroups
-      const aggregatePackageData: Map<
+      const aggregateSourcePackageData: Map<
         string,
         {
           quantityUsed: number;
@@ -203,20 +206,92 @@ export const createPackageCsvModule = {
         for (const dataRow of rowGroup.dataRows) {
           const key = dataRow[CreatePackageCsvColumns.SOURCE_PACKAGE_TAG];
 
-          if (!aggregatePackageData.has(key)) {
-            aggregatePackageData.set(key, {
+          if (!aggregateSourcePackageData.has(key)) {
+            aggregateSourcePackageData.set(key, {
               quantityUsed: 0,
             });
           }
 
-          aggregatePackageData.get(key)!.quantityUsed += parseFloat(
+          aggregateSourcePackageData.get(key)!.quantityUsed += parseFloat(
             dataRow[CreatePackageCsvColumns.SOURCE_PACKAGE_QUANTITY_USED]
           );
         }
       }
 
-      // Validate each rowgroup
+      // Lookup maps
+      const packageMap: Map<string, IIndexedPackageData> = new Map(
+        packages.map((x) => [x.Label, x])
+      );
+      const tagMap: Map<string, IIndexedTagData> = new Map(tags.map((x) => [x.Label, x]));
+      const itemMap: Map<string, IItemData> = new Map(items.map((x) => [x.Name, x]));
+      const locationMap: Map<string, ILocationData> = new Map(locations.map((x) => [x.Name, x]));
+
+      // Validate each rowgroup and select default values if necessary
       for (const rowGroup of rowGroups) {
+        // CHECK
+        // Source package tags match active packages
+        //
+        // This check must come first - defaults are derived from the source package
+        for (const dataRow of rowGroup.dataRows) {
+          const srcTag = dataRow[CreatePackageCsvColumns.SOURCE_PACKAGE_TAG];
+          const columnIndex = COLUMNS.indexOf(CreatePackageCsvColumns.SOURCE_PACKAGE_TAG);
+
+          if (!packageMap.has(srcTag)) {
+            rowGroup.errors.push({
+              text: `Source package ${srcTag} does not match an active package`,
+              cellCoordinates: [{ rowIndex: dataRow.Index, columnIndex }],
+            });
+          }
+        }
+
+        // CHECK
+        // New package tag matches available package tag
+        for (const dataRow of rowGroup.dataRows) {
+          const newTag = dataRow[CreatePackageCsvColumns.NEW_PACKAGE_TAG];
+          const columnIndex = COLUMNS.indexOf(CreatePackageCsvColumns.NEW_PACKAGE_TAG);
+
+          if (!tagMap.has(newTag)) {
+            rowGroup.errors.push({
+              text: `New package tag ${newTag} does not match an active tag`,
+              cellCoordinates: [{ rowIndex: dataRow.Index, columnIndex }],
+            });
+          }
+        }
+
+        // CHECK
+        // New package tag is of correct type
+        for (const dataRow of rowGroup.dataRows) {
+          const newTag = dataRow[CreatePackageCsvColumns.NEW_PACKAGE_TAG];
+          const columnIndex = COLUMNS.indexOf(CreatePackageCsvColumns.NEW_PACKAGE_TAG);
+
+          const tag = tagMap.get(newTag)!;
+
+          if (!tag.TagTypeName.includes("Package")) {
+            rowGroup.errors.push({
+              text: `New package tag ${newTag} is not the correct tag type: ${tag.TagTypeName}`,
+              cellCoordinates: [{ rowIndex: dataRow.Index, columnIndex }],
+            });
+          }
+        }
+
+        // SET DEFAULT
+        // Packaged date
+        for (const dataRow of rowGroup.dataRows) {
+          const key = CreatePackageCsvColumns.PACKAGED_DATE;
+          if (!dataRow[key]) {
+            dataRow[key] = todayIsodate();
+            rowGroup.messages.push({
+              text: `Used default value for packaged date: ${todayIsodate()}`,
+              cellCoordinates: [
+                {
+                  rowIndex: dataRow.Index,
+                  columnIndex: COLUMNS.indexOf(key),
+                },
+              ],
+            });
+          }
+        }
+
         // CHECK
         // All dates within group match
         const uniquePackagedDates = new Set(
@@ -248,16 +323,22 @@ export const createPackageCsvModule = {
           });
         }
 
-        // CHECK
-        // Source package tags match active packages
+        // SET DEFAULT
+        // Item
         for (const dataRow of rowGroup.dataRows) {
-          const SRC_TAG = dataRow[CreatePackageCsvColumns.SOURCE_PACKAGE_TAG];
-          const columnIndex = COLUMNS.indexOf(CreatePackageCsvColumns.SOURCE_PACKAGE_TAG);
+          const pkg = packageMap.get(dataRow[CreatePackageCsvColumns.SOURCE_PACKAGE_TAG])!;
 
-          if (!packages.find((x) => x.Label === SRC_TAG)) {
-            rowGroup.errors.push({
-              text: `Source package ${SRC_TAG} does not match an active package`,
-              cellCoordinates: [{ rowIndex: dataRow.Index, columnIndex }],
+          const key = CreatePackageCsvColumns.ITEM_NAME;
+          if (!dataRow[key]) {
+            dataRow[key] = pkg.Item.Name;
+            rowGroup.messages.push({
+              text: `Used default value for item: ${pkg.Item.Name}`,
+              cellCoordinates: [
+                {
+                  rowIndex: dataRow.Index,
+                  columnIndex: COLUMNS.indexOf(key),
+                },
+              ],
             });
           }
         }
@@ -265,13 +346,33 @@ export const createPackageCsvModule = {
         // CHECK
         // Item exists
         for (const dataRow of rowGroup.dataRows) {
-          const ITEM_NAME = dataRow[CreatePackageCsvColumns.ITEM_NAME];
+          const itemName = dataRow[CreatePackageCsvColumns.ITEM_NAME];
           const columnIndex = COLUMNS.indexOf(CreatePackageCsvColumns.ITEM_NAME);
 
-          if (!items.find((x) => x.Name === ITEM_NAME)) {
+          if (!itemMap.get(itemName)) {
             rowGroup.errors.push({
-              text: `Item ${ITEM_NAME} does not match an active item`,
+              text: `Item ${itemName} does not match an active item`,
               cellCoordinates: [{ rowIndex: dataRow.Index, columnIndex }],
+            });
+          }
+        }
+
+        // SET DEFAULT
+        // Location
+        for (const dataRow of rowGroup.dataRows) {
+          const pkg = packageMap.get(dataRow[CreatePackageCsvColumns.SOURCE_PACKAGE_TAG])!;
+
+          const key = CreatePackageCsvColumns.LOCATION_NAME;
+          if (!dataRow[key]) {
+            dataRow[key] = pkg.LocationName || "";
+            rowGroup.messages.push({
+              text: `Used default value for location: ${pkg.LocationName}`,
+              cellCoordinates: [
+                {
+                  rowIndex: dataRow.Index,
+                  columnIndex: COLUMNS.indexOf(key),
+                },
+              ],
             });
           }
         }
@@ -279,13 +380,33 @@ export const createPackageCsvModule = {
         // CHECK
         // Location exists
         for (const dataRow of rowGroup.dataRows) {
-          const LOCATION_NAME = dataRow[CreatePackageCsvColumns.LOCATION_NAME];
+          const locationName = dataRow[CreatePackageCsvColumns.LOCATION_NAME];
           const columnIndex = COLUMNS.indexOf(CreatePackageCsvColumns.LOCATION_NAME);
 
-          if (!items.find((x) => x.Name === LOCATION_NAME)) {
+          if (!itemMap.has(locationName)) {
             rowGroup.errors.push({
-              text: `Location ${LOCATION_NAME} does not match an active location`,
+              text: `Location ${locationName} does not match an active location`,
               cellCoordinates: [{ rowIndex: dataRow.Index, columnIndex }],
+            });
+          }
+        }
+
+        // SET DEFAULT
+        // Source package quantity unit of measure
+        for (const dataRow of rowGroup.dataRows) {
+          const pkg = packageMap.get(dataRow[CreatePackageCsvColumns.SOURCE_PACKAGE_TAG])!;
+
+          const key = CreatePackageCsvColumns.SOURCE_PACKAGE_QUANTITY_UNIT_OF_MEASURE;
+          if (!dataRow[key]) {
+            dataRow[key] = pkg.Item.UnitOfMeasureName;
+            rowGroup.messages.push({
+              text: `Used default value for unit of measure: ${pkg.Item.UnitOfMeasureName}`,
+              cellCoordinates: [
+                {
+                  rowIndex: dataRow.Index,
+                  columnIndex: COLUMNS.indexOf(key),
+                },
+              ],
             });
           }
         }
@@ -293,37 +414,195 @@ export const createPackageCsvModule = {
         // CHECK
         // Source package item unit of measure matches quantity used unit of measure
         for (const dataRow of rowGroup.dataRows) {
-          const SOURCE_PACKAGE_TAG = dataRow[CreatePackageCsvColumns.SOURCE_PACKAGE_TAG];
+          const srcPackageTag = dataRow[CreatePackageCsvColumns.SOURCE_PACKAGE_TAG];
           const SOURCE_PACKAGE_QUANTITY_UNIT_OF_MEASURE =
             dataRow[CreatePackageCsvColumns.SOURCE_PACKAGE_QUANTITY_UNIT_OF_MEASURE];
+
+          const srcPackageItem = packageMap.get(srcPackageTag)!.Item;
           const columnIndex = COLUMNS.indexOf(
             CreatePackageCsvColumns.SOURCE_PACKAGE_QUANTITY_UNIT_OF_MEASURE
           );
 
-          // const srcPackageItem = packages.find((x) => x.Label === SOURCE_PACKAGE_TAG)!.U;
+          if (
+            !(await fuzzyUnitsMatchOrError(
+              srcPackageItem.Name,
+              SOURCE_PACKAGE_QUANTITY_UNIT_OF_MEASURE
+            ))
+          ) {
+            rowGroup.errors.push({
+              text: `Source item unit and quantity used unit do not match`,
+              cellCoordinates: [
+                {
+                  rowIndex: dataRow.Index,
+                  columnIndex,
+                },
+              ],
+            });
+          }
+        }
 
-          const item = items.find((x) => x.Name === dataRow[CreatePackageCsvColumns.ITEM_NAME]);
+        // SET DEFAULT
+        // Output quantity unit of measure
+        for (const dataRow of rowGroup.dataRows) {
+          const item = itemMap.get(dataRow[CreatePackageCsvColumns.ITEM_NAME])!;
 
-          if (!item) {
-            // This error will surface elsewhere, just fall through
+          const key = CreatePackageCsvColumns.NEW_PACKAGE_UNIT_OF_MEASURE;
+          if (!dataRow[key]) {
+            dataRow[key] = item.Name;
+            rowGroup.messages.push({
+              text: `Used default value for item: ${item.Name}`,
+              cellCoordinates: [
+                {
+                  rowIndex: dataRow.Index,
+                  columnIndex: COLUMNS.indexOf(key),
+                },
+              ],
+            });
+          }
+        }
+
+        // CHECK
+        // Output item unit matches output quantity unit
+        for (const dataRow of rowGroup.dataRows) {
+          const item = itemMap.get(dataRow[CreatePackageCsvColumns.ITEM_NAME])!;
+
+          if (
+            !(await fuzzyUnitsMatchOrError(
+              item.UnitOfMeasureName,
+              dataRow[CreatePackageCsvColumns.NEW_PACKAGE_UNIT_OF_MEASURE]
+            ))
+          ) {
+            rowGroup.errors.push({
+              text: `New package unit and new package item unit do not match`,
+              cellCoordinates: [
+                {
+                  rowIndex: dataRow.Index,
+                  columnIndex: COLUMNS.indexOf(CreatePackageCsvColumns.ITEM_NAME),
+                },
+                {
+                  rowIndex: dataRow.Index,
+                  columnIndex: COLUMNS.indexOf(CreatePackageCsvColumns.NEW_PACKAGE_UNIT_OF_MEASURE),
+                },
+              ],
+            });
+          }
+        }
+
+        // SET DEFAULT
+        // Output quantity
+        for (const dataRow of rowGroup.dataRows) {
+          const key = CreatePackageCsvColumns.NEW_PACKAGE_QUANTITY;
+
+          // If unit of measure does not match, fall through
+          if (
+            !(await fuzzyUnitsMatchOrError(
+              dataRow[CreatePackageCsvColumns.SOURCE_PACKAGE_QUANTITY_UNIT_OF_MEASURE],
+              dataRow[CreatePackageCsvColumns.NEW_PACKAGE_UNIT_OF_MEASURE]
+            ))
+          ) {
             continue;
           }
 
-          // if (item.UnitOfMeasureName !== )
+          if (!dataRow[key]) {
+            const inputTotal: number = rowGroup.dataRows
+              .map((x) => parseFloat(x[CreatePackageCsvColumns.SOURCE_PACKAGE_QUANTITY_USED]))
+              .reduce((a, b) => a + b, 0);
+
+            dataRow[key] = inputTotal.toString();
+            rowGroup.messages.push({
+              text: `Used default output quantity: ${inputTotal} ${
+                dataRow[CreatePackageCsvColumns.NEW_PACKAGE_UNIT_OF_MEASURE]
+              }`,
+              cellCoordinates: [
+                {
+                  rowIndex: dataRow.Index,
+                  columnIndex: COLUMNS.indexOf(key),
+                },
+              ],
+            });
+          }
         }
 
         // CHECK
         // Source package quantity used does not exceed total
+        for (const dataRow of rowGroup.dataRows) {
+          const key = CreatePackageCsvColumns.SOURCE_PACKAGE_QUANTITY_USED;
 
-        if (rowGroup.errors.length > 0) {
-          continue;
+          // If unit of measure does not match, fall through
+          if (
+            !(await fuzzyUnitsMatchOrError(
+              dataRow[CreatePackageCsvColumns.SOURCE_PACKAGE_QUANTITY_UNIT_OF_MEASURE],
+              dataRow[CreatePackageCsvColumns.NEW_PACKAGE_UNIT_OF_MEASURE]
+            ))
+          ) {
+            continue;
+          }
+
+          const sourcePkg = packageMap.get(dataRow[CreatePackageCsvColumns.SOURCE_PACKAGE_TAG])!;
+
+          const sourcePkgUsedQuantity = aggregateSourcePackageData.get(
+            dataRow[CreatePackageCsvColumns.SOURCE_PACKAGE_TAG]
+          )!.quantityUsed;
+
+          if (sourcePkgUsedQuantity > sourcePkg.Quantity) {
+            rowGroup.errors.push({
+              text: `Source package ${sourcePkg.Label} only contains ${sourcePkg.Quantity} ${sourcePkg.UnitOfMeasureAbbreviation} but ${sourcePkgUsedQuantity} is being used`,
+              cellCoordinates: [
+                {
+                  rowIndex: dataRow.Index,
+                  columnIndex: COLUMNS.indexOf(key),
+                },
+              ],
+            });
+          }
         }
-        // If no errors, generate parsed data
-        const ActualDate = packageDate;
 
-        // rowGroup.parsedData = {
-        //   ActualDate
-        // }
+        // SET DEFAULT
+        // Expiration date defaults to maximum of parent packages
+        for (const dataRow of rowGroup.dataRows) {
+          const key = CreatePackageCsvColumns.EXPIRATION_DATE;
+
+          const previousExpirationDate = dataRow[key];
+
+          if (!dataRow[key] && !!previousExpirationDate) {
+            // Default to the latest expiration date
+            dataRow[key] = rowGroup.dataRows
+              .map(
+                (x) =>
+                  packageMap.get(x[CreatePackageCsvColumns.SOURCE_PACKAGE_TAG])!.ExpirationDate ??
+                  ""
+              )
+              .sort()[rowGroup.dataRows.length - 1];
+          }
+        }
+
+        // TODO flood fill empty values
+
+        // CHECK
+        // For each group, all output package values must match
+        for (const dataRow of rowGroup.dataRows) {
+          const keys: CreatePackageCsvColumns[] = [
+            CreatePackageCsvColumns.NEW_PACKAGE_TAG,
+            CreatePackageCsvColumns.LOCATION_NAME,
+            CreatePackageCsvColumns.ITEM_NAME,
+            CreatePackageCsvColumns.NEW_PACKAGE_QUANTITY,
+            CreatePackageCsvColumns.NEW_PACKAGE_UNIT_OF_MEASURE,
+            CreatePackageCsvColumns.PACKAGED_DATE,
+            CreatePackageCsvColumns.NOTE,
+            CreatePackageCsvColumns.PRODUCTION_BATCH_NUMBER,
+            CreatePackageCsvColumns.IS_DONATION,
+            CreatePackageCsvColumns.IS_TRADE_SAMPLE,
+            CreatePackageCsvColumns.EXPIRATION_DATE,
+          ];
+
+          for (const key of keys) {
+            const set = new Set(rowGroup.dataRows.map((x) => x[key]));
+
+            if (set.size > 1) {
+              // TODO
+            }
+          }
+        }
       }
 
       ctx.state.rowGroups = rowGroups;

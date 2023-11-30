@@ -140,10 +140,10 @@ describe("units.ts", () => {
   });
 
   it("Correctly fuzzy matches units", async () => {
-    expect(await fuzzyUnitsMatchOrError({ name: "Grams" }, { abbreviation: "g" })).toEqual(true);
-    expect(await fuzzyUnitsMatchOrError({ name: "Pounds" }, { abbreviation: "g" })).toEqual(false);
-    expect(fuzzyUnitsMatchOrError({ name: "foo" }, { abbreviation: "g" })).rejects.toEqual(
-      Error(`Unit A value invalid: {"name":"foo"}`)
-    );
+    expect(await fuzzyUnitsMatchOrError("Grams", "g")).toEqual(true);
+    expect(await fuzzyUnitsMatchOrError("Pounds", "g")).toEqual(false);
+    expect(await fuzzyUnitsMatchOrError(4, "g")).toEqual(true);
+    expect(await fuzzyUnitsMatchOrError("g", 4)).toEqual(true);
+    expect(fuzzyUnitsMatchOrError("foo", "g")).rejects.toEqual(Error(`Unit A value invalid: foo`));
   });
 });

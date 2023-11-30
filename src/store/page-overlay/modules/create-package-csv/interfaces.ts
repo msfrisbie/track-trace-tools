@@ -32,16 +32,16 @@ export interface ICreatePackageCsvRowGroup {
   destinationLabel: string;
   dataRows: ICreatePackageCsvRow[];
   messages: {
-    text: string,
-    cellCoordinates: {rowIndex: number, columnIndex: number}[]
+    text: string;
+    cellCoordinates: { rowIndex: number; columnIndex: number }[];
   }[];
   warnings: {
-    text: string,
-    cellCoordinates: {rowIndex: number, columnIndex: number}[]
+    text: string;
+    cellCoordinates: { rowIndex: number; columnIndex: number }[];
   }[];
   errors: {
-    text: string,
-    cellCoordinates: {rowIndex: number, columnIndex: number}[]
+    text: string;
+    cellCoordinates: { rowIndex: number; columnIndex: number }[];
   }[];
   parsedData: IParsedRowGroupData | null;
 }
@@ -62,7 +62,7 @@ export interface ICreatePackageCsvRow {
   [CreatePackageCsvColumns.LOCATION_NAME]: string;
   [CreatePackageCsvColumns.ITEM_NAME]: string;
   [CreatePackageCsvColumns.NEW_PACKAGE_QUANTITY]: string;
-  [CreatePackageCsvColumns.NEW_PACKAGE_UNIT]: string;
+  [CreatePackageCsvColumns.NEW_PACKAGE_UNIT_OF_MEASURE]: string;
   [CreatePackageCsvColumns.PACKAGED_DATE]: string;
   [CreatePackageCsvColumns.NOTE]: string;
   [CreatePackageCsvColumns.PRODUCTION_BATCH_NUMBER]: string;

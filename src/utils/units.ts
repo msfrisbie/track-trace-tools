@@ -103,47 +103,50 @@ export function convertUnits(
 }
 
 export async function fuzzyUnitsMatchOrError(
-  a: { name?: string; id?: number; abbreviation?: string },
-  b: { name?: string; id?: number; abbreviation?: string }
+  a: string | number,
+  b: string | number
 ): Promise<boolean> {
   const unitsOfMeasure = await dynamicConstsManager.unitsOfMeasure();
 
   let unitA: IUnitOfMeasure | null = null;
   let unitB: IUnitOfMeasure | null = null;
 
-  if (a.name !== undefined) {
-    unitA =
-      unitsOfMeasure.find((x) => x.Name.toLocaleLowerCase() === a.name!.toLocaleLowerCase()) ??
-      null;
-  } else if (a.id !== undefined) {
-    unitA = unitsOfMeasure.find((x) => x.Id === a.id) ?? null;
-  } else if (a.abbreviation !== undefined) {
+  unitA =
+    unitsOfMeasure.find((x) => x.Name.toLocaleLowerCase() === a.toString().toLocaleLowerCase()) ??
+    null;
+
+  if (!unitA) {
+    unitA = unitsOfMeasure.find((x) => x.Id.toString() === a.toString()) ?? null;
+  }
+
+  if (!unitA) {
     unitA =
       unitsOfMeasure.find(
-        (x) => x.Abbreviation.toLocaleLowerCase() === a.abbreviation!.toLocaleLowerCase()
+        (x) => x.Abbreviation.toLocaleLowerCase() === a.toString().toLocaleLowerCase()
       ) ?? null;
   }
 
   if (unitA === null) {
-    throw new Error(`Unit A value invalid: ${JSON.stringify(a)}`);
+    throw new Error(`Unit A value invalid: ${a}`);
   }
 
-  if (b.name !== undefined) {
-    unitB =
-      unitsOfMeasure.find((x) => x.Name.toLocaleLowerCase() === b.name!.toLocaleLowerCase()) ??
-      null;
-  } else if (b.id !== undefined) {
-    unitB = unitsOfMeasure.find((x) => x.Id === b.id) ?? null;
-  } else if (b.abbreviation !== undefined) {
+  unitB =
+    unitsOfMeasure.find((x) => x.Name.toLocaleLowerCase() === b.toString().toLocaleLowerCase()) ??
+    null;
+
+  if (!unitB) {
+    unitB = unitsOfMeasure.find((x) => x.Id.toString() === b.toString()) ?? null;
+  }
+
+  if (!unitB) {
     unitB =
       unitsOfMeasure.find(
-        (x) => x.Abbreviation.toLocaleLowerCase() === b.abbreviation!.toLocaleLowerCase()
+        (x) => x.Abbreviation.toLocaleLowerCase() === b.toString().toLocaleLowerCase()
       ) ?? null;
   }
 
   if (unitB === null) {
-    throw new Error(`Unit B value invalid: ${JSON.stringify(b)}`);
+    throw new Error(`Unit B value invalid: ${b}`);
   }
-
   return unitA.Id === unitB.Id;
 }
