@@ -54,6 +54,7 @@ export interface ICreatePackageCsvState {
 }
 
 export interface ICreatePackageCsvRow {
+  RealIndex: number;
   Index: number;
   [CreatePackageCsvColumns.SOURCE_PACKAGE_TAG]: string;
   [CreatePackageCsvColumns.SOURCE_PACKAGE_QUANTITY_USED]: string;

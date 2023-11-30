@@ -1,7 +1,6 @@
 import { ICsvFile } from "@/interfaces";
 import _ from "lodash-es";
 import { timer } from "rxjs";
-import { safeZip } from "./array";
 
 export function serialize(csvData: any[][]) {
   return csvData.map((e) => e.join(",")).join("\n");
@@ -145,23 +144,31 @@ export function getIndexOfHeaderRowOrError({
 }
 
 export function convertMatrixIntoKeyValRows<T>({
+  headerRowIndex,
   matrix,
   columns,
 }: {
+  headerRowIndex: number;
   matrix: string[][];
   columns: string[];
 }): T[] {
   const keyvalRows: T[] = [];
 
-  for (const [idx, dataRow] of matrix.entries()) {
+  // Chop off everything that is not data and has nonzero length
+  for (const [idx, dataRow] of matrix
+    .slice(headerRowIndex + 1)
+    .filter((x) => x.length > 0)
+    .entries()) {
     // @ts-ignore
     const keyvalRow: T = {};
-    for (const [value, column] of safeZip(dataRow, columns)) {
+    for (const [value, column] of _.zip(dataRow, columns)) {
       // @ts-ignore
       keyvalRow[column] = value;
     }
     // @ts-ignore
     keyvalRow.Index = idx;
+    // @ts-ignore
+    keyvalRow.RealIndex = idx + headerRowIndex;
     keyvalRows.push(keyvalRow);
   }
 

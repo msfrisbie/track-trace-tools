@@ -5,10 +5,8 @@ import {
   IItemData,
   ILocationData,
   IPluginState,
-  IUnitOfMeasure,
 } from "@/interfaces";
 import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
-import { dynamicConstsManager } from "@/modules/dynamic-consts-manager.module";
 import {
   convertMatrixIntoKeyValRows,
   downloadCsvFile,
@@ -75,6 +73,7 @@ export const createPackageCsvModule = {
     ) => {
       ctx.state.status = PackageCsvStatus.INITIAL;
       ctx.state.csvData = null;
+      ctx.state.rowGroups = [];
       ctx.state.statusMessage = "";
     },
     [CreatePackageCsvActions.IMPORT_CSV]: async (
@@ -107,7 +106,6 @@ export const createPackageCsvModule = {
       let tags: IIndexedTagData[];
       let items: IItemData[];
       let locations: ILocationData[];
-      const unitsOfMeasure: IUnitOfMeasure[] = await dynamicConstsManager.unitsOfMeasure();
 
       ctx.state.statusMessage = "Loading data...";
 
@@ -167,8 +165,8 @@ export const createPackageCsvModule = {
       const COLUMNS: string[] = CREATE_PACKAGE_CSV_COLUMNS.map((x) => x.value);
 
       const keyvalRows: ICreatePackageCsvRow[] = convertMatrixIntoKeyValRows<ICreatePackageCsvRow>({
-        // Chop off everything that is not data and has nonzero length
-        matrix: ctx.state.csvData.slice(headerRowIndex + 1).filter((x) => x.length > 0),
+        headerRowIndex,
+        matrix: ctx.state.csvData,
         columns: COLUMNS,
       });
 
@@ -395,7 +393,7 @@ export const createPackageCsvModule = {
           const locationName = dataRow[CreatePackageCsvColumns.LOCATION_NAME];
           const columnIndex = COLUMNS.indexOf(CreatePackageCsvColumns.LOCATION_NAME);
 
-          if (!itemMap.has(locationName)) {
+          if (!locationMap.has(locationName)) {
             rowGroup.errors.push({
               text: `Location ${locationName} does not match an active location`,
               cellCoordinates: [{ rowIndex: dataRow.Index, columnIndex }],
@@ -634,6 +632,8 @@ export const createPackageCsvModule = {
       // TODO: check that all error fields are empty before enabling
       // a submit button.
       ctx.state.status = PackageCsvStatus.PARSED;
+
+      ctx.state.statusMessage = "Finished parsing CSV";
     },
     [CreatePackageCsvActions.GENERATE_CSV_TEMPLATE]: async (
       ctx: ActionContext<ICreatePackageCsvState, IPluginState>,
