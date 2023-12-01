@@ -102,16 +102,15 @@ export const createPackageCsvModule = {
         throw new Error("Cannot parse null CSV data");
       }
 
-      let packages: IIndexedPackageData[];
-      let tags: IIndexedTagData[];
-      let items: IItemData[];
-      let locations: ILocationData[];
+      let packages: IIndexedPackageData[] | null = null;
+      let tags: IIndexedTagData[] | null = null;
+      let items: IItemData[] | null = null;
+      let locations: ILocationData[] | null = null;
 
       ctx.state.statusMessage = "Loading data...";
 
-      /* eslint-disable-next-line no-warning-comments */
-      // TODO fallback to not checking tags, locations, items
       try {
+        // 10 minute cache
         packages = await primaryDataLoader.activePackages(10 * 60 * 1000);
       } catch {
         ctx.state.status = PackageCsvStatus.ERROR;

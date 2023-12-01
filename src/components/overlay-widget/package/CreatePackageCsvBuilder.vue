@@ -1,18 +1,20 @@
 <template>
   <div class="grid grid-cols-2 gap-8" style="grid-template-columns: auto 1fr">
     <div class="h-full">
-      <div>{{ createPackageCsvState.status }}</div>
+      <!-- <div>{{ createPackageCsvState.status }}</div> -->
       <b-button-group vertical>
-        <b-button @click="generateCsvTemplate()">DOWNLOAD TEMPLATE</b-button>
+        <b-button variant="outline-primary" @click="generateCsvTemplate()"
+          >DOWNLOAD TEMPLATE</b-button
+        >
         <b-button
           v-if="createPackageCsvState.status !== PackageCsvStatus.INITIAL"
           @click="reset()"
-          variant="warning"
+          variant="outline-warning"
           >RESET</b-button
         >
         <label
           v-if="createPackageCsvState.status === PackageCsvStatus.INITIAL"
-          class="btn btn-secondary"
+          class="btn btn-outline-primary"
         >
           <b-form-file class="hidden" v-model="csvFile" accept=".csv"></b-form-file>
 
@@ -24,7 +26,7 @@
     </div>
 
     <div class="h-full">
-      <template v-if="!createPackageCsvState.csvData"> Upload a CSV </template>
+      <!-- <template v-if="!createPackageCsvState.csvData"> Upload a CSV </template> -->
 
       <b-tabs>
         <b-tab title="Summary" active>

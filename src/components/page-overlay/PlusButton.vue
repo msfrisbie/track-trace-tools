@@ -32,6 +32,7 @@
 
         <ul class="list-disc pl-3 pb-4">
           <li>Enable advanced reports and tools</li>
+          <li>Early access to new features</li>
           <li>Support the open source project</li>
           <li>Hide the bottom right T3+ badge</li>
         </ul>
