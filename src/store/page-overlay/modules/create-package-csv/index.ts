@@ -102,7 +102,8 @@ export const createPackageCsvModule = {
         throw new Error("Cannot parse null CSV data");
       }
 
-      TODO use alternate load endpoints from new package window
+      /* eslint-disable-next-line */
+      // TODO use alternate load endpoints from new package window
       let packages: IIndexedPackageData[] | null = null;
       let tags: IIndexedTagData[] | null = null;
       let items: IItemData[] | null = null;
