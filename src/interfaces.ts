@@ -12,7 +12,7 @@ import {
   TagState,
   TaskType,
   ToolkitView,
-  TransferState
+  TransferState,
 } from "@/consts";
 import { Store } from "vuex";
 import { IAnnouncementsState } from "./store/page-overlay/modules/announcements/interfaces";
@@ -35,7 +35,7 @@ import { ISplitPackageBuilderState } from "./store/page-overlay/modules/split-pa
 import { ITagSearchState } from "./store/page-overlay/modules/tag-search/interfaces";
 import {
   DriverLayoverLeg,
-  ITransferBuilderState
+  ITransferBuilderState,
 } from "./store/page-overlay/modules/transfer-builder/interfaces";
 import { ITransferPackageSearchState } from "./store/page-overlay/modules/transfer-package-search/interfaces";
 import { ITransferSearchState } from "./store/page-overlay/modules/transfer-search/interfaces";
@@ -234,8 +234,6 @@ export interface IPluginState extends IRootState {
   graph: IGraphState;
 }
 
-export type MetrcTagType = "CannabisPlant" | "CannabisPackage" | "MedicalPlant" | "MedicalPackage";
-
 export interface IAddress {
   address1: string;
   address2: string;
@@ -281,7 +279,7 @@ export interface IExtractedDataImportApiVerificationTokenData {
 
 export interface ITagOrderParams {
   MaxOrderQuantity: number;
-  TagType: MetrcTagType;
+  TagType: MetrcTagTypeName;
 }
 
 export interface IMetrcShippingData {
@@ -347,16 +345,33 @@ export interface ITaggedIResponseObjectData extends IResponseObjectData {
   Label: string;
 }
 
+export type MetrcTagTypeName =
+  | "Medical Package"
+  | "Medical Plant"
+  | "Cannabis Package"
+  | "Cannabis Plant";
+export type TagInventoryTypeName =
+  | "MedicalPackage"
+  | "MedicalPlant"
+  | "CannabisPackage"
+  | "CannabisPlant";
+
 export interface ITagData extends ITaggedIResponseObjectData {
   Id: number;
-  IsArchived: boolean;
-  IsUsed: boolean;
-  LastModified: string;
+  GroupTagTypeName: null;
+  TagTypeName: MetrcTagTypeName;
+  GroupTagTypeId: null;
+  TagTypeId: string; // "TagType-6",
+  TagInventoryTypeName: TagInventoryTypeName;
+  MaxGroupSize: number;
+  FacilityId: number;
   StatusName: "Received" | "Used" | "Voided";
-  TagTypeName: MetrcTagType;
-  UsedDateTime: string;
   CommissionedDateTime: string;
-  DetachedDateTime: string;
+  IsUsed: boolean;
+  UsedDateTime: string | null;
+  DetachedDateTime: string | null;
+  IsArchived: boolean;
+  LastModified: string;
 }
 
 export interface IItemData extends IResponseObjectData {
@@ -1079,7 +1094,7 @@ export interface IMetrcAddPackageNoteData {
 
 export interface IReorderTagsPayload {
   Details: Array<{
-    TagType: MetrcTagType;
+    TagType: MetrcTagTypeName;
     Quantity: string;
   }>;
   Shipping: IMetrcShippingData;
@@ -2016,14 +2031,14 @@ export interface ILicenseFormFilters {
 }
 
 export interface IBuilderListOption {
-    route: string,
-    text: string,
-    icon: string,
-    backgroundColor: string,
-    isBeta: boolean,
-    isNew: boolean,
-    enabled: boolean,
-    visible: boolean,
-    isPlus: boolean,
-    showDisabledMessage: boolean,
+  route: string;
+  text: string;
+  icon: string;
+  backgroundColor: string;
+  isBeta: boolean;
+  isNew: boolean;
+  enabled: boolean;
+  visible: boolean;
+  isPlus: boolean;
+  showDisabledMessage: boolean;
 }

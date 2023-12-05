@@ -7,12 +7,17 @@
           <div class="text-center text-xl">Plant Tags</div>
           <tag-picker
             :selectedTags.sync="selectedPackageTags"
-            :tagTypeNames="['CannabisPackage', 'MedicalPackage']"
+            :tagTypeNames="[
+              'CannabisPackage',
+              'MedicalPackage',
+              'Cannabis Package',
+              'Medical Package',
+            ]"
             :tagCount="0"
           />
           <tag-picker
             :selectedTags.sync="selectedPlantTags"
-            :tagTypeNames="['CannabisPlant', 'MedicalPlant']"
+            :tagTypeNames="['CannabisPlant', 'MedicalPlant', 'Cannabis Plant', 'Medical Plant']"
             :tagCount="0"
           />
         </div>
@@ -43,20 +48,20 @@
 </template>
 
 <script lang="ts">
-import TagPicker from '@/components/overlay-widget/shared/TagPicker.vue';
-import { MessageType } from '@/consts';
-import { ITagData } from '@/interfaces';
-import { analyticsManager } from '@/modules/analytics-manager.module';
-import { authManager } from '@/modules/auth-manager.module';
-import { primaryMetrcRequestManager } from '@/modules/metrc-request-manager.module';
-import store from '@/store/page-overlay/index';
-import { getVoidTagBody } from '@/utils/tags';
-import { timer } from 'rxjs';
-import Vue from 'vue';
-import { mapState } from 'vuex';
+import TagPicker from "@/components/overlay-widget/shared/TagPicker.vue";
+import { MessageType } from "@/consts";
+import { ITagData } from "@/interfaces";
+import { analyticsManager } from "@/modules/analytics-manager.module";
+import { authManager } from "@/modules/auth-manager.module";
+import { primaryMetrcRequestManager } from "@/modules/metrc-request-manager.module";
+import store from "@/store/page-overlay/index";
+import { getVoidTagBody } from "@/utils/tags";
+import { timer } from "rxjs";
+import Vue from "vue";
+import { mapState } from "vuex";
 
 export default Vue.extend({
-  name: 'VoidTagForm',
+  name: "VoidTagForm",
   store,
   components: {
     TagPicker,

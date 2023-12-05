@@ -139,7 +139,7 @@
 
             <b-form-group class="w-full">
               <tag-picker
-                :tagTypeNames="['CannabisPackage', 'MedicalPackage']"
+                :tagTypeNames="['CannabisPackage', 'MedicalPackage', 'Cannabis Package', 'Medical Package']"
                 :tagCount="newPackageData.length"
                 :selectedTags.sync="packageTags"
               />

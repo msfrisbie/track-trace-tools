@@ -144,7 +144,7 @@
             </div>
 
             <tag-picker
-              :tagTypeNames="['CannabisPackage', 'MedicalPackage']"
+              :tagTypeNames="['CannabisPackage', 'MedicalPackage', 'Cannabis Package', 'Medical Package']"
               :tagCount="newPackageCount"
               :selectedTags.sync="packageTags"
             />

@@ -210,13 +210,13 @@
 </template>
 
 <script lang="ts">
-import AnimatedNumber from '@/components/overlay-widget/shared/AnimatedNumber.vue';
-import ErrorReadout from '@/components/overlay-widget/shared/ErrorReadout.vue';
-import ItemPicker from '@/components/overlay-widget/shared/ItemPicker.vue';
-import LocationPicker from '@/components/overlay-widget/shared/LocationPicker.vue';
-import PasteTags from '@/components/overlay-widget/shared/PasteTags.vue';
-import PickerCard from '@/components/overlay-widget/shared/PickerCard.vue';
-import { DATA_LOAD_MAX_COUNT } from '@/consts';
+import AnimatedNumber from "@/components/overlay-widget/shared/AnimatedNumber.vue";
+import ErrorReadout from "@/components/overlay-widget/shared/ErrorReadout.vue";
+import ItemPicker from "@/components/overlay-widget/shared/ItemPicker.vue";
+import LocationPicker from "@/components/overlay-widget/shared/LocationPicker.vue";
+import PasteTags from "@/components/overlay-widget/shared/PasteTags.vue";
+import PickerCard from "@/components/overlay-widget/shared/PickerCard.vue";
+import { DATA_LOAD_MAX_COUNT } from "@/consts";
 import {
   IClientItemFilters,
   IClientLocationFilters,
@@ -224,32 +224,30 @@ import {
   IItemData,
   ILocationData,
   IPackageData,
-} from '@/interfaces';
-import { authManager } from '@/modules/auth-manager.module';
-import { primaryDataLoader } from '@/modules/data-loader/data-loader.module';
-import store from '@/store/page-overlay/index';
-import { itemMatchesFilters } from '@/utils/filters';
+} from "@/interfaces";
+import { authManager } from "@/modules/auth-manager.module";
+import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
+import store from "@/store/page-overlay/index";
+import { itemMatchesFilters } from "@/utils/filters";
 import {
   getItemNameOrError,
   getLabelOrError,
   getNormalizedPackageContentsDescription,
-} from '@/utils/package';
-import { combineLatest, Subject } from 'rxjs';
-import {
-  debounceTime, distinctUntilChanged, filter, startWith, tap,
-} from 'rxjs/operators';
-import { v4 } from 'uuid';
-import Vue from 'vue';
+} from "@/utils/package";
+import { Subject, combineLatest } from "rxjs";
+import { debounceTime, distinctUntilChanged, filter, startWith, tap } from "rxjs/operators";
+import { v4 } from "uuid";
+import Vue from "vue";
 
 const PAGE_SIZE = 100;
 
 export enum SelectedMenuState {
-  SELECTION = 'Select Packages',
-  PASTED_TAGS = 'Paste Package Tags',
+  SELECTION = "Select Packages",
+  PASTED_TAGS = "Paste Package Tags",
 }
 
 export default Vue.extend({
-  name: 'PackagePicker',
+  name: "PackagePicker",
   store,
   components: {
     ItemPicker,
@@ -334,7 +332,8 @@ export default Vue.extend({
     },
     filterSelectedByPastedTags() {
       this.$data.selectedPackagesMirror = this.$data.sourcePackages.filter((x: IPackageData) =>
-        this.$data.pastedTags.includes(x.Label));
+        this.$data.pastedTags.includes(x.Label)
+      );
     },
     selectAll() {
       this.$data.selectedPackagesMirror = this.$data.sourcePackages;
@@ -396,7 +395,8 @@ export default Vue.extend({
           });
 
           this.$data.sourcePackages = filteredPackages.sort((a: IPackageData, b: IPackageData) =>
-            (a.Label > b.Label ? 1 : -1));
+            a.Label.localeCompare(b.Label)
+          );
 
           // This must perform a shallow clone
           this.$data.selectedPackagesMirror = [...this.$data.sourcePackages];
@@ -473,7 +473,7 @@ export default Vue.extend({
     selectedPackagesMirror: {
       immediate: true,
       handler(newValue, oldValue) {
-        this.$emit('update:selectedPackages', newValue);
+        this.$emit("update:selectedPackages", newValue);
       },
     },
     pastedTags: {
@@ -499,15 +499,15 @@ export default Vue.extend({
         tap((_: any) => {
           this.$data.packagesPageIndex = 0;
         }),
-        filter(([item, location]) => !!item || !!location),
+        filter(([item, location]) => !!item || !!location)
       )
       .subscribe(async ([item, location]: [IItemData, ILocationData]) => {
         this.$data.item = item;
         this.$data.location = location;
 
         // Allow parent component to use selected item/location
-        this.$emit('selectItem', item);
-        this.$emit('selectLocation', location);
+        this.$emit("selectItem", item);
+        this.$emit("selectLocation", location);
 
         this.loadPackages();
       });

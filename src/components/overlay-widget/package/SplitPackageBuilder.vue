@@ -220,7 +220,7 @@
               "
             >
               <tag-picker
-                :tagTypeNames="['CannabisPackage', 'MedicalPackage']"
+                :tagTypeNames="['CannabisPackage', 'MedicalPackage', 'Cannabis Package', 'Medical Package']"
                 :tagCount="quantityList.length"
                 :selectedTags="packageTags"
                 v-on:update:selectedTags="updateSplitPackageData({ packageTags: $event })"
