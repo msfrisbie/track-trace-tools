@@ -80,15 +80,38 @@
                   <div class="grid grid-cols-2 gap-8" style="grid-template-columns: 1fr auto">
                     <template v-for="[idx, rowGroup] of createPackageCsvState.rowGroups.entries()">
                       <fragment v-bind:key="rowGroup.destinationLabel">
-                        <div class="grid grid-cols-4 gap-2 place-items-center">
-                          <div id="source-package-column" class="flex flex-col items-stretch justify-center">
-                            <!-- <canonical-package-card v-for="pkg of rowGroup." :pkg="pkg" -->
+                        <div class="grid grid-cols-3 gap-2 place-items-center">
+                          <div
+                            id="source-packages"
+                            class="grid grid-cols-2"
+                            style="grid-template-rows: 1fr auto"
+                          >
+                            <template
+                              v-for="[j, ingredient] of rowGroup.parsedData.Ingredients.entries()"
+                            >
+                              <fragment v-bind:key="j + rowGroup.destinationLabel">
+                                <canonical-package-card
+                                  :pkg="ingredient.pkg"
+                                ></canonical-package-card>
+                                <div>
+                                  {{ ingredient.Quantity }}
+                                  {{
+                                    ingredient.UnitOfMeasure
+                                      ? ingredient.UnitOfMeasure.Abbreviation
+                                      : null
+                                  }}
+                                </div>
+                              </fragment>
+                            </template>
                           </div>
-                          <div id="source-package-qty"></div>
                           <div id="arrow">
                             <font-awesome-icon icon="arrow-right"></font-awesome-icon>
                           </div>
-                          <div id="output-package"></div>
+                          <div id="output-package">
+                            <canonical-package-card
+                              :pkg="rowGroup.mockPackage"
+                            ></canonical-package-card>
+                          </div>
                         </div>
 
                         <!-- <div

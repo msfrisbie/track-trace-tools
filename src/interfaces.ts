@@ -662,7 +662,7 @@ export interface IPackageData extends ITaggedIResponseObjectData {
   TradeSampleFacilityLicenseNumber: string | null;
   TransferManifestNumber: string;
   TransferPackageStateName: string | null;
-  UnitOfMeasureAbbreviation: "lb" | "ea" | "g";
+  UnitOfMeasureAbbreviation: UnitOfMeasureAbbreviation;
   UnitOfMeasureId: number;
   UnitOfMeasureQuantityType: "WeightBased" | "CountBased" | "VolumeBased";
   SourceHarvestCount: number;

@@ -9,11 +9,13 @@ import { CreatePackageCsvColumns, PackageCsvStatus } from "./consts";
 
 export interface IParsedRowGroupData {
   ActualDate: string | null; // Defaults to today
-  Ingredients: {
-    pkg: IIndexedPackageData;
-    Quantity: number;
-    UnitOfMeasure: IUnitOfMeasure; // Defaults to item
-  }[] | null;
+  Ingredients:
+    | {
+        pkg: IIndexedPackageData | null;
+        Quantity: number | null;
+        UnitOfMeasure: IUnitOfMeasure | null; // Defaults to item
+      }[]
+    | null;
   Item: IItemData | null; // Defaults to same item
   Location: ILocationData | null; // Defaults to parent location
   Note: string | null;
@@ -40,6 +42,7 @@ export interface ICreatePackageCsvRowGroup {
   warnings: IRowGroupMessage[];
   errors: IRowGroupMessage[];
   parsedData: IParsedRowGroupData | null;
+  mockPackage: IIndexedPackageData | null;
 }
 
 export interface ICreatePackageCsvState {

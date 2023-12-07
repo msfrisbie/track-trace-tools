@@ -1,3 +1,4 @@
+import { PackageState } from "@/consts";
 import {
   ICsvFile,
   IIndexedPackageData,
@@ -7,6 +8,7 @@ import {
   IPluginState,
   IUnitOfMeasure,
 } from "@/interfaces";
+import { authManager } from "@/modules/auth-manager.module";
 import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
 import {
   convertMatrixIntoKeyValRows,
@@ -15,7 +17,7 @@ import {
 } from "@/utils/csv";
 import { todayIsodate } from "@/utils/date";
 import { readCsvFile } from "@/utils/file";
-import { fuzzyUnitOrError, fuzzyUnitsMatch } from "@/utils/units";
+import { fuzzyUnitOrError, fuzzyUnitOrNull, fuzzyUnitsMatch } from "@/utils/units";
 import { ActionContext } from "vuex";
 import {
   CREATE_PACKAGE_CSV_COLUMNS,
@@ -261,6 +263,7 @@ export const createPackageCsvModule = {
           warnings: [],
           errors: [],
           parsedData: null,
+          mockPackage: null,
         })
       );
 
@@ -325,28 +328,25 @@ export const createPackageCsvModule = {
         }
 
         const Ingredients: {
-          pkg: IIndexedPackageData;
-          Quantity: number;
-          UnitOfMeasure: IUnitOfMeasure;
-        }[] = (
-          await Promise.allSettled(
-            rowGroup.dataRows.map(async (dataRow) => {
-              const pkg = packageMap.get(dataRow[CreatePackageCsvColumns.SOURCE_PACKAGE_TAG])!;
-              const Quantity = parseFloat(
-                dataRow[CreatePackageCsvColumns.SOURCE_PACKAGE_QUANTITY_USED]
-              );
-              const UnitOfMeasure = await fuzzyUnitOrError(
-                dataRow[CreatePackageCsvColumns.SOURCE_PACKAGE_QUANTITY_UNIT_OF_MEASURE]
-              );
+          pkg: IIndexedPackageData | null;
+          Quantity: number | null;
+          UnitOfMeasure: IUnitOfMeasure | null;
+        }[] = [];
 
-              return {
-                pkg,
-                Quantity,
-                UnitOfMeasure,
-              };
-            })
-          )
-        ).map((x) => (x as PromiseFulfilledResult<any>).value);
+        for (const dataRow of rowGroup.dataRows) {
+          const pkg = packageMap.get(dataRow[CreatePackageCsvColumns.SOURCE_PACKAGE_TAG]) ?? null;
+          const Quantity =
+            parseFloat(dataRow[CreatePackageCsvColumns.SOURCE_PACKAGE_QUANTITY_USED]) ?? null;
+          const UnitOfMeasure = await fuzzyUnitOrNull(
+            dataRow[CreatePackageCsvColumns.SOURCE_PACKAGE_QUANTITY_UNIT_OF_MEASURE]
+          );
+
+          Ingredients.push({
+            pkg,
+            Quantity,
+            UnitOfMeasure,
+          });
+        }
 
         // CHECK
         // New package tag matches available package tag
@@ -838,18 +838,19 @@ export const createPackageCsvModule = {
         const sharedNoteOrNull: string | null =
           checkAllValuesMatchAndAreNonEmptyAndReturnSharedValueOrNull(
             rowGroup,
-            CreatePackageCsvColumns.NOTE
+            CreatePackageCsvColumns.NOTE,
+            { errorIfEmptyString: false }
           );
 
         // ASSIGN PARSED VALUE
-        const Note = sharedExpirationDateOrNull;
+        const Note = sharedNoteOrNull;
 
         // CHECK
         // All production batch values match
         const sharedProductionBatchOrNull: string | null =
           checkAllValuesMatchAndAreNonEmptyAndReturnSharedValueOrNull(
             rowGroup,
-            CreatePackageCsvColumns.NOTE,
+            CreatePackageCsvColumns.PRODUCTION_BATCH_NUMBER,
             { errorIfEmptyString: false }
           );
 
@@ -871,6 +872,137 @@ export const createPackageCsvModule = {
           IsDonation: false,
           ExpirationDate,
         };
+
+        // Fill in these values as much as possible, but
+        const mockPackage: IIndexedPackageData = {
+          Id: -1,
+          PackageState: PackageState.ACTIVE,
+          LicenseNumber: (await authManager.authStateOrError()).license,
+          TagMatcher: "",
+          ExpirationDate,
+          Note: Note ?? "",
+          Label: Tag?.Label ?? "",
+          LocationName: Location?.Name ?? "",
+          ProductionBatchNumber: ProductionBatchNumber ?? "",
+          Quantity: Quantity ?? 0,
+          PackagedDate: ActualDate ?? "",
+          UnitOfMeasureAbbreviation: UnitOfMeasure?.Abbreviation ?? "g",
+          UnitOfMeasureId: UnitOfMeasure?.Id ?? 0,
+          UnitOfMeasureQuantityType: UnitOfMeasure?.QuantityType ?? "WeightBased",
+          Item: Item ?? {
+            Id: -1,
+            AdministrationMethod: "",
+            ApprovalStatusDateTime: "",
+            ApprovalStatusName: "Approved",
+            DefaultLabTestingStateName: "NotRequired",
+            Description: "",
+            FacilityLicenseNumber: null,
+            FacilityName: null,
+            IsArchived: false,
+            IsUsed: false,
+            ItemBrandId: 0,
+            ItemBrandName: null,
+            LabelImages: [], // Assuming an empty array
+            Name: "",
+            NumberOfDoses: null,
+            PackagingImages: [], // Assuming an empty array
+            ProductCategoryName: "",
+            ProductCategoryTypeName: "",
+            ProductImages: [], // Assuming an empty array
+            PublicIngredients: "",
+            QuantityTypeName: "WeightBased",
+            ServingSize: "",
+            StrainName: null,
+            SupplyDurationDays: null,
+            UnitCbdContent: null,
+            UnitCbdContentDose: null,
+            UnitCbdContentDoseUnitOfMeasureAbbreviation: null,
+            UnitCbdContentUnitOfMeasureAbbreviation: null,
+            UnitCbdPercent: null,
+            UnitOfMeasureId: 0,
+            UnitOfMeasureName: "",
+            UnitQuantity: null,
+            UnitQuantityUnitOfMeasureAbbreviation: null,
+            UnitThcContent: null,
+            UnitThcContentDose: null,
+            UnitThcContentDoseUnitOfMeasureAbbreviation: null,
+            UnitThcContentUnitOfMeasureAbbreviation: null,
+            UnitThcPercent: null,
+            UnitVolume: null,
+            UnitVolumeUnitOfMeasureAbbreviation: null,
+            UnitWeight: null,
+            UnitWeightUnitOfMeasureAbbreviation: null,
+            UnitWeightUnitOfMeasureId: null,
+            ExpirationDateConfiguration: "Off",
+            SellByDateConfiguration: "Off",
+            UseByDateConfiguration: "Off",
+          },
+          // Empty values
+          ArchivedDate: null,
+          ContainsRemediatedProduct: false,
+          DonationFacilityLicenseNumber: null,
+          DonationFacilityName: null,
+          FacilityLicenseNumber: null,
+          FacilityName: null,
+          FinishedDate: null,
+          InitialLabTestingState: "NotRequired",
+          IsArchived: false,
+          IsDonation: false,
+          IsDonationPersistent: false,
+          IsFinished: false,
+          IsInTransit: false,
+          IsOnHold: false,
+          IsProcessValidationTestingSample: false,
+          IsProductionBatch: false,
+          IsTestingSample: false,
+          IsTradeSample: false,
+          IsTradeSamplePersistent: false,
+          ItemFromFacilityLicenseNumber: "",
+          ItemFromFacilityName: "",
+          LabTestingStateDate: "",
+          LabTestingStateName: "",
+          LastModified: "",
+          LocationTypeName: null,
+          MultiHarvest: false,
+          MultiPackage: false,
+          MultiProductionBatch: false,
+          PackageType: "ImmaturePlant",
+          PackagedByFacilityLicenseNumber: "",
+          PackagedByFacilityName: "",
+          PatientLicenseNumber: "",
+          ProductRequiresRemediation: false,
+          ReceivedDateTime: null,
+          ReceivedFromFacilityLicenseNumber: null,
+          ReceivedFromFacilityName: null,
+          ReceivedFromManifestNumber: null,
+          RemediationDate: null,
+          SourceHarvestNames: "",
+          SourcePackageIsDonation: false,
+          SourcePackageIsTradeSample: false,
+          SourcePackageLabels: "",
+          SourceProductionBatchNumbers: "",
+          TradeSampleFacilityName: null,
+          TradeSampleFacilityLicenseNumber: null,
+          TransferManifestNumber: "",
+          TransferPackageStateName: null,
+          SourceHarvestCount: 0,
+          SourcePackageCount: 0,
+          SourceProcessingJobCount: 0,
+          SourceProcessingJobNumbers: "",
+          SourceProcessingJobNames: "",
+          MultiProcessingJob: false,
+          SellByDate: null,
+          UseByDate: null,
+          LabTestResultDocumentFileId: null,
+          IsOnTrip: false,
+          IsOnRetailerDelivery: false,
+          PackageForProductDestruction: null,
+          Trip: null,
+          HasPartial: false,
+          IsPartial: false,
+        };
+
+        rowGroup.mockPackage = mockPackage;
       }
 
       ctx.state.rowGroups = rowGroups;
