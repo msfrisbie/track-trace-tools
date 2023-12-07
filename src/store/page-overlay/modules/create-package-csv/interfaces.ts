@@ -8,22 +8,27 @@ import {
 import { CreatePackageCsvColumns, PackageCsvStatus } from "./consts";
 
 export interface IParsedRowGroupData {
-  ActualDate: string; // Defaults to today
+  ActualDate: string | null; // Defaults to today
   Ingredients: {
     pkg: IIndexedPackageData;
     Quantity: number;
     UnitOfMeasure: IUnitOfMeasure; // Defaults to item
-  }[];
-  Item: IItemData; // Defaults to same item
-  Location: ILocationData; // Defaults to parent location
-  Note: string;
-  ProductionBatchNumber: string;
-  Quantity: number;
-  Tag: IIndexedTagData;
-  UnitOfMeasure: IUnitOfMeasure; // Defaults to item
-  UseSameItem: boolean;
-  IsDonation: boolean;
+  }[] | null;
+  Item: IItemData | null; // Defaults to same item
+  Location: ILocationData | null; // Defaults to parent location
+  Note: string | null;
+  ProductionBatchNumber: string | null;
+  Quantity: number | null;
+  Tag: IIndexedTagData | null;
+  UnitOfMeasure: IUnitOfMeasure | null; // Defaults to item
+  UseSameItem: boolean | null;
+  IsDonation: boolean | null;
   ExpirationDate: string | null;
+}
+
+export interface IRowGroupMessage {
+  text: string;
+  cellCoordinates: { rowIndex: number; columnIndex: number }[];
 }
 
 export interface ICreatePackageCsvRowGroup {
@@ -31,18 +36,9 @@ export interface ICreatePackageCsvRowGroup {
   // Corresponds to a single create package request
   destinationLabel: string;
   dataRows: ICreatePackageCsvRow[];
-  messages: {
-    text: string;
-    cellCoordinates: { rowIndex: number; columnIndex: number }[];
-  }[];
-  warnings: {
-    text: string;
-    cellCoordinates: { rowIndex: number; columnIndex: number }[];
-  }[];
-  errors: {
-    text: string;
-    cellCoordinates: { rowIndex: number; columnIndex: number }[];
-  }[];
+  messages: IRowGroupMessage[];
+  warnings: IRowGroupMessage[];
+  errors: IRowGroupMessage[];
   parsedData: IParsedRowGroupData | null;
 }
 

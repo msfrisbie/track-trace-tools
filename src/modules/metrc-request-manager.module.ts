@@ -1,8 +1,8 @@
-import { IAtomicService, IAuthState } from '@/interfaces';
-import { origin } from '@/modules/environment.module';
-import { customAxios } from '@/modules/fetch-manager.module';
-import { CsvUpload } from '@/types';
-import { authManager } from './auth-manager.module';
+import { IAtomicService, IAuthState } from "@/interfaces";
+import { origin } from "@/modules/environment.module";
+import { customAxios } from "@/modules/fetch-manager.module";
+import { CsvUpload } from "@/types";
+import { authManager } from "./auth-manager.module";
 
 const LOGIN_URL = `${origin({ divertToNullOrigin: false })}/log-in`;
 
@@ -14,6 +14,17 @@ const EMPLOYEES_URL = `${origin({ divertToNullOrigin: false })}/api/employees`;
 const AVAILABLE_TAGS_URL = `${origin({ divertToNullOrigin: false })}/api/tags/available`;
 const USED_TAGS_URL = `${origin({ divertToNullOrigin: false })}/api/tags/used`;
 const VOIDED_TAGS_URL = `${origin({ divertToNullOrigin: false })}/api/tags/voided`;
+
+// Modals have separate view for all items
+const AVAILABLE_TAGS_MODAL_URL = `/api/tags/forlookup/newtagindustrypackages`;
+const ACTIVE_ITEMS_MODAL_URL = `/api/items/forlookup/packges`;
+const ACTIVE_PACKAGES_MODAL_URL = `/api/packages/forlookup/packages`;
+const TRANSFER_DESTINATION_FACILITIES_MODAL_URL = `${origin({
+  divertToNullOrigin: false,
+})}/api/facilities/forlookup/forlicensedtransferdestinations`;
+const TRANSFER_TRANSPORTER_FACILITIES_MODAL_URL = `${origin({
+  divertToNullOrigin: false,
+})}/api/facilities/forlookup/forlicensedtransfertransporters`;
 
 const ACTIVE_PACKAGES_URL = `${origin({ divertToNullOrigin: false })}/api/packages`;
 const INACTIVE_PACKAGES_URL = `${origin({ divertToNullOrigin: false })}/api/packages/inactive`;
@@ -30,29 +41,42 @@ const ACTIVE_HARVESTS_URL = `${origin({ divertToNullOrigin: false })}/api/harves
 const INACTIVE_HARVESTS_URL = `${origin({ divertToNullOrigin: false })}/api/harvests/inactive`;
 
 const PLANT_BATCHES_URL = `${origin({ divertToNullOrigin: false })}/api/plantbatches`;
-const INACTIVE_PLANT_BATCHES_URL = `${origin({ divertToNullOrigin: false })}/api/plantbatches/inactive`;
+const INACTIVE_PLANT_BATCHES_URL = `${origin({
+  divertToNullOrigin: false,
+})}/api/plantbatches/inactive`;
 
-const INCOMING_TRANSFERS_URL = `${origin({ divertToNullOrigin: false })}/api/transfers/incoming?slt=Licensed&active=True`;
-const INCOMING_INACTIVE_TRANSFERS_URL = `${origin({ divertToNullOrigin: false })}/api/transfers/incoming?slt=Licensed&active=False`;
-const OUTGOING_TRANSFERS_URL = `${origin({ divertToNullOrigin: false })}/api/transfers/outgoing?slt=Licensed&active=True`;
-const OUTGOING_INACTIVE_TRANSFERS_URL = `${origin({ divertToNullOrigin: false })}/api/transfers/outgoing?slt=Licensed&active=False`;
+const INCOMING_TRANSFERS_URL = `${origin({
+  divertToNullOrigin: false,
+})}/api/transfers/incoming?slt=Licensed&active=True`;
+const INCOMING_INACTIVE_TRANSFERS_URL = `${origin({
+  divertToNullOrigin: false,
+})}/api/transfers/incoming?slt=Licensed&active=False`;
+const OUTGOING_TRANSFERS_URL = `${origin({
+  divertToNullOrigin: false,
+})}/api/transfers/outgoing?slt=Licensed&active=True`;
+const OUTGOING_INACTIVE_TRANSFERS_URL = `${origin({
+  divertToNullOrigin: false,
+})}/api/transfers/outgoing?slt=Licensed&active=False`;
 const REJECTED_TRANSFERS_URL = `${origin({ divertToNullOrigin: false })}/api/transfers/rejected`;
 const LAYOVER_TRANSFERS_URL = `${origin({ divertToNullOrigin: false })}/api/transfers/layovers`;
 
-const TRANSFER_DESTINATIONS_URL = `${origin({ divertToNullOrigin: false })}/api/transfers/destinations`; // ?id=39
-const TRANSFER_DESTINATION_PACKAGES_URL = `${origin({ divertToNullOrigin: false })}/api/transfers/destinations/packages`; // ?id=39
-
-const TRANSFER_DESTINATION_FACILITIES_URL = `${origin({ divertToNullOrigin: false })
-}/api/facilities/forlookup/forlicensedtransferdestinations`;
-const TRANSFER_TRANSPORTER_FACILITIES_URL = `${origin({ divertToNullOrigin: false })
-}/api/facilities/forlookup/forlicensedtransfertransporters`;
+const TRANSFER_DESTINATIONS_URL = `${origin({
+  divertToNullOrigin: false,
+})}/api/transfers/destinations`; // ?id=39
+const TRANSFER_DESTINATION_PACKAGES_URL = `${origin({
+  divertToNullOrigin: false,
+})}/api/transfers/destinations/packages`; // ?id=39
 
 const LOCATIONS_URL = `${origin({ divertToNullOrigin: false })}/api/locations`;
 const STRAINS_URL = `${origin({ divertToNullOrigin: false })}/api/strains`;
 const ITEMS_URL = `${origin({ divertToNullOrigin: false })}/api/items`;
 
-const ACTIVE_SALES_RECEIPTS_URL = `${origin({ divertToNullOrigin: false })}/api/sales/receipts/active`;
-const INACTIVE_SALES_RECEIPTS_URL = `${origin({ divertToNullOrigin: false })}/api/sales/receipts/inactive`;
+const ACTIVE_SALES_RECEIPTS_URL = `${origin({
+  divertToNullOrigin: false,
+})}/api/sales/receipts/active`;
+const INACTIVE_SALES_RECEIPTS_URL = `${origin({
+  divertToNullOrigin: false,
+})}/api/sales/receipts/inactive`;
 
 const NOOP_URL = `${origin({ divertToNullOrigin: false })}/api/system/noop`;
 
@@ -87,21 +111,21 @@ const UPDATE_TRANSFERS_URL = `${origin()}/api/transfers/update`;
 const DATAIMPORT_MOVE_PLANTS_URL = `${origin()}/api/dataimport/plants/change/locations`;
 
 const DEFAULT_FETCH_POST_READ_OPTIONS = {
-  method: 'POST',
+  method: "POST",
   timeout: 20000,
 };
 
 const DEFAULT_FETCH_POST_WRITE_OPTIONS = {
-  method: 'POST',
+  method: "POST",
 };
 
 const DEFAULT_FETCH_GET_OPTIONS = {
-  method: 'GET',
+  method: "GET",
 };
 
 const JSON_HEADERS = {
-  'Content-Type': 'application/json',
-  Accept: 'application/json, text/javascript, */*; q=0.01',
+  "Content-Type": "application/json",
+  Accept: "application/json, text/javascript, */*; q=0.01",
 };
 
 enum UrlType {
@@ -146,186 +170,148 @@ enum UrlType {
 async function buildDynamicUrl(
   authState: IAuthState,
   urlType: UrlType,
-  options: any = {},
+  options: any = {}
 ): Promise<string> {
   switch (urlType) {
     case UrlType.REORDER_TAGS_MODAL:
-      return (
-        `${origin({ divertToNullOrigin: false })
-        }/industry/${
-          authState.license
-        }/admin/tagorders/addedit?isModal=true&adding=true&_=${new Date().getTime()}`
-      );
+      return `${origin({ divertToNullOrigin: false })}/industry/${
+        authState.license
+      }/admin/tagorders/addedit?isModal=true&adding=true&_=${new Date().getTime()}`;
     case UrlType.NEW_TRANSFER_MODAL:
-      return (
-        `${origin({ divertToNullOrigin: false })
-        }/industry/${
-          authState.license
-        }/transfers/licensed/addedit?isModal=true&adding=true&_=${new Date().getTime()}`
-      );
+      return `${origin({ divertToNullOrigin: false })}/industry/${
+        authState.license
+      }/transfers/licensed/addedit?isModal=true&adding=true&_=${new Date().getTime()}`;
     case UrlType.PACKAGES:
       return `${origin({ divertToNullOrigin: false })}/industry/${authState.license}/packages`;
     case UrlType.MOVE_PACKAGES_MODAL:
-      return (
-        `${origin({ divertToNullOrigin: false })
-        }/industry/${
-          authState.license
-        }/packages/change/locations?isModal=true&adding=true&_=${new Date().getTime()}`
-      );
+      return `${origin({ divertToNullOrigin: false })}/industry/${
+        authState.license
+      }/packages/change/locations?isModal=true&adding=true&_=${new Date().getTime()}`;
     case UrlType.NEW_ITEM_MODAL:
-      return (
-        `${origin({ divertToNullOrigin: false })
-        }/industry/${
-          authState.license
-        }/admin/items/addedit?isModal=true&adding=true&_=${new Date().getTime()}`
-      );
+      return `${origin({ divertToNullOrigin: false })}/industry/${
+        authState.license
+      }/admin/items/addedit?isModal=true&adding=true&_=${new Date().getTime()}`;
     case UrlType.NEW_STRAIN_MODAL:
-      return (
-        `${origin({ divertToNullOrigin: false })
-        }/industry/${
-          authState.license
-        }/admin/strains/addedit?isModal=true&adding=true&_=${new Date().getTime()}`
-      );
+      return `${origin({ divertToNullOrigin: false })}/industry/${
+        authState.license
+      }/admin/strains/addedit?isModal=true&adding=true&_=${new Date().getTime()}`;
     case UrlType.WASTE_BY_LOCATION:
-      return (
-        `${origin({ divertToNullOrigin: false })
-        }/industry/${
-          authState.license
-        }/plants/waste/record/location?isModal=true&_=${new Date().getTime()}`
-      );
+      return `${origin({ divertToNullOrigin: false })}/industry/${
+        authState.license
+      }/plants/waste/record/location?isModal=true&_=${new Date().getTime()}`;
     case UrlType.ADJUST_PACKAGE:
-      return (
-        `${origin({ divertToNullOrigin: false })
-        }/industry/${authState.license}/packages/adjust?isModal=true&_=${new Date().getTime()}`
-      );
+      return `${origin({ divertToNullOrigin: false })}/industry/${
+        authState.license
+      }/packages/adjust?isModal=true&_=${new Date().getTime()}`;
     case UrlType.REMEDIATE_PACKAGE:
-      return (
-        `${origin({ divertToNullOrigin: false })
-        }/industry/${authState.license}/packages/remediate?isModal=true&_=${new Date().getTime()}`
-      );
+      return `${origin({ divertToNullOrigin: false })}/industry/${
+        authState.license
+      }/packages/remediate?isModal=true&_=${new Date().getTime()}`;
     case UrlType.CREATE_PLANTINGS_FROM_PACKAGE:
-      return (
-        `${origin({ divertToNullOrigin: false })
-        }/industry/${
-          authState.license
-        }/packages/create/plantings?isModal=true&_=${new Date().getTime()}`
-      );
+      return `${origin({ divertToNullOrigin: false })}/industry/${
+        authState.license
+      }/packages/create/plantings?isModal=true&_=${new Date().getTime()}`;
     case UrlType.CHANGE_PLANT_BATCH_GROWTH_PHASE:
-      return (
-        `${origin({ divertToNullOrigin: false })
-        }/industry/${
-          authState.license
-        }/plantbatches/change/growthphase?isModal=true&_=${new Date().getTime()}`
-      );
+      return `${origin({ divertToNullOrigin: false })}/industry/${
+        authState.license
+      }/plantbatches/change/growthphase?isModal=true&_=${new Date().getTime()}`;
     case UrlType.NEW_PACKAGE_MODAL:
-      return (
-        `${origin({ divertToNullOrigin: false })
-        }/industry/${authState.license}/packages/new?isModal=true&_=${new Date().getTime()}`
-      );
+      return `${origin({ divertToNullOrigin: false })}/industry/${
+        authState.license
+      }/packages/new?isModal=true&_=${new Date().getTime()}`;
     case UrlType.NEW_TRANSFER_TEMPLATE_MODAL:
-      return (
-        `${origin({ divertToNullOrigin: false })
-        }/industry/${
-          authState.license
-        }/transfers/licensed/templates/addedit?isModal=true&adding=true&_=${new Date().getTime()}`
-      );
+      return `${origin({ divertToNullOrigin: false })}/industry/${
+        authState.license
+      }/transfers/licensed/templates/addedit?isModal=true&adding=true&_=${new Date().getTime()}`;
     case UrlType.USER_PROFILE:
-      return (
-        `${origin({ divertToNullOrigin: false })}/user/profile?licenseNumber=${authState.license}`
-      );
+      return `${origin({ divertToNullOrigin: false })}/user/profile?licenseNumber=${
+        authState.license
+      }`;
     case UrlType.API_KEYS:
-      return (
-        `${origin({ divertToNullOrigin: false })}/user/apikeys?licenseNumber=${authState.license}`
-      );
+      return `${origin({ divertToNullOrigin: false })}/user/apikeys?licenseNumber=${
+        authState.license
+      }`;
     case UrlType.DATAIMPORT:
       return `${origin({ divertToNullOrigin: false })}/industry/${authState.license}/dataimport`;
     case UrlType.DATAIMPORT_HISTORY:
       return `${origin({ divertToNullOrigin: false })}/api/dataimport?type=${options.csvUpload}`;
     case UrlType.LAB_RESULTS_BY_PACKAGE_ID:
       if (!options?.packageId) {
-        throw new Error('Missing required URL options');
+        throw new Error("Missing required URL options");
       }
-      return (
-        `${origin({ divertToNullOrigin: false })
-        }/api/packages/labresults/byid?id=${options.packageId}`
-      );
+      return `${origin({ divertToNullOrigin: false })}/api/packages/labresults/byid?id=${
+        options.packageId
+      }`;
     case UrlType.PACKAGE_HISTORY_BY_PACKAGE_ID:
       if (!options?.packageId) {
-        throw new Error('Missing required URL options');
+        throw new Error("Missing required URL options");
       }
-      return (
-        `${origin({ divertToNullOrigin: false })}/api/packages/history?id=${options.packageId}`
-      );
+      return `${origin({ divertToNullOrigin: false })}/api/packages/history?id=${
+        options.packageId
+      }`;
     case UrlType.PLANT_BATCH_HISTORY_BY_PLANT_BATCH_ID:
       if (!options?.plantBatchId) {
-        throw new Error('Missing required URL options');
+        throw new Error("Missing required URL options");
       }
-      return (
-        `${origin({ divertToNullOrigin: false })
-        }/api/plantbatches/history?id=${options.plantBatchId}`
-      );
+      return `${origin({ divertToNullOrigin: false })}/api/plantbatches/history?id=${
+        options.plantBatchId
+      }`;
     case UrlType.PLANT_HISTORY_BY_PLANT_ID:
       if (!options?.plantId) {
-        throw new Error('Missing required URL options');
+        throw new Error("Missing required URL options");
       }
       return `${origin({ divertToNullOrigin: false })}/api/plants/history?id=${options.plantId}`;
     case UrlType.PACKAGE_HARVEST_HISTORY_BY_PACKAGE_ID:
       if (!options?.packageId) {
-        throw new Error('Missing required URL options');
+        throw new Error("Missing required URL options");
       }
-      return (
-        `${origin({ divertToNullOrigin: false })
-        }/api/packages/sourceHarvest?id=${options.packageId}`
-      );
+      return `${origin({ divertToNullOrigin: false })}/api/packages/sourceHarvest?id=${
+        options.packageId
+      }`;
     case UrlType.TRANSFER_HISTORY_BY_TRANSFER_ID:
       if (!options?.manifestNumber) {
-        throw new Error('Missing required URL options');
+        throw new Error("Missing required URL options");
       }
-      return (
-        `${origin({ divertToNullOrigin: false })
-        }/api/transfers/history?id=${options.manifestNumber}`
-      );
+      return `${origin({ divertToNullOrigin: false })}/api/transfers/history?id=${
+        options.manifestNumber
+      }`;
     case UrlType.TRANSFER_DESTINATIONS_BY_TRANSFER_ID:
       if (!options?.transferId) {
-        throw new Error('Missing required URL options');
+        throw new Error("Missing required URL options");
       }
-      return (
-        `${origin({ divertToNullOrigin: false })
-        }/api/transfers/destinations?id=${options.transferId}`
-      );
+      return `${origin({ divertToNullOrigin: false })}/api/transfers/destinations?id=${
+        options.transferId
+      }`;
     case UrlType.TRANSFER_TRANSPORTER_DETAILS_BY_TRANSFER_ID:
       if (!options?.transferId) {
-        throw new Error('Missing required URL options');
+        throw new Error("Missing required URL options");
       }
-      return (
-        `${origin({ divertToNullOrigin: false })
-        }/api/transfers/transporters/details?id=${options.transferId}`
-      );
+      return `${origin({ divertToNullOrigin: false })}/api/transfers/transporters/details?id=${
+        options.transferId
+      }`;
     case UrlType.DESTINATION_TRANSPORTERS_BY_DESTINATION_ID:
       if (!options?.destinationId) {
-        throw new Error('Missing required URL options');
+        throw new Error("Missing required URL options");
       }
-      return (
-        `${origin({ divertToNullOrigin: false })
-        }/api/transfers/destinations/transporters?id=${options.destinationId}`
-      );
+      return `${origin({ divertToNullOrigin: false })}/api/transfers/destinations/transporters?id=${
+        options.destinationId
+      }`;
     case UrlType.DESTINATION_PACKAGES_BY_DESTINATION_ID:
       if (!options?.destinationId) {
-        throw new Error('Missing required URL options');
+        throw new Error("Missing required URL options");
       }
-      return (
-        `${origin({ divertToNullOrigin: false })
-        }/api/transfers/destinations/packages?id=${options.destinationId}`
-      );
+      return `${origin({ divertToNullOrigin: false })}/api/transfers/destinations/packages?id=${
+        options.destinationId
+      }`;
     case UrlType.HARVEST_HISTORY_BY_HARVEST_ID:
       if (!options?.harvestId) {
-        throw new Error('Missing required URL options');
+        throw new Error("Missing required URL options");
       }
-      return (
-        `${origin({ divertToNullOrigin: false })}/api/harvests/history?id=${options.harvestId}`
-      );
+      return `${origin({ divertToNullOrigin: false })}/api/harvests/history?id=${
+        options.harvestId
+      }`;
     default:
-      throw new Error('Bad URL type');
+      throw new Error("Bad URL type");
   }
 }
 
@@ -335,7 +321,7 @@ async function buildAuthenticationHeaders(authState: IAuthState) {
 
   const headers = {
     ApiVerificationToken: authState.apiVerificationToken,
-    'X-Metrc-LicenseNumber': authState.license,
+    "X-Metrc-LicenseNumber": authState.license,
   };
 
   // if (includeXRequestedWith) {
@@ -359,7 +345,7 @@ export class MetrcRequestManager implements IAtomicService {
 
   get authStateOrError(): IAuthState {
     if (!this._authState) {
-      throw new Error('AuthState not available');
+      throw new Error("AuthState not available");
     }
 
     return this._authState;
@@ -483,7 +469,7 @@ export class MetrcRequestManager implements IAtomicService {
           ...JSON_HEADERS,
         },
         body,
-      },
+      }
     );
   }
 
@@ -679,7 +665,7 @@ export class MetrcRequestManager implements IAtomicService {
   }
 
   async transferDestinationFacilitiesDeprecated() {
-    return customAxios(TRANSFER_DESTINATION_FACILITIES_URL, {
+    return customAxios(TRANSFER_DESTINATION_FACILITIES_MODAL_URL, {
       ...DEFAULT_FETCH_POST_READ_OPTIONS,
       headers: {
         ...(await buildAuthenticationHeaders(this.authStateOrError)),
@@ -689,7 +675,7 @@ export class MetrcRequestManager implements IAtomicService {
   }
 
   async transferTransporterFaciliitesDeprecated() {
-    return customAxios(TRANSFER_DESTINATION_FACILITIES_URL, {
+    return customAxios(TRANSFER_TRANSPORTER_FACILITIES_MODAL_URL, {
       ...DEFAULT_FETCH_POST_READ_OPTIONS,
       headers: {
         ...(await buildAuthenticationHeaders(this.authStateOrError)),
@@ -699,26 +685,26 @@ export class MetrcRequestManager implements IAtomicService {
   }
 
   async transferDestinationFacilities(query: string) {
-    return customAxios(TRANSFER_DESTINATION_FACILITIES_URL, {
+    return customAxios(TRANSFER_DESTINATION_FACILITIES_MODAL_URL, {
       ...DEFAULT_FETCH_POST_READ_OPTIONS,
       headers: {
         ...(await buildAuthenticationHeaders(this.authStateOrError)),
-        'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
-        Accept: '*/*',
+        "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
+        Accept: "*/*",
       },
-      body: `request%5BTake%5D=10&request%5BFilter%5D%5BLogic%5D=or&request%5BFilter%5D%5BFilters%5D%5B0%5D%5BField%5D=LicenseNumber&request%5BFilter%5D%5BFilters%5D%5B0%5D%5BOperator%5D=contains&request%5BFilter%5D%5BFilters%5D%5B0%5D%5BValue%5D=${query}&request%5BFilter%5D%5BFilters%5D%5B1%5D%5BField%5D=FacilityName&request%5BFilter%5D%5BFilters%5D%5B1%5D%5BOperator%5D=contains&request%5BFilter%5D%5BFilters%5D%5B1%5D%5BValue%5D=${query}`
+      body: `request%5BTake%5D=10&request%5BFilter%5D%5BLogic%5D=or&request%5BFilter%5D%5BFilters%5D%5B0%5D%5BField%5D=LicenseNumber&request%5BFilter%5D%5BFilters%5D%5B0%5D%5BOperator%5D=contains&request%5BFilter%5D%5BFilters%5D%5B0%5D%5BValue%5D=${query}&request%5BFilter%5D%5BFilters%5D%5B1%5D%5BField%5D=FacilityName&request%5BFilter%5D%5BFilters%5D%5B1%5D%5BOperator%5D=contains&request%5BFilter%5D%5BFilters%5D%5B1%5D%5BValue%5D=${query}`,
     });
   }
 
   async transferTransporterFaciliites(query: string) {
-    return customAxios(TRANSFER_DESTINATION_FACILITIES_URL, {
+    return customAxios(TRANSFER_TRANSPORTER_FACILITIES_MODAL_URL, {
       ...DEFAULT_FETCH_POST_READ_OPTIONS,
       headers: {
         ...(await buildAuthenticationHeaders(this.authStateOrError)),
-        'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
-        Accept: '*/*',
+        "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
+        Accept: "*/*",
       },
-      body: `request%5BTake%5D=10&request%5BFilter%5D%5BLogic%5D=or&request%5BFilter%5D%5BFilters%5D%5B0%5D%5BField%5D=LicenseNumber&request%5BFilter%5D%5BFilters%5D%5B0%5D%5BOperator%5D=contains&request%5BFilter%5D%5BFilters%5D%5B0%5D%5BValue%5D=${query}&request%5BFilter%5D%5BFilters%5D%5B1%5D%5BField%5D=FacilityName&request%5BFilter%5D%5BFilters%5D%5B1%5D%5BOperator%5D=contains&request%5BFilter%5D%5BFilters%5D%5B1%5D%5BValue%5D=${query}`
+      body: `request%5BTake%5D=10&request%5BFilter%5D%5BLogic%5D=or&request%5BFilter%5D%5BFilters%5D%5B0%5D%5BField%5D=LicenseNumber&request%5BFilter%5D%5BFilters%5D%5B0%5D%5BOperator%5D=contains&request%5BFilter%5D%5BFilters%5D%5B0%5D%5BValue%5D=${query}&request%5BFilter%5D%5BFilters%5D%5B1%5D%5BField%5D=FacilityName&request%5BFilter%5D%5BFilters%5D%5B1%5D%5BOperator%5D=contains&request%5BFilter%5D%5BFilters%5D%5B1%5D%5BValue%5D=${query}`,
     });
   }
 
@@ -756,7 +742,7 @@ export class MetrcRequestManager implements IAtomicService {
           ...JSON_HEADERS,
         },
         body,
-      },
+      }
     );
   }
 
@@ -767,7 +753,7 @@ export class MetrcRequestManager implements IAtomicService {
         UrlType.DESTINATION_TRANSPORTERS_BY_DESTINATION_ID,
         {
           destinationId,
-        },
+        }
       ),
       {
         ...DEFAULT_FETCH_POST_READ_OPTIONS,
@@ -776,7 +762,7 @@ export class MetrcRequestManager implements IAtomicService {
           ...JSON_HEADERS,
         },
         body,
-      },
+      }
     );
   }
 
@@ -792,7 +778,7 @@ export class MetrcRequestManager implements IAtomicService {
           ...JSON_HEADERS,
         },
         body,
-      },
+      }
     );
   }
 
@@ -803,7 +789,7 @@ export class MetrcRequestManager implements IAtomicService {
         UrlType.TRANSFER_TRANSPORTER_DETAILS_BY_TRANSFER_ID,
         {
           transferId,
-        },
+        }
       ),
       {
         ...DEFAULT_FETCH_POST_READ_OPTIONS,
@@ -812,7 +798,7 @@ export class MetrcRequestManager implements IAtomicService {
           ...JSON_HEADERS,
         },
         body,
-      },
+      }
     );
   }
 
@@ -828,7 +814,7 @@ export class MetrcRequestManager implements IAtomicService {
           ...JSON_HEADERS,
         },
         body,
-      },
+      }
     );
   }
 
@@ -845,7 +831,7 @@ export class MetrcRequestManager implements IAtomicService {
           ...JSON_HEADERS,
         },
         body,
-      },
+      }
     );
   }
 
@@ -861,7 +847,7 @@ export class MetrcRequestManager implements IAtomicService {
           ...JSON_HEADERS,
         },
         body,
-      },
+      }
     );
   }
 
@@ -877,7 +863,7 @@ export class MetrcRequestManager implements IAtomicService {
           ...JSON_HEADERS,
         },
         body,
-      },
+      }
     );
   }
 
@@ -893,7 +879,7 @@ export class MetrcRequestManager implements IAtomicService {
           ...JSON_HEADERS,
         },
         body,
-      },
+      }
     );
   }
 
@@ -909,7 +895,7 @@ export class MetrcRequestManager implements IAtomicService {
           ...JSON_HEADERS,
         },
         body,
-      },
+      }
     );
   }
 
@@ -934,7 +920,7 @@ export class MetrcRequestManager implements IAtomicService {
           ...JSON_HEADERS,
         },
         body,
-      },
+      }
     );
   }
 
@@ -943,7 +929,7 @@ export class MetrcRequestManager implements IAtomicService {
       ...DEFAULT_FETCH_GET_OPTIONS,
       headers: {
         ...(await buildAuthenticationHeaders(this.authStateOrError)),
-        Accept: 'text/html, */*; q=0.01',
+        Accept: "text/html, */*; q=0.01",
       },
     });
   }
@@ -953,7 +939,7 @@ export class MetrcRequestManager implements IAtomicService {
       ...DEFAULT_FETCH_GET_OPTIONS,
       headers: {
         ...(await buildAuthenticationHeaders(this.authStateOrError)),
-        Accept: 'text/html, */*; q=0.01',
+        Accept: "text/html, */*; q=0.01",
       },
     });
   }
@@ -963,7 +949,7 @@ export class MetrcRequestManager implements IAtomicService {
       ...DEFAULT_FETCH_GET_OPTIONS,
       headers: {
         ...(await buildAuthenticationHeaders(this.authStateOrError)),
-        Accept: 'text/html, */*; q=0.01',
+        Accept: "text/html, */*; q=0.01",
       },
     });
   }
@@ -973,7 +959,7 @@ export class MetrcRequestManager implements IAtomicService {
       ...DEFAULT_FETCH_GET_OPTIONS,
       headers: {
         ...(await buildAuthenticationHeaders(this.authStateOrError)),
-        Accept: 'text/html, */*; q=0.01',
+        Accept: "text/html, */*; q=0.01",
       },
     });
   }
@@ -983,7 +969,7 @@ export class MetrcRequestManager implements IAtomicService {
       ...DEFAULT_FETCH_POST_WRITE_OPTIONS,
       headers: {
         ...(await buildAuthenticationHeaders(this.authStateOrError)),
-        Accept: '*/*',
+        Accept: "*/*",
       },
     });
   }
@@ -1004,8 +990,8 @@ export class MetrcRequestManager implements IAtomicService {
       ...DEFAULT_FETCH_POST_WRITE_OPTIONS,
       headers: {
         ...(await buildAuthenticationHeaders(this.authStateOrError)),
-        'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
-        Accept: '*/*',
+        "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
+        Accept: "*/*",
       },
       body,
     });
@@ -1252,7 +1238,7 @@ export class MetrcRequestManager implements IAtomicService {
       ...DEFAULT_FETCH_GET_OPTIONS,
       headers: {
         ...(await buildAuthenticationHeaders(this.authStateOrError)),
-        Accept: 'text/html, */*; q=0.01',
+        Accept: "text/html, */*; q=0.01",
       },
     });
   }
@@ -1262,7 +1248,7 @@ export class MetrcRequestManager implements IAtomicService {
       ...DEFAULT_FETCH_GET_OPTIONS,
       headers: {
         ...(await buildAuthenticationHeaders(this.authStateOrError)),
-        Accept: 'text/html, */*; q=0.01',
+        Accept: "text/html, */*; q=0.01",
       },
     });
   }
@@ -1272,7 +1258,7 @@ export class MetrcRequestManager implements IAtomicService {
       ...DEFAULT_FETCH_GET_OPTIONS,
       headers: {
         ...(await buildAuthenticationHeaders(this.authStateOrError)),
-        Accept: 'text/html, */*; q=0.01',
+        Accept: "text/html, */*; q=0.01",
       },
     });
   }
@@ -1282,7 +1268,7 @@ export class MetrcRequestManager implements IAtomicService {
       ...DEFAULT_FETCH_GET_OPTIONS,
       headers: {
         ...(await buildAuthenticationHeaders(this.authStateOrError)),
-        Accept: 'text/html, */*; q=0.01',
+        Accept: "text/html, */*; q=0.01",
       },
     });
   }
@@ -1292,7 +1278,7 @@ export class MetrcRequestManager implements IAtomicService {
       ...DEFAULT_FETCH_GET_OPTIONS,
       headers: {
         ...(await buildAuthenticationHeaders(this.authStateOrError)),
-        Accept: 'text/html, */*; q=0.01',
+        Accept: "text/html, */*; q=0.01",
       },
     });
   }
@@ -1302,7 +1288,7 @@ export class MetrcRequestManager implements IAtomicService {
       ...DEFAULT_FETCH_GET_OPTIONS,
       headers: {
         ...(await buildAuthenticationHeaders(this.authStateOrError)),
-        Accept: 'text/html, */*; q=0.01',
+        Accept: "text/html, */*; q=0.01",
       },
     });
   }
@@ -1312,7 +1298,7 @@ export class MetrcRequestManager implements IAtomicService {
       ...DEFAULT_FETCH_GET_OPTIONS,
       headers: {
         ...(await buildAuthenticationHeaders(this.authStateOrError)),
-        Accept: 'text/html, */*; q=0.01',
+        Accept: "text/html, */*; q=0.01",
       },
     });
   }
@@ -1322,7 +1308,7 @@ export class MetrcRequestManager implements IAtomicService {
       ...DEFAULT_FETCH_GET_OPTIONS,
       headers: {
         ...(await buildAuthenticationHeaders(this.authStateOrError)),
-        Accept: 'text/html, */*; q=0.01',
+        Accept: "text/html, */*; q=0.01",
       },
     });
   }
@@ -1334,9 +1320,9 @@ export class MetrcRequestManager implements IAtomicService {
         ...DEFAULT_FETCH_GET_OPTIONS,
         headers: {
           ...(await buildAuthenticationHeaders(this.authStateOrError)),
-          Accept: 'text/html, */*; q=0.01',
+          Accept: "text/html, */*; q=0.01",
         },
-      },
+      }
     );
   }
 
@@ -1347,9 +1333,9 @@ export class MetrcRequestManager implements IAtomicService {
         ...DEFAULT_FETCH_GET_OPTIONS,
         headers: {
           ...(await buildAuthenticationHeaders(this.authStateOrError)),
-          Accept: 'text/html, */*; q=0.01',
+          Accept: "text/html, */*; q=0.01",
         },
-      },
+      }
     );
   }
 
@@ -1358,7 +1344,7 @@ export class MetrcRequestManager implements IAtomicService {
       ...DEFAULT_FETCH_GET_OPTIONS,
       headers: {
         ...(await buildAuthenticationHeaders(this.authStateOrError)),
-        Accept: 'text/html, */*; q=0.01',
+        Accept: "text/html, */*; q=0.01",
       },
     });
   }
@@ -1370,9 +1356,9 @@ export class MetrcRequestManager implements IAtomicService {
         ...DEFAULT_FETCH_GET_OPTIONS,
         headers: {
           ...(await buildAuthenticationHeaders(this.authStateOrError)),
-          Accept: 'text/html, */*; q=0.01',
+          Accept: "text/html, */*; q=0.01",
         },
-      },
+      }
     );
   }
 }

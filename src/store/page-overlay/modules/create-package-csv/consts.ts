@@ -35,7 +35,6 @@ export enum PackageCsvStatus {
   INFLIGHT = "INFLIGHT",
   PARSED = "PARSED",
   ERROR = "ERROR",
-  SUCCESS = "SUCCESS",
 }
 
 export const CREATE_PACKAGE_CSV_COLUMNS: {

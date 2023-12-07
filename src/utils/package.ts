@@ -1,4 +1,4 @@
-import { METRC_TAG_REGEX, PackageState } from '@/consts';
+import { METRC_TAG_REGEX, PackageState } from "@/consts";
 import {
   ICsvFile,
   IDestinationData,
@@ -6,159 +6,203 @@ import {
   IIndexedDestinationPackageData,
   IIndexedPackageData,
   IIndexedTransferData,
-  IMetadataSimplePackageData, ISimpleCogsPackageData,
+  IMetadataSimplePackageData,
+  ISimpleCogsPackageData,
   ISimplePackageData,
   ISimpleTransferPackageData,
   ITestResultData,
   IUnionIndexedPackageData,
-  PackageMetadata
-} from '@/interfaces';
-import { authManager } from '@/modules/auth-manager.module';
+  PackageMetadata,
+} from "@/interfaces";
+import { authManager } from "@/modules/auth-manager.module";
 import {
   getDataLoaderByLicense,
-  primaryDataLoader
-} from '@/modules/data-loader/data-loader.module';
-import { toastManager } from '@/modules/toast-manager.module';
-import { downloadCsvFile } from './csv';
-import { downloadFileFromUrl } from './dom';
-import { extractParentPackageLabelsFromHistory } from './history';
+  primaryDataLoader,
+} from "@/modules/data-loader/data-loader.module";
+import { toastManager } from "@/modules/toast-manager.module";
+import { downloadCsvFile } from "./csv";
+import { downloadFileFromUrl } from "./dom";
+import { extractParentPackageLabelsFromHistory } from "./history";
 import {
   UnitOfMeasureAbbreviation,
-  unitOfMeasureAbbreviationToName,
   UnitOfMeasureName,
-  unitOfMeasureNameToAbbreviation
-} from './units';
+  unitOfMeasureAbbreviationToName,
+  unitOfMeasureNameToAbbreviation,
+} from "./units";
 
 export function getIdOrError(unionPkg: IUnionIndexedPackageData): number {
   const pkg = unionPkg as any;
-  if ('Id' in pkg) {
+  if ("Id" in pkg) {
     return (pkg as IIndexedPackageData).Id;
   }
-  if ('PackageId' in pkg) {
+  if ("PackageId" in pkg) {
     return (pkg as IDestinationPackageData).PackageId;
   }
-  throw new Error('Could not extract ID');
+  throw new Error("Could not extract ID");
 }
 
 export function getLabelOrError(unionPkg: IUnionIndexedPackageData): string {
   const pkg = unionPkg as any;
-  if ('Label' in pkg) {
+  if ("Label" in pkg) {
     return (pkg as IIndexedPackageData).Label;
   }
-  if ('PackageLabel' in pkg) {
+  if ("PackageLabel" in pkg) {
     return (pkg as IDestinationPackageData).PackageLabel;
   }
-  throw new Error('Could not extract Label');
+  throw new Error("Could not extract Label");
 }
 
 export function getQuantityOrError(unionPkg: IUnionIndexedPackageData): number {
   const pkg = unionPkg as any;
-  if ('Quantity' in pkg) {
+  if ("Quantity" in pkg) {
     return (pkg as IIndexedPackageData).Quantity;
   }
-  if ('ShippedQuantity' in pkg) {
+  if ("ShippedQuantity" in pkg) {
     return (pkg as IDestinationPackageData).ShippedQuantity;
   }
-  throw new Error('Could not extract Quantity');
+  throw new Error("Could not extract Quantity");
 }
 
 export function getStrainNameOrError(unionPkg: IUnionIndexedPackageData): string {
   const pkg = unionPkg as any;
-  if (pkg.Item && 'StrainName' in pkg.Item) {
-    return (pkg as IIndexedPackageData).Item.StrainName ?? '';
+  if (pkg.Item && "StrainName" in pkg.Item) {
+    return (pkg as IIndexedPackageData).Item.StrainName ?? "";
   }
-  if ('ItemStrainName' in pkg) {
-    return (pkg as IDestinationPackageData).ItemStrainName ?? '';
+  if ("ItemStrainName" in pkg) {
+    return (pkg as IDestinationPackageData).ItemStrainName ?? "";
   }
-  throw new Error('Could not extract Strain Name');
+  throw new Error("Could not extract Strain Name");
 }
 
 export function getSourceHarvestNamesOrError(unionPkg: IUnionIndexedPackageData): string {
   const pkg = unionPkg as any;
-  if ('SourceHarvestNames' in pkg) {
+  if ("SourceHarvestNames" in pkg) {
     return (pkg as IIndexedPackageData).SourceHarvestNames;
   }
-  if ('SourceHarvestNames' in pkg) {
+  if ("SourceHarvestNames" in pkg) {
     return (pkg as IDestinationPackageData).SourceHarvestNames;
   }
-  throw new Error('Could not extract Harvest Names');
+  throw new Error("Could not extract Harvest Names");
 }
 
 export function getSourcePackageTagsOrError(unionPkg: IUnionIndexedPackageData): string {
   const pkg = unionPkg as any;
-  if ('SourcePackageLabels' in pkg) {
+  if ("SourcePackageLabels" in pkg) {
     return (pkg as IIndexedPackageData).SourcePackageLabels;
   }
-  if ('SourcePackageLabels' in pkg) {
+  if ("SourcePackageLabels" in pkg) {
     return (pkg as IDestinationPackageData).SourcePackageLabels;
   }
-  throw new Error('Could not extract Source Pakcage Tags');
+  throw new Error("Could not extract Source Pakcage Tags");
 }
 
 export function getItemNameOrError(unionPkg: IUnionIndexedPackageData): string {
   const pkg = unionPkg as any;
-  if (pkg.Item && 'Name' in pkg.Item) {
+  if (pkg.Item && "Name" in pkg.Item) {
     return (pkg as IIndexedPackageData).Item.Name;
   }
-  if ('ProductName' in pkg) {
+  if ("ProductName" in pkg) {
     return (pkg as IDestinationPackageData).ProductName;
   }
-  throw new Error('Could not extract Item Name');
+  throw new Error("Could not extract Item Name");
 }
 
 export function getItemCategoryOrError(unionPkg: IUnionIndexedPackageData): string {
   const pkg = unionPkg as any;
-  if (pkg.Item && 'ProductCategoryName' in pkg.Item) {
+  if (pkg.Item && "ProductCategoryName" in pkg.Item) {
     return (pkg as IIndexedPackageData).Item.ProductCategoryName;
   }
-  if ('ProductCategoryName' in pkg) {
+  if ("ProductCategoryName" in pkg) {
     return (pkg as IDestinationPackageData).ProductCategoryName;
   }
-  throw new Error('Could not extract Item Category');
+  throw new Error("Could not extract Item Category");
 }
 
 export function getItemStrainOrError(unionPkg: IUnionIndexedPackageData): string {
   const pkg = unionPkg as any;
-  if (pkg.Item && 'StrainName' in pkg.Item) {
-    return (pkg as IIndexedPackageData).Item.StrainName ?? '';
+  if (pkg.Item && "StrainName" in pkg.Item) {
+    return (pkg as IIndexedPackageData).Item.StrainName ?? "";
   }
-  if ('ItemStrainName' in pkg) {
-    return (pkg as IDestinationPackageData).ItemStrainName ?? '';
+  if ("ItemStrainName" in pkg) {
+    return (pkg as IDestinationPackageData).ItemStrainName ?? "";
   }
-  throw new Error('Could not extract Item Strain');
+  throw new Error("Could not extract Item Strain");
 }
 
 export function getLabTestingStateOrError(unionPkg: IUnionIndexedPackageData): string {
   const pkg = unionPkg as any;
-  if ('LabTestingStateName' in pkg) {
+  if ("LabTestingStateName" in pkg) {
     return (pkg as IIndexedPackageData).LabTestingStateName;
   }
-  if ('LabTestingStateName' in pkg) {
+  if ("LabTestingStateName" in pkg) {
     return (pkg as IDestinationPackageData).LabTestingStateName;
   }
-  throw new Error('Could not extract Lab Testing State');
+  throw new Error("Could not extract Lab Testing State");
 }
 
 export function getGrossWeightOrError(unionPkg: IUnionIndexedPackageData): number | null {
   const pkg = unionPkg as any;
-  if ('Item' in pkg) {
+  if ("Item" in pkg) {
     return null;
   }
-  if ('GrossWeight' in pkg) {
+  if ("GrossWeight" in pkg) {
     return (pkg as IDestinationPackageData).GrossWeight;
   }
-  throw new Error('Could not extract Gross Weight');
+  throw new Error("Could not extract Gross Weight");
 }
 
 export function getWholesalePriceOrError(unionPkg: IUnionIndexedPackageData): number | null {
   const pkg = unionPkg as any;
-  if ('Item' in pkg) {
+  if ("Item" in pkg) {
     return null;
   }
-  if ('ShipperWholesalePrice' in pkg) {
+  if ("ShipperWholesalePrice" in pkg) {
     return (pkg as IDestinationPackageData).ShipperWholesalePrice;
   }
-  throw new Error('Could not extract Wholesale Price');
+  throw new Error("Could not extract Wholesale Price");
+}
+
+export function getProductionBatchNumberOrError(unionPkg: IUnionIndexedPackageData): string | null {
+  const pkg = unionPkg as any;
+  if ("Item" in pkg) {
+    return (pkg as IIndexedPackageData).ProductionBatchNumber;
+  }
+
+  if ("ProductName" in pkg) {
+    return (pkg as IDestinationPackageData).ProductionBatchNumber;
+  }
+
+  throw new Error("Could not extract ProductionBatchNumber");
+}
+
+export function getPackagedByFacilityLicenseNumberOrError(
+  unionPkg: IUnionIndexedPackageData
+): string | null {
+  const pkg = unionPkg as any;
+  if ("Item" in pkg) {
+    return (pkg as IIndexedPackageData).PackagedByFacilityLicenseNumber;
+  }
+
+  if ("ProductName" in pkg) {
+    null;
+  }
+
+  throw new Error("Could not extract PackagedByFacilityLicenseNumber");
+}
+
+export function getReceivedFromFacilityLicenseNumberOrError(
+  unionPkg: IUnionIndexedPackageData
+): string | null {
+  const pkg = unionPkg as any;
+  if ("Item" in pkg) {
+    return (pkg as IIndexedPackageData).ReceivedFromFacilityLicenseNumber;
+  }
+
+  if ("ProductName" in pkg) {
+    null;
+  }
+
+  throw new Error("Could not extract ReceivedFromFacilityLicenseNumber");
 }
 
 export function getItemUnitQuantityAndUnitOrError(unionPkg: IUnionIndexedPackageData): {
@@ -166,29 +210,29 @@ export function getItemUnitQuantityAndUnitOrError(unionPkg: IUnionIndexedPackage
   unitOfMeasureAbbreviation: string;
 } {
   const pkg = unionPkg as any;
-  if (pkg.Item && 'UnitWeight' in pkg.Item && 'UnitWeightUnitOfMeasureAbbreviation' in pkg.Item) {
+  if (pkg.Item && "UnitWeight" in pkg.Item && "UnitWeightUnitOfMeasureAbbreviation" in pkg.Item) {
     return {
       quantity: (pkg as IIndexedPackageData).Item.UnitWeight!,
       unitOfMeasureAbbreviation: (pkg as IIndexedPackageData).Item
         .UnitWeightUnitOfMeasureAbbreviation!,
     };
   }
-  if ('ItemUnitWeight' in pkg && 'ItemUnitWeightUnitOfMeasureAbbreviation' in pkg) {
+  if ("ItemUnitWeight" in pkg && "ItemUnitWeightUnitOfMeasureAbbreviation" in pkg) {
     return {
       quantity: (pkg as IDestinationPackageData).ItemUnitWeight!,
       unitOfMeasureAbbreviation: (pkg as IDestinationPackageData)
         .ItemUnitWeightUnitOfMeasureAbbreviation!,
     };
   }
-  throw new Error('Could not extract Item Quantity');
+  throw new Error("Could not extract Item Quantity");
 }
 
 export function getDelimiterSeparatedValuesOrError(
   joinedValues: string,
-  options?: { delimiter?: string; regex?: RegExp },
+  options?: { delimiter?: string; regex?: RegExp }
 ): string[] {
   const { delimiter, regex } = {
-    delimiter: ',',
+    delimiter: ",",
     ...options,
   };
 
@@ -214,7 +258,7 @@ export function getQuantityAndUnitDescription(pkg: IUnionIndexedPackageData): st
 
 export function getNormalizedPackageContentsDescription(pkg: IUnionIndexedPackageData): string {
   return `${getQuantityOrError(pkg)} ${getUnitOfMeasureAbbreviationOrError(
-    pkg,
+    pkg
   )} ${getItemNameOrError(pkg)}`;
 }
 
@@ -236,51 +280,50 @@ export async function getSourcePackageTags(target: IUnionIndexedPackageData): Pr
 }
 
 export function getUnitOfMeasureAbbreviationOrError(
-  unionPkg: IUnionIndexedPackageData,
+  unionPkg: IUnionIndexedPackageData
 ): UnitOfMeasureAbbreviation {
   return unitOfMeasureNameToAbbreviation(getUnitOfMeasureNameOrError(unionPkg));
 }
 
 export function getItemUnitOfMeasureAbbreviationOrError(
-  unionPkg: IUnionIndexedPackageData,
+  unionPkg: IUnionIndexedPackageData
 ): UnitOfMeasureAbbreviation {
   return unitOfMeasureNameToAbbreviation(getItemUnitOfMeasureNameOrError(unionPkg));
 }
 
-export function getUnitOfMeasureNameOrError(
-  unionPkg: IUnionIndexedPackageData,
-): UnitOfMeasureName {
+export function getUnitOfMeasureNameOrError(unionPkg: IUnionIndexedPackageData): UnitOfMeasureName {
   const pkg = unionPkg as any;
-  if ('UnitOfMeasureAbbreviation' in pkg) {
+  if ("UnitOfMeasureAbbreviation" in pkg) {
     return unitOfMeasureAbbreviationToName((pkg as IIndexedPackageData).UnitOfMeasureAbbreviation);
   }
-  if ('ShippedUnitOfMeasureAbbreviation' in pkg) {
+  if ("ShippedUnitOfMeasureAbbreviation" in pkg) {
     return unitOfMeasureAbbreviationToName(
-      (pkg as IDestinationPackageData).ShippedUnitOfMeasureAbbreviation as UnitOfMeasureAbbreviation,
+      (pkg as IDestinationPackageData).ShippedUnitOfMeasureAbbreviation as UnitOfMeasureAbbreviation
     );
   }
-  throw new Error('Could not extract UnitOfMeasureName');
+  throw new Error("Could not extract UnitOfMeasureName");
 }
 
 export function getItemUnitOfMeasureNameOrError(
-  unionPkg: IUnionIndexedPackageData,
+  unionPkg: IUnionIndexedPackageData
 ): UnitOfMeasureName {
   const pkg = unionPkg as any;
-  if (pkg.Item && 'UnitOfMeasureName' in pkg.Item) {
+  if (pkg.Item && "UnitOfMeasureName" in pkg.Item) {
     return (pkg as IIndexedPackageData).Item.UnitOfMeasureName as UnitOfMeasureName;
   }
-  if ('ItemUnitQuantityUnitOfMeasureAbbreviation' in pkg) {
+  if ("ItemUnitQuantityUnitOfMeasureAbbreviation" in pkg) {
     return unitOfMeasureAbbreviationToName(
-      (pkg as IDestinationPackageData).ItemUnitQuantityUnitOfMeasureAbbreviation as UnitOfMeasureAbbreviation,
+      (pkg as IDestinationPackageData)
+        .ItemUnitQuantityUnitOfMeasureAbbreviation as UnitOfMeasureAbbreviation
     );
   }
-  throw new Error('Could not extract Item UnitOfMeasureName');
+  throw new Error("Could not extract Item UnitOfMeasureName");
 }
 
 // Extremely long lists will be truncated with an ellipsis
 export async function getParentPackageLabelsDeprecated(pkg: ISimpleCogsPackageData) {
-  if (!pkg.SourcePackageLabels.endsWith('...')) {
-    return pkg.SourcePackageLabels.split(',').map((x) => x.trim());
+  if (!pkg.SourcePackageLabels.endsWith("...")) {
+    return pkg.SourcePackageLabels.split(",").map((x) => x.trim());
   }
   // Source package labels may have been truncated
   if (pkg.parentPackageLabels) {
@@ -288,24 +331,26 @@ export async function getParentPackageLabelsDeprecated(pkg: ISimpleCogsPackageDa
   }
   console.warn(`${pkg.Label} falling back to parent label history fetch`);
   const history = await getDataLoaderByLicense(pkg.LicenseNumber).then((dataLoader) =>
-    dataLoader.packageHistoryByPackageId(pkg.Id));
+    dataLoader.packageHistoryByPackageId(pkg.Id)
+  );
 
   return extractParentPackageLabelsFromHistory(history);
 }
 
 export async function getParentPackageLabels(pkg: ISimpleTransferPackageData | ISimplePackageData) {
-  const stringParsedPackageLabels = pkg.SourcePackageLabels.split(',')
+  const stringParsedPackageLabels = pkg.SourcePackageLabels.split(",")
     .map((x) => x.trim())
     .filter((label) => label.match(METRC_TAG_REGEX));
 
-  if (pkg.SourcePackageLabels.endsWith('...')) {
+  if (pkg.SourcePackageLabels.endsWith("...")) {
     // Source package labels may have been truncated
     if (pkg.parentPackageLabels) {
       return pkg.parentPackageLabels;
     }
     if (pkg.PackageState !== PackageState.DEPARTED_FACILITY) {
       const history = await getDataLoaderByLicense(pkg.LicenseNumber).then((dataLoader) =>
-        dataLoader.packageHistoryByPackageId(pkg.Id));
+        dataLoader.packageHistoryByPackageId(pkg.Id)
+      );
 
       const historyParsedLabels = extractParentPackageLabelsFromHistory(history);
 
@@ -320,13 +365,17 @@ export async function getParentPackageLabels(pkg: ISimpleTransferPackageData | I
 
 export async function getLabTestResultsFromPackage({
   pkg,
-}: {pkg:IUnionIndexedPackageData}): Promise<ITestResultData[]> {
+}: {
+  pkg: IUnionIndexedPackageData;
+}): Promise<ITestResultData[]> {
   return primaryDataLoader.testResultsByPackageId(getIdOrError(pkg));
 }
 
 export async function getLabTestFileIdsFromPackage({
   pkg,
-}: {pkg:IUnionIndexedPackageData}): Promise<number[]> {
+}: {
+  pkg: IUnionIndexedPackageData;
+}): Promise<number[]> {
   const testResults = await getLabTestResultsFromPackage({ pkg });
 
   const fileIds = new Set<number>();
@@ -340,7 +389,11 @@ export async function getLabTestFileIdsFromPackage({
   return [...fileIds];
 }
 
-export async function generatePackageMetadata({ pkg }: {pkg: IUnionIndexedPackageData}): Promise<PackageMetadata> {
+export async function generatePackageMetadata({
+  pkg,
+}: {
+  pkg: IUnionIndexedPackageData;
+}): Promise<PackageMetadata> {
   const authState = await authManager.authStateOrError();
 
   const packageMetadata: PackageMetadata = {
@@ -364,7 +417,11 @@ export async function generatePackageMetadata({ pkg }: {pkg: IUnionIndexedPackag
 
   packageMetadata.testResultPdfUrls = [...fileIds].map(
     (fileId) =>
-      `${window.location.origin}/filesystem/${authState.license}/download/labtest/result/document?packageId=${getIdOrError(pkg)}&labTestResultDocumentFileId=${fileId}`,
+      `${window.location.origin}/filesystem/${
+        authState.license
+      }/download/labtest/result/document?packageId=${getIdOrError(
+        pkg
+      )}&labTestResultDocumentFileId=${fileId}`
   );
 
   return packageMetadata;
@@ -383,12 +440,12 @@ export async function getLabTestPdfUrlsFromPackage({
 
   if (fileIds.length === 0 && showZeroResultsError) {
     setTimeout(() => {
-      toastManager.openToast('Metrc did not return any lab PDFs for this package.', {
-        title: 'Missing Lab Results',
+      toastManager.openToast("Metrc did not return any lab PDFs for this package.", {
+        title: "Missing Lab Results",
         autoHideDelay: 5000,
-        variant: 'danger',
+        variant: "danger",
         appendToast: true,
-        toaster: 'ttt-toaster',
+        toaster: "ttt-toaster",
         solid: true,
       });
     }, 500);
@@ -398,7 +455,11 @@ export async function getLabTestPdfUrlsFromPackage({
 
   return fileIds.map(
     (fileId) =>
-      `${window.location.origin}/filesystem/${authState.license}/download/labtest/result/document?packageId=${getIdOrError(pkg)}&labTestResultDocumentFileId=${fileId}`,
+      `${window.location.origin}/filesystem/${
+        authState.license
+      }/download/labtest/result/document?packageId=${getIdOrError(
+        pkg
+      )}&labTestResultDocumentFileId=${fileId}`
   );
 }
 
@@ -413,19 +474,21 @@ export async function downloadLabTestPdfs({ pkg }: { pkg: IUnionIndexedPackageDa
 export async function downloadLabTestCsv({ pkg }: { pkg: IUnionIndexedPackageData }) {
   const testResultData = await generatePackageMetadata({ pkg });
 
-  const matrix: any[][] = [[
-    'Test Date',
-    'Test Name',
-    'Overall Passed?',
-    'Result',
-    'Notes',
-    'Released Date',
-    'Sample Package',
-    'Item',
-    'Category',
-    'Lab Facility License Number',
-    'Lab Facility Name',
-  ]];
+  const matrix: any[][] = [
+    [
+      "Test Date",
+      "Test Name",
+      "Overall Passed?",
+      "Result",
+      "Notes",
+      "Released Date",
+      "Sample Package",
+      "Item",
+      "Category",
+      "Lab Facility License Number",
+      "Lab Facility Name",
+    ],
+  ];
 
   for (const testResult of testResultData.testResults) {
     matrix.push([
@@ -468,7 +531,7 @@ export function simplePackageConverter(pkg: IIndexedPackageData): ISimplePackage
 export function simpleTransferPackageConverter(
   transfer: IIndexedTransferData,
   destination: IDestinationData,
-  pkg: IIndexedDestinationPackageData,
+  pkg: IIndexedDestinationPackageData
 ): ISimpleTransferPackageData {
   return {
     ETD: destination.EstimatedDepartureDateTime,
@@ -489,13 +552,13 @@ export function simpleTransferPackageConverter(
 }
 
 export function simplePackageNormalizer(
-  pkg: ISimplePackageData | ISimpleTransferPackageData | IMetadataSimplePackageData,
+  pkg: ISimplePackageData | ISimpleTransferPackageData | IMetadataSimplePackageData
 ): IMetadataSimplePackageData {
   return {
-    Type: '',
-    ETD: '',
-    ManifestNumber: '',
-    UnitOfMeasureAbbreviation: '',
+    Type: "",
+    ETD: "",
+    ManifestNumber: "",
+    UnitOfMeasureAbbreviation: "",
     Quantity: null,
     fractionalCostMultiplierPairs: undefined,
     ...pkg,
