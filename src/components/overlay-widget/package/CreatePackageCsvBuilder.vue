@@ -243,9 +243,10 @@
 </template>
 
 <script lang="ts">
-import { MessageType } from "@/consts";
-import { IPluginState } from "@/interfaces";
+import { BuilderType, MessageType } from "@/consts";
+import { IMetrcCreatePackagesFromPackagesPayload, IPluginState } from "@/interfaces";
 import { analyticsManager } from "@/modules/analytics-manager.module";
+import { builderManager } from "@/modules/builder-manager.module";
 import router from "@/router/index";
 import store from "@/store/page-overlay/index";
 import {
@@ -256,6 +257,8 @@ import {
   PackageCsvStatus,
 } from "@/store/page-overlay/modules/create-package-csv/consts";
 import { cellColumnFromIndex } from "@/utils/csv";
+import { submitDateFromIsodate } from "@/utils/date";
+import _ from "lodash-es";
 import Vue from "vue";
 import { mapActions, mapGetters, mapState } from "vuex";
 import CanonicalPackageCard from "../shared/CanonicalPackageCard.vue";
@@ -311,7 +314,53 @@ export default Vue.extend({
 
       this.$router.push(path);
     },
-    submit() {},
+    submit() {
+      const rows: IMetrcCreatePackagesFromPackagesPayload[] =
+        store.state.createPackageCsv.rowGroups.map((rowGroup) => {
+          const parsedData = rowGroup.parsedData!;
+
+          const row: IMetrcCreatePackagesFromPackagesPayload = {
+            ActualDate: submitDateFromIsodate(parsedData.ActualDate!),
+            Ingredients: parsedData.Ingredients!.map((ingredient) => ({
+              FinishDate: "", // Default to do not finish
+              PackageId: ingredient.pkg!.Id.toString(),
+              Quantity: ingredient.Quantity!.toString(),
+              UnitOfMeasureId: ingredient.UnitOfMeasure!.Id.toString(),
+            })),
+            ItemId: parsedData.Item!.Id.toString(),
+            Note: parsedData.Note!,
+            Quantity: parsedData.Quantity!.toString(),
+            TagId: parsedData.Tag!.Id.toString(),
+            UnitOfMeasureId: parsedData.Item!.UnitOfMeasureId.toString(),
+            RemediationDate: "",
+            RemediationMethodId: "0", // await defaultRemediatePackageMethod(),
+            RemediationSteps: "",
+            UseByDate: "",
+            SellByDate: "",
+            ExpirationDate: parsedData.ExpirationDate
+              ? submitDateFromIsodate(parsedData.ExpirationDate!)
+              : "",
+            ProductionBatchNumber: parsedData.ProductionBatchNumber!,
+            ...(parsedData.IsDonation ? { IsDonation: "true" } : {}),
+            ...(parsedData.IsTradeSample ? { IsTradeSample: "true" } : {}),
+            LocationId: parsedData.Location!.Id.toString(),
+            // UseSameItem: "false", // default to false and just provide the item id anyway
+          };
+
+          return row;
+        });
+
+      builderManager.submitProject(
+        // This is probably redundant
+        _.cloneDeep(rows),
+        BuilderType.CSV_CREATE_PACKAGE,
+        {
+          packageTotal: store.state.createPackageCsv.rowGroups.length,
+        },
+        [],
+        1 // This is to address Metrc package allocation bug https://track-trace-tools.talkyard.net/-65/unpack-immature-packages
+      );
+    },
   },
   async created() {},
   async mounted() {},

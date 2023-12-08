@@ -17,6 +17,7 @@ import {
 } from "@/utils/csv";
 import { todayIsodate } from "@/utils/date";
 import { readCsvFile } from "@/utils/file";
+import { fuzzyTrueFalseOrNull } from "@/utils/misc";
 import { fuzzyUnitOrError, fuzzyUnitOrNull, fuzzyUnitsMatch } from "@/utils/units";
 import { ActionContext } from "vuex";
 import {
@@ -882,6 +883,108 @@ export const createPackageCsvModule = {
           });
         }
 
+        // SET DEFAULT
+        // IsDonation
+        for (const dataRow of rowGroup.dataRows) {
+          const key = CreatePackageCsvColumns.IS_DONATION;
+
+          // Don't override an existing date
+          if (dataRow[key]) {
+            continue;
+          }
+
+          dataRow[key] = "false";
+        }
+
+        // CHECK AND NORMALIZE
+        // Valid
+        for (const dataRow of rowGroup.dataRows) {
+          const key = CreatePackageCsvColumns.IS_DONATION;
+
+          const fuzzyBoolean = fuzzyTrueFalseOrNull(dataRow[key]);
+
+          if (fuzzyBoolean === null) {
+            const columnIndex = COLUMNS.indexOf(key);
+
+            mergeOrAddRowGroupMessage(rowGroup.errors, {
+              text: `${key} value "${dataRow[key]}" for ${rowGroup.destinationLabel} is invalid`,
+              cellCoordinates: [
+                {
+                  rowIndex: dataRow.RealIndex,
+                  columnIndex,
+                },
+              ],
+            });
+          } else {
+            dataRow[key] = fuzzyBoolean.toString();
+          }
+        }
+
+        // CHECK
+        // All IsDonation values match
+        const sharedIsDonationOrNull: string | null =
+          checkAllValuesMatchAndAreNonEmptyAndReturnSharedValueOrNull(
+            rowGroup,
+            CreatePackageCsvColumns.IS_DONATION
+          );
+
+        // ASSIGN PARSED VALUE
+        const IsDonation: boolean | null =
+          sharedIsDonationOrNull === null
+            ? sharedIsDonationOrNull
+            : sharedIsDonationOrNull === "true";
+
+        // SET DEFAULT
+        // IsTradeSample
+        for (const dataRow of rowGroup.dataRows) {
+          const key = CreatePackageCsvColumns.IS_TRADE_SAMPLE;
+
+          // Don't override an existing date
+          if (dataRow[key]) {
+            continue;
+          }
+
+          dataRow[key] = "false";
+        }
+
+        // CHECK AND NORMALIZE
+        // Valid
+        for (const dataRow of rowGroup.dataRows) {
+          const key = CreatePackageCsvColumns.IS_TRADE_SAMPLE;
+
+          const fuzzyBoolean = fuzzyTrueFalseOrNull(dataRow[key]);
+
+          if (fuzzyBoolean === null) {
+            const columnIndex = COLUMNS.indexOf(key);
+
+            mergeOrAddRowGroupMessage(rowGroup.errors, {
+              text: `${key} value "${dataRow[key]}" for ${rowGroup.destinationLabel} is invalid`,
+              cellCoordinates: [
+                {
+                  rowIndex: dataRow.RealIndex,
+                  columnIndex,
+                },
+              ],
+            });
+          } else {
+            dataRow[key] = fuzzyBoolean.toString();
+          }
+        }
+
+        // CHECK
+        // All IsTradeSample values match
+        const sharedIsTradeSampleOrNull: string | null =
+          checkAllValuesMatchAndAreNonEmptyAndReturnSharedValueOrNull(
+            rowGroup,
+            CreatePackageCsvColumns.IS_TRADE_SAMPLE
+          );
+
+        // ASSIGN PARSED VALUE
+        const IsTradeSample: boolean | null =
+          sharedIsTradeSampleOrNull === null
+            ? sharedIsTradeSampleOrNull
+            : sharedIsTradeSampleOrNull === "true";
+
         // Merge Parsed
         rowGroup.parsedData = {
           ActualDate,
@@ -894,7 +997,8 @@ export const createPackageCsvModule = {
           Tag,
           UnitOfMeasure,
           UseSameItem: false,
-          IsDonation: false,
+          IsDonation,
+          IsTradeSample,
           ExpirationDate,
         };
 

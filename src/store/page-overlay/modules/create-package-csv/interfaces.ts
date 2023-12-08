@@ -25,6 +25,7 @@ export interface IParsedRowGroupData {
   UnitOfMeasure: IUnitOfMeasure | null; // Defaults to item
   UseSameItem: boolean | null;
   IsDonation: boolean | null;
+  IsTradeSample: boolean | null;
   ExpirationDate: string | null;
 }
 
