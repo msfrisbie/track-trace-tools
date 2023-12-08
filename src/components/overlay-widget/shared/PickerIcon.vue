@@ -2,7 +2,7 @@
   <div class="flex flex-col items-center justify-center space-y-1">
     <font-awesome-icon :icon="icon" size="2x" style="color: #49276a" class="opacity-60" />
 
-    <span v-bind:class="mergedTextClass">{{ text }}</span>
+    <span class="whitespace-nowrap" v-bind:class="mergedTextClass">{{ text }}</span>
   </div>
 </template>
 

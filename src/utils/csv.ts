@@ -181,3 +181,27 @@ export function convertMatrixIntoKeyValRows<T>({
 
   return keyvalRows;
 }
+
+export function cellColumnFromIndex(columnIndex: number): string {
+  let columnIdentifier = "";
+  while (columnIndex >= 0) {
+    const remainder = columnIndex % 26;
+    columnIdentifier = String.fromCharCode(65 + remainder) + columnIdentifier;
+    columnIndex = Math.floor(columnIndex / 26) - 1;
+  }
+  return columnIdentifier;
+}
+
+export function cellIdentifierFromCoordinates({
+  rowIndex,
+  columnIndex,
+}: {
+  rowIndex: number;
+  columnIndex: number;
+}): string {
+  const columnIdentifier = cellColumnFromIndex(columnIndex);
+
+  // Combine the Excel column letter(s) with the row number
+  // Add in offset since Excel starts with row 1
+  return `${columnIdentifier}${rowIndex + 1}`;
+}

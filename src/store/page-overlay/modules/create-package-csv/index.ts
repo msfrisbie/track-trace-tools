@@ -124,13 +124,33 @@ export const createPackageCsvModule = {
     },
   },
   getters: {
-    [CreatePackageCsvGetters.CREATE_PACKAGE_CSV_GETTER]: (
+    [CreatePackageCsvGetters.ELIGIBLE_FOR_SUBMIT]: (
       state: ICreatePackageCsvState,
       getters: any,
       rootState: any,
       rootGetters: any
     ) => {
-      // return state.data
+      let errorCount = 0;
+
+      for (const rowGroup of state.rowGroups) {
+        errorCount += rowGroup.errors.length;
+      }
+
+      return errorCount === 0;
+    },
+    [CreatePackageCsvGetters.TOTAL_ERROR_COUNT]: (
+      state: ICreatePackageCsvState,
+      getters: any,
+      rootState: any,
+      rootGetters: any
+    ) => {
+      let errorCount = 0;
+
+      for (const rowGroup of state.rowGroups) {
+        errorCount += rowGroup.errors.length;
+      }
+
+      return errorCount;
     },
   },
   actions: {
@@ -154,7 +174,10 @@ export const createPackageCsvModule = {
       ctx.state.status = PackageCsvStatus.INFLIGHT;
 
       try {
-        ctx.state.csvData = await readCsvFile(data.file);
+        // Auto-strip empty rows
+        ctx.state.csvData = (await readCsvFile(data.file)).filter((x) =>
+          x.find((y) => y.length > 0)
+        );
       } catch (e) {
         ctx.state.status = PackageCsvStatus.ERROR;
         ctx.state.statusMessage = `Failed to load CSV data: ${(e as Error).toString()}`;
@@ -325,27 +348,6 @@ export const createPackageCsvModule = {
               cellCoordinates: [{ rowIndex: dataRow.RealIndex, columnIndex }],
             });
           }
-        }
-
-        const Ingredients: {
-          pkg: IIndexedPackageData | null;
-          Quantity: number | null;
-          UnitOfMeasure: IUnitOfMeasure | null;
-        }[] = [];
-
-        for (const dataRow of rowGroup.dataRows) {
-          const pkg = packageMap.get(dataRow[CreatePackageCsvColumns.SOURCE_PACKAGE_TAG]) ?? null;
-          const Quantity =
-            parseFloat(dataRow[CreatePackageCsvColumns.SOURCE_PACKAGE_QUANTITY_USED]) ?? null;
-          const UnitOfMeasure = await fuzzyUnitOrNull(
-            dataRow[CreatePackageCsvColumns.SOURCE_PACKAGE_QUANTITY_UNIT_OF_MEASURE]
-          );
-
-          Ingredients.push({
-            pkg,
-            Quantity,
-            UnitOfMeasure,
-          });
         }
 
         // CHECK
@@ -856,6 +858,29 @@ export const createPackageCsvModule = {
 
         // ASSIGN PARSED VALUE
         const ProductionBatchNumber: string | null = sharedProductionBatchOrNull;
+
+        // ASSIGN PARSED VALUE
+        // This must occur after other defauls are set
+        const Ingredients: {
+          pkg: IIndexedPackageData | null;
+          Quantity: number | null;
+          UnitOfMeasure: IUnitOfMeasure | null;
+        }[] = [];
+
+        for (const dataRow of rowGroup.dataRows) {
+          const pkg = packageMap.get(dataRow[CreatePackageCsvColumns.SOURCE_PACKAGE_TAG]) ?? null;
+          const Quantity =
+            parseFloat(dataRow[CreatePackageCsvColumns.SOURCE_PACKAGE_QUANTITY_USED]) ?? null;
+          const UnitOfMeasure = await fuzzyUnitOrNull(
+            dataRow[CreatePackageCsvColumns.SOURCE_PACKAGE_QUANTITY_UNIT_OF_MEASURE]
+          );
+
+          Ingredients.push({
+            pkg,
+            Quantity,
+            UnitOfMeasure,
+          });
+        }
 
         // Merge Parsed
         rowGroup.parsedData = {

@@ -20,7 +20,8 @@ export enum CreatePackageCsvMutations {
 }
 
 export enum CreatePackageCsvGetters {
-  CREATE_PACKAGE_CSV_GETTER = "CREATE_PACKAGE_CSV_GETTER",
+  ELIGIBLE_FOR_SUBMIT = "ELIGIBLE_FOR_SUBMIT",
+  TOTAL_ERROR_COUNT = "TOTAL_ERROR_COUNT",
 }
 
 export enum CreatePackageCsvActions {

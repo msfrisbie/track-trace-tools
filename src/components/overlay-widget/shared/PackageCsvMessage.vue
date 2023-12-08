@@ -16,6 +16,7 @@ import { IPluginState } from "@/interfaces";
 import router from "@/router/index";
 import store from "@/store/page-overlay/index";
 import { IRowGroupMessage } from "@/store/page-overlay/modules/create-package-csv/interfaces";
+import { cellIdentifierFromCoordinates } from "@/utils/csv";
 import Vue from "vue";
 import { mapState } from "vuex";
 
@@ -38,19 +39,9 @@ export default Vue.extend({
     unpackedMsg(): IExtendedRowGroupMessage {
       return {
         ...this.msg,
-        readableCellCoordinates: this.msg.cellCoordinates.map(({ rowIndex, columnIndex }) => {
-          let excelCell = "";
-          // Convert column index to Excel column letter(s)
-          while (columnIndex > 0) {
-            let remainder = (columnIndex - 1) % 26; // 0-based index
-            excelCell = String.fromCharCode(65 + remainder) + excelCell;
-            columnIndex = Math.floor((columnIndex - 1) / 26);
-          }
-          // Combine the Excel column letter(s) with the row number
-          // Add in offset since excel starts with row 1
-          excelCell += rowIndex + 1;
-          return excelCell;
-        }),
+        readableCellCoordinates: this.msg.cellCoordinates.map(({ rowIndex, columnIndex }) =>
+          cellIdentifierFromCoordinates({ rowIndex, columnIndex })
+        ),
       };
     },
   },

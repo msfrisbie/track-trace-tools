@@ -1,4 +1,4 @@
-import { convertMatrixIntoKeyValRows } from "./csv";
+import { cellIdentifierFromCoordinates, convertMatrixIntoKeyValRows } from "./csv";
 
 describe("csv.ts", () => {
   it("Correctly converts a matrix into keyval rows", () => {
@@ -24,5 +24,16 @@ describe("csv.ts", () => {
         baz: "6",
       },
     ]);
+  });
+
+  it("Correctly converts csv coordinates into a readable cell", () => {
+    expect(cellIdentifierFromCoordinates({ rowIndex: 0, columnIndex: 0 })).toEqual("A1");
+    expect(cellIdentifierFromCoordinates({ rowIndex: 1, columnIndex: 0 })).toEqual("A2");
+    expect(cellIdentifierFromCoordinates({ rowIndex: 0, columnIndex: 1 })).toEqual("B1");
+    expect(cellIdentifierFromCoordinates({ rowIndex: 1, columnIndex: 1 })).toEqual("B2");
+    expect(cellIdentifierFromCoordinates({ rowIndex: 2, columnIndex: 2 })).toEqual("C3");
+    expect(cellIdentifierFromCoordinates({ rowIndex: 27, columnIndex: 0 })).toEqual("A28");
+    expect(cellIdentifierFromCoordinates({ rowIndex: 0, columnIndex: 27 })).toEqual("AB1");
+    expect(cellIdentifierFromCoordinates({ rowIndex: 27, columnIndex: 27 })).toEqual("AB28");
   });
 });

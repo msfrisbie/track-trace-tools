@@ -32,26 +32,54 @@
     </template>
     <template v-else>
       <div class="flex flex-col gap-8">
-        <div class="flex row-col items-center gap-4">
-          <b-button
-            v-if="createPackageCsvState.status !== PackageCsvStatus.INITIAL"
-            @click="reset()"
-            variant="outline-primary"
-            >RESET</b-button
-          >
+        <div class="flex flex-row items-center gap-4 justify-between">
+          <div class="flex flex-row items-center gap-4">
+            <template v-if="createPackageCsvState.status === PackageCsvStatus.INFLIGHT">
+              <div class="flex flex-row gap-2 items-center text-base text-gray-500">
+                <b-spinner small></b-spinner>
+                <div>{{ createPackageCsvState.statusMessage }}</div>
+              </div>
+            </template>
 
-          <template v-if="createPackageCsvState.status === PackageCsvStatus.INFLIGHT">
-            <div class="flex flex-row gap-2 items-center text-lg">
-              <b-spinner small></b-spinner>
-              <div>{{ createPackageCsvState.statusMessage }}</div>
-            </div>
-          </template>
+            <template v-if="createPackageCsvState.status === PackageCsvStatus.ERROR">
+              <div class="flex flex-row gap-2 items-center text-lg text-red-500">
+                {{ createPackageCsvState.statusMessage }}
+              </div>
+            </template>
 
-          <template v-if="createPackageCsvState.status === PackageCsvStatus.ERROR">
-            <div class="flex flex-row gap-2 items-center text-lg text-red-500">
-              {{ createPackageCsvState.statusMessage }}
-            </div>
-          </template>
+            <template v-if="createPackageCsvState.status === PackageCsvStatus.PARSED">
+              <div class="flex flex-row gap-2 items-center text-lg ttt-purple">
+                Loaded {{ createPackageCsvState.csvData.length - 1 }} CSV rows.
+              </div>
+
+              <div
+                class="flex flex-row gap-2 items-center text-lg text-red-500"
+                v-if="totalErrorCount > 0"
+              >
+                {{ totalErrorCount }} error{{ totalErrorCount === 1 ? "" : "s" }} must be fixed
+                before submitting.
+              </div>
+            </template>
+          </div>
+
+          <div class="flex flex-row items-center gap-4">
+            <b-button
+              v-if="createPackageCsvState.status !== PackageCsvStatus.INITIAL"
+              @click="reset()"
+              variant="outline-primary"
+              >RESET</b-button
+            >
+
+            <b-button
+              v-if="createPackageCsvState.status === PackageCsvStatus.PARSED"
+              :disabled="!eligibleForSubmit"
+              @click="submit()"
+              variant="success"
+              >CREATE {{ createPackageCsvState.rowGroups.length }} PACKAGE{{
+                createPackageCsvState.rowGroups.length === 1 ? "" : "S"
+              }}</b-button
+            >
+          </div>
         </div>
 
         <div>
@@ -59,9 +87,10 @@
             <b-tabs>
               <b-tab title="Summary" active>
                 <template v-if="createPackageCsvState.rowGroups">
+                  <!-- the autoformat line breaks mess up the template compiler, using template str-->
                   <div
                     class="grid grid-cols-4 gap-4 place-items-center my-4"
-                    style="grid-template-columns: 1fr 0fr 1fr minmax(200px, 400px)"
+                    :style="`grid-template-columns: minmax(350px, auto) 50px minmax(300px, auto) minmax(200px, auto);`"
                   >
                     <template v-for="[idx, rowGroup] of createPackageCsvState.rowGroups.entries()">
                       <fragment v-bind:key="rowGroup.destinationLabel">
@@ -74,9 +103,16 @@
                               <canonical-package-card
                                 :pkg="ingredient.pkg"
                               ></canonical-package-card>
-                              <div class="w-16 flex flex-col items-center justify-center">
+
+                              <div
+                                class="flex flex-col items-center justify-center p-4 border border-1 rounded-lg text-base font-bold whitespace-nowrap"
+                              >
                                 {{ ingredient.Quantity }}
-                                {{ ingredient.UnitOfMeasure ? ingredient.UnitOfMeasure : null }}
+                                {{
+                                  ingredient.UnitOfMeasure
+                                    ? ingredient.UnitOfMeasure.Abbreviation
+                                    : null
+                                }}
                               </div>
                             </fragment>
                           </template>
@@ -117,29 +153,37 @@
                             v-bind:key="'message' + idx"
                           ></package-csv-message>
                         </div>
+
+                        <div class="col-span-4 border border-1 w-full h-px"></div>
                       </fragment>
                     </template>
                   </div>
                 </template>
               </b-tab>
 
-              <b-tab title="Data Table">
+              <b-tab title="Smart CSV Data">
                 <template v-if="createPackageCsvState.rowGroups">
                   <b-table-simple class="my-4">
                     <b-tr>
-                      <b-th v-for="column of CREATE_PACKAGE_CSV_COLUMNS" v-bind:key="column.value">
+                      <b-th
+                        v-for="column of CREATE_PACKAGE_CSV_COLUMNS"
+                        v-bind:key="column.value"
+                        class="whitespace-nowrap border border-1 text-center"
+                      >
                         {{ column.value }}
                       </b-th>
                     </b-tr>
 
-                    <template v-for="rowGroup of createPackageCsvState.rowGroups">
+                    <template v-for="[i, rowGroup] of createPackageCsvState.rowGroups.entries()">
                       <b-tr
-                        v-for="dataRow of rowGroup.dataRows"
+                        v-for="[j, dataRow] of rowGroup.dataRows.entries()"
                         v-bind:key="rowGroup.destinationLabel + dataRow.Index"
+                        v-bind:class="{ 'bg-purple-100': (i + j) % 2 === 0 }"
                       >
                         <b-td
                           v-for="column of CREATE_PACKAGE_CSV_COLUMNS"
                           v-bind:key="dataRow.Index + column.value"
+                          class="whitespace-nowrap border border-1"
                         >
                           {{ dataRow[column.value] }}
                         </b-td>
@@ -149,13 +193,47 @@
                 </template>
               </b-tab>
 
-              <b-tab title="Raw Data">
+              <b-tab title="Raw CSV Data">
+                <template v-if="createPackageCsvState.csvData">
+                  <b-table-simple class="my-4">
+                    <b-tr>
+                      <b-th class="whitespace-nowrap border border-1 text-center">
+                        <!-- empty -->
+                      </b-th>
+                      <b-th
+                        v-for="[i, column] of CREATE_PACKAGE_CSV_COLUMNS.entries()"
+                        v-bind:key="column.value"
+                        class="whitespace-nowrap border border-1 text-center"
+                      >
+                        {{ cellColumnFromIndex(i) }}
+                      </b-th>
+                    </b-tr>
+
+                    <b-tr
+                      v-for="[i, row] of createPackageCsvState.csvData.entries()"
+                      v-bind:key="`${i}row`"
+                      v-bind:class="{ 'bg-purple-100': i % 2 === 0 }"
+                    >
+                      <b-th class="whitespace-nowrap border border-1 text-center">{{ i + 1 }}</b-th>
+                      <b-td
+                        class="whitespace-nowrap border border-1"
+                        v-for="[j, cell] of row.entries()"
+                        v-bind:key="`${i},${j}`"
+                      >
+                        {{ cell }}
+                      </b-td>
+                    </b-tr>
+                  </b-table-simple>
+                </template>
+              </b-tab>
+
+              <!-- <b-tab title="Raw CSV Data">
                 <template v-if="createPackageCsvState.csvData">
                   <pre class="my-4">{{
                     JSON.stringify(createPackageCsvState.csvData, null, 2)
                   }}</pre>
                 </template>
-              </b-tab>
+              </b-tab> -->
             </b-tabs>
           </template>
         </div>
@@ -174,10 +252,12 @@ import {
   CREATE_PACKAGE_CSV_COLUMNS,
   CreatePackageCsvActions,
   CreatePackageCsvColumns,
+  CreatePackageCsvGetters,
   PackageCsvStatus,
 } from "@/store/page-overlay/modules/create-package-csv/consts";
+import { cellColumnFromIndex } from "@/utils/csv";
 import Vue from "vue";
-import { mapActions, mapState } from "vuex";
+import { mapActions, mapGetters, mapState } from "vuex";
 import CanonicalPackageCard from "../shared/CanonicalPackageCard.vue";
 import PackageCsvMessage from "../shared/PackageCsvMessage.vue";
 
@@ -191,6 +271,10 @@ export default Vue.extend({
     ...mapState<IPluginState>({
       authState: (state: IPluginState) => state.pluginAuth.authState,
       createPackageCsvState: (state: IPluginState) => state.createPackageCsv,
+    }),
+    ...mapGetters({
+      eligibleForSubmit: `createPackageCsv/${CreatePackageCsvGetters.ELIGIBLE_FOR_SUBMIT}`,
+      totalErrorCount: `createPackageCsv/${CreatePackageCsvGetters.TOTAL_ERROR_COUNT}`,
     }),
   },
   data() {
@@ -219,7 +303,7 @@ export default Vue.extend({
       reset: `createPackageCsv/${CreatePackageCsvActions.RESET}`,
       generateCsvTemplate: `createPackageCsv/${CreatePackageCsvActions.GENERATE_CSV_TEMPLATE}`,
     }),
-
+    cellColumnFromIndex,
     open(path: string) {
       analyticsManager.track(MessageType.BUILDER_ENGAGEMENT, {
         action: `Navigated to ${path}`,
@@ -227,6 +311,7 @@ export default Vue.extend({
 
       this.$router.push(path);
     },
+    submit() {},
   },
   async created() {},
   async mounted() {},
