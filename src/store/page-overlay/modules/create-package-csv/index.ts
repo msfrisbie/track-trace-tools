@@ -176,13 +176,20 @@ export const createPackageCsvModule = {
 
       try {
         // Auto-strip empty rows
-        ctx.state.csvData = (await readCsvFile(data.file)).filter((x) =>
-          x.find((y) => y.length > 0)
-        );
+        ctx.state.csvData = (await readCsvFile(data.file))
+          .map((row) => {
+            // Ensure each row is filled to proper length
+            for (const [i, column] of CREATE_PACKAGE_CSV_COLUMNS.entries()) {
+              row[i] = row[i] ?? "";
+            }
+
+            return row;
+          })
+          .filter((x) => x.find((y) => y.length > 0));
       } catch (e) {
         ctx.state.status = PackageCsvStatus.ERROR;
         ctx.state.statusMessage = `Failed to load CSV data: ${(e as Error).toString()}`;
-        return;
+        throw e;
       }
 
       try {
@@ -190,6 +197,7 @@ export const createPackageCsvModule = {
       } catch (e) {
         ctx.state.status = PackageCsvStatus.ERROR;
         ctx.state.statusMessage = `Failed to parse CSV data: ${(e as Error).toString()}`;
+        throw e;
       }
     },
     [CreatePackageCsvActions.PARSE_CSV_DATA]: async (
@@ -257,7 +265,7 @@ export const createPackageCsvModule = {
       } catch (e) {
         ctx.state.status = PackageCsvStatus.ERROR;
         ctx.state.statusMessage = `Failed to parse CSV data: ${(e as Error).toString()}`;
-        return;
+        throw e;
       }
 
       // Group rows
@@ -351,8 +359,13 @@ export const createPackageCsvModule = {
           }
         }
 
+        /* eslint-disable-next-line no-warning-comments */
         // TODO CHECK
         // New package tag appears exactly once per row group
+
+        /* eslint-disable-next-line no-warning-comments */
+        // TODO CHECK
+        // Output unit matches output item
 
         // CHECK
         // New package tag matches available package tag
@@ -727,7 +740,7 @@ export const createPackageCsvModule = {
           const key = CreatePackageCsvColumns.NEW_PACKAGE_QUANTITY;
 
           if (Number.isNaN(parseFloat(dataRow[key]))) {
-            mergeOrAddRowGroupMessage(rowGroup.messages, {
+            mergeOrAddRowGroupMessage(rowGroup.errors, {
               text: `Output quantity is invalid: ${dataRow[key]}`,
               cellCoordinates: [
                 {
@@ -767,7 +780,11 @@ export const createPackageCsvModule = {
             continue;
           }
 
-          const sourcePkg = packageMap.get(dataRow[CreatePackageCsvColumns.SOURCE_PACKAGE_TAG])!;
+          const sourcePkg = packageMap.get(dataRow[CreatePackageCsvColumns.SOURCE_PACKAGE_TAG]);
+
+          if (!sourcePkg) {
+            continue;
+          }
 
           const sourcePkgUsedQuantity = aggregateSourcePackageData.get(
             dataRow[CreatePackageCsvColumns.SOURCE_PACKAGE_TAG]
@@ -792,7 +809,7 @@ export const createPackageCsvModule = {
           rowGroup.dataRows
             .map(
               (x) =>
-                packageMap.get(x[CreatePackageCsvColumns.SOURCE_PACKAGE_TAG])!.ExpirationDate ?? ""
+                packageMap.get(x[CreatePackageCsvColumns.SOURCE_PACKAGE_TAG])?.ExpirationDate ?? ""
             )
             .filter((x) => x.length > 0)
             .sort()[rowGroup.dataRows.length - 1] ?? "";

@@ -13,7 +13,7 @@
           <div class="flex flex-col gap-2">
             <label
               v-if="createPackageCsvState.status === PackageCsvStatus.INITIAL"
-              class="btn btn-outline-primary mb-0"
+              class="btn btn-primary mb-0"
             >
               <b-form-file class="hidden" v-model="csvFile" accept=".csv"></b-form-file>
 
@@ -23,7 +23,7 @@
 
           <div class="flex flex-col gap-2">
             <b-button variant="outline-primary" @click="generateCsvTemplate()"
-              >DOWNLOAD TEMPLATE</b-button
+              >DOWNLOAD CSV TEMPLATE</b-button
             >
           </div>
 
@@ -67,11 +67,11 @@
                   CSV data row{{ createPackageCsvState.csvData.length - 1 === 1 ? "" : "s" }}.
                 </div>
 
-                <div class="flex flex-row gap-2 items-center text-lg ttt-purple">
+                <!-- <div class="flex flex-row gap-2 items-center text-lg ttt-purple">
                   Submitting will create
                   <span class="font-bold">{{ createPackageCsvState.rowGroups.length }}</span>
                   new package{{ createPackageCsvState.rowGroups.length === 1 ? "" : "s" }}.
-                </div>
+                </div> -->
 
                 <div
                   class="flex flex-row gap-2 items-center text-lg text-red-500"
@@ -113,7 +113,7 @@
 
         <div>
           <template v-if="createPackageCsvState.status === PackageCsvStatus.PARSED">
-            <b-tabs>
+            <b-tabs pills card>
               <b-tab title="Summary" active>
                 <template v-if="createPackageCsvState.rowGroups">
                   <!-- the autoformat line breaks mess up the template compiler, using template str-->
@@ -132,9 +132,12 @@
                             v-for="[j, ingredient] of rowGroup.parsedData.Ingredients.entries()"
                           >
                             <fragment v-bind:key="j + rowGroup.destinationLabel">
-                              <canonical-package-card
-                                :pkg="ingredient.pkg"
-                              ></canonical-package-card>
+                              <div>
+                                <canonical-package-card
+                                  v-if="ingredient.pkg"
+                                  :pkg="ingredient.pkg"
+                                ></canonical-package-card>
+                              </div>
 
                               <div
                                 class="flex flex-col items-center justify-center p-4 border border-1 rounded-lg text-base font-bold whitespace-nowrap"
@@ -156,10 +159,13 @@
                         </div>
 
                         <!-- output package -->
-                        <canonical-package-card
-                          class="w-full"
-                          :pkg="rowGroup.mockPackage"
-                        ></canonical-package-card>
+                        <div>
+                          <canonical-package-card
+                            class="w-full"
+                            :pkg="rowGroup.mockPackage"
+                            v-if="rowGroup.mockPackage"
+                          ></canonical-package-card>
+                        </div>
 
                         <!-- messages -->
                         <div class="flex flex-col gap-2 place-self-start">
