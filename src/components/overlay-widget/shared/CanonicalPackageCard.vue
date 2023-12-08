@@ -1,10 +1,8 @@
 <template>
-  <div class="rounded-md border border-solid ttt-purple-border overflow-hidden">
-    <div class="flex flex-col items-stretch gap-1 p-2 ttt-purple-bg text-white">
+  <div class="rounded-md border border-solid overflow-hidden">
+    <div class="flex flex-col items-stretch gap-1 p-2">
       <div class="flex flex-row items-center justify-between gap-2">
-        <span>
-          <div>{{ pkg.LicenseNumber }}</div>
-        </span>
+        <span class="text-sm">{{ pkg.LicenseNumber }} </span>
 
         <b-badge :variant="getBadgeVariant(pkg.PackageState)">{{ pkg.PackageState }}</b-badge>
       </div>
@@ -12,9 +10,7 @@
 
     <hr />
 
-    <div
-      class="p-2 flex flex-row items-center justify-start space-x-4 text-sm whitespace-nowrap overflow-x-auto"
-    >
+    <div class="p-2 flex flex-row items-center justify-start space-x-4 text-sm">
       <picker-icon
         icon="box"
         style="width: 5rem"
@@ -24,9 +20,9 @@
       />
 
       <div class="flex flex-col items-start space-y-2">
-        <span class="text-lg text-gray-700">{{ getItemNameOrError(pkg) }}</span>
+        <span class="text-md text-gray-700">{{ getItemNameOrError(pkg) }}</span>
 
-        <dual-color-tag class="text-md" :label="getLabelOrError(pkg)" />
+        <dual-color-tag class="text-sm" :label="getLabelOrError(pkg)" />
       </div>
     </div>
     <template v-if="hasVisibleSecondaryAttributes">
@@ -58,7 +54,6 @@
 
 <script lang="ts">
 import DualColorTag from "@/components/overlay-widget/shared/DualColorTag.vue";
-import PickerCard from "@/components/overlay-widget/shared/PickerCard.vue";
 import PickerIcon from "@/components/overlay-widget/shared/PickerIcon.vue";
 import { PackageState } from "@/consts";
 import { IPluginState, IUnionIndexedPackageData } from "@/interfaces";
@@ -97,7 +92,7 @@ export default Vue.extend({
   },
   components: {
     DualColorTag,
-    PickerCard,
+    // PickerCard,
     PickerIcon,
   },
   computed: {
