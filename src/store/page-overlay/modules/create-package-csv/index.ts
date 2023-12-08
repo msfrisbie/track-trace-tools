@@ -351,6 +351,9 @@ export const createPackageCsvModule = {
           }
         }
 
+        // TODO CHECK
+        // New package tag appears exactly once per row group
+
         // CHECK
         // New package tag matches available package tag
         for (const dataRow of rowGroup.dataRows) {

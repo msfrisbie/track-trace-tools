@@ -1,4 +1,4 @@
-import { BuilderType, MessageType } from '@/consts';
+import { BuilderType, MessageType } from "@/consts";
 import {
   IAtomicService,
   ICsvFile,
@@ -7,6 +7,7 @@ import {
   IMetrcCreatePackagesFromPackagesPayload,
   IMetrcCreatePlantBatchPackagesFromMotherPlantBatchPayload,
   IMetrcCreatePlantBatchPackagesFromMotherPlantPayload,
+  IMetrcCreateTransferPayload,
   IMetrcDestroyPlantsPayload,
   IMetrcFinishPackagesPayload,
   IMetrcHarvestPlantsPayload,
@@ -18,21 +19,21 @@ import {
   IMetrcReplacePlantTagsPayload,
   IMetrcUnpackImmaturePlantsPayload,
   IMetrcUpdateTransferPayload,
-  IMetrcCreateTransferPayload,
-} from '@/interfaces';
-import { primaryMetrcRequestManager } from '@/modules/metrc-request-manager.module';
-import store from '@/store/page-overlay/index';
-import { PromoteImmaturePlantsBuilderActions } from '@/store/page-overlay/modules/promote-immature-plants-builder/consts';
-import { SplitPackageBuilderActions } from '@/store/page-overlay/modules/split-package-builder/consts';
-import { debugLogFactory } from '@/utils/debug';
-import { AxiosResponse } from 'axios';
-import _ from 'lodash-es';
-import { Subject, timer } from 'rxjs';
-import { TransferBuilderActions } from '../store/page-overlay/modules/transfer-builder/consts';
-import { analyticsManager } from './analytics-manager.module';
-import { authManager } from './auth-manager.module';
-import { pageManager } from './page-manager/page-manager.module';
-import { toastManager } from './toast-manager.module';
+} from "@/interfaces";
+import { primaryMetrcRequestManager } from "@/modules/metrc-request-manager.module";
+import store from "@/store/page-overlay/index";
+import { CreatePackageCsvActions } from "@/store/page-overlay/modules/create-package-csv/consts";
+import { PromoteImmaturePlantsBuilderActions } from "@/store/page-overlay/modules/promote-immature-plants-builder/consts";
+import { SplitPackageBuilderActions } from "@/store/page-overlay/modules/split-package-builder/consts";
+import { debugLogFactory } from "@/utils/debug";
+import { AxiosResponse } from "axios";
+import _ from "lodash-es";
+import { Subject, timer } from "rxjs";
+import { TransferBuilderActions } from "../store/page-overlay/modules/transfer-builder/consts";
+import { analyticsManager } from "./analytics-manager.module";
+import { authManager } from "./auth-manager.module";
+import { pageManager } from "./page-manager/page-manager.module";
+import { toastManager } from "./toast-manager.module";
 
 enum BuilderSubmitState {
   IDLE,
@@ -58,7 +59,7 @@ type IEligibleRowType =
   | IMetrcAdjustPackagePayload
   | IMetrcUpdateTransferPayload;
 
-const debugLog = debugLogFactory('builder-manager.module.ts');
+const debugLog = debugLogFactory("builder-manager.module.ts");
 
 export interface IBuilderProject {
   builderType: BuilderType;
@@ -69,7 +70,7 @@ export interface IBuilderProject {
   pageSize: number;
 }
 
-const BUILDER_PROJECT_IDB_KEY = 'builder_project';
+const BUILDER_PROJECT_IDB_KEY = "builder_project";
 
 const DEFAULT_SUBMIT_PAGE_SIZE = 10;
 const SUBMIT_INTERVAL_DELAY_MS = 0;
@@ -103,14 +104,14 @@ class BuilderManager implements IAtomicService {
     this.activeBuilderProjectUpdate.next();
 
     if (
-      store.state.settings?.preventActiveProjectPageLeave
-      && project
-      && (project?.pendingRows.length > 0
-        || project?.inflightRows.length > 0
-        || project?.failedRows.length > 0)
+      store.state.settings?.preventActiveProjectPageLeave &&
+      project &&
+      (project?.pendingRows.length > 0 ||
+        project?.inflightRows.length > 0 ||
+        project?.failedRows.length > 0)
     ) {
       window.onbeforeunload = function () {
-        return '';
+        return "";
       };
     } else {
       window.onbeforeunload = null;
@@ -122,7 +123,7 @@ class BuilderManager implements IAtomicService {
     builderType: BuilderType,
     summary: Object,
     csvFiles: ICsvFile[],
-    pageSize: number = DEFAULT_SUBMIT_PAGE_SIZE,
+    pageSize: number = DEFAULT_SUBMIT_PAGE_SIZE
   ): void {
     // Vue might be passing in Observers, collapse them into regular objects
     this.submitProjectImpl(
@@ -130,7 +131,7 @@ class BuilderManager implements IAtomicService {
       builderType,
       _.cloneDeep(summary),
       _.cloneDeep(csvFiles),
-      pageSize,
+      pageSize
     );
   }
 
@@ -139,10 +140,10 @@ class BuilderManager implements IAtomicService {
     builderType: BuilderType,
     summary: Object,
     csvFiles: ICsvFile[],
-    pageSize: number,
+    pageSize: number
   ) {
     if (this.activeBuilderProject) {
-      throw new Error('Cannot overwrite existing project');
+      throw new Error("Cannot overwrite existing project");
     }
 
     await this.updateProject({
@@ -154,9 +155,9 @@ class BuilderManager implements IAtomicService {
       successRows: [],
     });
 
-    debugLog(async () => ['Updated project', rows]);
+    debugLog(async () => ["Updated project", rows]);
 
-    debugLog(async () => ['Submitting...']);
+    debugLog(async () => ["Submitting..."]);
 
     this.submit();
 
@@ -168,11 +169,11 @@ class BuilderManager implements IAtomicService {
 
   async retryFailedRows() {
     if (!this.activeBuilderProject) {
-      throw new Error('Project missing');
+      throw new Error("Project missing");
     }
 
     this.activeBuilderProject.pendingRows.push(
-      ...this.activeBuilderProject.failedRows.splice(0, this.activeBuilderProject.failedRows.length),
+      ...this.activeBuilderProject.failedRows.splice(0, this.activeBuilderProject.failedRows.length)
     );
     this.updateProject(this.activeBuilderProject);
 
@@ -183,9 +184,9 @@ class BuilderManager implements IAtomicService {
     this.pause();
 
     if (
-      this.activeBuilderProject?.failedRows.length === 0
-      && this.activeBuilderProject?.inflightRows.length === 0
-      && this.activeBuilderProject?.pendingRows.length === 0
+      this.activeBuilderProject?.failedRows.length === 0 &&
+      this.activeBuilderProject?.inflightRows.length === 0 &&
+      this.activeBuilderProject?.pendingRows.length === 0
     ) {
       analyticsManager.track(MessageType.BUILDER_PROJECT_FINISHED);
 
@@ -195,13 +196,16 @@ class BuilderManager implements IAtomicService {
           break;
         case BuilderType.PROMOTE_IMMATURE_PLANTS:
           store.dispatch(
-            `promoteImmaturePlantsBuilder/${PromoteImmaturePlantsBuilderActions.RESET_PROMOTE_IMMATURE_PLANTS_DATA}`,
+            `promoteImmaturePlantsBuilder/${PromoteImmaturePlantsBuilderActions.RESET_PROMOTE_IMMATURE_PLANTS_DATA}`
           );
           break;
         case BuilderType.SPLIT_PACKAGE:
           store.dispatch(
-            `splitPackageBuilder/${SplitPackageBuilderActions.RESET_SPLIT_PACKAGE_DATA}`,
+            `splitPackageBuilder/${SplitPackageBuilderActions.RESET_SPLIT_PACKAGE_DATA}`
           );
+          break;
+        case BuilderType.CSV_CREATE_PACKAGE:
+          store.dispatch(`createPackageCsv/${CreatePackageCsvActions.RESET}`);
           break;
         default:
           break;
@@ -226,12 +230,12 @@ class BuilderManager implements IAtomicService {
     }
 
     if (this.activeBuilderProject?.inflightRows.length > 0) {
-      throw new Error('Project has inflight rows');
+      throw new Error("Project has inflight rows");
     }
 
     this.activeBuilderProject.inflightRows = this.activeBuilderProject.pendingRows.splice(
       0,
-      this.activeBuilderProject.pageSize,
+      this.activeBuilderProject.pageSize
     );
 
     if (this.activeBuilderProject.inflightRows.length === 0) {
@@ -247,7 +251,7 @@ class BuilderManager implements IAtomicService {
     try {
       const response = await this.submitRows(
         this.activeBuilderProject.inflightRows,
-        this.activeBuilderProject.builderType,
+        this.activeBuilderProject.builderType
       );
       success = response.status === 200;
       if (!success) {
@@ -261,16 +265,16 @@ class BuilderManager implements IAtomicService {
           errorMessage = JSON.parse(data).Message ?? data;
         } catch {}
         toastManager.openToast(errorMessage, {
-          title: 'T3 Submit Error',
+          title: "T3 Submit Error",
           autoHideDelay: 30000,
-          variant: 'danger',
+          variant: "danger",
           appendToast: true,
-          toaster: 'ttt-toaster',
+          toaster: "ttt-toaster",
           solid: true,
         });
       }
     } catch (e) {
-      console.error('Builder submit error', e);
+      console.error("Builder submit error", e);
       error = e;
     }
 
@@ -350,6 +354,7 @@ class BuilderManager implements IAtomicService {
         break;
       case BuilderType.MERGE_PACKAGES:
       case BuilderType.SPLIT_PACKAGE:
+      case BuilderType.CSV_CREATE_PACKAGE:
         response = await primaryMetrcRequestManager.createPackages(JSON.stringify(rows));
         break;
       case BuilderType.FINISH_PACKAGES:
@@ -361,12 +366,12 @@ class BuilderManager implements IAtomicService {
         break;
       case BuilderType.CREATE_IMMATURE_PLANT_PACKAGES_FROM_MOTHER_PLANT:
         response = await primaryMetrcRequestManager.immaturePlantPackagesFromMotherPlant(
-          JSON.stringify(rows),
+          JSON.stringify(rows)
         );
         break;
       case BuilderType.CREATE_IMMATURE_PLANT_PACKAGES_FROM_MOTHER_PLANT_BATCH:
         response = await primaryMetrcRequestManager.immaturePlantPackagesFromMotherPlantBatch(
-          JSON.stringify(rows),
+          JSON.stringify(rows)
         );
         break;
       case BuilderType.CREATE_TRANSFER:
@@ -389,7 +394,7 @@ class BuilderManager implements IAtomicService {
     }
 
     if (!response) {
-      throw new Error('Missing response');
+      throw new Error("Missing response");
     }
 
     return response;
