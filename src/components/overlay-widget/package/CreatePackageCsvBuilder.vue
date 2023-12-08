@@ -38,6 +38,7 @@
           <div class="flex flex-col gap-2 max-w-md text-blue-500 text-lg">
             NOTE: This tool is in beta. Once you upload a CSV, ensure the values displayed in the
             "Smart CSV Data" tab are correct before submitting.
+            <span class="font-bold">Thanks in advance for all bug reports!</span>
           </div>
         </div>
       </div>
