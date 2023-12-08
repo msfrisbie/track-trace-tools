@@ -5,7 +5,6 @@
 <script lang="ts">
 import BuilderList from "@/components/overlay-widget/shared/BuilderList.vue";
 import { IBuilderListOption, IPluginState } from "@/interfaces";
-import { env } from "@/modules/environment.module";
 import store from "@/store/page-overlay/index";
 import { HOST_WILDCARD, isCurrentHostAllowed } from "@/utils/builder";
 import { hasPlusImpl } from "@/utils/plus";
@@ -39,7 +38,7 @@ export default Vue.extend({
           backgroundColor: "#2774ae",
           isBeta: false,
           isNew: false,
-          enabled: env() === "development",
+          enabled: true,
           visible: true,
           isPlus: true,
           showDisabledMessage: false,

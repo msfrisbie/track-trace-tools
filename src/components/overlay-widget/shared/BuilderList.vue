@@ -83,7 +83,7 @@
             </template>
             <template v-if="option.enabled && option.isPlus && !clientState.t3plus">
               <span class="text-xs flex flex-row items-center justify-center">
-                This tool is becoming part of T3+.
+                This tool is part of T3+.
                 <b-button
                   size="sm"
                   variant="link"

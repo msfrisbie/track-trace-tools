@@ -3,6 +3,13 @@
     <template v-if="createPackageCsvState.status === PackageCsvStatus.INITIAL">
       <div class="flex flex-col items-center justify-center h-full">
         <div class="flex flex-col items-stretch max-w-md gap-8 text-center">
+          <template v-if="!submitEnabled">
+            <div class="flex flex-row gap-1 items-center">
+              <div class="text-lg">This is a tool preview.</div>
+              <b-button variant="link" @click="open('/plus')">Unlock with T3+</b-button>
+            </div>
+          </template>
+
           <div class="flex flex-col gap-2">
             <label
               v-if="createPackageCsvState.status === PackageCsvStatus.INITIAL"
@@ -27,6 +34,11 @@
               >HOW TO USE</b-button
             >
           </div>
+
+          <div class="flex flex-col gap-2 max-w-md text-blue-500 text-lg">
+            NOTE: This tool is in beta. Once you upload a CSV, ensure the values displayed in the
+            "Smart CSV Data" tab are correct before submitting.
+          </div>
         </div>
       </div>
     </template>
@@ -48,36 +60,53 @@
             </template>
 
             <template v-if="createPackageCsvState.status === PackageCsvStatus.PARSED">
-              <div class="flex flex-row gap-2 items-center text-lg ttt-purple">
-                Loaded {{ createPackageCsvState.csvData.length - 1 }} CSV rows.
-              </div>
+              <div class="flex flex-col gap-1">
+                <div class="flex flex-row gap-2 items-center text-lg ttt-purple">
+                  Loaded
+                  <span class="font-bold">{{ createPackageCsvState.csvData.length - 1 }}</span>
+                  CSV data row{{ createPackageCsvState.csvData.length - 1 === 1 ? "" : "s" }}.
+                </div>
 
-              <div
-                class="flex flex-row gap-2 items-center text-lg text-red-500"
-                v-if="totalErrorCount > 0"
-              >
-                {{ totalErrorCount }} error{{ totalErrorCount === 1 ? "" : "s" }} must be fixed
-                before submitting.
+                <div class="flex flex-row gap-2 items-center text-lg ttt-purple">
+                  Submitting will create
+                  <span class="font-bold">{{ createPackageCsvState.rowGroups.length }}</span>
+                  new package{{ createPackageCsvState.rowGroups.length === 1 ? "" : "s" }}.
+                </div>
+
+                <div
+                  class="flex flex-row gap-2 items-center text-lg text-red-500"
+                  v-if="totalErrorCount > 0"
+                >
+                  {{ totalErrorCount }} error{{ totalErrorCount === 1 ? "" : "s" }} must be fixed
+                  before submitting.
+                </div>
               </div>
             </template>
           </div>
 
+          <template v-if="!submitEnabled">
+            <div class="flex flex-row gap-1 items-center">
+              <div class="text-lg">This is a tool preview.</div>
+              <b-button variant="link" @click="open('/plus')">Unlock with T3+</b-button>
+            </div>
+          </template>
+
           <div class="flex flex-row items-center gap-4">
             <b-button
-              v-if="createPackageCsvState.status !== PackageCsvStatus.INITIAL"
-              @click="reset()"
-              variant="outline-primary"
-              >RESET</b-button
-            >
-
-            <b-button
-              v-if="createPackageCsvState.status === PackageCsvStatus.PARSED"
+              v-if="submitEnabled && createPackageCsvState.status === PackageCsvStatus.PARSED"
               :disabled="!eligibleForSubmit"
               @click="submit()"
               variant="success"
               >CREATE {{ createPackageCsvState.rowGroups.length }} PACKAGE{{
                 createPackageCsvState.rowGroups.length === 1 ? "" : "S"
               }}</b-button
+            >
+
+            <b-button
+              v-if="createPackageCsvState.status !== PackageCsvStatus.INITIAL"
+              @click="reset()"
+              variant="outline-primary"
+              >RESET</b-button
             >
           </div>
         </div>
@@ -89,13 +118,16 @@
                 <template v-if="createPackageCsvState.rowGroups">
                   <!-- the autoformat line breaks mess up the template compiler, using template str-->
                   <div
-                    class="grid grid-cols-4 gap-4 place-items-center my-4"
+                    class="grid grid-cols-4 gap-8 place-items-center my-4"
                     :style="`grid-template-columns: minmax(350px, auto) 50px minmax(300px, auto) minmax(200px, auto);`"
                   >
                     <template v-for="[idx, rowGroup] of createPackageCsvState.rowGroups.entries()">
                       <fragment v-bind:key="rowGroup.destinationLabel">
                         <!-- input packages -->
-                        <div class="grid grid-cols-2 gap-4" style="grid-template-columns: 1fr auto">
+                        <div
+                          class="grid grid-cols-2 gap-4 w-full"
+                          style="grid-template-columns: 1fr auto"
+                        >
                           <template
                             v-for="[j, ingredient] of rowGroup.parsedData.Ingredients.entries()"
                           >
@@ -124,34 +156,45 @@
                         </div>
 
                         <!-- output package -->
-                        <div>
-                          <canonical-package-card
-                            :pkg="rowGroup.mockPackage"
-                          ></canonical-package-card>
-                        </div>
+                        <canonical-package-card
+                          class="w-full"
+                          :pkg="rowGroup.mockPackage"
+                        ></canonical-package-card>
 
                         <!-- messages -->
                         <div class="flex flex-col gap-2 place-self-start">
-                          <package-csv-message
-                            class="text-red-500"
-                            :msg="error"
+                          <div
+                            class="flex flex-row items-center gap-2 text-red-500"
                             v-for="[idx, error] of rowGroup.errors.entries()"
                             v-bind:key="'error' + idx"
-                          ></package-csv-message>
+                          >
+                            <font-awesome-icon
+                              size="lg"
+                              icon="exclamation-triangle"
+                            ></font-awesome-icon>
+                            <package-csv-message :msg="error"></package-csv-message>
+                          </div>
 
-                          <package-csv-message
-                            class="text-orange-500"
-                            :msg="warning"
+                          <div
+                            class="flex flex-row items-center gap-2 text-orange-500"
                             v-for="[idx, warning] of rowGroup.warnings.entries()"
                             v-bind:key="'warning' + idx"
-                          ></package-csv-message>
+                          >
+                            <font-awesome-icon
+                              size="lg"
+                              icon="exclamation-triangle"
+                            ></font-awesome-icon>
+                            <package-csv-message :msg="warning"></package-csv-message>
+                          </div>
 
-                          <package-csv-message
-                            class="text-blue-500"
-                            :msg="message"
+                          <div
+                            class="flex flex-row items-center gap-2 text-blue-500"
                             v-for="[idx, message] of rowGroup.messages.entries()"
                             v-bind:key="'message' + idx"
-                          ></package-csv-message>
+                          >
+                            <font-awesome-icon size="lg" icon="info-circle"></font-awesome-icon>
+                            <package-csv-message class="" :msg="message"></package-csv-message>
+                          </div>
                         </div>
 
                         <div class="col-span-4 border border-1 w-full h-px"></div>
@@ -178,7 +221,7 @@
                       <b-tr
                         v-for="[j, dataRow] of rowGroup.dataRows.entries()"
                         v-bind:key="rowGroup.destinationLabel + dataRow.Index"
-                        v-bind:class="{ 'bg-purple-100': (i + j) % 2 === 0 }"
+                        class="even:bg-purple-100"
                       >
                         <b-td
                           v-for="column of CREATE_PACKAGE_CSV_COLUMNS"
@@ -212,7 +255,7 @@
                     <b-tr
                       v-for="[i, row] of createPackageCsvState.csvData.entries()"
                       v-bind:key="`${i}row`"
-                      v-bind:class="{ 'bg-purple-100': i % 2 === 0 }"
+                      class="even:bg-purple-100"
                     >
                       <b-th class="whitespace-nowrap border border-1 text-center">{{ i + 1 }}</b-th>
                       <b-td
@@ -279,6 +322,9 @@ export default Vue.extend({
       eligibleForSubmit: `createPackageCsv/${CreatePackageCsvGetters.ELIGIBLE_FOR_SUBMIT}`,
       totalErrorCount: `createPackageCsv/${CreatePackageCsvGetters.TOTAL_ERROR_COUNT}`,
     }),
+    submitEnabled(): boolean {
+      return store.state.client.values.ENABLE_T3PLUS || store.state.client.t3plus;
+    },
   },
   data() {
     return {

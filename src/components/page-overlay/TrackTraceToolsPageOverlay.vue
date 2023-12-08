@@ -171,6 +171,7 @@ library.add(
   fontawesomeSolid.faHistory,
   fontawesomeSolid.faHome,
   fontawesomeSolid.faInfo,
+  fontawesomeSolid.faInfoCircle,
   fontawesomeSolid.faJoint,
   fontawesomeSolid.faLeaf,
   fontawesomeSolid.faLevelUpAlt,
