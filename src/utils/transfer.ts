@@ -7,13 +7,14 @@ import {
   IMetrcDriverData,
   IMetrcFacilityData,
   IMetrcVehicleData,
-  IRichDestinationData, ITransferHistoryData,
-  ITransferMetadata
+  IRichDestinationData,
+  ITransferHistoryData,
+  ITransferMetadata,
 } from "@/interfaces";
 import { authManager } from "@/modules/auth-manager.module";
 import {
   getDataLoaderByLicense,
-  primaryDataLoader
+  primaryDataLoader,
 } from "@/modules/data-loader/data-loader.module";
 import { dynamicConstsManager } from "@/modules/dynamic-consts-manager.module";
 import { toastManager } from "@/modules/toast-manager.module";
@@ -23,8 +24,8 @@ import { TransferPackageSearchAlgorithm } from "@/store/page-overlay/modules/tra
 import {
   getIdOrError,
   getItemNameOrError,
+  getLabTestResultsFromPackage,
   getLabelOrError,
-  getLabTestResultsFromPackage
 } from "./package";
 import { createScanSheetOrError } from "./sheets-export";
 
@@ -51,7 +52,7 @@ const VEHICLE_MATCHER = /^- Vehicle Make Model \(Lic. No.\): (.+) \((.+)\)$/;
 
 export async function extractRecentDestinationFacilitiesFromTransfers(): Promise<
   IMetrcFacilityData[]
-  > {
+> {
   const outgoingTransfers = await primaryDataLoader.outgoingTransfers();
 
   const facilityMap: Map<string, IMetrcFacilityData> = await dynamicConstsManager.facilityMap();
@@ -87,7 +88,7 @@ export async function extractRecentDestinationFacilitiesFromTransfers(): Promise
 
 export async function extractRecentTransporterFacilitiesFromTransfers(): Promise<
   IMetrcFacilityData[]
-  > {
+> {
   const outgoingTransfers = await primaryDataLoader.outgoingTransfers();
 
   const facilityMap: Map<string, IMetrcFacilityData> = await dynamicConstsManager.facilityMap();
@@ -98,7 +99,8 @@ export async function extractRecentTransporterFacilitiesFromTransfers(): Promise
 
   for (const outgoingTransfer of outgoingTransfers) {
     // ShipperFacilityLicenseNumber: "C12-0000020-LIC"
-    const transporterFacilityLicenseMatch = outgoingTransfer.ShipperFacilityLicenseNumber.match(/^[^\s]+/);
+    const transporterFacilityLicenseMatch =
+      outgoingTransfer.ShipperFacilityLicenseNumber.match(/^[^\s]+/);
     if (transporterFacilityLicenseMatch) {
       const transporterFacilityLicense: string = transporterFacilityLicenseMatch[0];
 
@@ -134,7 +136,8 @@ export async function extractDriversAndVehiclesFromTransferHistory(): Promise<{
 
   // Limit this to 25 requests
   for (const transfer of outgoingTransfers.slice(0, 25)) {
-    const historyList: ITransferHistoryData[] = await primaryDataLoader.transferHistoryByOutGoingTransferId(transfer.Id);
+    const historyList: ITransferHistoryData[] =
+      await primaryDataLoader.transferHistoryByOutGoingTransferId(transfer.Id);
 
     for (const history of historyList) {
       let vehicleMatch = null;
@@ -146,12 +149,16 @@ export async function extractDriversAndVehiclesFromTransferHistory(): Promise<{
         vehicleMatch = description.match(VEHICLE_MATCHER);
 
         if (vehicleMatch) {
-          const [VehicleMake, ...model] = vehicleMatch[1].split(/\s+/);
+          const [Make, ...model] = vehicleMatch[1].split(/\s+/);
 
           vehicles.push({
-            VehicleMake,
-            VehicleModel: model.join(" "),
-            VehicleLicensePlateNumber: vehicleMatch[2],
+            Make,
+            Model: model.join(" "),
+            LicensePlateNumber: vehicleMatch[2],
+            Id: -1,
+            FacilityId: -1,
+            IsArchived: false,
+            LastModified: "",
           });
 
           vehicleMatch = null;
@@ -176,9 +183,13 @@ export async function extractDriversAndVehiclesFromTransferHistory(): Promise<{
 
         if (driverNameMatch && driverEmployeeIdMatch && driverLicenseNumberMatch) {
           drivers.push({
-            DriverName: driverNameMatch[1],
-            DriverOccupationalLicenseNumber: driverEmployeeIdMatch[1],
-            DriverVehicleLicenseNumber: driverLicenseNumberMatch[1],
+            Name: driverNameMatch[1],
+            EmployeeId: driverEmployeeIdMatch[1],
+            DriversLicenseNumber: driverLicenseNumberMatch[1],
+            Id: -1,
+            FacilityId: -1,
+            IsArchived: false,
+            LastModified: "",
           });
 
           driverNameMatch = null;
@@ -462,7 +473,7 @@ export async function findMatchingTransferPackages({
 
 export async function generateTransferMetadata({
   transfer,
-  loadPackageTestData
+  loadPackageTestData,
 }: {
   transfer: IIndexedTransferData;
   loadPackageTestData: boolean;
@@ -507,7 +518,9 @@ export async function generateTransferMetadata({
 
     for (const pkg of transferMetadata.packages) {
       promises.push(
-        getLabTestResultsFromPackage({ pkg }).then((response) => { pkg.testResults = response; })
+        getLabTestResultsFromPackage({ pkg }).then((response) => {
+          pkg.testResults = response;
+        })
       );
     }
 

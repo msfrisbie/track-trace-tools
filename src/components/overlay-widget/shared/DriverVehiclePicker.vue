@@ -11,7 +11,7 @@
             class="flex-grow"
             :data="drivers"
             :showOnFocus="true"
-            :serializer="(driver) => `${driver.DriverName} | ${driver.DriverVehicleLicenseNumber}`"
+            :serializer="(driver) => `${driver.Name} | ${driver.DriversLicenseNumber}`"
             @hit="selectDriver($event)"
           >
           </vue-typeahead-bootstrap>
@@ -62,8 +62,7 @@
             :data="vehicles"
             :showOnFocus="true"
             :serializer="
-              (vehicle) =>
-                `${vehicle.VehicleMake} ${vehicle.VehicleModel} (${vehicle.VehicleLicensePlateNumber})`
+              (vehicle) => `${vehicle.Make} ${vehicle.Model} (${vehicle.LicensePlateNumber})`
             "
             @hit="selectVehicle($event)"
           >
@@ -117,45 +116,24 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue';
-import store from '@/store/page-overlay/index';
-import {
-  TransferBuilderActions,
-  TransferBuilderGetters,
-  TRANSFER_BUILDER,
-} from '@/store/page-overlay/modules/transfer-builder/consts';
-import {
-  IPlantData,
-  IPlantFilter,
-  ICsvFile,
-  ILocationData,
-  IMetrcMovePlantsPayload,
-  IPackageData,
-  IMetrcTransferType,
-  IMetrcDriverData,
-  IMetrcFacilityData,
-  IPluginState,
-  IMetrcVehicleData,
-  ITransferPackageList,
-  ITransferData,
-  IComputedGetSet,
-} from '@/interfaces';
-import {
-  combineLatest, from, Subject, timer,
-} from 'rxjs';
-import { authManager } from '@/modules/auth-manager.module';
-import { dynamicConstsManager } from '@/modules/dynamic-consts-manager.module';
-import { extractDriversAndVehiclesFromTransferHistory } from '@/utils/transfer';
-import _ from 'lodash-es';
-import { BuilderType, MessageType } from '@/consts';
-import { analyticsManager } from '@/modules/analytics-manager.module';
-import { mapState } from 'vuex';
+import { BuilderType, MessageType } from "@/consts";
+import { IComputedGetSet, IMetrcDriverData, IMetrcVehicleData, IPluginState } from "@/interfaces";
+import { analyticsManager } from "@/modules/analytics-manager.module";
+import { authManager } from "@/modules/auth-manager.module";
+import { dynamicConstsManager } from "@/modules/dynamic-consts-manager.module";
+import store from "@/store/page-overlay/index";
+import { TransferBuilderActions } from "@/store/page-overlay/modules/transfer-builder/consts";
+import _ from "lodash-es";
+import { timer } from "rxjs";
+import Vue from "vue";
+import { mapState } from "vuex";
 
+/* eslint-disable-next-line */
 const dedupObjects = (acc: any[], current: any) =>
-  (acc.find((x: any) => _.isEqual(x, current)) ? acc : [...acc, current]);
+  acc.find((x: any) => _.isEqual(x, current)) ? acc : [...acc, current];
 
 export default Vue.extend({
-  name: 'DriverVehiclePicker',
+  name: "DriverVehiclePicker",
   store,
   computed: {
     ...mapState<IPluginState>({
@@ -235,9 +213,9 @@ export default Vue.extend({
   data() {
     return {
       layoverLegOptions: [
-        { value: 'FromAndToLayover', text: 'From And To Layover' },
-        { value: 'FromLayover', text: 'From Layover' },
-        { value: 'ToLayover', text: 'To Layover' },
+        { value: "FromAndToLayover", text: "From And To Layover" },
+        { value: "FromLayover", text: "From Layover" },
+        { value: "ToLayover", text: "To Layover" },
       ],
       transferDataLoading: false,
       drivers: [],
@@ -253,16 +231,16 @@ export default Vue.extend({
       }
 
       store.dispatch(`transferBuilder/${TransferBuilderActions.UPDATE_TRANSFER_DATA}`, {
-        driverName: driver.DriverName,
-        driverEmployeeId: driver.DriverOccupationalLicenseNumber,
-        driverLicenseNumber: driver.DriverVehicleLicenseNumber,
+        driverName: driver.Name,
+        driverEmployeeId: driver.EmployeeId,
+        driverLicenseNumber: driver.DriversLicenseNumber,
       });
 
       this.$data.showDriverSearch = false;
 
       analyticsManager.track(MessageType.BUILDER_ENGAGEMENT, {
         builder: BuilderType.CREATE_TRANSFER,
-        action: 'Selected driver',
+        action: "Selected driver",
         driver,
       });
     },
@@ -272,16 +250,16 @@ export default Vue.extend({
       }
 
       store.dispatch(`transferBuilder/${TransferBuilderActions.UPDATE_TRANSFER_DATA}`, {
-        vehicleMake: vehicle.VehicleMake,
-        vehicleModel: vehicle.VehicleModel,
-        vehicleLicensePlate: vehicle.VehicleLicensePlateNumber,
+        vehicleMake: vehicle.Make,
+        vehicleModel: vehicle.Model,
+        vehicleLicensePlate: vehicle.LicensePlateNumber,
       });
 
       this.$data.showVehicleSearch = false;
 
       analyticsManager.track(MessageType.BUILDER_ENGAGEMENT, {
         builder: BuilderType.CREATE_TRANSFER,
-        action: 'Selected vehicle',
+        action: "Selected vehicle",
         vehicle,
       });
     },
@@ -289,7 +267,8 @@ export default Vue.extend({
       if (!this.$data.showVehicleSearch) {
         timer(0).subscribe(() =>
           // @ts-ignore
-          this.$refs.vehiclesearch.$el.querySelector('input').focus());
+          this.$refs.vehiclesearch.$el.querySelector("input").focus()
+        );
       }
 
       this.$data.showVehicleSearch = !this.$data.showVehicleSearch;
@@ -303,7 +282,8 @@ export default Vue.extend({
       if (!this.$data.showDriverSearch) {
         timer(0).subscribe(() =>
           // @ts-ignore
-          this.$refs.driversearch.$el.querySelector('input').focus());
+          this.$refs.driversearch.$el.querySelector("input").focus()
+        );
       }
 
       this.$data.showDriverSearch = !this.$data.showDriverSearch;
@@ -322,65 +302,94 @@ export default Vue.extend({
 
     analyticsManager.track(MessageType.BUILDER_EVENT, {
       builder: BuilderType.CREATE_TRANSFER,
-      action: 'Started driver and vehicle load',
+      action: "Started driver and vehicle load",
     });
 
     try {
-      extractDriversAndVehiclesFromTransferHistory()
-        .then(
-          async ({
-            drivers,
-            vehicles,
-          }: {
-            drivers: IMetrcDriverData[];
-            vehicles: IMetrcVehicleData[];
-          }) => {
-            this.$data.drivers = [...(await dynamicConstsManager.drivers()), ...drivers].reduce(
-              dedupObjects,
-              [],
-            );
+      // extractDriversAndVehiclesFromTransferHistory()
+      //   .then(
+      //     async ({
+      //       drivers,
+      //       vehicles,
+      //     }: {
+      //       drivers: IMetrcDriverData[];
+      //       vehicles: IMetrcVehicleData[];
+      //     }) => {
+      //       this.$data.drivers = [...(await dynamicConstsManager.drivers()), ...drivers].reduce(
+      //         dedupObjects,
+      //         []
+      //       );
 
-            this.$data.vehicles = [...(await dynamicConstsManager.vehicles()), ...vehicles].reduce(
-              dedupObjects,
-              [],
-            );
+      //       this.$data.vehicles = [...(await dynamicConstsManager.vehicles()), ...vehicles].reduce(
+      //         dedupObjects,
+      //         []
+      //       );
 
-            analyticsManager.track(MessageType.BUILDER_EVENT, {
-              builder: BuilderType.CREATE_TRANSFER,
-              action: `Finished loading ${this.$data.drivers.length} drivers and ${this.$data.vehicles.length} vehicles`,
-            });
+      //       analyticsManager.track(MessageType.BUILDER_EVENT, {
+      //         builder: BuilderType.CREATE_TRANSFER,
+      //         action: `Finished loading ${this.$data.drivers.length} drivers and ${this.$data.vehicles.length} vehicles`,
+      //       });
 
-            if (
-              this.$data.drivers.length > 0
-              && !this.driverName
-              && !this.driverEmployeeId
-              && !this.driverLicenseNumber
-            ) {
-              this.$data.showDriverSearch = true;
-            }
+      //       if (
+      //         this.$data.drivers.length > 0 &&
+      //         !this.driverName &&
+      //         !this.driverEmployeeId &&
+      //         !this.driverLicenseNumber
+      //       ) {
+      //         this.$data.showDriverSearch = true;
+      //       }
 
-            if (
-              this.$data.vehicles.length > 0
-              && !this.vehicleMake
-              && !this.vehicleModel
-              && !this.vehicleLicensePlate
-            ) {
-              this.$data.showVehicleSearch = true;
-            }
+      //       if (
+      //         this.$data.vehicles.length > 0 &&
+      //         !this.vehicleMake &&
+      //         !this.vehicleModel &&
+      //         !this.vehicleLicensePlate
+      //       ) {
+      //         this.$data.showVehicleSearch = true;
+      //       }
 
-            this.$data.transferDataLoading = false;
-          },
-        )
-        .catch(() => {
-          this.$data.transferDataLoading = false;
-        });
+      //       this.$data.transferDataLoading = false;
+      //     }
+      //   )
+      //   .catch(() => {
+      //     this.$data.transferDataLoading = false;
+      //   });
+
+      this.$data.drivers = await dynamicConstsManager.drivers();
+
+      this.$data.vehicles = await dynamicConstsManager.vehicles();
+
+      analyticsManager.track(MessageType.BUILDER_EVENT, {
+        builder: BuilderType.CREATE_TRANSFER,
+        action: `Finished loading ${this.$data.drivers.length} drivers and ${this.$data.vehicles.length} vehicles`,
+      });
+
+      if (
+        this.$data.drivers.length > 0 &&
+        !this.driverName &&
+        !this.driverEmployeeId &&
+        !this.driverLicenseNumber
+      ) {
+        this.$data.showDriverSearch = true;
+      }
+
+      if (
+        this.$data.vehicles.length > 0 &&
+        !this.vehicleMake &&
+        !this.vehicleModel &&
+        !this.vehicleLicensePlate
+      ) {
+        this.$data.showVehicleSearch = true;
+      }
+
+      this.$data.transferDataLoading = false;
     } catch (e) {
       console.error(e);
       this.$data.showInitializationError = true;
 
       analyticsManager.track(MessageType.BUILDER_EVENT, {
         builder: BuilderType.CREATE_TRANSFER,
-        action: 'Failed loading drivers/vehicles',
+        action: "Failed loading drivers/vehicles",
         error: e,
       });
 

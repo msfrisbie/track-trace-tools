@@ -25,6 +25,7 @@ const TRANSFER_DESTINATION_FACILITIES_MODAL_URL = `${origin({
 const TRANSFER_TRANSPORTER_FACILITIES_MODAL_URL = `${origin({
   divertToNullOrigin: false,
 })}/api/facilities/forlookup/forlicensedtransfertransporters`;
+const TRANSFER_PACKAGES_URL = `/api/packages/forlookup/transfers`;
 
 const ACTIVE_PACKAGES_URL = `${origin({ divertToNullOrigin: false })}/api/packages`;
 const INACTIVE_PACKAGES_URL = `${origin({ divertToNullOrigin: false })}/api/packages/inactive`;
@@ -664,27 +665,29 @@ export class MetrcRequestManager implements IAtomicService {
     });
   }
 
-  async transferDestinationFacilitiesDeprecated() {
+  async transferDestinationFacilities(body: string) {
     return customAxios(TRANSFER_DESTINATION_FACILITIES_MODAL_URL, {
       ...DEFAULT_FETCH_POST_READ_OPTIONS,
       headers: {
         ...(await buildAuthenticationHeaders(this.authStateOrError)),
         ...JSON_HEADERS,
       },
+      body,
     });
   }
 
-  async transferTransporterFaciliitesDeprecated() {
+  async transferTransporterFacilities(body: string) {
     return customAxios(TRANSFER_TRANSPORTER_FACILITIES_MODAL_URL, {
       ...DEFAULT_FETCH_POST_READ_OPTIONS,
       headers: {
         ...(await buildAuthenticationHeaders(this.authStateOrError)),
         ...JSON_HEADERS,
       },
+      body,
     });
   }
 
-  async transferDestinationFacilities(query: string) {
+  async transferDestinationFacilitiesAutocomplete(query: string) {
     return customAxios(TRANSFER_DESTINATION_FACILITIES_MODAL_URL, {
       ...DEFAULT_FETCH_POST_READ_OPTIONS,
       headers: {
@@ -696,7 +699,7 @@ export class MetrcRequestManager implements IAtomicService {
     });
   }
 
-  async transferTransporterFaciliites(query: string) {
+  async transferTransporterFacilitiesAutocomplete(query: string) {
     return customAxios(TRANSFER_TRANSPORTER_FACILITIES_MODAL_URL, {
       ...DEFAULT_FETCH_POST_READ_OPTIONS,
       headers: {

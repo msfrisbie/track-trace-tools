@@ -216,7 +216,9 @@ export default Vue.extend({
         this.$data.inflight = true;
 
         // @ts-ignore
-        // this.setSourcePackages(await primaryDataLoader.activePackages());
+        if (!this.$props.selectAllPackageTypes) {
+          this.setSourcePackages(await primaryDataLoader.activePackages());
+        }
       } catch (e) {
         console.error(e);
         this.$data.error = e;
@@ -276,16 +278,15 @@ export default Vue.extend({
 
       const queryString = _this.$data.query;
 
-      if (queryString.length === 0) {
-        _this.$data.sourcePackages = [];
-      }
-
-      _this.$data.sourcePackages = await primaryDataLoader.onDemandActivePackageSearch({
-        queryString,
-      });
       if (_this.selectAllPackageTypes) {
+        if (queryString.length === 0) {
+          _this.$data.sourcePackages = [];
+        }
+
         _this.$data.sourcePackages = [
-          ..._this.$data.sourcePackages,
+          ...(await primaryDataLoader.onDemandActivePackageSearch({
+            queryString,
+          })),
           ...(await primaryDataLoader.onDemandInactivePackageSearch({
             queryString,
           })),

@@ -1820,20 +1820,24 @@ export interface IPageMetrcFacilityData {
 //   MobilePhoneNumber: string;
 // }
 
-// This may not be correct - based on old data dump
 export interface IMetrcDriverData {
-  RowNumber?: number;
-  DriverName: string;
-  DriverOccupationalLicenseNumber: string;
-  DriverVehicleLicenseNumber: string;
+  Id: number;
+  FacilityId: number;
+  EmployeeId: string;
+  Name: string;
+  DriversLicenseNumber: string;
+  IsArchived: boolean;
+  LastModified: string;
 }
 
-// This may not be correct - based on old data dump
 export interface IMetrcVehicleData {
-  RowNumber?: number;
-  VehicleLicensePlateNumber: string;
-  VehicleMake: string;
-  VehicleModel: string;
+  Id: number;
+  FacilityId: number;
+  Make: string;
+  Model: string;
+  LicensePlateNumber: string;
+  IsArchived: boolean;
+  LastModified: string;
 }
 
 export type PluginKeyvalCategory =

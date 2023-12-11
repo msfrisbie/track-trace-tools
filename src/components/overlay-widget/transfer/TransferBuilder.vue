@@ -1049,13 +1049,17 @@ export default Vue.extend({
     transporterQuery: {
       immediate: true,
       async handler(newValue, oldValue) {
+        if (this.$data.allTransporterFacilitiesLoaded) {
+          return;
+        }
+
         if (newValue.length < 3) {
           return;
         }
 
         this.$data.transferDataLoading = true;
         primaryDataLoader
-          .transferTransporterFacilities(newValue)
+          .transferTransporterFacilitiesAutocomplete(newValue)
           .then((transporterFacilities) => {
             this.$data.transporterFacilities = transporterFacilities;
           })
@@ -1067,13 +1071,17 @@ export default Vue.extend({
     destinationQuery: {
       immediate: true,
       async handler(newValue, oldValue) {
+        if (this.$data.allDestinationFacilitiesLoaded) {
+          return;
+        }
+
         if (newValue.length < 3) {
           return;
         }
 
         this.$data.transferDataLoading = true;
         primaryDataLoader
-          .transferDestinationFacilities(newValue)
+          .transferDestinationFacilitiesAutocomplete(newValue)
           .then((destinationFacilities) => {
             this.$data.destinationFacilities = destinationFacilities;
           })
@@ -1293,7 +1301,9 @@ export default Vue.extend({
       sourcePackages: [],
       transferTypes: [],
       transporterFacilities: [],
+      allTransporterFacilitiesLoaded: false,
       destinationFacilities: [],
+      allDestinationFacilitiesLoaded: false,
       recentTransporterFacilities: [],
       recentDestinationFacilities: [],
       defaultPhoneNumberForQuestions: "",
@@ -1336,10 +1346,15 @@ export default Vue.extend({
       this.$data.facilities = await dynamicConstsManager.facilities();
       // this.$data.transporterFacilities = await dynamicConstsManager.transporterFacilities();
       // this.$data.destinationFacilities = await dynamicConstsManager.destinationFacilities();
-      // this.$data.transporterFacilities =
-      //   await primaryDataLoader.transferTransporterFacilitiesDeprecated();
-      // this.$data.destinationFacilities =
-      //   await primaryDataLoader.transferDestinationFacilitiesDeprecated();
+      try {
+        this.$data.destinationFacilities = await primaryDataLoader.transferDestinationFacilities();
+        this.$data.allDestinationFacilitiesLoaded = true;
+      } catch {}
+
+      try {
+        this.$data.transporterFacilities = await primaryDataLoader.transferTransporterFacilities();
+        this.$data.allTransporterFacilitiesLoaded = true;
+      } catch {}
 
       this.$data.defaultPhoneNumberForQuestions =
         await dynamicConstsManager.defaultPhoneNumberForQuestions();

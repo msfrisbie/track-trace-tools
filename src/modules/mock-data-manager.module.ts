@@ -1270,41 +1270,41 @@ class MockDataManager implements IAtomicService {
 
   mockDrivers(): IMetrcDriverData[] {
     return [
-      {
-        DriverName: "Driver One",
-        DriverOccupationalLicenseNumber: "Driver1",
-        DriverVehicleLicenseNumber: "DRV00001",
-      },
-      {
-        DriverName: "Driver Two",
-        DriverOccupationalLicenseNumber: "Driver2",
-        DriverVehicleLicenseNumber: "DRV00002",
-      },
-      {
-        DriverName: "Driver Three",
-        DriverOccupationalLicenseNumber: "Driver3",
-        DriverVehicleLicenseNumber: "DRV00003",
-      },
+      // {
+      //   DriverName: "Driver One",
+      //   DriverOccupationalLicenseNumber: "Driver1",
+      //   DriverVehicleLicenseNumber: "DRV00001",
+      // },
+      // {
+      //   DriverName: "Driver Two",
+      //   DriverOccupationalLicenseNumber: "Driver2",
+      //   DriverVehicleLicenseNumber: "DRV00002",
+      // },
+      // {
+      //   DriverName: "Driver Three",
+      //   DriverOccupationalLicenseNumber: "Driver3",
+      //   DriverVehicleLicenseNumber: "DRV00003",
+      // },
     ];
   }
 
   mockVehicles(): IMetrcVehicleData[] {
     return [
-      {
-        VehicleMake: "Ford",
-        VehicleModel: "F-150",
-        VehicleLicensePlateNumber: "1111111",
-      },
-      {
-        VehicleMake: "Ford",
-        VehicleModel: "F-250",
-        VehicleLicensePlateNumber: "2222222",
-      },
-      {
-        VehicleMake: "Ford",
-        VehicleModel: "F-350",
-        VehicleLicensePlateNumber: "3333333",
-      },
+      // {
+      //   VehicleMake: "Ford",
+      //   VehicleModel: "F-150",
+      //   VehicleLicensePlateNumber: "1111111",
+      // },
+      // {
+      //   VehicleMake: "Ford",
+      //   VehicleModel: "F-250",
+      //   VehicleLicensePlateNumber: "2222222",
+      // },
+      // {
+      //   VehicleMake: "Ford",
+      //   VehicleModel: "F-350",
+      //   VehicleLicensePlateNumber: "3333333",
+      // },
     ];
   }
 }
