@@ -2,6 +2,18 @@
   <fragment>
     <template v-if="createPackageCsvState.status === PackageCsvStatus.INITIAL">
       <div class="flex flex-col items-center justify-center h-full">
+        <div class="py-12">
+          <iframe
+            width="800"
+            height="500"
+            src="https://www.youtube.com/embed/2jeUYYuqz5Y?si=aLOxlXSKCJxREDZQ"
+            title="YouTube video player"
+            frameborder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            allowfullscreen
+          ></iframe>
+        </div>
+
         <div class="flex flex-col items-stretch max-w-md gap-8 text-center">
           <template v-if="!submitEnabled">
             <div class="flex flex-row gap-1 items-center">
