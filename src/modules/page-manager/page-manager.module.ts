@@ -287,6 +287,13 @@ class PageManager implements IAtomicService {
 
     observer.observe(document.body, { subtree: true, childList: true });
 
+    window.addEventListener("hashchange", () => {
+      console.log("hashchange", window.location.hash);
+
+      // Treat a URL change as a DOM change
+      this.modifyPageOnDomChange();
+    });
+
     if (store.state.settings?.preventLogout) {
       if ("wakeLock" in navigator) {
         try {
@@ -307,6 +314,7 @@ class PageManager implements IAtomicService {
         window.history.replaceState({}, "T3 Metrc Demo", window.location.origin);
       }
 
+      // When holding alt in demo mode, mousemoves will scramble numbers
       document.addEventListener("mousemove", (e) => {
         if (!e.altKey || !e.target) {
           return;
@@ -323,18 +331,8 @@ class PageManager implements IAtomicService {
             }
           }
 
-          console.log(txt);
-
           element.firstChild!.nodeValue = txt.join("");
-
-          // console.log("Original Text:", element.firstChild?.nodeValue); // Log the original text
-          // element.firstChild!.nodeValue = 'foobar'; // Replace text node value with 'foobar'
         }
-
-        // // @ts-ignore
-        // e.target?.classList.add('demo-blur');
-        // e.preventDefault();
-        // e.stopPropagation();
       });
     }
   }
