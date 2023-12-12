@@ -148,7 +148,7 @@ const routes: Array<RouteConfig> = [
   },
   {
     path: "/package/create-package-csv",
-    name: "Create Package CSV",
+    name: "New Package CSV",
     component: CreatePackageCsvBuilder,
   },
   {

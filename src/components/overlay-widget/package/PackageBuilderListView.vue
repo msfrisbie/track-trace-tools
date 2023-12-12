@@ -33,7 +33,7 @@ export default Vue.extend({
       return [
         {
           route: "/package/create-package-csv",
-          text: "CSV PACKAGES",
+          text: "NEW PACKAGES CSV",
           icon: "file-csv",
           backgroundColor: "#2774ae",
           isBeta: false,

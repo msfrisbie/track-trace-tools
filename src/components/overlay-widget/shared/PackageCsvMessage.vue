@@ -40,7 +40,7 @@ export default Vue.extend({
       return {
         ...this.msg,
         readableCellCoordinates: this.msg.cellCoordinates.map(({ rowIndex, columnIndex }) =>
-          cellIdentifierFromCoordinates({ rowIndex, columnIndex })
+          cellIdentifierFromCoordinates({ rowIndex: rowIndex + 1, columnIndex })
         ),
       };
     },

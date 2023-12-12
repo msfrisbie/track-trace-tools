@@ -1,13 +1,14 @@
-import { MessageType } from '@/consts';
-import { IAtomicService, IAuthState } from '@/interfaces';
-import { analyticsManager } from '@/modules/analytics-manager.module';
-import { customAxios } from '@/modules/fetch-manager.module';
-import store from '@/store/page-overlay';
-import { PluginAuthActions } from '@/store/page-overlay/modules/plugin-auth/consts';
-import { isIdentityAllowedToUseTtt } from '@/utils/access-control';
-import { debugLogFactory } from '@/utils/debug';
-import { extract, ExtractionType } from '@/utils/html';
-import { messageBus } from './message-bus.module';
+import { MessageType } from "@/consts";
+import { IAtomicService, IAuthState } from "@/interfaces";
+import { analyticsManager } from "@/modules/analytics-manager.module";
+import { customAxios } from "@/modules/fetch-manager.module";
+import store from "@/store/page-overlay";
+import { PluginAuthActions } from "@/store/page-overlay/modules/plugin-auth/consts";
+import { isIdentityAllowedToUseTtt } from "@/utils/access-control";
+import { debugLogFactory } from "@/utils/debug";
+import { ExtractionType, extract } from "@/utils/html";
+import { isDevelopment } from "./environment.module";
+import { messageBus } from "./message-bus.module";
 
 // Plugin scripts are sandboxed from the window variables.
 // It would be more efficient to pull them from the window.$.ajaxSettings,
@@ -18,7 +19,7 @@ import { messageBus } from './message-bus.module';
 // authState.license = ajaxSettings.headers["X-Metrc-LicenseNumber"];
 // authState.apiVerificationToken = ajaxSettings.headers["ApiVerificationToken"];
 
-const debugLog = debugLogFactory('auth-manager.module.ts');
+const debugLog = debugLogFactory("auth-manager.module.ts");
 
 class AuthManager implements IAtomicService {
   private _authStatePromise: Promise<IAuthState | null>;
@@ -29,7 +30,7 @@ class AuthManager implements IAtomicService {
     // Assumes that the auth can be in exactly one state per page load
     this._authStatePromise = new Promise((resolve, reject) => {
       // If auth state cant be acquired in 10s, timeout
-      const id = setTimeout(() => reject('Auth state timed out'), 10000);
+      const id = setTimeout(() => reject("Auth state timed out"), 10000);
 
       this._authStateResolver = (authState: any) => {
         clearTimeout(id);
@@ -65,11 +66,11 @@ class AuthManager implements IAtomicService {
     }
 
     if (!identity || !license || !apiVerificationToken) {
-      debugLog(async () => ['Fetching remote auth data']);
+      debugLog(async () => ["Fetching remote auth data"]);
       // Data was not found in the page.
       // Piggyback on browser cookies/redirect and load the initial logged in page, which should have credentials
       const loadedHTML = await customAxios(window.location.origin).then(
-        (response) => response.data,
+        (response) => response.data
       );
 
       extractedAuthData = extract(ExtractionType.AUTH_DATA, loadedHTML);
@@ -91,6 +92,17 @@ class AuthManager implements IAtomicService {
       }
     }
 
+    if (store.state.mockDataMode && isDevelopment()) {
+      this.resolveAuthState({
+        identity: "USER001",
+        license: "XYZ-00001",
+        apiVerificationToken: "VOID_83293hurkjkhu3nkushufekasuakuh",
+        hostname: "example.metrc.com",
+      });
+
+      return;
+    }
+
     if (!!identity && !!license && !!apiVerificationToken) {
       this.resolveAuthState({
         identity,
@@ -106,7 +118,7 @@ class AuthManager implements IAtomicService {
   }
 
   private async resolveAuthState(authState: IAuthState | null) {
-    debugLog(async () => ['Resolving:', authState]);
+    debugLog(async () => ["Resolving:", authState]);
 
     this._authStateResolver(authState);
   }
@@ -119,7 +131,7 @@ class AuthManager implements IAtomicService {
     }
   }
 
-  async authStateOrError(errorMessage: string = 'Missing auth state'): Promise<IAuthState> {
+  async authStateOrError(errorMessage: string = "Missing auth state"): Promise<IAuthState> {
     const authState = await this.authStateOrNull();
 
     if (!authState) {

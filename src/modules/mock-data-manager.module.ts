@@ -322,11 +322,22 @@ const FROZEN_STORAGE_LOCATION: ILocationData = {
   ForPackages: true,
   ForPlantBatches: true,
   ForPlants: true,
-  Id: 60000001,
+  Id: 60000002,
   IsArchived: false,
   LocationTypeId: 1,
   LocationTypeName: "Default Location Type",
   Name: "Frozen Storage",
+};
+const SHELF_01_LOCATION: ILocationData = {
+  ForHarvests: true,
+  ForPackages: true,
+  ForPlantBatches: true,
+  ForPlants: true,
+  Id: 60000003,
+  IsArchived: false,
+  LocationTypeId: 1,
+  LocationTypeName: "Default Location Type",
+  Name: "Shelf 01",
 };
 
 const NEW_HARVEST: IIndexedHarvestData = {
@@ -896,6 +907,7 @@ class MockDataManager implements IAtomicService {
 
     this._mockLocations.push(ROW_01_LOCATION);
     this._mockLocations.push(FROZEN_STORAGE_LOCATION);
+    this._mockLocations.push(SHELF_01_LOCATION);
 
     return this._mockLocations;
   }
