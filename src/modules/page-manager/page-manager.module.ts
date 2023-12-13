@@ -288,8 +288,6 @@ class PageManager implements IAtomicService {
     observer.observe(document.body, { subtree: true, childList: true });
 
     window.addEventListener("hashchange", () => {
-      console.log("hashchange", window.location.hash);
-
       // Treat a URL change as a DOM change
       this.modifyPageOnDomChange();
     });
