@@ -1,8 +1,9 @@
 import ActiveProjectView from "@/components/overlay-widget/ActiveProjectView.vue";
+import BuilderDefaultView from "@/components/overlay-widget/BuilderDefaultView.vue";
+import UnavailablePage from "@/components/overlay-widget/UnavailablePage.vue";
 import AdminListView from "@/components/overlay-widget/admin/AdminListView.vue";
 import LayoutSandbox from "@/components/overlay-widget/admin/LayoutSandbox.vue";
 import PickerSandbox from "@/components/overlay-widget/admin/PickerSandbox.vue";
-import BuilderDefaultView from "@/components/overlay-widget/BuilderDefaultView.vue";
 import CultivatorBuilderListView from "@/components/overlay-widget/cultivation/CultivatorBuilderListView.vue";
 import CultivatorToolsHelp from "@/components/overlay-widget/cultivation/CultivatorToolsHelp.vue";
 import DestroyPlantsBuilder from "@/components/overlay-widget/cultivation/DestroyPlantsBuilder.vue";
@@ -34,16 +35,17 @@ import PackageHistory from "@/components/overlay-widget/package/PackageHistory.v
 import PackageToolsHelp from "@/components/overlay-widget/package/PackageToolsHelp.vue";
 import SplitPackageBuilder from "@/components/overlay-widget/package/SplitPackageBuilder.vue";
 import TransferBuilder from "@/components/overlay-widget/transfer/TransferBuilder.vue";
+import TransferBuilderListView from "@/components/overlay-widget/transfer/TransferBuilderListView.vue";
+import TransferCsvFill from "@/components/overlay-widget/transfer/TransferCsvFill.vue";
 import TransferToolsHelp from "@/components/overlay-widget/transfer/TransferToolsHelp.vue";
-import UnavailablePage from "@/components/overlay-widget/UnavailablePage.vue";
 import CheckPermissionsView from "@/components/page-overlay/CheckPermissionsView.vue";
-import FinalizeSalesReceiptsForm from "@/components/page-overlay/forms/FinalizeSalesReceiptsForm.vue";
-import SettingsForm from "@/components/page-overlay/forms/SettingsForm.vue";
-import VoidTagForm from "@/components/page-overlay/forms/VoidTagForm.vue";
 import GoogleSheetsExport from "@/components/page-overlay/GoogleSheetsExport.vue";
 import ManageAccount from "@/components/page-overlay/ManageAccount.vue";
 import QuickScripts from "@/components/page-overlay/QuickScripts.vue";
 import Screenshot from "@/components/page-overlay/Screenshot.vue";
+import FinalizeSalesReceiptsForm from "@/components/page-overlay/forms/FinalizeSalesReceiptsForm.vue";
+import SettingsForm from "@/components/page-overlay/forms/SettingsForm.vue";
+import VoidTagForm from "@/components/page-overlay/forms/VoidTagForm.vue";
 import VueRouter, { RouteConfig } from "vue-router";
 
 const routes: Array<RouteConfig> = [
@@ -97,9 +99,9 @@ const routes: Array<RouteConfig> = [
   },
   {
     path: "/transfer",
-    redirect: "/transfer/transfer-builder",
-    // name: "Transfer Tools",
-    // component: TransferBuilderListView
+    // redirect: "/transfer/transfer-builder",
+    name: "Transfer Tools",
+    component: TransferBuilderListView,
   },
   {
     path: "/quick-scripts",
@@ -220,6 +222,11 @@ const routes: Array<RouteConfig> = [
     path: "/cultivator/mother/plant-batches",
     name: "Mother Plant Batches",
     component: MotherPlantBatchPackageBuilder,
+  },
+  {
+    path: "/transfer/csv-fill",
+    name: "Transfer CSV Fill",
+    component: TransferCsvFill,
   },
   {
     path: "/transfer/transfer-builder",

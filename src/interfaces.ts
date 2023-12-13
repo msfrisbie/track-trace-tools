@@ -37,6 +37,7 @@ import {
   DriverLayoverLeg,
   ITransferBuilderState,
 } from "./store/page-overlay/modules/transfer-builder/interfaces";
+import { ITransferCsvState } from "./store/page-overlay/modules/transfer-csv/interfaces";
 import { ITransferPackageSearchState } from "./store/page-overlay/modules/transfer-package-search/interfaces";
 import { ITransferSearchState } from "./store/page-overlay/modules/transfer-search/interfaces";
 import { CsvUpload, CsvUploadStatus } from "./types";
@@ -232,6 +233,7 @@ export interface IPluginState extends IRootState {
   createPackageCsv: ICreatePackageCsvState;
   transferPackageSearch: ITransferPackageSearchState;
   graph: IGraphState;
+  transferCsv: ITransferCsvState;
 }
 
 export interface IAddress {
