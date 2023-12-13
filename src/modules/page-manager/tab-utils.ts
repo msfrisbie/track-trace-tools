@@ -6,7 +6,7 @@ import {
   TransfersTabLabel,
 } from "@/consts";
 import store from "@/store/page-overlay/index";
-import { hashObjectValueOrNull, readHashValueOrNull } from "@/utils/url";
+import { readHashValueOrNull } from "@/utils/url";
 import { pageManager } from "./page-manager.module";
 
 export function isTabActiveImpl(tab: any) {
@@ -208,7 +208,7 @@ export async function manageTransfersTabsImpl() {
     pageManager.selectedTransferTab = activeTab;
     return;
   }
-  
+
   const activeTabId = readHashValueOrNull("activeTabId");
 
   switch (activeTabId) {

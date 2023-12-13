@@ -240,10 +240,10 @@ export default Vue.extend({
     reset(): void {
       Object.assign(this.$data, initialState);
     },
-    tabKeyUrl(path: string, activeTabId: ActiveTabId): string {
+    tabKeyUrl(subPath: string, activeTabId: ActiveTabId): string {
       const license = store.state.pluginAuth.authState?.license;
 
-      return navigationUrl(`/industry/${license}/${path}`, {
+      return navigationUrl(`/industry/${license}/${subPath}`, {
         hashValues: {
           activeTabId,
         },
