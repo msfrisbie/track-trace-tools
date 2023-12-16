@@ -127,30 +127,6 @@ export default Vue.extend({
     },
     options() {
       return [
-        // {
-        //   backgroundColor: "gray",
-        //   text: "T3+",
-        //   icon: "plus",
-        //   visible: !store.state.client.values.ENABLE_T3PLUS && !store.state.client.t3plus,
-        //   enabled: true,
-        //   isBeta: false,
-        //   isNew: false,
-        //   route: "/plus",
-        //   isPlus: false
-        //   // url: 'https://www.trackandtrace.tools/plus',
-        // },
-        {
-          backgroundColor: "#2774ae",
-          text: "VERIFY",
-          route: "/verify",
-          icon: "check",
-          enabled: true,
-          visible: false,
-          isBeta: false,
-          isNew: true,
-          isPlus: false,
-          // helpRoute: "/help/package",
-        },
         {
           backgroundColor: "#2774ae",
           text: "PACKAGE TOOLS",
@@ -163,18 +139,6 @@ export default Vue.extend({
           helpRoute: "/help/package",
         },
         {
-          backgroundColor: "#773c77",
-          text: "TRANSFER TOOLS",
-          route: "/transfer",
-          icon: "truck-loading",
-          enabled: true,
-          visible: true,
-          isBeta: false,
-          isNew: false,
-          isPlus: true,
-          helpRoute: "/help/transfer",
-        },
-        {
           backgroundColor: "#48b867",
           text: "CULTIVATION TOOLS",
           route: "/cultivator",
@@ -184,6 +148,18 @@ export default Vue.extend({
           isBeta: false,
           isNew: false,
           helpRoute: "/help/cultivator",
+        },
+        {
+          backgroundColor: "#773c77",
+          text: "TRANSFER TOOLS",
+          route: "/transfer",
+          icon: "truck-loading",
+          enabled: true,
+          visible: true,
+          isBeta: false,
+          isNew: false,
+          isPlus: false,
+          helpRoute: "/help/transfer",
         },
         {
           backgroundColor: "#48b867",

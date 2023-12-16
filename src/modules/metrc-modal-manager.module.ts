@@ -34,6 +34,17 @@ class MetrcModalManager implements IAtomicService {
 
   async init() {}
 
+  testForOpenedModalTitle(titles: string[]): boolean {
+
+    const modal = activeMetrcModalOrNull();
+
+    if (!modal) {
+      return false;
+    }
+
+    return titles.includes(modalTitleOrError(modal));
+  }
+
   // Idempotent method that manages the contents of the modal
   // each time the DOM changes
   maybeAddWidgetsAndListenersToModal() {
