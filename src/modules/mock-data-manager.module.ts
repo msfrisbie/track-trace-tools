@@ -31,6 +31,8 @@ import { sum } from "lodash-es";
  * - Always return only what is being filtered for
  */
 
+const FACILITY_PACKAGES_HAVE_LOCATION: boolean = window.location.hostname !== "ca.metrc.com";
+
 const OLD_DATE = "2021-01-01";
 const OLD_DATETIME = `${OLD_DATE}T00:00:00+00:00`;
 
@@ -546,6 +548,12 @@ class MockDataManager implements IAtomicService {
 
     const labels = generateTagRangeOrError(firstTag, lastTag);
 
+    function getLocationName(i: number): string | null {
+      const name = i % 2 ? ROW_01_LOCATION.Name : FROZEN_STORAGE_LOCATION.Name;
+
+      return FACILITY_PACKAGES_HAVE_LOCATION ? name : null;
+    }
+
     // Harvested flower
     for (const [i, label] of labels.entries()) {
       if (i < packageDistribution[0]) {
@@ -580,8 +588,8 @@ class MockDataManager implements IAtomicService {
           LabTestingStateName: "NotSubmitted",
           Label: label,
           LastModified: OLD_DATETIME,
-          LocationName: i % 2 ? ROW_01_LOCATION.Name : FROZEN_STORAGE_LOCATION.Name,
-          LocationTypeName: "Default Location Type",
+          LocationName: getLocationName(i),
+          LocationTypeName: FACILITY_PACKAGES_HAVE_LOCATION ? "Default Location Type" : null,
           MultiHarvest: true,
           MultiPackage: true,
           MultiProductionBatch: false,
@@ -664,8 +672,8 @@ class MockDataManager implements IAtomicService {
           LabTestingStateName: "NotRequired",
           Label: label,
           LastModified: OLD_DATETIME,
-          LocationName: i % 2 ? ROW_01_LOCATION.Name : FROZEN_STORAGE_LOCATION.Name,
-          LocationTypeName: "Default Location Type",
+          LocationName: getLocationName(i),
+          LocationTypeName: FACILITY_PACKAGES_HAVE_LOCATION ? "Default Location Type" : null,
           MultiHarvest: false,
           MultiPackage: false,
           MultiProductionBatch: false,
@@ -748,8 +756,8 @@ class MockDataManager implements IAtomicService {
           LabTestingStateName: "TestPassed",
           Label: label,
           LastModified: OLD_DATETIME,
-          LocationName: i % 2 ? ROW_01_LOCATION.Name : FROZEN_STORAGE_LOCATION.Name,
-          LocationTypeName: "Default Location Type",
+          LocationName: getLocationName(i),
+          LocationTypeName: FACILITY_PACKAGES_HAVE_LOCATION ? "Default Location Type" : null,
           MultiHarvest: true,
           MultiPackage: false,
           MultiProductionBatch: false,
@@ -832,8 +840,8 @@ class MockDataManager implements IAtomicService {
           LabTestingStateName: "NotSubmitted",
           Label: label,
           LastModified: OLD_DATETIME,
-          LocationName: i % 2 ? ROW_01_LOCATION.Name : FROZEN_STORAGE_LOCATION.Name,
-          LocationTypeName: "Default Location Type",
+          LocationName: getLocationName(i),
+          LocationTypeName: FACILITY_PACKAGES_HAVE_LOCATION ? "Default Location Type" : null,
           MultiHarvest: true,
           MultiPackage: true,
           MultiProductionBatch: false,
@@ -901,6 +909,10 @@ class MockDataManager implements IAtomicService {
   }
 
   mockLocations(): ILocationData[] {
+    if (!FACILITY_PACKAGES_HAVE_LOCATION) {
+      return [];
+    }
+
     if (this._mockLocations.length > 0) {
       return this._mockLocations;
     }

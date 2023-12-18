@@ -72,13 +72,18 @@ function mergeOrAddRowGroupMessage(messages: IRowGroupMessage[], newMessage: IRo
   messages.push(newMessage);
 }
 
-function checkAllValuesMatchAndAreNonEmptyAndReturnSharedValueOrNull(
+function checkAllValuesMatchAndHaveValidContentsAndReturnSharedValueOrNull(
   rowGroup: ICreatePackageCsvRowGroup,
   key: CreatePackageCsvColumns,
   options: {
     errorIfEmptyString?: boolean;
-  } = { errorIfEmptyString: true }
+    errorIfNonEmptyString?: boolean;
+  } = { errorIfEmptyString: true, errorIfNonEmptyString: false }
 ): string | null {
+  if (options?.errorIfEmptyString && options?.errorIfNonEmptyString) {
+    throw new Error("Invalid options");
+  }
+
   const uniqueValues: string[] = [...new Set(rowGroup.dataRows.map((x) => x[key]))];
 
   const columnIndex = COLUMNS.indexOf(key);
@@ -92,6 +97,17 @@ function checkAllValuesMatchAndAreNonEmptyAndReturnSharedValueOrNull(
 
         mergeOrAddRowGroupMessage(rowGroup.errors, {
           text: `Column '${key}' for output package ${rowGroup.destinationLabel} is empty`,
+          cellCoordinates: rowGroup.dataRows.map((x) => ({ rowIndex: x.RealIndex, columnIndex })),
+        });
+      }
+    }
+  } else if (options.errorIfNonEmptyString) {
+    for (const dataRow of rowGroup.dataRows) {
+      if (dataRow[key].length > 0) {
+        shouldReturnValue = false;
+
+        mergeOrAddRowGroupMessage(rowGroup.errors, {
+          text: `Column '${key}' for output package ${rowGroup.destinationLabel} must be empty, currently contains ${dataRow[key]}`,
           cellCoordinates: rowGroup.dataRows.map((x) => ({ rowIndex: x.RealIndex, columnIndex })),
         });
       }
@@ -227,6 +243,8 @@ export const createPackageCsvModule = {
         return;
       }
 
+      const currentFacilityUsesLocation: boolean = (packages[0]?.LocationName ?? null) !== null;
+
       try {
         tags = await primaryDataLoader.availableTags();
       } catch {
@@ -236,13 +254,15 @@ export const createPackageCsvModule = {
         return;
       }
 
-      try {
-        locations = await primaryDataLoader.locations();
-      } catch {
-        ctx.state.status = PackageCsvStatus.ERROR;
-        ctx.state.statusMessage =
-          "Unable to load locations. Ensure this Metrc account has location permissions.";
-        return;
+      if (currentFacilityUsesLocation) {
+        try {
+          locations = await primaryDataLoader.locations();
+        } catch {
+          ctx.state.status = PackageCsvStatus.ERROR;
+          ctx.state.statusMessage =
+            "Unable to load locations. Ensure this Metrc account has location permissions.";
+          return;
+        }
       }
 
       try {
@@ -329,7 +349,9 @@ export const createPackageCsvModule = {
       );
       const tagMap: Map<string, IIndexedTagData> = new Map(tags.map((x) => [x.Label, x]));
       const itemMap: Map<string, IItemData> = new Map(items.map((x) => [x.Name, x]));
-      const locationMap: Map<string, ILocationData> = new Map(locations.map((x) => [x.Name, x]));
+      const locationMap: Map<string, ILocationData> = new Map(
+        (locations ?? []).map((x) => [x.Name, x])
+      );
 
       // Validate each rowgroup and select default values if necessary
       for (const rowGroup of rowGroups) {
@@ -404,7 +426,7 @@ export const createPackageCsvModule = {
         // CHECK
         // New package tags match
         const sharedTagOrNull: string | null =
-          checkAllValuesMatchAndAreNonEmptyAndReturnSharedValueOrNull(
+          checkAllValuesMatchAndHaveValidContentsAndReturnSharedValueOrNull(
             rowGroup,
             CreatePackageCsvColumns.NEW_PACKAGE_TAG
           );
@@ -435,7 +457,7 @@ export const createPackageCsvModule = {
         // CHECK
         // All dates within group match
         const sharedPackagedDateOrNull: string | null =
-          checkAllValuesMatchAndAreNonEmptyAndReturnSharedValueOrNull(
+          checkAllValuesMatchAndHaveValidContentsAndReturnSharedValueOrNull(
             rowGroup,
             CreatePackageCsvColumns.PACKAGED_DATE
           );
@@ -501,7 +523,7 @@ export const createPackageCsvModule = {
         // CHECK
         // All items match
         const sharedItemOrNull: string | null =
-          checkAllValuesMatchAndAreNonEmptyAndReturnSharedValueOrNull(
+          checkAllValuesMatchAndHaveValidContentsAndReturnSharedValueOrNull(
             rowGroup,
             CreatePackageCsvColumns.ITEM_NAME
           );
@@ -511,50 +533,57 @@ export const createPackageCsvModule = {
           ? itemMap.get(sharedItemOrNull) ?? null
           : null;
 
-        // SET DEFAULT
-        // Location
-        for (const dataRow of rowGroup.dataRows) {
-          const pkg = packageMap.get(dataRow[CreatePackageCsvColumns.SOURCE_PACKAGE_TAG]);
+        if (currentFacilityUsesLocation) {
+          // SET DEFAULT
+          // Location
+          for (const dataRow of rowGroup.dataRows) {
+            const pkg = packageMap.get(dataRow[CreatePackageCsvColumns.SOURCE_PACKAGE_TAG]);
 
-          if (!pkg) {
-            continue;
+            if (!pkg) {
+              continue;
+            }
+
+            const key = CreatePackageCsvColumns.LOCATION_NAME;
+            if (!dataRow[key]) {
+              dataRow[key] = pkg.LocationName || "";
+              mergeOrAddRowGroupMessage(rowGroup.messages, {
+                text: `Used default value for location: ${pkg.LocationName}`,
+                cellCoordinates: [
+                  {
+                    rowIndex: dataRow.RealIndex,
+                    columnIndex: COLUMNS.indexOf(key),
+                  },
+                ],
+              });
+            }
           }
 
-          const key = CreatePackageCsvColumns.LOCATION_NAME;
-          if (!dataRow[key]) {
-            dataRow[key] = pkg.LocationName || "";
-            mergeOrAddRowGroupMessage(rowGroup.messages, {
-              text: `Used default value for location: ${pkg.LocationName}`,
-              cellCoordinates: [
-                {
-                  rowIndex: dataRow.RealIndex,
-                  columnIndex: COLUMNS.indexOf(key),
-                },
-              ],
-            });
-          }
-        }
+          // CHECK
+          // Location exists
+          for (const dataRow of rowGroup.dataRows) {
+            const locationName = dataRow[CreatePackageCsvColumns.LOCATION_NAME];
+            const columnIndex = COLUMNS.indexOf(CreatePackageCsvColumns.LOCATION_NAME);
 
-        // CHECK
-        // Location exists
-        for (const dataRow of rowGroup.dataRows) {
-          const locationName = dataRow[CreatePackageCsvColumns.LOCATION_NAME];
-          const columnIndex = COLUMNS.indexOf(CreatePackageCsvColumns.LOCATION_NAME);
-
-          if (!locationMap.has(locationName)) {
-            mergeOrAddRowGroupMessage(rowGroup.errors, {
-              text: `Location ${locationName} does not match an active location`,
-              cellCoordinates: [{ rowIndex: dataRow.RealIndex, columnIndex }],
-            });
+            if (!locationMap.has(locationName)) {
+              mergeOrAddRowGroupMessage(rowGroup.errors, {
+                text: `Location ${locationName} does not match an active location`,
+                cellCoordinates: [{ rowIndex: dataRow.RealIndex, columnIndex }],
+              });
+            }
           }
         }
 
         // CHECK
         // All locations match
-        const sharedLocationOrNull = checkAllValuesMatchAndAreNonEmptyAndReturnSharedValueOrNull(
-          rowGroup,
-          CreatePackageCsvColumns.LOCATION_NAME
-        );
+        const sharedLocationOrNull =
+          checkAllValuesMatchAndHaveValidContentsAndReturnSharedValueOrNull(
+            rowGroup,
+            CreatePackageCsvColumns.LOCATION_NAME,
+            {
+              errorIfEmptyString: currentFacilityUsesLocation,
+              errorIfNonEmptyString: !currentFacilityUsesLocation,
+            }
+          );
 
         // ASSIGN PARSED VALUE
         const Location: ILocationData | null = sharedLocationOrNull
@@ -689,10 +718,11 @@ export const createPackageCsvModule = {
 
         // CHECK
         // All output units match
-        const sharedOutputUnitOrNull = checkAllValuesMatchAndAreNonEmptyAndReturnSharedValueOrNull(
-          rowGroup,
-          CreatePackageCsvColumns.NEW_PACKAGE_UNIT_OF_MEASURE
-        );
+        const sharedOutputUnitOrNull =
+          checkAllValuesMatchAndHaveValidContentsAndReturnSharedValueOrNull(
+            rowGroup,
+            CreatePackageCsvColumns.NEW_PACKAGE_UNIT_OF_MEASURE
+          );
 
         // ASSIGN PARSED VALUE
         const UnitOfMeasure: IUnitOfMeasure | null = sharedOutputUnitOrNull
@@ -755,7 +785,7 @@ export const createPackageCsvModule = {
         // CHECK
         // All output quantities match
         const sharedNewPackageQuantity: string | null =
-          checkAllValuesMatchAndAreNonEmptyAndReturnSharedValueOrNull(
+          checkAllValuesMatchAndHaveValidContentsAndReturnSharedValueOrNull(
             rowGroup,
             CreatePackageCsvColumns.NEW_PACKAGE_QUANTITY
           );
@@ -830,7 +860,7 @@ export const createPackageCsvModule = {
         // CHECK
         // All expiration dates within group match
         const sharedExpirationDateOrNull: string | null =
-          checkAllValuesMatchAndAreNonEmptyAndReturnSharedValueOrNull(
+          checkAllValuesMatchAndHaveValidContentsAndReturnSharedValueOrNull(
             rowGroup,
             CreatePackageCsvColumns.EXPIRATION_DATE,
             { errorIfEmptyString: false }
@@ -859,7 +889,7 @@ export const createPackageCsvModule = {
         // CHECK
         // All note values match
         const sharedNoteOrNull: string | null =
-          checkAllValuesMatchAndAreNonEmptyAndReturnSharedValueOrNull(
+          checkAllValuesMatchAndHaveValidContentsAndReturnSharedValueOrNull(
             rowGroup,
             CreatePackageCsvColumns.NOTE,
             { errorIfEmptyString: false }
@@ -871,7 +901,7 @@ export const createPackageCsvModule = {
         // CHECK
         // All production batch values match
         const sharedProductionBatchOrNull: string | null =
-          checkAllValuesMatchAndAreNonEmptyAndReturnSharedValueOrNull(
+          checkAllValuesMatchAndHaveValidContentsAndReturnSharedValueOrNull(
             rowGroup,
             CreatePackageCsvColumns.PRODUCTION_BATCH_NUMBER,
             { errorIfEmptyString: false }
@@ -943,7 +973,7 @@ export const createPackageCsvModule = {
         // CHECK
         // All IsDonation values match
         const sharedIsDonationOrNull: string | null =
-          checkAllValuesMatchAndAreNonEmptyAndReturnSharedValueOrNull(
+          checkAllValuesMatchAndHaveValidContentsAndReturnSharedValueOrNull(
             rowGroup,
             CreatePackageCsvColumns.IS_DONATION
           );
@@ -994,7 +1024,7 @@ export const createPackageCsvModule = {
         // CHECK
         // All IsTradeSample values match
         const sharedIsTradeSampleOrNull: string | null =
-          checkAllValuesMatchAndAreNonEmptyAndReturnSharedValueOrNull(
+          checkAllValuesMatchAndHaveValidContentsAndReturnSharedValueOrNull(
             rowGroup,
             CreatePackageCsvColumns.IS_TRADE_SAMPLE
           );
