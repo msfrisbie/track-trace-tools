@@ -828,7 +828,7 @@ export class MetrcRequestManager implements IAtomicService {
       }),
       {
         ...DEFAULT_FETCH_POST_READ_OPTIONS,
-        timeout: 5000,
+        // timeout: 10000,
         headers: {
           ...(await buildAuthenticationHeaders(this.authStateOrError)),
           ...JSON_HEADERS,

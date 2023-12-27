@@ -4,7 +4,7 @@ import {
   IPackageFilter,
   IPluginState,
   ISpreadsheet,
-  ITransferFilter,
+  ITransferFilter
 } from '@/interfaces';
 import { primaryDataLoader } from '@/modules/data-loader/data-loader.module';
 import { messageBus } from '@/modules/message-bus.module';
@@ -13,7 +13,7 @@ import { ReportsMutations, ReportType } from '@/store/page-overlay/modules/repor
 import {
   IReportConfig,
   IReportData,
-  IReportsState,
+  IReportsState
 } from '@/store/page-overlay/modules/reports/interfaces';
 import { ActionContext } from 'vuex';
 import { isodateToSlashDate, todayIsodate } from '../date';
@@ -22,7 +22,7 @@ import {
   extractInitialPackageLocationNameFromHistoryOrNull,
   extractInitialPackageQuantityAndUnitFromHistoryOrError,
   extractParentPackageTagQuantityUnitItemSetsFromHistory,
-  extractTestSamplePackageLabelsFromHistory,
+  extractTestSamplePackageLabelsFromHistory
 } from '../history';
 import { pad } from '../misc';
 import {
@@ -32,7 +32,7 @@ import {
   autoResizeDimensionsRequestFactory,
   freezeTopRowRequestFactory,
   numberColumnRequestFactory,
-  styleTopRowRequestFactory,
+  styleTopRowRequestFactory
 } from '../sheets';
 import { writeDataSheet } from '../sheets-export';
 
@@ -127,12 +127,29 @@ export async function maybeLoadCogsTrackerReportData({
     return true;
   });
 
-  const historyPromises: Promise<any>[] = dateFilteredPackages.map((pkg) =>
-    primaryDataLoader.packageHistoryByPackageId(pkg.Id).then((history) => {
+  const historyPromises: Promise<any>[] = [];
+
+  for (const pkg of dateFilteredPackages) {
+    historyPromises.push(primaryDataLoader.packageHistoryByPackageId(pkg.Id).then((history) => {
       pkg.history = history;
     }));
 
-  await Promise.allSettled(historyPromises);
+    if (historyPromises.length % 100 === 0) {
+      await Promise.allSettled(historyPromises);
+    }
+  }
+
+  // const historyPromises: Promise<any>[] = dateFilteredPackages.map((pkg) =>
+  //   primaryDataLoader.packageHistoryByPackageId(pkg.Id).then((history) => {
+  //     pkg.history = history;
+  //   }));
+
+  const result = await Promise.allSettled(historyPromises);
+
+  const failedPromises = result.filter((x) => x.status !== 'fulfilled');
+  if (failedPromises.length > 0) {
+    throw new Error(`Failed to load history for ${failedPromises.length} packages. This usually happens when Metrc's servers are overloaded. Waiting a few minutes and trying again often fixes this issue.`);
+  }
 
   const bulkInfusedMatrix: any[][] = [];
   const distRexCogsMatrix: any[][] = [];
