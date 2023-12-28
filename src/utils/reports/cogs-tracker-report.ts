@@ -139,11 +139,6 @@ export async function maybeLoadCogsTrackerReportData({
     }
   }
 
-  // const historyPromises: Promise<any>[] = dateFilteredPackages.map((pkg) =>
-  //   primaryDataLoader.packageHistoryByPackageId(pkg.Id).then((history) => {
-  //     pkg.history = history;
-  //   }));
-
   const result = await Promise.allSettled(historyPromises);
 
   const failedPromises = result.filter((x) => x.status !== 'fulfilled');
