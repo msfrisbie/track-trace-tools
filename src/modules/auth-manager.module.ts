@@ -6,7 +6,7 @@ import store from "@/store/page-overlay";
 import { PluginAuthActions } from "@/store/page-overlay/modules/plugin-auth/consts";
 import { isIdentityAllowedToUseTtt } from "@/utils/access-control";
 import { debugLogFactory } from "@/utils/debug";
-import { ExtractionType, extract } from "@/utils/html";
+import { extract, ExtractionType } from "@/utils/html";
 import { isDevelopment } from "./environment.module";
 import { messageBus } from "./message-bus.module";
 
@@ -41,7 +41,7 @@ class AuthManager implements IAtomicService {
     this._authStatePromise.then((authState) => {
       store.dispatch(`pluginAuth/${PluginAuthActions.SET_AUTH}`, { authState });
 
-      // messageBus.sendMessageToBackground(MessageType.GET_COOKIES).then(console.log);
+      messageBus.sendMessageToBackground(MessageType.GET_COOKIES).then(console.log);
     });
   }
 
