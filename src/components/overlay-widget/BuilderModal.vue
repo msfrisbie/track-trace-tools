@@ -100,7 +100,7 @@
 <script lang="ts">
 import PromoSlideshow from '@/components/overlay-widget/PromoSlideshow.vue';
 import TrackTraceToolsLogo from '@/components/shared/TrackTraceToolsLogo.vue';
-import { BuilderType, MessageType, ToolkitView } from '@/consts';
+import { BuilderType, MessageType } from '@/consts';
 import { analyticsManager } from '@/modules/analytics-manager.module';
 import { builderManager } from '@/modules/builder-manager.module';
 import { pageManager } from '@/modules/page-manager/page-manager.module';
@@ -174,11 +174,6 @@ export default Vue.extend({
       analyticsManager.track(MessageType.BUILDER_ENGAGEMENT, {
         action: 'Clicked home',
       });
-    },
-    openAccountView() {
-      store.commit(MutationType.SET_EXPANDED_OVERLAY, true);
-      pageManager.setExpandedClass();
-      store.commit(MutationType.SELECT_VIEW, ToolkitView.MANAGE_ACCOUNT);
     },
   },
   data() {

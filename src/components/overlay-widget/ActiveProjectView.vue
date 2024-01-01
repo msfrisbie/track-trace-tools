@@ -96,7 +96,7 @@
 
 <script lang="ts">
 import NextStepOptions from '@/components/overlay-widget/NextStepOptions.vue';
-import { BuilderType, ToolkitView } from '@/consts';
+import { BuilderType } from '@/consts';
 import { builderManager, IBuilderProject } from '@/modules/builder-manager.module';
 import { pageManager } from '@/modules/page-manager/page-manager.module';
 import { MutationType } from '@/mutation-types';
@@ -126,11 +126,6 @@ export default Vue.extend({
     },
     retry() {
       builderManager.retryFailedRows();
-    },
-    openAccountView() {
-      store.commit(MutationType.SET_EXPANDED_OVERLAY, true);
-      pageManager.setExpandedClass();
-      store.commit(MutationType.SELECT_VIEW, ToolkitView.MANAGE_ACCOUNT);
     },
   },
   data() {

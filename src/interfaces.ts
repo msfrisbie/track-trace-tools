@@ -10,8 +10,6 @@ import {
   PlantState,
   SearchModalView,
   TagState,
-  TaskType,
-  ToolkitView,
   TransferState,
 } from "@/consts";
 import { Store } from "vuex";
@@ -186,23 +184,17 @@ export interface IRootState {
   accountSettings: IAccountSettings;
   contactData: IContactData | null;
   currentVersion: string | null;
-  currentView: ToolkitView | null;
-  currentViewSelectedAt: number | null;
   credentials: string | null;
   builderModalOpen: CsvUpload | null;
   debugMode: boolean;
   demoMode: boolean;
   mockDataMode: boolean;
   errorMessage: string | null;
-  expanded: boolean;
   flashMessage: string | null;
   flashMessageTimeout: number | null;
   loadingMessage: string | null;
   muteAnalytics: boolean;
-  navigateOnNextLoad: boolean;
   searchModalView: SearchModalView | null;
-  taskQueue: Array<Task>;
-  taskQueuePaused: boolean;
   trackedInteractions: ITrackedInteractions;
   backgroundTasks: IBackgroundTasksState;
   metrcStatusData: IMetrcStatusData | null;
@@ -328,13 +320,6 @@ export interface IIdentityState {
 
 export interface IApiKeyState {
   metrcApiKey: string;
-}
-
-export interface Task {
-  taskId: string;
-  taskType: TaskType;
-  taskName: string;
-  taskData: any;
 }
 
 export interface IResponseObjectData {

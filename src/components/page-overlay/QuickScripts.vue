@@ -72,7 +72,7 @@ export default Vue.extend({
   },
   mounted() {},
   computed: {
-    ...mapState(['backgroundTasks']),
+    ...mapState([]),
   },
   destroyed() {},
   methods: {

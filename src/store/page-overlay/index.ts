@@ -2,7 +2,6 @@ import {
   BackgroundTaskState,
   ChromeStorageKeys,
   DEBUG_ATTRIBUTE,
-  ToolkitView,
   VUEX_KEY
 } from '@/consts';
 import {
@@ -111,23 +110,17 @@ const defaultState: IRootState = {
   },
   contactData: null,
   currentVersion: null,
-  currentView: null,
-  currentViewSelectedAt: null,
   credentials: null,
   debugMode: false,
   demoMode: false,
   mockDataMode: false,
   errorMessage: null,
-  expanded: false,
   builderModalOpen: null,
   flashMessage: null,
   flashMessageTimeout: null,
   loadingMessage: null,
   muteAnalytics: isDevelopment(),
-  navigateOnNextLoad: false,
   searchModalView: null,
-  taskQueue: [],
-  taskQueuePaused: false,
   metrcStatusData: null,
   trackedInteractions: {
     dismissedCsvBuilderPopover: false,
@@ -168,15 +161,6 @@ const vuexStore = new Vuex.Store<IPluginState>({
     [MutationType.SET_CURRENT_VERSION](state: IRootState, version: string) {
       state.currentVersion = version;
     },
-    [MutationType.SELECT_VIEW](state: IRootState, view: ToolkitView) {
-      state.currentView = view;
-    },
-    [MutationType.TOGGLE_EXPANDED_OVERLAY](state: IRootState) {
-      state.expanded = !state.expanded;
-    },
-    [MutationType.SET_EXPANDED_OVERLAY](state: IRootState, expanded: boolean) {
-      state.expanded = expanded;
-    },
     [MutationType.SET_CONTACT_DATA](state: IRootState, contactData: IContactData) {
       state.contactData = {
         ...contactData,
@@ -197,29 +181,6 @@ const vuexStore = new Vuex.Store<IPluginState>({
     },
     [MutationType.RESET_TRACKED_INTERACTIONS](state: IRootState) {
       state.trackedInteractions = defaultState.trackedInteractions;
-    },
-    // [MutationType.ENQUEUE_TASK](state: IRootState, taskData: Task) {
-    //   state.taskQueue.push(taskData);
-    // },
-    // [MutationType.DEQUEUE_TASK](state: IRootState, taskId: string) {
-    //   for (let i = 0; i < state.taskQueue.length; i++) {
-    //     let obj = state.taskQueue[i];
-
-    //     if (obj.taskId === taskId) {
-    //       state.taskQueue.splice(i, 1);
-    //       break;
-    //     }
-    //   }
-    // },
-    [MutationType.PURGE_TASK_QUEUE](state: IRootState) {
-      state.taskQueue = [];
-    },
-    // [MutationType.TOGGLE_PAUSE_TASK_QUEUE](state: IRootState) {
-    //   state.taskQueuePaused = !state.taskQueuePaused
-    // },
-    [MutationType.TOGGLE_DEBUG_MODE](state: IRootState) {
-      console.error('DEPRECATED! do not call this!');
-      // state.debugMode = !state.debugMode;
     },
     [MutationType.SET_DEMO_MODE](state: IRootState, demoMode: boolean) {
       state.demoMode = demoMode;
@@ -242,9 +203,6 @@ const vuexStore = new Vuex.Store<IPluginState>({
     [MutationType.SET_ERROR_MESSAGE](state: IRootState, errorMessage: string | null) {
       state.errorMessage = errorMessage;
     },
-    [MutationType.SET_REDIRECT](state: IRootState, value: boolean) {
-      state.navigateOnNextLoad = value;
-    },
     [MutationType.SET_FLASH_MESSAGE](state: IRootState, flashMessage: string | null) {
       // DEPRECATED in favor of toast
       state.flashMessageTimeout && clearTimeout(state.flashMessageTimeout);
@@ -262,72 +220,6 @@ const vuexStore = new Vuex.Store<IPluginState>({
       builderModalOpen: CsvUpload | null,
     ) {
       state.builderModalOpen = builderModalOpen;
-    },
-    [MutationType.SET_FINALIZE_SALES_RECEIPTS_STATE](
-      state: IRootState,
-      finalizeSalesReceiptsState: BackgroundTaskState,
-    ) {
-      state.backgroundTasks.finalizeSalesReceiptsState = finalizeSalesReceiptsState;
-    },
-    [MutationType.SET_FINALIZE_SALES_RECEIPTS_LICENSE](
-      state: IRootState,
-      finalizeSalesReceiptsLicense: string,
-    ) {
-      state.backgroundTasks.finalizeSalesReceiptsLicense = finalizeSalesReceiptsLicense;
-    },
-    [MutationType.SET_FINALIZE_SALES_RECEIPTS_STOP_DATE](
-      state: IRootState,
-      finalizeSalesReceiptsStopIsodate: string | null,
-    ) {
-      state.backgroundTasks.finalizeSalesReceiptsStopIsodate = finalizeSalesReceiptsStopIsodate;
-    },
-    [MutationType.SET_FINALIZE_SALES_RECEIPTS_READOUT](
-      state: IRootState,
-      finalizeSalesReceiptsReadout: string | null,
-    ) {
-      state.backgroundTasks.finalizeSalesReceiptsReadout = finalizeSalesReceiptsReadout;
-    },
-    [MutationType.SET_FINALIZE_SALES_RECEIPTS_RUNNING_TOTAL](
-      state: IRootState,
-      finalizeSalesReceiptsRunningTotal: number,
-    ) {
-      state.backgroundTasks.finalizeSalesReceiptsRunningTotal = finalizeSalesReceiptsRunningTotal;
-    },
-    [MutationType.SET_VOID_TAGS_CONSECUTIVE_ERROR_TOTAL](
-      state: IRootState,
-      finalizeSalesReceiptsConsecutiveErrorTotal: number,
-    ) {
-      state.backgroundTasks.finalizeSalesReceiptsConsecutiveErrorTotal = finalizeSalesReceiptsConsecutiveErrorTotal;
-    },
-    [MutationType.SET_VOID_TAGS_STATE](state: IRootState, voidTagsState: BackgroundTaskState) {
-      state.backgroundTasks.voidTagsState = voidTagsState;
-    },
-    [MutationType.SET_VOID_TAGS_LICENSE](state: IRootState, voidTagsLicense: string) {
-      state.backgroundTasks.voidTagsLicense = voidTagsLicense;
-    },
-    [MutationType.SET_VOID_TAGS_DATA](
-      state: IRootState,
-      {
-        startTag = null,
-        endTag = null,
-        lastAttemptedTag = null,
-      }: { startTag: string | null; endTag: string | null; lastAttemptedTag: null },
-    ) {
-      state.backgroundTasks.voidTagsStartTag = startTag;
-      state.backgroundTasks.voidTagsEndTag = endTag;
-      state.backgroundTasks.voidTagsLastAttemptedTag = lastAttemptedTag;
-    },
-    [MutationType.SET_VOID_TAGS_READOUT](state: IRootState, voidTagsReadout: string | null) {
-      state.backgroundTasks.voidTagsReadout = voidTagsReadout;
-    },
-    [MutationType.SET_VOID_TAGS_RUNNING_TOTAL](state: IRootState, voidTagsRunningTotal: number) {
-      state.backgroundTasks.voidTagsRunningTotal = voidTagsRunningTotal;
-    },
-    [MutationType.SET_VOID_TAGS_CONSECUTIVE_ERROR_TOTAL](
-      state: IRootState,
-      voidTagsConsecutiveErrorTotal: number,
-    ) {
-      state.backgroundTasks.voidTagsConsecutiveErrorTotal = voidTagsConsecutiveErrorTotal;
     },
     [MutationType.SET_ACCOUNT_ENABLED](state: IRootState, accountEnabled: boolean) {
       state.accountEnabled = accountEnabled;

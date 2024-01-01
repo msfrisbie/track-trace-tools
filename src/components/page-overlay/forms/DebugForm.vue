@@ -182,22 +182,6 @@ export default Vue.extend({
       window.location.hash = '';
       store.commit(MutationType.SET_DEBUG_MODE, !store.state.debugMode);
     },
-    // async createNoopTasks() {
-    //   for (let i = 0; i < 20; ++i) {
-    //     store.commit(
-    //       MutationType.ENQUEUE_TASK,
-    //       await createTask(TaskType.NOOP)
-    //     );
-    //   }
-    // },
-    // async createNoopNetworkTasks() {
-    //   for (let i = 0; i < 20; ++i) {
-    //     store.commit(
-    //       MutationType.ENQUEUE_TASK,
-    //       await createTask(TaskType.NOOP_NETWORK)
-    //     );
-    //   }
-    // },
     async throwError() {
       throw new Error('Test error');
     },
