@@ -1,54 +1,49 @@
-import {
-  BackgroundTaskState,
-  ChromeStorageKeys,
-  DEBUG_ATTRIBUTE,
-  VUEX_KEY
-} from '@/consts';
+import { BackgroundTaskState, ChromeStorageKeys, DEBUG_ATTRIBUTE, VUEX_KEY } from "@/consts";
 import {
   IAccountSettings,
   IContactData,
   IMetrcStatusData,
   IPluginState,
   IRootState,
-  ITrackedInteractions
-} from '@/interfaces';
-import { isDevelopment } from '@/modules/environment.module';
-import { MutationType } from '@/mutation-types';
-import { CsvUpload } from '@/types';
-import Vue from 'vue';
-import Vuex from 'vuex';
-import VuexPersistence from 'vuex-persist';
-import { announcementsModule, announcementsReducer } from './modules/announcements';
-import { clientModule, clientReducer } from './modules/client';
-import { createPackageCsvModule, createPackageCsvReducer } from './modules/create-package-csv';
-import { employeeSamplesModule, employeeSamplesReducer } from './modules/employee-samples';
-import { explorerModule, explorerReducer } from './modules/explorer';
-import { flagsModule, flagsReducer } from './modules/flags/index';
-import { graphModule, graphReducer } from './modules/graph';
-import { listingModule, listingReducer } from './modules/listing';
-import { packageHistoryModule, packageHistoryReducer } from './modules/package-history';
-import { packageSearchModule, packageSearchReducer } from './modules/package-search';
-import { plantSearchModule, plantSearchReducer } from './modules/plant-search';
-import { pluginAuthModule, pluginAuthReducer } from './modules/plugin-auth/index';
+  ITrackedInteractions,
+} from "@/interfaces";
+import { isDevelopment } from "@/modules/environment.module";
+import { MutationType } from "@/mutation-types";
+import { CsvUpload } from "@/types";
+import Vue from "vue";
+import Vuex from "vuex";
+import VuexPersistence from "vuex-persist";
+import { announcementsModule, announcementsReducer } from "./modules/announcements";
+import { clientModule, clientReducer } from "./modules/client";
+import { createPackageCsvModule, createPackageCsvReducer } from "./modules/create-package-csv";
+import { employeeSamplesModule, employeeSamplesReducer } from "./modules/employee-samples";
+import { explorerModule, explorerReducer } from "./modules/explorer";
+import { flagsModule, flagsReducer } from "./modules/flags/index";
+import { graphModule, graphReducer } from "./modules/graph";
+import { listingModule, listingReducer } from "./modules/listing";
+import { packageHistoryModule, packageHistoryReducer } from "./modules/package-history";
+import { packageSearchModule, packageSearchReducer } from "./modules/package-search";
+import { plantSearchModule, plantSearchReducer } from "./modules/plant-search";
+import { pluginAuthModule, pluginAuthReducer } from "./modules/plugin-auth/index";
 import {
   promoteImmaturePlantsBuilderModule,
-  promoteImmaturePlantsBuilderReducer
-} from './modules/promote-immature-plants-builder';
-import { reportsModule, reportsReducer } from './modules/reports';
-import { searchModule, searchReducer } from './modules/search';
-import { settingsModule, settingsReducer } from './modules/settings';
-import { SettingsActions } from './modules/settings/consts';
+  promoteImmaturePlantsBuilderReducer,
+} from "./modules/promote-immature-plants-builder";
+import { reportsModule, reportsReducer } from "./modules/reports";
+import { searchModule, searchReducer } from "./modules/search";
+import { settingsModule, settingsReducer } from "./modules/settings";
+import { SettingsActions } from "./modules/settings/consts";
 import {
   splitPackageBuilderModule,
-  splitPackageBuilderReducer
-} from './modules/split-package-builder';
-import { tagSearchModule, tagSearchReducer } from './modules/tag-search';
-import { transferBuilderModule, transferBuilderReducer } from './modules/transfer-builder/index';
+  splitPackageBuilderReducer,
+} from "./modules/split-package-builder";
+import { tagSearchModule, tagSearchReducer } from "./modules/tag-search";
+import { transferBuilderModule, transferBuilderReducer } from "./modules/transfer-builder/index";
 import {
   transferPackageSearchModule,
-  transferPackageSearchReducer
-} from './modules/transfer-package-search';
-import { transferSearchModule, transferSearchReducer } from './modules/transfer-search';
+  transferPackageSearchReducer,
+} from "./modules/transfer-package-search";
+import { transferSearchModule, transferSearchReducer } from "./modules/transfer-search";
 
 // Taken from https://gist.github.com/Myeris/3f13b42f6764ded6640cef693d9d1987
 const vuexLocal = {
@@ -79,7 +74,7 @@ const vuexShared = {
     flags: flagsReducer(state.flags),
     splitPackageBuilder: splitPackageBuilderReducer(state.splitPackageBuilder),
     promoteImmaturePlantsBuilder: promoteImmaturePlantsBuilderReducer(
-      state.promoteImmaturePlantsBuilder,
+      state.promoteImmaturePlantsBuilder
     ),
     listing: listingReducer(state.listing),
     settings: settingsReducer(state.settings),
@@ -173,7 +168,7 @@ const vuexStore = new Vuex.Store<IPluginState>({
     },
     [MutationType.UPDATE_TRACKED_INTERACTIONS](
       state: IRootState,
-      trackedInteractions: ITrackedInteractions,
+      trackedInteractions: ITrackedInteractions
     ) {
       state.trackedInteractions = {
         ...trackedInteractions,
@@ -197,36 +192,20 @@ const vuexStore = new Vuex.Store<IPluginState>({
     [MutationType.SET_MUTE_ANALYTICS](state: IRootState, muteAnalytics: boolean) {
       state.muteAnalytics = muteAnalytics;
     },
-    [MutationType.SET_LOADING_MESSAGE](state: IRootState, loadingMessage: string | null) {
-      state.loadingMessage = loadingMessage;
-    },
-    [MutationType.SET_ERROR_MESSAGE](state: IRootState, errorMessage: string | null) {
-      state.errorMessage = errorMessage;
-    },
-    [MutationType.SET_FLASH_MESSAGE](state: IRootState, flashMessage: string | null) {
-      // DEPRECATED in favor of toast
-      state.flashMessageTimeout && clearTimeout(state.flashMessageTimeout);
-
-      state.flashMessage = flashMessage;
-
-      if (flashMessage) {
-        state.flashMessageTimeout = setTimeout(() => {
-          state.flashMessage = null;
-        }, 3000) as any;
-      }
-    },
     [MutationType.SET_BUILDER_MODAL_DISPLAY_STATE](
       state: IRootState,
-      builderModalOpen: CsvUpload | null,
+      builderModalOpen: CsvUpload | null
     ) {
       state.builderModalOpen = builderModalOpen;
     },
     [MutationType.SET_ACCOUNT_ENABLED](state: IRootState, accountEnabled: boolean) {
       state.accountEnabled = accountEnabled;
     },
+    /* eslint-disable-next-line no-warning-comments */
+    // TODO remove
     [MutationType.UPDATE_METRC_STATUS_DATA](
       state: IRootState,
-      metrcStatusData: IMetrcStatusData | null,
+      metrcStatusData: IMetrcStatusData | null
     ) {
       state.metrcStatusData = metrcStatusData;
     },
@@ -341,17 +320,17 @@ try {
 
     // If persisted settings are older, don't bother using
     if (vuexStore.state.settings.persistTimestamp > persistedSettings.persistTimestamp) {
-      console.log('Persisted settings too old');
+      console.log("Persisted settings too old");
       return;
     }
 
     // Only load if the STORED flag is set
     if (!persistedSettings.writeSettingsToChromeStorage) {
-      console.log('Persist disabled');
+      console.log("Persist disabled");
       return;
     }
 
-    console.log('Inserting persisted settings');
+    console.log("Inserting persisted settings");
 
     vuexStore.dispatch(`settings/${SettingsActions.UPDATE_SETTINGS}`, persistedSettings);
   });
