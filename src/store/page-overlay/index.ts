@@ -130,7 +130,6 @@ const defaultState: IRootState = {
   taskQueuePaused: false,
   metrcStatusData: null,
   trackedInteractions: {
-    dismissedScreenshotPopover: false,
     dismissedCsvBuilderPopover: false,
     dismissedBuilderPopover: false,
     dismissedToolboxPopover: false,

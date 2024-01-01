@@ -85,7 +85,6 @@ export interface IAccountSettings {
 }
 
 export interface ITrackedInteractions {
-  dismissedScreenshotPopover: boolean;
   dismissedCsvBuilderPopover: boolean;
   dismissedBuilderPopover: boolean;
   dismissedToolboxPopover: boolean;
@@ -1125,17 +1124,6 @@ export interface IBusMessage {
 export interface IBusEvent {
   uuid?: string;
   message: IBusMessage;
-}
-
-export interface IBackgroundScriptScreenshotUploadData {
-  metrcId: string;
-  state: string;
-  url: string;
-  license: string;
-}
-
-export interface IContentScriptScreenshotUploadData extends IBackgroundScriptScreenshotUploadData {
-  blobUrl: string;
 }
 
 export interface IDocumentUploadData {

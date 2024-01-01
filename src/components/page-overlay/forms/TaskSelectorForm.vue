@@ -34,18 +34,6 @@ export default Vue.extend({
           value: ToolkitView.SETTINGS,
           text: 'Edit Toolkit Settings',
         },
-        // {
-        //   value: ToolkitView.MANAGE_ACCOUNT,
-        //   text: "Connect T3"
-        // },
-        {
-          value: ToolkitView.SCREENSHOT,
-          text: 'Create a Screenshot Share',
-        },
-        // {
-        //   value: ToolkitView.CREATE_CSV,
-        //   text: "Generate Metrc CSV files",
-        // },
         {
           label: 'Sales',
           options: [

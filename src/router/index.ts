@@ -43,7 +43,6 @@ import VoidTagForm from "@/components/page-overlay/forms/VoidTagForm.vue";
 import GoogleSheetsExport from "@/components/page-overlay/GoogleSheetsExport.vue";
 import ManageAccount from "@/components/page-overlay/ManageAccount.vue";
 import QuickScripts from "@/components/page-overlay/QuickScripts.vue";
-import Screenshot from "@/components/page-overlay/Screenshot.vue";
 import VueRouter, { RouteConfig } from "vue-router";
 
 const routes: Array<RouteConfig> = [
@@ -245,11 +244,6 @@ const routes: Array<RouteConfig> = [
     path: "/check-permissions",
     name: "Check Permissions",
     component: CheckPermissionsView,
-  },
-  {
-    path: "/screenshot/create-screenshot",
-    name: "Screenshot Share",
-    component: Screenshot,
   },
   {
     path: "/tags/void-tags",

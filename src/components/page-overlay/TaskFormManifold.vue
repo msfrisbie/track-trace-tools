@@ -2,7 +2,6 @@
   <div>
     <settings-form v-if="!currentView || currentView === settings" />
     <csv-links v-if="currentView === createCsv" />
-    <screenshot v-if="currentView === screenshot" />
     <void-tag-form v-if="currentView === voidTags" />
     <package-note-form v-if="currentView === packageNote" />
     <reorder-tags-form v-if="currentView === reorderTags" />
@@ -18,7 +17,6 @@ import FinalizeSalesReceiptsForm from '@/components/page-overlay/forms/FinalizeS
 import SettingsForm from '@/components/page-overlay/forms/SettingsForm.vue';
 import VoidTagForm from '@/components/page-overlay/forms/VoidTagForm.vue';
 import ManageAccount from '@/components/page-overlay/ManageAccount.vue';
-import Screenshot from '@/components/page-overlay/Screenshot.vue';
 import { ToolkitView } from '@/consts';
 import Vue from 'vue';
 import { mapState } from 'vuex';
@@ -30,7 +28,6 @@ export default Vue.extend({
     return {
       settings: ToolkitView.SETTINGS,
       createCsv: ToolkitView.CREATE_CSV,
-      screenshot: ToolkitView.SCREENSHOT,
       voidTags: ToolkitView.VOID_TAGS,
       packageNote: ToolkitView.ADD_PACKAGE_NOTE,
       reorderTags: ToolkitView.REORDER_TAGS,
@@ -41,7 +38,6 @@ export default Vue.extend({
   components: {
     PackageNoteForm,
     ReorderTagsForm,
-    Screenshot,
     SettingsForm,
     VoidTagForm,
     FinalizeSalesReceiptsForm,

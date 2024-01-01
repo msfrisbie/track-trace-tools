@@ -199,26 +199,6 @@
             Disable overlay messages (not recommended)
           </b-form-checkbox>
 
-          <!-- <b-form-checkbox
-          id="checkbox-hideScreenshotButton"
-          class="mb-2"
-          v-model="settings.hideScreenshotButton"
-          name="checkbox-hideScreenshotButton"
-          @change="onChange()"
-        >
-          Hide screenshot button
-        </b-form-checkbox> -->
-
-          <!-- <b-form-checkbox
-            id="checkbox-useLegacyScreenshot"
-            class="mb-2"
-            v-model="settings.useLegacyScreenshot"
-            name="checkbox-useLegacyScreenshot"
-            @change="onChange()"
-          >
-            Use legacy screenshot (slower, not recommended)
-          </b-form-checkbox> -->
-
           <b-form-checkbox id="checkbox-hideInlineTransferButtons" class="mb-2"
             v-model="settings.hideInlineTransferButtons" name="checkbox-hideInlineTransferButtons" @change="onChange()">
             Hide inline table buttons

@@ -1,7 +1,6 @@
 import { IAtomicService } from '@/interfaces';
 
 export interface IDeprecatedFlags {
-  enableScreenshot: boolean;
   enableCsvBuilder: boolean;
   enableQuickActions: boolean;
   downloadDocumentOnOpen: boolean;
@@ -10,7 +9,6 @@ export interface IDeprecatedFlags {
 }
 
 const DEFAULT_FLAGS: IDeprecatedFlags = {
-  enableScreenshot: true,
   enableCsvBuilder: false,
   enableQuickActions: false,
   downloadDocumentOnOpen: false,

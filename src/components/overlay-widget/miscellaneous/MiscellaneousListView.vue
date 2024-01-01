@@ -94,15 +94,6 @@ export default Vue.extend({
     }),
     options() {
       return [
-        // {
-        //   backgroundColor: "gray",
-        //   text: "TAKE A SCREENSHOT",
-        //   route: "/screenshot/create-screenshot",
-        //   icon: "camera",
-        //   enabled: true,
-        //   isBeta: false,
-        //   isNew: false
-        // },
         {
           backgroundColor: 'gray',
           text: 'FINALIZE SALES',

@@ -10,7 +10,6 @@
       <b-button variant="info" @click="resetAnnouncements()">RESET ANNOUNCEMENTS</b-button>
       <b-button variant="info" @click="throwError()">THROW ERROR</b-button>
       <b-button variant="info" @click="testToast()">TEST TOAST</b-button>
-      <b-button variant="info" @click="takeScreenshot()">TAKE SCREENSHOT</b-button>
       <!-- <b-button variant="info" @click="openCsvModal()">OPEN CSV MODAL</b-button> -->
     </div>
 
@@ -127,7 +126,6 @@
 <script lang="ts">
 import { ModalType } from '@/consts';
 import { modalManager } from '@/modules/modal-manager.module';
-import { screenshotManager } from '@/modules/screenshot-manager.module';
 import { toastManager } from '@/modules/toast-manager.module';
 import { MutationType } from '@/mutation-types';
 import store from '@/store/page-overlay/index';
@@ -211,13 +209,6 @@ export default Vue.extend({
         appendToast: true,
         toaster: 'ttt-toaster',
         solid: true,
-      });
-    },
-    async takeScreenshot() {
-      screenshotManager.takeScreenshot({
-        downloadFile: false,
-        useBackground: true,
-        useLegacyScreenshot: store.state.settings.useLegacyScreenshot,
       });
     },
     async resetState() {
