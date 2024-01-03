@@ -5,8 +5,8 @@ import {
   SalesTabLabel,
   TagsTabLabel,
   TransfersTabLabel,
-} from '@/consts';
-import { BackgroundState, DarkModeState, SnowflakeState } from '@/interfaces';
+} from "@/consts";
+import { BackgroundState, DarkModeState, SnowflakeState } from "@/interfaces";
 
 export interface ISettingsState {
   autoOpenActivePackages: boolean;
@@ -26,7 +26,6 @@ export interface ISettingsState {
   hideInlineTransferButtons: boolean;
   hidePackageSearch: boolean;
   hideQuickActionButtons: boolean;
-  hideScreenshotButton: boolean;
   hideTransferSearch: boolean;
   landingPage: LandingPage;
   licenseKey: string;
@@ -47,11 +46,10 @@ export interface ISettingsState {
   snowflakeCharacter: string;
   snowflakeSize: string;
   snowflakeImage: string;
-  snowflakeImageCrop: 'none' | 'square' | 'circle' | 'rounded';
+  snowflakeImageCrop: "none" | "square" | "circle" | "rounded";
   snowflakeText: string;
   tagDefaultPageSize: number;
   transferDefaultPageSize: number;
-  useLegacyScreenshot: boolean;
   enableManifestDocumentViewer: boolean;
   hideListingsButton: boolean;
   preventActiveProjectPageLeave: boolean;

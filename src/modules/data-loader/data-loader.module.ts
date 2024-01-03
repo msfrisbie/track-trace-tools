@@ -66,7 +66,6 @@ import {
   primaryMetrcRequestManager,
 } from "@/modules/metrc-request-manager.module";
 import { mockDataManager } from "@/modules/mock-data-manager.module";
-import { MutationType } from "@/mutation-types";
 import store from "@/store/page-overlay/index";
 import { CsvUpload } from "@/types";
 import { buildBody, streamFactory } from "@/utils/data-loader";
@@ -2750,7 +2749,7 @@ export class DataLoader implements IAtomicService {
   private async loadDestinationTransporters(destinationId: number): Promise<ITransporterData[]> {
     await authManager.authStateOrError();
 
-    store.commit(MutationType.SET_LOADING_MESSAGE, "Loading destination transporters...");
+    console.log("Loading destination transporters...");
 
     let destinationTransporters: ITransporterData[] = [];
 
@@ -2762,15 +2761,13 @@ export class DataLoader implements IAtomicService {
 
     console.log(`Loaded ${destinationTransporters.length} destinationTransporters`);
 
-    store.commit(MutationType.SET_LOADING_MESSAGE, null);
-
     return destinationTransporters;
   }
 
   private async loadTransferDestinations(transferId: number): Promise<IDestinationData[]> {
     await authManager.authStateOrError();
 
-    store.commit(MutationType.SET_LOADING_MESSAGE, "Loading transfer destinations...");
+    console.log("Loading transfer destinations...");
 
     let transferDestinations: IDestinationData[] = [];
 
@@ -2782,8 +2779,6 @@ export class DataLoader implements IAtomicService {
 
     console.log(`Loaded ${transferDestinations.length} transferDestinations`);
 
-    store.commit(MutationType.SET_LOADING_MESSAGE, null);
-
     return transferDestinations;
   }
 
@@ -2792,7 +2787,7 @@ export class DataLoader implements IAtomicService {
   ): Promise<ITransferTransporterDetails[]> {
     await authManager.authStateOrError();
 
-    store.commit(MutationType.SET_LOADING_MESSAGE, "Loading transfer transporter details...");
+    console.log("Loading transfer transporter details...");
 
     let transferDestinations: ITransferTransporterDetails[] = [];
 
@@ -2804,15 +2799,13 @@ export class DataLoader implements IAtomicService {
 
     console.log(`Loaded ${transferDestinations.length} transfer transporter details`);
 
-    store.commit(MutationType.SET_LOADING_MESSAGE, null);
-
     return transferDestinations;
   }
 
   private async loadDestinationPackages(destinationId: number): Promise<IDestinationPackageData[]> {
     await authManager.authStateOrError();
 
-    store.commit(MutationType.SET_LOADING_MESSAGE, "Loading destination packages...");
+    console.log("Loading destination packages...");
 
     let destinationPackages: IDestinationPackageData[] = [];
 
@@ -2823,8 +2816,6 @@ export class DataLoader implements IAtomicService {
     );
 
     console.log(`Loaded ${destinationPackages.length} destinationPackages`);
-
-    store.commit(MutationType.SET_LOADING_MESSAGE, null);
 
     return destinationPackages;
   }
@@ -3035,7 +3026,7 @@ export class DataLoader implements IAtomicService {
   ): Promise<IMetrcFacilityData[]> {
     await authManager.authStateOrError();
 
-    store.commit(MutationType.SET_LOADING_MESSAGE, "Loading transfer destination facilities...");
+    console.log("Loading transfer destination facilities...");
 
     const response =
       await this.metrcRequestManagerOrError.transferDestinationFacilitiesAutocomplete(query);
@@ -3043,8 +3034,6 @@ export class DataLoader implements IAtomicService {
     const transferDestinationFacilities: IMetrcFacilityData[] = response.data.Data;
 
     console.log(`Loaded ${transferDestinationFacilities.length} transferDestinationFacilities`);
-
-    store.commit(MutationType.SET_LOADING_MESSAGE, null);
 
     return transferDestinationFacilities;
   }
@@ -3054,7 +3043,7 @@ export class DataLoader implements IAtomicService {
   ): Promise<IMetrcFacilityData[]> {
     await authManager.authStateOrError();
 
-    store.commit(MutationType.SET_LOADING_MESSAGE, "Loading transfer transporter facilities...");
+    console.log("Loading transfer transporter facilities...");
 
     const response =
       await this.metrcRequestManagerOrError.transferTransporterFacilitiesAutocomplete(query);
@@ -3062,8 +3051,6 @@ export class DataLoader implements IAtomicService {
     const transferTransporterFacilities: IMetrcFacilityData[] = response.data.Data;
 
     console.log(`Loaded ${transferTransporterFacilities.length} transferTransporterFacilities`);
-
-    store.commit(MutationType.SET_LOADING_MESSAGE, null);
 
     return transferTransporterFacilities;
   }
@@ -3176,7 +3163,7 @@ export class DataLoader implements IAtomicService {
   private async loadActivePackages(): Promise<IPackageData[]> {
     await authManager.authStateOrError();
 
-    store.commit(MutationType.SET_LOADING_MESSAGE, "Loading active packages...");
+    console.log("Loading active packages...");
 
     let activePackages: IPackageData[] = [];
 
@@ -3185,8 +3172,6 @@ export class DataLoader implements IAtomicService {
     });
 
     console.log(`Loaded ${activePackages.length} activePackages`);
-
-    store.commit(MutationType.SET_LOADING_MESSAGE, null);
 
     return activePackages;
   }
@@ -3227,7 +3212,7 @@ export class DataLoader implements IAtomicService {
   private async loadInactivePackages(): Promise<IPackageData[]> {
     await authManager.authStateOrError();
 
-    store.commit(MutationType.SET_LOADING_MESSAGE, "Loading inactive packages...");
+    console.log("Loading inactive packages...");
 
     let inactivePackages: IPackageData[] = [];
 
@@ -3238,8 +3223,6 @@ export class DataLoader implements IAtomicService {
     });
 
     console.log(`Loaded ${inactivePackages.length} inactivePackages`);
-
-    store.commit(MutationType.SET_LOADING_MESSAGE, null);
 
     return inactivePackages;
   }
@@ -3280,7 +3263,7 @@ export class DataLoader implements IAtomicService {
   private async loadOnHoldPackages(): Promise<IPackageData[]> {
     await authManager.authStateOrError();
 
-    store.commit(MutationType.SET_LOADING_MESSAGE, "Loading on hold packages...");
+    console.log("Loading on hold packages...");
 
     let onHoldPackages: IPackageData[] = [];
 
@@ -3290,15 +3273,13 @@ export class DataLoader implements IAtomicService {
 
     console.log(`Loaded ${onHoldPackages.length} onHoldPackages`);
 
-    store.commit(MutationType.SET_LOADING_MESSAGE, null);
-
     return onHoldPackages;
   }
 
   private async loadInTransitPackages(): Promise<IPackageData[]> {
     await authManager.authStateOrError();
 
-    store.commit(MutationType.SET_LOADING_MESSAGE, "Loading in transit packages...");
+    console.log("Loading in transit packages...");
 
     let inTransitPackages: IPackageData[] = [];
 
@@ -3308,15 +3289,13 @@ export class DataLoader implements IAtomicService {
 
     console.log(`Loaded ${inTransitPackages.length} inTransitPackages`);
 
-    store.commit(MutationType.SET_LOADING_MESSAGE, null);
-
     return inTransitPackages;
   }
 
   private async loadIncomingTransfers(): Promise<ITransferData[]> {
     await authManager.authStateOrError();
 
-    store.commit(MutationType.SET_LOADING_MESSAGE, "Loading incoming transfers...");
+    console.log("Loading incoming transfers...");
 
     let incomingTransfers: ITransferData[] = [];
 
@@ -3326,15 +3305,13 @@ export class DataLoader implements IAtomicService {
 
     console.log(`Loaded ${incomingTransfers.length} incomingTransfers`);
 
-    store.commit(MutationType.SET_LOADING_MESSAGE, null);
-
     return incomingTransfers;
   }
 
   private async loadIncomingInactiveTransfers(): Promise<ITransferData[]> {
     await authManager.authStateOrError();
 
-    store.commit(MutationType.SET_LOADING_MESSAGE, "Loading incoming inactive transfers...");
+    console.log("Loading incoming inactive transfers...");
 
     let incomingInactiveTransfers: ITransferData[] = [];
 
@@ -3346,15 +3323,13 @@ export class DataLoader implements IAtomicService {
 
     console.log(`Loaded ${incomingInactiveTransfers.length} incomingInactiveTransfers`);
 
-    store.commit(MutationType.SET_LOADING_MESSAGE, null);
-
     return incomingInactiveTransfers;
   }
 
   private async loadOutgoingTransfers(): Promise<ITransferData[]> {
     await authManager.authStateOrError();
 
-    store.commit(MutationType.SET_LOADING_MESSAGE, "Loading outgoing transfers...");
+    console.log("Loading outgoing transfers...");
 
     let outgoingTransfers: ITransferData[] = [];
 
@@ -3364,15 +3339,13 @@ export class DataLoader implements IAtomicService {
 
     console.log(`Loaded ${outgoingTransfers.length} outgoingTransfers`);
 
-    store.commit(MutationType.SET_LOADING_MESSAGE, null);
-
     return outgoingTransfers;
   }
 
   private async loadOutgoingInactiveTransfers(): Promise<ITransferData[]> {
     await authManager.authStateOrError();
 
-    store.commit(MutationType.SET_LOADING_MESSAGE, "Loading outgoing inactive transfers...");
+    console.log("Loading outgoing inactive transfers...");
 
     let outgoingTransfers: ITransferData[] = [];
 
@@ -3384,15 +3357,13 @@ export class DataLoader implements IAtomicService {
 
     console.log(`Loaded ${outgoingTransfers.length} outgoingInactiveTransfers`);
 
-    store.commit(MutationType.SET_LOADING_MESSAGE, null);
-
     return outgoingTransfers;
   }
 
   private async loadRejectedTransfers(): Promise<ITransferData[]> {
     await authManager.authStateOrError();
 
-    store.commit(MutationType.SET_LOADING_MESSAGE, "Loading rejected transfers...");
+    console.log("Loading rejected transfers...");
 
     let rejectedTransfers: ITransferData[] = [];
 
@@ -3402,15 +3373,13 @@ export class DataLoader implements IAtomicService {
 
     console.log(`Loaded ${rejectedTransfers.length} rejectedTransfers`);
 
-    store.commit(MutationType.SET_LOADING_MESSAGE, null);
-
     return rejectedTransfers;
   }
 
   private async loadLayoverTransfers(): Promise<ITransferData[]> {
     await authManager.authStateOrError();
 
-    store.commit(MutationType.SET_LOADING_MESSAGE, "Loading layover transfers...");
+    console.log("Loading layover transfers...");
 
     let layoverTransfers: ITransferData[] = [];
 
@@ -3420,15 +3389,13 @@ export class DataLoader implements IAtomicService {
 
     console.log(`Loaded ${layoverTransfers.length} layoverTransfers`);
 
-    store.commit(MutationType.SET_LOADING_MESSAGE, null);
-
     return layoverTransfers;
   }
 
   private async loadTransferDestinationFacilities(): Promise<IMetrcFacilityData[]> {
     await authManager.authStateOrError();
 
-    store.commit(MutationType.SET_LOADING_MESSAGE, "Loading transfer destination facilities...");
+    console.log("Loading transfer destination facilities...");
 
     let facilities: IMetrcFacilityData[] = [];
 
@@ -3440,15 +3407,13 @@ export class DataLoader implements IAtomicService {
 
     console.log(`Loaded ${facilities.length} facilities`);
 
-    store.commit(MutationType.SET_LOADING_MESSAGE, null);
-
     return facilities;
   }
 
   private async loadTransferTransporterFacilities(): Promise<IMetrcFacilityData[]> {
     await authManager.authStateOrError();
 
-    store.commit(MutationType.SET_LOADING_MESSAGE, "Loading transfer transporter facilities...");
+    console.log("Loading transfer transporter facilities...");
 
     let facilities: IMetrcFacilityData[] = [];
 
@@ -3460,15 +3425,13 @@ export class DataLoader implements IAtomicService {
 
     console.log(`Loaded ${facilities.length} facilities`);
 
-    store.commit(MutationType.SET_LOADING_MESSAGE, null);
-
     return facilities;
   }
 
   private async loadActiveHarvests(): Promise<IHarvestData[]> {
     await authManager.authStateOrError();
 
-    store.commit(MutationType.SET_LOADING_MESSAGE, "Loading harvests...");
+    console.log("Loading harvests...");
 
     let harvests: IHarvestData[] = [];
 
@@ -3478,15 +3441,13 @@ export class DataLoader implements IAtomicService {
 
     console.log(`Loaded ${harvests.length} harvests`);
 
-    store.commit(MutationType.SET_LOADING_MESSAGE, null);
-
     return harvests;
   }
 
   private async loadInactiveHarvests(): Promise<IHarvestData[]> {
     await authManager.authStateOrError();
 
-    store.commit(MutationType.SET_LOADING_MESSAGE, "Loading inactive harvests...");
+    console.log("Loading inactive harvests...");
 
     let harvests: IHarvestData[] = [];
 
@@ -3496,15 +3457,13 @@ export class DataLoader implements IAtomicService {
 
     console.log(`Loaded ${harvests.length} inactive harvests`);
 
-    store.commit(MutationType.SET_LOADING_MESSAGE, null);
-
     return harvests;
   }
 
   private async loadLocations(): Promise<ILocationData[]> {
     await authManager.authStateOrError();
 
-    store.commit(MutationType.SET_LOADING_MESSAGE, "Loading locations...");
+    console.log("Loading locations...");
 
     let locations: ILocationData[] = [];
 
@@ -3522,15 +3481,13 @@ export class DataLoader implements IAtomicService {
 
     console.log(`Loaded ${locations.length} locations`);
 
-    store.commit(MutationType.SET_LOADING_MESSAGE, null);
-
     return locations;
   }
 
   private async loadItems(): Promise<IItemData[]> {
     await authManager.authStateOrError();
 
-    store.commit(MutationType.SET_LOADING_MESSAGE, "Loading items...");
+    console.log("Loading items...");
 
     let items: IItemData[] = [];
 
@@ -3548,15 +3505,13 @@ export class DataLoader implements IAtomicService {
 
     console.log(`Loaded ${items.length} items`);
 
-    store.commit(MutationType.SET_LOADING_MESSAGE, null);
-
     return items;
   }
 
   private async loadStrains(): Promise<IStrainData[]> {
     await authManager.authStateOrError();
 
-    store.commit(MutationType.SET_LOADING_MESSAGE, "Loading strains...");
+    console.log("Loading strains...");
 
     let strains: IStrainData[] = [];
 
@@ -3573,8 +3528,6 @@ export class DataLoader implements IAtomicService {
     });
 
     console.log(`Loaded ${strains.length} strains`);
-
-    store.commit(MutationType.SET_LOADING_MESSAGE, null);
 
     return strains;
   }
@@ -3618,7 +3571,7 @@ export class DataLoader implements IAtomicService {
   private async loadVegetativePlants(options: IPlantOptions): Promise<IPlantData[]> {
     await authManager.authStateOrError();
 
-    store.commit(MutationType.SET_LOADING_MESSAGE, "Loading vegetative plants...");
+    console.log("Loading vegetative plants...");
 
     let plants: IPlantData[] = [];
 
@@ -3627,8 +3580,6 @@ export class DataLoader implements IAtomicService {
     });
 
     console.log(`Loaded ${plants.length} vegetative plants`);
-
-    store.commit(MutationType.SET_LOADING_MESSAGE, null);
 
     return plants;
   }
@@ -3672,7 +3623,7 @@ export class DataLoader implements IAtomicService {
   private async loadFloweringPlants(options: IPlantOptions): Promise<IPlantData[]> {
     await authManager.authStateOrError();
 
-    store.commit(MutationType.SET_LOADING_MESSAGE, "Loading flowering plants...");
+    console.log("Loading flowering plants...");
 
     let plants: IPlantData[] = [];
 
@@ -3681,8 +3632,6 @@ export class DataLoader implements IAtomicService {
     });
 
     console.log(`Loaded ${plants.length} flowering plants`);
-
-    store.commit(MutationType.SET_LOADING_MESSAGE, null);
 
     return plants;
   }
@@ -3726,7 +3675,7 @@ export class DataLoader implements IAtomicService {
   private async loadInactivePlants(options: IPlantOptions): Promise<IPlantData[]> {
     await authManager.authStateOrError();
 
-    store.commit(MutationType.SET_LOADING_MESSAGE, "Loading inactive plants...");
+    console.log("Loading inactive plants...");
 
     let plants: IPlantData[] = [];
 
@@ -3736,15 +3685,13 @@ export class DataLoader implements IAtomicService {
 
     console.log(`Loaded ${plants.length} inactive plants`);
 
-    store.commit(MutationType.SET_LOADING_MESSAGE, null);
-
     return plants;
   }
 
   private async loadPlantBatches(options: IPlantBatchOptions): Promise<IPlantBatchData[]> {
     await authManager.authStateOrError();
 
-    store.commit(MutationType.SET_LOADING_MESSAGE, "Loading plant batches...");
+    console.log("Loading plant batches...");
 
     let plantBatches: IPlantBatchData[] = [];
 
@@ -3753,8 +3700,6 @@ export class DataLoader implements IAtomicService {
     });
 
     console.log(`Loaded ${plantBatches.length} plant batches`);
-
-    store.commit(MutationType.SET_LOADING_MESSAGE, null);
 
     return plantBatches;
   }
@@ -3795,7 +3740,7 @@ export class DataLoader implements IAtomicService {
   private async loadInactivePlantBatches(options: IPlantBatchOptions): Promise<IPlantBatchData[]> {
     await authManager.authStateOrError();
 
-    store.commit(MutationType.SET_LOADING_MESSAGE, "Loading inactive plant batches...");
+    console.log("Loading inactive plant batches...");
 
     let plantBatches: IPlantBatchData[] = [];
 
@@ -3806,8 +3751,6 @@ export class DataLoader implements IAtomicService {
     );
 
     console.log(`Loaded ${plantBatches.length} inactive plant batches`);
-
-    store.commit(MutationType.SET_LOADING_MESSAGE, null);
 
     return plantBatches;
   }
@@ -3849,7 +3792,7 @@ export class DataLoader implements IAtomicService {
   async loadActiveSalesReceipts(): Promise<ISalesReceiptData[]> {
     await authManager.authStateOrError();
 
-    store.commit(MutationType.SET_LOADING_MESSAGE, "Loading sales receipts...");
+    console.log("Loading sales receipts...");
 
     let salesReceipts: ISalesReceiptData[] = [];
 
@@ -3866,8 +3809,6 @@ export class DataLoader implements IAtomicService {
       .toPromise();
 
     console.log(`Loaded ${salesReceipts.length} sales receipts`);
-
-    store.commit(MutationType.SET_LOADING_MESSAGE, null);
 
     return salesReceipts;
   }
@@ -3914,7 +3855,7 @@ export class DataLoader implements IAtomicService {
   ): Promise<IMetrcEmployeeData[]> {
     await authManager.authStateOrError();
 
-    store.commit(MutationType.SET_LOADING_MESSAGE, "Loading employees...");
+    console.log("Loading employees...");
 
     let employees: IMetrcEmployeeData[] = [];
 
@@ -3926,15 +3867,13 @@ export class DataLoader implements IAtomicService {
 
     console.log(`Loaded ${employees.length} employees`);
 
-    store.commit(MutationType.SET_LOADING_MESSAGE, null);
-
     return employees;
   }
 
   private async loadAvailableTags(dataLoadOptions: IDataLoadOptions = {}): Promise<ITagData[]> {
     await authManager.authStateOrError();
 
-    store.commit(MutationType.SET_LOADING_MESSAGE, "Loading tags...");
+    console.log("Loading tags...");
 
     let availableTags: ITagData[] = [];
 
@@ -3946,15 +3885,13 @@ export class DataLoader implements IAtomicService {
 
     console.log(`Loaded ${availableTags.length} availableTags`);
 
-    store.commit(MutationType.SET_LOADING_MESSAGE, null);
-
     return availableTags;
   }
 
   private async loadUsedTags(dataLoadOptions: IDataLoadOptions = {}): Promise<ITagData[]> {
     await authManager.authStateOrError();
 
-    store.commit(MutationType.SET_LOADING_MESSAGE, "Loading tags...");
+    console.log("Loading tags...");
 
     let usedTags: ITagData[] = [];
 
@@ -3964,15 +3901,13 @@ export class DataLoader implements IAtomicService {
 
     console.log(`Loaded ${usedTags.length} usedTags`);
 
-    store.commit(MutationType.SET_LOADING_MESSAGE, null);
-
     return usedTags;
   }
 
   private async loadVoidedTags(dataLoadOptions: IDataLoadOptions = {}): Promise<ITagData[]> {
     await authManager.authStateOrError();
 
-    store.commit(MutationType.SET_LOADING_MESSAGE, "Loading tags...");
+    console.log("Loading tags...");
 
     let voidedTags: ITagData[] = [];
 
@@ -3981,8 +3916,6 @@ export class DataLoader implements IAtomicService {
     });
 
     console.log(`Loaded ${voidedTags.length} voidedTags`);
-
-    store.commit(MutationType.SET_LOADING_MESSAGE, null);
 
     return voidedTags;
   }
@@ -4091,7 +4024,7 @@ export class DataLoader implements IAtomicService {
   private async loadAllPreviousTagOrders(): Promise<ITagOrderData[]> {
     await authManager.authStateOrError();
 
-    store.commit(MutationType.SET_LOADING_MESSAGE, "Loading tag orders...");
+    console.log("Loading tag orders...");
 
     let previousTagOrders: ITagOrderData[] = [];
 
@@ -4109,15 +4042,13 @@ export class DataLoader implements IAtomicService {
 
     console.log(`Loaded ${previousTagOrders.length} previous tag orders`);
 
-    store.commit(MutationType.SET_LOADING_MESSAGE, null);
-
     return previousTagOrders;
   }
 
   async loadAllCsvUploads(csvUpload: CsvUpload): Promise<ICsvUploadResult[]> {
     await authManager.authStateOrError();
 
-    store.commit(MutationType.SET_LOADING_MESSAGE, "Loading csv uploads...");
+    console.log("Loading csv uploads...");
 
     let csvUploads: ICsvUploadResult[] = [];
 
@@ -4134,8 +4065,6 @@ export class DataLoader implements IAtomicService {
     });
 
     console.log(`Loaded ${csvUploads.length} csv uploads`);
-
-    store.commit(MutationType.SET_LOADING_MESSAGE, null);
 
     return csvUploads;
   }

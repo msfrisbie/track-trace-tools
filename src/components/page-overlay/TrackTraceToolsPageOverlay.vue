@@ -1,22 +1,16 @@
 <template>
   <div class="ttt-wrapper absolute">
-    <template v-if="expanded">
-      <div class="fixed bottom-0 right-0">
-        <page-overlay-container />
-      </div>
-    </template>
-    <template v-else>
-      <div class="fixed bottom-2 right-2">
-        <floating-button-container />
-      </div>
-    </template>
+    <div class="fixed bottom-2 right-2">
+      <floating-button-container />
+    </div>
+
     <snowflakes></snowflakes>
   </div>
 </template>
 
 <script lang="ts">
 import FloatingButtonContainer from "@/components/page-overlay/FloatingButtonContainer.vue";
-import PageOverlayContainer from "@/components/page-overlay/PageOverlayContainer.vue";
+// import PageOverlayContainer from "@/components/page-overlay/PageOverlayContainer.vue";
 import Snowflakes from "@/components/page-overlay/Snowflakes.vue";
 import { MessageType, VUEX_KEY } from "@/consts";
 import { IAuthState } from "@/interfaces";
@@ -219,7 +213,7 @@ export default Vue.extend({
   name: "TrackTraceToolsPageOverlay",
   store,
   components: {
-    PageOverlayContainer,
+    // PageOverlayContainer,
     FloatingButtonContainer,
     Snowflakes,
   },
@@ -296,7 +290,6 @@ export default Vue.extend({
     telemetryManager.init();
   },
   mounted() {
-    pageManager.setExpandedClass();
   },
 });
 </script>

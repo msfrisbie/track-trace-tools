@@ -33,14 +33,6 @@
         <b-button size="sm" variant="outline-primary" class="mb-2" @click="dismissFacilityPopover()"
           >GOT IT</b-button
         >
-
-        <!-- <b-button
-          size="sm"
-          variant="outline-dark"
-          class="mb-2"
-          @click="openSettings()"
-          >OPEN SETTINGS</b-button
-        > -->
       </div>
     </b-popover>
   </div>
@@ -49,7 +41,6 @@
 <script lang="ts">
 import FacilityPicker from '@/components/shared/FacilityPicker.vue';
 import TrackTraceToolsLogo from '@/components/shared/TrackTraceToolsLogo.vue';
-import { ToolkitView } from '@/consts';
 import { authManager } from '@/modules/auth-manager.module';
 import { pageManager } from '@/modules/page-manager/page-manager.module';
 import { MutationType } from '@/mutation-types';
@@ -76,11 +67,6 @@ export default Vue.extend({
     this.$data.authState = await authManager.authStateOrNull();
   },
   methods: {
-    openSettings() {
-      store.commit(MutationType.TOGGLE_EXPANDED_OVERLAY);
-      pageManager.setExpandedClass();
-      store.commit(MutationType.SELECT_VIEW, ToolkitView.SETTINGS);
-    },
     dismissFacilityPopover() {
       const trackedInteractions = JSON.parse(JSON.stringify(store.state.trackedInteractions));
 

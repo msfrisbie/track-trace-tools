@@ -1,25 +1,3 @@
-// Only enable when taking screenshot
-.screenshot button.shadow {
-  box-shadow: none !important;
-}
-
-body.ttt-expanded {
-  width: calc(100% - 400px);
-
-  .navbar {
-    right: 400px;
-  }
-
-  .facilities-dropdown,
-  .installation-title {
-    display: none;
-  }
-
-  .k-grid {
-    overflow-x: scroll;
-  }
-}
-
 body.quick-action-hidden .quick-action-button {
   display: none;
 }

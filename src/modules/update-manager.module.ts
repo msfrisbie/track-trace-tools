@@ -1,4 +1,4 @@
-import { MessageType, ToolkitView } from '@/consts';
+import { MessageType } from '@/consts';
 import { IAtomicService } from '@/interfaces';
 import { version } from '@/modules/version';
 import { MutationType } from '@/mutation-types';
@@ -16,9 +16,6 @@ class UpdateManager implements IAtomicService {
 
   private handleUpdate() {
     console.log(`Updated to version ${version}`);
-
-    // Open the settings view in case the selected view was removed
-    store.commit(MutationType.SELECT_VIEW, ToolkitView.SETTINGS);
 
     analyticsManager.track(MessageType.UPDATED_VERSION, { version });
   }

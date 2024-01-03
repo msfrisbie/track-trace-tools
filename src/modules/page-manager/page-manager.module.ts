@@ -68,7 +68,6 @@ import {
   controlBackgroundImpl,
   controlDarkModeImpl,
   controlLogoutBarImpl,
-  setExpandedClassImpl,
   togglePageVisibilityClassesImpl,
 } from "./style-utils";
 import {
@@ -367,9 +366,6 @@ class PageManager implements IAtomicService {
       // } catch (e) {
       //   console.error(e);
       // }
-
-      // Phase out Task Queue, remove from settings
-      store.commit(MutationType.PURGE_TASK_QUEUE);
 
       if (window.location.hash === "#debug") {
         document.body.setAttribute(DEBUG_ATTRIBUTE, "true");
@@ -833,10 +829,6 @@ class PageManager implements IAtomicService {
 
   async manageTagsTabs() {
     return manageTagsTabsImpl();
-  }
-
-  setExpandedClass() {
-    return setExpandedClassImpl();
   }
 
   clickRefreshLinks() {

@@ -3,6 +3,7 @@ import { analyticsManager } from '@/modules/analytics-manager.module';
 import { authManager } from '@/modules/auth-manager.module';
 import { primaryDataLoader } from '@/modules/data-loader/data-loader.module';
 import { dynamicConstsManager } from '@/modules/dynamic-consts-manager.module';
+import { facilityManager } from '@/modules/facility-manager.module';
 import { pageManager } from '@/modules/page-manager/page-manager.module';
 import { toastManager } from '@/modules/toast-manager.module';
 import _, { zip } from 'lodash-es';
@@ -94,7 +95,13 @@ export const QUICK_SCRIPTS: IQuickScript[] = [
     name: 'Copy Username',
     description: 'Copy my username to the clipboard for easy T3+ signup',
     quickScriptFunction: copyUsername,
-
+  },
+  {
+    id: 'COPY_METREX_TOKEN',
+    name: 'Copy Metrex Token',
+    description: 'Get a token to use the Metrex API',
+    quickScriptFunction: copyMetrexToken,
+    contextLink: 'https://github.com/msfrisbie/metrex'
   },
   // {
   //   id: "SHOW_ALL_COLUMNS",
@@ -163,6 +170,55 @@ export async function copyUsername() {
   copyToClipboard(identity);
 
   toastManager.openToast(`Copied ${identity} to clipboard`, {
+    title: 'Quick Script Success',
+    autoHideDelay: 5000,
+    variant: 'success',
+    appendToast: true,
+    toaster: 'ttt-toaster',
+    solid: true,
+  });
+}
+
+export async function copyMetrexToken() {
+  const { apiVerificationToken } = await authManager.authStateOrError();
+
+  const hostname: string = window.location.hostname;
+
+  const cookies: {[key: string]: string} = Object.fromEntries(
+    (await authManager.cookies())
+      .filter((x) => x.domain === hostname)
+      .map((x) => [x.name, x.value])
+  );
+
+  if (!cookies.MetrcAuth || !cookies.MetrcSessionTime || !cookies.MetrcRequestToken) {
+  toastManager.openToast(`Unable to extract all required values for token`, {
+    title: 'Quick Script Error',
+    autoHideDelay: 5000,
+    variant: 'danger',
+    appendToast: true,
+    toaster: 'ttt-toaster',
+    solid: true,
+  });
+
+  return;
+  }
+
+  const licenseNumbers: string[] = (await facilityManager.ownedFacilitiesOrError()).map((x) => x.licenseNumber).sort();
+
+  const tokenData = {
+    hostname,
+    apiVerificationToken,
+    cookies,
+    licenseNumbers
+  };
+
+  console.log(tokenData);
+
+  const token = JSON.stringify(tokenData);
+
+  copyToClipboard(token);
+
+  toastManager.openToast(`Copied Metrxtract token to clipboard`, {
     title: 'Quick Script Success',
     autoHideDelay: 5000,
     variant: 'success',

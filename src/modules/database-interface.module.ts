@@ -21,8 +21,6 @@ import { dataObjectToIndexableTags } from '@/utils/db';
 import { toastManager } from './toast-manager.module';
 
 function setError(errorMessage: string | null) {
-  store.commit(MutationType.SET_ERROR_MESSAGE, errorMessage);
-
   if (errorMessage) {
     if (store.state.errorMessage === errorMessage) {
       return;
