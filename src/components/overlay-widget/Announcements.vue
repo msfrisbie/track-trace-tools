@@ -42,19 +42,18 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue';
-import { mapActions, mapGetters, mapState } from 'vuex';
-import router from '@/router/index';
-import store from '@/store/page-overlay/index';
-import { IPluginState } from '@/interfaces';
+import { IPluginState } from "@/interfaces";
+import router from "@/router/index";
+import store from "@/store/page-overlay/index";
 import {
   AnnouncementsActions,
   AnnouncementsGetters,
-} from '@/store/page-overlay/modules/announcements/consts';
-import { IAnnouncementData } from '@/store/page-overlay/modules/announcements/interfaces';
+} from "@/store/page-overlay/modules/announcements/consts";
+import Vue from "vue";
+import { mapActions, mapGetters, mapState } from "vuex";
 
 export default Vue.extend({
-  name: 'Announcements',
+  name: "Announcements",
   store,
   router,
   props: {},
@@ -84,18 +83,18 @@ export default Vue.extend({
     // Create the Intersection Observer
     const observer = new IntersectionObserver(
       (entries, observer) => {
-        entries.forEach((entry) => {
+        entries.forEach(async (entry) => {
           if (entry.isIntersecting) {
             // If the element is in the viewport
-            store.dispatch(`announcements/${AnnouncementsActions.VIEW_ANNOUNCEMENTS}`);
+            await store.dispatch(`announcements/${AnnouncementsActions.VIEW_ANNOUNCEMENTS}`);
           }
         });
       },
       {
         root: null, // Use the viewport as the container
-        rootMargin: '0px', // No margins
+        rootMargin: "0px", // No margins
         threshold: 0, // Trigger the callback when even one pixel is visible
-      },
+      }
     );
 
     // Start observing the target

@@ -15,9 +15,15 @@ const defaultState: IExampleState = {
 export const exampleModule = {
   state: () => defaultState,
   mutations: {
-    [ExampleMutations.EXAMPLE_MUTATION](state: IExampleState, data: any) {
-      // state.data = data;
-    },
+    [ExampleMutations.EXAMPLE_MUTATION](state: IExampleState, data: Partial<IExampleState>) {
+      (Object.keys(data) as Array<keyof IExampleState>).forEach((key) => {
+        const value = data[key];
+        if (typeof value !== 'undefined') {
+          // @ts-ignore
+          state[key] = value;
+        }
+      });
+    }
   },
   getters: {
     [ExampleGetters.EXAMPLE_GETTER]: (
@@ -34,7 +40,7 @@ export const exampleModule = {
       ctx: ActionContext<IExampleState, IPluginState>,
       data: any,
     ) => {
-      ctx.commit(ExampleMutations.EXAMPLE_MUTATION, data);
+      ctx.commit(ExampleMutations.EXAMPLE_MUTATION, data as Partial<IExampleState>);
     },
   },
 };

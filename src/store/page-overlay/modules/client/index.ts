@@ -22,8 +22,14 @@ const defaultState: IClientState = {
 export const clientModule = {
   state: () => defaultState,
   mutations: {
-    [ClientMutations.CLIENT_MUTATION](state: IClientState, data: any) {
-      // state.data = data;
+    [ClientMutations.CLIENT_MUTATION](state: IClientState, data: Partial<IClientState>) {
+      (Object.keys(data) as Array<keyof IClientState>).forEach((key) => {
+        const value = data[key];
+        if (typeof value !== 'undefined') {
+          // @ts-ignore
+          state[key] = value;
+        }
+      });
     },
   },
   getters: {
@@ -46,8 +52,10 @@ export const clientModule = {
       ctx.state.t3plus = t3plus;
 
       if (!ctx.rootState.settings.licenseKey) {
-        ctx.state.clientName = null;
-        ctx.state.values = {};
+        ctx.commit(ClientMutations.CLIENT_MUTATION, {
+          clientName: null,
+          values: {}
+        } as Partial<IClientState>);
       } else {
         const { clientName, values } = await t3RequestManager.loadClientDataOrError(
           ctx.rootState.settings.licenseKey,
@@ -64,8 +72,10 @@ export const clientModule = {
           });
         }
 
-        ctx.state.clientName = clientName;
-        ctx.state.values = values;
+        ctx.commit(ClientMutations.CLIENT_MUTATION, {
+          clientName,
+          values
+        } as Partial<IClientState>);
       }
 
       const flags = await t3RequestManager.loadFlags();

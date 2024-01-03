@@ -41,7 +41,7 @@ class AuthManager implements IAtomicService {
     this._authStatePromise.then((authState) => {
       store.dispatch(`pluginAuth/${PluginAuthActions.SET_AUTH}`, { authState });
 
-      messageBus.sendMessageToBackground(MessageType.GET_COOKIES).then(console.log);
+      // messageBus.sendMessageToBackground(MessageType.GET_COOKIES).then(console.log);
     });
   }
 

@@ -127,6 +127,18 @@ export default Vue.extend({
           isPlus: false,
           showDisabledMessage: false,
         },
+        {
+          route: "/package/bulk-coa",
+          text: "BULK ADD COAs",
+          icon: "file-csv",
+          backgroundColor: "#2774ae",
+          isBeta: false,
+          isNew: false,
+          enabled: isCurrentHostAllowed([HOST_WILDCARD]),
+          visible: hasPlusImpl() || store.state.client.values.ENABLE_BULK_COA,
+          isPlus: false,
+          showDisabledMessage: false,
+        },
       ];
     },
   },

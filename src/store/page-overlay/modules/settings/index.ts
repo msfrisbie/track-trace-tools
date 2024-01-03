@@ -82,6 +82,15 @@ export const settingsModule = {
     [SettingsMutations.SET_HOME_LICENSE](state: ISettingsState, homeLicense: [string, string]) {
       state.homeLicenses[homeLicense[0]] = homeLicense[1];
     },
+    [SettingsMutations.SETTINGS_MUTATION](state: ISettingsState, data: Partial<ISettingsState>) {
+      (Object.keys(data) as Array<keyof ISettingsState>).forEach((key) => {
+        const value = data[key];
+        if (typeof value !== 'undefined') {
+          // @ts-ignore
+          state[key] = value;
+        }
+      });
+    }
   },
   getters: {},
   actions: {
@@ -92,15 +101,12 @@ export const settingsModule = {
     },
     async [SettingsActions.UPDATE_SETTINGS](
       ctx: ActionContext<ISettingsState, IPluginState>,
-      settings: any,
+      settings: Partial<ISettingsState>,
     ) {
-      console.log('updating settings');
+      console.log('Updating settings');
 
-      for (const [key, value] of Object.entries(settings)) {
-        // @ts-ignore
-        ctx.state[key] = value;
-      }
-      ctx.state.persistTimestamp = Date.now();
+      ctx.commit(SettingsMutations.SETTINGS_MUTATION, settings as Partial<ISettingsState>);
+      ctx.commit(SettingsMutations.SETTINGS_MUTATION, { persistTimestamp: Date.now() } as Partial<ISettingsState>);
 
       // Always write
       try {

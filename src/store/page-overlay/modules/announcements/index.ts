@@ -27,7 +27,11 @@ const renderer = {
   },
 };
 
-marked.use({ renderer });
+marked.use({
+  renderer,
+  mangle: false,
+  headerIds: false
+});
 
 const inMemoryState = {
   showDismissed: false,
@@ -49,9 +53,18 @@ const defaultState: IAnnouncementsState = {
 export const announcementsModule = {
   state: () => defaultState,
   mutations: {
-    [AnnouncementsMutations.ANNOUNCEMENTS_MUTATION](state: IAnnouncementsState, data: any) {
-      // state.data = data;
-    },
+    [AnnouncementsMutations.ANNOUNCEMENTS_MUTATION](
+      state: IAnnouncementsState,
+      data: Partial<IAnnouncementsState>
+    ) {
+      (Object.keys(data) as Array<keyof IAnnouncementsState>).forEach((key) => {
+        const value = data[key];
+        if (typeof value !== 'undefined') {
+          // @ts-ignore
+          state[key] = value;
+        }
+      });
+    }
   },
   getters: {
     [AnnouncementsGetters.DISMISSABLE_ANNOUNCEMENTS]: (
@@ -143,16 +156,18 @@ export const announcementsModule = {
       data: any
     ) => {
       const announcements = await t3RequestManager.loadAnnouncements();
-
-      ctx.state.announcements = announcements;
-      ctx.state.lastAnnouncementsCheckDatetime = new Date().toISOString();
-      ctx.state.notificationCount = announcements.filter(
+      const lastAnnouncementsCheckDatetime = new Date().toISOString();
+      const notificationCount = announcements.filter(
         (x) =>
           x.show_notification &&
           // Only show fresh notifications
           (!ctx.state.lastAnnouncementsViewedDatetime ||
             x.published_at > ctx.state.lastAnnouncementsViewedDatetime)
       ).length;
+
+      ctx.commit(AnnouncementsMutations.ANNOUNCEMENTS_MUTATION, {
+        announcements, lastAnnouncementsCheckDatetime, notificationCount
+      } as Partial<IAnnouncementsState>);
     },
     [AnnouncementsActions.VIEW_ANNOUNCEMENTS]: async (
       ctx: ActionContext<IAnnouncementsState, IPluginState>,
@@ -162,17 +177,24 @@ export const announcementsModule = {
         return;
       }
 
-      ctx.state.lastAnnouncementsViewedDatetime = ctx.state.announcements[0].published_at;
+      const lastAnnouncementsViewedDatetime = ctx.state.announcements[0].published_at;
+
+      ctx.commit(AnnouncementsMutations.ANNOUNCEMENTS_MUTATION, {
+        lastAnnouncementsViewedDatetime,
+        notificationCount: 0
+      } as Partial<IAnnouncementsState>);
+
       if (ctx.state.notificationCount > 0) {
         analyticsManager.track(MessageType.VIEWED_UNREAD_ANNOUNCEMENTS);
       }
-      ctx.state.notificationCount = 0;
     },
     [AnnouncementsActions.SHOW_ALL_ANNOUNCEMENTS]: async (
       ctx: ActionContext<IAnnouncementsState, IPluginState>,
       data: any
     ) => {
-      ctx.state.showDismissed = true;
+      ctx.commit(AnnouncementsMutations.ANNOUNCEMENTS_MUTATION, {
+        showDismissed: true
+      } as Partial<IAnnouncementsState>);
     },
     [AnnouncementsActions.DISMISS_ANNOUNCEMENTS]: async (
       ctx: ActionContext<IAnnouncementsState, IPluginState>,
@@ -182,7 +204,11 @@ export const announcementsModule = {
         return;
       }
 
-      ctx.state.dismissedDatetime = ctx.state.announcements[0].published_at;
+      const dismissedDatetime = ctx.state.announcements[0].published_at;
+
+      ctx.commit(AnnouncementsMutations.ANNOUNCEMENTS_MUTATION, {
+        dismissedDatetime
+      } as Partial<IAnnouncementsState>);
 
       analyticsManager.track(MessageType.DISMISSED_ANNOUNCEMENTS);
     },
@@ -190,11 +216,13 @@ export const announcementsModule = {
       ctx: ActionContext<IAnnouncementsState, IPluginState>,
       data: any
     ) => {
-      ctx.state.notificationCount = 0;
-      ctx.state.announcements = [];
-      ctx.state.lastAnnouncementsCheckDatetime = null;
-      ctx.state.lastAnnouncementsViewedDatetime = null;
-      ctx.state.dismissedDatetime = null;
+      ctx.commit(AnnouncementsMutations.ANNOUNCEMENTS_MUTATION, {
+        notificationCount: 0,
+        announcements: [],
+        lastAnnouncementsCheckDatetime: null,
+        lastAnnouncementsViewedDatetime: null,
+        dismissedDatetime: null
+      } as Partial<IAnnouncementsState>);
     },
   },
 };

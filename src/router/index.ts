@@ -23,6 +23,7 @@ import MiscellaneousListView from "@/components/overlay-widget/miscellaneous/Mis
 import Plus from "@/components/overlay-widget/miscellaneous/Plus.vue";
 import Verify from "@/components/overlay-widget/miscellaneous/Verify.vue";
 import AllocateSamplesBuilder from "@/components/overlay-widget/package/AllocateSamplesBuilder.vue";
+import BulkCoaUpload from "@/components/overlay-widget/package/BulkCoaUpload.vue";
 import CreatePackageCsvBuilder from "@/components/overlay-widget/package/CreatePackageCsvBuilder.vue";
 import CsvPackageInstructions from "@/components/overlay-widget/package/CsvPackageInstructions.vue";
 import FinishPackagesBuilder from "@/components/overlay-widget/package/FinishPackagesBuilder.vue";
@@ -129,6 +130,11 @@ const routes: Array<RouteConfig> = [
     path: "/package/history",
     name: "Package History",
     component: PackageHistory,
+  },
+  {
+    path: "/package/bulk-coa",
+    name: "Bulk Add COAs",
+    component: BulkCoaUpload,
   },
   {
     path: "/metrc-explorer",

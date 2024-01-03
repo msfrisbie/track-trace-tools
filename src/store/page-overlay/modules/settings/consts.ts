@@ -1,5 +1,6 @@
 export enum SettingsMutations {
   SET_HOME_LICENSE = 'SET_HOME_LICENSE',
+  SETTINGS_MUTATION = 'SETTINGS_MUTATION'
 }
 
 export enum SettingsGetters {}
