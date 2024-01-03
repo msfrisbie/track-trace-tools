@@ -49,7 +49,9 @@ export const clientModule = {
 
       const t3plus = plusUsers.length > 0;
 
-      ctx.state.t3plus = t3plus;
+      ctx.commit(ClientMutations.CLIENT_MUTATION, {
+        t3plus
+      } as Partial<IClientState>);
 
       if (!ctx.rootState.settings.licenseKey) {
         ctx.commit(ClientMutations.CLIENT_MUTATION, {
@@ -80,7 +82,9 @@ export const clientModule = {
 
       const flags = await t3RequestManager.loadFlags();
 
-      ctx.state.flags = flags;
+      ctx.commit(ClientMutations.CLIENT_MUTATION, {
+        flags
+      } as Partial<IClientState>);
     },
   },
 };
