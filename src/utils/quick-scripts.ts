@@ -96,13 +96,13 @@ export const QUICK_SCRIPTS: IQuickScript[] = [
     description: 'Copy my username to the clipboard for easy T3+ signup',
     quickScriptFunction: copyUsername,
   },
-  {
-    id: 'COPY_METREX_TOKEN',
-    name: 'Copy Metrex Token',
-    description: 'Get a token to use the Metrex API',
-    quickScriptFunction: copyMetrexToken,
-    contextLink: 'https://github.com/msfrisbie/metrex'
-  },
+  // {
+  //   id: 'COPY_METREX_TOKEN',
+  //   name: 'Copy Metrex Token',
+  //   description: 'Get a token to use the Metrex API',
+  //   quickScriptFunction: copyMetrexToken,
+  //   contextLink: 'https://github.com/msfrisbie/metrex'
+  // },
   // {
   //   id: "SHOW_ALL_COLUMNS",
   //   name: "Show All Columns",
