@@ -134,7 +134,7 @@ export default Vue.extend({
           backgroundColor: "#2774ae",
           isBeta: false,
           isNew: false,
-          enabled: isCurrentHostAllowed([HOST_WILDCARD]),
+          enabled: false,
           visible: hasPlusImpl() || store.state.client.values.ENABLE_BULK_COA,
           isPlus: false,
           showDisabledMessage: false,
