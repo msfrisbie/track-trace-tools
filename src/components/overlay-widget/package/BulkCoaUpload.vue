@@ -111,7 +111,57 @@
         </div>
       </template>
       <template v-else>
-        <div>TODO INSTRUCTIONS</div>
+        <div class="grid grid-cols-2 gap-4 text-base" style="grid-template-columns: auto 1fr">
+          <div class="col-span-2 text-lg text-purple-700">
+            The <span class="font-semibold">Bulk Add COAs</span> tool can quickly attach COA PDFs to
+            any number of packages.
+          </div>
+          <div class="font-bold">Step 1</div>
+          <div>Record tests for packages in Metrc as you currently do.</div>
+          <div class="font-bold">Step 2</div>
+          <div class="flex flex-col gap-8">
+            <div>
+              Upload your <span class="font-semibold">COA CSV</span>. This CSV contains a list of
+              packages and the name of the COA PDF file that should be attached.
+            </div>
+            <div>The CSV you upload should have three colums:</div>
+            <div>
+              <ul class="list-disc ml-6 font-semibold">
+                <li>Sample ID (optional, OK to leave blank)</li>
+                <li>Package Tag</li>
+                <li>COA PDF file name</li>
+              </ul>
+            </div>
+            <div>Example:</div>
+            <div class="font-mono">
+              <table>
+                <tr>
+                  <td class="border border-gray-500 p-2">Sample 01</td>
+                  <td class="border border-gray-500 p-2">1A4400000000000000000001</td>
+                  <td class="border border-gray-500 p-2">test01.pdf</td>
+                </tr>
+                <tr>
+                  <td class="border border-gray-500 p-2"></td>
+                  <td class="border border-gray-500 p-2">1A4400000000000000000002</td>
+                  <td class="border border-gray-500 p-2">test02.pdf</td>
+                </tr>
+              </table>
+            </div>
+            <div>
+              <b-button variant="light" @click="downloadCsvTemplate()">DOWNLOAD EMPTY CSV</b-button>
+            </div>
+          </div>
+          <div class="font-bold">Step 3</div>
+          <div>
+            <div>
+              Select the COA PDF files listed in the CSV.
+              <span class="font-bold">The names must match exactly.</span>
+            </div>
+            <div>If everything matches, you can upload the PDF files directly to Metrc.</div>
+          </div>
+          <div class="font-bold">Step 4</div>
+          <div>Click "Submit" to attach the COA PDFs to the tested packages.</div>
+        </div>
       </template>
     </div>
   </div>
@@ -119,7 +169,7 @@
 
 <script lang="ts">
 import { BuilderType } from "@/consts";
-import { IPluginState } from "@/interfaces";
+import { ICsvFile, IPluginState } from "@/interfaces";
 import router from "@/router/index";
 import store from "@/store/page-overlay/index";
 import {
@@ -127,6 +177,7 @@ import {
   LabCsvGetters,
   LabCsvStatus,
 } from "@/store/page-overlay/modules/lab-csv/consts";
+import { downloadCsvFile } from "@/utils/csv";
 import Vue from "vue";
 import { mapActions, mapGetters, mapState } from "vuex";
 import CanonicalPackageCard from "../shared/CanonicalPackageCard.vue";
@@ -164,6 +215,20 @@ export default Vue.extend({
       uploadCOAs: `labCsv/${LabCsvActions.UPLOAD_COA_FILES}`,
       submit: `labCsv/${LabCsvActions.ASSIGN_COA_FILES}`,
     }),
+    downloadCsvTemplate() {
+      const csvFile: ICsvFile = {
+        filename: `coa_list_${Date.now()}`,
+        data: [
+          [
+            "Example Sample ID (optional)",
+            "EXAMPLE000000000000000001234",
+            "example-test-result-01.pdf",
+          ],
+        ],
+      };
+
+      downloadCsvFile({ csvFile });
+    },
   },
   async created() {},
   async mounted() {},
