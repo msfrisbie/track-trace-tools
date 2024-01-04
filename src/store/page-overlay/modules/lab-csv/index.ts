@@ -70,6 +70,8 @@ export const labCsvModule = {
       const packages = await primaryDataLoader.activePackages();
       const filteredPackages: IIndexedPackageData[] = [];
 
+      ctx.commit(LabCsvMutations.LAB_CSV_MUTATION, { statusMessages: [] });
+
       // Check CSV is well formed
 
       if (csvData.length === 0) {
@@ -129,6 +131,14 @@ export const labCsvModule = {
             variant: "danger",
           });
         }
+
+        if (pkg.testResults && pkg.testResults.length > 0) {
+          // ctx.commit(LabCsvMutations.RECORD_MESSAGE, {
+          //   text: `Package ${pkg.Label} does not have any test results`,
+          //   variant: "danger",
+          // });
+          // TODO check that test results do not have existing PDFs, add warning
+        }
       }
 
       // TODO check for duplicates
@@ -148,7 +158,10 @@ export const labCsvModule = {
       ctx: ActionContext<ILabCsvState, IPluginState>,
       data: { files: File[] }
     ) => {
+      debugger;
+
       console.log(data);
+
       ctx.commit(LabCsvMutations.LAB_CSV_MUTATION, {
         status: LabCsvStatus.INFLIGHT,
         statusMessages: [{ text: "Loading package data...", variant: "primary" }],
@@ -161,6 +174,8 @@ export const labCsvModule = {
           metrcFileId: null,
         })),
       } as Partial<ILabCsvState>);
+
+      ctx.commit(LabCsvMutations.LAB_CSV_MUTATION, { statusMessages: [] });
 
       // TODO validate filenames against expected filenames
 

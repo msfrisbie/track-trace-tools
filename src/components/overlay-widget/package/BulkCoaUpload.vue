@@ -1,8 +1,6 @@
 <template>
   <div class="grid grid-cols-3 gap-8">
     <div class="h-full flex flex-col justify-start items-stretch gap-2">
-      <b-button v-if="labCsvState.status !== LabCsvStatus.INITIAL" @click="reset()">RESET</b-button>
-
       <label v-if="labCsvState.status === LabCsvStatus.INITIAL" class="btn btn-primary mb-0">
         <b-form-file class="hidden" v-model="csvFile" accept=".csv"></b-form-file>
 
@@ -20,13 +18,21 @@
 
       <b-button
         v-if="!hasErrors && labCsvState.status === LabCsvStatus.UPLOADED_COAS"
+        variant="success"
         @click="uploadCOAs()"
         >UPLOAD COAs TO METRC</b-button
+      >
+
+      <b-button
+        v-if="labCsvState.status !== LabCsvStatus.INITIAL"
+        @click="reset()"
+        variant="warning"
+        >RESET</b-button
       >
     </div>
 
     <div class="h-full flex flex-col justify-start items-stretch gap-2">
-      <div v-for="[idx, filedata] of labCsvState.files" v-bind:key="idx">
+      <div v-for="[idx, filedata] of labCsvState.files.entries()" v-bind:key="idx">
         {{ filedata.filename }}
       </div>
     </div>
@@ -108,13 +114,14 @@ export default Vue.extend({
     coaFiles: {
       immediate: true,
       handler(newValue, oldValue) {
-        console.log(newValue);
-        if (!newValue || !newValue.files || newValue.files.length === 0) {
+        console.log({ newValue });
+
+        if (!newValue || (newValue.length ?? 0) === 0) {
           return;
         }
 
         store.dispatch(`labCsv/${LabCsvActions.SELECT_COA_FILES}`, {
-          files: newValue.files,
+          files: newValue,
         });
       },
     },
