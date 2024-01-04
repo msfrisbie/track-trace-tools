@@ -1,5 +1,5 @@
 <template>
-  <div class="grid grid-cols-3 gap-8">
+  <div class="grid grid-cols-2 gap-8" style="grid-template-columns: 300px 1fr">
     <div class="h-full flex flex-col justify-start items-stretch gap-2">
       <label v-if="labCsvState.status === LabCsvStatus.INITIAL" class="btn btn-primary mb-0">
         <b-form-file class="hidden" v-model="csvFile" accept=".csv"></b-form-file>
@@ -8,7 +8,7 @@
       </label>
 
       <label
-        v-if="!hasErrors && labCsvState.status === LabCsvStatus.UPLOADED_CSV"
+        v-if="!hasErrors && labCsvState.status === [LabCsvStatus.UPLOADED_CSV, ]"
         class="btn btn-primary mb-0"
       >
         <b-form-file class="hidden" v-model="coaFiles" accept=".pdf" multiple></b-form-file>
@@ -29,25 +29,47 @@
         variant="warning"
         >RESET</b-button
       >
-    </div>
 
-    <div class="h-full flex flex-col justify-start items-stretch gap-2">
-      <div v-for="[idx, filedata] of labCsvState.files.entries()" v-bind:key="idx">
-        {{ filedata.filename }}
+      <div class="flex flex-col justify-start items-stretch gap-2">
+        <div v-for="[idx, statusMessage] of labCsvState.statusMessages.entries()" v-bind:key="idx">
+          <span v-if="statusMessage.variant === 'primary'" class="text-purple-500">{{
+            statusMessage.text
+          }}</span>
+          <span v-if="statusMessage.variant === 'danger'" class="text-red-500">{{
+            statusMessage.text
+          }}</span>
+          <span v-if="statusMessage.variant === 'warning'" class="text-yellow-500">{{
+            statusMessage.text
+          }}</span>
+        </div>
       </div>
     </div>
 
-    <div class="h-full flex flex-col justify-start items-stretch gap-2">
-      <div v-for="[idx, statusMessage] of labCsvState.statusMessages.entries()" v-bind:key="idx">
-        <span v-if="statusMessage.variant === 'primary'" class="text-purple-500">{{
-          statusMessage.text
-        }}</span>
-        <span v-if="statusMessage.variant === 'danger'" class="text-red-500">{{
-          statusMessage.text
-        }}</span>
-        <span v-if="statusMessage.variant === 'warning'" class="text-yellow-500">{{
-          statusMessage.text
-        }}</span>
+    <div class="h-full flex flex-col justify-start">
+      <div v-if="showOutputTable" class="grid grid-cols-2 gap-2">
+        <fragment v-for="[idx, richPackage] of richPackageLabData.entries()" v-bind:key="idx">
+          <template v-if="!richPackage.pkg">
+            <div>No active package matches "{{ richPackage.packageLabel }}"</div>
+          </template>
+          <template v-else>
+            <canonical-package-card
+              v-if="richPackage.pkg"
+              :pkg="richPackage.pkg"
+            ></canonical-package-card>
+          </template>
+
+          <template v-if="!richPackage.file">
+            <div>Awaiting COA: "{{ richPackage.filename }}"</div>
+          </template>
+          <template v-else>
+            <font-awesome-icon icon="file-pdf" />
+            {{ richPackage.filename }}
+          </template>
+
+          <div v-if="!richPackage.file">
+            {{ richPackage.file && richPackage.file.filename }}
+          </div>
+        </fragment>
       </div>
     </div>
   </div>
@@ -65,13 +87,16 @@ import {
 } from "@/store/page-overlay/modules/lab-csv/consts";
 import Vue from "vue";
 import { mapActions, mapGetters, mapState } from "vuex";
+import CanonicalPackageCard from "../shared/CanonicalPackageCard.vue";
 
 export default Vue.extend({
   name: "BulkCoaUpload",
   store,
   router,
   props: {},
-  components: {},
+  components: {
+    CanonicalPackageCard,
+  },
   computed: {
     ...mapState<IPluginState>({
       authState: (state: IPluginState) => state.pluginAuth.authState,
@@ -79,6 +104,8 @@ export default Vue.extend({
     }),
     ...mapGetters({
       hasErrors: `labCsv/${LabCsvGetters.HAS_ERRORS}`,
+      richPackageLabData: `labCsv/${LabCsvGetters.RICH_PACKAGE_LAB_DATA}`,
+      showOutputTable: `labCsv/${LabCsvGetters.SHOW_OUTPUT_TABLE}`,
     }),
   },
   data() {

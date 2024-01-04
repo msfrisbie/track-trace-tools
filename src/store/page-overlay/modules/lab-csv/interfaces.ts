@@ -14,8 +14,4 @@ export interface ILabCsvState {
     metrcFileId: number | null;
   }[];
   packages: IIndexedPackageData[];
-  packageResultsCoaSets: {
-    labTestResultId: number;
-    metrcFileId: number | null;
-  }[];
 }

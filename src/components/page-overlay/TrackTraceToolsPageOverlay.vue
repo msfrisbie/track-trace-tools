@@ -160,6 +160,7 @@ library.add(
   fontawesomeSolid.faFileAlt,
   fontawesomeSolid.faFileCsv,
   fontawesomeSolid.faFileDownload,
+  fontawesomeSolid.faFilePdf,
   fontawesomeSolid.faFilter,
   fontawesomeSolid.faFlask,
   fontawesomeSolid.faHistory,

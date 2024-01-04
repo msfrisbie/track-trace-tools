@@ -11,7 +11,6 @@ const inMemoryState = {
   csvData: [],
   files: [],
   packages: [],
-  packageResultsCoaSets: [],
 };
 
 const persistedState = {};
@@ -47,6 +46,24 @@ export const labCsvModule = {
       rootState: any,
       rootGetters: any
     ) => state.statusMessages.filter((x) => x.variant === "danger").length > 0,
+    [LabCsvGetters.RICH_PACKAGE_LAB_DATA]: (
+      state: ILabCsvState,
+      getters: any,
+      rootState: any,
+      rootGetters: any
+    ) =>
+      state.csvData.map(([sampleId, packageLabel, filename]) => ({
+        packageLabel,
+        pkg: state.packages.find((x) => x.Label === packageLabel),
+        filename,
+        file: state.files.find((x) => x.filename === filename),
+      })),
+    [LabCsvGetters.SHOW_OUTPUT_TABLE]: (
+      state: ILabCsvState,
+      getters: any,
+      rootState: any,
+      rootGetters: any
+    ) => ![LabCsvStatus.INITIAL, LabCsvStatus.INFLIGHT].includes(state.status),
   },
   actions: {
     [LabCsvActions.LAB_CSV_ACTION]: async (
@@ -158,10 +175,6 @@ export const labCsvModule = {
       ctx: ActionContext<ILabCsvState, IPluginState>,
       data: { files: File[] }
     ) => {
-      debugger;
-
-      console.log(data);
-
       ctx.commit(LabCsvMutations.LAB_CSV_MUTATION, {
         status: LabCsvStatus.INFLIGHT,
         statusMessages: [{ text: "Loading package data...", variant: "primary" }],

@@ -5,6 +5,8 @@ export enum LabCsvMutations {
 
 export enum LabCsvGetters {
   HAS_ERRORS = "HAS_ERRORS",
+  RICH_PACKAGE_LAB_DATA = "RICH_PACKAGE_LAB_DATA",
+  SHOW_OUTPUT_TABLE = "SHOW_OUTPUT_TABLE",
 }
 
 export enum LabCsvActions {
