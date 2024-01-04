@@ -38,7 +38,7 @@ export const customAxios = function (
   init?:
     | {
         method: string;
-        body?: string;
+        body?: string | FormData;
         signal?: AbortSignal;
         headers?: { [key: string]: string };
         timeout?: number;

@@ -19,6 +19,7 @@ import {
   IMetrcReplacePlantTagsPayload,
   IMetrcUnpackImmaturePlantsPayload,
   IMetrcUpdateTransferPayload,
+  IMetrcAssignCoaPayload
 } from "@/interfaces";
 import { primaryMetrcRequestManager } from "@/modules/metrc-request-manager.module";
 import store from "@/store/page-overlay/index";
@@ -57,7 +58,8 @@ type IEligibleRowType =
   | IMetrcReplacePlantBatchTagsPayload
   | IMetrcReplacePlantTagsPayload
   | IMetrcAdjustPackagePayload
-  | IMetrcUpdateTransferPayload;
+  | IMetrcUpdateTransferPayload
+  | IMetrcAssignCoaPayload;
 
 const debugLog = debugLogFactory("builder-manager.module.ts");
 
@@ -388,6 +390,9 @@ class BuilderManager implements IAtomicService {
         break;
       case BuilderType.REPLACE_PLANT_BATCH_TAGS:
         response = await primaryMetrcRequestManager.replacePlantBatchTags(JSON.stringify(rows));
+        break;
+      case BuilderType.ASSIGN_LAB_COA:
+        response = await primaryMetrcRequestManager.assignLabDocument(JSON.stringify(rows));
         break;
       default:
         throw new Error(`Bad builder type: ${builderType}`);

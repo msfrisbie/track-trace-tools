@@ -107,6 +107,8 @@ const IMMATURE_PLANT_PACKAGES_FROM_MOTHER_PLANT_URL = `${origin()}/api/plants/cr
 const IMMATURE_PLANT_PACKAGES_FROM_MOTHER_PLANT_BATCH_URL = `${origin()}/api/plantbatches/create/packages`;
 const CREATE_TRANSFERS_URL = `${origin()}/api/transfers/create`;
 const UPDATE_TRANSFERS_URL = `${origin()}/api/transfers/update`;
+const UPLOAD_LAB_DOCUMENT_URL = `${origin()}/api/file/system/add/labtest/result/document`;
+const ADD_LABTEST_DOCUMENT_TO_RESULT_URL = `${origin()}/api/labtests/upload/document`;
 
 // DATAIMPORT
 const DATAIMPORT_MOVE_PLANTS_URL = `${origin()}/api/dataimport/plants/change/locations`;
@@ -1227,6 +1229,28 @@ export class MetrcRequestManager implements IAtomicService {
 
   async finalizeSalesReceipts(body: string) {
     return customAxios(FINALIZE_SALES_RECEIPTS_URL, {
+      ...DEFAULT_FETCH_POST_WRITE_OPTIONS,
+      headers: {
+        ...(await buildAuthenticationHeaders(this.authStateOrError)),
+        ...JSON_HEADERS,
+      },
+      body,
+    });
+  }
+
+  async uploadLabDocument(body: FormData) {
+    return customAxios(UPLOAD_LAB_DOCUMENT_URL, {
+      ...DEFAULT_FETCH_POST_WRITE_OPTIONS,
+      headers: {
+        Accept: "text/html, */*; q=0.01",
+        ...(await buildAuthenticationHeaders(this.authStateOrError)),
+      },
+      body,
+    });
+  }
+
+  async assignLabDocument(body: string) {
+    return customAxios(ADD_LABTEST_DOCUMENT_TO_RESULT_URL, {
       ...DEFAULT_FETCH_POST_WRITE_OPTIONS,
       headers: {
         ...(await buildAuthenticationHeaders(this.authStateOrError)),

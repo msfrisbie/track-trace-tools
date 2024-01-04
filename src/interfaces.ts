@@ -39,6 +39,7 @@ import { ITransferPackageSearchState } from "./store/page-overlay/modules/transf
 import { ITransferSearchState } from "./store/page-overlay/modules/transfer-search/interfaces";
 import { CsvUpload, CsvUploadStatus } from "./types";
 import { UnitOfMeasureAbbreviation, UnitOfMeasureName } from "./utils/units";
+import { ILabCsvState } from "./store/page-overlay/modules/lab-csv/interfaces";
 
 export type PlantBatchTypeName = "Clone" | "Seed";
 export type PlantGrowthPhase = "Vegetative" | "Flowering";
@@ -223,6 +224,7 @@ export interface IPluginState extends IRootState {
   createPackageCsv: ICreatePackageCsvState;
   transferPackageSearch: ITransferPackageSearchState;
   graph: IGraphState;
+  labCsv: ILabCsvState;
 }
 
 export interface IAddress {
@@ -709,6 +711,7 @@ export interface IPlantHistoryData {}
 export interface IPlantBatchHistoryData {}
 
 export interface ITestResultData {
+  ExpirationDateTime: string | null;
   IsRevoked: boolean;
   LabFacilityLicenseNumber: string;
   LabFacilityName: string;
@@ -719,12 +722,12 @@ export interface ITestResultData {
   LabTestResultId: number;
   OverallPassed: boolean;
   PackageId: number;
-  ProductCategoryName: string;
-  ProductName: string;
-  ResultReleaseDateTime: string;
+  ProductCategoryName: string | null;
+  ProductName: string | null;
   ResultReleased: boolean;
+  ResultReleaseDateTime: string;
   RevokedDate: string | null;
-  SourcePackageLabel: string;
+  SourcePackageLabel: string | null;
   TestComment: string;
   TestInformationalOnly: boolean;
   TestPassed: boolean;
@@ -1332,6 +1335,11 @@ export interface IMetrcCreateTransferPayload {
 
 export interface IMetrcUpdateTransferPayload extends IMetrcCreateTransferPayload {
   Id: number;
+}
+
+export interface IMetrcAssignCoaPayload {
+  LabTestResultDocumentId: string;
+  Id: string;
 }
 
 export interface IMetrcTransferDestinationData {
