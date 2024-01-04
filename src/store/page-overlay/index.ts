@@ -204,6 +204,73 @@ const vuexStore = new Vuex.Store<IPluginState>({
     ) {
       state.builderModalOpen = builderModalOpen;
     },
+    [MutationType.SET_FINALIZE_SALES_RECEIPTS_STATE](
+      state: IRootState,
+      finalizeSalesReceiptsState: BackgroundTaskState
+    ) {
+      state.backgroundTasks.finalizeSalesReceiptsState = finalizeSalesReceiptsState;
+    },
+    [MutationType.SET_FINALIZE_SALES_RECEIPTS_LICENSE](
+      state: IRootState,
+      finalizeSalesReceiptsLicense: string
+    ) {
+      state.backgroundTasks.finalizeSalesReceiptsLicense = finalizeSalesReceiptsLicense;
+    },
+    [MutationType.SET_FINALIZE_SALES_RECEIPTS_STOP_DATE](
+      state: IRootState,
+      finalizeSalesReceiptsStopIsodate: string | null
+    ) {
+      state.backgroundTasks.finalizeSalesReceiptsStopIsodate = finalizeSalesReceiptsStopIsodate;
+    },
+    [MutationType.SET_FINALIZE_SALES_RECEIPTS_READOUT](
+      state: IRootState,
+      finalizeSalesReceiptsReadout: string | null
+    ) {
+      state.backgroundTasks.finalizeSalesReceiptsReadout = finalizeSalesReceiptsReadout;
+    },
+    [MutationType.SET_FINALIZE_SALES_RECEIPTS_RUNNING_TOTAL](
+      state: IRootState,
+      finalizeSalesReceiptsRunningTotal: number
+    ) {
+      state.backgroundTasks.finalizeSalesReceiptsRunningTotal = finalizeSalesReceiptsRunningTotal;
+    },
+    [MutationType.SET_FINALIZE_SALES_RECEIPTS_CONSECUTIVE_ERROR_TOTAL](
+      state: IRootState,
+      finalizeSalesReceiptsConsecutiveErrorTotal: number
+    ) {
+      state.backgroundTasks.finalizeSalesReceiptsConsecutiveErrorTotal =
+        finalizeSalesReceiptsConsecutiveErrorTotal;
+    },
+    [MutationType.SET_VOID_TAGS_STATE](state: IRootState, voidTagsState: BackgroundTaskState) {
+      state.backgroundTasks.voidTagsState = voidTagsState;
+    },
+    [MutationType.SET_VOID_TAGS_LICENSE](state: IRootState, voidTagsLicense: string) {
+      state.backgroundTasks.voidTagsLicense = voidTagsLicense;
+    },
+    [MutationType.SET_VOID_TAGS_DATA](
+      state: IRootState,
+      {
+        startTag = null,
+        endTag = null,
+        lastAttemptedTag = null,
+      }: { startTag: string | null; endTag: string | null; lastAttemptedTag: null }
+    ) {
+      state.backgroundTasks.voidTagsStartTag = startTag;
+      state.backgroundTasks.voidTagsEndTag = endTag;
+      state.backgroundTasks.voidTagsLastAttemptedTag = lastAttemptedTag;
+    },
+    [MutationType.SET_VOID_TAGS_READOUT](state: IRootState, voidTagsReadout: string | null) {
+      state.backgroundTasks.voidTagsReadout = voidTagsReadout;
+    },
+    [MutationType.SET_VOID_TAGS_RUNNING_TOTAL](state: IRootState, voidTagsRunningTotal: number) {
+      state.backgroundTasks.voidTagsRunningTotal = voidTagsRunningTotal;
+    },
+    [MutationType.SET_VOID_TAGS_CONSECUTIVE_ERROR_TOTAL](
+      state: IRootState,
+      voidTagsConsecutiveErrorTotal: number
+    ) {
+      state.backgroundTasks.voidTagsConsecutiveErrorTotal = voidTagsConsecutiveErrorTotal;
+    },
     [MutationType.SET_ACCOUNT_ENABLED](state: IRootState, accountEnabled: boolean) {
       state.accountEnabled = accountEnabled;
     },
