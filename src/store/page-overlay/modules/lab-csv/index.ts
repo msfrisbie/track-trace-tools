@@ -167,16 +167,17 @@ export const labCsvModule = {
           });
         }
 
-        if (pkg.testResults && pkg.testResults.length > 0) {
-          // ctx.commit(LabCsvMutations.RECORD_MESSAGE, {
-          //   text: `Package ${pkg.Label} does not have any test results`,
-          //   variant: "danger",
-          // });
-          // TODO check that test results do not have existing PDFs, add warning
+        if (
+          pkg.testResults &&
+          pkg.testResults.length > 0 &&
+          pkg.testResults.find((x) => typeof x.LabTestResultDocumentFileId === "number")
+        ) {
+          ctx.commit(LabCsvMutations.RECORD_MESSAGE, {
+            text: `Package ${pkg.Label} appears to already have a COA attached`,
+            variant: "warning",
+          });
         }
       }
-
-      // TODO check for duplicates
 
       ctx.commit(LabCsvMutations.LAB_CSV_MUTATION, {
         packages: filteredPackages,
@@ -264,7 +265,7 @@ export const labCsvModule = {
       data: any
     ) => {
       ctx.commit(LabCsvMutations.LAB_CSV_MUTATION, {
-        status: LabCsvStatus.INFLIGHT,
+        // status: LabCsvStatus.INFLIGHT,
         statusMessages: [{ text: "Uploading COA PDFs...", variant: "primary" }],
       });
 

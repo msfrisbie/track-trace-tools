@@ -110,7 +110,8 @@
           </fragment>
         </div>
       </template>
-      <template v-else>
+
+      <template v-if="labCsvState.status === LabCsvStatus.INITIAL">
         <div class="grid grid-cols-2 gap-4 text-base" style="grid-template-columns: auto 1fr">
           <div class="col-span-2 text-lg text-purple-700">
             The <span class="font-semibold">Bulk Add COAs</span> tool can quickly attach COA PDFs to
@@ -248,8 +249,6 @@ export default Vue.extend({
     coaFiles: {
       immediate: true,
       handler(newValue, oldValue) {
-        console.log({ newValue });
-
         if (!newValue || (newValue.length ?? 0) === 0) {
           return;
         }
