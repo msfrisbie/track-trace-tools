@@ -8,10 +8,19 @@ export interface ILabCsvState {
     variant: string;
   }[];
   csvData: string[][];
-  files: {
-    file: File;
-    filename: string;
-    metrcFileId: number | null;
-  }[];
+  files: ILabFileData[];
   packages: IIndexedPackageData[];
+}
+
+export interface ILabFileData {
+  file: File;
+  filename: string;
+  metrcFileId: string | null;
+}
+
+export interface IRichPackageLabData {
+  packageLabel: string;
+  pkg: IIndexedPackageData | null;
+  filename: string;
+  file: ILabFileData | null;
 }

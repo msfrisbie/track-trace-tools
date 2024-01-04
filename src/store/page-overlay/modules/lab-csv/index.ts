@@ -1,9 +1,14 @@
-import { IIndexedPackageData, IPluginState } from "@/interfaces";
+import { BuilderType } from "@/consts";
+import { IIndexedPackageData, IMetrcAssignCoaPayload, IPluginState } from "@/interfaces";
+import { builderManager } from "@/modules/builder-manager.module";
 import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
+import { isDevelopment } from "@/modules/environment.module";
+import { primaryMetrcRequestManager } from "@/modules/metrc-request-manager.module";
 import { readCsvFile } from "@/utils/file";
+import _ from "lodash-es";
 import { ActionContext } from "vuex";
 import { LabCsvActions, LabCsvGetters, LabCsvMutations, LabCsvStatus } from "./consts";
-import { ILabCsvState } from "./interfaces";
+import { ILabCsvState, IRichPackageLabData } from "./interfaces";
 
 const inMemoryState = {
   status: LabCsvStatus.INITIAL,
@@ -36,7 +41,20 @@ export const labCsvModule = {
       state: ILabCsvState,
       statusMessage: { text: string; variant: string }
     ) {
-      state.statusMessages = [statusMessage, ...state.statusMessages];
+      state.statusMessages = [...state.statusMessages, statusMessage];
+    },
+    [LabCsvMutations.SET_METRC_FILE_ID](
+      state: ILabCsvState,
+      data: { filename: string; metrcFileId: string }
+    ) {
+      for (const file of state.files) {
+        if (file.filename === data.filename) {
+          file.metrcFileId = data.metrcFileId;
+          return;
+        }
+      }
+
+      throw new Error(`No file update performed, could not match ${data.filename}`);
     },
   },
   getters: {
@@ -54,10 +72,10 @@ export const labCsvModule = {
     ) =>
       state.csvData.map(([sampleId, packageLabel, filename]) => ({
         packageLabel,
-        pkg: state.packages.find((x) => x.Label === packageLabel),
+        pkg: state.packages.find((x) => x.Label === packageLabel) ?? null,
         filename,
-        file: state.files.find((x) => x.filename === filename),
-      })),
+        file: state.files.find((x) => x.filename === filename) ?? null,
+      })) as IRichPackageLabData[],
     [LabCsvGetters.SHOW_OUTPUT_TABLE]: (
       state: ILabCsvState,
       getters: any,
@@ -117,7 +135,7 @@ export const labCsvModule = {
 
         if (!coaFilename) {
           ctx.commit(LabCsvMutations.RECORD_MESSAGE, {
-            text: `[${rowIdentifier}]: missing COA filename`,
+            text: `[${rowIdentifier}]: missing COA PDF file name`,
             variant: "danger",
           });
         }
@@ -164,9 +182,33 @@ export const labCsvModule = {
         packages: filteredPackages,
       });
 
-      ctx.commit(LabCsvMutations.LAB_CSV_MUTATION, {
-        status: LabCsvStatus.UPLOADED_CSV,
-      });
+      if (ctx.getters[LabCsvGetters.HAS_ERRORS]) {
+        ctx.commit(LabCsvMutations.LAB_CSV_MUTATION, {
+          status: LabCsvStatus.UPLOADED_CSV,
+          messages: [
+            {
+              text: `Invalid CSV. Fix the issues and re-upload to continue.`,
+              variant: "danger",
+            },
+          ],
+        });
+      } else {
+        const uniqueExpectedFilesnames = new Set(
+          ctx.getters[LabCsvGetters.RICH_PACKAGE_LAB_DATA].map(
+            (x: IRichPackageLabData) => x.filename
+          )
+        );
+
+        ctx.commit(LabCsvMutations.LAB_CSV_MUTATION, {
+          status: LabCsvStatus.UPLOADED_CSV,
+          messages: [
+            {
+              text: `Valid CSV uploaded. Upload the ${uniqueExpectedFilesnames.size} matching COA PDFs to continue.`,
+              variant: "primary",
+            },
+          ],
+        });
+      }
     },
     [LabCsvActions.RESET]: async (ctx: ActionContext<ILabCsvState, IPluginState>, data: any) => {
       ctx.commit(LabCsvMutations.LAB_CSV_MUTATION, defaultState);
@@ -190,21 +232,118 @@ export const labCsvModule = {
 
       ctx.commit(LabCsvMutations.LAB_CSV_MUTATION, { statusMessages: [] });
 
-      // TODO validate filenames against expected filenames
-
       ctx.commit(LabCsvMutations.LAB_CSV_MUTATION, {
-        status: LabCsvStatus.UPLOADED_COAS,
+        status: LabCsvStatus.SELECTED_COAS,
         statusMessages: [{ text: `${ctx.state.files.length} COAs selected`, variant: "primary" }],
       });
+
+      const richData: IRichPackageLabData[] = ctx.getters[LabCsvGetters.RICH_PACKAGE_LAB_DATA];
+
+      for (const richPackageLabData of richData) {
+        if (!richPackageLabData.file) {
+          ctx.commit(LabCsvMutations.RECORD_MESSAGE, {
+            text: `Package ${richPackageLabData.packageLabel} expects COA ${richPackageLabData.filename}, but this file was not selected`,
+            variant: "danger",
+          });
+        }
+      }
+
+      const expectedFilenames = richData.map((x) => x.filename);
+
+      for (const filedata of ctx.state.files) {
+        if (!expectedFilenames.includes(filedata.filename)) {
+          ctx.commit(LabCsvMutations.RECORD_MESSAGE, {
+            text: `COA PDF ${filedata.filename} was selected, but this does not match any row in the CSV`,
+            variant: "warning",
+          });
+        }
+      }
     },
     [LabCsvActions.UPLOAD_COA_FILES]: async (
       ctx: ActionContext<ILabCsvState, IPluginState>,
       data: any
-    ) => {},
+    ) => {
+      ctx.commit(LabCsvMutations.LAB_CSV_MUTATION, {
+        status: LabCsvStatus.INFLIGHT,
+        statusMessages: [{ text: "Uploading COA PDFs...", variant: "primary" }],
+      });
+
+      for (const filedata of ctx.state.files) {
+        const formData = new FormData();
+
+        formData.append("uploadFiles-0", filedata.file);
+
+        try {
+          const response = await primaryMetrcRequestManager.uploadLabDocument(formData);
+
+          if (response.status !== 200) {
+            ctx.commit(LabCsvMutations.RECORD_MESSAGE, {
+              text: `Failed to upload ${filedata.filename}`,
+              variant: "danger",
+            });
+          } else {
+            ctx.commit(LabCsvMutations.SET_METRC_FILE_ID, {
+              filename: filedata.filename,
+              metrcFileId: isDevelopment() ? Math.random().toString() : response.data,
+            });
+          }
+        } catch (e) {
+          ctx.commit(LabCsvMutations.RECORD_MESSAGE, {
+            text: `Failed to upload files, try again - (${(e as Error).toString()})`,
+            variant: "warning",
+          });
+          ctx.commit(LabCsvMutations.LAB_CSV_MUTATION, {
+            status: LabCsvStatus.SELECTED_COAS,
+          });
+          return;
+        }
+      }
+
+      if (!ctx.getters[LabCsvGetters.HAS_ERRORS]) {
+        ctx.commit(LabCsvMutations.LAB_CSV_MUTATION, {
+          status: LabCsvStatus.UPLOADED_COAS,
+          statusMessages: [
+            { text: "COA PDFs successfully uploaded, ready to submit", variant: "primary" },
+          ],
+        });
+      }
+    },
     [LabCsvActions.ASSIGN_COA_FILES]: async (
       ctx: ActionContext<ILabCsvState, IPluginState>,
-      data: { files: File[] }
-    ) => {},
+      data: any
+    ) => {
+      const richDataList: IRichPackageLabData[] = ctx.getters[LabCsvGetters.RICH_PACKAGE_LAB_DATA];
+
+      const rows: IMetrcAssignCoaPayload[] = [];
+
+      for (const richData of richDataList) {
+        console.log(richData);
+
+        const uniqueLabTestResultIds: string[] = [
+          ...new Set(richData.pkg!.testResults?.map((x) => x.LabTestResultId.toString())),
+        ];
+
+        for (const uniqueLabTestResultId of uniqueLabTestResultIds) {
+          rows.push({
+            LabTestResultDocumentId: richData.file!.metrcFileId!.toString(),
+            Id: uniqueLabTestResultId,
+          });
+        }
+      }
+
+      builderManager.submitProject(
+        _.cloneDeep(rows),
+        BuilderType.ASSIGN_LAB_COA,
+        {
+          labTestCount: rows.length,
+          coaCount: richDataList.length,
+        },
+        [],
+        1
+      );
+
+      ctx.dispatch(LabCsvActions.RESET);
+    },
   },
 };
 

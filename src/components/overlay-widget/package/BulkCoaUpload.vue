@@ -7,30 +7,41 @@
         UPLOAD CSV
       </label>
 
+      <b-button
+        v-if="labCsvState.status === LabCsvStatus.UPLOADED_COAS"
+        :disabled="hasErrors"
+        variant="success"
+        @click="submit()"
+        >SUBMIT</b-button
+      >
+
+      <b-button
+        v-if="labCsvState.status === LabCsvStatus.SELECTED_COAS"
+        :disabled="hasErrors"
+        variant="success"
+        @click="uploadCOAs()"
+        >UPLOAD COA PDFs TO METRC</b-button
+      >
+
       <label
-        v-if="!hasErrors && labCsvState.status === [LabCsvStatus.UPLOADED_CSV, ]"
-        class="btn btn-primary mb-0"
+        v-if="
+          (!hasErrors || labCsvState.status !== LabCsvStatus.UPLOADED_CSV) &&
+          [LabCsvStatus.UPLOADED_CSV, LabCsvStatus.SELECTED_COAS].includes(labCsvState.status)
+        "
+        class="btn btn-outline-primary mb-0"
       >
         <b-form-file class="hidden" v-model="coaFiles" accept=".pdf" multiple></b-form-file>
 
-        SELECT COAs
+        SELECT COA PDFs
       </label>
-
-      <b-button
-        v-if="!hasErrors && labCsvState.status === LabCsvStatus.UPLOADED_COAS"
-        variant="success"
-        @click="uploadCOAs()"
-        >UPLOAD COAs TO METRC</b-button
-      >
-
       <b-button
         v-if="labCsvState.status !== LabCsvStatus.INITIAL"
         @click="reset()"
-        variant="warning"
+        variant="outline-dark"
         >RESET</b-button
       >
 
-      <div class="flex flex-col justify-start items-stretch gap-2">
+      <div class="flex flex-col justify-start items-stretch gap-2 text-base">
         <div v-for="[idx, statusMessage] of labCsvState.statusMessages.entries()" v-bind:key="idx">
           <span v-if="statusMessage.variant === 'primary'" class="text-purple-500">{{
             statusMessage.text
@@ -46,31 +57,62 @@
     </div>
 
     <div class="h-full flex flex-col justify-start">
-      <div v-if="showOutputTable" class="grid grid-cols-2 gap-2">
-        <fragment v-for="[idx, richPackage] of richPackageLabData.entries()" v-bind:key="idx">
-          <template v-if="!richPackage.pkg">
-            <div>No active package matches "{{ richPackage.packageLabel }}"</div>
-          </template>
-          <template v-else>
-            <canonical-package-card
-              v-if="richPackage.pkg"
-              :pkg="richPackage.pkg"
-            ></canonical-package-card>
-          </template>
+      <template v-if="showOutputTable">
+        <div class="grid grid-cols-3 gap-2" style="grid-template-columns: 1fr 80px 1fr">
+          <fragment v-for="[idx, richPackage] of richPackageLabData.entries()" v-bind:key="idx">
+            <template v-if="!richPackage.pkg">
+              <div
+                class="rounded-md border border-red-500 flex flex-row items-center justify-center gap-2 text-red-500 text-lg"
+              >
+                <font-awesome-icon icon="exclamation-triangle"></font-awesome-icon>
+                <div>No active package matches "{{ richPackage.packageLabel }}"</div>
+              </div>
+            </template>
+            <template v-else>
+              <canonical-package-card
+                v-if="richPackage.pkg"
+                :pkg="richPackage.pkg"
+              ></canonical-package-card>
+            </template>
 
-          <template v-if="!richPackage.file">
-            <div>Awaiting COA: "{{ richPackage.filename }}"</div>
-          </template>
-          <template v-else>
-            <font-awesome-icon icon="file-pdf" />
-            {{ richPackage.filename }}
-          </template>
+            <div class="grid place-items-center text-xl">
+              <font-awesome-icon icon="arrow-right"></font-awesome-icon>
+            </div>
 
-          <div v-if="!richPackage.file">
-            {{ richPackage.file && richPackage.file.filename }}
-          </div>
-        </fragment>
-      </div>
+            <template v-if="!richPackage.file">
+              <div
+                class="rounded-md border border-gray-200 flex flex-row items-center justify-center gap-2 text-lg text-gray-200"
+                style="border-style: dashed !important"
+              >
+                <font-awesome-icon icon="file-pdf"></font-awesome-icon>
+                <div>{{ richPackage.filename }}</div>
+              </div>
+            </template>
+            <template v-else>
+              <template v-if="richPackage.file.metrcFileId">
+                <div
+                  class="rounded-md border flex flex-row items-center justify-center gap-2 text-lg text-green-600"
+                  style="border-color: rgb(5, 150, 105) !important"
+                >
+                  <font-awesome-icon icon="file-pdf"></font-awesome-icon>
+                  <div>{{ richPackage.filename }}</div>
+                </div>
+              </template>
+              <template v-else>
+                <div
+                  class="rounded-md border border-gray-600 flex flex-row items-center justify-center gap-2 text-lg text-gray-600"
+                >
+                  <font-awesome-icon icon="file-pdf"></font-awesome-icon>
+                  <div>{{ richPackage.filename }}</div>
+                </div>
+              </template>
+            </template>
+          </fragment>
+        </div>
+      </template>
+      <template v-else>
+        <div>TODO INSTRUCTIONS</div>
+      </template>
     </div>
   </div>
 </template>
@@ -120,8 +162,8 @@ export default Vue.extend({
     ...mapActions({
       reset: `labCsv/${LabCsvActions.RESET}`,
       uploadCOAs: `labCsv/${LabCsvActions.UPLOAD_COA_FILES}`,
+      submit: `labCsv/${LabCsvActions.ASSIGN_COA_FILES}`,
     }),
-    submit() {},
   },
   async created() {},
   async mounted() {},
