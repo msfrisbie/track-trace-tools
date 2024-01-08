@@ -25,6 +25,7 @@ import { AxiosResponse } from "axios";
 import { get, keys, set } from "idb-keyval";
 import _ from "lodash-es";
 import { timer } from "rxjs";
+import { primaryDataLoader } from "./data-loader/data-loader.module";
 
 const DYNAMIC_CONST_TIMEOUT_MS = 30000;
 
@@ -815,6 +816,17 @@ class DynamicConstsManager implements IAtomicService {
     }
 
     try {
+      const packages = [
+        ...(await primaryDataLoader.activePackageSample()),
+        ...(await primaryDataLoader.inactivePackageSample()),
+      ];
+
+      console.log(packages);
+
+      if (packages.length > 0) {
+        return packages[0].LocationName !== null;
+      }
+
       return primaryMetrcRequestManager
         .getPackagesHTML()
         .then((response) => response.data)

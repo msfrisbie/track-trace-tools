@@ -1,4 +1,4 @@
-import { IAtomicService } from '@/interfaces';
+import { IAtomicService } from "@/interfaces";
 
 // Class for testing code that runs at various lifecycle points
 class SandboxManager implements IAtomicService {
@@ -6,10 +6,11 @@ class SandboxManager implements IAtomicService {
 
   async runsBeforeModuleInit() {}
 
-  async runsBeforeVueAppMount() {
-  }
+  async runsBeforeVueAppMount() {}
 
   async runsAfterAuthInit() {}
+
+  async runsAfterModuleInit() {}
 }
 
 export const sandboxManager = new SandboxManager();

@@ -289,6 +289,8 @@ export default Vue.extend({
 
     // Run this in both states, but only after auth is acquired
     telemetryManager.init();
+
+    await sandboxManager.runsAfterModuleInit();
   },
   mounted() {
   },

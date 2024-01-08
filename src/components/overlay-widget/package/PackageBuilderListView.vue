@@ -136,7 +136,7 @@ export default Vue.extend({
           isNew: false,
           enabled: hasPlusImpl() || store.state.client.values.ENABLE_BULK_COA,
           visible: true,
-          isPlus: false,
+          isPlus: true,
           showDisabledMessage: false,
         },
       ];

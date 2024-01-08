@@ -282,6 +282,10 @@ export class DataLoader implements IAtomicService {
     return total;
   }
 
+  private async extractCollection<T>(responsePromise: Promise<AxiosResponse>): Promise<T[]> {
+    return (await responsePromise).data.Data;
+  }
+
   async availableTagCount(): Promise<number | null> {
     return this.extractTotalOrNull(
       this.metrcRequestManagerOrError.getAvailableTags(this._countPayload)
@@ -295,6 +299,18 @@ export class DataLoader implements IAtomicService {
   async voidedTagCount(): Promise<number | null> {
     return this.extractTotalOrNull(
       this.metrcRequestManagerOrError.getVoidedTags(this._countPayload)
+    );
+  }
+
+  async activePackageSample(): Promise<IIndexedPackageData[]> {
+    return this.extractCollection<IIndexedPackageData>(
+      this.metrcRequestManagerOrError.getActivePackages(this._countPayload)
+    );
+  }
+
+  async inactivePackageSample(): Promise<IIndexedPackageData[]> {
+    return this.extractCollection<IIndexedPackageData>(
+      this.metrcRequestManagerOrError.getInactivePackages(this._countPayload)
     );
   }
 
