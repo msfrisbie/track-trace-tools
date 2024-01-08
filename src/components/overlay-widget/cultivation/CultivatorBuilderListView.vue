@@ -67,6 +67,18 @@ export default Vue.extend({
           showDisabledMessage: false,
         },
         {
+          route: "/cultivator/destroy-plant-batches",
+          text: "DESTROY PLANT BATCHES",
+          icon: "trash-alt",
+          backgroundColor: "#48b867",
+          enabled: false,
+          isPlus: false,
+          isBeta: false,
+          isNew: true,
+          visible: true,
+          showDisabledMessage: false,
+        },
+        {
           route: "/cultivator/destroy-plants",
           text: "DESTROY PLANTS",
           icon: "trash-alt",
