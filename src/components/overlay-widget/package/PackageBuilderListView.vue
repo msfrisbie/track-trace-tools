@@ -5,6 +5,7 @@
 <script lang="ts">
 import BuilderList from "@/components/overlay-widget/shared/BuilderList.vue";
 import { IBuilderListOption, IPluginState } from "@/interfaces";
+import { dynamicConstsManager } from "@/modules/dynamic-consts-manager.module";
 import store from "@/store/page-overlay/index";
 import { HOST_WILDCARD, isCurrentHostAllowed } from "@/utils/builder";
 import { hasPlusImpl } from "@/utils/plus";
@@ -19,9 +20,14 @@ export default Vue.extend({
   },
   methods: {},
   data() {
-    return {};
+    return {
+      facilityUsesLocationForPackages: false,
+    };
   },
-  async mounted() {},
+  async mounted() {
+    this.$data.facilityUsesLocationForPackages =
+      await dynamicConstsManager.facilityUsesLocationForPackages();
+  },
   async created() {},
   computed: {
     ...mapState<IPluginState>({
@@ -74,7 +80,7 @@ export default Vue.extend({
           isBeta: false,
           isNew: false,
           backgroundColor: "#2774ae",
-          enabled: true,
+          enabled: this.$data.facilityUsesLocationForPackages,
           visible: true,
           showDisabledMessage: false,
           isPlus: false,
