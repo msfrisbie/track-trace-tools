@@ -821,8 +821,6 @@ class DynamicConstsManager implements IAtomicService {
         ...(await primaryDataLoader.inactivePackageSample()),
       ];
 
-      console.log(packages);
-
       if (packages.length > 0) {
         return packages[0].LocationName !== null;
       }

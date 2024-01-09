@@ -6,6 +6,7 @@
 import BuilderList from "@/components/overlay-widget/shared/BuilderList.vue";
 import { CALIFORNIA_METRC_HOSTNAME, TESTING_AZ_METRC_HOSTNAME } from "@/consts";
 import { IBuilderListOption, IPluginState } from "@/interfaces";
+import { isDevelopment } from "@/modules/environment.module";
 import store from "@/store/page-overlay/index";
 import { isCurrentHostAllowed } from "@/utils/builder";
 import { hasPlusImpl } from "@/utils/plus";
@@ -71,8 +72,8 @@ export default Vue.extend({
           text: "DESTROY PLANT BATCHES",
           icon: "trash-alt",
           backgroundColor: "#48b867",
-          enabled: false,
-          isPlus: false,
+          enabled: isDevelopment(),
+          isPlus: true,
           isBeta: false,
           isNew: true,
           visible: true,

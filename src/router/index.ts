@@ -1,10 +1,12 @@
 import ActiveProjectView from "@/components/overlay-widget/ActiveProjectView.vue";
+import BuilderDefaultView from "@/components/overlay-widget/BuilderDefaultView.vue";
+import UnavailablePage from "@/components/overlay-widget/UnavailablePage.vue";
 import AdminListView from "@/components/overlay-widget/admin/AdminListView.vue";
 import LayoutSandbox from "@/components/overlay-widget/admin/LayoutSandbox.vue";
 import PickerSandbox from "@/components/overlay-widget/admin/PickerSandbox.vue";
-import BuilderDefaultView from "@/components/overlay-widget/BuilderDefaultView.vue";
 import CultivatorBuilderListView from "@/components/overlay-widget/cultivation/CultivatorBuilderListView.vue";
 import CultivatorToolsHelp from "@/components/overlay-widget/cultivation/CultivatorToolsHelp.vue";
+import DestroyPlantBatchesBuilder from "@/components/overlay-widget/cultivation/DestroyPlantBatchesBuilder.vue";
 import DestroyPlantsBuilder from "@/components/overlay-widget/cultivation/DestroyPlantsBuilder.vue";
 import HarvestBuilder from "@/components/overlay-widget/cultivation/HarvestBuilder.vue";
 import ManicureBuilder from "@/components/overlay-widget/cultivation/ManicureBuilder.vue";
@@ -36,14 +38,13 @@ import PackageToolsHelp from "@/components/overlay-widget/package/PackageToolsHe
 import SplitPackageBuilder from "@/components/overlay-widget/package/SplitPackageBuilder.vue";
 import TransferBuilder from "@/components/overlay-widget/transfer/TransferBuilder.vue";
 import TransferToolsHelp from "@/components/overlay-widget/transfer/TransferToolsHelp.vue";
-import UnavailablePage from "@/components/overlay-widget/UnavailablePage.vue";
 import CheckPermissionsView from "@/components/page-overlay/CheckPermissionsView.vue";
-import FinalizeSalesReceiptsForm from "@/components/page-overlay/forms/FinalizeSalesReceiptsForm.vue";
-import SettingsForm from "@/components/page-overlay/forms/SettingsForm.vue";
-import VoidTagForm from "@/components/page-overlay/forms/VoidTagForm.vue";
 import GoogleSheetsExport from "@/components/page-overlay/GoogleSheetsExport.vue";
 import ManageAccount from "@/components/page-overlay/ManageAccount.vue";
 import QuickScripts from "@/components/page-overlay/QuickScripts.vue";
+import FinalizeSalesReceiptsForm from "@/components/page-overlay/forms/FinalizeSalesReceiptsForm.vue";
+import SettingsForm from "@/components/page-overlay/forms/SettingsForm.vue";
+import VoidTagForm from "@/components/page-overlay/forms/VoidTagForm.vue";
 import VueRouter, { RouteConfig } from "vue-router";
 
 const routes: Array<RouteConfig> = [
@@ -170,6 +171,11 @@ const routes: Array<RouteConfig> = [
     path: "/cultivator/destroy-plants",
     name: "Destroy Plants",
     component: DestroyPlantsBuilder,
+  },
+  {
+    path: "/cultivator/destroy-plant-batches",
+    name: "Destroy Plant Batches",
+    component: DestroyPlantBatchesBuilder,
   },
   {
     path: "/cultivator/harvest-plants",
