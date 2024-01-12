@@ -1,15 +1,10 @@
 const TerserPlugin = require("terser-webpack-plugin");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
-const BundleAnalyzerPlugin = require("webpack-bundle-analyzer").BundleAnalyzerPlugin;
 
 // https://webpack.js.org/configuration/
 module.exports = (env, argv) => {
   const isDevelopment = argv.mode === "development";
   const isCircleCI = process.env.CIRCLECI === "true";
-
-  if (isCircleCI) {
-    throw new Error("foobar");
-  }
 
   const config = {
     optimization: {
@@ -26,14 +21,14 @@ module.exports = (env, argv) => {
       minimizer: [
         new TerserPlugin({
           terserOptions: {
-            parallel: !isCircleCI,
-            sourceMap: !isCircleCI, // Set to false if you don't need source maps
+            parallel: false,
+            sourceMap: false, // Set to false if you don't need source maps
             compress: {
-              drop_console: !isDevelopment,
+              drop_console: true,
               // Other compress options here
             },
             output: {
-              comments: isDevelopment,
+              comments: false,
             },
           },
         }),
