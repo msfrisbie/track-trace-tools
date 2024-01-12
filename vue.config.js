@@ -1,9 +1,37 @@
+const TerserPlugin = require("terser-webpack-plugin");
+
 // Created with
 // https://github.com/adambullmer/vue-cli-plugin-browser-extension
 module.exports = {
   filenameHashing: false,
-  configureWebpack: {
-    devtool: "source-map",
+  configureWebpack: (config) => {
+    const isCircleCI = process.env.CIRCLECI === "true";
+    const isDevelopment = process.env.NODE_ENV === "production";
+
+    if (isCircleCI) {
+      throw new Error("foobar");
+    }
+
+    return {
+      devtool: "source-map",
+      //   optimization: {
+      //     minimizer: [
+      //       new TerserPlugin({
+      //         terserOptions: {
+      //           parallel: false,
+      //           sourceMap: false,
+      //           compress: {
+      //             drop_console: true,
+      //             // Other compress options here
+      //           },
+      //           output: {
+      //             comments: false,
+      //           },
+      //         },
+      //       }),
+      //     ],
+      //   },
+    };
   },
   pages: {
     popup: {

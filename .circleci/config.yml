@@ -12,6 +12,8 @@ jobs:
     docker:
       - image: cimg/node:16.10
     resource_class: large
+    environment:
+      NODE_OPTIONS: --max_old_space_size=4096
     steps:
       - checkout
       - run: yarn install
@@ -23,6 +25,8 @@ jobs:
     docker:
       - image: cimg/node:16.10
     resource_class: large
+    environment:
+      NODE_OPTIONS: --max_old_space_size=4096
     steps:
       - checkout
       - attach_workspace: # This will fetch the previously saved state (with node_modules)
@@ -32,6 +36,8 @@ jobs:
     docker:
       - image: cimg/node:16.10
     resource_class: large
+    environment:
+      NODE_OPTIONS: --max_old_space_size=4096
     steps:
       - checkout
       - attach_workspace:
@@ -41,6 +47,8 @@ jobs:
     docker:
       - image: cimg/node:16.10
     resource_class: large
+    environment:
+      NODE_OPTIONS: --max_old_space_size=4096
     steps:
       - checkout
       - attach_workspace:
