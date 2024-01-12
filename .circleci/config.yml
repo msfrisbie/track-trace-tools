@@ -31,7 +31,7 @@ jobs:
       - checkout
       - attach_workspace: # This will fetch the previously saved state (with node_modules)
           at: .
-      - run: yarn build
+      - run: yarn build:nocompat
   lint:
     docker:
       - image: cimg/node:16.10
