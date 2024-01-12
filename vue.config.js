@@ -8,10 +8,6 @@ module.exports = {
     const isCircleCI = process.env.CIRCLECI === "true";
     const isDevelopment = process.env.NODE_ENV === "production";
 
-    if (isCircleCI) {
-      throw new Error("foobar");
-    }
-
     return {
       devtool: "source-map",
       //   optimization: {
