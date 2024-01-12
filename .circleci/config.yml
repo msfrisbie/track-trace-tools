@@ -11,6 +11,7 @@ jobs:
   setup: # This job will checkout the code and install dependencies
     docker:
       - image: cimg/node:16.10
+    resource_class: large
     steps:
       - checkout
       - run: yarn install
@@ -21,6 +22,7 @@ jobs:
   build:
     docker:
       - image: cimg/node:16.10
+    resource_class: large
     steps:
       - checkout
       - attach_workspace: # This will fetch the previously saved state (with node_modules)
@@ -29,6 +31,7 @@ jobs:
   lint:
     docker:
       - image: cimg/node:16.10
+    resource_class: large
     steps:
       - checkout
       - attach_workspace:
@@ -37,6 +40,7 @@ jobs:
   test:
     docker:
       - image: cimg/node:16.10
+    resource_class: large
     steps:
       - checkout
       - attach_workspace:

@@ -78,23 +78,5 @@ export default Vue.extend({
 </script>
 
 <style type="text/scss" lang="scss">
-@import "@/scss/bootstrap-theme";
-
-@import "node_modules/tailwindcss/dist/base";
-@import "node_modules/tailwindcss/dist/components";
-@import "node_modules/tailwindcss/dist/utilities";
-
-@import "@/scss/bootstrap-override";
-
-@import "@/scss/misc";
-@import "@/scss/fonts";
-
-html {
-  /* Firefox doesnt seem to collapse, this allows for cross-browser compat */
-  min-width: 300px;
-}
-
-body {
-  font-family: "Roboto", sans-serif;
-}
+@import "@/scss/extension-page-shared";
 </style>
