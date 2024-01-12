@@ -7,6 +7,10 @@ module.exports = (env, argv) => {
   const isDevelopment = argv.mode === "development";
   const isCircleCI = process.env.CIRCLECI === "true";
 
+  if (isCircleCI) {
+    throw new Error("foobar");
+  }
+
   const config = {
     optimization: {
       splitChunks: {
