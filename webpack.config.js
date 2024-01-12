@@ -5,6 +5,7 @@ const BundleAnalyzerPlugin = require("webpack-bundle-analyzer").BundleAnalyzerPl
 // https://webpack.js.org/configuration/
 module.exports = (env, argv) => {
   const isDevelopment = argv.mode === "development";
+  const isCircleCI = process.env.CIRCLECI === "true";
 
   const config = {
     optimization: {
@@ -21,13 +22,14 @@ module.exports = (env, argv) => {
       minimizer: [
         new TerserPlugin({
           terserOptions: {
-            sourceMap: isDevelopment, // Set to false if you don't need source maps
+            parallel: !isCircleCI,
+            sourceMap: !isCircleCI, // Set to false if you don't need source maps
             compress: {
-              drop_console: true,
+              drop_console: !isDevelopment,
               // Other compress options here
             },
             output: {
-              comments: false,
+              comments: isDevelopment,
             },
           },
         }),
