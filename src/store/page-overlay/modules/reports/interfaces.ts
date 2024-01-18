@@ -1,24 +1,24 @@
 import {
-  IAuthState, IHarvestFilter,
-  IIndexedHarvestData,
-  IIndexedPackageData,
-  IIndexedPlantBatchData,
-  IIndexedPlantData,
-  IIndexedRichIncomingTransferData,
-  IIndexedRichOutgoingTransferData,
-  IIndexedTagData, IPackageFilter,
-  IPlantBatchFilter,
-  IPlantFilter, ISimpleSpreadsheet,
-  ISpreadsheet,
-  ITagFilter,
-  ITransferFilter
+    IAuthState, IHarvestFilter,
+    IIndexedHarvestData,
+    IIndexedPackageData,
+    IIndexedPlantBatchData,
+    IIndexedPlantData,
+    IIndexedRichIncomingTransferData,
+    IIndexedRichOutgoingTransferData,
+    IIndexedTagData, IPackageFilter,
+    IPlantBatchFilter,
+    IPlantFilter, ISimpleSpreadsheet,
+    ISpreadsheet,
+    ITagFilter,
+    ITransferFilter
 } from '@/interfaces';
 import { ImmaturePlantQuickviewDimension } from '@/utils/reports/immature-plants-quickview-report';
 import { MaturePlantQuickviewDimension } from '@/utils/reports/mature-plants-quickview-report';
 import { PackageQuickviewDimension } from '@/utils/reports/packages-quickview-report';
 import {
-  InventoryStrategy,
-  IPackageDateMetadata
+    InventoryStrategy,
+    IPackageDateMetadata
 } from '@/utils/reports/point-in-time-inventory-report';
 import { IStatusMessage, ReportStatus, ReportType } from './consts';
 
@@ -70,7 +70,7 @@ export interface IReportConfig {
     displayFullTags: boolean;
     addSpacing: boolean;
     removeFloorNugs: boolean;
-    harvestMatchFilter: string;
+    harvestMatchFilterList: string;
     enableHarvestMatchFilter: boolean;
     fields: null;
   };

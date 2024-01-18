@@ -6,15 +6,15 @@ import {
   IIndexedRichOutgoingTransferData,
   IPluginState,
   IUnionIndexedPackageData,
-  IUnitOfMeasure,
+  IUnitOfMeasure
 } from "@/interfaces";
 import { DataLoader, getDataLoaderByLicense } from "@/modules/data-loader/data-loader.module";
 import { dynamicConstsManager } from "@/modules/dynamic-consts-manager.module";
-import { ReportType, ReportsMutations } from "@/store/page-overlay/modules/reports/consts";
+import { ReportsMutations, ReportType } from "@/store/page-overlay/modules/reports/consts";
 import {
   IReportConfig,
   IReportData,
-  IReportsState,
+  IReportsState
 } from "@/store/page-overlay/modules/reports/interfaces";
 import { TransferPackageSearchAlgorithm } from "@/store/page-overlay/modules/transfer-package-search/consts";
 import { v4 as uuidv4 } from "uuid";
@@ -28,7 +28,7 @@ import {
   extractHarvestChildPackageLabelsFromHistory,
   extractInitialPackageQuantityAndUnitFromHistoryOrError,
   extractParentPackageTagQuantityUnitItemSetsFromHistory,
-  extractTestSamplePackageLabelsFromHistory,
+  extractTestSamplePackageLabelsFromHistory
 } from "../history";
 import {
   getIdOrError,
@@ -36,7 +36,7 @@ import {
   getItemUnitOfMeasureAbbreviationOrError,
   getItemUnitQuantityAndUnitOrError,
   getLabelOrError,
-  getStrainNameOrError,
+  getStrainNameOrError
 } from "../package";
 import { findMatchingTransferPackages } from "../transfer";
 import { convertUnits } from "../units";
@@ -55,7 +55,7 @@ interface IHarvestPackagesReportFormFilters {
   addSpacing: boolean;
   debug: boolean;
   enableHarvestMatchFilter: boolean;
-  harvestMatchFilter: string;
+  harvestMatchFilterList: string;
 }
 
 type IHarvestPackageRowData = {
@@ -119,7 +119,7 @@ export const harvestPackagesFormFiltersFactory: () => IHarvestPackagesReportForm
   addSpacing: false,
   debug: false,
   enableHarvestMatchFilter: false,
-  harvestMatchFilter: "",
+  harvestMatchFilterList: "",
   ...licenseFilterFactory("all"),
 });
 
@@ -150,7 +150,7 @@ export function addHarvestPackagesReport({
     displayFullTags: harvestPackagesFormFilters.displayFullTags,
     addSpacing: harvestPackagesFormFilters.addSpacing,
     removeFloorNugs: harvestPackagesFormFilters.removeFloorNugs,
-    harvestMatchFilter: harvestPackagesFormFilters.harvestMatchFilter,
+    harvestMatchFilterList: harvestPackagesFormFilters.harvestMatchFilterList,
     enableHarvestMatchFilter: harvestPackagesFormFilters.enableHarvestMatchFilter,
     fields: null,
   };
@@ -273,9 +273,17 @@ export async function maybeLoadHarvestPackagesReportData({
 
   await Promise.allSettled(promises);
 
+  const harvestMatchFilters: string[] = harvestConfig.harvestMatchFilterList.split(',').map((x: string) => x.trim().toLocaleLowerCase());
+
   harvests = harvests.filter((harvest) => {
     if (harvestConfig.enableHarvestMatchFilter) {
-      if (!harvest.Name.includes(harvestConfig.harvestMatchFilter)) {
+      const normalizedHarvestName = harvest.Name.trim().toLowerCase();
+
+      const isMatched = harvestMatchFilters.some((harvestMatchFilter) =>
+        normalizedHarvestName.includes(harvestMatchFilter)
+      );
+
+      if (!isMatched) {
         return false;
       }
     }

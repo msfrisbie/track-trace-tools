@@ -310,8 +310,8 @@
                   label="Only include harvest names matching:"
                 >
                   <b-form-input
-                    placeholder="Full or partial harvest name"
-                    v-model="harvestPackagesFormFilters.harvestMatchFilter"
+                    placeholder="Full or partial harvest names, comma separated"
+                    v-model="harvestPackagesFormFilters.harvestMatchFilterList"
                   >
                   </b-form-input>
                 </b-form-group>
