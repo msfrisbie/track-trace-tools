@@ -6,15 +6,15 @@ import {
   IIndexedRichOutgoingTransferData,
   IPluginState,
   IUnionIndexedPackageData,
-  IUnitOfMeasure
+  IUnitOfMeasure,
 } from "@/interfaces";
 import { DataLoader, getDataLoaderByLicense } from "@/modules/data-loader/data-loader.module";
 import { dynamicConstsManager } from "@/modules/dynamic-consts-manager.module";
-import { ReportsMutations, ReportType } from "@/store/page-overlay/modules/reports/consts";
+import { ReportType, ReportsMutations } from "@/store/page-overlay/modules/reports/consts";
 import {
   IReportConfig,
   IReportData,
-  IReportsState
+  IReportsState,
 } from "@/store/page-overlay/modules/reports/interfaces";
 import { TransferPackageSearchAlgorithm } from "@/store/page-overlay/modules/transfer-package-search/consts";
 import { v4 as uuidv4 } from "uuid";
@@ -28,7 +28,7 @@ import {
   extractHarvestChildPackageLabelsFromHistory,
   extractInitialPackageQuantityAndUnitFromHistoryOrError,
   extractParentPackageTagQuantityUnitItemSetsFromHistory,
-  extractTestSamplePackageLabelsFromHistory
+  extractTestSamplePackageLabelsFromHistory,
 } from "../history";
 import {
   getIdOrError,
@@ -36,7 +36,7 @@ import {
   getItemUnitOfMeasureAbbreviationOrError,
   getItemUnitQuantityAndUnitOrError,
   getLabelOrError,
-  getStrainNameOrError
+  getStrainNameOrError,
 } from "../package";
 import { findMatchingTransferPackages } from "../transfer";
 import { convertUnits } from "../units";
@@ -273,35 +273,39 @@ export async function maybeLoadHarvestPackagesReportData({
 
   await Promise.allSettled(promises);
 
-  const harvestMatchFilters: string[] = harvestConfig.harvestMatchFilterList.split(',').map((x: string) => x.trim().toLocaleLowerCase());
+  const harvestMatchFilters: string[] = harvestConfig.harvestMatchFilterList
+    .split(",")
+    .map((x: string) => x.trim().toLocaleLowerCase());
 
-  harvests = harvests.filter((harvest) => {
-    if (harvestConfig.enableHarvestMatchFilter) {
-      const normalizedHarvestName = harvest.Name.trim().toLowerCase();
+  harvests = harvests
+    .filter((harvest) => {
+      if (harvestConfig.enableHarvestMatchFilter) {
+        const normalizedHarvestName = harvest.Name.trim().toLowerCase();
 
-      const isMatched = harvestMatchFilters.some((harvestMatchFilter) =>
-        normalizedHarvestName.includes(harvestMatchFilter)
-      );
+        const isMatched = harvestMatchFilters.some((harvestMatchFilter) =>
+          normalizedHarvestName.includes(harvestMatchFilter)
+        );
 
-      if (!isMatched) {
-        return false;
+        if (!isMatched) {
+          return false;
+        }
       }
-    }
 
-    if (harvestConfig.harvestFilter.harvestDateLt) {
-      if (harvest.HarvestStartDate > harvestConfig.harvestFilter.harvestDateLt) {
-        return false;
+      if (harvestConfig.harvestFilter.harvestDateLt) {
+        if (harvest.HarvestStartDate > harvestConfig.harvestFilter.harvestDateLt) {
+          return false;
+        }
       }
-    }
 
-    if (harvestConfig.harvestFilter.harvestDateGt) {
-      if (harvest.HarvestStartDate < harvestConfig.harvestFilter.harvestDateGt) {
-        return false;
+      if (harvestConfig.harvestFilter.harvestDateGt) {
+        if (harvest.HarvestStartDate < harvestConfig.harvestFilter.harvestDateGt) {
+          return false;
+        }
       }
-    }
 
-    return true;
-  });
+      return true;
+    })
+    .sort((a, b) => a.HarvestStartDate.localeCompare(b.HarvestStartDate));
 
   const harvestPackageRowData: IHarvestPackageRowData[] = [];
 
