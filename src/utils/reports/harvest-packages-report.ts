@@ -108,6 +108,73 @@ function rowDataFactory(rowData: {
   };
 }
 
+function findMostCommonAndPercentageOrNull(
+  arr: number[]
+): { mostCommon: number; percentage: number } | null {
+  if (arr.length === 0) {
+    return null;
+  }
+
+  let frequency: { [key: number]: number } = {};
+  let maxFreq = 0;
+  let mostCommon: number = 0;
+
+  // Count the frequency of each number
+  arr.map((num) => {
+    if (frequency[num]) {
+      frequency[num]++;
+    } else {
+      frequency[num] = 1;
+    }
+
+    // Keep track of the most common number and its frequency
+    if (frequency[num] > maxFreq) {
+      maxFreq = frequency[num];
+      mostCommon = num;
+    }
+  });
+
+  // Calculate the percentage
+  let percentage = (maxFreq / arr.length) * 100;
+
+  return { mostCommon, percentage };
+}
+
+function isPackagingIntakePackage(pkg: IIndexedPackageData): boolean {
+  if (!pkg.history) {
+    throw new Error("Package must have history loaded");
+  }
+
+  const childPackageSets = extractChildPackageTagQuantityUnitSetsFromHistory(pkg.history!);
+
+  // Check that there are enough child packages
+  if (childPackageSets.length <= 7) {
+    return false;
+  }
+
+  const mostCommonValueData = findMostCommonAndPercentageOrNull(childPackageSets.map((x) => x[1]));
+
+  if (!mostCommonValueData) {
+    return false;
+  }
+
+  // Check that 80% of the packages are uniform
+  if (mostCommonValueData.percentage < 80) {
+    return false;
+  }
+
+  // Check the packages are larger than 20% of the parent package
+  if (
+    mostCommonValueData.mostCommon /
+      extractInitialPackageQuantityAndUnitFromHistoryOrError(pkg.history!)[0] >
+    0.2
+  ) {
+    return false;
+  }
+
+  return true;
+}
+
 export const harvestPackagesFormFiltersFactory: () => IHarvestPackagesReportFormFilters = () => ({
   harvestDateGt: todayIsodate(),
   harvestDateLt: todayIsodate(),
