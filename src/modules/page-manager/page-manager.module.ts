@@ -423,14 +423,16 @@ class PageManager implements IAtomicService {
             targetClassName = e.target.className;
           } catch (err) {}
 
-          analyticsManager.track(MessageType.CLICK, {
-            targetText,
-            targetClassName,
-            clientX,
-            clientY,
-            windowWidth,
-            windowHeight,
-          });
+          if (store.state.client.flags.enable_click_tracking === "true") {
+            analyticsManager.track(MessageType.CLICK, {
+              targetText,
+              targetClassName,
+              clientX,
+              clientY,
+              windowWidth,
+              windowHeight,
+            });
+          }
         } catch (err) {}
       }
     });

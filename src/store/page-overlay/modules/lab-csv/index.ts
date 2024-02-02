@@ -1,5 +1,6 @@
-import { BuilderType } from "@/consts";
+import { BuilderType, MessageType } from "@/consts";
 import { IIndexedPackageData, IMetrcAssignCoaPayload, IPluginState } from "@/interfaces";
+import { analyticsManager } from "@/modules/analytics-manager.module";
 import { builderManager } from "@/modules/builder-manager.module";
 import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
 import { isDevelopment } from "@/modules/environment.module";
@@ -94,6 +95,11 @@ export const labCsvModule = {
       ctx: ActionContext<ILabCsvState, IPluginState>,
       data: { file: File }
     ) => {
+      analyticsManager.track(MessageType.BUILDER_EVENT, {
+        builder: BuilderType.ASSIGN_LAB_COA,
+        action: "Begin load CSV",
+      });
+
       const csvData = (await readCsvFile(data.file)).filter((x) => x.some((y) => y.length > 0));
 
       ctx.commit(LabCsvMutations.LAB_CSV_MUTATION, {
@@ -218,6 +224,11 @@ export const labCsvModule = {
       ctx: ActionContext<ILabCsvState, IPluginState>,
       data: { files: File[] }
     ) => {
+      analyticsManager.track(MessageType.BUILDER_EVENT, {
+        builder: BuilderType.ASSIGN_LAB_COA,
+        action: "Select COA files",
+      });
+
       ctx.commit(LabCsvMutations.LAB_CSV_MUTATION, {
         status: LabCsvStatus.INFLIGHT,
         statusMessages: [{ text: "Loading package data...", variant: "primary" }],
@@ -264,6 +275,11 @@ export const labCsvModule = {
       ctx: ActionContext<ILabCsvState, IPluginState>,
       data: any
     ) => {
+      analyticsManager.track(MessageType.BUILDER_EVENT, {
+        builder: BuilderType.ASSIGN_LAB_COA,
+        action: "Upload COA files",
+      });
+
       ctx.commit(LabCsvMutations.LAB_CSV_MUTATION, {
         // status: LabCsvStatus.INFLIGHT,
         statusMessages: [{ text: "Uploading COA PDFs...", variant: "primary" }],
@@ -313,6 +329,11 @@ export const labCsvModule = {
       ctx: ActionContext<ILabCsvState, IPluginState>,
       data: any
     ) => {
+      analyticsManager.track(MessageType.BUILDER_EVENT, {
+        builder: BuilderType.ASSIGN_LAB_COA,
+        action: "Assign COA files",
+      });
+
       const richDataList: IRichPackageLabData[] = ctx.getters[LabCsvGetters.RICH_PACKAGE_LAB_DATA];
 
       const rows: IMetrcAssignCoaPayload[] = [];
