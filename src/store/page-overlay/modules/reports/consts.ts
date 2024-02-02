@@ -436,13 +436,25 @@ const COMMON_HARVEST_FIELD_DATA: IFieldData[] = [
   {
     value: "HarvestState",
     readableName: "Harvest Status",
-    required: true,
+    required: false,
+    initiallyChecked: true,
+  },
+  {
+    value: "SourceStrainNames",
+    readableName: "Strain Names",
+    required: false,
     initiallyChecked: true,
   },
   {
     value: "CurrentWeight",
     readableName: "Current Weight",
-    required: true,
+    required: false,
+    initiallyChecked: true,
+  },
+  {
+    value: "UnitOfWeightAbbreviation",
+    readableName: "Unit of Weight",
+    required: false,
     initiallyChecked: true,
   },
   {
@@ -456,6 +468,36 @@ const COMMON_HARVEST_FIELD_DATA: IFieldData[] = [
     readableName: "Harvest Type",
     required: false,
     initiallyChecked: true,
+  },
+  {
+    value: "PlantCount",
+    readableName: "Plant Count",
+    required: false,
+    initiallyChecked: false,
+  },
+  {
+    value: "TotalPackagedWeight",
+    readableName: "Total Packaged Weight",
+    required: false,
+    initiallyChecked: false,
+  },
+  {
+    value: "TotalRestoredWeight",
+    readableName: "Total Restored Weight",
+    required: false,
+    initiallyChecked: false,
+  },
+  {
+    value: "TotalWasteWeight",
+    readableName: "Total Waste Weight",
+    required: false,
+    initiallyChecked: false,
+  },
+  {
+    value: "TotalWetWeight",
+    readableName: "Total Wet Weight",
+    required: false,
+    initiallyChecked: false,
   },
 ];
 

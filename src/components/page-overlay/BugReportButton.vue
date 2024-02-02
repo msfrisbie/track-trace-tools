@@ -29,7 +29,7 @@
       </template>
 
       <div style="min-width: 200px" class="flex flex-col space-y-2 text-base">
-        <p>Report problems with T3 diretly to the developer.</p>
+        <p>Report problems with T3 directly to the developer.</p>
 
         <b-button
           size="sm"
@@ -44,14 +44,14 @@
 </template>
 
 <script lang="ts">
-import TrackTraceToolsLogo from '@/components/shared/TrackTraceToolsLogo.vue';
-import { MutationType } from '@/mutation-types';
-import store from '@/store/page-overlay/index';
-import Vue from 'vue';
-import { mapState } from 'vuex';
+import TrackTraceToolsLogo from "@/components/shared/TrackTraceToolsLogo.vue";
+import { MutationType } from "@/mutation-types";
+import store from "@/store/page-overlay/index";
+import Vue from "vue";
+import { mapState } from "vuex";
 
 export default Vue.extend({
-  name: 'BugReportButton',
+  name: "BugReportButton",
   store,
   components: {
     TrackTraceToolsLogo,
@@ -74,9 +74,9 @@ export default Vue.extend({
       trackedInteractions.dismissedBugReportsPopover = true;
 
       // @ts-ignore
-      this.$refs['bug-report-popover'].$emit('close');
+      this.$refs["bug-report-popover"].$emit("close");
       // @ts-ignore
-      this.$refs['bug-report-popover'].$emit('disable');
+      this.$refs["bug-report-popover"].$emit("disable");
 
       store.commit(MutationType.UPDATE_TRACKED_INTERACTIONS, trackedInteractions);
     },
