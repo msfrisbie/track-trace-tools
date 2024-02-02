@@ -1,4 +1,4 @@
-import { PackageState } from "@/consts";
+import { BuilderType, MessageType, PackageState } from "@/consts";
 import {
   ICsvFile,
   IIndexedPackageData,
@@ -8,6 +8,7 @@ import {
   IPluginState,
   IUnitOfMeasure,
 } from "@/interfaces";
+import { analyticsManager } from "@/modules/analytics-manager.module";
 import { authManager } from "@/modules/auth-manager.module";
 import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
 import {
@@ -37,7 +38,7 @@ import {
 
 const inMemoryState = {
   status: PackageCsvStatus.INITIAL,
-  statusMessage: null,
+  statusMessages: [],
   rowGroups: [],
   csvData: null,
 };
@@ -135,9 +136,15 @@ export const createPackageCsvModule = {
   mutations: {
     [CreatePackageCsvMutations.CREATE_PACKAGE_CSV_MUTATION](
       state: ICreatePackageCsvState,
-      data: any
+      data: Partial<ICreatePackageCsvState>
     ) {
-      // state.data = data;
+      (Object.keys(data) as Array<keyof ICreatePackageCsvState>).forEach((key) => {
+        const value = data[key];
+        if (typeof value !== "undefined") {
+          // @ts-ignore
+          state[key] = value;
+        }
+      });
     },
   },
   getters: {
@@ -177,10 +184,16 @@ export const createPackageCsvModule = {
         file: File;
       }
     ) => {
-      ctx.state.status = PackageCsvStatus.INITIAL;
-      ctx.state.csvData = null;
-      ctx.state.rowGroups = [];
-      ctx.state.statusMessage = "";
+      ctx.commit(CreatePackageCsvMutations.CREATE_PACKAGE_CSV_MUTATION, {
+        status: PackageCsvStatus.INITIAL,
+        rowGroups: [],
+        statusMessages: [],
+      });
+
+      analyticsManager.track(MessageType.BUILDER_EVENT, {
+        builder: BuilderType.CSV_CREATE_PACKAGE,
+        action: "Reset",
+      });
     },
     [CreatePackageCsvActions.IMPORT_CSV]: async (
       ctx: ActionContext<ICreatePackageCsvState, IPluginState>,
@@ -188,11 +201,18 @@ export const createPackageCsvModule = {
         file: File;
       }
     ) => {
-      ctx.state.status = PackageCsvStatus.INFLIGHT;
+      analyticsManager.track(MessageType.BUILDER_EVENT, {
+        builder: BuilderType.CSV_CREATE_PACKAGE,
+        action: "Begin import",
+      });
+
+      ctx.commit(CreatePackageCsvMutations.CREATE_PACKAGE_CSV_MUTATION, {
+        status: PackageCsvStatus.INFLIGHT,
+      });
 
       try {
         // Auto-strip empty rows
-        ctx.state.csvData = (await readCsvFile(data.file))
+        const csvData = (await readCsvFile(data.file))
           .map((row) => {
             // Ensure each row is filled to proper length
             for (const [i, column] of CREATE_PACKAGE_CSV_COLUMNS.entries()) {
@@ -202,17 +222,29 @@ export const createPackageCsvModule = {
             return row;
           })
           .filter((x) => x.find((y) => y.length > 0));
+
+        ctx.commit(CreatePackageCsvMutations.CREATE_PACKAGE_CSV_MUTATION, {
+          csvData,
+        });
       } catch (e) {
-        ctx.state.status = PackageCsvStatus.ERROR;
-        ctx.state.statusMessage = `Failed to load CSV data: ${(e as Error).toString()}`;
+        ctx.commit(CreatePackageCsvMutations.CREATE_PACKAGE_CSV_MUTATION, {
+          status: PackageCsvStatus.ERROR,
+          statusMessages: [
+            { variant: "primary", text: `Failed to load CSV data: ${(e as Error).toString()}` },
+          ],
+        });
         throw e;
       }
 
       try {
         await ctx.dispatch(CreatePackageCsvActions.PARSE_CSV_DATA);
       } catch (e) {
-        ctx.state.status = PackageCsvStatus.ERROR;
-        ctx.state.statusMessage = `Failed to parse CSV data: ${(e as Error).toString()}`;
+        ctx.commit(CreatePackageCsvMutations.CREATE_PACKAGE_CSV_MUTATION, {
+          status: PackageCsvStatus.ERROR,
+          statusMessages: [
+            { variant: "primary", text: `Failed to parse CSV data: ${(e as Error).toString()}` },
+          ],
+        });
         throw e;
       }
     },
@@ -220,6 +252,11 @@ export const createPackageCsvModule = {
       ctx: ActionContext<ICreatePackageCsvState, IPluginState>,
       data: {}
     ) => {
+      analyticsManager.track(MessageType.BUILDER_EVENT, {
+        builder: BuilderType.CSV_CREATE_PACKAGE,
+        action: "Parse CSV data",
+      });
+
       if (!ctx.state.csvData) {
         throw new Error("Cannot parse null CSV data");
       }
@@ -231,15 +268,23 @@ export const createPackageCsvModule = {
       let items: IItemData[] | null = null;
       let locations: ILocationData[] | null = null;
 
-      ctx.state.statusMessage = "Loading data...";
+      ctx.commit(CreatePackageCsvMutations.CREATE_PACKAGE_CSV_MUTATION, {
+        statusMessages: [{ variant: "primary", text: "Loading data..." }],
+      });
 
       try {
         // 10 minute cache
         packages = await primaryDataLoader.activePackages(10 * 60 * 1000);
       } catch {
-        ctx.state.status = PackageCsvStatus.ERROR;
-        ctx.state.statusMessage =
-          "Unable to load packages. Ensure this Metrc account has package permissions.";
+        ctx.commit(CreatePackageCsvMutations.CREATE_PACKAGE_CSV_MUTATION, {
+          status: PackageCsvStatus.ERROR,
+          statusMessages: [
+            {
+              variant: "primary",
+              text: "Unable to load packages. Ensure this Metrc account has package permissions.",
+            },
+          ],
+        });
         return;
       }
 
@@ -248,9 +293,15 @@ export const createPackageCsvModule = {
       try {
         tags = await primaryDataLoader.availableTags();
       } catch {
-        ctx.state.status = PackageCsvStatus.ERROR;
-        ctx.state.statusMessage =
-          "Unable to load tags. Ensure this Metrc account has tag permissions.";
+        ctx.commit(CreatePackageCsvMutations.CREATE_PACKAGE_CSV_MUTATION, {
+          status: PackageCsvStatus.ERROR,
+          statusMessages: [
+            {
+              variant: "primary",
+              text: "Unable to load tags. Ensure this Metrc account has tag permissions.",
+            },
+          ],
+        });
         return;
       }
 
@@ -258,9 +309,15 @@ export const createPackageCsvModule = {
         try {
           locations = await primaryDataLoader.locations();
         } catch {
-          ctx.state.status = PackageCsvStatus.ERROR;
-          ctx.state.statusMessage =
-            "Unable to load locations. Ensure this Metrc account has location permissions.";
+          ctx.commit(CreatePackageCsvMutations.CREATE_PACKAGE_CSV_MUTATION, {
+            status: PackageCsvStatus.ERROR,
+            statusMessages: [
+              {
+                variant: "primary",
+                text: "Unable to load locations. Ensure this Metrc account has location permissions.",
+              },
+            ],
+          });
           return;
         }
       }
@@ -268,9 +325,15 @@ export const createPackageCsvModule = {
       try {
         items = await primaryDataLoader.items();
       } catch {
-        ctx.state.status = PackageCsvStatus.ERROR;
-        ctx.state.statusMessage =
-          "Unable to load items. Ensure this Metrc account has item permissions.";
+        ctx.commit(CreatePackageCsvMutations.CREATE_PACKAGE_CSV_MUTATION, {
+          status: PackageCsvStatus.ERROR,
+          statusMessages: [
+            {
+              variant: "primary",
+              text: "Unable to load items. Ensure this Metrc account has item permissions.",
+            },
+          ],
+        });
         return;
       }
 
@@ -283,8 +346,12 @@ export const createPackageCsvModule = {
           matrix: ctx.state.csvData!,
         });
       } catch (e) {
-        ctx.state.status = PackageCsvStatus.ERROR;
-        ctx.state.statusMessage = `Failed to parse CSV data: ${(e as Error).toString()}`;
+        ctx.commit(CreatePackageCsvMutations.CREATE_PACKAGE_CSV_MUTATION, {
+          status: PackageCsvStatus.ERROR,
+          statusMessages: [
+            { variant: "primary", text: `Failed to parse CSV data: ${(e as Error).toString()}` },
+          ],
+        });
         throw e;
       }
 
@@ -1184,15 +1251,15 @@ export const createPackageCsvModule = {
         rowGroup.mockPackage = mockPackage;
       }
 
-      ctx.state.rowGroups = rowGroups;
-
       // Parsed just means finished with no critical errors.
       /* eslint-disable-next-line no-warning-comments */
       // TODO: check that all error fields are empty before enabling
       // a submit button.
-      ctx.state.status = PackageCsvStatus.PARSED;
-
-      ctx.state.statusMessage = "Finished parsing CSV";
+      ctx.commit(CreatePackageCsvMutations.CREATE_PACKAGE_CSV_MUTATION, {
+        status: PackageCsvStatus.PARSED,
+        rowGroups,
+        statusMessages: [{ variant: "primary", text: "Finished parsing CSV" }],
+      });
     },
     [CreatePackageCsvActions.GENERATE_CSV_TEMPLATE]: async (
       ctx: ActionContext<ICreatePackageCsvState, IPluginState>,
