@@ -1,9 +1,13 @@
+import InlineToolbar from "@/components/widgets/InlineToolbar.vue";
 import { DOLLAR_NUMBER_REGEX, MessageType, METRC_TAG_REGEX, WEIGHT_NUMBER_REGEX } from "@/consts";
 import { IAtomicService } from "@/interfaces";
+import store from "@/store/page-overlay";
 import { debugLogFactory } from "@/utils/debug";
 import { activeMetrcModalOrNull, modalTitleOrError } from "@/utils/metrc-modal";
 import * as Papa from "papaparse";
+import Vue from "vue";
 import { analyticsManager } from "./analytics-manager.module";
+import { isDevelopment } from "./environment.module";
 import { toastManager } from "./toast-manager.module";
 
 const debugLog = debugLogFactory("modules/metrc-modal-analyzer.module.ts");
@@ -11,6 +15,8 @@ const debugLog = debugLogFactory("modules/metrc-modal-analyzer.module.ts");
 const NEW_TRANSFER_TITLE: string = "New Transfer";
 const NEW_LICENSED_TRANSFER_TITLE: string = "New Licensed Transfer";
 const EDIT_LICENSED_TRANSFER_TITLE: string = "Edit Licensed Transfer";
+
+const METRC_MODAL_INLINE_TOOLBAR_CONTAINER_ID: string = `metrc-modal-inline-toolbar`;
 
 class MetrcModalManager implements IAtomicService {
   // clientData: IClientConfig | null = clientBuildManager.clientConfig;
@@ -32,80 +38,119 @@ class MetrcModalManager implements IAtomicService {
       case NEW_TRANSFER_TITLE:
       case NEW_LICENSED_TRANSFER_TITLE:
       case EDIT_LICENSED_TRANSFER_TITLE:
-        const destinations: HTMLElement[] = [
-          ...modal.querySelectorAll(`[ng-repeat="destination in line.Destinations"]`),
-        ] as HTMLElement[];
+        this.maybeRenderCustomCsv(modal);
 
-        for (const destination of destinations) {
-          const csvInputContainer: HTMLElement | null =
-            destination.querySelector(`.k-upload.k-header`);
-
-          if (!csvInputContainer) {
-            throw new Error("Unable to match CSV input container");
-          }
-
-          let tttContainer = csvInputContainer.querySelector(`[ttt-container]`);
-
-          if (!tttContainer) {
-            tttContainer = document.createElement("div");
-            tttContainer.setAttribute(`ttt-container`, "true");
-            tttContainer.classList.add("ttt-modal-container");
-            csvInputContainer.appendChild(tttContainer);
-          }
-
-          const csvInput: HTMLInputElement | null =
-            csvInputContainer.querySelector(`input[data-role="upload"]`);
-
-          if (!csvInput) {
-            throw new Error("Unable to match CSV input");
-          }
-
-          let intermediateCsvInput: HTMLInputElement | null = csvInputContainer.querySelector(
-            `input[ttt-intermediate-csv]`
-          );
-
-          if (!intermediateCsvInput) {
-            intermediateCsvInput = document.createElement("input");
-            intermediateCsvInput.setAttribute(`ttt-intermediate-csv`, "true");
-            intermediateCsvInput.setAttribute("type", "file");
-            intermediateCsvInput.setAttribute("accept", ".txt,.csv,text/plain,text/csv");
-            intermediateCsvInput.setAttribute("multiple", "multiple");
-            intermediateCsvInput.style.display = "none";
-            intermediateCsvInput.addEventListener("change", () => this.propagateCsv(destination));
-
-            const label = document.createElement("label");
-            label.innerText = "SELECT CSVs";
-            label.classList.add("btn", "btn-default", "ttt-modal-btn");
-
-            label.appendChild(intermediateCsvInput);
-
-            tttContainer.appendChild(label);
-          }
-
-          let applyBtn: HTMLButtonElement | null =
-            csvInputContainer.querySelector(`button[ttt-apply-csv]`);
-
-          if (!applyBtn) {
-            applyBtn = document.createElement("button");
-            applyBtn.setAttribute(`ttt-apply-csv`, "true");
-            applyBtn.setAttribute("type", "button");
-            applyBtn.classList.add("btn", "btn-default", "ttt-modal-btn");
-            applyBtn.innerText = "FILL CSV DATA";
-            applyBtn.addEventListener("click", (e) => this.applyTransferCsvData(destination));
-
-            tttContainer.appendChild(applyBtn);
-          }
-
-          applyBtn.style.display = "none";
-
-          if (csvInput.files?.length) {
-            applyBtn.style.removeProperty("display");
-          }
-        }
+        this.renderTransferTools(modal);
 
         break;
       default:
         break;
+    }
+  }
+
+  async renderTransferTools(modal: HTMLElement) {
+    if (!store.state.client.flags.enable_transfer_tools && !isDevelopment()) {
+      return;
+    }
+
+    let container = modal.querySelector(`#${METRC_MODAL_INLINE_TOOLBAR_CONTAINER_ID}`);
+
+    if (container) {
+      return;
+    }
+
+    container = document.createElement("div");
+    container.setAttribute("id", METRC_MODAL_INLINE_TOOLBAR_CONTAINER_ID);
+    const target = document.createElement("div");
+    container.appendChild(target);
+
+    const titlebar = modal.querySelector(".k-window-titlebar");
+
+    if (!titlebar) {
+      return;
+    }
+
+    titlebar.insertAdjacentElement("afterend", container);
+
+    new Vue({
+      store,
+      render: (h) => h(InlineToolbar),
+    }).$mount(`#${METRC_MODAL_INLINE_TOOLBAR_CONTAINER_ID} div`);
+  }
+
+  async maybeRenderCustomCsv(modal: HTMLElement) {
+    if (!store.state.client.values.ENABLE_TRANSFER_CSV) {
+      return;
+    }
+
+    const destinations: HTMLElement[] = [
+      ...modal.querySelectorAll(`[ng-repeat="destination in line.Destinations"]`),
+    ] as HTMLElement[];
+
+    for (const destination of destinations) {
+      const csvInputContainer: HTMLElement | null = destination.querySelector(`.k-upload.k-header`);
+
+      if (!csvInputContainer) {
+        throw new Error("Unable to match CSV input container");
+      }
+
+      let tttContainer = csvInputContainer.querySelector(`[ttt-container]`);
+
+      if (!tttContainer) {
+        tttContainer = document.createElement("div");
+        tttContainer.setAttribute(`ttt-container`, "true");
+        tttContainer.classList.add("ttt-modal-container");
+        csvInputContainer.appendChild(tttContainer);
+      }
+
+      const csvInput: HTMLInputElement | null =
+        csvInputContainer.querySelector(`input[data-role="upload"]`);
+
+      if (!csvInput) {
+        throw new Error("Unable to match CSV input");
+      }
+
+      let intermediateCsvInput: HTMLInputElement | null = csvInputContainer.querySelector(
+        `input[ttt-intermediate-csv]`
+      );
+
+      if (!intermediateCsvInput) {
+        intermediateCsvInput = document.createElement("input");
+        intermediateCsvInput.setAttribute(`ttt-intermediate-csv`, "true");
+        intermediateCsvInput.setAttribute("type", "file");
+        intermediateCsvInput.setAttribute("accept", ".txt,.csv,text/plain,text/csv");
+        intermediateCsvInput.setAttribute("multiple", "multiple");
+        intermediateCsvInput.style.display = "none";
+        intermediateCsvInput.addEventListener("change", () => this.propagateCsv(destination));
+
+        const label = document.createElement("label");
+        label.innerText = "SELECT CSVs";
+        label.classList.add("btn", "btn-default", "ttt-modal-btn");
+
+        label.appendChild(intermediateCsvInput);
+
+        tttContainer.appendChild(label);
+      }
+
+      let applyBtn: HTMLButtonElement | null =
+        csvInputContainer.querySelector(`button[ttt-apply-csv]`);
+
+      if (!applyBtn) {
+        applyBtn = document.createElement("button");
+        applyBtn.setAttribute(`ttt-apply-csv`, "true");
+        applyBtn.setAttribute("type", "button");
+        applyBtn.classList.add("btn", "btn-default", "ttt-modal-btn");
+        applyBtn.innerText = "FILL CSV DATA";
+        applyBtn.addEventListener("click", (e) => this.applyTransferCsvData(destination));
+
+        tttContainer.appendChild(applyBtn);
+      }
+
+      applyBtn.style.display = "none";
+
+      if (csvInput.files?.length) {
+        applyBtn.style.removeProperty("display");
+      }
     }
   }
 
