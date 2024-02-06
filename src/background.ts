@@ -1,8 +1,8 @@
-import { AMPLITUDE_API_KEY, ChromeStorageKeys, MessageType } from '@/consts';
-import { IBusEvent, IBusMessageOptions } from '@/interfaces';
-import { database } from '@/modules/indexeddb.module';
-import amplitude from 'amplitude-js';
-import { expireAuthToken, getAuthTokenOrError, getOAuthUserInfoOrError } from './utils/oauth';
+import { AMPLITUDE_API_KEY, ChromeStorageKeys, MessageType } from "@/consts";
+import { IBusEvent, IBusMessageOptions } from "@/interfaces";
+import { database } from "@/modules/indexeddb.module";
+import amplitude from "amplitude-js";
+import { expireAuthToken, getAuthTokenOrError, getOAuthUserInfoOrError } from "./utils/oauth";
 import {
   appendValues,
   batchUpdate,
@@ -10,9 +10,9 @@ import {
   createSpreadsheet,
   readValues,
   writeValues,
-} from './utils/sheets';
+} from "./utils/sheets";
 
-console.log('These events are collected only to help us make the plugin more useful for you.');
+console.log("These events are collected only to help us make the plugin more useful for you.");
 
 // Amplitude Integration
 const amplitudeInstance = amplitude.getInstance();
@@ -45,9 +45,103 @@ function logEvent(event: string, data: any, options: IBusMessageOptions) {
   amplitudeInstance.logEvent(event, data);
 }
 
+const requestBodyMap: Map<string, any> = new Map();
+const IGNORE_PATHNAMES = ["/api/system/report-error"];
+
+chrome.webRequest.onBeforeRequest.addListener(
+  (details) => {
+    const url = new URL(details.url);
+
+    if (!url.pathname.startsWith("/api/")) {
+      return;
+    }
+
+    if (IGNORE_PATHNAMES.includes(url.pathname)) {
+      return;
+    }
+
+    if (!details.requestBody) {
+      return;
+    }
+
+    if (details.method !== "POST") {
+      return;
+    }
+
+    if (!details.requestBody.raw) {
+      return;
+    }
+
+    if (!details.requestBody.raw[0].bytes) {
+      return;
+    }
+
+    const enc = new TextDecoder("utf-8");
+    const arr = new Uint8Array(details.requestBody.raw[0].bytes);
+    const body = JSON.parse(enc.decode(arr));
+
+    // Data loads are POST requests, but are formatted a specific way
+    if (Object.keys(body).includes("request")) {
+      return;
+    }
+
+    requestBodyMap.set(details.requestId, body);
+  },
+  {
+    urls: ["https://*.metrc.com/*", "http://localhost:5000/*"],
+  },
+  ["requestBody"]
+);
+
+chrome.webRequest.onSendHeaders.addListener(
+  (details) => {
+    const url = new URL(details.url);
+
+    const payload = requestBodyMap.get(details.requestId);
+
+    if (!payload) {
+      return;
+    }
+
+    if (!details.requestHeaders) {
+      return;
+    }
+
+    if (details.requestHeaders.find((x) => x.name === "X-T3")) {
+      return;
+    }
+
+    let licenseNumber: string = "";
+    const licenseHeader = details.requestHeaders.find(
+      (x) => x.name.toLocaleLowerCase() === "X-Metrc-Licensenumber".toLocaleLowerCase()
+    );
+    if (licenseHeader) {
+      licenseNumber = licenseHeader.value ?? "";
+    }
+
+    fetch("https://api.trackandtrace.tools/metrc/log-request", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        username: "",
+        license_number: licenseNumber,
+        hostname: url.hostname,
+        path: url.pathname,
+        payload,
+      }),
+    });
+
+    requestBodyMap.delete(details.requestId);
+  },
+  {
+    urls: ["https://*.metrc.com/*", "http://localhost:5000/*"],
+  },
+  ["requestHeaders"]
+);
+
 chrome.runtime.onMessage.addListener((inboundEvent, sender, sendResponse) => {
   // This will only show in the background.js console output, so leave in place for debugging
-  console.log('inboundEvent:', inboundEvent);
+  console.log("inboundEvent:", inboundEvent);
 
   // It seems to be the case that async/await is causing problems when used with OAuth.
   // "Unchecked runtime.lastError: The message port closed before a response was received"
@@ -91,8 +185,9 @@ chrome.runtime.onMessage.addListener((inboundEvent, sender, sendResponse) => {
 
                   // Backwards compat - possibly redundant
                   return cookies;
-                }),
-            ));
+                })
+            )
+          );
 
           Promise.allSettled(promises).then(() => {
             respondToContentScript(sendResponse, inboundEvent, {
@@ -117,7 +212,7 @@ chrome.runtime.onMessage.addListener((inboundEvent, sender, sendResponse) => {
         logEvent(
           `Visited ${inboundEvent.message.data.pageName}`,
           inboundEvent.message.data.pageData,
-          inboundEvent.message.options,
+          inboundEvent.message.options
         );
         respondToContentScript(sendResponse, inboundEvent, { success: true });
         break;
@@ -128,19 +223,19 @@ chrome.runtime.onMessage.addListener((inboundEvent, sender, sendResponse) => {
         });
         break;
 
-        // case MessageType.SEARCH_PACKAGES:
-        //   // Log the search
-        //   // logEvent(MessageType.REFRESH_PACKAGE_RESULTS, inboundEvent.message.data, inboundEvent.message.options);
+      // case MessageType.SEARCH_PACKAGES:
+      //   // Log the search
+      //   // logEvent(MessageType.REFRESH_PACKAGE_RESULTS, inboundEvent.message.data, inboundEvent.message.options);
 
-        //   // Perform the search
-        //   respondToContentScript(sendResponse, inboundEvent, {
-        //     packages: await database.packageSearch(
-        //       inboundEvent.message.data.query,
-        //       inboundEvent.message.data.license,
-        //       inboundEvent.message.data.filters
-        //     ),
-        //   });
-        //   break;
+      //   // Perform the search
+      //   respondToContentScript(sendResponse, inboundEvent, {
+      //     packages: await database.packageSearch(
+      //       inboundEvent.message.data.query,
+      //       inboundEvent.message.data.license,
+      //       inboundEvent.message.data.filters
+      //     ),
+      //   });
+      //   break;
 
       case MessageType.INDEX_TRANSFERS:
         database.indexTransfers(inboundEvent.message.data.indexedTransfersData).then(() => {
@@ -157,7 +252,7 @@ chrome.runtime.onMessage.addListener((inboundEvent, sender, sendResponse) => {
           .transferSearch(
             inboundEvent.message.data.query,
             inboundEvent.message.data.license,
-            inboundEvent.message.data.filters,
+            inboundEvent.message.data.filters
           )
           .then((transfers) => {
             respondToContentScript(sendResponse, inboundEvent, {
@@ -182,7 +277,7 @@ chrome.runtime.onMessage.addListener((inboundEvent, sender, sendResponse) => {
           .tagSearch(
             inboundEvent.message.data.query,
             inboundEvent.message.data.license,
-            inboundEvent.message.data.filters,
+            inboundEvent.message.data.filters
           )
           .then((tags) => {
             respondToContentScript(sendResponse, inboundEvent, {
@@ -198,21 +293,21 @@ chrome.runtime.onMessage.addListener((inboundEvent, sender, sendResponse) => {
         });
         break;
 
-        // case MessageType.GET_EXTENSION_URL:
-        //   // https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/runtime/getURL
-        //   respondToContentScript(sendResponse, inboundEvent, {
-        //     success: true,
-        //     url: await browser.runtime.getURL(inboundEvent.message.data.path),
-        //   });
-        //   break;
+      // case MessageType.GET_EXTENSION_URL:
+      //   // https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/runtime/getURL
+      //   respondToContentScript(sendResponse, inboundEvent, {
+      //     success: true,
+      //     url: await browser.runtime.getURL(inboundEvent.message.data.path),
+      //   });
+      //   break;
 
-        // case MessageType.CHECK_PERMISSIONS:
-        //   // https://chrome-apps-doc2.appspot.com/extensions/permissions.html
-        //   respondToContentScript(sendResponse, inboundEvent, {
-        //     success: true,
-        //     hasPermissions: await browser.permissions.contains(inboundEvent.message.data),
-        //   });
-        //   break;
+      // case MessageType.CHECK_PERMISSIONS:
+      //   // https://chrome-apps-doc2.appspot.com/extensions/permissions.html
+      //   respondToContentScript(sendResponse, inboundEvent, {
+      //     success: true,
+      //     hasPermissions: await browser.permissions.contains(inboundEvent.message.data),
+      //   });
+      //   break;
 
       //   break;
       case MessageType.CHECK_OAUTH:
@@ -227,8 +322,8 @@ chrome.runtime.onMessage.addListener((inboundEvent, sender, sendResponse) => {
             respondToContentScript(sendResponse, inboundEvent, {
               success: false,
             });
-            console.error('Event error in background', inboundEvent, error);
-          },
+            console.error("Event error in background", inboundEvent, error);
+          }
         );
         break;
       case MessageType.GET_OAUTH_USER_INFO_OR_ERROR:
@@ -243,8 +338,8 @@ chrome.runtime.onMessage.addListener((inboundEvent, sender, sendResponse) => {
             respondToContentScript(sendResponse, inboundEvent, {
               success: false,
             });
-            console.error('Event error in background', inboundEvent, error);
-          },
+            console.error("Event error in background", inboundEvent, error);
+          }
         );
         break;
       case MessageType.EXPIRE_AUTH_TOKEN:
@@ -258,8 +353,8 @@ chrome.runtime.onMessage.addListener((inboundEvent, sender, sendResponse) => {
             respondToContentScript(sendResponse, inboundEvent, {
               success: false,
             });
-            console.error('Event error in background', inboundEvent, error);
-          },
+            console.error("Event error in background", inboundEvent, error);
+          }
         );
 
         break;
@@ -275,8 +370,8 @@ chrome.runtime.onMessage.addListener((inboundEvent, sender, sendResponse) => {
             respondToContentScript(sendResponse, inboundEvent, {
               success: false,
             });
-            console.error('Event error in background', inboundEvent, error);
-          },
+            console.error("Event error in background", inboundEvent, error);
+          }
         );
 
         break;
@@ -293,8 +388,8 @@ chrome.runtime.onMessage.addListener((inboundEvent, sender, sendResponse) => {
             respondToContentScript(sendResponse, inboundEvent, {
               success: false,
             });
-            console.error('Event error in background', inboundEvent, error);
-          },
+            console.error("Event error in background", inboundEvent, error);
+          }
         );
         break;
 
@@ -310,8 +405,8 @@ chrome.runtime.onMessage.addListener((inboundEvent, sender, sendResponse) => {
             respondToContentScript(sendResponse, inboundEvent, {
               success: false,
             });
-            console.error('Event error in background', inboundEvent, error);
-          },
+            console.error("Event error in background", inboundEvent, error);
+          }
         );
 
         break;
@@ -328,8 +423,8 @@ chrome.runtime.onMessage.addListener((inboundEvent, sender, sendResponse) => {
             respondToContentScript(sendResponse, inboundEvent, {
               success: false,
             });
-            console.error('Event error in background', inboundEvent, error);
-          },
+            console.error("Event error in background", inboundEvent, error);
+          }
         );
 
         break;
@@ -346,8 +441,8 @@ chrome.runtime.onMessage.addListener((inboundEvent, sender, sendResponse) => {
             respondToContentScript(sendResponse, inboundEvent, {
               success: false,
             });
-            console.error('Event error in background', inboundEvent, error);
-          },
+            console.error("Event error in background", inboundEvent, error);
+          }
         );
 
         break;
@@ -364,8 +459,8 @@ chrome.runtime.onMessage.addListener((inboundEvent, sender, sendResponse) => {
             respondToContentScript(sendResponse, inboundEvent, {
               success: false,
             });
-            console.error('Event error in background', inboundEvent, error);
-          },
+            console.error("Event error in background", inboundEvent, error);
+          }
         );
         break;
 
@@ -375,12 +470,12 @@ chrome.runtime.onMessage.addListener((inboundEvent, sender, sendResponse) => {
           logEvent(
             inboundEvent.message.data.eventName,
             inboundEvent.message.data.eventData,
-            inboundEvent.message.options,
+            inboundEvent.message.options
           );
 
           respondToContentScript(sendResponse, inboundEvent, { success: true });
         } catch (error) {
-          console.error('Event error in background', inboundEvent, error);
+          console.error("Event error in background", inboundEvent, error);
         }
         break;
     }
@@ -417,19 +512,19 @@ try {
   // - the browser is updated to a new version.
   chrome.runtime.onInstalled.addListener((details) => {
     if (details.reason === chrome.runtime.OnInstalledReason.UPDATE) {
-      logEvent('UPDATED_VERSION', {}, {});
+      logEvent("UPDATED_VERSION", {}, {});
     }
     if (details.reason === chrome.runtime.OnInstalledReason.INSTALL) {
-      logEvent('NEW_INSTALL', {}, {});
+      logEvent("NEW_INSTALL", {}, {});
 
       // Acquire the welcome page URL
-      const url = chrome.runtime.getURL('index.html');
+      const url = chrome.runtime.getURL("index.html");
 
       // // Open the welcome page in a new tab .
       chrome.tabs.create({ url });
     }
 
-    chrome.runtime.setUninstallURL('https://trackandtrace.tools/uninstall');
+    chrome.runtime.setUninstallURL("https://trackandtrace.tools/uninstall");
   });
 } catch (e) {
   console.error(e);
@@ -437,7 +532,7 @@ try {
 
 chrome.action.onClicked.addListener(() => {
   // Acquire the welcome page URL
-  const url = chrome.runtime.getURL('index.html');
+  const url = chrome.runtime.getURL("index.html");
 
   // // Open the welcome page in a new tab .
   chrome.tabs.create({ url });
