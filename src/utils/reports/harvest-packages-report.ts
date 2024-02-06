@@ -115,7 +115,7 @@ function findMostCommonAndPercentageOrNull(
     return null;
   }
 
-  let frequency: { [key: number]: number } = {};
+  const frequency: { [key: number]: number } = {};
   let maxFreq = 0;
   let mostCommon: number = 0;
 
@@ -135,12 +135,12 @@ function findMostCommonAndPercentageOrNull(
   });
 
   // Calculate the percentage
-  let percentage = (maxFreq / arr.length) * 100;
+  const percentage = (maxFreq / arr.length) * 100;
 
   return { mostCommon, percentage };
 }
 
-function isPackagingIntakePackage(pkg: IIndexedPackageData): boolean {
+function isPackagingIntakePackage(pkg: IUnionIndexedPackageData): boolean {
   if (!pkg.history) {
     throw new Error("Package must have history loaded");
   }
@@ -173,6 +173,46 @@ function isPackagingIntakePackage(pkg: IIndexedPackageData): boolean {
   }
 
   return true;
+}
+
+async function getPackageFromOutboundTransferOrNull(
+  label: string,
+  license: string,
+  startDate: string
+): Promise<[IIndexedRichOutgoingTransferData, IIndexedDestinationPackageData] | null> {
+  const abortController = new AbortController();
+
+  let richTransfer: IIndexedRichOutgoingTransferData | null = null;
+  let transferPkg: IIndexedDestinationPackageData | null = null;
+
+  await findMatchingTransferPackages({
+    queryString: label,
+    startDate,
+    licenses: [license],
+    signal: abortController.signal,
+    algorithm: TransferPackageSearchAlgorithm.OLD_TO_NEW,
+    updateFn: (transfers) => {
+      for (const transfer of transfers) {
+        for (const destination of transfer.outgoingDestinations!) {
+          for (const pkg of destination.packages!) {
+            if (getLabelOrError(pkg) === label) {
+              richTransfer = transfer;
+              transferPkg = pkg;
+
+              abortController.abort();
+              break;
+            }
+          }
+        }
+      }
+    },
+  });
+
+  if (richTransfer && transferPkg) {
+    return [richTransfer, transferPkg];
+  }
+
+  return null;
 }
 
 export const harvestPackagesFormFiltersFactory: () => IHarvestPackagesReportFormFilters = () => ({
@@ -246,6 +286,7 @@ export async function maybeLoadHarvestPackagesReportData({
 
   const promises: Promise<any>[] = [];
 
+  // Import all Metrc data that can be loaded in bulk via pagination
   for (const license of harvestConfig.licenses) {
     ctx.commit(ReportsMutations.SET_STATUS, {
       statusMessage: { text: `Loading ${license} harvests...`, level: "success" },
@@ -344,8 +385,11 @@ export async function maybeLoadHarvestPackagesReportData({
     .split(",")
     .map((x: string) => x.trim().toLocaleLowerCase());
 
+  // Filter out harvests that will not appear in the report,
+  // then sort by harvest start date
   harvests = harvests
     .filter((harvest) => {
+      // Harvest match filter allows for individual harvests to be plucked out
       if (harvestConfig.enableHarvestMatchFilter) {
         const normalizedHarvestName = harvest.Name.trim().toLowerCase();
 
@@ -358,6 +402,7 @@ export async function maybeLoadHarvestPackagesReportData({
         }
       }
 
+      // Date range match
       if (harvestConfig.harvestFilter.harvestDateLt) {
         if (harvest.HarvestStartDate > harvestConfig.harvestFilter.harvestDateLt) {
           return false;
@@ -374,49 +419,11 @@ export async function maybeLoadHarvestPackagesReportData({
     })
     .sort((a, b) => a.HarvestStartDate.localeCompare(b.HarvestStartDate));
 
+  // Object representation of columns that will eventually be formed into 2d table
   const harvestPackageRowData: IHarvestPackageRowData[] = [];
 
+  // Global body of packages organized as key-value map
   const packageMap = new Map<string, IUnionIndexedPackageData>(packages.map((x) => [x.Label, x]));
-
-  async function getPackageFromOutboundTransferOrNull(
-    label: string,
-    license: string,
-    startDate: string
-  ): Promise<[IIndexedRichOutgoingTransferData, IIndexedDestinationPackageData] | null> {
-    const abortController = new AbortController();
-
-    let richTransfer: IIndexedRichOutgoingTransferData | null = null;
-    let transferPkg: IIndexedDestinationPackageData | null = null;
-
-    await findMatchingTransferPackages({
-      queryString: label,
-      startDate,
-      licenses: [license],
-      signal: abortController.signal,
-      algorithm: TransferPackageSearchAlgorithm.OLD_TO_NEW,
-      updateFn: (transfers) => {
-        for (const transfer of transfers) {
-          for (const destination of transfer.outgoingDestinations!) {
-            for (const pkg of destination.packages!) {
-              if (getLabelOrError(pkg) === label) {
-                richTransfer = transfer;
-                transferPkg = pkg;
-
-                abortController.abort();
-                break;
-              }
-            }
-          }
-        }
-      },
-    });
-
-    if (richTransfer && transferPkg) {
-      return [richTransfer, transferPkg];
-    }
-
-    return null;
-  }
 
   const harvestHistoryPromises: Promise<any>[] = [];
 
@@ -485,14 +492,14 @@ export async function maybeLoadHarvestPackagesReportData({
           return;
         }
 
-        const childPackageLabels = extractChildPackageLabelsFromHistory(history);
+        const childPackageLabels = extractChildPackageLabelsFromHistory(history).sort();
 
         for (const childPackageLabel of childPackageLabels) {
           const childPkg = packageMap.get(childPackageLabel);
 
           // This is probably OK
           if (!childPkg) {
-            console.error(`Skipping child package ${childPackageLabel}`);
+            // console.error(`Skipping child package ${childPackageLabel}`);
             continue;
           }
 
@@ -504,12 +511,20 @@ export async function maybeLoadHarvestPackagesReportData({
 
   await Promise.allSettled(packageHistoryPromises);
 
-  const temporaryValueMap = new Map<any, any>();
+  const temporaryValueMap = new Map<string | number | null, string | number | null>();
 
   for (const harvest of harvests) {
     const harvestPackageLabels = extractHarvestChildPackageLabelsFromHistory(harvest.history!);
 
+    if (harvestPackageLabels.length > 1) {
+      console.error(
+        `Harvest "${harvest.Name}" has ${harvestPackageLabels.length} harvest packages`
+      );
+    }
+
     for (const harvestPackageLabel of harvestPackageLabels) {
+      // Top-level package is the harvest package.
+      // All flower in this harvest is contained in this initial pakage
       const harvestPackage = packageMap.get(harvestPackageLabel);
 
       if (!harvestPackage) {
@@ -521,25 +536,6 @@ export async function maybeLoadHarvestPackagesReportData({
         );
 
         continue;
-
-        // const result = await getPackageFromOutboundTransferOrNull(
-        //   harvestPackageLabel,
-        //   harvest.LicenseNumber,
-        //   harvest.HarvestStartDate
-        // );
-
-        // if (result) {
-        //   const [transfer, pkg] = result;
-
-        //   harvestPackage = pkg;
-        // } else {
-        //   harvestPackageRowData.push([
-        //     ...Array(10).fill(""),
-        //     `Could not match harvest package. harvest:${harvest.Name}, label:${harvestPackageLabel}`,
-        //   ]);
-
-        //   continue;
-        // }
       }
 
       // Assign temporary value to be replaced later
@@ -580,7 +576,9 @@ export async function maybeLoadHarvestPackagesReportData({
         continue;
       }
 
-      const childPackageLabels = extractChildPackageLabelsFromHistory(harvestPackage.history!);
+      const childPackageLabels = extractChildPackageLabelsFromHistory(
+        harvestPackage.history!
+      ).sort();
 
       const trimChildPackages: IUnionIndexedPackageData[] = [];
       const shakeChildPackages: IUnionIndexedPackageData[] = [];
@@ -666,12 +664,14 @@ export async function maybeLoadHarvestPackagesReportData({
 
         if (passthroughTestPackageLabels.length === 0 && passthroughPackageLabels.length === 1) {
           if (packageMap.has(passthroughPackageLabels[0].label)) {
+            // Can safely skip this package for its child
             childPackage = packageMap.get(passthroughPackageLabels[0].label)!;
           } else {
+            console.error("Invoked slow method getPackageFromOutboundTransferOrNull()");
+
             const result = await getPackageFromOutboundTransferOrNull(
               passthroughPackageLabels[0].label,
               childPackage.LicenseNumber,
-              // childPackage.PackagedDate!
               passthroughPackageLabels[0].history.RecordedDateTime.split("T")[0]
             );
 
@@ -692,12 +692,19 @@ export async function maybeLoadHarvestPackagesReportData({
             passthroughMsg = `Passthrough matched! Original:${getLabelOrError(
               originalPackage
             )} Passthrough:${getLabelOrError(childPackage)}`;
+
             console.log(passthroughMsg);
           }
         }
 
         // Double check that history was loaded
         if (!childPackage.history) {
+          console.warn(
+            `Child package ${getLabelOrError(
+              childPackage
+            )} history was not eagerly loaded, loading on demand`
+          );
+
           await getDataLoaderByLicense(childPackage.LicenseNumber)
             .then((dataLoader) => dataLoader.packageHistoryByPackageId(getIdOrError(childPackage!)))
             .then((history) => {
@@ -729,7 +736,18 @@ export async function maybeLoadHarvestPackagesReportData({
           continue;
         }
 
-        const grandchildPackageLabels = extractChildPackageLabelsFromHistory(childPackage.history!);
+        let grandchildPackageLabels = extractChildPackageLabelsFromHistory(
+          childPackage.history!
+        ).sort();
+
+        let detectedTwoLevelIntakeFlow: boolean = false;
+
+        // If we detect the child package is an intake package, we do not traverse down to the
+        // third level for intake packaging
+        if (isPackagingIntakePackage(childPackage)) {
+          detectedTwoLevelIntakeFlow = true;
+          grandchildPackageLabels = [getLabelOrError(childPackage)];
+        }
 
         const standardPackages: IUnionIndexedPackageData[] = [];
         const shakePackages: IUnionIndexedPackageData[] = [];
@@ -738,7 +756,6 @@ export async function maybeLoadHarvestPackagesReportData({
           const grandchildPackage = packageMap.get(grandchildPackageLabel);
 
           if (!grandchildPackage) {
-            // Seems this is not needed
             console.error(`Skipping grandchild package ${grandchildPackageLabel}`);
             continue;
           }
@@ -792,7 +809,12 @@ export async function maybeLoadHarvestPackagesReportData({
           }
 
           if (harvestConfig.addSpacing) {
-            harvestPackageRowData.push(rowDataFactory({ RowSource: "7" }));
+            harvestPackageRowData.push(
+              rowDataFactory({
+                RowSource: "7",
+                Note: detectedTwoLevelIntakeFlow ? "Detected Two-Level Intake Flow" : "",
+              })
+            );
           }
         }
       }
@@ -885,8 +907,8 @@ export async function maybeLoadHarvestPackagesReportData({
       }) => [
         License,
         HarvestID,
-        SourceTag,
-        BatchTag,
+        SourceTag ? SourceTag.padStart(5, "0") : "",
+        BatchTag ? BatchTag.padStart(5, "0") : "",
         Strain,
         Rename,
         MaterialType,
