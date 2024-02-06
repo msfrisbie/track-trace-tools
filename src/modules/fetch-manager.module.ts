@@ -54,7 +54,10 @@ export const customAxios = function (
 
   if (init) {
     axiosConfig.method = init.method?.toLowerCase();
-    axiosConfig.headers = init.headers;
+    axiosConfig.headers = {
+      ...init.headers,
+      "X-T3": "1",
+    };
     axiosConfig.data = init.body;
     axiosConfig.signal = init.signal;
     axiosConfig.timeout = init.timeout;
