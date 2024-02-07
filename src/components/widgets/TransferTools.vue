@@ -86,7 +86,9 @@
 </template>
 
 <script lang="ts">
+import { MessageType } from "@/consts";
 import { IPluginState } from "@/interfaces";
+import { analyticsManager } from "@/modules/analytics-manager.module";
 import { authManager } from "@/modules/auth-manager.module";
 import { t3RequestManager } from "@/modules/t3-request-manager.module";
 import { toastManager } from "@/modules/toast-manager.module";
@@ -192,6 +194,10 @@ export default Vue.extend({
       });
     },
     async fillGoogleMapsDirections() {
+      analyticsManager.track(MessageType.USED_TRANSFER_TOOL, {
+        toolType: "Google Maps Directions",
+      });
+
       if (!store.state.transferTools.selectedDestinationLicense) {
         toastManager.openToast(`Select a destination to autofill directions`, {
           title: "T3 Error",
@@ -255,6 +261,8 @@ export default Vue.extend({
       }
     },
     autofillWeight() {
+      analyticsManager.track(MessageType.USED_TRANSFER_TOOL, { toolType: "Autofill Weight" });
+
       const elementRefs = this.getElementRefs();
 
       const value = this.$data.autofillValue;
@@ -266,6 +274,10 @@ export default Vue.extend({
       }
     },
     async autofillUnitOfMeasure() {
+      analyticsManager.track(MessageType.USED_TRANSFER_TOOL, {
+        toolType: "Autofill Unit of Measure",
+      });
+
       const elementRefs = this.getElementRefs();
 
       const value = (await fuzzyUnitOrNull(this.$data.autofillValue))?.Id;
@@ -290,6 +302,10 @@ export default Vue.extend({
       }
     },
     autofillWholesalePrice() {
+      analyticsManager.track(MessageType.USED_TRANSFER_TOOL, {
+        toolType: "Autofill Wholesale Price",
+      });
+
       const elementRefs = this.getElementRefs();
 
       const value = this.$data.autofillValue;
@@ -300,8 +316,16 @@ export default Vue.extend({
         }
       }
     },
-    csvFill() {},
+    csvFill() {
+      analyticsManager.track(MessageType.USED_TRANSFER_TOOL, {
+        toolType: "CSV Fill",
+      });
+    },
     setSameSiteTransfer() {
+      analyticsManager.track(MessageType.USED_TRANSFER_TOOL, {
+        toolType: "Set Same-Site Transfer",
+      });
+
       const elementRefs = this.getElementRefs();
 
       let partialFill: boolean = false;
@@ -360,6 +384,10 @@ export default Vue.extend({
       }
     },
     toggleQuickTab() {
+      analyticsManager.track(MessageType.USED_TRANSFER_TOOL, {
+        toolType: "Toggle Quick Tab",
+      });
+
       (this.$data.modal as HTMLElement).classList.toggle("enable-form-quick-tab");
     },
   },
