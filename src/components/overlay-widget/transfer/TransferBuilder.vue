@@ -13,6 +13,11 @@
       <template v-if="activeStepIndex === 0">
         <div class="grid grid-cols-2 gap-8 h-full">
           <div class="flex flex-col items-stretch space-y-4 hide-scroll overflow-y-auto px-1">
+            <div class="text-red-800">
+              This transfer tool is deprecated. V2 of transfer tools is automatically added to the
+              default Metrc transfer window.
+            </div>
+
             <div v-if="clientValues['ENABLE_TRANSFER_EDIT']">
               <b-form-checkbox size="sm" v-model="editTransfer">
                 <span>Edit existing transfer</span>
