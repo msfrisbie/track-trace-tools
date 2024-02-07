@@ -1,34 +1,125 @@
 <template>
-  <div class="m-2 grid grid-cols-3 gap-2">
-    <b-button @click="fillGoogleMapsDirections()" size="sm" variant="outline-primary"
-      >AUTOFILL DIRECTIONS</b-button
-    >
-    <b-button @click="setSameSiteTransfer()" size="sm" variant="outline-primary"
-      >AUTOFILL SAME-SITE TRANSFER</b-button
-    >
-    <b-button @click="toggleQuickTab()" size="sm" variant="outline-primary"
-      >TOGGLE BUTTONS FOR QUICK TABBING</b-button
-    >
-    <b-dropdown
+  <div
+    class="m-2 grid grid-cols-4 gap-2"
+    style="grid-template-columns: repeat(auto-fit, max-content)"
+  >
+    <b-button
+      @click="fillGoogleMapsDirections()"
       size="sm"
-      text="RECENT DESTINATIONS"
-      disabled
       variant="outline-primary"
-    ></b-dropdown>
-    <b-dropdown
+      title="Autofill directions from Google Maps into the 'Planned Route' input"
+      class="flex flex-row items-center justify-center gap-2"
+    >
+      <font-awesome-icon icon="directions"></font-awesome-icon>
+      <span>AUTOFILL DIRECTIONS</span>
+    </b-button>
+    <b-button
+      @click="setSameSiteTransfer()"
       size="sm"
-      text="RECENT TRANSPORTERS"
-      disabled
       variant="outline-primary"
-    ></b-dropdown>
-    <div class="flex flex-row items-center gap-2">
-      <b-button @click="csvFill()" class="flex-grow" disabled size="sm" variant="outline-primary"
-        >CSV FILL</b-button
+      title="Autofill default values for route, driver, and vehicle"
+      class="flex flex-row items-center justify-center gap-2"
+    >
+      <font-awesome-icon icon="sync"></font-awesome-icon>
+      <span>AUTOFILL SAME-SITE TRANSFER</span>
+    </b-button>
+    <b-button
+      @click="autofillPackageWeight()"
+      size="sm"
+      variant="outline-primary"
+      title="Autofill the same weight for package and unit of measure"
+      class="flex flex-row items-center justify-center gap-2"
+    >
+      <font-awesome-icon icon="weight"></font-awesome-icon>
+      <span>AUTOFILL PACKAGE WEIGHTS</span>
+    </b-button>
+    <b-button
+      @click="toggleQuickTab()"
+      size="sm"
+      variant="outline-primary"
+      title="Hide extra buttons to allow for faster tabbing through the form"
+      class="flex flex-row items-center justify-center gap-2"
+    >
+      <font-awesome-icon icon="toggle-on"></font-awesome-icon>
+      <span>TOGGLE BUTTONS FOR QUICK TABBING</span>
+    </b-button>
+
+    <div class="relative flex flex-col items-stretch">
+      <div
+        v-if="!hasT3plus"
+        class="absolute left-0 top-0 h-full flex flex-col items-center justify-center px-2"
       >
-      <div id="csv-popover-target">
+        <b-badge variant="primary">T3+</b-badge>
+      </div>
+
+      <b-dropdown :disabled="!hasT3plus" no-caret size="sm" variant="outline-primary">
+        <template #button-content>
+          <div class="flex flex-row items-center justify-center gap-2">
+            <font-awesome-icon icon="clock"></font-awesome-icon>
+            <span>RECENT DESTINATIONS</span>
+            <font-awesome-icon icon="caret-down"></font-awesome-icon>
+          </div>
+        </template>
+        <b-dropdown-item
+          v-for="destination of transferToolsState.recentDestinationFacilities"
+          @click="fillDestination(destination)"
+          v-bind:key="destination.Id"
+          >{{ destination.FacilityName }} | {{ destination.LicenseNumber }}</b-dropdown-item
+        >
+      </b-dropdown>
+    </div>
+    <div class="relative flex flex-col items-stretch">
+      <div
+        v-if="!hasT3plus"
+        class="absolute left-0 top-0 h-full flex flex-col items-center justify-center px-2"
+      >
+        <b-badge variant="primary">T3+</b-badge>
+      </div>
+
+      <b-dropdown :disabled="!hasT3plus" no-caret size="sm" variant="outline-primary">
+        <template #button-content>
+          <div class="flex flex-row items-center justify-center gap-2">
+            <font-awesome-icon icon="clock"></font-awesome-icon>
+            <span>RECENT TRANSPORTERS</span>
+            <font-awesome-icon icon="caret-down"></font-awesome-icon>
+          </div>
+        </template>
+        <b-dropdown-item
+          v-for="transporter of transferToolsState.recentTransporterFacilities"
+          @click="fillTransporter(transporter)"
+          v-bind:key="transporter.Id"
+          >{{ transporter.FacilityName }} | {{ transporter.LicenseNumber }}</b-dropdown-item
+        >
+      </b-dropdown>
+    </div>
+    <div class="relative flex flex-col items-stretch">
+      <div
+        v-if="!hasT3plus"
+        class="absolute left-0 top-0 h-full flex flex-col items-center justify-center px-2"
+      >
+        <b-badge variant="primary">T3+</b-badge>
+      </div>
+
+      <b-button
+        :disabled="!hasT3plus || true"
+        @click="csvFill()"
+        size="sm"
+        variant="outline-primary"
+        class="flex flex-row items-center justify-center gap-2"
+      >
+        <font-awesome-icon icon="file-csv"></font-awesome-icon>
+        <span>CSV FILL</span>
+      </b-button>
+      <div
+        id="csv-popover-target"
+        class="absolute right-0 top-0 h-full flex flex-col items-center justify-center px-2"
+      >
         <div id="csv-popover-container"></div>
 
-        <font-awesome-icon icon="question-circle" class="cursor-pointer"></font-awesome-icon>
+        <font-awesome-icon
+          icon="question-circle"
+          class="cursor-pointer ttt-purple"
+        ></font-awesome-icon>
 
         <b-popover
           target="csv-popover-target"
@@ -74,32 +165,40 @@
         v-model="autofillValue"
         size="sm"
       ></b-form-input>
-      <b-dropdown size="sm" text="PACKAGE AUTOFILL" variant="outline-primary">
-        <b-dropdown-item @click="autofillWeight()">Weight</b-dropdown-item>
+      <b-dropdown no-caret size="sm" variant="outline-primary">
+        <template #button-content>
+          <div class="flex flex-row items-center justify-center gap-2">
+            <font-awesome-icon icon="arrows-alt"></font-awesome-icon>
+            <span>PACkAGE AUTOFILL</span>
+            <font-awesome-icon icon="caret-down"></font-awesome-icon>
+          </div>
+        </template>
+        <b-dropdown-item @click="autofillCustomWeight()">Weight</b-dropdown-item>
         <b-dropdown-item @click="autofillUnitOfMeasure()">Unit Of Measure</b-dropdown-item>
         <b-dropdown-item @click="autofillWholesalePrice()">Wholesale Price</b-dropdown-item>
       </b-dropdown>
     </b-input-group>
-    <!-- CSV -->
-    <!-- Fill all package values...  -->
+    <!-- search for packages to fill -->
   </div>
 </template>
 
 <script lang="ts">
 import { MessageType } from "@/consts";
-import { IPluginState } from "@/interfaces";
+import { IMetrcFacilityData, IPluginState } from "@/interfaces";
 import { analyticsManager } from "@/modules/analytics-manager.module";
 import { authManager } from "@/modules/auth-manager.module";
 import { t3RequestManager } from "@/modules/t3-request-manager.module";
 import { toastManager } from "@/modules/toast-manager.module";
 import router from "@/router/index";
 import store from "@/store/page-overlay/index";
+import { ClientGetters } from "@/store/page-overlay/modules/client/consts";
 import { ExampleActions, ExampleGetters } from "@/store/page-overlay/modules/example/consts";
 import {
   TransferToolsActions,
   TransferToolsMutations,
 } from "@/store/page-overlay/modules/transfer-tools/consts";
 import { activeMetrcModalOrNull, metrcAddressToString } from "@/utils/metrc-modal";
+import { fillTransferWeights } from "@/utils/quick-scripts";
 import { fuzzyUnitOrNull } from "@/utils/units";
 import _ from "lodash-es";
 import Vue from "vue";
@@ -113,10 +212,11 @@ export default Vue.extend({
   components: {},
   computed: {
     ...mapState<IPluginState>({
-      authState: (state: IPluginState) => state.pluginAuth.authState,
+      transferToolsState: (state: IPluginState) => state.transferTools,
     }),
     ...mapGetters({
       exampleGetter: `example/${ExampleGetters.EXAMPLE_GETTER}`,
+      hasT3plus: `client/${ClientGetters.T3PLUS}`,
     }),
   },
   data() {
@@ -132,6 +232,9 @@ export default Vue.extend({
     }),
     getElementRefs(): {
       destinationInput: HTMLInputElement | null;
+      destinationHiddenInput: HTMLInputElement | null;
+      transporterInput: HTMLInputElement | null;
+      transporterHiddenInput: HTMLInputElement | null;
       routeInput: HTMLTextAreaElement | null;
       driverNameInput: HTMLInputElement | null;
       employeeIdInput: HTMLInputElement | null;
@@ -150,6 +253,13 @@ export default Vue.extend({
     } {
       return {
         destinationInput: this.$data.modal.querySelector(`[ng-model="destination.RecipientId"]`),
+        destinationHiddenInput: this.$data.modal.querySelector(
+          `[name="model[0][Destinations][0][RecipientId]"]`
+        ),
+        transporterInput: this.$data.modal.querySelector(`[ng-model="transporter.TransporterId"]`),
+        transporterHiddenInput: this.$data.modal.querySelector(
+          `[name="model[0][Destinations][0][Transporters][0][TransporterId]"]`
+        ),
         routeInput: this.$data.modal.querySelector(`[ng-model="destination.PlannedRoute"]`),
         driverNameInput: this.$data.modal.querySelector(
           `[ng-model="transporterDetail.DriverName"]`
@@ -260,7 +370,45 @@ export default Vue.extend({
         elementRefs.routeInput.value = data.directions;
       }
     },
-    autofillWeight() {
+    fillDestination(destinationFacility: IMetrcFacilityData) {
+      analyticsManager.track(MessageType.USED_TRANSFER_TOOL, { toolType: "Fill destination" });
+
+      const elementRefs = this.getElementRefs();
+
+      if (elementRefs.destinationInput && elementRefs.destinationHiddenInput) {
+        elementRefs.destinationInput.value = destinationFacility.LicenseNumber;
+        elementRefs.destinationHiddenInput.value = destinationFacility.Id.toString();
+      } else {
+        toastManager.openToast(`Failed to fill destination`, {
+          title: "T3 Error",
+          autoHideDelay: 5000,
+          variant: "danger",
+          appendToast: true,
+          toaster: "ttt-toaster",
+          solid: true,
+        });
+      }
+    },
+    fillTransporter(transporterFacility: IMetrcFacilityData) {
+      analyticsManager.track(MessageType.USED_TRANSFER_TOOL, { toolType: "Fill transporter" });
+
+      const elementRefs = this.getElementRefs();
+
+      if (elementRefs.transporterInput && elementRefs.transporterHiddenInput) {
+        elementRefs.transporterInput.value = transporterFacility.LicenseNumber;
+        elementRefs.transporterHiddenInput.value = transporterFacility.Id.toString();
+      } else {
+        toastManager.openToast(`Failed to fill transporter`, {
+          title: "T3 Error",
+          autoHideDelay: 5000,
+          variant: "danger",
+          appendToast: true,
+          toaster: "ttt-toaster",
+          solid: true,
+        });
+      }
+    },
+    autofillCustomWeight() {
       analyticsManager.track(MessageType.USED_TRANSFER_TOOL, { toolType: "Autofill Weight" });
 
       const elementRefs = this.getElementRefs();
@@ -272,6 +420,15 @@ export default Vue.extend({
           packageRow.grossWeightInput.value = value;
         }
       }
+    },
+    autofillPackageWeight() {
+      analyticsManager.track(MessageType.USED_TRANSFER_TOOL, {
+        toolType: "Autofill Package Weight",
+      });
+
+      const elementRefs = this.getElementRefs();
+
+      fillTransferWeights();
     },
     async autofillUnitOfMeasure() {
       analyticsManager.track(MessageType.USED_TRANSFER_TOOL, {

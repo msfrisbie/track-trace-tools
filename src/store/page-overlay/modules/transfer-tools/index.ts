@@ -1,5 +1,9 @@
-import { IPluginState } from "@/interfaces";
+import { IMetrcFacilityData, IPluginState } from "@/interfaces";
 import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
+import {
+  extractRecentDestinationFacilitiesFromTransfers,
+  extractRecentTransporterFacilitiesFromTransfers,
+} from "@/utils/transfer";
 import { ActionContext } from "vuex";
 import { TransferToolsActions, TransferToolsGetters, TransferToolsMutations } from "./consts";
 import { ITransferToolsState } from "./interfaces";
@@ -7,6 +11,8 @@ import { ITransferToolsState } from "./interfaces";
 const inMemoryState = {
   destinationFacilities: [],
   transporterFacilities: [],
+  recentTransporterFacilities: [],
+  recentDestinationFacilities: [],
   selectedDestinationLicense: null,
 };
 
@@ -59,6 +65,26 @@ export const transferToolsModule = {
           transporterFacilities,
         } as Partial<ITransferToolsState>);
       });
+
+      extractRecentDestinationFacilitiesFromTransfers().then(
+        (recentDestinationFacilities: IMetrcFacilityData[]) => {
+          ctx.commit(TransferToolsMutations.TRANSFER_TOOLS_MUTATION, {
+            recentDestinationFacilities: recentDestinationFacilities.sort((a, b) =>
+              a.FacilityName.localeCompare(b.FacilityName)
+            ),
+          } as Partial<ITransferToolsState>);
+        }
+      );
+
+      extractRecentTransporterFacilitiesFromTransfers().then(
+        (recentTransporterFacilities: IMetrcFacilityData[]) => {
+          ctx.commit(TransferToolsMutations.TRANSFER_TOOLS_MUTATION, {
+            recentTransporterFacilities: recentTransporterFacilities.sort((a, b) =>
+              a.FacilityName.localeCompare(b.FacilityName)
+            ),
+          } as Partial<ITransferToolsState>);
+        }
+      );
     },
   },
 };

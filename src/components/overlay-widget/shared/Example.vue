@@ -6,6 +6,7 @@
 import { IPluginState } from "@/interfaces";
 import router from "@/router/index";
 import store from "@/store/page-overlay/index";
+import { ClientGetters } from "@/store/page-overlay/modules/client/consts";
 import { ExampleActions, ExampleGetters } from "@/store/page-overlay/modules/example/consts";
 import Vue from "vue";
 import { mapActions, mapGetters, mapState } from "vuex";
@@ -22,6 +23,7 @@ export default Vue.extend({
     }),
     ...mapGetters({
       exampleGetter: `example/${ExampleGetters.EXAMPLE_GETTER}`,
+      hasT3plus: `client/${ClientGetters.T3PLUS}`,
     }),
   },
   data() {
