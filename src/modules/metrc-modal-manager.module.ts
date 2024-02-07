@@ -75,7 +75,7 @@ class MetrcModalManager implements IAtomicService {
     new Vue({
       store,
       render: (h) => h(InlineToolbar),
-    }).$mount(`#${METRC_MODAL_INLINE_TOOLBAR_CONTAINER_ID} div`);
+    }).$mount(target);
   }
 
   async maybeRenderCustomCsv(modal: HTMLElement) {
