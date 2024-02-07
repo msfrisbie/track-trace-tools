@@ -7,7 +7,6 @@ import { activeMetrcModalOrNull, modalTitleOrError } from "@/utils/metrc-modal";
 import * as Papa from "papaparse";
 import Vue from "vue";
 import { analyticsManager } from "./analytics-manager.module";
-import { isDevelopment } from "./environment.module";
 import { toastManager } from "./toast-manager.module";
 
 const debugLog = debugLogFactory("modules/metrc-modal-analyzer.module.ts");
@@ -49,10 +48,6 @@ class MetrcModalManager implements IAtomicService {
   }
 
   async renderTransferTools(modal: HTMLElement) {
-    if (!store.state.client.flags.enable_transfer_tools && !isDevelopment()) {
-      return;
-    }
-
     let container = modal.querySelector(`#${METRC_MODAL_INLINE_TOOLBAR_CONTAINER_ID}`);
 
     if (container) {
