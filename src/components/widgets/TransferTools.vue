@@ -169,7 +169,7 @@
         <template #button-content>
           <div class="flex flex-row items-center justify-center gap-2">
             <font-awesome-icon icon="arrows-alt"></font-awesome-icon>
-            <span>PACkAGE AUTOFILL</span>
+            <span>PACKAGE AUTOFILL</span>
             <font-awesome-icon icon="caret-down"></font-awesome-icon>
           </div>
         </template>
