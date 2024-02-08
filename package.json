@@ -1,6 +1,6 @@
 {
   "name": "track-trace-tools",
-  "version": "1.11.0",
+  "version": "1.19.1",
   "private": true,
   "scripts": {
     "serve": "NODE_OPTIONS=--openssl-legacy-provider; vue-cli-service build --mode development --watch",
@@ -9,7 +9,7 @@
     "test:unit": "vue-cli-service test:unit",
     "lint": "vue-cli-service lint",
     "clientupdate": "node bin/encrypt-client-data.js",
-    "cleanup": "git branch --merged | egrep -v \"(^\\*|master|main|dev)\" | xargs git branch -d",
+    "cleanup": "git branch --merged | egrep -v \"(^\\*|master|main|develop)\" | xargs git branch -d",
     "preinstall": "yarn config set ignore-engines true",
     "buildrelease": "zip -r \"./releases/track-trace-tools_$(node -pe \"require('./package.json').version\").zip\" dist/"
   },

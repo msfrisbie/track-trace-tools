@@ -62,13 +62,37 @@
             <template v-if="createPackageCsvState.status === PackageCsvStatus.INFLIGHT">
               <div class="flex flex-row gap-2 items-center text-base text-gray-500">
                 <b-spinner small></b-spinner>
-                <div>{{ createPackageCsvState.statusMessage }}</div>
+                <div
+                  v-for="[idx, statusMessage] of createPackageCsvState.statusMessages.entries()"
+                  v-bind:key="idx"
+                >
+                  <span v-if="statusMessage.variant === 'primary'" class="text-purple-500">{{
+                    statusMessage.text
+                  }}</span>
+                  <span v-if="statusMessage.variant === 'danger'" class="text-red-500">{{
+                    statusMessage.text
+                  }}</span>
+                  <span v-if="statusMessage.variant === 'warning'" class="text-yellow-500">{{
+                    statusMessage.text
+                  }}</span>
+                </div>
               </div>
             </template>
 
             <template v-if="createPackageCsvState.status === PackageCsvStatus.ERROR">
-              <div class="flex flex-row gap-2 items-center text-lg text-red-500">
-                {{ createPackageCsvState.statusMessage }}
+              <div
+                v-for="[idx, statusMessage] of createPackageCsvState.statusMessages.entries()"
+                v-bind:key="idx"
+              >
+                <span v-if="statusMessage.variant === 'primary'" class="text-purple-500">{{
+                  statusMessage.text
+                }}</span>
+                <span v-if="statusMessage.variant === 'danger'" class="text-red-500">{{
+                  statusMessage.text
+                }}</span>
+                <span v-if="statusMessage.variant === 'warning'" class="text-yellow-500">{{
+                  statusMessage.text
+                }}</span>
               </div>
             </template>
 
@@ -380,6 +404,11 @@ export default Vue.extend({
       this.$router.push(path);
     },
     submit() {
+      analyticsManager.track(MessageType.BUILDER_EVENT, {
+        builder: BuilderType.CSV_CREATE_PACKAGE,
+        action: "Generating rows",
+      });
+
       const rows: IMetrcCreatePackagesFromPackagesPayload[] =
         store.state.createPackageCsv.rowGroups.map((rowGroup) => {
           const parsedData = rowGroup.parsedData!;
@@ -415,6 +444,11 @@ export default Vue.extend({
           return row;
         });
 
+      analyticsManager.track(MessageType.BUILDER_EVENT, {
+        builder: BuilderType.CSV_CREATE_PACKAGE,
+        action: `Generated ${rows.length} rows, submitting...`,
+      });
+
       builderManager.submitProject(
         // This is probably redundant
         _.cloneDeep(rows),
@@ -423,8 +457,13 @@ export default Vue.extend({
           packageTotal: store.state.createPackageCsv.rowGroups.length,
         },
         [],
-        1 // This is to address Metrc package allocation bug https://track-trace-tools.talkyard.net/-65/unpack-immature-packages
+        10
       );
+
+      analyticsManager.track(MessageType.BUILDER_EVENT, {
+        builder: BuilderType.CSV_CREATE_PACKAGE,
+        action: `Submitted project for submit`,
+      });
     },
   },
   async created() {},

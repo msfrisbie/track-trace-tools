@@ -48,7 +48,10 @@ export interface ICreatePackageCsvRowGroup {
 
 export interface ICreatePackageCsvState {
   status: PackageCsvStatus;
-  statusMessage: string | null;
+  statusMessages: {
+    text: string;
+    variant: string;
+  }[];
   rowGroups: ICreatePackageCsvRowGroup[];
   csvData: string[][] | null;
 }

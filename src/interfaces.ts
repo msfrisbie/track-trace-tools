@@ -40,6 +40,7 @@ import { ITransferSearchState } from "./store/page-overlay/modules/transfer-sear
 import { CsvUpload, CsvUploadStatus } from "./types";
 import { UnitOfMeasureAbbreviation, UnitOfMeasureName } from "./utils/units";
 import { ILabCsvState } from "./store/page-overlay/modules/lab-csv/interfaces";
+import { ITransferToolsState } from "./store/page-overlay/modules/transfer-tools/interfaces";
 
 export type PlantBatchTypeName = "Clone" | "Seed";
 export type PlantGrowthPhase = "Vegetative" | "Flowering";
@@ -225,6 +226,7 @@ export interface IPluginState extends IRootState {
   transferPackageSearch: ITransferPackageSearchState;
   graph: IGraphState;
   labCsv: ILabCsvState;
+  transferTools: ITransferToolsState;
 }
 
 export interface IAddress {

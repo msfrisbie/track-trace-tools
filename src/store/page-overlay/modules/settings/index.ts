@@ -31,6 +31,7 @@ const persistedState: ISettingsState = {
   darkModeState: DarkModeState.DISABLED,
   disablePopups: false,
   disableSnowAnimation: false,
+  enableTransferTools: true,
   hideFacilityPicker: false,
   hideInlineTransferButtons: false,
   hidePackageSearch: false,
@@ -68,7 +69,7 @@ const persistedState: ISettingsState = {
   writeSettingsToChromeStorage: false,
   loadDataInParallel: true,
   usePersistedCache: false,
-  persistTimestamp: 0
+  persistTimestamp: 0,
 };
 
 const defaultState: ISettingsState = {

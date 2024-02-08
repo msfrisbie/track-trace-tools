@@ -40,3 +40,9 @@ body.demo-mode {
     content: "DEMO00000000000000001234";
   }
 }
+
+.enable-form-quick-tab {
+  button[data-popover-updater], button[ng-click*=removeLine] {
+    display: none;
+  }
+}

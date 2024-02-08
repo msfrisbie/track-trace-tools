@@ -860,13 +860,10 @@ class DynamicConstsManager implements IAtomicService {
     }
 
     if (!this._cachedFacilities) {
-      const repeaterData = await this.newTransferRepeaterData();
-
-      if (repeaterData.Facilities) {
-        this._cachedFacilities = Object.values(repeaterData.Facilities);
-      } else {
-        throw new Error("Facilities unable to load");
-      }
+      this._cachedFacilities = [
+        ...(await primaryDataLoader.transferTransporterFacilities()),
+        ...(await primaryDataLoader.transferDestinationFacilities()),
+      ];
     }
 
     return this._cachedFacilities;

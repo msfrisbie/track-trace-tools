@@ -1,29 +1,34 @@
 <template>
-  <div>Example</div>
+  <div class="ttt-wrapper">
+    <transfer-tools></transfer-tools>
+  </div>
 </template>
 
 <script lang="ts">
 import { IPluginState } from "@/interfaces";
 import router from "@/router/index";
 import store from "@/store/page-overlay/index";
-import { ClientGetters } from "@/store/page-overlay/modules/client/consts";
 import { ExampleActions, ExampleGetters } from "@/store/page-overlay/modules/example/consts";
+import { activeMetrcModalOrNull } from "@/utils/metrc-modal";
 import Vue from "vue";
 import { mapActions, mapGetters, mapState } from "vuex";
+import _ from "lodash-es";
+import TransferTools from "@/components/widgets/TransferTools.vue";
 
 export default Vue.extend({
-  name: "Example",
+  name: "InlineToolbar",
   store,
   router,
   props: {},
-  components: {},
+  components: {
+    TransferTools,
+  },
   computed: {
     ...mapState<IPluginState>({
       authState: (state: IPluginState) => state.pluginAuth.authState,
     }),
     ...mapGetters({
       exampleGetter: `example/${ExampleGetters.EXAMPLE_GETTER}`,
-      hasT3plus: `client/${ClientGetters.T3PLUS}`,
     }),
   },
   data() {
@@ -45,4 +50,6 @@ export default Vue.extend({
 });
 </script>
 
-<style type="text/scss" lang="scss" scoped></style>
+<style type="text/scss" lang="scss">
+@import "src/scss/styles";
+</style>
