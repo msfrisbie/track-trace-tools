@@ -1,3 +1,4 @@
+import { IIndexedHarvestData } from "@/interfaces";
 import { IFieldData } from "./interfaces";
 
 export enum ReportsMutations {
@@ -440,10 +441,76 @@ const COMMON_HARVEST_FIELD_DATA: IFieldData[] = [
     initiallyChecked: true,
   },
   {
+    value: "TotalWetWeight",
+    readableName: "Wet Weight",
+    required: true,
+    initiallyChecked: true,
+  },
+  {
     value: "CurrentWeight",
     readableName: "Current Weight",
     required: true,
     initiallyChecked: true,
+  },
+  {
+    value: "UnitOfWeightAbbreviation",
+    readableName: "Unit of Measure",
+    required: true,
+    initiallyChecked: true,
+  },
+  {
+    value: "CurrentWeightPercent",
+    readableName: "Current % Wet Weight",
+    required: false,
+    initiallyChecked: true,
+    customTransformer(row: IIndexedHarvestData) {
+      return `${Math.round(((100 * row.CurrentWeight) / row.TotalWetWeight + Number.EPSILON) * 100) / 100}%`;
+    }
+  },
+  {
+    value: "TotalPackagedWeight",
+    readableName: "Packaged Weight",
+    required: false,
+    initiallyChecked: false,
+  },
+  {
+    value: "PackagedWeightPercent",
+    readableName: "Packaged % Wet Weight",
+    required: false,
+    initiallyChecked: false,
+    customTransformer(row: IIndexedHarvestData) {
+      return `${Math.round(((100 * row.TotalPackagedWeight) / row.TotalWetWeight + Number.EPSILON) * 100) / 100}%`;
+    }
+  },
+  {
+    value: "TotalWasteWeight",
+    readableName: "Waste Weight",
+    required: false,
+    initiallyChecked: false,
+  },
+  {
+    value: "WasteWeightPercent",
+    readableName: "Waste % Wet Weight",
+    required: false,
+    initiallyChecked: false,
+    customTransformer(row: IIndexedHarvestData) {
+      return `${Math.round(((100 * row.TotalWasteWeight) / row.TotalWetWeight + Number.EPSILON) * 100) / 100}%`;
+    }
+  },
+  {
+    value: "TotalRestoredWeight",
+    readableName: "Restored Weight",
+    required: false,
+    initiallyChecked: false,
+  },
+  {
+    value: "RestoredWeightPercent",
+    readableName: "Restored % Wet Weight",
+    required: false,
+    initiallyChecked: false,
+    customTransformer(row: IIndexedHarvestData) {
+      return `${Math.round(((100 * row.TotalRestoredWeight) / row.TotalWetWeight + Number.EPSILON) * 100) / 100}%`;
+    }
   },
   {
     value: "HarvestStartDate",
