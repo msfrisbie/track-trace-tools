@@ -30,7 +30,6 @@
 </template>
 
 <script lang="ts">
-import { IPageMetrcFacilityData } from "@/interfaces";
 import { authManager } from "@/modules/auth-manager.module";
 import { facilityManager } from "@/modules/facility-manager.module";
 import router from "@/router/index";
@@ -51,13 +50,6 @@ export default Vue.extend({
   components: {},
   computed: {
     ...mapState([]),
-    decodedLicenses(): { text: string; value: string }[] {
-      const fullLicenseData: IPageMetrcFacilityData[] = this.$data.fullLicenseData;
-
-      console.log("fld", { fullLicenseData });
-
-      return this.$props.formFilters.licenseOptions;
-    },
   },
   data() {
     return {
