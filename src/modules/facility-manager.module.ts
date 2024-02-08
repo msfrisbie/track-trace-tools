@@ -134,6 +134,8 @@ class FacilityManager implements IAtomicService {
     this.cachedFacilities = ownedFacilities;
     this.cachedActiveFacility = ownedFacilities.filter((x) => x.licenseNumber === authState.license)[0];
 
+    console.log({ ownedFacilities });
+
     return ownedFacilities;
   }
 

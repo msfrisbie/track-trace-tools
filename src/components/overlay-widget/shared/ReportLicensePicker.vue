@@ -2,8 +2,9 @@
   <div class="flex flex-col items-stretch">
     <b-form-group label="Licenses:">
       <b-form-checkbox-group
+        class="flex flex-col"
         v-model="formFilters.licenses"
-        :options="formFilters.licenseOptions"
+        :options="richLicenseOptions"
       ></b-form-checkbox-group>
     </b-form-group>
     <b-button-group>
@@ -29,7 +30,9 @@
 </template>
 
 <script lang="ts">
+import { IPageMetrcFacilityData } from "@/interfaces";
 import { authManager } from "@/modules/auth-manager.module";
+import { facilityManager } from "@/modules/facility-manager.module";
 import router from "@/router/index";
 import store from "@/store/page-overlay/index";
 import Vue from "vue";
@@ -48,16 +51,37 @@ export default Vue.extend({
   components: {},
   computed: {
     ...mapState([]),
+    decodedLicenses(): { text: string; value: string }[] {
+      const fullLicenseData: IPageMetrcFacilityData[] = this.$data.fullLicenseData;
+
+      console.log("fld", { fullLicenseData });
+
+      return this.$props.formFilters.licenseOptions;
+    },
   },
   data() {
     return {
       currentLicense: "",
+      richLicenseOptions: [],
     };
   },
   methods: {},
   async created() {},
   async mounted() {
     this.$data.currentLicense = (await authManager.authStateOrError()).license;
+
+    const ownedFacilities = await facilityManager.ownedFacilitiesOrError();
+
+    this.$data.richLicenseOptions = this.$props.formFilters.licenseOptions.map(
+      (licenseNumber: string) => {
+        const facilityData = ownedFacilities.find((y) => y.licenseNumber === licenseNumber)!;
+
+        return {
+          text: facilityData.name,
+          value: licenseNumber,
+        };
+      }
+    );
   },
 });
 </script>
