@@ -446,10 +446,16 @@ export function applyFieldTransformer({
   return values.map((row) =>
     fields.map((fieldData) => {
       let value = row;
-      for (const subProperty of fieldData.value.split('.')) {
-        // @ts-ignore
-        value = value[subProperty];
+
+      if (fieldData.customTransformer) {
+        value = fieldData.customTransformer(row);
+      } else {
+        for (const subProperty of fieldData.value.split('.')) {
+          // @ts-ignore
+          value = value[subProperty];
+        }
       }
+
       return value;
     }));
 }

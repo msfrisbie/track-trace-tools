@@ -265,6 +265,7 @@ export interface IFieldData {
   required: boolean;
   initiallyChecked: boolean;
   checkedMessage?: string;
+  customTransformer?: (row: any) => any
 }
 
 export interface ICogsArchive {
