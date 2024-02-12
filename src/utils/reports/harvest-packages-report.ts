@@ -55,6 +55,7 @@ interface IHarvestPackagesReportFormFilters {
   addSpacing: boolean;
   debug: boolean;
   enableHarvestMatchFilter: boolean;
+  generateDebugLog: boolean;
   harvestMatchFilterList: string;
 }
 
@@ -226,6 +227,7 @@ export const harvestPackagesFormFiltersFactory: () => IHarvestPackagesReportForm
   addSpacing: false,
   debug: false,
   enableHarvestMatchFilter: false,
+  generateDebugLog: false,
   harvestMatchFilterList: "",
   ...licenseFilterFactory("all"),
 });
@@ -259,6 +261,7 @@ export function addHarvestPackagesReport({
     removeFloorNugs: harvestPackagesFormFilters.removeFloorNugs,
     harvestMatchFilterList: harvestPackagesFormFilters.harvestMatchFilterList,
     enableHarvestMatchFilter: harvestPackagesFormFilters.enableHarvestMatchFilter,
+    generateDebugLog: harvestPackagesFormFilters.generateDebugLog,
     fields: null,
   };
 }
@@ -639,6 +642,7 @@ export async function maybeLoadHarvestPackagesReportData({
       for (const childPackage of harvestPostQcPackages) {
         recordHarvestPostQcRow(
           reportConfig,
+          reportData,
           harvest,
           strainName,
           harvestPackage,
@@ -715,6 +719,7 @@ export async function maybeLoadHarvestPackagesReportData({
         try {
           recordPostQcRows(
             reportConfig,
+            reportData,
             harvest,
             strainName,
             harvestPackage,
@@ -779,6 +784,7 @@ export async function maybeLoadHarvestPackagesReportData({
           for (const pkg of shakePackages) {
             recordShakeRow(
               reportConfig,
+              reportData,
               harvest,
               strainName,
               harvestPackage,
@@ -798,6 +804,7 @@ export async function maybeLoadHarvestPackagesReportData({
           for (const pkg of standardPackages) {
             recordPackagingRows(
               reportConfig,
+              reportData,
               harvest,
               strainName,
               harvestPackage,
@@ -823,6 +830,7 @@ export async function maybeLoadHarvestPackagesReportData({
       for (const childPackage of shakeChildPackages) {
         recordShakeRow(
           reportConfig,
+          reportData,
           harvest,
           strainName,
           harvestPackage,
@@ -837,6 +845,7 @@ export async function maybeLoadHarvestPackagesReportData({
       for (const childPackage of trimChildPackages) {
         recordTrimRow(
           reportConfig,
+          reportData,
           harvest,
           strainName,
           harvestPackage,
@@ -848,6 +857,7 @@ export async function maybeLoadHarvestPackagesReportData({
 
       recordHarvestPackageAdjustmentRows(
         reportConfig,
+        reportData,
         harvest,
         strainName,
         harvestPackage,
@@ -970,6 +980,7 @@ function normalizeItemNameToMaterialType(itemName: string) {
 
 function recordHarvestPostQcRow(
   reportConfig: IReportConfig,
+  reportData: IReportData,
   harvest: IIndexedHarvestData,
   strainName: string,
   harvestPackage: IUnionIndexedPackageData,
@@ -1001,6 +1012,7 @@ function recordHarvestPostQcRow(
 
 function recordPostQcRows(
   reportConfig: IReportConfig,
+  reportData: IReportData,
   harvest: IIndexedHarvestData,
   strainName: string,
   harvestPackage: IUnionIndexedPackageData,
@@ -1084,6 +1096,7 @@ function recordPostQcRows(
 
   maybeRecordPostQCWasteRow(
     reportConfig,
+    reportData,
     harvest,
     strainName,
     harvestPackage,
@@ -1099,6 +1112,7 @@ function recordPostQcRows(
 
 function recordPackagingRows(
   reportConfig: IReportConfig,
+  reportData: IReportData,
   harvest: IIndexedHarvestData,
   strainName: string,
   harvestPackage: IUnionIndexedPackageData,
@@ -1318,6 +1332,7 @@ function recordPackagingRows(
 
 function recordShakeRow(
   reportConfig: IReportConfig,
+  reportData: IReportData,
   harvest: IIndexedHarvestData,
   strainName: string,
   harvestPackage: IUnionIndexedPackageData,
@@ -1348,6 +1363,7 @@ function recordShakeRow(
 
 function maybeRecordPostQCWasteRow(
   reportConfig: IReportConfig,
+  reportData: IReportData,
   harvest: IIndexedHarvestData,
   strainName: string,
   harvestPackage: IUnionIndexedPackageData,
@@ -1387,6 +1403,7 @@ function maybeRecordPostQCWasteRow(
 
 function recordTrimRow(
   reportConfig: IReportConfig,
+  reportData: IReportData,
   harvest: IIndexedHarvestData,
   strainName: string,
   harvestPackage: IUnionIndexedPackageData,
@@ -1416,6 +1433,7 @@ function recordTrimRow(
 
 function recordHarvestPackageAdjustmentRows(
   reportConfig: IReportConfig,
+  reportData: IReportData,
   harvest: IIndexedHarvestData,
   strainName: string,
   harvestPackage: IUnionIndexedPackageData,

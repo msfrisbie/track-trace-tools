@@ -305,6 +305,9 @@
                 <b-form-checkbox v-model="harvestPackagesFormFilters.enableHarvestMatchFilter">
                   <span class="leading-6">Use harvest match filter</span>
                 </b-form-checkbox>
+                <b-form-checkbox v-model="harvestPackagesFormFilters.generateDebugLog">
+                  <span class="leading-6">Generate debug log</span>
+                </b-form-checkbox>
                 <b-form-group
                   v-if="harvestPackagesFormFilters.enableHarvestMatchFilter"
                   label="Only include harvest names matching:"

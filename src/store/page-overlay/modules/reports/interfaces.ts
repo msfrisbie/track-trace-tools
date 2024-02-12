@@ -72,6 +72,7 @@ export interface IReportConfig {
     removeFloorNugs: boolean;
     harvestMatchFilterList: string;
     enableHarvestMatchFilter: boolean;
+    generateDebugLog: boolean;
     fields: null;
   };
   [ReportType.COGS_TRACKER]?: {
