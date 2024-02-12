@@ -1,4 +1,4 @@
-import { SheetTitles } from '@/consts';
+import { SheetTitles } from "@/consts";
 import {
   IDestinationData,
   IIndexedDestinationPackageData,
@@ -6,28 +6,27 @@ import {
   IIndexedRichIncomingTransferData,
   IIndexedRichOutgoingTransferData,
   IIndexedTransferData,
-  ILicenseFormFilters, ITransferData,
-  ITransporterData
-} from '@/interfaces';
-import { facilityManager } from '@/modules/facility-manager.module';
+  ILicenseFormFilters,
+  ITransferData,
+  ITransporterData,
+} from "@/interfaces";
+import { facilityManager } from "@/modules/facility-manager.module";
 import store from "@/store/page-overlay/index";
-import {
-  ReportType
-} from '@/store/page-overlay/modules/reports/consts';
+import { ReportType } from "@/store/page-overlay/modules/reports/consts";
 import {
   IFieldData,
   IReportConfig,
   IReportData,
-  IReportOption
-} from '@/store/page-overlay/modules/reports/interfaces';
-import { todayIsodate } from '../date';
-import { extractEmployeeAuditData } from './employee-audit-report';
-import { extractHarvestPackagesData } from './harvest-packages-report';
-import { extractImmaturePlantPropertyFromDimension } from './immature-plants-quickview-report';
-import { extractMaturePlantPropertyFromDimension } from './mature-plants-quickview-report';
-import { extractPackagePropertyFromDimension } from './packages-quickview-report';
-import { extractPointInTimeInventoryData } from './point-in-time-inventory-report';
-import { extractSingleTransferData } from './single-transfer-report';
+  IReportOption,
+} from "@/store/page-overlay/modules/reports/interfaces";
+import { todayIsodate } from "../date";
+import { extractEmployeeAuditData } from "./employee-audit-report";
+import { extractHarvestPackagesData } from "./harvest-packages-report";
+import { extractImmaturePlantPropertyFromDimension } from "./immature-plants-quickview-report";
+import { extractMaturePlantPropertyFromDimension } from "./mature-plants-quickview-report";
+import { extractPackagePropertyFromDimension } from "./packages-quickview-report";
+import { extractPointInTimeInventoryData } from "./point-in-time-inventory-report";
+import { extractSingleTransferData } from "./single-transfer-report";
 
 export function reportCatalogFactory(): IReportOption[] {
   const hasPlus: boolean = store.state.client.values.ENABLE_T3PLUS || store.state.client.t3plus;
@@ -46,7 +45,7 @@ export function reportCatalogFactory(): IReportOption[] {
       isSpecialty: false,
       isCatalog: false,
       isQuickview: false,
-      isHeadless: false
+      isHeadless: false,
     },
     {
       text: "Packages",
@@ -61,7 +60,7 @@ export function reportCatalogFactory(): IReportOption[] {
       isSpecialty: false,
       isCatalog: true,
       isQuickview: false,
-      isHeadless: false
+      isHeadless: false,
     },
     {
       text: "Point-in-time inventory",
@@ -76,7 +75,7 @@ export function reportCatalogFactory(): IReportOption[] {
       isSpecialty: true,
       isCatalog: false,
       isQuickview: false,
-      isHeadless: false
+      isHeadless: false,
     },
     {
       text: "Plant Batches",
@@ -91,7 +90,7 @@ export function reportCatalogFactory(): IReportOption[] {
       isSpecialty: false,
       isCatalog: true,
       isQuickview: false,
-      isHeadless: false
+      isHeadless: false,
     },
     {
       text: "Mature Plants",
@@ -106,7 +105,7 @@ export function reportCatalogFactory(): IReportOption[] {
       isSpecialty: false,
       isCatalog: true,
       isQuickview: false,
-      isHeadless: false
+      isHeadless: false,
     },
     {
       text: "Incoming Transfers",
@@ -121,7 +120,7 @@ export function reportCatalogFactory(): IReportOption[] {
       isSpecialty: false,
       isCatalog: true,
       isQuickview: false,
-      isHeadless: false
+      isHeadless: false,
     },
     {
       text: "Outgoing Transfers",
@@ -136,7 +135,7 @@ export function reportCatalogFactory(): IReportOption[] {
       isSpecialty: false,
       isCatalog: true,
       isQuickview: false,
-      isHeadless: false
+      isHeadless: false,
     },
     // Disabled - Destinations returns 0, more like incoming?
     // {
@@ -160,7 +159,7 @@ export function reportCatalogFactory(): IReportOption[] {
       isSpecialty: false,
       isCatalog: true,
       isQuickview: false,
-      isHeadless: false
+      isHeadless: false,
     },
     {
       text: "Harvests",
@@ -175,7 +174,7 @@ export function reportCatalogFactory(): IReportOption[] {
       isSpecialty: false,
       isCatalog: true,
       isQuickview: false,
-      isHeadless: false
+      isHeadless: false,
     },
     {
       text: "Outgoing Transfer Manifests",
@@ -190,7 +189,7 @@ export function reportCatalogFactory(): IReportOption[] {
       isSpecialty: true,
       isCatalog: false,
       isQuickview: false,
-      isHeadless: false
+      isHeadless: false,
     },
     {
       text: "Straggler Inventory",
@@ -205,7 +204,7 @@ export function reportCatalogFactory(): IReportOption[] {
       isSpecialty: true,
       isCatalog: false,
       isQuickview: false,
-      isHeadless: false
+      isHeadless: false,
     },
     {
       text: "Employee Activity",
@@ -220,7 +219,7 @@ export function reportCatalogFactory(): IReportOption[] {
       isSpecialty: true,
       isCatalog: false,
       isQuickview: false,
-      isHeadless: false
+      isHeadless: false,
     },
     {
       text: "COGS",
@@ -235,7 +234,7 @@ export function reportCatalogFactory(): IReportOption[] {
       isSpecialty: false,
       isCatalog: false,
       isQuickview: false,
-      isHeadless: false
+      isHeadless: false,
     },
     {
       text: "COGS Tracker",
@@ -250,7 +249,7 @@ export function reportCatalogFactory(): IReportOption[] {
       isSpecialty: false,
       isCatalog: false,
       isQuickview: false,
-      isHeadless: false
+      isHeadless: false,
     },
     {
       text: "Employee Samples",
@@ -265,7 +264,7 @@ export function reportCatalogFactory(): IReportOption[] {
       isSpecialty: false,
       isCatalog: false,
       isQuickview: false,
-      isHeadless: false
+      isHeadless: false,
     },
     {
       text: "Harvest Packages",
@@ -280,7 +279,7 @@ export function reportCatalogFactory(): IReportOption[] {
       isSpecialty: false,
       isCatalog: false,
       isQuickview: false,
-      isHeadless: false
+      isHeadless: false,
     },
     {
       text: "Packages Quickview",
@@ -295,7 +294,7 @@ export function reportCatalogFactory(): IReportOption[] {
       isSpecialty: false,
       isCatalog: false,
       isQuickview: true,
-      isHeadless: false
+      isHeadless: false,
     },
     {
       text: "Plant Batch Quickview",
@@ -310,15 +309,14 @@ export function reportCatalogFactory(): IReportOption[] {
       isSpecialty: false,
       isCatalog: false,
       isQuickview: true,
-      isHeadless: false
+      isHeadless: false,
     },
     {
       text: "Mature Plants Quickview",
       value: ReportType.MATURE_PLANTS_QUICKVIEW,
       enabled: hasPlus,
       visible: true,
-      description:
-        "Grouped summary of mature plants by growth phase, strain, location, and dates",
+      description: "Grouped summary of mature plants by growth phase, strain, location, and dates",
       isCustom: false,
       usesFormulas: false,
       isMultiSheet: false,
@@ -326,7 +324,7 @@ export function reportCatalogFactory(): IReportOption[] {
       isSpecialty: false,
       isCatalog: false,
       isQuickview: true,
-      isHeadless: false
+      isHeadless: false,
     },
     {
       text: "Transfer Quickview",
@@ -341,7 +339,7 @@ export function reportCatalogFactory(): IReportOption[] {
       isSpecialty: false,
       isCatalog: false,
       isQuickview: true,
-      isHeadless: false
+      isHeadless: false,
     },
     // {
     //   text: "Incoming Inventory",
@@ -372,7 +370,7 @@ export function reportCatalogFactory(): IReportOption[] {
       isSpecialty: false,
       isCatalog: false,
       isQuickview: false,
-      isHeadless: false
+      isHeadless: false,
     },
   ];
 
@@ -450,14 +448,15 @@ export function applyFieldTransformer({
       if (fieldData.customTransformer) {
         value = fieldData.customTransformer(row);
       } else {
-        for (const subProperty of fieldData.value.split('.')) {
+        for (const subProperty of fieldData.value.split(".")) {
           // @ts-ignore
           value = value[subProperty];
         }
       }
 
       return value;
-    }));
+    })
+  );
 }
 
 export function extractQuickviewData({
@@ -498,7 +497,7 @@ export function extractQuickviewData({
       extractor = extractPackagePropertyFromDimension;
       break;
     default:
-      throw new Error('Bad report type');
+      throw new Error("Bad report type");
   }
 
   const indexedDimensionCounts: { [key: string]: { [key: string]: number } } = {};
@@ -508,7 +507,7 @@ export function extractQuickviewData({
 
   for (const object of objects) {
     const primaryValue = extractor(object, primaryDimension);
-    const secondaryValue = secondaryDimension ? extractor(object, secondaryDimension) : '*';
+    const secondaryValue = secondaryDimension ? extractor(object, secondaryDimension) : "*";
 
     primaryKeys.add(primaryValue);
     secondaryKeys.add(secondaryValue);
@@ -528,10 +527,10 @@ export function extractQuickviewData({
   const sortedSecondaryKeys = [...secondaryKeys].sort();
 
   data.push([
-    `${secondaryDimension ?? '*'} / ${primaryDimension}`,
+    `${secondaryDimension ?? "*"} / ${primaryDimension}`,
     ...sortedPrimaryKeys,
-    '',
-    'TOTAL',
+    "",
+    "TOTAL",
   ]);
 
   const colTotals = Array(sortedPrimaryKeys.length).fill(0);
@@ -552,11 +551,11 @@ export function extractQuickviewData({
       row.push(cellSum.toString());
     }
 
-    data.push([...row, '', rowTotal.toString()]);
+    data.push([...row, "", rowTotal.toString()]);
   }
 
   data.push([]);
-  data.push(['TOTAL', ...colTotals, '', `GRAND TOTAL: ${grandTotal}`]);
+  data.push(["TOTAL", ...colTotals, "", `GRAND TOTAL: ${grandTotal}`]);
 
   return data;
 }
@@ -727,11 +726,9 @@ export function getCsvFilename({
   return `${sheetTitle} [Generated ${date}]`;
 }
 
-export function getGoogleSheetName({
-  license,
+export function getSpreadsheetName({
   reportConfig,
 }: {
-  license: string;
   reportConfig: IReportConfig;
 }): string {
   const date = todayIsodate();
@@ -815,26 +812,28 @@ export function getSheetTitle({
     ReportType.EMPLOYEE_SAMPLES,
   ];
 
-  if (!NO_LICENSE_TYPES.includes(reportType) && 'licenses' in reportConfig[reportType]!) {
+  if (!NO_LICENSE_TYPES.includes(reportType) && "licenses" in reportConfig[reportType]!) {
     // @ts-ignore
-    title += ` (${reportConfig[reportType]!.licenses.join(',')})`;
+    title += ` (${reportConfig[reportType]!.licenses.join(",")})`;
   }
 
   return title;
 }
 
-export function licenseFilterFactory(initial: 'all' | 'current' | 'none' = 'current'): ILicenseFormFilters {
+export function licenseFilterFactory(
+  initial: "all" | "current" | "none" = "current"
+): ILicenseFormFilters {
   let licenses: string[] = [];
   const currentLicense: string | null = facilityManager.cachedActiveFacility?.licenseNumber ?? null;
   const allLicenses: string[] = facilityManager.cachedFacilities.map((x) => x.licenseNumber);
 
   switch (initial) {
-    case 'none':
+    case "none":
       break;
-    case 'current':
+    case "current":
       licenses = currentLicense ? [currentLicense] : [];
       break;
-    case 'all':
+    case "all":
       licenses = allLicenses;
       break;
   }
@@ -845,8 +844,8 @@ export function licenseFilterFactory(initial: 'all' | 'current' | 'none' = 'curr
   };
 }
 
-export function extractLicenseFields(formFilters: ILicenseFormFilters): {licenses: string[]} {
+export function extractLicenseFields(formFilters: ILicenseFormFilters): { licenses: string[] } {
   return {
-    licenses: formFilters.licenses
+    licenses: formFilters.licenses,
   };
 }

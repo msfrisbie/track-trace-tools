@@ -1,4 +1,4 @@
-import { IAtomicService } from "@/interfaces";
+import { IAtomicService, IXslxFile } from "@/interfaces";
 import { IAnnouncementData } from "@/store/page-overlay/modules/announcements/interfaces";
 import { AxiosError } from "axios";
 import { authManager } from "./auth-manager.module";
@@ -13,6 +13,7 @@ const ANNOUNCEMENTS_PATH = "announcements";
 const T3PLUS_PATH = "plus_users/status";
 const FLAGS_PATH = "flags";
 const GOOGLE_MAPS_DIRECTIONS = "metrc/directions";
+const GENERATE_REPORT_PATH = "reports/generate";
 
 const DEFAULT_POST_HEADERS = {
   "Content-Type": "application/json",
@@ -96,6 +97,36 @@ class T3RequestManager implements IAtomicService {
         destination,
       }),
     });
+
+    return response.data;
+  }
+
+  async generateAndDownloadReport({ xslxFile }: { xslxFile: IXslxFile }) {
+    const response = await customAxios(BASE_URL + GENERATE_REPORT_PATH, {
+      method: "POST",
+      headers: DEFAULT_POST_HEADERS,
+      body: JSON.stringify(xslxFile),
+      responseType: "arraybuffer",
+    });
+
+    const blob = new Blob([response.data], {
+      type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    });
+
+    const url = window.URL.createObjectURL(blob);
+
+    // Create a temporary anchor element and set its attributes
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `${xslxFile.filename}.xslx`; // Provide a filename here
+
+    // Append the anchor to the body, click it, and then remove it
+    document.body.appendChild(a);
+    a.click();
+
+    // Clean up by revoking the object URL and removing the anchor
+    window.URL.revokeObjectURL(url);
+    document.body.removeChild(a);
 
     return response.data;
   }

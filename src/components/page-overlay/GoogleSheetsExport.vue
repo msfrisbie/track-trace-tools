@@ -6,7 +6,10 @@
         class="flex flex-col gap-2 items-stretch"
         v-bind:class="{ 'opacity-50': reportStatus !== ReportStatus.INITIAL }"
       >
-        <div class="text-start text-gray-600 pb-2" v-if="!clientValues['ENABLE_T3PLUS'] && !t3plus">
+        <div
+          class="text-start text-gray-600 pb-2"
+          v-if="!clientValues['ENABLE_T3PLUS'] && !hasT3plus"
+        >
           Get access to advanced reports with
           <a class="text-purple-500 underline" href="#" @click="$router.push('/plus')">T3+</a>
         </div>
@@ -43,9 +46,6 @@
             {{ selectedReports.length }} REPORT{{ selectedReports.length > 1 ? "S" : "" }}
             SELECTED:
           </div>
-          <!-- <div class="ttt-purple text-center">
-              Configure your report below. <br />Defaults to active data and all fields.
-            </div> -->
         </template>
         <template v-else>
           <div class="text-center flex flex-col gap-2 border rounded-xl p-4">
@@ -408,13 +408,13 @@
                     <span class="leading-6">Include transfer hub packages</span>
                   </b-form-checkbox> -->
 
-              <!-- <b-form-checkbox :disabled="!clientValues['ENABLE_T3PLUS'] && !t3plus">
+              <!-- <b-form-checkbox :disabled="!clientValues['ENABLE_T3PLUS'] && !hasT3plus">
                     <div class="flex flex-col items-start">
                       <span class="leading-6"
                         >Include packages transferred out of this facility</span
                       >
                       <span
-                        v-if="!clientValues['ENABLE_T3PLUS'] && !t3plus"
+                        v-if="!clientValues['ENABLE_T3PLUS'] && !hasT3plus"
                         class="text-xs text-gray-300"
                         >Enable this with
                         <a href="https://trackandtrace.tools/plus" target="_blank">T3+</a></span
@@ -1079,7 +1079,7 @@
                 <span class="leading-6">Include Inactive Outgoing</span>
               </b-form-checkbox>
               <b-form-checkbox
-                :disabled="!clientValues['ENABLE_T3PLUS'] && !t3plus"
+                :disabled="!clientValues['ENABLE_T3PLUS'] && !hasT3plus"
                 v-model="outgoingTransferManifestsFormFilters.onlyWholesale"
               >
                 <span class="leading-6">Only Wholesale</span>
@@ -1601,6 +1601,7 @@
               to your Google account to export to Sheets.
             </div>
           </template>
+
           <b-button
             variant="primary"
             size="sm"
@@ -1610,6 +1611,21 @@
           >
           <template v-if="!enableCsvGenerateButton && selectedReports.length > 0">
             <div class="text-xs">The selected report(s) are not CSV compatible</div>
+          </template>
+
+          <b-button
+            variant="primary"
+            size="sm"
+            @click="generateReports('XSLX')"
+            :disabled="!enableXslxGenerateButton"
+            >EXPORT TO XSLX</b-button
+          >
+          <template v-if="!enableXslxGenerateButton && !hasT3plus && selectedReports.length > 0">
+            <div class="text-xs">Upgrade to T3+ to export to XSLX</div>
+          </template>
+
+          <template v-if="!enableXslxGenerateButton && hasT3plus && selectedReports.length > 0">
+            <div class="text-xs">The selected report(s) are not XSLX compatible</div>
           </template>
 
           <template v-if="selectedReports.length === 0">
@@ -1712,12 +1728,13 @@ import { authManager } from "@/modules/auth-manager.module";
 import { messageBus } from "@/modules/message-bus.module";
 import router from "@/router/index";
 import store from "@/store/page-overlay/index";
+import { ClientGetters } from "@/store/page-overlay/modules/client/consts";
 import { OAuthState, PluginAuthActions } from "@/store/page-overlay/modules/plugin-auth/consts";
 import {
   ReportAuxTask,
-  ReportsActions,
   ReportStatus,
   ReportType,
+  ReportsActions,
   SHEET_FIELDS,
 } from "@/store/page-overlay/modules/reports/consts";
 import { IReportConfig, IReportOption } from "@/store/page-overlay/modules/reports/interfaces";
@@ -1746,9 +1763,9 @@ import {
 } from "@/utils/reports/harvest-packages-report";
 import { addHarvestsReport, harvestsFormFiltersFactory } from "@/utils/reports/harvests-report";
 import {
+  IMMATURE_PLANT_QUICKVIEW_DIMENSIONS,
   addImmaturePlantsQuickviewReport,
   immaturePlantsQuickviewFormFiltersFactory,
-  IMMATURE_PLANT_QUICKVIEW_DIMENSIONS,
 } from "@/utils/reports/immature-plants-quickview-report";
 import {
   addImmaturePlantsReport,
@@ -1759,9 +1776,9 @@ import {
   incomingTransfersFormFiltersFactory,
 } from "@/utils/reports/incoming-transfers-report";
 import {
+  MATURE_PLANT_QUICKVIEW_DIMENSIONS,
   addMaturePlantsQuickviewReport,
   maturePlantsQuickviewFormFiltersFactory,
-  MATURE_PLANT_QUICKVIEW_DIMENSIONS,
 } from "@/utils/reports/mature-plants-quickview-report";
 import {
   addMaturePlantsReport,
@@ -1777,9 +1794,9 @@ import {
 } from "@/utils/reports/outgoing-transfers-report";
 import { addPackageReport, packageFormFiltersFactory } from "@/utils/reports/package-report";
 import {
+  PACKAGES_QUICKVIEW_DIMENSIONS,
   addPackagesQuickviewReport,
   packagesQuickviewFormFiltersFactory,
-  PACKAGES_QUICKVIEW_DIMENSIONS,
 } from "@/utils/reports/packages-quickview-report";
 import {
   addPointInTimeInventoryReport,
@@ -1797,7 +1814,7 @@ import {
 } from "@/utils/reports/transfer-hub-transfers-report";
 import _ from "lodash-es";
 import Vue from "vue";
-import { mapActions, mapState } from "vuex";
+import { mapActions, mapGetters, mapState } from "vuex";
 import ArchiveWidget from "../shared/ArchiveWidget.vue";
 import SimpleDrawer from "../shared/SimpleDrawer.vue";
 
@@ -1817,7 +1834,6 @@ export default Vue.extend({
       authState: (state: IPluginState) => state.pluginAuth.authState,
       oAuthState: (state: IPluginState) => state.pluginAuth.oAuthState,
       clientValues: (state: IPluginState) => state.client.values,
-      t3plus: (state: IPluginState) => state.client.t3plus,
       generatedSpreadsheet: (state: IPluginState) => state.reports.generatedSpreadsheet,
       generatedSpreadsheetHistory: (state: IPluginState) =>
         state.reports.generatedSpreadsheetHistory,
@@ -1825,11 +1841,23 @@ export default Vue.extend({
       reportStatusMessage: (state: IPluginState) => state.reports.statusMessage,
       reportStatusMessageHistory: (state: IPluginState) => state.reports.statusMessageHistory,
     }),
+    ...mapGetters({
+      hasT3plus: `client/${ClientGetters.T3PLUS}`,
+    }),
     enableCsvGenerateButton(): boolean {
       return (
         this.selectedReports.length > 0 &&
         this.selectedReports.filter((x: IReportOption) => x.usesFormulas || x.isMultiSheet)
           .length === 0
+      );
+    },
+    enableXslxGenerateButton(): boolean {
+      console.log(this.selectedReports, this.hasT3plus);
+      return (
+        this.hasT3plus &&
+        this.selectedReports.length > 0 &&
+        // Multi-sheet is OK, but formulas are not yet supported
+        this.selectedReports.filter((x: IReportOption) => x.usesFormulas).length === 0
       );
     },
     enableGoogleSheetsGenerateButton(): boolean {
@@ -1936,44 +1964,14 @@ export default Vue.extend({
     uncheckAll(reportType: ReportType): void {
       this.fields[reportType] = _.cloneDeep(SHEET_FIELDS[reportType]).filter((x) => x.required);
     },
-    // eligibleReportOptionsImpl(): IReportOption[] {
-    //   return this.reportCatalogFactory().filter((x: IReportOption) => {
-    //     if (x.hidden) {
-    //       return false;
-    //     }
-
-    //     if (!x.enabled) {
-    //       return false;
-    //     }
-
-    //     if (x.t3plus) {
-    //       return store.state.client.values.ENABLE_T3PLUS || store.state.client.t3plus;
-    //     }
-    //     return true;
-    //   });
-    // },
-    // disabledVisibleReportOptionsImpl(): IReportOption[] {
-    //   return this.reportCatalogFactory().filter((x: IReportOption) => {
-    //     if (x.hidden) {
-    //       return false;
-    //     }
-
-    //     if (!x.enabled) {
-    //       return true;
-    //     }
-
-    //     if (x.t3plus) {
-    //       return !store.state.client.values.ENABLE_T3PLUS && !store.state.client.t3plus;
-    //     }
-    //     return false;
-    //   });
-    // },
     openOAuthPage(): void {
       messageBus.sendMessageToBackground(MessageType.OPEN_OPTIONS_PAGE, {
         path: "/google-sheets",
       });
     },
-    async generateReports(exportFormat: "GOOGLE_SHEETS" | "CSV" = "GOOGLE_SHEETS"): Promise<void> {
+    async generateReports(
+      exportFormat: "GOOGLE_SHEETS" | "CSV" | "XSLX" = "GOOGLE_SHEETS"
+    ): Promise<void> {
       const reportConfig: IReportConfig = {
         authState: await authManager.authStateOrError(),
         exportFormat,

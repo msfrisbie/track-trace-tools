@@ -45,7 +45,7 @@ export interface IReportsState {
 
 export interface IReportConfig {
   authState: IAuthState;
-  exportFormat?: 'CSV' | 'GOOGLE_SHEETS';
+  exportFormat?: 'CSV' | 'GOOGLE_SHEETS' | 'XSLX';
   [ReportType.TEST]?: {
     exampleFilter: any;
     fields: IFieldData[];

@@ -26,7 +26,7 @@ import { maybeLoadStragglerPackageReportData } from '@/utils/reports/straggler-p
 import { maybeLoadTagsReportData } from '@/utils/reports/tags-report';
 import { maybeLoadTransferHubTransfersReportData } from '@/utils/reports/transfer-hub-transfers-report';
 import { getSimpleSpreadsheet } from '@/utils/sheets';
-import { createCsvOrError, createSpreadsheetOrError } from '@/utils/sheets-export';
+import { createCsvOrError, createSpreadsheetOrError, createXslxOrError } from '@/utils/sheets-export';
 import { v4 as uuidv4 } from 'uuid';
 import { ActionContext } from 'vuex';
 import {
@@ -173,6 +173,8 @@ export const reportsModule = {
 
         if (reportConfig.exportFormat === 'CSV') {
           await createCsvOrError({ reportData, reportConfig });
+        } else if (reportConfig.exportFormat === 'XSLX') {
+          await createXslxOrError({ reportData, reportConfig });
         } else {
           const spreadsheet: ISpreadsheet = await createSpreadsheetOrError({
             reportData,

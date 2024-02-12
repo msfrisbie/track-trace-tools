@@ -82,6 +82,7 @@ import { IPluginState } from "@/interfaces";
 import { analyticsManager } from "@/modules/analytics-manager.module";
 import router from "@/router/index";
 import store from "@/store/page-overlay/index";
+import { ClientGetters } from "@/store/page-overlay/modules/client/consts";
 import { hasPlusImpl } from "@/utils/plus";
 import { notAvailableMessage } from "@/utils/text";
 import Vue from "vue";
@@ -127,18 +128,6 @@ export default Vue.extend({
     },
     options() {
       return [
-        // {
-        //   backgroundColor: "gray",
-        //   text: "T3+",
-        //   icon: "plus",
-        //   visible: !store.state.client.values.ENABLE_T3PLUS && !store.state.client.t3plus,
-        //   enabled: true,
-        //   isBeta: false,
-        //   isNew: false,
-        //   route: "/plus",
-        //   isPlus: false
-        //   // url: 'https://www.trackandtrace.tools/plus',
-        // },
         {
           backgroundColor: "#2774ae",
           text: "VERIFY",
@@ -287,6 +276,17 @@ export default Vue.extend({
           enabled: true,
           isBeta: false,
           isNew: false,
+        },
+        {
+          backgroundColor: "gray",
+          text: "MANAGE T3+",
+          icon: "plus",
+          visible: store.getters[`client/${ClientGetters.T3PLUS}`],
+          enabled: true,
+          isBeta: false,
+          isNew: false,
+          isPlus: false,
+          url: "https://dash.trackandtrace.tools",
         },
       ];
     },

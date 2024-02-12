@@ -1181,6 +1181,14 @@ export interface ICsvFile {
   data: any[][];
 }
 
+export interface IXslxFile {
+  filename: string;
+  sheets: {
+    sheetName: string;
+    data: any[][];
+  }[]
+}
+
 export interface ITextFile {
   filename: string;
   data: string;
