@@ -4,6 +4,7 @@ import { AxiosError } from "axios";
 import { authManager } from "./auth-manager.module";
 import { customAxios } from "./fetch-manager.module";
 
+// const BASE_URL = isDevelopment() ? "http://127.0.0.1:5000/" : "https://api.trackandtrace.tools/";
 const BASE_URL = "https://api.trackandtrace.tools/";
 
 const CLIENT_KEY_PATH = "client";
@@ -14,6 +15,7 @@ const T3PLUS_PATH = "plus_users/status";
 const FLAGS_PATH = "flags";
 const GOOGLE_MAPS_DIRECTIONS = "metrc/directions";
 const GENERATE_REPORT_PATH = "reports/generate";
+const DOWNLOAD_REPORT_PATH = "reports/download";
 
 const DEFAULT_POST_HEADERS = {
   "Content-Type": "application/json",
@@ -106,29 +108,12 @@ class T3RequestManager implements IAtomicService {
       method: "POST",
       headers: DEFAULT_POST_HEADERS,
       body: JSON.stringify(xslxFile),
-      responseType: "arraybuffer",
+      responseType: "json",
     });
 
-    const blob = new Blob([response.data], {
-      type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-    });
+    window.open(`${BASE_URL}${DOWNLOAD_REPORT_PATH}/${response.data.report_id}`, "_blank");
 
-    const url = window.URL.createObjectURL(blob);
-
-    // Create a temporary anchor element and set its attributes
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `${xslxFile.filename}.xslx`; // Provide a filename here
-
-    // Append the anchor to the body, click it, and then remove it
-    document.body.appendChild(a);
-    a.click();
-
-    // Clean up by revoking the object URL and removing the anchor
-    window.URL.revokeObjectURL(url);
-    document.body.removeChild(a);
-
-    return response.data;
+    return response;
   }
 
   async loadAnnouncements(): Promise<IAnnouncementData[]> {

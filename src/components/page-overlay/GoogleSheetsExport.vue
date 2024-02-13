@@ -6,10 +6,7 @@
         class="flex flex-col gap-2 items-stretch"
         v-bind:class="{ 'opacity-50': reportStatus !== ReportStatus.INITIAL }"
       >
-        <div
-          class="text-start text-gray-600 pb-2"
-          v-if="!clientValues['ENABLE_T3PLUS'] && !hasT3plus"
-        >
+        <div class="text-start text-gray-600 pb-2" v-if="!hasT3plus">
           Get access to advanced reports with
           <a class="text-purple-500 underline" href="#" @click="$router.push('/plus')">T3+</a>
         </div>
@@ -1078,10 +1075,7 @@
               >
                 <span class="leading-6">Include Inactive Outgoing</span>
               </b-form-checkbox>
-              <b-form-checkbox
-                :disabled="!clientValues['ENABLE_T3PLUS'] && !hasT3plus"
-                v-model="outgoingTransferManifestsFormFilters.onlyWholesale"
-              >
+              <b-form-checkbox v-model="outgoingTransferManifestsFormFilters.onlyWholesale">
                 <span class="leading-6">Only Wholesale</span>
               </b-form-checkbox>
 
@@ -1620,11 +1614,8 @@
             :disabled="!enableXslxGenerateButton"
             >EXPORT TO XSLX</b-button
           >
-          <template v-if="!enableXslxGenerateButton && !hasT3plus && selectedReports.length > 0">
-            <div class="text-xs">Upgrade to T3+ to export to XSLX</div>
-          </template>
 
-          <template v-if="!enableXslxGenerateButton && hasT3plus && selectedReports.length > 0">
+          <template v-if="!enableXslxGenerateButton && selectedReports.length > 0">
             <div class="text-xs">The selected report(s) are not XSLX compatible</div>
           </template>
 
@@ -1852,9 +1843,7 @@ export default Vue.extend({
       );
     },
     enableXslxGenerateButton(): boolean {
-      console.log(this.selectedReports, this.hasT3plus);
       return (
-        this.hasT3plus &&
         this.selectedReports.length > 0 &&
         // Multi-sheet is OK, but formulas are not yet supported
         this.selectedReports.filter((x: IReportOption) => x.usesFormulas).length === 0
@@ -2214,8 +2203,6 @@ export default Vue.extend({
     selectedReports: {
       immediate: true,
       handler(newValue: IReportOption[], oldValue) {
-        // console.log(newValue);
-
         const singleonReportTypes: ReportType[] = reportCatalogFactory()
           .filter((x: IReportOption) => x.isMultiSheet)
           .map((x: IReportOption) => x.value) as ReportType[];
