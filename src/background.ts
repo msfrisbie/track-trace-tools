@@ -2,6 +2,7 @@ import { AMPLITUDE_API_KEY, ChromeStorageKeys, MessageType } from "@/consts";
 import { IBusEvent, IBusMessageOptions } from "@/interfaces";
 import { database } from "@/modules/indexeddb.module";
 import amplitude from "amplitude-js";
+import "exboost-js";
 import { expireAuthToken, getAuthTokenOrError, getOAuthUserInfoOrError } from "./utils/oauth";
 import {
   appendValues,

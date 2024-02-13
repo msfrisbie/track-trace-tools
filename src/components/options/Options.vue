@@ -23,6 +23,7 @@
       </b-collapse>
     </b-navbar>
     <router-view></router-view>
+    <iframe data-exboost-slot="options-footer"></iframe>
   </div>
 </template>
 
@@ -35,6 +36,7 @@ import { library } from "@fortawesome/fontawesome-svg-core";
 import * as fontawesomeSolid from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import { BootstrapVue } from "bootstrap-vue";
+import ExBoost from "exboost-js";
 import Vue from "vue";
 import VueRouter from "vue-router";
 import router from "./router";
@@ -79,6 +81,8 @@ export default Vue.extend({
     });
 
     maybeNavigate();
+
+    ExBoost.init();
   },
   methods: {},
 });
