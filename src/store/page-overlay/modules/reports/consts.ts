@@ -30,6 +30,7 @@ export enum ReportType {
   INCOMING_TRANSFERS = "INCOMING_TRANSFERS",
   OUTGOING_TRANSFERS = "OUTGOING_TRANSFERS",
   TRANSFER_HUB_TRANSFERS = "TRANSFER_HUB_TRANSFERS",
+  INCOMING_MANIFEST_INVENTORY = "INCOMING_MANIFEST_INVENTORY",
   INCOMING_TRANSFER_MANIFESTS = "INCOMING_TRANSFER_MANIFESTS",
   OUTGOING_TRANSFER_MANIFESTS = "OUTGOING_TRANSFER_MANIFESTS",
   TRANSFER_HUB_TRANSFER_MANIFESTS = "TRANSFER_HUB_TRANSFER_MANIFESTS",
@@ -55,6 +56,15 @@ export enum ReportAuxTask {
 const COMMON_FIELD_DATA: IFieldData[] = [
   {
     value: "LicenseNumber",
+    readableName: "Current License",
+    required: true,
+    initiallyChecked: true,
+  },
+];
+
+const COMMON_TRANSFER_FIELD_DATA: IFieldData[] = [
+  {
+    value: "Transfer.LicenseNumber",
     readableName: "Current License",
     required: true,
     initiallyChecked: true,
@@ -281,7 +291,7 @@ const COMMON_PLANT_BATCH_FIELD_DATA: IFieldData[] = [
   },
 ];
 const COMMON_INCOMING_TRANSFER_FIELD_DATA: IFieldData[] = [
-  ...COMMON_FIELD_DATA,
+  ...COMMON_TRANSFER_FIELD_DATA,
   {
     value: "Transfer.ManifestNumber",
     readableName: "Manifest #",
@@ -344,7 +354,7 @@ const COMMON_INCOMING_TRANSFER_FIELD_DATA: IFieldData[] = [
   },
 ];
 const COMMON_OUTGOING_TRANSFER_FIELD_DATA: IFieldData[] = [
-  ...COMMON_FIELD_DATA,
+  ...COMMON_TRANSFER_FIELD_DATA,
   {
     value: "Transfer.ManifestNumber",
     readableName: "Manifest #",
@@ -671,6 +681,16 @@ export const SHEET_FIELDS: { [key: string]: IFieldData[] } = {
   [ReportType.OUTGOING_TRANSFERS]: [...COMMON_OUTGOING_TRANSFER_FIELD_DATA],
   [ReportType.TRANSFER_HUB_TRANSFERS]: [...COMMON_OUTGOING_TRANSFER_FIELD_DATA],
   [ReportType.INCOMING_TRANSFER_MANIFESTS]: [
+    ...COMMON_INCOMING_TRANSFER_FIELD_DATA,
+    ...COMMON_TRANSFER_PACKAGE_DATA,
+  ],
+  [ReportType.INCOMING_MANIFEST_INVENTORY]: [
+    {
+      value: "Transfer.ManifestNumber",
+      readableName: "Manifest #",
+      required: true,
+      initiallyChecked: true,
+    },
     {
       value: "Package.PackageLabel",
       readableName: "Package",

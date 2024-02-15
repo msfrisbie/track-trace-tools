@@ -297,6 +297,21 @@ export function reportCatalogFactory(): IReportOption[] {
       isHeadless: false,
     },
     {
+      text: "Incoming Manifest Inventory",
+      value: ReportType.INCOMING_MANIFEST_INVENTORY,
+      enabled: !!store.state.client.values.ENABLE_INCOMING_MANIFEST_INVENTORY,
+      visible: !!store.state.client.values.ENABLE_INCOMING_MANIFEST_INVENTORY,
+      description: "Generate summary of incoming manifests for inventory checks",
+      usesFieldTransformer: true,
+      usesFormulas: false,
+      isMultiSheet: false,
+      isCustom: true,
+      isSpecialty: false,
+      isCatalog: false,
+      isQuickview: false,
+      isHeadless: false,
+    },
+    {
       text: "Packages Quickview",
       value: ReportType.PACKAGES_QUICKVIEW,
       enabled: hasPlus,
@@ -431,6 +446,8 @@ export function extractNestedData({
     case ReportType.OUTGOING_TRANSFERS:
       return reportData[reportType]!.outgoingTransfers!;
     case ReportType.INCOMING_TRANSFER_MANIFESTS:
+      return reportData[reportType]!.richIncomingTransfers!;
+    case ReportType.INCOMING_MANIFEST_INVENTORY:
       return reportData[reportType]!.richIncomingTransfers!;
     case ReportType.OUTGOING_TRANSFER_MANIFESTS:
       return reportData[reportType]!.richOutgoingTransfers!;
@@ -659,6 +676,7 @@ export function extractFlattenedData({
 
         return flattenedTransferHubTransfers;
       case ReportType.INCOMING_TRANSFER_MANIFESTS:
+      case ReportType.INCOMING_MANIFEST_INVENTORY:
         const flattenedIncomingPackages: {
           Package: IIndexedDestinationPackageData;
           Transfer: ITransferData;
@@ -815,6 +833,9 @@ export function getSheetTitle({
       break;
     case ReportType.INCOMING_TRANSFER_MANIFESTS:
       title = SheetTitles.INCOMING_TRANSFER_MANIFESTS;
+      break;
+    case ReportType.INCOMING_MANIFEST_INVENTORY:
+      title = SheetTitles.INCOMING_MANIFEST_INVENTORY;
       break;
     case ReportType.OUTGOING_TRANSFER_MANIFESTS:
       title = SheetTitles.OUTGOING_TRANSFER_MANIFESTS;

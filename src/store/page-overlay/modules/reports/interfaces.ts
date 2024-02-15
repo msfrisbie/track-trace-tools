@@ -153,6 +153,10 @@ export interface IReportConfig {
     transferFilter: ITransferFilter;
     fields: IFieldData[];
   };
+  [ReportType.INCOMING_MANIFEST_INVENTORY]?: {
+    transferFilter: ITransferFilter;
+    fields: IFieldData[];
+  };
   [ReportType.INCOMING_TRANSFER_MANIFESTS]?: {
     transferFilter: ITransferFilter;
     fields: IFieldData[];
@@ -259,6 +263,9 @@ export interface IReportData {
   [ReportType.INCOMING_TRANSFER_MANIFESTS]?: {
     richIncomingTransfers?: IIndexedRichIncomingTransferData[];
   };
+  [ReportType.INCOMING_MANIFEST_INVENTORY]?: {
+    richIncomingTransfers?: IIndexedRichIncomingTransferData[];
+  },
   [ReportType.OUTGOING_TRANSFER_MANIFESTS]?: {
     richOutgoingTransfers?: IIndexedRichOutgoingTransferData[];
   };

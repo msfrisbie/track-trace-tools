@@ -13,6 +13,7 @@ import { maybeLoadHarvestPackagesReportData } from "@/utils/reports/harvest-pack
 import { maybeLoadHarvestsReportData } from "@/utils/reports/harvests-report";
 import { maybeLoadImmaturePlantsQuickviewReportData } from "@/utils/reports/immature-plants-quickview-report";
 import { maybeLoadImmaturePlantsReportData } from "@/utils/reports/immature-plants-report";
+import { maybeLoadIncomingManifestInventoryReportData } from "@/utils/reports/incoming-manifest-inventory";
 import { maybeLoadIncomingTransferManifestsReportData } from "@/utils/reports/incoming-transfer-manifests-report";
 import { maybeLoadIncomingTransfersReportData } from "@/utils/reports/incoming-transfers-report";
 import { maybeLoadMaturePlantsQuickviewReportData } from "@/utils/reports/mature-plants-quickview-report";
@@ -164,6 +165,7 @@ export const reportsModule = {
         await maybeLoadOutgoingTransfersReportData({ ctx, reportData, reportConfig });
         await maybeLoadTransferHubTransfersReportData({ ctx, reportData, reportConfig });
         await maybeLoadIncomingTransferManifestsReportData({ ctx, reportData, reportConfig });
+        await maybeLoadIncomingManifestInventoryReportData({ ctx, reportData, reportConfig });
         await maybeLoadOutgoingTransferManifestsReportData({ ctx, reportData, reportConfig });
         await maybeLoadEmployeeSamplesReportData({ ctx, reportData, reportConfig });
         await maybeLoadHarvestPackagesReportData({ ctx, reportData, reportConfig });

@@ -320,6 +320,91 @@
           </div>
         </template>
 
+        <!-- Incoming Manifest Inventory -->
+        <template
+          v-if="
+            selectedReports.find(
+              (report) => report.value === ReportType.INCOMING_MANIFEST_INVENTORY
+            )
+          "
+        >
+          <div
+            class="overflow-visible rounded border border-gray-300 p-2 flex flex-col items-stretch gap-2"
+          >
+            <div class="font-semibold text-white ttt-purple-bg p-2 -m-2">
+              Incoming Manifest Inventory
+            </div>
+            <hr />
+            <div class="flex flex-col items-stretch gap-4">
+              <div class="flex flex-col items-start gap-1">
+                <b-form-checkbox
+                  v-model="incomingManifestInventoryFormFilters.shouldFilterEstimatedArrivalDateGt"
+                >
+                  <span class="leading-6">ETA on or after:</span>
+                </b-form-checkbox>
+                <b-form-datepicker
+                  v-if="incomingManifestInventoryFormFilters.shouldFilterEstimatedArrivalDateGt"
+                  :disabled="
+                    !incomingManifestInventoryFormFilters.shouldFilterEstimatedArrivalDateGt
+                  "
+                  initial-date
+                  size="sm"
+                  v-model="incomingManifestInventoryFormFilters.estimatedArrivalDateGt"
+                />
+              </div>
+
+              <div class="flex flex-col items-start gap-1">
+                <b-form-checkbox
+                  v-model="incomingManifestInventoryFormFilters.shouldFilterEstimatedArrivalDateLt"
+                >
+                  <span class="leading-6">ETA on or before:</span>
+                </b-form-checkbox>
+                <b-form-datepicker
+                  v-if="incomingManifestInventoryFormFilters.shouldFilterEstimatedArrivalDateLt"
+                  :disabled="
+                    !incomingManifestInventoryFormFilters.shouldFilterEstimatedArrivalDateLt
+                  "
+                  initial-date
+                  size="sm"
+                  v-model="incomingManifestInventoryFormFilters.estimatedArrivalDateLt"
+                />
+              </div>
+
+              <hr />
+
+              <div class="font-semibold text-gray-700">Columns:</div>
+
+              <b-form-checkbox-group
+                v-model="fields[ReportType.INCOMING_MANIFEST_INVENTORY]"
+                class="flex flex-col items-start gap-1"
+              >
+                <b-form-checkbox
+                  v-for="fieldData of SHEET_FIELDS[ReportType.INCOMING_MANIFEST_INVENTORY]"
+                  v-bind:key="fieldData.value"
+                  :value="fieldData"
+                  :disabled="fieldData.required"
+                >
+                  <span class="leading-6">{{ fieldData.readableName }}</span>
+                </b-form-checkbox>
+              </b-form-checkbox-group>
+              <div class="grid grid-cols-2 gap-2">
+                <b-button
+                  variant="outline-dark"
+                  size="sm"
+                  @click="checkAll(ReportType.INCOMING_MANIFEST_INVENTORY)"
+                  >CHECK ALL</b-button
+                >
+                <b-button
+                  variant="outline-dark"
+                  size="sm"
+                  @click="uncheckAll(ReportType.INCOMING_MANIFEST_INVENTORY)"
+                  >UNCHECK ALL</b-button
+                >
+              </div>
+            </div>
+          </div>
+        </template>
+
         <!-- Point In Time Inventory -->
         <template
           v-if="
@@ -1709,7 +1794,7 @@
             >EMAIL XLSX TO {{ settingsState.email }}</b-button
           >
 
-          <template v-if="!settingsState.email.length && hasT3plus">
+          <template v-if="!settingsState.email.length">
             <div class="text-xs">
               Enter your email in
               <a
@@ -1830,90 +1915,91 @@ import store from "@/store/page-overlay/index";
 import { ClientGetters } from "@/store/page-overlay/modules/client/consts";
 import { OAuthState, PluginAuthActions } from "@/store/page-overlay/modules/plugin-auth/consts";
 import {
-  ReportAuxTask,
-  ReportStatus,
-  ReportType,
-  ReportsActions,
-  SHEET_FIELDS,
+ReportAuxTask,
+ReportStatus,
+ReportType,
+ReportsActions,
+SHEET_FIELDS,
 } from "@/store/page-overlay/modules/reports/consts";
 import { IReportConfig, IReportOption } from "@/store/page-overlay/modules/reports/interfaces";
 import { getIsoDateFromOffset } from "@/utils/date";
 import { addCogsReport, cogsFormFiltersFactory } from "@/utils/reports/cogs-report";
 import {
-  addCogsTrackerReport,
-  cogsTrackerFormFiltersFactory,
+addCogsTrackerReport,
+cogsTrackerFormFiltersFactory,
 } from "@/utils/reports/cogs-tracker-report";
 import {
-  addCogsV2Report,
-  cogsV2FormFiltersFactory,
-  getCogsV2CacheKey,
+addCogsV2Report,
+cogsV2FormFiltersFactory,
+getCogsV2CacheKey,
 } from "@/utils/reports/cogs-v2-report";
 import {
-  addEmployeeAuditReport,
-  employeeAuditFormFiltersFactory,
+addEmployeeAuditReport,
+employeeAuditFormFiltersFactory,
 } from "@/utils/reports/employee-audit-report";
 import {
-  addEmployeeSamplesReport,
-  employeeSamplesFormFiltersFactory,
+addEmployeeSamplesReport,
+employeeSamplesFormFiltersFactory,
 } from "@/utils/reports/employee-samples-report";
 import {
-  addHarvestPackagesReport,
-  harvestPackagesFormFiltersFactory,
+addHarvestPackagesReport,
+harvestPackagesFormFiltersFactory,
 } from "@/utils/reports/harvest-packages-report";
 import { addHarvestsReport, harvestsFormFiltersFactory } from "@/utils/reports/harvests-report";
 import {
-  IMMATURE_PLANT_QUICKVIEW_DIMENSIONS,
-  addImmaturePlantsQuickviewReport,
-  immaturePlantsQuickviewFormFiltersFactory,
+IMMATURE_PLANT_QUICKVIEW_DIMENSIONS,
+addImmaturePlantsQuickviewReport,
+immaturePlantsQuickviewFormFiltersFactory,
 } from "@/utils/reports/immature-plants-quickview-report";
 import {
-  addImmaturePlantsReport,
-  immaturePlantsFormFiltersFactory,
+addImmaturePlantsReport,
+immaturePlantsFormFiltersFactory,
 } from "@/utils/reports/immature-plants-report";
+import { addIncomingManifestInventoryReport, incomingManifestInventoryFormFiltersFactory } from "@/utils/reports/incoming-manifest-inventory";
 import {
-  addIncomingTransferManifestsReport,
-  incomingTransferManifestsFormFiltersFactory,
+addIncomingTransferManifestsReport,
+incomingTransferManifestsFormFiltersFactory,
 } from "@/utils/reports/incoming-transfer-manifests-report";
 import {
-  addIncomingTransfersReport,
-  incomingTransfersFormFiltersFactory,
+addIncomingTransfersReport,
+incomingTransfersFormFiltersFactory,
 } from "@/utils/reports/incoming-transfers-report";
 import {
-  MATURE_PLANT_QUICKVIEW_DIMENSIONS,
-  addMaturePlantsQuickviewReport,
-  maturePlantsQuickviewFormFiltersFactory,
+MATURE_PLANT_QUICKVIEW_DIMENSIONS,
+addMaturePlantsQuickviewReport,
+maturePlantsQuickviewFormFiltersFactory,
 } from "@/utils/reports/mature-plants-quickview-report";
 import {
-  addMaturePlantsReport,
-  maturePlantsFormFiltersFactory,
+addMaturePlantsReport,
+maturePlantsFormFiltersFactory,
 } from "@/utils/reports/mature-plants-report";
 import {
-  addOutgoingTransferManifestsReport,
-  outgoingTransferManifestsFormFiltersFactory,
+addOutgoingTransferManifestsReport,
+outgoingTransferManifestsFormFiltersFactory,
 } from "@/utils/reports/outgoing-transfer-manifests-report";
 import {
-  addOutgoingTransfersReport,
-  outgoingTransfersFormFiltersFactory,
+addOutgoingTransfersReport,
+outgoingTransfersFormFiltersFactory,
 } from "@/utils/reports/outgoing-transfers-report";
 import { addPackageReport, packageFormFiltersFactory } from "@/utils/reports/package-report";
 import {
-  PACKAGES_QUICKVIEW_DIMENSIONS,
-  addPackagesQuickviewReport,
-  packagesQuickviewFormFiltersFactory,
+PACKAGES_QUICKVIEW_DIMENSIONS,
+addPackagesQuickviewReport,
+packagesQuickviewFormFiltersFactory,
 } from "@/utils/reports/packages-quickview-report";
 import {
-  addPointInTimeInventoryReport,
-  pointInTimeInventoryFormFiltersFactory,
+addPointInTimeInventoryReport,
+pointInTimeInventoryFormFiltersFactory,
 } from "@/utils/reports/point-in-time-inventory-report";
 import { reportCatalogFactory } from "@/utils/reports/reports-shared";
 import {
-  addStragglerPackagesReport,
-  stragglerPackagesFormFiltersFactory,
+addStragglerPackagesReport,
+stragglerPackagesFormFiltersFactory,
 } from "@/utils/reports/straggler-package-report";
 import { addTagsReport, tagsFormFiltersFactory } from "@/utils/reports/tags-report";
 import {
-  addTransferHubTransfersReport,
-  transferHubTransfersFormFiltersFactory,
+addTransferHubTransfersReport,
+transferHubTransfersFormFiltersFactory,
 } from "@/utils/reports/transfer-hub-transfers-report";
 import _ from "lodash-es";
 import Vue from "vue";
@@ -2010,6 +2096,7 @@ export default Vue.extend({
       outgoingTransfersFormFilters: outgoingTransfersFormFiltersFactory(),
       transferHubTransfersFormFilters: transferHubTransfersFormFiltersFactory(),
       incomingTransferManifestsFormFilters: incomingTransferManifestsFormFiltersFactory(),
+      incomingManifestInventoryFormFilters: incomingManifestInventoryFormFiltersFactory(),
       outgoingTransferManifestsFormFilters: outgoingTransferManifestsFormFiltersFactory(),
       pointInTimeInventoryFormFilters: pointInTimeInventoryFormFiltersFactory(),
       // transferHubTransferManifestsFormFilters: transferHubTransferManifestsFormFiltersFactory(),
@@ -2273,6 +2360,18 @@ export default Vue.extend({
 
       if (
         this.selectedReports.find(
+          (report: IReportOption) => report.value === ReportType.INCOMING_MANIFEST_INVENTORY
+        )
+      ) {
+        addIncomingManifestInventoryReport({
+          reportConfig,
+          incomingManifestInventoryFormFilters: this.incomingManifestInventoryFormFilters,
+          fields: this.fields[ReportType.INCOMING_MANIFEST_INVENTORY],
+        });
+      }
+
+      if (
+        this.selectedReports.find(
           (report: IReportOption) => report.value === ReportType.OUTGOING_TRANSFER_MANIFESTS
         )
       ) {
@@ -2367,6 +2466,3 @@ export default Vue.extend({
 </script>
 
 <style type="text/scss" lang="scss" scoped></style>
-
-function incomingTransferManifestsFormFiltersFactory() { throw new Error("Function not
-implemented."); }

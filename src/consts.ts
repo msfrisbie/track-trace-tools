@@ -523,6 +523,7 @@ export enum SheetTitles {
   OUTGOING_TRANSFERS = "Outgoing Transfers",
   TRANSFER_HUB_TRANSFERS = "Hub Transfers",
   INCOMING_TRANSFER_MANIFESTS = "Incoming Transfer Manifest Packages",
+  INCOMING_MANIFEST_INVENTORY = "Incoming Transfer Manifest Packages",
   OUTGOING_TRANSFER_MANIFESTS = "Outgoing Transfer Manifest Packages",
   TRANSFER_HUB_TRANSFER_MANIFESTS = "Hub Manifest Packages",
   STRAGGLER_PACKAGES = "Straggler Packages",
