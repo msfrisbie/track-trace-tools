@@ -179,7 +179,7 @@ export const reportsModule = {
 
         if (reportConfig.exportFormat === "CSV") {
           await createCsvOrError({ reportData, reportConfig });
-        } else if (reportConfig.exportFormat === "XSLX") {
+        } else if (reportConfig.exportFormat === "XLSX") {
           await createXlsxOrError({ reportData, reportConfig });
         } else {
           const spreadsheet: ISpreadsheet = await createSpreadsheetOrError({
@@ -189,7 +189,14 @@ export const reportsModule = {
 
           ctx.commit(ReportsMutations.SET_GENERATED_SPREADSHEET, { spreadsheet });
 
-          window.open(spreadsheet.spreadsheetUrl, "_blank");
+          switch (reportConfig.fileDeliveryFormat) {
+            case "OPEN_LINK":
+              window.open(spreadsheet.spreadsheetUrl, "_blank");
+              break;
+
+            default:
+              throw new Error(`Invalid file delivery format: ${reportConfig.fileDeliveryFormat}`);
+          }
         }
 
         ctx.commit(ReportsMutations.SET_STATUS, {

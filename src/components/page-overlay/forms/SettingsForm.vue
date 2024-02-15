@@ -735,7 +735,7 @@ export default Vue.extend({
         return null;
       }
 
-      const test = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(this.$data.unsavedEmail);
+      const test = /^\S+@\S+\.\S+$/.test(this.$data.unsavedEmail);
 
       return test;
     },

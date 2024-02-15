@@ -40,6 +40,8 @@ import {
   styleTopRowRequestFactory,
 } from "./sheets";
 /* eslint-disable-next-line */
+import { t3RequestManager } from "@/modules/t3-request-manager.module";
+import { toastManager } from "@/modules/toast-manager.module";
 import { downloadXlsxFile } from "./xlsx";
 
 export async function readSpreadsheet({
@@ -336,7 +338,13 @@ export async function createCsvOrError({
       data,
     };
 
-    downloadCsvFile({ csvFile, delay: 50 });
+    switch (reportConfig.fileDeliveryFormat) {
+      case "DOWNLOAD":
+        downloadCsvFile({ csvFile, delay: 50 });
+        break;
+      default:
+        throw new Error(`Invalid file delivery format: ${reportConfig.fileDeliveryFormat}`);
+    }
   }
 }
 
@@ -397,7 +405,40 @@ export async function createXlsxOrError({
     });
   }
 
-  downloadXlsxFile({ xlsxFile });
+  switch (reportConfig.fileDeliveryFormat) {
+    case "DOWNLOAD":
+      downloadXlsxFile({ xlsxFile });
+      break;
+    case "EMAIL":
+      const response = await t3RequestManager.generateAndEmailReport({
+        xlsxFile,
+        email: store.state.settings.email,
+      });
+
+      if (response.status !== 200) {
+        toastManager.openToast(`Failed to send generated report to ${store.state.settings.email}`, {
+          title: "Report Error",
+          autoHideDelay: 5000,
+          variant: "danger",
+          appendToast: true,
+          toaster: "ttt-toaster",
+          solid: true,
+        });
+      } else {
+        toastManager.openToast(`Successfully sent report to ${store.state.settings.email}`, {
+          title: "Report Success",
+          autoHideDelay: 5000,
+          variant: "success",
+          appendToast: true,
+          toaster: "ttt-toaster",
+          solid: true,
+        });
+      }
+
+      break;
+    default:
+      throw new Error(`Invalid file delivery format: ${reportConfig.fileDeliveryFormat}`);
+  }
 }
 
 export async function createSpreadsheetOrError({

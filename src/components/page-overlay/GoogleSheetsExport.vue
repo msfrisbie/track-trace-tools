@@ -1668,7 +1668,7 @@
           <b-button
             variant="primary"
             size="sm"
-            @click="generateReports('GOOGLE_SHEETS')"
+            @click="generateReports('GOOGLE_SHEETS', 'OPEN_LINK')"
             :disabled="!enableGoogleSheetsGenerateButton"
             >EXPORT TO GOOGLE SHEETS</b-button
           >
@@ -1684,7 +1684,7 @@
           <b-button
             variant="primary"
             size="sm"
-            @click="generateReports('CSV')"
+            @click="generateReports('CSV', 'DOWNLOAD')"
             :disabled="!enableCsvGenerateButton"
             >EXPORT TO CSV</b-button
           >
@@ -1695,13 +1695,35 @@
           <b-button
             variant="primary"
             size="sm"
-            @click="generateReports('XSLX')"
+            @click="generateReports('XLSX', 'DOWNLOAD')"
             :disabled="!enableXlsxGenerateButton"
-            >EXPORT TO XSLX</b-button
+            >EXPORT TO XLSX</b-button
           >
 
+          <b-button
+            v-if="settingsState.email.length"
+            variant="primary"
+            size="sm"
+            @click="generateReports('XLSX', 'EMAIL')"
+            :disabled="!enableXlsxGenerateButton"
+            >EMAIL XLSX TO {{ settingsState.email }}</b-button
+          >
+
+          <template v-if="!settingsState.email.length && hasT3plus">
+            <div class="text-xs">
+              Enter your email in
+              <a
+                class="text-purple-500 hover:text-purple-500 underline"
+                href="#"
+                @click.stop="openRoute('/settings/all')"
+                >Settings</a
+              >
+              to send XSLX reports via email
+            </div>
+          </template>
+
           <template v-if="!enableXlsxGenerateButton && selectedReports.length > 0">
-            <div class="text-xs">The selected report(s) are not XSLX compatible</div>
+            <div class="text-xs">The selected report(s) are not XLSX compatible</div>
           </template>
 
           <template v-if="selectedReports.length === 0">
@@ -1798,10 +1820,11 @@
 <script lang="ts">
 import ReportCheckboxSection from "@/components/overlay-widget/shared/ReportCheckboxSection.vue";
 import ReportLicensePicker from "@/components/overlay-widget/shared/ReportLicensePicker.vue";
-import { MessageType } from "@/consts";
+import { MessageType, ModalAction, ModalType } from "@/consts";
 import { IPluginState } from "@/interfaces";
 import { authManager } from "@/modules/auth-manager.module";
 import { messageBus } from "@/modules/message-bus.module";
+import { modalManager } from "@/modules/modal-manager.module";
 import router from "@/router/index";
 import store from "@/store/page-overlay/index";
 import { ClientGetters } from "@/store/page-overlay/modules/client/consts";
@@ -1913,6 +1936,7 @@ export default Vue.extend({
     ...mapState<IPluginState>({
       authState: (state: IPluginState) => state.pluginAuth.authState,
       oAuthState: (state: IPluginState) => state.pluginAuth.oAuthState,
+      settingsState: (state: IPluginState) => state.settings,
       clientValues: (state: IPluginState) => state.client.values,
       generatedSpreadsheet: (state: IPluginState) => state.reports.generatedSpreadsheet,
       generatedSpreadsheetHistory: (state: IPluginState) =>
@@ -2016,6 +2040,11 @@ export default Vue.extend({
       reset: `reports/${ReportsActions.RESET}`,
       runAuxReportTask: `reports/${ReportsActions.RUN_AUX_REPORT_TASK}`,
     }),
+    openRoute(initialRoute: string) {
+      modalManager.dispatchModalEvent(ModalType.BUILDER, ModalAction.OPEN, {
+        initialRoute,
+      });
+    },
     async updateMasterPbCostSheet() {
       const reportConfig: IReportConfig = {
         authState: await authManager.authStateOrError(),
@@ -2049,11 +2078,13 @@ export default Vue.extend({
       });
     },
     async generateReports(
-      exportFormat: "GOOGLE_SHEETS" | "CSV" | "XSLX" = "GOOGLE_SHEETS"
+      exportFormat: "GOOGLE_SHEETS" | "CSV" | "XLSX" = "GOOGLE_SHEETS",
+      fileDeliveryFormat: "DOWNLOAD" | "EMAIL" | "OPEN_LINK"
     ): Promise<void> {
       const reportConfig: IReportConfig = {
         authState: await authManager.authStateOrError(),
         exportFormat,
+        fileDeliveryFormat,
       };
 
       if (this.selectedReports.find((report: IReportOption) => report.value === ReportType.COGS)) {

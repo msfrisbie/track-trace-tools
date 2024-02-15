@@ -6,7 +6,7 @@ export async function downloadXlsxFile({ xlsxFile }: { xlsxFile: IXlsxFile }) {
   const response = await t3RequestManager.generateAndDownloadReport({ xlsxFile });
 
   if (response.status !== 200) {
-    toastManager.openToast(`Failed to generate XSLX`, {
+    toastManager.openToast(`Failed to generate XLSX`, {
       title: "Report error",
       autoHideDelay: 5000,
       variant: "danger",
