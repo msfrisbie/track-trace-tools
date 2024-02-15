@@ -16,6 +16,7 @@ const FLAGS_PATH = "flags";
 const GOOGLE_MAPS_DIRECTIONS = "metrc/directions";
 const GENERATE_REPORT_PATH = "reports/generate";
 const DOWNLOAD_REPORT_PATH = "reports/download";
+const EMAIL_REPORT_PATH = "reports/email";
 
 const DEFAULT_POST_HEADERS = {
   "Content-Type": "application/json",
@@ -114,6 +115,26 @@ class T3RequestManager implements IAtomicService {
     window.open(`${BASE_URL}${DOWNLOAD_REPORT_PATH}/${response.data.report_id}`, "_blank");
 
     return response;
+  }
+
+  async generateAndEmailReport({ xlsxFile, email }: { xlsxFile: IXlsxFile; email: string }) {
+    const response = await customAxios(BASE_URL + GENERATE_REPORT_PATH, {
+      method: "POST",
+      headers: DEFAULT_POST_HEADERS,
+      body: JSON.stringify(xlsxFile),
+      responseType: "json",
+    });
+
+    const emailResponse = fetch(BASE_URL + EMAIL_REPORT_PATH, {
+      method: "POST",
+      headers: DEFAULT_POST_HEADERS,
+      body: JSON.stringify({
+        email,
+        report_id: response.data.report_id,
+      }),
+    });
+
+    return emailResponse;
   }
 
   async loadAnnouncements(): Promise<IAnnouncementData[]> {

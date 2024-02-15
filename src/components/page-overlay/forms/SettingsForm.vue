@@ -423,7 +423,7 @@
               </b-form-input>
               <b-input-group-append>
                 <b-button
-                  :disabled="!unsavedEmail || emailValidState !== true"
+                  :disabled="!unsavedEmail || emailValidState === false"
                   size="md"
                   @click="saveEmail()"
                   variant="outline-success"
@@ -725,16 +725,19 @@ export default Vue.extend({
     ...mapState<IPluginState>({
       explorer: (state: IPluginState) => state.explorer,
       clientName: (state: IPluginState) => state.client.clientName,
+      settingsState: (state: IPluginState) => state.settings,
     }),
     decryptedClientData() {
       return getMatchingDecryptedDataOrNull(store.state.settings?.licenseKey);
     },
     emailValidState(): boolean | null {
-      if (store.state.settings.email.length === 0) {
+      if (this.$data.unsavedEmail.length === 0) {
         return null;
       }
 
-      return /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(store.state.settings.email);
+      const test = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(this.$data.unsavedEmail);
+
+      return test;
     },
   },
   methods: {
