@@ -7,7 +7,7 @@ import {
   ISheetValues,
   ISpreadsheet,
   IValueRange,
-  IXslxFile,
+  IXlsxFile,
 } from "@/interfaces";
 import { messageBus } from "@/modules/message-bus.module";
 import store from "@/store/page-overlay/index";
@@ -39,7 +39,8 @@ import {
   shrinkFontRequestFactory,
   styleTopRowRequestFactory,
 } from "./sheets";
-import { downloadXslxFile } from "./xslx";
+/* eslint-disable-next-line */
+import { downloadXlsxFile } from "./xlsx";
 
 export async function readSpreadsheet({
   spreadsheetId,
@@ -339,7 +340,7 @@ export async function createCsvOrError({
   }
 }
 
-export async function createXslxOrError({
+export async function createXlsxOrError({
   reportData,
   reportConfig,
 }: {
@@ -358,13 +359,13 @@ export async function createXslxOrError({
     .map((x) => x.value as ReportType)
     .filter((reportType) => shouldGenerateReport({ reportType, reportConfig, reportData }));
 
-  // const filename = getXslxFilename({
+  // const filename = getXlsxFilename({
   //   reportType,
   //   license: store.state.pluginAuth?.authState?.license,
   //   reportConfig,
   // });
 
-  const xslxFile: IXslxFile = {
+  const xlsxFile: IXlsxFile = {
     filename: getSpreadsheetName({
       reportConfig,
     }),
@@ -390,13 +391,13 @@ export async function createXslxOrError({
       data = [fields.map((fieldData) => fieldData.readableName), ...data];
     }
 
-    xslxFile.sheets.push({
+    xlsxFile.sheets.push({
       sheetName,
       data,
     });
   }
 
-  downloadXslxFile({ xslxFile });
+  downloadXlsxFile({ xlsxFile });
 }
 
 export async function createSpreadsheetOrError({

@@ -177,6 +177,21 @@ export function reportCatalogFactory(): IReportOption[] {
       isHeadless: false,
     },
     {
+      text: "Incoming Transfer Manifests",
+      value: ReportType.INCOMING_TRANSFER_MANIFESTS,
+      enabled: hasPlus,
+      visible: true,
+      description: "Full transfer and package data for all incoming transfers.",
+      isCustom: false,
+      usesFormulas: false,
+      isMultiSheet: false,
+      usesFieldTransformer: true,
+      isSpecialty: true,
+      isCatalog: false,
+      isQuickview: false,
+      isHeadless: false,
+    },
+    {
       text: "Outgoing Transfer Manifests",
       value: ReportType.OUTGOING_TRANSFER_MANIFESTS,
       enabled: hasPlus,
@@ -415,6 +430,8 @@ export function extractNestedData({
       return reportData[reportType]!.incomingTransfers!;
     case ReportType.OUTGOING_TRANSFERS:
       return reportData[reportType]!.outgoingTransfers!;
+    case ReportType.INCOMING_TRANSFER_MANIFESTS:
+      return reportData[reportType]!.richIncomingTransfers!;
     case ReportType.OUTGOING_TRANSFER_MANIFESTS:
       return reportData[reportType]!.richOutgoingTransfers!;
     case ReportType.TRANSFER_HUB_TRANSFERS:
@@ -641,6 +658,24 @@ export function extractFlattenedData({
         }
 
         return flattenedTransferHubTransfers;
+      case ReportType.INCOMING_TRANSFER_MANIFESTS:
+        const flattenedIncomingPackages: {
+          Package: IIndexedDestinationPackageData;
+          Transfer: ITransferData;
+        }[] = [];
+
+        for (const transfer of extractNestedData({
+          reportType,
+          reportData,
+        }) as IIndexedRichIncomingTransferData[]) {
+          for (const pkg of transfer.incomingPackages ?? []) {
+            flattenedIncomingPackages.push({
+              Package: pkg,
+              Transfer: transfer,
+            });
+          }
+        }
+        return flattenedIncomingPackages;
       case ReportType.OUTGOING_TRANSFER_MANIFESTS:
         const flattenedOutgoingPackages: {
           Package: IIndexedDestinationPackageData;
@@ -726,11 +761,7 @@ export function getCsvFilename({
   return `${sheetTitle} [Generated ${date}]`;
 }
 
-export function getSpreadsheetName({
-  reportConfig,
-}: {
-  reportConfig: IReportConfig;
-}): string {
+export function getSpreadsheetName({ reportConfig }: { reportConfig: IReportConfig }): string {
   const date = todayIsodate();
 
   return `T3 Metrc Report [Generated ${date}]`;
@@ -781,6 +812,9 @@ export function getSheetTitle({
       break;
     case ReportType.OUTGOING_TRANSFERS:
       title = SheetTitles.OUTGOING_TRANSFERS;
+      break;
+    case ReportType.INCOMING_TRANSFER_MANIFESTS:
+      title = SheetTitles.INCOMING_TRANSFER_MANIFESTS;
       break;
     case ReportType.OUTGOING_TRANSFER_MANIFESTS:
       title = SheetTitles.OUTGOING_TRANSFER_MANIFESTS;

@@ -1152,6 +1152,91 @@
           </div>
         </template>
 
+        <!-- Incoming Transfer Manifests -->
+        <template
+          v-if="
+            selectedReports.find(
+              (report) => report.value === ReportType.INCOMING_TRANSFER_MANIFESTS
+            )
+          "
+        >
+          <div
+            class="overflow-visible rounded border border-gray-300 p-2 flex flex-col items-stretch gap-2"
+          >
+            <div class="font-semibold text-white ttt-purple-bg p-2 -m-2">
+              Incoming Transfer Manifests
+            </div>
+            <hr />
+            <div class="flex flex-col items-stretch gap-4">
+              <div class="flex flex-col items-start gap-1">
+                <b-form-checkbox
+                  v-model="incomingTransferManifestsFormFilters.shouldFilterEstimatedArrivalDateGt"
+                >
+                  <span class="leading-6">ETA on or after:</span>
+                </b-form-checkbox>
+                <b-form-datepicker
+                  v-if="incomingTransferManifestsFormFilters.shouldFilterEstimatedArrivalDateGt"
+                  :disabled="
+                    !incomingTransferManifestsFormFilters.shouldFilterEstimatedArrivalDateGt
+                  "
+                  initial-date
+                  size="sm"
+                  v-model="incomingTransferManifestsFormFilters.estimatedArrivalDateGt"
+                />
+              </div>
+
+              <div class="flex flex-col items-start gap-1">
+                <b-form-checkbox
+                  v-model="incomingTransferManifestsFormFilters.shouldFilterEstimatedArrivalDateLt"
+                >
+                  <span class="leading-6">ETA on or before:</span>
+                </b-form-checkbox>
+                <b-form-datepicker
+                  v-if="incomingTransferManifestsFormFilters.shouldFilterEstimatedArrivalDateLt"
+                  :disabled="
+                    !incomingTransferManifestsFormFilters.shouldFilterEstimatedArrivalDateLt
+                  "
+                  initial-date
+                  size="sm"
+                  v-model="incomingTransferManifestsFormFilters.estimatedArrivalDateLt"
+                />
+              </div>
+
+              <hr />
+
+              <div class="font-semibold text-gray-700">Columns:</div>
+
+              <b-form-checkbox-group
+                v-model="fields[ReportType.INCOMING_TRANSFER_MANIFESTS]"
+                class="flex flex-col items-start gap-1"
+              >
+                <b-form-checkbox
+                  v-for="fieldData of SHEET_FIELDS[ReportType.INCOMING_TRANSFER_MANIFESTS]"
+                  v-bind:key="fieldData.value"
+                  :value="fieldData"
+                  :disabled="fieldData.required"
+                >
+                  <span class="leading-6">{{ fieldData.readableName }}</span>
+                </b-form-checkbox>
+              </b-form-checkbox-group>
+              <div class="grid grid-cols-2 gap-2">
+                <b-button
+                  variant="outline-dark"
+                  size="sm"
+                  @click="checkAll(ReportType.INCOMING_TRANSFER_MANIFESTS)"
+                  >CHECK ALL</b-button
+                >
+                <b-button
+                  variant="outline-dark"
+                  size="sm"
+                  @click="uncheckAll(ReportType.INCOMING_TRANSFER_MANIFESTS)"
+                  >UNCHECK ALL</b-button
+                >
+              </div>
+            </div>
+          </div>
+        </template>
+
         <!-- Straggler Packages -->
         <template
           v-if="selectedReports.find((report) => report.value === ReportType.STRAGGLER_PACKAGES)"
@@ -1611,11 +1696,11 @@
             variant="primary"
             size="sm"
             @click="generateReports('XSLX')"
-            :disabled="!enableXslxGenerateButton"
+            :disabled="!enableXlsxGenerateButton"
             >EXPORT TO XSLX</b-button
           >
 
-          <template v-if="!enableXslxGenerateButton && selectedReports.length > 0">
+          <template v-if="!enableXlsxGenerateButton && selectedReports.length > 0">
             <div class="text-xs">The selected report(s) are not XSLX compatible</div>
           </template>
 
@@ -1763,6 +1848,10 @@ import {
   immaturePlantsFormFiltersFactory,
 } from "@/utils/reports/immature-plants-report";
 import {
+  addIncomingTransferManifestsReport,
+  incomingTransferManifestsFormFiltersFactory,
+} from "@/utils/reports/incoming-transfer-manifests-report";
+import {
   addIncomingTransfersReport,
   incomingTransfersFormFiltersFactory,
 } from "@/utils/reports/incoming-transfers-report";
@@ -1842,7 +1931,7 @@ export default Vue.extend({
           .length === 0
       );
     },
-    enableXslxGenerateButton(): boolean {
+    enableXlsxGenerateButton(): boolean {
       return (
         this.selectedReports.length > 0 &&
         // Multi-sheet is OK, but formulas are not yet supported
@@ -1896,6 +1985,7 @@ export default Vue.extend({
       incomingTransfersFormFilters: incomingTransfersFormFiltersFactory(),
       outgoingTransfersFormFilters: outgoingTransfersFormFiltersFactory(),
       transferHubTransfersFormFilters: transferHubTransfersFormFiltersFactory(),
+      incomingTransferManifestsFormFilters: incomingTransferManifestsFormFiltersFactory(),
       outgoingTransferManifestsFormFilters: outgoingTransferManifestsFormFiltersFactory(),
       pointInTimeInventoryFormFilters: pointInTimeInventoryFormFiltersFactory(),
       // transferHubTransferManifestsFormFilters: transferHubTransferManifestsFormFiltersFactory(),
@@ -2140,6 +2230,18 @@ export default Vue.extend({
 
       if (
         this.selectedReports.find(
+          (report: IReportOption) => report.value === ReportType.INCOMING_TRANSFER_MANIFESTS
+        )
+      ) {
+        addIncomingTransferManifestsReport({
+          reportConfig,
+          incomingTransferManifestsFormFilters: this.incomingTransferManifestsFormFilters,
+          fields: this.fields[ReportType.INCOMING_TRANSFER_MANIFESTS],
+        });
+      }
+
+      if (
+        this.selectedReports.find(
           (report: IReportOption) => report.value === ReportType.OUTGOING_TRANSFER_MANIFESTS
         )
       ) {
@@ -2234,3 +2336,6 @@ export default Vue.extend({
 </script>
 
 <style type="text/scss" lang="scss" scoped></style>
+
+function incomingTransferManifestsFormFiltersFactory() { throw new Error("Function not
+implemented."); }

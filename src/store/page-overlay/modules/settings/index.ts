@@ -70,6 +70,7 @@ const persistedState: ISettingsState = {
   loadDataInParallel: true,
   usePersistedCache: false,
   persistTimestamp: 0,
+  email: ""
 };
 
 const defaultState: ISettingsState = {

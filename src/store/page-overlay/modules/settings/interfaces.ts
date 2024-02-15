@@ -61,4 +61,5 @@ export interface ISettingsState {
   loadDataInParallel: boolean;
   usePersistedCache: boolean;
   persistTimestamp: number;
+  email: string;
 }

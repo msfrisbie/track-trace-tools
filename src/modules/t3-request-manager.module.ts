@@ -1,4 +1,4 @@
-import { IAtomicService, IXslxFile } from "@/interfaces";
+import { IAtomicService, IXlsxFile } from "@/interfaces";
 import { IAnnouncementData } from "@/store/page-overlay/modules/announcements/interfaces";
 import { AxiosError } from "axios";
 import { authManager } from "./auth-manager.module";
@@ -103,11 +103,11 @@ class T3RequestManager implements IAtomicService {
     return response.data;
   }
 
-  async generateAndDownloadReport({ xslxFile }: { xslxFile: IXslxFile }) {
+  async generateAndDownloadReport({ xlsxFile }: { xlsxFile: IXlsxFile }) {
     const response = await customAxios(BASE_URL + GENERATE_REPORT_PATH, {
       method: "POST",
       headers: DEFAULT_POST_HEADERS,
-      body: JSON.stringify(xslxFile),
+      body: JSON.stringify(xlsxFile),
       responseType: "json",
     });
 

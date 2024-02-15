@@ -30,6 +30,7 @@ export enum ReportType {
   INCOMING_TRANSFERS = "INCOMING_TRANSFERS",
   OUTGOING_TRANSFERS = "OUTGOING_TRANSFERS",
   TRANSFER_HUB_TRANSFERS = "TRANSFER_HUB_TRANSFERS",
+  INCOMING_TRANSFER_MANIFESTS = "INCOMING_TRANSFER_MANIFESTS",
   OUTGOING_TRANSFER_MANIFESTS = "OUTGOING_TRANSFER_MANIFESTS",
   TRANSFER_HUB_TRANSFER_MANIFESTS = "TRANSFER_HUB_TRANSFER_MANIFESTS",
   MATURE_PLANTS = "MATURE_PLANTS",
@@ -476,8 +477,10 @@ const COMMON_HARVEST_FIELD_DATA: IFieldData[] = [
     required: false,
     initiallyChecked: true,
     customTransformer(row: IIndexedHarvestData) {
-      return `${Math.round(((100 * row.CurrentWeight) / row.TotalWetWeight + Number.EPSILON) * 100) / 100}%`;
-    }
+      return `${
+        Math.round(((100 * row.CurrentWeight) / row.TotalWetWeight + Number.EPSILON) * 100) / 100
+      }%`;
+    },
   },
   {
     value: "TotalPackagedWeight",
@@ -491,8 +494,11 @@ const COMMON_HARVEST_FIELD_DATA: IFieldData[] = [
     required: false,
     initiallyChecked: false,
     customTransformer(row: IIndexedHarvestData) {
-      return `${Math.round(((100 * row.TotalPackagedWeight) / row.TotalWetWeight + Number.EPSILON) * 100) / 100}%`;
-    }
+      return `${
+        Math.round(((100 * row.TotalPackagedWeight) / row.TotalWetWeight + Number.EPSILON) * 100) /
+        100
+      }%`;
+    },
   },
   {
     value: "TotalWasteWeight",
@@ -506,8 +512,10 @@ const COMMON_HARVEST_FIELD_DATA: IFieldData[] = [
     required: false,
     initiallyChecked: false,
     customTransformer(row: IIndexedHarvestData) {
-      return `${Math.round(((100 * row.TotalWasteWeight) / row.TotalWetWeight + Number.EPSILON) * 100) / 100}%`;
-    }
+      return `${
+        Math.round(((100 * row.TotalWasteWeight) / row.TotalWetWeight + Number.EPSILON) * 100) / 100
+      }%`;
+    },
   },
   {
     value: "TotalRestoredWeight",
@@ -521,8 +529,11 @@ const COMMON_HARVEST_FIELD_DATA: IFieldData[] = [
     required: false,
     initiallyChecked: false,
     customTransformer(row: IIndexedHarvestData) {
-      return `${Math.round(((100 * row.TotalRestoredWeight) / row.TotalWetWeight + Number.EPSILON) * 100) / 100}%`;
-    }
+      return `${
+        Math.round(((100 * row.TotalRestoredWeight) / row.TotalWetWeight + Number.EPSILON) * 100) /
+        100
+      }%`;
+    },
   },
   {
     value: "HarvestStartDate",
@@ -568,7 +579,7 @@ const COMMON_HARVEST_FIELD_DATA: IFieldData[] = [
   },
 ];
 
-const COMMON_OUTGOING_TRANSFER_PACKAGE_DATA: IFieldData[] = [
+const COMMON_TRANSFER_PACKAGE_DATA: IFieldData[] = [
   ...COMMON_FIELD_DATA,
   {
     value: "Package.PackageLabel",
@@ -659,14 +670,109 @@ export const SHEET_FIELDS: { [key: string]: IFieldData[] } = {
   [ReportType.INCOMING_TRANSFERS]: [...COMMON_INCOMING_TRANSFER_FIELD_DATA],
   [ReportType.OUTGOING_TRANSFERS]: [...COMMON_OUTGOING_TRANSFER_FIELD_DATA],
   [ReportType.TRANSFER_HUB_TRANSFERS]: [...COMMON_OUTGOING_TRANSFER_FIELD_DATA],
+  [ReportType.INCOMING_TRANSFER_MANIFESTS]: [
+    {
+      value: "Package.PackageLabel",
+      readableName: "Package",
+      required: true,
+      initiallyChecked: true,
+    },
+    {
+      value: "Package.SourceHarvestNames",
+      readableName: "Source Harvest(s)",
+      required: false,
+      initiallyChecked: true,
+    },
+    {
+      value: "Package.SourcePackageLabels",
+      readableName: "Source Package(s)",
+      required: false,
+      initiallyChecked: true,
+    },
+    {
+      value: "Package.ProductName",
+      readableName: "Item",
+      required: false,
+      initiallyChecked: true,
+    },
+    {
+      value: "Package.ProductCategoryName",
+      readableName: "Category",
+      required: false,
+      initiallyChecked: true,
+    },
+    {
+      value: "Package.ItemStrainName",
+      readableName: "Item Strain",
+      required: false,
+      initiallyChecked: true,
+    },
+    {
+      value: "Package.LabTestingStateName",
+      readableName: "Transfer Lab Testing State",
+      required: false,
+      initiallyChecked: true,
+    },
+    {
+      value: "Package.ShippedQuantity",
+      readableName: "Shipped Quantity",
+      required: false,
+      initiallyChecked: true,
+    },
+    {
+      value: "Package.GrossWeight",
+      readableName: "Gross Weight",
+      required: false,
+      initiallyChecked: true,
+    },
+    {
+      value: "Package.ShipperWholesalePrice",
+      readableName: "Shipper Wholesale Price",
+      required: false,
+      initiallyChecked: true,
+    },
+    {
+      value: "Package.ReceivedQuantity",
+      readableName: "Received Quantity",
+      required: false,
+      initiallyChecked: true,
+    },
+    {
+      value: "Package.ReceiverWholesalePrice",
+      readableName: "Receiver Wholesale Price",
+      required: false,
+      initiallyChecked: true,
+    },
+    {
+      value: "Package.ShipmentPackageState",
+      readableName: "Status",
+      required: false,
+      initiallyChecked: true,
+    },
+    {
+      value: "UnitWeight",
+      readableName: "Unit Weight",
+      required: false,
+      initiallyChecked: true,
+      customTransformer(row) {
+        const match = row.Package.ProductName.match(/(\d+(?:\.\d+)?)(?:\s?)(g|mg)/);
+
+        if (match) {
+          return `${match[1]} ${match[2]}`;
+        }
+
+        return "";
+      },
+    },
+  ],
   [ReportType.OUTGOING_TRANSFER_MANIFESTS]: [
     ...COMMON_OUTGOING_TRANSFER_FIELD_DATA.slice(0, 5),
-    ...COMMON_OUTGOING_TRANSFER_PACKAGE_DATA.slice(1),
+    ...COMMON_TRANSFER_PACKAGE_DATA.slice(1),
     ...COMMON_OUTGOING_TRANSFER_FIELD_DATA.slice(5),
   ],
   [ReportType.TRANSFER_HUB_TRANSFER_MANIFESTS]: [
     ...COMMON_OUTGOING_TRANSFER_FIELD_DATA.slice(0, 5),
-    ...COMMON_OUTGOING_TRANSFER_PACKAGE_DATA.slice(1),
+    ...COMMON_TRANSFER_PACKAGE_DATA.slice(1),
     ...COMMON_OUTGOING_TRANSFER_FIELD_DATA.slice(5),
   ],
 };

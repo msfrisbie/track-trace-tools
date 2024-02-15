@@ -1,26 +1,29 @@
 import {
-  IAuthState, IHarvestFilter,
+  IAuthState,
+  IHarvestFilter,
   IIndexedHarvestData,
   IIndexedPackageData,
   IIndexedPlantBatchData,
   IIndexedPlantData,
   IIndexedRichIncomingTransferData,
   IIndexedRichOutgoingTransferData,
-  IIndexedTagData, IPackageFilter,
+  IIndexedTagData,
+  IPackageFilter,
   IPlantBatchFilter,
-  IPlantFilter, ISimpleSpreadsheet,
+  IPlantFilter,
+  ISimpleSpreadsheet,
   ISpreadsheet,
   ITagFilter,
-  ITransferFilter
-} from '@/interfaces';
-import { ImmaturePlantQuickviewDimension } from '@/utils/reports/immature-plants-quickview-report';
-import { MaturePlantQuickviewDimension } from '@/utils/reports/mature-plants-quickview-report';
-import { PackageQuickviewDimension } from '@/utils/reports/packages-quickview-report';
+  ITransferFilter,
+} from "@/interfaces";
+import { ImmaturePlantQuickviewDimension } from "@/utils/reports/immature-plants-quickview-report";
+import { MaturePlantQuickviewDimension } from "@/utils/reports/mature-plants-quickview-report";
+import { PackageQuickviewDimension } from "@/utils/reports/packages-quickview-report";
 import {
+  IPackageDateMetadata,
   InventoryStrategy,
-  IPackageDateMetadata
-} from '@/utils/reports/point-in-time-inventory-report';
-import { IStatusMessage, ReportStatus, ReportType } from './consts';
+} from "@/utils/reports/point-in-time-inventory-report";
+import { IStatusMessage, ReportStatus, ReportType } from "./consts";
 
 export interface IReportsState {
   status: ReportStatus;
@@ -45,7 +48,7 @@ export interface IReportsState {
 
 export interface IReportConfig {
   authState: IAuthState;
-  exportFormat?: 'CSV' | 'GOOGLE_SHEETS' | 'XSLX';
+  exportFormat?: "CSV" | "GOOGLE_SHEETS" | "XSLX";
   [ReportType.TEST]?: {
     exampleFilter: any;
     fields: IFieldData[];
@@ -118,7 +121,7 @@ export interface IReportConfig {
   [ReportType.SINGLE_TRANSFER]?: {
     manifestNumber: string;
     fields: null;
-  },
+  };
   [ReportType.PACKAGES_QUICKVIEW]?: {
     packageFilter: IPackageFilter;
     primaryDimension: PackageQuickviewDimension;
@@ -146,6 +149,10 @@ export interface IReportConfig {
     fields: IFieldData[];
   };
   [ReportType.OUTGOING_TRANSFERS]?: {
+    transferFilter: ITransferFilter;
+    fields: IFieldData[];
+  };
+  [ReportType.INCOMING_TRANSFER_MANIFESTS]?: {
     transferFilter: ITransferFilter;
     fields: IFieldData[];
   };
@@ -248,6 +255,9 @@ export interface IReportData {
   [ReportType.TRANSFER_HUB_TRANSFERS]?: {
     transferHubTransfers: IIndexedRichOutgoingTransferData[];
   };
+  [ReportType.INCOMING_TRANSFER_MANIFESTS]?: {
+    richIncomingTransfers?: IIndexedRichIncomingTransferData[];
+  };
   [ReportType.OUTGOING_TRANSFER_MANIFESTS]?: {
     richOutgoingTransfers?: IIndexedRichOutgoingTransferData[];
   };
@@ -256,7 +266,7 @@ export interface IReportData {
   };
   [ReportType.SINGLE_TRANSFER]?: {
     singleTransferMatrix: any[][];
-  }
+  };
 }
 
 export interface IFieldData {
@@ -265,7 +275,7 @@ export interface IFieldData {
   required: boolean;
   initiallyChecked: boolean;
   checkedMessage?: string;
-  customTransformer?: (row: any) => any
+  customTransformer?: (row: any) => any;
 }
 
 export interface ICogsArchive {

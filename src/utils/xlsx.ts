@@ -1,9 +1,9 @@
-import { IXslxFile } from "@/interfaces";
+import { IXlsxFile } from "@/interfaces";
 import { t3RequestManager } from "@/modules/t3-request-manager.module";
 import { toastManager } from "@/modules/toast-manager.module";
 
-export async function downloadXslxFile({ xslxFile }: { xslxFile: IXslxFile }) {
-  const response = await t3RequestManager.generateAndDownloadReport({ xslxFile });
+export async function downloadXlsxFile({ xlsxFile }: { xlsxFile: IXlsxFile }) {
+  const response = await t3RequestManager.generateAndDownloadReport({ xlsxFile });
 
   if (response.status !== 200) {
     toastManager.openToast(`Failed to generate XSLX`, {
