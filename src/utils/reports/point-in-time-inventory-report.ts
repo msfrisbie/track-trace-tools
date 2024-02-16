@@ -512,7 +512,7 @@ export function extractPointInTimeInventoryData({
 }): any[][] {
   const matrix: any[][] = [];
 
-  const headers = ["License", "Tag", "Item", "Quantity (estimated)", "Unit of Measure", "Note"];
+  const headers = ["Current License", "Tag", "Item", "Quantity (estimated)", "Unit of Measure", "Note"];
 
   if (reportConfig[ReportType.POINT_IN_TIME_INVENTORY]!.showDebugColumns) {
     headers.push(

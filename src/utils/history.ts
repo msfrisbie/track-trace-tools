@@ -253,8 +253,6 @@ export function extractInitialPackageQuantityAndUnitFromHistoryOrError(
     }
   }
 
-  debugger;
-
   throw new Error("Could not locate initial quantity");
 }
 
