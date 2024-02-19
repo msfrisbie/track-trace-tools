@@ -5797,10 +5797,10 @@ evp_bytestokey@^1.0.0, evp_bytestokey@^1.0.3:
     md5.js "^1.3.4"
     safe-buffer "^5.1.1"
 
-exboost-js@^1.9.0:
-  version "1.9.0"
-  resolved "https://registry.yarnpkg.com/exboost-js/-/exboost-js-1.9.0.tgz#3ecf6b90df2e77b95c00421bff9c6d46cce3571a"
-  integrity sha512-+MikRIgYWKWWrG25ivZ7Wm0YTyvFeAYhU69pOEr6L12poWERM4uoUgG5DTr8xAdYkRn3zX6OS6PhYGv5OwGgyw==
+exboost-js@^1.10.0:
+  version "1.10.0"
+  resolved "https://registry.yarnpkg.com/exboost-js/-/exboost-js-1.10.0.tgz#1c568f38b6530c96a14a6642088edbdb3a2fd2f0"
+  integrity sha512-gRNEC3FeJPuOHI9XyMa6TUsvuFQMZTc8KQa3TyWrmf0NlFGXrGxVA7/iIqJCep+pCUHQUekDOuJA3YbJAj7SRQ==
 
 exec-sh@^0.3.2:
   version "0.3.6"

@@ -77,17 +77,20 @@
         </div>
       </div>
     </div>
+
+    <div class="exboost-slot"></div>
   </div>
 </template>
 
 <script lang="ts">
-import router from '@/router/index';
-import store from '@/store/page-overlay/index';
-import Vue from 'vue';
-import { mapState } from 'vuex';
+import router from "@/router/index";
+import store from "@/store/page-overlay/index";
+import ExBoost from "exboost-js";
+import Vue from "vue";
+import { mapState } from "vuex";
 
 export default Vue.extend({
-  name: 'Faq',
+  name: "Faq",
   store,
   router,
   props: {},
@@ -97,18 +100,25 @@ export default Vue.extend({
   },
   data() {
     return {
-      webStoreUrl: 'https://chrome.google.com/webstore/detail/dfljickgkbfaoiifheibjpejloipegcb',
-      githubUrl: 'https://github.com/msfrisbie/track-trace-tools',
-      githubReleasesUrl: 'https://github.com/msfrisbie/track-trace-tools/releases',
-      forumUrl: 'https://track-trace-tools.talkyard.net/latest',
-      email: 'mailto:matt@trackandtrace.tools',
-      mitLicenseUrl: 'https://github.com/msfrisbie/track-trace-tools/blob/master/LICENSE.md',
-      gplLicenseUrl: 'https://www.gnu.org/licenses/gpl-3.0.txt',
+      webStoreUrl: "https://chrome.google.com/webstore/detail/dfljickgkbfaoiifheibjpejloipegcb",
+      githubUrl: "https://github.com/msfrisbie/track-trace-tools",
+      githubReleasesUrl: "https://github.com/msfrisbie/track-trace-tools/releases",
+      forumUrl: "https://track-trace-tools.talkyard.net/latest",
+      email: "mailto:matt@trackandtrace.tools",
+      mitLicenseUrl: "https://github.com/msfrisbie/track-trace-tools/blob/master/LICENSE.md",
+      gplLicenseUrl: "https://www.gnu.org/licenses/gpl-3.0.txt",
     };
   },
   methods: {},
   async created() {},
-  async mounted() {},
+  async mounted() {
+    ExBoost.renderSlotDataOrError({
+      exboostSlotId: "t3-options",
+      target: document.querySelector(".exboost-slot"),
+      containerClass: "flex flex-col gap-2 text-center my-8",
+      linkClass: "underline",
+    });
+  },
 });
 </script>
 

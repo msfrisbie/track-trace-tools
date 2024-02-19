@@ -584,7 +584,7 @@
         ></b-form-select>
       </div>
     </b-form>
-    <iframe data-exboost-slot="settings-footer"></iframe>
+    <div class="exboost-slot"></div>
   </div>
 </template>
 
@@ -838,7 +838,12 @@ export default Vue.extend({
     },
   },
   async mounted() {
-    ExBoost.init();
+    ExBoost.renderSlotDataOrError({
+      exboostSlotId: "test",
+      target: document.querySelector(".exboost-slot"),
+      containerClass: "flex flex-col gap-2 text-center my-8",
+      linkClass: "underline",
+    });
   },
 });
 </script>
