@@ -36,6 +36,9 @@ export interface IReportsState {
     spreadsheet: ISimpleSpreadsheet;
   }[];
   selectedReports: IReportOption[];
+  fields: {
+    [key: string]: IFieldData[]
+  }
 }
 
 // export interface IPackageCostCalculationData {

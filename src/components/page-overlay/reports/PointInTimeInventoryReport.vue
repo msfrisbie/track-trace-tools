@@ -69,7 +69,6 @@ export default Vue.extend({
   router,
   props: {
     pointInTimeInventoryFormFilters: Object as () => IPointInTimeInventoryReportFormFilters,
-    fields: Object as () => IFieldData[],
   },
   components: {
     ReportLicensePicker,
@@ -79,6 +78,7 @@ export default Vue.extend({
     ...mapState<IPluginState>({
       authState: (state: IPluginState) => state.pluginAuth.authState,
       selectedReports: (state: IPluginState) => state.reports.selectedReports,
+      fields: (state: IPluginState) => state.reports.fields,
     }),
     ...mapGetters({
       exampleGetter: `example/${ExampleGetters.EXAMPLE_GETTER}`,

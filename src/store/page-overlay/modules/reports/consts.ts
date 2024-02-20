@@ -6,16 +6,20 @@ export enum ReportsMutations {
   UPDATE_SELECTED_REPORTS = "UPDATE_SELECTED_REPORTS",
   SET_STATUS = "SET_STATUS",
   SET_GENERATED_SPREADSHEET = "SET_GENERATED_SPREADSHEET",
+  CHECK_ALL = "CHECK_ALL",
+  UNCHECK_ALL = "UNCHECK_ALL",
 }
 
 export enum ReportsGetters {
-  REPORT_OPTIONS = "REPORT_OPTIONS"
+  REPORT_OPTIONS = "REPORT_OPTIONS",
 }
 
 export enum ReportsActions {
   RESET = "RESET",
   GENERATE_REPORT = "GENERATE_REPORT",
   RUN_AUX_REPORT_TASK = "RUN_AUX_REPORT_TASK",
+  CHECK_ALL = "CHECK_ALL",
+  UNCHECK_ALL = "UNCHECK_ALL",
 }
 
 export enum ReportStatus {
@@ -438,6 +442,12 @@ const COMMON_TAG_FIELD_DATA: IFieldData[] = [
     value: "StatusName",
     readableName: "Status",
     required: true,
+    initiallyChecked: true,
+  },
+  {
+    value: "Used Datetime",
+    readableName: "UsedDateTime",
+    required: false,
     initiallyChecked: true,
   },
 ];

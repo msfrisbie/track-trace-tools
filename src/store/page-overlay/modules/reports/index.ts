@@ -5,7 +5,7 @@ import { maybeLoadCogsReportData } from "@/utils/reports/cogs-report";
 import { maybeLoadCogsTrackerReportData } from "@/utils/reports/cogs-tracker-report";
 import {
   maybeLoadCogsV2ReportData,
-  updateCogsV2MasterCostSheet
+  updateCogsV2MasterCostSheet,
 } from "@/utils/reports/cogs-v2-report";
 import { maybeLoadEmployeeAuditReportData } from "@/utils/reports/employee-audit-report";
 import { maybeLoadEmployeeSamplesReportData } from "@/utils/reports/employee-samples-report";
@@ -31,17 +31,21 @@ import { getSimpleSpreadsheet } from "@/utils/sheets";
 import {
   createCsvOrError,
   createSpreadsheetOrError,
-  createXlsxOrError
+  createXlsxOrError,
 } from "@/utils/sheets-export";
+import _ from "lodash-es";
 import { v4 as uuidv4 } from "uuid";
 import { ActionContext } from "vuex";
 import { ClientGetters } from "../client/consts";
 import {
   IStatusMessage,
-  ReportAuxTask, ReportsActions,
+  ReportAuxTask,
+  ReportStatus,
+  ReportType,
+  ReportsActions,
   ReportsGetters,
-  ReportsMutations, ReportStatus,
-  ReportType
+  ReportsMutations,
+  SHEET_FIELDS,
 } from "./consts";
 import { IReportConfig, IReportData, IReportOption, IReportsState } from "./interfaces";
 
@@ -51,6 +55,17 @@ const inMemoryState = {
   statusMessageHistory: [],
   generatedSpreadsheet: null,
   selectedReports: [],
+  fields: (() => {
+    const fields = _.cloneDeep(SHEET_FIELDS);
+
+    for (const key in fields) {
+      if (Array.isArray(fields[key])) {
+        fields[key] = fields[key].filter((x) => x.initiallyChecked);
+      }
+    }
+
+    return fields;
+  })(),
 };
 
 const persistedState = {
@@ -86,6 +101,14 @@ export const reportsModule = {
       }
 
       state.selectedReports = data.selectedReports;
+    },
+    [ReportsMutations.CHECK_ALL](state: IReportsState, data: { reportType: ReportType }) {
+      state.fields[data.reportType] = _.cloneDeep(SHEET_FIELDS[data.reportType]);
+    },
+    [ReportsMutations.UNCHECK_ALL](state: IReportsState, data: { reportType: ReportType }) {
+      state.fields[data.reportType] = _.cloneDeep(SHEET_FIELDS[data.reportType]).filter(
+        (x) => x.required
+      );
     },
     [ReportsMutations.SET_STATUS](
       state: IReportsState,
@@ -540,6 +563,18 @@ export const reportsModule = {
           status: ReportStatus.INITIAL,
         });
       }
+    },
+    [ReportsActions.CHECK_ALL]: async (
+      ctx: ActionContext<IReportsState, IPluginState>,
+      data: { reportType: ReportType }
+    ) => {
+      ctx.commit(ReportsMutations.CHECK_ALL, data);
+    },
+    [ReportsActions.UNCHECK_ALL]: async (
+      ctx: ActionContext<IReportsState, IPluginState>,
+      data: { reportType: ReportType }
+    ) => {
+      ctx.commit(ReportsMutations.UNCHECK_ALL, data);
     },
     [ReportsActions.GENERATE_REPORT]: async (
       ctx: ActionContext<IReportsState, IPluginState>,
