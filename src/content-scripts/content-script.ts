@@ -73,8 +73,8 @@ async function initializeToolkit() {
     const lastNavigationTime = localStorage.getItem(T3_AUTH_REDIRECT_TIMESTAMP_LOCALSTORAGE_TOKEN);
     const currentTime = new Date().getTime();
 
-    // Check if the last navigation occurred within the last 10 seconds
-    if (!lastNavigationTime || currentTime - parseInt(lastNavigationTime, 10) > 10000) {
+    // Check if the last navigation occurred within the last 60 seconds
+    if (!lastNavigationTime || currentTime - parseInt(lastNavigationTime, 60) > 10000) {
       fetch("/").then(
         (response) => {
           if (response.status !== 200) {
