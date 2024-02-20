@@ -1906,7 +1906,7 @@
 import ReportCheckboxSection from "@/components/overlay-widget/shared/ReportCheckboxSection.vue";
 import ReportLicensePicker from "@/components/overlay-widget/shared/ReportLicensePicker.vue";
 import { MessageType, ModalAction, ModalType } from "@/consts";
-import { IPluginState } from "@/interfaces";
+import { IComputedGetSet, IPluginState } from "@/interfaces";
 import { authManager } from "@/modules/auth-manager.module";
 import { messageBus } from "@/modules/message-bus.module";
 import { modalManager } from "@/modules/modal-manager.module";
@@ -1915,91 +1915,96 @@ import store from "@/store/page-overlay/index";
 import { ClientGetters } from "@/store/page-overlay/modules/client/consts";
 import { OAuthState, PluginAuthActions } from "@/store/page-overlay/modules/plugin-auth/consts";
 import {
-ReportAuxTask,
-ReportStatus,
-ReportType,
-ReportsActions,
-SHEET_FIELDS,
+  ReportAuxTask,
+  ReportStatus,
+  ReportType,
+  ReportsActions,
+  ReportsMutations,
+  SHEET_FIELDS,
+  ReportsGetters,
 } from "@/store/page-overlay/modules/reports/consts";
 import { IReportConfig, IReportOption } from "@/store/page-overlay/modules/reports/interfaces";
 import { getIsoDateFromOffset } from "@/utils/date";
 import { addCogsReport, cogsFormFiltersFactory } from "@/utils/reports/cogs-report";
 import {
-addCogsTrackerReport,
-cogsTrackerFormFiltersFactory,
+  addCogsTrackerReport,
+  cogsTrackerFormFiltersFactory,
 } from "@/utils/reports/cogs-tracker-report";
 import {
-addCogsV2Report,
-cogsV2FormFiltersFactory,
-getCogsV2CacheKey,
+  addCogsV2Report,
+  cogsV2FormFiltersFactory,
+  getCogsV2CacheKey,
 } from "@/utils/reports/cogs-v2-report";
 import {
-addEmployeeAuditReport,
-employeeAuditFormFiltersFactory,
+  addEmployeeAuditReport,
+  employeeAuditFormFiltersFactory,
 } from "@/utils/reports/employee-audit-report";
 import {
-addEmployeeSamplesReport,
-employeeSamplesFormFiltersFactory,
+  addEmployeeSamplesReport,
+  employeeSamplesFormFiltersFactory,
 } from "@/utils/reports/employee-samples-report";
 import {
-addHarvestPackagesReport,
-harvestPackagesFormFiltersFactory,
+  addHarvestPackagesReport,
+  harvestPackagesFormFiltersFactory,
 } from "@/utils/reports/harvest-packages-report";
 import { addHarvestsReport, harvestsFormFiltersFactory } from "@/utils/reports/harvests-report";
 import {
-IMMATURE_PLANT_QUICKVIEW_DIMENSIONS,
-addImmaturePlantsQuickviewReport,
-immaturePlantsQuickviewFormFiltersFactory,
+  IMMATURE_PLANT_QUICKVIEW_DIMENSIONS,
+  addImmaturePlantsQuickviewReport,
+  immaturePlantsQuickviewFormFiltersFactory,
 } from "@/utils/reports/immature-plants-quickview-report";
 import {
-addImmaturePlantsReport,
-immaturePlantsFormFiltersFactory,
+  addImmaturePlantsReport,
+  immaturePlantsFormFiltersFactory,
 } from "@/utils/reports/immature-plants-report";
-import { addIncomingManifestInventoryReport, incomingManifestInventoryFormFiltersFactory } from "@/utils/reports/incoming-manifest-inventory";
 import {
-addIncomingTransferManifestsReport,
-incomingTransferManifestsFormFiltersFactory,
+  addIncomingManifestInventoryReport,
+  incomingManifestInventoryFormFiltersFactory,
+} from "@/utils/reports/incoming-manifest-inventory";
+import {
+  addIncomingTransferManifestsReport,
+  incomingTransferManifestsFormFiltersFactory,
 } from "@/utils/reports/incoming-transfer-manifests-report";
 import {
-addIncomingTransfersReport,
-incomingTransfersFormFiltersFactory,
+  addIncomingTransfersReport,
+  incomingTransfersFormFiltersFactory,
 } from "@/utils/reports/incoming-transfers-report";
 import {
-MATURE_PLANT_QUICKVIEW_DIMENSIONS,
-addMaturePlantsQuickviewReport,
-maturePlantsQuickviewFormFiltersFactory,
+  MATURE_PLANT_QUICKVIEW_DIMENSIONS,
+  addMaturePlantsQuickviewReport,
+  maturePlantsQuickviewFormFiltersFactory,
 } from "@/utils/reports/mature-plants-quickview-report";
 import {
-addMaturePlantsReport,
-maturePlantsFormFiltersFactory,
+  addMaturePlantsReport,
+  maturePlantsFormFiltersFactory,
 } from "@/utils/reports/mature-plants-report";
 import {
-addOutgoingTransferManifestsReport,
-outgoingTransferManifestsFormFiltersFactory,
+  addOutgoingTransferManifestsReport,
+  outgoingTransferManifestsFormFiltersFactory,
 } from "@/utils/reports/outgoing-transfer-manifests-report";
 import {
-addOutgoingTransfersReport,
-outgoingTransfersFormFiltersFactory,
+  addOutgoingTransfersReport,
+  outgoingTransfersFormFiltersFactory,
 } from "@/utils/reports/outgoing-transfers-report";
 import { addPackageReport, packageFormFiltersFactory } from "@/utils/reports/package-report";
 import {
-PACKAGES_QUICKVIEW_DIMENSIONS,
-addPackagesQuickviewReport,
-packagesQuickviewFormFiltersFactory,
+  PACKAGES_QUICKVIEW_DIMENSIONS,
+  addPackagesQuickviewReport,
+  packagesQuickviewFormFiltersFactory,
 } from "@/utils/reports/packages-quickview-report";
 import {
-addPointInTimeInventoryReport,
-pointInTimeInventoryFormFiltersFactory,
+  addPointInTimeInventoryReport,
+  pointInTimeInventoryFormFiltersFactory,
 } from "@/utils/reports/point-in-time-inventory-report";
 import { reportCatalogFactory } from "@/utils/reports/reports-shared";
 import {
-addStragglerPackagesReport,
-stragglerPackagesFormFiltersFactory,
+  addStragglerPackagesReport,
+  stragglerPackagesFormFiltersFactory,
 } from "@/utils/reports/straggler-package-report";
 import { addTagsReport, tagsFormFiltersFactory } from "@/utils/reports/tags-report";
 import {
-addTransferHubTransfersReport,
-transferHubTransfersFormFiltersFactory,
+  addTransferHubTransfersReport,
+  transferHubTransfersFormFiltersFactory,
 } from "@/utils/reports/transfer-hub-transfers-report";
 import _ from "lodash-es";
 import Vue from "vue";
@@ -2033,7 +2038,18 @@ export default Vue.extend({
     }),
     ...mapGetters({
       hasT3plus: `client/${ClientGetters.T3PLUS}`,
+      reportOptions: `reports/${ReportsGetters.REPORT_OPTIONS}`,
     }),
+    selectedReports: {
+      get(): IReportOption[] {
+        return store.state.reports.selectedReports;
+      },
+      set(selectedReports: IReportOption[]) {
+        store.commit(`reports/${ReportsMutations.UPDATE_SELECTED_REPORTS}`, {
+          selectedReports,
+        });
+      },
+    } as IComputedGetSet<IReportOption[]>,
     enableCsvGenerateButton(): boolean {
       return (
         this.selectedReports.length > 0 &&
@@ -2054,9 +2070,9 @@ export default Vue.extend({
         store.state.pluginAuth.oAuthState === OAuthState.AUTHENTICATED
       );
     },
-    reportOptions(): IReportOption[] {
-      return reportCatalogFactory();
-    },
+    // reportOptions(): IReportOption[] {
+    //   return reportCatalogFactory();
+    // },
     // eligibleReportOptions(): IReportOption[] {
     //   return this.eligibleReportOptionsImpl();
     // },
@@ -2080,7 +2096,6 @@ export default Vue.extend({
       MATURE_PLANT_QUICKVIEW_DIMENSIONS,
       IMMATURE_PLANT_QUICKVIEW_DIMENSIONS,
       PACKAGES_QUICKVIEW_DIMENSIONS,
-      selectedReports: [] as IReportOption[],
       cogsFormFilters: cogsFormFiltersFactory(),
       cogsV2FormFilters: cogsV2FormFiltersFactory(),
       cogsTrackerFormFilters: cogsTrackerFormFiltersFactory(),
@@ -2431,27 +2446,27 @@ export default Vue.extend({
     },
   },
 
-  watch: {
-    selectedReports: {
-      immediate: true,
-      handler(newValue: IReportOption[], oldValue) {
-        const singleonReportTypes: ReportType[] = reportCatalogFactory()
-          .filter((x: IReportOption) => x.isMultiSheet)
-          .map((x: IReportOption) => x.value) as ReportType[];
+  // watch: {
+  //   selectedReports: {
+  //     immediate: true,
+  //     handler(newValue: IReportOption[], oldValue) {
+  //       const singleonReportTypes: ReportType[] = reportCatalogFactory()
+  //         .filter((x: IReportOption) => x.isMultiSheet)
+  //         .map((x: IReportOption) => x.value) as ReportType[];
 
-        for (const reportType of singleonReportTypes) {
-          const firstSelectedSingleton = newValue.find(
-            (report: IReportOption) => report.value === reportType
-          );
+  //       for (const reportType of singleonReportTypes) {
+  //         const firstSelectedSingleton = newValue.find(
+  //           (report: IReportOption) => report.value === reportType
+  //         );
 
-          if (newValue.length > 1 && firstSelectedSingleton) {
-            this.selectedReports = [firstSelectedSingleton];
-            break;
-          }
-        }
-      },
-    },
-  },
+  //         if (newValue.length > 1 && firstSelectedSingleton) {
+  //           this.selectedReports = [firstSelectedSingleton];
+  //           break;
+  //         }
+  //       }
+  //     },
+  //   },
+  // },
   async created() {},
   async mounted() {
     this.refreshOAuthState({});

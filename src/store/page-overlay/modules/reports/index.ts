@@ -35,20 +35,24 @@ import {
 } from "@/utils/sheets-export";
 import { v4 as uuidv4 } from "uuid";
 import { ActionContext } from "vuex";
+import { ClientGetters } from "../client/consts";
 import {
   IStatusMessage,
   ReportAuxTask,
   ReportStatus,
+  ReportType,
   ReportsActions,
+  ReportsGetters,
   ReportsMutations,
 } from "./consts";
-import { IReportConfig, IReportData, IReportsState } from "./interfaces";
+import { IReportConfig, IReportData, IReportOption, IReportsState } from "./interfaces";
 
 const inMemoryState = {
   status: ReportStatus.INITIAL,
   statusMessage: null,
   statusMessageHistory: [],
   generatedSpreadsheet: null,
+  selectedReports: [],
 };
 
 const persistedState = {
@@ -63,6 +67,49 @@ const defaultState: IReportsState = {
 export const reportsModule = {
   state: () => defaultState,
   mutations: {
+    [ReportsMutations.REPORTS_MUTATION](state: IReportsState, data: Partial<IReportsState>) {
+      (Object.keys(data) as Array<keyof IReportsState>).forEach((key) => {
+        const value = data[key];
+        if (typeof value !== "undefined") {
+          // @ts-ignore
+          state[key] = value;
+        }
+      });
+    },
+    [ReportsMutations.UPDATE_SELECTED_REPORTS](
+      state: IReportsState,
+      data: { selectedReports: IReportOption[] }
+    ) {
+      // let correctedSelectedReports: IReportOption[] = data.selectedReports;
+
+      console.log(data);
+
+      for (const selectedReport of data.selectedReports) {
+        if (selectedReport.isMultiSheet) {
+          state.selectedReports = [selectedReport];
+          return;
+        }
+      }
+
+      state.selectedReports = data.selectedReports;
+
+      // const singleonReportTypes: ReportType[] = reportCatalogFactory()
+      //   .filter((x: IReportOption) => x.isMultiSheet)
+      //   .map((x: IReportOption) => x.value) as ReportType[];
+
+      // for (const reportType of singleonReportTypes) {
+      //   const firstSelectedSingleton = data.selectedReports.find(
+      //     (report: IReportOption) => report.value === reportType
+      //   );
+
+      //   if (firstSelectedSingleton) {
+      //     correctedSelectedReports = [firstSelectedSingleton];
+      //     break;
+      //   }
+      // }
+
+      // state.selectedReports = correctedSelectedReports;
+    },
     [ReportsMutations.SET_STATUS](
       state: IReportsState,
       {
@@ -105,7 +152,390 @@ export const reportsModule = {
       }
     },
   },
-  getters: {},
+  getters: {
+    [ReportsGetters.REPORT_OPTIONS]: (
+      state: IReportsState,
+      getters: any,
+      rootState: IPluginState,
+      rootGetters: any
+    ) => {
+      const reportOptions: IReportOption[] = [
+        {
+          text: "Test",
+          value: ReportType.TEST,
+          enabled: rootGetters[`client/${ClientGetters.T3PLUS}`],
+          visible: false,
+          description: "Test report",
+          isCustom: false,
+          usesFormulas: false,
+          isMultiSheet: false,
+          usesFieldTransformer: false,
+          isSpecialty: false,
+          isCatalog: false,
+          isQuickview: false,
+          isHeadless: false,
+        },
+        {
+          text: "Packages",
+          value: ReportType.PACKAGES,
+          enabled: rootGetters[`client/${ClientGetters.T3PLUS}`],
+          visible: true,
+          description: "All packages. Filter by type and date.",
+          isCustom: false,
+          usesFormulas: false,
+          isMultiSheet: false,
+          usesFieldTransformer: true,
+          isSpecialty: false,
+          isCatalog: true,
+          isQuickview: false,
+          isHeadless: false,
+        },
+        {
+          text: "Point-in-time inventory",
+          value: ReportType.POINT_IN_TIME_INVENTORY,
+          enabled: rootGetters[`client/${ClientGetters.T3PLUS}`],
+          visible: true,
+          description: "All active packages on a certain date.",
+          isCustom: false,
+          usesFormulas: false,
+          isMultiSheet: false,
+          usesFieldTransformer: false,
+          isSpecialty: true,
+          isCatalog: false,
+          isQuickview: false,
+          isHeadless: false,
+        },
+        {
+          text: "Plant Batches",
+          value: ReportType.IMMATURE_PLANTS,
+          enabled: rootGetters[`client/${ClientGetters.T3PLUS}`],
+          visible: true,
+          description: "All plant batches. Filter by planted date.",
+          isCustom: false,
+          usesFormulas: false,
+          isMultiSheet: false,
+          usesFieldTransformer: true,
+          isSpecialty: false,
+          isCatalog: true,
+          isQuickview: false,
+          isHeadless: false,
+        },
+        {
+          text: "Mature Plants",
+          value: ReportType.MATURE_PLANTS,
+          enabled: rootGetters[`client/${ClientGetters.T3PLUS}`],
+          visible: true,
+          description: "All mature plants. Filter by growth phase and planted date",
+          isCustom: false,
+          usesFormulas: false,
+          isMultiSheet: false,
+          usesFieldTransformer: true,
+          isSpecialty: false,
+          isCatalog: true,
+          isQuickview: false,
+          isHeadless: false,
+        },
+        {
+          text: "Incoming Transfers",
+          value: ReportType.INCOMING_TRANSFERS,
+          enabled: rootGetters[`client/${ClientGetters.T3PLUS}`],
+          visible: true,
+          description: "All incoming transfers. Filter by wholesale and ETA",
+          isCustom: false,
+          usesFormulas: false,
+          isMultiSheet: false,
+          usesFieldTransformer: true,
+          isSpecialty: false,
+          isCatalog: true,
+          isQuickview: false,
+          isHeadless: false,
+        },
+        {
+          text: "Outgoing Transfers",
+          value: ReportType.OUTGOING_TRANSFERS,
+          enabled: rootGetters[`client/${ClientGetters.T3PLUS}`],
+          visible: true,
+          description: "All outgoing transfers. Filter by wholesale and ETD",
+          isCustom: false,
+          usesFormulas: false,
+          isMultiSheet: false,
+          usesFieldTransformer: true,
+          isSpecialty: false,
+          isCatalog: true,
+          isQuickview: false,
+          isHeadless: false,
+        },
+        // Disabled - Destinations returns 0, more like incoming?
+        // {
+        //   text: "Hub Transfers",
+        //   value: ReportType.TRANSFER_HUB_TRANSFERS,
+        //
+        //   enabled: rootGetters[`client/${ClientGetters.T3PLUS}`],
+        //   description: "Filter by estimated time of departure",
+        //   isCustom: false,
+        // },
+        {
+          text: "Tags",
+          value: ReportType.TAGS,
+          enabled: rootGetters[`client/${ClientGetters.T3PLUS}`],
+          visible: true,
+          description: "All tags. Filter by status and tag type.",
+          isCustom: false,
+          usesFormulas: false,
+          isMultiSheet: false,
+          usesFieldTransformer: true,
+          isSpecialty: false,
+          isCatalog: true,
+          isQuickview: false,
+          isHeadless: false,
+        },
+        {
+          text: "Harvests",
+          value: ReportType.HARVESTS,
+          enabled: rootGetters[`client/${ClientGetters.T3PLUS}`],
+          visible: true,
+          description: "All harvests. Filter by status and harvest date.",
+          isCustom: false,
+          usesFormulas: false,
+          isMultiSheet: false,
+          usesFieldTransformer: true,
+          isSpecialty: false,
+          isCatalog: true,
+          isQuickview: false,
+          isHeadless: false,
+        },
+        {
+          text: "Incoming Transfer Manifests",
+          value: ReportType.INCOMING_TRANSFER_MANIFESTS,
+          enabled: rootGetters[`client/${ClientGetters.T3PLUS}`],
+          visible: true,
+          description: "Full transfer and package data for all incoming transfers.",
+          isCustom: false,
+          usesFormulas: false,
+          isMultiSheet: false,
+          usesFieldTransformer: true,
+          isSpecialty: true,
+          isCatalog: false,
+          isQuickview: false,
+          isHeadless: false,
+        },
+        {
+          text: "Outgoing Transfer Manifests",
+          value: ReportType.OUTGOING_TRANSFER_MANIFESTS,
+          enabled: rootGetters[`client/${ClientGetters.T3PLUS}`],
+          visible: true,
+          description: "Full transfer and package data for all outgoing transfers.",
+          isCustom: false,
+          usesFormulas: false,
+          isMultiSheet: false,
+          usesFieldTransformer: true,
+          isSpecialty: true,
+          isCatalog: false,
+          isQuickview: false,
+          isHeadless: false,
+        },
+        {
+          text: "Straggler Inventory",
+          value: ReportType.STRAGGLER_PACKAGES,
+          enabled: rootGetters[`client/${ClientGetters.T3PLUS}`],
+          visible: true,
+          description: "Find old and empty inventory",
+          isCustom: false,
+          usesFormulas: false,
+          isMultiSheet: false,
+          usesFieldTransformer: true,
+          isSpecialty: true,
+          isCatalog: false,
+          isQuickview: false,
+          isHeadless: false,
+        },
+        {
+          text: "Employee Activity",
+          value: ReportType.EMPLOYEE_AUDIT,
+          enabled: rootGetters[`client/${ClientGetters.T3PLUS}`],
+          visible: true,
+          description: "View all employee activity in Metrc",
+          isCustom: false,
+          usesFormulas: false,
+          isMultiSheet: false,
+          usesFieldTransformer: false,
+          isSpecialty: true,
+          isCatalog: false,
+          isQuickview: false,
+          isHeadless: false,
+        },
+        {
+          text: "COGS",
+          value: ReportType.COGS_V2,
+          enabled: !!rootState.client.values.ENABLE_COGS,
+          visible: !!rootState.client.values.ENABLE_COGS,
+          description: "Generate COGS calculator",
+          isCustom: true,
+          usesFormulas: true,
+          isMultiSheet: true,
+          usesFieldTransformer: false,
+          isSpecialty: false,
+          isCatalog: false,
+          isQuickview: false,
+          isHeadless: false,
+        },
+        {
+          text: "COGS Tracker",
+          value: ReportType.COGS_TRACKER,
+          enabled: !!rootState.client.values.ENABLE_COGS_TRACKER,
+          visible: !!rootState.client.values.ENABLE_COGS_TRACKER,
+          description: "Generate COGS Tracker sheets",
+          isCustom: true,
+          usesFormulas: true,
+          isMultiSheet: true,
+          usesFieldTransformer: false,
+          isSpecialty: false,
+          isCatalog: false,
+          isQuickview: false,
+          isHeadless: false,
+        },
+        {
+          text: "Employee Samples",
+          value: ReportType.EMPLOYEE_SAMPLES,
+          enabled: !!rootState.client.values.ENABLE_EMPLOYEE_SAMPLE_TOOL,
+          visible: !!rootState.client.values.ENABLE_EMPLOYEE_SAMPLE_TOOL,
+          description: "Generate summary of employee samples",
+          isCustom: true,
+          usesFormulas: true,
+          isMultiSheet: true,
+          usesFieldTransformer: false,
+          isSpecialty: false,
+          isCatalog: false,
+          isQuickview: false,
+          isHeadless: false,
+        },
+        {
+          text: "Harvest Packages",
+          value: ReportType.HARVEST_PACKAGES,
+          enabled: !!rootState.client.values.ENABLE_HARVEST_PACKAGES,
+          visible: !!rootState.client.values.ENABLE_HARVEST_PACKAGES,
+          description: "Generate summary of harvest packages",
+          usesFieldTransformer: false,
+          usesFormulas: false,
+          isMultiSheet: false,
+          isCustom: true,
+          isSpecialty: false,
+          isCatalog: false,
+          isQuickview: false,
+          isHeadless: false,
+        },
+        {
+          text: "Incoming Manifest Inventory",
+          value: ReportType.INCOMING_MANIFEST_INVENTORY,
+          enabled: !!rootState.client.values.ENABLE_INCOMING_MANIFEST_INVENTORY,
+          visible: !!rootState.client.values.ENABLE_INCOMING_MANIFEST_INVENTORY,
+          description: "Generate summary of incoming manifests for inventory checks",
+          usesFieldTransformer: true,
+          usesFormulas: false,
+          isMultiSheet: false,
+          isCustom: true,
+          isSpecialty: false,
+          isCatalog: false,
+          isQuickview: false,
+          isHeadless: false,
+        },
+        {
+          text: "Packages Quickview",
+          value: ReportType.PACKAGES_QUICKVIEW,
+          enabled: rootGetters[`client/${ClientGetters.T3PLUS}`],
+          visible: true,
+          description: "Grouped summary of packages by item, location, and dates",
+          isCustom: false,
+          usesFormulas: false,
+          isMultiSheet: false,
+          usesFieldTransformer: false,
+          isSpecialty: false,
+          isCatalog: false,
+          isQuickview: true,
+          isHeadless: false,
+        },
+        {
+          text: "Plant Batch Quickview",
+          value: ReportType.IMMATURE_PLANTS_QUICKVIEW,
+          enabled: rootGetters[`client/${ClientGetters.T3PLUS}`],
+          visible: true,
+          description: "Grouped summary of plant batches by strain, location, and dates",
+          isCustom: false,
+          usesFormulas: false,
+          isMultiSheet: false,
+          usesFieldTransformer: false,
+          isSpecialty: false,
+          isCatalog: false,
+          isQuickview: true,
+          isHeadless: false,
+        },
+        {
+          text: "Mature Plants Quickview",
+          value: ReportType.MATURE_PLANTS_QUICKVIEW,
+          enabled: rootGetters[`client/${ClientGetters.T3PLUS}`],
+          visible: true,
+          description:
+            "Grouped summary of mature plants by growth phase, strain, location, and dates",
+          isCustom: false,
+          usesFormulas: false,
+          isMultiSheet: false,
+          usesFieldTransformer: false,
+          isSpecialty: false,
+          isCatalog: false,
+          isQuickview: true,
+          isHeadless: false,
+        },
+        {
+          text: "Transfer Quickview",
+          value: null,
+          enabled: false,
+          visible: true,
+          description: "Summary of incoming, outgoing, and rejected packages",
+          isCustom: false,
+          usesFormulas: false,
+          isMultiSheet: false,
+          usesFieldTransformer: false,
+          isSpecialty: false,
+          isCatalog: false,
+          isQuickview: true,
+          isHeadless: false,
+        },
+        // {
+        //   text: "Incoming Inventory",
+        //   value: null,
+        //
+        //   enabled: false,
+        //   description: "See packages not yet recieved",
+        //   isCustom: false,
+        // },
+        // {
+        //   text: "Harvested Plants",
+        //   value: null,
+        //
+        //   enabled: false,
+        //   description: "All plants and associated harvest data within this license",
+        //   isCustom: false,
+        // },
+        {
+          text: "Single Transfer",
+          value: ReportType.SINGLE_TRANSFER,
+          enabled: rootGetters[`client/${ClientGetters.T3PLUS}`],
+          visible: false,
+          description: "Single transfer",
+          isCustom: false,
+          usesFormulas: false,
+          isMultiSheet: false,
+          usesFieldTransformer: false,
+          isSpecialty: false,
+          isCatalog: false,
+          isQuickview: false,
+          isHeadless: false,
+        },
+      ];
+
+      return reportOptions;
+    },
+  },
   actions: {
     [ReportsActions.RESET]: async (ctx: ActionContext<IReportsState, IPluginState>, data: any) => {
       ctx.commit(ReportsMutations.SET_STATUS, {

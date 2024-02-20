@@ -35,6 +35,7 @@ export interface IReportsState {
     timestamp: string;
     spreadsheet: ISimpleSpreadsheet;
   }[];
+  selectedReports: IReportOption[];
 }
 
 // export interface IPackageCostCalculationData {

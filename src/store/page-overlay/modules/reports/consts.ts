@@ -2,11 +2,15 @@ import { IIndexedHarvestData } from "@/interfaces";
 import { IFieldData } from "./interfaces";
 
 export enum ReportsMutations {
+  REPORTS_MUTATION = "REPORTS_MUTATION",
+  UPDATE_SELECTED_REPORTS = "UPDATE_SELECTED_REPORTS",
   SET_STATUS = "SET_STATUS",
   SET_GENERATED_SPREADSHEET = "SET_GENERATED_SPREADSHEET",
 }
 
-export enum ReportsGetters {}
+export enum ReportsGetters {
+  REPORT_OPTIONS = "REPORT_OPTIONS"
+}
 
 export enum ReportsActions {
   RESET = "RESET",

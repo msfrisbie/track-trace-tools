@@ -11,7 +11,7 @@ import {
 } from "@/interfaces";
 import { messageBus } from "@/modules/message-bus.module";
 import store from "@/store/page-overlay/index";
-import { ReportType, ReportsMutations } from "@/store/page-overlay/modules/reports/consts";
+import { ReportType, ReportsGetters, ReportsMutations } from "@/store/page-overlay/modules/reports/consts";
 import {
   IFieldData,
   IReportConfig,
@@ -30,6 +30,7 @@ import {
   getSheetTitle,
   getSpreadsheetName,
   reportCatalogFactory,
+  // reportCatalogFactory,
   shouldGenerateReport,
 } from "./reports/reports-shared";
 import {
