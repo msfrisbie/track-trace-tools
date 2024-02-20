@@ -405,64 +405,10 @@
           </div>
         </template>
 
-        <!-- Point In Time Inventory -->
-        <template
-          v-if="
-            selectedReports.find((report) => report.value === ReportType.POINT_IN_TIME_INVENTORY)
-          "
-        >
-          <div
-            class="overflow-visible rounded border border-gray-300 p-2 flex flex-col items-stretch gap-2"
-          >
-            <div class="font-semibold text-white ttt-purple-bg p-2 -m-2">
-              Point In Time Inventory
-            </div>
-            <hr />
-            <div class="flex flex-col items-stretch gap-4">
-              <div class="font-semibold text-gray-700">Filters:</div>
-
-              <div class="flex flex-col items-start gap-1">
-                <span class="leading-6">Point in time:</span>
-                <b-form-datepicker
-                  initial-date
-                  size="sm"
-                  v-model="pointInTimeInventoryFormFilters.targetDate"
-                />
-              </div>
-              <b-form-group label="Longest amount of time a package is held at this facility:">
-                <b-form-select
-                  :disabled="!pointInTimeInventoryFormFilters.useRestrictedWindowOptimization"
-                  v-model="pointInTimeInventoryFormFilters.restrictedWindowDays"
-                  :options="pointInTimeInventoryFormFilters.restrictedWindowDaysOptions"
-                ></b-form-select>
-              </b-form-group>
-              <hr />
-
-              <simple-drawer toggleText="ADVANCED">
-                <report-license-picker
-                  :formFilters="pointInTimeInventoryFormFilters"
-                ></report-license-picker>
-
-                <b-form-checkbox
-                  v-model="pointInTimeInventoryFormFilters.useRestrictedWindowOptimization"
-                >
-                  <span class="leading-6">Restrict package window (recommended)</span>
-                </b-form-checkbox>
-
-                <span
-                  v-if="!pointInTimeInventoryFormFilters.useRestrictedWindowOptimization"
-                  class="mb-4 text-xs text-red-500"
-                  >Disabling this will include packages held for any length of time, but report
-                  generation will be significantly slower.</span
-                >
-
-                <b-form-checkbox v-model="pointInTimeInventoryFormFilters.showDebugColumns">
-                  <span class="leading-6">Show debug columns</span>
-                </b-form-checkbox>
-              </simple-drawer>
-            </div>
-          </div>
-        </template>
+        <point-in-time-inventory-report
+          :pointInTimeInventoryFormFilters="pointInTimeInventoryFormFilters"
+          :fields="fields"
+        ></point-in-time-inventory-report>
 
         <!-- Packages -->
         <template v-if="selectedReports.find((report) => report.value === ReportType.PACKAGES)">
@@ -1521,86 +1467,13 @@
           :packagesQuickviewFormFilters="packagesQuickviewFormFilters"
         ></packages-quickview-report>
 
-        <immature-plants-quickview-report :immaturePlantsQuickviewFormFilters="immaturePlantsQuickviewFormFilters"></immature-plants-quickview-report>
+        <immature-plants-quickview-report
+          :immaturePlantsQuickviewFormFilters="immaturePlantsQuickviewFormFilters"
+        ></immature-plants-quickview-report>
 
-        <!-- Mature Plants Quickview -->
-        <template
-          v-if="
-            selectedReports.find((report) => report.value === ReportType.MATURE_PLANTS_QUICKVIEW)
-          "
-        >
-          <div
-            class="overflow-visible rounded border border-gray-300 p-2 flex flex-col items-stretch gap-2"
-          >
-            <div class="font-semibold text-white ttt-purple-bg p-2 -m-2">
-              Mature Plants Quickview
-            </div>
-            <hr />
-            <div class="flex flex-col items-stretch gap-4">
-              <div class="font-semibold text-gray-700">Filters:</div>
-
-              <b-form-group label="Slice plants by:" label-size="sm">
-                <b-form-select
-                  v-model="maturePlantsQuickviewFormFilters.primaryDimension"
-                  :options="MATURE_PLANT_QUICKVIEW_DIMENSIONS"
-                ></b-form-select>
-              </b-form-group>
-
-              <b-form-group label="Slice plants by: (optional)" label-size="sm">
-                <b-form-select
-                  v-model="maturePlantsQuickviewFormFilters.secondaryDimension"
-                  :options="[{ text: 'None', value: null }, ...MATURE_PLANT_QUICKVIEW_DIMENSIONS]"
-                ></b-form-select>
-              </b-form-group>
-
-              <b-form-checkbox v-model="maturePlantsQuickviewFormFilters.includeVegetative">
-                <span class="leading-6">Include Vegetative</span>
-              </b-form-checkbox>
-              <b-form-checkbox v-model="maturePlantsQuickviewFormFilters.includeFlowering">
-                <span class="leading-6">Include Flowering</span>
-              </b-form-checkbox>
-              <b-form-checkbox v-model="maturePlantsQuickviewFormFilters.includeInactive">
-                <span class="leading-6">Include Inactive</span>
-              </b-form-checkbox>
-
-              <div class="flex flex-col items-start gap-1">
-                <b-form-checkbox
-                  v-model="maturePlantsQuickviewFormFilters.shouldFilterPlantedDateGt"
-                >
-                  <span class="leading-6">Planted on or after:</span>
-                </b-form-checkbox>
-                <b-form-datepicker
-                  v-if="maturePlantsQuickviewFormFilters.shouldFilterPlantedDateGt"
-                  :disabled="!maturePlantsQuickviewFormFilters.shouldFilterPlantedDateGt"
-                  initial-date
-                  size="sm"
-                  v-model="maturePlantsQuickviewFormFilters.plantedDateGt"
-                />
-              </div>
-
-              <div class="flex flex-col items-start gap-1">
-                <b-form-checkbox
-                  v-model="maturePlantsQuickviewFormFilters.shouldFilterPlantedDateLt"
-                >
-                  <span class="leading-6">Planted on or before:</span>
-                </b-form-checkbox>
-                <b-form-datepicker
-                  v-if="maturePlantsQuickviewFormFilters.shouldFilterPlantedDateLt"
-                  :disabled="!maturePlantsQuickviewFormFilters.shouldFilterPlantedDateLt"
-                  initial-date
-                  size="sm"
-                  v-model="maturePlantsQuickviewFormFilters.plantedDateLt"
-                />
-              </div>
-
-              <simple-drawer toggleText="ADVANCED">
-                <report-license-picker
-                  :formFilters="maturePlantsQuickviewFormFilters"
-                ></report-license-picker>
-              </simple-drawer>
-            </div>
-          </div>
-        </template>
+        <mature-plants-quickview-report
+          :maturePlantsQuickviewFormFilters="maturePlantsQuickviewFormFilters"
+        ></mature-plants-quickview-report>
       </div>
 
       <!-- End Column -->
@@ -1866,8 +1739,10 @@ import Vue from "vue";
 import { mapActions, mapGetters, mapState } from "vuex";
 import ArchiveWidget from "../shared/ArchiveWidget.vue";
 import SimpleDrawer from "../shared/SimpleDrawer.vue";
-import PackagesQuickviewReport from "./reports/PackagesQuickviewReport.vue";
 import ImmaturePlantsQuickviewReport from "./reports/ImmaturePlantsQuickviewReport.vue";
+import MaturePlantsQuickviewReport from "./reports/MaturePlantsQuickviewReport.vue";
+import PackagesQuickviewReport from "./reports/PackagesQuickviewReport.vue";
+import PointInTimeInventoryReport from "./reports/PointInTimeInventoryReport.vue";
 
 export default Vue.extend({
   name: "GoogleSheetsExport",
@@ -1881,6 +1756,8 @@ export default Vue.extend({
     ReportCheckboxSection,
     PackagesQuickviewReport,
     ImmaturePlantsQuickviewReport,
+    MaturePlantsQuickviewReport,
+    PointInTimeInventoryReport,
   },
   computed: {
     ...mapState<IPluginState>({
