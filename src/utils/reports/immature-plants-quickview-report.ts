@@ -47,7 +47,7 @@ export function extractImmaturePlantPropertyFromDimension(
   }
 }
 
-interface IImmaturePlantsQuickviewReportFormFilters extends IImmaturePlantsReportFormFilters {
+export interface IImmaturePlantsQuickviewReportFormFilters extends IImmaturePlantsReportFormFilters {
   primaryDimension: ImmaturePlantQuickviewDimension;
   secondaryDimension: ImmaturePlantQuickviewDimension | null;
 }

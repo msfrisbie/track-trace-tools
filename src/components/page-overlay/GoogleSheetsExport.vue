@@ -1521,82 +1521,7 @@
           :packagesQuickviewFormFilters="packagesQuickviewFormFilters"
         ></packages-quickview-report>
 
-        <!-- Immature Plants Quickview -->
-        <template
-          v-if="
-            selectedReports.find((report) => report.value === ReportType.IMMATURE_PLANTS_QUICKVIEW)
-          "
-        >
-          <div
-            class="overflow-visible rounded border border-gray-300 p-2 flex flex-col items-stretch gap-2"
-          >
-            <div class="font-semibold text-white ttt-purple-bg p-2 -m-2">
-              Immature Plants Quickview
-            </div>
-            <hr />
-            <div class="flex flex-col items-stretch gap-4">
-              <div class="font-semibold text-gray-700">Filters:</div>
-
-              <b-form-group label="Slice plants by:" label-size="sm">
-                <b-form-select
-                  v-model="immaturePlantsQuickviewFormFilters.primaryDimension"
-                  :options="IMMATURE_PLANT_QUICKVIEW_DIMENSIONS"
-                ></b-form-select>
-              </b-form-group>
-
-              <b-form-group label="Slice plants by: (optional)" label-size="sm">
-                <b-form-select
-                  v-model="immaturePlantsQuickviewFormFilters.secondaryDimension"
-                  :options="[{ text: 'None', value: null }, ...IMMATURE_PLANT_QUICKVIEW_DIMENSIONS]"
-                ></b-form-select>
-              </b-form-group>
-
-              <b-form-checkbox v-model="immaturePlantsQuickviewFormFilters.includeActive">
-                <span class="leading-6">Include Active</span>
-              </b-form-checkbox>
-
-              <b-form-checkbox v-model="immaturePlantsQuickviewFormFilters.includeInactive">
-                <span class="leading-6">Include Inactive</span>
-              </b-form-checkbox>
-
-              <div class="flex flex-col items-start gap-1">
-                <b-form-checkbox
-                  v-model="immaturePlantsQuickviewFormFilters.shouldFilterPlantedDateGt"
-                >
-                  <span class="leading-6">Planted on or after:</span>
-                </b-form-checkbox>
-                <b-form-datepicker
-                  v-if="immaturePlantsQuickviewFormFilters.shouldFilterPlantedDateGt"
-                  :disabled="!immaturePlantsQuickviewFormFilters.shouldFilterPlantedDateGt"
-                  initial-date
-                  size="sm"
-                  v-model="immaturePlantsQuickviewFormFilters.plantedDateGt"
-                />
-              </div>
-
-              <div class="flex flex-col items-start gap-1">
-                <b-form-checkbox
-                  v-model="immaturePlantsQuickviewFormFilters.shouldFilterPlantedDateLt"
-                >
-                  <span class="leading-6">Planted on or before:</span>
-                </b-form-checkbox>
-                <b-form-datepicker
-                  v-if="immaturePlantsQuickviewFormFilters.shouldFilterPlantedDateLt"
-                  :disabled="!immaturePlantsQuickviewFormFilters.shouldFilterPlantedDateLt"
-                  initial-date
-                  size="sm"
-                  v-model="immaturePlantsQuickviewFormFilters.plantedDateLt"
-                />
-              </div>
-
-              <simple-drawer toggleText="ADVANCED">
-                <report-license-picker
-                  :formFilters="immaturePlantsQuickviewFormFilters"
-                ></report-license-picker>
-              </simple-drawer>
-            </div>
-          </div>
-        </template>
+        <immature-plants-quickview-report :immaturePlantsQuickviewFormFilters="immaturePlantsQuickviewFormFilters"></immature-plants-quickview-report>
 
         <!-- Mature Plants Quickview -->
         <template
@@ -1942,6 +1867,7 @@ import { mapActions, mapGetters, mapState } from "vuex";
 import ArchiveWidget from "../shared/ArchiveWidget.vue";
 import SimpleDrawer from "../shared/SimpleDrawer.vue";
 import PackagesQuickviewReport from "./reports/PackagesQuickviewReport.vue";
+import ImmaturePlantsQuickviewReport from "./reports/ImmaturePlantsQuickviewReport.vue";
 
 export default Vue.extend({
   name: "GoogleSheetsExport",
@@ -1954,6 +1880,7 @@ export default Vue.extend({
     ReportLicensePicker,
     ReportCheckboxSection,
     PackagesQuickviewReport,
+    ImmaturePlantsQuickviewReport,
   },
   computed: {
     ...mapState<IPluginState>({
