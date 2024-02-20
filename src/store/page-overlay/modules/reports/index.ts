@@ -5,7 +5,7 @@ import { maybeLoadCogsReportData } from "@/utils/reports/cogs-report";
 import { maybeLoadCogsTrackerReportData } from "@/utils/reports/cogs-tracker-report";
 import {
   maybeLoadCogsV2ReportData,
-  updateCogsV2MasterCostSheet,
+  updateCogsV2MasterCostSheet
 } from "@/utils/reports/cogs-v2-report";
 import { maybeLoadEmployeeAuditReportData } from "@/utils/reports/employee-audit-report";
 import { maybeLoadEmployeeSamplesReportData } from "@/utils/reports/employee-samples-report";
@@ -31,19 +31,17 @@ import { getSimpleSpreadsheet } from "@/utils/sheets";
 import {
   createCsvOrError,
   createSpreadsheetOrError,
-  createXlsxOrError,
+  createXlsxOrError
 } from "@/utils/sheets-export";
 import { v4 as uuidv4 } from "uuid";
 import { ActionContext } from "vuex";
 import { ClientGetters } from "../client/consts";
 import {
   IStatusMessage,
-  ReportAuxTask,
-  ReportStatus,
-  ReportType,
-  ReportsActions,
+  ReportAuxTask, ReportsActions,
   ReportsGetters,
-  ReportsMutations,
+  ReportsMutations, ReportStatus,
+  ReportType
 } from "./consts";
 import { IReportConfig, IReportData, IReportOption, IReportsState } from "./interfaces";
 
@@ -80,10 +78,6 @@ export const reportsModule = {
       state: IReportsState,
       data: { selectedReports: IReportOption[] }
     ) {
-      // let correctedSelectedReports: IReportOption[] = data.selectedReports;
-
-      console.log(data);
-
       for (const selectedReport of data.selectedReports) {
         if (selectedReport.isMultiSheet) {
           state.selectedReports = [selectedReport];
@@ -92,23 +86,6 @@ export const reportsModule = {
       }
 
       state.selectedReports = data.selectedReports;
-
-      // const singleonReportTypes: ReportType[] = reportCatalogFactory()
-      //   .filter((x: IReportOption) => x.isMultiSheet)
-      //   .map((x: IReportOption) => x.value) as ReportType[];
-
-      // for (const reportType of singleonReportTypes) {
-      //   const firstSelectedSingleton = data.selectedReports.find(
-      //     (report: IReportOption) => report.value === reportType
-      //   );
-
-      //   if (firstSelectedSingleton) {
-      //     correctedSelectedReports = [firstSelectedSingleton];
-      //     break;
-      //   }
-      // }
-
-      // state.selectedReports = correctedSelectedReports;
     },
     [ReportsMutations.SET_STATUS](
       state: IReportsState,

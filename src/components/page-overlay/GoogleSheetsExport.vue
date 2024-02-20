@@ -1517,78 +1517,9 @@
           </div>
         </template>
 
-        <!-- Packages Quickview -->
-        <template
-          v-if="selectedReports.find((report) => report.value === ReportType.PACKAGES_QUICKVIEW)"
-        >
-          <div
-            class="overflow-visible rounded border border-gray-300 p-2 flex flex-col items-stretch gap-2"
-          >
-            <div class="font-semibold text-white ttt-purple-bg p-2 -m-2">Packages Quickview</div>
-            <hr />
-            <div class="flex flex-col items-stretch gap-4">
-              <div class="font-semibold text-gray-700">Filters:</div>
-
-              <b-form-group label="Slice packages by:" label-size="sm">
-                <b-form-select
-                  v-model="packagesQuickviewFormFilters.primaryDimension"
-                  :options="PACKAGES_QUICKVIEW_DIMENSIONS"
-                ></b-form-select>
-              </b-form-group>
-
-              <b-form-group label="Slice packages by: (optional)" label-size="sm">
-                <b-form-select
-                  v-model="packagesQuickviewFormFilters.secondaryDimension"
-                  :options="[{ text: 'None', value: null }, ...PACKAGES_QUICKVIEW_DIMENSIONS]"
-                ></b-form-select>
-              </b-form-group>
-
-              <b-form-checkbox v-model="packagesQuickviewFormFilters.includeActive">
-                <span class="leading-6">Include Active</span>
-              </b-form-checkbox>
-
-              <b-form-checkbox v-model="packagesQuickviewFormFilters.includeIntransit">
-                <span class="leading-6">Include In Transit</span>
-              </b-form-checkbox>
-
-              <b-form-checkbox v-model="packagesQuickviewFormFilters.includeInactive">
-                <span class="leading-6">Include Inactive</span>
-              </b-form-checkbox>
-
-              <div class="flex flex-col items-start gap-1">
-                <b-form-checkbox v-model="packagesQuickviewFormFilters.shouldFilterPackagedDateGt">
-                  <span class="leading-6">Packaged on or after:</span>
-                </b-form-checkbox>
-                <b-form-datepicker
-                  v-if="packagesQuickviewFormFilters.shouldFilterPackagedDateGt"
-                  :disabled="!packagesQuickviewFormFilters.shouldFilterPackagedDateGt"
-                  initial-date
-                  size="sm"
-                  v-model="packagesQuickviewFormFilters.packagedDateGt"
-                />
-              </div>
-
-              <div class="flex flex-col items-start gap-1">
-                <b-form-checkbox v-model="packagesQuickviewFormFilters.shouldFilterPackagedDateLt">
-                  <span class="leading-6">Packaged on or before:</span>
-                </b-form-checkbox>
-                <b-form-datepicker
-                  v-if="packagesQuickviewFormFilters.shouldFilterPackagedDateLt"
-                  :disabled="!packagesQuickviewFormFilters.shouldFilterPackagedDateLt"
-                  initial-date
-                  size="sm"
-                  v-model="packagesQuickviewFormFilters.packagedDateLt"
-                />
-              </div>
-
-              <simple-drawer toggleText="ADVANCED">
-                <report-license-picker
-                  :formFilters="packagesQuickviewFormFilters"
-                ></report-license-picker>
-              </simple-drawer>
-            </div>
-          </div>
-        </template>
+        <packages-quickview-report
+          :packagesQuickviewFormFilters="packagesQuickviewFormFilters"
+        ></packages-quickview-report>
 
         <!-- Immature Plants Quickview -->
         <template
@@ -1916,12 +1847,12 @@ import { ClientGetters } from "@/store/page-overlay/modules/client/consts";
 import { OAuthState, PluginAuthActions } from "@/store/page-overlay/modules/plugin-auth/consts";
 import {
   ReportAuxTask,
+  ReportsActions,
+  ReportsGetters,
+  ReportsMutations,
   ReportStatus,
   ReportType,
-  ReportsActions,
-  ReportsMutations,
   SHEET_FIELDS,
-  ReportsGetters,
 } from "@/store/page-overlay/modules/reports/consts";
 import { IReportConfig, IReportOption } from "@/store/page-overlay/modules/reports/interfaces";
 import { getIsoDateFromOffset } from "@/utils/date";
@@ -1949,9 +1880,9 @@ import {
 } from "@/utils/reports/harvest-packages-report";
 import { addHarvestsReport, harvestsFormFiltersFactory } from "@/utils/reports/harvests-report";
 import {
-  IMMATURE_PLANT_QUICKVIEW_DIMENSIONS,
   addImmaturePlantsQuickviewReport,
   immaturePlantsQuickviewFormFiltersFactory,
+  IMMATURE_PLANT_QUICKVIEW_DIMENSIONS,
 } from "@/utils/reports/immature-plants-quickview-report";
 import {
   addImmaturePlantsReport,
@@ -1970,9 +1901,9 @@ import {
   incomingTransfersFormFiltersFactory,
 } from "@/utils/reports/incoming-transfers-report";
 import {
-  MATURE_PLANT_QUICKVIEW_DIMENSIONS,
   addMaturePlantsQuickviewReport,
   maturePlantsQuickviewFormFiltersFactory,
+  MATURE_PLANT_QUICKVIEW_DIMENSIONS,
 } from "@/utils/reports/mature-plants-quickview-report";
 import {
   addMaturePlantsReport,
@@ -1988,15 +1919,14 @@ import {
 } from "@/utils/reports/outgoing-transfers-report";
 import { addPackageReport, packageFormFiltersFactory } from "@/utils/reports/package-report";
 import {
-  PACKAGES_QUICKVIEW_DIMENSIONS,
   addPackagesQuickviewReport,
   packagesQuickviewFormFiltersFactory,
+  PACKAGES_QUICKVIEW_DIMENSIONS,
 } from "@/utils/reports/packages-quickview-report";
 import {
   addPointInTimeInventoryReport,
   pointInTimeInventoryFormFiltersFactory,
 } from "@/utils/reports/point-in-time-inventory-report";
-import { reportCatalogFactory } from "@/utils/reports/reports-shared";
 import {
   addStragglerPackagesReport,
   stragglerPackagesFormFiltersFactory,
@@ -2011,6 +1941,7 @@ import Vue from "vue";
 import { mapActions, mapGetters, mapState } from "vuex";
 import ArchiveWidget from "../shared/ArchiveWidget.vue";
 import SimpleDrawer from "../shared/SimpleDrawer.vue";
+import PackagesQuickviewReport from "./reports/PackagesQuickviewReport.vue";
 
 export default Vue.extend({
   name: "GoogleSheetsExport",
@@ -2022,6 +1953,7 @@ export default Vue.extend({
     SimpleDrawer,
     ReportLicensePicker,
     ReportCheckboxSection,
+    PackagesQuickviewReport,
   },
   computed: {
     ...mapState<IPluginState>({

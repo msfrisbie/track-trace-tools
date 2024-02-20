@@ -47,7 +47,7 @@ export function extractPackagePropertyFromDimension(
   }
 }
 
-interface IPackagesQuickviewReportFormFilters extends IPackageReportFormFilters, ILicenseFormFilters {
+export interface IPackagesQuickviewReportFormFilters extends IPackageReportFormFilters, ILicenseFormFilters {
   primaryDimension: PackageQuickviewDimension;
   secondaryDimension: PackageQuickviewDimension | null;
 }
