@@ -1,6 +1,8 @@
 import { MessageType } from "@/consts";
-import { IPluginState, ISpreadsheet } from "@/interfaces";
+import { IIndexedTransferData, IPluginState, ISpreadsheet } from "@/interfaces";
 import { analyticsManager } from "@/modules/analytics-manager.module";
+import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
+import { todayIsodate } from "@/utils/date";
 import { maybeLoadCogsReportData } from "@/utils/reports/cogs-report";
 import { maybeLoadCogsTrackerReportData } from "@/utils/reports/cogs-tracker-report";
 import {
@@ -66,6 +68,17 @@ const inMemoryState = {
 
     return fields;
   })(),
+  reportFormFilters: {
+    [ReportType.INCOMING_MANIFEST_INVENTORY]: {
+      estimatedArrivalDateLt: todayIsodate(),
+      estimatedArrivalDateGt: todayIsodate(),
+      shouldFilterEstimatedArrivalDateLt: false,
+      shouldFilterEstimatedArrivalDateGt: false,
+      useExactTransferIds: [],
+      allTransfers: [],
+      selectedTransfers: [],
+    },
+  },
 };
 
 const persistedState = {
@@ -109,6 +122,15 @@ export const reportsModule = {
       state.fields[data.reportType] = _.cloneDeep(SHEET_FIELDS[data.reportType]).filter(
         (x) => x.required
       );
+    },
+    [ReportsMutations.UPDATE_DYNAMIC_REPORT_DATA](
+      state: IReportsState,
+      data: {
+        incomingTransfers: IIndexedTransferData[];
+      }
+    ) {
+      state.reportFormFilters[ReportType.INCOMING_MANIFEST_INVENTORY].allTransfers =
+        data.incomingTransfers;
     },
     [ReportsMutations.SET_STATUS](
       state: IReportsState,
@@ -537,6 +559,23 @@ export const reportsModule = {
     },
   },
   actions: {
+    [ReportsActions.UPDATE_DYNAMIC_REPORT_DATA]: async (
+      ctx: ActionContext<IReportsState, IPluginState>,
+      data: { reportType: ReportType }
+    ) => {
+      switch (data.reportType) {
+        case ReportType.INCOMING_MANIFEST_INVENTORY:
+          let incomingTransfers: IIndexedTransferData[] = [];
+          try {
+            incomingTransfers = await primaryDataLoader.incomingTransfers();
+          } catch {}
+
+          ctx.commit(ReportsMutations.UPDATE_DYNAMIC_REPORT_DATA, {
+            incomingTransfers,
+          });
+          break;
+      }
+    },
     [ReportsActions.RESET]: async (ctx: ActionContext<IReportsState, IPluginState>, data: any) => {
       ctx.commit(ReportsMutations.SET_STATUS, {
         status: ReportStatus.INITIAL,

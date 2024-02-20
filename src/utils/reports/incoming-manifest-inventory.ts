@@ -1,54 +1,33 @@
 import { IIndexedRichIncomingTransferData, IPluginState, ITransferFilter } from "@/interfaces";
 import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
+import store from "@/store/page-overlay/index";
 import { ReportType, ReportsMutations } from "@/store/page-overlay/modules/reports/consts";
 import {
-  IFieldData,
   IReportConfig,
   IReportData,
   IReportsState,
 } from "@/store/page-overlay/modules/reports/interfaces";
 import { ActionContext } from "vuex";
-import { todayIsodate } from "../date";
 
-interface IIncomingManifestInventoryReportFormFilters {
-  estimatedArrivalDateLt: string;
-  estimatedArrivalDateGt: string;
-  shouldFilterEstimatedArrivalDateLt: boolean;
-  shouldFilterEstimatedArrivalDateGt: boolean;
+export interface IIncomingManifestInventoryReportFormFilters {
+  allTransfers: IIndexedRichIncomingTransferData[];
+  selectedTransfers: IIndexedRichIncomingTransferData[];
 }
-
-export const incomingManifestInventoryFormFiltersFactory: () => IIncomingManifestInventoryReportFormFilters =
-  () => ({
-    estimatedArrivalDateLt: todayIsodate(),
-    estimatedArrivalDateGt: todayIsodate(),
-    shouldFilterEstimatedArrivalDateLt: false,
-    shouldFilterEstimatedArrivalDateGt: false,
-  });
 
 export function addIncomingManifestInventoryReport({
   reportConfig,
-  incomingManifestInventoryFormFilters,
-  fields,
 }: {
   reportConfig: IReportConfig;
-  incomingManifestInventoryFormFilters: IIncomingManifestInventoryReportFormFilters;
-  fields: IFieldData[];
 }) {
   const transferFilter: ITransferFilter = {};
 
-  transferFilter.estimatedArrivalDateGt =
-    incomingManifestInventoryFormFilters.shouldFilterEstimatedArrivalDateGt
-      ? incomingManifestInventoryFormFilters.estimatedArrivalDateGt
-      : null;
+  const formFilters = store.state.reports.reportFormFilters[ReportType.INCOMING_MANIFEST_INVENTORY];
 
-  transferFilter.estimatedArrivalDateLt =
-    incomingManifestInventoryFormFilters.shouldFilterEstimatedArrivalDateLt
-      ? incomingManifestInventoryFormFilters.estimatedArrivalDateLt
-      : null;
+  transferFilter.idMatches = formFilters.selectedTransfers.map((x) => x.Id);
 
   reportConfig[ReportType.INCOMING_MANIFEST_INVENTORY] = {
     transferFilter,
-    fields,
+    fields: store.state.reports.fields[ReportType.INCOMING_MANIFEST_INVENTORY],
   };
 }
 
@@ -75,16 +54,9 @@ export async function maybeLoadIncomingManifestInventoryReportData({
     ];
 
     richIncomingTransfers = richIncomingTransfers.filter((transfer) => {
-      if (transferManifestConfig.transferFilter.estimatedArrivalDateLt) {
-        if (
-          transfer.CreatedDateTime > transferManifestConfig.transferFilter.estimatedArrivalDateLt
-        ) {
-          return false;
-        }
-      }
-
-      if (transferManifestConfig.transferFilter.estimatedArrivalDateGt) {
-        if (transfer.LastModified < transferManifestConfig.transferFilter.estimatedArrivalDateGt) {
+      // Only select specific transfers
+      if (transferManifestConfig.transferFilter.idMatches !== null) {
+        if (!transferManifestConfig.transferFilter.idMatches!.includes(transfer.Id)) {
           return false;
         }
       }

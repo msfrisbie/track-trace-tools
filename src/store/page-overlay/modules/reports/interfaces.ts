@@ -17,6 +17,7 @@ import {
   ITransferFilter,
 } from "@/interfaces";
 import { ImmaturePlantQuickviewDimension } from "@/utils/reports/immature-plants-quickview-report";
+import { IIncomingManifestInventoryReportFormFilters } from "@/utils/reports/incoming-manifest-inventory";
 import { MaturePlantQuickviewDimension } from "@/utils/reports/mature-plants-quickview-report";
 import { PackageQuickviewDimension } from "@/utils/reports/packages-quickview-report";
 import {
@@ -37,8 +38,11 @@ export interface IReportsState {
   }[];
   selectedReports: IReportOption[];
   fields: {
-    [key: string]: IFieldData[]
-  }
+    [key: string]: IFieldData[];
+  };
+  reportFormFilters: {
+    [ReportType.INCOMING_MANIFEST_INVENTORY]: IIncomingManifestInventoryReportFormFilters;
+  };
 }
 
 // export interface IPackageCostCalculationData {
@@ -269,7 +273,7 @@ export interface IReportData {
   };
   [ReportType.INCOMING_MANIFEST_INVENTORY]?: {
     richIncomingTransfers?: IIndexedRichIncomingTransferData[];
-  },
+  };
   [ReportType.OUTGOING_TRANSFER_MANIFESTS]?: {
     richOutgoingTransfers?: IIndexedRichOutgoingTransferData[];
   };

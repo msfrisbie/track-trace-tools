@@ -512,6 +512,7 @@ export interface IHarvestFilter extends IMetrcFilter {
 
 export interface ITransferFilter extends IMetrcFilter {
   manifestNumber?: string | null;
+  idMatches?: number[] | null;
   createdDateGt?: string | null;
   createdDateEq?: string | null;
   createdDateLt?: string | null;
