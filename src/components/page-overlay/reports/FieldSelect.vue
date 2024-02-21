@@ -3,7 +3,7 @@
     <div class="font-semibold text-gray-700">Columns:</div>
 
     <b-form-checkbox-group v-model="fields[reportType]" class="flex flex-col items-start gap-1">
-      <b-form-checkbox v-for="fieldData of SHEET_FIELDS[reportType]" v-bind:key="fieldData.value" :value="fieldData"
+      <b-form-checkbox v-for="fieldData of fields[reportType]" v-bind:key="fieldData.value" :value="fieldData"
         :disabled="fieldData.required">
         <span class="leading-6">{{ fieldData.readableName }}</span>
       </b-form-checkbox>

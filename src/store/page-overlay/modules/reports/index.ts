@@ -7,7 +7,7 @@ import { maybeLoadCogsReportData } from "@/utils/reports/cogs-report";
 import { maybeLoadCogsTrackerReportData } from "@/utils/reports/cogs-tracker-report";
 import {
   maybeLoadCogsV2ReportData,
-  updateCogsV2MasterCostSheet,
+  updateCogsV2MasterCostSheet
 } from "@/utils/reports/cogs-v2-report";
 import { maybeLoadEmployeeAuditReportData } from "@/utils/reports/employee-audit-report";
 import { maybeLoadEmployeeSamplesReportData } from "@/utils/reports/employee-samples-report";
@@ -33,7 +33,7 @@ import { getSimpleSpreadsheet } from "@/utils/sheets";
 import {
   createCsvOrError,
   createSpreadsheetOrError,
-  createXlsxOrError,
+  createXlsxOrError
 } from "@/utils/sheets-export";
 import _ from "lodash-es";
 import { v4 as uuidv4 } from "uuid";
@@ -41,13 +41,10 @@ import { ActionContext } from "vuex";
 import { ClientGetters } from "../client/consts";
 import {
   IStatusMessage,
-  ReportAuxTask,
-  ReportStatus,
-  ReportType,
-  ReportsActions,
+  ReportAuxTask, ReportsActions,
   ReportsGetters,
-  ReportsMutations,
-  SHEET_FIELDS,
+  ReportsMutations, ReportStatus,
+  ReportType, SHEET_FIELDS
 } from "./consts";
 import { IReportConfig, IReportData, IReportOption, IReportsState } from "./interfaces";
 
@@ -60,10 +57,8 @@ const inMemoryState = {
   fields: (() => {
     const fields = _.cloneDeep(SHEET_FIELDS);
 
-    for (const key in fields) {
-      if (Array.isArray(fields[key])) {
-        fields[key] = fields[key].filter((x) => x.initiallyChecked);
-      }
+    for (const key of Object.keys(fields)) {
+      fields[key] = fields[key].filter((x) => x.initiallyChecked);
     }
 
     return fields;
