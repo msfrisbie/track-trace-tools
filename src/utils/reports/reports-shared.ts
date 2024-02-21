@@ -8,16 +8,16 @@ import {
   IIndexedTransferData,
   ILicenseFormFilters,
   ITransferData,
-  ITransporterData,
+  ITransporterData
 } from "@/interfaces";
 import { facilityManager } from "@/modules/facility-manager.module";
 import store from "@/store/page-overlay/index";
-import { ReportType, ReportsGetters } from "@/store/page-overlay/modules/reports/consts";
+import { ReportsGetters, ReportType } from "@/store/page-overlay/modules/reports/consts";
 import {
   IFieldData,
   IReportConfig,
   IReportData,
-  IReportOption,
+  IReportOption
 } from "@/store/page-overlay/modules/reports/interfaces";
 import { todayIsodate } from "../date";
 import { extractEmployeeAuditData } from "./employee-audit-report";
@@ -407,7 +407,9 @@ export function getCsvFilename({
 export function getSpreadsheetName({ reportConfig }: { reportConfig: IReportConfig }): string {
   const date = todayIsodate();
 
-  return `T3 Metrc Report [Generated ${date}]`;
+  const fileExtension: string = reportConfig.exportFormat === 'XLSX' ? '.xlsx' : '';
+
+  return `T3 Metrc Report [Generated ${date}]${fileExtension}`;
 }
 
 export function getSheetTitle({

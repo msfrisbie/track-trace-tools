@@ -37,7 +37,10 @@ export interface IReportsState {
     spreadsheet: ISimpleSpreadsheet;
   }[];
   selectedReports: IReportOption[];
-  fields: {
+  allFields: {
+    [key: string]: IFieldData[];
+  };
+  selectedFields: {
     [key: string]: IFieldData[];
   };
   reportFormFilters: {

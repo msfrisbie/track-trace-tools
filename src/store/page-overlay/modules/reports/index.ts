@@ -54,7 +54,8 @@ const inMemoryState = {
   statusMessageHistory: [],
   generatedSpreadsheet: null,
   selectedReports: [],
-  fields: (() => {
+  allFields: SHEET_FIELDS,
+  selectedFields: (() => {
     const fields = _.cloneDeep(SHEET_FIELDS);
 
     for (const key of Object.keys(fields)) {
@@ -111,10 +112,10 @@ export const reportsModule = {
       state.selectedReports = data.selectedReports;
     },
     [ReportsMutations.CHECK_ALL](state: IReportsState, data: { reportType: ReportType }) {
-      state.fields[data.reportType] = _.cloneDeep(SHEET_FIELDS[data.reportType]);
+      state.selectedFields[data.reportType] = _.cloneDeep(SHEET_FIELDS[data.reportType]);
     },
     [ReportsMutations.UNCHECK_ALL](state: IReportsState, data: { reportType: ReportType }) {
-      state.fields[data.reportType] = _.cloneDeep(SHEET_FIELDS[data.reportType]).filter(
+      state.selectedFields[data.reportType] = _.cloneDeep(SHEET_FIELDS[data.reportType]).filter(
         (x) => x.required
       );
     },

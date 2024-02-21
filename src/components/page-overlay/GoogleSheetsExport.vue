@@ -1033,7 +1033,7 @@ export default Vue.extend({
       reportStatus: (state: IPluginState) => state.reports.status,
       reportStatusMessage: (state: IPluginState) => state.reports.statusMessage,
       reportStatusMessageHistory: (state: IPluginState) => state.reports.statusMessageHistory,
-      fields: (state: IPluginState) => state.reports.fields,
+      selectedFields: (state: IPluginState) => state.reports.selectedFields,
     }),
     ...mapGetters({
       hasT3plus: `client/${ClientGetters.T3PLUS}`,
@@ -1231,7 +1231,7 @@ export default Vue.extend({
         addPackageReport({
           reportConfig,
           packagesFormFilters: this.packagesFormFilters,
-          fields: this.fields[ReportType.PACKAGES],
+          fields: this.selectedFields[ReportType.PACKAGES],
         });
       }
 
@@ -1243,7 +1243,7 @@ export default Vue.extend({
         addStragglerPackagesReport({
           reportConfig,
           stragglerPackagesFormFilters: this.stragglerPackagesFormFilters,
-          fields: this.fields[ReportType.STRAGGLER_PACKAGES],
+          fields: this.selectedFields[ReportType.STRAGGLER_PACKAGES],
         });
       }
 
@@ -1266,7 +1266,7 @@ export default Vue.extend({
         addMaturePlantsReport({
           reportConfig,
           maturePlantsFormFilters: this.maturePlantsFormFilters,
-          fields: this.fields[ReportType.MATURE_PLANTS],
+          fields: this.selectedFields[ReportType.MATURE_PLANTS],
         });
       }
 
@@ -1278,7 +1278,7 @@ export default Vue.extend({
         addIncomingTransfersReport({
           reportConfig,
           incomingTransfersFormFilters: this.incomingTransfersFormFilters,
-          fields: this.fields[ReportType.INCOMING_TRANSFERS],
+          fields: this.selectedFields[ReportType.INCOMING_TRANSFERS],
         });
       }
 
@@ -1290,7 +1290,7 @@ export default Vue.extend({
         addOutgoingTransfersReport({
           reportConfig,
           outgoingTransfersFormFilters: this.outgoingTransfersFormFilters,
-          fields: this.fields[ReportType.OUTGOING_TRANSFERS],
+          fields: this.selectedFields[ReportType.OUTGOING_TRANSFERS],
         });
       }
 
@@ -1302,7 +1302,7 @@ export default Vue.extend({
         addTransferHubTransfersReport({
           reportConfig,
           transferHubTransfersFormFilters: this.transferHubTransfersFormFilters,
-          fields: this.fields[ReportType.TRANSFER_HUB_TRANSFERS],
+          fields: this.selectedFields[ReportType.TRANSFER_HUB_TRANSFERS],
         });
       }
 
@@ -1312,7 +1312,7 @@ export default Vue.extend({
         addHarvestsReport({
           reportConfig,
           harvestsFormFilters: this.harvestsFormFilters,
-          fields: this.fields[ReportType.HARVESTS],
+          fields: this.selectedFields[ReportType.HARVESTS],
         });
       }
 
@@ -1320,7 +1320,7 @@ export default Vue.extend({
         addTagsReport({
           reportConfig,
           tagsFormFilters: this.tagsFormFilters,
-          fields: this.fields[ReportType.TAGS],
+          fields: this.selectedFields[ReportType.TAGS],
         });
       }
 
@@ -1332,7 +1332,7 @@ export default Vue.extend({
         addImmaturePlantsReport({
           reportConfig,
           immaturePlantsFormFilters: this.immaturePlantsFormFilters,
-          fields: this.fields[ReportType.IMMATURE_PLANTS],
+          fields: this.selectedFields[ReportType.IMMATURE_PLANTS],
         });
       }
 
@@ -1344,7 +1344,7 @@ export default Vue.extend({
         addIncomingTransferManifestsReport({
           reportConfig,
           incomingTransferManifestsFormFilters: this.incomingTransferManifestsFormFilters,
-          fields: this.fields[ReportType.INCOMING_TRANSFER_MANIFESTS],
+          fields: this.selectedFields[ReportType.INCOMING_TRANSFER_MANIFESTS],
         });
       }
 
@@ -1366,7 +1366,7 @@ export default Vue.extend({
         addOutgoingTransferManifestsReport({
           reportConfig,
           outgoingTransferManifestsFormFilters: this.outgoingTransferManifestsFormFilters,
-          fields: this.fields[ReportType.OUTGOING_TRANSFER_MANIFESTS],
+          fields: this.selectedFields[ReportType.OUTGOING_TRANSFER_MANIFESTS],
         });
       }
 
@@ -1378,7 +1378,7 @@ export default Vue.extend({
         // addTransferHubTransferManifestsReport({
         //   reportConfig,
         //   transferHubTransferManifestsFormFilters: this.transferHubTransferManifestsFormFilters,
-        //   fields: this.fields[ReportType.TRANSFER_HUB_TRANSFER_MANIFESTS],
+        //   fields: this.selectedFields[ReportType.TRANSFER_HUB_TRANSFER_MANIFESTS],
         // });
       }
 

@@ -78,7 +78,7 @@ export default Vue.extend({
     ...mapState<IPluginState>({
       authState: (state: IPluginState) => state.pluginAuth.authState,
       selectedReports: (state: IPluginState) => state.reports.selectedReports,
-      fields: (state: IPluginState) => state.reports.fields,
+      selectedFields: (state: IPluginState) => state.reports.selectedFields,
     }),
     ...mapGetters({
       exampleGetter: `example/${ExampleGetters.EXAMPLE_GETTER}`,

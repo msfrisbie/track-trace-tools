@@ -368,12 +368,6 @@ export async function createXlsxOrError({
     .map((x) => x.value as ReportType)
     .filter((reportType) => shouldGenerateReport({ reportType, reportConfig, reportData }));
 
-  // const filename = getXlsxFilename({
-  //   reportType,
-  //   license: store.state.pluginAuth?.authState?.license,
-  //   reportConfig,
-  // });
-
   const xlsxFile: IXlsxFile = {
     filename: getSpreadsheetName({
       reportConfig,

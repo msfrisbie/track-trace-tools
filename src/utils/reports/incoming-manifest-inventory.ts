@@ -1,11 +1,11 @@
 import { IIndexedRichIncomingTransferData, IPluginState, ITransferFilter } from "@/interfaces";
 import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
 import store from "@/store/page-overlay/index";
-import { ReportType, ReportsMutations } from "@/store/page-overlay/modules/reports/consts";
+import { ReportsMutations, ReportType } from "@/store/page-overlay/modules/reports/consts";
 import {
   IReportConfig,
   IReportData,
-  IReportsState,
+  IReportsState
 } from "@/store/page-overlay/modules/reports/interfaces";
 import { ActionContext } from "vuex";
 
@@ -27,7 +27,7 @@ export function addIncomingManifestInventoryReport({
 
   reportConfig[ReportType.INCOMING_MANIFEST_INVENTORY] = {
     transferFilter,
-    fields: store.state.reports.fields[ReportType.INCOMING_MANIFEST_INVENTORY],
+    fields: store.state.reports.selectedFields[ReportType.INCOMING_MANIFEST_INVENTORY],
   };
 }
 
