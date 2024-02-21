@@ -209,24 +209,13 @@
                 <b-form-checkbox v-model="harvestPackagesFormFilters.enableHarvestMatchFilter">
                   <span class="leading-6">Use harvest match filter</span>
                 </b-form-checkbox>
-<<<<<<< HEAD
                 <b-form-checkbox v-model="harvestPackagesFormFilters.generateDebugLog">
                   <span class="leading-6">Generate debug log</span>
                 </b-form-checkbox>
-                <b-form-group
-                  v-if="harvestPackagesFormFilters.enableHarvestMatchFilter"
-                  label="Only include harvest names matching:"
-                >
-                  <b-form-input
-                    placeholder="Full or partial harvest names, comma separated"
-                    v-model="harvestPackagesFormFilters.harvestMatchFilterList"
-                  >
-=======
                 <b-form-group v-if="harvestPackagesFormFilters.enableHarvestMatchFilter"
                   label="Only include harvest names matching:">
-                  <b-form-input placeholder="Full or partial harvest name"
-                    v-model="harvestPackagesFormFilters.harvestMatchFilter">
->>>>>>> develop
+                  <b-form-input placeholder="Full or partial harvest names, comma separated"
+                    v-model="harvestPackagesFormFilters.harvestMatchFilterList">
                   </b-form-input>
                 </b-form-group>
                 <report-license-picker :formFilters="harvestPackagesFormFilters"></report-license-picker>
