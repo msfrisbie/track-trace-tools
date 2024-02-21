@@ -2,6 +2,7 @@ import { IdbKeyPiece } from "@/consts";
 import {
   IAdjustPackageReason,
   IAtomicService,
+  IAuthState,
   IItemCategory,
   IMetrcDriverData,
   IMetrcFacilityData,
@@ -16,7 +17,10 @@ import {
   IWasteReason,
 } from "@/interfaces";
 import { authManager } from "@/modules/auth-manager.module";
-import { primaryMetrcRequestManager } from "@/modules/metrc-request-manager.module";
+import {
+  MetrcRequestManager,
+  primaryMetrcRequestManager,
+} from "@/modules/metrc-request-manager.module";
 import { mockDataManager } from "@/modules/mock-data-manager.module";
 import store from "@/store/page-overlay/index";
 import { debugLogFactory } from "@/utils/debug";
@@ -204,7 +208,9 @@ interface INewTransferRepeaterData {
 
 const debugLog = debugLogFactory("dynamic-consts-manager.module.ts");
 
-class DynamicConstsManager implements IAtomicService {
+export class DynamicConstsManager implements IAtomicService {
+  private _metrcRequestManager: MetrcRequestManager | null = null;
+
   private _newTransferModalText: Promise<string> | null = null;
 
   private _newPackageModalText: Promise<string> | null = null;
@@ -237,7 +243,16 @@ class DynamicConstsManager implements IAtomicService {
 
   private _cachedTransportFacilities: IMetrcFacilityData[] | null = null;
 
-  async init() {
+  async init(spoofedAuthState: IAuthState | null = null) {
+    if (spoofedAuthState) {
+      const spoofedMetrcRequestManager = new MetrcRequestManager();
+      spoofedMetrcRequestManager.init(spoofedAuthState);
+      this._metrcRequestManager = spoofedMetrcRequestManager;
+    } else {
+      // This ordering matters, other methods eagerly access this value
+      this._metrcRequestManager = primaryMetrcRequestManager;
+    }
+
     // Allow 5s for the page to settle down
     await timer(5000).toPromise();
 
@@ -251,6 +266,14 @@ class DynamicConstsManager implements IAtomicService {
     return `${key}_${authState.license}`;
   }
 
+  get metrcRequestManagerOrError() {
+    if (!this._metrcRequestManager) {
+      throw new Error("MetrcRequestManager not available");
+    }
+
+    return this._metrcRequestManager;
+  }
+
   private async movePackageRepeaterData(): Promise<IMovePackageRepeaterData> {
     if (!this._movePackageRepeaterdata) {
       this._movePackageRepeaterdata = new Promise(async (resolve, reject) => {
@@ -259,7 +282,7 @@ class DynamicConstsManager implements IAtomicService {
         );
 
         try {
-          const html = await primaryMetrcRequestManager
+          const html = await this.metrcRequestManagerOrError
             .getMovePackagesHTML()
             .then((response) => response.data);
 
@@ -292,7 +315,7 @@ class DynamicConstsManager implements IAtomicService {
         );
 
         try {
-          const html = await primaryMetrcRequestManager
+          const html = await this.metrcRequestManagerOrError
             .getNewItemHTML()
             .then((response) => response.data);
 
@@ -325,7 +348,7 @@ class DynamicConstsManager implements IAtomicService {
         );
 
         try {
-          const html = await primaryMetrcRequestManager
+          const html = await this.metrcRequestManagerOrError
             .getNewStrainHTML()
             .then((response) => response.data);
 
@@ -358,7 +381,7 @@ class DynamicConstsManager implements IAtomicService {
         );
 
         try {
-          const html = await primaryMetrcRequestManager
+          const html = await this.metrcRequestManagerOrError
             .getWasteByLocationHTML()
             .then((response) => response.data);
 
@@ -391,7 +414,7 @@ class DynamicConstsManager implements IAtomicService {
         );
 
         try {
-          const html = await primaryMetrcRequestManager
+          const html = await this.metrcRequestManagerOrError
             .getAdjustPackageHTML()
             .then((response) => response.data);
 
@@ -424,7 +447,7 @@ class DynamicConstsManager implements IAtomicService {
         );
 
         try {
-          const html = await primaryMetrcRequestManager
+          const html = await this.metrcRequestManagerOrError
             .getRemediatePackageHTML()
             .then((response) => response.data);
 
@@ -457,7 +480,7 @@ class DynamicConstsManager implements IAtomicService {
         );
 
         try {
-          const html = await primaryMetrcRequestManager
+          const html = await this.metrcRequestManagerOrError
             .getCreatePlantingsFromPackageHTML()
             .then((response) => response.data);
 
@@ -494,7 +517,7 @@ class DynamicConstsManager implements IAtomicService {
         );
 
         try {
-          const html = await primaryMetrcRequestManager
+          const html = await this.metrcRequestManagerOrError
             .getChangePlantBatchGrowthPhaseHTML()
             .then((response) => response.data);
 
@@ -565,7 +588,7 @@ class DynamicConstsManager implements IAtomicService {
       //   }
       // );
 
-      this._newTransferModalText = primaryMetrcRequestManager
+      this._newTransferModalText = this.metrcRequestManagerOrError
         .getNewTransferHTML()
         .then((response: AxiosResponse) => response.data);
     }
@@ -577,7 +600,7 @@ class DynamicConstsManager implements IAtomicService {
   private async newPackageModalRequest() {
     if (!this._newPackageModalText) {
       debugLog(async () => ["Sending package modal request"]);
-      this._newPackageModalText = primaryMetrcRequestManager
+      this._newPackageModalText = this.metrcRequestManagerOrError
         .getNewPackageHTML()
         .then((response: AxiosResponse) => response.data);
     }
@@ -825,7 +848,7 @@ class DynamicConstsManager implements IAtomicService {
         return packages[0].LocationName !== null;
       }
 
-      return primaryMetrcRequestManager
+      return this.metrcRequestManagerOrError
         .getPackagesHTML()
         .then((response) => response.data)
         .then((body: string) => body.includes("Change Locations"));

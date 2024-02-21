@@ -389,6 +389,53 @@
           >
         </b-form-group>
 
+        <b-form-group class="col-span-2">
+          <template v-if="!!settings.email">
+            <b-input-group class="items-start">
+              <b-form-input
+                id="input-email"
+                class="mb-2"
+                v-model="settings.email"
+                name="input-email"
+                disabled="disabled"
+              >
+              </b-form-input>
+
+              <b-input-group-append>
+                <b-button size="md" @click="clearEmail()" variant="outline-danger">CLEAR</b-button>
+              </b-input-group-append>
+            </b-input-group>
+          </template>
+
+          <template v-else>
+            <b-input-group class="items-start">
+              <b-form-input
+                id="input-email"
+                placeholder="Enter your email here"
+                class="mb-2"
+                v-model="unsavedEmail"
+                name="input-email"
+                type="email"
+                v-on:keydown.enter.prevent="saveEmail()"
+                autocomplete="off"
+                :state="emailValidState"
+              >
+              </b-form-input>
+              <b-input-group-append>
+                <b-button
+                  :disabled="!unsavedEmail || emailValidState === false"
+                  size="md"
+                  @click="saveEmail()"
+                  variant="outline-success"
+                  >SAVE</b-button
+                >
+              </b-input-group-append>
+            </b-input-group>
+          </template>
+
+          <small v-if="emailValidState === false">Invalid email</small>
+        </b-form-group>
+
         <b-button-group vertical class="col-span-2 mb-4">
           <b-button variant="outline-primary" @click="resetSettings()">RESET SETTINGS</b-button>
           <b-button variant="outline-primary" @click="navToPermissions('/check-permissions')"
@@ -537,6 +584,7 @@
         ></b-form-select>
       </div>
     </b-form>
+    <div class="exboost-slot"></div>
   </div>
 </template>
 
@@ -561,6 +609,7 @@ import store from "@/store/page-overlay/index";
 import { SettingsActions } from "@/store/page-overlay/modules/settings/consts";
 import { getMatchingDecryptedDataOrNull } from "@/utils/encryption";
 import { generateThumbnail } from "@/utils/file";
+import ExBoost from "exboost-js";
 import Vue from "vue";
 import { mapState } from "vuex";
 
@@ -668,6 +717,7 @@ export default Vue.extend({
         },
       ],
       unsavedLicenseKey: "",
+      unsavedEmail: "",
       settings: JSON.parse(JSON.stringify(store.state.settings)),
     };
   },
@@ -675,9 +725,19 @@ export default Vue.extend({
     ...mapState<IPluginState>({
       explorer: (state: IPluginState) => state.explorer,
       clientName: (state: IPluginState) => state.client.clientName,
+      settingsState: (state: IPluginState) => state.settings,
     }),
     decryptedClientData() {
       return getMatchingDecryptedDataOrNull(store.state.settings?.licenseKey);
+    },
+    emailValidState(): boolean | null {
+      if (this.$data.unsavedEmail.length === 0) {
+        return null;
+      }
+
+      const test = /^\S+@\S+\.\S+$/.test(this.$data.unsavedEmail);
+
+      return test;
     },
   },
   methods: {
@@ -702,6 +762,11 @@ export default Vue.extend({
       this.onChange();
       clientBuildManager.loadClientConfig();
     },
+    saveEmail() {
+      this.$data.settings.email = this.$data.unsavedEmail;
+      this.$data.unsavedEmail = "";
+      this.onChange();
+    },
     clearLicenseKey() {
       /* eslint-disable-next-line no-alert */
       if (!window.confirm("Are you sure you want to remove your license key?")) {
@@ -710,6 +775,14 @@ export default Vue.extend({
       this.$data.settings.licenseKey = "";
       this.onChange();
       clientBuildManager.loadClientConfig();
+    },
+    clearEmail() {
+      /* eslint-disable-next-line no-alert */
+      if (!window.confirm("Are you sure you want to remove your email?")) {
+        return;
+      }
+      this.$data.settings.email = "";
+      this.onChange();
     },
     onImageChange() {},
     onChange() {
@@ -763,6 +836,14 @@ export default Vue.extend({
         });
       },
     },
+  },
+  async mounted() {
+    ExBoost.renderSlotDataOrError({
+      exboostSlotId: "test",
+      target: document.querySelector(".exboost-slot"),
+      containerClass: "flex flex-col gap-2 text-center my-8",
+      linkClass: "underline",
+    });
   },
 });
 </script>

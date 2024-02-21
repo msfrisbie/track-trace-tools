@@ -275,6 +275,7 @@ export default Vue.extend({
       const reportConfig: IReportConfig = {
         authState: await authManager.authStateOrError(),
         exportFormat: "CSV",
+        fileDeliveryFormat: "DOWNLOAD",
         [ReportType.SINGLE_TRANSFER]: {
           manifestNumber: this.$props.transfer.ManifestNumber as string,
           fields: null,

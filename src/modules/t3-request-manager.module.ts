@@ -1,9 +1,10 @@
-import { IAtomicService } from "@/interfaces";
+import { IAtomicService, IXlsxFile } from "@/interfaces";
 import { IAnnouncementData } from "@/store/page-overlay/modules/announcements/interfaces";
 import { AxiosError } from "axios";
 import { authManager } from "./auth-manager.module";
 import { customAxios } from "./fetch-manager.module";
 
+// const BASE_URL = isDevelopment() ? "http://127.0.0.1:5000/" : "https://api.trackandtrace.tools/";
 const BASE_URL = "https://api.trackandtrace.tools/";
 
 const CLIENT_KEY_PATH = "client";
@@ -13,6 +14,9 @@ const ANNOUNCEMENTS_PATH = "announcements";
 const T3PLUS_PATH = "plus_users/status";
 const FLAGS_PATH = "flags";
 const GOOGLE_MAPS_DIRECTIONS = "metrc/directions";
+const GENERATE_REPORT_PATH = "reports/generate";
+const DOWNLOAD_REPORT_PATH = "reports/download";
+const EMAIL_REPORT_PATH = "reports/email";
 
 const DEFAULT_POST_HEADERS = {
   "Content-Type": "application/json",
@@ -98,6 +102,39 @@ class T3RequestManager implements IAtomicService {
     });
 
     return response.data;
+  }
+
+  async generateAndDownloadReport({ xlsxFile }: { xlsxFile: IXlsxFile }) {
+    const response = await customAxios(BASE_URL + GENERATE_REPORT_PATH, {
+      method: "POST",
+      headers: DEFAULT_POST_HEADERS,
+      body: JSON.stringify(xlsxFile),
+      responseType: "json",
+    });
+
+    window.open(`${BASE_URL}${DOWNLOAD_REPORT_PATH}/${response.data.report_id}`, "_blank");
+
+    return response;
+  }
+
+  async generateAndEmailReport({ xlsxFile, email }: { xlsxFile: IXlsxFile; email: string }) {
+    const response = await customAxios(BASE_URL + GENERATE_REPORT_PATH, {
+      method: "POST",
+      headers: DEFAULT_POST_HEADERS,
+      body: JSON.stringify(xlsxFile),
+      responseType: "json",
+    });
+
+    const emailResponse = fetch(BASE_URL + EMAIL_REPORT_PATH, {
+      method: "POST",
+      headers: DEFAULT_POST_HEADERS,
+      body: JSON.stringify({
+        email,
+        report_id: response.data.report_id,
+      }),
+    });
+
+    return emailResponse;
   }
 
   async loadAnnouncements(): Promise<IAnnouncementData[]> {

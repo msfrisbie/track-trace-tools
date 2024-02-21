@@ -1,26 +1,30 @@
 import {
-    IAuthState, IHarvestFilter,
-    IIndexedHarvestData,
-    IIndexedPackageData,
-    IIndexedPlantBatchData,
-    IIndexedPlantData,
-    IIndexedRichIncomingTransferData,
-    IIndexedRichOutgoingTransferData,
-    IIndexedTagData, IPackageFilter,
-    IPlantBatchFilter,
-    IPlantFilter, ISimpleSpreadsheet,
-    ISpreadsheet,
-    ITagFilter,
-    ITransferFilter
-} from '@/interfaces';
-import { ImmaturePlantQuickviewDimension } from '@/utils/reports/immature-plants-quickview-report';
-import { MaturePlantQuickviewDimension } from '@/utils/reports/mature-plants-quickview-report';
-import { PackageQuickviewDimension } from '@/utils/reports/packages-quickview-report';
+  IAuthState,
+  IHarvestFilter,
+  IIndexedHarvestData,
+  IIndexedPackageData,
+  IIndexedPlantBatchData,
+  IIndexedPlantData,
+  IIndexedRichIncomingTransferData,
+  IIndexedRichOutgoingTransferData,
+  IIndexedTagData,
+  IPackageFilter,
+  IPlantBatchFilter,
+  IPlantFilter,
+  ISimpleSpreadsheet,
+  ISpreadsheet,
+  ITagFilter,
+  ITransferFilter,
+} from "@/interfaces";
+import { ImmaturePlantQuickviewDimension } from "@/utils/reports/immature-plants-quickview-report";
+import { IIncomingManifestInventoryReportFormFilters } from "@/utils/reports/incoming-manifest-inventory";
+import { MaturePlantQuickviewDimension } from "@/utils/reports/mature-plants-quickview-report";
+import { PackageQuickviewDimension } from "@/utils/reports/packages-quickview-report";
 import {
-    InventoryStrategy,
-    IPackageDateMetadata
-} from '@/utils/reports/point-in-time-inventory-report';
-import { IStatusMessage, ReportStatus, ReportType } from './consts';
+  IPackageDateMetadata,
+  InventoryStrategy,
+} from "@/utils/reports/point-in-time-inventory-report";
+import { CustomTransformer, IStatusMessage, ReportStatus, ReportType } from "./consts";
 
 export interface IReportsState {
   status: ReportStatus;
@@ -32,6 +36,16 @@ export interface IReportsState {
     timestamp: string;
     spreadsheet: ISimpleSpreadsheet;
   }[];
+  selectedReports: IReportOption[];
+  allFields: {
+    [key: string]: IFieldData[];
+  };
+  selectedFields: {
+    [key: string]: IFieldData[];
+  };
+  reportFormFilters: {
+    [ReportType.INCOMING_MANIFEST_INVENTORY]: IIncomingManifestInventoryReportFormFilters;
+  };
 }
 
 // export interface IPackageCostCalculationData {
@@ -45,7 +59,8 @@ export interface IReportsState {
 
 export interface IReportConfig {
   authState: IAuthState;
-  exportFormat?: 'CSV' | 'GOOGLE_SHEETS';
+  exportFormat?: "CSV" | "GOOGLE_SHEETS" | "XLSX";
+  fileDeliveryFormat?: "DOWNLOAD" | "EMAIL" | "OPEN_LINK";
   [ReportType.TEST]?: {
     exampleFilter: any;
     fields: IFieldData[];
@@ -119,7 +134,7 @@ export interface IReportConfig {
   [ReportType.SINGLE_TRANSFER]?: {
     manifestNumber: string;
     fields: null;
-  },
+  };
   [ReportType.PACKAGES_QUICKVIEW]?: {
     packageFilter: IPackageFilter;
     primaryDimension: PackageQuickviewDimension;
@@ -147,6 +162,14 @@ export interface IReportConfig {
     fields: IFieldData[];
   };
   [ReportType.OUTGOING_TRANSFERS]?: {
+    transferFilter: ITransferFilter;
+    fields: IFieldData[];
+  };
+  [ReportType.INCOMING_MANIFEST_INVENTORY]?: {
+    transferFilter: ITransferFilter;
+    fields: IFieldData[];
+  };
+  [ReportType.INCOMING_TRANSFER_MANIFESTS]?: {
     transferFilter: ITransferFilter;
     fields: IFieldData[];
   };
@@ -249,6 +272,12 @@ export interface IReportData {
   [ReportType.TRANSFER_HUB_TRANSFERS]?: {
     transferHubTransfers: IIndexedRichOutgoingTransferData[];
   };
+  [ReportType.INCOMING_TRANSFER_MANIFESTS]?: {
+    richIncomingTransfers?: IIndexedRichIncomingTransferData[];
+  };
+  [ReportType.INCOMING_MANIFEST_INVENTORY]?: {
+    richIncomingTransfers?: IIndexedRichIncomingTransferData[];
+  };
   [ReportType.OUTGOING_TRANSFER_MANIFESTS]?: {
     richOutgoingTransfers?: IIndexedRichOutgoingTransferData[];
   };
@@ -257,7 +286,7 @@ export interface IReportData {
   };
   [ReportType.SINGLE_TRANSFER]?: {
     singleTransferMatrix: any[][];
-  }
+  };
 }
 
 export interface IFieldData {
@@ -266,7 +295,8 @@ export interface IFieldData {
   required: boolean;
   initiallyChecked: boolean;
   checkedMessage?: string;
-  customTransformer?: (row: any) => any
+  // customTransformer?: (row: any) => any;
+  customTransformer?: CustomTransformer;
 }
 
 export interface ICogsArchive {

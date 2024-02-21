@@ -45,6 +45,7 @@ export const customAxios = function (
         axiosRetry?: {
           retries: number;
         };
+        responseType?: XMLHttpRequestResponseType;
       }
     | undefined
 ) {
@@ -62,6 +63,7 @@ export const customAxios = function (
     axiosConfig.signal = init.signal;
     axiosConfig.timeout = init.timeout;
     axiosConfig["axios-retry"] = init.axiosRetry;
+    axiosConfig.responseType = init.responseType || "json";
   }
   return client.request(axiosConfig);
 };

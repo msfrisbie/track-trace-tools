@@ -1,17 +1,26 @@
-import { IIndexedHarvestData } from "@/interfaces";
 import { IFieldData } from "./interfaces";
 
 export enum ReportsMutations {
+  REPORTS_MUTATION = "REPORTS_MUTATION",
+  UPDATE_SELECTED_REPORTS = "UPDATE_SELECTED_REPORTS",
   SET_STATUS = "SET_STATUS",
   SET_GENERATED_SPREADSHEET = "SET_GENERATED_SPREADSHEET",
+  CHECK_ALL = "CHECK_ALL",
+  UNCHECK_ALL = "UNCHECK_ALL",
+  UPDATE_DYNAMIC_REPORT_DATA = "UPDATE_DYNAMIC_REPORT_DATA",
 }
 
-export enum ReportsGetters {}
+export enum ReportsGetters {
+  REPORT_OPTIONS = "REPORT_OPTIONS",
+}
 
 export enum ReportsActions {
   RESET = "RESET",
   GENERATE_REPORT = "GENERATE_REPORT",
   RUN_AUX_REPORT_TASK = "RUN_AUX_REPORT_TASK",
+  CHECK_ALL = "CHECK_ALL",
+  UNCHECK_ALL = "UNCHECK_ALL",
+  UPDATE_DYNAMIC_REPORT_DATA = "UPDATE_DYNAMIC_REPORT_DATA",
 }
 
 export enum ReportStatus {
@@ -30,6 +39,8 @@ export enum ReportType {
   INCOMING_TRANSFERS = "INCOMING_TRANSFERS",
   OUTGOING_TRANSFERS = "OUTGOING_TRANSFERS",
   TRANSFER_HUB_TRANSFERS = "TRANSFER_HUB_TRANSFERS",
+  INCOMING_MANIFEST_INVENTORY = "INCOMING_MANIFEST_INVENTORY",
+  INCOMING_TRANSFER_MANIFESTS = "INCOMING_TRANSFER_MANIFESTS",
   OUTGOING_TRANSFER_MANIFESTS = "OUTGOING_TRANSFER_MANIFESTS",
   TRANSFER_HUB_TRANSFER_MANIFESTS = "TRANSFER_HUB_TRANSFER_MANIFESTS",
   MATURE_PLANTS = "MATURE_PLANTS",
@@ -59,6 +70,23 @@ const COMMON_FIELD_DATA: IFieldData[] = [
     initiallyChecked: true,
   },
 ];
+
+const COMMON_TRANSFER_FIELD_DATA: IFieldData[] = [
+  {
+    value: "Transfer.LicenseNumber",
+    readableName: "Current License",
+    required: true,
+    initiallyChecked: true,
+  },
+];
+
+export enum CustomTransformer {
+  CURRENT_PERCENT_WET_WEIGHT = "CURRENT_PERCENT_WET_WEIGHT",
+  PACKAGED_PERCENT_WET_WEIGHT = "PACKAGED_PERCENT_WET_WEIGHT",
+  WASTE_PERCENT_WET_WEIGHT = "WASTE_PERCENT_WET_WEIGHT",
+  RESTORED_PERCENT_WET_WEIGHT = "RESTORED_PERCENT_WET_WEIGHT",
+  TRANSFER_PACKAGE_UNIT_WEIGHT = "TRANSFER_PACKAGE_UNIT_WEIGHT"
+}
 
 const COMMON_PACKAGE_FIELD_DATA: IFieldData[] = [
   ...COMMON_FIELD_DATA,
@@ -280,7 +308,7 @@ const COMMON_PLANT_BATCH_FIELD_DATA: IFieldData[] = [
   },
 ];
 const COMMON_INCOMING_TRANSFER_FIELD_DATA: IFieldData[] = [
-  ...COMMON_FIELD_DATA,
+  ...COMMON_TRANSFER_FIELD_DATA,
   {
     value: "Transfer.ManifestNumber",
     readableName: "Manifest #",
@@ -343,7 +371,7 @@ const COMMON_INCOMING_TRANSFER_FIELD_DATA: IFieldData[] = [
   },
 ];
 const COMMON_OUTGOING_TRANSFER_FIELD_DATA: IFieldData[] = [
-  ...COMMON_FIELD_DATA,
+  ...COMMON_TRANSFER_FIELD_DATA,
   {
     value: "Transfer.ManifestNumber",
     readableName: "Manifest #",
@@ -425,6 +453,12 @@ const COMMON_TAG_FIELD_DATA: IFieldData[] = [
     required: true,
     initiallyChecked: true,
   },
+  {
+    value: "Used Datetime",
+    readableName: "UsedDateTime",
+    required: false,
+    initiallyChecked: true,
+  },
 ];
 const COMMON_HARVEST_FIELD_DATA: IFieldData[] = [
   ...COMMON_FIELD_DATA,
@@ -475,9 +509,7 @@ const COMMON_HARVEST_FIELD_DATA: IFieldData[] = [
     readableName: "Current % Wet Weight",
     required: false,
     initiallyChecked: true,
-    customTransformer(row: IIndexedHarvestData) {
-      return `${Math.round(((100 * row.CurrentWeight) / row.TotalWetWeight + Number.EPSILON) * 100) / 100}%`;
-    }
+    customTransformer: CustomTransformer.CURRENT_PERCENT_WET_WEIGHT
   },
   {
     value: "TotalPackagedWeight",
@@ -490,9 +522,7 @@ const COMMON_HARVEST_FIELD_DATA: IFieldData[] = [
     readableName: "Packaged % Wet Weight",
     required: false,
     initiallyChecked: false,
-    customTransformer(row: IIndexedHarvestData) {
-      return `${Math.round(((100 * row.TotalPackagedWeight) / row.TotalWetWeight + Number.EPSILON) * 100) / 100}%`;
-    }
+    customTransformer: CustomTransformer.PACKAGED_PERCENT_WET_WEIGHT
   },
   {
     value: "TotalWasteWeight",
@@ -505,9 +535,7 @@ const COMMON_HARVEST_FIELD_DATA: IFieldData[] = [
     readableName: "Waste % Wet Weight",
     required: false,
     initiallyChecked: false,
-    customTransformer(row: IIndexedHarvestData) {
-      return `${Math.round(((100 * row.TotalWasteWeight) / row.TotalWetWeight + Number.EPSILON) * 100) / 100}%`;
-    }
+    customTransformer: CustomTransformer.WASTE_PERCENT_WET_WEIGHT
   },
   {
     value: "TotalRestoredWeight",
@@ -520,9 +548,7 @@ const COMMON_HARVEST_FIELD_DATA: IFieldData[] = [
     readableName: "Restored % Wet Weight",
     required: false,
     initiallyChecked: false,
-    customTransformer(row: IIndexedHarvestData) {
-      return `${Math.round(((100 * row.TotalRestoredWeight) / row.TotalWetWeight + Number.EPSILON) * 100) / 100}%`;
-    }
+    customTransformer: CustomTransformer.RESTORED_PERCENT_WET_WEIGHT
   },
   {
     value: "HarvestStartDate",
@@ -568,7 +594,7 @@ const COMMON_HARVEST_FIELD_DATA: IFieldData[] = [
   },
 ];
 
-const COMMON_OUTGOING_TRANSFER_PACKAGE_DATA: IFieldData[] = [
+const COMMON_TRANSFER_PACKAGE_DATA: IFieldData[] = [
   ...COMMON_FIELD_DATA,
   {
     value: "Package.PackageLabel",
@@ -659,14 +685,111 @@ export const SHEET_FIELDS: { [key: string]: IFieldData[] } = {
   [ReportType.INCOMING_TRANSFERS]: [...COMMON_INCOMING_TRANSFER_FIELD_DATA],
   [ReportType.OUTGOING_TRANSFERS]: [...COMMON_OUTGOING_TRANSFER_FIELD_DATA],
   [ReportType.TRANSFER_HUB_TRANSFERS]: [...COMMON_OUTGOING_TRANSFER_FIELD_DATA],
+  [ReportType.INCOMING_TRANSFER_MANIFESTS]: [
+    ...COMMON_INCOMING_TRANSFER_FIELD_DATA,
+    ...COMMON_TRANSFER_PACKAGE_DATA,
+  ],
+  [ReportType.INCOMING_MANIFEST_INVENTORY]: [
+    {
+      value: "Transfer.ManifestNumber",
+      readableName: "Manifest #",
+      required: true,
+      initiallyChecked: true,
+    },
+    {
+      value: "Package.PackageLabel",
+      readableName: "Package",
+      required: true,
+      initiallyChecked: true,
+    },
+    {
+      value: "Package.SourceHarvestNames",
+      readableName: "Source Harvest(s)",
+      required: false,
+      initiallyChecked: true,
+    },
+    {
+      value: "Package.SourcePackageLabels",
+      readableName: "Source Package(s)",
+      required: false,
+      initiallyChecked: true,
+    },
+    {
+      value: "Package.ProductName",
+      readableName: "Item",
+      required: false,
+      initiallyChecked: true,
+    },
+    {
+      value: "Package.ProductCategoryName",
+      readableName: "Category",
+      required: false,
+      initiallyChecked: true,
+    },
+    {
+      value: "Package.ItemStrainName",
+      readableName: "Item Strain",
+      required: false,
+      initiallyChecked: true,
+    },
+    {
+      value: "Package.LabTestingStateName",
+      readableName: "Transfer Lab Testing State",
+      required: false,
+      initiallyChecked: true,
+    },
+    {
+      value: "Package.ShippedQuantity",
+      readableName: "Shipped Quantity",
+      required: false,
+      initiallyChecked: true,
+    },
+    {
+      value: "Package.GrossWeight",
+      readableName: "Gross Weight",
+      required: false,
+      initiallyChecked: true,
+    },
+    {
+      value: "Package.ShipperWholesalePrice",
+      readableName: "Shipper Wholesale Price",
+      required: false,
+      initiallyChecked: true,
+    },
+    {
+      value: "Package.ReceivedQuantity",
+      readableName: "Received Quantity",
+      required: false,
+      initiallyChecked: true,
+    },
+    {
+      value: "Package.ReceiverWholesalePrice",
+      readableName: "Receiver Wholesale Price",
+      required: false,
+      initiallyChecked: true,
+    },
+    {
+      value: "Package.ShipmentPackageState",
+      readableName: "Status",
+      required: false,
+      initiallyChecked: true,
+    },
+    {
+      value: "UnitWeight",
+      readableName: "Unit Weight",
+      required: false,
+      initiallyChecked: true,
+      customTransformer: CustomTransformer.TRANSFER_PACKAGE_UNIT_WEIGHT
+    },
+  ],
   [ReportType.OUTGOING_TRANSFER_MANIFESTS]: [
     ...COMMON_OUTGOING_TRANSFER_FIELD_DATA.slice(0, 5),
-    ...COMMON_OUTGOING_TRANSFER_PACKAGE_DATA.slice(1),
+    ...COMMON_TRANSFER_PACKAGE_DATA.slice(1),
     ...COMMON_OUTGOING_TRANSFER_FIELD_DATA.slice(5),
   ],
   [ReportType.TRANSFER_HUB_TRANSFER_MANIFESTS]: [
     ...COMMON_OUTGOING_TRANSFER_FIELD_DATA.slice(0, 5),
-    ...COMMON_OUTGOING_TRANSFER_PACKAGE_DATA.slice(1),
+    ...COMMON_TRANSFER_PACKAGE_DATA.slice(1),
     ...COMMON_OUTGOING_TRANSFER_FIELD_DATA.slice(5),
   ],
 };

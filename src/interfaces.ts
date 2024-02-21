@@ -20,6 +20,7 @@ import { IEmployeeSamplesState } from "./store/page-overlay/modules/employee-sam
 import { IExplorerState } from "./store/page-overlay/modules/explorer/interfaces";
 import { IFlagsState } from "./store/page-overlay/modules/flags/interfaces";
 import { IGraphState } from "./store/page-overlay/modules/graph/interfaces";
+import { ILabCsvState } from "./store/page-overlay/modules/lab-csv/interfaces";
 import { IListingState } from "./store/page-overlay/modules/listing/interfaces";
 import { IPackageHistoryState } from "./store/page-overlay/modules/package-history/interfaces";
 import { IPackageSearchState } from "./store/page-overlay/modules/package-search/interfaces";
@@ -37,10 +38,9 @@ import {
 } from "./store/page-overlay/modules/transfer-builder/interfaces";
 import { ITransferPackageSearchState } from "./store/page-overlay/modules/transfer-package-search/interfaces";
 import { ITransferSearchState } from "./store/page-overlay/modules/transfer-search/interfaces";
+import { ITransferToolsState } from "./store/page-overlay/modules/transfer-tools/interfaces";
 import { CsvUpload, CsvUploadStatus } from "./types";
 import { UnitOfMeasureAbbreviation, UnitOfMeasureName } from "./utils/units";
-import { ILabCsvState } from "./store/page-overlay/modules/lab-csv/interfaces";
-import { ITransferToolsState } from "./store/page-overlay/modules/transfer-tools/interfaces";
 
 export type PlantBatchTypeName = "Clone" | "Seed";
 export type PlantGrowthPhase = "Vegetative" | "Flowering";
@@ -512,6 +512,7 @@ export interface IHarvestFilter extends IMetrcFilter {
 
 export interface ITransferFilter extends IMetrcFilter {
   manifestNumber?: string | null;
+  idMatches?: number[] | null;
   createdDateGt?: string | null;
   createdDateEq?: string | null;
   createdDateLt?: string | null;
@@ -1067,7 +1068,7 @@ export interface IIndexedRichOutgoingTransferData extends IIndexedTransferData {
 
 export interface IIndexedRichIncomingTransferData extends IIndexedTransferData {
   incomingTransporters?: ITransporterData[];
-  incomingPackages?: IPackageData[];
+  incomingPackages?: IIndexedDestinationPackageData[];
 }
 
 export interface IIndexedTagData extends ITagData {
@@ -1179,6 +1180,14 @@ export interface CsvPlantHarvestGroup
 export interface ICsvFile {
   filename: string;
   data: any[][];
+}
+
+export interface IXlsxFile {
+  filename: string;
+  sheets: {
+    sheetName: string;
+    data: any[][];
+  }[];
 }
 
 export interface ITextFile {
@@ -1698,9 +1707,63 @@ export interface IMetrcStatusData {
   };
 }
 
+export interface IItemCategoryFacilityType {
+  ProductCategoryId: number;
+  FacilityTypeId: number;
+  CanCreateFromProductionBatch: boolean;
+  CanCreateFromHarvestBatch: boolean;
+}
+
 export interface IItemCategory {
   Id: number;
   Name: string;
+  ProductCategoryType: string;
+  ProductCategoryTypeName: string;
+  QuantityType: string;
+  QuantityTypeName: string;
+  DefaultLabTestingStateName: string;
+  PatientPurchaseAmountMultiplier: number;
+  RequiresApproval: boolean;
+  RequiresStrain: boolean;
+  RequiresItemBrand: boolean;
+  RequiresAdministrationMethod: boolean;
+  RequiresUnitCbdPercent: boolean;
+  RequiresUnitCbdContent: boolean;
+  RequiresUnitCbdContentDose: boolean;
+  RequiresUnitThcPercent: boolean;
+  RequiresUnitThcContent: boolean;
+  RequiresUnitThcContentDose: boolean;
+  RequiresUnitVolume: boolean;
+  RequiresUnitWeight: boolean;
+  RequiresServingSize: boolean;
+  RequiresSupplyDurationDays: boolean;
+  RequiresNumberOfDoses: boolean;
+  CalculateUnitQuantity: boolean;
+  UnitQuantityMultiplier: number | null;
+  UnitQuantityUnitOfMeasureAbbreviation: string | null;
+  RequiresPublicIngredients: boolean;
+  RequiresDescription: boolean;
+  RequiresAllergens: boolean;
+  RequiresProductPhotos: number;
+  RequiresProductPhotoDescription: boolean;
+  RequiresLabelPhotos: number;
+  RequiresLabelPhotoDescription: boolean;
+  RequiresPackagingPhotos: number;
+  RequiresPackagingPhotoDescription: boolean;
+  CanContainSeeds: boolean;
+  CanBeRemediated: boolean;
+  CanBeDestroyed: boolean;
+  UseItemWeightAsPatientFlowerPurchased: boolean;
+  UseItemWeightAsPatientConcentratePurchased: boolean;
+  UseItemWeightAsPatientInfusedPurchased: boolean;
+  ExpirationDateConfiguration: string;
+  SellByDateConfiguration: string;
+  UseByDateConfiguration: string;
+  ExpirationDateDaysInAdvance: number | null;
+  SellByDateDaysInAdvance: number | null;
+  UseByDateDaysInAdvance: number | null;
+  FacilityTypes: IItemCategoryFacilityType[];
+  RequiresProductPDFDocuments: number;
 }
 
 export interface IUnitOfMeasure {

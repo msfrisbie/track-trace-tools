@@ -34,7 +34,7 @@ export enum InventoryStrategy {
   PARTIAL_DAY = "Only include inventory that was in custody at any point on this day",
 }
 
-interface IPointInTimeInventoryReportFormFilters extends ILicenseFormFilters {
+export interface IPointInTimeInventoryReportFormFilters extends ILicenseFormFilters {
   targetDate: string;
   useRestrictedWindowOptimization: boolean;
   restrictedWindowDays: number;
@@ -512,7 +512,7 @@ export function extractPointInTimeInventoryData({
 }): any[][] {
   const matrix: any[][] = [];
 
-  const headers = ["License", "Tag", "Item", "Quantity (estimated)", "Unit of Measure", "Note"];
+  const headers = ["Current License", "Tag", "Item", "Quantity (estimated)", "Unit of Measure", "Note"];
 
   if (reportConfig[ReportType.POINT_IN_TIME_INVENTORY]!.showDebugColumns) {
     headers.push(

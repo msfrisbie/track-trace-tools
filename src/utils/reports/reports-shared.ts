@@ -1,382 +1,34 @@
-import { SheetTitles } from '@/consts';
+import { SheetTitles } from "@/consts";
 import {
-  IDestinationData,
-  IIndexedDestinationPackageData,
+  IDestinationData, IIndexedDestinationPackageData,
+  IIndexedHarvestData,
   IIndexedPlantBatchData,
   IIndexedRichIncomingTransferData,
   IIndexedRichOutgoingTransferData,
   IIndexedTransferData,
   ILicenseFormFilters, ITransferData,
   ITransporterData
-} from '@/interfaces';
-import { facilityManager } from '@/modules/facility-manager.module';
+} from "@/interfaces";
+import { facilityManager } from "@/modules/facility-manager.module";
 import store from "@/store/page-overlay/index";
-import {
-  ReportType
-} from '@/store/page-overlay/modules/reports/consts';
+import { CustomTransformer, ReportsGetters, ReportType } from "@/store/page-overlay/modules/reports/consts";
 import {
   IFieldData,
   IReportConfig,
   IReportData,
   IReportOption
-} from '@/store/page-overlay/modules/reports/interfaces';
-import { todayIsodate } from '../date';
-import { extractEmployeeAuditData } from './employee-audit-report';
-import { extractHarvestPackagesData } from './harvest-packages-report';
-import { extractImmaturePlantPropertyFromDimension } from './immature-plants-quickview-report';
-import { extractMaturePlantPropertyFromDimension } from './mature-plants-quickview-report';
-import { extractPackagePropertyFromDimension } from './packages-quickview-report';
-import { extractPointInTimeInventoryData } from './point-in-time-inventory-report';
-import { extractSingleTransferData } from './single-transfer-report';
+} from "@/store/page-overlay/modules/reports/interfaces";
+import { todayIsodate } from "../date";
+import { extractEmployeeAuditData } from "./employee-audit-report";
+import { extractHarvestPackagesData } from "./harvest-packages-report";
+import { extractImmaturePlantPropertyFromDimension } from "./immature-plants-quickview-report";
+import { extractMaturePlantPropertyFromDimension } from "./mature-plants-quickview-report";
+import { extractPackagePropertyFromDimension } from "./packages-quickview-report";
+import { extractPointInTimeInventoryData } from "./point-in-time-inventory-report";
+import { extractSingleTransferData } from "./single-transfer-report";
 
 export function reportCatalogFactory(): IReportOption[] {
-  const hasPlus: boolean = store.state.client.values.ENABLE_T3PLUS || store.state.client.t3plus;
-
-  const reportOptions: IReportOption[] = [
-    {
-      text: "Test",
-      value: ReportType.TEST,
-      enabled: hasPlus,
-      visible: false,
-      description: "Test report",
-      isCustom: false,
-      usesFormulas: false,
-      isMultiSheet: false,
-      usesFieldTransformer: false,
-      isSpecialty: false,
-      isCatalog: false,
-      isQuickview: false,
-      isHeadless: false
-    },
-    {
-      text: "Packages",
-      value: ReportType.PACKAGES,
-      enabled: hasPlus,
-      visible: true,
-      description: "All packages. Filter by type and date.",
-      isCustom: false,
-      usesFormulas: false,
-      isMultiSheet: false,
-      usesFieldTransformer: true,
-      isSpecialty: false,
-      isCatalog: true,
-      isQuickview: false,
-      isHeadless: false
-    },
-    {
-      text: "Point-in-time inventory",
-      value: ReportType.POINT_IN_TIME_INVENTORY,
-      enabled: hasPlus,
-      visible: true,
-      description: "All active packages on a certain date.",
-      isCustom: false,
-      usesFormulas: false,
-      isMultiSheet: false,
-      usesFieldTransformer: false,
-      isSpecialty: true,
-      isCatalog: false,
-      isQuickview: false,
-      isHeadless: false
-    },
-    {
-      text: "Plant Batches",
-      value: ReportType.IMMATURE_PLANTS,
-      enabled: hasPlus,
-      visible: true,
-      description: "All plant batches. Filter by planted date.",
-      isCustom: false,
-      usesFormulas: false,
-      isMultiSheet: false,
-      usesFieldTransformer: true,
-      isSpecialty: false,
-      isCatalog: true,
-      isQuickview: false,
-      isHeadless: false
-    },
-    {
-      text: "Mature Plants",
-      value: ReportType.MATURE_PLANTS,
-      enabled: hasPlus,
-      visible: true,
-      description: "All mature plants. Filter by growth phase and planted date",
-      isCustom: false,
-      usesFormulas: false,
-      isMultiSheet: false,
-      usesFieldTransformer: true,
-      isSpecialty: false,
-      isCatalog: true,
-      isQuickview: false,
-      isHeadless: false
-    },
-    {
-      text: "Incoming Transfers",
-      value: ReportType.INCOMING_TRANSFERS,
-      enabled: hasPlus,
-      visible: true,
-      description: "All incoming transfers. Filter by wholesale and ETA",
-      isCustom: false,
-      usesFormulas: false,
-      isMultiSheet: false,
-      usesFieldTransformer: true,
-      isSpecialty: false,
-      isCatalog: true,
-      isQuickview: false,
-      isHeadless: false
-    },
-    {
-      text: "Outgoing Transfers",
-      value: ReportType.OUTGOING_TRANSFERS,
-      enabled: hasPlus,
-      visible: true,
-      description: "All outgoing transfers. Filter by wholesale and ETD",
-      isCustom: false,
-      usesFormulas: false,
-      isMultiSheet: false,
-      usesFieldTransformer: true,
-      isSpecialty: false,
-      isCatalog: true,
-      isQuickview: false,
-      isHeadless: false
-    },
-    // Disabled - Destinations returns 0, more like incoming?
-    // {
-    //   text: "Hub Transfers",
-    //   value: ReportType.TRANSFER_HUB_TRANSFERS,
-    //
-    //   enabled: hasPlus,
-    //   description: "Filter by estimated time of departure",
-    //   isCustom: false,
-    // },
-    {
-      text: "Tags",
-      value: ReportType.TAGS,
-      enabled: hasPlus,
-      visible: true,
-      description: "All tags. Filter by status and tag type.",
-      isCustom: false,
-      usesFormulas: false,
-      isMultiSheet: false,
-      usesFieldTransformer: true,
-      isSpecialty: false,
-      isCatalog: true,
-      isQuickview: false,
-      isHeadless: false
-    },
-    {
-      text: "Harvests",
-      value: ReportType.HARVESTS,
-      enabled: hasPlus,
-      visible: true,
-      description: "All harvests. Filter by status and harvest date.",
-      isCustom: false,
-      usesFormulas: false,
-      isMultiSheet: false,
-      usesFieldTransformer: true,
-      isSpecialty: false,
-      isCatalog: true,
-      isQuickview: false,
-      isHeadless: false
-    },
-    {
-      text: "Outgoing Transfer Manifests",
-      value: ReportType.OUTGOING_TRANSFER_MANIFESTS,
-      enabled: hasPlus,
-      visible: true,
-      description: "Full transfer and package data for all outgoing transfers.",
-      isCustom: false,
-      usesFormulas: false,
-      isMultiSheet: false,
-      usesFieldTransformer: true,
-      isSpecialty: true,
-      isCatalog: false,
-      isQuickview: false,
-      isHeadless: false
-    },
-    {
-      text: "Straggler Inventory",
-      value: ReportType.STRAGGLER_PACKAGES,
-      enabled: hasPlus,
-      visible: true,
-      description: "Find old and empty inventory",
-      isCustom: false,
-      usesFormulas: false,
-      isMultiSheet: false,
-      usesFieldTransformer: true,
-      isSpecialty: true,
-      isCatalog: false,
-      isQuickview: false,
-      isHeadless: false
-    },
-    {
-      text: "Employee Activity",
-      value: ReportType.EMPLOYEE_AUDIT,
-      enabled: hasPlus,
-      visible: true,
-      description: "View all employee activity in Metrc",
-      isCustom: false,
-      usesFormulas: false,
-      isMultiSheet: false,
-      usesFieldTransformer: false,
-      isSpecialty: true,
-      isCatalog: false,
-      isQuickview: false,
-      isHeadless: false
-    },
-    {
-      text: "COGS",
-      value: ReportType.COGS_V2,
-      enabled: !!store.state.client.values.ENABLE_COGS,
-      visible: !!store.state.client.values.ENABLE_COGS,
-      description: "Generate COGS calculator",
-      isCustom: true,
-      usesFormulas: true,
-      isMultiSheet: true,
-      usesFieldTransformer: false,
-      isSpecialty: false,
-      isCatalog: false,
-      isQuickview: false,
-      isHeadless: false
-    },
-    {
-      text: "COGS Tracker",
-      value: ReportType.COGS_TRACKER,
-      enabled: !!store.state.client.values.ENABLE_COGS_TRACKER,
-      visible: !!store.state.client.values.ENABLE_COGS_TRACKER,
-      description: "Generate COGS Tracker sheets",
-      isCustom: true,
-      usesFormulas: true,
-      isMultiSheet: true,
-      usesFieldTransformer: false,
-      isSpecialty: false,
-      isCatalog: false,
-      isQuickview: false,
-      isHeadless: false
-    },
-    {
-      text: "Employee Samples",
-      value: ReportType.EMPLOYEE_SAMPLES,
-      enabled: !!store.state.client.values.ENABLE_EMPLOYEE_SAMPLE_TOOL,
-      visible: !!store.state.client.values.ENABLE_EMPLOYEE_SAMPLE_TOOL,
-      description: "Generate summary of employee samples",
-      isCustom: true,
-      usesFormulas: true,
-      isMultiSheet: true,
-      usesFieldTransformer: false,
-      isSpecialty: false,
-      isCatalog: false,
-      isQuickview: false,
-      isHeadless: false
-    },
-    {
-      text: "Harvest Packages",
-      value: ReportType.HARVEST_PACKAGES,
-      enabled: !!store.state.client.values.ENABLE_HARVEST_PACKAGES,
-      visible: !!store.state.client.values.ENABLE_HARVEST_PACKAGES,
-      description: "Generate summary of harvest packages",
-      usesFieldTransformer: false,
-      usesFormulas: false,
-      isMultiSheet: false,
-      isCustom: true,
-      isSpecialty: false,
-      isCatalog: false,
-      isQuickview: false,
-      isHeadless: false
-    },
-    {
-      text: "Packages Quickview",
-      value: ReportType.PACKAGES_QUICKVIEW,
-      enabled: hasPlus,
-      visible: true,
-      description: "Grouped summary of packages by item, location, and dates",
-      isCustom: false,
-      usesFormulas: false,
-      isMultiSheet: false,
-      usesFieldTransformer: false,
-      isSpecialty: false,
-      isCatalog: false,
-      isQuickview: true,
-      isHeadless: false
-    },
-    {
-      text: "Plant Batch Quickview",
-      value: ReportType.IMMATURE_PLANTS_QUICKVIEW,
-      enabled: hasPlus,
-      visible: true,
-      description: "Grouped summary of plant batches by strain, location, and dates",
-      isCustom: false,
-      usesFormulas: false,
-      isMultiSheet: false,
-      usesFieldTransformer: false,
-      isSpecialty: false,
-      isCatalog: false,
-      isQuickview: true,
-      isHeadless: false
-    },
-    {
-      text: "Mature Plants Quickview",
-      value: ReportType.MATURE_PLANTS_QUICKVIEW,
-      enabled: hasPlus,
-      visible: true,
-      description:
-        "Grouped summary of mature plants by growth phase, strain, location, and dates",
-      isCustom: false,
-      usesFormulas: false,
-      isMultiSheet: false,
-      usesFieldTransformer: false,
-      isSpecialty: false,
-      isCatalog: false,
-      isQuickview: true,
-      isHeadless: false
-    },
-    {
-      text: "Transfer Quickview",
-      value: null,
-      enabled: false,
-      visible: true,
-      description: "Summary of incoming, outgoing, and rejected packages",
-      isCustom: false,
-      usesFormulas: false,
-      isMultiSheet: false,
-      usesFieldTransformer: false,
-      isSpecialty: false,
-      isCatalog: false,
-      isQuickview: true,
-      isHeadless: false
-    },
-    // {
-    //   text: "Incoming Inventory",
-    //   value: null,
-    //
-    //   enabled: false,
-    //   description: "See packages not yet recieved",
-    //   isCustom: false,
-    // },
-    // {
-    //   text: "Harvested Plants",
-    //   value: null,
-    //
-    //   enabled: false,
-    //   description: "All plants and associated harvest data within this license",
-    //   isCustom: false,
-    // },
-    {
-      text: "Single Transfer",
-      value: ReportType.SINGLE_TRANSFER,
-      enabled: hasPlus,
-      visible: false,
-      description: "Single transfer",
-      isCustom: false,
-      usesFormulas: false,
-      isMultiSheet: false,
-      usesFieldTransformer: false,
-      isSpecialty: false,
-      isCatalog: false,
-      isQuickview: false,
-      isHeadless: false
-    },
-  ];
-
-  return reportOptions;
+  return store.getters[`reports/${ReportsGetters.REPORT_OPTIONS}`];
 }
 
 export function shouldGenerateReport({
@@ -417,6 +69,10 @@ export function extractNestedData({
       return reportData[reportType]!.incomingTransfers!;
     case ReportType.OUTGOING_TRANSFERS:
       return reportData[reportType]!.outgoingTransfers!;
+    case ReportType.INCOMING_TRANSFER_MANIFESTS:
+      return reportData[reportType]!.richIncomingTransfers!;
+    case ReportType.INCOMING_MANIFEST_INVENTORY:
+      return reportData[reportType]!.richIncomingTransfers!;
     case ReportType.OUTGOING_TRANSFER_MANIFESTS:
       return reportData[reportType]!.richOutgoingTransfers!;
     case ReportType.TRANSFER_HUB_TRANSFERS:
@@ -436,6 +92,52 @@ export function extractNestedData({
   }
 }
 
+export function applyCustomTransformer(field: IFieldData, untypedRow: any): string {
+  const customTransformer = field.customTransformer;
+
+  if (!customTransformer) {
+    throw new Error(`Field ${field.readableName} has no custom transformer`);
+  }
+
+  let row;
+
+  switch (customTransformer) {
+    case CustomTransformer.CURRENT_PERCENT_WET_WEIGHT:
+      row = untypedRow as IIndexedHarvestData;
+      return `${
+        Math.round(((100 * row.CurrentWeight) / row.TotalWetWeight + Number.EPSILON) * 100) / 100
+      }%`;
+    case CustomTransformer.PACKAGED_PERCENT_WET_WEIGHT:
+      row = untypedRow as IIndexedHarvestData;
+      return `${
+        Math.round(((100 * row.TotalPackagedWeight) / row.TotalWetWeight + Number.EPSILON) * 100) /
+        100
+      }%`;
+    case CustomTransformer.WASTE_PERCENT_WET_WEIGHT:
+      row = untypedRow as IIndexedHarvestData;
+      return `${
+        Math.round(((100 * row.TotalWasteWeight) / row.TotalWetWeight + Number.EPSILON) * 100) / 100
+      }%`;
+    case CustomTransformer.RESTORED_PERCENT_WET_WEIGHT:
+      row = untypedRow as IIndexedHarvestData;
+      return `${
+        Math.round(((100 * row.TotalRestoredWeight) / row.TotalWetWeight + Number.EPSILON) * 100) /
+        100
+      }%`;
+    case CustomTransformer.TRANSFER_PACKAGE_UNIT_WEIGHT:
+      row = untypedRow as { Package: IIndexedDestinationPackageData };
+      const match = row.Package.ProductName.match(/(\d+(?:\.\d+)?)(?:\s?)(g|mg)/);
+
+        if (match) {
+          return `${match[1]} ${match[2]}`;
+        }
+
+        return "";
+    default:
+      throw new Error('Unmatched custom transformer');
+  }
+}
+
 export function applyFieldTransformer({
   fields,
   values,
@@ -448,16 +150,17 @@ export function applyFieldTransformer({
       let value = row;
 
       if (fieldData.customTransformer) {
-        value = fieldData.customTransformer(row);
+        value = applyCustomTransformer(fieldData, row);
       } else {
-        for (const subProperty of fieldData.value.split('.')) {
+        for (const subProperty of fieldData.value.split(".")) {
           // @ts-ignore
           value = value[subProperty];
         }
       }
 
       return value;
-    }));
+    })
+  );
 }
 
 export function extractQuickviewData({
@@ -498,7 +201,7 @@ export function extractQuickviewData({
       extractor = extractPackagePropertyFromDimension;
       break;
     default:
-      throw new Error('Bad report type');
+      throw new Error("Bad report type");
   }
 
   const indexedDimensionCounts: { [key: string]: { [key: string]: number } } = {};
@@ -508,7 +211,7 @@ export function extractQuickviewData({
 
   for (const object of objects) {
     const primaryValue = extractor(object, primaryDimension);
-    const secondaryValue = secondaryDimension ? extractor(object, secondaryDimension) : '*';
+    const secondaryValue = secondaryDimension ? extractor(object, secondaryDimension) : "*";
 
     primaryKeys.add(primaryValue);
     secondaryKeys.add(secondaryValue);
@@ -528,10 +231,10 @@ export function extractQuickviewData({
   const sortedSecondaryKeys = [...secondaryKeys].sort();
 
   data.push([
-    `${secondaryDimension ?? '*'} / ${primaryDimension}`,
+    `${secondaryDimension ?? "*"} / ${primaryDimension}`,
     ...sortedPrimaryKeys,
-    '',
-    'TOTAL',
+    "",
+    "TOTAL",
   ]);
 
   const colTotals = Array(sortedPrimaryKeys.length).fill(0);
@@ -552,11 +255,11 @@ export function extractQuickviewData({
       row.push(cellSum.toString());
     }
 
-    data.push([...row, '', rowTotal.toString()]);
+    data.push([...row, "", rowTotal.toString()]);
   }
 
   data.push([]);
-  data.push(['TOTAL', ...colTotals, '', `GRAND TOTAL: ${grandTotal}`]);
+  data.push(["TOTAL", ...colTotals, "", `GRAND TOTAL: ${grandTotal}`]);
 
   return data;
 }
@@ -642,6 +345,25 @@ export function extractFlattenedData({
         }
 
         return flattenedTransferHubTransfers;
+      case ReportType.INCOMING_TRANSFER_MANIFESTS:
+      case ReportType.INCOMING_MANIFEST_INVENTORY:
+        const flattenedIncomingPackages: {
+          Package: IIndexedDestinationPackageData;
+          Transfer: ITransferData;
+        }[] = [];
+
+        for (const transfer of extractNestedData({
+          reportType,
+          reportData,
+        }) as IIndexedRichIncomingTransferData[]) {
+          for (const pkg of transfer.incomingPackages ?? []) {
+            flattenedIncomingPackages.push({
+              Package: pkg,
+              Transfer: transfer,
+            });
+          }
+        }
+        return flattenedIncomingPackages;
       case ReportType.OUTGOING_TRANSFER_MANIFESTS:
         const flattenedOutgoingPackages: {
           Package: IIndexedDestinationPackageData;
@@ -727,16 +449,12 @@ export function getCsvFilename({
   return `${sheetTitle} [Generated ${date}]`;
 }
 
-export function getGoogleSheetName({
-  license,
-  reportConfig,
-}: {
-  license: string;
-  reportConfig: IReportConfig;
-}): string {
+export function getSpreadsheetName({ reportConfig }: { reportConfig: IReportConfig }): string {
   const date = todayIsodate();
 
-  return `T3 Metrc Report [Generated ${date}]`;
+  const fileExtension: string = reportConfig.exportFormat === 'XLSX' ? '.xlsx' : '';
+
+  return `T3 Metrc Report [Generated ${date}]${fileExtension}`;
 }
 
 export function getSheetTitle({
@@ -785,6 +503,12 @@ export function getSheetTitle({
     case ReportType.OUTGOING_TRANSFERS:
       title = SheetTitles.OUTGOING_TRANSFERS;
       break;
+    case ReportType.INCOMING_TRANSFER_MANIFESTS:
+      title = SheetTitles.INCOMING_TRANSFER_MANIFESTS;
+      break;
+    case ReportType.INCOMING_MANIFEST_INVENTORY:
+      title = SheetTitles.INCOMING_MANIFEST_INVENTORY;
+      break;
     case ReportType.OUTGOING_TRANSFER_MANIFESTS:
       title = SheetTitles.OUTGOING_TRANSFER_MANIFESTS;
       break;
@@ -815,26 +539,28 @@ export function getSheetTitle({
     ReportType.EMPLOYEE_SAMPLES,
   ];
 
-  if (!NO_LICENSE_TYPES.includes(reportType) && 'licenses' in reportConfig[reportType]!) {
+  if (!NO_LICENSE_TYPES.includes(reportType) && "licenses" in reportConfig[reportType]!) {
     // @ts-ignore
-    title += ` (${reportConfig[reportType]!.licenses.join(',')})`;
+    title += ` (${reportConfig[reportType]!.licenses.join(",")})`;
   }
 
   return title;
 }
 
-export function licenseFilterFactory(initial: 'all' | 'current' | 'none' = 'current'): ILicenseFormFilters {
+export function licenseFilterFactory(
+  initial: "all" | "current" | "none" = "current"
+): ILicenseFormFilters {
   let licenses: string[] = [];
   const currentLicense: string | null = facilityManager.cachedActiveFacility?.licenseNumber ?? null;
   const allLicenses: string[] = facilityManager.cachedFacilities.map((x) => x.licenseNumber);
 
   switch (initial) {
-    case 'none':
+    case "none":
       break;
-    case 'current':
+    case "current":
       licenses = currentLicense ? [currentLicense] : [];
       break;
-    case 'all':
+    case "all":
       licenses = allLicenses;
       break;
   }
@@ -845,8 +571,8 @@ export function licenseFilterFactory(initial: 'all' | 'current' | 'none' = 'curr
   };
 }
 
-export function extractLicenseFields(formFilters: ILicenseFormFilters): {licenses: string[]} {
+export function extractLicenseFields(formFilters: ILicenseFormFilters): { licenses: string[] } {
   return {
-    licenses: formFilters.licenses
+    licenses: formFilters.licenses,
   };
 }
