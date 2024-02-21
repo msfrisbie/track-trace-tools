@@ -1,18 +1,17 @@
 import { SheetTitles } from "@/consts";
 import {
-  IDestinationData,
-  IIndexedDestinationPackageData,
+  IDestinationData, IIndexedDestinationPackageData,
+  IIndexedHarvestData,
   IIndexedPlantBatchData,
   IIndexedRichIncomingTransferData,
   IIndexedRichOutgoingTransferData,
   IIndexedTransferData,
-  ILicenseFormFilters,
-  ITransferData,
+  ILicenseFormFilters, ITransferData,
   ITransporterData
 } from "@/interfaces";
 import { facilityManager } from "@/modules/facility-manager.module";
 import store from "@/store/page-overlay/index";
-import { ReportsGetters, ReportType } from "@/store/page-overlay/modules/reports/consts";
+import { CustomTransformer, ReportsGetters, ReportType } from "@/store/page-overlay/modules/reports/consts";
 import {
   IFieldData,
   IReportConfig,
@@ -93,6 +92,52 @@ export function extractNestedData({
   }
 }
 
+export function applyCustomTransformer(field: IFieldData, untypedRow: any): string {
+  const customTransformer = field.customTransformer;
+
+  if (!customTransformer) {
+    throw new Error(`Field ${field.readableName} has no custom transformer`);
+  }
+
+  let row;
+
+  switch (customTransformer) {
+    case CustomTransformer.CURRENT_PERCENT_WET_WEIGHT:
+      row = untypedRow as IIndexedHarvestData;
+      return `${
+        Math.round(((100 * row.CurrentWeight) / row.TotalWetWeight + Number.EPSILON) * 100) / 100
+      }%`;
+    case CustomTransformer.PACKAGED_PERCENT_WET_WEIGHT:
+      row = untypedRow as IIndexedHarvestData;
+      return `${
+        Math.round(((100 * row.TotalPackagedWeight) / row.TotalWetWeight + Number.EPSILON) * 100) /
+        100
+      }%`;
+    case CustomTransformer.WASTE_PERCENT_WET_WEIGHT:
+      row = untypedRow as IIndexedHarvestData;
+      return `${
+        Math.round(((100 * row.TotalWasteWeight) / row.TotalWetWeight + Number.EPSILON) * 100) / 100
+      }%`;
+    case CustomTransformer.RESTORED_PERCENT_WET_WEIGHT:
+      row = untypedRow as IIndexedHarvestData;
+      return `${
+        Math.round(((100 * row.TotalRestoredWeight) / row.TotalWetWeight + Number.EPSILON) * 100) /
+        100
+      }%`;
+    case CustomTransformer.TRANSFER_PACKAGE_UNIT_WEIGHT:
+      row = untypedRow as { Package: IIndexedDestinationPackageData };
+      const match = row.Package.ProductName.match(/(\d+(?:\.\d+)?)(?:\s?)(g|mg)/);
+
+        if (match) {
+          return `${match[1]} ${match[2]}`;
+        }
+
+        return "";
+    default:
+      throw new Error('Unmatched custom transformer');
+  }
+}
+
 export function applyFieldTransformer({
   fields,
   values,
@@ -105,7 +150,7 @@ export function applyFieldTransformer({
       let value = row;
 
       if (fieldData.customTransformer) {
-        value = fieldData.customTransformer(row);
+        value = applyCustomTransformer(fieldData, row);
       } else {
         for (const subProperty of fieldData.value.split(".")) {
           // @ts-ignore

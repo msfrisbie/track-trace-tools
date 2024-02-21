@@ -1,4 +1,3 @@
-import { IIndexedHarvestData } from "@/interfaces";
 import { IFieldData } from "./interfaces";
 
 export enum ReportsMutations {
@@ -80,6 +79,14 @@ const COMMON_TRANSFER_FIELD_DATA: IFieldData[] = [
     initiallyChecked: true,
   },
 ];
+
+export enum CustomTransformer {
+  CURRENT_PERCENT_WET_WEIGHT = "CURRENT_PERCENT_WET_WEIGHT",
+  PACKAGED_PERCENT_WET_WEIGHT = "PACKAGED_PERCENT_WET_WEIGHT",
+  WASTE_PERCENT_WET_WEIGHT = "WASTE_PERCENT_WET_WEIGHT",
+  RESTORED_PERCENT_WET_WEIGHT = "RESTORED_PERCENT_WET_WEIGHT",
+  TRANSFER_PACKAGE_UNIT_WEIGHT = "TRANSFER_PACKAGE_UNIT_WEIGHT"
+}
 
 const COMMON_PACKAGE_FIELD_DATA: IFieldData[] = [
   ...COMMON_FIELD_DATA,
@@ -502,11 +509,7 @@ const COMMON_HARVEST_FIELD_DATA: IFieldData[] = [
     readableName: "Current % Wet Weight",
     required: false,
     initiallyChecked: true,
-    customTransformer(row: IIndexedHarvestData) {
-      return `${
-        Math.round(((100 * row.CurrentWeight) / row.TotalWetWeight + Number.EPSILON) * 100) / 100
-      }%`;
-    },
+    customTransformer: CustomTransformer.CURRENT_PERCENT_WET_WEIGHT
   },
   {
     value: "TotalPackagedWeight",
@@ -519,12 +522,7 @@ const COMMON_HARVEST_FIELD_DATA: IFieldData[] = [
     readableName: "Packaged % Wet Weight",
     required: false,
     initiallyChecked: false,
-    customTransformer(row: IIndexedHarvestData) {
-      return `${
-        Math.round(((100 * row.TotalPackagedWeight) / row.TotalWetWeight + Number.EPSILON) * 100) /
-        100
-      }%`;
-    },
+    customTransformer: CustomTransformer.PACKAGED_PERCENT_WET_WEIGHT
   },
   {
     value: "TotalWasteWeight",
@@ -537,11 +535,7 @@ const COMMON_HARVEST_FIELD_DATA: IFieldData[] = [
     readableName: "Waste % Wet Weight",
     required: false,
     initiallyChecked: false,
-    customTransformer(row: IIndexedHarvestData) {
-      return `${
-        Math.round(((100 * row.TotalWasteWeight) / row.TotalWetWeight + Number.EPSILON) * 100) / 100
-      }%`;
-    },
+    customTransformer: CustomTransformer.WASTE_PERCENT_WET_WEIGHT
   },
   {
     value: "TotalRestoredWeight",
@@ -554,12 +548,7 @@ const COMMON_HARVEST_FIELD_DATA: IFieldData[] = [
     readableName: "Restored % Wet Weight",
     required: false,
     initiallyChecked: false,
-    customTransformer(row: IIndexedHarvestData) {
-      return `${
-        Math.round(((100 * row.TotalRestoredWeight) / row.TotalWetWeight + Number.EPSILON) * 100) /
-        100
-      }%`;
-    },
+    customTransformer: CustomTransformer.RESTORED_PERCENT_WET_WEIGHT
   },
   {
     value: "HarvestStartDate",
@@ -790,15 +779,7 @@ export const SHEET_FIELDS: { [key: string]: IFieldData[] } = {
       readableName: "Unit Weight",
       required: false,
       initiallyChecked: true,
-      customTransformer(row) {
-        const match = row.Package.ProductName.match(/(\d+(?:\.\d+)?)(?:\s?)(g|mg)/);
-
-        if (match) {
-          return `${match[1]} ${match[2]}`;
-        }
-
-        return "";
-      },
+      customTransformer: CustomTransformer.TRANSFER_PACKAGE_UNIT_WEIGHT
     },
   ],
   [ReportType.OUTGOING_TRANSFER_MANIFESTS]: [

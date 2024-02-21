@@ -24,7 +24,7 @@ import {
   IPackageDateMetadata,
   InventoryStrategy,
 } from "@/utils/reports/point-in-time-inventory-report";
-import { IStatusMessage, ReportStatus, ReportType } from "./consts";
+import { CustomTransformer, IStatusMessage, ReportStatus, ReportType } from "./consts";
 
 export interface IReportsState {
   status: ReportStatus;
@@ -294,7 +294,8 @@ export interface IFieldData {
   required: boolean;
   initiallyChecked: boolean;
   checkedMessage?: string;
-  customTransformer?: (row: any) => any;
+  // customTransformer?: (row: any) => any;
+  customTransformer?: CustomTransformer;
 }
 
 export interface ICogsArchive {
