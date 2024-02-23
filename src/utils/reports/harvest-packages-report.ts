@@ -5,6 +5,7 @@ import {
   IIndexedPackageData,
   IIndexedRichOutgoingTransferData,
   IPluginState,
+  ITextFile,
   IUnionIndexedPackageData,
   IUnitOfMeasure,
 } from "@/interfaces";
@@ -20,6 +21,7 @@ import { TransferPackageSearchAlgorithm } from "@/store/page-overlay/modules/tra
 import { v4 as uuidv4 } from "uuid";
 import { ActionContext } from "vuex";
 import { todayIsodate } from "../date";
+import { downloadTextFile } from "../file";
 import {
   extractAdjustmentReasonNoteSetsFromHistory,
   extractChildPackageLabelsFromHistory,
@@ -287,6 +289,14 @@ export async function maybeLoadHarvestPackagesReportData({
     return;
   }
 
+  TODO break this into three steps:
+
+  1) Generate a tree of packages 4-deep (5?)
+  2) Analyze shape of tree, assign steps to each node
+  3) Iteratively traverse the tree, generating the report
+
+  const debugLog: string[] = [];
+
   const promises: Promise<any>[] = [];
 
   // Import all Metrc data that can be loaded in bulk via pagination
@@ -516,6 +526,7 @@ export async function maybeLoadHarvestPackagesReportData({
 
   const temporaryValueMap = new Map<string | number | null, string | number | null>();
 
+  // At this point, data collection has finished and parsing begins.
   for (const harvest of harvests) {
     const harvestPackageLabels = extractHarvestChildPackageLabelsFromHistory(harvest.history!);
 
@@ -526,17 +537,20 @@ export async function maybeLoadHarvestPackagesReportData({
     }
 
     for (const harvestPackageLabel of harvestPackageLabels) {
+      debugLog.push(`>>> Harvest Package: ${harvestPackageLabel}`);
       // Top-level package is the harvest package.
       // All flower in this harvest is contained in this initial pakage
       const harvestPackage = packageMap.get(harvestPackageLabel);
 
       if (!harvestPackage) {
+        const Note = `Could not match harvest package. license:${harvest.LicenseNumber} harvest:${harvest.Name}, label:${harvestPackageLabel}`;
         harvestPackageRowData.push(
           rowDataFactory({
-            Note: `Could not match harvest package. license:${harvest.LicenseNumber} harvest:${harvest.Name}, label:${harvestPackageLabel}`,
+            Note,
             RowSource: "2",
           })
         );
+        debugLog.push(`${Note}`);
 
         continue;
       }
@@ -583,6 +597,8 @@ export async function maybeLoadHarvestPackagesReportData({
         harvestPackage.history!
       ).sort();
 
+      debugLog.push(`Detected ${childPackageLabels.length} child package labels`);
+
       const trimChildPackages: IUnionIndexedPackageData[] = [];
       const shakeChildPackages: IUnionIndexedPackageData[] = [];
       const harvestPostQcPackages: IUnionIndexedPackageData[] = [];
@@ -592,17 +608,23 @@ export async function maybeLoadHarvestPackagesReportData({
       for (const childPackageLabel of childPackageLabels) {
         const childPackage = packageMap.get(childPackageLabel);
 
+        debugLog.push(`>>> Child Package: ${childPackageLabel}`);
+
         if (!childPackage) {
+          const Note = `Packaging stage: Could not match child package. license:${
+            harvest.LicenseNumber
+          } harvest:${harvest.Name}, harvestPkg:${getLabelOrError(
+            harvestPackage
+          )}, label:${childPackageLabel}`;
+
           harvestPackageRowData.push(
             rowDataFactory({
-              Note: `Packaging stage: Could not match child package. license:${
-                harvest.LicenseNumber
-              } harvest:${harvest.Name}, harvestPkg:${getLabelOrError(
-                harvestPackage
-              )}, label:${childPackageLabel}`,
+              Note,
               RowSource: "4",
             })
           );
+
+          debugLog.push(`${Note}`);
 
           continue;
         }
@@ -627,79 +649,49 @@ export async function maybeLoadHarvestPackagesReportData({
           !stringMatch(childItemName, ["Popcorn", "Flower"])
         ) {
           trimChildPackages.push(childPackage);
+
+          debugLog.push(`Identified ${getLabelOrError(childPackage)} as Trim package`);
+
           continue;
         }
 
         // Shake is handled later on
         if (stringMatch(childItemName, ["Shake"])) {
           shakeChildPackages.push(childPackage);
+
+          debugLog.push(`Identified ${getLabelOrError(childPackage)} as Shake package`);
+
           continue;
         }
 
         intakePackages.push(childPackage);
+
+        debugLog.push(`Identified ${getLabelOrError(childPackage)} as an Intake package`);
       }
 
-      for (const childPackage of harvestPostQcPackages) {
-        recordHarvestPostQcRow(
-          reportConfig,
-          reportData,
-          harvest,
-          strainName,
+      // This will never execute due to comment above (Post QC - Sent to Lab package)
+      //
+      // for (const childPackage of harvestPostQcPackages) {
+      //   recordHarvestPostQcRow(
+      //     reportConfig,
+      //     reportData,
+      //     harvest,
+      //     strainName,
+      //     harvestPackage,
+      //     childPackage,
+      //     harvestPackageRowData,
+      //     unitsOfMeasure,
+      //     ""
+      //   );
+      // }
+
+      for (const initialPackage of intakePackages) {
+        const { childPackage, passthruMsg } = await maybeUsePassthruPackage({
+          initialPackage,
           harvestPackage,
-          childPackage,
-          harvestPackageRowData,
-          unitsOfMeasure,
-          ""
-        );
-      }
-
-      for (let childPackage of intakePackages) {
-        const originalPackage = childPackage;
-
-        const passthroughTestPackageLabels = extractTestSamplePackageLabelsFromHistory(
-          childPackage.history!
-        );
-
-        const passthroughPackageLabels = extractChildPackageLabelsFromHistory_Full(
-          childPackage.history!
-        );
-
-        let passthroughMsg: string = "";
-
-        if (passthroughTestPackageLabels.length === 0 && passthroughPackageLabels.length === 1) {
-          if (packageMap.has(passthroughPackageLabels[0].label)) {
-            // Can safely skip this package for its child
-            childPackage = packageMap.get(passthroughPackageLabels[0].label)!;
-          } else {
-            console.error("Invoked slow method getPackageFromOutboundTransferOrNull()");
-
-            const result = await getPackageFromOutboundTransferOrNull(
-              passthroughPackageLabels[0].label,
-              childPackage.LicenseNumber,
-              passthroughPackageLabels[0].history.RecordedDateTime.split("T")[0]
-            );
-
-            if (result) {
-              const [transfer, pkg] = result;
-
-              childPackage = pkg;
-            }
-          }
-
-          if (!childPackage) {
-            throw new Error(
-              `Passthrough failed: childLabel:${getLabelOrError(childPackage)} passthroughLabel:${
-                passthroughPackageLabels[0].label
-              }`
-            );
-          } else {
-            passthroughMsg = `Passthrough matched! Original:${getLabelOrError(
-              originalPackage
-            )} Passthrough:${getLabelOrError(childPackage)}`;
-
-            console.log(passthroughMsg);
-          }
-        }
+          packageMap,
+          debugLog,
+        });
 
         // Double check that history was loaded
         if (!childPackage.history) {
@@ -726,17 +718,22 @@ export async function maybeLoadHarvestPackagesReportData({
             childPackage,
             harvestPackageRowData,
             unitsOfMeasure,
-            passthroughMsg
+            passthruMsg,
+            debugLog
           );
         } catch (e) {
+          const Note = `Could not record QC Rows: ${(e as any).toString()}. license:${
+            childPackage.LicenseNumber
+          } harvest:${harvest.Name}, label:${getLabelOrError(childPackage)}`;
+
           harvestPackageRowData.push(
             rowDataFactory({
-              Note: `Could not record QC Rows: ${(e as any).toString()}. license:${
-                childPackage.LicenseNumber
-              } harvest:${harvest.Name}, label:${getLabelOrError(childPackage)}`,
+              Note,
               RowSource: "5",
             })
           );
+
+          debugLog.push(`${Note}`);
 
           continue;
         }
@@ -745,6 +742,8 @@ export async function maybeLoadHarvestPackagesReportData({
           childPackage.history!
         ).sort();
 
+        debugLog.push(`Detected ${grandchildPackageLabels.length} grandchild package labels`);
+
         let detectedTwoLevelIntakeFlow: boolean = false;
 
         // If we detect the child package is an intake package, we do not traverse down to the
@@ -752,6 +751,8 @@ export async function maybeLoadHarvestPackagesReportData({
         if (isPackagingIntakePackage(childPackage)) {
           detectedTwoLevelIntakeFlow = true;
           grandchildPackageLabels = [getLabelOrError(childPackage)];
+
+          debugLog.push(`Detected two-level intake flow for ${getLabelOrError(childPackage)}`);
         }
 
         const standardPackages: IUnionIndexedPackageData[] = [];
@@ -759,6 +760,8 @@ export async function maybeLoadHarvestPackagesReportData({
 
         for (const grandchildPackageLabel of grandchildPackageLabels) {
           const grandchildPackage = packageMap.get(grandchildPackageLabel);
+
+          debugLog.push(`>>> Grandchild Package ${grandchildPackageLabel}`);
 
           if (!grandchildPackage) {
             console.error(`Skipping grandchild package ${grandchildPackageLabel}`);
@@ -775,8 +778,12 @@ export async function maybeLoadHarvestPackagesReportData({
 
           if (stringMatch(getItemNameOrError(grandchildPackage), ["Shake"])) {
             shakePackages.push(grandchildPackage);
+
+            debugLog.push(`Identified ${grandchildPackageLabel} as Shake package`);
           } else {
             standardPackages.push(grandchildPackage);
+
+            debugLog.push(`Identified ${grandchildPackageLabel} as Standard package`);
           }
         }
 
@@ -811,7 +818,8 @@ export async function maybeLoadHarvestPackagesReportData({
               pkg,
               harvestPackageRowData,
               unitsOfMeasure,
-              packageMap
+              packageMap,
+              debugLog
             );
           }
 
@@ -945,6 +953,15 @@ export async function maybeLoadHarvestPackagesReportData({
     harvestConfig.debug ? "RowSource" : "",
   ]);
 
+  if (harvestConfig.generateDebugLog) {
+    const textFile: ITextFile = {
+      filename: "debug.txt",
+      data: debugLog.join("\n"),
+    };
+
+    downloadTextFile({ textFile });
+  }
+
   reportData[ReportType.HARVEST_PACKAGES] = {
     harvestPackageMatrix,
   };
@@ -1019,19 +1036,25 @@ function recordPostQcRows(
   childPackage: IUnionIndexedPackageData,
   harvestPackageRowData: IHarvestPackageRowData[],
   unitsOfMeasure: IUnitOfMeasure[],
-  msg: string
+  msg: string,
+  debugLog: string[]
 ) {
   const harvestConfig = reportConfig[ReportType.HARVEST_PACKAGES]!;
 
+  debugLog.push(`Recording Post QC rows for ${getLabelOrError(childPackage)}`);
+
   if (!childPackage.history) {
+    const Note = `Could not match post QC child package. harvest:${
+      harvest.Name
+    }, label:${getLabelOrError(childPackage)}`;
     harvestPackageRowData.push(
       rowDataFactory({
-        Note: `Could not match post QC child package. harvest:${
-          harvest.Name
-        }, label:${getLabelOrError(childPackage)}`,
+        Note,
         RowSource: "11",
       })
     );
+
+    debugLog.push(Note);
   }
 
   const initialChildQuantity: number = childPackage.history
@@ -1119,9 +1142,12 @@ function recordPackagingRows(
   grandchildPackage: IUnionIndexedPackageData,
   harvestPackageRowData: IHarvestPackageRowData[],
   unitsOfMeasure: IUnitOfMeasure[],
-  packageMap: Map<string, IUnionIndexedPackageData>
+  packageMap: Map<string, IUnionIndexedPackageData>,
+  debugLog: string[]
 ) {
   const harvestConfig = reportConfig[ReportType.HARVEST_PACKAGES]!;
+
+  debugLog.push(`Recording Packaging rows for ${getLabelOrError(grandchildPackage)}`);
 
   const initialGrandchildQuantity: number = grandchildPackage.history
     ? extractInitialPackageQuantityAndUnitFromHistoryOrError(grandchildPackage.history!)[0]
@@ -1538,4 +1564,77 @@ function stringMatch(src: string, tokens: string[]): boolean {
   }
 
   return false;
+}
+
+export async function maybeUsePassthruPackage({
+  initialPackage,
+  harvestPackage,
+  packageMap,
+  debugLog,
+}: {
+  initialPackage: IUnionIndexedPackageData;
+  harvestPackage: IUnionIndexedPackageData;
+  packageMap: Map<string, IUnionIndexedPackageData>;
+  debugLog: string[];
+}): Promise<{
+  passthruMsg: string;
+  childPackage: IUnionIndexedPackageData;
+}> {
+  const passthruTestPackageLabels = extractTestSamplePackageLabelsFromHistory(
+    initialPackage.history!
+  );
+
+  const passthruPackageLabels = extractChildPackageLabelsFromHistory_Full(initialPackage.history!);
+
+  let passthruMsg: string = "";
+  let candidatePassthruPackage: IUnionIndexedPackageData | null = null;
+
+  // Is candidate for passthru if it has exactly one child that is not a lab test
+  if (passthruTestPackageLabels.length === 0 && passthruPackageLabels.length === 1) {
+    candidatePassthruPackage = packageMap.get(passthruPackageLabels[0].label) ?? null;
+
+    if (!candidatePassthruPackage) {
+      console.error("Invoked slow method getPackageFromOutboundTransferOrNull()");
+
+      const result = await getPackageFromOutboundTransferOrNull(
+        passthruPackageLabels[0].label,
+        initialPackage.LicenseNumber,
+        passthruPackageLabels[0].history.RecordedDateTime.split("T")[0]
+      );
+
+      if (result) {
+        const [transfer, pkg] = result;
+
+        candidatePassthruPackage = pkg;
+      }
+    }
+
+    // Evaluate fitness of candidate package
+    if (
+      candidatePassthruPackage &&
+      candidatePassthruPackage!.SourceHarvestNames !== harvestPackage.SourceHarvestNames
+    ) {
+      passthruMsg = `Skipped passthru because candidate pkg ${getLabelOrError(
+        candidatePassthruPackage
+      )} has mismatched harvest`;
+      candidatePassthruPackage = null;
+    }
+
+    if (candidatePassthruPackage) {
+      passthruMsg = `Passthru matched! Original:${getLabelOrError(
+        initialPackage
+      )} Passthru:${getLabelOrError(candidatePassthruPackage)}`;
+
+      debugLog.push(`${passthruMsg}`);
+    }
+  }
+
+  if (candidatePassthruPackage) {
+    return {
+      childPackage: candidatePassthruPackage,
+      passthruMsg,
+    };
+  }
+
+  return { childPackage: initialPackage, passthruMsg };
 }
