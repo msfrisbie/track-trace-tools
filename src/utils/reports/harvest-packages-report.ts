@@ -289,12 +289,6 @@ export async function maybeLoadHarvestPackagesReportData({
     return;
   }
 
-  TODO break this into three steps:
-
-  1) Generate a tree of packages 4-deep (5?)
-  2) Analyze shape of tree, assign steps to each node
-  3) Iteratively traverse the tree, generating the report
-
   const debugLog: string[] = [];
 
   const promises: Promise<any>[] = [];
@@ -753,6 +747,17 @@ export async function maybeLoadHarvestPackagesReportData({
           grandchildPackageLabels = [getLabelOrError(childPackage)];
 
           debugLog.push(`Detected two-level intake flow for ${getLabelOrError(childPackage)}`);
+        } else if (
+          grandchildPackageLabels.length === 1 &&
+          packageMap.has(grandchildPackageLabels[0]) &&
+          packageMap.get(grandchildPackageLabels[0])!.SourceHarvestNames !==
+            harvestPackage.SourceHarvestNames
+        ) {
+          grandchildPackageLabels = [getLabelOrError(childPackage)];
+
+          debugLog.push(
+            `Detected mixed harvest package, stubbing out ${grandchildPackageLabels[0]}`
+          );
         }
 
         const standardPackages: IUnionIndexedPackageData[] = [];
