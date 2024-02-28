@@ -1186,6 +1186,9 @@ export interface IXlsxFile {
   filename: string;
   sheets: {
     sheetName: string;
+    options?: {
+      table: boolean;
+    }
     data: any[][];
   }[];
 }

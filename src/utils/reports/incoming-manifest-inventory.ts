@@ -66,6 +66,7 @@ export async function maybeLoadIncomingManifestInventoryReportData({
 
     for (const transfer of richIncomingTransfers) {
       transfer.incomingPackages = await primaryDataLoader.destinationPackages(transfer.DeliveryId);
+      transfer.incomingTransporters = await primaryDataLoader.destinationTransporters(transfer.DeliveryId);
     }
 
     reportData[ReportType.INCOMING_MANIFEST_INVENTORY] = {

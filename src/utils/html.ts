@@ -376,3 +376,17 @@ export function extract(extractionType: ExtractionType, plaintext: string): Extr
 
   return data;
 }
+
+export function generateHtmlTag({
+  tagType,
+  attributes,
+  htmlContent,
+}: {
+  tagType: string;
+  attributes?: { [key: string]: string };
+  htmlContent: string;
+}): string {
+  return `<${tagType} ${Object.entries(attributes ?? {})
+    .map(([key, value]) => `${key}="${value}"`)
+    .join(" ")}>${htmlContent ?? ""}</${tagType}>`;
+}

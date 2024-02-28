@@ -6,6 +6,7 @@ import {
   IIndexedTransferData,
   ISheetValues,
   ISpreadsheet,
+  ITransporterData,
   IValueRange,
   IXlsxFile,
 } from "@/interfaces";
@@ -43,6 +44,7 @@ import {
 } from "./sheets";
 /* eslint-disable-next-line */
 import { t3RequestManager } from "@/modules/t3-request-manager.module";
+import { generateHtmlTag } from "./html";
 import { downloadXlsxFile } from "./xlsx";
 
 export async function readSpreadsheet({
@@ -375,6 +377,8 @@ export async function createXlsxOrError({
     sheets: [],
   };
 
+  let extraHtml: string | null = null;
+
   for (const reportType of ELIGIBLE_REPORT_TYPES) {
     const sheetName = getSheetTitle({
       reportType,
@@ -394,10 +398,82 @@ export async function createXlsxOrError({
       data = [fields.map((fieldData) => fieldData.readableName), ...data];
     }
 
+    let options;
+
+    if (reportType === ReportType.INCOMING_MANIFEST_INVENTORY) {
+      options = { table: true };
+    }
+
     xlsxFile.sheets.push({
       sheetName,
+      options,
       data,
     });
+
+    if (reportType === ReportType.INCOMING_MANIFEST_INVENTORY) {
+      const sharedAttributes = {
+        // style: "text-align: left;",
+      };
+
+      let tableHtml: string = `
+      <table style="margin: 36px 0px; text-align: left; border-spacing: 8px;">
+        <tr style="color: blue">
+          <th>Originating Facility</th>
+          <th>Originating License</th>
+          <th>Manifest #</th>
+          <th>Total Packages</th>
+        </tr>
+      `;
+
+      let totalPackages = 0;
+
+      for (const richTransfer of reportData[ReportType.INCOMING_MANIFEST_INVENTORY]!
+        .richIncomingTransfers!) {
+        let cellsHtml: string = "";
+
+        // Originating Entity
+        cellsHtml += generateHtmlTag({
+          tagType: "td",
+          htmlContent: richTransfer.ShipperFacilityName,
+          attributes: sharedAttributes,
+        });
+        cellsHtml += generateHtmlTag({
+          tagType: "td",
+          htmlContent: richTransfer.ShipperFacilityLicenseNumber,
+          attributes: sharedAttributes,
+        });
+
+        const finalTransporter: ITransporterData = [...richTransfer.incomingTransporters!].pop()!;
+
+        // Manifest Summary
+        cellsHtml += generateHtmlTag({
+          tagType: "td",
+          htmlContent: richTransfer.ManifestNumber,
+          attributes: sharedAttributes,
+        });
+        cellsHtml += generateHtmlTag({
+          tagType: "td",
+          htmlContent: richTransfer.PackageCount.toString(),
+          attributes: { ...sharedAttributes, style: "text-align: right" },
+        });
+
+        totalPackages += richTransfer.PackageCount;
+
+        // Build the row
+        tableHtml += generateHtmlTag({
+          tagType: "tr",
+          htmlContent: cellsHtml,
+          attributes: sharedAttributes,
+        });
+      }
+
+      // Summary row
+      tableHtml += `<tr><td colspan="3"></td><td style="color: red; font-weight: 700; text-align: right">TOTAL: ${totalPackages}</td></tr>`;
+
+      tableHtml += "</table>";
+
+      extraHtml = tableHtml;
+    }
   }
 
   switch (reportConfig.fileDeliveryFormat) {
@@ -407,6 +483,7 @@ export async function createXlsxOrError({
     case "EMAIL":
       const response = await t3RequestManager.generateAndEmailReport({
         xlsxFile,
+        extraHtml,
         email: store.state.settings.email,
       });
 

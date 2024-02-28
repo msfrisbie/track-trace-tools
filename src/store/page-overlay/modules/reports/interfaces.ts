@@ -276,6 +276,7 @@ export interface IReportData {
     richIncomingTransfers?: IIndexedRichIncomingTransferData[];
   };
   [ReportType.INCOMING_MANIFEST_INVENTORY]?: {
+    extraHtml?: string;
     richIncomingTransfers?: IIndexedRichIncomingTransferData[];
   };
   [ReportType.OUTGOING_TRANSFER_MANIFESTS]?: {

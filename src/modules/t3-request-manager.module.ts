@@ -2,10 +2,11 @@ import { IAtomicService, IXlsxFile } from "@/interfaces";
 import { IAnnouncementData } from "@/store/page-overlay/modules/announcements/interfaces";
 import { AxiosError } from "axios";
 import { authManager } from "./auth-manager.module";
+import { isDevelopment } from "./environment.module";
 import { customAxios } from "./fetch-manager.module";
 
-// const BASE_URL = isDevelopment() ? "http://127.0.0.1:5000/" : "https://api.trackandtrace.tools/";
-const BASE_URL = "https://api.trackandtrace.tools/";
+const BASE_URL = isDevelopment() ? "http://127.0.0.1:5000/" : "https://api.trackandtrace.tools/";
+// const BASE_URL = "https://api.trackandtrace.tools/";
 
 const CLIENT_KEY_PATH = "client";
 const VERIFY_TEST_PATH = "verify/test";
@@ -117,7 +118,15 @@ class T3RequestManager implements IAtomicService {
     return response;
   }
 
-  async generateAndEmailReport({ xlsxFile, email }: { xlsxFile: IXlsxFile; email: string }) {
+  async generateAndEmailReport({
+    xlsxFile,
+    email,
+    extraHtml,
+  }: {
+    xlsxFile: IXlsxFile;
+    email: string;
+    extraHtml: string | null;
+  }) {
     const response = await customAxios(BASE_URL + GENERATE_REPORT_PATH, {
       method: "POST",
       headers: DEFAULT_POST_HEADERS,
@@ -130,6 +139,7 @@ class T3RequestManager implements IAtomicService {
       headers: DEFAULT_POST_HEADERS,
       body: JSON.stringify({
         email,
+        extra_html: extraHtml ?? "",
         report_id: response.data.report_id,
       }),
     });

@@ -831,7 +831,7 @@
               Enter your email in
               <a class="text-purple-500 hover:text-purple-500 underline" href="#"
                 @click.stop="openRoute('/settings/all')">Settings</a>
-              to send XSLX reports via email
+              to send XLSX reports via email
             </div>
           </template>
 
