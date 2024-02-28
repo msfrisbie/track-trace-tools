@@ -85,7 +85,8 @@ export enum CustomTransformer {
   PACKAGED_PERCENT_WET_WEIGHT = "PACKAGED_PERCENT_WET_WEIGHT",
   WASTE_PERCENT_WET_WEIGHT = "WASTE_PERCENT_WET_WEIGHT",
   RESTORED_PERCENT_WET_WEIGHT = "RESTORED_PERCENT_WET_WEIGHT",
-  TRANSFER_PACKAGE_UNIT_WEIGHT = "TRANSFER_PACKAGE_UNIT_WEIGHT"
+  TRANSFER_PACKAGE_UNIT_WEIGHT = "TRANSFER_PACKAGE_UNIT_WEIGHT",
+  TRANSFER_PACKAGE_UNIT_WEIGHT_UOM = "TRANSFER_PACKAGE_UNIT_WEIGHT_UOM",
 }
 
 const COMMON_PACKAGE_FIELD_DATA: IFieldData[] = [
@@ -509,7 +510,7 @@ const COMMON_HARVEST_FIELD_DATA: IFieldData[] = [
     readableName: "Current % Wet Weight",
     required: false,
     initiallyChecked: true,
-    customTransformer: CustomTransformer.CURRENT_PERCENT_WET_WEIGHT
+    customTransformer: CustomTransformer.CURRENT_PERCENT_WET_WEIGHT,
   },
   {
     value: "TotalPackagedWeight",
@@ -522,7 +523,7 @@ const COMMON_HARVEST_FIELD_DATA: IFieldData[] = [
     readableName: "Packaged % Wet Weight",
     required: false,
     initiallyChecked: false,
-    customTransformer: CustomTransformer.PACKAGED_PERCENT_WET_WEIGHT
+    customTransformer: CustomTransformer.PACKAGED_PERCENT_WET_WEIGHT,
   },
   {
     value: "TotalWasteWeight",
@@ -535,7 +536,7 @@ const COMMON_HARVEST_FIELD_DATA: IFieldData[] = [
     readableName: "Waste % Wet Weight",
     required: false,
     initiallyChecked: false,
-    customTransformer: CustomTransformer.WASTE_PERCENT_WET_WEIGHT
+    customTransformer: CustomTransformer.WASTE_PERCENT_WET_WEIGHT,
   },
   {
     value: "TotalRestoredWeight",
@@ -548,7 +549,7 @@ const COMMON_HARVEST_FIELD_DATA: IFieldData[] = [
     readableName: "Restored % Wet Weight",
     required: false,
     initiallyChecked: false,
-    customTransformer: CustomTransformer.RESTORED_PERCENT_WET_WEIGHT
+    customTransformer: CustomTransformer.RESTORED_PERCENT_WET_WEIGHT,
   },
   {
     value: "HarvestStartDate",
@@ -779,7 +780,14 @@ export const SHEET_FIELDS: { [key: string]: IFieldData[] } = {
       readableName: "Unit Weight",
       required: false,
       initiallyChecked: true,
-      customTransformer: CustomTransformer.TRANSFER_PACKAGE_UNIT_WEIGHT
+      customTransformer: CustomTransformer.TRANSFER_PACKAGE_UNIT_WEIGHT,
+    },
+    {
+      value: "UnitWeightUOM",
+      readableName: "Unit Weight UOM",
+      required: false,
+      initiallyChecked: true,
+      customTransformer: CustomTransformer.TRANSFER_PACKAGE_UNIT_WEIGHT_UOM,
     },
   ],
   [ReportType.OUTGOING_TRANSFER_MANIFESTS]: [
@@ -798,3 +806,5 @@ export interface IStatusMessage {
   text: string;
   level: "success" | "warning" | "error";
 }
+
+export const PRODUCT_UNIT_WEIGHT_REGEX = /(\d*(?:\.\d+)?)(?:\s?)(g|mg)/;

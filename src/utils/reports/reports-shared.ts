@@ -1,22 +1,29 @@
 import { SheetTitles } from "@/consts";
 import {
-  IDestinationData, IIndexedDestinationPackageData,
+  IDestinationData,
+  IIndexedDestinationPackageData,
   IIndexedHarvestData,
   IIndexedPlantBatchData,
   IIndexedRichIncomingTransferData,
   IIndexedRichOutgoingTransferData,
   IIndexedTransferData,
-  ILicenseFormFilters, ITransferData,
-  ITransporterData
+  ILicenseFormFilters,
+  ITransferData,
+  ITransporterData,
 } from "@/interfaces";
 import { facilityManager } from "@/modules/facility-manager.module";
 import store from "@/store/page-overlay/index";
-import { CustomTransformer, ReportsGetters, ReportType } from "@/store/page-overlay/modules/reports/consts";
+import {
+  CustomTransformer,
+  PRODUCT_UNIT_WEIGHT_REGEX,
+  ReportType,
+  ReportsGetters,
+} from "@/store/page-overlay/modules/reports/consts";
 import {
   IFieldData,
   IReportConfig,
   IReportData,
-  IReportOption
+  IReportOption,
 } from "@/store/page-overlay/modules/reports/interfaces";
 import { todayIsodate } from "../date";
 import { extractEmployeeAuditData } from "./employee-audit-report";
@@ -126,15 +133,24 @@ export function applyCustomTransformer(field: IFieldData, untypedRow: any): stri
       }%`;
     case CustomTransformer.TRANSFER_PACKAGE_UNIT_WEIGHT:
       row = untypedRow as { Package: IIndexedDestinationPackageData };
-      const match = row.Package.ProductName.match(/(\d+(?:\.\d+)?)(?:\s?)(g|mg)/);
+      const weightMatch = row.Package.ProductName.match(PRODUCT_UNIT_WEIGHT_REGEX);
 
-        if (match) {
-          return `${match[1]} ${match[2]}`;
-        }
+      if (weightMatch) {
+        return parseFloat(weightMatch[1]).toString();
+      }
 
-        return "";
+      return "";
+    case CustomTransformer.TRANSFER_PACKAGE_UNIT_WEIGHT_UOM:
+      row = untypedRow as { Package: IIndexedDestinationPackageData };
+      const unitMatch = row.Package.ProductName.match(PRODUCT_UNIT_WEIGHT_REGEX);
+
+      if (unitMatch) {
+        return unitMatch[2];
+      }
+
+      return "";
     default:
-      throw new Error('Unmatched custom transformer');
+      throw new Error("Unmatched custom transformer");
   }
 }
 
@@ -452,7 +468,7 @@ export function getCsvFilename({
 export function getSpreadsheetName({ reportConfig }: { reportConfig: IReportConfig }): string {
   const date = todayIsodate();
 
-  const fileExtension: string = reportConfig.exportFormat === 'XLSX' ? '.xlsx' : '';
+  const fileExtension: string = reportConfig.exportFormat === "XLSX" ? ".xlsx" : "";
 
   return `T3 Metrc Report [Generated ${date}]${fileExtension}`;
 }

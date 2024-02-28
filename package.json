@@ -34,7 +34,7 @@
     "csv-parser": "^3.0.0",
     "csv-writer": "^1.6.0",
     "dexie": "^3.0.3",
-    "exboost-js": "^1.10.0",
+    "exboost-js": "^1.12.1",
     "fetch-retry": "5.0.6",
     "graphology": "^0.25.4",
     "idb-keyval": "^5.0.1",
