@@ -1,38 +1,19 @@
 <template>
   <!-- animation is breaking modal, disable -->
-  <b-modal
-    v-if="pluginAuth.authState"
-    id="builder-modal"
-    modal-class="ttt-modal"
-    content-class="ttt-content"
-    dialog-class="ttt-dialog"
-    size="xl"
-    header-class="builder-header"
-    footer-class="builder-footer"
-    body-class="builder-body toolkit-scroll flex flex-column-shim flex-col items-stretch p-4"
-    :static="true"
-    no-fade
-    centered
-    ref="builder"
-    @show="handleOpen()"
-    @hidden="handleClose()"
-  >
+  <b-modal v-if="pluginAuth.authState" id="builder-modal" modal-class="ttt-modal" content-class="ttt-content"
+    dialog-class="ttt-dialog" size="xl" header-class="builder-header" footer-class="builder-footer"
+    :body-class="`builder-body toolkit-scroll flex flex-column-shim flex-col items-stretch ${$route.path === '/' ? 'p-0' : 'p-4'}`"
+    :static="true" no-fade centered ref="builder" @show="handleOpen()" @hidden="handleClose()">
     <template #modal-header>
       <div class="w-full grid grid-cols-3">
         <div class="flex flex-row justify-start">
           <template v-if="$route.path !== '/' && !activeProject">
-            <span
-              class="text-lg font-bold cursor-pointer hover:bg-purple-50 p-4 rounded-lg"
-              @click="exit()"
-              style="color: #49276a"
-              ><font-awesome-icon icon="chevron-left" />
+            <span class="text-lg font-bold cursor-pointer hover:bg-purple-50 p-4 rounded-lg" @click="exit()"
+              style="color: #49276a"><font-awesome-icon icon="chevron-left" />
             </span>
 
-            <span
-              class="text-lg font-bold cursor-pointer hover:bg-purple-50 p-4 rounded-lg"
-              @click="goHome()"
-              style="color: #49276a"
-              ><font-awesome-icon icon="home" />
+            <span class="text-lg font-bold cursor-pointer hover:bg-purple-50 p-4 rounded-lg" @click="goHome()"
+              style="color: #49276a"><font-awesome-icon icon="home" />
             </span>
           </template>
         </div>
@@ -46,36 +27,24 @@
             <div class="w-full flex flex-row justify-center items-center space-x-2">
               <track-trace-tools-logo fill="#49276a" :inverted="true" />
 
-              <span class="sans-serif font-extralight tracking-widest text-3xl"
-                >T3{{ clientBuildSuffix }}</span
-              >
+              <span class="sans-serif font-extralight tracking-widest text-3xl">T3{{ clientBuildSuffix }}</span>
             </div>
           </template>
         </div>
 
         <div class="flex flex-row justify-end">
-          <span
-            class="text-lg font-bold cursor-pointer hover:bg-purple-50 p-4 rounded-lg"
-            @click="toggleFullscreen()"
-            style="color: #777777"
-            ><font-awesome-icon :icon="isFullscreen ? 'compress-arrows-alt' : 'expand-arrows-alt'"
-          /></span>
-          <span
-            class="text-lg font-bold cursor-pointer hover:bg-purple-50 p-4 rounded-lg"
-            @click="hide()"
-            style="color: #777777"
-            ><font-awesome-icon icon="times"
-          /></span>
+          <span class="text-lg font-bold cursor-pointer hover:bg-purple-50 p-4 rounded-lg" @click="toggleFullscreen()"
+            style="color: #777777"><font-awesome-icon
+              :icon="isFullscreen ? 'compress-arrows-alt' : 'expand-arrows-alt'" /></span>
+          <span class="text-lg font-bold cursor-pointer hover:bg-purple-50 p-4 rounded-lg" @click="hide()"
+            style="color: #777777"><font-awesome-icon icon="times" /></span>
         </div>
       </div>
     </template>
 
     <template #modal-footer>
       <div class="w-full grid grid-cols-5 place-items-center">
-        <div
-          class="flex flex-row justify-start items-center space-x-2 opacity-30"
-          style="place-self: center start"
-        >
+        <div class="flex flex-row justify-start items-center space-x-2 opacity-30" style="place-self: center start">
           <track-trace-tools-logo fill="#49276a" :inverted="true" />
 
           <span class="sans-serif font-extralight tracking-widest text-3xl">T3{{ suffix }}</span>
@@ -103,8 +72,6 @@ import TrackTraceToolsLogo from '@/components/shared/TrackTraceToolsLogo.vue';
 import { BuilderType, MessageType } from '@/consts';
 import { analyticsManager } from '@/modules/analytics-manager.module';
 import { builderManager } from '@/modules/builder-manager.module';
-import { pageManager } from '@/modules/page-manager/page-manager.module';
-import { MutationType } from '@/mutation-types';
 import router from '@/router/index';
 import store from '@/store/page-overlay/index';
 import Vue from 'vue';

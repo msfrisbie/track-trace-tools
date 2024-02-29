@@ -1243,19 +1243,21 @@ export class DataLoader implements IAtomicService {
       return mockDataManager.mockPackages();
     }
 
-    const cachedData = await readDataOrNull<IIndexedPackageData[]>({
-      license: this._authState!.license,
-      keyType,
-      ttlMs,
-      validatorFn: (data) => data instanceof Array,
-    });
+    if (ttlMs > 0) {
+      const cachedData = await readDataOrNull<IIndexedPackageData[]>({
+        license: this._authState!.license,
+        keyType,
+        ttlMs,
+        validatorFn: (data) => data instanceof Array,
+      });
 
-    if (cachedData) {
-      return cachedData;
-    }
+      if (cachedData) {
+        return cachedData;
+      }
 
-    if (!hitNetworkOnCacheMiss) {
-      return [];
+      if (!hitNetworkOnCacheMiss) {
+        return [];
+      }
     }
 
     const freshData = new Promise<IIndexedPackageData[]>(async (resolve, reject) => {
