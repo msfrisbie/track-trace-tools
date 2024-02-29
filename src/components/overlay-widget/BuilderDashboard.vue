@@ -23,27 +23,31 @@
         :url="activePackagesUrl"
       ></dashboard-card>
 
-      <div class="row-span-3 overflow-x-auto">
-        <b-table-simple small>
-          <b-thead>
-            <b-tr>
-              <b-th>Label</b-th>
-              <b-th>Item</b-th>
-              <b-th>Quantity</b-th>
-            </b-tr>
-          </b-thead>
-          <b-tbody>
-            <b-tr
-              v-bind:key="pkg.Label"
-              v-for="[idx, pkg] of activePackages.entries()"
-              :class="idx % 2 === 0 ? 'bg-purple-50' : ''"
-            >
-              <b-td>...{{ pkg.Label.slice(-8) }}</b-td>
-              <b-td>{{ pkg.Item.Name }}</b-td>
-              <b-td>{{ pkg.Quantity }} {{ pkg.UnitOfMeasureAbbreviation }}</b-td>
-            </b-tr>
-          </b-tbody>
-        </b-table-simple>
+      <div class="row-span-3 overflow-auto">
+        <template v-if="activePackages.length > 0">
+          <b-table-simple small>
+            <b-thead>
+              <b-tr>
+                <b-th>Label</b-th>
+                <b-th>Item</b-th>
+                <b-th>Quantity</b-th>
+              </b-tr>
+            </b-thead>
+            <b-tbody>
+              <b-tr
+                v-bind:key="pkg.Label"
+                v-for="[idx, pkg] of activePackages.entries()"
+                :class="idx % 2 === 0 ? 'bg-purple-50' : ''"
+              >
+                <b-td>...{{ pkg.Label.slice(-8) }}</b-td>
+                <b-td>{{ pkg.Item.Name }}</b-td>
+                <b-td>{{ pkg.Quantity }} {{ pkg.UnitOfMeasureAbbreviation }}</b-td>
+              </b-tr>
+            </b-tbody>
+          </b-table-simple>
+
+          <b-button size="sm" variant="outline-primary">LOAD ALL</b-button>
+        </template>
       </div>
       <dashboard-card
         class="col-start-1"
