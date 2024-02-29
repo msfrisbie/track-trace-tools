@@ -9,87 +9,111 @@
           @facilityHit="selectFacility($event)"
         ></facility-picker>
       </div>
-      <div
-        class="pb-2 px-3 col-span-2 text-left text-2xl ttt-purple font-normal"
-        style="border-bottom: 1px solid rgb(92, 0, 128)"
-      >
-        PACKAGES
-      </div>
-      <dashboard-card
-        class="col-start-1"
-        title="ACTIVE"
-        :count="activePackageCount"
-        :loading="activePackageCount === null"
-        :url="activePackagesUrl"
-      ></dashboard-card>
+      <template v-if="hasPackagesPermissions !== false">
+        <div
+          class="pb-2 px-3 col-span-2 text-left text-2xl ttt-purple font-normal"
+          style="border-bottom: 1px solid rgb(92, 0, 128)"
+        >
+          PACKAGES
+        </div>
+        <dashboard-card
+          class="col-start-1"
+          title="ACTIVE"
+          :count="activePackageCount"
+          :loading="activePackageCount === null"
+          :url="activePackagesUrl"
+        ></dashboard-card>
 
-      <div class="row-span-3 overflow-auto">
-        <template v-if="activePackages.length > 0">
-          <b-table-simple small>
-            <b-thead>
-              <b-tr>
-                <b-th>Label</b-th>
-                <b-th>Item</b-th>
-                <b-th>Quantity</b-th>
-              </b-tr>
-            </b-thead>
-            <b-tbody>
-              <b-tr
-                v-bind:key="pkg.Label"
-                v-for="[idx, pkg] of activePackages.entries()"
-                :class="idx % 2 === 0 ? 'bg-purple-50' : ''"
-              >
-                <b-td>...{{ pkg.Label.slice(-8) }}</b-td>
-                <b-td>{{ pkg.Item.Name }}</b-td>
-                <b-td>{{ pkg.Quantity }} {{ pkg.UnitOfMeasureAbbreviation }}</b-td>
-              </b-tr>
-            </b-tbody>
-          </b-table-simple>
+        <div class="row-span-3 overflow-auto">
+          <template v-if="activePackages.length > 0">
+            <b-table-simple small>
+              <b-thead>
+                <b-tr>
+                  <b-th>Label</b-th>
+                  <b-th>Item</b-th>
+                  <b-th>Quantity</b-th>
+                </b-tr>
+              </b-thead>
+              <b-tbody>
+                <b-tr
+                  v-bind:key="pkg.Label"
+                  v-for="[idx, pkg] of activePackages.entries()"
+                  :class="idx % 2 === 0 ? 'bg-purple-50' : ''"
+                >
+                  <b-td>...{{ pkg.Label.slice(-8) }}</b-td>
+                  <b-td>{{ pkg.Item.Name }}</b-td>
+                  <b-td>{{ pkg.Quantity }} {{ pkg.UnitOfMeasureAbbreviation }}</b-td>
+                </b-tr>
+              </b-tbody>
+            </b-table-simple>
 
-          <b-button size="sm" variant="outline-primary">LOAD ALL</b-button>
-        </template>
-      </div>
-      <dashboard-card
-        class="col-start-1"
-        title="INACTIVE"
-        :count="inactivePackageCount"
-        :loading="inactivePackageCount === null"
-        :url="inactivePackagesUrl"
-      ></dashboard-card>
-      <dashboard-card
-        class="col-start-1"
-        title="IN TRANSIT"
-        :count="intransitPackageCount"
-        :loading="intransitPackageCount === null"
-        :url="intransitPackagesUrl"
-      ></dashboard-card>
-      <div
-        class="pb-2 pt-6 px-3 col-span-2 text-left text-2xl ttt-purple font-normal"
-        style="border-bottom: 1px solid rgb(92, 0, 128)"
-      >
-        TRANSFERS
-      </div>
-      <dashboard-card
-        class="col-start-1"
-        title="INCOMING"
-        :count="incomingTransferCount"
-        :loading="incomingTransferCount === null"
-        :url="incomingTransfersUrl"
-      ></dashboard-card>
-      <dashboard-card
-        class="col-start-1"
-        title="OUTGOING"
-        :count="outgoingTransferCount"
-        :loading="outgoingTransferCount === null"
-        :url="outgoingTransfersUrl"
-      ></dashboard-card>
-      <dashboard-card
-        class="col-start-1"
-        title="REJECTED"
-        :count="rejectedTransferCount"
-        :loading="rejectedTransferCount === null"
-        :url="rejectedTransfersUrl"
-      ></dashboard-card>
+            <b-button size="sm" variant="outline-primary">LOAD ALL</b-button>
+          </template>
+        </div>
+        <dashboard-card
+          class="col-start-1"
+          title="INACTIVE"
+          :count="inactivePackageCount"
+          :loading="inactivePackageCount === null"
+          :url="inactivePackagesUrl"
+        ></dashboard-card>
+        <dashboard-card
+          class="col-start-1"
+          title="IN TRANSIT"
+          :count="intransitPackageCount"
+          :loading="intransitPackageCount === null"
+          :url="intransitPackagesUrl"
+        ></dashboard-card>
+      </template>
+      <template v-if="hasTransfersPermissions !== false">
+        <div
+          class="pb-2 pt-6 px-3 col-span-2 text-left text-2xl ttt-purple font-normal"
+          style="border-bottom: 1px solid rgb(92, 0, 128)"
+        >
+          INCOMING TRANSFERS
+        </div>
+        <dashboard-card
+          class="col-start-1"
+          title="INCOMING"
+          :count="incomingTransferCount"
+          :loading="incomingTransferCount === null"
+          :url="incomingTransfersUrl"
+        ></dashboard-card>
+        <dashboard-card
+          class="col-start-1"
+          title="INCOMING INACTIVE"
+          :count="incomingTransferCount"
+          :loading="incomingTransferCount === null"
+          :url="incomingTransfersUrl"
+        ></dashboard-card>
+        <div
+          class="pb-2 pt-6 px-3 col-span-2 text-left text-2xl ttt-purple font-normal"
+          style="border-bottom: 1px solid rgb(92, 0, 128)"
+        >
+          OUTGOING TRANSFERS
+        </div>
+        <dashboard-card
+          class="col-start-1"
+          title="OUTGOING"
+          :count="outgoingTransferCount"
+          :loading="outgoingTransferCount === null"
+          :url="outgoingTransfersUrl"
+        ></dashboard-card>
+        <dashboard-card
+          class="col-start-1"
+          title="REJECTED"
+          :count="rejectedTransferCount"
+          :loading="rejectedTransferCount === null"
+          :url="rejectedTransfersUrl"
+        ></dashboard-card>
+        <dashboard-card
+          class="col-start-1"
+          title="OUTGOING INACTIBE"
+          :count="outgoingTransferCount"
+          :loading="outgoingTransferCount === null"
+          :url="outgoingTransfersUrl"
+        ></dashboard-card>
+      </template>
       <div
         class="pb-2 pt-6 px-3 col-span-2 text-left text-2xl ttt-purple font-normal"
         style="border-bottom: 1px solid rgb(92, 0, 128)"
@@ -227,30 +251,54 @@ import { mapState } from "vuex";
 import DashboardCard from "./DashboardCard.vue";
 
 const initialState = {
+  // Items
+  hasItemsPermissions: null,
+  activeItems: [],
+  activeItemsCount: null,
+  inactiveItemsCount: null,
+  // Strains
+  hasStrainsPermissions: null,
+  activeStrains: [],
+  activeStrainsCount: null,
+  inactiveStrainsCount: null,
+  // Plant Batches
+  hasPlantBatchesPermissions: null,
   activePlantBatches: [],
   activePlantBatchCount: null,
   inactivePlantBatchCount: null,
+  // Plants
+  hasPlantsPermissions: null,
   vegetativePlants: [],
   vegetativePlantCount: null,
   floweringPlants: [],
   floweringPlantCount: null,
   inactivePlantCount: null,
+  // Harvests
+  hasHarvestsPermissions: null,
   activeHarvests: [],
   activeHarvestCount: null,
   inactiveHarvestCount: null,
+  // Packages
+  hasPackagesPermissions: null,
   activePackages: [],
   activePackageCount: null,
   inactivePackageCount: null,
   intransitPackageCount: null,
+  // Transfers
+  hasTransfersPermissions: null,
   incomingTransfers: [],
   incomingTransferCount: null,
   outgoingTransfers: [],
   outgoingTransferCount: null,
   rejectedTransferCount: null,
+  // Tags
+  hasTagsPermissions: null,
   availableTags: [],
   availableTagCount: null,
   usedTagCount: null,
   voidedTagCount: null,
+  // Sales
+  hasSalesPermissions: null,
   activeSales: [],
   activeSalesCount: null,
   inactiveSalesCount: null,
@@ -367,12 +415,16 @@ export default Vue.extend({
       dataLoader.inactiveHarvestCount().then((count: number | null) => {
         this.$data.inactiveHarvestCount = count || 0;
       });
-      dataLoader.metrcRequestManagerOrError
-        .getActivePackages(dataLoader.countPayload)
-        .then(({ data }) => {
+      dataLoader.metrcRequestManagerOrError.getActivePackages(dataLoader.peekPayload).then(
+        ({ data }) => {
+          this.$data.hasPackagesPermissions = true;
           this.$data.activePackageCount = data.Total ?? 0;
           this.$data.activePackages = data.Data;
-        });
+        },
+        (error) => {
+          this.$data.hasPackagesPermissions = false;
+        }
+      );
 
       dataLoader.inactivePackageCount().then((count: number | null) => {
         this.$data.inactivePackageCount = count || 0;

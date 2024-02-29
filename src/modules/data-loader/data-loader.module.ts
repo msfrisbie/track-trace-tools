@@ -149,6 +149,8 @@ export class DataLoader implements IAtomicService {
 
   countPayload: string = buildBody({ page: 0, pageSize: 5 });
 
+  peekPayload: string = buildBody({ page: 0, pageSize: 25 });
+
   /**
    * init() should contain eagerly loaded data pieces
    */
