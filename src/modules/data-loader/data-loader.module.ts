@@ -169,6 +169,26 @@ export class DataLoader implements IAtomicService {
     },
   });
 
+  recentApprovalPayload: string = JSON.stringify({
+    request: {
+      take: 5000,
+      skip: 0,
+      page: 1,
+      pageSize: 5000,
+      filter: {
+        logic: "and",
+        filters: [
+          {
+            field: "ApprovalStatusDateTime",
+            operator: "gt",
+            value: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
+          },
+        ],
+      },
+      group: [],
+    },
+  });
+
   /**
    * init() should contain eagerly loaded data pieces
    */

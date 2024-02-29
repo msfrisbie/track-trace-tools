@@ -1,55 +1,33 @@
 <template>
   <div :class="`w-full facility-picker ${theme}`" @click="focus()">
     <!-- showAll is causing problems when using the arrow keys to select -->
-    <vue-typeahead-bootstrap
-      v-model="query"
-      :data="facilities"
-      :showOnFocus="true"
-      :serializer="(facility) => facility.name"
-      :placeholder="activeFacilityName"
-      inputClass="special-input-class"
-      highlightClass="special-highlight-class"
-      ref="typeahead"
-      size="md"
-      @hit="facilityHit($event)"
-      :maxMatches="100"
-    >
+    <vue-typeahead-bootstrap v-model="query" :data="facilities" :showOnFocus="true"
+      :serializer="(facility) => facility.name" :placeholder="activeFacilityName" inputClass="special-input-class"
+      highlightClass="special-highlight-class" ref="typeahead" size="md" @hit="facilityHit($event)" :maxMatches="100">
       <template slot="suggestion" slot-scope="{ htmlText, data }">
         <div class="flex flex-row items-center justify-between">
           <div v-html="htmlText"></div>
 
           <template v-if="showButtons">
             <div class="flex flex-row items-center space-x-4">
-              <a
-                title="COPY LICENSE"
-                class="cursor-pointer opacity-60 hover:opacity-100"
-                @click.stop.prevent="copyToClipboard(data)"
-              >
+              <a title="COPY LICENSE" class="cursor-pointer opacity-60 hover:opacity-100"
+                @click.stop.prevent="copyToClipboard(data)">
                 <font-awesome-icon :icon="['far', 'copy']" />
               </a>
-              <a
-                title="OPEN FACILITY IN NEW TAB"
-                class="cursor-pointer opacity-60 hover:opacity-100"
-                @click.stop.prevent="openFacilityInNewTab(data)"
-              >
+              <a title="OPEN FACILITY IN NEW TAB" class="cursor-pointer opacity-60 hover:opacity-100"
+                @click.stop.prevent="openFacilityInNewTab(data)">
                 <font-awesome-icon icon="external-link-alt" />
               </a>
               <template v-if="facilities.length > 1">
                 <template v-if="data.name.endsWith(settings.homeLicenses[identity])">
-                  <a
-                    title="REMOVE HOME LICENSE"
-                    class="cursor-pointer opacity-80 hover:opacity-100"
-                    @click.stop.prevent="unsetHomeLicense()"
-                  >
+                  <a title="REMOVE HOME LICENSE" class="cursor-pointer opacity-80 hover:opacity-100"
+                    @click.stop.prevent="unsetHomeLicense()">
                     <font-awesome-icon icon="home" style="color: #49276a" />
                   </a>
                 </template>
                 <template v-else>
-                  <a
-                    title="SET AS HOME LICENSE"
-                    class="opacity-20 hover:opacity-100"
-                    @click.stop.prevent="setHomeLicense(data)"
-                  >
+                  <a title="SET AS HOME LICENSE" class="opacity-20 hover:opacity-100"
+                    @click.stop.prevent="setHomeLicense(data)">
                     <font-awesome-icon icon="home" />
                   </a>
                 </template>

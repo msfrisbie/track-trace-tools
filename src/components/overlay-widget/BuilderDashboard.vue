@@ -47,7 +47,7 @@
         </div>
         <dashboard-card class="col-start-1" title="INCOMING" :count="incomingTransferCount"
           :loading="incomingTransferCount === null" :url="incomingTransfersUrl"></dashboard-card>
-        <div class="row-span-2 overflow-auto" style="height: 14rem">
+        <div class="row-span-3 overflow-auto" style="height: 14rem">
           <template v-if="incomingTransfers.length > 0">
             <b-table-simple small>
               <b-tbody>
@@ -70,6 +70,7 @@
         </div>
         <dashboard-card class="col-start-1" title="INACTIVE" :count="incomingTransferCount"
           :loading="incomingTransferCount === null" :url="incomingTransfersUrl"></dashboard-card>
+        <div class="col-start-1"></div>
 
         <div class="pb-2 pt-6 px-3 col-span-2 text-left text-2xl ttt-purple font-normal"
           style="border-bottom: 1px solid rgb(92, 0, 128)">
@@ -112,8 +113,31 @@
         </div>
         <dashboard-card class="col-start-1" title="ACTIVE" :count="activePlantBatchCount"
           :loading="activePlantBatchCount === null" :url="activePlantBatchesUrl"></dashboard-card>
+        <div class="row-span-3 overflow-auto" style="height: 14rem">
+          <template v-if="activePlantBatches.length > 0">
+            <b-table-simple small>
+              <b-tbody>
+                <b-tr v-bind:key="plantBatch.Id" v-for="[idx, plantBatch] of activePlantBatches.entries()"
+                  :class="idx % 2 === 0 ? 'bg-purple-50' : ''">
+                  <b-td class="italic text-nowrap">{{ isotimeToTimeAgoExpression(plantBatch.LastModified) }}</b-td>
+                  <b-td class="font-bold">{{ plantBatch.Name }}</b-td>
+                  <b-td>{{ plantBatch.StrainName }}</b-td>
+                  <b-td>{{ plantBatch.UntrackedCount }} plants</b-td>
+                </b-tr>
+              </b-tbody>
+            </b-table-simple>
+
+            <template v-if="activePlantBatches.length < activePlantBatchCount">
+              <span>{{ activePlantBatchCount - activePlantBatches.length }} not shown</span>
+            </template>
+          </template>
+          <template v-else>
+            <span>No recent plant batch activity.</span>
+          </template>
+        </div>
         <dashboard-card class="col-start-1" title="INACTIVE" :count="inactivePlantBatchCount"
           :loading="inactivePlantBatchCount === null" :url="inactivePlantBatchesUrl"></dashboard-card>
+        <div class="col-start-1"></div>
       </template>
 
       <template v-if="hasItemsPermissions">
@@ -123,16 +147,62 @@
         </div>
         <dashboard-card class="col-start-1" title="ACTIVE" :count="activeItemsCount" :loading="activeItemsCount === null"
           :url="activeItemsUrl"></dashboard-card>
+        <div class="row-span-3 overflow-auto" style="height: 14rem">
+          <template v-if="activeItems.length > 0">
+            <b-table-simple small>
+              <b-tbody>
+                <b-tr v-bind:key="item.Id" v-for="[idx, item] of activeItems.entries()"
+                  :class="idx % 2 === 0 ? 'bg-purple-50' : ''">
+                  <b-td class="italic text-nowrap">{{ isotimeToTimeAgoExpression(item.ApprovalStatusDateTime) }}</b-td>
+                  <b-td class="font-bold">{{ item.Name }}</b-td>
+                  <b-td>{{ item.ProductCategoryName }}</b-td>
+                </b-tr>
+              </b-tbody>
+            </b-table-simple>
+
+            <template v-if="activeItems.length < activeItemsCount">
+              <span>{{ activeItemsCount - activeItems.length }} not shown</span>
+            </template>
+          </template>
+          <template v-else>
+            <span>No recent item activity.</span>
+          </template>
+        </div>
+        <div class="col-start-1"></div>
+        <div class="col-start-1"></div>
       </template>
 
-      <template v-if="hasStrainsPermissions">
+      <!-- <template v-if="hasStrainsPermissions">
         <div class="pb-2 pt-6 px-3 col-span-2 text-left text-2xl ttt-purple font-normal"
           style="border-bottom: 1px solid rgb(92, 0, 128)">
           STRAINS
         </div>
         <dashboard-card class="col-start-1" title="ACTIVE" :count="activeStrainsCount"
           :loading="activeStrainsCount === null" :url="activeStrainsUrl"></dashboard-card>
-      </template>
+        <div class="row-span-3 overflow-auto" style="height: 14rem">
+          <template v-if="activeStrains.length > 0">
+            <b-table-simple small>
+              <b-tbody>
+                <b-tr v-bind:key="strain.Id" v-for="[idx, strain] of activeStrains.entries()"
+                  :class="idx % 2 === 0 ? 'bg-purple-50' : ''">
+                  <b-td class="italic text-nowrap">{{ isotimeToTimeAgoExpression(strain.LastModified) }}</b-td>
+                  <b-td class="font-bold">{{ strain.Name }}</b-td>
+                  <b-td>{{ strain.IndicaPercentage }}% Indica / {{ strain.SativaPercentage }}% Sativa</b-td>
+                </b-tr>
+              </b-tbody>
+            </b-table-simple>
+
+            <template v-if="activeStrains.length < activeStrainsCount">
+              <span>{{ activeStrainsCount - activeStrains.length }} not shown</span>
+            </template>
+          </template>
+          <template v-else>
+            <span>No recent strain activity.</span>
+          </template>
+        </div>
+        <div class="col-start-1"></div>
+        <div class="col-start-1"></div>
+      </template> -->
 
       <template v-if="hasPlantsPermissions">
         <div class="pb-2 pt-6 px-3 col-span-2 text-left text-2xl ttt-purple font-normal"
@@ -142,6 +212,29 @@
 
         <dashboard-card class="col-start-1" title="VEGETATIVE" :count="vegetativePlantCount"
           :loading="vegetativePlantCount === null" :url="vegetativePlantsUrl"></dashboard-card>
+        <div class="row-span-3 overflow-auto" style="height: 14rem">
+          <template v-if="vegetativePlants.length > 0">
+            <b-table-simple small>
+              <b-tbody>
+                <b-tr v-bind:key="vegetativePlant.Id" v-for="[idx, vegetativePlant] of vegetativePlants.entries()"
+                  :class="idx % 2 === 0 ? 'bg-purple-50' : ''">
+                  <b-td class="italic text-nowrap">{{ isotimeToTimeAgoExpression(vegetativePlant.LastModified) }}</b-td>
+                  <b-td class="font-bold">{{ vegetativePlant.Label.slice(-8) }}</b-td>
+                  <b-td>{{ vegetativePlant.StrainName }}</b-td>
+                </b-tr>
+              </b-tbody>
+            </b-table-simple>
+
+            <template v-if="vegetativePlants.length < vegetativePlantCount">
+              <span>{{ vegetativePlantCount - vegetativePlants.length }} not shown</span>
+            </template>
+          </template>
+          <template v-else>
+            <span>No recent vegetative plant activity.</span>
+          </template>
+        </div>
+        <div class="col-start-1"></div>
+        <div class="col-start-1"></div>
 
         <div class="pb-2 pt-6 px-3 col-span-2 text-left text-2xl ttt-purple font-normal"
           style="border-bottom: 1px solid rgb(92, 0, 128)">
@@ -149,8 +242,30 @@
         </div>
         <dashboard-card class="col-start-1" title="FLOWERING" :count="floweringPlantCount"
           :loading="floweringPlantCount === null" :url="floweringPlantsUrl"></dashboard-card>
+        <div class="row-span-3 overflow-auto" style="height: 14rem">
+          <template v-if="floweringPlants.length > 0">
+            <b-table-simple small>
+              <b-tbody>
+                <b-tr v-bind:key="floweringPlant.Id" v-for="[idx, floweringPlant] of floweringPlants.entries()"
+                  :class="idx % 2 === 0 ? 'bg-purple-50' : ''">
+                  <b-td class="italic text-nowrap">{{ isotimeToTimeAgoExpression(floweringPlant.LastModified) }}</b-td>
+                  <b-td class="font-bold">{{ floweringPlant.Label.slice(-8) }}</b-td>
+                  <b-td>{{ floweringPlant.StrainName }}</b-td>
+                </b-tr>
+              </b-tbody>
+            </b-table-simple>
+
+            <template v-if="floweringPlants.length < floweringPlantCount">
+              <span>{{ floweringPlantCount - floweringPlants.length }} not shown</span>
+            </template>
+          </template>
+          <template v-else>
+            <span>No recent flowering plant activity.</span>
+          </template>
+        </div>
         <dashboard-card class="col-start-1" title="INACTIVE" :count="inactivePlantCount"
           :loading="inactivePlantCount === null" :url="inactivePlantsUrl"></dashboard-card>
+        <div class="col-start-1"></div>
       </template>
 
       <template v-if="hasHarvestsPermissions">
@@ -161,9 +276,30 @@
 
         <dashboard-card class="col-start-1" title="ACTIVE" :count="activeHarvestCount"
           :loading="activeHarvestCount === null" :url="activeHarvestsUrl"></dashboard-card>
+        <div class="row-span-3 overflow-auto" style="height: 14rem">
+          <template v-if="activeHarvests.length > 0">
+            <b-table-simple small>
+              <b-tbody>
+                <b-tr v-bind:key="activeHarvest.Id" v-for="[idx, activeHarvest] of activeHarvests.entries()"
+                  :class="idx % 2 === 0 ? 'bg-purple-50' : ''">
+                  <b-td class="italic text-nowrap">{{ isotimeToTimeAgoExpression(activeHarvest.LastModified) }}</b-td>
+                  <b-td class="font-bold">{{ activeHarvest.Name.slice(0, 32) }}</b-td>
+                  <b-td>{{ activeHarvest.HarvestDate }}</b-td>
+                </b-tr>
+              </b-tbody>
+            </b-table-simple>
+
+            <template v-if="activeHarvests.length < activeHarvestCount">
+              <span>{{ activeHarvestCount - activeHarvests.length }} not shown</span>
+            </template>
+          </template>
+          <template v-else>
+            <span>No recent harvest activity.</span>
+          </template>
+        </div>
         <dashboard-card class="col-start-1" title="INACTIVE" :count="inactiveHarvestCount"
           :loading="inactiveHarvestCount === null" :url="inactiveHarvestsUrl"></dashboard-card>
-
+        <div class="col-start-1"></div>
       </template>
 
       <template v-if="hasTagsPermissions">
@@ -174,6 +310,27 @@
 
         <dashboard-card class="col-start-1" title="AVAILABLE" :count="availableTagCount"
           :loading="availableTagCount === null" :url="availableTagsUrl"></dashboard-card>
+        <div class="row-span-3 overflow-auto" style="height: 14rem">
+          <template v-if="availableTags.length > 0">
+            <b-table-simple small>
+              <b-tbody>
+                <b-tr v-bind:key="availableTag.Id" v-for="[idx, availableTag] of availableTags.entries()"
+                  :class="idx % 2 === 0 ? 'bg-purple-50' : ''">
+                  <b-td class="italic text-nowrap">{{ isotimeToTimeAgoExpression(availableTag.LastModified) }}</b-td>
+                  <b-td class="font-bold">{{ availableTag.Label.slice(-8) }}</b-td>
+                  <b-td>{{ availableTag.TagTypeName }}</b-td>
+                </b-tr>
+              </b-tbody>
+            </b-table-simple>
+
+            <template v-if="availableTags.length < availableTagCount">
+              <span>{{ availableTagCount - availableTags.length }} not shown</span>
+            </template>
+          </template>
+          <template v-else>
+            <span>No recent available tag activity.</span>
+          </template>
+        </div>
         <dashboard-card class="col-start-1" title="USED" :count="usedTagCount" :loading="usedTagCount === null"
           :url="usedTagsUrl"></dashboard-card>
         <dashboard-card class="col-start-1" title="VOIDED" :count="voidedTagCount" :loading="voidedTagCount === null"
@@ -188,8 +345,31 @@
 
         <dashboard-card class="col-start-1" title="ACTIVE" :count="activeSalesCount" :loading="activeSalesCount === null"
           :url="activeSalesUrl"></dashboard-card>
+        <div class="row-span-3 overflow-auto" style="height: 14rem">
+          <template v-if="activeSales.length > 0">
+            <b-table-simple small>
+              <b-tbody>
+                <b-tr v-bind:key="activeSale.Id" v-for="[idx, activeSale] of activeSales.entries()"
+                  :class="idx % 2 === 0 ? 'bg-purple-50' : ''">
+                  <b-td class="italic text-nowrap">{{ isotimeToTimeAgoExpression(activeSale.LastModified) }}</b-td>
+                  <b-td class="font-bold">{{ activeSale.ReceiptNumber }}</b-td>
+                  <b-td>${{ activeSale.TotalPrice }}</b-td>
+                  <b-td>{{ activeSale.TotalPackages }} packages</b-td>
+                </b-tr>
+              </b-tbody>
+            </b-table-simple>
+
+            <template v-if="activeSales.length < activeSalesCount">
+              <span>{{ activeSalesCount - activeSales.length }} not shown</span>
+            </template>
+          </template>
+          <template v-else>
+            <span>No recent sales activity.</span>
+          </template>
+        </div>
         <dashboard-card class="col-start-1" title="INACTIVE" :count="inactiveSalesCount"
           :loading="inactiveSalesCount === null" :url="inactiveSalesUrl"></dashboard-card>
+        <div class="col-start-1"></div>
       </template>
     </div>
   </div>
@@ -215,12 +395,10 @@ const initialState = {
   hasItemsPermissions: null,
   activeItems: [],
   activeItemsCount: null,
-  inactiveItemsCount: null,
   // Strains
   hasStrainsPermissions: null,
   activeStrains: [],
   activeStrainsCount: null,
-  inactiveStrainsCount: null,
   // Plant Batches
   hasPlantBatchesPermissions: null,
   activePlantBatches: [],
@@ -361,27 +539,85 @@ export default Vue.extend({
 
       const dataLoader = await getDataLoaderByLicense(facility.licenseNumber);
 
-      dataLoader.activePlantBatchCount().then((count: number | null) => {
-        this.$data.activePlantBatchCount = count || 0;
-      });
+      // Plant Batches
+      dataLoader.metrcRequestManagerOrError.getPlantBatches(dataLoader.recentActivityPayload).then(
+        ({ data }) => {
+          this.$data.hasPlantBatchesPermissions = true;
+          this.$data.activePlantBatches = data.Total ?? 0;
+          this.$data.activePlantBatches = data.Data;
+        },
+        (error) => {
+          this.$data.hasPlantBatchesPermissions = false;
+        }
+      );
       dataLoader.inactivePlantBatchCount().then((count: number | null) => {
         this.$data.inactivePlantBatchCount = count || 0;
       });
-      dataLoader.vegetativePlantCount().then((count: number | null) => {
-        this.$data.vegetativePlantCount = count || 0;
-      });
-      dataLoader.floweringPlantCount().then((count: number | null) => {
-        this.$data.floweringPlantCount = count || 0;
-      });
+
+      // Plants
+      dataLoader.metrcRequestManagerOrError.getVegetativePlants(dataLoader.recentActivityPayload).then(
+        ({ data }) => {
+          this.$data.hasPlantsPermissions = true;
+          this.$data.vegetativePlantCount = data.Total ?? 0;
+          this.$data.vegetativePlants = data.Data;
+        },
+        (error) => {
+          // Not everyone has vegetative?
+          // this.$data.hasPlantsPermissions = false;
+        }
+      );
+      dataLoader.metrcRequestManagerOrError.getFloweringPlants(dataLoader.recentActivityPayload).then(
+        ({ data }) => {
+          this.$data.hasPlantsPermissions = true;
+          this.$data.floweringPlantCount = data.Total ?? 0;
+          this.$data.floweringPlants = data.Data;
+        },
+        (error) => {
+          this.$data.hasPlantsPermissions = false;
+        }
+      );
       dataLoader.inactivePlantCount().then((count: number | null) => {
         this.$data.inactivePlantCount = count || 0;
       });
-      dataLoader.activeHarvestCount().then((count: number | null) => {
-        this.$data.activeHarvestCount = count || 0;
-      });
+
+      // Harvests
+      dataLoader.metrcRequestManagerOrError.getActiveHarvests(dataLoader.recentActivityPayload).then(
+        ({ data }) => {
+          this.$data.hasHarvestsPermissions = true;
+          this.$data.activeHarvestCount = data.Total ?? 0;
+          this.$data.activeHarvests = data.Data;
+        },
+        (error) => {
+          this.$data.hasHarvestsPermissions = false;
+        }
+      );
       dataLoader.inactiveHarvestCount().then((count: number | null) => {
         this.$data.inactiveHarvestCount = count || 0;
       });
+
+      // Items
+      dataLoader.metrcRequestManagerOrError.getItems(dataLoader.recentApprovalPayload).then(
+        ({ data }) => {
+          this.$data.hasItemsPermissions = true;
+          this.$data.activeItemsCount = data.Total ?? 0;
+          this.$data.activeItems = data.Data;
+        },
+        (error) => {
+          this.$data.hasItemsPermissions = false;
+        }
+      );
+
+      // Strains
+      dataLoader.metrcRequestManagerOrError.getStrains(dataLoader.recentActivityPayload).then(
+        ({ data }) => {
+          this.$data.hasStrainsPermissions = true;
+          this.$data.activeStrainsCount = data.Total ?? 0;
+          this.$data.activeStrains = data.Data;
+        },
+        (error) => {
+          this.$data.hasStrainsPermissions = false;
+        }
+      );
 
       // Packages
       dataLoader.metrcRequestManagerOrError.getActivePackages(dataLoader.recentActivityPayload).then(
@@ -430,18 +666,35 @@ export default Vue.extend({
       });
 
       // Tags
-      dataLoader.availableTagCount().then((count: number | null) => {
-        this.$data.availableTagCount = count || 0;
-      });
+
+      dataLoader.metrcRequestManagerOrError.getAvailableTags(dataLoader.recentActivityPayload).then(
+        ({ data }) => {
+          this.$data.hasTagsPermissions = true;
+          this.$data.availableTagCount = data.Total ?? 0;
+          this.$data.availableTags = data.Data;
+        },
+        (error) => {
+          this.$data.hasTagsPermissions = false;
+        }
+      );
       dataLoader.usedTagCount().then((count: number | null) => {
         this.$data.usedTagCount = count || 0;
       });
       dataLoader.voidedTagCount().then((count: number | null) => {
         this.$data.voidedTagCount = count || 0;
       });
-      dataLoader.activeSalesCount().then((count: number | null) => {
-        this.$data.activeSalesCount = count || 0;
-      });
+
+      // Sales
+      dataLoader.metrcRequestManagerOrError.getActiveSalesReceipts(dataLoader.recentActivityPayload).then(
+        ({ data }) => {
+          this.$data.hasSalesPermissions = true;
+          this.$data.activeSalesCount = data.Total ?? 0;
+          this.$data.activeSales = data.Data;
+        },
+        (error) => {
+          this.$data.hasSalesPermissions = false;
+        }
+      );
       dataLoader.inactiveSalesCount().then((count: number | null) => {
         this.$data.inactiveSalesCount = count || 0;
       });
