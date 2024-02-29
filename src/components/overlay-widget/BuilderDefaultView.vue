@@ -2,7 +2,7 @@
   <!-- need this wrapping element to absorb the inherited classes -->
 
   <div>
-    <div ref="mainmenu" class="w-full grid gap-8 grid-cols-3"
+    <div ref="mainmenu" class="flex-grow w-full grid gap-8 grid-cols-3"
       style="grid-template-columns: minmax(280px, auto) 1fr minmax(280px, 400px)">
       <div class="flex gap-2 flex-col p-4 bg-purple-50">
         <!-- <div

@@ -8,7 +8,7 @@ import {
   PlantState,
   SEARCH_LOAD_PAGE_SIZE,
   TagState,
-  TransferState
+  TransferState,
 } from "@/consts";
 import {
   IAtomicService,
@@ -57,21 +57,21 @@ import {
   ITransferFilter,
   ITransferHistoryData,
   ITransferTransporterDetails,
-  ITransporterData
+  ITransporterData,
 } from "@/interfaces";
 import { authManager } from "@/modules/auth-manager.module";
 import { databaseInterface } from "@/modules/database-interface.module";
 import {
   MetrcRequestManager,
-  primaryMetrcRequestManager
+  primaryMetrcRequestManager,
 } from "@/modules/metrc-request-manager.module";
 import { mockDataManager } from "@/modules/mock-data-manager.module";
 import store from "@/store/page-overlay/index";
 import { CsvUpload } from "@/types";
 import { buildBody, streamFactory } from "@/utils/data-loader";
 import { debugLogFactory } from "@/utils/debug";
-import { extract, ExtractedData, ExtractionType } from "@/utils/html";
-import { readDataOrNull, StorageKeyType, writeData } from "@/utils/storage";
+import { ExtractedData, ExtractionType, extract } from "@/utils/html";
+import { StorageKeyType, readDataOrNull, writeData } from "@/utils/storage";
 import { AxiosResponse } from "axios";
 import { get } from "idb-keyval";
 import { Subject, timer } from "rxjs";
@@ -149,7 +149,25 @@ export class DataLoader implements IAtomicService {
 
   countPayload: string = buildBody({ page: 0, pageSize: 5 });
 
-  peekPayload: string = buildBody({ page: 0, pageSize: 25 });
+  recentActivityPayload: string = JSON.stringify({
+    request: {
+      take: 5000,
+      skip: 0,
+      page: 1,
+      pageSize: 5000,
+      filter: {
+        logic: "and",
+        filters: [
+          {
+            field: "LastModified",
+            operator: "gt",
+            value: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
+          },
+        ],
+      },
+      group: [],
+    },
+  });
 
   /**
    * init() should contain eagerly loaded data pieces
@@ -264,9 +282,7 @@ export class DataLoader implements IAtomicService {
    * These dispatch a single lightweight request and therefore are not cached.
    */
 
-  async extractTotalOrNull(
-    responsePromise: Promise<AxiosResponse>
-  ): Promise<number | null> {
+  async extractTotalOrNull(responsePromise: Promise<AxiosResponse>): Promise<number | null> {
     let total: number | null = null;
 
     try {
@@ -357,9 +373,7 @@ export class DataLoader implements IAtomicService {
   }
 
   async locationCount(): Promise<number | null> {
-    return this.extractTotalOrNull(
-      this.metrcRequestManagerOrError.getLocations(this.countPayload)
-    );
+    return this.extractTotalOrNull(this.metrcRequestManagerOrError.getLocations(this.countPayload));
   }
 
   async strainCount(): Promise<number | null> {
