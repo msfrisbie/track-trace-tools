@@ -31,7 +31,7 @@ amplitudeInstance.init(AMPLITUDE_API_KEY);
 function respondToContentScript(sendResponse: any, inboundEvent: IBusEvent, outboundData: any) {
   console.log({ inboundEvent, outboundData });
   sendResponse({
-    uuid: inboundEvent.uuid,
+  uuid: inboundEvent.uuid,
     message: { data: outboundData },
   } as IBusEvent);
 }
