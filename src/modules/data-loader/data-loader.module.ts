@@ -8,7 +8,7 @@ import {
   PlantState,
   SEARCH_LOAD_PAGE_SIZE,
   TagState,
-  TransferState,
+  TransferState
 } from "@/consts";
 import {
   IAtomicService,
@@ -57,21 +57,21 @@ import {
   ITransferFilter,
   ITransferHistoryData,
   ITransferTransporterDetails,
-  ITransporterData,
+  ITransporterData
 } from "@/interfaces";
 import { authManager } from "@/modules/auth-manager.module";
 import { databaseInterface } from "@/modules/database-interface.module";
 import {
   MetrcRequestManager,
-  primaryMetrcRequestManager,
+  primaryMetrcRequestManager
 } from "@/modules/metrc-request-manager.module";
 import { mockDataManager } from "@/modules/mock-data-manager.module";
 import store from "@/store/page-overlay/index";
 import { CsvUpload } from "@/types";
 import { buildBody, streamFactory } from "@/utils/data-loader";
 import { debugLogFactory } from "@/utils/debug";
-import { ExtractedData, ExtractionType, extract } from "@/utils/html";
-import { StorageKeyType, readDataOrNull, writeData } from "@/utils/storage";
+import { extract, ExtractedData, ExtractionType } from "@/utils/html";
+import { readDataOrNull, StorageKeyType, writeData } from "@/utils/storage";
 import { AxiosResponse } from "axios";
 import { get } from "idb-keyval";
 import { Subject, timer } from "rxjs";
@@ -143,11 +143,11 @@ export class DataLoader implements IAtomicService {
 
   private _inactiveHarvests: Promise<IIndexedHarvestData[]> | null = null;
 
-  private _countPayload: string = buildBody({ page: 0, pageSize: 5 });
-
   private _authState: IAuthState | null = null;
 
   private _metrcRequestManager: MetrcRequestManager | null = null;
+
+  countPayload: string = buildBody({ page: 0, pageSize: 5 });
 
   /**
    * init() should contain eagerly loaded data pieces
@@ -262,7 +262,7 @@ export class DataLoader implements IAtomicService {
    * These dispatch a single lightweight request and therefore are not cached.
    */
 
-  private async extractTotalOrNull(
+  async extractTotalOrNull(
     responsePromise: Promise<AxiosResponse>
   ): Promise<number | null> {
     let total: number | null = null;
@@ -282,139 +282,139 @@ export class DataLoader implements IAtomicService {
     return total;
   }
 
-  private async extractCollection<T>(responsePromise: Promise<AxiosResponse>): Promise<T[]> {
+  async extractCollection<T>(responsePromise: Promise<AxiosResponse>): Promise<T[]> {
     return (await responsePromise).data.Data;
   }
 
   async availableTagCount(): Promise<number | null> {
     return this.extractTotalOrNull(
-      this.metrcRequestManagerOrError.getAvailableTags(this._countPayload)
+      this.metrcRequestManagerOrError.getAvailableTags(this.countPayload)
     );
   }
 
   async usedTagCount(): Promise<number | null> {
-    return this.extractTotalOrNull(this.metrcRequestManagerOrError.getUsedTags(this._countPayload));
+    return this.extractTotalOrNull(this.metrcRequestManagerOrError.getUsedTags(this.countPayload));
   }
 
   async voidedTagCount(): Promise<number | null> {
     return this.extractTotalOrNull(
-      this.metrcRequestManagerOrError.getVoidedTags(this._countPayload)
+      this.metrcRequestManagerOrError.getVoidedTags(this.countPayload)
     );
   }
 
   async activePackageSample(): Promise<IIndexedPackageData[]> {
     return this.extractCollection<IIndexedPackageData>(
-      this.metrcRequestManagerOrError.getActivePackages(this._countPayload)
+      this.metrcRequestManagerOrError.getActivePackages(this.countPayload)
     );
   }
 
   async inactivePackageSample(): Promise<IIndexedPackageData[]> {
     return this.extractCollection<IIndexedPackageData>(
-      this.metrcRequestManagerOrError.getInactivePackages(this._countPayload)
+      this.metrcRequestManagerOrError.getInactivePackages(this.countPayload)
     );
   }
 
   async activePackageCount(): Promise<number | null> {
     return this.extractTotalOrNull(
-      this.metrcRequestManagerOrError.getActivePackages(this._countPayload)
+      this.metrcRequestManagerOrError.getActivePackages(this.countPayload)
     );
   }
 
   async inactivePackageCount(): Promise<number | null> {
     return this.extractTotalOrNull(
-      this.metrcRequestManagerOrError.getInactivePackages(this._countPayload)
+      this.metrcRequestManagerOrError.getInactivePackages(this.countPayload)
     );
   }
 
   async intransitPackageCount(): Promise<number | null> {
     return this.extractTotalOrNull(
-      this.metrcRequestManagerOrError.getInTransitPackages(this._countPayload)
+      this.metrcRequestManagerOrError.getInTransitPackages(this.countPayload)
     );
   }
 
   async incomingTransferCount(): Promise<number | null> {
     return this.extractTotalOrNull(
-      this.metrcRequestManagerOrError.getIncomingTransfers(this._countPayload)
+      this.metrcRequestManagerOrError.getIncomingTransfers(this.countPayload)
     );
   }
 
   async outgoingTransferCount(): Promise<number | null> {
     return this.extractTotalOrNull(
-      this.metrcRequestManagerOrError.getOutgoingTransfers(this._countPayload)
+      this.metrcRequestManagerOrError.getOutgoingTransfers(this.countPayload)
     );
   }
 
   async rejectedTransferCount(): Promise<number | null> {
     return this.extractTotalOrNull(
-      this.metrcRequestManagerOrError.getRejectedTransfers(this._countPayload)
+      this.metrcRequestManagerOrError.getRejectedTransfers(this.countPayload)
     );
   }
 
   async itemCount(): Promise<number | null> {
-    return this.extractTotalOrNull(this.metrcRequestManagerOrError.getItems(this._countPayload));
+    return this.extractTotalOrNull(this.metrcRequestManagerOrError.getItems(this.countPayload));
   }
 
   async locationCount(): Promise<number | null> {
     return this.extractTotalOrNull(
-      this.metrcRequestManagerOrError.getLocations(this._countPayload)
+      this.metrcRequestManagerOrError.getLocations(this.countPayload)
     );
   }
 
   async strainCount(): Promise<number | null> {
-    return this.extractTotalOrNull(this.metrcRequestManagerOrError.getStrains(this._countPayload));
+    return this.extractTotalOrNull(this.metrcRequestManagerOrError.getStrains(this.countPayload));
   }
 
   async activePlantBatchCount(): Promise<number | null> {
     return this.extractTotalOrNull(
-      this.metrcRequestManagerOrError.getPlantBatches(this._countPayload)
+      this.metrcRequestManagerOrError.getPlantBatches(this.countPayload)
     );
   }
 
   async inactivePlantBatchCount(): Promise<number | null> {
     return this.extractTotalOrNull(
-      this.metrcRequestManagerOrError.getInactivePlantBatches(this._countPayload)
+      this.metrcRequestManagerOrError.getInactivePlantBatches(this.countPayload)
     );
   }
 
   async vegetativePlantCount(): Promise<number | null> {
     return this.extractTotalOrNull(
-      this.metrcRequestManagerOrError.getVegetativePlants(this._countPayload)
+      this.metrcRequestManagerOrError.getVegetativePlants(this.countPayload)
     );
   }
 
   async floweringPlantCount(): Promise<number | null> {
     return this.extractTotalOrNull(
-      this.metrcRequestManagerOrError.getFloweringPlants(this._countPayload)
+      this.metrcRequestManagerOrError.getFloweringPlants(this.countPayload)
     );
   }
 
   async inactivePlantCount(): Promise<number | null> {
     return this.extractTotalOrNull(
-      this.metrcRequestManagerOrError.getInactivePlants(this._countPayload)
+      this.metrcRequestManagerOrError.getInactivePlants(this.countPayload)
     );
   }
 
   async activeHarvestCount(): Promise<number | null> {
     return this.extractTotalOrNull(
-      this.metrcRequestManagerOrError.getActiveHarvests(this._countPayload)
+      this.metrcRequestManagerOrError.getActiveHarvests(this.countPayload)
     );
   }
 
   async inactiveHarvestCount(): Promise<number | null> {
     return this.extractTotalOrNull(
-      this.metrcRequestManagerOrError.getInactiveHarvests(this._countPayload)
+      this.metrcRequestManagerOrError.getInactiveHarvests(this.countPayload)
     );
   }
 
   async activeSalesCount(): Promise<number | null> {
     return this.extractTotalOrNull(
-      this.metrcRequestManagerOrError.getActiveSalesReceipts(this._countPayload)
+      this.metrcRequestManagerOrError.getActiveSalesReceipts(this.countPayload)
     );
   }
 
   async inactiveSalesCount(): Promise<number | null> {
     return this.extractTotalOrNull(
-      this.metrcRequestManagerOrError.getInactiveSalesReceipts(this._countPayload)
+      this.metrcRequestManagerOrError.getInactiveSalesReceipts(this.countPayload)
     );
   }
 

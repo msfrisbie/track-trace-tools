@@ -4,7 +4,7 @@ import {
   IIntermediatePromotePlantBatchData,
   IPackageData,
   IPlantBatchData,
-  ITagData,
+  ITagData
 } from "@/interfaces";
 import { debugLogFactory } from "@/utils/debug";
 import { fStrip } from "./math";
@@ -309,4 +309,13 @@ export function fuzzyTrueFalseOrError(x: string): boolean {
   }
 
   return result;
+}
+
+export function filterObjectKeys(originalObject: {[key: string]: any}, keysToKeep: string[]) {
+  return Object.keys(originalObject)
+    .filter((key) => keysToKeep.includes(key)) // Keep only specified keys
+    .reduce((newObj: {[key: string]: any}, key: string) => {
+      newObj[key] = originalObject[key]; // Copy key-value pair to new object
+      return newObj;
+    }, {}); // Initial value for the new object
 }

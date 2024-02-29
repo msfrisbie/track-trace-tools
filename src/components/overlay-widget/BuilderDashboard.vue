@@ -1,6 +1,6 @@
 <template>
   <div class="flex flex-col justify-start items-stretch gap-4 text-center">
-    <div class="grid grid-cols-2 gap-2" style="grid-template-columns: 180px 1fr">
+    <div class="grid grid-cols-2 gap-2" style="grid-template-columns: 120px 1fr">
       <div class="col-span-2 pb-6">
         <facility-picker
           theme="light"
@@ -23,9 +23,27 @@
         :url="activePackagesUrl"
       ></dashboard-card>
 
-      <div class="row-span-3">
-        {{ activePackages }}
-        <b-table striped hover :items="activePackages"></b-table>
+      <div class="row-span-3 overflow-x-auto">
+        <b-table-simple small>
+          <b-thead>
+            <b-tr>
+              <b-th>Label</b-th>
+              <b-th>Item</b-th>
+              <b-th>Quantity</b-th>
+            </b-tr>
+          </b-thead>
+          <b-tbody>
+            <b-tr
+              v-bind:key="pkg.Label"
+              v-for="[idx, pkg] of activePackages.entries()"
+              :class="idx % 2 === 0 ? 'bg-purple-50' : ''"
+            >
+              <b-td>...{{ pkg.Label.slice(-8) }}</b-td>
+              <b-td>{{ pkg.Item.Name }}</b-td>
+              <b-td>{{ pkg.Quantity }} {{ pkg.UnitOfMeasureAbbreviation }}</b-td>
+            </b-tr>
+          </b-tbody>
+        </b-table-simple>
       </div>
       <dashboard-card
         class="col-start-1"
@@ -205,25 +223,33 @@ import { mapState } from "vuex";
 import DashboardCard from "./DashboardCard.vue";
 
 const initialState = {
+  activePlantBatches: [],
   activePlantBatchCount: null,
   inactivePlantBatchCount: null,
+  vegetativePlants: [],
   vegetativePlantCount: null,
+  floweringPlants: [],
   floweringPlantCount: null,
   inactivePlantCount: null,
+  activeHarvests: [],
   activeHarvestCount: null,
   inactiveHarvestCount: null,
+  activePackages: [],
   activePackageCount: null,
   inactivePackageCount: null,
   intransitPackageCount: null,
+  incomingTransfers: [],
   incomingTransferCount: null,
+  outgoingTransfers: [],
   outgoingTransferCount: null,
   rejectedTransferCount: null,
+  availableTags: [],
   availableTagCount: null,
   usedTagCount: null,
   voidedTagCount: null,
+  activeSales: [],
   activeSalesCount: null,
   inactiveSalesCount: null,
-  activePackages: [],
 };
 
 export default Vue.extend({
@@ -304,6 +330,10 @@ export default Vue.extend({
       this.$data.activeFacility = facility;
     },
     async selectFacilityImpl(facility: IPageMetrcFacilityData) {
+      if (!facility) {
+        return;
+      }
+
       await authManager.authStateOrError();
 
       for (const [key, value] of Object.entries(initialState)) {
@@ -311,8 +341,6 @@ export default Vue.extend({
       }
 
       const dataLoader = await getDataLoaderByLicense(facility.licenseNumber);
-
-      console.log({ dataLoader });
 
       dataLoader.activePlantBatchCount().then((count: number | null) => {
         this.$data.activePlantBatchCount = count || 0;
@@ -335,9 +363,13 @@ export default Vue.extend({
       dataLoader.inactiveHarvestCount().then((count: number | null) => {
         this.$data.inactiveHarvestCount = count || 0;
       });
-      dataLoader.activePackageCount().then((count: number | null) => {
-        this.$data.activePackageCount = count || 0;
-      });
+      dataLoader.metrcRequestManagerOrError
+        .getActivePackages(dataLoader.countPayload)
+        .then(({ data }) => {
+          this.$data.activePackageCount = data.Total ?? 0;
+          this.$data.activePackages = data.Data;
+        });
+
       dataLoader.inactivePackageCount().then((count: number | null) => {
         this.$data.inactivePackageCount = count || 0;
       });
@@ -370,7 +402,7 @@ export default Vue.extend({
       });
     },
     tabKeyUrl(subPath: string, activeTabId: ActiveTabId): string {
-      const license = store.state.pluginAuth.authState?.license;
+      const license = this.$data.activeFacility?.licenseNumber;
 
       return navigationUrl(`/industry/${license}/${subPath}`, {
         hashValues: {
