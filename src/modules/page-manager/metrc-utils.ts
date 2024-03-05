@@ -1,26 +1,26 @@
-import { ModalAction, ModalType, TTT_SNOWFLAKES } from '@/consts';
-import { SnowflakeState } from '@/interfaces';
-import store from '@/store/page-overlay/index';
-import { timer } from 'rxjs';
-import { modalManager } from '../modal-manager.module';
+import { ModalAction, ModalType, TTT_SNOWFLAKES } from "@/consts";
+import { SnowflakeState } from "@/interfaces";
+import store from "@/store/page-overlay/index";
+import { timer } from "rxjs";
+import { modalManager } from "../modal-manager.module";
 import {
   PACKAGE_TAB_REGEX,
   PLANTS_TAB_REGEX,
   SALES_TAB_REGEX,
   TAG_TAB_REGEX,
   TRANSFER_TAB_REGEX,
-} from './consts';
-import { pageManager } from './page-manager.module';
+} from "./consts";
+import { pageManager } from "./page-manager.module";
 
 export function getVisibleAnimationContainerImpl(expectedText: string) {
   // Assumption: last container is almost certainly the one just added
-  const containers = document.querySelectorAll('.k-animation-container');
+  const containers = document.querySelectorAll(".k-animation-container");
 
   for (let i = containers.length - 1; i >= 0; --i) {
     const container = containers[i] as HTMLElement;
 
     // if (container.style.display !== 'none') {
-    if (container.textContent?.includes(expectedText) && container.style.display !== 'none') {
+    if (container.textContent?.includes(expectedText) && container.style.display !== "none") {
       return container;
     }
   }
@@ -29,15 +29,15 @@ export function getVisibleAnimationContainerImpl(expectedText: string) {
 }
 
 export function suppressAnimationContainerImpl() {
-  pageManager.suppressAnimationContainerTimeout
-    && clearTimeout(pageManager.suppressAnimationContainerTimeout);
+  pageManager.suppressAnimationContainerTimeout &&
+    clearTimeout(pageManager.suppressAnimationContainerTimeout);
   pageManager.suppressAnimationContainerTimeout = null;
 
-  document.body.classList.add('suppress-animation-container');
+  document.body.classList.add("suppress-animation-container");
 
   pageManager.suppressAnimationContainerTimeout = setTimeout(
-    () => document.body.classList.remove('suppress-animation-container'),
-    1000,
+    () => document.body.classList.remove("suppress-animation-container"),
+    1000
   );
 }
 
@@ -51,15 +51,15 @@ export async function interceptViewManifestButtonImpl() {
   }
 
   // This will work on the main transfer page
-  pageManager.viewManifestButton = document.querySelector('#viewmanifest-btn');
+  pageManager.viewManifestButton = document.querySelector("#viewmanifest-btn");
 
   // This is the fallback, used in transfer hub
   if (!pageManager.viewManifestButton) {
-    const btns = document.querySelectorAll('button.btn.shadow');
+    const btns = document.querySelectorAll("button.btn.shadow");
     for (let i = 0; i < btns.length; ++i) {
       const btn = btns[i] as HTMLButtonElement;
 
-      if (btn.innerText.includes('View Manifest')) {
+      if (btn.innerText.includes("View Manifest")) {
         // @ts-ignore
         pageManager.viewManifestButton = btns[i];
         break;
@@ -73,28 +73,28 @@ export async function interceptViewManifestButtonImpl() {
   }
 
   // @ts-ignore
-  pageManager.viewManifestButton.style.display = 'none';
+  pageManager.viewManifestButton.style.display = "none";
 
-  const button = document.createElement('button');
-  button.classList.add('btn', 'shadow');
-  button.setAttribute('type', 'button');
-  button.innerText = 'View Manifest';
-  button.addEventListener('click', () => {
+  const button = document.createElement("button");
+  button.classList.add("btn", "shadow");
+  button.setAttribute("type", "button");
+  button.innerText = "View Manifest";
+  button.addEventListener("click", () => {
     try {
       let selectedRow = document.querySelector(
-        '.k-content > * > * > * >.k-master-row.k-state-selected',
+        ".k-content > * > * > * >.k-master-row.k-state-selected"
       );
 
       if (!selectedRow) {
         // Relax the selector
-        selectedRow = document.querySelector('.k-master-row.k-state-selected');
+        selectedRow = document.querySelector(".k-master-row.k-state-selected");
       }
 
       const targetCell = selectedRow?.children[1];
 
       if (!targetCell) {
         // fall back to the original button
-        pageManager.viewManifestButton?.dispatchEvent(new Event('click'));
+        pageManager.viewManifestButton?.dispatchEvent(new Event("click"));
         return;
       }
 
@@ -103,8 +103,8 @@ export async function interceptViewManifestButtonImpl() {
 
       if (!selectedRow || !manifestNumber) {
         // fall back to the original button
-        console.error('manifestNumber fallback');
-        pageManager.viewManifestButton?.dispatchEvent(new Event('click'));
+        console.error("manifestNumber fallback");
+        pageManager.viewManifestButton?.dispatchEvent(new Event("click"));
         return;
       }
 
@@ -115,8 +115,8 @@ export async function interceptViewManifestButtonImpl() {
       });
     } catch (e) {
       // Last-ditch fallback
-      console.error('last ditch fallback', e);
-      pageManager.viewManifestButton?.dispatchEvent(new Event('click'));
+      console.error("last ditch fallback", e);
+      pageManager.viewManifestButton?.dispatchEvent(new Event("click"));
     }
   });
 
@@ -163,10 +163,10 @@ export async function setPaginationImpl() {
   // @ts-ignore
   const currentPagination = parseInt(pageManager.visiblePaginationSizeSelector.textContent, 10);
 
-  const animationContainer = pageManager.getVisibleAnimationContainer('500');
+  const animationContainer = pageManager.getVisibleAnimationContainer("500");
 
   if (animationContainer) {
-    pageManager.paginationOptions = animationContainer.querySelectorAll('ul.k-list li');
+    pageManager.paginationOptions = animationContainer.querySelectorAll("ul.k-list li");
   }
 
   if (expectedPagination !== currentPagination) {
@@ -192,9 +192,9 @@ export async function setPaginationImpl() {
 
 export async function clickLogoutDismissImpl() {
   if (
-    pageManager.extendButton
-    && pageManager.sessionTimeoutAlert
-    && getComputedStyle(pageManager.sessionTimeoutAlert).display !== 'none'
+    pageManager.extendButton &&
+    pageManager.sessionTimeoutAlert &&
+    getComputedStyle(pageManager.sessionTimeoutAlert).display !== "none"
   ) {
     pageManager.extendButton.click();
   }
@@ -202,7 +202,7 @@ export async function clickLogoutDismissImpl() {
 
 export function controlSnowflakeAnimationImpl(state: SnowflakeState) {
   if (pageManager.snowflakeCanvas) {
-    pageManager.snowflakeCanvas.style.display = 'block';
+    pageManager.snowflakeCanvas.style.display = "block";
   }
 
   document.body.classList.remove(TTT_SNOWFLAKES);
@@ -212,14 +212,14 @@ export function controlSnowflakeAnimationImpl(state: SnowflakeState) {
       break;
     case SnowflakeState.CSS:
       if (pageManager.snowflakeCanvas) {
-        pageManager.snowflakeCanvas.style.display = 'none';
+        pageManager.snowflakeCanvas.style.display = "none";
       }
       document.body.classList.add(TTT_SNOWFLAKES);
       break;
     case SnowflakeState.DISABLED:
     default:
       if (pageManager.snowflakeCanvas) {
-        pageManager.snowflakeCanvas.style.display = 'none';
+        pageManager.snowflakeCanvas.style.display = "none";
       }
       break;
   }
@@ -231,7 +231,7 @@ export function clickRefreshLinksImpl() {
     pageManager.suppressAnimationContainer();
 
     try {
-      const refreshButtons = document.querySelectorAll('.k-pager-refresh');
+      const refreshButtons = document.querySelectorAll(".k-pager-refresh");
 
       for (let i = 0; i < refreshButtons.length; ++i) {
         // @ts-ignore
@@ -239,4 +239,8 @@ export function clickRefreshLinksImpl() {
       }
     } catch (e) {}
   });
+}
+
+export async function selectedRowsOrNone() {
+  console.log(document.querySelectorAll(".k-master-row.k-state-selected"));
 }

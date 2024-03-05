@@ -46,6 +46,7 @@ import {
 } from "./modules/transfer-package-search";
 import { transferSearchModule, transferSearchReducer } from "./modules/transfer-search";
 import { transferToolsModule, transferToolsReducer } from "./modules/transfer-tools";
+import { metrcTableReducer } from "./modules/metrc-table";
 
 // Taken from https://gist.github.com/Myeris/3f13b42f6764ded6640cef693d9d1987
 const vuexLocal = {
@@ -88,6 +89,7 @@ const vuexShared = {
     graph: graphReducer(state.graph),
     labCsv: labCsvReducer(state.labCsv),
     transferTools: transferToolsReducer(state.transferTools),
+    metrcTable: metrcTableReducer(state.metrcTable),
   }),
 };
 

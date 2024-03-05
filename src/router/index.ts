@@ -45,6 +45,8 @@ import QuickScripts from "@/components/page-overlay/QuickScripts.vue";
 import FinalizeSalesReceiptsForm from "@/components/page-overlay/forms/FinalizeSalesReceiptsForm.vue";
 import SettingsForm from "@/components/page-overlay/forms/SettingsForm.vue";
 import VoidTagForm from "@/components/page-overlay/forms/VoidTagForm.vue";
+import PrintTags from "@/components/overlay-widget/tags/PrintTags.vue";
+import TagBuilderListView from "@/components/overlay-widget/tags/TagBuilderListView.vue";
 import VueRouter, { RouteConfig } from "vue-router";
 
 const routes: Array<RouteConfig> = [
@@ -256,6 +258,16 @@ const routes: Array<RouteConfig> = [
     path: "/check-permissions",
     name: "Check Permissions",
     component: CheckPermissionsView,
+  },
+  {
+    path: "/tags",
+    name: "Tag Tools",
+    component: TagBuilderListView,
+  },
+  {
+    path: "/tags/print-tags",
+    name: "Print Tags",
+    component: PrintTags,
   },
   {
     path: "/tags/void-tags",

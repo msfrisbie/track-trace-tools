@@ -43,6 +43,7 @@ import {
   controlSnowflakeAnimationImpl,
   getVisibleAnimationContainerImpl,
   interceptViewManifestButtonImpl,
+  selectedRowsOrNone,
   setPaginationImpl,
   suppressAnimationContainerImpl,
 } from "./metrc-utils";
@@ -435,6 +436,8 @@ class PageManager implements IAtomicService {
           }
         } catch (err) {}
       }
+
+      selectedRowsOrNone();
     });
 
     document.addEventListener("keyup", (e: KeyboardEvent) => {
