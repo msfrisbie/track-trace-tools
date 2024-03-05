@@ -63,8 +63,6 @@ export const metrcTableModule = {
         barcodeValues: labels
       };
 
-      console.log({ labels });
-
       ctx.commit(MetrcTableMutations.METRC_TABLE_MUTATION, mutationData);
     },
   },

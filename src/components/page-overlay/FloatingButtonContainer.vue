@@ -13,9 +13,13 @@
         <search-button class="floating-shadow"></search-button>
 
         <quick-script-button class="floating-shadow" />
+
+        <print-button v-if="metrcTableState.barcodeValues.length === 0"></print-button>
       </div>
 
       <plus-button v-if="!t3plus" class="floating-shadow" />
+
+      <print-button v-if="metrcTableState.barcodeValues.length > 0"></print-button>
 
       <div class="relative">
         <builder-button class="floating-shadow" />
@@ -34,6 +38,7 @@ import BugReportButton from "@/components/page-overlay/BugReportButton.vue";
 import BuilderButton from "@/components/page-overlay/BuilderButton.vue";
 import DebugButton from "@/components/page-overlay/DebugButton.vue";
 import PlusButton from "@/components/page-overlay/PlusButton.vue";
+import PrintButton from "@/components/page-overlay/PrintButton.vue";
 import QuickScriptButton from "@/components/page-overlay/QuickScriptButton.vue";
 import ScrollButton from "@/components/page-overlay/ScrollButton.vue";
 import SearchButton from "@/components/page-overlay/SearchButton.vue";
@@ -53,6 +58,7 @@ export default Vue.extend({
     SearchButton,
     PlusButton,
     BugReportButton,
+    PrintButton,
   },
   async mounted() {},
   data() {
@@ -66,6 +72,7 @@ export default Vue.extend({
       t3plus: (state: IPluginState) => state.client.t3plus,
       debugMode: (state: IPluginState) => state.debugMode,
       notificationCount: (state: IPluginState) => state.announcements.notificationCount,
+      metrcTableState: (state: IPluginState) => state.metrcTable,
     }),
   },
   methods: {},
