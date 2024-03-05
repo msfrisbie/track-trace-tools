@@ -7,12 +7,13 @@ import {
   PlantFilterIdentifiers,
   TagFilterIdentifiers,
   TransferFilterIdentifiers,
-  TTT_TABLEGROUP_ATTRIBUTE,
+  TTT_TABLEGROUP_ATTRIBUTE
 } from "@/consts";
 import { BackgroundState, DarkModeState, IAtomicService, SnowflakeState } from "@/interfaces";
 import { toastManager } from "@/modules/toast-manager.module";
 import { MutationType } from "@/mutation-types";
 import store from "@/store/page-overlay/index";
+import { MetrcTableActions } from "@/store/page-overlay/modules/metrc-table/consts";
 import { debugLogFactory } from "@/utils/debug";
 import _ from "lodash-es";
 import { timer } from "rxjs";
@@ -30,22 +31,20 @@ import {
   TAG_TAB_REGEX,
   TRANSFER_HUB_REGEX,
   TRANSFER_TAB_REGEX,
-  TRANSFER_TEMPLATE_TAB_REGEX,
+  TRANSFER_TEMPLATE_TAB_REGEX
 } from "./consts";
 import {
   addButtonsToPackageTableImpl,
   addButtonsToTransferTableImpl,
-  modifyTransferModalImpl,
+  modifyTransferModalImpl
 } from "./inline-widget-utils";
 import {
   clickLogoutDismissImpl,
   clickRefreshLinksImpl,
   controlSnowflakeAnimationImpl,
   getVisibleAnimationContainerImpl,
-  interceptViewManifestButtonImpl,
-  selectedRowsOrNone,
-  setPaginationImpl,
-  suppressAnimationContainerImpl,
+  interceptViewManifestButtonImpl, setPaginationImpl,
+  suppressAnimationContainerImpl
 } from "./metrc-utils";
 import {
   acquirePackageFilterElementsImpl,
@@ -63,13 +62,13 @@ import {
   setPackageFilterImpl,
   setPlantFilterImpl,
   setTagFilterImpl,
-  setTransferFilterImpl,
+  setTransferFilterImpl
 } from "./search-utils";
 import {
   controlBackgroundImpl,
   controlDarkModeImpl,
   controlLogoutBarImpl,
-  togglePageVisibilityClassesImpl,
+  togglePageVisibilityClassesImpl
 } from "./style-utils";
 import {
   activeTabOrNullImpl,
@@ -79,7 +78,7 @@ import {
   managePlantTabsImpl,
   manageSalesTabsImpl,
   manageTagsTabsImpl,
-  manageTransfersTabsImpl,
+  manageTransfersTabsImpl
 } from "./tab-utils";
 
 const debugLog = debugLogFactory("page-manager.module.ts");
@@ -437,7 +436,7 @@ class PageManager implements IAtomicService {
         } catch (err) {}
       }
 
-      selectedRowsOrNone();
+      store.dispatch(`metrcTable/${MetrcTableActions.UPDATE_PRINTABLE_TAG_POOL}`);
     });
 
     document.addEventListener("keyup", (e: KeyboardEvent) => {

@@ -15,7 +15,7 @@ const defaultState: IExampleState = {
 export const exampleModule = {
   state: () => defaultState,
   mutations: {
-    [ExampleMutations.EXAMPLE_MUTATION](state: IExampleState, data: Partial<IExampleState>) {
+    [ExampleMutations.EXAMPLE_MUTATION](state: IExampleState, data: Partial<IExampleState> = {}) {
       (Object.keys(data) as Array<keyof IExampleState>).forEach((key) => {
         const value = data[key];
         if (typeof value !== 'undefined') {
@@ -38,9 +38,11 @@ export const exampleModule = {
   actions: {
     [ExampleActions.EXAMPLE_ACTION]: async (
       ctx: ActionContext<IExampleState, IPluginState>,
-      data: any,
+      actionData: Partial<IExampleState> = {},
     ) => {
-      ctx.commit(ExampleMutations.EXAMPLE_MUTATION, data as Partial<IExampleState>);
+      const mutationData: Partial<IExampleState> = {};
+
+      ctx.commit(ExampleMutations.EXAMPLE_MUTATION, mutationData);
     },
   },
 };

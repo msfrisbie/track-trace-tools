@@ -7,5 +7,5 @@ export enum MetrcTableGetters {
 }
 
 export enum MetrcTableActions {
-  METRC_TABLE_ACTION = 'METRC_TABLE_ACTION',
+  UPDATE_PRINTABLE_TAG_POOL = 'UPDATE_PRINTABLE_TAG_POOL',
 }

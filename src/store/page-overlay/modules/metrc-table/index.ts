@@ -1,9 +1,12 @@
+import { METRC_TAG_REGEX } from '@/consts';
 import { IPluginState } from '@/interfaces';
 import { ActionContext } from 'vuex';
 import { MetrcTableActions, MetrcTableGetters, MetrcTableMutations } from './consts';
 import { IMetrcTableState } from './interfaces';
 
-const inMemoryState = {};
+const inMemoryState = {
+  barcodeValues: []
+};
 
 const persistedState = {};
 
@@ -36,11 +39,33 @@ export const metrcTableModule = {
     },
   },
   actions: {
-    [MetrcTableActions.METRC_TABLE_ACTION]: async (
+    [MetrcTableActions.UPDATE_PRINTABLE_TAG_POOL]: async (
       ctx: ActionContext<IMetrcTableState, IPluginState>,
-      data: any,
+      actionData: any = {},
     ) => {
-      ctx.commit(MetrcTableMutations.METRC_TABLE_MUTATION, data as Partial<IMetrcTableState>);
+      const selectedRows = [...document.querySelectorAll(".k-master-row.k-state-selected")];
+
+      const labels: string[] = selectedRows.map((selectedRow) => {
+        const tdElements = [...selectedRow.querySelectorAll(`td`)];
+
+        for (const tdElement of tdElements) {
+          const labelCandidate = tdElement.textContent ?? '';
+
+          if (labelCandidate.trim().match(METRC_TAG_REGEX)) {
+            return labelCandidate;
+          }
+        }
+
+        return null;
+      }).filter((x) => x !== null) as string[];
+
+      const mutationData: Partial<IMetrcTableState> = {
+        barcodeValues: labels
+      };
+
+      console.log({ labels });
+
+      ctx.commit(MetrcTableMutations.METRC_TABLE_MUTATION, mutationData);
     },
   },
 };
