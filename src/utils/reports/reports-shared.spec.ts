@@ -1,17 +1,20 @@
+import {
+  CustomTransformer,
+  PRODUCT_UNIT_WEIGHT_REGEX
+} from "@/store/page-overlay/modules/reports/consts";
+import { IFieldData } from "@/store/page-overlay/modules/reports/interfaces";
 import "@/test/utils/auto-mock-chrome";
 import "@/test/utils/auto-mock-fetch";
 import "@/test/utils/auto-mock-store";
-
-import {
-  CustomTransformer,
-  PRODUCT_UNIT_WEIGHT_REGEX,
-} from "@/store/page-overlay/modules/reports/consts";
-import { IFieldData } from "@/store/page-overlay/modules/reports/interfaces";
 import { applyCustomTransformer } from "./reports-shared";
 
 describe("reports-spec.ts", () => {
   it("Correctly extracts values", () => {
     const INPUT_OUTPUT_PAIRS = [
+      {
+        input: "Cookies - OGK - Single Preroll 1.0g",
+        output: ["1.0", "g"],
+      },
       {
         input: "foo 0.5mg bar",
         output: ["0.5", "mg"],
@@ -48,6 +51,10 @@ describe("reports-spec.ts", () => {
 
   it("Correctly applies custom transformers", () => {
     const INPUT_OUTPUT_PAIRS = [
+      {
+        input: "Cookies - OGK - Single Preroll 1.0g",
+        output: ["1", "g"],
+      },
       {
         input: "foo 0.5mg bar",
         output: ["0.5", "mg"],

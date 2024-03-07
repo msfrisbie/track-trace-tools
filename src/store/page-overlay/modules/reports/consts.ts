@@ -807,4 +807,4 @@ export interface IStatusMessage {
   level: "success" | "warning" | "error";
 }
 
-export const PRODUCT_UNIT_WEIGHT_REGEX = /(\d*(?:\.\d+)?)(?:\s?)(g|mg)/;
+export const PRODUCT_UNIT_WEIGHT_REGEX = /(\d*\.?\d+)\s*(g|mg)/;
