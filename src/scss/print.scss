@@ -3,35 +3,57 @@
 @page {
   size: Letter portrait;
   margin: 0;
-  // margin: 0.1875in 0.5625in !important;
-  padding: 0.5625in 0.1875in;
+  // Bottom is slightly less to account for marginal offset
+  margin: 0.5625in 0.1875in 0.4in 0.1875in !important;
 }
 
-.body {
-  width: 8.5in;
-  margin: 0;
-  // margin: 0.1875in 0.5625in !important;
-  // padding: 0.1875in 0.5625in;
-  padding: 0;
+body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  background-color: gray !important;
+  padding: 0 !important;
 }
 
 .printed-label {
   border: 1px dashed #ccc;
   box-sizing: border-box;
-  // padding: 0.1in;
-  // font-size: 10pt;
   overflow: hidden;
-}
-
-@media print {
-  .printed-label {
-    // border-color: transparent !important;
-  }
 }
 
 .label-container {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  column-gap: 0.125in;
+  grid-template-rows: min-content;
   row-gap: 0;
+  background-color: white !important;
+}
+
+.option-select {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  align-items: center;
+  border-radius: 0.5rem;
+  background-color: white !important;
+  padding: 1rem;
+  margin: 1rem;
+}
+
+@media print {
+  body {
+    background-color: transparent !important;
+  }
+
+  .printed-label {
+    border: 0;
+  }
+
+  .label-container {
+    background-color: transparent !important;
+  }
+
+  .option-select {
+    display: none;
+  }
 }

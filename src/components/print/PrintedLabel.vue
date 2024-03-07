@@ -1,14 +1,11 @@
 <template>
-  <div class="printed-label grid place-items-stretch" :style="inlineLabelStyle">
-    <!-- <div class="flex flex-col items-center p-2"> -->
+  <div class="printed-label" :style="inlineLabelStyle">
     <canvas
       style="width: 100%; padding: 0.5rem"
       jsbarcode-background="transparent"
       :jsbarcode-value="barcode"
       :id="`barcode-${barcode}`"
     ></canvas>
-    <!-- <span>{{ barcode }}</span> -->
-    <!-- </div> -->
   </div>
 </template>
 
