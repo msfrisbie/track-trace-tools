@@ -148,7 +148,9 @@ export function applyCustomTransformer(field: IFieldData, untypedRow: any): stri
     case CustomTransformer.PACKAGE_MANIFEST_INDEX:
       const packageManifestIndexRow: { Transfer: IIndexedRichIncomingTransferData, Package: IIndexedDestinationPackageData } = untypedRow;
 
-      return (packageManifestIndexRow.Transfer.incomingPackages!.findIndex((pkg) => getLabelOrError(pkg) === getLabelOrError(packageManifestIndexRow.Package) + 1).toString());
+      const idx = packageManifestIndexRow.Transfer.incomingPackages!.findIndex((pkg) => getLabelOrError(pkg) === getLabelOrError(packageManifestIndexRow.Package));
+
+      return (idx + 1).toString();
     default:
       throw new Error("Unmatched custom transformer");
   }
