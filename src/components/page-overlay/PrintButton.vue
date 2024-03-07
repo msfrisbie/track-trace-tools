@@ -38,6 +38,7 @@
 <script lang="ts">
 import { MessageType, OPTIONS_REDIRECT_KEY, PRINT_DATA_KEY } from "@/consts";
 import { IPluginState } from "@/interfaces";
+import { analyticsManager } from "@/modules/analytics-manager.module";
 import { messageBus } from "@/modules/message-bus.module";
 import { toastManager } from "@/modules/toast-manager.module";
 import { MutationType } from "@/mutation-types";
@@ -91,6 +92,8 @@ export default Vue.extend({
         [PRINT_DATA_KEY]: store.state.metrcTable.barcodeValues,
         [OPTIONS_REDIRECT_KEY]: "/print.html",
       });
+
+      analyticsManager.track(MessageType.PRINT_TAGS);
 
       messageBus.sendMessageToBackground(MessageType.OPEN_OPTIONS_PAGE);
     },
