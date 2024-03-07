@@ -1,37 +1,37 @@
 @import "node_modules/gutenberg-css/dist/gutenberg";
 
 @page {
-    size: Letter portrait;
-    margin: 0;
-    // margin: 0.1875in 0.5625in !important;
-    padding: 0.5625in 0.1875in;
+  size: Letter portrait;
+  margin: 0;
+  // margin: 0.1875in 0.5625in !important;
+  padding: 0.5625in 0.1875in;
 }
 
 .body {
-    width: 8.5in;
-    margin: 0;
-    // margin: 0.1875in 0.5625in !important;
-    // padding: 0.1875in 0.5625in;
-    padding: 0;
+  width: 8.5in;
+  margin: 0;
+  // margin: 0.1875in 0.5625in !important;
+  // padding: 0.1875in 0.5625in;
+  padding: 0;
 }
 
 .printed-label {
-    border: 1px dashed #ccc;
-    box-sizing: border-box;
-    padding: 0.1in;
-    font-size: 10pt;
-    overflow: hidden;
+  border: 1px dashed #ccc;
+  box-sizing: border-box;
+  // padding: 0.1in;
+  // font-size: 10pt;
+  overflow: hidden;
 }
 
 @media print {
-    .printed-label {
-        // border-color: transparent !important;
-    }
+  .printed-label {
+    // border-color: transparent !important;
+  }
 }
 
 .label-container {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    column-gap: 0.125in;
-    row-gap: 0;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  column-gap: 0.125in;
+  row-gap: 0;
 }

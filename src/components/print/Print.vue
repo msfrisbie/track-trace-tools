@@ -5,7 +5,7 @@
       v-bind:key="idx"
       width="2.625in"
       height="1in"
-      padding="0.1in"
+      padding="0"
       :barcode="value"
     ></printed-label>
   </div>
