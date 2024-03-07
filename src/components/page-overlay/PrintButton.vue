@@ -9,16 +9,6 @@
   >
     <div class="flex flex-col items-center justify-center" style="width: 52px; height: 52px">
       <font-awesome-icon icon="print" style="height: 26px"></font-awesome-icon>
-
-      <div class="relative" style="height: 0">
-        <b-badge
-          variant="warning"
-          class="absolute"
-          style="right: 0.5rem; bottom: 0.5rem"
-          v-if="metrcTableState.barcodeValues.length > 0"
-          >{{ metrcTableState.barcodeValues.length }}</b-badge
-        >
-      </div>
     </div>
 
     <b-popover
@@ -46,9 +36,9 @@
 </template>
 
 <script lang="ts">
-import { ModalType } from "@/consts";
+import { MessageType, OPTIONS_REDIRECT_KEY, PRINT_DATA_KEY } from "@/consts";
 import { IPluginState } from "@/interfaces";
-import { modalManager } from "@/modules/modal-manager.module";
+import { messageBus } from "@/modules/message-bus.module";
 import { MutationType } from "@/mutation-types";
 import store from "@/store/page-overlay/index";
 import Vue from "vue";
@@ -80,7 +70,12 @@ export default Vue.extend({
       store.commit(MutationType.UPDATE_TRACKED_INTERACTIONS, trackedInteractions);
     },
     async openPrint() {
-      modalManager.dispatchModalEvent(ModalType.SEARCH);
+      await chrome.storage.local.set({
+        [PRINT_DATA_KEY]: store.state.metrcTable.barcodeValues,
+        [OPTIONS_REDIRECT_KEY]: "/print.html",
+      });
+
+      messageBus.sendMessageToBackground(MessageType.OPEN_OPTIONS_PAGE);
     },
   },
 });

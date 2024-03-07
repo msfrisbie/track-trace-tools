@@ -8,18 +8,37 @@
 
     <template v-if="authState">
       <div class="flex flex-row gap-2 floating-hover-reveal-target">
-        <bug-report-button class="floating-shadow" />
+        <div class="relative">
+          <bug-report-button class="floating-shadow" />
+        </div>
 
-        <search-button class="floating-shadow"></search-button>
+        <div class="relative">
+          <search-button class="floating-shadow"></search-button>
+        </div>
 
-        <quick-script-button class="floating-shadow" />
+        <div class="relative">
+          <quick-script-button class="floating-shadow" />
+        </div>
 
-        <print-button v-if="metrcTableState.barcodeValues.length === 0"></print-button>
+        <div v-if="metrcTableState.barcodeValues.length === 0" class="relative">
+          <print-button :disabled="true"></print-button>
+        </div>
       </div>
 
-      <plus-button v-if="!t3plus" class="floating-shadow" />
+      <div v-if="!t3plus" class="relative">
+        <plus-button class="floating-shadow" />
+      </div>
 
-      <print-button v-if="metrcTableState.barcodeValues.length > 0"></print-button>
+      <div v-if="metrcTableState.barcodeValues.length > 0" class="relative">
+        <print-button></print-button>
+
+        <b-badge
+          variant="warning"
+          class="absolute"
+          style="right: 0.5rem; bottom: 0.5rem"
+          >{{ metrcTableState.barcodeValues.length }}</b-badge
+        >
+      </div>
 
       <div class="relative">
         <builder-button class="floating-shadow" />

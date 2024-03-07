@@ -49,9 +49,9 @@ export const metrcTableModule = {
         const tdElements = [...selectedRow.querySelectorAll(`td`)];
 
         for (const tdElement of tdElements) {
-          const labelCandidate = tdElement.textContent ?? '';
+          const labelCandidate = (tdElement.textContent ?? '').trim();
 
-          if (labelCandidate.trim().match(METRC_TAG_REGEX)) {
+          if (labelCandidate.match(METRC_TAG_REGEX)) {
             return labelCandidate;
           }
         }

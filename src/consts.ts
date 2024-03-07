@@ -545,3 +545,6 @@ export enum SheetTitles {
 // Sheets self-enforced timeout is 180000ms,
 // this allows for 3 requests plus a little extra
 export const SHEETS_API_MESSAGE_TIMEOUT_MS = 3 * 180000 + 60000;
+
+export const PRINT_DATA_KEY = "PRINT_DATA_KEY";
+export const OPTIONS_REDIRECT_KEY = "OPTIONS_REDIRECT_KEY";
