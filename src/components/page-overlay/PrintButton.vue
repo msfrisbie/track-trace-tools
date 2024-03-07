@@ -39,6 +39,7 @@
 import { MessageType, OPTIONS_REDIRECT_KEY, PRINT_DATA_KEY } from "@/consts";
 import { IPluginState } from "@/interfaces";
 import { messageBus } from "@/modules/message-bus.module";
+import { toastManager } from "@/modules/toast-manager.module";
 import { MutationType } from "@/mutation-types";
 import store from "@/store/page-overlay/index";
 import Vue from "vue";
@@ -70,6 +71,22 @@ export default Vue.extend({
       store.commit(MutationType.UPDATE_TRACKED_INTERACTIONS, trackedInteractions);
     },
     async openPrint() {
+      if (store.state.metrcTable.barcodeValues.length === 0) {
+        toastManager.openToast(
+          "No tagged items selected. Select tagged items (packages, plants) in a Metrc table to print",
+          {
+            title: "T3 Tag Print Error",
+            autoHideDelay: 5000,
+            variant: "danger",
+            appendToast: true,
+            toaster: "ttt-toaster",
+            solid: true,
+          }
+        );
+
+        return;
+      }
+
       await chrome.storage.local.set({
         [PRINT_DATA_KEY]: store.state.metrcTable.barcodeValues,
         [OPTIONS_REDIRECT_KEY]: "/print.html",

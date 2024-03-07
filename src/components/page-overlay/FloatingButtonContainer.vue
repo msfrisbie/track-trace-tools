@@ -21,7 +21,7 @@
         </div>
 
         <div v-if="metrcTableState.barcodeValues.length === 0" class="relative">
-          <print-button :disabled="true"></print-button>
+          <print-button></print-button>
         </div>
       </div>
 
@@ -32,12 +32,9 @@
       <div v-if="metrcTableState.barcodeValues.length > 0" class="relative">
         <print-button></print-button>
 
-        <b-badge
-          variant="warning"
-          class="absolute"
-          style="right: 0.5rem; bottom: 0.5rem"
-          >{{ metrcTableState.barcodeValues.length }}</b-badge
-        >
+        <b-badge variant="warning" class="absolute" style="right: 0.1rem; bottom: 0.1rem">{{
+          metrcTableState.barcodeValues.length
+        }}</b-badge>
       </div>
 
       <div class="relative">
