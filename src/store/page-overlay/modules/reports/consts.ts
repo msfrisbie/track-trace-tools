@@ -87,6 +87,7 @@ export enum CustomTransformer {
   RESTORED_PERCENT_WET_WEIGHT = "RESTORED_PERCENT_WET_WEIGHT",
   TRANSFER_PACKAGE_UNIT_WEIGHT = "TRANSFER_PACKAGE_UNIT_WEIGHT",
   TRANSFER_PACKAGE_UNIT_WEIGHT_UOM = "TRANSFER_PACKAGE_UNIT_WEIGHT_UOM",
+  PACKAGE_MANIFEST_INDEX = "PACKAGE_MANIFEST_INDEX"
 }
 
 const COMMON_PACKAGE_FIELD_DATA: IFieldData[] = [
@@ -696,6 +697,13 @@ export const SHEET_FIELDS: { [key: string]: IFieldData[] } = {
       readableName: "Manifest #",
       required: true,
       initiallyChecked: true,
+    },
+    {
+      value: "Package.ManifestIndex",
+      readableName: "Package Manifest Index",
+      required: false,
+      initiallyChecked: true,
+      customTransformer: CustomTransformer.PACKAGE_MANIFEST_INDEX,
     },
     {
       value: "Package.PackageLabel",

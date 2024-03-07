@@ -7,25 +7,23 @@ import {
   IIndexedRichIncomingTransferData,
   IIndexedRichOutgoingTransferData,
   IIndexedTransferData,
-  ILicenseFormFilters,
-  ITransferData,
-  ITransporterData,
+  ILicenseFormFilters, ITransferData,
+  ITransporterData
 } from "@/interfaces";
 import { facilityManager } from "@/modules/facility-manager.module";
 import store from "@/store/page-overlay/index";
 import {
   CustomTransformer,
-  PRODUCT_UNIT_WEIGHT_REGEX,
-  ReportType,
-  ReportsGetters,
+  PRODUCT_UNIT_WEIGHT_REGEX, ReportsGetters, ReportType
 } from "@/store/page-overlay/modules/reports/consts";
 import {
   IFieldData,
   IReportConfig,
   IReportData,
-  IReportOption,
+  IReportOption
 } from "@/store/page-overlay/modules/reports/interfaces";
 import { todayIsodate } from "../date";
+import { getLabelOrError } from "../package";
 import { extractEmployeeAuditData } from "./employee-audit-report";
 import { extractHarvestPackagesData } from "./harvest-packages-report";
 import { extractImmaturePlantPropertyFromDimension } from "./immature-plants-quickview-report";
@@ -106,34 +104,32 @@ export function applyCustomTransformer(field: IFieldData, untypedRow: any): stri
     throw new Error(`Field ${field.readableName} has no custom transformer`);
   }
 
-  let row;
-
   switch (customTransformer) {
     case CustomTransformer.CURRENT_PERCENT_WET_WEIGHT:
-      row = untypedRow as IIndexedHarvestData;
+      const currentPercentWetWeightRow = untypedRow as IIndexedHarvestData;
       return `${
-        Math.round(((100 * row.CurrentWeight) / row.TotalWetWeight + Number.EPSILON) * 100) / 100
+        Math.round(((100 * currentPercentWetWeightRow.CurrentWeight) / currentPercentWetWeightRow.TotalWetWeight + Number.EPSILON) * 100) / 100
       }%`;
     case CustomTransformer.PACKAGED_PERCENT_WET_WEIGHT:
-      row = untypedRow as IIndexedHarvestData;
+      const packagedPercentWetWeightRow: IIndexedHarvestData = untypedRow;
       return `${
-        Math.round(((100 * row.TotalPackagedWeight) / row.TotalWetWeight + Number.EPSILON) * 100) /
+        Math.round(((100 * packagedPercentWetWeightRow.TotalPackagedWeight) / packagedPercentWetWeightRow.TotalWetWeight + Number.EPSILON) * 100) /
         100
       }%`;
     case CustomTransformer.WASTE_PERCENT_WET_WEIGHT:
-      row = untypedRow as IIndexedHarvestData;
+      const wastePercentWetWeightRow: IIndexedHarvestData = untypedRow;
       return `${
-        Math.round(((100 * row.TotalWasteWeight) / row.TotalWetWeight + Number.EPSILON) * 100) / 100
+        Math.round(((100 * wastePercentWetWeightRow.TotalWasteWeight) / wastePercentWetWeightRow.TotalWetWeight + Number.EPSILON) * 100) / 100
       }%`;
     case CustomTransformer.RESTORED_PERCENT_WET_WEIGHT:
-      row = untypedRow as IIndexedHarvestData;
+      const restoredPercentWetWeightRow: IIndexedHarvestData = untypedRow;
       return `${
-        Math.round(((100 * row.TotalRestoredWeight) / row.TotalWetWeight + Number.EPSILON) * 100) /
+        Math.round(((100 * restoredPercentWetWeightRow.TotalRestoredWeight) / restoredPercentWetWeightRow.TotalWetWeight + Number.EPSILON) * 100) /
         100
       }%`;
     case CustomTransformer.TRANSFER_PACKAGE_UNIT_WEIGHT:
-      row = untypedRow as { Package: IIndexedDestinationPackageData };
-      const weightMatch = row.Package.ProductName.match(PRODUCT_UNIT_WEIGHT_REGEX);
+      const transferPackageUnitWeightRow: { Package: IIndexedDestinationPackageData } = untypedRow;
+      const weightMatch = transferPackageUnitWeightRow.Package.ProductName.match(PRODUCT_UNIT_WEIGHT_REGEX);
 
       if (weightMatch) {
         return parseFloat(weightMatch[1]).toString();
@@ -141,14 +137,18 @@ export function applyCustomTransformer(field: IFieldData, untypedRow: any): stri
 
       return "";
     case CustomTransformer.TRANSFER_PACKAGE_UNIT_WEIGHT_UOM:
-      row = untypedRow as { Package: IIndexedDestinationPackageData };
-      const unitMatch = row.Package.ProductName.match(PRODUCT_UNIT_WEIGHT_REGEX);
+      const transferPackageUnitWeightUomRow: { Package: IIndexedDestinationPackageData } = untypedRow;
+      const unitMatch = transferPackageUnitWeightUomRow.Package.ProductName.match(PRODUCT_UNIT_WEIGHT_REGEX);
 
       if (unitMatch) {
         return unitMatch[2];
       }
 
       return "";
+    case CustomTransformer.PACKAGE_MANIFEST_INDEX:
+      const packageManifestIndexRow: { Transfer: IIndexedRichIncomingTransferData, Package: IIndexedDestinationPackageData } = untypedRow;
+
+      return (packageManifestIndexRow.Transfer.incomingPackages!.findIndex((pkg) => getLabelOrError(pkg) === getLabelOrError(packageManifestIndexRow.Package) + 1).toString());
     default:
       throw new Error("Unmatched custom transformer");
   }
