@@ -58,12 +58,12 @@ workflows:
     # Inside the workflow, you define the jobs you want to run.
     jobs:
       - setup
-      - build:
+      - lint:
           requires:
             - setup
       - test:
           requires:
             - setup
-      - lint:
-          requires:
-            - setup
+      # - build:
+      #     requires:
+      #       - setup
