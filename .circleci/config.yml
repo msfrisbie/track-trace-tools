@@ -46,11 +46,9 @@ jobs:
       - checkout
       - attach_workspace:
           at: .
-      - run: 
+      - run:
           name: Run Unit Tests in Parallel
-          command: |
-            TESTFILES=$(circleci tests glob "src/**/*.spec.js" | circleci tests split --split-by=name)
-            yarn test:unit $TESTFILES
+          command: npx jest --listTests | circleci tests run --command="JEST_JUNIT_ADD_FILE_ATTRIBUTE=true xargs npx jest --config jest.config.js --runInBand --" --verbose --split-by=name
 
 # Invoke jobs via workflows
 # See: https://circleci.com/docs/2.0/configuration-reference/#workflows
