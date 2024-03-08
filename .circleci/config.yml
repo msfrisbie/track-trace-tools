@@ -41,11 +41,18 @@ jobs:
     docker:
       - image: cimg/node:16.10
     resource_class: large
+    parallelism: 4
     steps:
       - checkout
       - attach_workspace:
           at: .
-      - run: yarn test:unit
+      - run: 
+          name: Run Unit Tests in Parallel
+          command: |
+            # Use CircleCI's environment variables to split tests
+            # Here, we're assuming Jest is configured to pick up tests from the 'utils/' directory
+            TESTFILES=$(circleci tests glob "**/*.spec.js" | circleci tests split --split-by=name)
+            yarn test:unit $TESTFILES
 
 # Invoke jobs via workflows
 # See: https://circleci.com/docs/2.0/configuration-reference/#workflows
