@@ -20,6 +20,8 @@ module.exports = {
     // https://stackoverflow.com/questions/42260218/jest-setup-syntaxerror-unexpected-token-export
     "^lodash-es$": "lodash",
     axios: "axios/dist/node/axios.cjs",
+    "\\.(css|scss)$": "<rootDir>/mocks/styleMock.js",
+    "vue-typeahead-bootstrap": "<rootDir>/mocks/vueMock.js",
   },
   setupFiles: ["<rootDir>/jest/envVars.js"],
   setupFilesAfterEnv: ["<rootDir>/jest/jest.setup.js"],

@@ -3,6 +3,11 @@ import { BootstrapVue } from 'bootstrap-vue';
 import { chrome } from 'jest-chrome';
 import Vuex from 'vuex';
 
+const mockModuleFactory = (extras = {}) => ({
+  init: jest.fn(),
+  ...extras
+});
+
 export function mockConsts() {
   jest.mock('@/consts', () => {
     const originalModule = jest.requireActual('@/consts');
@@ -49,14 +54,64 @@ export function mockStore() {
 export function mockAuthManager() {
   jest.mock('@/modules/auth-manager.module', () => ({
     __esModule: true,
-    authManager: jest.fn(),
+    authManager: mockModuleFactory({
+      authStateOrError: () => ({
+        identity: 'user@example.com',
+      }),
+      authStateOrNull: () => ({
+        identity: 'user@example.com',
+      }),
+    })
+  }));
+}
+
+export function mockPageManager() {
+  jest.mock('@/modules/page-manager/page-manager.module', () => ({
+    __esModule: true,
+    pageManager: mockModuleFactory(),
   }));
 }
 
 export function mockAnalyticsManager() {
   jest.mock('@/modules/analytics-manager.module', () => ({
     __esModule: true,
-    analyticsManager: jest.fn(),
+    analyticsManager: mockModuleFactory(),
+  }));
+}
+
+export function mockPassivePageAnalyzer() {
+  jest.mock('@/modules/passive-page-analyzer.module', () => ({
+    __esModule: true,
+    passivePageAnalyzer: mockModuleFactory(),
+  }));
+}
+
+export function mockFacilityManager() {
+  jest.mock('@/modules/facility-manager.module', () => ({
+    __esModule: true,
+    facilityManager: mockModuleFactory({
+      cachedFacilities: []
+    }),
+  }));
+}
+
+export function mockT3RequestManager() {
+  jest.mock('@/modules/t3-request-manager.module', () => ({
+    __esModule: true,
+    t3RequestManager: mockModuleFactory({
+      loadT3plus: () => ({
+        plusUsers: []
+      }),
+      loadFlags: () => ({}),
+      loadAnnouncements: () => ([])
+    }),
+  }));
+}
+
+export function mockMetrcRequestManager() {
+  jest.mock('@/modules/metrc-request-manager.module', () => ({
+    __esModule: true,
+    metrcRequestManager: mockModuleFactory(),
   }));
 }
 
