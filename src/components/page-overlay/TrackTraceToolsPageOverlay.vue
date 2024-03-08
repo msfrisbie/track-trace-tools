@@ -54,7 +54,6 @@ import { BootstrapVue } from "bootstrap-vue";
 import Vue from "vue";
 import VueRouter from "vue-router";
 import VueSlider from "vue-slider-component";
-import "vue-slider-component/theme/default.css";
 import VueTypeaheadBootstrap from "vue-typeahead-bootstrap";
 import { mapState } from "vuex";
 
