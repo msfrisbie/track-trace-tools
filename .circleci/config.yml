@@ -60,7 +60,7 @@ workflows:
             - setup
       - test:
           requires:
-            - build
+            - setup
       - lint:
           requires:
             - setup
