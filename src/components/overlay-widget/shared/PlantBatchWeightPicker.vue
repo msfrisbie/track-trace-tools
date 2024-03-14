@@ -115,7 +115,7 @@ enum WeightMode {
 }
 
 export default Vue.extend({
-  name: 'PlantWeightPicker',
+  name: 'PlantBatchWeightPicker',
   store,
   props: {
     selectedPlantBatches: {

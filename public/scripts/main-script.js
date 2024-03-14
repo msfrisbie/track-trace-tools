@@ -30,3 +30,5 @@ const confirmShim = function (message) {
 };
 
 window["confirm"] = confirmShim;
+
+document.querySelector("html").style.fontSize = "14px";

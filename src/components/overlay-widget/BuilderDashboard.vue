@@ -32,7 +32,7 @@
                   v-for="[idx, pkg] of activePackages.entries()"
                   :class="idx % 2 === 0 ? 'bg-purple-50' : ''"
                 >
-                  <b-td class="italic text-nowrap">{{
+                  <b-td class="italic whitespace-nowrap">{{
                     isotimeToTimeAgoExpression(pkg.LastModified)
                   }}</b-td>
                   <b-td class="font-bold">{{ pkg.Label.slice(-8) }}</b-td>
@@ -89,7 +89,7 @@
                   v-for="[idx, transfer] of incomingTransfers.entries()"
                   :class="idx % 2 === 0 ? 'bg-purple-50' : ''"
                 >
-                  <b-td class="italic text-nowrap">{{
+                  <b-td class="italic whitespace-nowrap">{{
                     isotimeToTimeAgoExpression(transfer.LastModified)
                   }}</b-td>
                   <b-td class="font-bold">{{ transfer.ManifestNumber }}</b-td>
@@ -137,7 +137,7 @@
                   v-for="[idx, transfer] of outgoingTransfers.entries()"
                   :class="idx % 2 === 0 ? 'bg-purple-50' : ''"
                 >
-                  <b-td class="italic text-nowrap">{{
+                  <b-td class="italic whitespace-nowrap">{{
                     isotimeToTimeAgoExpression(transfer.LastModified)
                   }}</b-td>
                   <b-td class="font-bold">{{ transfer.ManifestNumber }}</b-td>
@@ -194,7 +194,7 @@
                   v-for="[idx, plantBatch] of activePlantBatches.entries()"
                   :class="idx % 2 === 0 ? 'bg-purple-50' : ''"
                 >
-                  <b-td class="italic text-nowrap">{{
+                  <b-td class="italic whitespace-nowrap">{{
                     isotimeToTimeAgoExpression(plantBatch.LastModified)
                   }}</b-td>
                   <b-td class="font-bold">{{ plantBatch.Name }}</b-td>
@@ -245,7 +245,7 @@
                   v-for="[idx, item] of activeItems.entries()"
                   :class="idx % 2 === 0 ? 'bg-purple-50' : ''"
                 >
-                  <b-td class="italic text-nowrap">{{
+                  <b-td class="italic whitespace-nowrap">{{
                     isotimeToTimeAgoExpression(item.ApprovalStatusDateTime)
                   }}</b-td>
                   <b-td class="font-bold">{{ item.Name }}</b-td>
@@ -279,7 +279,7 @@
               <b-tbody>
                 <b-tr v-bind:key="strain.Id" v-for="[idx, strain] of activeStrains.entries()"
                   :class="idx % 2 === 0 ? 'bg-purple-50' : ''">
-                  <b-td class="italic text-nowrap">{{ isotimeToTimeAgoExpression(strain.LastModified) }}</b-td>
+                  <b-td class="italic whitespace-nowrap">{{ isotimeToTimeAgoExpression(strain.LastModified) }}</b-td>
                   <b-td class="font-bold">{{ strain.Name }}</b-td>
                   <b-td>{{ strain.IndicaPercentage }}% Indica / {{ strain.SativaPercentage }}% Sativa</b-td>
                 </b-tr>
@@ -322,7 +322,7 @@
                   v-for="[idx, vegetativePlant] of vegetativePlants.entries()"
                   :class="idx % 2 === 0 ? 'bg-purple-50' : ''"
                 >
-                  <b-td class="italic text-nowrap">{{
+                  <b-td class="italic whitespace-nowrap">{{
                     isotimeToTimeAgoExpression(vegetativePlant.LastModified)
                   }}</b-td>
                   <b-td class="font-bold">{{ vegetativePlant.Label.slice(-8) }}</b-td>
@@ -364,7 +364,7 @@
                   v-for="[idx, floweringPlant] of floweringPlants.entries()"
                   :class="idx % 2 === 0 ? 'bg-purple-50' : ''"
                 >
-                  <b-td class="italic text-nowrap">{{
+                  <b-td class="italic whitespace-nowrap">{{
                     isotimeToTimeAgoExpression(floweringPlant.LastModified)
                   }}</b-td>
                   <b-td class="font-bold">{{ floweringPlant.Label.slice(-8) }}</b-td>
@@ -415,7 +415,7 @@
                   v-for="[idx, activeHarvest] of activeHarvests.entries()"
                   :class="idx % 2 === 0 ? 'bg-purple-50' : ''"
                 >
-                  <b-td class="italic text-nowrap">{{
+                  <b-td class="italic whitespace-nowrap">{{
                     isotimeToTimeAgoExpression(activeHarvest.LastModified)
                   }}</b-td>
                   <b-td class="font-bold">{{ activeHarvest.Name.slice(0, 32) }}</b-td>
@@ -466,7 +466,7 @@
                   v-for="[idx, availableTag] of availableTags.entries()"
                   :class="idx % 2 === 0 ? 'bg-purple-50' : ''"
                 >
-                  <b-td class="italic text-nowrap">{{
+                  <b-td class="italic whitespace-nowrap">{{
                     isotimeToTimeAgoExpression(availableTag.LastModified)
                   }}</b-td>
                   <b-td class="font-bold">{{ availableTag.Label.slice(-8) }}</b-td>
@@ -523,7 +523,7 @@
                   v-for="[idx, activeSale] of activeSales.entries()"
                   :class="idx % 2 === 0 ? 'bg-purple-50' : ''"
                 >
-                  <b-td class="italic text-nowrap">{{
+                  <b-td class="italic whitespace-nowrap">{{
                     isotimeToTimeAgoExpression(activeSale.LastModified)
                   }}</b-td>
                   <b-td class="font-bold">{{ activeSale.ReceiptNumber }}</b-td>

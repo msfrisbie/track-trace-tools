@@ -29,10 +29,20 @@
     </template>
 
     <template v-if="activeStepIndex === 1">
-      <div class="w-full">
-        <b-button class="w-full" variant="success" size="md" @click="activeStepIndex = 2">
-          NEXT
-        </b-button>
+      <div class="w-full flex-grow grid grid-cols-2 gap-4">
+        <div class="flex flex-col items-center p-4 col-span-2">
+          <div class="flex flex-col items-center">
+            <plant-batch-count-picker
+              :selectedPlantBatches="selectedPlantBatches"
+              :plantBatchCounts.sync="destroyedCounts"
+            />
+          </div>
+        </div>
+        <div class="col-start-2">
+          <b-button class="w-full" variant="success" size="md" @click="activeStepIndex = 2">
+            NEXT
+          </b-button>
+        </div>
       </div>
     </template>
 
@@ -54,11 +64,7 @@
               </b-form-group>
 
               <b-form-group class="w-full" label="Destroy Date:" label-size="sm">
-                <b-form-datepicker
-                  initial-date
-                  v-model="destroyPlantBatchesIsodate"
-                  size="md"
-                />
+                <b-form-datepicker initial-date v-model="destroyPlantBatchesIsodate" size="md" />
               </b-form-group>
 
               <template v-if="showHiddenDetailFields">
@@ -112,18 +118,16 @@
             <div class="flex flex-col space-y-2 text-xl pt-6" style="width: 600px">
               <div>
                 Destroying
-                <span class="font-bold ttt-purple"
-                  >{{ totalDestroyedWeight }} {{ unitOfWeight.Name }}</span
-                >
-                from
+                <span class="font-bold ttt-purple">{{ totalDestroyedCount }}</span>
+                plants from
                 <span class="font-bold ttt-purple">{{ selectedPlantBatches.length }}</span>
-                plants.
+                plant batches.
               </div>
 
               <div>
                 Average per plant waste:
                 <span class="font-bold ttt-purple"
-                  >{{ averagePerPlantWaste }} {{ unitOfWeight.Name }}</span
+                  >{{ averagePerPlantBatchWaste }} {{ unitOfWeight.Name }}</span
                 >
               </div>
 
@@ -174,6 +178,7 @@
             <span v-if="!unitOfWeight.Name">Unit of weight not provided</span>
             <span v-if="!destroyPlantBatchesIsodate">Destroy date not provided</span>
             <span v-if="!totalDestroyedWeight">Total destroyed weight not provided</span>
+            <span v-if="!totalDestroyedCount">Total destroyed count not provided</span>
             <span v-if="!reasonNote">Reason note not provided</span>
             <span v-if="!wasteMaterialMixed">Waste material mixed not provided</span>
           </div>
@@ -186,6 +191,7 @@
 <script lang="ts">
 import BuilderStepHeader from "@/components/overlay-widget/shared/BuilderStepHeader.vue";
 import CsvBreakout from "@/components/overlay-widget/shared/CsvBreakout.vue";
+import PlantBatchCountPicker from "@/components/overlay-widget/shared/PlantBatchCountPicker.vue";
 import PlantBatchPicker from "@/components/overlay-widget/shared/PlantBatchPicker.vue";
 import PlantBatchWeightPicker from "@/components/overlay-widget/shared/PlantBatchWeightPicker.vue";
 import { BuilderType, MessageType } from "@/consts";
@@ -212,6 +218,7 @@ export default Vue.extend({
     BuilderStepHeader,
     PlantBatchPicker,
     PlantBatchWeightPicker,
+    PlantBatchCountPicker,
     CsvBreakout,
   },
   methods: {
@@ -232,9 +239,11 @@ export default Vue.extend({
       for (let i = 0; i < this.$data.selectedPlantBatches.length; ++i) {
         const plantBatch: IPlantBatchData = this.$data.selectedPlantBatches[i];
         const weight: number = this.$data.destroyedWeights[i];
+        const count: number = this.$data.destroyedCounts[i];
 
         rows.push({
           ActualDate: submitDateFromIsodate(this.$data.destroyPlantBatchesIsodate),
+          CountToDestroy: count.toString(),
           PlantWasteMethodId: this.$data.wasteMethod.Id.toString(),
           WasteReasonId: this.$data.wasteReason.Id.toString(),
           ReasonNote: this.$data.reasonNote,
@@ -251,6 +260,7 @@ export default Vue.extend({
         {
           plantBatchTotal: this.$data.selectedPlantBatches.length,
           totalDestroyedWeight: sum(this.$data.destroyedWeights),
+          totalDestroyedCount: sum(this.$data.destroyedCounts),
           unitOfWeight: this.$data.unitOfWeight.Name,
         },
         this.buildCsvFiles(),
@@ -267,6 +277,7 @@ export default Vue.extend({
         csvData: {
           tagCount: this.$data.selectedPlantBatches.length,
           totalDestroyedWeight: sum(this.$data.destroyedWeights),
+          totalDestroyedCount: sum(this.$data.destroyedCounts),
           unitOfWeight: this.$data.unitOfWeight.Name,
           destroyIsodate: this.$data.destroyPlantBatchesIsodate,
         },
@@ -274,6 +285,7 @@ export default Vue.extend({
     },
     buildCsvFiles(): ICsvFile[] {
       try {
+        // PlantBatch,Count,WasteMethodName,WasteMaterialMixed,WasteReasonName,ReasonNote,WasteWeight,WasteUnitOfMeasure,ActualDate
         const csvData = buildCsvDataOrError([
           {
             isVector: true,
@@ -282,24 +294,23 @@ export default Vue.extend({
             ),
           },
           {
-            // TODO
             isVector: true,
-            data: [],
+            data: this.$data.destroyedCounts,
           },
           { isVector: false, data: this.$data.wasteMethod.Name },
           { isVector: false, data: this.$data.wasteMaterialMixed },
-          { isVector: true, data: this.$data.destroyedWeights },
-          { isVector: false, data: this.$data.unitOfWeight.Name },
           { isVector: false, data: this.$data.wasteReason.Name },
           { isVector: false, data: this.$data.reasonNote },
+          { isVector: true, data: this.$data.destroyedWeights },
+          { isVector: false, data: this.$data.unitOfWeight.Name },
           { isVector: false, data: this.$data.destroyPlantBatchesIsodate },
         ]);
 
         return buildNamedCsvFileData(
           csvData,
-          `Waste ${sum(this.$data.destroyedWeights)} ${this.$data.unitOfWeight.Name} from ${
+          `Destroy ${sum(this.$data.destroyedCounts)} plants from ${
             this.$data.selectedPlantBatches.length
-          } plants`
+          } plant batches`
         );
       } catch (e) {
         console.error(e);
@@ -332,10 +343,39 @@ export default Vue.extend({
         ],
       }).valid;
     },
+    allPlantBatchesHaveValidCountImpl() {
+      return arrayIsValid(this.$data.destroyedCounts, {
+        rowValidators: [
+          {
+            fn: (row: any): boolean => typeof row === "number" && row > 0,
+            message: "All values must be a number greater than 0",
+          },
+        ],
+        collectionValidators: [
+          {
+            fn: (rows: any[]): boolean => rows.length === this.$data.selectedPlantBatches.length,
+            message: "Collection must be same size as plant batches",
+          },
+          {
+            fn: (rows: any[]): boolean => {
+              try {
+                return rows.reduce((a: number, b: number) => a + b, 0) > 0;
+              } catch (e) {
+                return false;
+              }
+            },
+            message: "Collection must sum to a positive number",
+          },
+        ],
+      }).valid;
+    },
   },
   computed: {
     totalDestroyedWeight() {
       return sum(this.$data.destroyedWeights).toFixed(3);
+    },
+    totalDestroyedCount() {
+      return sum(this.$data.destroyedCounts);
     },
     weightOptions() {
       return this.$data.unitsOfWeight.map((unitOfWeight: any) => ({
@@ -357,7 +397,7 @@ export default Vue.extend({
     },
     averagePerPlantBatchWaste() {
       return parseFloat(
-        (sum(this.$data.destroyedWeights) / this.$data.selectedPlantBatches.length).toFixed(3)
+        (sum(this.$data.destroyedWeights) / sum(this.$data.destroyedCounts)).toFixed(3)
       );
     },
     showWeightEntry(): boolean {
@@ -373,6 +413,9 @@ export default Vue.extend({
     allPlantBatchesHaveValidWeight(): boolean {
       return this.allPlantBatchesHaveValidWeightImpl();
     },
+    allPlantBatchesHaveValidCount(): boolean {
+      return this.allPlantBatchesHaveValidCountImpl();
+    },
     allDetailsProvided(): boolean {
       return (
         !!this.$data.wasteMethod &&
@@ -380,6 +423,7 @@ export default Vue.extend({
         !!this.$data.unitOfWeight &&
         !!this.$data.destroyPlantBatchesIsodate &&
         this.allPlantBatchesHaveValidWeightImpl() &&
+        this.allPlantBatchesHaveValidCountImpl() &&
         !!this.$data.reasonNote &&
         !!this.$data.wasteMaterialMixed
       );
@@ -391,7 +435,7 @@ export default Vue.extend({
   },
   data() {
     return {
-      builderType: BuilderType.DESTROY_PLANTS,
+      builderType: BuilderType.DESTROY_PLANT_BATCHES,
       activeStepIndex: 0,
       selectedPlantBatches: [],
       // Builder state
@@ -399,6 +443,7 @@ export default Vue.extend({
       // Submission data
       destroyPlantBatchesIsodate: todayIsodate(),
       destroyedWeights: [],
+      destroyedCounts: [],
       unitOfWeight: null,
       wasteMethod: null,
       wasteReason: null,
@@ -429,6 +474,10 @@ export default Vue.extend({
       handler(newValue, oldValue) {
         if (this.$data.destroyedWeights.length !== newValue.length) {
           this.$data.destroyedWeights = Array(newValue.length).fill(0);
+        }
+
+        if (this.$data.destroyedCounts.length !== newValue.length) {
+          this.$data.destroyedCounts = Array(newValue.length).fill(0);
         }
       },
     },

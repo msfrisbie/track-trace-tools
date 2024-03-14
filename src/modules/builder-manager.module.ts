@@ -2,15 +2,11 @@ import { BuilderType, MessageType } from "@/consts";
 import {
   IAtomicService,
   ICsvFile,
-  IMetrcAdjustPackagePayload,
-  IMetrcCreateItemsPayload,
+  IMetrcAdjustPackagePayload, IMetrcAssignCoaPayload, IMetrcCreateItemsPayload,
   IMetrcCreatePackagesFromPackagesPayload,
   IMetrcCreatePlantBatchPackagesFromMotherPlantBatchPayload,
   IMetrcCreatePlantBatchPackagesFromMotherPlantPayload,
-  IMetrcCreateTransferPayload,
-  IMetrcDestroyPlantsPayload,
-  IMetrcDestroyPlantBatchesPayload,
-  IMetrcFinishPackagesPayload,
+  IMetrcCreateTransferPayload, IMetrcDestroyPlantBatchesPayload, IMetrcDestroyPlantsPayload, IMetrcFinishPackagesPayload,
   IMetrcHarvestPlantsPayload,
   IMetrcManicurePlantsPayload,
   IMetrcMovePackagesPayload,
@@ -19,8 +15,7 @@ import {
   IMetrcReplacePlantBatchTagsPayload,
   IMetrcReplacePlantTagsPayload,
   IMetrcUnpackImmaturePlantsPayload,
-  IMetrcUpdateTransferPayload,
-  IMetrcAssignCoaPayload
+  IMetrcUpdateTransferPayload
 } from "@/interfaces";
 import { primaryMetrcRequestManager } from "@/modules/metrc-request-manager.module";
 import store from "@/store/page-overlay/index";
@@ -346,6 +341,9 @@ class BuilderManager implements IAtomicService {
         break;
       case BuilderType.DESTROY_PLANTS:
         response = await primaryMetrcRequestManager.destroyPlants(JSON.stringify(rows));
+        break;
+      case BuilderType.DESTROY_PLANT_BATCHES:
+        response = await primaryMetrcRequestManager.destroyPlantBatches(JSON.stringify(rows));
         break;
       case BuilderType.UNPACK_IMMATURE_PLANTS:
         response = await primaryMetrcRequestManager.unpackImmaturePlants(JSON.stringify(rows));
