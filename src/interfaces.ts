@@ -10,7 +10,7 @@ import {
   PlantState,
   SearchModalView,
   TagState,
-  TransferState,
+  TransferState
 } from "@/consts";
 import { Store } from "vuex";
 import { IAnnouncementsState } from "./store/page-overlay/modules/announcements/interfaces";
@@ -22,6 +22,7 @@ import { IFlagsState } from "./store/page-overlay/modules/flags/interfaces";
 import { IGraphState } from "./store/page-overlay/modules/graph/interfaces";
 import { ILabCsvState } from "./store/page-overlay/modules/lab-csv/interfaces";
 import { IListingState } from "./store/page-overlay/modules/listing/interfaces";
+import { IMetrcTableState } from "./store/page-overlay/modules/metrc-table/interfaces";
 import { IPackageHistoryState } from "./store/page-overlay/modules/package-history/interfaces";
 import { IPackageSearchState } from "./store/page-overlay/modules/package-search/interfaces";
 import { IPlantSearchState } from "./store/page-overlay/modules/plant-search/interfaces";
@@ -34,14 +35,13 @@ import { ISplitPackageBuilderState } from "./store/page-overlay/modules/split-pa
 import { ITagSearchState } from "./store/page-overlay/modules/tag-search/interfaces";
 import {
   DriverLayoverLeg,
-  ITransferBuilderState,
+  ITransferBuilderState
 } from "./store/page-overlay/modules/transfer-builder/interfaces";
 import { ITransferPackageSearchState } from "./store/page-overlay/modules/transfer-package-search/interfaces";
 import { ITransferSearchState } from "./store/page-overlay/modules/transfer-search/interfaces";
 import { ITransferToolsState } from "./store/page-overlay/modules/transfer-tools/interfaces";
 import { CsvUpload, CsvUploadStatus } from "./types";
 import { UnitOfMeasureAbbreviation, UnitOfMeasureName } from "./utils/units";
-import { IMetrcTableState } from "./store/page-overlay/modules/metrc-table/interfaces";
 
 export type PlantBatchTypeName = "Clone" | "Seed";
 export type PlantGrowthPhase = "Vegetative" | "Flowering";
@@ -1810,6 +1810,11 @@ export interface IRemediatePackageMethod {
 }
 
 export interface IWasteMethod {
+  Id: number;
+  Name: string;
+}
+
+export interface IDestroyPlantBatchActionReason {
   Id: number;
   Name: string;
 }

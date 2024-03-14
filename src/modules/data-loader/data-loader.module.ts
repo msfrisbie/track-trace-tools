@@ -149,6 +149,8 @@ export class DataLoader implements IAtomicService {
 
   countPayload: string = buildBody({ page: 0, pageSize: 5 });
 
+  fullPayload: string = buildBody({ page: 0, pageSize: 5000 });
+
   recentActivityPayload: string = JSON.stringify({
     request: {
       take: 5000,
@@ -160,6 +162,26 @@ export class DataLoader implements IAtomicService {
         filters: [
           {
             field: "LastModified",
+            operator: "gt",
+            value: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
+          },
+        ],
+      },
+      group: [],
+    },
+  });
+
+  recentPlantedPayload: string = JSON.stringify({
+    request: {
+      take: 5000,
+      skip: 0,
+      page: 1,
+      pageSize: 5000,
+      filter: {
+        logic: "and",
+        filters: [
+          {
+            field: "PlantedDate",
             operator: "gt",
             value: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
           },

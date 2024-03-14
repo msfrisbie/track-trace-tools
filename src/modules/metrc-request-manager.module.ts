@@ -137,6 +137,7 @@ enum UrlType {
   NEW_TRANSFER_MODAL,
   NEW_PACKAGE_MODAL,
   NEW_TRANSFER_TEMPLATE_MODAL,
+  DESTROY_PLANT_BATCHES_MODAL,
   USER_PROFILE,
   LAB_RESULTS_BY_PACKAGE_ID,
   TRANSFER_HISTORY_BY_TRANSFER_ID,
@@ -222,6 +223,10 @@ async function buildDynamicUrl(
       return `${origin({ divertToNullOrigin: false })}/industry/${
         authState.license
       }/packages/new?isModal=true&_=${new Date().getTime()}`;
+    case UrlType.DESTROY_PLANT_BATCHES_MODAL:
+      return `${origin({ divertToNullOrigin: false })}/industry/${
+        authState.license
+      }/plantbatches/destroy/plants?isModal=true&_=${new Date().getTime()}`;
     case UrlType.NEW_TRANSFER_TEMPLATE_MODAL:
       return `${origin({ divertToNullOrigin: false })}/industry/${
         authState.license
@@ -1282,6 +1287,16 @@ export class MetrcRequestManager implements IAtomicService {
 
   async getMovePackagesHTML() {
     return customAxios(await buildDynamicUrl(this.authStateOrError, UrlType.MOVE_PACKAGES_MODAL), {
+      ...DEFAULT_FETCH_GET_OPTIONS,
+      headers: {
+        ...(await buildAuthenticationHeaders(this.authStateOrError)),
+        Accept: "text/html, */*; q=0.01",
+      },
+    });
+  }
+
+  async getDestroyPlantBatchesHTML() {
+    return customAxios(await buildDynamicUrl(this.authStateOrError, UrlType.DESTROY_PLANT_BATCHES_MODAL), {
       ...DEFAULT_FETCH_GET_OPTIONS,
       headers: {
         ...(await buildAuthenticationHeaders(this.authStateOrError)),

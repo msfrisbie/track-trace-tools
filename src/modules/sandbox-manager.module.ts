@@ -1,4 +1,5 @@
 import { IAtomicService } from "@/interfaces";
+import { dynamicConstsManager } from "./dynamic-consts-manager.module";
 
 // Class for testing code that runs at various lifecycle points
 class SandboxManager implements IAtomicService {
@@ -10,7 +11,8 @@ class SandboxManager implements IAtomicService {
 
   async runsAfterAuthInit() {}
 
-  async runsAfterModuleInit() {}
+  async runsAfterModuleInit() {
+  }
 }
 
 export const sandboxManager = new SandboxManager();

@@ -2,8 +2,7 @@ import { IdbKeyPiece } from "@/consts";
 import {
   IAdjustPackageReason,
   IAtomicService,
-  IAuthState,
-  IItemCategory,
+  IAuthState, IDestroyPlantBatchActionReason, IItemCategory,
   IMetrcDriverData,
   IMetrcFacilityData,
   IMetrcTransferType,
@@ -14,17 +13,17 @@ import {
   ITagData,
   IUnitOfMeasure,
   IWasteMethod,
-  IWasteReason,
+  IWasteReason
 } from "@/interfaces";
 import { authManager } from "@/modules/auth-manager.module";
 import {
   MetrcRequestManager,
-  primaryMetrcRequestManager,
+  primaryMetrcRequestManager
 } from "@/modules/metrc-request-manager.module";
 import { mockDataManager } from "@/modules/mock-data-manager.module";
 import store from "@/store/page-overlay/index";
 import { debugLogFactory } from "@/utils/debug";
-import { ExtractionType, extract } from "@/utils/html";
+import { extract, ExtractionType } from "@/utils/html";
 import { AxiosResponse } from "axios";
 import { get, keys, set } from "idb-keyval";
 import _ from "lodash-es";
@@ -163,6 +162,10 @@ interface ICreateItemRepeaterData {
   UnitsOfMeasure: IUnitOfMeasure[];
 }
 
+interface IDestroyPlantBatchesRepeaterData {
+  ActionReasons: IDestroyPlantBatchActionReason[];
+}
+
 interface IWasteByLocationRepeaterData {
   PlantWasteMethods: IWasteMethod[];
   ActionReasons: IWasteReason[];
@@ -232,6 +235,8 @@ export class DynamicConstsManager implements IAtomicService {
   private _changePlantBatchGrowthPhaseRepeaterData: Promise<any> | null = null;
 
   private _newTransferRepeaterData: Promise<any> | null = null;
+
+  private _destroyPlantBatchesRepeaterData: Promise<any> | null = null;
 
   private _cachedParsedTemplateRepeaterData: any = null;
 
@@ -305,6 +310,39 @@ export class DynamicConstsManager implements IAtomicService {
     }
 
     return this._movePackageRepeaterdata;
+  }
+
+  private async destroyPlantBatchesRepeaterData(): Promise<IDestroyPlantBatchesRepeaterData> {
+    if (!this._destroyPlantBatchesRepeaterData) {
+      this._destroyPlantBatchesRepeaterData = new Promise(async (resolve, reject) => {
+        const subscription = timer(DYNAMIC_CONST_TIMEOUT_MS).subscribe(() =>
+          reject("Destroy plant batches fetch timed out")
+        );
+
+        try {
+          const html = await this.metrcRequestManagerOrError
+            .getDestroyPlantBatchesHTML()
+            .then((response) => response.data);
+
+          const extractedData = extract(ExtractionType.REPEATER_DATA, html);
+
+          const parsedRepeaterData = extractedData?.repeaterData?.parsedRepeaterData;
+
+          if (!parsedRepeaterData) {
+            throw new Error("destroyPlantBatchesRepeaterData: Failed to extract repeaterData");
+          }
+
+          subscription.unsubscribe();
+          resolve(parsedRepeaterData);
+        } catch (e) {
+          subscription.unsubscribe();
+          reject(e);
+          this._destroyPlantBatchesRepeaterData = null;
+        }
+      });
+    }
+
+    return this._destroyPlantBatchesRepeaterData;
   }
 
   private async createItemRepeaterData(): Promise<ICreateItemRepeaterData> {
@@ -694,6 +732,16 @@ export class DynamicConstsManager implements IAtomicService {
     }
 
     return this._newTransferRepeaterData;
+  }
+
+  async destroyPlantBatchesReasons(): Promise<IDestroyPlantBatchActionReason[]> {
+    const repeaterData = await this.destroyPlantBatchesRepeaterData();
+
+    if (repeaterData.ActionReasons) {
+      return repeaterData.ActionReasons;
+    }
+
+    throw new Error("Destroy plant batch reasons unable to load");
   }
 
   async itemCategories(): Promise<IItemCategory[]> {
