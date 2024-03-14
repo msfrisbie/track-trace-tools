@@ -9,6 +9,7 @@ import {
   IMetrcCreatePlantBatchPackagesFromMotherPlantPayload,
   IMetrcCreateTransferPayload,
   IMetrcDestroyPlantsPayload,
+  IMetrcDestroyPlantBatchesPayload,
   IMetrcFinishPackagesPayload,
   IMetrcHarvestPlantsPayload,
   IMetrcManicurePlantsPayload,
@@ -47,6 +48,7 @@ type IEligibleRowType =
   | IMetrcMovePlantsPayload
   | IMetrcMovePackagesPayload
   | IMetrcDestroyPlantsPayload
+  | IMetrcDestroyPlantBatchesPayload
   | IMetrcUnpackImmaturePlantsPayload
   | IMetrcPromoteImmaturePlantsPayload
   | IMetrcCreatePackagesFromPackagesPayload

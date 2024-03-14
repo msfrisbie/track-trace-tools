@@ -1504,6 +1504,18 @@ export interface IMetrcDestroyPlantsPayload {
   WasteWeight: string;
 }
 
+export interface IMetrcDestroyPlantBatchesPayload {
+  ActualDate: string;
+  Id: string;
+  CountToDestroy: string;
+  MaterialMixed: string;
+  PlantWasteMethodId: string;
+  ReasonNote: string;
+  WasteReasonId: string;
+  WasteUnitOfMeasureId: string;
+  WasteWeight: string;
+}
+
 export interface IMetrcCreatePlantBatchPackagesFromMotherPlantPayload {
   ItemId: string;
   LocationId?: string;

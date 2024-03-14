@@ -93,6 +93,7 @@ const MOVE_PACKAGES_URL = `${origin()}/api/packages/change/locations`;
 const HARVEST_PLANTS_URL = `${origin()}/api/plants/harvest`;
 const MANICURE_PLANTS_URL = `${origin()}/api/plants/manicure`;
 const DESTROY_PLANTS_URL = `${origin()}/api/plants/destroy/plants`;
+const DESTROY_PLANT_BATCHES_URL = `${origin()}/api/plantbatches/destroy/plants`;
 const REPLACE_PLANT_TAGS_URL = `${origin()}/api/plants/replacetags`;
 const REPLACE_PLANT_BATCH_TAGS_URL = `${origin()}/api/plantbatches/replacetags`;
 const FINALIZE_SALES_RECEIPTS_URL = `${origin()}/api/sales/receipts/finalize`;
@@ -1191,6 +1192,17 @@ export class MetrcRequestManager implements IAtomicService {
 
   async destroyPlants(body: string) {
     return customAxios(DESTROY_PLANTS_URL, {
+      ...DEFAULT_FETCH_POST_WRITE_OPTIONS,
+      headers: {
+        ...(await buildAuthenticationHeaders(this.authStateOrError)),
+        ...JSON_HEADERS,
+      },
+      body,
+    });
+  }
+
+  async destroyPlantBatches(body: string) {
+    return customAxios(DESTROY_PLANT_BATCHES_URL, {
       ...DEFAULT_FETCH_POST_WRITE_OPTIONS,
       headers: {
         ...(await buildAuthenticationHeaders(this.authStateOrError)),

@@ -163,6 +163,7 @@ interface ICreateItemRepeaterData {
 }
 
 interface IDestroyPlantBatchesRepeaterData {
+  PlantWasteMethods: IWasteMethod[];
   ActionReasons: IDestroyPlantBatchActionReason[];
 }
 
@@ -800,6 +801,16 @@ export class DynamicConstsManager implements IAtomicService {
     }
 
     throw new Error("Waste methods unable to load");
+  }
+
+  async plantBatchWasteMethods(): Promise<IWasteMethod[]> {
+    const repeaterData = await this.destroyPlantBatchesRepeaterData();
+
+    if (repeaterData.PlantWasteMethods) {
+      return repeaterData.PlantWasteMethods;
+    }
+
+    throw new Error("Plant batch waste methods unable to load");
   }
 
   async adjustPackageReasons(): Promise<IAdjustPackageReason[]> {
