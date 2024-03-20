@@ -7,20 +7,23 @@ import {
   IIndexedRichIncomingTransferData,
   IIndexedRichOutgoingTransferData,
   IIndexedTransferData,
-  ILicenseFormFilters, ITransferData,
-  ITransporterData
+  ILicenseFormFilters,
+  ITransferData,
+  ITransporterData,
 } from "@/interfaces";
 import { facilityManager } from "@/modules/facility-manager.module";
 import store from "@/store/page-overlay/index";
 import {
   CustomTransformer,
-  PRODUCT_UNIT_WEIGHT_REGEX, ReportsGetters, ReportType
+  PRODUCT_UNIT_WEIGHT_REGEX,
+  ReportType,
+  ReportsGetters,
 } from "@/store/page-overlay/modules/reports/consts";
 import {
   IFieldData,
   IReportConfig,
   IReportData,
-  IReportOption
+  IReportOption,
 } from "@/store/page-overlay/modules/reports/interfaces";
 import { todayIsodate } from "../date";
 import { getLabelOrError } from "../package";
@@ -108,28 +111,47 @@ export function applyCustomTransformer(field: IFieldData, untypedRow: any): stri
     case CustomTransformer.CURRENT_PERCENT_WET_WEIGHT:
       const currentPercentWetWeightRow = untypedRow as IIndexedHarvestData;
       return `${
-        Math.round(((100 * currentPercentWetWeightRow.CurrentWeight) / currentPercentWetWeightRow.TotalWetWeight + Number.EPSILON) * 100) / 100
+        Math.round(
+          ((100 * currentPercentWetWeightRow.CurrentWeight) /
+            currentPercentWetWeightRow.TotalWetWeight +
+            Number.EPSILON) *
+            100
+        ) / 100
       }%`;
     case CustomTransformer.PACKAGED_PERCENT_WET_WEIGHT:
       const packagedPercentWetWeightRow: IIndexedHarvestData = untypedRow;
       return `${
-        Math.round(((100 * packagedPercentWetWeightRow.TotalPackagedWeight) / packagedPercentWetWeightRow.TotalWetWeight + Number.EPSILON) * 100) /
-        100
+        Math.round(
+          ((100 * packagedPercentWetWeightRow.TotalPackagedWeight) /
+            packagedPercentWetWeightRow.TotalWetWeight +
+            Number.EPSILON) *
+            100
+        ) / 100
       }%`;
     case CustomTransformer.WASTE_PERCENT_WET_WEIGHT:
       const wastePercentWetWeightRow: IIndexedHarvestData = untypedRow;
       return `${
-        Math.round(((100 * wastePercentWetWeightRow.TotalWasteWeight) / wastePercentWetWeightRow.TotalWetWeight + Number.EPSILON) * 100) / 100
+        Math.round(
+          ((100 * wastePercentWetWeightRow.TotalWasteWeight) /
+            wastePercentWetWeightRow.TotalWetWeight +
+            Number.EPSILON) *
+            100
+        ) / 100
       }%`;
     case CustomTransformer.RESTORED_PERCENT_WET_WEIGHT:
       const restoredPercentWetWeightRow: IIndexedHarvestData = untypedRow;
       return `${
-        Math.round(((100 * restoredPercentWetWeightRow.TotalRestoredWeight) / restoredPercentWetWeightRow.TotalWetWeight + Number.EPSILON) * 100) /
-        100
+        Math.round(
+          ((100 * restoredPercentWetWeightRow.TotalRestoredWeight) /
+            restoredPercentWetWeightRow.TotalWetWeight +
+            Number.EPSILON) *
+            100
+        ) / 100
       }%`;
     case CustomTransformer.TRANSFER_PACKAGE_UNIT_WEIGHT:
       const transferPackageUnitWeightRow: { Package: IIndexedDestinationPackageData } = untypedRow;
-      const weightMatch = transferPackageUnitWeightRow.Package.ProductName.match(PRODUCT_UNIT_WEIGHT_REGEX);
+      const weightMatch =
+        transferPackageUnitWeightRow.Package.ProductName.match(PRODUCT_UNIT_WEIGHT_REGEX);
 
       if (weightMatch) {
         return parseFloat(weightMatch[1]).toString();
@@ -137,8 +159,10 @@ export function applyCustomTransformer(field: IFieldData, untypedRow: any): stri
 
       return "";
     case CustomTransformer.TRANSFER_PACKAGE_UNIT_WEIGHT_UOM:
-      const transferPackageUnitWeightUomRow: { Package: IIndexedDestinationPackageData } = untypedRow;
-      const unitMatch = transferPackageUnitWeightUomRow.Package.ProductName.match(PRODUCT_UNIT_WEIGHT_REGEX);
+      const transferPackageUnitWeightUomRow: { Package: IIndexedDestinationPackageData } =
+        untypedRow;
+      const unitMatch =
+        transferPackageUnitWeightUomRow.Package.ProductName.match(PRODUCT_UNIT_WEIGHT_REGEX);
 
       if (unitMatch) {
         return unitMatch[2];
@@ -146,9 +170,14 @@ export function applyCustomTransformer(field: IFieldData, untypedRow: any): stri
 
       return "";
     case CustomTransformer.PACKAGE_MANIFEST_INDEX:
-      const packageManifestIndexRow: { Transfer: IIndexedRichIncomingTransferData, Package: IIndexedDestinationPackageData } = untypedRow;
+      const packageManifestIndexRow: {
+        Transfer: IIndexedRichIncomingTransferData;
+        Package: IIndexedDestinationPackageData;
+      } = untypedRow;
 
-      const idx = packageManifestIndexRow.Transfer.incomingPackages!.findIndex((pkg) => getLabelOrError(pkg) === getLabelOrError(packageManifestIndexRow.Package));
+      const idx = packageManifestIndexRow.Transfer.incomingPackages!.findIndex(
+        (pkg) => getLabelOrError(pkg) === getLabelOrError(packageManifestIndexRow.Package)
+      );
 
       return (idx + 1).toString();
     default:
@@ -540,7 +569,9 @@ export function getSheetTitle({
       title = SheetTitles.EMPLOYEE_AUDIT;
       break;
     case ReportType.SINGLE_TRANSFER:
-      title = SheetTitles.SINGLE_TRANSFER;
+      title = `${SheetTitles.SINGLE_TRANSFER} ${
+        reportConfig[ReportType.SINGLE_TRANSFER]!.manifestNumber
+      }`;
       break;
     case ReportType.POINT_IN_TIME_INVENTORY:
       title = `${SheetTitles.POINT_IN_TIME_INVENTORY} ${

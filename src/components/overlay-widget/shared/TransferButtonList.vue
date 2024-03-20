@@ -1,27 +1,23 @@
 <template>
   <fragment>
-    <b-button
-      size="sm"
-      v-if="enableEditTransferButton"
-      variant="outline-primary"
-      @click.stop.prevent="editTransfer()"
-      ><div class="w-full grid grid-cols-3 gap-2" style="grid-template-columns: 2rem 1fr auto">
+    <b-button size="sm" v-if="enableEditTransferButton" variant="outline-primary" @click.stop.prevent="editTransfer()">
+      <div class="w-full grid grid-cols-3 gap-2" style="grid-template-columns: 2rem 1fr auto">
         <div class="aspect-square grid place-items-center"><font-awesome-icon icon="edit" /></div>
         <span>EDIT TRANSFER</span>
         <div style="width: 30px"></div>
       </div>
     </b-button>
 
-    <b-button size="sm" variant="outline-primary" @click.stop.prevent="viewManifest()"
-      ><div class="w-full grid grid-cols-3 gap-2" style="grid-template-columns: 2rem 1fr auto">
+    <b-button size="sm" variant="outline-primary" @click.stop.prevent="viewManifest()">
+      <div class="w-full grid grid-cols-3 gap-2" style="grid-template-columns: 2rem 1fr auto">
         <div class="aspect-square grid place-items-center"><font-awesome-icon icon="file" /></div>
         <span>VIEW MANIFEST</span>
         <div style="width: 30px"></div>
       </div>
     </b-button>
 
-    <b-button size="sm" variant="outline-primary" @click.stop.prevent="newTabManifest()"
-      ><div class="w-full grid grid-cols-3 gap-2" style="grid-template-columns: 2rem 1fr auto">
+    <b-button size="sm" variant="outline-primary" @click.stop.prevent="newTabManifest()">
+      <div class="w-full grid grid-cols-3 gap-2" style="grid-template-columns: 2rem 1fr auto">
         <div class="aspect-square grid place-items-center">
           <font-awesome-icon icon="external-link-alt" />
         </div>
@@ -30,16 +26,16 @@
       </div>
     </b-button>
 
-    <b-button size="sm" variant="outline-primary" @click.stop.prevent="printManifest()"
-      ><div class="w-full grid grid-cols-3 gap-2" style="grid-template-columns: 2rem 1fr auto">
+    <b-button size="sm" variant="outline-primary" @click.stop.prevent="printManifest()">
+      <div class="w-full grid grid-cols-3 gap-2" style="grid-template-columns: 2rem 1fr auto">
         <div class="aspect-square grid place-items-center"><font-awesome-icon icon="print" /></div>
         <span>PRINT MANIFEST</span>
         <div style="width: 30px"></div>
       </div>
     </b-button>
 
-    <b-button size="sm" variant="outline-primary" @click.stop.prevent="downloadManifest()"
-      ><div class="w-full grid grid-cols-3 gap-2" style="grid-template-columns: 2rem 1fr auto">
+    <b-button size="sm" variant="outline-primary" @click.stop.prevent="downloadManifest()">
+      <div class="w-full grid grid-cols-3 gap-2" style="grid-template-columns: 2rem 1fr auto">
         <div class="aspect-square grid place-items-center">
           <font-awesome-icon icon="file-download" />
         </div>
@@ -48,22 +44,32 @@
       </div>
     </b-button>
 
-    <b-button size="sm" variant="outline-primary" @click.stop.prevent="downloadSummary()"
-      ><div class="w-full grid grid-cols-3 gap-2" style="grid-template-columns: 2rem 1fr auto">
+    <b-button size="sm" variant="outline-primary" @click.stop.prevent="downloadSummary('CSV')" :disabled="!hasPlus">
+      <div class="w-full grid grid-cols-3 gap-2" style="grid-template-columns: 2rem 1fr auto">
         <div class="aspect-square grid place-items-center">
           <font-awesome-icon icon="file-csv" />
         </div>
-        <span>DOWNLOAD SUMMARY</span>
-        <div style="width: 30px"></div>
+        <span>DOWNLOAD SUMMARY CSV</span>
+        <div>
+          <b-badge variant="primary">T3+</b-badge>
+        </div>
       </div>
     </b-button>
 
-    <b-button
-      size="sm"
-      variant="outline-primary"
-      @click.stop.prevent="createScanSheet()"
-      :disabled="!hasPlus"
-      ><div class="w-full grid grid-cols-3 gap-2" style="grid-template-columns: 2rem 1fr auto">
+    <b-button size="sm" variant="outline-primary" @click.stop.prevent="downloadSummary('XLSX')" :disabled="!hasPlus">
+      <div class="w-full grid grid-cols-3 gap-2" style="grid-template-columns: 2rem 1fr auto">
+        <div class="aspect-square grid place-items-center">
+          <font-awesome-icon icon="file-excel" />
+        </div>
+        <span>DOWNLOAD SUMMARY XLSX</span>
+        <div>
+          <b-badge variant="primary">T3+</b-badge>
+        </div>
+      </div>
+    </b-button>
+
+    <b-button size="sm" variant="outline-primary" @click.stop.prevent="createScanSheet()" :disabled="!hasPlus">
+      <div class="w-full grid grid-cols-3 gap-2" style="grid-template-columns: 2rem 1fr auto">
         <div class="aspect-square grid place-items-center">
           <font-awesome-icon icon="barcode" />
         </div>
@@ -75,24 +81,16 @@
     </b-button>
 
     <template v-if="!transferMetadataLoaded">
-      <b-button
-        size="sm"
-        variant="outline-primary"
-        disabled
-        class="flex flex-row items-center justify-center gap-2"
-      >
+      <b-button size="sm" variant="outline-primary" disabled class="flex flex-row items-center justify-center gap-2">
         <b-spinner small /> <span> Loading transfer test data...</span>
       </b-button>
     </template>
 
     <template v-if="transferMetadataLoaded">
       <template v-if="displayTransferLabTestPdfOptions">
-        <b-button
-          size="sm"
-          :disabled="!transfer || !hasPlus"
-          variant="outline-primary"
-          @click.stop.prevent="downloadAllLabTestPdfs()"
-          ><div class="w-full grid grid-cols-3 gap-2" style="grid-template-columns: 2rem 1fr auto">
+        <b-button size="sm" :disabled="!transfer || !hasPlus" variant="outline-primary"
+          @click.stop.prevent="downloadAllLabTestPdfs()">
+          <div class="w-full grid grid-cols-3 gap-2" style="grid-template-columns: 2rem 1fr auto">
             <div class="aspect-square grid place-items-center">
               <font-awesome-icon icon="file-download" />
             </div>
@@ -106,12 +104,9 @@
       </template>
 
       <template v-if="displayTransferLabTestCsvOptions">
-        <b-button
-          size="sm"
-          :disabled="!transfer || !hasPlus"
-          variant="outline-primary"
-          @click.stop.prevent="downloadAllLabTestCsvs()"
-          ><div class="w-full grid grid-cols-3 gap-2" style="grid-template-columns: 2rem 1fr auto">
+        <b-button size="sm" :disabled="!transfer || !hasPlus" variant="outline-primary"
+          @click.stop.prevent="downloadAllLabTestCsvs()">
+          <div class="w-full grid grid-cols-3 gap-2" style="grid-template-columns: 2rem 1fr auto">
             <div class="aspect-square grid place-items-center">
               <font-awesome-icon icon="file-csv" />
             </div>
@@ -140,7 +135,7 @@ import { ExplorerActions } from "@/store/page-overlay/modules/explorer/consts";
 import { PackageHistoryActions } from "@/store/page-overlay/modules/package-history/consts";
 import { PackageSearchActions } from "@/store/page-overlay/modules/package-search/consts";
 import { PluginAuthActions } from "@/store/page-overlay/modules/plugin-auth/consts";
-import { ReportsActions, ReportType } from "@/store/page-overlay/modules/reports/consts";
+import { ReportType, ReportsActions } from "@/store/page-overlay/modules/reports/consts";
 import { IReportConfig } from "@/store/page-overlay/modules/reports/interfaces";
 import { SearchActions } from "@/store/page-overlay/modules/search/consts";
 import { SplitPackageBuilderActions } from "@/store/page-overlay/modules/split-package-builder/consts";
@@ -267,22 +262,26 @@ export default Vue.extend({
       analyticsManager.track(MessageType.CLICKED_DOWNLOAD_MANIFEST_BUTTON);
       this.dismiss();
     },
-    async downloadSummary() {
+    async downloadSummary(exportFormat: 'CSV' | 'GOOGLE_SHEETS' | 'XLSX' = 'CSV') {
       analyticsManager.track(MessageType.CONTEXT_MENU_SELECT, { event: "downloadSummary" });
 
       toastManager.info("Generating transfer summary CSV...");
 
-      const reportConfig: IReportConfig = {
-        authState: await authManager.authStateOrError(),
-        exportFormat: "CSV",
-        fileDeliveryFormat: "DOWNLOAD",
-        [ReportType.SINGLE_TRANSFER]: {
-          manifestNumber: this.$props.transfer.ManifestNumber as string,
-          fields: null,
-        },
-      };
+      try {
+        const reportConfig: IReportConfig = {
+          authState: await authManager.authStateOrError(),
+          exportFormat,
+          fileDeliveryFormat: "DOWNLOAD",
+          [ReportType.SINGLE_TRANSFER]: {
+            manifestNumber: this.$props.transfer.ManifestNumber as string,
+            fields: null,
+          },
+        };
 
-      store.dispatch(`reports/${ReportsActions.GENERATE_REPORT}`, { reportConfig });
+        store.dispatch(`reports/${ReportsActions.GENERATE_REPORT}`, { reportConfig });
+      } catch {
+        toastManager.error("Failed to generate summary CSV");
+      }
 
       this.dismiss();
     },
@@ -379,8 +378,8 @@ export default Vue.extend({
       },
     },
   },
-  async created() {},
-  async mounted() {},
+  async created() { },
+  async mounted() { },
 });
 </script>
 
