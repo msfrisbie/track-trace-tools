@@ -44,7 +44,8 @@
       </div>
     </b-button>
 
-    <b-button size="sm" variant="outline-primary" @click.stop.prevent="downloadSummary('CSV')" :disabled="!hasPlus">
+    <b-button size="sm" variant="outline-primary" @click.stop.prevent="downloadSummary('CSV')"
+      :disabled="!hasPlus || clientState.values.ENABLE_BULK_COA">
       <div class="w-full grid grid-cols-3 gap-2" style="grid-template-columns: 2rem 1fr auto">
         <div class="aspect-square grid place-items-center">
           <font-awesome-icon icon="file-csv" />
@@ -56,7 +57,8 @@
       </div>
     </b-button>
 
-    <b-button size="sm" variant="outline-primary" @click.stop.prevent="downloadSummary('XLSX')" :disabled="!hasPlus">
+    <b-button size="sm" variant="outline-primary" @click.stop.prevent="downloadSummary('XLSX')"
+      :disabled="!hasPlus || clientState.values.ENABLE_BULK_COA">
       <div class="w-full grid grid-cols-3 gap-2" style="grid-template-columns: 2rem 1fr auto">
         <div class="aspect-square grid place-items-center">
           <font-awesome-icon icon="file-excel" />
