@@ -131,6 +131,16 @@ body.ttt-efficient-spacing {
   // }
 }
 
+body.t3-modal-expand {
+  .k-window.k-widget {
+    top: 0 !important;
+    left: 0 !important;
+    min-width: 100vw !important;
+    min-height: 100vh !important;
+  }
+}
+
+
 @import "@/scss/page-overlay";
 @import "@/scss/modal";
 @import "@/scss/inline";

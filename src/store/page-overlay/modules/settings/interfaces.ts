@@ -36,6 +36,7 @@ export interface ISettingsState {
   preventLogout: boolean;
   fixMetrcStyling: boolean;
   efficientSpacing: boolean;
+  modalExpand: boolean;
   autoDismissPopups: boolean;
   salesDefaultPageSize: number;
   backgroundState: BackgroundState;

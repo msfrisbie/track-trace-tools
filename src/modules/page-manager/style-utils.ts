@@ -108,6 +108,12 @@ export function togglePageVisibilityClassesImpl() {
   } else {
     document.body.classList.remove("ttt-efficient-spacing");
   }
+
+  if (store.state.settings?.modalExpand) {
+    document.body.classList.add("t3-modal-expand");
+  } else {
+    document.body.classList.remove("t3-modal-expand");
+  }
 }
 
 export function controlLogoutBarImpl(hide: boolean) {

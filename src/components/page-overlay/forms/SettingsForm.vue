@@ -45,6 +45,16 @@
             Enable high-density Metrc UI
           </b-form-checkbox>
 
+          <b-form-checkbox
+            id="checkbox-modalExpand"
+            class="mb-2"
+            v-model="settings.modalExpand"
+            name="checkbox-modalExpand"
+            @change="onChange()"
+          >
+            Auto-expand Metrc windows to fill screen
+          </b-form-checkbox>
+
           <!-- <b-form-checkbox
             id="checkbox-darkModeState"
             class="mb-2"
