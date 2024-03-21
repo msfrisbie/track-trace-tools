@@ -45,7 +45,7 @@ const persistedState: ISettingsState = {
   preventLogout: true,
   fixMetrcStyling: true,
   efficientSpacing: false,
-  modalExpand: true,
+  modalExpand: false,
   autoDismissPopups: true,
   salesDefaultPageSize: 20,
   backgroundState: BackgroundState.DEFAULT,
