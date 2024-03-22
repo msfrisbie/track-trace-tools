@@ -14,6 +14,7 @@ import MotherBuilderList from "@/components/overlay-widget/cultivation/MotherBui
 import MotherPlantBatchPackageBuilder from "@/components/overlay-widget/cultivation/MotherPlantBatchPackageBuilder.vue";
 import MotherPlantPackageBuilder from "@/components/overlay-widget/cultivation/MotherPlantPackageBuilder.vue";
 import MovePlantsBuilder from "@/components/overlay-widget/cultivation/MovePlantsBuilder.vue";
+import MovePlantBatchesBuilder from "@/components/overlay-widget/cultivation/MovePlantBatchesBuilder.vue";
 import PackImmaturePlantsBuilder from "@/components/overlay-widget/cultivation/PackImmaturePlantsBuilder.vue";
 import PromoteImmaturePlantsBuilder from "@/components/overlay-widget/cultivation/PromoteImmaturePlantsBuilder.vue";
 import ReplacePlantBatchTagsBuilder from "@/components/overlay-widget/cultivation/ReplacePlantBatchTagsBuilder.vue";
@@ -193,6 +194,11 @@ const routes: Array<RouteConfig> = [
     path: "/cultivator/move-plants",
     name: "Move Plants",
     component: MovePlantsBuilder,
+  },
+  {
+    path: "/cultivator/move-plant-batches",
+    name: "Move Plant Batches",
+    component: MovePlantBatchesBuilder,
   },
   {
     path: "/cultivator/unpack-immature-plants",

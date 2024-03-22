@@ -1407,6 +1407,12 @@ export interface IMetrcMovePlantsPayload {
   Id: string;
 }
 
+export interface IMetrcMovePlantBatchesPayload {
+  ActualDate: string;
+  LocationId: string;
+  Id: string;
+}
+
 export interface IMetrcMovePackagesPayload {
   ActualDate: string;
   LocationId: string;

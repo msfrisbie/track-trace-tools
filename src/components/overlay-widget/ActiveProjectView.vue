@@ -175,6 +175,7 @@ export default Vue.extend({
         case BuilderType.UNPACK_IMMATURE_PLANTS:
         case BuilderType.CREATE_IMMATURE_PLANTS_FROM_MOTHER:
         case BuilderType.PROMOTE_IMMATURE_PLANTS:
+        case BuilderType.MOVE_PLANT_BATCHES:
           return 'plant batches';
         case BuilderType.CREATE_ITEMS:
           return 'items';

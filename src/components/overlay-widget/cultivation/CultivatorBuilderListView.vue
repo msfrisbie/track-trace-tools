@@ -103,6 +103,18 @@ export default Vue.extend({
           showDisabledMessage: false,
         },
         {
+          route: "/cultivator/move-plant-batches",
+          text: "MOVE PLANT_BATCHES",
+          icon: "exchange-alt",
+          backgroundColor: "#48b867",
+          enabled: true,
+          isPlus: false,
+          isBeta: false,
+          isNew: false,
+          visible: true,
+          showDisabledMessage: false,
+        },
+        {
           route: "/cultivator/unpack-immature-plants",
           text: "UNPACK IMMATURE PLANTS",
           icon: "box-open",

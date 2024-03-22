@@ -909,10 +909,6 @@ class MockDataManager implements IAtomicService {
   }
 
   mockLocations(): ILocationData[] {
-    if (!FACILITY_PACKAGES_HAVE_LOCATION) {
-      return [];
-    }
-
     if (this._mockLocations.length > 0) {
       return this._mockLocations;
     }

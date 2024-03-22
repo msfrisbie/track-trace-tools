@@ -11,6 +11,7 @@ import {
   IMetrcManicurePlantsPayload,
   IMetrcMovePackagesPayload,
   IMetrcMovePlantsPayload,
+  IMetrcMovePlantBatchesPayload,
   IMetrcPromoteImmaturePlantsPayload,
   IMetrcReplacePlantBatchTagsPayload,
   IMetrcReplacePlantTagsPayload,
@@ -41,6 +42,7 @@ type IEligibleRowType =
   | IMetrcHarvestPlantsPayload
   | IMetrcManicurePlantsPayload
   | IMetrcMovePlantsPayload
+  | IMetrcMovePlantBatchesPayload
   | IMetrcMovePackagesPayload
   | IMetrcDestroyPlantsPayload
   | IMetrcDestroyPlantBatchesPayload
@@ -329,6 +331,9 @@ class BuilderManager implements IAtomicService {
     switch (builderType) {
       case BuilderType.MOVE_PLANTS:
         response = await primaryMetrcRequestManager.movePlants(JSON.stringify(rows));
+        break;
+      case BuilderType.MOVE_PLANT_BATCHES:
+        response = await primaryMetrcRequestManager.movePlantBatches(JSON.stringify(rows));
         break;
       case BuilderType.MOVE_PACKAGES:
         response = await primaryMetrcRequestManager.movePackages(JSON.stringify(rows));

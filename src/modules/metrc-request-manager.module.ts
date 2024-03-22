@@ -89,6 +89,7 @@ const PACKAGE_NOTE_URL = `${origin()}/api/packages/change/notes`;
 const VOID_TAG_URL = `${origin()}/api/tags/void`;
 const REORDER_TAGS_URL = `${origin()}/api/tagorders/create`;
 const MOVE_PLANTS_URL = `${origin()}/api/plants/change/locations`;
+const MOVE_PLANT_BATCHES_URL = `${origin()}/api/plantbatches/change/locations`;
 const MOVE_PACKAGES_URL = `${origin()}/api/packages/change/locations`;
 const HARVEST_PLANTS_URL = `${origin()}/api/plants/harvest`;
 const MANICURE_PLANTS_URL = `${origin()}/api/plants/manicure`;
@@ -1038,6 +1039,17 @@ export class MetrcRequestManager implements IAtomicService {
 
   async movePlants(body: string) {
     return customAxios(MOVE_PLANTS_URL, {
+      ...DEFAULT_FETCH_POST_WRITE_OPTIONS,
+      headers: {
+        ...(await buildAuthenticationHeaders(this.authStateOrError)),
+        ...JSON_HEADERS,
+      },
+      body,
+    });
+  }
+
+  async movePlantBatches(body: string) {
+    return customAxios(MOVE_PLANT_BATCHES_URL, {
       ...DEFAULT_FETCH_POST_WRITE_OPTIONS,
       headers: {
         ...(await buildAuthenticationHeaders(this.authStateOrError)),
