@@ -22,8 +22,8 @@ export default Vue.extend({
   data() {
     return {};
   },
-  async mounted() {},
-  async created() {},
+  async mounted() { },
+  async created() { },
   computed: {
     ...mapState<IPluginState>({
       clientState: (state: IPluginState) => state.client,
@@ -108,7 +108,7 @@ export default Vue.extend({
           icon: "exchange-alt",
           backgroundColor: "#48b867",
           enabled: true,
-          isPlus: false,
+          isPlus: true,
           isBeta: false,
           isNew: false,
           visible: true,
