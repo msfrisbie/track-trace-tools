@@ -104,7 +104,7 @@ export default Vue.extend({
         },
         {
           route: "/cultivator/move-plant-batches",
-          text: "MOVE PLANT_BATCHES",
+          text: "MOVE PLANT BATCHES",
           icon: "exchange-alt",
           backgroundColor: "#48b867",
           enabled: true,
