@@ -56,7 +56,7 @@
             </template>
           </b-form-group>
 
-          <b-form-group label-size="sm" label="# plants per batch">
+          <b-form-group class="w-full" label-size="sm" label="Maximum # plants per batch">
             <b-form-select v-model="plantCountPerBatch" :options="plantCountPerBatchOptions"></b-form-select>
           </b-form-group>
 
