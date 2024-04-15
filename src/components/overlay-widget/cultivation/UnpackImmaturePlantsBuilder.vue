@@ -1,27 +1,16 @@
 <template>
   <div class="w-full flex flex-col items-stretch flex-grow space-y-4">
     <div class="w-full grid grid-cols-3 gap-4 auto-cols-fr">
-      <builder-step-header
-        v-for="(step, index) of steps"
-        :key="index"
-        :stepNumber="index + 1"
-        :stepText="step.stepText"
-        :active="index === activeStepIndex"
-        @click.stop.prevent.native="setActiveStepIndex(index)"
-      />
+      <builder-step-header v-for="(step, index) of steps" :key="index" :stepNumber="index + 1" :stepText="step.stepText"
+        :active="index === activeStepIndex" @click.stop.prevent.native="setActiveStepIndex(index)" />
     </div>
 
     <template v-if="activeStepIndex === 0">
-      <package-picker
-        :builderType="builderType"
-        :selectedPackages.sync="selectedPackages"
-        :itemFilters="itemFilters"
+      <package-picker :builderType="builderType" :selectedPackages.sync="selectedPackages" :itemFilters="itemFilters"
         :packageFilters="{
-          isEmpty: false,
-        }"
-        itemFilterZeroResultsErrorSuggestionMessage="Only packages of clones or
-      seeds can be used here."
-      />
+        isEmpty: false,
+      }" itemFilterZeroResultsErrorSuggestionMessage="Only packages of clones or
+      seeds can be used here." />
 
       <template v-if="selectedPackages.length > 0">
         <div class="w-full flex flex-row justify-end">
@@ -38,16 +27,8 @@
           <!-- <template v-if="!showTagPicker"> -->
           <b-form-group class="w-full" label="Configure plants:" label-size="sm">
             <b-input-group>
-              <b-form-input
-                v-model.number="totalPlantCount"
-                type="number"
-                size="md"
-                step="1"
-                min="1"
-                :max="maximumTotalPlantCount"
-                required
-                class="text-center"
-              ></b-form-input>
+              <b-form-input v-model.number="totalPlantCount" type="number" size="md" step="1" min="1"
+                :max="maximumTotalPlantCount" required class="text-center"></b-form-input>
 
               <b-input-group-append>
                 <b-form-select size="md" :options="plantBatchTypeOptions" v-model="plantBatchType">
@@ -65,8 +46,8 @@
             </template>
 
             <template v-if="maximumTotalPlantCount">
-              <b-form-text
-                ><div class="flex flex-row items-center space-x-2">
+              <b-form-text>
+                <div class="flex flex-row items-center space-x-2">
                   <span>Total # available: {{ maximumTotalPlantCount }}</span>
 
                   <b-button variant="link" size="sm" @click="plantMax()">PLANT ALL</b-button>
@@ -75,59 +56,37 @@
             </template>
           </b-form-group>
 
+          <b-form-group label-size="sm" label="# plants per batch">
+            <b-form-select v-model="plantCountPerBatch" :options="plantCountPerBatchOptions"></b-form-select>
+          </b-form-group>
+
           <b-form-group class="w-full" label-size="sm">
-            <strain-picker
-              :strain.sync="strain"
-              :enableHotStrainCreate="true"
-              :suggestedStrainName="suggestedStrainName"
-            />
+            <strain-picker :strain.sync="strain" :enableHotStrainCreate="true"
+              :suggestedStrainName="suggestedStrainName" />
           </b-form-group>
 
           <b-form-group class="w-full" label="Planting Location:" label-size="sm">
-            <location-picker
-              :location.sync="plantingLocation"
-              :suggestedLocationName="suggestedLocationName"
-            />
+            <location-picker :location.sync="plantingLocation" :suggestedLocationName="suggestedLocationName" />
           </b-form-group>
 
           <b-form-group class="w-full" label="Planting Date:" label-size="sm">
-            <b-form-datepicker
-              initial-date
-              size="md"
-              v-model="plantingIsodate"
-              :value="plantingIsodate"
-            />
+            <b-form-datepicker initial-date size="md" v-model="plantingIsodate" :value="plantingIsodate" />
           </b-form-group>
 
           <template v-if="showHiddenDetailFields">
-            <b-form-group
-              class="w-full"
-              label="Unpackaging Date:"
-              description="Leave this alone unless you are sure you need to change it"
-              label-size="sm"
-            >
-              <b-form-datepicker
-                initial-date
-                size="md"
-                v-model="actualIsodate"
-                :value="actualIsodate"
-              />
+            <b-form-group class="w-full" label="Unpackaging Date:"
+              description="Leave this alone unless you are sure you need to change it" label-size="sm">
+              <b-form-datepicker initial-date size="md" v-model="actualIsodate" :value="actualIsodate" />
             </b-form-group>
 
-            <b-form-group
-              class="w-full"
-              label="Patient License Number:"
-              description="Leave this alone unless you are sure you need to change it"
-              label-size="sm"
-            >
+            <b-form-group class="w-full" label="Patient License Number:"
+              description="Leave this alone unless you are sure you need to change it" label-size="sm">
               <b-form-input size="md" v-model="patientLicenseNumber"></b-form-input>
             </b-form-group>
           </template>
 
           <template v-else>
-            <b-button class="opacity-40" variant="light" @click="showHiddenDetailFields = true"
-              >ADVANCED</b-button
-            >
+            <b-button class="opacity-40" variant="light" @click="showHiddenDetailFields = true">ADVANCED</b-button>
           </template>
 
           <!-- <template v-if="allDetailsProvided">
@@ -149,11 +108,8 @@
             </template>
 
             <b-form-group class="w-full">
-              <tag-picker
-                :tagTypeNames="['CannabisPlant', 'MedicalPlant', 'Cannabis Plant', 'Medical Plant']"
-                :tagCount="plantingData.length"
-                :selectedTags.sync="plantBatchTags"
-              />
+              <tag-picker :tagTypeNames="['CannabisPlant', 'MedicalPlant', 'Cannabis Plant', 'Medical Plant']"
+                :tagCount="plantingData.length" :selectedTags.sync="plantBatchTags" />
             </b-form-group>
 
             <template v-if="allDetailsProvided && tagsSelected">
@@ -202,27 +158,18 @@
 
               <div style="height: 3rem"></div>
 
-              <b-button class="w-full" variant="success" size="md" @click="submit()"
-                >UNPACK {{ totalPlantCount }} PLANTS</b-button
-              >
+              <b-button class="w-full" variant="success" size="md" @click="submit()">UNPACK {{ totalPlantCount }}
+                PLANTS</b-button>
             </div>
 
             <div style="height: 6rem"></div>
 
-            <b-button class="opacity-40" variant="light" size="md" @click="downloadAll()"
-              >DOWNLOAD CSVs</b-button
-            >
+            <b-button class="opacity-40" variant="light" size="md" @click="downloadAll()">DOWNLOAD CSVs</b-button>
 
             <csv-breakout class="opacity-40 mt-4" :csvFiles="csvFiles" />
 
-            <b-button
-              v-if="debugRows.length === 0"
-              class="opacity-40 mt-4"
-              size="md"
-              @click="debugRows = buildRowsImpl()"
-              variant="light"
-              >SHOW DEBUG</b-button
-            >
+            <b-button v-if="debugRows.length === 0" class="opacity-40 mt-4" size="md"
+              @click="debugRows = buildRowsImpl()" variant="light">SHOW DEBUG</b-button>
 
             <template v-if="debugRows.length > 0">
               <pre>{{ JSON.stringify(debugRows, null, 2) }}</pre>
@@ -238,9 +185,8 @@
             <span v-if="selectedPackages.length === 0">No packages selected</span>
             <span v-if="plantingData.length === 0">No planting data provided</span>
             <span v-if="plantBatchTags.length === 0">No tags provided</span>
-            <span v-if="plantingData.length > 0 && plantBatchTags.length !== plantingData.length"
-              >Incorrect number of tags provided</span
-            >
+            <span v-if="plantingData.length > 0 && plantBatchTags.length !== plantingData.length">Incorrect number of
+              tags provided</span>
             <span v-if="!plantingLocation">Planting location not provided</span>
             <span v-if="!strain">Strain not provided</span>
             <span v-if="!plantingIsodate">Planting date not provided</span>
@@ -508,6 +454,7 @@ export default Vue.extend({
           this.$data.plantingData = allocateImmaturePlantCounts(
             newValue,
             this.$data.selectedPackages,
+            this.$data.plantCountPerBatch
           );
         } catch (e) {
           toastManager.openToast(`Failed to allocate plants: ${(e as Error).toString()}`, {
@@ -531,6 +478,8 @@ export default Vue.extend({
       plantingIsodate: todayIsodate(),
       actualIsodate: todayIsodate(),
       totalPlantCount: 0,
+      plantCountPerBatchOptions: Array.from({ length: 100 }, (_, i) => 100 - i),
+      plantCountPerBatch: 100,
       plantingData: [],
       plantBatchTags: [],
       strain: null,

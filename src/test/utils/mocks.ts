@@ -86,6 +86,77 @@ export function mockPassivePageAnalyzer() {
   }));
 }
 
+export function mockClientBuildManager() {
+  jest.mock('@/modules/client-build-manager.module', () => ({
+    __esModule: true,
+    clientBuildManager: mockModuleFactory(),
+  }));
+}
+
+export function mockExpiringCacheManager() {
+  jest.mock('@/modules/expiring-cache-manager.module', () => ({
+    __esModule: true,
+    expiringCacheManager: mockModuleFactory(),
+  }));
+}
+
+export function mockCredentialManager() {
+  jest.mock('@/modules/credential-manager.module', () => ({
+    __esModule: true,
+    credentialManager: mockModuleFactory(),
+  }));
+}
+
+export function mockMockDataManager() {
+  jest.mock('@/modules/mock-data-manager.module', () => ({
+    __esModule: true,
+    mockDataManager: mockModuleFactory(),
+  }));
+}
+
+export function mockModalManager() {
+  jest.mock('@/modules/modal-manager.module', () => ({
+    __esModule: true,
+    modalManager: mockModuleFactory(),
+  }));
+}
+
+
+export function mockUpdateManager() {
+  jest.mock('@/modules/update-manager.module', () => ({
+    __esModule: true,
+    updateManager: mockModuleFactory(),
+  }));
+}
+
+export function mockIntegrigyManager() {
+  jest.mock('@/modules/integrity-manager.module', () => ({
+    __esModule: true,
+    integrityManager: mockModuleFactory(),
+  }));
+}
+
+export function mockMetrcModalManager() {
+  jest.mock('@/modules/metrc-modal-manager.module', () => ({
+    __esModule: true,
+    metrcModalManager: mockModuleFactory(),
+  }));
+}
+
+export function mockAnnouncementsManager() {
+  jest.mock('@/modules/announcements-manager.module', () => ({
+    __esModule: true,
+    announcementsManager: mockModuleFactory(),
+  }));
+}
+
+export function mockToastManager() {
+  jest.mock('@/modules/toast-manager.module', () => ({
+    __esModule: true,
+    toastManager: mockModuleFactory(),
+  }));
+}
+
 export function mockFacilityManager() {
   jest.mock('@/modules/facility-manager.module', () => ({
     __esModule: true,
