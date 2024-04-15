@@ -1173,6 +1173,7 @@ export const createPackageCsvModule = {
             UnitThcContentDose: null,
             UnitThcContentDoseUnitOfMeasureAbbreviation: null,
             UnitThcContentUnitOfMeasureAbbreviation: null,
+            UnitThcContentUnitOfMeasureId: null,
             UnitThcPercent: null,
             UnitVolume: null,
             UnitVolumeUnitOfMeasureAbbreviation: null,

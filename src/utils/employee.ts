@@ -1,28 +1,28 @@
-import { IIndexedPackageData, IMetrcEmployeeData, IPackageHistoryData } from '@/interfaces';
-import { dynamicConstsManager } from '@/modules/dynamic-consts-manager.module';
+import { IIndexedPackageData, IMetrcEmployeeData, IPackageHistoryData } from "@/interfaces";
+import { dynamicConstsManager } from "@/modules/dynamic-consts-manager.module";
 import {
   MAX_30_DAY_CONCENTRATE_GRAMS,
   MAX_30_DAY_FLOWER_GRAMS,
   MAX_30_DAY_INFUSED_GRAMS,
-} from '@/store/page-overlay/modules/employee-samples/consts';
+} from "@/store/page-overlay/modules/employee-samples/consts";
 import {
   IHistoryAllocationData,
   INormalizedAllocation,
   ISampleAllocation,
-} from '@/store/page-overlay/modules/employee-samples/interfaces';
-import { v4 as uuidv4 } from 'uuid';
-import { getIsoDateFromOffset, normalizeIsodate } from './date';
-import { convertUnits } from './units';
+} from "@/store/page-overlay/modules/employee-samples/interfaces";
+import { v4 as uuidv4 } from "uuid";
+import { getIsoDateFromOffset, normalizeIsodate } from "./date";
+import { convertUnits } from "./units";
 
-const ADJUSTMENT_REGEX = new RegExp('Package adjusted by -([0-9\.]+) ([a-zA-Z]+)');
-const EMPLOYEE_REGEX = new RegExp('Note: ([^0-9]+) ([0-9]+)');
+const ADJUSTMENT_REGEX = new RegExp("Package adjusted by -([0-9.]+) ([a-zA-Z]+)");
+const EMPLOYEE_REGEX = new RegExp("Note: ([^0-9]+) ([0-9]+)");
 
 export function getEstimatedNumberOfSamplesRemaining(pkg: IIndexedPackageData): number {
   if (pkg.Quantity === 0) {
     return 0;
   }
 
-  if (pkg.UnitOfMeasureAbbreviation === 'ea') {
+  if (pkg.UnitOfMeasureAbbreviation === "ea") {
     return pkg.Quantity;
   }
 
@@ -31,14 +31,14 @@ export function getEstimatedNumberOfSamplesRemaining(pkg: IIndexedPackageData): 
 
 export function getAllocatedSampleFromPackageHistoryEntryOrNull(
   packageLabel: string,
-  historyEntry: IPackageHistoryData,
+  historyEntry: IPackageHistoryData
 ): IHistoryAllocationData | null {
-  if (!historyEntry.Descriptions.find((x) => x.includes('Reason: Trade Sample'))) {
+  if (!historyEntry.Descriptions.find((x) => x.includes("Reason: Trade Sample"))) {
     return null;
   }
 
   if (!historyEntry.ActualDate) {
-    console.error('No actual date');
+    console.error("No actual date");
     return null;
   }
 
@@ -48,13 +48,14 @@ export function getAllocatedSampleFromPackageHistoryEntryOrNull(
   let employeeLicenseNumber: string | null = null;
 
   const [adjustmentLineMatch] = historyEntry.Descriptions.map((x) =>
-    x.match(ADJUSTMENT_REGEX)).filter((x) => !!x);
+    x.match(ADJUSTMENT_REGEX)
+  ).filter((x) => !!x);
   const [employeeLineMatch] = historyEntry.Descriptions.map((x) => x.match(EMPLOYEE_REGEX)).filter(
-    (x) => !!x,
+    (x) => !!x
   );
 
   if (!adjustmentLineMatch || !employeeLineMatch) {
-    console.error('Regex non-match', historyEntry.Descriptions);
+    console.error("Regex non-match", historyEntry.Descriptions);
     return null;
   }
 
@@ -74,10 +75,10 @@ export function getAllocatedSampleFromPackageHistoryEntryOrNull(
 }
 
 export function getAllocatedSamplesFromPackageHistoryOrError(
-  pkg: IIndexedPackageData,
+  pkg: IIndexedPackageData
 ): IHistoryAllocationData[] {
   if (!pkg.history) {
-    throw new Error('Package is missing history');
+    throw new Error("Package is missing history");
   }
 
   const allocatedSamples: IHistoryAllocationData[] = [];
@@ -96,21 +97,21 @@ export function getAllocatedSamplesFromPackageHistoryOrError(
 export async function getSampleAllocationFromAllocationDataOrNull(
   employees: IMetrcEmployeeData[],
   packages: IIndexedPackageData[],
-  allocationData: IHistoryAllocationData,
+  allocationData: IHistoryAllocationData
 ): Promise<ISampleAllocation | null> {
   const employee = employees.find(
-    (x) => parseInt(x.License.Number, 10) === parseInt(allocationData.employeeLicenseNumber, 10),
+    (x) => parseInt(x.License.Number, 10) === parseInt(allocationData.employeeLicenseNumber, 10)
   );
 
   if (!employee) {
-    console.error('No employee match, ignoring allocation');
+    console.error("No employee match, ignoring allocation");
     return null;
   }
 
   const pkg = packages.find((x) => x.Label === allocationData.packageLabel);
 
   if (!pkg) {
-    console.error('No pkg match, ignoring allocation');
+    console.error("No pkg match, ignoring allocation");
     return null;
   }
 
@@ -129,7 +130,7 @@ export function canEmployeeAcceptSample(
   sample: { quantity: number; pkg: IIndexedPackageData; allocation: INormalizedAllocation },
   distributionDate: string,
   recordedAllocationBuffer: ISampleAllocation[],
-  pendingAllocationBuffer: ISampleAllocation[],
+  pendingAllocationBuffer: ISampleAllocation[]
 ): boolean {
   // Cannot give out if distribution date is before received date
   if (normalizeIsodate(sample.pkg.ReceivedDateTime!) > distributionDate) {
@@ -157,30 +158,30 @@ export function canEmployeeAcceptSample(
   const preceding30dayWindow = [
     ...recordedAllocationBuffer.filter(
       (x) =>
-        x.distributionDate >= startDate
-        && x.distributionDate <= currentDate
-        && x.employee.Id === employee.Id,
+        x.distributionDate >= startDate &&
+        x.distributionDate <= currentDate &&
+        x.employee.Id === employee.Id
     ),
     ...pendingAllocationBuffer.filter(
       (x) =>
-        x.distributionDate >= startDate
-        && x.distributionDate <= currentDate
-        && x.employee.Id === employee.Id,
+        x.distributionDate >= startDate &&
+        x.distributionDate <= currentDate &&
+        x.employee.Id === employee.Id
     ),
   ];
 
   const following30dayWindow = [
     ...recordedAllocationBuffer.filter(
       (x) =>
-        x.distributionDate >= currentDate
-        && x.distributionDate <= endDate
-        && x.employee.Id === employee.Id,
+        x.distributionDate >= currentDate &&
+        x.distributionDate <= endDate &&
+        x.employee.Id === employee.Id
     ),
     ...pendingAllocationBuffer.filter(
       (x) =>
-        x.distributionDate >= currentDate
-        && x.distributionDate <= endDate
-        && x.employee.Id === employee.Id,
+        x.distributionDate >= currentDate &&
+        x.distributionDate <= endDate &&
+        x.employee.Id === employee.Id
     ),
   ];
 
@@ -214,15 +215,15 @@ export function canEmployeeAcceptSample(
       .reduce((a, b) => a + b, 0);
 
     if (
-      sample.allocation.concentrateAllocationGrams + totalPrecedingGrams
-      > MAX_30_DAY_CONCENTRATE_GRAMS
+      sample.allocation.concentrateAllocationGrams + totalPrecedingGrams >
+      MAX_30_DAY_CONCENTRATE_GRAMS
     ) {
       return false;
     }
 
     if (
-      sample.allocation.concentrateAllocationGrams + totalFollowingGrams
-      > MAX_30_DAY_CONCENTRATE_GRAMS
+      sample.allocation.concentrateAllocationGrams + totalFollowingGrams >
+      MAX_30_DAY_CONCENTRATE_GRAMS
     ) {
       return false;
     }
@@ -250,12 +251,12 @@ export function canEmployeeAcceptSample(
     return true;
   }
 
-  throw new Error('Invalid sample allocation');
+  throw new Error("Invalid sample allocation");
 }
 
 export async function toNormalizedAllocationQuantity(
   pkg: IIndexedPackageData,
-  sampleQuantity: number,
+  sampleQuantity: number
 ): Promise<INormalizedAllocation> {
   const FALLBACK_ALLOCATION = {
     flowerAllocationGrams: 0,
@@ -278,13 +279,13 @@ export async function toNormalizedAllocationQuantity(
   let allocationType: AllocationType = AllocationType.INFUSED;
 
   if (
-    pkg.Item.ProductCategoryName.includes('Buds')
-    || pkg.Item.ProductCategoryName.includes('Shake')
+    pkg.Item.ProductCategoryName.includes("Buds") ||
+    pkg.Item.ProductCategoryName.includes("Shake")
   ) {
     allocationType = AllocationType.FLOWER;
   } else if (
-    pkg.Item.ProductCategoryName.includes('Concentrate')
-    || pkg.Item.ProductCategoryName.includes('Vape')
+    pkg.Item.ProductCategoryName.includes("Concentrate") ||
+    pkg.Item.ProductCategoryName.includes("Vape")
   ) {
     allocationType = AllocationType.CONCENTRATE;
   }
@@ -293,21 +294,23 @@ export async function toNormalizedAllocationQuantity(
   let unitOfWeightId = pkg.UnitOfMeasureId;
 
   if (
-    pkg.UnitOfMeasureQuantityType === 'VolumeBased'
-    || pkg.Item.QuantityTypeName === 'VolumeBased'
+    pkg.UnitOfMeasureQuantityType === "VolumeBased" ||
+    pkg.Item.QuantityTypeName === "VolumeBased" ||
+    pkg.Item.UnitVolume !== null
   ) {
     return FALLBACK_ALLOCATION;
   }
 
-  if (pkg.Item.UnitOfMeasureName === 'Each') {
+  if (pkg.Item.UnitOfMeasureName === "Each") {
     computedQuantity = sampleQuantity * pkg.Item.UnitWeight!;
     unitOfWeightId = pkg.Item.UnitWeightUnitOfMeasureId!;
   }
 
   const unitOfMeasure = unitsOfMeasure.find((x) => x.Id === unitOfWeightId);
-  const gramsUnitOfMeasure = unitsOfMeasure.find((x) => x.Name === 'Grams')!;
+  const gramsUnitOfMeasure = unitsOfMeasure.find((x) => x.Name === "Grams")!;
+
   if (!unitOfMeasure || !gramsUnitOfMeasure) {
-    throw new Error('Could not match unit of measure');
+    throw new Error("Could not match unit of measure");
   }
 
   // Force into grams
@@ -323,18 +326,18 @@ export async function toNormalizedAllocationQuantity(
     case AllocationType.INFUSED:
       const thcRegexes = [
         // Look for THC identifier
-        '([0-9]+)\s?mg THC',
+        "([0-9]+)s?mg THC",
         // Look for THC identifier
-        '([0-9]+)\s?mg thc',
+        "([0-9]+)s?mg thc",
         // Look for any weight at all
-        '([0-9]+)\s?mg',
+        "([0-9]+)s?mg",
       ];
 
       for (const rx of thcRegexes) {
         const match = pkg.Item.Name.match(rx);
 
         // Find "milligrams"
-        if (match && match[1] && typeof parseInt(match[1], 10) === 'number') {
+        if (match && match[1] && typeof parseInt(match[1], 10) === "number") {
           computedQuantity = parseInt(match[1], 10) / 1000;
 
           const multiplierRegexes = [/(\d+)\s?pk/i, /(\d+)\s?pack/i, /(\d+)\s?pck/i];
@@ -342,7 +345,7 @@ export async function toNormalizedAllocationQuantity(
           for (const rx of multiplierRegexes) {
             const match = pkg.Item.Name.match(rx);
 
-            if (match && match[1] && typeof parseInt(match[1], 10) === 'number') {
+            if (match && match[1] && typeof parseInt(match[1], 10) === "number") {
               computedQuantity *= parseInt(match[1], 10);
             }
           }
@@ -354,7 +357,7 @@ export async function toNormalizedAllocationQuantity(
       infusedAllocationGrams = Math.min(0.2, computedQuantity);
       break;
     default:
-      throw new Error('Bad allocation type');
+      throw new Error("Bad allocation type");
   }
 
   return {

@@ -399,6 +399,7 @@ export interface IItemData extends IResponseObjectData {
   UnitQuantityUnitOfMeasureAbbreviation: string | null;
   UnitThcContent: number | null;
   UnitThcContentDose: number | null;
+  UnitThcContentUnitOfMeasureId: number | null;
   UnitThcContentDoseUnitOfMeasureAbbreviation: string | null;
   UnitThcContentUnitOfMeasureAbbreviation: string | null;
   UnitThcPercent: number | null;
