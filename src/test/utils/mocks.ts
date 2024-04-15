@@ -121,7 +121,6 @@ export function mockModalManager() {
   }));
 }
 
-
 export function mockUpdateManager() {
   jest.mock('@/modules/update-manager.module', () => ({
     __esModule: true,
