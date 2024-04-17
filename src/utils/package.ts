@@ -12,22 +12,19 @@ import {
   ISimpleTransferPackageData,
   ITestResultData,
   IUnionIndexedPackageData,
-  PackageMetadata,
+  PackageMetadata
 } from "@/interfaces";
 import { authManager } from "@/modules/auth-manager.module";
 import {
   getDataLoaderByLicense,
-  primaryDataLoader,
+  primaryDataLoader
 } from "@/modules/data-loader/data-loader.module";
 import { toastManager } from "@/modules/toast-manager.module";
 import { downloadCsvFile } from "./csv";
 import { downloadFileFromUrl } from "./dom";
 import { extractParentPackageLabelsFromHistory } from "./history";
 import {
-  UnitOfMeasureAbbreviation,
-  UnitOfMeasureName,
-  unitOfMeasureAbbreviationToName,
-  unitOfMeasureNameToAbbreviation,
+  UnitOfMeasureAbbreviation, unitOfMeasureAbbreviationToName, UnitOfMeasureName, unitOfMeasureNameToAbbreviation
 } from "./units";
 
 export function getIdOrError(unionPkg: IUnionIndexedPackageData): number {
@@ -85,7 +82,7 @@ export function getSourceHarvestNamesOrError(unionPkg: IUnionIndexedPackageData)
   throw new Error("Could not extract Harvest Names");
 }
 
-export function getSourcePackageTagsOrError(unionPkg: IUnionIndexedPackageData): string {
+export function getSourcePackageLabelsOrError(unionPkg: IUnionIndexedPackageData): string {
   const pkg = unionPkg as any;
   if ("SourcePackageLabels" in pkg) {
     return (pkg as IIndexedPackageData).SourcePackageLabels;

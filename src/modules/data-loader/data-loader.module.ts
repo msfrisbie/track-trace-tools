@@ -1200,7 +1200,7 @@ export class DataLoader implements IAtomicService {
     });
   }
 
-  onDemandDestinationPackageSearchBody({ queryString }: { queryString: string }): string {z
+  onDemandDestinationPackageSearchBody({ queryString }: { queryString: string }): string {
     return JSON.stringify({
       request: {
         take: SEARCH_LOAD_PAGE_SIZE,
