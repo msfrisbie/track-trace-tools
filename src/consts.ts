@@ -207,11 +207,11 @@ export const DEXIE_TRANSFER_SCHEMA: string = "&Id, License, TagMatcher";
 export const DEXIE_TAG_SCHEMA: string = "&Id, License, Label, TagMatcher";
 
 export enum PackageState {
-  DEPARTED_FACILITY = "DEPARTED_FACILITY",
   ACTIVE = "ACTIVE",
   INACTIVE = "INACTIVE",
   IN_TRANSIT = "IN_TRANSIT",
   ON_HOLD = "ON_HOLD",
+  TRANSFERRED = "TRANSFERRED",
 }
 
 export enum PlantBatchState {
@@ -264,6 +264,18 @@ export enum PackageFilterIdentifiers {
   LocationName = "LocationName",
   ProductionBatchNumber = "ProductionBatchNumber",
   SourceProductionBatchNumbers = "SourceProductionBatchNumbers",
+}
+
+export enum DestinationPackageFilterIdentifiers {
+  PackageLabel = "PackageLabel",
+  SourceHarvestNames = "SourceHarvestNames",
+  SourcePackageLabels = "SourcePackageLabels",
+  ProductName = "ProductName",
+  ItemStrainName = "ItemStrainName",
+  ProductCategoryName = "ProductCategoryName",
+  ManifestNumber = "ManifestNumber",
+  DestinationLicenseNumber = "DestinationLicenseNumber",
+  DestinationFacilityName = "DestinationFacilityName",
 }
 
 export enum PlantFilterIdentifiers {
@@ -551,3 +563,18 @@ export const SHEETS_API_MESSAGE_TIMEOUT_MS = 3 * 180000 + 60000;
 
 export const PRINT_DATA_KEY = "PRINT_DATA_KEY";
 export const OPTIONS_REDIRECT_KEY = "OPTIONS_REDIRECT_KEY";
+
+export enum PackageSearchFilterKeys {
+  LABEL = "label",
+  SOURCE_HARVET_NAMES = "sourceHarvestNames",
+  SOURCE_PACKAGE_LABELS = "sourcePackageLabels",
+  PRODUCTION_BATCH_NUMBER = "productionBatchNumber",
+  SOURCE_PRODUCTION_BATCH_NUMBERS = "sourceProductionBatchNumbers",
+  ITEM_NAME = "itemName",
+  ITEM_STRAIN_NAME = "itemStrainName",
+  ITEM_PRODUCT_CATEGORY_NAME = "itemProductCategoryName",
+  LOCATION_NAME = "locationName",
+  MANIFEST_NUMBER = "manifestNumber",
+  DESTINATION_FACILITY_NAME = "destinationFacilityName",
+  DESTINATION_LICENSE_NUMBER = "destinationLicenseNumber",
+}

@@ -7,8 +7,8 @@
         <div class="text-xl text-gray-500">
           <template v-if="sectionName">
             {{ packages.length }}{{ packages.length === 500 ? "+" : "" }}&nbsp;{{
-              sectionName
-            }}&nbsp;matches:
+    sectionName
+  }}&nbsp;matches:
           </template>
           <template v-else> All matching packages: </template>
         </div>
@@ -16,37 +16,22 @@
 
       <div class="flex-grow"></div>
 
-      <b-button
-        v-if="!expanded && !disableFilter"
-        variant="outline-primary"
-        size="sm"
-        @click.stop.prevent="applyFilter"
-        v-show="isOnPackagesPage"
-      >
+      <b-button v-if="!expanded && !disableFilter" variant="outline-primary" size="sm" @click.stop.prevent="applyFilter"
+        v-show="isOnPackagesPage">
         FILTER
         <!-- <font-awesome-icon icon="chevron-right"/> -->
       </b-button>
     </div>
 
-    <package-search-result-preview
-      v-for="(pkg, index) in visiblePackages"
-      :key="pkg.Id"
-      :pkg="pkg"
-      :sectionName="sectionName"
-      :selected="
-        !!packageSearchState.selectedPackageMetadata &&
-        pkg.Id === packageSearchState.selectedPackageMetadata.packageData.Id &&
-        sectionName === packageSearchState.selectedPackageMetadata.sectionName
-      "
-      :idx="index"
-      v-on:selected-package="showPackageDetail($event)"
-    />
+    <package-search-result-preview v-for="(pkg, index) in visiblePackages" :key="pkg.Id" :pkg="pkg"
+      :sectionName="sectionName" :selected="!!packageSearchState.selectedPackageMetadata &&
+    pkg.Id === packageSearchState.selectedPackageMetadata.packageData.Id &&
+    sectionName === packageSearchState.selectedPackageMetadata.sectionName
+    " :idx="index" v-on:selected-package="showPackageDetail($event)" />
 
-    <div
-      v-if="!showAll && !expanded && packages.length > previewLength"
+    <div v-if="!showAll && !expanded && packages.length > previewLength"
       class="cursor-pointer flex flex-row justify-center items-center hover:bg-purple-100"
-      @click.stop.prevent="showAll = true"
-    >
+      @click.stop.prevent="showAll = true">
       <span class="text-gray-500 p-2">{{ packages.length - previewLength }}&nbsp;MORE</span>
     </div>
   </div>
@@ -60,10 +45,8 @@ import store from '@/store/page-overlay/index';
 import { PackageSearchActions } from '@/store/page-overlay/modules/package-search/consts';
 import { ISelectedPackageMetadata } from '@/store/page-overlay/modules/package-search/interfaces';
 import { SearchActions } from '@/store/page-overlay/modules/search/consts';
-import { Subject } from 'rxjs';
-import { take, takeUntil } from 'rxjs/operators';
 import Vue from 'vue';
-import { mapActions, mapState, Store } from 'vuex';
+import { Store, mapActions, mapState } from 'vuex';
 
 export default Vue.extend({
   name: 'PackageSearchResultsGroup',
@@ -73,7 +56,7 @@ export default Vue.extend({
     // destroyed$: Subject<void>;
     // selectedPackageMetadata: ISelectedPackageMetadata | null;
     showAll: boolean;
-    } {
+  } {
     return {
       // destroyed$: new Subject(),
       // selectedPackageMetadata: null,
@@ -139,9 +122,9 @@ export default Vue.extend({
     groupIcon(): string {
       switch (this.packageFilterIdentifier) {
         case 'label':
-        case 'sourcePackageLabel':
+        case 'sourcePackageLabels':
           return 'tags';
-        case 'sourceHarvestName':
+        case 'sourceHarvestNames':
           return 'cut';
         case 'itemStrainName':
           return 'cannabis';

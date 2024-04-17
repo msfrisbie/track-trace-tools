@@ -31,6 +31,7 @@ const ACTIVE_PACKAGES_URL = `${origin({ divertToNullOrigin: false })}/api/packag
 const INACTIVE_PACKAGES_URL = `${origin({ divertToNullOrigin: false })}/api/packages/inactive`;
 const ON_HOLD_PACKAGES_URL = `${origin({ divertToNullOrigin: false })}/api/packages/onhold`;
 const IN_TRANSIT_PACKAGES_URL = `${origin({ divertToNullOrigin: false })}/api/packages/intransit`;
+const TRANSFERRED_PACKAGES_URL = `${origin({ divertToNullOrigin: false })}/api/packages/transferred`;
 
 const TAG_ORDER_HISTORY_URL = `${origin({ divertToNullOrigin: false })}/api/tagorders/history`;
 
@@ -577,6 +578,17 @@ export class MetrcRequestManager implements IAtomicService {
 
   async getInTransitPackages(body: string) {
     return customAxios(IN_TRANSIT_PACKAGES_URL, {
+      ...DEFAULT_FETCH_POST_READ_OPTIONS,
+      headers: {
+        ...(await buildAuthenticationHeaders(this.authStateOrError)),
+        ...JSON_HEADERS,
+      },
+      body,
+    });
+  }
+
+  async getTransferredPackages(body: string) {
+    return customAxios(TRANSFERRED_PACKAGES_URL, {
       ...DEFAULT_FETCH_POST_READ_OPTIONS,
       headers: {
         ...(await buildAuthenticationHeaders(this.authStateOrError)),

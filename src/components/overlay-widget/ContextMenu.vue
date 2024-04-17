@@ -5,10 +5,7 @@
         <template v-if="pkg">
           <b-dropdown variant="outline-primary" size="sm" no-caret>
             <template #button-content>
-              <div
-                class="w-full grid grid-cols-3 gap-2"
-                style="grid-template-columns: 2rem 1fr auto"
-              >
+              <div class="w-full grid grid-cols-3 gap-2" style="grid-template-columns: 2rem 1fr auto">
                 <div class="aspect-square grid place-items-center">
                   <font-awesome-icon icon="filter" />
                 </div>
@@ -18,73 +15,58 @@
               </div>
             </template>
 
-            <b-dropdown-item
-              class="text-lg"
-              @click.stop.prevent="filterPackages({ label: pkg.Label })"
-              ><div class="flex flex-row space-x-2 justify-between flex-nowrap">
+            <b-dropdown-item class="text-lg" @click.stop.prevent="filterPackages({ label: pkg.Label })">
+              <div class="flex flex-row space-x-2 justify-between flex-nowrap">
                 <span>Tag:</span> <span class="font-bold">{{ pkg.Label }}</span>
-              </div></b-dropdown-item
-            >
-            <b-dropdown-item
-              class="text-lg"
-              @click.stop.prevent="filterPackages({ itemName: pkg.Item.Name })"
-              ><div class="flex flex-row space-x-2 justify-between flex-nowrap">
+              </div>
+            </b-dropdown-item>
+            <b-dropdown-item class="text-lg" @click.stop.prevent="filterPackages({ itemName: pkg.Item.Name })">
+              <div class="flex flex-row space-x-2 justify-between flex-nowrap">
                 <span>Item:</span> <span class="font-bold">{{ pkg.Item.Name }}</span>
-              </div></b-dropdown-item
-            >
-            <b-dropdown-item
-              class="text-lg"
-              v-if="pkg.LocationName"
-              @click.stop.prevent="filterPackages({ locationName: pkg.LocationName })"
-              ><div class="flex flex-row space-x-2 justify-between flex-nowrap">
+              </div>
+            </b-dropdown-item>
+            <b-dropdown-item class="text-lg" v-if="pkg.LocationName"
+              @click.stop.prevent="filterPackages({ locationName: pkg.LocationName })">
+              <div class="flex flex-row space-x-2 justify-between flex-nowrap">
                 <span>Location:</span> <span class="font-bold">{{ pkg.LocationName }}</span>
-              </div></b-dropdown-item
-            >
-            <b-dropdown-item
-              class="text-lg"
-              v-if="pkg.Item.StrainName"
-              @click.stop.prevent="filterPackages({ itemStrainName: pkg.Item.StrainName })"
-              ><div class="flex flex-row space-x-2 justify-between flex-nowrap">
+              </div>
+            </b-dropdown-item>
+            <b-dropdown-item class="text-lg" v-if="pkg.Item.StrainName"
+              @click.stop.prevent="filterPackages({ itemStrainName: pkg.Item.StrainName })">
+              <div class="flex flex-row space-x-2 justify-between flex-nowrap">
                 <span>Strain:</span> <span class="font-bold">{{ pkg.Item.StrainName }}</span>
-              </div></b-dropdown-item
-            >
-            <b-dropdown-item
-              class="text-lg"
-              @click.stop.prevent="filterPackages({ sourcePackageLabel: pkg.SourcePackageLabels })"
-              ><div class="flex flex-row space-x-2 justify-between flex-nowrap">
+              </div>
+            </b-dropdown-item>
+            <b-dropdown-item class="text-lg"
+              @click.stop.prevent="filterPackages({ sourcePackageLabels: pkg.SourcePackageLabels })">
+              <div class="flex flex-row space-x-2 justify-between flex-nowrap">
                 <span>Source tag:</span>
                 <span class="font-bold">{{ pkg.SourcePackageLabels.slice(0, 30) }}</span>
-              </div></b-dropdown-item
-            >
-            <b-dropdown-item
-              class="text-lg"
-              @click.stop.prevent="
-                filterPackages({ productionBatchNumber: pkg.ProductionBatchNumber })
-              "
-              ><div class="flex flex-row space-x-2 justify-between flex-nowrap">
+              </div>
+            </b-dropdown-item>
+            <b-dropdown-item class="text-lg" @click.stop.prevent="
+        filterPackages({ productionBatchNumber: pkg.ProductionBatchNumber })
+        ">
+              <div class="flex flex-row space-x-2 justify-between flex-nowrap">
                 <span>PB #:</span>
                 <span class="font-bold">{{ pkg.ProductionBatchNumber.slice(0, 30) }}</span>
-              </div></b-dropdown-item
-            >
-            <b-dropdown-item
-              class="text-lg"
-              @click.stop.prevent="
-                filterPackages({ sourceProductionBatchNumbers: pkg.SourceProductionBatchNumbers })
-              "
-              ><div class="flex flex-row space-x-2 justify-between flex-nowrap">
+              </div>
+            </b-dropdown-item>
+            <b-dropdown-item class="text-lg" @click.stop.prevent="
+        filterPackages({ sourceProductionBatchNumbers: pkg.SourceProductionBatchNumbers })
+        ">
+              <div class="flex flex-row space-x-2 justify-between flex-nowrap">
                 <span>Source PB #:</span>
                 <span class="font-bold">{{ pkg.SourceProductionBatchNumbers.slice(0, 30) }}</span>
-              </div></b-dropdown-item
-            >
-            <b-dropdown-item
-              class="text-lg"
-              v-if="pkg.SourceHarvestNames"
-              @click.stop.prevent="filterPackages({ sourceHarvestName: pkg.SourceHarvestNames })"
-              ><div class="flex flex-row space-x-2 justify-between flex-nowrap">
+              </div>
+            </b-dropdown-item>
+            <b-dropdown-item class="text-lg" v-if="pkg.SourceHarvestNames"
+              @click.stop.prevent="filterPackages({ sourceHarvestNames: pkg.SourceHarvestNames })">
+              <div class="flex flex-row space-x-2 justify-between flex-nowrap">
                 <span>Harvest:</span>
                 <span class="font-bold">{{ pkg.SourceHarvestNames.slice(0, 30) }}</span>
-              </div></b-dropdown-item
-            >
+              </div>
+            </b-dropdown-item>
           </b-dropdown>
 
           <package-button-list :pkg="pkg"></package-button-list>
@@ -110,54 +92,44 @@
           </template>
 
           <template v-if="transfer">
-            <b-dropdown-item
-              class="text-lg"
-              @click.stop.prevent="searchTransfer(transfer.ManifestNumber)"
-              ><div class="flex flex-row space-x-2 justify-between flex-nowrap">
+            <b-dropdown-item class="text-lg" @click.stop.prevent="searchTransfer(transfer.ManifestNumber)">
+              <div class="flex flex-row space-x-2 justify-between flex-nowrap">
                 <span>Manifest #:</span>
                 <span class="font-bold">{{ transfer.ManifestNumber }}</span>
-              </div></b-dropdown-item
-            >
+              </div>
+            </b-dropdown-item>
 
-            <b-dropdown-item
-              v-if="transfer.DeliveryFacilities"
-              class="text-lg"
-              @click.stop.prevent="searchTransfer(transfer.DeliveryFacilities)"
-              ><div class="flex flex-row space-x-2 justify-between flex-nowrap">
+            <b-dropdown-item v-if="transfer.DeliveryFacilities" class="text-lg"
+              @click.stop.prevent="searchTransfer(transfer.DeliveryFacilities)">
+              <div class="flex flex-row space-x-2 justify-between flex-nowrap">
                 <span>Delivery Facility:</span>
                 <span class="font-bold">{{ transfer.DeliveryFacilities }}</span>
-              </div></b-dropdown-item
-            >
+              </div>
+            </b-dropdown-item>
 
-            <b-dropdown-item
-              v-if="transfer.RecipientFacilityLicenseNumber"
-              class="text-lg"
-              @click.stop.prevent="searchTransfer(transfer.RecipientFacilityLicenseNumber)"
-              ><div class="flex flex-row space-x-2 justify-between flex-nowrap">
+            <b-dropdown-item v-if="transfer.RecipientFacilityLicenseNumber" class="text-lg"
+              @click.stop.prevent="searchTransfer(transfer.RecipientFacilityLicenseNumber)">
+              <div class="flex flex-row space-x-2 justify-between flex-nowrap">
                 <span>Recipient Facility:</span>
                 <span class="font-bold">{{ transfer.RecipientFacilityLicenseNumber }}</span>
-              </div></b-dropdown-item
-            >
+              </div>
+            </b-dropdown-item>
 
-            <b-dropdown-item
-              v-if="transfer.ShipperFacilityLicenseNumber"
-              class="text-lg"
-              @click.stop.prevent="searchTransfer(transfer.ShipperFacilityLicenseNumber)"
-              ><div class="flex flex-row space-x-2 justify-between flex-nowrap">
+            <b-dropdown-item v-if="transfer.ShipperFacilityLicenseNumber" class="text-lg"
+              @click.stop.prevent="searchTransfer(transfer.ShipperFacilityLicenseNumber)">
+              <div class="flex flex-row space-x-2 justify-between flex-nowrap">
                 <span>Shipper Facility:</span>
                 <span class="font-bold">{{ transfer.ShipperFacilityLicenseNumber }}</span>
-              </div></b-dropdown-item
-            >
+              </div>
+            </b-dropdown-item>
 
-            <b-dropdown-item
-              v-if="transfer.TransporterFacilityLicenseNumber"
-              class="text-lg"
-              @click.stop.prevent="searchTransfer(transfer.TransporterFacilityLicenseNumber)"
-              ><div class="flex flex-row space-x-2 justify-between flex-nowrap">
+            <b-dropdown-item v-if="transfer.TransporterFacilityLicenseNumber" class="text-lg"
+              @click.stop.prevent="searchTransfer(transfer.TransporterFacilityLicenseNumber)">
+              <div class="flex flex-row space-x-2 justify-between flex-nowrap">
                 <span>Transporter Facility:</span>
                 <span class="font-bold">{{ transfer.TransporterFacilityLicenseNumber }}</span>
-              </div></b-dropdown-item
-            >
+              </div>
+            </b-dropdown-item>
           </template>
         </b-dropdown>
 
@@ -345,7 +317,7 @@ export default Vue.extend({
       },
     },
   },
-  async created() {},
+  async created() { },
   async mounted() {
     this.refreshOAuthState({});
   },

@@ -1,7 +1,7 @@
-import { IIndexedPackageData, IPackageSearchFilters } from '@/interfaces';
+import { IPackageSearchFilters, IUnionIndexedPackageData } from "@/interfaces";
 
 export interface ISelectedPackageMetadata {
-  packageData: IIndexedPackageData;
+  packageData: IUnionIndexedPackageData;
   sectionName: string;
   priority: number;
 }
@@ -9,6 +9,6 @@ export interface ISelectedPackageMetadata {
 export interface IPackageSearchState {
   searchInflight: boolean;
   packageSearchFilters: IPackageSearchFilters;
-  packages: IIndexedPackageData[];
+  packages: IUnionIndexedPackageData[];
   selectedPackageMetadata: ISelectedPackageMetadata | null;
 }

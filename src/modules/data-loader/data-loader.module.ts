@@ -119,6 +119,8 @@ export class DataLoader implements IAtomicService {
   // private _inactivePackages: Promise<IIndexedPackageData[]> | null = null;
   private _inTransitPackages: Promise<IIndexedPackageData[]> | null = null;
 
+  private _transferredPackages: Promise<IIndexedDestinationPackageData[]> | null = null;
+
   private _previousTagOrders: Promise<ITagOrderData[]> | null = null;
 
   private _incomingTransfers: Promise<IIndexedTransferData[]> | null = null;
@@ -389,6 +391,12 @@ export class DataLoader implements IAtomicService {
   async intransitPackageCount(): Promise<number | null> {
     return this.extractTotalOrNull(
       this.metrcRequestManagerOrError.getInTransitPackages(this.countPayload)
+    );
+  }
+
+  async transferredPackagesCount(): Promise<number | null> {
+    return this.extractTotalOrNull(
+      this.metrcRequestManagerOrError.getTransferredPackages(this.countPayload)
     );
   }
 
@@ -1192,6 +1200,32 @@ export class DataLoader implements IAtomicService {
     });
   }
 
+  onDemandDestinationPackageSearchBody({ queryString }: { queryString: string }): string {z
+    return JSON.stringify({
+      request: {
+        take: SEARCH_LOAD_PAGE_SIZE,
+        skip: 0,
+        page: 1,
+        pageSize: SEARCH_LOAD_PAGE_SIZE,
+        filter: {
+          logic: "or",
+          filters: [
+            { field: "RecipientFacilityLicenseNumber", operator: "contains", value: queryString },
+            { field: "ManifestNumber", operator: "contains", value: queryString },
+            { field: "PackageLabel", operator: "contains", value: queryString },
+            { field: "ProductCategoryName", operator: "contains", value: queryString },
+            { field: "SourcePackageLabels", operator: "contains", value: queryString },
+            { field: "ProductionBatchNumber", operator: "contains", value: queryString },
+            { field: "SourceHarvestNames", operator: "contains", value: queryString },
+            { field: "ItemStrainName", operator: "contains", value: queryString },
+            { field: "ProductName", operator: "contains", value: queryString },
+          ],
+        },
+        group: [],
+      },
+    });
+  }
+
   async onDemandActivePackageSearch({
     queryString,
   }: {
@@ -1286,6 +1320,42 @@ export class DataLoader implements IAtomicService {
       packages = [...packages, ...activePackages];
     } else {
       console.error("In transit packages request failed.");
+    }
+
+    return packages;
+  }
+
+  async onDemandTransferredPackageSearch({
+    queryString,
+  }: {
+    queryString: string;
+  }): Promise<IIndexedDestinationPackageData[]> {
+    if (store.state.mockDataMode && store.state.flags?.mockedFlags.mockPackages.enabled) {
+      return [];
+    }
+
+    let packages: IIndexedDestinationPackageData[] = [];
+
+    const body = this.onDemandDestinationPackageSearchBody({ queryString });
+
+    const transferredPackagesResponse = await primaryMetrcRequestManager.getTransferredPackages(
+      body
+    );
+
+    if (transferredPackagesResponse.status === 200) {
+      const responseData: ICollectionResponse<IDestinationPackageData> =
+        await transferredPackagesResponse.data;
+
+      const transferredPackages: IIndexedDestinationPackageData[] = responseData.Data.map((x) => ({
+        ...x,
+        PackageState: PackageState.TRANSFERRED,
+        TagMatcher: "",
+        LicenseNumber: this._authState!.license,
+      }));
+
+      packages = [...packages, ...transferredPackages];
+    } else {
+      console.error("Transferred packages request failed.");
     }
 
     return packages;
@@ -1500,7 +1570,7 @@ export class DataLoader implements IAtomicService {
           await this.loadDestinationPackages(destinationId)
         ).map((pkg) => ({
           ...pkg,
-          PackageState: PackageState.DEPARTED_FACILITY,
+          PackageState: PackageState.TRANSFERRED,
           TagMatcher: "",
           LicenseNumber: this._authState!.license,
         }));
@@ -1631,6 +1701,84 @@ export class DataLoader implements IAtomicService {
         const packageData: IIndexedPackageData = {
           ...(await this.loadInTransitPackage(label)),
           PackageState: PackageState.IN_TRANSIT,
+          TagMatcher: "",
+          LicenseNumber: this._authState!.license,
+        };
+
+        subscription.unsubscribe();
+        resolve(packageData);
+      } catch (e) {
+        subscription.unsubscribe();
+        reject(e);
+      }
+    });
+  }
+
+  async transferredPackages(
+    resetCache: boolean = false
+  ): Promise<IIndexedDestinationPackageData[]> {
+    if (resetCache) {
+      this._transferredPackages = null;
+    }
+
+    if (!this._transferredPackages) {
+      this._transferredPackages = new Promise(async (resolve, reject) => {
+        const subscription = timer(DATA_LOAD_FETCH_TIMEOUT_MS).subscribe(() =>
+          reject("Transferred package fetch timed out")
+        );
+
+        try {
+          const transferredPackages: IIndexedDestinationPackageData[] = (
+            await this.loadTransferredPackages()
+          ).map((pkg) => ({
+            ...pkg,
+            PackageState: PackageState.TRANSFERRED,
+            TagMatcher: "",
+            LicenseNumber: this._authState!.license,
+          }));
+
+          // databaseInterface.indexPackages(transferredPackages, PackageState.IN_TRANSIT);
+
+          subscription.unsubscribe();
+          resolve(transferredPackages);
+        } catch (e) {
+          subscription.unsubscribe();
+          reject(e);
+          this._transferredPackages = null;
+        }
+      });
+    }
+
+    return this._transferredPackages;
+  }
+
+  async transferredPackage(
+    label: string,
+    options: { useCache?: boolean } = {}
+  ): Promise<IIndexedDestinationPackageData> {
+    if (options.useCache) {
+      if (!this._transferredPackages) {
+        await this.transferredPackages();
+      }
+
+      if (this._transferredPackages) {
+        const match = (await this._transferredPackages).find((pkg) => pkg.PackageLabel === label);
+
+        if (match) {
+          return match;
+        }
+      }
+    }
+
+    return new Promise(async (resolve, reject) => {
+      const subscription = timer(DATA_LOAD_FETCH_TIMEOUT_MS).subscribe(() =>
+        reject("Transferred package fetch timed out")
+      );
+
+      try {
+        const packageData: IIndexedDestinationPackageData = {
+          ...(await this.loadTransferredPackage(label)),
+          PackageState: PackageState.TRANSFERRED,
           TagMatcher: "",
           LicenseNumber: this._authState!.license,
         };
@@ -2566,6 +2714,18 @@ export class DataLoader implements IAtomicService {
     return streamFactory<IPackageData>(options, responseFactory);
   }
 
+  transferredPackagesStream(
+    options: IPackageOptions = {}
+  ): Subject<ICollectionResponse<IDestinationPackageData>> {
+    const responseFactory = (paginationOptions: IPaginationOptions): Promise<AxiosResponse> => {
+      const body = buildBody(paginationOptions);
+
+      return this.metrcRequestManagerOrError.getTransferredPackages(body);
+    };
+
+    return streamFactory<IDestinationPackageData>(options, responseFactory);
+  }
+
   vegetativePlantsStream(options: IPlantOptions): Subject<ICollectionResponse<IPlantData>> {
     const responseFactory = (paginationOptions: IPaginationOptions): Promise<AxiosResponse> => {
       const body = buildBody(
@@ -3336,6 +3496,39 @@ export class DataLoader implements IAtomicService {
     return responseData.Data[0];
   }
 
+  private async loadTransferredPackage(label: string): Promise<IDestinationPackageData> {
+    await authManager.authStateOrError();
+
+    const page = 0;
+
+    const packageFilter: IPackageFilter = {
+      label,
+    };
+
+    const body = buildBody({ page, pageSize: 5 }, { packageFilter });
+
+    const response = await this.metrcRequestManagerOrError.getTransferredPackages(body);
+
+    if (response.status !== 200) {
+      throw new Error("Request failed");
+    }
+
+    const responseData: ICollectionResponse<IDestinationPackageData> = await response.data;
+
+    if (responseData.Data.length !== 1) {
+      if (responseData.Data.length === 0) {
+        throw new DataLoadError(
+          DataLoadErrorType.ZERO_RESULTS,
+          `Metrc indicated ${label} is not available`
+        );
+      } else {
+        throw new Error("Returned multiple packages");
+      }
+    }
+
+    return responseData.Data[0];
+  }
+
   private async loadOnHoldPackages(): Promise<IPackageData[]> {
     await authManager.authStateOrError();
 
@@ -3366,6 +3559,24 @@ export class DataLoader implements IAtomicService {
     console.log(`Loaded ${inTransitPackages.length} inTransitPackages`);
 
     return inTransitPackages;
+  }
+
+  private async loadTransferredPackages(): Promise<IDestinationPackageData[]> {
+    await authManager.authStateOrError();
+
+    console.log("Loading transferred packages...");
+
+    let transferredPackages: IDestinationPackageData[] = [];
+
+    await this.transferredPackagesStream().forEach(
+      (next: ICollectionResponse<IDestinationPackageData>) => {
+        transferredPackages = [...transferredPackages, ...next.Data];
+      }
+    );
+
+    console.log(`Loaded ${transferredPackages.length} transferredPackages`);
+
+    return transferredPackages;
   }
 
   private async loadIncomingTransfers(): Promise<ITransferData[]> {

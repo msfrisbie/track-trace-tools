@@ -48,7 +48,7 @@
 import PackageHistoryList from '@/components/search/package-search/PackageHistoryList.vue';
 import PackageResultGroups from '@/components/search/package-search/PackageResultGroups.vue';
 import PackageSearchResultDetail from '@/components/search/package-search/PackageSearchResultDetail.vue';
-import { IIndexedPackageData, IPackageData, IPluginState } from '@/interfaces';
+import { IIndexedPackageData, IPackageData, IPluginState, IUnionIndexedPackageData } from '@/interfaces';
 import store from '@/store/page-overlay/index';
 import { PackageSearchActions } from '@/store/page-overlay/modules/package-search/consts';
 import { TransferBuilderGetters } from '@/store/page-overlay/modules/transfer-builder/consts';
@@ -70,7 +70,7 @@ export default Vue.extend({
     return {};
   },
   props: {
-    packages: Array as () => IIndexedPackageData[],
+    packages: Array as () => IUnionIndexedPackageData[],
     inflight: Boolean,
   },
   methods: {

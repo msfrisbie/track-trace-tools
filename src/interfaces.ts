@@ -5,6 +5,7 @@ import {
   Level,
   MessageType,
   MetrcStatus,
+  PackageSearchFilterKeys,
   PackageState,
   PlantBatchState,
   PlantState,
@@ -130,16 +131,21 @@ export interface ICollectionResponse<T> {
   Total: number;
 }
 
+PackageSearchFilterKeys;
+
 export interface IPackageSearchFilters {
-  label?: string | null;
-  sourceHarvestName?: string | null;
-  sourcePackageLabel?: string | null;
-  productionBatchNumber?: string | null;
-  sourceProductionBatchNumbers?: string | null;
-  itemName?: string | null;
-  itemStrainName?: string | null;
-  itemProductCategoryName?: string | null;
-  locationName?: string | null;
+  [PackageSearchFilterKeys.LABEL]?: string | null;
+  [PackageSearchFilterKeys.SOURCE_HARVET_NAMES]?: string | null;
+  [PackageSearchFilterKeys.SOURCE_PACKAGE_LABELS]?: string | null;
+  [PackageSearchFilterKeys.PRODUCTION_BATCH_NUMBER]?: string | null;
+  [PackageSearchFilterKeys.SOURCE_PRODUCTION_BATCH_NUMBERS]?: string | null;
+  [PackageSearchFilterKeys.ITEM_NAME]?: string | null;
+  [PackageSearchFilterKeys.ITEM_STRAIN_NAME]?: string | null;
+  [PackageSearchFilterKeys.ITEM_PRODUCT_CATEGORY_NAME]?: string | null;
+  [PackageSearchFilterKeys.LOCATION_NAME]?: string | null;
+  [PackageSearchFilterKeys.MANIFEST_NUMBER]?: string | null;
+  [PackageSearchFilterKeys.DESTINATION_FACILITY_NAME]?: string | null;
+  [PackageSearchFilterKeys.DESTINATION_LICENSE_NUMBER]?: string | null;
 }
 
 export interface IPlantSearchFilters {

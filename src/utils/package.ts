@@ -347,7 +347,7 @@ export async function getParentPackageLabels(pkg: ISimpleTransferPackageData | I
     if (pkg.parentPackageLabels) {
       return pkg.parentPackageLabels;
     }
-    if (pkg.PackageState !== PackageState.DEPARTED_FACILITY) {
+    if (pkg.PackageState !== PackageState.TRANSFERRED) {
       const history = await getDataLoaderByLicense(pkg.LicenseNumber).then((dataLoader) =>
         dataLoader.packageHistoryByPackageId(pkg.Id)
       );

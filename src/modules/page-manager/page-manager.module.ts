@@ -1,5 +1,6 @@
 import {
   DEBUG_ATTRIBUTE,
+  DestinationPackageFilterIdentifiers,
   MessageType,
   ModalAction,
   ModalType,
@@ -7,7 +8,7 @@ import {
   PlantFilterIdentifiers,
   TagFilterIdentifiers,
   TransferFilterIdentifiers,
-  TTT_TABLEGROUP_ATTRIBUTE
+  TTT_TABLEGROUP_ATTRIBUTE,
 } from "@/consts";
 import { BackgroundState, DarkModeState, IAtomicService, SnowflakeState } from "@/interfaces";
 import { toastManager } from "@/modules/toast-manager.module";
@@ -31,25 +32,27 @@ import {
   TAG_TAB_REGEX,
   TRANSFER_HUB_REGEX,
   TRANSFER_TAB_REGEX,
-  TRANSFER_TEMPLATE_TAB_REGEX
+  TRANSFER_TEMPLATE_TAB_REGEX,
 } from "./consts";
 import {
   addButtonsToPackageTableImpl,
   addButtonsToTransferTableImpl,
-  modifyTransferModalImpl
+  modifyTransferModalImpl,
 } from "./inline-widget-utils";
 import {
   clickLogoutDismissImpl,
   clickRefreshLinksImpl,
   controlSnowflakeAnimationImpl,
   getVisibleAnimationContainerImpl,
-  interceptViewManifestButtonImpl, setPaginationImpl,
-  suppressAnimationContainerImpl
+  interceptViewManifestButtonImpl,
+  setPaginationImpl,
+  suppressAnimationContainerImpl,
 } from "./metrc-utils";
 import {
   acquirePackageFilterElementsImpl,
   acquirePlantFilterElementsImpl,
   acquireTransferFilterElementsImpl,
+  applyDestinationPackageFilterImpl,
   applyPackageFilterImpl,
   applyPlantFilterImpl,
   applyTagFilterImpl,
@@ -59,16 +62,17 @@ import {
   resetMetrcPlantFiltersImpl,
   resetMetrcTagFiltersImpl,
   resetMetrcTransferFiltersImpl,
+  setDestinationPackageFilterImpl,
   setPackageFilterImpl,
   setPlantFilterImpl,
   setTagFilterImpl,
-  setTransferFilterImpl
+  setTransferFilterImpl,
 } from "./search-utils";
 import {
   controlBackgroundImpl,
   controlDarkModeImpl,
   controlLogoutBarImpl,
-  togglePageVisibilityClassesImpl
+  togglePageVisibilityClassesImpl,
 } from "./style-utils";
 import {
   activeTabOrNullImpl,
@@ -78,7 +82,7 @@ import {
   managePlantTabsImpl,
   manageSalesTabsImpl,
   manageTagsTabsImpl,
-  manageTransfersTabsImpl
+  manageTransfersTabsImpl,
 } from "./tab-utils";
 
 const debugLog = debugLogFactory("page-manager.module.ts");
@@ -213,6 +217,50 @@ class PageManager implements IAtomicService {
   packageLocationNameFilterInput: HTMLInputElement | null = null;
 
   packageLocationNameApplyFiltersButton: HTMLButtonElement | null = null;
+
+  destinationPackageDestinationFacilityNameFilterInput: HTMLInputElement | null = null;
+
+  destinationPackageDestinationFacilityNameFilterSelect: HTMLElement | null = null;
+
+  destinationPackageDestinationFacilityNameApplyFiltersButton: HTMLButtonElement | null = null;
+
+  destinationPackageDestinationLicenseNumberFilterInput: HTMLInputElement | null = null;
+
+  destinationPackageDestinationLicenseNumberFilterSelect: HTMLElement | null = null;
+
+  destinationPackageDestinationLicenseNumberApplyFiltersButton: HTMLButtonElement | null = null;
+
+  destinationPackageManifestNumberFilterInput: HTMLInputElement | null = null;
+
+  destinationPackageManifestNumberFilterSelect: HTMLElement | null = null;
+
+  destinationPackageManifestNumberApplyFiltersButton: HTMLButtonElement | null = null;
+
+  destinationPackageLabelFilterInput: HTMLInputElement | null = null;
+
+  destinationPackageLabelFilterSelect: HTMLElement | null = null;
+
+  destinationPackageLabelApplyFiltersButton: HTMLButtonElement | null = null;
+
+  destinationPackageSourceHarvestNameFilterInput: HTMLInputElement | null = null;
+
+  destinationPackageSourceHarvestNameApplyFiltersButton: HTMLButtonElement | null = null;
+
+  destinationPackageSourcePackageLabelFilterInput: HTMLInputElement | null = null;
+
+  destinationPackageSourcePackageLabelApplyFiltersButton: HTMLButtonElement | null = null;
+
+  destinationPackageProductNameFilterInput: HTMLInputElement | null = null;
+
+  destinationPackageProductNameApplyFiltersButton: HTMLButtonElement | null = null;
+
+  destinationPackageItemStrainNameFilterInput: HTMLInputElement | null = null;
+
+  destinationPackageItemStrainNameApplyFiltersButton: HTMLButtonElement | null = null;
+
+  destinationPackageItemProductCategoryNameFilterInput: HTMLInputElement | null = null;
+
+  destinationPackageItemProductCategoryNameApplyFiltersButton: HTMLButtonElement | null = null;
 
   packageClearFiltersButton: HTMLButtonElement | null = null;
 
@@ -446,8 +494,10 @@ class PageManager implements IAtomicService {
         this.flushTextBuffer();
       }
 
-      if (e.key === 'Escape') {
-        const modalCloseButton: HTMLAnchorElement | null = document.querySelector(`.k-widget.k-window .k-window-titlebar a[aria-label="Close"]`);
+      if (e.key === "Escape") {
+        const modalCloseButton: HTMLAnchorElement | null = document.querySelector(
+          `.k-widget.k-window .k-window-titlebar a[aria-label="Close"]`
+        );
 
         if (modalCloseButton) {
           modalCloseButton.click();
@@ -709,6 +759,13 @@ class PageManager implements IAtomicService {
     return setPackageFilterImpl(packageFilterIdentifier, value);
   }
 
+  async setDestinationPackageFilter(
+    destinationPackageFilterIdentifier: DestinationPackageFilterIdentifiers,
+    value: string
+  ) {
+    return setDestinationPackageFilterImpl(destinationPackageFilterIdentifier, value);
+  }
+
   async setTransferFilter(transferFilterIdentifier: TransferFilterIdentifiers, value: string) {
     return setTransferFilterImpl(transferFilterIdentifier, value);
   }
@@ -724,6 +781,11 @@ class PageManager implements IAtomicService {
   applyPackageFilter(packageFilterIdentifier: PackageFilterIdentifiers) {
     return applyPackageFilterImpl(packageFilterIdentifier);
   }
+
+  applyDestinationPackageFilter(destinationPackageFilterIdentifier: DestinationPackageFilterIdentifiers) {
+    return applyDestinationPackageFilterImpl(destinationPackageFilterIdentifier);
+  }
+
 
   applyTransferFilter(transferFilterIdentifier: TransferFilterIdentifiers) {
     return applyTransferFilterImpl(transferFilterIdentifier);
