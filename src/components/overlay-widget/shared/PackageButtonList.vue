@@ -1,6 +1,6 @@
 <template>
   <fragment>
-    <b-button
+    <!-- <b-button
       size="sm"
       variant="outline-primary"
       @click.stop.prevent="transferPackage()"
@@ -16,10 +16,10 @@
           <b-badge variant="primary">T3+</b-badge>
         </div>
       </div>
-    </b-button>
+    </b-button> -->
 
     <b-button
-      v-if="clientState.values.ENABLE_PACKAGE_HISTORY"
+      v-if="clientState.values.ENABLE_PACKAGE_HISTORY && pkg.PackageState !== PackageState.TRANSFERRED"
       size="sm"
       variant="outline-primary"
       @click.stop.prevent="setPackageHistorySourcePackage({ pkg }) && openPackageHistoryBuilder()"
@@ -222,6 +222,7 @@ export default Vue.extend({
   data() {
     return {
       packageMetadata: null,
+      PackageState
     };
   },
   methods: {

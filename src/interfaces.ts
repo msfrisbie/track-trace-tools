@@ -11,7 +11,7 @@ import {
   PlantState,
   SearchModalView,
   TagState,
-  TransferState
+  TransferState,
 } from "@/consts";
 import { Store } from "vuex";
 import { IAnnouncementsState } from "./store/page-overlay/modules/announcements/interfaces";
@@ -36,7 +36,7 @@ import { ISplitPackageBuilderState } from "./store/page-overlay/modules/split-pa
 import { ITagSearchState } from "./store/page-overlay/modules/tag-search/interfaces";
 import {
   DriverLayoverLeg,
-  ITransferBuilderState
+  ITransferBuilderState,
 } from "./store/page-overlay/modules/transfer-builder/interfaces";
 import { ITransferPackageSearchState } from "./store/page-overlay/modules/transfer-package-search/interfaces";
 import { ITransferSearchState } from "./store/page-overlay/modules/transfer-search/interfaces";
@@ -135,7 +135,7 @@ PackageSearchFilterKeys;
 
 export interface IPackageSearchFilters {
   [PackageSearchFilterKeys.LABEL]?: string | null;
-  [PackageSearchFilterKeys.SOURCE_HARVET_NAMES]?: string | null;
+  [PackageSearchFilterKeys.SOURCE_HARVEST_NAMES]?: string | null;
   [PackageSearchFilterKeys.SOURCE_PACKAGE_LABELS]?: string | null;
   [PackageSearchFilterKeys.PRODUCTION_BATCH_NUMBER]?: string | null;
   [PackageSearchFilterKeys.SOURCE_PRODUCTION_BATCH_NUMBERS]?: string | null;
@@ -782,6 +782,39 @@ export interface IRichIndexedDestinationPackageData extends IIndexedDestinationP
   errors?: string[];
 }
 
+export interface ITransferredPackageData {
+  Id: number;
+  PackageId: number;
+  RecipientFacilityLicenseNumber: string;
+  RecipientFacilityName: string;
+  ManifestNumber: string;
+  PackageLabel: string;
+  SourceHarvestNames: string;
+  SourcePackageLabels: string;
+  ProductName: string;
+  ProductCategoryName: string;
+  ItemStrainName: string;
+  LabTestingStateName: string; // "TestPassed",
+  ShippedQuantity: number;
+  ShippedUnitOfMeasureAbbreviation: string;
+  GrossWeight: number;
+  GrossUnitOfWeightAbbreviation: string;
+  ShipperWholesalePrice: number;
+  ReceivedQuantity: number;
+  ReceivedUnitOfMeasureAbbreviation: string;
+  ReceiverWholesalePrice: number;
+  ShipmentPackageStateName: string; // "Accepted",
+  ActualDepartureDateTime: string;
+}
+
+export interface IIndexedTransferredPackageData extends ITransferredPackageData {
+  PackageState: PackageState;
+  LicenseNumber: string;
+  TagMatcher: string;
+  history?: null;
+  testResults?: null;
+}
+
 export interface IDestinationPackageData {
   ContainsRemediatedProduct: boolean;
   DonationFacilityLicenseNumber: null;
@@ -848,8 +881,11 @@ export interface IIndexedDestinationPackageData extends IDestinationPackageData 
   fractionalCostData?: IFractionalCostData[];
 }
 
-export type IUnionPackageData = IPackageData | IDestinationPackageData;
-export type IUnionIndexedPackageData = IIndexedPackageData | IIndexedDestinationPackageData;
+export type IUnionPackageData = IPackageData | IDestinationPackageData | ITransferredPackageData;
+export type IUnionIndexedPackageData =
+  | IIndexedPackageData
+  | IIndexedDestinationPackageData
+  | IIndexedTransferredPackageData;
 export type IUnionRichIndexedPackageData =
   | IRichIndexedPackageData
   | IRichIndexedDestinationPackageData;
@@ -1197,7 +1233,7 @@ export interface IXlsxFile {
     sheetName: string;
     options?: {
       table: boolean;
-    }
+    };
     data: any[][];
   }[];
 }

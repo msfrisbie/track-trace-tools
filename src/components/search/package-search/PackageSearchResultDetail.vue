@@ -1,50 +1,33 @@
 <template>
-  <div
-    v-if="packageSearchState.selectedPackageMetadata"
-    class="flex flex-col items-center space-y-8 px-2 p-4"
-  >
+  <div v-if="packageSearchState.selectedPackageMetadata" class="flex flex-col items-center space-y-8 px-2 p-4">
     <div class="w-full grid grid-cols-3" style="grid-template-columns: 1fr 8fr 1fr">
       <div></div>
 
       <div class="flex flex-col items-center space-y-8 flex-grow">
         <div class="flex flex-col space-y-2 items-center">
           <div class="flex flex-row items-center space-x-4 text-center">
-            <metrc-tag
-              :label="packageSearchState.selectedPackageMetadata.packageData.Label"
-              sideText="PACKAGE"
-            ></metrc-tag>
+            <metrc-tag :label="getLabelOrError(packageSearchState.selectedPackageMetadata.packageData)"
+              sideText="PACKAGE"></metrc-tag>
           </div>
 
-          <b-badge
-            class="text-lg"
-            :variant="badgeVariant(packageSearchState.selectedPackageMetadata.packageData)"
-            >{{
-              displayPackageState(packageSearchState.selectedPackageMetadata.packageData)
-            }}</b-badge
-          >
+          <b-badge class="text-lg" :variant="badgeVariant(packageSearchState.selectedPackageMetadata.packageData)">{{
+    displayPackageState(packageSearchState.selectedPackageMetadata.packageData)
+  }}</b-badge>
         </div>
       </div>
 
-      <div
-        v-show="isOnPackagesPage"
-        @click.stop.prevent="
-          setPackageLabelFilter(packageSearchState.selectedPackageMetadata.packageData)
-        "
-        class="flex flex-row items-center justify-center cursor-pointer h-full"
-      >
+      <div v-show="isOnPackagesPage" @click.stop.prevent="
+    setPackageLabelFilter(packageSearchState.selectedPackageMetadata.packageData)
+    " class="flex flex-row items-center justify-center cursor-pointer h-full">
         <font-awesome-icon icon="chevron-right" class="text-2xl text-purple-500" />
       </div>
     </div>
 
     <div class="grid grid-cols-2 gap-2">
-      <package-button-list
-        :pkg="packageSearchState.selectedPackageMetadata.packageData"
-      ></package-button-list>
+      <package-button-list :pkg="packageSearchState.selectedPackageMetadata.packageData"></package-button-list>
     </div>
 
-    <recursive-json-table
-      :jsonObject="packageSearchState.selectedPackageMetadata.packageData"
-    ></recursive-json-table>
+    <recursive-json-table :jsonObject="packageSearchState.selectedPackageMetadata.packageData"></recursive-json-table>
   </div>
 </template>
 
@@ -57,9 +40,10 @@ import {
   METRC_HOSTNAMES_LACKING_LAB_PDFS,
   ModalAction,
   ModalType,
+  PackageSearchFilterKeys,
   PackageState,
 } from "@/consts";
-import { IIndexedPackageData, IPluginState, ITransferPackageList } from "@/interfaces";
+import { IUnionIndexedPackageData, IPluginState, ITransferPackageList } from "@/interfaces";
 import { analyticsManager } from "@/modules/analytics-manager.module";
 import { modalManager } from "@/modules/modal-manager.module";
 import { PACKAGE_TAB_REGEX } from "@/modules/page-manager/consts";
@@ -129,7 +113,7 @@ export default Vue.extend({
         initialRoute: "/transfer/transfer-builder",
       });
     },
-    async setPackageLabelFilter(pkg: IIndexedPackageData) {
+    async setPackageLabelFilter(pkg: IUnionIndexedPackageData) {
       analyticsManager.track(MessageType.SELECTED_PACKAGE);
 
       store.dispatch(
@@ -137,19 +121,19 @@ export default Vue.extend({
         {
           packageState: pkg.PackageState,
           packageSearchFilters: {
-            label: pkg.Label,
+            [PackageSearchFilterKeys.LABEL]: getLabelOrError(pkg),
           },
         }
       );
 
       this.setShowSearchResults({ showSearchResults: false });
     },
-    copyToClipboard(pkg: IIndexedPackageData) {
-      analyticsManager.track(MessageType.COPIED_TEXT, { value: pkg.Label });
+    copyToClipboard(pkg: IUnionIndexedPackageData) {
+      analyticsManager.track(MessageType.COPIED_TEXT, { value: getLabelOrError(pkg) });
 
-      copyToClipboard(pkg.Label);
+      copyToClipboard(getLabelOrError(pkg));
 
-      toastManager.openToast(`'${pkg.Label}' copied to clipboard`, {
+      toastManager.openToast(`'${getLabelOrError(pkg)}' copied to clipboard`, {
         title: "Copied Tag",
         autoHideDelay: 5000,
         variant: "primary",
@@ -158,7 +142,7 @@ export default Vue.extend({
         solid: true,
       });
     },
-    badgeVariant(pkg: IIndexedPackageData) {
+    badgeVariant(pkg: IUnionIndexedPackageData) {
       switch (pkg.PackageState) {
         case PackageState.ACTIVE:
           return "success";
@@ -170,7 +154,7 @@ export default Vue.extend({
           return null;
       }
     },
-    displayPackageState(pkg: IIndexedPackageData) {
+    displayPackageState(pkg: IUnionIndexedPackageData) {
       return pkg.PackageState.replaceAll("_", " ");
     },
   },

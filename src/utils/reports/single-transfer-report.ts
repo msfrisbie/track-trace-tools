@@ -5,20 +5,23 @@ import { toastManager } from "@/modules/toast-manager.module";
 import store from "@/store/page-overlay/index";
 import { ReportType } from "@/store/page-overlay/modules/reports/consts";
 import {
-    IReportConfig,
-    IReportData,
-    IReportsState
+  IReportConfig,
+  IReportData,
+  IReportsState,
 } from "@/store/page-overlay/modules/reports/interfaces";
 import { ActionContext } from "vuex";
 import {
-    getGrossWeightOrError,
-    getItemCategoryOrError,
-    getItemNameOrError,
-    getItemStrainOrError, getLabelOrError, getLabTestingStateOrError, getQuantityOrError,
-    getSourceHarvestNamesOrError,
-    getSourcePackageLabelsOrError,
-    getUnitOfMeasureAbbreviationOrError,
-    getWholesalePriceOrError
+  getGrossWeightOrError,
+  getItemCategoryOrError,
+  getItemNameOrError,
+  getItemStrainNameOrError,
+  getLabTestingStateOrError,
+  getLabelOrError,
+  getQuantityOrError,
+  getSourceHarvestNamesOrError,
+  getSourcePackageLabelsOrError,
+  getUnitOfMeasureAbbreviationOrError,
+  getWholesalePriceOrError,
 } from "../package";
 import { generateTransferMetadata } from "../transfer";
 
@@ -111,7 +114,7 @@ export async function maybeLoadSingleTransferReportData({
             getSourcePackageLabelsOrError(pkg),
             getItemNameOrError(pkg),
             getItemCategoryOrError(pkg),
-            getItemStrainOrError(pkg),
+            getItemStrainNameOrError(pkg),
             getLabTestingStateOrError(pkg),
             getQuantityOrError(pkg),
             getUnitOfMeasureAbbreviationOrError(pkg),
@@ -165,7 +168,7 @@ export async function maybeLoadSingleTransferReportData({
               getSourcePackageLabelsOrError(pkg),
               getItemNameOrError(pkg),
               getItemCategoryOrError(pkg),
-              getItemStrainOrError(pkg),
+              getItemStrainNameOrError(pkg),
               getLabTestingStateOrError(pkg),
               getQuantityOrError(pkg),
               getUnitOfMeasureAbbreviationOrError(pkg),

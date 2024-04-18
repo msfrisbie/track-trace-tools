@@ -1,14 +1,14 @@
 import {
   DEBUG_ATTRIBUTE,
-  DestinationPackageFilterIdentifiers,
   MessageType,
   ModalAction,
   ModalType,
   PackageFilterIdentifiers,
   PlantFilterIdentifiers,
+  TTT_TABLEGROUP_ATTRIBUTE,
   TagFilterIdentifiers,
   TransferFilterIdentifiers,
-  TTT_TABLEGROUP_ATTRIBUTE,
+  TransferredPackageFilterIdentifiers,
 } from "@/consts";
 import { BackgroundState, DarkModeState, IAtomicService, SnowflakeState } from "@/interfaces";
 import { toastManager } from "@/modules/toast-manager.module";
@@ -760,7 +760,7 @@ class PageManager implements IAtomicService {
   }
 
   async setDestinationPackageFilter(
-    destinationPackageFilterIdentifier: DestinationPackageFilterIdentifiers,
+    destinationPackageFilterIdentifier: TransferredPackageFilterIdentifiers,
     value: string
   ) {
     return setDestinationPackageFilterImpl(destinationPackageFilterIdentifier, value);
@@ -782,10 +782,11 @@ class PageManager implements IAtomicService {
     return applyPackageFilterImpl(packageFilterIdentifier);
   }
 
-  applyDestinationPackageFilter(destinationPackageFilterIdentifier: DestinationPackageFilterIdentifiers) {
+  applyDestinationPackageFilter(
+    destinationPackageFilterIdentifier: TransferredPackageFilterIdentifiers
+  ) {
     return applyDestinationPackageFilterImpl(destinationPackageFilterIdentifier);
   }
-
 
   applyTransferFilter(transferFilterIdentifier: TransferFilterIdentifiers) {
     return applyTransferFilterImpl(transferFilterIdentifier);

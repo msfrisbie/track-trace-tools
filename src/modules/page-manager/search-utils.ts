@@ -1,10 +1,11 @@
 import {
-  DestinationPackageFilterIdentifiers,
   MessageType,
   PackageFilterIdentifiers,
+  PackageSearchFilterKeys,
   PlantFilterIdentifiers,
   TagFilterIdentifiers,
   TransferFilterIdentifiers,
+  TransferredPackageFilterIdentifiers,
 } from "@/consts";
 import store from "@/store/page-overlay/index";
 import { PackageSearchActions } from "@/store/page-overlay/modules/package-search/consts";
@@ -176,7 +177,10 @@ export async function acquirePackageFilterElementsImpl() {
     return;
   }
 
-  const packageFilterIdentifiers: PackageFilterIdentifiers[] = [
+  const packageFilterIdentifiers: (
+    | PackageFilterIdentifiers
+    | TransferredPackageFilterIdentifiers
+  )[] = [
     PackageFilterIdentifiers.Label,
     PackageFilterIdentifiers.SourceHarvestNames,
     PackageFilterIdentifiers.SourcePackageLabels,
@@ -186,6 +190,15 @@ export async function acquirePackageFilterElementsImpl() {
     PackageFilterIdentifiers.ItemStrainName,
     PackageFilterIdentifiers.ItemProductCategoryName,
     PackageFilterIdentifiers.LocationName,
+    TransferredPackageFilterIdentifiers.PackageLabel,
+    TransferredPackageFilterIdentifiers.SourceHarvestNames,
+    TransferredPackageFilterIdentifiers.SourcePackageLabels,
+    TransferredPackageFilterIdentifiers.ProductName,
+    TransferredPackageFilterIdentifiers.ItemStrainName,
+    TransferredPackageFilterIdentifiers.ProductCategoryName,
+    TransferredPackageFilterIdentifiers.ManifestNumber,
+    TransferredPackageFilterIdentifiers.DestinationLicenseNumber,
+    TransferredPackageFilterIdentifiers.DestinationFacilityName,
   ];
 
   let menuButton;
@@ -224,11 +237,28 @@ export async function acquirePackageFilterElementsImpl() {
               input.addEventListener("input", (e: any) =>
                 store.dispatch(
                   `packageSearch/${PackageSearchActions.PARTIAL_UPDATE_PACKAGE_SEARCH_FILTERS}`,
-                  { packageSearchFilters: { label: e.target.value }, propagate: false }
+                  {
+                    packageSearchFilters: { [PackageSearchFilterKeys.LABEL]: e.target.value },
+                    propagate: false,
+                  }
                 )
               );
               pageManager.packageLabelFilterSelect = select;
               pageManager.packageLabelApplyFiltersButton = button;
+              break;
+            case TransferredPackageFilterIdentifiers.PackageLabel:
+              pageManager.destinationPackageLabelFilterInput = input;
+              input.addEventListener("input", (e: any) =>
+                store.dispatch(
+                  `packageSearch/${PackageSearchActions.PARTIAL_UPDATE_PACKAGE_SEARCH_FILTERS}`,
+                  {
+                    packageSearchFilters: { [PackageSearchFilterKeys.LABEL]: e.target.value },
+                    propagate: false,
+                  }
+                )
+              );
+              pageManager.destinationPackageLabelFilterSelect = select;
+              pageManager.destinationPackageLabelApplyFiltersButton = button;
               break;
             case PackageFilterIdentifiers.SourceHarvestNames:
               pageManager.packageSourceHarvestNameFilterInput = input;
@@ -236,12 +266,29 @@ export async function acquirePackageFilterElementsImpl() {
                 store.dispatch(
                   `packageSearch/${PackageSearchActions.PARTIAL_UPDATE_PACKAGE_SEARCH_FILTERS}`,
                   {
-                    packageSearchFilters: { sourceHarvestNames: e.target.value },
+                    packageSearchFilters: {
+                      [PackageSearchFilterKeys.SOURCE_HARVEST_NAMES]: e.target.value,
+                    },
                     propagate: false,
                   }
                 )
               );
               pageManager.packageSourceHarvestNameApplyFiltersButton = button;
+              break;
+            case TransferredPackageFilterIdentifiers.SourceHarvestNames:
+              pageManager.destinationPackageSourceHarvestNameFilterInput = input;
+              input.addEventListener("input", (e: any) =>
+                store.dispatch(
+                  `packageSearch/${PackageSearchActions.PARTIAL_UPDATE_PACKAGE_SEARCH_FILTERS}`,
+                  {
+                    packageSearchFilters: {
+                      [PackageSearchFilterKeys.SOURCE_HARVEST_NAMES]: e.target.value,
+                    },
+                    propagate: false,
+                  }
+                )
+              );
+              pageManager.destinationPackageSourceHarvestNameApplyFiltersButton = button;
               break;
             case PackageFilterIdentifiers.SourcePackageLabels:
               pageManager.packageSourcePackageLabelFilterInput = input;
@@ -249,12 +296,29 @@ export async function acquirePackageFilterElementsImpl() {
                 store.dispatch(
                   `packageSearch/${PackageSearchActions.PARTIAL_UPDATE_PACKAGE_SEARCH_FILTERS}`,
                   {
-                    packageSearchFilters: { sourcePackageLabels: e.target.value },
+                    packageSearchFilters: {
+                      [PackageSearchFilterKeys.SOURCE_PACKAGE_LABELS]: e.target.value,
+                    },
                     propagate: false,
                   }
                 )
               );
               pageManager.packageSourcePackageLabelApplyFiltersButton = button;
+              break;
+            case TransferredPackageFilterIdentifiers.SourcePackageLabels:
+              pageManager.destinationPackageSourcePackageLabelFilterInput = input;
+              input.addEventListener("input", (e: any) =>
+                store.dispatch(
+                  `packageSearch/${PackageSearchActions.PARTIAL_UPDATE_PACKAGE_SEARCH_FILTERS}`,
+                  {
+                    packageSearchFilters: {
+                      [PackageSearchFilterKeys.SOURCE_PACKAGE_LABELS]: e.target.value,
+                    },
+                    propagate: false,
+                  }
+                )
+              );
+              pageManager.destinationPackageSourcePackageLabelApplyFiltersButton = button;
               break;
             case PackageFilterIdentifiers.ProductionBatchNumber:
               pageManager.packageProductionBatchNumberFilterInput = input;
@@ -262,7 +326,9 @@ export async function acquirePackageFilterElementsImpl() {
                 store.dispatch(
                   `packageSearch/${PackageSearchActions.PARTIAL_UPDATE_PACKAGE_SEARCH_FILTERS}`,
                   {
-                    packageSearchFilters: { productionBatchNumber: e.target.value },
+                    packageSearchFilters: {
+                      [PackageSearchFilterKeys.PRODUCTION_BATCH_NUMBER]: e.target.value,
+                    },
                     propagate: false,
                   }
                 )
@@ -275,7 +341,9 @@ export async function acquirePackageFilterElementsImpl() {
                 store.dispatch(
                   `packageSearch/${PackageSearchActions.PARTIAL_UPDATE_PACKAGE_SEARCH_FILTERS}`,
                   {
-                    packageSearchFilters: { sourceProductionBatchNumbers: e.target.value },
+                    packageSearchFilters: {
+                      [PackageSearchFilterKeys.SOURCE_PRODUCTION_BATCH_NUMBERS]: e.target.value,
+                    },
                     propagate: false,
                   }
                 )
@@ -287,20 +355,56 @@ export async function acquirePackageFilterElementsImpl() {
               input.addEventListener("input", (e: any) =>
                 store.dispatch(
                   `packageSearch/${PackageSearchActions.PARTIAL_UPDATE_PACKAGE_SEARCH_FILTERS}`,
-                  { packageSearchFilters: { itemName: e.target.value }, propagate: false }
+                  {
+                    packageSearchFilters: { [PackageSearchFilterKeys.ITEM_NAME]: e.target.value },
+                    propagate: false,
+                  }
                 )
               );
               pageManager.packageItemNameApplyFiltersButton = button;
+              break;
+            case TransferredPackageFilterIdentifiers.ProductName:
+              pageManager.destinationPackageProductNameFilterInput = input;
+              input.addEventListener("input", (e: any) =>
+                store.dispatch(
+                  `packageSearch/${PackageSearchActions.PARTIAL_UPDATE_PACKAGE_SEARCH_FILTERS}`,
+                  {
+                    packageSearchFilters: { [PackageSearchFilterKeys.ITEM_NAME]: e.target.value },
+                    propagate: false,
+                  }
+                )
+              );
+              pageManager.destinationPackageProductNameApplyFiltersButton = button;
               break;
             case PackageFilterIdentifiers.ItemStrainName:
               pageManager.packageItemStrainNameFilterInput = input;
               input.addEventListener("input", (e: any) =>
                 store.dispatch(
                   `packageSearch/${PackageSearchActions.PARTIAL_UPDATE_PACKAGE_SEARCH_FILTERS}`,
-                  { packageSearchFilters: { itemStrainName: e.target.value }, propagate: false }
+                  {
+                    packageSearchFilters: {
+                      [PackageSearchFilterKeys.ITEM_STRAIN_NAME]: e.target.value,
+                    },
+                    propagate: false,
+                  }
                 )
               );
               pageManager.packageItemStrainNameApplyFiltersButton = button;
+              break;
+            case TransferredPackageFilterIdentifiers.ItemStrainName:
+              pageManager.destinationPackageItemStrainNameFilterInput = input;
+              input.addEventListener("input", (e: any) =>
+                store.dispatch(
+                  `packageSearch/${PackageSearchActions.PARTIAL_UPDATE_PACKAGE_SEARCH_FILTERS}`,
+                  {
+                    packageSearchFilters: {
+                      [PackageSearchFilterKeys.ITEM_STRAIN_NAME]: e.target.value,
+                    },
+                    propagate: false,
+                  }
+                )
+              );
+              pageManager.destinationPackageItemStrainNameApplyFiltersButton = button;
               break;
             case PackageFilterIdentifiers.ItemProductCategoryName:
               pageManager.packageItemProductCategoryNameFilterInput = input;
@@ -308,22 +412,89 @@ export async function acquirePackageFilterElementsImpl() {
                 store.dispatch(
                   `packageSearch/${PackageSearchActions.PARTIAL_UPDATE_PACKAGE_SEARCH_FILTERS}`,
                   {
-                    packageSearchFilters: { itemProductCategoryName: e.target.value },
+                    packageSearchFilters: {
+                      [PackageSearchFilterKeys.ITEM_PRODUCT_CATEGORY_NAME]: e.target.value,
+                    },
                     propagate: false,
                   }
                 )
               );
               pageManager.packageItemProductCategoryNameApplyFiltersButton = button;
               break;
+            case TransferredPackageFilterIdentifiers.ProductCategoryName:
+              pageManager.destinationPackageItemProductCategoryNameFilterInput = input;
+              input.addEventListener("input", (e: any) =>
+                store.dispatch(
+                  `packageSearch/${PackageSearchActions.PARTIAL_UPDATE_PACKAGE_SEARCH_FILTERS}`,
+                  {
+                    packageSearchFilters: {
+                      [PackageSearchFilterKeys.ITEM_PRODUCT_CATEGORY_NAME]: e.target.value,
+                    },
+                    propagate: false,
+                  }
+                )
+              );
+              pageManager.destinationPackageItemProductCategoryNameApplyFiltersButton = button;
+              break;
             case PackageFilterIdentifiers.LocationName:
               pageManager.packageLocationNameFilterInput = input;
               input.addEventListener("input", (e: any) =>
                 store.dispatch(
                   `packageSearch/${PackageSearchActions.PARTIAL_UPDATE_PACKAGE_SEARCH_FILTERS}`,
-                  { packageSearchFilters: { locationName: e.target.value }, propagate: false }
+                  {
+                    packageSearchFilters: {
+                      [PackageSearchFilterKeys.LOCATION_NAME]: e.target.value,
+                    },
+                    propagate: false,
+                  }
                 )
               );
               pageManager.packageLocationNameApplyFiltersButton = button;
+              break;
+            case TransferredPackageFilterIdentifiers.ManifestNumber:
+              pageManager.destinationPackageManifestNumberFilterInput = input;
+              input.addEventListener("input", (e: any) =>
+                store.dispatch(
+                  `packageSearch/${PackageSearchActions.PARTIAL_UPDATE_PACKAGE_SEARCH_FILTERS}`,
+                  {
+                    packageSearchFilters: {
+                      [PackageSearchFilterKeys.MANIFEST_NUMBER]: e.target.value,
+                    },
+                    propagate: false,
+                  }
+                )
+              );
+              pageManager.destinationPackageManifestNumberApplyFiltersButton = button;
+              break;
+            case TransferredPackageFilterIdentifiers.DestinationFacilityName:
+              pageManager.destinationPackageDestinationFacilityNameFilterInput = input;
+              input.addEventListener("input", (e: any) =>
+                store.dispatch(
+                  `packageSearch/${PackageSearchActions.PARTIAL_UPDATE_PACKAGE_SEARCH_FILTERS}`,
+                  {
+                    packageSearchFilters: {
+                      [PackageSearchFilterKeys.DESTINATION_FACILITY_NAME]: e.target.value,
+                    },
+                    propagate: false,
+                  }
+                )
+              );
+              pageManager.destinationPackageDestinationFacilityNameApplyFiltersButton = button;
+              break;
+            case TransferredPackageFilterIdentifiers.DestinationLicenseNumber:
+              pageManager.destinationPackageDestinationLicenseNumberFilterInput = input;
+              input.addEventListener("input", (e: any) =>
+                store.dispatch(
+                  `packageSearch/${PackageSearchActions.PARTIAL_UPDATE_PACKAGE_SEARCH_FILTERS}`,
+                  {
+                    packageSearchFilters: {
+                      [PackageSearchFilterKeys.DESTINATION_LICENSE_NUMBER]: e.target.value,
+                    },
+                    propagate: false,
+                  }
+                )
+              );
+              pageManager.destinationPackageDestinationLicenseNumberApplyFiltersButton = button;
               break;
             default:
               break;
@@ -600,7 +771,7 @@ export async function setPackageFilterImpl(
 }
 
 export async function setDestinationPackageFilterImpl(
-  destinationPackageFilterIdentifier: DestinationPackageFilterIdentifiers,
+  destinationPackageFilterIdentifier: TransferredPackageFilterIdentifiers,
   value: string
 ) {
   await pageManager.refresh;
@@ -613,31 +784,31 @@ export async function setDestinationPackageFilterImpl(
   let input: HTMLInputElement | null = null;
 
   switch (destinationPackageFilterIdentifier) {
-    case DestinationPackageFilterIdentifiers.PackageLabel:
+    case TransferredPackageFilterIdentifiers.PackageLabel:
       input = pageManager.destinationPackageLabelFilterInput;
       break;
-    case DestinationPackageFilterIdentifiers.SourceHarvestNames:
+    case TransferredPackageFilterIdentifiers.SourceHarvestNames:
       input = pageManager.destinationPackageSourceHarvestNameFilterInput;
       break;
-    case DestinationPackageFilterIdentifiers.SourcePackageLabels:
+    case TransferredPackageFilterIdentifiers.SourcePackageLabels:
       input = pageManager.destinationPackageSourcePackageLabelFilterInput;
       break;
-    case DestinationPackageFilterIdentifiers.ProductName:
+    case TransferredPackageFilterIdentifiers.ProductName:
       input = pageManager.destinationPackageProductNameFilterInput;
       break;
-    case DestinationPackageFilterIdentifiers.ItemStrainName:
+    case TransferredPackageFilterIdentifiers.ItemStrainName:
       input = pageManager.destinationPackageItemStrainNameFilterInput;
       break;
-    case DestinationPackageFilterIdentifiers.ProductCategoryName:
+    case TransferredPackageFilterIdentifiers.ProductCategoryName:
       input = pageManager.destinationPackageItemProductCategoryNameFilterInput;
       break;
-    case DestinationPackageFilterIdentifiers.ManifestNumber:
+    case TransferredPackageFilterIdentifiers.ManifestNumber:
       input = pageManager.destinationPackageManifestNumberFilterInput;
       break;
-    case DestinationPackageFilterIdentifiers.DestinationFacilityName:
+    case TransferredPackageFilterIdentifiers.DestinationFacilityName:
       input = pageManager.destinationPackageDestinationFacilityNameFilterInput;
       break;
-    case DestinationPackageFilterIdentifiers.DestinationLicenseNumber:
+    case TransferredPackageFilterIdentifiers.DestinationLicenseNumber:
       input = pageManager.destinationPackageDestinationLicenseNumberFilterInput;
       break;
     default:
@@ -804,36 +975,36 @@ export function applyPackageFilterImpl(packageFilterIdentifier: PackageFilterIde
 }
 
 export function applyDestinationPackageFilterImpl(
-  destinationPackageFilterIdentifier: DestinationPackageFilterIdentifiers
+  destinationPackageFilterIdentifier: TransferredPackageFilterIdentifiers
 ) {
   let button: HTMLButtonElement | null = null;
 
   switch (destinationPackageFilterIdentifier) {
-    case DestinationPackageFilterIdentifiers.PackageLabel:
+    case TransferredPackageFilterIdentifiers.PackageLabel:
       button = pageManager.destinationPackageLabelApplyFiltersButton;
       break;
-    case DestinationPackageFilterIdentifiers.SourceHarvestNames:
+    case TransferredPackageFilterIdentifiers.SourceHarvestNames:
       button = pageManager.destinationPackageSourceHarvestNameApplyFiltersButton;
       break;
-    case DestinationPackageFilterIdentifiers.SourcePackageLabels:
+    case TransferredPackageFilterIdentifiers.SourcePackageLabels:
       button = pageManager.destinationPackageSourcePackageLabelApplyFiltersButton;
       break;
-    case DestinationPackageFilterIdentifiers.ProductName:
+    case TransferredPackageFilterIdentifiers.ProductName:
       button = pageManager.destinationPackageProductNameApplyFiltersButton;
       break;
-    case DestinationPackageFilterIdentifiers.ItemStrainName:
+    case TransferredPackageFilterIdentifiers.ItemStrainName:
       button = pageManager.destinationPackageItemStrainNameApplyFiltersButton;
       break;
-    case DestinationPackageFilterIdentifiers.ProductCategoryName:
+    case TransferredPackageFilterIdentifiers.ProductCategoryName:
       button = pageManager.destinationPackageItemProductCategoryNameApplyFiltersButton;
       break;
-    case DestinationPackageFilterIdentifiers.ManifestNumber:
+    case TransferredPackageFilterIdentifiers.ManifestNumber:
       button = pageManager.destinationPackageManifestNumberApplyFiltersButton;
       break;
-    case DestinationPackageFilterIdentifiers.DestinationFacilityName:
+    case TransferredPackageFilterIdentifiers.DestinationFacilityName:
       button = pageManager.destinationPackageDestinationFacilityNameApplyFiltersButton;
       break;
-    case DestinationPackageFilterIdentifiers.DestinationLicenseNumber:
+    case TransferredPackageFilterIdentifiers.DestinationLicenseNumber:
       button = pageManager.destinationPackageDestinationLicenseNumberApplyFiltersButton;
       break;
     default:

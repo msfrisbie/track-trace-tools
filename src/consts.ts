@@ -266,7 +266,7 @@ export enum PackageFilterIdentifiers {
   SourceProductionBatchNumbers = "SourceProductionBatchNumbers",
 }
 
-export enum DestinationPackageFilterIdentifiers {
+export enum TransferredPackageFilterIdentifiers {
   PackageLabel = "PackageLabel",
   SourceHarvestNames = "SourceHarvestNames",
   SourcePackageLabels = "SourcePackageLabels",
@@ -274,8 +274,8 @@ export enum DestinationPackageFilterIdentifiers {
   ItemStrainName = "ItemStrainName",
   ProductCategoryName = "ProductCategoryName",
   ManifestNumber = "ManifestNumber",
-  DestinationLicenseNumber = "DestinationLicenseNumber",
-  DestinationFacilityName = "DestinationFacilityName",
+  DestinationLicenseNumber = "RecipientFacilityLicenseNumber",
+  DestinationFacilityName = "RecipientFacilityName",
 }
 
 export enum PlantFilterIdentifiers {
@@ -566,7 +566,7 @@ export const OPTIONS_REDIRECT_KEY = "OPTIONS_REDIRECT_KEY";
 
 export enum PackageSearchFilterKeys {
   LABEL = "label",
-  SOURCE_HARVET_NAMES = "sourceHarvestNames",
+  SOURCE_HARVEST_NAMES = "sourceHarvestNames",
   SOURCE_PACKAGE_LABELS = "sourcePackageLabels",
   PRODUCTION_BATCH_NUMBER = "productionBatchNumber",
   SOURCE_PRODUCTION_BATCH_NUMBERS = "sourceProductionBatchNumbers",

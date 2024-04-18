@@ -1,8 +1,8 @@
 import {
-  DestinationPackageFilterIdentifiers,
   PackageFilterIdentifiers,
   PackageSearchFilterKeys,
   PackageState,
+  TransferredPackageFilterIdentifiers,
 } from "@/consts";
 import { IPackageSearchFilters, IPluginState } from "@/interfaces";
 import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
@@ -130,19 +130,19 @@ export const packageSearchModule = {
         packageState?: PackageState | null;
       }
     ) {
-      const defaultPackageSearchFilters = {
-        label: null,
-        sourceHarvestNames: null,
-        sourcePackageLabels: null,
-        productionBatchNumber: null,
-        sourceProductionBatchNumbers: null,
-        itemName: null,
-        itemStrainName: null,
-        itemProductCategoryName: null,
-        locationName: null,
-        manifestNumber: null,
-        destinationFacilityName: null,
-        destinationLicenseNumber: null,
+      const defaultPackageSearchFilters: { [key: string]: string | null } = {
+        [PackageSearchFilterKeys.LABEL]: null,
+        [PackageSearchFilterKeys.SOURCE_HARVEST_NAMES]: null,
+        [PackageSearchFilterKeys.SOURCE_PACKAGE_LABELS]: null,
+        [PackageSearchFilterKeys.PRODUCTION_BATCH_NUMBER]: null,
+        [PackageSearchFilterKeys.SOURCE_PRODUCTION_BATCH_NUMBERS]: null,
+        [PackageSearchFilterKeys.ITEM_NAME]: null,
+        [PackageSearchFilterKeys.ITEM_STRAIN_NAME]: null,
+        [PackageSearchFilterKeys.ITEM_PRODUCT_CATEGORY_NAME]: null,
+        [PackageSearchFilterKeys.LOCATION_NAME]: null,
+        [PackageSearchFilterKeys.MANIFEST_NUMBER]: null,
+        [PackageSearchFilterKeys.DESTINATION_FACILITY_NAME]: null,
+        [PackageSearchFilterKeys.DESTINATION_LICENSE_NUMBER]: null,
       };
 
       packageSearchFilters = {
@@ -161,48 +161,54 @@ export const packageSearchModule = {
         packageState as PackageState
       );
 
+      console.log({
+        isOwnedPackage,
+        isTransferredPackage,
+        packageSearchFilters: JSON.stringify(packageSearchFilters),
+      });
+
       if (propagate) {
         for (const [k, v] of Object.entries(packageSearchFilters)) {
           // @ts-ignore
           if (ctx.state.packageSearchFilters[k] !== v) {
             switch (k) {
-              case "label":
+              case PackageSearchFilterKeys.LABEL:
                 if (isOwnedPackage) {
                   pageManager.setPackageFilter(PackageFilterIdentifiers.Label, v);
                 } else if (isTransferredPackage) {
                   pageManager.setDestinationPackageFilter(
-                    DestinationPackageFilterIdentifiers.PackageLabel,
+                    TransferredPackageFilterIdentifiers.PackageLabel,
                     v
                   );
                 } else {
-                  console.error(`No filter applied: packageState is null`);
+                  console.error(`No filter applied: packageState is null ${k},${v}`);
                 }
                 break;
-              case "sourceHarvestNames":
+              case PackageSearchFilterKeys.SOURCE_HARVEST_NAMES:
                 if (isOwnedPackage) {
                   pageManager.setPackageFilter(PackageFilterIdentifiers.SourceHarvestNames, v);
                 } else if (isTransferredPackage) {
                   pageManager.setDestinationPackageFilter(
-                    DestinationPackageFilterIdentifiers.SourceHarvestNames,
+                    TransferredPackageFilterIdentifiers.SourceHarvestNames,
                     v
                   );
                 } else {
-                  console.error(`No filter applied: packageState is null`);
+                  console.error(`No filter applied: packageState is null ${k},${v}`);
                 }
                 break;
-              case "sourcePackageLabels":
+              case PackageSearchFilterKeys.SOURCE_PACKAGE_LABELS:
                 if (isOwnedPackage) {
                   pageManager.setPackageFilter(PackageFilterIdentifiers.SourcePackageLabels, v);
                 } else if (isTransferredPackage) {
                   pageManager.setDestinationPackageFilter(
-                    DestinationPackageFilterIdentifiers.SourcePackageLabels,
+                    TransferredPackageFilterIdentifiers.SourcePackageLabels,
                     v
                   );
                 } else {
-                  console.error(`No filter applied: packageState is null`);
+                  console.error(`No filter applied: packageState is null ${k},${v}`);
                 }
                 break;
-              case "productionBatchNumber":
+              case PackageSearchFilterKeys.PRODUCTION_BATCH_NUMBER:
                 if (isOwnedPackage) {
                   pageManager.setPackageFilter(PackageFilterIdentifiers.ProductionBatchNumber, v);
                 } else if (isTransferredPackage) {
@@ -210,10 +216,10 @@ export const packageSearchModule = {
                     `Transferred packages cannot be filtered by production batch number`
                   );
                 } else {
-                  console.error(`No filter applied: packageState is null`);
+                  console.error(`No filter applied: packageState is null ${k},${v}`);
                 }
                 break;
-              case "sourceProductionBatchNumbers":
+              case PackageSearchFilterKeys.SOURCE_PRODUCTION_BATCH_NUMBERS:
                 if (isOwnedPackage) {
                   pageManager.setPackageFilter(
                     PackageFilterIdentifiers.SourceProductionBatchNumbers,
@@ -224,7 +230,7 @@ export const packageSearchModule = {
                     `Transferred packages cannot be filtered by source production batch number`
                   );
                 } else {
-                  console.error(`No filter applied: packageState is null`);
+                  console.error(`No filter applied: packageState is null ${k},${v}`);
                 }
                 break;
               case PackageSearchFilterKeys.ITEM_NAME:
@@ -232,11 +238,11 @@ export const packageSearchModule = {
                   pageManager.setPackageFilter(PackageFilterIdentifiers.ItemName, v);
                 } else if (isTransferredPackage) {
                   pageManager.setDestinationPackageFilter(
-                    DestinationPackageFilterIdentifiers.ProductName,
+                    TransferredPackageFilterIdentifiers.ProductName,
                     v
                   );
                 } else {
-                  console.error(`No filter applied: packageState is null`);
+                  console.error(`No filter applied: packageState is null ${k},${v}`);
                 }
                 break;
               case PackageSearchFilterKeys.ITEM_STRAIN_NAME:
@@ -244,11 +250,11 @@ export const packageSearchModule = {
                   pageManager.setPackageFilter(PackageFilterIdentifiers.ItemStrainName, v);
                 } else if (isTransferredPackage) {
                   pageManager.setDestinationPackageFilter(
-                    DestinationPackageFilterIdentifiers.ItemStrainName,
+                    TransferredPackageFilterIdentifiers.ItemStrainName,
                     v
                   );
                 } else {
-                  console.error(`No filter applied: packageState is null`);
+                  console.error(`No filter applied: packageState is null ${k},${v}`);
                 }
                 break;
               case PackageSearchFilterKeys.ITEM_PRODUCT_CATEGORY_NAME:
@@ -256,11 +262,11 @@ export const packageSearchModule = {
                   pageManager.setPackageFilter(PackageFilterIdentifiers.ItemProductCategoryName, v);
                 } else if (isTransferredPackage) {
                   pageManager.setDestinationPackageFilter(
-                    DestinationPackageFilterIdentifiers.ProductCategoryName,
+                    TransferredPackageFilterIdentifiers.ProductCategoryName,
                     v
                   );
                 } else {
-                  console.error(`No filter applied: packageState is null`);
+                  console.error(`No filter applied: packageState is null ${k},${v}`);
                 }
                 break;
               case PackageSearchFilterKeys.LOCATION_NAME:
@@ -269,7 +275,7 @@ export const packageSearchModule = {
                 } else if (isTransferredPackage) {
                   console.error(`Transferred packages cannot be filtered by location name`);
                 } else {
-                  console.error(`No filter applied: packageState is null`);
+                  console.error(`No filter applied: packageState is null ${k},${v}`);
                 }
                 break;
               case PackageSearchFilterKeys.MANIFEST_NUMBER:
@@ -277,11 +283,11 @@ export const packageSearchModule = {
                   console.error(`Owned packages cannot be filtered by manifest number`);
                 } else if (isTransferredPackage) {
                   pageManager.setDestinationPackageFilter(
-                    DestinationPackageFilterIdentifiers.ManifestNumber,
+                    TransferredPackageFilterIdentifiers.ManifestNumber,
                     v
                   );
                 } else {
-                  console.error(`No filter applied: packageState is null`);
+                  console.error(`No filter applied: packageState is null ${k},${v}`);
                 }
                 break;
               case PackageSearchFilterKeys.DESTINATION_FACILITY_NAME:
@@ -289,11 +295,11 @@ export const packageSearchModule = {
                   console.error(`Owned packages cannot be filtered by destination facility name`);
                 } else if (isTransferredPackage) {
                   pageManager.setDestinationPackageFilter(
-                    DestinationPackageFilterIdentifiers.DestinationFacilityName,
+                    TransferredPackageFilterIdentifiers.DestinationFacilityName,
                     v
                   );
                 } else {
-                  console.error(`No filter applied: packageState is null`);
+                  console.error(`No filter applied: packageState is null ${k},${v}`);
                 }
                 break;
               case PackageSearchFilterKeys.DESTINATION_LICENSE_NUMBER:
@@ -301,11 +307,11 @@ export const packageSearchModule = {
                   console.error(`Owned packages cannot be filtered by destination facility name`);
                 } else if (isTransferredPackage) {
                   pageManager.setDestinationPackageFilter(
-                    DestinationPackageFilterIdentifiers.DestinationLicenseNumber,
+                    TransferredPackageFilterIdentifiers.DestinationLicenseNumber,
                     v
                   );
                 } else {
-                  console.error(`No filter applied: packageState is null`);
+                  console.error(`No filter applied: packageState is null ${k},${v}`);
                 }
                 break;
               default:

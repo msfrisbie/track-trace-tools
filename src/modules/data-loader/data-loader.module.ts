@@ -29,6 +29,7 @@ import {
   IIndexedPlantData,
   IIndexedTagData,
   IIndexedTransferData,
+  IIndexedTransferredPackageData,
   IItemData,
   ILocationData,
   IMetrcEmployeeData,
@@ -57,6 +58,7 @@ import {
   ITransferFilter,
   ITransferHistoryData,
   ITransferTransporterDetails,
+  ITransferredPackageData,
   ITransporterData,
 } from "@/interfaces";
 import { authManager } from "@/modules/auth-manager.module";
@@ -119,7 +121,7 @@ export class DataLoader implements IAtomicService {
   // private _inactivePackages: Promise<IIndexedPackageData[]> | null = null;
   private _inTransitPackages: Promise<IIndexedPackageData[]> | null = null;
 
-  private _transferredPackages: Promise<IIndexedDestinationPackageData[]> | null = null;
+  private _transferredPackages: Promise<IIndexedTransferredPackageData[]> | null = null;
 
   private _previousTagOrders: Promise<ITagOrderData[]> | null = null;
 
@@ -1329,12 +1331,12 @@ export class DataLoader implements IAtomicService {
     queryString,
   }: {
     queryString: string;
-  }): Promise<IIndexedDestinationPackageData[]> {
+  }): Promise<IIndexedTransferredPackageData[]> {
     if (store.state.mockDataMode && store.state.flags?.mockedFlags.mockPackages.enabled) {
       return [];
     }
 
-    let packages: IIndexedDestinationPackageData[] = [];
+    let packages: IIndexedTransferredPackageData[] = [];
 
     const body = this.onDemandDestinationPackageSearchBody({ queryString });
 
@@ -1343,10 +1345,10 @@ export class DataLoader implements IAtomicService {
     );
 
     if (transferredPackagesResponse.status === 200) {
-      const responseData: ICollectionResponse<IDestinationPackageData> =
+      const responseData: ICollectionResponse<ITransferredPackageData> =
         await transferredPackagesResponse.data;
 
-      const transferredPackages: IIndexedDestinationPackageData[] = responseData.Data.map((x) => ({
+      const transferredPackages: IIndexedTransferredPackageData[] = responseData.Data.map((x) => ({
         ...x,
         PackageState: PackageState.TRANSFERRED,
         TagMatcher: "",
@@ -1716,7 +1718,7 @@ export class DataLoader implements IAtomicService {
 
   async transferredPackages(
     resetCache: boolean = false
-  ): Promise<IIndexedDestinationPackageData[]> {
+  ): Promise<IIndexedTransferredPackageData[]> {
     if (resetCache) {
       this._transferredPackages = null;
     }
@@ -1728,7 +1730,7 @@ export class DataLoader implements IAtomicService {
         );
 
         try {
-          const transferredPackages: IIndexedDestinationPackageData[] = (
+          const transferredPackages: IIndexedTransferredPackageData[] = (
             await this.loadTransferredPackages()
           ).map((pkg) => ({
             ...pkg,
@@ -1755,7 +1757,7 @@ export class DataLoader implements IAtomicService {
   async transferredPackage(
     label: string,
     options: { useCache?: boolean } = {}
-  ): Promise<IIndexedDestinationPackageData> {
+  ): Promise<IIndexedTransferredPackageData> {
     if (options.useCache) {
       if (!this._transferredPackages) {
         await this.transferredPackages();
@@ -1776,7 +1778,7 @@ export class DataLoader implements IAtomicService {
       );
 
       try {
-        const packageData: IIndexedDestinationPackageData = {
+        const packageData: IIndexedTransferredPackageData = {
           ...(await this.loadTransferredPackage(label)),
           PackageState: PackageState.TRANSFERRED,
           TagMatcher: "",
@@ -2716,14 +2718,14 @@ export class DataLoader implements IAtomicService {
 
   transferredPackagesStream(
     options: IPackageOptions = {}
-  ): Subject<ICollectionResponse<IDestinationPackageData>> {
+  ): Subject<ICollectionResponse<ITransferredPackageData>> {
     const responseFactory = (paginationOptions: IPaginationOptions): Promise<AxiosResponse> => {
       const body = buildBody(paginationOptions);
 
       return this.metrcRequestManagerOrError.getTransferredPackages(body);
     };
 
-    return streamFactory<IDestinationPackageData>(options, responseFactory);
+    return streamFactory<ITransferredPackageData>(options, responseFactory);
   }
 
   vegetativePlantsStream(options: IPlantOptions): Subject<ICollectionResponse<IPlantData>> {
@@ -3496,7 +3498,7 @@ export class DataLoader implements IAtomicService {
     return responseData.Data[0];
   }
 
-  private async loadTransferredPackage(label: string): Promise<IDestinationPackageData> {
+  private async loadTransferredPackage(label: string): Promise<ITransferredPackageData> {
     await authManager.authStateOrError();
 
     const page = 0;
@@ -3513,7 +3515,7 @@ export class DataLoader implements IAtomicService {
       throw new Error("Request failed");
     }
 
-    const responseData: ICollectionResponse<IDestinationPackageData> = await response.data;
+    const responseData: ICollectionResponse<ITransferredPackageData> = await response.data;
 
     if (responseData.Data.length !== 1) {
       if (responseData.Data.length === 0) {
@@ -3561,15 +3563,15 @@ export class DataLoader implements IAtomicService {
     return inTransitPackages;
   }
 
-  private async loadTransferredPackages(): Promise<IDestinationPackageData[]> {
+  private async loadTransferredPackages(): Promise<ITransferredPackageData[]> {
     await authManager.authStateOrError();
 
     console.log("Loading transferred packages...");
 
-    let transferredPackages: IDestinationPackageData[] = [];
+    let transferredPackages: ITransferredPackageData[] = [];
 
     await this.transferredPackagesStream().forEach(
-      (next: ICollectionResponse<IDestinationPackageData>) => {
+      (next: ICollectionResponse<ITransferredPackageData>) => {
         transferredPackages = [...transferredPackages, ...next.Data];
       }
     );

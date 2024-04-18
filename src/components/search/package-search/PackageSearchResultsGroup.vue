@@ -23,7 +23,7 @@
       </b-button>
     </div>
 
-    <package-search-result-preview v-for="(pkg, index) in visiblePackages" :key="pkg.Id" :pkg="pkg"
+    <package-search-result-preview v-for="(pkg, index) in visiblePackages" :key="getIdOrError(pkg)" :pkg="pkg"
       :sectionName="sectionName" :selected="!!packageSearchState.selectedPackageMetadata &&
     pkg.Id === packageSearchState.selectedPackageMetadata.packageData.Id &&
     sectionName === packageSearchState.selectedPackageMetadata.sectionName
@@ -39,12 +39,13 @@
 
 <script lang="ts">
 import PackageSearchResultPreview from '@/components/search/package-search/PackageSearchResultPreview.vue';
-import { IIndexedPackageData, IPluginState } from '@/interfaces';
+import { IUnionIndexedPackageData, IPluginState } from '@/interfaces';
 import { PACKAGE_TAB_REGEX } from '@/modules/page-manager/consts';
 import store from '@/store/page-overlay/index';
 import { PackageSearchActions } from '@/store/page-overlay/modules/package-search/consts';
 import { ISelectedPackageMetadata } from '@/store/page-overlay/modules/package-search/interfaces';
 import { SearchActions } from '@/store/page-overlay/modules/search/consts';
+import { getIdOrError } from '@/utils/package';
 import Vue from 'vue';
 import { Store, mapActions, mapState } from 'vuex';
 
@@ -65,7 +66,7 @@ export default Vue.extend({
   },
   props: {
     sectionName: String,
-    packages: Array as () => IIndexedPackageData[],
+    packages: Array as () => IUnionIndexedPackageData[],
     packageFilterIdentifier: String,
     sectionPriority: Number,
     expanded: Boolean,
@@ -114,7 +115,7 @@ export default Vue.extend({
     isOnPackagesPage(): boolean {
       return !!window.location.pathname.match(PACKAGE_TAB_REGEX);
     },
-    visiblePackages(): IIndexedPackageData[] {
+    visiblePackages(): IUnionIndexedPackageData[] {
       return this.expanded || this.$data.showAll
         ? this.packages
         : this.packages.slice(0, this.previewLength);
@@ -147,10 +148,11 @@ export default Vue.extend({
     }),
   },
   methods: {
+    getIdOrError,
     ...mapActions({
       setShowSearchResults: `search/${SearchActions.SET_SHOW_SEARCH_RESULTS}`,
     }),
-    showPackageDetail(packageData: IIndexedPackageData) {
+    showPackageDetail(packageData: IUnionIndexedPackageData) {
       store.state.packageSearch.selectedPackageMetadata = {
         packageData,
         sectionName: this.sectionName,
