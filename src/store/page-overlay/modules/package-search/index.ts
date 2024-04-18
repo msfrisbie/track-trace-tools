@@ -150,22 +150,17 @@ export const packageSearchModule = {
         ...packageSearchFilters,
       };
 
-      const isOwnedPackage: boolean = [
+      const applyOwnedPackageFilters: boolean = [
         PackageState.ACTIVE,
         PackageState.ON_HOLD,
         PackageState.INACTIVE,
         PackageState.IN_TRANSIT,
-      ].includes(packageState as PackageState);
+        null,
+      ].includes(packageState);
 
-      const isTransferredPackage: boolean = [PackageState.TRANSFERRED].includes(
-        packageState as PackageState
+      const applyTransferredPackageFilters: boolean = [PackageState.TRANSFERRED, null].includes(
+        packageState
       );
-
-      console.log({
-        isOwnedPackage,
-        isTransferredPackage,
-        packageSearchFilters: JSON.stringify(packageSearchFilters),
-      });
 
       if (propagate) {
         for (const [k, v] of Object.entries(packageSearchFilters)) {
@@ -173,9 +168,10 @@ export const packageSearchModule = {
           if (ctx.state.packageSearchFilters[k] !== v) {
             switch (k) {
               case PackageSearchFilterKeys.LABEL:
-                if (isOwnedPackage) {
+                if (applyOwnedPackageFilters) {
                   pageManager.setPackageFilter(PackageFilterIdentifiers.Label, v);
-                } else if (isTransferredPackage) {
+                }
+                if (applyTransferredPackageFilters) {
                   pageManager.setDestinationPackageFilter(
                     TransferredPackageFilterIdentifiers.PackageLabel,
                     v
@@ -185,9 +181,10 @@ export const packageSearchModule = {
                 }
                 break;
               case PackageSearchFilterKeys.SOURCE_HARVEST_NAMES:
-                if (isOwnedPackage) {
+                if (applyOwnedPackageFilters) {
                   pageManager.setPackageFilter(PackageFilterIdentifiers.SourceHarvestNames, v);
-                } else if (isTransferredPackage) {
+                }
+                if (applyTransferredPackageFilters) {
                   pageManager.setDestinationPackageFilter(
                     TransferredPackageFilterIdentifiers.SourceHarvestNames,
                     v
@@ -197,9 +194,10 @@ export const packageSearchModule = {
                 }
                 break;
               case PackageSearchFilterKeys.SOURCE_PACKAGE_LABELS:
-                if (isOwnedPackage) {
+                if (applyOwnedPackageFilters) {
                   pageManager.setPackageFilter(PackageFilterIdentifiers.SourcePackageLabels, v);
-                } else if (isTransferredPackage) {
+                }
+                if (applyTransferredPackageFilters) {
                   pageManager.setDestinationPackageFilter(
                     TransferredPackageFilterIdentifiers.SourcePackageLabels,
                     v
@@ -209,9 +207,10 @@ export const packageSearchModule = {
                 }
                 break;
               case PackageSearchFilterKeys.PRODUCTION_BATCH_NUMBER:
-                if (isOwnedPackage) {
+                if (applyOwnedPackageFilters) {
                   pageManager.setPackageFilter(PackageFilterIdentifiers.ProductionBatchNumber, v);
-                } else if (isTransferredPackage) {
+                }
+                if (applyTransferredPackageFilters) {
                   console.error(
                     `Transferred packages cannot be filtered by production batch number`
                   );
@@ -220,12 +219,13 @@ export const packageSearchModule = {
                 }
                 break;
               case PackageSearchFilterKeys.SOURCE_PRODUCTION_BATCH_NUMBERS:
-                if (isOwnedPackage) {
+                if (applyOwnedPackageFilters) {
                   pageManager.setPackageFilter(
                     PackageFilterIdentifiers.SourceProductionBatchNumbers,
                     v
                   );
-                } else if (isTransferredPackage) {
+                }
+                if (applyTransferredPackageFilters) {
                   console.error(
                     `Transferred packages cannot be filtered by source production batch number`
                   );
@@ -234,9 +234,10 @@ export const packageSearchModule = {
                 }
                 break;
               case PackageSearchFilterKeys.ITEM_NAME:
-                if (isOwnedPackage) {
+                if (applyOwnedPackageFilters) {
                   pageManager.setPackageFilter(PackageFilterIdentifiers.ItemName, v);
-                } else if (isTransferredPackage) {
+                }
+                if (applyTransferredPackageFilters) {
                   pageManager.setDestinationPackageFilter(
                     TransferredPackageFilterIdentifiers.ProductName,
                     v
@@ -246,9 +247,10 @@ export const packageSearchModule = {
                 }
                 break;
               case PackageSearchFilterKeys.ITEM_STRAIN_NAME:
-                if (isOwnedPackage) {
+                if (applyOwnedPackageFilters) {
                   pageManager.setPackageFilter(PackageFilterIdentifiers.ItemStrainName, v);
-                } else if (isTransferredPackage) {
+                }
+                if (applyTransferredPackageFilters) {
                   pageManager.setDestinationPackageFilter(
                     TransferredPackageFilterIdentifiers.ItemStrainName,
                     v
@@ -258,9 +260,10 @@ export const packageSearchModule = {
                 }
                 break;
               case PackageSearchFilterKeys.ITEM_PRODUCT_CATEGORY_NAME:
-                if (isOwnedPackage) {
+                if (applyOwnedPackageFilters) {
                   pageManager.setPackageFilter(PackageFilterIdentifiers.ItemProductCategoryName, v);
-                } else if (isTransferredPackage) {
+                }
+                if (applyTransferredPackageFilters) {
                   pageManager.setDestinationPackageFilter(
                     TransferredPackageFilterIdentifiers.ProductCategoryName,
                     v
@@ -270,18 +273,20 @@ export const packageSearchModule = {
                 }
                 break;
               case PackageSearchFilterKeys.LOCATION_NAME:
-                if (isOwnedPackage) {
+                if (applyOwnedPackageFilters) {
                   pageManager.setPackageFilter(PackageFilterIdentifiers.LocationName, v);
-                } else if (isTransferredPackage) {
+                }
+                if (applyTransferredPackageFilters) {
                   console.error(`Transferred packages cannot be filtered by location name`);
                 } else {
                   console.error(`No filter applied: packageState is null ${k},${v}`);
                 }
                 break;
               case PackageSearchFilterKeys.MANIFEST_NUMBER:
-                if (isOwnedPackage) {
+                if (applyOwnedPackageFilters) {
                   console.error(`Owned packages cannot be filtered by manifest number`);
-                } else if (isTransferredPackage) {
+                }
+                if (applyTransferredPackageFilters) {
                   pageManager.setDestinationPackageFilter(
                     TransferredPackageFilterIdentifiers.ManifestNumber,
                     v
@@ -291,9 +296,10 @@ export const packageSearchModule = {
                 }
                 break;
               case PackageSearchFilterKeys.DESTINATION_FACILITY_NAME:
-                if (isOwnedPackage) {
+                if (applyOwnedPackageFilters) {
                   console.error(`Owned packages cannot be filtered by destination facility name`);
-                } else if (isTransferredPackage) {
+                }
+                if (applyTransferredPackageFilters) {
                   pageManager.setDestinationPackageFilter(
                     TransferredPackageFilterIdentifiers.DestinationFacilityName,
                     v
@@ -303,9 +309,10 @@ export const packageSearchModule = {
                 }
                 break;
               case PackageSearchFilterKeys.DESTINATION_LICENSE_NUMBER:
-                if (isOwnedPackage) {
+                if (applyOwnedPackageFilters) {
                   console.error(`Owned packages cannot be filtered by destination facility name`);
-                } else if (isTransferredPackage) {
+                }
+                if (applyTransferredPackageFilters) {
                   pageManager.setDestinationPackageFilter(
                     TransferredPackageFilterIdentifiers.DestinationLicenseNumber,
                     v

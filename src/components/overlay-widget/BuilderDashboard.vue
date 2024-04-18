@@ -662,6 +662,9 @@ export default Vue.extend({
     intransitPackagesUrl(): string {
       return this.tabKeyUrl("packages", ActiveTabId.PACKAGES_INTRANSIT);
     },
+    transferredPackagesUrl(): string {
+      return this.tabKeyUrl("packages", ActiveTabId.PACKAGES_TRANSFERRED);
+    },
     incomingTransfersUrl(): string {
       return this.tabKeyUrl("transfers/licensed", ActiveTabId.TRANSFERS_INCOMING);
     },

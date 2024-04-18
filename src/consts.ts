@@ -473,6 +473,7 @@ export enum ActiveTabId {
   PACKAGES_ONHOLD = "packages_onhold",
   PACKAGES_INACTIVE = "packages_inactive",
   PACKAGES_INTRANSIT = "packages_intransit",
+  PACKAGES_TRANSFERRED = "packages_transferred",
   TRANSFERS_INCOMING = "transfers_incoming",
   TRANSFERS_OUTGOING = "transfers_outgoing",
   TRANSFERS_REJECTED = "transfers_rejected",
@@ -493,6 +494,7 @@ export enum PackageTabLabel {
   ON_HOLD = "On Hold",
   INACTIVE = "Inactive",
   IN_TRANSIT = "In Transit",
+  TRANSFERRED = "Transferred",
 }
 
 export enum SalesTabLabel {

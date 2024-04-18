@@ -183,6 +183,9 @@ export async function managePackageTabsImpl() {
     case ActiveTabId.PACKAGES_INTRANSIT:
       await pageManager.clickTabStartingWith(pageManager.packageTabs, PackageTabLabel.IN_TRANSIT);
       return;
+    case ActiveTabId.PACKAGES_TRANSFERRED:
+      await pageManager.clickTabStartingWith(pageManager.packageTabs, PackageTabLabel.TRANSFERRED);
+      return;
   }
 
   if (store.state.settings?.autoOpenActivePackages) {
