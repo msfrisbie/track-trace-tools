@@ -1,4 +1,4 @@
-import { METRC_TAG_REGEX } from '@/consts';
+import { METRC_TAG_REGEX, PackageState } from '@/consts';
 import '@/test/utils/auto-mock-chrome';
 import '@/test/utils/auto-mock-fetch';
 import {
@@ -8,6 +8,7 @@ import {
 describe('package.ts', () => {
   it('Extracts UnionPackage values correctly', () => {
     const pkg = {
+      PackageState: PackageState.ACTIVE,
       Id: 3,
       Label: 'foo',
       Quantity: 9,
@@ -24,6 +25,7 @@ describe('package.ts', () => {
     } as any;
 
     const transferPkg = {
+      PackageState: PackageState.TRANSFERRED,
       PackageId: 5,
       PackageLabel: 'bar',
       ShippedQuantity: 12,
