@@ -135,6 +135,43 @@ export async function acquirePackageFilterElementsImpl() {
     }
   }
 
+  console.log([
+    pageManager.packageLabelFilterInput,
+    pageManager.packageLabelFilterSelect,
+    pageManager.packageLabelApplyFiltersButton,
+    pageManager.packageSourceHarvestNameFilterInput,
+    pageManager.packageSourceHarvestNameApplyFiltersButton,
+    pageManager.packageSourcePackageLabelFilterInput,
+    pageManager.packageSourcePackageLabelApplyFiltersButton,
+    pageManager.packageItemNameFilterInput,
+    pageManager.packageItemNameApplyFiltersButton,
+    pageManager.packageItemStrainNameFilterInput,
+    pageManager.packageItemStrainNameApplyFiltersButton,
+    pageManager.packageItemProductCategoryNameFilterInput,
+    pageManager.packageItemProductCategoryNameApplyFiltersButton,
+    pageManager.packageLocationNameFilterInput,
+    pageManager.packageLocationNameApplyFiltersButton,
+    pageManager.destinationPackageLabelFilterInput,
+    pageManager.destinationPackageLabelFilterSelect,
+    pageManager.destinationPackageLabelApplyFiltersButton,
+    pageManager.destinationPackageSourceHarvestNameFilterInput,
+    pageManager.destinationPackageSourceHarvestNameApplyFiltersButton,
+    pageManager.destinationPackageSourcePackageLabelFilterInput,
+    pageManager.destinationPackageSourcePackageLabelApplyFiltersButton,
+    pageManager.destinationPackageProductNameFilterInput,
+    pageManager.destinationPackageProductNameApplyFiltersButton,
+    pageManager.destinationPackageItemStrainNameFilterInput,
+    pageManager.destinationPackageItemStrainNameApplyFiltersButton,
+    pageManager.destinationPackageItemProductCategoryNameFilterInput,
+    pageManager.destinationPackageItemProductCategoryNameApplyFiltersButton,
+    pageManager.destinationPackageManifestNumberFilterInput,
+    pageManager.destinationPackageManifestNumberApplyFiltersButton,
+    pageManager.destinationPackageDestinationLicenseNumberFilterInput,
+    pageManager.destinationPackageDestinationLicenseNumberApplyFiltersButton,
+    pageManager.destinationPackageDestinationFacilityNameFilterInput,
+    pageManager.destinationPackageDestinationFacilityNameApplyFiltersButton,
+  ]);
+
   // This is important, as otherwise click() calls will kill page usability
   if (
     atLeastOneIsTruthy(

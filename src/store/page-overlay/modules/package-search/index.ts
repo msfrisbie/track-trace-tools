@@ -176,8 +176,6 @@ export const packageSearchModule = {
                     TransferredPackageFilterIdentifiers.PackageLabel,
                     v
                   );
-                } else {
-                  console.error(`No filter applied: packageState is null ${k},${v}`);
                 }
                 break;
               case PackageSearchFilterKeys.SOURCE_HARVEST_NAMES:
@@ -189,8 +187,6 @@ export const packageSearchModule = {
                     TransferredPackageFilterIdentifiers.SourceHarvestNames,
                     v
                   );
-                } else {
-                  console.error(`No filter applied: packageState is null ${k},${v}`);
                 }
                 break;
               case PackageSearchFilterKeys.SOURCE_PACKAGE_LABELS:
@@ -202,8 +198,6 @@ export const packageSearchModule = {
                     TransferredPackageFilterIdentifiers.SourcePackageLabels,
                     v
                   );
-                } else {
-                  console.error(`No filter applied: packageState is null ${k},${v}`);
                 }
                 break;
               case PackageSearchFilterKeys.PRODUCTION_BATCH_NUMBER:
@@ -214,8 +208,6 @@ export const packageSearchModule = {
                   console.error(
                     `Transferred packages cannot be filtered by production batch number`
                   );
-                } else {
-                  console.error(`No filter applied: packageState is null ${k},${v}`);
                 }
                 break;
               case PackageSearchFilterKeys.SOURCE_PRODUCTION_BATCH_NUMBERS:
@@ -229,8 +221,6 @@ export const packageSearchModule = {
                   console.error(
                     `Transferred packages cannot be filtered by source production batch number`
                   );
-                } else {
-                  console.error(`No filter applied: packageState is null ${k},${v}`);
                 }
                 break;
               case PackageSearchFilterKeys.ITEM_NAME:
@@ -242,8 +232,6 @@ export const packageSearchModule = {
                     TransferredPackageFilterIdentifiers.ProductName,
                     v
                   );
-                } else {
-                  console.error(`No filter applied: packageState is null ${k},${v}`);
                 }
                 break;
               case PackageSearchFilterKeys.ITEM_STRAIN_NAME:
@@ -255,8 +243,6 @@ export const packageSearchModule = {
                     TransferredPackageFilterIdentifiers.ItemStrainName,
                     v
                   );
-                } else {
-                  console.error(`No filter applied: packageState is null ${k},${v}`);
                 }
                 break;
               case PackageSearchFilterKeys.ITEM_PRODUCT_CATEGORY_NAME:
@@ -268,8 +254,6 @@ export const packageSearchModule = {
                     TransferredPackageFilterIdentifiers.ProductCategoryName,
                     v
                   );
-                } else {
-                  console.error(`No filter applied: packageState is null ${k},${v}`);
                 }
                 break;
               case PackageSearchFilterKeys.LOCATION_NAME:
@@ -278,8 +262,6 @@ export const packageSearchModule = {
                 }
                 if (applyTransferredPackageFilters) {
                   console.error(`Transferred packages cannot be filtered by location name`);
-                } else {
-                  console.error(`No filter applied: packageState is null ${k},${v}`);
                 }
                 break;
               case PackageSearchFilterKeys.MANIFEST_NUMBER:
@@ -291,8 +273,6 @@ export const packageSearchModule = {
                     TransferredPackageFilterIdentifiers.ManifestNumber,
                     v
                   );
-                } else {
-                  console.error(`No filter applied: packageState is null ${k},${v}`);
                 }
                 break;
               case PackageSearchFilterKeys.DESTINATION_FACILITY_NAME:
@@ -304,8 +284,6 @@ export const packageSearchModule = {
                     TransferredPackageFilterIdentifiers.DestinationFacilityName,
                     v
                   );
-                } else {
-                  console.error(`No filter applied: packageState is null ${k},${v}`);
                 }
                 break;
               case PackageSearchFilterKeys.DESTINATION_LICENSE_NUMBER:
@@ -317,8 +295,6 @@ export const packageSearchModule = {
                     TransferredPackageFilterIdentifiers.DestinationLicenseNumber,
                     v
                   );
-                } else {
-                  console.error(`No filter applied: packageState is null ${k},${v}`);
                 }
                 break;
               default:
