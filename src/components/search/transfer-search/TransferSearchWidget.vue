@@ -89,7 +89,6 @@ export default Vue.extend({
     ...mapActions({
       setShowSearchResults: `search/${SearchActions.SET_SHOW_SEARCH_RESULTS}`,
       setQueryString: `search/${SearchActions.SET_QUERY_STRING}`,
-      setExpandSearchOnNextLoad: `search/${SearchActions.SET_EXPAND_SEARCH_ON_NEXT_LOAD}`,
     }),
     search(queryString: string) {
       this.setShowSearchResults({ showSearchResults: true });

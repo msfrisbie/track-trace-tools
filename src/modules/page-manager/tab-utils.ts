@@ -1,10 +1,4 @@
-import {
-  ActiveTabId,
-  PackageTabLabel,
-  PlantsTabLabel,
-  TagsTabLabel,
-  TransfersTabLabel,
-} from "@/consts";
+import { MetrcGridId } from "@/consts";
 import store from "@/store/page-overlay/index";
 import { readHashValueOrNull } from "@/utils/url";
 import { pageManager } from "./page-manager.module";
@@ -86,69 +80,14 @@ export async function managePlantTabsImpl() {
     return;
   }
 
-  const activeTabId = readHashValueOrNull("activeTabId");
+  const metrcGridId: MetrcGridId | null = readHashValueOrNull("metrcGridId") as MetrcGridId | null;
 
-  switch (activeTabId) {
-    case ActiveTabId.PLANTS_PLANTBATCHES_ACTIVE:
-      await pageManager.clickTabStartingWith(pageManager.plantsTabs, PlantsTabLabel.IMMATURE);
-      return;
-    case ActiveTabId.PLANTS_PLANTBATCHES_INACTIVE:
-      await pageManager.clickTabStartingWith(
-        pageManager.plantsTabs,
-        PlantsTabLabel.INACTIVE,
-        PlantsTabLabel.IMMATURE
-      );
-      return;
-    case ActiveTabId.PlANTS_PLANTS_VEGETATIVE:
-      await pageManager.clickTabStartingWith(pageManager.plantsTabs, PlantsTabLabel.VEGETATIVE);
-      return;
-    case ActiveTabId.PlANTS_PLANTS_FLOWERING:
-      await pageManager.clickTabStartingWith(pageManager.plantsTabs, PlantsTabLabel.FLOWERING);
-      return;
-    case ActiveTabId.PlANTS_PLANTS_ONHOLD:
-      await pageManager.clickTabStartingWith(
-        pageManager.plantsTabs,
-        PlantsTabLabel.ON_HOLD,
-        PlantsTabLabel.FLOWERING
-      );
-      return;
-    case ActiveTabId.PlANTS_PLANTS_INACTIVE:
-      await pageManager.clickTabStartingWith(
-        pageManager.plantsTabs,
-        PlantsTabLabel.INACTIVE,
-        PlantsTabLabel.FLOWERING
-      );
-      return;
-    case ActiveTabId.PlANTS_PLANTS_ADDITIVE:
-      await pageManager.clickTabStartingWith(pageManager.plantsTabs, PlantsTabLabel.ADDITIVE);
-      return;
-    case ActiveTabId.PlANTS_PLANTS_WASTE:
-      await pageManager.clickTabStartingWith(pageManager.plantsTabs, PlantsTabLabel.WASTE);
-      return;
-    case ActiveTabId.PlANTS_HARVESTED_ACTIVE:
-      await pageManager.clickTabStartingWith(pageManager.plantsTabs, PlantsTabLabel.HARVESTED);
-      return;
-    case ActiveTabId.PlANTS_HARVESTED_ONHOLD:
-      await pageManager.clickTabStartingWith(
-        pageManager.plantsTabs,
-        PlantsTabLabel.ON_HOLD,
-        PlantsTabLabel.HARVESTED
-      );
-      return;
-    case ActiveTabId.PlANTS_HARVESTED_INACTIVE:
-      await pageManager.clickTabStartingWith(
-        pageManager.plantsTabs,
-        PlantsTabLabel.INACTIVE,
-        PlantsTabLabel.HARVESTED
-      );
-      return;
+  if (metrcGridId) {
+    await pageManager.clickTabWithGridId(metrcGridId);
   }
 
   if (store.state.settings?.autoOpenFloweringPlants) {
-    await pageManager.clickTabStartingWith(
-      pageManager.plantsTabs,
-      store.state.settings?.autoOpenPlantsTab
-    );
+    await pageManager.clickTabWithGridId(MetrcGridId.PLANTS_FLOWERING);
   }
 }
 
@@ -168,31 +107,14 @@ export async function managePackageTabsImpl() {
     return;
   }
 
-  const activeTabId = readHashValueOrNull("activeTabId");
+  const metrcGridId: MetrcGridId | null = readHashValueOrNull("metrcGridId") as MetrcGridId | null;
 
-  switch (activeTabId) {
-    case ActiveTabId.PACKAGES_ACTIVE:
-      await pageManager.clickTabStartingWith(pageManager.packageTabs, PackageTabLabel.ACTIVE);
-      return;
-    case ActiveTabId.PACKAGES_ONHOLD:
-      await pageManager.clickTabStartingWith(pageManager.packageTabs, PackageTabLabel.ON_HOLD);
-      return;
-    case ActiveTabId.PACKAGES_INACTIVE:
-      await pageManager.clickTabStartingWith(pageManager.packageTabs, PackageTabLabel.INACTIVE);
-      return;
-    case ActiveTabId.PACKAGES_INTRANSIT:
-      await pageManager.clickTabStartingWith(pageManager.packageTabs, PackageTabLabel.IN_TRANSIT);
-      return;
-    case ActiveTabId.PACKAGES_TRANSFERRED:
-      await pageManager.clickTabStartingWith(pageManager.packageTabs, PackageTabLabel.TRANSFERRED);
-      return;
+  if (metrcGridId) {
+    await pageManager.clickTabWithGridId(metrcGridId);
   }
 
   if (store.state.settings?.autoOpenActivePackages) {
-    await pageManager.clickTabStartingWith(
-      pageManager.packageTabs,
-      store.state.settings?.autoOpenPackageTab
-    );
+    await pageManager.clickTabWithGridId(MetrcGridId.PACKAGES_ACTIVE);
   }
 }
 
@@ -212,25 +134,14 @@ export async function manageTransfersTabsImpl() {
     return;
   }
 
-  const activeTabId = readHashValueOrNull("activeTabId");
+  const metrcGridId: MetrcGridId | null = readHashValueOrNull("metrcGridId") as MetrcGridId | null;
 
-  switch (activeTabId) {
-    case ActiveTabId.TRANSFERS_INCOMING:
-      await pageManager.clickTabStartingWith(pageManager.transferTabs, TransfersTabLabel.INCOMING);
-      return;
-    case ActiveTabId.TRANSFERS_OUTGOING:
-      await pageManager.clickTabStartingWith(pageManager.transferTabs, TransfersTabLabel.OUTGOING);
-      return;
-    case ActiveTabId.TRANSFERS_REJECTED:
-      await pageManager.clickTabStartingWith(pageManager.transferTabs, TransfersTabLabel.REJECTED);
-      return;
+  if (metrcGridId) {
+    await pageManager.clickTabWithGridId(metrcGridId);
   }
 
   if (store.state.settings?.autoOpenIncomingTransfers) {
-    await pageManager.clickTabStartingWith(
-      pageManager.transferTabs,
-      store.state.settings?.autoOpenTransfersTab
-    );
+    await pageManager.clickTabWithGridId(MetrcGridId.TRANSFERS_INCOMING);
   }
 }
 
@@ -240,10 +151,7 @@ export async function manageSalesTabsImpl() {
   }
 
   if (store.state.settings?.autoOpenActiveSales) {
-    await pageManager.clickTabStartingWith(
-      pageManager.salesTabs,
-      store.state.settings?.autoOpenSalesTab
-    );
+    await pageManager.clickTabWithGridId(MetrcGridId.SALES_ACTIVE);
   }
 }
 
@@ -263,24 +171,13 @@ export async function manageTagsTabsImpl() {
     return;
   }
 
-  const activeTabId = readHashValueOrNull("activeTabId");
+  const metrcGridId = readHashValueOrNull("metrcGridId") as MetrcGridId | null;
 
-  switch (activeTabId) {
-    case ActiveTabId.TAGS_AVAILABLE:
-      await pageManager.clickTabStartingWith(pageManager.tagTabs, TagsTabLabel.AVAILABLE);
-      return;
-    case ActiveTabId.TAGS_USED:
-      await pageManager.clickTabStartingWith(pageManager.tagTabs, TagsTabLabel.USED);
-      return;
-    case ActiveTabId.TAGS_VOIDED:
-      await pageManager.clickTabStartingWith(pageManager.tagTabs, TagsTabLabel.VOIDED);
-      return;
+  if (metrcGridId) {
+    await pageManager.clickTabWithGridId(metrcGridId);
   }
 
   if (store.state.settings?.autoOpenAvailableTags) {
-    await pageManager.clickTabStartingWith(
-      pageManager.tagTabs,
-      store.state.settings?.autoOpenTagsTab
-    );
+    await pageManager.clickTabWithGridId(MetrcGridId.TAGS_AVAILABLE);
   }
 }

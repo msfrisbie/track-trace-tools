@@ -1,7 +1,7 @@
 import {
   MessageType,
+  MetrcGridId,
   PackageFilterIdentifiers,
-  PackageSearchFilterKeys,
   PlantFilterIdentifiers,
   TagFilterIdentifiers,
   TransferFilterIdentifiers,
@@ -12,708 +12,76 @@ import { PackageSearchActions } from "@/store/page-overlay/modules/package-searc
 import { PlantSearchActions } from "@/store/page-overlay/modules/plant-search/consts";
 import { analyticsManager } from "../analytics-manager.module";
 import { pageManager } from "./page-manager.module";
-import { atLeastOneIsTruthy } from "./utils";
 
-export async function acquirePlantFilterElementsImpl() {
-  if (!pageManager.plantClearFiltersButton) {
-    const btn = document.querySelector(".k-state-active span.icon-filter") as HTMLElement;
+const T3_SEARCH_MENU_ATTRIBUTE = `t3-search-menu`;
+const T3_GRID_ID_ATTRIBUTE = `t3-grid-id`;
+const T3_SEARCH_FIELD_ATTRIBUTE = `t3-search-field`;
 
-    if (btn) {
-      btn.click();
-      // @ts-ignore
-      pageManager.plantClearFiltersButton = btn.parentElement?.parentElement?.querySelector("a");
-      btn.click();
-    }
-  }
-
-  // This is important, as otherwise click() calls will kill page usability
-  if (
-    atLeastOneIsTruthy(
-      pageManager.plantLabelFilterInput,
-      pageManager.plantLabelFilterSelect,
-      pageManager.plantLabelApplyFiltersButton,
-      pageManager.plantStrainNameFilterInput,
-      pageManager.plantStrainNameApplyFiltersButton,
-      pageManager.plantLocationNameFilterInput,
-      pageManager.plantLocationNameApplyFiltersButton
-    )
-  ) {
-    return;
-  }
-
-  const plantFilterIdentifiers: PlantFilterIdentifiers[] = [
-    PlantFilterIdentifiers.Label,
-    PlantFilterIdentifiers.StrainName,
-    PlantFilterIdentifiers.LocationName,
+export async function initializeFilterButtonsImpl() {
+  const menuButtons = [
+    ...document.querySelectorAll(
+      `th[data-field]:not([${T3_SEARCH_MENU_ATTRIBUTE}]) .k-header-column-menu`
+    ),
   ];
 
-  let menuButton;
-
-  for (const plantFilterIdentifier of plantFilterIdentifiers) {
-    menuButton = document.querySelector(
-      `.k-state-active th[data-field="${plantFilterIdentifier}"] .k-header-column-menu`
-    ) as HTMLElement | null;
-
-    if (menuButton) {
-      pageManager.suppressAnimationContainer();
-
-      // This opens the menu and creates the form
-      menuButton.click();
-
-      let form = null;
-      const animationContainer = pageManager.getVisibleAnimationContainer("Sort Ascending");
-
-      if (animationContainer) {
-        form = animationContainer.querySelector(".k-popup form.k-filter-menu");
-      }
-
-      if (form) {
-        const input = form.querySelector(
-          'input[title="Filter Criteria"]'
-        ) as HTMLInputElement | null;
-        const button = form.querySelector('button[type="submit"]') as HTMLButtonElement | null;
-        const select = animationContainer?.querySelector(
-          ".k-list-scroller ul"
-        ) as HTMLElement | null;
-
-        if (input) {
-          switch (plantFilterIdentifier) {
-            case PlantFilterIdentifiers.Label:
-              pageManager.plantLabelFilterInput = input;
-              input.addEventListener("input", (e: any) =>
-                store.dispatch(
-                  `plantSearch/${PlantSearchActions.PARTIAL_UPDATE_PLANT_SEARCH_FILTERS}`,
-                  { plantSearchFilters: { label: e.target.value }, propagate: false }
-                )
-              );
-              pageManager.plantLabelFilterSelect = select;
-              pageManager.plantLabelApplyFiltersButton = button;
-              break;
-            case PlantFilterIdentifiers.StrainName:
-              pageManager.plantStrainNameFilterInput = input;
-              input.addEventListener("input", (e: any) =>
-                store.dispatch(
-                  `plantSearch/${PlantSearchActions.PARTIAL_UPDATE_PLANT_SEARCH_FILTERS}`,
-                  { plantSearchFilters: { strainName: e.target.value }, propagate: false }
-                )
-              );
-              pageManager.plantStrainNameApplyFiltersButton = button;
-              break;
-            case PlantFilterIdentifiers.LocationName:
-              pageManager.plantLocationNameFilterInput = input;
-              input.addEventListener("input", (e: any) =>
-                store.dispatch(
-                  `plantSearch/${PlantSearchActions.PARTIAL_UPDATE_PLANT_SEARCH_FILTERS}`,
-                  { plantSearchFilters: { locationName: e.target.value }, propagate: false }
-                )
-              );
-              pageManager.plantLocationNameApplyFiltersButton = button;
-              break;
-            default:
-              break;
-          }
-        }
-      }
-
-      // Close the menu
-      menuButton.click();
-    } else {
-      console.error("Menu button not found", plantFilterIdentifier);
-    }
+  for (const menuButton of menuButtons) {
+    menuButton.parentElement!.setAttribute(T3_SEARCH_MENU_ATTRIBUTE, "1");
   }
 }
 
-export async function acquirePackageFilterElementsImpl() {
-  if (!pageManager.packageClearFiltersButton) {
-    const btn = document.querySelector(".k-state-active span.icon-filter") as HTMLElement;
+export async function getFilterFormOrError(
+  gridId: MetrcGridId,
+  searchFilter: string
+): Promise<HTMLFormElement> {
+  let mappedAnimationContainer = document.querySelector(
+    `.k-animation-container[${T3_SEARCH_FIELD_ATTRIBUTE}="${searchFilter}"][${T3_GRID_ID_ATTRIBUTE}="${gridId}"]`
+  );
 
-    if (btn) {
-      btn.click();
-      // @ts-ignore
-      pageManager.packageClearFiltersButton = btn.parentElement?.parentElement?.querySelector("a");
-      btn.click();
-    }
-  }
-
-  console.log([
-    pageManager.packageLabelFilterInput,
-    pageManager.packageLabelFilterSelect,
-    pageManager.packageLabelApplyFiltersButton,
-    pageManager.packageSourceHarvestNameFilterInput,
-    pageManager.packageSourceHarvestNameApplyFiltersButton,
-    pageManager.packageSourcePackageLabelFilterInput,
-    pageManager.packageSourcePackageLabelApplyFiltersButton,
-    pageManager.packageItemNameFilterInput,
-    pageManager.packageItemNameApplyFiltersButton,
-    pageManager.packageItemStrainNameFilterInput,
-    pageManager.packageItemStrainNameApplyFiltersButton,
-    pageManager.packageItemProductCategoryNameFilterInput,
-    pageManager.packageItemProductCategoryNameApplyFiltersButton,
-    pageManager.packageLocationNameFilterInput,
-    pageManager.packageLocationNameApplyFiltersButton,
-    pageManager.destinationPackageLabelFilterInput,
-    pageManager.destinationPackageLabelFilterSelect,
-    pageManager.destinationPackageLabelApplyFiltersButton,
-    pageManager.destinationPackageSourceHarvestNameFilterInput,
-    pageManager.destinationPackageSourceHarvestNameApplyFiltersButton,
-    pageManager.destinationPackageSourcePackageLabelFilterInput,
-    pageManager.destinationPackageSourcePackageLabelApplyFiltersButton,
-    pageManager.destinationPackageProductNameFilterInput,
-    pageManager.destinationPackageProductNameApplyFiltersButton,
-    pageManager.destinationPackageItemStrainNameFilterInput,
-    pageManager.destinationPackageItemStrainNameApplyFiltersButton,
-    pageManager.destinationPackageItemProductCategoryNameFilterInput,
-    pageManager.destinationPackageItemProductCategoryNameApplyFiltersButton,
-    pageManager.destinationPackageManifestNumberFilterInput,
-    pageManager.destinationPackageManifestNumberApplyFiltersButton,
-    pageManager.destinationPackageDestinationLicenseNumberFilterInput,
-    pageManager.destinationPackageDestinationLicenseNumberApplyFiltersButton,
-    pageManager.destinationPackageDestinationFacilityNameFilterInput,
-    pageManager.destinationPackageDestinationFacilityNameApplyFiltersButton,
-  ]);
-
-  // This is important, as otherwise click() calls will kill page usability
-  if (
-    atLeastOneIsTruthy(
-      pageManager.packageLabelFilterInput,
-      pageManager.packageLabelFilterSelect,
-      pageManager.packageLabelApplyFiltersButton,
-      pageManager.packageSourceHarvestNameFilterInput,
-      pageManager.packageSourceHarvestNameApplyFiltersButton,
-      pageManager.packageSourcePackageLabelFilterInput,
-      pageManager.packageSourcePackageLabelApplyFiltersButton,
-      pageManager.packageItemNameFilterInput,
-      pageManager.packageItemNameApplyFiltersButton,
-      pageManager.packageItemStrainNameFilterInput,
-      pageManager.packageItemStrainNameApplyFiltersButton,
-      pageManager.packageItemProductCategoryNameFilterInput,
-      pageManager.packageItemProductCategoryNameApplyFiltersButton,
-      pageManager.packageLocationNameFilterInput,
-      pageManager.packageLocationNameApplyFiltersButton,
-      pageManager.destinationPackageLabelFilterInput,
-      pageManager.destinationPackageLabelFilterSelect,
-      pageManager.destinationPackageLabelApplyFiltersButton,
-      pageManager.destinationPackageSourceHarvestNameFilterInput,
-      pageManager.destinationPackageSourceHarvestNameApplyFiltersButton,
-      pageManager.destinationPackageSourcePackageLabelFilterInput,
-      pageManager.destinationPackageSourcePackageLabelApplyFiltersButton,
-      pageManager.destinationPackageProductNameFilterInput,
-      pageManager.destinationPackageProductNameApplyFiltersButton,
-      pageManager.destinationPackageItemStrainNameFilterInput,
-      pageManager.destinationPackageItemStrainNameApplyFiltersButton,
-      pageManager.destinationPackageItemProductCategoryNameFilterInput,
-      pageManager.destinationPackageItemProductCategoryNameApplyFiltersButton,
-      pageManager.destinationPackageManifestNumberFilterInput,
-      pageManager.destinationPackageManifestNumberApplyFiltersButton,
-      pageManager.destinationPackageDestinationLicenseNumberFilterInput,
-      pageManager.destinationPackageDestinationLicenseNumberApplyFiltersButton,
-      pageManager.destinationPackageDestinationFacilityNameFilterInput,
-      pageManager.destinationPackageDestinationFacilityNameApplyFiltersButton
-    )
-  ) {
-    return;
-  }
-
-  const packageFilterIdentifiers: (
-    | PackageFilterIdentifiers
-    | TransferredPackageFilterIdentifiers
-  )[] = [
-    PackageFilterIdentifiers.Label,
-    PackageFilterIdentifiers.SourceHarvestNames,
-    PackageFilterIdentifiers.SourcePackageLabels,
-    PackageFilterIdentifiers.ProductionBatchNumber,
-    PackageFilterIdentifiers.SourceProductionBatchNumbers,
-    PackageFilterIdentifiers.ItemName,
-    PackageFilterIdentifiers.ItemStrainName,
-    PackageFilterIdentifiers.ItemProductCategoryName,
-    PackageFilterIdentifiers.LocationName,
-    TransferredPackageFilterIdentifiers.PackageLabel,
-    TransferredPackageFilterIdentifiers.SourceHarvestNames,
-    TransferredPackageFilterIdentifiers.SourcePackageLabels,
-    TransferredPackageFilterIdentifiers.ProductName,
-    TransferredPackageFilterIdentifiers.ItemStrainName,
-    TransferredPackageFilterIdentifiers.ProductCategoryName,
-    TransferredPackageFilterIdentifiers.ManifestNumber,
-    TransferredPackageFilterIdentifiers.DestinationLicenseNumber,
-    TransferredPackageFilterIdentifiers.DestinationFacilityName,
-  ];
-
-  let menuButton;
-
-  for (const packageFilterIdentifier of packageFilterIdentifiers) {
-    menuButton = document.querySelector(
-      `.k-state-active th[data-field="${packageFilterIdentifier}"] .k-header-column-menu`
+  if (!mappedAnimationContainer) {
+    const menuButton = document.querySelector(
+      `th[data-field="${searchFilter}"] .k-header-column-menu`
     ) as HTMLElement | null;
 
-    if (menuButton) {
-      pageManager.suppressAnimationContainer();
-
-      // This opens the menu and creates the form
-      menuButton.click();
-
-      let form = null;
-      const animationContainer = pageManager.getVisibleAnimationContainer("Sort Ascending");
-
-      if (animationContainer) {
-        form = animationContainer.querySelector(".k-popup form.k-filter-menu");
-      }
-
-      if (form) {
-        const input = form.querySelector(
-          'input[title="Filter Criteria"]'
-        ) as HTMLInputElement | null;
-        const button = form.querySelector('button[type="submit"]') as HTMLButtonElement | null;
-        const select = animationContainer?.querySelector(
-          ".k-list-scroller ul"
-        ) as HTMLElement | null;
-
-        if (input) {
-          switch (packageFilterIdentifier) {
-            case PackageFilterIdentifiers.Label:
-              pageManager.packageLabelFilterInput = input;
-              input.addEventListener("input", (e: any) =>
-                store.dispatch(
-                  `packageSearch/${PackageSearchActions.PARTIAL_UPDATE_PACKAGE_SEARCH_FILTERS}`,
-                  {
-                    packageSearchFilters: { [PackageSearchFilterKeys.LABEL]: e.target.value },
-                    propagate: false,
-                  }
-                )
-              );
-              pageManager.packageLabelFilterSelect = select;
-              pageManager.packageLabelApplyFiltersButton = button;
-              break;
-            case TransferredPackageFilterIdentifiers.PackageLabel:
-              pageManager.destinationPackageLabelFilterInput = input;
-              input.addEventListener("input", (e: any) =>
-                store.dispatch(
-                  `packageSearch/${PackageSearchActions.PARTIAL_UPDATE_PACKAGE_SEARCH_FILTERS}`,
-                  {
-                    packageSearchFilters: { [PackageSearchFilterKeys.LABEL]: e.target.value },
-                    propagate: false,
-                  }
-                )
-              );
-              pageManager.destinationPackageLabelFilterSelect = select;
-              pageManager.destinationPackageLabelApplyFiltersButton = button;
-              break;
-            case PackageFilterIdentifiers.SourceHarvestNames:
-              pageManager.packageSourceHarvestNameFilterInput = input;
-              input.addEventListener("input", (e: any) =>
-                store.dispatch(
-                  `packageSearch/${PackageSearchActions.PARTIAL_UPDATE_PACKAGE_SEARCH_FILTERS}`,
-                  {
-                    packageSearchFilters: {
-                      [PackageSearchFilterKeys.SOURCE_HARVEST_NAMES]: e.target.value,
-                    },
-                    propagate: false,
-                  }
-                )
-              );
-              pageManager.packageSourceHarvestNameApplyFiltersButton = button;
-              break;
-            case TransferredPackageFilterIdentifiers.SourceHarvestNames:
-              pageManager.destinationPackageSourceHarvestNameFilterInput = input;
-              input.addEventListener("input", (e: any) =>
-                store.dispatch(
-                  `packageSearch/${PackageSearchActions.PARTIAL_UPDATE_PACKAGE_SEARCH_FILTERS}`,
-                  {
-                    packageSearchFilters: {
-                      [PackageSearchFilterKeys.SOURCE_HARVEST_NAMES]: e.target.value,
-                    },
-                    propagate: false,
-                  }
-                )
-              );
-              pageManager.destinationPackageSourceHarvestNameApplyFiltersButton = button;
-              break;
-            case PackageFilterIdentifiers.SourcePackageLabels:
-              pageManager.packageSourcePackageLabelFilterInput = input;
-              input.addEventListener("input", (e: any) =>
-                store.dispatch(
-                  `packageSearch/${PackageSearchActions.PARTIAL_UPDATE_PACKAGE_SEARCH_FILTERS}`,
-                  {
-                    packageSearchFilters: {
-                      [PackageSearchFilterKeys.SOURCE_PACKAGE_LABELS]: e.target.value,
-                    },
-                    propagate: false,
-                  }
-                )
-              );
-              pageManager.packageSourcePackageLabelApplyFiltersButton = button;
-              break;
-            case TransferredPackageFilterIdentifiers.SourcePackageLabels:
-              pageManager.destinationPackageSourcePackageLabelFilterInput = input;
-              input.addEventListener("input", (e: any) =>
-                store.dispatch(
-                  `packageSearch/${PackageSearchActions.PARTIAL_UPDATE_PACKAGE_SEARCH_FILTERS}`,
-                  {
-                    packageSearchFilters: {
-                      [PackageSearchFilterKeys.SOURCE_PACKAGE_LABELS]: e.target.value,
-                    },
-                    propagate: false,
-                  }
-                )
-              );
-              pageManager.destinationPackageSourcePackageLabelApplyFiltersButton = button;
-              break;
-            case PackageFilterIdentifiers.ProductionBatchNumber:
-              pageManager.packageProductionBatchNumberFilterInput = input;
-              input.addEventListener("input", (e: any) =>
-                store.dispatch(
-                  `packageSearch/${PackageSearchActions.PARTIAL_UPDATE_PACKAGE_SEARCH_FILTERS}`,
-                  {
-                    packageSearchFilters: {
-                      [PackageSearchFilterKeys.PRODUCTION_BATCH_NUMBER]: e.target.value,
-                    },
-                    propagate: false,
-                  }
-                )
-              );
-              pageManager.packageProductionBatchNumberApplyFiltersButton = button;
-              break;
-            case PackageFilterIdentifiers.SourceProductionBatchNumbers:
-              pageManager.packageSourceProductionBatchNumbersFilterInput = input;
-              input.addEventListener("input", (e: any) =>
-                store.dispatch(
-                  `packageSearch/${PackageSearchActions.PARTIAL_UPDATE_PACKAGE_SEARCH_FILTERS}`,
-                  {
-                    packageSearchFilters: {
-                      [PackageSearchFilterKeys.SOURCE_PRODUCTION_BATCH_NUMBERS]: e.target.value,
-                    },
-                    propagate: false,
-                  }
-                )
-              );
-              pageManager.packageSourceProductionBatchNumbersApplyFiltersButton = button;
-              break;
-            case PackageFilterIdentifiers.ItemName:
-              pageManager.packageItemNameFilterInput = input;
-              input.addEventListener("input", (e: any) =>
-                store.dispatch(
-                  `packageSearch/${PackageSearchActions.PARTIAL_UPDATE_PACKAGE_SEARCH_FILTERS}`,
-                  {
-                    packageSearchFilters: { [PackageSearchFilterKeys.ITEM_NAME]: e.target.value },
-                    propagate: false,
-                  }
-                )
-              );
-              pageManager.packageItemNameApplyFiltersButton = button;
-              break;
-            case TransferredPackageFilterIdentifiers.ProductName:
-              pageManager.destinationPackageProductNameFilterInput = input;
-              input.addEventListener("input", (e: any) =>
-                store.dispatch(
-                  `packageSearch/${PackageSearchActions.PARTIAL_UPDATE_PACKAGE_SEARCH_FILTERS}`,
-                  {
-                    packageSearchFilters: { [PackageSearchFilterKeys.ITEM_NAME]: e.target.value },
-                    propagate: false,
-                  }
-                )
-              );
-              pageManager.destinationPackageProductNameApplyFiltersButton = button;
-              break;
-            case PackageFilterIdentifiers.ItemStrainName:
-              pageManager.packageItemStrainNameFilterInput = input;
-              input.addEventListener("input", (e: any) =>
-                store.dispatch(
-                  `packageSearch/${PackageSearchActions.PARTIAL_UPDATE_PACKAGE_SEARCH_FILTERS}`,
-                  {
-                    packageSearchFilters: {
-                      [PackageSearchFilterKeys.ITEM_STRAIN_NAME]: e.target.value,
-                    },
-                    propagate: false,
-                  }
-                )
-              );
-              pageManager.packageItemStrainNameApplyFiltersButton = button;
-              break;
-            case TransferredPackageFilterIdentifiers.ItemStrainName:
-              pageManager.destinationPackageItemStrainNameFilterInput = input;
-              input.addEventListener("input", (e: any) =>
-                store.dispatch(
-                  `packageSearch/${PackageSearchActions.PARTIAL_UPDATE_PACKAGE_SEARCH_FILTERS}`,
-                  {
-                    packageSearchFilters: {
-                      [PackageSearchFilterKeys.ITEM_STRAIN_NAME]: e.target.value,
-                    },
-                    propagate: false,
-                  }
-                )
-              );
-              pageManager.destinationPackageItemStrainNameApplyFiltersButton = button;
-              break;
-            case PackageFilterIdentifiers.ItemProductCategoryName:
-              pageManager.packageItemProductCategoryNameFilterInput = input;
-              input.addEventListener("input", (e: any) =>
-                store.dispatch(
-                  `packageSearch/${PackageSearchActions.PARTIAL_UPDATE_PACKAGE_SEARCH_FILTERS}`,
-                  {
-                    packageSearchFilters: {
-                      [PackageSearchFilterKeys.ITEM_PRODUCT_CATEGORY_NAME]: e.target.value,
-                    },
-                    propagate: false,
-                  }
-                )
-              );
-              pageManager.packageItemProductCategoryNameApplyFiltersButton = button;
-              break;
-            case TransferredPackageFilterIdentifiers.ProductCategoryName:
-              pageManager.destinationPackageItemProductCategoryNameFilterInput = input;
-              input.addEventListener("input", (e: any) =>
-                store.dispatch(
-                  `packageSearch/${PackageSearchActions.PARTIAL_UPDATE_PACKAGE_SEARCH_FILTERS}`,
-                  {
-                    packageSearchFilters: {
-                      [PackageSearchFilterKeys.ITEM_PRODUCT_CATEGORY_NAME]: e.target.value,
-                    },
-                    propagate: false,
-                  }
-                )
-              );
-              pageManager.destinationPackageItemProductCategoryNameApplyFiltersButton = button;
-              break;
-            case PackageFilterIdentifiers.LocationName:
-              pageManager.packageLocationNameFilterInput = input;
-              input.addEventListener("input", (e: any) =>
-                store.dispatch(
-                  `packageSearch/${PackageSearchActions.PARTIAL_UPDATE_PACKAGE_SEARCH_FILTERS}`,
-                  {
-                    packageSearchFilters: {
-                      [PackageSearchFilterKeys.LOCATION_NAME]: e.target.value,
-                    },
-                    propagate: false,
-                  }
-                )
-              );
-              pageManager.packageLocationNameApplyFiltersButton = button;
-              break;
-            case TransferredPackageFilterIdentifiers.ManifestNumber:
-              pageManager.destinationPackageManifestNumberFilterInput = input;
-              input.addEventListener("input", (e: any) =>
-                store.dispatch(
-                  `packageSearch/${PackageSearchActions.PARTIAL_UPDATE_PACKAGE_SEARCH_FILTERS}`,
-                  {
-                    packageSearchFilters: {
-                      [PackageSearchFilterKeys.MANIFEST_NUMBER]: e.target.value,
-                    },
-                    propagate: false,
-                  }
-                )
-              );
-              pageManager.destinationPackageManifestNumberApplyFiltersButton = button;
-              break;
-            case TransferredPackageFilterIdentifiers.DestinationFacilityName:
-              pageManager.destinationPackageDestinationFacilityNameFilterInput = input;
-              input.addEventListener("input", (e: any) =>
-                store.dispatch(
-                  `packageSearch/${PackageSearchActions.PARTIAL_UPDATE_PACKAGE_SEARCH_FILTERS}`,
-                  {
-                    packageSearchFilters: {
-                      [PackageSearchFilterKeys.DESTINATION_FACILITY_NAME]: e.target.value,
-                    },
-                    propagate: false,
-                  }
-                )
-              );
-              pageManager.destinationPackageDestinationFacilityNameApplyFiltersButton = button;
-              break;
-            case TransferredPackageFilterIdentifiers.DestinationLicenseNumber:
-              pageManager.destinationPackageDestinationLicenseNumberFilterInput = input;
-              input.addEventListener("input", (e: any) =>
-                store.dispatch(
-                  `packageSearch/${PackageSearchActions.PARTIAL_UPDATE_PACKAGE_SEARCH_FILTERS}`,
-                  {
-                    packageSearchFilters: {
-                      [PackageSearchFilterKeys.DESTINATION_LICENSE_NUMBER]: e.target.value,
-                    },
-                    propagate: false,
-                  }
-                )
-              );
-              pageManager.destinationPackageDestinationLicenseNumberApplyFiltersButton = button;
-              break;
-            default:
-              break;
-          }
-        }
-      }
-
-      // Close the menu
-      menuButton.click();
-    } else {
-      console.error("Menu button not found", packageFilterIdentifier);
+    if (!menuButton) {
+      throw new Error(`Cannot find menu button for filter: ${searchFilter}`);
     }
+
+    pageManager.suppressAnimationContainer();
+
+    menuButton.click();
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    menuButton.click();
+
+    const untaggedAnimationContainer = document.querySelector(
+      `.k-animation-container:not([${T3_SEARCH_FIELD_ATTRIBUTE}]) .k-column-menu`
+    )?.parentElement;
+
+    if (!untaggedAnimationContainer) {
+      throw new Error(`Could not initialize animation container for filter: ${searchFilter}`);
+    }
+
+    untaggedAnimationContainer.setAttribute(T3_GRID_ID_ATTRIBUTE, gridId);
+    untaggedAnimationContainer.setAttribute(T3_SEARCH_FIELD_ATTRIBUTE, searchFilter);
+
+    mappedAnimationContainer = untaggedAnimationContainer;
   }
+
+  return mappedAnimationContainer.querySelector("form")!;
 }
 
-export async function acquireTransferFilterElementsImpl() {
-  if (!pageManager.transferClearFiltersButton) {
-    const btn = document.querySelector(".k-state-active span.icon-filter") as HTMLElement;
+export async function setFilterImpl(gridId: MetrcGridId, searchFilter: string, value: string) {
+  await pageManager.refresh;
 
-    if (btn) {
-      btn.click();
-      // @ts-ignore
-      pageManager.transferClearFiltersButton = btn.parentElement?.parentElement?.querySelector("a");
-      btn.click();
-    }
-  }
+  const form = await getFilterFormOrError(gridId, searchFilter);
 
-  // This is important, as otherwise click() calls will kill page usability
-  if (
-    atLeastOneIsTruthy(
-      pageManager.transferManifestNumberFilterInput,
-      pageManager.transferManifestNumberFilterSelect,
-      pageManager.transferManifestNumberApplyFiltersButton,
-      pageManager.transferOutgoingDeliveryFacilitiesFilterInput,
-      pageManager.transferOutgoingDeliveryFacilitiesApplyFiltersButton,
-      pageManager.transferIncomingShipperFacilityInfoFilterInput,
-      pageManager.transferIncomingShipperFacilityInfoApplyFiltersButton
-    )
-  ) {
-    return;
-  }
-
-  const transferFilterIdentifiers: TransferFilterIdentifiers[] = [
-    TransferFilterIdentifiers.ManifestNumber,
-    TransferFilterIdentifiers.DeliveryFacilities,
-    TransferFilterIdentifiers.ShipperFacilityInfo,
-  ];
-
-  let menuButton;
-
-  for (const transferFilterIdentifier of transferFilterIdentifiers) {
-    menuButton = document.querySelector(
-      `.k-state-active th[data-field="${transferFilterIdentifier}"] .k-header-column-menu`
-    ) as HTMLElement | null;
-
-    if (menuButton) {
-      pageManager.suppressAnimationContainer();
-
-      // This opens the menu and creates the form
-      menuButton.click();
-
-      let form = null;
-      const animationContainer = pageManager.getVisibleAnimationContainer("Sort Ascending");
-
-      if (animationContainer) {
-        form = animationContainer.querySelector(".k-popup form.k-filter-menu");
-      }
-
-      if (form) {
-        const input = form.querySelector(
-          'input[title="Filter Criteria"]'
-        ) as HTMLInputElement | null;
-        const button = form.querySelector('button[type="submit"]') as HTMLButtonElement | null;
-        const select = animationContainer?.querySelector(
-          ".k-list-scroller ul"
-        ) as HTMLElement | null;
-
-        if (input) {
-          switch (transferFilterIdentifier) {
-            case TransferFilterIdentifiers.ManifestNumber:
-              pageManager.transferManifestNumberFilterInput = input;
-              pageManager.transferManifestNumberFilterSelect = select;
-              pageManager.transferManifestNumberApplyFiltersButton = button;
-              break;
-            case TransferFilterIdentifiers.DeliveryFacilities:
-              pageManager.transferOutgoingDeliveryFacilitiesFilterInput = input;
-              pageManager.transferOutgoingDeliveryFacilitiesApplyFiltersButton = button;
-              break;
-            case TransferFilterIdentifiers.ShipperFacilityInfo:
-              pageManager.transferIncomingShipperFacilityInfoFilterInput = input;
-              pageManager.transferIncomingShipperFacilityInfoApplyFiltersButton = button;
-              break;
-            default:
-              break;
-          }
-        }
-      }
-
-      // Close the menu
-      menuButton.click();
-    } else {
-      console.error("Menu button not found", transferFilterIdentifier);
-    }
-  }
-}
-
-export async function acquireTagFilterElementsImpl() {
-  if (!pageManager.tagClearFiltersButton) {
-    const btn = document.querySelector(".k-state-active span.icon-filter") as HTMLElement;
-
-    if (btn) {
-      btn.click();
-      // @ts-ignore
-      pageManager.tagClearFiltersButton = btn.parentElement?.parentElement?.querySelector("a");
-      btn.click();
-    }
-  }
-
-  // This is important, as otherwise click() calls will kill page usability
-  if (
-    atLeastOneIsTruthy(
-      pageManager.tagNumberFilterInput,
-      pageManager.tagNumberFilterSelect,
-      pageManager.tagNumberApplyFiltersButton
-    )
-  ) {
-    return;
-  }
-
-  const tagFilterIdentifiers: TagFilterIdentifiers[] = [TagFilterIdentifiers.Label];
-
-  let menuButton;
-
-  for (const tagFilterIdentifier of tagFilterIdentifiers) {
-    menuButton = document.querySelector(
-      `.k-state-active th[data-field="${tagFilterIdentifier}"] .k-header-column-menu`
-    ) as HTMLElement | null;
-
-    if (menuButton) {
-      pageManager.suppressAnimationContainer();
-
-      // This opens the menu and creates the form
-      menuButton.click();
-
-      let form = null;
-      const animationContainer = pageManager.getVisibleAnimationContainer("Sort Ascending");
-
-      if (animationContainer) {
-        form = animationContainer.querySelector(".k-popup form.k-filter-menu");
-      }
-
-      if (form) {
-        const input = form.querySelector(
-          'input[title="Filter Criteria"]'
-        ) as HTMLInputElement | null;
-        const button = form.querySelector('button[type="submit"]') as HTMLButtonElement | null;
-        const select = animationContainer?.querySelector(
-          ".k-list-scroller ul"
-        ) as HTMLElement | null;
-
-        if (input) {
-          switch (tagFilterIdentifier) {
-            case TagFilterIdentifiers.Label:
-              pageManager.tagNumberFilterInput = input;
-              pageManager.tagNumberFilterSelect = select;
-              pageManager.tagNumberApplyFiltersButton = button;
-              break;
-            default:
-              break;
-          }
-        }
-      }
-
-      // Close the menu
-      menuButton.click();
-    } else {
-      console.error("Menu button not found", tagFilterIdentifier);
-    }
-  }
+  const input = form.querySelector(`input[title="Filter Criteria"]`)! as HTMLElement;
+  const button = form.querySelector(`button[type="submit"]`)! as HTMLElement;
+  input.dispatchEvent(new Event("change"));
+  button.click();
 }
 
 export async function setPlantFilterImpl(
+  gridId: MetrcGridId,
   plantFilterIdentifier: PlantFilterIdentifiers,
   value: string
 ) {
@@ -724,34 +92,11 @@ export async function setPlantFilterImpl(
     value,
   });
 
-  let input: HTMLInputElement | null = null;
-
-  switch (plantFilterIdentifier) {
-    case PlantFilterIdentifiers.Label:
-      input = pageManager.plantLabelFilterInput;
-      break;
-    case PlantFilterIdentifiers.StrainName:
-      input = pageManager.plantStrainNameFilterInput;
-      break;
-    case PlantFilterIdentifiers.LocationName:
-      input = pageManager.plantLocationNameFilterInput;
-      break;
-    default:
-      console.error("bad identifier:", plantFilterIdentifier);
-      break;
-  }
-
-  if (input) {
-    input.value = value;
-    input.dispatchEvent(new Event("change"));
-  } else {
-    console.log("bad input");
-  }
-
-  pageManager.applyPlantFilter(plantFilterIdentifier);
+  await setFilterImpl(gridId, plantFilterIdentifier, value);
 }
 
 export async function setPackageFilterImpl(
+  gridId: MetrcGridId,
   packageFilterIdentifier: PackageFilterIdentifiers,
   value: string
 ) {
@@ -762,52 +107,11 @@ export async function setPackageFilterImpl(
     value,
   });
 
-  let input: HTMLInputElement | null = null;
-
-  switch (packageFilterIdentifier) {
-    case PackageFilterIdentifiers.Label:
-      input = pageManager.packageLabelFilterInput;
-      break;
-    case PackageFilterIdentifiers.SourceHarvestNames:
-      input = pageManager.packageSourceHarvestNameFilterInput;
-      break;
-    case PackageFilterIdentifiers.SourcePackageLabels:
-      input = pageManager.packageSourcePackageLabelFilterInput;
-      break;
-    case PackageFilterIdentifiers.ProductionBatchNumber:
-      input = pageManager.packageProductionBatchNumberFilterInput;
-      break;
-    case PackageFilterIdentifiers.SourceProductionBatchNumbers:
-      input = pageManager.packageSourceProductionBatchNumbersFilterInput;
-      break;
-    case PackageFilterIdentifiers.ItemName:
-      input = pageManager.packageItemNameFilterInput;
-      break;
-    case PackageFilterIdentifiers.ItemStrainName:
-      input = pageManager.packageItemStrainNameFilterInput;
-      break;
-    case PackageFilterIdentifiers.ItemProductCategoryName:
-      input = pageManager.packageItemProductCategoryNameFilterInput;
-      break;
-    case PackageFilterIdentifiers.LocationName:
-      input = pageManager.packageLocationNameFilterInput;
-      break;
-    default:
-      console.error("bad identifier:", packageFilterIdentifier);
-      break;
-  }
-
-  if (input) {
-    input.value = value;
-    input.dispatchEvent(new Event("change"));
-  } else {
-    console.log("bad input");
-  }
-
-  pageManager.applyPackageFilter(packageFilterIdentifier);
+  await setFilterImpl(gridId, packageFilterIdentifier, value);
 }
 
 export async function setDestinationPackageFilterImpl(
+  gridId: MetrcGridId,
   destinationPackageFilterIdentifier: TransferredPackageFilterIdentifiers,
   value: string
 ) {
@@ -818,52 +122,11 @@ export async function setDestinationPackageFilterImpl(
     value,
   });
 
-  let input: HTMLInputElement | null = null;
-
-  switch (destinationPackageFilterIdentifier) {
-    case TransferredPackageFilterIdentifiers.PackageLabel:
-      input = pageManager.destinationPackageLabelFilterInput;
-      break;
-    case TransferredPackageFilterIdentifiers.SourceHarvestNames:
-      input = pageManager.destinationPackageSourceHarvestNameFilterInput;
-      break;
-    case TransferredPackageFilterIdentifiers.SourcePackageLabels:
-      input = pageManager.destinationPackageSourcePackageLabelFilterInput;
-      break;
-    case TransferredPackageFilterIdentifiers.ProductName:
-      input = pageManager.destinationPackageProductNameFilterInput;
-      break;
-    case TransferredPackageFilterIdentifiers.ItemStrainName:
-      input = pageManager.destinationPackageItemStrainNameFilterInput;
-      break;
-    case TransferredPackageFilterIdentifiers.ProductCategoryName:
-      input = pageManager.destinationPackageItemProductCategoryNameFilterInput;
-      break;
-    case TransferredPackageFilterIdentifiers.ManifestNumber:
-      input = pageManager.destinationPackageManifestNumberFilterInput;
-      break;
-    case TransferredPackageFilterIdentifiers.DestinationFacilityName:
-      input = pageManager.destinationPackageDestinationFacilityNameFilterInput;
-      break;
-    case TransferredPackageFilterIdentifiers.DestinationLicenseNumber:
-      input = pageManager.destinationPackageDestinationLicenseNumberFilterInput;
-      break;
-    default:
-      console.error("bad identifier:", destinationPackageFilterIdentifier);
-      break;
-  }
-
-  if (input) {
-    input.value = value;
-    input.dispatchEvent(new Event("change"));
-  } else {
-    console.log("bad input");
-  }
-
-  pageManager.applyDestinationPackageFilter(destinationPackageFilterIdentifier);
+  await setFilterImpl(gridId, destinationPackageFilterIdentifier, value);
 }
 
 export async function setTransferFilterImpl(
+  gridId: MetrcGridId,
   transferFilterIdentifier: TransferFilterIdentifiers,
   value: string
 ) {
@@ -874,34 +137,14 @@ export async function setTransferFilterImpl(
     value,
   });
 
-  let input: HTMLInputElement | null = null;
-
-  switch (transferFilterIdentifier) {
-    case TransferFilterIdentifiers.ManifestNumber:
-      input = pageManager.transferManifestNumberFilterInput;
-      break;
-    case TransferFilterIdentifiers.DeliveryFacilities:
-      input = pageManager.transferOutgoingDeliveryFacilitiesFilterInput;
-      break;
-    case TransferFilterIdentifiers.ShipperFacilityInfo:
-      input = pageManager.transferIncomingShipperFacilityInfoFilterInput;
-      break;
-    default:
-      console.error("bad identifier:", transferFilterIdentifier);
-      break;
-  }
-
-  if (input) {
-    input.value = value;
-    input.dispatchEvent(new Event("change"));
-  } else {
-    console.log("bad input");
-  }
-
-  pageManager.applyTransferFilter(transferFilterIdentifier);
+  await setFilterImpl(gridId, transferFilterIdentifier, value);
 }
 
-export async function setTagFilterImpl(tagFilterIdentifier: TagFilterIdentifiers, value: string) {
+export async function setTagFilterImpl(
+  gridId: MetrcGridId,
+  tagFilterIdentifier: TagFilterIdentifiers,
+  value: string
+) {
   await pageManager.refresh;
 
   analyticsManager.track(MessageType.SELECTED_TAG_FILTER, {
@@ -909,38 +152,40 @@ export async function setTagFilterImpl(tagFilterIdentifier: TagFilterIdentifiers
     value,
   });
 
-  let input: HTMLInputElement | null = null;
-  let select: HTMLElement | null = null;
+  await setFilterImpl(gridId, tagFilterIdentifier, value);
 
-  switch (tagFilterIdentifier) {
-    case TagFilterIdentifiers.Label:
-      input = pageManager.tagNumberFilterInput;
-      select = pageManager.tagNumberFilterSelect;
-      break;
-    default:
-      console.error("bad identifier:", tagFilterIdentifier);
-      break;
-  }
+  // let input: HTMLInputElement | null = null;
+  // let select: HTMLElement | null = null;
 
-  if (input) {
-    input.value = value;
-    input.dispatchEvent(new Event("change"));
-  } else {
-    console.log("bad input");
-  }
+  // switch (tagFilterIdentifier) {
+  //   case TagFilterIdentifiers.Label:
+  //     input = pageManager.tagNumberFilterInput;
+  //     select = pageManager.tagNumberFilterSelect;
+  //     break;
+  //   default:
+  //     console.error("bad identifier:", tagFilterIdentifier);
+  //     break;
+  // }
 
-  if (select) {
-    for (const li of select.querySelectorAll("li")) {
-      if (li.innerText.trim() === "Equal to") {
-        li.click();
-        break;
-      }
-    }
-  } else {
-    console.log("bad select");
-  }
+  // if (input) {
+  //   input.value = value;
+  //   input.dispatchEvent(new Event("change"));
+  // } else {
+  //   console.log("bad input");
+  // }
 
-  pageManager.applyTagFilter(tagFilterIdentifier);
+  // if (select) {
+  //   for (const li of select.querySelectorAll("li")) {
+  //     if (li.innerText.trim() === "Equal to") {
+  //       li.click();
+  //       break;
+  //     }
+  //   }
+  // } else {
+  //   console.log("bad select");
+  // }
+
+  // pageManager.applyTagFilter(tagFilterIdentifier);
 }
 
 export function applyPlantFilterImpl(plantFilterIdentifier: PlantFilterIdentifiers) {

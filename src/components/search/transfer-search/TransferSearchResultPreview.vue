@@ -1,17 +1,9 @@
 <template>
-  <div
-    class="border-purple-300"
-    v-bind:class="{
-      'bg-white': selected,
-    }"
-    @mouseenter="selectTransfer(transfer)"
-    @click.stop.prevent="setTransferManifestNumberFilter(transfer)"
-  >
+  <div class="border-purple-300" v-bind:class="{
+    'bg-white': selected,
+  }" @mouseenter="selectTransfer(transfer)" @click.stop.prevent="setTransferManifestNumberFilter(transfer)">
     <div class="flex flex-row items-center space-x-6 cursor-pointer p-4">
-      <div
-        class="flex flex-column-shim flex-col space-y-2"
-        v-bind:class="{ 'font-bold': selected }"
-      >
+      <div class="flex flex-column-shim flex-col space-y-2" v-bind:class="{ 'font-bold': selected }">
         <div class="text-xl text-purple-700">
           {{ transferDescriptor }}
         </div>
@@ -25,7 +17,7 @@
 </template>
 
 <script lang="ts">
-import { MessageType, TransferFilterIdentifiers, TransferState } from '@/consts';
+import { MessageType, MetrcGridId, TransferFilterIdentifiers, TransferState } from '@/consts';
 import { IIndexedTransferData } from '@/interfaces';
 import { analyticsManager } from '@/modules/analytics-manager.module';
 import { pageManager } from '@/modules/page-manager/page-manager.module';
@@ -72,13 +64,19 @@ export default Vue.extend({
 
       switch (this.$props.transfer.TransferState as TransferState) {
         case TransferState.INCOMING:
-          await pageManager.clickTabStartingWith(pageManager.transferTabs, 'Incoming');
+          await pageManager.clickTabWithGridId(MetrcGridId.TRANSFERS_INCOMING);
+          break;
+        case TransferState.INCOMING_INACTIVE:
+          await pageManager.clickTabWithGridId(MetrcGridId.TRANSFERS_INCOMING_INACTIVE);
           break;
         case TransferState.OUTGOING:
-          await pageManager.clickTabStartingWith(pageManager.transferTabs, 'Outgoing');
+          await pageManager.clickTabWithGridId(MetrcGridId.TRANSFERS_OUTGOING);
+          break;
+        case TransferState.OUTGOING_INACTIVE:
+          await pageManager.clickTabWithGridId(MetrcGridId.TRANSFERS_OUTGOING_INACTIVE);
           break;
         case TransferState.REJECTED:
-          await pageManager.clickTabStartingWith(pageManager.transferTabs, 'Rejected');
+          await pageManager.clickTabWithGridId(MetrcGridId.TRANSFERS_REJECTED);
           break;
         default:
           return;

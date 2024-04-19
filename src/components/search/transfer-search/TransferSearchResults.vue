@@ -1,8 +1,5 @@
 <template>
-  <div
-    class="hide-scrollbar grid grid-cols-6 grid-rows-3 h-full"
-    style="grid-template-rows: auto auto 1fr"
-  >
+  <div class="hide-scrollbar grid grid-cols-6 grid-rows-3 h-full" style="grid-template-rows: auto auto 1fr">
     <template v-if="searchState.queryString.length > 0">
       <search-view-selector />
 
@@ -45,16 +42,14 @@
 </template>
 
 <script lang="ts">
-import TransferHistoryList from '@/components/search/transfer-search/TransferHistoryList.vue';
-import TransferResultGroups from '@/components/search/transfer-search/TransferResultGroups.vue';
-import TransferSearchResultDetail from '@/components/search/transfer-search/TransferSearchResultDetail.vue';
-import { IIndexedTransferData, ITransferData, IPluginState } from '@/interfaces';
-import store from '@/store/page-overlay/index';
-import { TransferSearchActions } from '@/store/page-overlay/modules/transfer-search/consts';
-import Vue from 'vue';
-import { mapActions, mapGetters, mapState } from 'vuex';
 import HistoryList from '@/components/search/shared/HistoryList.vue';
 import SearchViewSelector from '@/components/search/shared/SearchViewSelector.vue';
+import TransferResultGroups from '@/components/search/transfer-search/TransferResultGroups.vue';
+import TransferSearchResultDetail from '@/components/search/transfer-search/TransferSearchResultDetail.vue';
+import { IIndexedTransferData, IPluginState } from '@/interfaces';
+import store from '@/store/page-overlay/index';
+import Vue from 'vue';
+import { mapActions, mapGetters, mapState } from 'vuex';
 
 export default Vue.extend({
   name: 'TransferSearchResults',
@@ -74,8 +69,6 @@ export default Vue.extend({
   },
   methods: {
     ...mapActions({
-      partialUpdateTransferSearchFilters: `transferSearch/${TransferSearchActions.PARTIAL_UPDATE_TRANSFER_SEARCH_FILTERS}`,
-      setTransferSearchFilters: `transferSearch/${TransferSearchActions.SET_TRANSFER_SEARCH_FILTERS}`,
     }),
   },
   computed: {

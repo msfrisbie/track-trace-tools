@@ -62,7 +62,8 @@
     </div>
 
     <template v-if="!searchState.modalSearchOpen || modalSearch">
-      <template v-if="searchType === SearchType.PACKAGES">
+      {{ searchState.searchResults}}
+      <!-- <template v-if="searchType === SearchType.PACKAGES">
         <package-search-widget />
       </template>
       <template v-if="searchType === SearchType.TRANSFERS">
@@ -76,7 +77,7 @@
       </template>
       <template v-if="searchType === SearchType.TRANSFER_PACKAGES">
         <transfer-package-search-widget />
-      </template>
+      </template> -->
     </template>
   </div>
 </template>
@@ -107,11 +108,11 @@ export default Vue.extend({
     },
   },
   components: {
-    TagSearchWidget,
-    TransferSearchWidget,
-    PackageSearchWidget,
-    PlantSearchWidget,
-    TransferPackageSearchWidget,
+    // TagSearchWidget,
+    // TransferSearchWidget,
+    // PackageSearchWidget,
+    // PlantSearchWidget,
+    // TransferPackageSearchWidget,
     // SearchPickerSelect,
   },
   computed: {
@@ -135,7 +136,6 @@ export default Vue.extend({
   },
   methods: {
     ...mapActions({
-      setSearchType: `search/${SearchActions.INITIALIZE_SEARCH_TYPE}`,
       setQueryString: `search/${SearchActions.SET_QUERY_STRING}`,
       setShowSearchResults: `search/${SearchActions.SET_SHOW_SEARCH_RESULTS}`,
     }),

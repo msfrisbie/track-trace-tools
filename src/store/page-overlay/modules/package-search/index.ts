@@ -1,4 +1,5 @@
 import {
+  MetrcGridId,
   PackageFilterIdentifiers,
   PackageSearchFilterKeys,
   PackageState,
@@ -91,16 +92,19 @@ export const packageSearchModule = {
       if (packageState) {
         switch (packageState as PackageState) {
           case PackageState.ACTIVE:
-            await pageManager.clickTabStartingWith(pageManager.packageTabs, "Active");
+            await pageManager.clickTabWithGridId(MetrcGridId.PACKAGES_ACTIVE);
+            break;
+          case PackageState.ON_HOLD:
+            await pageManager.clickTabWithGridId(MetrcGridId.PACKAGES_ON_HOLD);
             break;
           case PackageState.INACTIVE:
-            await pageManager.clickTabStartingWith(pageManager.packageTabs, "Inactive");
+            await pageManager.clickTabWithGridId(MetrcGridId.PACKAGES_INACTIVE);
             break;
           case PackageState.IN_TRANSIT:
-            await pageManager.clickTabStartingWith(pageManager.packageTabs, "In Transit");
+            await pageManager.clickTabWithGridId(MetrcGridId.PACKAGES_IN_TRANSIT);
             break;
           case PackageState.TRANSFERRED:
-            await pageManager.clickTabStartingWith(pageManager.packageTabs, "Transferred");
+            await pageManager.clickTabWithGridId(MetrcGridId.PACKAGES_TRANSFERRED);
             break;
           default:
             break;

@@ -1,6 +1,7 @@
 import {
   DEBUG_ATTRIBUTE,
   MessageType,
+  MetrcGridId,
   ModalAction,
   ModalType,
   PackageFilterIdentifiers,
@@ -49,14 +50,12 @@ import {
   suppressAnimationContainerImpl,
 } from "./metrc-utils";
 import {
-  acquirePackageFilterElementsImpl,
-  acquirePlantFilterElementsImpl,
-  acquireTransferFilterElementsImpl,
   applyDestinationPackageFilterImpl,
   applyPackageFilterImpl,
   applyPlantFilterImpl,
   applyTagFilterImpl,
   applyTransferFilterImpl,
+  initializeFilterButtonsImpl,
   resetFilterElementReferencesImpl,
   resetMetrcPackageFiltersImpl,
   resetMetrcPlantFiltersImpl,
@@ -568,6 +567,8 @@ class PageManager implements IAtomicService {
 
       this.tagTableGroups();
 
+      this.initializeFilterButtoms();
+
       if (window.location.pathname.match(PACKAGE_TAB_REGEX)) {
         await this.managePackageTabs();
         this.acquirePackageFilterElements();
@@ -720,6 +721,10 @@ class PageManager implements IAtomicService {
     return modifyTransferModalImpl();
   }
 
+  async clickTabWithGridId(gridId: MetrcGridId) {
+    (document.querySelector(`[data-grid-selector=#${gridId}]`)! as HTMLElement).click();
+  }
+
   async clickTabStartingWith(
     tabList: NodeList,
     tabText: string,
@@ -735,43 +740,48 @@ class PageManager implements IAtomicService {
     return clickTabStartingWithImpl(tabList, tabText, previousTabText, previousTabTextOffset);
   }
 
-  async acquirePlantFilterElements() {
-    return acquirePlantFilterElementsImpl();
+  async initializeFilterButtons() {
+    return initializeFilterButtonsImpl();
   }
 
-  async acquirePackageFilterElements() {
-    return acquirePackageFilterElementsImpl();
+  async setPlantFilter(
+    metrcGridId: MetrcGridId,
+    plantFilterIdentifier: PlantFilterIdentifiers,
+    value: string
+  ) {
+    return setPlantFilterImpl(metrcGridId, plantFilterIdentifier, value);
   }
 
-  async acquireTransferFilterElements() {
-    return acquireTransferFilterElementsImpl();
-  }
-
-  async acquireTagFilterElements() {
-    return acquirePackageFilterElementsImpl();
-  }
-
-  async setPlantFilter(plantFilterIdentifier: PlantFilterIdentifiers, value: string) {
-    return setPlantFilterImpl(plantFilterIdentifier, value);
-  }
-
-  async setPackageFilter(packageFilterIdentifier: PackageFilterIdentifiers, value: string) {
-    return setPackageFilterImpl(packageFilterIdentifier, value);
+  async setPackageFilter(
+    metrcGridId: MetrcGridId,
+    packageFilterIdentifier: PackageFilterIdentifiers,
+    value: string
+  ) {
+    return setPackageFilterImpl(metrcGridId, packageFilterIdentifier, value);
   }
 
   async setDestinationPackageFilter(
+    metrcGridId: MetrcGridId,
     destinationPackageFilterIdentifier: TransferredPackageFilterIdentifiers,
     value: string
   ) {
-    return setDestinationPackageFilterImpl(destinationPackageFilterIdentifier, value);
+    return setDestinationPackageFilterImpl(metrcGridId, destinationPackageFilterIdentifier, value);
   }
 
-  async setTransferFilter(transferFilterIdentifier: TransferFilterIdentifiers, value: string) {
-    return setTransferFilterImpl(transferFilterIdentifier, value);
+  async setTransferFilter(
+    metrcGridId: MetrcGridId,
+    transferFilterIdentifier: TransferFilterIdentifiers,
+    value: string
+  ) {
+    return setTransferFilterImpl(metrcGridId, transferFilterIdentifier, value);
   }
 
-  async setTagFilter(tagFilterIdentifier: TagFilterIdentifiers, value: string) {
-    return setTagFilterImpl(tagFilterIdentifier, value);
+  async setTagFilter(
+    metrcGridId: MetrcGridId,
+    tagFilterIdentifier: TagFilterIdentifiers,
+    value: string
+  ) {
+    return setTagFilterImpl(metrcGridId, tagFilterIdentifier, value);
   }
 
   applyPlantFilter(plantFilterIdentifier: PlantFilterIdentifiers) {

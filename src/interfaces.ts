@@ -1336,6 +1336,8 @@ export interface ISalesReceiptData {
   Transactions: any[];
 }
 
+export interface IIndexedSalesReceiptData extends ISalesReceiptData {}
+
 export interface IMetrcFacilityData {
   Id: number;
   LicenseNumber: string;

@@ -1,11 +1,11 @@
-import { TagFilterIdentifiers, TagState } from '@/consts';
-import { IPluginState, ITagSearchFilters } from '@/interfaces';
-import { primaryDataLoader } from '@/modules/data-loader/data-loader.module';
-import { pageManager } from '@/modules/page-manager/page-manager.module';
-import { timer } from 'rxjs';
-import { ActionContext } from 'vuex';
-import { TagSearchActions, TagSearchMutations } from './consts';
-import { ITagSearchState } from './interfaces';
+import { MetrcGridId, TagFilterIdentifiers, TagState } from "@/consts";
+import { IPluginState, ITagSearchFilters } from "@/interfaces";
+import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
+import { pageManager } from "@/modules/page-manager/page-manager.module";
+import { timer } from "rxjs";
+import { ActionContext } from "vuex";
+import { TagSearchActions, TagSearchMutations } from "./consts";
+import { ITagSearchState } from "./interfaces";
 
 const inMemoryState = {
   searchInflight: false,
@@ -30,7 +30,7 @@ export const tagSearchModule = {
   mutations: {
     [TagSearchMutations.SET_TAG_SEARCH_FILTERS](
       state: ITagSearchState,
-      { tagSearchFilters }: { tagSearchFilters: ITagSearchFilters },
+      { tagSearchFilters }: { tagSearchFilters: ITagSearchFilters }
     ) {
       state.tagSearchFilters = {
         ...tagSearchFilters,
@@ -41,7 +41,7 @@ export const tagSearchModule = {
   actions: {
     [TagSearchActions.EXECUTE_QUERY]: async (
       ctx: ActionContext<ITagSearchState, IPluginState>,
-      { queryString }: { queryString: string },
+      { queryString }: { queryString: string }
     ) => {
       ctx.state.tags = [];
       ctx.state.selectedTagMetadata = null;
@@ -78,18 +78,18 @@ export const tagSearchModule = {
         tagSearchFilters: ITagSearchFilters;
         propagate?: boolean;
         tagState?: TagState | null;
-      },
+      }
     ) => {
       if (tagState) {
         switch (tagState as TagState) {
           case TagState.AVAILABLE:
-            await pageManager.clickTabStartingWith(pageManager.tagTabs, 'Available');
+            await pageManager.clickTabWithGridId(MetrcGridId.TAGS_AVAILABLE);
             break;
           case TagState.USED:
-            await pageManager.clickTabStartingWith(pageManager.tagTabs, 'Used');
+            await pageManager.clickTabWithGridId(MetrcGridId.TAGS_USED);
             break;
           case TagState.VOIDED:
-            await pageManager.clickTabStartingWith(pageManager.tagTabs, 'Void');
+            await pageManager.clickTabWithGridId(MetrcGridId.TAGS_VOIDED);
             break;
           default:
             break;
@@ -111,7 +111,7 @@ export const tagSearchModule = {
       {
         tagSearchFilters,
         propagate = true,
-      }: { tagSearchFilters: ITagSearchFilters; propagate?: boolean },
+      }: { tagSearchFilters: ITagSearchFilters; propagate?: boolean }
     ) {
       const defaultTagSearchFilters = {
         label: null,
@@ -127,7 +127,7 @@ export const tagSearchModule = {
           // @ts-ignore
           if (ctx.state.tagSearchFilters[k] !== v) {
             switch (k) {
-              case 'label':
+              case "label":
                 pageManager.setTagFilter(TagFilterIdentifiers.Label, v);
                 break;
               default:

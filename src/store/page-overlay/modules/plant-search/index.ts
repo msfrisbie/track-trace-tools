@@ -1,11 +1,11 @@
-import { PlantFilterIdentifiers, PlantState } from '@/consts';
-import { IPlantSearchFilters, IPluginState } from '@/interfaces';
-import { primaryDataLoader } from '@/modules/data-loader/data-loader.module';
-import { pageManager } from '@/modules/page-manager/page-manager.module';
-import { timer } from 'rxjs';
-import { ActionContext } from 'vuex';
-import { PlantSearchActions, PlantSearchMutations } from './consts';
-import { IPlantSearchState } from './interfaces';
+import { MetrcGridId, PlantFilterIdentifiers, PlantState } from "@/consts";
+import { IPlantSearchFilters, IPluginState } from "@/interfaces";
+import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
+import { pageManager } from "@/modules/page-manager/page-manager.module";
+import { timer } from "rxjs";
+import { ActionContext } from "vuex";
+import { PlantSearchActions, PlantSearchMutations } from "./consts";
+import { IPlantSearchState } from "./interfaces";
 
 const inMemoryState = {
   searchInflight: false,
@@ -30,7 +30,7 @@ export const plantSearchModule = {
   mutations: {
     [PlantSearchMutations.SET_PLANT_SEARCH_FILTERS](
       state: IPlantSearchState,
-      { plantSearchFilters }: { plantSearchFilters: IPlantSearchFilters },
+      { plantSearchFilters }: { plantSearchFilters: IPlantSearchFilters }
     ) {
       state.plantSearchFilters = {
         ...plantSearchFilters,
@@ -41,7 +41,7 @@ export const plantSearchModule = {
   actions: {
     [PlantSearchActions.EXECUTE_QUERY]: async (
       ctx: ActionContext<IPlantSearchState, IPluginState>,
-      { queryString }: { queryString: string },
+      { queryString }: { queryString: string }
     ) => {
       ctx.state.plants = [];
       ctx.state.selectedPlantMetadata = null;
@@ -72,18 +72,21 @@ export const plantSearchModule = {
         plantSearchFilters: IPlantSearchFilters;
         propagate?: boolean;
         plantState?: PlantState | null;
-      },
+      }
     ) => {
       if (plantState) {
         switch (plantState as PlantState) {
           case PlantState.FLOWERING:
-            await pageManager.clickTabStartingWith(pageManager.plantsTabs, 'Flowering');
+            pageManager.clickTabWithGridId(MetrcGridId.PLANTS_FLOWERING);
             break;
           case PlantState.VEGETATIVE:
-            await pageManager.clickTabStartingWith(pageManager.plantsTabs, 'Vegetative');
+            pageManager.clickTabWithGridId(MetrcGridId.PLANTS_VEGETATIVE);
             break;
           case PlantState.INACTIVE:
-            await pageManager.clickTabStartingWith(pageManager.plantsTabs, 'Inactive', 'On Hold');
+            pageManager.clickTabWithGridId(MetrcGridId.PLANTS_INACTIVE);
+            break;
+          case PlantState.ON_HOLD:
+            pageManager.clickTabWithGridId(MetrcGridId.PLANTS_ON_HOLD);
             break;
           default:
             break;
@@ -105,7 +108,7 @@ export const plantSearchModule = {
       {
         plantSearchFilters,
         propagate = true,
-      }: { plantSearchFilters: IPlantSearchFilters; propagate?: boolean },
+      }: { plantSearchFilters: IPlantSearchFilters; propagate?: boolean }
     ) {
       const defaultPlantSearchFilters = {
         label: null,
@@ -123,13 +126,13 @@ export const plantSearchModule = {
           // @ts-ignore
           if (ctx.state.plantSearchFilters[k] !== v) {
             switch (k) {
-              case 'label':
+              case "label":
                 pageManager.setPlantFilter(PlantFilterIdentifiers.Label, v);
                 break;
-              case 'strainName':
+              case "strainName":
                 pageManager.setPlantFilter(PlantFilterIdentifiers.StrainName, v);
                 break;
-              case 'locationName':
+              case "locationName":
                 pageManager.setPlantFilter(PlantFilterIdentifiers.LocationName, v);
                 break;
               default:

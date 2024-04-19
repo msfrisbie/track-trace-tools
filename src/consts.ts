@@ -217,12 +217,14 @@ export enum PackageState {
 export enum PlantBatchState {
   ACTIVE = "ACTIVE",
   INACTIVE = "INACTIVE",
+  ON_HOLD = "ON_HOLD",
 }
 
 export enum PlantState {
   VEGETATIVE = "VEGETATIVE",
   FLOWERING = "FLOWERING",
   INACTIVE = "INACTIVE",
+  ON_HOLD = "ON_HOLD",
 }
 
 export enum TagState {
@@ -233,7 +235,7 @@ export enum TagState {
 
 export enum HarvestState {
   ACTIVE = "ACTIVE",
-  ONHOLD = "ONHOLD",
+  ON_HOLD = "ON_HOLD",
   INACTIVE = "INACTIVE",
 }
 
@@ -579,4 +581,38 @@ export enum PackageSearchFilterKeys {
   MANIFEST_NUMBER = "manifestNumber",
   DESTINATION_FACILITY_NAME = "destinationFacilityName",
   DESTINATION_LICENSE_NUMBER = "destinationLicenseNumber",
+}
+
+export enum MetrcGridId {
+  PLANT_BATCHES = "plantbatches-grid",
+  PLANT_BATCHES_ON_HOLD = "plantbatchesonhold-grid",
+  PLANT_BATCHES_INACTIVE = "plantbatchesinactive-grid",
+
+  PLANTS_VEGETATIVE = "plantsvegetative-grid",
+  PLANTS_FLOWERING = "plantsflowering-grid",
+  PLANTS_ON_HOLD = "plantsonhold-grid",
+  PLANTS_INACTIVE = "plantsinactive-grid",
+
+  HARVESTS_HARVESTED = "harvested-grid",
+  HARVESTS_ON_HOLD = "harvestsonhold-grid",
+  HARVESTS_INACTIVE = "harvestsinactive-grid",
+
+  PACKAGES_ACTIVE = "active-grid",
+  PACKAGES_ON_HOLD = "onhold-grid",
+  PACKAGES_INACTIVE = "inactive-grid",
+  PACKAGES_IN_TRANSIT = "intransit-grid",
+  PACKAGES_TRANSFERRED = "transferred-grid",
+
+  TRANSFERS_INCOMING = "incoming-grid",
+  TRANSFERS_INCOMING_INACTIVE = "incomingInactive-grid",
+  TRANSFERS_OUTGOING = "outgoing-grid",
+  TRANSFERS_REJECTED = "rejected-grid",
+  TRANSFERS_OUTGOING_INACTIVE = "outgoingInactive-grid",
+
+  TAGS_AVAILABLE = "available-grid",
+  TAGS_USED = "used-grid",
+  TAGS_VOIDED = "voided-grid",
+
+  SALES_ACTIVE = "active-grid",
+  SALES_INACTIVE = "inactive-grid",
 }

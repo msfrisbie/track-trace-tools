@@ -30,7 +30,7 @@ import { SearchActions } from '@/store/page-overlay/modules/search/consts';
 import Vue from 'vue';
 import { mapActions } from 'vuex';
 import store from '@/store/page-overlay/index';
-import { getNormalizedPackageContentsDescription } from '@/utils/package';
+import { getLabelOrError, getNormalizedPackageContentsDescription } from '@/utils/package';
 
 export default Vue.extend({
   name: 'PackageSearchResultPreview',
@@ -44,7 +44,6 @@ export default Vue.extend({
     ...mapActions({
       setShowSearchResults: `search/${SearchActions.SET_SHOW_SEARCH_RESULTS}`,
       partialUpdatePackageSearchFilters: `packageSearch/${PackageSearchActions.PARTIAL_UPDATE_PACKAGE_SEARCH_FILTERS}`,
-      setPackageSearchFilters: `packageSearch/${PackageSearchActions.SET_PACKAGE_SEARCH_FILTERS}`,
     }),
     selectPackage(pkg: IIndexedPackageData) {
       this.$emit('selected-package', pkg);
@@ -52,12 +51,11 @@ export default Vue.extend({
     async setPackageLabelFilter(pkg: IIndexedPackageData) {
       analyticsManager.track(MessageType.SELECTED_PACKAGE);
 
-      store.dispatch(
-        `packageSearch/${PackageSearchActions.PARTIAL_UPDATE_PACKAGE_SEARCH_FILTERS}`,
+      this.partialUpdatePackageSearchFilters(
         {
           packageState: pkg.PackageState,
           packageSearchFilters: {
-            label: pkg.Label,
+            label: getLabelOrError(pkg),
           },
         },
       );
