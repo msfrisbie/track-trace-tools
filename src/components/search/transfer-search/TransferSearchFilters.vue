@@ -43,10 +43,10 @@ export default Vue.extend({
   },
   methods: {
     clearTransferManifestNumberFilter() {
-      pageManager.setTransferFilter(TransferFilterIdentifiers.ManifestNumber, '');
+      // pageManager.setTransferFilter(TransferFilterIdentifiers.ManifestNumber, '');
     },
     clearMetrcSearch() {
-      pageManager.resetMetrcTransferFilters();
+      // pageManager.resetMetrcTransferFilters();
     },
   },
   async mounted() {},

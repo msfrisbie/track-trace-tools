@@ -1,7 +1,7 @@
 <template>
   <div class="border-purple-300" v-bind:class="{
     'bg-white': selected,
-  }" @mouseenter="selectTransfer(transfer)" @click.stop.prevent="setTransferManifestNumberFilter(transfer)">
+  }" @mouseenter="selectTransfer(transfer)" @click.stop.prevent="setTransferManifestNumberFilter()">
     <div class="flex flex-row items-center space-x-6 cursor-pointer p-4">
       <div class="flex flex-column-shim flex-col space-y-2" v-bind:class="{ 'font-bold': selected }">
         <div class="text-xl text-purple-700">
@@ -21,8 +21,8 @@ import { MessageType, MetrcGridId, TransferFilterIdentifiers, TransferState } fr
 import { IIndexedTransferData } from '@/interfaces';
 import { analyticsManager } from '@/modules/analytics-manager.module';
 import { pageManager } from '@/modules/page-manager/page-manager.module';
-import { MutationType } from '@/mutation-types';
 import store from '@/store/page-overlay/index';
+import { SearchActions } from '@/store/page-overlay/modules/search/consts';
 import Vue from 'vue';
 
 export default Vue.extend({
@@ -62,33 +62,37 @@ export default Vue.extend({
     async setTransferManifestNumberFilter() {
       analyticsManager.track(MessageType.SELECTED_TRANSFER);
 
+      let metrcGridId: MetrcGridId;
+
       switch (this.$props.transfer.TransferState as TransferState) {
         case TransferState.INCOMING:
-          await pageManager.clickTabWithGridId(MetrcGridId.TRANSFERS_INCOMING);
+          metrcGridId = MetrcGridId.TRANSFERS_INCOMING;
           break;
         case TransferState.INCOMING_INACTIVE:
-          await pageManager.clickTabWithGridId(MetrcGridId.TRANSFERS_INCOMING_INACTIVE);
+          metrcGridId = MetrcGridId.TRANSFERS_INCOMING_INACTIVE;
           break;
         case TransferState.OUTGOING:
-          await pageManager.clickTabWithGridId(MetrcGridId.TRANSFERS_OUTGOING);
+          metrcGridId = MetrcGridId.TRANSFERS_OUTGOING;
           break;
         case TransferState.OUTGOING_INACTIVE:
-          await pageManager.clickTabWithGridId(MetrcGridId.TRANSFERS_OUTGOING_INACTIVE);
+          metrcGridId = MetrcGridId.TRANSFERS_OUTGOING_INACTIVE;
           break;
         case TransferState.REJECTED:
-          await pageManager.clickTabWithGridId(MetrcGridId.TRANSFERS_REJECTED);
+          metrcGridId = MetrcGridId.TRANSFERS_REJECTED;
           break;
         default:
           return;
       }
 
-      pageManager.setTransferFilter(
+      await pageManager.clickTabWithGridId(metrcGridId);
+
+      pageManager.setFilter(
+        metrcGridId,
         TransferFilterIdentifiers.ManifestNumber,
-        // @ts-ignore
         this.$props.transfer.ManifestNumber,
       );
 
-      store.commit(`transferSearch/${MutationType.SET_SHOW_TRANSFER_SEARCH_RESULTS}`, false);
+      store.commit(`search/${SearchActions.SET_SHOW_SEARCH_RESULTS}`, { showSearchResults: false });
     },
   },
 });

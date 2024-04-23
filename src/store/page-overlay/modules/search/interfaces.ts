@@ -1,5 +1,15 @@
-import { IIndexedPackageData, IIndexedPlantBatchData, IIndexedPlantData, IIndexedSalesReceiptData, IIndexedTagData, IIndexedTransferData, IIndexedTransferredPackageData, IItemData, ISalesReceiptData, IStrainData } from '@/interfaces';
-import { SearchType } from './consts';
+import {
+  IIndexedPackageData,
+  IIndexedPlantBatchData,
+  IIndexedPlantData,
+  IIndexedSalesReceiptData,
+  IIndexedTagData,
+  IIndexedTransferData,
+  IIndexedTransferredPackageData,
+  IItemData,
+  IStrainData,
+} from "@/interfaces";
+import { SearchType } from "./consts";
 
 export interface ISearchResult {
   score: number;
@@ -24,4 +34,8 @@ export interface ISearchState {
   modalSearchOpen: boolean;
   searchResults: ISearchResult[];
   activeSearchResult: ISearchResult | null;
+
+  // Deprecated
+
+  searchType: SearchType;
 }

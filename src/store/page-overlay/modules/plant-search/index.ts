@@ -1,4 +1,4 @@
-import { MetrcGridId, PlantFilterIdentifiers, PlantState } from "@/consts";
+import { MetrcGridId, PlantState } from "@/consts";
 import { IPlantSearchFilters, IPluginState } from "@/interfaces";
 import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
 import { pageManager } from "@/modules/page-manager/page-manager.module";
@@ -125,19 +125,19 @@ export const plantSearchModule = {
         for (const [k, v] of Object.entries(plantSearchFilters)) {
           // @ts-ignore
           if (ctx.state.plantSearchFilters[k] !== v) {
-            switch (k) {
-              case "label":
-                pageManager.setPlantFilter(PlantFilterIdentifiers.Label, v);
-                break;
-              case "strainName":
-                pageManager.setPlantFilter(PlantFilterIdentifiers.StrainName, v);
-                break;
-              case "locationName":
-                pageManager.setPlantFilter(PlantFilterIdentifiers.LocationName, v);
-                break;
-              default:
-                break;
-            }
+            //   switch (k) {
+            //     case "label":
+            //       pageManager.setPlantFilter(PlantFilterIdentifiers.Label, v);
+            //       break;
+            //     case "strainName":
+            //       pageManager.setPlantFilter(PlantFilterIdentifiers.StrainName, v);
+            //       break;
+            //     case "locationName":
+            //       pageManager.setPlantFilter(PlantFilterIdentifiers.LocationName, v);
+            //       break;
+            //     default:
+            //       break;
+            //   }
           }
         }
       }

@@ -157,19 +157,19 @@ export const transferSearchModule = {
         for (const [k, v] of Object.entries(transferSearchFilters)) {
           // @ts-ignore
           if (ctx.state.transferSearchFilters[k] !== v) {
-            switch (k) {
-              case "manifestNumber":
-                pageManager.setTransferFilter(TransferFilterIdentifiers.ManifestNumber, v);
-                break;
-              case "destinationFacilities":
-                pageManager.setTransferFilter(TransferFilterIdentifiers.DeliveryFacilities, v);
-                break;
-              case "shipperFacilityInfo":
-                pageManager.setTransferFilter(TransferFilterIdentifiers.ShipperFacilityInfo, v);
-                break;
-              default:
-                break;
-            }
+            // switch (k) {
+            //   case "manifestNumber":
+            //     pageManager.setTransferFilter(TransferFilterIdentifiers.ManifestNumber, v);
+            //     break;
+            //   case "destinationFacilities":
+            //     pageManager.setTransferFilter(TransferFilterIdentifiers.DeliveryFacilities, v);
+            //     break;
+            //   case "shipperFacilityInfo":
+            //     pageManager.setTransferFilter(TransferFilterIdentifiers.ShipperFacilityInfo, v);
+            //     break;
+            //   default:
+            //     break;
+            // }
           }
         }
       }

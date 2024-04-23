@@ -1,8 +1,7 @@
-import { MessageType, MetrcGridId, TagState, TransferState } from "@/consts";
+import { MessageType, TagState, TransferState } from "@/consts";
 import { IPluginState } from "@/interfaces";
 import { analyticsManager } from "@/modules/analytics-manager.module";
 import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
-import { pageManager } from "@/modules/page-manager/page-manager.module";
 import { maybePushOntoUniqueStack } from "@/utils/search";
 import _ from "lodash-es";
 import { ActionContext } from "vuex";
@@ -17,7 +16,8 @@ const inMemoryState = {
   queryLicenseNumber: "", // TODO
   searchResults: [],
   activeSearchResult: null,
-  searchFilters: {}
+  searchFilters: {},
+  searchType: SearchType.PACKAGES,
 };
 
 const persistedState = {
@@ -78,26 +78,30 @@ export const searchModule = {
     //   // }
     // },
 
-    [SearchActions.SET_SEARCH_FILTERS]: async (
-      ctx: ActionContext<ISearchState, IPluginState>,
-      {
-        searchFilters,
-        metrcGridId
-      }: {
-        searchFilters: {[key: string]: string},
-        metrcGridId: MetrcGridId,
-      }
-    ) => {
-      await pageManager.clickTabWithGridId(metrcGridId);
+    // [SearchActions.SET_SEARCH_FILTERS]: async (
+    //   ctx: ActionContext<ISearchState, IPluginState>,
+    //   {
+    //     searchFilters,
+    //     metrcGridId
+    //   }: {
+    //     searchFilters: {[key: string]: string},
+    //     metrcGridId: MetrcGridId,
+    //   }
+    // ) => {
+    //   await pageManager.clickTabWithGridId(metrcGridId);
 
-      ctx.commit(SearchMutations.SEARCH_MUTATION, { searchFilters });
-    },
+    //   ctx.commit(SearchMutations.SEARCH_MUTATION, { searchFilters });
+    // },
     [SearchActions.EXECUTE_QUERY]: _.debounce(
       async (
         ctx: ActionContext<ISearchState, IPluginState>,
         { queryString }: { queryString: string }
       ) => {
         if (!queryString.length) {
+          ctx.commit(SearchMutations.SEARCH_MUTATION, {
+            searchResults: [],
+          });
+
           return;
         }
 

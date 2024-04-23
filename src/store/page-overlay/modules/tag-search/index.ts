@@ -126,13 +126,13 @@ export const tagSearchModule = {
         for (const [k, v] of Object.entries(tagSearchFilters)) {
           // @ts-ignore
           if (ctx.state.tagSearchFilters[k] !== v) {
-            switch (k) {
-              case "label":
-                pageManager.setTagFilter(TagFilterIdentifiers.Label, v);
-                break;
-              default:
-                break;
-            }
+            // switch (k) {
+            //   case "label":
+            //     pageManager.setTagFilter(TagFilterIdentifiers.Label, v);
+            //     break;
+            //   default:
+            //     break;
+            // }
           }
         }
       }

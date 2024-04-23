@@ -71,9 +71,9 @@ export async function managePlantTabsImpl() {
     // If we see the tab has changed, the current filters are
     // invalid and we need to reacquire the inputs
     if (!!pageManager.selectedPlantTab && activeTab !== pageManager.selectedPlantTab) {
-      pageManager.resetMetrcPlantFilters();
-      await pageManager.clickSettleDelay();
-      pageManager.resetFilterElementReferences();
+      // pageManager.resetMetrcPlantFilters();
+      // await pageManager.clickSettleDelay();
+      // pageManager.resetFilterElementReferences();
     }
 
     pageManager.selectedPlantTab = activeTab;
@@ -98,9 +98,9 @@ export async function managePackageTabsImpl() {
     // If we see the tab has changed, the current filters are
     // invalid and we need to reacquire the inputs
     if (!!pageManager.selectedPackageTab && activeTab !== pageManager.selectedPackageTab) {
-      pageManager.resetMetrcPackageFilters();
-      await pageManager.clickSettleDelay();
-      pageManager.resetFilterElementReferences();
+      // pageManager.resetMetrcPackageFilters();
+      // await pageManager.clickSettleDelay();
+      // pageManager.resetFilterElementReferences();
     }
 
     pageManager.selectedPackageTab = activeTab;
@@ -125,9 +125,9 @@ export async function manageTransfersTabsImpl() {
     // If we see the tab has changed, the current filters are
     // invalid and we need to reacquire the inputs
     if (!!pageManager.selectedTransferTab && activeTab !== pageManager.selectedTransferTab) {
-      pageManager.resetMetrcTransferFilters();
-      await pageManager.clickSettleDelay();
-      pageManager.resetFilterElementReferences();
+      // pageManager.resetMetrcTransferFilters();
+      // await pageManager.clickSettleDelay();
+      // pageManager.resetFilterElementReferences();
     }
 
     pageManager.selectedTransferTab = activeTab;
@@ -162,9 +162,9 @@ export async function manageTagsTabsImpl() {
     // If we see the tab has changed, the current filters are
     // invalid and we need to reacquire the inputs
     if (!!pageManager.selectedTagTab && activeTab !== pageManager.selectedTagTab) {
-      pageManager.resetMetrcTagFilters();
-      await pageManager.clickSettleDelay();
-      pageManager.resetFilterElementReferences();
+      // pageManager.resetMetrcTagFilters();
+      // await pageManager.clickSettleDelay();
+      // pageManager.resetFilterElementReferences();
     }
 
     pageManager.selectedTagTab = activeTab;

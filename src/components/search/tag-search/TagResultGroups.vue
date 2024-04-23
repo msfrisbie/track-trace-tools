@@ -81,7 +81,7 @@ export default Vue.extend({
       setShowSearchResults: `search/${SearchActions.SET_SHOW_SEARCH_RESULTS}`,
     }),
     resetFilters() {
-      pageManager.resetMetrcTagFilters();
+      // pageManager.resetMetrcTagFilters();
     },
   },
 });
