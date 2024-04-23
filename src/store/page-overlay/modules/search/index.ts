@@ -2,12 +2,12 @@ import { MessageType, MetrcGridId, TagState, TransferState } from "@/consts";
 import { IPluginState } from "@/interfaces";
 import { analyticsManager } from "@/modules/analytics-manager.module";
 import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
+import { pageManager } from "@/modules/page-manager/page-manager.module";
 import { maybePushOntoUniqueStack } from "@/utils/search";
 import _ from "lodash-es";
 import { ActionContext } from "vuex";
 import { SearchActions, SearchMutations, SearchType } from "./consts";
 import { ISearchResult, ISearchState } from "./interfaces";
-import { pageManager } from "@/modules/page-manager/page-manager.module";
 
 const inMemoryState = {
   queryString: "",
@@ -17,6 +17,7 @@ const inMemoryState = {
   queryLicenseNumber: "", // TODO
   searchResults: [],
   activeSearchResult: null,
+  searchFilters: {}
 };
 
 const persistedState = {
@@ -76,7 +77,7 @@ export const searchModule = {
     //   //   ctx.dispatch(SearchActions.SET_SEARCH_TYPE, { searchType: SearchType.PACKAGES });
     //   // }
     // },
-    
+
     [SearchActions.SET_SEARCH_FILTERS]: async (
       ctx: ActionContext<ISearchState, IPluginState>,
       {
@@ -89,7 +90,7 @@ export const searchModule = {
     ) => {
       await pageManager.clickTabWithGridId(metrcGridId);
 
-      for ()
+      ctx.commit(SearchMutations.SEARCH_MUTATION, { searchFilters });
     },
     [SearchActions.EXECUTE_QUERY]: _.debounce(
       async (
