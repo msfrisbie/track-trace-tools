@@ -23,7 +23,7 @@
 <script lang="ts">
 import store from '@/store/page-overlay/index';
 import Vue from 'vue';
-import UnifiedSearchWidget from '@/components/page-overlay/UnifiedSearchWidget.vue';
+import UnifiedSearchWidget from '@/components/search/unified/UnifiedSearchWidget.vue';
 import { MessageType } from '@/consts';
 import { analyticsManager } from '@/modules/analytics-manager.module';
 

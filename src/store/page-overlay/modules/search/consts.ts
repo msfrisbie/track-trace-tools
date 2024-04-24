@@ -23,3 +23,10 @@ export enum SearchType {
   SALES = "SALES",
   TRANSFER_TEMPLATES = "TRANSFER_TEMPLATES",
 }
+
+export enum SearchStatus {
+  INITIAL = "INITIAL",
+  INFLIGHT = "INFLIGHT",
+  SUCCESS = "SUCCESS",
+  ERROR = "ERROR",
+}

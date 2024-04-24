@@ -5,12 +5,13 @@ import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
 import { maybePushOntoUniqueStack } from "@/utils/search";
 import _ from "lodash-es";
 import { ActionContext } from "vuex";
-import { SearchActions, SearchMutations, SearchType } from "./consts";
+import { SearchActions, SearchMutations, SearchStatus, SearchType } from "./consts";
 import { ISearchResult, ISearchState } from "./interfaces";
 
 const inMemoryState = {
   queryString: "",
-  searchInflight: false,
+  status: SearchStatus.INITIAL,
+  statusMessage: null,
   showSearchResults: false,
   modalSearchOpen: false,
   queryLicenseNumber: "", // TODO
@@ -99,6 +100,8 @@ export const searchModule = {
       ) => {
         if (!queryString.length) {
           ctx.commit(SearchMutations.SEARCH_MUTATION, {
+            status: SearchStatus.INITIAL,
+            statusMessage: null,
             searchResults: [],
           });
 
@@ -111,197 +114,204 @@ export const searchModule = {
 
         ctx.commit(SearchMutations.SEARCH_MUTATION, {
           queryStringHistory: maybePushOntoUniqueStack(queryString, ctx.state.queryStringHistory),
-          searchInflight: true,
+          status: SearchStatus.INFLIGHT,
           searchResults: [],
         });
 
-        await Promise.allSettled([
-          primaryDataLoader.onDemandActivePackageSearch({ queryString }).then((result) => {
-            const newSearchResults: ISearchResult[] = result.map((pkg) => ({
-              score: 1,
-              pkg,
-            }));
-
-            ctx.commit(SearchMutations.SEARCH_MUTATION, {
-              searchResults: [...ctx.state.searchResults, ...newSearchResults],
-            });
-          }),
-          primaryDataLoader.onDemandInTransitPackageSearch({ queryString }).then((result) => {
-            const newSearchResults: ISearchResult[] = result.map((pkg) => ({
-              score: 1,
-              pkg,
-            }));
-
-            ctx.commit(SearchMutations.SEARCH_MUTATION, {
-              searchResults: [...ctx.state.searchResults, ...newSearchResults],
-            });
-          }),
-          primaryDataLoader.onDemandInactivePackageSearch({ queryString }).then((result) => {
-            const newSearchResults: ISearchResult[] = result.map((pkg) => ({
-              score: 1,
-              pkg,
-            }));
-
-            ctx.commit(SearchMutations.SEARCH_MUTATION, {
-              searchResults: [...ctx.state.searchResults, ...newSearchResults],
-            });
-          }),
-          primaryDataLoader.onDemandTransferredPackageSearch({ queryString }).then((result) => {
-            const newSearchResults: ISearchResult[] = result.map((transferredPkg) => ({
-              score: 1,
-              transferredPkg,
-            }));
-
-            ctx.commit(SearchMutations.SEARCH_MUTATION, {
-              searchResults: [...ctx.state.searchResults, ...newSearchResults],
-            });
-          }),
-          primaryDataLoader.onDemandFloweringPlantSearch({ queryString }).then((result) => {
-            const newSearchResults: ISearchResult[] = result.map((plant) => ({
-              score: 1,
-              plant,
-            }));
-
-            ctx.commit(SearchMutations.SEARCH_MUTATION, {
-              searchResults: [...ctx.state.searchResults, ...newSearchResults],
-            });
-          }),
-          primaryDataLoader.onDemandVegetativePlantSearch({ queryString }).then((result) => {
-            const newSearchResults: ISearchResult[] = result.map((plant) => ({
-              score: 1,
-              plant,
-            }));
-
-            ctx.commit(SearchMutations.SEARCH_MUTATION, {
-              searchResults: [...ctx.state.searchResults, ...newSearchResults],
-            });
-          }),
-          primaryDataLoader.onDemandInactivePlantSearch({ queryString }).then((result) => {
-            const newSearchResults: ISearchResult[] = result.map((plant) => ({
-              score: 1,
-              plant,
-            }));
-
-            ctx.commit(SearchMutations.SEARCH_MUTATION, {
-              searchResults: [...ctx.state.searchResults, ...newSearchResults],
-            });
-          }),
-          primaryDataLoader
-            .onDemandTransferSearch({
-              transferState: TransferState.INCOMING,
-              queryString,
-            })
-            .then((result) => {
-              const newSearchResults: ISearchResult[] = result.map((incomingTransfer) => ({
+        try {
+          await Promise.allSettled([
+            primaryDataLoader.onDemandActivePackageSearch({ queryString }).then((result) => {
+              const newSearchResults: ISearchResult[] = result.map((pkg) => ({
                 score: 1,
-                incomingTransfer,
+                pkg,
               }));
 
               ctx.commit(SearchMutations.SEARCH_MUTATION, {
                 searchResults: [...ctx.state.searchResults, ...newSearchResults],
               });
             }),
-          primaryDataLoader
-            .onDemandTransferSearch({
-              transferState: TransferState.INCOMING_INACTIVE,
-              queryString,
-            })
-            .then((result) => {
-              const newSearchResults: ISearchResult[] = result.map((incomingTransfer) => ({
+            primaryDataLoader.onDemandInTransitPackageSearch({ queryString }).then((result) => {
+              const newSearchResults: ISearchResult[] = result.map((pkg) => ({
                 score: 1,
-                incomingTransfer,
+                pkg,
               }));
 
               ctx.commit(SearchMutations.SEARCH_MUTATION, {
                 searchResults: [...ctx.state.searchResults, ...newSearchResults],
               });
             }),
-          primaryDataLoader
-            .onDemandTransferSearch({
-              transferState: TransferState.OUTGOING,
-              queryString,
-            })
-            .then((result) => {
-              const newSearchResults: ISearchResult[] = result.map((outgoingTransfer) => ({
+            primaryDataLoader.onDemandInactivePackageSearch({ queryString }).then((result) => {
+              const newSearchResults: ISearchResult[] = result.map((pkg) => ({
                 score: 1,
-                outgoingTransfer,
+                pkg,
               }));
 
               ctx.commit(SearchMutations.SEARCH_MUTATION, {
                 searchResults: [...ctx.state.searchResults, ...newSearchResults],
               });
             }),
-          primaryDataLoader
-            .onDemandTransferSearch({
-              transferState: TransferState.OUTGOING_INACTIVE,
-              queryString,
-            })
-            .then((result) => {
-              const newSearchResults: ISearchResult[] = result.map((outgoingTransfer) => ({
+            primaryDataLoader.onDemandTransferredPackageSearch({ queryString }).then((result) => {
+              const newSearchResults: ISearchResult[] = result.map((transferredPkg) => ({
                 score: 1,
-                outgoingTransfer,
+                transferredPkg,
               }));
 
               ctx.commit(SearchMutations.SEARCH_MUTATION, {
                 searchResults: [...ctx.state.searchResults, ...newSearchResults],
               });
             }),
-          primaryDataLoader
-            .onDemandTransferSearch({
-              transferState: TransferState.REJECTED,
-              queryString,
-            })
-            .then((result) => {
-              const newSearchResults: ISearchResult[] = result.map((outgoingTransfer) => ({
+            primaryDataLoader.onDemandFloweringPlantSearch({ queryString }).then((result) => {
+              const newSearchResults: ISearchResult[] = result.map((plant) => ({
                 score: 1,
-                outgoingTransfer,
+                plant,
               }));
 
               ctx.commit(SearchMutations.SEARCH_MUTATION, {
                 searchResults: [...ctx.state.searchResults, ...newSearchResults],
               });
             }),
-          primaryDataLoader
-            .onDemandTagSearch({ queryString, tagState: TagState.AVAILABLE })
-            .then((result) => {
-              const newSearchResults: ISearchResult[] = result.map((tag) => ({
+            primaryDataLoader.onDemandVegetativePlantSearch({ queryString }).then((result) => {
+              const newSearchResults: ISearchResult[] = result.map((plant) => ({
                 score: 1,
-                tag,
+                plant,
               }));
 
               ctx.commit(SearchMutations.SEARCH_MUTATION, {
                 searchResults: [...ctx.state.searchResults, ...newSearchResults],
               });
             }),
-          primaryDataLoader
-            .onDemandTagSearch({ queryString, tagState: TagState.USED })
-            .then((result) => {
-              const newSearchResults: ISearchResult[] = result.map((tag) => ({
+            primaryDataLoader.onDemandInactivePlantSearch({ queryString }).then((result) => {
+              const newSearchResults: ISearchResult[] = result.map((plant) => ({
                 score: 1,
-                tag,
+                plant,
               }));
 
               ctx.commit(SearchMutations.SEARCH_MUTATION, {
                 searchResults: [...ctx.state.searchResults, ...newSearchResults],
               });
             }),
-          primaryDataLoader
-            .onDemandTagSearch({ queryString, tagState: TagState.VOIDED })
-            .then((result) => {
-              const newSearchResults: ISearchResult[] = result.map((tag) => ({
-                score: 1,
-                tag,
-              }));
+            primaryDataLoader
+              .onDemandTransferSearch({
+                transferState: TransferState.INCOMING,
+                queryString,
+              })
+              .then((result) => {
+                const newSearchResults: ISearchResult[] = result.map((incomingTransfer) => ({
+                  score: 1,
+                  incomingTransfer,
+                }));
 
-              ctx.commit(SearchMutations.SEARCH_MUTATION, {
-                searchResults: [...ctx.state.searchResults, ...newSearchResults],
-              });
-            }),
-        ]);
+                ctx.commit(SearchMutations.SEARCH_MUTATION, {
+                  searchResults: [...ctx.state.searchResults, ...newSearchResults],
+                });
+              }),
+            primaryDataLoader
+              .onDemandTransferSearch({
+                transferState: TransferState.INCOMING_INACTIVE,
+                queryString,
+              })
+              .then((result) => {
+                const newSearchResults: ISearchResult[] = result.map((incomingTransfer) => ({
+                  score: 1,
+                  incomingTransfer,
+                }));
 
-        ctx.commit(SearchMutations.SEARCH_MUTATION, {
-          searchInflight: false,
-        });
+                ctx.commit(SearchMutations.SEARCH_MUTATION, {
+                  searchResults: [...ctx.state.searchResults, ...newSearchResults],
+                });
+              }),
+            primaryDataLoader
+              .onDemandTransferSearch({
+                transferState: TransferState.OUTGOING,
+                queryString,
+              })
+              .then((result) => {
+                const newSearchResults: ISearchResult[] = result.map((outgoingTransfer) => ({
+                  score: 1,
+                  outgoingTransfer,
+                }));
+
+                ctx.commit(SearchMutations.SEARCH_MUTATION, {
+                  searchResults: [...ctx.state.searchResults, ...newSearchResults],
+                });
+              }),
+            primaryDataLoader
+              .onDemandTransferSearch({
+                transferState: TransferState.OUTGOING_INACTIVE,
+                queryString,
+              })
+              .then((result) => {
+                const newSearchResults: ISearchResult[] = result.map((outgoingTransfer) => ({
+                  score: 1,
+                  outgoingTransfer,
+                }));
+
+                ctx.commit(SearchMutations.SEARCH_MUTATION, {
+                  searchResults: [...ctx.state.searchResults, ...newSearchResults],
+                });
+              }),
+            primaryDataLoader
+              .onDemandTransferSearch({
+                transferState: TransferState.REJECTED,
+                queryString,
+              })
+              .then((result) => {
+                const newSearchResults: ISearchResult[] = result.map((outgoingTransfer) => ({
+                  score: 1,
+                  outgoingTransfer,
+                }));
+
+                ctx.commit(SearchMutations.SEARCH_MUTATION, {
+                  searchResults: [...ctx.state.searchResults, ...newSearchResults],
+                });
+              }),
+            primaryDataLoader
+              .onDemandTagSearch({ queryString, tagState: TagState.AVAILABLE })
+              .then((result) => {
+                const newSearchResults: ISearchResult[] = result.map((tag) => ({
+                  score: 1,
+                  tag,
+                }));
+
+                ctx.commit(SearchMutations.SEARCH_MUTATION, {
+                  searchResults: [...ctx.state.searchResults, ...newSearchResults],
+                });
+              }),
+            primaryDataLoader
+              .onDemandTagSearch({ queryString, tagState: TagState.USED })
+              .then((result) => {
+                const newSearchResults: ISearchResult[] = result.map((tag) => ({
+                  score: 1,
+                  tag,
+                }));
+
+                ctx.commit(SearchMutations.SEARCH_MUTATION, {
+                  searchResults: [...ctx.state.searchResults, ...newSearchResults],
+                });
+              }),
+            primaryDataLoader
+              .onDemandTagSearch({ queryString, tagState: TagState.VOIDED })
+              .then((result) => {
+                const newSearchResults: ISearchResult[] = result.map((tag) => ({
+                  score: 1,
+                  tag,
+                }));
+
+                ctx.commit(SearchMutations.SEARCH_MUTATION, {
+                  searchResults: [...ctx.state.searchResults, ...newSearchResults],
+                });
+              }),
+          ]);
+
+          ctx.commit(SearchMutations.SEARCH_MUTATION, {
+            status: SearchStatus.SUCCESS,
+          });
+        } catch (e) {
+          ctx.commit(SearchMutations.SEARCH_MUTATION, {
+            status: SearchStatus.ERROR,
+            statusMessage: (e as Error).toString(),
+          });
+        }
       },
       700
     ),

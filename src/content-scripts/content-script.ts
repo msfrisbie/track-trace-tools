@@ -3,7 +3,7 @@
 import OverlayWidget from "@/components/overlay-widget/OverlayWidget.vue";
 import FloatingFacilityPicker from "@/components/page-overlay/FloatingFacilityPicker.vue";
 import TrackTraceToolsPageOverlay from "@/components/page-overlay/TrackTraceToolsPageOverlay.vue";
-import UnifiedSearchWidget from "@/components/page-overlay/UnifiedSearchWidget.vue";
+import UnifiedSearchWidget from "@/components/search/unified/UnifiedSearchWidget.vue";
 import { analyticsManager } from "@/modules/analytics-manager.module";
 import { authManager } from "@/modules/auth-manager.module";
 import { isDevelopment } from "@/modules/environment.module";

@@ -9,7 +9,7 @@ import {
   IItemData,
   IStrainData,
 } from "@/interfaces";
-import { SearchType } from "./consts";
+import { SearchStatus, SearchType } from "./consts";
 
 export interface ISearchResult {
   score: number;
@@ -27,7 +27,8 @@ export interface ISearchResult {
 
 export interface ISearchState {
   showSearchResults: boolean;
-  searchInflight: boolean;
+  status: SearchStatus,
+  statusMessage: string | null,
   queryString: string;
   queryLicenseNumber: string;
   queryStringHistory: string[];
