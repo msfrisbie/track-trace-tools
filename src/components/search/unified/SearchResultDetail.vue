@@ -1,18 +1,18 @@
 <template>
   <div>
     <!-- {{ searchState.activeSearchResult }} -->
-    <package-search-result-detail></package-search-result-detail>
-    <plant-search-result-detail></plant-search-result-detail>
-    <tag-search-result-detail></tag-search-result-detail>
-    <transfer-search-result-detail></transfer-search-result-detail>
+    <package-search-result-detail-v2></package-search-result-detail-v2>
+    <plant-search-result-detail-v2></plant-search-result-detail-v2>
+    <tag-search-result-detail-v2></tag-search-result-detail-v2>
+    <transfer-search-result-detail-v2></transfer-search-result-detail-v2>
   </div>
 </template>
 
 <script lang="ts">
-import PackageSearchResultDetail from "@/components/search/package-search/PackageSearchResultDetail.vue";
-import PlantSearchResultDetail from "@/components/search/plant-search/PlantSearchResultDetail.vue";
-import TagSearchResultDetail from "@/components/search/tag-search/TagSearchResultDetail.vue";
-import TransferSearchResultDetail from "@/components/search/transfer-search/TransferSearchResultDetail.vue";
+import PackageSearchResultDetailV2 from "@/components/search/unified/PackageSearchResultDetailV2.vue";
+import PlantSearchResultDetailV2 from "@/components/search/unified/PlantSearchResultDetailV2.vue";
+import TagSearchResultDetailV2 from "@/components/search/unified/TagSearchResultDetailV2.vue";
+import TransferSearchResultDetailV2 from "@/components/search/unified/TransferSearchResultDetailV2.vue";
 import { IPluginState } from "@/interfaces";
 import router from "@/router/index";
 import store from "@/store/page-overlay/index";
@@ -27,10 +27,10 @@ export default Vue.extend({
   router,
   props: {},
   components: {
-    PackageSearchResultDetail,
-    PlantSearchResultDetail,
-    TransferSearchResultDetail,
-    TagSearchResultDetail,
+    PackageSearchResultDetailV2,
+    PlantSearchResultDetailV2,
+    TransferSearchResultDetailV2,
+    TagSearchResultDetailV2,
   },
   computed: {
     ...mapState<IPluginState>({
