@@ -42,11 +42,32 @@ export const searchModule = {
         }
       });
     },
+    [SearchMutations.PUSH_SEARCH_RESULTS](state: ISearchState, { newSearchResults }: {newSearchResults: ISearchResult[]}) {
+      state.searchResults = [
+        ...newSearchResults,
+        ...state.searchResults
+      ].sort((a, b) => b.score - a.score);
+
+      const highestScoreSearchResult: ISearchResult | null = state.searchResults[0] ?? null;
+
+      if (!highestScoreSearchResult) {
+        return;
+      }
+
+      if (!state.activeSearchResult || state.activeSearchResult.score < highestScoreSearchResult.score) {
+        state.activeSearchResult = highestScoreSearchResult;
+      }
+    },
   },
   getters: {
-    // TODO sorted search results
   },
   actions: {
+    [SearchActions.SELECT_SEARCH_RESULT](
+      ctx: ActionContext<ISearchState, IPluginState>,
+      { searchResult }: { searchResult: ISearchResult | null }
+    ) {
+      ctx.commit(SearchMutations.SEARCH_MUTATION, { activeSearchResult: searchResult });
+    },
     [SearchActions.SET_QUERY_STRING](
       ctx: ActionContext<ISearchState, IPluginState>,
       { queryString }: { queryString: string }
@@ -126,8 +147,8 @@ export const searchModule = {
                 pkg,
               }));
 
-              ctx.commit(SearchMutations.SEARCH_MUTATION, {
-                searchResults: [...ctx.state.searchResults, ...newSearchResults],
+              ctx.commit(SearchMutations.PUSH_SEARCH_RESULTS, {
+                newSearchResults
               });
             }),
             primaryDataLoader.onDemandInTransitPackageSearch({ queryString }).then((result) => {
@@ -136,8 +157,8 @@ export const searchModule = {
                 pkg,
               }));
 
-              ctx.commit(SearchMutations.SEARCH_MUTATION, {
-                searchResults: [...ctx.state.searchResults, ...newSearchResults],
+              ctx.commit(SearchMutations.PUSH_SEARCH_RESULTS, {
+                newSearchResults
               });
             }),
             primaryDataLoader.onDemandInactivePackageSearch({ queryString }).then((result) => {
@@ -146,8 +167,8 @@ export const searchModule = {
                 pkg,
               }));
 
-              ctx.commit(SearchMutations.SEARCH_MUTATION, {
-                searchResults: [...ctx.state.searchResults, ...newSearchResults],
+              ctx.commit(SearchMutations.PUSH_SEARCH_RESULTS, {
+                newSearchResults
               });
             }),
             primaryDataLoader.onDemandTransferredPackageSearch({ queryString }).then((result) => {
@@ -156,8 +177,8 @@ export const searchModule = {
                 transferredPkg,
               }));
 
-              ctx.commit(SearchMutations.SEARCH_MUTATION, {
-                searchResults: [...ctx.state.searchResults, ...newSearchResults],
+              ctx.commit(SearchMutations.PUSH_SEARCH_RESULTS, {
+                newSearchResults
               });
             }),
             primaryDataLoader.onDemandFloweringPlantSearch({ queryString }).then((result) => {
@@ -166,8 +187,8 @@ export const searchModule = {
                 plant,
               }));
 
-              ctx.commit(SearchMutations.SEARCH_MUTATION, {
-                searchResults: [...ctx.state.searchResults, ...newSearchResults],
+              ctx.commit(SearchMutations.PUSH_SEARCH_RESULTS, {
+                newSearchResults
               });
             }),
             primaryDataLoader.onDemandVegetativePlantSearch({ queryString }).then((result) => {
@@ -176,8 +197,8 @@ export const searchModule = {
                 plant,
               }));
 
-              ctx.commit(SearchMutations.SEARCH_MUTATION, {
-                searchResults: [...ctx.state.searchResults, ...newSearchResults],
+              ctx.commit(SearchMutations.PUSH_SEARCH_RESULTS, {
+                newSearchResults
               });
             }),
             primaryDataLoader.onDemandInactivePlantSearch({ queryString }).then((result) => {
@@ -186,8 +207,8 @@ export const searchModule = {
                 plant,
               }));
 
-              ctx.commit(SearchMutations.SEARCH_MUTATION, {
-                searchResults: [...ctx.state.searchResults, ...newSearchResults],
+              ctx.commit(SearchMutations.PUSH_SEARCH_RESULTS, {
+                newSearchResults
               });
             }),
             primaryDataLoader

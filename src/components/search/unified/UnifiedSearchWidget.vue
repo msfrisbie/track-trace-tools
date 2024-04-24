@@ -1,34 +1,60 @@
 <template>
-  <div class="ttt-wrapper flex flex-col items-stretch" v-bind:class="{
-    'inline-search': !modalSearch,
-    'modal-search': modalSearch,
-    'search-expanded': searchState.showSearchResults,
-    'search-collapsed': !searchState.showSearchResults,
-  }">
+  <div
+    class="ttt-wrapper flex flex-col items-stretch"
+    v-bind:class="{
+      'inline-search': !modalSearch,
+      'modal-search': modalSearch,
+      'search-expanded': searchState.showSearchResults,
+      'search-collapsed': !searchState.showSearchResults,
+    }"
+  >
     <div v-on:click.stop.prevent class="flex flex-col flex-grow">
       <div class="relative">
         <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-          <svg aria-hidden="true" class="w-5 h-5 text-gray-500 dark:text-gray-400" fill="none" stroke="currentColor"
-            viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+          <svg
+            aria-hidden="true"
+            class="w-5 h-5 text-gray-500 dark:text-gray-400"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+            ></path>
           </svg>
         </div>
         <div class="flex">
-          <input v-bind:style="{
-    borderBottomRightRadius: searchState.showSearchResults ? '0 !important' : 'inherit',
-    borderBottomLeftRadius: searchState.showSearchResults ? '0 !important' : 'inherit',
-  }" style="margin-bottom: 0" v-model="queryString" type="search" id="default-search"
+          <input
+            v-bind:style="{
+              borderBottomRightRadius: searchState.showSearchResults ? '0 !important' : 'inherit',
+              borderBottomLeftRadius: searchState.showSearchResults ? '0 !important' : 'inherit',
+            }"
+            style="margin-bottom: 0"
+            v-model="queryString"
+            type="search"
+            id="default-search"
             class="block w-full px-6 py-2 pl-12 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-            placeholder="Packages, plants, tags, transfers" autocomplete="off"
+            placeholder="Packages, plants, tags, transfers"
+            autocomplete="off"
             @input="setQueryString({ queryString: $event.target.value })"
             @click="setShowSearchResults({ showSearchResults: true })"
-            @focus="setShowSearchResults({ showSearchResults: true })" ref="search" />
+            @focus="setShowSearchResults({ showSearchResults: true })"
+            ref="search"
+          />
         </div>
-        <div v-if="searchState.queryString.length > 0 && searchState.showSearchResults"
-          class="cursor-pointer absolute inset-y-0 right-0 flex items-center pr-3">
-          <font-awesome-icon @click="setQueryString({ queryString: '' })"
-            class="w-5 h-5 text-gray-500 dark:text-gray-400" icon="backspace" />
+        <div
+          v-if="searchState.queryString.length > 0 && searchState.showSearchResults"
+          class="cursor-pointer absolute inset-y-0 right-0 flex items-center pr-3"
+        >
+          <font-awesome-icon
+            @click="setQueryString({ queryString: '' })"
+            class="w-5 h-5 text-gray-500 dark:text-gray-400"
+            icon="backspace"
+          />
         </div>
       </div>
     </div>
@@ -38,21 +64,28 @@
         <div class="relative">
           <div v-on:click.stop.prevent class="search-bar-container flex flex-col flex-grow">
             <div v-if="searchState.showSearchResults" class="relative">
-              <div class="search-bar flex absolute w-full flex-col bg-white rounded-b-md" style="height:85vh">
+              <div
+                class="search-bar flex absolute w-full flex-col bg-white rounded-b-md"
+                style="height: 85vh"
+              >
                 <div class="flex-grow overflow-y-auto">
                   <!-- {{ searchState.searchResults }}
                    -->
 
-                  <div class="hide-scrollbar grid grid-cols-6 grid-rows-3 h-full"
-                    style="grid-template-rows: auto auto 1fr">
+                  <div
+                    class="hide-scrollbar grid grid-cols-6 grid-rows-3 h-full"
+                    style="grid-template-rows: auto auto 1fr"
+                  >
                     <template v-if="searchState.queryString.length > 0">
                       <!-- <search-view-selector /> -->
 
-                      <div class="col-span-6 flex flex-row items-center space-x-2 p-4 border-purple-300 border-b">
+                      <div
+                        class="col-span-6 flex flex-row items-center space-x-2 p-4 border-purple-300 border-b"
+                      >
                         <p class="text-lg text-gray-600">
                           <span class="font-bold text-gray-900">{{ searchState.queryString }}</span>
-                          matches {{ searchState.searchResults.length }}{{ searchState.searchResults.length === 500 ?
-    "+" : "" }} packages
+                          matches {{ searchState.searchResults.length
+                          }}{{ searchState.searchResults.length === 500 ? "+" : "" }} packages
                         </p>
 
                         <div class="flex-grow"></div>
@@ -65,15 +98,19 @@
 
                     <template v-if="searchState.queryString.length > 0">
                       <div class="flex flex-col overflow-y-auto bg-purple-50 col-span-3">
-                        <search-result-preview v-for="(searchResult, idx) in searchState.searchResults" v-bind:key="idx"
-                          :searchResult="searchResult"></search-result-preview>
+                        <search-result-preview
+                          v-for="(searchResult, idx) in searchState.searchResults"
+                          v-bind:key="idx"
+                          :searchResult="searchResult"
+                        ></search-result-preview>
 
                         <div class="flex-grow bg-purple-50"></div>
                       </div>
 
                       <div class="flex flex-col overflow-y-auto col-span-3">
                         <!-- <package-search-result-detail /> -->
-                        <div>RESULT DETAIL</div>
+                        <!-- <div>RESULT DETAIL</div> -->
+                        <search-result-detail></search-result-detail>
                       </div>
                     </template>
 
@@ -89,8 +126,10 @@
                   </div>
                 </div>
 
-                <div v-if="!searchState.modalSearchOpen"
-                  class="flex flex-row items-center space-x-1 p-1 text-xs text-gray-500 border-purple-300 border-t">
+                <div
+                  v-if="!searchState.modalSearchOpen"
+                  class="flex flex-row items-center space-x-1 p-1 text-xs text-gray-500 border-purple-300 border-t"
+                >
                   <span>Press</span>
                   <b-badge variant="light">esc</b-badge>
                   <span>to close</span>
@@ -105,17 +144,22 @@
 </template>
 
 <script lang="ts">
-import HistoryList from '@/components/search/shared/HistoryList.vue';
-import { IPluginState } from '@/interfaces';
-import router from '@/router/index';
-import store from '@/store/page-overlay/index';
-import { SearchActions, SearchStatus, SearchType } from '@/store/page-overlay/modules/search/consts';
-import Vue from 'vue';
-import { mapActions, mapState } from 'vuex';
-import SearchResultPreview from './SearchResultPreview.vue';
+import HistoryList from "@/components/search/shared/HistoryList.vue";
+import { IPluginState } from "@/interfaces";
+import router from "@/router/index";
+import store from "@/store/page-overlay/index";
+import {
+  SearchActions,
+  SearchStatus,
+  SearchType,
+} from "@/store/page-overlay/modules/search/consts";
+import Vue from "vue";
+import { mapActions, mapState } from "vuex";
+import SearchResultDetail from "./SearchResultDetail.vue";
+import SearchResultPreview from "./SearchResultPreview.vue";
 
 export default Vue.extend({
-  name: 'UnifiedSearchWidget',
+  name: "UnifiedSearchWidget",
   store,
   router,
   props: {
@@ -127,7 +171,8 @@ export default Vue.extend({
   },
   components: {
     HistoryList,
-    SearchResultPreview
+    SearchResultPreview,
+    SearchResultDetail,
   },
   computed: {
     ...mapState<IPluginState>({
@@ -146,7 +191,7 @@ export default Vue.extend({
   data() {
     return {
       SearchType,
-      SearchStatus
+      SearchStatus,
     };
   },
   methods: {
@@ -162,7 +207,7 @@ export default Vue.extend({
     },
   },
   watch: {
-    'searchState.showSearchResults': {
+    "searchState.showSearchResults": {
       immediate: true,
       handler(newValue: boolean, oldValue: boolean) {
         if (newValue) {
@@ -171,8 +216,8 @@ export default Vue.extend({
       },
     },
   },
-  async created() { },
-  async mounted() { },
+  async created() {},
+  async mounted() {},
 });
 </script>
 

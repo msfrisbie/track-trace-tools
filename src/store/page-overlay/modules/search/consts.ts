@@ -1,5 +1,6 @@
 export enum SearchMutations {
   SEARCH_MUTATION = "SEARCH_MUTATION",
+  PUSH_SEARCH_RESULTS = "PUSH_SEARCH_RESULTS"
 }
 
 export enum SearchGetters {}
@@ -10,6 +11,7 @@ export enum SearchActions {
   SET_QUERY_STRING = "SET_QUERY_STRING",
   EXECUTE_QUERY = "EXECUTE_QUERY",
   SET_SEARCH_FILTERS = "SET_SEARCH_FILTERS",
+  SELECT_SEARCH_RESULT = "SELECT_SEARCH_RESULT"
 }
 
 export enum SearchType {
