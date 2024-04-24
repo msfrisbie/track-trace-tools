@@ -7,22 +7,102 @@ import {
   TransferFilterIdentifiers,
   TransferredPackageFilterIdentifiers,
 } from "@/consts";
+import store from "@/store/page-overlay/index";
+import { SearchActions } from "@/store/page-overlay/modules/search/consts";
+import _ from "lodash-es";
 import { analyticsManager } from "../analytics-manager.module";
 import { pageManager } from "./page-manager.module";
 
-const T3_SEARCH_MENU_ATTRIBUTE = `t3-search-menu`;
 const T3_GRID_ID_ATTRIBUTE = `t3-grid-id`;
 const T3_SEARCH_FIELD_ATTRIBUTE = `t3-search-field`;
 
-export async function initializeFilterButtonsImpl() {
-  const menuButtons = [
-    ...document.querySelectorAll(
-      `th[data-field]:not([${T3_SEARCH_MENU_ATTRIBUTE}]) .k-header-column-menu`
-    ),
-  ];
+export function getActiveGridSelectorOrNull(): MetrcGridId | null {
+  return (
+    (document
+      .querySelector(`[data-grid-selector].k-state-active`)
+      ?.getAttribute("data-grid-selector")
+      ?.replace("#", "") as MetrcGridId) ?? null
+  );
+}
 
-  for (const menuButton of menuButtons) {
-    menuButton.parentElement!.setAttribute(T3_SEARCH_MENU_ATTRIBUTE, "1");
+export const mirrorMetrcSearchStateImpl = _.debounce(async () => {
+  const metrcGridId = getActiveGridSelectorOrNull();
+
+  store.dispatch(`search/${SearchActions.SET_ACTIVE_GRID_ID}`, { metrcGridId });
+
+  const inputs: HTMLInputElement[] = [
+    ...document.querySelectorAll(
+      `input[${T3_GRID_ID_ATTRIBUTE}="${metrcGridId}"][${T3_SEARCH_FIELD_ATTRIBUTE}]`
+    ),
+  ] as HTMLInputElement[];
+
+  const searchFilters: { [key: string]: string } = {};
+
+  console.log({ inputs });
+
+  for (const input of inputs) {
+    console.log(input.value);
+    if (!input.value) {
+      continue;
+    }
+
+    searchFilters[input.getAttribute(T3_SEARCH_FIELD_ATTRIBUTE)!] = input.value;
+  }
+
+  console.log({ searchFilters });
+
+  store.dispatch(`search/${SearchActions.SET_METRC_SEARCH_FILTERS}`, {
+    metrcGridId,
+    searchFilters,
+  });
+}, 100);
+
+export async function initializeFilterButtonsImpl() {
+  const allGrids = [...document.querySelectorAll(`div[data-role="grid"]`)];
+
+  for (const grid of allGrids) {
+    const gridId = grid.getAttribute("id");
+
+    if (!gridId) {
+      console.error(`Missing grid ID`);
+      continue;
+    }
+
+    const untaggedMenuButtons = [
+      ...grid.querySelectorAll(
+        `th[data-field] .k-header-column-menu:not([${T3_GRID_ID_ATTRIBUTE}])`
+      ),
+    ];
+
+    for (const menuButton of untaggedMenuButtons) {
+      const searchFilter: string | null = menuButton.parentElement!.getAttribute("data-field");
+
+      if (!searchFilter) {
+        console.error(`Missing searchFilter`);
+        continue;
+      }
+
+      menuButton.setAttribute(T3_GRID_ID_ATTRIBUTE, gridId);
+      menuButton.setAttribute(T3_SEARCH_FIELD_ATTRIBUTE, searchFilter);
+
+      menuButton.addEventListener("click", async () => {
+        await pageManager.clickSettleDelay();
+
+        // If an animation container is created, it will be last
+        const filterMenuForms = [...document.querySelectorAll(`form.k-filter-menu`)];
+        const lastFilterMenuForm = filterMenuForms[filterMenuForms.length - 1];
+
+        if (!lastFilterMenuForm.hasAttribute(T3_SEARCH_FIELD_ATTRIBUTE)) {
+          lastFilterMenuForm.setAttribute(T3_GRID_ID_ATTRIBUTE, gridId);
+          lastFilterMenuForm.setAttribute(T3_SEARCH_FIELD_ATTRIBUTE, searchFilter);
+
+          const input = lastFilterMenuForm.querySelector("input")!;
+
+          input.setAttribute(T3_GRID_ID_ATTRIBUTE, gridId);
+          input.setAttribute(T3_SEARCH_FIELD_ATTRIBUTE, searchFilter);
+        }
+      });
+    }
   }
 }
 
@@ -30,11 +110,11 @@ export async function getFilterFormOrError(
   metrcGridId: MetrcGridId,
   searchFilter: string
 ): Promise<HTMLFormElement> {
-  let mappedAnimationContainer = document.querySelector(
-    `.k-animation-container[${T3_SEARCH_FIELD_ATTRIBUTE}="${searchFilter}"][${T3_GRID_ID_ATTRIBUTE}="${metrcGridId}"]`
+  let mappedFilterForm: HTMLFormElement | null = document.querySelector(
+    `form.k-filter-menu[${T3_SEARCH_FIELD_ATTRIBUTE}="${searchFilter}"][${T3_GRID_ID_ATTRIBUTE}="${metrcGridId}"]`
   );
 
-  if (!mappedAnimationContainer) {
+  if (!mappedFilterForm) {
     const menuButton = document.querySelector(
       `th[data-field="${searchFilter}"] .k-header-column-menu`
     ) as HTMLElement | null;
@@ -49,21 +129,21 @@ export async function getFilterFormOrError(
     await new Promise((resolve) => setTimeout(resolve, 0));
     menuButton.click();
 
-    const untaggedAnimationContainer = document.querySelector(
-      `.k-animation-container:not([${T3_SEARCH_FIELD_ATTRIBUTE}]) .k-column-menu`
-    )?.parentElement;
+    const untaggedForm: HTMLFormElement | null = document.querySelector(
+      `.form.k-filter-menu:not([${T3_SEARCH_FIELD_ATTRIBUTE}])`
+    );
 
-    if (!untaggedAnimationContainer) {
+    if (!untaggedForm) {
       throw new Error(`Could not initialize animation container for filter: ${searchFilter}`);
     }
 
-    untaggedAnimationContainer.setAttribute(T3_GRID_ID_ATTRIBUTE, metrcGridId);
-    untaggedAnimationContainer.setAttribute(T3_SEARCH_FIELD_ATTRIBUTE, searchFilter);
+    untaggedForm.setAttribute(T3_GRID_ID_ATTRIBUTE, metrcGridId);
+    untaggedForm.setAttribute(T3_SEARCH_FIELD_ATTRIBUTE, searchFilter);
 
-    mappedAnimationContainer = untaggedAnimationContainer;
+    mappedFilterForm = untaggedForm;
   }
 
-  return mappedAnimationContainer.querySelector("form")!;
+  return mappedFilterForm!;
 }
 
 export async function setFilterImpl(metrcGridId: MetrcGridId, searchFilter: string, value: string) {

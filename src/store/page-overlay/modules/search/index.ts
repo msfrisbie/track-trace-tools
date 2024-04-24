@@ -1,4 +1,4 @@
-import { MessageType, TagState, TransferState } from "@/consts";
+import { MessageType, MetrcGridId, TagState, TransferState } from "@/consts";
 import { IPluginState } from "@/interfaces";
 import { analyticsManager } from "@/modules/analytics-manager.module";
 import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
@@ -17,8 +17,9 @@ const inMemoryState = {
   queryLicenseNumber: "", // TODO
   searchResults: [],
   activeSearchResult: null,
-  searchFilters: {},
   searchType: SearchType.PACKAGES,
+  metrcSearchFilters: {},
+  activeGridId: null,
 };
 
 const persistedState = {
@@ -42,11 +43,13 @@ export const searchModule = {
         }
       });
     },
-    [SearchMutations.PUSH_SEARCH_RESULTS](state: ISearchState, { newSearchResults }: {newSearchResults: ISearchResult[]}) {
-      state.searchResults = [
-        ...newSearchResults,
-        ...state.searchResults
-      ].sort((a, b) => b.score - a.score);
+    [SearchMutations.PUSH_SEARCH_RESULTS](
+      state: ISearchState,
+      { newSearchResults }: { newSearchResults: ISearchResult[] }
+    ) {
+      state.searchResults = [...newSearchResults, ...state.searchResults].sort(
+        (a, b) => b.score - a.score
+      );
 
       const highestScoreSearchResult: ISearchResult | null = state.searchResults[0] ?? null;
 
@@ -54,13 +57,15 @@ export const searchModule = {
         return;
       }
 
-      if (!state.activeSearchResult || state.activeSearchResult.score < highestScoreSearchResult.score) {
+      if (
+        !state.activeSearchResult ||
+        state.activeSearchResult.score < highestScoreSearchResult.score
+      ) {
         state.activeSearchResult = highestScoreSearchResult;
       }
     },
   },
-  getters: {
-  },
+  getters: {},
   actions: {
     [SearchActions.SELECT_SEARCH_RESULT](
       ctx: ActionContext<ISearchState, IPluginState>,
@@ -100,20 +105,33 @@ export const searchModule = {
     //   // }
     // },
 
-    // [SearchActions.SET_SEARCH_FILTERS]: async (
-    //   ctx: ActionContext<ISearchState, IPluginState>,
-    //   {
-    //     searchFilters,
-    //     metrcGridId
-    //   }: {
-    //     searchFilters: {[key: string]: string},
-    //     metrcGridId: MetrcGridId,
-    //   }
-    // ) => {
-    //   await pageManager.clickTabWithGridId(metrcGridId);
+    [SearchActions.SET_METRC_SEARCH_FILTERS]: async (
+      ctx: ActionContext<ISearchState, IPluginState>,
+      {
+        searchFilters,
+        metrcGridId,
+      }: {
+        searchFilters: { [key: string]: string };
+        metrcGridId: MetrcGridId;
+      }
+    ) => {
+      const metrcSearchFilters = {
+        ...ctx.state.metrcSearchFilters,
+        [metrcGridId]: searchFilters,
+      };
 
-    //   ctx.commit(SearchMutations.SEARCH_MUTATION, { searchFilters });
-    // },
+      ctx.commit(SearchMutations.SEARCH_MUTATION, { metrcSearchFilters });
+    },
+    [SearchActions.SET_ACTIVE_GRID_ID]: async (
+      ctx: ActionContext<ISearchState, IPluginState>,
+      {
+        metrcGridId,
+      }: {
+        metrcGridId: MetrcGridId;
+      }
+    ) => {
+      ctx.commit(SearchMutations.SEARCH_MUTATION, { activeGridId: metrcGridId });
+    },
     [SearchActions.EXECUTE_QUERY]: _.debounce(
       async (
         ctx: ActionContext<ISearchState, IPluginState>,
@@ -148,7 +166,7 @@ export const searchModule = {
               }));
 
               ctx.commit(SearchMutations.PUSH_SEARCH_RESULTS, {
-                newSearchResults
+                newSearchResults,
               });
             }),
             primaryDataLoader.onDemandInTransitPackageSearch({ queryString }).then((result) => {
@@ -158,7 +176,7 @@ export const searchModule = {
               }));
 
               ctx.commit(SearchMutations.PUSH_SEARCH_RESULTS, {
-                newSearchResults
+                newSearchResults,
               });
             }),
             primaryDataLoader.onDemandInactivePackageSearch({ queryString }).then((result) => {
@@ -168,7 +186,7 @@ export const searchModule = {
               }));
 
               ctx.commit(SearchMutations.PUSH_SEARCH_RESULTS, {
-                newSearchResults
+                newSearchResults,
               });
             }),
             primaryDataLoader.onDemandTransferredPackageSearch({ queryString }).then((result) => {
@@ -178,7 +196,7 @@ export const searchModule = {
               }));
 
               ctx.commit(SearchMutations.PUSH_SEARCH_RESULTS, {
-                newSearchResults
+                newSearchResults,
               });
             }),
             primaryDataLoader.onDemandFloweringPlantSearch({ queryString }).then((result) => {
@@ -188,7 +206,7 @@ export const searchModule = {
               }));
 
               ctx.commit(SearchMutations.PUSH_SEARCH_RESULTS, {
-                newSearchResults
+                newSearchResults,
               });
             }),
             primaryDataLoader.onDemandVegetativePlantSearch({ queryString }).then((result) => {
@@ -198,7 +216,7 @@ export const searchModule = {
               }));
 
               ctx.commit(SearchMutations.PUSH_SEARCH_RESULTS, {
-                newSearchResults
+                newSearchResults,
               });
             }),
             primaryDataLoader.onDemandInactivePlantSearch({ queryString }).then((result) => {
@@ -208,7 +226,7 @@ export const searchModule = {
               }));
 
               ctx.commit(SearchMutations.PUSH_SEARCH_RESULTS, {
-                newSearchResults
+                newSearchResults,
               });
             }),
             primaryDataLoader

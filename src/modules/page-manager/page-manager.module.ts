@@ -46,6 +46,7 @@ import {
 } from "./metrc-utils";
 import {
   initializeFilterButtonsImpl,
+  mirrorMetrcSearchStateImpl,
   resetFilterElementReferencesImpl,
   setFilterImpl,
 } from "./search-utils";
@@ -466,6 +467,8 @@ class PageManager implements IAtomicService {
       }
 
       store.dispatch(`metrcTable/${MetrcTableActions.UPDATE_PRINTABLE_TAG_POOL}`);
+
+      this.mirrorMetrcSearchState();
     });
 
     document.addEventListener("keyup", (e: KeyboardEvent) => {
@@ -484,6 +487,14 @@ class PageManager implements IAtomicService {
           modalCloseButton.click();
         }
       }
+    });
+
+    document.addEventListener("input", (e: Event) => {
+      this.mirrorMetrcSearchState();
+    });
+
+    document.addEventListener("change", (e: Event) => {
+      this.mirrorMetrcSearchState();
     });
   }
 
@@ -550,6 +561,8 @@ class PageManager implements IAtomicService {
       this.tagTableGroups();
 
       this.initializeFilterButtons();
+
+      this.mirrorMetrcSearchState();
 
       if (window.location.pathname.match(PACKAGE_TAB_REGEX)) {
         await this.managePackageTabs();
@@ -724,6 +737,10 @@ class PageManager implements IAtomicService {
 
   async initializeFilterButtons() {
     return initializeFilterButtonsImpl();
+  }
+
+  async mirrorMetrcSearchState() {
+    return mirrorMetrcSearchStateImpl();
   }
 
   // async setPlantFilter(
