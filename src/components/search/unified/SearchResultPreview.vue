@@ -1,19 +1,31 @@
 <template>
   <div
-    class="flex flex-row gap-4 p-4"
+    class="flex flex-row gap-2 p-1"
     v-bind:class="{
       'bg-white': searchState.activeSearchResult === searchResult,
     }"
     @mouseenter="selectSearchResult({ searchResult })"
   >
-    <complex-icon
-      :primaryIconName="searchResult.primaryIconName"
-      primaryIconNameIconSize="xl"
-      :secondaryIconName="searchResult.secondaryIconName"
-      secondaryIconNameIconSize="sm"
-    ></complex-icon>
-    <div>
-      {{ searchResult.primaryTextualDescriptor }}
+    <div class="flex flex-col justify-center gap-1 items-center text-center w-20 text-sm">
+      <complex-icon
+        class="ttt-purple"
+        :primaryIconName="searchResult.primaryIconName"
+        primaryIconSize="xl"
+        :secondaryIconName="searchResult.secondaryIconName"
+        secondaryIconSize="sm"
+      ></complex-icon>
+
+      <div>
+        {{ searchResult.primaryTextualDescriptor }}
+      </div>
+    </div>
+    <div class="flex flex-col items-start justify-start">
+      <div>
+        {{ searchResult.primaryTextualIdentifier }}
+      </div>
+      <div>
+        {{ searchResult.secondaryTextualIdentifier }}
+      </div>
     </div>
   </div>
 </template>
