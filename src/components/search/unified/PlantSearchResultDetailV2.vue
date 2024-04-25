@@ -1,33 +1,30 @@
 <template>
-  <div class="flex flex-col items-center space-y-8 px-2 p-4">
+  <div v-if="searchResultPlantOrNull" class="flex flex-col items-center space-y-8 px-2 p-4">
     <div class="w-full grid grid-cols-3" style="grid-template-columns: 1fr 8fr 1fr">
       <div></div>
 
       <div class="flex flex-col items-center space-y-8 flex-grow">
         <div class="flex flex-col space-y-2 items-center">
           <div class="flex flex-col items-center space-x-4 text-center">
-            <metrc-tag
-              :label="searchState.activeSearchResult.plant.Label"
-              sideText="PLANT"
-            ></metrc-tag>
+            <metrc-tag :label="searchResultPlantOrNull.Label" sideText="PLANT"></metrc-tag>
           </div>
 
-          <b-badge class="text-lg" :variant="badgeVariant(searchState.activeSearchResult.plant)">{{
-            displayPlantState(searchState.activeSearchResult.plant)
+          <b-badge class="text-lg" :variant="badgeVariant(searchResultPlantOrNull)">{{
+            displayPlantState(searchResultPlantOrNull)
           }}</b-badge>
         </div>
       </div>
 
       <div
         v-show="isOnPlantsPage"
-        @click.stop.prevent="setPlantLabelFilter(searchState.activeSearchResult.plant)"
+        @click.stop.prevent="setPlantLabelFilter(searchResultPlantOrNull)"
         class="flex flex-row items-center justify-center cursor-pointer h-full"
       >
         <font-awesome-icon icon="chevron-right" class="text-2xl text-purple-500" />
       </div>
     </div>
 
-    <recursive-json-table :jsonObject="searchState.activeSearchResult.plant"></recursive-json-table>
+    <recursive-json-table :jsonObject="searchResultPlantOrNull"></recursive-json-table>
   </div>
 </template>
 
@@ -59,6 +56,9 @@ export default Vue.extend({
       flags: (state: IPluginState) => state.flags,
       searchState: (state: IPluginState) => state.search,
     }),
+    searchResultPlantOrNull(): IIndexedPlantData | null {
+      return store.state.search.activeSearchResult?.plant ?? null;
+    },
     isOnPlantsPage(): boolean {
       return !!window.location.pathname.match(PLANTS_TAB_REGEX);
     },

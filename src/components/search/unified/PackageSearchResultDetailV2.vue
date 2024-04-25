@@ -1,33 +1,37 @@
 <template>
-  <div class="flex flex-col items-center space-y-8 px-2 p-4">
+  <div v-if="searchResultPackageOrNull" class="flex flex-col items-center space-y-8 px-2 p-4">
     <div class="w-full grid grid-cols-3" style="grid-template-columns: 1fr 8fr 1fr">
       <div></div>
 
       <div class="flex flex-col items-center space-y-8 flex-grow">
         <div class="flex flex-col space-y-2 items-center">
           <div class="flex flex-row items-center space-x-4 text-center">
-            <metrc-tag :label="getLabelOrError(searchState.activeSearchResult.pkg)"
-              sideText="PACKAGE"></metrc-tag>
+            <metrc-tag
+              :label="getLabelOrError(searchResultPackageOrNull)"
+              sideText="PACKAGE"
+            ></metrc-tag>
           </div>
 
-          <b-badge class="text-lg" :variant="badgeVariant(searchState.activeSearchResult.pkg)">{{
-    displayPackageState(searchState.activeSearchResult.pkg)
-  }}</b-badge>
+          <b-badge class="text-lg" :variant="badgeVariant(searchResultPackageOrNull)">{{
+            displayPackageState(searchResultPackageOrNull)
+          }}</b-badge>
         </div>
       </div>
 
-      <div v-show="isOnPackagesPage" @click.stop.prevent="
-    setPackageLabelFilter(searchState.activeSearchResult.pkg)
-    " class="flex flex-row items-center justify-center cursor-pointer h-full">
+      <div
+        v-show="isOnPackagesPage"
+        @click.stop.prevent="setPackageLabelFilter(searchResultPackageOrNull)"
+        class="flex flex-row items-center justify-center cursor-pointer h-full"
+      >
         <font-awesome-icon icon="chevron-right" class="text-2xl text-purple-500" />
       </div>
     </div>
 
     <div class="grid grid-cols-2 gap-2">
-      <package-button-list :pkg="searchState.activeSearchResult.pkg"></package-button-list>
+      <package-button-list :pkg="searchResultPackageOrNull"></package-button-list>
     </div>
 
-    <recursive-json-table :jsonObject="searchState.activeSearchResult.pkg"></recursive-json-table>
+    <recursive-json-table :jsonObject="searchResultPackageOrNull"></recursive-json-table>
   </div>
 </template>
 
@@ -36,14 +40,14 @@ import MetrcTag from "@/components/overlay-widget/shared/MetrcTag.vue";
 import PackageButtonList from "@/components/overlay-widget/shared/PackageButtonList.vue";
 import RecursiveJsonTable from "@/components/search/shared/RecursiveJsonTable.vue";
 import {
-  MessageType,
-  METRC_HOSTNAMES_LACKING_LAB_PDFS,
-  ModalAction,
-  ModalType,
-  PackageSearchFilterKeys,
-  PackageState,
+MessageType,
+METRC_HOSTNAMES_LACKING_LAB_PDFS,
+ModalAction,
+ModalType,
+PackageSearchFilterKeys,
+PackageState
 } from "@/consts";
-import { IUnionIndexedPackageData, IPluginState, ITransferPackageList } from "@/interfaces";
+import { IPluginState, ITransferPackageList, IUnionIndexedPackageData } from "@/interfaces";
 import { analyticsManager } from "@/modules/analytics-manager.module";
 import { modalManager } from "@/modules/modal-manager.module";
 import { PACKAGE_TAB_REGEX } from "@/modules/page-manager/consts";
@@ -55,8 +59,7 @@ import { PackageSearchActions } from "@/store/page-overlay/modules/package-searc
 import { SearchActions } from "@/store/page-overlay/modules/search/consts";
 import { SplitPackageBuilderActions } from "@/store/page-overlay/modules/split-package-builder/consts";
 import {
-  TransferBuilderActions,
-  TransferBuilderGetters,
+TransferBuilderActions
 } from "@/store/page-overlay/modules/transfer-builder/consts";
 import { copyToClipboard } from "@/utils/dom";
 import { getLabelOrError } from "@/utils/package";
@@ -84,6 +87,10 @@ export default Vue.extend({
       flags: (state: IPluginState) => state.flags,
       searchState: (state: IPluginState) => state.search,
     }),
+    searchResultPackageOrNull(): IUnionIndexedPackageData | null {
+      return (store.state.search.activeSearchResult?.pkg ||
+      store.state.search.activeSearchResult?.transferPkg) ?? null;
+    },
     isOnPackagesPage() {
       return window.location.pathname.match(PACKAGE_TAB_REGEX);
     },

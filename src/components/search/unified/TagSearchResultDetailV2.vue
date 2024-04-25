@@ -1,7 +1,5 @@
 <template>
-  <div
-    class="flex flex-col items-center space-y-8 px-2 p-4"
-  >
+  <div v-if="searchResultTagOrNull" class="flex flex-col items-center space-y-8 px-2 p-4">
     <div class="w-full grid grid-cols-3" style="grid-template-columns: 1fr 8fr 1fr">
       <div></div>
 
@@ -9,60 +7,51 @@
         <div class="flex flex-col space-y-2 items-center">
           <div class="flex flex-col items-center space-x-4 text-center">
             <metrc-tag
-              :label="searchState.activeSearchResult.tag.Label"
-              :sideText="searchState.activeSearchResult.tag.TagTypeName"
+              :label="searchResultTagOrNull.Label"
+              :sideText="searchResultTagOrNull.TagTypeName"
             ></metrc-tag>
           </div>
 
-          <b-badge
-            class="text-lg"
-            :variant="badgeVariant(searchState.activeSearchResult.tag)"
-            >{{ displayTagState(searchState.activeSearchResult.tag) }}</b-badge
-          >
+          <b-badge class="text-lg" :variant="badgeVariant(searchResultTagOrNull)">{{
+            displayTagState(searchResultTagOrNull)
+          }}</b-badge>
         </div>
       </div>
 
       <div
         v-show="isOnTagsPage"
-        @click.stop.prevent="setTagLabelFilter(searchState.activeSearchResult.tag)"
+        @click.stop.prevent="setTagLabelFilter(searchResultTagOrNull)"
         class="flex flex-row items-center justify-center cursor-pointer h-full"
       >
         <font-awesome-icon icon="chevron-right" class="text-2xl text-purple-500" />
       </div>
     </div>
 
-    <recursive-json-table
-      :jsonObject="searchState.activeSearchResult.tag"
-    ></recursive-json-table>
+    <recursive-json-table :jsonObject="searchResultTagOrNull"></recursive-json-table>
   </div>
 </template>
 
 <script lang="ts">
-import { MessageType, TagState } from '@/consts';
-import { IIndexedTagData, IPluginState } from '@/interfaces';
-import { analyticsManager } from '@/modules/analytics-manager.module';
-import { TAG_TAB_REGEX } from '@/modules/page-manager/consts';
-import { searchManager } from '@/modules/search-manager.module';
-import { toastManager } from '@/modules/toast-manager.module';
-import store from '@/store/page-overlay/index';
-import { TagSearchActions } from '@/store/page-overlay/modules/tag-search/consts';
-import { copyToClipboard } from '@/utils/dom';
-import { Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
-import Vue from 'vue';
-import { mapActions, mapGetters, mapState } from 'vuex';
-import MetrcTag from '@/components/overlay-widget/shared/MetrcTag.vue';
-import RecursiveJsonTable from '@/components/search/shared/RecursiveJsonTable.vue';
-import { SearchActions } from '@/store/page-overlay/modules/search/consts';
+import MetrcTag from "@/components/overlay-widget/shared/MetrcTag.vue";
+import RecursiveJsonTable from "@/components/search/shared/RecursiveJsonTable.vue";
+import { MessageType, TagState } from "@/consts";
+import { IIndexedTagData, IPluginState } from "@/interfaces";
+import { analyticsManager } from "@/modules/analytics-manager.module";
+import { TAG_TAB_REGEX } from "@/modules/page-manager/consts";
+import { toastManager } from "@/modules/toast-manager.module";
+import store from "@/store/page-overlay/index";
+import { SearchActions } from "@/store/page-overlay/modules/search/consts";
+import { TagSearchActions } from "@/store/page-overlay/modules/tag-search/consts";
+import { copyToClipboard } from "@/utils/dom";
+import Vue from "vue";
+import { mapActions, mapGetters, mapState } from "vuex";
 
 export default Vue.extend({
-  name: 'TagSearchResultDetailV2',
+  name: "TagSearchResultDetailV2",
   store,
   components: { MetrcTag, RecursiveJsonTable },
-  data(): {
-  } {
-    return {
-    };
+  data(): {} {
+    return {};
   },
   computed: {
     ...mapState<IPluginState>({
@@ -70,6 +59,9 @@ export default Vue.extend({
       flags: (state: IPluginState) => state.flags,
       searchState: (state: IPluginState) => state.search,
     }),
+    searchResultTagOrNull(): IIndexedTagData | null {
+      return store.state.search.activeSearchResult?.tag ?? null;
+    },
     isOnTagsPage() {
       return window.location.pathname.match(TAG_TAB_REGEX);
     },
@@ -100,11 +92,11 @@ export default Vue.extend({
       copyToClipboard(tag.Label);
 
       toastManager.openToast(`'${tag.Label}' copied to clipboard`, {
-        title: 'Copied Tag',
+        title: "Copied Tag",
         autoHideDelay: 5000,
-        variant: 'primary',
+        variant: "primary",
         appendToast: true,
-        toaster: 'ttt-toaster',
+        toaster: "ttt-toaster",
         solid: true,
       });
     },
@@ -112,17 +104,17 @@ export default Vue.extend({
       // @ts-ignore
       switch (tag.TagState as TagState) {
         case TagState.AVAILABLE:
-          return 'success';
+          return "success";
         case TagState.USED:
-          return 'dark';
+          return "dark";
         case TagState.VOIDED:
-          return 'danger';
+          return "danger";
         default:
           return null;
       }
     },
     displayTagState(tag: IIndexedTagData) {
-      return tag.TagState.replaceAll('_', ' ');
+      return tag.TagState.replaceAll("_", " ");
     },
   },
 });

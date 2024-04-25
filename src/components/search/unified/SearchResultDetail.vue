@@ -1,7 +1,7 @@
 <template>
   <div>
     <!-- {{ searchState.activeSearchResult }} -->
-    <package-search-result-detail-v2 :pkg=""></package-search-result-detail-v2>
+    <package-search-result-detail-v2></package-search-result-detail-v2>
     <plant-search-result-detail-v2></plant-search-result-detail-v2>
     <tag-search-result-detail-v2></tag-search-result-detail-v2>
     <transfer-search-result-detail-v2></transfer-search-result-detail-v2>

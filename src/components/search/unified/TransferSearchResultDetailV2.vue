@@ -1,7 +1,5 @@
 <template>
-  <div
-    class="flex flex-col items-center space-y-8 px-2 p-4"
-  >
+  <div v-if="searchResultTransferOrNull" class="flex flex-col items-center space-y-8 px-2 p-4">
     <div class="w-full grid grid-cols-3" style="grid-template-columns: 1fr 8fr 1fr">
       <div></div>
 
@@ -10,25 +8,19 @@
           <div class="flex flex-row items-center space-x-4 text-center">
             <div class="text-2xl text-purple-800">
               Manifest
-              {{ searchState.activeSearchResult.outgoingTransfer.ManifestNumber }}
+              {{ searchResultTransferOrNull.ManifestNumber }}
             </div>
           </div>
 
-          <b-badge
-            class="text-lg"
-            :variant="badgeVariant(searchState.activeSearchResult.outgoingTransfer)"
-            >{{
-              displayTransferState(searchState.activeSearchResult.outgoingTransfer)
-            }}</b-badge
-          >
+          <b-badge class="text-lg" :variant="badgeVariant(searchResultTransferOrNull)">{{
+            displayTransferState(searchResultTransferOrNull)
+          }}</b-badge>
         </div>
       </div>
 
       <div
         v-show="isOnTransfersPage"
-        @click.stop.prevent="
-          setTransferManifestNumberFilter(searchState.activeSearchResult.outgoingTransfer)
-        "
+        @click.stop.prevent="setTransferManifestNumberFilter(searchResultTransferOrNull)"
         class="flex flex-row items-center justify-center cursor-pointer h-full"
       >
         <font-awesome-icon icon="chevron-right" class="text-2xl text-purple-500" />
@@ -36,14 +28,10 @@
     </div>
 
     <div class="grid grid-cols-2 gap-2">
-      <transfer-button-list
-        :transfer="searchState.activeSearchResult.outgoingTransfer"
-      ></transfer-button-list>
+      <transfer-button-list :transfer="searchResultTransferOrNull"></transfer-button-list>
     </div>
 
-    <recursive-json-table
-      :jsonObject="searchState.activeSearchResult.outgoingTransfer"
-    ></recursive-json-table>
+    <recursive-json-table :jsonObject="searchResultTransferOrNull"></recursive-json-table>
   </div>
 </template>
 
@@ -100,6 +88,13 @@ export default Vue.extend({
     ...mapState<IPluginState>({
       searchState: (state: IPluginState) => state.search,
     }),
+    searchResultTransferOrNull(): IIndexedTransferData | null {
+      return (
+        (store.state.search.activeSearchResult?.incomingTransfer ||
+          store.state.search.activeSearchResult?.outgoingTransfer) ??
+        null
+      );
+    },
     isOnTransfersPage(): boolean {
       return !!window.location.pathname.match(TRANSFER_TAB_REGEX);
     },
