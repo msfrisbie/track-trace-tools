@@ -1,4 +1,5 @@
 import {
+  HarvestState,
   MessageType,
   MetrcGridId,
   PackageFilterIdentifiers,
@@ -192,18 +193,46 @@ export function generateSearchResultMetadata(partialResult: Partial<ISearchResul
     primaryTextualDescriptor = 'Plant Batch';
     secondaryTextualDescriptor = partialResult.plantBatch.TypeName;
   } else if (partialResult.harvest) {
+    switch (partialResult.harvest.HarvestState) {
+      case HarvestState.ACTIVE:
+        primaryStatusTextualDescriptor = 'Active';
+        isActive = true;
+        break;
+      case HarvestState.INACTIVE:
+        primaryStatusTextualDescriptor = 'Inactive';
+        isInactive = true;
+        break;
+      default:
+        break;
+    }
+
     primaryIconName = "cannabis";
     secondaryIconName = "cut";
+    primaryTextualIdentifier = partialResult.harvest.Name;
+    secondaryTextualIdentifier = `${partialResult.harvest.CurrentWeight} ${partialResult.harvest.UnitOfWeightAbbreviation} ${partialResult.harvest.HarvestTypeName} - ${partialResult.harvest.HarvestStartDate}`;
+    primaryTextualDescriptor = 'Harvest';
+    secondaryTextualDescriptor = partialResult.harvest.HarvestTypeName;
   } else if (partialResult.item) {
     primaryIconName = "box";
     secondaryIconName = "clipboard-list";
+    primaryTextualIdentifier = partialResult.item.Name;
+    primaryTextualDescriptor = 'Item';
+    secondaryTextualDescriptor = partialResult.item.ProductCategoryName;
+    isActive = true;
   } else if (partialResult.strain) {
     primaryIconName = "cannabis";
     secondaryIconName = "clipboard-list";
-  } else if (partialResult.salesReceipt) {
-    primaryIconName = "file-invoice-dollar";
-    secondaryIconName = null;
-  }
+    primaryTextualIdentifier = partialResult.strain.Name;
+    primaryTextualDescriptor = 'Strain';
+    isActive = true;
+  } // else if (partialResult.salesReceipt) {
+  //   switch (partialResult.salesReceipt.SalesReceiptState) {
+
+  //   }
+
+  //   primaryIconName = "file-invoice-dollar";
+  //   secondaryIconName = null;
+  // }
 
   return {
     ...partialResult,

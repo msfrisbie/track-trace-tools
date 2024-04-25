@@ -9,9 +9,10 @@ import {
   PackageState,
   PlantBatchState,
   PlantState,
+  SalesReceiptState,
   SearchModalView,
   TagState,
-  TransferState,
+  TransferState
 } from "@/consts";
 import { Store } from "vuex";
 import { IAnnouncementsState } from "./store/page-overlay/modules/announcements/interfaces";
@@ -36,7 +37,7 @@ import { ISplitPackageBuilderState } from "./store/page-overlay/modules/split-pa
 import { ITagSearchState } from "./store/page-overlay/modules/tag-search/interfaces";
 import {
   DriverLayoverLeg,
-  ITransferBuilderState,
+  ITransferBuilderState
 } from "./store/page-overlay/modules/transfer-builder/interfaces";
 import { ITransferPackageSearchState } from "./store/page-overlay/modules/transfer-package-search/interfaces";
 import { ITransferSearchState } from "./store/page-overlay/modules/transfer-search/interfaces";
@@ -417,6 +418,11 @@ export interface IItemData extends IResponseObjectData {
   ExpirationDateConfiguration: "Off" | "Optional";
   SellByDateConfiguration: "Off" | "Optional";
   UseByDateConfiguration: "Off" | "Optional";
+}
+
+export interface IIndexedItemData extends IItemData {
+  LicenseNumber: string;
+  TagMatcher: string;
 }
 
 // Values that are defined per-request
@@ -1283,6 +1289,11 @@ export interface IStrainData {
   IsArchived: boolean;
 }
 
+export interface IIndexedSalesData extends IStrainData {
+  LicenseNumber: string;
+  TagMatcher: string;
+}
+
 export interface IHarvestData {
   ArchivedDate: string | null;
   CurrentWeight: number;
@@ -1336,7 +1347,11 @@ export interface ISalesReceiptData {
   Transactions: any[];
 }
 
-export interface IIndexedSalesReceiptData extends ISalesReceiptData {}
+export interface IIndexedSalesReceiptData extends ISalesReceiptData {
+  SalesReceiptState: SalesReceiptState;
+  LicenseNumber: string;
+  TagMatcher: string;
+}
 
 export interface IMetrcFacilityData {
   Id: number;

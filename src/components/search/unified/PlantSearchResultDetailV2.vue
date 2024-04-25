@@ -47,7 +47,7 @@ import Vue from "vue";
 import { mapActions, mapGetters, mapState } from "vuex";
 
 export default Vue.extend({
-  name: "PlantSearchResultDetail",
+  name: "PlantSearchResultDetailV2",
   store,
   components: { MetrcTag, RecursiveJsonTable },
   data(): {} {

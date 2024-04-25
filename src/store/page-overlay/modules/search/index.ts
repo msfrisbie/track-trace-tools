@@ -2,6 +2,7 @@ import { HarvestState, MessageType, MetrcGridId, TagState, TransferState } from 
 import { IPluginState } from "@/interfaces";
 import { analyticsManager } from "@/modules/analytics-manager.module";
 import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
+import { generateSearchResultMetadata } from "@/modules/page-manager/search-utils";
 import { maybePushOntoUniqueStack } from "@/utils/search";
 import _ from "lodash-es";
 import { ActionContext } from "vuex";
@@ -160,8 +161,7 @@ export const searchModule = {
         try {
           await Promise.allSettled([
             primaryDataLoader.onDemandActivePackageSearch({ queryString }).then((result) => {
-              const newSearchResults: ISearchResult[] = result.map((pkg) => ({
-                score: 1,
+              const newSearchResults: ISearchResult[] = result.map((pkg) => generateSearchResultMetadata({
                 pkg,
               }));
 
@@ -170,8 +170,7 @@ export const searchModule = {
               });
             }),
             primaryDataLoader.onDemandInTransitPackageSearch({ queryString }).then((result) => {
-              const newSearchResults: ISearchResult[] = result.map((pkg) => ({
-                score: 1,
+              const newSearchResults: ISearchResult[] = result.map((pkg) => generateSearchResultMetadata({
                 pkg,
               }));
 
@@ -180,8 +179,7 @@ export const searchModule = {
               });
             }),
             primaryDataLoader.onDemandInactivePackageSearch({ queryString }).then((result) => {
-              const newSearchResults: ISearchResult[] = result.map((pkg) => ({
-                score: 1,
+              const newSearchResults: ISearchResult[] = result.map((pkg) => generateSearchResultMetadata({
                 pkg,
               }));
 
@@ -190,8 +188,7 @@ export const searchModule = {
               });
             }),
             primaryDataLoader.onDemandTransferredPackageSearch({ queryString }).then((result) => {
-              const newSearchResults: ISearchResult[] = result.map((transferPkg) => ({
-                score: 1,
+              const newSearchResults: ISearchResult[] = result.map((transferPkg) => generateSearchResultMetadata({
                 transferPkg,
               }));
 
@@ -200,8 +197,7 @@ export const searchModule = {
               });
             }),
             primaryDataLoader.onDemandFloweringPlantSearch({ queryString }).then((result) => {
-              const newSearchResults: ISearchResult[] = result.map((plant) => ({
-                score: 1,
+              const newSearchResults: ISearchResult[] = result.map((plant) => generateSearchResultMetadata({
                 plant,
               }));
 
@@ -210,8 +206,7 @@ export const searchModule = {
               });
             }),
             primaryDataLoader.onDemandVegetativePlantSearch({ queryString }).then((result) => {
-              const newSearchResults: ISearchResult[] = result.map((plant) => ({
-                score: 1,
+              const newSearchResults: ISearchResult[] = result.map((plant) => generateSearchResultMetadata({
                 plant,
               }));
 
@@ -220,8 +215,7 @@ export const searchModule = {
               });
             }),
             primaryDataLoader.onDemandInactivePlantSearch({ queryString }).then((result) => {
-              const newSearchResults: ISearchResult[] = result.map((plant) => ({
-                score: 1,
+              const newSearchResults: ISearchResult[] = result.map((plant) => generateSearchResultMetadata({
                 plant,
               }));
 
@@ -235,8 +229,7 @@ export const searchModule = {
                 queryString,
               })
               .then((result) => {
-                const newSearchResults: ISearchResult[] = result.map((incomingTransfer) => ({
-                  score: 1,
+                const newSearchResults: ISearchResult[] = result.map((incomingTransfer) => generateSearchResultMetadata({
                   incomingTransfer,
                 }));
 
@@ -250,8 +243,7 @@ export const searchModule = {
                 queryString,
               })
               .then((result) => {
-                const newSearchResults: ISearchResult[] = result.map((incomingTransfer) => ({
-                  score: 1,
+                const newSearchResults: ISearchResult[] = result.map((incomingTransfer) => generateSearchResultMetadata({
                   incomingTransfer,
                 }));
 
@@ -265,8 +257,7 @@ export const searchModule = {
                 queryString,
               })
               .then((result) => {
-                const newSearchResults: ISearchResult[] = result.map((outgoingTransfer) => ({
-                  score: 1,
+                const newSearchResults: ISearchResult[] = result.map((outgoingTransfer) => generateSearchResultMetadata({
                   outgoingTransfer,
                 }));
 
@@ -280,8 +271,7 @@ export const searchModule = {
                 queryString,
               })
               .then((result) => {
-                const newSearchResults: ISearchResult[] = result.map((outgoingTransfer) => ({
-                  score: 1,
+                const newSearchResults: ISearchResult[] = result.map((outgoingTransfer) => generateSearchResultMetadata({
                   outgoingTransfer,
                 }));
 
@@ -295,8 +285,7 @@ export const searchModule = {
                 queryString,
               })
               .then((result) => {
-                const newSearchResults: ISearchResult[] = result.map((outgoingTransfer) => ({
-                  score: 1,
+                const newSearchResults: ISearchResult[] = result.map((outgoingTransfer) => generateSearchResultMetadata({
                   outgoingTransfer,
                 }));
 
@@ -307,8 +296,7 @@ export const searchModule = {
             primaryDataLoader
               .onDemandTagSearch({ queryString, tagState: TagState.AVAILABLE })
               .then((result) => {
-                const newSearchResults: ISearchResult[] = result.map((tag) => ({
-                  score: 1,
+                const newSearchResults: ISearchResult[] = result.map((tag) => generateSearchResultMetadata({
                   tag,
                 }));
 
@@ -319,8 +307,7 @@ export const searchModule = {
             primaryDataLoader
               .onDemandTagSearch({ queryString, tagState: TagState.USED })
               .then((result) => {
-                const newSearchResults: ISearchResult[] = result.map((tag) => ({
-                  score: 1,
+                const newSearchResults: ISearchResult[] = result.map((tag) => generateSearchResultMetadata({
                   tag,
                 }));
 
@@ -331,8 +318,7 @@ export const searchModule = {
             primaryDataLoader
               .onDemandTagSearch({ queryString, tagState: TagState.VOIDED })
               .then((result) => {
-                const newSearchResults: ISearchResult[] = result.map((tag) => ({
-                  score: 1,
+                const newSearchResults: ISearchResult[] = result.map((tag) => generateSearchResultMetadata({
                   tag,
                 }));
 
@@ -340,30 +326,29 @@ export const searchModule = {
                   searchResults: [...ctx.state.searchResults, ...newSearchResults],
                 });
               }),
-              primaryDataLoader
-                .onDemandHarvestSearch({ queryString, harvestState: HarvestState.ACTIVE })
-                .then((result) => {
-                  const newSearchResults: ISearchResult[] = result.map((harvest) => ({
-                    score: 1,
-                    harvest,
-                  }));
+            primaryDataLoader
+              .onDemandHarvestSearch({ queryString, harvestState: HarvestState.ACTIVE })
+              .then((result) => {
+                const newSearchResults: ISearchResult[] = result.map((harvest) => generateSearchResultMetadata({
+                  harvest,
+                }));
 
-                  ctx.commit(SearchMutations.SEARCH_MUTATION, {
-                    searchResults: [...ctx.state.searchResults, ...newSearchResults],
-                  });
-                }),
-                primaryDataLoader
-                  .onDemandHarvestSearch({ queryString, harvestState: HarvestState.INACTIVE })
-                  .then((result) => {
-                    const newSearchResults: ISearchResult[] = result.map((harvest) => ({
-                      score: 1,
-                      harvest,
-                    }));
+                ctx.commit(SearchMutations.SEARCH_MUTATION, {
+                  searchResults: [...ctx.state.searchResults, ...newSearchResults],
+                });
+              }),
+            primaryDataLoader
+              .onDemandHarvestSearch({ queryString, harvestState: HarvestState.INACTIVE })
+              .then((result) => {
+                const newSearchResults: ISearchResult[] = result.map((harvest) => generateSearchResultMetadata({
+                  harvest,
+                }));
 
-                    ctx.commit(SearchMutations.SEARCH_MUTATION, {
-                      searchResults: [...ctx.state.searchResults, ...newSearchResults],
-                    });
-                  }),
+                ctx.commit(SearchMutations.SEARCH_MUTATION, {
+                  searchResults: [...ctx.state.searchResults, ...newSearchResults],
+                });
+              }),
+              // TODO load sales
           ]);
 
           // TODO handle what happens when some searches fail

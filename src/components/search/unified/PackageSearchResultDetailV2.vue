@@ -64,7 +64,7 @@ import Vue from "vue";
 import { mapActions, mapGetters, mapState } from "vuex";
 
 export default Vue.extend({
-  name: "PackageSearchResultDetail",
+  name: "PackageSearchResultDetailV2",
   store,
   components: { MetrcTag, RecursiveJsonTable, PackageButtonList },
   data(): {

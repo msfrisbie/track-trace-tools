@@ -6,6 +6,7 @@ import {
   PackageState,
   PlantBatchState,
   PlantState,
+  SalesReceiptState,
   SEARCH_LOAD_PAGE_SIZE,
   TagState,
   TransferState
@@ -27,6 +28,7 @@ import {
   IIndexedPackageData,
   IIndexedPlantBatchData,
   IIndexedPlantData,
+  IIndexedSalesReceiptData,
   IIndexedTagData,
   IIndexedTransferData,
   IIndexedTransferredPackageData,
@@ -2646,15 +2648,22 @@ export class DataLoader implements IAtomicService {
     return this._inactiveHarvests;
   }
 
-  async activeSalesReceipts(): Promise<ISalesReceiptData[]> {
-    const activeSalesReceipts: Promise<ISalesReceiptData[]> = new Promise(
+  async activeSalesReceipts(): Promise<IIndexedSalesReceiptData[]> {
+    const activeSalesReceipts: Promise<IIndexedSalesReceiptData[]> = new Promise(
       async (resolve, reject) => {
         const subscription = timer(DATA_LOAD_FETCH_TIMEOUT_MS).subscribe(() =>
           reject("Active sales receipt fetch timed out")
         );
 
         try {
-          const activeSalesReceipts = await this.loadActiveSalesReceipts();
+          const activeSalesReceipts = (await this.loadActiveSalesReceipts()).map(
+            (salesReceipt) => ({
+              ...salesReceipt,
+              SalesReceiptState: SalesReceiptState.ACTIVE,
+              TagMatcher: "",
+              LicenseNumber: this._authState!.license,
+            })
+          );
 
           subscription.unsubscribe();
           resolve(activeSalesReceipts);

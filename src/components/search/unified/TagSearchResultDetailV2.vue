@@ -56,7 +56,7 @@ import RecursiveJsonTable from '@/components/search/shared/RecursiveJsonTable.vu
 import { SearchActions } from '@/store/page-overlay/modules/search/consts';
 
 export default Vue.extend({
-  name: 'TagSearchResultDetail',
+  name: 'TagSearchResultDetailV2',
   store,
   components: { MetrcTag, RecursiveJsonTable },
   data(): {

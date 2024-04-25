@@ -89,7 +89,7 @@ function deliveryTimeDescriptor(isodate: string | null): string {
 }
 
 export default Vue.extend({
-  name: "TransferSearchResultDetail",
+  name: "TransferSearchResultDetailV2",
   store,
   components: {
     // TransferIcon,

@@ -248,6 +248,12 @@ export enum TransferState {
   LAYOVER = "LAYOVER",
 }
 
+export enum SalesReceiptState {
+  ACTIVE = "ACTIVE",
+  ON_HOLD = "ON_HOLD",
+  INACTIVE = "INACTIVE",
+}
+
 export enum LandingPage {
   DEFAULT = "DEFAULT",
   TRANSFERS = "TRANSFERS",

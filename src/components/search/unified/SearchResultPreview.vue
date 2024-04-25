@@ -7,9 +7,9 @@
     @mouseenter="selectSearchResult({ searchResult })"
   >
     <complex-icon
-      :primaryIconNameIconName="searchResult.primaryIconName"
+      :primaryIconName="searchResult.primaryIconName"
       primaryIconNameIconSize="xl"
-      :secondaryIconNameIconName="searchResult.secondaryIconName"
+      :secondaryIconName="searchResult.secondaryIconName"
       secondaryIconNameIconSize="sm"
     ></complex-icon>
     <div>
