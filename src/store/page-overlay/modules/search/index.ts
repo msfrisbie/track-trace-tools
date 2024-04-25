@@ -1,4 +1,4 @@
-import { MessageType, MetrcGridId, TagState, TransferState } from "@/consts";
+import { HarvestState, MessageType, MetrcGridId, TagState, TransferState } from "@/consts";
 import { IPluginState } from "@/interfaces";
 import { analyticsManager } from "@/modules/analytics-manager.module";
 import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
@@ -19,7 +19,7 @@ const inMemoryState = {
   activeSearchResult: null,
   searchType: SearchType.PACKAGES,
   metrcSearchFilters: {},
-  activeGridId: null,
+  activeMetrcGridId: null,
 };
 
 const persistedState = {
@@ -122,7 +122,7 @@ export const searchModule = {
 
       ctx.commit(SearchMutations.SEARCH_MUTATION, { metrcSearchFilters });
     },
-    [SearchActions.SET_ACTIVE_GRID_ID]: async (
+    [SearchActions.SET_ACTIVE_METRC_GRID_ID]: async (
       ctx: ActionContext<ISearchState, IPluginState>,
       {
         metrcGridId,
@@ -130,7 +130,7 @@ export const searchModule = {
         metrcGridId: MetrcGridId;
       }
     ) => {
-      ctx.commit(SearchMutations.SEARCH_MUTATION, { activeGridId: metrcGridId });
+      ctx.commit(SearchMutations.SEARCH_MUTATION, { activeMetrcGridId: metrcGridId });
     },
     [SearchActions.EXECUTE_QUERY]: _.debounce(
       async (
@@ -190,9 +190,9 @@ export const searchModule = {
               });
             }),
             primaryDataLoader.onDemandTransferredPackageSearch({ queryString }).then((result) => {
-              const newSearchResults: ISearchResult[] = result.map((transferredPkg) => ({
+              const newSearchResults: ISearchResult[] = result.map((transferPkg) => ({
                 score: 1,
-                transferredPkg,
+                transferPkg,
               }));
 
               ctx.commit(SearchMutations.PUSH_SEARCH_RESULTS, {
@@ -340,7 +340,33 @@ export const searchModule = {
                   searchResults: [...ctx.state.searchResults, ...newSearchResults],
                 });
               }),
+              primaryDataLoader
+                .onDemandHarvestSearch({ queryString, harvestState: HarvestState.ACTIVE })
+                .then((result) => {
+                  const newSearchResults: ISearchResult[] = result.map((harvest) => ({
+                    score: 1,
+                    harvest,
+                  }));
+
+                  ctx.commit(SearchMutations.SEARCH_MUTATION, {
+                    searchResults: [...ctx.state.searchResults, ...newSearchResults],
+                  });
+                }),
+                primaryDataLoader
+                  .onDemandHarvestSearch({ queryString, harvestState: HarvestState.INACTIVE })
+                  .then((result) => {
+                    const newSearchResults: ISearchResult[] = result.map((harvest) => ({
+                      score: 1,
+                      harvest,
+                    }));
+
+                    ctx.commit(SearchMutations.SEARCH_MUTATION, {
+                      searchResults: [...ctx.state.searchResults, ...newSearchResults],
+                    });
+                  }),
           ]);
+
+          // TODO handle what happens when some searches fail
 
           ctx.commit(SearchMutations.SEARCH_MUTATION, {
             status: SearchStatus.SUCCESS,

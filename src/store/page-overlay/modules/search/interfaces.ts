@@ -1,5 +1,6 @@
 import { MetrcGridId } from "@/consts";
 import {
+  IIndexedHarvestData,
   IIndexedPackageData,
   IIndexedPlantBatchData,
   IIndexedPlantData,
@@ -8,7 +9,7 @@ import {
   IIndexedTransferData,
   IIndexedTransferredPackageData,
   IItemData,
-  IStrainData,
+  IStrainData
 } from "@/interfaces";
 import { SearchStatus, SearchType } from "./consts";
 
@@ -21,6 +22,7 @@ export interface ISearchResult {
   tag?: IIndexedTagData;
   incomingTransfer?: IIndexedTransferData;
   outgoingTransfer?: IIndexedTransferData;
+  harvest?: IIndexedHarvestData;
   item?: IItemData;
   strain?: IStrainData;
   salesReceipt?: IIndexedSalesReceiptData;
@@ -38,7 +40,7 @@ export interface ISearchState {
   activeSearchResult: ISearchResult | null;
 
   // Metrc page mirror data
-  activeGridId: MetrcGridId | null;
+  activeMetrcGridId: MetrcGridId | null;
   metrcSearchFilters: { [key: string]: { [key: string]: string } };
 
   // Deprecated

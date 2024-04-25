@@ -1,13 +1,19 @@
 <template>
-  <div class="flex flex-row gap-4 p-4" @mouseenter="selectSearchResult({ searchResult })">
+  <div
+    class="flex flex-row gap-4 p-4"
+    v-bind:class="{
+      'bg-white': searchState.activeSearchResult === searchResult,
+    }"
+    @mouseenter="selectSearchResult({ searchResult })"
+  >
     <complex-icon
-      primaryIconName="box"
+      :primaryIconName="searchResultIcons.primary"
       primaryIconSize="xl"
-      secondaryIconName="cog"
+      :secondaryIconName="searchResultIcons.secondary"
       secondaryIconSize="sm"
     ></complex-icon>
     <div>
-      {{ searchResult.score }}
+      {{ searchResult }}
     </div>
   </div>
 </template>
@@ -37,11 +43,59 @@ export default Vue.extend({
   computed: {
     ...mapState<IPluginState>({
       authState: (state: IPluginState) => state.pluginAuth.authState,
+      searchState: (state: IPluginState) => state.search,
     }),
     ...mapGetters({
       exampleGetter: `example/${ExampleGetters.EXAMPLE_GETTER}`,
       hasT3plus: `client/${ClientGetters.T3PLUS}`,
     }),
+    searchResultIcons(): { primary: string; secondary: string | null } {
+      if (this.searchResult.incomingTransfer) {
+        return { primary: "truck-loading", secondary: "arrow-left" };
+      }
+
+      if (this.searchResult.outgoingTransfer) {
+        return { primary: "truck-loading", secondary: "arrow-right" };
+      }
+
+      if (this.searchResult.pkg) {
+        return { primary: "box", secondary: null };
+      }
+
+      if (this.searchResult.tag) {
+        return { primary: "tag", secondary: null };
+      }
+
+      if (this.searchResult.transferPkg) {
+        return { primary: "box", secondary: "truck" };
+      }
+
+      if (this.searchResult.plant) {
+        return { primary: "leaf", secondary: null };
+      }
+
+      if (this.searchResult.plantBatch) {
+        return { primary: "seedling", secondary: null };
+      }
+
+      if (this.searchResult.harvest) {
+        return { primary: "cannabis", secondary: "cut" };
+      }
+
+      if (this.searchResult.item) {
+        return { primary: "box", secondary: "clipboard-list" };
+      }
+
+      if (this.searchResult.strain) {
+        return { primary: "cannabis", secondary: "clipboard-list" };
+      }
+
+      if (this.searchResult.salesReceipt) {
+        return { primary: "file-invoice-dollar", secondary: null };
+      }
+
+      return { primary: "question-circle", secondary: null };
+    },
   },
   data() {
     return {};

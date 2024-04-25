@@ -137,6 +137,7 @@ library.add(
   fontawesomeSolid.faChevronLeft,
   fontawesomeSolid.faChevronRight,
   fontawesomeSolid.faClipboardCheck,
+  fontawesomeSolid.faClipboardList,
   fontawesomeRegular.faClock,
   fontawesomeSolid.faClock,
   fontawesomeSolid.faCog,
@@ -162,6 +163,7 @@ library.add(
   fontawesomeSolid.faFileCsv,
   fontawesomeSolid.faFileDownload,
   fontawesomeSolid.faFileExcel,
+  fontawesomeSolid.faFileInvoiceDollar,
   fontawesomeSolid.faFilePdf,
   fontawesomeSolid.faFilter,
   fontawesomeSolid.faFlask,
@@ -295,8 +297,7 @@ export default Vue.extend({
 
     await sandboxManager.runsAfterModuleInit();
   },
-  mounted() {
-  },
+  mounted() {},
 });
 </script>
 

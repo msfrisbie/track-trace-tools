@@ -8,7 +8,7 @@ import {
   PlantState,
   SEARCH_LOAD_PAGE_SIZE,
   TagState,
-  TransferState,
+  TransferState
 } from "@/consts";
 import {
   IAtomicService,
@@ -56,24 +56,21 @@ import {
   ITestResultData,
   ITransferData,
   ITransferFilter,
-  ITransferHistoryData,
-  ITransferTransporterDetails,
-  ITransferredPackageData,
-  ITransporterData,
+  ITransferHistoryData, ITransferredPackageData, ITransferTransporterDetails, ITransporterData
 } from "@/interfaces";
 import { authManager } from "@/modules/auth-manager.module";
 import { databaseInterface } from "@/modules/database-interface.module";
 import {
   MetrcRequestManager,
-  primaryMetrcRequestManager,
+  primaryMetrcRequestManager
 } from "@/modules/metrc-request-manager.module";
 import { mockDataManager } from "@/modules/mock-data-manager.module";
 import store from "@/store/page-overlay/index";
 import { CsvUpload } from "@/types";
 import { buildBody, streamFactory } from "@/utils/data-loader";
 import { debugLogFactory } from "@/utils/debug";
-import { ExtractedData, ExtractionType, extract } from "@/utils/html";
-import { StorageKeyType, readDataOrNull, writeData } from "@/utils/storage";
+import { extract, ExtractedData, ExtractionType } from "@/utils/html";
+import { readDataOrNull, StorageKeyType, writeData } from "@/utils/storage";
 import { AxiosResponse } from "axios";
 import { get } from "idb-keyval";
 import { Subject, timer } from "rxjs";
@@ -1027,6 +1024,26 @@ export class DataLoader implements IAtomicService {
     });
   }
 
+  onDemandHarvestSearchBody({ queryString }: { queryString: string }): string {
+    return JSON.stringify({
+      request: {
+        take: SEARCH_LOAD_PAGE_SIZE,
+        skip: 0,
+        page: 1,
+        pageSize: SEARCH_LOAD_PAGE_SIZE,
+        filter: {
+          logic: "or",
+          filters: [
+            { field: "Label", operator: "contains", value: queryString },
+            { field: "LocationName", operator: "contains", value: queryString },
+            { field: "StrainName", operator: "contains", value: queryString },
+          ],
+        },
+        group: [],
+      },
+    });
+  }
+
   async onDemandFloweringPlantSearch({
     queryString,
   }: {
@@ -1129,6 +1146,84 @@ export class DataLoader implements IAtomicService {
     }
 
     return plants;
+  }
+
+  async onDemandActiveHarvestSearch({
+    queryString,
+  }: {
+    queryString: string;
+  }): Promise<IIndexedHarvestData[]> {
+    if (store.state.mockDataMode && store.state.flags?.mockedFlags.mockHarvests.enabled) {
+      // @ts-ignore
+      return mockDataManager.mockHarvests({ filters: {} }).map((x) => ({
+        ...x,
+        TagMatcher: "",
+        HarvestState: HarvestState.ACTIVE,
+        LicenseNumber: this._authState!.license,
+      }));
+    }
+
+    let harvests: IIndexedHarvestData[] = [];
+
+    const body = this.onDemandHarvestSearchBody({ queryString });
+
+    const activeHarvestsResponse = await primaryMetrcRequestManager.getActiveHarvests(body);
+
+    if (activeHarvestsResponse.status === 200) {
+      const responseData: ICollectionResponse<IHarvestData> = await activeHarvestsResponse.data;
+
+      const activeHarvests: IIndexedHarvestData[] = responseData.Data.map((x) => ({
+        ...x,
+        HarvestState: HarvestState.ACTIVE,
+        TagMatcher: "",
+        LicenseNumber: this._authState!.license,
+      }));
+
+      harvests = [...harvests, ...activeHarvests];
+    } else {
+      console.error("Active harvests request failed.");
+    }
+
+    return harvests;
+  }
+
+  async onDemandInactiveHarvestSearch({
+    queryString,
+  }: {
+    queryString: string;
+  }): Promise<IIndexedHarvestData[]> {
+    if (store.state.mockDataMode && store.state.flags?.mockedFlags.mockHarvests.enabled) {
+      // @ts-ignore
+      return mockDataManager.mockHarvests({ filters: {} }).map((x) => ({
+        ...x,
+        TagMatcher: "",
+        HarvestState: HarvestState.INACTIVE,
+        LicenseNumber: this._authState!.license,
+      }));
+    }
+
+    let harvests: IIndexedHarvestData[] = [];
+
+    const body = this.onDemandHarvestSearchBody({ queryString });
+
+    const activeHarvestsResponse = await primaryMetrcRequestManager.getInactiveHarvests(body);
+
+    if (activeHarvestsResponse.status === 200) {
+      const responseData: ICollectionResponse<IHarvestData> = await activeHarvestsResponse.data;
+
+      const activeHarvests: IIndexedHarvestData[] = responseData.Data.map((x) => ({
+        ...x,
+        HarvestState: HarvestState.INACTIVE,
+        TagMatcher: "",
+        LicenseNumber: this._authState!.license,
+      }));
+
+      harvests = [...harvests, ...activeHarvests];
+    } else {
+      console.error("Inactive harvests request failed.");
+    }
+
+    return harvests;
   }
 
   async onDemandPackageItemSearch({
@@ -1882,6 +1977,48 @@ export class DataLoader implements IAtomicService {
     }
 
     return tags;
+  }
+
+  async onDemandHarvestSearch({
+    harvestState,
+    queryString,
+  }: {
+    harvestState: HarvestState;
+    queryString: string;
+  }): Promise<IIndexedHarvestData[]> {
+    let harvests: IIndexedHarvestData[] = [];
+
+    const body = this.onDemandHarvestSearchBody({ queryString });
+
+    let harvestResponse;
+    switch (harvestState) {
+      case HarvestState.ACTIVE:
+        harvestResponse = await primaryMetrcRequestManager.getActiveHarvests(body);
+        break;
+      // case HarvestState.ON_HOLD:
+      //   harvestResponse = await primaryMetrcRequestManager.getOnHoldHarvests(body);
+      //   break;
+      case HarvestState.INACTIVE:
+        harvestResponse = await primaryMetrcRequestManager.getInactiveHarvests(body);
+        break;
+      default:
+        throw new Error("Invalid harvest state");
+    }
+
+    if (harvestResponse.status === 200) {
+      const responseData: ICollectionResponse<IHarvestData> = await harvestResponse.data;
+
+      harvests = responseData.Data.map((x) => ({
+        ...x,
+        HarvestState: harvestState,
+        TagMatcher: "",
+        LicenseNumber: this._authState!.license,
+      }));
+    } else {
+      console.error(`${harvestState} harvests request failed.`);
+    }
+
+    return harvests;
   }
 
   async incomingTransfers(resetCache: boolean = false): Promise<IIndexedTransferData[]> {
