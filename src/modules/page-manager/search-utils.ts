@@ -2,19 +2,223 @@ import {
   MessageType,
   MetrcGridId,
   PackageFilterIdentifiers,
+  PackageState,
+  PlantBatchState,
   PlantFilterIdentifiers,
+  PlantState,
   TagFilterIdentifiers,
+  TagState,
   TransferFilterIdentifiers,
-  TransferredPackageFilterIdentifiers
+  TransferredPackageFilterIdentifiers,
+  TransferState
 } from "@/consts";
 import store from "@/store/page-overlay/index";
 import { SearchActions } from "@/store/page-overlay/modules/search/consts";
+import { ISearchResult } from "@/store/page-overlay/modules/search/interfaces";
 import _ from "lodash-es";
 import { analyticsManager } from "../analytics-manager.module";
 import { pageManager } from "./page-manager.module";
 
 const T3_METRC_GRID_ID_ATTRIBUTE = `t3-grid-id`;
 const T3_SEARCH_FILTER_ATTRIBUTE = `t3-search-filter`;
+
+export function generateSearchResultMetadata(partialResult: Partial<ISearchResult>): ISearchResult {
+  let primaryIconName: string = "question-circle";
+  let secondaryIconName: string | null = null;
+
+  // Label, Manifest #, PB Name, etc
+  let primaryTextualIdentifier: string = "";
+
+  // 4 lbs OG Kush, 50 clones,
+  let secondaryTextualIdentifier: string = "";
+
+  // Plant, Incoming Transfer
+  let primaryTextualDescriptor: string = "";
+
+  // Cannabis Plant [Tag]
+  let secondaryTextualDescriptor: string | null = null;
+
+  // Active, Inactive
+  let primaryStatusTextualDescriptor: string | null = null;
+
+  let isActive: boolean = false;
+  let isInactive: boolean = false;
+
+  const score: number = 1;
+
+  if (partialResult.incomingTransfer) {
+    switch (partialResult.incomingTransfer.TransferState) {
+      case TransferState.INCOMING_INACTIVE:
+        primaryStatusTextualDescriptor = "Inactive";
+        isInactive = true;
+        break;
+      case TransferState.INCOMING:
+      default:
+        primaryStatusTextualDescriptor = "Active";
+        isActive = true;
+        break;
+    }
+
+    primaryIconName = "truck-loading";
+    secondaryIconName = "arrow-left";
+    primaryTextualDescriptor = "Incoming Transfer";
+    primaryTextualIdentifier = partialResult.incomingTransfer.ManifestNumber;
+    secondaryTextualIdentifier = `${partialResult.incomingTransfer.PackageCount} pkg transfer from ${partialResult.incomingTransfer.ShipperFacilityName}`;
+  } else if (partialResult.outgoingTransfer) {
+    switch (partialResult.outgoingTransfer.TransferState) {
+      case TransferState.OUTGOING_INACTIVE:
+        primaryStatusTextualDescriptor = "Inactive";
+        isInactive = true;
+        break;
+      case TransferState.REJECTED:
+        primaryStatusTextualDescriptor = "Rejected";
+        break;
+      case TransferState.OUTGOING:
+      default:
+        primaryStatusTextualDescriptor = "Active";
+        isActive = true;
+        break;
+    }
+
+    primaryIconName = "truck-loading";
+    secondaryIconName = "arrow-right";
+    primaryTextualDescriptor = "Outgoing Transfer";
+    primaryTextualIdentifier = partialResult.outgoingTransfer.ManifestNumber;
+    secondaryTextualIdentifier = `${partialResult.outgoingTransfer.PackageCount} pkg transfer`;
+  } else if (partialResult.pkg) {
+    switch (partialResult.pkg.PackageState) {
+      case PackageState.ACTIVE:
+        primaryStatusTextualDescriptor = "Active";
+        isActive = true;
+        break;
+      case PackageState.INACTIVE:
+        primaryStatusTextualDescriptor = "Inactive";
+        isInactive = true;
+        break;
+      case PackageState.IN_TRANSIT:
+        primaryStatusTextualDescriptor = "Added to Transfer";
+        break;
+      default:
+        break;
+    }
+
+    primaryIconName = "box";
+    secondaryIconName = null;
+    primaryTextualDescriptor = "Package";
+    secondaryTextualDescriptor = partialResult.pkg.Item.ProductCategoryName;
+    primaryTextualIdentifier = partialResult.pkg.Label;
+    secondaryTextualIdentifier = `${partialResult.pkg.Quantity} ${partialResult.pkg.UnitOfMeasureAbbreviation} ${partialResult.pkg.Item.Name}`;
+  } else if (partialResult.tag) {
+    switch (partialResult.tag.TagState) {
+      case TagState.AVAILABLE:
+        primaryStatusTextualDescriptor = `Available`;
+        isActive = true;
+        break;
+      case TagState.USED:
+        primaryStatusTextualDescriptor = `Used`;
+        isInactive = true;
+        break;
+      case TagState.VOIDED:
+        primaryStatusTextualDescriptor = `Voided`;
+        isInactive = true;
+        break;
+      default:
+        break;
+    }
+
+    primaryIconName = "tag";
+    secondaryIconName = null;
+    primaryTextualIdentifier = partialResult.tag.Label;
+    secondaryTextualDescriptor = ``;
+    primaryTextualDescriptor = "Tag";
+    secondaryTextualDescriptor = partialResult.tag.TagTypeName;
+  } else if (partialResult.transferPkg) {
+    switch (partialResult.transferPkg.PackageState) {
+      case PackageState.TRANSFERRED:
+        primaryStatusTextualDescriptor = "Transferred";
+        isInactive = true;
+        break;
+      default:
+        break;
+    }
+
+    primaryIconName = "box";
+    secondaryIconName = "truck";
+    primaryTextualIdentifier = partialResult.transferPkg.PackageLabel;
+    secondaryTextualIdentifier = `${partialResult.transferPkg.ShippedQuantity} ${partialResult.transferPkg.ShippedUnitOfMeasureAbbreviation} ${partialResult.transferPkg.ProductName}`;
+    primaryTextualDescriptor = `Package`;
+  } else if (partialResult.plant) {
+    switch (partialResult.plant.PlantState) {
+      case PlantState.FLOWERING:
+        primaryStatusTextualDescriptor = 'Flowering';
+        isActive = true;
+        break;
+      case PlantState.VEGETATIVE:
+        primaryStatusTextualDescriptor = 'Vegetative';
+        isActive = true;
+        break;
+      case PlantState.INACTIVE:
+        primaryStatusTextualDescriptor = 'Inactive';
+        isInactive = true;
+        break;
+      default:
+        break;
+    }
+
+    primaryIconName = "leaf";
+    secondaryIconName = null;
+    primaryTextualIdentifier = partialResult.plant.Label;
+    secondaryTextualIdentifier = `${partialResult.plant.StrainName} Plant`;
+    primaryTextualDescriptor = 'Plant';
+    secondaryTextualDescriptor = partialResult.plant.StrainName;
+  } else if (partialResult.plantBatch) {
+    switch (partialResult.plantBatch.PlantBatchState) {
+      case PlantBatchState.ACTIVE:
+        primaryStatusTextualDescriptor = 'Active';
+        isActive = true;
+        break;
+      case PlantBatchState.INACTIVE:
+        primaryStatusTextualDescriptor = 'Inactive';
+        isInactive = true;
+        break;
+      default:
+        break;
+    }
+
+    primaryIconName = "seedling";
+    secondaryIconName = null;
+    primaryTextualIdentifier = partialResult.plantBatch.Name;
+    secondaryTextualIdentifier = `${partialResult.plantBatch.UntrackedCount} ${partialResult.plantBatch.StrainName} ${partialResult.plantBatch.TypeName}s`;
+    primaryTextualDescriptor = 'Plant Batch';
+    secondaryTextualDescriptor = partialResult.plantBatch.TypeName;
+  } else if (partialResult.harvest) {
+    primaryIconName = "cannabis";
+    secondaryIconName = "cut";
+  } else if (partialResult.item) {
+    primaryIconName = "box";
+    secondaryIconName = "clipboard-list";
+  } else if (partialResult.strain) {
+    primaryIconName = "cannabis";
+    secondaryIconName = "clipboard-list";
+  } else if (partialResult.salesReceipt) {
+    primaryIconName = "file-invoice-dollar";
+    secondaryIconName = null;
+  }
+
+  return {
+    ...partialResult,
+    score,
+    primaryIconName,
+    secondaryIconName,
+    primaryTextualIdentifier,
+    secondaryTextualIdentifier,
+    primaryTextualDescriptor,
+    secondaryTextualDescriptor,
+    primaryStatusTextualDescriptor,
+    isInactive,
+    isActive
+  };
+}
 
 export function getActiveMetrcGridIdOrNull(): MetrcGridId | null {
   return (

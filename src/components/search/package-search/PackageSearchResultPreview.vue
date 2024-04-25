@@ -15,7 +15,7 @@
         <div class="text-xl text-purple-700">
           {{ getNormalizedPackageContentsDescription(pkg) }}
         </div>
-        <div class="text-gray-700 text-lg metrc-tag">{{ pkg.Label }}</div>
+      <div class="text-gray-700 text-lg metrc-tag">{{ pkg.Label }}</div>
       </div>
     </div>
   </div>

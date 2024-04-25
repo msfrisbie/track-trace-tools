@@ -14,7 +14,6 @@ import {
 import { SearchStatus, SearchType } from "./consts";
 
 export interface ISearchResult {
-  score: number;
   pkg?: IIndexedPackageData;
   transferPkg?: IIndexedTransferredPackageData;
   plant?: IIndexedPlantData;
@@ -26,6 +25,17 @@ export interface ISearchResult {
   item?: IItemData;
   strain?: IStrainData;
   salesReceipt?: IIndexedSalesReceiptData;
+  // Metadata
+  score: number;
+  primaryIconName: string;
+  secondaryIconName: string | null;
+  primaryTextualIdentifier: string;
+  secondaryTextualIdentifier: string | null;
+  primaryTextualDescriptor: string;
+  secondaryTextualDescriptor: string | null;
+  primaryStatusTextualDescriptor: string | null;
+  isActive: boolean;
+  isInactive: boolean;
 }
 
 export interface ISearchState {
