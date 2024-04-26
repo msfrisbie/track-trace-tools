@@ -23,7 +23,44 @@ import { pageManager } from "./page-manager.module";
 const T3_METRC_GRID_ID_ATTRIBUTE = `t3-grid-id`;
 const T3_SEARCH_FILTER_ATTRIBUTE = `t3-search-filter`;
 
-export function generateSearchResultMetadata(partialResult: Partial<ISearchResult>): ISearchResult {
+const IGNORE_FIELDS = new Set([
+  'Id',
+]);
+
+export function extractMatchedFields(queryString: string, o: {[key: string]: any}): {field: string, value: string}[] {
+  console.log({ o });
+
+  const normalizedQueryString = queryString.toLocaleLowerCase();
+
+  const matchedFields: {field: string, value: string}[] = [];
+
+  for (const [k, v] of Object.entries(o)) {
+    if (IGNORE_FIELDS.has(k)) {
+      continue;
+    }
+
+    if (typeof v === 'object') {
+      matchedFields.concat(
+        ...extractMatchedFields(queryString, v).map((x) => ({
+          ...x,
+          field: [k, x.field].join('.')
+        }))
+      );
+      continue;
+    }
+
+    if (v.toLocaleLowerCase().includes(normalizedQueryString)) {
+      matchedFields.push({
+        field: k,
+        value: v.toString()
+      });
+    }
+  }
+
+  return matchedFields;
+}
+
+export function generateSearchResultMetadata(queryString: string, partialResult: Partial<ISearchResult>): ISearchResult {
   let primaryIconName: string = "question-circle";
   let secondaryIconName: string | null = null;
 
@@ -45,9 +82,13 @@ export function generateSearchResultMetadata(partialResult: Partial<ISearchResul
   let isActive: boolean = false;
   let isInactive: boolean = false;
 
+  let matchedFields: {field: string, value: string}[] = [];
+
   const score: number = 1;
 
   if (partialResult.incomingTransfer) {
+    matchedFields = extractMatchedFields(queryString, partialResult.incomingTransfer);
+
     switch (partialResult.incomingTransfer.TransferState) {
       case TransferState.INCOMING_INACTIVE:
         primaryStatusTextualDescriptor = "Inactive";
@@ -66,6 +107,8 @@ export function generateSearchResultMetadata(partialResult: Partial<ISearchResul
     primaryTextualIdentifier = partialResult.incomingTransfer.ManifestNumber;
     secondaryTextualIdentifier = `${partialResult.incomingTransfer.PackageCount} pkg transfer from ${partialResult.incomingTransfer.ShipperFacilityName}`;
   } else if (partialResult.outgoingTransfer) {
+    matchedFields = extractMatchedFields(queryString, partialResult.outgoingTransfer);
+
     switch (partialResult.outgoingTransfer.TransferState) {
       case TransferState.OUTGOING_INACTIVE:
         primaryStatusTextualDescriptor = "Inactive";
@@ -87,6 +130,8 @@ export function generateSearchResultMetadata(partialResult: Partial<ISearchResul
     primaryTextualIdentifier = partialResult.outgoingTransfer.ManifestNumber;
     secondaryTextualIdentifier = `${partialResult.outgoingTransfer.PackageCount} pkg transfer`;
   } else if (partialResult.pkg) {
+    matchedFields = extractMatchedFields(queryString, partialResult.pkg);
+
     switch (partialResult.pkg.PackageState) {
       case PackageState.ACTIVE:
         primaryStatusTextualDescriptor = "Active";
@@ -110,6 +155,8 @@ export function generateSearchResultMetadata(partialResult: Partial<ISearchResul
     primaryTextualIdentifier = partialResult.pkg.Label;
     secondaryTextualIdentifier = `${partialResult.pkg.Quantity} ${partialResult.pkg.UnitOfMeasureAbbreviation} ${partialResult.pkg.Item.Name}`;
   } else if (partialResult.tag) {
+    matchedFields = extractMatchedFields(queryString, partialResult.tag);
+
     switch (partialResult.tag.TagState) {
       case TagState.AVAILABLE:
         primaryStatusTextualDescriptor = `Available`;
@@ -134,6 +181,8 @@ export function generateSearchResultMetadata(partialResult: Partial<ISearchResul
     primaryTextualDescriptor = "Tag";
     secondaryTextualDescriptor = partialResult.tag.TagTypeName;
   } else if (partialResult.transferPkg) {
+    matchedFields = extractMatchedFields(queryString, partialResult.transferPkg);
+
     switch (partialResult.transferPkg.PackageState) {
       case PackageState.TRANSFERRED:
         primaryStatusTextualDescriptor = "Transferred";
@@ -149,6 +198,8 @@ export function generateSearchResultMetadata(partialResult: Partial<ISearchResul
     secondaryTextualIdentifier = `${partialResult.transferPkg.ShippedQuantity} ${partialResult.transferPkg.ShippedUnitOfMeasureAbbreviation} ${partialResult.transferPkg.ProductName}`;
     primaryTextualDescriptor = `Package`;
   } else if (partialResult.plant) {
+    matchedFields = extractMatchedFields(queryString, partialResult.plant);
+
     switch (partialResult.plant.PlantState) {
       case PlantState.FLOWERING:
         primaryStatusTextualDescriptor = 'Flowering';
@@ -173,6 +224,8 @@ export function generateSearchResultMetadata(partialResult: Partial<ISearchResul
     primaryTextualDescriptor = 'Plant';
     secondaryTextualDescriptor = partialResult.plant.StrainName;
   } else if (partialResult.plantBatch) {
+    matchedFields = extractMatchedFields(queryString, partialResult.plantBatch);
+
     switch (partialResult.plantBatch.PlantBatchState) {
       case PlantBatchState.ACTIVE:
         primaryStatusTextualDescriptor = 'Active';
@@ -193,6 +246,8 @@ export function generateSearchResultMetadata(partialResult: Partial<ISearchResul
     primaryTextualDescriptor = 'Plant Batch';
     secondaryTextualDescriptor = partialResult.plantBatch.TypeName;
   } else if (partialResult.harvest) {
+    matchedFields = extractMatchedFields(queryString, partialResult.harvest);
+
     switch (partialResult.harvest.HarvestState) {
       case HarvestState.ACTIVE:
         primaryStatusTextualDescriptor = 'Active';
@@ -213,6 +268,8 @@ export function generateSearchResultMetadata(partialResult: Partial<ISearchResul
     primaryTextualDescriptor = 'Harvest';
     secondaryTextualDescriptor = partialResult.harvest.HarvestTypeName;
   } else if (partialResult.item) {
+    matchedFields = extractMatchedFields(queryString, partialResult.item);
+
     primaryIconName = "box";
     secondaryIconName = "clipboard-list";
     primaryTextualIdentifier = partialResult.item.Name;
@@ -220,6 +277,8 @@ export function generateSearchResultMetadata(partialResult: Partial<ISearchResul
     secondaryTextualDescriptor = partialResult.item.ProductCategoryName;
     isActive = true;
   } else if (partialResult.strain) {
+    matchedFields = extractMatchedFields(queryString, partialResult.strain);
+
     primaryIconName = "cannabis";
     secondaryIconName = "clipboard-list";
     primaryTextualIdentifier = partialResult.strain.Name;
@@ -234,7 +293,7 @@ export function generateSearchResultMetadata(partialResult: Partial<ISearchResul
   //   secondaryIconName = null;
   // }
 
-  return {
+  const result = {
     ...partialResult,
     score,
     primaryIconName,
@@ -244,9 +303,15 @@ export function generateSearchResultMetadata(partialResult: Partial<ISearchResul
     primaryTextualDescriptor,
     secondaryTextualDescriptor,
     primaryStatusTextualDescriptor,
+    matchedFields,
     isInactive,
     isActive
   };
+
+  TODO;
+  console.log({ result });
+
+  return result;
 }
 
 export function getActiveMetrcGridIdOrNull(): MetrcGridId | null {

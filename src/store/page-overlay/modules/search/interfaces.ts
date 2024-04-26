@@ -36,6 +36,10 @@ export interface ISearchResult {
   primaryStatusTextualDescriptor: string | null;
   isActive: boolean;
   isInactive: boolean;
+  matchedFields: {
+    field: string,
+    value: string
+  }[]
 }
 
 export interface ISearchState {

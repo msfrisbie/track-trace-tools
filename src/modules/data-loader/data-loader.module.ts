@@ -1036,9 +1036,9 @@ export class DataLoader implements IAtomicService {
         filter: {
           logic: "or",
           filters: [
-            { field: "Label", operator: "contains", value: queryString },
-            { field: "LocationName", operator: "contains", value: queryString },
-            { field: "StrainName", operator: "contains", value: queryString },
+            { field: "Name", operator: "contains", value: queryString },
+            { field: "DryingLocationName", operator: "contains", value: queryString },
+            { field: "SourceStrainNames", operator: "contains", value: queryString },
           ],
         },
         group: [],

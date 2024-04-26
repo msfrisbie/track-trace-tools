@@ -20,12 +20,13 @@
       </div>
     </div>
     <div class="flex flex-col items-start justify-start">
-      <div>
+      <!-- <div>
         {{ searchResult.primaryTextualIdentifier }}
       </div>
       <div>
         {{ searchResult.secondaryTextualIdentifier }}
-      </div>
+      </div> -->
+      {{ searchResult.matchedFields }}
     </div>
   </div>
 </template>
