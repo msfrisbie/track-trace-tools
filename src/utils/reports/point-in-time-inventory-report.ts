@@ -7,21 +7,21 @@ import {
   IIndexedTransferData,
   ILicenseFormFilters,
   IPluginState,
-  IRichIncomingTransferData,
+  IRichIncomingTransferData
 } from "@/interfaces";
 import { DataLoader, getDataLoaderByLicense } from "@/modules/data-loader/data-loader.module";
-import { ReportType, ReportsMutations } from "@/store/page-overlay/modules/reports/consts";
+import { ReportsMutations, ReportType } from "@/store/page-overlay/modules/reports/consts";
 import {
   IReportConfig,
   IReportData,
-  IReportsState,
+  IReportsState
 } from "@/store/page-overlay/modules/reports/interfaces";
 import { ActionContext } from "vuex";
 import {
   getIsoDateFromOffset,
   isCustodiedDatetimeOrError,
   isoDatetimeToLocalDate,
-  todayIsodate,
+  todayIsodate
 } from "../date";
 import { extractInitialPackageQuantityAndUnitFromHistoryOrError } from "../history";
 import { getItemNameOrError, getLabelOrError } from "../package";
@@ -489,7 +489,8 @@ export async function maybeLoadPointInTimeInventoryReportData({
     }
 
     const [quantity, unitOfMeasure] = extractInitialPackageQuantityAndUnitFromHistoryOrError(
-      metadata.pkg!.history!
+      metadata.pkg!.history!,
+      getLabelOrError(metadata.pkg)
     );
 
     metadata.quantity = quantity;

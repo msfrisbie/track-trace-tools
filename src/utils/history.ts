@@ -1,7 +1,7 @@
 import {
   METRC_TAG_REGEX_PATTERN,
   PLANT_BATCH_NAME_REGEX_PATTERN,
-  ZERO_PADDED_MANIFEST_NUMBER_REGEX_PATTERN,
+  ZERO_PADDED_MANIFEST_NUMBER_REGEX_PATTERN
 } from "@/consts";
 import { IHarvestHistoryData, IPackageHistoryData } from "@/interfaces";
 import _ from "lodash-es";
@@ -241,7 +241,8 @@ export function extractLocationNameOrNull(description: string): string | null {
 // Full history methods
 
 export function extractInitialPackageQuantityAndUnitFromHistoryOrError(
-  historyList: IPackageHistoryData[]
+  historyList: IPackageHistoryData[],
+  packageLabelContext: string = ''
 ): [number, string] {
   for (const history of historyList) {
     for (const description of history.Descriptions) {
@@ -253,7 +254,7 @@ export function extractInitialPackageQuantityAndUnitFromHistoryOrError(
     }
   }
 
-  throw new Error("Could not locate initial quantity");
+  throw new Error(`Could not locate initial quantity for package ${packageLabelContext}`);
 }
 
 export function extractParentPackageLabelsFromHistory(
