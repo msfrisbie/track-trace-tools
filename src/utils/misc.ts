@@ -193,7 +193,8 @@ export function allocatePackageQuantities(
 
 export function allocateImmaturePlantCounts(
   totalPlantCount: number,
-  packages: IPackageData[]
+  packages: IPackageData[],
+  plantCountPerBatch: number
 ): IIntermediateCreatePlantBatchFromPackageData[] {
   // Sanity check: is mixed?
   const unitOfMeasureSet = new Set();
@@ -233,7 +234,7 @@ export function allocateImmaturePlantCounts(
       throw new Error("Killswitch");
     }
 
-    const batchSize: number = Math.min(remainingTotal, selectedPackageRemainingPlantCount, 100);
+    const batchSize: number = Math.min(remainingTotal, selectedPackageRemainingPlantCount, plantCountPerBatch);
 
     debugLog(async () => ["Next batch size:", batchSize]);
 

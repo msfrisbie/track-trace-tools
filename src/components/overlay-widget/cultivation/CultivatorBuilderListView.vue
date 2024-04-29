@@ -6,7 +6,6 @@
 import BuilderList from "@/components/overlay-widget/shared/BuilderList.vue";
 import { CALIFORNIA_METRC_HOSTNAME, TESTING_AZ_METRC_HOSTNAME } from "@/consts";
 import { IBuilderListOption, IPluginState } from "@/interfaces";
-import { isDevelopment } from "@/modules/environment.module";
 import store from "@/store/page-overlay/index";
 import { isCurrentHostAllowed } from "@/utils/builder";
 import { hasPlusImpl } from "@/utils/plus";
@@ -23,8 +22,8 @@ export default Vue.extend({
   data() {
     return {};
   },
-  async mounted() {},
-  async created() {},
+  async mounted() { },
+  async created() { },
   computed: {
     ...mapState<IPluginState>({
       clientState: (state: IPluginState) => state.client,
@@ -72,7 +71,7 @@ export default Vue.extend({
           text: "DESTROY PLANT BATCHES",
           icon: "trash-alt",
           backgroundColor: "#48b867",
-          enabled: isDevelopment(),
+          enabled: hasPlusImpl(),
           isPlus: true,
           isBeta: false,
           isNew: true,
@@ -98,6 +97,18 @@ export default Vue.extend({
           backgroundColor: "#48b867",
           enabled: true,
           isPlus: false,
+          isBeta: false,
+          isNew: false,
+          visible: true,
+          showDisabledMessage: false,
+        },
+        {
+          route: "/cultivator/move-plant-batches",
+          text: "MOVE PLANT BATCHES",
+          icon: "exchange-alt",
+          backgroundColor: "#48b867",
+          enabled: true,
+          isPlus: true,
           isBeta: false,
           isNew: false,
           visible: true,

@@ -1,19 +1,28 @@
-import '@/test/utils/auto-mock-auth-manager';
-import '@/test/utils/auto-mock-chrome';
-import '@/test/utils/auto-mock-facility-manager';
-import '@/test/utils/auto-mock-fetch';
-import '@/test/utils/auto-mock-metrc-request-manager';
-import '@/test/utils/auto-mock-page-manager';
-import '@/test/utils/auto-mock-passive-page-analyzer';
-import '@/test/utils/auto-mock-t3-request-manager';
-import { mockVuex } from '@/test/utils/mocks';
-import { shallowMount, Wrapper } from '@vue/test-utils';
-import Vuex, { Store } from 'vuex';
-import TrackTraceToolsPageOverlay from './TrackTraceToolsPageOverlay.vue';
+import "@/test/utils/auto-mock-announcements-manager";
+import "@/test/utils/auto-mock-auth-manager";
+import "@/test/utils/auto-mock-chrome";
+import "@/test/utils/auto-mock-client-build-manager";
+import "@/test/utils/auto-mock-credential-manager";
+import "@/test/utils/auto-mock-facility-manager";
+import "@/test/utils/auto-mock-fetch";
+import "@/test/utils/auto-mock-integrity-manager";
+import "@/test/utils/auto-mock-metrc-modal-manager";
+import "@/test/utils/auto-mock-metrc-request-manager";
+import "@/test/utils/auto-mock-mock-data-manager";
+import "@/test/utils/auto-mock-modal-manager";
+import "@/test/utils/auto-mock-page-manager";
+import "@/test/utils/auto-mock-passive-page-analyzer";
+import "@/test/utils/auto-mock-t3-request-manager";
+import "@/test/utils/auto-mock-toast-manager";
+import "@/test/utils/auto-mock-update-manager";
+import { mockVuex } from "@/test/utils/mocks";
+import { shallowMount, Wrapper } from "@vue/test-utils";
+import Vuex, { Store } from "vuex";
+import TrackTraceToolsPageOverlay from "./TrackTraceToolsPageOverlay.vue";
 
 const localVue = mockVuex();
 
-describe('TrackTraceToolsPageOverlay.vue', () => {
+describe("TrackTraceToolsPageOverlay.vue", () => {
   let wrapper: Wrapper<any>;
   let store: Store<any>;
 
@@ -26,7 +35,7 @@ describe('TrackTraceToolsPageOverlay.vue', () => {
     });
   });
 
-  it('Renders component', () => {
+  it("Renders component", () => {
     expect(wrapper.exists()).toEqual(true);
   });
 });

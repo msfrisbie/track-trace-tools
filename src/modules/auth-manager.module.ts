@@ -92,16 +92,16 @@ class AuthManager implements IAtomicService {
       }
     }
 
-    if (store.state.mockDataMode && isDevelopment()) {
-      this.resolveAuthState({
-        identity: "USER001",
-        license: "XYZ-00001",
-        apiVerificationToken: "VOID_83293hurkjkhu3nkushufekasuakuh",
-        hostname: "example.metrc.com",
-      });
+    // if (store.state.mockDataMode && isDevelopment()) {
+    //   this.resolveAuthState({
+    //     identity: "USER001",
+    //     license: "XYZ-00001",
+    //     apiVerificationToken: "VOID_83293hurkjkhu3nkushufekasuakuh",
+    //     hostname: "example.metrc.com",
+    //   });
 
-      return;
-    }
+    //   return;
+    // }
 
     if (!!identity && !!license && !!apiVerificationToken) {
       this.resolveAuthState({

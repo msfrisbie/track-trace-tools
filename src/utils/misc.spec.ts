@@ -21,7 +21,7 @@ describe('misc.ts', () => {
   it('Correctly allocates plant counts to a single small package', () => {
     const mockPackages: IPackageData[] = [90].map((qty, idx) => buildMockPackage(idx + 1, qty));
 
-    expect(allocateImmaturePlantCounts(3, mockPackages)).toEqual([
+    expect(allocateImmaturePlantCounts(3, mockPackages, 100)).toEqual([
       {
         count: 3,
         pkg: {
@@ -37,7 +37,7 @@ describe('misc.ts', () => {
       },
     ]);
 
-    expect(allocateImmaturePlantCounts(90, mockPackages)).toEqual([
+    expect(allocateImmaturePlantCounts(90, mockPackages, 100)).toEqual([
       {
         count: 90,
         pkg: {
@@ -53,13 +53,13 @@ describe('misc.ts', () => {
       },
     ]);
 
-    expect(() => allocateImmaturePlantCounts(110, mockPackages)).toThrowError();
+    expect(() => allocateImmaturePlantCounts(110, mockPackages, 100)).toThrowError();
   });
 
   it('Correctly allocates plant counts to a single large package', () => {
     const mockPackages: IPackageData[] = [900].map((qty, idx) => buildMockPackage(idx + 1, qty));
 
-    expect(allocateImmaturePlantCounts(3, mockPackages)).toEqual([
+    expect(allocateImmaturePlantCounts(3, mockPackages, 100)).toEqual([
       {
         count: 3,
         pkg: {
@@ -75,7 +75,7 @@ describe('misc.ts', () => {
       },
     ]);
 
-    expect(allocateImmaturePlantCounts(202, mockPackages)).toEqual([
+    expect(allocateImmaturePlantCounts(202, mockPackages, 100)).toEqual([
       {
         count: 100,
         pkg: {
@@ -117,7 +117,7 @@ describe('misc.ts', () => {
       },
     ]);
 
-    expect(() => allocateImmaturePlantCounts(1000, mockPackages)).toThrowError();
+    expect(() => allocateImmaturePlantCounts(1000, mockPackages, 100)).toThrowError();
   });
 
   it('Correctly allocates plant counts to multiple packages', () => {
@@ -126,7 +126,7 @@ describe('misc.ts', () => {
     const mockPackages2: IPackageData[] = [250, 100, 150].map((qty, idx) =>
       buildMockPackage(idx + 1, qty));
 
-    expect(allocateImmaturePlantCounts(3, mockPackages)).toEqual([
+    expect(allocateImmaturePlantCounts(3, mockPackages, 100)).toEqual([
       {
         count: 3,
         pkg: {
@@ -141,7 +141,7 @@ describe('misc.ts', () => {
         unitOfMeasureId: 1,
       },
     ]);
-    expect(allocateImmaturePlantCounts(3, mockPackages2)).toEqual([
+    expect(allocateImmaturePlantCounts(3, mockPackages2, 100)).toEqual([
       {
         count: 3,
         pkg: {
@@ -157,7 +157,7 @@ describe('misc.ts', () => {
       },
     ]);
 
-    expect(allocateImmaturePlantCounts(200, mockPackages)).toEqual([
+    expect(allocateImmaturePlantCounts(200, mockPackages, 100)).toEqual([
       {
         count: 50,
         pkg: {
@@ -198,7 +198,7 @@ describe('misc.ts', () => {
         unitOfMeasureId: 1,
       },
     ]);
-    expect(allocateImmaturePlantCounts(200, mockPackages2)).toEqual([
+    expect(allocateImmaturePlantCounts(200, mockPackages2, 100)).toEqual([
       {
         count: 100,
         pkg: {
@@ -227,7 +227,7 @@ describe('misc.ts', () => {
       },
     ]);
 
-    expect(allocateImmaturePlantCounts(300, mockPackages)).toEqual([
+    expect(allocateImmaturePlantCounts(300, mockPackages, 100)).toEqual([
       {
         count: 50,
         pkg: {
@@ -281,7 +281,88 @@ describe('misc.ts', () => {
         unitOfMeasureId: 1,
       },
     ]);
-    expect(allocateImmaturePlantCounts(300, mockPackages2)).toEqual([
+
+    expect(allocateImmaturePlantCounts(300, mockPackages, 50)).toEqual([
+      {
+        count: 50,
+        pkg: {
+          Id: 1,
+          Item: {
+            QuantityTypeName: 'CountBased',
+            UnitOfMeasureId: 1,
+          },
+          Quantity: 50,
+        },
+        quantity: 50,
+        unitOfMeasureId: 1,
+      },
+      {
+        count: 50,
+        pkg: {
+          Id: 2,
+          Item: {
+            QuantityTypeName: 'CountBased',
+            UnitOfMeasureId: 1,
+          },
+          Quantity: 100,
+        },
+        quantity: 50,
+        unitOfMeasureId: 1,
+      },
+      {
+        count: 50,
+        pkg: {
+          Id: 2,
+          Item: {
+            QuantityTypeName: 'CountBased',
+            UnitOfMeasureId: 1,
+          },
+          Quantity: 100,
+        },
+        quantity: 50,
+        unitOfMeasureId: 1,
+      },
+      {
+        count: 50,
+        pkg: {
+          Id: 3,
+          Item: {
+            QuantityTypeName: 'CountBased',
+            UnitOfMeasureId: 1,
+          },
+          Quantity: 150,
+        },
+        quantity: 50,
+        unitOfMeasureId: 1,
+      },
+      {
+        count: 50,
+        pkg: {
+          Id: 3,
+          Item: {
+            QuantityTypeName: 'CountBased',
+            UnitOfMeasureId: 1,
+          },
+          Quantity: 150,
+        },
+        quantity: 50,
+        unitOfMeasureId: 1,
+      },
+      {
+        count: 50,
+        pkg: {
+          Id: 3,
+          Item: {
+            QuantityTypeName: 'CountBased',
+            UnitOfMeasureId: 1,
+          },
+          Quantity: 150,
+        },
+        quantity: 50,
+        unitOfMeasureId: 1,
+      },
+    ]);
+    expect(allocateImmaturePlantCounts(300, mockPackages2, 100)).toEqual([
       {
         count: 100,
         pkg: {
@@ -336,18 +417,18 @@ describe('misc.ts', () => {
       },
     ]);
 
-    expect(() => allocateImmaturePlantCounts(301, mockPackages)).toThrowError();
-    expect(() => allocateImmaturePlantCounts(601, mockPackages2)).toThrowError();
+    expect(() => allocateImmaturePlantCounts(301, mockPackages, 100)).toThrowError();
+    expect(() => allocateImmaturePlantCounts(601, mockPackages2, 100)).toThrowError();
   });
 
   it('Correctly allocates weight-based plant counts to a single package', () => {
     const mockPackages: IPackageData[] = [50, 100, 150].map((qty, idx) =>
       buildMockPackage(idx + 1, qty, 'WeightBased'));
 
-    expect(() => allocateImmaturePlantCounts(3, mockPackages)).toThrowError();
+    expect(() => allocateImmaturePlantCounts(3, mockPackages, 100)).toThrowError();
 
-    expect(() => allocateImmaturePlantCounts(90, mockPackages)).toThrowError();
+    expect(() => allocateImmaturePlantCounts(90, mockPackages, 100)).toThrowError();
 
-    expect(() => allocateImmaturePlantCounts(110, mockPackages)).toThrowError();
+    expect(() => allocateImmaturePlantCounts(110, mockPackages, 100)).toThrowError();
   });
 });

@@ -5,56 +5,39 @@
     <b-form-group class="w-full" :label="label" label-size="sm">
       <template v-if="item">
         <b-button-group class="self-start">
-          <b-button
-            size="md"
-            variant="primary"
-            class="overflow-x-hidden"
-            style="max-width: 400px"
-            disabled
-            >{{ item.Name }}</b-button
-          >
-          <b-button
-            size="md"
-            variant="primary"
-            @click="
-              $emit('update:item', null);
-              itemQuery = '';
-            "
-            >&#10005;</b-button
-          >
+          <b-button size="md" variant="primary" class="overflow-x-hidden" style="max-width: 400px" disabled>{{ item.Name
+            }}</b-button>
+          <b-button size="md" variant="primary" @click="
+      $emit('update:item', null);
+    itemQuery = '';
+    ">&#10005;</b-button>
         </b-button-group>
       </template>
 
       <template v-if="!item">
-        <vue-typeahead-bootstrap
-          v-model="itemQuery"
-          :data="items"
-          :serializer="(item) => item.Name"
-          :minMatchingChars="0"
-          :showOnFocus="true"
-          :maxMatches="100"
-          @hit="$emit('update:item', $event)"
-          type="text"
-          required
-          placeholder="Item name"
-          class="w-full"
-          size="md"
-        />
+        <vue-typeahead-bootstrap v-model="itemQuery" :data="items" :serializer="(item) => item.Name"
+          :minMatchingChars="0" :showOnFocus="true" :maxMatches="100" @hit="$emit('update:item', $event)" type="text"
+          required placeholder="Item name" class="w-full" size="md" />
       </template>
     </b-form-group>
 
-    <error-readout
-      v-if="error || inflight"
-      class="text-center"
-      :inflight="inflight"
-      :error="error"
-      loadingMessage="Loading items..."
-      errorMessage="Unable to load items."
+    <template v-if="showSelectList">
+      <div class="w-full flex flex-col overflow-auto" style="max-height: 400px">
+        <div class="flex flex-col items-stretch gap-1">
+          <b-button v-for="item of items" @click="$emit('update:item', item)" v-bind:key="item.Id"
+            variant="outline-primary" size="sm">
+            {{ item.Name }}
+          </b-button>
+        </div>
+      </div>
+    </template>
+
+    <error-readout v-if="error || inflight" class="text-center" :inflight="inflight" :error="error"
+      loadingMessage="Loading items..." errorMessage="Unable to load items."
       zeroResultsErrorMessage="Metrc returned 0 eligible items."
       :zeroResultsErrorSuggestionMessage="zeroResultsErrorSuggestionMessage"
       permissionsErrorMessage="Check that your employee account has 'Manage Items' permissions."
-      v-on:retry="loadItems()"
-    />
+      v-on:retry="loadItems()" />
   </div>
 </template>
 
@@ -87,6 +70,10 @@ export default Vue.extend({
     },
     zeroResultsErrorSuggestionMessage: String,
     selectOwnedItems: Boolean,
+    showSelectList: {
+      type: Boolean,
+      default: false
+    }
   },
   data() {
     return {
@@ -125,10 +112,10 @@ export default Vue.extend({
       this.$data.inflight = false;
       this.$data.error = null;
 
-      if (this.$data.itemQuery.length === 0) {
-        this.$data.items = [];
-        return;
-      }
+      // if (this.$data.itemQuery.length === 0) {
+      //   this.$data.items = [];
+      //   return;
+      // }
 
       try {
         this.$data.inflight = true;

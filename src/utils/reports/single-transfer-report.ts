@@ -2,11 +2,27 @@ import { TransferState } from "@/consts";
 import { IIndexedTransferData, IPluginState } from "@/interfaces";
 import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
 import { toastManager } from "@/modules/toast-manager.module";
-import store from '@/store/page-overlay/index';
+import store from "@/store/page-overlay/index";
 import { ReportType } from "@/store/page-overlay/modules/reports/consts";
-import { IReportConfig, IReportData, IReportsState } from "@/store/page-overlay/modules/reports/interfaces";
+import {
+  IReportConfig,
+  IReportData,
+  IReportsState,
+} from "@/store/page-overlay/modules/reports/interfaces";
 import { ActionContext } from "vuex";
-import { getGrossWeightOrError, getItemCategoryOrError, getItemNameOrError, getItemStrainOrError, getLabelOrError, getLabTestingStateOrError, getQuantityOrError, getSourceHarvestNamesOrError, getSourcePackageTagsOrError, getUnitOfMeasureAbbreviationOrError, getWholesalePriceOrError } from "../package";
+import {
+  getGrossWeightOrError,
+  getItemCategoryOrError,
+  getItemNameOrError,
+  getItemStrainOrError,
+  getLabTestingStateOrError,
+  getLabelOrError,
+  getQuantityOrError,
+  getSourceHarvestNamesOrError,
+  getSourcePackageTagsOrError,
+  getUnitOfMeasureAbbreviationOrError,
+  getWholesalePriceOrError,
+} from "../package";
 import { generateTransferMetadata } from "../transfer";
 
 export async function maybeLoadSingleTransferReportData({
@@ -14,10 +30,10 @@ export async function maybeLoadSingleTransferReportData({
   reportData,
   reportConfig,
 }: {
-    ctx: ActionContext<IReportsState, IPluginState>;
-    reportData: IReportData;
-    reportConfig: IReportConfig;
-  }) {
+  ctx: ActionContext<IReportsState, IPluginState>;
+  reportData: IReportData;
+  reportConfig: IReportConfig;
+}) {
   const config = reportConfig[ReportType.SINGLE_TRANSFER];
 
   if (config) {
@@ -32,13 +48,9 @@ export async function maybeLoadSingleTransferReportData({
 
     await Promise.allSettled([
       primaryDataLoader.incomingTransfer(config.manifestNumber).then(handler),
-      primaryDataLoader
-        .incomingInactiveTransfer(config.manifestNumber)
-        .then(handler),
+      primaryDataLoader.incomingInactiveTransfer(config.manifestNumber).then(handler),
       primaryDataLoader.outgoingTransfer(config.manifestNumber).then(handler),
-      primaryDataLoader
-        .outgoingInactiveTransfer(config.manifestNumber)
-        .then(handler),
+      primaryDataLoader.outgoingInactiveTransfer(config.manifestNumber).then(handler),
       primaryDataLoader.rejectedTransfer(config.manifestNumber).then(handler),
     ]);
 
@@ -48,7 +60,7 @@ export async function maybeLoadSingleTransferReportData({
     }
 
     if (!matchedTransfer) {
-      toastManager.error('Could not match manifest number');
+      toastManager.error("Could not match manifest number");
       return;
     }
 
@@ -57,35 +69,28 @@ export async function maybeLoadSingleTransferReportData({
 
     const singleTransferMatrix: any[][] = [];
 
-    const transferMetadata = await generateTransferMetadata({ transfer, loadPackageTestData: false });
+    const transferMetadata = await generateTransferMetadata({
+      transfer,
+      loadPackageTestData: false,
+    });
 
     switch (transfer.TransferState) {
       case TransferState.INCOMING:
       case TransferState.INCOMING_INACTIVE:
         singleTransferMatrix.push(
+          ["Manifest", transfer.ManifestNumber],
+          ["Origin", transfer.ShipperFacilityName],
+          ["Origin License", transfer.ShipperFacilityLicenseNumber],
+          ["Destination", transfer.RecipientFacilityName],
+          ["Destination License", transfer.RecipientFacilityLicenseNumber],
+          ["Total Packages", transferMetadata.packages.length],
           [
-            "Manifest", transfer.ManifestNumber
+            "Total Wholesale Value",
+            transferMetadata.packages
+              .map((x) => getWholesalePriceOrError(x) ?? 0)
+              .reduce((a, b) => a + b, 0),
           ],
-          [
-            "Origin",
-            transfer.ShipperFacilityName
-          ],
-          [
-            "Origin License",
-            transfer.ShipperFacilityLicenseNumber
-          ],
-          [
-            "Destination",
-            transfer.RecipientFacilityName
-          ],
-          [
-            "Destination License",
-            transfer.RecipientFacilityLicenseNumber
-          ],
-          [
-            "Total Packages",
-            transferMetadata.packages.length
-          ],
+          [],
           [
             "Package",
             "Source Harvest(s)",
@@ -125,21 +130,17 @@ export async function maybeLoadSingleTransferReportData({
         // Destination-by-destination
 
         singleTransferMatrix.push(
+          ["Manifest", transfer.ManifestNumber],
+          ["Origin", transfer.ShipperFacilityName],
+          ["Origin License", transfer.ShipperFacilityLicenseNumber],
+          ["Total Packages", transferMetadata.packages.length],
           [
-            "Manifest", transfer.ManifestNumber
+            "Total Wholesale Value",
+            transferMetadata.packages
+              .map((x) => getWholesalePriceOrError(x) ?? 0)
+              .reduce((a, b) => a + b, 0),
           ],
-          [
-            "Origin",
-            transfer.ShipperFacilityName
-          ],
-          [
-            "Origin License",
-            transfer.ShipperFacilityLicenseNumber
-          ],
-          [
-            "Total Packages",
-            transferMetadata.packages.length
-          ],
+          [],
           [
             "Destination",
             "Destination License",
@@ -193,10 +194,10 @@ export function extractSingleTransferData({
   reportConfig,
   reportData,
 }: {
-    reportType: ReportType;
-    reportConfig: IReportConfig;
-    reportData: IReportData;
-  }): any[][] {
+  reportType: ReportType;
+  reportConfig: IReportConfig;
+  reportData: IReportData;
+}): any[][] {
   return reportData[ReportType.SINGLE_TRANSFER]!.singleTransferMatrix;
 }
 
@@ -204,14 +205,14 @@ export async function createSingleTransferReportOrError({
   reportData,
   reportConfig,
 }: {
-    reportData: IReportData;
-    reportConfig: IReportConfig;
-  }): Promise<any> {
+  reportData: IReportData;
+  reportConfig: IReportConfig;
+}): Promise<any> {
   if (!store.state.pluginAuth?.authState?.license) {
-    throw new Error('Invalid authState');
+    throw new Error("Invalid authState");
   }
 
   if (!reportData[ReportType.SINGLE_TRANSFER]) {
-    throw new Error('Missing single transfer data');
+    throw new Error("Missing single transfer data");
   }
 }

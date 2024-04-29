@@ -312,7 +312,7 @@ export async function createCsvOrError({
 
   // Check that inputs are well-formed
   const ELIGIBLE_REPORT_TYPES: ReportType[] = reportCatalogFactory()
-    .filter((x) => x.value && x.enabled && x.visible)
+    .filter((x) => x.value && x.enabled)
     .map((x) => x.value as ReportType)
     .filter((reportType) => shouldGenerateReport({ reportType, reportConfig, reportData }));
 
@@ -366,7 +366,7 @@ export async function createXlsxOrError({
 
   // Check that inputs are well-formed
   const ELIGIBLE_REPORT_TYPES: ReportType[] = reportCatalogFactory()
-    .filter((x) => x.value && x.enabled && x.visible)
+    .filter((x) => x.value && x.enabled)
     .map((x) => x.value as ReportType)
     .filter((reportType) => shouldGenerateReport({ reportType, reportConfig, reportData }));
 
@@ -559,7 +559,7 @@ export async function createSpreadsheetOrError({
   //
 
   const ELIGIBLE_REPORT_TYPES: ReportType[] = reportCatalogFactory()
-    .filter((x) => x.value && x.enabled && x.visible)
+    .filter((x) => x.value && x.enabled)
     .map((x) => x.value as ReportType)
     .filter((reportType) => shouldGenerateReport({ reportType, reportConfig, reportData }));
 

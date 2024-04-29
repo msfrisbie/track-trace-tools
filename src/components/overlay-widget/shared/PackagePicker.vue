@@ -1,8 +1,5 @@
 <template>
-  <div
-    class="w-full flex-grow grid grid-cols-2 grid-flow-row auto-rows-fr gap-4"
-    style="max-height: 50vh"
-  >
+  <div class="w-full flex-grow grid grid-cols-2 grid-flow-row auto-rows-fr gap-4" style="max-height: 50vh">
     <!-- Package filter -->
     <div class="flex flex-col row-span-2 items-center p-4">
       <div class="w-full flex flex-col space-y-4" style="width: 420px">
@@ -12,11 +9,9 @@
           </div> -->
 
           <b-form-group label="Filter by item" label-class="text-gray-400" label-size="sm">
-            <item-picker
-              :item.sync="item"
-              :itemFilters="itemFilters"
+            <item-picker :item.sync="item" :itemFilters="itemFilters"
               :zeroResultsErrorSuggestionMessage="itemFilterZeroResultsErrorSuggestionMessage"
-            />
+              :showSelectList="!item" />
           </b-form-group>
         </template>
 
@@ -26,11 +21,8 @@
           </div> -->
 
           <b-form-group label="Filter by location" label-class="text-gray-400" label-size="sm">
-            <location-picker
-              :location.sync="location"
-              :locationFilters="locationFilters"
-              :zeroResultsErrorSuggestionMessage="locationFilterZeroResultsErrorSuggestionMessage"
-            />
+            <location-picker :location.sync="location" :locationFilters="locationFilters"
+              :zeroResultsErrorSuggestionMessage="locationFilterZeroResultsErrorSuggestionMessage" />
           </b-form-group>
         </template>
 
@@ -42,15 +34,10 @@
         </template>
 
         <div class="flex flex-col items-center text-center space-y-4">
-          <error-readout
-            v-if="error || inflight"
-            :inflight="inflight"
-            :error="error"
-            loadingMessage="Loading packages..."
-            errorMessage="Unable to load packages."
+          <error-readout v-if="error || inflight" :inflight="inflight" :error="error"
+            loadingMessage="Loading packages..." errorMessage="Unable to load packages."
             permissionsErrorMessage="Check that your employee account has full Packages permissions."
-            v-on:retry="loadPackages()"
-          />
+            v-on:retry="loadPackages()" />
 
           <template v-if="!inflight && !sourcePackages.length && (!!item || !!location)">
             <span>0 matching packages.</span>
@@ -62,97 +49,53 @@
     <!-- Selected packages -->
     <div class="row-span-2 flex flex-col items-center space-y-4 p-4">
       <template v-if="sourcePackages.length > 0">
-        <b-dropdown
-          style="width: 420px"
-          :text="selectedMenuItem.toUpperCase()"
-          variant="outline-primary"
-          class="w-full"
-          menu-class="w-100 pt-0 pb-0"
-          block
-          rounded
-        >
-          <b-dropdown-item
-            :active="selectedMenuItem === selectedMenuState.SELECTION"
-            @click="selectedMenuItem = selectedMenuState.SELECTION"
-          >
+        <b-dropdown style="width: 420px" :text="selectedMenuItem.toUpperCase()" variant="outline-primary" class="w-full"
+          menu-class="w-100 pt-0 pb-0" block rounded>
+          <b-dropdown-item :active="selectedMenuItem === selectedMenuState.SELECTION"
+            @click="selectedMenuItem = selectedMenuState.SELECTION">
             <div class="pt-2 pb-2">{{ selectedMenuState.SELECTION }}</div>
           </b-dropdown-item>
           <div class="border-b border-solid border-inherit"></div>
-          <b-dropdown-item
-            :active="selectedMenuItem === selectedMenuState.PASTED_TAGS"
-            @click="selectedMenuItem = selectedMenuState.PASTED_TAGS"
-          >
+          <b-dropdown-item :active="selectedMenuItem === selectedMenuState.PASTED_TAGS"
+            @click="selectedMenuItem = selectedMenuState.PASTED_TAGS">
             <div class="pt-2 pb-2">{{ selectedMenuState.PASTED_TAGS }}</div>
           </b-dropdown-item>
         </b-dropdown>
 
         <template v-if="selectedMenuItem === selectedMenuState.SELECTION">
-          <div
-            style="width: 420px"
-            class="toolkit-scroll flex flex-col items-center h-4/6 overflow-y-auto p-1"
-          >
+          <div style="width: 420px" class="toolkit-scroll flex flex-col items-center h-4/6 overflow-y-auto p-1">
             <div class="w-full flex flex-col flex-grow items-center space-y-2">
               <div
                 class="w-full hover-reveal-target flex flex-row items-center justify-between space-x-8 text-lg package-list-item"
-                v-for="(pkg, index) in packagesPage"
-                :key="pkg.Label"
-              >
+                v-for="(pkg, index) in packagesPage" :key="pkg.Label">
                 <div class="flex flex-col flex-grow space-y-2">
                   <template v-if="pageOffset + index > 0">
                     <div class="grid grid-cols-2 gap-2 mb-2">
-                      <b-button
-                        variant="outline-success"
-                        class="hover-reveal"
-                        size="sm"
-                        @click="addBefore(pageOffset + index)"
-                        >CHECK {{ pageOffset + index }} BEFORE</b-button
-                      >
+                      <b-button variant="outline-success" class="hover-reveal" size="sm"
+                        @click="addBefore(pageOffset + index)">CHECK {{ pageOffset + index }} BEFORE</b-button>
 
-                      <b-button
-                        variant="outline-danger"
-                        class="hover-reveal"
-                        size="sm"
-                        @click="removeBefore(pageOffset + index)"
-                        >UNCHECK {{ pageOffset + index }} BEFORE</b-button
-                      >
+                      <b-button variant="outline-danger" class="hover-reveal" size="sm"
+                        @click="removeBefore(pageOffset + index)">UNCHECK {{ pageOffset + index }} BEFORE</b-button>
                     </div>
                   </template>
 
-                  <b-form-checkbox
-                    class="hover:bg-purple-50"
-                    size="md"
-                    v-model="selectedPackagesMirror"
-                    :value="pkg"
-                  >
-                    <picker-card
-                      :title="getNormalizedPackageContentsDescription(pkg)"
-                      :label="getLabelOrError(pkg)"
-                    />
+                  <b-form-checkbox class="hover:bg-purple-50" size="md" v-model="selectedPackagesMirror" :value="pkg">
+                    <picker-card :title="getNormalizedPackageContentsDescription(pkg)" :label="getLabelOrError(pkg)" />
                   </b-form-checkbox>
 
                   <template v-if="sourcePackages.length - (pageOffset + index) - 1 > 0">
                     <div class="grid grid-cols-2 gap-2 mt-2">
-                      <b-button
-                        variant="outline-success"
-                        class="hover-reveal"
-                        size="sm"
-                        @click="addAfter(pageOffset + index)"
-                      >
+                      <b-button variant="outline-success" class="hover-reveal" size="sm"
+                        @click="addAfter(pageOffset + index)">
                         CHECK
                         {{ sourcePackages.length - (pageOffset + index) - 1 }}
-                        AFTER</b-button
-                      >
+                        AFTER</b-button>
 
-                      <b-button
-                        variant="outline-danger"
-                        class="hover-reveal"
-                        size="sm"
-                        @click="removeAfter(pageOffset + index)"
-                      >
+                      <b-button variant="outline-danger" class="hover-reveal" size="sm"
+                        @click="removeAfter(pageOffset + index)">
                         UNCHECK
                         {{ sourcePackages.length - (pageOffset + index) - 1 }}
-                        AFTER</b-button
-                      >
+                        AFTER</b-button>
                     </div>
                   </template>
                 </div>
@@ -161,41 +104,26 @@
           </div>
         </template>
 
-        <paste-tags
-          v-if="selectedMenuItem === selectedMenuState.PASTED_TAGS"
-          :sourceLabels="sourcePackages.map((x) => x.Label)"
-          :tags.sync="pastedTags"
-          ref="pasteTags"
-        >
+        <paste-tags v-if="selectedMenuItem === selectedMenuState.PASTED_TAGS"
+          :sourceLabels="sourcePackages.map((x) => x.Label)" :tags.sync="pastedTags" ref="pasteTags">
         </paste-tags>
       </template>
 
       <template v-if="selectedMenuItem === selectedMenuState.SELECTION">
         <template v-if="sourcePackages.length > packagesPageSize">
           <div class="flex flex-row justify-between items-center" style="width: 420px">
-            <b-button
-              :disabled="!hasPrevPage"
-              variant="outline-info"
-              @click="packagesPageIndex -= 1"
-              >&lt;</b-button
-            >
+            <b-button :disabled="!hasPrevPage" variant="outline-info" @click="packagesPageIndex -= 1">&lt;</b-button>
 
             <span>{{ packagesPageIndex + 1 }} of {{ pages }}</span>
 
-            <b-button
-              :disabled="!hasNextPage"
-              variant="outline-info"
-              @click="packagesPageIndex += 1"
-              >&gt;</b-button
-            >
+            <b-button :disabled="!hasNextPage" variant="outline-info" @click="packagesPageIndex += 1">&gt;</b-button>
           </div>
         </template>
       </template>
 
       <div class="flex flex-row items-center justify-center space-x-6">
-        <span class="text-center text-xl font-bold"
-          ><animated-number :number="selectedPackages.length" /> packages selected</span
-        >
+        <span class="text-center text-xl font-bold"><animated-number :number="selectedPackages.length" /> packages
+          selected</span>
 
         <template v-if="selectedPackages.length > 0">
           <span class="text-purple-500 underline cursor-pointer" @click="clear()">CLEAR</span>

@@ -21,123 +21,76 @@
         <div class="grid grid-cols-3 gap-8">
           <div class="flex flex-col items-stretch gap-4">
             <div class="grid grid-cols-3 gap-2">
-              <b-button
-                class="col-span-2"
-                variant="primary"
-                @click="allocateSamples()"
-                :disabled="!enableAllocation"
-                >SUGGEST&nbsp;SAMPLES</b-button
-              >
-              <b-form-select
-                v-model="daysInRange"
-                :options="
-                  [0, 30, 60, 90, 120].map((x) => ({
-                    value: x,
-                    text: x === 0 ? 'today' : `past ${x} days`,
-                  }))
-                "
-              >
+              <b-button class="col-span-2" variant="primary" @click="allocateSamples()"
+                :disabled="!enableAllocation">SUGGEST&nbsp;SAMPLES</b-button>
+              <b-form-select v-model="daysInRange" :options="[0, 30, 60, 90, 120].map((x) => ({
+        value: x,
+        text: x === 0 ? 'today' : `past ${x} days`,
+      }))
+        ">
               </b-form-select>
             </div>
 
-            <b-button variant="outline-primary" v-b-toggle="'collapse-1'"
-              >Employees ({{ selectedEmployees.length }})</b-button
-            >
+            <b-button variant="outline-primary" v-b-toggle="'collapse-1'">Employees ({{ selectedEmployees.length
+              }})</b-button>
 
             <b-collapse id="collapse-1" class="h-auto" style="transition: none !important">
-              <b-card
-                ><div class="grid grid-cols-1 gap-1">
+              <b-card>
+                <div class="grid grid-cols-1 gap-1">
                   <div class="w-full grid grid-cols-2 gap-2 mb-4">
-                    <b-button
-                      variant="light"
-                      @click="
-                        employeeSamples.employees.map((x) =>
-                          toggleEmployee({ employeeId: x.Id, add: true })
-                        )
-                      "
-                      >ALL</b-button
-                    >
-                    <b-button
-                      variant="light"
-                      @click="
-                        employeeSamples.employees.map((x) =>
-                          toggleEmployee({ employeeId: x.Id, remove: true })
-                        )
-                      "
-                      >NONE</b-button
-                    >
+                    <b-button variant="light" @click="
+        employeeSamples.employees.map((x) =>
+          toggleEmployee({ employeeId: x.Id, add: true })
+        )
+        ">ALL</b-button>
+                    <b-button variant="light" @click="
+        employeeSamples.employees.map((x) =>
+          toggleEmployee({ employeeId: x.Id, remove: true })
+        )
+        ">NONE</b-button>
                   </div>
 
-                  <b-form-checkbox
-                    v-for="employee of employeeSamples.employees"
-                    v-bind:key="employee.Id"
-                    size="sm"
+                  <b-form-checkbox v-for="employee of employeeSamples.employees" v-bind:key="employee.Id" size="sm"
                     :checked="employeeSamples.selectedEmployeeIds.includes(employee.Id)"
-                    @change="toggleEmployee({ employeeId: employee.Id })"
-                  >
+                    @change="toggleEmployee({ employeeId: employee.Id })">
                     <div class="text-xs">{{ employee.FullName }}</div>
                   </b-form-checkbox>
                 </div>
               </b-card>
             </b-collapse>
 
-            <b-button variant="outline-primary" v-b-toggle="'collapse-2'"
-              >Sample Packages ({{ selectedSamplePackages.length }})</b-button
-            >
+            <b-button variant="outline-primary" v-b-toggle="'collapse-2'">Sample Packages ({{
+        selectedSamplePackages.length }})</b-button>
 
             <b-collapse id="collapse-2" class="h-auto" style="transition: none !important">
-              <b-card
-                ><div class="grid grid-cols-1 gap-1">
+              <b-card>
+                <div class="grid grid-cols-1 gap-1">
                   <div class="w-full grid grid-cols-2 gap-2">
-                    <b-button
-                      variant="light"
-                      @click="
-                        employeeSamples.availableSamplePackages.map((x) =>
-                          togglePackage({ packageId: x.Id, add: true })
-                        )
-                      "
-                      >ALL</b-button
-                    >
-                    <b-button
-                      variant="light"
-                      @click="
-                        employeeSamples.availableSamplePackages.map((x) =>
-                          togglePackage({ packageId: x.Id, remove: true })
-                        )
-                      "
-                      >NONE</b-button
-                    >
+                    <b-button variant="light" @click="
+        employeeSamples.availableSamplePackages.map((x) =>
+          togglePackage({ packageId: x.Id, add: true })
+        )
+        ">ALL</b-button>
+                    <b-button variant="light" @click="
+        employeeSamples.availableSamplePackages.map((x) =>
+          togglePackage({ packageId: x.Id, remove: true })
+        )
+        ">NONE</b-button>
                   </div>
 
-                  <div
-                    v-for="[date, packages] of dateGroupedAvailableSamplePackages"
-                    v-bind:key="date"
-                  >
+                  <div v-for="[date, packages] of dateGroupedAvailableSamplePackages" v-bind:key="date">
                     <div class="flex flex-row gap-2 space-between items-center">
                       <div class="font-bold text-lg my-4">{{ date }}</div>
-                      <b-button
-                        variant="light"
-                        size="sm"
-                        @click="packages.map((x) => togglePackage({ packageId: x.Id, add: true }))"
-                        >+</b-button
-                      >
-                      <b-button
-                        variant="light"
-                        size="sm"
-                        @click="
-                          packages.map((x) => togglePackage({ packageId: x.Id, remove: true }))
-                        "
-                        >-</b-button
-                      >
+                      <b-button variant="light" size="sm"
+                        @click="packages.map((x) => togglePackage({ packageId: x.Id, add: true }))">+</b-button>
+                      <b-button variant="light" size="sm" @click="
+        packages.map((x) => togglePackage({ packageId: x.Id, remove: true }))
+        ">-</b-button>
                     </div>
 
-                    <b-form-checkbox
-                      v-for="pkg of packages"
-                      v-bind:key="pkg.Id"
-                      size="sm"
+                    <b-form-checkbox v-for="pkg of packages" v-bind:key="pkg.Id" size="sm"
                       :checked="employeeSamples.selectedSamplePackageIds.includes(pkg.Id)"
-                      @change="togglePackage({ packageId: pkg.Id })"
-                    >
+                      @change="togglePackage({ packageId: pkg.Id })">
                       <div class="text-xs">
                         <div class="font-bold">
                           {{ pkg.Item.Name }} ({{ pkg.Quantity }}
@@ -159,7 +112,7 @@
             <template v-if="employeeSamples.toolState === EmployeeSamplesState.ALLOCATION_INFLIGHT">
               <div class="flex flex-row justify-center items-center gap-2">
                 <b-spinner small></b-spinner>
-                <div>Allocating employee samples, this takes a few seconds...</div>
+                <div>Allocating employee samples, this takes a few minutes...</div>
               </div>
             </template>
 
@@ -170,21 +123,13 @@
 
               <template v-else>
                 <div class="w-full grid grid-cols-3 gap-2">
-                  <b-button variant="success" size="md" @click="submit()"
-                    >SUBMIT {{ selectedSampleAllocations.length }} ADJUSTMENTS</b-button
-                  >
+                  <b-button variant="success" size="md" @click="submit()">SUBMIT {{ selectedSampleAllocations.length }}
+                    ADJUSTMENTS</b-button>
 
-                  <b-button class="opacity-40" variant="light" size="md" @click="downloadAll()"
-                    >DOWNLOAD CSVs</b-button
-                  >
+                  <b-button class="opacity-40" variant="light" size="md" @click="downloadAll()">DOWNLOAD CSVs</b-button>
 
-                  <b-button
-                    class="opacity-40"
-                    variant="light"
-                    size="md"
-                    @click="downloadTextSummary()"
-                    >DOWNLOAD SUMMARY</b-button
-                  >
+                  <b-button class="opacity-40" variant="light" size="md" @click="downloadTextSummary()">DOWNLOAD
+                    SUMMARY</b-button>
                 </div>
 
                 <b-card v-for="employee of selectedEmployees" v-bind:key="employee.Id">
@@ -193,22 +138,15 @@
                       {{ employee.FullName }}
                     </div>
                     <div class="col-span-2 flex flex-col gap-2 text-xs">
-                      <b-form-checkbox
-                        v-for="sampleAllocation of employeeSamples.pendingAllocationBuffer.filter(
-                          (allocation) => allocation.employee.Id === employee.Id
-                        )"
-                        v-bind:key="sampleAllocation.uuid"
-                        size="sm"
-                        :checked="
-                          employeeSamples.pendingAllocationBufferIds.includes(sampleAllocation.uuid)
-                        "
-                        @change="toggleSampleAllocation({ uuid: sampleAllocation.uuid })"
-                      >
+                      <b-form-checkbox v-for="sampleAllocation of employeeSamples.pendingAllocationBuffer.filter(
+          (allocation) => allocation.employee.Id === employee.Id
+        )" v-bind:key="sampleAllocation.uuid" size="sm" :checked="employeeSamples.pendingAllocationBufferIds.includes(sampleAllocation.uuid)
+        " @change="toggleSampleAllocation({ uuid: sampleAllocation.uuid })">
                         <div class="flex-grow">
                           <div class="font-bold">
                             {{ sampleAllocation.pkg.Item.Name }} ({{
-                              sampleAllocation.adjustmentQuantity
-                            }}
+        sampleAllocation.adjustmentQuantity
+      }}
                             {{ sampleAllocation.pkg.UnitOfMeasureAbbreviation }})
                           </div>
                           <div>
@@ -226,8 +164,8 @@
                           </div>
                           <div v-if="sampleAllocation.infusedAllocationGrams > 0">
                             {{
-                              Number((sampleAllocation.infusedAllocationGrams * 1000).toFixed(3))
-                            }}mg infused
+        Number((sampleAllocation.infusedAllocationGrams * 1000).toFixed(3))
+      }}mg infused
                           </div>
                         </div>
                       </b-form-checkbox>
@@ -244,8 +182,17 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue';
-import { mapActions, mapGetters, mapState } from 'vuex';
+import { BuilderType, MessageType } from '@/consts';
+import {
+  IAdjustPackageReason,
+  ICsvFile,
+  IMetrcAdjustPackagePayload,
+  IPluginState,
+  IUnitOfMeasure
+} from '@/interfaces';
+import { analyticsManager } from '@/modules/analytics-manager.module';
+import { builderManager } from '@/modules/builder-manager.module';
+import { dynamicConstsManager } from '@/modules/dynamic-consts-manager.module';
 import router from '@/router/index';
 import store from '@/store/page-overlay/index';
 import {
@@ -253,25 +200,12 @@ import {
   EmployeeSamplesGetters,
   EmployeeSamplesState,
 } from '@/store/page-overlay/modules/employee-samples/consts';
-import {
-  IAdjustPackageReason,
-  ICsvFile,
-  IMetrcAddPackageNoteData,
-  IMetrcAdjustPackagePayload,
-  IMetrcFinishPackagesPayload,
-  IPackageData,
-  IPluginState,
-  IUnitOfMeasure,
-} from '@/interfaces';
-import { builderManager } from '@/modules/builder-manager.module';
+import { ISampleAllocation } from '@/store/page-overlay/modules/employee-samples/interfaces';
 import { buildCsvDataOrError, buildNamedCsvFileData, downloadCsvFile } from '@/utils/csv';
 import { submitDateFromIsodate, todayIsodate } from '@/utils/date';
-import { BuilderType, MessageType } from '@/consts';
-import { dynamicConstsManager } from '@/modules/dynamic-consts-manager.module';
-import { ISampleAllocation } from '@/store/page-overlay/modules/employee-samples/interfaces';
-import { analyticsManager } from '@/modules/analytics-manager.module';
-import { sum } from 'lodash-es';
 import { downloadTextFile } from '@/utils/file';
+import Vue from 'vue';
+import { mapActions, mapGetters, mapState } from 'vuex';
 
 export default Vue.extend({
   name: 'AllocateSamplesBuilder',
@@ -446,17 +380,14 @@ export default Vue.extend({
         data += `\n${samples[0].employee.FullName}\n\n`;
 
         for (const sampleAllocation of samples) {
-          data += `[${sampleAllocation.distributionDate}] ${
-            sampleAllocation.pkg.Label
-          } - ${sampleAllocation.flowerAllocationGrams.toFixed(
-            2,
-          )}/${sampleAllocation.concentrateAllocationGrams.toFixed(
-            2,
-          )}/${sampleAllocation.infusedAllocationGrams.toFixed(2)} - ${
-            sampleAllocation.pkg.Item.Name
-          } (${sampleAllocation.adjustmentQuantity}${
-            sampleAllocation.pkg.UnitOfMeasureAbbreviation
-          })\n`;
+          data += `[${sampleAllocation.distributionDate}] ${sampleAllocation.pkg.Label
+            } - ${sampleAllocation.flowerAllocationGrams.toFixed(
+              2,
+            )}/${sampleAllocation.concentrateAllocationGrams.toFixed(
+              2,
+            )}/${sampleAllocation.infusedAllocationGrams.toFixed(2)} - ${sampleAllocation.pkg.Item.Name
+            } (${sampleAllocation.adjustmentQuantity}${sampleAllocation.pkg.UnitOfMeasureAbbreviation
+            })\n`;
         }
       }
 
@@ -468,7 +399,7 @@ export default Vue.extend({
       });
     },
   },
-  async created() {},
+  async created() { },
   async mounted() {
     this.reset();
 

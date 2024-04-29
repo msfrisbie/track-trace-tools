@@ -399,6 +399,7 @@ export interface IItemData extends IResponseObjectData {
   UnitQuantityUnitOfMeasureAbbreviation: string | null;
   UnitThcContent: number | null;
   UnitThcContentDose: number | null;
+  UnitThcContentUnitOfMeasureId: number | null;
   UnitThcContentDoseUnitOfMeasureAbbreviation: string | null;
   UnitThcContentUnitOfMeasureAbbreviation: string | null;
   UnitThcPercent: number | null;
@@ -1402,6 +1403,12 @@ export interface IMetrcTransferTransporterDetailsData {
 }
 
 export interface IMetrcMovePlantsPayload {
+  ActualDate: string;
+  LocationId: string;
+  Id: string;
+}
+
+export interface IMetrcMovePlantBatchesPayload {
   ActualDate: string;
   LocationId: string;
   Id: string;

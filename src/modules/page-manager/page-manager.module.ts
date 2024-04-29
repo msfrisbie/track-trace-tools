@@ -445,6 +445,14 @@ class PageManager implements IAtomicService {
       if (this.textBuffer.length > 500) {
         this.flushTextBuffer();
       }
+
+      if (e.key === 'Escape') {
+        const modalCloseButton: HTMLAnchorElement | null = document.querySelector(`.k-widget.k-window .k-window-titlebar a[aria-label="Close"]`);
+
+        if (modalCloseButton) {
+          modalCloseButton.click();
+        }
+      }
     });
   }
 
