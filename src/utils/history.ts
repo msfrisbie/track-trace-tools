@@ -25,6 +25,13 @@ export function extractInitialPackageQuantityAndUnitOrNull(
     return [parseFloat(plantMatch[1].replaceAll(",", "")), "Each"];
   }
 
+  const repackagedPlantMatcher = new RegExp("^Repackaged ([0-9,.]+) plant");
+  const repackagedPlantMatch = description.match(repackagedPlantMatcher);
+
+  if (repackagedPlantMatch) {
+    return [parseFloat(repackagedPlantMatch[1].replaceAll(",", "")), "Each"];
+  }
+
   return null;
 }
 
