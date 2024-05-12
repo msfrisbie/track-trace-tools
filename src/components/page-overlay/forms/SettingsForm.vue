@@ -36,6 +36,16 @@
           </b-form-checkbox>
 
           <b-form-checkbox
+            id="checkbox-hideAiButton"
+            class="mb-2"
+            v-model="settings.hideAiButton"
+            name="checkbox-hideAiButton"
+            @change="onChange()"
+          >
+            Hide Metrc AI button
+          </b-form-checkbox>
+
+          <b-form-checkbox
             id="checkbox-efficientSpacing"
             class="mb-2"
             v-model="settings.efficientSpacing"
