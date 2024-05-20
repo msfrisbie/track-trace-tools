@@ -83,6 +83,12 @@ body.ttt-styling-fix {
   }
 }
 
+body.ttt-metrc-ai-fix {
+  .stn-wdgt {
+    display: none !important;
+  }
+}
+
 body.ttt-efficient-spacing {
   .well.shadow.span24 {
     padding: 0;
@@ -139,7 +145,6 @@ body.t3-modal-expand {
     min-height: 100vh !important;
   }
 }
-
 
 @import "@/scss/page-overlay";
 @import "@/scss/modal";

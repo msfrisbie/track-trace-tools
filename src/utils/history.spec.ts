@@ -12,6 +12,25 @@ import {
   extractTestSamplePackageLabelsFromHistory,
 } from "./history";
 
+const REPACKAGED_HISTORY: IPackageHistoryData[] = [
+  {
+    Descriptions: [
+      "Repackaged 800 plants",
+      "- Took 150 plants from Package 1A4000000000000000019963",
+      "- Took 150 plants from Package 1A4000000000000000019964",
+      "- Took 150 plants from Package 1A4000000000000000019965",
+      "- Took 150 plants from Package 1A4000000000000000019966",
+      "- Took 150 plants from Package 1A4000000000000000019967",
+      "- Took 50 plants from Package 1A4000000000000000019968",
+    ],
+    UserName: "Foo Bar",
+    ActualDate: "2023-03-29",
+    RecordedDateTime: "2023-03-29T12:38:41.7279076Z",
+    InputSourcesNames: "User",
+    ExternalSourceName: "",
+  },
+];
+
 const PREROLL_PACKAGE_HISTORY: IPackageHistoryData[] = [
   {
     Descriptions: [
@@ -1628,6 +1647,12 @@ describe("history.ts", () => {
   it("Correctly extracts initial quantity", () => {
     expect(extractInitialPackageQuantityAndUnitFromHistoryOrError(PREROLL_PACKAGE_HISTORY)).toEqual(
       [2590, "Each"]
+    );
+  });
+
+  it("Correctly extracts initial quantity of repackaged plants", () => {
+    expect(extractInitialPackageQuantityAndUnitFromHistoryOrError(REPACKAGED_HISTORY)).toEqual(
+      [800, "Each"]
     );
   });
 });

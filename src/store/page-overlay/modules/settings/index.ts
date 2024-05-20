@@ -44,6 +44,7 @@ const persistedState: ISettingsState = {
   plantDefaultPageSize: 20,
   preventLogout: true,
   fixMetrcStyling: true,
+  hideAiButton: true,
   efficientSpacing: false,
   modalExpand: false,
   autoDismissPopups: true,
