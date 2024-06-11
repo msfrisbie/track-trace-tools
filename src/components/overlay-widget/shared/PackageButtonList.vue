@@ -1,11 +1,8 @@
 <template>
   <fragment>
-    <b-button
-      size="sm"
-      variant="outline-primary"
-      @click.stop.prevent="transferPackage()"
-      :disabled="!hasPlus && !clientState.flags.enable_t3plus_free_tools"
-      ><div class="w-full grid grid-cols-3 gap-2" style="grid-template-columns: 2rem 1fr auto">
+    <b-button size="sm" variant="outline-primary" @click.stop.prevent="transferPackage()"
+      :disabled="!hasPlus && !clientState.flags.enable_t3plus_free_tools">
+      <div class="w-full grid grid-cols-3 gap-2" style="grid-template-columns: 2rem 1fr auto">
         <div class="aspect-square grid place-items-center">
           <font-awesome-icon icon="truck" />
         </div>
@@ -18,12 +15,9 @@
       </div>
     </b-button>
 
-    <b-button
-      v-if="clientState.values.ENABLE_PACKAGE_HISTORY"
-      size="sm"
-      variant="outline-primary"
-      @click.stop.prevent="setPackageHistorySourcePackage({ pkg }) && openPackageHistoryBuilder()"
-      ><div class="w-full grid grid-cols-3 gap-2" style="grid-template-columns: 2rem 1fr auto">
+    <b-button v-if="clientState.values.ENABLE_PACKAGE_HISTORY" size="sm" variant="outline-primary"
+      @click.stop.prevent="setPackageHistorySourcePackage({ pkg }) && openPackageHistoryBuilder()">
+      <div class="w-full grid grid-cols-3 gap-2" style="grid-template-columns: 2rem 1fr auto">
         <div class="aspect-square grid place-items-center">
           <font-awesome-icon icon="sitemap" />
         </div>
@@ -48,14 +42,10 @@
       </div>
     </b-button> -->
 
-    <b-button
-      size="sm"
-      variant="outline-primary"
-      :disabled="!hasPlus"
-      @click.stop.prevent="
+    <b-button size="sm" variant="outline-primary" :disabled="!hasPlus" @click.stop.prevent="
         setExplorerData({ packageLabel: getLabelOrError(pkg) }) && openMetrcExplorer()
-      "
-      ><div class="w-full grid grid-cols-3 gap-2" style="grid-template-columns: 2rem 1fr auto">
+        ">
+      <div class="w-full grid grid-cols-3 gap-2" style="grid-template-columns: 2rem 1fr auto">
         <div class="aspect-square grid place-items-center">
           <font-awesome-icon icon="sitemap" />
         </div>
@@ -68,12 +58,9 @@
     </b-button>
 
     <template v-if="isPackageEligibleForSplit">
-      <b-button
-        size="sm"
-        variant="outline-primary"
-        @click.stop.prevent="splitPackage()"
-        :disabled="!hasPlus && !clientState.flags.enable_t3plus_free_tools"
-        ><div class="w-full grid grid-cols-3 gap-2" style="grid-template-columns: 2rem 1fr auto">
+      <b-button size="sm" variant="outline-primary" @click.stop.prevent="splitPackage()"
+        :disabled="!hasPlus && !clientState.flags.enable_t3plus_free_tools">
+        <div class="w-full grid grid-cols-3 gap-2" style="grid-template-columns: 2rem 1fr auto">
           <div class="aspect-square grid place-items-center">
             <font-awesome-icon icon="expand-alt" />
           </div>
@@ -87,24 +74,28 @@
     </template>
 
     <template v-if="!packageMetadataLoaded">
-      <b-button
-        size="sm"
-        variant="outline-primary"
-        disabled
-        class="flex flex-row items-center justify-center gap-2"
-      >
+      <b-button size="sm" variant="outline-primary" disabled class="flex flex-row items-center justify-center gap-2">
         <b-spinner small /> <span> Loading package test data...</span>
       </b-button>
     </template>
 
+    <b-button size="sm" variant="outline-primary" @click.stop.prevent="printTag()">
+      <div class="w-full grid grid-cols-3 gap-2" style="grid-template-columns: 2rem 1fr auto">
+        <div class="aspect-square grid place-items-center">
+          <font-awesome-icon icon="print" />
+        </div>
+
+        <span>PRINT TAG</span>
+        <div style="width:30px"></div>
+      </div>
+    </b-button>
+
     <template v-if="packageMetadataLoaded">
       <template v-if="displayPackageLabTestOptions">
         <template v-if="displayPackageLabTestPDFOptions">
-          <b-button size="sm" variant="outline-primary" @click.stop.prevent="viewLabTests()"
-            ><div
-              class="w-full grid grid-cols-3 gap-2"
-              style="grid-template-columns: 2rem 1fr auto"
-            >
+
+          <b-button size="sm" variant="outline-primary" @click.stop.prevent="viewLabTests()">
+            <div class="w-full grid grid-cols-3 gap-2" style="grid-template-columns: 2rem 1fr auto">
               <div class="aspect-square grid place-items-center">
                 <font-awesome-icon icon="file" />
               </div>
@@ -114,11 +105,8 @@
             </div>
           </b-button>
 
-          <b-button size="sm" variant="outline-primary" @click.stop.prevent="printLabTests()"
-            ><div
-              class="w-full grid grid-cols-3 gap-2"
-              style="grid-template-columns: 2rem 1fr auto"
-            >
+          <b-button size="sm" variant="outline-primary" @click.stop.prevent="printLabTests()">
+            <div class="w-full grid grid-cols-3 gap-2" style="grid-template-columns: 2rem 1fr auto">
               <div class="aspect-square grid place-items-center">
                 <font-awesome-icon icon="print" />
               </div>
@@ -128,11 +116,8 @@
             </div>
           </b-button>
 
-          <b-button size="sm" variant="outline-primary" @click.stop.prevent="downloadLabTestPdfs()"
-            ><div
-              class="w-full grid grid-cols-3 gap-2"
-              style="grid-template-columns: 2rem 1fr auto"
-            >
+          <b-button size="sm" variant="outline-primary" @click.stop.prevent="downloadLabTestPdfs()">
+            <div class="w-full grid grid-cols-3 gap-2" style="grid-template-columns: 2rem 1fr auto">
               <div class="aspect-square grid place-items-center">
                 <font-awesome-icon icon="file-download" />
               </div>
@@ -143,8 +128,8 @@
           </b-button>
         </template>
 
-        <b-button size="sm" variant="outline-primary" @click.stop.prevent="downloadLabTestCsv()"
-          ><div class="w-full grid grid-cols-3 gap-2" style="grid-template-columns: 2rem 1fr auto">
+        <b-button size="sm" variant="outline-primary" @click.stop.prevent="downloadLabTestCsv()">
+          <div class="w-full grid grid-cols-3 gap-2" style="grid-template-columns: 2rem 1fr auto">
             <div class="aspect-square grid place-items-center">
               <font-awesome-icon icon="file-csv" />
             </div>
@@ -162,9 +147,12 @@ import { MessageType, ModalAction, ModalType, PackageState } from "@/consts";
 import { IPluginState, IUnionIndexedPackageData } from "@/interfaces";
 import { analyticsManager } from "@/modules/analytics-manager.module";
 import { modalManager } from "@/modules/modal-manager.module";
+import { toastManager } from "@/modules/toast-manager.module";
 import router from "@/router/index";
 import store from "@/store/page-overlay/index";
 import { ExplorerActions } from "@/store/page-overlay/modules/explorer/consts";
+import { LabelPrintActions } from "@/store/page-overlay/modules/label-print/consts";
+import { ILabelData } from "@/store/page-overlay/modules/label-print/interfaces";
 import { PackageHistoryActions } from "@/store/page-overlay/modules/package-history/consts";
 import { PluginAuthActions } from "@/store/page-overlay/modules/plugin-auth/consts";
 import { SplitPackageBuilderActions } from "@/store/page-overlay/modules/split-package-builder/consts";
@@ -287,6 +275,33 @@ export default Vue.extend({
       });
       this.dismiss();
     },
+    async printTag() {
+      analyticsManager.track(MessageType.CONTEXT_MENU_SELECT, { event: "printTag" });
+
+      const labelDataList: ILabelData[] = [
+        {
+          count: 1,
+          primaryValue: this.$props.pkg.Label,
+          secondaryValue: null,
+          tertiaryValue: null
+        }
+      ];
+
+      toastManager.openToast(`Added ${this.$props.pkg.Label} to print list`, {
+        title: "Success",
+        autoHideDelay: 3000,
+        variant: "primary",
+        appendToast: true,
+        toaster: "ttt-toaster",
+        solid: true,
+      });
+
+      store.dispatch(`labelPrint/${LabelPrintActions.PUSH_LABELS}`, {
+        labelDataList
+      });
+
+      this.dismiss();
+    },
     async viewLabTests() {
       analyticsManager.track(MessageType.CONTEXT_MENU_SELECT, { event: "viewLabTests" });
 
@@ -336,8 +351,8 @@ export default Vue.extend({
       },
     },
   },
-  async created() {},
-  async mounted() {},
+  async created() { },
+  async mounted() { },
 });
 </script>
 

@@ -32,14 +32,12 @@ export const labelPrintModule = {
     },
   },
   getters: {
-    [LabelPrintGetters.LABEL_PRINT_GETTER]: (
+    [LabelPrintGetters.TOTAL_LABELS]: (
       state: ILabelPrintState,
       getters: any,
       rootState: any,
       rootGetters: any
-    ) => {
-      // return state.data
-    },
+    ) => state.labelDataList.map((x) => x.count).reduce((a, b) => a + b, 0),
   },
   actions: {
     [LabelPrintActions.UPDATE_LABELS]: async (

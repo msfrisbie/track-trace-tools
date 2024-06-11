@@ -2,31 +2,51 @@
     <fragment>
         <div class="flex flex-col items-center">
             <template v-if="labelPrintState.labelDataList.length === 0">
-                <div>You haven't added any labels to print.</div>
+                <div class="font-bold">You haven't added any labels to print.</div>
                 <div>Add labels using T3 search, by selecting rows in Metrc, or in
                     T3 tool menus.</div>
             </template>
             <template v-else>
-                <div class="grid grid-cols-2 gap-4">
+                <div class="grid grid-cols-3 gap-4 place-items-center">
+                    <div class="flex flex-col items-center gap-2">
+                        <b-button variant="primary" :disabled="!hasT3plus && totalLabels > 10" @click="printLabels({
+                labelDataList: labelPrintState.labelDataList,
+                templateId: labelTemplateOption,
+                download: false
+            })">PRINT {{ totalLabels }} TAGS</b-button>
+                        <div v-if="!hasT3plus && totalLabels > 10" class="text-red-500 text-xs">
+                            Free plans are limited to 10 tags per PDF. Print unlimited labels with T3+
+                        </div>
+                    </div>
+                    <div></div>
+                    <b-button variant="warning" @click="resetLabels()">CLEAR ALL TAGS</b-button>
+
+                    <div></div>
                     <div>Copies per tag:</div>
-                    <b-form-select v-model="selected" :options="options" @change="updateCount($event)"></b-form-select>
-                    <hr class="col-span-2" />
+                    <div class="flex flex-col gap-2">
+                        <b-form-select :disabled="!hasT3plus" :options="copiesOptions"
+                            @change="updateCount($event)"></b-form-select>
+                        <div v-if="!hasT3plus" class="text-red-500 text-xs">
+                            Enable this with T3+
+                        </div>
+                    </div>
+
+                    <div></div>
+                    <div>Printer label template:</div>
+                    <b-form-select v-model="labelTemplateOption" :options="labelTemplateOptions"></b-form-select>
+
+                    <div class="col-span-3 h-24"></div>
+
                     <fragment v-for="labelData of labelPrintState.labelDataList" v-bind:key="labelData.primaryValue">
                         <metrc-tag :label="labelData.primaryValue" sideText="METRC"></metrc-tag>
+                        <div class="text-4xl">x{{ labelData.count }}</div>
                         <div>
                             <b-button variant="outline-danger"
-                                @click="removeLabel({ labelValue: labelData.primaryValue })">&times;</b-button>
+                                @click="removeLabel({ labelValue: labelData.primaryValue })">&times; REMOVE</b-button>
                         </div>
                     </fragment>
                 </div>
-                <b-button @click="resetLabels()">RESET</b-button>
-                <b-button @click="printLabels({
-                labelDataList: labelPrintState.labelDataList,
-                templateId: 'AVERY_8160',
-                download: false
-            })">PRINT</b-button>
             </template>
-            {{ labelPrintState }}
         </div>
     </fragment>
 </template>
@@ -37,10 +57,16 @@ import { IPluginState } from "@/interfaces";
 import router from "@/router/index";
 import store from "@/store/page-overlay/index";
 import { ClientGetters } from "@/store/page-overlay/modules/client/consts";
-import { ExampleGetters } from "@/store/page-overlay/modules/example/consts";
-import { LabelPrintActions } from "@/store/page-overlay/modules/label-print/consts";
+import { LabelPrintActions, LabelPrintGetters } from "@/store/page-overlay/modules/label-print/consts";
 import Vue from "vue";
 import { mapActions, mapGetters, mapState } from "vuex";
+
+const LABEL_TEMPLATE_OPTIONS: { value: string, text: string }[] = [
+    {
+        text: 'Avery 8160 (2 5/8" x 1")',
+        value: 'AVERY_8160'
+    }
+];
 
 export default Vue.extend({
     name: "PrintTags",
@@ -48,10 +74,6 @@ export default Vue.extend({
     router,
     props: {},
     components: {
-        // PlantPicker,
-        // PlantBatchPicker,
-        // PackagePicker,
-        // TagPicker
         MetrcTag
     },
     computed: {
@@ -60,14 +82,15 @@ export default Vue.extend({
             labelPrintState: (state: IPluginState) => state.labelPrint
         }),
         ...mapGetters({
-            exampleGetter: `example/${ExampleGetters.EXAMPLE_GETTER}`,
+            totalLabels: `labelPrint/${LabelPrintGetters.TOTAL_LABELS}`,
             hasT3plus: `client/${ClientGetters.T3PLUS}`,
         }),
     },
     data() {
         return {
-            selected: 1,
-            options: Array.from(Array(25), (x, i) => i + 1)
+            copiesOptions: Array.from(Array(25), (x, i) => i + 1),
+            labelTemplateOptions: LABEL_TEMPLATE_OPTIONS,
+            labelTemplateOption: LABEL_TEMPLATE_OPTIONS[0].value
         };
     },
     methods: {
@@ -76,12 +99,12 @@ export default Vue.extend({
             removeLabel: `labelPrint/${LabelPrintActions.REMOVE_LABEL}`,
             printLabels: `labelPrint/${LabelPrintActions.PRINT_LABELS}`
         }),
-        updateCount(count: number) {
+        updateCount(count: string) {
             store.dispatch(`labelPrint/${LabelPrintActions.UPDATE_LABELS}`, {
                 labelDataList: store.state.labelPrint.labelDataList.map((x) => ({
                     ...x,
                     ...{
-                        count
+                        count: parseInt(count, 10)
                     }
                 }))
             });
