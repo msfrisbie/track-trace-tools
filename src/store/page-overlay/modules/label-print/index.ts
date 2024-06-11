@@ -1,4 +1,5 @@
 import { IPluginState } from "@/interfaces";
+import { t3RequestManager } from "@/modules/t3-request-manager.module";
 import { ActionContext } from "vuex";
 import { LabelPrintActions, LabelPrintGetters, LabelPrintMutations } from "./consts";
 import { ILabelData, ILabelPrintState } from "./interfaces";
@@ -81,8 +82,18 @@ export const labelPrintModule = {
     },
     [LabelPrintActions.PRINT_LABELS]: async (
       ctx: ActionContext<ILabelPrintState, IPluginState>,
-      actionData: any = {}
-    ) => {},
+      {
+        labelDataList,
+        templateId,
+        download,
+      }: { labelDataList: ILabelData[]; templateId: string; download: boolean }
+    ) => {
+      t3RequestManager.generateLabelPdf({
+        labelDataList,
+        templateId,
+        download,
+      });
+    },
   },
 };
 
