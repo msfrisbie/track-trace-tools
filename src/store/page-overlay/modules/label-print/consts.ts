@@ -1,0 +1,15 @@
+export enum LabelPrintMutations {
+  LABEL_PRINT_MUTATION = 'LABEL_PRINT_MUTATION',
+}
+
+export enum LabelPrintGetters {
+  LABEL_PRINT_GETTER = 'LABEL_PRINT_GETTER',
+}
+
+export enum LabelPrintActions {
+  UPDATE_LABELS = 'UPDATE_LABELS',
+  PUSH_LABELS = 'PUSH_LABELS',
+  REMOVE_LABEL = 'REMOVE_LABEL',
+  RESET_LABELS = 'RESET_LABELS',
+  PRINT_LABELS = 'PRINT_LABELS',
+}

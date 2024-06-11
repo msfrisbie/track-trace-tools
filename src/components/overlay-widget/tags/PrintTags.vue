@@ -1,6 +1,8 @@
 <template>
     <fragment>
-        <b-tabs pills card vertical class="h-full">
+        Foobar
+        {{ labelPrintState }}
+        <!-- <b-tabs pills card vertical class="h-full">
             <b-tab title="Unused Tags" active>
                 <tag-picker :selectedTags.sync="selectedTags" :tagTypeNames="[
                     'CannabisPackage',
@@ -26,15 +28,11 @@
                 <package-picker :selectedPackages.sync="selectedPackages" :eagerLoad="true"
                     :showLocationPicker="true"></package-picker>
             </b-tab>
-        </b-tabs>
+        </b-tabs> -->
     </fragment>
 </template>
 
 <script lang="ts">
-import PackagePicker from "@/components/overlay-widget/shared/PackagePicker.vue";
-import PlantBatchPicker from "@/components/overlay-widget/shared/PlantBatchPicker.vue";
-import PlantPicker from "@/components/overlay-widget/shared/PlantPicker.vue";
-import TagPicker from "@/components/overlay-widget/shared/TagPicker.vue";
 import { IPluginState } from "@/interfaces";
 import router from "@/router/index";
 import store from "@/store/page-overlay/index";
@@ -49,14 +47,15 @@ export default Vue.extend({
     router,
     props: {},
     components: {
-        PlantPicker,
-        PlantBatchPicker,
-        PackagePicker,
-        TagPicker
+        // PlantPicker,
+        // PlantBatchPicker,
+        // PackagePicker,
+        // TagPicker
     },
     computed: {
         ...mapState<IPluginState>({
             authState: (state: IPluginState) => state.pluginAuth.authState,
+            labelPrintState: (state: IPluginState) => state.labelPrint
         }),
         ...mapGetters({
             exampleGetter: `example/${ExampleGetters.EXAMPLE_GETTER}`,
@@ -65,11 +64,11 @@ export default Vue.extend({
     },
     data() {
         return {
-            selectedPlants: [],
-            selectedPackages: [],
-            selectedPlantBatches: [],
-            selectedTags: [],
-            tagData: []
+            // selectedPlants: [],
+            // selectedPackages: [],
+            // selectedPlantBatches: [],
+            // selectedTags: [],
+            // tagData: []
         };
     },
     methods: {
