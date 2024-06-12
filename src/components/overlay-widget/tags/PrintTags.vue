@@ -33,7 +33,12 @@
 
                     <div></div>
                     <div>Printer label template:</div>
-                    <b-form-select v-model="labelTemplateOption" :options="labelTemplateOptions"></b-form-select>
+                    <div class="flex flex-col gap-2">
+                        <b-form-select v-model="labelTemplateOption" :options="labelTemplateOptions"></b-form-select>
+                        <div v-if="!hasT3plus" class="text-red-500 text-xs">
+                            Enable all label templates with T3+
+                        </div>
+                    </div>
 
                     <div class="col-span-3 h-24"></div>
 
@@ -61,17 +66,6 @@ import { LabelPrintActions, LabelPrintGetters } from "@/store/page-overlay/modul
 import Vue from "vue";
 import { mapActions, mapGetters, mapState } from "vuex";
 
-const LABEL_TEMPLATE_OPTIONS: { value: string, text: string }[] = [
-    {
-        text: 'Avery 8160 (2 5/8" x 1")',
-        value: 'AVERY_8160'
-    },
-    {
-        text: 'Dymo 30252 (3 1/2" x 1 1/8")',
-        value: 'DYMO_30252'
-    }
-];
-
 export default Vue.extend({
     name: "PrintTags",
     store,
@@ -89,12 +83,25 @@ export default Vue.extend({
             totalLabels: `labelPrint/${LabelPrintGetters.TOTAL_LABELS}`,
             hasT3plus: `client/${ClientGetters.T3PLUS}`,
         }),
+        labelTemplateOptions(): { value: string, text: string, disabled: boolean }[] {
+            return [
+                {
+                    text: 'Avery 8160 (2 5/8" x 1")',
+                    value: 'AVERY_8160',
+                    disabled: false
+                },
+                {
+                    text: 'Dymo 30252 (3 1/2" x 1 1/8")',
+                    value: 'DYMO_30252',
+                    disabled: !this.hasT3plus
+                }
+            ];
+        }
     },
     data() {
         return {
             copiesOptions: Array.from(Array(25), (x, i) => i + 1),
-            labelTemplateOptions: LABEL_TEMPLATE_OPTIONS,
-            labelTemplateOption: LABEL_TEMPLATE_OPTIONS[0].value
+            labelTemplateOption: "AVERY_8160"
         };
     },
     methods: {
@@ -112,7 +119,7 @@ export default Vue.extend({
                     }
                 }))
             });
-        }
+        },
     },
     async created() { },
     async mounted() { },

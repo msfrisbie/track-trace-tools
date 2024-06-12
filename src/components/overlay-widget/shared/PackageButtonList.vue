@@ -144,7 +144,7 @@
 
 <script lang="ts">
 import { MessageType, ModalAction, ModalType, PackageState } from "@/consts";
-import { IPluginState, IUnionIndexedPackageData } from "@/interfaces";
+import { IIndexedPackageData, IPluginState, IUnionIndexedPackageData } from "@/interfaces";
 import { analyticsManager } from "@/modules/analytics-manager.module";
 import { modalManager } from "@/modules/modal-manager.module";
 import { toastManager } from "@/modules/toast-manager.module";
@@ -283,7 +283,11 @@ export default Vue.extend({
           count: 1,
           primaryValue: this.$props.pkg.Label,
           secondaryValue: null,
-          tertiaryValue: null
+          tertiaryValue: null,
+          licenseNumber: (this.$props.pkg as IIndexedPackageData).LicenseNumber,
+          packageState: (this.$props.pkg as IIndexedPackageData).PackageState,
+          plantState: null,
+          plantBatchState: null
         }
       ];
 

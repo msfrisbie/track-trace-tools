@@ -21,8 +21,9 @@
 </template>
 
 <script lang="ts">
-import { ModalAction, ModalType } from "@/consts";
+import { ModalAction, ModalType, PackageState, PlantBatchState, PlantState } from "@/consts";
 import { IPluginState } from "@/interfaces";
+import { authManager } from "@/modules/auth-manager.module";
 import { modalManager } from "@/modules/modal-manager.module";
 import { MutationType } from "@/mutation-types";
 import store from "@/store/page-overlay/index";
@@ -57,11 +58,21 @@ export default Vue.extend({
       store.commit(MutationType.UPDATE_TRACKED_INTERACTIONS, trackedInteractions);
     },
     async openPrint() {
+      const licenseNumber = (await authManager.authStateOrError()).license;
+
+      let packageState: PackageState | null = null;
+      let plantState: PlantState | null = null;
+      let plantBatchState: PlantBatchState | null = null;
+
       const labelDataList: ILabelData[] = store.state.metrcTable.barcodeValues.map((x) => ({
         primaryValue: x,
         secondaryValue: null,
         tertiaryValue: null,
-        count: 1
+        count: 1,
+        licenseNumber,
+        packageState,
+        plantState,
+        plantBatchState
       }));
 
       await store.dispatch(`labelPrint/${LabelPrintActions.PUSH_LABELS}`, {
