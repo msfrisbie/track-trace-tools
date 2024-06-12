@@ -5,7 +5,7 @@ import {
   IMetrcStatusData,
   IPluginState,
   IRootState,
-  ITrackedInteractions
+  ITrackedInteractions,
 } from "@/interfaces";
 import { isDevelopment } from "@/modules/environment.module";
 import { MutationType } from "@/mutation-types";
@@ -21,6 +21,7 @@ import { explorerModule, explorerReducer } from "./modules/explorer";
 import { flagsModule, flagsReducer } from "./modules/flags/index";
 import { graphModule, graphReducer } from "./modules/graph";
 import { labCsvModule, labCsvReducer } from "./modules/lab-csv";
+import { labelPrintModule, labelPrintReducer } from "./modules/label-print";
 import { listingModule, listingReducer } from "./modules/listing";
 import { metrcTableModule, metrcTableReducer } from "./modules/metrc-table";
 import { packageHistoryModule, packageHistoryReducer } from "./modules/package-history";
@@ -29,7 +30,7 @@ import { plantSearchModule, plantSearchReducer } from "./modules/plant-search";
 import { pluginAuthModule, pluginAuthReducer } from "./modules/plugin-auth/index";
 import {
   promoteImmaturePlantsBuilderModule,
-  promoteImmaturePlantsBuilderReducer
+  promoteImmaturePlantsBuilderReducer,
 } from "./modules/promote-immature-plants-builder";
 import { reportsModule, reportsReducer } from "./modules/reports";
 import { searchModule, searchReducer } from "./modules/search";
@@ -37,13 +38,13 @@ import { settingsModule, settingsReducer } from "./modules/settings";
 import { SettingsActions } from "./modules/settings/consts";
 import {
   splitPackageBuilderModule,
-  splitPackageBuilderReducer
+  splitPackageBuilderReducer,
 } from "./modules/split-package-builder";
 import { tagSearchModule, tagSearchReducer } from "./modules/tag-search";
 import { transferBuilderModule, transferBuilderReducer } from "./modules/transfer-builder/index";
 import {
   transferPackageSearchModule,
-  transferPackageSearchReducer
+  transferPackageSearchReducer,
 } from "./modules/transfer-package-search";
 import { transferSearchModule, transferSearchReducer } from "./modules/transfer-search";
 import { transferToolsModule, transferToolsReducer } from "./modules/transfer-tools";
@@ -90,6 +91,7 @@ const vuexShared = {
     labCsv: labCsvReducer(state.labCsv),
     transferTools: transferToolsReducer(state.transferTools),
     metrcTable: metrcTableReducer(state.metrcTable),
+    labelPrint: labelPrintReducer(state.labelPrint),
   }),
 };
 
@@ -393,8 +395,12 @@ const vuexStore = new Vuex.Store<IPluginState>({
     },
     metrcTable: {
       namespaced: true,
-      ...metrcTableModule
-    }
+      ...metrcTableModule,
+    },
+    labelPrint: {
+      namespaced: true,
+      ...labelPrintModule,
+    },
   },
   plugins: [vuexPersistence.plugin],
 });

@@ -2,11 +2,8 @@
   <!-- need this wrapping element to absorb the inherited classes -->
 
   <div>
-    <div
-      ref="mainmenu"
-      class="flex-grow w-full grid gap-8 grid-cols-3"
-      style="grid-template-columns: minmax(280px, auto) 1fr minmax(280px, 400px)"
-    >
+    <div ref="mainmenu" class="flex-grow w-full grid gap-8 grid-cols-3"
+      style="grid-template-columns: minmax(280px, auto) 1fr minmax(280px, 400px)">
       <div class="flex gap-2 flex-col p-4 bg-purple-50">
         <!-- <div
           v-for="option of options"
@@ -18,19 +15,13 @@
         > -->
         <!-- <font-awesome-icon size="3x" class="text-gray-500" :icon="option.icon" /> -->
         <b-button-group vertical class="rounded border border-purple-600 overflow-hidden">
-          <b-button
-            v-for="option of options"
-            v-bind:key="option.text"
+          <b-button v-for="option of options" v-bind:key="option.text"
             class="w-full flex flex-row items-center justify-between space-x-4 opacity-70 hover:opacity-100 border-0"
             v-bind:style="{
-              // 'background-color': option.backgroundColor,
-              opacity: option.enabled ? 'inherit' : '0.4',
-              display: option.visible ? 'flex' : 'none',
-            }"
-            variant="outline-primary"
-            :disabled="!option.enabled"
-            @click.stop.prevent="open(option)"
-          >
+            // 'background-color': option.backgroundColor,
+            opacity: option.enabled ? 'inherit' : '0.4',
+            display: option.visible ? 'flex' : 'none',
+          }" variant="outline-primary" :disabled="!option.enabled" @click.stop.prevent="open(option)">
             <div class="w-full grid grid-cols-3 gap-2" style="grid-template-columns: 2rem 1fr 2rem">
               <div class="aspect-square grid place-items-center">
                 <font-awesome-icon :icon="option.icon" />
@@ -41,35 +32,22 @@
               <div class="aspect-square grid place-items-center">
                 <template v-if="option.isPlus">
                   <!-- flex struggles to vertical align the badge for some reason -->
-                  <b-badge
-                    style="padding-top: 0.3rem; margin-top: 0.1rem; line-height: initial"
-                    variant="primary"
-                    >T3+</b-badge
-                  ></template
-                >
+                  <b-badge style="padding-top: 0.3rem; margin-top: 0.1rem; line-height: initial"
+                    variant="primary">T3+</b-badge></template>
 
                 <template v-else-if="option.isBeta">
                   <!-- flex struggles to vertical align the badge for some reason -->
-                  <b-badge
-                    style="padding-top: 0.3rem; margin-top: 0.1rem; line-height: initial"
-                    variant="primary"
-                    >BETA</b-badge
-                  ></template
-                >
+                  <b-badge style="padding-top: 0.3rem; margin-top: 0.1rem; line-height: initial"
+                    variant="primary">BETA</b-badge></template>
 
                 <template v-else-if="option.isNew">
                   <!-- flex struggles to vertical align the badge for some reason -->
-                  <b-badge
-                    style="
+                  <b-badge style="
                       padding-top: 0.3rem;
                       margin-top: 0.1rem;
                       line-height: initial;
                       background-color: goldenrod;
-                    "
-                    variant="primary"
-                    >NEW!</b-badge
-                  ></template
-                >
+                    " variant="primary">NEW!</b-badge></template>
               </div>
             </div>
           </b-button>
@@ -169,26 +147,26 @@ export default Vue.extend({
           isNew: false,
           helpRoute: "/help/cultivator",
         },
-        // {
-        //   backgroundColor: "#c14747",
-        //   text: "TAG TOOLS",
-        //   route: "/tags",
-        //   icon: "tags",
-        //   visible: true,
-        //   enabled: true,
-        //   isBeta: false,
-        //   isNew: true,
-        // },
         {
           backgroundColor: "#c14747",
-          text: "VOID TAGS",
-          route: "/tags/void-tags",
+          text: "TAG TOOLS",
+          route: "/tags",
           icon: "tags",
           visible: true,
           enabled: true,
           isBeta: false,
-          isNew: false,
+          isNew: true,
         },
+        // {
+        //   backgroundColor: "#c14747",
+        //   text: "VOID TAGS",
+        //   route: "/tags/void-tags",
+        //   icon: "tags",
+        //   visible: true,
+        //   enabled: true,
+        //   isBeta: false,
+        //   isNew: false,
+        // },
         {
           backgroundColor: "#48b867",
           text: "QUICK SCRIPTS",
@@ -340,6 +318,6 @@ export default Vue.extend({
       }
     },
   },
-  async created() {},
+  async created() { },
 });
 </script>

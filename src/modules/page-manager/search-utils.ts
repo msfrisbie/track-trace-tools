@@ -11,7 +11,7 @@ import {
   TagState,
   TransferFilterIdentifiers,
   TransferredPackageFilterIdentifiers,
-  TransferState
+  TransferState,
 } from "@/consts";
 import store from "@/store/page-overlay/index";
 import { SearchActions } from "@/store/page-overlay/modules/search/consts";
@@ -23,27 +23,28 @@ import { pageManager } from "./page-manager.module";
 const T3_METRC_GRID_ID_ATTRIBUTE = `t3-grid-id`;
 const T3_SEARCH_FILTER_ATTRIBUTE = `t3-search-filter`;
 
-const IGNORE_FIELDS = new Set([
-  'Id',
-]);
+const IGNORE_FIELDS = new Set(["Id"]);
 
-export function extractMatchedFields(queryString: string, o: {[key: string]: any}): {field: string, value: string}[] {
+export function extractMatchedFields(
+  queryString: string,
+  o: { [key: string]: any }
+): { field: string; value: string }[] {
   console.log({ o });
 
   const normalizedQueryString = queryString.toLocaleLowerCase();
 
-  const matchedFields: {field: string, value: string}[] = [];
+  const matchedFields: { field: string; value: string }[] = [];
 
   for (const [k, v] of Object.entries(o)) {
     if (IGNORE_FIELDS.has(k)) {
       continue;
     }
 
-    if (typeof v === 'object') {
+    if (typeof v === "object") {
       matchedFields.concat(
         ...extractMatchedFields(queryString, v).map((x) => ({
           ...x,
-          field: [k, x.field].join('.')
+          field: [k, x.field].join("."),
         }))
       );
       continue;
@@ -52,7 +53,7 @@ export function extractMatchedFields(queryString: string, o: {[key: string]: any
     if (v.toLocaleLowerCase().includes(normalizedQueryString)) {
       matchedFields.push({
         field: k,
-        value: v.toString()
+        value: v.toString(),
       });
     }
   }
@@ -60,7 +61,10 @@ export function extractMatchedFields(queryString: string, o: {[key: string]: any
   return matchedFields;
 }
 
-export function generateSearchResultMetadata(queryString: string, partialResult: Partial<ISearchResult>): ISearchResult {
+export function generateSearchResultMetadata(
+  queryString: string,
+  partialResult: Partial<ISearchResult>
+): ISearchResult {
   let primaryIconName: string = "question-circle";
   let secondaryIconName: string | null = null;
 
@@ -82,7 +86,7 @@ export function generateSearchResultMetadata(queryString: string, partialResult:
   let isActive: boolean = false;
   let isInactive: boolean = false;
 
-  let matchedFields: {field: string, value: string}[] = [];
+  let matchedFields: { field: string; value: string }[] = [];
 
   const score: number = 1;
 
@@ -202,15 +206,15 @@ export function generateSearchResultMetadata(queryString: string, partialResult:
 
     switch (partialResult.plant.PlantState) {
       case PlantState.FLOWERING:
-        primaryStatusTextualDescriptor = 'Flowering';
+        primaryStatusTextualDescriptor = "Flowering";
         isActive = true;
         break;
       case PlantState.VEGETATIVE:
-        primaryStatusTextualDescriptor = 'Vegetative';
+        primaryStatusTextualDescriptor = "Vegetative";
         isActive = true;
         break;
       case PlantState.INACTIVE:
-        primaryStatusTextualDescriptor = 'Inactive';
+        primaryStatusTextualDescriptor = "Inactive";
         isInactive = true;
         break;
       default:
@@ -221,18 +225,18 @@ export function generateSearchResultMetadata(queryString: string, partialResult:
     secondaryIconName = null;
     primaryTextualIdentifier = partialResult.plant.Label;
     secondaryTextualIdentifier = `${partialResult.plant.StrainName} Plant`;
-    primaryTextualDescriptor = 'Plant';
+    primaryTextualDescriptor = "Plant";
     secondaryTextualDescriptor = partialResult.plant.StrainName;
   } else if (partialResult.plantBatch) {
     matchedFields = extractMatchedFields(queryString, partialResult.plantBatch);
 
     switch (partialResult.plantBatch.PlantBatchState) {
       case PlantBatchState.ACTIVE:
-        primaryStatusTextualDescriptor = 'Active';
+        primaryStatusTextualDescriptor = "Active";
         isActive = true;
         break;
       case PlantBatchState.INACTIVE:
-        primaryStatusTextualDescriptor = 'Inactive';
+        primaryStatusTextualDescriptor = "Inactive";
         isInactive = true;
         break;
       default:
@@ -243,18 +247,18 @@ export function generateSearchResultMetadata(queryString: string, partialResult:
     secondaryIconName = null;
     primaryTextualIdentifier = partialResult.plantBatch.Name;
     secondaryTextualIdentifier = `${partialResult.plantBatch.UntrackedCount} ${partialResult.plantBatch.StrainName} ${partialResult.plantBatch.TypeName}s`;
-    primaryTextualDescriptor = 'Plant Batch';
+    primaryTextualDescriptor = "Plant Batch";
     secondaryTextualDescriptor = partialResult.plantBatch.TypeName;
   } else if (partialResult.harvest) {
     matchedFields = extractMatchedFields(queryString, partialResult.harvest);
 
     switch (partialResult.harvest.HarvestState) {
       case HarvestState.ACTIVE:
-        primaryStatusTextualDescriptor = 'Active';
+        primaryStatusTextualDescriptor = "Active";
         isActive = true;
         break;
       case HarvestState.INACTIVE:
-        primaryStatusTextualDescriptor = 'Inactive';
+        primaryStatusTextualDescriptor = "Inactive";
         isInactive = true;
         break;
       default:
@@ -265,7 +269,7 @@ export function generateSearchResultMetadata(queryString: string, partialResult:
     secondaryIconName = "cut";
     primaryTextualIdentifier = partialResult.harvest.Name;
     secondaryTextualIdentifier = `${partialResult.harvest.CurrentWeight} ${partialResult.harvest.UnitOfWeightAbbreviation} ${partialResult.harvest.HarvestTypeName} - ${partialResult.harvest.HarvestStartDate}`;
-    primaryTextualDescriptor = 'Harvest';
+    primaryTextualDescriptor = "Harvest";
     secondaryTextualDescriptor = partialResult.harvest.HarvestTypeName;
   } else if (partialResult.item) {
     matchedFields = extractMatchedFields(queryString, partialResult.item);
@@ -273,7 +277,7 @@ export function generateSearchResultMetadata(queryString: string, partialResult:
     primaryIconName = "box";
     secondaryIconName = "clipboard-list";
     primaryTextualIdentifier = partialResult.item.Name;
-    primaryTextualDescriptor = 'Item';
+    primaryTextualDescriptor = "Item";
     secondaryTextualDescriptor = partialResult.item.ProductCategoryName;
     isActive = true;
   } else if (partialResult.strain) {
@@ -282,7 +286,7 @@ export function generateSearchResultMetadata(queryString: string, partialResult:
     primaryIconName = "cannabis";
     secondaryIconName = "clipboard-list";
     primaryTextualIdentifier = partialResult.strain.Name;
-    primaryTextualDescriptor = 'Strain';
+    primaryTextualDescriptor = "Strain";
     isActive = true;
   } // else if (partialResult.salesReceipt) {
   //   switch (partialResult.salesReceipt.SalesReceiptState) {
@@ -305,7 +309,7 @@ export function generateSearchResultMetadata(queryString: string, partialResult:
     primaryStatusTextualDescriptor,
     matchedFields,
     isInactive,
-    isActive
+    isActive,
   };
 
   TODO;
@@ -324,7 +328,9 @@ export function getActiveMetrcGridIdOrNull(): MetrcGridId | null {
 }
 
 export function getAllMetrcGridIds(): MetrcGridId[] {
-  return [...document.querySelectorAll(`[data-grid-selector]`)].map((x) => (x.getAttribute("data-grid-selector")!.replace("#", "") as MetrcGridId));
+  return [...document.querySelectorAll(`[data-grid-selector]`)].map(
+    (x) => x.getAttribute("data-grid-selector")!.replace("#", "") as MetrcGridId
+  );
 }
 
 export const mirrorMetrcSearchStateImpl = _.debounce(async () => {

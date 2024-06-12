@@ -32,18 +32,16 @@
       <div v-if="metrcTableState.barcodeValues.length > 0" class="relative">
         <print-button></print-button>
 
-        <b-badge variant="warning" class="absolute" style="right: 0.1rem; bottom: 0.1rem">{{
-          metrcTableState.barcodeValues.length
-        }}</b-badge>
+        <b-badge variant="warning" class="absolute" style="right: 0.1rem; bottom: 0.1rem">+{{
+      metrcTableState.barcodeValues.length
+    }}</b-badge>
       </div>
 
       <div class="relative">
         <builder-button class="floating-shadow" />
-        <div
-          v-if="notificationCount > 0"
+        <div v-if="notificationCount > 0"
           class="absolute rounded-full text-white flex flex-col items-center justify-center text-center text-xs border border-white notification-breathe"
-          style="width: 0.8rem; height: 0.8rem; bottom: -0.3rem; left: -0.3rem"
-        ></div>
+          style="width: 0.8rem; height: 0.8rem; bottom: -0.3rem; left: -0.3rem"></div>
       </div>
     </template>
   </div>
@@ -76,7 +74,7 @@ export default Vue.extend({
     BugReportButton,
     PrintButton,
   },
-  async mounted() {},
+  async mounted() { },
   data() {
     return {};
   },
@@ -127,11 +125,13 @@ export default Vue.extend({
 }
 
 @keyframes colorAndSizeChange {
+
   0%,
   100% {
     background-color: rgb(255, 0, 0);
     transform: scale(1);
   }
+
   50% {
     background-color: rgb(255, 98, 50);
     transform: scale(1.2);

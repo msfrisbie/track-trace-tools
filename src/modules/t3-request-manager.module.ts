@@ -1,5 +1,6 @@
 import { IAtomicService, IXlsxFile } from "@/interfaces";
 import { IAnnouncementData } from "@/store/page-overlay/modules/announcements/interfaces";
+import { ILabelData } from "@/store/page-overlay/modules/label-print/interfaces";
 import { AxiosError } from "axios";
 import { authManager } from "./auth-manager.module";
 import { customAxios } from "./fetch-manager.module";
@@ -17,6 +18,8 @@ const GOOGLE_MAPS_DIRECTIONS = "metrc/directions";
 const GENERATE_REPORT_PATH = "reports/generate";
 const DOWNLOAD_REPORT_PATH = "reports/download";
 const EMAIL_REPORT_PATH = "reports/email";
+const STORE_LABEL_DATA_LIST_PATH = "file/label-data";
+const RENDER_LABEL_PDF = "file/labels";
 
 const DEFAULT_POST_HEADERS = {
   "Content-Type": "application/json",
@@ -144,6 +147,30 @@ class T3RequestManager implements IAtomicService {
     });
 
     return emailResponse;
+  }
+
+  async generateLabelPdf({
+    labelDataList,
+    templateId,
+    download,
+  }: {
+    labelDataList: ILabelData[];
+    templateId: string;
+    download: boolean;
+  }) {
+    const response = await customAxios(BASE_URL + STORE_LABEL_DATA_LIST_PATH, {
+      method: "POST",
+      headers: DEFAULT_POST_HEADERS,
+      body: JSON.stringify({ labelDataList }),
+      responseType: "json",
+    });
+
+    window.open(
+      `${BASE_URL}${RENDER_LABEL_PDF}/${
+        response.data.labelDataListId
+      }?templateId=${templateId}&disposition=${download ? "attachment" : "inline"}`,
+      "_blank"
+    );
   }
 
   async loadAnnouncements(): Promise<IAnnouncementData[]> {
