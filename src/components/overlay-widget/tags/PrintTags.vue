@@ -38,7 +38,7 @@
                     <div class="col-span-3 h-24"></div>
 
                     <fragment v-for="labelData of labelPrintState.labelDataList" v-bind:key="labelData.primaryValue">
-                        <metrc-tag :label="labelData.primaryValue" sideText="METRC"></metrc-tag>
+                        <printable-tag :label="labelData.primaryValue"></printable-tag>
                         <div class="text-4xl">x{{ labelData.count }}</div>
                         <div>
                             <b-button variant="outline-danger"
@@ -52,7 +52,7 @@
 </template>
 
 <script lang="ts">
-import MetrcTag from '@/components/overlay-widget/shared/MetrcTag.vue';
+import PrintableTag from '@/components/overlay-widget/shared/PrintableTag.vue';
 import { IPluginState } from "@/interfaces";
 import router from "@/router/index";
 import store from "@/store/page-overlay/index";
@@ -65,6 +65,10 @@ const LABEL_TEMPLATE_OPTIONS: { value: string, text: string }[] = [
     {
         text: 'Avery 8160 (2 5/8" x 1")',
         value: 'AVERY_8160'
+    },
+    {
+        text: 'Dymo 30252 (3 1/2" x 1 1/8")',
+        value: 'DYMO_30252'
     }
 ];
 
@@ -74,7 +78,7 @@ export default Vue.extend({
     router,
     props: {},
     components: {
-        MetrcTag
+        PrintableTag
     },
     computed: {
         ...mapState<IPluginState>({
