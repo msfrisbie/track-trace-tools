@@ -18,7 +18,8 @@
                             Free plans are limited to 10 tags per PDF. Print unlimited labels with T3+
                         </div>
                     </div>
-                    <div></div>
+                    <b-button variant="light" @click="generateLabelFields()">REGENERATE TAG DESCRIPTIONS</b-button>
+
                     <b-button variant="warning" @click="resetLabels()">CLEAR ALL TAGS</b-button>
 
                     <div></div>
@@ -43,7 +44,10 @@
                     <div class="col-span-3 h-24"></div>
 
                     <fragment v-for="labelData of labelPrintState.labelDataList" v-bind:key="labelData.primaryValue">
-                        <printable-tag :label="labelData.primaryValue"></printable-tag>
+                        <div>
+                            <div>{{ labelData.secondaryValue }}</div>
+                            <printable-tag :label="labelData.primaryValue"></printable-tag>
+                        </div>
                         <div class="text-4xl">x{{ labelData.count }}</div>
                         <div>
                             <b-button variant="outline-danger"
@@ -108,7 +112,8 @@ export default Vue.extend({
         ...mapActions({
             resetLabels: `labelPrint/${LabelPrintActions.RESET_LABELS}`,
             removeLabel: `labelPrint/${LabelPrintActions.REMOVE_LABEL}`,
-            printLabels: `labelPrint/${LabelPrintActions.PRINT_LABELS}`
+            printLabels: `labelPrint/${LabelPrintActions.PRINT_LABELS}`,
+            generateLabelFields: `labelPrint/${LabelPrintActions.GENERATE_LABEL_FIELDS}`
         }),
         updateCount(count: string) {
             store.dispatch(`labelPrint/${LabelPrintActions.UPDATE_LABELS}`, {
@@ -122,7 +127,9 @@ export default Vue.extend({
         },
     },
     async created() { },
-    async mounted() { },
+    async mounted() {
+        this.generateLabelFields();
+    },
     watch: {
         foobar: {
             immediate: true,

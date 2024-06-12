@@ -1,4 +1,5 @@
-import { IPluginState } from "@/interfaces";
+import { IIndexedPackageData, IIndexedPlantBatchData, IPluginState } from "@/interfaces";
+import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
 import { t3RequestManager } from "@/modules/t3-request-manager.module";
 import { ActionContext } from "vuex";
 import { LabelPrintActions, LabelPrintGetters, LabelPrintMutations } from "./consts";
@@ -48,6 +49,45 @@ export const labelPrintModule = {
         labelDataList: ILabelData[];
       }
     ) => {
+      ctx.commit(LabelPrintMutations.LABEL_PRINT_MUTATION, { labelDataList });
+    },
+    [LabelPrintActions.GENERATE_LABEL_FIELDS]: async (
+      ctx: ActionContext<ILabelPrintState, IPluginState>,
+      {} = {}
+    ) => {
+      let plantBatches: IIndexedPlantBatchData[] = [];
+      let packages: IIndexedPackageData[] = [];
+
+      try {
+        plantBatches = await primaryDataLoader.plantBatches();
+      } catch (error) {
+        console.error("Error loading plant batches:", error);
+      }
+
+      try {
+        const activePackages = await primaryDataLoader.activePackages();
+        const inTransitPackages = await primaryDataLoader.inTransitPackages();
+        packages = [...activePackages, ...inTransitPackages];
+      } catch (error) {
+        console.error("Error loading packages:", error);
+      }
+
+      const labelDataList: ILabelData[] = ctx.state.labelDataList;
+
+      for (const labelData of labelDataList) {
+        const matchedPackage = packages.find((x) => x.Label === labelData.primaryValue);
+        if (matchedPackage) {
+          labelData.secondaryValue = matchedPackage.Item.Name;
+          continue;
+        }
+
+        const matchedPlantBatch = plantBatches.find((x) => x.Name);
+        if (matchedPlantBatch) {
+          labelData.secondaryValue = matchedPlantBatch.StrainName;
+          continue;
+        }
+      }
+
       ctx.commit(LabelPrintMutations.LABEL_PRINT_MUTATION, { labelDataList });
     },
     [LabelPrintActions.PUSH_LABELS]: async (
