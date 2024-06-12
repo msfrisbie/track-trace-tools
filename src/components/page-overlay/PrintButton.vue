@@ -57,22 +57,6 @@ export default Vue.extend({
       store.commit(MutationType.UPDATE_TRACKED_INTERACTIONS, trackedInteractions);
     },
     async openPrint() {
-      // if (store.state.metrcTable.barcodeValues.length === 0) {
-      //   toastManager.openToast(
-      //     "No tagged items selected. Select tagged items (packages, plants) in a Metrc table to print",
-      //     {
-      //       title: "T3 Tag Print Error",
-      //       autoHideDelay: 5000,
-      //       variant: "danger",
-      //       appendToast: true,
-      //       toaster: "ttt-toaster",
-      //       solid: true,
-      //     }
-      //   );
-
-      //   // return;
-      // }
-
       const labelDataList: ILabelData[] = store.state.metrcTable.barcodeValues.map((x) => ({
         primaryValue: x,
         secondaryValue: null,
@@ -87,15 +71,6 @@ export default Vue.extend({
       modalManager.dispatchModalEvent(ModalType.BUILDER, ModalAction.OPEN, {
         initialRoute: "/tags/print-tags",
       });
-
-      // await chrome.storage.local.set({
-      //   [PRINT_DATA_KEY]: store.state.metrcTable.barcodeValues,
-      //   [OPTIONS_REDIRECT_KEY]: "/print.html",
-      // });
-
-      // analyticsManager.track(MessageType.PRINT_TAGS);
-
-      // messageBus.sendMessageToBackground(MessageType.OPEN_OPTIONS_PAGE);
     },
   },
 });
