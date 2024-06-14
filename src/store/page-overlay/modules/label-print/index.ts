@@ -114,9 +114,25 @@ export const labelPrintModule = {
         labelDataList: ILabelData[];
       }
     ) => {
-      ctx.commit(LabelPrintMutations.LABEL_PRINT_MUTATION, {
-        labelDataList: [...ctx.state.labelDataList, ...labelDataList],
+      const mergedLabels = [...ctx.state.labelDataList, ...labelDataList];
+
+      // Use a Set to ensure each primaryValue is unique
+      const seenValues = new Set();
+      const uniqueLabels = mergedLabels.filter((label) => {
+        if (!seenValues.has(label.primaryValue)) {
+          seenValues.add(label.primaryValue);
+          return true;
+        }
+        return false;
       });
+
+      uniqueLabels.sort((a, b) => a.primaryValue.localeCompare(b.primaryValue));
+
+      ctx.commit(LabelPrintMutations.LABEL_PRINT_MUTATION, {
+        labelDataList: uniqueLabels,
+      });
+
+      ctx.dispatch(LabelPrintActions.GENERATE_LABEL_FIELDS);
     },
     [LabelPrintActions.REMOVE_LABEL]: async (
       ctx: ActionContext<ILabelPrintState, IPluginState>,
@@ -143,7 +159,7 @@ export const labelPrintModule = {
         templateId,
         layoutId,
         download,
-      }: { labelDataList: ILabelData[]; templateId: string; layoutId: string, download: boolean }
+      }: { labelDataList: ILabelData[]; templateId: string; layoutId: string; download: boolean }
     ) => {
       t3RequestManager.generateLabelPdf({
         labelDataList,

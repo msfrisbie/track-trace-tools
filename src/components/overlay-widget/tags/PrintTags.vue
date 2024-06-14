@@ -57,9 +57,9 @@
                                 Free plans are limited to 10 tags per PDF.
                             </div>
                         </div>
-                        <b-button variant="outline-primary" @click="generateLabelFields()"
+                        <!-- <b-button variant="outline-primary" @click="generateLabelFields()"
                             :disabled="!hasT3plus">REGENERATE TAG
-                            DESCRIPTIONS</b-button>
+                            DESCRIPTIONS</b-button> -->
 
                         <b-button variant="outline-danger" @click="resetLabels()">CLEAR ALL TAGS</b-button>
                     </div>
@@ -166,7 +166,7 @@ export default Vue.extend({
     },
     async created() { },
     async mounted() {
-        this.generateLabelFields();
+        // this.generateLabelFields();
     },
     watch: {
         foobar: {

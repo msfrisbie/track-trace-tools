@@ -23,7 +23,7 @@
     <b-badge v-if="metrcTableState.barcodeValues.length > 0" @click="openPrint($event)" variant="warning"
       class="cursor-pointer absolute" style="right: 0.1rem; bottom: 0.1rem">+{{
       metrcTableState.barcodeValues.length
-    }}</b-badge>
+      }}</b-badge>
   </fragment>
 </template>
 
@@ -32,6 +32,7 @@ import { ModalAction, ModalType, PackageState, PlantBatchState, PlantState } fro
 import { IPluginState } from "@/interfaces";
 import { authManager } from "@/modules/auth-manager.module";
 import { modalManager } from "@/modules/modal-manager.module";
+import { toastManager } from "@/modules/toast-manager.module";
 import { MutationType } from "@/mutation-types";
 import store from "@/store/page-overlay/index";
 import { LabelPrintActions } from "@/store/page-overlay/modules/label-print/consts";
@@ -85,6 +86,17 @@ export default Vue.extend({
       await store.dispatch(`labelPrint/${LabelPrintActions.PUSH_LABELS}`, {
         labelDataList
       });
+
+      if (labelDataList.length > 0) {
+        toastManager.openToast(`Added ${labelDataList.length} selected tags to print list`, {
+          title: "Success",
+          autoHideDelay: 3000,
+          variant: "primary",
+          appendToast: true,
+          toaster: "ttt-toaster",
+          solid: true,
+        });
+      }
 
       modalManager.dispatchModalEvent(ModalType.BUILDER, ModalAction.OPEN, {
         initialRoute: "/tags/print-tags",
