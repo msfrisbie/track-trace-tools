@@ -14,31 +14,31 @@ body.demo-mode {
     display: none;
   }
 
-  tbody td,
-  div.k-pager-wrap,
-  .demo-blur,
-  .demo-blur * {
-    color: transparent !important;
-    text-shadow: 0 0 8px rgba(0, 0, 0, 0.4);
-  }
+  // tbody td,
+  // div.k-pager-wrap,
+  // .demo-blur,
+  // .demo-blur * {
+  //   color: transparent !important;
+  //   text-shadow: 0 0 8px rgba(0, 0, 0, 0.4);
+  // }
 
   div#footer {
     display: none;
   }
 
-  .metrc-tag {
-    visibility: hidden;
-    position: relative;
-    // position: absolute;
-  }
+  // .metrc-tag {
+  //   visibility: hidden;
+  //   position: relative;
+  //   // position: absolute;
+  // }
 
-  .metrc-tag:before {
-    visibility: visible;
-    position: absolute;
-    top: -2px;
-    left: -2px;
-    content: "DEMO00000000000000001234";
-  }
+  // .metrc-tag:before {
+  //   visibility: visible;
+  //   position: absolute;
+  //   top: -2px;
+  //   left: -2px;
+  //   content: "DEMO00000000000000001234";
+  // }
 }
 
 .enable-form-quick-tab {
