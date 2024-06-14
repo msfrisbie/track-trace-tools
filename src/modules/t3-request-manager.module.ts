@@ -152,10 +152,12 @@ class T3RequestManager implements IAtomicService {
   async generateLabelPdf({
     labelDataList,
     templateId,
+    layoutId,
     download,
   }: {
     labelDataList: ILabelData[];
     templateId: string;
+    layoutId: string;
     download: boolean;
   }) {
     const response = await customAxios(BASE_URL + STORE_LABEL_DATA_LIST_PATH, {
@@ -168,7 +170,9 @@ class T3RequestManager implements IAtomicService {
     window.open(
       `${BASE_URL}${RENDER_LABEL_PDF}/${
         response.data.labelDataListId
-      }?templateId=${templateId}&disposition=${download ? "attachment" : "inline"}`,
+      }?templateId=${templateId}&layoutId=${layoutId}&disposition=${
+        download ? "attachment" : "inline"
+      }`,
       "_blank"
     );
   }

@@ -1,21 +1,11 @@
 <template>
-  <div
-    id="plus-popover-target"
-    title="T3+"
-    @click="openBuilder($event)"
+  <div id="plus-popover-target" title="T3+" @click="openBuilder($event)"
     class="cursor-pointer rounded bg-gradient-to-r from-purple-800 hover:from-purple-900 to-purple-400 hover:to-purple-500 flex flex-col items-center justify-center text-xl font-semibold text-white text-center"
-    style="width: 52px; height: 52px; border: 1px solid white"
-  >
-    <span>T3+</span>
+    style="width: 100px; height: 52px; border: 1px solid white">
+    <span>GET T3+</span>
 
-    <b-popover
-      target="plus-popover-target"
-      triggers="hover"
-      placement="top"
-      variant="light"
-      ref="plus-popover"
-      container="popover-container"
-    >
+    <b-popover target="plus-popover-target" triggers="hover" placement="top" variant="light" ref="plus-popover"
+      container="popover-container">
       <template #title>
         <div class="flex flex-row items-center space-x-2">
           <track-trace-tools-logo class="h-6" fill="#49276a" :inverted="true" />

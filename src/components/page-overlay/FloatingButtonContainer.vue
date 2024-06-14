@@ -19,29 +19,18 @@
         <div class="relative">
           <quick-script-button class="floating-shadow" />
         </div>
-
-        <div v-if="metrcTableState.barcodeValues.length === 0" class="relative">
-          <print-button></print-button>
-        </div>
       </div>
 
       <div v-if="!t3plus" class="relative">
         <plus-button class="floating-shadow" />
       </div>
 
-      <div v-if="metrcTableState.barcodeValues.length > 0" class="relative">
+      <div class="relative">
         <print-button></print-button>
-
-        <b-badge variant="warning" class="absolute" style="right: 0.1rem; bottom: 0.1rem">+{{
-      metrcTableState.barcodeValues.length
-    }}</b-badge>
       </div>
 
       <div class="relative">
         <builder-button class="floating-shadow" />
-        <div v-if="notificationCount > 0"
-          class="absolute rounded-full text-white flex flex-col items-center justify-center text-center text-xs border border-white notification-breathe"
-          style="width: 0.8rem; height: 0.8rem; bottom: -0.3rem; left: -0.3rem"></div>
       </div>
     </template>
   </div>
@@ -122,23 +111,5 @@ export default Vue.extend({
   max-width: 100vw;
   z-index: 0;
   transition-delay: 0s;
-}
-
-@keyframes colorAndSizeChange {
-
-  0%,
-  100% {
-    background-color: rgb(255, 0, 0);
-    transform: scale(1);
-  }
-
-  50% {
-    background-color: rgb(255, 98, 50);
-    transform: scale(1.2);
-  }
-}
-
-.notification-breathe {
-  animation: colorAndSizeChange 4s infinite;
 }
 </style>

@@ -33,12 +33,24 @@ export const labelPrintModule = {
     },
   },
   getters: {
+    [LabelPrintGetters.ACTIVE_LABELS]: (
+      state: ILabelPrintState,
+      getters: any,
+      rootState: IPluginState,
+      rootGetters: any
+    ) =>
+      state.labelDataList.filter(
+        (x: ILabelData) => x.licenseNumber === rootState.pluginAuth.authState?.license
+      ),
     [LabelPrintGetters.TOTAL_LABELS]: (
       state: ILabelPrintState,
       getters: any,
       rootState: any,
       rootGetters: any
-    ) => state.labelDataList.map((x) => x.count).reduce((a, b) => a + b, 0),
+    ) =>
+      getters[LabelPrintGetters.ACTIVE_LABELS]
+        .map((x: ILabelData) => x.count)
+        .reduce((a: number, b: number) => a + b, 0),
   },
   actions: {
     [LabelPrintActions.UPDATE_LABELS]: async (
@@ -55,6 +67,10 @@ export const labelPrintModule = {
       ctx: ActionContext<ILabelPrintState, IPluginState>,
       {} = {}
     ) => {
+      if (ctx.getters[LabelPrintGetters.TOTAL_LABELS] === 0) {
+        return;
+      }
+
       let plantBatches: IIndexedPlantBatchData[] = [];
       let packages: IIndexedPackageData[] = [];
 
@@ -77,11 +93,11 @@ export const labelPrintModule = {
       for (const labelData of labelDataList) {
         const matchedPackage = packages.find((x) => x.Label === labelData.primaryValue);
         if (matchedPackage) {
-          labelData.secondaryValue = matchedPackage.Item.Name;
+          labelData.secondaryValue = `${matchedPackage.Quantity} ${matchedPackage.UnitOfMeasureAbbreviation} ${matchedPackage.Item.Name}`;
           continue;
         }
 
-        const matchedPlantBatch = plantBatches.find((x) => x.Name);
+        const matchedPlantBatch = plantBatches.find((x) => x.Name === labelData.primaryValue);
         if (matchedPlantBatch) {
           labelData.secondaryValue = matchedPlantBatch.StrainName;
           continue;
@@ -115,7 +131,9 @@ export const labelPrintModule = {
       actionData: any = {}
     ) => {
       ctx.commit(LabelPrintMutations.LABEL_PRINT_MUTATION, {
-        labelDataList: [],
+        labelDataList: ctx.getters[LabelPrintGetters.ACTIVE_LABELS].filter(
+          (x: ILabelData) => x.licenseNumber !== ctx.rootState.pluginAuth.authState?.license
+        ),
       });
     },
     [LabelPrintActions.PRINT_LABELS]: async (
@@ -123,12 +141,14 @@ export const labelPrintModule = {
       {
         labelDataList,
         templateId,
+        layoutId,
         download,
-      }: { labelDataList: ILabelData[]; templateId: string; download: boolean }
+      }: { labelDataList: ILabelData[]; templateId: string; layoutId: string, download: boolean }
     ) => {
       t3RequestManager.generateLabelPdf({
         labelDataList,
         templateId,
+        layoutId,
         download,
       });
     },

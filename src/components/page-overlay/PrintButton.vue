@@ -1,23 +1,30 @@
 <template>
-  <b-button id="print-popover-target" variant="primary" title="Print" class="relative" @click="openPrint($event)"
-    style="padding: 0">
-    <div class="flex flex-col items-center justify-center" style="width: 52px; height: 52px">
-      <font-awesome-icon icon="print" style="height: 26px"></font-awesome-icon>
-    </div>
-
-    <b-popover target="print-popover-target" triggers="hover" placement="top" variant="light" ref="print-popover"
-      :disabled="trackedInteractions.dismissedPrintPopover" container="popover-container">
-      <template #title>
-        <span class="text-base">New: <b>Barcode Printing</b></span>
-      </template>
-
-      <div style="min-width: 200px" class="flex flex-col space-y-2 text-base">
-        <p>Select Metrc table rows to easily print barcodes.</p>
-
-        <b-button size="sm" variant="outline-primary" class="mb-2" @click="dismissPrintPopover()">GOT IT</b-button>
+  <fragment>
+    <b-button id="print-popover-target" variant="primary" title="Print" class="relative" @click="openPrint($event)"
+      style="padding: 0">
+      <div class="flex flex-col items-center justify-center" style="width: 52px; height: 52px">
+        <font-awesome-icon icon="print" style="height: 26px"></font-awesome-icon>
       </div>
-    </b-popover>
-  </b-button>
+
+      <b-popover target="print-popover-target" triggers="hover" placement="top" variant="light" ref="print-popover"
+        :disabled="trackedInteractions.dismissedPrintPopover" container="popover-container">
+        <template #title>
+          <span class="text-base">New: <b>Barcode Printing</b></span>
+        </template>
+
+        <div style="min-width: 200px" class="flex flex-col space-y-2 text-base">
+          <p>Select Metrc table rows to easily print barcodes.</p>
+
+          <b-button size="sm" variant="outline-primary" class="mb-2" @click="dismissPrintPopover()">GOT IT</b-button>
+        </div>
+      </b-popover>
+    </b-button>
+
+    <b-badge v-if="metrcTableState.barcodeValues.length > 0" @click="openPrint($event)" variant="warning"
+      class="cursor-pointer absolute" style="right: 0.1rem; bottom: 0.1rem">+{{
+      metrcTableState.barcodeValues.length
+    }}</b-badge>
+  </fragment>
 </template>
 
 <script lang="ts">
@@ -60,9 +67,9 @@ export default Vue.extend({
     async openPrint() {
       const licenseNumber = (await authManager.authStateOrError()).license;
 
-      let packageState: PackageState | null = null;
-      let plantState: PlantState | null = null;
-      let plantBatchState: PlantBatchState | null = null;
+      const packageState: PackageState | null = null;
+      const plantState: PlantState | null = null;
+      const plantBatchState: PlantBatchState | null = null;
 
       const labelDataList: ILabelData[] = store.state.metrcTable.barcodeValues.map((x) => ({
         primaryValue: x,

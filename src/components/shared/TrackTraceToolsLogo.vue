@@ -6,7 +6,7 @@
   >
     <g class="animate-fill" v-bind:style="{ fill: fill }">
       <template v-if="inverted">
-        <g featurekey="rootContainer" transform="matrix(1,0,0,1,0,0)" fill="#49276a">
+        <g featurekey="rootContainer" transform="matrix(1,0,0,1,0,0)" v-bind:fill="fill">
           <rect xmlns="http://www.w3.org/2000/svg" width="134" height="134" rx="10" ry="10" />
         </g>
         <g
@@ -35,7 +35,7 @@
         </g>
       </template>
       <template v-else>
-        <g featurekey="rootContainer" transform="matrix(1,0,0,1,0,0)" fill="#49276a">
+        <g featurekey="rootContainer" transform="matrix(1,0,0,1,0,0)" v-bind:fill="fill">
           <rect xmlns="http://www.w3.org/2000/svg" width="134" height="134" rx="10" ry="10" />
         </g>
         <g
