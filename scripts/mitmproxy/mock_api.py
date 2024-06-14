@@ -25,7 +25,9 @@ PATHS = [
     "/api/packages/transferred",
     "/api/packages/intransit",
     "/api/transfers/incoming",
+    "/api/transfers/incoming/inactive",
     "/api/transfers/outgoing",
+    "/api/transfers/outgoing/inactive",
     "/api/transfers/rejected",
     "/api/plants/vegetative",
     "/api/plants/flowering",
@@ -37,6 +39,12 @@ PATHS = [
     "/api/plantbatches",
     "/api/plantbatches/onhold",
     "/api/plantbatches/inactive",
+    "/api/tags/available",
+    "/api/tags/used",
+    "/api/tags/voided",
+    "/api/locations",
+    "/api/items",
+    "/api/strains",
 ]
 
 TAG_KEYS = ["Label", "PackageLabel", "Name", "SourcePackageLabels"]
@@ -52,9 +60,11 @@ GENERIC_KEYS = [
     "ProductionBatchNumber",
     "SourceProductionBatchNumbers",
     "TransferManifestNumber",
+    "CreatedByUserName",
+    "ManifestNumber",
 ]
 
-GENERIC_PARTIALS = ["Facility"]
+GENERIC_PARTIALS = ["Facility", "Facilities", "LicenseNumber"]
 
 NESTED_KEYS = ["Item"]
 
@@ -188,13 +198,10 @@ def response(flow: http.HTTPFlow):
     if not flow.request.pretty_host.endswith(".metrc.com"):
         return
 
-    # if not flow.request.path.startswith("/api/"):
-    #     return
-
     # if not "application/json" in response.headers.get("Content-Type", ""):
     #     return
 
-    if flow.request.path in PATHS:
+    if flow.request.path.split("?")[0] in PATHS:
         data = flow.response.json()
 
         try:
