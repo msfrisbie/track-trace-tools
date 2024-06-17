@@ -373,6 +373,13 @@ const COMMON_INCOMING_TRANSFER_FIELD_DATA: IFieldData[] = [
     required: false,
     initiallyChecked: true,
   },
+  {
+    value: "ManifestTotalIncomingWholesaleValue",
+    readableName: "Manifest Total Incoming Wholesale Value",
+    required: false,
+    initiallyChecked: true,
+    customTransformer: CustomTransformer.TRANSFER_MANIFEST_TOTAL_INCOMING_WHOLESALE_VALUE,
+  },
 ];
 const COMMON_OUTGOING_TRANSFER_FIELD_DATA: IFieldData[] = [
   ...COMMON_TRANSFER_FIELD_DATA,
@@ -411,6 +418,13 @@ const COMMON_OUTGOING_TRANSFER_FIELD_DATA: IFieldData[] = [
     readableName: "Shipper License",
     required: false,
     initiallyChecked: true,
+  },
+  {
+    value: "ManifestTotalOutgoingWholesaleValue",
+    readableName: "Manifest Total Outgoing Wholesale Value",
+    required: false,
+    initiallyChecked: true,
+    customTransformer: CustomTransformer.TRANSFER_MANIFEST_TOTAL_OUTGOING_WHOLESALE_VALUE,
   },
   {
     value: "Destination.RecipientFacilityName",
