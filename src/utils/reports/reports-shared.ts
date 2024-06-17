@@ -169,6 +169,41 @@ export function applyCustomTransformer(field: IFieldData, untypedRow: any): stri
       }
 
       return "";
+    case CustomTransformer.TRANSFER_MANIFEST_TOTAL_INCOMING_WHOLESALE_VALUE:
+      const incomingTransferManifestTotalWholesaleRow: {
+        Transfer: IIndexedRichIncomingTransferData;
+      } = untypedRow;
+
+      let incomingValueTotal = 0;
+
+      for (const pkg of incomingTransferManifestTotalWholesaleRow.Transfer.incomingPackages || []) {
+        if (!pkg.ShipperWholesalePrice) {
+          continue;
+        }
+
+        incomingValueTotal += pkg.ShipperWholesalePrice;
+      }
+
+      return incomingValueTotal.toString();
+    case CustomTransformer.TRANSFER_MANIFEST_TOTAL_OUTGOING_WHOLESALE_VALUE:
+      const outgoingTransferManifestTotalWholesaleRow: {
+        Transfer: IIndexedRichOutgoingTransferData;
+      } = untypedRow;
+
+      let outgoingValueTotal = 0;
+
+      for (const destination of outgoingTransferManifestTotalWholesaleRow.Transfer
+        .outgoingDestinations || []) {
+        for (const pkg of destination.packages || []) {
+          if (!pkg.ShipperWholesalePrice) {
+            continue;
+          }
+
+          outgoingValueTotal += pkg.ShipperWholesalePrice;
+        }
+      }
+
+      return outgoingValueTotal.toString();
     case CustomTransformer.PACKAGE_MANIFEST_INDEX:
       const packageManifestIndexRow: {
         Transfer: IIndexedRichIncomingTransferData;

@@ -54,10 +54,10 @@ const INCOMING_INACTIVE_TRANSFERS_URL = `${origin({
 })}/api/transfers/incoming?slt=Licensed&active=False`;
 const OUTGOING_TRANSFERS_URL = `${origin({
   divertToNullOrigin: false,
-})}/api/transfers/outgoing?slt=Licensed&active=True`;
+})}/api/transfers/outgoing?slt=Licensed&activeOnly=True`;
 const OUTGOING_INACTIVE_TRANSFERS_URL = `${origin({
   divertToNullOrigin: false,
-})}/api/transfers/outgoing?slt=Licensed&active=False`;
+})}/api/transfers/outgoing/inactive?slt=Licensed`;
 const REJECTED_TRANSFERS_URL = `${origin({ divertToNullOrigin: false })}/api/transfers/rejected`;
 const LAYOVER_TRANSFERS_URL = `${origin({ divertToNullOrigin: false })}/api/transfers/layovers`;
 
@@ -1320,13 +1320,16 @@ export class MetrcRequestManager implements IAtomicService {
   }
 
   async getDestroyPlantBatchesHTML() {
-    return customAxios(await buildDynamicUrl(this.authStateOrError, UrlType.DESTROY_PLANT_BATCHES_MODAL), {
-      ...DEFAULT_FETCH_GET_OPTIONS,
-      headers: {
-        ...(await buildAuthenticationHeaders(this.authStateOrError)),
-        Accept: "text/html, */*; q=0.01",
-      },
-    });
+    return customAxios(
+      await buildDynamicUrl(this.authStateOrError, UrlType.DESTROY_PLANT_BATCHES_MODAL),
+      {
+        ...DEFAULT_FETCH_GET_OPTIONS,
+        headers: {
+          ...(await buildAuthenticationHeaders(this.authStateOrError)),
+          Accept: "text/html, */*; q=0.01",
+        },
+      }
+    );
   }
 
   async getNewItemHTML() {

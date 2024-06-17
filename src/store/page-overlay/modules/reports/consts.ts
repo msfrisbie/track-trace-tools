@@ -87,7 +87,9 @@ export enum CustomTransformer {
   RESTORED_PERCENT_WET_WEIGHT = "RESTORED_PERCENT_WET_WEIGHT",
   TRANSFER_PACKAGE_UNIT_WEIGHT = "TRANSFER_PACKAGE_UNIT_WEIGHT",
   TRANSFER_PACKAGE_UNIT_WEIGHT_UOM = "TRANSFER_PACKAGE_UNIT_WEIGHT_UOM",
-  PACKAGE_MANIFEST_INDEX = "PACKAGE_MANIFEST_INDEX"
+  PACKAGE_MANIFEST_INDEX = "PACKAGE_MANIFEST_INDEX",
+  TRANSFER_MANIFEST_TOTAL_INCOMING_WHOLESALE_VALUE = "TRANSFER_MANIFEST_TOTAL_INCOMING_WHOLESALE_VALUE",
+  TRANSFER_MANIFEST_TOTAL_OUTGOING_WHOLESALE_VALUE = "TRANSFER_MANIFEST_TOTAL_OUTGOING_WHOLESALE_VALUE",
 }
 
 const COMMON_PACKAGE_FIELD_DATA: IFieldData[] = [
@@ -690,6 +692,13 @@ export const SHEET_FIELDS: { [key: string]: IFieldData[] } = {
   [ReportType.INCOMING_TRANSFER_MANIFESTS]: [
     ...COMMON_INCOMING_TRANSFER_FIELD_DATA,
     ...COMMON_TRANSFER_PACKAGE_DATA,
+    {
+      value: "ManifestTotalIncomingWholesaleValue",
+      readableName: "Manifest Total Incoming Wholesale Value",
+      required: false,
+      initiallyChecked: true,
+      customTransformer: CustomTransformer.TRANSFER_MANIFEST_TOTAL_INCOMING_WHOLESALE_VALUE,
+    },
   ],
   [ReportType.INCOMING_MANIFEST_INVENTORY]: [
     {
@@ -802,6 +811,13 @@ export const SHEET_FIELDS: { [key: string]: IFieldData[] } = {
     ...COMMON_OUTGOING_TRANSFER_FIELD_DATA.slice(0, 5),
     ...COMMON_TRANSFER_PACKAGE_DATA.slice(1),
     ...COMMON_OUTGOING_TRANSFER_FIELD_DATA.slice(5),
+    {
+      value: "ManifestTotalOutgoingWholesaleValue",
+      readableName: "Manifest Total Outgoing Wholesale Value",
+      required: false,
+      initiallyChecked: true,
+      customTransformer: CustomTransformer.TRANSFER_MANIFEST_TOTAL_OUTGOING_WHOLESALE_VALUE,
+    },
   ],
   [ReportType.TRANSFER_HUB_TRANSFER_MANIFESTS]: [
     ...COMMON_OUTGOING_TRANSFER_FIELD_DATA.slice(0, 5),

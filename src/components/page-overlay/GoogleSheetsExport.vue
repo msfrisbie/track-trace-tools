@@ -1357,7 +1357,7 @@ export default Vue.extend({
         )
       ) {
         addIncomingManifestInventoryReport({
-          reportConfig,
+          reportConfig
         });
       }
 
