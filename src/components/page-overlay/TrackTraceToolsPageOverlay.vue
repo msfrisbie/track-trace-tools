@@ -294,6 +294,8 @@ export default Vue.extend({
     telemetryManager.init();
 
     await sandboxManager.runsAfterModuleInit();
+
+    await t3RequestManager.testT3SessionAuth();
   },
   mounted() {
   },

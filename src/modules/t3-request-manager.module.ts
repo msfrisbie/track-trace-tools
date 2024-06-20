@@ -3,10 +3,13 @@ import { IAnnouncementData } from "@/store/page-overlay/modules/announcements/in
 import { ILabelData } from "@/store/page-overlay/modules/label-print/interfaces";
 import { AxiosError } from "axios";
 import { authManager } from "./auth-manager.module";
+import { isDevelopment } from "./environment.module";
+import { facilityManager } from "./facility-manager.module";
 import { customAxios } from "./fetch-manager.module";
 
-// const BASE_URL = isDevelopment() ? "http://127.0.0.1:5000/" : "https://api.trackandtrace.tools/";
-const BASE_URL = "https://api.trackandtrace.tools/";
+// TODO
+const BASE_URL = isDevelopment() ? "http://127.0.0.1:5000/" : "https://api.trackandtrace.tools/";
+// const BASE_URL = "https://api.trackandtrace.tools/";
 
 const CLIENT_KEY_PATH = "client";
 const VERIFY_TEST_PATH = "verify/test";
@@ -20,6 +23,7 @@ const DOWNLOAD_REPORT_PATH = "reports/download";
 const EMAIL_REPORT_PATH = "reports/email";
 const STORE_LABEL_DATA_LIST_PATH = "file/label-data";
 const RENDER_LABEL_PDF = "file/labels";
+const SESSION_AUTH_PATH = "v1/metrc/login/session";
 
 const DEFAULT_POST_HEADERS = {
   "Content-Type": "application/json",
@@ -213,6 +217,47 @@ class T3RequestManager implements IAtomicService {
       method: "POST",
       headers: DEFAULT_POST_HEADERS,
       body: JSON.stringify(data),
+    });
+  }
+
+  async testT3SessionAuth() {
+    const authState = await authManager.authStateOrError();
+    const cookies = await authManager.cookies();
+
+    const facilities = await facilityManager.ownedFacilitiesOrError();
+
+    const cookieDict: { [key: string]: string } = {};
+
+    for (const cookie of cookies) {
+      cookieDict[cookie.name] = cookie.value;
+    }
+
+    const payload: {
+      username: string;
+      hostname: string;
+      cookies: { [key: string]: string };
+      facilities: {
+        facilityLicenseNumber: string;
+        facilityName: string;
+      }[];
+      apiVerificationToken: string;
+    } = {
+      username: authState.identity,
+      hostname: window.location.hostname,
+      cookies: cookieDict,
+      facilities: facilities.map((x) => ({
+        facilityLicenseNumber: x.licenseNumber,
+        facilityName: x.licenseName,
+      })),
+      apiVerificationToken: authState.apiVerificationToken,
+    };
+
+    console.log(payload);
+
+    return customAxios(BASE_URL + SESSION_AUTH_PATH, {
+      method: "POST",
+      headers: DEFAULT_POST_HEADERS,
+      body: JSON.stringify(payload),
     });
   }
 }
