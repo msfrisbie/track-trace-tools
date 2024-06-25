@@ -230,11 +230,14 @@ export default Vue.extend({
     sandboxManager.init();
     await sandboxManager.runsBeforeModuleInit();
 
+    // This module has async initialization
+    await t3RequestManager.init();
+
     // Initialize modules that are not dependent on auth state
+    // And do not require in-order initialization
     clientBuildManager.init();
     expiringCacheManager.init();
     primaryMetrcRequestManager.init();
-    t3RequestManager.init();
     credentialManager.init();
     mockDataManager.init();
     toastManager.init();
@@ -294,8 +297,6 @@ export default Vue.extend({
     telemetryManager.init();
 
     await sandboxManager.runsAfterModuleInit();
-
-    await t3RequestManager.testT3SessionAuth();
   },
   mounted() {
   },

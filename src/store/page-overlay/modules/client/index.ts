@@ -1,17 +1,19 @@
-import { IPluginState } from '@/interfaces';
-import { t3RequestManager } from '@/modules/t3-request-manager.module';
-import { toastManager } from '@/modules/toast-manager.module';
-import { ActionContext } from 'vuex';
-import { ClientActions, ClientGetters, ClientMutations } from './consts';
-import { IClientState } from './interfaces';
+import { ChromeStorageKeys } from "@/consts";
+import { IPluginState } from "@/interfaces";
+import { t3RequestManager } from "@/modules/t3-request-manager.module";
+import { toastManager } from "@/modules/toast-manager.module";
+import { ActionContext } from "vuex";
+import { ClientActions, ClientGetters, ClientMutations } from "./consts";
+import { IClientState } from "./interfaces";
 
 const inMemoryState = {};
 
 const persistedState = {
   clientName: null,
   t3plus: false,
+  t3ApiToken: null,
   values: {},
-  flags: {}
+  flags: {},
 };
 
 const defaultState: IClientState = {
@@ -25,7 +27,7 @@ export const clientModule = {
     [ClientMutations.CLIENT_MUTATION](state: IClientState, data: Partial<IClientState>) {
       (Object.keys(data) as Array<keyof IClientState>).forEach((key) => {
         const value = data[key];
-        if (typeof value !== 'undefined') {
+        if (typeof value !== "undefined") {
           // @ts-ignore
           state[key] = value;
         }
@@ -33,57 +35,53 @@ export const clientModule = {
     },
   },
   getters: {
-    [ClientGetters.T3PLUS]: (
-      state: IClientState,
-      getters: any,
-      rootState: any,
-      rootGetters: any,
-    ) => state.t3plus || !!state.values.ENABLE_T3PLUS,
+    [ClientGetters.T3PLUS]: (state: IClientState, getters: any, rootState: any, rootGetters: any) =>
+      state.t3plus || !!state.values.ENABLE_T3PLUS,
   },
   actions: {
     [ClientActions.UPDATE_CLIENT_VALUES]: async (
       ctx: ActionContext<IClientState, IPluginState>,
-      data: { notify?: boolean } = {},
+      data: { notify?: boolean } = {}
     ) => {
       const plusUsers = await t3RequestManager.loadT3plus();
 
       const t3plus = plusUsers.length > 0;
 
       ctx.commit(ClientMutations.CLIENT_MUTATION, {
-        t3plus
+        t3plus,
       } as Partial<IClientState>);
 
       if (!ctx.rootState.settings.licenseKey) {
         ctx.commit(ClientMutations.CLIENT_MUTATION, {
           clientName: null,
-          values: {}
+          values: {},
         } as Partial<IClientState>);
       } else {
         const { clientName, values } = await t3RequestManager.loadClientDataOrError(
-          ctx.rootState.settings.licenseKey,
+          ctx.rootState.settings.licenseKey
         );
 
         if (data.notify && !clientName) {
-          toastManager.openToast('This license key is invalid.', {
-            title: 'License Key Error',
+          toastManager.openToast("This license key is invalid.", {
+            title: "License Key Error",
             autoHideDelay: 5000,
-            variant: 'danger',
+            variant: "danger",
             appendToast: true,
-            toaster: 'ttt-toaster',
+            toaster: "ttt-toaster",
             solid: true,
           });
         }
 
         ctx.commit(ClientMutations.CLIENT_MUTATION, {
           clientName,
-          values
+          values,
         } as Partial<IClientState>);
       }
 
       const flags = await t3RequestManager.loadFlags();
 
       ctx.commit(ClientMutations.CLIENT_MUTATION, {
-        flags
+        flags,
       } as Partial<IClientState>);
     },
   },
