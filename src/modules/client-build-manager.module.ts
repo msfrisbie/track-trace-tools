@@ -47,6 +47,7 @@ class ClientBuildManager implements IAtomicService {
     } catch (e) {
       console.error({ e });
       this.setT3AuthState(T3AuthState.ERROR);
+      throw e;
     }
   }
 
@@ -80,14 +81,14 @@ class ClientBuildManager implements IAtomicService {
   }
 
   async checkValidSessionOrError() {
-    console.log("Testing session");
+    console.log("Testing access token");
     // Test API key to ensure the credential mapping is still valid, otherwise dispose
     const response = await t3RequestManager.t3AuthCheck();
     if (response.status !== 200) {
       console.log("Failed to refresh, authenticating");
       this.t3AuthOrError();
     } else {
-      console.log("Session is valid");
+      console.log("Access token is valid");
     }
   }
 
