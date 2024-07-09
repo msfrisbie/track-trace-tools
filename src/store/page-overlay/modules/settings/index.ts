@@ -69,6 +69,7 @@ const persistedState: ISettingsState = {
   disableAutoRefreshOnModalClose: false,
   useLegacyDateFormatForSubmit: false,
   writeSettingsToChromeStorage: false,
+  enableSameItemPatch: false,
   loadDataInParallel: true,
   usePersistedCache: false,
   persistTimestamp: 0,
