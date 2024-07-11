@@ -100,7 +100,7 @@ The base version of Track & Trace Tools is still free. The T3+ badge at the bott
         {
           question: "How much does T3+ cost?",
           answerMarkdown: `
-**T3+ is a monthly subscription with a 7-day free trial.** 
+**T3+ is a monthly subscription with a 30-day free trial.** 
 
 There are multiple pricing tiers to fit the needs of small and large organizations.
 
