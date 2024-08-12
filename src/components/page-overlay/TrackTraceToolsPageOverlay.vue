@@ -81,6 +81,7 @@ setTimeout(() => {
         "timed out",
         "Setting the value of 'vuex' exceeded the quota",
         "No metrc kendo present",
+        "ResizeObserver loop"
       ]) {
         if (hint && hint?.originalException?.toString().includes(blacklistEntry)) {
           if (Math.random() > 0.001) {
