@@ -22,9 +22,9 @@ const DOWNLOAD_REPORT_PATH = "reports/download";
 const EMAIL_REPORT_PATH = "reports/email";
 const STORE_LABEL_DATA_LIST_PATH = "file/label-data";
 const RENDER_LABEL_PDF = "file/labels";
-const SESSION_AUTH_PATH = "v1/metrc/login/session";
-const AUTH_CHECK_PATH = "v1/authcheck";
-const TOKEN_REFRESH_PATH = "v1/refresh";
+const SESSION_AUTH_PATH = "v2/auth/session";
+const AUTH_CHECK_PATH = "v2/auth/check";
+const TOKEN_REFRESH_PATH = "v2/auth/refresh";
 
 const DEFAULT_POST_HEADERS = {
   "Content-Type": "application/json",

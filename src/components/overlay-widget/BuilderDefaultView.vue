@@ -155,7 +155,7 @@ export default Vue.extend({
           visible: true,
           enabled: true,
           isBeta: false,
-          isNew: true,
+          isNew: false,
         },
         // {
         //   backgroundColor: "#c14747",
