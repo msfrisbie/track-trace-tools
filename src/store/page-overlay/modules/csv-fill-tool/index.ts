@@ -78,14 +78,20 @@ export const csvFillToolModule = {
         addSectionButton: Element | null;
       }
 
-      const hierarchy: IHierarchyNode[] = [];
+      const root: IHierarchyNode = {
+        el: data.modal,
+        name: "Root",
+        childSections: [],
+        inputs: [],
+        addSectionButton: null
+      };
 
       // BUILD HIERARCHY
 
-      function insertSection(hierarchy: IHierarchyNode[], currentElement: Element) {
-        for (const hierarchyNode of hierarchy) {
+      function insertSection(hierarchy: IHierarchyNode, currentElement: Element) {
+        for (const hierarchyNode of hierarchy.childSections) {
           if (hierarchyNode.el.contains(currentElement)) {
-            insertSection(hierarchyNode.childSections, currentElement);
+            insertSection(hierarchyNode, currentElement);
 
             return;
           }
@@ -104,7 +110,7 @@ export const csvFillToolModule = {
           name = name[0].toUpperCase() + name.slice(1);
         }
 
-        hierarchy.push({
+        hierarchy.childSections.push({
           el: currentElement,
           name,
           childSections: [],
@@ -113,7 +119,7 @@ export const csvFillToolModule = {
         });
       }
 
-      sections.map((x: Element) => insertSection(hierarchy, x));
+      sections.map((x: Element) => insertSection(root, x));
 
       // FORM INPUTS
 
@@ -142,10 +148,10 @@ export const csvFillToolModule = {
         return true;
       });
 
-      function insertInput(hierarchy: IHierarchyNode[], currentInput: Element): boolean {
-        for (const node of hierarchy) {
+      function insertInput(hierarchy: IHierarchyNode, currentInput: Element): boolean {
+        for (const node of hierarchy.childSections) {
           if (node.el.contains(currentInput)) {
-            const inserted: boolean = insertInput(node.childSections, currentInput);
+            const inserted: boolean = insertInput(node, currentInput);
 
             if (!inserted) {
               const ngModel = currentInput.getAttribute("ng-model")!;
@@ -159,35 +165,27 @@ export const csvFillToolModule = {
                 ?.match(/Type part of (the )?(.*)\.\.\./);
 
               if (placeholder) {
-                name = placeholder[2];
+                name = placeholder[2].split(/\s+/)
+                .map((x) => x[0].toUpperCase() + x.slice(1))
+                .join(" ");
               } else {
-                // ingredient.FinishDate becomes Ingredient Finish Date
-                name = name
-                  .replaceAll(".", "")
-                  .replaceAll("line", objectName || "row")
-                  .split(/(?=[A-Z])/)
-                  .map((x) => x[0].toUpperCase() + x.slice(1))
-                  .filter((x) => x !== "Id")
-                  .join(" ");
-                // Look for a local label
-                // let parent = currentInput.parentElement!;
-                // let count = 0;
-                // while (count < 5) {
-                //   const label = parent.querySelector("label");
-                //   if (label) {
-                //     name = (label.textContent ?? "").trim();
-                //     break;
-                //   }
-                //   parent = parent.parentElement!;
-                //   count++;
-                // }
+              // ingredient.FinishDate becomes Ingredient Finish Date
+              name = name
+                .replaceAll(".", "")
+                .split(/(?=[A-Z])/)
+                .map((x) => x.trim())
+                .map((x) => x[0].toUpperCase() + x.slice(1))
+                .filter((x) => !["Id", 'Line'].includes(x))
+                .join(" ");
               }
 
-              node.inputs.push({
-                name,
-                ngModel,
-                el: currentInput,
-              });
+              if (!name.startsWith('Template')) {
+                node.inputs.push({
+                  name,
+                  ngModel,
+                  el: currentInput,
+                });
+              }
             }
 
             return true;
@@ -197,49 +195,53 @@ export const csvFillToolModule = {
         return false;
       }
 
-      inputs.map((x: Element) => insertInput(hierarchy, x));
+      inputs.map((x: Element) => insertInput(root, x));
 
       // ADD SECTION BUTTONS
 
       const addSectionButtons = [...data.modal.querySelectorAll(`[ng-click^="addLine"]`)];
 
-      function insertAddSectionButton(
-        hierarchy: IHierarchyNode[],
+      function maybeInsertAddSectionButton(
+        hierarchy: IHierarchyNode,
         currentAddSectionButton: Element
       ): boolean {
-        for (const node of hierarchy) {
-          if (node.el.contains(currentAddSectionButton)) {
-            const inserted: boolean = insertAddSectionButton(
-              node.childSections,
-              currentAddSectionButton
-            );
+        if (!hierarchy.el.contains(currentAddSectionButton)) {
+          return false;
+        }
 
-            if (!inserted) {
-              node.addSectionButton = currentAddSectionButton;
-            }
+        let inserted: boolean = false;
 
-            return true;
+        for (const node of hierarchy.childSections) {
+          inserted = maybeInsertAddSectionButton(
+            node,
+            currentAddSectionButton
+          );
+
+          if (inserted) {
+            break;
           }
         }
 
-        return false;
+        if (!inserted) {
+          hierarchy.addSectionButton = currentAddSectionButton;
+        }
+
+        return true;
       }
 
       console.log({ addSectionButtons });
 
-      addSectionButtons.map((x: Element) => insertAddSectionButton(hierarchy, x));
+      addSectionButtons.map((x: Element) => maybeInsertAddSectionButton(root, x));
 
-      function dump(hierarchy: IHierarchyNode[], depth: number = 0) {
-        for (const h of hierarchy) {
-          console.log(`${"  ".repeat(depth)}${h.name}`);
-          console.log(`${"  ".repeat(depth)}(${h.inputs.map((x) => x.name).join(",")}`);
-          dump(h.childSections, depth + 1);
-        }
+      function dump(node: IHierarchyNode, depth: number = 0) {
+        console.log(`${"  ".repeat(depth)}${node.name}`);
+        console.log(`${"  ".repeat(depth)}(${node.inputs.map((x) => x.name).join(",")}`);
+        node.childSections.map((h) => dump(h, depth + 1));
       }
 
-      dump(hierarchy);
+      dump(root);
 
-      console.log(hierarchy);
+      console.log(root);
     },
     [CsvFillToolActions.CSV_FILL_TOOL_ACTION]: async (
       ctx: ActionContext<ICsvFillToolState, IPluginState>,
