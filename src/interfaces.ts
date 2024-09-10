@@ -10,17 +10,19 @@ import {
   PlantState,
   SearchModalView,
   TagState,
-  TransferState
+  TransferState,
 } from "@/consts";
 import { Store } from "vuex";
 import { IAnnouncementsState } from "./store/page-overlay/modules/announcements/interfaces";
 import { IClientState } from "./store/page-overlay/modules/client/interfaces";
 import { ICreatePackageCsvState } from "./store/page-overlay/modules/create-package-csv/interfaces";
+import { ICsvFillToolState } from "./store/page-overlay/modules/csv-fill-tool/interfaces";
 import { IEmployeeSamplesState } from "./store/page-overlay/modules/employee-samples/interfaces";
 import { IExplorerState } from "./store/page-overlay/modules/explorer/interfaces";
 import { IFlagsState } from "./store/page-overlay/modules/flags/interfaces";
 import { IGraphState } from "./store/page-overlay/modules/graph/interfaces";
 import { ILabCsvState } from "./store/page-overlay/modules/lab-csv/interfaces";
+import { ILabelPrintState } from "./store/page-overlay/modules/label-print/interfaces";
 import { IListingState } from "./store/page-overlay/modules/listing/interfaces";
 import { IMetrcTableState } from "./store/page-overlay/modules/metrc-table/interfaces";
 import { IPackageHistoryState } from "./store/page-overlay/modules/package-history/interfaces";
@@ -35,14 +37,13 @@ import { ISplitPackageBuilderState } from "./store/page-overlay/modules/split-pa
 import { ITagSearchState } from "./store/page-overlay/modules/tag-search/interfaces";
 import {
   DriverLayoverLeg,
-  ITransferBuilderState
+  ITransferBuilderState,
 } from "./store/page-overlay/modules/transfer-builder/interfaces";
 import { ITransferPackageSearchState } from "./store/page-overlay/modules/transfer-package-search/interfaces";
 import { ITransferSearchState } from "./store/page-overlay/modules/transfer-search/interfaces";
 import { ITransferToolsState } from "./store/page-overlay/modules/transfer-tools/interfaces";
 import { CsvUpload, CsvUploadStatus } from "./types";
 import { UnitOfMeasureAbbreviation, UnitOfMeasureName } from "./utils/units";
-import { ILabelPrintState } from "./store/page-overlay/modules/label-print/interfaces";
 
 export type PlantBatchTypeName = "Clone" | "Seed";
 export type PlantGrowthPhase = "Vegetative" | "Flowering";
@@ -231,6 +232,7 @@ export interface IPluginState extends IRootState {
   transferTools: ITransferToolsState;
   metrcTable: IMetrcTableState;
   labelPrint: ILabelPrintState;
+  csvFillTool: ICsvFillToolState;
 }
 
 export interface IAddress {
@@ -1193,7 +1195,7 @@ export interface IXlsxFile {
     sheetName: string;
     options?: {
       table: boolean;
-    }
+    };
     data: any[][];
   }[];
 }

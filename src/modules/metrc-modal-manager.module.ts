@@ -33,21 +33,30 @@ class MetrcModalManager implements IAtomicService {
 
     const modalTitle = modalTitleOrError(modal);
 
+    const props: {
+      showTransferTools: boolean;
+      showCsvFillTool: boolean;
+    } = {
+      showTransferTools: false,
+      showCsvFillTool: true,
+    };
+
     switch (modalTitle) {
       case NEW_TRANSFER_TITLE:
       case NEW_LICENSED_TRANSFER_TITLE:
       case EDIT_LICENSED_TRANSFER_TITLE:
         this.maybeRenderCustomCsv(modal);
 
-        this.renderTransferTools(modal);
-
+        props.showTransferTools = true;
         break;
       default:
         break;
     }
+
+    this.renderInlineToolbar(modal, props);
   }
 
-  async renderTransferTools(modal: HTMLElement) {
+  async renderInlineToolbar(modal: HTMLElement, props: { showTransferTools: boolean }) {
     if (!store.state.settings.enableTransferTools) {
       return;
     }
@@ -73,7 +82,10 @@ class MetrcModalManager implements IAtomicService {
 
     new Vue({
       store,
-      render: (h) => h(InlineToolbar),
+      render: (h) =>
+        h(InlineToolbar, {
+          props,
+        }),
     }).$mount(target);
   }
 
