@@ -7,6 +7,9 @@
         <button class="btn btn-outline-primary mb-0" @click="downloadTemplate()">
             DOWNLOAD TEMPLATE
         </button>
+        <button class="btn btn-outline-primary mb-0" @click="dumpForm()">
+            DUMP FORM
+        </button>
     </div>
 </template>
 
@@ -43,7 +46,8 @@ export default Vue.extend({
     methods: {
         ...mapActions({
             exampleAction: `example/${ExampleActions.EXAMPLE_ACTION}`,
-            downloadTemplate: `csvFillTool/${CsvFillToolActions.DOWNLOAD_TEMPLATE}`
+            downloadTemplate: `csvFillTool/${CsvFillToolActions.DOWNLOAD_TEMPLATE}`,
+            dumpForm: `csvFillTool/${CsvFillToolActions.DUMP_FORM}`
         }),
     },
     async created() { },

@@ -37,16 +37,14 @@ export function collectInputs(modal: HTMLElement): IModalInput[] {
       continue;
     }
 
+    ngModelSet.add(ngModel);
+
     let ngRepeat: string | null = null;
     let el = input;
     let count = 0;
 
-    console.log("New input", input);
-
     while (true) {
       ngRepeat = el.getAttribute("ng-repeat");
-
-      console.log(ngRepeat);
 
       if (ngRepeat) {
         break;
@@ -57,7 +55,6 @@ export function collectInputs(modal: HTMLElement): IModalInput[] {
       }
 
       if (!el.parentElement) {
-        // console.log(`No parent element`, input);
         continue;
       }
 
@@ -102,8 +99,6 @@ export function collectInputs(modal: HTMLElement): IModalInput[] {
 }
 
 export function buildHierarchy(data: { modal: HTMLElement }): IHierarchyNode {
-  console.log(data.modal);
-
   const objectName = data.modal
     .querySelector("legend")
     ?.textContent!.split("#")[0]
@@ -167,8 +162,6 @@ export function buildHierarchy(data: { modal: HTMLElement }): IHierarchyNode {
   // ADD SECTION BUTTONS
 
   const addSectionButtons = [...data.modal.querySelectorAll(`[ng-click^="addLine"]`)];
-
-  //   console.log({ addSectionButtons });
 
   addSectionButtons.map((x: Element) => maybeInsertAddSectionButton(root, x));
 

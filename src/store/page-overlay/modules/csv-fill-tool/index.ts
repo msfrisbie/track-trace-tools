@@ -59,6 +59,81 @@ export const csvFillToolModule = {
 
       // console.log(root);
     },
+    [CsvFillToolActions.DUMP_FORM]: async (
+      ctx: ActionContext<ICsvFillToolState, IPluginState>,
+      data: {}
+    ) => {
+      const modal = activeMetrcModalOrNull();
+
+      if (!modal) {
+        throw new Error("Cannot access modal");
+      }
+
+      // const root = buildHierarchy({ modal });
+
+      const inputData = collectInputs(modal);
+
+      const title = modal.querySelector(".k-window-title")!.textContent!.trim();
+      const filename = `${title
+        .replaceAll(/\s+/g, "_")
+        .toLocaleLowerCase()}_autofill_${new Date().toISOString()}.csv`;
+
+      const ngRepeatSelectors: string[] = [];
+      const ngModelSelectors: string[] = [];
+      const columns: string[] = [];
+
+      // let node: IHierarchyNode = root;
+      for (const input of inputData) {
+        ngRepeatSelectors.push(input.ngRepeat);
+        ngModelSelectors.push(input.ngModel);
+        columns.push(input.name);
+      }
+      const topLevelSections = modal.querySelectorAll(`[ng-repeat="${ngRepeatSelectors[0]}"]`);
+
+      const dataRows: string[][] = [];
+
+      for (const section of topLevelSections) {
+        const queues: string[][] = columns.map(() => []);
+
+        for (const [colIdx, columnName] of columns.entries()) {
+          const ngRepeat = ngRepeatSelectors[colIdx];
+          const ngModel = ngModelSelectors[colIdx];
+
+          const inputs = [
+            ...section.querySelectorAll(`[ng-repeat="${ngRepeat}"] [ng-model="${ngModel}"]`),
+          ];
+
+          for (const input of inputs) {
+            if (input.nodeName === "SELECT") {
+              const match = [...(input as HTMLSelectElement).querySelectorAll("option")].find(
+                (x) => x.value === (input as HTMLSelectElement).value
+              );
+              if (match) {
+                queues[colIdx].push(match.getAttribute("label") ?? "");
+              }
+            } else {
+              // @ts-ignore
+              queues[colIdx].push((input as HTMLInputElement).value);
+            }
+          }
+        }
+
+        while (queues.some((arr) => arr.length > 0)) {
+          const row = queues.map((x) => x.shift() ?? "");
+
+          dataRows.push(row);
+        }
+      }
+
+      const matrix = [ngRepeatSelectors, ngModelSelectors, columns, ...dataRows];
+
+      const csvFile: ICsvFile = {
+        filename,
+        data: matrix,
+      };
+
+      downloadCsvFile({ csvFile });
+    },
     [CsvFillToolActions.DOWNLOAD_TEMPLATE]: async (
       ctx: ActionContext<ICsvFillToolState, IPluginState>,
       data: {}
