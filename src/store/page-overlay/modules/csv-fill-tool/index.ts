@@ -5,7 +5,7 @@ import { activeMetrcModalOrNull } from "@/utils/metrc-modal";
 import { ActionContext } from "vuex";
 import { CsvFillToolActions, CsvFillToolGetters, CsvFillToolMutations } from "./consts";
 import { ICsvFillToolState } from "./interfaces";
-import { buildHierarchy, collectInputs, dump } from "./utils";
+import { buildHierarchy, collectInputs } from "./utils";
 
 const inMemoryState = {};
 
@@ -55,9 +55,9 @@ export const csvFillToolModule = {
 
       const root = buildHierarchy({ modal });
 
-      dump(root);
+      // dump(root);
 
-      console.log(root);
+      // console.log(root);
     },
     [CsvFillToolActions.DOWNLOAD_TEMPLATE]: async (
       ctx: ActionContext<ICsvFillToolState, IPluginState>,
@@ -106,6 +106,10 @@ export const csvFillToolModule = {
         throw new Error("Cannot access modal");
       }
 
+      [...modal.querySelectorAll("[typeahead-wait-ms]")].map((x) => {
+        x.removeAttribute("typeahead-wait-ms");
+      });
+
       const csvData = await readCsvFile(data.file);
 
       // Remove empty rows:
@@ -114,7 +118,12 @@ export const csvFillToolModule = {
         (arr) => arr.length > 0 && !arr.every((str) => str.trim() === "")
       );
 
-      const rowCount: number = filteredCsvData.length - 1;
+      // 3 header rows:
+      // - ngRepeat
+      // - ngModel
+      // - column name
+      const headerRows: string[][] = filteredCsvData.slice(0, 3);
+      const dataRows: string[][] = filteredCsvData.slice(3);
 
       const root = buildHierarchy({ modal });
 
@@ -124,9 +133,67 @@ export const csvFillToolModule = {
         throw new Error("Missing top-level add section button");
       }
 
-      for (let i = 0; i < rowCount - currentRowCount; ++i) {
-        root.addSectionButton.dispatchEvent(new Event("click"));
+      // initialize all sections to proper length
+      for (let i = 0; i < dataRows.length - currentRowCount; ++i) {
+        root.addSectionButton.dispatchEvent(new Event("click", { bubbles: false }));
       }
+
+      // fill all inputs
+      for (const [rowIdx, dataRow] of dataRows.entries()) {
+        for (const [colIdx, cellValue] of dataRow.entries()) {
+          const ngRepeat = headerRows[0][colIdx];
+          const ngModel = headerRows[1][colIdx];
+
+          const els = modal.querySelectorAll(`[ng-repeat="${ngRepeat}"] [ng-model="${ngModel}"]`);
+          const el = els[rowIdx];
+
+          if (el.nodeName === "INPUT") {
+            (el as HTMLInputElement).value = cellValue;
+            el.dispatchEvent(new Event("input"));
+
+            if (el.hasAttribute("uib-typeahead")) {
+              let attempts = 0;
+              const interval = 50; // milliseconds
+              const maxTime = 500; // milliseconds
+              const maxAttempts = maxTime / interval;
+
+              const tryDispatchClick = async () => {
+                const success = (() => {
+                  try {
+                    // @ts-ignore
+                    el.nextSibling!.children[0].dispatchEvent(new Event("click"));
+                    return true;
+                  } catch (error) {
+                    return false;
+                  }
+                })();
+
+                if (success || attempts >= maxAttempts) {
+                  return;
+                }
+
+                attempts++;
+                await new Promise((r) => setTimeout(r, interval));
+                await tryDispatchClick();
+              };
+
+              await tryDispatchClick();
+            }
+          } else if (el.nodeName === "SELECT") {
+            try {
+              (el as HTMLSelectElement).value = [...el.querySelectorAll("option")].filter(
+                (x) =>
+                  x.textContent?.trim().toLocaleLowerCase() === cellValue.trim().toLocaleLowerCase()
+              )[0].value;
+              el.dispatchEvent(new Event("change", { bubbles: false }));
+            } catch (e) {
+              // Failed to set
+            }
+          }
+        }
+      }
+
+      // end
 
       const mutationData: Partial<ICsvFillToolState> = {};
 

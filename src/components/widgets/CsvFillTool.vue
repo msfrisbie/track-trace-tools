@@ -1,10 +1,10 @@
 <template>
-    <div class="m-4 flex flex-row gap-4">
-        <label class="btn btn-primary mb-0">
+    <div class="m-2 flex flex-row gap-2">
+        <label class="btn btn-outline-primary mb-0">
             <b-form-file class="hidden" v-model="csvFile" accept=".csv"></b-form-file>
             UPLOAD CSV
         </label>
-        <button class="btn btn-primary mb-0" @click="downloadTemplate()">
+        <button class="btn btn-outline-primary mb-0" @click="downloadTemplate()">
             DOWNLOAD TEMPLATE
         </button>
     </div>
@@ -17,8 +17,6 @@ import store from "@/store/page-overlay/index";
 import { ClientGetters } from "@/store/page-overlay/modules/client/consts";
 import { CsvFillToolActions } from "@/store/page-overlay/modules/csv-fill-tool/consts";
 import { ExampleActions, ExampleGetters } from "@/store/page-overlay/modules/example/consts";
-import { activeMetrcModalOrNull } from "@/utils/metrc-modal";
-import _ from "lodash-es";
 import Vue from "vue";
 import { mapActions, mapGetters, mapState } from "vuex";
 
@@ -50,15 +48,15 @@ export default Vue.extend({
     },
     async created() { },
     async mounted() {
-        const modal = activeMetrcModalOrNull();
+        // const modal = activeMetrcModalOrNull();
 
-        if (!modal) {
-            return;
-        }
+        // if (!modal) {
+        //     return;
+        // }
 
-        const debouncedHandler = _.debounce(() => store.dispatch(`csvFillTool/${CsvFillToolActions.ANALYZE}`, { modal }), 100);
-        const observer = new MutationObserver(() => debouncedHandler());
-        observer.observe(modal, { subtree: true, childList: true });
+        // const debouncedHandler = _.debounce(() => store.dispatch(`csvFillTool/${CsvFillToolActions.ANALYZE}`, { modal }), 100);
+        // const observer = new MutationObserver(() => debouncedHandler());
+        // observer.observe(modal, { subtree: true, childList: true });
     },
     watch: {
         csvFile: {

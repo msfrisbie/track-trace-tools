@@ -164,7 +164,7 @@ export function buildHierarchy(data: { modal: HTMLElement }): IHierarchyNode {
 
   const addSectionButtons = [...data.modal.querySelectorAll(`[ng-click^="addLine"]`)];
 
-  console.log({ addSectionButtons });
+//   console.log({ addSectionButtons });
 
   addSectionButtons.map((x: Element) => maybeInsertAddSectionButton(root, x));
 
