@@ -112,6 +112,8 @@ export const csvFillToolModule = {
 
       const csvData = await readCsvFile(data.file);
 
+      console.log({ csvData });
+
       // Remove empty rows:
       // [], [""], ["  "]
       const filteredCsvData = csvData.filter(
@@ -125,27 +127,66 @@ export const csvFillToolModule = {
       const headerRows: string[][] = filteredCsvData.slice(0, 3);
       const dataRows: string[][] = filteredCsvData.slice(3);
 
-      const root = buildHierarchy({ modal });
+      // const root = buildHierarchy({ modal });
 
-      const currentRowCount = root.childSections.length;
+      // if (!root.addSectionButton) {
+      //   throw new Error("Missing top-level add section button");
+      // }
 
-      if (!root.addSectionButton) {
-        throw new Error("Missing top-level add section button");
-      }
+      // const ngRepeatIndex: Map<string, number> = new Map(
+      //   [...new Set(headerRows[0])].map((x) => [x, 0])
+      // );
 
-      // initialize all sections to proper length
-      for (let i = 0; i < dataRows.length - currentRowCount; ++i) {
-        root.addSectionButton.dispatchEvent(new Event("click", { bubbles: false }));
-      }
+      console.log({ dataRows });
 
-      // fill all inputs
       for (const [rowIdx, dataRow] of dataRows.entries()) {
+        // There will never be less than one of each
+        if (rowIdx > 0) {
+          // Track ng repeat values that are "full rows"
+          const ngRepeats: Set<string> = new Set();
+
+          console.log({ dataRow });
+
+          for (const [colIdx, cellValue] of dataRow.entries()) {
+            const ngRepeat = headerRows[0][colIdx];
+
+            // Note a non-null value in this ng repeat
+            if (cellValue.trim() !== "") {
+              ngRepeats.add(ngRepeat);
+            }
+          }
+
+          const allAddButtons = [...modal.querySelectorAll(`[ng-click^="addLine("]`)];
+
+          console.log({ ngRepeats });
+
+          // Start a new top-level row
+          if (ngRepeats.has(headerRows[0][0])) {
+            allAddButtons[allAddButtons.length - 1].dispatchEvent(new Event("click"));
+          } else {
+            for (const ngRepeat of ngRepeats) {
+              // line.Ingredients
+              const id = ngRepeat.split("in")[1].trim();
+
+              const buttons = allAddButtons.filter((x) => x.getAttribute("ng-click")!.includes(id));
+
+              buttons[buttons.length - 1].dispatchEvent(new Event("click"));
+            }
+          }
+        }
+
+        // Rows are now set, fill this data
+
         for (const [colIdx, cellValue] of dataRow.entries()) {
           const ngRepeat = headerRows[0][colIdx];
           const ngModel = headerRows[1][colIdx];
 
+          if (cellValue.trim() === "") {
+            continue;
+          }
+
           const els = modal.querySelectorAll(`[ng-repeat="${ngRepeat}"] [ng-model="${ngModel}"]`);
-          const el = els[rowIdx];
+          const el = els[els.length - 1];
 
           if (el.nodeName === "INPUT") {
             (el as HTMLInputElement).value = cellValue;
@@ -192,6 +233,70 @@ export const csvFillToolModule = {
           }
         }
       }
+
+      // initialize all sections to proper length
+      // for (let i = 0; i < dataRows.length - currentRowCount; ++i) {
+      //   root.addSectionButton.dispatchEvent(new Event("click", { bubbles: false }));
+      // }
+
+      // fill all inputs
+      // for (const [rowIdx, dataRow] of dataRows.entries()) {
+      //   for (const [colIdx, cellValue] of dataRow.entries()) {
+      //     const ngRepeat = headerRows[0][colIdx];
+      //     const ngModel = headerRows[1][colIdx];
+
+      //     const els = modal.querySelectorAll(`[ng-repeat="${ngRepeat}"] [ng-model="${ngModel}"]`);
+      //     const el = els[rowIdx];
+
+      //     if (!el) {
+      //       debugger;
+      //     }
+
+      //     if (el.nodeName === "INPUT") {
+      //       (el as HTMLInputElement).value = cellValue;
+      //       el.dispatchEvent(new Event("input"));
+
+      //       if (el.hasAttribute("uib-typeahead")) {
+      //         let attempts = 0;
+      //         const interval = 50; // milliseconds
+      //         const maxTime = 500; // milliseconds
+      //         const maxAttempts = maxTime / interval;
+
+      //         const tryDispatchClick = async () => {
+      //           const success = (() => {
+      //             try {
+      //               // @ts-ignore
+      //               el.nextSibling!.children[0].dispatchEvent(new Event("click"));
+      //               return true;
+      //             } catch (error) {
+      //               return false;
+      //             }
+      //           })();
+
+      //           if (success || attempts >= maxAttempts) {
+      //             return;
+      //           }
+
+      //           attempts++;
+      //           await new Promise((r) => setTimeout(r, interval));
+      //           await tryDispatchClick();
+      //         };
+
+      //         await tryDispatchClick();
+      //       }
+      //     } else if (el.nodeName === "SELECT") {
+      //       try {
+      //         (el as HTMLSelectElement).value = [...el.querySelectorAll("option")].filter(
+      //           (x) =>
+      //             x.textContent?.trim().toLocaleLowerCase() === cellValue.trim().toLocaleLowerCase()
+      //         )[0].value;
+      //         el.dispatchEvent(new Event("change", { bubbles: false }));
+      //       } catch (e) {
+      //         // Failed to set
+      //       }
+      //     }
+      //   }
+      // }
 
       // end
 
