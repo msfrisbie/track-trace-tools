@@ -41,7 +41,7 @@ export function collectInputs(modal: HTMLElement): IModalInput[] {
     let el = input;
     let count = 0;
 
-    console.log('New input', input);
+    console.log("New input", input);
 
     while (true) {
       ngRepeat = el.getAttribute("ng-repeat");
@@ -151,6 +151,10 @@ export function buildHierarchy(data: { modal: HTMLElement }): IHierarchyNode {
       return false;
     }
 
+    if (x.nodeName === "DIV") {
+      return false;
+    }
+
     if (templateRow && templateRow.contains(x)) {
       return false;
     }
@@ -164,7 +168,7 @@ export function buildHierarchy(data: { modal: HTMLElement }): IHierarchyNode {
 
   const addSectionButtons = [...data.modal.querySelectorAll(`[ng-click^="addLine"]`)];
 
-//   console.log({ addSectionButtons });
+  //   console.log({ addSectionButtons });
 
   addSectionButtons.map((x: Element) => maybeInsertAddSectionButton(root, x));
 

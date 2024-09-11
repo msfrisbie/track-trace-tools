@@ -161,16 +161,19 @@ export const csvFillToolModule = {
           console.log({ ngRepeats });
 
           // Start a new top-level row
-          if (ngRepeats.has(headerRows[0][0])) {
+          if (ngRepeats.has("line in repeaterLines")) {
             allAddButtons[allAddButtons.length - 1].dispatchEvent(new Event("click"));
           } else {
             for (const ngRepeat of ngRepeats) {
               // line.Ingredients
-              const id = ngRepeat.split("in")[1].trim();
+              const id = ngRepeat.split(" in ")[1].trim();
 
               const buttons = allAddButtons.filter((x) => x.getAttribute("ng-click")!.includes(id));
 
-              buttons[buttons.length - 1].dispatchEvent(new Event("click"));
+              const targetButton = buttons[buttons.length - 1];
+
+              console.log(id, targetButton.getAttribute("ng-click"));
+              targetButton.dispatchEvent(new Event("click"));
             }
           }
         }
@@ -187,6 +190,8 @@ export const csvFillToolModule = {
 
           const els = modal.querySelectorAll(`[ng-repeat="${ngRepeat}"] [ng-model="${ngModel}"]`);
           const el = els[els.length - 1];
+
+          console.log({ cellValue, el, ngRepeat, ngModel });
 
           if (el.nodeName === "INPUT") {
             (el as HTMLInputElement).value = cellValue;
