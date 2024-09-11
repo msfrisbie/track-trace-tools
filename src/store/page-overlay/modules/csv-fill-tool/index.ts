@@ -1,9 +1,11 @@
-import { IPluginState } from "@/interfaces";
+import { ICsvFile, IPluginState } from "@/interfaces";
+import { downloadCsvFile } from "@/utils/csv";
 import { readCsvFile } from "@/utils/file";
 import { activeMetrcModalOrNull } from "@/utils/metrc-modal";
 import { ActionContext } from "vuex";
 import { CsvFillToolActions, CsvFillToolGetters, CsvFillToolMutations } from "./consts";
-import { ICsvFillToolState } from "./interfaces";
+import { ICsvFillToolState, IHierarchyNode } from "./interfaces";
+import { buildHierarchy, dump } from "./utils";
 
 const inMemoryState = {};
 
@@ -43,207 +45,63 @@ export const csvFillToolModule = {
   actions: {
     [CsvFillToolActions.ANALYZE]: async (
       ctx: ActionContext<ICsvFillToolState, IPluginState>,
-      data: {
-        modal: HTMLElement;
-      }
+      data: {}
     ) => {
-      console.log(data.modal);
+      const modal = activeMetrcModalOrNull();
 
-      const objectName = data.modal
-        .querySelector("legend")
-        ?.textContent!.split("#")[0]
-        .trim()
-        .split(/\s+/)
-        .join(" ");
-
-      console.log({ objectName });
-
-      const sections: Element[] = [...data.modal.querySelectorAll(`[ng-repeat]`)].filter((x) => {
-        if (x.tagName === "LABEL") {
-          return false;
-        }
-
-        return true;
-      });
-
-      interface IHierarchyNode {
-        el: Element;
-        name: string;
-        childSections: IHierarchyNode[];
-        inputs: {
-          el: Element;
-          ngModel: string;
-          name: string;
-        }[];
-        addSectionButton: Element | null;
+      if (!modal) {
+        throw new Error("Cannot access modal");
       }
 
-      const root: IHierarchyNode = {
-        el: data.modal,
-        name: "Root",
-        childSections: [],
-        inputs: [],
-        addSectionButton: null
-      };
-
-      // BUILD HIERARCHY
-
-      function insertSection(hierarchy: IHierarchyNode, currentElement: Element) {
-        for (const hierarchyNode of hierarchy.childSections) {
-          if (hierarchyNode.el.contains(currentElement)) {
-            insertSection(hierarchyNode, currentElement);
-
-            return;
-          }
-        }
-
-        const val = currentElement.getAttribute("ng-repeat")!;
-        let name: string = val.split(" in ")[0];
-
-        if (name === "line") {
-          if (objectName) {
-            name = objectName;
-          } else {
-            name = data.modal.querySelector(".k-window-title")!.textContent!.trim();
-          }
-        } else {
-          name = name[0].toUpperCase() + name.slice(1);
-        }
-
-        hierarchy.childSections.push({
-          el: currentElement,
-          name,
-          childSections: [],
-          inputs: [],
-          addSectionButton: null,
-        });
-      }
-
-      sections.map((x: Element) => insertSection(root, x));
-
-      // FORM INPUTS
-
-      const templateRow = data.modal.querySelector(".template-row");
-      const inputs = [...data.modal.querySelectorAll(`[ng-model]`)].filter((x) => {
-        if (x.getAttribute("type") === "hidden") {
-          return false;
-        }
-
-        if (x.hasAttribute("disabled")) {
-          return false;
-        }
-
-        if (x.hasAttribute("readonly")) {
-          return false;
-        }
-
-        if (x.nodeName === "BUTTON") {
-          return false;
-        }
-
-        if (templateRow && templateRow.contains(x)) {
-          return false;
-        }
-
-        return true;
-      });
-
-      function insertInput(hierarchy: IHierarchyNode, currentInput: Element): boolean {
-        for (const node of hierarchy.childSections) {
-          if (node.el.contains(currentInput)) {
-            const inserted: boolean = insertInput(node, currentInput);
-
-            if (!inserted) {
-              const ngModel = currentInput.getAttribute("ng-model")!;
-
-              // Backup name
-              let name: string = ngModel;
-
-              // An autocomplete indicates a good column title
-              const placeholder = currentInput
-                .getAttribute("placeholder")
-                ?.match(/Type part of (the )?(.*)\.\.\./);
-
-              if (placeholder) {
-                name = placeholder[2].split(/\s+/)
-                .map((x) => x[0].toUpperCase() + x.slice(1))
-                .join(" ");
-              } else {
-              // ingredient.FinishDate becomes Ingredient Finish Date
-              name = name
-                .replaceAll(".", "")
-                .split(/(?=[A-Z])/)
-                .map((x) => x.trim())
-                .map((x) => x[0].toUpperCase() + x.slice(1))
-                .filter((x) => !["Id", 'Line'].includes(x))
-                .join(" ");
-              }
-
-              if (!name.startsWith('Template')) {
-                node.inputs.push({
-                  name,
-                  ngModel,
-                  el: currentInput,
-                });
-              }
-            }
-
-            return true;
-          }
-        }
-
-        return false;
-      }
-
-      inputs.map((x: Element) => insertInput(root, x));
-
-      // ADD SECTION BUTTONS
-
-      const addSectionButtons = [...data.modal.querySelectorAll(`[ng-click^="addLine"]`)];
-
-      function maybeInsertAddSectionButton(
-        hierarchy: IHierarchyNode,
-        currentAddSectionButton: Element
-      ): boolean {
-        if (!hierarchy.el.contains(currentAddSectionButton)) {
-          return false;
-        }
-
-        let inserted: boolean = false;
-
-        for (const node of hierarchy.childSections) {
-          inserted = maybeInsertAddSectionButton(
-            node,
-            currentAddSectionButton
-          );
-
-          if (inserted) {
-            break;
-          }
-        }
-
-        if (!inserted) {
-          hierarchy.addSectionButton = currentAddSectionButton;
-        }
-
-        return true;
-      }
-
-      console.log({ addSectionButtons });
-
-      addSectionButtons.map((x: Element) => maybeInsertAddSectionButton(root, x));
-
-      function dump(node: IHierarchyNode, depth: number = 0) {
-        console.log(`${"  ".repeat(depth)}${node.name}`);
-        console.log(`${"  ".repeat(depth)}(${node.inputs.map((x) => x.name).join(",")}`);
-        node.childSections.map((h) => dump(h, depth + 1));
-      }
+      const root = buildHierarchy({ modal });
 
       dump(root);
 
       console.log(root);
     },
-    [CsvFillToolActions.CSV_FILL_TOOL_ACTION]: async (
+    [CsvFillToolActions.DOWNLOAD_TEMPLATE]: async (
+      ctx: ActionContext<ICsvFillToolState, IPluginState>,
+      data: {}
+    ) => {
+      const modal = activeMetrcModalOrNull();
+
+      if (!modal) {
+        throw new Error("Cannot access modal");
+      }
+
+      const root = buildHierarchy({ modal });
+
+      const title = modal.querySelector(".k-window-title")!.textContent!.trim();
+      const filename = `${title.replaceAll(/\s+/g, "_").toLocaleLowerCase()}_autofill_template.csv`;
+
+      const sectionNames: string[] = [];
+      const selectors: string[] = [];
+      const columns: string[] = [];
+
+      let node: IHierarchyNode = root;
+      while (true) {
+        for (const input of node.inputs) {
+          sectionNames.push(node.name);
+          selectors.push(input.ngModel);
+          columns.push(input.name);
+        }
+
+        if (node.childSections.length > 0) {
+          node = node.childSections[0];
+          continue;
+        }
+
+        break;
+      }
+
+      const csvFile: ICsvFile = {
+        filename,
+        data: [sectionNames, selectors, columns],
+      };
+
+      downloadCsvFile({ csvFile });
+    },
+    [CsvFillToolActions.FILL_CSV_INTO_MODAL_FORM]: async (
       ctx: ActionContext<ICsvFillToolState, IPluginState>,
       data: {
         file: File;
@@ -252,12 +110,30 @@ export const csvFillToolModule = {
       const modal = activeMetrcModalOrNull();
 
       if (!modal) {
-        return;
+        throw new Error("Cannot access modal");
       }
 
       const csvData = await readCsvFile(data.file);
 
-      console.log(csvData);
+      // Remove empty rows:
+      // [], [""], ["  "]
+      const filteredCsvData = csvData.filter(
+        (arr) => arr.length > 0 && !arr.every((str) => str.trim() === "")
+      );
+
+      const rowCount: number = filteredCsvData.length - 1;
+
+      const root = buildHierarchy({ modal });
+
+      const currentRowCount = root.childSections.length;
+
+      if (!root.addSectionButton) {
+        throw new Error("Missing top-level add section button");
+      }
+
+      for (let i = 0; i < rowCount - currentRowCount; ++i) {
+        root.addSectionButton.dispatchEvent(new Event("click"));
+      }
 
       const mutationData: Partial<ICsvFillToolState> = {};
 
@@ -270,3 +146,14 @@ export const csvFillToolReducer = (state: ICsvFillToolState): ICsvFillToolState 
   ...state,
   ...inMemoryState,
 });
+function insertSection(root: IHierarchyNode, x: Element): any {
+  throw new Error("Function not implemented.");
+}
+
+function maybeInsertAddSectionButton(root: IHierarchyNode, x: Element): any {
+  throw new Error("Function not implemented.");
+}
+
+function insertInput(root: IHierarchyNode, x: Element): any {
+  throw new Error("Function not implemented.");
+}

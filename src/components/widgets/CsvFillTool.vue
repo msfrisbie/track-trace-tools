@@ -1,9 +1,12 @@
 <template>
-    <div>
+    <div class="m-4 flex flex-row gap-4">
         <label class="btn btn-primary mb-0">
             <b-form-file class="hidden" v-model="csvFile" accept=".csv"></b-form-file>
             UPLOAD CSV
         </label>
+        <button class="btn btn-primary mb-0" @click="downloadTemplate()">
+            DOWNLOAD TEMPLATE
+        </button>
     </div>
 </template>
 
@@ -42,6 +45,7 @@ export default Vue.extend({
     methods: {
         ...mapActions({
             exampleAction: `example/${ExampleActions.EXAMPLE_ACTION}`,
+            downloadTemplate: `csvFillTool/${CsvFillToolActions.DOWNLOAD_TEMPLATE}`
         }),
     },
     async created() { },
@@ -64,7 +68,7 @@ export default Vue.extend({
                     return;
                 }
 
-                store.dispatch(`csvFillTool/${CsvFillToolActions.CSV_FILL_TOOL_ACTION}`, {
+                store.dispatch(`csvFillTool/${CsvFillToolActions.FILL_CSV_INTO_MODAL_FORM}`, {
                     file: newValue,
                 });
             },
