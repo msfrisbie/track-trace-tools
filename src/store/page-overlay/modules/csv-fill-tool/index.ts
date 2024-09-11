@@ -76,7 +76,7 @@ export const csvFillToolModule = {
       const title = modal.querySelector(".k-window-title")!.textContent!.trim();
       const filename = `${title
         .replaceAll(/\s+/g, "_")
-        .toLocaleLowerCase()}_autofill_${new Date().toISOString()}.csv`;
+        .toLocaleLowerCase()}_autofill_${new Date().toISOString()}.t3.csv`;
 
       const ngRepeatSelectors: string[] = [];
       const ngModelSelectors: string[] = [];
@@ -149,7 +149,7 @@ export const csvFillToolModule = {
       const inputData = collectInputs(modal);
 
       const title = modal.querySelector(".k-window-title")!.textContent!.trim();
-      const filename = `${title.replaceAll(/\s+/g, "_").toLocaleLowerCase()}_autofill_template.csv`;
+      const filename = `${title.replaceAll(/\s+/g, "_").toLocaleLowerCase()}_autofill_template.t3.csv`;
 
       const ngRepeatSelectors: string[] = [];
       const ngModelSelectoprs: string[] = [];

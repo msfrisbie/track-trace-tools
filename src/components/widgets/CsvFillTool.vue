@@ -1,15 +1,20 @@
 <template>
     <div class="m-2 flex flex-row gap-2">
-        <label class="btn btn-outline-primary mb-0">
-            <b-form-file class="hidden" v-model="csvFile" accept=".csv"></b-form-file>
-            UPLOAD CSV
-        </label>
-        <button class="btn btn-outline-primary mb-0" @click="downloadTemplate()">
-            DOWNLOAD TEMPLATE
-        </button>
-        <button class="btn btn-outline-primary mb-0" @click="dumpForm()">
-            DUMP FORM
-        </button>
+        <b-button-group>
+            <button class="btn btn-outline-primary mb-0 flex flex-row gap-2 items-center" @click="downloadTemplate()">
+                <font-awesome-icon icon="fa-download" size="lg"></font-awesome-icon>
+                <span>DOWNLOAD EMPTY TEMPLATE</span>
+            </button>
+            <button class="btn btn-outline-primary mb-0 flex flex-row gap-2 items-center" @click="dumpForm()">
+                <font-awesome-icon icon="fa-file-export" size="lg"></font-awesome-icon>
+                EXPORT FORM DATA
+            </button>
+            <label class="btn btn-outline-success mb-0 flex flex-row gap-2 items-center">
+                <font-awesome-icon icon="fa-file-csv" size="lg"></font-awesome-icon>
+                <b-form-file class="hidden" v-model="csvFile" accept=".csv"></b-form-file>
+                AUTOFILL T3 CSV
+            </label>
+        </b-button-group>
     </div>
 </template>
 
