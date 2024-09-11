@@ -38,18 +38,35 @@ export function collectInputs(modal: HTMLElement): IModalInput[] {
     }
 
     let ngRepeat: string | null = null;
-    let el = input.parentElement!;
+    let el = input;
+    let count = 0;
+
+    console.log('New input', input);
+
     while (true) {
-      if (el.hasAttribute("ng-repeat")) {
-        ngRepeat = el.getAttribute("ng-repeat")!;
+      ngRepeat = el.getAttribute("ng-repeat");
+
+      console.log(ngRepeat);
+
+      if (ngRepeat) {
         break;
       }
+
+      if (count++ > 12) {
+        break;
+      }
+
+      if (!el.parentElement) {
+        // console.log(`No parent element`, input);
+        continue;
+      }
+
       el = el.parentElement!;
-      break;
     }
 
     if (!ngRepeat) {
-      throw new Error("Failed to match ngRepeat");
+      continue;
+      // throw new Error("Failed to match ngRepeat");
     }
 
     let name: string = ngModel;

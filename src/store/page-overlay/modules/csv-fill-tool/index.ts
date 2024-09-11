@@ -4,8 +4,8 @@ import { readCsvFile } from "@/utils/file";
 import { activeMetrcModalOrNull } from "@/utils/metrc-modal";
 import { ActionContext } from "vuex";
 import { CsvFillToolActions, CsvFillToolGetters, CsvFillToolMutations } from "./consts";
-import { ICsvFillToolState, IHierarchyNode } from "./interfaces";
-import { buildHierarchy, dump } from "./utils";
+import { ICsvFillToolState } from "./interfaces";
+import { buildHierarchy, collectInputs, dump } from "./utils";
 
 const inMemoryState = {};
 
@@ -69,34 +69,27 @@ export const csvFillToolModule = {
         throw new Error("Cannot access modal");
       }
 
-      const root = buildHierarchy({ modal });
+      // const root = buildHierarchy({ modal });
+
+      const inputData = collectInputs(modal);
 
       const title = modal.querySelector(".k-window-title")!.textContent!.trim();
       const filename = `${title.replaceAll(/\s+/g, "_").toLocaleLowerCase()}_autofill_template.csv`;
 
-      const sectionNames: string[] = [];
-      const selectors: string[] = [];
+      const ngRepeatSelectors: string[] = [];
+      const ngModelSelectoprs: string[] = [];
       const columns: string[] = [];
 
-      let node: IHierarchyNode = root;
-      while (true) {
-        for (const input of node.inputs) {
-          sectionNames.push(node.name);
-          selectors.push(input.ngModel);
-          columns.push(input.name);
-        }
-
-        if (node.childSections.length > 0) {
-          node = node.childSections[0];
-          continue;
-        }
-
-        break;
+      // let node: IHierarchyNode = root;
+      for (const input of inputData) {
+        ngRepeatSelectors.push(input.ngRepeat);
+        ngModelSelectoprs.push(input.ngModel);
+        columns.push(input.name);
       }
 
       const csvFile: ICsvFile = {
         filename,
-        data: [sectionNames, selectors, columns],
+        data: [ngRepeatSelectors, ngModelSelectoprs, columns],
       };
 
       downloadCsvFile({ csvFile });
@@ -146,14 +139,3 @@ export const csvFillToolReducer = (state: ICsvFillToolState): ICsvFillToolState 
   ...state,
   ...inMemoryState,
 });
-function insertSection(root: IHierarchyNode, x: Element): any {
-  throw new Error("Function not implemented.");
-}
-
-function maybeInsertAddSectionButton(root: IHierarchyNode, x: Element): any {
-  throw new Error("Function not implemented.");
-}
-
-function insertInput(root: IHierarchyNode, x: Element): any {
-  throw new Error("Function not implemented.");
-}
