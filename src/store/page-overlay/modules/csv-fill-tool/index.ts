@@ -1,7 +1,9 @@
 import { ICsvFile, IPluginState } from "@/interfaces";
+import { toastManager } from "@/modules/toast-manager.module";
 import { downloadCsvFile } from "@/utils/csv";
 import { readCsvFile } from "@/utils/file";
 import { activeMetrcModalOrNull } from "@/utils/metrc-modal";
+import { hasPlusImpl } from "@/utils/plus";
 import { ActionContext } from "vuex";
 import { CsvFillToolActions, CsvFillToolGetters, CsvFillToolMutations } from "./consts";
 import { ICsvFillToolState } from "./interfaces";
@@ -217,6 +219,22 @@ export const csvFillToolModule = {
       // );
 
       for (const [rowIdx, dataRow] of dataRows.entries()) {
+        if (!hasPlusImpl() && rowIdx > 4) {
+          toastManager.openToast(
+            "Autofill is limited to 5 rows with the free plan. For unlimited autofills, subscribe to T3+ at trackandtrace.tools/plus",
+            {
+              title: "Row limit reached",
+              autoHideDelay: 3000,
+              variant: "warning",
+              appendToast: true,
+              toaster: "ttt-toaster",
+              solid: true,
+            }
+          );
+
+          break;
+        }
+
         // There will never be less than one of each
         if (rowIdx > 0) {
           // Track ng repeat values that are "full rows"

@@ -15,6 +15,11 @@
                 AUTOFILL T3 CSV
             </label>
         </b-button-group>
+
+        <b-button class="ttt-purple flex flex-row gap-2 items-center" variant="link"
+            href="https://www.youtube.com/watch?v=PyM30jB-G8I" target="_blank">
+            <font-awesome-icon icon="fa-external-link-alt" size="lg"></font-awesome-icon>
+            <span>WATCH DEMO</span></b-button>
     </div>
 </template>
 
