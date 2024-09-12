@@ -12,6 +12,8 @@ export enum T3AuthState {
 class ClientBuildManager implements IAtomicService {
   t3AuthState: T3AuthState = T3AuthState.INITIAL;
 
+  logServerAuth: boolean = false;
+
   async init() {
     this.loadClientConfig();
 
@@ -81,20 +83,20 @@ class ClientBuildManager implements IAtomicService {
   }
 
   async checkValidSessionOrError() {
-    console.log("Testing access token");
+    this.logServerAuth && console.log("Testing access token");
     // Test API key to ensure the credential mapping is still valid, otherwise dispose
     const response = await t3RequestManager.t3AuthCheck();
     if (response.status !== 200) {
-      console.log("Failed to refresh, authenticating");
+      this.logServerAuth && console.log("Failed to refresh, authenticating");
       this.t3AuthOrError();
     } else {
-      console.log("Access token is valid");
+      this.logServerAuth && console.log("Access token is valid");
     }
   }
 
   async initializeIntervalRefresh() {
     setInterval(async () => {
-      console.log("Interval token refresh");
+      this.logServerAuth && console.log("Interval token refresh");
       try {
         await this.refreshT3AuthTokenOrError();
 
@@ -106,7 +108,7 @@ class ClientBuildManager implements IAtomicService {
   }
 
   setT3AuthState(state: T3AuthState) {
-    console.log({ state });
+    this.logServerAuth && console.log({ state });
     this.t3AuthState = state;
   }
 }

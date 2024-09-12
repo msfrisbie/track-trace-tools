@@ -28,6 +28,7 @@ import { packageHistoryModule, packageHistoryReducer } from "./modules/package-h
 import { packageSearchModule, packageSearchReducer } from "./modules/package-search";
 import { plantSearchModule, plantSearchReducer } from "./modules/plant-search";
 import { pluginAuthModule, pluginAuthReducer } from "./modules/plugin-auth/index";
+import { csvFillToolModule, csvFillToolReducer } from "./modules/csv-fill-tool/index";
 import {
   promoteImmaturePlantsBuilderModule,
   promoteImmaturePlantsBuilderReducer,
@@ -92,6 +93,7 @@ const vuexShared = {
     transferTools: transferToolsReducer(state.transferTools),
     metrcTable: metrcTableReducer(state.metrcTable),
     labelPrint: labelPrintReducer(state.labelPrint),
+    csvFillTool: csvFillToolReducer(state.csvFillTool),
   }),
 };
 
@@ -400,6 +402,10 @@ const vuexStore = new Vuex.Store<IPluginState>({
     labelPrint: {
       namespaced: true,
       ...labelPrintModule,
+    },
+    csvFillTool: {
+      namespaced: true,
+      ...csvFillToolModule,
     },
   },
   plugins: [vuexPersistence.plugin],
