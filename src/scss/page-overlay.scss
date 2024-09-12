@@ -14,13 +14,20 @@ body.demo-mode {
     display: none;
   }
 
-  // tbody td,
-  // div.k-pager-wrap,
-  // .demo-blur,
-  // .demo-blur * {
-  //   color: transparent !important;
-  //   text-shadow: 0 0 8px rgba(0, 0, 0, 0.4);
-  // }
+  #body_content {
+    tbody td,
+    div.k-pager-wrap,
+    .demo-blur,
+    .demo-blur * {
+      color: transparent !important;
+      text-shadow: 0 0 8px rgba(0, 0, 0, 0.4);
+    }
+  }
+
+  label.checkbox {
+    color: transparent !important;
+    text-shadow: 0 0 8px rgba(0, 0, 0, 0.4);
+  }
 
   div#footer {
     display: none;

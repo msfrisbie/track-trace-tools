@@ -109,7 +109,11 @@ export const csvFillToolModule = {
                 (x) => x.value === (input as HTMLSelectElement).value
               );
               if (match) {
-                queues[colIdx].push(match.getAttribute("label") ?? "");
+                if (match.hasAttribute("label")) {
+                  queues[colIdx].push(match.getAttribute("label") ?? "");
+                } else {
+                  queues[colIdx].push(match.getAttribute("value") ?? "");
+                }
               }
             } else {
               // @ts-ignore
@@ -149,7 +153,9 @@ export const csvFillToolModule = {
       const inputData = collectInputs(modal);
 
       const title = modal.querySelector(".k-window-title")!.textContent!.trim();
-      const filename = `${title.replaceAll(/\s+/g, "_").toLocaleLowerCase()}_autofill_template.t3.csv`;
+      const filename = `${title
+        .replaceAll(/\s+/g, "_")
+        .toLocaleLowerCase()}_autofill_template.t3.csv`;
 
       const ngRepeatSelectors: string[] = [];
       const ngModelSelectoprs: string[] = [];
