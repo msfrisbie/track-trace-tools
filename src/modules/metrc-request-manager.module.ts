@@ -111,6 +111,7 @@ const CREATE_TRANSFERS_URL = `${origin()}/api/transfers/create`;
 const UPDATE_TRANSFERS_URL = `${origin()}/api/transfers/update`;
 const UPLOAD_LAB_DOCUMENT_URL = `${origin()}/api/file/system/add/labtest/result/document`;
 const ADD_LABTEST_DOCUMENT_TO_RESULT_URL = `${origin()}/api/labtests/upload/document`;
+const CHANGE_PLANTS_GROWTH_PHASE_URL = `${origin()}/api/plants/change/growthphases`;
 
 // DATAIMPORT
 const DATAIMPORT_MOVE_PLANTS_URL = `${origin()}/api/dataimport/plants/change/locations`;
@@ -1273,6 +1274,17 @@ export class MetrcRequestManager implements IAtomicService {
       headers: {
         Accept: "text/html, */*; q=0.01",
         ...(await buildAuthenticationHeaders(this.authStateOrError)),
+      },
+      body,
+    });
+  }
+
+  async changePlantsGrowthPhase(body: string) {
+    return customAxios(CHANGE_PLANTS_GROWTH_PHASE_URL, {
+      ...DEFAULT_FETCH_POST_WRITE_OPTIONS,
+      headers: {
+        ...(await buildAuthenticationHeaders(this.authStateOrError)),
+        ...JSON_HEADERS,
       },
       body,
     });

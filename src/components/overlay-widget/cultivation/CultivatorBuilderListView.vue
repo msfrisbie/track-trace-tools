@@ -91,6 +91,18 @@ export default Vue.extend({
           showDisabledMessage: false,
         },
         {
+          route: "/cultivator/change-plants-growth-phase",
+          text: "CHANGE PLANTS GROWTH PHASE",
+          icon: "exchange-alt",
+          backgroundColor: "#48b867",
+          enabled: true,
+          isPlus: false,
+          isBeta: false,
+          isNew: false,
+          visible: true,
+          showDisabledMessage: false,
+        },
+        {
           route: "/cultivator/move-plants",
           text: "MOVE PLANTS",
           icon: "exchange-alt",
