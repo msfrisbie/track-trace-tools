@@ -198,6 +198,7 @@ export default Vue.extend({
         case BuilderType.HARVEST_PLANTS:
         case BuilderType.MANICURE_PLANTS:
         case BuilderType.MOVE_PLANTS:
+        case BuilderType.CHANGE_PLANTS_GROWTH_PHASE:
           return 'plants';
         default:
           return 'entries';

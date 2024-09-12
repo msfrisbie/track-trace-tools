@@ -1412,6 +1412,14 @@ export interface IMetrcMovePlantsPayload {
   Id: string;
 }
 
+export interface IMetrcChangePlantsGrowthPhasePayload {
+  GrowthDate: string;
+  GrowthPhase: string;
+  Id: string;
+  NewLocationId: string;
+  NewTagId: string;
+}
+
 export interface IMetrcMovePlantBatchesPayload {
   ActualDate: string;
   LocationId: string;

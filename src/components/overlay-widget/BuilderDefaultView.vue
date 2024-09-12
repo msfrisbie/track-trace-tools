@@ -244,6 +244,16 @@ export default Vue.extend({
         },
         {
           backgroundColor: "gray",
+          text: "T3 API",
+          icon: "file",
+          visible: true,
+          enabled: true,
+          isBeta: false,
+          isNew: false,
+          url: "https://api.trackandtrace.tools/v2/docs",
+        },
+        {
+          backgroundColor: "gray",
           text: "COMMUNITY",
           icon: "users",
           visible: true,

@@ -2,21 +2,27 @@ import { BuilderType, MessageType } from "@/consts";
 import {
   IAtomicService,
   ICsvFile,
-  IMetrcAdjustPackagePayload, IMetrcAssignCoaPayload, IMetrcCreateItemsPayload,
+  IMetrcAdjustPackagePayload,
+  IMetrcAssignCoaPayload,
+  IMetrcChangePlantsGrowthPhasePayload,
+  IMetrcCreateItemsPayload,
   IMetrcCreatePackagesFromPackagesPayload,
   IMetrcCreatePlantBatchPackagesFromMotherPlantBatchPayload,
   IMetrcCreatePlantBatchPackagesFromMotherPlantPayload,
-  IMetrcCreateTransferPayload, IMetrcDestroyPlantBatchesPayload, IMetrcDestroyPlantsPayload, IMetrcFinishPackagesPayload,
+  IMetrcCreateTransferPayload,
+  IMetrcDestroyPlantBatchesPayload,
+  IMetrcDestroyPlantsPayload,
+  IMetrcFinishPackagesPayload,
   IMetrcHarvestPlantsPayload,
   IMetrcManicurePlantsPayload,
   IMetrcMovePackagesPayload,
-  IMetrcMovePlantsPayload,
   IMetrcMovePlantBatchesPayload,
+  IMetrcMovePlantsPayload,
   IMetrcPromoteImmaturePlantsPayload,
   IMetrcReplacePlantBatchTagsPayload,
   IMetrcReplacePlantTagsPayload,
   IMetrcUnpackImmaturePlantsPayload,
-  IMetrcUpdateTransferPayload
+  IMetrcUpdateTransferPayload,
 } from "@/interfaces";
 import { primaryMetrcRequestManager } from "@/modules/metrc-request-manager.module";
 import store from "@/store/page-overlay/index";
@@ -58,7 +64,8 @@ type IEligibleRowType =
   | IMetrcReplacePlantTagsPayload
   | IMetrcAdjustPackagePayload
   | IMetrcUpdateTransferPayload
-  | IMetrcAssignCoaPayload;
+  | IMetrcAssignCoaPayload
+  | IMetrcChangePlantsGrowthPhasePayload;
 
 const debugLog = debugLogFactory("builder-manager.module.ts");
 
@@ -398,6 +405,9 @@ class BuilderManager implements IAtomicService {
         break;
       case BuilderType.ASSIGN_LAB_COA:
         response = await primaryMetrcRequestManager.assignLabDocument(JSON.stringify(rows));
+        break;
+      case BuilderType.CHANGE_PLANTS_GROWTH_PHASE:
+        response = await primaryMetrcRequestManager.changePlantsGrowthPhase(JSON.stringify(rows));
         break;
       default:
         throw new Error(`Bad builder type: ${builderType}`);
