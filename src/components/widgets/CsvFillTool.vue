@@ -20,6 +20,12 @@
             href="https://www.youtube.com/watch?v=PyM30jB-G8I" target="_blank">
             <font-awesome-icon icon="fa-external-link-alt" size="lg"></font-awesome-icon>
             <span>WATCH DEMO</span></b-button>
+
+        <h1>Select a Folder to Read Files</h1>
+        <button id="folderPicker">Select Folder</button>
+
+        <h2>Files:</h2>
+        <ul id="fileList"></ul>
     </div>
 </template>
 
@@ -62,6 +68,45 @@ export default Vue.extend({
     },
     async created() { },
     async mounted() {
+        const folderPicker = document.getElementById('folderPicker')!;
+        const fileList = document.getElementById('fileList')!;
+
+        folderPicker.addEventListener('click', async () => {
+            // Request access to the user's folder
+            // @ts-ignore
+            const directoryHandle = await window.showDirectoryPicker();
+            fileList.innerHTML = ''; // Clear previous file list
+            // fileContent.textContent = ''; // Clear previous file content
+
+            // Recursively read the directory and display files
+            async function readDirectory(handle: any) {
+                for await (const entry of handle.values()) {
+                    console.log({ entry });
+                    if (entry.kind === 'file') {
+                        const file = await entry.getFile();
+                        console.log({ file });
+
+                        // Display file information and provide a way to view content
+                        const li = document.createElement('li');
+                        li.innerHTML = `${entry.name} (${file.size} bytes) <button data-file="${entry.name}">View Content</button>`;
+                        fileList.appendChild(li);
+
+                        // Attach event to display file content when the button is clicked
+                        // const viewButton = li.querySelector('button');
+                        // viewButton.addEventListener('click', async () => {
+                        //     // Read and display the file content
+                        const fileContentText = await file.text();
+                        console.log(`File: ${entry.name}\n\n${fileContentText}`);
+                        // });
+                    } else if (entry.kind === 'directory') {
+                        await readDirectory(entry);
+                    }
+                }
+            }
+
+            // Start reading the directory
+            await readDirectory(directoryHandle);
+        });
         // const modal = activeMetrcModalOrNull();
 
         // if (!modal) {
