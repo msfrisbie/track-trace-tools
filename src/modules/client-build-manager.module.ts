@@ -17,7 +17,7 @@ class ClientBuildManager implements IAtomicService {
   async init() {
     this.loadClientConfig();
 
-    this.manageAuthState();
+    // this.manageAuthState();
   }
 
   async loadClientConfig() {
