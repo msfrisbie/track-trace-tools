@@ -87,6 +87,16 @@ export function collectInputs(modal: HTMLElement): IModalInput[] {
         .join(" ");
     }
 
+    try {
+      if (input.getAttribute("type") === "checkbox") {
+        const nameCandidate: string | undefined = input.parentElement?.textContent?.trim();
+
+        if (nameCandidate && nameCandidate.length > 0) {
+          name = nameCandidate;
+        }
+      }
+    } catch (e) {}
+
     inputData.push({
       ngRepeat,
       ngModel,

@@ -169,19 +169,19 @@ export const csvFillToolModule = {
         .toLocaleLowerCase()}_autofill_template.t3.csv`;
 
       const ngRepeatSelectors: string[] = [];
-      const ngModelSelectoprs: string[] = [];
+      const ngModelSelectors: string[] = [];
       const columns: string[] = [];
 
       // let node: IHierarchyNode = root;
       for (const input of inputData) {
         ngRepeatSelectors.push(input.ngRepeat);
-        ngModelSelectoprs.push(input.ngModel);
+        ngModelSelectors.push(input.ngModel);
         columns.push(input.name);
       }
 
       const csvFile: ICsvFile = {
         filename,
-        data: [ngRepeatSelectors, ngModelSelectoprs, columns],
+        data: [ngRepeatSelectors, ngModelSelectors, columns],
       };
 
       downloadCsvFile({ csvFile });
