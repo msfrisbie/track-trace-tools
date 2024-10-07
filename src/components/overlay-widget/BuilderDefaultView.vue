@@ -58,7 +58,7 @@
           </b-button>
         </b-button-group>
       </div>
-      <builder-dashboard class="py-4"></builder-dashboard>
+      <builder-dashboard class="py-4 pr-4"></builder-dashboard>
       <!-- <announcements class="bg-purple-50 p-4"></announcements> -->
     </div>
   </div>
