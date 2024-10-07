@@ -118,8 +118,17 @@ export const csvFillToolModule = {
                 }
               }
             } else {
-              // @ts-ignore
-              queues[colIdx].push((input as HTMLInputElement).value);
+              let value: string = (input as HTMLInputElement).value;
+
+              if (input.getAttribute("type") === "checkbox") {
+                if ((input as HTMLInputElement).checked) {
+                  value = "yes";
+                } else {
+                  value = "";
+                }
+              }
+
+              queues[colIdx].push(value);
             }
           }
         }
@@ -281,9 +290,20 @@ export const csvFillToolModule = {
           const els = modal.querySelectorAll(`[ng-repeat="${ngRepeat}"] [ng-model="${ngModel}"]`);
           const el = els[els.length - 1];
 
+          console.log(el.nodeName);
+
           if (el.nodeName === "INPUT") {
-            (el as HTMLInputElement).value = cellValue;
-            el.dispatchEvent(new Event("input"));
+            if (el.getAttribute("type") === "checkbox") {
+              const shouldBeChecked: boolean = cellValue.trim().length > 0;
+              const isChecked: boolean = (el as HTMLInputElement).checked;
+
+              if (shouldBeChecked !== isChecked) {
+                (el as HTMLInputElement).click();
+              }
+            } else {
+              (el as HTMLInputElement).value = cellValue;
+              el.dispatchEvent(new Event("input"));
+            }
 
             if (el.hasAttribute("uib-typeahead")) {
               let attempts = 0;
@@ -326,6 +346,8 @@ export const csvFillToolModule = {
           } else if (el.nodeName === "TEXTAREA") {
             (el as HTMLTextAreaElement).value = cellValue;
             el.dispatchEvent(new Event("input"));
+          } else {
+            console.log("Unsupported input type, skipping");
           }
         }
       }

@@ -19,6 +19,10 @@
         <div class="relative">
           <quick-script-button class="floating-shadow" />
         </div>
+
+        <div v-if="notificationCount === 0" class="relative">
+          <announcements-button class="floating-shadow"></announcements-button>
+        </div>
       </div>
 
       <div v-if="!t3plus" class="relative">
@@ -29,6 +33,10 @@
         <print-button></print-button>
       </div>
 
+      <div v-if="notificationCount > 0" class="relative">
+        <announcements-button class="floating-shadow"></announcements-button>
+      </div>
+
       <div class="relative">
         <builder-button class="floating-shadow" />
       </div>
@@ -37,6 +45,7 @@
 </template>
 
 <script lang="ts">
+import AnnouncementsButton from "@/components/page-overlay/AnnouncementsButton.vue";
 import BugReportButton from "@/components/page-overlay/BugReportButton.vue";
 import BuilderButton from "@/components/page-overlay/BuilderButton.vue";
 import DebugButton from "@/components/page-overlay/DebugButton.vue";
@@ -62,6 +71,7 @@ export default Vue.extend({
     PlusButton,
     BugReportButton,
     PrintButton,
+    AnnouncementsButton,
   },
   async mounted() { },
   data() {

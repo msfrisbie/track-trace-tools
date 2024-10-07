@@ -42,6 +42,7 @@ import PrintTags from "@/components/overlay-widget/tags/PrintTags.vue";
 import TagBuilderListView from "@/components/overlay-widget/tags/TagBuilderListView.vue";
 import TransferBuilder from "@/components/overlay-widget/transfer/TransferBuilder.vue";
 import TransferToolsHelp from "@/components/overlay-widget/transfer/TransferToolsHelp.vue";
+import Announcements from "@/components/page-overlay/Announcements.vue";
 import CheckPermissionsView from "@/components/page-overlay/CheckPermissionsView.vue";
 import GoogleSheetsExport from "@/components/page-overlay/GoogleSheetsExport.vue";
 import ManageAccount from "@/components/page-overlay/ManageAccount.vue";
@@ -105,6 +106,11 @@ const routes: Array<RouteConfig> = [
     redirect: "/transfer/transfer-builder",
     // name: "Transfer Tools",
     // component: TransferBuilderListView
+  },
+  {
+    path: "/announcements",
+    name: "Announcements",
+    component: Announcements,
   },
   {
     path: "/quick-scripts",

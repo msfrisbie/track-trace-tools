@@ -81,10 +81,11 @@ setTimeout(() => {
         "timed out",
         "Setting the value of 'vuex' exceeded the quota",
         "No metrc kendo present",
-        "ResizeObserver loop"
+        "ResizeObserver loop",
+        "insertBefore",
       ]) {
         if (hint && hint?.originalException?.toString().includes(blacklistEntry)) {
-          if (Math.random() > 0.001) {
+          if (Math.random() > 0.0001) {
             return null;
           }
         }
@@ -123,6 +124,7 @@ library.add(
   fontawesomeSolid.faBarcode,
   fontawesomeSolid.faBolt,
   fontawesomeSolid.faBox,
+  fontawesomeSolid.faBell,
   fontawesomeSolid.faBoxOpen,
   fontawesomeSolid.faBoxes,
   fontawesomeSolid.faBug,
