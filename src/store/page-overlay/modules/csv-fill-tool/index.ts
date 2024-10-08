@@ -101,8 +101,12 @@ export const csvFillToolModule = {
           const ngRepeat = ngRepeatSelectors[colIdx];
           const ngModel = ngModelSelectors[colIdx];
 
+          const secondaryAttribute = ngModel.endsWith("FileSystemIds") ? "data-type" : "ng-model";
+
           const inputs = [
-            ...section.querySelectorAll(`[ng-repeat="${ngRepeat}"] [ng-model="${ngModel}"]`),
+            ...section.querySelectorAll(
+              `[ng-repeat="${ngRepeat}"] [${secondaryAttribute}="${ngModel}"]`
+            ),
           ];
 
           for (const input of inputs) {
@@ -190,6 +194,7 @@ export const csvFillToolModule = {
       ctx: ActionContext<ICsvFillToolState, IPluginState>,
       data: {
         file: File;
+        preloadedFiles: File[];
       }
     ) => {
       const modal = activeMetrcModalOrNull();
@@ -277,8 +282,29 @@ export const csvFillToolModule = {
           }
         }
 
-        // Rows are now set, fill this data
+        let requiresTimeout = false;
 
+        for (const [colIdx, cellValue] of dataRow.entries()) {
+          const ngModel = headerRows[1][colIdx];
+
+          if (cellValue.trim() === "") {
+            continue;
+          }
+
+          const secondaryAttribute = ngModel.endsWith("FileSystemIds") ? "data-type" : "ng-model";
+
+          if (secondaryAttribute === "data-type") {
+            requiresTimeout = true;
+            break;
+          }
+        }
+
+        if (requiresTimeout) {
+          // Wait for select buttons to render
+          await new Promise((resolve) => setTimeout(resolve, 500));
+        }
+
+        // Rows are now set, fill this data
         for (const [colIdx, cellValue] of dataRow.entries()) {
           const ngRepeat = headerRows[0][colIdx];
           const ngModel = headerRows[1][colIdx];
@@ -287,10 +313,14 @@ export const csvFillToolModule = {
             continue;
           }
 
-          const els = modal.querySelectorAll(`[ng-repeat="${ngRepeat}"] [ng-model="${ngModel}"]`);
+          const secondaryAttribute = ngModel.endsWith("FileSystemIds") ? "data-type" : "ng-model";
+
+          const els = modal.querySelectorAll(
+            `[ng-repeat="${ngRepeat}"] [${secondaryAttribute}="${ngModel}"]`
+          );
           const el = els[els.length - 1];
 
-          console.log(el.nodeName);
+          console.log(el);
 
           if (el.nodeName === "INPUT") {
             if (el.getAttribute("type") === "checkbox") {
@@ -300,6 +330,39 @@ export const csvFillToolModule = {
               if (shouldBeChecked !== isChecked) {
                 (el as HTMLInputElement).click();
               }
+            } else if (el.getAttribute("data-role") === "upload") {
+              const dataTransfer = new DataTransfer();
+
+              const filenameMatchers: string[] = cellValue
+                .split(",")
+                .map((x) => x.trim().toLocaleLowerCase());
+
+              for (const filenameMatcher of filenameMatchers) {
+                let matched = false;
+                for (const file of data.preloadedFiles) {
+                  if (file.name.toLocaleLowerCase().startsWith(filenameMatcher)) {
+                    dataTransfer.items.add(file);
+                    matched = true;
+                    break;
+                  }
+                }
+                if (!matched) {
+                  toastManager.openToast(
+                    `'${filenameMatcher}' was not matched to a preloaded image, skipping.`,
+                    {
+                      title: "Unmatched image",
+                      autoHideDelay: 5000,
+                      variant: "warning",
+                      appendToast: true,
+                      toaster: "ttt-toaster",
+                      solid: true,
+                    }
+                  );
+                }
+              }
+
+              (el as HTMLInputElement).files = dataTransfer.files;
+              el.dispatchEvent(new Event("change"));
             } else {
               (el as HTMLInputElement).value = cellValue;
               el.dispatchEvent(new Event("input"));

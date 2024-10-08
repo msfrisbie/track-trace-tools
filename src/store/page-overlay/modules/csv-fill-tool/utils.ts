@@ -6,7 +6,10 @@ export function collectInputs(modal: HTMLElement): IModalInput[] {
   const ngModelSet = new Set<string>();
 
   const templateRow = modal.querySelector(".template-row");
-  const inputs = [...modal.querySelectorAll(`[ng-model]`)].filter((x) => {
+  const inputs = [
+    ...modal.querySelectorAll(`[ng-model]`),
+    ...modal.querySelectorAll(`input[data-role="upload"]`),
+  ].filter((x) => {
     if (x.getAttribute("type") === "hidden") {
       return false;
     }
@@ -31,7 +34,7 @@ export function collectInputs(modal: HTMLElement): IModalInput[] {
   });
 
   for (const input of inputs) {
-    const ngModel = input.getAttribute("ng-model")!;
+    const ngModel = (input.getAttribute("ng-model") || input.getAttribute("data-type")) as string;
 
     if (ngModelSet.has(ngModel)) {
       continue;
@@ -76,6 +79,8 @@ export function collectInputs(modal: HTMLElement): IModalInput[] {
         .split(/\s+/)
         .map((x) => x[0].toUpperCase() + x.slice(1))
         .join(" ");
+    } else if (input.getAttribute("data-role") === "upload") {
+      name = input.getAttribute("data-type")!;
     } else {
       // ingredient.FinishDate becomes Ingredient Finish Date
       name = name

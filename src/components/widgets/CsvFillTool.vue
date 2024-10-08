@@ -9,6 +9,11 @@
                 <font-awesome-icon icon="fa-file-export" size="lg"></font-awesome-icon>
                 EXPORT FORM DATA
             </button>
+            <label for="fileInput" class="btn btn-outline-primary mb-0 flex flex-row gap-2 items-center">
+                <font-awesome-icon icon="fa-image" size="lg"></font-awesome-icon>
+                {{ preloadedFiles.length === 0 ? 'PRELOAD IMAGES' : preloadedFiles.length + ' FILES PRELOADED' }}
+            </label>
+            <input class="hidden" type="file" id="fileInput" webkitdirectory multiple @change="handleChange($event)" />
             <label class="btn btn-outline-success mb-0 flex flex-row gap-2 items-center">
                 <font-awesome-icon icon="fa-file-csv" size="lg"></font-awesome-icon>
                 <b-form-file class="hidden" v-model="csvFile" accept=".csv"></b-form-file>
@@ -51,6 +56,8 @@ export default Vue.extend({
     data() {
         return {
             csvFile: null,
+            // name, file object
+            preloadedFiles: []
         };
     },
     methods: {
@@ -59,6 +66,49 @@ export default Vue.extend({
             downloadTemplate: `csvFillTool/${CsvFillToolActions.DOWNLOAD_TEMPLATE}`,
             dumpForm: `csvFillTool/${CsvFillToolActions.DUMP_FORM}`
         }),
+        async handleChange(event: any) {
+            this.$data.preloadedFiles = [];
+
+            const files = event.target.files;
+
+            // console.log({ files });
+
+            // const dataTransfer = new DataTransfer();
+
+            const promises: Promise<any>[] = [];
+
+            // Loop through files and check if they are images
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+
+                if (file.type.startsWith('image/')) {
+                    this.$data.preloadedFiles.push(file);
+                    // promises.push(new Promise((resolve) => {
+                    //     const reader = new FileReader();
+
+                    //     reader.onload = (e) => {
+                    //         this.$data.preloadedFiles.push(file);
+
+                    //         // console.log(`File ${i}:`, e.target?.result); // Log file contents (base64 string)
+
+                    //         // // Add the file to the DataTransfer object
+                    //         // dataTransfer.items.add(file);
+
+                    //         resolve(null);
+                    //     };
+                    //     reader.readAsDataURL(file); // Read file as base64 encoded string
+                    // }));
+                }
+            }
+
+            await Promise.allSettled(promises);
+
+            // @ts-ignore
+            // const el: HTMLInputElement = document.querySelector('[data-type="ProductImageFileSystemIds"]');
+            // el.files = dataTransfer.files;
+
+            // el.dispatchEvent(new Event('change'));
+        }
     },
     async created() { },
     async mounted() {
@@ -82,6 +132,7 @@ export default Vue.extend({
 
                 store.dispatch(`csvFillTool/${CsvFillToolActions.FILL_CSV_INTO_MODAL_FORM}`, {
                     file: newValue,
+                    preloadedFiles: this.$data.preloadedFiles
                 });
             },
         },

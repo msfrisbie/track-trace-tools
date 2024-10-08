@@ -24,10 +24,11 @@ body.demo-mode {
     }
   }
 
-  label.checkbox {
-    color: transparent !important;
-    text-shadow: 0 0 8px rgba(0, 0, 0, 0.4);
-  }
+  // Enable this if you need to blur facility checkboxes
+  // label.checkbox {
+  //   color: transparent !important;
+  //   text-shadow: 0 0 8px rgba(0, 0, 0, 0.4);
+  // }
 
   div#footer {
     display: none;

@@ -172,6 +172,7 @@ library.add(
   fontawesomeSolid.faFlask,
   fontawesomeSolid.faHistory,
   fontawesomeSolid.faHome,
+  fontawesomeSolid.faImage,
   fontawesomeSolid.faInfo,
   fontawesomeSolid.faInfoCircle,
   fontawesomeSolid.faJoint,

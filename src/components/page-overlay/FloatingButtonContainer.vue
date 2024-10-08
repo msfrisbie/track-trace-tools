@@ -25,7 +25,7 @@
         </div>
       </div>
 
-      <div v-if="!t3plus" class="relative">
+      <div v-if="!hasPlus" class="relative">
         <plus-button class="floating-shadow" />
       </div>
 
@@ -56,6 +56,7 @@ import ScrollButton from "@/components/page-overlay/ScrollButton.vue";
 import SearchButton from "@/components/page-overlay/SearchButton.vue";
 import { IPluginState } from "@/interfaces";
 import store from "@/store/page-overlay/index";
+import { hasPlusImpl } from "@/utils/plus";
 import Vue from "vue";
 import { mapState } from "vuex";
 
@@ -87,6 +88,9 @@ export default Vue.extend({
       notificationCount: (state: IPluginState) => state.announcements.notificationCount,
       metrcTableState: (state: IPluginState) => state.metrcTable,
     }),
+    hasPlus(): boolean {
+      return hasPlusImpl();
+    },
   },
   methods: {},
   watch: {},
