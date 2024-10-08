@@ -28,7 +28,7 @@ export default Vue.extend({
     this.$data.facilityUsesLocationForPackages =
       await dynamicConstsManager.facilityUsesLocationForPackages();
   },
-  async created() { },
+  async created() {},
   computed: {
     ...mapState<IPluginState>({
       authState: (state: IPluginState) => state.pluginAuth.authState,
@@ -45,7 +45,7 @@ export default Vue.extend({
           isBeta: false,
           isNew: false,
           enabled: true,
-          visible: false,
+          visible: true,
           isPlus: true,
           showDisabledMessage: false,
         },
