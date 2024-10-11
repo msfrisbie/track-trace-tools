@@ -349,7 +349,7 @@ export enum BuilderType {
   UPDATE_TRANSFER = "UPDATE_TRANSFER",
   CSV_CREATE_PACKAGE = "CSV_CREATE_PACKAGE",
   ASSIGN_LAB_COA = "ASSIGN_LAB_COA",
-  CHANGE_PLANTS_GROWTH_PHASE = "CHANGE_PLANTS_GROWTH_PHASE"
+  CHANGE_PLANTS_GROWTH_PHASE = "CHANGE_PLANTS_GROWTH_PHASE",
 }
 
 export enum BackgroundTaskState {
@@ -360,7 +360,7 @@ export enum BackgroundTaskState {
 }
 
 const DATA_LOAD_MAX_PAGES: number = 1;
-export const SEARCH_LOAD_PAGE_SIZE: number = 500;
+export const SEARCH_LOAD_PAGE_SIZE: number = 10;
 export const DATA_LOAD_PAGE_SIZE: number = 5000;
 export const DATA_LOAD_MAX_COUNT: number = DATA_LOAD_PAGE_SIZE * DATA_LOAD_MAX_PAGES;
 export const DATA_LOAD_MAX_ITERATION_FAILSAFE: number = 100;
