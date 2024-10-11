@@ -71,56 +71,22 @@ export default Vue.extend({
 
             const files = event.target.files;
 
-            // console.log({ files });
-
-            // const dataTransfer = new DataTransfer();
-
             const promises: Promise<any>[] = [];
 
             // Loop through files and check if they are images
             for (let i = 0; i < files.length; i++) {
                 const file = files[i];
 
-                if (file.type.startsWith('image/')) {
+                if (file.type.startsWith('image/') || file.type === 'application/pdf') {
                     this.$data.preloadedFiles.push(file);
-                    // promises.push(new Promise((resolve) => {
-                    //     const reader = new FileReader();
-
-                    //     reader.onload = (e) => {
-                    //         this.$data.preloadedFiles.push(file);
-
-                    //         // console.log(`File ${i}:`, e.target?.result); // Log file contents (base64 string)
-
-                    //         // // Add the file to the DataTransfer object
-                    //         // dataTransfer.items.add(file);
-
-                    //         resolve(null);
-                    //     };
-                    //     reader.readAsDataURL(file); // Read file as base64 encoded string
-                    // }));
                 }
             }
 
             await Promise.allSettled(promises);
-
-            // @ts-ignore
-            // const el: HTMLInputElement = document.querySelector('[data-type="ProductImageFileSystemIds"]');
-            // el.files = dataTransfer.files;
-
-            // el.dispatchEvent(new Event('change'));
         }
     },
     async created() { },
     async mounted() {
-        // const modal = activeMetrcModalOrNull();
-
-        // if (!modal) {
-        //     return;
-        // }
-
-        // const debouncedHandler = _.debounce(() => store.dispatch(`csvFillTool/${CsvFillToolActions.ANALYZE}`, { modal }), 100);
-        // const observer = new MutationObserver(() => debouncedHandler());
-        // observer.observe(modal, { subtree: true, childList: true });
     },
     watch: {
         csvFile: {
