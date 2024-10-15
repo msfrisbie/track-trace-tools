@@ -46,12 +46,14 @@ export const searchModule = {
     },
     [SearchMutations.PUSH_SEARCH_RESULTS](
       state: ISearchState,
-      { newSearchResults, searchId }: { newSearchResults: ISearchResult[], searchId: string }
+      { newSearchResults, searchId }: { newSearchResults: ISearchResult[]; searchId: string }
     ) {
       // If this search did not come from the current queryString, discard
       // if (state.queryString !== searchId) {
       //   return;
       // }
+
+      console.log({ newSearchResults });
 
       state.searchResults = [...newSearchResults, ...state.searchResults].sort(
         (a, b) => b.score - a.score
@@ -169,68 +171,90 @@ export const searchModule = {
           await Promise.allSettled([
             primaryDataLoader.onDemandActivePackageSearch({ queryString }).then((result) => {
               console.log({ result });
-              const newSearchResults: ISearchResult[] = result.map((pkg) => generateSearchResultMetadata(queryString, {
-                pkg,
-              }));
+
+              const newSearchResults: ISearchResult[] = result.map((pkg) =>
+                generateSearchResultMetadata(queryString, {
+                  pkg,
+                })
+              );
 
               console.log({ newSearchResults });
 
               ctx.commit(SearchMutations.PUSH_SEARCH_RESULTS, {
-                searchId, newSearchResults,
+                searchId,
+                newSearchResults,
               });
             }),
             primaryDataLoader.onDemandInTransitPackageSearch({ queryString }).then((result) => {
-              const newSearchResults: ISearchResult[] = result.map((pkg) => generateSearchResultMetadata(queryString, {
-                pkg,
-              }));
+              const newSearchResults: ISearchResult[] = result.map((pkg) =>
+                generateSearchResultMetadata(queryString, {
+                  pkg,
+                })
+              );
 
               ctx.commit(SearchMutations.PUSH_SEARCH_RESULTS, {
-                searchId, newSearchResults,
+                searchId,
+                newSearchResults,
               });
             }),
             primaryDataLoader.onDemandInactivePackageSearch({ queryString }).then((result) => {
-              const newSearchResults: ISearchResult[] = result.map((pkg) => generateSearchResultMetadata(queryString, {
-                pkg,
-              }));
+              const newSearchResults: ISearchResult[] = result.map((pkg) =>
+                generateSearchResultMetadata(queryString, {
+                  pkg,
+                })
+              );
 
               ctx.commit(SearchMutations.PUSH_SEARCH_RESULTS, {
-                searchId, newSearchResults,
+                searchId,
+                newSearchResults,
               });
             }),
             primaryDataLoader.onDemandTransferredPackageSearch({ queryString }).then((result) => {
-              const newSearchResults: ISearchResult[] = result.map((transferPkg) => generateSearchResultMetadata(queryString, {
-                transferPkg,
-              }));
+              const newSearchResults: ISearchResult[] = result.map((transferPkg) =>
+                generateSearchResultMetadata(queryString, {
+                  transferPkg,
+                })
+              );
 
               ctx.commit(SearchMutations.PUSH_SEARCH_RESULTS, {
-                searchId, newSearchResults,
+                searchId,
+                newSearchResults,
               });
             }),
             primaryDataLoader.onDemandFloweringPlantSearch({ queryString }).then((result) => {
-              const newSearchResults: ISearchResult[] = result.map((plant) => generateSearchResultMetadata(queryString, {
-                plant,
-              }));
+              const newSearchResults: ISearchResult[] = result.map((plant) =>
+                generateSearchResultMetadata(queryString, {
+                  plant,
+                })
+              );
 
               ctx.commit(SearchMutations.PUSH_SEARCH_RESULTS, {
-                searchId, newSearchResults,
+                searchId,
+                newSearchResults,
               });
             }),
             primaryDataLoader.onDemandVegetativePlantSearch({ queryString }).then((result) => {
-              const newSearchResults: ISearchResult[] = result.map((plant) => generateSearchResultMetadata(queryString, {
-                plant,
-              }));
+              const newSearchResults: ISearchResult[] = result.map((plant) =>
+                generateSearchResultMetadata(queryString, {
+                  plant,
+                })
+              );
 
               ctx.commit(SearchMutations.PUSH_SEARCH_RESULTS, {
-                searchId, newSearchResults,
+                searchId,
+                newSearchResults,
               });
             }),
             primaryDataLoader.onDemandInactivePlantSearch({ queryString }).then((result) => {
-              const newSearchResults: ISearchResult[] = result.map((plant) => generateSearchResultMetadata(queryString, {
-                plant,
-              }));
+              const newSearchResults: ISearchResult[] = result.map((plant) =>
+                generateSearchResultMetadata(queryString, {
+                  plant,
+                })
+              );
 
               ctx.commit(SearchMutations.PUSH_SEARCH_RESULTS, {
-                searchId, newSearchResults,
+                searchId,
+                newSearchResults,
               });
             }),
             primaryDataLoader
@@ -239,12 +263,15 @@ export const searchModule = {
                 queryString,
               })
               .then((result) => {
-                const newSearchResults: ISearchResult[] = result.map((incomingTransfer) => generateSearchResultMetadata(queryString, {
-                  incomingTransfer,
-                }));
+                const newSearchResults: ISearchResult[] = result.map((incomingTransfer) =>
+                  generateSearchResultMetadata(queryString, {
+                    incomingTransfer,
+                  })
+                );
 
                 ctx.commit(SearchMutations.PUSH_SEARCH_RESULTS, {
-                  searchId, newSearchResults,
+                  searchId,
+                  newSearchResults,
                 });
               }),
             primaryDataLoader
@@ -253,12 +280,15 @@ export const searchModule = {
                 queryString,
               })
               .then((result) => {
-                const newSearchResults: ISearchResult[] = result.map((incomingTransfer) => generateSearchResultMetadata(queryString, {
-                  incomingTransfer,
-                }));
+                const newSearchResults: ISearchResult[] = result.map((incomingTransfer) =>
+                  generateSearchResultMetadata(queryString, {
+                    incomingTransfer,
+                  })
+                );
 
                 ctx.commit(SearchMutations.PUSH_SEARCH_RESULTS, {
-                  searchId, newSearchResults,
+                  searchId,
+                  newSearchResults,
                 });
               }),
             primaryDataLoader
@@ -267,12 +297,15 @@ export const searchModule = {
                 queryString,
               })
               .then((result) => {
-                const newSearchResults: ISearchResult[] = result.map((outgoingTransfer) => generateSearchResultMetadata(queryString, {
-                  outgoingTransfer,
-                }));
+                const newSearchResults: ISearchResult[] = result.map((outgoingTransfer) =>
+                  generateSearchResultMetadata(queryString, {
+                    outgoingTransfer,
+                  })
+                );
 
                 ctx.commit(SearchMutations.PUSH_SEARCH_RESULTS, {
-                  searchId, newSearchResults,
+                  searchId,
+                  newSearchResults,
                 });
               }),
             primaryDataLoader
@@ -281,12 +314,15 @@ export const searchModule = {
                 queryString,
               })
               .then((result) => {
-                const newSearchResults: ISearchResult[] = result.map((outgoingTransfer) => generateSearchResultMetadata(queryString, {
-                  outgoingTransfer,
-                }));
+                const newSearchResults: ISearchResult[] = result.map((outgoingTransfer) =>
+                  generateSearchResultMetadata(queryString, {
+                    outgoingTransfer,
+                  })
+                );
 
                 ctx.commit(SearchMutations.PUSH_SEARCH_RESULTS, {
-                  searchId, newSearchResults,
+                  searchId,
+                  newSearchResults,
                 });
               }),
             primaryDataLoader
@@ -295,70 +331,88 @@ export const searchModule = {
                 queryString,
               })
               .then((result) => {
-                const newSearchResults: ISearchResult[] = result.map((outgoingTransfer) => generateSearchResultMetadata(queryString, {
-                  outgoingTransfer,
-                }));
+                const newSearchResults: ISearchResult[] = result.map((outgoingTransfer) =>
+                  generateSearchResultMetadata(queryString, {
+                    outgoingTransfer,
+                  })
+                );
 
                 ctx.commit(SearchMutations.PUSH_SEARCH_RESULTS, {
-                  searchId, newSearchResults,
+                  searchId,
+                  newSearchResults,
                 });
               }),
             primaryDataLoader
               .onDemandTagSearch({ queryString, tagState: TagState.AVAILABLE })
               .then((result) => {
-                const newSearchResults: ISearchResult[] = result.map((tag) => generateSearchResultMetadata(queryString, {
-                  tag,
-                }));
+                const newSearchResults: ISearchResult[] = result.map((tag) =>
+                  generateSearchResultMetadata(queryString, {
+                    tag,
+                  })
+                );
 
                 ctx.commit(SearchMutations.PUSH_SEARCH_RESULTS, {
-                  searchId, newSearchResults,
+                  searchId,
+                  newSearchResults,
                 });
               }),
             primaryDataLoader
               .onDemandTagSearch({ queryString, tagState: TagState.USED })
               .then((result) => {
-                const newSearchResults: ISearchResult[] = result.map((tag) => generateSearchResultMetadata(queryString, {
-                  tag,
-                }));
+                const newSearchResults: ISearchResult[] = result.map((tag) =>
+                  generateSearchResultMetadata(queryString, {
+                    tag,
+                  })
+                );
 
                 ctx.commit(SearchMutations.PUSH_SEARCH_RESULTS, {
-                  searchId, newSearchResults,
+                  searchId,
+                  newSearchResults,
                 });
               }),
             primaryDataLoader
               .onDemandTagSearch({ queryString, tagState: TagState.VOIDED })
               .then((result) => {
-                const newSearchResults: ISearchResult[] = result.map((tag) => generateSearchResultMetadata(queryString, {
-                  tag,
-                }));
+                const newSearchResults: ISearchResult[] = result.map((tag) =>
+                  generateSearchResultMetadata(queryString, {
+                    tag,
+                  })
+                );
 
                 ctx.commit(SearchMutations.PUSH_SEARCH_RESULTS, {
-                  searchId, newSearchResults,
+                  searchId,
+                  newSearchResults,
                 });
               }),
             primaryDataLoader
               .onDemandHarvestSearch({ queryString, harvestState: HarvestState.ACTIVE })
               .then((result) => {
-                const newSearchResults: ISearchResult[] = result.map((harvest) => generateSearchResultMetadata(queryString, {
-                  harvest,
-                }));
+                const newSearchResults: ISearchResult[] = result.map((harvest) =>
+                  generateSearchResultMetadata(queryString, {
+                    harvest,
+                  })
+                );
 
                 ctx.commit(SearchMutations.PUSH_SEARCH_RESULTS, {
-                  searchId, newSearchResults,
+                  searchId,
+                  newSearchResults,
                 });
               }),
             primaryDataLoader
               .onDemandHarvestSearch({ queryString, harvestState: HarvestState.INACTIVE })
               .then((result) => {
-                const newSearchResults: ISearchResult[] = result.map((harvest) => generateSearchResultMetadata(queryString, {
-                  harvest,
-                }));
+                const newSearchResults: ISearchResult[] = result.map((harvest) =>
+                  generateSearchResultMetadata(queryString, {
+                    harvest,
+                  })
+                );
 
                 ctx.commit(SearchMutations.PUSH_SEARCH_RESULTS, {
-                  searchId, newSearchResults,
+                  searchId,
+                  newSearchResults,
                 });
               }),
-              // TODO load sales
+            // TODO load sales
           ]);
 
           // TODO handle what happens when some searches fail

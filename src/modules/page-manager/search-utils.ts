@@ -29,31 +29,33 @@ export function extractMatchedFields(
   queryString: string,
   o: { [key: string]: any }
 ): { field: string; value: string }[] {
-  console.log({ o });
-
   const normalizedQueryString = queryString.toLocaleLowerCase();
 
   const matchedFields: { field: string; value: string }[] = [];
+
+  if (!o) {
+    return matchedFields; // return an empty array if the object is null or undefined
+  }
 
   for (const [k, v] of Object.entries(o)) {
     if (IGNORE_FIELDS.has(k)) {
       continue;
     }
 
-    if (typeof v === "object") {
-      matchedFields.concat(
+    if (typeof v === "object" && v !== null) {
+      matchedFields.push(
         ...extractMatchedFields(queryString, v).map((x) => ({
           ...x,
-          field: [k, x.field].join("."),
+          field: `${k}.${x.field}`,
         }))
       );
       continue;
     }
 
-    if (v.toLocaleLowerCase().includes(normalizedQueryString)) {
+    if (typeof v === "string" && v.toLocaleLowerCase().includes(normalizedQueryString)) {
       matchedFields.push({
         field: k,
-        value: v.toString(),
+        value: v,
       });
     }
   }
@@ -288,7 +290,11 @@ export function generateSearchResultMetadata(
     primaryTextualIdentifier = partialResult.strain.Name;
     primaryTextualDescriptor = "Strain";
     isActive = true;
-  } // else if (partialResult.salesReceipt) {
+  } else {
+    console.error("no match");
+    throw new Error("Unable to match datatype for partial result");
+  }
+  // else if (partialResult.salesReceipt) {
   //   switch (partialResult.salesReceipt.SalesReceiptState) {
 
   //   }
@@ -312,8 +318,10 @@ export function generateSearchResultMetadata(
     isActive,
   };
 
-  TODO;
-  console.log({ result });
+  console.log(">>>>>>>>>>> TODO");
+  // TODO
+
+  console.log("generate result", { result });
 
   return result;
 }

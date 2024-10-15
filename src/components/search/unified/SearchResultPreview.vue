@@ -1,19 +1,10 @@
 <template>
-  <div
-    class="flex flex-row gap-2 p-1"
-    v-bind:class="{
-      'bg-white': searchState.activeSearchResult === searchResult,
-    }"
-    @mouseenter="selectSearchResult({ searchResult })"
-  >
+  <div class="flex flex-row gap-2 p-1 cursor-pointer hover:bg-purple-200" v-bind:class="{
+    'bg-white': searchState.activeSearchResult === searchResult,
+  }" @click="selectSearchResult({ searchResult })">
     <div class="flex flex-col justify-center gap-1 items-center text-center w-20 text-sm">
-      <complex-icon
-        class="ttt-purple"
-        :primaryIconName="searchResult.primaryIconName"
-        primaryIconSize="xl"
-        :secondaryIconName="searchResult.secondaryIconName"
-        secondaryIconSize="sm"
-      ></complex-icon>
+      <complex-icon class="ttt-purple" :primaryIconName="searchResult.primaryIconName" primaryIconSize="xl"
+        :secondaryIconName="searchResult.secondaryIconName" secondaryIconSize="sm"></complex-icon>
 
       <div>
         {{ searchResult.primaryTextualDescriptor }}
@@ -71,12 +62,12 @@ export default Vue.extend({
       selectSearchResult: `search/${SearchActions.SELECT_SEARCH_RESULT}`,
     }),
   },
-  async created() {},
-  async mounted() {},
+  async created() { },
+  async mounted() { },
   watch: {
     foobar: {
       immediate: true,
-      handler(newValue, oldValue) {},
+      handler(newValue, oldValue) { },
     },
   },
 });

@@ -1,7 +1,6 @@
 <template>
   <fragment>
-    <b-button size="sm" variant="outline-primary" @click.stop.prevent="transferPackage()"
-      :disabled="!hasPlus">
+    <b-button size="sm" variant="outline-primary" @click.stop.prevent="transferPackage()" :disabled="!hasPlus">
       <div class="w-full grid grid-cols-3 gap-2" style="grid-template-columns: 2rem 1fr auto">
         <div class="aspect-square grid place-items-center">
           <font-awesome-icon icon="truck" />
@@ -13,14 +12,12 @@
           <b-badge variant="primary">T3+</b-badge>
         </div>
       </div>
-    </b-button> -->
+    </b-button>
 
-    <b-button
-      v-if="clientState.values.ENABLE_PACKAGE_HISTORY && pkg.PackageState !== PackageState.TRANSFERRED"
-      size="sm"
-      variant="outline-primary"
-      @click.stop.prevent="setPackageHistorySourcePackage({ pkg }) && openPackageHistoryBuilder()"
-      ><div class="w-full grid grid-cols-3 gap-2" style="grid-template-columns: 2rem 1fr auto">
+    <b-button v-if="clientState.values.ENABLE_PACKAGE_HISTORY && pkg.PackageState !== PackageState.TRANSFERRED"
+      size="sm" variant="outline-primary"
+      @click.stop.prevent="setPackageHistorySourcePackage({ pkg }) && openPackageHistoryBuilder()">
+      <div class="w-full grid grid-cols-3 gap-2" style="grid-template-columns: 2rem 1fr auto">
         <div class="aspect-square grid place-items-center">
           <font-awesome-icon icon="sitemap" />
         </div>
@@ -46,8 +43,8 @@
     </b-button> -->
 
     <b-button size="sm" variant="outline-primary" :disabled="!hasPlus" @click.stop.prevent="
-        setExplorerData({ packageLabel: getLabelOrError(pkg) }) && openMetrcExplorer()
-        ">
+      setExplorerData({ packageLabel: getLabelOrError(pkg) }) && openMetrcExplorer()
+      ">
       <div class="w-full grid grid-cols-3 gap-2" style="grid-template-columns: 2rem 1fr auto">
         <div class="aspect-square grid place-items-center">
           <font-awesome-icon icon="sitemap" />
@@ -61,8 +58,7 @@
     </b-button>
 
     <template v-if="isPackageEligibleForSplit">
-      <b-button size="sm" variant="outline-primary" @click.stop.prevent="splitPackage()"
-        :disabled="!hasPlus">
+      <b-button size="sm" variant="outline-primary" @click.stop.prevent="splitPackage()" :disabled="!hasPlus">
         <div class="w-full grid grid-cols-3 gap-2" style="grid-template-columns: 2rem 1fr auto">
           <div class="aspect-square grid place-items-center">
             <font-awesome-icon icon="expand-alt" />
