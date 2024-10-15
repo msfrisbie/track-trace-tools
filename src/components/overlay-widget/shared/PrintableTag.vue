@@ -1,6 +1,8 @@
 <template>
-  <div class="flex flex-row items-stretch rounded overflow-hidden" style="border: 1px dashed gray">
+  <div class="flex flex-row items-stretch">
     <div class="flex flex-col items-center p-2">
+      <div v-if="title && title.length">{{ title }}</div>
+      <div v-if="subtitle && subtitle.length">{{ subtitle }}</div>
       <canvas :id="`barcode-${label}`"></canvas>
       <div>{{ label }}</div>
     </div>
@@ -20,7 +22,8 @@ export default Vue.extend({
   router,
   props: {
     label: String,
-    sideText: String,
+    title: String,
+    subtitle: String,
   },
   components: {
   },

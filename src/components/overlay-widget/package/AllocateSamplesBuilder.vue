@@ -23,7 +23,7 @@
             <div class="grid grid-cols-3 gap-2">
               <b-button class="col-span-2" variant="primary" @click="allocateSamples()"
                 :disabled="!enableAllocation">SUGGEST&nbsp;SAMPLES</b-button>
-              <b-form-select v-model="daysInRange" :options="[0, 30, 60, 90, 120].map((x) => ({
+              <b-form-select v-model="daysInRange" :options="[0, 7, 30, 60, 90, 180, 365].map((x) => ({
         value: x,
         text: x === 0 ? 'today' : `past ${x} days`,
       }))

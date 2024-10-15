@@ -81,9 +81,11 @@ setTimeout(() => {
         "timed out",
         "Setting the value of 'vuex' exceeded the quota",
         "No metrc kendo present",
+        "ResizeObserver loop",
+        "insertBefore",
       ]) {
         if (hint && hint?.originalException?.toString().includes(blacklistEntry)) {
-          if (Math.random() > 0.001) {
+          if (Math.random() > 0.0001) {
             return null;
           }
         }
@@ -122,6 +124,7 @@ library.add(
   fontawesomeSolid.faBarcode,
   fontawesomeSolid.faBolt,
   fontawesomeSolid.faBox,
+  fontawesomeSolid.faBell,
   fontawesomeSolid.faBoxOpen,
   fontawesomeSolid.faBoxes,
   fontawesomeSolid.faBug,
@@ -148,6 +151,7 @@ library.add(
   fontawesomeSolid.faCut,
   fontawesomeSolid.faDirections,
   fontawesomeSolid.faDollarSign,
+  fontawesomeSolid.faDownload,
   fontawesomeSolid.faEdit,
   fontawesomeSolid.faEllipsisV,
   fontawesomeSolid.faExchangeAlt,
@@ -164,11 +168,13 @@ library.add(
   fontawesomeSolid.faFileDownload,
   fontawesomeSolid.faFileExcel,
   fontawesomeSolid.faFileInvoiceDollar,
+  fontawesomeSolid.faFileExport,
   fontawesomeSolid.faFilePdf,
   fontawesomeSolid.faFilter,
   fontawesomeSolid.faFlask,
   fontawesomeSolid.faHistory,
   fontawesomeSolid.faHome,
+  fontawesomeSolid.faImage,
   fontawesomeSolid.faInfo,
   fontawesomeSolid.faInfoCircle,
   fontawesomeSolid.faJoint,
@@ -232,11 +238,14 @@ export default Vue.extend({
     sandboxManager.init();
     await sandboxManager.runsBeforeModuleInit();
 
+    // This module has async initialization
+    await t3RequestManager.init();
+
     // Initialize modules that are not dependent on auth state
+    // And do not require in-order initialization
     clientBuildManager.init();
     expiringCacheManager.init();
     primaryMetrcRequestManager.init();
-    t3RequestManager.init();
     credentialManager.init();
     mockDataManager.init();
     toastManager.init();

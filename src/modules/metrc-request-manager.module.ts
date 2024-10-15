@@ -55,10 +55,10 @@ const INCOMING_INACTIVE_TRANSFERS_URL = `${origin({
 })}/api/transfers/incoming?slt=Licensed&active=False`;
 const OUTGOING_TRANSFERS_URL = `${origin({
   divertToNullOrigin: false,
-})}/api/transfers/outgoing?slt=Licensed&active=True`;
+})}/api/transfers/outgoing?slt=Licensed&activeOnly=True`;
 const OUTGOING_INACTIVE_TRANSFERS_URL = `${origin({
   divertToNullOrigin: false,
-})}/api/transfers/outgoing?slt=Licensed&active=False`;
+})}/api/transfers/outgoing/inactive?slt=Licensed`;
 const REJECTED_TRANSFERS_URL = `${origin({ divertToNullOrigin: false })}/api/transfers/rejected`;
 const LAYOVER_TRANSFERS_URL = `${origin({ divertToNullOrigin: false })}/api/transfers/layovers`;
 
@@ -112,6 +112,7 @@ const CREATE_TRANSFERS_URL = `${origin()}/api/transfers/create`;
 const UPDATE_TRANSFERS_URL = `${origin()}/api/transfers/update`;
 const UPLOAD_LAB_DOCUMENT_URL = `${origin()}/api/file/system/add/labtest/result/document`;
 const ADD_LABTEST_DOCUMENT_TO_RESULT_URL = `${origin()}/api/labtests/upload/document`;
+const CHANGE_PLANTS_GROWTH_PHASE_URL = `${origin()}/api/plants/change/growthphases`;
 
 // DATAIMPORT
 const DATAIMPORT_MOVE_PLANTS_URL = `${origin()}/api/dataimport/plants/change/locations`;
@@ -1290,6 +1291,17 @@ export class MetrcRequestManager implements IAtomicService {
     });
   }
 
+  async changePlantsGrowthPhase(body: string) {
+    return customAxios(CHANGE_PLANTS_GROWTH_PHASE_URL, {
+      ...DEFAULT_FETCH_POST_WRITE_OPTIONS,
+      headers: {
+        ...(await buildAuthenticationHeaders(this.authStateOrError)),
+        ...JSON_HEADERS,
+      },
+      body,
+    });
+  }
+
   async assignLabDocument(body: string) {
     return customAxios(ADD_LABTEST_DOCUMENT_TO_RESULT_URL, {
       ...DEFAULT_FETCH_POST_WRITE_OPTIONS,
@@ -1332,13 +1344,16 @@ export class MetrcRequestManager implements IAtomicService {
   }
 
   async getDestroyPlantBatchesHTML() {
-    return customAxios(await buildDynamicUrl(this.authStateOrError, UrlType.DESTROY_PLANT_BATCHES_MODAL), {
-      ...DEFAULT_FETCH_GET_OPTIONS,
-      headers: {
-        ...(await buildAuthenticationHeaders(this.authStateOrError)),
-        Accept: "text/html, */*; q=0.01",
-      },
-    });
+    return customAxios(
+      await buildDynamicUrl(this.authStateOrError, UrlType.DESTROY_PLANT_BATCHES_MODAL),
+      {
+        ...DEFAULT_FETCH_GET_OPTIONS,
+        headers: {
+          ...(await buildAuthenticationHeaders(this.authStateOrError)),
+          Accept: "text/html, */*; q=0.01",
+        },
+      }
+    );
   }
 
   async getNewItemHTML() {

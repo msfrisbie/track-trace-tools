@@ -4,6 +4,7 @@ import UnavailablePage from "@/components/overlay-widget/UnavailablePage.vue";
 import AdminListView from "@/components/overlay-widget/admin/AdminListView.vue";
 import LayoutSandbox from "@/components/overlay-widget/admin/LayoutSandbox.vue";
 import PickerSandbox from "@/components/overlay-widget/admin/PickerSandbox.vue";
+import ChangeGrowthPhaseBuilder from "@/components/overlay-widget/cultivation/ChangeGrowthPhaseBuilder.vue";
 import CultivatorBuilderListView from "@/components/overlay-widget/cultivation/CultivatorBuilderListView.vue";
 import CultivatorToolsHelp from "@/components/overlay-widget/cultivation/CultivatorToolsHelp.vue";
 import DestroyPlantBatchesBuilder from "@/components/overlay-widget/cultivation/DestroyPlantBatchesBuilder.vue";
@@ -13,8 +14,8 @@ import ManicureBuilder from "@/components/overlay-widget/cultivation/ManicureBui
 import MotherBuilderList from "@/components/overlay-widget/cultivation/MotherBuilderList.vue";
 import MotherPlantBatchPackageBuilder from "@/components/overlay-widget/cultivation/MotherPlantBatchPackageBuilder.vue";
 import MotherPlantPackageBuilder from "@/components/overlay-widget/cultivation/MotherPlantPackageBuilder.vue";
-import MovePlantsBuilder from "@/components/overlay-widget/cultivation/MovePlantsBuilder.vue";
 import MovePlantBatchesBuilder from "@/components/overlay-widget/cultivation/MovePlantBatchesBuilder.vue";
+import MovePlantsBuilder from "@/components/overlay-widget/cultivation/MovePlantsBuilder.vue";
 import PackImmaturePlantsBuilder from "@/components/overlay-widget/cultivation/PackImmaturePlantsBuilder.vue";
 import PromoteImmaturePlantsBuilder from "@/components/overlay-widget/cultivation/PromoteImmaturePlantsBuilder.vue";
 import ReplacePlantBatchTagsBuilder from "@/components/overlay-widget/cultivation/ReplacePlantBatchTagsBuilder.vue";
@@ -37,8 +38,11 @@ import PackageBuilderListView from "@/components/overlay-widget/package/PackageB
 import PackageHistory from "@/components/overlay-widget/package/PackageHistory.vue";
 import PackageToolsHelp from "@/components/overlay-widget/package/PackageToolsHelp.vue";
 import SplitPackageBuilder from "@/components/overlay-widget/package/SplitPackageBuilder.vue";
+import PrintTags from "@/components/overlay-widget/tags/PrintTags.vue";
+import TagBuilderListView from "@/components/overlay-widget/tags/TagBuilderListView.vue";
 import TransferBuilder from "@/components/overlay-widget/transfer/TransferBuilder.vue";
 import TransferToolsHelp from "@/components/overlay-widget/transfer/TransferToolsHelp.vue";
+import Announcements from "@/components/page-overlay/Announcements.vue";
 import CheckPermissionsView from "@/components/page-overlay/CheckPermissionsView.vue";
 import GoogleSheetsExport from "@/components/page-overlay/GoogleSheetsExport.vue";
 import ManageAccount from "@/components/page-overlay/ManageAccount.vue";
@@ -46,8 +50,6 @@ import QuickScripts from "@/components/page-overlay/QuickScripts.vue";
 import FinalizeSalesReceiptsForm from "@/components/page-overlay/forms/FinalizeSalesReceiptsForm.vue";
 import SettingsForm from "@/components/page-overlay/forms/SettingsForm.vue";
 import VoidTagForm from "@/components/page-overlay/forms/VoidTagForm.vue";
-import PrintTags from "@/components/overlay-widget/tags/PrintTags.vue";
-import TagBuilderListView from "@/components/overlay-widget/tags/TagBuilderListView.vue";
 import VueRouter, { RouteConfig } from "vue-router";
 
 const routes: Array<RouteConfig> = [
@@ -104,6 +106,11 @@ const routes: Array<RouteConfig> = [
     redirect: "/transfer/transfer-builder",
     // name: "Transfer Tools",
     // component: TransferBuilderListView
+  },
+  {
+    path: "/announcements",
+    name: "Announcements",
+    component: Announcements,
   },
   {
     path: "/quick-scripts",
@@ -174,6 +181,11 @@ const routes: Array<RouteConfig> = [
     path: "/cultivator/destroy-plants",
     name: "Destroy Plants",
     component: DestroyPlantsBuilder,
+  },
+  {
+    path: "/cultivator/change-plants-growth-phase",
+    name: "Change Plants Growth Phase",
+    component: ChangeGrowthPhaseBuilder,
   },
   {
     path: "/cultivator/destroy-plant-batches",

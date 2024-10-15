@@ -1,11 +1,8 @@
 <template>
   <fragment>
-    <!-- <b-button
-      size="sm"
-      variant="outline-primary"
-      @click.stop.prevent="transferPackage()"
-      :disabled="!hasPlus && !clientState.flags.enable_t3plus_free_tools"
-      ><div class="w-full grid grid-cols-3 gap-2" style="grid-template-columns: 2rem 1fr auto">
+    <b-button size="sm" variant="outline-primary" @click.stop.prevent="transferPackage()"
+      :disabled="!hasPlus">
+      <div class="w-full grid grid-cols-3 gap-2" style="grid-template-columns: 2rem 1fr auto">
         <div class="aspect-square grid place-items-center">
           <font-awesome-icon icon="truck" />
         </div>
@@ -65,7 +62,7 @@
 
     <template v-if="isPackageEligibleForSplit">
       <b-button size="sm" variant="outline-primary" @click.stop.prevent="splitPackage()"
-        :disabled="!hasPlus && !clientState.flags.enable_t3plus_free_tools">
+        :disabled="!hasPlus">
         <div class="w-full grid grid-cols-3 gap-2" style="grid-template-columns: 2rem 1fr auto">
           <div class="aspect-square grid place-items-center">
             <font-awesome-icon icon="expand-alt" />

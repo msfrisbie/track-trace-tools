@@ -60,6 +60,7 @@ export interface ISettingsState {
   disableAutoRefreshOnModalClose: boolean;
   useLegacyDateFormatForSubmit: boolean;
   writeSettingsToChromeStorage: boolean;
+  enableSameItemPatch: boolean;
   loadDataInParallel: boolean;
   usePersistedCache: boolean;
   persistTimestamp: number;

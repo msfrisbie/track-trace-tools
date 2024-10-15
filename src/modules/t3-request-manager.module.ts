@@ -1,8 +1,10 @@
+import { ChromeStorageKeys } from "@/consts";
 import { IAtomicService, IXlsxFile } from "@/interfaces";
 import { IAnnouncementData } from "@/store/page-overlay/modules/announcements/interfaces";
 import { ILabelData } from "@/store/page-overlay/modules/label-print/interfaces";
 import { AxiosError } from "axios";
 import { authManager } from "./auth-manager.module";
+import { facilityManager } from "./facility-manager.module";
 import { customAxios } from "./fetch-manager.module";
 
 // const BASE_URL = isDevelopment() ? "http://127.0.0.1:5000/" : "https://api.trackandtrace.tools/";
@@ -20,6 +22,9 @@ const DOWNLOAD_REPORT_PATH = "reports/download";
 const EMAIL_REPORT_PATH = "reports/email";
 const STORE_LABEL_DATA_LIST_PATH = "file/label-data";
 const RENDER_LABEL_PDF = "file/labels";
+const SESSION_AUTH_PATH = "v2/auth/session";
+const AUTH_CHECK_PATH = "v2/auth/check";
+const TOKEN_REFRESH_PATH = "v2/auth/refresh";
 
 const DEFAULT_POST_HEADERS = {
   "Content-Type": "application/json",
@@ -27,7 +32,42 @@ const DEFAULT_POST_HEADERS = {
 const DEFAULT_GET_HEADERS = {};
 
 class T3RequestManager implements IAtomicService {
-  async init() {}
+  _t3AccessToken: string | null = null;
+
+  _t3RefreshToken: string | null = null;
+
+  async init() {
+    const result = await chrome.storage.local.get([
+      ChromeStorageKeys.T3_ACCESS_TOKEN,
+      ChromeStorageKeys.T3_REFRESH_TOKEN,
+    ]);
+
+    this.t3AccessToken = result[ChromeStorageKeys.T3_ACCESS_TOKEN] || null;
+    this.t3RefreshToken = result[ChromeStorageKeys.T3_REFRESH_TOKEN] || null;
+  }
+
+  get t3AccessToken(): string | null {
+    return this._t3AccessToken;
+  }
+
+  get t3RefreshToken(): string | null {
+    return this._t3RefreshToken;
+  }
+
+  set t3AccessToken(token: string | null) {
+    this._t3AccessToken = token;
+    chrome.storage.local.set({ [ChromeStorageKeys.T3_ACCESS_TOKEN]: token });
+  }
+
+  set t3RefreshToken(token: string | null) {
+    this._t3RefreshToken = token;
+    chrome.storage.local.set({ [ChromeStorageKeys.T3_REFRESH_TOKEN]: token });
+  }
+
+  clearTokens() {
+    this.t3AccessToken = null;
+    this.t3RefreshToken = null;
+  }
 
   async loadClientDataOrError(clientKey: string): Promise<{
     clientName: string | null;
@@ -152,10 +192,12 @@ class T3RequestManager implements IAtomicService {
   async generateLabelPdf({
     labelDataList,
     templateId,
+    layoutId,
     download,
   }: {
     labelDataList: ILabelData[];
     templateId: string;
+    layoutId: string;
     download: boolean;
   }) {
     const response = await customAxios(BASE_URL + STORE_LABEL_DATA_LIST_PATH, {
@@ -168,7 +210,9 @@ class T3RequestManager implements IAtomicService {
     window.open(
       `${BASE_URL}${RENDER_LABEL_PDF}/${
         response.data.labelDataListId
-      }?templateId=${templateId}&disposition=${download ? "attachment" : "inline"}`,
+      }?templateId=${templateId}&layoutId=${layoutId}&disposition=${
+        download ? "attachment" : "inline"
+      }`,
       "_blank"
     );
   }
@@ -209,6 +253,65 @@ class T3RequestManager implements IAtomicService {
       method: "POST",
       headers: DEFAULT_POST_HEADERS,
       body: JSON.stringify(data),
+    });
+  }
+
+  async t3SessionAuth() {
+    const authState = await authManager.authStateOrError();
+    const cookies = await authManager.cookies();
+
+    const facilities = await facilityManager.ownedFacilitiesOrError();
+
+    const cookieDict: { [key: string]: string } = {};
+
+    for (const cookie of cookies) {
+      cookieDict[cookie.name] = cookie.value;
+    }
+
+    const payload: {
+      username: string;
+      hostname: string;
+      cookies: { [key: string]: string };
+      facilities: {
+        facilityLicenseNumber: string;
+        facilityName: string;
+      }[];
+      apiVerificationToken: string;
+    } = {
+      username: authState.identity,
+      hostname: window.location.hostname,
+      cookies: cookieDict,
+      facilities: facilities.map((x) => ({
+        facilityLicenseNumber: x.licenseNumber,
+        facilityName: x.licenseName,
+      })),
+      apiVerificationToken: authState.apiVerificationToken,
+    };
+
+    return customAxios(BASE_URL + SESSION_AUTH_PATH, {
+      method: "POST",
+      headers: DEFAULT_POST_HEADERS,
+      body: JSON.stringify(payload),
+    });
+  }
+
+  async t3SessionRefresh() {
+    return customAxios(BASE_URL + TOKEN_REFRESH_PATH, {
+      method: "POST",
+      headers: {
+        ...DEFAULT_POST_HEADERS,
+        Authorization: `Bearer ${this._t3RefreshToken}`,
+      },
+    });
+  }
+
+  async t3AuthCheck() {
+    return customAxios(BASE_URL + AUTH_CHECK_PATH, {
+      method: "POST",
+      headers: {
+        ...DEFAULT_POST_HEADERS,
+        Authorization: `Bearer ${this._t3AccessToken}`,
+      },
     });
   }
 }

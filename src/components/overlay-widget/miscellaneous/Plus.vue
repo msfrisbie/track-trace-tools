@@ -1,32 +1,17 @@
 <template>
   <div class="grid grid-cols-3 gap-8">
     <div class="flex flex-col gap-2 h-full p-4">
-      <a
-        class="shadow-xl py-2 px-4 mb-8 rounded-md no-underline bg-gradient-to-r from-purple-800 to-purple-400 hover:from-purple-700 hover:to-purple-300 text-white text-xl font-light flex flex-row items-center gap-6 justify-between"
-        href="https://dash.trackandtrace.tools"
-        style="text-decoration: none"
-        target="_blank"
-        ><span>GET T3+</span><span class="bounce">→</span></a
-      >
+      <a class="shadow-xl py-2 px-4 mb-8 rounded-md no-underline bg-gradient-to-r from-purple-800 to-purple-400 hover:from-purple-700 hover:to-purple-300 text-white text-xl font-light flex flex-row items-center gap-6 justify-between"
+        href="https://dash.trackandtrace.tools" style="text-decoration: none" target="_blank"><span>GET T3+</span><span
+          class="bounce">→</span></a>
       <div v-for="entry of entries" v-bind:key="entry.question" @click="selectEntry(entry)">
-        <span
-          class="text-xl font-light ttt-purple hover:underline cursor-pointer hover:text-purple-300"
-          >&#8250;&nbsp;{{ entry.question }}</span
-        >
+        <span class="text-xl font-light ttt-purple hover:underline cursor-pointer hover:text-purple-300">&#8250;&nbsp;{{
+        entry.question }}</span>
       </div>
     </div>
-    <div
-      class="col-span-2 overflow-y-auto toolkit-scroll h-full flex flex-col gap-12 p-4"
-      ref="answers"
-    >
-      <div
-        v-bind:class="{ 'bg-purple-50': entry === selectedEntry }"
-        :id="entry.id"
-        v-for="entry of entries"
-        v-bind:key="entry.id"
-        class="flex flex-col gap-4 p-4 rounded-xl shadow"
-        v-html="entry.answerHtml"
-      ></div>
+    <div class="col-span-2 overflow-y-auto toolkit-scroll h-full flex flex-col gap-12 p-4" ref="answers">
+      <div v-bind:class="{ 'bg-purple-50': entry === selectedEntry }" :id="entry.id" v-for="entry of entries"
+        v-bind:key="entry.id" class="flex flex-col gap-4 p-4 rounded-xl shadow" v-html="entry.answerHtml"></div>
     </div>
   </div>
 </template>
@@ -74,22 +59,22 @@ T3+ gives you access to additional tools and is available as a monthly subscript
           answerHtml: "",
           id: "",
         },
-        {
-          question: "What is changing?",
-          answerMarkdown: `
-**Users now have the option to subscribe to T3+.**
+        //         {
+        //           question: "What is changing?",
+        //           answerMarkdown: `
+        // **Users now have the option to subscribe to T3+.**
 
-T3+ makes Track & Trace Tools even more powerful by adding new features such as advanced reports, a Metrc history explorer, scan sheet generator, and more.
+        // T3+ makes Track & Trace Tools even more powerful by adding new features such as advanced reports, a Metrc history explorer, scan sheet generator, and more.
 
-Track & Trace Tools will not require a subscription to use basic features.
+        // Track & Trace Tools will not require a subscription to use basic features.
 
-A small number of existing tools are being moved to T3+. These tools will be available as part of the free plan until 12/1/2023.
+        // A small number of existing tools are being moved to T3+. These tools will be available as part of the free plan until 12/1/2023.
 
-[Read more about T3+ tools](https://dash.trackandtrace.tools/features)
-          `,
-          answerHtml: "",
-          id: "",
-        },
+        // [Read more about T3+ tools](https://dash.trackandtrace.tools/features)
+        //           `,
+        //           answerHtml: "",
+        //           id: "",
+        //         },
         {
           question: "What is included with T3+?",
           answerMarkdown: `
@@ -115,7 +100,7 @@ The base version of Track & Trace Tools is still free. The T3+ badge at the bott
         {
           question: "How much does T3+ cost?",
           answerMarkdown: `
-**T3+ is a monthly subscription with a 7-day free trial.** 
+**T3+ is a monthly subscription with a 30-day free trial.** 
 
 There are multiple pricing tiers to fit the needs of small and large organizations.
 
@@ -124,18 +109,18 @@ There are multiple pricing tiers to fit the needs of small and large organizatio
           answerHtml: "",
           id: "",
         },
-        {
-          question: "What happens if I use a license key?",
-          answerMarkdown: `
-**All license keys will no longer grant access to T3+.** 
+        //         {
+        //           question: "What happens if I use a license key?",
+        //           answerMarkdown: `
+        // **All license keys will no longer grant access to T3+.**
 
-If you use a license key for either the T3+ beta or for custom features, these keys will no longer provide access to T3+ effective 12/1/2023.
+        // If you use a license key for either the T3+ beta or for custom features, these keys will no longer provide access to T3+ effective 12/1/2023.
 
-To keep using T3+ features, you will need a T3+ subscription.
-`,
-          answerHtml: "",
-          id: "",
-        },
+        // To keep using T3+ features, you will need a T3+ subscription.
+        // `,
+        //           answerHtml: "",
+        //           id: "",
+        //         },
         {
           question: "Who works on T3+?",
           answerMarkdown: `
@@ -178,7 +163,7 @@ Reach out to [matt@trackandtrace.tools](mailto:matt@trackandtrace.tools)
         .scrollIntoView({ behavior: "smooth", block: "start", inline: "start" });
     },
   },
-  async created() {},
+  async created() { },
   async mounted() {
     analyticsManager.track(MessageType.OPENED_PLUS);
   },
@@ -189,16 +174,21 @@ Reach out to [matt@trackandtrace.tools](mailto:matt@trackandtrace.tools)
 .bounce {
   animation: bounceRight 3s ease infinite;
 }
+
 @keyframes bounceRight {
+
   from,
   to {
     transform: scale(1, 1);
   }
+
   25% {
     transform: scale(0.8, 1.2);
   }
 }
+
 @keyframes bounceRight {
+
   0%,
   20%,
   50%,
@@ -206,9 +196,11 @@ Reach out to [matt@trackandtrace.tools](mailto:matt@trackandtrace.tools)
   100% {
     transform: translateX(0);
   }
+
   40% {
     transform: translateX(12px);
   }
+
   60% {
     transform: translateX(6px);
   }

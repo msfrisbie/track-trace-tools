@@ -1,24 +1,14 @@
 <template>
   <div class="grid grid-cols-3 gap-8 h-full" style="grid-template-rows: auto 1fr">
-    <builder-step-header
-      v-for="(step, index) of steps"
-      :key="index"
-      :stepNumber="index + 1"
-      :stepText="step.stepText"
-      :active="index === activeStepIndex"
-      @click.stop.prevent.native="setActiveStepIndex(index)"
-    />
+    <builder-step-header v-for="(step, index) of steps" :key="index" :stepNumber="index + 1" :stepText="step.stepText"
+      :active="index === activeStepIndex" @click.stop.prevent.native="setActiveStepIndex(index)" />
 
     <div class="col-span-3 h-full">
       <template v-if="activeStepIndex === 0">
         <div class="grid grid-cols-2 grid-rows-2 gap-8 h-full" style="grid-template-rows: 1fr auto">
-          <single-package-picker
-            class="col-span-2 h-full"
-            :selectedPackages="sourcePackage ? [sourcePackage] : []"
-            v-on:removePackage="setPackage({ pkg: null })"
-            v-on:addPackage="setPackage({ pkg: $event })"
-            :reopenPickerAfterSelect="false"
-          />
+          <single-package-picker class="col-span-2 h-full" :selectedPackages="sourcePackage ? [sourcePackage] : []"
+            v-on:removePackage="setPackage({ pkg: null })" v-on:addPackage="setPackage({ pkg: $event })"
+            :reopenPickerAfterSelect="false" />
 
           <div class="col-start-2 flex flex-col items-stretch">
             <template v-if="!pageOneErrorMessage">
@@ -42,82 +32,50 @@
 
               <div class="flex flex-col items-stretch space-y-6">
                 <div>
-                  <item-picker
-                    class="w-full"
-                    :item="outputItem"
-                    :selectOwnedItems="true"
-                    v-on:update:item="updateSplitPackageData({ outputItem: $event })"
-                  />
+                  <item-picker class="w-full" :item="outputItem" :selectOwnedItems="true"
+                    v-on:update:item="updateSplitPackageData({ outputItem: $event })" />
 
                   <template v-if="!outputItem">
-                    <b-button variant="link" size="sm" @click="outputItem = sourcePackage.Item"
-                      >USE SAME ITEM</b-button
-                    >
+                    <b-button variant="link" size="sm" @click="outputItem = sourcePackage.Item">USE SAME ITEM</b-button>
                   </template>
                 </div>
 
                 <template v-if="outputItem">
                   <div class="w-full grid grid-cols-12">
                     <b-input-group :append="outputUnitAbbreviation" class="col-span-5">
-                      <b-form-input
-                        v-model.number="perPackageQuantity"
-                        type="number"
-                        step="0.0000001"
-                        min="0"
-                        :max="sourcePackage.Quantity"
-                        :state="!perPackageQuantityErrorMessage"
-                        required
-                        class="text-center"
-                      ></b-form-input>
+                      <b-form-input v-model.number="perPackageQuantity" type="number" step="0.0000001" min="0"
+                        :max="sourcePackage.Quantity" :state="!perPackageQuantityErrorMessage" required
+                        class="text-center"></b-form-input>
                     </b-input-group>
 
                     <span class="col-span-2 text-center text-xl">&#10005;</span>
 
-                    <b-form-input
-                      v-model.number="newPackageCount"
-                      type="number"
-                      step="1"
-                      min="1"
-                      required
-                      :state="!newPackageCountErrorMessage"
-                      class="text-center col-span-5"
-                    ></b-form-input>
+                    <b-form-input v-model.number="newPackageCount" type="number" step="1" min="1" required
+                      :state="!newPackageCountErrorMessage" class="text-center col-span-5"></b-form-input>
                   </div>
                 </template>
 
-                <template
-                  v-if="
-                    facilityUsesLocationForPackages &&
-                    outputItem &&
-                    perPackageQuantity &&
-                    newPackageCount
-                  "
-                >
-                  <location-picker
-                    class="flex-grow"
-                    :location="location"
+                <template v-if="facilityUsesLocationForPackages &&
+      outputItem &&
+      perPackageQuantity &&
+      newPackageCount
+      ">
+                  <location-picker class="flex-grow" :location="location"
                     :suggestedLocationName="sourcePackage && sourcePackage.LocationName"
-                    v-on:update:location="updateSplitPackageData({ location: $event })"
-                  />
+                    v-on:update:location="updateSplitPackageData({ location: $event })" />
 
-                  <b-form-group
-                    v-if="outputItem && outputItem.ExpirationDateConfiguration !== 'Off'"
-                    label="Expiration Date:"
-                    label-size="sm"
-                  >
+                  <b-form-group v-if="outputItem && outputItem.ExpirationDateConfiguration !== 'Off'"
+                    label="Expiration Date:" label-size="sm">
                     <b-form-datepicker size="md" v-model="expirationDate" :value="expirationDate" />
                   </b-form-group>
                 </template>
               </div>
 
-              <template
-                v-if="
-                  outputItem &&
-                  perPackageQuantity &&
-                  newPackageCount &&
-                  (!facilityUsesLocationForPackages || location)
-                "
-              >
+              <template v-if="outputItem &&
+      perPackageQuantity &&
+      newPackageCount &&
+      (!facilityUsesLocationForPackages || location)
+      ">
                 <div class="flex flex-col items-center border-r-2 border-blue-500 px-4">
                   <span class="text-lg font-bold">SOURCE PACKAGE</span>
                 </div>
@@ -125,54 +83,32 @@
                 <div class="flex flex-col items-stretch space-y-6">
                   <div class="flex flex-row text-lg items-center space-x-4 whitespace-nowrap">
                     <b-input-group prepend="Subtract" :append="sourceUnitAbbreviation">
-                      <b-form-input
-                        v-model.number="sourcePackageAdjustQuantity"
-                        type="number"
-                        step="0.0000001"
-                        min="0"
-                        :max="sourcePackage.Quantity"
-                        required
-                        :state="!sourcePackageAdjustQuantityErrorMessage"
-                        class="text-center flex-grow"
-                      ></b-form-input>
+                      <b-form-input v-model.number="sourcePackageAdjustQuantity" type="number" step="0.0000001" min="0"
+                        :max="sourcePackage.Quantity" required :state="!sourcePackageAdjustQuantityErrorMessage"
+                        class="text-center flex-grow"></b-form-input>
                     </b-input-group>
-                    <b-button
-                      variant="link"
-                      size="sm"
-                      class="self-start"
-                      @click="sourcePackageAdjustQuantity = sourcePackage.Quantity"
-                      >USE ALL</b-button
-                    >
+                    <b-button variant="link" size="sm" class="self-start"
+                      @click="sourcePackageAdjustQuantity = sourcePackage.Quantity">USE ALL</b-button>
                   </div>
 
                   <span class="text-lg">
-                    <span class="font-bold ttt-purple"
-                      >{{ round(sourcePackage.Quantity - sourcePackageAdjustQuantity, 4) }}
-                      {{ sourceUnitAbbreviation }}</span
-                    >
-                    remaining</span
-                  >
+                    <span class="font-bold ttt-purple">{{ round(sourcePackage.Quantity - sourcePackageAdjustQuantity, 4)
+                      }}
+                      {{ sourceUnitAbbreviation }}</span>
+                    remaining</span>
                 </div>
               </template>
 
-              <template
-                v-if="
-                  outputItem &&
-                  newPackageCount &&
-                  perPackageQuantity &&
-                  sourcePackageAdjustQuantity &&
-                  (!facilityUsesLocationForPackages || location)
-                "
-              >
+              <template v-if="outputItem &&
+      newPackageCount &&
+      perPackageQuantity &&
+      sourcePackageAdjustQuantity &&
+      (!facilityUsesLocationForPackages || location)
+      ">
                 <template v-if="showHiddenDetailFields">
                   <div class="col-span-2">
                     <b-form-group label="Package Date:" label-size="sm">
-                      <b-form-datepicker
-                        initial-date
-                        size="md"
-                        v-model="packageIsodate"
-                        :value="packageIsodate"
-                      />
+                      <b-form-datepicker initial-date size="md" v-model="packageIsodate" :value="packageIsodate" />
                     </b-form-group>
 
                     <b-form-group label="Note (optional):" label-size="sm">
@@ -180,11 +116,7 @@
                     </b-form-group>
 
                     <b-form-group label="Production Batch Number (optional):" label-size="sm">
-                      <b-form-input
-                        v-model="productionBatchNumber"
-                        type="text"
-                        size="md"
-                      ></b-form-input>
+                      <b-form-input v-model="productionBatchNumber" type="text" size="md"></b-form-input>
                     </b-form-group>
 
                     <b-form-checkbox size="md" class="text-lg" v-model="isDonation">
@@ -198,33 +130,23 @@
                 </template>
 
                 <div class="col-span-2 flex flex-row justify-center">
-                  <b-button
-                    class="opacity-40"
-                    variant="light"
-                    @click="showHiddenDetailFields = !showHiddenDetailFields"
-                    >ADVANCED</b-button
-                  >
+                  <b-button class="opacity-40" variant="light"
+                    @click="showHiddenDetailFields = !showHiddenDetailFields">ADVANCED</b-button>
                 </div>
               </template>
             </div>
           </div>
 
           <div class="flex flex-col items-stretch space-y-8">
-            <template
-              v-if="
-                outputItem &&
-                (!facilityUsesLocationForPackages || location) &&
-                newPackageCount &&
-                perPackageQuantity &&
-                sourcePackageAdjustQuantity
-              "
-            >
-              <tag-picker
-                :tagTypeNames="['CannabisPackage', 'MedicalPackage', 'Cannabis Package', 'Medical Package']"
-                :tagCount="quantityList.length"
-                :selectedTags="packageTags"
-                v-on:update:selectedTags="updateSplitPackageData({ packageTags: $event })"
-              />
+            <template v-if="outputItem &&
+      (!facilityUsesLocationForPackages || location) &&
+      newPackageCount &&
+      perPackageQuantity &&
+      sourcePackageAdjustQuantity
+      ">
+              <tag-picker :tagTypeNames="['CannabisPackage', 'MedicalPackage', 'Cannabis Package', 'Medical Package']"
+                :tagCount="quantityList.length" :selectedTags="packageTags"
+                v-on:update:selectedTags="updateSplitPackageData({ packageTags: $event })" />
             </template>
           </div>
 
@@ -252,9 +174,8 @@
 
               <div>
                 Each new package contains
-                <span class="font-bold ttt-purple"
-                  >{{ quantityList[0] }} {{ sourcePackage.Item.UnitOfMeasureName }}</span
-                >
+                <span class="font-bold ttt-purple">{{ quantityList[0] }} {{ sourcePackage.Item.UnitOfMeasureName
+                  }}</span>
                 of
                 <span class="font-bold ttt-purple">{{ sourcePackage.Item.Name }}</span>
                 .
@@ -279,14 +200,8 @@
 
               <div class="flex flex-col items-center">
                 <transition name="fade">
-                  <b-button
-                    class="w-full"
-                    style="max-width: 600px"
-                    variant="success"
-                    size="md"
-                    @click="submit()"
-                    >CREATE {{ quantityList.length }} PACKAGES</b-button
-                  >
+                  <b-button class="w-full" style="max-width: 600px" variant="success" size="md" @click="submit()">CREATE
+                    {{ quantityList.length }} PACKAGES</b-button>
                 </transition>
               </div>
             </div>
@@ -431,6 +346,11 @@ export default Vue.extend({
             : {}),
           // UseSameItem: "false", // default to false and just provide the item id anyway
         };
+
+        if (store.state.settings.enableSameItemPatch && sourcePackage.Item.Id.toString() === newPackageItem.Id.toString()) {
+          row.ItemId = '0';
+          row.UseSameItem = 'true';
+        }
 
         rows.push(row);
       }
@@ -947,10 +867,15 @@ export default Vue.extend({
 .prepend-icon {
   width: 2rem;
 }
+
 .fade-enter-active {
   transition: all 0.5s;
 }
-.fade-enter /* .fade-leave-active below version 2.1.8 */ {
+
+.fade-enter
+
+/* .fade-leave-active below version 2.1.8 */
+  {
   opacity: 0;
   transform: translateY(10px);
 }

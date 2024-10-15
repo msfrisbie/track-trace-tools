@@ -15,6 +15,8 @@ export enum ChromeStorageKeys {
   VUEX_STATE = "VUEX_STATE",
   LICENSE_KEY = "LICENSE_KEY",
   SETTINGS = "SETTINGS",
+  T3_ACCESS_TOKEN = "T3_ACCESS_TOKEN",
+  T3_REFRESH_TOKEN = "T3_REFRESH_TOKEN",
 }
 
 export const METRC_INT_SUFFIX_CHARCOUNT = 8;
@@ -367,6 +369,7 @@ export enum BuilderType {
   UPDATE_TRANSFER = "UPDATE_TRANSFER",
   CSV_CREATE_PACKAGE = "CSV_CREATE_PACKAGE",
   ASSIGN_LAB_COA = "ASSIGN_LAB_COA",
+  CHANGE_PLANTS_GROWTH_PHASE = "CHANGE_PLANTS_GROWTH_PHASE",
 }
 
 export enum BackgroundTaskState {
@@ -377,13 +380,13 @@ export enum BackgroundTaskState {
 }
 
 const DATA_LOAD_MAX_PAGES: number = 1;
-export const SEARCH_LOAD_PAGE_SIZE: number = 20;
+export const SEARCH_LOAD_PAGE_SIZE: number = 10;
 export const DATA_LOAD_PAGE_SIZE: number = 5000;
 export const DATA_LOAD_MAX_COUNT: number = DATA_LOAD_PAGE_SIZE * DATA_LOAD_MAX_PAGES;
 export const DATA_LOAD_MAX_ITERATION_FAILSAFE: number = 100;
 export const DATA_LOAD_FETCH_TIMEOUT_MS: number = 5 * 60 * 1000;
 export const PLANTABLE_ITEM_CATEGORY_NAMES = [
-  // Note: this was to match an inconsistency in the plural.
+// Note: this was to match an inconsistency in the plural.
   // There's no apparent penalty for having both.
   "Immature Plant",
   "Immature Plants",

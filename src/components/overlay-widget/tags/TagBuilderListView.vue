@@ -37,7 +37,7 @@ export default Vue.extend({
                     icon: "print",
                     backgroundColor: "#2774ae",
                     isBeta: false,
-                    isNew: true,
+                    isNew: false,
                     enabled: true,
                     visible: true,
                     isPlus: false,

@@ -4,6 +4,7 @@ export enum LabelPrintMutations {
 
 export enum LabelPrintGetters {
   TOTAL_LABELS = "TOTAL_LABELS",
+  ACTIVE_LABELS = "ACTIVE_LABELS",
 }
 
 export enum LabelPrintActions {
@@ -12,4 +13,5 @@ export enum LabelPrintActions {
   REMOVE_LABEL = "REMOVE_LABEL",
   RESET_LABELS = "RESET_LABELS",
   PRINT_LABELS = "PRINT_LABELS",
+  GENERATE_LABEL_FIELDS = "GENERATE_LABEL_FIELDS"
 }

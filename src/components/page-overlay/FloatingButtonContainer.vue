@@ -20,34 +20,32 @@
           <quick-script-button class="floating-shadow" />
         </div>
 
-        <div v-if="metrcTableState.barcodeValues.length === 0" class="relative">
-          <print-button></print-button>
+        <div v-if="notificationCount === 0" class="relative">
+          <announcements-button class="floating-shadow"></announcements-button>
         </div>
       </div>
 
-      <div v-if="!t3plus" class="relative">
+      <div v-if="!hasPlus" class="relative">
         <plus-button class="floating-shadow" />
       </div>
 
-      <div v-if="metrcTableState.barcodeValues.length > 0" class="relative">
+      <div class="relative">
         <print-button></print-button>
+      </div>
 
-        <b-badge variant="warning" class="absolute" style="right: 0.1rem; bottom: 0.1rem">+{{
-      metrcTableState.barcodeValues.length
-    }}</b-badge>
+      <div v-if="notificationCount > 0" class="relative">
+        <announcements-button class="floating-shadow"></announcements-button>
       </div>
 
       <div class="relative">
         <builder-button class="floating-shadow" />
-        <div v-if="notificationCount > 0"
-          class="absolute rounded-full text-white flex flex-col items-center justify-center text-center text-xs border border-white notification-breathe"
-          style="width: 0.8rem; height: 0.8rem; bottom: -0.3rem; left: -0.3rem"></div>
       </div>
     </template>
   </div>
 </template>
 
 <script lang="ts">
+import AnnouncementsButton from "@/components/page-overlay/AnnouncementsButton.vue";
 import BugReportButton from "@/components/page-overlay/BugReportButton.vue";
 import BuilderButton from "@/components/page-overlay/BuilderButton.vue";
 import DebugButton from "@/components/page-overlay/DebugButton.vue";
@@ -58,6 +56,7 @@ import ScrollButton from "@/components/page-overlay/ScrollButton.vue";
 import SearchButton from "@/components/page-overlay/SearchButton.vue";
 import { IPluginState } from "@/interfaces";
 import store from "@/store/page-overlay/index";
+import { hasPlusImpl } from "@/utils/plus";
 import Vue from "vue";
 import { mapState } from "vuex";
 
@@ -73,6 +72,7 @@ export default Vue.extend({
     PlusButton,
     BugReportButton,
     PrintButton,
+    AnnouncementsButton,
   },
   async mounted() { },
   data() {
@@ -88,6 +88,9 @@ export default Vue.extend({
       notificationCount: (state: IPluginState) => state.announcements.notificationCount,
       metrcTableState: (state: IPluginState) => state.metrcTable,
     }),
+    hasPlus(): boolean {
+      return hasPlusImpl();
+    },
   },
   methods: {},
   watch: {},
@@ -122,23 +125,5 @@ export default Vue.extend({
   max-width: 100vw;
   z-index: 0;
   transition-delay: 0s;
-}
-
-@keyframes colorAndSizeChange {
-
-  0%,
-  100% {
-    background-color: rgb(255, 0, 0);
-    transform: scale(1);
-  }
-
-  50% {
-    background-color: rgb(255, 98, 50);
-    transform: scale(1.2);
-  }
-}
-
-.notification-breathe {
-  animation: colorAndSizeChange 4s infinite;
 }
 </style>

@@ -1,22 +1,13 @@
 <template>
   <div class="flex flex-col items-stretch">
     <div class="flex flex-row justify-end mb-1 opacity-50 hover:opacity-100">
-      <b-button
-        size="sm"
-        variant="link"
-        v-if="!showEmptyValues"
-        @click.stop.prevent="showEmptyValues = true"
-        >SHOW EMPTY VALUES</b-button
-      >
+      <b-button size="sm" variant="link" v-if="showEmptyValues" @click.stop.prevent="showEmptyValues = false">HIDE EMPTY
+        VALUES</b-button>
     </div>
 
-    <div
-      class="grid grid-cols-3 gap-1 cursor-pointer hover:bg-purple-50"
-      v-bind:class="{ 'bg-purple-100': idx % 2 === 0 }"
-      v-bind:key="pair[0]"
-      v-for="[idx, pair] of formattedTablePairs.entries()"
-      @click.stop.prevent="copyToClipboard(pair[1])"
-    >
+    <div class="grid grid-cols-3 gap-1 cursor-pointer hover:bg-purple-50"
+      v-bind:class="{ 'bg-purple-100': idx % 2 === 0 }" v-bind:key="pair[0]"
+      v-for="[idx, pair] of formattedTablePairs.entries()" @click.stop.prevent="copyToClipboard(pair[1])">
       <div class="p-1 font-semibold text-wrap">{{ pair[0] }}</div>
       <div class="p-1 col-span-2">{{ pair[1] }}</div>
     </div>
@@ -24,15 +15,14 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue';
-import { mapState } from 'vuex';
+import { MessageType } from '@/consts';
+import { analyticsManager } from '@/modules/analytics-manager.module';
+import { toastManager } from '@/modules/toast-manager.module';
 import router from '@/router/index';
 import store from '@/store/page-overlay/index';
 import { copyToClipboard } from '@/utils/dom';
-import { MessageType } from '@/consts';
-import { IIndexedTransferData } from '@/interfaces';
-import { analyticsManager } from '@/modules/analytics-manager.module';
-import { toastManager } from '@/modules/toast-manager.module';
+import Vue from 'vue';
+import { mapState } from 'vuex';
 
 export default Vue.extend({
   name: 'RecursiveJsonTable',
@@ -81,7 +71,7 @@ export default Vue.extend({
   },
   data() {
     return {
-      showEmptyValues: false,
+      showEmptyValues: true,
     };
   },
   methods: {
@@ -102,8 +92,8 @@ export default Vue.extend({
       });
     },
   },
-  async created() {},
-  async mounted() {},
+  async created() { },
+  async mounted() { },
 });
 </script>
 

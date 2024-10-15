@@ -92,9 +92,29 @@ export async function maybeLoadIncomingTransferManifestsReportData({
       return true;
     });
 
+    const promises: Promise<any>[] = [];
+
     for (const transfer of richIncomingTransfers) {
-      transfer.incomingPackages = await primaryDataLoader.destinationPackages(transfer.DeliveryId);
+      if (promises.length % 100 === 0) {
+        await Promise.allSettled(promises);
+      }
+
+      promises.push(
+        primaryDataLoader
+          .destinationTransporters(transfer.DeliveryId)
+          .then((incomingTransporters) => {
+            transfer.incomingTransporters = incomingTransporters;
+          })
+      );
+
+      promises.push(
+        primaryDataLoader.destinationPackages(transfer.DeliveryId).then((incomingPackages) => {
+          transfer.incomingPackages = incomingPackages;
+        })
+      );
     }
+
+    await Promise.allSettled(promises);
 
     reportData[ReportType.INCOMING_TRANSFER_MANIFESTS] = {
       richIncomingTransfers,

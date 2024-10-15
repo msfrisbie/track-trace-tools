@@ -1,19 +1,14 @@
-import {
-  IIndexedRichOutgoingTransferData,
-  IPluginState,
-  IRichDestinationData,
-  ITransferFilter,
-} from '@/interfaces';
-import { primaryDataLoader } from '@/modules/data-loader/data-loader.module';
-import { ReportsMutations, ReportType } from '@/store/page-overlay/modules/reports/consts';
+import { IIndexedRichOutgoingTransferData, IPluginState, ITransferFilter } from "@/interfaces";
+import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
+import { ReportType, ReportsMutations } from "@/store/page-overlay/modules/reports/consts";
 import {
   IFieldData,
   IReportConfig,
   IReportData,
   IReportsState,
-} from '@/store/page-overlay/modules/reports/interfaces';
-import { ActionContext } from 'vuex';
-import { todayIsodate } from '../date';
+} from "@/store/page-overlay/modules/reports/interfaces";
+import { ActionContext } from "vuex";
+import { todayIsodate } from "../date";
 
 interface IOutgoingTransferManifestsReportFormFilters {
   estimatedDepartureDateLt: string;
@@ -26,16 +21,17 @@ interface IOutgoingTransferManifestsReportFormFilters {
   includeOutgoingInactive: boolean;
 }
 
-export const outgoingTransferManifestsFormFiltersFactory: () => IOutgoingTransferManifestsReportFormFilters = () => ({
-  estimatedDepartureDateLt: todayIsodate(),
-  estimatedDepartureDateGt: todayIsodate(),
-  shouldFilterEstimatedDepartureDateLt: false,
-  shouldFilterEstimatedDepartureDateGt: false,
-  onlyWholesale: false,
-  includeOutgoing: true,
-  includeRejected: true,
-  includeOutgoingInactive: false,
-});
+export const outgoingTransferManifestsFormFiltersFactory: () => IOutgoingTransferManifestsReportFormFilters =
+  () => ({
+    estimatedDepartureDateLt: todayIsodate(),
+    estimatedDepartureDateGt: todayIsodate(),
+    shouldFilterEstimatedDepartureDateLt: false,
+    shouldFilterEstimatedDepartureDateGt: false,
+    onlyWholesale: false,
+    includeOutgoing: true,
+    includeRejected: true,
+    includeOutgoingInactive: false,
+  });
 
 export function addOutgoingTransferManifestsReport({
   reportConfig,
@@ -51,15 +47,18 @@ export function addOutgoingTransferManifestsReport({
   transferFilter.onlyWholesale = outgoingTransferManifestsFormFilters.onlyWholesale;
   transferFilter.includeOutgoing = outgoingTransferManifestsFormFilters.includeOutgoing;
   transferFilter.includeRejected = outgoingTransferManifestsFormFilters.includeRejected;
-  transferFilter.includeOutgoingInactive = outgoingTransferManifestsFormFilters.includeOutgoingInactive;
+  transferFilter.includeOutgoingInactive =
+    outgoingTransferManifestsFormFilters.includeOutgoingInactive;
 
-  transferFilter.estimatedDepartureDateGt = outgoingTransferManifestsFormFilters.shouldFilterEstimatedDepartureDateGt
-    ? outgoingTransferManifestsFormFilters.estimatedDepartureDateGt
-    : null;
+  transferFilter.estimatedDepartureDateGt =
+    outgoingTransferManifestsFormFilters.shouldFilterEstimatedDepartureDateGt
+      ? outgoingTransferManifestsFormFilters.estimatedDepartureDateGt
+      : null;
 
-  transferFilter.estimatedDepartureDateLt = outgoingTransferManifestsFormFilters.shouldFilterEstimatedDepartureDateLt
-    ? outgoingTransferManifestsFormFilters.estimatedDepartureDateLt
-    : null;
+  transferFilter.estimatedDepartureDateLt =
+    outgoingTransferManifestsFormFilters.shouldFilterEstimatedDepartureDateLt
+      ? outgoingTransferManifestsFormFilters.estimatedDepartureDateLt
+      : null;
 
   reportConfig[ReportType.OUTGOING_TRANSFER_MANIFESTS] = {
     transferFilter,
@@ -79,7 +78,7 @@ export async function maybeLoadOutgoingTransferManifestsReportData({
   const transferManifestConfig = reportConfig[ReportType.OUTGOING_TRANSFER_MANIFESTS];
   if (transferManifestConfig?.transferFilter) {
     ctx.commit(ReportsMutations.SET_STATUS, {
-      statusMessage: { text: 'Loading transfer manifest packages...', level: 'success' },
+      statusMessage: { text: "Loading transfer manifest packages...", level: "success" },
     });
 
     let richOutgoingTransfers: IIndexedRichOutgoingTransferData[] = [];
@@ -125,27 +124,55 @@ export async function maybeLoadOutgoingTransferManifestsReportData({
       return true;
     });
 
+    const promises: Promise<any>[] = [];
+
     for (const transfer of richOutgoingTransfers) {
-      const destinations: IRichDestinationData[] = (
-        await primaryDataLoader.transferDestinations(transfer.Id)
-      ).map((x) => ({ ...x, packages: [] }));
-
-      for (const destination of destinations) {
-        destination.packages = await primaryDataLoader.destinationPackages(destination.Id);
+      if (promises.length % 100 === 0) {
+        await Promise.allSettled(promises);
       }
-      transfer.outgoingDestinations = destinations;
 
-      transfer.outgoingDestinations = destinations.filter((destination) => {
+      promises.push(
+        primaryDataLoader.transferDestinations(transfer.Id).then((outgoingDestinations) => {
+          transfer.outgoingDestinations = outgoingDestinations;
+        })
+      );
+    }
+
+    await Promise.allSettled(promises);
+
+    for (const transfer of richOutgoingTransfers) {
+      for (const destination of transfer.outgoingDestinations!) {
+        if (promises.length % 100 === 0) {
+          await Promise.allSettled(promises);
+        }
+
+        promises.push(
+          primaryDataLoader.destinationPackages(destination.Id).then((packages) => {
+            destination.packages = packages;
+          })
+        );
+        promises.push(
+          primaryDataLoader.destinationTransporters(destination.Id).then((transporters) => {
+            destination.transporters = transporters;
+          })
+        );
+      }
+    }
+
+    await Promise.allSettled(promises);
+
+    for (const transfer of richOutgoingTransfers) {
+      transfer.outgoingDestinations = transfer.outgoingDestinations!.filter((destination) => {
         if (transferManifestConfig.transferFilter.onlyWholesale) {
-          if (!destination.ShipmentTypeName.includes('Wholesale')) {
+          if (!destination.ShipmentTypeName.includes("Wholesale")) {
             return false;
           }
         }
 
         if (transferManifestConfig.transferFilter.estimatedDepartureDateLt) {
           if (
-            destination.EstimatedDepartureDateTime
-            > transferManifestConfig.transferFilter.estimatedDepartureDateLt
+            destination.EstimatedDepartureDateTime >
+            transferManifestConfig.transferFilter.estimatedDepartureDateLt
           ) {
             return false;
           }
@@ -153,8 +180,8 @@ export async function maybeLoadOutgoingTransferManifestsReportData({
 
         if (transferManifestConfig.transferFilter.estimatedDepartureDateGt) {
           if (
-            destination.EstimatedDepartureDateTime
-            < transferManifestConfig.transferFilter.estimatedDepartureDateGt
+            destination.EstimatedDepartureDateTime <
+            transferManifestConfig.transferFilter.estimatedDepartureDateGt
           ) {
             return false;
           }

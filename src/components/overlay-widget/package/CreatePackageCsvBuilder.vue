@@ -3,15 +3,10 @@
     <template v-if="createPackageCsvState.status === PackageCsvStatus.INITIAL">
       <div class="flex flex-col items-center justify-center h-full">
         <div class="py-12">
-          <iframe
-            width="800"
-            height="500"
-            src="https://www.youtube.com/embed/2jeUYYuqz5Y?si=aLOxlXSKCJxREDZQ"
-            title="YouTube video player"
-            frameborder="0"
+          <iframe width="800" height="500" src="https://www.youtube.com/embed/2jeUYYuqz5Y?si=aLOxlXSKCJxREDZQ"
+            title="YouTube video player" frameborder="0"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-            allowfullscreen
-          ></iframe>
+            allowfullscreen></iframe>
         </div>
 
         <div class="flex flex-col items-stretch max-w-md gap-8 text-center">
@@ -23,10 +18,7 @@
           </template>
 
           <div class="flex flex-col gap-2">
-            <label
-              v-if="createPackageCsvState.status === PackageCsvStatus.INITIAL"
-              class="btn btn-primary mb-0"
-            >
+            <label v-if="createPackageCsvState.status === PackageCsvStatus.INITIAL" class="btn btn-primary mb-0">
               <b-form-file class="hidden" v-model="csvFile" accept=".csv"></b-form-file>
 
               UPLOAD CSV
@@ -34,23 +26,17 @@
           </div>
 
           <div class="flex flex-col gap-2">
-            <b-button variant="outline-primary" @click="generateCsvTemplate()"
-              >DOWNLOAD CSV TEMPLATE</b-button
-            >
+            <b-button variant="outline-primary" @click="generateCsvTemplate()">DOWNLOAD CSV TEMPLATE</b-button>
           </div>
 
           <div class="flex flex-col gap-2">
-            <b-button
-              variant="outline-primary"
-              @click="open('/package/create-package-csv/instructions')"
-              >HOW TO USE</b-button
-            >
+            <b-button variant="outline-primary" @click="open('/package/create-package-csv/instructions')">HOW TO
+              USE</b-button>
           </div>
 
           <div class="flex flex-col gap-2 max-w-md text-blue-500 text-lg">
-            NOTE: This tool is in beta. Once you upload a CSV, ensure the values displayed in the
+            NOTE: Once you upload a CSV, ensure the values displayed in the
             "Smart CSV Data" tab are correct before submitting.
-            <span class="font-bold">Thanks in advance for all bug reports!</span>
           </div>
         </div>
       </div>
@@ -62,37 +48,31 @@
             <template v-if="createPackageCsvState.status === PackageCsvStatus.INFLIGHT">
               <div class="flex flex-row gap-2 items-center text-base text-gray-500">
                 <b-spinner small></b-spinner>
-                <div
-                  v-for="[idx, statusMessage] of createPackageCsvState.statusMessages.entries()"
-                  v-bind:key="idx"
-                >
+                <div v-for="[idx, statusMessage] of createPackageCsvState.statusMessages.entries()" v-bind:key="idx">
                   <span v-if="statusMessage.variant === 'primary'" class="text-purple-500">{{
-                    statusMessage.text
-                  }}</span>
+      statusMessage.text
+    }}</span>
                   <span v-if="statusMessage.variant === 'danger'" class="text-red-500">{{
-                    statusMessage.text
-                  }}</span>
+      statusMessage.text
+    }}</span>
                   <span v-if="statusMessage.variant === 'warning'" class="text-yellow-500">{{
-                    statusMessage.text
-                  }}</span>
+      statusMessage.text
+    }}</span>
                 </div>
               </div>
             </template>
 
             <template v-if="createPackageCsvState.status === PackageCsvStatus.ERROR">
-              <div
-                v-for="[idx, statusMessage] of createPackageCsvState.statusMessages.entries()"
-                v-bind:key="idx"
-              >
+              <div v-for="[idx, statusMessage] of createPackageCsvState.statusMessages.entries()" v-bind:key="idx">
                 <span v-if="statusMessage.variant === 'primary'" class="text-purple-500">{{
-                  statusMessage.text
-                }}</span>
+      statusMessage.text
+    }}</span>
                 <span v-if="statusMessage.variant === 'danger'" class="text-red-500">{{
-                  statusMessage.text
-                }}</span>
+      statusMessage.text
+    }}</span>
                 <span v-if="statusMessage.variant === 'warning'" class="text-yellow-500">{{
-                  statusMessage.text
-                }}</span>
+      statusMessage.text
+    }}</span>
               </div>
             </template>
 
@@ -110,10 +90,7 @@
                   new package{{ createPackageCsvState.rowGroups.length === 1 ? "" : "s" }}.
                 </div> -->
 
-                <div
-                  class="flex flex-row gap-2 items-center text-lg text-red-500"
-                  v-if="totalErrorCount > 0"
-                >
+                <div class="flex flex-row gap-2 items-center text-lg text-red-500" v-if="totalErrorCount > 0">
                   {{ totalErrorCount }} error{{ totalErrorCount === 1 ? "" : "s" }} must be fixed
                   before submitting.
                 </div>
@@ -129,22 +106,15 @@
           </template>
 
           <div class="flex flex-row items-center gap-4">
-            <b-button
-              v-if="submitEnabled && createPackageCsvState.status === PackageCsvStatus.PARSED"
-              :disabled="!eligibleForSubmit"
-              @click="submit()"
-              variant="success"
-              >CREATE {{ createPackageCsvState.rowGroups.length }} PACKAGE{{
-                createPackageCsvState.rowGroups.length === 1 ? "" : "S"
-              }}</b-button
-            >
+            <b-button v-if="submitEnabled && createPackageCsvState.status === PackageCsvStatus.PARSED"
+              :disabled="!eligibleForSubmit" @click="submit()" variant="success">CREATE {{
+      createPackageCsvState.rowGroups.length
+    }} PACKAGE{{
+        createPackageCsvState.rowGroups.length === 1 ? "" : "S"
+      }}</b-button>
 
-            <b-button
-              v-if="createPackageCsvState.status !== PackageCsvStatus.INITIAL"
-              @click="reset()"
-              variant="outline-primary"
-              >RESET</b-button
-            >
+            <b-button v-if="createPackageCsvState.status !== PackageCsvStatus.INITIAL" @click="reset()"
+              variant="outline-primary">RESET</b-button>
           </div>
         </div>
 
@@ -154,37 +124,27 @@
               <b-tab title="Summary" active>
                 <template v-if="createPackageCsvState.rowGroups">
                   <!-- the autoformat line breaks mess up the template compiler, using template str-->
-                  <div
-                    class="grid grid-cols-4 gap-8 place-items-center my-4"
-                    :style="`grid-template-columns: minmax(350px, auto) 50px minmax(300px, auto) minmax(200px, auto);`"
-                  >
+                  <div class="grid grid-cols-4 gap-8 place-items-center my-4"
+                    :style="`grid-template-columns: minmax(350px, auto) 50px minmax(300px, auto) minmax(200px, auto);`">
                     <template v-for="[idx, rowGroup] of createPackageCsvState.rowGroups.entries()">
                       <fragment v-bind:key="rowGroup.destinationLabel">
                         <!-- input packages -->
-                        <div
-                          class="grid grid-cols-2 gap-4 w-full"
-                          style="grid-template-columns: 1fr auto"
-                        >
-                          <template
-                            v-for="[j, ingredient] of rowGroup.parsedData.Ingredients.entries()"
-                          >
+                        <div class="grid grid-cols-2 gap-4 w-full" style="grid-template-columns: 1fr auto">
+                          <template v-for="[j, ingredient] of rowGroup.parsedData.Ingredients.entries()">
                             <fragment v-bind:key="j + rowGroup.destinationLabel">
                               <div>
-                                <canonical-package-card
-                                  v-if="ingredient.pkg"
-                                  :pkg="ingredient.pkg"
-                                ></canonical-package-card>
+                                <canonical-package-card v-if="ingredient.pkg"
+                                  :pkg="ingredient.pkg"></canonical-package-card>
                               </div>
 
                               <div
-                                class="flex flex-col items-center justify-center p-4 border border-1 rounded-lg text-base font-bold whitespace-nowrap"
-                              >
+                                class="flex flex-col items-center justify-center p-4 border border-1 rounded-lg text-base font-bold whitespace-nowrap">
                                 {{ ingredient.Quantity }}
                                 {{
-                                  ingredient.UnitOfMeasure
-                                    ? ingredient.UnitOfMeasure.Abbreviation
-                                    : null
-                                }}
+      ingredient.UnitOfMeasure
+        ? ingredient.UnitOfMeasure.Abbreviation
+        : null
+    }}
                               </div>
                             </fragment>
                           </template>
@@ -197,44 +157,26 @@
 
                         <!-- output package -->
                         <div>
-                          <canonical-package-card
-                            class="w-full"
-                            :pkg="rowGroup.mockPackage"
-                            v-if="rowGroup.mockPackage"
-                          ></canonical-package-card>
+                          <canonical-package-card class="w-full" :pkg="rowGroup.mockPackage"
+                            v-if="rowGroup.mockPackage"></canonical-package-card>
                         </div>
 
                         <!-- messages -->
                         <div class="flex flex-col gap-2 place-self-start">
-                          <div
-                            class="flex flex-row items-center gap-2 text-red-500"
-                            v-for="[idx, error] of rowGroup.errors.entries()"
-                            v-bind:key="'error' + idx"
-                          >
-                            <font-awesome-icon
-                              size="lg"
-                              icon="exclamation-triangle"
-                            ></font-awesome-icon>
+                          <div class="flex flex-row items-center gap-2 text-red-500"
+                            v-for="[idx, error] of rowGroup.errors.entries()" v-bind:key="'error' + idx">
+                            <font-awesome-icon size="lg" icon="exclamation-triangle"></font-awesome-icon>
                             <package-csv-message :msg="error"></package-csv-message>
                           </div>
 
-                          <div
-                            class="flex flex-row items-center gap-2 text-orange-500"
-                            v-for="[idx, warning] of rowGroup.warnings.entries()"
-                            v-bind:key="'warning' + idx"
-                          >
-                            <font-awesome-icon
-                              size="lg"
-                              icon="exclamation-triangle"
-                            ></font-awesome-icon>
+                          <div class="flex flex-row items-center gap-2 text-orange-500"
+                            v-for="[idx, warning] of rowGroup.warnings.entries()" v-bind:key="'warning' + idx">
+                            <font-awesome-icon size="lg" icon="exclamation-triangle"></font-awesome-icon>
                             <package-csv-message :msg="warning"></package-csv-message>
                           </div>
 
-                          <div
-                            class="flex flex-row items-center gap-2 text-blue-500"
-                            v-for="[idx, message] of rowGroup.messages.entries()"
-                            v-bind:key="'message' + idx"
-                          >
+                          <div class="flex flex-row items-center gap-2 text-blue-500"
+                            v-for="[idx, message] of rowGroup.messages.entries()" v-bind:key="'message' + idx">
                             <font-awesome-icon size="lg" icon="info-circle"></font-awesome-icon>
                             <package-csv-message class="" :msg="message"></package-csv-message>
                           </div>
@@ -251,26 +193,17 @@
                 <template v-if="createPackageCsvState.rowGroups">
                   <b-table-simple class="my-4">
                     <b-tr>
-                      <b-th
-                        v-for="column of CREATE_PACKAGE_CSV_COLUMNS"
-                        v-bind:key="column.value"
-                        class="whitespace-nowrap border border-1 text-center"
-                      >
+                      <b-th v-for="column of CREATE_PACKAGE_CSV_COLUMNS" v-bind:key="column.value"
+                        class="whitespace-nowrap border border-1 text-center">
                         {{ column.value }}
                       </b-th>
                     </b-tr>
 
                     <template v-for="[i, rowGroup] of createPackageCsvState.rowGroups.entries()">
-                      <b-tr
-                        v-for="[j, dataRow] of rowGroup.dataRows.entries()"
-                        v-bind:key="rowGroup.destinationLabel + dataRow.Index"
-                        class="even:bg-purple-100"
-                      >
-                        <b-td
-                          v-for="column of CREATE_PACKAGE_CSV_COLUMNS"
-                          v-bind:key="dataRow.Index + column.value"
-                          class="whitespace-nowrap border border-1"
-                        >
+                      <b-tr v-for="[j, dataRow] of rowGroup.dataRows.entries()"
+                        v-bind:key="rowGroup.destinationLabel + dataRow.Index" class="even:bg-purple-100">
+                        <b-td v-for="column of CREATE_PACKAGE_CSV_COLUMNS" v-bind:key="dataRow.Index + column.value"
+                          class="whitespace-nowrap border border-1">
                           {{ dataRow[column.value] }}
                         </b-td>
                       </b-tr>
@@ -286,26 +219,17 @@
                       <b-th class="whitespace-nowrap border border-1 text-center">
                         <!-- empty -->
                       </b-th>
-                      <b-th
-                        v-for="[i, column] of CREATE_PACKAGE_CSV_COLUMNS.entries()"
-                        v-bind:key="column.value"
-                        class="whitespace-nowrap border border-1 text-center"
-                      >
+                      <b-th v-for="[i, column] of CREATE_PACKAGE_CSV_COLUMNS.entries()" v-bind:key="column.value"
+                        class="whitespace-nowrap border border-1 text-center">
                         {{ cellColumnFromIndex(i) }}
                       </b-th>
                     </b-tr>
 
-                    <b-tr
-                      v-for="[i, row] of createPackageCsvState.csvData.entries()"
-                      v-bind:key="`${i}row`"
-                      class="even:bg-purple-100"
-                    >
+                    <b-tr v-for="[i, row] of createPackageCsvState.csvData.entries()" v-bind:key="`${i}row`"
+                      class="even:bg-purple-100">
                       <b-th class="whitespace-nowrap border border-1 text-center">{{ i + 1 }}</b-th>
-                      <b-td
-                        class="whitespace-nowrap border border-1"
-                        v-for="[j, cell] of row.entries()"
-                        v-bind:key="`${i},${j}`"
-                      >
+                      <b-td class="whitespace-nowrap border border-1" v-for="[j, cell] of row.entries()"
+                        v-bind:key="`${i},${j}`">
                         {{ cell }}
                       </b-td>
                     </b-tr>
@@ -466,8 +390,8 @@ export default Vue.extend({
       });
     },
   },
-  async created() {},
-  async mounted() {},
+  async created() { },
+  async mounted() { },
   watch: {
     csvFile: {
       immediate: true,

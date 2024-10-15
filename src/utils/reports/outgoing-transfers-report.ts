@@ -3,17 +3,17 @@ import {
   IPluginState,
   IRichDestinationData,
   ITransferFilter,
-} from '@/interfaces';
-import { primaryDataLoader } from '@/modules/data-loader/data-loader.module';
-import { ReportsMutations, ReportType } from '@/store/page-overlay/modules/reports/consts';
+} from "@/interfaces";
+import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
+import { ReportType, ReportsMutations } from "@/store/page-overlay/modules/reports/consts";
 import {
   IFieldData,
   IReportConfig,
   IReportData,
   IReportsState,
-} from '@/store/page-overlay/modules/reports/interfaces';
-import { ActionContext } from 'vuex';
-import { todayIsodate } from '../date';
+} from "@/store/page-overlay/modules/reports/interfaces";
+import { ActionContext } from "vuex";
+import { todayIsodate } from "../date";
 
 interface IOutgoingTransfersReportFormFilters {
   estimatedDepartureDateLt: string;
@@ -26,16 +26,17 @@ interface IOutgoingTransfersReportFormFilters {
   includeOutgoingInactive: boolean;
 }
 
-export const outgoingTransfersFormFiltersFactory: () => IOutgoingTransfersReportFormFilters = () => ({
-  estimatedDepartureDateLt: todayIsodate(),
-  estimatedDepartureDateGt: todayIsodate(),
-  shouldFilterEstimatedDepartureDateLt: false,
-  shouldFilterEstimatedDepartureDateGt: false,
-  onlyWholesale: false,
-  includeOutgoing: true,
-  includeRejected: true,
-  includeOutgoingInactive: false,
-});
+export const outgoingTransfersFormFiltersFactory: () => IOutgoingTransfersReportFormFilters =
+  () => ({
+    estimatedDepartureDateLt: todayIsodate(),
+    estimatedDepartureDateGt: todayIsodate(),
+    shouldFilterEstimatedDepartureDateLt: false,
+    shouldFilterEstimatedDepartureDateGt: false,
+    onlyWholesale: false,
+    includeOutgoing: true,
+    includeRejected: true,
+    includeOutgoingInactive: false,
+  });
 
 export function addOutgoingTransfersReport({
   reportConfig,
@@ -53,13 +54,15 @@ export function addOutgoingTransfersReport({
   transferFilter.includeRejected = outgoingTransfersFormFilters.includeRejected;
   transferFilter.includeOutgoingInactive = outgoingTransfersFormFilters.includeOutgoingInactive;
 
-  transferFilter.estimatedDepartureDateGt = outgoingTransfersFormFilters.shouldFilterEstimatedDepartureDateGt
-    ? (outgoingTransfersFormFilters.estimatedDepartureDateGt as string)
-    : null;
+  transferFilter.estimatedDepartureDateGt =
+    outgoingTransfersFormFilters.shouldFilterEstimatedDepartureDateGt
+      ? (outgoingTransfersFormFilters.estimatedDepartureDateGt as string)
+      : null;
 
-  transferFilter.estimatedDepartureDateLt = outgoingTransfersFormFilters.shouldFilterEstimatedDepartureDateLt
-    ? outgoingTransfersFormFilters.estimatedDepartureDateLt
-    : null;
+  transferFilter.estimatedDepartureDateLt =
+    outgoingTransfersFormFilters.shouldFilterEstimatedDepartureDateLt
+      ? outgoingTransfersFormFilters.estimatedDepartureDateLt
+      : null;
 
   reportConfig[ReportType.OUTGOING_TRANSFERS] = {
     transferFilter,
@@ -79,7 +82,7 @@ export async function maybeLoadOutgoingTransfersReportData({
   const outgoingTransferConfig = reportConfig[ReportType.OUTGOING_TRANSFERS];
   if (outgoingTransferConfig?.transferFilter) {
     ctx.commit(ReportsMutations.SET_STATUS, {
-      statusMessage: { text: 'Loading outgoing transfers...', level: 'success' },
+      statusMessage: { text: "Loading outgoing transfers...", level: "success" },
     });
 
     let richOutgoingTransfers: IIndexedRichOutgoingTransferData[] = [];
@@ -132,15 +135,15 @@ export async function maybeLoadOutgoingTransfersReportData({
 
       transfer.outgoingDestinations = destinations.filter((destination) => {
         if (outgoingTransferConfig.transferFilter.onlyWholesale) {
-          if (!destination.ShipmentTypeName.includes('Wholesale')) {
+          if (!destination.ShipmentTypeName.includes("Wholesale")) {
             return false;
           }
         }
 
         if (outgoingTransferConfig.transferFilter.estimatedDepartureDateLt) {
           if (
-            destination.EstimatedDepartureDateTime
-            > outgoingTransferConfig.transferFilter.estimatedDepartureDateLt
+            destination.EstimatedDepartureDateTime >
+            outgoingTransferConfig.transferFilter.estimatedDepartureDateLt
           ) {
             return false;
           }
@@ -148,8 +151,8 @@ export async function maybeLoadOutgoingTransfersReportData({
 
         if (outgoingTransferConfig.transferFilter.estimatedDepartureDateGt) {
           if (
-            destination.EstimatedDepartureDateTime
-            < outgoingTransferConfig.transferFilter.estimatedDepartureDateGt
+            destination.EstimatedDepartureDateTime <
+            outgoingTransferConfig.transferFilter.estimatedDepartureDateGt
           ) {
             return false;
           }
@@ -160,6 +163,43 @@ export async function maybeLoadOutgoingTransfersReportData({
     }
 
     richOutgoingTransfers = richOutgoingTransfers.filter((transfer) => true);
+
+    const promises: Promise<any>[] = [];
+
+    for (const transfer of richOutgoingTransfers) {
+      if (promises.length % 100 === 0) {
+        await Promise.allSettled(promises);
+      }
+
+      promises.push(
+        primaryDataLoader.transferDestinations(transfer.Id).then((outgoingDestinations) => {
+          transfer.outgoingDestinations = outgoingDestinations;
+        })
+      );
+    }
+
+    await Promise.allSettled(promises);
+
+    for (const transfer of richOutgoingTransfers) {
+      for (const destination of transfer.outgoingDestinations!) {
+        if (promises.length % 100 === 0) {
+          await Promise.allSettled(promises);
+        }
+
+        promises.push(
+          primaryDataLoader.destinationPackages(destination.Id).then((packages) => {
+            destination.packages = packages;
+          })
+        );
+        promises.push(
+          primaryDataLoader.destinationTransporters(destination.Id).then((transporters) => {
+            destination.transporters = transporters;
+          })
+        );
+      }
+    }
+
+    await Promise.allSettled(promises);
 
     reportData[ReportType.OUTGOING_TRANSFERS] = {
       outgoingTransfers: richOutgoingTransfers,
