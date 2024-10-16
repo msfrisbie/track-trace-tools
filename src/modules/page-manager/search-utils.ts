@@ -28,10 +28,10 @@ const IGNORE_FIELDS = new Set(["Id"]);
 export function extractMatchedFields(
   queryString: string,
   o: { [key: string]: any }
-): { field: string; value: string }[] {
+): { field: string; value: string; subscore: number }[] {
   const normalizedQueryString = queryString.toLocaleLowerCase();
 
-  const matchedFields: { field: string; value: string }[] = [];
+  const matchedFields: { field: string; value: string; subscore: number }[] = [];
 
   if (!o) {
     return matchedFields; // return an empty array if the object is null or undefined
@@ -56,9 +56,12 @@ export function extractMatchedFields(
       matchedFields.push({
         field: k,
         value: v,
+        subscore: generateScoreFromMatch({ queryString: normalizedQueryString, value: v }),
       });
     }
   }
+
+  matchedFields.sort((a, b) => (a.subscore > b.subscore ? 1 : -1));
 
   return matchedFields;
 }
@@ -88,9 +91,9 @@ export function generateSearchResultMetadata(
   let isActive: boolean = false;
   let isInactive: boolean = false;
 
-  let matchedFields: { field: string; value: string }[] = [];
+  let matchedFields: { field: string; value: string; subscore: number }[] = [];
 
-  const score: number = 1;
+  let score: number = 1;
 
   if (partialResult.incomingTransfer) {
     matchedFields = extractMatchedFields(queryString, partialResult.incomingTransfer);
@@ -303,6 +306,17 @@ export function generateSearchResultMetadata(
   //   secondaryIconName = null;
   // }
 
+  score = matchedFields.reduce((maxObj, currentObj) => {
+    if (currentObj.subscore > maxObj.subscore) {
+      // If the subscore of the current object is greater than the subscore of the max object,
+      // update the max object to be the current object.
+      return currentObj;
+    }
+
+    // Otherwise, keep the max object as it is.
+    return maxObj;
+  }, matchedFields[0]).subscore;
+
   const result = {
     ...partialResult,
     score,
@@ -318,12 +332,41 @@ export function generateSearchResultMetadata(
     isActive,
   };
 
-  console.log(">>>>>>>>>>> TODO");
-  // TODO
-
-  console.log("generate result", { result });
-
   return result;
+}
+
+export function generateScoreFromMatch({
+  queryString,
+  value,
+}: {
+  queryString: string;
+  value: string;
+}): number {
+  // If either the query or body is empty, return 0
+  if (!queryString || !value) return 0;
+
+  const queryLength = queryString.length;
+  const bodyLength = value.length;
+
+  // Find the index of the query in the body
+  const startIndex = value.indexOf(queryString);
+
+  // If the query is not found in the body, return 0
+  if (startIndex === -1) return 0;
+
+  // Calculate proximity score based on how close the match is to the start or end of the body
+  const proximityToStart = 1 - startIndex / bodyLength;
+  const proximityToEnd = 1 - (bodyLength - (startIndex + queryLength)) / bodyLength;
+
+  const proximityScore = Math.max(proximityToStart, proximityToEnd);
+
+  // Calculate the percentage of the body string that the query string matches
+  const matchPercentage = queryLength / bodyLength;
+
+  // Final score is the product of the proximity score and the match percentage
+  const finalScore = proximityScore * matchPercentage;
+
+  return finalScore;
 }
 
 export function getActiveMetrcGridIdOrNull(): MetrcGridId | null {

@@ -33,11 +33,7 @@
       </div>
     </div>
 
-    GRID METADATA
-
-    {{ searchState.activeMetrcGridId }}
-
-    {{ searchState.metrcSearchFilters }}
+    <grid-filters v-if="!searchState.showSearchResults"></grid-filters>
 
     <template v-if="searchState.showSearchResults && (!searchState.modalSearchOpen || modalSearch)">
       <div class="ttt-wrapper t3-search" v-on:click.stop.prevent>
@@ -60,7 +56,8 @@
                         </template>
 
                         <p class="text-lg text-gray-600">
-                          {{ searchState.searchResults.length }} results for <span class="font-bold text-gray-900">{{
+                          <span class="font-semibold ttt-purple">{{ searchState.searchResults.length }}</span>
+                          results for <span class="font-semibold text-gray-900">{{
                             searchState.queryString }}</span>
                         </p>
 
@@ -69,18 +66,18 @@
                     </template>
 
                     <template v-if="searchState.queryString.length > 0">
-                      <div class="flex flex-col overflow-y-auto bg-purple-50 col-span-3">
+                      <div class="flex flex-col overflow-y-auto bg-gray-50 col-span-3 min-h-screen">
                         <search-result-preview v-for="(searchResult, idx) in searchState.searchResults" v-bind:key="idx"
                           :searchResult="searchResult"></search-result-preview>
 
-                        <div class="flex-grow bg-purple-50"></div>
+                        <div class="flex-grow bg-gray-50"></div>
                       </div>
 
                       <div class="flex flex-col overflow-y-auto col-span-3">
                         <!-- <package-search-result-detail /> -->
                         <!-- <div>RESULT DETAIL</div> -->
                         <search-result-detail></search-result-detail>
-                        {{ searchState.activeSearchResult }}
+                        <!-- {{ searchState.activeSearchResult }} -->
                       </div>
                     </template>
 
@@ -112,6 +109,7 @@
 </template>
 
 <script lang="ts">
+import GridFilters from "@/components/search/shared/GridFilters.vue";
 import HistoryList from "@/components/search/shared/HistoryList.vue";
 import { IPluginState } from "@/interfaces";
 import router from "@/router/index";
@@ -141,6 +139,7 @@ export default Vue.extend({
     HistoryList,
     SearchResultPreview,
     SearchResultDetail,
+    GridFilters
   },
   computed: {
     ...mapState<IPluginState>({

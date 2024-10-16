@@ -38,7 +38,8 @@ export interface ISearchResult {
   isInactive: boolean;
   matchedFields: {
     field: string,
-    value: string
+    value: string,
+    subscore: number
   }[]
 }
 

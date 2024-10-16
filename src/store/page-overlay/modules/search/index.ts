@@ -53,8 +53,6 @@ export const searchModule = {
       //   return;
       // }
 
-      console.log({ newSearchResults });
-
       state.searchResults = [...newSearchResults, ...state.searchResults].sort(
         (a, b) => b.score - a.score
       );
@@ -177,8 +175,6 @@ export const searchModule = {
                   pkg,
                 })
               );
-
-              console.log({ newSearchResults });
 
               ctx.commit(SearchMutations.PUSH_SEARCH_RESULTS, {
                 searchId,
