@@ -384,7 +384,7 @@ export function getAllMetrcGridIds(): MetrcGridId[] {
   );
 }
 
-export const mirrorMetrcSearchStateImpl = _.debounce(async () => {
+export const mirrorMetrcTableStateImpl = _.debounce(async () => {
   const metrcGridId = getActiveMetrcGridIdOrNull();
 
   store.dispatch(`search/${SearchActions.SET_ACTIVE_METRC_GRID_ID}`, { metrcGridId });
@@ -405,7 +405,7 @@ export const mirrorMetrcSearchStateImpl = _.debounce(async () => {
     searchFilters[input.getAttribute(T3_SEARCH_FILTER_ATTRIBUTE)!] = input.value;
   }
 
-  store.dispatch(`search/${SearchActions.SET_METRC_SEARCH_FILTERS}`, {
+  store.dispatch(`search/${SearchActions.MIRROR_METRC_SEARCH_FILTERS}`, {
     metrcGridId,
     searchFilters,
   });

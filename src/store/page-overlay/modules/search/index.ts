@@ -111,7 +111,7 @@ export const searchModule = {
     //   // }
     // },
 
-    [SearchActions.SET_METRC_SEARCH_FILTERS]: async (
+    [SearchActions.MIRROR_METRC_SEARCH_FILTERS]: async (
       ctx: ActionContext<ISearchState, IPluginState>,
       {
         searchFilters,
