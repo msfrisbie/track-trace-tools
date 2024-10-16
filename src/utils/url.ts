@@ -1,44 +1,50 @@
-export function hashObjectValueOrNull(key: string) {
+import { URLHashData } from "@/interfaces";
+
+export function getHashData(): URLHashData {
   try {
-    return JSON.parse(decodeURI(window.location.hash).slice(1))[key];
+    return JSON.parse(decodeURIComponent(window.location.hash).slice(1));
   } catch (e) {
-    return null;
+    return {};
   }
 }
 
-export function getTrimmedHash() {
-  if (window.location.hash.startsWith("#")) {
-    return window.location.hash.substring(1);
-  }
-  return window.location.hash;
+export function setHashData(hashData: URLHashData) {
+  window.location.hash = encodeURIComponent(JSON.stringify(hashData));
 }
 
-export function mergeHashValues(newHashValues: { [key: string]: string }): {
-  [key: string]: string;
-} {
-  const currentHashValues = Object.fromEntries(new URLSearchParams(getTrimmedHash()));
+// export function getTrimmedHash() {
+//   if (window.location.hash.startsWith("#")) {
+//     return window.location.hash.substring(1);
+//   }
+//   return window.location.hash;
+// }
 
-  return {
-    ...currentHashValues,
-    ...newHashValues,
-  };
-}
+// export function mergeHashValues(newHashValues: { [key: string]: string }): {
+//   [key: string]: string;
+// } {
+//   const currentHashValues = Object.fromEntries(new URLSearchParams(getTrimmedHash()));
 
-export function updateHash(newHashValues: { [key: string]: string }) {
-  const mergedHashValues = mergeHashValues(newHashValues);
+//   return {
+//     ...currentHashValues,
+//     ...newHashValues,
+//   };
+// }
 
-  window.location.hash = new URLSearchParams(mergedHashValues).toString();
-}
+// export function updateHash(newHashValues: { [key: string]: string }) {
+//   const mergedHashValues = mergeHashValues(newHashValues);
 
-export function readHashValueOrNull(key: string) {
-  const values = new URLSearchParams(getTrimmedHash());
+//   window.location.hash = new URLSearchParams(mergedHashValues).toString();
+// }
 
-  if (!values.has(key)) {
-    return null;
-  }
+// export function readHashValueOrNull(key: string) {
+//   const values = new URLSearchParams(getTrimmedHash());
 
-  return values.get(key);
-}
+//   if (!values.has(key)) {
+//     return null;
+//   }
+
+//   return values.get(key);
+// }
 
 export function getNonce(): string {
   return Date.now().toString();

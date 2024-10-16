@@ -60,11 +60,7 @@ import {
   activeTabOrNullImpl,
   clickTabStartingWithImpl,
   isTabActiveImpl,
-  managePackageTabsImpl,
-  managePlantTabsImpl,
-  manageSalesTabsImpl,
-  manageTagsTabsImpl,
-  manageTransfersTabsImpl,
+  manageTabs,
 } from "./tab-utils";
 
 const debugLog = debugLogFactory("page-manager.module.ts");
@@ -74,23 +70,23 @@ class PageManager implements IAtomicService {
 
   suppressAnimationContainerTimeout: any = null;
 
-  plantsTabs: NodeList = [] as any;
+  // plantsTabs: NodeList = [] as any;
 
-  selectedPlantTab: HTMLElement | null = null;
+  // selectedPlantTab: HTMLElement | null = null;
 
-  packageTabs: NodeList = [] as any;
+  // packageTabs: NodeList = [] as any;
 
-  selectedPackageTab: HTMLElement | null = null;
+  // selectedPackageTab: HTMLElement | null = null;
 
-  transferTabs: NodeList = [] as any;
+  // transferTabs: NodeList = [] as any;
 
-  selectedTransferTab: HTMLElement | null = null;
+  // selectedTransferTab: HTMLElement | null = null;
 
-  salesTabs: NodeList = [] as any;
+  // salesTabs: NodeList = [] as any;
 
-  tagTabs: NodeList = [] as any;
+  // tagTabs: NodeList = [] as any;
 
-  selectedTagTab: HTMLElement | null = null;
+  // selectedTagTab: HTMLElement | null = null;
 
   paginationOptions: NodeList = [] as any;
 
@@ -300,12 +296,14 @@ class PageManager implements IAtomicService {
 
     // These are references which are not expected to be dynamic in nature
     this.snowflakeCanvas = document.querySelector("canvas") as HTMLElement | null;
-    this.packageTabs = document.querySelectorAll("#packages_tabstrip li.k-item") as NodeList;
-    this.plantsTabs = document.querySelectorAll("#plants_tabstrip li.k-item") as NodeList;
-    this.transferTabs = document.querySelectorAll("#transfers_tabstrip li.k-item") as NodeList;
-    this.salesTabs = document.querySelectorAll("#sales_tabstrip li.k-item") as NodeList;
-    this.tagTabs = document.querySelectorAll("#tags_tabstrip li.k-item") as NodeList;
-    this.plantsTabs = document.querySelectorAll("#plants_tabstrip li.k-item") as NodeList;
+    // this.packageTabs = document.querySelectorAll("#packages_tabstrip li.k-item") as NodeList;
+    // this.plantsTabs = document.querySelectorAll("#plants_tabstrip li.k-item") as NodeList;
+    // this.transferTabs = document.querySelectorAll("#transfers_tabstrip li.k-item") as NodeList;
+    // this.salesTabs = document.querySelectorAll("#sales_tabstrip li.k-item") as NodeList;
+    // this.tagTabs = document.querySelectorAll("#tags_tabstrip li.k-item") as NodeList;
+    // this.plantsTabs = document.querySelectorAll("#plants_tabstrip li.k-item") as NodeList;
+
+    await manageTabs();
 
     // Eagerly modify
     timer(0, 2500).subscribe(() => this.modifyPageAtInterval());
@@ -565,14 +563,14 @@ class PageManager implements IAtomicService {
       this.mirrorMetrcTableState();
 
       if (window.location.pathname.match(PACKAGE_TAB_REGEX)) {
-        await this.managePackageTabs();
+        // await managePackageTabs();
         // this.acquirePackageFilterElements();
 
         this.addButtonsToPackageTable();
       }
 
       if (window.location.pathname.match(TRANSFER_TAB_REGEX)) {
-        await this.manageTransfersTabs();
+        // await manageTransfersTabs();
         // this.acquireTransferFilterElements();
 
         this.interceptViewManifestButton();
@@ -600,16 +598,16 @@ class PageManager implements IAtomicService {
       }
 
       if (window.location.pathname.match(TAG_TAB_REGEX)) {
-        await this.manageTagsTabs();
+        // await manageTagsTabs();
         // this.acquireTagFilterElements();
       }
 
       if (window.location.pathname.match(SALES_TAB_REGEX)) {
-        await this.manageSalesTabs();
+        // await manageSalesTabs();
       }
 
       if (window.location.pathname.match(PLANTS_TAB_REGEX)) {
-        await this.managePlantTabs();
+        // await managePlantTabs();
         // this.acquirePlantFilterElements();
       }
 
@@ -716,8 +714,17 @@ class PageManager implements IAtomicService {
     return modifyTransferModalImpl();
   }
 
-  async clickTabWithGridId(metrcGridId: MetrcGridId) {
-    (document.querySelector(`[data-grid-selector="#${metrcGridId}"]`)! as HTMLElement).click();
+  async clickTabWithGridId(metrcGridId: MetrcGridId): Promise<boolean> {
+    const element = document.querySelector(
+      `[data-grid-selector="#${metrcGridId}"]`
+    )! as HTMLElement;
+
+    if (element) {
+      element.click();
+      return true;
+    }
+
+    return false;
   }
 
   async clickTabStartingWith(
@@ -897,26 +904,6 @@ class PageManager implements IAtomicService {
     } catch (e: any) {
       console.error(e);
     }
-  }
-
-  async managePlantTabs() {
-    return managePlantTabsImpl();
-  }
-
-  async managePackageTabs() {
-    return managePackageTabsImpl();
-  }
-
-  async manageTransfersTabs() {
-    return manageTransfersTabsImpl();
-  }
-
-  async manageSalesTabs() {
-    return manageSalesTabsImpl();
-  }
-
-  async manageTagsTabs() {
-    return manageTagsTabsImpl();
   }
 
   clickRefreshLinks() {

@@ -4,6 +4,7 @@ import {
   HistoryTreeNodeType,
   Level,
   MessageType,
+  MetrcGridId,
   MetrcStatus,
   PackageSearchFilterKeys,
   PackageState,
@@ -2191,4 +2192,13 @@ export interface IBuilderListOption {
   visible: boolean;
   isPlus: boolean;
   showDisabledMessage: boolean;
+}
+
+export interface URLHashData {
+  metrcGridId?: MetrcGridId;
+  metrcGridFilters?: {
+    field: string;
+    operator: string;
+    value: string;
+  }[];
 }
