@@ -9,7 +9,7 @@ import {
   IIndexedTransferData,
   IIndexedTransferredPackageData,
   IItemData,
-  IStrainData
+  IStrainData,
 } from "@/interfaces";
 import { SearchStatus, SearchType } from "./consts";
 
@@ -37,10 +37,10 @@ export interface ISearchResult {
   isActive: boolean;
   isInactive: boolean;
   matchedFields: {
-    field: string,
-    value: string,
-    subscore: number
-  }[]
+    field: string;
+    value: string;
+    subscore: number;
+  }[];
 }
 
 export interface ISearchState {
@@ -56,7 +56,7 @@ export interface ISearchState {
 
   // Metrc page mirror data
   activeMetrcGridId: MetrcGridId | null;
-  metrcSearchFilters: { [key: string]: { [key: string]: string } };
+  metrcGridFilters: { [key: string]: { [key: string]: string } };
 
   // Deprecated
 

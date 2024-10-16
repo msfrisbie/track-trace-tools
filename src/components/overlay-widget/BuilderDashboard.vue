@@ -19,8 +19,8 @@
                 <b-tr v-bind:key="pkg.Id" v-for="[idx, pkg] of activePackages.entries()"
                   :class="idx % 2 === 0 ? 'bg-purple-50' : ''">
                   <b-td class="italic whitespace-nowrap">{{
-          isotimeToTimeAgoExpression(pkg.LastModified)
-        }}</b-td>
+                    isotimeToTimeAgoExpression(pkg.LastModified)
+                  }}</b-td>
                   <b-td class="font-bold">{{ pkg.Label.slice(-8) }}</b-td>
                   <b-td>{{ pkg.Quantity }} {{ pkg.UnitOfMeasureAbbreviation }}</b-td>
                   <b-td>{{ pkg.Item.Name }}</b-td>
@@ -56,8 +56,8 @@
                 <b-tr v-bind:key="transfer.Id" v-for="[idx, transfer] of incomingTransfers.entries()"
                   :class="idx % 2 === 0 ? 'bg-purple-50' : ''">
                   <b-td class="italic whitespace-nowrap">{{
-          isotimeToTimeAgoExpression(transfer.LastModified)
-        }}</b-td>
+                    isotimeToTimeAgoExpression(transfer.LastModified)
+                  }}</b-td>
                   <b-td class="font-bold">{{ transfer.ManifestNumber }}</b-td>
                   <b-td>{{ transfer.ShipperFacilityName }}</b-td>
                   <b-td>{{ transfer.PackageCount }} packages</b-td>
@@ -89,8 +89,8 @@
                 <b-tr v-bind:key="transfer.Id" v-for="[idx, transfer] of outgoingTransfers.entries()"
                   :class="idx % 2 === 0 ? 'bg-purple-50' : ''">
                   <b-td class="italic whitespace-nowrap">{{
-          isotimeToTimeAgoExpression(transfer.LastModified)
-        }}</b-td>
+                    isotimeToTimeAgoExpression(transfer.LastModified)
+                  }}</b-td>
                   <b-td class="font-bold">{{ transfer.ManifestNumber }}</b-td>
                   <b-td>{{ transfer.RecipientFacilityName }}</b-td>
                   <b-td>{{ transfer.PackageCount }} packages</b-td>
@@ -126,8 +126,8 @@
                 <b-tr v-bind:key="plantBatch.Id" v-for="[idx, plantBatch] of activePlantBatches.entries()"
                   :class="idx % 2 === 0 ? 'bg-purple-50' : ''">
                   <b-td class="italic whitespace-nowrap">{{
-          isotimeToTimeAgoExpression(plantBatch.LastModified)
-        }}</b-td>
+                    isotimeToTimeAgoExpression(plantBatch.LastModified)
+                  }}</b-td>
                   <b-td class="font-bold">{{ plantBatch.Name }}</b-td>
                   <b-td>{{ plantBatch.StrainName }}</b-td>
                   <b-td>{{ plantBatch.UntrackedCount }} plants</b-td>
@@ -162,8 +162,8 @@
                 <b-tr v-bind:key="item.Id" v-for="[idx, item] of activeItems.entries()"
                   :class="idx % 2 === 0 ? 'bg-purple-50' : ''">
                   <b-td class="italic whitespace-nowrap">{{
-          isotimeToTimeAgoExpression(item.ApprovalStatusDateTime)
-        }}</b-td>
+                    isotimeToTimeAgoExpression(item.ApprovalStatusDateTime)
+                  }}</b-td>
                   <b-td class="font-bold">{{ item.Name }}</b-td>
                   <b-td>{{ item.ProductCategoryName }}</b-td>
                 </b-tr>
@@ -229,8 +229,8 @@
                 <b-tr v-bind:key="vegetativePlant.Id" v-for="[idx, vegetativePlant] of vegetativePlants.entries()"
                   :class="idx % 2 === 0 ? 'bg-purple-50' : ''">
                   <b-td class="italic whitespace-nowrap">{{
-          isotimeToTimeAgoExpression(vegetativePlant.LastModified)
-        }}</b-td>
+                    isotimeToTimeAgoExpression(vegetativePlant.LastModified)
+                  }}</b-td>
                   <b-td class="font-bold">{{ vegetativePlant.Label.slice(-8) }}</b-td>
                   <b-td>{{ vegetativePlant.StrainName }}</b-td>
                 </b-tr>
@@ -261,8 +261,8 @@
                 <b-tr v-bind:key="floweringPlant.Id" v-for="[idx, floweringPlant] of floweringPlants.entries()"
                   :class="idx % 2 === 0 ? 'bg-purple-50' : ''">
                   <b-td class="italic whitespace-nowrap">{{
-          isotimeToTimeAgoExpression(floweringPlant.LastModified)
-        }}</b-td>
+                    isotimeToTimeAgoExpression(floweringPlant.LastModified)
+                  }}</b-td>
                   <b-td class="font-bold">{{ floweringPlant.Label.slice(-8) }}</b-td>
                   <b-td>{{ floweringPlant.StrainName }}</b-td>
                 </b-tr>
@@ -297,8 +297,8 @@
                 <b-tr v-bind:key="activeHarvest.Id" v-for="[idx, activeHarvest] of activeHarvests.entries()"
                   :class="idx % 2 === 0 ? 'bg-purple-50' : ''">
                   <b-td class="italic whitespace-nowrap">{{
-          isotimeToTimeAgoExpression(activeHarvest.LastModified)
-        }}</b-td>
+                    isotimeToTimeAgoExpression(activeHarvest.LastModified)
+                  }}</b-td>
                   <b-td class="font-bold">{{ activeHarvest.Name.slice(0, 32) }}</b-td>
                   <b-td>{{ activeHarvest.HarvestDate }}</b-td>
                 </b-tr>
@@ -333,8 +333,8 @@
                 <b-tr v-bind:key="availableTag.Id" v-for="[idx, availableTag] of availableTags.entries()"
                   :class="idx % 2 === 0 ? 'bg-purple-50' : ''">
                   <b-td class="italic whitespace-nowrap">{{
-          isotimeToTimeAgoExpression(availableTag.LastModified)
-        }}</b-td>
+                    isotimeToTimeAgoExpression(availableTag.LastModified)
+                  }}</b-td>
                   <b-td class="font-bold">{{ availableTag.Label.slice(-8) }}</b-td>
                   <b-td>{{ availableTag.TagTypeName }}</b-td>
                 </b-tr>
@@ -370,8 +370,8 @@
                 <b-tr v-bind:key="activeSale.Id" v-for="[idx, activeSale] of activeSales.entries()"
                   :class="idx % 2 === 0 ? 'bg-purple-50' : ''">
                   <b-td class="italic whitespace-nowrap">{{
-          isotimeToTimeAgoExpression(activeSale.LastModified)
-        }}</b-td>
+                    isotimeToTimeAgoExpression(activeSale.LastModified)
+                  }}</b-td>
                   <b-td class="font-bold">{{ activeSale.ReceiptNumber }}</b-td>
                   <b-td>${{ activeSale.TotalPrice }}</b-td>
                   <b-td>{{ activeSale.TotalPackages }} packages</b-td>
@@ -405,7 +405,7 @@ import { facilityManager } from "@/modules/facility-manager.module";
 import router from "@/router/index";
 import store from "@/store/page-overlay/index";
 import { isotimeToTimeAgoExpression } from "@/utils/time";
-import { navigationUrl } from "@/utils/url";
+import { encodeHashData, navigationUrl } from "@/utils/url";
 import Vue from "vue";
 import { mapState } from "vuex";
 import DashboardCard from "./DashboardCard.vue";
@@ -741,17 +741,13 @@ export default Vue.extend({
         this.$data.inactiveSalesCount = count || 0;
       });
     },
-    tabKeyUrl(subPath: string, metrcGridId?: MetrcGridId): string {
+    tabKeyUrl(subPath: string, activeMetrcGridId?: MetrcGridId): string {
       const license = this.$data.activeFacility?.licenseNumber;
 
-      const hashValues: any = metrcGridId
-        ? {
-          metrcGridId,
-        }
-        : {};
-
       return navigationUrl(`/industry/${license}/${subPath}`, {
-        hashValues,
+        hash: encodeHashData({
+          activeMetrcGridId
+        }),
       });
     },
   },

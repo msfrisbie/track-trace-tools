@@ -46,9 +46,8 @@ import {
 } from "./metrc-utils";
 import {
   initializeFilterButtonsImpl,
-  mirrorMetrcTableStateImpl,
+  mirrorMetrcTableState,
   resetFilterElementReferencesImpl,
-  setFilterImpl,
 } from "./search-utils";
 import {
   controlBackgroundImpl,
@@ -466,7 +465,7 @@ class PageManager implements IAtomicService {
 
       store.dispatch(`metrcTable/${MetrcTableActions.UPDATE_PRINTABLE_TAG_POOL}`);
 
-      this.mirrorMetrcTableState();
+      mirrorMetrcTableState();
     });
 
     document.addEventListener("keyup", (e: KeyboardEvent) => {
@@ -488,11 +487,11 @@ class PageManager implements IAtomicService {
     });
 
     document.addEventListener("input", (e: Event) => {
-      this.mirrorMetrcTableState();
+      mirrorMetrcTableState();
     });
 
     document.addEventListener("change", (e: Event) => {
-      this.mirrorMetrcTableState();
+      mirrorMetrcTableState();
     });
   }
 
@@ -560,7 +559,7 @@ class PageManager implements IAtomicService {
 
       this.initializeFilterButtons();
 
-      this.mirrorMetrcTableState();
+      mirrorMetrcTableState();
 
       if (window.location.pathname.match(PACKAGE_TAB_REGEX)) {
         // await managePackageTabs();
@@ -746,10 +745,6 @@ class PageManager implements IAtomicService {
     return initializeFilterButtonsImpl();
   }
 
-  async mirrorMetrcTableState() {
-    return mirrorMetrcTableStateImpl();
-  }
-
   // async setPlantFilter(
   //   metrcGridId: MetrcGridId,
   //   plantFilterIdentifier: PlantFilterIdentifiers,
@@ -781,10 +776,6 @@ class PageManager implements IAtomicService {
   // ) {
   //   return setTransferFilterImpl(metrcGridId, transferFilterIdentifier, value);
   // }
-
-  async setFilter(metrcGridId: MetrcGridId, searchFilter: string, value: string) {
-    return setFilterImpl(metrcGridId, searchFilter, value);
-  }
 
   // async setTagFilter(
   //   metrcGridId: MetrcGridId,

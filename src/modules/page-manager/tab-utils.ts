@@ -11,6 +11,7 @@ import {
   TRANSFER_TAB_REGEX,
 } from "./consts";
 import { pageManager } from "./page-manager.module";
+import { applyGridState, getActiveMetrcGridIdOrNull } from "./search-utils";
 
 export function isTabActiveImpl(tab: any) {
   return tab.getAttribute("aria-selected") === "true";
@@ -74,7 +75,10 @@ export async function clickTabStartingWithImpl(
 }
 
 export async function manageTabs() {
-  if (await applyUrlGridState()) {
+  await applyUrlGridState();
+
+  // If the grid state sets an active tab, don't use the defaults
+  if (await getActiveMetrcGridIdOrNull()) {
     return;
   }
 
@@ -218,16 +222,12 @@ export async function manageTabs() {
 //   }
 // }
 
-async function applyUrlGridState(): Promise<boolean> {
+async function applyUrlGridState() {
   const hashData: URLHashData = getHashData();
 
-  if (!hashData.metrcGridId) {
-    return false;
+  if (!hashData) {
+    return;
   }
 
-  if (!(await pageManager.clickTabWithGridId(hashData.metrcGridId))) {
-    return false;
-  }
-
-  return true;
+  applyGridState(hashData.activeMetrcGridId ?? null, hashData.metrcGridFilters ?? {});
 }

@@ -21,6 +21,7 @@ import { MessageType, MetrcGridId, TransferFilterIdentifiers, TransferState } fr
 import { IIndexedTransferData } from '@/interfaces';
 import { analyticsManager } from '@/modules/analytics-manager.module';
 import { pageManager } from '@/modules/page-manager/page-manager.module';
+import { setFilter } from '@/modules/page-manager/search-utils';
 import store from '@/store/page-overlay/index';
 import { SearchActions } from '@/store/page-overlay/modules/search/consts';
 import Vue from 'vue';
@@ -86,7 +87,7 @@ export default Vue.extend({
 
       await pageManager.clickTabWithGridId(metrcGridId);
 
-      pageManager.setFilter(
+      setFilter(
         metrcGridId,
         TransferFilterIdentifiers.ManifestNumber,
         this.$props.transfer.ManifestNumber,

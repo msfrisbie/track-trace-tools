@@ -41,7 +41,7 @@ export default Vue.extend({
                 return [];
             }
 
-            return Object.entries(store.state.search.metrcSearchFilters[store.state.search.activeMetrcGridId]);
+            return Object.entries(store.state.search.metrcGridFilters[store.state.search.activeMetrcGridId]);
         }
     },
     data() {

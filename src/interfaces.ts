@@ -2195,10 +2195,6 @@ export interface IBuilderListOption {
 }
 
 export interface URLHashData {
-  metrcGridId?: MetrcGridId;
-  metrcGridFilters?: {
-    field: string;
-    operator: string;
-    value: string;
-  }[];
+  activeMetrcGridId?: MetrcGridId | null;
+  metrcGridFilters?: { [key: string]: { [key: string]: string } };
 }

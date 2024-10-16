@@ -384,31 +384,35 @@ export function getAllMetrcGridIds(): MetrcGridId[] {
   );
 }
 
-export const mirrorMetrcTableStateImpl = _.debounce(async () => {
-  const metrcGridId = getActiveMetrcGridIdOrNull();
+export const mirrorMetrcTableState = _.debounce(async () => {
+  const activeMetrcGridId = getActiveMetrcGridIdOrNull();
 
-  store.dispatch(`search/${SearchActions.SET_ACTIVE_METRC_GRID_ID}`, { metrcGridId });
+  store.dispatch(`search/${SearchActions.SET_ACTIVE_METRC_GRID_ID}`, {
+    metrcGridId: activeMetrcGridId,
+  });
 
-  const inputs: HTMLInputElement[] = [
-    ...document.querySelectorAll(
-      `input[${T3_METRC_GRID_ID_ATTRIBUTE}="${metrcGridId}"][${T3_SEARCH_FILTER_ATTRIBUTE}]`
-    ),
-  ] as HTMLInputElement[];
+  for (const metrcGridId of getAllMetrcGridIds()) {
+    const inputs: HTMLInputElement[] = [
+      ...document.querySelectorAll(
+        `input[${T3_METRC_GRID_ID_ATTRIBUTE}="${metrcGridId}"][${T3_SEARCH_FILTER_ATTRIBUTE}]`
+      ),
+    ] as HTMLInputElement[];
 
-  const searchFilters: { [key: string]: string } = {};
+    const searchFilters: { [key: string]: string } = {};
 
-  for (const input of inputs) {
-    if (!input.value) {
-      continue;
+    for (const input of inputs) {
+      if (!input.value) {
+        continue;
+      }
+
+      searchFilters[input.getAttribute(T3_SEARCH_FILTER_ATTRIBUTE)!] = input.value;
     }
 
-    searchFilters[input.getAttribute(T3_SEARCH_FILTER_ATTRIBUTE)!] = input.value;
+    await store.dispatch(`search/${SearchActions.MIRROR_METRC_SEARCH_FILTERS}`, {
+      metrcGridId,
+      searchFilters,
+    });
   }
-
-  store.dispatch(`search/${SearchActions.MIRROR_METRC_SEARCH_FILTERS}`, {
-    metrcGridId,
-    searchFilters,
-  });
 }, 100);
 
 export async function initializeFilterButtonsImpl() {
@@ -464,9 +468,9 @@ export async function getFilterFormOrError(
   metrcGridId: MetrcGridId,
   searchFilter: string
 ): Promise<HTMLFormElement> {
-  let mappedFilterForm: HTMLFormElement | null = document.querySelector(
-    `form.k-filter-menu[${T3_SEARCH_FILTER_ATTRIBUTE}="${searchFilter}"][${T3_METRC_GRID_ID_ATTRIBUTE}="${metrcGridId}"]`
-  );
+  const mappedFilterFormSelector: string = `form.k-filter-menu[${T3_SEARCH_FILTER_ATTRIBUTE}="${searchFilter}"][${T3_METRC_GRID_ID_ATTRIBUTE}="${metrcGridId}"]`;
+
+  let mappedFilterForm: HTMLFormElement | null = document.querySelector(mappedFilterFormSelector);
 
   if (!mappedFilterForm) {
     const menuButton = document.querySelector(
@@ -480,35 +484,41 @@ export async function getFilterFormOrError(
     pageManager.suppressAnimationContainer();
 
     menuButton.click();
+    // attributes are set in initializeFilterButtonsImpl during the event loop turn
     await new Promise((resolve) => setTimeout(resolve, 0));
     menuButton.click();
 
-    const untaggedForm: HTMLFormElement | null = document.querySelector(
-      `.form.k-filter-menu:not([${T3_SEARCH_FILTER_ATTRIBUTE}])`
-    );
+    mappedFilterForm = document.querySelector(mappedFilterFormSelector);
 
-    if (!untaggedForm) {
-      throw new Error(`Could not initialize animation container for filter: ${searchFilter}`);
+    // const untaggedFormSelector: string = `form.k-filter-menu:not([${T3_METRC_GRID_ID_ATTRIBUTE}])`;
+
+    // const untaggedForm: HTMLFormElement | null = document.querySelector(untaggedFormSelector);
+
+    if (!mappedFilterForm) {
+      throw new Error(`Form query selector failed: ${mappedFilterFormSelector}`);
     }
 
-    untaggedForm.setAttribute(T3_METRC_GRID_ID_ATTRIBUTE, metrcGridId);
-    untaggedForm.setAttribute(T3_SEARCH_FILTER_ATTRIBUTE, searchFilter);
+    // untaggedForm.setAttribute(T3_METRC_GRID_ID_ATTRIBUTE, metrcGridId);
+    // untaggedForm.setAttribute(T3_SEARCH_FILTER_ATTRIBUTE, searchFilter);
 
-    mappedFilterForm = untaggedForm;
+    // mappedFilterForm = untaggedForm;
   }
 
   return mappedFilterForm!;
 }
 
-export async function setFilterImpl(metrcGridId: MetrcGridId, searchFilter: string, value: string) {
+export async function setFilter(metrcGridId: MetrcGridId, searchFilter: string, value: string) {
   await pageManager.refresh;
 
   await pageManager.clickTabWithGridId(metrcGridId);
 
   const form = await getFilterFormOrError(metrcGridId, searchFilter);
 
-  const input = form.querySelector(`input[title="Filter Criteria"]`)! as HTMLElement;
-  const button = form.querySelector(`button[type="submit"]`)! as HTMLElement;
+  console.log({ form });
+
+  const input = form.querySelector(`input[title="Filter Criteria"]`)! as HTMLInputElement;
+  input.value = value;
+  const button = form.querySelector(`button[type="submit"]`)! as HTMLButtonElement;
   input.dispatchEvent(new Event("change"));
   button.click();
 }
@@ -525,7 +535,7 @@ export async function setPlantFilterImpl(
     value,
   });
 
-  await setFilterImpl(metrcGridId, plantFilterIdentifier, value);
+  await setFilter(metrcGridId, plantFilterIdentifier, value);
 }
 
 export async function setPackageFilterImpl(
@@ -540,7 +550,7 @@ export async function setPackageFilterImpl(
     value,
   });
 
-  await setFilterImpl(metrcGridId, packageFilterIdentifier, value);
+  await setFilter(metrcGridId, packageFilterIdentifier, value);
 }
 
 export async function setDestinationPackageFilterImpl(
@@ -555,7 +565,7 @@ export async function setDestinationPackageFilterImpl(
     value,
   });
 
-  await setFilterImpl(metrcGridId, destinationPackageFilterIdentifier, value);
+  await setFilter(metrcGridId, destinationPackageFilterIdentifier, value);
 }
 
 export async function setTransferFilterImpl(
@@ -570,7 +580,7 @@ export async function setTransferFilterImpl(
     value,
   });
 
-  await setFilterImpl(metrcGridId, transferFilterIdentifier, value);
+  await setFilter(metrcGridId, transferFilterIdentifier, value);
 }
 
 export async function setTagFilterImpl(
@@ -585,7 +595,7 @@ export async function setTagFilterImpl(
     value,
   });
 
-  await setFilterImpl(metrcGridId, tagFilterIdentifier, value);
+  await setFilter(metrcGridId, tagFilterIdentifier, value);
 
   // let input: HTMLInputElement | null = null;
   // let select: HTMLElement | null = null;
@@ -851,4 +861,20 @@ export async function resetFilterElementReferencesImpl() {
   // pageManager.tagNumberFilterInput = null;
   // pageManager.tagNumberFilterSelect = null;
   // pageManager.tagNumberApplyFiltersButton = null;
+}
+
+export async function applyGridState(
+  activeMetrcGridId: MetrcGridId | null,
+  metrcGridFilters: { [key: string]: { [key: string]: string } }
+) {
+  if (activeMetrcGridId) {
+    await pageManager.clickTabWithGridId(activeMetrcGridId);
+  }
+
+  // TODO apply all filters
+  for (const [metrcGridId, metrcGridData] of Object.entries(metrcGridFilters)) {
+    for (const [field, value] of Object.entries(metrcGridData)) {
+      setFilter(metrcGridId as MetrcGridId, field, value);
+    }
+  }
 }

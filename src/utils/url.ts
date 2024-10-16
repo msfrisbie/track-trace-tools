@@ -1,5 +1,9 @@
 import { URLHashData } from "@/interfaces";
 
+export function encodeHashData(hashData: URLHashData): string {
+  return encodeURIComponent(JSON.stringify(hashData));
+}
+
 export function getHashData(): URLHashData {
   try {
     return JSON.parse(decodeURIComponent(window.location.hash).slice(1));
@@ -9,7 +13,7 @@ export function getHashData(): URLHashData {
 }
 
 export function setHashData(hashData: URLHashData) {
-  window.location.hash = encodeURIComponent(JSON.stringify(hashData));
+  window.location.hash = encodeHashData(hashData);
 }
 
 // export function getTrimmedHash() {
@@ -53,14 +57,14 @@ export function getNonce(): string {
 export function navigationUrl(
   path: string,
   options: {
-    hashValues?: { [key: string]: string };
+    hash?: string;
     nonce?: string;
     origin?: string;
   } = {}
 ): string {
   const url = new URL(options.origin ?? window.location.origin + path);
   url.searchParams.set("nonce", options.nonce ?? getNonce());
-  url.hash = new URLSearchParams(options.hashValues ?? {}).toString();
+  url.hash = options.hash ?? '';
 
   return url.toString();
 }

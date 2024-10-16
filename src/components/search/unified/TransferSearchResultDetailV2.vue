@@ -14,15 +14,12 @@
 
           <b-badge class="text-lg" :variant="badgeVariant(searchResultTransferOrNull)">{{
             displayTransferState(searchResultTransferOrNull)
-          }}</b-badge>
+            }}</b-badge>
         </div>
       </div>
 
-      <div
-        v-show="isOnTransfersPage"
-        @click.stop.prevent="setTransferManifestNumberFilter(searchResultTransferOrNull)"
-        class="flex flex-row items-center justify-center cursor-pointer h-full"
-      >
+      <div v-show="isOnTransfersPage" @click.stop.prevent="setTransferManifestNumberFilter(searchResultTransferOrNull)"
+        class="flex flex-row items-center justify-center cursor-pointer h-full">
         <font-awesome-icon icon="chevron-right" class="text-2xl text-purple-500" />
       </div>
     </div>
@@ -38,14 +35,15 @@
 <script lang="ts">
 import TransferButtonList from "@/components/overlay-widget/shared/TransferButtonList.vue";
 import RecursiveJsonTable from "@/components/search/shared/RecursiveJsonTable.vue";
-import { MessageType, TransferState } from "@/consts";
+import { MessageType, MetrcGridId, TransferState } from "@/consts";
 import { IIndexedTransferData, IPluginState } from "@/interfaces";
 import { analyticsManager } from "@/modules/analytics-manager.module";
 import { TRANSFER_TAB_REGEX } from "@/modules/page-manager/consts";
+import { pageManager } from "@/modules/page-manager/page-manager.module";
+import { setFilter } from "@/modules/page-manager/search-utils";
 import { toastManager } from "@/modules/toast-manager.module";
 import store from "@/store/page-overlay/index";
 import { SearchActions } from "@/store/page-overlay/modules/search/consts";
-import { TransferSearchActions } from "@/store/page-overlay/modules/transfer-search/consts";
 import { copyToClipboard } from "@/utils/dom";
 import Vue from "vue";
 import { mapActions, mapState } from "vuex";
@@ -172,15 +170,40 @@ export default Vue.extend({
     async setTransferManifestNumberFilter(transfer: IIndexedTransferData) {
       analyticsManager.track(MessageType.SELECTED_TRANSFER);
 
-      store.dispatch(
-        `transferSearch/${TransferSearchActions.PARTIAL_UPDATE_TRANSFER_SEARCH_FILTERS}`,
-        {
-          transferState: transfer.TransferState,
-          transferSearchFilters: {
-            manifestNumber: transfer.ManifestNumber,
-          },
-        }
-      );
+      let metrcGridId: MetrcGridId;
+      switch (transfer.TransferState) {
+        case TransferState.INCOMING:
+          metrcGridId = MetrcGridId.TRANSFERS_INCOMING;
+          break;
+        case TransferState.INCOMING_INACTIVE:
+          metrcGridId = MetrcGridId.TRANSFERS_INCOMING_INACTIVE;
+          break;
+        case TransferState.OUTGOING:
+          metrcGridId = MetrcGridId.TRANSFERS_OUTGOING;
+          break;
+        case TransferState.OUTGOING_INACTIVE:
+          metrcGridId = MetrcGridId.TRANSFERS_OUTGOING_INACTIVE;
+          break;
+        case TransferState.REJECTED:
+          metrcGridId = MetrcGridId.TRANSFERS_REJECTED;
+          break;
+        default:
+          throw new Error(`Unexpected transfer state: ${transfer.TransferState}`);
+      }
+
+      await pageManager.clickTabWithGridId(metrcGridId);
+
+      await setFilter(metrcGridId, 'ManifestNumber', transfer.ManifestNumber);
+
+      // store.dispatch(
+      //   `transferSearch/${TransferSearchActions.PARTIAL_UPDATE_TRANSFER_SEARCH_FILTERS}`,
+      //   {
+      //     transferState: transfer.TransferState,
+      //     transferSearchFilters: {
+      //       manifestNumber: transfer.ManifestNumber,
+      //     },
+      //   }
+      // );
 
       this.setShowSearchResults({ showSearchResults: false });
     },

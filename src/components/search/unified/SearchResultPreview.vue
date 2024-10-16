@@ -86,8 +86,8 @@ export default Vue.extend({
 
       if (searchResult.incomingTransfer || searchResult.outgoingTransfer) {
         return {
-          bgColorClass: 'bg-orange-200 hover:bg-orange-300',
-          textColorClass: 'text-orange-700'
+          bgColorClass: 'bg-yellow-200 hover:bg-yellow-300',
+          textColorClass: 'text-yellow-700'
         };
       }
 

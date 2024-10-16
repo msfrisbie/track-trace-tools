@@ -4,6 +4,7 @@ import { analyticsManager } from "@/modules/analytics-manager.module";
 import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
 import { generateSearchResultMetadata } from "@/modules/page-manager/search-utils";
 import { maybePushOntoUniqueStack } from "@/utils/search";
+import { getHashData, setHashData } from "@/utils/url";
 import _ from "lodash-es";
 import { ActionContext } from "vuex";
 import { SearchActions, SearchMutations, SearchStatus, SearchType } from "./consts";
@@ -19,7 +20,7 @@ const inMemoryState = {
   searchResults: [],
   activeSearchResult: null,
   searchType: SearchType.PACKAGES,
-  metrcSearchFilters: {},
+  metrcGridFilters: {},
   activeMetrcGridId: null,
 };
 
@@ -121,12 +122,12 @@ export const searchModule = {
         metrcGridId: MetrcGridId;
       }
     ) => {
-      const metrcSearchFilters = {
-        ...ctx.state.metrcSearchFilters,
+      const metrcGridFilters = {
+        ...ctx.state.metrcGridFilters,
         [metrcGridId]: searchFilters,
       };
 
-      ctx.commit(SearchMutations.SEARCH_MUTATION, { metrcSearchFilters });
+      ctx.commit(SearchMutations.SEARCH_MUTATION, { metrcGridFilters });
     },
     [SearchActions.SET_ACTIVE_METRC_GRID_ID]: async (
       ctx: ActionContext<ISearchState, IPluginState>,
@@ -136,6 +137,13 @@ export const searchModule = {
         metrcGridId: MetrcGridId;
       }
     ) => {
+      const currentHashData = getHashData();
+
+      setHashData({
+        ...currentHashData,
+        activeMetrcGridId: metrcGridId,
+      });
+
       ctx.commit(SearchMutations.SEARCH_MUTATION, { activeMetrcGridId: metrcGridId });
     },
     [SearchActions.EXECUTE_QUERY]: _.debounce(
@@ -168,8 +176,6 @@ export const searchModule = {
         try {
           await Promise.allSettled([
             primaryDataLoader.onDemandActivePackageSearch({ queryString }).then((result) => {
-              console.log({ result });
-
               const newSearchResults: ISearchResult[] = result.map((pkg) =>
                 generateSearchResultMetadata(queryString, {
                   pkg,

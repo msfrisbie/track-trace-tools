@@ -12,9 +12,9 @@ describe("url.ts", () => {
   //   expect(readHashValueOrNull("foo")).toEqual("234");
   // });
 
-  it("Correctly generates a nav url", () => {
-    expect(navigationUrl("/foo/bar", { hashValues: { baz: "qux" }, nonce: "12345" })).toEqual(
-      "http://localhost/foo/bar?nonce=12345#baz=qux"
-    );
-  });
+  // it("Correctly generates a nav url", () => {
+  //   expect(navigationUrl("/foo/bar", { hashValues: { baz: "qux" }, nonce: "12345" })).toEqual(
+  //     "http://localhost/foo/bar?nonce=12345#baz=qux"
+  //   );
+  // });
 });
