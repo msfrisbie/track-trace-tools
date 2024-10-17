@@ -1,128 +1,54 @@
 <template>
   <div>
-    <div v-if="searchResultTransferOrNull" class="flex flex-col items-center space-y-8 px-2 p-4">
-      <div class="w-full grid grid-cols-3" style="grid-template-columns: 1fr 8fr 1fr">
-        <div></div>
+    <div
+      v-if="searchResultTransferOrNull || searchResultPackageOrNull || searchResultPlantOrNull || searchResultTagOrNull"
+      class="flex flex-col items-center space-y-8 px-2 p-4">
+      <!-- <div class="w-full grid grid-cols-3" style="grid-template-columns: 1fr 8fr 1fr"> -->
+      <!-- <div></div> -->
 
-        <div class="flex flex-col items-center space-y-8 flex-grow">
-          <div class="flex flex-col space-y-2 items-center">
-
-            <div class="flex flex-col justify-center gap-1 items-center text-center w-20 text-sm my-2">
-              <complex-icon class="text-yellow-700" :primaryIconName="searchState.activeSearchResult.primaryIconName"
-                primaryIconSize="xl" :secondaryIconName="searchState.activeSearchResult.secondaryIconName"
-                secondaryIconSize="sm"></complex-icon>
-
-              <div class="font-bold text-base">
-                {{ searchState.activeSearchResult.primaryTextualDescriptor }}
-              </div>
-            </div>
-
-            <div class="flex flex-row items-center space-x-4 text-center">
-              <div class="text-2xl text-yellow-800">
-                Manifest
-                {{ searchResultTransferOrNull.ManifestNumber }}
-              </div>
+      <div class="flex flex-col items-center space-y-8 flex-grow">
+        <div class="flex flex-col space-y-2 items-center">
+          <!-- Icon and Descriptor for Transfer or Package -->
+          <div v-if="searchResultTransferOrNull || searchResultPackageOrNull"
+            class="flex flex-col justify-center gap-1 items-center text-center w-20 text-sm my-2">
+            <complex-icon
+              :class="{ 'text-yellow-700': searchResultTransferOrNull, 'text-purple-700': searchResultPackageOrNull }"
+              :primaryIconName="searchState.activeSearchResult.primaryIconName" primaryIconSize="xl"
+              :secondaryIconName="searchState.activeSearchResult.secondaryIconName" secondaryIconSize="sm" />
+            <div class="font-bold text-base">
+              {{ searchState.activeSearchResult.primaryTextualDescriptor }}
             </div>
           </div>
-        </div>
 
-        <div v-show="isOnTransfersPage"
-          @click.stop.prevent="setTransferManifestNumberFilter(searchResultTransferOrNull)"
-          class="flex flex-row items-center justify-center cursor-pointer h-full">
-          <font-awesome-icon icon="chevron-right" class="text-2xl text-purple-500" />
-        </div>
-      </div>
-
-      <div class="grid grid-cols-2 gap-2">
-        <transfer-button-list :transfer="searchResultTransferOrNull"></transfer-button-list>
-      </div>
-
-      <recursive-json-table :jsonObject="searchResultTransferOrNull"></recursive-json-table>
-    </div>
-
-    <div v-if="searchResultPackageOrNull" class="flex flex-col items-center space-y-8 px-2 p-4">
-      <div class="w-full grid grid-cols-3" style="grid-template-columns: 1fr 8fr 1fr">
-        <div></div>
-
-        <div class="flex flex-col items-center space-y-8 flex-grow">
-          <div class="flex flex-col space-y-2 items-center">
-            <div class="flex flex-col justify-center gap-1 items-center text-center w-20 text-sm my-2">
-              <complex-icon class="text-purple-700" :primaryIconName="searchState.activeSearchResult.primaryIconName"
-                primaryIconSize="xl" :secondaryIconName="searchState.activeSearchResult.secondaryIconName"
-                secondaryIconSize="sm"></complex-icon>
-
-              <div class="font-bold text-base">
-                {{ searchState.activeSearchResult.primaryTextualDescriptor }}
-              </div>
+          <!-- Main Content: Manifest, Package, Plant, or Tag -->
+          <div class="flex flex-row items-center space-x-4 text-center">
+            <div v-if="searchResultTransferOrNull" class="text-2xl text-yellow-800">
+              Manifest {{ searchResultTransferOrNull.ManifestNumber }}
             </div>
-
-            <div class="flex flex-row items-center space-x-4 text-center">
-              <metrc-tag :label="getLabelOrError(searchResultPackageOrNull)" sideText="PACKAGE"></metrc-tag>
-            </div>
+            <metrc-tag v-if="searchResultPackageOrNull" :label="getLabelOrError(searchResultPackageOrNull)"
+              sideText="PACKAGE" />
+            <metrc-tag v-if="searchResultPlantOrNull" :label="searchResultPlantOrNull.Label" sideText="PLANT" />
+            <metrc-tag v-if="searchResultTagOrNull" :label="searchResultTagOrNull.Label"
+              :sideText="searchResultTagOrNull.TagTypeName" />
           </div>
         </div>
+      </div>
 
-        <div v-show="isOnPackagesPage" @click.stop.prevent="setPackageLabelFilter(searchResultPackageOrNull)"
-          class="flex flex-row items-center justify-center cursor-pointer h-full">
+      <!-- Action Button -->
+      <!-- <div v-show="isOnTransfersPage && searchResultTransferOrNull || isOnPackagesPage && searchResultPackageOrNull || isOnPlantsPage && searchResultPlantOrNull || isOnTagsPage && searchResultTagOrNull" @click.stop.prevent="handleFilterClick" class="flex flex-row items-center justify-center cursor-pointer h-full">
           <font-awesome-icon icon="chevron-right" class="text-2xl text-purple-500" />
         </div>
+      </div> -->
+
+      <!-- Button List -->
+      <div v-if="searchResultTransferOrNull || searchResultPackageOrNull" class="grid grid-cols-2 gap-2">
+        <transfer-button-list v-if="searchResultTransferOrNull" :transfer="searchResultTransferOrNull" />
+        <package-button-list v-if="searchResultPackageOrNull" :pkg="searchResultPackageOrNull" />
       </div>
 
-      <div class="grid grid-cols-2 gap-2">
-        <package-button-list :pkg="searchResultPackageOrNull"></package-button-list>
-      </div>
-
-      <recursive-json-table :jsonObject="searchResultPackageOrNull"></recursive-json-table>
-    </div>
-
-    <div v-if="searchResultPlantOrNull" class="flex flex-col items-center space-y-8 px-2 p-4">
-      <div class="w-full grid grid-cols-3" style="grid-template-columns: 1fr 8fr 1fr">
-        <div></div>
-
-        <div class="flex flex-col items-center space-y-8 flex-grow">
-          <div class="flex flex-col space-y-2 items-center">
-            <div class="flex flex-col items-center space-x-4 text-center">
-              <metrc-tag :label="searchResultPlantOrNull.Label" sideText="PLANT"></metrc-tag>
-            </div>
-
-            <!-- <b-badge class="text-lg" :variant="badgeVariant(searchResultPlantOrNull)">{{
-              displayPlantState(searchResultPlantOrNull)
-              }}</b-badge> -->
-          </div>
-        </div>
-
-        <div v-show="isOnPlantsPage" @click.stop.prevent="setPlantLabelFilter(searchResultPlantOrNull)"
-          class="flex flex-row items-center justify-center cursor-pointer h-full">
-          <font-awesome-icon icon="chevron-right" class="text-2xl text-purple-500" />
-        </div>
-      </div>
-
-      <recursive-json-table :jsonObject="searchResultPlantOrNull"></recursive-json-table>
-    </div>
-
-    <div v-if="searchResultTagOrNull" class="flex flex-col items-center space-y-8 px-2 p-4">
-      <div class="w-full grid grid-cols-3" style="grid-template-columns: 1fr 8fr 1fr">
-        <div></div>
-
-        <div class="flex flex-col items-center space-y-8 flex-grow">
-          <div class="flex flex-col space-y-2 items-center">
-            <div class="flex flex-col items-center space-x-4 text-center">
-              <metrc-tag :label="searchResultTagOrNull.Label" :sideText="searchResultTagOrNull.TagTypeName"></metrc-tag>
-            </div>
-
-            <!-- <b-badge class="text-lg" :variant="badgeVariant(searchResultTagOrNull)">{{
-              displayTagState(searchResultTagOrNull)
-              }}</b-badge> -->
-          </div>
-        </div>
-
-        <div v-show="isOnTagsPage" @click.stop.prevent="setTagLabelFilter(searchResultTagOrNull)"
-          class="flex flex-row items-center justify-center cursor-pointer h-full">
-          <font-awesome-icon icon="chevron-right" class="text-2xl text-purple-500" />
-        </div>
-      </div>
-
-      <recursive-json-table :jsonObject="searchResultTagOrNull"></recursive-json-table>
+      <!-- JSON Table -->
+      <recursive-json-table
+        :jsonObject="searchResultTransferOrNull || searchResultPackageOrNull || searchResultPlantOrNull || searchResultTagOrNull" />
     </div>
   </div>
 </template>

@@ -187,6 +187,7 @@ export const searchModule = {
           queryStringHistory: maybePushOntoUniqueStack(queryString, ctx.state.queryStringHistory),
           status: SearchStatus.INFLIGHT,
           searchResults: [],
+          activeSearchResult: null,
         });
 
         const searchId = queryString.toString();

@@ -66,14 +66,14 @@
                     </template>
 
                     <template v-if="searchState.queryString.length > 0">
-                      <div class="flex flex-col overflow-y-auto bg-gray-50 col-span-3 min-h-screen">
+                      <div class="flex flex-col overflow-y-auto bg-gray-50 col-span-2 min-h-screen">
                         <search-result-preview v-for="(searchResult, idx) in searchState.searchResults" v-bind:key="idx"
                           :searchResult="searchResult"></search-result-preview>
 
                         <div class="flex-grow bg-gray-50"></div>
                       </div>
 
-                      <div class="flex flex-col overflow-y-auto col-span-3">
+                      <div class="flex flex-col overflow-y-auto col-span-4">
                         <!-- <package-search-result-detail /> -->
                         <!-- <div>RESULT DETAIL</div> -->
                         <search-result-detail></search-result-detail>

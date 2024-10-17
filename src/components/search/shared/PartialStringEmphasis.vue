@@ -1,7 +1,7 @@
 <template>
     <div class="flex flex-row items-center">
         <span v-bind:key="idx" v-for="[idx, stringPiece] of stringPieces.entries()"
-            v-bind:class="{ 'font-bold': stringPiece.emphasized }">
+            v-bind:class="{ 'font-extrabold underline': stringPiece.emphasized, 'font-light': !stringPiece.emphasized }">
             {{ stringPiece.text }}
         </span>
     </div>

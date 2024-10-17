@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-row gap-2 p-1 cursor-pointer border-b border-purple-200" v-bind:class="{
+  <div class="flex flex-row gap-2 p-1 cursor-pointer border-b border-gray-200" v-bind:class="{
     'bg-white': searchState.activeSearchResult === searchResult,
     [classNames(searchResult).bgColorClass]: true
   }" @click="selectSearchResult({ searchResult })">
@@ -14,16 +14,14 @@
       </div>
     </div>
 
-    <div class="flex flex-row items-center p-2">
-      <table class="table-auto w-full text-start">
-        <tr class="border-b" v-for="[idx, matchedField] of searchResult.matchedFields.entries()" v-bind:key="idx">
-          <td class="text-right p-2 align-top">{{ matchedField.field }}:</td>
-          <td class="p-2 font-mono align-top">
-            <partial-string-emphasis class="text-wrap flex-wrap" :fullString="matchedField.value"
-              style="max-width:300px" :partialString="searchState.queryString"></partial-string-emphasis>
-          </td>
-        </tr>
-      </table>
+    <div class="p-2 w-full grid grid-cols-2 gap-2">
+      <fragment v-for="[idx, matchedField] of searchResult.matchedFields.entries()" v-bind:key="idx">
+        <div class="text-right p-2 align-self-start">{{ matchedField.field }}:</div>
+        <div class="p-2 font-mono align-self-start">
+          <partial-string-emphasis class="text-wrap flex-wrap" :fullString="matchedField.value" style="max-width:300px"
+            :partialString="searchState.queryString"></partial-string-emphasis>
+        </div>
+      </fragment>
     </div>
   </div>
 </template>
@@ -72,27 +70,27 @@ export default Vue.extend({
     classNames(searchResult: ISearchResult): { bgColorClass: string, textColorClass: string } {
       if (searchResult.plant || searchResult.plantBatch) {
         return {
-          bgColorClass: 'bg-purple-100 hover:bg-green-300',
+          bgColorClass: 'bg-gray-100 hover:bg-green-300',
           textColorClass: 'text-green-700'
         };
       }
 
       if (searchResult.tag) {
         return {
-          bgColorClass: 'bg-purple-100 hover:bg-blue-300',
+          bgColorClass: 'bg-gray-100 hover:bg-blue-300',
           textColorClass: 'text-blue-700'
         };
       }
 
       if (searchResult.incomingTransfer || searchResult.outgoingTransfer) {
         return {
-          bgColorClass: 'bg-purple-100 hover:bg-yellow-300',
+          bgColorClass: 'bg-gray-100 hover:bg-yellow-300',
           textColorClass: 'text-yellow-700'
         };
       }
 
       return {
-        bgColorClass: 'bg-purple-100 hover:bg-purple-300',
+        bgColorClass: 'bg-gray-100 hover:bg-purple-300',
         textColorClass: 'ttt-purple'
       };
     }
