@@ -475,60 +475,64 @@ export async function getFilterFormOrError(
   metrcGridId: MetrcGridId,
   searchFilter: string
 ): Promise<HTMLFormElement> {
-  if (getActiveMetrcGridIdOrNull() !== metrcGridId) {
-    await pageManager.refresh;
+  // if (getActiveMetrcGridIdOrNull() !== metrcGridId) {
+  await pageManager.refresh;
 
-    await pageManager.clickTabWithGridIdIfExists(metrcGridId);
-  }
+  //   await pageManager.clickTabWithGridIdIfExists(metrcGridId);
+  // }
 
-  const mappedFilterFormSelector: string = `form.k-filter-menu[${T3_SEARCH_FILTER_ATTRIBUTE}="${searchFilter}"][${T3_METRC_GRID_ID_ATTRIBUTE}="${metrcGridId}"]`;
+  const mappedFilterFormSelector: string = `form.k-filter-menu[${T3_METRC_GRID_ID_ATTRIBUTE}="${metrcGridId}"][${T3_SEARCH_FILTER_ATTRIBUTE}="${searchFilter}"]`;
 
   let mappedFilterForm: HTMLFormElement | null = document.querySelector(mappedFilterFormSelector);
 
   if (!mappedFilterForm) {
     const menuButton = document.querySelector(
-      `th[data-field="${searchFilter}"] .k-header-column-menu`
+      `#${metrcGridId} th[data-field="${searchFilter}"] .k-header-column-menu`
     ) as HTMLElement | null;
 
     if (!menuButton) {
       throw new Error(`Cannot find menu button for filter: ${searchFilter}`);
     }
 
-    const t0 = Date.now();
-    while (true) {
-      pageManager.suppressAnimationContainer();
+    pageManager.suppressAnimationContainer();
 
-      menuButton.click();
-      // attributes are set in initializeFilterButtons during the event loop turn
-      await pageManager.clickSettleDelay();
-      menuButton.click();
+    menuButton.click();
+    // attributes are set in initializeFilterButtons during the event loop turn
+    await pageManager.clickSettleDelay();
+    menuButton.click();
 
-      // await new Promise((resolve) => setTimeout(resolve, 1000));
+    console.log(mappedFilterFormSelector);
 
-      // await pageManager.clickSettleDelay();
+    mappedFilterForm = document.querySelector(mappedFilterFormSelector);
 
-      // await new Promise((resolve) => setTimeout(resolve, 1000));
+    // const t0 = Date.now();
+    // while (true) {
+    //   pageManager.suppressAnimationContainer();
 
-      // debugger;
-      if (Date.now() - t0 > 5000) {
-        break;
-      }
+    //   menuButton.click();
+    //   // attributes are set in initializeFilterButtons during the event loop turn
+    //   await pageManager.clickSettleDelay();
+    //   menuButton.click();
 
-      mappedFilterForm = document.querySelector(mappedFilterFormSelector);
+    //   if (Date.now() - t0 > 5000) {
+    //     break;
+    //   }
 
-      if (mappedFilterForm) {
-        break;
-      }
-      console.log({ mappedFilterForm });
+    //   mappedFilterForm = document.querySelector(mappedFilterFormSelector);
 
-      await new Promise((resolve) => setTimeout(resolve, 100));
-    }
+    //   if (mappedFilterForm) {
+    //     break;
+    //   }
+    //   console.log({ mappedFilterForm });
+
+    //   await new Promise((resolve) => setTimeout(resolve, 100));
+    // }
 
     // const untaggedFormSelector: string = `form.k-filter-menu:not([${T3_METRC_GRID_ID_ATTRIBUTE}])`;
 
     // const untaggedForm: HTMLFormElement | null = document.querySelector(untaggedFormSelector);
 
-    console.log({ mappedFilterForm });
+    // console.log({ mappedFilterForm });
 
     if (!mappedFilterForm) {
       throw new Error(`Form query selector failed: ${mappedFilterFormSelector}`);

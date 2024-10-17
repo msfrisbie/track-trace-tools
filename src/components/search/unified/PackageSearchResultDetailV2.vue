@@ -154,13 +154,7 @@ export default Vue.extend({
 
       await pageManager.clickTabWithGridIdIfExists(metrcGridId);
 
-      // await pageManager.clickSettleDelay();
-
       await clearFilters(metrcGridId);
-
-      // await pageManager.clickSettleDelay();
-
-      // await new Promise((resolve) => setTimeout(resolve, 1000));
 
       const label = getLabelOrError(pkg);
 

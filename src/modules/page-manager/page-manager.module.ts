@@ -150,16 +150,6 @@ class PageManager implements IAtomicService {
       await applyUrlGridState();
 
       await applyDefaultTabs();
-
-      // const currentHashData = getHashData();
-
-      // // Only initialize the active grid filters
-      // const activeMetrcGridId: MetrcGridId | null =
-      //   currentHashData.activeMetrcGridId as MetrcGridId;
-
-      // const metrcGridFilters = currentHashData.metrcGridFilters ?? {};
-
-      // await applyGridState(activeMetrcGridId, metrcGridFilters);
     } catch (e) {
       console.error("FAILED HASH DATA");
       console.error(e);
@@ -420,8 +410,7 @@ class PageManager implements IAtomicService {
 
       this.tagTableGroups();
 
-      // INIT BUTTONS
-      // await initializeFilterButtons();
+      await initializeFilterButtons();
 
       await mirrorMetrcTableState();
 
