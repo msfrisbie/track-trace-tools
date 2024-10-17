@@ -5,16 +5,10 @@
 
       <div class="flex flex-col items-center space-y-8 flex-grow">
         <div class="flex flex-col space-y-2 items-center">
-          <div
-            class="flex flex-col justify-center gap-1 items-center text-center w-20 text-sm my-2"
-          >
-            <complex-icon
-              class="text-purple-700"
-              :primaryIconName="searchState.activeSearchResult.primaryIconName"
-              primaryIconSize="xl"
-              :secondaryIconName="searchState.activeSearchResult.secondaryIconName"
-              secondaryIconSize="sm"
-            ></complex-icon>
+          <div class="flex flex-col justify-center gap-1 items-center text-center w-20 text-sm my-2">
+            <complex-icon class="text-purple-700" :primaryIconName="searchState.activeSearchResult.primaryIconName"
+              primaryIconSize="xl" :secondaryIconName="searchState.activeSearchResult.secondaryIconName"
+              secondaryIconSize="sm"></complex-icon>
 
             <div class="font-bold text-base">
               {{ searchState.activeSearchResult.primaryTextualDescriptor }}
@@ -22,10 +16,7 @@
           </div>
 
           <div class="flex flex-row items-center space-x-4 text-center">
-            <metrc-tag
-              :label="getLabelOrError(searchResultPackageOrNull)"
-              sideText="PACKAGE"
-            ></metrc-tag>
+            <metrc-tag :label="getLabelOrError(searchResultPackageOrNull)" sideText="PACKAGE"></metrc-tag>
           </div>
 
           <!-- <b-badge class="text-lg" :variant="badgeVariant(searchResultPackageOrNull)">{{
@@ -34,11 +25,8 @@
         </div>
       </div>
 
-      <div
-        v-show="isOnPackagesPage"
-        @click.stop.prevent="setPackageLabelFilter(searchResultPackageOrNull)"
-        class="flex flex-row items-center justify-center cursor-pointer h-full"
-      >
+      <div v-show="isOnPackagesPage" @click.stop.prevent="setPackageLabelFilter(searchResultPackageOrNull)"
+        class="flex flex-row items-center justify-center cursor-pointer h-full">
         <font-awesome-icon icon="chevron-right" class="text-2xl text-purple-500" />
       </div>
     </div>
@@ -164,19 +152,17 @@ export default Vue.extend({
           throw new Error(`Unexpected package state: ${pkg.PackageState}`);
       }
 
-      await pageManager.clickTabWithGridId(metrcGridId);
+      await pageManager.clickTabWithGridIdIfExists(metrcGridId);
 
-      await pageManager.clickSettleDelay();
+      // await pageManager.clickSettleDelay();
 
-      clearFilters(metrcGridId);
+      await clearFilters(metrcGridId);
 
-      await pageManager.clickSettleDelay();
+      // await pageManager.clickSettleDelay();
 
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      // await new Promise((resolve) => setTimeout(resolve, 1000));
 
       const label = getLabelOrError(pkg);
-
-      debugger;
 
       if (pkg.PackageState === PackageState.TRANSFERRED) {
         setFilter(metrcGridId, "PackageLabel", label);

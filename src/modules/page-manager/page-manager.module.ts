@@ -1,7 +1,6 @@
 import {
   DEBUG_ATTRIBUTE,
   MessageType,
-  MetrcGridId,
   ModalAction,
   ModalType,
   TTT_TABLEGROUP_ATTRIBUTE,
@@ -12,7 +11,6 @@ import { MutationType } from "@/mutation-types";
 import store from "@/store/page-overlay/index";
 import { MetrcTableActions } from "@/store/page-overlay/modules/metrc-table/consts";
 import { debugLogFactory } from "@/utils/debug";
-import { getHashData } from "@/utils/url";
 import _ from "lodash-es";
 import { timer } from "rxjs";
 import { v4 as uuidv4 } from "uuid";
@@ -46,10 +44,9 @@ import {
   suppressAnimationContainerImpl,
 } from "./metrc-utils";
 import {
-  initializeFilterButtonsImpl,
+  initializeFilterButtons,
   mirrorMetrcTableState,
   resetFilterElementReferencesImpl,
-  setFilter,
 } from "./search-utils";
 import {
   controlBackgroundImpl,
@@ -59,9 +56,10 @@ import {
 } from "./style-utils";
 import {
   activeTabOrNullImpl,
+  applyDefaultTabs,
+  applyUrlGridState,
   clickTabStartingWithImpl,
   isTabActiveImpl,
-  manageTabs,
 } from "./tab-utils";
 
 const debugLog = debugLogFactory("page-manager.module.ts");
@@ -109,6 +107,8 @@ class PageManager implements IAtomicService {
 
   activeModal: HTMLElement | null = null;
 
+  finishedGridInit: boolean = false;
+
   // Transfer Modal
 
   addMoreButton: HTMLElement | null = null;
@@ -145,25 +145,32 @@ class PageManager implements IAtomicService {
     this.snowflakeCanvas = document.querySelector("canvas") as HTMLElement | null;
 
     try {
-      await manageTabs();
+      await initializeFilterButtons();
 
-      const currentHashData = getHashData();
+      await applyUrlGridState();
 
-      for (const [metrcGridId, metrcGridFilters] of Object.entries(currentHashData.metrcGridFilters ?? {})) {
-        for (const [field, value] of Object.entries(metrcGridFilters)) {
-          console.log({ metrcGridId, field, value });
-          await setFilter(metrcGridId as MetrcGridId, field, value);
-        }
-      }
+      await applyDefaultTabs();
+
+      // const currentHashData = getHashData();
+
+      // // Only initialize the active grid filters
+      // const activeMetrcGridId: MetrcGridId | null =
+      //   currentHashData.activeMetrcGridId as MetrcGridId;
+
+      // const metrcGridFilters = currentHashData.metrcGridFilters ?? {};
+
+      // await applyGridState(activeMetrcGridId, metrcGridFilters);
     } catch (e) {
-      console.error('FAILED HASH DATA');
+      console.error("FAILED HASH DATA");
       console.error(e);
     }
+
+    this.finishedGridInit = true;
 
     // Eagerly modify
     timer(0, 2500).subscribe(() => this.modifyPageAtInterval());
 
-    const debouncedHandler = _.debounce(() => this.modifyPageOnDomChange(), 100);
+    const debouncedHandler = _.debounce(() => this.modifyPageOnDomChange(), 100, { leading: true });
 
     const observer = new MutationObserver(() => debouncedHandler());
 
@@ -413,9 +420,10 @@ class PageManager implements IAtomicService {
 
       this.tagTableGroups();
 
-      this.initializeFilterButtons();
+      // INIT BUTTONS
+      // await initializeFilterButtons();
 
-      mirrorMetrcTableState();
+      await mirrorMetrcTableState();
 
       if (window.location.pathname.match(PACKAGE_TAB_REGEX)) {
         this.addButtonsToPackageTable();
@@ -558,17 +566,49 @@ class PageManager implements IAtomicService {
     return modifyTransferModalImpl();
   }
 
-  async clickTabWithGridId(metrcGridId: MetrcGridId): Promise<boolean> {
-    const element = document.querySelector(
-      `[data-grid-selector="#${metrcGridId}"]`
-    )! as HTMLElement;
+  async clickTabWithGridIdIfExists(metrcGridId: string) {
+    try {
+      await this.clickTabWithGridIdOrError(metrcGridId);
+    } catch {}
+  }
+
+  async clickTabWithGridIdOrError(metrcGridId: string) {
+    const element = document.querySelector(`[data-grid-selector="#${metrcGridId}"]`) as HTMLElement;
 
     if (element) {
       element.click();
-      return true;
+      await pageManager.clickSettleDelay();
+
+      // Spin lock: checks for the `.k-loading-mask` every 100ms until it's removed or 5000ms have passed
+      await new Promise<void>((resolve, reject) => {
+        const timeout = 5000;
+        const interval = 100;
+        let elapsed = 0;
+
+        const checkMask = setInterval(() => {
+          const loadingMask = document.querySelector(`#${metrcGridId} .k-loading-mask`);
+
+          if (!loadingMask) {
+            clearInterval(checkMask);
+            resolve(); // The loading mask is gone, we resolve the promise
+          }
+
+          elapsed += interval;
+          if (elapsed >= timeout) {
+            clearInterval(checkMask);
+            reject(
+              new Error(
+                `Loading mask for grid ID ${metrcGridId} did not disappear within ${timeout}ms.`
+              )
+            );
+          }
+        }, interval);
+      });
+
+      return;
     }
 
-    return false;
+    throw new Error(`Unable to match grid ID: ${metrcGridId}`);
   }
 
   async clickTabStartingWith(
@@ -584,10 +624,6 @@ class PageManager implements IAtomicService {
     previousTabTextOffset: number | null = null
   ) {
     return clickTabStartingWithImpl(tabList, tabText, previousTabText, previousTabTextOffset);
-  }
-
-  async initializeFilterButtons() {
-    return initializeFilterButtonsImpl();
   }
 
   // When a tab changes, we need to wipe out the references and reacquire them

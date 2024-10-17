@@ -77,16 +77,16 @@ export const plantSearchModule = {
       if (plantState) {
         switch (plantState as PlantState) {
           case PlantState.FLOWERING:
-            pageManager.clickTabWithGridId(MetrcGridId.PLANTS_FLOWERING);
+            pageManager.clickTabWithGridIdIfExists(MetrcGridId.PLANTS_FLOWERING);
             break;
           case PlantState.VEGETATIVE:
-            pageManager.clickTabWithGridId(MetrcGridId.PLANTS_VEGETATIVE);
+            pageManager.clickTabWithGridIdIfExists(MetrcGridId.PLANTS_VEGETATIVE);
             break;
           case PlantState.INACTIVE:
-            pageManager.clickTabWithGridId(MetrcGridId.PLANTS_INACTIVE);
+            pageManager.clickTabWithGridIdIfExists(MetrcGridId.PLANTS_INACTIVE);
             break;
           case PlantState.ON_HOLD:
-            pageManager.clickTabWithGridId(MetrcGridId.PLANTS_ON_HOLD);
+            pageManager.clickTabWithGridIdIfExists(MetrcGridId.PLANTS_ON_HOLD);
             break;
           default:
             break;

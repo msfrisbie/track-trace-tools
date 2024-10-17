@@ -86,19 +86,19 @@ export const packageSearchModule = {
       if (packageState) {
         switch (packageState as PackageState) {
           case PackageState.ACTIVE:
-            await pageManager.clickTabWithGridId(MetrcGridId.PACKAGES_ACTIVE);
+            await pageManager.clickTabWithGridIdIfExists(MetrcGridId.PACKAGES_ACTIVE);
             break;
           case PackageState.ON_HOLD:
-            await pageManager.clickTabWithGridId(MetrcGridId.PACKAGES_ON_HOLD);
+            await pageManager.clickTabWithGridIdIfExists(MetrcGridId.PACKAGES_ON_HOLD);
             break;
           case PackageState.INACTIVE:
-            await pageManager.clickTabWithGridId(MetrcGridId.PACKAGES_INACTIVE);
+            await pageManager.clickTabWithGridIdIfExists(MetrcGridId.PACKAGES_INACTIVE);
             break;
           case PackageState.IN_TRANSIT:
-            await pageManager.clickTabWithGridId(MetrcGridId.PACKAGES_IN_TRANSIT);
+            await pageManager.clickTabWithGridIdIfExists(MetrcGridId.PACKAGES_IN_TRANSIT);
             break;
           case PackageState.TRANSFERRED:
-            await pageManager.clickTabWithGridId(MetrcGridId.PACKAGES_TRANSFERRED);
+            await pageManager.clickTabWithGridIdIfExists(MetrcGridId.PACKAGES_TRANSFERRED);
             break;
           default:
             break;

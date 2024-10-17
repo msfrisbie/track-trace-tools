@@ -1,4 +1,4 @@
-import { MetrcGridId, TagFilterIdentifiers, TagState } from "@/consts";
+import { MetrcGridId, TagState } from "@/consts";
 import { IPluginState, ITagSearchFilters } from "@/interfaces";
 import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
 import { pageManager } from "@/modules/page-manager/page-manager.module";
@@ -83,13 +83,13 @@ export const tagSearchModule = {
       if (tagState) {
         switch (tagState as TagState) {
           case TagState.AVAILABLE:
-            await pageManager.clickTabWithGridId(MetrcGridId.TAGS_AVAILABLE);
+            await pageManager.clickTabWithGridIdIfExists(MetrcGridId.TAGS_AVAILABLE);
             break;
           case TagState.USED:
-            await pageManager.clickTabWithGridId(MetrcGridId.TAGS_USED);
+            await pageManager.clickTabWithGridIdIfExists(MetrcGridId.TAGS_USED);
             break;
           case TagState.VOIDED:
-            await pageManager.clickTabWithGridId(MetrcGridId.TAGS_VOIDED);
+            await pageManager.clickTabWithGridIdIfExists(MetrcGridId.TAGS_VOIDED);
             break;
           default:
             break;

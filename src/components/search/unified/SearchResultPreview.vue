@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-row gap-2 p-1 cursor-pointer" v-bind:class="{
+  <div class="flex flex-row gap-2 p-1 cursor-pointer border-b border-purple-200" v-bind:class="{
     'bg-white': searchState.activeSearchResult === searchResult,
     [classNames(searchResult).bgColorClass]: true
   }" @click="selectSearchResult({ searchResult })">
@@ -72,27 +72,27 @@ export default Vue.extend({
     classNames(searchResult: ISearchResult): { bgColorClass: string, textColorClass: string } {
       if (searchResult.plant || searchResult.plantBatch) {
         return {
-          bgColorClass: 'bg-green-200 hover:bg-green-300',
+          bgColorClass: 'bg-purple-100 hover:bg-green-300',
           textColorClass: 'text-green-700'
         };
       }
 
       if (searchResult.tag) {
         return {
-          bgColorClass: 'bg-blue-200 hover:bg-blue-300',
+          bgColorClass: 'bg-purple-100 hover:bg-blue-300',
           textColorClass: 'text-blue-700'
         };
       }
 
       if (searchResult.incomingTransfer || searchResult.outgoingTransfer) {
         return {
-          bgColorClass: 'bg-yellow-200 hover:bg-yellow-300',
+          bgColorClass: 'bg-purple-100 hover:bg-yellow-300',
           textColorClass: 'text-yellow-700'
         };
       }
 
       return {
-        bgColorClass: 'bg-purple-200 hover:bg-purple-300',
+        bgColorClass: 'bg-purple-100 hover:bg-purple-300',
         textColorClass: 'ttt-purple'
       };
     }

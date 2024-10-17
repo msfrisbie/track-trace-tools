@@ -2,6 +2,7 @@ import { HarvestState, MessageType, MetrcGridId, TagState, TransferState } from 
 import { IPluginState } from "@/interfaces";
 import { analyticsManager } from "@/modules/analytics-manager.module";
 import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
+import { pageManager } from "@/modules/page-manager/page-manager.module";
 import { generateSearchResultMetadata } from "@/modules/page-manager/search-utils";
 import { maybePushOntoUniqueStack } from "@/utils/search";
 import { getHashData, setHashData } from "@/utils/url";
@@ -9,6 +10,8 @@ import _ from "lodash-es";
 import { ActionContext } from "vuex";
 import { SearchActions, SearchMutations, SearchStatus, SearchType } from "./consts";
 import { ISearchResult, ISearchState } from "./interfaces";
+
+const QUERY_DEBOUNCE_MS: number = 700;
 
 const inMemoryState = {
   queryString: "",
@@ -122,6 +125,10 @@ export const searchModule = {
         metrcGridId: MetrcGridId;
       }
     ) => {
+      if (!pageManager.finishedGridInit) {
+        return;
+      }
+
       const metrcGridFilters = {
         ...ctx.state.metrcGridFilters,
         [metrcGridId]: searchFilters,
@@ -131,7 +138,7 @@ export const searchModule = {
 
       setHashData({
         ...currentHashData,
-        metrcGridFilters
+        metrcGridFilters,
       });
 
       ctx.commit(SearchMutations.SEARCH_MUTATION, { metrcGridFilters });
@@ -144,6 +151,10 @@ export const searchModule = {
         metrcGridId: MetrcGridId;
       }
     ) => {
+      if (!pageManager.finishedGridInit) {
+        return;
+      }
+
       const currentHashData = getHashData();
 
       setHashData({
@@ -436,7 +447,7 @@ export const searchModule = {
           });
         }
       },
-      700
+      QUERY_DEBOUNCE_MS
     ),
   },
 };

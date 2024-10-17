@@ -85,7 +85,7 @@ export default Vue.extend({
           return;
       }
 
-      await pageManager.clickTabWithGridId(metrcGridId);
+      await pageManager.clickTabWithGridIdIfExists(metrcGridId);
 
       setFilter(
         metrcGridId,

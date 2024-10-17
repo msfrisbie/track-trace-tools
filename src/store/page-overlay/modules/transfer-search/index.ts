@@ -1,4 +1,4 @@
-import { MetrcGridId, TransferFilterIdentifiers, TransferState } from "@/consts";
+import { MetrcGridId, TransferState } from "@/consts";
 import { IPluginState, ITransferSearchFilters } from "@/interfaces";
 import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
 import { pageManager } from "@/modules/page-manager/page-manager.module";
@@ -108,19 +108,19 @@ export const transferSearchModule = {
       if (transferState) {
         switch (transferState as TransferState) {
           case TransferState.INCOMING:
-            await pageManager.clickTabWithGridId(MetrcGridId.TRANSFERS_INCOMING);
+            await pageManager.clickTabWithGridIdIfExists(MetrcGridId.TRANSFERS_INCOMING);
             break;
           case TransferState.INCOMING_INACTIVE:
-            await pageManager.clickTabWithGridId(MetrcGridId.TRANSFERS_INCOMING_INACTIVE);
+            await pageManager.clickTabWithGridIdIfExists(MetrcGridId.TRANSFERS_INCOMING_INACTIVE);
             break;
           case TransferState.OUTGOING:
-            await pageManager.clickTabWithGridId(MetrcGridId.TRANSFERS_OUTGOING);
+            await pageManager.clickTabWithGridIdIfExists(MetrcGridId.TRANSFERS_OUTGOING);
             break;
           case TransferState.REJECTED:
-            await pageManager.clickTabWithGridId(MetrcGridId.TRANSFERS_REJECTED);
+            await pageManager.clickTabWithGridIdIfExists(MetrcGridId.TRANSFERS_REJECTED);
             break;
           case TransferState.OUTGOING_INACTIVE:
-            await pageManager.clickTabWithGridId(MetrcGridId.TRANSFERS_OUTGOING_INACTIVE);
+            await pageManager.clickTabWithGridIdIfExists(MetrcGridId.TRANSFERS_OUTGOING_INACTIVE);
             break;
           default:
             break;

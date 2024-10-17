@@ -204,7 +204,7 @@ export default Vue.extend({
           throw new Error(`Unexpected transfer state: ${transfer.TransferState}`);
       }
 
-      await pageManager.clickTabWithGridId(metrcGridId);
+      await pageManager.clickTabWithGridIdIfExists(metrcGridId);
 
       await pageManager.clickSettleDelay();
 

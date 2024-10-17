@@ -74,9 +74,7 @@ export async function clickTabStartingWithImpl(
   await pageManager.refresh;
 }
 
-export async function manageTabs() {
-  await applyUrlGridState();
-
+export async function applyDefaultTabs() {
   // If the grid state sets an active tab, don't use the defaults
   if (await getActiveMetrcGridIdOrNull()) {
     return;
@@ -84,150 +82,41 @@ export async function manageTabs() {
 
   if (window.location.pathname.match(PLANTS_TAB_REGEX)) {
     if (store.state.settings?.autoOpenFloweringPlants) {
-      await pageManager.clickTabWithGridId(MetrcGridId.PLANTS_FLOWERING);
+      await pageManager.clickTabWithGridIdIfExists(MetrcGridId.PLANTS_FLOWERING);
     }
   }
 
   if (window.location.pathname.match(PACKAGE_TAB_REGEX)) {
     if (store.state.settings?.autoOpenActivePackages) {
-      await pageManager.clickTabWithGridId(MetrcGridId.PACKAGES_ACTIVE);
+      await pageManager.clickTabWithGridIdIfExists(MetrcGridId.PACKAGES_ACTIVE);
     }
   }
 
   if (window.location.pathname.match(TRANSFER_TAB_REGEX)) {
     if (store.state.settings?.autoOpenIncomingTransfers) {
-      await pageManager.clickTabWithGridId(MetrcGridId.TRANSFERS_INCOMING);
+      await pageManager.clickTabWithGridIdIfExists(MetrcGridId.TRANSFERS_INCOMING);
     }
   }
 
   if (window.location.pathname.match(SALES_TAB_REGEX)) {
     if (store.state.settings?.autoOpenActiveSales) {
-      await pageManager.clickTabWithGridId(MetrcGridId.SALES_ACTIVE);
+      await pageManager.clickTabWithGridIdIfExists(MetrcGridId.SALES_ACTIVE);
     }
   }
 
   if (window.location.pathname.match(TAG_TAB_REGEX)) {
     if (store.state.settings?.autoOpenAvailableTags) {
-      await pageManager.clickTabWithGridId(MetrcGridId.TAGS_AVAILABLE);
+      await pageManager.clickTabWithGridIdIfExists(MetrcGridId.TAGS_AVAILABLE);
     }
   }
 }
 
-// export async function managePlantTabs() {
-//   const activeTab = pageManager.activeTabOrNull(pageManager.plantsTabs);
-
-//   if (activeTab) {
-//     // If we see the tab has changed, the current filters are
-//     // invalid and we need to reacquire the inputs
-//     if (!!pageManager.selectedPlantTab && activeTab !== pageManager.selectedPlantTab) {
-//       // pageManager.resetMetrcPlantFilters();
-//       // await pageManager.clickSettleDelay();
-//       // pageManager.resetFilterElementReferences();
-//     }
-
-//     pageManager.selectedPlantTab = activeTab;
-//     return;
-//   }
-
-//   applyUrlGridState();
-
-//   if (store.state.settings?.autoOpenFloweringPlants) {
-//     await pageManager.clickTabWithGridId(MetrcGridId.PLANTS_FLOWERING);
-//   }
-// }
-
-// export async function managePackageTabs() {
-//   const activeTab = pageManager.activeTabOrNull(pageManager.packageTabs);
-
-//   if (activeTab) {
-//     // If we see the tab has changed, the current filters are
-//     // invalid and we need to reacquire the inputs
-//     if (!!pageManager.selectedPackageTab && activeTab !== pageManager.selectedPackageTab) {
-//       // pageManager.resetMetrcPackageFilters();
-//       // await pageManager.clickSettleDelay();
-//       // pageManager.resetFilterElementReferences();
-//     }
-
-//     pageManager.selectedPackageTab = activeTab;
-//     return;
-//   }
-
-//   applyUrlGridState();
-
-//   if (store.state.settings?.autoOpenActivePackages) {
-//     await pageManager.clickTabWithGridId(MetrcGridId.PACKAGES_ACTIVE);
-//   }
-// }
-
-// export async function manageTransfersTabs() {
-//   const activeTab = pageManager.activeTabOrNull(pageManager.transferTabs);
-
-//   if (activeTab) {
-//     // If we see the tab has changed, the current filters are
-//     // invalid and we need to reacquire the inputs
-//     if (!!pageManager.selectedTransferTab && activeTab !== pageManager.selectedTransferTab) {
-//       // pageManager.resetMetrcTransferFilters();
-//       // await pageManager.clickSettleDelay();
-//       // pageManager.resetFilterElementReferences();
-//     }
-
-//     pageManager.selectedTransferTab = activeTab;
-//     return;
-//   }
-
-//   applyUrlGridState();
-
-//   if (store.state.settings?.autoOpenIncomingTransfers) {
-//     await pageManager.clickTabWithGridId(MetrcGridId.TRANSFERS_INCOMING);
-//   }
-// }
-
-// export async function manageSalesTabs() {
-//   if (pageManager.activeTabOrNull(pageManager.salesTabs)) {
-//     return;
-//   }
-
-//   if (store.state.settings?.autoOpenActiveSales) {
-//     await pageManager.clickTabWithGridId(MetrcGridId.SALES_ACTIVE);
-//   }
-// }
-
-// export async function manageTagsTabs() {
-
-//   if (await applyUrlGridState()) {
-//     return;
-//   }
-
-//   // const activeTab = pageManager.activeTabOrNull(pageManager.tagTabs);
-
-//   // if (activeTab) {
-//   //   // If we see the tab has changed, the current filters are
-//   //   // invalid and we need to reacquire the inputs
-//   //   if (!!pageManager.selectedTagTab && activeTab !== pageManager.selectedTagTab) {
-//   //     // pageManager.resetMetrcTagFilters();
-//   //     // await pageManager.clickSettleDelay();
-//   //     // pageManager.resetFilterElementReferences();
-//   //   }
-
-//   //   pageManager.selectedTagTab = activeTab;
-//   //   return;
-//   // }
-
-//   // if (await applyUrlGridState()) {
-//   //   return;
-//   // }
-
-//   if (store.state.settings?.autoOpenAvailableTags) {
-//     await pageManager.clickTabWithGridId(MetrcGridId.TAGS_AVAILABLE);
-//   }
-// }
-
-async function applyUrlGridState() {
+export async function applyUrlGridState() {
   const hashData: URLHashData = getHashData();
 
   if (!hashData) {
     return;
   }
 
-  applyGridState(hashData.activeMetrcGridId ?? null, hashData.metrcGridFilters ?? {});
+  await applyGridState(hashData.activeMetrcGridId ?? null, hashData.metrcGridFilters ?? {});
 }

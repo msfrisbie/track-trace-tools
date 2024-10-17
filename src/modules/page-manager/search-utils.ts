@@ -384,38 +384,42 @@ export function getAllMetrcGridIds(): MetrcGridId[] {
   );
 }
 
-export const mirrorMetrcTableState = _.debounce(async () => {
-  const activeMetrcGridId = getActiveMetrcGridIdOrNull();
+export const mirrorMetrcTableState = _.debounce(
+  async () => {
+    const activeMetrcGridId = getActiveMetrcGridIdOrNull();
 
-  store.dispatch(`search/${SearchActions.SET_ACTIVE_METRC_GRID_ID}`, {
-    metrcGridId: activeMetrcGridId,
-  });
+    store.dispatch(`search/${SearchActions.SET_ACTIVE_METRC_GRID_ID}`, {
+      metrcGridId: activeMetrcGridId,
+    });
 
-  for (const metrcGridId of getAllMetrcGridIds()) {
-    const inputs: HTMLInputElement[] = [
-      ...document.querySelectorAll(
-        `input[${T3_METRC_GRID_ID_ATTRIBUTE}="${metrcGridId}"][${T3_SEARCH_FILTER_ATTRIBUTE}]`
-      ),
-    ] as HTMLInputElement[];
+    for (const metrcGridId of getAllMetrcGridIds()) {
+      const inputs: HTMLInputElement[] = [
+        ...document.querySelectorAll(
+          `input[${T3_METRC_GRID_ID_ATTRIBUTE}="${metrcGridId}"][${T3_SEARCH_FILTER_ATTRIBUTE}]`
+        ),
+      ] as HTMLInputElement[];
 
-    const searchFilters: { [key: string]: string } = {};
+      const searchFilters: { [key: string]: string } = {};
 
-    for (const input of inputs) {
-      if (!input.value) {
-        continue;
+      for (const input of inputs) {
+        if (!input.value) {
+          continue;
+        }
+
+        searchFilters[input.getAttribute(T3_SEARCH_FILTER_ATTRIBUTE)!] = input.value;
       }
 
-      searchFilters[input.getAttribute(T3_SEARCH_FILTER_ATTRIBUTE)!] = input.value;
+      await store.dispatch(`search/${SearchActions.MIRROR_METRC_SEARCH_FILTERS}`, {
+        metrcGridId,
+        searchFilters,
+      });
     }
+  },
+  100,
+  { leading: true }
+);
 
-    await store.dispatch(`search/${SearchActions.MIRROR_METRC_SEARCH_FILTERS}`, {
-      metrcGridId,
-      searchFilters,
-    });
-  }
-}, 100);
-
-export async function initializeFilterButtonsImpl() {
+export async function initializeFilterButtons() {
   const allGrids = [...document.querySelectorAll(`div[data-role="grid"]`)];
 
   for (const grid of allGrids) {
@@ -443,7 +447,10 @@ export async function initializeFilterButtonsImpl() {
       menuButton.setAttribute(T3_METRC_GRID_ID_ATTRIBUTE, metrcGridId);
       menuButton.setAttribute(T3_SEARCH_FILTER_ATTRIBUTE, searchFilter);
 
+      console.log("Assigned button event handler", metrcGridId, searchFilter);
+
       menuButton.addEventListener("click", async () => {
+        console.log("Menu button event handler", metrcGridId, searchFilter);
         await pageManager.clickSettleDelay();
 
         // If an animation container is created, it will be last
@@ -471,9 +478,7 @@ export async function getFilterFormOrError(
   if (getActiveMetrcGridIdOrNull() !== metrcGridId) {
     await pageManager.refresh;
 
-    await pageManager.clickTabWithGridId(metrcGridId);
-
-    await pageManager.clickSettleDelay();
+    await pageManager.clickTabWithGridIdIfExists(metrcGridId);
   }
 
   const mappedFilterFormSelector: string = `form.k-filter-menu[${T3_SEARCH_FILTER_ATTRIBUTE}="${searchFilter}"][${T3_METRC_GRID_ID_ATTRIBUTE}="${metrcGridId}"]`;
@@ -489,18 +494,41 @@ export async function getFilterFormOrError(
       throw new Error(`Cannot find menu button for filter: ${searchFilter}`);
     }
 
-    pageManager.suppressAnimationContainer();
+    const t0 = Date.now();
+    while (true) {
+      pageManager.suppressAnimationContainer();
 
-    menuButton.click();
-    // attributes are set in initializeFilterButtonsImpl during the event loop turn
-    await pageManager.clickSettleDelay();
-    menuButton.click();
+      menuButton.click();
+      // attributes are set in initializeFilterButtons during the event loop turn
+      await pageManager.clickSettleDelay();
+      menuButton.click();
 
-    mappedFilterForm = document.querySelector(mappedFilterFormSelector);
+      // await new Promise((resolve) => setTimeout(resolve, 1000));
+
+      // await pageManager.clickSettleDelay();
+
+      // await new Promise((resolve) => setTimeout(resolve, 1000));
+
+      // debugger;
+      if (Date.now() - t0 > 5000) {
+        break;
+      }
+
+      mappedFilterForm = document.querySelector(mappedFilterFormSelector);
+
+      if (mappedFilterForm) {
+        break;
+      }
+      console.log({ mappedFilterForm });
+
+      await new Promise((resolve) => setTimeout(resolve, 100));
+    }
 
     // const untaggedFormSelector: string = `form.k-filter-menu:not([${T3_METRC_GRID_ID_ATTRIBUTE}])`;
 
     // const untaggedForm: HTMLFormElement | null = document.querySelector(untaggedFormSelector);
+
+    console.log({ mappedFilterForm });
 
     if (!mappedFilterForm) {
       throw new Error(`Form query selector failed: ${mappedFilterFormSelector}`);
@@ -607,279 +635,40 @@ export async function setTagFilterImpl(
   });
 
   await setFilter(metrcGridId, tagFilterIdentifier, value);
-
-  // let input: HTMLInputElement | null = null;
-  // let select: HTMLElement | null = null;
-
-  // switch (tagFilterIdentifier) {
-  //   case TagFilterIdentifiers.Label:
-  //     input = pageManager.tagNumberFilterInput;
-  //     select = pageManager.tagNumberFilterSelect;
-  //     break;
-  //   default:
-  //     console.error("bad identifier:", tagFilterIdentifier);
-  //     break;
-  // }
-
-  // if (input) {
-  //   input.value = value;
-  //   input.dispatchEvent(new Event("change"));
-  // } else {
-  //   console.log("bad input");
-  // }
-
-  // if (select) {
-  //   for (const li of select.querySelectorAll("li")) {
-  //     if (li.innerText.trim() === "Equal to") {
-  //       li.click();
-  //       break;
-  //     }
-  //   }
-  // } else {
-  //   console.log("bad select");
-  // }
-
-  // pageManager.applyTagFilter(tagFilterIdentifier);
 }
 
-export function applyPlantFilterImpl(plantFilterIdentifier: PlantFilterIdentifiers) {
-  // let button: HTMLButtonElement | null = null;
-  // switch (plantFilterIdentifier) {
-  //   case PlantFilterIdentifiers.Label:
-  //     button = pageManager.plantLabelApplyFiltersButton;
-  //     break;
-  //   case PlantFilterIdentifiers.StrainName:
-  //     button = pageManager.plantStrainNameApplyFiltersButton;
-  //     break;
-  //   case PlantFilterIdentifiers.LocationName:
-  //     button = pageManager.plantLocationNameApplyFiltersButton;
-  //     break;
-  //   default:
-  //     console.error("bad identifier:", plantFilterIdentifier);
-  //     break;
-  // }
-  // if (button) {
-  //   button.click();
-  // } else {
-  //   console.log("bad button");
-  // }
-}
+export function applyPlantFilterImpl(plantFilterIdentifier: PlantFilterIdentifiers) {}
 
-export function applyPackageFilterImpl(packageFilterIdentifier: PackageFilterIdentifiers) {
-  // let button: HTMLButtonElement | null = null;
-  // switch (packageFilterIdentifier) {
-  //   case PackageFilterIdentifiers.Label:
-  //     button = pageManager.packageLabelApplyFiltersButton;
-  //     break;
-  //   case PackageFilterIdentifiers.SourceHarvestNames:
-  //     button = pageManager.packageSourceHarvestNameApplyFiltersButton;
-  //     break;
-  //   case PackageFilterIdentifiers.SourcePackageLabels:
-  //     button = pageManager.packageSourcePackageLabelApplyFiltersButton;
-  //     break;
-  //   case PackageFilterIdentifiers.ProductionBatchNumber:
-  //     button = pageManager.packageProductionBatchNumberApplyFiltersButton;
-  //     break;
-  //   case PackageFilterIdentifiers.SourceProductionBatchNumbers:
-  //     button = pageManager.packageSourceProductionBatchNumbersApplyFiltersButton;
-  //     break;
-  //   case PackageFilterIdentifiers.ItemName:
-  //     button = pageManager.packageItemNameApplyFiltersButton;
-  //     break;
-  //   case PackageFilterIdentifiers.ItemStrainName:
-  //     button = pageManager.packageItemStrainNameApplyFiltersButton;
-  //     break;
-  //   case PackageFilterIdentifiers.ItemProductCategoryName:
-  //     button = pageManager.packageItemProductCategoryNameApplyFiltersButton;
-  //     break;
-  //   case PackageFilterIdentifiers.LocationName:
-  //     button = pageManager.packageLocationNameApplyFiltersButton;
-  //     break;
-  //   default:
-  //     console.error("bad identifier:", packageFilterIdentifier);
-  //     break;
-  // }
-  // if (button) {
-  //   button.click();
-  // } else {
-  //   console.log("bad button");
-  // }
-}
+export function applyPackageFilterImpl(packageFilterIdentifier: PackageFilterIdentifiers) {}
 
 export function applyDestinationPackageFilterImpl(
   destinationPackageFilterIdentifier: TransferredPackageFilterIdentifiers
-) {
-  // let button: HTMLButtonElement | null = null;
-  // switch (destinationPackageFilterIdentifier) {
-  //   case TransferredPackageFilterIdentifiers.PackageLabel:
-  //     button = pageManager.destinationPackageLabelApplyFiltersButton;
-  //     break;
-  //   case TransferredPackageFilterIdentifiers.SourceHarvestNames:
-  //     button = pageManager.destinationPackageSourceHarvestNameApplyFiltersButton;
-  //     break;
-  //   case TransferredPackageFilterIdentifiers.SourcePackageLabels:
-  //     button = pageManager.destinationPackageSourcePackageLabelApplyFiltersButton;
-  //     break;
-  //   case TransferredPackageFilterIdentifiers.ProductName:
-  //     button = pageManager.destinationPackageProductNameApplyFiltersButton;
-  //     break;
-  //   case TransferredPackageFilterIdentifiers.ItemStrainName:
-  //     button = pageManager.destinationPackageItemStrainNameApplyFiltersButton;
-  //     break;
-  //   case TransferredPackageFilterIdentifiers.ProductCategoryName:
-  //     button = pageManager.destinationPackageItemProductCategoryNameApplyFiltersButton;
-  //     break;
-  //   case TransferredPackageFilterIdentifiers.ManifestNumber:
-  //     button = pageManager.destinationPackageManifestNumberApplyFiltersButton;
-  //     break;
-  //   case TransferredPackageFilterIdentifiers.DestinationFacilityName:
-  //     button = pageManager.destinationPackageDestinationFacilityNameApplyFiltersButton;
-  //     break;
-  //   case TransferredPackageFilterIdentifiers.DestinationLicenseNumber:
-  //     button = pageManager.destinationPackageDestinationLicenseNumberApplyFiltersButton;
-  //     break;
-  //   default:
-  //     console.error("bad identifier:", destinationPackageFilterIdentifier);
-  //     break;
-  // }
-  // if (button) {
-  //   button.click();
-  // } else {
-  //   console.log("bad button");
-  // }
-}
+) {}
 
-export function applyTransferFilterImpl(transferFilterIdentifier: TransferFilterIdentifiers) {
-  // let button: HTMLButtonElement | null = null;
-  // switch (transferFilterIdentifier) {
-  //   case TransferFilterIdentifiers.ManifestNumber:
-  //     button = pageManager.transferManifestNumberApplyFiltersButton;
-  //     break;
-  //   case TransferFilterIdentifiers.DeliveryFacilities:
-  //     button = pageManager.transferOutgoingDeliveryFacilitiesApplyFiltersButton;
-  //     break;
-  //   case TransferFilterIdentifiers.ShipperFacilityInfo:
-  //     button = pageManager.transferIncomingShipperFacilityInfoApplyFiltersButton;
-  //     break;
-  //   default:
-  //     console.error("bad identifier:", transferFilterIdentifier);
-  //     break;
-  // }
-  // if (button) {
-  //   button.click();
-  // } else {
-  //   console.log("bad button");
-  // }
-}
+export function applyTransferFilterImpl(transferFilterIdentifier: TransferFilterIdentifiers) {}
 
-export function applyTagFilterImpl(tagFilterIdentifier: TagFilterIdentifiers) {
-  // let button: HTMLButtonElement | null = null;
-  // switch (tagFilterIdentifier) {
-  //   case TagFilterIdentifiers.Label:
-  //     button = pageManager.tagNumberApplyFiltersButton;
-  //     break;
-  //   default:
-  //     console.error("bad identifier:", tagFilterIdentifier);
-  //     break;
-  // }
-  // if (button) {
-  //   button.click();
-  // } else {
-  //   console.log("bad button");
-  // }
-}
+export function applyTagFilterImpl(tagFilterIdentifier: TagFilterIdentifiers) {}
 
 // Clicks the Metrc reset button - everything is wiped out
-export async function resetMetrcPlantFiltersImpl() {
-  // store.dispatch(`plantSearch/${PlantSearchActions.SET_PLANT_SEARCH_FILTERS}`, {
-  //   plantSearchFilters: {},
-  // });
-  // if (pageManager.plantClearFiltersButton) {
-  //   pageManager.plantClearFiltersButton.click();
-  // } else {
-  //   console.log("Bad resetMetrcPlantFilters");
-  // }
-}
+export async function resetMetrcPlantFiltersImpl() {}
 
 // Clicks the Metrc reset button - everything is wiped out
-export async function resetMetrcPackageFiltersImpl() {
-  // store.dispatch(`packageSearch/${PackageSearchActions.SET_PACKAGE_SEARCH_FILTERS}`, {
-  //   packageSearchFilters: {},
-  // });
-  // if (pageManager.packageClearFiltersButton) {
-  //   pageManager.packageClearFiltersButton.click();
-  // } else {
-  //   console.log("Bad resetMetrcPackageFilters");
-  // }
-}
+export async function resetMetrcPackageFiltersImpl() {}
 
 // Clicks the Metrc reset button - everything is wiped out
-export async function resetMetrcTransferFiltersImpl() {
-  // if (pageManager.transferClearFiltersButton) {
-  //   pageManager.transferClearFiltersButton.click();
-  // } else {
-  //   console.log("Bad resetMetrcTransferFilters");
-  // }
-}
+export async function resetMetrcTransferFiltersImpl() {}
 
 // Clicks the Metrc reset button - everything is wiped out
-export async function resetMetrcTagFiltersImpl() {
-  // if (pageManager.tagClearFiltersButton) {
-  //   pageManager.tagClearFiltersButton.click();
-  // } else {
-  //   console.log("Bad resetMetrcTagFilters");
-  // }
-}
+export async function resetMetrcTagFiltersImpl() {}
 
-export async function resetFilterElementReferencesImpl() {
-  // Plant
-  // pageManager.plantClearFiltersButton = null;
-  // pageManager.plantLabelFilterInput = null;
-  // pageManager.plantLabelFilterSelect = null;
-  // pageManager.plantLabelApplyFiltersButton = null;
-  // pageManager.plantStrainNameFilterInput = null;
-  // pageManager.plantStrainNameApplyFiltersButton = null;
-  // pageManager.plantLocationNameFilterInput = null;
-  // pageManager.plantLocationNameApplyFiltersButton = null;
-  // // Package
-  // pageManager.packageClearFiltersButton = null;
-  // pageManager.packageLabelFilterInput = null;
-  // pageManager.packageLabelFilterSelect = null;
-  // pageManager.packageLabelApplyFiltersButton = null;
-  // pageManager.packageSourceHarvestNameFilterInput = null;
-  // pageManager.packageSourceHarvestNameApplyFiltersButton = null;
-  // pageManager.packageSourcePackageLabelFilterInput = null;
-  // pageManager.packageSourcePackageLabelApplyFiltersButton = null;
-  // pageManager.packageItemNameFilterInput = null;
-  // pageManager.packageItemNameApplyFiltersButton = null;
-  // pageManager.packageItemStrainNameFilterInput = null;
-  // pageManager.packageItemStrainNameApplyFiltersButton = null;
-  // pageManager.packageItemProductCategoryNameFilterInput = null;
-  // pageManager.packageItemProductCategoryNameApplyFiltersButton = null;
-  // pageManager.packageLocationNameFilterInput = null;
-  // pageManager.packageLocationNameApplyFiltersButton = null;
-  // // Transfer
-  // pageManager.transferClearFiltersButton = null;
-  // pageManager.transferManifestNumberFilterInput = null;
-  // pageManager.transferManifestNumberFilterSelect = null;
-  // pageManager.transferManifestNumberApplyFiltersButton = null;
-  // pageManager.transferOutgoingDeliveryFacilitiesFilterInput = null;
-  // pageManager.transferOutgoingDeliveryFacilitiesApplyFiltersButton = null;
-  // pageManager.transferIncomingShipperFacilityInfoFilterInput = null;
-  // pageManager.transferIncomingShipperFacilityInfoApplyFiltersButton = null;
-  // // Tag
-  // pageManager.tagClearFiltersButton = null;
-  // pageManager.tagNumberFilterInput = null;
-  // pageManager.tagNumberFilterSelect = null;
-  // pageManager.tagNumberApplyFiltersButton = null;
-}
+export async function resetFilterElementReferencesImpl() {}
 
 export async function applyGridState(
   activeMetrcGridId: MetrcGridId | null,
   metrcGridFilters: { [key: string]: { [key: string]: string } }
 ) {
   if (activeMetrcGridId) {
-    await pageManager.clickTabWithGridId(activeMetrcGridId);
+    await pageManager.clickTabWithGridIdIfExists(activeMetrcGridId);
   }
 
   for (const [metrcGridId, metrcGridData] of Object.entries(metrcGridFilters)) {
@@ -896,6 +685,7 @@ export async function clearFilters(metrcGridId: MetrcGridId) {
     if (anchor.textContent?.includes("Clear Filters")) {
       // @ts-ignore
       anchor.click();
+      await pageManager.clickSettleDelay();
       return;
     }
   }
