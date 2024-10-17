@@ -12,7 +12,7 @@
 
 <script lang="ts">
 import { IPluginState } from "@/interfaces";
-import { getActiveMetrcGridIdOrNull } from "@/modules/page-manager/search-utils";
+import { clearFilters, getActiveMetrcGridIdOrNull } from "@/modules/page-manager/search-utils";
 import router from "@/router/index";
 import store from "@/store/page-overlay/index";
 import { ClientGetters } from "@/store/page-overlay/modules/client/consts";
@@ -52,15 +52,13 @@ export default Vue.extend({
             exampleAction: `example/${ExampleActions.EXAMPLE_ACTION}`,
         }),
         clearFilters() {
-            const anchors = [...document.querySelectorAll(`#${getActiveMetrcGridIdOrNull()} .dropdown-menu.pull-right a`)];
+            const activeMetrcGridId = getActiveMetrcGridIdOrNull();
 
-            for (const anchor of anchors) {
-                if (anchor.textContent?.includes('Clear Filters')) {
-                    // @ts-ignore
-                    anchor.click();
-                    return;
-                }
+            if (!activeMetrcGridId) {
+                return;
             }
+
+            clearFilters(activeMetrcGridId);
         }
     },
     async created() { },

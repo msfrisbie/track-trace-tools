@@ -485,7 +485,7 @@ export async function getFilterFormOrError(
 
     menuButton.click();
     // attributes are set in initializeFilterButtonsImpl during the event loop turn
-    await new Promise((resolve) => setTimeout(resolve, 0));
+    await pageManager.clickSettleDelay();
     menuButton.click();
 
     mappedFilterForm = document.querySelector(mappedFilterFormSelector);
@@ -507,14 +507,20 @@ export async function getFilterFormOrError(
   return mappedFilterForm!;
 }
 
-export async function setFilter(metrcGridId: MetrcGridId, searchFilter: string, value: string) {
+export async function setFilter(
+  metrcGridId: MetrcGridId,
+  searchFilter: string,
+  value: string,
+  reset: boolean = false
+) {
+  if (reset) {
+  }
+
   await pageManager.refresh;
 
   await pageManager.clickTabWithGridId(metrcGridId);
 
   const form = await getFilterFormOrError(metrcGridId, searchFilter);
-
-  console.log({ form });
 
   const input = form.querySelector(`input[title="Filter Criteria"]`)! as HTMLInputElement;
   input.value = value;
@@ -871,10 +877,21 @@ export async function applyGridState(
     await pageManager.clickTabWithGridId(activeMetrcGridId);
   }
 
-  // TODO apply all filters
   for (const [metrcGridId, metrcGridData] of Object.entries(metrcGridFilters)) {
     for (const [field, value] of Object.entries(metrcGridData)) {
       setFilter(metrcGridId as MetrcGridId, field, value);
+    }
+  }
+}
+
+export async function clearFilters(metrcGridId: MetrcGridId) {
+  const anchors = [...document.querySelectorAll(`#${metrcGridId} .dropdown-menu.pull-right a`)];
+
+  for (const anchor of anchors) {
+    if (anchor.textContent?.includes("Clear Filters")) {
+      // @ts-ignore
+      anchor.click();
+      return;
     }
   }
 }

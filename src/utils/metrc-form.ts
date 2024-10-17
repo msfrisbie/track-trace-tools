@@ -1,3 +1,5 @@
+import { pageManager } from "@/modules/page-manager/page-manager.module";
+
 export async function setFormInputValue(
   input: HTMLInputElement | HTMLSelectElement,
   value: string,
@@ -5,7 +7,7 @@ export async function setFormInputValue(
 ) {
   input.value = value;
   input.dispatchEvent(new Event(eventType));
-  await new Promise((resolve) => setTimeout(resolve, 0));
+  await pageManager.clickSettleDelay();
 }
 
 export async function setAutocompleteValueOrError(input: HTMLInputElement, value: string) {
@@ -31,5 +33,5 @@ export async function setAutocompleteValueOrError(input: HTMLInputElement, value
 
   autocompleteChildren[0].click();
 
-  await new Promise((resolve) => setTimeout(resolve, 0));
+  await pageManager.clickSettleDelay();
 }

@@ -5,16 +5,27 @@
 
       <div class="flex flex-col items-center space-y-8 flex-grow">
         <div class="flex flex-col space-y-2 items-center">
+
+          <div class="flex flex-col justify-center gap-1 items-center text-center w-20 text-sm my-2">
+            <complex-icon class="text-yellow-700" :primaryIconName="searchState.activeSearchResult.primaryIconName"
+              primaryIconSize="xl" :secondaryIconName="searchState.activeSearchResult.secondaryIconName"
+              secondaryIconSize="sm"></complex-icon>
+
+            <div class="font-bold text-base">
+              {{ searchState.activeSearchResult.primaryTextualDescriptor }}
+            </div>
+          </div>
+
           <div class="flex flex-row items-center space-x-4 text-center">
-            <div class="text-2xl text-purple-800">
+            <div class="text-2xl text-yellow-800">
               Manifest
               {{ searchResultTransferOrNull.ManifestNumber }}
             </div>
           </div>
 
-          <b-badge class="text-lg" :variant="badgeVariant(searchResultTransferOrNull)">{{
+          <!-- <b-badge class="text-lg" :variant="badgeVariant(searchResultTransferOrNull)">{{
             displayTransferState(searchResultTransferOrNull)
-            }}</b-badge>
+          }}</b-badge> -->
         </div>
       </div>
 
@@ -33,6 +44,7 @@
 </template>
 
 <script lang="ts">
+import ComplexIcon from "@/components/overlay-widget/shared/ComplexIcon.vue";
 import TransferButtonList from "@/components/overlay-widget/shared/TransferButtonList.vue";
 import RecursiveJsonTable from "@/components/search/shared/RecursiveJsonTable.vue";
 import { MessageType, MetrcGridId, TransferState } from "@/consts";
@@ -40,7 +52,7 @@ import { IIndexedTransferData, IPluginState } from "@/interfaces";
 import { analyticsManager } from "@/modules/analytics-manager.module";
 import { TRANSFER_TAB_REGEX } from "@/modules/page-manager/consts";
 import { pageManager } from "@/modules/page-manager/page-manager.module";
-import { setFilter } from "@/modules/page-manager/search-utils";
+import { clearFilters, setFilter } from "@/modules/page-manager/search-utils";
 import { toastManager } from "@/modules/toast-manager.module";
 import store from "@/store/page-overlay/index";
 import { SearchActions } from "@/store/page-overlay/modules/search/consts";
@@ -81,6 +93,7 @@ export default Vue.extend({
     // TransferIcon,
     RecursiveJsonTable,
     TransferButtonList,
+    ComplexIcon
   },
   computed: {
     ...mapState<IPluginState>({
@@ -193,17 +206,13 @@ export default Vue.extend({
 
       await pageManager.clickTabWithGridId(metrcGridId);
 
-      await setFilter(metrcGridId, 'ManifestNumber', transfer.ManifestNumber);
+      await pageManager.clickSettleDelay();
 
-      // store.dispatch(
-      //   `transferSearch/${TransferSearchActions.PARTIAL_UPDATE_TRANSFER_SEARCH_FILTERS}`,
-      //   {
-      //     transferState: transfer.TransferState,
-      //     transferSearchFilters: {
-      //       manifestNumber: transfer.ManifestNumber,
-      //     },
-      //   }
-      // );
+      clearFilters(metrcGridId);
+
+      await pageManager.clickSettleDelay();
+
+      setFilter(metrcGridId, 'ManifestNumber', transfer.ManifestNumber);
 
       this.setShowSearchResults({ showSearchResults: false });
     },
