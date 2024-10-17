@@ -232,7 +232,7 @@ class MetrcModalManager implements IAtomicService {
       if (!row[0]) {
         if (formattingErrorCount < 5) {
           toastManager.openToast(
-            `Row ${idx} is missing a tag value
+          `Row ${idx} is missing a tag value
           
           ${JSON.stringify(row)}`,
             {

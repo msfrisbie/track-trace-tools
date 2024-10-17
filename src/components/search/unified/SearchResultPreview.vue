@@ -1,9 +1,9 @@
 <template>
-  <div class="flex flex-row gap-2 p-1 cursor-pointer border-b border-gray-200" v-bind:class="{
+  <div class="grid grid-cols-2 gap-2 p-1 cursor-pointer border-b border-gray-200" v-bind:class="{
     'bg-white': searchState.activeSearchResult === searchResult,
     [classNames(searchResult).bgColorClass]: true
-  }" @click="selectSearchResult({ searchResult })">
-    <div class="flex flex-col justify-center gap-1 items-center text-center w-20 text-sm my-2 mx-4">
+  }" @click="selectSearchResult({ searchResult })" style="grid-template-columns: 10rem 1fr;">
+    <div class="flex flex-col justify-center gap-1 items-center text-center text-sm my-2 mx-2">
       <complex-icon v-bind:class="{
         [classNames(searchResult).textColorClass]: true
       }" :primaryIconName="searchResult.primaryIconName" primaryIconSize="xl"
@@ -14,7 +14,20 @@
       </div>
     </div>
 
-    <div class="p-2 w-full grid grid-cols-3 gap-2 text-wrap break-words">
+    <div class="flex flex-col gap-6 p-4">
+      <div class="w-full gap-2 text-wrap break-words border-b border-gray-200"
+        v-for="[idx, matchedField] of searchResult.matchedFields.entries()" v-bind:key="idx">
+        <fragment>
+          <div class="font-bold text-sm pb-2 text-gray-400">{{ matchedField.field }}</div>
+          <div class="font-mono">
+            <partial-string-emphasis :fullString="matchedField.value"
+              :partialString="searchState.queryString"></partial-string-emphasis>
+          </div>
+        </fragment>
+      </div>
+    </div>
+
+    <!-- <div class="p-2 w-full grid grid-cols-3 gap-2 text-wrap break-words">
       <fragment v-for="[idx, matchedField] of searchResult.matchedFields.entries()" v-bind:key="idx">
         <div class="text-right p-2 align-self-start text-gray-600">{{ matchedField.field }}:</div>
         <div class="p-2 font-mono align-self-start col-span-2">
@@ -22,7 +35,7 @@
             :partialString="searchState.queryString"></partial-string-emphasis>
         </div>
       </fragment>
-    </div>
+    </div> -->
   </div>
 </template>
 

@@ -1,9 +1,7 @@
 <template>
   <div v-if="searchState.activeSearchResult">
-    <!-- {{ searchState.activeSearchResult }} -->
-
-    <div class="flex flex-col items-center space-y-8 px-2 p-4">
-
+    <div class="flex flex-col items-center gap-8 px-2 p-4">
+      <!-- Header -->
       <div class="flex flex-col items-center gap-4 flex-grow">
         <div class="flex flex-row gap-2 items-center" :class="{
           'text-yellow-700': searchResultTransferOrNull,
@@ -16,54 +14,23 @@
 
           <span class="text-2xl">{{ searchState.activeSearchResult.primaryTextualIdentifier }}</span>
         </div>
+        <span class="text-2xl font-bold">
+          {{ searchState.activeSearchResult.primaryStatusTextualDescriptor.toLocaleUpperCase() }} {{
+            searchState.activeSearchResult.primaryTextualDescriptor.toLocaleUpperCase() }}
+        </span>
         <span class="text-xl">
           {{ searchState.activeSearchResult.secondaryTextualIdentifier }}
         </span>
-        <span class="text-2xl font-bold">
-          {{ searchState.activeSearchResult.primaryStatusTextualDescriptor.toLocaleUpperCase() }}
-        </span>
-      </div>
-    </div>
-
-    <div
-      v-if="searchResultTransferOrNull || searchResultPackageOrNull || searchResultPlantOrNull || searchResultTagOrNull"
-      class="flex flex-col items-center space-y-8 px-2 p-4">
-      <!-- <div class="w-full grid grid-cols-3" style="grid-template-columns: 1fr 8fr 1fr"> -->
-      <!-- <div></div> -->
-
-      <div class="flex flex-col items-center space-y-8 flex-grow">
-        <div class="flex flex-col space-y-2 items-center">
-          <!-- Icon and Descriptor for Transfer or Package -->
-          <div v-if="searchResultTransferOrNull || searchResultPackageOrNull"
-            class="flex flex-col justify-center gap-1 items-center text-center w-20 text-sm my-2">
-            <complex-icon
-              :class="{ 'text-yellow-700': searchResultTransferOrNull, 'text-purple-700': searchResultPackageOrNull }"
-              :primaryIconName="searchState.activeSearchResult.primaryIconName" primaryIconSize="xl"
-              :secondaryIconName="searchState.activeSearchResult.secondaryIconName" secondaryIconSize="sm" />
-            <div class="font-bold text-base">
-              {{ searchState.activeSearchResult.primaryTextualDescriptor }}
-            </div>
-          </div>
-
-          <!-- Main Content: Manifest, Package, Plant, or Tag -->
-          <div class="flex flex-row items-center space-x-4 text-center">
-            <div v-if="searchResultTransferOrNull" class="text-2xl text-yellow-800">
-              Manifest {{ searchResultTransferOrNull.ManifestNumber }}
-            </div>
-            <metrc-tag v-if="searchResultPackageOrNull" :label="getLabelOrError(searchResultPackageOrNull)"
-              sideText="PACKAGE" />
-            <metrc-tag v-if="searchResultPlantOrNull" :label="searchResultPlantOrNull.Label" sideText="PLANT" />
-            <metrc-tag v-if="searchResultTagOrNull" :label="searchResultTagOrNull.Label"
-              :sideText="searchResultTagOrNull.TagTypeName" />
-          </div>
-        </div>
       </div>
 
-      <!-- Action Button -->
-      <!-- <div v-show="isOnTransfersPage && searchResultTransferOrNull || isOnPackagesPage && searchResultPackageOrNull || isOnPlantsPage && searchResultPlantOrNull || isOnTagsPage && searchResultTagOrNull" @click.stop.prevent="handleFilterClick" class="flex flex-row items-center justify-center cursor-pointer h-full">
-          <font-awesome-icon icon="chevron-right" class="text-2xl text-purple-500" />
-        </div>
-      </div> -->
+      <!-- Metrc Tag -->
+      <metrc-tag v-if="searchResultPackageOrNull" :label="getLabelOrError(searchResultPackageOrNull)"
+        sideText="PACKAGE" />
+      <metrc-tag v-if="searchResultPlantOrNull" :label="searchResultPlantOrNull.Label" sideText="PLANT" />
+      <metrc-tag v-if="searchResultPlantBatchOrNull && plantBatchHasTagName" :label="searchResultPlantBatchOrNull.Name"
+        sideText="PLANT BATCH" />
+      <metrc-tag v-if="searchResultTagOrNull" :label="searchResultTagOrNull.Label"
+        :sideText="searchResultTagOrNull.TagTypeName" />
 
       <!-- Button List -->
       <div v-if="searchResultTransferOrNull || searchResultPackageOrNull" class="grid grid-cols-2 gap-2">
@@ -73,7 +40,8 @@
 
       <!-- JSON Table -->
       <recursive-json-table
-        :jsonObject="searchResultTransferOrNull || searchResultPackageOrNull || searchResultPlantOrNull || searchResultTagOrNull" />
+        :jsonObject="searchResultTransferOrNull || searchResultPackageOrNull || searchResultPlantOrNull || searchResultTagOrNull || searchResultHarvestOrNull || searchResultPlantBatchOrNull || searchResultSalesReceiptOrNull" />
+
     </div>
   </div>
 </template>
@@ -84,8 +52,8 @@ import MetrcTag from "@/components/overlay-widget/shared/MetrcTag.vue";
 import PackageButtonList from "@/components/overlay-widget/shared/PackageButtonList.vue";
 import TransferButtonList from "@/components/overlay-widget/shared/TransferButtonList.vue";
 import RecursiveJsonTable from "@/components/search/shared/RecursiveJsonTable.vue";
-import { MessageType, METRC_HOSTNAMES_LACKING_LAB_PDFS, MetrcGridId, ModalAction, ModalType, PackageState, TransferState } from "@/consts";
-import { IIndexedPlantData, IIndexedTagData, IIndexedTransferData, IPluginState, ITransferPackageList, IUnionIndexedPackageData } from "@/interfaces";
+import { MessageType, METRC_HOSTNAMES_LACKING_LAB_PDFS, METRC_TAG_REGEX, MetrcGridId, ModalAction, ModalType, PackageState, TransferState } from "@/consts";
+import { IIndexedHarvestData, IIndexedPlantBatchData, IIndexedPlantData, IIndexedSalesReceiptData, IIndexedTagData, IIndexedTransferData, IPluginState, ITransferPackageList, IUnionIndexedPackageData } from "@/interfaces";
 import { analyticsManager } from "@/modules/analytics-manager.module";
 import { modalManager } from "@/modules/modal-manager.module";
 import { PACKAGE_TAB_REGEX, PLANTS_TAB_REGEX, TAG_TAB_REGEX, TRANSFER_TAB_REGEX } from "@/modules/page-manager/consts";
@@ -258,7 +226,32 @@ export default Vue.extend({
     isOnTagsPage() {
       return window.location.pathname.match(TAG_TAB_REGEX);
     },
+    //
+    // Harvest
+    //
+    searchResultHarvestOrNull(): IIndexedHarvestData | null {
+      return store.state.search.activeSearchResult?.harvest ?? null;
+    },
+    //
+    // Plant Batches
+    //
+    searchResultPlantBatchOrNull(): IIndexedPlantBatchData | null {
+      return store.state.search.activeSearchResult?.plantBatch ?? null;
+    },
+    plantBatchHasTagName(): boolean {
+      if (!store.state.search.activeSearchResult?.plantBatch) {
+        return false;
+      }
 
+      return !!store.state.search.activeSearchResult.plantBatch.Name.match(METRC_TAG_REGEX);
+    },
+    //
+    // Sales Receipt
+    //
+    searchResultSalesReceiptOrNull(): IIndexedSalesReceiptData | null {
+      return store.state.search.activeSearchResult?.salesReceipt ?? null;
+    },
+    //
   },
   data(): {
     packageLabTestPdfEligible: boolean;

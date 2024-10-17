@@ -43,7 +43,7 @@
               <div class="search-bar flex absolute w-full flex-col bg-white rounded-b-md" style="height: 85vh">
                 <div class="flex-grow overflow-y-auto">
                   <div class="hide-scrollbar grid grid-rows-3 grid-cols-2 gap-2 h-full min-h-screen"
-                    style="grid-template-columns: 0fr 1fr; grid-template-rows: auto auto 1fr">
+                    style="grid-template-columns: 36rem 1fr; grid-template-rows: auto auto 1fr">
                     <template v-if="searchState.queryString.length > 0">
                       <div class="col-span-2 flex flex-row items-center space-x-2 p-4 border-purple-300 border-b">
                         <template v-if="searchState.status === SearchStatus.INFLIGHT">
@@ -61,7 +61,7 @@
                     </template>
 
                     <template v-if="searchState.queryString.length > 0">
-                      <div class="flex flex-col overflow-y-auto bg-gray-50 min-h-screen" style="min-width:560px">
+                      <div class="flex flex-col overflow-y-auto bg-gray-50 min-h-screen">
                         <search-result-preview v-for="(searchResult, idx) in searchState.searchResults" v-bind:key="idx"
                           :searchResult="searchResult"></search-result-preview>
 

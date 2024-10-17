@@ -167,7 +167,7 @@ export function generateSearchResultMetadata(
     primaryTextualDescriptor = "Package";
     secondaryTextualDescriptor = partialResult.pkg.Item.ProductCategoryName;
     primaryTextualIdentifier = partialResult.pkg.Label;
-    secondaryTextualIdentifier = `${partialResult.pkg.Quantity} ${partialResult.pkg.UnitOfMeasureAbbreviation} ${partialResult.pkg.Item.Name} package`;
+    secondaryTextualIdentifier = `${partialResult.pkg.Quantity} ${partialResult.pkg.UnitOfMeasureAbbreviation} package of ${partialResult.pkg.Item.Name}`;
   } else if (partialResult.tag) {
     matchedFields = extractMatchedFields(queryString, partialResult.tag);
 
