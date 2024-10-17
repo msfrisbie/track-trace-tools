@@ -1,11 +1,5 @@
 <template>
   <div>
-    <!-- {{ searchState.activeSearchResult }} -->
-    <!-- <package-search-result-detail-v2></package-search-result-detail-v2> -->
-    <!-- <plant-search-result-detail-v2></plant-search-result-detail-v2> -->
-    <!-- <tag-search-result-detail-v2></tag-search-result-detail-v2> -->
-    <!-- <transfer-search-result-detail-v2></transfer-search-result-detail-v2> -->
-
     <div v-if="searchResultTransferOrNull" class="flex flex-col items-center space-y-8 px-2 p-4">
       <div class="w-full grid grid-cols-3" style="grid-template-columns: 1fr 8fr 1fr">
         <div></div>

@@ -95,6 +95,10 @@ export function generateSearchResultMetadata(
 
   let score: number = 1;
 
+  let enablePackageScoreBoost = false;
+  let enablePlantScoreBoost = false;
+  let enablePlantBatchScoreBoost = false;
+
   if (partialResult.incomingTransfer) {
     matchedFields = extractMatchedFields(queryString, partialResult.incomingTransfer);
 
@@ -139,6 +143,7 @@ export function generateSearchResultMetadata(
     primaryTextualIdentifier = partialResult.outgoingTransfer.ManifestNumber;
     secondaryTextualIdentifier = `${partialResult.outgoingTransfer.PackageCount} pkg transfer`;
   } else if (partialResult.pkg) {
+    enablePackageScoreBoost = true;
     matchedFields = extractMatchedFields(queryString, partialResult.pkg);
 
     switch (partialResult.pkg.PackageState) {
@@ -190,6 +195,7 @@ export function generateSearchResultMetadata(
     primaryTextualDescriptor = "Tag";
     secondaryTextualDescriptor = partialResult.tag.TagTypeName;
   } else if (partialResult.transferPkg) {
+    enablePackageScoreBoost = true;
     matchedFields = extractMatchedFields(queryString, partialResult.transferPkg);
 
     switch (partialResult.transferPkg.PackageState) {
@@ -207,6 +213,7 @@ export function generateSearchResultMetadata(
     secondaryTextualIdentifier = `${partialResult.transferPkg.ShippedQuantity} ${partialResult.transferPkg.ShippedUnitOfMeasureAbbreviation} ${partialResult.transferPkg.ProductName}`;
     primaryTextualDescriptor = `Package`;
   } else if (partialResult.plant) {
+    enablePlantScoreBoost = true;
     matchedFields = extractMatchedFields(queryString, partialResult.plant);
 
     switch (partialResult.plant.PlantState) {
@@ -233,6 +240,7 @@ export function generateSearchResultMetadata(
     primaryTextualDescriptor = "Plant";
     secondaryTextualDescriptor = partialResult.plant.StrainName;
   } else if (partialResult.plantBatch) {
+    enablePlantBatchScoreBoost = true;
     matchedFields = extractMatchedFields(queryString, partialResult.plantBatch);
 
     switch (partialResult.plantBatch.PlantBatchState) {
@@ -317,6 +325,18 @@ export function generateSearchResultMetadata(
     return maxObj;
   }, matchedFields[0]).subscore;
 
+  if (enablePackageScoreBoost) {
+    score *= 1.1;
+  }
+
+  if (enablePlantScoreBoost) {
+    score *= 1.1;
+  }
+
+  if (enablePlantBatchScoreBoost) {
+    score *= 1.1;
+  }
+
   const result = {
     ...partialResult,
     score,
@@ -361,7 +381,7 @@ export function generateScoreFromMatch({
   const proximityScore = Math.max(proximityToStart, proximityToEnd);
 
   // Calculate the percentage of the body string that the query string matches
-  const matchPercentage = queryLength / bodyLength;
+  const matchPercentage = Math.sqrt(queryLength / bodyLength);
 
   // Final score is the product of the proximity score and the match percentage
   const finalScore = proximityScore * matchPercentage;
