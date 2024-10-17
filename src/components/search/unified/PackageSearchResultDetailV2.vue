@@ -5,10 +5,16 @@
 
       <div class="flex flex-col items-center space-y-8 flex-grow">
         <div class="flex flex-col space-y-2 items-center">
-          <div class="flex flex-col justify-center gap-1 items-center text-center w-20 text-sm my-2">
-            <complex-icon class="text-purple-700" :primaryIconName="searchState.activeSearchResult.primaryIconName"
-              primaryIconSize="xl" :secondaryIconName="searchState.activeSearchResult.secondaryIconName"
-              secondaryIconSize="sm"></complex-icon>
+          <div
+            class="flex flex-col justify-center gap-1 items-center text-center w-20 text-sm my-2"
+          >
+            <complex-icon
+              class="text-purple-700"
+              :primaryIconName="searchState.activeSearchResult.primaryIconName"
+              primaryIconSize="xl"
+              :secondaryIconName="searchState.activeSearchResult.secondaryIconName"
+              secondaryIconSize="sm"
+            ></complex-icon>
 
             <div class="font-bold text-base">
               {{ searchState.activeSearchResult.primaryTextualDescriptor }}
@@ -16,7 +22,10 @@
           </div>
 
           <div class="flex flex-row items-center space-x-4 text-center">
-            <metrc-tag :label="getLabelOrError(searchResultPackageOrNull)" sideText="PACKAGE"></metrc-tag>
+            <metrc-tag
+              :label="getLabelOrError(searchResultPackageOrNull)"
+              sideText="PACKAGE"
+            ></metrc-tag>
           </div>
 
           <!-- <b-badge class="text-lg" :variant="badgeVariant(searchResultPackageOrNull)">{{
@@ -25,8 +34,11 @@
         </div>
       </div>
 
-      <div v-show="isOnPackagesPage" @click.stop.prevent="setPackageLabelFilter(searchResultPackageOrNull)"
-        class="flex flex-row items-center justify-center cursor-pointer h-full">
+      <div
+        v-show="isOnPackagesPage"
+        @click.stop.prevent="setPackageLabelFilter(searchResultPackageOrNull)"
+        class="flex flex-row items-center justify-center cursor-pointer h-full"
+      >
         <font-awesome-icon icon="chevron-right" class="text-2xl text-purple-500" />
       </div>
     </div>
@@ -50,7 +62,7 @@ import {
   MetrcGridId,
   ModalAction,
   ModalType,
-  PackageState
+  PackageState,
 } from "@/consts";
 import { IPluginState, ITransferPackageList, IUnionIndexedPackageData } from "@/interfaces";
 import { analyticsManager } from "@/modules/analytics-manager.module";
@@ -65,9 +77,7 @@ import { PackageHistoryActions } from "@/store/page-overlay/modules/package-hist
 import { PackageSearchActions } from "@/store/page-overlay/modules/package-search/consts";
 import { SearchActions } from "@/store/page-overlay/modules/search/consts";
 import { SplitPackageBuilderActions } from "@/store/page-overlay/modules/split-package-builder/consts";
-import {
-  TransferBuilderActions
-} from "@/store/page-overlay/modules/transfer-builder/consts";
+import { TransferBuilderActions } from "@/store/page-overlay/modules/transfer-builder/consts";
 import { copyToClipboard } from "@/utils/dom";
 import { getLabelOrError } from "@/utils/package";
 import Vue from "vue";
@@ -95,14 +105,16 @@ export default Vue.extend({
       searchState: (state: IPluginState) => state.search,
     }),
     searchResultPackageOrNull(): IUnionIndexedPackageData | null {
-      return (store.state.search.activeSearchResult?.pkg ||
-        store.state.search.activeSearchResult?.transferPkg) ?? null;
+      return (
+        (store.state.search.activeSearchResult?.pkg ||
+          store.state.search.activeSearchResult?.transferPkg) ??
+        null
+      );
     },
     isOnPackagesPage() {
       return window.location.pathname.match(PACKAGE_TAB_REGEX);
     },
-    ...mapGetters({
-    }),
+    ...mapGetters({}),
     t3plusEnabled() {
       return store.state.client.values.ENABLE_T3PLUS || store.state.client.t3plus;
     },
@@ -128,6 +140,8 @@ export default Vue.extend({
     },
     async setPackageLabelFilter(pkg: IUnionIndexedPackageData) {
       analyticsManager.track(MessageType.SELECTED_PACKAGE);
+
+      this.setShowSearchResults({ showSearchResults: false });
 
       let metrcGridId: MetrcGridId;
       switch (pkg.PackageState) {
@@ -158,15 +172,17 @@ export default Vue.extend({
 
       await pageManager.clickSettleDelay();
 
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
       const label = getLabelOrError(pkg);
 
-      if (pkg.PackageState === PackageState.TRANSFERRED) {
-        setFilter(metrcGridId, 'PackageLabel', label);
-      } else {
-        setFilter(metrcGridId, 'Label', label);
-      }
+      debugger;
 
-      this.setShowSearchResults({ showSearchResults: false });
+      if (pkg.PackageState === PackageState.TRANSFERRED) {
+        setFilter(metrcGridId, "PackageLabel", label);
+      } else {
+        setFilter(metrcGridId, "Label", label);
+      }
     },
     copyToClipboard(pkg: IUnionIndexedPackageData) {
       analyticsManager.track(MessageType.COPIED_TEXT, { value: getLabelOrError(pkg) });

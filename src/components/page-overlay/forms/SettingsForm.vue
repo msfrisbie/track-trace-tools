@@ -5,33 +5,58 @@
         <b-form-group>
           <div class="mb-2 text-gray-400 text-lg">Appearance &amp; Behavior</div>
 
-          <b-form-checkbox id="checkbox-preventLogout" class="mb-2" v-model="settings.preventLogout"
-            name="checkbox-preventLogout" @change="onChange()">
+          <b-form-checkbox
+            id="checkbox-preventLogout"
+            class="mb-2"
+            v-model="settings.preventLogout"
+            name="checkbox-preventLogout"
+            @change="onChange()"
+          >
             Prevent Metrc from logging me out
           </b-form-checkbox>
 
-          <b-form-checkbox id="checkbox-autoDismissPopups" class="mb-2" v-model="settings.autoDismissPopups"
-            name="checkbox-autoDismissPopups" @change="onChange()">
+          <b-form-checkbox
+            id="checkbox-autoDismissPopups"
+            class="mb-2"
+            v-model="settings.autoDismissPopups"
+            name="checkbox-autoDismissPopups"
+            @change="onChange()"
+          >
             Auto-dismiss Metrc banners
           </b-form-checkbox>
 
-          <b-form-checkbox id="checkbox-fixMetrcStyling" class="mb-2" v-model="settings.fixMetrcStyling"
-            name="checkbox-fixMetrcStyling" @change="onChange()">
+          <b-form-checkbox
+            id="checkbox-fixMetrcStyling"
+            class="mb-2"
+            v-model="settings.fixMetrcStyling"
+            name="checkbox-fixMetrcStyling"
+            @change="onChange()"
+          >
             Fix Metrc styling
           </b-form-checkbox>
 
-          <b-form-checkbox id="checkbox-hideAiButton" class="mb-2" v-model="settings.hideAiButton"
+          <!-- <b-form-checkbox id="checkbox-hideAiButton" class="mb-2" v-model="settings.hideAiButton"
             name="checkbox-hideAiButton" @change="onChange()">
             Hide Metrc AI button
-          </b-form-checkbox>
+          </b-form-checkbox> -->
 
-          <b-form-checkbox id="checkbox-efficientSpacing" class="mb-2" v-model="settings.efficientSpacing"
-            name="checkbox-efficientSpacing" @change="onChange()">
+          <b-form-checkbox
+            id="checkbox-efficientSpacing"
+            class="mb-2"
+            v-model="settings.efficientSpacing"
+            name="checkbox-efficientSpacing"
+            @change="onChange()"
+          >
             Enable high-density Metrc UI
           </b-form-checkbox>
 
-          <b-form-checkbox id="checkbox-modalExpand" class="mb-2" v-model="settings.modalExpand"
-            name="checkbox-modalExpand" @change="onChange()">
+          <b-form-checkbox
+            id="checkbox-modalExpand"
+            class="mb-2"
+            v-model="settings.modalExpand"
+            name="checkbox-modalExpand"
+            @change="onChange()"
+          >
             Auto-expand Metrc windows to fill screen
           </b-form-checkbox>
 
@@ -46,13 +71,19 @@
           </b-form-checkbox> -->
 
           <b-form-group label="Dark mode (beta)">
-            <b-form-select :options="darkModeStateOptions" @change="onChange()"
-              v-model="settings.darkModeState"></b-form-select>
+            <b-form-select
+              :options="darkModeStateOptions"
+              @change="onChange()"
+              v-model="settings.darkModeState"
+            ></b-form-select>
           </b-form-group>
 
           <b-form-group label="Metrc Background">
-            <b-form-select :options="backgroundOptions" @change="onChange()"
-              v-model="settings.backgroundState"></b-form-select>
+            <b-form-select
+              :options="backgroundOptions"
+              @change="onChange()"
+              v-model="settings.backgroundState"
+            ></b-form-select>
           </b-form-group>
 
           <template v-if="settings.backgroundState === 'COLOR'">
@@ -63,11 +94,19 @@
 
           <template v-if="settings.backgroundState === 'GRADIENT'">
             <b-form-group label="Background gradient start color">
-              <input type="color" v-model="settings.backgroundGradientStartColor" @change="onChange()" />
+              <input
+                type="color"
+                v-model="settings.backgroundGradientStartColor"
+                @change="onChange()"
+              />
             </b-form-group>
 
             <b-form-group label="Background gradient end color">
-              <input type="color" v-model="settings.backgroundGradientEndColor" @change="onChange()" />
+              <input
+                type="color"
+                v-model="settings.backgroundGradientEndColor"
+                @change="onChange()"
+              />
             </b-form-group>
           </template>
 
@@ -84,21 +123,37 @@
           </template>
 
           <b-form-group label="Snowflakes">
-            <b-form-select :options="snowflakeStateOptions" @change="onChange()"
-              v-model="settings.snowflakeState"></b-form-select>
+            <b-form-select
+              :options="snowflakeStateOptions"
+              @change="onChange()"
+              v-model="settings.snowflakeState"
+            ></b-form-select>
           </b-form-group>
 
           <b-form-group label="Snowflake appearance" v-if="settings.snowflakeState === 'CSS'">
             <b-input-group>
-              <b-form-select :options="snowflakeIconOptions" @change="onChange()"
-                v-model="settings.snowflakeCharacter"></b-form-select>
-              <b-form-select :options="snowflakeSizeOptions" @change="onChange()"
-                v-model="settings.snowflakeSize"></b-form-select>
+              <b-form-select
+                :options="snowflakeIconOptions"
+                @change="onChange()"
+                v-model="settings.snowflakeCharacter"
+              ></b-form-select>
+              <b-form-select
+                :options="snowflakeSizeOptions"
+                @change="onChange()"
+                v-model="settings.snowflakeSize"
+              ></b-form-select>
             </b-input-group>
           </b-form-group>
           <template v-if="settings.snowflakeState === 'CSS'">
-            <b-form-group label="Custom snowflake text" v-if="settings.snowflakeCharacter === 'TEXT'">
-              <b-form-textarea rows="3" v-model="settings.snowflakeText" @input="onChange()"></b-form-textarea>
+            <b-form-group
+              label="Custom snowflake text"
+              v-if="settings.snowflakeCharacter === 'TEXT'"
+            >
+              <b-form-textarea
+                rows="3"
+                v-model="settings.snowflakeText"
+                @input="onChange()"
+              ></b-form-textarea>
             </b-form-group>
 
             <template v-if="settings.snowflakeCharacter === 'IMAGE'">
@@ -109,9 +164,13 @@
               <template v-if="settings.snowflakeImage">
                 <div class="grid grid-cols-2 gap-2">
                   <img :src="settings.snowflakeImage" />
-                  <b-form-group label="Crop">:
-                    <b-form-select :options="snowflakeImageCropOptions" @change="onChange()"
-                      v-model="settings.snowflakeImageCrop"></b-form-select>
+                  <b-form-group label="Crop"
+                    >:
+                    <b-form-select
+                      :options="snowflakeImageCropOptions"
+                      @change="onChange()"
+                      v-model="settings.snowflakeImageCrop"
+                    ></b-form-select>
                   </b-form-group>
                 </div>
               </template>
@@ -170,62 +229,113 @@
         Hide quick action buttons
       </b-form-checkbox> -->
 
-          <b-form-checkbox id="checkbox-enableTransferTools" class="mb-2" v-model="settings.enableTransferTools"
-            name="checkbox-enableTransferTools" @change="onChange()">
+          <b-form-checkbox
+            id="checkbox-enableTransferTools"
+            class="mb-2"
+            v-model="settings.enableTransferTools"
+            name="checkbox-enableTransferTools"
+            @change="onChange()"
+          >
             Add Transfer Tools to Metrc transfer window
           </b-form-checkbox>
 
-          <b-form-checkbox id="checkbox-disableAutoRefreshOnModalClose" class="mb-2"
-            v-model="settings.disableAutoRefreshOnModalClose" name="checkbox-disableAutoRefreshOnModalClose"
-            @change="onChange()">
+          <b-form-checkbox
+            id="checkbox-disableAutoRefreshOnModalClose"
+            class="mb-2"
+            v-model="settings.disableAutoRefreshOnModalClose"
+            name="checkbox-disableAutoRefreshOnModalClose"
+            @change="onChange()"
+          >
             Disable auto-refresh Metrc interface after closing modal windows
           </b-form-checkbox>
 
-          <b-form-checkbox id="checkbox-preventActiveProjectPageLeave" class="mb-2"
-            v-model="settings.preventActiveProjectPageLeave" name="checkbox-preventActiveProjectPageLeave"
-            @change="onChange()">
+          <b-form-checkbox
+            id="checkbox-preventActiveProjectPageLeave"
+            class="mb-2"
+            v-model="settings.preventActiveProjectPageLeave"
+            name="checkbox-preventActiveProjectPageLeave"
+            @change="onChange()"
+          >
             Stop me from leaving the page when T3 submit is in progress
           </b-form-checkbox>
 
-          <b-form-checkbox id="checkbox-loadDataInParallel" class="mb-2" v-model="settings.loadDataInParallel"
-            name="checkbox-loadDataInParallel" @change="onChange()">
+          <b-form-checkbox
+            id="checkbox-loadDataInParallel"
+            class="mb-2"
+            v-model="settings.loadDataInParallel"
+            name="checkbox-loadDataInParallel"
+            @change="onChange()"
+          >
             Load Metrc data in parallel
           </b-form-checkbox>
 
-          <b-form-checkbox id="checkbox-useLegacyDateFormatForSubmit" class="mb-2"
-            v-model="settings.useLegacyDateFormatForSubmit" name="checkbox-useLegacyDateFormatForSubmit"
-            @change="onChange()">
+          <b-form-checkbox
+            id="checkbox-useLegacyDateFormatForSubmit"
+            class="mb-2"
+            v-model="settings.useLegacyDateFormatForSubmit"
+            name="checkbox-useLegacyDateFormatForSubmit"
+            @change="onChange()"
+          >
             Use legacy format when submitting dates
           </b-form-checkbox>
 
-          <b-form-checkbox id="checkbox-writeSettingsToChromeStorage" class="mb-2"
-            v-model="settings.writeSettingsToChromeStorage" name="checkbox-writeSettingsToChromeStorage"
-            @change="onChange()">
+          <b-form-checkbox
+            id="checkbox-writeSettingsToChromeStorage"
+            class="mb-2"
+            v-model="settings.writeSettingsToChromeStorage"
+            name="checkbox-writeSettingsToChromeStorage"
+            @change="onChange()"
+          >
             Persist T3 to Chrome storage
           </b-form-checkbox>
 
-          <b-form-checkbox id="checkbox-usePersistedCache" class="mb-2" v-model="settings.usePersistedCache"
-            name="checkbox-usePersistedCache" @change="onChange()">
+          <b-form-checkbox
+            id="checkbox-usePersistedCache"
+            class="mb-2"
+            v-model="settings.usePersistedCache"
+            name="checkbox-usePersistedCache"
+            @change="onChange()"
+          >
             Use persisted cache
           </b-form-checkbox>
 
-          <b-form-checkbox id="checkbox-disablePopups" class="mb-2" v-model="settings.disablePopups"
-            name="checkbox-disablePopups" @change="onChange()">
+          <b-form-checkbox
+            id="checkbox-disablePopups"
+            class="mb-2"
+            v-model="settings.disablePopups"
+            name="checkbox-disablePopups"
+            @change="onChange()"
+          >
             Disable overlay messages (not recommended)
           </b-form-checkbox>
 
-          <b-form-checkbox id="checkbox-hideInlineTransferButtons" class="mb-2"
-            v-model="settings.hideInlineTransferButtons" name="checkbox-hideInlineTransferButtons" @change="onChange()">
+          <b-form-checkbox
+            id="checkbox-hideInlineTransferButtons"
+            class="mb-2"
+            v-model="settings.hideInlineTransferButtons"
+            name="checkbox-hideInlineTransferButtons"
+            @change="onChange()"
+          >
             Hide inline table buttons
           </b-form-checkbox>
 
-          <b-form-checkbox id="checkbox-hideFacilityPicker" class="mb-2" v-model="settings.hideFacilityPicker"
-            name="checkbox-hideFacilityPicker" @change="onChange()">
+          <b-form-checkbox
+            id="checkbox-hideFacilityPicker"
+            class="mb-2"
+            v-model="settings.hideFacilityPicker"
+            name="checkbox-hideFacilityPicker"
+            @change="onChange()"
+          >
             Use default Metrc facility picker
           </b-form-checkbox>
 
-          <b-form-checkbox id="checkbox-enableSameItemPatch" class="mb-2" v-model="settings.enableSameItemPatch"
-            name="checkbox-enableSameItemPatch" @change="onChange()">
+          <b-form-checkbox
+            id="checkbox-enableSameItemPatch"
+            class="mb-2"
+            v-model="settings.enableSameItemPatch"
+            name="checkbox-enableSameItemPatch"
+            @change="onChange()"
+          >
             Enable same item patch
           </b-form-checkbox>
 
@@ -254,38 +364,66 @@
             </template> -->
 
             <b-input-group class="items-start">
-              <b-form-input id="input-licenseKey" class="mb-2" v-model="settings.licenseKey" name="input-licenseKey"
-                disabled="disabled">
+              <b-form-input
+                id="input-licenseKey"
+                class="mb-2"
+                v-model="settings.licenseKey"
+                name="input-licenseKey"
+                disabled="disabled"
+              >
               </b-form-input>
 
               <b-input-group-append>
-                <b-button size="md" @click="clearLicenseKey()" variant="outline-danger">CLEAR</b-button>
+                <b-button size="md" @click="clearLicenseKey()" variant="outline-danger"
+                  >CLEAR</b-button
+                >
               </b-input-group-append>
             </b-input-group>
           </template>
 
           <template v-else>
             <b-input-group class="items-start">
-              <b-form-input id="input-licenseKey" placeholder="Paste your license key here" class="mb-2"
-                v-model="unsavedLicenseKey" name="input-licenseKey" type="text"
-                v-on:keydown.enter.prevent="saveLicenseKey()" autocomplete="off">
+              <b-form-input
+                id="input-licenseKey"
+                placeholder="Paste your license key here"
+                class="mb-2"
+                v-model="unsavedLicenseKey"
+                name="input-licenseKey"
+                type="text"
+                v-on:keydown.enter.prevent="saveLicenseKey()"
+                autocomplete="off"
+              >
               </b-form-input>
               <b-input-group-append>
-                <b-button :disabled="!unsavedLicenseKey" size="md" @click="saveLicenseKey()"
-                  variant="outline-success">SAVE</b-button>
+                <b-button
+                  :disabled="!unsavedLicenseKey"
+                  size="md"
+                  @click="saveLicenseKey()"
+                  variant="outline-success"
+                  >SAVE</b-button
+                >
               </b-input-group-append>
             </b-input-group>
           </template>
 
-          <a class="text-purple-600 underline" href="https://www.trackandtrace.tools/solutions" target="_blank">What is
-            this?</a>
+          <a
+            class="text-purple-600 underline"
+            href="https://www.trackandtrace.tools/solutions"
+            target="_blank"
+            >What is this?</a
+          >
         </b-form-group>
 
         <b-form-group class="col-span-2">
           <template v-if="!!settings.email">
             <b-input-group class="items-start">
-              <b-form-input id="input-email" class="mb-2" v-model="settings.email" name="input-email"
-                disabled="disabled">
+              <b-form-input
+                id="input-email"
+                class="mb-2"
+                v-model="settings.email"
+                name="input-email"
+                disabled="disabled"
+              >
               </b-form-input>
 
               <b-input-group-append>
@@ -296,13 +434,26 @@
 
           <template v-else>
             <b-input-group class="items-start">
-              <b-form-input id="input-email" placeholder="Enter your email here" class="mb-2" v-model="unsavedEmail"
-                name="input-email" type="email" v-on:keydown.enter.prevent="saveEmail()" autocomplete="off"
-                :state="emailValidState">
+              <b-form-input
+                id="input-email"
+                placeholder="Enter your email here"
+                class="mb-2"
+                v-model="unsavedEmail"
+                name="input-email"
+                type="email"
+                v-on:keydown.enter.prevent="saveEmail()"
+                autocomplete="off"
+                :state="emailValidState"
+              >
               </b-form-input>
               <b-input-group-append>
-                <b-button :disabled="!unsavedEmail || emailValidState === false" size="md" @click="saveEmail()"
-                  variant="outline-success">SAVE</b-button>
+                <b-button
+                  :disabled="!unsavedEmail || emailValidState === false"
+                  size="md"
+                  @click="saveEmail()"
+                  variant="outline-success"
+                  >SAVE</b-button
+                >
               </b-input-group-append>
             </b-input-group>
           </template>
@@ -312,90 +463,150 @@
 
         <b-button-group vertical class="col-span-2 mb-4">
           <b-button variant="outline-primary" @click="resetSettings()">RESET SETTINGS</b-button>
-          <b-button variant="outline-primary" @click="navToPermissions('/check-permissions')">CHECK MY
-            PERMISSIONS</b-button>
+          <b-button variant="outline-primary" @click="navToPermissions('/check-permissions')"
+            >CHECK MY PERMISSIONS</b-button
+          >
         </b-button-group>
 
         <div class="col-span-2 text-gray-400 text-lg">Packages</div>
 
-        <b-form-checkbox id="checkbox-autoOpenActivePackages" v-model="settings.autoOpenActivePackages"
-          name="checkbox-autoOpenActivePackages" @change="onChange()">
+        <b-form-checkbox
+          id="checkbox-autoOpenActivePackages"
+          v-model="settings.autoOpenActivePackages"
+          name="checkbox-autoOpenActivePackages"
+          @change="onChange()"
+        >
           Auto-open Packages tab
         </b-form-checkbox>
 
-        <b-form-select v-model="settings.autoOpenPackageTab" :options="packageTabOptions" @change="onChange()"
-          v-if="settings.autoOpenActivePackages"></b-form-select>
+        <b-form-select
+          v-model="settings.autoOpenPackageTab"
+          :options="packageTabOptions"
+          @change="onChange()"
+          v-if="settings.autoOpenActivePackages"
+        ></b-form-select>
 
         <span>Viewing # Packages:</span>
 
-        <b-form-select v-model="settings.packageDefaultPageSize" :options="pageSizeOptions"
-          @change="onChange()"></b-form-select>
+        <b-form-select
+          v-model="settings.packageDefaultPageSize"
+          :options="pageSizeOptions"
+          @change="onChange()"
+        ></b-form-select>
 
         <div class="col-span-2 text-gray-400 text-lg py-4">Transfers</div>
 
-        <b-form-checkbox id="checkbox-enableManifestDocumentViewer" class="col-span-2"
-          v-model="settings.enableManifestDocumentViewer" name="checkbox-enableManifestDocumentViewer"
-          @change="onChange()">
+        <b-form-checkbox
+          id="checkbox-enableManifestDocumentViewer"
+          class="col-span-2"
+          v-model="settings.enableManifestDocumentViewer"
+          name="checkbox-enableManifestDocumentViewer"
+          @change="onChange()"
+        >
           Always use T3 PDF viewer for manifests
         </b-form-checkbox>
 
-        <b-form-checkbox id="checkbox-autoOpenIncomingTransfers" v-model="settings.autoOpenIncomingTransfers"
-          name="checkbox-autoOpenIncomingTransfers" @change="onChange()">
+        <b-form-checkbox
+          id="checkbox-autoOpenIncomingTransfers"
+          v-model="settings.autoOpenIncomingTransfers"
+          name="checkbox-autoOpenIncomingTransfers"
+          @change="onChange()"
+        >
           Auto-open Transfers tab
         </b-form-checkbox>
 
-        <b-form-select v-model="settings.autoOpenTransfersTab" :options="transfersTabOptions" @change="onChange()"
-          v-if="settings.autoOpenIncomingTransfers"></b-form-select>
+        <b-form-select
+          v-model="settings.autoOpenTransfersTab"
+          :options="transfersTabOptions"
+          @change="onChange()"
+          v-if="settings.autoOpenIncomingTransfers"
+        ></b-form-select>
 
         <span>Viewing # Transfers:</span>
 
-        <b-form-select v-model="settings.transferDefaultPageSize" :options="pageSizeOptions"
-          @change="onChange()"></b-form-select>
+        <b-form-select
+          v-model="settings.transferDefaultPageSize"
+          :options="pageSizeOptions"
+          @change="onChange()"
+        ></b-form-select>
 
         <div class="col-span-2 text-gray-400 text-lg py-4">Sales</div>
 
-        <b-form-checkbox id="checkbox-autoOpenActiveSales" v-model="settings.autoOpenActiveSales"
-          name="checkbox-autoOpenActiveSales" @change="onChange()">
+        <b-form-checkbox
+          id="checkbox-autoOpenActiveSales"
+          v-model="settings.autoOpenActiveSales"
+          name="checkbox-autoOpenActiveSales"
+          @change="onChange()"
+        >
           Auto-open Sales tab
         </b-form-checkbox>
 
-        <b-form-select v-model="settings.autoOpenSalesTab" :options="salesTabOptions" @change="onChange()"
-          v-if="settings.autoOpenActiveSales"></b-form-select>
+        <b-form-select
+          v-model="settings.autoOpenSalesTab"
+          :options="salesTabOptions"
+          @change="onChange()"
+          v-if="settings.autoOpenActiveSales"
+        ></b-form-select>
 
         <span>Viewing # Sales:</span>
 
-        <b-form-select v-model="settings.salesDefaultPageSize" :options="pageSizeOptions"
-          @change="onChange()"></b-form-select>
+        <b-form-select
+          v-model="settings.salesDefaultPageSize"
+          :options="pageSizeOptions"
+          @change="onChange()"
+        ></b-form-select>
 
         <div class="col-span-2 text-gray-400 text-lg py-4">Tags</div>
 
-        <b-form-checkbox id="checkbox-autoOpenAvailableTags" v-model="settings.autoOpenAvailableTags"
-          name="checkbox-autoOpenAvailableTags" @change="onChange()">
+        <b-form-checkbox
+          id="checkbox-autoOpenAvailableTags"
+          v-model="settings.autoOpenAvailableTags"
+          name="checkbox-autoOpenAvailableTags"
+          @change="onChange()"
+        >
           Auto-open Tags tab
         </b-form-checkbox>
 
-        <b-form-select v-model="settings.autoOpenTagsTab" :options="tagsTabOptions" @change="onChange()"
-          v-if="settings.autoOpenAvailableTags"></b-form-select>
+        <b-form-select
+          v-model="settings.autoOpenTagsTab"
+          :options="tagsTabOptions"
+          @change="onChange()"
+          v-if="settings.autoOpenAvailableTags"
+        ></b-form-select>
 
         <span>Viewing # Tags:</span>
 
-        <b-form-select v-model="settings.tagDefaultPageSize" :options="pageSizeOptions"
-          @change="onChange()"></b-form-select>
+        <b-form-select
+          v-model="settings.tagDefaultPageSize"
+          :options="pageSizeOptions"
+          @change="onChange()"
+        ></b-form-select>
 
         <div class="col-span-2 text-gray-400 text-lg py-4">Plants</div>
 
-        <b-form-checkbox id="checkbox-autoOpenFloweringPlants" v-model="settings.autoOpenFloweringPlants"
-          name="checkbox-autoOpenFloweringPlants" @change="onChange()">
+        <b-form-checkbox
+          id="checkbox-autoOpenFloweringPlants"
+          v-model="settings.autoOpenFloweringPlants"
+          name="checkbox-autoOpenFloweringPlants"
+          @change="onChange()"
+        >
           Auto-open Plants tab
         </b-form-checkbox>
 
-        <b-form-select v-model="settings.autoOpenPlantsTab" :options="plantsTabOptions" @change="onChange()"
-          v-if="settings.autoOpenFloweringPlants"></b-form-select>
+        <b-form-select
+          v-model="settings.autoOpenPlantsTab"
+          :options="plantsTabOptions"
+          @change="onChange()"
+          v-if="settings.autoOpenFloweringPlants"
+        ></b-form-select>
 
         <span>Viewing # Plants:</span>
 
-        <b-form-select v-model="settings.plantDefaultPageSize" :options="pageSizeOptions"
-          @change="onChange()"></b-form-select>
+        <b-form-select
+          v-model="settings.plantDefaultPageSize"
+          :options="pageSizeOptions"
+          @change="onChange()"
+        ></b-form-select>
       </div>
     </b-form>
     <!-- <div class="exboost-slot"></div> -->
@@ -598,7 +809,7 @@ export default Vue.extend({
       this.$data.settings.email = "";
       this.onChange();
     },
-    onImageChange() { },
+    onImageChange() {},
     onChange() {
       pageManager.pauseFor(3000);
 

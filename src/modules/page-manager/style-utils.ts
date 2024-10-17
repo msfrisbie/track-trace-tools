@@ -97,12 +97,6 @@ export function togglePageVisibilityClassesImpl() {
     document.body.classList.remove("demo-mode");
   }
 
-  if (store.state.settings?.hideAiButton) {
-    document.body.classList.add("ttt-metrc-ai-fix");
-  } else {
-    document.body.classList.remove("ttt-metrc-ai-fix");
-  }
-
   if (store.state.settings?.fixMetrcStyling) {
     document.body.classList.add("ttt-styling-fix");
   } else {

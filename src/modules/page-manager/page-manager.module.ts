@@ -12,6 +12,7 @@ import { MutationType } from "@/mutation-types";
 import store from "@/store/page-overlay/index";
 import { MetrcTableActions } from "@/store/page-overlay/modules/metrc-table/consts";
 import { debugLogFactory } from "@/utils/debug";
+import { getHashData } from "@/utils/url";
 import _ from "lodash-es";
 import { timer } from "rxjs";
 import { v4 as uuidv4 } from "uuid";
@@ -48,6 +49,7 @@ import {
   initializeFilterButtonsImpl,
   mirrorMetrcTableState,
   resetFilterElementReferencesImpl,
+  setFilter,
 } from "./search-utils";
 import {
   controlBackgroundImpl,
@@ -68,24 +70,6 @@ class PageManager implements IAtomicService {
   textBuffer: string = "";
 
   suppressAnimationContainerTimeout: any = null;
-
-  // plantsTabs: NodeList = [] as any;
-
-  // selectedPlantTab: HTMLElement | null = null;
-
-  // packageTabs: NodeList = [] as any;
-
-  // selectedPackageTab: HTMLElement | null = null;
-
-  // transferTabs: NodeList = [] as any;
-
-  // selectedTransferTab: HTMLElement | null = null;
-
-  // salesTabs: NodeList = [] as any;
-
-  // tagTabs: NodeList = [] as any;
-
-  // selectedTagTab: HTMLElement | null = null;
 
   paginationOptions: NodeList = [] as any;
 
@@ -133,142 +117,6 @@ class PageManager implements IAtomicService {
 
   packageTagInputContainer: HTMLElement | null = null;
 
-  // Plant Search
-
-  // plantSearchComponent: HTMLElement | null = null;
-
-  // plantLabelFilterInput: HTMLInputElement | null = null;
-
-  // plantLabelFilterSelect: HTMLElement | null = null;
-
-  // plantLabelApplyFiltersButton: HTMLButtonElement | null = null;
-
-  // plantStrainNameFilterInput: HTMLInputElement | null = null;
-
-  // plantStrainNameApplyFiltersButton: HTMLButtonElement | null = null;
-
-  // plantLocationNameFilterInput: HTMLInputElement | null = null;
-
-  // plantLocationNameApplyFiltersButton: HTMLButtonElement | null = null;
-
-  // plantClearFiltersButton: HTMLButtonElement | null = null;
-
-  // // Package Search
-
-  // packageSearchComponent: HTMLElement | null = null;
-
-  // packageLabelFilterInput: HTMLInputElement | null = null;
-
-  // packageLabelFilterSelect: HTMLElement | null = null;
-
-  // packageLabelApplyFiltersButton: HTMLButtonElement | null = null;
-
-  // packageSourceHarvestNameFilterInput: HTMLInputElement | null = null;
-
-  // packageSourceHarvestNameApplyFiltersButton: HTMLButtonElement | null = null;
-
-  // packageSourcePackageLabelFilterInput: HTMLInputElement | null = null;
-
-  // packageSourcePackageLabelApplyFiltersButton: HTMLButtonElement | null = null;
-
-  // packageProductionBatchNumberFilterInput: HTMLInputElement | null = null;
-
-  // packageProductionBatchNumberApplyFiltersButton: HTMLButtonElement | null = null;
-
-  // packageSourceProductionBatchNumbersFilterInput: HTMLInputElement | null = null;
-
-  // packageSourceProductionBatchNumbersApplyFiltersButton: HTMLButtonElement | null = null;
-
-  // packageItemNameFilterInput: HTMLInputElement | null = null;
-
-  // packageItemNameApplyFiltersButton: HTMLButtonElement | null = null;
-
-  // packageItemStrainNameFilterInput: HTMLInputElement | null = null;
-
-  // packageItemStrainNameApplyFiltersButton: HTMLButtonElement | null = null;
-
-  // packageItemProductCategoryNameFilterInput: HTMLInputElement | null = null;
-
-  // packageItemProductCategoryNameApplyFiltersButton: HTMLButtonElement | null = null;
-
-  // packageLocationNameFilterInput: HTMLInputElement | null = null;
-
-  // packageLocationNameApplyFiltersButton: HTMLButtonElement | null = null;
-
-  // destinationPackageDestinationFacilityNameFilterInput: HTMLInputElement | null = null;
-
-  // destinationPackageDestinationFacilityNameFilterSelect: HTMLElement | null = null;
-
-  // destinationPackageDestinationFacilityNameApplyFiltersButton: HTMLButtonElement | null = null;
-
-  // destinationPackageDestinationLicenseNumberFilterInput: HTMLInputElement | null = null;
-
-  // destinationPackageDestinationLicenseNumberFilterSelect: HTMLElement | null = null;
-
-  // destinationPackageDestinationLicenseNumberApplyFiltersButton: HTMLButtonElement | null = null;
-
-  // destinationPackageManifestNumberFilterInput: HTMLInputElement | null = null;
-
-  // destinationPackageManifestNumberFilterSelect: HTMLElement | null = null;
-
-  // destinationPackageManifestNumberApplyFiltersButton: HTMLButtonElement | null = null;
-
-  // destinationPackageLabelFilterInput: HTMLInputElement | null = null;
-
-  // destinationPackageLabelFilterSelect: HTMLElement | null = null;
-
-  // destinationPackageLabelApplyFiltersButton: HTMLButtonElement | null = null;
-
-  // destinationPackageSourceHarvestNameFilterInput: HTMLInputElement | null = null;
-
-  // destinationPackageSourceHarvestNameApplyFiltersButton: HTMLButtonElement | null = null;
-
-  // destinationPackageSourcePackageLabelFilterInput: HTMLInputElement | null = null;
-
-  // destinationPackageSourcePackageLabelApplyFiltersButton: HTMLButtonElement | null = null;
-
-  // destinationPackageProductNameFilterInput: HTMLInputElement | null = null;
-
-  // destinationPackageProductNameApplyFiltersButton: HTMLButtonElement | null = null;
-
-  // destinationPackageItemStrainNameFilterInput: HTMLInputElement | null = null;
-
-  // destinationPackageItemStrainNameApplyFiltersButton: HTMLButtonElement | null = null;
-
-  // destinationPackageItemProductCategoryNameFilterInput: HTMLInputElement | null = null;
-
-  // destinationPackageItemProductCategoryNameApplyFiltersButton: HTMLButtonElement | null = null;
-
-  // packageClearFiltersButton: HTMLButtonElement | null = null;
-
-  // // Transfer Search
-
-  // transferManifestNumberFilterInput: HTMLInputElement | null = null;
-
-  // transferManifestNumberFilterSelect: HTMLElement | null = null;
-
-  // transferManifestNumberApplyFiltersButton: HTMLButtonElement | null = null;
-
-  // transferIncomingShipperFacilityInfoFilterInput: HTMLInputElement | null = null;
-
-  // transferIncomingShipperFacilityInfoApplyFiltersButton: HTMLButtonElement | null = null;
-
-  // transferOutgoingDeliveryFacilitiesFilterInput: HTMLInputElement | null = null;
-
-  // transferOutgoingDeliveryFacilitiesApplyFiltersButton: HTMLButtonElement | null = null;
-
-  // transferClearFiltersButton: HTMLButtonElement | null = null;
-
-  // // Tag Search
-
-  // tagNumberFilterInput: HTMLInputElement | null = null;
-
-  // tagNumberFilterSelect: HTMLElement | null = null;
-
-  // tagNumberApplyFiltersButton: HTMLButtonElement | null = null;
-
-  // tagClearFiltersButton: HTMLButtonElement | null = null;
-
   // Prevents recurring method from overrunning itself
   paused: boolean = false;
 
@@ -295,14 +143,22 @@ class PageManager implements IAtomicService {
 
     // These are references which are not expected to be dynamic in nature
     this.snowflakeCanvas = document.querySelector("canvas") as HTMLElement | null;
-    // this.packageTabs = document.querySelectorAll("#packages_tabstrip li.k-item") as NodeList;
-    // this.plantsTabs = document.querySelectorAll("#plants_tabstrip li.k-item") as NodeList;
-    // this.transferTabs = document.querySelectorAll("#transfers_tabstrip li.k-item") as NodeList;
-    // this.salesTabs = document.querySelectorAll("#sales_tabstrip li.k-item") as NodeList;
-    // this.tagTabs = document.querySelectorAll("#tags_tabstrip li.k-item") as NodeList;
-    // this.plantsTabs = document.querySelectorAll("#plants_tabstrip li.k-item") as NodeList;
 
-    await manageTabs();
+    try {
+      await manageTabs();
+
+      const currentHashData = getHashData();
+
+      for (const [metrcGridId, metrcGridFilters] of Object.entries(currentHashData.metrcGridFilters ?? {})) {
+        for (const [field, value] of Object.entries(metrcGridFilters)) {
+          console.log({ metrcGridId, field, value });
+          await setFilter(metrcGridId as MetrcGridId, field, value);
+        }
+      }
+    } catch (e) {
+      console.error('FAILED HASH DATA');
+      console.error(e);
+    }
 
     // Eagerly modify
     timer(0, 2500).subscribe(() => this.modifyPageAtInterval());
@@ -562,16 +418,10 @@ class PageManager implements IAtomicService {
       mirrorMetrcTableState();
 
       if (window.location.pathname.match(PACKAGE_TAB_REGEX)) {
-        // await managePackageTabs();
-        // this.acquirePackageFilterElements();
-
         this.addButtonsToPackageTable();
       }
 
       if (window.location.pathname.match(TRANSFER_TAB_REGEX)) {
-        // await manageTransfersTabs();
-        // this.acquireTransferFilterElements();
-
         this.interceptViewManifestButton();
 
         this.addButtonsToTransferTable();
@@ -597,17 +447,12 @@ class PageManager implements IAtomicService {
       }
 
       if (window.location.pathname.match(TAG_TAB_REGEX)) {
-        // await manageTagsTabs();
-        // this.acquireTagFilterElements();
       }
 
       if (window.location.pathname.match(SALES_TAB_REGEX)) {
-        // await manageSalesTabs();
       }
 
       if (window.location.pathname.match(PLANTS_TAB_REGEX)) {
-        // await managePlantTabs();
-        // this.acquirePlantFilterElements();
       }
 
       if (window.location.pathname.match(REPORTS_TAB_REGEX)) {
@@ -744,88 +589,6 @@ class PageManager implements IAtomicService {
   async initializeFilterButtons() {
     return initializeFilterButtonsImpl();
   }
-
-  // async setPlantFilter(
-  //   metrcGridId: MetrcGridId,
-  //   plantFilterIdentifier: PlantFilterIdentifiers,
-  //   value: string
-  // ) {
-  //   return setPlantFilterImpl(metrcGridId, plantFilterIdentifier, value);
-  // }
-
-  // async setPackageFilter(
-  //   metrcGridId: MetrcGridId,
-  //   packageFilterIdentifier: PackageFilterIdentifiers,
-  //   value: string
-  // ) {
-  //   return setPackageFilterImpl(metrcGridId, packageFilterIdentifier, value);
-  // }
-
-  // async setDestinationPackageFilter(
-  //   metrcGridId: MetrcGridId,
-  //   destinationPackageFilterIdentifier: TransferredPackageFilterIdentifiers,
-  //   value: string
-  // ) {
-  //   return setDestinationPackageFilterImpl(metrcGridId, destinationPackageFilterIdentifier, value);
-  // }
-
-  // async setTransferFilter(
-  //   metrcGridId: MetrcGridId,
-  //   transferFilterIdentifier: TransferFilterIdentifiers,
-  //   value: string
-  // ) {
-  //   return setTransferFilterImpl(metrcGridId, transferFilterIdentifier, value);
-  // }
-
-  // async setTagFilter(
-  //   metrcGridId: MetrcGridId,
-  //   tagFilterIdentifier: TagFilterIdentifiers,
-  //   value: string
-  // ) {
-  //   return setTagFilterImpl(metrcGridId, tagFilterIdentifier, value);
-  // }
-
-  // applyPlantFilter(plantFilterIdentifier: PlantFilterIdentifiers) {
-  //   return applyPlantFilterImpl(plantFilterIdentifier);
-  // }
-
-  // applyPackageFilter(packageFilterIdentifier: PackageFilterIdentifiers) {
-  //   return applyPackageFilterImpl(packageFilterIdentifier);
-  // }
-
-  // applyDestinationPackageFilter(
-  //   destinationPackageFilterIdentifier: TransferredPackageFilterIdentifiers
-  // ) {
-  //   return applyDestinationPackageFilterImpl(destinationPackageFilterIdentifier);
-  // }
-
-  // applyTransferFilter(transferFilterIdentifier: TransferFilterIdentifiers) {
-  //   return applyTransferFilterImpl(transferFilterIdentifier);
-  // }
-
-  // applyTagFilter(tagFilterIdentifier: TagFilterIdentifiers) {
-  //   return applyTagFilterImpl(tagFilterIdentifier);
-  // }
-
-  // // Clicks the Metrc reset button - everything is wiped out
-  // async resetMetrcPlantFilters() {
-  //   return resetMetrcPlantFiltersImpl();
-  // }
-
-  // // Clicks the Metrc reset button - everything is wiped out
-  // async resetMetrcPackageFilters() {
-  //   return resetMetrcPackageFiltersImpl();
-  // }
-
-  // // Clicks the Metrc reset button - everything is wiped out
-  // async resetMetrcTransferFilters() {
-  //   return resetMetrcTransferFiltersImpl();
-  // }
-
-  // // Clicks the Metrc reset button - everything is wiped out
-  // async resetMetrcTagFilters() {
-  //   return resetMetrcTagFiltersImpl();
-  // }
 
   // When a tab changes, we need to wipe out the references and reacquire them
   async resetFilterElementReferences() {

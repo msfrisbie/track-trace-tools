@@ -468,6 +468,14 @@ export async function getFilterFormOrError(
   metrcGridId: MetrcGridId,
   searchFilter: string
 ): Promise<HTMLFormElement> {
+  if (getActiveMetrcGridIdOrNull() !== metrcGridId) {
+    await pageManager.refresh;
+
+    await pageManager.clickTabWithGridId(metrcGridId);
+
+    await pageManager.clickSettleDelay();
+  }
+
   const mappedFilterFormSelector: string = `form.k-filter-menu[${T3_SEARCH_FILTER_ATTRIBUTE}="${searchFilter}"][${T3_METRC_GRID_ID_ATTRIBUTE}="${metrcGridId}"]`;
 
   let mappedFilterForm: HTMLFormElement | null = document.querySelector(mappedFilterFormSelector);
@@ -516,10 +524,6 @@ export async function setFilter(
   if (reset) {
   }
 
-  await pageManager.refresh;
-
-  await pageManager.clickTabWithGridId(metrcGridId);
-
   const form = await getFilterFormOrError(metrcGridId, searchFilter);
 
   const input = form.querySelector(`input[title="Filter Criteria"]`)! as HTMLInputElement;
@@ -527,6 +531,7 @@ export async function setFilter(
   const button = form.querySelector(`button[type="submit"]`)! as HTMLButtonElement;
   input.dispatchEvent(new Event("change"));
   button.click();
+  await pageManager.clickSettleDelay();
 }
 
 export async function setPlantFilterImpl(

@@ -127,6 +127,13 @@ export const searchModule = {
         [metrcGridId]: searchFilters,
       };
 
+      const currentHashData = getHashData();
+
+      setHashData({
+        ...currentHashData,
+        metrcGridFilters
+      });
+
       ctx.commit(SearchMutations.SEARCH_MUTATION, { metrcGridFilters });
     },
     [SearchActions.SET_ACTIVE_METRC_GRID_ID]: async (
