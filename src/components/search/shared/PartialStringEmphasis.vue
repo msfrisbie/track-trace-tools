@@ -1,8 +1,9 @@
 <template>
     <div class="flex flex-row items-center flex-wrap">
-        <span class="text-wrap break-words" v-bind:key="idx" v-for="[idx, stringPiece] of stringPieces.entries()"
-            v-bind:class="{ 'font-extrabold underline text-gray-800': stringPiece.emphasized, 'font-light text-gray-400': !stringPiece.emphasized }">
-            {{ stringPiece.text }}
+        <span class="text-wrap break-words whitespace-pre-wrap" v-bind:key="idx"
+            v-for="(stringPiece, idx) in stringPieces"
+            v-bind:class="{ 'font-extrabold underline text-gray-800': stringPiece.emphasized, 'font-light text-gray-400': !stringPiece.emphasized }"
+            v-html="formatText(stringPiece.text)">
         </span>
     </div>
 </template>
@@ -66,6 +67,10 @@ export default Vue.extend({
         ...mapActions({
             exampleAction: `example/${ExampleActions.EXAMPLE_ACTION}`,
         }),
+        formatText(text: string): string {
+            // Replace spaces with non-breaking spaces to preserve leading/trailing whitespace
+            return text.replace(/ /g, '&nbsp;');
+        },
     },
     async created() { },
     async mounted() { },
