@@ -5,18 +5,19 @@
       <dual-color-tag class="text-md" :label="label" />
     </div>
     <div class="bg-black w-8 flex flex-col items-center justify-center text-center">
-      <span class="transform rotate-90 text-white font-semibold block">{{ sideText }}</span>
+      <span class="transform rotate-90 text-white font-semibold block text-nowrap">{{ sideText.toLocaleUpperCase()
+        }}</span>
     </div>
   </div>
 </template>
 
 <script lang="ts">
-import Vue from 'vue';
-import { mapState } from 'vuex';
+import DualColorTag from '@/components/overlay-widget/shared/DualColorTag.vue';
 import router from '@/router/index';
 import store from '@/store/page-overlay/index';
-import DualColorTag from '@/components/overlay-widget/shared/DualColorTag.vue';
 import JsBarcode from 'jsbarcode';
+import Vue from 'vue';
+import { mapState } from 'vuex';
 
 export default Vue.extend({
   name: 'MetrcTag',
@@ -36,7 +37,7 @@ export default Vue.extend({
     return {};
   },
   methods: {},
-  async created() {},
+  async created() { },
   async mounted() {
     JsBarcode(`#barcode-${this.$props.label}`, this.$props.label, {
       background: 'transparent',

@@ -118,7 +118,7 @@ export function generateSearchResultMetadata(
     secondaryIconName = "arrow-left";
     primaryTextualDescriptor = "Incoming Transfer";
     primaryTextualIdentifier = partialResult.incomingTransfer.ManifestNumber;
-    secondaryTextualIdentifier = `${partialResult.incomingTransfer.PackageCount} pkg transfer from ${partialResult.incomingTransfer.ShipperFacilityName}`;
+    secondaryTextualIdentifier = `${partialResult.incomingTransfer.PackageCount} package incoming transfer from ${partialResult.incomingTransfer.ShipperFacilityName}`;
   } else if (partialResult.outgoingTransfer) {
     matchedFields = extractMatchedFields(queryString, partialResult.outgoingTransfer);
 
@@ -141,7 +141,7 @@ export function generateSearchResultMetadata(
     secondaryIconName = "arrow-right";
     primaryTextualDescriptor = "Outgoing Transfer";
     primaryTextualIdentifier = partialResult.outgoingTransfer.ManifestNumber;
-    secondaryTextualIdentifier = `${partialResult.outgoingTransfer.PackageCount} pkg transfer`;
+    secondaryTextualIdentifier = `${partialResult.outgoingTransfer.PackageCount} package outgoing transfer`;
   } else if (partialResult.pkg) {
     enablePackageScoreBoost = true;
     matchedFields = extractMatchedFields(queryString, partialResult.pkg);
@@ -167,7 +167,7 @@ export function generateSearchResultMetadata(
     primaryTextualDescriptor = "Package";
     secondaryTextualDescriptor = partialResult.pkg.Item.ProductCategoryName;
     primaryTextualIdentifier = partialResult.pkg.Label;
-    secondaryTextualIdentifier = `${partialResult.pkg.Quantity} ${partialResult.pkg.UnitOfMeasureAbbreviation} ${partialResult.pkg.Item.Name}`;
+    secondaryTextualIdentifier = `${partialResult.pkg.Quantity} ${partialResult.pkg.UnitOfMeasureAbbreviation} ${partialResult.pkg.Item.Name} package`;
   } else if (partialResult.tag) {
     matchedFields = extractMatchedFields(queryString, partialResult.tag);
 

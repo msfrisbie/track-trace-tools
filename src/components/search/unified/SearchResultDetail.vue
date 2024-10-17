@@ -1,5 +1,30 @@
 <template>
-  <div>
+  <div v-if="searchState.activeSearchResult">
+    <!-- {{ searchState.activeSearchResult }} -->
+
+    <div class="flex flex-col items-center space-y-8 px-2 p-4">
+
+      <div class="flex flex-col items-center gap-4 flex-grow">
+        <div class="flex flex-row gap-2 items-center" :class="{
+          'text-yellow-700': searchResultTransferOrNull,
+          'text-purple-700': searchResultPackageOrNull,
+          'text-green-700': searchResultPlantOrNull,
+          'text-blue-700': searchResultTagOrNull
+        }">
+          <complex-icon :primaryIconName="searchState.activeSearchResult.primaryIconName" primaryIconSize="xl"
+            :secondaryIconName="searchState.activeSearchResult.secondaryIconName" secondaryIconSize="sm" />
+
+          <span class="text-2xl">{{ searchState.activeSearchResult.primaryTextualIdentifier }}</span>
+        </div>
+        <span class="text-xl">
+          {{ searchState.activeSearchResult.secondaryTextualIdentifier }}
+        </span>
+        <span class="text-2xl font-bold">
+          {{ searchState.activeSearchResult.primaryStatusTextualDescriptor.toLocaleUpperCase() }}
+        </span>
+      </div>
+    </div>
+
     <div
       v-if="searchResultTransferOrNull || searchResultPackageOrNull || searchResultPlantOrNull || searchResultTagOrNull"
       class="flex flex-col items-center space-y-8 px-2 p-4">

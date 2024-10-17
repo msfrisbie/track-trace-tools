@@ -1,6 +1,6 @@
 <template>
-    <div class="flex flex-row items-center">
-        <span v-bind:key="idx" v-for="[idx, stringPiece] of stringPieces.entries()"
+    <div class="flex flex-row items-center flex-wrap">
+        <span class="text-wrap break-words" v-bind:key="idx" v-for="[idx, stringPiece] of stringPieces.entries()"
             v-bind:class="{ 'font-extrabold underline': stringPiece.emphasized, 'font-light': !stringPiece.emphasized }">
             {{ stringPiece.text }}
         </span>

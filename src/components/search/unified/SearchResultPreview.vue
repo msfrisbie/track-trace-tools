@@ -3,22 +3,22 @@
     'bg-white': searchState.activeSearchResult === searchResult,
     [classNames(searchResult).bgColorClass]: true
   }" @click="selectSearchResult({ searchResult })">
-    <div class="flex flex-col justify-center gap-1 items-center text-center w-20 text-sm my-2">
+    <div class="flex flex-col justify-center gap-1 items-center text-center w-20 text-sm my-2 mx-4">
       <complex-icon v-bind:class="{
         [classNames(searchResult).textColorClass]: true
       }" :primaryIconName="searchResult.primaryIconName" primaryIconSize="xl"
         :secondaryIconName="searchResult.secondaryIconName" secondaryIconSize="sm"></complex-icon>
 
       <div class="font-bold text-base">
-        {{ searchResult.primaryTextualDescriptor }}
+        {{ searchResult.primaryStatusTextualDescriptor }} {{ searchResult.primaryTextualDescriptor }}
       </div>
     </div>
 
-    <div class="p-2 w-full grid grid-cols-2 gap-2">
+    <div class="p-2 w-full grid grid-cols-3 gap-2 text-wrap break-words">
       <fragment v-for="[idx, matchedField] of searchResult.matchedFields.entries()" v-bind:key="idx">
-        <div class="text-right p-2 align-self-start">{{ matchedField.field }}:</div>
-        <div class="p-2 font-mono align-self-start">
-          <partial-string-emphasis class="text-wrap flex-wrap" :fullString="matchedField.value" style="max-width:300px"
+        <div class="text-right p-2 align-self-start text-gray-600">{{ matchedField.field }}:</div>
+        <div class="p-2 font-mono align-self-start col-span-2">
+          <partial-string-emphasis :fullString="matchedField.value"
             :partialString="searchState.queryString"></partial-string-emphasis>
         </div>
       </fragment>
