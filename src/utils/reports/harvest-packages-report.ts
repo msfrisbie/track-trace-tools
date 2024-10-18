@@ -1,3 +1,4 @@
+import { TransferPackageSearchAlgorithm } from "@/consts";
 import {
   IHarvestFilter,
   IIndexedDestinationPackageData,
@@ -17,7 +18,6 @@ import {
   IReportData,
   IReportsState,
 } from "@/store/page-overlay/modules/reports/interfaces";
-import { TransferPackageSearchAlgorithm } from "@/store/page-overlay/modules/transfer-package-search/consts";
 import { v4 as uuidv4 } from "uuid";
 import { ActionContext } from "vuex";
 import { todayIsodate } from "../date";

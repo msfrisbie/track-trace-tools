@@ -1,3 +1,5 @@
+import { MetrcGridId } from "@/consts";
+
 export enum SearchMutations {
   SEARCH_MUTATION = "SEARCH_MUTATION",
   PUSH_SEARCH_RESULTS = "PUSH_SEARCH_RESULTS",
@@ -6,7 +8,6 @@ export enum SearchMutations {
 export enum SearchGetters {}
 
 export enum SearchActions {
-  SET_SEARCH_TYPE = "SET_SEARCH_TYPE",
   SET_SHOW_SEARCH_RESULTS = "SET_SHOW_SEARCH_RESULTS",
   SET_QUERY_STRING = "SET_QUERY_STRING",
   EXECUTE_QUERY = "EXECUTE_QUERY",

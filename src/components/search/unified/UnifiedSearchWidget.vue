@@ -51,16 +51,22 @@
                         </template>
 
                         <p class="text-lg text-gray-600">
-                          <span class="font-semibold ttt-purple">{{ searchState.searchResults.length }}</span>
+                          <span class="font-semibold text-purple-600">{{ searchState.searchResults.length }}</span>
                           results for <span class="font-semibold text-gray-900">{{
                             searchState.queryString }}</span>
                         </p>
 
+                        <search-control-panel></search-control-panel>
+
                         <div class="flex-grow"></div>
                       </div>
-                    </template>
 
-                    <template v-if="searchState.queryString.length > 0">
+                      <div>
+                        <b-button-group>
+
+                        </b-button-group>
+                      </div>
+
                       <div class="flex flex-col overflow-y-auto bg-gray-50 min-h-screen">
                         <search-result-preview v-for="(searchResult, idx) in searchState.searchResults" v-bind:key="idx"
                           :searchResult="searchResult"></search-result-preview>
@@ -69,7 +75,9 @@
                       </div>
 
                       <div class="flex flex-col overflow-y-auto">
-                        <search-result-detail></search-result-detail>
+                        <div class="pl-24">
+                          <search-result-detail></search-result-detail>
+                        </div>
                       </div>
                     </template>
 
@@ -79,6 +87,8 @@
                       </div>
 
                       <div class="flex flex-col overflow-y-auto col-span-2">
+                        <search-control-panel></search-control-panel>
+
                         <history-list />
                       </div>
                     </template>
@@ -113,6 +123,7 @@ import {
 } from "@/store/page-overlay/modules/search/consts";
 import Vue from "vue";
 import { mapActions, mapState } from "vuex";
+import SearchControlPanel from "./SearchControlPanel.vue";
 import SearchResultDetail from "./SearchResultDetail.vue";
 import SearchResultPreview from "./SearchResultPreview.vue";
 
@@ -131,13 +142,16 @@ export default Vue.extend({
     HistoryList,
     SearchResultPreview,
     SearchResultDetail,
-    GridFilters
+    GridFilters,
+    SearchControlPanel
   },
   computed: {
     ...mapState<IPluginState>({
-      searchType: (state: IPluginState) => state.search.searchType,
       searchState: (state: IPluginState) => state.search,
     }),
+    inlineControlPanelDisplayed(): boolean {
+      return this.$data.showInlineControlPanel && !store.state.search.showSearchResults;
+    },
     queryString: {
       get(): string {
         return store.state.search.queryString;
@@ -149,6 +163,7 @@ export default Vue.extend({
   },
   data() {
     return {
+      showInlineControlPanel: false,
       SearchType,
       SearchStatus,
     };

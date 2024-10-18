@@ -243,11 +243,11 @@ export enum HarvestState {
 }
 
 export enum ItemState {
-  ACTIVE = "ACTIVE"
+  ACTIVE = "ACTIVE",
 }
 
 export enum StrainState {
-  ACTIVE = "ACTIVE"
+  ACTIVE = "ACTIVE",
 }
 
 export enum TransferState {
@@ -395,7 +395,7 @@ export const DATA_LOAD_MAX_COUNT: number = DATA_LOAD_PAGE_SIZE * DATA_LOAD_MAX_P
 export const DATA_LOAD_MAX_ITERATION_FAILSAFE: number = 100;
 export const DATA_LOAD_FETCH_TIMEOUT_MS: number = 5 * 60 * 1000;
 export const PLANTABLE_ITEM_CATEGORY_NAMES = [
-// Note: this was to match an inconsistency in the plural.
+  // Note: this was to match an inconsistency in the plural.
   // There's no apparent penalty for having both.
   "Immature Plant",
   "Immature Plants",
@@ -636,5 +636,49 @@ export enum MetrcGridId {
 
   ITEMS_GRID = "items-grid",
 
-  STRAIN_GRID = "strain-grid"
+  STRAIN_GRID = "strain-grid",
+  // NOTE: must add new values to ALL_METRC_GRID_IDS
+}
+
+export const ALL_METRC_GRID_IDS = [
+  MetrcGridId.PLANT_BATCHES,
+  MetrcGridId.PLANT_BATCHES_ON_HOLD,
+  MetrcGridId.PLANT_BATCHES_INACTIVE,
+
+  MetrcGridId.PLANTS_VEGETATIVE,
+  MetrcGridId.PLANTS_FLOWERING,
+  MetrcGridId.PLANTS_ON_HOLD,
+  MetrcGridId.PLANTS_INACTIVE,
+
+  MetrcGridId.HARVESTS_HARVESTED,
+  MetrcGridId.HARVESTS_ON_HOLD,
+  MetrcGridId.HARVESTS_INACTIVE,
+
+  MetrcGridId.PACKAGES_ACTIVE,
+  MetrcGridId.PACKAGES_ON_HOLD,
+  MetrcGridId.PACKAGES_INACTIVE,
+  MetrcGridId.PACKAGES_IN_TRANSIT,
+  MetrcGridId.PACKAGES_TRANSFERRED,
+
+  MetrcGridId.TRANSFERS_INCOMING,
+  MetrcGridId.TRANSFERS_INCOMING_INACTIVE,
+  MetrcGridId.TRANSFERS_OUTGOING,
+  MetrcGridId.TRANSFERS_REJECTED,
+  MetrcGridId.TRANSFERS_OUTGOING_INACTIVE,
+
+  MetrcGridId.TAGS_AVAILABLE,
+  MetrcGridId.TAGS_USED,
+  MetrcGridId.TAGS_VOIDED,
+
+  MetrcGridId.SALES_ACTIVE,
+  MetrcGridId.SALES_INACTIVE,
+
+  MetrcGridId.ITEMS_GRID,
+
+  MetrcGridId.STRAIN_GRID,
+];
+
+export enum TransferPackageSearchAlgorithm {
+  OLD_TO_NEW = "OLD_TO_NEW",
+  NEW_TO_OLD = "NEW_TO_OLD",
 }

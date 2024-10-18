@@ -15,53 +15,52 @@
               </div>
             </template>
 
-            <b-dropdown-item class="text-lg" @click.stop.prevent="filterPackages({ label: pkg.Label })">
+            <b-dropdown-item class="text-lg" @click.stop.prevent="filterPackages(pkg.Label)">
               <div class="flex flex-row space-x-2 justify-between flex-nowrap">
                 <span>Tag:</span> <span class="font-bold">{{ pkg.Label }}</span>
               </div>
             </b-dropdown-item>
-            <b-dropdown-item class="text-lg" @click.stop.prevent="filterPackages({ itemName: pkg.Item.Name })">
+            <b-dropdown-item class="text-lg" @click.stop.prevent="filterPackages(pkg.Item.Name)">
               <div class="flex flex-row space-x-2 justify-between flex-nowrap">
                 <span>Item:</span> <span class="font-bold">{{ pkg.Item.Name }}</span>
               </div>
             </b-dropdown-item>
             <b-dropdown-item class="text-lg" v-if="pkg.LocationName"
-              @click.stop.prevent="filterPackages({ locationName: pkg.LocationName })">
+              @click.stop.prevent="filterPackages(pkg.LocationName)">
               <div class="flex flex-row space-x-2 justify-between flex-nowrap">
                 <span>Location:</span> <span class="font-bold">{{ pkg.LocationName }}</span>
               </div>
             </b-dropdown-item>
             <b-dropdown-item class="text-lg" v-if="pkg.Item.StrainName"
-              @click.stop.prevent="filterPackages({ itemStrainName: pkg.Item.StrainName })">
+              @click.stop.prevent="filterPackages(pkg.Item.StrainName)">
               <div class="flex flex-row space-x-2 justify-between flex-nowrap">
                 <span>Strain:</span> <span class="font-bold">{{ pkg.Item.StrainName }}</span>
               </div>
             </b-dropdown-item>
-            <b-dropdown-item class="text-lg"
-              @click.stop.prevent="filterPackages({ sourcePackageLabels: pkg.SourcePackageLabels })">
+            <b-dropdown-item class="text-lg" @click.stop.prevent="filterPackages(pkg.SourcePackageLabels)">
               <div class="flex flex-row space-x-2 justify-between flex-nowrap">
                 <span>Source tag:</span>
                 <span class="font-bold">{{ pkg.SourcePackageLabels.slice(0, 30) }}</span>
               </div>
             </b-dropdown-item>
             <b-dropdown-item class="text-lg" @click.stop.prevent="
-        filterPackages({ productionBatchNumber: pkg.ProductionBatchNumber })
-        ">
+              filterPackages(pkg.ProductionBatchNumber)
+              ">
               <div class="flex flex-row space-x-2 justify-between flex-nowrap">
                 <span>PB #:</span>
                 <span class="font-bold">{{ pkg.ProductionBatchNumber.slice(0, 30) }}</span>
               </div>
             </b-dropdown-item>
             <b-dropdown-item class="text-lg" @click.stop.prevent="
-        filterPackages({ sourceProductionBatchNumbers: pkg.SourceProductionBatchNumbers })
-        ">
+              filterPackages(pkg.SourceProductionBatchNumbers)
+              ">
               <div class="flex flex-row space-x-2 justify-between flex-nowrap">
                 <span>Source PB #:</span>
                 <span class="font-bold">{{ pkg.SourceProductionBatchNumbers.slice(0, 30) }}</span>
               </div>
             </b-dropdown-item>
             <b-dropdown-item class="text-lg" v-if="pkg.SourceHarvestNames"
-              @click.stop.prevent="filterPackages({ sourceHarvestNames: pkg.SourceHarvestNames })">
+              @click.stop.prevent="filterPackages(pkg.SourceHarvestNames)">
               <div class="flex flex-row space-x-2 justify-between flex-nowrap">
                 <span>Harvest:</span>
                 <span class="font-bold">{{ pkg.SourceHarvestNames.slice(0, 30) }}</span>
@@ -154,8 +153,7 @@ import { MessageType } from "@/consts";
 import {
   IIndexedPackageData,
   IIndexedTransferData,
-  IPackageSearchFilters,
-  IPluginState,
+  IPluginState
 } from "@/interfaces";
 import { analyticsManager } from "@/modules/analytics-manager.module";
 import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
@@ -164,7 +162,6 @@ import router from "@/router/index";
 import store from "@/store/page-overlay/index";
 import { ExplorerActions } from "@/store/page-overlay/modules/explorer/consts";
 import { PackageHistoryActions } from "@/store/page-overlay/modules/package-history/consts";
-import { PackageSearchActions } from "@/store/page-overlay/modules/package-search/consts";
 import { PluginAuthActions } from "@/store/page-overlay/modules/plugin-auth/consts";
 import { SearchActions } from "@/store/page-overlay/modules/search/consts";
 import { SplitPackageBuilderActions } from "@/store/page-overlay/modules/split-package-builder/consts";
@@ -210,8 +207,6 @@ export default Vue.extend({
       addPackageToTransferList: `transferBuilder/${TransferBuilderActions.ADD_PACKAGE}`,
       removePackageFromTransferList: `transferBuilder/${TransferBuilderActions.REMOVE_PACKAGE}`,
       setSplitSourcePackage: `splitPackageBuilder/${SplitPackageBuilderActions.SET_SOURCE_PACKAGE}`,
-      partialUpdatePackageSearchFilters: `packageSearch/${PackageSearchActions.PARTIAL_UPDATE_PACKAGE_SEARCH_FILTERS}`,
-      setSearchType: `search/${SearchActions.SET_SEARCH_TYPE}`,
       setShowSearchResults: `search/${SearchActions.SET_SHOW_SEARCH_RESULTS}`,
       setPackageHistorySourcePackage: `packageHistory/${PackageHistoryActions.SET_SOURCE_PACKAGE}`,
       setExplorerData: `explorer/${ExplorerActions.SET_EXPLORER_DATA}`,
@@ -221,21 +216,13 @@ export default Vue.extend({
     dismiss() {
       modalManager.dispatchContextMenuEvent(null);
     },
-    filterPackages(packageSearchFilters: IPackageSearchFilters) {
+    filterPackages(text: string) {
       analyticsManager.track(MessageType.CONTEXT_MENU_SELECT, {
         event: "filterPackage",
-        packageSearchFilters,
       });
-
-      analyticsManager.track(MessageType.CLICKED_SEARCH_PACKAGE_BUTTON);
-
+      this.setShowSearchResults({ showSearchResults: true });
+      store.dispatch(`search/${SearchActions.SET_QUERY_STRING}`, { queryString: text });
       this.dismiss();
-
-      this.partialUpdatePackageSearchFilters({
-        packageSearchFilters,
-      });
-
-      this.setSearchType({ searchType: "PACKAGES" });
     },
     searchTransfer(text: string) {
       analyticsManager.track(MessageType.CONTEXT_MENU_SELECT, { event: "searchTransfer", text });

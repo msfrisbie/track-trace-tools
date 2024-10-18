@@ -1,4 +1,4 @@
-import { TransferState } from "@/consts";
+import { TransferPackageSearchAlgorithm, TransferState } from "@/consts";
 import {
   IDestinationData,
   IDestinationPackageData,
@@ -20,7 +20,6 @@ import { dynamicConstsManager } from "@/modules/dynamic-consts-manager.module";
 import { toastManager } from "@/modules/toast-manager.module";
 import store from "@/store/page-overlay/index";
 import { OAuthState } from "@/store/page-overlay/modules/plugin-auth/consts";
-import { TransferPackageSearchAlgorithm } from "@/store/page-overlay/modules/transfer-package-search/consts";
 import {
   getIdOrError,
   getItemNameOrError,

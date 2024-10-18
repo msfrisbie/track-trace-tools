@@ -1,4 +1,5 @@
 import {
+  ALL_METRC_GRID_IDS,
   HarvestState,
   ItemState,
   MessageType,
@@ -18,7 +19,7 @@ import { maybePushOntoUniqueStack } from "@/utils/search";
 import { getHashData, setHashData } from "@/utils/url";
 import _ from "lodash-es";
 import { ActionContext } from "vuex";
-import { SearchActions, SearchMutations, SearchStatus, SearchType } from "./consts";
+import { SearchActions, SearchMutations, SearchStatus } from "./consts";
 import { ISearchResult, ISearchState } from "./interfaces";
 
 const QUERY_DEBOUNCE_MS: number = 700;
@@ -32,13 +33,13 @@ const inMemoryState = {
   queryLicenseNumber: "",
   searchResults: [],
   activeSearchResult: null,
-  searchType: SearchType.PACKAGES,
   metrcGridFilters: {},
   activeMetrcGridId: null,
 };
 
 const persistedState = {
   queryStringHistory: [],
+  enabledResultMetrcGridIds: [...ALL_METRC_GRID_IDS],
 };
 
 const defaultState: ISearchState = {
@@ -107,23 +108,6 @@ export const searchModule = {
     ) {
       ctx.commit(SearchMutations.SEARCH_MUTATION, { showSearchResults });
     },
-    [SearchActions.SET_SEARCH_TYPE](
-      ctx: ActionContext<ISearchState, IPluginState>,
-      { searchType }: { searchType: SearchType }
-    ) {
-      ctx.commit(SearchMutations.SEARCH_MUTATION, { searchType });
-    },
-    // [SearchActions.INITIALIZE_SEARCH_TYPE](ctx: ActionContext<ISearchState, IPluginState>) {
-    //   // if (window.location.pathname.match(PLANTS_TAB_REGEX)) {
-    //   //   ctx.dispatch(SearchActions.SET_SEARCH_TYPE, { searchType: SearchType.PLANTS });
-    //   // } else if (window.location.pathname.match(TAG_TAB_REGEX)) {
-    //   //   ctx.dispatch(SearchActions.SET_SEARCH_TYPE, { searchType: SearchType.TAGS });
-    //   // } else if (window.location.pathname.match(TRANSFER_TAB_REGEX)) {
-    //   //   ctx.dispatch(SearchActions.SET_SEARCH_TYPE, { searchType: SearchType.TRANSFERS });
-    //   // } else if (window.location.pathname.match(PACKAGE_TAB_REGEX)) {
-    //   //   ctx.dispatch(SearchActions.SET_SEARCH_TYPE, { searchType: SearchType.PACKAGES });
-    //   // }
-    // },
 
     [SearchActions.MIRROR_METRC_SEARCH_FILTERS]: async (
       ctx: ActionContext<ISearchState, IPluginState>,

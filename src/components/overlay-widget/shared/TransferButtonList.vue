@@ -135,7 +135,6 @@ import router from "@/router/index";
 import store from "@/store/page-overlay/index";
 import { ExplorerActions } from "@/store/page-overlay/modules/explorer/consts";
 import { PackageHistoryActions } from "@/store/page-overlay/modules/package-history/consts";
-import { PackageSearchActions } from "@/store/page-overlay/modules/package-search/consts";
 import { PluginAuthActions } from "@/store/page-overlay/modules/plugin-auth/consts";
 import { ReportType, ReportsActions } from "@/store/page-overlay/modules/reports/consts";
 import { IReportConfig } from "@/store/page-overlay/modules/reports/interfaces";
@@ -207,8 +206,6 @@ export default Vue.extend({
       addPackageToTransferList: `transferBuilder/${TransferBuilderActions.ADD_PACKAGE}`,
       removePackageFromTransferList: `transferBuilder/${TransferBuilderActions.REMOVE_PACKAGE}`,
       setSplitSourcePackage: `splitPackageBuilder/${SplitPackageBuilderActions.SET_SOURCE_PACKAGE}`,
-      partialUpdatePackageSearchFilters: `packageSearch/${PackageSearchActions.PARTIAL_UPDATE_PACKAGE_SEARCH_FILTERS}`,
-      setSearchType: `search/${SearchActions.SET_SEARCH_TYPE}`,
       setShowSearchResults: `search/${SearchActions.SET_SHOW_SEARCH_RESULTS}`,
       setPackageHistorySourcePackage: `packageHistory/${PackageHistoryActions.SET_SOURCE_PACKAGE}`,
       setExplorerData: `explorer/${ExplorerActions.SET_EXPLORER_DATA}`,

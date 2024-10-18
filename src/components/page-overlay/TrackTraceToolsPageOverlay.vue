@@ -136,6 +136,7 @@ library.add(
   fontawesomeSolid.faCaretRight,
   fontawesomeSolid.faCheck,
   fontawesomeSolid.faCheckSquare,
+  fontawesomeSolid.faChevronUp,
   fontawesomeSolid.faChevronDown,
   fontawesomeSolid.faChevronLeft,
   fontawesomeSolid.faChevronRight,
@@ -306,7 +307,7 @@ export default Vue.extend({
 
     await sandboxManager.runsAfterModuleInit();
   },
-  mounted() {},
+  mounted() { },
 });
 </script>
 

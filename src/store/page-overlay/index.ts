@@ -16,6 +16,7 @@ import VuexPersistence from "vuex-persist";
 import { announcementsModule, announcementsReducer } from "./modules/announcements";
 import { clientModule, clientReducer } from "./modules/client";
 import { createPackageCsvModule, createPackageCsvReducer } from "./modules/create-package-csv";
+import { csvFillToolModule, csvFillToolReducer } from "./modules/csv-fill-tool/index";
 import { employeeSamplesModule, employeeSamplesReducer } from "./modules/employee-samples";
 import { explorerModule, explorerReducer } from "./modules/explorer";
 import { flagsModule, flagsReducer } from "./modules/flags/index";
@@ -25,10 +26,7 @@ import { labelPrintModule, labelPrintReducer } from "./modules/label-print";
 import { listingModule, listingReducer } from "./modules/listing";
 import { metrcTableModule, metrcTableReducer } from "./modules/metrc-table";
 import { packageHistoryModule, packageHistoryReducer } from "./modules/package-history";
-import { packageSearchModule, packageSearchReducer } from "./modules/package-search";
-import { plantSearchModule, plantSearchReducer } from "./modules/plant-search";
 import { pluginAuthModule, pluginAuthReducer } from "./modules/plugin-auth/index";
-import { csvFillToolModule, csvFillToolReducer } from "./modules/csv-fill-tool/index";
 import {
   promoteImmaturePlantsBuilderModule,
   promoteImmaturePlantsBuilderReducer,
@@ -41,13 +39,7 @@ import {
   splitPackageBuilderModule,
   splitPackageBuilderReducer,
 } from "./modules/split-package-builder";
-import { tagSearchModule, tagSearchReducer } from "./modules/tag-search";
 import { transferBuilderModule, transferBuilderReducer } from "./modules/transfer-builder/index";
-import {
-  transferPackageSearchModule,
-  transferPackageSearchReducer,
-} from "./modules/transfer-package-search";
-import { transferSearchModule, transferSearchReducer } from "./modules/transfer-search";
 import { transferToolsModule, transferToolsReducer } from "./modules/transfer-tools";
 
 // Taken from https://gist.github.com/Myeris/3f13b42f6764ded6640cef693d9d1987
@@ -71,11 +63,7 @@ const vuexShared = {
     client: clientReducer(state.client),
     search: searchReducer(state.search),
     transferBuilder: transferBuilderReducer(state.transferBuilder),
-    packageSearch: packageSearchReducer(state.packageSearch),
     explorer: explorerReducer(state.explorer),
-    plantSearch: plantSearchReducer(state.plantSearch),
-    transferSearch: transferSearchReducer(state.transferSearch),
-    tagSearch: tagSearchReducer(state.tagSearch),
     flags: flagsReducer(state.flags),
     splitPackageBuilder: splitPackageBuilderReducer(state.splitPackageBuilder),
     promoteImmaturePlantsBuilder: promoteImmaturePlantsBuilderReducer(
@@ -87,7 +75,6 @@ const vuexShared = {
     reports: reportsReducer(state.reports),
     employeeSamples: employeeSamplesReducer(state.employeeSamples),
     createPackageCsv: createPackageCsvReducer(state.createPackageCsv),
-    transferPackageSearch: transferPackageSearchReducer(state.transferPackageSearch),
     graph: graphReducer(state.graph),
     labCsv: labCsvReducer(state.labCsv),
     transferTools: transferToolsReducer(state.transferTools),
@@ -311,25 +298,9 @@ const vuexStore = new Vuex.Store<IPluginState>({
       namespaced: true,
       ...pluginAuthModule,
     },
-    packageSearch: {
-      namespaced: true,
-      ...packageSearchModule,
-    },
     packageHistory: {
       namespaced: true,
       ...packageHistoryModule,
-    },
-    plantSearch: {
-      namespaced: true,
-      ...plantSearchModule,
-    },
-    transferSearch: {
-      namespaced: true,
-      ...transferSearchModule,
-    },
-    tagSearch: {
-      namespaced: true,
-      ...tagSearchModule,
     },
     flags: {
       namespaced: true,
@@ -378,10 +349,6 @@ const vuexStore = new Vuex.Store<IPluginState>({
     announcements: {
       namespaced: true,
       ...announcementsModule,
-    },
-    transferPackageSearch: {
-      namespaced: true,
-      ...transferPackageSearchModule,
     },
     graph: {
       namespaced: true,

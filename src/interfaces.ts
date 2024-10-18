@@ -7,7 +7,6 @@ import {
   MessageType,
   MetrcGridId,
   MetrcStatus,
-  PackageSearchFilterKeys,
   PackageState,
   PlantBatchState,
   PlantState,
@@ -31,21 +30,16 @@ import { ILabelPrintState } from "./store/page-overlay/modules/label-print/inter
 import { IListingState } from "./store/page-overlay/modules/listing/interfaces";
 import { IMetrcTableState } from "./store/page-overlay/modules/metrc-table/interfaces";
 import { IPackageHistoryState } from "./store/page-overlay/modules/package-history/interfaces";
-import { IPackageSearchState } from "./store/page-overlay/modules/package-search/interfaces";
-import { IPlantSearchState } from "./store/page-overlay/modules/plant-search/interfaces";
 import { IPluginAuthState } from "./store/page-overlay/modules/plugin-auth/interfaces";
 import { IPromoteImmaturePlantsBuilderState } from "./store/page-overlay/modules/promote-immature-plants-builder/interfaces";
 import { IReportsState } from "./store/page-overlay/modules/reports/interfaces";
 import { ISearchState } from "./store/page-overlay/modules/search/interfaces";
 import { ISettingsState } from "./store/page-overlay/modules/settings/interfaces";
 import { ISplitPackageBuilderState } from "./store/page-overlay/modules/split-package-builder/interfaces";
-import { ITagSearchState } from "./store/page-overlay/modules/tag-search/interfaces";
 import {
   DriverLayoverLeg,
   ITransferBuilderState,
 } from "./store/page-overlay/modules/transfer-builder/interfaces";
-import { ITransferPackageSearchState } from "./store/page-overlay/modules/transfer-package-search/interfaces";
-import { ITransferSearchState } from "./store/page-overlay/modules/transfer-search/interfaces";
 import { ITransferToolsState } from "./store/page-overlay/modules/transfer-tools/interfaces";
 import { CsvUpload, CsvUploadStatus } from "./types";
 import { UnitOfMeasureAbbreviation, UnitOfMeasureName } from "./utils/units";
@@ -137,39 +131,6 @@ export interface ICollectionResponse<T> {
   Total: number;
 }
 
-PackageSearchFilterKeys;
-
-export interface IPackageSearchFilters {
-  [PackageSearchFilterKeys.LABEL]?: string | null;
-  [PackageSearchFilterKeys.SOURCE_HARVEST_NAMES]?: string | null;
-  [PackageSearchFilterKeys.SOURCE_PACKAGE_LABELS]?: string | null;
-  [PackageSearchFilterKeys.PRODUCTION_BATCH_NUMBER]?: string | null;
-  [PackageSearchFilterKeys.SOURCE_PRODUCTION_BATCH_NUMBERS]?: string | null;
-  [PackageSearchFilterKeys.ITEM_NAME]?: string | null;
-  [PackageSearchFilterKeys.ITEM_STRAIN_NAME]?: string | null;
-  [PackageSearchFilterKeys.ITEM_PRODUCT_CATEGORY_NAME]?: string | null;
-  [PackageSearchFilterKeys.LOCATION_NAME]?: string | null;
-  [PackageSearchFilterKeys.MANIFEST_NUMBER]?: string | null;
-  [PackageSearchFilterKeys.DESTINATION_FACILITY_NAME]?: string | null;
-  [PackageSearchFilterKeys.DESTINATION_LICENSE_NUMBER]?: string | null;
-}
-
-export interface IPlantSearchFilters {
-  label: string | null;
-  strainName: string | null;
-  locationName: string | null;
-}
-
-export interface ITransferSearchFilters {
-  manifestNumber: string | null;
-  shipperFacilityInfo: string | null;
-  deliveryFacilities: string | null;
-}
-
-export interface ITagSearchFilters {
-  label: string | null;
-}
-
 export interface ITransferPackageList {
   identity: string;
   license: string;
@@ -221,10 +182,6 @@ export interface IPluginState extends IRootState {
   announcements: IAnnouncementsState;
   client: IClientState;
   transferBuilder: ITransferBuilderState;
-  packageSearch: IPackageSearchState;
-  plantSearch: IPlantSearchState;
-  transferSearch: ITransferSearchState;
-  tagSearch: ITagSearchState;
   splitPackageBuilder: ISplitPackageBuilderState;
   promoteImmaturePlantsBuilder: IPromoteImmaturePlantsBuilderState;
   search: ISearchState;
@@ -236,7 +193,6 @@ export interface IPluginState extends IRootState {
   explorer: IExplorerState;
   employeeSamples: IEmployeeSamplesState;
   createPackageCsv: ICreatePackageCsvState;
-  transferPackageSearch: ITransferPackageSearchState;
   graph: IGraphState;
   labCsv: ILabCsvState;
   transferTools: ITransferToolsState;

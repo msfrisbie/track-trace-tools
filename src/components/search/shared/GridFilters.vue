@@ -29,7 +29,6 @@ export default Vue.extend({
     computed: {
         ...mapState<IPluginState>({
             authState: (state: IPluginState) => state.pluginAuth.authState,
-            searchType: (state: IPluginState) => state.search.searchType,
             searchState: (state: IPluginState) => state.search,
         }),
         ...mapGetters({

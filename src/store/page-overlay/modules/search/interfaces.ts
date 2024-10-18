@@ -11,7 +11,7 @@ import {
   IIndexedTransferData,
   IIndexedTransferredPackageData,
 } from "@/interfaces";
-import { SearchStatus, SearchType } from "./consts";
+import { SearchStatus } from "./consts";
 
 export interface ISearchResult {
   pkg?: IIndexedPackageData;
@@ -35,6 +35,7 @@ export interface ISearchResult {
     value: string;
     subscore: number;
   }[];
+  enabledResultMetrcGridIds: MetrcGridId[];
   // Rendering
   primaryIconName: string;
   secondaryIconName: string | null;
@@ -64,8 +65,4 @@ export interface ISearchState {
   // Metrc page mirror data
   activeMetrcGridId: MetrcGridId | null;
   metrcGridFilters: { [key: string]: { [key: string]: string } };
-
-  // Deprecated
-
-  searchType: SearchType;
 }
