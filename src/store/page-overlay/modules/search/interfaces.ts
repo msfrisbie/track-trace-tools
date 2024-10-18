@@ -50,6 +50,17 @@ export interface ISearchResult {
   primaryField: string;
 }
 
+export interface MetrcGridChild {
+  name: string;
+  metrcGridId: MetrcGridId;
+  enabled: boolean;
+}
+
+export interface MetrcGroup {
+  name: string;
+  children: MetrcGridChild[];
+}
+
 export interface ISearchState {
   showSearchResults: boolean;
   status: SearchStatus;
@@ -60,7 +71,7 @@ export interface ISearchState {
   modalSearchOpen: boolean;
   searchResults: ISearchResult[];
   activeSearchResult: ISearchResult | null;
-  enabledResultMetrcGridIds: MetrcGridId[];
+  searchResultMetrcGridGroups: MetrcGroup[];
 
   // Metrc page mirror data
   activeMetrcGridId: MetrcGridId | null;

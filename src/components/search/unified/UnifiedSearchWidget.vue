@@ -43,9 +43,9 @@
               <div class="search-bar flex absolute w-full flex-col bg-white rounded-b-md" style="height: 85vh">
                 <div class="flex-grow overflow-y-auto">
                   <div class="hide-scrollbar grid grid-rows-3 grid-cols-2 gap-2 h-full min-h-screen"
-                    style="grid-template-columns: 36rem 1fr; grid-template-rows: auto auto 1fr">
+                    style="grid-template-columns: 36rem 1fr; grid-template-rows: min-content auto 1fr">
                     <template v-if="searchState.queryString.length > 0">
-                      <div class="col-span-2 flex flex-row items-center space-x-2 p-4 border-purple-300 border-b">
+                      <div class="col-span-2 flex flex-row items-center space-x-2 py-2 px-4 border-purple-300 border-b">
                         <template v-if="searchState.status === SearchStatus.INFLIGHT">
                           <b-spinner class="ttt-purple mr-2" />
                         </template>
@@ -56,15 +56,9 @@
                             searchState.queryString }}</span>
                         </p>
 
-                        <search-control-panel></search-control-panel>
+                        <search-control-panel class="px-4"></search-control-panel>
 
                         <div class="flex-grow"></div>
-                      </div>
-
-                      <div>
-                        <b-button-group>
-
-                        </b-button-group>
                       </div>
 
                       <div class="flex flex-col overflow-y-auto bg-gray-50 min-h-screen">
@@ -87,7 +81,7 @@
                       </div>
 
                       <div class="flex flex-col overflow-y-auto col-span-2">
-                        <search-control-panel></search-control-panel>
+                        <search-control-panel class="px-4 pb-2 border-b border-gray-200"></search-control-panel>
 
                         <history-list />
                       </div>

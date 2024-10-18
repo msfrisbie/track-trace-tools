@@ -1,5 +1,4 @@
 import {
-  ALL_METRC_GRID_IDS,
   HarvestState,
   ItemState,
   MessageType,
@@ -19,7 +18,7 @@ import { maybePushOntoUniqueStack } from "@/utils/search";
 import { getHashData, setHashData } from "@/utils/url";
 import _ from "lodash-es";
 import { ActionContext } from "vuex";
-import { SearchActions, SearchMutations, SearchStatus } from "./consts";
+import { ALL_METRC_GROUPS, SearchActions, SearchMutations, SearchStatus } from "./consts";
 import { ISearchResult, ISearchState } from "./interfaces";
 
 const QUERY_DEBOUNCE_MS: number = 700;
@@ -39,7 +38,7 @@ const inMemoryState = {
 
 const persistedState = {
   queryStringHistory: [],
-  enabledResultMetrcGridIds: [...ALL_METRC_GRID_IDS],
+  searchResultMetrcGridGroups: ALL_METRC_GROUPS,
 };
 
 const defaultState: ISearchState = {
