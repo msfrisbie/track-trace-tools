@@ -1,12 +1,11 @@
 <template>
-  <div class="grid grid-cols-2 gap-2 p-1 cursor-pointer border-b border-gray-200" v-bind:class="{
-    'bg-white': searchState.activeSearchResult === searchResult,
-    [classNames(searchResult).bgColorClass]: true
+  <div class="grid grid-cols-2 gap-2 p-1 cursor-pointer border-b border-gray-200 bg-gray-100" v-bind:class="{
+    [`hover:bg-${searchState.activeSearchResult.colorClassName}-300`]: true,
+    'bg-white': searchState.activeSearchResult === searchResult
   }" @click="selectSearchResult({ searchResult })" style="grid-template-columns: 10rem 1fr;">
     <div class="flex flex-col justify-center gap-1 items-center text-center text-sm my-2 mx-2">
-      <complex-icon v-bind:class="{
-        [classNames(searchResult).textColorClass]: true
-      }" :primaryIconName="searchResult.primaryIconName" primaryIconSize="xl"
+      <complex-icon :class="`text-${searchState.activeSearchResult.colorGlassName}}-700`"
+        :primaryIconName="searchResult.primaryIconName" primaryIconSize="xl"
         :secondaryIconName="searchResult.secondaryIconName" secondaryIconSize="sm"></complex-icon>
 
       <div class="font-bold text-base">
@@ -26,16 +25,6 @@
         </fragment>
       </div>
     </div>
-
-    <!-- <div class="p-2 w-full grid grid-cols-3 gap-2 text-wrap break-words">
-      <fragment v-for="[idx, matchedField] of searchResult.matchedFields.entries()" v-bind:key="idx">
-        <div class="text-right p-2 align-self-start text-gray-600">{{ matchedField.field }}:</div>
-        <div class="p-2 font-mono align-self-start col-span-2">
-          <partial-string-emphasis :fullString="matchedField.value"
-            :partialString="searchState.queryString"></partial-string-emphasis>
-        </div>
-      </fragment>
-    </div> -->
   </div>
 </template>
 
@@ -80,33 +69,6 @@ export default Vue.extend({
     ...mapActions({
       selectSearchResult: `search/${SearchActions.SELECT_SEARCH_RESULT}`,
     }),
-    classNames(searchResult: ISearchResult): { bgColorClass: string, textColorClass: string } {
-      if (searchResult.plant || searchResult.plantBatch) {
-        return {
-          bgColorClass: 'bg-gray-100 hover:bg-green-300',
-          textColorClass: 'text-green-700'
-        };
-      }
-
-      if (searchResult.tag) {
-        return {
-          bgColorClass: 'bg-gray-100 hover:bg-blue-300',
-          textColorClass: 'text-blue-700'
-        };
-      }
-
-      if (searchResult.incomingTransfer || searchResult.outgoingTransfer) {
-        return {
-          bgColorClass: 'bg-gray-100 hover:bg-yellow-300',
-          textColorClass: 'text-yellow-700'
-        };
-      }
-
-      return {
-        bgColorClass: 'bg-gray-100 hover:bg-purple-300',
-        textColorClass: 'ttt-purple'
-      };
-    }
   },
   async created() { },
   async mounted() { },

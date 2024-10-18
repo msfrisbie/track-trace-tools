@@ -3,12 +3,7 @@
     <div class="flex flex-col items-center gap-8 px-2 p-4">
       <!-- Header -->
       <div class="flex flex-col items-center gap-4 flex-grow">
-        <div class="flex flex-row gap-2 items-center" :class="{
-          'text-yellow-700': searchResultTransferOrNull,
-          'text-purple-700': searchResultPackageOrNull,
-          'text-green-700': searchResultPlantOrNull,
-          'text-blue-700': searchResultTagOrNull
-        }">
+        <div :class="`flex flex-row gap-2 items-center text-${searchState.activeSearchResult.colorClassName}-700`">
           <complex-icon :primaryIconName="searchState.activeSearchResult.primaryIconName" primaryIconSize="xl"
             :secondaryIconName="searchState.activeSearchResult.secondaryIconName" secondaryIconSize="sm" />
 
@@ -27,10 +22,16 @@
       <metrc-tag v-if="searchResultPackageOrNull" :label="getLabelOrError(searchResultPackageOrNull)"
         sideText="PACKAGE" />
       <metrc-tag v-if="searchResultPlantOrNull" :label="searchResultPlantOrNull.Label" sideText="PLANT" />
-      <metrc-tag v-if="searchResultPlantBatchOrNull && plantBatchHasTagName" :label="searchResultPlantBatchOrNull.Name"
-        sideText="PLANT BATCH" />
+      <metrc-tag v-if="searchResultPlantBatchOrNull && searchState.activeSearchResult.isPrimaryIdentifierMetrcTag"
+        :label="searchResultPlantBatchOrNull.Name" sideText="PLANT BATCH" />
       <metrc-tag v-if="searchResultTagOrNull" :label="searchResultTagOrNull.Label"
         :sideText="searchResultTagOrNull.TagTypeName" />
+
+      <b-button-group class="grid grid-cols-3">
+        <b-button>Button 1</b-button>
+        <b-button>Button 2</b-button>
+        <b-button>Button 3</b-button>
+      </b-button-group>
 
       <!-- Button List -->
       <div v-if="searchResultTransferOrNull || searchResultPackageOrNull" class="grid grid-cols-2 gap-2">
@@ -52,13 +53,13 @@ import MetrcTag from "@/components/overlay-widget/shared/MetrcTag.vue";
 import PackageButtonList from "@/components/overlay-widget/shared/PackageButtonList.vue";
 import TransferButtonList from "@/components/overlay-widget/shared/TransferButtonList.vue";
 import RecursiveJsonTable from "@/components/search/shared/RecursiveJsonTable.vue";
-import { MessageType, METRC_HOSTNAMES_LACKING_LAB_PDFS, METRC_TAG_REGEX, MetrcGridId, ModalAction, ModalType, PackageState, TransferState } from "@/consts";
+import { MessageType, METRC_HOSTNAMES_LACKING_LAB_PDFS, MetrcGridId, ModalAction, ModalType, PackageState } from "@/consts";
 import { IIndexedHarvestData, IIndexedPlantBatchData, IIndexedPlantData, IIndexedSalesReceiptData, IIndexedTagData, IIndexedTransferData, IPluginState, ITransferPackageList, IUnionIndexedPackageData } from "@/interfaces";
 import { analyticsManager } from "@/modules/analytics-manager.module";
 import { modalManager } from "@/modules/modal-manager.module";
-import { PACKAGE_TAB_REGEX, PLANTS_TAB_REGEX, TAG_TAB_REGEX, TRANSFER_TAB_REGEX } from "@/modules/page-manager/consts";
+import { PACKAGE_TAB_REGEX, PLANTS_TAB_REGEX, SALES_TAB_REGEX, TAG_TAB_REGEX, TRANSFER_TAB_REGEX } from "@/modules/page-manager/consts";
 import { pageManager } from "@/modules/page-manager/page-manager.module";
-import { clearFilters, setFilter } from "@/modules/page-manager/search-utils";
+import { clearGridFilters, setFilter } from "@/modules/page-manager/search-utils";
 import { toastManager } from "@/modules/toast-manager.module";
 import router from "@/router/index";
 import store from "@/store/page-overlay/index";
@@ -132,69 +133,6 @@ export default Vue.extend({
     isOnTransfersPage(): boolean {
       return !!window.location.pathname.match(TRANSFER_TAB_REGEX);
     },
-    transferDescriptor() {
-      const transfer: IIndexedTransferData = this.$data.transfer;
-
-      switch (transfer.TransferState) {
-        case TransferState.INCOMING:
-          return transfer.ShipperFacilityName;
-        case TransferState.OUTGOING:
-        case TransferState.REJECTED:
-          return transfer.DeliveryFacilities;
-        default:
-          return "Metrc Transfer";
-      }
-    },
-    transferPackageSummary() {
-      const transfer: IIndexedTransferData = this.$data.transfer;
-
-      switch (transfer.TransferState) {
-        case TransferState.INCOMING:
-        case TransferState.OUTGOING:
-          return `${transfer.PackageCount} packages`;
-        case TransferState.REJECTED:
-        default:
-          return `${transfer.DeliveryPackageCount} packages`;
-      }
-    },
-    transferNextCheckpoint() {
-      const transfer: IIndexedTransferData = this.$data.transfer;
-
-      switch (transfer.TransferState) {
-        case TransferState.INCOMING:
-          if (transfer.ReceivedDateTime) {
-            return `Received ${deliveryTimeDescriptor(transfer.ReceivedDateTime)}`;
-          }
-
-          if (transfer.EstimatedArrivalDateTime) {
-            return `Scheduled for delivery ${deliveryTimeDescriptor(
-              transfer.EstimatedArrivalDateTime
-            )}`;
-          }
-
-          return "Scheduled for delivery";
-        case TransferState.OUTGOING:
-          if (transfer.CreatedDateTime) {
-            return `Created ${deliveryTimeDescriptor(transfer.CreatedDateTime)}`;
-          }
-
-          return "Scheduled for delivery";
-        case TransferState.REJECTED:
-          if (transfer.ReceivedDateTime) {
-            return `Return received ${deliveryTimeDescriptor(transfer.ReceivedDateTime)}`;
-          }
-
-          if (transfer.EstimatedReturnDepartureDateTime) {
-            return `Scheduled for return ${deliveryTimeDescriptor(
-              transfer.EstimatedReturnDepartureDateTime
-            )}`;
-          }
-
-          return "Scheduled for return";
-        default:
-          return "Scheduled for transfer";
-      }
-    },
     //
     // Packages
     //
@@ -238,18 +176,14 @@ export default Vue.extend({
     searchResultPlantBatchOrNull(): IIndexedPlantBatchData | null {
       return store.state.search.activeSearchResult?.plantBatch ?? null;
     },
-    plantBatchHasTagName(): boolean {
-      if (!store.state.search.activeSearchResult?.plantBatch) {
-        return false;
-      }
-
-      return !!store.state.search.activeSearchResult.plantBatch.Name.match(METRC_TAG_REGEX);
-    },
     //
     // Sales Receipt
     //
     searchResultSalesReceiptOrNull(): IIndexedSalesReceiptData | null {
       return store.state.search.activeSearchResult?.salesReceipt ?? null;
+    },
+    isOnSalesPage() {
+      return window.location.pathname.match(SALES_TAB_REGEX);
     },
     //
   },
@@ -287,45 +221,65 @@ export default Vue.extend({
     //
     // Transfer
     //
-    async setTransferManifestNumberFilter(transfer: IIndexedTransferData) {
-      analyticsManager.track(MessageType.SELECTED_TRANSFER);
+    async openInPage() {
+      analyticsManager.track(MessageType.SELECTED_SEARCH_RESULT);
 
-      let metrcGridId: MetrcGridId;
-      switch (transfer.TransferState) {
-        case TransferState.INCOMING:
-          metrcGridId = MetrcGridId.TRANSFERS_INCOMING;
-          break;
-        case TransferState.INCOMING_INACTIVE:
-          metrcGridId = MetrcGridId.TRANSFERS_INCOMING_INACTIVE;
-          break;
-        case TransferState.OUTGOING:
-          metrcGridId = MetrcGridId.TRANSFERS_OUTGOING;
-          break;
-        case TransferState.OUTGOING_INACTIVE:
-          metrcGridId = MetrcGridId.TRANSFERS_OUTGOING_INACTIVE;
-          break;
-        case TransferState.REJECTED:
-          metrcGridId = MetrcGridId.TRANSFERS_REJECTED;
-          break;
-        default:
-          throw new Error(`Unexpected transfer state: ${transfer.TransferState}`);
+      const activeSearchResult = store.state.search.activeSearchResult;
+
+      if (!activeSearchResult) {
+        throw new Error('Active search result is not defined');
       }
 
-      await pageManager.clickTabWithGridIdIfExists(metrcGridId);
+      if (activeSearchResult!.metrcGridId) {
+        await pageManager.clickTabWithGridIdIfExists(activeSearchResult!.metrcGridId);
+
+        await pageManager.clickSettleDelay();
+      }
+
+      clearGridFilters(activeSearchResult!.metrcGridId);
 
       await pageManager.clickSettleDelay();
 
-      clearFilters(metrcGridId);
-
-      await pageManager.clickSettleDelay();
-
-      setFilter(metrcGridId, 'ManifestNumber', transfer.ManifestNumber);
+      setFilter(activeSearchResult!.metrcGridId, activeSearchResult!.primaryField, activeSearchResult!.primaryTextualIdentifier);
 
       store.dispatch(`search/${SearchActions.SET_SHOW_SEARCH_RESULTS}`, { showSearchResults: false });
     },
-    displayTransferState(transfer: IIndexedTransferData) {
-      return transfer.TransferState.replaceAll("_", " ");
-    },
+    // async setTransferManifestNumberFilter(transfer: IIndexedTransferData) {
+    //   analyticsManager.track(MessageType.SELECTED_TRANSFER);
+
+    //   let metrcGridId: MetrcGridId;
+    //   switch (transfer.TransferState) {
+    //     case TransferState.INCOMING:
+    //       metrcGridId = MetrcGridId.TRANSFERS_INCOMING;
+    //       break;
+    //     case TransferState.INCOMING_INACTIVE:
+    //       metrcGridId = MetrcGridId.TRANSFERS_INCOMING_INACTIVE;
+    //       break;
+    //     case TransferState.OUTGOING:
+    //       metrcGridId = MetrcGridId.TRANSFERS_OUTGOING;
+    //       break;
+    //     case TransferState.OUTGOING_INACTIVE:
+    //       metrcGridId = MetrcGridId.TRANSFERS_OUTGOING_INACTIVE;
+    //       break;
+    //     case TransferState.REJECTED:
+    //       metrcGridId = MetrcGridId.TRANSFERS_REJECTED;
+    //       break;
+    //     default:
+    //       throw new Error(`Unexpected transfer state: ${transfer.TransferState}`);
+    //   }
+
+    //   await pageManager.clickTabWithGridIdIfExists(metrcGridId);
+
+    //   await pageManager.clickSettleDelay();
+
+    //   clearGridFilters(metrcGridId);
+
+    //   await pageManager.clickSettleDelay();
+
+    //   setFilter(metrcGridId, 'ManifestNumber', transfer.ManifestNumber);
+
+    //   store.dispatch(`search/${SearchActions.SET_SHOW_SEARCH_RESULTS}`, { showSearchResults: false });
+    // },
     //
     // Package
     //
@@ -363,7 +317,7 @@ export default Vue.extend({
 
       await pageManager.clickTabWithGridIdIfExists(metrcGridId);
 
-      await clearFilters(metrcGridId);
+      await clearGridFilters(metrcGridId);
 
       const label = getLabelOrError(pkg);
 

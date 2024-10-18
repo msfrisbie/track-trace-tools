@@ -1294,7 +1294,7 @@ export interface IStrainData {
   IsArchived: boolean;
 }
 
-export interface IIndexedSalesData extends IStrainData {
+export interface IIndexedStrainData extends IStrainData {
   LicenseNumber: string;
   TagMatcher: string;
 }

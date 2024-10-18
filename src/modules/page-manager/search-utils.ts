@@ -1,12 +1,14 @@
 import {
   HarvestState,
   MessageType,
+  METRC_TAG_REGEX,
   MetrcGridId,
   PackageFilterIdentifiers,
   PackageState,
   PlantBatchState,
   PlantFilterIdentifiers,
   PlantState,
+  SalesReceiptState,
   TagFilterIdentifiers,
   TagState,
   TransferFilterIdentifiers,
@@ -99,18 +101,26 @@ export function generateSearchResultMetadata(
   let enablePlantScoreBoost = false;
   let enablePlantBatchScoreBoost = false;
 
+  let path: string;
+  let metrcGridId: MetrcGridId;
+  let colorClassName: string;
+  let primaryField: string;
+  let isPrimaryIdentifierMetrcTag: boolean = false;
+
   if (partialResult.incomingTransfer) {
     matchedFields = extractMatchedFields(queryString, partialResult.incomingTransfer);
 
     switch (partialResult.incomingTransfer.TransferState) {
-      case TransferState.INCOMING_INACTIVE:
-        primaryStatusTextualDescriptor = "Inactive";
-        isInactive = true;
-        break;
       case TransferState.INCOMING:
-      default:
+        metrcGridId = MetrcGridId.TRANSFERS_INCOMING;
         primaryStatusTextualDescriptor = "Active";
         isActive = true;
+        break;
+      case TransferState.INCOMING_INACTIVE:
+      default:
+        metrcGridId = MetrcGridId.TRANSFERS_INCOMING_INACTIVE;
+        primaryStatusTextualDescriptor = "Inactive";
+        isInactive = true;
         break;
     }
 
@@ -119,21 +129,27 @@ export function generateSearchResultMetadata(
     primaryTextualDescriptor = "Incoming Transfer";
     primaryTextualIdentifier = partialResult.incomingTransfer.ManifestNumber;
     secondaryTextualIdentifier = `${partialResult.incomingTransfer.PackageCount} package incoming transfer from ${partialResult.incomingTransfer.ShipperFacilityName}`;
+    path = `/industry/${partialResult.incomingTransfer.LicenseNumber}/transfers/licensed`;
+    colorClassName = "yellow";
+    primaryField = "ManifestNumber";
   } else if (partialResult.outgoingTransfer) {
     matchedFields = extractMatchedFields(queryString, partialResult.outgoingTransfer);
 
     switch (partialResult.outgoingTransfer.TransferState) {
-      case TransferState.OUTGOING_INACTIVE:
-        primaryStatusTextualDescriptor = "Inactive";
-        isInactive = true;
+      case TransferState.OUTGOING:
+        metrcGridId = MetrcGridId.TRANSFERS_OUTGOING;
+        primaryStatusTextualDescriptor = "Active";
+        isActive = true;
         break;
       case TransferState.REJECTED:
         primaryStatusTextualDescriptor = "Rejected";
+        metrcGridId = MetrcGridId.TRANSFERS_REJECTED;
         break;
-      case TransferState.OUTGOING:
+      case TransferState.OUTGOING_INACTIVE:
       default:
-        primaryStatusTextualDescriptor = "Active";
-        isActive = true;
+        metrcGridId = MetrcGridId.TRANSFERS_OUTGOING_INACTIVE;
+        primaryStatusTextualDescriptor = "Inactive";
+        isInactive = true;
         break;
     }
 
@@ -142,23 +158,28 @@ export function generateSearchResultMetadata(
     primaryTextualDescriptor = "Outgoing Transfer";
     primaryTextualIdentifier = partialResult.outgoingTransfer.ManifestNumber;
     secondaryTextualIdentifier = `${partialResult.outgoingTransfer.PackageCount} package outgoing transfer`;
+    path = `/industry/${partialResult.outgoingTransfer.LicenseNumber}/transfers/licensed`;
+    colorClassName = "yellow";
+    primaryField = "ManifestNumber";
   } else if (partialResult.pkg) {
     enablePackageScoreBoost = true;
     matchedFields = extractMatchedFields(queryString, partialResult.pkg);
 
     switch (partialResult.pkg.PackageState) {
       case PackageState.ACTIVE:
+        metrcGridId = MetrcGridId.PACKAGES_ACTIVE;
         primaryStatusTextualDescriptor = "Active";
         isActive = true;
         break;
-      case PackageState.INACTIVE:
-        primaryStatusTextualDescriptor = "Inactive";
-        isInactive = true;
-        break;
       case PackageState.IN_TRANSIT:
+        metrcGridId = MetrcGridId.PACKAGES_IN_TRANSIT;
         primaryStatusTextualDescriptor = "Added to Transfer";
         break;
+      case PackageState.INACTIVE:
       default:
+        metrcGridId = MetrcGridId.PACKAGES_INACTIVE;
+        primaryStatusTextualDescriptor = "Inactive";
+        isInactive = true;
         break;
     }
 
@@ -168,23 +189,29 @@ export function generateSearchResultMetadata(
     secondaryTextualDescriptor = partialResult.pkg.Item.ProductCategoryName;
     primaryTextualIdentifier = partialResult.pkg.Label;
     secondaryTextualIdentifier = `${partialResult.pkg.Quantity} ${partialResult.pkg.UnitOfMeasureAbbreviation} package of ${partialResult.pkg.Item.Name}`;
+    path = `/industry/${partialResult.pkg.LicenseNumber}/packages`;
+    colorClassName = "purple";
+    primaryField = "Label";
+    isPrimaryIdentifierMetrcTag = true;
   } else if (partialResult.tag) {
     matchedFields = extractMatchedFields(queryString, partialResult.tag);
 
     switch (partialResult.tag.TagState) {
       case TagState.AVAILABLE:
+        metrcGridId = MetrcGridId.TAGS_AVAILABLE;
         primaryStatusTextualDescriptor = `Available`;
         isActive = true;
         break;
       case TagState.USED:
+        metrcGridId = MetrcGridId.TAGS_USED;
         primaryStatusTextualDescriptor = `Used`;
         isInactive = true;
         break;
       case TagState.VOIDED:
+      default:
+        metrcGridId = MetrcGridId.TAGS_VOIDED;
         primaryStatusTextualDescriptor = `Voided`;
         isInactive = true;
-        break;
-      default:
         break;
     }
 
@@ -194,42 +221,47 @@ export function generateSearchResultMetadata(
     secondaryTextualDescriptor = ``;
     primaryTextualDescriptor = "Tag";
     secondaryTextualDescriptor = partialResult.tag.TagTypeName;
+    path = `/industry/${partialResult.tag.LicenseNumber}/admin/tags`;
+    colorClassName = "blue";
+    primaryField = "Label";
+    isPrimaryIdentifierMetrcTag = true;
   } else if (partialResult.transferPkg) {
     enablePackageScoreBoost = true;
     matchedFields = extractMatchedFields(queryString, partialResult.transferPkg);
 
-    switch (partialResult.transferPkg.PackageState) {
-      case PackageState.TRANSFERRED:
-        primaryStatusTextualDescriptor = "Transferred";
-        isInactive = true;
-        break;
-      default:
-        break;
-    }
+    metrcGridId = MetrcGridId.PACKAGES_TRANSFERRED;
+    primaryStatusTextualDescriptor = "Transferred";
+    isInactive = true;
 
     primaryIconName = "box";
     secondaryIconName = "truck";
     primaryTextualIdentifier = partialResult.transferPkg.PackageLabel;
     secondaryTextualIdentifier = `${partialResult.transferPkg.ShippedQuantity} ${partialResult.transferPkg.ShippedUnitOfMeasureAbbreviation} ${partialResult.transferPkg.ProductName}`;
-    primaryTextualDescriptor = `Package`;
+    primaryTextualDescriptor = "Package";
+    path = `/industry/${partialResult.transferPkg.LicenseNumber}/packages`;
+    colorClassName = "purple";
+    primaryField = "PackageLabel";
+    isPrimaryIdentifierMetrcTag = true;
   } else if (partialResult.plant) {
     enablePlantScoreBoost = true;
     matchedFields = extractMatchedFields(queryString, partialResult.plant);
 
     switch (partialResult.plant.PlantState) {
       case PlantState.FLOWERING:
+        metrcGridId = MetrcGridId.PLANTS_FLOWERING;
         primaryStatusTextualDescriptor = "Flowering";
         isActive = true;
         break;
       case PlantState.VEGETATIVE:
+        metrcGridId = MetrcGridId.PLANTS_VEGETATIVE;
         primaryStatusTextualDescriptor = "Vegetative";
         isActive = true;
         break;
       case PlantState.INACTIVE:
+      default:
+        metrcGridId = MetrcGridId.PLANTS_INACTIVE;
         primaryStatusTextualDescriptor = "Inactive";
         isInactive = true;
-        break;
-      default:
         break;
     }
 
@@ -239,20 +271,25 @@ export function generateSearchResultMetadata(
     secondaryTextualIdentifier = `${partialResult.plant.StrainName} Plant`;
     primaryTextualDescriptor = "Plant";
     secondaryTextualDescriptor = partialResult.plant.StrainName;
+    path = `/industry/${partialResult.plant.LicenseNumber}/plants`;
+    colorClassName = "green";
+    primaryField = "Label";
+    isPrimaryIdentifierMetrcTag = true;
   } else if (partialResult.plantBatch) {
     enablePlantBatchScoreBoost = true;
     matchedFields = extractMatchedFields(queryString, partialResult.plantBatch);
 
     switch (partialResult.plantBatch.PlantBatchState) {
       case PlantBatchState.ACTIVE:
+        metrcGridId = MetrcGridId.PLANT_BATCHES;
         primaryStatusTextualDescriptor = "Active";
         isActive = true;
         break;
       case PlantBatchState.INACTIVE:
+      default:
+        metrcGridId = MetrcGridId.PLANT_BATCHES_INACTIVE;
         primaryStatusTextualDescriptor = "Inactive";
         isInactive = true;
-        break;
-      default:
         break;
     }
 
@@ -262,19 +299,24 @@ export function generateSearchResultMetadata(
     secondaryTextualIdentifier = `${partialResult.plantBatch.UntrackedCount} ${partialResult.plantBatch.StrainName} ${partialResult.plantBatch.TypeName}s`;
     primaryTextualDescriptor = "Plant Batch";
     secondaryTextualDescriptor = partialResult.plantBatch.TypeName;
+    path = `/industry/${partialResult.plantBatch.LicenseNumber}/plants`;
+    colorClassName = "green";
+    primaryField = "Name";
+    isPrimaryIdentifierMetrcTag = !!partialResult.plantBatch.Name.match(METRC_TAG_REGEX);
   } else if (partialResult.harvest) {
     matchedFields = extractMatchedFields(queryString, partialResult.harvest);
 
     switch (partialResult.harvest.HarvestState) {
       case HarvestState.ACTIVE:
+        metrcGridId = MetrcGridId.HARVESTS_HARVESTED;
         primaryStatusTextualDescriptor = "Active";
         isActive = true;
         break;
       case HarvestState.INACTIVE:
+      default:
+        metrcGridId = MetrcGridId.HARVESTS_INACTIVE;
         primaryStatusTextualDescriptor = "Inactive";
         isInactive = true;
-        break;
-      default:
         break;
     }
 
@@ -284,6 +326,9 @@ export function generateSearchResultMetadata(
     secondaryTextualIdentifier = `${partialResult.harvest.CurrentWeight} ${partialResult.harvest.UnitOfWeightAbbreviation} ${partialResult.harvest.HarvestTypeName} - ${partialResult.harvest.HarvestStartDate}`;
     primaryTextualDescriptor = "Harvest";
     secondaryTextualDescriptor = partialResult.harvest.HarvestTypeName;
+    path = `/industry/${partialResult.harvest.LicenseNumber}/plants`;
+    colorClassName = "red";
+    primaryField = "Name";
   } else if (partialResult.item) {
     matchedFields = extractMatchedFields(queryString, partialResult.item);
 
@@ -293,6 +338,34 @@ export function generateSearchResultMetadata(
     primaryTextualDescriptor = "Item";
     secondaryTextualDescriptor = partialResult.item.ProductCategoryName;
     isActive = true;
+    metrcGridId = MetrcGridId.ITEMS_GRID;
+    path = `/industry/${partialResult.item.LicenseNumber}/admin/items`;
+    colorClassName = "gray";
+    primaryField = "Name";
+  } else if (partialResult.salesReceipt) {
+    matchedFields = extractMatchedFields(queryString, partialResult.salesReceipt);
+
+    switch (partialResult.salesReceipt.SalesReceiptState) {
+      case SalesReceiptState.ACTIVE:
+        metrcGridId = MetrcGridId.SALES_ACTIVE;
+        primaryStatusTextualDescriptor = "Active";
+        isActive = true;
+        break;
+      case SalesReceiptState.INACTIVE:
+      default:
+        metrcGridId = MetrcGridId.SALES_INACTIVE;
+        primaryStatusTextualDescriptor = "Inactive";
+        isInactive = true;
+        break;
+    }
+
+    primaryIconName = "file-invoice-dollar";
+    secondaryIconName = null;
+    primaryTextualIdentifier = partialResult.salesReceipt.ReceiptNumber;
+    primaryTextualDescriptor = "Sales Receipt";
+    path = `/industry/${partialResult.salesReceipt.LicenseNumber}/sales/receipts`;
+    colorClassName = "gray";
+    primaryField = "ReceiptNumber";
   } else if (partialResult.strain) {
     matchedFields = extractMatchedFields(queryString, partialResult.strain);
 
@@ -301,10 +374,15 @@ export function generateSearchResultMetadata(
     primaryTextualIdentifier = partialResult.strain.Name;
     primaryTextualDescriptor = "Strain";
     isActive = true;
+    metrcGridId = MetrcGridId.STRAIN_GRID;
+    path = `/industry/${partialResult.strain.LicenseNumber}/admin/strains`;
+    colorClassName = "gray";
+    primaryField = "Name";
   } else {
     console.error("no match");
     throw new Error("Unable to match datatype for partial result");
   }
+
   // else if (partialResult.salesReceipt) {
   //   switch (partialResult.salesReceipt.SalesReceiptState) {
 
@@ -339,6 +417,11 @@ export function generateSearchResultMetadata(
 
   const result = {
     ...partialResult,
+    path,
+    colorClassName,
+    metrcGridId,
+    primaryField,
+    isPrimaryIdentifierMetrcTag,
     score,
     primaryIconName,
     secondaryIconName,
@@ -525,43 +608,9 @@ export async function getFilterFormOrError(
 
     mappedFilterForm = document.querySelector(mappedFilterFormSelector);
 
-    // const t0 = Date.now();
-    // while (true) {
-    //   pageManager.suppressAnimationContainer();
-
-    //   menuButton.click();
-    //   // attributes are set in initializeFilterButtons during the event loop turn
-    //   await pageManager.clickSettleDelay();
-    //   menuButton.click();
-
-    //   if (Date.now() - t0 > 5000) {
-    //     break;
-    //   }
-
-    //   mappedFilterForm = document.querySelector(mappedFilterFormSelector);
-
-    //   if (mappedFilterForm) {
-    //     break;
-    //   }
-    //   console.log({ mappedFilterForm });
-
-    //   await new Promise((resolve) => setTimeout(resolve, 100));
-    // }
-
-    // const untaggedFormSelector: string = `form.k-filter-menu:not([${T3_METRC_GRID_ID_ATTRIBUTE}])`;
-
-    // const untaggedForm: HTMLFormElement | null = document.querySelector(untaggedFormSelector);
-
-    // console.log({ mappedFilterForm });
-
     if (!mappedFilterForm) {
       throw new Error(`Form query selector failed: ${mappedFilterFormSelector}`);
     }
-
-    // untaggedForm.setAttribute(T3_METRC_GRID_ID_ATTRIBUTE, metrcGridId);
-    // untaggedForm.setAttribute(T3_SEARCH_FILTER_ATTRIBUTE, searchFilter);
-
-    // mappedFilterForm = untaggedForm;
   }
 
   return mappedFilterForm!;
@@ -702,7 +751,7 @@ export async function applyGridState(
   }
 }
 
-export async function clearFilters(metrcGridId: MetrcGridId) {
+export async function clearGridFilters(metrcGridId: MetrcGridId) {
   const anchors = [...document.querySelectorAll(`#${metrcGridId} .dropdown-menu.pull-right a`)];
 
   for (const anchor of anchors) {

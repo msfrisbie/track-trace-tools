@@ -143,7 +143,7 @@
 
 <script lang="ts">
 import { MessageType, ModalAction, ModalType, PackageState } from "@/consts";
-import { IIndexedPackageData, IPluginState, IUnionIndexedPackageData } from "@/interfaces";
+import { IPluginState, IUnionIndexedPackageData } from "@/interfaces";
 import { analyticsManager } from "@/modules/analytics-manager.module";
 import { modalManager } from "@/modules/modal-manager.module";
 import { toastManager } from "@/modules/toast-manager.module";
@@ -281,11 +281,11 @@ export default Vue.extend({
       const labelDataList: ILabelData[] = [
         {
           count: 1,
-          primaryValue: this.$props.pkg.Label,
+          primaryValue: getLabelOrError(this.$props.pkg),
           secondaryValue: null,
           tertiaryValue: null,
-          licenseNumber: (this.$props.pkg as IIndexedPackageData).LicenseNumber,
-          packageState: (this.$props.pkg as IIndexedPackageData).PackageState,
+          licenseNumber: this.$props.pkg.LicenseNumber,
+          packageState: this.$props.pkg.PackageState,
           plantState: null,
           plantBatchState: null
         }
