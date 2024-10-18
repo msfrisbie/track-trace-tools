@@ -10,7 +10,7 @@
           <span class="text-2xl">{{ searchState.activeSearchResult.primaryTextualIdentifier }}</span>
         </div>
         <span class="text-2xl font-bold">
-          {{ searchState.activeSearchResult.primaryStatusTextualDescriptor.toLocaleUpperCase() }} {{
+          {{ searchState.activeSearchResult.primaryStatusTextualDescriptor?.toLocaleUpperCase() }} {{
             searchState.activeSearchResult.primaryTextualDescriptor.toLocaleUpperCase() }}
         </span>
         <span class="text-xl">
@@ -27,10 +27,20 @@
       <metrc-tag v-if="searchResultTagOrNull" :label="searchResultTagOrNull.Label"
         :sideText="searchResultTagOrNull.TagTypeName" />
 
-      <b-button-group class="grid grid-cols-3">
-        <b-button>Button 1</b-button>
-        <b-button>Button 2</b-button>
-        <b-button>Button 3</b-button>
+      <b-button-group>
+        <b-button class="flex flex-row items-center gap-1" size="lg" variant="outline-success" v-if="enableShowInMetrc"
+          @click="openInPage()">
+          <font-awesome-icon icon="search"></font-awesome-icon>
+          <span>SHOW IN METRC</span>
+        </b-button>
+        <b-button class="flex flex-row items-center gap-1" size="lg" variant="outline-primary" @click="openInNewTab()">
+          <font-awesome-icon icon="external-link-alt"></font-awesome-icon>
+          <span>OPEN IN NEW TAB</span>
+        </b-button>
+        <b-button class="flex flex-row items-center gap-1" size="lg" variant="outline-primary" @click="copyLink()">
+          <font-awesome-icon icon="link"></font-awesome-icon>
+          <span>COPY LINK</span>
+        </b-button>
       </b-button-group>
 
       <!-- Button List -->
@@ -41,7 +51,7 @@
 
       <!-- JSON Table -->
       <recursive-json-table
-        :jsonObject="searchResultTransferOrNull || searchResultPackageOrNull || searchResultPlantOrNull || searchResultTagOrNull || searchResultHarvestOrNull || searchResultPlantBatchOrNull || searchResultSalesReceiptOrNull" />
+        :jsonObject="searchResultTransferOrNull || searchResultPackageOrNull || searchResultPlantOrNull || searchResultTagOrNull || searchResultHarvestOrNull || searchResultPlantBatchOrNull || searchResultSalesReceiptOrNull || searchResultItemOrNull || searchResultStrainOrNull" />
 
     </div>
   </div>
@@ -53,11 +63,10 @@ import MetrcTag from "@/components/overlay-widget/shared/MetrcTag.vue";
 import PackageButtonList from "@/components/overlay-widget/shared/PackageButtonList.vue";
 import TransferButtonList from "@/components/overlay-widget/shared/TransferButtonList.vue";
 import RecursiveJsonTable from "@/components/search/shared/RecursiveJsonTable.vue";
-import { MessageType, METRC_HOSTNAMES_LACKING_LAB_PDFS, MetrcGridId, ModalAction, ModalType, PackageState } from "@/consts";
-import { IIndexedHarvestData, IIndexedPlantBatchData, IIndexedPlantData, IIndexedSalesReceiptData, IIndexedTagData, IIndexedTransferData, IPluginState, ITransferPackageList, IUnionIndexedPackageData } from "@/interfaces";
+import { MessageType, METRC_HOSTNAMES_LACKING_LAB_PDFS } from "@/consts";
+import { IIndexedHarvestData, IIndexedItemData, IIndexedPlantBatchData, IIndexedPlantData, IIndexedSalesReceiptData, IIndexedStrainData, IIndexedTagData, IIndexedTransferData, IPluginState, ITransferPackageList, IUnionIndexedPackageData, URLHashData } from "@/interfaces";
 import { analyticsManager } from "@/modules/analytics-manager.module";
-import { modalManager } from "@/modules/modal-manager.module";
-import { PACKAGE_TAB_REGEX, PLANTS_TAB_REGEX, SALES_TAB_REGEX, TAG_TAB_REGEX, TRANSFER_TAB_REGEX } from "@/modules/page-manager/consts";
+import { ITEMS_TAB_REGEX, PACKAGE_TAB_REGEX, PLANTS_TAB_REGEX, SALES_TAB_REGEX, STRAINS_TAB_REGEX, TAG_TAB_REGEX, TRANSFER_TAB_REGEX } from "@/modules/page-manager/consts";
 import { pageManager } from "@/modules/page-manager/page-manager.module";
 import { clearGridFilters, setFilter } from "@/modules/page-manager/search-utils";
 import { toastManager } from "@/modules/toast-manager.module";
@@ -65,11 +74,10 @@ import router from "@/router/index";
 import store from "@/store/page-overlay/index";
 import { ClientGetters } from "@/store/page-overlay/modules/client/consts";
 import { ExampleActions } from "@/store/page-overlay/modules/example/consts";
-import { PlantSearchActions } from "@/store/page-overlay/modules/plant-search/consts";
 import { SearchActions } from "@/store/page-overlay/modules/search/consts";
-import { TagSearchActions } from "@/store/page-overlay/modules/tag-search/consts";
 import { copyToClipboard } from "@/utils/dom";
 import { getLabelOrError } from "@/utils/package";
+import { encodeHashData } from "@/utils/url";
 import Vue from "vue";
 import { mapActions, mapGetters, mapState } from "vuex";
 
@@ -186,6 +194,75 @@ export default Vue.extend({
       return window.location.pathname.match(SALES_TAB_REGEX);
     },
     //
+    // Strain + Item
+    //
+    searchResultItemOrNull(): IIndexedItemData | null {
+      return store.state.search.activeSearchResult?.item ?? null;
+    },
+    searchResultStrainOrNull(): IIndexedStrainData | null {
+      return store.state.search.activeSearchResult?.strain ?? null;
+    },
+    enableShowInMetrc(): boolean {
+      const activeSearchResult = store.state.search.activeSearchResult!;
+
+      if (!activeSearchResult) {
+        return false;
+      }
+
+      // Plants Page
+      if (activeSearchResult.plant && !!window.location.pathname.match(PLANTS_TAB_REGEX)) {
+        return true;
+      }
+
+      if (activeSearchResult.harvest && !!window.location.pathname.match(PLANTS_TAB_REGEX)) {
+        return true;
+      }
+
+      if (activeSearchResult.plantBatch && !!window.location.pathname.match(PLANTS_TAB_REGEX)) {
+        return true;
+      }
+
+      // Packages Page
+      if (activeSearchResult.pkg && !!window.location.pathname.match(PACKAGE_TAB_REGEX)) {
+        return true;
+      }
+
+      if (activeSearchResult.transferPkg && !!window.location.pathname.match(PACKAGE_TAB_REGEX)) {
+        return true;
+      }
+
+      // Transfers Page
+      if (activeSearchResult.incomingTransfer && !!window.location.pathname.match(TRANSFER_TAB_REGEX)) {
+        return true;
+      }
+
+      if (activeSearchResult.outgoingTransfer && !!window.location.pathname.match(TRANSFER_TAB_REGEX)) {
+        return true;
+      }
+
+      // Sales Page
+      if (activeSearchResult.salesReceipt && !!window.location.pathname.match(SALES_TAB_REGEX)) {
+        return true;
+      }
+
+      // Tags Page
+      if (activeSearchResult.tag && !!window.location.pathname.match(TAG_TAB_REGEX)) {
+        return true;
+      }
+
+      // Items Page
+      if (activeSearchResult.item && !!window.location.pathname.match(ITEMS_TAB_REGEX)) {
+        return true;
+      }
+
+      // Strains Page
+      if (activeSearchResult.strain && !!window.location.pathname.match(STRAINS_TAB_REGEX)) {
+        return true;
+      }
+
+      return false;
+    }
+    //
   },
   data(): {
     packageLabTestPdfEligible: boolean;
@@ -204,20 +281,6 @@ export default Vue.extend({
       setShowSearchResults: `search/${SearchActions.SET_SHOW_SEARCH_RESULTS}`,
     }),
     getLabelOrError,
-    copyToClipboard(pkg: IUnionIndexedPackageData) {
-      analyticsManager.track(MessageType.COPIED_TEXT, { value: getLabelOrError(pkg) });
-
-      copyToClipboard(getLabelOrError(pkg));
-
-      toastManager.openToast(`'${getLabelOrError(pkg)}' copied to clipboard`, {
-        title: "Copied Tag",
-        autoHideDelay: 5000,
-        variant: "primary",
-        appendToast: true,
-        toaster: "ttt-toaster",
-        solid: true,
-      });
-    },
     //
     // Transfer
     //
@@ -244,127 +307,48 @@ export default Vue.extend({
 
       store.dispatch(`search/${SearchActions.SET_SHOW_SEARCH_RESULTS}`, { showSearchResults: false });
     },
-    // async setTransferManifestNumberFilter(transfer: IIndexedTransferData) {
-    //   analyticsManager.track(MessageType.SELECTED_TRANSFER);
-
-    //   let metrcGridId: MetrcGridId;
-    //   switch (transfer.TransferState) {
-    //     case TransferState.INCOMING:
-    //       metrcGridId = MetrcGridId.TRANSFERS_INCOMING;
-    //       break;
-    //     case TransferState.INCOMING_INACTIVE:
-    //       metrcGridId = MetrcGridId.TRANSFERS_INCOMING_INACTIVE;
-    //       break;
-    //     case TransferState.OUTGOING:
-    //       metrcGridId = MetrcGridId.TRANSFERS_OUTGOING;
-    //       break;
-    //     case TransferState.OUTGOING_INACTIVE:
-    //       metrcGridId = MetrcGridId.TRANSFERS_OUTGOING_INACTIVE;
-    //       break;
-    //     case TransferState.REJECTED:
-    //       metrcGridId = MetrcGridId.TRANSFERS_REJECTED;
-    //       break;
-    //     default:
-    //       throw new Error(`Unexpected transfer state: ${transfer.TransferState}`);
-    //   }
-
-    //   await pageManager.clickTabWithGridIdIfExists(metrcGridId);
-
-    //   await pageManager.clickSettleDelay();
-
-    //   clearGridFilters(metrcGridId);
-
-    //   await pageManager.clickSettleDelay();
-
-    //   setFilter(metrcGridId, 'ManifestNumber', transfer.ManifestNumber);
-
-    //   store.dispatch(`search/${SearchActions.SET_SHOW_SEARCH_RESULTS}`, { showSearchResults: false });
-    // },
-    //
-    // Package
-    //
-    openNewTransferBuilder() {
-      analyticsManager.track(MessageType.STARTED_TRANSFER_FROM_TOOLKIT_SEARCH, {});
-      modalManager.dispatchModalEvent(ModalType.BUILDER, ModalAction.OPEN, {
-        initialRoute: "/transfer/transfer-builder",
-      });
+    async openInNewTab() {
+      window.open(this.getLink(), "_blank");
     },
-    async setPackageLabelFilter(pkg: IUnionIndexedPackageData) {
-      analyticsManager.track(MessageType.SELECTED_PACKAGE);
+    async copyLink() {
+      const activeSearchResult = store.state.search.activeSearchResult;
 
-      this.setShowSearchResults({ showSearchResults: false });
-
-      let metrcGridId: MetrcGridId;
-      switch (pkg.PackageState) {
-        case PackageState.ACTIVE:
-          metrcGridId = MetrcGridId.PACKAGES_ACTIVE;
-          break;
-        case PackageState.ON_HOLD:
-          metrcGridId = MetrcGridId.PACKAGES_ON_HOLD;
-          break;
-        case PackageState.INACTIVE:
-          metrcGridId = MetrcGridId.PACKAGES_INACTIVE;
-          break;
-        case PackageState.IN_TRANSIT:
-          metrcGridId = MetrcGridId.PACKAGES_IN_TRANSIT;
-          break;
-        case PackageState.TRANSFERRED:
-          metrcGridId = MetrcGridId.PACKAGES_TRANSFERRED;
-          break;
-        default:
-          throw new Error(`Unexpected package state: ${pkg.PackageState}`);
+      if (!activeSearchResult) {
+        throw new Error('Active search result is not defined');
       }
 
-      await pageManager.clickTabWithGridIdIfExists(metrcGridId);
+      const link: string = this.getLink();
 
-      await clearGridFilters(metrcGridId);
+      analyticsManager.track(MessageType.COPIED_TEXT, { value: link });
 
-      const label = getLabelOrError(pkg);
+      copyToClipboard(link);
 
-      if (pkg.PackageState === PackageState.TRANSFERRED) {
-        setFilter(metrcGridId, "PackageLabel", label);
-      } else {
-        setFilter(metrcGridId, "Label", label);
+      toastManager.openToast(`${activeSearchResult.primaryTextualIdentifier} link copied to clipboard`, {
+        title: "Copied Link",
+        autoHideDelay: 5000,
+        variant: "primary",
+        appendToast: true,
+        toaster: "ttt-toaster",
+        solid: true,
+      });
+    },
+    getLink(): string {
+      const activeSearchResult = store.state.search.activeSearchResult;
+
+      if (!activeSearchResult) {
+        throw new Error('Active search result is not defined');
       }
-    },
-    displayPackageState(pkg: IUnionIndexedPackageData) {
-      return pkg.PackageState.replaceAll("_", " ");
-    },
-    //
-    // Plants
-    //
-    async setPlantLabelFilter(plant: IIndexedPlantData) {
-      analyticsManager.track(MessageType.SELECTED_PLANT);
 
-      store.dispatch(`plantSearch/${PlantSearchActions.PARTIAL_UPDATE_PLANT_SEARCH_FILTERS}`, {
-        plantState: plant.PlantState,
-        plantSearchFilters: {
-          label: plant.Label,
-        },
-      });
+      const hashData: URLHashData = {
+        activeMetrcGridId: activeSearchResult.metrcGridId,
+        metrcGridFilters: {
+          [activeSearchResult.metrcGridId]: {
+            [activeSearchResult!.primaryField]: activeSearchResult!.primaryTextualIdentifier
+          }
+        }
+      };
 
-      this.setShowSearchResults({ showSearchResults: false });
-    },
-    displayPlantState(plant: IIndexedPlantData) {
-      return plant.PlantState.replaceAll("_", " ");
-    },
-    //
-    // Tags
-    //
-    async setTagLabelFilter(tag: IIndexedTagData) {
-      analyticsManager.track(MessageType.SELECTED_TAG);
-
-      store.dispatch(`tagSearch/${TagSearchActions.PARTIAL_UPDATE_TAG_SEARCH_FILTERS}`, {
-        tagState: tag.TagState,
-        tagSearchFilters: {
-          label: tag.Label,
-        },
-      });
-
-      this.setShowSearchResults({ showSearchResults: false });
-    },
-    displayTagState(tag: IIndexedTagData) {
-      return tag.TagState.replaceAll("_", " ");
+      return `${window.location.origin}${activeSearchResult.path}#${encodeHashData(hashData)}`;
     },
   },
   async created() { },

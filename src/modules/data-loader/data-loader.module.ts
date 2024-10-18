@@ -3,13 +3,15 @@ import {
   DATA_LOAD_PAGE_SIZE,
   HarvestState,
   IdbKeyPiece,
+  ItemState,
   PackageState,
   PlantBatchState,
   PlantState,
   SalesReceiptState,
   SEARCH_LOAD_PAGE_SIZE,
+  StrainState,
   TagState,
-  TransferState
+  TransferState,
 } from "@/consts";
 import {
   IAtomicService,
@@ -25,10 +27,12 @@ import {
   IHarvestHistoryData,
   IIndexedDestinationPackageData,
   IIndexedHarvestData,
+  IIndexedItemData,
   IIndexedPackageData,
   IIndexedPlantBatchData,
   IIndexedPlantData,
   IIndexedSalesReceiptData,
+  IIndexedStrainData,
   IIndexedTagData,
   IIndexedTransferData,
   IIndexedTransferredPackageData,
@@ -58,13 +62,16 @@ import {
   ITestResultData,
   ITransferData,
   ITransferFilter,
-  ITransferHistoryData, ITransferredPackageData, ITransferTransporterDetails, ITransporterData
+  ITransferHistoryData,
+  ITransferredPackageData,
+  ITransferTransporterDetails,
+  ITransporterData,
 } from "@/interfaces";
 import { authManager } from "@/modules/auth-manager.module";
 import { databaseInterface } from "@/modules/database-interface.module";
 import {
   MetrcRequestManager,
-  primaryMetrcRequestManager
+  primaryMetrcRequestManager,
 } from "@/modules/metrc-request-manager.module";
 import { mockDataManager } from "@/modules/mock-data-manager.module";
 import store from "@/store/page-overlay/index";
@@ -1046,6 +1053,76 @@ export class DataLoader implements IAtomicService {
     });
   }
 
+  onDemandSalesReceiptSearchBody({ queryString }: { queryString: string }): string {
+    return JSON.stringify({
+      request: {
+        take: SEARCH_LOAD_PAGE_SIZE,
+        skip: 0,
+        page: 1,
+        pageSize: SEARCH_LOAD_PAGE_SIZE,
+        filter: {
+          logic: "or",
+          filters: [{ field: "ReceiptNumber", operator: "contains", value: queryString }],
+        },
+        group: [],
+      },
+    });
+  }
+
+  onDemandPlantBatchSearchBody({ queryString }: { queryString: string }): string {
+    return JSON.stringify({
+      request: {
+        take: SEARCH_LOAD_PAGE_SIZE,
+        skip: 0,
+        page: 1,
+        pageSize: SEARCH_LOAD_PAGE_SIZE,
+        filter: {
+          logic: "or",
+          filters: [
+            { field: "Name", operator: "contains", value: queryString },
+            { field: "StrainName", operator: "contains", value: queryString },
+          ],
+        },
+        group: [],
+      },
+    });
+  }
+
+  onDemandItemSearchBody({ queryString }: { queryString: string }): string {
+    return JSON.stringify({
+      request: {
+        take: SEARCH_LOAD_PAGE_SIZE,
+        skip: 0,
+        page: 1,
+        pageSize: SEARCH_LOAD_PAGE_SIZE,
+        filter: {
+          logic: "or",
+          filters: [
+            { field: "Name", operator: "contains", value: queryString },
+            { field: "StrainName", operator: "contains", value: queryString },
+          ],
+        },
+        group: [],
+      },
+    });
+  }
+
+  onDemandStrainSearchBody({ queryString }: { queryString: string }): string {
+    return JSON.stringify({
+      request: {
+        take: SEARCH_LOAD_PAGE_SIZE,
+        skip: 0,
+        page: 1,
+        pageSize: SEARCH_LOAD_PAGE_SIZE,
+        filter: {
+          logic: "or",
+          filters: [{ field: "Name", operator: "contains", value: queryString }],
+        },
+        group: [],
+      },
+    });
+  }
+
   async onDemandFloweringPlantSearch({
     queryString,
   }: {
@@ -1979,6 +2056,162 @@ export class DataLoader implements IAtomicService {
     }
 
     return tags;
+  }
+
+  async onDemandSalesReceiptSearch({
+    salesReceiptState,
+    queryString,
+  }: {
+    salesReceiptState: SalesReceiptState;
+    queryString: string;
+  }): Promise<IIndexedSalesReceiptData[]> {
+    let salesReceipts: IIndexedSalesReceiptData[] = [];
+
+    const body = this.onDemandSalesReceiptSearchBody({ queryString });
+
+    let salesReceiptResponse;
+    switch (salesReceiptState) {
+      case SalesReceiptState.ACTIVE:
+        salesReceiptResponse = await primaryMetrcRequestManager.getActiveSalesReceipts(body);
+        break;
+      // case HarvestState.ON_HOLD:
+      //   harvestResponse = await primaryMetrcRequestManager.getOnHoldHarvests(body);
+      //   break;
+      case SalesReceiptState.INACTIVE:
+        salesReceiptResponse = await primaryMetrcRequestManager.getInactiveSalesReceipts(body);
+        break;
+      default:
+        throw new Error("Invalid sales receipt state");
+    }
+
+    if (salesReceiptResponse.status === 200) {
+      const responseData: ICollectionResponse<ISalesReceiptData> = await salesReceiptResponse.data;
+
+      salesReceipts = responseData.Data.map((x) => ({
+        ...x,
+        SalesReceiptState: salesReceiptState,
+        TagMatcher: "",
+        LicenseNumber: this._authState!.license,
+      }));
+    } else {
+      console.error(`${salesReceiptState} sales request failed.`);
+    }
+
+    return salesReceipts;
+  }
+
+  async onDemandPlantBatchSearch({
+    plantBatchState,
+    queryString,
+  }: {
+    plantBatchState: PlantBatchState;
+    queryString: string;
+  }): Promise<IIndexedPlantBatchData[]> {
+    let plantBatches: IIndexedPlantBatchData[] = [];
+
+    const body = this.onDemandPlantBatchSearchBody({ queryString });
+
+    let plantBatchResponse;
+    switch (plantBatchState) {
+      case PlantBatchState.ACTIVE:
+        plantBatchResponse = await primaryMetrcRequestManager.getPlantBatches(body);
+        break;
+      // case HarvestState.ON_HOLD:
+      //   harvestResponse = await primaryMetrcRequestManager.getOnHoldHarvests(body);
+      //   break;
+      case PlantBatchState.INACTIVE:
+        plantBatchResponse = await primaryMetrcRequestManager.getInactivePlantBatches(body);
+        break;
+      default:
+        throw new Error("Invalid sales receipt state");
+    }
+
+    if (plantBatchResponse.status === 200) {
+      const responseData: ICollectionResponse<IPlantBatchData> = await plantBatchResponse.data;
+
+      plantBatches = responseData.Data.map((x) => ({
+        ...x,
+        PlantBatchState: plantBatchState,
+        TagMatcher: "",
+        LicenseNumber: this._authState!.license,
+      }));
+    } else {
+      console.error(`${plantBatchState} sales request failed.`);
+    }
+
+    return plantBatches;
+  }
+
+  async onDemandItemSearch({
+    itemState,
+    queryString,
+  }: {
+    itemState: ItemState;
+    queryString: string;
+  }): Promise<IIndexedItemData[]> {
+    let items: IIndexedItemData[] = [];
+
+    const body = this.onDemandItemSearchBody({ queryString });
+
+    let itemResponse;
+    switch (itemState) {
+      case ItemState.ACTIVE:
+        itemResponse = await primaryMetrcRequestManager.getItems(body);
+        break;
+      default:
+        throw new Error("Invalid items state");
+    }
+
+    if (itemResponse.status === 200) {
+      const responseData: ICollectionResponse<IItemData> = await itemResponse.data;
+
+      items = responseData.Data.map((x) => ({
+        ...x,
+        ItemState: itemState,
+        TagMatcher: "",
+        LicenseNumber: this._authState!.license,
+      }));
+    } else {
+      console.error(`${itemState} items request failed.`);
+    }
+
+    return items;
+  }
+
+  async onDemandStrainSearch({
+    strainState,
+    queryString,
+  }: {
+    strainState: StrainState;
+    queryString: string;
+  }): Promise<IIndexedStrainData[]> {
+    let strains: IIndexedStrainData[] = [];
+
+    const body = this.onDemandStrainSearchBody({ queryString });
+
+    let strainResponse;
+    switch (strainState) {
+      case StrainState.ACTIVE:
+        strainResponse = await primaryMetrcRequestManager.getStrains(body);
+        break;
+      default:
+        throw new Error("Invalid strains state");
+    }
+
+    if (strainResponse.status === 200) {
+      const responseData: ICollectionResponse<IStrainData> = await strainResponse.data;
+
+      strains = responseData.Data.map((x) => ({
+        ...x,
+        StrainState: strainState,
+        TagMatcher: "",
+        LicenseNumber: this._authState!.license,
+      }));
+    } else {
+      console.error(`${strainState} strains request failed.`);
+    }
+
+    return strains;
   }
 
   async onDemandHarvestSearch({

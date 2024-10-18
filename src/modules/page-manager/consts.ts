@@ -14,3 +14,5 @@ export const TRANSFER_HUB_REGEX = /.*\/transfers\/hub\/?$/;
 export const TRANSFER_TEMPLATE_TAB_REGEX = /.*\/transfers\/licensed\/templates\/?$/;
 export const SALES_TAB_REGEX = /.*\/sales\/receipts\/?$/;
 export const TAG_TAB_REGEX = /.*\/admin\/tags\/?$/;
+export const ITEMS_TAB_REGEX = /.*\/admin\/items\/?$/;
+export const STRAINS_TAB_REGEX = /.*\/admin\/strains\/?$/;

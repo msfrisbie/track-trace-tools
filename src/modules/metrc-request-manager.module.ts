@@ -31,7 +31,9 @@ const ACTIVE_PACKAGES_URL = `${origin({ divertToNullOrigin: false })}/api/packag
 const INACTIVE_PACKAGES_URL = `${origin({ divertToNullOrigin: false })}/api/packages/inactive`;
 const ON_HOLD_PACKAGES_URL = `${origin({ divertToNullOrigin: false })}/api/packages/onhold`;
 const IN_TRANSIT_PACKAGES_URL = `${origin({ divertToNullOrigin: false })}/api/packages/intransit`;
-const TRANSFERRED_PACKAGES_URL = `${origin({ divertToNullOrigin: false })}/api/packages/transferred`;
+const TRANSFERRED_PACKAGES_URL = `${origin({
+  divertToNullOrigin: false,
+})}/api/packages/transferred`;
 
 const TAG_ORDER_HISTORY_URL = `${origin({ divertToNullOrigin: false })}/api/tagorders/history`;
 

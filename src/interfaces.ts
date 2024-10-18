@@ -2,6 +2,7 @@ import {
   BackgroundTaskState,
   HarvestState,
   HistoryTreeNodeType,
+  ItemState,
   Level,
   MessageType,
   MetrcGridId,
@@ -12,6 +13,7 @@ import {
   PlantState,
   SalesReceiptState,
   SearchModalView,
+  StrainState,
   TagState,
   TransferState,
 } from "@/consts";
@@ -426,6 +428,7 @@ export interface IItemData extends IResponseObjectData {
 }
 
 export interface IIndexedItemData extends IItemData {
+  ItemState: ItemState;
   LicenseNumber: string;
   TagMatcher: string;
 }
@@ -1295,6 +1298,7 @@ export interface IStrainData {
 }
 
 export interface IIndexedStrainData extends IStrainData {
+  StrainState: StrainState;
   LicenseNumber: string;
   TagMatcher: string;
 }

@@ -332,6 +332,7 @@ export function generateSearchResultMetadata(
   } else if (partialResult.item) {
     matchedFields = extractMatchedFields(queryString, partialResult.item);
 
+    primaryStatusTextualDescriptor = "Active";
     primaryIconName = "box";
     secondaryIconName = "clipboard-list";
     primaryTextualIdentifier = partialResult.item.Name;
@@ -372,6 +373,7 @@ export function generateSearchResultMetadata(
     primaryIconName = "cannabis";
     secondaryIconName = "clipboard-list";
     primaryTextualIdentifier = partialResult.strain.Name;
+    primaryStatusTextualDescriptor = "Active";
     primaryTextualDescriptor = "Strain";
     isActive = true;
     metrcGridId = MetrcGridId.STRAIN_GRID;
@@ -382,15 +384,6 @@ export function generateSearchResultMetadata(
     console.error("no match");
     throw new Error("Unable to match datatype for partial result");
   }
-
-  // else if (partialResult.salesReceipt) {
-  //   switch (partialResult.salesReceipt.SalesReceiptState) {
-
-  //   }
-
-  //   primaryIconName = "file-invoice-dollar";
-  //   secondaryIconName = null;
-  // }
 
   score = matchedFields.reduce((maxObj, currentObj) => {
     if (currentObj.subscore > maxObj.subscore) {
@@ -550,10 +543,7 @@ export async function initializeFilterButtons() {
       menuButton.setAttribute(T3_METRC_GRID_ID_ATTRIBUTE, metrcGridId);
       menuButton.setAttribute(T3_SEARCH_FILTER_ATTRIBUTE, searchFilter);
 
-      console.log("Assigned button event handler", metrcGridId, searchFilter);
-
       menuButton.addEventListener("click", async () => {
-        console.log("Menu button event handler", metrcGridId, searchFilter);
         await pageManager.clickSettleDelay();
 
         // If an animation container is created, it will be last

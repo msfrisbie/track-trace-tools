@@ -242,6 +242,14 @@ export enum HarvestState {
   INACTIVE = "INACTIVE",
 }
 
+export enum ItemState {
+  ACTIVE = "ACTIVE"
+}
+
+export enum StrainState {
+  ACTIVE = "ACTIVE"
+}
+
 export enum TransferState {
   INCOMING = "INCOMING",
   INCOMING_INACTIVE = "INCOMING_INACTIVE",

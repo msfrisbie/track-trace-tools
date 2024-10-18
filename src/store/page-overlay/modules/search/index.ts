@@ -1,4 +1,14 @@
-import { HarvestState, MessageType, MetrcGridId, TagState, TransferState } from "@/consts";
+import {
+  HarvestState,
+  ItemState,
+  MessageType,
+  MetrcGridId,
+  PlantBatchState,
+  SalesReceiptState,
+  StrainState,
+  TagState,
+  TransferState,
+} from "@/consts";
 import { IPluginState } from "@/interfaces";
 import { analyticsManager } from "@/modules/analytics-manager.module";
 import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
@@ -19,7 +29,7 @@ const inMemoryState = {
   statusMessage: null,
   showSearchResults: false,
   modalSearchOpen: false,
-  queryLicenseNumber: "", // TODO
+  queryLicenseNumber: "",
   searchResults: [],
   activeSearchResult: null,
   searchType: SearchType.PACKAGES,
@@ -433,10 +443,99 @@ export const searchModule = {
                   newSearchResults,
                 });
               }),
-            // TODO load sales
+            primaryDataLoader
+              .onDemandSalesReceiptSearch({
+                queryString,
+                salesReceiptState: SalesReceiptState.ACTIVE,
+              })
+              .then((result) => {
+                const newSearchResults: ISearchResult[] = result.map((salesReceipt) =>
+                  generateSearchResultMetadata(queryString, {
+                    salesReceipt,
+                  })
+                );
+
+                ctx.commit(SearchMutations.PUSH_SEARCH_RESULTS, {
+                  searchId,
+                  newSearchResults,
+                });
+              }),
+            primaryDataLoader
+              .onDemandSalesReceiptSearch({
+                queryString,
+                salesReceiptState: SalesReceiptState.INACTIVE,
+              })
+              .then((result) => {
+                const newSearchResults: ISearchResult[] = result.map((salesReceipt) =>
+                  generateSearchResultMetadata(queryString, {
+                    salesReceipt,
+                  })
+                );
+
+                ctx.commit(SearchMutations.PUSH_SEARCH_RESULTS, {
+                  searchId,
+                  newSearchResults,
+                });
+              }),
+            primaryDataLoader
+              .onDemandPlantBatchSearch({ queryString, plantBatchState: PlantBatchState.ACTIVE })
+              .then((result) => {
+                const newSearchResults: ISearchResult[] = result.map((plantBatch) =>
+                  generateSearchResultMetadata(queryString, {
+                    plantBatch,
+                  })
+                );
+
+                ctx.commit(SearchMutations.PUSH_SEARCH_RESULTS, {
+                  searchId,
+                  newSearchResults,
+                });
+              }),
+            primaryDataLoader
+              .onDemandPlantBatchSearch({ queryString, plantBatchState: PlantBatchState.INACTIVE })
+              .then((result) => {
+                const newSearchResults: ISearchResult[] = result.map((plantBatch) =>
+                  generateSearchResultMetadata(queryString, {
+                    plantBatch,
+                  })
+                );
+
+                ctx.commit(SearchMutations.PUSH_SEARCH_RESULTS, {
+                  searchId,
+                  newSearchResults,
+                });
+              }),
+            primaryDataLoader
+              .onDemandItemSearch({ queryString, itemState: ItemState.ACTIVE })
+              .then((result) => {
+                const newSearchResults: ISearchResult[] = result.map((item) =>
+                  generateSearchResultMetadata(queryString, {
+                    item,
+                  })
+                );
+
+                ctx.commit(SearchMutations.PUSH_SEARCH_RESULTS, {
+                  searchId,
+                  newSearchResults,
+                });
+              }),
+            primaryDataLoader
+              .onDemandStrainSearch({ queryString, strainState: StrainState.ACTIVE })
+              .then((result) => {
+                const newSearchResults: ISearchResult[] = result.map((strain) =>
+                  generateSearchResultMetadata(queryString, {
+                    strain,
+                  })
+                );
+
+                ctx.commit(SearchMutations.PUSH_SEARCH_RESULTS, {
+                  searchId,
+                  newSearchResults,
+                });
+              }),
           ]);
 
-          // TODO handle what happens when some searches fail
+          // NEXT: handle what happens when some searches fail
 
           ctx.commit(SearchMutations.SEARCH_MUTATION, {
             status: SearchStatus.SUCCESS,

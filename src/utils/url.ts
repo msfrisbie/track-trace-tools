@@ -42,40 +42,6 @@ export function setHashData(hashData: URLHashData) {
   window.location.hash = encodeHashData(hashData);
 }
 
-// export function getTrimmedHash() {
-//   if (window.location.hash.startsWith("#")) {
-//     return window.location.hash.substring(1);
-//   }
-//   return window.location.hash;
-// }
-
-// export function mergeHashValues(newHashValues: { [key: string]: string }): {
-//   [key: string]: string;
-// } {
-//   const currentHashValues = Object.fromEntries(new URLSearchParams(getTrimmedHash()));
-
-//   return {
-//     ...currentHashValues,
-//     ...newHashValues,
-//   };
-// }
-
-// export function updateHash(newHashValues: { [key: string]: string }) {
-//   const mergedHashValues = mergeHashValues(newHashValues);
-
-//   window.location.hash = new URLSearchParams(mergedHashValues).toString();
-// }
-
-// export function readHashValueOrNull(key: string) {
-//   const values = new URLSearchParams(getTrimmedHash());
-
-//   if (!values.has(key)) {
-//     return null;
-//   }
-
-//   return values.get(key);
-// }
-
 export function getNonce(): string {
   return Date.now().toString();
 }
