@@ -296,9 +296,9 @@ export function generateSearchResultMetadata(
     primaryIconName = "seedling";
     secondaryIconName = null;
     primaryTextualIdentifier = partialResult.plantBatch.Name;
-    secondaryTextualIdentifier = `${partialResult.plantBatch.UntrackedCount} ${partialResult.plantBatch.StrainName} ${partialResult.plantBatch.TypeName}s`;
+    secondaryTextualIdentifier = `${partialResult.plantBatch.UntrackedCount} ${partialResult.plantBatch.StrainName} ${partialResult.plantBatch.PlantBatchTypeName}s`;
     primaryTextualDescriptor = "Plant Batch";
-    secondaryTextualDescriptor = partialResult.plantBatch.TypeName;
+    secondaryTextualDescriptor = partialResult.plantBatch.PlantBatchTypeName;
     path = `/industry/${partialResult.plantBatch.LicenseNumber}/plants`;
     colorClassName = "green";
     primaryField = "Name";
@@ -568,11 +568,7 @@ export async function getFilterFormOrError(
   metrcGridId: MetrcGridId,
   searchFilter: string
 ): Promise<HTMLFormElement> {
-  // if (getActiveMetrcGridIdOrNull() !== metrcGridId) {
   await pageManager.refresh;
-
-  //   await pageManager.clickTabWithGridIdIfExists(metrcGridId);
-  // }
 
   const mappedFilterFormSelector: string = `form.k-filter-menu[${T3_METRC_GRID_ID_ATTRIBUTE}="${metrcGridId}"][${T3_SEARCH_FILTER_ATTRIBUTE}="${searchFilter}"]`;
 
@@ -593,8 +589,6 @@ export async function getFilterFormOrError(
     // attributes are set in initializeFilterButtons during the event loop turn
     await pageManager.clickSettleDelay();
     menuButton.click();
-
-    console.log(mappedFilterFormSelector);
 
     mappedFilterForm = document.querySelector(mappedFilterFormSelector);
 

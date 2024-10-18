@@ -515,7 +515,7 @@ class MockDataManager implements IAtomicService {
         SourcePlantLabel: null,
         StrainName: options.filter?.strainName || DO_SI_DOS_STRAIN.Name,
         TrackedCount: 0,
-        TypeName: "",
+        PlantBatchTypeName: "",
         UntrackedCount: 72,
       });
     }

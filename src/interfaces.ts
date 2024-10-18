@@ -588,7 +588,7 @@ export interface IPlantBatchData {
   SourcePlantLabel: string | null;
   StrainName: string;
   TrackedCount: number;
-  TypeName: string;
+  PlantBatchTypeName: string;
   UntrackedCount: number;
 }
 
