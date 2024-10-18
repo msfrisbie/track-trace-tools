@@ -35,7 +35,6 @@ export interface ISearchResult {
     value: string;
     subscore: number;
   }[];
-  enabledResultMetrcGridIds: MetrcGridId[];
   // Rendering
   primaryIconName: string;
   secondaryIconName: string | null;
@@ -61,6 +60,7 @@ export interface ISearchState {
   modalSearchOpen: boolean;
   searchResults: ISearchResult[];
   activeSearchResult: ISearchResult | null;
+  enabledResultMetrcGridIds: MetrcGridId[];
 
   // Metrc page mirror data
   activeMetrcGridId: MetrcGridId | null;
