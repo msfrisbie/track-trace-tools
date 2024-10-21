@@ -569,7 +569,7 @@ export async function initializeFilterButtons() {
   const allGrids = [...document.querySelectorAll(`div[data-role="grid"]`)];
 
   for (const grid of allGrids) {
-    const nativeMetrcGridId = grid.getAttribute("id");
+    const nativeMetrcGridId: string | null = grid.getAttribute("id");
 
     if (!nativeMetrcGridId) {
       console.error(`Missing grid ID`);
@@ -696,7 +696,8 @@ export async function applyGridState(
 }
 
 export async function clearGridFilters(uniqueMetrcGridId: UniqueMetrcGridId) {
-  const nativeMetrcGridId = METRC_GRID_METADATA[uniqueMetrcGridId];
+  const nativeMetrcGridId: NativeMetrcGridId =
+    METRC_GRID_METADATA[uniqueMetrcGridId].nativeMetrcGridId;
 
   const anchors = [
     ...document.querySelectorAll(`#${nativeMetrcGridId} .dropdown-menu.pull-right a`),
