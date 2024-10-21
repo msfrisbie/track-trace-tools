@@ -1,29 +1,36 @@
 <template>
-    <div class="search-filter-hover-reveal-target flex flex-row items-start flex-wrap">
-        <div class="flex flex-col w-36" v-for="group of searchState.searchResultMetrcGridGroups"
-            v-bind:key="group.name">
-            <div @click.stop.prevent="toggleGroup(group)">
-                <b-form-checkbox class="pt-1" size="sm" name="check-button" switch
-                    :checked="!!group.children.find((x) => x.enabled)">
-                    {{ group.name }}
-                </b-form-checkbox>
+    <div class="search-filter-hover-reveal-target select-none">
+        <div class="flex flex-row items-start px-4 pb-2">
+            <div class="flex flex-col w-36" v-for="group of searchState.searchResultMetrcGridGroups"
+                v-bind:key="group.name">
+                <div @click.stop.prevent="toggleGroup(group)">
+                    <b-form-checkbox class="pt-1" size="sm" name="check-button" switch
+                        :checked="!!group.children.find((x) => x.enabled)">
+                        {{ group.name }}
+                    </b-form-checkbox>
+                </div>
             </div>
-            <div class="relative">
-                <!-- Wrapper div with a white background containing the absolute content -->
-                <div class="absolute bg-white w-full flex flex-col items-stretch p-2 shadow-lg z-10">
-                    <hr />
-                    <div @click.stop.prevent="toggleSingle(group, child)" v-for="child of group.children"
-                        v-bind:key="child.name">
-                        <b-form-checkbox size="sm" name="check-button" switch :checked="child.enabled">
-                            {{ child.name }}
-                        </b-form-checkbox>
+
+            <b-button-group>
+                <b-button variant="outline-primary" class="text-xs" size="sm" @click="toggleAll()">TOGGLE ALL</b-button>
+                <b-button variant="outline-primary" class="text-xs" size="sm" @click="setDefault()">RESET</b-button>
+            </b-button-group>
+        </div>
+        <div class="relative search-filter-hover-reveal z-10">
+            <div class="absolute bg-white px-4 py-2">
+                <div class="flex flex-row">
+                    <div class="flex flex-col w-36" v-for="group of searchState.searchResultMetrcGridGroups"
+                        v-bind:key="group.name">
+                        <div @click.stop.prevent="toggleSingle(group, child)" v-for="child of group.children"
+                            v-bind:key="child.name">
+                            <b-form-checkbox size="sm" name="check-button" switch :checked="child.enabled">
+                                {{ child.name }}
+                            </b-form-checkbox>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-
-        <b-button class="text-xs" size="sm" @click="toggleAll()">TOGGLE ALL</b-button>
-        <b-button class="text-xs" size="sm" @click="setDefault()">RESET</b-button>
     </div>
 </template>
 
@@ -132,16 +139,11 @@ export default Vue.extend({
 
 <style type="text/scss" lang="scss" scoped>
 .search-filter-hover-reveal-target .search-filter-hover-reveal {
-    display: block;
-    opacity: 0;
-    visibility: hidden;
-    transition: opacity 0.5s ease, visibility 0s 3s;
+    display: none;
 }
 
 .search-filter-hover-reveal-target:hover .search-filter-hover-reveal,
 .search-filter-hover-reveal:hover {
-    opacity: 1;
-    visibility: visible;
-    transition: opacity 0.5s ease, visibility 0s 0s;
+    display: block;
 }
 </style>

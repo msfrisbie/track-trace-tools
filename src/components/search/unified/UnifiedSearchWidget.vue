@@ -56,7 +56,7 @@
                             searchState.queryString }}</span>
                         </p>
 
-                        <search-control-panel class="px-4"></search-control-panel>
+                        <search-control-panel class="pt-2"></search-control-panel>
 
                         <div class="flex-grow"></div>
                       </div>
@@ -80,10 +80,11 @@
                         <!-- Top row is sized "auto", so this placeholer is needed -->
                       </div>
 
-                      <div class="flex flex-col overflow-y-auto col-span-2">
-                        <search-control-panel class="px-4 pb-2 border-b border-gray-200"></search-control-panel>
-
+                      <div class="grid grid-cols-2 overflow-y-auto col-span-2 gap-2"
+                        style="grid-template-columns: 360px 1fr;">
                         <history-list />
+
+                        <search-control-panel class="bg-white border-b border-gray-200 "></search-control-panel>
                       </div>
                     </template>
                   </div>
