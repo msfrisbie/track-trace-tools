@@ -1,11 +1,12 @@
 <template>
   <div class="grid grid-cols-2 gap-2 p-1 cursor-pointer border-b border-gray-200 bg-gray-100" v-bind:class="{
-    [`hover:bg-${searchResult.colorClassName}-300`]: true,
+    [`hover:bg-${searchResult.isActive ? searchResult.colorClassName : 'gray'}-300`]: true,
     'bg-white': searchState.activeSearchResult === searchResult
   }" @click="selectSearchResult({ searchResult })" style="grid-template-columns: 10rem 1fr;">
     <div class="flex flex-col justify-center gap-1 items-center text-center text-sm my-2 mx-2">
-      <complex-icon :class="`text-${searchResult.colorClassName}-700`" :primaryIconName="searchResult.primaryIconName"
-        primaryIconSize="xl" :secondaryIconName="searchResult.secondaryIconName" secondaryIconSize="sm"></complex-icon>
+      <complex-icon :class="`text-${searchResult.isActive ? searchResult.colorClassName + '-700' : 'gray-300'}`"
+        :primaryIconName="searchResult.primaryIconName" primaryIconSize="xl"
+        :secondaryIconName="searchResult.secondaryIconName" secondaryIconSize="sm"></complex-icon>
 
       <div class="font-bold text-base">
         {{ searchResult.primaryStatusTextualDescriptor }} {{ searchResult.primaryTextualDescriptor }}

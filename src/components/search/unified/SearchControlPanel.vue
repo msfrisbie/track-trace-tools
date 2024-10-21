@@ -16,7 +16,7 @@
                 <b-button variant="outline-primary" class="text-xs" size="sm" @click="setDefault()">RESET</b-button>
             </b-button-group>
         </div>
-        <div class="relative search-filter-hover-reveal z-10">
+        <div class="relative search-filter-hover-reveal z-10 border-b border-l border-r border-gray-50">
             <div class="absolute bg-white px-4 py-2">
                 <div class="flex flex-row">
                     <div class="flex flex-col w-36" v-for="group of searchState.searchResultMetrcGridGroups"
@@ -40,7 +40,7 @@ import router from "@/router/index";
 import store from "@/store/page-overlay/index";
 import { ClientGetters } from "@/store/page-overlay/modules/client/consts";
 import { ExampleActions, ExampleGetters } from "@/store/page-overlay/modules/example/consts";
-import { ALL_METRC_GROUPS, SearchMutations } from "@/store/page-overlay/modules/search/consts";
+import { ALL_METRC_GROUPS, SearchActions } from "@/store/page-overlay/modules/search/consts";
 import { MetrcGridChild, MetrcGroup } from "@/store/page-overlay/modules/search/interfaces";
 import _ from "lodash-es";
 import Vue from "vue";
@@ -72,11 +72,11 @@ export default Vue.extend({
         toggleSingle(group: MetrcGroup, child: MetrcGridChild) {
             const copy: MetrcGroup[] = _.cloneDeep(store.state.search.searchResultMetrcGridGroups);
 
-            const current = copy.find((x) => x.name === group.name)!.children.find((x) => x.metrcGridId === child.metrcGridId)!;
+            const current = copy.find((x) => x.name === group.name)!.children.find((x) => x.uniqueMetrcGridId === child.uniqueMetrcGridId)!;
 
             current.enabled = !current.enabled;
 
-            store.commit(`search/${SearchMutations.SEARCH_MUTATION}`, {
+            store.dispatch(`search/${SearchActions.UPDATE_SEARCH_GROUPS}`, {
                 searchResultMetrcGridGroups: copy
             });
         },
@@ -97,7 +97,7 @@ export default Vue.extend({
             });
 
             // Commit the updated groups back to the store
-            store.commit(`search/${SearchMutations.SEARCH_MUTATION}`, {
+            store.dispatch(`search/${SearchActions.UPDATE_SEARCH_GROUPS}`, {
                 searchResultMetrcGridGroups: copy
             });
         },
@@ -115,13 +115,13 @@ export default Vue.extend({
             });
 
             // Commit the updated groups back to the store
-            store.commit(`search/${SearchMutations.SEARCH_MUTATION}`, {
+            store.dispatch(`search/${SearchActions.UPDATE_SEARCH_GROUPS}`, {
                 searchResultMetrcGridGroups: copy
             });
         },
         setDefault() {
             // Commit the updated groups back to the store
-            store.commit(`search/${SearchMutations.SEARCH_MUTATION}`, {
+            store.dispatch(`search/${SearchActions.UPDATE_SEARCH_GROUPS}`, {
                 searchResultMetrcGridGroups: ALL_METRC_GROUPS
             });
         }

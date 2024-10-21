@@ -1,9 +1,11 @@
 import {
   DEBUG_ATTRIBUTE,
   MessageType,
+  METRC_GRID_METADATA,
   ModalAction,
   ModalType,
   TTT_TABLEGROUP_ATTRIBUTE,
+  UniqueMetrcGridId,
 } from "@/consts";
 import { BackgroundState, DarkModeState, IAtomicService, SnowflakeState } from "@/interfaces";
 import { toastManager } from "@/modules/toast-manager.module";
@@ -43,11 +45,7 @@ import {
   setPaginationImpl,
   suppressAnimationContainerImpl,
 } from "./metrc-utils";
-import {
-  initializeFilterButtons,
-  mirrorMetrcTableState,
-  resetFilterElementReferencesImpl,
-} from "./search-utils";
+import { initializeFilterButtons, mirrorMetrcTableState } from "./search-utils";
 import {
   controlBackgroundImpl,
   controlDarkModeImpl,
@@ -555,14 +553,18 @@ class PageManager implements IAtomicService {
     return modifyTransferModalImpl();
   }
 
-  async clickTabWithGridIdIfExists(metrcGridId: string) {
+  async clickTabWithGridIdIfExists(uniqueMetrcGridId: UniqueMetrcGridId) {
     try {
-      await this.clickTabWithGridIdOrError(metrcGridId);
+      await this.clickTabWithGridIdOrError(uniqueMetrcGridId);
     } catch {}
   }
 
-  async clickTabWithGridIdOrError(metrcGridId: string) {
-    const element = document.querySelector(`[data-grid-selector="#${metrcGridId}"]`) as HTMLElement;
+  async clickTabWithGridIdOrError(uniqueMetrcGridId: UniqueMetrcGridId) {
+    const nativeMetrcGridId = METRC_GRID_METADATA[uniqueMetrcGridId].nativeMetrcGridId;
+
+    const element = document.querySelector(
+      `[data-grid-selector="#${nativeMetrcGridId}"]`
+    ) as HTMLElement;
 
     if (element) {
       element.click();
@@ -575,7 +577,7 @@ class PageManager implements IAtomicService {
         let elapsed = 0;
 
         const checkMask = setInterval(() => {
-          const loadingMask = document.querySelector(`#${metrcGridId} .k-loading-mask`);
+          const loadingMask = document.querySelector(`#${nativeMetrcGridId} .k-loading-mask`);
 
           if (!loadingMask) {
             clearInterval(checkMask);
@@ -587,7 +589,7 @@ class PageManager implements IAtomicService {
             clearInterval(checkMask);
             reject(
               new Error(
-                `Loading mask for grid ID ${metrcGridId} did not disappear within ${timeout}ms.`
+                `Loading mask for grid ID ${nativeMetrcGridId} did not disappear within ${timeout}ms.`
               )
             );
           }
@@ -597,7 +599,7 @@ class PageManager implements IAtomicService {
       return;
     }
 
-    throw new Error(`Unable to match grid ID: ${metrcGridId}`);
+    throw new Error(`Unable to match grid ID: ${nativeMetrcGridId}`);
   }
 
   async clickTabStartingWith(
@@ -613,11 +615,6 @@ class PageManager implements IAtomicService {
     previousTabTextOffset: number | null = null
   ) {
     return clickTabStartingWithImpl(tabList, tabText, previousTabText, previousTabTextOffset);
-  }
-
-  // When a tab changes, we need to wipe out the references and reacquire them
-  async resetFilterElementReferences() {
-    return resetFilterElementReferencesImpl();
   }
 
   // This should be done exactly once per pageload, once the element is found

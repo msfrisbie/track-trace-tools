@@ -293,17 +293,15 @@ export default Vue.extend({
         throw new Error('Active search result is not defined');
       }
 
-      if (activeSearchResult!.metrcGridId) {
-        await pageManager.clickTabWithGridIdIfExists(activeSearchResult!.metrcGridId);
-
-        await pageManager.clickSettleDelay();
-      }
-
-      clearGridFilters(activeSearchResult!.metrcGridId);
+      await pageManager.clickTabWithGridIdIfExists(activeSearchResult!.uniqueMetrcGridId);
 
       await pageManager.clickSettleDelay();
 
-      setFilter(activeSearchResult!.metrcGridId, activeSearchResult!.primaryField, activeSearchResult!.primaryTextualIdentifier);
+      clearGridFilters(activeSearchResult!.uniqueMetrcGridId);
+
+      await pageManager.clickSettleDelay();
+
+      setFilter(activeSearchResult!.uniqueMetrcGridId, activeSearchResult!.primaryField, activeSearchResult!.primaryTextualIdentifier);
 
       store.dispatch(`search/${SearchActions.SET_SHOW_SEARCH_RESULTS}`, { showSearchResults: false });
     },
@@ -340,9 +338,9 @@ export default Vue.extend({
       }
 
       const hashData: URLHashData = {
-        activeMetrcGridId: activeSearchResult.metrcGridId,
+        activeUniqueMetrcGridId: activeSearchResult.uniqueMetrcGridId,
         metrcGridFilters: {
-          [activeSearchResult.metrcGridId]: {
+          [activeSearchResult.uniqueMetrcGridId]: {
             [activeSearchResult!.primaryField]: activeSearchResult!.primaryTextualIdentifier
           }
         }

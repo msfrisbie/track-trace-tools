@@ -1,4 +1,4 @@
-import { MetrcGridId } from "@/consts";
+import { UniqueMetrcGridId } from "@/consts";
 import { MetrcGroup } from "./interfaces";
 
 export enum SearchMutations {
@@ -15,6 +15,7 @@ export enum SearchActions {
   MIRROR_METRC_SEARCH_FILTERS = "MIRROR_METRC_SEARCH_FILTERS",
   SET_ACTIVE_METRC_GRID_ID = "SET_ACTIVE_METRC_GRID_ID",
   SELECT_SEARCH_RESULT = "SELECT_SEARCH_RESULT",
+  UPDATE_SEARCH_GROUPS = "UPDATE_SEARCH_GROUPS",
 }
 
 export enum SearchType {
@@ -42,17 +43,17 @@ export const ALL_METRC_GROUPS: MetrcGroup[] = [
     children: [
       {
         name: "VEGETATIVE",
-        metrcGridId: MetrcGridId.PLANTS_VEGETATIVE,
+        uniqueMetrcGridId: UniqueMetrcGridId.PLANTS_VEGETATIVE,
         enabled: true,
       },
       {
         name: "FLOWERING",
-        metrcGridId: MetrcGridId.PLANTS_FLOWERING,
+        uniqueMetrcGridId: UniqueMetrcGridId.PLANTS_FLOWERING,
         enabled: true,
       },
       {
         name: "INACTIVE",
-        metrcGridId: MetrcGridId.PLANTS_INACTIVE,
+        uniqueMetrcGridId: UniqueMetrcGridId.PLANTS_INACTIVE,
         enabled: false,
       },
     ],
@@ -62,27 +63,27 @@ export const ALL_METRC_GROUPS: MetrcGroup[] = [
     children: [
       {
         name: "ACTIVE",
-        metrcGridId: MetrcGridId.PACKAGES_ACTIVE,
+        uniqueMetrcGridId: UniqueMetrcGridId.PACKAGES_ACTIVE,
         enabled: true,
       },
       {
         name: "ON HOLD",
-        metrcGridId: MetrcGridId.PACKAGES_ON_HOLD,
+        uniqueMetrcGridId: UniqueMetrcGridId.PACKAGES_ON_HOLD,
         enabled: false,
       },
       {
         name: "INACTIVE",
-        metrcGridId: MetrcGridId.PACKAGES_INACTIVE,
+        uniqueMetrcGridId: UniqueMetrcGridId.PACKAGES_INACTIVE,
         enabled: false,
       },
       {
         name: "IN TRANSIT",
-        metrcGridId: MetrcGridId.PACKAGES_IN_TRANSIT,
+        uniqueMetrcGridId: UniqueMetrcGridId.PACKAGES_IN_TRANSIT,
         enabled: true,
       },
       {
         name: "TRANSFERRED",
-        metrcGridId: MetrcGridId.PACKAGES_TRANSFERRED,
+        uniqueMetrcGridId: UniqueMetrcGridId.PACKAGES_TRANSFERRED,
         enabled: false,
       },
     ],
@@ -92,27 +93,27 @@ export const ALL_METRC_GROUPS: MetrcGroup[] = [
     children: [
       {
         name: "INCOMING",
-        metrcGridId: MetrcGridId.TRANSFERS_INCOMING,
+        uniqueMetrcGridId: UniqueMetrcGridId.TRANSFERS_INCOMING,
         enabled: true,
       },
       {
         name: "INCOMING INACTIVE",
-        metrcGridId: MetrcGridId.TRANSFERS_INCOMING_INACTIVE,
+        uniqueMetrcGridId: UniqueMetrcGridId.TRANSFERS_INCOMING_INACTIVE,
         enabled: false,
       },
       {
         name: "OUTGOING",
-        metrcGridId: MetrcGridId.TRANSFERS_OUTGOING,
+        uniqueMetrcGridId: UniqueMetrcGridId.TRANSFERS_OUTGOING,
         enabled: true,
       },
       {
         name: "OUTGOING INACTIVE",
-        metrcGridId: MetrcGridId.TRANSFERS_OUTGOING_INACTIVE,
+        uniqueMetrcGridId: UniqueMetrcGridId.TRANSFERS_OUTGOING_INACTIVE,
         enabled: false,
       },
       {
         name: "REJECTED",
-        metrcGridId: MetrcGridId.TRANSFERS_REJECTED,
+        uniqueMetrcGridId: UniqueMetrcGridId.TRANSFERS_REJECTED,
         enabled: true,
       },
     ],
@@ -122,17 +123,17 @@ export const ALL_METRC_GROUPS: MetrcGroup[] = [
     children: [
       {
         name: "AVAILABLE",
-        metrcGridId: MetrcGridId.TAGS_AVAILABLE,
+        uniqueMetrcGridId: UniqueMetrcGridId.TAGS_AVAILABLE,
         enabled: false,
       },
       {
         name: "USED",
-        metrcGridId: MetrcGridId.TAGS_USED,
+        uniqueMetrcGridId: UniqueMetrcGridId.TAGS_USED,
         enabled: false,
       },
       {
         name: "VOIDED",
-        metrcGridId: MetrcGridId.TAGS_VOIDED,
+        uniqueMetrcGridId: UniqueMetrcGridId.TAGS_VOIDED,
         enabled: false,
       },
     ],
@@ -142,12 +143,12 @@ export const ALL_METRC_GROUPS: MetrcGroup[] = [
     children: [
       {
         name: "ACTIVE",
-        metrcGridId: MetrcGridId.SALES_ACTIVE,
+        uniqueMetrcGridId: UniqueMetrcGridId.SALES_ACTIVE,
         enabled: true,
       },
       {
         name: "INACTIVE",
-        metrcGridId: MetrcGridId.SALES_INACTIVE,
+        uniqueMetrcGridId: UniqueMetrcGridId.SALES_INACTIVE,
         enabled: false,
       },
     ],
@@ -157,7 +158,7 @@ export const ALL_METRC_GROUPS: MetrcGroup[] = [
     children: [
       {
         name: "ACTIVE",
-        metrcGridId: MetrcGridId.ITEMS_GRID,
+        uniqueMetrcGridId: UniqueMetrcGridId.ITEMS_GRID,
         enabled: true,
       },
     ],
@@ -167,7 +168,7 @@ export const ALL_METRC_GROUPS: MetrcGroup[] = [
     children: [
       {
         name: "ACTIVE",
-        metrcGridId: MetrcGridId.STRAIN_GRID,
+        uniqueMetrcGridId: UniqueMetrcGridId.STRAIN_GRID,
         enabled: true,
       },
     ],

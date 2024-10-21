@@ -1968,6 +1968,96 @@ export class DataLoader implements IAtomicService {
     });
   }
 
+  async onDemandPackageSearch({
+    packageState,
+    queryString,
+  }: {
+    packageState: PackageState;
+    queryString: string;
+  }): Promise<IIndexedPackageData[]> {
+    let packages: IIndexedPackageData[] = [];
+
+    const body = this.onDemandPackageSearchBody({ queryString });
+
+    let packageResponse;
+    switch (packageState) {
+      case PackageState.ACTIVE:
+        packageResponse = await primaryMetrcRequestManager.getActivePackages(body);
+        break;
+      case PackageState.ON_HOLD:
+        packageResponse = await primaryMetrcRequestManager.getOnHoldPackages(body);
+        break;
+      case PackageState.INACTIVE:
+        packageResponse = await primaryMetrcRequestManager.getInactivePackages(body);
+        break;
+      case PackageState.IN_TRANSIT:
+        packageResponse = await primaryMetrcRequestManager.getInTransitPackages(body);
+        break;
+      default:
+        throw new Error("Invalid package state");
+    }
+
+    if (packageResponse.status === 200) {
+      const responseData: ICollectionResponse<IPackageData> = await packageResponse.data;
+
+      packages = responseData.Data.map((x) => ({
+        ...x,
+        PackageState: packageState,
+        TagMatcher: "",
+        LicenseNumber: this._authState!.license,
+      }));
+    } else {
+      console.error(`${packageState} packages request failed.`);
+    }
+
+    return packages;
+  }
+
+  async onDemandPlantSearch({
+    plantState,
+    queryString,
+  }: {
+    plantState: PlantState;
+    queryString: string;
+  }): Promise<IIndexedPlantData[]> {
+    let plants: IIndexedPlantData[] = [];
+
+    const body = this.onDemandPlantSearchBody({ queryString });
+
+    let plantResponse;
+    switch (plantState) {
+      case PlantState.VEGETATIVE:
+        plantResponse = await primaryMetrcRequestManager.getVegetativePlants(body);
+        break;
+      case PlantState.FLOWERING:
+        plantResponse = await primaryMetrcRequestManager.getFloweringPlants(body);
+        break;
+      // case PlantState.ON_HOLD:
+      //   plantResponse = await primaryMetrcRequestManager.getOnHold(body);
+      //   break;
+      case PlantState.INACTIVE:
+        plantResponse = await primaryMetrcRequestManager.getInactivePlants(body);
+        break;
+      default:
+        throw new Error("Invalid plant state");
+    }
+
+    if (plantResponse.status === 200) {
+      const responseData: ICollectionResponse<IPlantData> = await plantResponse.data;
+
+      plants = responseData.Data.map((x) => ({
+        ...x,
+        PlantState: plantState,
+        TagMatcher: "",
+        LicenseNumber: this._authState!.license,
+      }));
+    } else {
+      console.error(`${plantState} plants request failed.`);
+    }
+
+    return plants;
+  }
+
   async onDemandTransferSearch({
     transferState,
     queryString,

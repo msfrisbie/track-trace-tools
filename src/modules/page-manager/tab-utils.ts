@@ -1,4 +1,4 @@
-import { MetrcGridId } from "@/consts";
+import { UniqueMetrcGridId } from "@/consts";
 import store from "@/store/page-overlay/index";
 // import { readHashValueOrNull } from "@/utils/url";
 import { URLHashData } from "@/interfaces";
@@ -11,7 +11,7 @@ import {
   TRANSFER_TAB_REGEX,
 } from "./consts";
 import { pageManager } from "./page-manager.module";
-import { applyGridState, getActiveMetrcGridIdOrNull } from "./search-utils";
+import { applyGridState, getActiveUniqueMetrcGridIdOrNull } from "./search-utils";
 
 export function isTabActiveImpl(tab: any) {
   return tab.getAttribute("aria-selected") === "true";
@@ -76,37 +76,37 @@ export async function clickTabStartingWithImpl(
 
 export async function applyDefaultTabs() {
   // If the grid state sets an active tab, don't use the defaults
-  if (await getActiveMetrcGridIdOrNull()) {
+  if (await getActiveUniqueMetrcGridIdOrNull()) {
     return;
   }
 
   if (window.location.pathname.match(PLANTS_TAB_REGEX)) {
     if (store.state.settings?.autoOpenFloweringPlants) {
-      await pageManager.clickTabWithGridIdIfExists(MetrcGridId.PLANTS_FLOWERING);
+      await pageManager.clickTabWithGridIdIfExists(UniqueMetrcGridId.PLANTS_FLOWERING);
     }
   }
 
   if (window.location.pathname.match(PACKAGE_TAB_REGEX)) {
     if (store.state.settings?.autoOpenActivePackages) {
-      await pageManager.clickTabWithGridIdIfExists(MetrcGridId.PACKAGES_ACTIVE);
+      await pageManager.clickTabWithGridIdIfExists(UniqueMetrcGridId.PACKAGES_ACTIVE);
     }
   }
 
   if (window.location.pathname.match(TRANSFER_TAB_REGEX)) {
     if (store.state.settings?.autoOpenIncomingTransfers) {
-      await pageManager.clickTabWithGridIdIfExists(MetrcGridId.TRANSFERS_INCOMING);
+      await pageManager.clickTabWithGridIdIfExists(UniqueMetrcGridId.TRANSFERS_INCOMING);
     }
   }
 
   if (window.location.pathname.match(SALES_TAB_REGEX)) {
     if (store.state.settings?.autoOpenActiveSales) {
-      await pageManager.clickTabWithGridIdIfExists(MetrcGridId.SALES_ACTIVE);
+      await pageManager.clickTabWithGridIdIfExists(UniqueMetrcGridId.SALES_ACTIVE);
     }
   }
 
   if (window.location.pathname.match(TAG_TAB_REGEX)) {
     if (store.state.settings?.autoOpenAvailableTags) {
-      await pageManager.clickTabWithGridIdIfExists(MetrcGridId.TAGS_AVAILABLE);
+      await pageManager.clickTabWithGridIdIfExists(UniqueMetrcGridId.TAGS_AVAILABLE);
     }
   }
 }
@@ -118,5 +118,5 @@ export async function applyUrlGridState() {
     return;
   }
 
-  await applyGridState(hashData.activeMetrcGridId ?? null, hashData.metrcGridFilters ?? {});
+  await applyGridState(hashData.activeUniqueMetrcGridId ?? null, hashData.metrcGridFilters ?? {});
 }

@@ -397,7 +397,7 @@
 
 <script lang="ts">
 import FacilityPicker from "@/components/shared/FacilityPicker.vue";
-import { ActiveTabId, MetrcGridId } from "@/consts";
+import { UniqueMetrcGridId } from "@/consts";
 import { IPageMetrcFacilityData, IPlantBatchData } from "@/interfaces";
 import { authManager } from "@/modules/auth-manager.module";
 import { getDataLoaderByLicense } from "@/modules/data-loader/data-loader.module";
@@ -474,61 +474,61 @@ export default Vue.extend({
   computed: {
     ...mapState(["authState"]),
     activePlantBatchesUrl(): string {
-      return this.tabKeyUrl("plants", MetrcGridId.PLANT_BATCHES);
+      return this.tabKeyUrl("plants", UniqueMetrcGridId.PLANT_BATCHES);
     },
     inactivePlantBatchesUrl(): string {
-      return this.tabKeyUrl("plants", MetrcGridId.PLANT_BATCHES_INACTIVE);
+      return this.tabKeyUrl("plants", UniqueMetrcGridId.PLANT_BATCHES_INACTIVE);
     },
     vegetativePlantsUrl(): string {
-      return this.tabKeyUrl("plants", MetrcGridId.PLANTS_VEGETATIVE);
+      return this.tabKeyUrl("plants", UniqueMetrcGridId.PLANTS_VEGETATIVE);
     },
     floweringPlantsUrl(): string {
-      return this.tabKeyUrl("plants", MetrcGridId.PLANTS_FLOWERING);
+      return this.tabKeyUrl("plants", UniqueMetrcGridId.PLANTS_FLOWERING);
     },
     inactivePlantsUrl(): string {
-      return this.tabKeyUrl("plants", MetrcGridId.PLANTS_INACTIVE);
+      return this.tabKeyUrl("plants", UniqueMetrcGridId.PLANTS_INACTIVE);
     },
     activeHarvestsUrl(): string {
-      return this.tabKeyUrl("plants", MetrcGridId.HARVESTS_HARVESTED);
+      return this.tabKeyUrl("plants", UniqueMetrcGridId.HARVESTS_HARVESTED);
     },
     inactiveHarvestsUrl(): string {
-      return this.tabKeyUrl("plants", MetrcGridId.HARVESTS_INACTIVE);
+      return this.tabKeyUrl("plants", UniqueMetrcGridId.HARVESTS_INACTIVE);
     },
     activePackagesUrl(): string {
-      return this.tabKeyUrl("packages", MetrcGridId.PACKAGES_ACTIVE);
+      return this.tabKeyUrl("packages", UniqueMetrcGridId.PACKAGES_ACTIVE);
     },
     inactivePackagesUrl(): string {
-      return this.tabKeyUrl("packages", MetrcGridId.PACKAGES_INACTIVE);
+      return this.tabKeyUrl("packages", UniqueMetrcGridId.PACKAGES_INACTIVE);
     },
     intransitPackagesUrl(): string {
-      return this.tabKeyUrl("packages", MetrcGridId.PACKAGES_IN_TRANSIT);
+      return this.tabKeyUrl("packages", UniqueMetrcGridId.PACKAGES_IN_TRANSIT);
     },
     transferredPackagesUrl(): string {
-      return this.tabKeyUrl("packages", MetrcGridId.PACKAGES_TRANSFERRED);
+      return this.tabKeyUrl("packages", UniqueMetrcGridId.PACKAGES_TRANSFERRED);
     },
     incomingTransfersUrl(): string {
-      return this.tabKeyUrl("transfers/licensed", MetrcGridId.TRANSFERS_INCOMING);
+      return this.tabKeyUrl("transfers/licensed", UniqueMetrcGridId.TRANSFERS_INCOMING);
     },
     outgoingTransfersUrl(): string {
-      return this.tabKeyUrl("transfers/licensed", MetrcGridId.TRANSFERS_OUTGOING);
+      return this.tabKeyUrl("transfers/licensed", UniqueMetrcGridId.TRANSFERS_OUTGOING);
     },
     rejectedTransfersUrl(): string {
-      return this.tabKeyUrl("transfers/licensed", MetrcGridId.TRANSFERS_REJECTED);
+      return this.tabKeyUrl("transfers/licensed", UniqueMetrcGridId.TRANSFERS_REJECTED);
     },
     availableTagsUrl(): string {
-      return this.tabKeyUrl("admin/tags", MetrcGridId.TAGS_AVAILABLE);
+      return this.tabKeyUrl("admin/tags", UniqueMetrcGridId.TAGS_AVAILABLE);
     },
     usedTagsUrl(): string {
-      return this.tabKeyUrl("admin/tags", MetrcGridId.TAGS_USED);
+      return this.tabKeyUrl("admin/tags", UniqueMetrcGridId.TAGS_USED);
     },
     voidedTagsUrl(): string {
-      return this.tabKeyUrl("admin/tags", MetrcGridId.TAGS_VOIDED);
+      return this.tabKeyUrl("admin/tags", UniqueMetrcGridId.TAGS_VOIDED);
     },
     activeSalesUrl(): string {
-      return this.tabKeyUrl("sales/receipts", MetrcGridId.SALES_ACTIVE);
+      return this.tabKeyUrl("sales/receipts", UniqueMetrcGridId.SALES_ACTIVE);
     },
     inactiveSalesUrl(): string {
-      return this.tabKeyUrl("sales/receipts", MetrcGridId.SALES_INACTIVE);
+      return this.tabKeyUrl("sales/receipts", UniqueMetrcGridId.SALES_INACTIVE);
     },
     activeItemsUrl(): string {
       return this.tabKeyUrl("admin/items");
@@ -539,7 +539,6 @@ export default Vue.extend({
   },
   data() {
     return {
-      ActiveTabId,
       activeFacility: null,
       ...initialState,
     };
@@ -741,12 +740,12 @@ export default Vue.extend({
         this.$data.inactiveSalesCount = count || 0;
       });
     },
-    tabKeyUrl(subPath: string, activeMetrcGridId?: MetrcGridId): string {
+    tabKeyUrl(subPath: string, activeUniqueMetrcGridId?: UniqueMetrcGridId): string {
       const license = this.$data.activeFacility?.licenseNumber;
 
       return navigationUrl(`/industry/${license}/${subPath}`, {
         hash: encodeHashData({
-          activeMetrcGridId
+          activeUniqueMetrcGridId
         }),
       });
     },

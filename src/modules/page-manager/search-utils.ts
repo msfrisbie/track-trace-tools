@@ -1,25 +1,20 @@
 import {
   HarvestState,
-  MessageType,
+  METRC_GRID_METADATA,
   METRC_TAG_REGEX,
-  MetrcGridId,
-  PackageFilterIdentifiers,
+  NativeMetrcGridId,
   PackageState,
   PlantBatchState,
-  PlantFilterIdentifiers,
   PlantState,
   SalesReceiptState,
-  TagFilterIdentifiers,
   TagState,
-  TransferFilterIdentifiers,
-  TransferredPackageFilterIdentifiers,
   TransferState,
+  UniqueMetrcGridId,
 } from "@/consts";
 import store from "@/store/page-overlay/index";
 import { SearchActions } from "@/store/page-overlay/modules/search/consts";
 import { ISearchResult } from "@/store/page-overlay/modules/search/interfaces";
 import _ from "lodash-es";
-import { analyticsManager } from "../analytics-manager.module";
 import { pageManager } from "./page-manager.module";
 
 const T3_METRC_GRID_ID_ATTRIBUTE = `t3-grid-id`;
@@ -28,6 +23,7 @@ const T3_SEARCH_FILTER_ATTRIBUTE = `t3-search-filter`;
 const IGNORE_FIELDS = new Set(["Id"]);
 
 export function extractMatchedFields(
+  primaryField: string,
   queryString: string,
   o: { [key: string]: any }
 ): { field: string; value: string; subscore: number }[] {
@@ -46,7 +42,7 @@ export function extractMatchedFields(
 
     if (typeof v === "object" && v !== null) {
       matchedFields.push(
-        ...extractMatchedFields(queryString, v).map((x) => ({
+        ...extractMatchedFields(primaryField, queryString, v).map((x) => ({
           ...x,
           field: `${k}.${x.field}`,
         }))
@@ -58,7 +54,12 @@ export function extractMatchedFields(
       matchedFields.push({
         field: k,
         value: v,
-        subscore: generateScoreFromMatch({ queryString: normalizedQueryString, value: v }),
+        subscore: generateScoreFromMatch({
+          primaryField,
+          matchedField: k,
+          queryString: normalizedQueryString,
+          value: v,
+        }),
       });
     }
   }
@@ -90,8 +91,7 @@ export function generateSearchResultMetadata(
   // Active, Inactive
   let primaryStatusTextualDescriptor: string | null = null;
 
-  let isActive: boolean = false;
-  let isInactive: boolean = false;
+  let isActive: boolean;
 
   let matchedFields: { field: string; value: string; subscore: number }[] = [];
 
@@ -102,25 +102,23 @@ export function generateSearchResultMetadata(
   let enablePlantBatchScoreBoost = false;
 
   let path: string;
-  let metrcGridId: MetrcGridId;
+  let uniqueMetrcGridId: UniqueMetrcGridId;
   let colorClassName: string;
   let primaryField: string;
   let isPrimaryIdentifierMetrcTag: boolean = false;
 
   if (partialResult.incomingTransfer) {
-    matchedFields = extractMatchedFields(queryString, partialResult.incomingTransfer);
-
     switch (partialResult.incomingTransfer.TransferState) {
       case TransferState.INCOMING:
-        metrcGridId = MetrcGridId.TRANSFERS_INCOMING;
+        uniqueMetrcGridId = UniqueMetrcGridId.TRANSFERS_INCOMING;
         primaryStatusTextualDescriptor = "Active";
         isActive = true;
         break;
       case TransferState.INCOMING_INACTIVE:
       default:
-        metrcGridId = MetrcGridId.TRANSFERS_INCOMING_INACTIVE;
+        uniqueMetrcGridId = UniqueMetrcGridId.TRANSFERS_INCOMING_INACTIVE;
         primaryStatusTextualDescriptor = "Inactive";
-        isInactive = true;
+        isActive = false;
         break;
     }
 
@@ -132,24 +130,25 @@ export function generateSearchResultMetadata(
     path = `/industry/${partialResult.incomingTransfer.LicenseNumber}/transfers/licensed`;
     colorClassName = "yellow";
     primaryField = "ManifestNumber";
-  } else if (partialResult.outgoingTransfer) {
-    matchedFields = extractMatchedFields(queryString, partialResult.outgoingTransfer);
 
+    matchedFields = extractMatchedFields(primaryField, queryString, partialResult.incomingTransfer);
+  } else if (partialResult.outgoingTransfer) {
     switch (partialResult.outgoingTransfer.TransferState) {
       case TransferState.OUTGOING:
-        metrcGridId = MetrcGridId.TRANSFERS_OUTGOING;
+        uniqueMetrcGridId = UniqueMetrcGridId.TRANSFERS_OUTGOING;
         primaryStatusTextualDescriptor = "Active";
         isActive = true;
         break;
       case TransferState.REJECTED:
         primaryStatusTextualDescriptor = "Rejected";
-        metrcGridId = MetrcGridId.TRANSFERS_REJECTED;
+        isActive = true;
+        uniqueMetrcGridId = UniqueMetrcGridId.TRANSFERS_REJECTED;
         break;
       case TransferState.OUTGOING_INACTIVE:
       default:
-        metrcGridId = MetrcGridId.TRANSFERS_OUTGOING_INACTIVE;
+        uniqueMetrcGridId = UniqueMetrcGridId.TRANSFERS_OUTGOING_INACTIVE;
         primaryStatusTextualDescriptor = "Inactive";
-        isInactive = true;
+        isActive = false;
         break;
     }
 
@@ -161,25 +160,27 @@ export function generateSearchResultMetadata(
     path = `/industry/${partialResult.outgoingTransfer.LicenseNumber}/transfers/licensed`;
     colorClassName = "yellow";
     primaryField = "ManifestNumber";
+
+    matchedFields = extractMatchedFields(primaryField, queryString, partialResult.outgoingTransfer);
   } else if (partialResult.pkg) {
     enablePackageScoreBoost = true;
-    matchedFields = extractMatchedFields(queryString, partialResult.pkg);
 
     switch (partialResult.pkg.PackageState) {
       case PackageState.ACTIVE:
-        metrcGridId = MetrcGridId.PACKAGES_ACTIVE;
+        uniqueMetrcGridId = UniqueMetrcGridId.PACKAGES_ACTIVE;
         primaryStatusTextualDescriptor = "Active";
         isActive = true;
         break;
       case PackageState.IN_TRANSIT:
-        metrcGridId = MetrcGridId.PACKAGES_IN_TRANSIT;
+        uniqueMetrcGridId = UniqueMetrcGridId.PACKAGES_IN_TRANSIT;
         primaryStatusTextualDescriptor = "Added to Transfer";
+        isActive = true;
         break;
       case PackageState.INACTIVE:
       default:
-        metrcGridId = MetrcGridId.PACKAGES_INACTIVE;
+        uniqueMetrcGridId = UniqueMetrcGridId.PACKAGES_INACTIVE;
         primaryStatusTextualDescriptor = "Inactive";
-        isInactive = true;
+        isActive = false;
         break;
     }
 
@@ -193,25 +194,25 @@ export function generateSearchResultMetadata(
     colorClassName = "purple";
     primaryField = "Label";
     isPrimaryIdentifierMetrcTag = true;
-  } else if (partialResult.tag) {
-    matchedFields = extractMatchedFields(queryString, partialResult.tag);
 
+    matchedFields = extractMatchedFields(primaryField, queryString, partialResult.pkg);
+  } else if (partialResult.tag) {
     switch (partialResult.tag.TagState) {
       case TagState.AVAILABLE:
-        metrcGridId = MetrcGridId.TAGS_AVAILABLE;
+        uniqueMetrcGridId = UniqueMetrcGridId.TAGS_AVAILABLE;
         primaryStatusTextualDescriptor = `Available`;
         isActive = true;
         break;
       case TagState.USED:
-        metrcGridId = MetrcGridId.TAGS_USED;
+        uniqueMetrcGridId = UniqueMetrcGridId.TAGS_USED;
         primaryStatusTextualDescriptor = `Used`;
-        isInactive = true;
+        isActive = false;
         break;
       case TagState.VOIDED:
       default:
-        metrcGridId = MetrcGridId.TAGS_VOIDED;
+        uniqueMetrcGridId = UniqueMetrcGridId.TAGS_VOIDED;
         primaryStatusTextualDescriptor = `Voided`;
-        isInactive = true;
+        isActive = false;
         break;
     }
 
@@ -225,13 +226,14 @@ export function generateSearchResultMetadata(
     colorClassName = "blue";
     primaryField = "Label";
     isPrimaryIdentifierMetrcTag = true;
+
+    matchedFields = extractMatchedFields(primaryField, queryString, partialResult.tag);
   } else if (partialResult.transferPkg) {
     enablePackageScoreBoost = true;
-    matchedFields = extractMatchedFields(queryString, partialResult.transferPkg);
 
-    metrcGridId = MetrcGridId.PACKAGES_TRANSFERRED;
+    uniqueMetrcGridId = UniqueMetrcGridId.PACKAGES_TRANSFERRED;
     primaryStatusTextualDescriptor = "Transferred";
-    isInactive = true;
+    isActive = false;
 
     primaryIconName = "box";
     secondaryIconName = "truck";
@@ -242,26 +244,27 @@ export function generateSearchResultMetadata(
     colorClassName = "purple";
     primaryField = "PackageLabel";
     isPrimaryIdentifierMetrcTag = true;
+
+    matchedFields = extractMatchedFields(primaryField, queryString, partialResult.transferPkg);
   } else if (partialResult.plant) {
     enablePlantScoreBoost = true;
-    matchedFields = extractMatchedFields(queryString, partialResult.plant);
 
     switch (partialResult.plant.PlantState) {
       case PlantState.FLOWERING:
-        metrcGridId = MetrcGridId.PLANTS_FLOWERING;
+        uniqueMetrcGridId = UniqueMetrcGridId.PLANTS_FLOWERING;
         primaryStatusTextualDescriptor = "Flowering";
         isActive = true;
         break;
       case PlantState.VEGETATIVE:
-        metrcGridId = MetrcGridId.PLANTS_VEGETATIVE;
+        uniqueMetrcGridId = UniqueMetrcGridId.PLANTS_VEGETATIVE;
         primaryStatusTextualDescriptor = "Vegetative";
         isActive = true;
         break;
       case PlantState.INACTIVE:
       default:
-        metrcGridId = MetrcGridId.PLANTS_INACTIVE;
+        uniqueMetrcGridId = UniqueMetrcGridId.PLANTS_INACTIVE;
         primaryStatusTextualDescriptor = "Inactive";
-        isInactive = true;
+        isActive = false;
         break;
     }
 
@@ -275,21 +278,22 @@ export function generateSearchResultMetadata(
     colorClassName = "green";
     primaryField = "Label";
     isPrimaryIdentifierMetrcTag = true;
+
+    matchedFields = extractMatchedFields(primaryField, queryString, partialResult.plant);
   } else if (partialResult.plantBatch) {
     enablePlantBatchScoreBoost = true;
-    matchedFields = extractMatchedFields(queryString, partialResult.plantBatch);
 
     switch (partialResult.plantBatch.PlantBatchState) {
       case PlantBatchState.ACTIVE:
-        metrcGridId = MetrcGridId.PLANT_BATCHES;
+        uniqueMetrcGridId = UniqueMetrcGridId.PLANT_BATCHES;
         primaryStatusTextualDescriptor = "Active";
         isActive = true;
         break;
       case PlantBatchState.INACTIVE:
       default:
-        metrcGridId = MetrcGridId.PLANT_BATCHES_INACTIVE;
+        uniqueMetrcGridId = UniqueMetrcGridId.PLANT_BATCHES_INACTIVE;
         primaryStatusTextualDescriptor = "Inactive";
-        isInactive = true;
+        isActive = false;
         break;
     }
 
@@ -303,20 +307,20 @@ export function generateSearchResultMetadata(
     colorClassName = "green";
     primaryField = "Name";
     isPrimaryIdentifierMetrcTag = !!partialResult.plantBatch.Name.match(METRC_TAG_REGEX);
-  } else if (partialResult.harvest) {
-    matchedFields = extractMatchedFields(queryString, partialResult.harvest);
 
+    matchedFields = extractMatchedFields(primaryField, queryString, partialResult.plantBatch);
+  } else if (partialResult.harvest) {
     switch (partialResult.harvest.HarvestState) {
       case HarvestState.ACTIVE:
-        metrcGridId = MetrcGridId.HARVESTS_HARVESTED;
+        uniqueMetrcGridId = UniqueMetrcGridId.HARVESTS_HARVESTED;
         primaryStatusTextualDescriptor = "Active";
         isActive = true;
         break;
       case HarvestState.INACTIVE:
       default:
-        metrcGridId = MetrcGridId.HARVESTS_INACTIVE;
+        uniqueMetrcGridId = UniqueMetrcGridId.HARVESTS_INACTIVE;
         primaryStatusTextualDescriptor = "Inactive";
-        isInactive = true;
+        isActive = false;
         break;
     }
 
@@ -329,9 +333,9 @@ export function generateSearchResultMetadata(
     path = `/industry/${partialResult.harvest.LicenseNumber}/plants`;
     colorClassName = "red";
     primaryField = "Name";
-  } else if (partialResult.item) {
-    matchedFields = extractMatchedFields(queryString, partialResult.item);
 
+    matchedFields = extractMatchedFields(primaryField, queryString, partialResult.harvest);
+  } else if (partialResult.item) {
     primaryStatusTextualDescriptor = "Active";
     primaryIconName = "box";
     secondaryIconName = "clipboard-list";
@@ -339,24 +343,24 @@ export function generateSearchResultMetadata(
     primaryTextualDescriptor = "Item";
     secondaryTextualDescriptor = partialResult.item.ProductCategoryName;
     isActive = true;
-    metrcGridId = MetrcGridId.ITEMS_GRID;
+    uniqueMetrcGridId = UniqueMetrcGridId.ITEMS_GRID;
     path = `/industry/${partialResult.item.LicenseNumber}/admin/items`;
     colorClassName = "gray";
     primaryField = "Name";
-  } else if (partialResult.salesReceipt) {
-    matchedFields = extractMatchedFields(queryString, partialResult.salesReceipt);
 
+    matchedFields = extractMatchedFields(primaryField, queryString, partialResult.item);
+  } else if (partialResult.salesReceipt) {
     switch (partialResult.salesReceipt.SalesReceiptState) {
       case SalesReceiptState.ACTIVE:
-        metrcGridId = MetrcGridId.SALES_ACTIVE;
+        uniqueMetrcGridId = UniqueMetrcGridId.SALES_ACTIVE;
         primaryStatusTextualDescriptor = "Active";
         isActive = true;
         break;
       case SalesReceiptState.INACTIVE:
       default:
-        metrcGridId = MetrcGridId.SALES_INACTIVE;
+        uniqueMetrcGridId = UniqueMetrcGridId.SALES_INACTIVE;
         primaryStatusTextualDescriptor = "Inactive";
-        isInactive = true;
+        isActive = false;
         break;
     }
 
@@ -367,19 +371,21 @@ export function generateSearchResultMetadata(
     path = `/industry/${partialResult.salesReceipt.LicenseNumber}/sales/receipts`;
     colorClassName = "gray";
     primaryField = "ReceiptNumber";
-  } else if (partialResult.strain) {
-    matchedFields = extractMatchedFields(queryString, partialResult.strain);
 
+    matchedFields = extractMatchedFields(primaryField, queryString, partialResult.salesReceipt);
+  } else if (partialResult.strain) {
     primaryIconName = "cannabis";
     secondaryIconName = "clipboard-list";
     primaryTextualIdentifier = partialResult.strain.Name;
     primaryStatusTextualDescriptor = "Active";
     primaryTextualDescriptor = "Strain";
     isActive = true;
-    metrcGridId = MetrcGridId.STRAIN_GRID;
+    uniqueMetrcGridId = UniqueMetrcGridId.STRAIN_GRID;
     path = `/industry/${partialResult.strain.LicenseNumber}/admin/strains`;
     colorClassName = "gray";
     primaryField = "Name";
+
+    matchedFields = extractMatchedFields(primaryField, queryString, partialResult.strain);
   } else {
     console.error("no match");
     throw new Error("Unable to match datatype for partial result");
@@ -408,11 +414,15 @@ export function generateSearchResultMetadata(
     score *= 1.1;
   }
 
+  if (!isActive) {
+    score *= 0.2;
+  }
+
   const result = {
     ...partialResult,
     path,
     colorClassName,
-    metrcGridId,
+    uniqueMetrcGridId,
     primaryField,
     isPrimaryIdentifierMetrcTag,
     score,
@@ -424,7 +434,6 @@ export function generateSearchResultMetadata(
     secondaryTextualDescriptor,
     primaryStatusTextualDescriptor,
     matchedFields,
-    isInactive,
     isActive,
   };
 
@@ -432,9 +441,13 @@ export function generateSearchResultMetadata(
 }
 
 export function generateScoreFromMatch({
+  primaryField,
+  matchedField,
   queryString,
   value,
 }: {
+  primaryField: string;
+  matchedField: string;
   queryString: string;
   value: string;
 }): number {
@@ -460,38 +473,75 @@ export function generateScoreFromMatch({
   const matchPercentage = Math.sqrt(queryLength / bodyLength);
 
   // Final score is the product of the proximity score and the match percentage
-  const finalScore = proximityScore * matchPercentage;
+  let score = proximityScore * matchPercentage;
 
-  return finalScore;
+  // Modifiers
+  // If not primary field, reduce match score by 80%
+  if (primaryField !== matchedField) {
+    score *= 0.2;
+  }
+
+  return score;
 }
 
-export function getActiveMetrcGridIdOrNull(): MetrcGridId | null {
-  return (
+export function getActiveUniqueMetrcGridIdOrNull(): UniqueMetrcGridId | null {
+  const nativeMetrcGridId: NativeMetrcGridId | null =
     (document
       .querySelector(`[data-grid-selector].k-state-active`)
       ?.getAttribute("data-grid-selector")
-      ?.replace("#", "") as MetrcGridId) ?? null
-  );
+      ?.replace("#", "") as NativeMetrcGridId) ?? null;
+
+  if (!nativeMetrcGridId) {
+    return null;
+  }
+
+  for (const [uniqueMetrcGridId, metadata] of Object.entries(METRC_GRID_METADATA)) {
+    if (metadata.nativeMetrcGridId === nativeMetrcGridId) {
+      return uniqueMetrcGridId as UniqueMetrcGridId;
+    }
+  }
+
+  console.error("Unmatched grid ID");
+
+  return null;
 }
 
-export function getAllMetrcGridIds(): MetrcGridId[] {
-  return [...document.querySelectorAll(`[data-grid-selector]`)].map(
-    (x) => x.getAttribute("data-grid-selector")!.replace("#", "") as MetrcGridId
+export function getAllUniqueMetrcGridIds(): UniqueMetrcGridId[] {
+  const nativeMetrcGridIds = [...document.querySelectorAll(`[data-grid-selector]`)].map(
+    (x) => x.getAttribute("data-grid-selector")!.replace("#", "") as NativeMetrcGridId
   );
+
+  const uniqueMetrcGridIds: UniqueMetrcGridId[] = [];
+
+  for (const nativeMetrcGridId of nativeMetrcGridIds) {
+    let matched = false;
+    for (const [uniqueMetrcGridId, metadata] of Object.entries(METRC_GRID_METADATA)) {
+      if (metadata.nativeMetrcGridId === nativeMetrcGridId) {
+        uniqueMetrcGridIds.push(uniqueMetrcGridId as UniqueMetrcGridId);
+        matched = true;
+        break;
+      }
+    }
+    if (!matched) {
+      console.error(`Bad Metrc Grid Id: ${nativeMetrcGridId}`);
+    }
+  }
+
+  return uniqueMetrcGridIds;
 }
 
 export const mirrorMetrcTableState = _.debounce(
   async () => {
-    const activeMetrcGridId = getActiveMetrcGridIdOrNull();
+    const activeUniqueMetrcGridId = getActiveUniqueMetrcGridIdOrNull();
 
     store.dispatch(`search/${SearchActions.SET_ACTIVE_METRC_GRID_ID}`, {
-      metrcGridId: activeMetrcGridId,
+      activeUniqueMetrcGridId,
     });
 
-    for (const metrcGridId of getAllMetrcGridIds()) {
+    for (const uniqueMetrcGridId of getAllUniqueMetrcGridIds()) {
       const inputs: HTMLInputElement[] = [
         ...document.querySelectorAll(
-          `input[${T3_METRC_GRID_ID_ATTRIBUTE}="${metrcGridId}"][${T3_SEARCH_FILTER_ATTRIBUTE}]`
+          `input[${T3_METRC_GRID_ID_ATTRIBUTE}="${uniqueMetrcGridId}"][${T3_SEARCH_FILTER_ATTRIBUTE}]`
         ),
       ] as HTMLInputElement[];
 
@@ -506,7 +556,7 @@ export const mirrorMetrcTableState = _.debounce(
       }
 
       await store.dispatch(`search/${SearchActions.MIRROR_METRC_SEARCH_FILTERS}`, {
-        metrcGridId,
+        uniqueMetrcGridId,
         searchFilters,
       });
     }
@@ -519,9 +569,9 @@ export async function initializeFilterButtons() {
   const allGrids = [...document.querySelectorAll(`div[data-role="grid"]`)];
 
   for (const grid of allGrids) {
-    const metrcGridId = grid.getAttribute("id");
+    const nativeMetrcGridId = grid.getAttribute("id");
 
-    if (!metrcGridId) {
+    if (!nativeMetrcGridId) {
       console.error(`Missing grid ID`);
       continue;
     }
@@ -540,7 +590,20 @@ export async function initializeFilterButtons() {
         continue;
       }
 
-      menuButton.setAttribute(T3_METRC_GRID_ID_ATTRIBUTE, metrcGridId);
+      let uniqueMetrcGridId: UniqueMetrcGridId | null = null;
+      for (const [currentUniqueMetrcGridId, metadata] of Object.entries(METRC_GRID_METADATA)) {
+        if (metadata.nativeMetrcGridId === nativeMetrcGridId) {
+          uniqueMetrcGridId = currentUniqueMetrcGridId as UniqueMetrcGridId;
+          break;
+        }
+      }
+
+      if (!uniqueMetrcGridId) {
+        console.error(`Bad native ID: ${nativeMetrcGridId}`);
+        continue;
+      }
+
+      menuButton.setAttribute(T3_METRC_GRID_ID_ATTRIBUTE, uniqueMetrcGridId!);
       menuButton.setAttribute(T3_SEARCH_FILTER_ATTRIBUTE, searchFilter);
 
       menuButton.addEventListener("click", async () => {
@@ -551,12 +614,12 @@ export async function initializeFilterButtons() {
         const lastFilterMenuForm = filterMenuForms[filterMenuForms.length - 1];
 
         if (!lastFilterMenuForm.hasAttribute(T3_SEARCH_FILTER_ATTRIBUTE)) {
-          lastFilterMenuForm.setAttribute(T3_METRC_GRID_ID_ATTRIBUTE, metrcGridId);
+          lastFilterMenuForm.setAttribute(T3_METRC_GRID_ID_ATTRIBUTE, uniqueMetrcGridId!);
           lastFilterMenuForm.setAttribute(T3_SEARCH_FILTER_ATTRIBUTE, searchFilter);
 
           const input = lastFilterMenuForm.querySelector("input")!;
 
-          input.setAttribute(T3_METRC_GRID_ID_ATTRIBUTE, metrcGridId);
+          input.setAttribute(T3_METRC_GRID_ID_ATTRIBUTE, uniqueMetrcGridId!);
           input.setAttribute(T3_SEARCH_FILTER_ATTRIBUTE, searchFilter);
         }
       });
@@ -565,18 +628,20 @@ export async function initializeFilterButtons() {
 }
 
 export async function getFilterFormOrError(
-  metrcGridId: MetrcGridId,
+  uniqueMetrcGridId: UniqueMetrcGridId,
   searchFilter: string
 ): Promise<HTMLFormElement> {
+  const nativeMetrcGridId = METRC_GRID_METADATA[uniqueMetrcGridId].nativeMetrcGridId;
+
   await pageManager.refresh;
 
-  const mappedFilterFormSelector: string = `form.k-filter-menu[${T3_METRC_GRID_ID_ATTRIBUTE}="${metrcGridId}"][${T3_SEARCH_FILTER_ATTRIBUTE}="${searchFilter}"]`;
+  const mappedFilterFormSelector: string = `form.k-filter-menu[${T3_METRC_GRID_ID_ATTRIBUTE}="${uniqueMetrcGridId}"][${T3_SEARCH_FILTER_ATTRIBUTE}="${searchFilter}"]`;
 
   let mappedFilterForm: HTMLFormElement | null = document.querySelector(mappedFilterFormSelector);
 
   if (!mappedFilterForm) {
     const menuButton = document.querySelector(
-      `#${metrcGridId} th[data-field="${searchFilter}"] .k-header-column-menu`
+      `#${nativeMetrcGridId} th[data-field="${searchFilter}"] .k-header-column-menu`
     ) as HTMLElement | null;
 
     if (!menuButton) {
@@ -601,15 +666,11 @@ export async function getFilterFormOrError(
 }
 
 export async function setFilter(
-  metrcGridId: MetrcGridId,
+  uniqueMetrcGridId: UniqueMetrcGridId,
   searchFilter: string,
-  value: string,
-  reset: boolean = false
+  value: string
 ) {
-  if (reset) {
-  }
-
-  const form = await getFilterFormOrError(metrcGridId, searchFilter);
+  const form = await getFilterFormOrError(uniqueMetrcGridId, searchFilter);
 
   const input = form.querySelector(`input[title="Filter Criteria"]`)! as HTMLInputElement;
   input.value = value;
@@ -619,124 +680,27 @@ export async function setFilter(
   await pageManager.clickSettleDelay();
 }
 
-export async function setPlantFilterImpl(
-  metrcGridId: MetrcGridId,
-  plantFilterIdentifier: PlantFilterIdentifiers,
-  value: string
-) {
-  await pageManager.refresh;
-
-  analyticsManager.track(MessageType.SELECTED_PACKAGE_FILTER, {
-    plantFilterIdentifier,
-    value,
-  });
-
-  await setFilter(metrcGridId, plantFilterIdentifier, value);
-}
-
-export async function setPackageFilterImpl(
-  metrcGridId: MetrcGridId,
-  packageFilterIdentifier: PackageFilterIdentifiers,
-  value: string
-) {
-  await pageManager.refresh;
-
-  analyticsManager.track(MessageType.SELECTED_PACKAGE_FILTER, {
-    packageFilterIdentifier,
-    value,
-  });
-
-  await setFilter(metrcGridId, packageFilterIdentifier, value);
-}
-
-export async function setDestinationPackageFilterImpl(
-  metrcGridId: MetrcGridId,
-  destinationPackageFilterIdentifier: TransferredPackageFilterIdentifiers,
-  value: string
-) {
-  await pageManager.refresh;
-
-  analyticsManager.track(MessageType.SELECTED_PACKAGE_FILTER, {
-    destinationPackageFilterIdentifier,
-    value,
-  });
-
-  await setFilter(metrcGridId, destinationPackageFilterIdentifier, value);
-}
-
-export async function setTransferFilterImpl(
-  metrcGridId: MetrcGridId,
-  transferFilterIdentifier: TransferFilterIdentifiers,
-  value: string
-) {
-  await pageManager.refresh;
-
-  analyticsManager.track(MessageType.SELECTED_TRANSFER_FILTER, {
-    transferFilterIdentifier,
-    value,
-  });
-
-  await setFilter(metrcGridId, transferFilterIdentifier, value);
-}
-
-export async function setTagFilterImpl(
-  metrcGridId: MetrcGridId,
-  tagFilterIdentifier: TagFilterIdentifiers,
-  value: string
-) {
-  await pageManager.refresh;
-
-  analyticsManager.track(MessageType.SELECTED_TAG_FILTER, {
-    tagFilterIdentifier,
-    value,
-  });
-
-  await setFilter(metrcGridId, tagFilterIdentifier, value);
-}
-
-export function applyPlantFilterImpl(plantFilterIdentifier: PlantFilterIdentifiers) {}
-
-export function applyPackageFilterImpl(packageFilterIdentifier: PackageFilterIdentifiers) {}
-
-export function applyDestinationPackageFilterImpl(
-  destinationPackageFilterIdentifier: TransferredPackageFilterIdentifiers
-) {}
-
-export function applyTransferFilterImpl(transferFilterIdentifier: TransferFilterIdentifiers) {}
-
-export function applyTagFilterImpl(tagFilterIdentifier: TagFilterIdentifiers) {}
-
-// Clicks the Metrc reset button - everything is wiped out
-export async function resetMetrcPlantFiltersImpl() {}
-
-// Clicks the Metrc reset button - everything is wiped out
-export async function resetMetrcPackageFiltersImpl() {}
-
-// Clicks the Metrc reset button - everything is wiped out
-export async function resetMetrcTransferFiltersImpl() {}
-
-// Clicks the Metrc reset button - everything is wiped out
-export async function resetMetrcTagFiltersImpl() {}
-
-export async function resetFilterElementReferencesImpl() {}
-
 export async function applyGridState(
-  activeMetrcGridId: MetrcGridId | null,
+  activeUniqueMetrcGridId: UniqueMetrcGridId | null,
   metrcGridFilters: { [key: string]: { [key: string]: string } }
 ) {
-  if (activeMetrcGridId) {
-    await pageManager.clickTabWithGridIdIfExists(activeMetrcGridId);
+  if (activeUniqueMetrcGridId) {
+    await pageManager.clickTabWithGridIdIfExists(activeUniqueMetrcGridId);
   }
 
-  for (const [metrcGridId, metrcGridData] of Object.entries(metrcGridFilters)) {
+  for (const [uniqueMetrcGridId, metrcGridData] of Object.entries(metrcGridFilters)) {
     for (const [field, value] of Object.entries(metrcGridData)) {
-      setFilter(metrcGridId as MetrcGridId, field, value);
+      setFilter(uniqueMetrcGridId as UniqueMetrcGridId, field, value);
     }
   }
 }
 
-export async function clearGridFilters(metrcGridId: MetrcGridId) {
-  const anchors = [...document.querySelectorAll(`#${metrcGridId} .dropdown-menu.pull-right a`)];
+export async function clearGridFilters(uniqueMetrcGridId: UniqueMetrcGridId) {
+  const nativeMetrcGridId = METRC_GRID_METADATA[uniqueMetrcGridId];
+
+  const anchors = [
+    ...document.querySelectorAll(`#${nativeMetrcGridId} .dropdown-menu.pull-right a`),
+  ];
 
   for (const anchor of anchors) {
     if (anchor.textContent?.includes("Clear Filters")) {

@@ -12,7 +12,7 @@
 
 <script lang="ts">
 import { IPluginState } from "@/interfaces";
-import { clearGridFilters, getActiveMetrcGridIdOrNull } from "@/modules/page-manager/search-utils";
+import { clearGridFilters, getActiveUniqueMetrcGridIdOrNull } from "@/modules/page-manager/search-utils";
 import router from "@/router/index";
 import store from "@/store/page-overlay/index";
 import { ClientGetters } from "@/store/page-overlay/modules/client/consts";
@@ -36,7 +36,7 @@ export default Vue.extend({
             hasT3plus: `client/${ClientGetters.T3PLUS}`,
         }),
         formattedFilters(): [string, any][] {
-            if (!store.state.search.activeMetrcGridId) {
+            if (!store.state.search.activeUniqueMetrcGridId) {
                 return [];
             }
 
@@ -45,7 +45,7 @@ export default Vue.extend({
             }
 
             return Object.entries(
-                store.state.search.metrcGridFilters[store.state.search.activeMetrcGridId] ?? {}
+                store.state.search.metrcGridFilters[store.state.search.activeUniqueMetrcGridId] ?? {}
             );
         },
     },
@@ -57,13 +57,13 @@ export default Vue.extend({
             exampleAction: `example/${ExampleActions.EXAMPLE_ACTION}`,
         }),
         clearGridFilters() {
-            const activeMetrcGridId = getActiveMetrcGridIdOrNull();
+            const activeUniqueMetrcGridId = getActiveUniqueMetrcGridIdOrNull();
 
-            if (!activeMetrcGridId) {
+            if (!activeUniqueMetrcGridId) {
                 return;
             }
 
-            clearGridFilters(activeMetrcGridId);
+            clearGridFilters(activeUniqueMetrcGridId);
         },
     },
     async created() { },

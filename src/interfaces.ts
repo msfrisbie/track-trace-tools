@@ -5,7 +5,6 @@ import {
   ItemState,
   Level,
   MessageType,
-  MetrcGridId,
   MetrcStatus,
   PackageState,
   PlantBatchState,
@@ -15,6 +14,7 @@ import {
   StrainState,
   TagState,
   TransferState,
+  UniqueMetrcGridId,
 } from "@/consts";
 import { Store } from "vuex";
 import { IAnnouncementsState } from "./store/page-overlay/modules/announcements/interfaces";
@@ -2155,6 +2155,6 @@ export interface IBuilderListOption {
 }
 
 export interface URLHashData {
-  activeMetrcGridId?: MetrcGridId | null;
+  activeUniqueMetrcGridId?: UniqueMetrcGridId | null;
   metrcGridFilters?: { [key: string]: { [key: string]: string } };
 }
