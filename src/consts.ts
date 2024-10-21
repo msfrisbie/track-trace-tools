@@ -574,7 +574,6 @@ export enum PackageSearchFilterKeys {
   DESTINATION_LICENSE_NUMBER = "destinationLicenseNumber",
 }
 
-// TODO These are not unique
 export enum NativeMetrcGridId {
   PLANT_BATCHES = "plantbatches-grid",
   PLANT_BATCHES_ON_HOLD = "plantbatchesonhold-grid",
