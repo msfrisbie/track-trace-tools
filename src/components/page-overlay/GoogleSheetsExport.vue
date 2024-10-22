@@ -24,7 +24,8 @@
       </div>
 
       <!-- Middle Column -->
-      <div v-bind:class="{ invisible: reportStatus !== ReportStatus.INITIAL }" class="flex flex-col items-stretch gap-4">
+      <div v-bind:class="{ invisible: reportStatus !== ReportStatus.INITIAL }"
+        class="flex flex-col items-stretch gap-4">
         <template v-if="selectedReports.length > 0">
           <div class="pb-2 flex flex-col items-stretch gap-2 text-xl font-semibold ttt-purple">
             {{ selectedReports.length }} REPORT{{ selectedReports.length > 1 ? "S" : "" }}
@@ -75,8 +76,8 @@
                 finishes.</span>
             </div>
 
-            <b-button size="sm" variant="link" class="text-purple-500 underline" :href="clientValues['COGS_YOUTUBE_URL']"
-              target="_blank">How to use this tool</b-button>
+            <b-button size="sm" variant="link" class="text-purple-500 underline"
+              :href="clientValues['COGS_YOUTUBE_URL']" target="_blank">How to use this tool</b-button>
 
             <hr />
             <div class="flex flex-col items-stretch gap-4">
@@ -480,7 +481,7 @@
 
         <!-- Transfer Hub Transfers -->
         <template v-if="selectedReports.find((report) => report.value === ReportType.TRANSFER_HUB_TRANSFERS)
-          ">
+        ">
           <div class="overflow-visible rounded border border-gray-300 p-2 flex flex-col items-stretch gap-2">
             <div class="font-semibold text-white ttt-purple-bg p-2 -m-2">Hub Transfers</div>
             <hr />
@@ -491,8 +492,8 @@
                   <span class="leading-6">ETD on or after:</span>
                 </b-form-checkbox>
                 <b-form-datepicker v-if="transferHubTransfersFormFilters.shouldFilterEstimatedDepartureDateGt"
-                  :disabled="!transferHubTransfersFormFilters.shouldFilterEstimatedDepartureDateGt" initial-date size="sm"
-                  v-model="transferHubTransfersFormFilters.estimatedDepartureDateGt" />
+                  :disabled="!transferHubTransfersFormFilters.shouldFilterEstimatedDepartureDateGt" initial-date
+                  size="sm" v-model="transferHubTransfersFormFilters.estimatedDepartureDateGt" />
               </div>
 
               <div class="flex flex-col items-start gap-1">
@@ -500,8 +501,8 @@
                   <span class="leading-6">ETD on or before:</span>
                 </b-form-checkbox>
                 <b-form-datepicker v-if="transferHubTransfersFormFilters.shouldFilterEstimatedDepartureDateLt"
-                  :disabled="!transferHubTransfersFormFilters.shouldFilterEstimatedDepartureDateLt" initial-date size="sm"
-                  v-model="transferHubTransfersFormFilters.estimatedDepartureDateLt" />
+                  :disabled="!transferHubTransfersFormFilters.shouldFilterEstimatedDepartureDateLt" initial-date
+                  size="sm" v-model="transferHubTransfersFormFilters.estimatedDepartureDateLt" />
               </div>
 
               <hr />
@@ -587,7 +588,7 @@
         <template v-if="selectedReports.find(
           (report) => report.value === ReportType.OUTGOING_TRANSFER_MANIFESTS
         )
-          ">
+        ">
           <div class="overflow-visible rounded border border-gray-300 p-2 flex flex-col items-stretch gap-2">
             <div class="font-semibold text-white ttt-purple-bg p-2 -m-2">
               Outgoing Transfer Manifests
@@ -639,13 +640,24 @@
         <template v-if="selectedReports.find(
           (report) => report.value === ReportType.INCOMING_TRANSFER_MANIFESTS
         )
-          ">
+        ">
           <div class="overflow-visible rounded border border-gray-300 p-2 flex flex-col items-stretch gap-2">
             <div class="font-semibold text-white ttt-purple-bg p-2 -m-2">
               Incoming Transfer Manifests
             </div>
             <hr />
             <div class="flex flex-col items-stretch gap-4">
+              <div class="font-semibold text-gray-700">Filters:</div>
+              <b-form-checkbox v-model="incomingTransferManifestsFormFilters.includeIncoming">
+                <span class="leading-6">Include Incoming</span>
+              </b-form-checkbox>
+              <b-form-checkbox v-model="incomingTransferManifestsFormFilters.includeIncomingInactive">
+                <span class="leading-6">Include Inactive Incoming</span>
+              </b-form-checkbox>
+              <b-form-checkbox v-model="incomingTransferManifestsFormFilters.onlyWholesale">
+                <span class="leading-6">Only Wholesale</span>
+              </b-form-checkbox>
+
               <div class="flex flex-col items-start gap-1">
                 <b-form-checkbox v-model="incomingTransferManifestsFormFilters.shouldFilterEstimatedArrivalDateGt">
                   <span class="leading-6">ETA on or after:</span>

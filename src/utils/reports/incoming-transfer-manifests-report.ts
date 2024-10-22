@@ -15,12 +15,18 @@ interface IIncomingTransferManifestsReportFormFilters {
   estimatedArrivalDateGt: string;
   shouldFilterEstimatedArrivalDateLt: boolean;
   shouldFilterEstimatedArrivalDateGt: boolean;
+  onlyWholesale: boolean;
+  includeIncoming: boolean;
+  includeIncomingInactive: boolean;
 }
 
 export const incomingTransferManifestsFormFiltersFactory: () => IIncomingTransferManifestsReportFormFilters =
   () => ({
     estimatedArrivalDateLt: todayIsodate(),
     estimatedArrivalDateGt: todayIsodate(),
+    includeIncoming: true,
+    includeIncomingInactive: false,
+    onlyWholesale: false,
     shouldFilterEstimatedArrivalDateLt: false,
     shouldFilterEstimatedArrivalDateGt: false,
   });
@@ -35,6 +41,11 @@ export function addIncomingTransferManifestsReport({
   fields: IFieldData[];
 }) {
   const transferFilter: ITransferFilter = {};
+
+  transferFilter.onlyWholesale = incomingTransferManifestsFormFilters.onlyWholesale;
+  transferFilter.includeIncoming = incomingTransferManifestsFormFilters.includeIncoming;
+  transferFilter.includeIncomingInactive =
+    incomingTransferManifestsFormFilters.includeIncomingInactive;
 
   transferFilter.estimatedArrivalDateGt =
     incomingTransferManifestsFormFilters.shouldFilterEstimatedArrivalDateGt
@@ -69,12 +80,27 @@ export async function maybeLoadIncomingTransferManifestsReportData({
 
     let richIncomingTransfers: IIndexedRichIncomingTransferData[] = [];
 
-    richIncomingTransfers = [
-      ...(await primaryDataLoader.incomingTransfers()),
-      ...richIncomingTransfers,
-    ];
+    if (transferManifestConfig.transferFilter.includeIncoming) {
+      richIncomingTransfers = [
+        ...(await primaryDataLoader.incomingTransfers()),
+        ...richIncomingTransfers,
+      ];
+    }
+
+    if (transferManifestConfig.transferFilter.includeIncomingInactive) {
+      richIncomingTransfers = [
+        ...(await primaryDataLoader.incomingInactiveTransfers()),
+        ...richIncomingTransfers,
+      ];
+    }
 
     richIncomingTransfers = richIncomingTransfers.filter((transfer) => {
+      if (transferManifestConfig.transferFilter.onlyWholesale) {
+        if (!transfer.ShipmentTypeName.includes("Wholesale")) {
+          return false;
+        }
+      }
+
       if (transferManifestConfig.transferFilter.estimatedArrivalDateLt) {
         if (
           transfer.CreatedDateTime > transferManifestConfig.transferFilter.estimatedArrivalDateLt
