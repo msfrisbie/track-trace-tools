@@ -609,7 +609,7 @@ export enum NativeMetrcGridId {
 
   ITEMS_GRID = "items-grid",
 
-  STRAIN_GRID = "strain-grid",
+  STRAIN_GRID = "strains-grid",
 
   PLANT_WASTE_GRID = "waste-grid",
 

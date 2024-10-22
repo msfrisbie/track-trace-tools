@@ -81,7 +81,7 @@
                       </div>
 
                       <div class="grid grid-cols-2 overflow-y-auto col-span-2 gap-2"
-                        style="grid-template-columns: 360px 1fr;">
+                        style="grid-template-columns: 240px 1fr;">
                         <history-list />
 
                         <search-control-panel class="bg-white border-b border-gray-200 "></search-control-panel>

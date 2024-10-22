@@ -1,7 +1,7 @@
 <template>
   <div class="font-mono">
-    <span class="text-gray-400 text-center">{{ labelPrefix }}</span>
-    <span class="text-gray-800 text-center font-bold">{{ labelSuffix }}</span>
+    <span :class="`text-${colorName}-400 text-center`">{{ labelPrefix }}</span>
+    <span :class="`text-${colorName}-800 text-center font-bold`">{{ labelSuffix }}</span>
   </div>
 </template>
 
@@ -18,6 +18,10 @@ export default Vue.extend({
   name: 'DualColorTag',
   props: {
     label: String,
+    colorName: {
+      type: String,
+      default: 'gray'
+    }
   },
   computed: {
     labelPrefix() {

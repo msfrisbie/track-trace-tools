@@ -489,14 +489,18 @@ export function generateScoreFromMatch({
   return score;
 }
 
+function getTabs() {}
+
 export function getActiveUniqueMetrcGridIdOrNull(): UniqueMetrcGridId | null {
+  const pageHasTabs = !!document.querySelector(`li[data-grid-selector]`);
+
   let activeNativeMetrcGridId: NativeMetrcGridId | null =
     (document
       .querySelector(`[data-grid-selector].k-state-active`)
       ?.getAttribute("data-grid-selector")
       ?.replace("#", "") as NativeMetrcGridId) ?? null;
 
-  if (!activeNativeMetrcGridId) {
+  if (!activeNativeMetrcGridId && !pageHasTabs) {
     // Might be on a page with no tabs (items, strains)
     activeNativeMetrcGridId =
       (document
@@ -520,11 +524,13 @@ export function getActiveUniqueMetrcGridIdOrNull(): UniqueMetrcGridId | null {
 }
 
 export function getAllUniqueMetrcGridIds(): UniqueMetrcGridId[] {
+  const pageHasTabs = !!document.querySelector(`li[data-grid-selector]`);
+
   let nativeMetrcGridIds: NativeMetrcGridId[] = [
     ...document.querySelectorAll(`[data-grid-selector]`),
   ].map((x) => x.getAttribute("data-grid-selector")!.replace("#", "") as NativeMetrcGridId);
 
-  if (!nativeMetrcGridIds.length) {
+  if (!nativeMetrcGridIds.length && !pageHasTabs) {
     nativeMetrcGridIds = [
       ...document.querySelectorAll(`[data-role="grid"].k-grid.k-widget.k-display-block`),
     ].map((x) => x.getAttribute("id") as NativeMetrcGridId);

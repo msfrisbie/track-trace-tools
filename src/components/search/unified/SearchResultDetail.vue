@@ -1,52 +1,68 @@
 <template>
   <div v-if="searchState.activeSearchResult">
-    <div class="flex flex-col items-center gap-8 px-2 p-4">
+    <div class="flex flex-col items-stretch w-full max-w-4xl gap-8 p-4">
       <!-- Header -->
-      <div class="flex flex-col items-center gap-4 flex-grow">
-        <div :class="`flex flex-row gap-2 items-center text-${searchState.activeSearchResult.colorClassName}-700`">
-          <complex-icon :primaryIconName="searchState.activeSearchResult.primaryIconName" primaryIconSize="xl"
-            :secondaryIconName="searchState.activeSearchResult.secondaryIconName" secondaryIconSize="sm" />
-
-          <span class="text-2xl">{{ searchState.activeSearchResult.primaryTextualIdentifier }}</span>
+      <div class="shadow-xl rounded-xl border border-gray-200 flex flex-col items-stretch overflow-hidden">
+        <div :class="`flex flex-col items-center bg-${activeColorClassName}-700`"><span
+            class="text-2xl font-bold text-white">
+            {{ searchState.activeSearchResult.primaryStatusTextualDescriptor?.toLocaleUpperCase() }} {{
+              searchState.activeSearchResult.primaryTextualDescriptor.toLocaleUpperCase() }}
+          </span>
         </div>
-        <span class="text-2xl font-bold">
-          {{ searchState.activeSearchResult.primaryStatusTextualDescriptor?.toLocaleUpperCase() }} {{
-            searchState.activeSearchResult.primaryTextualDescriptor.toLocaleUpperCase() }}
-        </span>
-        <span class="text-xl">
-          {{ searchState.activeSearchResult.secondaryTextualIdentifier }}
-        </span>
-      </div>
+        <hr />
+        <div class="flex flex-col items-center gap-8 p-4">
+          <div class="flex flex-col items-center gap-4 flex-grow">
+            <div :class="`flex flex-row gap-2 items-center justify-center text-${activeColorClassName}-700`">
+              <complex-icon :primaryIconName="searchState.activeSearchResult.primaryIconName" primaryIconSize="xl"
+                :secondaryIconName="searchState.activeSearchResult.secondaryIconName" secondaryIconSize="sm" />
 
-      <!-- Metrc Tag -->
-      <metrc-tag v-if="searchResultPackageOrNull" :label="getLabelOrError(searchResultPackageOrNull)"
-        sideText="PACKAGE" />
-      <metrc-tag v-if="searchResultPlantOrNull" :label="searchResultPlantOrNull.Label" sideText="PLANT" />
-      <metrc-tag v-if="searchResultPlantBatchOrNull && searchState.activeSearchResult.isPrimaryIdentifierMetrcTag"
-        :label="searchResultPlantBatchOrNull.Name" sideText="PLANT BATCH" />
-      <metrc-tag v-if="searchResultTagOrNull" :label="searchResultTagOrNull.Label"
-        :sideText="searchResultTagOrNull.TagTypeName" />
+              <template v-if="searchState.activeSearchResult.isPrimaryIdentifierMetrcTag">
+                <dual-color-tag :colorName="activeColorClassName" class="text-2xl"
+                  :label="searchState.activeSearchResult.primaryTextualIdentifier" />
+              </template>
+              <template v-else>
+                <span class="text-2xl">{{ searchState.activeSearchResult.primaryTextualIdentifier }}</span>
+              </template>
+            </div>
 
-      <b-button-group>
-        <b-button class="flex flex-row items-center gap-1" size="lg" variant="outline-success" v-if="enableShowInMetrc"
-          @click="openInPage()">
-          <font-awesome-icon icon="search"></font-awesome-icon>
-          <span>SHOW IN METRC</span>
-        </b-button>
-        <b-button class="flex flex-row items-center gap-1" size="lg" variant="outline-primary" @click="openInNewTab()">
-          <font-awesome-icon icon="external-link-alt"></font-awesome-icon>
-          <span>OPEN IN NEW TAB</span>
-        </b-button>
-        <b-button class="flex flex-row items-center gap-1" size="lg" variant="outline-primary" @click="copyLink()">
-          <font-awesome-icon icon="link"></font-awesome-icon>
-          <span>COPY LINK</span>
-        </b-button>
-      </b-button-group>
+            <span class="text-xl">
+              {{ searchState.activeSearchResult.secondaryTextualIdentifier }}
+            </span>
 
-      <!-- Button List -->
-      <div v-if="searchResultTransferOrNull || searchResultPackageOrNull" class="grid grid-cols-2 gap-2">
-        <transfer-button-list v-if="searchResultTransferOrNull" :transfer="searchResultTransferOrNull" />
-        <package-button-list v-if="searchResultPackageOrNull" :pkg="searchResultPackageOrNull" />
+            <!-- Metrc Tag -->
+            <metrc-tag v-if="searchResultPackageOrNull" :label="getLabelOrError(searchResultPackageOrNull)"
+              sideText="PACKAGE" />
+            <metrc-tag v-if="searchResultPlantOrNull" :label="searchResultPlantOrNull.Label" sideText="PLANT" />
+            <metrc-tag v-if="searchResultPlantBatchOrNull && searchState.activeSearchResult.isPrimaryIdentifierMetrcTag"
+              :label="searchResultPlantBatchOrNull.Name" sideText="PLANT BATCH" />
+            <metrc-tag v-if="searchResultTagOrNull" :label="searchResultTagOrNull.Label"
+              :sideText="searchResultTagOrNull.TagTypeName" />
+
+            <b-button-group>
+              <b-button class="flex flex-row items-center gap-1" size="lg" variant="outline-success"
+                v-if="enableShowInMetrc" @click="openInPage()">
+                <font-awesome-icon icon="search"></font-awesome-icon>
+                <span>SHOW IN METRC</span>
+              </b-button>
+              <b-button class="flex flex-row items-center gap-1" size="lg" variant="outline-primary"
+                @click="openInNewTab()">
+                <font-awesome-icon icon="external-link-alt"></font-awesome-icon>
+                <span>OPEN IN NEW TAB</span>
+              </b-button>
+              <b-button class="flex flex-row items-center gap-1" size="lg" variant="outline-primary"
+                @click="copyLink()">
+                <font-awesome-icon icon="link"></font-awesome-icon>
+                <span>COPY LINK</span>
+              </b-button>
+            </b-button-group>
+
+            <!-- Button List -->
+            <div v-if="searchResultTransferOrNull || searchResultPackageOrNull" class="grid grid-cols-2 gap-2">
+              <transfer-button-list v-if="searchResultTransferOrNull" :transfer="searchResultTransferOrNull" />
+              <package-button-list v-if="searchResultPackageOrNull" :pkg="searchResultPackageOrNull" />
+            </div>
+          </div>
+        </div>
       </div>
 
       <!-- JSON Table -->
@@ -59,6 +75,7 @@
 
 <script lang="ts">
 import ComplexIcon from "@/components/overlay-widget/shared/ComplexIcon.vue";
+import DualColorTag from "@/components/overlay-widget/shared/DualColorTag.vue";
 import MetrcTag from "@/components/overlay-widget/shared/MetrcTag.vue";
 import PackageButtonList from "@/components/overlay-widget/shared/PackageButtonList.vue";
 import TransferButtonList from "@/components/overlay-widget/shared/TransferButtonList.vue";
@@ -118,6 +135,7 @@ export default Vue.extend({
     ComplexIcon,
     MetrcTag,
     PackageButtonList,
+    DualColorTag
   },
   computed: {
     ...mapState<IPluginState>({
@@ -128,6 +146,13 @@ export default Vue.extend({
     ...mapGetters({
       hasT3plus: `client/${ClientGetters.T3PLUS}`,
     }),
+    activeColorClassName(): string {
+      if (!store.state.search.activeSearchResult!.isActive) {
+        return 'gray';
+      }
+
+      return store.state.search.activeSearchResult!.colorClassName;
+    },
     //
     // Transfers
     //
