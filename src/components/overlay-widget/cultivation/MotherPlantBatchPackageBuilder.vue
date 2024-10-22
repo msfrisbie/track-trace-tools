@@ -1,22 +1,13 @@
 <template>
   <div class="grid grid-cols-3 gap-8 h-full" style="grid-template-rows: auto 1fr">
-    <builder-step-header
-      v-for="(step, index) of steps"
-      :key="index"
-      :stepNumber="index + 1"
-      :stepText="step.stepText"
-      :active="index === activeStepIndex"
-      @click.stop.prevent.native="setActiveStepIndex(index)"
-    />
+    <builder-step-header v-for="(step, index) of steps" :key="index" :stepNumber="index + 1" :stepText="step.stepText"
+      :active="index === activeStepIndex" @click.stop.prevent.native="setActiveStepIndex(index)" />
 
     <div class="col-span-3 h-full">
       <template v-if="activeStepIndex === 0">
         <div class="grid grid-cols-2 grid-rows-2 gap-8 h-full" style="grid-template-rows: 1fr auto">
-          <plant-batch-picker
-            class="col-span-2"
-            :builderType="builderType"
-            :selectedPlantBatches.sync="selectedPlantBatches"
-          />
+          <plant-batch-picker class="col-span-2" :builderType="builderType"
+            :selectedPlantBatches.sync="selectedPlantBatches" />
 
           <div class="col-start-2 flex flex-col items-stretch">
             <template v-if="!pageOneErrorMessage">
@@ -34,20 +25,12 @@
         <div class="grid grid-cols-2 grid-rows-2 gap-8 h-full" style="grid-template-rows: 1fr auto">
           <template v-if="!showTagPicker">
             <div class="w-full items-stretch flex flex-col p-4">
-              <item-picker
-                :item.sync="item"
-                :itemFilters="itemFilters"
-                :selectOwnedItems="true"
-                label="New packages contain:"
-              />
+              <item-picker :item.sync="item" :itemFilters="itemFilters" :selectOwnedItems="true"
+                label="New packages contain:" />
 
               <template v-if="item">
                 <b-form-group label="Plant batch type:" label-size="sm">
-                  <b-form-select
-                    size="md"
-                    :options="plantBatchTypeOptions"
-                    v-model="plantBatchType"
-                  >
+                  <b-form-select size="md" :options="plantBatchTypeOptions" v-model="plantBatchType">
                     <template #first>
                       <b-form-select-option :value="null" disabled>--</b-form-select-option>
                     </template>
@@ -55,12 +38,7 @@
                 </b-form-group>
 
                 <b-form-group label="Take Date:" label-size="sm">
-                  <b-form-datepicker
-                    initial-date
-                    size="md"
-                    v-model="actualIsodate"
-                    :value="actualIsodate"
-                  />
+                  <b-form-datepicker initial-date size="md" v-model="actualIsodate" :value="actualIsodate" />
                 </b-form-group>
 
                 <template v-if="facilityUsesLocationForPackages">
@@ -95,33 +73,23 @@
                     Trade Sample
                   </b-form-checkbox> -->
 
-                  <b-form-group
-                    label="Patient License Number:"
-                    description="Leave this alone unless you are sure you need to change it"
-                    label-size="sm"
-                  >
+                  <b-form-group label="Patient License Number:"
+                    description="Leave this alone unless you are sure you need to change it" label-size="sm">
                     <b-form-input size="md" v-model="patientLicenseNumber"></b-form-input>
                   </b-form-group>
                 </template>
 
                 <template v-else>
-                  <b-button
-                    class="opacity-40"
-                    variant="light"
-                    @click="showHiddenDetailFields = true"
-                    >ADVANCED</b-button
-                  >
+                  <b-button class="opacity-40" variant="light"
+                    @click="showHiddenDetailFields = true">ADVANCED</b-button>
                 </template>
               </template>
             </div>
 
             <template v-if="showChildCountEntry">
               <div class="flex flex-col items-stretch p-4 space-y-4">
-                <mother-plant-picker
-                  :selectedMothers="selectedPlantBatches"
-                  :plantBatchType="plantBatchType"
-                  :childMatrix.sync="childMatrix"
-                />
+                <mother-plant-picker :selectedMothers="selectedPlantBatches" :plantBatchType="plantBatchType"
+                  :childMatrix.sync="childMatrix" />
 
                 <template v-if="!pageTwoPreTagErrorMessage">
                   <b-button variant="success" size="md" @click="showTagPicker = true">
@@ -143,11 +111,8 @@
               <div class="text-lg font-bold">{{ newPackageCount }} tags required.</div>
             </div>
 
-            <tag-picker
-              :tagTypeNames="['CannabisPackage', 'MedicalPackage', 'Cannabis Package', 'Medical Package']"
-              :tagCount="newPackageCount"
-              :selectedTags.sync="packageTags"
-            />
+            <tag-picker :tagTypeNames="['CannabisPackage', 'MedicalPackage', 'Cannabis Package', 'Medical Package']"
+              :tagCount="newPackageCount" :selectedTags.sync="packageTags" />
 
             <div class="col-start-2 flex flex-col items-stretch">
               <template v-if="!pageTwoErrorMessage">
@@ -177,9 +142,7 @@
 
               <div>
                 Creates
-                <span class="font-bold ttt-purple"
-                  >{{ newPackageCount }} {{ item.Name }} packages.</span
-                >
+                <span class="font-bold ttt-purple">{{ newPackageCount }} {{ item.Name }} packages.</span>
               </div>
 
               <div>
@@ -194,17 +157,13 @@
 
               <div style="height: 3rem"></div>
 
-              <b-button class="w-full" variant="success" size="md" @click="submit()"
-                >PACKAGE {{ totalChildCount }}
-                {{ plantBatchType.Name.toLocaleUpperCase() + "S" }}</b-button
-              >
+              <b-button class="w-full" variant="success" size="md" @click="submit()">PACKAGE {{ totalChildCount }}
+                {{ plantBatchType.Name.toLocaleUpperCase() + "S" }}</b-button>
             </div>
 
             <div style="height: 6rem"></div>
 
-            <b-button class="opacity-40" variant="light" size="md" @click="downloadAll()"
-              >DOWNLOAD CSVs</b-button
-            >
+            <b-button class="opacity-40" variant="light" size="md" @click="downloadAll()">DOWNLOAD CSVs</b-button>
 
             <csv-breakout class="opacity-40 mt-4" :csvFiles="csvFiles" />
           </div>
@@ -304,6 +263,9 @@ export default Vue.extend({
               LocationId: this.$data.location.Id.toString(),
             }
             : {}),
+          ExpirationDate: "",
+          UseByDate: "",
+          SellByDate: ""
         };
 
         rows.push(row);
@@ -409,8 +371,7 @@ export default Vue.extend({
 
         return buildNamedCsvFileData(
           csvData,
-          `Taking ${this.totalChildCountImpl()} ${`${this.$data.plantBatchType.Name.toLocaleLowerCase()}s`} from ${
-            this.$data.selectedPlantBatches.length
+          `Taking ${this.totalChildCountImpl()} ${`${this.$data.plantBatchType.Name.toLocaleLowerCase()}s`} from ${this.$data.selectedPlantBatches.length
           } mothers`,
         );
       } catch (e) {

@@ -1,22 +1,13 @@
 <template>
   <div class="grid grid-cols-3 gap-8 h-full" style="grid-template-rows: auto 1fr">
-    <builder-step-header
-      v-for="(step, index) of steps"
-      :key="index"
-      :stepNumber="index + 1"
-      :stepText="step.stepText"
-      :active="index === activeStepIndex"
-      @click.stop.prevent.native="setActiveStepIndex(index)"
-    />
+    <builder-step-header v-for="(step, index) of steps" :key="index" :stepNumber="index + 1" :stepText="step.stepText"
+      :active="index === activeStepIndex" @click.stop.prevent.native="setActiveStepIndex(index)" />
 
     <div class="col-span-3 h-full">
       <template v-if="activeStepIndex === 0">
         <div class="grid grid-cols-2 grid-rows-2 gap-8 h-full" style="grid-template-rows: 1fr auto">
-          <plant-batch-picker
-            class="col-span-2"
-            :builderType="builderType"
-            :selectedPlantBatches.sync="selectedPlantBatches"
-          />
+          <plant-batch-picker class="col-span-2" :builderType="builderType"
+            :selectedPlantBatches.sync="selectedPlantBatches" />
 
           <div class="col-start-2 flex flex-col items-stretch">
             <template v-if="!pageOneErrorMessage">
@@ -33,21 +24,12 @@
       <template v-if="activeStepIndex === 1">
         <div class="grid grid-cols-2 grid-rows-2 gap-8 h-full" style="grid-template-rows: 1fr auto">
           <div class="w-full items-stretch flex flex-col space-y-4 p-4">
-            <item-picker
-              :item.sync="item"
-              :itemFilters="itemFilters"
-              :selectOwnedItems="true"
-              label="New packages contain:"
-            />
+            <item-picker :item.sync="item" :itemFilters="itemFilters" :selectOwnedItems="true"
+              label="New packages contain:" />
 
             <template v-if="item">
               <b-form-group label="Package Date:" label-size="sm">
-                <b-form-datepicker
-                  initial-date
-                  size="md"
-                  v-model="packageDate"
-                  :value="packageDate"
-                />
+                <b-form-datepicker initial-date size="md" v-model="packageDate" :value="packageDate" />
               </b-form-group>
 
               <template v-if="facilityUsesLocationForPackages">
@@ -82,19 +64,14 @@
                   Trade Sample
                 </b-form-checkbox> -->
 
-                <b-form-group
-                  label="Patient License Number:"
-                  description="Leave this alone unless you are sure you need to change it"
-                  label-size="sm"
-                >
+                <b-form-group label="Patient License Number:"
+                  description="Leave this alone unless you are sure you need to change it" label-size="sm">
                   <b-form-input size="md" v-model="patientLicenseNumber"></b-form-input>
                 </b-form-group>
               </template>
 
               <template v-else>
-                <b-button class="opacity-40" variant="light" @click="showHiddenDetailFields = true"
-                  >ADVANCED</b-button
-                >
+                <b-button class="opacity-40" variant="light" @click="showHiddenDetailFields = true">ADVANCED</b-button>
               </template>
             </template>
           </div>
@@ -108,11 +85,8 @@
                   </div>
                 </div>
 
-                <tag-picker
-                  :tagTypeNames="['CannabisPackage', 'MedicalPackage', 'Cannabis Package', 'Medical Package']"
-                  :tagCount="selectedPlantBatchesCount"
-                  :selectedTags.sync="packageTags"
-                />
+                <tag-picker :tagTypeNames="['CannabisPackage', 'MedicalPackage', 'Cannabis Package', 'Medical Package']"
+                  :tagCount="selectedPlantBatchesCount" :selectedTags.sync="packageTags" />
 
                 <div class="col-start-2 flex flex-col items-stretch">
                   <template v-if="!pageTwoErrorMessage">
@@ -141,9 +115,7 @@
               <div class="flex flex-col space-y-4 text-xl" style="width: 600px">
                 <div>
                   Creates
-                  <span class="font-bold ttt-purple"
-                    >{{ selectedPlantBatchesCount }} packages.</span
-                  >
+                  <span class="font-bold ttt-purple">{{ selectedPlantBatchesCount }} packages.</span>
                 </div>
 
                 <div>
@@ -158,16 +130,13 @@
 
                 <div style="height: 3rem"></div>
 
-                <b-button class="w-full" variant="success" size="md" @click="submit()"
-                  >PACKAGE {{ selectedPlantBatchesCount }} {{ "PLANT BATCHES" }}</b-button
-                >
+                <b-button class="w-full" variant="success" size="md" @click="submit()">PACKAGE {{
+                  selectedPlantBatchesCount }} {{ "PLANT BATCHES" }}</b-button>
               </div>
 
               <div style="height: 6rem"></div>
 
-              <b-button class="opacity-40" variant="light" size="md" @click="downloadAll()"
-                >DOWNLOAD CSVs</b-button
-              >
+              <b-button class="opacity-40" variant="light" size="md" @click="downloadAll()">DOWNLOAD CSVs</b-button>
 
               <csv-breakout class="opacity-40 mt-4" :csvFiles="csvFiles" />
             </div>
@@ -176,7 +145,7 @@
           <template v-else>
             <span class="text-center text-red-700">{{
               pageThreeErrorMessage || errorMessage
-            }}</span>
+              }}</span>
           </template>
         </div>
       </template>
@@ -246,6 +215,9 @@ export default Vue.extend({
               LocationId: this.$data.location.Id.toString(),
             }
             : {}),
+          ExpirationDate: "",
+          UseByDate: "",
+          SellByDate: ""
         };
         rows.push(row);
       });
