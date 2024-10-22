@@ -17,7 +17,9 @@
       <div class="w-full gap-2 text-wrap break-words border-b border-gray-200"
         v-for="[idx, matchedField] of searchResult.matchedFields.entries()" v-bind:key="idx">
         <fragment>
-          <div class="font-bold text-sm pb-2 text-gray-400">{{ matchedField.field }}</div>
+          <div
+            v-bind:class="{ [`font-bold text-sm pb-2 text-${matchedField.isPrimaryField ? searchResult.colorClassName : 'gray'}-400`]: true }">
+            {{ matchedField.field }}</div>
           <div class="font-mono">
             <partial-string-emphasis :fullString="matchedField.value"
               :partialString="searchState.queryString"></partial-string-emphasis>

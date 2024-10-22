@@ -13,7 +13,10 @@ import {
 } from "@/consts";
 import store from "@/store/page-overlay/index";
 import { SearchActions } from "@/store/page-overlay/modules/search/consts";
-import { ISearchResult } from "@/store/page-overlay/modules/search/interfaces";
+import {
+  IMatchedFieldMetadata,
+  ISearchResult,
+} from "@/store/page-overlay/modules/search/interfaces";
 import _ from "lodash-es";
 import { pageManager } from "./page-manager.module";
 
@@ -26,10 +29,10 @@ export function extractMatchedFields(
   primaryField: string,
   queryString: string,
   o: { [key: string]: any }
-): { field: string; value: string; subscore: number }[] {
+): IMatchedFieldMetadata[] {
   const normalizedQueryString = queryString.toLocaleLowerCase();
 
-  const matchedFields: { field: string; value: string; subscore: number }[] = [];
+  const matchedFields: IMatchedFieldMetadata[] = [];
 
   if (!o) {
     return matchedFields; // return an empty array if the object is null or undefined
@@ -45,6 +48,7 @@ export function extractMatchedFields(
         ...extractMatchedFields(primaryField, queryString, v).map((x) => ({
           ...x,
           field: `${k}.${x.field}`,
+          isPrimaryField: `${k}.${x.field}` === primaryField,
         }))
       );
       continue;
@@ -60,11 +64,12 @@ export function extractMatchedFields(
           queryString: normalizedQueryString,
           value: v,
         }),
+        isPrimaryField: k === primaryField,
       });
     }
   }
 
-  matchedFields.sort((a, b) => (a.subscore > b.subscore ? 1 : -1));
+  matchedFields.sort((a, b) => (a.subscore < b.subscore ? 1 : -1));
 
   return matchedFields;
 }
@@ -93,7 +98,7 @@ export function generateSearchResultMetadata(
 
   let isActive: boolean;
 
-  let matchedFields: { field: string; value: string; subscore: number }[] = [];
+  let matchedFields: IMatchedFieldMetadata[] = [];
 
   let score: number = 1;
 
@@ -485,18 +490,26 @@ export function generateScoreFromMatch({
 }
 
 export function getActiveUniqueMetrcGridIdOrNull(): UniqueMetrcGridId | null {
-  const nativeMetrcGridId: NativeMetrcGridId | null =
+  let activeNativeMetrcGridId: NativeMetrcGridId | null =
     (document
       .querySelector(`[data-grid-selector].k-state-active`)
       ?.getAttribute("data-grid-selector")
       ?.replace("#", "") as NativeMetrcGridId) ?? null;
 
-  if (!nativeMetrcGridId) {
+  if (!activeNativeMetrcGridId) {
+    // Might be on a page with no tabs (items, strains)
+    activeNativeMetrcGridId =
+      (document
+        .querySelector(`[data-role="grid"].k-grid.k-widget.k-display-block`)
+        ?.getAttribute("id") as NativeMetrcGridId) ?? null;
+  }
+
+  if (!activeNativeMetrcGridId) {
     return null;
   }
 
   for (const [uniqueMetrcGridId, metadata] of Object.entries(METRC_GRID_METADATA)) {
-    if (metadata.nativeMetrcGridId === nativeMetrcGridId) {
+    if (metadata.nativeMetrcGridId === activeNativeMetrcGridId) {
       return uniqueMetrcGridId as UniqueMetrcGridId;
     }
   }
@@ -507,9 +520,15 @@ export function getActiveUniqueMetrcGridIdOrNull(): UniqueMetrcGridId | null {
 }
 
 export function getAllUniqueMetrcGridIds(): UniqueMetrcGridId[] {
-  const nativeMetrcGridIds = [...document.querySelectorAll(`[data-grid-selector]`)].map(
-    (x) => x.getAttribute("data-grid-selector")!.replace("#", "") as NativeMetrcGridId
-  );
+  let nativeMetrcGridIds: NativeMetrcGridId[] = [
+    ...document.querySelectorAll(`[data-grid-selector]`),
+  ].map((x) => x.getAttribute("data-grid-selector")!.replace("#", "") as NativeMetrcGridId);
+
+  if (!nativeMetrcGridIds.length) {
+    nativeMetrcGridIds = [
+      ...document.querySelectorAll(`[data-role="grid"].k-grid.k-widget.k-display-block`),
+    ].map((x) => x.getAttribute("id") as NativeMetrcGridId);
+  }
 
   const uniqueMetrcGridIds: UniqueMetrcGridId[] = [];
 

@@ -610,6 +610,10 @@ export enum NativeMetrcGridId {
   ITEMS_GRID = "items-grid",
 
   STRAIN_GRID = "strain-grid",
+
+  PLANT_WASTE_GRID = "waste-grid",
+
+  PLANT_ADDITIVES_GRID = "additives-grid",
 }
 
 export enum UniqueMetrcGridId {
@@ -648,6 +652,10 @@ export enum UniqueMetrcGridId {
   ITEMS_GRID = "ITEMS_GRID",
 
   STRAIN_GRID = "STRAIN_GRID",
+
+  PLANT_WASTE_GRID = "PLANT_WASTE_GRID",
+
+  PLANT_ADDIVIES_GRID = "PLANT_ADDIVIES_GRID",
 }
 
 export enum MetrcPageId {
@@ -782,6 +790,14 @@ export const METRC_GRID_METADATA: {
   [UniqueMetrcGridId.STRAIN_GRID]: {
     nativeMetrcGridId: NativeMetrcGridId.STRAIN_GRID,
     metrcPageId: MetrcPageId.STRAINS,
+  },
+  [UniqueMetrcGridId.PLANT_WASTE_GRID]: {
+    nativeMetrcGridId: NativeMetrcGridId.PLANT_WASTE_GRID,
+    metrcPageId: MetrcPageId.PLANTS,
+  },
+  [UniqueMetrcGridId.PLANT_ADDIVIES_GRID]: {
+    nativeMetrcGridId: NativeMetrcGridId.PLANT_ADDITIVES_GRID,
+    metrcPageId: MetrcPageId.PLANTS,
   },
 };
 

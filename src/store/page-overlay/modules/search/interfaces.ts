@@ -40,11 +40,7 @@ export interface ISearchResult {
   score: number;
   isActive: boolean;
   isPrimaryIdentifierMetrcTag: boolean;
-  matchedFields: {
-    field: string;
-    value: string;
-    subscore: number;
-  }[];
+  matchedFields: IMatchedFieldMetadata[];
   // Rendering
   primaryIconName: string;
   secondaryIconName: string | null;
@@ -136,4 +132,11 @@ export interface ItemSearchParams extends QueryParams {
 
 export interface StrainSearchParams extends QueryParams {
   strainState: StrainState;
+}
+
+export interface IMatchedFieldMetadata {
+  field: string;
+  value: string;
+  subscore: number;
+  isPrimaryField: boolean;
 }
