@@ -1,6 +1,7 @@
 import {
   DATA_LOAD_FETCH_TIMEOUT_MS,
   DATA_LOAD_PAGE_SIZE,
+  DEFAULT_SEARCH_LOAD_PAGE_SIZE,
   HarvestState,
   IdbKeyPiece,
   ItemState,
@@ -8,7 +9,6 @@ import {
   PlantBatchState,
   PlantState,
   SalesReceiptState,
-  SEARCH_LOAD_PAGE_SIZE,
   StrainState,
   TagState,
   TransferState,
@@ -984,10 +984,10 @@ export class DataLoader implements IAtomicService {
   onDemandTransferSearchBody({ queryString }: { queryString: string }): string {
     return JSON.stringify({
       request: {
-        take: SEARCH_LOAD_PAGE_SIZE,
+        take: store.state.search.searchResultPageSize,
         skip: 0,
         page: 1,
-        pageSize: SEARCH_LOAD_PAGE_SIZE,
+        pageSize: store.state.search.searchResultPageSize,
         filter: {
           logic: "or",
           filters: [{ field: "ManifestNumber", operator: "contains", value: queryString }],
@@ -1000,10 +1000,10 @@ export class DataLoader implements IAtomicService {
   onDemandTagSearchBody({ queryString }: { queryString: string }): string {
     return JSON.stringify({
       request: {
-        take: SEARCH_LOAD_PAGE_SIZE,
+        take: store.state.search.searchResultPageSize,
         skip: 0,
         page: 1,
-        pageSize: SEARCH_LOAD_PAGE_SIZE,
+        pageSize: store.state.search.searchResultPageSize,
         filter: {
           logic: "or",
           filters: [{ field: "Label", operator: "endswith", value: queryString }],
@@ -1016,10 +1016,10 @@ export class DataLoader implements IAtomicService {
   onDemandPlantSearchBody({ queryString }: { queryString: string }): string {
     return JSON.stringify({
       request: {
-        take: SEARCH_LOAD_PAGE_SIZE,
+        take: store.state.search.searchResultPageSize,
         skip: 0,
         page: 1,
-        pageSize: SEARCH_LOAD_PAGE_SIZE,
+        pageSize: store.state.search.searchResultPageSize,
         filter: {
           logic: "or",
           filters: [
@@ -1036,10 +1036,10 @@ export class DataLoader implements IAtomicService {
   onDemandHarvestSearchBody({ queryString }: { queryString: string }): string {
     return JSON.stringify({
       request: {
-        take: SEARCH_LOAD_PAGE_SIZE,
+        take: store.state.search.searchResultPageSize,
         skip: 0,
         page: 1,
-        pageSize: SEARCH_LOAD_PAGE_SIZE,
+        pageSize: store.state.search.searchResultPageSize,
         filter: {
           logic: "or",
           filters: [
@@ -1056,10 +1056,10 @@ export class DataLoader implements IAtomicService {
   onDemandSalesReceiptSearchBody({ queryString }: { queryString: string }): string {
     return JSON.stringify({
       request: {
-        take: SEARCH_LOAD_PAGE_SIZE,
+        take: store.state.search.searchResultPageSize,
         skip: 0,
         page: 1,
-        pageSize: SEARCH_LOAD_PAGE_SIZE,
+        pageSize: store.state.search.searchResultPageSize,
         filter: {
           logic: "or",
           filters: [{ field: "ReceiptNumber", operator: "contains", value: queryString }],
@@ -1072,10 +1072,10 @@ export class DataLoader implements IAtomicService {
   onDemandPlantBatchSearchBody({ queryString }: { queryString: string }): string {
     return JSON.stringify({
       request: {
-        take: SEARCH_LOAD_PAGE_SIZE,
+        take: store.state.search.searchResultPageSize,
         skip: 0,
         page: 1,
-        pageSize: SEARCH_LOAD_PAGE_SIZE,
+        pageSize: store.state.search.searchResultPageSize,
         filter: {
           logic: "or",
           filters: [
@@ -1091,10 +1091,10 @@ export class DataLoader implements IAtomicService {
   onDemandItemSearchBody({ queryString }: { queryString: string }): string {
     return JSON.stringify({
       request: {
-        take: SEARCH_LOAD_PAGE_SIZE,
+        take: store.state.search.searchResultPageSize,
         skip: 0,
         page: 1,
-        pageSize: SEARCH_LOAD_PAGE_SIZE,
+        pageSize: store.state.search.searchResultPageSize,
         filter: {
           logic: "or",
           filters: [
@@ -1110,10 +1110,10 @@ export class DataLoader implements IAtomicService {
   onDemandStrainSearchBody({ queryString }: { queryString: string }): string {
     return JSON.stringify({
       request: {
-        take: SEARCH_LOAD_PAGE_SIZE,
+        take: store.state.search.searchResultPageSize,
         skip: 0,
         page: 1,
-        pageSize: SEARCH_LOAD_PAGE_SIZE,
+        pageSize: store.state.search.searchResultPageSize,
         filter: {
           logic: "or",
           filters: [{ field: "Name", operator: "contains", value: queryString }],
@@ -1353,10 +1353,10 @@ export class DataLoader implements IAtomicService {
   onDemandPackageSearchBody({ queryString }: { queryString: string }): string {
     return JSON.stringify({
       request: {
-        take: SEARCH_LOAD_PAGE_SIZE,
+        take: store.state.search.searchResultPageSize ?? DEFAULT_SEARCH_LOAD_PAGE_SIZE,
         skip: 0,
         page: 1,
-        pageSize: SEARCH_LOAD_PAGE_SIZE,
+        pageSize: store.state.search.searchResultPageSize,
         filter: {
           logic: "or",
           filters: [
@@ -1379,10 +1379,10 @@ export class DataLoader implements IAtomicService {
   onDemandDestinationPackageSearchBody({ queryString }: { queryString: string }): string {
     return JSON.stringify({
       request: {
-        take: SEARCH_LOAD_PAGE_SIZE,
+        take: store.state.search.searchResultPageSize,
         skip: 0,
         page: 1,
-        pageSize: SEARCH_LOAD_PAGE_SIZE,
+        pageSize: store.state.search.searchResultPageSize,
         filter: {
           logic: "or",
           filters: [

@@ -389,7 +389,7 @@ export enum BackgroundTaskState {
 }
 
 const DATA_LOAD_MAX_PAGES: number = 1;
-export const SEARCH_LOAD_PAGE_SIZE: number = 10;
+export const DEFAULT_SEARCH_LOAD_PAGE_SIZE: number = 100;
 export const DATA_LOAD_PAGE_SIZE: number = 5000;
 export const DATA_LOAD_MAX_COUNT: number = DATA_LOAD_PAGE_SIZE * DATA_LOAD_MAX_PAGES;
 export const DATA_LOAD_MAX_ITERATION_FAILSAFE: number = 100;

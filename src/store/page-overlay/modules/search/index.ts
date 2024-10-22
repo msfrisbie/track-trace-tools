@@ -70,6 +70,7 @@ const inMemoryState = {
 const persistedState = {
   queryStringHistory: [],
   searchResultMetrcGridGroups: ALL_METRC_GROUPS,
+  searchResultPageSize: 100,
 };
 
 const defaultState: ISearchState = {
@@ -98,8 +99,6 @@ export const searchModule = {
         (a, b) => b.score - a.score
       );
 
-      console.log(state.searchResults.map((x) => x.score));
-
       // Check if searchResults is empty after the sort
       if (state.searchResults.length === 0) {
         state.activeSearchResult = null;
@@ -109,18 +108,12 @@ export const searchModule = {
       // Get the highest score result (the first element after sorting)
       const highestScoreSearchResult: ISearchResult = state.searchResults[0];
 
-      console.log(`new score candidate: ${highestScoreSearchResult.score}`);
-
       // Update activeSearchResult only if there is no active, or candidate has an equal or higher
       if (
         !state.activeSearchResult ||
         state.activeSearchResult.score <= highestScoreSearchResult.score
       ) {
         state.activeSearchResult = highestScoreSearchResult;
-      } else {
-        console.log(
-          `Rejecting ${highestScoreSearchResult.score} for ${state.activeSearchResult?.score}`
-        );
       }
     },
   },
@@ -138,7 +131,7 @@ export const searchModule = {
     ) {
       ctx.commit(SearchMutations.SEARCH_MUTATION, { queryString });
 
-      ctx.dispatch(SearchActions.EXECUTE_QUERY, { queryString });
+      ctx.dispatch(SearchActions.EXECUTE_QUERY, {});
     },
     [SearchActions.SET_SHOW_SEARCH_RESULTS](
       ctx: ActionContext<ISearchState, IPluginState>,
@@ -187,9 +180,21 @@ export const searchModule = {
         searchResultMetrcGridGroups,
       });
 
-      ctx.dispatch(SearchActions.EXECUTE_QUERY, {
-        queryString: ctx.state.queryString,
+      ctx.dispatch(SearchActions.EXECUTE_QUERY, {});
+    },
+    [SearchActions.UPDATE_SEARCH_RESULT_PAGE_SIZE]: async (
+      ctx: ActionContext<ISearchState, IPluginState>,
+      {
+        searchResultPageSize,
+      }: {
+        searchResultPageSize: number;
+      }
+    ) => {
+      ctx.commit(SearchMutations.SEARCH_MUTATION, {
+        searchResultPageSize,
       });
+
+      ctx.dispatch(SearchActions.EXECUTE_QUERY, {});
     },
     [SearchActions.SET_ACTIVE_METRC_GRID_ID]: async (
       ctx: ActionContext<ISearchState, IPluginState>,
@@ -213,11 +218,8 @@ export const searchModule = {
       ctx.commit(SearchMutations.SEARCH_MUTATION, { activeUniqueMetrcGridId });
     },
     [SearchActions.EXECUTE_QUERY]: _.debounce(
-      async (
-        ctx: ActionContext<ISearchState, IPluginState>,
-        { queryString }: { queryString: string }
-      ) => {
-        console.log("EXECUTE SEARCH", { queryString });
+      async (ctx: ActionContext<ISearchState, IPluginState>, data: any) => {
+        const queryString = ctx.state.queryString;
 
         if (!queryString.length) {
           ctx.commit(SearchMutations.SEARCH_MUTATION, {
@@ -442,7 +444,6 @@ export const searchModule = {
               );
 
               if (ctx.state.queryId !== queryId) {
-                console.log("Stale results, exiting");
                 return;
               }
 

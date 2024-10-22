@@ -83,6 +83,7 @@ export interface ISearchState {
   activeSearchResult: ISearchResult | null;
   searchResultMetrcGridGroups: MetrcGroup[];
   queryId: string;
+  searchResultPageSize: number;
 
   // Metrc page mirror data
   activeUniqueMetrcGridId: UniqueMetrcGridId | null;
