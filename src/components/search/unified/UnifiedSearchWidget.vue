@@ -42,26 +42,35 @@
             <div v-if="searchState.showSearchResults" class="relative">
               <div class="search-bar flex absolute w-full flex-col bg-white rounded-b-md" style="height: 85vh">
                 <div class="flex-grow overflow-y-auto">
-                  <div class="hide-scrollbar grid grid-rows-3 grid-cols-2 gap-2 h-full min-h-screen"
+                  <div class="hide-scrollbar grid grid-rows-3 grid-cols-2 h-full min-h-screen"
                     style="grid-template-columns: 36rem 1fr; grid-template-rows: min-content auto 1fr">
                     <template v-if="searchState.queryString.length > 0">
-                      <div class="col-span-2 flex flex-row items-center space-x-2 py-2 px-4 border-purple-300 border-b">
-                        <template v-if="searchState.status === SearchStatus.INFLIGHT">
-                          <b-spinner class="ttt-purple mr-2" />
-                        </template>
+                      <div class="col-span-2 flex flex-col items-stretch">
+                        <div class="flex flex-row items-center space-x-2 py-2 px-4 border-purple-300 border-b">
+                          <template v-if="searchState.status === SearchStatus.INFLIGHT">
+                            <b-spinner class="ttt-purple mr-2" />
+                          </template>
 
-                        <p class="text-lg text-gray-600">
-                          <span class="font-semibold text-purple-600">{{ searchState.searchResults.length }}</span>
-                          results for <span class="font-semibold text-gray-900">{{
-                            searchState.queryString }}</span>
-                        </p>
+                          <p class="text-lg text-gray-600">
+                            <span class="font-semibold text-purple-600">{{ searchState.searchResults.length }}</span>
+                            results for <span class="font-semibold text-gray-900">{{
+                              searchState.queryString }}</span>
+                          </p>
 
-                        <search-control-panel class="pt-2"></search-control-panel>
+                          <search-control-panel
+                            :class="{ 'pt-2': true, 'bg-red-300': highlightControlPanel }"></search-control-panel>
 
-                        <div class="flex-grow"></div>
+                          <div class="flex-grow"></div>
+                        </div>
                       </div>
 
                       <div class="flex flex-col overflow-y-auto bg-gray-50 min-h-screen">
+
+                        <div class="text-center text-sm px-4 py-1">Not finding what you need? <b-button size="sm"
+                            variant="link" class="underline font-bold" @click="enableHighlightControlPanel()">Adjust
+                            your search filters</b-button>
+                        </div>
+
                         <search-result-preview v-for="(searchResult, idx) in searchState.searchResults" v-bind:key="idx"
                           :searchResult="searchResult"></search-result-preview>
 
@@ -161,6 +170,7 @@ export default Vue.extend({
       showInlineControlPanel: false,
       SearchType,
       SearchStatus,
+      highlightControlPanel: false
     };
   },
   methods: {
@@ -174,6 +184,13 @@ export default Vue.extend({
         this.$refs.search.focus();
       }, 100);
     },
+    enableHighlightControlPanel() {
+      this.$data.highlightControlPanel = true;
+
+      setTimeout(() => {
+        this.$data.highlightControlPanel = false;
+      }, 1000);
+    }
   },
   watch: {
     "searchState.showSearchResults": {

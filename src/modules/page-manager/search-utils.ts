@@ -19,6 +19,7 @@ import {
 } from "@/store/page-overlay/modules/search/interfaces";
 import _ from "lodash-es";
 import { pageManager } from "./page-manager.module";
+import { uniqueMetrcGridIdFromNativeMetrcGridIdAndPathnameOrNull } from "./utils";
 
 const T3_METRC_GRID_ID_ATTRIBUTE = `t3-grid-id`;
 const T3_SEARCH_FILTER_ATTRIBUTE = `t3-search-filter`;
@@ -512,15 +513,10 @@ export function getActiveUniqueMetrcGridIdOrNull(): UniqueMetrcGridId | null {
     return null;
   }
 
-  for (const [uniqueMetrcGridId, metadata] of Object.entries(METRC_GRID_METADATA)) {
-    if (metadata.nativeMetrcGridId === activeNativeMetrcGridId) {
-      return uniqueMetrcGridId as UniqueMetrcGridId;
-    }
-  }
-
-  console.error("Unmatched grid ID");
-
-  return null;
+  return uniqueMetrcGridIdFromNativeMetrcGridIdAndPathnameOrNull(
+    activeNativeMetrcGridId,
+    window.location.pathname
+  );
 }
 
 export function getAllUniqueMetrcGridIds(): UniqueMetrcGridId[] {
@@ -544,18 +540,17 @@ export function getAllUniqueMetrcGridIds(): UniqueMetrcGridId[] {
       continue;
     }
 
-    let matched = false;
-    for (const [uniqueMetrcGridId, metadata] of Object.entries(METRC_GRID_METADATA)) {
-      if (metadata.nativeMetrcGridId === nativeMetrcGridId) {
-        uniqueMetrcGridIds.push(uniqueMetrcGridId as UniqueMetrcGridId);
-        matched = true;
-        break;
-      }
+    const match = uniqueMetrcGridIdFromNativeMetrcGridIdAndPathnameOrNull(
+      nativeMetrcGridId,
+      window.location.pathname
+    );
+
+    if (match) {
+      uniqueMetrcGridIds.push(match);
+      continue;
     }
 
-    if (!matched) {
-      console.error(`Bad Metrc Grid Id: ${nativeMetrcGridId}`);
-    }
+    console.error(`Bad Metrc Grid Id: ${nativeMetrcGridId}`);
   }
 
   return uniqueMetrcGridIds;
@@ -621,13 +616,11 @@ export async function initializeFilterButtons() {
         continue;
       }
 
-      let uniqueMetrcGridId: UniqueMetrcGridId | null = null;
-      for (const [currentUniqueMetrcGridId, metadata] of Object.entries(METRC_GRID_METADATA)) {
-        if (metadata.nativeMetrcGridId === nativeMetrcGridId) {
-          uniqueMetrcGridId = currentUniqueMetrcGridId as UniqueMetrcGridId;
-          break;
-        }
-      }
+      const uniqueMetrcGridId: UniqueMetrcGridId | null =
+        uniqueMetrcGridIdFromNativeMetrcGridIdAndPathnameOrNull(
+          nativeMetrcGridId as NativeMetrcGridId,
+          window.location.pathname
+        );
 
       if (!uniqueMetrcGridId) {
         console.error(`Bad native ID: ${nativeMetrcGridId}`);

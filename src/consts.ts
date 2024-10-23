@@ -675,6 +675,21 @@ export const METRC_PAGE_METADATA: {
   [MetrcPageId.PACKAGES]: {
     pathPartial: "/packages",
   },
+  [MetrcPageId.PLANTS]: {
+    pathPartial: "/plants",
+  },
+  [MetrcPageId.TRANSFERS]: {
+    pathPartial: "/transfers/licensed",
+  },
+  [MetrcPageId.SALES_RECEIPTS]: {
+    pathPartial: "/sales/receipts",
+  },
+  [MetrcPageId.ITEMS]: {
+    pathPartial: "/admin/items",
+  },
+  [MetrcPageId.STRAINS]: {
+    pathPartial: "/admin/strains",
+  },
 };
 
 export const METRC_GRID_METADATA: {
