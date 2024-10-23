@@ -30,6 +30,10 @@ export default Vue.extend({
   router,
   props: {
     jsonObject: Object as () => Object,
+    ignoreKeys: {
+      type: Array,
+      default: () => []
+    }
   },
   components: {},
   computed: {
@@ -58,6 +62,7 @@ export default Vue.extend({
 
       return pairs
         .filter(([k, v]) => this.$data.showEmptyValues || (v !== null && v !== ''))
+        .filter(([k, v]) => !this.$props.ignoreKeys.includes(k))
         .map(([k, v]) => [
           k
             .replace(/([A-Z])/g, ' $1')

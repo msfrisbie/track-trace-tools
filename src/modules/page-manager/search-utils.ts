@@ -539,6 +539,11 @@ export function getAllUniqueMetrcGridIds(): UniqueMetrcGridId[] {
   const uniqueMetrcGridIds: UniqueMetrcGridId[] = [];
 
   for (const nativeMetrcGridId of nativeMetrcGridIds) {
+    if (nativeMetrcGridId.startsWith(".js-")) {
+      // This is a nested grid, ignore
+      continue;
+    }
+
     let matched = false;
     for (const [uniqueMetrcGridId, metadata] of Object.entries(METRC_GRID_METADATA)) {
       if (metadata.nativeMetrcGridId === nativeMetrcGridId) {
@@ -547,6 +552,7 @@ export function getAllUniqueMetrcGridIds(): UniqueMetrcGridId[] {
         break;
       }
     }
+
     if (!matched) {
       console.error(`Bad Metrc Grid Id: ${nativeMetrcGridId}`);
     }

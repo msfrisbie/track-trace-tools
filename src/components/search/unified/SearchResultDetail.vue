@@ -25,7 +25,7 @@
               </template>
             </div>
 
-            <span class="text-xl">
+            <span class="text-xl text-center">
               {{ searchState.activeSearchResult.secondaryTextualIdentifier }}
             </span>
 
@@ -67,7 +67,8 @@
 
       <!-- JSON Table -->
       <recursive-json-table
-        :jsonObject="searchResultTransferOrNull || searchResultPackageOrNull || searchResultPlantOrNull || searchResultTagOrNull || searchResultHarvestOrNull || searchResultPlantBatchOrNull || searchResultSalesReceiptOrNull || searchResultItemOrNull || searchResultStrainOrNull" />
+        :jsonObject="searchResultTransferOrNull || searchResultPackageOrNull || searchResultPlantOrNull || searchResultTagOrNull || searchResultHarvestOrNull || searchResultPlantBatchOrNull || searchResultSalesReceiptOrNull || searchResultItemOrNull || searchResultStrainOrNull"
+        :ignoreKeys="['history', 'testResults', 'TagMatcher']" />
 
     </div>
   </div>
