@@ -70,6 +70,7 @@ const persistedState: ISettingsState = {
   useLegacyDateFormatForSubmit: false,
   writeSettingsToChromeStorage: false,
   enableSameItemPatch: false,
+  enableLegacyTransferTools: false,
   loadDataInParallel: true,
   usePersistedCache: false,
   persistTimestamp: 0,

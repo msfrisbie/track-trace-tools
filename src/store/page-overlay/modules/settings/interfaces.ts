@@ -61,6 +61,7 @@ export interface ISettingsState {
   useLegacyDateFormatForSubmit: boolean;
   writeSettingsToChromeStorage: boolean;
   enableSameItemPatch: boolean;
+  enableLegacyTransferTools: boolean;
   loadDataInParallel: boolean;
   usePersistedCache: boolean;
   persistTimestamp: number;

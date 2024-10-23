@@ -233,7 +233,7 @@ export default Vue.extend({
           route: "/transfer/transfer-builder",
           icon: "truck-loading",
           enabled: store.state.client.values.ENABLE_T3PLUS || store.state.client.t3plus,
-          visible: false,
+          visible: store.state.settings.enableLegacyTransferTools,
           isBeta: false,
           isNew: false,
           isPlus: true,
