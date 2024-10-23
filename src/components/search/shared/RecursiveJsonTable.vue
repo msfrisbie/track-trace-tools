@@ -38,11 +38,14 @@ export default Vue.extend({
   components: {},
   computed: {
     formattedTablePairs(): [string, any][] {
-      function flattenObject(obj: Object) {
+      const flattenObject = (obj: Object) => {
         const result = {};
 
-        function recurse(current: any, path = '') {
+        const recurse = (current: any, path = '') => {
           for (const key in current) { /* eslint-disable-line guard-for-in */
+            if (this.$props.ignoreKeys.includes(key)) {
+              continue;
+            }
             const newPath = path ? `${path}${key}` : key;
             if (typeof current[key] === 'object') {
               recurse(current[key], newPath);
@@ -51,18 +54,17 @@ export default Vue.extend({
               result[newPath] = current[key];
             }
           }
-        }
+        };
 
         recurse(obj);
 
         return result;
-      }
+      };
 
       const pairs = Object.entries(flattenObject(this.$props.jsonObject)) as [string, any][];
 
       return pairs
         .filter(([k, v]) => this.$data.showEmptyValues || (v !== null && v !== ''))
-        .filter(([k, v]) => !this.$props.ignoreKeys.includes(k))
         .map(([k, v]) => [
           k
             .replace(/([A-Z])/g, ' $1')
