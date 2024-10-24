@@ -25,18 +25,11 @@
           <b-input-group>
             <b-form-select size="md" v-model="filterDateField" :options="filterDateFieldOptions" />
             <b-form-select size="md" v-model="filterDateMatch" :options="filterDateMatchOptions" />
-            <b-form-datepicker
-              button-only
-              label-no-date-selected=""
-              size="md"
-              v-model="filterDate"
-            />
+            <b-form-datepicker button-only label-no-date-selected="" size="md" v-model="filterDate" />
           </b-input-group>
         </b-form-group>
 
-        <span class="text-center text-purple-500 underline cursor-pointer" @click="clear()"
-          >RESET</span
-        >
+        <span class="text-center text-purple-500 underline cursor-pointer" @click="clear()">RESET</span>
 
         <template v-if="selectedPlants.length >= maxPlantCount">
           <div class="font-bold text-red-700 text-center">Plant Maximum Reached</div>
@@ -46,19 +39,12 @@
         </template>
 
         <div class="flex flex-col items-center text-center space-y-4">
-          <error-readout
-            v-if="error || inflight"
-            :inflight="inflight"
-            :error="error"
-            loadingMessage="Loading plants..."
+          <error-readout v-if="error || inflight" :inflight="inflight" :error="error" loadingMessage="Loading plants..."
             errorMessage="Unable to load plants."
             permissionsErrorMessage="Check that your employee account has full 'Veg/Flower Plants' permissions."
-            v-on:retry="loadPlants()"
-          />
+            v-on:retry="loadPlants()" />
 
-          <template
-            v-if="!inflight && !sourcePlants.length && (!location || !strain || filterDate)"
-          >
+          <template v-if="!inflight && !sourcePlants.length && (!location || !strain || filterDate)">
             <span>0 matching plants.</span>
           </template>
         </div>
@@ -68,94 +54,53 @@
     <!-- Selected tags -->
     <div class="flex flex-col items-center space-y-4 p-4">
       <template v-if="sourcePlants.length > 0">
-        <b-dropdown
-          style="width: 420px"
-          :text="selectedMenuItem.toUpperCase()"
-          variant="outline-primary"
-          class="w-full"
-          menu-class="w-100 pt-0 pb-0"
-          block
-          rounded
-        >
-          <b-dropdown-item
-            :active="selectedMenuItem === selectedMenuState.SELECTION"
-            @click="selectedMenuItem = selectedMenuState.SELECTION"
-          >
+        <b-dropdown style="width: 420px" :text="selectedMenuItem.toUpperCase()" variant="outline-primary" class="w-full"
+          menu-class="w-100 pt-0 pb-0" block rounded>
+          <b-dropdown-item :active="selectedMenuItem === selectedMenuState.SELECTION"
+            @click="selectedMenuItem = selectedMenuState.SELECTION">
             <div class="pt-2 pb-2">{{ selectedMenuState.SELECTION }}</div>
           </b-dropdown-item>
           <div class="border-b border-solid border-inherit"></div>
-          <b-dropdown-item
-            :active="selectedMenuItem === selectedMenuState.PASTED_TAGS"
-            @click="selectedMenuItem = selectedMenuState.PASTED_TAGS"
-          >
+          <b-dropdown-item :active="selectedMenuItem === selectedMenuState.PASTED_TAGS"
+            @click="selectedMenuItem = selectedMenuState.PASTED_TAGS">
             <div class="pt-2 pb-2">{{ selectedMenuState.PASTED_TAGS }}</div>
           </b-dropdown-item>
         </b-dropdown>
 
         <template v-if="selectedMenuItem === selectedMenuState.SELECTION">
-          <div
-            style="width: 420px"
-            class="toolkit-scroll flex flex-col items-center h-4/6 overflow-y-auto p-1"
-          >
+          <div style="width: 420px" class="toolkit-scroll flex flex-col items-center h-4/6 overflow-y-auto p-1">
             <div class="w-full flex flex-col flex-grow items-center space-y-2">
               <div
                 class="w-full hover-reveal-target flex flex-row items-center justify-between space-x-8 text-lg plant-list-item"
-                v-for="(plant, index) in plantsPage"
-                :key="plant.Label"
-              >
+                v-for="(plant, index) in plantsPage" :key="plant.Label">
                 <div class="flex flex-col flex-grow space-y-2">
                   <template v-if="pageOffset + index > 0">
                     <div class="grid grid-cols-2 gap-2 mb-2">
-                      <b-button
-                        variant="outline-success"
-                        class="hover-reveal"
-                        size="sm"
-                        @click="addBefore(pageOffset + index)"
-                        >CHECK {{ pageOffset + index }} BEFORE</b-button
-                      >
+                      <b-button variant="outline-success" class="hover-reveal" size="sm"
+                        @click="addBefore(pageOffset + index)">CHECK {{ pageOffset + index }} BEFORE</b-button>
 
-                      <b-button
-                        variant="outline-danger"
-                        class="hover-reveal"
-                        size="sm"
-                        @click="removeBefore(pageOffset + index)"
-                        >UNCHECK {{ pageOffset + index }} BEFORE</b-button
-                      >
+                      <b-button variant="outline-danger" class="hover-reveal" size="sm"
+                        @click="removeBefore(pageOffset + index)">UNCHECK {{ pageOffset + index }} BEFORE</b-button>
                     </div>
                   </template>
 
-                  <b-form-checkbox
-                    class="hover:bg-purple-50"
-                    size="md"
-                    v-model="selectedPlantsMirror"
-                    :value="plant"
-                  >
+                  <b-form-checkbox class="hover:bg-purple-50" size="md" v-model="selectedPlantsMirror" :value="plant">
                     <picker-card :title="plant.StrainName" :label="plant.Label" />
                   </b-form-checkbox>
 
                   <template v-if="sourcePlants.length - (pageOffset + index) - 1 > 0">
                     <div class="grid grid-cols-2 gap-2 mt-2">
-                      <b-button
-                        variant="outline-success"
-                        class="hover-reveal"
-                        size="sm"
-                        @click="addAfter(pageOffset + index)"
-                      >
+                      <b-button variant="outline-success" class="hover-reveal" size="sm"
+                        @click="addAfter(pageOffset + index)">
                         CHECK
                         {{ sourcePlants.length - (pageOffset + index) - 1 }}
-                        AFTER</b-button
-                      >
+                        AFTER</b-button>
 
-                      <b-button
-                        variant="outline-danger"
-                        class="hover-reveal"
-                        size="sm"
-                        @click="removeAfter(pageOffset + index)"
-                      >
+                      <b-button variant="outline-danger" class="hover-reveal" size="sm"
+                        @click="removeAfter(pageOffset + index)">
                         UNCHECK
                         {{ sourcePlants.length - (pageOffset + index) - 1 }}
-                        AFTER</b-button
-                      >
+                        AFTER</b-button>
                     </div>
                   </template>
                 </div>
@@ -164,35 +109,26 @@
           </div>
         </template>
 
-        <paste-tags
-          v-if="selectedMenuItem === selectedMenuState.PASTED_TAGS"
-          :sourceLabels="sourcePlants.map((x) => x.Label)"
-          :tags.sync="pastedTags"
-          ref="pasteTags"
-        >
+        <paste-tags v-if="selectedMenuItem === selectedMenuState.PASTED_TAGS"
+          :sourceLabels="sourcePlants.map((x) => x.Label)" :tags.sync="pastedTags" ref="pasteTags">
         </paste-tags>
       </template>
 
       <template v-if="selectedMenuItem === selectedMenuState.SELECTION">
         <template v-if="sourcePlants.length > plantsPageSize">
           <div class="flex flex-row justify-between items-center" style="width: 420px">
-            <b-button :disabled="!hasPrevPage" variant="outline-info" @click="plantsPageIndex -= 1"
-              >&lt;</b-button
-            >
+            <b-button :disabled="!hasPrevPage" variant="outline-info" @click="plantsPageIndex -= 1">&lt;</b-button>
 
             <span>{{ plantsPageIndex + 1 }} of {{ pages }}</span>
 
-            <b-button :disabled="!hasNextPage" variant="outline-info" @click="plantsPageIndex += 1"
-              >&gt;</b-button
-            >
+            <b-button :disabled="!hasNextPage" variant="outline-info" @click="plantsPageIndex += 1">&gt;</b-button>
           </div>
         </template>
       </template>
 
       <div class="flex flex-row items-center justify-center space-x-6">
-        <span class="text-center text-xl font-bold"
-          ><animated-number :number="selectedPlants.length" /> plants selected</span
-        >
+        <span class="text-center text-xl font-bold"><animated-number :number="selectedPlants.length" /> plants
+          selected</span>
 
         <template v-if="selectedPlants.length > 0">
           <span class="text-purple-500 underline cursor-pointer" @click="clear()">CLEAR</span>
@@ -373,13 +309,13 @@ export default Vue.extend({
         const plants =
           this.$data.growthPhase === "Vegetative"
             ? await primaryDataLoader.vegetativePlants({
-                filter,
-                maxCount: DATA_LOAD_MAX_COUNT,
-              })
+              filter,
+              maxCount: DATA_LOAD_MAX_COUNT,
+            })
             : await primaryDataLoader.floweringPlants({
-                filter,
-                maxCount: DATA_LOAD_MAX_COUNT,
-              });
+              filter,
+              maxCount: DATA_LOAD_MAX_COUNT,
+            });
 
         // If there was a subsequent load, don't overwrite
         if (this.$data.lockUuid === lock) {
@@ -529,7 +465,7 @@ export default Vue.extend({
       },
     },
   },
-  async mounted() {},
+  async mounted() { },
   async created() {
     await authManager.authStateOrError();
 

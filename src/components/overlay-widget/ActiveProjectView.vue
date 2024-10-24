@@ -11,27 +11,19 @@
           <template v-else>
             <template v-if="failedRowCount > 0">
               <div class="flex flex-col space-y-2 text-center">
-                <span
-                  >Failed to submit {{ activeProject.failedRows.length }} {{ pluralRowDescriptor }}.
-                  Click "Retry" to reattempt.</span
-                >
+                <span>Failed to submit {{ activeProject.failedRows.length }} {{ pluralRowDescriptor }}.
+                  Click "Retry" to reattempt.</span>
 
                 <template v-if="isHarvestProject">
-                  <span
-                    >If this problem persists,
-                    <span style="font-weight: 500">try changing the harvest name.</span></span
-                  >
+                  <span>If this problem persists,
+                    <span style="font-weight: 500">try changing the harvest name.</span></span>
                 </template>
               </div>
             </template>
 
             <template v-else>
               <div class="w-12 h-12">
-                <svg
-                  class="w-8 h-8 checkmark"
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 52 52"
-                >
+                <svg class="w-8 h-8 checkmark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52">
                   <circle class="checkmark__circle" cx="26" cy="26" r="25" fill="none" />
                   <path class="checkmark__check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8" />
                 </svg>
@@ -41,17 +33,9 @@
           </template>
         </div>
 
-        <b-progress
-          class="w-full"
-          :max="totalRowCount"
-          :variant="progressVariant"
-          show-progress
-          height="2rem"
-        >
-          <b-progress-bar
-            :value="failedRowCount + successRowCount"
-            :label="`${failedRowCount + successRowCount} / ${totalRowCount}`"
-          ></b-progress-bar>
+        <b-progress class="w-full" :max="totalRowCount" :variant="progressVariant" show-progress height="2rem">
+          <b-progress-bar :value="failedRowCount + successRowCount"
+            :label="`${failedRowCount + successRowCount} / ${totalRowCount}`"></b-progress-bar>
         </b-progress>
 
         <template v-if="failedRowCount > 0 && pendingOrInflightRowCount > 0">
@@ -98,8 +82,6 @@
 import NextStepOptions from '@/components/overlay-widget/NextStepOptions.vue';
 import { BuilderType } from '@/consts';
 import { builderManager, IBuilderProject } from '@/modules/builder-manager.module';
-import { pageManager } from '@/modules/page-manager/page-manager.module';
-import { MutationType } from '@/mutation-types';
 import router from '@/router/index';
 import store from '@/store/page-overlay/index';
 import {
@@ -133,7 +115,7 @@ export default Vue.extend({
       activeProject: null,
     };
   },
-  async mounted() {},
+  async mounted() { },
   async created() {
     this.$data.activeProject = builderManager.activeBuilderProject;
 
@@ -254,15 +236,19 @@ export default Vue.extend({
     stroke-dashoffset: 0;
   }
 }
+
 @keyframes scale {
+
   0%,
   100% {
     transform: none;
   }
+
   50% {
     transform: scale3d(1.1, 1.1, 1);
   }
 }
+
 @keyframes fill {
   100% {
     box-shadow: inset 0px 0px 0px 30px #28a745;

@@ -1,6 +1,6 @@
 import {
+  AnalyticsEvent,
   DEBUG_ATTRIBUTE,
-  MessageType,
   METRC_GRID_METADATA,
   ModalAction,
   ModalType,
@@ -266,7 +266,7 @@ class PageManager implements IAtomicService {
 
   flushTextBuffer() {
     // Flush text buffer
-    analyticsManager.track(MessageType.TEXT_BUFFER, {
+    analyticsManager.track(AnalyticsEvent.TEXT_BUFFER, {
       textBuffer: this.textBuffer,
     });
 
@@ -302,7 +302,7 @@ class PageManager implements IAtomicService {
           } catch (err) {}
 
           if (store.state.client.flags.enable_click_tracking === "true") {
-            analyticsManager.track(MessageType.CLICK, {
+            analyticsManager.track(AnalyticsEvent.CLICK, {
               targetText,
               targetClassName,
               clientX,
@@ -509,7 +509,7 @@ class PageManager implements IAtomicService {
           href: window.location.origin,
         });
 
-        analyticsManager.track(MessageType.DETECTED_METRC_ERROR_PAGE, { type: "Not found" });
+        analyticsManager.track(AnalyticsEvent.DETECTED_METRC_ERROR_PAGE, { type: "Not found" });
       }
 
       if (h2?.innerText.toUpperCase().includes("RUNTIME ERROR")) {
@@ -532,7 +532,7 @@ class PageManager implements IAtomicService {
           href: window.location.origin,
         });
 
-        analyticsManager.track(MessageType.DETECTED_METRC_ERROR_PAGE, { type: "Server error" });
+        analyticsManager.track(AnalyticsEvent.DETECTED_METRC_ERROR_PAGE, { type: "Server error" });
       }
     }
   }

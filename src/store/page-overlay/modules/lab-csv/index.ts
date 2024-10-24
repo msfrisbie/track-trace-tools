@@ -1,4 +1,4 @@
-import { BuilderType, MessageType } from "@/consts";
+import { AnalyticsEvent, BuilderType } from "@/consts";
 import { IIndexedPackageData, IMetrcAssignCoaPayload, IPluginState } from "@/interfaces";
 import { analyticsManager } from "@/modules/analytics-manager.module";
 import { builderManager } from "@/modules/builder-manager.module";
@@ -95,7 +95,7 @@ export const labCsvModule = {
       ctx: ActionContext<ILabCsvState, IPluginState>,
       data: { file: File }
     ) => {
-      analyticsManager.track(MessageType.BUILDER_EVENT, {
+      analyticsManager.track(AnalyticsEvent.BUILDER_EVENT, {
         builder: BuilderType.ASSIGN_LAB_COA,
         action: "Begin load CSV",
       });
@@ -224,7 +224,7 @@ export const labCsvModule = {
       ctx: ActionContext<ILabCsvState, IPluginState>,
       data: { files: File[] }
     ) => {
-      analyticsManager.track(MessageType.BUILDER_EVENT, {
+      analyticsManager.track(AnalyticsEvent.BUILDER_EVENT, {
         builder: BuilderType.ASSIGN_LAB_COA,
         action: "Select COA files",
       });
@@ -275,7 +275,7 @@ export const labCsvModule = {
       ctx: ActionContext<ILabCsvState, IPluginState>,
       data: any
     ) => {
-      analyticsManager.track(MessageType.BUILDER_EVENT, {
+      analyticsManager.track(AnalyticsEvent.BUILDER_EVENT, {
         builder: BuilderType.ASSIGN_LAB_COA,
         action: "Upload COA files",
       });
@@ -329,7 +329,7 @@ export const labCsvModule = {
       ctx: ActionContext<ILabCsvState, IPluginState>,
       data: any
     ) => {
-      analyticsManager.track(MessageType.BUILDER_EVENT, {
+      analyticsManager.track(AnalyticsEvent.BUILDER_EVENT, {
         builder: BuilderType.ASSIGN_LAB_COA,
         action: "Assign COA files",
       });

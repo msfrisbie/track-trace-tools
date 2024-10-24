@@ -8,7 +8,7 @@ import {
   PLANTS_TAB_REGEX,
   SALES_TAB_REGEX,
   TAG_TAB_REGEX,
-  TRANSFER_TAB_REGEX
+  TRANSFER_TAB_REGEX,
 } from "./consts";
 import { pageManager } from "./page-manager.module";
 

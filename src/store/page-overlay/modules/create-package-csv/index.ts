@@ -1,4 +1,4 @@
-import { BuilderType, MessageType, PackageState } from "@/consts";
+import { AnalyticsEvent, BuilderType, PackageState } from "@/consts";
 import {
   ICsvFile,
   IIndexedPackageData,
@@ -190,7 +190,7 @@ export const createPackageCsvModule = {
         statusMessages: [],
       });
 
-      analyticsManager.track(MessageType.BUILDER_EVENT, {
+      analyticsManager.track(AnalyticsEvent.BUILDER_EVENT, {
         builder: BuilderType.CSV_CREATE_PACKAGE,
         action: "Reset",
       });
@@ -201,7 +201,7 @@ export const createPackageCsvModule = {
         file: File;
       }
     ) => {
-      analyticsManager.track(MessageType.BUILDER_EVENT, {
+      analyticsManager.track(AnalyticsEvent.BUILDER_EVENT, {
         builder: BuilderType.CSV_CREATE_PACKAGE,
         action: "Begin import",
       });
@@ -252,7 +252,7 @@ export const createPackageCsvModule = {
       ctx: ActionContext<ICreatePackageCsvState, IPluginState>,
       data: {}
     ) => {
-      analyticsManager.track(MessageType.BUILDER_EVENT, {
+      analyticsManager.track(AnalyticsEvent.BUILDER_EVENT, {
         builder: BuilderType.CSV_CREATE_PACKAGE,
         action: "Parse CSV data",
       });

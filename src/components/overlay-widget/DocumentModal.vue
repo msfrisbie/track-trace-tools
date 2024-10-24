@@ -1,40 +1,20 @@
 <template>
   <!-- animation is breaking modal, disable -->
-  <b-modal
-    id="document-modal"
-    modal-class="ttt-modal"
-    content-class="ttt-content"
-    dialog-class="ttt-dialog"
-    body-class="document-body toolkit-scroll flex flex-column-shim flex-col items-center p-0"
-    size="xl"
-    :static="true"
-    no-fade
-    centered
-    hide-header
-    ref="document"
-    @hidden="handleClose()"
-  >
+  <b-modal id="document-modal" modal-class="ttt-modal" content-class="ttt-content" dialog-class="ttt-dialog"
+    body-class="document-body toolkit-scroll flex flex-column-shim flex-col items-center p-0" size="xl" :static="true"
+    no-fade centered hide-header ref="document" @hidden="handleClose()">
     <template #modal-footer>
       <div class="w-full grid grid-cols-3 place-items-center">
-        <div
-          class="flex flex-row justify-start items-center space-x-2 opacity-30"
-          style="place-self: center start"
-        >
+        <div class="flex flex-row justify-start items-center space-x-2 opacity-30" style="place-self: center start">
           <track-trace-tools-logo fill="#49276a" :inverted="true" />
 
-          <span class="sans-serif font-extralight tracking-widest text-3xl whitespace-nowrap"
-            >T3{{ suffix }}</span
-          >
+          <span class="sans-serif font-extralight tracking-widest text-3xl whitespace-nowrap">T3{{ suffix }}</span>
         </div>
 
         <template v-if="documentUrls.length > 1">
           <div class="flex flex-row justify-center items-center space-x-4">
-            <b-button
-              v-for="(documentUrl, index) of documentUrls"
-              :key="documentUrl"
-              variant="primary"
-              @click="showDocument(documentUrl)"
-            >
+            <b-button v-for="(documentUrl, index) of documentUrls" :key="documentUrl" variant="primary"
+              @click="showDocument(documentUrl)">
               {{ index + 1 }} OF {{ documentUrls.length }}
             </b-button>
           </div>
@@ -46,19 +26,13 @@
       <b-spinner style="color: #49276a" />
     </div>
 
-    <iframe
-      v-show="ready"
-      ref="iframe"
-      type="application/pdf"
-      :src="documentUrl"
-      class="doc-container w-full"
-    />
+    <iframe v-show="ready" ref="iframe" type="application/pdf" :src="documentUrl" class="doc-container w-full" />
   </b-modal>
 </template>
 
 <script lang="ts">
 import TrackTraceToolsLogo from "@/components/shared/TrackTraceToolsLogo.vue";
-import { MessageType } from "@/consts";
+import { AnalyticsEvent } from "@/consts";
 import { analyticsManager } from "@/modules/analytics-manager.module";
 import { toastManager } from "@/modules/toast-manager.module";
 import store from "@/store/page-overlay/index";
@@ -191,12 +165,12 @@ export default Vue.extend({
 
       this.$bvModal.show("document-modal");
 
-      analyticsManager.track(MessageType.VIEWED_DOCUMENTS, {
+      analyticsManager.track(AnalyticsEvent.VIEWED_DOCUMENTS, {
         documentUrls,
       });
     },
   },
-  async mounted() {},
+  async mounted() { },
 });
 </script>
 

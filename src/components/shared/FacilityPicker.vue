@@ -47,7 +47,7 @@
 </template>
 
 <script lang="ts">
-import { MessageType } from "@/consts";
+import { AnalyticsEvent } from "@/consts";
 import { IPageMetrcFacilityData } from "@/interfaces";
 import { analyticsManager } from "@/modules/analytics-manager.module";
 import { authManager } from "@/modules/auth-manager.module";
@@ -146,7 +146,7 @@ export default Vue.extend({
         return;
       }
 
-      analyticsManager.track(MessageType.CHANGED_FACILITY, {
+      analyticsManager.track(AnalyticsEvent.CHANGED_FACILITY, {
         newFacility,
       });
 
@@ -157,7 +157,7 @@ export default Vue.extend({
       window.open(facility?.link, "_blank"); // .blur();
       // window.focus();
 
-      analyticsManager.track(MessageType.FACILITY_PICKER_ENGAGEMENT, {
+      analyticsManager.track(AnalyticsEvent.FACILITY_PICKER_ENGAGEMENT, {
         action: "openInNewTab",
         value: facility.name,
       });
@@ -173,7 +173,7 @@ export default Vue.extend({
 
       copyToClipboard(license);
 
-      analyticsManager.track(MessageType.COPIED_TEXT, {
+      analyticsManager.track(AnalyticsEvent.COPIED_TEXT, {
         value: license,
       });
 
@@ -186,7 +186,7 @@ export default Vue.extend({
         solid: true,
       });
 
-      analyticsManager.track(MessageType.FACILITY_PICKER_ENGAGEMENT, {
+      analyticsManager.track(AnalyticsEvent.FACILITY_PICKER_ENGAGEMENT, {
         action: "copyToClipboard",
         value: license,
       });
@@ -210,7 +210,7 @@ export default Vue.extend({
         solid: true,
       });
 
-      analyticsManager.track(MessageType.FACILITY_PICKER_ENGAGEMENT, {
+      analyticsManager.track(AnalyticsEvent.FACILITY_PICKER_ENGAGEMENT, {
         action: "setHomeLicense",
         value: license,
       });
@@ -229,7 +229,7 @@ export default Vue.extend({
         solid: true,
       });
 
-      analyticsManager.track(MessageType.FACILITY_PICKER_ENGAGEMENT, {
+      analyticsManager.track(AnalyticsEvent.FACILITY_PICKER_ENGAGEMENT, {
         action: "setHomeLicense",
         value: null,
       });

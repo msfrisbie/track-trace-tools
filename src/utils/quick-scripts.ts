@@ -1,4 +1,4 @@
-import { MessageType } from "@/consts";
+import { AnalyticsEvent } from "@/consts";
 import { analyticsManager } from "@/modules/analytics-manager.module";
 import { authManager } from "@/modules/auth-manager.module";
 import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
@@ -27,7 +27,7 @@ export enum ColumnGroups {
 }
 
 export async function runQuickScript(quickScript: IQuickScript, childOption?: any) {
-  analyticsManager.track(MessageType.RAN_QUICK_SCRIPT, { scriptId: quickScript.id });
+  analyticsManager.track(AnalyticsEvent.RAN_QUICK_SCRIPT, { scriptId: quickScript.id });
 
   // Allow menu to collapse before running quick script
   await pageManager.clickSettleDelay();

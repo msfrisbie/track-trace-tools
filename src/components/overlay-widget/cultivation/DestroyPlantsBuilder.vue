@@ -1,23 +1,13 @@
 <template>
   <div class="w-full flex flex-col flex-grow space-y-4">
     <div class="w-full grid grid-cols-3 gap-4 auto-cols-fr">
-      <builder-step-header
-        v-for="(step, index) of steps"
-        :key="index"
-        :stepNumber="index + 1"
-        :stepText="step.stepText"
-        :active="index === activeStepIndex"
-        @click.stop.prevent.native="setActiveStepIndex(index)"
-      />
+      <builder-step-header v-for="(step, index) of steps" :key="index" :stepNumber="index + 1" :stepText="step.stepText"
+        :active="index === activeStepIndex" @click.stop.prevent.native="setActiveStepIndex(index)" />
     </div>
 
     <template v-if="activeStepIndex === 0">
       <div class="w-full flex flex-col space-y-4">
-        <plant-picker
-          :enableVegetative="true"
-          :builderType="builderType"
-          :selectedPlants.sync="selectedPlants"
-        />
+        <plant-picker :enableVegetative="true" :builderType="builderType" :selectedPlants.sync="selectedPlants" />
 
         <template v-if="selectedPlants.length > 0">
           <div class="w-full flex flex-row justify-end">
@@ -47,29 +37,19 @@
               </b-form-group>
 
               <b-form-group class="w-full" label="Destroy Date:" label-size="sm">
-                <b-form-datepicker
-                  initial-date
-                  v-model="destroyPlantsIsodate"
-                  :value="destroyPlantsIsodate"
-                  size="md"
-                />
+                <b-form-datepicker initial-date v-model="destroyPlantsIsodate" :value="destroyPlantsIsodate"
+                  size="md" />
               </b-form-group>
 
               <template v-if="showHiddenDetailFields">
-                <b-form-group
-                  class="w-full"
-                  label="Waste Material Mixed:"
-                  description="Leave this alone unless you are sure you need to change it"
-                  label-size="sm"
-                >
+                <b-form-group class="w-full" label="Waste Material Mixed:"
+                  description="Leave this alone unless you are sure you need to change it" label-size="sm">
                   <b-form-input size="md" v-model="wasteMaterialMixed"></b-form-input>
                 </b-form-group>
               </template>
 
               <template v-else>
-                <b-button class="opacity-40" variant="light" @click="showHiddenDetailFields = true"
-                  >ADVANCED</b-button
-                >
+                <b-button class="opacity-40" variant="light" @click="showHiddenDetailFields = true">ADVANCED</b-button>
               </template>
             </div>
           </div>
@@ -77,11 +57,8 @@
 
         <template v-if="showWeightEntry">
           <div class="flex flex-col items-center p-4 space-y-4">
-            <plant-weight-picker
-              :selectedPlants="selectedPlants"
-              :unitOfWeight.sync="unitOfWeight"
-              :plantWeights.sync="destroyedWeights"
-            />
+            <plant-weight-picker :selectedPlants="selectedPlants" :unitOfWeight.sync="unitOfWeight"
+              :plantWeights.sync="destroyedWeights" />
 
             <template v-if="!allPlantsHaveValidWeight">
               <p class="text-red-500">One or more plants is missing a weight value.</p>
@@ -106,9 +83,7 @@
             <div class="flex flex-col space-y-2 text-xl pt-6" style="width: 600px">
               <div>
                 Destroying
-                <span class="font-bold ttt-purple"
-                  >{{ totalDestroyedWeight }} {{ unitOfWeight.Name }}</span
-                >
+                <span class="font-bold ttt-purple">{{ totalDestroyedWeight }} {{ unitOfWeight.Name }}</span>
                 from
                 <span class="font-bold ttt-purple">{{ selectedPlants.length }}</span>
                 plants.
@@ -116,9 +91,7 @@
 
               <div>
                 Average per plant waste:
-                <span class="font-bold ttt-purple"
-                  >{{ averagePerPlantWaste }} {{ unitOfWeight.Name }}</span
-                >
+                <span class="font-bold ttt-purple">{{ averagePerPlantWaste }} {{ unitOfWeight.Name }}</span>
               </div>
 
               <div>
@@ -143,16 +116,13 @@
 
               <div style="height: 3rem"></div>
 
-              <b-button class="w-full" variant="success" size="md" @click="submit()"
-                >DESTROY {{ selectedPlants.length }} PLANTS</b-button
-              >
+              <b-button class="w-full" variant="success" size="md" @click="submit()">DESTROY {{ selectedPlants.length }}
+                PLANTS</b-button>
             </div>
 
             <div style="height: 6rem"></div>
 
-            <b-button class="opacity-40" variant="light" size="md" @click="downloadAll()"
-              >DOWNLOAD CSVs</b-button
-            >
+            <b-button class="opacity-40" variant="light" size="md" @click="downloadAll()">DOWNLOAD CSVs</b-button>
 
             <csv-breakout class="opacity-40 mt-4" :csvFiles="csvFiles" />
           </div>
@@ -178,24 +148,22 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue';
-import store from '@/store/page-overlay/index';
-import { mapState } from 'vuex';
 import BuilderStepHeader from '@/components/overlay-widget/shared/BuilderStepHeader.vue';
-import { normalDistribution } from '@/utils/math';
+import { ICsvFile, IMetrcDestroyPlantsPayload, IPlantData } from '@/interfaces';
+import store from '@/store/page-overlay/index';
 import { arrayIsValid } from '@/utils/array';
-import { IPlantData, ICsvFile, IMetrcDestroyPlantsPayload } from '@/interfaces';
-import { downloadCsvFile, buildCsvDataOrError, buildNamedCsvFileData } from '@/utils/csv';
+import { buildCsvDataOrError, buildNamedCsvFileData, downloadCsvFile } from '@/utils/csv';
+import Vue from 'vue';
 
-import { todayIsodate, submitDateFromIsodate } from '@/utils/date';
-import { analyticsManager } from '@/modules/analytics-manager.module';
-import { BuilderType, MessageType } from '@/consts';
-import { builderManager } from '@/modules/builder-manager.module';
+import CsvBreakout from '@/components/overlay-widget/shared/CsvBreakout.vue';
 import PlantPicker from '@/components/overlay-widget/shared/PlantPicker.vue';
 import PlantWeightPicker from '@/components/overlay-widget/shared/PlantWeightPicker.vue';
-import CsvBreakout from '@/components/overlay-widget/shared/CsvBreakout.vue';
-import { sum } from 'lodash-es';
+import { AnalyticsEvent, BuilderType } from '@/consts';
+import { analyticsManager } from '@/modules/analytics-manager.module';
+import { builderManager } from '@/modules/builder-manager.module';
 import { dynamicConstsManager } from '@/modules/dynamic-consts-manager.module';
+import { submitDateFromIsodate, todayIsodate } from '@/utils/date';
+import { sum } from 'lodash-es';
 
 export default Vue.extend({
   name: 'DestroyPlantsBuilder',
@@ -213,7 +181,7 @@ export default Vue.extend({
     setActiveStepIndex(index: number) {
       this.$data.activeStepIndex = index;
 
-      analyticsManager.track(MessageType.BUILDER_ENGAGEMENT, {
+      analyticsManager.track(AnalyticsEvent.BUILDER_ENGAGEMENT, {
         builder: this.$data.builderType,
         action: `Set active step to ${index}`,
       });
@@ -254,7 +222,7 @@ export default Vue.extend({
         await downloadCsvFile({ csvFile, delay: 500 });
       }
 
-      analyticsManager.track(MessageType.DOWNLOADED_CSVS, {
+      analyticsManager.track(AnalyticsEvent.DOWNLOADED_CSVS, {
         builderType: this.$data.builderType,
         csvData: {
           tagCount: this.$data.selectedPlants.length,
@@ -282,8 +250,7 @@ export default Vue.extend({
 
         return buildNamedCsvFileData(
           csvData,
-          `Waste ${sum(this.$data.destroyedWeights)} ${this.$data.unitOfWeight.Name} from ${
-            this.$data.selectedPlants.length
+          `Waste ${sum(this.$data.destroyedWeights)} ${this.$data.unitOfWeight.Name} from ${this.$data.selectedPlants.length
           } plants`,
         );
       } catch (e) {
@@ -433,7 +400,7 @@ export default Vue.extend({
     this.$data.wasteMethod = this.$data.wasteMethods[0];
     this.$data.wasteReason = this.$data.wasteReasons[0];
   },
-  async created() {},
+  async created() { },
   destroyed() {
     // Looks like modal is not actually destroyed
   },

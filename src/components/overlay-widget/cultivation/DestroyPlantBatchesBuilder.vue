@@ -1,22 +1,13 @@
 <template>
   <div class="w-full flex flex-col flex-grow space-y-4">
     <div class="w-full grid grid-cols-4 gap-4 auto-cols-fr">
-      <builder-step-header
-        v-for="(step, index) of steps"
-        :key="index"
-        :stepNumber="index + 1"
-        :stepText="step.stepText"
-        :active="index === activeStepIndex"
-        @click.stop.prevent.native="setActiveStepIndex(index)"
-      />
+      <builder-step-header v-for="(step, index) of steps" :key="index" :stepNumber="index + 1" :stepText="step.stepText"
+        :active="index === activeStepIndex" @click.stop.prevent.native="setActiveStepIndex(index)" />
     </div>
 
     <template v-if="activeStepIndex === 0">
       <div class="w-full flex flex-col space-y-4">
-        <plant-batch-picker
-          :builderType="builderType"
-          :selectedPlantBatches.sync="selectedPlantBatches"
-        />
+        <plant-batch-picker :builderType="builderType" :selectedPlantBatches.sync="selectedPlantBatches" />
 
         <template v-if="selectedPlantBatches.length > 0">
           <div class="w-full flex flex-row justify-end">
@@ -32,10 +23,8 @@
       <div class="w-full flex-grow grid grid-cols-2 gap-4">
         <div class="flex flex-col items-center p-4 col-span-2">
           <div class="flex flex-col items-center">
-            <plant-batch-count-picker
-              :selectedPlantBatches="selectedPlantBatches"
-              :plantBatchCounts.sync="destroyedCounts"
-            />
+            <plant-batch-count-picker :selectedPlantBatches="selectedPlantBatches"
+              :plantBatchCounts.sync="destroyedCounts" />
           </div>
         </div>
         <div class="col-start-2">
@@ -68,20 +57,14 @@
               </b-form-group>
 
               <template v-if="showHiddenDetailFields">
-                <b-form-group
-                  class="w-full"
-                  label="Waste Material Mixed:"
-                  description="Leave this alone unless you are sure you need to change it"
-                  label-size="sm"
-                >
+                <b-form-group class="w-full" label="Waste Material Mixed:"
+                  description="Leave this alone unless you are sure you need to change it" label-size="sm">
                   <b-form-input size="md" v-model="wasteMaterialMixed"></b-form-input>
                 </b-form-group>
               </template>
 
               <template v-else>
-                <b-button class="opacity-40" variant="light" @click="showHiddenDetailFields = true"
-                  >ADVANCED</b-button
-                >
+                <b-button class="opacity-40" variant="light" @click="showHiddenDetailFields = true">ADVANCED</b-button>
               </template>
             </div>
           </div>
@@ -89,11 +72,8 @@
 
         <template v-if="showWeightEntry">
           <div class="flex flex-col items-center p-4 space-y-4">
-            <plant-batch-weight-picker
-              :selectedPlantBatches="selectedPlantBatches"
-              :unitOfWeight.sync="unitOfWeight"
-              :plantBatchWeights.sync="destroyedWeights"
-            />
+            <plant-batch-weight-picker :selectedPlantBatches="selectedPlantBatches" :unitOfWeight.sync="unitOfWeight"
+              :plantBatchWeights.sync="destroyedWeights" />
 
             <template v-if="!allPlantBatchesHaveValidWeight">
               <p class="text-red-500">One or more plant batches is missing a weight value.</p>
@@ -126,9 +106,7 @@
 
               <div>
                 Average per plant waste:
-                <span class="font-bold ttt-purple"
-                  >{{ averagePerPlantBatchWaste }} {{ unitOfWeight.Name }}</span
-                >
+                <span class="font-bold ttt-purple">{{ averagePerPlantBatchWaste }} {{ unitOfWeight.Name }}</span>
               </div>
 
               <div>
@@ -153,16 +131,13 @@
 
               <div style="height: 3rem"></div>
 
-              <b-button class="w-full" variant="success" size="md" @click="submit()"
-                >DESTROY {{ selectedPlantBatches.length }} PLANTS</b-button
-              >
+              <b-button class="w-full" variant="success" size="md" @click="submit()">DESTROY {{
+                selectedPlantBatches.length }} PLANTS</b-button>
             </div>
 
             <div style="height: 6rem"></div>
 
-            <b-button class="opacity-40" variant="light" size="md" @click="downloadAll()"
-              >DOWNLOAD CSVs</b-button
-            >
+            <b-button class="opacity-40" variant="light" size="md" @click="downloadAll()">DOWNLOAD CSVs</b-button>
 
             <csv-breakout class="opacity-40 mt-4" :csvFiles="csvFiles" />
           </div>
@@ -194,7 +169,7 @@ import CsvBreakout from "@/components/overlay-widget/shared/CsvBreakout.vue";
 import PlantBatchCountPicker from "@/components/overlay-widget/shared/PlantBatchCountPicker.vue";
 import PlantBatchPicker from "@/components/overlay-widget/shared/PlantBatchPicker.vue";
 import PlantBatchWeightPicker from "@/components/overlay-widget/shared/PlantBatchWeightPicker.vue";
-import { BuilderType, MessageType } from "@/consts";
+import { AnalyticsEvent, BuilderType } from "@/consts";
 import {
   ICsvFile,
   IMetrcDestroyPlantBatchesPayload,
@@ -228,7 +203,7 @@ export default Vue.extend({
     setActiveStepIndex(index: number) {
       this.$data.activeStepIndex = index;
 
-      analyticsManager.track(MessageType.BUILDER_ENGAGEMENT, {
+      analyticsManager.track(AnalyticsEvent.BUILDER_ENGAGEMENT, {
         builder: this.$data.builderType,
         action: `Set active step to ${index}`,
       });
@@ -272,7 +247,7 @@ export default Vue.extend({
         await downloadCsvFile({ csvFile, delay: 500 });
       }
 
-      analyticsManager.track(MessageType.DOWNLOADED_CSVS, {
+      analyticsManager.track(AnalyticsEvent.DOWNLOADED_CSVS, {
         builderType: this.$data.builderType,
         csvData: {
           tagCount: this.$data.selectedPlantBatches.length,
@@ -308,8 +283,7 @@ export default Vue.extend({
 
         return buildNamedCsvFileData(
           csvData,
-          `Destroy ${sum(this.$data.destroyedCounts)} plants from ${
-            this.$data.selectedPlantBatches.length
+          `Destroy ${sum(this.$data.destroyedCounts)} plants from ${this.$data.selectedPlantBatches.length
           } plant batches`
         );
       } catch (e) {
@@ -500,7 +474,7 @@ export default Vue.extend({
     this.$data.wasteMethod = this.$data.wasteMethods[0];
     this.$data.wasteReason = this.$data.wasteReasons[0];
   },
-  async created() {},
+  async created() { },
   destroyed() {
     // Looks like modal is not actually destroyed
   },

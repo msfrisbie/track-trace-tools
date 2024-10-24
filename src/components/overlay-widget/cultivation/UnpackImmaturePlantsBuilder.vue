@@ -8,8 +8,8 @@
     <template v-if="activeStepIndex === 0">
       <package-picker :builderType="builderType" :selectedPackages.sync="selectedPackages" :itemFilters="itemFilters"
         :packageFilters="{
-        isEmpty: false,
-      }" itemFilterZeroResultsErrorSuggestionMessage="Only packages of clones or
+          isEmpty: false,
+        }" itemFilterZeroResultsErrorSuggestionMessage="Only packages of clones or
       seeds can be used here." />
 
       <template v-if="selectedPackages.length > 0">
@@ -205,7 +205,7 @@ import LocationPicker from '@/components/overlay-widget/shared/LocationPicker.vu
 import PackagePicker from '@/components/overlay-widget/shared/PackagePicker.vue';
 import StrainPicker from '@/components/overlay-widget/shared/StrainPicker.vue';
 import TagPicker from '@/components/overlay-widget/shared/TagPicker.vue';
-import { BuilderType, MessageType, PLANTABLE_ITEM_CATEGORY_NAMES } from '@/consts';
+import { AnalyticsEvent, BuilderType, PLANTABLE_ITEM_CATEGORY_NAMES } from '@/consts';
 import {
   ICsvFile,
   IIntermediateCreatePlantBatchFromPackageData,
@@ -256,7 +256,7 @@ export default Vue.extend({
     setActiveStepIndex(index: number) {
       this.$data.activeStepIndex = index;
 
-      analyticsManager.track(MessageType.BUILDER_ENGAGEMENT, {
+      analyticsManager.track(AnalyticsEvent.BUILDER_ENGAGEMENT, {
         builder: this.$data.builderType,
         action: `Set active step to ${index}`,
       });
@@ -314,7 +314,7 @@ export default Vue.extend({
         await downloadCsvFile({ csvFile, delay: 500 });
       }
 
-      analyticsManager.track(MessageType.DOWNLOADED_CSVS, {
+      analyticsManager.track(AnalyticsEvent.DOWNLOADED_CSVS, {
         builderType: this.$data.builderType,
         csvData: {
           packageCount: this.$data.selectedPackages.length,

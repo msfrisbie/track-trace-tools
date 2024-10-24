@@ -1,5 +1,10 @@
 import InlineToolbar from "@/components/widgets/InlineToolbar.vue";
-import { DOLLAR_NUMBER_REGEX, MessageType, METRC_TAG_REGEX, WEIGHT_NUMBER_REGEX } from "@/consts";
+import {
+  AnalyticsEvent,
+  DOLLAR_NUMBER_REGEX,
+  METRC_TAG_REGEX,
+  WEIGHT_NUMBER_REGEX,
+} from "@/consts";
 import { IAtomicService } from "@/interfaces";
 import store from "@/store/page-overlay";
 import { debugLogFactory } from "@/utils/debug";
@@ -194,7 +199,7 @@ class MetrcModalManager implements IAtomicService {
   }
 
   async propagateCsv(destination: HTMLElement) {
-    analyticsManager.track(MessageType.CSV_AUTOFILL_UPLOAD);
+    analyticsManager.track(AnalyticsEvent.CSV_AUTOFILL_UPLOAD);
 
     const intermediateCsvInput: HTMLInputElement | null = destination.querySelector(
       `input[ttt-intermediate-csv]`
@@ -232,7 +237,7 @@ class MetrcModalManager implements IAtomicService {
       if (!row[0]) {
         if (formattingErrorCount < 5) {
           toastManager.openToast(
-          `Row ${idx} is missing a tag value
+            `Row ${idx} is missing a tag value
           
           ${JSON.stringify(row)}`,
             {
@@ -402,7 +407,7 @@ class MetrcModalManager implements IAtomicService {
   }
 
   async applyTransferCsvData(destination: HTMLElement) {
-    analyticsManager.track(MessageType.CSV_AUTOFILL_FILL);
+    analyticsManager.track(AnalyticsEvent.CSV_AUTOFILL_FILL);
 
     const input: HTMLInputElement | null = destination.querySelector(`input[ttt-intermediate-csv]`);
 

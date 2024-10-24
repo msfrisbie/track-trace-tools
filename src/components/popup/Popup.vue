@@ -16,11 +16,8 @@
         <font-awesome-icon icon="plus-circle"></font-awesome-icon><span>T3+</span>
       </b-button> -->
 
-      <b-button
-        variant="outline-primary"
-        @click="openOptions()"
-        class="flex flex-row gap-2 justify-center items-center"
-      >
+      <b-button variant="outline-primary" @click="openOptions()"
+        class="flex flex-row gap-2 justify-center items-center">
         <font-awesome-icon icon="info-circle"></font-awesome-icon><span>ABOUT</span>
       </b-button>
     </div>

@@ -29,9 +29,7 @@
         </ul>
 
         <div class="col-span-2 items-center justify-center py-12">
-          <b-button size="lg" variant="primary" @click="open('/package/create-package-csv')"
-            >GO BACK</b-button
-          >
+          <b-button size="lg" variant="primary" @click="open('/package/create-package-csv')">GO BACK</b-button>
         </div>
       </div>
 
@@ -58,70 +56,56 @@
         </div>
         <ul class="flex flex-col gap-2 list-disc ml-4">
           <li>
-            <span class="font-bold text-purple-500"
-              >T3 defaults to the same location as the source package.</span
-            >
+            <span class="font-bold text-purple-500">T3 defaults to the same location as the source package.</span>
             Otherwise, if a child package is in a different location, fill in Location Name.
           </li>
 
           <li>
-            <span class="font-bold text-purple-500"
-              >T3 defaults to the same item and unit of measure as the source package.</span
-            >
+            <span class="font-bold text-purple-500">T3 defaults to the same item and unit of measure as the source
+              package.</span>
             Otherwise, if a child package has a different item/unit, fill in Item Name, New Package
             Quantity, and New Package Unit.
           </li>
 
           <li>
-            <span class="font-bold text-purple-500"
-              >T3 defaults to the sum of all the source packages with the same unit of
-              measure.</span
-            >
+            <span class="font-bold text-purple-500">T3 defaults to the sum of all the source packages with the same unit
+              of
+              measure.</span>
             Otherwise, if a child package shouldn't have the sum of the source packages, fill in New
             Package Quantity and New Package Unit.
           </li>
 
           <li>
-            <span class="font-bold text-purple-500"
-              >T3 defaults to today for the packaged date.</span
-            >
+            <span class="font-bold text-purple-500">T3 defaults to today for the packaged date.</span>
             Otherwise, if a child package wasn't created today, fill out Packaged Date.
           </li>
 
           <li>
-            <span class="font-bold text-purple-500"
-              >T3 defaults to nothing for Note and Production Batch Number.</span
-            >
+            <span class="font-bold text-purple-500">T3 defaults to nothing for Note and Production Batch Number.</span>
             Otherwise, fill in these values.
           </li>
 
           <li>
-            <span class="font-bold text-purple-500"
-              >T3 defaults to FALSE for Is Donation and Is Trade Sample.</span
-            >
+            <span class="font-bold text-purple-500">T3 defaults to FALSE for Is Donation and Is Trade Sample.</span>
             Otherwise, fill in these values.
           </li>
         </ul>
 
         <div>The following CSV is an example of a simple filled-out CSV:</div>
 
-        <b-button variant="outline-primary" @click="downloadAutofillCsv()"
-          >DOWNLOAD EXAMPLE CSV</b-button
-        >
+        <b-button variant="outline-primary" @click="downloadAutofillCsv()">DOWNLOAD EXAMPLE CSV</b-button>
 
         <div class="ttt-purple text-2xl font-semibold">
           What do I enter for columns like New Package Unit, Is Donation, Packaged Date, etc?
         </div>
 
-        <span class="font-bold text-purple-500"
-          >T3 can intelligently understand almost anything entered in these columns.</span
-        >
+        <span class="font-bold text-purple-500">T3 can intelligently understand almost anything entered in these
+          columns.</span>
 
         <ul class="flex flex-col gap-2 list-disc ml-4">
           <li>
-            <span class="font-bold text-purple-500"
-              >For date columns like Packaged Date, T3 can understand most date formats.</span
-            >
+            <span class="font-bold text-purple-500">For date columns like Packaged Date, T3 can understand most date
+              formats.</span>
           </li>
           <li>These are all valid:</li>
           <ul class="flex flex-col gap-2 list-disc ml-4 font-mono">
@@ -133,10 +117,9 @@
           </ul>
 
           <li>
-            <span class="font-bold text-purple-500"
-              >For unit columns like New Package Unit, T3 can read understand most unit
-              formats.</span
-            >
+            <span class="font-bold text-purple-500">For unit columns like New Package Unit, T3 can read understand most
+              unit
+              formats.</span>
           </li>
           <li>These are all valid:</li>
           <ul class="flex flex-col gap-2 list-disc ml-4 font-mono">
@@ -148,9 +131,8 @@
           </ul>
 
           <li>
-            <span class="font-bold text-purple-500"
-              >For yes/no columns like Is Donation, T3 can read understand most formats.</span
-            >
+            <span class="font-bold text-purple-500">For yes/no columns like Is Donation, T3 can read understand most
+              formats.</span>
           </li>
           <li>These are all valid:</li>
           <ul class="flex flex-col gap-2 list-disc ml-4 font-mono">
@@ -163,18 +145,15 @@
 
         <div>The following example CSV demonstrates various allowed values:</div>
 
-        <b-button variant="outline-primary" @click="downloadAutofillCsv()"
-          >DOWNLOAD EXAMPLE CSV</b-button
-        >
+        <b-button variant="outline-primary" @click="downloadAutofillCsv()">DOWNLOAD EXAMPLE CSV</b-button>
 
         <div class="ttt-purple text-2xl font-semibold">
           How do I make a package that has multiple source packages?
         </div>
 
         <div>
-          <span class="font-bold text-purple-500"
-            >Each CSV row represents one source package being used for one child package.</span
-          >
+          <span class="font-bold text-purple-500">Each CSV row represents one source package being used for one child
+            package.</span>
           For multiple source packages, enter identical information for the child package on each
           row.
         </div>
@@ -192,25 +171,22 @@
 
         <div>
           Remember, for each of these rows,
-          <span class="font-bold text-purple-500"
-            >All columns following Source Package Quantity Unit Of Measure must be identical.</span
-          >
+          <span class="font-bold text-purple-500">All columns following Source Package Quantity Unit Of Measure must be
+            identical.</span>
         </div>
 
         <div>
           The following example CSV demonstrates how to create a package with multiple sources:
         </div>
 
-        <b-button variant="outline-primary" @click="downloadMultiCsv()"
-          >DOWNLOAD EXAMPLE CSV</b-button
-        >
+        <b-button variant="outline-primary" @click="downloadMultiCsv()">DOWNLOAD EXAMPLE CSV</b-button>
       </div>
     </div>
   </div>
 </template>
 
 <script lang="ts">
-import { MessageType } from "@/consts";
+import { AnalyticsEvent } from "@/consts";
 import { ICsvFile, IPluginState } from "@/interfaces";
 import { analyticsManager } from "@/modules/analytics-manager.module";
 import router from "@/router/index";
@@ -238,7 +214,7 @@ export default Vue.extend({
   },
   methods: {
     open(path: string) {
-      analyticsManager.track(MessageType.BUILDER_ENGAGEMENT, {
+      analyticsManager.track(AnalyticsEvent.BUILDER_ENGAGEMENT, {
         action: `Navigated to ${path}`,
       });
 
@@ -363,8 +339,8 @@ export default Vue.extend({
       downloadCsvFile({ csvFile, delay: 500 });
     },
   },
-  async created() {},
-  async mounted() {},
+  async created() { },
+  async mounted() { },
 });
 </script>
 

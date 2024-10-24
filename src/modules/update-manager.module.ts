@@ -1,9 +1,9 @@
-import { MessageType } from '@/consts';
-import { IAtomicService } from '@/interfaces';
-import { version } from '@/modules/version';
-import { MutationType } from '@/mutation-types';
-import store from '@/store/page-overlay/index';
-import { analyticsManager } from './analytics-manager.module';
+import { AnalyticsEvent } from "@/consts";
+import { IAtomicService } from "@/interfaces";
+import { version } from "@/modules/version";
+import { MutationType } from "@/mutation-types";
+import store from "@/store/page-overlay/index";
+import { analyticsManager } from "./analytics-manager.module";
 
 class UpdateManager implements IAtomicService {
   async init() {
@@ -17,7 +17,7 @@ class UpdateManager implements IAtomicService {
   private handleUpdate() {
     console.log(`Updated to version ${version}`);
 
-    analyticsManager.track(MessageType.UPDATED_VERSION, { version });
+    analyticsManager.track(AnalyticsEvent.UPDATED_VERSION, { version });
   }
 }
 

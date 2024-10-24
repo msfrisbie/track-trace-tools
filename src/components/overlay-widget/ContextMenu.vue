@@ -149,7 +149,7 @@
 <script lang="ts">
 import PackageButtonList from "@/components/overlay-widget/shared/PackageButtonList.vue";
 import TransferButtonList from "@/components/overlay-widget/shared/TransferButtonList.vue";
-import { MessageType } from "@/consts";
+import { AnalyticsEvent } from "@/consts";
 import {
   IIndexedPackageData,
   IIndexedTransferData,
@@ -217,7 +217,7 @@ export default Vue.extend({
       modalManager.dispatchContextMenuEvent(null);
     },
     filterPackages(text: string) {
-      analyticsManager.track(MessageType.CONTEXT_MENU_SELECT, {
+      analyticsManager.track(AnalyticsEvent.CONTEXT_MENU_SELECT, {
         event: "filterPackage",
       });
       this.setShowSearchResults({ showSearchResults: true });
@@ -225,7 +225,7 @@ export default Vue.extend({
       this.dismiss();
     },
     searchTransfer(text: string) {
-      analyticsManager.track(MessageType.CONTEXT_MENU_SELECT, { event: "searchTransfer", text });
+      analyticsManager.track(AnalyticsEvent.CONTEXT_MENU_SELECT, { event: "searchTransfer", text });
 
       this.setShowSearchResults({ showSearchResults: true });
       store.dispatch(`search/${SearchActions.SET_QUERY_STRING}`, { queryString: text });

@@ -1,42 +1,20 @@
 <template>
   <div class="w-full flex flex-col flex-grow space-y-4">
     <div class="w-full grid grid-cols-3 gap-4 auto-cols-fr">
-      <builder-step-header
-        v-for="(step, index) of steps"
-        :key="index"
-        :stepNumber="index + 1"
-        :stepText="step.stepText"
-        :active="index === activeStepIndex"
-        @click.stop.prevent.native="setActiveStepIndex(index)"
-      />
+      <builder-step-header v-for="(step, index) of steps" :key="index" :stepNumber="index + 1" :stepText="step.stepText"
+        :active="index === activeStepIndex" @click.stop.prevent.native="setActiveStepIndex(index)" />
     </div>
 
     <template v-if="activeStepIndex === 0">
       <template v-if="categories.length > 0 && unitsOfMeasure.length > 0">
         <div class="flex flex-col" style="width: 600px">
-          <b-form-group
-            label="Enter Batch Number"
-            label-size="sm"
-            label-class="text-gray-400"
-            class="w-full"
-          >
-            <b-form-input
-              type="text"
-              required
-              placeholder="Batch number"
-              class="w-full text-left"
-              size="md"
-              v-model="batchNumber"
-            />
+          <b-form-group label="Enter Batch Number" label-size="sm" label-class="text-gray-400" class="w-full">
+            <b-form-input type="text" required placeholder="Batch number" class="w-full text-left" size="md"
+              v-model="batchNumber" />
           </b-form-group>
 
           <template v-if="batchNumber">
-            <b-form-group
-              label="Select Strain"
-              label-size="sm"
-              label-class="text-gray-400"
-              class="w-full"
-            >
+            <b-form-group label="Select Strain" label-size="sm" label-class="text-gray-400" class="w-full">
               <strain-picker :strain.sync="strain" :enableHotStrainCreate="true" />
             </b-form-group>
           </template>
@@ -117,14 +95,8 @@
 
             <div class="flex flex-col items-center">
               <transition name="fade">
-                <b-button
-                  class="w-full"
-                  style="max-width: 600px"
-                  variant="success"
-                  size="md"
-                  @click="submit()"
-                  >CREATE ITEMS</b-button
-                >
+                <b-button class="w-full" style="max-width: 600px" variant="success" size="md" @click="submit()">CREATE
+                  ITEMS</b-button>
               </transition>
             </div>
           </div>
@@ -139,31 +111,31 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue';
-import store from '@/store/page-overlay/index';
-import { mapActions, mapState } from 'vuex';
 import BuilderStepHeader from '@/components/overlay-widget/shared/BuilderStepHeader.vue';
-import {
-  IMetrcCreateItemsPayload,
-  IItemTemplate,
-  ICsvFile,
-  IBuilderComponentError,
-  IUnitOfMeasure,
-  IItemCategory,
-  IItemData,
-} from '@/interfaces';
-import { buildCsvDataOrError, buildNamedCsvFileData } from '@/utils/csv';
-import { BuilderType, MessageType } from '@/consts';
-import { analyticsManager } from '@/modules/analytics-manager.module';
-import { builderManager } from '@/modules/builder-manager.module';
 import ItemDataList from '@/components/overlay-widget/shared/ItemDataList.vue';
 import StrainPicker from '@/components/overlay-widget/shared/StrainPicker.vue';
-import { dynamicConstsManager } from '@/modules/dynamic-consts-manager.module';
+import { AnalyticsEvent, BuilderType } from '@/consts';
+import {
+  IBuilderComponentError,
+  ICsvFile,
+  IItemCategory,
+  IItemData,
+  IItemTemplate,
+  IMetrcCreateItemsPayload,
+  IUnitOfMeasure,
+} from '@/interfaces';
+import { analyticsManager } from '@/modules/analytics-manager.module';
+import { builderManager } from '@/modules/builder-manager.module';
 import { primaryDataLoader } from '@/modules/data-loader/data-loader.module';
-import { unitOfMeasureNameToAbbreviation } from '@/utils/units';
+import { dynamicConstsManager } from '@/modules/dynamic-consts-manager.module';
+import store from '@/store/page-overlay/index';
 import { abbreviateString } from '@/utils/abbreviate';
+import { buildCsvDataOrError, buildNamedCsvFileData } from '@/utils/csv';
 import { round } from '@/utils/math';
+import { unitOfMeasureNameToAbbreviation } from '@/utils/units';
 import _ from 'lodash-es';
+import Vue from 'vue';
+import { mapActions, mapState } from 'vuex';
 
 export default Vue.extend({
   name: 'ItemTemplateBuilder',
@@ -177,7 +149,7 @@ export default Vue.extend({
     ...mapActions({}),
     setActiveStepIndex(index: number) {
       this.$data.activeStepIndex = index;
-      analyticsManager.track(MessageType.BUILDER_ENGAGEMENT, {
+      analyticsManager.track(AnalyticsEvent.BUILDER_ENGAGEMENT, {
         builder: this.$data.builderType,
         action: `Set active step to ${index}`,
       });
@@ -585,8 +557,8 @@ export default Vue.extend({
       (x: IItemCategory) => x.Name === 'Vape Cartridge (weight - each)',
     ) || null;
   },
-  async created() {},
-  destroyed() {},
+  async created() { },
+  destroyed() { },
 });
 </script>
 
@@ -594,10 +566,15 @@ export default Vue.extend({
 .prepend-icon {
   width: 2rem;
 }
+
 .fade-enter-active {
   transition: all 0.5s;
 }
-.fade-enter /* .fade-leave-active below version 2.1.8 */ {
+
+.fade-enter
+
+/* .fade-leave-active below version 2.1.8 */
+  {
   opacity: 0;
   transform: translateY(10px);
 }

@@ -15,7 +15,7 @@
 </template>
 
 <script lang="ts">
-import { MessageType } from '@/consts';
+import { AnalyticsEvent } from '@/consts';
 import { analyticsManager } from '@/modules/analytics-manager.module';
 import { toastManager } from '@/modules/toast-manager.module';
 import router from '@/router/index';
@@ -83,7 +83,7 @@ export default Vue.extend({
   },
   methods: {
     copyToClipboard(text: string) {
-      analyticsManager.track(MessageType.COPIED_TEXT, {
+      analyticsManager.track(AnalyticsEvent.COPIED_TEXT, {
         value: text,
       });
 

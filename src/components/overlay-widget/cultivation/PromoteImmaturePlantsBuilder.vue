@@ -1,23 +1,14 @@
 <template>
   <div class="grid grid-cols-3 gap-8 h-full" style="grid-template-rows: auto 1fr">
-    <builder-step-header
-      v-for="(step, index) of steps"
-      :key="index"
-      :stepNumber="index + 1"
-      :stepText="step.stepText"
-      :active="index === activeStepIndex"
-      @click.stop.prevent.native="setActiveStepIndex(index)"
-    />
+    <builder-step-header v-for="(step, index) of steps" :key="index" :stepNumber="index + 1" :stepText="step.stepText"
+      :active="index === activeStepIndex" @click.stop.prevent.native="setActiveStepIndex(index)" />
 
     <div class="col-span-3 h-full">
       <template v-if="activeStepIndex === 0">
         <div class="grid grid-cols-2 grid-rows-2 gap-8 h-full" style="grid-template-rows: 1fr auto">
-          <plant-batch-picker
-            class="col-span-2 h-full"
-            :builderType="builderType"
+          <plant-batch-picker class="col-span-2 h-full" :builderType="builderType"
             :selectedPlantBatches="selectedPlantBatches"
-            v-on:update:selectedPlantBatches="selectedPlantBatches = $event"
-          />
+            v-on:update:selectedPlantBatches="selectedPlantBatches = $event" />
 
           <div class="col-start-2 flex flex-col items-stretch">
             <template v-if="!pageOneErrorMessage">
@@ -36,16 +27,8 @@
           <div class="flex flex-col items-stretch space-y-8">
             <b-form-group class="w-full" label="Configure plants:" label-size="sm">
               <b-input-group>
-                <b-form-input
-                  v-model.number="totalPlantCount"
-                  type="number"
-                  size="md"
-                  step="1"
-                  min="1"
-                  :max="maximumTotalPlantCount"
-                  required
-                  class="text-center"
-                ></b-form-input>
+                <b-form-input v-model.number="totalPlantCount" type="number" size="md" step="1" min="1"
+                  :max="maximumTotalPlantCount" required class="text-center"></b-form-input>
 
                 <b-input-group-append>
                   <b-form-select size="md" :options="growthPhaseOptions" v-model="growthPhase" />
@@ -59,8 +42,8 @@
               </template>
 
               <template v-if="maximumTotalPlantCount">
-                <b-form-text
-                  ><div class="flex flex-row items-center space-x-2">
+                <b-form-text>
+                  <div class="flex flex-row items-center space-x-2">
                     <span>Total # available: {{ maximumTotalPlantCount }}</span>
 
                     <b-button variant="link" size="sm" @click="promoteMax()">PROMOTE ALL</b-button>
@@ -70,36 +53,22 @@
             </b-form-group>
 
             <b-form-group class="w-full" label="Plant Location:" label-size="sm">
-              <location-picker
-                :location.sync="plantLocation"
-                :suggestedLocationName="suggestedLocationName"
-              />
+              <location-picker :location.sync="plantLocation" :suggestedLocationName="suggestedLocationName" />
             </b-form-group>
 
             <b-form-group class="w-full" label="Planting Date:" label-size="sm">
-              <b-form-datepicker
-                initial-date
-                size="md"
-                v-model="growthIsodate"
-                :value="growthIsodate"
-              />
+              <b-form-datepicker initial-date size="md" v-model="growthIsodate" :value="growthIsodate" />
             </b-form-group>
 
             <template v-if="showHiddenDetailFields">
-              <b-form-group
-                class="w-full"
-                label="Patient License Number:"
-                description="Leave this alone unless you are sure you need to change it"
-                label-size="sm"
-              >
+              <b-form-group class="w-full" label="Patient License Number:"
+                description="Leave this alone unless you are sure you need to change it" label-size="sm">
                 <b-form-input size="md" v-model="patientLicenseNumber"></b-form-input>
               </b-form-group>
             </template>
 
             <template v-else>
-              <b-button class="opacity-40" variant="light" @click="showHiddenDetailFields = true"
-                >ADVANCED</b-button
-              >
+              <b-button class="opacity-40" variant="light" @click="showHiddenDetailFields = true">ADVANCED</b-button>
             </template>
           </div>
           <div class="flex flex-col items-stretch space-y-8">
@@ -111,12 +80,8 @@
               </template>
 
               <b-form-group class="w-full">
-                <tag-picker
-                  :tagTypeNames="['CannabisPlant', 'MedicalPlant', 'Cannabis Plant', 'Medical Plant']"
-                  :tagCount="totalPlantCount"
-                  :selectedTags="plantTags"
-                  v-on:update:selectedTags="plantTags = $event"
-                />
+                <tag-picker :tagTypeNames="['CannabisPlant', 'MedicalPlant', 'Cannabis Plant', 'Medical Plant']"
+                  :tagCount="totalPlantCount" :selectedTags="plantTags" v-on:update:selectedTags="plantTags = $event" />
               </b-form-group>
 
               <div class="col-start-2 flex flex-col items-stretch">
@@ -143,8 +108,7 @@
                 Promoting
                 <span class="font-bold ttt-purple">{{ totalPlantCount }}</span>
                 plants to
-                <span class="font-bold ttt-purple">{{ growthPhase.Display }}</span
-                >.
+                <span class="font-bold ttt-purple">{{ growthPhase.Display }}</span>.
               </div>
 
               <div>
@@ -164,16 +128,13 @@
 
               <div style="height: 3rem"></div>
 
-              <b-button class="w-full" variant="success" size="md" @click="submit()"
-                >PROMOTE {{ totalPlantCount }} PLANTS</b-button
-              >
+              <b-button class="w-full" variant="success" size="md" @click="submit()">PROMOTE {{ totalPlantCount }}
+                PLANTS</b-button>
             </div>
 
             <div style="height: 6rem"></div>
 
-            <b-button class="opacity-40" variant="light" size="md" @click="downloadAll()"
-              >DOWNLOAD CSVs</b-button
-            >
+            <b-button class="opacity-40" variant="light" size="md" @click="downloadAll()">DOWNLOAD CSVs</b-button>
 
             <csv-breakout class="opacity-40 mt-4" :csvFiles="csvFiles" />
           </template>
@@ -193,7 +154,7 @@ import CsvBreakout from '@/components/overlay-widget/shared/CsvBreakout.vue';
 import LocationPicker from '@/components/overlay-widget/shared/LocationPicker.vue';
 import PlantBatchPicker from '@/components/overlay-widget/shared/PlantBatchPicker.vue';
 import TagPicker from '@/components/overlay-widget/shared/TagPicker.vue';
-import { BuilderType, MessageType } from '@/consts';
+import { AnalyticsEvent, BuilderType } from '@/consts';
 import {
   IBuilderComponentError,
   ICsvFile,
@@ -229,7 +190,7 @@ function totalPlantsAvailableOrNull(plantBatches: IPlantBatchData[]): number | n
 
 // This component should mirror the vuex model, so casting the type is acceptable
 // since Vue struggles to type 'this'
-interface PromoteImmaturePlantsBuilderVuexCoupler extends IPromoteImmaturePlantsBuilderState {}
+interface PromoteImmaturePlantsBuilderVuexCoupler extends IPromoteImmaturePlantsBuilderState { }
 
 export default Vue.extend({
   name: 'PromoteImmaturePlantsBuilder',
@@ -245,7 +206,7 @@ export default Vue.extend({
     setActiveStepIndex(index: number): void {
       this.$data.activeStepIndex = index;
 
-      analyticsManager.track(MessageType.BUILDER_ENGAGEMENT, {
+      analyticsManager.track(AnalyticsEvent.BUILDER_ENGAGEMENT, {
         builder: this.$data.builderType,
         action: `Set active step to ${index}`,
       });
@@ -302,7 +263,7 @@ export default Vue.extend({
         await downloadCsvFile({ csvFile, delay: 500 });
       }
 
-      analyticsManager.track(MessageType.DOWNLOADED_CSVS, {
+      analyticsManager.track(AnalyticsEvent.DOWNLOADED_CSVS, {
         builderType: this.$data.builderType,
         csvData: {
           plantBatchCount: (this as PromoteImmaturePlantsBuilderVuexCoupler).selectedPlantBatches
@@ -369,8 +330,7 @@ export default Vue.extend({
 
         return buildNamedCsvFileData(
           csvData,
-          `Promoting ${this.totalPlantCount} plants to ${
-            (this as PromoteImmaturePlantsBuilderVuexCoupler).growthPhase?.Display as string
+          `Promoting ${this.totalPlantCount} plants to ${(this as PromoteImmaturePlantsBuilderVuexCoupler).growthPhase?.Display as string
           }`,
         );
       } catch (e) {

@@ -2,7 +2,9 @@ import { IdbKeyPiece } from "@/consts";
 import {
   IAdjustPackageReason,
   IAtomicService,
-  IAuthState, IDestroyPlantBatchActionReason, IItemCategory,
+  IAuthState,
+  IDestroyPlantBatchActionReason,
+  IItemCategory,
   IMetrcDriverData,
   IMetrcFacilityData,
   IMetrcTransferType,
@@ -13,12 +15,12 @@ import {
   ITagData,
   IUnitOfMeasure,
   IWasteMethod,
-  IWasteReason
+  IWasteReason,
 } from "@/interfaces";
 import { authManager } from "@/modules/auth-manager.module";
 import {
   MetrcRequestManager,
-  primaryMetrcRequestManager
+  primaryMetrcRequestManager,
 } from "@/modules/metrc-request-manager.module";
 import { mockDataManager } from "@/modules/mock-data-manager.module";
 import store from "@/store/page-overlay/index";

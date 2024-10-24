@@ -1,4 +1,4 @@
-import { MessageType } from "@/consts";
+import { AnalyticsEvent, MessageType } from "@/consts";
 import { IAtomicService, IAuthState } from "@/interfaces";
 import { analyticsManager } from "@/modules/analytics-manager.module";
 import { customAxios } from "@/modules/fetch-manager.module";
@@ -7,7 +7,6 @@ import { PluginAuthActions } from "@/store/page-overlay/modules/plugin-auth/cons
 import { isIdentityAllowedToUseTtt } from "@/utils/access-control";
 import { debugLogFactory } from "@/utils/debug";
 import { extract, ExtractionType } from "@/utils/html";
-import { isDevelopment } from "./environment.module";
 import { messageBus } from "./message-bus.module";
 
 // Plugin scripts are sandboxed from the window variables.
@@ -83,7 +82,7 @@ class AuthManager implements IAtomicService {
     // Check if identity matches blacklist. Identity matching will only work in CA
     if (identity) {
       if (!isIdentityAllowedToUseTtt({ identity, hostname: window.location.hostname })) {
-        analyticsManager.track(MessageType.MATCHED_BLACKLIST_HOSTNAME, {
+        analyticsManager.track(AnalyticsEvent.MATCHED_BLACKLIST_HOSTNAME, {
           identity,
         });
 

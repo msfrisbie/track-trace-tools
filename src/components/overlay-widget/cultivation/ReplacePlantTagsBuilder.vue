@@ -1,23 +1,13 @@
 <template>
   <div class="w-full flex flex-col items-stretch flex-grow space-y-4">
     <div class="w-full grid grid-cols-3 gap-4 auto-cols-fr">
-      <builder-step-header
-        v-for="(step, index) of steps"
-        :key="index"
-        :stepNumber="index + 1"
-        :stepText="step.stepText"
-        :active="index === activeStepIndex"
-        @click.stop.prevent.native="setActiveStepIndex(index)"
-      />
+      <builder-step-header v-for="(step, index) of steps" :key="index" :stepNumber="index + 1" :stepText="step.stepText"
+        :active="index === activeStepIndex" @click.stop.prevent.native="setActiveStepIndex(index)" />
     </div>
 
     <template v-if="activeStepIndex === 0">
-      <plant-picker
-        class="col-span-2"
-        :builderType="builderType"
-        :selectedPlants.sync="selectedPlants"
-        :enableVegetative="true"
-      />
+      <plant-picker class="col-span-2" :builderType="builderType" :selectedPlants.sync="selectedPlants"
+        :enableVegetative="true" />
 
       <template v-if="selectedPlants.length > 0">
         <div class="w-full flex flex-row justify-end">
@@ -32,12 +22,7 @@
       <div class="w-full grid grid-cols-2">
         <div class="flex flex-col items-center space-y-4">
           <b-form-group class="w-full" label="Retagging Date:" label-size="sm">
-            <b-form-datepicker
-              initial-date
-              size="md"
-              v-model="actualIsodate"
-              :value="actualIsodate"
-            />
+            <b-form-datepicker initial-date size="md" v-model="actualIsodate" :value="actualIsodate" />
           </b-form-group>
         </div>
 
@@ -48,11 +33,8 @@
             </template>
 
             <b-form-group class="w-full">
-              <tag-picker
-                :tagTypeNames="['CannabisPlant', 'MedicalPlant', 'Cannabis Plant', 'Medical Plant']"
-                :tagCount="selectedPlants.length"
-                :selectedTags.sync="plantTags"
-              />
+              <tag-picker :tagTypeNames="['CannabisPlant', 'MedicalPlant', 'Cannabis Plant', 'Medical Plant']"
+                :tagCount="selectedPlants.length" :selectedTags.sync="plantTags" />
             </b-form-group>
 
             <template v-if="allDetailsProvided && tagsSelected">
@@ -84,9 +66,8 @@
 
               <div style="height: 3rem"></div>
 
-              <b-button class="w-full" variant="success" size="md" @click="submit()"
-                >RETAG {{ selectedPlants.length }} PLANTS</b-button
-              >
+              <b-button class="w-full" variant="success" size="md" @click="submit()">RETAG {{ selectedPlants.length }}
+                PLANTS</b-button>
 
               <!-- <div style="height: 6rem"></div> -->
 
@@ -105,9 +86,8 @@
 
             <span v-if="selectedPlants.length === 0">Total plant count is 0</span>
             <span v-if="plantTags.length === 0">No tags provided</span>
-            <span v-if="selectedPlants.length > 0 && selectedPlants.length !== plantTags.length"
-              >Incorrect number of tags provided</span
-            >
+            <span v-if="selectedPlants.length > 0 && selectedPlants.length !== plantTags.length">Incorrect number of
+              tags provided</span>
             <span v-if="!actualIsodate">Retag date not provided</span>
           </div>
         </template>
@@ -120,7 +100,7 @@
 import BuilderStepHeader from '@/components/overlay-widget/shared/BuilderStepHeader.vue';
 import PlantPicker from '@/components/overlay-widget/shared/PlantPicker.vue';
 import TagPicker from '@/components/overlay-widget/shared/TagPicker.vue';
-import { BuilderType, MessageType } from '@/consts';
+import { AnalyticsEvent, BuilderType } from '@/consts';
 import {
   ICsvFile, IMetrcReplacePlantTagsPayload, IPlantData, ITagData,
 } from '@/interfaces';
@@ -146,7 +126,7 @@ export default Vue.extend({
     setActiveStepIndex(index: number) {
       this.$data.activeStepIndex = index;
 
-      analyticsManager.track(MessageType.BUILDER_ENGAGEMENT, {
+      analyticsManager.track(AnalyticsEvent.BUILDER_ENGAGEMENT, {
         builder: this.$data.builderType,
         action: `Set active step to ${index}`,
       });
@@ -188,7 +168,7 @@ export default Vue.extend({
         await downloadCsvFile({ csvFile, delay: 500 });
       }
 
-      analyticsManager.track(MessageType.DOWNLOADED_CSVS, {
+      analyticsManager.track(AnalyticsEvent.DOWNLOADED_CSVS, {
         builderType: this.$data.builderType,
         csvData: {
           plantCount: this.$data.selectedPlants.length,

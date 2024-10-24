@@ -1,10 +1,6 @@
 <template>
-  <b-card
-    @click="open()"
-    variant="ttt"
-    class="cursor-pointer hover:bg-purple-100 hover:border hover:border-purple-600 p-2"
-    no-body
-  >
+  <b-card @click="open()" variant="ttt"
+    class="cursor-pointer hover:bg-purple-100 hover:border hover:border-purple-600 p-2" no-body>
     <div>{{ title }}</div>
     <template v-if="loading">
       <div class="flex flex-row items-center justify-center">
@@ -25,7 +21,7 @@
 </template>
 
 <script lang="ts">
-import { MessageType } from "@/consts";
+import { AnalyticsEvent } from "@/consts";
 import { analyticsManager } from "@/modules/analytics-manager.module";
 import router from "@/router/index";
 import store from "@/store/page-overlay/index";
@@ -53,15 +49,15 @@ export default Vue.extend({
     open() {
       try {
         analyticsManager.track(
-          MessageType.CLICKED_DASHBOARD_CARD_LINK,
+          AnalyticsEvent.CLICKED_DASHBOARD_CARD_LINK,
           JSON.parse(decodeURI(this.$props.url.split("#")[1]))
         );
-      } catch (e) {}
+      } catch (e) { }
       window.location.href = this.$props.url;
     },
   },
-  async created() {},
-  async mounted() {},
+  async created() { },
+  async mounted() { },
 });
 </script>
 

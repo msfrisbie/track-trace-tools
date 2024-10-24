@@ -31,7 +31,7 @@ amplitudeInstance.init(AMPLITUDE_API_KEY);
 function respondToContentScript(sendResponse: any, inboundEvent: IBusEvent, outboundData: any) {
   console.log({ inboundEvent, outboundData });
   sendResponse({
-  uuid: inboundEvent.uuid,
+    uuid: inboundEvent.uuid,
     message: { data: outboundData },
   } as IBusEvent);
 }
@@ -200,12 +200,16 @@ chrome.runtime.onMessage.addListener((inboundEvent, sender, sendResponse) => {
         break;
 
       case MessageType.SET_USER_ID:
-        amplitudeInstance.setUserId(inboundEvent.message.data.identity);
+        // Amplitude is counting thousands of redundant IDs
+        // Disabled until a fix can be found
+        // amplitudeInstance.setUserId(inboundEvent.message.data.identity);
         respondToContentScript(sendResponse, inboundEvent, { success: true });
         break;
 
       case MessageType.SET_USER_PROPERTIES:
-        amplitudeInstance.setUserProperties(inboundEvent.message.data);
+        // Amplitude is counting thousands of redundant IDs
+        // Disabled until a fix can be found
+        // amplitudeInstance.setUserProperties(inboundEvent.message.data);
         respondToContentScript(sendResponse, inboundEvent, { success: true });
         break;
 
@@ -465,7 +469,7 @@ chrome.runtime.onMessage.addListener((inboundEvent, sender, sendResponse) => {
         );
         break;
 
-      default:
+      case MessageType.LOG_ANALYTICS_EVENT:
         try {
           // Default behavior is to track event data in analytics
           logEvent(
@@ -478,6 +482,9 @@ chrome.runtime.onMessage.addListener((inboundEvent, sender, sendResponse) => {
         } catch (error) {
           console.error("Event error in background", inboundEvent, error);
         }
+        break;
+
+      default:
         break;
     }
   }

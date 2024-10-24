@@ -1,23 +1,14 @@
 <template>
   <div class="w-full flex flex-col flex-grow space-y-4">
     <div class="w-full grid grid-cols-3 gap-4 auto-cols-fr">
-      <builder-step-header
-        v-for="(step, index) of steps"
-        :key="index"
-        :stepNumber="index + 1"
-        :stepText="step.stepText"
-        :active="index === activeStepIndex"
-        @click.stop.prevent.native="setActiveStepIndex(index)"
-      />
+      <builder-step-header v-for="(step, index) of steps" :key="index" :stepNumber="index + 1" :stepText="step.stepText"
+        :active="index === activeStepIndex" @click.stop.prevent.native="setActiveStepIndex(index)" />
     </div>
 
     <template v-if="activeStepIndex === 0">
       <div class="w-full flex flex-col space-y-4">
-        <package-picker
-          :builderType="builderType"
-          :selectedPackages.sync="selectedPackages"
-          :showLocationPicker="true"
-        />
+        <package-picker :builderType="builderType" :selectedPackages.sync="selectedPackages"
+          :showLocationPicker="true" />
 
         <template v-if="selectedPackages.length > 0">
           <div class="flex flex-row justify-end">
@@ -58,8 +49,7 @@
                 Moving
                 <span class="font-bold ttt-purple">{{ selectedPackages.length }}</span>
                 packages to
-                <span class="font-bold ttt-purple">{{ newLocation.Name }}</span
-                >.
+                <span class="font-bold ttt-purple">{{ newLocation.Name }}</span>.
               </div>
 
               <div>
@@ -69,9 +59,8 @@
 
               <div style="height: 3rem"></div>
 
-              <b-button class="w-full" variant="success" size="md" @click="submit()"
-                >MOVE {{ selectedPackages.length }} PACKAGES</b-button
-              >
+              <b-button class="w-full" variant="success" size="md" @click="submit()">MOVE {{ selectedPackages.length }}
+                PACKAGES</b-button>
             </div>
           </div>
         </template>
@@ -91,32 +80,21 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue';
-import store from '@/store/page-overlay/index';
-import { mapState } from 'vuex';
 import BuilderStepHeader from '@/components/overlay-widget/shared/BuilderStepHeader.vue';
-import { isValidTag, generateTagRangeOrError } from '@/utils/tags';
-import { primaryDataLoader } from '@/modules/data-loader/data-loader.module';
-import { combineLatest, from, Subject } from 'rxjs';
+import LocationPicker from '@/components/overlay-widget/shared/LocationPicker.vue';
+import PackagePicker from '@/components/overlay-widget/shared/PackagePicker.vue';
+import { AnalyticsEvent, BuilderType } from '@/consts';
 import {
-  debounceTime, distinctUntilChanged, filter, startWith, tap,
-} from 'rxjs/operators';
-import {
-  IPackageData,
-  IPackageFilter,
   ICsvFile,
-  ILocationData,
   IMetrcMovePackagesPayload,
+  IPackageData
 } from '@/interfaces';
-import { downloadCsvFile, buildCsvDataOrError, buildNamedCsvFileData } from '@/utils/csv';
-import { todayIsodate, submitDateFromIsodate } from '@/utils/date';
-import { primaryMetrcRequestManager } from '@/modules/metrc-request-manager.module';
-import { authManager } from '@/modules/auth-manager.module';
-import { BuilderType, MessageType } from '@/consts';
 import { analyticsManager } from '@/modules/analytics-manager.module';
 import { builderManager } from '@/modules/builder-manager.module';
-import PackagePicker from '@/components/overlay-widget/shared/PackagePicker.vue';
-import LocationPicker from '@/components/overlay-widget/shared/LocationPicker.vue';
+import store from '@/store/page-overlay/index';
+import { buildCsvDataOrError, buildNamedCsvFileData, downloadCsvFile } from '@/utils/csv';
+import { submitDateFromIsodate, todayIsodate } from '@/utils/date';
+import Vue from 'vue';
 
 export default Vue.extend({
   name: 'MovePackagesBuilder',
@@ -130,7 +108,7 @@ export default Vue.extend({
     setActiveStepIndex(index: number) {
       this.$data.activeStepIndex = index;
 
-      analyticsManager.track(MessageType.BUILDER_ENGAGEMENT, {
+      analyticsManager.track(AnalyticsEvent.BUILDER_ENGAGEMENT, {
         builder: this.$data.builderType,
         action: `Set active step to ${index}`,
       });
@@ -161,7 +139,7 @@ export default Vue.extend({
         await downloadCsvFile({ csvFile, delay: 500 });
       }
 
-      analyticsManager.track(MessageType.DOWNLOADED_CSVS, {
+      analyticsManager.track(AnalyticsEvent.DOWNLOADED_CSVS, {
         builderType: this.$data.builderType,
         csvData: {
           tagCount: this.$data.selectedPackages.length,
@@ -224,8 +202,8 @@ export default Vue.extend({
       ],
     };
   },
-  async mounted() {},
-  async created() {},
+  async mounted() { },
+  async created() { },
   destroyed() {
     // Looks like modal is not actually destroyed
   },

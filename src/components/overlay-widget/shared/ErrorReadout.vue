@@ -53,7 +53,7 @@
 </template>
 
 <script lang="ts">
-import { MessageType } from '@/consts';
+import { AnalyticsEvent } from '@/consts';
 import { analyticsManager } from '@/modules/analytics-manager.module';
 import { DataLoadError, DataLoadErrorType } from '@/modules/data-loader/data-loader-error';
 import store from '@/store/page-overlay/index';
@@ -81,7 +81,7 @@ export default Vue.extend({
       immediate: true,
       handler(newValue, oldValue) {
         if (newValue) {
-          analyticsManager.track(MessageType.BUILDER_ERROR_READOUT, {
+          analyticsManager.track(AnalyticsEvent.BUILDER_ERROR_READOUT, {
             error: newValue,
             errorMessage: newValue.toString(),
             errorType: newValue.errorType,

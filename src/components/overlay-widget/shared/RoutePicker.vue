@@ -1,18 +1,8 @@
 <template>
   <div class="flex flex-col items-stretch space-y-8">
-    <b-form-group
-      label="PLANNED ROUTE"
-      label-class="text-gray-400"
-      label-size="sm"
-      style="margin: 0"
-    >
-      <b-form-textarea
-        v-model="plannedRoute"
-        rows="4"
-        placeholder="Enter route description"
-        required
-        :state="!plannedRoute ? false : null"
-      />
+    <b-form-group label="PLANNED ROUTE" label-class="text-gray-400" label-size="sm" style="margin: 0">
+      <b-form-textarea v-model="plannedRoute" rows="4" placeholder="Enter route description" required
+        :state="!plannedRoute ? false : null" />
     </b-form-group>
 
     <template v-if="directionDataLoading">
@@ -23,19 +13,15 @@
     </template>
 
     <template v-if="showMapsIframe">
-      <google-maps
-        class="w-full h-full col-span-2"
-        mapMode="directions"
-        :destination="destinationAddress"
-        :origin="originAddress"
-      />
+      <google-maps class="w-full h-full col-span-2" mapMode="directions" :destination="destinationAddress"
+        :origin="originAddress" />
     </template>
   </div>
 </template>
 
 <script lang="ts">
 import GoogleMaps from '@/components/shared/GoogleMaps.vue';
-import { MessageType } from '@/consts';
+import { AnalyticsEvent } from '@/consts';
 import { analyticsManager } from '@/modules/analytics-manager.module';
 import store from '@/store/page-overlay/index';
 import { TransferBuilderActions } from '@/store/page-overlay/modules/transfer-builder/consts';
@@ -124,7 +110,7 @@ export default Vue.extend({
         return;
       }
 
-      analyticsManager.track(MessageType.BUILDER_EVENT, {
+      analyticsManager.track(AnalyticsEvent.BUILDER_EVENT, {
         action: 'Started update directions',
       });
 
@@ -137,7 +123,7 @@ export default Vue.extend({
         //   _this.destinationAddress
         // );
       } catch (e) {
-        analyticsManager.track(MessageType.BUILDER_EVENT, {
+        analyticsManager.track(AnalyticsEvent.BUILDER_EVENT, {
           action: 'Failed to load directions',
         });
       }
@@ -147,7 +133,7 @@ export default Vue.extend({
       if (!response || !response.valid) {
         debugLog(async () => ['directions response', response]);
 
-        analyticsManager.track(MessageType.BUILDER_EVENT, {
+        analyticsManager.track(AnalyticsEvent.BUILDER_EVENT, {
           action: 'Directions response was invalid',
         });
 
@@ -159,14 +145,14 @@ export default Vue.extend({
       // Only update the planned route if the textarea is empty
       _this.plannedRoute = extractTextDirections(directions[0]);
 
-      analyticsManager.track(MessageType.BUILDER_EVENT, {
+      analyticsManager.track(AnalyticsEvent.BUILDER_EVENT, {
         action: 'Received directions response',
         directionsResponse: response,
       });
     }, 500),
   },
-  async created() {},
-  async mounted() {},
+  async created() { },
+  async mounted() { },
 });
 </script>
 

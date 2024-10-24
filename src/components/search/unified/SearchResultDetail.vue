@@ -81,7 +81,7 @@ import MetrcTag from "@/components/overlay-widget/shared/MetrcTag.vue";
 import PackageButtonList from "@/components/overlay-widget/shared/PackageButtonList.vue";
 import TransferButtonList from "@/components/overlay-widget/shared/TransferButtonList.vue";
 import RecursiveJsonTable from "@/components/search/shared/RecursiveJsonTable.vue";
-import { MessageType, METRC_HOSTNAMES_LACKING_LAB_PDFS } from "@/consts";
+import { AnalyticsEvent, METRC_HOSTNAMES_LACKING_LAB_PDFS } from "@/consts";
 import { IIndexedHarvestData, IIndexedItemData, IIndexedPlantBatchData, IIndexedPlantData, IIndexedSalesReceiptData, IIndexedStrainData, IIndexedTagData, IIndexedTransferData, IPluginState, ITransferPackageList, IUnionIndexedPackageData, URLHashData } from "@/interfaces";
 import { analyticsManager } from "@/modules/analytics-manager.module";
 import { ITEMS_TAB_REGEX, PACKAGE_TAB_REGEX, PLANTS_TAB_REGEX, SALES_TAB_REGEX, STRAINS_TAB_REGEX, TAG_TAB_REGEX, TRANSFER_TAB_REGEX } from "@/modules/page-manager/consts";
@@ -311,7 +311,7 @@ export default Vue.extend({
     // Transfer
     //
     async openInPage() {
-      analyticsManager.track(MessageType.SELECTED_SEARCH_RESULT);
+      analyticsManager.track(AnalyticsEvent.SELECTED_SEARCH_RESULT);
 
       const activeSearchResult = store.state.search.activeSearchResult;
 
@@ -343,7 +343,7 @@ export default Vue.extend({
 
       const link: string = this.getLink();
 
-      analyticsManager.track(MessageType.COPIED_TEXT, { value: link });
+      analyticsManager.track(AnalyticsEvent.COPIED_TEXT, { value: link });
 
       copyToClipboard(link);
 

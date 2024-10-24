@@ -142,7 +142,7 @@
 </template>
 
 <script lang="ts">
-import { MessageType, ModalAction, ModalType, PackageState } from "@/consts";
+import { AnalyticsEvent, ModalAction, ModalType, PackageState } from "@/consts";
 import { IPluginState, IUnionIndexedPackageData } from "@/interfaces";
 import { analyticsManager } from "@/modules/analytics-manager.module";
 import { modalManager } from "@/modules/modal-manager.module";
@@ -223,7 +223,7 @@ export default Vue.extend({
       refreshOAuthState: `pluginAuth/${PluginAuthActions.REFRESH_OAUTH_STATE}`,
     }),
     openPackageHistoryBuilder() {
-      analyticsManager.track(MessageType.OPENED_PACKAGE_HISTORY, {
+      analyticsManager.track(AnalyticsEvent.OPENED_PACKAGE_HISTORY, {
         source: "CONTEXT_MENU",
       });
       modalManager.dispatchModalEvent(ModalType.BUILDER, ModalAction.OPEN, {
@@ -231,7 +231,7 @@ export default Vue.extend({
       });
     },
     openMetrcExplorer() {
-      analyticsManager.track(MessageType.OPENED_METRC_EXPLORER, {
+      analyticsManager.track(AnalyticsEvent.OPENED_METRC_EXPLORER, {
         source: "CONTEXT_MENU",
       });
       modalManager.dispatchModalEvent(ModalType.BUILDER, ModalAction.OPEN, {
@@ -239,7 +239,7 @@ export default Vue.extend({
       });
     },
     openPackageGraph(query: string) {
-      analyticsManager.track(MessageType.OPENED_GRAPH, {
+      analyticsManager.track(AnalyticsEvent.OPENED_GRAPH, {
         source: "CONTEXT_MENU",
       });
 
@@ -254,29 +254,29 @@ export default Vue.extend({
       modalManager.dispatchContextMenuEvent(null);
     },
     transferPackage() {
-      analyticsManager.track(MessageType.CONTEXT_MENU_SELECT, { event: "transferPackage" });
+      analyticsManager.track(AnalyticsEvent.CONTEXT_MENU_SELECT, { event: "transferPackage" });
 
       this.addPackageToTransferList({ pkg: this.$props.pkg });
 
-      analyticsManager.track(MessageType.STARTED_TRANSFER_FROM_INLINE_BUTTON, {});
+      analyticsManager.track(AnalyticsEvent.STARTED_TRANSFER_FROM_INLINE_BUTTON, {});
       modalManager.dispatchModalEvent(ModalType.BUILDER, ModalAction.OPEN, {
         initialRoute: "/transfer/transfer-builder",
       });
       this.dismiss();
     },
     splitPackage() {
-      analyticsManager.track(MessageType.CONTEXT_MENU_SELECT, { event: "splitPackage" });
+      analyticsManager.track(AnalyticsEvent.CONTEXT_MENU_SELECT, { event: "splitPackage" });
 
       this.setSplitSourcePackage({ pkg: this.$props.pkg });
 
-      analyticsManager.track(MessageType.SPLIT_PACKAGE_FROM_TOOLKIT_SEARCH, {});
+      analyticsManager.track(AnalyticsEvent.SPLIT_PACKAGE_FROM_TOOLKIT_SEARCH, {});
       modalManager.dispatchModalEvent(ModalType.BUILDER, ModalAction.OPEN, {
         initialRoute: "/package/split-package",
       });
       this.dismiss();
     },
     async printTag() {
-      analyticsManager.track(MessageType.CONTEXT_MENU_SELECT, { event: "printTag" });
+      analyticsManager.track(AnalyticsEvent.CONTEXT_MENU_SELECT, { event: "printTag" });
 
       const labelDataList: ILabelData[] = [
         {
@@ -307,40 +307,40 @@ export default Vue.extend({
       this.dismiss();
     },
     async viewLabTests() {
-      analyticsManager.track(MessageType.CONTEXT_MENU_SELECT, { event: "viewLabTests" });
+      analyticsManager.track(AnalyticsEvent.CONTEXT_MENU_SELECT, { event: "viewLabTests" });
 
       const labTestData = await generatePackageMetadata({ pkg: this.$props.pkg });
 
       modalManager.dispatchModalEvent(ModalType.DOCUMENT, ModalAction.OPEN, {
         documentUrls: labTestData.testResultPdfUrls,
       });
-      analyticsManager.track(MessageType.CLICKED_VIEW_LAB_TEST_BUTTON);
+      analyticsManager.track(AnalyticsEvent.CLICKED_VIEW_LAB_TEST_BUTTON);
       this.dismiss();
     },
     async printLabTests() {
-      analyticsManager.track(MessageType.CONTEXT_MENU_SELECT, { event: "printLabTests" });
+      analyticsManager.track(AnalyticsEvent.CONTEXT_MENU_SELECT, { event: "printLabTests" });
 
       const labTestData = await generatePackageMetadata({ pkg: this.$props.pkg });
 
       printPdfFromUrl({ urls: labTestData.testResultPdfUrls, modal: true });
 
-      analyticsManager.track(MessageType.CLICKED_PRINT_LAB_TEST_BUTTON);
+      analyticsManager.track(AnalyticsEvent.CLICKED_PRINT_LAB_TEST_BUTTON);
       this.dismiss();
     },
     downloadLabTestPdfs() {
-      analyticsManager.track(MessageType.CONTEXT_MENU_SELECT, { event: "downloadLabTestPdfs" });
+      analyticsManager.track(AnalyticsEvent.CONTEXT_MENU_SELECT, { event: "downloadLabTestPdfs" });
 
       downloadLabTestPdfs({ pkg: this.$props.pkg });
 
-      analyticsManager.track(MessageType.CLICKED_DOWNLOAD_LAB_TEST_BUTTON);
+      analyticsManager.track(AnalyticsEvent.CLICKED_DOWNLOAD_LAB_TEST_BUTTON);
       this.dismiss();
     },
     downloadLabTestCsv() {
-      analyticsManager.track(MessageType.CONTEXT_MENU_SELECT, { event: "downloadLabTestCsv" });
+      analyticsManager.track(AnalyticsEvent.CONTEXT_MENU_SELECT, { event: "downloadLabTestCsv" });
 
       downloadLabTestCsv({ pkg: this.$props.pkg });
 
-      analyticsManager.track(MessageType.CLICKED_DOWNLOAD_LAB_TEST_BUTTON);
+      analyticsManager.track(AnalyticsEvent.CLICKED_DOWNLOAD_LAB_TEST_BUTTON);
       this.dismiss();
     },
   },

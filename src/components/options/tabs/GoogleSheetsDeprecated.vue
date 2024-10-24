@@ -92,8 +92,8 @@ export default Vue.extend({
       console.log(await createSpreadsheet());
     },
   },
-  async created() {},
-  async mounted() {},
+  async created() { },
+  async mounted() { },
 });
 </script>
 

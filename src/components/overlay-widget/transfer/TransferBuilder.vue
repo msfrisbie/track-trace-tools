@@ -1,13 +1,7 @@
 <template>
   <div class="grid grid-cols-3 gap-8 h-full" style="grid-template-rows: auto 1fr">
-    <builder-step-header
-      v-for="(step, index) of steps"
-      :key="index"
-      :stepNumber="index + 1"
-      :stepText="step.stepText"
-      :active="index === activeStepIndex"
-      @click.stop.prevent.native="setActiveStepIndex(index)"
-    />
+    <builder-step-header v-for="(step, index) of steps" :key="index" :stepNumber="index + 1" :stepText="step.stepText"
+      :active="index === activeStepIndex" @click.stop.prevent.native="setActiveStepIndex(index)" />
 
     <div class="col-span-3 h-full">
       <template v-if="activeStepIndex === 0">
@@ -23,39 +17,24 @@
                 <span>Edit existing transfer</span>
               </b-form-checkbox>
 
-              <transfer-picker
-                v-if="editTransfer"
-                :transfer.sync="transferForUpdate"
-              ></transfer-picker>
+              <transfer-picker v-if="editTransfer" :transfer.sync="transferForUpdate"></transfer-picker>
             </div>
 
             <b-form-group label="TRANSFER TYPE" label-class="text-gray-400">
-              <b-form-select
-                v-model="transferType"
-                :options="transferTypeOptions"
-                size="md"
-              ></b-form-select>
+              <b-form-select v-model="transferType" :options="transferTypeOptions" size="md"></b-form-select>
             </b-form-group>
 
             <template v-if="!destinationFacility">
               <b-form-group label="SELECT DESTINATION" label-class="text-gray-400" label-size="sm">
                 <!-- position:relative fixes a bug where the dropdown falls off the screen -->
-                <vue-typeahead-bootstrap
-                  style="position: relative"
-                  v-model="destinationQuery"
-                  placeholder="Search by license or facility name"
-                  size="md"
-                  :data="destinationFacilities"
-                  :showOnFocus="true"
-                  :serializer="facilitySummary"
-                  @hit="selectDestinationFacility($event)"
-                >
+                <vue-typeahead-bootstrap style="position: relative" v-model="destinationQuery"
+                  placeholder="Search by license or facility name" size="md" :data="destinationFacilities"
+                  :showOnFocus="true" :serializer="facilitySummary" @hit="selectDestinationFacility($event)">
                   <template slot="prepend">
                     <!-- Probably a better way to do this -->
                     <div class="input-group-prepend">
-                      <span class="input-group-text"
-                        ><font-awesome-icon icon="map-marker-alt" class="prepend-icon"
-                      /></span>
+                      <span class="input-group-text"><font-awesome-icon icon="map-marker-alt"
+                          class="prepend-icon" /></span>
                     </div>
                   </template>
                 </vue-typeahead-bootstrap>
@@ -71,26 +50,18 @@
 
             <template v-if="showInitializationError">
               <div class="flex flex-col space-y-2 items-center text-red-700">
-                <span class="font-bold"
-                  >Something went wrong while setting up this transfer tool.</span
-                >
+                <span class="font-bold">Something went wrong while setting up this transfer tool.</span>
                 <span>The T3 team has been notified, and we're working on a fix.</span>
               </div>
             </template>
 
             <template v-if="destinationFacility">
-              <div
-                class="h-full grid grid-cols-3 grid-rows-3 gap-8"
-                style="grid-template-columns: auto 1fr 1fr; grid-template-rows: auto auto 1fr"
-              >
+              <div class="h-full grid grid-cols-3 grid-rows-3 gap-8"
+                style="grid-template-columns: auto 1fr 1fr; grid-template-rows: auto auto 1fr">
                 <start-finish-icons :ellipsisCount="6" class="row-span-2 text-purple-500" />
 
-                <b-form-group
-                  label="ORIGIN"
-                  label-class="text-gray-400"
-                  label-size="sm"
-                  v-bind:class="{ 'col-span-2': isSameSiteTransfer }"
-                >
+                <b-form-group label="ORIGIN" label-class="text-gray-400" label-size="sm"
+                  v-bind:class="{ 'col-span-2': isSameSiteTransfer }">
                   <template v-if="originFacility">
                     <facility-summary :facility="originFacility" />
                   </template>
@@ -98,65 +69,37 @@
 
                 <!-- Only needed for google maps -->
                 <template v-if="!isSameSiteTransfer">
-                  <b-form-group
-                    label="ORIGIN ADDRESS"
-                    label-class="text-gray-400"
-                    label-size="sm"
-                    class="opacity-0"
-                  >
-                    <b-form-textarea
-                      v-model="originAddress"
-                      rows="3"
-                      class="borderless-input"
-                      placeholder="Origin Address"
-                    />
+                  <b-form-group label="ORIGIN ADDRESS" label-class="text-gray-400" label-size="sm" class="opacity-0">
+                    <b-form-textarea v-model="originAddress" rows="3" class="borderless-input"
+                      placeholder="Origin Address" />
                   </b-form-group>
                 </template>
 
-                <b-form-group
-                  label="DESTINATION"
-                  label-class="text-gray-400"
-                  label-size="sm"
-                  v-bind:class="{ 'col-span-2': isSameSiteTransfer }"
-                >
+                <b-form-group label="DESTINATION" label-class="text-gray-400" label-size="sm"
+                  v-bind:class="{ 'col-span-2': isSameSiteTransfer }">
                   <facility-summary :facility="destinationFacility" />
                 </b-form-group>
 
                 <!-- Only needed for google maps -->
                 <template v-if="!isSameSiteTransfer">
-                  <b-form-group
-                    label="DESTINATION ADDRESS"
-                    label-class="text-gray-400"
-                    label-size="sm"
-                    class="opacity-0"
-                  >
-                    <b-form-textarea
-                      v-model="destinationAddress"
-                      rows="3"
-                      class="borderless-input"
-                      placeholder="Destination Address"
-                    />
+                  <b-form-group label="DESTINATION ADDRESS" label-class="text-gray-400" label-size="sm"
+                    class="opacity-0">
+                    <b-form-textarea v-model="destinationAddress" rows="3" class="borderless-input"
+                      placeholder="Destination Address" />
                   </b-form-group>
                 </template>
 
                 <div class="col-start-2">
-                  <b-button
-                    variant="outline-danger"
-                    @click="selectDestinationFacility(null)"
-                    size="sm"
-                    class="my-4 opacity-60"
-                    >REMOVE</b-button
-                  >
+                  <b-button variant="outline-danger" @click="selectDestinationFacility(null)" size="sm"
+                    class="my-4 opacity-60">REMOVE</b-button>
                 </div>
               </div>
             </template>
 
             <template v-else>
               <template v-if="!transferDataLoading">
-                <recent-facility-picker
-                  :facilities="recentDestinationFacilities"
-                  v-on:selectFacility="selectDestinationFacility($event)"
-                />
+                <recent-facility-picker :facilities="recentDestinationFacilities"
+                  v-on:selectFacility="selectDestinationFacility($event)" />
               </template>
             </template>
           </div>
@@ -167,24 +110,12 @@
                 <b-form-checkbox v-model="isSameSiteTransfer" size="md" id="same-site-checkbox">
                 </b-form-checkbox>
 
-                <label style="margin: 0 !important" for="same-site-checkbox"
-                  >Same Site Transfer</label
-                >
+                <label style="margin: 0 !important" for="same-site-checkbox">Same Site Transfer</label>
 
                 <div id="transfer-builder-popover-container">
-                  <font-awesome-icon
-                    icon="question-circle"
-                    class="text-gray-500"
-                    id="same-site-popover-target"
-                  />
-                  <b-popover
-                    target="same-site-popover-target"
-                    triggers="hover"
-                    placement="bottom"
-                    variant="primary"
-                    ref="same-site-popover"
-                    container="transfer-builder-popover-container"
-                  >
+                  <font-awesome-icon icon="question-circle" class="text-gray-500" id="same-site-popover-target" />
+                  <b-popover target="same-site-popover-target" triggers="hover" placement="bottom" variant="primary"
+                    ref="same-site-popover" container="transfer-builder-popover-container">
                     <template #title>
                       <span class="text-base"><b>Same Site Transfers</b></span>
                     </template>
@@ -202,18 +133,12 @@
               </div>
 
               <template v-if="!isSameSiteTransfer">
-                <route-picker
-                  class="flex-grow"
-                  :originAddress="originAddress"
-                  :destinationAddress="destinationAddress"
-                />
+                <route-picker class="flex-grow" :originAddress="originAddress"
+                  :destinationAddress="destinationAddress" />
               </template>
             </template>
 
-            <div
-              class="col-span-2 flex flex-col justify-end"
-              v-bind:class="{ 'flex-grow': isSameSiteTransfer }"
-            >
+            <div class="col-span-2 flex flex-col justify-end" v-bind:class="{ 'flex-grow': isSameSiteTransfer }">
               <template v-if="!pageOneErrorMessage">
                 <b-button variant="success" size="md" @click="activeStepIndex = 1"> NEXT </b-button>
               </template>
@@ -228,13 +153,8 @@
 
       <template v-if="activeStepIndex === 1">
         <div class="grid grid-cols-2 grid-rows-2 gap-8 h-full" style="grid-template-rows: 1fr auto">
-          <single-package-picker
-            class="col-span-2 h-full"
-            :enablePaste="true"
-            :selectedPackages="transferPackages"
-            v-on:removePackage="removePackage({ pkg: $event })"
-            v-on:addPackage="addPackage({ pkg: $event })"
-          />
+          <single-package-picker class="col-span-2 h-full" :enablePaste="true" :selectedPackages="transferPackages"
+            v-on:removePackage="removePackage({ pkg: $event })" v-on:addPackage="addPackage({ pkg: $event })" />
 
           <div class="col-start-2 flex flex-col items-stretch space-y-2">
             <template v-if="!pageTwoErrorMessage">
@@ -251,38 +171,21 @@
       <template v-if="activeStepIndex === 2">
         <div class="grid grid-cols-3 gap-8 h-full" style="grid-template-rows: 1fr auto">
           <!-- Column 1 -->
-          <div
-            class="flex flex-col items-stretch space-y-8 overflow-y-auto overflow-x-hidden toolkit-scroll"
-          >
+          <div class="flex flex-col items-stretch space-y-8 overflow-y-auto overflow-x-hidden toolkit-scroll">
             <div class="text-start text-2xl font-bold border-b border-gray-400 text-gray-400">
               PACKAGES ({{ transferPackages.length }})
             </div>
 
-            <div
-              class="flex flex-col items-stretch text-md text-gray-700 gap-2 overflow-y-auto toolkit-scroll px-2"
-              style="max-height: 35vh"
-            >
+            <div class="flex flex-col items-stretch text-md text-gray-700 gap-2 overflow-y-auto toolkit-scroll px-2"
+              style="max-height: 35vh">
               <template v-if="isTransferSubmittedWithDestinationGrossWeight">
-                <b-form-group
-                  label="DESTINATION GROSS WEIGHT"
-                  label-class="text-gray-400"
-                  label-size="sm"
-                >
+                <b-form-group label="DESTINATION GROSS WEIGHT" label-class="text-gray-400" label-size="sm">
                   <b-input-group class="mt-2">
-                    <b-form-input
-                      size="md"
-                      type="number"
-                      value="null"
-                      v-model="destinationGrossWeight"
-                      :state="!!destinationGrossWeight"
-                    ></b-form-input>
+                    <b-form-input size="md" type="number" value="null" v-model="destinationGrossWeight"
+                      :state="!!destinationGrossWeight"></b-form-input>
 
-                    <b-form-select
-                      size="md"
-                      :options="weightOptions"
-                      v-model="destinationGrossUnitOfWeight"
-                      :state="!!destinationGrossUnitOfWeight"
-                    />
+                    <b-form-select size="md" :options="weightOptions" v-model="destinationGrossUnitOfWeight"
+                      :state="!!destinationGrossUnitOfWeight" />
                   </b-input-group>
                 </b-form-group>
               </template>
@@ -299,34 +202,19 @@
                   </div>
                   <template v-if="isTransferSubmittedWithPackageGrossWeight">
                     <b-input-group class="mt-2">
-                      <b-form-input
-                        size="md"
-                        type="number"
-                        value="null"
-                        v-model="packageGrossWeights[idx]"
-                        :state="!!packageGrossWeights[idx]"
-                      ></b-form-input>
+                      <b-form-input size="md" type="number" value="null" v-model="packageGrossWeights[idx]"
+                        :state="!!packageGrossWeights[idx]"></b-form-input>
 
-                      <b-form-select
-                        size="md"
-                        :options="weightOptions"
-                        v-model="packageGrossUnitsOfWeight[idx]"
-                        :state="!!packageGrossUnitsOfWeight[idx]"
-                      />
+                      <b-form-select size="md" :options="weightOptions" v-model="packageGrossUnitsOfWeight[idx]"
+                        :state="!!packageGrossUnitsOfWeight[idx]" />
                     </b-input-group>
                     <b-form-text>Gross Weight</b-form-text>
                   </template>
 
                   <template v-if="isTransferSubmittedWithWholesalePrice">
                     <b-input-group prepend="$">
-                      <b-form-input
-                        size="md"
-                        type="number"
-                        value="null"
-                        step="0.01"
-                        :state="!!wholesalePackageValues[idx]"
-                        v-model="wholesalePackageValues[idx]"
-                      ></b-form-input>
+                      <b-form-input size="md" type="number" value="null" step="0.01"
+                        :state="!!wholesalePackageValues[idx]" v-model="wholesalePackageValues[idx]"></b-form-input>
                     </b-input-group>
                     <b-form-text>Wholesale Price</b-form-text>
                   </template>
@@ -337,9 +225,7 @@
 
           <!-- Column 2 -->
           <div class="flex flex-col items-stretch">
-            <div
-              class="flex flex-col items-stretch space-y-8 overflow-y-auto overflow-x-hidden toolkit-scroll"
-            >
+            <div class="flex flex-col items-stretch space-y-8 overflow-y-auto overflow-x-hidden toolkit-scroll">
               <div class="text-start text-2xl font-bold border-b border-gray-400 text-gray-400">
                 ITINERARY
               </div>
@@ -349,46 +235,29 @@
           </div>
 
           <!-- Column 3 -->
-          <div
-            class="flex flex-col items-stretch space-y-8 overflow-y-auto overflow-x-hidden toolkit-scroll px-1"
-          >
+          <div class="flex flex-col items-stretch space-y-8 overflow-y-auto overflow-x-hidden toolkit-scroll px-1">
             <div class="text-start text-2xl font-bold border-b border-gray-400 text-gray-400">
               TRANSPORTER
             </div>
 
             <template v-if="!isTransferSubmittedWithoutTransporter">
               <template v-if="!transporterFacility">
-                <b-form-group
-                  label="SELECT TRANSPORTER"
-                  label-class="text-gray-400"
-                  label-size="sm"
-                >
-                  <vue-typeahead-bootstrap
-                    style="position: relative"
-                    v-model="transporterQuery"
-                    placeholder="Search by license or facility name"
-                    size="md"
-                    :data="transporterFacilities"
-                    :showOnFocus="true"
-                    :serializer="facilitySummary"
-                    @hit="selectTransporterFacility($event)"
-                  >
+                <b-form-group label="SELECT TRANSPORTER" label-class="text-gray-400" label-size="sm">
+                  <vue-typeahead-bootstrap style="position: relative" v-model="transporterQuery"
+                    placeholder="Search by license or facility name" size="md" :data="transporterFacilities"
+                    :showOnFocus="true" :serializer="facilitySummary" @hit="selectTransporterFacility($event)">
                     <template slot="prepend">
                       <!-- Probably a better way to do this -->
                       <div class="input-group-prepend">
-                        <span class="input-group-text"
-                          ><font-awesome-icon icon="truck" class="prepend-icon"
-                        /></span>
+                        <span class="input-group-text"><font-awesome-icon icon="truck" class="prepend-icon" /></span>
                       </div>
                     </template>
                   </vue-typeahead-bootstrap>
                 </b-form-group>
 
                 <template v-if="!transferDataLoading">
-                  <recent-facility-picker
-                    :facilities="recentTransporterFacilities"
-                    v-on:selectFacility="selectTransporterFacility($event)"
-                  />
+                  <recent-facility-picker :facilities="recentTransporterFacilities"
+                    v-on:selectFacility="selectTransporterFacility($event)" />
                 </template>
               </template>
 
@@ -396,42 +265,25 @@
                 <facility-summary :facility="transporterFacility" />
 
                 <div class="flex flex-col items-start justify-start">
-                  <b-button
-                    variant="outline-danger"
-                    @click="selectTransporterFacility(null)"
-                    size="sm"
-                    class="opacity-60"
-                    >REMOVE</b-button
-                  >
+                  <b-button variant="outline-danger" @click="selectTransporterFacility(null)" size="sm"
+                    class="opacity-60">REMOVE</b-button>
                 </div>
 
                 <b-form-group label="PHONE NUMBER" label-class="text-gray-400" label-size="sm">
-                  <div
-                    class="flex flex-row items-center space-x-2 border border-gray-200 px-2 rounded-sm"
-                  >
+                  <div class="flex flex-row items-center space-x-2 border border-gray-200 px-2 rounded-sm">
                     <font-awesome-icon icon="phone" class="text-gray-500" />
 
-                    <b-form-input
-                      v-model="phoneNumberForQuestions"
-                      class="borderless-input"
-                      required
-                      :state="!phoneNumberForQuestions ? false : null"
-                    />
+                    <b-form-input v-model="phoneNumberForQuestions" class="borderless-input" required
+                      :state="!phoneNumberForQuestions ? false : null" />
                   </div>
                 </b-form-group>
 
-                <template
-                  v-if="
-                    !!defaultPhoneNumberForQuestions &&
-                    phoneNumberForQuestions !== defaultPhoneNumberForQuestions
-                  "
-                >
-                  <b-button
-                    variant="link"
-                    size="sm"
-                    @click="phoneNumberForQuestions = defaultPhoneNumberForQuestions"
-                    >USE DEFAULT PHONE #</b-button
-                  >
+                <template v-if="
+                  !!defaultPhoneNumberForQuestions &&
+                  phoneNumberForQuestions !== defaultPhoneNumberForQuestions
+                ">
+                  <b-button variant="link" size="sm"
+                    @click="phoneNumberForQuestions = defaultPhoneNumberForQuestions">USE DEFAULT PHONE #</b-button>
                 </template>
 
                 <template v-if="!isSameSiteTransfer">
@@ -448,13 +300,7 @@
           <div class="col-span-3 flex flex-col items-center">
             <transition name="fade">
               <template v-if="!errorMessage">
-                <b-button
-                  class="w-full"
-                  style="max-width: 600px"
-                  variant="success"
-                  size="md"
-                  @click="submit()"
-                >
+                <b-button class="w-full" style="max-width: 600px" variant="success" size="md" @click="submit()">
                   <template v-if="transferForUpdate === null"> CREATE TRANSFER </template>
                   <template v-else> UPDATE TRANSFER </template>
                 </b-button>
@@ -463,8 +309,7 @@
               <template v-else>
                 <span class="text-red-700">{{
                   pageThreeErrorMessage || errorMessage
-                }}</span></template
-              >
+                }}</span></template>
             </transition>
           </div>
         </div>
@@ -483,7 +328,7 @@ import RoutePicker from "@/components/overlay-widget/shared/RoutePicker.vue";
 import SinglePackagePicker from "@/components/overlay-widget/shared/SinglePackagePicker.vue";
 import StartFinishIcons from "@/components/overlay-widget/shared/StartFinishIcons.vue";
 import TransferPicker from "@/components/overlay-widget/shared/TransferPicker.vue";
-import { BuilderType, MessageType } from "@/consts";
+import { AnalyticsEvent, BuilderType } from "@/consts";
 import {
   IBuilderComponentError,
   IComputedGetSet,
@@ -582,7 +427,7 @@ export default Vue.extend({
           this.isSameSiteTransfer = true;
         }
 
-        analyticsManager.track(MessageType.BUILDER_ENGAGEMENT, {
+        analyticsManager.track(AnalyticsEvent.BUILDER_ENGAGEMENT, {
           builder: this.builderType,
           action: `Set destination facility to ${facility?.FacilityName}`,
         });
@@ -595,7 +440,7 @@ export default Vue.extend({
         this.transporterFacility = facility;
         this.$data.transporterQuery = facilitySummary(facility);
 
-        analyticsManager.track(MessageType.BUILDER_ENGAGEMENT, {
+        analyticsManager.track(AnalyticsEvent.BUILDER_ENGAGEMENT, {
           builder: this.builderType,
           action: `Set transporter facility to ${facility?.FacilityName}`,
         });
@@ -604,7 +449,7 @@ export default Vue.extend({
     setActiveStepIndex(index: number) {
       this.$data.activeStepIndex = index;
 
-      analyticsManager.track(MessageType.BUILDER_ENGAGEMENT, {
+      analyticsManager.track(AnalyticsEvent.BUILDER_ENGAGEMENT, {
         builder: this.builderType,
         action: `Set active step to ${index}`,
       });
@@ -632,15 +477,15 @@ export default Vue.extend({
       const estimatedDepartureDateTime: string = this.isSameSiteTransfer
         ? isoNowDatetime
         : combineTimeAndDate({
-            isodate: this.transferBuilderState.departureIsodate,
-            isotime: this.transferBuilderState.departureIsotime,
-          });
+          isodate: this.transferBuilderState.departureIsodate,
+          isotime: this.transferBuilderState.departureIsotime,
+        });
       const estimatedArrivalDateTime: string = this.isSameSiteTransfer
         ? isoNowDatetime
         : combineTimeAndDate({
-            isodate: this.transferBuilderState.arrivalIsodate,
-            isotime: this.transferBuilderState.arrivalIsotime,
-          });
+          isodate: this.transferBuilderState.arrivalIsodate,
+          isotime: this.transferBuilderState.arrivalIsotime,
+        });
 
       const driverName: string = this.isSameSiteTransfer
         ? "N/A"
@@ -688,25 +533,25 @@ export default Vue.extend({
 
       const layoverTransporterMixin = this.transferBuilderState.isLayover
         ? {
-            IsLayover: "true",
-            EstimatedDepartureDateTime: combineTimeAndDate({
-              isodate: this.transferBuilderState.layoverCheckOutIsodate,
-              isotime: this.transferBuilderState.layoverCheckOutIsotime,
-            }),
-            EstimatedArrivalDateTime: combineTimeAndDate({
-              isodate: this.transferBuilderState.layoverCheckInIsodate,
-              isotime: this.transferBuilderState.layoverCheckInIsotime,
-            }),
-          }
+          IsLayover: "true",
+          EstimatedDepartureDateTime: combineTimeAndDate({
+            isodate: this.transferBuilderState.layoverCheckOutIsodate,
+            isotime: this.transferBuilderState.layoverCheckOutIsotime,
+          }),
+          EstimatedArrivalDateTime: combineTimeAndDate({
+            isodate: this.transferBuilderState.layoverCheckInIsodate,
+            isotime: this.transferBuilderState.layoverCheckInIsotime,
+          }),
+        }
         : {};
 
       const layoverDriverMixin = this.transferBuilderState.isLayover
         ? {
-            DriverLayoverLeg: this.transferBuilderState.driverLayoverLeg,
-          }
+          DriverLayoverLeg: this.transferBuilderState.driverLayoverLeg,
+        }
         : {
-            DriverLayoverLeg: "" as DriverLayoverLeg,
-          };
+          DriverLayoverLeg: "" as DriverLayoverLeg,
+        };
 
       const transporters: IMetrcTransferTransporterData[] = [
         {
@@ -735,14 +580,14 @@ export default Vue.extend({
 
       const destinationGrossWeightMixin = this.isTransferSubmittedWithDestinationGrossWeight
         ? {
-            GrossWeight: this.transferBuilderState.destinationGrossWeight!.toString(),
-            GrossUnitOfWeightId:
-              this.transferBuilderState.destinationGrossUnitOfWeight!.Id.toString(),
-          }
+          GrossWeight: this.transferBuilderState.destinationGrossWeight!.toString(),
+          GrossUnitOfWeightId:
+            this.transferBuilderState.destinationGrossUnitOfWeight!.Id.toString(),
+        }
         : {
-            GrossWeight: "",
-            GrossUnitOfWeightId: "",
-          };
+          GrossWeight: "",
+          GrossUnitOfWeightId: "",
+        };
 
       const transferData: IMetrcCreateTransferPayload | IMetrcUpdateTransferPayload = {
         ShipmentLicenseType: "Licensed",
@@ -765,7 +610,7 @@ export default Vue.extend({
       const rows: IMetrcCreateTransferPayload[] | IMetrcUpdateTransferPayload[] = [transferData];
 
       if (rows[0].Destinations.length === 0) {
-        analyticsManager.track(MessageType.BUILDER_DATA_ERROR, {
+        analyticsManager.track(AnalyticsEvent.BUILDER_DATA_ERROR, {
           builder: BuilderType.CREATE_TRANSFER,
           action: "Destinations is empty",
           payload: JSON.stringify(rows),
@@ -800,13 +645,13 @@ export default Vue.extend({
       );
 
       if (this.transferForUpdate) {
-        analyticsManager.track(MessageType.BUILDER_EVENT, {
+        analyticsManager.track(AnalyticsEvent.BUILDER_EVENT, {
           builder: BuilderType.UPDATE_TRANSFER,
           action: "Updated transfer",
           payload: JSON.stringify(rows),
         });
       } else {
-        analyticsManager.track(MessageType.BUILDER_EVENT, {
+        analyticsManager.track(AnalyticsEvent.BUILDER_EVENT, {
           builder: BuilderType.CREATE_TRANSFER,
           action: "Created transfer",
           payload: JSON.stringify(rows),
@@ -1354,12 +1199,12 @@ export default Vue.extend({
       try {
         this.$data.destinationFacilities = await primaryDataLoader.transferDestinationFacilities();
         this.$data.allDestinationFacilitiesLoaded = true;
-      } catch {}
+      } catch { }
 
       try {
         this.$data.transporterFacilities = await primaryDataLoader.transferTransporterFacilities();
         this.$data.allTransporterFacilitiesLoaded = true;
-      } catch {}
+      } catch { }
 
       this.$data.defaultPhoneNumberForQuestions =
         await dynamicConstsManager.defaultPhoneNumberForQuestions();
@@ -1390,7 +1235,7 @@ export default Vue.extend({
 
       this.$data.showInitializationError = true;
 
-      analyticsManager.track(MessageType.BUILDER_ERROR_READOUT, {
+      analyticsManager.track(AnalyticsEvent.BUILDER_ERROR_READOUT, {
         errorMessage: "Transfer builder initialization error",
         error: (e as Error)?.toString(),
       });
@@ -1398,7 +1243,7 @@ export default Vue.extend({
 
     this.$data.transferDataLoading = false;
   },
-  async created() {},
+  async created() { },
 });
 </script>
 
@@ -1406,10 +1251,15 @@ export default Vue.extend({
 .prepend-icon {
   width: 2rem;
 }
+
 .fade-enter-active {
   transition: all 0.5s;
 }
-.fade-enter /* .fade-leave-active below version 2.1.8 */ {
+
+.fade-enter
+
+/* .fade-leave-active below version 2.1.8 */
+  {
   opacity: 0;
   transform: translateY(10px);
 }

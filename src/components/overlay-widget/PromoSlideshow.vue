@@ -1,36 +1,16 @@
 <template>
   <div style="height: 40px; overflow: hidden">
-    <b-carousel
-      v-model="slide"
-      no-hover-pause
-      :interval="interval"
-      img-width="640"
-      img-height="40"
-      background="transparent"
-      @sliding-start="onSlideStart"
-      @sliding-end="onSlideEnd"
-      class="promo-carousel"
-      style="margin-bottom: 0 !important"
-      ref="myCarousel"
-    >
-      <b-carousel-slide
-        v-for="(slide, index) of slides"
-        :key="index"
-        html="foobar"
-        img-blank
-        @click.native="next()"
-      >
+    <b-carousel v-model="slide" no-hover-pause :interval="interval" img-width="640" img-height="40"
+      background="transparent" @sliding-start="onSlideStart" @sliding-end="onSlideEnd" class="promo-carousel"
+      style="margin-bottom: 0 !important" ref="myCarousel">
+      <b-carousel-slide v-for="(slide, index) of slides" :key="index" html="foobar" img-blank @click.native="next()">
         <template v-if="slide === 'review'">
           <div class="text-gray-700 flex flex-col justify-around gap-2">
             <div class="font-semibold ttt-purple">Enjoying Track & Trace Tools?</div>
             <div>
-              <a
-                class="text-purple-500 underline"
+              <a class="text-purple-500 underline"
                 href="https://chrome.google.com/webstore/detail/track-trace-tools/dfljickgkbfaoiifheibjpejloipegcb/reviews"
-                target="_blank"
-                @click.stop
-                >Leave a review!</a
-              >
+                target="_blank" @click.stop>Leave a review!</a>
               It only takes 5 seconds.
             </div>
           </div>
@@ -53,13 +33,9 @@
             <div class="font-semibold ttt-purple">Questions? Bugs? Feature ideas?</div>
             <div>
               Post in the
-              <a
-                class="text-purple-500 hover:text-purple-500 underline"
-                href="https://track-trace-tools.talkyard.net/latest"
-                target="_blank"
-                @click.stop
-                >Track & Trace Tools Forum</a
-              >
+              <a class="text-purple-500 hover:text-purple-500 underline"
+                href="https://track-trace-tools.talkyard.net/latest" target="_blank" @click.stop>Track & Trace Tools
+                Forum</a>
             </div>
           </div>
         </template>
@@ -68,13 +44,8 @@
             <div class="font-semibold ttt-purple">Need custom features for your company?</div>
             <div>
               Reach out to
-              <a
-                class="text-purple-500 hover:text-purple-500 underline"
-                href="mailto:matt@trackandtrace.tools"
-                target="_blank"
-                @click.stop
-                >matt@trackandtrace.tools</a
-              >
+              <a class="text-purple-500 hover:text-purple-500 underline" href="mailto:matt@trackandtrace.tools"
+                target="_blank" @click.stop>matt@trackandtrace.tools</a>
             </div>
           </div>
         </template>
@@ -83,13 +54,8 @@
             <div class="font-semibold ttt-purple">Track & Trace Tools is open source!</div>
             <div>
               Source code can be found
-              <a
-                class="text-purple-500 hover:text-purple-500 underline"
-                href="https://github.com/msfrisbie/track-trace-tools"
-                target="_blank"
-                @click.stop
-                >here</a
-              >
+              <a class="text-purple-500 hover:text-purple-500 underline"
+                href="https://github.com/msfrisbie/track-trace-tools" target="_blank" @click.stop>here</a>
             </div>
           </div>
         </template>
@@ -147,12 +113,8 @@
             <div class="font-semibold ttt-purple">Metrc Maximized</div>
             <div>
               Get access to advanced Track &amp; Trace Tools features with
-              <a
-                class="text-purple-500 hover:text-purple-500 underline"
-                href="#"
-                @click.stop="openRoute('/plus')"
-                >T3+</a
-              >
+              <a class="text-purple-500 hover:text-purple-500 underline" href="#"
+                @click.stop="openRoute('/plus')">T3+</a>
             </div>
           </div>
         </template>
@@ -161,12 +123,8 @@
             <div class="font-semibold ttt-purple">Customise Metrc Appearance</div>
             <div>
               Change the look and feel of Metrc in
-              <a
-                class="text-purple-500 hover:text-purple-500 underline"
-                href="#"
-                @click.stop="openRoute('/settings/all')"
-                >Settings</a
-              >
+              <a class="text-purple-500 hover:text-purple-500 underline" href="#"
+                @click.stop="openRoute('/settings/all')">Settings</a>
             </div>
           </div>
         </template>
@@ -175,13 +133,8 @@
             <div class="font-semibold ttt-purple">Support Track &amp; Trace Tools!</div>
             <div>
               Donate to the open source cannabis project
-              <a
-                class="text-purple-500 hover:text-purple-500 underline"
-                :href="donateUrl"
-                target="_blank"
-                @click.stop
-                >here</a
-              >
+              <a class="text-purple-500 hover:text-purple-500 underline" :href="donateUrl" target="_blank"
+                @click.stop>here</a>
             </div>
           </div>
         </template>
@@ -195,13 +148,8 @@
           <div class="text-gray-700 flex flex-col justify-around gap-2">
             <div class="font-semibold ttt-purple">T3 Search is getting an upgrade!</div>
             <div>
-              <a
-                class="text-purple-500 hover:text-purple-500 underline"
-                href="https://forms.gle/HnGn8hAN9tMXK3fp9"
-                target="_blank"
-                @click.stop
-                >Take this quick survey</a
-              >
+              <a class="text-purple-500 hover:text-purple-500 underline" href="https://forms.gle/HnGn8hAN9tMXK3fp9"
+                target="_blank" @click.stop>Take this quick survey</a>
               to make sure search V2 has what you need
             </div>
           </div>
@@ -213,61 +161,36 @@
             </div>
             <div class="flex flex-row justify-center items-center gap-2">
               <!-- Twitter (url, text, @mention) -->
-              <a
-                class="text-purple-500 hover:text-purple-500 underline"
-                :href="twitterShareUrl"
-                target="_blank"
-                @click.stop
-              >
+              <a class="text-purple-500 hover:text-purple-500 underline" :href="twitterShareUrl" target="_blank"
+                @click.stop>
                 <font-awesome-icon :icon="['fab', 'twitter']" />
               </a>
 
               <!-- Facebook (url) -->
-              <a
-                class="text-purple-500 hover:text-purple-500 underline"
-                :href="facebookShareUrl"
-                target="_blank"
-                @click.stop
-              >
+              <a class="text-purple-500 hover:text-purple-500 underline" :href="facebookShareUrl" target="_blank"
+                @click.stop>
                 <font-awesome-icon :icon="['fab', 'facebook']" />
               </a>
 
               <!-- Reddit (url, title) -->
-              <a
-                class="text-purple-500 hover:text-purple-500 underline"
-                :href="redditShareUrl"
-                target="_blank"
-                @click.stop
-              >
+              <a class="text-purple-500 hover:text-purple-500 underline" :href="redditShareUrl" target="_blank"
+                @click.stop>
                 <font-awesome-icon :icon="['fab', 'reddit']" />
               </a>
 
               <!-- LinkedIn (url, title, summary, source url) -->
-              <a
-                class="text-purple-500 hover:text-purple-500 underline"
-                :href="linkedinShareUrl"
-                target="_blank"
-                @click.stop
-              >
+              <a class="text-purple-500 hover:text-purple-500 underline" :href="linkedinShareUrl" target="_blank"
+                @click.stop>
                 <font-awesome-icon :icon="['fab', 'linkedin']" />
               </a>
 
               <!-- Email (subject, body) -->
-              <a
-                class="text-purple-500 hover:text-purple-500 underline"
-                :href="emailShareUrl"
-                target="_blank"
-                @click.stop
-              >
+              <a class="text-purple-500 hover:text-purple-500 underline" :href="emailShareUrl" target="_blank"
+                @click.stop>
                 <font-awesome-icon icon="envelope" />
               </a>
 
-              <a
-                class="text-purple-500 hover:text-purple-500 underline"
-                :href="shareUrl"
-                target="_blank"
-                @click.stop
-              >
+              <a class="text-purple-500 hover:text-purple-500 underline" :href="shareUrl" target="_blank" @click.stop>
                 <font-awesome-icon icon="link" />
               </a>
             </div>
@@ -355,8 +278,8 @@ export default Vue.extend({
       });
     },
   },
-  async created() {},
-  async mounted() {},
+  async created() { },
+  async mounted() { },
 });
 </script>
 

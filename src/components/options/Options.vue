@@ -10,11 +10,8 @@
           <b-nav-item href="#/">Welcome</b-nav-item>
           <b-nav-item href="#/faq">FAQ</b-nav-item>
           <b-nav-item href="https://dash.trackandtrace.tools" target="_blank">T3+</b-nav-item>
-          <b-nav-item
-            href="https://github.com/msfrisbie/track-trace-tools/commits/master"
-            target="_blank"
-            >Changelog</b-nav-item
-          >
+          <b-nav-item href="https://github.com/msfrisbie/track-trace-tools/commits/master"
+            target="_blank">Changelog</b-nav-item>
           <b-nav-item href="#/google-sheets">Google Sheets</b-nav-item>
           <b-nav-item href="#/custom-features">Custom Features</b-nav-item>
           <b-nav-item href="#/license">License</b-nav-item>
@@ -28,7 +25,7 @@
 
 <script lang="ts">
 import TitleBanner from "@/components/shared/TitleBanner.vue";
-import { ChromeStorageKeys, MessageType } from "@/consts";
+import { AnalyticsEvent, ChromeStorageKeys } from "@/consts";
 import { analyticsManager } from "@/modules/analytics-manager.module";
 import { messageBus } from "@/modules/message-bus.module";
 import { library } from "@fortawesome/fontawesome-svg-core";
@@ -57,7 +54,7 @@ export default Vue.extend({
   async mounted() {
     messageBus.init();
 
-    analyticsManager.track(MessageType.VIEWED_STANDALONE_PAGE, {
+    analyticsManager.track(AnalyticsEvent.VIEWED_STANDALONE_PAGE, {
       url: window.location.href,
     });
 

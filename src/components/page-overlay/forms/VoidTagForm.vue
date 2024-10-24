@@ -5,31 +5,21 @@
         <div class="w-full grid grid-cols-2 gap-4">
           <div class="text-center text-xl">Package Tags</div>
           <div class="text-center text-xl">Plant Tags</div>
-          <tag-picker
-            :selectedTags.sync="selectedPackageTags"
-            :tagTypeNames="[
-              'CannabisPackage',
-              'MedicalPackage',
-              'Cannabis Package',
-              'Medical Package',
-            ]"
-            :tagCount="0"
-          />
-          <tag-picker
-            :selectedTags.sync="selectedPlantTags"
-            :tagTypeNames="['CannabisPlant', 'MedicalPlant', 'Cannabis Plant', 'Medical Plant']"
-            :tagCount="0"
-          />
+          <tag-picker :selectedTags.sync="selectedPackageTags" :tagTypeNames="[
+            'CannabisPackage',
+            'MedicalPackage',
+            'Cannabis Package',
+            'Medical Package',
+          ]" :tagCount="0" />
+          <tag-picker :selectedTags.sync="selectedPlantTags"
+            :tagTypeNames="['CannabisPlant', 'MedicalPlant', 'Cannabis Plant', 'Medical Plant']" :tagCount="0" />
         </div>
       </template>
 
       <template v-if="!submitInflight">
-        <b-button
-          @click="startVoid()"
-          variant="success"
-          :disabled="selectedPackageTags.length + selectedPlantTags.length === 0"
-          >VOID {{ selectedPackageTags.length + selectedPlantTags.length }} TAGS</b-button
-        >
+        <b-button @click="startVoid()" variant="success"
+          :disabled="selectedPackageTags.length + selectedPlantTags.length === 0">VOID {{ selectedPackageTags.length +
+            selectedPlantTags.length }} TAGS</b-button>
         <div class="py-8 flex flex-col gap-2">
           <div class="text-center font-bold">How can I select a range of tags?</div>
           <div>1. Hover over the start tag, click it, and then click "Check # After"</div>
@@ -49,7 +39,7 @@
 
 <script lang="ts">
 import TagPicker from "@/components/overlay-widget/shared/TagPicker.vue";
-import { MessageType } from "@/consts";
+import { AnalyticsEvent } from "@/consts";
 import { ITagData } from "@/interfaces";
 import { analyticsManager } from "@/modules/analytics-manager.module";
 import { authManager } from "@/modules/auth-manager.module";
@@ -91,7 +81,7 @@ export default Vue.extend({
       this.$data.selectedPackageTags = [];
     },
     async startVoid() {
-      analyticsManager.track(MessageType.STARTED_VOID_TAGS_BACKGROUND_JOB);
+      analyticsManager.track(AnalyticsEvent.STARTED_VOID_TAGS_BACKGROUND_JOB);
       this.$data.submitInflight = true;
 
       for (const tagData of this.$data.selectedPlantTags) {
@@ -109,10 +99,10 @@ export default Vue.extend({
       }
 
       this.$data.successfulFinish = true;
-      analyticsManager.track(MessageType.VOID_TAGS_SUCCESS);
+      analyticsManager.track(AnalyticsEvent.VOID_TAGS_SUCCESS);
     },
     async stopVoid() {
-      analyticsManager.track(MessageType.STOPPED_VOID_TAGS_BACKGROUND_JOB);
+      analyticsManager.track(AnalyticsEvent.STOPPED_VOID_TAGS_BACKGROUND_JOB);
       await this.reset();
     },
     async voidTag({ tagData }: { tagData: ITagData }) {
@@ -122,7 +112,7 @@ export default Vue.extend({
         if (response.status !== 200) {
           this.$data.runningErrorTotal += 1;
 
-          analyticsManager.track(MessageType.VOID_TAGS_ERROR, {
+          analyticsManager.track(AnalyticsEvent.VOID_TAGS_ERROR, {
             error: `Returned response status ${response.status}`,
           });
         } else {
@@ -131,7 +121,7 @@ export default Vue.extend({
       } catch (e) {
         this.$data.runningErrorTotal += 1;
         console.error(e);
-        analyticsManager.track(MessageType.VOID_TAGS_ERROR, { error: e });
+        analyticsManager.track(AnalyticsEvent.VOID_TAGS_ERROR, { error: e });
 
         await timer(3000).toPromise();
       }

@@ -16,78 +16,42 @@
         <template v-if="!isSameSiteTransfer">
           <b-form-group label="DEPART" label-class="text-gray-400" label-size="sm">
             <b-input-group class="flex flex-row gap-1">
-              <b-form-timepicker
-                v-model="departureIsotime"
-                size="sm"
-                required
-                :state="!departureIsotime ? false : null"
-              ></b-form-timepicker>
+              <b-form-timepicker v-model="departureIsotime" size="sm" required
+                :state="!departureIsotime ? false : null"></b-form-timepicker>
 
-              <b-form-datepicker
-                :date-format-options="dateFormatOptions"
-                v-model="departureIsodate"
-                size="sm"
-                required
-                :state="!departureIsodate ? false : null"
-              ></b-form-datepicker>
+              <b-form-datepicker :date-format-options="dateFormatOptions" v-model="departureIsodate" size="sm" required
+                :state="!departureIsodate ? false : null"></b-form-datepicker>
             </b-input-group>
           </b-form-group>
 
           <template v-if="isLayover">
             <b-form-group label="LAYOVER CHECK IN" label-class="text-gray-400" label-size="sm">
               <b-input-group class="flex flex-row gap-1">
-                <b-form-timepicker
-                  v-model="layoverCheckInIsotime"
-                  size="sm"
-                  required
-                  :state="!layoverCheckInIsotime ? false : null"
-                ></b-form-timepicker>
+                <b-form-timepicker v-model="layoverCheckInIsotime" size="sm" required
+                  :state="!layoverCheckInIsotime ? false : null"></b-form-timepicker>
 
-                <b-form-datepicker
-                  :date-format-options="dateFormatOptions"
-                  v-model="layoverCheckInIsodate"
-                  size="sm"
-                  required
-                  :state="!layoverCheckInIsodate ? false : null"
-                ></b-form-datepicker>
+                <b-form-datepicker :date-format-options="dateFormatOptions" v-model="layoverCheckInIsodate" size="sm"
+                  required :state="!layoverCheckInIsodate ? false : null"></b-form-datepicker>
               </b-input-group>
             </b-form-group>
             <b-form-group label="LAYOVER CHECK OUT" label-class="text-gray-400" label-size="sm">
               <b-input-group class="flex flex-row gap-1">
-                <b-form-timepicker
-                  v-model="layoverCheckOutIsotime"
-                  required
-                  size="sm"
-                  :state="!layoverCheckOutIsotime ? false : null"
-                ></b-form-timepicker>
+                <b-form-timepicker v-model="layoverCheckOutIsotime" required size="sm"
+                  :state="!layoverCheckOutIsotime ? false : null"></b-form-timepicker>
 
-                <b-form-datepicker
-                  :date-format-options="dateFormatOptions"
-                  required
-                  v-model="layoverCheckOutIsodate"
-                  size="sm"
-                  :state="!layoverCheckOutIsodate ? false : null"
-                ></b-form-datepicker>
+                <b-form-datepicker :date-format-options="dateFormatOptions" required v-model="layoverCheckOutIsodate"
+                  size="sm" :state="!layoverCheckOutIsodate ? false : null"></b-form-datepicker>
               </b-input-group>
             </b-form-group>
           </template>
 
           <b-form-group label="ARRIVE" label-class="text-gray-400" label-size="sm">
             <b-input-group class="flex flex-row gap-1">
-              <b-form-timepicker
-                v-model="arrivalIsotime"
-                required
-                size="sm"
-                :state="!arrivalIsotime ? false : null"
-              ></b-form-timepicker>
+              <b-form-timepicker v-model="arrivalIsotime" required size="sm"
+                :state="!arrivalIsotime ? false : null"></b-form-timepicker>
 
-              <b-form-datepicker
-                :date-format-options="dateFormatOptions"
-                required
-                v-model="arrivalIsodate"
-                size="sm"
-                :state="!arrivalIsodate ? false : null"
-              ></b-form-datepicker>
+              <b-form-datepicker :date-format-options="dateFormatOptions" required v-model="arrivalIsodate" size="sm"
+                :state="!arrivalIsodate ? false : null"></b-form-datepicker>
             </b-input-group>
           </b-form-group>
         </template>
@@ -108,13 +72,12 @@
 <script lang="ts">
 import FacilitySummary from '@/components/overlay-widget/shared/FacilitySummary.vue';
 import StartFinishIcons from '@/components/overlay-widget/shared/StartFinishIcons.vue';
-import { BuilderType, MessageType } from '@/consts';
+import { AnalyticsEvent, BuilderType } from '@/consts';
 import { IComputedGetSet } from '@/interfaces';
 import { analyticsManager } from '@/modules/analytics-manager.module';
 import router from '@/router/index';
 import store from '@/store/page-overlay/index';
 import { TransferBuilderActions } from '@/store/page-overlay/modules/transfer-builder/consts';
-import { todayIsodate } from '@/utils/date';
 import { isotimeToNaiveTime, naiveTimeToIsotime } from '@/utils/time';
 import Vue from 'vue';
 import { mapState } from 'vuex';
@@ -337,7 +300,7 @@ export default Vue.extend({
         }
       }
 
-      analyticsManager.track(MessageType.BUILDER_ENGAGEMENT, {
+      analyticsManager.track(AnalyticsEvent.BUILDER_ENGAGEMENT, {
         builder: BuilderType.CREATE_TRANSFER,
         action: `Updated layoverCheckOut/layoverCheckIn: ${this.layoverCheckInIsodate} ${this.layoverCheckInIsotime} -> ${this.layoverCheckOutIsodate} ${this.layoverCheckOutIsotime}`,
       });
@@ -374,14 +337,14 @@ export default Vue.extend({
         }
       }
 
-      analyticsManager.track(MessageType.BUILDER_ENGAGEMENT, {
+      analyticsManager.track(AnalyticsEvent.BUILDER_ENGAGEMENT, {
         builder: BuilderType.CREATE_TRANSFER,
         action: `Updated arrival/departure: ${this.departureIsodate} ${this.departureIsotime} -> ${this.arrivalIsodate} ${this.arrivalIsotime}`,
       });
     },
   },
-  async created() {},
-  async mounted() {},
+  async created() { },
+  async mounted() { },
 });
 </script>
 

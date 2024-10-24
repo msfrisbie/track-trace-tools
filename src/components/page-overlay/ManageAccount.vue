@@ -2,13 +2,8 @@
   <div class="flex flex-column-shim flex-col space-y-6">
     <b-form>
       <b-form-group>
-        <b-form-checkbox
-          id="checkbox-backupBuilderSubmits"
-          class="mb-2"
-          v-model="accountSettings.backupBuilderSubmits"
-          name="checkbox-backupBuilderSubmits"
-          @change="onChange()"
-        >
+        <b-form-checkbox id="checkbox-backupBuilderSubmits" class="mb-2" v-model="accountSettings.backupBuilderSubmits"
+          name="checkbox-backupBuilderSubmits" @change="onChange()">
           Back up toolbox submits
         </b-form-checkbox>
       </b-form-group>
@@ -17,7 +12,7 @@
 </template>
 
 <script lang="ts">
-import { MessageType } from '@/consts';
+import { AnalyticsEvent } from '@/consts';
 import { analyticsManager } from '@/modules/analytics-manager.module';
 import { pageManager } from '@/modules/page-manager/page-manager.module';
 import { toastManager } from '@/modules/toast-manager.module';
@@ -40,7 +35,7 @@ export default Vue.extend({
     onChange() {
       pageManager.pauseFor(3000);
 
-      analyticsManager.track(MessageType.UPDATED_SETTINGS, {
+      analyticsManager.track(AnalyticsEvent.UPDATED_SETTINGS, {
         settings: JSON.parse(JSON.stringify(this.accountSettings)),
       });
 

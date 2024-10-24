@@ -229,8 +229,8 @@
             Enable same item patch
           </b-form-checkbox>
 
-          <b-form-checkbox id="checkbox-enableLegacyTransferTools" class="mb-2" v-model="settings.enableLegacyTransferTools"
-            name="checkbox-enableLegacyTransferTools" @change="onChange()">
+          <b-form-checkbox id="checkbox-enableLegacyTransferTools" class="mb-2"
+            v-model="settings.enableLegacyTransferTools" name="checkbox-enableLegacyTransferTools" @change="onChange()">
             Enable legacy transfer tools
           </b-form-checkbox>
 
@@ -409,13 +409,13 @@
 
 <script lang="ts">
 import {
+  AnalyticsEvent,
   LandingPage,
-  MessageType,
   PackageTabLabel,
   PlantsTabLabel,
   SalesTabLabel,
   TagsTabLabel,
-  TransfersTabLabel,
+  TransfersTabLabel
 } from "@/consts";
 import { BackgroundState, DarkModeState, IPluginState, SnowflakeState } from "@/interfaces";
 import { analyticsManager } from "@/modules/analytics-manager.module";
@@ -607,7 +607,7 @@ export default Vue.extend({
     onChange() {
       pageManager.pauseFor(3000);
 
-      analyticsManager.track(MessageType.UPDATED_SETTINGS, {
+      analyticsManager.track(AnalyticsEvent.UPDATED_SETTINGS, {
         settings: JSON.parse(JSON.stringify(this.settings)),
       });
 

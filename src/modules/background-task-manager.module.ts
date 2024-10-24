@@ -1,14 +1,14 @@
-import { BackgroundTaskState, MessageType } from '@/consts';
-import { IAtomicService, ISalesReceiptData, ITagData } from '@/interfaces';
-import { MutationType } from '@/mutation-types';
-import store from '@/store/page-overlay/index';
-import { getIsoDateStringFromIsoDatetime } from '@/utils/date';
-import { getTagFromOffset, getVoidTagBody } from '@/utils/tags';
-import { timer } from 'rxjs';
-import { analyticsManager } from './analytics-manager.module';
-import { authManager } from './auth-manager.module';
-import { primaryDataLoader } from './data-loader/data-loader.module';
-import { primaryMetrcRequestManager } from './metrc-request-manager.module';
+import { AnalyticsEvent, BackgroundTaskState } from "@/consts";
+import { IAtomicService, ISalesReceiptData, ITagData } from "@/interfaces";
+import { MutationType } from "@/mutation-types";
+import store from "@/store/page-overlay/index";
+import { getIsoDateStringFromIsoDatetime } from "@/utils/date";
+import { getTagFromOffset, getVoidTagBody } from "@/utils/tags";
+import { timer } from "rxjs";
+import { analyticsManager } from "./analytics-manager.module";
+import { authManager } from "./auth-manager.module";
+import { primaryDataLoader } from "./data-loader/data-loader.module";
+import { primaryMetrcRequestManager } from "./metrc-request-manager.module";
 
 class BackgroundTaskManager implements IAtomicService {
   async init() {
@@ -31,7 +31,7 @@ class BackgroundTaskManager implements IAtomicService {
     store.commit(MutationType.SET_FINALIZE_SALES_RECEIPTS_READOUT, null);
     store.commit(MutationType.SET_FINALIZE_SALES_RECEIPTS_RUNNING_TOTAL, 0);
 
-    analyticsManager.track(MessageType.STARTED_FINALIZE_BACKGROUND_JOB);
+    analyticsManager.track(AnalyticsEvent.STARTED_FINALIZE_BACKGROUND_JOB);
 
     this.finalizeSalesImpl();
   }
@@ -39,13 +39,13 @@ class BackgroundTaskManager implements IAtomicService {
   stopFinalize(ranToCompletion: boolean = false) {
     store.commit(MutationType.SET_FINALIZE_SALES_RECEIPTS_STATE, BackgroundTaskState.SUCCESS);
     this.setFinalizeReadout(
-      `Finalized ${store.state.backgroundTasks.finalizeSalesReceiptsRunningTotal} receipts.`,
+      `Finalized ${store.state.backgroundTasks.finalizeSalesReceiptsRunningTotal} receipts.`
     );
 
     if (ranToCompletion) {
-      analyticsManager.track(MessageType.FINALIZED_SALES_SUCCESS);
+      analyticsManager.track(AnalyticsEvent.FINALIZED_SALES_SUCCESS);
     } else {
-      analyticsManager.track(MessageType.STOPPED_FINALIZE_BACKGROUND_JOB);
+      analyticsManager.track(AnalyticsEvent.STOPPED_FINALIZE_BACKGROUND_JOB);
     }
   }
 
@@ -53,7 +53,7 @@ class BackgroundTaskManager implements IAtomicService {
     store.commit(MutationType.SET_FINALIZE_SALES_RECEIPTS_STATE, BackgroundTaskState.ERROR);
     this.setFinalizeReadout(error);
 
-    analyticsManager.track(MessageType.FINALIZED_SALES_ERROR, { error });
+    analyticsManager.track(AnalyticsEvent.FINALIZED_SALES_ERROR, { error });
   }
 
   setFinalizeReadout(readout: string) {
@@ -64,7 +64,7 @@ class BackgroundTaskManager implements IAtomicService {
     const authState = await authManager.authStateOrError();
 
     if (store.state.backgroundTasks.finalizeSalesReceiptsLicense !== authState.license) {
-      this.finalizeError('The job stopped because you changed licenses.');
+      this.finalizeError("The job stopped because you changed licenses.");
     }
 
     if (store.state.backgroundTasks.finalizeSalesReceiptsState !== BackgroundTaskState.RUNNING) {
@@ -72,7 +72,7 @@ class BackgroundTaskManager implements IAtomicService {
       return;
     }
 
-    this.setFinalizeReadout('Loading sales receipts...');
+    this.setFinalizeReadout("Loading sales receipts...");
 
     let receipts: ISalesReceiptData[] = [];
 
@@ -86,7 +86,7 @@ class BackgroundTaskManager implements IAtomicService {
         console.error(e);
         if (i > 20) {
           this.finalizeError(
-            'Metrc returned an error when trying to load sales receipts. Try again.',
+            "Metrc returned an error when trying to load sales receipts. Try again."
           );
           return;
         }
@@ -104,7 +104,7 @@ class BackgroundTaskManager implements IAtomicService {
 
     if (isodate) {
       receipts = receipts.filter(
-        (receipt) => getIsoDateStringFromIsoDatetime(receipt.RecordedDateTime) < isodate,
+        (receipt) => getIsoDateStringFromIsoDatetime(receipt.RecordedDateTime) < isodate
       );
     }
 
@@ -122,11 +122,11 @@ class BackgroundTaskManager implements IAtomicService {
         const receiptPayload = receipts.map((x) => ({ Id: x.Id.toString() }));
 
         const response = await primaryMetrcRequestManager.finalizeSalesReceipts(
-          JSON.stringify(receiptPayload),
+          JSON.stringify(receiptPayload)
         );
 
         if (response.status !== 200) {
-          throw new Error('Failed to finalize sales receipts');
+          throw new Error("Failed to finalize sales receipts");
         }
 
         break;
@@ -135,7 +135,7 @@ class BackgroundTaskManager implements IAtomicService {
         console.error(e);
         if (i > 20) {
           this.finalizeError(
-            'Metrc returned an error when trying to finalize sales receipts. Try again.',
+            "Metrc returned an error when trying to finalize sales receipts. Try again."
           );
           return;
         }
@@ -144,7 +144,7 @@ class BackgroundTaskManager implements IAtomicService {
       }
     }
 
-    analyticsManager.track(MessageType.FINALIZED_SALES_RECEIPTS, {
+    analyticsManager.track(AnalyticsEvent.FINALIZED_SALES_RECEIPTS, {
       count: receipts.length,
     });
 
@@ -154,12 +154,12 @@ class BackgroundTaskManager implements IAtomicService {
     }
 
     this.setFinalizeReadout(
-      `Finalized ${store.state.backgroundTasks.finalizeSalesReceiptsRunningTotal} receipts.`,
+      `Finalized ${store.state.backgroundTasks.finalizeSalesReceiptsRunningTotal} receipts.`
     );
 
     store.commit(
       MutationType.SET_FINALIZE_SALES_RECEIPTS_RUNNING_TOTAL,
-      store.state.backgroundTasks.finalizeSalesReceiptsRunningTotal + receipts.length,
+      store.state.backgroundTasks.finalizeSalesReceiptsRunningTotal + receipts.length
     );
 
     if (store.state.backgroundTasks.finalizeSalesReceiptsState === BackgroundTaskState.RUNNING) {
@@ -181,7 +181,7 @@ class BackgroundTaskManager implements IAtomicService {
     store.commit(MutationType.SET_VOID_TAGS_RUNNING_TOTAL, 0);
     store.commit(MutationType.SET_VOID_TAGS_CONSECUTIVE_ERROR_TOTAL, 0);
 
-    analyticsManager.track(MessageType.STARTED_VOID_TAGS_BACKGROUND_JOB);
+    analyticsManager.track(AnalyticsEvent.STARTED_VOID_TAGS_BACKGROUND_JOB);
 
     this.voidTagsImpl();
   }
@@ -189,7 +189,7 @@ class BackgroundTaskManager implements IAtomicService {
   stopVoid(ranToCompletion: boolean = false) {
     store.commit(
       MutationType.SET_VOID_TAGS_READOUT,
-      `Voided ${store.state.backgroundTasks.voidTagsRunningTotal} tags.`,
+      `Voided ${store.state.backgroundTasks.voidTagsRunningTotal} tags.`
     );
 
     store.commit(MutationType.SET_VOID_TAGS_DATA, {
@@ -203,9 +203,9 @@ class BackgroundTaskManager implements IAtomicService {
     store.commit(MutationType.SET_VOID_TAGS_CONSECUTIVE_ERROR_TOTAL, 0);
 
     if (ranToCompletion) {
-      analyticsManager.track(MessageType.VOID_TAGS_SUCCESS);
+      analyticsManager.track(AnalyticsEvent.VOID_TAGS_SUCCESS);
     } else {
-      analyticsManager.track(MessageType.STOPPED_VOID_TAGS_BACKGROUND_JOB);
+      analyticsManager.track(AnalyticsEvent.STOPPED_VOID_TAGS_BACKGROUND_JOB);
     }
   }
 
@@ -213,14 +213,14 @@ class BackgroundTaskManager implements IAtomicService {
     store.commit(MutationType.SET_VOID_TAGS_STATE, BackgroundTaskState.ERROR);
     store.commit(MutationType.SET_VOID_TAGS_READOUT, error);
 
-    analyticsManager.track(MessageType.VOID_TAGS_ERROR, { error });
+    analyticsManager.track(AnalyticsEvent.VOID_TAGS_ERROR, { error });
   }
 
   private async voidTagsImpl() {
     const authState = await authManager.authStateOrError();
 
     if (store.state.backgroundTasks.voidTagsLicense !== authState.license) {
-      this.voidError('The job stopped because you changed licenses.');
+      this.voidError("The job stopped because you changed licenses.");
     }
 
     if (store.state.backgroundTasks.voidTagsState !== BackgroundTaskState.RUNNING) {
@@ -235,7 +235,7 @@ class BackgroundTaskManager implements IAtomicService {
     }
 
     if (!currentTag) {
-      this.voidError('Failed to generate tag');
+      this.voidError("Failed to generate tag");
       return;
     }
 
@@ -253,7 +253,7 @@ class BackgroundTaskManager implements IAtomicService {
         console.error(e);
         if (i > 20) {
           this.voidError(
-            `Metrc returned an error when looking up tag ${currentTag}. Check if this tag can be voided and try again.`,
+            `Metrc returned an error when looking up tag ${currentTag}. Check if this tag can be voided and try again.`
           );
           return;
         }
@@ -280,7 +280,7 @@ class BackgroundTaskManager implements IAtomicService {
         const response = await primaryMetrcRequestManager.voidTag(getVoidTagBody(tagData.Id));
 
         if (response.status !== 200) {
-          throw new Error('Failed to void tag');
+          throw new Error("Failed to void tag");
         }
 
         break;
@@ -289,7 +289,7 @@ class BackgroundTaskManager implements IAtomicService {
         console.error(e);
         if (i > 20) {
           this.voidError(
-            `Metrc returned an error when trying to void tag ${currentTag}. Check if this tag can be voided and try again.`,
+            `Metrc returned an error when trying to void tag ${currentTag}. Check if this tag can be voided and try again.`
           );
           return;
         }
@@ -298,7 +298,7 @@ class BackgroundTaskManager implements IAtomicService {
       }
     }
 
-    analyticsManager.track(MessageType.VOIDED_TAGS, { count: 1 });
+    analyticsManager.track(AnalyticsEvent.VOIDED_TAGS, { count: 1 });
 
     if (store.state.backgroundTasks.voidTagsState !== BackgroundTaskState.RUNNING) {
       this.stopVoid();
@@ -307,12 +307,12 @@ class BackgroundTaskManager implements IAtomicService {
 
     store.commit(
       MutationType.SET_VOID_TAGS_RUNNING_TOTAL,
-      store.state.backgroundTasks.voidTagsRunningTotal + 1,
+      store.state.backgroundTasks.voidTagsRunningTotal + 1
     );
 
     store.commit(
       MutationType.SET_VOID_TAGS_READOUT,
-      `Voided ${store.state.backgroundTasks.voidTagsRunningTotal} tags.`,
+      `Voided ${store.state.backgroundTasks.voidTagsRunningTotal} tags.`
     );
 
     if (currentTag === store.state.backgroundTasks.voidTagsEndTag) {

@@ -160,7 +160,7 @@ import ItemPicker from '@/components/overlay-widget/shared/ItemPicker.vue';
 import LocationPicker from '@/components/overlay-widget/shared/LocationPicker.vue';
 import PlantBatchPicker from '@/components/overlay-widget/shared/PlantBatchPicker.vue';
 import TagPicker from '@/components/overlay-widget/shared/TagPicker.vue';
-import { BuilderType, MessageType, PLANTABLE_ITEM_CATEGORY_NAMES } from '@/consts';
+import { AnalyticsEvent, BuilderType, PLANTABLE_ITEM_CATEGORY_NAMES } from '@/consts';
 import {
   IBuilderComponentError,
   ICsvFile,
@@ -193,7 +193,7 @@ export default Vue.extend({
     setActiveStepIndex(index: number) {
       this.$data.activeStepIndex = index;
 
-      analyticsManager.track(MessageType.BUILDER_ENGAGEMENT, {
+      analyticsManager.track(AnalyticsEvent.BUILDER_ENGAGEMENT, {
         builder: this.$data.builderType,
         action: `Set active step to ${index}`,
       });
@@ -250,7 +250,7 @@ export default Vue.extend({
         await downloadCsvFile({ csvFile, delay: 500 });
       }
 
-      analyticsManager.track(MessageType.DOWNLOADED_CSVS, {
+      analyticsManager.track(AnalyticsEvent.DOWNLOADED_CSVS, {
         builderType: this.$data.builderType,
         csvData: {
           plantBatchName: this.$data.selectedPlantBatches.map(

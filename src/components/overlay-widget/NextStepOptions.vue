@@ -3,24 +3,21 @@
     <span class="text-lg">NEXT STEPS:</span>
 
     <template v-if="showMergePackages">
-      <b-button variant="outline-primary" size="md" @click="visit('/package/merge-packages')"
-        >MERGE PACKAGES</b-button
-      >
+      <b-button variant="outline-primary" size="md" @click="visit('/package/merge-packages')">MERGE PACKAGES</b-button>
     </template>
 
     <template v-if="showFinishPackages">
-      <b-button variant="outline-primary" size="md" @click="visit('/package/finish-packages')"
-        >FINISH EMPTY PACKAGES</b-button
-      >
+      <b-button variant="outline-primary" size="md" @click="visit('/package/finish-packages')">FINISH EMPTY
+        PACKAGES</b-button>
     </template>
   </div>
 </template>
 
 <script lang="ts">
-import Vue from 'vue';
 import { BuilderType } from '@/consts';
-import router from '@/router/index';
 import { builderManager } from '@/modules/builder-manager.module';
+import router from '@/router/index';
+import Vue from 'vue';
 
 export default Vue.extend({
   name: 'NextStepOptions',

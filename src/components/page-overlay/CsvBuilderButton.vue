@@ -1,23 +1,12 @@
 <template>
-  <b-button
-    id="csv-builder-popover-target"
-    variant="light"
-    title="Build CSV"
-    @click="openCsvBuilder($event)"
-  >
+  <b-button id="csv-builder-popover-target" variant="light" title="Build CSV" @click="openCsvBuilder($event)">
     <!-- class="bg-gray-50 hover:bg-gray-200 rounded-full shadow-2xl border border-gray-400 h-16 w-16 flex items-center justify-center cursor-pointer" -->
 
     <font-awesome-icon icon="file-csv" size="2x" />
 
-    <b-popover
-      target="csv-builder-popover-target"
-      triggers="hover"
-      placement="top"
-      variant="primary"
-      ref="csv-builder-popover"
-      :disabled="trackedInteractions.dismissedCsvBuilderPopover"
-      container="popover-container"
-    >
+    <b-popover target="csv-builder-popover-target" triggers="hover" placement="top" variant="primary"
+      ref="csv-builder-popover" :disabled="trackedInteractions.dismissedCsvBuilderPopover"
+      container="popover-container">
       <template #title>
         <span class="text-base">New: <b>CSV Builder</b></span>
       </template>
@@ -25,20 +14,14 @@
       <div style="min-width: 200px" class="flex flex-col space-y-2 text-base">
         <p>Generate and download Metrc CSVs.</p>
 
-        <b-button
-          size="sm"
-          variant="outline-primary"
-          class="mb-2"
-          @click="dismissCsvBuilderPopover()"
-          >GOT IT</b-button
-        >
+        <b-button size="sm" variant="outline-primary" class="mb-2" @click="dismissCsvBuilderPopover()">GOT IT</b-button>
       </div>
     </b-popover>
   </b-button>
 </template>
 
 <script lang="ts">
-import { MessageType, ModalType } from '@/consts';
+import { ModalType } from '@/consts';
 import { analyticsManager } from '@/modules/analytics-manager.module';
 import { modalManager } from '@/modules/modal-manager.module';
 import { MutationType } from '@/mutation-types';
@@ -78,7 +61,7 @@ export default Vue.extend({
       //   return;
       // }
 
-      analyticsManager.track(MessageType.OPENED_CSV_BUILDER);
+      analyticsManager.track(AnalyticsEvent.OPENED_CSV_BUILDER);
 
       modalManager.dispatchModalEvent(ModalType.CSV);
     },

@@ -2,20 +2,13 @@
   <fragment>
     <div class="option-select">
       <div>Select your label template and print this page directly onto the labels</div>
-      <b-form-select
-        style="border: 1px solid gray; border-radius: 0.2rem; padding: 0.2rem"
-        size="lg"
-        :options="options"
-        v-model="selectedOption"
-      ></b-form-select>
+      <b-form-select style="border: 1px solid gray; border-radius: 0.2rem; padding: 0.2rem" size="lg" :options="options"
+        v-model="selectedOption"></b-form-select>
     </div>
     <div class="label-container" v-if="selectedOption" :style="selectedOption.labelContainerStyle">
       <fragment v-bind:key="idx" v-for="[idx, value] of barcodeValues.entries()">
-        <printed-label
-          :width="selectedOption.labelWidth"
-          :height="selectedOption.labelHeight"
-          :barcode="value"
-        ></printed-label>
+        <printed-label :width="selectedOption.labelWidth" :height="selectedOption.labelHeight"
+          :barcode="value"></printed-label>
         <!-- <div v-if="idx > 0 && idx % 30 === 0" class="col-start-1 col-span-3 break-after"></div> -->
       </fragment>
     </div>
@@ -56,7 +49,7 @@ export default Vue.extend({
     };
   },
   methods: {},
-  async created() {},
+  async created() { },
   async mounted() {
     this.$data.selectedOption = this.$data.options[0].value;
 
@@ -67,7 +60,7 @@ export default Vue.extend({
   watch: {
     foobar: {
       immediate: true,
-      handler(newValue, oldValue) {},
+      handler(newValue, oldValue) { },
     },
   },
 });

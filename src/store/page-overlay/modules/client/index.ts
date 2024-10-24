@@ -1,4 +1,3 @@
-import { ChromeStorageKeys } from "@/consts";
 import { IPluginState } from "@/interfaces";
 import { t3RequestManager } from "@/modules/t3-request-manager.module";
 import { toastManager } from "@/modules/toast-manager.module";

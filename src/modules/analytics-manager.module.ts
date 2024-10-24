@@ -1,20 +1,14 @@
-import { MessageType, METRC_INDUSTRY_LICENSE_PATH_REGEX } from '@/consts';
-import { IAtomicService, IAuthState } from '@/interfaces';
-import { messageBus } from '@/modules/message-bus.module';
-import { version } from '@/modules/version';
-import { debugLogFactory } from '@/utils/debug';
+import { AnalyticsEvent, MessageType, METRC_INDUSTRY_LICENSE_PATH_REGEX } from "@/consts";
+import { IAtomicService, IAuthState } from "@/interfaces";
+import { messageBus } from "@/modules/message-bus.module";
+import { version } from "@/modules/version";
+import { debugLogFactory } from "@/utils/debug";
 
 const hostname: string = window.location.hostname;
 const path: string = window.location.pathname;
 const url: string = window.location.href;
 
-const debugLog = debugLogFactory('analytics-manager.module.ts');
-
-function sendAnalyticsMessage(backgroundMessageType: MessageType, data: any) {
-  debugLog(async () => [backgroundMessageType, data]);
-
-  messageBus.sendMessageToBackground(backgroundMessageType, data);
-}
+const debugLog = debugLogFactory("analytics-manager.module.ts");
 
 class AnalyticsManager implements IAtomicService {
   private authState: IAuthState | null = null;
@@ -28,7 +22,7 @@ class AnalyticsManager implements IAtomicService {
   }
 
   async identify(identity: string) {
-    sendAnalyticsMessage(MessageType.SET_USER_ID, {
+    messageBus.sendMessageToBackground(MessageType.SET_USER_ID, {
       identity,
     });
   }
@@ -43,7 +37,7 @@ class AnalyticsManager implements IAtomicService {
     facilities?: string;
     vuexBlobSize?: number;
   }) {
-    sendAnalyticsMessage(MessageType.SET_USER_PROPERTIES, {
+    messageBus.sendMessageToBackground(MessageType.SET_USER_PROPERTIES, {
       ...userProperties,
       version,
       hostname,
@@ -66,11 +60,11 @@ class AnalyticsManager implements IAtomicService {
 
     let metrcVersion = null;
     try {
-      const metrcFooter: HTMLElement | null = document.querySelector('#footer_center');
+      const metrcFooter: HTMLElement | null = document.querySelector("#footer_center");
 
       const footerText = metrcFooter?.innerText;
       if (footerText) {
-        const pieces = footerText.split('|');
+        const pieces = footerText.split("|");
         if (pieces.length === 2) {
           metrcVersion = pieces[1].trim();
         }
@@ -78,14 +72,20 @@ class AnalyticsManager implements IAtomicService {
     } catch (e) {}
 
     const pageData = {
-      url, path, version, hostname, license, metrcVersion,
+      url,
+      path,
+      version,
+      hostname,
+      license,
+      metrcVersion,
     };
 
-    sendAnalyticsMessage(MessageType.PAGELOAD, { pageName, pageData });
+    messageBus.sendMessageToBackground(MessageType.PAGELOAD, { pageName, pageData });
   }
 
-  async track(eventName: MessageType, eventData: any = {}) {
+  async track(eventName: AnalyticsEvent, eventData: any = {}) {
     const license = this.authState?.license;
+    const identity = this.authState?.identity;
 
     eventData = {
       ...eventData,
@@ -93,9 +93,12 @@ class AnalyticsManager implements IAtomicService {
       hostname,
       url,
       license,
+      identity,
     };
 
-    sendAnalyticsMessage(eventName, { eventName, eventData });
+    debugLog(async () => [eventName, eventData]);
+
+    messageBus.sendMessageToBackground(MessageType.LOG_ANALYTICS_EVENT, { eventName, eventData });
   }
 }
 

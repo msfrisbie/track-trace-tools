@@ -1,7 +1,7 @@
 import {
+  AnalyticsEvent,
   HarvestState,
   ItemState,
-  MessageType,
   PackageState,
   PlantBatchState,
   PlantState,
@@ -231,7 +231,7 @@ export const searchModule = {
           return;
         }
 
-        analyticsManager.track(MessageType.ENTERED_SEARCH_QUERY, {
+        analyticsManager.track(AnalyticsEvent.ENTERED_SEARCH_QUERY, {
           queryString,
         });
 
@@ -431,7 +431,7 @@ export const searchModule = {
           }
         }
 
-        const filteredSearchConfig = searchConfig.filter((x) =>
+        const filteredSearchConfig: SearchConfigUnion[] = searchConfig.filter((x) =>
           enabledGridIds.has(x.uniqueMetrcGridId)
         );
 

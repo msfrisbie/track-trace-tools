@@ -11,13 +11,8 @@
     <hr />
 
     <div class="p-2 flex flex-row items-center justify-start space-x-4 text-sm">
-      <picker-icon
-        icon="box"
-        style="width: 5rem"
-        class="flex-shrink-0"
-        :textClass="pkg.Quantity === 0 ? 'text-red-500' : ''"
-        :text="getQuantityAndUnitDescription(pkg)"
-      />
+      <picker-icon icon="box" style="width: 5rem" class="flex-shrink-0"
+        :textClass="pkg.Quantity === 0 ? 'text-red-500' : ''" :text="getQuantityAndUnitDescription(pkg)" />
 
       <div class="flex flex-col items-start space-y-2">
         <span class="text-md text-gray-700">{{ getItemNameOrError(pkg) }}</span>
@@ -148,8 +143,8 @@ export default Vue.extend({
     },
     getQuantityAndUnitDescription,
   },
-  async created() {},
-  async mounted() {},
+  async created() { },
+  async mounted() { },
 });
 </script>
 

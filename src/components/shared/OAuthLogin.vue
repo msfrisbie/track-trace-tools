@@ -10,25 +10,16 @@
           >How do I make a report?</a
         > -->
 
-        <b-button
-          variant="outline-primary"
-          class="flex flex-row items-center gap-2 justify-center"
-          @click="logout()"
-        >
+        <b-button variant="outline-primary" class="flex flex-row items-center gap-2 justify-center" @click="logout()">
           <font-awesome-icon icon="sign-out-alt"></font-awesome-icon>
-          <span>LOGOUT</span></b-button
-        >
+          <span>LOGOUT</span></b-button>
       </template>
 
       <template v-if="!isAuthenticated">
-        <div
-          @click="loginOrError({ interactive: true })"
-          class="flex flex-row justify-between items-center gap-4 justify-center p-3 border border-gray-100 hover:bg-gray-100 rounded shadow-md cursor-pointer"
-        >
+        <div @click="loginOrError({ interactive: true })"
+          class="flex flex-row justify-between items-center gap-4 justify-center p-3 border border-gray-100 hover:bg-gray-100 rounded shadow-md cursor-pointer">
           <img src="img/google.svg" />
-          <span class="flex-grow text-center text-gray-400 text-lg font-semibold"
-            >Sign in with Google</span
-          >
+          <span class="flex-grow text-center text-gray-400 text-lg font-semibold">Sign in with Google</span>
         </div>
       </template>
     </template>
@@ -41,7 +32,7 @@
 </template>
 
 <script lang="ts">
-import { MessageType } from "@/consts";
+import { AnalyticsEvent, MessageType } from "@/consts";
 import { analyticsManager } from "@/modules/analytics-manager.module";
 import { messageBus } from "@/modules/message-bus.module";
 import router from "@/router/index";
@@ -80,9 +71,9 @@ export default Vue.extend({
       );
       this.$data.oauthUserInfo = response.data.result;
       if (response.data.success) {
-        analyticsManager.track(MessageType.OAUTH_LOGIN_SUCCESS);
+        analyticsManager.track(AnalyticsEvent.OAUTH_LOGIN_SUCCESS);
       } else {
-        analyticsManager.track(MessageType.OAUTH_LOGIN_ERROR);
+        analyticsManager.track(AnalyticsEvent.OAUTH_LOGIN_ERROR);
       }
     },
 
@@ -91,10 +82,10 @@ export default Vue.extend({
 
       this.$data.oauthUserInfo = null;
 
-      analyticsManager.track(MessageType.OAUTH_LOGOUT);
+      analyticsManager.track(AnalyticsEvent.OAUTH_LOGOUT);
     },
   },
-  async created() {},
+  async created() { },
   async mounted() {
     try {
       // If the login fails, dump out and show the login button

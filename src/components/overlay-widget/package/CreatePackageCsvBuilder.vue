@@ -50,14 +50,14 @@
                 <b-spinner small></b-spinner>
                 <div v-for="[idx, statusMessage] of createPackageCsvState.statusMessages.entries()" v-bind:key="idx">
                   <span v-if="statusMessage.variant === 'primary'" class="text-purple-500">{{
-      statusMessage.text
-    }}</span>
+                    statusMessage.text
+                    }}</span>
                   <span v-if="statusMessage.variant === 'danger'" class="text-red-500">{{
-      statusMessage.text
-    }}</span>
+                    statusMessage.text
+                    }}</span>
                   <span v-if="statusMessage.variant === 'warning'" class="text-yellow-500">{{
-      statusMessage.text
-    }}</span>
+                    statusMessage.text
+                    }}</span>
                 </div>
               </div>
             </template>
@@ -65,14 +65,14 @@
             <template v-if="createPackageCsvState.status === PackageCsvStatus.ERROR">
               <div v-for="[idx, statusMessage] of createPackageCsvState.statusMessages.entries()" v-bind:key="idx">
                 <span v-if="statusMessage.variant === 'primary'" class="text-purple-500">{{
-      statusMessage.text
-    }}</span>
+                  statusMessage.text
+                  }}</span>
                 <span v-if="statusMessage.variant === 'danger'" class="text-red-500">{{
-      statusMessage.text
-    }}</span>
+                  statusMessage.text
+                  }}</span>
                 <span v-if="statusMessage.variant === 'warning'" class="text-yellow-500">{{
-      statusMessage.text
-    }}</span>
+                  statusMessage.text
+                  }}</span>
               </div>
             </template>
 
@@ -108,10 +108,10 @@
           <div class="flex flex-row items-center gap-4">
             <b-button v-if="submitEnabled && createPackageCsvState.status === PackageCsvStatus.PARSED"
               :disabled="!eligibleForSubmit" @click="submit()" variant="success">CREATE {{
-      createPackageCsvState.rowGroups.length
-    }} PACKAGE{{
-        createPackageCsvState.rowGroups.length === 1 ? "" : "S"
-      }}</b-button>
+                createPackageCsvState.rowGroups.length
+              }} PACKAGE{{
+                createPackageCsvState.rowGroups.length === 1 ? "" : "S"
+              }}</b-button>
 
             <b-button v-if="createPackageCsvState.status !== PackageCsvStatus.INITIAL" @click="reset()"
               variant="outline-primary">RESET</b-button>
@@ -141,10 +141,10 @@
                                 class="flex flex-col items-center justify-center p-4 border border-1 rounded-lg text-base font-bold whitespace-nowrap">
                                 {{ ingredient.Quantity }}
                                 {{
-      ingredient.UnitOfMeasure
-        ? ingredient.UnitOfMeasure.Abbreviation
-        : null
-    }}
+                                  ingredient.UnitOfMeasure
+                                    ? ingredient.UnitOfMeasure.Abbreviation
+                                    : null
+                                }}
                               </div>
                             </fragment>
                           </template>
@@ -253,7 +253,7 @@
 </template>
 
 <script lang="ts">
-import { BuilderType, MessageType } from "@/consts";
+import { AnalyticsEvent, BuilderType } from "@/consts";
 import { IMetrcCreatePackagesFromPackagesPayload, IPluginState } from "@/interfaces";
 import { analyticsManager } from "@/modules/analytics-manager.module";
 import { builderManager } from "@/modules/builder-manager.module";
@@ -321,14 +321,14 @@ export default Vue.extend({
     }),
     cellColumnFromIndex,
     open(path: string) {
-      analyticsManager.track(MessageType.BUILDER_ENGAGEMENT, {
+      analyticsManager.track(AnalyticsEvent.BUILDER_ENGAGEMENT, {
         action: `Navigated to ${path}`,
       });
 
       this.$router.push(path);
     },
     submit() {
-      analyticsManager.track(MessageType.BUILDER_EVENT, {
+      analyticsManager.track(AnalyticsEvent.BUILDER_EVENT, {
         builder: BuilderType.CSV_CREATE_PACKAGE,
         action: "Generating rows",
       });
@@ -368,7 +368,7 @@ export default Vue.extend({
           return row;
         });
 
-      analyticsManager.track(MessageType.BUILDER_EVENT, {
+      analyticsManager.track(AnalyticsEvent.BUILDER_EVENT, {
         builder: BuilderType.CSV_CREATE_PACKAGE,
         action: `Generated ${rows.length} rows, submitting...`,
       });
@@ -384,7 +384,7 @@ export default Vue.extend({
         10
       );
 
-      analyticsManager.track(MessageType.BUILDER_EVENT, {
+      analyticsManager.track(AnalyticsEvent.BUILDER_EVENT, {
         builder: BuilderType.CSV_CREATE_PACKAGE,
         action: `Submitted project for submit`,
       });

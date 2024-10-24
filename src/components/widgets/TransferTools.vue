@@ -40,7 +40,7 @@
         </template>
         <b-dropdown-item v-for="destination of transferToolsState.recentDestinationFacilities"
           @click="fillDestination(destination)" v-bind:key="destination.Id">{{ destination.FacilityName }} | {{
-      destination.LicenseNumber }}</b-dropdown-item>
+            destination.LicenseNumber }}</b-dropdown-item>
       </b-dropdown>
     </div>
     <div class="relative flex flex-col items-stretch">
@@ -58,7 +58,7 @@
         </template>
         <b-dropdown-item v-for="transporter of transferToolsState.recentTransporterFacilities"
           @click="fillTransporter(transporter)" v-bind:key="transporter.Id">{{ transporter.FacilityName }} | {{
-      transporter.LicenseNumber }}</b-dropdown-item>
+            transporter.LicenseNumber }}</b-dropdown-item>
       </b-dropdown>
     </div>
     <div class="relative flex flex-col items-stretch">
@@ -133,7 +133,7 @@
 </template>
 
 <script lang="ts">
-import { MessageType } from "@/consts";
+import { AnalyticsEvent } from "@/consts";
 import { IMetrcFacilityData, IPluginState } from "@/interfaces";
 import { analyticsManager } from "@/modules/analytics-manager.module";
 import { authManager } from "@/modules/auth-manager.module";
@@ -254,7 +254,7 @@ export default Vue.extend({
       });
     },
     async fillGoogleMapsDirections() {
-      analyticsManager.track(MessageType.USED_TRANSFER_TOOL, {
+      analyticsManager.track(AnalyticsEvent.USED_TRANSFER_TOOL, {
         toolType: "Google Maps Directions",
       });
 
@@ -321,7 +321,7 @@ export default Vue.extend({
       }
     },
     fillDestination(destinationFacility: IMetrcFacilityData) {
-      analyticsManager.track(MessageType.USED_TRANSFER_TOOL, { toolType: "Fill destination" });
+      analyticsManager.track(AnalyticsEvent.USED_TRANSFER_TOOL, { toolType: "Fill destination" });
 
       const elementRefs = this.getElementRefs();
 
@@ -340,7 +340,7 @@ export default Vue.extend({
       }
     },
     fillTransporter(transporterFacility: IMetrcFacilityData) {
-      analyticsManager.track(MessageType.USED_TRANSFER_TOOL, { toolType: "Fill transporter" });
+      analyticsManager.track(AnalyticsEvent.USED_TRANSFER_TOOL, { toolType: "Fill transporter" });
 
       const elementRefs = this.getElementRefs();
 
@@ -359,7 +359,7 @@ export default Vue.extend({
       }
     },
     autofillCustomWeight() {
-      analyticsManager.track(MessageType.USED_TRANSFER_TOOL, { toolType: "Autofill Weight" });
+      analyticsManager.track(AnalyticsEvent.USED_TRANSFER_TOOL, { toolType: "Autofill Weight" });
 
       const elementRefs = this.getElementRefs();
 
@@ -372,7 +372,7 @@ export default Vue.extend({
       }
     },
     autofillPackageWeight() {
-      analyticsManager.track(MessageType.USED_TRANSFER_TOOL, {
+      analyticsManager.track(AnalyticsEvent.USED_TRANSFER_TOOL, {
         toolType: "Autofill Package Weight",
       });
 
@@ -381,7 +381,7 @@ export default Vue.extend({
       fillTransferWeights();
     },
     async autofillUnitOfMeasure() {
-      analyticsManager.track(MessageType.USED_TRANSFER_TOOL, {
+      analyticsManager.track(AnalyticsEvent.USED_TRANSFER_TOOL, {
         toolType: "Autofill Unit of Measure",
       });
 
@@ -409,7 +409,7 @@ export default Vue.extend({
       }
     },
     autofillWholesalePrice() {
-      analyticsManager.track(MessageType.USED_TRANSFER_TOOL, {
+      analyticsManager.track(AnalyticsEvent.USED_TRANSFER_TOOL, {
         toolType: "Autofill Wholesale Price",
       });
 
@@ -424,12 +424,12 @@ export default Vue.extend({
       }
     },
     csvFill() {
-      analyticsManager.track(MessageType.USED_TRANSFER_TOOL, {
+      analyticsManager.track(AnalyticsEvent.USED_TRANSFER_TOOL, {
         toolType: "CSV Fill",
       });
     },
     setSameSiteTransfer() {
-      analyticsManager.track(MessageType.USED_TRANSFER_TOOL, {
+      analyticsManager.track(AnalyticsEvent.USED_TRANSFER_TOOL, {
         toolType: "Set Same-Site Transfer",
       });
 
@@ -491,7 +491,7 @@ export default Vue.extend({
       }
     },
     toggleQuickTab() {
-      analyticsManager.track(MessageType.USED_TRANSFER_TOOL, {
+      analyticsManager.track(AnalyticsEvent.USED_TRANSFER_TOOL, {
         toolType: "Toggle Quick Tab",
       });
 

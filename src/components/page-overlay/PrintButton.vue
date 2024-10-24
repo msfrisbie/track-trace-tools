@@ -22,7 +22,7 @@
 
     <b-badge v-if="metrcTableState.barcodeValues.length > 0" @click="openPrint($event)" variant="warning"
       class="cursor-pointer absolute" style="right: 0.1rem; bottom: 0.1rem">+{{
-      metrcTableState.barcodeValues.length
+        metrcTableState.barcodeValues.length
       }}</b-badge>
   </fragment>
 </template>

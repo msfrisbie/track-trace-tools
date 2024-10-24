@@ -66,7 +66,7 @@
 
 <script lang="ts">
 import BuilderDashboard from "@/components/overlay-widget/BuilderDashboard.vue";
-import { MessageType } from "@/consts";
+import { AnalyticsEvent } from "@/consts";
 import { IPluginState } from "@/interfaces";
 import { analyticsManager } from "@/modules/analytics-manager.module";
 import router from "@/router/index";
@@ -321,7 +321,7 @@ export default Vue.extend({
       }
 
       if (route) {
-        analyticsManager.track(MessageType.BUILDER_ENGAGEMENT, {
+        analyticsManager.track(AnalyticsEvent.BUILDER_ENGAGEMENT, {
           action: `Navigated to ${route}`,
         });
 
@@ -329,7 +329,7 @@ export default Vue.extend({
       }
 
       if (url) {
-        analyticsManager.track(MessageType.BUILDER_ENGAGEMENT, {
+        analyticsManager.track(AnalyticsEvent.BUILDER_ENGAGEMENT, {
           action: `Navigated to ${url}`,
         });
 
@@ -337,7 +337,7 @@ export default Vue.extend({
       }
 
       if (handler) {
-        analyticsManager.track(MessageType.BUILDER_ENGAGEMENT, {
+        analyticsManager.track(AnalyticsEvent.BUILDER_ENGAGEMENT, {
           action: "Calling handler",
         });
 

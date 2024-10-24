@@ -1564,9 +1564,9 @@ export interface IMetrcCreatePlantBatchPackagesFromMotherPlantPayload {
   PlantId: string;
   PlantsCount: string;
   TagId: string;
-  SellByDate: string,
-  UseByDate: string,
-  ExpirationDate: string
+  SellByDate: string;
+  UseByDate: string;
+  ExpirationDate: string;
 }
 
 export interface IMetrcCreatePlantBatchPackagesFromMotherPlantBatchPayload {
@@ -1579,9 +1579,9 @@ export interface IMetrcCreatePlantBatchPackagesFromMotherPlantBatchPayload {
   Note: string;
   PlantBatchId: string;
   TagId: string;
-  SellByDate: string,
-  UseByDate: string,
-  ExpirationDate: string
+  SellByDate: string;
+  UseByDate: string;
+  ExpirationDate: string;
 }
 
 export interface IMetrcCreatePlantBatchPackagesFromImmaturePlantBatchPayload {
@@ -1591,9 +1591,9 @@ export interface IMetrcCreatePlantBatchPackagesFromImmaturePlantBatchPayload {
   Note: string;
   PlantBatchId: string;
   TagId: string;
-  SellByDate: string,
-  UseByDate: string,
-  ExpirationDate: string
+  SellByDate: string;
+  UseByDate: string;
+  ExpirationDate: string;
 }
 
 // Unused

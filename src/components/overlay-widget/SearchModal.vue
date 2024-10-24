@@ -1,31 +1,19 @@
 <template>
   <!-- animation is breaking modal, disable -->
-  <b-modal
-    id="search-modal"
-    modal-class="ttt-modal"
-    size="xl"
-    :static="true"
-    no-fade
-    centered
-    hide-header
-    hide-footer
-    content-class="ttt-content"
-    dialog-class="ttt-dialog search-dialog"
-    body-class="search-body flex flex-column-shim flex-col items-stretch"
-    ref="search"
-    @show="handleOpen()"
-    @hidden="handleClose()"
-  >
+  <b-modal id="search-modal" modal-class="ttt-modal" size="xl" :static="true" no-fade centered hide-header hide-footer
+    content-class="ttt-content" dialog-class="ttt-dialog search-dialog"
+    body-class="search-body flex flex-column-shim flex-col items-stretch" ref="search" @show="handleOpen()"
+    @hidden="handleClose()">
     <unified-search-widget ref="unifiedsearch" :modalSearch="true"></unified-search-widget>
   </b-modal>
 </template>
 
 <script lang="ts">
+import UnifiedSearchWidget from '@/components/search/unified/UnifiedSearchWidget.vue';
+import { AnalyticsEvent } from '@/consts';
+import { analyticsManager } from '@/modules/analytics-manager.module';
 import store from '@/store/page-overlay/index';
 import Vue from 'vue';
-import UnifiedSearchWidget from '@/components/search/unified/UnifiedSearchWidget.vue';
-import { MessageType } from '@/consts';
-import { analyticsManager } from '@/modules/analytics-manager.module';
 
 export default Vue.extend({
   name: 'SearchModal',
@@ -46,7 +34,7 @@ export default Vue.extend({
       this.$refs.search.toggle();
     },
     handleOpen() {
-      analyticsManager.track(MessageType.OPENED_SEARCH_MODAL);
+      analyticsManager.track(AnalyticsEvent.OPENED_SEARCH_MODAL);
 
       store.state.search.modalSearchOpen = true;
 
@@ -54,12 +42,12 @@ export default Vue.extend({
       this.$refs.unifiedsearch!.setFocus();
     },
     handleClose() {
-      analyticsManager.track(MessageType.CLOSED_SEARCH_MODAL);
+      analyticsManager.track(AnalyticsEvent.CLOSED_SEARCH_MODAL);
 
       store.state.search.modalSearchOpen = false;
     },
   },
-  async mounted() {},
+  async mounted() { },
 });
 </script>
 
@@ -77,8 +65,7 @@ export default Vue.extend({
   padding: 0 !important;
 }
 
-.search-dialog {
-}
+.search-dialog {}
 
 .search-footer {
   background-color: white !important;

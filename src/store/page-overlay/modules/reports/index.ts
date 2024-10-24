@@ -1,4 +1,3 @@
-import { MessageType } from "@/consts";
 import { IIndexedTransferData, IPluginState, ISpreadsheet } from "@/interfaces";
 import { analyticsManager } from "@/modules/analytics-manager.module";
 import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
@@ -7,7 +6,7 @@ import { maybeLoadCogsReportData } from "@/utils/reports/cogs-report";
 import { maybeLoadCogsTrackerReportData } from "@/utils/reports/cogs-tracker-report";
 import {
   maybeLoadCogsV2ReportData,
-  updateCogsV2MasterCostSheet
+  updateCogsV2MasterCostSheet,
 } from "@/utils/reports/cogs-v2-report";
 import { maybeLoadEmployeeAuditReportData } from "@/utils/reports/employee-audit-report";
 import { maybeLoadEmployeeSamplesReportData } from "@/utils/reports/employee-samples-report";
@@ -33,18 +32,22 @@ import { getSimpleSpreadsheet } from "@/utils/sheets";
 import {
   createCsvOrError,
   createSpreadsheetOrError,
-  createXlsxOrError
+  createXlsxOrError,
 } from "@/utils/sheets-export";
 import _ from "lodash-es";
 import { v4 as uuidv4 } from "uuid";
 import { ActionContext } from "vuex";
+import { AnalyticsEvent } from "@/consts";
 import { ClientGetters } from "../client/consts";
 import {
   IStatusMessage,
-  ReportAuxTask, ReportsActions,
+  ReportAuxTask,
+  ReportsActions,
   ReportsGetters,
-  ReportsMutations, ReportStatus,
-  ReportType, SHEET_FIELDS
+  ReportsMutations,
+  ReportStatus,
+  ReportType,
+  SHEET_FIELDS,
 } from "./consts";
 import { IReportConfig, IReportData, IReportOption, IReportsState } from "./interfaces";
 
@@ -615,7 +618,7 @@ export const reportsModule = {
       ctx: ActionContext<IReportsState, IPluginState>,
       { reportConfig }: { reportConfig: IReportConfig }
     ) => {
-      analyticsManager.track(MessageType.GENERATED_SPREADSHEET, reportConfig);
+      analyticsManager.track(AnalyticsEvent.GENERATED_SPREADSHEET, reportConfig);
 
       ctx.commit(ReportsMutations.SET_STATUS, { status: ReportStatus.INFLIGHT });
 
@@ -682,7 +685,7 @@ export const reportsModule = {
           status: ReportStatus.SUCCESS,
           statusMessage: null,
         });
-        analyticsManager.track(MessageType.GENERATED_SPREADSHEET_SUCCESS);
+        analyticsManager.track(AnalyticsEvent.GENERATED_SPREADSHEET_SUCCESS);
       } catch (e) {
         console.error((e as Error).stack);
 
@@ -695,7 +698,7 @@ export const reportsModule = {
         });
 
         // @ts-ignore
-        analyticsManager.track(MessageType.GENERATED_SPREADSHEET_ERROR, { error: e.toString() });
+        analyticsManager.track(AnalyticsEvent.GENERATED_SPREADSHEET_ERROR, { error: e.toString() });
 
         throw e;
       }

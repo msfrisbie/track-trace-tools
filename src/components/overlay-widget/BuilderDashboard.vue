@@ -20,7 +20,7 @@
                   :class="idx % 2 === 0 ? 'bg-purple-50' : ''">
                   <b-td class="italic whitespace-nowrap">{{
                     isotimeToTimeAgoExpression(pkg.LastModified)
-                  }}</b-td>
+                    }}</b-td>
                   <b-td class="font-bold">{{ pkg.Label.slice(-8) }}</b-td>
                   <b-td>{{ pkg.Quantity }} {{ pkg.UnitOfMeasureAbbreviation }}</b-td>
                   <b-td>{{ pkg.Item.Name }}</b-td>
@@ -57,7 +57,7 @@
                   :class="idx % 2 === 0 ? 'bg-purple-50' : ''">
                   <b-td class="italic whitespace-nowrap">{{
                     isotimeToTimeAgoExpression(transfer.LastModified)
-                  }}</b-td>
+                    }}</b-td>
                   <b-td class="font-bold">{{ transfer.ManifestNumber }}</b-td>
                   <b-td>{{ transfer.ShipperFacilityName }}</b-td>
                   <b-td>{{ transfer.PackageCount }} packages</b-td>
@@ -90,7 +90,7 @@
                   :class="idx % 2 === 0 ? 'bg-purple-50' : ''">
                   <b-td class="italic whitespace-nowrap">{{
                     isotimeToTimeAgoExpression(transfer.LastModified)
-                  }}</b-td>
+                    }}</b-td>
                   <b-td class="font-bold">{{ transfer.ManifestNumber }}</b-td>
                   <b-td>{{ transfer.RecipientFacilityName }}</b-td>
                   <b-td>{{ transfer.PackageCount }} packages</b-td>
@@ -127,7 +127,7 @@
                   :class="idx % 2 === 0 ? 'bg-purple-50' : ''">
                   <b-td class="italic whitespace-nowrap">{{
                     isotimeToTimeAgoExpression(plantBatch.LastModified)
-                  }}</b-td>
+                    }}</b-td>
                   <b-td class="font-bold">{{ plantBatch.Name }}</b-td>
                   <b-td>{{ plantBatch.StrainName }}</b-td>
                   <b-td>{{ plantBatch.UntrackedCount }} plants</b-td>
@@ -163,7 +163,7 @@
                   :class="idx % 2 === 0 ? 'bg-purple-50' : ''">
                   <b-td class="italic whitespace-nowrap">{{
                     isotimeToTimeAgoExpression(item.ApprovalStatusDateTime)
-                  }}</b-td>
+                    }}</b-td>
                   <b-td class="font-bold">{{ item.Name }}</b-td>
                   <b-td>{{ item.ProductCategoryName }}</b-td>
                 </b-tr>
@@ -230,7 +230,7 @@
                   :class="idx % 2 === 0 ? 'bg-purple-50' : ''">
                   <b-td class="italic whitespace-nowrap">{{
                     isotimeToTimeAgoExpression(vegetativePlant.LastModified)
-                  }}</b-td>
+                    }}</b-td>
                   <b-td class="font-bold">{{ vegetativePlant.Label.slice(-8) }}</b-td>
                   <b-td>{{ vegetativePlant.StrainName }}</b-td>
                 </b-tr>
@@ -262,7 +262,7 @@
                   :class="idx % 2 === 0 ? 'bg-purple-50' : ''">
                   <b-td class="italic whitespace-nowrap">{{
                     isotimeToTimeAgoExpression(floweringPlant.LastModified)
-                  }}</b-td>
+                    }}</b-td>
                   <b-td class="font-bold">{{ floweringPlant.Label.slice(-8) }}</b-td>
                   <b-td>{{ floweringPlant.StrainName }}</b-td>
                 </b-tr>
@@ -298,7 +298,7 @@
                   :class="idx % 2 === 0 ? 'bg-purple-50' : ''">
                   <b-td class="italic whitespace-nowrap">{{
                     isotimeToTimeAgoExpression(activeHarvest.LastModified)
-                  }}</b-td>
+                    }}</b-td>
                   <b-td class="font-bold">{{ activeHarvest.Name.slice(0, 32) }}</b-td>
                   <b-td>{{ activeHarvest.HarvestDate }}</b-td>
                 </b-tr>
@@ -334,7 +334,7 @@
                   :class="idx % 2 === 0 ? 'bg-purple-50' : ''">
                   <b-td class="italic whitespace-nowrap">{{
                     isotimeToTimeAgoExpression(availableTag.LastModified)
-                  }}</b-td>
+                    }}</b-td>
                   <b-td class="font-bold">{{ availableTag.Label.slice(-8) }}</b-td>
                   <b-td>{{ availableTag.TagTypeName }}</b-td>
                 </b-tr>
@@ -371,7 +371,7 @@
                   :class="idx % 2 === 0 ? 'bg-purple-50' : ''">
                   <b-td class="italic whitespace-nowrap">{{
                     isotimeToTimeAgoExpression(activeSale.LastModified)
-                  }}</b-td>
+                    }}</b-td>
                   <b-td class="font-bold">{{ activeSale.ReceiptNumber }}</b-td>
                   <b-td>${{ activeSale.TotalPrice }}</b-td>
                   <b-td>{{ activeSale.TotalPackages }} packages</b-td>

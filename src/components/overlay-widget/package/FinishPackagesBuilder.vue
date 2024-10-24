@@ -1,25 +1,15 @@
 <template>
   <div class="w-full flex flex-col flex-grow space-y-4">
     <div class="w-full grid grid-cols-3 gap-4 auto-cols-fr">
-      <builder-step-header
-        v-for="(step, index) of steps"
-        :key="index"
-        :stepNumber="index + 1"
-        :stepText="step.stepText"
-        :active="index === activeStepIndex"
-        @click.stop.prevent.native="setActiveStepIndex(index)"
-      />
+      <builder-step-header v-for="(step, index) of steps" :key="index" :stepNumber="index + 1" :stepText="step.stepText"
+        :active="index === activeStepIndex" @click.stop.prevent.native="setActiveStepIndex(index)" />
     </div>
 
     <template v-if="activeStepIndex === 0">
       <div class="w-full flex flex-col items-stretch">
-        <package-picker
-          :builderType="builderType"
-          :selectedPackages.sync="selectedPackages"
-          :packageFilters="{ isEmpty: true }"
-          :eagerLoad="true"
-          itemFilterZeroResultsErrorSuggestionMessage="Only empty active packages can be used here."
-        />
+        <package-picker :builderType="builderType" :selectedPackages.sync="selectedPackages"
+          :packageFilters="{ isEmpty: true }" :eagerLoad="true"
+          itemFilterZeroResultsErrorSuggestionMessage="Only empty active packages can be used here." />
 
         <template v-if="selectedPackages.length > 0">
           <div class="flex flex-row justify-end">
@@ -35,12 +25,7 @@
       <div class="flex flex-col items-center">
         <div class="flex flex-col items-center space-y-4" style="width: 600px">
           <b-form-group class="w-full" label="Finish Date:" label-size="sm">
-            <b-form-datepicker
-              initial-date
-              size="md"
-              v-model="finishIsodate"
-              :value="finishIsodate"
-            />
+            <b-form-datepicker initial-date size="md" v-model="finishIsodate" :value="finishIsodate" />
           </b-form-group>
 
           <template v-if="allDetailsProvided">
@@ -70,9 +55,8 @@
 
               <div style="height: 3rem"></div>
 
-              <b-button class="w-full" variant="success" size="md" @click="submit()"
-                >FINISH {{ selectedPackages.length }} PACKAGES</b-button
-              >
+              <b-button class="w-full" variant="success" size="md" @click="submit()">FINISH {{ selectedPackages.length
+                }} PACKAGES</b-button>
             </div>
           </div>
         </template>
@@ -92,46 +76,23 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue';
-import store from '@/store/page-overlay/index';
-import { mapState } from 'vuex';
 import BuilderStepHeader from '@/components/overlay-widget/shared/BuilderStepHeader.vue';
-import { isValidTag, generateTagRangeOrError, getTagFromOffset } from '@/utils/tags';
-import { primaryDataLoader } from '@/modules/data-loader/data-loader.module';
+import PackagePicker from '@/components/overlay-widget/shared/PackagePicker.vue';
 import {
-  combineLatest, from, Subject, timer,
-} from 'rxjs';
-import {
-  debounceTime, distinctUntilChanged, filter, startWith, tap,
-} from 'rxjs/operators';
-import {
-  IPackageData,
-  IPlantFilter,
-  ICsvFile,
-  ILocationData,
-  IMetrcFinishPackagesPayload,
-} from '@/interfaces';
-import { downloadCsvFile, buildCsvDataOrError, buildNamedCsvFileData } from '@/utils/csv';
-import { todayIsodate, submitDateFromIsodate } from '@/utils/date';
-import { primaryMetrcRequestManager } from '@/modules/metrc-request-manager.module';
-import { authManager } from '@/modules/auth-manager.module';
-import {
-  BuilderType,
-  MessageType,
-  PLANTABLE_ITEM_CATEGORY_NAMES,
-  PLANT_BATCH_TYPES,
+  AnalyticsEvent,
+  BuilderType
 } from '@/consts';
+import {
+  ICsvFile,
+  IMetrcFinishPackagesPayload,
+  IPackageData
+} from '@/interfaces';
 import { analyticsManager } from '@/modules/analytics-manager.module';
 import { builderManager } from '@/modules/builder-manager.module';
-import PackagePicker from '@/components/overlay-widget/shared/PackagePicker.vue';
-import LocationPicker from '@/components/overlay-widget/shared/LocationPicker.vue';
-import StrainPicker from '@/components/overlay-widget/shared/StrainPicker.vue';
-import TagPicker from '@/components/overlay-widget/shared/TagPicker.vue';
-import ItemPicker from '@/components/overlay-widget/shared/ItemPicker.vue';
-import PickerCard from '@/components/overlay-widget/shared/PickerCard.vue';
-import { allocatePackageQuantities } from '@/utils/misc';
-import { dynamicConstsManager } from '@/modules/dynamic-consts-manager.module';
-import { safeZip } from '@/utils/array';
+import store from '@/store/page-overlay/index';
+import { buildCsvDataOrError, buildNamedCsvFileData } from '@/utils/csv';
+import { submitDateFromIsodate, todayIsodate } from '@/utils/date';
+import Vue from 'vue';
 
 export default Vue.extend({
   name: 'FinishPackagesBuilder',
@@ -144,7 +105,7 @@ export default Vue.extend({
     setActiveStepIndex(index: number) {
       this.$data.activeStepIndex = index;
 
-      analyticsManager.track(MessageType.BUILDER_ENGAGEMENT, {
+      analyticsManager.track(AnalyticsEvent.BUILDER_ENGAGEMENT, {
         builder: this.$data.builderType,
         action: `Set active step to ${index}`,
       });
@@ -229,7 +190,7 @@ export default Vue.extend({
       ],
     };
   },
-  async created() {},
+  async created() { },
   destroyed() {
     // Looks like modal is not actually destroyed
   },

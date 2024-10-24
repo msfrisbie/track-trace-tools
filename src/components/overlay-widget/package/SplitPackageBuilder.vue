@@ -56,10 +56,10 @@
                 </template>
 
                 <template v-if="facilityUsesLocationForPackages &&
-      outputItem &&
-      perPackageQuantity &&
-      newPackageCount
-      ">
+                  outputItem &&
+                  perPackageQuantity &&
+                  newPackageCount
+                ">
                   <location-picker class="flex-grow" :location="location"
                     :suggestedLocationName="sourcePackage && sourcePackage.LocationName"
                     v-on:update:location="updateSplitPackageData({ location: $event })" />
@@ -72,10 +72,10 @@
               </div>
 
               <template v-if="outputItem &&
-      perPackageQuantity &&
-      newPackageCount &&
-      (!facilityUsesLocationForPackages || location)
-      ">
+                perPackageQuantity &&
+                newPackageCount &&
+                (!facilityUsesLocationForPackages || location)
+              ">
                 <div class="flex flex-col items-center border-r-2 border-blue-500 px-4">
                   <span class="text-lg font-bold">SOURCE PACKAGE</span>
                 </div>
@@ -100,11 +100,11 @@
               </template>
 
               <template v-if="outputItem &&
-      newPackageCount &&
-      perPackageQuantity &&
-      sourcePackageAdjustQuantity &&
-      (!facilityUsesLocationForPackages || location)
-      ">
+                newPackageCount &&
+                perPackageQuantity &&
+                sourcePackageAdjustQuantity &&
+                (!facilityUsesLocationForPackages || location)
+              ">
                 <template v-if="showHiddenDetailFields">
                   <div class="col-span-2">
                     <b-form-group label="Package Date:" label-size="sm">
@@ -139,11 +139,11 @@
 
           <div class="flex flex-col items-stretch space-y-8">
             <template v-if="outputItem &&
-      (!facilityUsesLocationForPackages || location) &&
-      newPackageCount &&
-      perPackageQuantity &&
-      sourcePackageAdjustQuantity
-      ">
+              (!facilityUsesLocationForPackages || location) &&
+              newPackageCount &&
+              perPackageQuantity &&
+              sourcePackageAdjustQuantity
+            ">
               <tag-picker :tagTypeNames="['CannabisPackage', 'MedicalPackage', 'Cannabis Package', 'Medical Package']"
                 :tagCount="quantityList.length" :selectedTags="packageTags"
                 v-on:update:selectedTags="updateSplitPackageData({ packageTags: $event })" />
@@ -222,7 +222,7 @@ import ItemPicker from '@/components/overlay-widget/shared/ItemPicker.vue';
 import LocationPicker from '@/components/overlay-widget/shared/LocationPicker.vue';
 import SinglePackagePicker from '@/components/overlay-widget/shared/SinglePackagePicker.vue';
 import TagPicker from '@/components/overlay-widget/shared/TagPicker.vue';
-import { BuilderType, MessageType } from '@/consts';
+import { AnalyticsEvent, BuilderType } from '@/consts';
 import {
   IBuilderComponentError,
   ICsvFile,
@@ -290,7 +290,7 @@ export default Vue.extend({
     setActiveStepIndex(index: number): void {
       this.$data.activeStepIndex = index;
 
-      analyticsManager.track(MessageType.BUILDER_ENGAGEMENT, {
+      analyticsManager.track(AnalyticsEvent.BUILDER_ENGAGEMENT, {
         builder: this.$data.builderType,
         action: `Set active step to ${index}`,
       });

@@ -1,15 +1,10 @@
 <template>
   <div class="flex flex-col space-y-20">
     <div class="w-full grid gap-12 grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 place-items-center">
-      <div
-        v-for="option of options"
-        :key="option.text"
-        class="flex flex-col items-center justify-center space-y-4 max-w-sm"
-        style="min-width: 300px"
-        v-bind:style="{
+      <div v-for="option of options" :key="option.text"
+        class="flex flex-col items-center justify-center space-y-4 max-w-sm" style="min-width: 300px" v-bind:style="{
           opacity: option.enabled ? '1' : '0.4',
-        }"
-      >
+        }">
         <font-awesome-icon size="3x" class="text-gray-500" :icon="option.icon" />
 
         <div class="w-full">
@@ -17,35 +12,22 @@
             class="w-full flex flex-row items-center justify-center space-x-4 text-white opacity-70 hover:opacity-100"
             v-bind:style="{
               'background-color': option.backgroundColor,
-            }"
-            :disabled="!option.enabled"
-            @click.stop.prevent="open(option.route)"
-            ><span>{{ option.text }}</span>
+            }" :disabled="!option.enabled" @click.stop.prevent="open(option.route)"><span>{{ option.text }}</span>
 
             <template v-if="option.isBeta">
               <!-- flex struggles to vertical align the badge for some reason -->
-              <b-badge
-                style="padding-top: 0.3rem; margin-top: 0.1rem; line-height: initial"
-                variant="light"
-                >BETA</b-badge
-              ></template
-            >
+              <b-badge style="padding-top: 0.3rem; margin-top: 0.1rem; line-height: initial"
+                variant="light">BETA</b-badge></template>
             <template v-if="option.isNew">
               <!-- flex struggles to vertical align the badge for some reason -->
-              <b-badge
-                style="padding-top: 0.3rem; margin-top: 0.1rem; line-height: initial"
-                variant="light"
-                >NEW!</b-badge
-              ></template
-            >
+              <b-badge style="padding-top: 0.3rem; margin-top: 0.1rem; line-height: initial"
+                variant="light">NEW!</b-badge></template>
           </b-button>
 
           <div class="w-full text-gray-500 text-center" style="height: 1rem; margin-top: 1rem">
             <template v-if="!option.enabled">
               {{ notAvailableMessage }}
-              <b-button variant="link" @click.stop.prevent="open('/help/unavailable')"
-                >Why?</b-button
-              >
+              <b-button variant="link" @click.stop.prevent="open('/help/unavailable')">Why?</b-button>
             </template>
           </div>
         </div>
@@ -55,7 +37,7 @@
 </template>
 
 <script lang="ts">
-import { MessageType } from '@/consts';
+import { AnalyticsEvent } from '@/consts';
 import { analyticsManager } from '@/modules/analytics-manager.module';
 import store from '@/store/page-overlay/index';
 import { notAvailableMessage } from '@/utils/text';
@@ -69,12 +51,12 @@ export default Vue.extend({
     selectBuilderType({ text, route }: { text: string; route: string }) {
       this.$router.push(route);
 
-      analyticsManager.track(MessageType.BUILDER_ENGAGEMENT, {
+      analyticsManager.track(AnalyticsEvent.BUILDER_ENGAGEMENT, {
         action: `Selected builder type ${text}`,
       });
     },
     open(path: string) {
-      analyticsManager.track(MessageType.BUILDER_ENGAGEMENT, {
+      analyticsManager.track(AnalyticsEvent.BUILDER_ENGAGEMENT, {
         action: `Navigated to ${path}`,
       });
 
@@ -86,8 +68,8 @@ export default Vue.extend({
       notAvailableMessage: notAvailableMessage(),
     };
   },
-  async mounted() {},
-  async created() {},
+  async mounted() { },
+  async created() { },
   computed: {
     ...mapState({
       authState: (state: any) => state.pluginAuth.authState,

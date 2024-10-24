@@ -6,7 +6,7 @@
           class="bounce">→</span></a>
       <div v-for="entry of entries" v-bind:key="entry.question" @click="selectEntry(entry)">
         <span class="text-xl font-light ttt-purple hover:underline cursor-pointer hover:text-purple-300">&#8250;&nbsp;{{
-        entry.question }}</span>
+          entry.question }}</span>
       </div>
     </div>
     <div class="col-span-2 overflow-y-auto toolkit-scroll h-full flex flex-col gap-12 p-4" ref="answers">
@@ -17,7 +17,7 @@
 </template>
 
 <script lang="ts">
-import { MessageType } from "@/consts";
+import { AnalyticsEvent } from "@/consts";
 import { analyticsManager } from "@/modules/analytics-manager.module";
 import router from "@/router/index";
 import store from "@/store/page-overlay/index";
@@ -151,7 +151,7 @@ Reach out to [matt@trackandtrace.tools](mailto:matt@trackandtrace.tools)
   },
   methods: {
     selectEntry(entry: IEntry) {
-      analyticsManager.track(MessageType.CLICKED_PLUS_QUESTION, { entry: entry.id });
+      analyticsManager.track(AnalyticsEvent.CLICKED_PLUS_QUESTION, { entry: entry.id });
 
       this.$data.selectedEntry = entry;
 
@@ -165,7 +165,7 @@ Reach out to [matt@trackandtrace.tools](mailto:matt@trackandtrace.tools)
   },
   async created() { },
   async mounted() {
-    analyticsManager.track(MessageType.OPENED_PLUS);
+    analyticsManager.track(AnalyticsEvent.OPENED_PLUS);
   },
 });
 </script>

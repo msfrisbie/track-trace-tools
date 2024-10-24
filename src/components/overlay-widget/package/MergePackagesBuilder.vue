@@ -1,28 +1,17 @@
 <template>
   <div class="w-full flex flex-col flex-grow space-y-4">
     <div class="w-full grid grid-cols-3 gap-4 auto-cols-fr">
-      <builder-step-header
-        v-for="(step, index) of steps"
-        :key="index"
-        :stepNumber="index + 1"
-        :stepText="step.stepText"
-        :active="index === activeStepIndex"
-        @click.stop.prevent.native="setActiveStepIndex(index)"
-      />
+      <builder-step-header v-for="(step, index) of steps" :key="index" :stepNumber="index + 1" :stepText="step.stepText"
+        :active="index === activeStepIndex" @click.stop.prevent.native="setActiveStepIndex(index)" />
     </div>
 
     <template v-if="activeStepIndex === 0">
       <div class="w-full flex flex-col items-stretch">
-        <package-picker
-          :builderType="builderType"
-          :selectedPackages.sync="selectedPackages"
-          v-on:selectItem="
-            inputItem = $event;
-            outputItem = $event;
-          "
-          :packageFilters="{ isEmpty: false }"
-          itemFilterZeroResultsErrorSuggestionMessage="Only active packages with remaining quantity can be used here."
-        />
+        <package-picker :builderType="builderType" :selectedPackages.sync="selectedPackages" v-on:selectItem="
+          inputItem = $event;
+        outputItem = $event;
+        " :packageFilters="{ isEmpty: false }"
+          itemFilterZeroResultsErrorSuggestionMessage="Only active packages with remaining quantity can be used here." />
 
         <template v-if="selectedPackages.length > 0">
           <div class="flex flex-row justify-end">
@@ -39,46 +28,30 @@
         <div class="flex flex-col items-center space-y-4" style="width: 600px">
           <template v-if="!showTagPicker">
             <b-form-group class="w-full" label="New package item:" label-size="sm">
-              <item-picker
-                :item.sync="outputItem"
-                :selectOwnedItems="true"
-                :itemFilters="{
-                  quantityType: [inputItem.QuantityTypeName],
-                }"
-              />
+              <item-picker :item.sync="outputItem" :selectOwnedItems="true" :itemFilters="{
+                quantityType: [inputItem.QuantityTypeName],
+              }" />
             </b-form-group>
 
             <b-form-group class="w-full" label="New package quantity:" label-size="sm">
               <b-input-group :append="outputItem.UnitOfMeasureName">
-                <b-form-input
-                  v-model.number="totalPackageQuantity"
-                  type="number"
-                  size="md"
-                  step="0.0000001"
-                  min="0"
-                  :max="maximumTotalPackageQuantity"
-                  required
-                  class="text-center"
-                ></b-form-input>
+                <b-form-input v-model.number="totalPackageQuantity" type="number" size="md" step="0.0000001" min="0"
+                  :max="maximumTotalPackageQuantity" required class="text-center"></b-form-input>
               </b-input-group>
 
-              <template
-                v-if="
-                  maximumTotalPackageQuantity && maximumTotalPackageQuantity < totalPackageQuantity
-                "
-              >
+              <template v-if="
+                maximumTotalPackageQuantity && maximumTotalPackageQuantity < totalPackageQuantity
+              ">
                 <b-form-invalid-feedback>
                   Warning: package total exceeds total quantity available
                 </b-form-invalid-feedback>
               </template>
 
               <template v-if="maximumTotalPackageQuantity">
-                <b-form-text
-                  ><div class="flex flex-row items-center space-x-2">
-                    <span
-                      >Total available: {{ maximumTotalPackageQuantity }}
-                      {{ inputItem.UnitOfMeasureName }}</span
-                    >
+                <b-form-text>
+                  <div class="flex flex-row items-center space-x-2">
+                    <span>Total available: {{ maximumTotalPackageQuantity }}
+                      {{ inputItem.UnitOfMeasureName }}</span>
 
                     <b-button variant="link" size="sm" @click="useMax()">MERGE ALL</b-button>
                   </div>
@@ -88,22 +61,13 @@
 
             <template v-if="facilityUsesLocationForPackages">
               <b-form-group class="w-full" label="Location:" label-size="sm">
-                <location-picker
-                  :location.sync="location"
-                  :suggestedLocationName="
-                    selectedPackages.length > 0 ? selectedPackages[0].locationName : ''
-                  "
-                />
+                <location-picker :location.sync="location" :suggestedLocationName="selectedPackages.length > 0 ? selectedPackages[0].locationName : ''
+                  " />
               </b-form-group>
             </template>
 
             <b-form-group class="w-full" label="Package Date:" label-size="sm">
-              <b-form-datepicker
-                initial-date
-                size="md"
-                v-model="packageIsodate"
-                :value="packageIsodate"
-              />
+              <b-form-datepicker initial-date size="md" v-model="packageIsodate" :value="packageIsodate" />
             </b-form-group>
 
             <b-form-group class="w-full" label="Note (optional):" label-size="sm">
@@ -138,11 +102,8 @@
             </template>
 
             <b-form-group class="w-full">
-              <tag-picker
-                :tagTypeNames="['CannabisPackage', 'MedicalPackage', 'Cannabis Package', 'Medical Package']"
-                :tagCount="newPackageData.length"
-                :selectedTags.sync="packageTags"
-              />
+              <tag-picker :tagTypeNames="['CannabisPackage', 'MedicalPackage', 'Cannabis Package', 'Medical Package']"
+                :tagCount="newPackageData.length" :selectedTags.sync="packageTags" />
             </b-form-group>
 
             <template v-if="allDetailsProvided && tagsSelected">
@@ -168,9 +129,7 @@
 
               <div>
                 Package contains
-                <span class="font-bold ttt-purple"
-                  >{{ totalPackageQuantity }} {{ outputItem.UnitOfMeasureName }}</span
-                >
+                <span class="font-bold ttt-purple">{{ totalPackageQuantity }} {{ outputItem.UnitOfMeasureName }}</span>
                 of
                 <span class="font-bold ttt-purple">{{ outputItem.Name }}</span>
                 .
@@ -188,9 +147,7 @@
 
               <div style="height: 3rem"></div>
 
-              <b-button class="w-full" variant="success" size="md" @click="submit()"
-                >CREATE MERGED PACKAGE</b-button
-              >
+              <b-button class="w-full" variant="success" size="md" @click="submit()">CREATE MERGED PACKAGE</b-button>
             </div>
           </div>
         </template>
@@ -203,9 +160,8 @@
             <span v-if="selectedPackages.length === 0">No packages selected</span>
             <span v-if="newPackageData.length === 0">No package data provided</span>
             <span v-if="packageTags.length === 0">No tags provided</span>
-            <span v-if="newPackageData.length > 0 && packageTags.length !== newPackageData.length"
-              >Incorrect number of tags provided</span
-            >
+            <span v-if="newPackageData.length > 0 && packageTags.length !== newPackageData.length">Incorrect number of
+              tags provided</span>
             <span v-if="!packageIsodate">Package date not provided</span>
             >
           </div>
@@ -221,7 +177,7 @@ import ItemPicker from '@/components/overlay-widget/shared/ItemPicker.vue';
 import LocationPicker from '@/components/overlay-widget/shared/LocationPicker.vue';
 import PackagePicker from '@/components/overlay-widget/shared/PackagePicker.vue';
 import TagPicker from '@/components/overlay-widget/shared/TagPicker.vue';
-import { BuilderType, MessageType } from '@/consts';
+import { AnalyticsEvent, BuilderType } from '@/consts';
 import {
   ICsvFile,
   IIntermediateCreatePackageFromPackagesData,
@@ -284,7 +240,7 @@ export default Vue.extend({
     setActiveStepIndex(index: number) {
       this.$data.activeStepIndex = index;
 
-      analyticsManager.track(MessageType.BUILDER_ENGAGEMENT, {
+      analyticsManager.track(AnalyticsEvent.BUILDER_ENGAGEMENT, {
         builder: this.$data.builderType,
         action: `Set active step to ${index}`,
       });

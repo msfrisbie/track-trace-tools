@@ -1,4 +1,4 @@
-import { MessageType } from "@/consts";
+import { AnalyticsEvent } from "@/consts";
 import { IPluginState } from "@/interfaces";
 import { analyticsManager } from "@/modules/analytics-manager.module";
 import { t3RequestManager } from "@/modules/t3-request-manager.module";
@@ -30,7 +30,7 @@ const renderer = {
 marked.use({
   renderer,
   mangle: false,
-  headerIds: false
+  headerIds: false,
 });
 
 const inMemoryState = {
@@ -59,12 +59,12 @@ export const announcementsModule = {
     ) {
       (Object.keys(data) as Array<keyof IAnnouncementsState>).forEach((key) => {
         const value = data[key];
-        if (typeof value !== 'undefined') {
+        if (typeof value !== "undefined") {
           // @ts-ignore
           state[key] = value;
         }
       });
-    }
+    },
   },
   getters: {
     [AnnouncementsGetters.DISMISSABLE_ANNOUNCEMENTS]: (
@@ -166,7 +166,9 @@ export const announcementsModule = {
       ).length;
 
       ctx.commit(AnnouncementsMutations.ANNOUNCEMENTS_MUTATION, {
-        announcements, lastAnnouncementsCheckDatetime, notificationCount
+        announcements,
+        lastAnnouncementsCheckDatetime,
+        notificationCount,
       } as Partial<IAnnouncementsState>);
     },
     [AnnouncementsActions.VIEW_ANNOUNCEMENTS]: async (
@@ -181,11 +183,11 @@ export const announcementsModule = {
 
       ctx.commit(AnnouncementsMutations.ANNOUNCEMENTS_MUTATION, {
         lastAnnouncementsViewedDatetime,
-        notificationCount: 0
+        notificationCount: 0,
       } as Partial<IAnnouncementsState>);
 
       if (ctx.state.notificationCount > 0) {
-        analyticsManager.track(MessageType.VIEWED_UNREAD_ANNOUNCEMENTS);
+        analyticsManager.track(AnalyticsEvent.VIEWED_UNREAD_ANNOUNCEMENTS);
       }
     },
     [AnnouncementsActions.SHOW_ALL_ANNOUNCEMENTS]: async (
@@ -193,7 +195,7 @@ export const announcementsModule = {
       data: any
     ) => {
       ctx.commit(AnnouncementsMutations.ANNOUNCEMENTS_MUTATION, {
-        showDismissed: true
+        showDismissed: true,
       } as Partial<IAnnouncementsState>);
     },
     [AnnouncementsActions.DISMISS_ANNOUNCEMENTS]: async (
@@ -207,10 +209,10 @@ export const announcementsModule = {
       const dismissedDatetime = ctx.state.announcements[0].published_at;
 
       ctx.commit(AnnouncementsMutations.ANNOUNCEMENTS_MUTATION, {
-        dismissedDatetime
+        dismissedDatetime,
       } as Partial<IAnnouncementsState>);
 
-      analyticsManager.track(MessageType.DISMISSED_ANNOUNCEMENTS);
+      analyticsManager.track(AnalyticsEvent.DISMISSED_ANNOUNCEMENTS);
     },
     [AnnouncementsActions.RESET]: async (
       ctx: ActionContext<IAnnouncementsState, IPluginState>,
@@ -221,7 +223,7 @@ export const announcementsModule = {
         announcements: [],
         lastAnnouncementsCheckDatetime: null,
         lastAnnouncementsViewedDatetime: null,
-        dismissedDatetime: null
+        dismissedDatetime: null,
       } as Partial<IAnnouncementsState>);
     },
   },

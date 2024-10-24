@@ -3,41 +3,20 @@
     <b-form-group label="DRIVER" label-class="text-gray-400" label-size="sm">
       <b-input-group class="flex flex-row">
         <template v-if="showDriverSearch">
-          <vue-typeahead-bootstrap
-            style="position: relative"
-            placeholder="Name or driver's license number"
-            size="sm"
-            ref="driversearch"
-            class="flex-grow"
-            :data="drivers"
-            :showOnFocus="true"
-            :serializer="(driver) => `${driver.Name} | ${driver.DriversLicenseNumber}`"
-            @hit="selectDriver($event)"
-          >
+          <vue-typeahead-bootstrap style="position: relative" placeholder="Name or driver's license number" size="sm"
+            ref="driversearch" class="flex-grow" :data="drivers" :showOnFocus="true"
+            :serializer="(driver) => `${driver.Name} | ${driver.DriversLicenseNumber}`" @hit="selectDriver($event)">
           </vue-typeahead-bootstrap>
         </template>
 
         <template v-else>
-          <b-form-input
-            v-model="driverName"
-            :state="!driverName ? false : null"
-            size="sm"
-            placeholder="NAME"
-          />
+          <b-form-input v-model="driverName" :state="!driverName ? false : null" size="sm" placeholder="NAME" />
 
-          <b-form-input
-            v-model="driverEmployeeId"
-            :state="!driverEmployeeId ? false : null"
-            size="sm"
-            placeholder="EMPLOYEE ID"
-          />
+          <b-form-input v-model="driverEmployeeId" :state="!driverEmployeeId ? false : null" size="sm"
+            placeholder="EMPLOYEE ID" />
 
-          <b-form-input
-            v-model="driverLicenseNumber"
-            :state="!driverLicenseNumber ? false : null"
-            size="sm"
-            placeholder="LICENSE #"
-          />
+          <b-form-input v-model="driverLicenseNumber" :state="!driverLicenseNumber ? false : null" size="sm"
+            placeholder="LICENSE #" />
         </template>
 
         <template v-if="drivers.length > 0">
@@ -53,41 +32,17 @@
     <b-form-group label="VEHICLE" label-class="text-gray-400" label-size="sm">
       <b-input-group class="flex flex-row">
         <template v-if="showVehicleSearch">
-          <vue-typeahead-bootstrap
-            style="position: relative"
-            placeholder="Search vehicles"
-            size="sm"
-            ref="vehiclesearch"
-            class="flex-grow"
-            :data="vehicles"
-            :showOnFocus="true"
-            :serializer="
-              (vehicle) => `${vehicle.Make} ${vehicle.Model} (${vehicle.LicensePlateNumber})`
-            "
-            @hit="selectVehicle($event)"
-          >
+          <vue-typeahead-bootstrap style="position: relative" placeholder="Search vehicles" size="sm"
+            ref="vehiclesearch" class="flex-grow" :data="vehicles" :showOnFocus="true" :serializer="(vehicle) => `${vehicle.Make} ${vehicle.Model} (${vehicle.LicensePlateNumber})`
+              " @hit="selectVehicle($event)">
           </vue-typeahead-bootstrap>
         </template>
 
         <template v-else>
-          <b-form-input
-            v-model="vehicleMake"
-            :state="!vehicleMake ? false : null"
-            placeholder="MAKE"
-            size="sm"
-          />
-          <b-form-input
-            v-model="vehicleModel"
-            :state="!vehicleModel ? false : null"
-            placeholder="MODEL"
-            size="sm"
-          />
-          <b-form-input
-            v-model="vehicleLicensePlate"
-            :state="!vehicleLicensePlate ? false : null"
-            placeholder="PLATE"
-            size="sm"
-          />
+          <b-form-input v-model="vehicleMake" :state="!vehicleMake ? false : null" placeholder="MAKE" size="sm" />
+          <b-form-input v-model="vehicleModel" :state="!vehicleModel ? false : null" placeholder="MODEL" size="sm" />
+          <b-form-input v-model="vehicleLicensePlate" :state="!vehicleLicensePlate ? false : null" placeholder="PLATE"
+            size="sm" />
         </template>
 
         <template v-if="vehicles.length > 0">
@@ -116,7 +71,7 @@
 </template>
 
 <script lang="ts">
-import { BuilderType, MessageType } from "@/consts";
+import { AnalyticsEvent, BuilderType } from "@/consts";
 import { IComputedGetSet, IMetrcDriverData, IMetrcVehicleData, IPluginState } from "@/interfaces";
 import { analyticsManager } from "@/modules/analytics-manager.module";
 import { authManager } from "@/modules/auth-manager.module";
@@ -238,7 +193,7 @@ export default Vue.extend({
 
       this.$data.showDriverSearch = false;
 
-      analyticsManager.track(MessageType.BUILDER_ENGAGEMENT, {
+      analyticsManager.track(AnalyticsEvent.BUILDER_ENGAGEMENT, {
         builder: BuilderType.CREATE_TRANSFER,
         action: "Selected driver",
         driver,
@@ -257,7 +212,7 @@ export default Vue.extend({
 
       this.$data.showVehicleSearch = false;
 
-      analyticsManager.track(MessageType.BUILDER_ENGAGEMENT, {
+      analyticsManager.track(AnalyticsEvent.BUILDER_ENGAGEMENT, {
         builder: BuilderType.CREATE_TRANSFER,
         action: "Selected vehicle",
         vehicle,
@@ -273,7 +228,7 @@ export default Vue.extend({
 
       this.$data.showVehicleSearch = !this.$data.showVehicleSearch;
 
-      analyticsManager.track(MessageType.BUILDER_ENGAGEMENT, {
+      analyticsManager.track(AnalyticsEvent.BUILDER_ENGAGEMENT, {
         builder: BuilderType.CREATE_TRANSFER,
         action: `Set show vehicle search to ${this.$data.showVehicleSearch}`,
       });
@@ -288,19 +243,19 @@ export default Vue.extend({
 
       this.$data.showDriverSearch = !this.$data.showDriverSearch;
 
-      analyticsManager.track(MessageType.BUILDER_ENGAGEMENT, {
+      analyticsManager.track(AnalyticsEvent.BUILDER_ENGAGEMENT, {
         builder: BuilderType.CREATE_TRANSFER,
         action: `Set show driver search to ${this.$data.showDriverSearch}`,
       });
     },
   },
-  async created() {},
+  async created() { },
   async mounted() {
     await authManager.authStateOrError();
 
     this.$data.transferDataLoading = true;
 
-    analyticsManager.track(MessageType.BUILDER_EVENT, {
+    analyticsManager.track(AnalyticsEvent.BUILDER_EVENT, {
       builder: BuilderType.CREATE_TRANSFER,
       action: "Started driver and vehicle load",
     });
@@ -325,7 +280,7 @@ export default Vue.extend({
       //         []
       //       );
 
-      //       analyticsManager.track(MessageType.BUILDER_EVENT, {
+      //       analyticsManager.track(AnalyticsEvent.BUILDER_EVENT, {
       //         builder: BuilderType.CREATE_TRANSFER,
       //         action: `Finished loading ${this.$data.drivers.length} drivers and ${this.$data.vehicles.length} vehicles`,
       //       });
@@ -359,7 +314,7 @@ export default Vue.extend({
 
       this.$data.vehicles = await dynamicConstsManager.vehicles();
 
-      analyticsManager.track(MessageType.BUILDER_EVENT, {
+      analyticsManager.track(AnalyticsEvent.BUILDER_EVENT, {
         builder: BuilderType.CREATE_TRANSFER,
         action: `Finished loading ${this.$data.drivers.length} drivers and ${this.$data.vehicles.length} vehicles`,
       });
@@ -387,7 +342,7 @@ export default Vue.extend({
       console.error(e);
       this.$data.showInitializationError = true;
 
-      analyticsManager.track(MessageType.BUILDER_EVENT, {
+      analyticsManager.track(AnalyticsEvent.BUILDER_EVENT, {
         builder: BuilderType.CREATE_TRANSFER,
         action: "Failed loading drivers/vehicles",
         error: e,

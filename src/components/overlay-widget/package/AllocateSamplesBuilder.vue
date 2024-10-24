@@ -24,10 +24,10 @@
               <b-button class="col-span-2" variant="primary" @click="allocateSamples()"
                 :disabled="!enableAllocation">SUGGEST&nbsp;SAMPLES</b-button>
               <b-form-select v-model="daysInRange" :options="[0, 7, 30, 60, 90, 180, 365].map((x) => ({
-        value: x,
-        text: x === 0 ? 'today' : `past ${x} days`,
-      }))
-        ">
+                value: x,
+                text: x === 0 ? 'today' : `past ${x} days`,
+              }))
+                ">
               </b-form-select>
             </div>
 
@@ -39,15 +39,15 @@
                 <div class="grid grid-cols-1 gap-1">
                   <div class="w-full grid grid-cols-2 gap-2 mb-4">
                     <b-button variant="light" @click="
-        employeeSamples.employees.map((x) =>
-          toggleEmployee({ employeeId: x.Id, add: true })
-        )
-        ">ALL</b-button>
+                      employeeSamples.employees.map((x) =>
+                        toggleEmployee({ employeeId: x.Id, add: true })
+                      )
+                      ">ALL</b-button>
                     <b-button variant="light" @click="
-        employeeSamples.employees.map((x) =>
-          toggleEmployee({ employeeId: x.Id, remove: true })
-        )
-        ">NONE</b-button>
+                      employeeSamples.employees.map((x) =>
+                        toggleEmployee({ employeeId: x.Id, remove: true })
+                      )
+                      ">NONE</b-button>
                   </div>
 
                   <b-form-checkbox v-for="employee of employeeSamples.employees" v-bind:key="employee.Id" size="sm"
@@ -60,22 +60,22 @@
             </b-collapse>
 
             <b-button variant="outline-primary" v-b-toggle="'collapse-2'">Sample Packages ({{
-        selectedSamplePackages.length }})</b-button>
+              selectedSamplePackages.length }})</b-button>
 
             <b-collapse id="collapse-2" class="h-auto" style="transition: none !important">
               <b-card>
                 <div class="grid grid-cols-1 gap-1">
                   <div class="w-full grid grid-cols-2 gap-2">
                     <b-button variant="light" @click="
-        employeeSamples.availableSamplePackages.map((x) =>
-          togglePackage({ packageId: x.Id, add: true })
-        )
-        ">ALL</b-button>
+                      employeeSamples.availableSamplePackages.map((x) =>
+                        togglePackage({ packageId: x.Id, add: true })
+                      )
+                      ">ALL</b-button>
                     <b-button variant="light" @click="
-        employeeSamples.availableSamplePackages.map((x) =>
-          togglePackage({ packageId: x.Id, remove: true })
-        )
-        ">NONE</b-button>
+                      employeeSamples.availableSamplePackages.map((x) =>
+                        togglePackage({ packageId: x.Id, remove: true })
+                      )
+                      ">NONE</b-button>
                   </div>
 
                   <div v-for="[date, packages] of dateGroupedAvailableSamplePackages" v-bind:key="date">
@@ -84,8 +84,8 @@
                       <b-button variant="light" size="sm"
                         @click="packages.map((x) => togglePackage({ packageId: x.Id, add: true }))">+</b-button>
                       <b-button variant="light" size="sm" @click="
-        packages.map((x) => togglePackage({ packageId: x.Id, remove: true }))
-        ">-</b-button>
+                        packages.map((x) => togglePackage({ packageId: x.Id, remove: true }))
+                        ">-</b-button>
                     </div>
 
                     <b-form-checkbox v-for="pkg of packages" v-bind:key="pkg.Id" size="sm"
@@ -139,14 +139,14 @@
                     </div>
                     <div class="col-span-2 flex flex-col gap-2 text-xs">
                       <b-form-checkbox v-for="sampleAllocation of employeeSamples.pendingAllocationBuffer.filter(
-          (allocation) => allocation.employee.Id === employee.Id
-        )" v-bind:key="sampleAllocation.uuid" size="sm" :checked="employeeSamples.pendingAllocationBufferIds.includes(sampleAllocation.uuid)
-        " @change="toggleSampleAllocation({ uuid: sampleAllocation.uuid })">
+                        (allocation) => allocation.employee.Id === employee.Id
+                      )" v-bind:key="sampleAllocation.uuid" size="sm" :checked="employeeSamples.pendingAllocationBufferIds.includes(sampleAllocation.uuid)
+                        " @change="toggleSampleAllocation({ uuid: sampleAllocation.uuid })">
                         <div class="flex-grow">
                           <div class="font-bold">
                             {{ sampleAllocation.pkg.Item.Name }} ({{
-        sampleAllocation.adjustmentQuantity
-      }}
+                              sampleAllocation.adjustmentQuantity
+                            }}
                             {{ sampleAllocation.pkg.UnitOfMeasureAbbreviation }})
                           </div>
                           <div>
@@ -164,8 +164,8 @@
                           </div>
                           <div v-if="sampleAllocation.infusedAllocationGrams > 0">
                             {{
-        Number((sampleAllocation.infusedAllocationGrams * 1000).toFixed(3))
-      }}mg infused
+                              Number((sampleAllocation.infusedAllocationGrams * 1000).toFixed(3))
+                            }}mg infused
                           </div>
                         </div>
                       </b-form-checkbox>
@@ -182,7 +182,7 @@
 </template>
 
 <script lang="ts">
-import { BuilderType, MessageType } from '@/consts';
+import { AnalyticsEvent, BuilderType } from '@/consts';
 import {
   IAdjustPackageReason,
   ICsvFile,
@@ -354,7 +354,7 @@ export default Vue.extend({
         await downloadCsvFile({ csvFile, delay: 500 });
       }
 
-      analyticsManager.track(MessageType.DOWNLOADED_CSVS, {
+      analyticsManager.track(AnalyticsEvent.DOWNLOADED_CSVS, {
         builderType: this.$data.builderType,
         csvData: {
           sampleTotal: this.selectedSampleAllocations.length,

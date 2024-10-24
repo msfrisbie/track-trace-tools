@@ -125,7 +125,7 @@
 </template>
 
 <script lang="ts">
-import { MessageType, ModalAction, ModalType, TransferState } from "@/consts";
+import { AnalyticsEvent, ModalAction, ModalType, TransferState } from "@/consts";
 import { IIndexedTransferData, IPluginState, ITransferMetadata } from "@/interfaces";
 import { analyticsManager } from "@/modules/analytics-manager.module";
 import { authManager } from "@/modules/auth-manager.module";
@@ -216,7 +216,7 @@ export default Vue.extend({
       modalManager.dispatchContextMenuEvent(null);
     },
     async editTransfer() {
-      analyticsManager.track(MessageType.CONTEXT_MENU_SELECT, { event: "editTransfer" });
+      analyticsManager.track(AnalyticsEvent.CONTEXT_MENU_SELECT, { event: "editTransfer" });
 
       await this.setTransferForUpdate({ transferForUpdate: this.$props.transfer });
 
@@ -224,45 +224,45 @@ export default Vue.extend({
         initialRoute: "/transfer/transfer-builder",
       });
 
-      analyticsManager.track(MessageType.CLICKED_EDIT_TRANSFER);
+      analyticsManager.track(AnalyticsEvent.CLICKED_EDIT_TRANSFER);
       this.dismiss();
     },
     viewManifest() {
-      analyticsManager.track(MessageType.CONTEXT_MENU_SELECT, { event: "viewManifest" });
+      analyticsManager.track(AnalyticsEvent.CONTEXT_MENU_SELECT, { event: "viewManifest" });
 
       modalManager.dispatchModalEvent(ModalType.DOCUMENT, ModalAction.OPEN, {
         documentUrls: [this.manifestUrl],
       });
-      analyticsManager.track(MessageType.CLICKED_VIEW_MANIFEST_BUTTON);
+      analyticsManager.track(AnalyticsEvent.CLICKED_VIEW_MANIFEST_BUTTON);
       this.dismiss();
     },
     newTabManifest() {
-      analyticsManager.track(MessageType.CONTEXT_MENU_SELECT, { event: "newTabManifest" });
+      analyticsManager.track(AnalyticsEvent.CONTEXT_MENU_SELECT, { event: "newTabManifest" });
 
       window.open(this.manifestUrl, "_blank");
       this.dismiss();
     },
     printManifest() {
-      analyticsManager.track(MessageType.CONTEXT_MENU_SELECT, { event: "printManifest" });
+      analyticsManager.track(AnalyticsEvent.CONTEXT_MENU_SELECT, { event: "printManifest" });
 
       printPdfFromUrl({ urls: [this.manifestUrl], modal: true });
 
-      analyticsManager.track(MessageType.CLICKED_PRINT_MANIFEST_BUTTON);
+      analyticsManager.track(AnalyticsEvent.CLICKED_PRINT_MANIFEST_BUTTON);
       this.dismiss();
     },
     downloadManifest() {
-      analyticsManager.track(MessageType.CONTEXT_MENU_SELECT, { event: "downloadManifest" });
+      analyticsManager.track(AnalyticsEvent.CONTEXT_MENU_SELECT, { event: "downloadManifest" });
 
       downloadFileFromUrl({
         url: this.manifestUrl,
         filename: `Manifest_${this.$props.transfer.ManifestNumber}.pdf`,
       });
 
-      analyticsManager.track(MessageType.CLICKED_DOWNLOAD_MANIFEST_BUTTON);
+      analyticsManager.track(AnalyticsEvent.CLICKED_DOWNLOAD_MANIFEST_BUTTON);
       this.dismiss();
     },
     async downloadSummary(exportFormat: 'CSV' | 'GOOGLE_SHEETS' | 'XLSX' = 'CSV') {
-      analyticsManager.track(MessageType.CONTEXT_MENU_SELECT, { event: "downloadSummary" });
+      analyticsManager.track(AnalyticsEvent.CONTEXT_MENU_SELECT, { event: "downloadSummary" });
 
       toastManager.info("Generating transfer summary CSV...");
 
@@ -286,7 +286,7 @@ export default Vue.extend({
     },
     async downloadAllLabTestCsvs() {
       // Show message immediately inflight...
-      analyticsManager.track(MessageType.CONTEXT_MENU_SELECT, { event: "downloadAllLabTestCsvs" });
+      analyticsManager.track(AnalyticsEvent.CONTEXT_MENU_SELECT, { event: "downloadAllLabTestCsvs" });
 
       toastManager.openToast("Downloading all available lab results from this transfer...", {
         title: "Download in progress",
@@ -318,7 +318,7 @@ export default Vue.extend({
     },
     async downloadAllLabTestPdfs() {
       // Show message immediately inflight...
-      analyticsManager.track(MessageType.CONTEXT_MENU_SELECT, { event: "downloadAllLabTestPdfs" });
+      analyticsManager.track(AnalyticsEvent.CONTEXT_MENU_SELECT, { event: "downloadAllLabTestPdfs" });
 
       toastManager.openToast("Downloading all available COAs from this transfer...", {
         title: "Download in progress",
@@ -353,7 +353,7 @@ export default Vue.extend({
       this.dismiss();
     },
     async createScanSheet() {
-      analyticsManager.track(MessageType.CONTEXT_MENU_SELECT, { event: "createScanSheet" });
+      analyticsManager.track(AnalyticsEvent.CONTEXT_MENU_SELECT, { event: "createScanSheet" });
 
       await createScanSheet(
         parseInt(this.$props.transfer.ManifestNumber!, 10),

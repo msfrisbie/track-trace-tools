@@ -1,37 +1,24 @@
 <template>
   <div class="flex flex-col space-y-20">
     <div class="w-full grid gap-12 grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 place-items-center">
-      <div
-        v-for="builderOption of builderOptions"
-        :key="builderOption.text"
-        class="flex flex-col items-center justify-center space-y-4 max-w-sm"
-        style="min-width: 300px"
-        v-bind:style="{
+      <div v-for="builderOption of builderOptions" :key="builderOption.text"
+        class="flex flex-col items-center justify-center space-y-4 max-w-sm" style="min-width: 300px" v-bind:style="{
           opacity: builderOption.enabled ? '1' : '0.4',
-        }"
-      >
+        }">
         <font-awesome-icon size="3x" class="text-gray-500" :icon="builderOption.icon" />
 
         <div class="w-full">
-          <b-button
-            class="w-full text-white opacity-70 hover:opacity-100"
-            v-bind:style="{
-              'background-color': builderOption.backgroundColor,
-            }"
-            :disabled="!builderOption.enabled"
-            @click.stop.prevent="selectBuilderType(builderOption)"
-            >{{ builderOption.text
-            }}<template v-if="builderOption.isBeta"
-              ><b-badge class="ml-2" variant="light">BETA</b-badge></template
-            ></b-button
-          >
+          <b-button class="w-full text-white opacity-70 hover:opacity-100" v-bind:style="{
+            'background-color': builderOption.backgroundColor,
+          }" :disabled="!builderOption.enabled" @click.stop.prevent="selectBuilderType(builderOption)">{{
+            builderOption.text
+          }}<template v-if="builderOption.isBeta"><b-badge class="ml-2"
+                variant="light">BETA</b-badge></template></b-button>
 
           <div class="w-full text-gray-500 text-center" style="height: 1rem; margin-top: 1rem">
             <template v-if="!builderOption.enabled">
               {{ notAvailableMessage }}
-              <b-button variant="link" @click.stop.prevent="open('/help/unavailable')"
-                >Why?</b-button
-              >
+              <b-button variant="link" @click.stop.prevent="open('/help/unavailable')">Why?</b-button>
             </template>
           </div>
         </div>
@@ -41,7 +28,7 @@
 </template>
 
 <script lang="ts">
-import { CALIFORNIA_METRC_HOSTNAME, MessageType } from '@/consts';
+import { CALIFORNIA_METRC_HOSTNAME } from '@/consts';
 import { analyticsManager } from '@/modules/analytics-manager.module';
 import store from '@/store/page-overlay/index';
 import { isCurrentHostAllowed } from '@/utils/builder';
@@ -56,12 +43,12 @@ export default Vue.extend({
     selectBuilderType({ text, route }: { text: string; route: string }) {
       this.$router.push(route);
 
-      analyticsManager.track(MessageType.BUILDER_ENGAGEMENT, {
+      analyticsManager.track(AnalyticsEvent.BUILDER_ENGAGEMENT, {
         action: `Selected builder type ${text}`,
       });
     },
     open(path: string) {
-      analyticsManager.track(MessageType.BUILDER_ENGAGEMENT, {
+      analyticsManager.track(AnalyticsEvent.BUILDER_ENGAGEMENT, {
         action: `Navigated to ${path}`,
       });
 
@@ -104,8 +91,8 @@ export default Vue.extend({
       ],
     };
   },
-  async mounted() {},
-  async created() {},
+  async mounted() { },
+  async created() { },
   computed: {
     ...mapState(['trackedInteractions', 'settings', 'accountEnabled']),
   },

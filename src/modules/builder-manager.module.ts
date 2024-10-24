@@ -1,4 +1,4 @@
-import { BuilderType, MessageType } from "@/consts";
+import { AnalyticsEvent, BuilderType } from "@/consts";
 import {
   IAtomicService,
   ICsvFile,
@@ -169,7 +169,7 @@ class BuilderManager implements IAtomicService {
 
     this.submit();
 
-    analyticsManager.track(MessageType.BUILDER_SUBMIT, {
+    analyticsManager.track(AnalyticsEvent.BUILDER_SUBMIT, {
       builderType,
       summary,
     });
@@ -196,7 +196,7 @@ class BuilderManager implements IAtomicService {
       this.activeBuilderProject?.inflightRows.length === 0 &&
       this.activeBuilderProject?.pendingRows.length === 0
     ) {
-      analyticsManager.track(MessageType.BUILDER_PROJECT_FINISHED);
+      analyticsManager.track(AnalyticsEvent.BUILDER_PROJECT_FINISHED);
 
       switch (this.activeBuilderProject?.builderType) {
         case BuilderType.CREATE_TRANSFER:
@@ -219,7 +219,7 @@ class BuilderManager implements IAtomicService {
           break;
       }
     } else {
-      analyticsManager.track(MessageType.BUILDER_PROJECT_CANCELLED);
+      analyticsManager.track(AnalyticsEvent.BUILDER_PROJECT_CANCELLED);
     }
 
     this.updateProject(null);
@@ -298,7 +298,7 @@ class BuilderManager implements IAtomicService {
         `Successfully submitted ${this.activeBuilderProject?.inflightRows.length} rows`,
       ]);
 
-      analyticsManager.track(MessageType.BUILDER_BATCH_ACCEPTED, {
+      analyticsManager.track(AnalyticsEvent.BUILDER_BATCH_ACCEPTED, {
         builderType: this.activeBuilderProject.builderType,
         rows: this.activeBuilderProject.inflightRows.length,
       });
@@ -306,7 +306,7 @@ class BuilderManager implements IAtomicService {
       this.activeBuilderProject.failedRows.push(...this.activeBuilderProject.inflightRows);
       console.error(`Failed to submit ${this.activeBuilderProject.inflightRows.length} rows`);
 
-      analyticsManager.track(MessageType.BUILDER_BATCH_FAILED, {
+      analyticsManager.track(AnalyticsEvent.BUILDER_BATCH_FAILED, {
         builderType: this.activeBuilderProject.builderType,
         rows: this.activeBuilderProject.inflightRows.length,
         error,
