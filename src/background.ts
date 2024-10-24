@@ -12,6 +12,7 @@ import {
   readValues,
   writeValues,
 } from "./utils/sheets";
+import { slackLog } from "./utils/slack";
 
 console.log("These events are collected only to help us make the plugin more useful for you.");
 
@@ -488,6 +489,10 @@ chrome.runtime.onMessage.addListener((inboundEvent, sender, sendResponse) => {
         }
         break;
 
+      case MessageType.SLACK_LOG:
+        slackLog(inboundEvent.data.eventName, inboundEvent.message.data.eventData);
+        break;
+
       default:
         break;
     }
@@ -529,10 +534,12 @@ try {
     if (details.reason === chrome.runtime.OnInstalledReason.INSTALL) {
       logEvent("NEW_INSTALL", {}, {});
 
+      slackLog("NEW INSTALL", {});
+
       // Acquire the welcome page URL
       const url = chrome.runtime.getURL("index.html");
 
-      // // Open the welcome page in a new tab .
+      // Open the welcome page in a new tab
       chrome.tabs.create({ url });
     }
 
