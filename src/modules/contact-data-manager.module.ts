@@ -5,8 +5,8 @@ import store from "@/store/page-overlay/index";
 import { extract, ExtractionType } from "@/utils/html";
 import { analyticsManager } from "./analytics-manager.module";
 import { authManager } from "./auth-manager.module";
-import { primaryMetrcRequestManager } from "./metrc-request-manager.module";
 import { messageBus } from "./message-bus.module";
+import { primaryMetrcRequestManager } from "./metrc-request-manager.module";
 
 // 30 seconds
 const CONTACT_DATA_FETCH_INTERVAL_MS = 1000 * 30;
@@ -33,8 +33,6 @@ class ContactDataManager implements IAtomicService {
 
     const extractedData = extract(ExtractionType.CONTACT_DATA, html);
 
-    console.log({ extractedData });
-
     if (extractedData && extractedData.contactData) {
       ({ email, phoneNumber } = extractedData.contactData);
     }
@@ -51,12 +49,11 @@ class ContactDataManager implements IAtomicService {
         phoneNumber: phoneNumber || undefined,
       });
 
-      messageBus.sendMessageToBackground(
-          MessageType.UPDATE_UNINSTALL_URL, {
-          email,
-          identity: authState.identity,
-          hostname: authState.hostname,
-          license: authState.license
+      messageBus.sendMessageToBackground(MessageType.UPDATE_UNINSTALL_URL, {
+        email,
+        identity: authState.identity,
+        hostname: authState.hostname,
+        license: authState.license,
       });
     } else {
       analyticsManager.track(AnalyticsEvent.CONTACT_DATA_PARSE_ERROR);
