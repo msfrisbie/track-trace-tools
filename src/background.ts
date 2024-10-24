@@ -248,6 +248,16 @@ chrome.runtime.onMessage.addListener((inboundEvent, sender, sendResponse) => {
         });
         break;
 
+      case MessageType.UPDATE_UNINSTALL_URL:
+        chrome.runtime.setUninstallURL(
+          `https://trackandtrace.tools/uninstall?metadata=${btoa(
+            JSON.stringify({
+              ...inboundEvent.message.data,
+            })
+          )}`
+        );
+        break;
+
       case MessageType.SEARCH_TRANSFERS:
         // Log the search
         // logEvent(MessageType.REFRESH_TRANSFER_RESULTS, inboundEvent.message.data, inboundEvent.message.options);
@@ -290,12 +300,6 @@ chrome.runtime.onMessage.addListener((inboundEvent, sender, sendResponse) => {
             });
           });
 
-        break;
-
-      case MessageType.UPDATE_UNINSTALL_URL:
-        respondToContentScript(sendResponse, inboundEvent, {
-          success: true,
-        });
         break;
 
       // case MessageType.GET_EXTENSION_URL:
