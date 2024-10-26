@@ -77,6 +77,7 @@ export function extractMatchedFields(
 
 export function generateSearchResultMetadata(
   queryString: string,
+  licenseNumber: string,
   partialResult: Partial<ISearchResult>
 ): ISearchResult {
   let primaryIconName: string = "question-circle";
@@ -424,6 +425,10 @@ export function generateSearchResultMetadata(
     score *= 0.2;
   }
 
+  if (licenseNumber === store.state.pluginAuth.authState?.license) {
+    score *= 1.1;
+  }
+
   const result = {
     ...partialResult,
     path,
@@ -441,6 +446,7 @@ export function generateSearchResultMetadata(
     primaryStatusTextualDescriptor,
     matchedFields,
     isActive,
+    licenseNumber
   };
 
   return result;
@@ -489,8 +495,6 @@ export function generateScoreFromMatch({
 
   return score;
 }
-
-function getTabs() {}
 
 export function getActiveUniqueMetrcGridIdOrNull(): UniqueMetrcGridId | null {
   const pageHasTabs = !!document.querySelector(`li[data-grid-selector]`);

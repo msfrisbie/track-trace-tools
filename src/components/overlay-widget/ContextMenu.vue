@@ -221,14 +221,14 @@ export default Vue.extend({
         event: "filterPackage",
       });
       this.setShowSearchResults({ showSearchResults: true });
-      store.dispatch(`search/${SearchActions.SET_QUERY_STRING}`, { queryString: text });
+      store.dispatch(`search/${SearchActions.SET_QUERY_DATA}`, { queryString: text, licenseNumbers: [store.state.pluginAuth.authState?.license] });
       this.dismiss();
     },
     searchTransfer(text: string) {
       analyticsManager.track(AnalyticsEvent.CONTEXT_MENU_SELECT, { event: "searchTransfer", text });
 
       this.setShowSearchResults({ showSearchResults: true });
-      store.dispatch(`search/${SearchActions.SET_QUERY_STRING}`, { queryString: text });
+      store.dispatch(`search/${SearchActions.SET_QUERY_DATA}`, { queryString: text, licenseNumbers: [store.state.pluginAuth.authState?.license] });
       this.dismiss();
     },
     reset() {

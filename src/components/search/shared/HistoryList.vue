@@ -28,7 +28,7 @@ export default Vue.extend({
   store,
   methods: {
     setSearch(queryString: string) {
-      store.dispatch(`search/${SearchActions.SET_QUERY_STRING}`, { queryString });
+      store.dispatch(`search/${SearchActions.SET_QUERY_DATA}`, { queryString, licenseNumbers: [store.state.pluginAuth.authState?.license] });
       analyticsManager.track(AnalyticsEvent.CLICKED_RECENT_QUERY, {
         queryString,
       });

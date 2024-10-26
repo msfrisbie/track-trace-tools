@@ -21,13 +21,13 @@
           }" style="margin-bottom: 0" v-model="queryString" type="search" id="default-search"
             class="block w-full px-6 py-2 pl-12 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
             placeholder="Packages, plants, plant batches, tags, transfers, sales, items, strains" autocomplete="off"
-            @input="setQueryString({ queryString: $event.target.value })"
+            @input="setQueryData({ queryString: $event.target.value })"
             @click="setShowSearchResults({ showSearchResults: true })"
             @focus="setShowSearchResults({ showSearchResults: true })" ref="search" />
         </div>
         <div v-if="searchState.queryString.length > 0 && searchState.showSearchResults"
           class="cursor-pointer absolute inset-y-0 right-0 flex items-center pr-3">
-          <font-awesome-icon @click="setQueryString({ queryString: '' })"
+          <font-awesome-icon @click="setQueryData({ queryString: '' })"
             class="w-5 h-5 text-gray-500 dark:text-gray-400" icon="backspace" />
         </div>
       </div>
@@ -152,6 +152,7 @@ export default Vue.extend({
   computed: {
     ...mapState<IPluginState>({
       searchState: (state: IPluginState) => state.search,
+      pluginAuth: (state: IPluginState) => state.pluginAuth,
     }),
     inlineControlPanelDisplayed(): boolean {
       return this.$data.showInlineControlPanel && !store.state.search.showSearchResults;
@@ -161,7 +162,7 @@ export default Vue.extend({
         return store.state.search.queryString;
       },
       set(queryString: string): void {
-        this.setQueryString({ queryString });
+        this.setQueryData({ queryString });
       },
     },
   },
@@ -175,7 +176,7 @@ export default Vue.extend({
   },
   methods: {
     ...mapActions({
-      setQueryString: `search/${SearchActions.SET_QUERY_STRING}`,
+      setQueryData: `search/${SearchActions.SET_QUERY_DATA}`,
       setShowSearchResults: `search/${SearchActions.SET_SHOW_SEARCH_RESULTS}`,
     }),
     setFocus() {

@@ -36,6 +36,7 @@ export interface ISearchResult {
   item?: IIndexedItemData;
   strain?: IIndexedStrainData;
   salesReceipt?: IIndexedSalesReceiptData;
+  licenseNumber: string;
   // Metadata
   score: number;
   isActive: boolean;
@@ -72,7 +73,7 @@ export interface ISearchState {
   status: SearchStatus;
   statusMessage: string | null;
   queryString: string;
-  queryLicenseNumber: string;
+  queryLicenseNumbers: string[];
   queryStringHistory: string[];
   modalSearchOpen: boolean;
   searchResults: ISearchResult[];
@@ -95,6 +96,7 @@ export interface SearchConfigEntry<TParams, TResult> {
 
 interface QueryParams {
   queryString: string;
+  licenseNumbers: string[]
 }
 
 export interface PackageSearchParams extends QueryParams {

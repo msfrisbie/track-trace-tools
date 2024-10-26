@@ -59,7 +59,7 @@ const inMemoryState = {
   statusMessage: null,
   showSearchResults: false,
   modalSearchOpen: false,
-  queryLicenseNumber: "",
+  queryLicenseNumbers: [],
   searchResults: [],
   activeSearchResult: null,
   metrcGridFilters: {},
@@ -125,11 +125,11 @@ export const searchModule = {
     ) {
       ctx.commit(SearchMutations.SEARCH_MUTATION, { activeSearchResult: searchResult });
     },
-    [SearchActions.SET_QUERY_STRING](
+    [SearchActions.SET_QUERY_DATA](
       ctx: ActionContext<ISearchState, IPluginState>,
-      { queryString }: { queryString: string }
+      { queryString, licenseNumbers }: { queryString: string, licenseNumbers: string[] }
     ) {
-      ctx.commit(SearchMutations.SEARCH_MUTATION, { queryString });
+      ctx.commit(SearchMutations.SEARCH_MUTATION, { queryString, licenseNumbers });
 
       ctx.dispatch(SearchActions.EXECUTE_QUERY, {});
     },
