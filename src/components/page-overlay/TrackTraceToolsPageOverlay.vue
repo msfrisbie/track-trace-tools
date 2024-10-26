@@ -57,6 +57,14 @@ import VueSlider from "vue-slider-component";
 import VueTypeaheadBootstrap from "vue-typeahead-bootstrap";
 import { mapState } from "vuex";
 
+const blacklist = [
+  "timed out",
+  "Setting the value of 'vuex' exceeded the quota",
+  "No metrc kendo present",
+  "resizeobserver loop",
+  "insertbefore",
+];
+
 // This allows firefox to render, but errors are uncollected.
 setTimeout(() => {
   // Don't send error tracking on local
@@ -77,18 +85,9 @@ setTimeout(() => {
       }),
     ],
     beforeSend(event, hint) {
-      for (const blacklistEntry of [
-        "timed out",
-        "Setting the value of 'vuex' exceeded the quota",
-        "No metrc kendo present",
-        "ResizeObserver loop",
-        "insertBefore",
-      ]) {
-        if (hint && hint?.originalException?.toString().includes(blacklistEntry)) {
-          if (Math.random() > 0.0001) {
-            return null;
-          }
-        }
+      const exceptionString = hint?.originalException?.toString().toLowerCase();
+      if (exceptionString && blacklist.some((entry) => exceptionString.includes(entry))) {
+        return null;
       }
 
       return event;
