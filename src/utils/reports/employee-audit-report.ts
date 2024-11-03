@@ -317,11 +317,11 @@ export async function maybeLoadEmployeeAuditReportData({
 
       for (const pkg of packages) {
         for (const history of pkg.history!) {
-          if (config.activityDateGt && history.RecordedDateTime < config.activityDateGt) {
+          if (config.activityDateGt && history.RecordedDateTime.split('T')[0] < config.activityDateGt) {
             continue;
           }
 
-          if (config.activityDateLt && history.RecordedDateTime > config.activityDateLt) {
+          if (config.activityDateLt && history.RecordedDateTime.split('T')[0] > config.activityDateLt) {
             continue;
           }
 
