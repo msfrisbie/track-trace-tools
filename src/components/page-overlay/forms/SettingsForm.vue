@@ -20,10 +20,10 @@
             Fix Metrc styling
           </b-form-checkbox>
 
-          <!-- <b-form-checkbox id="checkbox-hideAiButton" class="mb-2" v-model="settings.hideAiButton"
-            name="checkbox-hideAiButton" @change="onChange()">
+          <b-form-checkbox id="checkbox-hideMetrcAiButton" class="mb-2" v-model="settings.hideMetrcAiButton"
+            name="checkbox-hideMetrcAiButton" @change="onChange()">
             Hide Metrc AI button
-          </b-form-checkbox> -->
+          </b-form-checkbox>
 
           <b-form-checkbox id="checkbox-efficientSpacing" class="mb-2" v-model="settings.efficientSpacing"
             name="checkbox-efficientSpacing" @change="onChange()">

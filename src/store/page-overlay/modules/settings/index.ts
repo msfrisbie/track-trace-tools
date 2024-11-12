@@ -5,15 +5,13 @@ import {
   PlantsTabLabel,
   SalesTabLabel,
   TagsTabLabel,
-  TransfersTabLabel
-} from '@/consts';
-import {
-  BackgroundState, DarkModeState, IPluginState, SnowflakeState
-} from '@/interfaces';
-import { ActionContext } from 'vuex';
-import { ClientActions } from '../client/consts';
-import { SettingsActions, SettingsMutations } from './consts';
-import { ISettingsState } from './interfaces';
+  TransfersTabLabel,
+} from "@/consts";
+import { BackgroundState, DarkModeState, IPluginState, SnowflakeState } from "@/interfaces";
+import { ActionContext } from "vuex";
+import { ClientActions } from "../client/consts";
+import { SettingsActions, SettingsMutations } from "./consts";
+import { ISettingsState } from "./interfaces";
 
 const inMemoryState = {};
 
@@ -38,28 +36,28 @@ const persistedState: ISettingsState = {
   hideQuickActionButtons: false,
   hideTransferSearch: false,
   landingPage: LandingPage.PACKAGES,
-  licenseKey: '',
+  licenseKey: "",
   homeLicenses: {},
   packageDefaultPageSize: 20,
   plantDefaultPageSize: 20,
   preventLogout: true,
   fixMetrcStyling: true,
-  hideAiButton: true,
+  hideMetrcAiButton: false,
   efficientSpacing: false,
   modalExpand: false,
   autoDismissPopups: true,
   salesDefaultPageSize: 20,
   backgroundState: BackgroundState.DEFAULT,
-  backgroundColor: '#49276a',
-  backgroundGradientStartColor: '#49276a',
-  backgroundGradientEndColor: '#ffffff',
-  backgroundImage: '',
+  backgroundColor: "#49276a",
+  backgroundGradientStartColor: "#49276a",
+  backgroundGradientEndColor: "#ffffff",
+  backgroundImage: "",
   snowflakeState: SnowflakeState.DISABLED,
-  snowflakeCharacter: '❅',
-  snowflakeImageCrop: 'none',
-  snowflakeSize: 'md',
-  snowflakeImage: '',
-  snowflakeText: 'LET IT SNOW',
+  snowflakeCharacter: "❅",
+  snowflakeImageCrop: "none",
+  snowflakeSize: "md",
+  snowflakeImage: "",
+  snowflakeText: "LET IT SNOW",
   tagDefaultPageSize: 20,
   transferDefaultPageSize: 20,
   enableManifestDocumentViewer: false,
@@ -74,7 +72,7 @@ const persistedState: ISettingsState = {
   loadDataInParallel: true,
   usePersistedCache: false,
   persistTimestamp: 0,
-  email: ""
+  email: "",
 };
 
 const defaultState: ISettingsState = {
@@ -91,28 +89,28 @@ export const settingsModule = {
     [SettingsMutations.SETTINGS_MUTATION](state: ISettingsState, data: Partial<ISettingsState>) {
       (Object.keys(data) as Array<keyof ISettingsState>).forEach((key) => {
         const value = data[key];
-        if (typeof value !== 'undefined') {
+        if (typeof value !== "undefined") {
           // @ts-ignore
           state[key] = value;
         }
       });
-    }
+    },
   },
   getters: {},
   actions: {
-    [SettingsActions.RESET_SETTINGS](
-      ctx: ActionContext<ISettingsState, IPluginState>,
-    ) {
+    [SettingsActions.RESET_SETTINGS](ctx: ActionContext<ISettingsState, IPluginState>) {
       ctx.dispatch(SettingsActions.UPDATE_SETTINGS, defaultState);
     },
     async [SettingsActions.UPDATE_SETTINGS](
       ctx: ActionContext<ISettingsState, IPluginState>,
-      settings: Partial<ISettingsState>,
+      settings: Partial<ISettingsState>
     ) {
-      console.log('Updating settings');
+      console.log("Updating settings");
 
       ctx.commit(SettingsMutations.SETTINGS_MUTATION, settings as Partial<ISettingsState>);
-      ctx.commit(SettingsMutations.SETTINGS_MUTATION, { persistTimestamp: Date.now() } as Partial<ISettingsState>);
+      ctx.commit(SettingsMutations.SETTINGS_MUTATION, {
+        persistTimestamp: Date.now(),
+      } as Partial<ISettingsState>);
 
       // Always write
       try {
@@ -124,7 +122,7 @@ export const settingsModule = {
       ctx.dispatch(
         `client/${ClientActions.UPDATE_CLIENT_VALUES}`,
         { notify: true },
-        { root: true },
+        { root: true }
       );
     },
   },

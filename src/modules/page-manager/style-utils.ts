@@ -103,6 +103,12 @@ export function togglePageVisibilityClassesImpl() {
     document.body.classList.remove("ttt-styling-fix");
   }
 
+  if (store.state.settings?.hideMetrcAiButton) {
+    document.body.classList.add("ttt-remove-ai");
+  } else {
+    document.body.classList.remove("ttt-remove-ai");
+  }
+
   if (store.state.settings?.efficientSpacing) {
     document.body.classList.add("ttt-efficient-spacing");
   } else {

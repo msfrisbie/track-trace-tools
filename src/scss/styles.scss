@@ -71,20 +71,25 @@ body.ttt-styling-fix {
     min-width: 80px;
     max-width: 400px;
     // overflow-x: auto;
-    white-space: nowrap;
+    // white-space: nowrap;
   }
 
-  .k-grid td {
-    white-space: nowrap !important;
+  .k-grid td:not(:last-child) {
+    // white-space: nowrap !important;
   }
 
   .k-grid td:nth-child(2) {
+    white-space: nowrap !important;
     min-width: 280px;
   }
 }
 
-.stn-wdgt {
+.ttt-remove-ai .stn-wdgt {
   display: none !important;
+}
+
+.stn-wdgt > * > * > * {
+  transform: translateY(-50px) !important;
 }
 
 body.ttt-efficient-spacing {
