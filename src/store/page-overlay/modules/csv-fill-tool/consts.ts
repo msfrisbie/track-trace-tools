@@ -8,7 +8,8 @@ export enum CsvFillToolGetters {
 
 export enum CsvFillToolActions {
   FILL_CSV_INTO_MODAL_FORM = "FILL_CSV_INTO_MODAL_FORM",
-  ANALYZE = "ANALYZE",
   DOWNLOAD_TEMPLATE = "DOWNLOAD_TEMPLATE",
-  DUMP_FORM = "DUMP_FORM"
+  DUMP_FORM = "DUMP_FORM",
 }
+
+export const PER_ROW_DELAY_MS = 500;

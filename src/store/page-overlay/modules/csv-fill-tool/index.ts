@@ -5,9 +5,23 @@ import { readCsvFile } from "@/utils/file";
 import { activeMetrcModalOrNull } from "@/utils/metrc-modal";
 import { hasPlusImpl } from "@/utils/plus";
 import { ActionContext } from "vuex";
-import { CsvFillToolActions, CsvFillToolGetters, CsvFillToolMutations } from "./consts";
+import {
+  CsvFillToolActions,
+  CsvFillToolGetters,
+  CsvFillToolMutations,
+  PER_ROW_DELAY_MS,
+} from "./consts";
 import { ICsvFillToolState } from "./interfaces";
-import { collectInputs } from "./utils";
+import {
+  buildT3CsvGridData,
+  getSecondaryAttribute,
+  maybeHandleAutocomplete,
+  setCheckboxValue,
+  setImageInputValue,
+  setSelectValue,
+  setTextareaValue,
+  setTextInputValue,
+} from "./utils";
 
 const inMemoryState = {};
 
@@ -45,22 +59,6 @@ export const csvFillToolModule = {
     },
   },
   actions: {
-    [CsvFillToolActions.ANALYZE]: async (
-      ctx: ActionContext<ICsvFillToolState, IPluginState>,
-      data: {}
-    ) => {
-      const modal = activeMetrcModalOrNull();
-
-      if (!modal) {
-        throw new Error("Cannot access modal");
-      }
-
-      // const root = buildHierarchy({ modal });
-
-      // dump(root);
-
-      // console.log(root);
-    },
     [CsvFillToolActions.DUMP_FORM]: async (
       ctx: ActionContext<ICsvFillToolState, IPluginState>,
       data: {}
@@ -71,25 +69,9 @@ export const csvFillToolModule = {
         throw new Error("Cannot access modal");
       }
 
-      // const root = buildHierarchy({ modal });
+      const { title, filename, ngRepeatSelectors, ngModelSelectors, columns } =
+        buildT3CsvGridData(modal);
 
-      const inputData = collectInputs(modal);
-
-      const title = modal.querySelector(".k-window-title")!.textContent!.trim();
-      const filename = `${title
-        .replaceAll(/\s+/g, "_")
-        .toLocaleLowerCase()}_autofill_${new Date().toISOString()}.t3.csv`;
-
-      const ngRepeatSelectors: string[] = [];
-      const ngModelSelectors: string[] = [];
-      const columns: string[] = [];
-
-      // let node: IHierarchyNode = root;
-      for (const input of inputData) {
-        ngRepeatSelectors.push(input.ngRepeat);
-        ngModelSelectors.push(input.ngModel);
-        columns.push(input.name);
-      }
       const topLevelSections = modal.querySelectorAll(`[ng-repeat="${ngRepeatSelectors[0]}"]`);
 
       const dataRows: string[][] = [];
@@ -101,7 +83,7 @@ export const csvFillToolModule = {
           const ngRepeat = ngRepeatSelectors[colIdx];
           const ngModel = ngModelSelectors[colIdx];
 
-          const secondaryAttribute = ngModel.endsWith("FileSystemIds") ? "data-type" : "ng-model";
+          const secondaryAttribute = getSecondaryAttribute(ngModel);
 
           const inputs = [
             ...section.querySelectorAll(
@@ -163,25 +145,8 @@ export const csvFillToolModule = {
         throw new Error("Cannot access modal");
       }
 
-      // const root = buildHierarchy({ modal });
-
-      const inputData = collectInputs(modal);
-
-      const title = modal.querySelector(".k-window-title")!.textContent!.trim();
-      const filename = `${title
-        .replaceAll(/\s+/g, "_")
-        .toLocaleLowerCase()}_autofill_template.t3.csv`;
-
-      const ngRepeatSelectors: string[] = [];
-      const ngModelSelectors: string[] = [];
-      const columns: string[] = [];
-
-      // let node: IHierarchyNode = root;
-      for (const input of inputData) {
-        ngRepeatSelectors.push(input.ngRepeat);
-        ngModelSelectors.push(input.ngModel);
-        columns.push(input.name);
-      }
+      const { title, filename, ngRepeatSelectors, ngModelSelectors, columns } =
+        buildT3CsvGridData(modal);
 
       const csvFile: ICsvFile = {
         filename,
@@ -203,6 +168,7 @@ export const csvFillToolModule = {
         throw new Error("Cannot access modal");
       }
 
+      // Disable autocomplete delay by removing attribute
       [...modal.querySelectorAll("[typeahead-wait-ms]")].map((x) => {
         x.removeAttribute("typeahead-wait-ms");
       });
@@ -222,16 +188,6 @@ export const csvFillToolModule = {
       const headerRows: string[][] = filteredCsvData.slice(0, 3);
       const dataRows: string[][] = filteredCsvData.slice(3);
 
-      // const root = buildHierarchy({ modal });
-
-      // if (!root.addSectionButton) {
-      //   throw new Error("Missing top-level add section button");
-      // }
-
-      // const ngRepeatIndex: Map<string, number> = new Map(
-      //   [...new Set(headerRows[0])].map((x) => [x, 0])
-      // );
-
       for (const [rowIdx, dataRow] of dataRows.entries()) {
         if (!hasPlusImpl() && rowIdx > 4) {
           toastManager.openToast(
@@ -249,7 +205,7 @@ export const csvFillToolModule = {
           break;
         }
 
-        // There will never be less than one of each
+        // The default state of a Metrc form always has at least one row
         if (rowIdx > 0) {
           // Track ng repeat values that are "full rows"
           const ngRepeats: Set<string> = new Set();
@@ -282,30 +238,11 @@ export const csvFillToolModule = {
           }
         }
 
-        let requiresTimeout = false;
-
+        // Rows are now initialized, fill cell data into corresponding inputs
         for (const [colIdx, cellValue] of dataRow.entries()) {
-          const ngModel = headerRows[1][colIdx];
+          // Uploading images requires a brief delay in between rows
+          let requiresTimeout = false;
 
-          if (cellValue.trim() === "") {
-            continue;
-          }
-
-          const secondaryAttribute = ngModel.endsWith("FileSystemIds") ? "data-type" : "ng-model";
-
-          if (secondaryAttribute === "data-type") {
-            requiresTimeout = true;
-            break;
-          }
-        }
-
-        if (requiresTimeout) {
-          // Wait for select buttons to render
-          await new Promise((resolve) => setTimeout(resolve, 500));
-        }
-
-        // Rows are now set, fill this data
-        for (const [colIdx, cellValue] of dataRow.entries()) {
           const ngRepeat = headerRows[0][colIdx];
           const ngModel = headerRows[1][colIdx];
 
@@ -313,102 +250,48 @@ export const csvFillToolModule = {
             continue;
           }
 
-          const secondaryAttribute = ngModel.endsWith("FileSystemIds") ? "data-type" : "ng-model";
+          const secondaryAttribute = getSecondaryAttribute(ngModel);
 
-          const els = modal.querySelectorAll(
+          if (secondaryAttribute === "data-type") {
+            requiresTimeout = true;
+            break;
+          }
+
+          // Apply per-row delay
+          if (requiresTimeout) {
+            // Wait for select buttons to render
+            await new Promise((resolve) => setTimeout(resolve, PER_ROW_DELAY_MS));
+          }
+
+          // Locate the form field corresponding to this value
+          const formInputFieldElements = modal.querySelectorAll(
             `[ng-repeat="${ngRepeat}"] [${secondaryAttribute}="${ngModel}"]`
           );
-          const el = els[els.length - 1];
+          const formInputFieldElement = formInputFieldElements[formInputFieldElements.length - 1];
 
-          console.log(el);
+          debugger;
 
-          if (el.nodeName === "INPUT") {
-            if (el.getAttribute("type") === "checkbox") {
-              const shouldBeChecked: boolean = cellValue.trim().length > 0;
-              const isChecked: boolean = (el as HTMLInputElement).checked;
+          // Undefined
+          console.log(formInputFieldElement);
 
-              if (shouldBeChecked !== isChecked) {
-                (el as HTMLInputElement).click();
-              }
-            } else if (el.getAttribute("data-role") === "upload") {
-              const dataTransfer = new DataTransfer();
-
-              const filenameMatchers: string[] = cellValue
-                .split(",")
-                .map((x) => x.trim().toLocaleLowerCase());
-
-              for (const filenameMatcher of filenameMatchers) {
-                let matched = false;
-                for (const file of data.preloadedFiles) {
-                  if (file.name.toLocaleLowerCase().startsWith(filenameMatcher)) {
-                    dataTransfer.items.add(file);
-                    matched = true;
-                    break;
-                  }
-                }
-                if (!matched) {
-                  toastManager.openToast(
-                    `'${filenameMatcher}' was not matched to a preloaded image, skipping.`,
-                    {
-                      title: "Unmatched image",
-                      autoHideDelay: 5000,
-                      variant: "warning",
-                      appendToast: true,
-                      toaster: "ttt-toaster",
-                      solid: true,
-                    }
-                  );
-                }
-              }
-
-              (el as HTMLInputElement).files = dataTransfer.files;
-              el.dispatchEvent(new Event("change"));
+          if (formInputFieldElement.nodeName === "INPUT") {
+            if (formInputFieldElement.getAttribute("type") === "checkbox") {
+              setCheckboxValue(formInputFieldElement as HTMLInputElement, cellValue);
+            } else if (formInputFieldElement.getAttribute("data-role") === "upload") {
+              setImageInputValue(
+                formInputFieldElement as HTMLInputElement,
+                cellValue,
+                data.preloadedFiles
+              );
             } else {
-              (el as HTMLInputElement).value = cellValue;
-              el.dispatchEvent(new Event("input"));
+              setTextInputValue(formInputFieldElement as HTMLInputElement, cellValue);
             }
 
-            if (el.hasAttribute("uib-typeahead")) {
-              let attempts = 0;
-              const interval = 50; // milliseconds
-              const maxTime = 3000; // milliseconds
-              const maxAttempts = maxTime / interval;
-
-              const tryDispatchClick = async () => {
-                const success = (() => {
-                  try {
-                    // @ts-ignore
-                    el.nextSibling!.children[0].dispatchEvent(new Event("click"));
-                    return true;
-                  } catch (error) {
-                    return false;
-                  }
-                })();
-
-                if (success || attempts >= maxAttempts) {
-                  return;
-                }
-
-                attempts++;
-                await new Promise((r) => setTimeout(r, interval));
-                await tryDispatchClick();
-              };
-
-              await tryDispatchClick();
-            }
-          } else if (el.nodeName === "SELECT") {
-            try {
-              (el as HTMLSelectElement).value = [...el.querySelectorAll("option")].filter(
-                (x) =>
-                  x.textContent?.trim().toLocaleLowerCase() === cellValue.trim().toLocaleLowerCase()
-              )[0].value;
-              el.dispatchEvent(new Event("change", { bubbles: false }));
-            } catch (e) {
-              // Failed to set
-            }
-          } else if (el.nodeName === "TEXTAREA") {
-            (el as HTMLTextAreaElement).value = cellValue;
-            el.dispatchEvent(new Event("input"));
+            await maybeHandleAutocomplete(formInputFieldElement);
+          } else if (formInputFieldElement.nodeName === "SELECT") {
+            setSelectValue(formInputFieldElement as HTMLSelectElement, cellValue);
+          } else if (formInputFieldElement.nodeName === "TEXTAREA") {
+            setTextareaValue(formInputFieldElement as HTMLTextAreaElement, cellValue);
           } else {
             console.log("Unsupported input type, skipping");
           }

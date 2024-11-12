@@ -1,3 +1,4 @@
+import { toastManager } from "@/modules/toast-manager.module";
 import { IHierarchyNode, IModalInput } from "./interfaces";
 
 export function collectInputs(modal: HTMLElement): IModalInput[] {
@@ -291,4 +292,137 @@ export function dump(node: IHierarchyNode, depth: number = 0) {
   console.log(`${"  ".repeat(depth)}${node.name}`);
   console.log(`${"  ".repeat(depth)}(${node.inputs.map((x) => x.name).join(",")})`);
   node.childSections.map((h) => dump(h, depth + 1));
+}
+
+export function getSecondaryAttribute(ngModel: string): string {
+  return ngModel.endsWith("FileSystemIds") ? "data-type" : "ng-model";
+}
+
+export function buildT3CsvGridData(modal: HTMLElement): {
+  title: string;
+  filename: string;
+  ngRepeatSelectors: string[];
+  ngModelSelectors: string[];
+  columns: string[];
+} {
+  const inputData = collectInputs(modal);
+
+  const title = modal.querySelector(".k-window-title")!.textContent!.trim();
+  const filename = `${title.replaceAll(/\s+/g, "_").toLocaleLowerCase()}_autofill_template.t3.csv`;
+
+  const ngRepeatSelectors: string[] = [];
+  const ngModelSelectors: string[] = [];
+  const columns: string[] = [];
+
+  for (const input of inputData) {
+    ngRepeatSelectors.push(input.ngRepeat);
+    ngModelSelectors.push(input.ngModel);
+    columns.push(input.name);
+  }
+
+  return {
+    title,
+    filename,
+    ngRepeatSelectors,
+    ngModelSelectors,
+    columns,
+  };
+}
+
+export function setTextInputValue(inputElement: HTMLInputElement, value: string) {
+  inputElement.value = value;
+  inputElement.dispatchEvent(new Event("input"));
+}
+
+export function setImageInputValue(
+  inputElement: HTMLInputElement,
+  value: string,
+  preloadedFiles: File[]
+) {
+  const dataTransfer = new DataTransfer();
+
+  const filenameMatchers: string[] = value.split(",").map((x) => x.trim().toLocaleLowerCase());
+
+  for (const filenameMatcher of filenameMatchers) {
+    let matched = false;
+    for (const file of preloadedFiles) {
+      if (file.name.toLocaleLowerCase().startsWith(filenameMatcher)) {
+        dataTransfer.items.add(file);
+        matched = true;
+        break;
+      }
+    }
+    if (!matched) {
+      toastManager.openToast(
+        `'${filenameMatcher}' was not matched to a preloaded image, skipping.`,
+        {
+          title: "Unmatched image",
+          autoHideDelay: 5000,
+          variant: "warning",
+          appendToast: true,
+          toaster: "ttt-toaster",
+          solid: true,
+        }
+      );
+    }
+  }
+
+  inputElement.files = dataTransfer.files;
+  inputElement.dispatchEvent(new Event("change"));
+}
+
+export function setCheckboxValue(inputElement: HTMLInputElement, value: string) {
+  const shouldBeChecked: boolean = value.trim().length > 0;
+  const isChecked: boolean = inputElement.checked;
+
+  if (shouldBeChecked !== isChecked) {
+    inputElement.click();
+  }
+}
+
+export function setSelectValue(inputElement: HTMLSelectElement, value: string) {
+  try {
+    inputElement.value = [...inputElement.querySelectorAll("option")].filter(
+      (x) => x.textContent?.trim().toLocaleLowerCase() === value.trim().toLocaleLowerCase()
+    )[0].value;
+    inputElement.dispatchEvent(new Event("change", { bubbles: false }));
+  } catch (e) {
+    // Failed to set
+  }
+}
+
+export function setTextareaValue(inputElement: HTMLTextAreaElement, value: string) {
+  inputElement.value = value;
+  inputElement.dispatchEvent(new Event("input"));
+}
+
+export async function maybeHandleAutocomplete(inputElement: Element) {
+  if (inputElement.hasAttribute("uib-typeahead")) {
+    let attempts = 0;
+    const interval = 50; // milliseconds
+    const maxTime = 3000; // milliseconds
+    const maxAttempts = maxTime / interval;
+
+    const tryDispatchClick = async () => {
+      const success = (() => {
+        try {
+          // @ts-ignore
+          formInputFieldElement.nextSibling!.children[0].dispatchEvent(new Event("click"));
+          return true;
+        } catch (error) {
+          return false;
+        }
+      })();
+
+      if (success || attempts >= maxAttempts) {
+        return;
+      }
+
+      attempts++;
+      await new Promise((r) => setTimeout(r, interval));
+      await tryDispatchClick();
+    };
+
+    await tryDispatchClick();
+  }
 }
