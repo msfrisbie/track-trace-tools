@@ -35,7 +35,7 @@ export interface ISettingsState {
   plantDefaultPageSize: number;
   preventLogout: boolean;
   fixMetrcStyling: boolean;
-  hideAiButton: boolean;
+  hideMetrcAiButton: boolean;
   efficientSpacing: boolean;
   modalExpand: boolean;
   autoDismissPopups: boolean;
