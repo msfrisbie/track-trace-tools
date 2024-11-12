@@ -84,11 +84,15 @@ body.ttt-styling-fix {
   }
 }
 
-.ttt-remove-ai .stn-wdgt {
+body.ttt-remove-ai .stn-wdgt {
   display: none !important;
 }
 
-.stn-wdgt > * > * > * {
+// .stn-wdgt > * > * {
+//   transform: translateY(-50px) !important;
+// }
+
+.stn-wdgt {
   transform: translateY(-50px) !important;
 }
 
