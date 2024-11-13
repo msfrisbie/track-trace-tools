@@ -445,8 +445,7 @@ export async function maybeHandleAutocomplete(inputElement: Element) {
     const tryDispatchClick = async () => {
       const success = (() => {
         try {
-          // @ts-ignore
-          formInputFieldElement.nextSibling!.children[0].dispatchEvent(new Event("click"));
+          (inputElement.nextSibling! as HTMLElement).children[0].dispatchEvent(new Event("click"));
           return true;
         } catch (error) {
           return false;

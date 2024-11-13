@@ -264,11 +264,6 @@ export const csvFillToolModule = {
 
           const secondaryAttribute = getSecondaryAttribute(ngModel);
 
-          if (secondaryAttribute === "data-type") {
-            // Wait for select buttons to render
-            await new Promise((resolve) => setTimeout(resolve, PER_ROW_DELAY_MS));
-          }
-
           // Locate the form field corresponding to this value
           const formInputFieldElements = modal.querySelectorAll(
             `[ng-repeat="${ngRepeat}"] [${secondaryAttribute}="${ngModel}"]`
@@ -276,9 +271,6 @@ export const csvFillToolModule = {
 
           // Select the last one
           const formInputFieldElement = formInputFieldElements[formInputFieldElements.length - 1];
-
-          // Undefined
-          console.log(formInputFieldElement);
 
           if (formInputFieldElement.nodeName === "INPUT") {
             if (formInputFieldElement.getAttribute("type") === "checkbox") {
@@ -289,6 +281,8 @@ export const csvFillToolModule = {
                 cellValue,
                 data.preloadedFiles
               );
+
+              await new Promise((resolve) => setTimeout(resolve, PER_ROW_DELAY_MS));
             } else {
               setTextInputValue(formInputFieldElement as HTMLInputElement, cellValue);
             }
