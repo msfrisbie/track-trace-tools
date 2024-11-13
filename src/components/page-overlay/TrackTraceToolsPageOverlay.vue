@@ -125,6 +125,7 @@ library.add(
   fontawesomeSolid.faBox,
   fontawesomeSolid.faBell,
   fontawesomeSolid.faBoxOpen,
+  fontawesomeSolid.faBookOpen,
   fontawesomeSolid.faBoxes,
   fontawesomeSolid.faBug,
   fontawesomeSolid.faCalendar,
