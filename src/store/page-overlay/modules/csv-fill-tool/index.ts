@@ -9,6 +9,7 @@ import {
   CsvFillToolActions,
   CsvFillToolGetters,
   CsvFillToolMutations,
+  HIDDEN_ROW_MODELS,
   PER_ROW_DELAY_MS,
 } from "./consts";
 import { ICsvFillToolState } from "./interfaces";
@@ -70,7 +71,7 @@ export const csvFillToolModule = {
       }
 
       const { title, filename, ngRepeatSelectors, ngModelSelectors, columns } =
-        buildT3CsvGridData(modal);
+        await buildT3CsvGridData(modal);
 
       const topLevelSections = modal.querySelectorAll(`[ng-repeat="${ngRepeatSelectors[0]}"]`);
 
@@ -146,7 +147,7 @@ export const csvFillToolModule = {
       }
 
       const { title, filename, ngRepeatSelectors, ngModelSelectors, columns } =
-        buildT3CsvGridData(modal);
+        await buildT3CsvGridData(modal);
 
       const csvFile: ICsvFile = {
         filename,
@@ -238,11 +239,22 @@ export const csvFillToolModule = {
           }
         }
 
+        for (const [colIdx, cellValue] of dataRow.entries()) {
+          const ngRepeat = headerRows[0][colIdx];
+          const ngModel = headerRows[1][colIdx];
+
+          if (cellValue.trim() !== "" && HIDDEN_ROW_MODELS.includes(ngModel)) {
+            const addModelButtons = [...modal.querySelectorAll(`[ng-click^="addLine("]`)].filter(
+              (x) => x.getAttribute("ng-click")?.includes(ngModel)
+            );
+
+            const addModelButton = addModelButtons[addModelButtons.length - 1] as HTMLElement;
+            addModelButton.click();
+          }
+        }
+
         // Rows are now initialized, fill cell data into corresponding inputs
         for (const [colIdx, cellValue] of dataRow.entries()) {
-          // Uploading images requires a brief delay in between rows
-          let requiresTimeout = false;
-
           const ngRepeat = headerRows[0][colIdx];
           const ngModel = headerRows[1][colIdx];
 
@@ -253,12 +265,6 @@ export const csvFillToolModule = {
           const secondaryAttribute = getSecondaryAttribute(ngModel);
 
           if (secondaryAttribute === "data-type") {
-            requiresTimeout = true;
-            break;
-          }
-
-          // Apply per-row delay
-          if (requiresTimeout) {
             // Wait for select buttons to render
             await new Promise((resolve) => setTimeout(resolve, PER_ROW_DELAY_MS));
           }
@@ -267,9 +273,9 @@ export const csvFillToolModule = {
           const formInputFieldElements = modal.querySelectorAll(
             `[ng-repeat="${ngRepeat}"] [${secondaryAttribute}="${ngModel}"]`
           );
-          const formInputFieldElement = formInputFieldElements[formInputFieldElements.length - 1];
 
-          debugger;
+          // Select the last one
+          const formInputFieldElement = formInputFieldElements[formInputFieldElements.length - 1];
 
           // Undefined
           console.log(formInputFieldElement);

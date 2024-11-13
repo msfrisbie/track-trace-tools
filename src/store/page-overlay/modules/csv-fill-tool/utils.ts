@@ -1,12 +1,38 @@
 import { toastManager } from "@/modules/toast-manager.module";
+import { HIDDEN_ROW_MODELS } from "./consts";
 import { IHierarchyNode, IModalInput } from "./interfaces";
 
-export function collectInputs(modal: HTMLElement): IModalInput[] {
+export async function collectInputs(modal: HTMLElement): Promise<IModalInput[]> {
   const inputData: IModalInput[] = [];
 
   const ngModelSet = new Set<string>();
 
+  // Some Metrc forms have templates, ignore these entirely
   const templateRow = modal.querySelector(".template-row");
+
+  const firstRow = modal.querySelector("form [ng-repeat]") as HTMLElement;
+
+  let delay = false;
+
+  for (const hiddenRowModel of HIDDEN_ROW_MODELS) {
+    const addModelButtons = [...firstRow.querySelectorAll(`[ng-click^="addLine("]`)].filter((x) =>
+      x.getAttribute("ng-click")?.includes(hiddenRowModel)
+    );
+
+    if (addModelButtons.length === 0) {
+      continue;
+    }
+
+    const addModelButton = addModelButtons[addModelButtons.length - 1] as HTMLElement;
+    addModelButton.click();
+
+    delay = true;
+  }
+
+  if (delay) {
+    await new Promise((resolve) => setTimeout(resolve, 100));
+  }
+
   const inputs = [
     ...modal.querySelectorAll(`[ng-model]`),
     ...modal.querySelectorAll(`input[data-role="upload"]`),
@@ -109,6 +135,19 @@ export function collectInputs(modal: HTMLElement): IModalInput[] {
       el: input,
       name,
     });
+  }
+
+  for (const hiddenRowModel of HIDDEN_ROW_MODELS) {
+    const removeModelButtons = [...firstRow.querySelectorAll(`[ng-click^="removeLine("]`)].filter(
+      (x) => x.getAttribute("ng-click")?.includes(hiddenRowModel)
+    );
+
+    if (removeModelButtons.length === 0) {
+      continue;
+    }
+
+    const removeModelButton = removeModelButtons[removeModelButtons.length - 1] as HTMLElement;
+    removeModelButton.click();
   }
 
   return inputData;
@@ -295,17 +334,17 @@ export function dump(node: IHierarchyNode, depth: number = 0) {
 }
 
 export function getSecondaryAttribute(ngModel: string): string {
-  return ngModel.endsWith("FileSystemIds") ? "data-type" : "ng-model";
+  return ngModel.endsWith("FileSystemIds") || ngModel.endsWith("Photos") ? "data-type" : "ng-model";
 }
 
-export function buildT3CsvGridData(modal: HTMLElement): {
+export async function buildT3CsvGridData(modal: HTMLElement): Promise<{
   title: string;
   filename: string;
   ngRepeatSelectors: string[];
   ngModelSelectors: string[];
   columns: string[];
-} {
-  const inputData = collectInputs(modal);
+}> {
+  const inputData = await collectInputs(modal);
 
   const title = modal.querySelector(".k-window-title")!.textContent!.trim();
   const filename = `${title.replaceAll(/\s+/g, "_").toLocaleLowerCase()}_autofill_template.t3.csv`;

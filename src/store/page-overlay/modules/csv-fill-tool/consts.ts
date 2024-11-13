@@ -13,3 +13,10 @@ export enum CsvFillToolActions {
 }
 
 export const PER_ROW_DELAY_MS = 500;
+
+export const HIDDEN_ROW_MODELS = [
+  "ProductPhotos",
+  "LabelPhotos",
+  "PackagingPhotos",
+  "ItemIngredients",
+];
