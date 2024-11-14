@@ -9,14 +9,13 @@ import {
   CsvFillToolActions,
   CsvFillToolGetters,
   CsvFillToolMutations,
+  FORM_RENDER_DELAY_MS,
   HIDDEN_ROW_MODELS,
-  PER_ROW_DELAY_MS,
 } from "./consts";
 import { ICsvFillToolState } from "./interfaces";
 import {
   buildT3CsvGridData,
   getSecondaryAttribute,
-  maybeHandleAutocomplete,
   setCheckboxValue,
   setImageInputValue,
   setSelectValue,
@@ -253,6 +252,9 @@ export const csvFillToolModule = {
           }
         }
 
+        // Allow the selects to render
+        await new Promise((resolve) => setTimeout(resolve, FORM_RENDER_DELAY_MS));
+
         // Rows are now initialized, fill cell data into corresponding inputs
         for (const [colIdx, cellValue] of dataRow.entries()) {
           const ngRepeat = headerRows[0][colIdx];
@@ -274,27 +276,35 @@ export const csvFillToolModule = {
 
           if (formInputFieldElement.nodeName === "INPUT") {
             if (formInputFieldElement.getAttribute("type") === "checkbox") {
-              setCheckboxValue(formInputFieldElement as HTMLInputElement, cellValue);
-            } else if (formInputFieldElement.getAttribute("data-role") === "upload") {
-              setImageInputValue(
+              await setCheckboxValue(formInputFieldElement as HTMLInputElement, cellValue);
+              continue;
+            }
+
+            if (formInputFieldElement.getAttribute("data-role") === "upload") {
+              await setImageInputValue(
                 formInputFieldElement as HTMLInputElement,
                 cellValue,
                 data.preloadedFiles
               );
-
-              await new Promise((resolve) => setTimeout(resolve, PER_ROW_DELAY_MS));
-            } else {
-              setTextInputValue(formInputFieldElement as HTMLInputElement, cellValue);
+              continue;
             }
 
-            await maybeHandleAutocomplete(formInputFieldElement);
-          } else if (formInputFieldElement.nodeName === "SELECT") {
-            setSelectValue(formInputFieldElement as HTMLSelectElement, cellValue);
-          } else if (formInputFieldElement.nodeName === "TEXTAREA") {
-            setTextareaValue(formInputFieldElement as HTMLTextAreaElement, cellValue);
-          } else {
-            console.log("Unsupported input type, skipping");
+            // Regular text input OR autocomplete input
+            await setTextInputValue(formInputFieldElement as HTMLInputElement, cellValue);
+            continue;
           }
+
+          if (formInputFieldElement.nodeName === "SELECT") {
+            await setSelectValue(formInputFieldElement as HTMLSelectElement, cellValue);
+            continue;
+          }
+
+          if (formInputFieldElement.nodeName === "TEXTAREA") {
+            await setTextareaValue(formInputFieldElement as HTMLTextAreaElement, cellValue);
+            continue;
+          }
+
+          console.log("Unsupported input type, skipping");
         }
       }
 

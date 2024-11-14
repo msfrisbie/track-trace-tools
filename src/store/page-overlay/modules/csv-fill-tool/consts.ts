@@ -12,7 +12,7 @@ export enum CsvFillToolActions {
   DUMP_FORM = "DUMP_FORM",
 }
 
-export const PER_ROW_DELAY_MS = 500;
+export const FORM_RENDER_DELAY_MS = 500;
 
 export const HIDDEN_ROW_MODELS = [
   "ProductPhotos",

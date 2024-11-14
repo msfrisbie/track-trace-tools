@@ -1,5 +1,5 @@
 import { toastManager } from "@/modules/toast-manager.module";
-import { HIDDEN_ROW_MODELS } from "./consts";
+import { FORM_RENDER_DELAY_MS, HIDDEN_ROW_MODELS } from "./consts";
 import { IHierarchyNode, IModalInput } from "./interfaces";
 
 export async function collectInputs(modal: HTMLElement): Promise<IModalInput[]> {
@@ -334,7 +334,11 @@ export function dump(node: IHierarchyNode, depth: number = 0) {
 }
 
 export function getSecondaryAttribute(ngModel: string): string {
-  return ngModel.endsWith("FileSystemIds") || ngModel.endsWith("Photos") ? "data-type" : "ng-model";
+  if (ngModel.endsWith("FileSystemIds") || ngModel.endsWith("Photos")) {
+    return "data-type";
+  }
+
+  return "ng-model";
 }
 
 export async function buildT3CsvGridData(modal: HTMLElement): Promise<{
@@ -368,12 +372,14 @@ export async function buildT3CsvGridData(modal: HTMLElement): Promise<{
   };
 }
 
-export function setTextInputValue(inputElement: HTMLInputElement, value: string) {
+export async function setTextInputValue(inputElement: HTMLInputElement, value: string) {
   inputElement.value = value;
   inputElement.dispatchEvent(new Event("input"));
+
+  await maybeHandleAutocomplete(inputElement);
 }
 
-export function setImageInputValue(
+export async function setImageInputValue(
   inputElement: HTMLInputElement,
   value: string,
   preloadedFiles: File[]
@@ -408,9 +414,11 @@ export function setImageInputValue(
 
   inputElement.files = dataTransfer.files;
   inputElement.dispatchEvent(new Event("change"));
+
+  await new Promise((resolve) => setTimeout(resolve, FORM_RENDER_DELAY_MS));
 }
 
-export function setCheckboxValue(inputElement: HTMLInputElement, value: string) {
+export async function setCheckboxValue(inputElement: HTMLInputElement, value: string) {
   const shouldBeChecked: boolean = value.trim().length > 0;
   const isChecked: boolean = inputElement.checked;
 
@@ -419,7 +427,7 @@ export function setCheckboxValue(inputElement: HTMLInputElement, value: string) 
   }
 }
 
-export function setSelectValue(inputElement: HTMLSelectElement, value: string) {
+export async function setSelectValue(inputElement: HTMLSelectElement, value: string) {
   try {
     inputElement.value = [...inputElement.querySelectorAll("option")].filter(
       (x) => x.textContent?.trim().toLocaleLowerCase() === value.trim().toLocaleLowerCase()
@@ -430,7 +438,7 @@ export function setSelectValue(inputElement: HTMLSelectElement, value: string) {
   }
 }
 
-export function setTextareaValue(inputElement: HTMLTextAreaElement, value: string) {
+export async function setTextareaValue(inputElement: HTMLTextAreaElement, value: string) {
   inputElement.value = value;
   inputElement.dispatchEvent(new Event("input"));
 }
