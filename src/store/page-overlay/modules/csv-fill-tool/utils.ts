@@ -30,7 +30,7 @@ export async function collectInputs(modal: HTMLElement): Promise<IModalInput[]> 
   }
 
   if (delay) {
-    await new Promise((resolve) => setTimeout(resolve, 100));
+    await new Promise((resolve) => setTimeout(resolve, FORM_RENDER_DELAY_MS));
   }
 
   const inputs = [
