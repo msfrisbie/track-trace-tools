@@ -164,13 +164,13 @@ async function initializeToolkit() {
   }
 
   // Facility Picker
-  const dropdownElement = document.querySelector(".facilities-dropdown");
+  const navbarElement = document.querySelector(".navbar.navbar-fixed-top");
 
-  if (dropdownElement) {
+  if (navbarElement) {
     const facilityPickerComponent = document.createElement("div");
     facilityPickerComponent.setAttribute("id", "ttt-facility-picker");
 
-    dropdownElement.parentElement?.appendChild(facilityPickerComponent);
+    navbarElement?.appendChild(facilityPickerComponent);
 
     new Vue({
       el: "#ttt-facility-picker",

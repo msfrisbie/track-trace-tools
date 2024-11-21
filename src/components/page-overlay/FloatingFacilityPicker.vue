@@ -1,7 +1,7 @@
 <template>
   <div
     v-if="authState && !settings.hideFacilityPicker"
-    style="width: 540px; padding-top: 1px"
+    style="width: 540px; top: 0; float: right"
     id="facility-popover-target"
     class="ttt-wrapper facilities-dropdown"
   >
