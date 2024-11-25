@@ -66,6 +66,7 @@ import TrackTraceToolsLogo from "@/components/shared/TrackTraceToolsLogo.vue";
 import { ModalAction, ModalType } from "@/consts";
 import { modalManager } from "@/modules/modal-manager.module";
 import store from "@/store/page-overlay/index";
+import { isChristmasSeasonImpl } from "@/utils/misc";
 import Vue from "vue";
 
 export default Vue.extend({
@@ -80,12 +81,7 @@ export default Vue.extend({
   },
   computed: {
     isChristmasSeason() {
-      const currentDate = new Date();
-
-      const start = new Date('2024-11-24T00:00:00-06:00'); // 12:00 AM on 11/24
-      const end = new Date('2024-12-08T23:59:59-06:00'); // 11:59 PM on 12/08
-
-      return currentDate >= start && currentDate <= end;
+      return isChristmasSeasonImpl();
     },
   },
   methods: {

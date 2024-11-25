@@ -37,6 +37,7 @@ import { AnalyticsEvent } from "@/consts";
 import { analyticsManager } from "@/modules/analytics-manager.module";
 import router from "@/router/index";
 import store from "@/store/page-overlay/index";
+import { isChristmasSeasonImpl } from "@/utils/misc";
 import { hasPlusImpl } from "@/utils/plus";
 // The marked import structure is causing problems
 // @ts-ignore
@@ -62,12 +63,7 @@ export default Vue.extend({
       return hasPlusImpl();
     },
     isChristmasSeason() {
-      const currentDate = new Date();
-
-      const start = new Date('2024-11-24T00:00:00-06:00'); // 12:00 AM on 11/24
-      const end = new Date('2024-12-08T23:59:59-06:00'); // 11:59 PM on 12/08
-
-      return currentDate >= start && currentDate <= end;
+      return isChristmasSeasonImpl();
     },
     ...mapState([]),
   },
