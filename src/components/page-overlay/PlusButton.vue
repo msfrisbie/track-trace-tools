@@ -1,35 +1,63 @@
 <template>
-  <div id="plus-popover-target" title="T3+" @click="openBuilder($event)"
-    class="cursor-pointer rounded bg-gradient-to-r from-purple-800 hover:from-purple-900 to-purple-400 hover:to-purple-500 flex flex-col items-center justify-center text-xl font-semibold text-white text-center"
-    style="width: 100px; height: 52px; border: 1px solid white">
-    <span>GET T3+</span>
+  <div id="plus-popover-target" :title="isChristmasSeason ? '🎄 33% OFF T3+ 🎄' : 'T3+'" @click="openBuilder($event)"
+    :class="[
+      'cursor-pointer rounded flex flex-col items-center justify-center text-xl font-semibold text-white text-center ',
+      isChristmasSeason ? 'bg-gray-800 text-red-500 border-2 border-red-500' : 'border-1 border-white bg-gradient-to-r from-purple-800 hover:from-purple-900 to-purple-400 hover:to-purple-500'
+    ]" style="height: 52px;" v-bind:style="{ width: isChristmasSeason ? '160px' : '100px' }">
+    <span>{{ isChristmasSeason ? '🎄 33% OFF T3+ 🎄' : 'GET T3+' }}</span>
 
-    <b-popover target="plus-popover-target" triggers="hover" placement="top" variant="light" ref="plus-popover"
-      container="popover-container">
-      <template #title>
-        <div class="flex flex-row items-center space-x-2">
-          <track-trace-tools-logo class="h-6" fill="#49276a" :inverted="true" />
-          <span class="text-base font-bold">T3+</span>
+    <template v-if="isChristmasSeason">
+
+      <b-popover target="plus-popover-target" triggers="hover" placement="top" variant="dark" ref="plus-popover"
+        container="popover-container" custom-class="blackfriday-popover">
+        <template #title>
+          <div class="flex flex-row items-center space-x-2 text-white">
+            <track-trace-tools-logo class="h-6" fill="#49276a" :inverted="true" />
+            <span class="text-2xl font-bold">T3+ BLACK FRIDAY DISCOUNT</span>
+          </div>
+        </template>
+
+        <div style="min-width: 200px" class="flex flex-col space-y-2 text-base text-white text-xl">
+          <p>For a limited time, enjoy <span class="font-semibold text-red-500">33% off</span> a T3+ subscription</p>
+          <p class="py-6">Use coupon code <span class="font-semibold text-red-500 font-mono">BLACKFRIDAY</span> at
+            checkout on Stripe
+            to claim your discount.
+          </p>
+
+          <b-button variant="danger" @click="openBuilder($event)">LEARN MORE</b-button>
         </div>
-      </template>
+      </b-popover>
+    </template>
+    <template v-else>
 
-      <div style="min-width: 200px" class="flex flex-col space-y-2 text-base">
-        <p class="font-semibold text-purple-600">
-          You're using the free version of Track &amp; Trace Tools.
-        </p>
+      <b-popover target="plus-popover-target" triggers="hover" placement="top" variant="light" ref="plus-popover"
+        container="popover-container">
+        <template #title>
+          <div class="flex flex-row items-center space-x-2">
+            <track-trace-tools-logo class="h-6" fill="#49276a" :inverted="true" />
+            <span class="text-base font-bold">T3+</span>
+          </div>
+        </template>
 
-        <p class="font-bold">Why subscribe to T3+?</p>
+        <div style="min-width: 200px" class="flex flex-col space-y-2 text-base">
+          <p class="font-semibold text-purple-600">
+            You're using the free version of Track &amp; Trace Tools.
+          </p>
 
-        <ul class="list-disc pl-3 pb-4">
-          <li>Enable advanced reports and tools</li>
-          <li>Early access to new features</li>
-          <li>Support the open source project</li>
-          <li>Hide the bottom right T3+ badge</li>
-        </ul>
+          <p class="font-bold">Why subscribe to T3+?</p>
 
-        <b-button variant="primary" @click="openBuilder($event)">LEARN MORE</b-button>
-      </div>
-    </b-popover>
+          <ul class="list-disc pl-3 pb-4">
+            <li>Enable advanced reports and tools</li>
+            <li>Early access to new features</li>
+            <li>Support the open source project</li>
+            <li>Hide the bottom right T3+ badge</li>
+          </ul>
+
+          <b-button variant="primary" @click="openBuilder($event)">LEARN MORE</b-button>
+        </div>
+      </b-popover>
+    </template>
+
   </div>
 </template>
 
@@ -47,7 +75,18 @@ export default Vue.extend({
     TrackTraceToolsLogo,
   },
   data() {
-    return {};
+    return {
+    };
+  },
+  computed: {
+    isChristmasSeason() {
+      const currentDate = new Date();
+
+      const start = new Date('2024-11-24T00:00:00-06:00'); // 12:00 AM on 11/24
+      const end = new Date('2024-12-08T23:59:59-06:00'); // 11:59 PM on 12/08
+
+      return currentDate >= start && currentDate <= end;
+    },
   },
   methods: {
     async openBuilder() {

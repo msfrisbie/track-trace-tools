@@ -1,7 +1,7 @@
 <template>
-  <div class="grid grid-cols-3 gap-8">
+  <div class="grid grid-cols-2 gap-8" style="grid-template-columns: minmax(400px, auto) 1fr;">
     <div class="flex flex-col gap-2 h-full p-4">
-      <a class="shadow-xl py-2 px-4 mb-8 rounded-md no-underline bg-gradient-to-r from-purple-800 to-purple-400 hover:from-purple-700 hover:to-purple-300 text-white text-xl font-light flex flex-row items-center gap-6 justify-between"
+      <a class="shadow-xl py-4 px-4 mb-8 rounded-md no-underline bg-gradient-to-r from-purple-800 to-purple-400 hover:from-purple-700 hover:to-purple-300 text-white text-3xl font-light flex flex-row items-center gap-6 justify-between"
         href="https://dash.trackandtrace.tools" style="text-decoration: none" target="_blank"><span>GET T3+</span><span
           class="bounce">→</span></a>
       <div v-for="entry of entries" v-bind:key="entry.question" @click="selectEntry(entry)">
@@ -9,7 +9,23 @@
           entry.question }}</span>
       </div>
     </div>
-    <div class="col-span-2 overflow-y-auto toolkit-scroll h-full flex flex-col gap-12 p-4" ref="answers">
+    <div class="overflow-y-auto toolkit-scroll h-full flex flex-col gap-12 p-4" ref="answers">
+      <div class="flex flex-col gap-4 p-4 rounded-xl shadow border-2 border-red-500 bg-gray-800 text-white"
+        v-if="!hasPlus && isChristmasSeason">
+        <h2 class="text-3xl font-bold">Black Friday Deal for T3+</h2>
+        <p>New subscribers can enjoy <span class="font-semibold text-red-500">33% off</span> their T3+ subscription for
+          the first 3 months!</p>
+        <p>Don't miss out on this limited-time offer. Available until <strong>12/8/2024</strong>.</p>
+        <p class="text-xl py-6">Use coupon code <span class="font-semibold text-red-500 font-mono">BLACKFRIDAY</span> at
+          checkout on Stripe
+          to claim your discount.
+        </p>
+        <p class="italic">Offer valid only for new subscribers.</p>
+        <b-button class="max-w-sm" variant="danger" size="lg" href="https://dash.trackandtrace.tools"
+          target="_blank">GET THIS
+          DEAL</b-button>
+      </div>
+
       <div v-bind:class="{ 'bg-purple-50': entry === selectedEntry }" :id="entry.id" v-for="entry of entries"
         v-bind:key="entry.id" class="flex flex-col gap-4 p-4 rounded-xl shadow" v-html="entry.answerHtml"></div>
     </div>
@@ -21,6 +37,7 @@ import { AnalyticsEvent } from "@/consts";
 import { analyticsManager } from "@/modules/analytics-manager.module";
 import router from "@/router/index";
 import store from "@/store/page-overlay/index";
+import { hasPlusImpl } from "@/utils/plus";
 // The marked import structure is causing problems
 // @ts-ignore
 import * as marked from "marked/lib/marked.cjs";
@@ -41,6 +58,17 @@ export default Vue.extend({
   props: {},
   components: {},
   computed: {
+    hasPlus(): boolean {
+      return hasPlusImpl();
+    },
+    isChristmasSeason() {
+      const currentDate = new Date();
+
+      const start = new Date('2024-11-24T00:00:00-06:00'); // 12:00 AM on 11/24
+      const end = new Date('2024-12-08T23:59:59-06:00'); // 11:59 PM on 12/08
+
+      return currentDate >= start && currentDate <= end;
+    },
     ...mapState([]),
   },
   data() {
@@ -59,30 +87,14 @@ T3+ gives you access to additional tools and is available as a monthly subscript
           answerHtml: "",
           id: "",
         },
-        //         {
-        //           question: "What is changing?",
-        //           answerMarkdown: `
-        // **Users now have the option to subscribe to T3+.**
-
-        // T3+ makes Track & Trace Tools even more powerful by adding new features such as advanced reports, a Metrc history explorer, scan sheet generator, and more.
-
-        // Track & Trace Tools will not require a subscription to use basic features.
-
-        // A small number of existing tools are being moved to T3+. These tools will be available as part of the free plan until 12/1/2023.
-
-        // [Read more about T3+ tools](https://dash.trackandtrace.tools/features)
-        //           `,
-        //           answerHtml: "",
-        //           id: "",
-        //         },
         {
           question: "What is included with T3+?",
           answerMarkdown: `
 **T3+ gives you access to a large set of new tools specially designed for cannabis businesses of all types and sizes.**
 
-T3+ will continue to get new tools over time for no additional cost. T3+ users will also be granted early access to [OpenTag](https://trackandtrace.tools/scan) once it is ready.
+T3+ will continue to get new tools over time for no additional cost. 
 
-[Read more about all the T3+ features](https://dash.trackandtrace.tools/features)
+[Read more about all the T3+ features](https://github.com/classvsoftware/t3-wiki/wiki/T3+)
 `,
           answerHtml: "",
           id: "",
@@ -109,18 +121,6 @@ There are multiple pricing tiers to fit the needs of small and large organizatio
           answerHtml: "",
           id: "",
         },
-        //         {
-        //           question: "What happens if I use a license key?",
-        //           answerMarkdown: `
-        // **All license keys will no longer grant access to T3+.**
-
-        // If you use a license key for either the T3+ beta or for custom features, these keys will no longer provide access to T3+ effective 12/1/2023.
-
-        // To keep using T3+ features, you will need a T3+ subscription.
-        // `,
-        //           answerHtml: "",
-        //           id: "",
-        //         },
         {
           question: "Who works on T3+?",
           answerMarkdown: `
@@ -198,11 +198,11 @@ Reach out to [matt@trackandtrace.tools](mailto:matt@trackandtrace.tools)
   }
 
   40% {
-    transform: translateX(12px);
+    transform: translateX(20px);
   }
 
   60% {
-    transform: translateX(6px);
+    transform: translateX(10px);
   }
 }
 </style>

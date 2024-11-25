@@ -153,6 +153,21 @@ body.t3-modal-expand {
   }
 }
 
+.blackfriday-popover {
+  
+  border-color: #333333 !important;
+  
+  .popover-header {
+    background-color: rgb(37, 50, 67) !important;
+    border-color: #333333 !important;
+  }
+
+  .popover-body {
+    background-color: rgb(31, 41, 55) !important;
+    border-color: #333333 !important;
+  }
+}
+
 @import "@/scss/page-overlay";
 @import "@/scss/modal";
 @import "@/scss/inline";

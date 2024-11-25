@@ -23,14 +23,14 @@
         <div v-if="notificationCount === 0" class="relative">
           <announcements-button class="floating-shadow"></announcements-button>
         </div>
+
+        <div class="relative">
+          <print-button></print-button>
+        </div>
       </div>
 
       <div v-if="!hasPlus" class="relative">
         <plus-button class="floating-shadow" />
-      </div>
-
-      <div class="relative">
-        <print-button></print-button>
       </div>
 
       <div v-if="notificationCount > 0" class="relative">
