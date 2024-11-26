@@ -40,10 +40,9 @@
   z-index: 100000;
 }
 
-// This causes weird overlap issues with logout dropdown
-// .facilities-dropdown {
-//     z-index: 10000 !important;
-// }
+.ttt-wrapper.facilities-dropdown {
+  z-index: initial;
+}
 
 // Don't let the scroll reach the metrc toolkit button
 .facilities-dropdown .dropdown-menu {
