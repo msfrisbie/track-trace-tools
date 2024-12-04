@@ -73,4 +73,6 @@ export interface ICreatePackageCsvRow {
   [CreatePackageCsvColumns.IS_DONATION]: string;
   [CreatePackageCsvColumns.IS_TRADE_SAMPLE]: string;
   [CreatePackageCsvColumns.EXPIRATION_DATE]: string;
+  [CreatePackageCsvColumns.SELL_BY_DATE]: string;
+  [CreatePackageCsvColumns.USE_BY_DATE]: string;
 }

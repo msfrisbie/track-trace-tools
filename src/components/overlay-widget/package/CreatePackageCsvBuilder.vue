@@ -311,6 +311,8 @@ export default Vue.extend({
         CreatePackageCsvColumns.IS_DONATION,
         CreatePackageCsvColumns.IS_TRADE_SAMPLE,
         CreatePackageCsvColumns.EXPIRATION_DATE,
+        CreatePackageCsvColumns.SELL_BY_DATE,
+        CreatePackageCsvColumns.USE_BY_DATE,
       ],
     };
   },

@@ -13,6 +13,8 @@ export enum CreatePackageCsvColumns {
   IS_DONATION = "Is Donation?",
   IS_TRADE_SAMPLE = "Is Trade Sample?",
   EXPIRATION_DATE = "Expiration Date",
+  SELL_BY_DATE = "Sell By Date",
+  USE_BY_DATE = "Use By Date",
 }
 
 export enum CreatePackageCsvMutations {
@@ -110,6 +112,16 @@ export const CREATE_PACKAGE_CSV_COLUMNS: {
   },
   {
     value: CreatePackageCsvColumns.EXPIRATION_DATE,
+    required: false,
+    defaultDescription: "Same as parent package",
+  },
+  {
+    value: CreatePackageCsvColumns.SELL_BY_DATE,
+    required: false,
+    defaultDescription: "Same as parent package",
+  },
+  {
+    value: CreatePackageCsvColumns.USE_BY_DATE,
     required: false,
     defaultDescription: "Same as parent package",
   },

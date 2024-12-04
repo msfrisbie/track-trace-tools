@@ -924,12 +924,76 @@ export const createPackageCsvModule = {
           }
         }
 
+        // SET DEFAULT
+        // Sell by date defaults to maximum of parent packages
+        const maxParentPackageSellByDate: string =
+          rowGroup.dataRows
+            .map(
+              (x) => packageMap.get(x[CreatePackageCsvColumns.SOURCE_PACKAGE_TAG])?.SellByDate ?? ""
+            )
+            .filter((x) => x.length > 0)
+            .sort()[rowGroup.dataRows.length - 1] ?? "";
+
+        for (const dataRow of rowGroup.dataRows) {
+          const key = CreatePackageCsvColumns.SELL_BY_DATE;
+
+          // Don't override an existing date
+          if (dataRow[key]) {
+            continue;
+          }
+
+          if (maxParentPackageSellByDate) {
+            dataRow[key] = maxParentPackageSellByDate;
+          }
+        }
+
+        // SET DEFAULT
+        // Sell by date defaults to maximum of parent packages
+        const maxParentPackageUseByDate: string =
+          rowGroup.dataRows
+            .map(
+              (x) => packageMap.get(x[CreatePackageCsvColumns.SOURCE_PACKAGE_TAG])?.UseByDate ?? ""
+            )
+            .filter((x) => x.length > 0)
+            .sort()[rowGroup.dataRows.length - 1] ?? "";
+
+        for (const dataRow of rowGroup.dataRows) {
+          const key = CreatePackageCsvColumns.USE_BY_DATE;
+
+          // Don't override an existing date
+          if (dataRow[key]) {
+            continue;
+          }
+
+          if (maxParentPackageUseByDate) {
+            dataRow[key] = maxParentPackageUseByDate;
+          }
+        }
+
         // CHECK
         // All expiration dates within group match
         const sharedExpirationDateOrNull: string | null =
           checkAllValuesMatchAndHaveValidContentsAndReturnSharedValueOrNull(
             rowGroup,
             CreatePackageCsvColumns.EXPIRATION_DATE,
+            { errorIfEmptyString: false }
+          );
+
+        // CHECK
+        // All sell by dates within group match
+        const sharedSellByDateOrNull: string | null =
+          checkAllValuesMatchAndHaveValidContentsAndReturnSharedValueOrNull(
+            rowGroup,
+            CreatePackageCsvColumns.SELL_BY_DATE,
+            { errorIfEmptyString: false }
+          );
+
+        // CHECK
+        // All use by dates within group match
+        const sharedUseByDateOrNull: string | null =
+          checkAllValuesMatchAndHaveValidContentsAndReturnSharedValueOrNull(
+            rowGroup,
+            CreatePackageCsvColumns.USE_BY_DATE,
             { errorIfEmptyString: false }
           );
 
@@ -950,8 +1014,44 @@ export const createPackageCsvModule = {
           }
         }
 
+        // CHECK
+        // Sell by date is valid isodate
+        if (sharedSellByDateOrNull) {
+          const parsedSellByDate = Date.parse(sharedSellByDateOrNull);
+          if (Number.isNaN(parsedSellByDate)) {
+            const columnIndex = COLUMNS.indexOf(CreatePackageCsvColumns.SELL_BY_DATE);
+
+            mergeOrAddRowGroupMessage(rowGroup.errors, {
+              text: `Sell by date for output package ${rowGroup.destinationLabel} invalid: ${sharedSellByDateOrNull}`,
+              cellCoordinates: rowGroup.dataRows.map((x) => ({
+                rowIndex: x.RealIndex,
+                columnIndex,
+              })),
+            });
+          }
+        }
+
+        // CHECK
+        // Use by date is valid isodate
+        if (sharedUseByDateOrNull) {
+          const parsedUseByDate = Date.parse(sharedUseByDateOrNull);
+          if (Number.isNaN(parsedUseByDate)) {
+            const columnIndex = COLUMNS.indexOf(CreatePackageCsvColumns.USE_BY_DATE);
+
+            mergeOrAddRowGroupMessage(rowGroup.errors, {
+              text: `Use by date for output package ${rowGroup.destinationLabel} invalid: ${sharedUseByDateOrNull}`,
+              cellCoordinates: rowGroup.dataRows.map((x) => ({
+                rowIndex: x.RealIndex,
+                columnIndex,
+              })),
+            });
+          }
+        }
+
         // ASSIGN PARSED VALUE
         const ExpirationDate: string | null = sharedExpirationDateOrNull ?? null;
+        const SellByDate: string | null = sharedSellByDateOrNull ?? null;
+        const UseByDate: string | null = sharedUseByDateOrNull ?? null;
 
         // CHECK
         // All note values match
@@ -1126,6 +1226,8 @@ export const createPackageCsvModule = {
           LicenseNumber: (await authManager.authStateOrError()).license,
           TagMatcher: "",
           ExpirationDate,
+          SellByDate,
+          UseByDate,
           Note: Note ?? "",
           Label: Tag?.Label ?? "",
           LocationName: Location?.Name ?? "",
@@ -1238,8 +1340,6 @@ export const createPackageCsvModule = {
           SourceProcessingJobNumbers: "",
           SourceProcessingJobNames: "",
           MultiProcessingJob: false,
-          SellByDate: null,
-          UseByDate: null,
           LabTestResultDocumentFileId: null,
           IsOnTrip: false,
           IsOnRetailerDelivery: false,
