@@ -353,7 +353,7 @@ export default Vue.extend({
             TagId: parsedData.Tag!.Id.toString(),
             UnitOfMeasureId: parsedData.Item!.UnitOfMeasureId.toString(),
             RemediationDate: "",
-            RemediationMethodId: "0", // await defaultRemediatePackageMethod(),
+            RemediationMethodId: "", // await defaultRemediatePackageMethod(),
             RemediationSteps: "",
             UseByDate: "",
             SellByDate: "",
