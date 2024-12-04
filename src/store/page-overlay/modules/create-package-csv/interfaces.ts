@@ -27,6 +27,8 @@ export interface IParsedRowGroupData {
   IsDonation: boolean | null;
   IsTradeSample: boolean | null;
   ExpirationDate: string | null;
+  SellByDate: string | null;
+  UseByDate: string | null;
 }
 
 export interface IRowGroupMessage {

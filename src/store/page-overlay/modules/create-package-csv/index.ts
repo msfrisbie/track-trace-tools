@@ -1217,6 +1217,8 @@ export const createPackageCsvModule = {
           IsDonation,
           IsTradeSample,
           ExpirationDate,
+          UseByDate,
+          SellByDate
         };
 
         // Fill in these values as much as possible, but
