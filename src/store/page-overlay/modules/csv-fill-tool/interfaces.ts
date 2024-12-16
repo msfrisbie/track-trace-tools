@@ -1,5 +1,12 @@
 export interface ICsvFillToolState {}
 
+// top level is always array
+// line [
+//   { values: x, y, z }
+//   children: [
+//   ]
+// ]
+
 export interface IHierarchyNode {
   el: Element;
   name: string;

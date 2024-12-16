@@ -83,6 +83,7 @@ export const csvFillToolModule = {
           const ngRepeat = ngRepeatSelectors[colIdx];
           const ngModel = ngModelSelectors[colIdx];
 
+          // Either ng-model or data-type (if file input)
           const secondaryAttribute = getSecondaryAttribute(ngModel);
 
           const inputs = [
