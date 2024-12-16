@@ -4,7 +4,7 @@ import {
   IIntermediatePromotePlantBatchData,
   IPackageData,
   IPlantBatchData,
-  ITagData
+  ITagData,
 } from "@/interfaces";
 import { debugLogFactory } from "@/utils/debug";
 import { fStrip } from "./math";
@@ -234,7 +234,11 @@ export function allocateImmaturePlantCounts(
       throw new Error("Killswitch");
     }
 
-    const batchSize: number = Math.min(remainingTotal, selectedPackageRemainingPlantCount, plantCountPerBatch);
+    const batchSize: number = Math.min(
+      remainingTotal,
+      selectedPackageRemainingPlantCount,
+      plantCountPerBatch
+    );
 
     debugLog(async () => ["Next batch size:", batchSize]);
 
@@ -312,11 +316,20 @@ export function fuzzyTrueFalseOrError(x: string): boolean {
   return result;
 }
 
-export function filterObjectKeys(originalObject: {[key: string]: any}, keysToKeep: string[]) {
+export function filterObjectKeys(originalObject: { [key: string]: any }, keysToKeep: string[]) {
   return Object.keys(originalObject)
     .filter((key) => keysToKeep.includes(key)) // Keep only specified keys
-    .reduce((newObj: {[key: string]: any}, key: string) => {
+    .reduce((newObj: { [key: string]: any }, key: string) => {
       newObj[key] = originalObject[key]; // Copy key-value pair to new object
       return newObj;
     }, {}); // Initial value for the new object
+}
+
+export function isChristmasSeasonImpl(): boolean {
+  const currentDate = new Date();
+
+  const start = new Date("2024-11-24T00:00:00-06:00"); // 12:00 AM on 11/24
+  const end = new Date("2024-12-08T23:59:59-06:00"); // 11:59 PM on 12/08
+
+  return currentDate >= start && currentDate <= end;
 }

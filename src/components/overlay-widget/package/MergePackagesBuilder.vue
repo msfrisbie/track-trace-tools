@@ -278,7 +278,7 @@ export default Vue.extend({
           TagId: tag.Id.toString(),
           UnitOfMeasureId: this.$data.outputItem.UnitOfMeasureId.toString(),
           RemediationDate: '',
-          RemediationMethodId: '0', // await defaultRemediatePackageMethod(),
+          RemediationMethodId: '', // await defaultRemediatePackageMethod(),
           RemediationSteps: '',
           UseByDate: '',
           SellByDate: '',

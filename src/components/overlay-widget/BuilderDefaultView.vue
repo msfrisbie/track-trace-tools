@@ -261,7 +261,7 @@ export default Vue.extend({
         },
         {
           backgroundColor: "gray",
-          text: "T3 Wiki",
+          text: "T3 WIKI",
           icon: "book-open",
           visible: true,
           enabled: true,

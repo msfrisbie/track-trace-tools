@@ -1507,8 +1507,8 @@ export interface IMetrcCreatePackagesFromPackagesPayload {
   IsDonation?: "true";
   IsFromMotherPlant?: "true";
   ExpirationDate: string;
-  UseByDate: "";
-  SellByDate: "";
+  UseByDate: string;
+  SellByDate: string;
 }
 
 export interface IMetrcFinishPackagesPayload {

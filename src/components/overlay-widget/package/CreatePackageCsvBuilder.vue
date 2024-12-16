@@ -51,13 +51,13 @@
                 <div v-for="[idx, statusMessage] of createPackageCsvState.statusMessages.entries()" v-bind:key="idx">
                   <span v-if="statusMessage.variant === 'primary'" class="text-purple-500">{{
                     statusMessage.text
-                    }}</span>
+                  }}</span>
                   <span v-if="statusMessage.variant === 'danger'" class="text-red-500">{{
                     statusMessage.text
-                    }}</span>
+                  }}</span>
                   <span v-if="statusMessage.variant === 'warning'" class="text-yellow-500">{{
                     statusMessage.text
-                    }}</span>
+                  }}</span>
                 </div>
               </div>
             </template>
@@ -66,13 +66,13 @@
               <div v-for="[idx, statusMessage] of createPackageCsvState.statusMessages.entries()" v-bind:key="idx">
                 <span v-if="statusMessage.variant === 'primary'" class="text-purple-500">{{
                   statusMessage.text
-                  }}</span>
+                }}</span>
                 <span v-if="statusMessage.variant === 'danger'" class="text-red-500">{{
                   statusMessage.text
-                  }}</span>
+                }}</span>
                 <span v-if="statusMessage.variant === 'warning'" class="text-yellow-500">{{
                   statusMessage.text
-                  }}</span>
+                }}</span>
               </div>
             </template>
 
@@ -311,6 +311,8 @@ export default Vue.extend({
         CreatePackageCsvColumns.IS_DONATION,
         CreatePackageCsvColumns.IS_TRADE_SAMPLE,
         CreatePackageCsvColumns.EXPIRATION_DATE,
+        CreatePackageCsvColumns.SELL_BY_DATE,
+        CreatePackageCsvColumns.USE_BY_DATE,
       ],
     };
   },
@@ -351,10 +353,10 @@ export default Vue.extend({
             TagId: parsedData.Tag!.Id.toString(),
             UnitOfMeasureId: parsedData.Item!.UnitOfMeasureId.toString(),
             RemediationDate: "",
-            RemediationMethodId: "0", // await defaultRemediatePackageMethod(),
+            RemediationMethodId: "", // await defaultRemediatePackageMethod(),
             RemediationSteps: "",
-            UseByDate: "",
-            SellByDate: "",
+            UseByDate: parsedData.UseByDate ? submitDateFromIsodate(parsedData.UseByDate) : "",
+            SellByDate: parsedData.SellByDate ? submitDateFromIsodate(parsedData.SellByDate) : "",
             ExpirationDate: parsedData.ExpirationDate
               ? submitDateFromIsodate(parsedData.ExpirationDate!)
               : "",
