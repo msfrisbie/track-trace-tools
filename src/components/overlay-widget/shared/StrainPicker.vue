@@ -8,7 +8,7 @@
           size="md"
           variant="primary"
           class="overflow-x-hidden"
-          style="max-width:300px"
+          style="max-width: 300px"
           disabled
           >{{ strain.Name }}</b-button
         >
@@ -28,7 +28,7 @@
       <vue-typeahead-bootstrap
         v-model="strainNameQuery"
         :data="strains"
-        :serializer="strain => strain.Name"
+        :serializer="(strain) => strain.Name"
         :minMatchingChars="0"
         :showOnFocus="true"
         :maxMatches="100"
@@ -155,17 +155,18 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue';
-import store from '@/store/page-overlay/index';
-import { IStrainData, IMetrcCreateStrainsPayload } from '@/interfaces';
-import { primaryDataLoader } from '@/modules/data-loader/data-loader.module';
-import ErrorReadout from '@/components/overlay-widget/shared/ErrorReadout.vue';
-import { DataLoadError, DataLoadErrorType } from '@/modules/data-loader/data-loader-error';
-import { STRAIN_TESTING_STATUS_OPTIONS } from '@/consts';
-import { primaryMetrcRequestManager } from '@/modules/metrc-request-manager.module';
+import ErrorReadout from "@/components/overlay-widget/shared/ErrorReadout.vue";
+import { STRAIN_TESTING_STATUS_OPTIONS } from "@/consts";
+import { IMetrcCreateStrainsPayload, IStrainData } from "@/interfaces";
+import { DataLoadError, DataLoadErrorType } from "@/modules/data-loader/data-loader-error";
+import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
+import { primaryMetrcRequestManager } from "@/modules/metrc-request-manager.module";
+import { toastManager } from "@/modules/toast-manager.module";
+import store from "@/store/page-overlay/index";
+import Vue from "vue";
 
 export default Vue.extend({
-  name: 'StrainPicker',
+  name: "StrainPicker",
   store,
   components: {
     ErrorReadout,
@@ -180,10 +181,10 @@ export default Vue.extend({
   },
   data() {
     return {
-      test: '',
+      test: "",
       showCreateStrainForm: false,
       showCreateStrainOptionalFields: false,
-      strainNameQuery: '',
+      strainNameQuery: "",
       inflight: false,
       error: null,
       strains: [],
@@ -215,12 +216,8 @@ export default Vue.extend({
       return !strainNameMatchesExistingStrain;
     },
     strainCreateInputsValid() {
-      const {
-        strainNameQuery,
-        newStrainThcPercent,
-        newStrainCbdPercent,
-        newStrainIndicaPercent,
-      } = (this as any).$data;
+      const { strainNameQuery, newStrainThcPercent, newStrainCbdPercent, newStrainIndicaPercent } =
+        (this as any).$data;
 
       if (!strainNameQuery) {
         return false;
@@ -239,8 +236,8 @@ export default Vue.extend({
       }
 
       if (
-        (!!newStrainIndicaPercent && newStrainIndicaPercent < 0)
-        || newStrainIndicaPercent > 100
+        (!!newStrainIndicaPercent && newStrainIndicaPercent < 0) ||
+        newStrainIndicaPercent > 100
       ) {
         return false;
       }
@@ -249,10 +246,10 @@ export default Vue.extend({
     },
     indicaSativaAppend() {
       if (
-        !(this as any).$data.newStrainIndicaPercent
-        && (this as any).$data.newStrainIndicaPercent !== 0
+        !(this as any).$data.newStrainIndicaPercent &&
+        (this as any).$data.newStrainIndicaPercent !== 0
       ) {
-        return '% Indica';
+        return "% Indica";
       }
       return `% Indica, ${100 - (this as any).$data.newStrainIndicaPercent}% Sativa`;
     },
@@ -291,11 +288,11 @@ export default Vue.extend({
       }
 
       if (this.$data.strains.length === 0) {
-        console.error('Server returned 0 strains');
+        console.error("Server returned 0 strains");
 
         this.$data.error = new DataLoadError(
           DataLoadErrorType.ZERO_RESULTS,
-          'Zero results returned',
+          "Zero results returned"
         );
       }
     },
@@ -313,7 +310,7 @@ export default Vue.extend({
       }
 
       const matchingStrain = this.$data.strains.find(
-        (x: IStrainData) => x.Name === (this as any).suggestedStrainName,
+        (x: IStrainData) => x.Name === (this as any).suggestedStrainName
       );
 
       if (matchingStrain) {
@@ -321,15 +318,15 @@ export default Vue.extend({
       }
     },
     async selectStrain(strain: IStrainData | null) {
-      return this.$emit('update:strain', strain);
+      return this.$emit("update:strain", strain);
     },
     async createStrainAndReloadOrError() {
       this.$data.createStrainInflight = true;
       this.$data.createStrainError = null;
 
-      function numberStringOrEmptyString(val: number | null | undefined | ''): string {
+      function numberStringOrEmptyString(val: number | null | undefined | ""): string {
         if (!val && val !== 0) {
-          return '';
+          return "";
         }
         return `${val}`;
       }
@@ -349,24 +346,28 @@ export default Vue.extend({
         const response = await primaryMetrcRequestManager.createStrains(JSON.stringify(rows));
 
         if (response.status === 200) {
+          await new Promise((resolve) => setTimeout(resolve, 2000));
           this.$data.strains = await primaryDataLoader.strains(true);
 
           const matchingNewStrain = this.$data.strains.find(
-            (x: IStrainData) => x.Name === this.$data.strainNameQuery,
+            (x: IStrainData) => x.Name === this.$data.strainNameQuery
           );
 
           if (matchingNewStrain) {
             this.selectStrain(matchingNewStrain);
           } else {
-            console.error('Could not match strain');
+            console.error(`Created strain ${this.$data.strainNameQuery} but failed to match`);
+            toastManager.error(`Created strain ${this.$data.strainNameQuery} but failed to match`);
           }
 
           this.$data.showCreateStrainForm = false;
         } else {
-          throw new Error('Failed to create strain');
+          toastManager.error("Failed to create strain: Metrc returned an error code");
+          throw new Error("Failed to create strain");
         }
       } catch (e) {
-        this.$data.createStrainError = (e as Error).message || 'Failed to create strain';
+        this.$data.createStrainError = (e as Error).message || "Failed to create strain";
+        toastManager.error(this.$data.createStrainError);
       } finally {
         this.$data.createStrainInflight = false;
       }
