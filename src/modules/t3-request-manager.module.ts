@@ -81,7 +81,8 @@ class T3RequestManager implements IAtomicService {
           client_key: clientKey,
           username: (await authManager.authStateOrError()).identity,
           hostname: window.location.hostname,
-          facilities: await facilityManager.ownedFacilitiesOrError()
+          active_facility: (await authManager.authStateOrError()).license,
+          facilities: (await facilityManager.ownedFacilitiesOrError())
         }),
       });
 
