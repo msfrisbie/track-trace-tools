@@ -10,8 +10,7 @@ import {
   CsvFillToolGetters,
   CsvFillToolMutations,
   DELAY_SECTION_GROUP_NAMES,
-  FORM_RENDER_DELAY_MS,
-  ZERO_INITIAL_LINES_SECTION_GROUP_NAMES
+  FORM_RENDER_DELAY_MS
 } from "./consts";
 import { ICsvFillToolState } from "./interfaces";
 import {
@@ -222,16 +221,8 @@ export const csvFillToolModule = {
           }
         }
 
-        // Some ng-repeats might not exist since there are 0 rows
-        // const previewedAddButtons = [...modal.querySelectorAll(`[ng-repeat^="addLine("]`)];
-        // for (const ngRepeat of ngRepeats) {
-        //   if (!previewedAddButtons.find())
-        // }
-
-        // // You are always clicking the last add button... does this still apply?
-
         if (ngRepeats.has("line in repeaterLines")) {
-          // The default state of a Metrc form usually has at least one row
+          // The default state of a Metrc form begins with one top-level row
           if (rowIdx > 0) {
             const topLevelSectionAddButton = [...modal.querySelectorAll(`[ng-click^="addLine("]`)].at(-1)!;
 
@@ -252,17 +243,36 @@ export const csvFillToolModule = {
             continue;
           }
 
-          const sectionAddButtons = [...lastTopLevelSection.querySelectorAll(`[ng-click^="addLine("]`)];
+          const targetButton = [...lastTopLevelSection.querySelectorAll(`[ng-click^="addLine("]`)].filter((x) => x.getAttribute("ng-click")!.includes(sectionGroupName)).at(-1)!;
 
-          const targetButton = sectionAddButtons.filter((x) => x.getAttribute("ng-click")!.includes(sectionGroupName)).at(-1)!;
+          let sectionElement: Element | null = targetButton.parentElement;
+          while (true) {
+            sectionElement = sectionElement?.parentElement!;
+            if (sectionElement.hasAttribute('ng-repeat')) {
+              break;
+            }
+            if (sectionElement.nodeName === 'FORM') {
+              sectionElement = null;
+              break;
+            }
+          }
 
-          if (rowIdx > 0 || ZERO_INITIAL_LINES_SECTION_GROUP_NAMES.includes(sectionGroupName)) {
+          const untaggedSections = [...sectionElement!.querySelectorAll(`[ng-repeat]:not([t3-autofill-used])`)];
+
+          // 1) Find enclosing ng-repeat element
+          // 2) count untagged ng-repeat elements
+          // 3) if 0, click
+          if (untaggedSections.filter((x) => x.getAttribute('ng-repeat') === ngRepeat).length === 0) {
             targetButton.dispatchEvent(new Event("click"));
 
             if (DELAY_SECTION_GROUP_NAMES.includes(sectionGroupName)) {
               await new Promise((resolve) => setTimeout(resolve, FORM_RENDER_DELAY_MS));
             }
           }
+
+          // if (rowIdx > 0 || ZERO_INITIAL_LINES_SECTION_GROUP_NAMES.includes(sectionGroupName)) {
+
+          // }
         }
 
         // Rows are now initialized, fill cell data into corresponding inputs
@@ -316,6 +326,9 @@ export const csvFillToolModule = {
 
           console.log("Unsupported input type, skipping");
         }
+
+        // Tag all ng-repeat elements as used
+        [...modal.querySelectorAll('[ng-repeat')].map((x) => x.setAttribute('t3-autofill-used', '1'));
       }
 
       const mutationData: Partial<ICsvFillToolState> = {};
