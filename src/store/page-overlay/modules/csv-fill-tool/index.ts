@@ -10,7 +10,7 @@ import {
   CsvFillToolGetters,
   CsvFillToolMutations,
   FORM_RENDER_DELAY_MS,
-  HIDDEN_ROW_MODELS,
+  HIDDEN_ROW_ATTRIBUTES,
 } from "./consts";
 import { ICsvFillToolState } from "./interfaces";
 import {
@@ -74,14 +74,14 @@ export const csvFillToolModule = {
 
       const topLevelSections = modal.querySelectorAll(`[ng-repeat="${ngRepeatSelectors[0]}"]`);
 
-      const dataRows: string[][] = [];
+      const csvCellRows: string[][] = [];
 
       for (const section of topLevelSections) {
         const queues: string[][] = columns.map(() => []);
 
-        for (const [colIdx, columnName] of columns.entries()) {
-          const ngRepeat = ngRepeatSelectors[colIdx];
-          const ngModel = ngModelSelectors[colIdx];
+        for (const [xIndex, columnName] of columns.entries()) {
+          const ngRepeat = ngRepeatSelectors[xIndex];
+          const ngModel = ngModelSelectors[xIndex];
 
           // Either ng-model or data-type (if file input)
           const secondaryAttribute = getSecondaryAttribute(ngModel);
@@ -99,9 +99,9 @@ export const csvFillToolModule = {
               );
               if (match) {
                 if (match.hasAttribute("label")) {
-                  queues[colIdx].push(match.getAttribute("label") ?? "");
+                  queues[xIndex].push(match.getAttribute("label") ?? "");
                 } else {
-                  queues[colIdx].push(match.getAttribute("value") ?? "");
+                  queues[xIndex].push(match.getAttribute("value") ?? "");
                 }
               }
             } else {
@@ -115,7 +115,7 @@ export const csvFillToolModule = {
                 }
               }
 
-              queues[colIdx].push(value);
+              queues[xIndex].push(value);
             }
           }
         }
@@ -123,11 +123,11 @@ export const csvFillToolModule = {
         while (queues.some((arr) => arr.length > 0)) {
           const row = queues.map((x) => x.shift() ?? "");
 
-          dataRows.push(row);
+          csvCellRows.push(row);
         }
       }
 
-      const matrix = [ngRepeatSelectors, ngModelSelectors, columns, ...dataRows];
+      const matrix = [ngRepeatSelectors, ngModelSelectors, columns, ...csvCellRows];
 
       const csvFile: ICsvFile = {
         filename,
@@ -187,10 +187,10 @@ export const csvFillToolModule = {
       // - ngModel
       // - column name
       const headerRows: string[][] = filteredCsvData.slice(0, 3);
-      const dataRows: string[][] = filteredCsvData.slice(3);
+      const csvCellRows: string[][] = filteredCsvData.slice(3);
 
-      for (const [rowIdx, dataRow] of dataRows.entries()) {
-        if (!hasPlusImpl() && rowIdx > 4) {
+      for (const [yIndex, csvCellRow] of csvCellRows.entries()) {
+        if (!hasPlusImpl() && yIndex > 4) {
           toastManager.openToast(
             "Autofill is limited to 5 rows with the free plan. For unlimited autofills, subscribe to T3+ at trackandtrace.tools/plus",
             {
@@ -206,22 +206,24 @@ export const csvFillToolModule = {
           break;
         }
 
-        // The default state of a Metrc form always has at least one row
-        if (rowIdx > 0) {
-          // Track ng repeat values that are "full rows"
-          const ngRepeats: Set<string> = new Set();
+        // Track ng repeat values that are "full rows"
+        const ngRepeats: Set<string> = new Set();
 
-          for (const [colIdx, cellValue] of dataRow.entries()) {
-            const ngRepeat = headerRows[0][colIdx];
+        for (const [xIndex, csvCellValue] of csvCellRow.entries()) {
+          const ngRepeat = headerRows[0][xIndex];
 
-            // Note a non-null value in this ng repeat
-            if (cellValue.trim() !== "") {
-              ngRepeats.add(ngRepeat);
-            }
+          // Note a non-null value in this ng repeat
+          if (csvCellValue.trim() !== "") {
+            ngRepeats.add(ngRepeat);
           }
+        }
 
-          const allAddButtons = [...modal.querySelectorAll(`[ng-click^="addLine("]`)];
+        const allAddButtons = [...modal.querySelectorAll(`[ng-click^="addLine("]`)];
 
+        console.log({ ngRepeats });
+        // debugger;
+
+        if (yIndex > 0) {
           // Start a new top-level row
           if (ngRepeats.has("line in repeaterLines")) {
             allAddButtons[allAddButtons.length - 1].dispatchEvent(new Event("click"));
@@ -234,34 +236,72 @@ export const csvFillToolModule = {
 
               const targetButton = buttons[buttons.length - 1];
 
+              // let clickToOpenFirst = false;
+              // let requiresRenderDelay = false;
+
+              let skip = false;
+
+              for (const hiddenRowAttribute of HIDDEN_ROW_ATTRIBUTES) {
+                if (targetButton.getAttribute('ng-click')!.includes(hiddenRowAttribute.ngClickPartial)) {
+                  skip = true;
+                  break;
+                }
+              }
+
+              if (skip) {
+                continue;
+              }
+
+              // The default state of a Metrc form usually has at least one row,
+              // exceptions to this are handled in the next if block
+              // if (yIndex > 0 || clickToOpenFirst) {
+              console.log("clicking button");
               targetButton.dispatchEvent(new Event("click"));
+
+              // if (requiresRenderDelay) {
+              //   await new Promise((resolve) => setTimeout(resolve, FORM_RENDER_DELAY_MS));
+              // }
+              // }
             }
           }
         }
 
-        for (const [colIdx, cellValue] of dataRow.entries()) {
-          const ngRepeat = headerRows[0][colIdx];
-          const ngModel = headerRows[1][colIdx];
+        let delay = false;
 
-          if (cellValue.trim() !== "" && HIDDEN_ROW_MODELS.includes(ngModel)) {
+        for (const [xIndex, csvCellValue] of csvCellRow.entries()) {
+          // const ngRepeat = headerRows[0][xIndex];
+          const ngModel = headerRows[1][xIndex];
+
+          const hiddenMatch = HIDDEN_ROW_ATTRIBUTES.find((x) => x.ngModel === ngModel);
+
+          if (csvCellValue.trim() !== "" && !!hiddenMatch) {
             const addModelButtons = [...modal.querySelectorAll(`[ng-click^="addLine("]`)].filter(
-              (x) => x.getAttribute("ng-click")?.includes(ngModel)
+              (x) => x.getAttribute("ng-click")?.includes(hiddenMatch.ngClickPartial)
             );
 
+            if (addModelButtons.length === 0) {
+              continue;
+            }
+
             const addModelButton = addModelButtons[addModelButtons.length - 1] as HTMLElement;
+            console.log(`click2 ${hiddenMatch.ngClickPartial}`);
             addModelButton.click();
+
+            delay = delay || hiddenMatch.requiresRenderDelay;
           }
         }
 
-        // Allow the selects to render
-        await new Promise((resolve) => setTimeout(resolve, FORM_RENDER_DELAY_MS));
+        if (delay) {
+          // Allow the selects to render
+          await new Promise((resolve) => setTimeout(resolve, FORM_RENDER_DELAY_MS));
+        }
 
         // Rows are now initialized, fill cell data into corresponding inputs
-        for (const [colIdx, cellValue] of dataRow.entries()) {
-          const ngRepeat = headerRows[0][colIdx];
-          const ngModel = headerRows[1][colIdx];
+        for (const [xIndex, csvCellValue] of csvCellRow.entries()) {
+          const ngRepeat = headerRows[0][xIndex];
+          const ngModel = headerRows[1][xIndex];
 
-          if (cellValue.trim() === "") {
+          if (csvCellValue.trim() === "") {
             continue;
           }
 
@@ -277,31 +317,31 @@ export const csvFillToolModule = {
 
           if (formInputFieldElement.nodeName === "INPUT") {
             if (formInputFieldElement.getAttribute("type") === "checkbox") {
-              await setCheckboxValue(formInputFieldElement as HTMLInputElement, cellValue);
+              await setCheckboxValue(formInputFieldElement as HTMLInputElement, csvCellValue);
               continue;
             }
 
             if (formInputFieldElement.getAttribute("data-role") === "upload") {
               await setImageInputValue(
                 formInputFieldElement as HTMLInputElement,
-                cellValue,
+                csvCellValue,
                 data.preloadedFiles
               );
               continue;
             }
 
             // Regular text input OR autocomplete input
-            await setTextInputValue(formInputFieldElement as HTMLInputElement, cellValue);
+            await setTextInputValue(formInputFieldElement as HTMLInputElement, csvCellValue);
             continue;
           }
 
           if (formInputFieldElement.nodeName === "SELECT") {
-            await setSelectValue(formInputFieldElement as HTMLSelectElement, cellValue);
+            await setSelectValue(formInputFieldElement as HTMLSelectElement, csvCellValue);
             continue;
           }
 
           if (formInputFieldElement.nodeName === "TEXTAREA") {
-            await setTextareaValue(formInputFieldElement as HTMLTextAreaElement, cellValue);
+            await setTextareaValue(formInputFieldElement as HTMLTextAreaElement, csvCellValue);
             continue;
           }
 

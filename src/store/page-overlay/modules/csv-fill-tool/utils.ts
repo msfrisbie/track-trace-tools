@@ -1,6 +1,6 @@
 import { toastManager } from "@/modules/toast-manager.module";
-import { FORM_RENDER_DELAY_MS, HIDDEN_ROW_MODELS } from "./consts";
-import { IHierarchyNode, IModalInput } from "./interfaces";
+import { FORM_RENDER_DELAY_MS, HIDDEN_ROW_ATTRIBUTES } from "./consts";
+import { IModalInput } from "./interfaces";
 
 export async function collectInputs(modal: HTMLElement): Promise<IModalInput[]> {
   const inputData: IModalInput[] = [];
@@ -14,9 +14,9 @@ export async function collectInputs(modal: HTMLElement): Promise<IModalInput[]> 
 
   let delay = false;
 
-  for (const hiddenRowModel of HIDDEN_ROW_MODELS) {
+  for (const { ngClickPartial } of HIDDEN_ROW_ATTRIBUTES) {
     const addModelButtons = [...firstRow.querySelectorAll(`[ng-click^="addLine("]`)].filter((x) =>
-      x.getAttribute("ng-click")?.includes(hiddenRowModel)
+      x.getAttribute("ng-click")?.includes(ngClickPartial)
     );
 
     if (addModelButtons.length === 0) {
@@ -24,6 +24,7 @@ export async function collectInputs(modal: HTMLElement): Promise<IModalInput[]> 
     }
 
     const addModelButton = addModelButtons[addModelButtons.length - 1] as HTMLElement;
+    console.log(`click ${ngClickPartial}`);
     addModelButton.click();
 
     delay = true;
@@ -137,9 +138,9 @@ export async function collectInputs(modal: HTMLElement): Promise<IModalInput[]> 
     });
   }
 
-  for (const hiddenRowModel of HIDDEN_ROW_MODELS) {
+  for (const { ngClickPartial } of HIDDEN_ROW_ATTRIBUTES) {
     const removeModelButtons = [...firstRow.querySelectorAll(`[ng-click^="removeLine("]`)].filter(
-      (x) => x.getAttribute("ng-click")?.includes(hiddenRowModel)
+      (x) => x.getAttribute("ng-click")?.includes(ngClickPartial)
     );
 
     if (removeModelButtons.length === 0) {
@@ -358,6 +359,9 @@ export async function buildT3CsvGridData(modal: HTMLElement): Promise<{
   const columns: string[] = [];
 
   for (const input of inputData) {
+    if (input.ngModel.includes('newLinesCount')) {
+      continue;
+    }
     ngRepeatSelectors.push(input.ngRepeat);
     ngModelSelectors.push(input.ngModel);
     columns.push(input.name);

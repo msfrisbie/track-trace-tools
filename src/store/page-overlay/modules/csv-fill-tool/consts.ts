@@ -14,9 +14,13 @@ export enum CsvFillToolActions {
 
 export const FORM_RENDER_DELAY_MS = 300;
 
-export const HIDDEN_ROW_MODELS = [
-  "ProductPhotos",
-  "LabelPhotos",
-  "PackagingPhotos",
-  "ItemIngredients",
+export const HIDDEN_ROW_ATTRIBUTES: {
+  ngClickPartial: string,
+  ngModel: string
+  requiresRenderDelay: boolean
+}[] = [
+  { ngClickPartial: "ProductPhotos", ngModel: "ProductPhotos", requiresRenderDelay: true },
+  { ngClickPartial: "LabelPhotos", ngModel: "LabelPhotos", requiresRenderDelay: true },
+  { ngClickPartial: "PackagingPhotos", ngModel: "PackagingPhotos", requiresRenderDelay: true },
+  { ngClickPartial: "ItemIngredients", ngModel: "itemIngredient.Ingredient", requiresRenderDelay: false },
 ];
