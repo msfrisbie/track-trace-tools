@@ -221,9 +221,11 @@ export const csvFillToolModule = {
           }
         }
 
+        // Special logic for handling new top-level rows
         if (ngRepeats.has("line in repeaterLines")) {
           // The default state of a Metrc form begins with one top-level row
           if (rowIdx > 0) {
+            // The last add section button in the form adds new top-level sections
             const topLevelSectionAddButton = [...modal.querySelectorAll(`[ng-click^="addLine("]`)].at(-1)!;
 
             // Start a new top-level row
@@ -231,20 +233,28 @@ export const csvFillToolModule = {
           }
         }
 
+        // The CSV is parsed from top to bottom, and the form is filled from top to bottom
+        // We only care about the last section
         const lastTopLevelSection = [...modal.querySelectorAll(`[ng-repeat="line in repeaterLines"]`)].at(-1)!;
 
         for (const ngRepeat of ngRepeats) {
-          // itemIngredient in line.ItemIngredients
+          // Example values:
+          //
+          // ng-repeat="itemIngredient in line.ItemIngredients"
           // ng-click="addLine(line.newLinesCount, line.LabelPhotos); preload.methods.createNewControls('.js-upload-control-label');"
           // ng-click="addLine(line.newLinesCount, line.ItemIngredients); preload.methods.createNewControls();"
           const { sectionName, sectionGroupName } = parseNgRepeat(ngRepeat);
 
+          // This was already handled above
           if (sectionGroupName === 'repeaterLines') {
             continue;
           }
 
+          // Find the add line button for the current ngRepeat value
           const targetButton = [...lastTopLevelSection.querySelectorAll(`[ng-click^="addLine("]`)].filter((x) => x.getAttribute("ng-click")!.includes(sectionGroupName)).at(-1)!;
 
+          // We start at the add button element, and traverse upwards
+          // to locate the enclosing ng-repeat section
           let sectionElement: Element | null = targetButton.parentElement;
           while (true) {
             sectionElement = sectionElement?.parentElement!;
@@ -257,25 +267,26 @@ export const csvFillToolModule = {
             }
           }
 
+          // With this section, we can find all the untagged ng-repeat elements with a selector
           const untaggedSections = [...sectionElement!.querySelectorAll(`[ng-repeat]:not([t3-autofill-used])`)];
 
-          // 1) Find enclosing ng-repeat element
-          // 2) count untagged ng-repeat elements
-          // 3) if 0, click
+          // If the section was initialized with 1 row, this will be untagged,
+          // and no action needs to be taken. If there is no initialized row,
+          // or the other rows were tagged, it will be 0.
           if (untaggedSections.filter((x) => x.getAttribute('ng-repeat') === ngRepeat).length === 0) {
             targetButton.dispatchEvent(new Event("click"));
 
+            // Photo inputs require a delay to render
             if (DELAY_SECTION_GROUP_NAMES.includes(sectionGroupName)) {
               await new Promise((resolve) => setTimeout(resolve, FORM_RENDER_DELAY_MS));
             }
           }
-
-          // if (rowIdx > 0 || ZERO_INITIAL_LINES_SECTION_GROUP_NAMES.includes(sectionGroupName)) {
-
-          // }
         }
 
-        // Rows are now initialized, fill cell data into corresponding inputs
+        // We have now initialized the form so that there is one empty form field
+        // for every non-empty CSV cell value.
+        //
+        // Re-iterate through the CSV and fill cell data into corresponding inputs
         for (const [colIdx, csvCellValue] of csvCellRow.entries()) {
           const ngRepeat = headerRows[0][colIdx];
           const ngModel = headerRows[1][colIdx];
