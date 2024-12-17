@@ -9,13 +9,15 @@ import {
   CsvFillToolActions,
   CsvFillToolGetters,
   CsvFillToolMutations,
+  DELAY_SECTION_GROUP_NAMES,
   FORM_RENDER_DELAY_MS,
-  HIDDEN_ROW_ATTRIBUTES,
+  ZERO_INITIAL_LINES_SECTION_GROUP_NAMES
 } from "./consts";
 import { ICsvFillToolState } from "./interfaces";
 import {
   buildT3CsvGridData,
   getSecondaryAttribute,
+  parseNgRepeat,
   setCheckboxValue,
   setImageInputValue,
   setSelectValue,
@@ -79,9 +81,9 @@ export const csvFillToolModule = {
       for (const section of topLevelSections) {
         const queues: string[][] = columns.map(() => []);
 
-        for (const [xIndex, columnName] of columns.entries()) {
-          const ngRepeat = ngRepeatSelectors[xIndex];
-          const ngModel = ngModelSelectors[xIndex];
+        for (const [colIdx, columnName] of columns.entries()) {
+          const ngRepeat = ngRepeatSelectors[colIdx];
+          const ngModel = ngModelSelectors[colIdx];
 
           // Either ng-model or data-type (if file input)
           const secondaryAttribute = getSecondaryAttribute(ngModel);
@@ -99,9 +101,9 @@ export const csvFillToolModule = {
               );
               if (match) {
                 if (match.hasAttribute("label")) {
-                  queues[xIndex].push(match.getAttribute("label") ?? "");
+                  queues[colIdx].push(match.getAttribute("label") ?? "");
                 } else {
-                  queues[xIndex].push(match.getAttribute("value") ?? "");
+                  queues[colIdx].push(match.getAttribute("value") ?? "");
                 }
               }
             } else {
@@ -115,7 +117,7 @@ export const csvFillToolModule = {
                 }
               }
 
-              queues[xIndex].push(value);
+              queues[colIdx].push(value);
             }
           }
         }
@@ -189,8 +191,8 @@ export const csvFillToolModule = {
       const headerRows: string[][] = filteredCsvData.slice(0, 3);
       const csvCellRows: string[][] = filteredCsvData.slice(3);
 
-      for (const [yIndex, csvCellRow] of csvCellRows.entries()) {
-        if (!hasPlusImpl() && yIndex > 4) {
+      for (const [rowIdx, csvCellRow] of csvCellRows.entries()) {
+        if (!hasPlusImpl() && rowIdx > 4) {
           toastManager.openToast(
             "Autofill is limited to 5 rows with the free plan. For unlimited autofills, subscribe to T3+ at trackandtrace.tools/plus",
             {
@@ -206,11 +208,13 @@ export const csvFillToolModule = {
           break;
         }
 
-        // Track ng repeat values that are "full rows"
+        // Track ng repeat values that are "full rows",
+        // Meaning that at least one cell value is filled. This means
+        // that a new "row" must be created for that ng-repeat
         const ngRepeats: Set<string> = new Set();
 
-        for (const [xIndex, csvCellValue] of csvCellRow.entries()) {
-          const ngRepeat = headerRows[0][xIndex];
+        for (const [colIdx, csvCellValue] of csvCellRow.entries()) {
+          const ngRepeat = headerRows[0][colIdx];
 
           // Note a non-null value in this ng repeat
           if (csvCellValue.trim() !== "") {
@@ -218,88 +222,53 @@ export const csvFillToolModule = {
           }
         }
 
-        const allAddButtons = [...modal.querySelectorAll(`[ng-click^="addLine("]`)];
+        // Some ng-repeats might not exist since there are 0 rows
+        // const previewedAddButtons = [...modal.querySelectorAll(`[ng-repeat^="addLine("]`)];
+        // for (const ngRepeat of ngRepeats) {
+        //   if (!previewedAddButtons.find())
+        // }
 
-        console.log({ ngRepeats });
-        // debugger;
+        // // You are always clicking the last add button... does this still apply?
 
-        if (yIndex > 0) {
-          // Start a new top-level row
-          if (ngRepeats.has("line in repeaterLines")) {
-            allAddButtons[allAddButtons.length - 1].dispatchEvent(new Event("click"));
-          } else {
-            for (const ngRepeat of ngRepeats) {
-              // line.Ingredients
-              const id = ngRepeat.split(" in ")[1].trim();
+        if (ngRepeats.has("line in repeaterLines")) {
+          // The default state of a Metrc form usually has at least one row
+          if (rowIdx > 0) {
+            const topLevelSectionAddButton = [...modal.querySelectorAll(`[ng-click^="addLine("]`)].at(-1)!;
 
-              const buttons = allAddButtons.filter((x) => x.getAttribute("ng-click")!.includes(id));
-
-              const targetButton = buttons[buttons.length - 1];
-
-              // let clickToOpenFirst = false;
-              // let requiresRenderDelay = false;
-
-              let skip = false;
-
-              for (const hiddenRowAttribute of HIDDEN_ROW_ATTRIBUTES) {
-                if (targetButton.getAttribute('ng-click')!.includes(hiddenRowAttribute.ngClickPartial)) {
-                  skip = true;
-                  break;
-                }
-              }
-
-              if (skip) {
-                continue;
-              }
-
-              // The default state of a Metrc form usually has at least one row,
-              // exceptions to this are handled in the next if block
-              // if (yIndex > 0 || clickToOpenFirst) {
-              console.log("clicking button");
-              targetButton.dispatchEvent(new Event("click"));
-
-              // if (requiresRenderDelay) {
-              //   await new Promise((resolve) => setTimeout(resolve, FORM_RENDER_DELAY_MS));
-              // }
-              // }
-            }
+            // Start a new top-level row
+            topLevelSectionAddButton.dispatchEvent(new Event("click"));
           }
         }
 
-        let delay = false;
+        const lastTopLevelSection = [...modal.querySelectorAll(`[ng-repeat="line in repeaterLines"]`)].at(-1)!;
 
-        for (const [xIndex, csvCellValue] of csvCellRow.entries()) {
-          // const ngRepeat = headerRows[0][xIndex];
-          const ngModel = headerRows[1][xIndex];
+        for (const ngRepeat of ngRepeats) {
+          // itemIngredient in line.ItemIngredients
+          // ng-click="addLine(line.newLinesCount, line.LabelPhotos); preload.methods.createNewControls('.js-upload-control-label');"
+          // ng-click="addLine(line.newLinesCount, line.ItemIngredients); preload.methods.createNewControls();"
+          const { sectionName, sectionGroupName } = parseNgRepeat(ngRepeat);
 
-          const hiddenMatch = HIDDEN_ROW_ATTRIBUTES.find((x) => x.ngModel === ngModel);
-
-          if (csvCellValue.trim() !== "" && !!hiddenMatch) {
-            const addModelButtons = [...modal.querySelectorAll(`[ng-click^="addLine("]`)].filter(
-              (x) => x.getAttribute("ng-click")?.includes(hiddenMatch.ngClickPartial)
-            );
-
-            if (addModelButtons.length === 0) {
-              continue;
-            }
-
-            const addModelButton = addModelButtons[addModelButtons.length - 1] as HTMLElement;
-            console.log(`click2 ${hiddenMatch.ngClickPartial}`);
-            addModelButton.click();
-
-            delay = delay || hiddenMatch.requiresRenderDelay;
+          if (sectionGroupName === 'repeaterLines') {
+            continue;
           }
-        }
 
-        if (delay) {
-          // Allow the selects to render
-          await new Promise((resolve) => setTimeout(resolve, FORM_RENDER_DELAY_MS));
+          const sectionAddButtons = [...lastTopLevelSection.querySelectorAll(`[ng-click^="addLine("]`)];
+
+          const targetButton = sectionAddButtons.filter((x) => x.getAttribute("ng-click")!.includes(sectionGroupName)).at(-1)!;
+
+          if (rowIdx > 0 || ZERO_INITIAL_LINES_SECTION_GROUP_NAMES.includes(sectionGroupName)) {
+            targetButton.dispatchEvent(new Event("click"));
+
+            if (DELAY_SECTION_GROUP_NAMES.includes(sectionGroupName)) {
+              await new Promise((resolve) => setTimeout(resolve, FORM_RENDER_DELAY_MS));
+            }
+          }
         }
 
         // Rows are now initialized, fill cell data into corresponding inputs
-        for (const [xIndex, csvCellValue] of csvCellRow.entries()) {
-          const ngRepeat = headerRows[0][xIndex];
-          const ngModel = headerRows[1][xIndex];
+        for (const [colIdx, csvCellValue] of csvCellRow.entries()) {
+          const ngRepeat = headerRows[0][colIdx];
+          const ngModel = headerRows[1][colIdx];
 
           if (csvCellValue.trim() === "") {
             continue;

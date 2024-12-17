@@ -63,6 +63,7 @@ const blacklist = [
   "No metrc kendo present",
   "resizeobserver loop",
   "insertbefore",
+  "ResizeObserver",
 ];
 
 // This allows firefox to render, but errors are uncollected.
@@ -307,7 +308,7 @@ export default Vue.extend({
 
     await sandboxManager.runsAfterModuleInit();
   },
-  mounted() { },
+  mounted() {},
 });
 </script>
 

@@ -334,6 +334,14 @@ export async function collectInputs(modal: HTMLElement): Promise<IModalInput[]> 
 //   node.childSections.map((h) => dump(h, depth + 1));
 // }
 
+export function parseNgRepeat(ngRepeat: string): {sectionName: string, sectionGroupName: string} {
+  const [sectionName, sectionGroupName] = ngRepeat.split(" in ").map((x) => x.trim());
+
+  return {
+    sectionName, sectionGroupName
+  };
+}
+
 export function getSecondaryAttribute(ngModel: string): string {
   if (ngModel.endsWith("FileSystemIds") || ngModel.endsWith("Photos")) {
     return "data-type";

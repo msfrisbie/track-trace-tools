@@ -14,6 +14,19 @@ export enum CsvFillToolActions {
 
 export const FORM_RENDER_DELAY_MS = 300;
 
+export const DELAY_SECTION_GROUP_NAMES: string[] = [
+  "line.ProductPhotos",
+  "line.LabelPhotos",
+  "line.PackagingPhotos"
+];
+
+export const ZERO_INITIAL_LINES_SECTION_GROUP_NAMES: string[] = [
+  "line.ItemIngredients",
+  "line.ProductPhotos",
+  "line.LabelPhotos",
+  "line.PackagingPhotos"
+];
+
 export const HIDDEN_ROW_ATTRIBUTES: {
   ngClickPartial: string,
   ngModel: string
