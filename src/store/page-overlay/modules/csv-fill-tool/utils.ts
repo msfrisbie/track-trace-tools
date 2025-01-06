@@ -24,7 +24,6 @@ export async function collectInputs(modal: HTMLElement): Promise<IModalInput[]> 
     }
 
     const addModelButton = addModelButtons[addModelButtons.length - 1] as HTMLElement;
-    console.log(`click ${ngClickPartial}`);
     addModelButton.click();
 
     delay = true;
@@ -63,6 +62,12 @@ export async function collectInputs(modal: HTMLElement): Promise<IModalInput[]> 
 
   for (const input of inputs) {
     const ngModel = (input.getAttribute("ng-model") || input.getAttribute("data-type")) as string;
+
+    if (!ngModel) {
+      // This occurrs in the transfer window for the Select files... input
+      // This doesn't map to a model, so ignore it
+      continue;
+    }
 
     if (ngModelSet.has(ngModel)) {
       continue;
@@ -334,11 +339,12 @@ export async function collectInputs(modal: HTMLElement): Promise<IModalInput[]> 
 //   node.childSections.map((h) => dump(h, depth + 1));
 // }
 
-export function parseNgRepeat(ngRepeat: string): {sectionName: string, sectionGroupName: string} {
+export function parseNgRepeat(ngRepeat: string): { sectionName: string; sectionGroupName: string } {
   const [sectionName, sectionGroupName] = ngRepeat.split(" in ").map((x) => x.trim());
 
   return {
-    sectionName, sectionGroupName
+    sectionName,
+    sectionGroupName,
   };
 }
 
@@ -367,7 +373,8 @@ export async function buildT3CsvGridData(modal: HTMLElement): Promise<{
   const columns: string[] = [];
 
   for (const input of inputData) {
-    if (input.ngModel.includes('newLinesCount')) {
+    console.log(input);
+    if (input.ngModel.includes("newLinesCount")) {
       continue;
     }
     ngRepeatSelectors.push(input.ngRepeat);

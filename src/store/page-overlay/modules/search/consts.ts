@@ -159,7 +159,7 @@ export const ALL_METRC_GROUPS: MetrcGroup[] = [
     children: [
       {
         name: "ACTIVE",
-        uniqueMetrcGridId: UniqueMetrcGridId.ITEMS_GRID,
+        uniqueMetrcGridId: UniqueMetrcGridId.ITEMS,
         enabled: true,
       },
     ],
@@ -169,7 +169,7 @@ export const ALL_METRC_GROUPS: MetrcGroup[] = [
     children: [
       {
         name: "ACTIVE",
-        uniqueMetrcGridId: UniqueMetrcGridId.STRAIN_GRID,
+        uniqueMetrcGridId: UniqueMetrcGridId.STRAINS,
         enabled: true,
       },
     ],

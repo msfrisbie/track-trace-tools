@@ -66,7 +66,7 @@ export enum MessageType {
   UPDATE_UNINSTALL_URL = "UPDATE_UNINSTALL_URL",
   READ_SPREADSHEET_VALUES = "READ_SPREADSHEET_VALUES",
   WRITE_SPREADSHEET_VALUES = "WRITE_SPREADSHEET_VALUES",
-  LOG_ANALYTICS_EVENT = "LOG_ANALYTICS_EVENT"
+  LOG_ANALYTICS_EVENT = "LOG_ANALYTICS_EVENT",
 }
 
 export enum AnalyticsEvent {
@@ -589,6 +589,8 @@ export enum NativeMetrcGridId {
   PLANTS_FLOWERING = "plantsflowering-grid",
   PLANTS_ON_HOLD = "plantsonhold-grid",
   PLANTS_INACTIVE = "plantsinactive-grid",
+  PLANTS_WASTE = "waste-grid",
+  PLANTS_ADDITIVES = "additives-grid",
 
   HARVESTS_HARVESTED = "harvested-grid",
   HARVESTS_ON_HOLD = "harvestsonhold-grid",
@@ -599,12 +601,14 @@ export enum NativeMetrcGridId {
   PACKAGES_INACTIVE = "inactive-grid",
   PACKAGES_IN_TRANSIT = "intransit-grid",
   PACKAGES_TRANSFERRED = "transferred-grid",
+  PACKAGES_PRODUCT_LABELS = "retailid-grid",
 
   TRANSFERS_INCOMING = "incoming-grid",
   TRANSFERS_INCOMING_INACTIVE = "incomingInactive-grid",
   TRANSFERS_OUTGOING = "outgoing-grid",
   TRANSFERS_REJECTED = "rejected-grid",
   TRANSFERS_OUTGOING_INACTIVE = "outgoingInactive-grid",
+  TRANSFERS_TEMPLATES = "templates-grid",
 
   TAGS_AVAILABLE = "available-grid",
   TAGS_USED = "used-grid",
@@ -613,13 +617,12 @@ export enum NativeMetrcGridId {
   SALES_ACTIVE = "active-grid",
   SALES_INACTIVE = "inactive-grid",
 
-  ITEMS_GRID = "items-grid",
+  LOCATIONS = "locations-grid",
 
-  STRAIN_GRID = "strains-grid",
+  ITEMS = "items-grid",
+  ITEMS_ITEM_BRANDS = "itembrands-grid",
 
-  PLANT_WASTE_GRID = "waste-grid",
-
-  PLANT_ADDITIVES_GRID = "additives-grid",
+  STRAINS = "strains-grid",
 }
 
 export enum UniqueMetrcGridId {
@@ -631,6 +634,8 @@ export enum UniqueMetrcGridId {
   PLANTS_FLOWERING = "PLANTS_FLOWERING",
   PLANTS_ON_HOLD = "PLANTS_ON_HOLD",
   PLANTS_INACTIVE = "PLANTS_INACTIVE",
+  PLANTS_WASTE = "PLANTS_WASTE",
+  PLANTS_ADDITIVES = "PLANTS_ADDITIVES",
 
   HARVESTS_HARVESTED = "HARVESTS_HARVESTED",
   HARVESTS_ON_HOLD = "HARVESTS_ON_HOLD",
@@ -641,12 +646,14 @@ export enum UniqueMetrcGridId {
   PACKAGES_INACTIVE = "PACKAGES_INACTIVE",
   PACKAGES_IN_TRANSIT = "PACKAGES_IN_TRANSIT",
   PACKAGES_TRANSFERRED = "PACKAGES_TRANSFERRED",
+  PACKAGES_PRODUCT_LABELS = "PACKAGES_PRODUCT_LABELS",
 
   TRANSFERS_INCOMING = "TRANSFERS_INCOMING",
   TRANSFERS_INCOMING_INACTIVE = "TRANSFERS_INCOMING_INACTIVE",
   TRANSFERS_OUTGOING = "TRANSFERS_OUTGOING",
   TRANSFERS_REJECTED = "TRANSFERS_REJECTED",
   TRANSFERS_OUTGOING_INACTIVE = "TRANSFERS_OUTGOING_INACTIVE",
+  TRANSFERS_TEMPLATES = "TRANSFERS_TEMPLATES",
 
   TAGS_AVAILABLE = "TAGS_AVAILABLE",
   TAGS_USED = "TAGS_USED",
@@ -655,13 +662,12 @@ export enum UniqueMetrcGridId {
   SALES_ACTIVE = "SALES_ACTIVE",
   SALES_INACTIVE = "SALES_INACTIVE",
 
-  ITEMS_GRID = "ITEMS_GRID",
+  LOCATIONS = "LOCATION",
 
-  STRAIN_GRID = "STRAIN_GRID",
+  ITEMS = "ITEMS",
+  ITEMS_ITEM_BRANDS = "ITEMS_ITEM_BRANDS",
 
-  PLANT_WASTE_GRID = "PLANT_WASTE_GRID",
-
-  PLANT_ADDIVIES_GRID = "PLANT_ADDIVIES_GRID",
+  STRAINS = "STRAINS",
 }
 
 export enum MetrcPageId {
@@ -670,7 +676,11 @@ export enum MetrcPageId {
   TRANSFERS = "TRANSFERS",
   SALES_RECEIPTS = "SALES_RECEIPTS",
   ITEMS = "ITEMS",
+  ITEM_BRANDS = "ITEM_BRANDS",
   STRAINS = "STRAINS",
+  LOCATIONS = "LOCATIONS",
+  TAGS = "TAGS",
+  TRANSFERS_TEMPLATES = "TRANSFERS_TEMPLATES"
 }
 
 export const METRC_PAGE_METADATA: {
@@ -687,14 +697,26 @@ export const METRC_PAGE_METADATA: {
   [MetrcPageId.TRANSFERS]: {
     pathPartial: "/transfers/licensed",
   },
+  [MetrcPageId.TRANSFERS_TEMPLATES]: {
+    pathPartial: "/transfers/licensed.templates",
+  },
   [MetrcPageId.SALES_RECEIPTS]: {
     pathPartial: "/sales/receipts",
   },
   [MetrcPageId.ITEMS]: {
     pathPartial: "/admin/items",
   },
+  [MetrcPageId.ITEM_BRANDS]: {
+    pathPartial: "/admin/items/brands",
+  },
   [MetrcPageId.STRAINS]: {
     pathPartial: "/admin/strains",
+  },
+  [MetrcPageId.LOCATIONS]: {
+    pathPartial: "/admin/locations",
+  },
+  [MetrcPageId.TAGS]: {
+    pathPartial: "/admin/tags",
   },
 };
 
@@ -764,6 +786,10 @@ export const METRC_GRID_METADATA: {
     nativeMetrcGridId: NativeMetrcGridId.PACKAGES_TRANSFERRED,
     metrcPageId: MetrcPageId.PACKAGES,
   },
+  [UniqueMetrcGridId.PACKAGES_PRODUCT_LABELS]: {
+    nativeMetrcGridId: NativeMetrcGridId.PACKAGES_PRODUCT_LABELS,
+    metrcPageId: MetrcPageId.PACKAGES,
+  },
   [UniqueMetrcGridId.TRANSFERS_INCOMING]: {
     nativeMetrcGridId: NativeMetrcGridId.TRANSFERS_INCOMING,
     metrcPageId: MetrcPageId.TRANSFERS,
@@ -784,17 +810,21 @@ export const METRC_GRID_METADATA: {
     nativeMetrcGridId: NativeMetrcGridId.TRANSFERS_OUTGOING_INACTIVE,
     metrcPageId: MetrcPageId.TRANSFERS,
   },
+  [UniqueMetrcGridId.TRANSFERS_TEMPLATES]: {
+    nativeMetrcGridId: NativeMetrcGridId.TRANSFERS_TEMPLATES,
+    metrcPageId: MetrcPageId.TRANSFERS_TEMPLATES,
+  },
   [UniqueMetrcGridId.TAGS_AVAILABLE]: {
     nativeMetrcGridId: NativeMetrcGridId.TAGS_AVAILABLE,
-    metrcPageId: MetrcPageId.PACKAGES,
+    metrcPageId: MetrcPageId.TAGS,
   },
   [UniqueMetrcGridId.TAGS_USED]: {
     nativeMetrcGridId: NativeMetrcGridId.TAGS_USED,
-    metrcPageId: MetrcPageId.PACKAGES,
+    metrcPageId: MetrcPageId.TAGS,
   },
   [UniqueMetrcGridId.TAGS_VOIDED]: {
     nativeMetrcGridId: NativeMetrcGridId.TAGS_VOIDED,
-    metrcPageId: MetrcPageId.PACKAGES,
+    metrcPageId: MetrcPageId.TAGS,
   },
   [UniqueMetrcGridId.SALES_ACTIVE]: {
     nativeMetrcGridId: NativeMetrcGridId.SALES_ACTIVE,
@@ -804,20 +834,28 @@ export const METRC_GRID_METADATA: {
     nativeMetrcGridId: NativeMetrcGridId.SALES_INACTIVE,
     metrcPageId: MetrcPageId.SALES_RECEIPTS,
   },
-  [UniqueMetrcGridId.ITEMS_GRID]: {
-    nativeMetrcGridId: NativeMetrcGridId.ITEMS_GRID,
+  [UniqueMetrcGridId.ITEMS]: {
+    nativeMetrcGridId: NativeMetrcGridId.ITEMS,
     metrcPageId: MetrcPageId.ITEMS,
   },
-  [UniqueMetrcGridId.STRAIN_GRID]: {
-    nativeMetrcGridId: NativeMetrcGridId.STRAIN_GRID,
+  [UniqueMetrcGridId.ITEMS_ITEM_BRANDS]: {
+    nativeMetrcGridId: NativeMetrcGridId.ITEMS_ITEM_BRANDS,
+    metrcPageId: MetrcPageId.ITEM_BRANDS,
+  },
+  [UniqueMetrcGridId.STRAINS]: {
+    nativeMetrcGridId: NativeMetrcGridId.STRAINS,
     metrcPageId: MetrcPageId.STRAINS,
   },
-  [UniqueMetrcGridId.PLANT_WASTE_GRID]: {
-    nativeMetrcGridId: NativeMetrcGridId.PLANT_WASTE_GRID,
+  [UniqueMetrcGridId.LOCATIONS]: {
+    nativeMetrcGridId: NativeMetrcGridId.LOCATIONS,
+    metrcPageId: MetrcPageId.LOCATIONS,
+  },
+  [UniqueMetrcGridId.PLANTS_WASTE]: {
+    nativeMetrcGridId: NativeMetrcGridId.PLANTS_WASTE,
     metrcPageId: MetrcPageId.PLANTS,
   },
-  [UniqueMetrcGridId.PLANT_ADDIVIES_GRID]: {
-    nativeMetrcGridId: NativeMetrcGridId.PLANT_ADDITIVES_GRID,
+  [UniqueMetrcGridId.PLANTS_ADDITIVES]: {
+    nativeMetrcGridId: NativeMetrcGridId.PLANTS_ADDITIVES,
     metrcPageId: MetrcPageId.PLANTS,
   },
 };

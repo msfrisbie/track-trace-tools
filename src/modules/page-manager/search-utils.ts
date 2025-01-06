@@ -349,7 +349,7 @@ export function generateSearchResultMetadata(
     primaryTextualDescriptor = "Item";
     secondaryTextualDescriptor = partialResult.item.ProductCategoryName;
     isActive = true;
-    uniqueMetrcGridId = UniqueMetrcGridId.ITEMS_GRID;
+    uniqueMetrcGridId = UniqueMetrcGridId.ITEMS;
     path = `/industry/${partialResult.item.LicenseNumber}/admin/items`;
     colorClassName = "gray";
     primaryField = "Name";
@@ -386,7 +386,7 @@ export function generateSearchResultMetadata(
     primaryStatusTextualDescriptor = "Active";
     primaryTextualDescriptor = "Strain";
     isActive = true;
-    uniqueMetrcGridId = UniqueMetrcGridId.STRAIN_GRID;
+    uniqueMetrcGridId = UniqueMetrcGridId.STRAINS;
     path = `/industry/${partialResult.strain.LicenseNumber}/admin/strains`;
     colorClassName = "gray";
     primaryField = "Name";
@@ -489,8 +489,6 @@ export function generateScoreFromMatch({
 
   return score;
 }
-
-function getTabs() {}
 
 export function getActiveUniqueMetrcGridIdOrNull(): UniqueMetrcGridId | null {
   const pageHasTabs = !!document.querySelector(`li[data-grid-selector]`);

@@ -410,14 +410,14 @@ export const searchModule = {
               primaryDataLoader.onDemandItemSearch(onDemandSearchParams),
             params: { queryString, itemState: ItemState.ACTIVE },
             key: "item",
-            uniqueMetrcGridId: UniqueMetrcGridId.ITEMS_GRID,
+            uniqueMetrcGridId: UniqueMetrcGridId.ITEMS,
           } as SearchConfigEntry<ItemSearchParams, IIndexedItemData>,
           {
             loader: (onDemandSearchParams) =>
               primaryDataLoader.onDemandStrainSearch(onDemandSearchParams),
             params: { queryString, strainState: StrainState.ACTIVE },
             key: "strain",
-            uniqueMetrcGridId: UniqueMetrcGridId.STRAIN_GRID,
+            uniqueMetrcGridId: UniqueMetrcGridId.STRAINS,
           } as SearchConfigEntry<StrainSearchParams, IIndexedStrainData>,
         ];
 
