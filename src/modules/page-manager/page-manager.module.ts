@@ -13,7 +13,7 @@ import { MutationType } from "@/mutation-types";
 import store from "@/store/page-overlay/index";
 import { MetrcTableActions } from "@/store/page-overlay/modules/metrc-table/consts";
 import { debugLogFactory } from "@/utils/debug";
-import _ from "lodash-es";
+import _, { debounce } from "lodash-es";
 import { timer } from "rxjs";
 import { v4 as uuidv4 } from "uuid";
 import { analyticsManager } from "../analytics-manager.module";
@@ -274,9 +274,8 @@ class PageManager implements IAtomicService {
   }
 
   setEventHandlers() {
-    // This only informs us of how the users are spending time on Metrc
-    // without disclosing sensitive information.
-    document.addEventListener("click", (e: MouseEvent) => {
+    // Debounced click handler
+    const handleClick = debounce((e: MouseEvent) => {
       if (e.target && e.isTrusted) {
         if (this.textBuffer.length > 0) {
           this.flushTextBuffer();
@@ -317,9 +316,10 @@ class PageManager implements IAtomicService {
       store.dispatch(`metrcTable/${MetrcTableActions.UPDATE_PRINTABLE_TAG_POOL}`);
 
       mirrorMetrcTableState();
-    });
+    }, 300); // Adjust debounce delay as needed
 
-    document.addEventListener("keyup", (e: KeyboardEvent) => {
+    // Debounced keyup handler
+    const handleKeyUp = debounce((e: KeyboardEvent) => {
       this.textBuffer += e.key;
 
       if (this.textBuffer.length > 500) {
@@ -335,15 +335,23 @@ class PageManager implements IAtomicService {
           modalCloseButton.click();
         }
       }
-    });
+    }, 300); // Adjust debounce delay as needed
 
-    document.addEventListener("input", (e: Event) => {
+    // Debounced input handler
+    const handleInput = debounce(() => {
       mirrorMetrcTableState();
-    });
+    }, 300);
 
-    document.addEventListener("change", (e: Event) => {
+    // Debounced change handler
+    const handleChange = debounce(() => {
       mirrorMetrcTableState();
-    });
+    }, 300);
+
+    // Attach event listeners
+    document.addEventListener("click", handleClick);
+    document.addEventListener("keyup", handleKeyUp);
+    document.addEventListener("input", handleInput);
+    document.addEventListener("change", handleChange);
   }
 
   async modifyPageAtInterval() {

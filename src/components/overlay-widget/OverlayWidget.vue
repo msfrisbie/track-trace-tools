@@ -5,13 +5,8 @@
     <div id="foo-container" ref="popovercontainer" style="position: absolute">
       <div id="context-menu-popover" style="width: 1px; height: 1px"></div>
 
-      <b-popover
-        target="context-menu-popover"
-        triggers="manual"
-        placement="right"
-        container="foo-container"
-        variant="outline-primary"
-      >
+      <b-popover target="context-menu-popover" triggers="manual" placement="right" container="foo-container"
+        variant="outline-primary">
         <template #title v-if="contextMenuEvent">
           <div class="text-center text-normal text-lg">
             <template v-if="contextMenuEvent.packageTag">
@@ -28,10 +23,7 @@
       </b-popover>
     </div>
 
-    <b-toaster
-      style="position: fixed; left: 1rem; bottom: 1rem; z-index: 1000000"
-      name="ttt-toaster"
-    />
+    <b-toaster style="position: fixed; left: 1rem; bottom: 1rem; z-index: 1000000" name="ttt-toaster" />
 
     <div style="position: absolute">
       <debug-modal ref="debugmodal" />
@@ -57,10 +49,11 @@ import { toastManager } from '@/modules/toast-manager.module';
 import store from '@/store/page-overlay/index';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { BootstrapVue } from 'bootstrap-vue';
+import { debounce } from "lodash-es";
 import { debounceTime } from 'rxjs/operators';
 import Vue from 'vue';
-import VueTypeaheadBootstrap from 'vue-typeahead-bootstrap';
 import Fragment from 'vue-fragment';
+import VueTypeaheadBootstrap from 'vue-typeahead-bootstrap';
 
 Vue.use(BootstrapVue);
 Vue.use(Fragment.Plugin);
@@ -89,44 +82,65 @@ export default Vue.extend({
       this.$bvToast.toast(text, options);
     });
 
-    document.addEventListener('keydown', (e) => {
-      // œ is the macOS alt value
-      if (e.altKey && (e.key === 'œ' || e.key === 'q')) {
-        (this.$refs.documentmodal as any)?.hide();
-        (this.$refs.promomodal as any)?.hide();
-        (this.$refs.buildermodal as any)?.hide();
-        (this.$refs.debugmodal as any)?.toggle();
-        (this.$refs.searchmodal as any)?.hide();
-      } else if (e.altKey && (e.key === '†' || e.key === 't')) {
-        // † is the macOS alt value
-        (this.$refs.documentmodal as any)?.hide();
-        (this.$refs.debugmodal as any)?.hide();
-        (this.$refs.promomodal as any)?.hide();
-        (this.$refs.buildermodal as any)?.toggle();
-        (this.$refs.searchmodal as any)?.hide();
-      } else if (e.altKey && (e.key === 'ß' || e.key === 's')) {
-        // ß is the macOS alt value
-        (this.$refs.documentmodal as any)?.hide();
-        (this.$refs.debugmodal as any)?.hide();
-        (this.$refs.promomodal as any)?.hide();
-        (this.$refs.buildermodal as any)?.hide();
-        (this.$refs.searchmodal as any)?.toggle();
-      }
-    });
-
-    document.addEventListener('click', () => {
+    // Define handlers
+    const handleEscapeKey = () => {
       modalManager.dispatchContextMenuEvent(null);
-    });
+    };
 
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape') {
-        modalManager.dispatchContextMenuEvent(null);
+    const handleAltKeyCombos = (e: KeyboardEvent) => {
+      switch (e.key) {
+        case "œ": // macOS alt value for 'q'
+        case "q":
+          (this.$refs.documentmodal as any)?.hide();
+          (this.$refs.promomodal as any)?.hide();
+          (this.$refs.buildermodal as any)?.hide();
+          (this.$refs.debugmodal as any)?.toggle();
+          (this.$refs.searchmodal as any)?.hide();
+          break;
+
+        case "†": // macOS alt value for 't'
+        case "t":
+          (this.$refs.documentmodal as any)?.hide();
+          (this.$refs.debugmodal as any)?.hide();
+          (this.$refs.promomodal as any)?.hide();
+          (this.$refs.buildermodal as any)?.toggle();
+          (this.$refs.searchmodal as any)?.hide();
+          break;
+
+        case "ß": // macOS alt value for 's'
+        case "s":
+          (this.$refs.documentmodal as any)?.hide();
+          (this.$refs.debugmodal as any)?.hide();
+          (this.$refs.promomodal as any)?.hide();
+          (this.$refs.buildermodal as any)?.hide();
+          (this.$refs.searchmodal as any)?.toggle();
+          break;
+
+        default:
+          // Handle other keys if needed
+          break;
       }
-    });
+    };
 
-    // document.addEventListener("scroll", () => {
-    //   modalManager.dispatchContextMenuEvent(null);
-    // });
+    // Combined keydown handler
+    const keydownHandler = debounce((e) => {
+      if (e.key === "Escape") {
+        handleEscapeKey();
+        return;
+      }
+
+      if (e.altKey) {
+        handleAltKeyCombos(e);
+      }
+    }, 150); // Adjust debounce delay as needed
+
+    const clickHandler = debounce(() => {
+      modalManager.dispatchContextMenuEvent(null);
+    }, 150); // Adjust debounce delay as needed
+
+    // Assign handlers
+    document.addEventListener("keydown", keydownHandler);
+    document.addEventListener("click", clickHandler);
 
     modalManager
       .hoverMenu$()

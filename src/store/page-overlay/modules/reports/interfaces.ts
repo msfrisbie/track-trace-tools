@@ -1,6 +1,7 @@
 import {
   IAuthState,
   IHarvestFilter,
+  IIncomingTransferData,
   IIndexedHarvestData,
   IIndexedPackageData,
   IIndexedPlantBatchData,
@@ -8,6 +9,7 @@ import {
   IIndexedRichIncomingTransferData,
   IIndexedRichOutgoingTransferData,
   IIndexedTagData,
+  IOutgoingTransferData,
   IPackageFilter,
   IPlantBatchFilter,
   IPlantFilter,
@@ -129,6 +131,12 @@ export interface IReportConfig {
     // plantBatchFilter: IPlantBatchFilter;
     // harvestFilter: IHarvestFilter;
     employeeQuery: string;
+    fields: null;
+  };
+  [ReportType.SCAN_SHEET]?: {
+    incomingTransfers: IIncomingTransferData[];
+    outgoingTransfers: IOutgoingTransferData[];
+    rejectedTransfers: IIncomingTransferData[];
     fields: null;
   };
   [ReportType.SINGLE_TRANSFER]?: {
@@ -273,6 +281,10 @@ export interface IReportData {
     transferHubTransfers: IIndexedRichOutgoingTransferData[];
   };
   [ReportType.INCOMING_TRANSFER_MANIFESTS]?: {
+    richIncomingTransfers?: IIndexedRichIncomingTransferData[];
+  };
+  [ReportType.SCAN_SHEET]?: {
+    richOutgoingTransfers?: IIndexedRichOutgoingTransferData[];
     richIncomingTransfers?: IIndexedRichIncomingTransferData[];
   };
   [ReportType.INCOMING_MANIFEST_INVENTORY]?: {

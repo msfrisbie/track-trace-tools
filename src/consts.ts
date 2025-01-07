@@ -553,6 +553,7 @@ export enum SheetTitles {
   EMPLOYEE_SAMPLES = "Distributed Employee Samples",
   RECEIVED_SAMPLES = "Received Samples",
   EMPLOYEE_AUDIT = "Employee Audit",
+  SCAN_SHEET = "Scan Sheet",
   HARVEST_PACKAGES = "Harvest Packages",
   POINT_IN_TIME_INVENTORY = "Point In Time Inventory",
   SINGLE_TRANSFER = "Transfer",
@@ -564,21 +565,6 @@ export const SHEETS_API_MESSAGE_TIMEOUT_MS = 3 * 180000 + 60000;
 
 export const PRINT_DATA_KEY = "PRINT_DATA_KEY";
 export const OPTIONS_REDIRECT_KEY = "OPTIONS_REDIRECT_KEY";
-
-export enum PackageSearchFilterKeys {
-  LABEL = "label",
-  SOURCE_HARVEST_NAMES = "sourceHarvestNames",
-  SOURCE_PACKAGE_LABELS = "sourcePackageLabels",
-  PRODUCTION_BATCH_NUMBER = "productionBatchNumber",
-  SOURCE_PRODUCTION_BATCH_NUMBERS = "sourceProductionBatchNumbers",
-  ITEM_NAME = "itemName",
-  ITEM_STRAIN_NAME = "itemStrainName",
-  ITEM_PRODUCT_CATEGORY_NAME = "itemProductCategoryName",
-  LOCATION_NAME = "locationName",
-  MANIFEST_NUMBER = "manifestNumber",
-  DESTINATION_FACILITY_NAME = "destinationFacilityName",
-  DESTINATION_LICENSE_NUMBER = "destinationLicenseNumber",
-}
 
 export enum NativeMetrcGridId {
   PLANT_BATCHES = "plantbatches-grid",
