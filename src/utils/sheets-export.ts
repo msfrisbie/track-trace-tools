@@ -45,7 +45,8 @@ import {
 /* eslint-disable-next-line */
 import { t3RequestManager } from "@/modules/t3-request-manager.module";
 import { generateHtmlTag } from "./html";
-import { downloadXlsxFile } from "./xlsx";
+import { downloadXlsxFile, emailXlsxFile } from "./xlsx";
+import { createScanSheetSpreadsheetOrError } from "./reports/scan-sheet-report";
 
 export async function readSpreadsheet({
   spreadsheetId,
@@ -481,39 +482,14 @@ export async function createXlsxOrError({
       downloadXlsxFile({ xlsxFile });
       break;
     case "EMAIL":
-      const response = await t3RequestManager.generateAndEmailReport({
-        xlsxFile,
-        extraHtml,
-        email: store.state.settings.email,
-      });
-
-      if (response.status !== 200) {
-        toastManager.openToast(`Failed to send generated report to ${store.state.settings.email}`, {
-          title: "Report Error",
-          autoHideDelay: 5000,
-          variant: "danger",
-          appendToast: true,
-          toaster: "ttt-toaster",
-          solid: true,
-        });
-      } else {
-        toastManager.openToast(`Successfully sent report to ${store.state.settings.email}`, {
-          title: "Report Success",
-          autoHideDelay: 5000,
-          variant: "success",
-          appendToast: true,
-          toaster: "ttt-toaster",
-          solid: true,
-        });
-      }
-
+      emailXlsxFile({ xlsxFile, extraHtml });
       break;
     default:
       throw new Error(`Invalid file delivery format: ${reportConfig.fileDeliveryFormat}`);
   }
 }
 
-export async function createSpreadsheetOrError({
+export async function createGoogleDocsSpreadsheetOrError({
   reportData,
   reportConfig,
 }: {
@@ -547,6 +523,13 @@ export async function createSpreadsheetOrError({
 
   if (reportConfig[ReportType.EMPLOYEE_SAMPLES]) {
     return createEmployeeSamplesSpreadsheetOrError({
+      reportData,
+      reportConfig,
+    });
+  }
+
+  if (reportConfig[ReportType.SCAN_SHEET]) {
+    return createScanSheetSpreadsheetOrError({
       reportData,
       reportConfig,
     });
@@ -881,6 +864,15 @@ export async function createScanSheetOrError(
   );
 
   const sheetId = 0;
+  const matchColumn = {
+    index: 2,
+    identifier: "C",
+  };
+
+  const inputColumn = {
+    index: 3,
+    identifier: "D",
+  };
 
   const formattingRequests = [
     addRowsRequestFactory({ sheetId, length: manifest.length + 2 }),
@@ -893,55 +885,55 @@ export async function createScanSheetOrError(
     conditionalFormattingRequestFactory({
       sheetId,
       range: {
-        startColumnIndex: 2,
-        endColumnIndex: 3,
+        startColumnIndex: matchColumn.index,
+        endColumnIndex: matchColumn.index + 1,
         startRowIndex: 1,
       },
-      customFormula: "=COUNTIF(C$2:D,C2)=2",
+      customFormula: `=COUNTIF(${matchColumn.identifier}$2:${inputColumn.identifier},${matchColumn.identifier}2)=2`,
       backgroundColor: { green: 1 },
     }),
-    // Second column: turn red if tag appeas exactly once anywhere
+    // Second column: turn red if tag appears exactly once anywhere
     conditionalFormattingRequestFactory({
       sheetId,
       range: {
-        startColumnIndex: 2,
-        endColumnIndex: 3,
+        startColumnIndex: matchColumn.index,
+        endColumnIndex: matchColumn.index + 1,
         startRowIndex: 1,
       },
-      customFormula: "=COUNTIF(C$2:D,C2)=1",
+      customFormula: `=COUNTIF(${matchColumn.identifier}$2:${inputColumn.identifier},${matchColumn.identifier}2)=1`,
       backgroundColor: { red: 1 },
     }),
-    // FIrst column: turn yellow if tag appears more than twice anywhere
+    // First column: turn yellow if tag appears more than twice anywhere
     conditionalFormattingRequestFactory({
       sheetId,
       range: {
-        startColumnIndex: 2,
-        endColumnIndex: 3,
+        startColumnIndex: matchColumn.index,
+        endColumnIndex: matchColumn.index + 1,
         startRowIndex: 1,
       },
-      customFormula: "=COUNTIF($C$2:D,C2)>2",
+      customFormula: `=COUNTIF($${matchColumn.identifier}$2:${inputColumn.identifier},${matchColumn.identifier}2)>2`,
       backgroundColor: { red: 1, green: 1 },
     }),
     // Second column: turn yellow if tag appears more than once in the 2nd column
     conditionalFormattingRequestFactory({
       sheetId,
       range: {
-        startColumnIndex: 3,
-        endColumnIndex: 4,
+        startColumnIndex: inputColumn.index,
+        endColumnIndex: inputColumn.index + 1,
         startRowIndex: 1,
       },
-      customFormula: "=COUNTIF($D$2:D,D2)>1",
+      customFormula: `=COUNTIF($${inputColumn.identifier}$2:${inputColumn.identifier},${inputColumn.identifier}2)>1`,
       backgroundColor: { red: 1, green: 1 },
     }),
-    // Second column: turn prange if tag appears exactly once anywhere
+    // Second column: turn orange if tag appears exactly once anywhere
     conditionalFormattingRequestFactory({
       sheetId,
       range: {
-        startColumnIndex: 3,
-        endColumnIndex: 4,
+        startColumnIndex: inputColumn.index,
+        endColumnIndex: inputColumn.index + 1,
         startRowIndex: 1,
       },
-      customFormula: "=COUNTIF($C$2:D,D2)=1",
+      customFormula: `=COUNTIF($${matchColumn.identifier}$2:${inputColumn.identifier},${inputColumn.identifier}2)=1`,
       backgroundColor: { red: 1, green: 0.64 },
     }),
   ];

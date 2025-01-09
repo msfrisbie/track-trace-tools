@@ -227,6 +227,8 @@
 
         <incoming-manifest-inventory-report></incoming-manifest-inventory-report>
 
+        <scan-sheet-report></scan-sheet-report>
+
         <point-in-time-inventory-report
           :pointInTimeInventoryFormFilters="pointInTimeInventoryFormFilters"></point-in-time-inventory-report>
 
@@ -1001,6 +1003,7 @@ import {
   addPointInTimeInventoryReport,
   pointInTimeInventoryFormFiltersFactory,
 } from "@/utils/reports/point-in-time-inventory-report";
+import { addScanSheetReport, scanSheetFormFiltersFactory } from "@/utils/reports/scan-sheet-report";
 import {
   addStragglerPackagesReport,
   stragglerPackagesFormFiltersFactory,
@@ -1020,6 +1023,7 @@ import IncomingManifestInventoryReport from "./reports/IncomingManifestInventory
 import MaturePlantsQuickviewReport from "./reports/MaturePlantsQuickviewReport.vue";
 import PackagesQuickviewReport from "./reports/PackagesQuickviewReport.vue";
 import PointInTimeInventoryReport from "./reports/PointInTimeInventoryReport.vue";
+import ScanSheetReport from "./reports/ScanSheetReport.vue";
 
 export default Vue.extend({
   name: "GoogleSheetsExport",
@@ -1036,6 +1040,7 @@ export default Vue.extend({
     MaturePlantsQuickviewReport,
     PointInTimeInventoryReport,
     IncomingManifestInventoryReport,
+    ScanSheetReport,
     FieldSelect,
   },
   computed: {
@@ -1119,6 +1124,7 @@ export default Vue.extend({
       outgoingTransfersFormFilters: outgoingTransfersFormFiltersFactory(),
       transferHubTransfersFormFilters: transferHubTransfersFormFiltersFactory(),
       incomingTransferManifestsFormFilters: incomingTransferManifestsFormFiltersFactory(),
+      scanSheetFormFilters: scanSheetFormFiltersFactory(),
       outgoingTransferManifestsFormFilters: outgoingTransferManifestsFormFiltersFactory(),
       pointInTimeInventoryFormFilters: pointInTimeInventoryFormFiltersFactory(),
       // transferHubTransferManifestsFormFilters: transferHubTransferManifestsFormFiltersFactory(),
@@ -1372,6 +1378,18 @@ export default Vue.extend({
       ) {
         addIncomingManifestInventoryReport({
           reportConfig
+        });
+      }
+
+      if (
+        this.selectedReports.find(
+          (report: IReportOption) => report.value === ReportType.SCAN_SHEET
+        )
+      ) {
+        addScanSheetReport({
+          reportConfig,
+          scanSheetFormFilters: this.scanSheetFormFilters,
+          fields: []
         });
       }
 

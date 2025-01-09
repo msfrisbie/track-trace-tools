@@ -1,4 +1,11 @@
-import { IIndexedTransferData, IPluginState, ISpreadsheet } from "@/interfaces";
+import { AnalyticsEvent } from "@/consts";
+import {
+  IIndexedIncomingTransferData,
+  IIndexedOutgoingTransferData,
+  IIndexedTransferData,
+  IPluginState,
+  ISpreadsheet,
+} from "@/interfaces";
 import { analyticsManager } from "@/modules/analytics-manager.module";
 import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
 import { todayIsodate } from "@/utils/date";
@@ -24,6 +31,7 @@ import { maybeLoadOutgoingTransfersReportData } from "@/utils/reports/outgoing-t
 import { maybeLoadPackageReportData } from "@/utils/reports/package-report";
 import { maybeLoadPackagesQuickviewReportData } from "@/utils/reports/packages-quickview-report";
 import { maybeLoadPointInTimeInventoryReportData } from "@/utils/reports/point-in-time-inventory-report";
+import { maybeLoadScanSheetReportData } from "@/utils/reports/scan-sheet-report";
 import { maybeLoadSingleTransferReportData } from "@/utils/reports/single-transfer-report";
 import { maybeLoadStragglerPackageReportData } from "@/utils/reports/straggler-package-report";
 import { maybeLoadTagsReportData } from "@/utils/reports/tags-report";
@@ -31,13 +39,12 @@ import { maybeLoadTransferHubTransfersReportData } from "@/utils/reports/transfe
 import { getSimpleSpreadsheet } from "@/utils/sheets";
 import {
   createCsvOrError,
-  createSpreadsheetOrError,
+  createGoogleDocsSpreadsheetOrError,
   createXlsxOrError,
 } from "@/utils/sheets-export";
 import _ from "lodash-es";
 import { v4 as uuidv4 } from "uuid";
 import { ActionContext } from "vuex";
-import { AnalyticsEvent } from "@/consts";
 import { ClientGetters } from "../client/consts";
 import {
   IStatusMessage,
@@ -73,9 +80,16 @@ const inMemoryState = {
       estimatedArrivalDateGt: todayIsodate(),
       shouldFilterEstimatedArrivalDateLt: false,
       shouldFilterEstimatedArrivalDateGt: false,
-      useExactTransferIds: [],
       allTransfers: [],
       selectedTransfers: [],
+    },
+    [ReportType.SCAN_SHEET]: {
+      allIncomingTransfers: [],
+      selectedIncomingTransfers: [],
+      allOutgoingTransfers: [],
+      selectedOutgoingTransfers: [],
+      allRejectedTransfers: [],
+      selectedRejectedTransfers: [],
     },
   },
 };
@@ -124,12 +138,29 @@ export const reportsModule = {
     },
     [ReportsMutations.UPDATE_DYNAMIC_REPORT_DATA](
       state: IReportsState,
-      data: {
-        incomingTransfers: IIndexedTransferData[];
-      }
+      data: Partial<{
+        incomingTransfers: IIndexedIncomingTransferData[];
+        outgoingTransfers: IIndexedOutgoingTransferData[];
+        rejectedTransfers: IIndexedIncomingTransferData[];
+      }>
     ) {
-      state.reportFormFilters[ReportType.INCOMING_MANIFEST_INVENTORY].allTransfers =
-        data.incomingTransfers;
+      if (data.incomingTransfers) {
+        state.reportFormFilters[ReportType.INCOMING_MANIFEST_INVENTORY].allTransfers =
+          data.incomingTransfers;
+
+        state.reportFormFilters[ReportType.SCAN_SHEET].allIncomingTransfers =
+          data.incomingTransfers;
+      }
+
+      if (data.outgoingTransfers) {
+        state.reportFormFilters[ReportType.SCAN_SHEET].allOutgoingTransfers =
+          data.outgoingTransfers;
+      }
+
+      if (data.rejectedTransfers) {
+        state.reportFormFilters[ReportType.SCAN_SHEET].allRejectedTransfers =
+          data.rejectedTransfers;
+      }
     },
     [ReportsMutations.SET_STATUS](
       state: IReportsState,
@@ -588,6 +619,26 @@ export const reportsModule = {
             incomingTransfers,
           });
           break;
+        case ReportType.SCAN_SHEET: {
+          let incomingTransfers: IIndexedIncomingTransferData[] = [];
+          let outgoingTransfers: IIndexedOutgoingTransferData[] = [];
+          let rejectedTransfers: IIndexedIncomingTransferData[] = [];
+          try {
+            [incomingTransfers, outgoingTransfers, rejectedTransfers] = await Promise.all([
+              primaryDataLoader.incomingTransfers(),
+              primaryDataLoader.outgoingTransfers(),
+              primaryDataLoader.rejectedTransfers(),
+            ]);
+
+            ctx.commit(ReportsMutations.UPDATE_DYNAMIC_REPORT_DATA, {
+              incomingTransfers,
+              outgoingTransfers,
+              rejectedTransfers,
+            });
+          } catch (error) {
+            // Handle errors here
+          }
+        }
       }
     },
     [ReportsActions.RESET]: async (ctx: ActionContext<IReportsState, IPluginState>, data: any) => {
@@ -667,6 +718,7 @@ export const reportsModule = {
         await maybeLoadEmployeeAuditReportData({ ctx, reportData, reportConfig });
         await maybeLoadPointInTimeInventoryReportData({ ctx, reportData, reportConfig });
         await maybeLoadSingleTransferReportData({ ctx, reportData, reportConfig });
+        await maybeLoadScanSheetReportData({ ctx, reportData, reportConfig });
 
         ctx.commit(ReportsMutations.SET_STATUS, {
           statusMessage: { text: "Generating report...", level: "success" },
@@ -679,7 +731,7 @@ export const reportsModule = {
         } else if (reportConfig.exportFormat === "XLSX") {
           await createXlsxOrError({ reportData, reportConfig });
         } else {
-          const spreadsheet: ISpreadsheet = await createSpreadsheetOrError({
+          const spreadsheet: ISpreadsheet = await createGoogleDocsSpreadsheetOrError({
             reportData,
             reportConfig,
           });

@@ -34,6 +34,7 @@ import { extractMaturePlantPropertyFromDimension } from "./mature-plants-quickvi
 import { extractPackagePropertyFromDimension } from "./packages-quickview-report";
 import { extractPointInTimeInventoryData } from "./point-in-time-inventory-report";
 import { extractSingleTransferData } from "./single-transfer-report";
+import { extractScanSheetData } from "./scan-sheet-report";
 
 export function reportCatalogFactory(): IReportOption[] {
   return store.getters[`reports/${ReportsGetters.REPORT_OPTIONS}`];
@@ -499,6 +500,12 @@ export function extractFlattenedData({
           reportType,
           reportConfig,
           reportData,
+        });
+      case ReportType.SCAN_SHEET:
+        return extractScanSheetData({
+          reportType,
+          reportConfig,
+          reportData
         });
       default:
         throw new Error(`Bad reportType ${reportType}`);

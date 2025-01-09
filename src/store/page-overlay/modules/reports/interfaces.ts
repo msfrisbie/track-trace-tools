@@ -1,15 +1,15 @@
 import {
   IAuthState,
   IHarvestFilter,
-  IIncomingTransferData,
   IIndexedHarvestData,
+  IIndexedIncomingTransferData,
+  IIndexedOutgoingTransferData,
   IIndexedPackageData,
   IIndexedPlantBatchData,
   IIndexedPlantData,
   IIndexedRichIncomingTransferData,
   IIndexedRichOutgoingTransferData,
   IIndexedTagData,
-  IOutgoingTransferData,
   IPackageFilter,
   IPlantBatchFilter,
   IPlantFilter,
@@ -26,6 +26,7 @@ import {
   IPackageDateMetadata,
   InventoryStrategy,
 } from "@/utils/reports/point-in-time-inventory-report";
+import { IScanSheetReportFormFilters } from "@/utils/reports/scan-sheet-report";
 import { CustomTransformer, IStatusMessage, ReportStatus, ReportType } from "./consts";
 
 export interface IReportsState {
@@ -47,6 +48,7 @@ export interface IReportsState {
   };
   reportFormFilters: {
     [ReportType.INCOMING_MANIFEST_INVENTORY]: IIncomingManifestInventoryReportFormFilters;
+    [ReportType.SCAN_SHEET]: IScanSheetReportFormFilters;
   };
 }
 
@@ -134,9 +136,9 @@ export interface IReportConfig {
     fields: null;
   };
   [ReportType.SCAN_SHEET]?: {
-    incomingTransfers: IIncomingTransferData[];
-    outgoingTransfers: IOutgoingTransferData[];
-    rejectedTransfers: IIncomingTransferData[];
+    incomingTransferFilter: ITransferFilter;
+    outgoingTransferFilter: ITransferFilter;
+    rejectedTransferFilter: ITransferFilter;
     fields: null;
   };
   [ReportType.SINGLE_TRANSFER]?: {
@@ -284,8 +286,9 @@ export interface IReportData {
     richIncomingTransfers?: IIndexedRichIncomingTransferData[];
   };
   [ReportType.SCAN_SHEET]?: {
-    richOutgoingTransfers?: IIndexedRichOutgoingTransferData[];
     richIncomingTransfers?: IIndexedRichIncomingTransferData[];
+    richOutgoingTransfers?: IIndexedRichOutgoingTransferData[];
+    richRejectedTransfers?: IIndexedRichIncomingTransferData[];
   };
   [ReportType.INCOMING_MANIFEST_INVENTORY]?: {
     extraHtml?: string;

@@ -1,27 +1,27 @@
 import {
   IDestinationPackageData,
-  IIncomingTransferData,
+  IIndexedIncomingTransferData,
   IIndexedPackageData,
+  IIndexedRichIncomingTransferData,
   IIndexedRichOutgoingTransferData,
   IIndexedTagData,
   IIndexedTransferData,
   ILicenseFormFilters,
   IPluginState,
-  IRichIncomingTransferData
 } from "@/interfaces";
 import { DataLoader, getDataLoaderByLicense } from "@/modules/data-loader/data-loader.module";
 import { ReportsMutations, ReportType } from "@/store/page-overlay/modules/reports/consts";
 import {
   IReportConfig,
   IReportData,
-  IReportsState
+  IReportsState,
 } from "@/store/page-overlay/modules/reports/interfaces";
 import { ActionContext } from "vuex";
 import {
   getIsoDateFromOffset,
   isCustodiedDatetimeOrError,
   isoDatetimeToLocalDate,
-  todayIsodate
+  todayIsodate,
 } from "../date";
 import { extractInitialPackageQuantityAndUnitFromHistoryOrError } from "../history";
 import { getItemNameOrError, getLabelOrError } from "../package";
@@ -151,7 +151,7 @@ export async function maybeLoadPointInTimeInventoryReportData({
   // All packages that are currently in the custody of the parent license
   let allPackages: IIndexedPackageData[] = [];
   let allUsedTags: IIndexedTagData[] = [];
-  let allInactiveIncomingTransfers: IIncomingTransferData[] = [];
+  let allInactiveIncomingTransfers: IIndexedIncomingTransferData[] = [];
   let allInactiveOutgoingTransfers: IIndexedTransferData[] = [];
 
   for (const license of pointInTimeInventoryReportConfig.licenses) {
@@ -245,7 +245,7 @@ export async function maybeLoadPointInTimeInventoryReportData({
       : null;
   }
 
-  const filteredIncomingTransfers: IRichIncomingTransferData[] =
+  const filteredIncomingTransfers: IIndexedRichIncomingTransferData[] =
     allInactiveIncomingTransfers.filter((transfer) => {
       if (transfer.LastModified < minDate) {
         return false;
@@ -264,7 +264,7 @@ export async function maybeLoadPointInTimeInventoryReportData({
 
     promises.push(
       dataLoader.destinationPackages(incomingTransfer.DeliveryId).then((packages) => {
-        incomingTransfer.packages = packages;
+        incomingTransfer.incomingPackages = packages;
 
         // Backwards compat - possibly redundant
         return packages;
@@ -332,7 +332,7 @@ export async function maybeLoadPointInTimeInventoryReportData({
   await Promise.allSettled(promises);
 
   for (const incomingTransfer of filteredIncomingTransfers) {
-    for (const pkg of incomingTransfer.packages!) {
+    for (const pkg of incomingTransfer.incomingPackages!) {
       const label = getLabelOrError(pkg);
       if (!packageMetadataMap.has(label)) {
         packageMetadataMap.set(label, metadataFactory());
@@ -513,7 +513,14 @@ export function extractPointInTimeInventoryData({
 }): any[][] {
   const matrix: any[][] = [];
 
-  const headers = ["Current License", "Tag", "Item", "Quantity (estimated)", "Unit of Measure", "Note"];
+  const headers = [
+    "Current License",
+    "Tag",
+    "Item",
+    "Quantity (estimated)",
+    "Unit of Measure",
+    "Note",
+  ];
 
   if (reportConfig[ReportType.POINT_IN_TIME_INVENTORY]!.showDebugColumns) {
     headers.push(

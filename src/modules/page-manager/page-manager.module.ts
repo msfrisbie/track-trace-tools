@@ -316,7 +316,7 @@ class PageManager implements IAtomicService {
       store.dispatch(`metrcTable/${MetrcTableActions.UPDATE_PRINTABLE_TAG_POOL}`);
 
       mirrorMetrcTableState();
-    }, 300); // Adjust debounce delay as needed
+    }, 150); // Adjust debounce delay as needed
 
     // Debounced keyup handler
     const handleKeyUp = debounce((e: KeyboardEvent) => {
@@ -335,17 +335,17 @@ class PageManager implements IAtomicService {
           modalCloseButton.click();
         }
       }
-    }, 300); // Adjust debounce delay as needed
+    }, 150); // Adjust debounce delay as needed
 
     // Debounced input handler
     const handleInput = debounce(() => {
       mirrorMetrcTableState();
-    }, 300);
+    }, 150);
 
     // Debounced change handler
     const handleChange = debounce(() => {
       mirrorMetrcTableState();
-    }, 300);
+    }, 150);
 
     // Attach event listeners
     document.addEventListener("click", handleClick);

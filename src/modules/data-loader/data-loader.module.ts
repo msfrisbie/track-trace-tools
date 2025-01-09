@@ -27,7 +27,9 @@ import {
   IHarvestHistoryData,
   IIndexedDestinationPackageData,
   IIndexedHarvestData,
+  IIndexedIncomingTransferData,
   IIndexedItemData,
+  IIndexedOutgoingTransferData,
   IIndexedPackageData,
   IIndexedPlantBatchData,
   IIndexedPlantData,
@@ -2346,7 +2348,7 @@ export class DataLoader implements IAtomicService {
     return harvests;
   }
 
-  async incomingTransfers(resetCache: boolean = false): Promise<IIndexedTransferData[]> {
+  async incomingTransfers(resetCache: boolean = false): Promise<IIndexedIncomingTransferData[]> {
     if (resetCache) {
       this._incomingTransfers = null;
     }
@@ -2358,7 +2360,7 @@ export class DataLoader implements IAtomicService {
         );
 
         try {
-          const incomingTransfers: IIndexedTransferData[] = (
+          const incomingTransfers: IIndexedIncomingTransferData[] = (
             await this.loadIncomingTransfers()
           ).map((transfer) => ({
             ...transfer,
@@ -2382,7 +2384,7 @@ export class DataLoader implements IAtomicService {
     return this._incomingTransfers;
   }
 
-  async incomingInactiveTransfers(resetCache: boolean = false): Promise<IIndexedTransferData[]> {
+  async incomingInactiveTransfers(resetCache: boolean = false): Promise<IIndexedIncomingTransferData[]> {
     if (resetCache) {
       this._incomingInactiveTransfers = null;
     }
@@ -2394,7 +2396,7 @@ export class DataLoader implements IAtomicService {
         );
 
         try {
-          const incomingTransfers: IIndexedTransferData[] = (
+          const incomingTransfers: IIndexedIncomingTransferData[] = (
             await this.loadIncomingInactiveTransfers()
           ).map((transfer) => ({
             ...transfer,
@@ -2418,14 +2420,14 @@ export class DataLoader implements IAtomicService {
     return this._incomingInactiveTransfers;
   }
 
-  async incomingTransfer(manifestNumber: string): Promise<IIndexedTransferData> {
+  async incomingTransfer(manifestNumber: string): Promise<IIndexedIncomingTransferData> {
     return new Promise(async (resolve, reject) => {
       const subscription = timer(DATA_LOAD_FETCH_TIMEOUT_MS).subscribe(() =>
         reject("Transfer fetch timed out")
       );
 
       try {
-        const transferData: IIndexedTransferData = {
+        const transferData: IIndexedIncomingTransferData = {
           ...(await this.loadIncomingTransfer(manifestNumber)),
           TransferState: TransferState.INCOMING,
           TagMatcher: "",
@@ -2441,14 +2443,14 @@ export class DataLoader implements IAtomicService {
     });
   }
 
-  async incomingInactiveTransfer(manifestNumber: string): Promise<IIndexedTransferData> {
+  async incomingInactiveTransfer(manifestNumber: string): Promise<IIndexedIncomingTransferData> {
     return new Promise(async (resolve, reject) => {
       const subscription = timer(DATA_LOAD_FETCH_TIMEOUT_MS).subscribe(() =>
         reject("Incoming inactive transfer fetch timed out")
       );
 
       try {
-        const transferData: IIndexedTransferData = {
+        const transferData: IIndexedIncomingTransferData = {
           ...(await this.loadIncomingInactiveTransfer(manifestNumber)),
           TransferState: TransferState.INCOMING_INACTIVE,
           TagMatcher: "",
@@ -2464,7 +2466,7 @@ export class DataLoader implements IAtomicService {
     });
   }
 
-  async outgoingTransfers(resetCache: boolean = false): Promise<IIndexedTransferData[]> {
+  async outgoingTransfers(resetCache: boolean = false): Promise<IIndexedOutgoingTransferData[]> {
     if (resetCache) {
       this._outgoingTransfers = null;
     }
@@ -2476,7 +2478,7 @@ export class DataLoader implements IAtomicService {
         );
 
         try {
-          const outgoingTransfers: IIndexedTransferData[] = (
+          const outgoingTransfers: IIndexedOutgoingTransferData[] = (
             await this.loadOutgoingTransfers()
           ).map((transfer) => ({
             ...transfer,
@@ -2500,7 +2502,7 @@ export class DataLoader implements IAtomicService {
     return this._outgoingTransfers;
   }
 
-  async outgoingInactiveTransfers(resetCache: boolean = false): Promise<IIndexedTransferData[]> {
+  async outgoingInactiveTransfers(resetCache: boolean = false): Promise<IIndexedOutgoingTransferData[]> {
     if (resetCache) {
       this._outgoingInactiveTransfers = null;
     }
@@ -2512,7 +2514,7 @@ export class DataLoader implements IAtomicService {
         );
 
         try {
-          const outgoingTransfers: IIndexedTransferData[] = (
+          const outgoingTransfers: IIndexedOutgoingTransferData[] = (
             await this.loadOutgoingInactiveTransfers()
           ).map((transfer) => ({
             ...transfer,
@@ -2536,14 +2538,14 @@ export class DataLoader implements IAtomicService {
     return this._outgoingInactiveTransfers;
   }
 
-  async outgoingTransfer(manifestNumber: string): Promise<IIndexedTransferData> {
+  async outgoingTransfer(manifestNumber: string): Promise<IIndexedOutgoingTransferData> {
     return new Promise(async (resolve, reject) => {
       const subscription = timer(DATA_LOAD_FETCH_TIMEOUT_MS).subscribe(() =>
         reject("Transfer fetch timed out")
       );
 
       try {
-        const transferData: IIndexedTransferData = {
+        const transferData: IIndexedOutgoingTransferData = {
           ...(await this.loadOutgoingTransfer(manifestNumber)),
           TransferState: TransferState.OUTGOING,
           TagMatcher: "",
@@ -2559,14 +2561,14 @@ export class DataLoader implements IAtomicService {
     });
   }
 
-  async outgoingInactiveTransfer(manifestNumber: string): Promise<IIndexedTransferData> {
+  async outgoingInactiveTransfer(manifestNumber: string): Promise<IIndexedOutgoingTransferData> {
     return new Promise(async (resolve, reject) => {
       const subscription = timer(DATA_LOAD_FETCH_TIMEOUT_MS).subscribe(() =>
         reject("Outgoing inactive transfer fetch timed out")
       );
 
       try {
-        const transferData: IIndexedTransferData = {
+        const transferData: IIndexedOutgoingTransferData = {
           ...(await this.loadOutgoingInactiveTransfer(manifestNumber)),
           TransferState: TransferState.OUTGOING_INACTIVE,
           TagMatcher: "",
@@ -2582,7 +2584,7 @@ export class DataLoader implements IAtomicService {
     });
   }
 
-  async rejectedTransfers(resetCache: boolean = false): Promise<IIndexedTransferData[]> {
+  async rejectedTransfers(resetCache: boolean = false): Promise<IIndexedIncomingTransferData[]> {
     if (resetCache) {
       this._rejectedTransfers = null;
     }
@@ -2594,7 +2596,7 @@ export class DataLoader implements IAtomicService {
         );
 
         try {
-          const rejectedTransfers: IIndexedTransferData[] = (
+          const rejectedTransfers: IIndexedIncomingTransferData[] = (
             await this.loadRejectedTransfers()
           ).map((transfer) => ({
             ...transfer,
@@ -2618,14 +2620,14 @@ export class DataLoader implements IAtomicService {
     return this._rejectedTransfers;
   }
 
-  async rejectedTransfer(manifestNumber: string): Promise<IIndexedTransferData> {
+  async rejectedTransfer(manifestNumber: string): Promise<IIndexedIncomingTransferData> {
     return new Promise(async (resolve, reject) => {
       const subscription = timer(DATA_LOAD_FETCH_TIMEOUT_MS).subscribe(() =>
         reject("Transfer fetch timed out")
       );
 
       try {
-        const transferData: IIndexedTransferData = {
+        const transferData: IIndexedIncomingTransferData = {
           ...(await this.loadRejectedTransfer(manifestNumber)),
           TransferState: TransferState.REJECTED,
           TagMatcher: "",

@@ -957,18 +957,6 @@ export interface ITransferData {
   VehicleModel: string;
 }
 
-export interface IOutgoingTransferData extends IIndexedTransferData {
-  DeliveryId: 0;
-  DeliveryPackageCount: 0;
-  DeliveryReceivedPackageCount: 0;
-}
-
-export interface IIncomingTransferData extends IIndexedTransferData {}
-
-export interface IRichIncomingTransferData extends IIncomingTransferData {
-  packages?: IIndexedDestinationPackageData[];
-}
-
 export interface IVehicleData {
   Id: number;
   Make: string;
@@ -995,6 +983,33 @@ export interface IIndexedTransferData extends ITransferData {
   LicenseNumber: string;
   TagMatcher: string;
   history?: ITransferHistoryData[];
+}
+
+export interface IIndexedOutgoingTransferData extends IIndexedTransferData {}
+
+export interface IIndexedIncomingTransferData extends IIndexedTransferData {}
+
+/**
+ * The transfer format is gnarly. There are a lot of field overlaps
+ * between incoming/outgoing transfer, destination, and transporter
+ *
+ * Incoming transfers:
+ *   Single transporter
+ *   Multiple packages per transporter
+ *
+ * Outgoing transfers:
+ *   Multiple destinations
+ *   Multiple packages per destination
+ *
+ * This wrap them up into
+ */
+export interface IIndexedRichOutgoingTransferData extends IIndexedOutgoingTransferData {
+  outgoingDestinations?: IRichDestinationData[];
+}
+
+export interface IIndexedRichIncomingTransferData extends IIndexedIncomingTransferData {
+  incomingTransporters?: ITransporterData[];
+  incomingPackages?: IIndexedDestinationPackageData[];
 }
 
 export interface ITransporterData {
@@ -1061,29 +1076,6 @@ export interface ITransferTransporterDetails {
 export interface IRichDestinationData extends IDestinationData {
   transporters?: ITransporterData[];
   packages?: IIndexedDestinationPackageData[];
-}
-
-/**
- * The transfer format is gnarly. There are a lot of field overlaps
- * between incoming/outgoing transfer, destination, and transporter
- *
- * Incoming transfers:
- *   Single transporter
- *   Multiple packages per transporter
- *
- * Outgoing transfers:
- *   Multiple destinations
- *   Multiple packages per destination
- *
- * This wrap them up into
- */
-export interface IIndexedRichOutgoingTransferData extends IIndexedTransferData {
-  outgoingDestinations?: IRichDestinationData[];
-}
-
-export interface IIndexedRichIncomingTransferData extends IIndexedTransferData {
-  incomingTransporters?: ITransporterData[];
-  incomingPackages?: IIndexedDestinationPackageData[];
 }
 
 export interface IIndexedTagData extends ITagData {

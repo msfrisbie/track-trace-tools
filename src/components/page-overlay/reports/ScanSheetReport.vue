@@ -1,0 +1,101 @@
+<template>
+    <div v-if="selectedReports.find(
+        (report) => report.value === ReportType.SCAN_SHEET
+    )
+    " class="overflow-visible rounded border border-gray-300 p-2 flex flex-col items-stretch gap-2">
+        <div class="font-semibold text-white ttt-purple-bg p-2 -m-2">
+            Scan Sheet
+        </div>
+        <hr />
+        <div class="flex flex-col items-stretch">
+            <b-form-group label="Incoming Transfers:">
+                <b-form-checkbox-group class="flex flex-col"
+                    v-model="reportState.reportFormFilters[ReportType.SCAN_SHEET].selectedIncomingTransfers"
+                    :options="incomingTransferOptions"></b-form-checkbox-group>
+            </b-form-group>
+            <b-form-group label="Outgoing Transfers:">
+                <b-form-checkbox-group class="flex flex-col"
+                    v-model="reportState.reportFormFilters[ReportType.SCAN_SHEET].selectedOutgoingTransfers"
+                    :options="outgoingTransferOptions"></b-form-checkbox-group>
+            </b-form-group>
+            <b-form-group label="Incoming Transfers:">
+                <b-form-checkbox-group class="flex flex-col"
+                    v-model="reportState.reportFormFilters[ReportType.SCAN_SHEET].selectedRejectedTransfers"
+                    :options="rejectedTransferOptions"></b-form-checkbox-group>
+            </b-form-group>
+        </div>
+    </div>
+</template>
+
+<script lang="ts">
+import { IIndexedRichIncomingTransferData, IIndexedRichOutgoingTransferData, IPluginState } from "@/interfaces";
+import router from "@/router/index";
+import store from "@/store/page-overlay/index";
+import { ClientGetters } from "@/store/page-overlay/modules/client/consts";
+import { ExampleActions, ExampleGetters } from "@/store/page-overlay/modules/example/consts";
+import { ReportType, ReportsActions } from "@/store/page-overlay/modules/reports/consts";
+import Vue from "vue";
+import { mapActions, mapGetters, mapState } from "vuex";
+
+export default Vue.extend({
+    name: "ScanSheetReport",
+    store,
+    router,
+    props: {
+    },
+    components: {
+    },
+    computed: {
+        ...mapState<IPluginState>({
+            authState: (state: IPluginState) => state.pluginAuth.authState,
+            selectedReports: (state: IPluginState) => state.reports.selectedReports,
+            selectedFields: (state: IPluginState) => state.reports.selectedFields,
+            reportState: (state: IPluginState) => state.reports,
+        }),
+        ...mapGetters({
+            exampleGetter: `example/${ExampleGetters.EXAMPLE_GETTER}`,
+            hasT3plus: `client/${ClientGetters.T3PLUS}`,
+        }),
+        incomingTransferOptions(): { text: string, value: IIndexedRichIncomingTransferData }[] {
+            return store.state.reports.reportFormFilters[ReportType.SCAN_SHEET]!.allIncomingTransfers.map(
+                (x: IIndexedRichIncomingTransferData) => ({
+                    text: `${x.ManifestNumber} -- ${x.ShipperFacilityName} (${x.PackageCount} packages)`,
+                    value: x
+                }));
+        },
+        outgoingTransferOptions(): { text: string, value: IIndexedRichOutgoingTransferData }[] {
+            return store.state.reports.reportFormFilters[ReportType.SCAN_SHEET]!.allOutgoingTransfers.map(
+                (x: IIndexedRichOutgoingTransferData) => ({
+                    text: `${x.ManifestNumber} -- ${x.outgoingDestinations![0].RecipientFacilityName} (${x.PackageCount} packages)`,
+                    value: x
+                }));
+        },
+        rejectedTransferOptions(): { text: string, value: IIndexedRichIncomingTransferData }[] {
+            return store.state.reports.reportFormFilters[ReportType.SCAN_SHEET]!.allRejectedTransfers.map(
+                (x: IIndexedRichIncomingTransferData) => ({
+                    text: `${x.ManifestNumber} -- ${x.ShipperFacilityName} (${x.PackageCount} packages)`,
+                    value: x
+                }));
+        }
+    },
+    data() {
+        return {
+            ReportType,
+        };
+    },
+    methods: {
+        ...mapActions({
+            exampleAction: `example/${ExampleActions.EXAMPLE_ACTION}`,
+            updateDynamicReportData: `reports/${ReportsActions.UPDATE_DYNAMIC_REPORT_DATA}`,
+        }),
+    },
+    async created() { },
+    async mounted() {
+        this.updateDynamicReportData({
+            reportType: ReportType.SCAN_SHEET,
+        });
+    },
+});
+</script>
+
+<style type="text/scss" lang="scss" scoped></style>
