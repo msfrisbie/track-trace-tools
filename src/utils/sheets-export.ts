@@ -11,7 +11,6 @@ import {
   IXlsxFile,
 } from "@/interfaces";
 import { messageBus } from "@/modules/message-bus.module";
-import { toastManager } from "@/modules/toast-manager.module";
 import store from "@/store/page-overlay/index";
 import { ReportType, ReportsMutations } from "@/store/page-overlay/modules/reports/consts";
 import {
@@ -26,13 +25,13 @@ import { createCogsTrackerSpreadsheetOrError } from "./reports/cogs-tracker-repo
 import { createCogsV2SpreadsheetOrError } from "./reports/cogs-v2-report";
 import { createEmployeeSamplesSpreadsheetOrError } from "./reports/employee-samples-report";
 import {
+  eligibleReportTypes,
   extractFlattenedData,
   getCsvFilename,
+  getExcelSpreadsheetName,
+  getGoogleSpreadsheetName,
   getSheetTitle,
-  getSpreadsheetName,
   reportCatalogFactory,
-  // reportCatalogFactory,
-  shouldGenerateReport,
 } from "./reports/reports-shared";
 import {
   addRowsRequestFactory,
@@ -43,10 +42,9 @@ import {
   styleTopRowRequestFactory,
 } from "./sheets";
 /* eslint-disable-next-line */
-import { t3RequestManager } from "@/modules/t3-request-manager.module";
 import { generateHtmlTag } from "./html";
+import { createSingleGoogleDocScanSheetSpreadsheetOrError } from "./reports/scan-sheet-report";
 import { downloadXlsxFile, emailXlsxFile } from "./xlsx";
-import { createScanSheetSpreadsheetOrError } from "./reports/scan-sheet-report";
 
 export async function readSpreadsheet({
   spreadsheetId,
@@ -312,16 +310,14 @@ export async function createCsvOrError({
   const flattenedCache = new Map<ReportType, any[]>();
 
   // Check that inputs are well-formed
-  const ELIGIBLE_REPORT_TYPES: ReportType[] = reportCatalogFactory()
-    .filter((x) => x.value && x.enabled)
-    .map((x) => x.value as ReportType)
-    .filter((reportType) => shouldGenerateReport({ reportType, reportConfig, reportData }));
+  const ELIGIBLE_REPORT_TYPES: ReportType[] = eligibleReportTypes({ reportConfig, reportData });
 
   for (const reportType of ELIGIBLE_REPORT_TYPES) {
     const filename = getCsvFilename({
       reportType,
       license: store.state.pluginAuth?.authState?.license,
       reportConfig,
+      reportData,
     });
 
     let data: any[][] = extractFlattenedData({
@@ -366,14 +362,12 @@ export async function createXlsxOrError({
   const flattenedCache = new Map<ReportType, any[]>();
 
   // Check that inputs are well-formed
-  const ELIGIBLE_REPORT_TYPES: ReportType[] = reportCatalogFactory()
-    .filter((x) => x.value && x.enabled)
-    .map((x) => x.value as ReportType)
-    .filter((reportType) => shouldGenerateReport({ reportType, reportConfig, reportData }));
+  const ELIGIBLE_REPORT_TYPES: ReportType[] = eligibleReportTypes({ reportConfig, reportData });
 
   const xlsxFile: IXlsxFile = {
-    filename: getSpreadsheetName({
+    filename: getExcelSpreadsheetName({
       reportConfig,
+      reportData,
     }),
     sheets: [],
   };
@@ -384,6 +378,7 @@ export async function createXlsxOrError({
     const sheetName = getSheetTitle({
       reportType,
       reportConfig,
+      reportData,
     });
 
     let data: any[][] = extractFlattenedData({
@@ -399,10 +394,17 @@ export async function createXlsxOrError({
       data = [fields.map((fieldData) => fieldData.readableName), ...data];
     }
 
-    let options;
+    const options: { table: boolean; scan_sheet: boolean } = {
+      table: false,
+      scan_sheet: false,
+    };
 
     if (reportType === ReportType.INCOMING_MANIFEST_INVENTORY) {
-      options = { table: true };
+      options.table = true;
+    }
+
+    if (reportType === ReportType.SCAN_SHEET) {
+      options.scan_sheet = true;
     }
 
     xlsxFile.sheets.push({
@@ -529,7 +531,7 @@ export async function createGoogleDocsSpreadsheetOrError({
   }
 
   if (reportConfig[ReportType.SCAN_SHEET]) {
-    return createScanSheetSpreadsheetOrError({
+    return createSingleGoogleDocScanSheetSpreadsheetOrError({
       reportData,
       reportConfig,
     });
@@ -541,10 +543,7 @@ export async function createGoogleDocsSpreadsheetOrError({
   // Check that inputs are well-formed
   //
 
-  const ELIGIBLE_REPORT_TYPES: ReportType[] = reportCatalogFactory()
-    .filter((x) => x.value && x.enabled)
-    .map((x) => x.value as ReportType)
-    .filter((reportType) => shouldGenerateReport({ reportType, reportConfig, reportData }));
+  const ELIGIBLE_REPORT_TYPES: ReportType[] = eligibleReportTypes({ reportConfig, reportData });
 
   //
   // Generate Sheets
@@ -552,7 +551,9 @@ export async function createGoogleDocsSpreadsheetOrError({
 
   const sheetTitles: string[] = [
     SheetTitles.OVERVIEW,
-    ...ELIGIBLE_REPORT_TYPES.map((reportType) => getSheetTitle({ reportType, reportConfig })),
+    ...ELIGIBLE_REPORT_TYPES.map((reportType) =>
+      getSheetTitle({ reportType, reportConfig, reportData })
+    ),
   ];
 
   const response: {
@@ -563,8 +564,9 @@ export async function createGoogleDocsSpreadsheetOrError({
   } = await messageBus.sendMessageToBackground(
     MessageType.CREATE_SPREADSHEET,
     {
-      title: getSpreadsheetName({
+      title: getGoogleSpreadsheetName({
         reportConfig,
+        reportData,
       }),
       sheetTitles,
     },
@@ -597,7 +599,9 @@ export async function createGoogleDocsSpreadsheetOrError({
   ];
 
   for (const reportType of ELIGIBLE_REPORT_TYPES) {
-    const sheetId: number = sheetTitles.indexOf(getSheetTitle({ reportType, reportConfig }));
+    const sheetId: number = sheetTitles.indexOf(
+      getSheetTitle({ reportType, reportConfig, reportData })
+    );
     const length = Math.max(
       extractFlattenedData({
         flattenedCache,
@@ -637,7 +641,7 @@ export async function createGoogleDocsSpreadsheetOrError({
 
     await writeDataSheet({
       spreadsheetId: response.data.result.spreadsheetId,
-      spreadsheetTitle: getSheetTitle({ reportType, reportConfig }),
+      spreadsheetTitle: getSheetTitle({ reportType, reportConfig, reportData }),
       fields: reportConfig[reportType]?.fields as IFieldData[],
       data: extractFlattenedData({
         flattenedCache,
@@ -661,12 +665,13 @@ export async function createGoogleDocsSpreadsheetOrError({
   for (const reportType of ELIGIBLE_REPORT_TYPES) {
     summaryList.push([
       `=HYPERLINK("#gid=${sheetTitles.indexOf(
-        getSheetTitle({ reportType, reportConfig })
+        getSheetTitle({ reportType, reportConfig, reportData })
       )}","${getSheetTitle({
         reportType,
         reportConfig,
+        reportData,
       })}")`,
-      `=COUNTA('${getSheetTitle({ reportType, reportConfig })}'!A2:A)`,
+      `=COUNTA('${getSheetTitle({ reportType, reportConfig, reportData })}'!A2:A)`,
       // `=COUNTIF('${SheetTitles.PACKAGES}'!C2:C, "ACTIVE")`,
     ]);
   }
@@ -701,7 +706,7 @@ export async function createGoogleDocsSpreadsheetOrError({
     resizeRequests = [
       ...resizeRequests,
       autoResizeDimensionsRequestFactory({
-        sheetId: sheetTitles.indexOf(getSheetTitle({ reportType, reportConfig })),
+        sheetId: sheetTitles.indexOf(getSheetTitle({ reportType, reportConfig, reportData })),
       }),
     ];
   }
@@ -730,7 +735,7 @@ export async function createGoogleDocsSpreadsheetOrError({
     shrinkFontRequests = [
       ...shrinkFontRequests,
       shrinkFontRequestFactory({
-        sheetId: sheetTitles.indexOf(getSheetTitle({ reportType, reportConfig })),
+        sheetId: sheetTitles.indexOf(getSheetTitle({ reportType, reportConfig, reportData })),
       }),
     ];
   }

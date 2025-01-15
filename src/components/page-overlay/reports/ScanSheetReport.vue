@@ -12,16 +12,25 @@
                 <b-form-checkbox-group class="flex flex-col"
                     v-model="reportState.reportFormFilters[ReportType.SCAN_SHEET].selectedIncomingTransfers"
                     :options="incomingTransferOptions"></b-form-checkbox-group>
+                <template v-if="reportState.reportFormFilters[ReportType.SCAN_SHEET].allIncomingTransfers.length === 0">
+                    <p class="italic text-gray-500">0 incoming transfers found for this license</p>
+                </template>
             </b-form-group>
             <b-form-group label="Outgoing Transfers:">
                 <b-form-checkbox-group class="flex flex-col"
                     v-model="reportState.reportFormFilters[ReportType.SCAN_SHEET].selectedOutgoingTransfers"
                     :options="outgoingTransferOptions"></b-form-checkbox-group>
+                <template v-if="reportState.reportFormFilters[ReportType.SCAN_SHEET].allOutgoingTransfers.length === 0">
+                    <p class="italic text-gray-500">0 outgoing transfers found for this license</p>
+                </template>
             </b-form-group>
-            <b-form-group label="Incoming Transfers:">
+            <b-form-group label="Rejected Transfers:">
                 <b-form-checkbox-group class="flex flex-col"
                     v-model="reportState.reportFormFilters[ReportType.SCAN_SHEET].selectedRejectedTransfers"
                     :options="rejectedTransferOptions"></b-form-checkbox-group>
+                <template v-if="reportState.reportFormFilters[ReportType.SCAN_SHEET].allRejectedTransfers.length === 0">
+                    <p class="italic text-gray-500">0 rejected transfers found for this license</p>
+                </template>
             </b-form-group>
         </div>
     </div>
@@ -66,7 +75,7 @@ export default Vue.extend({
         outgoingTransferOptions(): { text: string, value: IIndexedRichOutgoingTransferData }[] {
             return store.state.reports.reportFormFilters[ReportType.SCAN_SHEET]!.allOutgoingTransfers.map(
                 (x: IIndexedRichOutgoingTransferData) => ({
-                    text: `${x.ManifestNumber} -- ${x.outgoingDestinations![0].RecipientFacilityName} (${x.PackageCount} packages)`,
+                    text: `${x.ManifestNumber} -- ${x.RecipientFacilityName} (${x.PackageCount} packages)`,
                     value: x
                 }));
         },

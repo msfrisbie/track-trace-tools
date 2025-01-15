@@ -80,6 +80,20 @@ export async function maybeLoadScanSheetReportData({
   reportConfig: IReportConfig;
 }) {
   const transferManifestConfig = reportConfig[ReportType.SCAN_SHEET];
+
+  if (!transferManifestConfig) {
+    return;
+  }
+
+  if (
+    transferManifestConfig!.incomingTransferFilter!.idMatches!.length +
+      transferManifestConfig!.outgoingTransferFilter!.idMatches!.length +
+      transferManifestConfig!.rejectedTransferFilter!.idMatches!.length ===
+    0
+  ) {
+    throw new Error("Must select at least one transfer");
+  }
+
   ctx.commit(ReportsMutations.SET_STATUS, {
     statusMessage: { text: "Loading transfer manifest packages...", level: "success" },
   });
@@ -205,7 +219,7 @@ export function extractScanSheetData({
       for (const pkg of destination.packages!) {
         matrix.push([
           richOutgoingTransfer.LicenseNumber,
-          "REJECTED",
+          "OUTGOING",
           richOutgoingTransfer.ManifestNumber,
           `${richOutgoingTransfer.ShipperFacilityLicenseNumber} (${richOutgoingTransfer.ShipperFacilityLicenseNumber})`,
           `${destination.RecipientFacilityLicenseNumber} (${destination.RecipientFacilityName})`,
@@ -234,7 +248,7 @@ export function extractScanSheetData({
   return matrix;
 }
 
-export async function createScanSheetSpreadsheetOrError({
+export async function createSingleGoogleDocScanSheetSpreadsheetOrError({
   reportData,
   reportConfig,
 }: {
@@ -249,7 +263,7 @@ export async function createScanSheetSpreadsheetOrError({
     throw new Error("Missing scan sheet data");
   }
 
-  const SHEET_TITLE = `Scan Sheet (${totalTransferCount(reportData)} transfers)`;
+  const SHEET_TITLE = `Scan Sheet (${totalScanSheetTransferCount(reportData)} transfers)`;
 
   const response: {
     data: {
@@ -259,7 +273,7 @@ export async function createScanSheetSpreadsheetOrError({
   } = await messageBus.sendMessageToBackground(
     MessageType.CREATE_SPREADSHEET,
     {
-      title: `Scan Sheet (${totalTransferCount(reportData)} transfers)`,
+      title: `Scan Sheet (${totalScanSheetTransferCount(reportData)} transfers)`,
       sheetTitles: [SHEET_TITLE],
     },
     undefined,
@@ -289,7 +303,7 @@ export async function createScanSheetSpreadsheetOrError({
   };
 
   const formattingRequests = [
-    addRowsRequestFactory({ sheetId, length: totalPackageCount(reportData) + 2 }),
+    addRowsRequestFactory({ sheetId, length: totalScanSheetPackageCount(reportData) + 2 }),
     styleTopRowRequestFactory({ sheetId }),
     freezeTopRowRequestFactory({ sheetId }),
     autoResizeDimensionsRequestFactory({
@@ -366,7 +380,7 @@ export async function createScanSheetSpreadsheetOrError({
     MessageType.WRITE_SPREADSHEET_VALUES,
     {
       spreadsheetId: response.data.result.spreadsheetId,
-      range: `'${SHEET_TITLE}'!A${totalPackageCount(reportData) + 3}`,
+      range: `'${SHEET_TITLE}'!A${totalScanSheetPackageCount(reportData) + 3}`,
       values: [[`Created with Track & Trace Tools @ ${Date().toString()}`]],
     },
     undefined,
@@ -376,7 +390,7 @@ export async function createScanSheetSpreadsheetOrError({
   return response.data.result;
 }
 
-function totalTransferCount(reportData: IReportData): number {
+export function totalScanSheetTransferCount(reportData: IReportData): number {
   const scanSheetData = reportData[ReportType.SCAN_SHEET]!;
 
   return (
@@ -386,7 +400,7 @@ function totalTransferCount(reportData: IReportData): number {
   );
 }
 
-function totalPackageCount(reportData: IReportData): number {
+export function totalScanSheetPackageCount(reportData: IReportData): number {
   const scanSheetData = reportData[ReportType.SCAN_SHEET]!;
 
   let count = 0;

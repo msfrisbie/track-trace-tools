@@ -820,40 +820,46 @@
       <!-- End Column -->
       <div class="flex flex-col gap-4 items-stretch text-center">
         <template v-if="reportStatus === ReportStatus.INITIAL">
-          <b-button variant="primary" size="sm" @click="generateReports('GOOGLE_SHEETS', 'OPEN_LINK')"
-            :disabled="!enableGoogleSheetsGenerateButton">EXPORT TO GOOGLE SHEETS</b-button>
-          <template v-if="oAuthState === OAuthState.NOT_AUTHENTICATED">
-            <div class="text-sm">
-              <span class="ttt-purple underline cursor-pointer" @click="openOAuthPage()">Sign in</span>
-              to your Google account to export to Sheets.
-            </div>
-          </template>
+          <div class="flex flex-col gap-4 items-stretch text-center">
+            <b-button variant="primary" size="sm" @click="generateReports('GOOGLE_SHEETS', 'OPEN_LINK')"
+              :disabled="!enableGoogleSheetsGenerateButton">EXPORT TO GOOGLE SHEETS</b-button>
+            <template v-if="oAuthState === OAuthState.NOT_AUTHENTICATED">
+              <div class="text-sm">
+                <span class="ttt-purple underline cursor-pointer" @click="openOAuthPage()">Sign in</span>
+                to your Google account to export to Sheets.
+              </div>
+            </template>
+          </div>
 
-          <b-button variant="primary" size="sm" @click="generateReports('CSV', 'DOWNLOAD')"
-            :disabled="!enableCsvGenerateButton">EXPORT TO CSV</b-button>
-          <template v-if="!enableCsvGenerateButton && selectedReports.length > 0">
-            <div class="text-xs">The selected report(s) are not CSV compatible</div>
-          </template>
+          <div class="flex flex-col gap-4 items-stretch text-center">
+            <b-button variant="primary" size="sm" @click="generateReports('CSV', 'DOWNLOAD')"
+              :disabled="!enableCsvGenerateButton">EXPORT TO CSV</b-button>
+            <template v-if="!enableCsvGenerateButton && selectedReports.length > 0">
+              <div class="text-xs">The selected report(s) are not CSV compatible</div>
+            </template>
+          </div>
 
-          <b-button variant="primary" size="sm" @click="generateReports('XLSX', 'DOWNLOAD')"
-            :disabled="!enableXlsxGenerateButton">EXPORT TO XLSX</b-button>
+          <div class="flex flex-col gap-4 items-stretch text-center">
+            <b-button variant="primary" size="sm" @click="generateReports('XLSX', 'DOWNLOAD')"
+              :disabled="!enableXlsxGenerateButton">EXPORT TO XLSX</b-button>
 
-          <b-button v-if="settingsState.email.length" variant="primary" size="sm"
-            @click="generateReports('XLSX', 'EMAIL')" :disabled="!enableXlsxGenerateButton">EMAIL XLSX TO {{
-              settingsState.email }}</b-button>
+            <b-button v-if="settingsState.email.length" variant="primary" size="sm"
+              @click="generateReports('XLSX', 'EMAIL')" :disabled="!enableXlsxGenerateButton">EMAIL XLSX TO {{
+                settingsState.email }}</b-button>
 
-          <template v-if="!settingsState.email.length">
-            <div class="text-xs">
-              Enter your email in
-              <a class="text-purple-500 hover:text-purple-500 underline" href="#"
-                @click.stop="openRoute('/settings/all')">Settings</a>
-              to send XLSX reports via email
-            </div>
-          </template>
+            <template v-if="!settingsState.email.length">
+              <div class="text-xs">
+                Enter your email in
+                <a class="text-purple-500 hover:text-purple-500 underline" href="#"
+                  @click.stop="openRoute('/settings/all')">Settings</a>
+                to send XLSX reports via email
+              </div>
+            </template>
 
-          <template v-if="!enableXlsxGenerateButton && selectedReports.length > 0">
-            <div class="text-xs">The selected report(s) are not XLSX compatible</div>
-          </template>
+            <template v-if="!enableXlsxGenerateButton && selectedReports.length > 0">
+              <div class="text-xs">The selected report(s) are not XLSX compatible</div>
+            </template>
+          </div>
 
           <template v-if="selectedReports.length === 0">
             <div class="text-red-500 text-center">Select something to include in your report</div>
@@ -1072,18 +1078,30 @@ export default Vue.extend({
       },
     } as IComputedGetSet<IReportOption[]>,
     enableCsvGenerateButton(): boolean {
-      return (
-        this.selectedReports.length > 0 &&
-        this.selectedReports.filter((x: IReportOption) => x.usesFormulas || x.isMultiSheet)
-          .length === 0
-      );
+      if (this.selectedReports.length === 0) {
+        return false;
+      }
+
+      if (this.selectedReports.find((x: IReportOption) => x.usesSpreadsheetFormulas)) {
+        return false;
+      }
+
+      if (this.selectedReports.find((x: IReportOption) => x.requiresGoogleSheets)) {
+        return false;
+      }
+
+      return true;
     },
     enableXlsxGenerateButton(): boolean {
-      return (
-        this.selectedReports.length > 0 &&
-        // Multi-sheet is OK, but formulas are not yet supported
-        this.selectedReports.filter((x: IReportOption) => x.usesFormulas).length === 0
-      );
+      if (this.selectedReports.length === 0) {
+        return false;
+      }
+
+      if (this.selectedReports.find((x: IReportOption) => x.requiresGoogleSheets)) {
+        return false;
+      }
+
+      return true;
     },
     enableGoogleSheetsGenerateButton(): boolean {
       return (
@@ -1459,7 +1477,7 @@ export default Vue.extend({
   //     immediate: true,
   //     handler(newValue: IReportOption[], oldValue) {
   //       const singleonReportTypes: ReportType[] = reportCatalogFactory()
-  //         .filter((x: IReportOption) => x.isMultiSheet)
+  //         .filter((x: IReportOption) => x.requiresGoogleSheets)
   //         .map((x: IReportOption) => x.value) as ReportType[];
 
   //       for (const reportType of singleonReportTypes) {

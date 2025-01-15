@@ -33,8 +33,30 @@ import { extractImmaturePlantPropertyFromDimension } from "./immature-plants-qui
 import { extractMaturePlantPropertyFromDimension } from "./mature-plants-quickview-report";
 import { extractPackagePropertyFromDimension } from "./packages-quickview-report";
 import { extractPointInTimeInventoryData } from "./point-in-time-inventory-report";
+import { extractScanSheetData, totalScanSheetTransferCount } from "./scan-sheet-report";
 import { extractSingleTransferData } from "./single-transfer-report";
-import { extractScanSheetData } from "./scan-sheet-report";
+
+export function eligibleReportTypes({
+  reportConfig,
+  reportData,
+}: {
+  reportConfig: IReportConfig;
+  reportData: IReportData;
+}): ReportType[] {
+  return eligibleReportOptions({ reportConfig, reportData }).map((x) => x.value!);
+}
+
+export function eligibleReportOptions({
+  reportConfig,
+  reportData,
+}: {
+  reportConfig: IReportConfig;
+  reportData: IReportData;
+}): IReportOption[] {
+  return reportCatalogFactory()
+    .filter((x) => x.value && x.enabled)
+    .filter((x) => shouldGenerateReport({ reportType: x.value!, reportConfig, reportData }));
+}
 
 export function reportCatalogFactory(): IReportOption[] {
   return store.getters[`reports/${ReportsGetters.REPORT_OPTIONS}`];
@@ -97,7 +119,7 @@ export function extractNestedData({
     case ReportType.PACKAGES_QUICKVIEW:
       return reportData[reportType]!.packages;
     default:
-      throw new Error(`Bad reportType ${reportType}`);
+      throw new Error(`Bad reportType, failed to extract nested data for ${reportType}`);
   }
 }
 
@@ -505,10 +527,10 @@ export function extractFlattenedData({
         return extractScanSheetData({
           reportType,
           reportConfig,
-          reportData
+          reportData,
         });
       default:
-        throw new Error(`Bad reportType ${reportType}`);
+        throw new Error(`Bad reportType, failed to extract flattened data for ${reportType}`);
     }
   })();
 
@@ -526,32 +548,72 @@ export function getCsvFilename({
   reportType,
   license,
   reportConfig,
+  reportData,
 }: {
   reportType: ReportType;
   license: string;
   reportConfig: IReportConfig;
+  reportData: IReportData;
 }): string {
-  const sheetTitle = getSheetTitle({ reportType, reportConfig });
+  const sheetTitle = getSheetTitle({ reportType, reportConfig, reportData });
 
   const date = todayIsodate();
 
   return `${sheetTitle} [Generated ${date}]`;
 }
 
-export function getSpreadsheetName({ reportConfig }: { reportConfig: IReportConfig }): string {
+function getSpreadsheetName({
+  reportConfig,
+  reportData,
+}: {
+  reportConfig: IReportConfig;
+  reportData: IReportData;
+}): string {
   const date = todayIsodate();
 
-  const fileExtension: string = reportConfig.exportFormat === "XLSX" ? ".xlsx" : "";
+  const selectedReportOptions: IReportOption[] = [];
 
-  return `T3 Metrc Report [Generated ${date}]${fileExtension}`;
+  for (const eligibleReportOption of eligibleReportOptions({ reportConfig, reportData })) {
+    if (reportConfig[eligibleReportOption.value!]) {
+      selectedReportOptions.push(eligibleReportOption);
+    }
+  }
+
+  const spreadsheetName: string = `T3 - ${selectedReportOptions
+    .map((x) => x.text)
+    .join(",")} [Generated ${date}]`;
+
+  return spreadsheetName;
+}
+
+export function getExcelSpreadsheetName({
+  reportConfig,
+  reportData,
+}: {
+  reportConfig: IReportConfig;
+  reportData: IReportData;
+}): string {
+  return `${getSpreadsheetName({ reportConfig, reportData })}.xlsx`;
+}
+
+export function getGoogleSpreadsheetName({
+  reportConfig,
+  reportData,
+}: {
+  reportConfig: IReportConfig;
+  reportData: IReportData;
+}): string {
+  return getSpreadsheetName({ reportConfig, reportData });
 }
 
 export function getSheetTitle({
   reportType,
   reportConfig,
+  reportData,
 }: {
   reportType: ReportType;
   reportConfig: IReportConfig;
+  reportData: IReportData;
 }): string {
   let title: string;
 
@@ -620,8 +682,11 @@ export function getSheetTitle({
         reportConfig[ReportType.POINT_IN_TIME_INVENTORY]!.targetDate
       }`;
       break;
+    case ReportType.SCAN_SHEET:
+      title = `Scan Sheet (${totalScanSheetTransferCount(reportData)})`;
+      break;
     default:
-      throw new Error(`Bad reportType ${reportType}`);
+      throw new Error(`Bad reportType, failed to generate title for ${reportType}`);
   }
 
   const NO_LICENSE_TYPES = [

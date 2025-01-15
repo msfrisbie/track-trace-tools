@@ -2,8 +2,6 @@ import {
   IAuthState,
   IHarvestFilter,
   IIndexedHarvestData,
-  IIndexedIncomingTransferData,
-  IIndexedOutgoingTransferData,
   IIndexedPackageData,
   IIndexedPlantBatchData,
   IIndexedPlantData,
@@ -332,8 +330,8 @@ export interface IReportOption {
   visible: boolean;
   description: string;
   usesFieldTransformer: boolean;
-  usesFormulas: boolean;
-  isMultiSheet: boolean;
+  usesSpreadsheetFormulas: boolean;
+  requiresGoogleSheets: boolean;
   isCustom: boolean;
   isSpecialty: boolean;
   isCatalog: boolean;
