@@ -65,24 +65,36 @@ export default Vue.extend({
             exampleGetter: `example/${ExampleGetters.EXAMPLE_GETTER}`,
             hasT3plus: `client/${ClientGetters.T3PLUS}`,
         }),
-        incomingTransferOptions(): { text: string, value: IIndexedRichIncomingTransferData }[] {
+        incomingTransferOptions(): { html: string, value: IIndexedRichIncomingTransferData }[] {
             return store.state.reports.reportFormFilters[ReportType.SCAN_SHEET]!.allIncomingTransfers.map(
                 (x: IIndexedRichIncomingTransferData) => ({
-                    text: `${x.ManifestNumber} -- ${x.ShipperFacilityName} (${x.PackageCount} packages)`,
+                    html: `<b>${x.ManifestNumber} (${x.PackageCount} packages, ETA ${new Date(x.EstimatedArrivalDateTime).toLocaleString("en-US", {
+                        dateStyle: "medium",
+                        timeStyle: "short",
+                    })})</b><br />
+                    ${x.ShipperFacilityName} (${x.ShipperFacilityLicenseNumber})</span>`,
                     value: x
                 }));
         },
-        outgoingTransferOptions(): { text: string, value: IIndexedRichOutgoingTransferData }[] {
+        outgoingTransferOptions(): { html: string, value: IIndexedRichOutgoingTransferData }[] {
             return store.state.reports.reportFormFilters[ReportType.SCAN_SHEET]!.allOutgoingTransfers.map(
                 (x: IIndexedRichOutgoingTransferData) => ({
-                    text: `${x.ManifestNumber} -- ${x.RecipientFacilityName} (${x.PackageCount} packages)`,
+                    html: `<b>${x.ManifestNumber} (${x.PackageCount} packages, ETD ${new Date(x.EstimatedDepartureDateTime).toLocaleString("en-US", {
+                        dateStyle: "medium",
+                        timeStyle: "short",
+                    })})</b><br />
+                    ${x.RecipientFacilityName} (${x.RecipientFacilityLicenseNumber})</span>`,
                     value: x
                 }));
         },
-        rejectedTransferOptions(): { text: string, value: IIndexedRichIncomingTransferData }[] {
+        rejectedTransferOptions(): { html: string, value: IIndexedRichIncomingTransferData }[] {
             return store.state.reports.reportFormFilters[ReportType.SCAN_SHEET]!.allRejectedTransfers.map(
                 (x: IIndexedRichIncomingTransferData) => ({
-                    text: `${x.ManifestNumber} -- ${x.ShipperFacilityName} (${x.PackageCount} packages)`,
+                    html: `<b>${x.ManifestNumber} (${x.PackageCount} packages, ETA ${new Date(x.EstimatedArrivalDateTime).toLocaleString("en-US", {
+                        dateStyle: "medium",
+                        timeStyle: "short",
+                    })})</b><br />
+                    <span>${x.ShipperFacilityName} (${x.ShipperFacilityLicenseNumber})</span>`,
                     value: x
                 }));
         }

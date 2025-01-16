@@ -70,7 +70,7 @@
       </div>
     </b-button>
 
-    <b-button size="sm" variant="outline-primary" @click.stop.prevent="createScanSheet()" :disabled="!hasPlus">
+    <b-button size="sm" variant="outline-primary" @click.stop.prevent="addToScanSheet()" :disabled="!hasPlus">
       <div class="w-full grid grid-cols-3 gap-2" style="grid-template-columns: 2rem 1fr auto">
         <div class="aspect-square grid place-items-center">
           <font-awesome-icon icon="barcode" />
@@ -136,8 +136,8 @@ import store from "@/store/page-overlay/index";
 import { ExplorerActions } from "@/store/page-overlay/modules/explorer/consts";
 import { PackageHistoryActions } from "@/store/page-overlay/modules/package-history/consts";
 import { PluginAuthActions } from "@/store/page-overlay/modules/plugin-auth/consts";
-import { ReportType, ReportsActions } from "@/store/page-overlay/modules/reports/consts";
-import { IReportConfig } from "@/store/page-overlay/modules/reports/interfaces";
+import { ReportType, ReportsActions, ReportsGetters, ReportsMutations } from "@/store/page-overlay/modules/reports/consts";
+import { IReportConfig, IReportOption } from "@/store/page-overlay/modules/reports/interfaces";
 import { SearchActions } from "@/store/page-overlay/modules/search/consts";
 import { SplitPackageBuilderActions } from "@/store/page-overlay/modules/split-package-builder/consts";
 import { TransferBuilderActions } from "@/store/page-overlay/modules/transfer-builder/consts";
@@ -352,13 +352,94 @@ export default Vue.extend({
 
       this.dismiss();
     },
-    async createScanSheet() {
+    async createScanSheetDeprecated() {
       analyticsManager.track(AnalyticsEvent.CONTEXT_MENU_SELECT, { event: "createScanSheet" });
 
       await createScanSheet(
         parseInt(this.$props.transfer.ManifestNumber!, 10),
         this.$props.transfer.ManifestNumber.padStart(10, "0")
       );
+
+      this.dismiss();
+    },
+    async addToScanSheet() {
+      analyticsManager.track(AnalyticsEvent.CONTEXT_MENU_SELECT, { event: "addToScanSheet" });
+
+      // Enable scan report if not already enabled
+      if (!store.state.reports.selectedReports.find((x: IReportOption) => x.value === ReportType.SCAN_SHEET)) {
+        store.commit(`reports/${ReportsMutations.REPORTS_MUTATION}`, {
+          selectedReports: [...store.state.reports.selectedReports, store.getters[`reports/${ReportsGetters.REPORT_OPTIONS}`].find((x: IReportOption) => x.value === ReportType.SCAN_SHEET)]
+        });
+      }
+
+      // Load the transfers
+      await store.dispatch(`reports/${ReportsActions.UPDATE_DYNAMIC_REPORT_DATA}`, { reportType: ReportType.SCAN_SHEET });
+
+      // Select this transfer
+      const reportFormFilters = store.state.reports.reportFormFilters;
+
+      const transfer: IIndexedTransferData = this.$props.transfer;
+
+      switch (transfer.TransferState) {
+        case TransferState.INCOMING:
+          const incomingTransfer = reportFormFilters[ReportType.SCAN_SHEET]!.allIncomingTransfers.find(
+            (x) => x.ManifestNumber === transfer.ManifestNumber
+          );
+          if (
+            incomingTransfer &&
+            !reportFormFilters[ReportType.SCAN_SHEET]!.selectedIncomingTransfers.find(
+              (x) => x.Id === incomingTransfer.Id
+            )
+          ) {
+            reportFormFilters[ReportType.SCAN_SHEET]!.selectedIncomingTransfers.push(incomingTransfer);
+            store.commit(`reports/${ReportsMutations.REPORTS_MUTATION}`, {
+              reportFormFilters
+            });
+          }
+          break;
+
+        case TransferState.OUTGOING:
+          const outgoingTransfer = reportFormFilters[ReportType.SCAN_SHEET]!.allOutgoingTransfers.find(
+            (x) => x.ManifestNumber === transfer.ManifestNumber
+          );
+          if (
+            outgoingTransfer &&
+            !reportFormFilters[ReportType.SCAN_SHEET]!.selectedOutgoingTransfers.find(
+              (x) => x.Id === outgoingTransfer.Id
+            )
+          ) {
+            reportFormFilters[ReportType.SCAN_SHEET]!.selectedOutgoingTransfers.push(outgoingTransfer);
+            store.commit(`reports/${ReportsMutations.REPORTS_MUTATION}`, {
+              reportFormFilters
+            });
+          }
+          break;
+
+        case TransferState.REJECTED:
+          const rejectedTransfer = reportFormFilters[ReportType.SCAN_SHEET]!.allRejectedTransfers.find(
+            (x) => x.ManifestNumber === transfer.ManifestNumber
+          );
+          if (
+            rejectedTransfer &&
+            !reportFormFilters[ReportType.SCAN_SHEET]!.selectedRejectedTransfers.find(
+              (x) => x.Id === rejectedTransfer.Id
+            )
+          ) {
+            reportFormFilters[ReportType.SCAN_SHEET]!.selectedRejectedTransfers.push(rejectedTransfer);
+            store.commit(`reports/${ReportsMutations.REPORTS_MUTATION}`, {
+              reportFormFilters
+            });
+          }
+          break;
+
+        default:
+          console.error(`Unexpected TransferState: ${transfer.TransferState}`);
+          break;
+      }
+
+      modalManager.dispatchModalEvent(ModalType.BUILDER, ModalAction.OPEN, {
+        initialRoute: "/google-sheets-export",
+      });
 
       this.dismiss();
     },
