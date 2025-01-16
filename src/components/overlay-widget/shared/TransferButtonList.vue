@@ -70,7 +70,25 @@
       </div>
     </b-button>
 
-    <b-button size="sm" variant="outline-primary" @click.stop.prevent="addToScanSheet()" :disabled="!hasPlus">
+    <!-- V2 scan sheet, dumps to reports -->
+    <b-button size="sm" variant="outline-primary"
+      v-if="transfer && [TransferState.INCOMING, TransferState.OUTGOING, TransferState.REJECTED].includes(transfer.TransferState)"
+      @click.stop.prevent="addToScanSheet()" :disabled="!hasPlus">
+      <div class="w-full grid grid-cols-3 gap-2" style="grid-template-columns: 2rem 1fr auto">
+        <div class="aspect-square grid place-items-center">
+          <font-awesome-icon icon="barcode" />
+        </div>
+        <span>CREATE SCAN SHEET</span>
+        <div>
+          <b-badge variant="primary">T3+</b-badge>
+        </div>
+      </div>
+    </b-button>
+
+    <!-- Deprecated one-off -->
+    <b-button size="sm" variant="outline-primary"
+      v-if="transfer && ![TransferState.INCOMING, TransferState.OUTGOING, TransferState.REJECTED].includes(transfer.TransferState)"
+      @click.stop.prevent="createScanSheetDeprecated()" :disabled="!hasPlus">
       <div class="w-full grid grid-cols-3 gap-2" style="grid-template-columns: 2rem 1fr auto">
         <div class="aspect-square grid place-items-center">
           <font-awesome-icon icon="barcode" />
@@ -197,6 +215,7 @@ export default Vue.extend({
   },
   data() {
     return {
+      TransferState,
       transferMetadata: null,
     };
   },

@@ -149,7 +149,7 @@
 <script lang="ts">
 import PackageButtonList from "@/components/overlay-widget/shared/PackageButtonList.vue";
 import TransferButtonList from "@/components/overlay-widget/shared/TransferButtonList.vue";
-import { AnalyticsEvent } from "@/consts";
+import { AnalyticsEvent, TransferState } from "@/consts";
 import {
   IIndexedPackageData,
   IIndexedTransferData,
@@ -271,7 +271,8 @@ export default Vue.extend({
         this.$data.transfer = null;
 
         const handler = (transfer: IIndexedTransferData) => {
-          if (!this.$data.transfer) {
+          // For some reason, layover double-finds transfers. Override if necessary
+          if (!this.$data.transfer || this.$data.transfer.TransferState === TransferState.LAYOVER) {
             this.$data.transfer = transfer;
           }
         };

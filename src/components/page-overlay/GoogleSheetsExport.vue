@@ -821,7 +821,7 @@
       <div class="flex flex-col gap-4 items-stretch text-center">
         <template v-if="reportStatus === ReportStatus.INITIAL">
           <div class="flex flex-col gap-4 items-stretch text-center">
-            <b-button variant="primary" size="sm" @click="generateReports('GOOGLE_SHEETS', 'OPEN_LINK')"
+            <b-button variant="success" size="sm" @click="generateReports('GOOGLE_SHEETS', 'OPEN_LINK')"
               :disabled="!enableGoogleSheetsGenerateButton">EXPORT TO GOOGLE SHEETS</b-button>
             <template v-if="oAuthState === OAuthState.NOT_AUTHENTICATED">
               <div class="text-sm">
@@ -832,7 +832,7 @@
           </div>
 
           <div class="flex flex-col gap-4 items-stretch text-center">
-            <b-button variant="primary" size="sm" @click="generateReports('CSV', 'DOWNLOAD')"
+            <b-button variant="success" size="sm" @click="generateReports('CSV', 'DOWNLOAD')"
               :disabled="!enableCsvGenerateButton">EXPORT TO CSV</b-button>
             <template v-if="!enableCsvGenerateButton && selectedReports.length > 0">
               <div class="text-xs">The selected report(s) are not CSV compatible</div>
@@ -840,11 +840,11 @@
           </div>
 
           <div class="flex flex-col gap-4 items-stretch text-center">
-            <b-button variant="primary" size="sm" @click="generateReports('XLSX', 'DOWNLOAD')"
-              :disabled="!enableXlsxGenerateButton">EXPORT TO XLSX</b-button>
+            <b-button variant="success" size="sm" @click="generateReports('XLSX', 'DOWNLOAD')"
+              :disabled="!enableXlsxGenerateButton">EXPORT TO EXCEL</b-button>
 
-            <b-button v-if="settingsState.email.length" variant="primary" size="sm"
-              @click="generateReports('XLSX', 'EMAIL')" :disabled="!enableXlsxGenerateButton">EMAIL XLSX TO {{
+            <b-button v-if="settingsState.email.length" variant="success" size="sm"
+              @click="generateReports('XLSX', 'EMAIL')" :disabled="!enableXlsxGenerateButton">EMAIL EXCEL TO {{
                 settingsState.email }}</b-button>
 
             <template v-if="!settingsState.email.length">
