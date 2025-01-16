@@ -156,9 +156,12 @@ class PageManager implements IAtomicService {
     this.finishedGridInit = true;
 
     // Eagerly modify
-    timer(0, 2500).subscribe(() => this.modifyPageAtInterval());
+    timer(0, 10000).subscribe(() => this.modifyPageAtInterval());
 
-    const debouncedHandler = _.debounce(() => this.modifyPageOnDomChange(), 100, { leading: true });
+    const debouncedHandler = _.debounce(() => this.modifyPageOnDomChange(), 500, {
+      trailing: true,
+      maxWait: 1000,
+    });
 
     const observer = new MutationObserver(() => debouncedHandler());
 
@@ -189,27 +192,61 @@ class PageManager implements IAtomicService {
         window.history.replaceState({}, "T3 Metrc Demo", window.location.origin);
       }
 
-      // When holding alt in demo mode, mousemoves will scramble numbers
-      document.addEventListener("mousemove", (e) => {
-        if (!e.altKey || !e.target) {
-          return;
+      // Blur or scramble page text on demand
+      document.addEventListener("click", (event) => {
+        const element = event.target as HTMLElement | null;
+
+        // Ensure the target is a valid HTMLElement
+        if (!element) return;
+
+        // Scramble contained text if the Alt key is pressed
+        if (event.altKey) {
+          event.preventDefault();
+          event.stopPropagation();
+          const firstChild = element.firstChild;
+
+          // Check if the element has a single text node as its child
+          if (firstChild && firstChild.nodeType === Node.TEXT_NODE) {
+            const originalText = firstChild.nodeValue ?? "";
+            const scrambledText = this.scrambleText(originalText, { digits: true, letters: false });
+            firstChild.nodeValue = scrambledText;
+          }
         }
 
-        const element = e.target as HTMLElement;
-
-        if (element.childNodes.length === 1 && element.firstChild?.nodeType === 3) {
-          const txt = element.firstChild!.nodeValue!.split("");
-
-          for (const [idx, char] of txt.entries()) {
-            if (/\d/.test(char)) {
-              txt[idx] = Math.floor(Math.random() * 10).toString();
-            }
-          }
-
-          element.firstChild!.nodeValue = txt.join("");
+        // Toggle 'demo-blur' class if the Meta key is pressed
+        if (event.metaKey) {
+          event.preventDefault();
+          event.stopPropagation();
+          element.classList.toggle("demo-blur");
         }
       });
     }
+  }
+
+  // Utility function to scramble text
+  private scrambleText(
+    text: string,
+    options: { digits?: boolean; letters?: boolean } = {}
+  ): string {
+    const { digits = true, letters = false } = options;
+
+    return Array.from(text)
+      .map((char) => {
+        if (digits && /\d/.test(char)) {
+          // Replace digit with a random digit
+          return Math.floor(Math.random() * 10).toString();
+        }
+        if (letters && /[a-zA-Z]/.test(char)) {
+          // Replace letter with a random letter (case preserved)
+          const isUpperCase = char === char.toUpperCase();
+          const randomChar = String.fromCharCode(
+            Math.floor(Math.random() * 26) + (isUpperCase ? 65 : 97)
+          );
+          return randomChar;
+        }
+        return char; // Keep non-target characters as-is
+      })
+      .join("");
   }
 
   pauseFor(pauseMs: number) {

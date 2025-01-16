@@ -14,7 +14,7 @@ body.demo-mode {
     display: none;
   }
 
-  #body_content {
+  // #body_content {
     tbody td,
     div.k-pager-wrap,
     .demo-blur,
@@ -22,7 +22,12 @@ body.demo-mode {
       color: transparent !important;
       text-shadow: 0 0 8px rgba(0, 0, 0, 0.4);
     }
-  }
+  // }
+
+  // .force-demo-blur {
+  //   color: transparent !important;
+  //   text-shadow: 0 0 8px rgba(0, 0, 0, 0.4);
+  // }
 
   // Enable this if you need to blur facility checkboxes
   // label.checkbox {
