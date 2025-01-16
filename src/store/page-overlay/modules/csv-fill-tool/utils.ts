@@ -73,6 +73,12 @@ export async function collectInputs(modal: HTMLElement): Promise<IModalInput[]> 
       continue;
     }
 
+    // Transfers have duplicate hours/minutes models with special handling
+    // Uncertain how to resolve this, so just stripping it out
+    if (["hours", "minutes", "seconds"].includes(ngModel)) {
+      continue;
+    }
+
     ngModelSet.add(ngModel);
 
     let ngRepeat: string | null = null;
