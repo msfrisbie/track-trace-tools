@@ -24,6 +24,7 @@ import { maybeLoadImmaturePlantsReportData } from "@/utils/reports/immature-plan
 import { maybeLoadIncomingManifestInventoryReportData } from "@/utils/reports/incoming-manifest-inventory";
 import { maybeLoadIncomingTransferManifestsReportData } from "@/utils/reports/incoming-transfer-manifests-report";
 import { maybeLoadIncomingTransfersReportData } from "@/utils/reports/incoming-transfers-report";
+import { maybeLoadLabResultsReportData } from "@/utils/reports/lab-results-report";
 import { maybeLoadMaturePlantsQuickviewReportData } from "@/utils/reports/mature-plants-quickview-report";
 import { maybeLoadMaturePlantsReportData } from "@/utils/reports/mature-plants-report";
 import { maybeLoadOutgoingTransferManifestsReportData } from "@/utils/reports/outgoing-transfer-manifests-report";
@@ -436,7 +437,7 @@ export const reportsModule = {
           value: ReportType.LAB_RESULTS,
           enabled: rootGetters[`client/${ClientGetters.T3PLUS}`],
           visible: true,
-          description: "Generate a scannable spreadsheet to verify transfer package lists",
+          description: "Export specific test values for your packages",
           isCustom: false,
           usesSpreadsheetFormulas: false,
           requiresGoogleSheets: false,
@@ -734,6 +735,7 @@ export const reportsModule = {
         await maybeLoadPointInTimeInventoryReportData({ ctx, reportData, reportConfig });
         await maybeLoadSingleTransferReportData({ ctx, reportData, reportConfig });
         await maybeLoadScanSheetReportData({ ctx, reportData, reportConfig });
+        await maybeLoadLabResultsReportData({ ctx, reportData, reportConfig });
 
         ctx.commit(ReportsMutations.SET_STATUS, {
           statusMessage: { text: "Generating report...", level: "success" },

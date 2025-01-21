@@ -30,6 +30,7 @@ import { getLabelOrError } from "../package";
 import { extractEmployeeAuditData } from "./employee-audit-report";
 import { extractHarvestPackagesData } from "./harvest-packages-report";
 import { extractImmaturePlantPropertyFromDimension } from "./immature-plants-quickview-report";
+import { extractLabResultsReportData } from "./lab-results-report";
 import { extractMaturePlantPropertyFromDimension } from "./mature-plants-quickview-report";
 import { extractPackagePropertyFromDimension } from "./packages-quickview-report";
 import { extractPointInTimeInventoryData } from "./point-in-time-inventory-report";
@@ -529,6 +530,12 @@ export function extractFlattenedData({
           reportConfig,
           reportData,
         });
+      case ReportType.LAB_RESULTS:
+        return extractLabResultsReportData({
+          reportType,
+          reportConfig,
+          reportData,
+        });
       default:
         throw new Error(`Bad reportType, failed to extract flattened data for ${reportType}`);
     }
@@ -684,6 +691,9 @@ export function getSheetTitle({
       break;
     case ReportType.SCAN_SHEET:
       title = `Scan Sheet (${totalScanSheetTransferCount(reportData)})`;
+      break;
+    case ReportType.LAB_RESULTS:
+      title = SheetTitles.LAB_RESULTS;
       break;
     default:
       throw new Error(`Bad reportType, failed to generate title for ${reportType}`);

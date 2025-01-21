@@ -557,6 +557,7 @@ export enum SheetTitles {
   HARVEST_PACKAGES = "Harvest Packages",
   POINT_IN_TIME_INVENTORY = "Point In Time Inventory",
   SINGLE_TRANSFER = "Transfer",
+  LAB_RESULTS = "Lab Results",
 }
 
 // Sheets self-enforced timeout is 180000ms,
@@ -666,7 +667,7 @@ export enum MetrcPageId {
   STRAINS = "STRAINS",
   LOCATIONS = "LOCATIONS",
   TAGS = "TAGS",
-  TRANSFERS_TEMPLATES = "TRANSFERS_TEMPLATES"
+  TRANSFERS_TEMPLATES = "TRANSFERS_TEMPLATES",
 }
 
 export const METRC_PAGE_METADATA: {

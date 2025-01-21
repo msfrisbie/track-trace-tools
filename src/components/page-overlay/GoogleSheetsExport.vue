@@ -229,7 +229,7 @@
 
         <scan-sheet-report></scan-sheet-report>
 
-        <lab-results-report></lab-results-report>
+        <lab-results-report :labResultsReportFormFilters="labResultsReportFormFilters"></lab-results-report>
 
         <point-in-time-inventory-report
           :pointInTimeInventoryFormFilters="pointInTimeInventoryFormFilters"></point-in-time-inventory-report>
@@ -1027,6 +1027,7 @@ import SimpleDrawer from "../shared/SimpleDrawer.vue";
 import FieldSelect from "./reports/FieldSelect.vue";
 import ImmaturePlantsQuickviewReport from "./reports/ImmaturePlantsQuickviewReport.vue";
 import IncomingManifestInventoryReport from "./reports/IncomingManifestInventoryReport.vue";
+import LabResultsReport from "./reports/LabResultsReport.vue";
 import MaturePlantsQuickviewReport from "./reports/MaturePlantsQuickviewReport.vue";
 import PackagesQuickviewReport from "./reports/PackagesQuickviewReport.vue";
 import PointInTimeInventoryReport from "./reports/PointInTimeInventoryReport.vue";
@@ -1048,6 +1049,7 @@ export default Vue.extend({
     PointInTimeInventoryReport,
     IncomingManifestInventoryReport,
     ScanSheetReport,
+    LabResultsReport,
     FieldSelect,
   },
   computed: {
@@ -1420,8 +1422,7 @@ export default Vue.extend({
       ) {
         addLabResultsReport({
           reportConfig,
-          labResultsFormFilters: this.labResultsFormFilters,
-          fields: []
+          labResultsReportFormFilters: this.labResultsReportFormFilters,
         });
       }
 

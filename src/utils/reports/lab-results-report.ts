@@ -7,7 +7,6 @@ import {
 import { DataLoader, getDataLoaderByLicense } from "@/modules/data-loader/data-loader.module";
 import { ReportsMutations, ReportType } from "@/store/page-overlay/modules/reports/consts";
 import {
-  IFieldData,
   IReportConfig,
   IReportData,
   IReportsState,
@@ -24,7 +23,7 @@ export interface ILabResultsReportFormFilters extends ILicenseFormFilters {
   includeActive: boolean;
   includeIntransit: boolean;
   includeInactive: boolean;
-  testTypeNames: string[]
+  testTypeQuery: string;
 }
 
 export const labResultsReportFormFiltersFactory: () => ILabResultsReportFormFilters = () => ({
@@ -35,7 +34,7 @@ export const labResultsReportFormFiltersFactory: () => ILabResultsReportFormFilt
   includeActive: true,
   includeIntransit: false,
   includeInactive: false,
-  testTypeNames: [],
+  testTypeQuery: "",
   ...licenseFilterFactory(),
 });
 
@@ -63,9 +62,9 @@ export function addLabResultsReport({
 
   reportConfig[ReportType.LAB_RESULTS] = {
     packageFilter,
-    testTypeNames: labResultsReportFormFilters.testTypeNames,
+    testTypeQuery: labResultsReportFormFilters.testTypeQuery,
     ...extractLicenseFields(labResultsReportFormFilters),
-    fields: null
+    fields: null,
   };
 }
 
@@ -122,6 +121,10 @@ export async function maybeLoadLabResultsReportData({
     }
 
     packages = packages.filter((pkg) => {
+      if (pkg.LabTestingStateName !== "TestPassed") {
+        return false;
+      }
+
       if (labResultsReportConfig.packageFilter.packagedDateLt) {
         if (pkg.PackagedDate > labResultsReportConfig.packageFilter.packagedDateLt) {
           return false;
@@ -144,7 +147,10 @@ export async function maybeLoadLabResultsReportData({
     });
 
     ctx.commit(ReportsMutations.SET_STATUS, {
-      statusMessage: { text: "Loading lab results...", level: "success" },
+      statusMessage: {
+        text: `Loading lab results matching "${labResultsReportConfig.testTypeQuery}"...`,
+        level: "success",
+      },
     });
 
     // Load all lab data for each package
@@ -190,67 +196,41 @@ export function extractLabResultsReportData({
 }): any[][] {
   const matrix: any[][] = [];
 
-  const headers = [
-    "Current License",
-    "Tag",
-    "Item",
-    "Quantity (estimated)",
-    "Unit of Measure",
-    "Note",
-  ];
+  const testResultNames: string[] = reportConfig[ReportType.LAB_RESULTS]!.testTypeQuery.split(
+    ","
+  ).map((x) => x.trim());
 
-  if (reportConfig[ReportType.LAB_RESULTS]!.showDebugColumns) {
-    headers.push(
-      "Debug Message",
-      "Incoming Manifests",
-      "Outgoing Manifests",
-      "Tag Used Date",
-      "Packaged Date",
-      "Archived Date",
-      "Finished Date",
-      "Received Date",
-      "Arrival Dates",
-      "Departure Dates",
-      "Eligible?",
-      "Has Package",
-      "Incomging Package Count",
-      "Outgoing Package Count"
-    );
-  }
+  const headers = [
+    "License",
+    "Package Status",
+    "Package Tag",
+    "Item",
+    "Quantity",
+    "Unit of Measure",
+    "Test Type Name",
+    "Test Result",
+    "Test Result Date",
+  ];
 
   matrix.push(headers);
 
-  const pairs = reportData[ReportType.LAB_RESULTS]!.packageMetadataPairs;
-
-  for (const [label, metadata] of pairs) {
-    if (metadata.eligible) {
-      const row: any[] = [
-        metadata.pkg?.LicenseNumber,
-        label,
-        metadata.itemName,
-        metadata.quantity,
-        metadata.unitOfMeasure,
-        metadata.message,
-      ];
-
-      if (reportConfig[ReportType.LAB_RESULTS]!.showDebugColumns) {
-        row.push(
-          metadata.debugMessage,
-          metadata.incomingManifests.join("|"),
-          metadata.outgoingManifests.join("|"),
-          metadata.tagUsedDate,
-          metadata.packagedDate,
-          metadata.archivedDate,
-          metadata.finishedDate,
-          metadata.receivedDate,
-          metadata.arrivalDatetimes.join("|"),
-          metadata.departureDatetimes.join("|"),
-          metadata.eligible,
-          !!metadata.pkg,
-          metadata.incomingTransferPackages.length,
-          metadata.outgoingDestinationPackages.length
-        );
+  for (const pkg of reportData[ReportType.LAB_RESULTS]!.packages) {
+    for (const labResult of pkg.testResults!) {
+      if (!testResultNames.includes(labResult.TestTypeName)) {
+        continue;
       }
+
+      const row: any[] = [
+        pkg.LicenseNumber,
+        pkg.PackageState,
+        pkg.Label,
+        pkg.Item.Name,
+        pkg.Quantity,
+        pkg.UnitOfMeasureAbbreviation,
+        labResult.TestTypeName,
+        labResult.TestResultLevel,
+        labResult.TestPerformedDate,
+      ];
 
       matrix.push(row);
     }
