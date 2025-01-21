@@ -106,6 +106,12 @@ export interface IReportConfig {
     licenses: string[];
     fields: IFieldData[];
   };
+  [ReportType.LAB_RESULTS]?: {
+    packageFilter: IPackageFilter;
+    testTypeNames: string[];
+    licenses: string[];
+    fields: null;
+  };
   [ReportType.POINT_IN_TIME_INVENTORY]?: {
     targetDate: string;
     inventoryStrategy: InventoryStrategy;
@@ -287,6 +293,9 @@ export interface IReportData {
     richIncomingTransfers?: IIndexedRichIncomingTransferData[];
     richOutgoingTransfers?: IIndexedRichOutgoingTransferData[];
     richRejectedTransfers?: IIndexedRichIncomingTransferData[];
+  };
+  [ReportType.LAB_RESULTS]?: {
+    packages: IIndexedPackageData[];
   };
   [ReportType.INCOMING_MANIFEST_INVENTORY]?: {
     extraHtml?: string;

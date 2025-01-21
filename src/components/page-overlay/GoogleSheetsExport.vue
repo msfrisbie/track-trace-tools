@@ -229,6 +229,8 @@
 
         <scan-sheet-report></scan-sheet-report>
 
+        <lab-results-report></lab-results-report>
+
         <point-in-time-inventory-report
           :pointInTimeInventoryFormFilters="pointInTimeInventoryFormFilters"></point-in-time-inventory-report>
 
@@ -815,8 +817,6 @@
           :maturePlantsQuickviewFormFilters="maturePlantsQuickviewFormFilters"></mature-plants-quickview-report>
       </div>
 
-      <!-- TODO SCAN_SHEET -->
-
       <!-- End Column -->
       <div class="flex flex-col gap-4 items-stretch text-center">
         <template v-if="reportStatus === ReportStatus.INITIAL">
@@ -982,6 +982,7 @@ import {
   addIncomingTransfersReport,
   incomingTransfersFormFiltersFactory,
 } from "@/utils/reports/incoming-transfers-report";
+import { addLabResultsReport, labResultsReportFormFiltersFactory } from "@/utils/reports/lab-results-report";
 import {
   MATURE_PLANT_QUICKVIEW_DIMENSIONS,
   addMaturePlantsQuickviewReport,
@@ -1143,6 +1144,7 @@ export default Vue.extend({
       transferHubTransfersFormFilters: transferHubTransfersFormFiltersFactory(),
       incomingTransferManifestsFormFilters: incomingTransferManifestsFormFiltersFactory(),
       scanSheetFormFilters: scanSheetFormFiltersFactory(),
+      labResultsReportFormFilters: labResultsReportFormFiltersFactory(),
       outgoingTransferManifestsFormFilters: outgoingTransferManifestsFormFiltersFactory(),
       pointInTimeInventoryFormFilters: pointInTimeInventoryFormFiltersFactory(),
       // transferHubTransferManifestsFormFilters: transferHubTransferManifestsFormFiltersFactory(),
@@ -1407,6 +1409,18 @@ export default Vue.extend({
         addScanSheetReport({
           reportConfig,
           scanSheetFormFilters: this.scanSheetFormFilters,
+          fields: []
+        });
+      }
+
+      if (
+        this.selectedReports.find(
+          (report: IReportOption) => report.value === ReportType.LAB_RESULTS
+        )
+      ) {
+        addLabResultsReport({
+          reportConfig,
+          labResultsFormFilters: this.labResultsFormFilters,
           fields: []
         });
       }
