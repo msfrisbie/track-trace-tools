@@ -108,6 +108,8 @@ export interface IReportConfig {
   };
   [ReportType.LAB_RESULTS]?: {
     packageFilter: IPackageFilter;
+    shouldFilterTestTypeName: boolean;
+    onlyIncludeMostRecentResultPerTest: boolean;
     testTypeQuery: string;
     licenses: string[];
     fields: null;

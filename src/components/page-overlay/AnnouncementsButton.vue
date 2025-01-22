@@ -7,8 +7,7 @@
     </b-button>
 
     <b-badge v-if="notificationCount > 0" @click="openBuilder($event)" variant="danger" class="cursor-pointer absolute"
-      style="right: 0.1rem; bottom: 0.1rem">{{
-        notificationCount
+      style="right: 0.1rem; bottom: 0.1rem">{{ "1"
       }}</b-badge>
   </fragment>
 </template>

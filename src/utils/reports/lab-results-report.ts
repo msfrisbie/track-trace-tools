@@ -3,6 +3,7 @@ import {
   ILicenseFormFilters,
   IPackageFilter,
   IPluginState,
+  ITestResultData,
 } from "@/interfaces";
 import { DataLoader, getDataLoaderByLicense } from "@/modules/data-loader/data-loader.module";
 import { ReportsMutations, ReportType } from "@/store/page-overlay/modules/reports/consts";
@@ -23,6 +24,8 @@ export interface ILabResultsReportFormFilters extends ILicenseFormFilters {
   includeActive: boolean;
   includeIntransit: boolean;
   includeInactive: boolean;
+  shouldFilterTestTypeName: boolean;
+  onlyIncludeMostRecentResultPerTest: boolean;
   testTypeQuery: string;
 }
 
@@ -34,6 +37,8 @@ export const labResultsReportFormFiltersFactory: () => ILabResultsReportFormFilt
   includeActive: true,
   includeIntransit: false,
   includeInactive: false,
+  shouldFilterTestTypeName: true,
+  onlyIncludeMostRecentResultPerTest: true,
   testTypeQuery: "",
   ...licenseFilterFactory(),
 });
@@ -62,6 +67,9 @@ export function addLabResultsReport({
 
   reportConfig[ReportType.LAB_RESULTS] = {
     packageFilter,
+    shouldFilterTestTypeName: labResultsReportFormFilters.shouldFilterTestTypeName,
+    onlyIncludeMostRecentResultPerTest:
+      labResultsReportFormFilters.onlyIncludeMostRecentResultPerTest,
     testTypeQuery: labResultsReportFormFilters.testTypeQuery,
     ...extractLicenseFields(labResultsReportFormFilters),
     fields: null,
@@ -148,7 +156,9 @@ export async function maybeLoadLabResultsReportData({
 
     ctx.commit(ReportsMutations.SET_STATUS, {
       statusMessage: {
-        text: `Loading lab results matching "${labResultsReportConfig.testTypeQuery}"...`,
+        text: labResultsReportConfig.shouldFilterTestTypeName
+          ? `Loading lab results matching "${labResultsReportConfig.testTypeQuery}"...`
+          : "Loading lab results...",
         level: "success",
       },
     });
@@ -196,9 +206,11 @@ export function extractLabResultsReportData({
 }): any[][] {
   const matrix: any[][] = [];
 
-  const testResultNames: string[] = reportConfig[ReportType.LAB_RESULTS]!.testTypeQuery.split(
-    ","
-  ).map((x) => x.trim());
+  const labResultReportConfig = reportConfig[ReportType.LAB_RESULTS]!;
+
+  const testResultNames: string[] = labResultReportConfig.testTypeQuery
+    .split(",")
+    .map((x) => x.trim());
 
   const headers = [
     "License",
@@ -215,9 +227,22 @@ export function extractLabResultsReportData({
   matrix.push(headers);
 
   for (const pkg of reportData[ReportType.LAB_RESULTS]!.packages) {
-    for (const labResult of pkg.testResults!) {
-      if (!testResultNames.includes(labResult.TestTypeName)) {
-        continue;
+    const resultNameSet = new Set<string>();
+    for (const labResult of pkg.testResults!.sort(
+      (a: ITestResultData, b: ITestResultData) =>
+        new Date(b.TestPerformedDate).getTime() - new Date(a.TestPerformedDate).getTime()
+    )) {
+      if (labResultReportConfig.onlyIncludeMostRecentResultPerTest) {
+        if (resultNameSet.has(labResult.TestTypeName)) {
+          continue;
+        }
+      }
+      resultNameSet.add(labResult.TestTypeName);
+
+      if (labResultReportConfig.shouldFilterTestTypeName) {
+        if (!testResultNames.includes(labResult.TestTypeName)) {
+          continue;
+        }
       }
 
       const row: any[] = [

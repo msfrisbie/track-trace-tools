@@ -8,16 +8,26 @@
         <div class="flex flex-col items-stretch gap-4">
             <div class="font-semibold text-gray-700">Filters:</div>
 
-            <div class="flex flex-col items-start gap-1">
-                <b-form-group label="Test Type Names:"
-                    description="Exact test names as they appears in Metrc, separated by commas">
-                    <b-form-input size="sm" :state="labResultsReportFormFilters.testTypeQuery.length > 3"
-                        v-model="labResultsReportFormFilters.testTypeQuery">
-                    </b-form-input>
-                </b-form-group>
-                <div>Example:</div>
-                <pre>Delta-9 THC (%) Mandatory Cannabinoid % and Totals,Delta-9 CBD (%) Mandatory Cannabinoid % and Totals</pre>
-            </div>
+            <b-form-checkbox v-model="labResultsReportFormFilters.onlyIncludeMostRecentResultPerTest">
+                <span class="leading-6">Only include the most recent test result per test type (recommended)</span>
+            </b-form-checkbox>
+
+            <b-form-checkbox v-model="labResultsReportFormFilters.shouldFilterTestTypeName">
+                <span class="leading-6">Only include specific test types</span>
+            </b-form-checkbox>
+
+            <template v-if="labResultsReportFormFilters.shouldFilterTestTypeName">
+                <div class="flex flex-col items-start gap-1">
+                    <b-form-group label="Test Type Names:"
+                        description="Exact test names exactly as they appears in Metrc's Lab Results table under the Test Name column. To include multiple test names, separated the names with commas">
+                        <b-form-input size="sm" :state="labResultsReportFormFilters.testTypeQuery.length > 3"
+                            v-model="labResultsReportFormFilters.testTypeQuery">
+                        </b-form-input>
+                    </b-form-group>
+                    <div>Example:</div>
+                    <pre>Delta-9 THC (%) Mandatory Cannabinoid % and Totals,Delta-9 CBD (%) Mandatory Cannabinoid % and Totals</pre>
+                </div>
+            </template>
 
             <b-form-checkbox v-model="labResultsReportFormFilters.includeActive">
                 <span class="leading-6">Include active packages</span>
@@ -57,6 +67,8 @@
 </template>
 
 <script lang="ts">
+import ReportLicensePicker from "@/components/overlay-widget/shared/ReportLicensePicker.vue";
+import SimpleDrawer from "@/components/shared/SimpleDrawer.vue";
 import { IPluginState } from "@/interfaces";
 import router from "@/router/index";
 import store from "@/store/page-overlay/index";
@@ -76,6 +88,8 @@ export default Vue.extend({
 
     },
     components: {
+        SimpleDrawer,
+        ReportLicensePicker
     },
     computed: {
         ...mapState<IPluginState>({
