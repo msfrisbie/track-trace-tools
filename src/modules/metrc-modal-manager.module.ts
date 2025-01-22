@@ -62,10 +62,6 @@ class MetrcModalManager implements IAtomicService {
   }
 
   async renderInlineToolbar(modal: HTMLElement, props: { showTransferTools: boolean }) {
-    if (!store.state.settings.enableTransferTools) {
-      return;
-    }
-
     let container = modal.querySelector(`#${METRC_MODAL_INLINE_TOOLBAR_CONTAINER_ID}`);
 
     if (container) {

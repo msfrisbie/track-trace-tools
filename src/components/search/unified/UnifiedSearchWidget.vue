@@ -1,5 +1,5 @@
 <template>
-  <div class="ttt-wrapper flex flex-col items-stretch" v-bind:class="{
+  <div v-if="!settingsState.disableInlineSearchBar" class="ttt-wrapper flex flex-col items-stretch" v-bind:class="{
     'inline-search': !modalSearch,
     'modal-search': modalSearch,
     'search-expanded': searchState.showSearchResults,
@@ -152,6 +152,7 @@ export default Vue.extend({
   computed: {
     ...mapState<IPluginState>({
       searchState: (state: IPluginState) => state.search,
+      settingsState: (state: IPluginState) => state.settings,
     }),
     inlineControlPanelDisplayed(): boolean {
       return this.$data.showInlineControlPanel && !store.state.search.showSearchResults;

@@ -2,92 +2,52 @@
   <!-- need this wrapping element to absorb the inherited classes -->
 
   <div>
-    <div ref="mainmenu" class="flex-grow w-full grid gap-8 grid-cols-3"
-      style="grid-template-columns: minmax(280px, auto) 1fr">
-      <div class="flex gap-2 flex-col p-4 bg-purple-50">
-        <!-- <div
-          v-for="option of options"
-          v-bind:key="option.text"
-          class="flex flex-col items-center justify-center space-y-4"
-          style="min-width: 300px"
-          v-bind:style="{
-          }"
-        > -->
-        <!-- <font-awesome-icon size="3x" class="text-gray-500" :icon="option.icon" /> -->
-        <b-button-group vertical class="rounded border border-purple-600 overflow-hidden">
-          <b-button v-for="option of options" v-bind:key="option.text"
-            class="w-full flex flex-row items-center justify-between space-x-4 opacity-70 hover:opacity-100 border-0"
-            v-bind:style="{
-              // 'background-color': option.backgroundColor,
-              opacity: option.enabled ? 'inherit' : '0.4',
-              display: option.visible ? 'flex' : 'none',
-            }" variant="outline-primary" :disabled="!option.enabled" @click.stop.prevent="open(option)">
-            <div class="w-full grid grid-cols-3 gap-2" style="grid-template-columns: 2rem 1fr 2rem">
-              <div class="aspect-square grid place-items-center">
-                <font-awesome-icon :icon="option.icon" />
-              </div>
-
-              <span>{{ option.text }}</span>
-
-              <div class="aspect-square grid place-items-center">
-                <template v-if="option.isPlus && !hasPlus">
-                  <!-- flex struggles to vertical align the badge for some reason -->
-                  <b-badge style="padding-top: 0.3rem; margin-top: 0.1rem; line-height: initial"
-                    variant="primary">T3+</b-badge></template>
-
-                <template v-else-if="option.isBeta">
-                  <!-- flex struggles to vertical align the badge for some reason -->
-                  <b-badge style="padding-top: 0.3rem; margin-top: 0.1rem; line-height: initial"
-                    variant="primary">BETA</b-badge></template>
-
-                <template v-else-if="option.enableNotificationBadge && notificationCount > 0">
-                  <!-- flex struggles to vertical align the badge for some reason -->
-                  <b-badge style="padding-top: 0.3rem; margin-top: 0.1rem; line-height: initial" variant="danger">{{
-                    notificationCount }}</b-badge></template>
-
-                <template v-else-if="option.isNew">
-                  <!-- flex struggles to vertical align the badge for some reason -->
-                  <b-badge style="
-                      padding-top: 0.3rem;
-                      margin-top: 0.1rem;
-                      line-height: initial;
-                      background-color: goldenrod;
-                    " variant="primary">NEW!</b-badge></template>
-              </div>
+    <div ref="mainmenu" class="flex-grow w-full">
+      <div class="grid grid-cols-2 gap-6 p-6 bg-white max-w-4xl mx-auto">
+        <template v-for="option of options">
+          <div v-bind:key="option.title" v-if="option.visible"
+            class="p-4 border shadow-md rounded-lg flex flex-col gap-6 items-stretch text-center ttt-purple-border"
+            v-bind:class="option.cardClass">
+            <div class="text-purple-600 font-semibold text-xl mb-2">{{ option.title }}</div>
+            <div class="text-gray-700 text-md flex-grow" v-html="option.body"></div>
+            <div class="grid gap-2 items-stretch" v-bind:class="option.buttonsClass">
+              <template v-for="action of option.actions">
+                <b-button v-bind:key="action.ctaText" variant="outline-primary"
+                  @click.stop.prevent="open({ url: action.url, route: action.route })">
+                  {{ action.ctaText }}
+                </b-button>
+              </template>
             </div>
-          </b-button>
-        </b-button-group>
+          </div>
+        </template>
+
       </div>
-      <builder-dashboard class="py-4 pr-4"></builder-dashboard>
-      <!-- <announcements class="bg-purple-50 p-4"></announcements> -->
     </div>
   </div>
 </template>
 
 <script lang="ts">
-import BuilderDashboard from "@/components/overlay-widget/BuilderDashboard.vue";
 import { AnalyticsEvent } from "@/consts";
 import { IPluginState } from "@/interfaces";
 import { analyticsManager } from "@/modules/analytics-manager.module";
 import router from "@/router/index";
 import store from "@/store/page-overlay/index";
-import { ClientGetters } from "@/store/page-overlay/modules/client/consts";
 import { hasPlusImpl } from "@/utils/plus";
 import { notAvailableMessage } from "@/utils/text";
 import Vue from "vue";
 import { mapActions, mapState } from "vuex";
 
 interface IOption {
-  backgroundColor: string;
-  text: string;
-  route?: string;
-  url?: string;
-  icon: string;
+  title: string;
+  body: string;
+  cardClass: string;
+  buttonsClass: string;
+  actions: {
+    ctaText: string;
+    route?: string;
+    url?: string;
+  }[],
   visible: boolean;
-  enabled: boolean;
-  isBeta: boolean;
-  isNew: boolean;
-  enableNotificationBadge?: boolean;
 }
 
 export default Vue.extend({
@@ -95,8 +55,6 @@ export default Vue.extend({
   router,
   store,
   components: {
-    // Announcements,
-    BuilderDashboard,
   },
   data() {
     return {
@@ -117,211 +75,132 @@ export default Vue.extend({
     hasPlus(): boolean {
       return hasPlusImpl();
     },
-    options() {
+    options(): IOption[] {
       return [
         {
-          backgroundColor: "#2774ae",
-          text: "VERIFY",
-          route: "/verify",
-          icon: "check",
-          enabled: true,
-          visible: false,
-          isBeta: false,
-          isNew: true,
-          isPlus: false,
-          // helpRoute: "/help/package",
+          title: `Thanks for subscribing to T3+!`,
+          body: `You're all set to use T3+. 
+          
+Premium T3+ features are enabled for this Metrc username.`,
+          cardClass: "col-span-2",
+          buttonsClass: "grid-cols-2 justify-center",
+          actions: [
+            {
+              ctaText: `MANAGE T3+`,
+              url: `https://dash.trackandtrace.tools`
+            },
+            {
+              ctaText: `LEARN WHAT'S POSSIBLE WITH T3+`,
+              url: `https://github.com/classvsoftware/t3-wiki/wiki/T3+`
+            }
+          ],
+          visible: hasPlusImpl()
         },
         {
-          backgroundColor: "#48b867",
-          text: "ANNOUNCEMENTS",
-          route: "/announcements",
-          icon: "bell",
-          visible: true,
-          enabled: true,
-          isBeta: false,
-          isNew: false,
-          enableNotificationBadge: true
+          title: `You're using T3 Free`,
+          body: `Subscribe to T3+ to unlock reports, scan sheets, CSV form fill, history explorer, and more. <br><br>Not sure if T3+ is for you?? T3+ has a 30-day free trial.`,
+          cardClass: "col-span-2",
+          buttonsClass: "grid-cols-2 justify-center",
+          actions: [
+            {
+              ctaText: `START YOUR T3+ FREE TRIAL`,
+              url: `https://dash.trackandtrace.tools`
+            },
+            {
+              ctaText: `LEARN WHAT'S POSSIBLE WITH T3+`,
+              url: `https://github.com/classvsoftware/t3-wiki/wiki/T3+`
+            }
+          ],
+          visible: !hasPlusImpl()
         },
         {
-          backgroundColor: "#2774ae",
-          text: "PACKAGE TOOLS",
-          route: "/package",
-          icon: "box",
-          enabled: true,
-          visible: true,
-          isBeta: false,
-          isNew: false,
-          helpRoute: "/help/package",
+          title: `T3 Chrome Extension Features`,
+          body: `Discover how to use all the different pieces of the Track & Trace Tools Chrome Extension to accelerate your Metrc workflows.`,
+          cardClass: "",
+          buttonsClass: "grid-cols-1",
+          actions: [
+            {
+              ctaText: `BASIC FEATURES`,
+              url: `https://github.com/classvsoftware/t3-wiki/wiki/T3-Chrome-Extension-:-Primary-Features`
+            },
+            {
+              ctaText: `T3+ FEATURES`,
+              url: `https://github.com/classvsoftware/t3-wiki/wiki/T3-Chrome-Extension-:-T3+-Features`
+            }
+          ],
+          visible: true
         },
         {
-          backgroundColor: "#48b867",
-          text: "CULTIVATION TOOLS",
-          route: "/cultivator",
-          icon: "leaf",
-          visible: true,
-          enabled: true,
-          isBeta: false,
-          isNew: false,
-          helpRoute: "/help/cultivator",
+          title: `T3 Wiki`,
+          body: `Want to learn about everything that T3 has to offer? Head over to the T3 wiki to learn more about everything the T3 platform has to offer.`,
+          cardClass: "",
+          buttonsClass: "grid-cols-1",
+          actions: [
+            {
+              ctaText: `VISIT THE T3 WIKI`,
+              url: `https://trackandtrace.tools/wiki`
+            }
+          ],
+          visible: true
         },
         {
-          backgroundColor: "#c14747",
-          text: "TAG TOOLS",
-          route: "/tags",
-          icon: "tags",
-          visible: true,
-          enabled: true,
-          isBeta: false,
-          isNew: false,
-        },
-        // {
-        //   backgroundColor: "#c14747",
-        //   text: "VOID TAGS",
-        //   route: "/tags/void-tags",
-        //   icon: "tags",
-        //   visible: true,
-        //   enabled: true,
-        //   isBeta: false,
-        //   isNew: false,
-        // },
-        {
-          backgroundColor: "#48b867",
-          text: "QUICK SCRIPTS",
-          route: "/quick-scripts",
-          icon: "bolt",
-          visible: true,
-          enabled: true,
-          isBeta: false,
-          isNew: false,
+          title: `T3 Community Forum`,
+          body: `Ask questions, request features, and read about the latest features on the T3 Community Forum.`,
+          cardClass: "",
+          buttonsClass: "grid-cols-1",
+          actions: [
+            {
+              ctaText: `VISIT THE T3 FORUM`,
+              url: `https://trackandtrace.tools/community`
+            }
+          ],
+          visible: true
         },
         {
-          backgroundColor: "#c14747",
-          text: "REPORTS",
-          route: "/google-sheets-export",
-          icon: "table",
-          visible: true,
-          enabled: true,
-          isBeta: false,
-          isNew: false,
-          isPlus: true,
+          title: `T3 API`,
+          body: `Generate reports, load bulk data, and automate Metrc actions with the T3 API.`,
+          cardClass: "",
+          buttonsClass: "grid-cols-1",
+          actions: [
+            {
+              ctaText: `GETTING STARTED WITH THE API`,
+              url: `https://github.com/classvsoftware/t3-wiki/wiki/T3-API-:-Getting-Started`
+            },
+            {
+              ctaText: `READ THE T3 API DOCUMENTATION`,
+              url: `https://trackandtrace.tools/api`
+            }
+          ],
+          visible: true
         },
         {
-          backgroundColor: "#c14747",
-          text: "EXPLORER",
-          route: "/metrc-explorer",
-          icon: "sitemap",
-          visible: true,
-          enabled: store.state.client.values.ENABLE_T3PLUS || store.state.client.t3plus,
-          isBeta: false,
-          isNew: false,
-          isPlus: true,
+          title: `T3 Settings`,
+          body: `Manage your T3 settings to enable/disable various pieces of T3, set Metrc defaults, and customize Metrc's appearance.`,
+          cardClass: "",
+          buttonsClass: "grid-cols-1",
+          actions: [
+            {
+              ctaText: `MANAGE T3 SETTINGS`,
+              route: `/settings/all`
+            },
+          ],
+          visible: true
         },
         {
-          backgroundColor: "#c14747",
-          text: "GRAPH",
-          route: "/graph",
-          icon: "project-diagram",
-          visible: true,
-          enabled: store.state.client.values.ENABLE_T3PLUS || store.state.client.t3plus,
-          isBeta: false,
-          isNew: false,
-          isPlus: true,
-        },
-        {
-          backgroundColor: "#773c77",
-          text: "TRANSFER BUILDER",
-          route: "/transfer/transfer-builder",
-          icon: "truck-loading",
-          enabled: store.state.client.values.ENABLE_T3PLUS || store.state.client.t3plus,
-          visible: store.state.settings.enableLegacyTransferTools,
-          isBeta: false,
-          isNew: false,
-          isPlus: true,
-          helpRoute: "/help/transfer",
-        },
-        {
-          backgroundColor: "orange",
-          text: "FINALIZE SALES",
-          route: "/sales/finalize-sales",
-          icon: "dollar-sign",
-          visible: true,
-          enabled: true,
-          isBeta: false,
-          isNew: false,
-        },
-        {
-          backgroundColor: "gray",
-          text: "SETTINGS",
-          route: "/settings/all",
-          icon: "sliders-h",
-          visible: true,
-          enabled: true,
-          isBeta: false,
-          isNew: false,
-        },
-        {
-          backgroundColor: "gray",
-          text: "T3 WIKI",
-          icon: "book-open",
-          visible: true,
-          enabled: true,
-          isBeta: false,
-          isNew: false,
-          url: "https://trackandtrace.tools/wiki",
-        },
-        {
-          backgroundColor: "gray",
-          text: "T3 API",
-          icon: "file",
-          visible: true,
-          enabled: true,
-          isBeta: false,
-          isNew: false,
-          url: "https://trackandtrace.tools/api",
-        },
-        {
-          backgroundColor: "gray",
-          text: "COMMUNITY",
-          icon: "users",
-          visible: true,
-          enabled: true,
-          isBeta: false,
-          isNew: false,
-          url: "https://track-trace-tools.talkyard.net/",
-        },
-        {
-          backgroundColor: "gray",
-          text: "REPORT A PROBLEM",
-          icon: "exclamation-triangle",
-          visible: true,
-          enabled: true,
-          isBeta: false,
-          isNew: false,
-          url: "https://docs.google.com/forms/d/e/1FAIpQLSd2hQFwtXyv1Bco9nHN9d4tEqkgbhe3w-WdbZAemBCTD_19VQ/viewform?usp=sf_link",
-        },
-        {
-          backgroundColor: "black",
-          text: "ADMIN",
-          route: "/admin",
-          icon: "cog",
-          visible: store.state.debugMode,
-          enabled: true,
-          isBeta: false,
-          isNew: false,
-        },
-        {
-          backgroundColor: "gray",
-          text: "MANAGE T3+",
-          icon: "plus",
-          visible: store.getters[`client/${ClientGetters.T3PLUS}`],
-          enabled: true,
-          isBeta: false,
-          isNew: false,
-          isPlus: false,
-          url: "https://dash.trackandtrace.tools",
-        },
+          title: `Bug Reports`,
+          body: `Track & Trace Tools is maintained by just one person. I do my best to keep the extension running smoothly, but problems are unavoidable. Reports from users like you are an important way for me to quickly fix these problems. `,
+          cardClass: "",
+          buttonsClass: "grid-cols-1",
+          actions: [
+            {
+              ctaText: `REPORT A BUG`,
+              url: `https://docs.google.com/forms/d/e/1FAIpQLSd2hQFwtXyv1Bco9nHN9d4tEqkgbhe3w-WdbZAemBCTD_19VQ/viewform`
+            }
+          ],
+          visible: true
+        }
       ];
-    },
+    }
   },
   methods: {
     ...mapActions({}),

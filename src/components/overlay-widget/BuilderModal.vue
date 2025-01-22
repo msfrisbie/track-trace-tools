@@ -1,7 +1,7 @@
 <template>
   <!-- animation is breaking modal, disable -->
   <b-modal v-if="pluginAuth.authState" id="builder-modal" modal-class="ttt-modal" content-class="ttt-content"
-    dialog-class="ttt-dialog" size="xl" header-class="builder-header" footer-class="builder-footer" :body-class="`builder-body toolkit-scroll flex flex-column-shim flex-col items-stretch ${$route.path === '/' ? 'p-0' : 'p-4'
+    dialog-class="ttt-dialog" size="xl" header-class="builder-header" footer-class="builder-footer" :body-class="`builder-body toolkit-scroll flex flex-column-shim flex-col items-stretch ${$route.path === '/' ? 'p-0' : 'p-0'
       }`" :static="true" no-fade centered ref="builder" @show="handleOpen()" @hidden="handleClose()">
     <template #modal-header>
       <div class="w-full grid grid-cols-3">
@@ -58,11 +58,16 @@
       </div>
     </template>
 
-    <!-- Uncomment this for debugging routing -->
-    <!-- {{ $route }} -->
+    <div class="grid grid-cols-2 h-full"
+      v-bind:style="`grid-template-columns: ${$route.path === '/' ? '280px' : '54px'} 1fr;`">
+      <builder-menu-button-list></builder-menu-button-list>
 
-    <!-- Child views should expand to fill the modal -->
-    <router-view class="flex flex-col items-center h-full"></router-view>
+      <!-- Uncomment this for debugging routing -->
+      <!-- {{ $route }} -->
+
+      <!-- Child views should expand to fill the modal -->
+      <router-view class="flex flex-col items-center h-full p-4"></router-view>
+    </div>
   </b-modal>
 </template>
 
@@ -76,6 +81,7 @@ import router from "@/router/index";
 import store from "@/store/page-overlay/index";
 import Vue from "vue";
 import { mapState } from "vuex";
+import BuilderMenuButtonList from "./BuilderMenuButtonList.vue";
 
 const activeProjectPath = "/active-project";
 
@@ -86,6 +92,7 @@ export default Vue.extend({
   components: {
     TrackTraceToolsLogo,
     PromoSlideshow,
+    BuilderMenuButtonList
   },
   methods: {
     async show(modalEventOptions: { builderType: BuilderType; initialRoute: string }) {

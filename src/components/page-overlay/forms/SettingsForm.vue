@@ -138,7 +138,42 @@
         </b-form-group>
 
         <b-form-group>
-          <div class="mt-4 mb-2 text-gray-400 text-lg">Toolkit</div>
+          <div class="mt-4 mb-2 text-gray-400 text-lg">T3 Page Widgets</div>
+
+          <b-form-checkbox id="checkbox-disableTransferTools" class="mb-2" v-model="settings.disableTransferTools"
+            name="checkbox-disableTransferTools" @change="onChange()">
+            Disable Transfer Tools in Metrc transfer window
+          </b-form-checkbox>
+
+          <b-form-checkbox id="checkbox-disableCsvFormFill" class="mb-2" v-model="settings.disableCsvFormFill"
+            name="checkbox-disableCsvFormFill" @change="onChange()">
+            Disable CSV form fill buttons
+          </b-form-checkbox>
+
+          <b-form-checkbox id="checkbox-disableInlineSearchBar" class="mb-2" v-model="settings.disableInlineSearchBar"
+            name="checkbox-disableInlineSearchBar" @change="onChange()">
+            Disable search bar
+          </b-form-checkbox>
+
+          <b-form-checkbox id="checkbox-hideInlineTransferButtons" class="mb-2"
+            v-model="settings.hideInlineTransferButtons" name="checkbox-hideInlineTransferButtons" @change="onChange()">
+            Disable inline table buttons
+          </b-form-checkbox>
+
+          <b-form-checkbox id="checkbox-hideFacilityPicker" class="mb-2" v-model="settings.hideFacilityPicker"
+            name="checkbox-hideFacilityPicker" @change="onChange()">
+            Disable T3 facility picker
+          </b-form-checkbox>
+
+          <b-form-checkbox id="checkbox-disablePopups" class="mb-2" v-model="settings.disablePopups"
+            name="checkbox-disablePopups" @change="onChange()">
+            Disable overlay messages (not recommended)
+          </b-form-checkbox>
+
+        </b-form-group>
+
+        <b-form-group>
+          <div class="mt-4 mb-2 text-gray-400 text-lg">T3 Behavior</div>
 
           <!-- <b-form-checkbox
         id="checkbox-hidePackageSearch"
@@ -169,11 +204,6 @@
       >
         Hide quick action buttons
       </b-form-checkbox> -->
-
-          <b-form-checkbox id="checkbox-enableTransferTools" class="mb-2" v-model="settings.enableTransferTools"
-            name="checkbox-enableTransferTools" @change="onChange()">
-            Add Transfer Tools to Metrc transfer window
-          </b-form-checkbox>
 
           <b-form-checkbox id="checkbox-disableAutoRefreshOnModalClose" class="mb-2"
             v-model="settings.disableAutoRefreshOnModalClose" name="checkbox-disableAutoRefreshOnModalClose"
@@ -207,21 +237,6 @@
           <b-form-checkbox id="checkbox-usePersistedCache" class="mb-2" v-model="settings.usePersistedCache"
             name="checkbox-usePersistedCache" @change="onChange()">
             Use persisted cache
-          </b-form-checkbox>
-
-          <b-form-checkbox id="checkbox-disablePopups" class="mb-2" v-model="settings.disablePopups"
-            name="checkbox-disablePopups" @change="onChange()">
-            Disable overlay messages (not recommended)
-          </b-form-checkbox>
-
-          <b-form-checkbox id="checkbox-hideInlineTransferButtons" class="mb-2"
-            v-model="settings.hideInlineTransferButtons" name="checkbox-hideInlineTransferButtons" @change="onChange()">
-            Hide inline table buttons
-          </b-form-checkbox>
-
-          <b-form-checkbox id="checkbox-hideFacilityPicker" class="mb-2" v-model="settings.hideFacilityPicker"
-            name="checkbox-hideFacilityPicker" @change="onChange()">
-            Use default Metrc facility picker
           </b-form-checkbox>
 
           <b-form-checkbox id="checkbox-enableSameItemPatch" class="mb-2" v-model="settings.enableSameItemPatch"

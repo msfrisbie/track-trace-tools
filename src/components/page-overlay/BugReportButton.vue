@@ -1,7 +1,7 @@
 <template>
   <b-button
     variant="primary"
-    title="Quick Scripts"
+    title="Report a Bug"
     id="bug-report-popover-target"
     class="cursor-pointer"
     style="padding: 0"

@@ -22,9 +22,11 @@ export interface ISettingsState {
   darkModeState: DarkModeState;
   disablePopups: boolean;
   disableSnowAnimation: boolean;
-  enableTransferTools: boolean;
+  disableTransferTools: boolean;
   hideFacilityPicker: boolean;
   hideInlineTransferButtons: boolean;
+  disableInlineSearchBar: boolean;
+  disableCsvFormFill: boolean;
   hidePackageSearch: boolean;
   hideQuickActionButtons: boolean;
   hideTransferSearch: boolean;

@@ -1,7 +1,7 @@
 <template>
   <div class="ttt-wrapper">
-    <transfer-tools v-if="showTransferTools"></transfer-tools>
-    <csv-fill-tool v-if="showCsvFillTool"></csv-fill-tool>
+    <transfer-tools v-if="!settingsState.disableTransferTools && showTransferTools"></transfer-tools>
+    <csv-fill-tool v-if="!settingsState.disableCsvFormFill && showCsvFillTool"></csv-fill-tool>
   </div>
 </template>
 
@@ -38,6 +38,7 @@ export default Vue.extend({
   computed: {
     ...mapState<IPluginState>({
       authState: (state: IPluginState) => state.pluginAuth.authState,
+      settingsState: (state: IPluginState) => state.settings
     }),
     ...mapGetters({
       exampleGetter: `example/${ExampleGetters.EXAMPLE_GETTER}`,

@@ -308,7 +308,7 @@ export default Vue.extend({
 
     await sandboxManager.runsAfterModuleInit();
   },
-  mounted() {},
+  mounted() { },
 });
 </script>
 

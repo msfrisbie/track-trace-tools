@@ -1,4 +1,5 @@
 import ActiveProjectView from "@/components/overlay-widget/ActiveProjectView.vue";
+import BuilderDashboard from "@/components/overlay-widget/BuilderDashboard.vue";
 import BuilderDefaultView from "@/components/overlay-widget/BuilderDefaultView.vue";
 import UnavailablePage from "@/components/overlay-widget/UnavailablePage.vue";
 import AdminListView from "@/components/overlay-widget/admin/AdminListView.vue";
@@ -111,6 +112,11 @@ const routes: Array<RouteConfig> = [
     path: "/announcements",
     name: "Announcements",
     component: Announcements,
+  },
+  {
+    path: "/dashboard",
+    name: "Dashboard",
+    component: BuilderDashboard,
   },
   {
     path: "/quick-scripts",

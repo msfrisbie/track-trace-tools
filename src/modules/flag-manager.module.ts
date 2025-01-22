@@ -1,11 +1,11 @@
-import { IAtomicService } from '@/interfaces';
+import { IAtomicService } from "@/interfaces";
 
 export interface IDeprecatedFlags {
   enableCsvBuilder: boolean;
   enableQuickActions: boolean;
   downloadDocumentOnOpen: boolean;
   eagerlyCacheTransferTemplate: boolean;
-  enableTransferTools: boolean;
+  disableTransferTools: boolean;
 }
 
 const DEFAULT_FLAGS: IDeprecatedFlags = {
@@ -13,16 +13,16 @@ const DEFAULT_FLAGS: IDeprecatedFlags = {
   enableQuickActions: false,
   downloadDocumentOnOpen: false,
   eagerlyCacheTransferTemplate: true,
-  enableTransferTools: true,
+  disableTransferTools: true,
 };
 
-const FLAG_OVERRIDE_KEY = 'mt-flagoverride';
+const FLAG_OVERRIDE_KEY = "mt-flagoverride";
 
 class DeprecatedFlagManager implements IAtomicService {
   public flags: IDeprecatedFlags;
 
   constructor() {
-    const existingFlagData: string = localStorage.getItem(FLAG_OVERRIDE_KEY) || '{}';
+    const existingFlagData: string = localStorage.getItem(FLAG_OVERRIDE_KEY) || "{}";
 
     const existingFlags: IDeprecatedFlags = JSON.parse(existingFlagData);
 
