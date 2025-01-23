@@ -145,7 +145,7 @@ Premium T3+ features are enabled for this Metrc username.`,
         },
         {
           title: `T3 Community Forum`,
-          body: `Ask questions, request features, and read about the latest features on the T3 Community Forum.`,
+          body: `Ask questions, request features, and read about the latest updates on the T3 Community Forum.`,
           cardClass: "",
           buttonsClass: "grid-cols-1",
           actions: [
