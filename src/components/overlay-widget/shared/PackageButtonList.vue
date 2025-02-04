@@ -78,7 +78,7 @@
       </b-button>
     </template>
 
-    <b-button size="sm" variant="outline-primary" @click.stop.prevent="printTag()">
+    <!-- <b-button size="sm" variant="outline-primary" @click.stop.prevent="printTag()">
       <div class="w-full grid grid-cols-3 gap-2" style="grid-template-columns: 2rem 1fr auto">
         <div class="aspect-square grid place-items-center">
           <font-awesome-icon icon="print" />
@@ -87,7 +87,7 @@
         <span>PRINT TAG</span>
         <div style="width:30px"></div>
       </div>
-    </b-button>
+    </b-button> -->
 
     <template v-if="packageMetadataLoaded">
       <template v-if="displayPackageLabTestOptions">
@@ -146,12 +146,9 @@ import { AnalyticsEvent, ModalAction, ModalType, PackageState } from "@/consts";
 import { IPluginState, IUnionIndexedPackageData } from "@/interfaces";
 import { analyticsManager } from "@/modules/analytics-manager.module";
 import { modalManager } from "@/modules/modal-manager.module";
-import { toastManager } from "@/modules/toast-manager.module";
 import router from "@/router/index";
 import store from "@/store/page-overlay/index";
 import { ExplorerActions } from "@/store/page-overlay/modules/explorer/consts";
-import { LabelPrintActions } from "@/store/page-overlay/modules/label-print/consts";
-import { ILabelData } from "@/store/page-overlay/modules/label-print/interfaces";
 import { PackageHistoryActions } from "@/store/page-overlay/modules/package-history/consts";
 import { PluginAuthActions } from "@/store/page-overlay/modules/plugin-auth/consts";
 import { SplitPackageBuilderActions } from "@/store/page-overlay/modules/split-package-builder/consts";
@@ -275,37 +272,37 @@ export default Vue.extend({
       });
       this.dismiss();
     },
-    async printTag() {
-      analyticsManager.track(AnalyticsEvent.CONTEXT_MENU_SELECT, { event: "printTag" });
+    // async printTag() {
+    //   analyticsManager.track(AnalyticsEvent.CONTEXT_MENU_SELECT, { event: "printTag" });
 
-      const labelDataList: ILabelData[] = [
-        {
-          count: 1,
-          primaryValue: getLabelOrError(this.$props.pkg),
-          secondaryValue: null,
-          tertiaryValue: null,
-          licenseNumber: this.$props.pkg.LicenseNumber,
-          packageState: this.$props.pkg.PackageState,
-          plantState: null,
-          plantBatchState: null
-        }
-      ];
+    //   const labelDataList: ILabelData[] = [
+    //     {
+    //       count: 1,
+    //       primaryValue: getLabelOrError(this.$props.pkg),
+    //       secondaryValue: null,
+    //       tertiaryValue: null,
+    //       licenseNumber: this.$props.pkg.LicenseNumber,
+    //       packageState: this.$props.pkg.PackageState,
+    //       plantState: null,
+    //       plantBatchState: null
+    //     }
+    //   ];
 
-      toastManager.openToast(`Added ${this.$props.pkg.Label} to print list`, {
-        title: "Success",
-        autoHideDelay: 3000,
-        variant: "primary",
-        appendToast: true,
-        toaster: "ttt-toaster",
-        solid: true,
-      });
+    //   toastManager.openToast(`Added ${this.$props.pkg.Label} to print list`, {
+    //     title: "Success",
+    //     autoHideDelay: 3000,
+    //     variant: "primary",
+    //     appendToast: true,
+    //     toaster: "ttt-toaster",
+    //     solid: true,
+    //   });
 
-      store.dispatch(`labelPrint/${LabelPrintActions.PUSH_LABELS}`, {
-        labelDataList
-      });
+    //   store.dispatch(`labelPrint/${LabelPrintActions.PUSH_LABELS}`, {
+    //     labelDataList
+    //   });
 
-      this.dismiss();
-    },
+    //   this.dismiss();
+    // },
     async viewLabTests() {
       analyticsManager.track(AnalyticsEvent.CONTEXT_MENU_SELECT, { event: "viewLabTests" });
 

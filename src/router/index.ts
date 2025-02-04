@@ -39,7 +39,7 @@ import PackageBuilderListView from "@/components/overlay-widget/package/PackageB
 import PackageHistory from "@/components/overlay-widget/package/PackageHistory.vue";
 import PackageToolsHelp from "@/components/overlay-widget/package/PackageToolsHelp.vue";
 import SplitPackageBuilder from "@/components/overlay-widget/package/SplitPackageBuilder.vue";
-import PrintTags from "@/components/overlay-widget/tags/PrintTags.vue";
+import LabelGenerator from "@/components/overlay-widget/tags/LabelGenerator.vue";
 import TagBuilderListView from "@/components/overlay-widget/tags/TagBuilderListView.vue";
 import TransferBuilder from "@/components/overlay-widget/transfer/TransferBuilder.vue";
 import TransferToolsHelp from "@/components/overlay-widget/transfer/TransferToolsHelp.vue";
@@ -291,7 +291,7 @@ const routes: Array<RouteConfig> = [
   {
     path: "/tags/print-tags",
     name: "Print Tags",
-    component: PrintTags,
+    component: LabelGenerator,
   },
   {
     path: "/tags/void-tags",

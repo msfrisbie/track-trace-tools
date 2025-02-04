@@ -1,16 +1,29 @@
-import { PackageState, PlantBatchState, PlantState } from "@/consts";
+import { LabelEndpoint } from "./consts";
 
-export interface ILabelData {
-  primaryValue: string;
-  secondaryValue: string | null;
-  tertiaryValue: string | null;
-  count: number;
-  licenseNumber: string;
-  packageState: PackageState | null;
-  plantState: PlantState | null;
-  plantBatchState: PlantBatchState | null;
+export interface ILabelTemplateLayoutOption {
+  id: string;
+  description: string;
+}
+
+export interface ILabelContentLayoutOption {
+  id: string;
+  description: string;
+}
+
+export interface ILabelEndpointConfig {
+  id: LabelEndpoint;
+  description: string;
 }
 
 export interface ILabelPrintState {
-  labelDataList: ILabelData[];
+  labelPdfBlobUrl: string | null;
+  labelPdfFilename: string | null;
+  labelTemplateLayoutOptions: ILabelTemplateLayoutOption[];
+  labelContentLayoutOptions: ILabelContentLayoutOption[];
+  selectedTemplateLayout: ILabelTemplateLayoutOption | null;
+  selectedContentLayout: ILabelContentLayoutOption | null;
+  rawTagList: string;
+  labelsPerTag: number;
+  selectedLabelEndpoint: LabelEndpoint;
+  errorText: string | null;
 }

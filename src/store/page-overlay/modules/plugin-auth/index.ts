@@ -1,9 +1,16 @@
 import { MessageType } from "@/consts";
 import { IAuthState, IPluginState } from "@/interfaces";
 import { messageBus } from "@/modules/message-bus.module";
+import { t3RequestManager } from "@/modules/t3-request-manager.module";
 import { debugLogFactory } from "@/utils/debug";
 import { ActionContext } from "vuex";
-import { OAuthState, PluginAuthActions, PluginAuthGetters, PluginAuthMutations } from "./consts";
+import {
+  OAuthState,
+  PluginAuthActions,
+  PluginAuthGetters,
+  PluginAuthMutations,
+  T3ApiAuthState,
+} from "./consts";
 import { IPluginAuthState } from "./interfaces";
 
 const debugLog = debugLogFactory("plugin-auth/index.ts");
@@ -11,6 +18,7 @@ const debugLog = debugLogFactory("plugin-auth/index.ts");
 const inMemoryState = {
   authState: null,
   oAuthState: OAuthState.INITIAL,
+  t3ApiAuthState: T3ApiAuthState.INITIAL,
 };
 
 const persistedState = {
@@ -40,6 +48,12 @@ export const pluginAuthModule = {
       { oAuthState }: { oAuthState: OAuthState }
     ) {
       state.oAuthState = oAuthState;
+    },
+    [PluginAuthMutations.SET_T3API_AUTH_STATE](
+      state: IPluginAuthState,
+      { t3ApiAuthState }: { t3ApiAuthState: T3ApiAuthState }
+    ) {
+      state.t3ApiAuthState = t3ApiAuthState;
     },
     [PluginAuthMutations.SET_LOGIN_DATA](
       state: IPluginAuthState,
@@ -155,6 +169,28 @@ export const pluginAuthModule = {
       } else {
         ctx.commit(PluginAuthMutations.SET_OAUTH_STATE, {
           oAuthState: OAuthState.NOT_AUTHENTICATED,
+        });
+      }
+    },
+    async [PluginAuthActions.REFRESH_T3API_AUTH_STATE](
+      ctx: ActionContext<IPluginAuthState, IPluginState>,
+      {}: {}
+    ) {
+      await t3RequestManager.clearTokens();
+
+      ctx.commit(PluginAuthMutations.SET_T3API_AUTH_STATE, {
+        t3ApiAuthState: T3ApiAuthState.INITIAL,
+      });
+
+      try {
+        await t3RequestManager.t3SessionAuthOrError();
+
+        ctx.commit(PluginAuthMutations.SET_T3API_AUTH_STATE, {
+          t3ApiAuthState: T3ApiAuthState.AUTHENTICATED,
+        });
+      } catch {
+        ctx.commit(PluginAuthMutations.SET_T3API_AUTH_STATE, {
+          t3ApiAuthState: T3ApiAuthState.NOT_AUTHENTICATED,
         });
       }
     },

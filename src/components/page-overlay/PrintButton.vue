@@ -28,15 +28,11 @@
 </template>
 
 <script lang="ts">
-import { ModalAction, ModalType, PackageState, PlantBatchState, PlantState } from "@/consts";
+import { ModalAction, ModalType } from "@/consts";
 import { IPluginState } from "@/interfaces";
-import { authManager } from "@/modules/auth-manager.module";
 import { modalManager } from "@/modules/modal-manager.module";
-import { toastManager } from "@/modules/toast-manager.module";
 import { MutationType } from "@/mutation-types";
 import store from "@/store/page-overlay/index";
-import { LabelPrintActions } from "@/store/page-overlay/modules/label-print/consts";
-import { ILabelData } from "@/store/page-overlay/modules/label-print/interfaces";
 import Vue from "vue";
 import { mapState } from "vuex";
 
@@ -66,37 +62,37 @@ export default Vue.extend({
       store.commit(MutationType.UPDATE_TRACKED_INTERACTIONS, trackedInteractions);
     },
     async openPrint() {
-      const licenseNumber = (await authManager.authStateOrError()).license;
+      // const licenseNumber = (await authManager.authStateOrError()).license;
 
-      const packageState: PackageState | null = null;
-      const plantState: PlantState | null = null;
-      const plantBatchState: PlantBatchState | null = null;
+      // const packageState: PackageState | null = null;
+      // const plantState: PlantState | null = null;
+      // const plantBatchState: PlantBatchState | null = null;
 
-      const labelDataList: ILabelData[] = store.state.metrcTable.barcodeValues.map((x) => ({
-        primaryValue: x,
-        secondaryValue: null,
-        tertiaryValue: null,
-        count: 1,
-        licenseNumber,
-        packageState,
-        plantState,
-        plantBatchState
-      }));
+      // const labelDataList: ILabelData[] = store.state.metrcTable.barcodeValues.map((x) => ({
+      //   primaryValue: x,
+      //   secondaryValue: null,
+      //   tertiaryValue: null,
+      //   count: 1,
+      //   licenseNumber,
+      //   packageState,
+      //   plantState,
+      //   plantBatchState
+      // }));
 
-      await store.dispatch(`labelPrint/${LabelPrintActions.PUSH_LABELS}`, {
-        labelDataList
-      });
+      // await store.dispatch(`labelPrint/${LabelPrintActions.PUSH_LABELS}`, {
+      //   labelDataList
+      // });
 
-      if (labelDataList.length > 0) {
-        toastManager.openToast(`Added ${labelDataList.length} selected tags to print list`, {
-          title: "Success",
-          autoHideDelay: 3000,
-          variant: "primary",
-          appendToast: true,
-          toaster: "ttt-toaster",
-          solid: true,
-        });
-      }
+      // if (labelDataList.length > 0) {
+      //   toastManager.openToast(`Added ${labelDataList.length} selected tags to print list`, {
+      //     title: "Success",
+      //     autoHideDelay: 3000,
+      //     variant: "primary",
+      //     appendToast: true,
+      //     toaster: "ttt-toaster",
+      //     solid: true,
+      //   });
+      // }
 
       modalManager.dispatchModalEvent(ModalType.BUILDER, ModalAction.OPEN, {
         initialRoute: "/tags/print-tags",
