@@ -13,7 +13,11 @@
         </div>
 
         <div class="relative">
-          <search-button class="floating-shadow"></search-button>
+          <feedback-button class="floating-shadow" />
+        </div>
+
+        <div class="relative">
+          <search-button class="floating-shadow" />
         </div>
 
         <div class="relative">
@@ -21,7 +25,7 @@
         </div>
 
         <div v-if="notificationCount === 0" class="relative">
-          <announcements-button class="floating-shadow"></announcements-button>
+          <announcements-button class="floating-shadow" />
         </div>
 
         <div class="relative">
@@ -34,7 +38,7 @@
       </div>
 
       <div v-if="notificationCount > 0" class="relative">
-        <announcements-button class="floating-shadow"></announcements-button>
+        <announcements-button class="floating-shadow" />
       </div>
 
       <div class="relative">
@@ -59,6 +63,7 @@ import store from "@/store/page-overlay/index";
 import { hasPlusImpl } from "@/utils/plus";
 import Vue from "vue";
 import { mapState } from "vuex";
+import FeedbackButton from "./FeedbackButton.vue";
 
 export default Vue.extend({
   name: "FloatingButtonContainer",
@@ -71,6 +76,7 @@ export default Vue.extend({
     SearchButton,
     PlusButton,
     BugReportButton,
+    FeedbackButton,
     PrintButton,
     AnnouncementsButton,
   },

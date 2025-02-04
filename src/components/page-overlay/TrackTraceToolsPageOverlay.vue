@@ -147,6 +147,7 @@ library.add(
   fontawesomeSolid.faClock,
   fontawesomeSolid.faCog,
   fontawesomeSolid.faCogs,
+  fontawesomeSolid.faComment,
   fontawesomeSolid.faCompressArrowsAlt,
   fontawesomeSolid.faCookieBite,
   fontawesomeSolid.faCopy,
