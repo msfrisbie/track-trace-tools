@@ -16,7 +16,8 @@ export interface ILabelEndpointConfig {
 }
 
 export interface ILabelPrintState {
-  labelPdfBlobUrl: File | null;
+  labelPdfBlobUrl: string | null;
+  labelPdfFilename: string | null;
   labelTemplateLayoutOptions: ILabelTemplateLayoutOption[];
   labelContentLayoutOptions: ILabelContentLayoutOption[];
   selectedTemplateLayout: ILabelTemplateLayoutOption | null;
@@ -24,4 +25,5 @@ export interface ILabelPrintState {
   rawTagList: string;
   labelsPerTag: number;
   selectedLabelEndpoint: LabelEndpoint;
+  errorText: string | null;
 }
