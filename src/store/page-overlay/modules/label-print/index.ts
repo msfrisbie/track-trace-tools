@@ -150,10 +150,14 @@ export const labelPrintModule = {
       switch (ctx.state.selectedLabelEndpoint) {
         case LabelEndpoint.ACTIVE_PACKAGES:
           try {
+            const labelData = ctx.getters[LabelPrintGetters.PARSED_TAG_LIST].flatMap((x: string) =>
+              Array(parseInt(ctx.state.labelsPerTag.toString(), 10)).fill(x)
+            );
+
             response = await t3RequestManager.generateActivePackageLabelPdf({
               labelTemplateLayoutId: ctx.state.selectedTemplateLayout!.id,
               labelContentLayoutId: ctx.state.selectedContentLayout!.id,
-              data: ctx.getters[LabelPrintGetters.PARSED_TAG_LIST],
+              data: labelData,
             });
 
             labelPdfBlobUrl = URL.createObjectURL(response.data);

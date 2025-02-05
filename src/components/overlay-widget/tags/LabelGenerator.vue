@@ -16,6 +16,11 @@
                 style="grid-template-columns: 420px 1fr;">
                 <div class="flex flex-col items-stretch gap-8">
 
+                    <div v-if="!hasPlus">
+                        You're using the free version of T3 label printing. Subscribe to T3+ to remove the T3 promo text
+                        from your labels.
+                    </div>
+
                     <!-- <b-form-group label="LABEL GENERATION"
                         description="Automatically generate from tag numbers, or manually provide label text"
                         label-size="sm" label-class="text-gray-400">
@@ -41,8 +46,8 @@
                             </template></b-form-select>
                     </b-form-group>
 
-                    <b-form-group label="LABEL LAYOUT" description="Specifies what you want to print on your labels"
-                        label-size="lg" label-class="text-purple-600">
+                    <b-form-group description="Specifies what you want to print on your labels" label-size="lg"
+                        label-class="text-purple-600">
                         <b-form-select :options="labelContentLayoutOptions"
                             :value="labelPrintState.selectedContentLayout"
                             @change="onChange('selectedContentLayout', $event)">
@@ -53,9 +58,7 @@
                             </template></b-form-select>
                     </b-form-group>
 
-                    <!-- TODO -->
-                    <!-- <b-form-select :value="labelPrintState.labelsPerTag" @change="onChange('labelsPerTag', $event)"
-                        :options="Array.from({ length: 20 }, (_, i) => ({ value: i + 1, text: i + 1 }))"></b-form-select> -->
+                    <hr />
 
                     <b-form-group label="TAG LIST"
                         description="Enter tags separated by commas or newlines. Must match existing tags in Metrc"
@@ -71,6 +74,14 @@
                             :enablePaste="false"></single-package-picker>
                     </b-form-group>
 
+                    <hr />
+
+                    <b-form-group description="How many copies of each label to generate" label-size="lg"
+                        label-class="text-purple-600">
+                        <b-form-input type="number" step="1" min="1" :value="labelPrintState.labelsPerTag"
+                            @change="onChange('labelsPerTag', $event)"></b-form-input>
+                    </b-form-group>
+
                     <b-button variant="primary" :disabled="!enableGeneration" @click="generateLabelPdf()">GENERATE
                         PDF</b-button>
 
@@ -83,7 +94,8 @@
                         <iframe :src="labelPrintState.labelPdfBlobUrl" class="w-full" style="height: 70vh"></iframe>
                     </template>
                     <template v-if="labelPrintState.errorText">
-                        <pre class="text-red-500 text-lg text-center">{{ labelPrintState.errorText }}</pre>
+                        <pre
+                            class="text-red-500 text-lg text-center">{{ JSON.stringify(labelPrintState.errorText, null, 2) }}</pre>
                     </template>
                 </div>
             </div>
@@ -99,6 +111,7 @@ import { ClientGetters } from "@/store/page-overlay/modules/client/consts";
 import { LabelEndpoint, LabelPrintActions, LabelPrintGetters, LabelPrintMutations } from "@/store/page-overlay/modules/label-print/consts";
 import { ILabelContentLayoutOption, ILabelEndpointConfig, ILabelTemplateLayoutOption } from "@/store/page-overlay/modules/label-print/interfaces";
 import { PluginAuthActions, T3ApiAuthState } from "@/store/page-overlay/modules/plugin-auth/consts";
+import { hasPlusImpl } from "@/utils/plus";
 import Vue from "vue";
 import { mapActions, mapGetters, mapState } from "vuex";
 import SinglePackagePicker from "../shared/SinglePackagePicker.vue";
@@ -116,6 +129,9 @@ export default Vue.extend({
             pluginAuthState: (state: IPluginState) => state.pluginAuth,
             labelPrintState: (state: IPluginState) => state.labelPrint,
         }),
+        hasPlus(): boolean {
+            return hasPlusImpl();
+        },
         ...mapGetters({
             hasT3plus: `client/${ClientGetters.T3PLUS}`,
             labelEndpointConfigOptions: `labelPrint/${LabelPrintGetters.LABEL_ENDPOINT_CONFIG_OPTIONS}`,
