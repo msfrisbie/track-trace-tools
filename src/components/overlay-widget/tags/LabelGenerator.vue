@@ -8,7 +8,7 @@
         <template v-if="isError">
             <div class="flex flex-col items-center justify-center h-full">
                 <span class="text-red-500">Something went wrong.</span>
-                <b-button @click="refreshT3Auth()">RETRY</b-button>
+                <b-button @click="refreshT3Auth({})">RETRY</b-button>
             </div>
         </template>
         <template v-if="isReady">
