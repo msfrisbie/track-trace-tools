@@ -10,15 +10,16 @@ const inMemoryState = {
   labelPdfFilename: null,
   labelTemplateLayoutOptions: [],
   labelContentLayoutOptions: [],
-  selectedTemplateLayout: null,
-  selectedContentLayout: null,
   rawTagList: "",
-  labelsPerTag: 1,
-  selectedLabelEndpoint: LabelEndpoint.ACTIVE_PACKAGES,
   errorText: null,
 };
 
-const persistedState = {};
+const persistedState = {
+  selectedTemplateLayoutId: null,
+  selectedContentLayoutId: null,
+  labelsPerTag: 1,
+  selectedLabelEndpoint: LabelEndpoint.ACTIVE_PACKAGES,
+};
 
 const defaultState: ILabelPrintState = {
   ...inMemoryState,
@@ -63,7 +64,7 @@ export const labelPrintModule = {
       rootState: IPluginState,
       rootGetters: any
     ): boolean => {
-      if (!state.selectedContentLayout) {
+      if (!state.selectedContentLayoutId) {
         return false;
       }
 
@@ -71,11 +72,15 @@ export const labelPrintModule = {
         return false;
       }
 
-      if (!state.selectedTemplateLayout) {
+      if (!state.selectedTemplateLayoutId) {
         return false;
       }
 
       if (getters[LabelPrintGetters.TAG_LIST_PARSE_ERRORS].length > 0) {
+        return false;
+      }
+
+      if (!state.labelsPerTag) {
         return false;
       }
 
@@ -117,8 +122,6 @@ export const labelPrintModule = {
       ctx.commit(LabelPrintMutations.LABEL_PRINT_MUTATION, {
         labelTemplateLayoutOptions,
         labelContentLayoutOptions,
-        selectedTemplateLayout: labelTemplateLayoutOptions[0],
-        selectedContentLayout: labelContentLayoutOptions[0],
       });
     },
     [LabelPrintActions.DOWNLOAD_PDF]: async (
@@ -150,10 +153,14 @@ export const labelPrintModule = {
       switch (ctx.state.selectedLabelEndpoint) {
         case LabelEndpoint.ACTIVE_PACKAGES:
           try {
+            const labelData = ctx.getters[LabelPrintGetters.PARSED_TAG_LIST].flatMap((x: string) =>
+              Array(parseInt(ctx.state.labelsPerTag.toString(), 10)).fill(x)
+            );
+
             response = await t3RequestManager.generateActivePackageLabelPdf({
-              labelTemplateLayoutId: ctx.state.selectedTemplateLayout!.id,
-              labelContentLayoutId: ctx.state.selectedContentLayout!.id,
-              data: ctx.getters[LabelPrintGetters.PARSED_TAG_LIST],
+              labelTemplateLayoutId: ctx.state.selectedTemplateLayoutId!,
+              labelContentLayoutId: ctx.state.selectedContentLayoutId!,
+              data: labelData,
             });
 
             labelPdfBlobUrl = URL.createObjectURL(response.data);

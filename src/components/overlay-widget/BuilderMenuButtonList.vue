@@ -37,9 +37,10 @@
               <b-badge style="
                       padding-top: 0.3rem;
                       margin-top: 0.1rem;
+                      margin-left: -0.5rem;
                       line-height: initial;
                       background-color: goldenrod;
-                    " variant="primary">NEW!</b-badge></template>
+                    " variant="primary">NEW</b-badge></template>
           </div>
         </div>
       </b-button>
@@ -141,6 +142,16 @@ export default Vue.extend({
           isBeta: false,
           isNew: false,
           enableNotificationBadge: true
+        },
+        {
+          backgroundColor: "#c14747",
+          text: "PRINT LABELS",
+          route: "/tags/print-tags",
+          icon: "print",
+          visible: true,
+          enabled: true,
+          isBeta: false,
+          isNew: true,
         },
         {
           backgroundColor: "#2774ae",
@@ -288,6 +299,16 @@ export default Vue.extend({
           isBeta: false,
           isNew: false,
           url: "https://docs.google.com/forms/d/e/1FAIpQLSd2hQFwtXyv1Bco9nHN9d4tEqkgbhe3w-WdbZAemBCTD_19VQ/viewform?usp=sf_link",
+        },
+        {
+          backgroundColor: "gray",
+          text: "SEND FEEDBACK",
+          icon: "comment",
+          visible: true,
+          enabled: true,
+          isBeta: false,
+          isNew: false,
+          url: "https://forms.gle/9J5UMXN4FkAZQ5wH9",
         },
         {
           backgroundColor: "black",

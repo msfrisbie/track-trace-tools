@@ -33,7 +33,7 @@ export default Vue.extend({
             return [
                 {
                     route: "/tags/print-tags",
-                    text: "PRINT TAGS",
+                    text: "PRINT LABELS",
                     icon: "print",
                     backgroundColor: "#2774ae",
                     isBeta: false,

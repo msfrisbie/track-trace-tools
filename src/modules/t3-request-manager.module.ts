@@ -5,9 +5,10 @@ import { AxiosError } from "axios";
 import { authManager } from "./auth-manager.module";
 import { facilityManager } from "./facility-manager.module";
 import { customAxios } from "./fetch-manager.module";
+import { isDevelopment } from "./environment.module";
 
-// const BASE_URL = isDevelopment() ? "http://127.0.0.1:5000/" : "https://api.trackandtrace.tools/";
-const BASE_URL = "https://api.trackandtrace.tools/";
+const BASE_URL = isDevelopment() ? "http://127.0.0.1:5000/" : "https://api.trackandtrace.tools/";
+// const BASE_URL = "https://api.trackandtrace.tools/";
 
 const CLIENT_KEY_PATH = "client";
 const VERIFY_TEST_PATH = "verify/test";

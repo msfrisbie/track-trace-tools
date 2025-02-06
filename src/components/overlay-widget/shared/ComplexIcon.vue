@@ -3,7 +3,7 @@
         <font-awesome-icon :icon="primaryIconName" :size="primaryIconSize"></font-awesome-icon>
         <div v-if="secondaryIconName"
             class="absolute p-1 rounded-full bg-white flex flex-col items-center justify-center"
-            style="left: 50%; top: 50%;">
+            v-bind:class="secondaryIconClass" style="left: 50%; top: 50%;">
             <font-awesome-icon :icon="secondaryIconName" :size="secondaryIconSize"></font-awesome-icon>
         </div>
     </div>
@@ -26,10 +26,14 @@ export default Vue.extend({
         primaryIconName: String,
         primaryIconSize: String,
         secondaryIconName: {
-            type: String,
+            // type: String,
             default: null
         },
         secondaryIconSize: {
+            type: String,
+            default: null
+        },
+        secondaryIconClass: {
             type: String,
             default: null
         }

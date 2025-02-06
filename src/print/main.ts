@@ -1,13 +1,13 @@
-import "@/assets/tailwind.css";
-import Print from "@/components/print/Print.vue";
-import Vue from "vue";
+// import "@/assets/tailwind.css";
+// import Print from "@/components/print/Print.vue";
+// import Vue from "vue";
 
-Vue.config.productionTip = false;
+// Vue.config.productionTip = false;
 
-(async () => {
-  /* eslint-disable no-new */
-  new Vue({
-    el: "#track-trace-tools",
-    render: (h) => h(Print),
-  });
-})();
+// (async () => {
+//   /* eslint-disable no-new */
+//   new Vue({
+//     el: "#track-trace-tools",
+//     render: (h) => h(Print),
+//   });
+// })();
