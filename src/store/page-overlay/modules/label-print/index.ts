@@ -80,6 +80,10 @@ export const labelPrintModule = {
         return false;
       }
 
+      if (!state.labelsPerTag) {
+        return false;
+      }
+
       return true;
     },
     [LabelPrintGetters.TAG_LIST_PARSE_ERRORS]: (

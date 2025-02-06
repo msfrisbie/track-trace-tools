@@ -28,11 +28,11 @@
                     </b-card>
 
                     <b-card class="text-lg">T3 label printing is in beta. <a href="https://forms.gle/9J5UMXN4FkAZQ5wH9"
-                            target="_blank" class="underline text-purple-500 font-semibold">Suggest additional label
-                            formats</a> or <a
+                            target="_blank" class="underline text-purple-500 font-semibold">SUGGEST ADDITIONAL
+                            FORMATS</a> or <a
                             href="https://docs.google.com/forms/d/e/1FAIpQLSd2hQFwtXyv1Bco9nHN9d4tEqkgbhe3w-WdbZAemBCTD_19VQ/viewform?usp=sf_link"
-                            class="underline text-purple-500 font-semibold" target="_blank">report a
-                            problem</a>.</b-card>
+                            class="underline text-purple-500 font-semibold" target="_blank">REPORT A
+                            PROBLEM</a>.</b-card>
 
                     <!-- <b-form-group label="LABEL GENERATION"
                         description="Automatically generate from tag numbers, or manually provide label text"
@@ -58,7 +58,8 @@
                             <template #first>
                                 <b-form-select-option :value="null" disabled>Select a label
                                     template</b-form-select-option>
-                            </template></b-form-select>
+                            </template>
+                        </b-form-select>
                     </b-form-group>
 
                     <b-form-group description="Specifies what you want to print on your labels" label-size="lg"
@@ -70,7 +71,8 @@
                             <template #first>
                                 <b-form-select-option :value="null" disabled>Select a label content
                                     layout</b-form-select-option>
-                            </template></b-form-select>
+                            </template>
+                        </b-form-select>
                     </b-form-group>
 
                     <hr />
@@ -169,7 +171,7 @@ export default Vue.extend({
         isReady(): boolean {
             return store.state.pluginAuth.t3ApiAuthState === T3ApiAuthState.AUTHENTICATED;
         },
-        labelTemplateLayoutOptions(): { label: string, options: { text: string, value: string }[] }[] {
+        labelTemplateLayoutOptions(): ({ label: string, options: { text: string, value: string }[] } | { html: string, disabled: boolean, value: string | null })[] {
             const thermalOptionGroup = store.state.labelPrint.labelTemplateLayoutOptions.filter((x) => x.printerTypes.includes('THERMAL')).map((x) => ({
                 text: x.description,
                 value: x.id
@@ -192,9 +194,14 @@ export default Vue.extend({
             }, {
                 label: 'INKJET',
                 options: inkjetOptionGroup
+            },
+            {
+                value: null,
+                disabled: true,
+                html: `Don't see what you need? Click the SUGGEST ADDITIONAL FORMATS link!`
             }];
         },
-        labelContentLayoutOptions(): { label: string, options: { text: string, value: string }[] }[] {
+        labelContentLayoutOptions(): ({ label: string, options: { text: string, value: string }[] } | { html: string, disabled: boolean, value: string | null })[] {
             const horizontalRectangleOptionGroup = store.state.labelPrint.labelContentLayoutOptions.filter((x) => x.aspectRatio > 1.1).map((x) => ({
                 text: x.description,
                 value: x.id
@@ -217,6 +224,11 @@ export default Vue.extend({
             }, {
                 label: 'VERTICAL RECTANGLES',
                 options: verticalRectantgleOptionGroup
+            },
+            {
+                value: null,
+                disabled: true,
+                html: `Don't see what you need? Click the SUGGEST ADDITIONAL FORMATS link!`
             }];
         },
         labelEndpointConfigOptions(): { text: string, value: LabelEndpoint }[] {
