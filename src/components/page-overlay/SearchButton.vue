@@ -1,26 +1,16 @@
 <template>
-  <b-button
-    id="search-popover-target"
-    variant="primary"
-    title="Search"
-    @click="openSearch($event)"
-    style="padding: 0"
-  >
+  <b-button id="search-popover-target" variant="primary" title="Search" @click="openSearch($event)" style="padding: 0">
     <div class="flex flex-col items-center justify-center" style="width: 52px; height: 52px">
       <font-awesome-icon icon="search" style="height: 26px"></font-awesome-icon>
     </div>
 
-    <b-popover
-      target="search-popover-target"
-      triggers="hover"
-      placement="top"
-      variant="light"
-      ref="search-popover"
-      :disabled="trackedInteractions.dismissedSearchPopover"
-      container="popover-container"
-    >
+    <b-popover target="search-popover-target" triggers="hover" placement="top" variant="light" ref="search-popover"
+      :disabled="trackedInteractions.dismissedSearchPopover" container="popover-container">
       <template #title>
-        <span class="text-base">New: <b>Search v2</b></span>
+        <div class="flex flex-row items-center space-x-2">
+          <track-trace-tools-logo class="h-6" fill="#49276a" :inverted="true" />
+          <span class="text-base font-bold">T3 Search</span>
+        </div>
       </template>
 
       <div style="min-width: 200px" class="flex flex-col space-y-2 text-base">
@@ -40,9 +30,7 @@
           <b-badge class="shadow-xl" variant="light">s</b-badge>
         </div>
 
-        <b-button size="sm" variant="outline-primary" class="mb-2" @click="dismissSearchPopover()"
-          >GOT IT</b-button
-        >
+        <b-button size="sm" variant="outline-primary" class="mb-2" @click="dismissSearchPopover()">GOT IT</b-button>
       </div>
     </b-popover>
   </b-button>
@@ -55,6 +43,7 @@ import { MutationType } from '@/mutation-types';
 import store from '@/store/page-overlay/index';
 import Vue from 'vue';
 import { mapState } from 'vuex';
+import TrackTraceToolsLogo from '../shared/TrackTraceToolsLogo.vue';
 
 export default Vue.extend({
   name: 'SearchButton',
@@ -62,6 +51,7 @@ export default Vue.extend({
   data() {
     return {};
   },
+  components: { TrackTraceToolsLogo },
   computed: mapState(['trackedInteractions', 'settings']),
   methods: {
     dismissSearchPopover() {

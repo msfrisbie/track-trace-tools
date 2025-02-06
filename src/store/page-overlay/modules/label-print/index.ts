@@ -10,15 +10,16 @@ const inMemoryState = {
   labelPdfFilename: null,
   labelTemplateLayoutOptions: [],
   labelContentLayoutOptions: [],
-  selectedTemplateLayout: null,
-  selectedContentLayout: null,
   rawTagList: "",
-  labelsPerTag: 1,
-  selectedLabelEndpoint: LabelEndpoint.ACTIVE_PACKAGES,
   errorText: null,
 };
 
-const persistedState = {};
+const persistedState = {
+  selectedTemplateLayoutId: null,
+  selectedContentLayoutId: null,
+  labelsPerTag: 1,
+  selectedLabelEndpoint: LabelEndpoint.ACTIVE_PACKAGES,
+};
 
 const defaultState: ILabelPrintState = {
   ...inMemoryState,
@@ -63,7 +64,7 @@ export const labelPrintModule = {
       rootState: IPluginState,
       rootGetters: any
     ): boolean => {
-      if (!state.selectedContentLayout) {
+      if (!state.selectedContentLayoutId) {
         return false;
       }
 
@@ -71,7 +72,7 @@ export const labelPrintModule = {
         return false;
       }
 
-      if (!state.selectedTemplateLayout) {
+      if (!state.selectedTemplateLayoutId) {
         return false;
       }
 
@@ -117,8 +118,6 @@ export const labelPrintModule = {
       ctx.commit(LabelPrintMutations.LABEL_PRINT_MUTATION, {
         labelTemplateLayoutOptions,
         labelContentLayoutOptions,
-        selectedTemplateLayout: labelTemplateLayoutOptions[0],
-        selectedContentLayout: labelContentLayoutOptions[0],
       });
     },
     [LabelPrintActions.DOWNLOAD_PDF]: async (
@@ -155,8 +154,8 @@ export const labelPrintModule = {
             );
 
             response = await t3RequestManager.generateActivePackageLabelPdf({
-              labelTemplateLayoutId: ctx.state.selectedTemplateLayout!.id,
-              labelContentLayoutId: ctx.state.selectedContentLayout!.id,
+              labelTemplateLayoutId: ctx.state.selectedTemplateLayoutId!,
+              labelContentLayoutId: ctx.state.selectedContentLayoutId!,
               data: labelData,
             });
 

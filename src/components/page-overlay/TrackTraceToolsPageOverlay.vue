@@ -115,6 +115,7 @@ library.add(
   fontawesomeSolid.faLink,
   fontawesomeRegular.faCircle,
   fontawesomeRegular.faCopy,
+  fontawesomeRegular.faListAlt,
   fontawesomeSolid.faArchive,
   fontawesomeSolid.faPlusCircle,
   fontawesomeSolid.faArrowsAlt,

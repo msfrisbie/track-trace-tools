@@ -4,46 +4,21 @@
     <div class="flex flex-col row-span-2 items-center">
       <div class="w-full flex flex-col space-y-4" style="max-width: 480px">
         <div class="flex flex-row items-stretch justify-center">
-          <b-form-group
-            label="SELECT PACKAGE"
-            label-size="sm"
-            label-class="text-gray-400"
-            class="w-full"
-          >
-            <vue-typeahead-bootstrap
-              v-model="query"
-              :data="filteredSourcePackages"
-              :serializer="
-                (pkg) =>
-                  `${getLabelOrError(pkg)} ${getQuantityOrError(pkg)} ${getUnitOfMeasureNameOrError(
-                    pkg
-                  )} ${getItemNameOrError(pkg)}`
-              "
-              :minMatchingChars="0"
-              :showOnFocus="true"
-              :maxMatches="100"
-              @hit="addPackage($event)"
-              type="text"
-              required
-              placeholder="Label, item, strain..."
-              size="md"
-              ref="typeahead"
-            >
+          <b-form-group :label="inputLabel" label-size="sm" label-class="text-gray-400" class="w-full">
+            <vue-typeahead-bootstrap v-model="query" :data="filteredSourcePackages" :serializer="(pkg) =>
+                `${getLabelOrError(pkg)} ${getQuantityOrError(pkg)} ${getUnitOfMeasureNameOrError(
+                  pkg
+                )} ${getItemNameOrError(pkg)}`
+              " :minMatchingChars="0" :showOnFocus="true" :maxMatches="100" @hit="addPackage($event)" type="text"
+              required placeholder="Label, item, strain..." size="md" ref="typeahead">
               <template slot="suggestion" slot-scope="{ htmlText, data }">
                 <div class="w-full flex flex-row items-center justify-start space-x-4">
-                  <picker-icon
-                    icon="box"
-                    style="width: 5rem"
-                    class="flex-shrink-0"
+                  <picker-icon icon="box" style="width: 5rem" class="flex-shrink-0"
                     :textClass="data.Quantity === 0 ? 'text-red-500' : ''"
-                    :text="getQuantityAndUnitDescription(data)"
-                  />
+                    :text="getQuantityAndUnitDescription(data)" />
 
-                  <picker-card
-                    class="flex-grow"
-                    :title="`${getItemNameOrError(data)}`"
-                    :label="getLabelOrError(data)"
-                  />
+                  <picker-card class="flex-grow" :title="`${getItemNameOrError(data)}`"
+                    :label="getLabelOrError(data)" />
                   <div style="display: none">{{ htmlText }}</div>
                   <div style="display: none">{{ data }}</div>
                 </div>
@@ -59,70 +34,39 @@
         </div>
 
         <template v-if="enablePaste">
-          <b-form-group
-            label="PASTE PACKAGE TAGS"
-            label-size="sm"
-            label-class="text-gray-400"
-            class="w-full"
-          >
-            <paste-tags
-              :tags.sync="pastedTags"
-              :sourceLabels="sourcePackages.map((x) => getLabelOrError(x))"
-              ref="pasteTags"
-            ></paste-tags>
+          <b-form-group label="PASTE PACKAGE TAGS" label-size="sm" label-class="text-gray-400" class="w-full">
+            <paste-tags :tags.sync="pastedTags" :sourceLabels="sourcePackages.map((x) => getLabelOrError(x))"
+              ref="pasteTags"></paste-tags>
           </b-form-group>
         </template>
 
         <div class="flex flex-col items-center text-center space-y-4">
-          <error-readout
-            v-if="error || inflight"
-            :inflight="inflight"
-            :error="error"
-            loadingMessage="Loading packages..."
-            errorMessage="Unable to load packages."
+          <error-readout v-if="error || inflight" :inflight="inflight" :error="error"
+            loadingMessage="Loading packages..." errorMessage="Unable to load packages."
             permissionsErrorMessage="Check that your employee account has full Packages permissions."
-            v-on:retry="loadPackages()"
-          />
+            v-on:retry="loadPackages()" />
         </div>
       </div>
     </div>
 
     <!-- Selected packages -->
     <div v-if="showSelection" class="flex flex-col items-stretch space-y-8 overflow-y-auto">
-      <div
-        class="pr-4 pb-4 overflow-x-hidden overflow-y-auto toolkit-scroll"
-        style="max-height: 35vh"
-      >
+      <div class="pr-4 pb-4 overflow-x-hidden overflow-y-auto toolkit-scroll" style="max-height: 35vh">
         <b-list-group>
           <!-- Making this fully responsive is fucking annoying. 35vh max height is a hack -->
           <transition-group name="list">
             <template v-for="pkg in selectedPackages">
-              <b-list-group-item
-                :key="getLabelOrError(pkg)"
-                class="flex flex-row items-center justify-start space-x-4 flex-nowrap"
-              >
+              <b-list-group-item :key="getLabelOrError(pkg)"
+                class="flex flex-row items-center justify-start space-x-4 flex-nowrap">
                 <!-- grid-column-start:1 is to fix some rendering weirdness when items enter/leave -->
-                <picker-icon
-                  icon="box"
-                  style="width: 5rem"
-                  class="flex-shrink-0"
+                <picker-icon icon="box" style="width: 5rem" class="flex-shrink-0"
                   :textClass="getQuantityOrError(pkg) === 0 ? 'text-red-500' : ''"
-                  :text="`${getQuantityOrError(pkg)} ${getUnitOfMeasureAbbreviationOrError(pkg)}`"
-                />
+                  :text="`${getQuantityOrError(pkg)} ${getUnitOfMeasureAbbreviationOrError(pkg)}`" />
 
-                <picker-card
-                  class="flex-grow"
-                  :title="`${getItemNameOrError(pkg)}`"
-                  :label="getLabelOrError(pkg)"
-                />
+                <picker-card class="flex-grow" :title="`${getItemNameOrError(pkg)}`" :label="getLabelOrError(pkg)" />
 
-                <b-button
-                  class="px-4 text-red-500 hover:text-red-800"
-                  variant="link"
-                  @click="removePackage(pkg)"
-                >
-                  &#215;</b-button
-                >
+                <b-button class="px-4 text-red-500 hover:text-red-800" variant="link" @click="removePackage(pkg)">
+                  &#215;</b-button>
               </b-list-group-item>
             </template>
           </transition-group>
@@ -130,19 +74,13 @@
       </div>
 
       <div class="flex flex-col items-center space-y-4">
-        <span class="text-center text-xl font-bold"
-          ><animated-number :number="selectedPackages.length" /> package{{
-            selectedPackages.length === 1 ? "" : "s"
-          }}
-          selected</span
-        >
+        <span class="text-center text-xl font-bold"><animated-number :number="selectedPackages.length" /> package{{
+          selectedPackages.length === 1 ? "" : "s"
+        }}
+          selected</span>
 
         <template v-if="selectedPackages.length > 0">
-          <span
-            class="text-center text-purple-500 underline cursor-pointer"
-            @click="resetPackages()"
-            >CLEAR</span
-          >
+          <span class="text-center text-purple-500 underline cursor-pointer" @click="resetPackages()">CLEAR</span>
         </template>
       </div>
     </div>
@@ -182,6 +120,10 @@ export default Vue.extend({
     PasteTags,
   },
   props: {
+    inputLabel: {
+      type: String,
+      default: "SELECT PACKAGE"
+    },
     enablePaste: {
       type: Boolean,
       default: false,
@@ -386,7 +328,7 @@ export default Vue.extend({
     // @ts-ignore
     // this.setSourcePackages(await primaryDataLoader.activePackages(true));
   },
-  async created() {},
+  async created() { },
 });
 </script>
 
@@ -411,7 +353,12 @@ export default Vue.extend({
 .list-leave-active {
   transition: all 0.4s;
 }
-.list-enter, .list-leave-to /* .list-leave-active below version 2.1.8 */ {
+
+.list-enter,
+.list-leave-to
+
+/* .list-leave-active below version 2.1.8 */
+  {
   opacity: 0;
   transform: translateX(30px);
 }

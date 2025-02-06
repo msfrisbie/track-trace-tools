@@ -27,12 +27,12 @@ module.exports = {
       title: "Track and Trace Tools",
       filename: "index.html",
     },
-    print: {
-      template: "public/browser-extension.html",
-      entry: "./src/print/main.ts",
-      title: "Track and Trace Tools",
-      filename: "print.html",
-    },
+    // print: {
+    //   template: "public/browser-extension.html",
+    //   entry: "./src/print/main.ts",
+    //   title: "Track and Trace Tools",
+    //   filename: "print.html",
+    // },
     // devtools: {
     //   template: 'public/browser-extension.html',
     //   entry: './src/devtools/main.js',

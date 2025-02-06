@@ -3,11 +3,13 @@ import { LabelEndpoint } from "./consts";
 export interface ILabelTemplateLayoutOption {
   id: string;
   description: string;
+  printerTypes: string[];
 }
 
 export interface ILabelContentLayoutOption {
   id: string;
   description: string;
+  aspectRatio: number;
 }
 
 export interface ILabelEndpointConfig {
@@ -20,8 +22,8 @@ export interface ILabelPrintState {
   labelPdfFilename: string | null;
   labelTemplateLayoutOptions: ILabelTemplateLayoutOption[];
   labelContentLayoutOptions: ILabelContentLayoutOption[];
-  selectedTemplateLayout: ILabelTemplateLayoutOption | null;
-  selectedContentLayout: ILabelContentLayoutOption | null;
+  selectedTemplateLayoutId: string | null;
+  selectedContentLayoutId: string | null;
   rawTagList: string;
   labelsPerTag: number;
   selectedLabelEndpoint: LabelEndpoint;

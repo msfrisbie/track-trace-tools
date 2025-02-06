@@ -37,9 +37,10 @@
               <b-badge style="
                       padding-top: 0.3rem;
                       margin-top: 0.1rem;
+                      margin-left: -0.5rem;
                       line-height: initial;
                       background-color: goldenrod;
-                    " variant="primary">NEW!</b-badge></template>
+                    " variant="primary">NEW</b-badge></template>
           </div>
         </div>
       </b-button>
@@ -141,6 +142,16 @@ export default Vue.extend({
           isBeta: false,
           isNew: false,
           enableNotificationBadge: true
+        },
+        {
+          backgroundColor: "#c14747",
+          text: "PRINT LABELS",
+          route: "/tags/print-tags",
+          icon: "print",
+          visible: true,
+          enabled: true,
+          isBeta: false,
+          isNew: true,
         },
         {
           backgroundColor: "#2774ae",
