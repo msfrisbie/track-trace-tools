@@ -94,8 +94,7 @@
                         <iframe :src="labelPrintState.labelPdfBlobUrl" class="w-full" style="height: 70vh"></iframe>
                     </template>
                     <template v-if="labelPrintState.errorText">
-                        <pre
-                            class="text-red-500 text-lg text-center">{{ JSON.stringify(labelPrintState.errorText, null, 2) }}</pre>
+                        <pre class="text-red-500 text-lg text-center">{{ labelPrintState.errorText }}</pre>
                     </template>
                 </div>
             </div>
