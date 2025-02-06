@@ -27,8 +27,9 @@
                         </div>
                     </b-card>
 
-                    <b-card class="text-lg">T3 label printing is in beta. <a href="https://forms.gle/9J5UMXN4FkAZQ5wH9"
-                            target="_blank" class="underline text-purple-500 font-semibold">SUGGEST ADDITIONAL
+                    <b-card class="text-lg">T3 label printing is in beta.<br /><a
+                            href="https://forms.gle/9J5UMXN4FkAZQ5wH9" target="_blank"
+                            class="underline text-purple-500 font-semibold">SUGGEST MORE
                             FORMATS</a> or <a
                             href="https://docs.google.com/forms/d/e/1FAIpQLSd2hQFwtXyv1Bco9nHN9d4tEqkgbhe3w-WdbZAemBCTD_19VQ/viewform?usp=sf_link"
                             class="underline text-purple-500 font-semibold" target="_blank">REPORT A
@@ -171,7 +172,7 @@ export default Vue.extend({
         isReady(): boolean {
             return store.state.pluginAuth.t3ApiAuthState === T3ApiAuthState.AUTHENTICATED;
         },
-        labelTemplateLayoutOptions(): ({ label: string, options: { text: string, value: string }[] } | { html: string, disabled: boolean, value: string | null })[] {
+        labelTemplateLayoutOptions(): ({ text?: string, value: string | null, html?: string, disabled?: boolean })[] {
             const thermalOptionGroup = store.state.labelPrint.labelTemplateLayoutOptions.filter((x) => x.printerTypes.includes('THERMAL')).map((x) => ({
                 text: x.description,
                 value: x.id
@@ -186,22 +187,24 @@ export default Vue.extend({
             }));
 
             return [{
-                label: 'THERMAL',
-                options: thermalOptionGroup
-            }, {
-                label: 'LASER',
-                options: laserOptionGroup
-            }, {
-                label: 'INKJET',
-                options: inkjetOptionGroup
+                disabled: true,
+                text: 'THERMAL',
+                value: null,
             },
+            ...thermalOptionGroup,
+            {
+                disabled: true,
+                text: 'LASER/INKJET',
+                value: null,
+            },
+            ...laserOptionGroup,
             {
                 value: null,
                 disabled: true,
-                html: `Don't see what you need? Click the SUGGEST ADDITIONAL FORMATS link!`
+                html: `Don't see what you need? Click the SUGGEST MORE FORMATS link!`
             }];
         },
-        labelContentLayoutOptions(): ({ label: string, options: { text: string, value: string }[] } | { html: string, disabled: boolean, value: string | null })[] {
+        labelContentLayoutOptions(): ({ text?: string, value: string | null, html?: string, disabled?: boolean })[] {
             const horizontalRectangleOptionGroup = store.state.labelPrint.labelContentLayoutOptions.filter((x) => x.aspectRatio > 1.1).map((x) => ({
                 text: x.description,
                 value: x.id
@@ -215,21 +218,32 @@ export default Vue.extend({
                 value: x.id
             }));
 
-            return [{
-                label: 'HORIZONTAL RECTANGLES',
-                options: horizontalRectangleOptionGroup
-            }, {
-                label: 'SQUARE',
-                options: squareOptionGroup
-            }, {
-                label: 'VERTICAL RECTANGLES',
-                options: verticalRectantgleOptionGroup
-            },
-            {
-                value: null,
-                disabled: true,
-                html: `Don't see what you need? Click the SUGGEST ADDITIONAL FORMATS link!`
-            }];
+            return [
+                ...horizontalRectangleOptionGroup,
+                ...squareOptionGroup,
+                ...verticalRectantgleOptionGroup,
+                {
+                    value: null,
+                    disabled: true,
+                    html: `Don't see what you need? Click the SUGGEST MORE FORMATS link!`
+                }
+            ];
+
+            // return [{
+            //     label: 'HORIZONTAL RECTANGLES',
+            //     options: horizontalRectangleOptionGroup
+            // }, {
+            //     label: 'SQUARE',
+            //     options: squareOptionGroup
+            // }, {
+            //     label: 'VERTICAL RECTANGLES',
+            //     options: verticalRectantgleOptionGroup
+            // },
+            // {
+            //     value: null,
+            //     disabled: true,
+            //     html: `Don't see what you need? Click the SUGGEST ADDITIONAL FORMATS link!`
+            // }];
         },
         labelEndpointConfigOptions(): { text: string, value: LabelEndpoint }[] {
             return store.getters[`labelPrint/${LabelPrintGetters.LABEL_ENDPOINT_CONFIG_OPTIONS}`].map((x: ILabelEndpointConfig) => ({
