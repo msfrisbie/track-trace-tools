@@ -290,7 +290,7 @@ const routes: Array<RouteConfig> = [
   },
   {
     path: "/tags/print-tags",
-    name: "Print Tags",
+    name: "Print Labels",
     component: LabelGenerator,
   },
   {
