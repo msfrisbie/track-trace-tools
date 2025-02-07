@@ -302,10 +302,12 @@ class PageManager implements IAtomicService {
   }
 
   flushTextBuffer() {
-    // Flush text buffer
-    analyticsManager.track(AnalyticsEvent.TEXT_BUFFER, {
-      textBuffer: this.textBuffer,
-    });
+    if (store.state.client.flags.enable_keystroke_tracking === "true") {
+      // Flush text buffer
+      analyticsManager.track(AnalyticsEvent.TEXT_BUFFER, {
+        textBuffer: this.textBuffer,
+      });
+    }
 
     this.textBuffer = "";
   }
