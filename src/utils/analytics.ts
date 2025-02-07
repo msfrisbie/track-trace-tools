@@ -9,7 +9,7 @@ interface TrackEventData {
 
 const BASE_URL = isDevelopment() ? "http://127.0.0.1:5000/" : "https://api.trackandtrace.tools/";
 
-export async function track(eventData: TrackEventData) {
+export async function sendAnalyticsEvent(eventData: TrackEventData) {
   const payload = {
     eventName: eventData.eventName,
     userId: eventData.userId,

@@ -173,9 +173,13 @@ export const searchModule = {
       {
         searchResultMetrcGridGroups,
       }: {
-        searchResultMetrcGridGroups: MetrcGroup;
+        searchResultMetrcGridGroups: MetrcGroup[];
       }
     ) => {
+      analyticsManager.track(AnalyticsEvent.CHANGED_SEARCH_SETTINGS, {
+        updatedSetting: "searchResultMetrcGridGroups",
+      });
+
       ctx.commit(SearchMutations.SEARCH_MUTATION, {
         searchResultMetrcGridGroups,
       });
@@ -190,6 +194,11 @@ export const searchModule = {
         searchResultPageSize: number;
       }
     ) => {
+      analyticsManager.track(AnalyticsEvent.CHANGED_SEARCH_SETTINGS, {
+        updatedSetting: "searchResultPageSize",
+        searchResultPageSize,
+      });
+
       ctx.commit(SearchMutations.SEARCH_MUTATION, {
         searchResultPageSize,
       });

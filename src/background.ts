@@ -1,7 +1,7 @@
 import { ChromeStorageKeys, MessageType } from "@/consts";
 import { IBusEvent } from "@/interfaces";
 import "exboost-js";
-import { track } from "./utils/analytics";
+import { sendAnalyticsEvent } from "./utils/analytics";
 import { expireAuthToken, getAuthTokenOrError, getOAuthUserInfoOrError } from "./utils/oauth";
 import {
   appendValues,
@@ -362,7 +362,7 @@ chrome.runtime.onMessage.addListener((inboundEvent, sender, sendResponse): boole
         }
 
         try {
-          track(inboundEvent.message.data);
+          sendAnalyticsEvent(inboundEvent.message.data);
 
           respondToContentScript(sendResponse, inboundEvent, { success: true });
         } catch (error) {

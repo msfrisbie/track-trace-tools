@@ -175,6 +175,7 @@ export function mockT3RequestManager() {
         plusUsers: [],
       }),
       loadFlags: () => ({}),
+      t3SessionAuthOrError: () => {},
       loadAnnouncements: () => [],
     }),
   }));

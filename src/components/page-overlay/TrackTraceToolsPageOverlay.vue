@@ -273,6 +273,8 @@ export default Vue.extend({
       // This changes for many users between pageloads as they change licenses
       analyticsManager.setUserProperties({ license: authState.license });
 
+      analyticsManager.page();
+
       await sandboxManager.runsAfterAuthInit();
 
       // Initialize modules that should run only when logged in

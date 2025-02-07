@@ -187,7 +187,7 @@ export const reportsModule = {
         state.statusMessage = statusMessage;
       }
     },
-    [ReportsMutations.SET_GENERATED_SPREADSHEET](
+    [ReportsMutations.SET_GENERATED_REPORT](
       state: IReportsState,
       { spreadsheet }: { spreadsheet: ISpreadsheet | null }
     ) {
@@ -662,7 +662,7 @@ export const reportsModule = {
         status: ReportStatus.INITIAL,
         statusMessage: null,
       });
-      ctx.commit(ReportsMutations.SET_GENERATED_SPREADSHEET, { spreadsheet: null });
+      ctx.commit(ReportsMutations.SET_GENERATED_REPORT, { spreadsheet: null });
     },
     [ReportsActions.RUN_AUX_REPORT_TASK]: async (
       ctx: ActionContext<IReportsState, IPluginState>,
@@ -700,7 +700,7 @@ export const reportsModule = {
       ctx: ActionContext<IReportsState, IPluginState>,
       { reportConfig }: { reportConfig: IReportConfig }
     ) => {
-      analyticsManager.track(AnalyticsEvent.GENERATED_SPREADSHEET, reportConfig);
+      analyticsManager.track(AnalyticsEvent.GENERATED_REPORT, reportConfig);
 
       ctx.commit(ReportsMutations.SET_STATUS, { status: ReportStatus.INFLIGHT });
 
@@ -753,7 +753,7 @@ export const reportsModule = {
             reportConfig,
           });
 
-          ctx.commit(ReportsMutations.SET_GENERATED_SPREADSHEET, { spreadsheet });
+          ctx.commit(ReportsMutations.SET_GENERATED_REPORT, { spreadsheet });
 
           switch (reportConfig.fileDeliveryFormat) {
             case "OPEN_LINK":
@@ -769,7 +769,7 @@ export const reportsModule = {
           status: ReportStatus.SUCCESS,
           statusMessage: null,
         });
-        analyticsManager.track(AnalyticsEvent.GENERATED_SPREADSHEET_SUCCESS);
+        analyticsManager.track(AnalyticsEvent.GENERATED_REPORT_SUCCESS);
       } catch (e) {
         console.error((e as Error).stack);
 
@@ -782,7 +782,7 @@ export const reportsModule = {
         });
 
         // @ts-ignore
-        analyticsManager.track(AnalyticsEvent.GENERATED_SPREADSHEET_ERROR, { error: e.toString() });
+        analyticsManager.track(AnalyticsEvent.GENERATED_REPORT_ERROR, { error: e.toString() });
 
         throw e;
       }

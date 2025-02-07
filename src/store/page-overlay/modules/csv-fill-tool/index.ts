@@ -1,4 +1,6 @@
+import { AnalyticsEvent } from "@/consts";
 import { ICsvFile, IPluginState } from "@/interfaces";
+import { analyticsManager } from "@/modules/analytics-manager.module";
 import { toastManager } from "@/modules/toast-manager.module";
 import { downloadCsvFile } from "@/utils/csv";
 import { readCsvFile } from "@/utils/file";
@@ -10,7 +12,7 @@ import {
   CsvFillToolGetters,
   CsvFillToolMutations,
   DELAY_SECTION_GROUP_NAMES,
-  FORM_RENDER_DELAY_MS
+  FORM_RENDER_DELAY_MS,
 } from "./consts";
 import { ICsvFillToolState } from "./interfaces";
 import {
@@ -73,6 +75,9 @@ export const csvFillToolModule = {
       const { title, filename, ngRepeatSelectors, ngModelSelectors, columns } =
         await buildT3CsvGridData(modal);
 
+      analyticsManager.track(AnalyticsEvent.CSV_FILL_FIELD_DUMP, {
+        title,
+      });
       const topLevelSections = modal.querySelectorAll(`[ng-repeat="${ngRepeatSelectors[0]}"]`);
 
       const csvCellRows: string[][] = [];
@@ -150,6 +155,10 @@ export const csvFillToolModule = {
       const { title, filename, ngRepeatSelectors, ngModelSelectors, columns } =
         await buildT3CsvGridData(modal);
 
+      analyticsManager.track(AnalyticsEvent.CSV_FILL_TEMPLATE_DOWNLOAD, {
+        title,
+      });
+
       const csvFile: ICsvFile = {
         filename,
         data: [ngRepeatSelectors, ngModelSelectors, columns],
@@ -169,6 +178,14 @@ export const csvFillToolModule = {
       if (!modal) {
         throw new Error("Cannot access modal");
       }
+
+      const { title, filename, ngRepeatSelectors, ngModelSelectors, columns } =
+        await buildT3CsvGridData(modal);
+
+      analyticsManager.track(AnalyticsEvent.CSV_FILL_WRITE_FIELDS, {
+        title,
+        preloadedFileCount: data.preloadedFiles?.length,
+      });
 
       // Disable autocomplete delay by removing attribute
       [...modal.querySelectorAll("[typeahead-wait-ms]")].map((x) => {
@@ -191,20 +208,24 @@ export const csvFillToolModule = {
       const csvCellRows: string[][] = filteredCsvData.slice(3);
 
       for (const [rowIdx, csvCellRow] of csvCellRows.entries()) {
-        if (!hasPlusImpl() && rowIdx > 4) {
-          toastManager.openToast(
-            "Autofill is limited to 5 rows with the free plan. For unlimited autofills, subscribe to T3+ at trackandtrace.tools/plus",
-            {
-              title: "Row limit reached",
-              autoHideDelay: 3000,
-              variant: "warning",
-              appendToast: true,
-              toaster: "ttt-toaster",
-              solid: true,
-            }
-          );
+        if (!hasPlusImpl()) {
+          if (rowIdx === 0) {
+            toastManager.openToast(
+              "Autofill is limited to 5 rows with the free plan. For unlimited autofills, subscribe to T3+ at trackandtrace.tools/plus",
+              {
+                title: "T3 Free Row Limit",
+                autoHideDelay: 3000,
+                variant: "warning",
+                appendToast: true,
+                toaster: "ttt-toaster",
+                solid: true,
+              }
+            );
+          }
 
-          break;
+          if (rowIdx > 4) {
+            break;
+          }
         }
 
         // Track ng repeat values that are "full rows",
@@ -226,7 +247,9 @@ export const csvFillToolModule = {
           // The default state of a Metrc form begins with one top-level row
           if (rowIdx > 0) {
             // The last add section button in the form adds new top-level sections
-            const topLevelSectionAddButton = [...modal.querySelectorAll(`[ng-click^="addLine("]`)].at(-1)!;
+            const topLevelSectionAddButton = [
+              ...modal.querySelectorAll(`[ng-click^="addLine("]`),
+            ].at(-1)!;
 
             // Start a new top-level row
             topLevelSectionAddButton.dispatchEvent(new Event("click"));
@@ -235,7 +258,9 @@ export const csvFillToolModule = {
 
         // The CSV is parsed from top to bottom, and the form is filled from top to bottom
         // We only care about the last section
-        const lastTopLevelSection = [...modal.querySelectorAll(`[ng-repeat="line in repeaterLines"]`)].at(-1)!;
+        const lastTopLevelSection = [
+          ...modal.querySelectorAll(`[ng-repeat="line in repeaterLines"]`),
+        ].at(-1)!;
 
         for (const ngRepeat of ngRepeats) {
           // Example values:
@@ -246,34 +271,40 @@ export const csvFillToolModule = {
           const { sectionName, sectionGroupName } = parseNgRepeat(ngRepeat);
 
           // This was already handled above
-          if (sectionGroupName === 'repeaterLines') {
+          if (sectionGroupName === "repeaterLines") {
             continue;
           }
 
           // Find the add line button for the current ngRepeat value
-          const targetButton = [...lastTopLevelSection.querySelectorAll(`[ng-click^="addLine("]`)].filter((x) => x.getAttribute("ng-click")!.includes(sectionGroupName)).at(-1)!;
+          const targetButton = [...lastTopLevelSection.querySelectorAll(`[ng-click^="addLine("]`)]
+            .filter((x) => x.getAttribute("ng-click")!.includes(sectionGroupName))
+            .at(-1)!;
 
           // We start at the add button element, and traverse upwards
           // to locate the enclosing ng-repeat section
           let sectionElement: Element | null = targetButton.parentElement;
           while (true) {
             sectionElement = sectionElement?.parentElement!;
-            if (sectionElement.hasAttribute('ng-repeat')) {
+            if (sectionElement.hasAttribute("ng-repeat")) {
               break;
             }
-            if (sectionElement.nodeName === 'FORM') {
+            if (sectionElement.nodeName === "FORM") {
               sectionElement = null;
               break;
             }
           }
 
           // With this section, we can find all the untagged ng-repeat elements with a selector
-          const untaggedSections = [...sectionElement!.querySelectorAll(`[ng-repeat]:not([t3-autofill-used])`)];
+          const untaggedSections = [
+            ...sectionElement!.querySelectorAll(`[ng-repeat]:not([t3-autofill-used])`),
+          ];
 
           // If the section was initialized with 1 row, this will be untagged,
           // and no action needs to be taken. If there is no initialized row,
           // or the other rows were tagged, it will be 0.
-          if (untaggedSections.filter((x) => x.getAttribute('ng-repeat') === ngRepeat).length === 0) {
+          if (
+            untaggedSections.filter((x) => x.getAttribute("ng-repeat") === ngRepeat).length === 0
+          ) {
             targetButton.dispatchEvent(new Event("click"));
 
             // Photo inputs require a delay to render
@@ -339,7 +370,9 @@ export const csvFillToolModule = {
         }
 
         // Tag all ng-repeat elements as used
-        [...modal.querySelectorAll('[ng-repeat')].map((x) => x.setAttribute('t3-autofill-used', '1'));
+        [...modal.querySelectorAll("[ng-repeat")].map((x) =>
+          x.setAttribute("t3-autofill-used", "1")
+        );
       }
 
       const mutationData: Partial<ICsvFillToolState> = {};

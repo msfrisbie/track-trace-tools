@@ -3,6 +3,7 @@ import { IAtomicService, IAuthState } from "@/interfaces";
 import { messageBus } from "@/modules/message-bus.module";
 import { version } from "@/modules/version";
 import { debugLogFactory } from "@/utils/debug";
+import { hasPlusImpl } from "@/utils/plus";
 
 const hostname: string = window.location.hostname;
 const path: string = window.location.pathname;
@@ -11,6 +12,8 @@ const url: string = window.location.href;
 const debugLog = debugLogFactory("analytics-manager.module.ts");
 
 interface IUserProperties {
+  version?: string;
+  hostname?: string;
   license?: string;
   email?: string;
   phoneNumber?: string;
@@ -19,6 +22,7 @@ interface IUserProperties {
   totalFacilities?: number;
   facilities?: string;
   vuexBlobSize?: number;
+  hasPlus?: boolean;
 }
 
 class AnalyticsManager implements IAtomicService {
@@ -44,16 +48,17 @@ class AnalyticsManager implements IAtomicService {
   }
 
   async setUserProperties(userProperties: IUserProperties) {
-    const mergedProperties = {
+    const hasPlus = hasPlusImpl();
+
+    this.userProperties = {
+      ...this.userProperties,
       ...userProperties,
+      hasPlus,
       version,
       hostname,
-      url,
     };
 
-    this.userProperties = mergedProperties;
-
-    messageBus.sendMessageToBackground(MessageType.SET_USER_PROPERTIES, mergedProperties);
+    messageBus.sendMessageToBackground(MessageType.SET_USER_PROPERTIES, this.userProperties);
   }
 
   async page() {
@@ -83,37 +88,30 @@ class AnalyticsManager implements IAtomicService {
     } catch (e) {}
 
     const pageData = {
-      url,
       path,
-      version,
-      hostname,
-      license,
+      pageName,
       metrcVersion,
     };
 
-    this.track(AnalyticsEvent.PAGELOAD, { eventName: `Visited ${pageName}`, eventData: pageData });
-
-    // messageBus.sendMessageToBackground(MessageType.PAGELOAD, { pageName, pageData });
+    this.track(AnalyticsEvent.PAGELOAD, pageData);
   }
 
-  async track(eventName: AnalyticsEvent, eventData: any = {}) {
+  async track(eventName: AnalyticsEvent, eventProperties: any = {}) {
     const license = this.authState?.license;
-    const identity = this.authState?.identity;
 
-    eventData = {
-      ...eventData,
+    eventProperties = {
+      ...eventProperties,
       version,
       hostname,
       url,
       license,
-      identity,
     };
 
-    debugLog(async () => [eventName, eventData]);
+    debugLog(async () => [eventName, eventProperties]);
 
     messageBus.sendMessageToBackground(MessageType.LOG_ANALYTICS_EVENT, {
       eventName,
-      eventData,
+      eventProperties,
       userId: this.identity,
       userProperties: this.userProperties,
     });

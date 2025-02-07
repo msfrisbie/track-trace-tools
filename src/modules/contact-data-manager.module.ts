@@ -46,7 +46,7 @@ class ContactDataManager implements IAtomicService {
 
       analyticsManager.setUserProperties({
         email: email || undefined,
-        phoneNumber: phoneNumber || undefined,
+        // phoneNumber: phoneNumber || undefined,
       });
 
       messageBus.sendMessageToBackground(MessageType.UPDATE_UNINSTALL_URL, {
