@@ -1,11 +1,12 @@
 import { ChromeStorageKeys } from "@/consts";
 import { IAtomicService, IXlsxFile } from "@/interfaces";
 import { IAnnouncementData } from "@/store/page-overlay/modules/announcements/interfaces";
+import { isJwtExpired } from "@/utils/jwt";
 import { AxiosError } from "axios";
 import { authManager } from "./auth-manager.module";
+import { isDevelopment } from "./environment.module";
 import { facilityManager } from "./facility-manager.module";
 import { customAxios } from "./fetch-manager.module";
-import { isDevelopment } from "./environment.module";
 
 const BASE_URL = isDevelopment() ? "http://127.0.0.1:5000/" : "https://api.trackandtrace.tools/";
 // const BASE_URL = "https://api.trackandtrace.tools/";
@@ -20,8 +21,6 @@ const GOOGLE_MAPS_DIRECTIONS = "metrc/directions";
 const GENERATE_REPORT_PATH = "reports/generate";
 const DOWNLOAD_REPORT_PATH = "reports/download";
 const EMAIL_REPORT_PATH = "reports/email";
-const STORE_LABEL_DATA_LIST_PATH = "file/label-data";
-const RENDER_LABEL_PDF = "file/labels";
 const SESSION_AUTH_PATH = "v2/auth/session";
 const AUTH_CHECK_PATH = "v2/auth/check";
 const TOKEN_REFRESH_PATH = "v2/auth/refresh";
@@ -68,9 +67,13 @@ class T3RequestManager implements IAtomicService {
     chrome.storage.local.set({ [ChromeStorageKeys.T3_REFRESH_TOKEN]: token });
   }
 
-  clearTokens() {
+  async clearTokens() {
     this.t3AccessToken = null;
     this.t3RefreshToken = null;
+    await chrome.storage.local.remove([
+      ChromeStorageKeys.T3_ACCESS_TOKEN,
+      ChromeStorageKeys.T3_REFRESH_TOKEN,
+    ]);
   }
 
   async loadClientDataOrError(clientKey: string): Promise<{
@@ -266,7 +269,13 @@ class T3RequestManager implements IAtomicService {
     });
   }
 
-  async t3SessionAuthOrError() {
+  async t3SessionAuthOrError(forceTokenRefresh: boolean = true) {
+    if (!forceTokenRefresh && this._t3AccessToken) {
+      if (!isJwtExpired(this._t3AccessToken)) {
+        return;
+      }
+    }
+
     // If the user is not authenticated, we cannot use the browser session
     const authState = await authManager.authStateOrError();
     const cookies = await authManager.cookies();

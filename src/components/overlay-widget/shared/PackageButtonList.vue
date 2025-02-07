@@ -1,19 +1,5 @@
 <template>
   <fragment>
-    <!-- <b-button size="sm" variant="outline-primary" @click.stop.prevent="transferPackage()" :disabled="!hasPlus">
-      <div class="w-full grid grid-cols-3 gap-2" style="grid-template-columns: 2rem 1fr auto">
-        <div class="aspect-square grid place-items-center">
-          <font-awesome-icon icon="truck" />
-        </div>
-
-        <span>TRANSFER PACKAGE</span>
-
-        <div class="aspect-square grid place-items-center">
-          <b-badge variant="primary">T3+</b-badge>
-        </div>
-      </div>
-    </b-button> -->
-
     <b-button v-if="clientState.values.ENABLE_PACKAGE_HISTORY && pkg.PackageState !== PackageState.TRANSFERRED"
       size="sm" variant="outline-primary"
       @click.stop.prevent="setPackageHistorySourcePackage({ pkg }) && openPackageHistoryBuilder()">
@@ -25,22 +11,6 @@
         <div style="width:30px"></div>
       </div>
     </b-button>
-
-    <!-- <b-button
-      size="sm"
-      variant="outline-primary"
-      @click.stop.prevent="openPackageGraph(getLabelOrError(pkg))"
-      :disabled="!hasPlus"
-      ><div class="w-full grid grid-cols-3 gap-2" style="grid-template-columns: 2rem 1fr auto">
-        <div class="aspect-square grid place-items-center">
-          <b-badge variant="primary">T3+</b-badge>
-        </div>
-        <span>PACKAGE GRAPH</span>
-        <div class="aspect-square grid place-items-center">
-          <font-awesome-icon icon="project-diagram" />
-        </div>
-      </div>
-    </b-button> -->
 
     <b-button size="sm" variant="outline-primary" :disabled="!hasPlus" @click.stop.prevent="
       setExplorerData({ packageLabel: getLabelOrError(pkg) }) && openMetrcExplorer()
@@ -77,17 +47,6 @@
         <b-spinner small /> <span> Loading package test data...</span>
       </b-button>
     </template>
-
-    <!-- <b-button size="sm" variant="outline-primary" @click.stop.prevent="printTag()">
-      <div class="w-full grid grid-cols-3 gap-2" style="grid-template-columns: 2rem 1fr auto">
-        <div class="aspect-square grid place-items-center">
-          <font-awesome-icon icon="print" />
-        </div>
-
-        <span>PRINT TAG</span>
-        <div style="width:30px"></div>
-      </div>
-    </b-button> -->
 
     <template v-if="packageMetadataLoaded">
       <template v-if="displayPackageLabTestOptions">
@@ -250,17 +209,6 @@ export default Vue.extend({
     dismiss() {
       modalManager.dispatchContextMenuEvent(null);
     },
-    transferPackage() {
-      analyticsManager.track(AnalyticsEvent.CONTEXT_MENU_SELECT, { event: "transferPackage" });
-
-      this.addPackageToTransferList({ pkg: this.$props.pkg });
-
-      analyticsManager.track(AnalyticsEvent.STARTED_TRANSFER_FROM_INLINE_BUTTON, {});
-      modalManager.dispatchModalEvent(ModalType.BUILDER, ModalAction.OPEN, {
-        initialRoute: "/transfer/transfer-builder",
-      });
-      this.dismiss();
-    },
     splitPackage() {
       analyticsManager.track(AnalyticsEvent.CONTEXT_MENU_SELECT, { event: "splitPackage" });
 
@@ -272,37 +220,6 @@ export default Vue.extend({
       });
       this.dismiss();
     },
-    // async printTag() {
-    //   analyticsManager.track(AnalyticsEvent.CONTEXT_MENU_SELECT, { event: "printTag" });
-
-    //   const labelDataList: ILabelData[] = [
-    //     {
-    //       count: 1,
-    //       primaryValue: getLabelOrError(this.$props.pkg),
-    //       secondaryValue: null,
-    //       tertiaryValue: null,
-    //       licenseNumber: this.$props.pkg.LicenseNumber,
-    //       packageState: this.$props.pkg.PackageState,
-    //       plantState: null,
-    //       plantBatchState: null
-    //     }
-    //   ];
-
-    //   toastManager.openToast(`Added ${this.$props.pkg.Label} to print list`, {
-    //     title: "Success",
-    //     autoHideDelay: 3000,
-    //     variant: "primary",
-    //     appendToast: true,
-    //     toaster: "ttt-toaster",
-    //     solid: true,
-    //   });
-
-    //   store.dispatch(`labelPrint/${LabelPrintActions.PUSH_LABELS}`, {
-    //     labelDataList
-    //   });
-
-    //   this.dismiss();
-    // },
     async viewLabTests() {
       analyticsManager.track(AnalyticsEvent.CONTEXT_MENU_SELECT, { event: "viewLabTests" });
 

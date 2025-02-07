@@ -195,7 +195,7 @@ class MetrcModalManager implements IAtomicService {
   }
 
   async propagateCsv(destination: HTMLElement) {
-    analyticsManager.track(AnalyticsEvent.CSV_AUTOFILL_UPLOAD);
+    analyticsManager.track(AnalyticsEvent.CUSTOM_CSV_AUTOFILL_UPLOAD);
 
     const intermediateCsvInput: HTMLInputElement | null = destination.querySelector(
       `input[ttt-intermediate-csv]`
@@ -403,7 +403,7 @@ class MetrcModalManager implements IAtomicService {
   }
 
   async applyTransferCsvData(destination: HTMLElement) {
-    analyticsManager.track(AnalyticsEvent.CSV_AUTOFILL_FILL);
+    analyticsManager.track(AnalyticsEvent.CUSTOM_CSV_AUTOFILL_FILL);
 
     const input: HTMLInputElement | null = destination.querySelector(`input[ttt-intermediate-csv]`);
 

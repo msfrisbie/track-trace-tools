@@ -16,6 +16,10 @@
                 style="grid-template-columns: 420px 1fr;">
                 <div class="flex flex-col items-stretch gap-8">
 
+                    <b-button variant="outline-info"
+                        href="https://github.com/classvsoftware/t3-wiki/wiki/T3-Chrome-Extension-:-Label-PDF-Generator"
+                        target="_blank">HOW DO I USE THIS?</b-button>
+
                     <b-card v-if="!hasPlus" class="text-lg">
                         <div class="flex flex-col gap-2">
                             <span>You're using the free version of T3 label

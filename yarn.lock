@@ -11,31 +11,6 @@
     event-pubsub "4.3.0"
     js-message "1.0.7"
 
-"@amplitude/analytics-connector@^1.4.6":
-  version "1.4.6"
-  resolved "https://registry.npmjs.org/@amplitude/analytics-connector/-/analytics-connector-1.4.6.tgz"
-  integrity sha512-6jD2pOosRD4y8DT8StUCz7yTd5ZDkdOU9/AWnlWKM5qk90Mz7sdZrdZ9H7sA/L3yOJEpQOYZgQplQdWWUzyWug==
-  dependencies:
-    "@amplitude/ua-parser-js" "0.7.31"
-
-"@amplitude/types@^1.10.2":
-  version "1.10.2"
-  resolved "https://registry.npmjs.org/@amplitude/types/-/types-1.10.2.tgz"
-  integrity sha512-I8qenRI7uU6wKNb9LiZrAosSHVoNHziXouKY81CrqxH9xhVTEIJFXeuCV0hbtBr0Al/8ejnGjQRx+S2SvU/pPg==
-
-"@amplitude/ua-parser-js@0.7.31":
-  version "0.7.31"
-  resolved "https://registry.npmjs.org/@amplitude/ua-parser-js/-/ua-parser-js-0.7.31.tgz"
-  integrity sha512-+z8UGRaj13Pt5NDzOnkTBy49HE2CX64jeL0ArB86HAtilpnfkPB7oqkigN7Lf2LxscMg4QhFD7mmCfedh3rqTg==
-
-"@amplitude/utils@^1.10.1":
-  version "1.10.2"
-  resolved "https://registry.npmjs.org/@amplitude/utils/-/utils-1.10.2.tgz"
-  integrity sha512-tVsHXu61jITEtRjB7NugQ5cVDd4QDzne8T3ifmZye7TiJeUfVRvqe44gDtf55A+7VqhDhyEIIXTA1iVcDGqlEw==
-  dependencies:
-    "@amplitude/types" "^1.10.2"
-    tslib "^2.0.0"
-
 "@ampproject/remapping@^2.1.0":
   version "2.2.0"
   resolved "https://registry.npmjs.org/@ampproject/remapping/-/remapping-2.2.0.tgz"
@@ -949,7 +924,7 @@
     "@babel/types" "^7.4.4"
     esutils "^2.0.2"
 
-"@babel/runtime@^7.11.0", "@babel/runtime@^7.3.4", "@babel/runtime@^7.8.4":
+"@babel/runtime@^7.11.0", "@babel/runtime@^7.8.4":
   version "7.20.6"
   resolved "https://registry.npmjs.org/@babel/runtime/-/runtime-7.20.6.tgz"
   integrity sha512-Q+8MqP7TiHMWzSfwiJwXCjyf4GYA4Dgw3emg/7xmwsdLJOZUp+nMqcOwOzzYheuM1rhDu8FSj2l0aoMygEuXuA==
@@ -1723,11 +1698,6 @@
   version "1.1.2"
   resolved "https://registry.npmjs.org/@tootallnate/once/-/once-1.1.2.tgz"
   integrity sha512-RbzJvlNzmRq5c3O09UipeuXno4tA1FE6ikOjxZK0tuxVv3412l64l5t1W5pj4+rJq9vpkm/kwiR07aZXnsKPxw==
-
-"@types/amplitude-js@^8.16.2":
-  version "8.16.2"
-  resolved "https://registry.npmjs.org/@types/amplitude-js/-/amplitude-js-8.16.2.tgz"
-  integrity sha512-a+tb/CEQOlrHRvEvAuYNOcoUy1POERANnAhfKgiTmsy0eACj3eukGP0ucA9t115QOPzVUhbnUfZqtyHp99IZyA==
 
 "@types/babel__core@^7.0.0", "@types/babel__core@^7.1.0", "@types/babel__core@^7.1.7":
   version "7.1.20"
@@ -2956,18 +2926,6 @@ alphanum-sort@^1.0.0:
   resolved "https://registry.npmjs.org/alphanum-sort/-/alphanum-sort-1.0.2.tgz"
   integrity sha512-0FcBfdcmaumGPQ0qPn7Q5qTgz/ooXgIyp1rf8ik5bGX8mpE2YHjC0P/eyQvxu1GURYQgq9ozf2mteQ5ZD9YiyQ==
 
-amplitude-js@^8.21.0:
-  version "8.21.3"
-  resolved "https://registry.npmjs.org/amplitude-js/-/amplitude-js-8.21.3.tgz"
-  integrity sha512-T9JsPoPWDm9sOWQrdJy+69ssYLev56993z+oP11TSjqhU9IHH45lMbWORB3YqJGE0dJw2U1qmepxkP5yOoymRA==
-  dependencies:
-    "@amplitude/analytics-connector" "^1.4.6"
-    "@amplitude/ua-parser-js" "0.7.31"
-    "@amplitude/utils" "^1.10.1"
-    "@babel/runtime" "^7.3.4"
-    blueimp-md5 "^2.10.0"
-    query-string "5"
-
 ansi-colors@^3.0.0:
   version "3.2.4"
   resolved "https://registry.npmjs.org/ansi-colors/-/ansi-colors-3.2.4.tgz"
@@ -3594,11 +3552,6 @@ bluebird@^3.1.1, bluebird@^3.5.5:
   version "3.7.2"
   resolved "https://registry.npmjs.org/bluebird/-/bluebird-3.7.2.tgz"
   integrity sha512-XpNj6GDQzdfW+r2Wnn7xiSAd7TM3jzkxGXBGTtWKuSXv1xUV+azxAm8jdWZN06QTQk+2N2XB9jRDkvbmQmcRtg==
-
-blueimp-md5@^2.10.0:
-  version "2.19.0"
-  resolved "https://registry.npmjs.org/blueimp-md5/-/blueimp-md5-2.19.0.tgz"
-  integrity sha512-DRQrD6gJyy8FbiE4s+bDoXS9hiW3Vbx5uCdwvcCf3zLHL+Iv7LtGHLpr+GZV8rHG8tK766FGYBwRbu8pELTt+w==
 
 bn.js@^4.0.0, bn.js@^4.1.0, bn.js@^4.11.9:
   version "4.12.0"
@@ -5129,11 +5082,6 @@ detective@^5.2.0, detective@^5.2.1:
     acorn-node "^1.8.2"
     defined "^1.0.0"
     minimist "^1.2.6"
-
-dexie@^3.0.3:
-  version "3.2.2"
-  resolved "https://registry.npmjs.org/dexie/-/dexie-3.2.2.tgz"
-  integrity sha512-q5dC3HPmir2DERlX+toCBbHQXW5MsyrFqPFcovkH9N2S/UW/H3H5AWAB6iEOExeraAu+j+zRDG+zg/D7YhH0qg==
 
 didyoumean@^1.2.2:
   version "1.2.2"
@@ -10869,15 +10817,6 @@ qs@~6.5.2:
   resolved "https://registry.npmjs.org/qs/-/qs-6.5.3.tgz"
   integrity sha512-qxXIEh4pCGfHICj1mAJQ2/2XVZkjCDTcEgfoSQxc/fYivUZxTkk7L3bDBJSoNrEzXI17oUO5Dp07ktqE5KzczA==
 
-query-string@5:
-  version "5.1.1"
-  resolved "https://registry.npmjs.org/query-string/-/query-string-5.1.1.tgz"
-  integrity sha512-gjWOsm2SoGlgLEdAGt7a6slVOk9mGiXmPFMqrEhLQ68rhQuBnpfs3+EmlvqKyxnCo9/PPlF+9MtY02S1aFg+Jw==
-  dependencies:
-    decode-uri-component "^0.2.0"
-    object-assign "^4.1.0"
-    strict-uri-encode "^1.0.0"
-
 query-string@^4.1.0:
   version "4.3.4"
   resolved "https://registry.npmjs.org/query-string/-/query-string-4.3.4.tgz"
@@ -12702,7 +12641,7 @@ tslib@^1.8.0, tslib@^1.8.1, tslib@^1.9.0, tslib@^1.9.3:
   resolved "https://registry.npmjs.org/tslib/-/tslib-1.14.1.tgz"
   integrity sha512-Xni35NKzjgMrwevysHTCArtLDpPvye8zV/0E4EyYn43P7/7qvQwPh9BGkHewbMulVntbigmcT7rdX3BNo9wRJg==
 
-tslib@^2.0.0, tslib@^2.0.3:
+tslib@^2.0.3:
   version "2.4.1"
   resolved "https://registry.npmjs.org/tslib/-/tslib-2.4.1.tgz"
   integrity sha512-tGyy4dAjRIEwI7BzsB0lynWgOpfqjUdq91XXAlIWD2OwKBH7oCl/GZG/HT4BOHrTlPMOASlMQ7veyTqpmRcrNA==

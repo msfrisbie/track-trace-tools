@@ -10,8 +10,23 @@ const url: string = window.location.href;
 
 const debugLog = debugLogFactory("analytics-manager.module.ts");
 
+interface IUserProperties {
+  license?: string;
+  email?: string;
+  phoneNumber?: string;
+  hasAccountPermissions?: boolean;
+  verificationEligible?: boolean;
+  totalFacilities?: number;
+  facilities?: string;
+  vuexBlobSize?: number;
+}
+
 class AnalyticsManager implements IAtomicService {
   private authState: IAuthState | null = null;
+
+  private identity: string | null = null;
+
+  private userProperties: IUserProperties = {};
 
   async init() {}
 
@@ -22,27 +37,23 @@ class AnalyticsManager implements IAtomicService {
   }
 
   async identify(identity: string) {
+    this.identity = identity;
     messageBus.sendMessageToBackground(MessageType.SET_USER_ID, {
       identity,
     });
   }
 
-  async setUserProperties(userProperties: {
-    license?: string;
-    email?: string;
-    phoneNumber?: string;
-    hasAccountPermissions?: boolean;
-    verificationEligible?: boolean;
-    totalFacilities?: number;
-    facilities?: string;
-    vuexBlobSize?: number;
-  }) {
-    messageBus.sendMessageToBackground(MessageType.SET_USER_PROPERTIES, {
+  async setUserProperties(userProperties: IUserProperties) {
+    const mergedProperties = {
       ...userProperties,
       version,
       hostname,
       url,
-    });
+    };
+
+    this.userProperties = mergedProperties;
+
+    messageBus.sendMessageToBackground(MessageType.SET_USER_PROPERTIES, mergedProperties);
   }
 
   async page() {
@@ -80,7 +91,9 @@ class AnalyticsManager implements IAtomicService {
       metrcVersion,
     };
 
-    messageBus.sendMessageToBackground(MessageType.PAGELOAD, { pageName, pageData });
+    this.track(AnalyticsEvent.PAGELOAD, { eventName: `Visited ${pageName}`, eventData: pageData });
+
+    // messageBus.sendMessageToBackground(MessageType.PAGELOAD, { pageName, pageData });
   }
 
   async track(eventName: AnalyticsEvent, eventData: any = {}) {
@@ -98,7 +111,12 @@ class AnalyticsManager implements IAtomicService {
 
     debugLog(async () => [eventName, eventData]);
 
-    messageBus.sendMessageToBackground(MessageType.LOG_ANALYTICS_EVENT, { eventName, eventData });
+    messageBus.sendMessageToBackground(MessageType.LOG_ANALYTICS_EVENT, {
+      eventName,
+      eventData,
+      userId: this.identity,
+      userProperties: this.userProperties,
+    });
   }
 }
 

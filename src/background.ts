@@ -1,8 +1,7 @@
-import { AMPLITUDE_API_KEY, ChromeStorageKeys, MessageType } from "@/consts";
-import { IBusEvent, IBusMessageOptions } from "@/interfaces";
-import { database } from "@/modules/indexeddb.module";
-import amplitude from "amplitude-js";
+import { ChromeStorageKeys, MessageType } from "@/consts";
+import { IBusEvent } from "@/interfaces";
 import "exboost-js";
+import { track } from "./utils/analytics";
 import { expireAuthToken, getAuthTokenOrError, getOAuthUserInfoOrError } from "./utils/oauth";
 import {
   appendValues,
@@ -16,35 +15,12 @@ import { slackLog } from "./utils/slack";
 
 console.log("These events are collected only to help us make the plugin more useful for you.");
 
-// Amplitude Integration
-const amplitudeInstance = amplitude.getInstance();
-amplitudeInstance.init(AMPLITUDE_API_KEY);
-
-// let portFromCS: any = null;
-
-// function sendMessageToContentScript(message: IBusMessage) {
-//   chrome.runtime.sendMessage()
-//   portFromCS.postMessage({
-//     message,
-//   });
-// }
-
 function respondToContentScript(sendResponse: any, inboundEvent: IBusEvent, outboundData: any) {
   console.log({ inboundEvent, outboundData });
   sendResponse({
     uuid: inboundEvent.uuid,
     message: { data: outboundData },
   } as IBusEvent);
-}
-
-function logEvent(event: string, data: any, options: IBusMessageOptions) {
-  console.log(event, data, options);
-
-  if (options.muteAnalytics) {
-    return;
-  }
-
-  amplitudeInstance.logEvent(event, data);
 }
 
 const requestBodyMap: Map<string, any> = new Map();
@@ -141,7 +117,7 @@ chrome.webRequest.onSendHeaders.addListener(
   ["requestHeaders"]
 );
 
-chrome.runtime.onMessage.addListener((inboundEvent, sender, sendResponse) => {
+chrome.runtime.onMessage.addListener((inboundEvent, sender, sendResponse): boolean => {
   // This will only show in the background.js console output, so leave in place for debugging
   console.log("inboundEvent:", inboundEvent);
 
@@ -214,41 +190,6 @@ chrome.runtime.onMessage.addListener((inboundEvent, sender, sendResponse) => {
         respondToContentScript(sendResponse, inboundEvent, { success: true });
         break;
 
-      case MessageType.PAGELOAD:
-        logEvent(
-          `Visited ${inboundEvent.message.data.pageName}`,
-          inboundEvent.message.data.pageData,
-          inboundEvent.message.options
-        );
-        respondToContentScript(sendResponse, inboundEvent, { success: true });
-        break;
-
-      case MessageType.INDEX_PACKAGES:
-        database.indexPackages(inboundEvent.message.data.indexedPackagesData).then(() => {
-          respondToContentScript(sendResponse, inboundEvent, { success: true });
-        });
-        break;
-
-      // case MessageType.SEARCH_PACKAGES:
-      //   // Log the search
-      //   // logEvent(MessageType.REFRESH_PACKAGE_RESULTS, inboundEvent.message.data, inboundEvent.message.options);
-
-      //   // Perform the search
-      //   respondToContentScript(sendResponse, inboundEvent, {
-      //     packages: await database.packageSearch(
-      //       inboundEvent.message.data.query,
-      //       inboundEvent.message.data.license,
-      //       inboundEvent.message.data.filters
-      //     ),
-      //   });
-      //   break;
-
-      case MessageType.INDEX_TRANSFERS:
-        database.indexTransfers(inboundEvent.message.data.indexedTransfersData).then(() => {
-          respondToContentScript(sendResponse, inboundEvent, { success: true });
-        });
-        break;
-
       case MessageType.UPDATE_UNINSTALL_URL:
         chrome.runtime.setUninstallURL(
           `https://trackandtrace.tools/uninstall?metadata=${btoa(
@@ -259,67 +200,6 @@ chrome.runtime.onMessage.addListener((inboundEvent, sender, sendResponse) => {
         );
         break;
 
-      case MessageType.SEARCH_TRANSFERS:
-        // Log the search
-        // logEvent(MessageType.REFRESH_TRANSFER_RESULTS, inboundEvent.message.data, inboundEvent.message.options);
-
-        // Perform the search
-        database
-          .transferSearch(
-            inboundEvent.message.data.query,
-            inboundEvent.message.data.license,
-            inboundEvent.message.data.filters
-          )
-          .then((transfers) => {
-            respondToContentScript(sendResponse, inboundEvent, {
-              transfers,
-            });
-          });
-
-        break;
-
-      case MessageType.INDEX_TAGS:
-        database.indexTags(inboundEvent.message.data.indexedTagsData).then(() => {
-          respondToContentScript(sendResponse, inboundEvent, { success: true });
-        });
-        break;
-
-      case MessageType.SEARCH_TAGS:
-        // Log the search
-        logEvent(MessageType.SEARCH_TAGS, inboundEvent.message.data, inboundEvent.message.options);
-
-        // Perform the search
-        database
-          .tagSearch(
-            inboundEvent.message.data.query,
-            inboundEvent.message.data.license,
-            inboundEvent.message.data.filters
-          )
-          .then((tags) => {
-            respondToContentScript(sendResponse, inboundEvent, {
-              tags,
-            });
-          });
-
-        break;
-
-      // case MessageType.GET_EXTENSION_URL:
-      //   // https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/runtime/getURL
-      //   respondToContentScript(sendResponse, inboundEvent, {
-      //     success: true,
-      //     url: await browser.runtime.getURL(inboundEvent.message.data.path),
-      //   });
-      //   break;
-
-      // case MessageType.CHECK_PERMISSIONS:
-      //   // https://chrome-apps-doc2.appspot.com/extensions/permissions.html
-      //   respondToContentScript(sendResponse, inboundEvent, {
-      //     success: true,
-      //     hasPermissions: await browser.permissions.contains(inboundEvent.message.data),
-      //   });
-      //   break;
-
-      //   break;
       case MessageType.CHECK_OAUTH:
         getAuthTokenOrError({ interactive: false }).then(
           () => {
@@ -475,13 +355,14 @@ chrome.runtime.onMessage.addListener((inboundEvent, sender, sendResponse) => {
         break;
 
       case MessageType.LOG_ANALYTICS_EVENT:
+        console.log(inboundEvent);
+
+        if (inboundEvent.message.options.muteAnalytics) {
+          return true;
+        }
+
         try {
-          // Default behavior is to track event data in analytics
-          logEvent(
-            inboundEvent.message.data.eventName,
-            inboundEvent.message.data.eventData,
-            inboundEvent.message.options
-          );
+          track(inboundEvent.message.data);
 
           respondToContentScript(sendResponse, inboundEvent, { success: true });
         } catch (error) {
@@ -503,25 +384,6 @@ chrome.runtime.onMessage.addListener((inboundEvent, sender, sendResponse) => {
   return true;
 });
 
-//   portFromCS.onDisconnect.addListener(() => {
-//     portFromCS = null;
-//     console.log("Disconnected");
-//   });
-// }
-
-// @ts-ignore
-// browser.runtime.onConnect.addListener(connected);
-// chrome.runtime.onMessage.addListener(messageHandler);
-
-// chrome.permissions.onAdded.addListener((permissions: any) => {
-//   console.log("Permissions added:", permissions);
-//   sendMessageToContentScript({
-//     type: MessageType.PERMISSIONS_ADDED,
-//     data: permissions,
-//     options: {},
-//   });
-// });
-
 try {
   // Fired when:
   // - the extension is first installed
@@ -529,10 +391,10 @@ try {
   // - the browser is updated to a new version.
   chrome.runtime.onInstalled.addListener((details) => {
     if (details.reason === chrome.runtime.OnInstalledReason.UPDATE) {
-      logEvent("UPDATED_VERSION", {}, {});
+      // logEvent("UPDATED_VERSION", {}, {});
     }
     if (details.reason === chrome.runtime.OnInstalledReason.INSTALL) {
-      logEvent("NEW_INSTALL", {}, {});
+      // logEvent("NEW_INSTALL", {}, {});
 
       slackLog("NEW INSTALL", {});
 

@@ -303,7 +303,10 @@ export default Vue.extend({
     } else {
       // User is not logged in. Collect what we can.
       analyticsManager.setUserProperties({});
+      await t3RequestManager.clearTokens();
     }
+
+    t3RequestManager.t3SessionAuthOrError(false);
 
     // Run this in both states, but only after auth is acquired
     telemetryManager.init();

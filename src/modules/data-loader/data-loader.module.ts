@@ -70,7 +70,6 @@ import {
   ITransporterData,
 } from "@/interfaces";
 import { authManager } from "@/modules/auth-manager.module";
-import { databaseInterface } from "@/modules/database-interface.module";
 import {
   MetrcRequestManager,
   primaryMetrcRequestManager,
@@ -544,8 +543,6 @@ export class DataLoader implements IAtomicService {
             LicenseNumber: this._authState!.license,
           }));
 
-          databaseInterface.indexTags(tags, TagState.AVAILABLE);
-
           subscription.unsubscribe();
           resolve(tags);
         } catch (e) {
@@ -597,8 +594,6 @@ export class DataLoader implements IAtomicService {
             LicenseNumber: this._authState!.license,
           }));
 
-          databaseInterface.indexTags(tags, TagState.USED);
-
           subscription.unsubscribe();
           resolve(tags);
         } catch (e) {
@@ -626,8 +621,6 @@ export class DataLoader implements IAtomicService {
             TagMatcher: "",
             LicenseNumber: this._authState!.license,
           }));
-
-          databaseInterface.indexTags(tags, TagState.VOIDED);
 
           subscription.unsubscribe();
           resolve(tags);
@@ -1837,8 +1830,6 @@ export class DataLoader implements IAtomicService {
             })
           );
 
-          // databaseInterface.indexPackages(inTransitPackages, PackageState.IN_TRANSIT);
-
           subscription.unsubscribe();
           resolve(inTransitPackages);
         } catch (e) {
@@ -1914,8 +1905,6 @@ export class DataLoader implements IAtomicService {
             TagMatcher: "",
             LicenseNumber: this._authState!.license,
           }));
-
-          // databaseInterface.indexPackages(transferredPackages, PackageState.IN_TRANSIT);
 
           subscription.unsubscribe();
           resolve(transferredPackages);
@@ -2369,8 +2358,6 @@ export class DataLoader implements IAtomicService {
             LicenseNumber: this._authState!.license,
           }));
 
-          databaseInterface.indexTransfers(incomingTransfers, TransferState.INCOMING);
-
           subscription.unsubscribe();
           resolve(incomingTransfers);
         } catch (e) {
@@ -2384,7 +2371,9 @@ export class DataLoader implements IAtomicService {
     return this._incomingTransfers;
   }
 
-  async incomingInactiveTransfers(resetCache: boolean = false): Promise<IIndexedIncomingTransferData[]> {
+  async incomingInactiveTransfers(
+    resetCache: boolean = false
+  ): Promise<IIndexedIncomingTransferData[]> {
     if (resetCache) {
       this._incomingInactiveTransfers = null;
     }
@@ -2404,8 +2393,6 @@ export class DataLoader implements IAtomicService {
             TagMatcher: "",
             LicenseNumber: this._authState!.license,
           }));
-
-          databaseInterface.indexTransfers(incomingTransfers, TransferState.INCOMING);
 
           subscription.unsubscribe();
           resolve(incomingTransfers);
@@ -2487,8 +2474,6 @@ export class DataLoader implements IAtomicService {
             LicenseNumber: this._authState!.license,
           }));
 
-          databaseInterface.indexTransfers(outgoingTransfers, TransferState.OUTGOING);
-
           subscription.unsubscribe();
           resolve(outgoingTransfers);
         } catch (e) {
@@ -2502,7 +2487,9 @@ export class DataLoader implements IAtomicService {
     return this._outgoingTransfers;
   }
 
-  async outgoingInactiveTransfers(resetCache: boolean = false): Promise<IIndexedOutgoingTransferData[]> {
+  async outgoingInactiveTransfers(
+    resetCache: boolean = false
+  ): Promise<IIndexedOutgoingTransferData[]> {
     if (resetCache) {
       this._outgoingInactiveTransfers = null;
     }
@@ -2522,8 +2509,6 @@ export class DataLoader implements IAtomicService {
             TagMatcher: "",
             LicenseNumber: this._authState!.license,
           }));
-
-          databaseInterface.indexTransfers(outgoingTransfers, TransferState.OUTGOING);
 
           subscription.unsubscribe();
           resolve(outgoingTransfers);
@@ -2604,8 +2589,6 @@ export class DataLoader implements IAtomicService {
             TagMatcher: "",
             LicenseNumber: this._authState!.license,
           }));
-
-          databaseInterface.indexTransfers(rejectedTransfers, TransferState.REJECTED);
 
           subscription.unsubscribe();
           resolve(rejectedTransfers);

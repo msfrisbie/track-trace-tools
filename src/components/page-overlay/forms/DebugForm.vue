@@ -10,7 +10,6 @@
       <b-button variant="info" @click="resetAnnouncements()">RESET ANNOUNCEMENTS</b-button>
       <b-button variant="info" @click="throwError()">THROW ERROR</b-button>
       <b-button variant="info" @click="testToast()">TEST TOAST</b-button>
-      <!-- <b-button variant="info" @click="openCsvModal()">OPEN CSV MODAL</b-button> -->
     </div>
 
     <div class="grid grid-cols-3 gap-1">
@@ -252,9 +251,6 @@ export default Vue.extend({
         toaster: 'ttt-toaster',
         solid: true,
       });
-    },
-    async openCsvModal() {
-      modalManager.dispatchModalEvent(ModalType.CSV);
     },
     onChange() {
       store.dispatch(`settings/${SettingsActions.UPDATE_SETTINGS}`, this.settings);
