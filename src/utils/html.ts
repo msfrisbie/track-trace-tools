@@ -195,7 +195,6 @@ function extractAuthData(html: string) {
   }
 
   // Process identity data if found
-  // TODO add HTML fallback
   if (identityDataScriptText) {
     const identityMatch = identityDataScriptText.match(INITIALIZE_DO_NOT_SHOW_REGEX);
     if (identityMatch && identityMatch[1]) {
