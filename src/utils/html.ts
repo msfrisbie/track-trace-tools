@@ -148,58 +148,69 @@ function decodeData(data: string): string {
 function extractAuthData(html: string) {
   const container = document.createElement("div");
   container.innerHTML = html;
+  const scripts = container.querySelectorAll("script") as any;
 
-  const scripts = container.querySelectorAll(
-    // Diffing OR and CA source reveals that the script tags
-    // may or may not have the [type='text/javascript'] attribute.
-    "script"
-  ) as any;
+  let authDataScriptText: string | null = null;
+  let identityDataScriptText: string | null = null;
 
-  let authDataScriptText = null;
-
+  // Check all script tags separately for auth data and identity data
   for (const script of scripts) {
-    const match = script.textContent.match(AJAX_SETUP_REGEX);
+    if (!authDataScriptText) {
+      const authMatch = script.textContent.match(AJAX_SETUP_REGEX);
+      if (authMatch && authMatch[1]) {
+        authDataScriptText = script.textContent;
+      }
+    }
 
-    if (match && match[1]) {
-      authDataScriptText = script.textContent;
+    if (!identityDataScriptText) {
+      const identityMatch = script.textContent.match(INITIALIZE_DO_NOT_SHOW_REGEX);
+      if (identityMatch && identityMatch[1]) {
+        identityDataScriptText = script.textContent;
+      }
+    }
+
+    // Stop checking if both have been found
+    if (authDataScriptText && identityDataScriptText) {
       break;
     }
   }
 
-  let authData: IExtractedAuthData | null = null;
+  let extractedAuthDataDict: Record<string, any> | null = null;
+  let extractedIdentityArray: any[] | null = null;
 
-  let extractedAuthDataDict = null;
-  let extractedIdentityArray = null;
-
+  // Process auth data if found
   if (authDataScriptText) {
     const authMatch = authDataScriptText.match(AJAX_SETUP_REGEX);
-
     if (authMatch && authMatch[1]) {
-      let authJson = authMatch[1];
+      try {
+        const authJson = authMatch[1].replaceAll("headers", '"headers"').replaceAll("'", '"');
 
-      authJson = authJson.replaceAll("headers", '"headers"');
-
-      authJson = authJson.replaceAll("'", '"');
-
-      extractedAuthDataDict = JSON.parse(authJson);
+        extractedAuthDataDict = JSON.parse(authJson);
+      } catch (error) {
+        console.error("Failed to parse auth data JSON:", error);
+      }
     } else {
       console.error("Could not match auth data regex");
     }
+  }
 
-    const identityMatch = authDataScriptText.match(INITIALIZE_DO_NOT_SHOW_REGEX);
-
+  // Process identity data if found
+  // TODO add HTML fallback
+  if (identityDataScriptText) {
+    const identityMatch = identityDataScriptText.match(INITIALIZE_DO_NOT_SHOW_REGEX);
     if (identityMatch && identityMatch[1]) {
-      const identityString = identityMatch[1];
-
-      let identityJson = identityString.replaceAll("'", '"');
-
-      identityJson = `[${identityJson}]`;
-
-      extractedIdentityArray = JSON.parse(identityJson);
+      try {
+        const identityJson = `[${identityMatch[1].replaceAll("'", '"')}]`;
+        extractedIdentityArray = JSON.parse(identityJson);
+      } catch (error) {
+        console.error("Failed to parse identity data JSON:", error);
+      }
     } else {
       console.error("Could not match identity data regex");
     }
   }
+
+  let authData: IExtractedAuthData | null = null;
 
   if (!!extractedAuthDataDict && !!extractedIdentityArray) {
     authData = {
