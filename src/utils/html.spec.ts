@@ -1,35 +1,47 @@
-import '@/test/utils/auto-mock-debug';
-import { getFileText } from '@/test/utils/file';
-import { extract, ExtractionType } from './html';
+import "@/test/utils/auto-mock-debug";
+import { getFileText } from "@/test/utils/file";
+import { extract, ExtractionType } from "./html";
 
-describe('html.ts', () => {
-  it('Correctly extracts auth state', () => {
-    const txt = getFileText('../../test/fixtures/html', 'mi-packages.html');
+describe("html.ts", () => {
+  it("Correctly extracts auth state", () => {
+    const MItxt = getFileText("../../test/fixtures/html", "mi-packages.html");
 
-    const authData = extract(ExtractionType.AUTH_DATA, txt);
+    const MIauthData = extract(ExtractionType.AUTH_DATA, MItxt);
 
-    expect(authData).toEqual({
+    expect(MIauthData).toEqual({
       authData: {
-        apiVerificationToken: 'Api-Verification-Token',
-        identity: 'USER_ID',
-        license: 'LICENSE-NUMBER-0001',
+        apiVerificationToken: "Api-Verification-Token",
+        identity: "USER_ID",
+        license: "LICENSE-NUMBER-0001",
+      },
+    });
+
+    const OHtxt = getFileText("../../test/fixtures/html", "oh-packages.html");
+
+    const OHauthData = extract(ExtractionType.AUTH_DATA, OHtxt);
+
+    expect(OHauthData).toEqual({
+      authData: {
+        apiVerificationToken: "VERIFTOKEN",
+        identity: "OH_USER",
+        license: "OH_LICENSE",
       },
     });
   });
 
-  it('Correctly extracts repeater data', () => {
-    const txt = getFileText('../../test/fixtures/html', 'add-items-modal-response.html');
+  it("Correctly extracts repeater data", () => {
+    const txt = getFileText("../../test/fixtures/html", "add-items-modal-response.html");
 
     const result = extract(ExtractionType.REPEATER_DATA, txt);
 
     expect(Object.keys(result?.repeaterData?.parsedRepeaterData || {})).toEqual([
-      'Adding',
-      'Items',
-      'ItemBrands',
-      'ItemCategories',
-      'Strains',
-      'UnitsOfMeasure',
-      'Details',
+      "Adding",
+      "Items",
+      "ItemBrands",
+      "ItemCategories",
+      "Strains",
+      "UnitsOfMeasure",
+      "Details",
     ]);
   });
 });
