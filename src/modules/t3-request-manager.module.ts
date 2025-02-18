@@ -368,6 +368,7 @@ class T3RequestManager implements IAtomicService {
     labelTemplateLayoutId: string;
     labelContentLayoutId: string;
     labelContentData: { [key: string]: string }[];
+    renderingOptions: { [key: string]: any };
   }) {
     return customAxios(
       `${BASE_URL}${GENERATE_LABELS_PATH}?licenseNumber=${
@@ -392,6 +393,7 @@ class T3RequestManager implements IAtomicService {
     labelTemplateLayoutId: string;
     labelContentLayoutId: string;
     data: string[];
+    renderingOptions: { [key: string]: any };
   }) {
     return customAxios(
       `${BASE_URL}${GENERATE_ACTIVE_PACKAGE_LABELS_PATH}?licenseNumber=${

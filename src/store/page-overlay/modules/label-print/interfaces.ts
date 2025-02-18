@@ -26,6 +26,7 @@ export interface ILabelPrintState {
   selectedContentLayoutId: string | null;
   rawTagList: string;
   labelsPerTag: number;
+  barcodeBarThickness: number;
   selectedLabelEndpoint: LabelEndpoint;
   errorText: string | null;
 }

@@ -112,6 +112,16 @@
                             @change="onChange('labelsPerTag', $event)"></b-form-input>
                     </b-form-group>
 
+                    <b-form-group
+                        description="Adjust this value if you're using a low-DPI printer and the printed
+                            barcodes are too thick
+                            and/or unscannable. A higher number means thicker barcode bars. 0.94 is the recommended value for most thermal printers."
+                        label-size="lg" label-class="text-purple-600">
+                        <b-form-input type="number" step="0.01" min="0.5" max="1.5"
+                            :value="labelPrintState.barcodeBarThickness"
+                            @change="onChange('barcodeBarThickness', $event)"></b-form-input>
+                    </b-form-group>
+
                     <b-button variant="primary" :disabled="!enableGeneration" @click="generateLabelPdf()">GENERATE
                         PDF</b-button>
 
