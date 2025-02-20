@@ -37,6 +37,7 @@ import { extractPackagePropertyFromDimension } from "./packages-quickview-report
 import { extractPointInTimeInventoryData } from "./point-in-time-inventory-report";
 import { extractScanSheetData, totalScanSheetTransferCount } from "./scan-sheet-report";
 import { extractSingleTransferData } from "./single-transfer-report";
+import { extractEmployeePermissionsData } from "./employee-permissions-report";
 
 export function eligibleReportTypes({
   reportConfig,
@@ -525,6 +526,12 @@ export function extractFlattenedData({
           reportConfig,
           reportData,
         });
+      case ReportType.EMPLOYEE_PERMISSIONS:
+        return extractEmployeePermissionsData({
+          reportType,
+          reportConfig,
+          reportData,
+        });
       case ReportType.HARVEST_PACKAGES:
         return extractHarvestPackagesData({
           reportType,
@@ -705,6 +712,9 @@ export function getSheetTitle({
       break;
     case ReportType.EMPLOYEE_AUDIT:
       title = SheetTitles.EMPLOYEE_AUDIT;
+      break;
+    case ReportType.EMPLOYEE_PERMISSIONS:
+      title = SheetTitles.EMPLOYEE_PERMISSIONS;
       break;
     case ReportType.SINGLE_TRANSFER:
       title = `${SheetTitles.SINGLE_TRANSFER} ${

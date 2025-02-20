@@ -46,6 +46,7 @@ import {
 import _ from "lodash-es";
 import { v4 as uuidv4 } from "uuid";
 import { ActionContext } from "vuex";
+import { maybeLoadEmployeePermissionsReportData } from "@/utils/reports/employee-permissions-report";
 import { ClientGetters } from "../client/consts";
 import {
   IStatusMessage,
@@ -418,6 +419,21 @@ export const reportsModule = {
           isHeadless: false,
         },
         {
+          text: "Employee Permissions",
+          value: ReportType.EMPLOYEE_PERMISSIONS,
+          enabled: rootGetters[`client/${ClientGetters.T3PLUS}`],
+          visible: true,
+          description: "View all employee permissions in Metrc",
+          isCustom: false,
+          usesSpreadsheetFormulas: false,
+          requiresGoogleSheets: false,
+          usesFieldTransformer: false,
+          isSpecialty: true,
+          isCatalog: false,
+          isQuickview: false,
+          isHeadless: false,
+        },
+        {
           text: "Scan Sheet",
           value: ReportType.SCAN_SHEET,
           enabled: rootGetters[`client/${ClientGetters.T3PLUS}`],
@@ -732,6 +748,7 @@ export const reportsModule = {
         await maybeLoadEmployeeSamplesReportData({ ctx, reportData, reportConfig });
         await maybeLoadHarvestPackagesReportData({ ctx, reportData, reportConfig });
         await maybeLoadEmployeeAuditReportData({ ctx, reportData, reportConfig });
+        await maybeLoadEmployeePermissionsReportData({ ctx, reportData, reportConfig });
         await maybeLoadPointInTimeInventoryReportData({ ctx, reportData, reportConfig });
         await maybeLoadSingleTransferReportData({ ctx, reportData, reportConfig });
         await maybeLoadScanSheetReportData({ ctx, reportData, reportConfig });

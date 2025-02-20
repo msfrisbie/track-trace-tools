@@ -807,6 +807,16 @@
           </div>
         </template>
 
+        <!-- Employee Permissions -->
+        <template v-if="selectedReports.find((report) => report.value === ReportType.EMPLOYEE_PERMISSIONS)">
+          <div class="overflow-visible rounded border border-gray-300 p-2 flex flex-col items-stretch gap-2">
+            <div class="font-semibold text-white ttt-purple-bg p-2 -m-2">Employee Permissions</div>
+            <hr />
+
+            <report-license-picker :formFilters="employeePermissionsFormFilters"></report-license-picker>
+          </div>
+        </template>
+
         <packages-quickview-report
           :packagesQuickviewFormFilters="packagesQuickviewFormFilters"></packages-quickview-report>
 
@@ -955,6 +965,7 @@ import {
   addEmployeeAuditReport,
   employeeAuditFormFiltersFactory,
 } from "@/utils/reports/employee-audit-report";
+import { addEmployeePermissionsReport, employeePermissionsFormFiltersFactory } from "@/utils/reports/employee-permissions-report";
 import {
   addEmployeeSamplesReport,
   employeeSamplesFormFiltersFactory,
@@ -1154,6 +1165,7 @@ export default Vue.extend({
       employeeSamplesFormFilters: employeeSamplesFormFiltersFactory(),
       harvestPackagesFormFilters: harvestPackagesFormFiltersFactory(),
       employeeAuditFormFilters: employeeAuditFormFiltersFactory(),
+      employeePermissionsFormFilters: employeePermissionsFormFiltersFactory(),
       showAllRecent: false,
     };
   },
@@ -1300,6 +1312,17 @@ export default Vue.extend({
         addEmployeeAuditReport({
           reportConfig,
           employeeAuditFormFilters: this.employeeAuditFormFilters,
+        });
+      }
+
+      if (
+        this.selectedReports.find(
+          (report: IReportOption) => report.value === ReportType.EMPLOYEE_PERMISSIONS
+        )
+      ) {
+        addEmployeePermissionsReport({
+          reportConfig,
+          employeePermissionsFormFilters: this.employeePermissionsFormFilters,
         });
       }
 

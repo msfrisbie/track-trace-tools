@@ -155,6 +155,7 @@ enum UrlType {
   HARVEST_HISTORY_BY_HARVEST_ID,
   NEW_ITEM_MODAL,
   MOVE_PACKAGES_MODAL,
+  EDIT_EMPLOYEES_MODAL,
   NEW_STRAIN_MODAL,
   WASTE_BY_LOCATION,
   ADJUST_PACKAGE,
@@ -191,6 +192,10 @@ async function buildDynamicUrl(
       return `${origin({ divertToNullOrigin: false })}/industry/${
         authState.license
       }/transfers/licensed/addedit?isModal=true&adding=true&_=${new Date().getTime()}`;
+    case UrlType.EDIT_EMPLOYEES_MODAL:
+      return `${origin({ divertToNullOrigin: false })}/industry/${
+        authState.license
+      }/admin/employees/addedit?isModal=true&adding=false&licenseSource=Internal&_=${new Date().getTime()}`;
     case UrlType.PACKAGES:
       return `${origin({ divertToNullOrigin: false })}/industry/${authState.license}/packages`;
     case UrlType.MOVE_PACKAGES_MODAL:
@@ -1337,6 +1342,16 @@ export class MetrcRequestManager implements IAtomicService {
 
   async getMovePackagesHTML() {
     return customAxios(await buildDynamicUrl(this.authStateOrError, UrlType.MOVE_PACKAGES_MODAL), {
+      ...DEFAULT_FETCH_GET_OPTIONS,
+      headers: {
+        ...(await buildAuthenticationHeaders(this.authStateOrError)),
+        Accept: "text/html, */*; q=0.01",
+      },
+    });
+  }
+
+  async getEditEmployeesHTML() {
+    return customAxios(await buildDynamicUrl(this.authStateOrError, UrlType.EDIT_EMPLOYEES_MODAL), {
       ...DEFAULT_FETCH_GET_OPTIONS,
       headers: {
         ...(await buildAuthenticationHeaders(this.authStateOrError)),

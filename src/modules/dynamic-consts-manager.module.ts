@@ -212,6 +212,54 @@ interface INewTransferRepeaterData {
   TransferTypes: IMetrcTransferType[];
 }
 
+export interface IEmployeeData {
+  EmployeeId: number; // 8383537
+  FacilityId: number; // 235235
+  LicenseSource: "Internal";
+  FacilityLicenseNumber: null;
+  EmployeeLicenseNumber: string; // EX00001
+  EmployeeFirstName: null;
+  EmployeeLastName: null;
+  EmployeeLastFourSocialSecurityNumber: null;
+  EmployeeBirthdayMonthYear: null;
+  EmployeeBirthdayMonthDayYear: null;
+  FullName: string; // Joe Dude
+  Email: string; // email@example.com
+  PhoneNumber: null;
+  PasswordSet: true;
+  ResendWelcomeEmail: false;
+  HomePage: "Packages";
+  CanLogIn: true;
+  Owner: false;
+  Manager: true;
+  IsFinancialContact: false;
+  Occupations: [];
+  IsIndustryAdmin: false;
+  Permissions: string[];
+  // [
+  //     "Industry | Caregiver Status Lookup",
+  //     "Industry | Manage Packages",
+  //     "Industry | Manage Patients Check-Ins",
+  //     "Industry | Manage Sales",
+  //     "Industry | Manage Sales Delivery",
+  //     "Industry | Manage Transfers",
+  //     "Industry | Manage Transfers Hub",
+  //     "Industry | Patient Status Lookup",
+  //     "Industry | View Packages"
+  // ],
+  Facilities: null;
+}
+
+export interface IEmployeeOccupationData {
+  Id: number;
+  Name: string;
+}
+
+export interface IEditEmployeesRepeaterData {
+  Employees: IEmployeeData[];
+  Occupations: IEmployeeOccupationData[];
+}
+
 const debugLog = debugLogFactory("dynamic-consts-manager.module.ts");
 
 export class DynamicConstsManager implements IAtomicService {
@@ -232,6 +280,8 @@ export class DynamicConstsManager implements IAtomicService {
   private _adjustPackageRepeaterData: Promise<any> | null = null;
 
   private _remediatePackageRepeaterData: Promise<any> | null = null;
+
+  private _editEmployeesRepeaterData: Promise<any> | null = null;
 
   private _createPlantingsFromPackagesRepeaterData: Promise<any> | null = null;
 
@@ -737,6 +787,40 @@ export class DynamicConstsManager implements IAtomicService {
     return this._newTransferRepeaterData;
   }
 
+  private async editEmployeesRepeaterData(): Promise<IEditEmployeesRepeaterData> {
+    if (!this._editEmployeesRepeaterData) {
+      this._editEmployeesRepeaterData = new Promise(async (resolve, reject) => {
+        // This payload is huge, double the allowed timeout
+        const subscription = timer(DYNAMIC_CONST_TIMEOUT_MS * 2).subscribe(() =>
+          reject("Edit employees fetch timed out")
+        );
+
+        try {
+          // The cost of loading the HTML from indexeDB and re-parsing it is huge,
+          // cache the result in memory
+          const html = await this.metrcRequestManagerOrError
+            .getEditEmployeesHTML()
+            .then((response) => response.data);
+
+          const extractedData = extract(ExtractionType.REPEATER_DATA, html);
+
+          const parsedRepeaterData = _.cloneDeep(extractedData?.repeaterData?.parsedRepeaterData);
+
+          if (!parsedRepeaterData) {
+            throw new Error("editEmployeesRepeaterData: Failed to extract repeaterData");
+          }
+
+          subscription.unsubscribe();
+          resolve(parsedRepeaterData);
+        } catch (e) {
+          subscription.unsubscribe();
+          reject(e);
+        }
+      });
+    }
+    return this._editEmployeesRepeaterData;
+  }
+
   async destroyPlantBatchesReasons(): Promise<IDestroyPlantBatchActionReason[]> {
     const repeaterData = await this.destroyPlantBatchesRepeaterData();
 
@@ -875,6 +959,26 @@ export class DynamicConstsManager implements IAtomicService {
     }
 
     throw new Error("Plant batch growth phases unable to load");
+  }
+
+  async employees(): Promise<IEmployeeData[]> {
+    const repeaterData = await this.editEmployeesRepeaterData();
+
+    if (repeaterData.Employees) {
+      return repeaterData.Employees;
+    }
+
+    throw new Error("Employees unable to load");
+  }
+
+  async employeeOccupations(): Promise<IEmployeeOccupationData[]> {
+    const repeaterData = await this.editEmployeesRepeaterData();
+
+    if (repeaterData.Occupations) {
+      return repeaterData.Occupations;
+    }
+
+    throw new Error("Occupations unable to load");
   }
 
   async defaultPhoneNumberForQuestions(): Promise<string> {

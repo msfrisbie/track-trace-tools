@@ -141,6 +141,10 @@ export interface IReportConfig {
     employeeQuery: string;
     fields: null;
   };
+  [ReportType.EMPLOYEE_PERMISSIONS]?: {
+    licenses: string[];
+    fields: null;
+  };
   [ReportType.SCAN_SHEET]?: {
     incomingTransferFilter: ITransferFilter;
     outgoingTransferFilter: ITransferFilter;
@@ -244,6 +248,9 @@ export interface IReportData {
   };
   [ReportType.EMPLOYEE_AUDIT]?: {
     employeeAuditMatrix: any[][];
+  };
+  [ReportType.EMPLOYEE_PERMISSIONS]?: {
+    employeePermissionsMatrix: any[][];
   };
   [ReportType.PACKAGES]?: {
     packages: IIndexedPackageData[];

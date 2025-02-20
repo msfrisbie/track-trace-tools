@@ -520,6 +520,7 @@ export enum SheetTitles {
   EMPLOYEE_SAMPLES = "Distributed Employee Samples",
   RECEIVED_SAMPLES = "Received Samples",
   EMPLOYEE_AUDIT = "Employee Audit",
+  EMPLOYEE_PERMISSIONS = "Employee Permissions",
   SCAN_SHEET = "Scan Sheet",
   HARVEST_PACKAGES = "Harvest Packages",
   POINT_IN_TIME_INVENTORY = "Point In Time Inventory",
