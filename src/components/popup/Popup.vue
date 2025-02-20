@@ -15,6 +15,36 @@
       >
         <font-awesome-icon icon="plus-circle"></font-awesome-icon><span>T3+</span>
       </b-button> -->
+      <b-button variant="outline-primary" href="https://trackandtrace.tools/wiki" target="_blank"
+        class="flex flex-row gap-2 justify-center items-center">
+        <font-awesome-icon icon="book-open"></font-awesome-icon><span>T3 WIKI</span>
+      </b-button>
+
+      <b-button variant="outline-primary" href="https://trackandtrace.tools/api" target="_blank"
+        class="flex flex-row gap-2 justify-center items-center">
+        <font-awesome-icon icon="file"></font-awesome-icon><span>T3 API</span>
+      </b-button>
+
+      <b-button variant="outline-primary" href="https://trackandtrace.tools/community" target="_blank"
+        class="flex flex-row gap-2 justify-center items-center">
+        <font-awesome-icon icon="users"></font-awesome-icon><span>COMMUNITY</span>
+      </b-button>
+
+      <b-button variant="outline-primary"
+        href="https://docs.google.com/forms/d/e/1FAIpQLSd2hQFwtXyv1Bco9nHN9d4tEqkgbhe3w-WdbZAemBCTD_19VQ/viewform?usp=sf_link"
+        target="_blank" class="flex flex-row gap-2 justify-center items-center">
+        <font-awesome-icon icon="exclamation-triangle"></font-awesome-icon><span>REPORT A PROBLEM</span>
+      </b-button>
+
+      <b-button variant="outline-primary" href="https://forms.gle/9J5UMXN4FkAZQ5wH9" target="_blank"
+        class="flex flex-row gap-2 justify-center items-center">
+        <font-awesome-icon icon="comment"></font-awesome-icon><span>SEND FEEDBACK</span>
+      </b-button>
+
+      <b-button variant="outline-primary" href="https://trackandtrace.tools/plus" target="_blank"
+        class="flex flex-row gap-2 justify-center items-center">
+        <font-awesome-icon icon="plus"></font-awesome-icon><span>T3+</span>
+      </b-button>
 
       <b-button variant="outline-primary" @click="openOptions()"
         class="flex flex-row gap-2 justify-center items-center">
@@ -49,7 +79,13 @@ library.add(
   // @ts-ignore
   fontawesomeSolid.faInfoCircle,
   fontawesomeSolid.faPlusCircle,
-  fontawesomeSolid.faSignOutAlt
+  fontawesomeSolid.faSignOutAlt,
+  fontawesomeSolid.faUsers,
+  fontawesomeSolid.faExclamationTriangle,
+  fontawesomeSolid.faComment,
+  fontawesomeSolid.faFile,
+  fontawesomeSolid.faPlus,
+  fontawesomeSolid.faBookOpen
 );
 
 export default Vue.extend({
