@@ -8,6 +8,7 @@ import {
   IIndexedRichOutgoingTransferData,
   IIndexedTransferData,
   ILicenseFormFilters,
+  IRichDestinationData,
   ITransferData,
   ITransporterData,
 } from "@/interfaces";
@@ -228,6 +229,32 @@ export function applyCustomTransformer(field: IFieldData, untypedRow: any): stri
       }
 
       return outgoingValueTotal.toString();
+
+    case CustomTransformer.INCOMING_TRANSFER_JOINED_TRANSPORTERS:
+      const incomingTransferJoinedTransportersRow: {
+        Transfer: IIndexedRichIncomingTransferData;
+      } = untypedRow;
+
+      return incomingTransferJoinedTransportersRow.Transfer.incomingTransporters!.map(
+        (x) => `${x.TransporterFacilityName} (${x.TransporterFacilityLicenseNumber})`
+      ).join(",");
+    case CustomTransformer.OUTGOING_TRANSFER_JOINED_TRANSPORTERS:
+      const outgoingTransferJoinedTransportersRow: {
+        Destination: IRichDestinationData;
+      } = untypedRow;
+
+      return outgoingTransferJoinedTransportersRow.Destination.transporters!.map(
+        (x) => `${x.TransporterFacilityName} (${x.TransporterFacilityLicenseNumber})`
+      ).join(",");
+    case CustomTransformer.OUTGOING_TRANSFER_JOINED_TRANSPORTER_DETAILS:
+      const outgoingTransferJoinedTransporterDetailsRow: {
+        Transfer: IIndexedRichOutgoingTransferData;
+      } = untypedRow;
+
+      return outgoingTransferJoinedTransporterDetailsRow.Transfer.transporterDetails!.map(
+        (x) =>
+          `${x.DriverName}/${x.VehicleMake} ${x.VehicleModel} (${x.VehicleLicensePlateNumber})`
+      ).join(",");
     case CustomTransformer.PACKAGE_MANIFEST_INDEX:
       const packageManifestIndexRow: {
         Transfer: IIndexedRichIncomingTransferData;

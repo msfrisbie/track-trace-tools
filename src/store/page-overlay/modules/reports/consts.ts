@@ -92,6 +92,9 @@ export enum CustomTransformer {
   PACKAGE_MANIFEST_INDEX = "PACKAGE_MANIFEST_INDEX",
   TRANSFER_MANIFEST_TOTAL_INCOMING_WHOLESALE_VALUE = "TRANSFER_MANIFEST_TOTAL_INCOMING_WHOLESALE_VALUE",
   TRANSFER_MANIFEST_TOTAL_OUTGOING_WHOLESALE_VALUE = "TRANSFER_MANIFEST_TOTAL_OUTGOING_WHOLESALE_VALUE",
+  INCOMING_TRANSFER_JOINED_TRANSPORTERS = "INCOMING_TRANSFER_JOINED_TRANSPORTERS",
+  OUTGOING_TRANSFER_JOINED_TRANSPORTER_DETAILS = "OUTGOING_TRANSFER_JOINED_TRANSPORTER_DETAILS",
+  OUTGOING_TRANSFER_JOINED_TRANSPORTERS = "OUTGOING_TRANSFER_JOINED_TRANSPORTERS",
 }
 
 const COMMON_PACKAGE_FIELD_DATA: IFieldData[] = [
@@ -376,11 +379,10 @@ const COMMON_INCOMING_TRANSFER_FIELD_DATA: IFieldData[] = [
     initiallyChecked: true,
   },
   {
-    value: "ManifestTotalIncomingWholesaleValue",
-    readableName: "Manifest Total Incoming Wholesale Value",
+    value: "Transfer.IsVoided",
+    readableName: "Is Voided?",
     required: false,
     initiallyChecked: true,
-    customTransformer: CustomTransformer.TRANSFER_MANIFEST_TOTAL_INCOMING_WHOLESALE_VALUE,
   },
 ];
 const COMMON_OUTGOING_TRANSFER_FIELD_DATA: IFieldData[] = [
@@ -420,13 +422,6 @@ const COMMON_OUTGOING_TRANSFER_FIELD_DATA: IFieldData[] = [
     readableName: "Shipper License",
     required: false,
     initiallyChecked: true,
-  },
-  {
-    value: "ManifestTotalOutgoingWholesaleValue",
-    readableName: "Manifest Total Outgoing Wholesale Value",
-    required: false,
-    initiallyChecked: true,
-    customTransformer: CustomTransformer.TRANSFER_MANIFEST_TOTAL_OUTGOING_WHOLESALE_VALUE,
   },
   {
     value: "Destination.RecipientFacilityName",
@@ -707,6 +702,13 @@ export const SHEET_FIELDS: { [key: string]: IFieldData[] } = {
   [ReportType.TRANSFER_HUB_TRANSFERS]: [...COMMON_OUTGOING_TRANSFER_FIELD_DATA],
   [ReportType.INCOMING_TRANSFER_MANIFESTS]: [
     ...COMMON_INCOMING_TRANSFER_FIELD_DATA,
+    {
+      value: "IncomingTransferJoinedTransporters",
+      readableName: "Incoming Transfer Transporter",
+      required: false,
+      initiallyChecked: true,
+      customTransformer: CustomTransformer.INCOMING_TRANSFER_JOINED_TRANSPORTERS,
+    },
     ...COMMON_TRANSFER_PACKAGE_DATA,
     {
       value: "ManifestTotalIncomingWholesaleValue",
@@ -826,6 +828,22 @@ export const SHEET_FIELDS: { [key: string]: IFieldData[] } = {
   [ReportType.OUTGOING_TRANSFER_MANIFESTS]: [
     ...COMMON_OUTGOING_TRANSFER_FIELD_DATA.slice(0, 5),
     ...COMMON_TRANSFER_PACKAGE_DATA.slice(1),
+
+    {
+      value: "OutgoingTransferJoinedTransporters",
+      readableName: "Outgoing Transfer Transporters",
+      required: false,
+      initiallyChecked: true,
+      customTransformer: CustomTransformer.OUTGOING_TRANSFER_JOINED_TRANSPORTERS,
+    },
+
+    {
+      value: "OutgoingTransferJoinedTransporterDetails",
+      readableName: "Outgoing Transfer Transporter Details",
+      required: false,
+      initiallyChecked: true,
+      customTransformer: CustomTransformer.OUTGOING_TRANSFER_JOINED_TRANSPORTER_DETAILS,
+    },
     ...COMMON_OUTGOING_TRANSFER_FIELD_DATA.slice(5),
     {
       value: "ManifestTotalOutgoingWholesaleValue",

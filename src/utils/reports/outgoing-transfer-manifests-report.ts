@@ -136,6 +136,12 @@ export async function maybeLoadOutgoingTransferManifestsReportData({
           transfer.outgoingDestinations = outgoingDestinations;
         })
       );
+
+      promises.push(
+        primaryDataLoader.transferTransporterDetails(transfer.Id).then((transporterDetails) => {
+          transfer.transporterDetails = transporterDetails;
+        })
+      );
     }
 
     await Promise.allSettled(promises);

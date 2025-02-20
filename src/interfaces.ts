@@ -1006,6 +1006,7 @@ export interface IIndexedIncomingTransferData extends IIndexedTransferData {}
  */
 export interface IIndexedRichOutgoingTransferData extends IIndexedOutgoingTransferData {
   outgoingDestinations?: IRichDestinationData[];
+  transporterDetails?: ITransferTransporterDetails[];
 }
 
 export interface IIndexedRichIncomingTransferData extends IIndexedIncomingTransferData {
