@@ -47,6 +47,24 @@ class T3RequestManager implements IAtomicService {
 
     this.t3AccessToken = result[ChromeStorageKeys.T3_ACCESS_TOKEN] || null;
     this.t3RefreshToken = result[ChromeStorageKeys.T3_REFRESH_TOKEN] || null;
+
+    setInterval(async () => {
+      if (!this.t3AccessToken || !this.t3RefreshToken) {
+        return;
+      }
+
+      const response = await this.t3SessionRefresh();
+
+      const { accessToken } = response.data;
+
+      if (!accessToken) {
+        throw new Error(
+          `Refresh endpoint did not return required tokens: ${JSON.stringify(response.data)}`
+        );
+      }
+
+      this.t3AccessToken = accessToken;
+    }, 30000);
   }
 
   get t3AccessToken(): string | null {
@@ -394,7 +412,7 @@ class T3RequestManager implements IAtomicService {
     labelContentLayoutId: string;
     data: string[];
     renderingOptions: { [key: string]: any };
-    debug: boolean
+    debug: boolean;
   }) {
     return customAxios(
       `${BASE_URL}${GENERATE_ACTIVE_PACKAGE_LABELS_PATH}?licenseNumber=${

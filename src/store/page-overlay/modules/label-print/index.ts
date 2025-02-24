@@ -19,6 +19,7 @@ const persistedState = {
   selectedContentLayoutId: null,
   labelsPerTag: 1,
   barcodeBarThickness: 0.94,
+  labelMarginThickness: 1.0,
   debug: false,
   selectedLabelEndpoint: LabelEndpoint.ACTIVE_PACKAGES,
 };
@@ -164,7 +165,8 @@ export const labelPrintModule = {
               labelContentLayoutId: ctx.state.selectedContentLayoutId!,
               data: labelData,
               renderingOptions: {
-                barcodeBarThickness: ctx.state.barcodeBarThickness
+                barcodeBarThickness: ctx.state.barcodeBarThickness,
+                labelMarginThickness: ctx.state.labelMarginThickness
               },
               debug: ctx.state.debug
             });

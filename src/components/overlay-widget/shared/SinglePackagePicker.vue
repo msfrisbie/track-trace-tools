@@ -4,11 +4,12 @@
     <div class="flex flex-col row-span-2 items-center">
       <div class="w-full flex flex-col space-y-4" style="max-width: 480px">
         <div class="flex flex-row items-stretch justify-center">
-          <b-form-group :label="inputLabel" label-size="sm" label-class="text-gray-400" class="w-full">
+          <b-form-group :label="inputLabel" :description="inputDescription" label-size="sm" label-class="text-gray-400"
+            class="w-full">
             <vue-typeahead-bootstrap v-model="query" :data="filteredSourcePackages" :serializer="(pkg) =>
-                `${getLabelOrError(pkg)} ${getQuantityOrError(pkg)} ${getUnitOfMeasureNameOrError(
-                  pkg
-                )} ${getItemNameOrError(pkg)}`
+              `${getLabelOrError(pkg)} ${getQuantityOrError(pkg)} ${getUnitOfMeasureNameOrError(
+                pkg
+              )} ${getItemNameOrError(pkg)}`
               " :minMatchingChars="0" :showOnFocus="true" :maxMatches="100" @hit="addPackage($event)" type="text"
               required placeholder="Label, item, strain..." size="md" ref="typeahead">
               <template slot="suggestion" slot-scope="{ htmlText, data }">
@@ -76,7 +77,7 @@
       <div class="flex flex-col items-center space-y-4">
         <span class="text-center text-xl font-bold"><animated-number :number="selectedPackages.length" /> package{{
           selectedPackages.length === 1 ? "" : "s"
-        }}
+          }}
           selected</span>
 
         <template v-if="selectedPackages.length > 0">
@@ -123,6 +124,10 @@ export default Vue.extend({
     inputLabel: {
       type: String,
       default: "SELECT PACKAGE"
+    },
+    inputDescription: {
+      type: String,
+      default: ""
     },
     enablePaste: {
       type: Boolean,
