@@ -19,6 +19,7 @@ const persistedState = {
   selectedContentLayoutId: null,
   labelsPerTag: 1,
   barcodeBarThickness: 0.94,
+  debug: false,
   selectedLabelEndpoint: LabelEndpoint.ACTIVE_PACKAGES,
 };
 
@@ -164,7 +165,8 @@ export const labelPrintModule = {
               data: labelData,
               renderingOptions: {
                 barcodeBarThickness: ctx.state.barcodeBarThickness
-              }
+              },
+              debug: ctx.state.debug
             });
 
             labelPdfBlobUrl = URL.createObjectURL(response.data);

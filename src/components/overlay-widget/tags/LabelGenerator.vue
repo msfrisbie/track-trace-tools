@@ -12,14 +12,9 @@
             </div>
         </template>
         <template v-if="isReady">
-            <div class="grid grid-cols-2 w-full h-full p-8 gap-8 justify-start"
-                style="grid-template-columns: 420px 1fr;">
-                <div class="flex flex-col items-stretch gap-8">
-
-                    <b-button variant="outline-info"
-                        href="https://github.com/classvsoftware/t3-wiki/wiki/T3-Chrome-Extension-:-Label-PDF-Generator"
-                        target="_blank">HOW DO I USE THIS?</b-button>
-
+            <div class="grid grid-cols-3 w-full h-full p-8 gap-8 justify-start"
+                style="grid-template-columns: 300px 300px 1fr; grid-template-rows: auto 1fr">
+                <div class="col-span-2 flex flex-col items-stretch gap-8">
                     <b-card v-if="!hasPlus" class="text-lg">
                         <div class="flex flex-col gap-2">
                             <span>You're using the free version of T3 label
@@ -31,13 +26,17 @@
                         </div>
                     </b-card>
 
-                    <b-card class="text-lg">T3 label printing is in beta.<br /><a
+                    <b-card class="text-lg text-center">T3 label printing is in beta.<br /><a
                             href="https://forms.gle/9J5UMXN4FkAZQ5wH9" target="_blank"
                             class="underline text-purple-500 font-semibold">SUGGEST MORE
                             FORMATS</a> or <a
                             href="https://docs.google.com/forms/d/e/1FAIpQLSd2hQFwtXyv1Bco9nHN9d4tEqkgbhe3w-WdbZAemBCTD_19VQ/viewform?usp=sf_link"
                             class="underline text-purple-500 font-semibold" target="_blank">REPORT A
                             PROBLEM</a>.</b-card>
+
+                    <b-button variant="outline-info"
+                        href="https://github.com/classvsoftware/t3-wiki/wiki/T3-Chrome-Extension-:-Label-PDF-Generator"
+                        target="_blank">HOW DO I USE THIS?</b-button>
 
                     <!-- <b-form-group label="LABEL GENERATION"
                         description="Automatically generate from tag numbers, or manually provide label text"
@@ -49,11 +48,11 @@
                             <template #first>
                                 <b-form-select-option :value="null" disabled>How do you want to fill out
                                     labels?</b-form-select-option>
-                            </template></b-form-select>
-</b-form-group> -->
+                            </template></b-form-select></b-form-group> -->
 
-                    <hr />
+                </div>
 
+                <div class="flex flex-col items-stretch gap-8 row-start-2">
                     <b-form-group label="LABEL TEMPLATE" description="Select what type of labels you are printing on"
                         label-size="lg" label-class="text-purple-600">
                         <b-form-select :options="labelTemplateLayoutOptions"
@@ -80,8 +79,38 @@
                         </b-form-select>
                     </b-form-group>
 
-                    <hr />
+                    <b-form-group description="How many copies of each label to generate" label-size="lg"
+                        label-class="text-purple-600">
+                        <b-form-input type="number" step="1" min="1" :value="labelPrintState.labelsPerTag"
+                            @change="onChange('labelsPerTag', $event)"></b-form-input>
+                    </b-form-group>
 
+                    <simple-drawer toggleText="ADVANCED">
+                        <b-form-group
+                            description="Adjust this value if you're using a low-DPI printer and the printed
+                            barcodes are too thick
+                            and/or unscannable. A higher number means thicker barcode bars. 0.94 is the recommended value for most thermal printers."
+                            label-size="lg" label-class="text-purple-600">
+                            <b-form-input type="number" step="0.01" min="0.5" max="1.5"
+                                :value="labelPrintState.barcodeBarThickness"
+                                @change="onChange('barcodeBarThickness', $event)"></b-form-input>
+                        </b-form-group>
+
+                        <b-form-group>
+                            <b-form-checkbox :checked="labelPrintState.debug" @change="onChange('debug', $event)">
+                                Debug
+                            </b-form-checkbox>
+                        </b-form-group>
+                    </simple-drawer>
+
+                    <b-button variant="primary" :disabled="!enableGeneration" @click="generateLabelPdf()">GENERATE
+                        PDF</b-button>
+
+                    <b-button variant="success" v-if="labelPrintState.labelPdfBlobUrl" @click="downloadPdf({})">DOWNLOAD
+                        PDF</b-button>
+                </div>
+
+                <div class="flex flex-col items-stretch gap-8 row-start-2">
                     <b-form-group label="TAG LIST"
                         description="Enter tags separated by commas or newlines. Must match existing tags in Metrc"
                         label-size="lg" label-class="text-purple-600">
@@ -103,33 +132,9 @@
                             Highlight rows in the Metrc package table to auto-add them
                         </span>
                     </div>
-
-                    <hr />
-
-                    <b-form-group description="How many copies of each label to generate" label-size="lg"
-                        label-class="text-purple-600">
-                        <b-form-input type="number" step="1" min="1" :value="labelPrintState.labelsPerTag"
-                            @change="onChange('labelsPerTag', $event)"></b-form-input>
-                    </b-form-group>
-
-                    <b-form-group
-                        description="Adjust this value if you're using a low-DPI printer and the printed
-                            barcodes are too thick
-                            and/or unscannable. A higher number means thicker barcode bars. 0.94 is the recommended value for most thermal printers."
-                        label-size="lg" label-class="text-purple-600">
-                        <b-form-input type="number" step="0.01" min="0.5" max="1.5"
-                            :value="labelPrintState.barcodeBarThickness"
-                            @change="onChange('barcodeBarThickness', $event)"></b-form-input>
-                    </b-form-group>
-
-                    <b-button variant="primary" :disabled="!enableGeneration" @click="generateLabelPdf()">GENERATE
-                        PDF</b-button>
-
-                    <b-button variant="success" v-if="labelPrintState.labelPdfBlobUrl" @click="downloadPdf({})">DOWNLOAD
-                        PDF</b-button>
-
                 </div>
-                <div>
+
+                <div class="row-span-2">
                     <template v-if="labelPrintState.labelPdfBlobUrl">
                         <iframe :src="labelPrintState.labelPdfBlobUrl" class="w-full" style="height: 70vh"></iframe>
                     </template>
@@ -137,12 +142,14 @@
                         <pre class="text-red-500 text-lg text-center">{{ labelPrintState.errorText }}</pre>
                     </template>
                 </div>
+
             </div>
         </template>
     </fragment>
 </template>
 
 <script lang="ts">
+import SimpleDrawer from "@/components/shared/SimpleDrawer.vue";
 import { IIndexedPackageData, IPluginState } from "@/interfaces";
 import router from "@/router/index";
 import store from "@/store/page-overlay/index";
@@ -161,7 +168,8 @@ export default Vue.extend({
     router,
     props: {},
     components: {
-        SinglePackagePicker
+        SinglePackagePicker,
+        SimpleDrawer
     },
     computed: {
         ...mapState<IPluginState>({
