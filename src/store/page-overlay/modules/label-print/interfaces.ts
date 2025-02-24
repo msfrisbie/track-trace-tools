@@ -27,6 +27,8 @@ export interface ILabelPrintState {
   rawTagList: string;
   labelsPerTag: number;
   barcodeBarThickness: number;
+  labelMarginThickness: number;
+  debug: boolean;
   selectedLabelEndpoint: LabelEndpoint;
   errorText: string | null;
 }
