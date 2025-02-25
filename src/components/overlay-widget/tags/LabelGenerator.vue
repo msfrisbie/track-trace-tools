@@ -111,7 +111,7 @@
 
                             <div class="pl-4" style="border-left: 2px solid #a858d0f0">
                                 <b-form-group label="SEARCH FOR PACKAGES" label-class="text-gray-500">
-                                    <single-package-picker class="w-full" inputLabel=""
+                                    <single-package-picker class="w-full" inputLabel="" maxWidth="100vw"
                                         inputDescription="Search for Metrc packages by label or item"
                                         style="grid-template-columns: repeat(1, minmax(0, 1fr));"
                                         v-on:addPackage="addPackage({ pkg: $event })" :showSelection="false"

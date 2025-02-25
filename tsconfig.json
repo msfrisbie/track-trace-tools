@@ -25,14 +25,6 @@
     "src/**/*.vue",
     "test/**/*.ts",
     "test/**/*.tsx",
-    "src/client/secrets/client-keys/client-002.js",
-    "src/client/secrets/client-keys/client-001.js",
-    "src/client/decrypted-data/data-002.js",
-    "src/client/decrypted-data/data-001.js",
-    "src/client/decrypted-data/data-001.js",
-    "src/client/decrypted-data/data-002.js",
-    "src/client/secrets/client-keys/client-001.js",
-    "src/client/secrets/client-keys/client-002.js"
   ],
   "exclude": ["node_modules"]
 }

@@ -2,7 +2,7 @@
   <div class="grid grid-cols-2 grid-rows-2 gap-8" style="grid-template-rows: 1fr auto">
     <!-- Package filter -->
     <div class="flex flex-col row-span-2 items-center">
-      <div class="w-full flex flex-col space-y-4" style="max-width: 480px">
+      <div class="w-full flex flex-col space-y-4" :style="{maxWidth}">
         <div class="flex flex-row items-stretch justify-center">
           <b-form-group :label="inputLabel" :description="inputDescription" label-size="sm" label-class="text-gray-400"
             class="w-full">
@@ -121,6 +121,10 @@ export default Vue.extend({
     PasteTags,
   },
   props: {
+    maxWidth: {
+      type: String,
+      default: "480px"
+    },
     inputLabel: {
       type: String,
       default: "SELECT PACKAGE"
