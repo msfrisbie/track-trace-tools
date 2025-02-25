@@ -166,9 +166,9 @@ export const labelPrintModule = {
               data: labelData,
               renderingOptions: {
                 barcodeBarThickness: ctx.state.barcodeBarThickness,
-                labelMarginThickness: ctx.state.labelMarginThickness
+                labelMarginThickness: ctx.state.labelMarginThickness,
               },
-              debug: ctx.state.debug
+              debug: ctx.state.debug,
             });
 
             labelPdfBlobUrl = URL.createObjectURL(response.data);
@@ -181,7 +181,24 @@ export const labelPrintModule = {
               }
             }
           } catch (err: any) {
-            errorText = await err.response.data.text();
+            // Axios forces the response to a blob, but this blob contains JSON
+            // when an error is returned. Need to conditinally extract the blob,
+            // then format to json, and also handle any other network errors.
+            try {
+              const errorBlob = err.response.data;
+              if (errorBlob instanceof Blob) {
+                const errorTextRaw = await errorBlob.text(); // Read the Blob as text
+                try {
+                  errorText = JSON.stringify(JSON.parse(errorTextRaw), null, 2); // Format if it's JSON
+                } catch {
+                  errorText = errorTextRaw; // Otherwise, keep it as plain text
+                }
+              } else {
+                errorText = JSON.stringify(await err.response.json(), null, 2);
+              }
+            } catch {
+              errorText = err.response.data?.toString() || err.message;
+            }
           }
 
           break;

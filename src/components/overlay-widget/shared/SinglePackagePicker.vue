@@ -2,7 +2,7 @@
   <div class="grid grid-cols-2 grid-rows-2 gap-8" style="grid-template-rows: 1fr auto">
     <!-- Package filter -->
     <div class="flex flex-col row-span-2 items-center">
-      <div class="w-full flex flex-col space-y-4" :style="{maxWidth}">
+      <div class="w-full flex flex-col space-y-4" :style="{ maxWidth }">
         <div class="flex flex-row items-stretch justify-center">
           <b-form-group :label="inputLabel" :description="inputDescription" label-size="sm" label-class="text-gray-400"
             class="w-full">
@@ -94,7 +94,7 @@ import ErrorReadout from "@/components/overlay-widget/shared/ErrorReadout.vue";
 import PasteTags from "@/components/overlay-widget/shared/PasteTags.vue";
 import PickerCard from "@/components/overlay-widget/shared/PickerCard.vue";
 import PickerIcon from "@/components/overlay-widget/shared/PickerIcon.vue";
-import { IPackageData } from "@/interfaces";
+import { IIndexedPackageData, IPackageData } from "@/interfaces";
 import { authManager } from "@/modules/auth-manager.module";
 import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
 import store from "@/store/page-overlay/index";
@@ -143,7 +143,15 @@ export default Vue.extend({
       type: Boolean,
       default: true,
     },
-    selectAllPackageTypes: {
+    selectActivePackageTypes: {
+      type: Boolean,
+      default: true,
+    },
+    selectInTransitPackageTypes: {
+      type: Boolean,
+      default: false,
+    },
+    selectInactivePackageTypes: {
       type: Boolean,
       default: false,
     },
@@ -166,10 +174,33 @@ export default Vue.extend({
       try {
         this.$data.inflight = true;
 
-        // @ts-ignore
-        if (!this.$props.selectAllPackageTypes) {
-          this.setSourcePackages(await primaryDataLoader.activePackages());
+        const promises: Promise<any>[] = [];
+
+        let updatedPackages: IIndexedPackageData[] = [];
+
+        if (this.$props.selectActivePackageTypes) {
+          promises.push(
+            primaryDataLoader.activePackages().then((packages) => {
+              updatedPackages = [
+                ...updatedPackages,
+                ...packages
+              ];
+            }));
         }
+
+        if (this.$props.selectInTransitPackageTypes) {
+          promises.push(
+            primaryDataLoader.inTransitPackages().then((packages) => {
+              updatedPackages = [
+                ...updatedPackages,
+                ...packages
+              ];
+            }));
+        }
+
+        await Promise.allSettled(promises);
+
+        this.setSourcePackages(updatedPackages);
       } catch (e) {
         console.error(e);
         this.$data.error = e;
@@ -229,23 +260,53 @@ export default Vue.extend({
 
       const queryString = _this.$data.query;
 
-      if (_this.selectAllPackageTypes) {
-        if (queryString.length === 0) {
-          _this.$data.sourcePackages = [];
-        }
-
-        _this.$data.sourcePackages = [
-          ...(await primaryDataLoader.onDemandActivePackageSearch({
-            queryString,
-          })),
-          ...(await primaryDataLoader.onDemandInactivePackageSearch({
-            queryString,
-          })),
-          ...(await primaryDataLoader.onDemandInTransitPackageSearch({
-            queryString,
-          })),
-        ];
+      if (queryString.length === 0) {
+        _this.$data.sourcePackages = [];
       }
+
+      const promises: Promise<any>[] = [];
+
+      let updatedPackages: IIndexedPackageData[] = [];
+
+      if (_this.$props.selectActivePackageTypes) {
+        promises.push(
+          primaryDataLoader.onDemandActivePackageSearch({
+            queryString,
+          }).then((packages) => {
+            updatedPackages = [
+              ...updatedPackages,
+              ...packages
+            ];
+          }));
+      }
+
+      if (_this.$props.selectInTransitPackageTypes) {
+        promises.push(
+          primaryDataLoader.onDemandInTransitPackageSearch({
+            queryString,
+          }).then((packages) => {
+            updatedPackages = [
+              ...updatedPackages,
+              ...packages
+            ];
+          }));
+      }
+
+      if (_this.$props.selectInactivePackageTypes) {
+        promises.push(
+          primaryDataLoader.onDemandInactivePackageSearch({
+            queryString,
+          }).then((packages) => {
+            updatedPackages = [
+              ...updatedPackages,
+              ...packages
+            ];
+          }));
+      }
+
+      await Promise.allSettled(promises);
+
+      _this.setSourcePackages(updatedPackages);
     }, 500),
   },
   computed: {
@@ -282,16 +343,18 @@ export default Vue.extend({
 
         for (const tag of newValue) {
           try {
-            let matchingPkg = await primaryDataLoader.activePackage(tag);
+            let matchingPkg = null;
 
-            if (this.selectAllPackageTypes) {
-              if (!matchingPkg) {
-                matchingPkg = await primaryDataLoader.inactivePackage(tag);
-              }
+            if (!matchingPkg && this.selectActivePackageTypes) {
+              matchingPkg = await primaryDataLoader.activePackage(tag);
+            }
 
-              if (!matchingPkg) {
-                matchingPkg = await primaryDataLoader.inTransitPackage(tag);
-              }
+            if (!matchingPkg && this.selectInactivePackageTypes) {
+              matchingPkg = await primaryDataLoader.inactivePackage(tag);
+            }
+
+            if (!matchingPkg && this.selectInTransitPackageTypes) {
+              matchingPkg = await primaryDataLoader.inTransitPackage(tag);
             }
 
             if (matchingPkg) {
@@ -311,18 +374,6 @@ export default Vue.extend({
         this.updateSourcePackages();
       },
     },
-    // selectedPackagesMirror: {
-    //   immediate: true,
-    //   handler(newValue, oldValue) {
-    //     console.log(newValue?.length, oldValue?.length);
-    //     // Throw out the first change
-    //     if (!oldValue || (newValue?.length === 0 && oldValue?.length === 0)) {
-    //       return;
-    //     }
-    //     // @ts-ignore
-    //     this.$emit("update:selectedPackages", newValue);
-    //   },
-    // },
   },
   async mounted() {
     // Single time per pageload
@@ -330,12 +381,6 @@ export default Vue.extend({
 
     // @ts-ignore
     this.loadPackages();
-
-    // Eagerly refresh
-    // @ts-ignore
-    // this.setSourcePackages(await primaryDataLoader.activePackages());
-    // @ts-ignore
-    // this.setSourcePackages(await primaryDataLoader.activePackages(true));
   },
   async created() { },
 });

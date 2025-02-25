@@ -7,7 +7,7 @@
         :selectedPackages="sourcePackage ? [sourcePackage] : []"
         v-on:removePackage="setPackage({ pkg: null })"
         v-on:addPackage="setPackage({ pkg: $event })"
-        :selectAllPackageTypes="true"
+        :selectInactivePackageTypes="true"
         :showSelection="false"
       ></single-package-picker>
     </template>

@@ -112,6 +112,7 @@
                             <div class="pl-4" style="border-left: 2px solid #a858d0f0">
                                 <b-form-group label="SEARCH FOR PACKAGES" label-class="text-gray-500">
                                     <single-package-picker class="w-full" inputLabel="" maxWidth="100vw"
+                                        :selectInTransitPackageTypes="true"
                                         inputDescription="Search for Metrc packages by label or item"
                                         style="grid-template-columns: repeat(1, minmax(0, 1fr));"
                                         v-on:addPackage="addPackage({ pkg: $event })" :showSelection="false"
@@ -134,29 +135,32 @@
                         </b-card>
 
                         <simple-drawer toggleText="ADVANCED" class="col-span-1 xl:col-span-2">
-                            <b-form-group
-                                description="Adjust this value if you're using a low-DPI printer and the printed
+                            <div class="grid grid-cols-2 gap-8">
+                                <b-form-group
+                                    description="Adjust this value if you're using a low-DPI printer and the printed
         barcodes are too thick
         and/or unscannable. A higher number means thicker barcode bars. 0.94 is the recommended value for most thermal printers."
-                                label-size="lg" label-class="text-purple-600">
-                                <b-form-input type="number" step="0.01" min="0.5" max="1.5"
-                                    :value="labelPrintState.barcodeBarThickness"
-                                    @change="onChange('barcodeBarThickness', parseFloat($event))"></b-form-input>
-                            </b-form-group>
+                                    label-size="lg" label-class="text-purple-600">
+                                    <b-form-input type="number" step="0.01" min="0.5" max="1.5"
+                                        :value="labelPrintState.barcodeBarThickness"
+                                        @change="onChange('barcodeBarThickness', parseFloat($event))"></b-form-input>
+                                </b-form-group>
 
-                            <b-form-group
-                                description="Adjust this value if your printer has trouble printing the exact center of labels. A higher number means thicker margins. 1.0 is the recommended value for most thermal printers."
-                                label-size="lg" label-class="text-purple-600">
-                                <b-form-input type="number" step="0.01" min="0.5" max="1.5"
-                                    :value="labelPrintState.labelMarginThickness"
-                                    @change="onChange('labelMarginThickness', parseFloat($event))"></b-form-input>
-                            </b-form-group>
+                                <b-form-group
+                                    description="Adjust this value if your printer has trouble printing the exact center of labels. A higher number means thicker margins. 1.0 is the recommended value for most thermal printers."
+                                    label-size="lg" label-class="text-purple-600">
+                                    <b-form-input type="number" step="0.01" min="0.5" max="1.5"
+                                        :value="labelPrintState.labelMarginThickness"
+                                        @change="onChange('labelMarginThickness', parseFloat($event))"></b-form-input>
+                                </b-form-group>
 
-                            <b-form-group>
-                                <b-form-checkbox :checked="labelPrintState.debug" @change="onChange('debug', $event)">
-                                    Debug
-                                </b-form-checkbox>
-                            </b-form-group>
+                                <b-form-group>
+                                    <b-form-checkbox :checked="labelPrintState.debug"
+                                        @change="onChange('debug', $event)">
+                                        Debug
+                                    </b-form-checkbox>
+                                </b-form-group>
+                            </div>
                         </simple-drawer>
                     </div>
                 </div>
@@ -179,7 +183,7 @@
                         <iframe :src="labelPrintState.labelPdfBlobUrl" class="w-full" style="height: 70vh"></iframe>
                     </template>
                     <template v-if="labelPrintState.errorText">
-                        <pre class="text-red-500 text-lg text-center">{{ labelPrintState.errorText }}</pre>
+                        <pre class="text-red-500 text-lg text-start">{{ labelPrintState.errorText }}</pre>
                     </template>
                 </div>
 
