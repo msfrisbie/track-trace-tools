@@ -41,9 +41,9 @@
           </b-form-group>
         </template>
 
-        <div class="flex flex-col items-center text-center space-y-4">
-          <error-readout v-if="error || inflight" :inflight="inflight" :error="error"
-            loadingMessage="Loading packages..." errorMessage="Unable to load packages."
+        <div v-if="error || inflight" class="flex flex-col items-center text-center space-y-4">
+          <error-readout :inflight="inflight" :error="error" loadingMessage="Loading packages..."
+            errorMessage="Unable to load packages."
             permissionsErrorMessage="Check that your employee account has full Packages permissions."
             v-on:retry="loadPackages()" />
         </div>
@@ -77,7 +77,7 @@
       <div class="flex flex-col items-center space-y-4">
         <span class="text-center text-xl font-bold"><animated-number :number="selectedPackages.length" /> package{{
           selectedPackages.length === 1 ? "" : "s"
-          }}
+        }}
           selected</span>
 
         <template v-if="selectedPackages.length > 0">

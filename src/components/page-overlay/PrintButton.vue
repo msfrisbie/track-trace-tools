@@ -7,7 +7,7 @@
           secondaryIconClass="ttt-purple w-7 h-7 border-2 ttt-purple-border"></complex-icon>
       </div>
 
-      <b-popover target="print-popover-target" triggers="hover" placement="top" variant="light" ref="print-popover"
+      <b-popover target="print-popover-target" triggers="hover" placement="topleft" variant="light" ref="print-popover"
         :disabled="trackedInteractions.dismissedPrintPopover" container="popover-container">
         <template #title>
           <div class="flex flex-row items-center space-x-2">

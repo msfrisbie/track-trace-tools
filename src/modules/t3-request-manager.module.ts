@@ -28,6 +28,7 @@ const LABEL_TEMPLATE_LAYOUTS_PATH = "v2/files/labels/template-layouts";
 const LABEL_CONTENT_LAYOUTS_PATH = "v2/files/labels/content-layouts";
 const GENERATE_LABELS_PATH = "v2/files/labels/generate";
 const GENERATE_ACTIVE_PACKAGE_LABELS_PATH = "v2/files/labels/packages/active";
+const GENERATE_IN_TRANSIT_PACKAGE_LABELS_PATH = "v2/files/labels/packages/intransit";
 
 const DEFAULT_POST_HEADERS = {
   "Content-Type": "application/json",
@@ -387,6 +388,7 @@ class T3RequestManager implements IAtomicService {
     labelContentLayoutId: string;
     labelContentData: { [key: string]: string }[];
     renderingOptions: { [key: string]: any };
+    debug: boolean;
   }) {
     return customAxios(
       `${BASE_URL}${GENERATE_LABELS_PATH}?licenseNumber=${
@@ -416,6 +418,32 @@ class T3RequestManager implements IAtomicService {
   }) {
     return customAxios(
       `${BASE_URL}${GENERATE_ACTIVE_PACKAGE_LABELS_PATH}?licenseNumber=${
+        (await authManager.authStateOrError()).license
+      }`,
+      {
+        method: "POST",
+        headers: {
+          ...DEFAULT_POST_HEADERS,
+          Authorization: `Bearer ${this._t3AccessToken}`,
+        },
+        axiosRetry: {
+          retries: 0,
+        },
+        body: JSON.stringify(data),
+        responseType: "blob",
+      }
+    );
+  }
+
+  async generateInTransitPackageLabelPdf(data: {
+    labelTemplateLayoutId: string;
+    labelContentLayoutId: string;
+    data: string[];
+    renderingOptions: { [key: string]: any };
+    debug: boolean;
+  }) {
+    return customAxios(
+      `${BASE_URL}${GENERATE_IN_TRANSIT_PACKAGE_LABELS_PATH}?licenseNumber=${
         (await authManager.authStateOrError()).license
       }`,
       {

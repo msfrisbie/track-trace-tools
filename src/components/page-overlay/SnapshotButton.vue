@@ -13,7 +13,7 @@
     <b-popover
       target="snapshot-popover-target"
       triggers="hover"
-      placement="top"
+      placement="lefttop"
       variant="light"
       ref="snapshot-popover"
       :disabled="trackedInteractions.dismissedSnapshotPopover"

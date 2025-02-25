@@ -55,7 +55,7 @@
     <b-popover
       target="quick-script-popover-target"
       triggers="hover"
-      placement="top"
+      placement="lefttop"
       variant="light"
       ref="quick-script-popover"
       :disabled="trackedInteractions.dismissedQuickScriptsPopover"

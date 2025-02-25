@@ -5,8 +5,8 @@
       <font-awesome-icon icon="comment" style="height: 26px"></font-awesome-icon>
     </div>
 
-    <b-popover target="feedback-popover-target" triggers="hover" placement="top" variant="light" ref="feedback-popover"
-      :disabled="trackedInteractions.dismissedFeedbackPopover" container="popover-container">
+    <b-popover target="feedback-popover-target" triggers="hover" placement="top" variant="light"
+      ref="feedback-popover" :disabled="trackedInteractions.dismissedFeedbackPopover" container="popover-container">
       <template #title>
         <div class="flex flex-row items-center space-x-2">
           <track-trace-tools-logo class="h-6" fill="#49276a" :inverted="true" />

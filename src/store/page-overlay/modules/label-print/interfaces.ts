@@ -31,4 +31,5 @@ export interface ILabelPrintState {
   debug: boolean;
   selectedLabelEndpoint: LabelEndpoint;
   errorText: string | null;
+  rawCsvMatrix: string[][] | null;
 }

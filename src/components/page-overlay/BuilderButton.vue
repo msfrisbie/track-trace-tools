@@ -22,8 +22,8 @@
         <font-awesome-icon icon="exclamation-triangle" size="2x" class="text-red-700" />
       </template>
 
-      <b-popover target="builder-popover-target" triggers="hover" placement="top" variant="light" ref="builder-popover"
-        :disabled="trackedInteractions.dismissedToolboxPopover" container="popover-container">
+      <b-popover target="builder-popover-target" triggers="hover" placement="topleft" variant="light"
+        ref="builder-popover" :disabled="trackedInteractions.dismissedToolboxPopover" container="popover-container">
         <template #title>
           <div class="flex flex-row items-center space-x-2">
             <track-trace-tools-logo class="h-6" fill="#49276a" :inverted="true" />

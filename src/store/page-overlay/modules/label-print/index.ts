@@ -1,5 +1,7 @@
-import { IPluginState } from "@/interfaces";
+import { ICsvFile, IPluginState } from "@/interfaces";
 import { t3RequestManager } from "@/modules/t3-request-manager.module";
+import { downloadCsvFile } from "@/utils/csv";
+import { readCsvFile } from "@/utils/file";
 import { AxiosResponse } from "axios";
 import { ActionContext } from "vuex";
 import { LabelEndpoint, LabelPrintActions, LabelPrintGetters, LabelPrintMutations } from "./consts";
@@ -11,6 +13,7 @@ const inMemoryState = {
   labelTemplateLayoutOptions: [],
   labelContentLayoutOptions: [],
   rawTagList: "",
+  rawCsvMatrix: null,
   errorText: null,
 };
 
@@ -46,6 +49,12 @@ export const labelPrintModule = {
     },
   },
   getters: {
+    [LabelPrintGetters.SELECTED_LABEL_CONTENT_LAYOUT]: (
+      state: ILabelPrintState,
+      getters: any,
+      rootState: IPluginState,
+      rootGetters: any
+    ) => state.labelContentLayoutOptions.find((x) => x.id === state.selectedContentLayoutId),
     [LabelPrintGetters.LABEL_ENDPOINT_CONFIG_OPTIONS]: (
       state: ILabelPrintState,
       getters: any,
@@ -53,12 +62,16 @@ export const labelPrintModule = {
       rootGetters: any
     ): ILabelEndpointConfig[] => [
       {
-        id: LabelEndpoint.RAW_LABEL_GENERATOR,
-        description: "Manually enter label values",
+        id: LabelEndpoint.ACTIVE_PACKAGES,
+        description: "Autogenerate labels from active packages",
       },
       {
-        id: LabelEndpoint.ACTIVE_PACKAGES,
-        description: "Autogenerate from active packages",
+        id: LabelEndpoint.INTRANSIT_PACKAGES,
+        description: "Autogenerate labels from in transit packages",
+      },
+      {
+        id: LabelEndpoint.RAW_LABEL_GENERATOR,
+        description: "Manually provide label values",
       },
     ],
     [LabelPrintGetters.ENABLE_GENERATION]: (
@@ -79,8 +92,20 @@ export const labelPrintModule = {
         return false;
       }
 
-      if (getters[LabelPrintGetters.TAG_LIST_PARSE_ERRORS].length > 0) {
-        return false;
+      switch (state.selectedLabelEndpoint) {
+        case LabelEndpoint.ACTIVE_PACKAGES:
+        case LabelEndpoint.INTRANSIT_PACKAGES:
+          if (getters[LabelPrintGetters.TAG_LIST_PARSE_ERRORS].length > 0) {
+            return false;
+          }
+          break;
+        case LabelEndpoint.RAW_LABEL_GENERATOR:
+          if (!state.rawCsvMatrix) {
+            return false;
+          }
+          break;
+        default:
+          return false;
       }
 
       if (!state.labelsPerTag) {
@@ -110,9 +135,62 @@ export const labelPrintModule = {
       state.rawTagList
         .split(/[\n,]+/)
         .map((x: string) => x.trim())
-        .filter((x) => x !== ""),
+        .filter((x) => x !== "")
+        .flatMap((x: string) => Array(parseInt(state.labelsPerTag.toString(), 10)).fill(x)),
+    [LabelPrintGetters.PARSED_CSV_DATA]: (
+      state: ILabelPrintState,
+      getters: any,
+      rootState: IPluginState,
+      rootGetters: any
+    ): { [key: string]: string }[] => {
+      if (!state.rawCsvMatrix) {
+        return [];
+      }
+
+      const labelCount = parseInt(state.labelsPerTag.toString(), 10);
+
+      return state.rawCsvMatrix!.slice(1).flatMap((row) =>
+        Array(labelCount)
+          .fill(null)
+          .map(() =>
+            Object.fromEntries(row.map((cell, index) => [state.rawCsvMatrix![0][index], cell]))
+          )
+      );
+    },
   },
   actions: {
+    [LabelPrintActions.DOWNLOAD_CSV_TEMPLATE]: async (
+      ctx: ActionContext<ILabelPrintState, IPluginState>,
+      data: {
+        file: File;
+      }
+    ) => {
+      const selectedLayout = ctx.getters[LabelPrintGetters.SELECTED_LABEL_CONTENT_LAYOUT];
+
+      if (!selectedLayout) {
+        throw new Error("No layout config selected");
+      }
+
+      const csvFile: ICsvFile = {
+        filename: `${selectedLayout.id}.csv`,
+        data: [selectedLayout.elements.map((x: any) => x.labelContentDataKey)],
+      };
+
+      downloadCsvFile({ csvFile });
+    },
+    [LabelPrintActions.LOAD_CSV]: async (
+      ctx: ActionContext<ILabelPrintState, IPluginState>,
+      data: {
+        file: File;
+      }
+    ) => {
+      const rawCsvMatrix = await readCsvFile(data.file);
+
+      ctx.commit(LabelPrintMutations.LABEL_PRINT_MUTATION, {
+        rawCsvMatrix,
+      });
+    },
+
     [LabelPrintActions.UPDATE_LAYOUT_OPTIONS]: async (
       ctx: ActionContext<ILabelPrintState, IPluginState>,
       {}: {}
@@ -153,13 +231,13 @@ export const labelPrintModule = {
       let labelPdfFilename: string | null = null;
       let errorText: string | null = null;
 
-      switch (ctx.state.selectedLabelEndpoint) {
-        case LabelEndpoint.ACTIVE_PACKAGES:
-          try {
-            const labelData = ctx.getters[LabelPrintGetters.PARSED_TAG_LIST].flatMap((x: string) =>
-              Array(parseInt(ctx.state.labelsPerTag.toString(), 10)).fill(x)
-            );
+      const labelData = ctx.getters[LabelPrintGetters.PARSED_TAG_LIST];
 
+      const csvData = ctx.getters[LabelPrintGetters.PARSED_CSV_DATA];
+
+      try {
+        switch (ctx.state.selectedLabelEndpoint) {
+          case LabelEndpoint.ACTIVE_PACKAGES:
             response = await t3RequestManager.generateActivePackageLabelPdf({
               labelTemplateLayoutId: ctx.state.selectedTemplateLayoutId!,
               labelContentLayoutId: ctx.state.selectedContentLayoutId!,
@@ -170,40 +248,63 @@ export const labelPrintModule = {
               },
               debug: ctx.state.debug,
             });
+            break;
+          case LabelEndpoint.INTRANSIT_PACKAGES:
+            response = await t3RequestManager.generateInTransitPackageLabelPdf({
+              labelTemplateLayoutId: ctx.state.selectedTemplateLayoutId!,
+              labelContentLayoutId: ctx.state.selectedContentLayoutId!,
+              data: labelData,
+              renderingOptions: {
+                barcodeBarThickness: ctx.state.barcodeBarThickness,
+                labelMarginThickness: ctx.state.labelMarginThickness,
+              },
+              debug: ctx.state.debug,
+            });
+            break;
+          case LabelEndpoint.RAW_LABEL_GENERATOR:
+            response = await t3RequestManager.generateLabelPdf({
+              labelTemplateLayoutId: ctx.state.selectedTemplateLayoutId!,
+              labelContentLayoutId: ctx.state.selectedContentLayoutId!,
+              labelContentData: csvData,
+              renderingOptions: {
+                barcodeBarThickness: ctx.state.barcodeBarThickness,
+                labelMarginThickness: ctx.state.labelMarginThickness,
+              },
+              debug: ctx.state.debug,
+            });
+            break;
+          default:
+            throw new Error("Invalid label endpoint");
+        }
 
-            labelPdfBlobUrl = URL.createObjectURL(response.data);
+        labelPdfBlobUrl = URL.createObjectURL(response.data);
 
-            const contentDisposition = response.headers["content-disposition"];
-            if (contentDisposition) {
-              const matches = contentDisposition.match(/filename="?([^"]+)"?/);
-              if (matches && matches[1]) {
-                labelPdfFilename = matches[1];
-              }
-            }
-          } catch (err: any) {
-            // Axios forces the response to a blob, but this blob contains JSON
-            // when an error is returned. Need to conditinally extract the blob,
-            // then format to json, and also handle any other network errors.
-            try {
-              const errorBlob = err.response.data;
-              if (errorBlob instanceof Blob) {
-                const errorTextRaw = await errorBlob.text(); // Read the Blob as text
-                try {
-                  errorText = JSON.stringify(JSON.parse(errorTextRaw), null, 2); // Format if it's JSON
-                } catch {
-                  errorText = errorTextRaw; // Otherwise, keep it as plain text
-                }
-              } else {
-                errorText = JSON.stringify(await err.response.json(), null, 2);
-              }
-            } catch {
-              errorText = err.response.data?.toString() || err.message;
-            }
+        const contentDisposition = response.headers["content-disposition"];
+        if (contentDisposition) {
+          const matches = contentDisposition.match(/filename="?([^"]+)"?/);
+          if (matches && matches[1]) {
+            labelPdfFilename = matches[1];
           }
-
-          break;
-        default:
-          throw new Error("Invalid label endpoint");
+        }
+      } catch (err: any) {
+        // Axios forces the response to a blob, but this blob contains JSON
+        // when an error is returned. Need to conditinally extract the blob,
+        // then format to json, and also handle any other network errors.
+        try {
+          const errorBlob = err.response?.data;
+          if (errorBlob instanceof Blob) {
+            const errorTextRaw = await errorBlob.text(); // Read the Blob as text
+            try {
+              errorText = JSON.stringify(JSON.parse(errorTextRaw), null, 2); // Format if it's JSON
+            } catch {
+              errorText = errorTextRaw; // Otherwise, keep it as plain text
+            }
+          } else {
+            errorText = JSON.stringify(await err.response.json(), null, 2);
+          }
+        } catch {
+          errorText = err.response?.data?.toString() || err?.message || err.toString();
+        }
       }
 
       ctx.commit(LabelPrintMutations.LABEL_PRINT_MUTATION, {

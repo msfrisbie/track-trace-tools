@@ -8,7 +8,7 @@
 
     <template v-if="isChristmasSeason">
 
-      <b-popover target="plus-popover-target" triggers="hover" placement="top" variant="dark" ref="plus-popover"
+      <b-popover target="plus-popover-target" triggers="hover" placement="topleft" variant="dark" ref="plus-popover"
         container="popover-container" custom-class="blackfriday-popover">
         <template #title>
           <div class="flex flex-row items-center space-x-2 text-white">
@@ -30,7 +30,7 @@
     </template>
     <template v-else>
 
-      <b-popover target="plus-popover-target" triggers="hover" placement="top" variant="light" ref="plus-popover"
+      <b-popover target="plus-popover-target" triggers="hover" placement="topleft" variant="light" ref="plus-popover"
         container="popover-container">
         <template #title>
           <div class="flex flex-row items-center space-x-2">
