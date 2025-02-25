@@ -441,7 +441,6 @@ import { MutationType } from "@/mutation-types";
 import router from "@/router/index";
 import store from "@/store/page-overlay/index";
 import { SettingsActions } from "@/store/page-overlay/modules/settings/consts";
-import { getMatchingDecryptedDataOrNull } from "@/utils/encryption";
 import { generateThumbnail } from "@/utils/file";
 import ExBoost from "exboost-js";
 import Vue from "vue";
@@ -561,9 +560,6 @@ export default Vue.extend({
       clientName: (state: IPluginState) => state.client.clientName,
       settingsState: (state: IPluginState) => state.settings,
     }),
-    decryptedClientData() {
-      return getMatchingDecryptedDataOrNull(store.state.settings?.licenseKey);
-    },
     emailValidState(): boolean | null {
       if (this.$data.unsavedEmail.length === 0) {
         return null;
