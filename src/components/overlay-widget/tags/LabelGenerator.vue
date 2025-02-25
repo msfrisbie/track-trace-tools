@@ -109,7 +109,7 @@
                                     <p>Select a label content layout</p>
                                 </template>
                                 <template v-else>
-                                    <p class="font-bold">{{ selectedLabelContentLayout.id }} CSV columns:</p>
+                                    <p class="font-bold">{{ selectedLabelContentLayout.id }} columns:</p>
 
                                     <ul class="list-disc ml-4">
                                         <li v-bind:key="element.labelContentDataKey"
@@ -120,17 +120,19 @@
                                         </li>
                                     </ul>
 
-                                    <label class="btn btn-outline-success mb-0 flex flex-row gap-2 items-center">
+                                    <button
+                                        class="btn btn-outline-primary mb-0 flex flex-row gap-2 justify-center items-center"
+                                        @click="downloadTemplate()">
+                                        <font-awesome-icon icon="fa-download" size="lg"></font-awesome-icon>
+                                        <span>DOWNLOAD LABEL DATA TEMPLATE</span>
+                                    </button>
+
+                                    <label
+                                        class="btn btn-outline-success mb-0 flex flex-row gap-2 justify-center items-center">
                                         <font-awesome-icon icon="fa-file-csv" size="lg"></font-awesome-icon>
                                         <b-form-file class="hidden" v-model="csvFile" accept=".csv"></b-form-file>
                                         UPLOAD LABEL DATA CSV
                                     </label>
-
-                                    <button class="btn btn-outline-primary mb-0 flex flex-row gap-2 items-center"
-                                        @click="downloadTemplate()">
-                                        <font-awesome-icon icon="fa-download" size="lg"></font-awesome-icon>
-                                        <span>DOWNLOAD EMPTY TEMPLATE</span>
-                                    </button>
 
                                     <template v-if="labelPrintState.rawCsvMatrix">
                                         <table class="font-mono border border-gray-400 border-collapse">
@@ -144,7 +146,7 @@
                                         </table>
                                     </template>
 
-                                    <simple-drawer toggleText="HOW TO USE THIS?">
+                                    <simple-drawer size="md" toggleText="HOW TO USE THIS?">
                                         <div class="flex flex-col gap-6">
                                             <p>Upload a CSV to manually specify the values that should appear in each
                                                 label. One CSV row corresponds to
@@ -258,7 +260,7 @@
 
                         </b-card>
 
-                        <simple-drawer toggleText="ADVANCED" class="col-span-1 xl:col-span-2">
+                        <simple-drawer toggleText="ADVANCED" class="col-span-1 xl:col-span-2" variant="light">
                             <div class="grid grid-cols-2 gap-8">
                                 <b-form-group
                                     description="Adjust this value if you're using a low-DPI printer and the printed

@@ -1,6 +1,6 @@
 <template>
   <div class="flex flex-col gap-2 items-stretch">
-    <b-button @click="isOpen = !isOpen" size="sm" variant="outline-dark"
+    <b-button @click="isOpen = !isOpen" :size="size" :variant="variant"
       >{{ isOpen ? "-" : "+" }} {{ toggleText }}</b-button
     >
 
@@ -22,6 +22,16 @@ export default Vue.extend({
   router,
   props: {
     toggleText: String,
+    size: {
+      type: String,
+      required: false,
+      default: 'sm'
+    },
+    variant: {
+      type: String,
+      required: false,
+      default: 'outline-dark'
+    },
     initialOpen: {
       type: Boolean,
       default: false,
