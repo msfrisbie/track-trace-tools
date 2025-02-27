@@ -79,20 +79,22 @@
                             <b-form-group description="How many copies of each label to generate" label-size="lg"
                                 label-class="text-purple-600">
                                 <b-form-input type="number" step="1" min="1" :value="labelPrintState.labelsPerTag"
-                                    @change="onChange('labelsPerTag', $event)"></b-form-input>
+                                    @change="onChange('labelsPerTag', parseInt(($event || 1).toString(), 10))"></b-form-input>
                             </b-form-group>
 
-                            <b-form-group description="Select how you want to provide label data" label-size="sm"
-                                label-class="text-gray-400">
-                                <b-form-select :options="labelEndpointConfigOptions"
-                                    :value="labelPrintState.selectedLabelEndpoint"
-                                    @change="onChange('selectedLabelEndpoint', $event)">
+                            <template v-if="!isSelectedLabelContentLayoutStatic">
+                                <b-form-group description="Select how you want to provide label data" label-size="sm"
+                                    label-class="text-gray-400">
+                                    <b-form-select :options="labelEndpointConfigOptions"
+                                        :value="labelPrintState.selectedLabelEndpoint"
+                                        @change="onChange('selectedLabelEndpoint', $event)">
 
-                                    <template #first>
-                                        <b-form-select-option :value="null" disabled>How do you want to fill out
-                                            labels?</b-form-select-option>
-                                    </template></b-form-select>
-                            </b-form-group>
+                                        <template #first>
+                                            <b-form-select-option :value="null" disabled>How do you want to fill out
+                                                labels?</b-form-select-option>
+                                        </template></b-form-select>
+                                </b-form-group>
+                            </template>
                         </b-card>
 
                         <b-card body-class="flex flex-col gap-6">
@@ -103,159 +105,169 @@
                                 <p class="text-purple-500">Select what data appears in your labels</p>
                             </b-form-group>
 
-                            <template
-                                v-if="labelPrintState.selectedLabelEndpoint === LabelEndpoint.RAW_LABEL_GENERATOR">
-                                <template v-if="!selectedLabelContentLayout">
-                                    <p>Select a label content layout</p>
-                                </template>
-                                <template v-else>
-                                    <p class="font-bold">{{ selectedLabelContentLayout.id }} columns:</p>
-
-                                    <ul class="list-disc ml-4">
-                                        <li v-bind:key="element.labelContentDataKey"
-                                            v-for="element of selectedLabelContentLayout.elements">
-                                            <span class="font-mono font-bold">{{ element.labelContentDataKey
-                                                }}</span>:
-                                            {{ element.description }}
-                                        </li>
-                                    </ul>
-
-                                    <button
-                                        class="btn btn-outline-primary mb-0 flex flex-row gap-2 justify-center items-center"
-                                        @click="downloadTemplate()">
-                                        <font-awesome-icon icon="fa-download" size="lg"></font-awesome-icon>
-                                        <span>DOWNLOAD LABEL DATA TEMPLATE</span>
-                                    </button>
-
-                                    <label
-                                        class="btn btn-outline-success mb-0 flex flex-row gap-2 justify-center items-center">
-                                        <font-awesome-icon icon="fa-file-csv" size="lg"></font-awesome-icon>
-                                        <b-form-file class="hidden" v-model="csvFile" accept=".csv"></b-form-file>
-                                        UPLOAD LABEL DATA CSV
-                                    </label>
-
-                                    <template v-if="labelPrintState.rawCsvMatrix">
-                                        <table class="font-mono border border-gray-400 border-collapse">
-                                            <tr v-bind:key="rowIdx"
-                                                v-for="[rowIdx, row] in labelPrintState.rawCsvMatrix.entries()">
-                                                <td class="border border-gray-400 border-collapse" v-bind:key="colIdx"
-                                                    v-for="[colIdx, col] of row.entries()">
-                                                    {{ col }}
-                                                </td>
-                                            </tr>
-                                        </table>
+                            <template v-if="isSelectedLabelContentLayoutStatic">
+                                <p>This label content is fixed, no label data is required.</p>
+                            </template>
+                            <template v-else>
+                                <template
+                                    v-if="labelPrintState.selectedLabelEndpoint === LabelEndpoint.RAW_LABEL_GENERATOR">
+                                    <template v-if="!selectedLabelContentLayout">
+                                        <p>Select a label content layout</p>
                                     </template>
+                                    <template v-else>
+                                        <p class="font-bold">{{ selectedLabelContentLayout.id }} columns:</p>
 
-                                    <simple-drawer size="md" toggleText="HOW TO USE THIS?">
-                                        <div class="flex flex-col gap-6">
-                                            <p>Upload a CSV to manually specify the values that should appear in each
-                                                label. One CSV row corresponds to
-                                                one label.</p>
-                                            <p class="font-bold">Required CSV formatting:</p>
+                                        <ul class="list-disc ml-4">
+                                            <li v-bind:key="element.labelContentDataKey"
+                                                v-for="element of selectedLabelContentLayout.elements">
+                                                <span class="font-mono font-bold">{{ element.labelContentDataKey
+                                                    }}</span>:
+                                                {{ element.description }}
+                                            </li>
+                                        </ul>
+
+                                        <button
+                                            class="btn btn-outline-primary mb-0 flex flex-row gap-2 justify-center items-center"
+                                            @click="downloadTemplate()">
+                                            <font-awesome-icon icon="fa-download" size="lg"></font-awesome-icon>
+                                            <span>DOWNLOAD LABEL DATA TEMPLATE</span>
+                                        </button>
+
+                                        <label
+                                            class="btn btn-outline-success mb-0 flex flex-row gap-2 justify-center items-center">
+                                            <font-awesome-icon icon="fa-file-csv" size="lg"></font-awesome-icon>
+                                            <b-form-file class="hidden" v-model="csvFile" accept=".csv"></b-form-file>
+                                            UPLOAD LABEL DATA CSV
+                                        </label>
+
+                                        <template v-if="labelPrintState.rawCsvMatrix">
                                             <table class="font-mono border border-gray-400 border-collapse">
-                                                <tr>
-                                                    <th class="border border-gray-400 border-collapse"
-                                                        v-bind:key="element.labelContentDataKey"
-                                                        v-for="element of selectedLabelContentLayout.elements">
-                                                        {{ element.labelContentDataKey }}
-                                                    </th>
-                                                </tr>
-                                                <tr>
+                                                <tr v-bind:key="rowIdx"
+                                                    v-for="[rowIdx, row] in labelPrintState.rawCsvMatrix.entries()">
                                                     <td class="border border-gray-400 border-collapse"
-                                                        v-bind:key="element.labelContentDataKey"
-                                                        v-for="element of selectedLabelContentLayout.elements">
-                                                        example
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td class="border border-gray-400 border-collapse"
-                                                        v-bind:key="element.labelContentDataKey"
-                                                        v-for="element of selectedLabelContentLayout.elements">
-                                                        example
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td>
-                                                        ...
+                                                        v-bind:key="colIdx" v-for="[colIdx, col] of row.entries()">
+                                                        {{ col }}
                                                     </td>
                                                 </tr>
                                             </table>
-                                        </div>
-                                    </simple-drawer>
+                                        </template>
+
+                                        <simple-drawer size="md" toggleText="HOW TO USE THIS?">
+                                            <div class="flex flex-col gap-6">
+                                                <p>Upload a CSV to manually specify the values that should appear in
+                                                    each
+                                                    label. One CSV row corresponds to
+                                                    one label.</p>
+                                                <p class="font-bold">Required CSV formatting:</p>
+                                                <table class="font-mono border border-gray-400 border-collapse">
+                                                    <tr>
+                                                        <th class="border border-gray-400 border-collapse"
+                                                            v-bind:key="element.labelContentDataKey"
+                                                            v-for="element of selectedLabelContentLayout.elements">
+                                                            {{ element.labelContentDataKey }}
+                                                        </th>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="border border-gray-400 border-collapse"
+                                                            v-bind:key="element.labelContentDataKey"
+                                                            v-for="element of selectedLabelContentLayout.elements">
+                                                            example
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="border border-gray-400 border-collapse"
+                                                            v-bind:key="element.labelContentDataKey"
+                                                            v-for="element of selectedLabelContentLayout.elements">
+                                                            example
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>
+                                                            ...
+                                                        </td>
+                                                    </tr>
+                                                </table>
+                                            </div>
+                                        </simple-drawer>
+                                    </template>
                                 </template>
-                            </template>
 
-                            <template v-if="labelPrintState.selectedLabelEndpoint === LabelEndpoint.ACTIVE_PACKAGES">
-                                <b-form-group label="ACTIVE PACKAGE LABELS" label-class="text-purple-400 font-semibold"
-                                    description="Enter tags separated by commas or newlines. Must match existing active packages in Metrc">
-                                    <b-textarea :value="labelPrintState.rawTagList" rows="8"
-                                        @change="onChange('rawTagList', $event)"></b-textarea>
-                                </b-form-group>
-
-                                <div class="pl-4" style="border-left: 2px solid #a858d0f0">
-                                    <b-form-group label-class="text-gray-500">
-                                        <single-package-picker class="-mb-4 w-full" inputLabel="" maxWidth="100vw"
-                                            :selectInTransitPackageTypes="false"
-                                            inputDescription="Search for active Metrc packages by label, item, or strain"
-                                            style="grid-template-columns: repeat(1, minmax(0, 1fr));"
-                                            v-on:addPackage="addPackage({ pkg: $event })" :showSelection="false"
-                                            :enablePaste="false"></single-package-picker>
+                                <template
+                                    v-if="labelPrintState.selectedLabelEndpoint === LabelEndpoint.ACTIVE_PACKAGES">
+                                    <b-form-group label="ACTIVE PACKAGE LABELS"
+                                        label-class="text-purple-400 font-semibold"
+                                        description="Enter tags separated by commas or newlines. Must match existing active packages in Metrc">
+                                        <b-textarea :value="labelPrintState.rawTagList" rows="8"
+                                            @change="onChange('rawTagList', $event)"></b-textarea>
                                     </b-form-group>
-                                </div>
 
-                                <div class="pl-4" style="border-left: 2px solid #a858d0f0">
-                                    <b-form-group label-class="text-gray-500"
-                                        description="Highlight rows orange in the Metrc active package table to auto-add them">
-                                        <p class="text-xs text-red-500 pb-2"
-                                            v-if="searchState.activeUniqueMetrcGridId !== UniqueMetrcGridId.PACKAGES_ACTIVE">
-                                            Select the Active Packages tab in Metrc to use this
-                                        </p>
-                                        <b-button
-                                            :disabled="searchState.activeUniqueMetrcGridId !== UniqueMetrcGridId.PACKAGES_ACTIVE || metrcTableState.barcodeValues.length === 0"
-                                            variant="outline-primary"
-                                            @click="addLabels(metrcTableState.barcodeValues)">ADD
-                                            {{
-                                                metrcTableState.barcodeValues.length }} SELECTED ACTIVE PACKAGES</b-button>
+                                    <div class="pl-4" style="border-left: 2px solid #a858d0f0">
+                                        <b-form-group label-class="text-gray-500">
+                                            <single-package-picker class="-mb-4 w-full" inputLabel="" maxWidth="100vw"
+                                                :selectInTransitPackageTypes="false"
+                                                inputDescription="Search for active Metrc packages by label, item, or strain"
+                                                style="grid-template-columns: repeat(1, minmax(0, 1fr));"
+                                                v-on:addPackage="addPackage({ pkg: $event })" :showSelection="false"
+                                                :enablePaste="false"></single-package-picker>
+                                        </b-form-group>
+                                    </div>
+
+                                    <div class="pl-4" style="border-left: 2px solid #a858d0f0">
+                                        <b-form-group label-class="text-gray-500"
+                                            description="Highlight rows orange in the Metrc active package table to auto-add them">
+                                            <p class="text-xs text-red-500 pb-2"
+                                                v-if="searchState.activeUniqueMetrcGridId !== UniqueMetrcGridId.PACKAGES_ACTIVE">
+                                                Select the Active Packages tab in Metrc to use this
+                                            </p>
+                                            <b-button
+                                                :disabled="searchState.activeUniqueMetrcGridId !== UniqueMetrcGridId.PACKAGES_ACTIVE || metrcTableState.barcodeValues.length === 0"
+                                                variant="outline-primary"
+                                                @click="addLabels(metrcTableState.barcodeValues)">ADD
+                                                {{
+                                                    metrcTableState.barcodeValues.length }} SELECTED ACTIVE
+                                                PACKAGES</b-button>
+                                        </b-form-group>
+                                    </div>
+                                </template>
+
+                                <template
+                                    v-if="labelPrintState.selectedLabelEndpoint === LabelEndpoint.INTRANSIT_PACKAGES">
+                                    <b-form-group label="IN TRANSIT PACKAGE LABELS"
+                                        label-class="text-purple-400 font-semibold"
+                                        description="Enter tags separated by commas or newlines. Must match existing in-transit packages in Metrc">
+                                        <b-textarea :value="labelPrintState.rawTagList" rows="8"
+                                            @change="onChange('rawTagList', $event)"></b-textarea>
                                     </b-form-group>
-                                </div>
-                            </template>
 
-                            <template v-if="labelPrintState.selectedLabelEndpoint === LabelEndpoint.INTRANSIT_PACKAGES">
-                                <b-form-group label="IN TRANSIT PACKAGE LABELS"
-                                    label-class="text-purple-400 font-semibold"
-                                    description="Enter tags separated by commas or newlines. Must match existing in-transit packages in Metrc">
-                                    <b-textarea :value="labelPrintState.rawTagList" rows="8"
-                                        @change="onChange('rawTagList', $event)"></b-textarea>
-                                </b-form-group>
+                                    <div class="pl-4" style="border-left: 2px solid #a858d0f0">
+                                        <b-form-group label-class="text-gray-500">
+                                            <single-package-picker class="-mb-4 w-full" inputLabel="" maxWidth="100vw"
+                                                :selectActivePackageTypes="false" :selectInTransitPackageTypes="true"
+                                                inputDescription="Search for in-transit Metrc packages by label, item, or strain"
+                                                style="grid-template-columns: repeat(1, minmax(0, 1fr));"
+                                                v-on:addPackage="addPackage({ pkg: $event })" :showSelection="false"
+                                                :enablePaste="false"></single-package-picker>
+                                        </b-form-group>
+                                    </div>
 
-                                <div class="pl-4" style="border-left: 2px solid #a858d0f0">
-                                    <b-form-group label-class="text-gray-500">
-                                        <single-package-picker class="-mb-4 w-full" inputLabel="" maxWidth="100vw"
-                                            :selectActivePackageTypes="false" :selectInTransitPackageTypes="true"
-                                            inputDescription="Search for in-transit Metrc packages by label, item, or strain"
-                                            style="grid-template-columns: repeat(1, minmax(0, 1fr));"
-                                            v-on:addPackage="addPackage({ pkg: $event })" :showSelection="false"
-                                            :enablePaste="false"></single-package-picker>
-                                    </b-form-group>
-                                </div>
+                                    <div class="pl-4" style="border-left: 2px solid #a858d0f0">
+                                        <b-form-group label-class="text-gray-500"
+                                            description="Highlight rows orange in the Metrc in-transit package table to auto-add them">
+                                            <p class="text-xs text-red-500 pb-2"
+                                                v-if="searchState.activeUniqueMetrcGridId !== UniqueMetrcGridId.PACKAGES_IN_TRANSIT">
+                                                Select the In Transit Packages tab in Metrc to use this
+                                            </p>
 
-                                <div class="pl-4" style="border-left: 2px solid #a858d0f0">
-                                    <b-form-group label-class="text-gray-500"
-                                        description="Highlight rows orange in the Metrc in-transit package table to auto-add them">
-                                        <p class="text-xs text-red-500 pb-2"
-                                            v-if="searchState.activeUniqueMetrcGridId !== UniqueMetrcGridId.PACKAGES_IN_TRANSIT">
-                                            Select the In Transit Packages tab in Metrc to use this
-                                        </p>
-
-                                        <b-button
-                                            :disabled="searchState.activeUniqueMetrcGridId !== UniqueMetrcGridId.PACKAGES_IN_TRANSIT || metrcTableState.barcodeValues.length === 0"
-                                            variant="outline-primary"
-                                            @click="addLabels(metrcTableState.barcodeValues)">ADD
-                                            {{
-                                                metrcTableState.barcodeValues.length }} SELECTED IN TRANSIT
-                                            PACKAGES</b-button>
-                                    </b-form-group>
-                                </div>
+                                            <b-button
+                                                :disabled="searchState.activeUniqueMetrcGridId !== UniqueMetrcGridId.PACKAGES_IN_TRANSIT || metrcTableState.barcodeValues.length === 0"
+                                                variant="outline-primary"
+                                                @click="addLabels(metrcTableState.barcodeValues)">ADD
+                                                {{
+                                                    metrcTableState.barcodeValues.length }} SELECTED IN TRANSIT
+                                                PACKAGES</b-button>
+                                        </b-form-group>
+                                    </div>
+                                </template>
                             </template>
 
                         </b-card>
@@ -357,6 +369,7 @@ export default Vue.extend({
             labelEndpointConfigOptions: `labelPrint/${LabelPrintGetters.LABEL_ENDPOINT_CONFIG_OPTIONS}`,
             enableGeneration: `labelPrint/${LabelPrintGetters.ENABLE_GENERATION}`,
             selectedLabelContentLayout: `labelPrint/${LabelPrintGetters.SELECTED_LABEL_CONTENT_LAYOUT}`,
+            isSelectedLabelContentLayoutStatic: `labelPrint/${LabelPrintGetters.IS_SELECTED_LABEL_CONTENT_LAYOUT_STATIC}`,
         }),
         isLoading(): boolean {
             return store.state.pluginAuth.t3ApiAuthState === T3ApiAuthState.INITIAL;
