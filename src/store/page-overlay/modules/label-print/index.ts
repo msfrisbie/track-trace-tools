@@ -55,6 +55,15 @@ export const labelPrintModule = {
       rootState: IPluginState,
       rootGetters: any
     ) => state.labelContentLayoutOptions.find((x) => x.id === state.selectedContentLayoutId),
+    [LabelPrintGetters.IS_SELECTED_LABEL_CONTENT_LAYOUT_STATIC]: (
+      state: ILabelPrintState,
+      getters: any,
+      rootState: IPluginState,
+      rootGetters: any
+    ) =>
+      getters[LabelPrintGetters.SELECTED_LABEL_CONTENT_LAYOUT]?.elements.filter(
+        (x: any) => !!x.labelContentDataKey
+      ).length === 0,
     [LabelPrintGetters.LABEL_ENDPOINT_CONFIG_OPTIONS]: (
       state: ILabelPrintState,
       getters: any,
@@ -92,20 +101,22 @@ export const labelPrintModule = {
         return false;
       }
 
-      switch (state.selectedLabelEndpoint) {
-        case LabelEndpoint.ACTIVE_PACKAGES:
-        case LabelEndpoint.INTRANSIT_PACKAGES:
-          if (getters[LabelPrintGetters.TAG_LIST_PARSE_ERRORS].length > 0) {
+      if (!getters[LabelPrintGetters.IS_SELECTED_LABEL_CONTENT_LAYOUT_STATIC]) {
+        switch (state.selectedLabelEndpoint) {
+          case LabelEndpoint.ACTIVE_PACKAGES:
+          case LabelEndpoint.INTRANSIT_PACKAGES:
+            if (getters[LabelPrintGetters.TAG_LIST_PARSE_ERRORS].length > 0) {
+              return false;
+            }
+            break;
+          case LabelEndpoint.RAW_LABEL_GENERATOR:
+            if (!state.rawCsvMatrix) {
+              return false;
+            }
+            break;
+          default:
             return false;
-          }
-          break;
-        case LabelEndpoint.RAW_LABEL_GENERATOR:
-          if (!state.rawCsvMatrix) {
-            return false;
-          }
-          break;
-        default:
-          return false;
+        }
       }
 
       if (!state.labelsPerTag) {
@@ -136,7 +147,7 @@ export const labelPrintModule = {
         .split(/[\n,]+/)
         .map((x: string) => x.trim())
         .filter((x) => x !== "")
-        .flatMap((x: string) => Array(parseInt(state.labelsPerTag.toString(), 10)).fill(x)),
+        .flatMap((x: string) => Array(state.labelsPerTag).fill(x)),
     [LabelPrintGetters.PARSED_CSV_DATA]: (
       state: ILabelPrintState,
       getters: any,
@@ -147,7 +158,7 @@ export const labelPrintModule = {
         return [];
       }
 
-      const labelCount = parseInt(state.labelsPerTag.toString(), 10);
+      const labelCount = state.labelsPerTag;
 
       return state.rawCsvMatrix!.slice(1).flatMap((row) =>
         Array(labelCount)
@@ -236,45 +247,58 @@ export const labelPrintModule = {
       const csvData = ctx.getters[LabelPrintGetters.PARSED_CSV_DATA];
 
       try {
-        switch (ctx.state.selectedLabelEndpoint) {
-          case LabelEndpoint.ACTIVE_PACKAGES:
-            response = await t3RequestManager.generateActivePackageLabelPdf({
-              labelTemplateLayoutId: ctx.state.selectedTemplateLayoutId!,
-              labelContentLayoutId: ctx.state.selectedContentLayoutId!,
-              data: labelData,
-              renderingOptions: {
-                barcodeBarThickness: ctx.state.barcodeBarThickness,
-                labelMarginThickness: ctx.state.labelMarginThickness,
-              },
-              debug: ctx.state.debug,
-            });
-            break;
-          case LabelEndpoint.INTRANSIT_PACKAGES:
-            response = await t3RequestManager.generateInTransitPackageLabelPdf({
-              labelTemplateLayoutId: ctx.state.selectedTemplateLayoutId!,
-              labelContentLayoutId: ctx.state.selectedContentLayoutId!,
-              data: labelData,
-              renderingOptions: {
-                barcodeBarThickness: ctx.state.barcodeBarThickness,
-                labelMarginThickness: ctx.state.labelMarginThickness,
-              },
-              debug: ctx.state.debug,
-            });
-            break;
-          case LabelEndpoint.RAW_LABEL_GENERATOR:
-            response = await t3RequestManager.generateLabelPdf({
-              labelTemplateLayoutId: ctx.state.selectedTemplateLayoutId!,
-              labelContentLayoutId: ctx.state.selectedContentLayoutId!,
-              labelContentData: csvData,
-              renderingOptions: {
-                barcodeBarThickness: ctx.state.barcodeBarThickness,
-                labelMarginThickness: ctx.state.labelMarginThickness,
-              },
-              debug: ctx.state.debug,
-            });
-            break;
-          default:
-            throw new Error("Invalid label endpoint");
+        if (ctx.getters[LabelPrintGetters.IS_SELECTED_LABEL_CONTENT_LAYOUT_STATIC]) {
+          response = await t3RequestManager.generateLabelPdf({
+            labelTemplateLayoutId: ctx.state.selectedTemplateLayoutId!,
+            labelContentLayoutId: ctx.state.selectedContentLayoutId!,
+            labelContentData: Array(ctx.state.labelsPerTag).fill({}),
+            renderingOptions: {
+              barcodeBarThickness: ctx.state.barcodeBarThickness,
+              labelMarginThickness: ctx.state.labelMarginThickness,
+            },
+            debug: ctx.state.debug,
+          });
+        } else {
+          switch (ctx.state.selectedLabelEndpoint) {
+            case LabelEndpoint.ACTIVE_PACKAGES:
+              response = await t3RequestManager.generateActivePackageLabelPdf({
+                labelTemplateLayoutId: ctx.state.selectedTemplateLayoutId!,
+                labelContentLayoutId: ctx.state.selectedContentLayoutId!,
+                data: labelData,
+                renderingOptions: {
+                  barcodeBarThickness: ctx.state.barcodeBarThickness,
+                  labelMarginThickness: ctx.state.labelMarginThickness,
+                },
+                debug: ctx.state.debug,
+              });
+              break;
+            case LabelEndpoint.INTRANSIT_PACKAGES:
+              response = await t3RequestManager.generateInTransitPackageLabelPdf({
+                labelTemplateLayoutId: ctx.state.selectedTemplateLayoutId!,
+                labelContentLayoutId: ctx.state.selectedContentLayoutId!,
+                data: labelData,
+                renderingOptions: {
+                  barcodeBarThickness: ctx.state.barcodeBarThickness,
+                  labelMarginThickness: ctx.state.labelMarginThickness,
+                },
+                debug: ctx.state.debug,
+              });
+              break;
+            case LabelEndpoint.RAW_LABEL_GENERATOR:
+              response = await t3RequestManager.generateLabelPdf({
+                labelTemplateLayoutId: ctx.state.selectedTemplateLayoutId!,
+                labelContentLayoutId: ctx.state.selectedContentLayoutId!,
+                labelContentData: csvData,
+                renderingOptions: {
+                  barcodeBarThickness: ctx.state.barcodeBarThickness,
+                  labelMarginThickness: ctx.state.labelMarginThickness,
+                },
+                debug: ctx.state.debug,
+              });
+              break;
+            default:
+              throw new Error("Invalid label endpoint");
+          }
         }
 
         labelPdfBlobUrl = URL.createObjectURL(response.data);
