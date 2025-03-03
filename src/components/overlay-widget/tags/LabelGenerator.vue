@@ -301,9 +301,8 @@
                                     </b-form-checkbox>
                                 </b-form-group>
 
-                                <b-form-group
-                                    description="Draws boxes around printed content"
-                                    label-size="lg" label-class="text-purple-600"></b-form-group>
+                                <b-form-group description="Draws boxes around printed content" label-size="lg"
+                                    label-class="text-purple-600">
                                     <b-form-checkbox :checked="labelPrintState.debug"
                                         @change="onChange('debug', $event)">
                                         Debug
