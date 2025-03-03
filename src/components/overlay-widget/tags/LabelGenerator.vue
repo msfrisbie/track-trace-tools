@@ -292,7 +292,18 @@
                                         @change="onChange('labelMarginThickness', parseFloat($event))"></b-form-input>
                                 </b-form-group>
 
-                                <b-form-group>
+                                <b-form-group
+                                    description="Check this box if you want the order of thermal printed labels to match how they appear in the PDF."
+                                    label-size="lg" label-class="text-purple-600">
+                                    <b-form-checkbox :checked="labelPrintState.reversePrintOrderdebug"
+                                        @change="onChange('reversePrintOrder', $event)">
+                                        Reverse print order
+                                    </b-form-checkbox>
+                                </b-form-group>
+
+                                <b-form-group
+                                    description="Draws boxes around printed content"
+                                    label-size="lg" label-class="text-purple-600"></b-form-group>
                                     <b-form-checkbox :checked="labelPrintState.debug"
                                         @change="onChange('debug', $event)">
                                         Debug

@@ -24,6 +24,7 @@ const persistedState = {
   barcodeBarThickness: 1.0,
   labelMarginThickness: 1.0,
   debug: false,
+  reversePrintOrder: false,
   selectedLabelEndpoint: LabelEndpoint.ACTIVE_PACKAGES,
 };
 
@@ -283,6 +284,10 @@ export const labelPrintModule = {
 
         if (!labelContentData) {
           throw new Error("Unable to assign labelContentData");
+        }
+
+        if (ctx.state.reversePrintOrder) {
+          labelContentData.reverse();
         }
 
         response = await t3RequestManager.generateLabelPdf({
