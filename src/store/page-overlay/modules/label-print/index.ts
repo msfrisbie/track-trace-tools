@@ -246,60 +246,55 @@ export const labelPrintModule = {
 
       const csvData = ctx.getters[LabelPrintGetters.PARSED_CSV_DATA];
 
+      let labelContentData: { [key: string]: string }[] | null = null;
+
       try {
         if (ctx.getters[LabelPrintGetters.IS_SELECTED_LABEL_CONTENT_LAYOUT_STATIC]) {
-          response = await t3RequestManager.generateLabelPdf({
-            labelTemplateLayoutId: ctx.state.selectedTemplateLayoutId!,
-            labelContentLayoutId: ctx.state.selectedContentLayoutId!,
-            labelContentData: Array(ctx.state.labelsPerTag).fill({}),
-            renderingOptions: {
-              barcodeBarThickness: ctx.state.barcodeBarThickness,
-              labelMarginThickness: ctx.state.labelMarginThickness,
-            },
-            debug: ctx.state.debug,
-          });
+          labelContentData = Array(ctx.state.labelsPerTag).fill({});
         } else {
           switch (ctx.state.selectedLabelEndpoint) {
             case LabelEndpoint.ACTIVE_PACKAGES:
-              response = await t3RequestManager.generateActivePackageLabelPdf({
-                labelTemplateLayoutId: ctx.state.selectedTemplateLayoutId!,
-                labelContentLayoutId: ctx.state.selectedContentLayoutId!,
-                data: labelData,
-                renderingOptions: {
-                  barcodeBarThickness: ctx.state.barcodeBarThickness,
-                  labelMarginThickness: ctx.state.labelMarginThickness,
-                },
-                debug: ctx.state.debug,
-              });
+              const activePackageLabelContentDataResponse =
+                await t3RequestManager.generateActivePackageLabelContentData({
+                  labelTemplateLayoutId: ctx.state.selectedTemplateLayoutId!,
+                  labelContentLayoutId: ctx.state.selectedContentLayoutId!,
+                  data: labelData,
+                });
+
+              labelContentData = activePackageLabelContentDataResponse.data.labelContentData;
               break;
             case LabelEndpoint.INTRANSIT_PACKAGES:
-              response = await t3RequestManager.generateInTransitPackageLabelPdf({
-                labelTemplateLayoutId: ctx.state.selectedTemplateLayoutId!,
-                labelContentLayoutId: ctx.state.selectedContentLayoutId!,
-                data: labelData,
-                renderingOptions: {
-                  barcodeBarThickness: ctx.state.barcodeBarThickness,
-                  labelMarginThickness: ctx.state.labelMarginThickness,
-                },
-                debug: ctx.state.debug,
-              });
+              const intransitPackageLabelContentDataResponse =
+                await t3RequestManager.generateInTransitPackageLabelContentData({
+                  labelTemplateLayoutId: ctx.state.selectedTemplateLayoutId!,
+                  labelContentLayoutId: ctx.state.selectedContentLayoutId!,
+                  data: labelData,
+                });
+
+              labelContentData = intransitPackageLabelContentDataResponse.data.labelContentData;
               break;
             case LabelEndpoint.RAW_LABEL_GENERATOR:
-              response = await t3RequestManager.generateLabelPdf({
-                labelTemplateLayoutId: ctx.state.selectedTemplateLayoutId!,
-                labelContentLayoutId: ctx.state.selectedContentLayoutId!,
-                labelContentData: csvData,
-                renderingOptions: {
-                  barcodeBarThickness: ctx.state.barcodeBarThickness,
-                  labelMarginThickness: ctx.state.labelMarginThickness,
-                },
-                debug: ctx.state.debug,
-              });
+              labelContentData = csvData;
               break;
             default:
               throw new Error("Invalid label endpoint");
           }
         }
+
+        if (!labelContentData) {
+          throw new Error("Unable to assign labelContentData");
+        }
+
+        response = await t3RequestManager.generateLabelPdf({
+          labelTemplateLayoutId: ctx.state.selectedTemplateLayoutId!,
+          labelContentLayoutId: ctx.state.selectedContentLayoutId!,
+          labelContentData,
+          renderingOptions: {
+            barcodeBarThickness: ctx.state.barcodeBarThickness,
+            labelMarginThickness: ctx.state.labelMarginThickness,
+          },
+          debug: ctx.state.debug,
+        });
 
         labelPdfBlobUrl = URL.createObjectURL(response.data);
 
@@ -311,23 +306,21 @@ export const labelPrintModule = {
           }
         }
       } catch (err: any) {
-        // Axios forces the response to a blob, but this blob contains JSON
-        // when an error is returned. Need to conditinally extract the blob,
-        // then format to json, and also handle any other network errors.
         try {
-          const errorBlob = err.response?.data;
-          if (errorBlob instanceof Blob) {
-            const errorTextRaw = await errorBlob.text(); // Read the Blob as text
+          const errorData = err.response?.data;
+
+          if (errorData instanceof Blob) {
+            const errorTextRaw = await errorData.text();
             try {
-              errorText = JSON.stringify(JSON.parse(errorTextRaw), null, 2); // Format if it's JSON
+              errorText = JSON.stringify(JSON.parse(errorTextRaw), null, 2);
             } catch {
-              errorText = errorTextRaw; // Otherwise, keep it as plain text
+              errorText = errorTextRaw; // Not JSON, keep as plain text
             }
           } else {
-            errorText = JSON.stringify(await err.response.json(), null, 2);
+            errorText = JSON.stringify(errorData, null, 2);
           }
         } catch {
-          errorText = err.response?.data?.toString() || err?.message || err.toString();
+          errorText = err.response?.data?.toString() || err.message || String(err);
         }
       }
 

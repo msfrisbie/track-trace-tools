@@ -28,7 +28,11 @@ const LABEL_TEMPLATE_LAYOUTS_PATH = "v2/files/labels/template-layouts";
 const LABEL_CONTENT_LAYOUTS_PATH = "v2/files/labels/content-layouts";
 const GENERATE_LABELS_PATH = "v2/files/labels/generate";
 const GENERATE_ACTIVE_PACKAGE_LABELS_PATH = "v2/files/labels/packages/active";
+const GENERATE_ACTIVE_PACKAGE_LABEL_CONTENT_DATA_PATH =
+  "v2/files/labels/content-data/packages/active";
 const GENERATE_IN_TRANSIT_PACKAGE_LABELS_PATH = "v2/files/labels/packages/intransit";
+const GENERATE_IN_TRANSIT_PACKAGE_LABEL_CONTENT_DATA_PATH =
+  "v2/files/labels/content-data/packages/intransit";
 
 const DEFAULT_POST_HEADERS = {
   "Content-Type": "application/json",
@@ -435,6 +439,29 @@ class T3RequestManager implements IAtomicService {
     );
   }
 
+  async generateActivePackageLabelContentData(data: {
+    labelTemplateLayoutId: string;
+    labelContentLayoutId: string;
+    data: string[];
+  }) {
+    return customAxios(
+      `${BASE_URL}${GENERATE_ACTIVE_PACKAGE_LABEL_CONTENT_DATA_PATH}?licenseNumber=${
+        (await authManager.authStateOrError()).license
+      }`,
+      {
+        method: "POST",
+        headers: {
+          ...DEFAULT_POST_HEADERS,
+          Authorization: `Bearer ${this._t3AccessToken}`,
+        },
+        axiosRetry: {
+          retries: 0,
+        },
+        body: JSON.stringify(data),
+      }
+    );
+  }
+
   async generateInTransitPackageLabelPdf(data: {
     labelTemplateLayoutId: string;
     labelContentLayoutId: string;
@@ -457,6 +484,29 @@ class T3RequestManager implements IAtomicService {
         },
         body: JSON.stringify(data),
         responseType: "blob",
+      }
+    );
+  }
+
+  async generateInTransitPackageLabelContentData(data: {
+    labelTemplateLayoutId: string;
+    labelContentLayoutId: string;
+    data: string[];
+  }) {
+    return customAxios(
+      `${BASE_URL}${GENERATE_IN_TRANSIT_PACKAGE_LABEL_CONTENT_DATA_PATH}?licenseNumber=${
+        (await authManager.authStateOrError()).license
+      }`,
+      {
+        method: "POST",
+        headers: {
+          ...DEFAULT_POST_HEADERS,
+          Authorization: `Bearer ${this._t3AccessToken}`,
+        },
+        axiosRetry: {
+          retries: 0,
+        },
+        body: JSON.stringify(data),
       }
     );
   }
