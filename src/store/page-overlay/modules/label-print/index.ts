@@ -21,7 +21,7 @@ const persistedState = {
   selectedTemplateLayoutId: null,
   selectedContentLayoutId: null,
   labelsPerTag: 1,
-  barcodeBarThickness: 0.94,
+  barcodeBarThickness: 1.0,
   labelMarginThickness: 1.0,
   debug: false,
   selectedLabelEndpoint: LabelEndpoint.ACTIVE_PACKAGES,
