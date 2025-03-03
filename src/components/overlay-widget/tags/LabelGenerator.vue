@@ -277,7 +277,7 @@
                                 <b-form-group
                                     description="Adjust this value if you're using a low-DPI printer and the printed
         barcodes are too thick
-        and/or unscannable. A higher number means thicker barcode bars. 0.94 is the recommended value for most thermal printers."
+        and/or unscannable. A higher number means thicker barcode bars. 1.0 is the recommended value for most thermal printers."
                                     label-size="lg" label-class="text-purple-600">
                                     <b-form-input type="number" step="0.01" min="0.5" max="1.5"
                                         :value="labelPrintState.barcodeBarThickness"
@@ -292,7 +292,17 @@
                                         @change="onChange('labelMarginThickness', parseFloat($event))"></b-form-input>
                                 </b-form-group>
 
-                                <b-form-group>
+                                <b-form-group
+                                    description="Thermal printers print labels sequentially, but the spooled order is reversed (last to first). Check this box to print labels in the same order as they appear in the PDF."
+                                    label-size="lg" label-class="text-purple-600">
+                                    <b-form-checkbox :checked="labelPrintState.reversePrintOrderdebug"
+                                        @change="onChange('reversePrintOrder', $event)">
+                                        Reverse print order
+                                    </b-form-checkbox>
+                                </b-form-group>
+
+                                <b-form-group description="Draws boxes around printed content" label-size="lg"
+                                    label-class="text-purple-600">
                                     <b-form-checkbox :checked="labelPrintState.debug"
                                         @change="onChange('debug', $event)">
                                         Debug

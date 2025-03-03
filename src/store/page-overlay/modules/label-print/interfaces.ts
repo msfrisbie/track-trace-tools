@@ -29,6 +29,7 @@ export interface ILabelPrintState {
   barcodeBarThickness: number;
   labelMarginThickness: number;
   debug: boolean;
+  reversePrintOrder: boolean;
   selectedLabelEndpoint: LabelEndpoint;
   errorText: string | null;
   rawCsvMatrix: string[][] | null;
