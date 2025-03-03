@@ -121,7 +121,7 @@
                                             <li v-bind:key="element.labelContentDataKey"
                                                 v-for="element of selectedLabelContentLayout.elements">
                                                 <span class="font-mono font-bold">{{ element.labelContentDataKey
-                                                }}</span>:
+                                                    }}</span>:
                                                 {{ element.description }}
                                             </li>
                                         </ul>
@@ -293,7 +293,7 @@
                                 </b-form-group>
 
                                 <b-form-group
-                                    description="Check this box if you want the order of thermal printed labels to match how they appear in the PDF."
+                                    description="Thermal printers print labels sequentially, but the spooled order is reversed (last to first). Check this box to print labels in the same order as they appear in the PDF."
                                     label-size="lg" label-class="text-purple-600">
                                     <b-form-checkbox :checked="labelPrintState.reversePrintOrderdebug"
                                         @change="onChange('reversePrintOrder', $event)">
