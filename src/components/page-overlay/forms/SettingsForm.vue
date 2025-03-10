@@ -338,13 +338,12 @@
 
         <div class="col-span-2 text-gray-400 text-lg">Packages</div>
 
-        <b-form-checkbox id="checkbox-autoOpenActivePackages" v-model="settings.autoOpenActivePackages"
-          name="checkbox-autoOpenActivePackages" @change="onChange()">
-          Auto-open Packages tab
-        </b-form-checkbox>
+        <span>
+          Auto-open Packages tab:
+        </span>
 
-        <b-form-select v-model="settings.autoOpenPackageTab" :options="packageTabOptions" @change="onChange()"
-          v-if="settings.autoOpenActivePackages"></b-form-select>
+        <b-form-select v-model="settings.autoOpenPackagesGrid" :options="packageGridOptions" @change="onChange()"
+          v-if="settings.autoOpenPackagesGrid"></b-form-select>
 
         <span>Viewing # Packages:</span>
 
@@ -359,13 +358,10 @@
           Always use T3 PDF viewer for manifests
         </b-form-checkbox>
 
-        <b-form-checkbox id="checkbox-autoOpenIncomingTransfers" v-model="settings.autoOpenIncomingTransfers"
-          name="checkbox-autoOpenIncomingTransfers" @change="onChange()">
-          Auto-open Transfers tab
-        </b-form-checkbox>
+        <span>Auto-open Transfers tab:</span>
 
-        <b-form-select v-model="settings.autoOpenTransfersTab" :options="transfersTabOptions" @change="onChange()"
-          v-if="settings.autoOpenIncomingTransfers"></b-form-select>
+        <b-form-select v-model="settings.autoOpenTransfersGrid" :options="transfersGridOptions"
+          @change="onChange()"></b-form-select>
 
         <span>Viewing # Transfers:</span>
 
@@ -374,13 +370,12 @@
 
         <div class="col-span-2 text-gray-400 text-lg py-4">Sales</div>
 
-        <b-form-checkbox id="checkbox-autoOpenActiveSales" v-model="settings.autoOpenActiveSales"
-          name="checkbox-autoOpenActiveSales" @change="onChange()">
-          Auto-open Sales tab
-        </b-form-checkbox>
+        <span>
+          Auto-open Sales tab:
+        </span>
 
-        <b-form-select v-model="settings.autoOpenSalesTab" :options="salesTabOptions" @change="onChange()"
-          v-if="settings.autoOpenActiveSales"></b-form-select>
+        <b-form-select v-model="settings.autoOpenSalesGrid" :options="salesGridOptions"
+          @change="onChange()"></b-form-select>
 
         <span>Viewing # Sales:</span>
 
@@ -389,13 +384,12 @@
 
         <div class="col-span-2 text-gray-400 text-lg py-4">Tags</div>
 
-        <b-form-checkbox id="checkbox-autoOpenAvailableTags" v-model="settings.autoOpenAvailableTags"
-          name="checkbox-autoOpenAvailableTags" @change="onChange()">
-          Auto-open Tags tab
-        </b-form-checkbox>
+        <span>
+          Auto-open Tags tab:
+        </span>
 
-        <b-form-select v-model="settings.autoOpenTagsTab" :options="tagsTabOptions" @change="onChange()"
-          v-if="settings.autoOpenAvailableTags"></b-form-select>
+        <b-form-select v-model="settings.autoOpenTagsGrid" :options="tagsGridOptions"
+          @change="onChange()"></b-form-select>
 
         <span>Viewing # Tags:</span>
 
@@ -404,13 +398,12 @@
 
         <div class="col-span-2 text-gray-400 text-lg py-4">Plants</div>
 
-        <b-form-checkbox id="checkbox-autoOpenFloweringPlants" v-model="settings.autoOpenFloweringPlants"
-          name="checkbox-autoOpenFloweringPlants" @change="onChange()">
-          Auto-open Plants tab
-        </b-form-checkbox>
+        <span>
+          Auto-open Plants tab:
+        </span>
 
-        <b-form-select v-model="settings.autoOpenPlantsTab" :options="plantsTabOptions" @change="onChange()"
-          v-if="settings.autoOpenFloweringPlants"></b-form-select>
+        <b-form-select v-model="settings.autoOpenPlantsGrid" :options="plantsGridOptions"
+          @change="onChange()"></b-form-select>
 
         <span>Viewing # Plants:</span>
 
@@ -426,11 +419,7 @@
 import {
   AnalyticsEvent,
   LandingPage,
-  PackageTabLabel,
-  PlantsTabLabel,
-  SalesTabLabel,
-  TagsTabLabel,
-  TransfersTabLabel
+  UniqueMetrcGridId
 } from "@/consts";
 import { BackgroundState, DarkModeState, IPluginState, SnowflakeState } from "@/interfaces";
 import { analyticsManager } from "@/modules/analytics-manager.module";
@@ -509,24 +498,37 @@ export default Vue.extend({
         value: x,
         text: x,
       })),
-      packageTabOptions: [
-        PackageTabLabel.ACTIVE,
-        PackageTabLabel.INACTIVE,
-        PackageTabLabel.IN_TRANSIT,
+      packageGridOptions: [
+        { text: "None", value: null },
+        { text: "ACTIVE", value: UniqueMetrcGridId.PACKAGES_ACTIVE },
+        { text: "IN TRANSIT", value: UniqueMetrcGridId.PACKAGES_IN_TRANSIT },
+        { text: "INACTIVE", value: UniqueMetrcGridId.PACKAGES_INACTIVE },
       ],
-      plantsTabOptions: [
-        PlantsTabLabel.IMMATURE,
-        PlantsTabLabel.VEGETATIVE,
-        PlantsTabLabel.FLOWERING,
-        PlantsTabLabel.HARVESTED,
+      plantsGridOptions: [
+        { text: "None", value: null },
+        { text: "PLANT BATCHES", value: UniqueMetrcGridId.PLANT_BATCHES },
+        { text: "VEGETATIVE", value: UniqueMetrcGridId.PLANTS_VEGETATIVE },
+        { text: "FLOWERING", value: UniqueMetrcGridId.PLANTS_FLOWERING },
+        { text: "HARVESTED", value: UniqueMetrcGridId.HARVESTS_HARVESTED },
       ],
-      transfersTabOptions: [
-        TransfersTabLabel.INCOMING,
-        TransfersTabLabel.OUTGOING,
-        TransfersTabLabel.REJECTED,
+      transfersGridOptions: [
+        { text: "None", value: null },
+        { text: "INCOMING", value: UniqueMetrcGridId.TRANSFERS_INCOMING },
+        { text: "OUTGOING", value: UniqueMetrcGridId.TRANSFERS_OUTGOING },
+        { text: "REJECTED", value: UniqueMetrcGridId.TRANSFERS_REJECTED },
       ],
-      tagsTabOptions: [TagsTabLabel.AVAILABLE, TagsTabLabel.USED, TagsTabLabel.VOIDED],
-      salesTabOptions: [SalesTabLabel.ACTIVE, SalesTabLabel.INACTIVE],
+      tagsGridOptions: [
+        { text: "None", value: null },
+        { text: "AVAILABLE", value: UniqueMetrcGridId.TAGS_AVAILABLE },
+        { text: "USED", value: UniqueMetrcGridId.TAGS_USED },
+        { text: "VOID", value: UniqueMetrcGridId.TAGS_VOIDED },
+      ],
+      salesGridOptions: [
+
+        { text: "None", value: null },
+        { text: "ACTIVE", value: UniqueMetrcGridId.SALES_ACTIVE },
+        { text: "INACTIVE", value: UniqueMetrcGridId.SALES_INACTIVE },
+      ],
       landingPageOptions: [
         {
           value: LandingPage.DEFAULT,

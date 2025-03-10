@@ -1,24 +1,12 @@
-import {
-  LandingPage,
-  PackageTabLabel,
-  PlantsTabLabel,
-  SalesTabLabel,
-  TagsTabLabel,
-  TransfersTabLabel,
-} from "@/consts";
+import { LandingPage, UniqueMetrcGridId } from "@/consts";
 import { BackgroundState, DarkModeState, SnowflakeState } from "@/interfaces";
 
 export interface ISettingsState {
-  autoOpenActivePackages: boolean;
-  autoOpenPackageTab: PackageTabLabel;
-  autoOpenActiveSales: boolean;
-  autoOpenSalesTab: SalesTabLabel;
-  autoOpenAvailableTags: boolean;
-  autoOpenTagsTab: TagsTabLabel;
-  autoOpenFloweringPlants: boolean;
-  autoOpenPlantsTab: PlantsTabLabel;
-  autoOpenIncomingTransfers: boolean;
-  autoOpenTransfersTab: TransfersTabLabel;
+  autoOpenPackagesGrid: UniqueMetrcGridId | null;
+  autoOpenSalesGrid: UniqueMetrcGridId | null;
+  autoOpenTagsGrid: UniqueMetrcGridId | null;
+  autoOpenPlantsGrid: UniqueMetrcGridId | null;
+  autoOpenTransfersGrid: UniqueMetrcGridId | null;
   darkModeState: DarkModeState;
   disablePopups: boolean;
   disableSnowAnimation: boolean;

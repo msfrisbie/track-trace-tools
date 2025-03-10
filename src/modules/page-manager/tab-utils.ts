@@ -1,4 +1,3 @@
-import { UniqueMetrcGridId } from "@/consts";
 import store from "@/store/page-overlay/index";
 // import { readHashValueOrNull } from "@/utils/url";
 import { URLHashData } from "@/interfaces";
@@ -81,32 +80,32 @@ export async function applyDefaultTabs() {
   }
 
   if (window.location.pathname.match(PLANTS_TAB_REGEX)) {
-    if (store.state.settings?.autoOpenFloweringPlants) {
-      await pageManager.clickTabWithGridIdIfExists(UniqueMetrcGridId.PLANTS_FLOWERING);
+    if (store.state.settings?.autoOpenPlantsGrid) {
+      await pageManager.clickTabWithGridIdIfExists(store.state.settings?.autoOpenPlantsGrid);
     }
   }
 
   if (window.location.pathname.match(PACKAGE_TAB_REGEX)) {
-    if (store.state.settings?.autoOpenActivePackages) {
-      await pageManager.clickTabWithGridIdIfExists(UniqueMetrcGridId.PACKAGES_ACTIVE);
+    if (store.state.settings?.autoOpenPackagesGrid) {
+      await pageManager.clickTabWithGridIdIfExists(store.state.settings?.autoOpenPackagesGrid);
     }
   }
 
   if (window.location.pathname.match(TRANSFER_TAB_REGEX)) {
-    if (store.state.settings?.autoOpenIncomingTransfers) {
-      await pageManager.clickTabWithGridIdIfExists(UniqueMetrcGridId.TRANSFERS_INCOMING);
+    if (store.state.settings?.autoOpenTransfersGrid) {
+      await pageManager.clickTabWithGridIdIfExists(store.state.settings?.autoOpenTransfersGrid);
     }
   }
 
   if (window.location.pathname.match(SALES_TAB_REGEX)) {
-    if (store.state.settings?.autoOpenActiveSales) {
-      await pageManager.clickTabWithGridIdIfExists(UniqueMetrcGridId.SALES_ACTIVE);
+    if (store.state.settings?.autoOpenSalesGrid) {
+      await pageManager.clickTabWithGridIdIfExists(store.state.settings?.autoOpenSalesGrid);
     }
   }
 
   if (window.location.pathname.match(TAG_TAB_REGEX)) {
-    if (store.state.settings?.autoOpenAvailableTags) {
-      await pageManager.clickTabWithGridIdIfExists(UniqueMetrcGridId.TAGS_AVAILABLE);
+    if (store.state.settings?.autoOpenTagsGrid) {
+      await pageManager.clickTabWithGridIdIfExists(store.state.settings?.autoOpenTagsGrid);
     }
   }
 }

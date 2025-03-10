@@ -6,6 +6,7 @@ import {
   SalesTabLabel,
   TagsTabLabel,
   TransfersTabLabel,
+  UniqueMetrcGridId,
 } from "@/consts";
 import { BackgroundState, DarkModeState, IPluginState, SnowflakeState } from "@/interfaces";
 import { ActionContext } from "vuex";
@@ -16,16 +17,11 @@ import { ISettingsState } from "./interfaces";
 const inMemoryState = {};
 
 const persistedState: ISettingsState = {
-  autoOpenActivePackages: true,
-  autoOpenPackageTab: PackageTabLabel.ACTIVE,
-  autoOpenActiveSales: true,
-  autoOpenSalesTab: SalesTabLabel.ACTIVE,
-  autoOpenAvailableTags: true,
-  autoOpenTagsTab: TagsTabLabel.AVAILABLE,
-  autoOpenFloweringPlants: true,
-  autoOpenPlantsTab: PlantsTabLabel.FLOWERING,
-  autoOpenIncomingTransfers: true,
-  autoOpenTransfersTab: TransfersTabLabel.OUTGOING,
+  autoOpenPackagesGrid: UniqueMetrcGridId.PACKAGES_ACTIVE,
+  autoOpenSalesGrid: UniqueMetrcGridId.SALES_ACTIVE,
+  autoOpenTagsGrid: UniqueMetrcGridId.TAGS_AVAILABLE,
+  autoOpenPlantsGrid: UniqueMetrcGridId.PLANTS_FLOWERING,
+  autoOpenTransfersGrid: UniqueMetrcGridId.TRANSFERS_OUTGOING,
   darkModeState: DarkModeState.DISABLED,
   disablePopups: false,
   disableSnowAnimation: false,
