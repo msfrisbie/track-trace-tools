@@ -342,8 +342,8 @@
           Auto-open Packages tab:
         </span>
 
-        <b-form-select v-model="settings.autoOpenPackagesGrid" :options="packageGridOptions" @change="onChange()"
-          v-if="settings.autoOpenPackagesGrid"></b-form-select>
+        <b-form-select v-model="settings.autoOpenPackagesGrid" :options="packageGridOptions"
+          @change="onChange()"></b-form-select>
 
         <span>Viewing # Packages:</span>
 
