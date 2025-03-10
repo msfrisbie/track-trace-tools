@@ -23,7 +23,7 @@ const DOWNLOAD_REPORT_PATH = "reports/download";
 const EMAIL_REPORT_PATH = "reports/email";
 const SESSION_AUTH_PATH = "v2/auth/session";
 const AUTH_CHECK_PATH = "v2/auth/check";
-const TOKEN_REFRESH_PATH = "v2/auth/refresh";
+// const TOKEN_REFRESH_PATH = "v2/auth/refresh";
 const LABEL_TEMPLATE_LAYOUTS_PATH = "v2/files/labels/template-layouts";
 const LABEL_CONTENT_LAYOUTS_PATH = "v2/files/labels/content-layouts";
 const GENERATE_LABELS_PATH = "v2/files/labels/generate";
@@ -42,60 +42,86 @@ const DEFAULT_GET_HEADERS = {};
 class T3RequestManager implements IAtomicService {
   _t3AccessToken: string | null = null;
 
-  _t3RefreshToken: string | null = null;
+  // _t3RefreshToken: string | null = null;
 
   async init() {
     const result = await chrome.storage.local.get([
       ChromeStorageKeys.T3_ACCESS_TOKEN,
-      ChromeStorageKeys.T3_REFRESH_TOKEN,
+      // ChromeStorageKeys.T3_REFRESH_TOKEN,
     ]);
 
     this.t3AccessToken = result[ChromeStorageKeys.T3_ACCESS_TOKEN] || null;
-    this.t3RefreshToken = result[ChromeStorageKeys.T3_REFRESH_TOKEN] || null;
+    // this.t3RefreshToken = result[ChromeStorageKeys.T3_REFRESH_TOKEN] || null;
 
-    setInterval(async () => {
-      if (!this.t3AccessToken || !this.t3RefreshToken) {
+    const intervalDuration = 5 * 60 * 1000; // 5 minutes
+    const maxRunTime = 30 * 60 * 1000; // 30 minutes
+    const startTime = Date.now();
+
+    const intervalId = setInterval(async () => {
+      if (!this.t3AccessToken) {
         return;
       }
 
-      const response = await this.t3SessionRefresh();
-
-      const { accessToken } = response.data;
-
-      if (!accessToken) {
-        throw new Error(
-          `Refresh endpoint did not return required tokens: ${JSON.stringify(response.data)}`
-        );
+      try {
+        this.t3SessionAuthOrError();
+      } catch (error) {
+        console.error("Authentication error, stopping interval:", error);
+        clearInterval(intervalId);
+        return;
       }
 
-      this.t3AccessToken = accessToken;
-    }, 30000);
+      // Stop interval after 30 minutes
+      if (Date.now() - startTime >= maxRunTime) {
+        console.log("Max runtime reached, stopping interval.");
+        clearInterval(intervalId);
+      }
+    }, intervalDuration);
+
+    // setInterval(async () => {
+    //   if (!this.t3AccessToken) {
+    //     // || !this.t3RefreshToken) {
+    //     return;
+    //   }
+
+    //   // const response = await this.t3SessionRefresh();
+    //   this.t3SessionAuthOrError();
+
+    //   // const { accessToken } = response.data;
+
+    //   // if (!accessToken) {
+    //   //   throw new Error(
+    //   //     `Refresh endpoint did not return required tokens: ${JSON.stringify(response.data)}`
+    //   //   );
+    //   // }
+
+    //   // this.t3AccessToken = accessToken;
+    // }, 10 * 60 * 1000);
   }
 
   get t3AccessToken(): string | null {
     return this._t3AccessToken;
   }
 
-  get t3RefreshToken(): string | null {
-    return this._t3RefreshToken;
-  }
+  // get t3RefreshToken(): string | null {
+  //   return this._t3RefreshToken;
+  // }
 
   set t3AccessToken(token: string | null) {
     this._t3AccessToken = token;
     chrome.storage.local.set({ [ChromeStorageKeys.T3_ACCESS_TOKEN]: token });
   }
 
-  set t3RefreshToken(token: string | null) {
-    this._t3RefreshToken = token;
-    chrome.storage.local.set({ [ChromeStorageKeys.T3_REFRESH_TOKEN]: token });
-  }
+  // set t3RefreshToken(token: string | null) {
+  //   this._t3RefreshToken = token;
+  //   chrome.storage.local.set({ [ChromeStorageKeys.T3_REFRESH_TOKEN]: token });
+  // }
 
   async clearTokens() {
     this.t3AccessToken = null;
-    this.t3RefreshToken = null;
+    // this.t3RefreshToken = null;
     await chrome.storage.local.remove([
       ChromeStorageKeys.T3_ACCESS_TOKEN,
-      ChromeStorageKeys.T3_REFRESH_TOKEN,
+      // ChromeStorageKeys.T3_REFRESH_TOKEN,
     ]);
   }
 
@@ -341,21 +367,24 @@ class T3RequestManager implements IAtomicService {
       throw new Error(`Failed to authenticate: ${response.data}`);
     }
 
-    const { accessToken, refreshToken } = response.data;
+    const {
+      accessToken,
+      // refreshToken
+    } = response.data;
 
     this.t3AccessToken = accessToken;
-    this.t3RefreshToken = refreshToken;
+    // this.t3RefreshToken = refreshToken;
   }
 
-  async t3SessionRefresh() {
-    return customAxios(BASE_URL + TOKEN_REFRESH_PATH, {
-      method: "POST",
-      headers: {
-        ...DEFAULT_POST_HEADERS,
-        Authorization: `Bearer ${this._t3RefreshToken}`,
-      },
-    });
-  }
+  // async t3SessionRefresh() {
+  //   return customAxios(BASE_URL + TOKEN_REFRESH_PATH, {
+  //     method: "POST",
+  //     headers: {
+  //       ...DEFAULT_POST_HEADERS,
+  //       Authorization: `Bearer ${this._t3RefreshToken}`,
+  //     },
+  //   });
+  // }
 
   async t3AuthCheck() {
     return customAxios(BASE_URL + AUTH_CHECK_PATH, {
