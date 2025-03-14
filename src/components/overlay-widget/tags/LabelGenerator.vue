@@ -108,6 +108,9 @@
                             <template v-if="isSelectedLabelContentLayoutStatic">
                                 <p>This label content is fixed, no label data is required.</p>
                             </template>
+                            <template v-if="isDemo">
+                                <p>Demo, no label data is required.</p>
+                            </template>
                             <template v-else>
                                 <template
                                     v-if="labelPrintState.selectedLabelEndpoint === LabelEndpoint.RAW_LABEL_GENERATOR">
@@ -121,7 +124,7 @@
                                             <li v-bind:key="element.labelContentDataKey"
                                                 v-for="element of selectedLabelContentLayout.elements">
                                                 <span class="font-mono font-bold">{{ element.labelContentDataKey
-                                                }}</span>:
+                                                    }}</span>:
                                                 {{ element.description }}
                                             </li>
                                         </ul>
@@ -380,6 +383,7 @@ export default Vue.extend({
             enableGeneration: `labelPrint/${LabelPrintGetters.ENABLE_GENERATION}`,
             selectedLabelContentLayout: `labelPrint/${LabelPrintGetters.SELECTED_LABEL_CONTENT_LAYOUT}`,
             isSelectedLabelContentLayoutStatic: `labelPrint/${LabelPrintGetters.IS_SELECTED_LABEL_CONTENT_LAYOUT_STATIC}`,
+            isDemo: `labelPrint/${LabelPrintGetters.IS_DEMO}`,
         }),
         isLoading(): boolean {
             return store.state.pluginAuth.t3ApiAuthState === T3ApiAuthState.INITIAL;

@@ -33,6 +33,8 @@ const GENERATE_ACTIVE_PACKAGE_LABEL_CONTENT_DATA_PATH =
 const GENERATE_IN_TRANSIT_PACKAGE_LABELS_PATH = "v2/files/labels/packages/intransit";
 const GENERATE_IN_TRANSIT_PACKAGE_LABEL_CONTENT_DATA_PATH =
   "v2/files/labels/content-data/packages/intransit";
+  const GENERATE_DEMO_PACKAGE_LABEL_CONTENT_DATA_PATH =
+  "v2/files/labels/content-data/packages/demo";
 
 const DEFAULT_POST_HEADERS = {
   "Content-Type": "application/json",
@@ -524,6 +526,29 @@ class T3RequestManager implements IAtomicService {
   }) {
     return customAxios(
       `${BASE_URL}${GENERATE_IN_TRANSIT_PACKAGE_LABEL_CONTENT_DATA_PATH}?licenseNumber=${
+        (await authManager.authStateOrError()).license
+      }`,
+      {
+        method: "POST",
+        headers: {
+          ...DEFAULT_POST_HEADERS,
+          Authorization: `Bearer ${this._t3AccessToken}`,
+        },
+        axiosRetry: {
+          retries: 0,
+        },
+        body: JSON.stringify(data),
+      }
+    );
+  }
+
+  async generateDemoPackageLabelContentData(data: {
+    labelTemplateLayoutId: string;
+    labelContentLayoutId: string;
+    data: string[];
+  }) {
+    return customAxios(
+      `${BASE_URL}${GENERATE_DEMO_PACKAGE_LABEL_CONTENT_DATA_PATH}?licenseNumber=${
         (await authManager.authStateOrError()).license
       }`,
       {

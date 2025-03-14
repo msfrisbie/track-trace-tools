@@ -70,12 +70,22 @@ export const labelPrintModule = {
       ]?.labelContentLayoutConfig.labelContentLayoutElements.filter(
         (x: any) => !!x.labelContentDataKey
       ).length === 0,
+    [LabelPrintGetters.IS_DEMO]: (
+      state: ILabelPrintState,
+      getters: any,
+      rootState: IPluginState,
+      rootGetters: any
+    ) => state.selectedLabelEndpoint === LabelEndpoint.DEMO_PACKAGES,
     [LabelPrintGetters.LABEL_ENDPOINT_CONFIG_OPTIONS]: (
       state: ILabelPrintState,
       getters: any,
       rootState: IPluginState,
       rootGetters: any
     ): ILabelEndpointConfig[] => [
+      {
+        id: LabelEndpoint.DEMO_PACKAGES,
+        description: "Generate demo package labels",
+      },
       {
         id: LabelEndpoint.ACTIVE_PACKAGES,
         description: "Autogenerate labels from active packages",
@@ -105,6 +115,10 @@ export const labelPrintModule = {
 
       if (!state.selectedTemplateLayoutId) {
         return false;
+      }
+
+      if (getters[LabelPrintGetters.IS_DEMO]) {
+        return true;
       }
 
       if (!getters[LabelPrintGetters.IS_SELECTED_LABEL_CONTENT_LAYOUT_STATIC]) {
@@ -280,6 +294,16 @@ export const labelPrintModule = {
               break;
             case LabelEndpoint.RAW_LABEL_GENERATOR:
               labelContentData = csvData;
+              break;
+            case LabelEndpoint.DEMO_PACKAGES:
+              const demoPackageLabelContentDataResponse =
+                await t3RequestManager.generateDemoPackageLabelContentData({
+                  labelTemplateLayoutId: ctx.state.selectedTemplateLayoutId!,
+                  labelContentLayoutId: ctx.state.selectedContentLayoutId!,
+                  data: labelData,
+                });
+
+              labelContentData = demoPackageLabelContentDataResponse.data.labelContentData;
               break;
             default:
               throw new Error("Invalid label endpoint");
