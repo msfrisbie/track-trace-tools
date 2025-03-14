@@ -149,6 +149,7 @@ enum UrlType {
   TRANSFER_HISTORY_BY_TRANSFER_ID,
   PACKAGE_HARVEST_HISTORY_BY_PACKAGE_ID,
   PACKAGE_HISTORY_BY_PACKAGE_ID,
+  ITEM_HISTORY_BY_ITEM_ID,
   API_KEYS,
   DATAIMPORT,
   DATAIMPORT_HISTORY,
@@ -268,6 +269,11 @@ async function buildDynamicUrl(
       return `${origin({ divertToNullOrigin: false })}/api/packages/history?id=${
         options.packageId
       }`;
+    case UrlType.ITEM_HISTORY_BY_ITEM_ID:
+      if (!options?.itemId) {
+        throw new Error("Missing required URL options");
+      }
+      return `${origin({ divertToNullOrigin: false })}/api/items/history?id=${options.itemId}`;
     case UrlType.PLANT_BATCH_HISTORY_BY_PLANT_BATCH_ID:
       if (!options?.plantBatchId) {
         throw new Error("Missing required URL options");
@@ -440,6 +446,23 @@ export class MetrcRequestManager implements IAtomicService {
       },
       body,
     });
+  }
+
+  async getItemHistory(body: string, itemId: number) {
+    return customAxios(
+      await buildDynamicUrl(this.authStateOrError, UrlType.ITEM_HISTORY_BY_ITEM_ID, {
+        itemId,
+      }),
+      {
+        ...DEFAULT_FETCH_POST_READ_OPTIONS,
+        // timeout: 10000,
+        headers: {
+          ...(await buildAuthenticationHeaders(this.authStateOrError)),
+          ...JSON_HEADERS,
+        },
+        body,
+      }
+    );
   }
 
   async getStrains(body: string) {

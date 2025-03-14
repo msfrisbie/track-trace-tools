@@ -59,6 +59,7 @@ export enum ReportType {
   SINGLE_TRANSFER = "SINGLE_TRANSFER",
   SCAN_SHEET = "SCAN_SHEET",
   LAB_RESULTS = "LAB_RESULTS",
+  ITEMS_METADATA = "ITEMS_METADATA"
 }
 
 export enum ReportAuxTask {

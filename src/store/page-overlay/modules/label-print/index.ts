@@ -203,8 +203,8 @@ export const labelPrintModule = {
       }
 
       const csvFile: ICsvFile = {
-        filename: `${selectedLayout.id}.csv`,
-        data: [selectedLayout.elements.map((x: any) => x.labelContentDataKey)],
+        filename: `${selectedLayout.labelContentLayoutId}.csv`,
+        data: [selectedLayout.labelContentLayoutConfig.labelContentLayoutElements.map((x: any) => x.labelContentDataKey)],
       };
 
       downloadCsvFile({ csvFile });

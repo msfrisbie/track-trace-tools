@@ -16,6 +16,7 @@ import {
   updateCogsV2MasterCostSheet,
 } from "@/utils/reports/cogs-v2-report";
 import { maybeLoadEmployeeAuditReportData } from "@/utils/reports/employee-audit-report";
+import { maybeLoadEmployeePermissionsReportData } from "@/utils/reports/employee-permissions-report";
 import { maybeLoadEmployeeSamplesReportData } from "@/utils/reports/employee-samples-report";
 import { maybeLoadHarvestPackagesReportData } from "@/utils/reports/harvest-packages-report";
 import { maybeLoadHarvestsReportData } from "@/utils/reports/harvests-report";
@@ -24,6 +25,7 @@ import { maybeLoadImmaturePlantsReportData } from "@/utils/reports/immature-plan
 import { maybeLoadIncomingManifestInventoryReportData } from "@/utils/reports/incoming-manifest-inventory";
 import { maybeLoadIncomingTransferManifestsReportData } from "@/utils/reports/incoming-transfer-manifests-report";
 import { maybeLoadIncomingTransfersReportData } from "@/utils/reports/incoming-transfers-report";
+import { maybeLoadItemsMetadataReportData } from "@/utils/reports/items-metadata-report";
 import { maybeLoadLabResultsReportData } from "@/utils/reports/lab-results-report";
 import { maybeLoadMaturePlantsQuickviewReportData } from "@/utils/reports/mature-plants-quickview-report";
 import { maybeLoadMaturePlantsReportData } from "@/utils/reports/mature-plants-report";
@@ -46,7 +48,6 @@ import {
 import _ from "lodash-es";
 import { v4 as uuidv4 } from "uuid";
 import { ActionContext } from "vuex";
-import { maybeLoadEmployeePermissionsReportData } from "@/utils/reports/employee-permissions-report";
 import { ClientGetters } from "../client/consts";
 import {
   IStatusMessage,
@@ -464,6 +465,22 @@ export const reportsModule = {
           isHeadless: false,
         },
         {
+          text: "Items Metadata",
+          value: ReportType.ITEMS_METADATA,
+          enabled: rootGetters[`client/${ClientGetters.T3PLUS}`],
+          visible: true,
+          description:
+            "Export items data with additional details like created date and approval number",
+          isCustom: false,
+          usesSpreadsheetFormulas: false,
+          requiresGoogleSheets: false,
+          usesFieldTransformer: false,
+          isSpecialty: true,
+          isCatalog: false,
+          isQuickview: false,
+          isHeadless: false,
+        },
+        {
           text: "COGS",
           value: ReportType.COGS_V2,
           enabled: !!rootState.client.values.ENABLE_COGS,
@@ -753,6 +770,7 @@ export const reportsModule = {
         await maybeLoadSingleTransferReportData({ ctx, reportData, reportConfig });
         await maybeLoadScanSheetReportData({ ctx, reportData, reportConfig });
         await maybeLoadLabResultsReportData({ ctx, reportData, reportConfig });
+        await maybeLoadItemsMetadataReportData({ ctx, reportData, reportConfig });
 
         ctx.commit(ReportsMutations.SET_STATUS, {
           statusMessage: { text: "Generating report...", level: "success" },

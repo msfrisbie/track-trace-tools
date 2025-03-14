@@ -231,6 +231,8 @@
 
         <lab-results-report :labResultsReportFormFilters="labResultsReportFormFilters"></lab-results-report>
 
+        <items-metadata-report :itemsMetadataReportFormFilters="itemsMetadataReportFormFilters"></items-metadata-report>
+
         <point-in-time-inventory-report
           :pointInTimeInventoryFormFilters="pointInTimeInventoryFormFilters"></point-in-time-inventory-report>
 
@@ -993,6 +995,7 @@ import {
   addIncomingTransfersReport,
   incomingTransfersFormFiltersFactory,
 } from "@/utils/reports/incoming-transfers-report";
+import { addItemsMetadataReport, itemsMetadataReportFormFiltersFactory } from "@/utils/reports/items-metadata-report";
 import { addLabResultsReport, labResultsReportFormFiltersFactory } from "@/utils/reports/lab-results-report";
 import {
   MATURE_PLANT_QUICKVIEW_DIMENSIONS,
@@ -1038,6 +1041,7 @@ import SimpleDrawer from "../shared/SimpleDrawer.vue";
 import FieldSelect from "./reports/FieldSelect.vue";
 import ImmaturePlantsQuickviewReport from "./reports/ImmaturePlantsQuickviewReport.vue";
 import IncomingManifestInventoryReport from "./reports/IncomingManifestInventoryReport.vue";
+import ItemsMetadataReport from "./reports/ItemsMetadataReport.vue";
 import LabResultsReport from "./reports/LabResultsReport.vue";
 import MaturePlantsQuickviewReport from "./reports/MaturePlantsQuickviewReport.vue";
 import PackagesQuickviewReport from "./reports/PackagesQuickviewReport.vue";
@@ -1061,6 +1065,7 @@ export default Vue.extend({
     IncomingManifestInventoryReport,
     ScanSheetReport,
     LabResultsReport,
+    ItemsMetadataReport,
     FieldSelect,
   },
   computed: {
@@ -1158,6 +1163,7 @@ export default Vue.extend({
       incomingTransferManifestsFormFilters: incomingTransferManifestsFormFiltersFactory(),
       scanSheetFormFilters: scanSheetFormFiltersFactory(),
       labResultsReportFormFilters: labResultsReportFormFiltersFactory(),
+      itemsMetadataReportFormFilters: itemsMetadataReportFormFiltersFactory(),
       outgoingTransferManifestsFormFilters: outgoingTransferManifestsFormFiltersFactory(),
       pointInTimeInventoryFormFilters: pointInTimeInventoryFormFiltersFactory(),
       // transferHubTransferManifestsFormFilters: transferHubTransferManifestsFormFiltersFactory(),
@@ -1446,6 +1452,17 @@ export default Vue.extend({
         addLabResultsReport({
           reportConfig,
           labResultsReportFormFilters: this.labResultsReportFormFilters,
+        });
+      }
+
+      if (
+        this.selectedReports.find(
+          (report: IReportOption) => report.value === ReportType.ITEMS_METADATA
+        )
+      ) {
+        addItemsMetadataReport({
+          reportConfig,
+          itemsMetadataReportFormFilters: this.itemsMetadataReportFormFilters,
         });
       }
 

@@ -118,11 +118,12 @@
                                         <p>Select a label content layout</p>
                                     </template>
                                     <template v-else>
-                                        <p class="font-bold">{{ selectedLabelContentLayout.id }} columns:</p>
+                                        <p class="font-bold">{{ selectedLabelContentLayout.labelContentLayoutId }}
+                                            columns:</p>
 
                                         <ul class="list-disc ml-4">
                                             <li v-bind:key="element.labelContentDataKey"
-                                                v-for="element of selectedLabelContentLayout.elements">
+                                                v-for="element of selectedLabelContentLayout.labelContentLayoutConfig.labelContentLayoutElements">
                                                 <span class="font-mono font-bold">{{ element.labelContentDataKey
                                                     }}</span>:
                                                 {{ element.description }}
@@ -166,21 +167,21 @@
                                                     <tr>
                                                         <th class="border border-gray-400 border-collapse"
                                                             v-bind:key="element.labelContentDataKey"
-                                                            v-for="element of selectedLabelContentLayout.elements">
+                                                            v-for="element of selectedLabelContentLayout.labelContentLayoutConfig.labelContentLayoutElements">
                                                             {{ element.labelContentDataKey }}
                                                         </th>
                                                     </tr>
                                                     <tr>
                                                         <td class="border border-gray-400 border-collapse"
                                                             v-bind:key="element.labelContentDataKey"
-                                                            v-for="element of selectedLabelContentLayout.elements">
+                                                            v-for="element of selectedLabelContentLayout.labelContentLayoutConfig.labelContentLayoutElements">
                                                             example
                                                         </td>
                                                     </tr>
                                                     <tr>
                                                         <td class="border border-gray-400 border-collapse"
                                                             v-bind:key="element.labelContentDataKey"
-                                                            v-for="element of selectedLabelContentLayout.elements">
+                                                            v-for="element of selectedLabelContentLayout.labelContentLayoutConfig.labelContentLayoutElements">
                                                             example
                                                         </td>
                                                     </tr>

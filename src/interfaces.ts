@@ -388,6 +388,7 @@ export interface IIndexedItemData extends IItemData {
   ItemState: ItemState;
   LicenseNumber: string;
   TagMatcher: string;
+  history?: IMetrcObjectHistoryData[];
 }
 
 // Values that are defined per-request

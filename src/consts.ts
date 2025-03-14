@@ -63,7 +63,6 @@ export enum MessageType {
 }
 
 export enum AnalyticsEvent {
-
   // T3
   CLICK = "CLICK",
   UPDATED_VERSION = "UPDATED_VERSION",
@@ -526,6 +525,7 @@ export enum SheetTitles {
   POINT_IN_TIME_INVENTORY = "Point In Time Inventory",
   SINGLE_TRANSFER = "Transfer",
   LAB_RESULTS = "Lab Results",
+  ITEMS_METADATA = "Items Metadata",
 }
 
 // Sheets self-enforced timeout is 180000ms,

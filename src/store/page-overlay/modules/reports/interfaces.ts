@@ -2,6 +2,7 @@ import {
   IAuthState,
   IHarvestFilter,
   IIndexedHarvestData,
+  IIndexedItemData,
   IIndexedPackageData,
   IIndexedPlantBatchData,
   IIndexedPlantData,
@@ -222,6 +223,10 @@ export interface IReportConfig {
     tagFilter: ITagFilter;
     fields: IFieldData[];
   };
+  [ReportType.ITEMS_METADATA]?: {
+    licenses: string[];
+    fields: null;
+  };
 }
 
 export interface IReportData {
@@ -305,6 +310,9 @@ export interface IReportData {
   };
   [ReportType.LAB_RESULTS]?: {
     packages: IIndexedPackageData[];
+  };
+  [ReportType.ITEMS_METADATA]?: {
+    items: IIndexedItemData[];
   };
   [ReportType.INCOMING_MANIFEST_INVENTORY]?: {
     extraHtml?: string;

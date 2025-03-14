@@ -42,6 +42,7 @@ import {
   ILocationData,
   IMetrcEmployeeData,
   IMetrcFacilityData,
+  IMetrcObjectHistoryData,
   IPackageData,
   IPackageFilter,
   IPackageHistoryData,
@@ -148,7 +149,7 @@ export class DataLoader implements IAtomicService {
 
   private _strains: Promise<IStrainData[]> | null = null;
 
-  private _items: Promise<IItemData[]> | null = null;
+  private _items: Promise<IIndexedItemData[]> | null = null;
 
   private _activeHarvests: Promise<IIndexedHarvestData[]> | null = null;
 
@@ -2815,9 +2816,9 @@ export class DataLoader implements IAtomicService {
     return this._strains;
   }
 
-  async items(): Promise<IItemData[]> {
+  async items(): Promise<IIndexedItemData[]> {
     if (store.state.mockDataMode && store.state.flags?.mockedFlags.mockItems.enabled) {
-      return mockDataManager.mockItems();
+      // return mockDataManager.mockItems();
     }
 
     if (!this._items) {
@@ -2827,7 +2828,12 @@ export class DataLoader implements IAtomicService {
         );
 
         try {
-          const items = await this.loadItems();
+          const items: IIndexedItemData[] = (await this.loadItems()).map((item) => ({
+            ...item,
+            ItemState: ItemState.ACTIVE,
+            TagMatcher: "",
+            LicenseNumber: this._authState!.license,
+          }));
 
           subscription.unsubscribe();
           resolve(items);
@@ -2996,6 +3002,21 @@ export class DataLoader implements IAtomicService {
     }
 
     const responseData: ICollectionResponse<ITestResultData> = await response.data;
+
+    return responseData.Data;
+  }
+
+  async itemHistoryByItemId(itemId: number): Promise<IMetrcObjectHistoryData[]> {
+    const page = 0;
+    const body = buildBody({ page, pageSize: DATA_LOAD_PAGE_SIZE });
+
+    const response = await this.metrcRequestManagerOrError.getItemHistory(body, itemId);
+
+    if (response.status !== 200) {
+      throw new Error("Request failed");
+    }
+
+    const responseData: ICollectionResponse<IMetrcObjectHistoryData> = await response.data;
 
     return responseData.Data;
   }

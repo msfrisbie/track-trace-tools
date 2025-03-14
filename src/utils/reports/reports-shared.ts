@@ -29,15 +29,16 @@ import {
 import { todayIsodate } from "../date";
 import { getLabelOrError } from "../package";
 import { extractEmployeeAuditData } from "./employee-audit-report";
+import { extractEmployeePermissionsData } from "./employee-permissions-report";
 import { extractHarvestPackagesData } from "./harvest-packages-report";
 import { extractImmaturePlantPropertyFromDimension } from "./immature-plants-quickview-report";
+import { extractItemsMetadataReportData } from "./items-metadata-report";
 import { extractLabResultsReportData } from "./lab-results-report";
 import { extractMaturePlantPropertyFromDimension } from "./mature-plants-quickview-report";
 import { extractPackagePropertyFromDimension } from "./packages-quickview-report";
 import { extractPointInTimeInventoryData } from "./point-in-time-inventory-report";
 import { extractScanSheetData, totalScanSheetTransferCount } from "./scan-sheet-report";
 import { extractSingleTransferData } from "./single-transfer-report";
-import { extractEmployeePermissionsData } from "./employee-permissions-report";
 
 export function eligibleReportTypes({
   reportConfig,
@@ -253,8 +254,7 @@ export function applyCustomTransformer(field: IFieldData, untypedRow: any): stri
       } = untypedRow;
 
       return outgoingTransferJoinedTransporterDetailsRow.Transfer.transporterDetails!.map(
-        (x) =>
-          `${x.DriverName}/${x.VehicleMake} ${x.VehicleModel} (${x.VehicleLicensePlateNumber})`
+        (x) => `${x.DriverName}/${x.VehicleMake} ${x.VehicleModel} (${x.VehicleLicensePlateNumber})`
       ).join(",");
     case CustomTransformer.PACKAGE_MANIFEST_INDEX:
       const packageManifestIndexRow: {
@@ -570,6 +570,12 @@ export function extractFlattenedData({
           reportConfig,
           reportData,
         });
+      case ReportType.ITEMS_METADATA:
+        return extractItemsMetadataReportData({
+          reportType,
+          reportConfig,
+          reportData,
+        });
       default:
         throw new Error(`Bad reportType, failed to extract flattened data for ${reportType}`);
     }
@@ -731,6 +737,9 @@ export function getSheetTitle({
       break;
     case ReportType.LAB_RESULTS:
       title = SheetTitles.LAB_RESULTS;
+      break;
+    case ReportType.ITEMS_METADATA:
+      title = SheetTitles.ITEMS_METADATA;
       break;
     default:
       throw new Error(`Bad reportType, failed to generate title for ${reportType}`);
