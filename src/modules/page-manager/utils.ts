@@ -46,7 +46,7 @@ export function uniqueMetrcGridIdFromNativeMetrcGridIdAndPathnameOrNull(
     }
   }
 
-  console.error("Unmatched grid ID");
+  console.error(`Unmatched grid ID: ${nativeMetrcGridId}`);
 
   return null;
 }

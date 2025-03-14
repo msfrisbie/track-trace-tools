@@ -55,14 +55,19 @@ export const labelPrintModule = {
       getters: any,
       rootState: IPluginState,
       rootGetters: any
-    ) => state.labelContentLayoutOptions.find((x) => x.id === state.selectedContentLayoutId),
+    ) =>
+      state.labelContentLayoutOptions.find(
+        (x) => x.labelContentLayoutId === state.selectedContentLayoutId
+      ),
     [LabelPrintGetters.IS_SELECTED_LABEL_CONTENT_LAYOUT_STATIC]: (
       state: ILabelPrintState,
       getters: any,
       rootState: IPluginState,
       rootGetters: any
     ) =>
-      getters[LabelPrintGetters.SELECTED_LABEL_CONTENT_LAYOUT]?.elements.filter(
+      getters[
+        LabelPrintGetters.SELECTED_LABEL_CONTENT_LAYOUT
+      ]?.labelContentLayoutConfig.labelContentLayoutElements.filter(
         (x: any) => !!x.labelContentDataKey
       ).length === 0,
     [LabelPrintGetters.LABEL_ENDPOINT_CONFIG_OPTIONS]: (
@@ -208,9 +213,8 @@ export const labelPrintModule = {
       {}: {}
     ) => {
       const labelTemplateLayoutOptions = (await t3RequestManager.getLabelTemplateLayouts()).data
-        .labelTemplateLayouts;
-      const labelContentLayoutOptions = (await t3RequestManager.getLabelContentLayouts()).data
-        .labelContentLayouts;
+        .data;
+      const labelContentLayoutOptions = (await t3RequestManager.getLabelContentLayouts()).data.data;
 
       ctx.commit(LabelPrintMutations.LABEL_PRINT_MUTATION, {
         labelTemplateLayoutOptions,

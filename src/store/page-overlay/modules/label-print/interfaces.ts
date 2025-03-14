@@ -1,15 +1,19 @@
 import { LabelEndpoint } from "./consts";
 
 export interface ILabelTemplateLayoutOption {
-  id: string;
+  labelTemplateLayoutId: string;
   description: string;
-  printerTypes: string[];
+  labelTemplateLayoutConfig: {
+    printerTypes: string[];
+  };
 }
 
 export interface ILabelContentLayoutOption {
-  id: string;
+  labelContentLayoutId: string;
   description: string;
-  aspectRatio: number;
+  labelContentLayoutConfig: {
+    aspectRatio: number;
+  };
 }
 
 export interface ILabelEndpointConfig {

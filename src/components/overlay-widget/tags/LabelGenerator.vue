@@ -121,7 +121,7 @@
                                             <li v-bind:key="element.labelContentDataKey"
                                                 v-for="element of selectedLabelContentLayout.elements">
                                                 <span class="font-mono font-bold">{{ element.labelContentDataKey
-                                                    }}</span>:
+                                                }}</span>:
                                                 {{ element.description }}
                                             </li>
                                         </ul>
@@ -391,17 +391,17 @@ export default Vue.extend({
             return store.state.pluginAuth.t3ApiAuthState === T3ApiAuthState.AUTHENTICATED;
         },
         labelTemplateLayoutOptions(): ({ text?: string, value: string | null, html?: string, disabled?: boolean })[] {
-            const thermalOptionGroup = store.state.labelPrint.labelTemplateLayoutOptions.filter((x) => x.printerTypes.includes('THERMAL')).map((x) => ({
+            const thermalOptionGroup = store.state.labelPrint.labelTemplateLayoutOptions.filter((x) => x.labelTemplateLayoutConfig.printerTypes.includes('THERMAL')).map((x) => ({
                 text: x.description,
-                value: x.id
+                value: x.labelTemplateLayoutId
             }));
-            const inkjetOptionGroup = store.state.labelPrint.labelTemplateLayoutOptions.filter((x) => x.printerTypes.includes('INKJET')).map((x) => ({
+            const inkjetOptionGroup = store.state.labelPrint.labelTemplateLayoutOptions.filter((x) => x.labelTemplateLayoutConfig.printerTypes.includes('INKJET')).map((x) => ({
                 text: x.description,
-                value: x.id
+                value: x.labelTemplateLayoutId
             }));
-            const laserOptionGroup = store.state.labelPrint.labelTemplateLayoutOptions.filter((x) => x.printerTypes.includes('LASER')).map((x) => ({
+            const laserOptionGroup = store.state.labelPrint.labelTemplateLayoutOptions.filter((x) => x.labelTemplateLayoutConfig.printerTypes.includes('LASER')).map((x) => ({
                 text: x.description,
-                value: x.id
+                value: x.labelTemplateLayoutId
             }));
 
             return [{
@@ -423,17 +423,17 @@ export default Vue.extend({
             }];
         },
         labelContentLayoutOptions(): ({ text?: string, value: string | null, html?: string, disabled?: boolean })[] {
-            const horizontalRectangleOptionGroup = store.state.labelPrint.labelContentLayoutOptions.filter((x) => x.aspectRatio > 1.1).map((x) => ({
+            const horizontalRectangleOptionGroup = store.state.labelPrint.labelContentLayoutOptions.filter((x) => x.labelContentLayoutConfig.aspectRatio > 1.1).map((x) => ({
                 text: x.description,
-                value: x.id
+                value: x.labelContentLayoutId
             }));
-            const squareOptionGroup = store.state.labelPrint.labelContentLayoutOptions.filter((x) => x.aspectRatio > 0.9 && x.aspectRatio < 1.1).map((x) => ({
+            const squareOptionGroup = store.state.labelPrint.labelContentLayoutOptions.filter((x) => x.labelContentLayoutConfig.aspectRatio > 0.9 && x.labelContentLayoutConfig.aspectRatio < 1.1).map((x) => ({
                 text: x.description,
-                value: x.id
+                value: x.labelContentLayoutId
             }));
-            const verticalRectantgleOptionGroup = store.state.labelPrint.labelContentLayoutOptions.filter((x) => x.aspectRatio < 0.9).map((x) => ({
+            const verticalRectantgleOptionGroup = store.state.labelPrint.labelContentLayoutOptions.filter((x) => x.labelContentLayoutConfig.aspectRatio < 0.9).map((x) => ({
                 text: x.description,
-                value: x.id
+                value: x.labelContentLayoutId
             }));
 
             return [
