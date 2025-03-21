@@ -4,10 +4,17 @@ import { downloadCsvFile } from "@/utils/csv";
 import { readCsvFile } from "@/utils/file";
 import { AxiosResponse } from "axios";
 import { ActionContext } from "vuex";
-import { LabelEndpoint, LabelPrintActions, LabelPrintGetters, LabelPrintMutations } from "./consts";
+import {
+  LabelEndpoint,
+  LabelPrintActions,
+  LabelPrintGetters,
+  LabelPrintMutations,
+  LabelPrintStatus,
+} from "./consts";
 import { ILabelEndpointConfig, ILabelPrintState } from "./interfaces";
 
 const inMemoryState = {
+  status: LabelPrintStatus.INITIAL,
   labelPdfBlobUrl: null,
   labelPdfFilename: null,
   labelTemplateLayoutOptions: [],
@@ -84,7 +91,7 @@ export const labelPrintModule = {
     ): ILabelEndpointConfig[] => [
       {
         id: LabelEndpoint.DEMO_PACKAGES,
-        description: "Generate demo package labels",
+        description: "Demo labels",
       },
       {
         id: LabelEndpoint.ACTIVE_PACKAGES,
@@ -96,7 +103,7 @@ export const labelPrintModule = {
       },
       {
         id: LabelEndpoint.RAW_LABEL_GENERATOR,
-        description: "Manually provide label values",
+        description: "Use label CSV",
       },
     ],
     [LabelPrintGetters.ENABLE_GENERATION]: (
@@ -105,6 +112,10 @@ export const labelPrintModule = {
       rootState: IPluginState,
       rootGetters: any
     ): boolean => {
+      if (state.status === LabelPrintStatus.INFLIGHT) {
+        return false;
+      }
+
       if (!state.selectedContentLayoutId) {
         return false;
       }
@@ -204,7 +215,11 @@ export const labelPrintModule = {
 
       const csvFile: ICsvFile = {
         filename: `${selectedLayout.labelContentLayoutId}.csv`,
-        data: [selectedLayout.labelContentLayoutConfig.labelContentLayoutElements.map((x: any) => x.labelContentDataKey)],
+        data: [
+          selectedLayout.labelContentLayoutConfig.labelContentLayoutElements.map(
+            (x: any) => x.labelContentDataKey
+          ),
+        ],
       };
 
       downloadCsvFile({ csvFile });
@@ -254,6 +269,7 @@ export const labelPrintModule = {
         labelPdfBlobUrl: null,
         labelPdfFilename: null,
         errorText: null,
+        status: LabelPrintStatus.INFLIGHT,
       });
 
       let response: AxiosResponse;
@@ -300,7 +316,9 @@ export const labelPrintModule = {
                 await t3RequestManager.generateDemoPackageLabelContentData({
                   labelTemplateLayoutId: ctx.state.selectedTemplateLayoutId!,
                   labelContentLayoutId: ctx.state.selectedContentLayoutId!,
-                  data: labelData,
+                  data: Array(parseInt(ctx.state.labelsPerTag.toString(), 10)).fill(
+                    "DEADBEEFDEADBEEFDEADBEEF"
+                  ),
                 });
 
               labelContentData = demoPackageLabelContentDataResponse.data.labelContentData;
@@ -338,6 +356,12 @@ export const labelPrintModule = {
             labelPdfFilename = matches[1];
           }
         }
+
+        ctx.commit(LabelPrintMutations.LABEL_PRINT_MUTATION, {
+          labelPdfBlobUrl,
+          labelPdfFilename,
+          status: LabelPrintStatus.SUCCESS,
+        });
       } catch (err: any) {
         try {
           const errorData = err.response?.data;
@@ -355,13 +379,12 @@ export const labelPrintModule = {
         } catch {
           errorText = err.response?.data?.toString() || err.message || String(err);
         }
-      }
 
-      ctx.commit(LabelPrintMutations.LABEL_PRINT_MUTATION, {
-        labelPdfBlobUrl,
-        labelPdfFilename,
-        errorText,
-      });
+        ctx.commit(LabelPrintMutations.LABEL_PRINT_MUTATION, {
+          errorText,
+          status: LabelPrintStatus.ERROR,
+        });
+      }
     },
   },
 };

@@ -1,4 +1,4 @@
-import { LabelEndpoint } from "./consts";
+import { LabelEndpoint, LabelPrintStatus } from "./consts";
 
 export interface ILabelTemplateLayoutOption {
   labelTemplateLayoutId: string;
@@ -22,6 +22,7 @@ export interface ILabelEndpointConfig {
 }
 
 export interface ILabelPrintState {
+  status: LabelPrintStatus;
   labelPdfBlobUrl: string | null;
   labelPdfFilename: string | null;
   labelTemplateLayoutOptions: ILabelTemplateLayoutOption[];
