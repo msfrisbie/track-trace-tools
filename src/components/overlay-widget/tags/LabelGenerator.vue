@@ -82,17 +82,13 @@
                                     @change="onChange('labelsPerTag', parseInt(($event || 1).toString(), 10))"></b-form-input>
                             </b-form-group>
 
-                            <template v-if="!isSelectedLabelContentLayoutStatic">
-                                <b-form-group description="Select how you want to provide label data" label-size="sm"
+                            <template v-if="!isSelectedLabelContentLayoutStatic"><b-form-group
+                                    description="Select how you want to provide label data" label-size="sm"
                                     label-class="text-gray-400">
-                                    <b-form-select :options="labelEndpointConfigOptions"
-                                        :value="labelPrintState.selectedLabelEndpoint"
-                                        @change="onChange('selectedLabelEndpoint', $event)">
-
-                                        <template #first>
-                                            <b-form-select-option :value="null" disabled>How do you want to fill out
-                                                labels?</b-form-select-option>
-                                        </template></b-form-select>
+                                    <!-- <label class="text-gray-400">How do you want to fill out labels?</label> -->
+                                    <b-form-radio-group :options="labelEndpointConfigOptions"
+                                        v-model="labelPrintState.selectedLabelEndpoint"
+                                        @change="onChange('selectedLabelEndpoint', $event)" stacked />
                                 </b-form-group>
                             </template>
                         </b-card>
@@ -125,7 +121,7 @@
                                             <li v-bind:key="element.labelContentDataKey"
                                                 v-for="element of selectedLabelContentLayout.labelContentLayoutConfig.labelContentLayoutElements">
                                                 <span class="font-mono font-bold">{{ element.labelContentDataKey
-                                                    }}</span>:
+                                                }}</span>:
                                                 {{ element.description }}
                                             </li>
                                         </ul>
@@ -319,23 +315,32 @@
 
                 <div class="flex flex-col items-stretch justify-start gap-8">
                     <div class="flex flex-row justify-center gap-3">
-                        <b-button size="lg" variant="primary" :disabled="!enableGeneration"
+
+                        <b-button size="lg" variant="primary"
+                            :disabled="!enableGeneration || labelPrintState.status === LabelPrintStatus.INFLIGHT"
                             @click="generateLabelPdf()">GENERATE
                             PDF</b-button>
 
-                        <b-button size="lg" variant="success" v-if="labelPrintState.labelPdfBlobUrl"
+                        <b-button size="lg" variant="success"
+                            v-if="labelPrintState.labelPdfBlobUrl && labelPrintState.status === LabelPrintStatus.SUCCESS"
                             @click="downloadPdf({})">DOWNLOAD
                             PDF</b-button>
                     </div>
 
-                    <p class="text-center" v-if="!enableGeneration">No label data found. Provide label data to
+                    <div class="grid place-items-center">
+                        <b-spinner v-if="labelPrintState.status === LabelPrintStatus.INFLIGHT"></b-spinner>
+                    </div>
+
+                    <p class="text-center"
+                        v-if="!enableGeneration && labelPrintState.status !== LabelPrintStatus.INFLIGHT">No label
+                        data found. Provide label data to
                         generate labels.
                     </p>
 
-                    <template v-if="labelPrintState.labelPdfBlobUrl">
+                    <template v-if="labelPrintState.status === LabelPrintStatus.SUCCESS">
                         <iframe :src="labelPrintState.labelPdfBlobUrl" class="w-full" style="height: 70vh"></iframe>
                     </template>
-                    <template v-if="labelPrintState.errorText">
+                    <template v-if="labelPrintState.status === LabelPrintStatus.ERROR">
                         <pre class="text-red-500 text-lg text-start">{{ labelPrintState.errorText }}</pre>
                     </template>
                 </div>
@@ -351,7 +356,7 @@ import { IIndexedPackageData, IPluginState } from "@/interfaces";
 import router from "@/router/index";
 import store from "@/store/page-overlay/index";
 import { ClientGetters } from "@/store/page-overlay/modules/client/consts";
-import { LabelEndpoint, LabelPrintActions, LabelPrintGetters, LabelPrintMutations } from "@/store/page-overlay/modules/label-print/consts";
+import { LabelEndpoint, LabelPrintActions, LabelPrintGetters, LabelPrintMutations, LabelPrintStatus } from "@/store/page-overlay/modules/label-print/consts";
 import { ILabelEndpointConfig } from "@/store/page-overlay/modules/label-print/interfaces";
 import { PluginAuthActions, T3ApiAuthState } from "@/store/page-overlay/modules/plugin-auth/consts";
 import { hasPlusImpl } from "@/utils/plus";
@@ -477,6 +482,7 @@ export default Vue.extend({
     },
     data() {
         return {
+            LabelPrintStatus,
             csvFile: null,
             T3ApiAuthState,
             UniqueMetrcGridId,
