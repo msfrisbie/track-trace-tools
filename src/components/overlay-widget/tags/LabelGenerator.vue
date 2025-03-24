@@ -140,7 +140,7 @@
                                             <li v-bind:key="element.labelContentDataKey"
                                                 v-for="element of selectedLabelContentLayout.labelContentLayoutConfig.labelContentLayoutElements">
                                                 <span class="font-mono font-bold">{{ element.labelContentDataKey
-                                                }}</span>:
+                                                    }}</span>:
                                                 {{ element.description }}
                                             </li>
                                         </ul>
@@ -341,10 +341,10 @@
 
                                     <p>Selected label content layout ID: {{
                                         labelPrintState.selectedContentLayoutId
-                                    }}</p>
+                                        }}</p>
                                     <p>Selected label template layout ID: {{
                                         labelPrintState.selectedTemplateLayoutId
-                                    }}</p>
+                                        }}</p>
 
                                     <pre><code>{{
                                         selectedLabelContentLayout
@@ -440,79 +440,6 @@ export default Vue.extend({
         isReady(): boolean {
             return store.state.pluginAuth.t3ApiAuthState === T3ApiAuthState.AUTHENTICATED;
         },
-        // labelTemplateLayoutOptions(): ({ text?: string, value: string | null, html?: string, disabled?: boolean })[] {
-        //     const thermalOptionGroup = store.state.labelPrint.labelTemplateLayoutOptions.filter((x) => x.labelTemplateLayoutConfig.printerTypes.includes('THERMAL')).map((x) => ({
-        //         text: x.description,
-        //         value: x.labelTemplateLayoutId
-        //     }));
-        //     const inkjetOptionGroup = store.state.labelPrint.labelTemplateLayoutOptions.filter((x) => x.labelTemplateLayoutConfig.printerTypes.includes('INKJET')).map((x) => ({
-        //         text: x.description,
-        //         value: x.labelTemplateLayoutId
-        //     }));
-        //     const laserOptionGroup = store.state.labelPrint.labelTemplateLayoutOptions.filter((x) => x.labelTemplateLayoutConfig.printerTypes.includes('LASER')).map((x) => ({
-        //         text: x.description,
-        //         value: x.labelTemplateLayoutId
-        //     }));
-
-        //     return [{
-        //         disabled: true,
-        //         text: 'THERMAL',
-        //         value: null,
-        //     },
-        //     ...thermalOptionGroup,
-        //     {
-        //         disabled: true,
-        //         text: 'LASER/INKJET',
-        //         value: null,
-        //     },
-        //     ...laserOptionGroup,
-        //     {
-        //         value: null,
-        //         disabled: true,
-        //         html: `Don't see what you need? Click the SUGGEST MORE FORMATS link!`
-        //     }];
-        // },
-        // labelContentLayoutOptions(): ({ text?: string, value: string | null, html?: string, disabled?: boolean })[] {
-        //     const horizontalRectangleOptionGroup = store.state.labelPrint.labelContentLayoutOptions.filter((x) => x.labelContentLayoutConfig.aspectRatio > 1.1).map((x) => ({
-        //         text: x.description,
-        //         value: x.labelContentLayoutId
-        //     }));
-        //     const squareOptionGroup = store.state.labelPrint.labelContentLayoutOptions.filter((x) => x.labelContentLayoutConfig.aspectRatio > 0.9 && x.labelContentLayoutConfig.aspectRatio < 1.1).map((x) => ({
-        //         text: x.description,
-        //         value: x.labelContentLayoutId
-        //     }));
-        //     const verticalRectantgleOptionGroup = store.state.labelPrint.labelContentLayoutOptions.filter((x) => x.labelContentLayoutConfig.aspectRatio < 0.9).map((x) => ({
-        //         text: x.description,
-        //         value: x.labelContentLayoutId
-        //     }));
-
-        //     return [
-        //         ...horizontalRectangleOptionGroup,
-        //         ...squareOptionGroup,
-        //         ...verticalRectantgleOptionGroup,
-        //         {
-        //             value: null,
-        //             disabled: true,
-        //             html: `Don't see what you need? Click the SUGGEST MORE FORMATS link!`
-        //         }
-        //     ];
-
-        //     // return [{
-        //     //     label: 'HORIZONTAL RECTANGLES',
-        //     //     options: horizontalRectangleOptionGroup
-        //     // }, {
-        //     //     label: 'SQUARE',
-        //     //     options: squareOptionGroup
-        //     // }, {
-        //     //     label: 'VERTICAL RECTANGLES',
-        //     //     options: verticalRectantgleOptionGroup
-        //     // },
-        //     // {
-        //     //     value: null,
-        //     //     disabled: true,
-        //     //     html: `Don't see what you need? Click the SUGGEST ADDITIONAL FORMATS link!`
-        //     // }];
-        // },
         labelEndpointConfigOptions(): { text: string, value: LabelEndpoint }[] {
             return store.getters[`labelPrint/${LabelPrintGetters.LABEL_ENDPOINT_CONFIG_OPTIONS}`].map((x: ILabelEndpointConfig) => ({
                 text: x.description,
