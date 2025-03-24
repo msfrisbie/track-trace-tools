@@ -52,6 +52,14 @@
 
                             <b-form-group description="Select what type of labels you are printing on" label-size="lg"
                                 label-class="text-purple-600">
+
+                                <!-- <vue-typeahead-bootstrap placeholder="Select a label template"
+                                    :data="labelTemplateLayoutOptions" :showOnFocus="true"
+                                    @hit="onChange('selectedTemplateLayoutId', $event.labelTemplateLayoutId)">
+                                </vue-typeahead-bootstrap> -->
+
+                                <!-- :serializer="(labelTemplateLayout) => labelTemplateLayout.description" -->
+
                                 <b-form-select :options="labelTemplateLayoutOptions"
                                     :value="labelPrintState.selectedTemplateLayoutId"
                                     @change="onChange('selectedTemplateLayoutId', $event)">
@@ -96,6 +104,12 @@
                                 @click="generateLabelPdf()">GENERATE
                                 PDF</b-button>
 
+                            <p class="text-center text-red-500"
+                                v-if="!enableGeneration && labelPrintState.status !== LabelPrintStatus.INFLIGHT">Provide
+                                label data to
+                                generate labels.
+                            </p>
+
                             <template v-if="!isSelectedLabelContentLayoutStatic"><b-form-group
                                     description="Select how you want to provide label data" label-size="sm"
                                     label-class="text-gray-400">
@@ -119,8 +133,8 @@
                                         <p>Select a label content layout</p>
                                     </template>
                                     <template v-else>
-                                        <p class="font-bold">{{ selectedLabelContentLayout.labelContentLayoutId }}
-                                            columns:</p>
+                                        <p class="font-bold">
+                                            Required CSV columns:</p>
 
                                         <ul class="list-disc ml-4">
                                             <li v-bind:key="element.labelContentDataKey"
@@ -306,20 +320,53 @@
                                     </b-form-checkbox>
                                 </b-form-group>
 
-                                <b-form-group description="Draws boxes around printed content" label-size="lg"
+                                <b-form-group description="Force enable promo banner on labels" label-size="lg"
+                                    label-class="text-purple-600">
+                                    <b-form-checkbox :checked="labelPrintState.forcePromo"
+                                        @change="onChange('forcePromo', $event)">
+                                        Force promo
+                                    </b-form-checkbox>
+                                </b-form-group>
+
+                                <b-form-group description="Enable rendering debug" label-size="lg"
                                     label-class="text-purple-600">
                                     <b-form-checkbox :checked="labelPrintState.debug"
                                         @change="onChange('debug', $event)">
                                         Debug
                                     </b-form-checkbox>
                                 </b-form-group>
+
+                                <template v-if="labelPrintState.debug">
+                                    <hr class="col-span-2" />
+
+                                    <p>Selected label content layout ID: {{
+                                        labelPrintState.selectedContentLayoutId
+                                    }}</p>
+                                    <p>Selected label template layout ID: {{
+                                        labelPrintState.selectedTemplateLayoutId
+                                    }}</p>
+
+                                    <pre><code>{{
+                                        selectedLabelContentLayout
+                                    }}</code></pre>
+                                    <pre><code>{{
+                                        selectedLabelTemplateLayout }}</code></pre>
+
+                                </template>
+
                             </div>
                         </simple-drawer>
                     </div>
                 </div>
 
                 <div class="flex flex-col items-stretch justify-start gap-8">
-                    <div class="flex flex-row justify-center gap-3">
+                    <div v-if="labelPrintState.status === LabelPrintStatus.INFLIGHT" class="grid place-items-center">
+                        <b-spinner></b-spinner>
+                    </div>
+
+                    <template v-if="labelPrintState.status === LabelPrintStatus.SUCCESS">
+                        <iframe style="height:60vh" :src="labelPrintState.labelPdfBlobUrl" class="w-full"></iframe>
+
                         <b-button-group
                             v-if="labelPrintState.labelPdfBlobUrl && labelPrintState.status === LabelPrintStatus.SUCCESS">
                             <b-button variant="outline-success" @click="downloadPdf({})">DOWNLOAD
@@ -330,21 +377,8 @@
                                 IN NEW
                                 TAB</b-button>
                         </b-button-group>
-                    </div>
-
-                    <div class="grid place-items-center">
-                        <b-spinner v-if="labelPrintState.status === LabelPrintStatus.INFLIGHT"></b-spinner>
-                    </div>
-
-                    <p class="text-center"
-                        v-if="!enableGeneration && labelPrintState.status !== LabelPrintStatus.INFLIGHT">No label
-                        data found. Provide label data to
-                        generate labels.
-                    </p>
-
-                    <template v-if="labelPrintState.status === LabelPrintStatus.SUCCESS">
-                        <iframe style="height:60vh" :src="labelPrintState.labelPdfBlobUrl" class="w-full"></iframe>
                     </template>
+
                     <template v-if="labelPrintState.status === LabelPrintStatus.ERROR">
                         <pre class="text-red-500 text-lg text-start">{{ labelPrintState.errorText }}</pre>
                     </template>
@@ -393,6 +427,7 @@ export default Vue.extend({
             labelEndpointConfigOptions: `labelPrint/${LabelPrintGetters.LABEL_ENDPOINT_CONFIG_OPTIONS}`,
             enableGeneration: `labelPrint/${LabelPrintGetters.ENABLE_GENERATION}`,
             selectedLabelContentLayout: `labelPrint/${LabelPrintGetters.SELECTED_LABEL_CONTENT_LAYOUT}`,
+            selectedLabelTemplateLayout: `labelPrint/${LabelPrintGetters.SELECTED_LABEL_TEMPLATE_LAYOUT}`,
             isSelectedLabelContentLayoutStatic: `labelPrint/${LabelPrintGetters.IS_SELECTED_LABEL_CONTENT_LAYOUT_STATIC}`,
             isDemo: `labelPrint/${LabelPrintGetters.IS_DEMO}`,
         }),

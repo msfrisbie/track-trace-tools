@@ -424,6 +424,7 @@ class T3RequestManager implements IAtomicService {
     labelContentData: { [key: string]: string }[];
     renderingOptions: { [key: string]: any };
     debug: boolean;
+    forcePromo: boolean;
   }) {
     return customAxios(
       `${BASE_URL}${GENERATE_LABELS_PATH}?licenseNumber=${

@@ -32,6 +32,7 @@ const persistedState = {
   labelMarginThickness: 1.0,
   debug: false,
   reversePrintOrder: false,
+  forcePromo: false,
   selectedLabelEndpoint: LabelEndpoint.ACTIVE_PACKAGES,
 };
 
@@ -65,6 +66,15 @@ export const labelPrintModule = {
     ) =>
       state.labelContentLayoutOptions.find(
         (x) => x.labelContentLayoutId === state.selectedContentLayoutId
+      ),
+    [LabelPrintGetters.SELECTED_LABEL_TEMPLATE_LAYOUT]: (
+      state: ILabelPrintState,
+      getters: any,
+      rootState: IPluginState,
+      rootGetters: any
+    ) =>
+      state.labelTemplateLayoutOptions.find(
+        (x) => x.labelTemplateLayoutId === state.selectedTemplateLayoutId
       ),
     [LabelPrintGetters.IS_SELECTED_LABEL_CONTENT_LAYOUT_STATIC]: (
       state: ILabelPrintState,
@@ -345,6 +355,7 @@ export const labelPrintModule = {
             labelMarginThickness: ctx.state.labelMarginThickness,
           },
           debug: ctx.state.debug,
+          forcePromo: ctx.state.forcePromo,
         });
 
         labelPdfBlobUrl = URL.createObjectURL(response.data);
