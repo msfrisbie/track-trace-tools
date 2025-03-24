@@ -50,38 +50,38 @@
 
                             </b-form-group>
 
-                            <b-form-group description="Select what type of labels you are printing on" label-size="lg"
+                            <b-form-group description="The type of labels you are printing on" label-size="lg"
                                 label-class="text-purple-600">
 
-                                <!-- <vue-typeahead-bootstrap placeholder="Select a label template"
-                                    :data="labelTemplateLayoutOptions" :showOnFocus="true"
+                                <vue-typeahead-bootstrap placeholder="Select a label template" style="position:relative"
+                                    :value="selectedLabelTemplateLayout?.description" :showOnFocus="true"
+                                    :data="labelPrintState.labelTemplateLayoutOptions"
+                                    :serializer="(labelTemplateLayout) => labelTemplateLayout.description"
                                     @hit="onChange('selectedTemplateLayoutId', $event.labelTemplateLayoutId)">
-                                </vue-typeahead-bootstrap> -->
 
-                                <!-- :serializer="(labelTemplateLayout) => labelTemplateLayout.description" -->
-
-                                <b-form-select :options="labelTemplateLayoutOptions"
-                                    :value="labelPrintState.selectedTemplateLayoutId"
-                                    @change="onChange('selectedTemplateLayoutId', $event)">
-
-                                    <template #first>
-                                        <b-form-select-option :value="null" disabled>Select a label
-                                            template</b-form-select-option>
+                                    <template slot="append" v-if="selectedLabelTemplateLayout">
+                                        <b-button class="clear-button" variant="outline-dark"
+                                            @click.stop.prevent="onChange('selectedTemplateLayoutId', null)">
+                                            <font-awesome-icon icon="backspace" />
+                                        </b-button>
                                     </template>
-                                </b-form-select>
+                                </vue-typeahead-bootstrap>
                             </b-form-group>
 
-                            <b-form-group description="Select what you want to print on your labels" label-size="lg"
+                            <b-form-group description="The content printed on your labels" label-size="lg"
                                 label-class="text-purple-600">
-                                <b-form-select :options="labelContentLayoutOptions"
-                                    :value="labelPrintState.selectedContentLayoutId"
-                                    @change="onChange('selectedContentLayoutId', $event)">
-
-                                    <template #first>
-                                        <b-form-select-option :value="null" disabled>Select a label content
-                                            layout</b-form-select-option>
+                                <vue-typeahead-bootstrap placeholder="Select a label content layout"
+                                    :value="selectedLabelContentLayout?.description" style="position:relative"
+                                    :showOnFocus="true" :data="labelPrintState.labelContentLayoutOptions"
+                                    :serializer="(labelContentLayout) => labelContentLayout.description"
+                                    @hit="onChange('selectedContentLayoutId', $event.labelContentLayoutId)">
+                                    <template slot="append" v-if="selectedLabelContentLayout">
+                                        <b-button class="clear-button" variant="outline-dark"
+                                            @click.stop.prevent="onChange('selectedContentLayoutId', null)">
+                                            <font-awesome-icon icon="backspace" />
+                                        </b-button>
                                     </template>
-                                </b-form-select>
+                                </vue-typeahead-bootstrap>
                             </b-form-group>
 
                             <b-form-group description="How many copies of each label to generate" label-size="lg"
@@ -440,79 +440,79 @@ export default Vue.extend({
         isReady(): boolean {
             return store.state.pluginAuth.t3ApiAuthState === T3ApiAuthState.AUTHENTICATED;
         },
-        labelTemplateLayoutOptions(): ({ text?: string, value: string | null, html?: string, disabled?: boolean })[] {
-            const thermalOptionGroup = store.state.labelPrint.labelTemplateLayoutOptions.filter((x) => x.labelTemplateLayoutConfig.printerTypes.includes('THERMAL')).map((x) => ({
-                text: x.description,
-                value: x.labelTemplateLayoutId
-            }));
-            const inkjetOptionGroup = store.state.labelPrint.labelTemplateLayoutOptions.filter((x) => x.labelTemplateLayoutConfig.printerTypes.includes('INKJET')).map((x) => ({
-                text: x.description,
-                value: x.labelTemplateLayoutId
-            }));
-            const laserOptionGroup = store.state.labelPrint.labelTemplateLayoutOptions.filter((x) => x.labelTemplateLayoutConfig.printerTypes.includes('LASER')).map((x) => ({
-                text: x.description,
-                value: x.labelTemplateLayoutId
-            }));
+        // labelTemplateLayoutOptions(): ({ text?: string, value: string | null, html?: string, disabled?: boolean })[] {
+        //     const thermalOptionGroup = store.state.labelPrint.labelTemplateLayoutOptions.filter((x) => x.labelTemplateLayoutConfig.printerTypes.includes('THERMAL')).map((x) => ({
+        //         text: x.description,
+        //         value: x.labelTemplateLayoutId
+        //     }));
+        //     const inkjetOptionGroup = store.state.labelPrint.labelTemplateLayoutOptions.filter((x) => x.labelTemplateLayoutConfig.printerTypes.includes('INKJET')).map((x) => ({
+        //         text: x.description,
+        //         value: x.labelTemplateLayoutId
+        //     }));
+        //     const laserOptionGroup = store.state.labelPrint.labelTemplateLayoutOptions.filter((x) => x.labelTemplateLayoutConfig.printerTypes.includes('LASER')).map((x) => ({
+        //         text: x.description,
+        //         value: x.labelTemplateLayoutId
+        //     }));
 
-            return [{
-                disabled: true,
-                text: 'THERMAL',
-                value: null,
-            },
-            ...thermalOptionGroup,
-            {
-                disabled: true,
-                text: 'LASER/INKJET',
-                value: null,
-            },
-            ...laserOptionGroup,
-            {
-                value: null,
-                disabled: true,
-                html: `Don't see what you need? Click the SUGGEST MORE FORMATS link!`
-            }];
-        },
-        labelContentLayoutOptions(): ({ text?: string, value: string | null, html?: string, disabled?: boolean })[] {
-            const horizontalRectangleOptionGroup = store.state.labelPrint.labelContentLayoutOptions.filter((x) => x.labelContentLayoutConfig.aspectRatio > 1.1).map((x) => ({
-                text: x.description,
-                value: x.labelContentLayoutId
-            }));
-            const squareOptionGroup = store.state.labelPrint.labelContentLayoutOptions.filter((x) => x.labelContentLayoutConfig.aspectRatio > 0.9 && x.labelContentLayoutConfig.aspectRatio < 1.1).map((x) => ({
-                text: x.description,
-                value: x.labelContentLayoutId
-            }));
-            const verticalRectantgleOptionGroup = store.state.labelPrint.labelContentLayoutOptions.filter((x) => x.labelContentLayoutConfig.aspectRatio < 0.9).map((x) => ({
-                text: x.description,
-                value: x.labelContentLayoutId
-            }));
+        //     return [{
+        //         disabled: true,
+        //         text: 'THERMAL',
+        //         value: null,
+        //     },
+        //     ...thermalOptionGroup,
+        //     {
+        //         disabled: true,
+        //         text: 'LASER/INKJET',
+        //         value: null,
+        //     },
+        //     ...laserOptionGroup,
+        //     {
+        //         value: null,
+        //         disabled: true,
+        //         html: `Don't see what you need? Click the SUGGEST MORE FORMATS link!`
+        //     }];
+        // },
+        // labelContentLayoutOptions(): ({ text?: string, value: string | null, html?: string, disabled?: boolean })[] {
+        //     const horizontalRectangleOptionGroup = store.state.labelPrint.labelContentLayoutOptions.filter((x) => x.labelContentLayoutConfig.aspectRatio > 1.1).map((x) => ({
+        //         text: x.description,
+        //         value: x.labelContentLayoutId
+        //     }));
+        //     const squareOptionGroup = store.state.labelPrint.labelContentLayoutOptions.filter((x) => x.labelContentLayoutConfig.aspectRatio > 0.9 && x.labelContentLayoutConfig.aspectRatio < 1.1).map((x) => ({
+        //         text: x.description,
+        //         value: x.labelContentLayoutId
+        //     }));
+        //     const verticalRectantgleOptionGroup = store.state.labelPrint.labelContentLayoutOptions.filter((x) => x.labelContentLayoutConfig.aspectRatio < 0.9).map((x) => ({
+        //         text: x.description,
+        //         value: x.labelContentLayoutId
+        //     }));
 
-            return [
-                ...horizontalRectangleOptionGroup,
-                ...squareOptionGroup,
-                ...verticalRectantgleOptionGroup,
-                {
-                    value: null,
-                    disabled: true,
-                    html: `Don't see what you need? Click the SUGGEST MORE FORMATS link!`
-                }
-            ];
+        //     return [
+        //         ...horizontalRectangleOptionGroup,
+        //         ...squareOptionGroup,
+        //         ...verticalRectantgleOptionGroup,
+        //         {
+        //             value: null,
+        //             disabled: true,
+        //             html: `Don't see what you need? Click the SUGGEST MORE FORMATS link!`
+        //         }
+        //     ];
 
-            // return [{
-            //     label: 'HORIZONTAL RECTANGLES',
-            //     options: horizontalRectangleOptionGroup
-            // }, {
-            //     label: 'SQUARE',
-            //     options: squareOptionGroup
-            // }, {
-            //     label: 'VERTICAL RECTANGLES',
-            //     options: verticalRectantgleOptionGroup
-            // },
-            // {
-            //     value: null,
-            //     disabled: true,
-            //     html: `Don't see what you need? Click the SUGGEST ADDITIONAL FORMATS link!`
-            // }];
-        },
+        //     // return [{
+        //     //     label: 'HORIZONTAL RECTANGLES',
+        //     //     options: horizontalRectangleOptionGroup
+        //     // }, {
+        //     //     label: 'SQUARE',
+        //     //     options: squareOptionGroup
+        //     // }, {
+        //     //     label: 'VERTICAL RECTANGLES',
+        //     //     options: verticalRectantgleOptionGroup
+        //     // },
+        //     // {
+        //     //     value: null,
+        //     //     disabled: true,
+        //     //     html: `Don't see what you need? Click the SUGGEST ADDITIONAL FORMATS link!`
+        //     // }];
+        // },
         labelEndpointConfigOptions(): { text: string, value: LabelEndpoint }[] {
             return store.getters[`labelPrint/${LabelPrintGetters.LABEL_ENDPOINT_CONFIG_OPTIONS}`].map((x: ILabelEndpointConfig) => ({
                 text: x.description,
