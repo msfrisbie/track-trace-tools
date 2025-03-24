@@ -54,8 +54,8 @@
                                 label-class="text-purple-600">
 
                                 <vue-typeahead-bootstrap placeholder="Select a label template" style="position:relative"
-                                    :value="selectedLabelTemplateLayout?.description" :showOnFocus="true"
-                                    :data="labelPrintState.labelTemplateLayoutOptions"
+                                    :value="selectedLabelTemplateLayout ? selectedLabelTemplateLayout.description : null"
+                                    :showOnFocus="true" :data="labelPrintState.labelTemplateLayoutOptions"
                                     :serializer="(labelTemplateLayout) => labelTemplateLayout.description"
                                     @hit="onChange('selectedTemplateLayoutId', $event.labelTemplateLayoutId)">
 
@@ -71,8 +71,9 @@
                             <b-form-group description="The content printed on your labels" label-size="lg"
                                 label-class="text-purple-600">
                                 <vue-typeahead-bootstrap placeholder="Select a label content layout"
-                                    :value="selectedLabelContentLayout?.description" style="position:relative"
-                                    :showOnFocus="true" :data="labelPrintState.labelContentLayoutOptions"
+                                    :value="selectedLabelContentLayout ? selectedLabelContentLayout.description : null"
+                                    style="position:relative" :showOnFocus="true"
+                                    :data="labelPrintState.labelContentLayoutOptions"
                                     :serializer="(labelContentLayout) => labelContentLayout.description"
                                     @hit="onChange('selectedContentLayoutId', $event.labelContentLayoutId)">
                                     <template slot="append" v-if="selectedLabelContentLayout">
@@ -140,7 +141,7 @@
                                             <li v-bind:key="element.labelContentDataKey"
                                                 v-for="element of selectedLabelContentLayout.labelContentLayoutConfig.labelContentLayoutElements">
                                                 <span class="font-mono font-bold">{{ element.labelContentDataKey
-                                                    }}</span>:
+                                                }}</span>:
                                                 {{ element.description }}
                                             </li>
                                         </ul>
@@ -341,10 +342,10 @@
 
                                     <p>Selected label content layout ID: {{
                                         labelPrintState.selectedContentLayoutId
-                                        }}</p>
+                                    }}</p>
                                     <p>Selected label template layout ID: {{
                                         labelPrintState.selectedTemplateLayoutId
-                                        }}</p>
+                                    }}</p>
 
                                     <pre><code>{{
                                         selectedLabelContentLayout
