@@ -120,9 +120,12 @@ export async function collectInputs(modal: HTMLElement): Promise<IModalInput[]> 
         .join(" ");
     } else if (input.getAttribute("data-role") === "upload") {
       name = input.getAttribute("data-type")!;
+    } else if (input.parentElement?.previousElementSibling?.className === 'control-label') {
+      name = input.parentElement!.previousElementSibling!.textContent!.trim();
     } else {
       // ingredient.FinishDate becomes Ingredient Finish Date
       name = name
+        .replace("repeaterLines[$index].", "")
         .replaceAll(".", "")
         .split(/(?=[A-Z])/)
         .map((x) => x.trim())
@@ -165,12 +168,25 @@ export async function collectInputs(modal: HTMLElement): Promise<IModalInput[]> 
   return inputData;
 }
 
-export function parseNgRepeat(ngRepeat: string): { sectionName: string; sectionGroupName: string } {
-  const [sectionName, sectionGroupName] = ngRepeat.split(" in ").map((x) => x.trim());
+export function parseNgRepeat(ngRepeat: string): {
+  sectionName: string;
+  sectionGroupName: string;
+  suffix: string | null;
+} {
+  // Example input: "packagingPhoto in line.PackagingPhotos track by $index"
+
+  const match = ngRepeat.match(/(\w+)\s+in\s+([\w.]+)(?:\s+(.*))?/);
+
+  if (!match) {
+    throw new Error(`Unable to match ngRepeat: "${ngRepeat}"`);
+  }
+
+  const [, sectionName, sectionGroupName, rawSuffix] = match;
 
   return {
-    sectionName,
-    sectionGroupName,
+    sectionName: sectionName.trim(),
+    sectionGroupName: sectionGroupName.trim(),
+    suffix: rawSuffix?.trim() || null,
   };
 }
 
