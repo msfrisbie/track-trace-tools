@@ -53,8 +53,9 @@
                             <b-form-group description="The type of labels you are printing on" label-size="lg"
                                 label-class="text-purple-600">
 
-                                <vue-typeahead-bootstrap placeholder="Select a label template" style="position:relative"
-                                    :value="selectedLabelTemplateLayout ? selectedLabelTemplateLayout.description : null"
+                                <vue-typeahead-bootstrap :maxMatches="100" placeholder="Select a label template"
+                                    style="position:relative"
+                                    :value="selectedLabelTemplateLayout ? selectedLabelTemplateLayout.description : ''"
                                     :showOnFocus="true" :data="labelPrintState.labelTemplateLayoutOptions"
                                     :serializer="(labelTemplateLayout) => labelTemplateLayout.description"
                                     @hit="onChange('selectedTemplateLayoutId', $event.labelTemplateLayoutId)">
@@ -70,8 +71,8 @@
 
                             <b-form-group description="The content printed on your labels" label-size="lg"
                                 label-class="text-purple-600">
-                                <vue-typeahead-bootstrap placeholder="Select a label content layout"
-                                    :value="selectedLabelContentLayout ? selectedLabelContentLayout.description : null"
+                                <vue-typeahead-bootstrap placeholder="Select a label content layout" :maxMatches="100"
+                                    :value="selectedLabelContentLayout ? selectedLabelContentLayout.description : ''"
                                     style="position:relative" :showOnFocus="true"
                                     :data="labelPrintState.labelContentLayoutOptions"
                                     :serializer="(labelContentLayout) => labelContentLayout.description"
