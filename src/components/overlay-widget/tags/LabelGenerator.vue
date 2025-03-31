@@ -53,8 +53,8 @@
                             <b-form-group description="The type of labels you are printing on" label-size="lg"
                                 label-class="text-purple-600">
 
-                                <vue-typeahead-bootstrap :maxMatches="100" placeholder="Select a label template"
-                                    style="position:relative"
+                                <vue-typeahead-bootstrap ref="labelTemplateLayoutTypeahead" :maxMatches="100"
+                                    placeholder="Select a label template" style="position:relative"
                                     :value="selectedLabelTemplateLayout ? selectedLabelTemplateLayout.description : ''"
                                     :showOnFocus="true" :data="labelPrintState.labelTemplateLayoutOptions"
                                     :serializer="(labelTemplateLayout) => labelTemplateLayout.description"
@@ -62,7 +62,7 @@
 
                                     <template slot="append" v-if="selectedLabelTemplateLayout">
                                         <b-button class="clear-button" variant="outline-dark"
-                                            @click.stop.prevent="onChange('selectedTemplateLayoutId', null)">
+                                            @click.stop.prevent="onChange('selectedTemplateLayoutId', null, 'labelTemplateLayoutTypeahead')">
                                             <font-awesome-icon icon="backspace" />
                                         </b-button>
                                     </template>
@@ -71,7 +71,8 @@
 
                             <b-form-group description="The content printed on your labels" label-size="lg"
                                 label-class="text-purple-600">
-                                <vue-typeahead-bootstrap placeholder="Select a label content layout" :maxMatches="100"
+                                <vue-typeahead-bootstrap ref="labelContentLayoutTypeahead"
+                                    placeholder="Select a label content layout" :maxMatches="100"
                                     :value="selectedLabelContentLayout ? selectedLabelContentLayout.description : ''"
                                     style="position:relative" :showOnFocus="true"
                                     :data="labelPrintState.labelContentLayoutOptions"
@@ -79,7 +80,7 @@
                                     @hit="onChange('selectedContentLayoutId', $event.labelContentLayoutId)">
                                     <template slot="append" v-if="selectedLabelContentLayout">
                                         <b-button class="clear-button" variant="outline-dark"
-                                            @click.stop.prevent="onChange('selectedContentLayoutId', null)">
+                                            @click.stop.prevent="onChange('selectedContentLayoutId', null, 'labelContentLayoutTypeahead')">
                                             <font-awesome-icon icon="backspace" />
                                         </b-button>
                                     </template>
@@ -464,10 +465,15 @@ export default Vue.extend({
             downloadPdf: `labelPrint/${LabelPrintActions.DOWNLOAD_PDF}`,
             downloadTemplate: `labelPrint/${LabelPrintActions.DOWNLOAD_CSV_TEMPLATE}`,
         }),
-        onChange(field: string, value: any) {
+        onChange(field: string, value: any, refocusRef: string | null = null) {
             store.commit(`labelPrint/${LabelPrintMutations.LABEL_PRINT_MUTATION}`, {
                 [field]: value
             });
+
+            if (refocusRef) {
+                // @ts-ignore
+                this.$refs[refocusRef]?.$el.querySelector("input").focus();
+            }
         },
         async generateLabelPdf() {
             // this.$data.inflight
