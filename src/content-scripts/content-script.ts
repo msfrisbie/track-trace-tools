@@ -109,6 +109,11 @@ async function initializeToolkit() {
     return;
   }
 
+  if (!document.querySelector(".navbar")) {
+    console.error("This does not look like a Metrc page, exiting");
+    return;
+  }
+
   const container = document.createElement("div");
   container.setAttribute("id", TRACK_TRACE_TOOLS_ROOT_ELEMENT_ID);
   document.body.appendChild(container);
