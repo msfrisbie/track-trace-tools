@@ -109,7 +109,7 @@ async function initializeToolkit() {
     return;
   }
 
-  if (!document.querySelector(".navbar")) {
+  if (window.location.pathname.includes('manifest/html')) {
     console.error("This does not look like a Metrc page, exiting");
     return;
   }
