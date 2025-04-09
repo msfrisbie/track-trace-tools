@@ -6,7 +6,7 @@ import store from "@/store/page-overlay";
 import { PluginAuthActions } from "@/store/page-overlay/modules/plugin-auth/consts";
 import { isIdentityAllowedToUseTtt } from "@/utils/access-control";
 import { debugLogFactory } from "@/utils/debug";
-import { extract, ExtractionType } from "@/utils/html";
+import { extract, extractAuthData, ExtractionType } from "@/utils/html";
 import { messageBus } from "./message-bus.module";
 
 // Plugin scripts are sandboxed from the window variables.
@@ -72,7 +72,7 @@ class AuthManager implements IAtomicService {
         (response) => response.data
       );
 
-      extractedAuthData = extract(ExtractionType.AUTH_DATA, loadedHTML);
+      extractedAuthData = await extractAuthData(loadedHTML);
 
       if (extractedAuthData && extractedAuthData.authData) {
         ({ identity, license, apiVerificationToken } = extractedAuthData.authData);
