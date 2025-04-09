@@ -88,6 +88,7 @@ class FacilityManager implements IAtomicService {
 
     if (!facilityLinks || facilityLinks.length === 0) {
       // Fall back to network request
+      // TODO This is broken
       const loadedHTML = await customAxios(window.location.origin).then(
         (response) => response.data,
       );
