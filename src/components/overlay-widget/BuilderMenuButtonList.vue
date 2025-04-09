@@ -30,7 +30,7 @@
             <template v-else-if="option.enableNotificationBadge && notificationCount > 0">
               <!-- flex struggles to vertical align the badge for some reason -->
               <b-badge style="padding-top: 0.3rem; margin-top: 0.1rem; line-height: initial" variant="danger">{{
-                notificationCount }}</b-badge></template>
+                1 }}</b-badge></template>
 
             <template v-else-if="option.isNew">
               <!-- flex struggles to vertical align the badge for some reason -->
