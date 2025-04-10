@@ -1,8 +1,8 @@
 import { IAtomicService, IPageMetrcFacilityData } from '@/interfaces';
 import { authManager } from '@/modules/auth-manager.module';
-import { customAxios } from '@/modules/fetch-manager.module';
 import store from '@/store/page-overlay/index';
 import { debugLogFactory } from '@/utils/debug';
+import { customAxios } from './fetch-manager.module';
 import { t3RequestManager } from './t3-request-manager.module';
 
 const debugLog = debugLogFactory('facility-manager.module.ts');
@@ -88,8 +88,6 @@ class FacilityManager implements IAtomicService {
 
     if (!facilityLinks || facilityLinks.length === 0) {
       // Fall back to network request
-      // @ts-ignore
-      // TODO This is broken
       const loadedHTML = await customAxios(window.location.origin).then(
         (response) => response.data,
       );
