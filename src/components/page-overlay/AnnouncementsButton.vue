@@ -135,9 +135,11 @@ export default Vue.extend({
 /* CSS */
 @keyframes rotate-jump-shake {
   0%   { transform: rotate(0deg) translateY(0); }
-  20%  { transform: rotate(-5deg) translateY(-10px); }
-  40%  { transform: rotate(5deg) translateY(-20px); }
-  60%  { transform: rotate(-5deg) translateY(-10px); }
+  20%  { transform: rotate(-5deg) translateY(-20px); }
+  30%  { transform: rotate(5deg) translateY(-30px); }
+  40%  { transform: rotate(-5deg) translateY(-40px); }
+  40%  { transform: rotate(5deg) translateY(-30px); }
+  60%  { transform: rotate(-5deg) translateY(-20px); }
   80%  { transform: rotate(5deg) translateY(0); }
   100% { transform: rotate(0deg) translateY(0); }
 }
