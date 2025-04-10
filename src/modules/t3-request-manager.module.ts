@@ -23,6 +23,7 @@ const DOWNLOAD_REPORT_PATH = "reports/download";
 const EMAIL_REPORT_PATH = "reports/email";
 const SESSION_AUTH_PATH = "v2/auth/session";
 const AUTH_CHECK_PATH = "v2/auth/check";
+const LAB_RESULT_METADATA_PATH = "/v2/packages/labresults-metadata";
 // const TOKEN_REFRESH_PATH = "v2/auth/refresh";
 const LABEL_TEMPLATE_LAYOUTS_PATH = "v2/files/labels/label-template-layouts";
 const LABEL_CONTENT_LAYOUTS_PATH = "v2/files/labels/label-content-layouts";
@@ -387,6 +388,18 @@ class T3RequestManager implements IAtomicService {
   //     },
   //   });
   // }
+
+  async t3LabResultMetadata(packageId: number, labTestResultDocumentFileId: number) {
+    return customAxios(`${BASE_URL}${LAB_RESULT_METADATA_PATH}?licenseNumber=${
+        (await authManager.authStateOrError()).license
+      }&packageId=${packageId}&labTestResultDocumentFileId=${labTestResultDocumentFileId}`, {
+      method: "POST",
+      headers: {
+        ...DEFAULT_POST_HEADERS,
+        Authorization: `Bearer ${this._t3AccessToken}`,
+      },
+    });
+  }
 
   async t3AuthCheck() {
     return customAxios(BASE_URL + AUTH_CHECK_PATH, {

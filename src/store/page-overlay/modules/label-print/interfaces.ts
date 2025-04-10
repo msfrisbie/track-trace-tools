@@ -35,6 +35,7 @@ export interface ILabelPrintState {
   labelMarginThickness: number;
   debug: boolean;
   reversePrintOrder: boolean;
+  generateMetadata: boolean;
   forcePromo: boolean;
   selectedLabelEndpoint: LabelEndpoint;
   errorText: string | null;

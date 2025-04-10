@@ -317,9 +317,18 @@
                                 <b-form-group
                                     description="Thermal printers print labels sequentially, but the spooled order is reversed (last to first). Check this box to print labels in the same order as they appear in the PDF."
                                     label-size="lg" label-class="text-purple-600">
-                                    <b-form-checkbox :checked="labelPrintState.reversePrintOrderdebug"
+                                    <b-form-checkbox :checked="labelPrintState.reversePrintOrder"
                                         @change="onChange('reversePrintOrder', $event)">
                                         Reverse print order
+                                    </b-form-checkbox>
+                                </b-form-group>
+
+                                <b-form-group
+                                    description="Extract lab test values from lab test PDFs. This will significantly slow down label generation."
+                                    label-size="lg" label-class="text-purple-600">
+                                    <b-form-checkbox :checked="labelPrintState.generateMetadata"
+                                        @change="onChange('generateMetadata', $event)">
+                                        Generate metadata from lab PDFs
                                     </b-form-checkbox>
                                 </b-form-group>
 

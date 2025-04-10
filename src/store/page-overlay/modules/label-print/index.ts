@@ -1,4 +1,5 @@
-import { ICsvFile, IPluginState } from "@/interfaces";
+import { ICsvFile, IPluginState, ITestResultBatchData } from "@/interfaces";
+import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
 import { t3RequestManager } from "@/modules/t3-request-manager.module";
 import { downloadCsvFile } from "@/utils/csv";
 import { readCsvFile } from "@/utils/file";
@@ -32,6 +33,7 @@ const persistedState = {
   labelMarginThickness: 1.0,
   debug: false,
   reversePrintOrder: false,
+  generateMetadata: false,
   forcePromo: false,
   selectedLabelEndpoint: LabelEndpoint.ACTIVE_PACKAGES,
 };
@@ -299,6 +301,52 @@ export const labelPrintModule = {
         } else {
           switch (ctx.state.selectedLabelEndpoint) {
             case LabelEndpoint.ACTIVE_PACKAGES:
+              if (ctx.state.generateMetadata) {
+                const packageIds = (await primaryDataLoader.activePackages()).filter((x) => labelData.includes(x.Label)).map((x) => x.Id);
+
+                const promises: Promise<any>[] = [];
+
+                const richBatches: {packageId: number, testResultBatch: ITestResultBatchData}[] = [];
+
+                for (const packageId of packageIds) {
+                  promises.push(
+                    primaryDataLoader.testResultBatchesByPackageId(packageId).then((testResultBatches) => {
+                      richBatches.push(...testResultBatches.map((testResultBatch) => ({ packageId, testResultBatch })));
+                    })
+                  );
+
+                  if (promises.length % 100) {
+                    await Promise.allSettled(promises);
+                  }
+                }
+
+                await Promise.allSettled(promises);
+
+                // file ID -> package ID
+                const labResultPairs:Map<number, number> = new Map();
+
+                for (const { packageId, testResultBatch } of richBatches) {
+                  for (const testResult of testResultBatch.Tests) {
+                    // If PDF is missing, nothing to be done
+                    if (!testResult.LabTestResultDocumentFileId) {
+                      continue;
+                    }
+
+                    if (!labResultPairs.has(testResult.LabTestResultDocumentFileId)) {
+                      labResultPairs.set(testResult.LabTestResultDocumentFileId, packageId);
+                    }
+                  }
+                }
+
+                const metadataPromises: Promise<any>[] = [];
+
+                for (const [labTestResultDocumentFileId, packageId] of labResultPairs) {
+                  metadataPromises.push(t3RequestManager.t3LabResultMetadata(packageId, labTestResultDocumentFileId));
+                }
+
+                await Promise.allSettled(metadataPromises);
+              }
+
               const activePackageLabelContentDataResponse =
                 await t3RequestManager.generateActivePackageLabelContentData({
                   labelTemplateLayoutId: ctx.state.selectedTemplateLayoutId!,

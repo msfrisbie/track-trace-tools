@@ -720,6 +720,17 @@ export interface ITestResultData {
   TestTypeName: string;
 }
 
+export interface ITestResultBatchData {
+  "Id": number,
+  "Name": string, // "Additional - Mandatory Cannabinoid % and Totals",
+  "TestTypesRequired": number,
+  "TestTypesPerformed": number,
+  "TestsPassed": number,
+  "TestsFailed": number,
+  "IsFullyRevoked": null,
+  "Tests": ITestResultData[]
+}
+
 export interface IIndexedPlantData extends IPlantData {
   PlantState: PlantState;
   LicenseNumber: string;
