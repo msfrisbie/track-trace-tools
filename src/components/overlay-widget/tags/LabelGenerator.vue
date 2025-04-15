@@ -324,6 +324,15 @@
                                 </b-form-group>
 
                                 <b-form-group
+                                    description="Rotate template 90 degrees (print sideways)."
+                                    label-size="lg" label-class="text-purple-600">
+                                    <b-form-checkbox :checked="labelPrintState.rotate"
+                                        @change="onChange('rotate', $event)">
+                                        Rotate label sideways
+                                    </b-form-checkbox>
+                                </b-form-group>
+
+                                <b-form-group
                                     description="Extract lab test values from lab test PDFs. This will significantly slow down label generation."
                                     label-size="lg" label-class="text-purple-600">
                                     <b-form-checkbox :checked="labelPrintState.generateMetadata"
@@ -334,8 +343,8 @@
 
                                 <b-form-group description="Force enable promo banner on labels" label-size="lg"
                                     label-class="text-purple-600">
-                                    <b-form-checkbox :checked="labelPrintState.forcePromo"
-                                        @change="onChange('forcePromo', $event)">
+                                    <b-form-checkbox :checked="labelPrintState.enablePromo"
+                                        @change="onChange('enablePromo', $event)">
                                         Force promo
                                     </b-form-checkbox>
                                 </b-form-group>

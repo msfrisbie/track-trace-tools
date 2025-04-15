@@ -34,7 +34,8 @@ const persistedState = {
   debug: false,
   reversePrintOrder: false,
   generateMetadata: false,
-  forcePromo: false,
+  enablePromo: false,
+  rotate: false,
   selectedLabelEndpoint: LabelEndpoint.ACTIVE_PACKAGES,
 };
 
@@ -401,9 +402,11 @@ export const labelPrintModule = {
           renderingOptions: {
             barcodeBarThickness: ctx.state.barcodeBarThickness,
             labelMarginThickness: ctx.state.labelMarginThickness,
-          },
-          debug: ctx.state.debug,
-          forcePromo: ctx.state.forcePromo,
+            debug: ctx.state.debug,
+            enablePromo: ctx.state.enablePromo,
+            reversePrintOrder: ctx.state.reversePrintOrder,
+            rotationDegrees: ctx.state.rotate ? 90 : 0
+          }
         });
 
         labelPdfBlobUrl = URL.createObjectURL(response.data);
