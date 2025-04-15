@@ -436,8 +436,6 @@ class T3RequestManager implements IAtomicService {
     labelContentLayoutId: string;
     labelContentData: { [key: string]: string }[];
     renderingOptions: { [key: string]: any };
-    debug: boolean;
-    forcePromo: boolean;
   }) {
     return customAxios(
       `${BASE_URL}${GENERATE_LABELS_PATH}?licenseNumber=${
@@ -458,31 +456,31 @@ class T3RequestManager implements IAtomicService {
     );
   }
 
-  async generateActivePackageLabelPdf(data: {
-    labelTemplateLayoutId: string;
-    labelContentLayoutId: string;
-    data: string[];
-    renderingOptions: { [key: string]: any };
-    debug: boolean;
-  }) {
-    return customAxios(
-      `${BASE_URL}${GENERATE_ACTIVE_PACKAGE_LABELS_PATH}?licenseNumber=${
-        (await authManager.authStateOrError()).license
-      }`,
-      {
-        method: "POST",
-        headers: {
-          ...DEFAULT_POST_HEADERS,
-          Authorization: `Bearer ${this._t3AccessToken}`,
-        },
-        axiosRetry: {
-          retries: 0,
-        },
-        body: JSON.stringify(data),
-        responseType: "blob",
-      }
-    );
-  }
+  // async generateActivePackageLabelPdf(data: {
+  //   labelTemplateLayoutId: string;
+  //   labelContentLayoutId: string;
+  //   data: string[];
+  //   renderingOptions: { [key: string]: any };
+  //   debug: boolean;
+  // }) {
+  //   return customAxios(
+  //     `${BASE_URL}${GENERATE_ACTIVE_PACKAGE_LABELS_PATH}?licenseNumber=${
+  //       (await authManager.authStateOrError()).license
+  //     }`,
+  //     {
+  //       method: "POST",
+  //       headers: {
+  //         ...DEFAULT_POST_HEADERS,
+  //         Authorization: `Bearer ${this._t3AccessToken}`,
+  //       },
+  //       axiosRetry: {
+  //         retries: 0,
+  //       },
+  //       body: JSON.stringify(data),
+  //       responseType: "blob",
+  //     }
+  //   );
+  // }
 
   async generateActivePackageLabelContentData(data: {
     labelTemplateLayoutId: string;
@@ -507,31 +505,31 @@ class T3RequestManager implements IAtomicService {
     );
   }
 
-  async generateInTransitPackageLabelPdf(data: {
-    labelTemplateLayoutId: string;
-    labelContentLayoutId: string;
-    data: string[];
-    renderingOptions: { [key: string]: any };
-    debug: boolean;
-  }) {
-    return customAxios(
-      `${BASE_URL}${GENERATE_IN_TRANSIT_PACKAGE_LABELS_PATH}?licenseNumber=${
-        (await authManager.authStateOrError()).license
-      }`,
-      {
-        method: "POST",
-        headers: {
-          ...DEFAULT_POST_HEADERS,
-          Authorization: `Bearer ${this._t3AccessToken}`,
-        },
-        axiosRetry: {
-          retries: 0,
-        },
-        body: JSON.stringify(data),
-        responseType: "blob",
-      }
-    );
-  }
+  // async generateInTransitPackageLabelPdf(data: {
+  //   labelTemplateLayoutId: string;
+  //   labelContentLayoutId: string;
+  //   data: string[];
+  //   renderingOptions: { [key: string]: any };
+  //   debug: boolean;
+  // }) {
+  //   return customAxios(
+  //     `${BASE_URL}${GENERATE_IN_TRANSIT_PACKAGE_LABELS_PATH}?licenseNumber=${
+  //       (await authManager.authStateOrError()).license
+  //     }`,
+  //     {
+  //       method: "POST",
+  //       headers: {
+  //         ...DEFAULT_POST_HEADERS,
+  //         Authorization: `Bearer ${this._t3AccessToken}`,
+  //       },
+  //       axiosRetry: {
+  //         retries: 0,
+  //       },
+  //       body: JSON.stringify(data),
+  //       responseType: "blob",
+  //     }
+  //   );
+  // }
 
   async generateInTransitPackageLabelContentData(data: {
     labelTemplateLayoutId: string;

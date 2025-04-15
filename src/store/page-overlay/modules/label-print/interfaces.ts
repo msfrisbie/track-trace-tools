@@ -36,7 +36,8 @@ export interface ILabelPrintState {
   debug: boolean;
   reversePrintOrder: boolean;
   generateMetadata: boolean;
-  forcePromo: boolean;
+  enablePromo: boolean;
+  rotate: boolean;
   selectedLabelEndpoint: LabelEndpoint;
   errorText: string | null;
   rawCsvMatrix: string[][] | null;
