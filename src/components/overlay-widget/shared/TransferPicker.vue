@@ -136,7 +136,7 @@ export default Vue.extend({
       this.$refs.typeahead?.$el.querySelector("input").blur();
     },
     clear() {
-      this.$data.query = "";
+      this.$data.transferQuery = "";
       // @ts-ignore
       this.$refs.typeahead?.$el.querySelector("input").value = "";
 
