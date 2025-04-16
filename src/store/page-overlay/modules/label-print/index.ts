@@ -1,4 +1,6 @@
+import { AnalyticsEvent } from "@/consts";
 import { ICsvFile, IPluginState, ITestResultBatchData } from "@/interfaces";
+import { analyticsManager } from "@/modules/analytics-manager.module";
 import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
 import { t3RequestManager } from "@/modules/t3-request-manager.module";
 import { downloadCsvFile } from "@/utils/csv";
@@ -267,6 +269,8 @@ export const labelPrintModule = {
       ctx: ActionContext<ILabelPrintState, IPluginState>,
       {}: {}
     ) => {
+      analyticsManager.track(AnalyticsEvent.LABEL_GENERATOR_DOWNLOAD_PDF);
+
       const link = document.createElement("a");
       link.href = ctx.state.labelPdfBlobUrl!;
       link.setAttribute("download", ctx.state.labelPdfFilename || "t3-labels.pdf");
@@ -278,6 +282,22 @@ export const labelPrintModule = {
       ctx: ActionContext<ILabelPrintState, IPluginState>,
       {}: {}
     ) => {
+      const renderingOptions = {
+        barcodeBarThickness: ctx.state.barcodeBarThickness,
+        labelMarginThickness: ctx.state.labelMarginThickness,
+        debug: ctx.state.debug,
+        enablePromo: ctx.state.enablePromo,
+        reversePrintOrder: ctx.state.reversePrintOrder,
+        rotationDegrees: ctx.state.rotate ? 90 : 0
+      };
+
+      analyticsManager.track(AnalyticsEvent.LABEL_GENERATOR_GENERATE_LABELS, {
+        selectedLabelEndpoint: ctx.state.selectedLabelEndpoint,
+        labelTemplateLayoutId: ctx.state.selectedTemplateLayoutId,
+        labelContentLayoutId: ctx.state.selectedContentLayoutId,
+        renderingOptions
+      });
+
       ctx.commit(LabelPrintMutations.LABEL_PRINT_MUTATION, {
         labelPdfBlobUrl: null,
         labelPdfFilename: null,
@@ -399,14 +419,7 @@ export const labelPrintModule = {
           labelTemplateLayoutId: ctx.state.selectedTemplateLayoutId!,
           labelContentLayoutId: ctx.state.selectedContentLayoutId!,
           labelContentData,
-          renderingOptions: {
-            barcodeBarThickness: ctx.state.barcodeBarThickness,
-            labelMarginThickness: ctx.state.labelMarginThickness,
-            debug: ctx.state.debug,
-            enablePromo: ctx.state.enablePromo,
-            reversePrintOrder: ctx.state.reversePrintOrder,
-            rotationDegrees: ctx.state.rotate ? 90 : 0
-          }
+          renderingOptions
         });
 
         labelPdfBlobUrl = URL.createObjectURL(response.data);

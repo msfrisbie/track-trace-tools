@@ -97,6 +97,8 @@ export interface ITrackedInteractions {
   dismissedBugReportsPopover: boolean;
   dismissedFeedbackPopover: boolean;
   dismissedSnapshotPopover: boolean;
+  dismissedPrintPopover: boolean;
+  dismissedReportPopover: boolean;
 }
 
 export interface IFilter {

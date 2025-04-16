@@ -13,7 +13,7 @@
             </b-form-checkbox>
 
             <b-form-checkbox v-model="labResultsReportFormFilters.shouldFilterTestTypeName">
-                <span class="leading-6">Only include specific test types</span>
+                <span class="leading-6">Only include specific test types. (Uncheck to export all lab results)</span>
             </b-form-checkbox>
 
             <template v-if="labResultsReportFormFilters.shouldFilterTestTypeName">
