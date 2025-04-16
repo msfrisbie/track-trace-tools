@@ -124,6 +124,15 @@ export interface IReportConfig {
     licenses: string[];
     fields: null;
   };
+  [ReportType.POINT_IN_TIME_INVENTORY_V2]?: {
+    targetDate: string;
+    inventoryStrategy: InventoryStrategy;
+    useRestrictedWindowOptimization: boolean;
+    restrictedWindowDays: number;
+    showDebugColumns: boolean;
+    licenses: string[];
+    fields: null;
+  };
   [ReportType.STRAGGLER_PACKAGES]?: {
     stragglerPackageFilter: IPackageFilter;
     fields: IFieldData[];
@@ -261,6 +270,9 @@ export interface IReportData {
     packages: IIndexedPackageData[];
   };
   [ReportType.POINT_IN_TIME_INVENTORY]?: {
+    packageMetadataPairs: [string, IPackageDateMetadata][];
+  };
+  [ReportType.POINT_IN_TIME_INVENTORY_V2]?: {
     packageMetadataPairs: [string, IPackageDateMetadata][];
   };
   [ReportType.EMPLOYEE_SAMPLES]?: {

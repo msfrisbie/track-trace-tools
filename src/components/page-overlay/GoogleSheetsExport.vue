@@ -1024,6 +1024,10 @@ import {
   addPointInTimeInventoryReport,
   pointInTimeInventoryFormFiltersFactory,
 } from "@/utils/reports/point-in-time-inventory-report";
+import {
+  addPointInTimeInventoryV2Report,
+  pointInTimeInventoryV2FormFiltersFactory,
+} from "@/utils/reports/point-in-time-inventory-report-v2";
 import { addScanSheetReport, scanSheetFormFiltersFactory } from "@/utils/reports/scan-sheet-report";
 import {
   addStragglerPackagesReport,
@@ -1166,6 +1170,7 @@ export default Vue.extend({
       itemsMetadataReportFormFilters: itemsMetadataReportFormFiltersFactory(),
       outgoingTransferManifestsFormFilters: outgoingTransferManifestsFormFiltersFactory(),
       pointInTimeInventoryFormFilters: pointInTimeInventoryFormFiltersFactory(),
+      pointInTimeInventoryV2FormFilters: pointInTimeInventoryV2FormFiltersFactory(),
       // transferHubTransferManifestsFormFilters: transferHubTransferManifestsFormFiltersFactory(),
       tagsFormFilters: tagsFormFiltersFactory(),
       employeeSamplesFormFilters: employeeSamplesFormFiltersFactory(),
@@ -1285,6 +1290,17 @@ export default Vue.extend({
         addPointInTimeInventoryReport({
           reportConfig,
           pointInTimeInventoryFormFilters: this.pointInTimeInventoryFormFilters,
+        });
+      }
+
+      if (
+        this.selectedReports.find(
+          (report: IReportOption) => report.value === ReportType.POINT_IN_TIME_INVENTORY_V2
+        )
+      ) {
+        addPointInTimeInventoryV2Report({
+          reportConfig,
+          pointInTimeInventoryV2FormFilters: this.pointInTimeInventoryV2FormFilters,
         });
       }
 

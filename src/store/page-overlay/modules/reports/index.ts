@@ -34,6 +34,7 @@ import { maybeLoadOutgoingTransfersReportData } from "@/utils/reports/outgoing-t
 import { maybeLoadPackageReportData } from "@/utils/reports/package-report";
 import { maybeLoadPackagesQuickviewReportData } from "@/utils/reports/packages-quickview-report";
 import { maybeLoadPointInTimeInventoryReportData } from "@/utils/reports/point-in-time-inventory-report";
+import { maybeLoadPointInTimeInventoryReportV2Data } from "@/utils/reports/point-in-time-inventory-report-v2";
 import { maybeLoadScanSheetReportData } from "@/utils/reports/scan-sheet-report";
 import { maybeLoadSingleTransferReportData } from "@/utils/reports/single-transfer-report";
 import { maybeLoadStragglerPackageReportData } from "@/utils/reports/straggler-package-report";
@@ -246,8 +247,23 @@ export const reportsModule = {
           isHeadless: false,
         },
         {
-          text: "Point-in-time inventory",
+          text: "Point-in-time inventory (deprecated)",
           value: ReportType.POINT_IN_TIME_INVENTORY,
+          enabled: rootGetters[`client/${ClientGetters.T3PLUS}`],
+          visible: true,
+          description: "All active packages on a certain date.",
+          isCustom: false,
+          usesSpreadsheetFormulas: false,
+          requiresGoogleSheets: false,
+          usesFieldTransformer: false,
+          isSpecialty: true,
+          isCatalog: false,
+          isQuickview: false,
+          isHeadless: false,
+        },
+        {
+          text: "Point-in-time inventory",
+          value: ReportType.POINT_IN_TIME_INVENTORY_V2,
           enabled: rootGetters[`client/${ClientGetters.T3PLUS}`],
           visible: true,
           description: "All active packages on a certain date.",
@@ -767,6 +783,7 @@ export const reportsModule = {
         await maybeLoadEmployeeAuditReportData({ ctx, reportData, reportConfig });
         await maybeLoadEmployeePermissionsReportData({ ctx, reportData, reportConfig });
         await maybeLoadPointInTimeInventoryReportData({ ctx, reportData, reportConfig });
+        await maybeLoadPointInTimeInventoryReportV2Data({ ctx, reportData, reportConfig });
         await maybeLoadSingleTransferReportData({ ctx, reportData, reportConfig });
         await maybeLoadScanSheetReportData({ ctx, reportData, reportConfig });
         await maybeLoadLabResultsReportData({ ctx, reportData, reportConfig });

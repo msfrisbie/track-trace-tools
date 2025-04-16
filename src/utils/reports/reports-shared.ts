@@ -544,6 +544,12 @@ export function extractFlattenedData({
           reportConfig,
           reportData,
         });
+      case ReportType.POINT_IN_TIME_INVENTORY_V2:
+        return extractPointInTimeInventoryData({
+          reportType,
+          reportConfig,
+          reportData,
+        });
       case ReportType.SINGLE_TRANSFER:
         return extractSingleTransferData({
           reportType,
@@ -730,6 +736,11 @@ export function getSheetTitle({
     case ReportType.POINT_IN_TIME_INVENTORY:
       title = `${SheetTitles.POINT_IN_TIME_INVENTORY} ${
         reportConfig[ReportType.POINT_IN_TIME_INVENTORY]!.targetDate
+      }`;
+      break;
+    case ReportType.POINT_IN_TIME_INVENTORY_V2:
+      title = `${SheetTitles.POINT_IN_TIME_INVENTORY_V2} ${
+        reportConfig[ReportType.POINT_IN_TIME_INVENTORY_V2]!.targetDate
       }`;
       break;
     case ReportType.SCAN_SHEET:
