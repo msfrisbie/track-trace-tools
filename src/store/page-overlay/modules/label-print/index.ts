@@ -110,11 +110,11 @@ export const labelPrintModule = {
       },
       {
         id: LabelEndpoint.ACTIVE_PACKAGES,
-        description: "Autogenerate labels from active packages",
+        description: "Autogenerate labels for active packages",
       },
       {
         id: LabelEndpoint.INTRANSIT_PACKAGES,
-        description: "Autogenerate labels from in transit packages",
+        description: "Autogenerate labels for outgoing transfer packages",
       },
       {
         id: LabelEndpoint.RAW_LABEL_GENERATOR,
@@ -411,9 +411,9 @@ export const labelPrintModule = {
           throw new Error("Unable to assign labelContentData");
         }
 
-        if (ctx.state.reversePrintOrder) {
-          labelContentData.reverse();
-        }
+        // if (ctx.state.reversePrintOrder) {
+        //   labelContentData.reverse();
+        // }
 
         response = await t3RequestManager.generateLabelPdf({
           labelTemplateLayoutId: ctx.state.selectedTemplateLayoutId!,
