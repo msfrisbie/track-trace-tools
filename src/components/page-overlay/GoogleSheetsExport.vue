@@ -5,19 +5,19 @@
       <div class="flex flex-col gap-2 items-stretch"
         v-bind:class="{ 'opacity-50': reportStatus !== ReportStatus.INITIAL }">
         <div class="text-start text-gray-600 pb-2" v-if="!hasT3plus">
-          Get access to advanced reports with
+          Get access to T3 exports with
           <a class="text-purple-500 underline" href="#" @click="$router.push('/plus')">T3+</a>
         </div>
 
         <b-form-group>
           <b-form-checkbox-group v-model="selectedReports" class="flex flex-col gap-1">
-            <report-checkbox-section title="CUSTOM"
+            <report-checkbox-section title="CUSTOM EXPORTS"
               :reportOptions="reportOptions.filter((x) => x.isCustom)"></report-checkbox-section>
-            <report-checkbox-section title="QUICKVIEW"
+            <report-checkbox-section title="QUICKVIEW EXPORTS"
               :reportOptions="reportOptions.filter((x) => x.isQuickview)"></report-checkbox-section>
-            <report-checkbox-section title="CATALOG"
+            <report-checkbox-section title="CATALOG EXPORTS"
               :reportOptions="reportOptions.filter((x) => x.isCatalog)"></report-checkbox-section>
-            <report-checkbox-section title="ADVANCED"
+            <report-checkbox-section title="ADVANCED EXPORTS"
               :reportOptions="reportOptions.filter((x) => x.isSpecialty)"></report-checkbox-section>
           </b-form-checkbox-group>
         </b-form-group>
@@ -28,7 +28,7 @@
         class="flex flex-col items-stretch gap-4">
         <template v-if="selectedReports.length > 0">
           <div class="pb-2 flex flex-col items-stretch gap-2 text-xl font-semibold ttt-purple">
-            {{ selectedReports.length }} REPORT{{ selectedReports.length > 1 ? "S" : "" }}
+            {{ selectedReports.length }} EXPORT{{ selectedReports.length > 1 ? "S" : "" }}
             SELECTED:
           </div>
         </template>
@@ -40,9 +40,9 @@
 
             <a class="underline text-purple-600"
               href="https://docs.google.com/spreadsheets/d/1fxBfjBUhFt6Gj7PpbQO8DlT1e76DIDtTwiq_2A5tHCU/edit?usp=sharing"
-              target="_blank">Example report</a>
-            <a class="underline text-purple-600" href="https://youtu.be/JBR21XSKK3I" target="_blank">How do I make a
-              report?</a>
+              target="_blank">Example export</a>
+            <a class="underline text-purple-600" href="https://youtu.be/JBR21XSKK3I" target="_blank">How do I create an
+              export?</a>
           </div>
         </template>
 
@@ -228,6 +228,8 @@
         <incoming-manifest-inventory-report></incoming-manifest-inventory-report>
 
         <scan-sheet-report></scan-sheet-report>
+
+        <invoice-report></invoice-report>
 
         <lab-results-report :labResultsReportFormFilters="labResultsReportFormFilters"></lab-results-report>
 
@@ -847,7 +849,7 @@
             <b-button variant="success" size="sm" @click="generateReports('CSV', 'DOWNLOAD')"
               :disabled="!enableCsvGenerateButton">EXPORT TO CSV</b-button>
             <template v-if="!enableCsvGenerateButton && selectedReports.length > 0">
-              <div class="text-xs">The selected report(s) are not CSV compatible</div>
+              <div class="text-xs">The selected export(s) are not CSV compatible</div>
             </template>
           </div>
 
@@ -869,7 +871,7 @@
             </template>
 
             <template v-if="!enableXlsxGenerateButton && selectedReports.length > 0">
-              <div class="text-xs">The selected report(s) are not XLSX compatible</div>
+              <div class="text-xs">The selected export(s) are not XLSX compatible</div>
             </template>
           </div>
 
@@ -995,6 +997,7 @@ import {
   addIncomingTransfersReport,
   incomingTransfersFormFiltersFactory,
 } from "@/utils/reports/incoming-transfers-report";
+import { addInvoiceReport, invoiceFormFiltersFactory } from "@/utils/reports/invoice-report";
 import { addItemsMetadataReport, itemsMetadataReportFormFiltersFactory } from "@/utils/reports/items-metadata-report";
 import { addLabResultsReport, labResultsReportFormFiltersFactory } from "@/utils/reports/lab-results-report";
 import {
@@ -1041,6 +1044,7 @@ import SimpleDrawer from "../shared/SimpleDrawer.vue";
 import FieldSelect from "./reports/FieldSelect.vue";
 import ImmaturePlantsQuickviewReport from "./reports/ImmaturePlantsQuickviewReport.vue";
 import IncomingManifestInventoryReport from "./reports/IncomingManifestInventoryReport.vue";
+import InvoiceReport from "./reports/InvoiceReport.vue";
 import ItemsMetadataReport from "./reports/ItemsMetadataReport.vue";
 import LabResultsReport from "./reports/LabResultsReport.vue";
 import MaturePlantsQuickviewReport from "./reports/MaturePlantsQuickviewReport.vue";
@@ -1064,6 +1068,7 @@ export default Vue.extend({
     PointInTimeInventoryReport,
     IncomingManifestInventoryReport,
     ScanSheetReport,
+    InvoiceReport,
     LabResultsReport,
     ItemsMetadataReport,
     FieldSelect,
@@ -1162,6 +1167,7 @@ export default Vue.extend({
       transferHubTransfersFormFilters: transferHubTransfersFormFiltersFactory(),
       incomingTransferManifestsFormFilters: incomingTransferManifestsFormFiltersFactory(),
       scanSheetFormFilters: scanSheetFormFiltersFactory(),
+      invoiceFormFilters: invoiceFormFiltersFactory(),
       labResultsReportFormFilters: labResultsReportFormFiltersFactory(),
       itemsMetadataReportFormFilters: itemsMetadataReportFormFiltersFactory(),
       outgoingTransferManifestsFormFilters: outgoingTransferManifestsFormFiltersFactory(),
@@ -1440,6 +1446,18 @@ export default Vue.extend({
         addScanSheetReport({
           reportConfig,
           scanSheetFormFilters: this.scanSheetFormFilters,
+          fields: []
+        });
+      }
+
+      if (
+        this.selectedReports.find(
+          (report: IReportOption) => report.value === ReportType.INVOICE
+        )
+      ) {
+        addInvoiceReport({
+          reportConfig,
+          invoiceFormFilters: this.invoiceFormFilters,
           fields: []
         });
       }

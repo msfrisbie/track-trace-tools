@@ -83,7 +83,7 @@ export default Vue.extend({
                         dateStyle: "medium",
                         timeStyle: "short",
                     })})</b><br />
-                    <span>${x.RecipientFacilityName} (${x.RecipientFacilityLicenseNumber})</span>`,
+                    <span>${x.DeliveryFacilities}</span>`,
                     value: x
                 }));
         },

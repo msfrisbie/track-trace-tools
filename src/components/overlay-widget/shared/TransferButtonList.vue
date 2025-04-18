@@ -381,6 +381,7 @@ export default Vue.extend({
 
       this.dismiss();
     },
+    // TODO add to invoice list
     async addToScanSheet() {
       analyticsManager.track(AnalyticsEvent.CONTEXT_MENU_SELECT, { event: "addToScanSheet" });
 

@@ -9,6 +9,7 @@ import {
   IIndexedRichIncomingTransferData,
   IIndexedRichOutgoingTransferData,
   IIndexedTagData,
+  IMetrcFacilityData,
   IPackageFilter,
   IPlantBatchFilter,
   IPlantFilter,
@@ -19,6 +20,7 @@ import {
 } from "@/interfaces";
 import { ImmaturePlantQuickviewDimension } from "@/utils/reports/immature-plants-quickview-report";
 import { IIncomingManifestInventoryReportFormFilters } from "@/utils/reports/incoming-manifest-inventory";
+import { IInvoiceReportFormFilters } from "@/utils/reports/invoice-report";
 import { MaturePlantQuickviewDimension } from "@/utils/reports/mature-plants-quickview-report";
 import { PackageQuickviewDimension } from "@/utils/reports/packages-quickview-report";
 import {
@@ -48,6 +50,7 @@ export interface IReportsState {
   reportFormFilters: {
     [ReportType.INCOMING_MANIFEST_INVENTORY]: IIncomingManifestInventoryReportFormFilters;
     [ReportType.SCAN_SHEET]: IScanSheetReportFormFilters;
+    [ReportType.INVOICE]: IInvoiceReportFormFilters;
   };
 }
 
@@ -150,6 +153,10 @@ export interface IReportConfig {
     incomingTransferFilter: ITransferFilter;
     outgoingTransferFilter: ITransferFilter;
     rejectedTransferFilter: ITransferFilter;
+    fields: null;
+  };
+  [ReportType.INVOICE]?: {
+    outgoingTransferFilter: ITransferFilter;
     fields: null;
   };
   [ReportType.SINGLE_TRANSFER]?: {
@@ -308,6 +315,11 @@ export interface IReportData {
     richOutgoingTransfers?: IIndexedRichOutgoingTransferData[];
     richRejectedTransfers?: IIndexedRichIncomingTransferData[];
   };
+  [ReportType.INVOICE]?: {
+    transporterFacilities: IMetrcFacilityData[],
+    destinationFacilities: IMetrcFacilityData[],
+    richOutgoingTransfers?: IIndexedRichOutgoingTransferData[];
+  };
   [ReportType.LAB_RESULTS]?: {
     packages: IIndexedPackageData[];
   };
@@ -363,4 +375,5 @@ export interface IReportOption {
   isCatalog: boolean;
   isQuickview: boolean;
   isHeadless: boolean;
+  disableMultiReport: boolean;
 }

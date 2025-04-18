@@ -300,7 +300,7 @@ const routes: Array<RouteConfig> = [
   },
   {
     path: "/google-sheets-export",
-    name: "Reports",
+    name: "Exports",
     component: GoogleSheetsExport,
   },
   {

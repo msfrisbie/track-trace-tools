@@ -32,6 +32,7 @@ import { extractEmployeeAuditData } from "./employee-audit-report";
 import { extractEmployeePermissionsData } from "./employee-permissions-report";
 import { extractHarvestPackagesData } from "./harvest-packages-report";
 import { extractImmaturePlantPropertyFromDimension } from "./immature-plants-quickview-report";
+import { extractInvoiceData } from "./invoice-report";
 import { extractItemsMetadataReportData } from "./items-metadata-report";
 import { extractLabResultsReportData } from "./lab-results-report";
 import { extractMaturePlantPropertyFromDimension } from "./mature-plants-quickview-report";
@@ -564,6 +565,12 @@ export function extractFlattenedData({
           reportConfig,
           reportData,
         });
+      case ReportType.INVOICE:
+        return extractInvoiceData({
+          reportType,
+          reportConfig,
+          reportData,
+        });
       case ReportType.LAB_RESULTS:
         return extractLabResultsReportData({
           reportType,
@@ -626,6 +633,10 @@ function getSpreadsheetName({
     }
   }
 
+  if (selectedReportOptions.length === 1 && selectedReportOptions[0].disableMultiReport) {
+    return getSheetTitle({ reportType: selectedReportOptions[0].value!, reportConfig, reportData });
+  }
+
   const spreadsheetName: string = `T3 - ${selectedReportOptions
     .map((x) => x.text)
     .join(",")} [Generated ${date}]`;
@@ -640,7 +651,7 @@ export function getExcelSpreadsheetName({
   reportConfig: IReportConfig;
   reportData: IReportData;
 }): string {
-  return `${getSpreadsheetName({ reportConfig, reportData })}.xlsx`;
+  return `${getSpreadsheetName({ reportConfig, reportData })}`;
 }
 
 export function getGoogleSpreadsheetName({
@@ -734,6 +745,9 @@ export function getSheetTitle({
       break;
     case ReportType.SCAN_SHEET:
       title = `Scan Sheet (${totalScanSheetTransferCount(reportData)})`;
+      break;
+    case ReportType.INVOICE:
+      title = `Manifest #${reportData[ReportType.INVOICE]!.richOutgoingTransfers!.map((x) => x.ManifestNumber).join(',')} Invoice`;
       break;
     case ReportType.LAB_RESULTS:
       title = SheetTitles.LAB_RESULTS;

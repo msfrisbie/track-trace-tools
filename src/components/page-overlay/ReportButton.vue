@@ -3,7 +3,7 @@
     <b-button id="report-popover-target" variant="primary" title="Report" class="relative" @click="openReport($event)"
       style="padding: 0">
       <div class="flex flex-col items-center justify-center" style="width: 52px; height: 52px">
-        <complex-icon primaryIconName="table" primaryIconSize="2xl"></complex-icon>
+        <complex-icon primaryIconName="file-export" primaryIconSize="2xl"></complex-icon>
       </div>
 
       <b-popover target="report-popover-target" triggers="hover" placement="topleft" variant="light" ref="report-popover"
@@ -11,7 +11,7 @@
         <template #title>
           <div class="flex flex-row items-center space-x-2">
             <track-trace-tools-logo class="h-6" fill="#49276a" :inverted="true" />
-            <span class="text-base font-bold">T3 Reports</span>
+            <span class="text-base font-bold">T3 Exports</span>
           </div>
         </template>
 

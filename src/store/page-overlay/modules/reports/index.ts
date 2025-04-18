@@ -25,6 +25,7 @@ import { maybeLoadImmaturePlantsReportData } from "@/utils/reports/immature-plan
 import { maybeLoadIncomingManifestInventoryReportData } from "@/utils/reports/incoming-manifest-inventory";
 import { maybeLoadIncomingTransferManifestsReportData } from "@/utils/reports/incoming-transfer-manifests-report";
 import { maybeLoadIncomingTransfersReportData } from "@/utils/reports/incoming-transfers-report";
+import { maybeLoadInvoiceReportData } from "@/utils/reports/invoice-report";
 import { maybeLoadItemsMetadataReportData } from "@/utils/reports/items-metadata-report";
 import { maybeLoadLabResultsReportData } from "@/utils/reports/lab-results-report";
 import { maybeLoadMaturePlantsQuickviewReportData } from "@/utils/reports/mature-plants-quickview-report";
@@ -94,6 +95,10 @@ const inMemoryState = {
       allRejectedTransfers: [],
       selectedRejectedTransfers: [],
     },
+    [ReportType.INVOICE]: {
+      allOutgoingTransfers: [],
+      selectedOutgoingTransfer: null,
+    }
   },
 };
 
@@ -123,7 +128,7 @@ export const reportsModule = {
       data: { selectedReports: IReportOption[] }
     ) {
       for (const selectedReport of data.selectedReports) {
-        if (selectedReport.requiresGoogleSheets) {
+        if (selectedReport.requiresGoogleSheets || selectedReport.disableMultiReport) {
           state.selectedReports = [selectedReport];
           return;
         }
@@ -157,6 +162,9 @@ export const reportsModule = {
 
       if (data.outgoingTransfers) {
         state.reportFormFilters[ReportType.SCAN_SHEET].allOutgoingTransfers =
+          data.outgoingTransfers;
+
+        state.reportFormFilters[ReportType.INVOICE].allOutgoingTransfers =
           data.outgoingTransfers;
       }
 
@@ -229,6 +237,7 @@ export const reportsModule = {
           isCatalog: false,
           isQuickview: false,
           isHeadless: false,
+          disableMultiReport: false,
         },
         {
           text: "Packages",
@@ -244,6 +253,7 @@ export const reportsModule = {
           isCatalog: true,
           isQuickview: false,
           isHeadless: false,
+          disableMultiReport: false,
         },
         {
           text: "Point-in-time inventory",
@@ -259,6 +269,7 @@ export const reportsModule = {
           isCatalog: false,
           isQuickview: false,
           isHeadless: false,
+          disableMultiReport: false,
         },
         {
           text: "Plant Batches",
@@ -274,6 +285,7 @@ export const reportsModule = {
           isCatalog: true,
           isQuickview: false,
           isHeadless: false,
+          disableMultiReport: false,
         },
         {
           text: "Mature Plants",
@@ -289,6 +301,7 @@ export const reportsModule = {
           isCatalog: true,
           isQuickview: false,
           isHeadless: false,
+          disableMultiReport: false,
         },
         {
           text: "Incoming Transfers",
@@ -304,6 +317,7 @@ export const reportsModule = {
           isCatalog: true,
           isQuickview: false,
           isHeadless: false,
+          disableMultiReport: false,
         },
         {
           text: "Outgoing Transfers",
@@ -319,6 +333,7 @@ export const reportsModule = {
           isCatalog: true,
           isQuickview: false,
           isHeadless: false,
+          disableMultiReport: false,
         },
         // Disabled - Destinations returns 0, more like incoming?
         // {
@@ -343,6 +358,7 @@ export const reportsModule = {
           isCatalog: true,
           isQuickview: false,
           isHeadless: false,
+          disableMultiReport: false,
         },
         {
           text: "Harvests",
@@ -358,6 +374,7 @@ export const reportsModule = {
           isCatalog: true,
           isQuickview: false,
           isHeadless: false,
+          disableMultiReport: false,
         },
         {
           text: "Incoming Transfer Manifests",
@@ -373,6 +390,7 @@ export const reportsModule = {
           isCatalog: false,
           isQuickview: false,
           isHeadless: false,
+          disableMultiReport: false,
         },
         {
           text: "Outgoing Transfer Manifests",
@@ -388,6 +406,7 @@ export const reportsModule = {
           isCatalog: false,
           isQuickview: false,
           isHeadless: false,
+          disableMultiReport: false,
         },
         {
           text: "Straggler Inventory",
@@ -403,6 +422,7 @@ export const reportsModule = {
           isCatalog: false,
           isQuickview: false,
           isHeadless: false,
+          disableMultiReport: false,
         },
         {
           text: "Employee Activity",
@@ -418,6 +438,7 @@ export const reportsModule = {
           isCatalog: false,
           isQuickview: false,
           isHeadless: false,
+          disableMultiReport: false,
         },
         {
           text: "Employee Permissions",
@@ -433,6 +454,23 @@ export const reportsModule = {
           isCatalog: false,
           isQuickview: false,
           isHeadless: false,
+          disableMultiReport: false,
+        },
+        {
+          text: "Transfer Invoices",
+          value: ReportType.INVOICE,
+          enabled: rootGetters[`client/${ClientGetters.T3PLUS}`],
+          visible: true,
+          description: "Generate invoices from outgoing transfers",
+          isCustom: false,
+          usesSpreadsheetFormulas: true,
+          requiresGoogleSheets: false,
+          usesFieldTransformer: false,
+          isSpecialty: true,
+          isCatalog: false,
+          isQuickview: false,
+          isHeadless: false,
+          disableMultiReport: true,
         },
         {
           text: "Scan Sheet",
@@ -448,6 +486,7 @@ export const reportsModule = {
           isCatalog: false,
           isQuickview: false,
           isHeadless: false,
+          disableMultiReport: false,
         },
         {
           text: "Lab Results",
@@ -463,6 +502,7 @@ export const reportsModule = {
           isCatalog: false,
           isQuickview: false,
           isHeadless: false,
+          disableMultiReport: false,
         },
         {
           text: "Items Metadata",
@@ -479,6 +519,7 @@ export const reportsModule = {
           isCatalog: false,
           isQuickview: false,
           isHeadless: false,
+          disableMultiReport: false,
         },
         {
           text: "COGS",
@@ -494,6 +535,7 @@ export const reportsModule = {
           isCatalog: false,
           isQuickview: false,
           isHeadless: false,
+          disableMultiReport: false,
         },
         {
           text: "COGS Tracker",
@@ -509,6 +551,7 @@ export const reportsModule = {
           isCatalog: false,
           isQuickview: false,
           isHeadless: false,
+          disableMultiReport: false,
         },
         {
           text: "Employee Samples",
@@ -524,6 +567,7 @@ export const reportsModule = {
           isCatalog: false,
           isQuickview: false,
           isHeadless: false,
+          disableMultiReport: false,
         },
         {
           text: "Harvest Packages",
@@ -539,6 +583,7 @@ export const reportsModule = {
           isCatalog: false,
           isQuickview: false,
           isHeadless: false,
+          disableMultiReport: false,
         },
         {
           text: "Incoming Manifest Inventory",
@@ -554,6 +599,7 @@ export const reportsModule = {
           isCatalog: false,
           isQuickview: false,
           isHeadless: false,
+          disableMultiReport: false,
         },
         {
           text: "Packages Quickview",
@@ -569,6 +615,7 @@ export const reportsModule = {
           isCatalog: false,
           isQuickview: true,
           isHeadless: false,
+          disableMultiReport: false,
         },
         {
           text: "Plant Batch Quickview",
@@ -584,6 +631,7 @@ export const reportsModule = {
           isCatalog: false,
           isQuickview: true,
           isHeadless: false,
+          disableMultiReport: false,
         },
         {
           text: "Mature Plants Quickview",
@@ -600,6 +648,7 @@ export const reportsModule = {
           isCatalog: false,
           isQuickview: true,
           isHeadless: false,
+          disableMultiReport: false,
         },
         {
           text: "Transfer Quickview",
@@ -615,6 +664,7 @@ export const reportsModule = {
           isCatalog: false,
           isQuickview: true,
           isHeadless: false,
+          disableMultiReport: false,
         },
         // {
         //   text: "Incoming Inventory",
@@ -646,6 +696,7 @@ export const reportsModule = {
           isCatalog: false,
           isQuickview: false,
           isHeadless: false,
+          disableMultiReport: false,
         },
       ];
 
@@ -687,6 +738,22 @@ export const reportsModule = {
           } catch (error) {
             // Handle errors here
           }
+          break;
+        }
+        case ReportType.INVOICE: {
+          let outgoingTransfers: IIndexedOutgoingTransferData[] = [];
+          try {
+            [outgoingTransfers] = await Promise.all([
+              primaryDataLoader.outgoingTransfers(),
+            ]);
+
+            ctx.commit(ReportsMutations.UPDATE_DYNAMIC_REPORT_DATA, {
+              outgoingTransfers,
+            });
+          } catch (error) {
+            // Handle errors here
+          }
+          break;
         }
       }
     },
@@ -769,6 +836,7 @@ export const reportsModule = {
         await maybeLoadPointInTimeInventoryReportData({ ctx, reportData, reportConfig });
         await maybeLoadSingleTransferReportData({ ctx, reportData, reportConfig });
         await maybeLoadScanSheetReportData({ ctx, reportData, reportConfig });
+        await maybeLoadInvoiceReportData({ ctx, reportData, reportConfig });
         await maybeLoadLabResultsReportData({ ctx, reportData, reportConfig });
         await maybeLoadItemsMetadataReportData({ ctx, reportData, reportConfig });
 
