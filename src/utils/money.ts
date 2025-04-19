@@ -3,5 +3,5 @@ export function shipperWholesalePriceToDollarString(shipperWholesalePrice: numbe
         return '';
     }
 
-    return `$${shipperWholesalePrice}.00`;
+    return `$${shipperWholesalePrice.toFixed(2)}`;
 }
