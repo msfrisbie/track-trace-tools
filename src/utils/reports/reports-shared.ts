@@ -747,7 +747,7 @@ export function getSheetTitle({
       title = `Scan Sheet (${totalScanSheetTransferCount(reportData)})`;
       break;
     case ReportType.INVOICE:
-      title = `Manifest #${reportData[ReportType.INVOICE]!.richOutgoingTransfers!.map((x) => x.ManifestNumber).join(',')} Invoice`;
+      title = `Manifest ${reportData[ReportType.INVOICE]!.richOutgoingTransfers!.map((x) => x.ManifestNumber).join(',')} Invoice`;
       break;
     case ReportType.LAB_RESULTS:
       title = SheetTitles.LAB_RESULTS;

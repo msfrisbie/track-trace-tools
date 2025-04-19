@@ -28,7 +28,7 @@ import {
   InventoryStrategy,
 } from "@/utils/reports/point-in-time-inventory-report";
 import { IScanSheetReportFormFilters } from "@/utils/reports/scan-sheet-report";
-import { CustomTransformer, IStatusMessage, ReportStatus, ReportType } from "./consts";
+import { CustomTransformer, IStatusMessage, ReportCategory, ReportStatus, ReportType } from "./consts";
 
 export interface IReportsState {
   status: ReportStatus;
@@ -370,10 +370,6 @@ export interface IReportOption {
   usesFieldTransformer: boolean;
   usesSpreadsheetFormulas: boolean;
   requiresGoogleSheets: boolean;
-  isCustom: boolean;
-  isSpecialty: boolean;
-  isCatalog: boolean;
-  isQuickview: boolean;
-  isHeadless: boolean;
+  reportCategory: ReportCategory,
   disableMultiReport: boolean;
 }

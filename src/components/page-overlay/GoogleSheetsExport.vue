@@ -11,14 +11,20 @@
 
         <b-form-group>
           <b-form-checkbox-group v-model="selectedReports" class="flex flex-col gap-1">
-            <report-checkbox-section title="CUSTOM EXPORTS"
-              :reportOptions="reportOptions.filter((x) => x.isCustom)"></report-checkbox-section>
-            <report-checkbox-section title="QUICKVIEW EXPORTS"
-              :reportOptions="reportOptions.filter((x) => x.isQuickview)"></report-checkbox-section>
-            <report-checkbox-section title="CATALOG EXPORTS"
-              :reportOptions="reportOptions.filter((x) => x.isCatalog)"></report-checkbox-section>
-            <report-checkbox-section title="ADVANCED EXPORTS"
-              :reportOptions="reportOptions.filter((x) => x.isSpecialty)"></report-checkbox-section>
+            <report-checkbox-section :icon="['fa','cog']" title="CUSTOM EXPORTS"
+              :reportOptions="reportOptions.filter((x) => x.reportCategory === ReportCategory.CUSTOM)"></report-checkbox-section>
+            <report-checkbox-section :icon="['fa','bolt']" title="QUICKVIEW EXPORTS"
+              :reportOptions="reportOptions.filter((x) => x.reportCategory === ReportCategory.QUICKVIEW)"></report-checkbox-section>
+            <report-checkbox-section :icon="['far','list-alt']" title="CATALOG EXPORTS"
+              :reportOptions="reportOptions.filter((x) => x.reportCategory === ReportCategory.CATALOG)"></report-checkbox-section>
+            <report-checkbox-section :icon="['fa','truck-loading']" title="TRANSFER EXPORTS"
+              :reportOptions="reportOptions.filter((x) => x.reportCategory === ReportCategory.TRANSFERS)"></report-checkbox-section>
+            <report-checkbox-section :icon="['fa','boxes']" title="PACKAGE EXPORTS"
+              :reportOptions="reportOptions.filter((x) => x.reportCategory === ReportCategory.PACKAGES)"></report-checkbox-section>
+            <report-checkbox-section :icon="['fa','users']" title="EMPLOYEE EXPORTS"
+              :reportOptions="reportOptions.filter((x) => x.reportCategory === ReportCategory.EMPLOYEES)"></report-checkbox-section>
+            <report-checkbox-section :icon="['fa','box-open']" title="ITEMS EXPORTS"
+              :reportOptions="reportOptions.filter((x) => x.reportCategory === ReportCategory.ITEMS)"></report-checkbox-section>
           </b-form-checkbox-group>
         </b-form-group>
       </div>
@@ -946,12 +952,13 @@ import { ClientGetters } from "@/store/page-overlay/modules/client/consts";
 import { OAuthState, PluginAuthActions } from "@/store/page-overlay/modules/plugin-auth/consts";
 import {
   ReportAuxTask,
+  ReportCategory,
   ReportStatus,
   ReportType,
   ReportsActions,
   ReportsGetters,
   ReportsMutations,
-  SHEET_FIELDS,
+  SHEET_FIELDS
 } from "@/store/page-overlay/modules/reports/consts";
 import { IReportConfig, IReportOption } from "@/store/page-overlay/modules/reports/interfaces";
 import { getIsoDateFromOffset } from "@/utils/date";
@@ -1146,6 +1153,7 @@ export default Vue.extend({
       OAuthState,
       ReportStatus,
       ReportType,
+      ReportCategory,
       SHEET_FIELDS,
       MATURE_PLANT_QUICKVIEW_DIMENSIONS,
       IMMATURE_PLANT_QUICKVIEW_DIMENSIONS,

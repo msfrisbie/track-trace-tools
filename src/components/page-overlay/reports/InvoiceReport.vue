@@ -4,11 +4,11 @@
     )
     " class="overflow-visible rounded border border-gray-300 p-2 flex flex-col items-stretch gap-2">
         <div class="font-semibold text-white ttt-purple-bg p-2 -m-2">
-            Invoice
+            Transfer Invoice
         </div>
         <hr />
         <div class="flex flex-col items-stretch">
-            <b-form-group label="Outgoing Transfers:">
+            <b-form-group label="Select a transfer to generate an invoice:">
                 <b-form-select class="flex flex-col"
                     v-model="reportState.reportFormFilters[ReportType.INVOICE].selectedOutgoingTransfer"
                     :options="outgoingTransferOptions"></b-form-select>
@@ -16,6 +16,7 @@
                     <p class="italic text-gray-500">0 outgoing transfers found for this license</p>
                 </template>
             </b-form-group>
+            <div>NOTE: when printing this in Excel, you may need to select "Scale to fit" in printing options</div>
         </div>
     </div>
 </template>

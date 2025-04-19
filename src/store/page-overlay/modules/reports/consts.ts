@@ -30,6 +30,16 @@ export enum ReportStatus {
   ERROR = "ERROR",
 }
 
+export enum ReportCategory {
+  QUICKVIEW = "QUICKVIEW",
+  CATALOG = "CATALOG",
+  PACKAGES = "PACKAGES",
+  TRANSFERS = "TRANSFERS",
+  ITEMS = "ITEMS",
+  EMPLOYEES = "EMPLOYEES",
+  CUSTOM = "CUSTOM"
+}
+
 export enum ReportType {
   TEST = "TEST",
   COGS = "COGS",

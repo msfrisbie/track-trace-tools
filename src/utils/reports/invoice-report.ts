@@ -127,7 +127,7 @@ export function extractInvoiceData({
     (x) => x.LicenseNumber === richOutgoingTransfer.outgoingDestinations![0].RecipientFacilityLicenseNumber
   )!;
 
-  matrix.push(["INVOICE #"]);
+  matrix.push(["INVOICE", "", "", "Created with T3 -> useT3.com"]);
   matrix.push([]);
   matrix.push(["Date:", new Date().toLocaleDateString("en-CA")]);
   matrix.push(["Payment terms:", "Net 30"]);

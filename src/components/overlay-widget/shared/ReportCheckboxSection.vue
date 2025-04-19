@@ -1,7 +1,11 @@
 <template>
   <fragment>
     <template v-if="reportOptions.filter((x) => x.visible).length > 0">
-      <div class="text-white ttt-purple-bg rounded py-1 px-2 mb-2">{{ title }}</div>
+
+      <div class="text-white ttt-purple-bg rounded py-1 px-2 mb-2 flex flex-row items-center gap-4">
+        <font-awesome-icon :icon="icon"></font-awesome-icon>
+        <span>{{ title }}</span>
+      </div>
 
       <b-form-checkbox
         v-for="enabledReportOption of reportOptions.filter((x) => x.visible && x.enabled)"
@@ -45,6 +49,7 @@ export default Vue.extend({
   router,
   props: {
     title: String,
+    icon: Array as () => string[],
     reportOptions: Array as () => IReportOption[],
   },
   components: {},
