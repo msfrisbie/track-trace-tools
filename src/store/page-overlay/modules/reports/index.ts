@@ -25,6 +25,7 @@ import { maybeLoadImmaturePlantsReportData } from "@/utils/reports/immature-plan
 import { maybeLoadIncomingManifestInventoryReportData } from "@/utils/reports/incoming-manifest-inventory";
 import { maybeLoadIncomingTransferManifestsReportData } from "@/utils/reports/incoming-transfer-manifests-report";
 import { maybeLoadIncomingTransfersReportData } from "@/utils/reports/incoming-transfers-report";
+import { maybeLoadInvoiceReportData } from "@/utils/reports/invoice-report";
 import { maybeLoadItemsMetadataReportData } from "@/utils/reports/items-metadata-report";
 import { maybeLoadLabResultsReportData } from "@/utils/reports/lab-results-report";
 import { maybeLoadMaturePlantsQuickviewReportData } from "@/utils/reports/mature-plants-quickview-report";
@@ -52,6 +53,7 @@ import { ClientGetters } from "../client/consts";
 import {
   IStatusMessage,
   ReportAuxTask,
+  ReportCategory,
   ReportsActions,
   ReportsGetters,
   ReportsMutations,
@@ -94,6 +96,10 @@ const inMemoryState = {
       allRejectedTransfers: [],
       selectedRejectedTransfers: [],
     },
+    [ReportType.INVOICE]: {
+      allOutgoingTransfers: [],
+      selectedOutgoingTransfer: null,
+    }
   },
 };
 
@@ -123,7 +129,7 @@ export const reportsModule = {
       data: { selectedReports: IReportOption[] }
     ) {
       for (const selectedReport of data.selectedReports) {
-        if (selectedReport.requiresGoogleSheets) {
+        if (selectedReport.requiresGoogleSheets || selectedReport.disableMultiReport) {
           state.selectedReports = [selectedReport];
           return;
         }
@@ -157,6 +163,9 @@ export const reportsModule = {
 
       if (data.outgoingTransfers) {
         state.reportFormFilters[ReportType.SCAN_SHEET].allOutgoingTransfers =
+          data.outgoingTransfers;
+
+        state.reportFormFilters[ReportType.INVOICE].allOutgoingTransfers =
           data.outgoingTransfers;
       }
 
@@ -221,14 +230,11 @@ export const reportsModule = {
           enabled: rootGetters[`client/${ClientGetters.T3PLUS}`],
           visible: false,
           description: "Test report",
-          isCustom: false,
           usesSpreadsheetFormulas: false,
           requiresGoogleSheets: false,
           usesFieldTransformer: false,
-          isSpecialty: false,
-          isCatalog: false,
-          isQuickview: false,
-          isHeadless: false,
+          reportCategory: ReportCategory.CUSTOM,
+          disableMultiReport: false,
         },
         {
           text: "Packages",
@@ -236,14 +242,11 @@ export const reportsModule = {
           enabled: rootGetters[`client/${ClientGetters.T3PLUS}`],
           visible: true,
           description: "All packages. Filter by type and date.",
-          isCustom: false,
           usesSpreadsheetFormulas: false,
           requiresGoogleSheets: false,
           usesFieldTransformer: true,
-          isSpecialty: false,
-          isCatalog: true,
-          isQuickview: false,
-          isHeadless: false,
+          reportCategory: ReportCategory.CATALOG,
+          disableMultiReport: false,
         },
         {
           text: "Point-in-time inventory",
@@ -251,14 +254,11 @@ export const reportsModule = {
           enabled: rootGetters[`client/${ClientGetters.T3PLUS}`],
           visible: true,
           description: "All active packages on a certain date.",
-          isCustom: false,
           usesSpreadsheetFormulas: false,
           requiresGoogleSheets: false,
           usesFieldTransformer: false,
-          isSpecialty: true,
-          isCatalog: false,
-          isQuickview: false,
-          isHeadless: false,
+          reportCategory: ReportCategory.PACKAGES,
+          disableMultiReport: false,
         },
         {
           text: "Plant Batches",
@@ -266,14 +266,11 @@ export const reportsModule = {
           enabled: rootGetters[`client/${ClientGetters.T3PLUS}`],
           visible: true,
           description: "All plant batches. Filter by planted date.",
-          isCustom: false,
           usesSpreadsheetFormulas: false,
           requiresGoogleSheets: false,
           usesFieldTransformer: true,
-          isSpecialty: false,
-          isCatalog: true,
-          isQuickview: false,
-          isHeadless: false,
+          reportCategory: ReportCategory.CATALOG,
+          disableMultiReport: false,
         },
         {
           text: "Mature Plants",
@@ -281,14 +278,11 @@ export const reportsModule = {
           enabled: rootGetters[`client/${ClientGetters.T3PLUS}`],
           visible: true,
           description: "All mature plants. Filter by growth phase and planted date",
-          isCustom: false,
           usesSpreadsheetFormulas: false,
           requiresGoogleSheets: false,
           usesFieldTransformer: true,
-          isSpecialty: false,
-          isCatalog: true,
-          isQuickview: false,
-          isHeadless: false,
+          reportCategory: ReportCategory.CATALOG,
+          disableMultiReport: false,
         },
         {
           text: "Incoming Transfers",
@@ -296,14 +290,11 @@ export const reportsModule = {
           enabled: rootGetters[`client/${ClientGetters.T3PLUS}`],
           visible: true,
           description: "All incoming transfers. Filter by wholesale and ETA",
-          isCustom: false,
           usesSpreadsheetFormulas: false,
           requiresGoogleSheets: false,
           usesFieldTransformer: true,
-          isSpecialty: false,
-          isCatalog: true,
-          isQuickview: false,
-          isHeadless: false,
+          reportCategory: ReportCategory.CATALOG,
+          disableMultiReport: false,
         },
         {
           text: "Outgoing Transfers",
@@ -311,14 +302,11 @@ export const reportsModule = {
           enabled: rootGetters[`client/${ClientGetters.T3PLUS}`],
           visible: true,
           description: "All outgoing transfers. Filter by wholesale and ETD",
-          isCustom: false,
           usesSpreadsheetFormulas: false,
           requiresGoogleSheets: false,
           usesFieldTransformer: true,
-          isSpecialty: false,
-          isCatalog: true,
-          isQuickview: false,
-          isHeadless: false,
+          reportCategory: ReportCategory.CATALOG,
+          disableMultiReport: false,
         },
         // Disabled - Destinations returns 0, more like incoming?
         // {
@@ -335,14 +323,11 @@ export const reportsModule = {
           enabled: rootGetters[`client/${ClientGetters.T3PLUS}`],
           visible: true,
           description: "All tags. Filter by status and tag type.",
-          isCustom: false,
           usesSpreadsheetFormulas: false,
           requiresGoogleSheets: false,
           usesFieldTransformer: true,
-          isSpecialty: false,
-          isCatalog: true,
-          isQuickview: false,
-          isHeadless: false,
+          reportCategory: ReportCategory.CATALOG,
+          disableMultiReport: false,
         },
         {
           text: "Harvests",
@@ -350,14 +335,11 @@ export const reportsModule = {
           enabled: rootGetters[`client/${ClientGetters.T3PLUS}`],
           visible: true,
           description: "All harvests. Filter by status and harvest date.",
-          isCustom: false,
           usesSpreadsheetFormulas: false,
           requiresGoogleSheets: false,
           usesFieldTransformer: true,
-          isSpecialty: false,
-          isCatalog: true,
-          isQuickview: false,
-          isHeadless: false,
+          reportCategory: ReportCategory.CATALOG,
+          disableMultiReport: false,
         },
         {
           text: "Incoming Transfer Manifests",
@@ -365,14 +347,11 @@ export const reportsModule = {
           enabled: rootGetters[`client/${ClientGetters.T3PLUS}`],
           visible: true,
           description: "Full transfer and package data for all incoming transfers.",
-          isCustom: false,
           usesSpreadsheetFormulas: false,
           requiresGoogleSheets: false,
           usesFieldTransformer: true,
-          isSpecialty: true,
-          isCatalog: false,
-          isQuickview: false,
-          isHeadless: false,
+          reportCategory: ReportCategory.TRANSFERS,
+          disableMultiReport: false,
         },
         {
           text: "Outgoing Transfer Manifests",
@@ -380,14 +359,11 @@ export const reportsModule = {
           enabled: rootGetters[`client/${ClientGetters.T3PLUS}`],
           visible: true,
           description: "Full transfer and package data for all outgoing transfers.",
-          isCustom: false,
           usesSpreadsheetFormulas: false,
           requiresGoogleSheets: false,
           usesFieldTransformer: true,
-          isSpecialty: true,
-          isCatalog: false,
-          isQuickview: false,
-          isHeadless: false,
+          reportCategory: ReportCategory.TRANSFERS,
+          disableMultiReport: false,
         },
         {
           text: "Straggler Inventory",
@@ -395,14 +371,11 @@ export const reportsModule = {
           enabled: rootGetters[`client/${ClientGetters.T3PLUS}`],
           visible: true,
           description: "Find old and empty inventory",
-          isCustom: false,
           usesSpreadsheetFormulas: false,
           requiresGoogleSheets: false,
           usesFieldTransformer: true,
-          isSpecialty: true,
-          isCatalog: false,
-          isQuickview: false,
-          isHeadless: false,
+          reportCategory: ReportCategory.PACKAGES,
+          disableMultiReport: false,
         },
         {
           text: "Employee Activity",
@@ -410,14 +383,11 @@ export const reportsModule = {
           enabled: rootGetters[`client/${ClientGetters.T3PLUS}`],
           visible: true,
           description: "View all employee activity in Metrc",
-          isCustom: false,
           usesSpreadsheetFormulas: false,
           requiresGoogleSheets: false,
           usesFieldTransformer: false,
-          isSpecialty: true,
-          isCatalog: false,
-          isQuickview: false,
-          isHeadless: false,
+          reportCategory: ReportCategory.EMPLOYEES,
+          disableMultiReport: false,
         },
         {
           text: "Employee Permissions",
@@ -425,14 +395,23 @@ export const reportsModule = {
           enabled: rootGetters[`client/${ClientGetters.T3PLUS}`],
           visible: true,
           description: "View all employee permissions in Metrc",
-          isCustom: false,
           usesSpreadsheetFormulas: false,
           requiresGoogleSheets: false,
           usesFieldTransformer: false,
-          isSpecialty: true,
-          isCatalog: false,
-          isQuickview: false,
-          isHeadless: false,
+          reportCategory: ReportCategory.EMPLOYEES,
+          disableMultiReport: false,
+        },
+        {
+          text: "Transfer Invoices",
+          value: ReportType.INVOICE,
+          enabled: rootGetters[`client/${ClientGetters.T3PLUS}`],
+          visible: true,
+          description: "Generate invoices from outgoing transfers",
+          usesSpreadsheetFormulas: true,
+          requiresGoogleSheets: false,
+          usesFieldTransformer: false,
+          reportCategory: ReportCategory.TRANSFERS,
+          disableMultiReport: true,
         },
         {
           text: "Scan Sheet",
@@ -440,14 +419,11 @@ export const reportsModule = {
           enabled: rootGetters[`client/${ClientGetters.T3PLUS}`],
           visible: true,
           description: "Generate a scannable spreadsheet to verify transfer package lists",
-          isCustom: false,
           usesSpreadsheetFormulas: true,
           requiresGoogleSheets: false,
           usesFieldTransformer: false,
-          isSpecialty: true,
-          isCatalog: false,
-          isQuickview: false,
-          isHeadless: false,
+          reportCategory: ReportCategory.TRANSFERS,
+          disableMultiReport: false,
         },
         {
           text: "Lab Results",
@@ -455,14 +431,11 @@ export const reportsModule = {
           enabled: rootGetters[`client/${ClientGetters.T3PLUS}`],
           visible: true,
           description: "Export specific test values for your packages",
-          isCustom: false,
           usesSpreadsheetFormulas: false,
           requiresGoogleSheets: false,
           usesFieldTransformer: false,
-          isSpecialty: true,
-          isCatalog: false,
-          isQuickview: false,
-          isHeadless: false,
+          reportCategory: ReportCategory.PACKAGES,
+          disableMultiReport: false,
         },
         {
           text: "Items Metadata",
@@ -471,14 +444,11 @@ export const reportsModule = {
           visible: true,
           description:
             "Export items data with additional details like created date and approval number",
-          isCustom: false,
           usesSpreadsheetFormulas: false,
           requiresGoogleSheets: false,
           usesFieldTransformer: false,
-          isSpecialty: true,
-          isCatalog: false,
-          isQuickview: false,
-          isHeadless: false,
+          reportCategory: ReportCategory.ITEMS,
+          disableMultiReport: false,
         },
         {
           text: "COGS",
@@ -486,14 +456,11 @@ export const reportsModule = {
           enabled: !!rootState.client.values.ENABLE_COGS,
           visible: !!rootState.client.values.ENABLE_COGS,
           description: "Generate COGS calculator",
-          isCustom: true,
+          reportCategory: ReportCategory.CUSTOM,
           usesSpreadsheetFormulas: true,
           requiresGoogleSheets: true,
           usesFieldTransformer: false,
-          isSpecialty: false,
-          isCatalog: false,
-          isQuickview: false,
-          isHeadless: false,
+          disableMultiReport: false,
         },
         {
           text: "COGS Tracker",
@@ -501,14 +468,11 @@ export const reportsModule = {
           enabled: !!rootState.client.values.ENABLE_COGS_TRACKER,
           visible: !!rootState.client.values.ENABLE_COGS_TRACKER,
           description: "Generate COGS Tracker sheets",
-          isCustom: true,
+          reportCategory: ReportCategory.CUSTOM,
           usesSpreadsheetFormulas: true,
           requiresGoogleSheets: true,
           usesFieldTransformer: false,
-          isSpecialty: false,
-          isCatalog: false,
-          isQuickview: false,
-          isHeadless: false,
+          disableMultiReport: false,
         },
         {
           text: "Employee Samples",
@@ -516,14 +480,11 @@ export const reportsModule = {
           enabled: !!rootState.client.values.ENABLE_EMPLOYEE_SAMPLE_TOOL,
           visible: !!rootState.client.values.ENABLE_EMPLOYEE_SAMPLE_TOOL,
           description: "Generate summary of employee samples",
-          isCustom: true,
+          reportCategory: ReportCategory.CUSTOM,
           usesSpreadsheetFormulas: true,
           requiresGoogleSheets: true,
           usesFieldTransformer: false,
-          isSpecialty: false,
-          isCatalog: false,
-          isQuickview: false,
-          isHeadless: false,
+          disableMultiReport: false,
         },
         {
           text: "Harvest Packages",
@@ -534,11 +495,8 @@ export const reportsModule = {
           usesFieldTransformer: false,
           usesSpreadsheetFormulas: false,
           requiresGoogleSheets: false,
-          isCustom: true,
-          isSpecialty: false,
-          isCatalog: false,
-          isQuickview: false,
-          isHeadless: false,
+          reportCategory: ReportCategory.CUSTOM,
+          disableMultiReport: false,
         },
         {
           text: "Incoming Manifest Inventory",
@@ -549,11 +507,8 @@ export const reportsModule = {
           usesFieldTransformer: true,
           usesSpreadsheetFormulas: false,
           requiresGoogleSheets: false,
-          isCustom: true,
-          isSpecialty: false,
-          isCatalog: false,
-          isQuickview: false,
-          isHeadless: false,
+          reportCategory: ReportCategory.CUSTOM,
+          disableMultiReport: false,
         },
         {
           text: "Packages Quickview",
@@ -561,14 +516,11 @@ export const reportsModule = {
           enabled: rootGetters[`client/${ClientGetters.T3PLUS}`],
           visible: true,
           description: "Grouped summary of packages by item, location, and dates",
-          isCustom: false,
           usesSpreadsheetFormulas: false,
           requiresGoogleSheets: false,
           usesFieldTransformer: false,
-          isSpecialty: false,
-          isCatalog: false,
-          isQuickview: true,
-          isHeadless: false,
+          reportCategory: ReportCategory.QUICKVIEW,
+          disableMultiReport: false,
         },
         {
           text: "Plant Batch Quickview",
@@ -576,14 +528,11 @@ export const reportsModule = {
           enabled: rootGetters[`client/${ClientGetters.T3PLUS}`],
           visible: true,
           description: "Grouped summary of plant batches by strain, location, and dates",
-          isCustom: false,
           usesSpreadsheetFormulas: false,
           requiresGoogleSheets: false,
           usesFieldTransformer: false,
-          isSpecialty: false,
-          isCatalog: false,
-          isQuickview: true,
-          isHeadless: false,
+          reportCategory: ReportCategory.QUICKVIEW,
+          disableMultiReport: false,
         },
         {
           text: "Mature Plants Quickview",
@@ -592,14 +541,11 @@ export const reportsModule = {
           visible: true,
           description:
             "Grouped summary of mature plants by growth phase, strain, location, and dates",
-          isCustom: false,
           usesSpreadsheetFormulas: false,
           requiresGoogleSheets: false,
           usesFieldTransformer: false,
-          isSpecialty: false,
-          isCatalog: false,
-          isQuickview: true,
-          isHeadless: false,
+          reportCategory: ReportCategory.QUICKVIEW,
+          disableMultiReport: false,
         },
         {
           text: "Transfer Quickview",
@@ -607,14 +553,11 @@ export const reportsModule = {
           enabled: false,
           visible: true,
           description: "Summary of incoming, outgoing, and rejected packages",
-          isCustom: false,
           usesSpreadsheetFormulas: false,
           requiresGoogleSheets: false,
           usesFieldTransformer: false,
-          isSpecialty: false,
-          isCatalog: false,
-          isQuickview: true,
-          isHeadless: false,
+          reportCategory: ReportCategory.QUICKVIEW,
+          disableMultiReport: false,
         },
         // {
         //   text: "Incoming Inventory",
@@ -638,14 +581,11 @@ export const reportsModule = {
           enabled: rootGetters[`client/${ClientGetters.T3PLUS}`],
           visible: false,
           description: "Single transfer",
-          isCustom: false,
           usesSpreadsheetFormulas: false,
           requiresGoogleSheets: false,
           usesFieldTransformer: false,
-          isSpecialty: false,
-          isCatalog: false,
-          isQuickview: false,
-          isHeadless: false,
+          disableMultiReport: false,
+          reportCategory: ReportCategory.TRANSFERS,
         },
       ];
 
@@ -687,6 +627,22 @@ export const reportsModule = {
           } catch (error) {
             // Handle errors here
           }
+          break;
+        }
+        case ReportType.INVOICE: {
+          let outgoingTransfers: IIndexedOutgoingTransferData[] = [];
+          try {
+            [outgoingTransfers] = await Promise.all([
+              primaryDataLoader.outgoingTransfers(),
+            ]);
+
+            ctx.commit(ReportsMutations.UPDATE_DYNAMIC_REPORT_DATA, {
+              outgoingTransfers,
+            });
+          } catch (error) {
+            // Handle errors here
+          }
+          break;
         }
       }
     },
@@ -769,6 +725,7 @@ export const reportsModule = {
         await maybeLoadPointInTimeInventoryReportData({ ctx, reportData, reportConfig });
         await maybeLoadSingleTransferReportData({ ctx, reportData, reportConfig });
         await maybeLoadScanSheetReportData({ ctx, reportData, reportConfig });
+        await maybeLoadInvoiceReportData({ ctx, reportData, reportConfig });
         await maybeLoadLabResultsReportData({ ctx, reportData, reportConfig });
         await maybeLoadItemsMetadataReportData({ ctx, reportData, reportConfig });
 

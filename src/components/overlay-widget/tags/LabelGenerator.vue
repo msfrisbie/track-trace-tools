@@ -57,8 +57,18 @@
                                     placeholder="Select a label template" style="position:relative"
                                     :value="selectedLabelTemplateLayout ? selectedLabelTemplateLayout.description : ''"
                                     :showOnFocus="true" :data="labelPrintState.labelTemplateLayoutOptions"
-                                    :serializer="(labelTemplateLayout) => labelTemplateLayout.description"
+                                    :serializer="(labelTemplateLayout) => `${labelTemplateLayout.description} ${labelTemplateLayout.labelTemplateLayoutId} ${labelTemplateLayout.tags.join(' ')}`"
                                     @hit="onChange('selectedTemplateLayoutId', $event.labelTemplateLayoutId)">
+
+                                    <template slot="suggestion" slot-scope="{ htmlText, data }">
+                                        <div class="flex flex-col">
+                                            <div class="font-bold">{{ data.description }}</div>
+                                            <!-- <div class="text-gray-300">{{ data.labelTemplateLayoutId }}</div> -->
+                                            <div class="flex flex-row items-center gap-1">
+                                                <b-badge v-for="tag in data.tags" v-bind:key="tag">{{ tag }}</b-badge>
+                                            </div>
+                                        </div>
+                                    </template>
 
                                     <template slot="append" v-if="selectedLabelTemplateLayout">
                                         <b-button class="clear-button" variant="outline-dark"
@@ -76,8 +86,19 @@
                                     :value="selectedLabelContentLayout ? selectedLabelContentLayout.description : ''"
                                     style="position:relative" :showOnFocus="true"
                                     :data="labelPrintState.labelContentLayoutOptions"
-                                    :serializer="(labelContentLayout) => labelContentLayout.description"
+                                    :serializer="(labelContentLayout) => `${labelContentLayout.description} ${labelContentLayout.labelTemplateLayoutId} ${labelContentLayout.tags.join(' ')}`"
                                     @hit="onChange('selectedContentLayoutId', $event.labelContentLayoutId)">
+
+                                    <template slot="suggestion" slot-scope="{ htmlText, data }">
+                                        <div class="flex flex-col">
+                                            <div class="font-bold">{{ data.description }}</div>
+                                            <!-- <div class="text-gray-300">{{ data.labelContentLayoutId }}</div> -->
+                                            <div class="flex flex-row items-center gap-1">
+                                                <b-badge v-for="tag in data.tags" v-bind:key="tag">{{ tag }}</b-badge>
+                                            </div>
+                                        </div>
+                                    </template>
+
                                     <template slot="append" v-if="selectedLabelContentLayout">
                                         <b-button class="clear-button" variant="outline-dark"
                                             @click.stop.prevent="onChange('selectedContentLayoutId', null, 'labelContentLayoutTypeahead')">
@@ -428,6 +449,7 @@ import { ClientGetters } from "@/store/page-overlay/modules/client/consts";
 import { LabelEndpoint, LabelPrintActions, LabelPrintGetters, LabelPrintMutations, LabelPrintStatus } from "@/store/page-overlay/modules/label-print/consts";
 import { ILabelEndpointConfig } from "@/store/page-overlay/modules/label-print/interfaces";
 import { PluginAuthActions, T3ApiAuthState } from "@/store/page-overlay/modules/plugin-auth/consts";
+import { data } from "@/test/fixtures/json/metrc-facility-data";
 import { hasPlusImpl } from "@/utils/plus";
 import Vue from "vue";
 import { mapActions, mapGetters, mapState } from "vuex";

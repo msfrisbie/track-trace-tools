@@ -30,6 +30,16 @@ export enum ReportStatus {
   ERROR = "ERROR",
 }
 
+export enum ReportCategory {
+  QUICKVIEW = "QUICKVIEW",
+  CATALOG = "CATALOG",
+  PACKAGES = "PACKAGES",
+  TRANSFERS = "TRANSFERS",
+  ITEMS = "ITEMS",
+  EMPLOYEES = "EMPLOYEES",
+  CUSTOM = "CUSTOM"
+}
+
 export enum ReportType {
   TEST = "TEST",
   COGS = "COGS",
@@ -58,8 +68,9 @@ export enum ReportType {
   EMPLOYEE_PERMISSIONS = "EMPLOYEE_PERMISSIONS",
   SINGLE_TRANSFER = "SINGLE_TRANSFER",
   SCAN_SHEET = "SCAN_SHEET",
+  INVOICE = "INVOICE",
   LAB_RESULTS = "LAB_RESULTS",
-  ITEMS_METADATA = "ITEMS_METADATA"
+  ITEMS_METADATA = "ITEMS_METADATA",
 }
 
 export enum ReportAuxTask {

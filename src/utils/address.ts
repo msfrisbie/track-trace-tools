@@ -2,6 +2,16 @@ import {
   IContactInfo, IMetrcFacilityData, ITagOrderData, ITagOrderModalData,
 } from '@/interfaces';
 
+export function formatAddress(addr: IMetrcFacilityData["PhysicalAddress"]):string[] {
+  const lines = [];
+  if (addr.Street1) lines.push(addr.Street1);
+  if (addr.Street2) lines.push(addr.Street2);
+  if (addr.Street3) lines.push(addr.Street3);
+  const cityLine = [addr.City, addr.State, addr.PostalCode].filter(Boolean).join(", ");
+  if (cityLine) lines.push(cityLine);
+  return lines;
+}
+
 export function extractIContactInfoFromITagOrderData(tagOrderData: ITagOrderData): IContactInfo {
   return {
     contactName: tagOrderData.FacilityContactName,
