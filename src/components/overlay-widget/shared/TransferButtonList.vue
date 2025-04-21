@@ -400,7 +400,7 @@ export default Vue.extend({
 
       // Enable scan report if not already enabled
       store.commit(`reports/${ReportsMutations.REPORTS_MUTATION}`, {
-        selectedReports: [ReportType.INVOICE]
+        selectedReports: [store.getters[`reports/${ReportsGetters.REPORT_OPTIONS}`].find((x: IReportOption) => x.value === ReportType.INVOICE)]
       });
 
       // Load the transfers
