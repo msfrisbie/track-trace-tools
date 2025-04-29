@@ -366,15 +366,16 @@ export default Vue.extend({
         await downloadLabTestPdfs({ pkg });
       }
 
-      const mergedPdfs: string[] = [
+      const mergedFileIds: number[] = [
         ...new Set(
-          (this.$data.transferMetadata as ITransferMetadata).packagesTestResults.map(
-            (x) => x.testResultPdfUrls
-          )
+          (this.$data.transferMetadata as ITransferMetadata).packagesTestResults
+            .flatMap((x) => x.fileIds)
         ),
-      ].flat();
+      ];
 
-      toastManager.openToast(`Finished downloading ${mergedPdfs.length} COAs`, {
+      console.log(mergedFileIds);
+
+      toastManager.openToast(`Finished downloading ${mergedFileIds.length} COAs`, {
         title: "Success",
         autoHideDelay: 3000,
         variant: "primary",

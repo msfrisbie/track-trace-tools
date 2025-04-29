@@ -540,6 +540,7 @@ export async function generatePackageMetadata({
 
   const packageMetadata: PackageMetadata = {
     testResults: [],
+    fileIds: [],
     testResultPdfUrls: [],
   };
 
@@ -557,7 +558,9 @@ export async function generatePackageMetadata({
     }
   }
 
-  packageMetadata.testResultPdfUrls = [...fileIds].map(
+  packageMetadata.fileIds = [...fileIds];
+
+  packageMetadata.testResultPdfUrls = packageMetadata.fileIds.map(
     (fileId) =>
       `${window.location.origin}/filesystem/${
         authState.license

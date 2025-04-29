@@ -543,6 +543,7 @@ export async function generateTransferMetadata({
 
       transferMetadata.packagesTestResults.push({
         pkg,
+        fileIds: [...fileIds],
         testResults: pkg.testResults!,
         testResultPdfUrls,
       });

@@ -2140,6 +2140,7 @@ export interface IMetrcEmployeeData {
 
 export interface PackageMetadata {
   testResults: ITestResultData[];
+  fileIds: number[];
   testResultPdfUrls: string[];
 }
 
@@ -2149,6 +2150,7 @@ export interface ITransferMetadata {
   packagesTestResults: {
     pkg: IIndexedDestinationPackageData;
     testResults: ITestResultData[];
+    fileIds: number[],
     testResultPdfUrls: string[];
   }[];
 }
