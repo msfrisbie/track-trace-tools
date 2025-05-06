@@ -24,6 +24,7 @@ export interface ISettingsState {
   packageDefaultPageSize: number;
   plantDefaultPageSize: number;
   preventLogout: boolean;
+  autoExtendSession: boolean;
   fixMetrcStyling: boolean;
   hideMetrcAiButton: boolean;
   efficientSpacing: boolean;

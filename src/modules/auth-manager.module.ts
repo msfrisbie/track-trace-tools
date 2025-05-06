@@ -109,11 +109,13 @@ class AuthManager implements IAtomicService {
         hostname: window.location.hostname,
       });
 
-      const authState = await authManager.authStateOrError();
-      const result = await chrome.storage.local.get(ChromeStorageKeys.T3_METRC_AVT_ENTRIES);
-      const avtEntries: Record<string, string> = result[ChromeStorageKeys.T3_METRC_AVT_ENTRIES] ?? {};
-      avtEntries[window.location.hostname] = authState.apiVerificationToken;
-      await chrome.storage.local.set({ [ChromeStorageKeys.T3_METRC_AVT_ENTRIES]: avtEntries });
+      if (store.state.settings?.autoExtendSession) {
+        const authState = await authManager.authStateOrError();
+        const result = await chrome.storage.local.get(ChromeStorageKeys.T3_METRC_AVT_ENTRIES);
+        const avtEntries: Record<string, string> = result[ChromeStorageKeys.T3_METRC_AVT_ENTRIES] ?? {};
+        avtEntries[window.location.hostname] = authState.apiVerificationToken;
+        await chrome.storage.local.set({ [ChromeStorageKeys.T3_METRC_AVT_ENTRIES]: avtEntries });
+      }
 
       return;
     }

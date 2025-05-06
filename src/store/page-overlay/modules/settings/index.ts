@@ -39,6 +39,7 @@ const persistedState: ISettingsState = {
   packageDefaultPageSize: 20,
   plantDefaultPageSize: 20,
   preventLogout: true,
+  autoExtendSession: true,
   fixMetrcStyling: true,
   hideMetrcAiButton: false,
   efficientSpacing: false,
