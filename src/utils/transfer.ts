@@ -27,6 +27,7 @@ import {
   getLabelOrError,
 } from "./package";
 import { createScanSheetOrError } from "./sheets-export";
+import { hasPlusImpl } from "./plus";
 
 const DRIVER_NAME_MATCHER = /^- Driver Name: (.+)$/;
 const DRIVER_EMPLOYEE_ID_MATCHER = /^- Driver Employee ID: (.+)$/;
@@ -205,7 +206,7 @@ export async function extractDriversAndVehiclesFromTransferHistory(): Promise<{
 }
 
 export async function createScanSheet(transferId: number, manifestNumber: string) {
-  if (!store.state.client.values.ENABLE_T3PLUS && !store.state.client.t3plus) {
+  if (!hasPlusImpl()) {
     toastManager.openToast(
       "This feature is only availble for T3+ users. Click here to learn more.",
       {

@@ -264,24 +264,6 @@
                 <span class="leading-6">Include in-transit packages</span>
               </b-form-checkbox>
 
-              <!-- <b-form-checkbox v-model="packagesFormFilters.includeTransferHub">
-                    <span class="leading-6">Include transfer hub packages</span>
-                  </b-form-checkbox> -->
-
-              <!-- <b-form-checkbox :disabled="!clientValues['ENABLE_T3PLUS'] && !hasT3plus">
-                    <div class="flex flex-col items-start">
-                      <span class="leading-6"
-                        >Include packages transferred out of this facility</span
-                      >
-                      <span
-                        v-if="!clientValues['ENABLE_T3PLUS'] && !hasT3plus"
-                        class="text-xs text-gray-300"
-                        >Enable this with
-                        <a href="https://trackandtrace.tools/plus" target="_blank">T3+</a></span
-                      >
-                    </div>
-                  </b-form-checkbox> -->
-
               <div class="flex flex-col items-start gap-1">
                 <b-form-checkbox v-model="packagesFormFilters.shouldFilterPackagedDateGt">
                   <span class="leading-6">Packaged on or after:</span>

@@ -1,4 +1,4 @@
-import { AnalyticsEvent, MessageType } from "@/consts";
+import { AnalyticsEvent, ChromeStorageKeys, MessageType } from "@/consts";
 import { IAtomicService, IAuthState } from "@/interfaces";
 import { analyticsManager } from "@/modules/analytics-manager.module";
 import store from "@/store/page-overlay";
@@ -108,6 +108,12 @@ class AuthManager implements IAtomicService {
         apiVerificationToken,
         hostname: window.location.hostname,
       });
+
+      const authState = await authManager.authStateOrError();
+      const result = await chrome.storage.local.get(ChromeStorageKeys.T3_METRC_AVT_ENTRIES);
+      const avtEntries: Record<string, string> = result[ChromeStorageKeys.T3_METRC_AVT_ENTRIES] ?? {};
+      avtEntries[window.location.hostname] = authState.apiVerificationToken;
+      await chrome.storage.local.set({ [ChromeStorageKeys.T3_METRC_AVT_ENTRIES]: avtEntries });
 
       return;
     }

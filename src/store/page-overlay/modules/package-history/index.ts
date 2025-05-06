@@ -16,6 +16,7 @@ import {
 } from "@/utils/package-history";
 import _ from "lodash-es";
 import { ActionContext } from "vuex";
+import { hasPlusImpl } from "@/utils/plus";
 import {
   PackageHistoryActions,
   PackageHistoryGetters,
@@ -290,7 +291,7 @@ export const packageHistoryModule = {
     ) => {
       analyticsManager.track(AnalyticsEvent.GENERATE_PACKAGE_HISTORY, { pkg });
 
-      if (!store.state.client.values.ENABLE_T3PLUS && !store.state.client.t3plus) {
+      if (!hasPlusImpl()) {
         return;
       }
 

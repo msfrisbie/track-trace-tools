@@ -1,3 +1,4 @@
+import { ChromeStorageKeys } from "@/consts";
 import { IPluginState } from "@/interfaces";
 import { t3RequestManager } from "@/modules/t3-request-manager.module";
 import { toastManager } from "@/modules/toast-manager.module";
@@ -35,7 +36,7 @@ export const clientModule = {
   },
   getters: {
     [ClientGetters.T3PLUS]: (state: IClientState, getters: any, rootState: any, rootGetters: any) =>
-      state.t3plus || !!state.values.ENABLE_T3PLUS,
+      state.t3plus,
   },
   actions: {
     [ClientActions.UPDATE_CLIENT_VALUES]: async (
@@ -44,11 +45,16 @@ export const clientModule = {
     ) => {
       const plusUsers = await t3RequestManager.loadT3plus();
 
-      const t3plus = plusUsers.length > 0;
+      const t3plus: boolean = plusUsers.length > 0;
 
       ctx.commit(ClientMutations.CLIENT_MUTATION, {
         t3plus,
       } as Partial<IClientState>);
+
+      const result = await chrome.storage.local.get([ChromeStorageKeys.T3PLUS]);
+      const existing: { [key: string]: any } = result[ChromeStorageKeys.T3PLUS] || {};
+      existing[window.location.hostname] = t3plus;
+      await chrome.storage.local.set({ [ChromeStorageKeys.T3PLUS]: existing });
 
       if (!ctx.rootState.settings.licenseKey) {
         ctx.commit(ClientMutations.CLIENT_MUTATION, {
@@ -75,6 +81,17 @@ export const clientModule = {
           clientName,
           values,
         } as Partial<IClientState>);
+
+        if (Object.keys(values).includes('ENABLE_T3PLUS')) {
+          ctx.commit(ClientMutations.CLIENT_MUTATION, {
+            t3plus: true,
+          } as Partial<IClientState>);
+
+          const result = await chrome.storage.local.get([ChromeStorageKeys.T3PLUS]);
+          const existing: { [key: string]: any } = result[ChromeStorageKeys.T3PLUS] || {};
+          existing[window.location.hostname] = true;
+          await chrome.storage.local.set({ [ChromeStorageKeys.T3PLUS]: existing });
+        }
       }
 
       const flags = await t3RequestManager.loadFlags();
