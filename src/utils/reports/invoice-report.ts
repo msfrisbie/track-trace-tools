@@ -77,7 +77,7 @@ export async function maybeLoadInvoiceReportData({
 
   richOutgoingTransfers = [
     ...(await primaryDataLoader.outgoingTransfers()),
-    ...richOutgoingTransfers,
+    ...(await primaryDataLoader.outgoingInactiveTransfers()),
   ];
 
   richOutgoingTransfers = richOutgoingTransfers.filter((transfer) => {
@@ -108,7 +108,7 @@ export async function maybeLoadInvoiceReportData({
   };
 }
 
-export function extractInvoiceData({
+export async function extractInvoiceData({
   reportType,
   reportConfig,
   reportData,
@@ -116,7 +116,7 @@ export function extractInvoiceData({
   reportType: ReportType;
   reportConfig: IReportConfig;
   reportData: IReportData;
-}): any[][] {
+}): Promise<any[][]> {
   const matrix: string[][] = [];
 
   const richOutgoingTransfer = reportData[ReportType.INVOICE]!.richOutgoingTransfers![0];

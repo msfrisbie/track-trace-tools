@@ -631,13 +631,15 @@ export const reportsModule = {
         }
         case ReportType.INVOICE: {
           let outgoingTransfers: IIndexedOutgoingTransferData[] = [];
+          let outgoingInactiveTransfers: IIndexedOutgoingTransferData[] = [];
           try {
             [outgoingTransfers] = await Promise.all([
               primaryDataLoader.outgoingTransfers(),
+              // primaryDataLoader.outgoingInactiveTransfers(),
             ]);
 
             ctx.commit(ReportsMutations.UPDATE_DYNAMIC_REPORT_DATA, {
-              outgoingTransfers,
+              outgoingTransfers: [...outgoingTransfers, ...outgoingInactiveTransfers],
             });
           } catch (error) {
             // Handle errors here

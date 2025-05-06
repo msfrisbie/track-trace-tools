@@ -399,7 +399,7 @@ export function extractQuickviewData({
   return data;
 }
 
-export function extractFlattenedData({
+export async function extractFlattenedData({
   flattenedCache,
   reportType,
   reportData,
@@ -409,12 +409,12 @@ export function extractFlattenedData({
   reportType: ReportType;
   reportData: IReportData;
   reportConfig: IReportConfig;
-}): any[] {
+}): Promise<any[]> {
   if (flattenedCache.has(reportType)) {
     return flattenedCache.get(reportType) as any[];
   }
 
-  let values = (() => {
+  let values = await (async () => {
     switch (reportType) {
       case ReportType.PACKAGES:
       case ReportType.STRAGGLER_PACKAGES:

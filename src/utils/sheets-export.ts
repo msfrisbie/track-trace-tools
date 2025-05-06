@@ -320,7 +320,7 @@ export async function createCsvOrError({
       reportData,
     });
 
-    let data: any[][] = extractFlattenedData({
+    let data: any[][] = await extractFlattenedData({
       flattenedCache,
       reportType,
       reportData,
@@ -381,7 +381,7 @@ export async function createXlsxOrError({
       reportData,
     });
 
-    let data: any[][] = extractFlattenedData({
+    let data: any[][] = await extractFlattenedData({
       flattenedCache,
       reportType,
       reportData,
@@ -603,12 +603,12 @@ export async function createGoogleDocsSpreadsheetOrError({
       getSheetTitle({ reportType, reportConfig, reportData })
     );
     const length = Math.max(
-      extractFlattenedData({
+      (await extractFlattenedData({
         flattenedCache,
         reportType,
         reportData,
         reportConfig,
-      }).length,
+      })).length,
       1
     );
 
@@ -643,7 +643,7 @@ export async function createGoogleDocsSpreadsheetOrError({
       spreadsheetId: response.data.result.spreadsheetId,
       spreadsheetTitle: getSheetTitle({ reportType, reportConfig, reportData }),
       fields: reportConfig[reportType]?.fields as IFieldData[],
-      data: extractFlattenedData({
+      data: await extractFlattenedData({
         flattenedCache,
         reportType,
         reportData,
