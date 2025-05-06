@@ -14,7 +14,7 @@
           <b-form-checkbox id="checkbox-autoExtendSession" class="mb-2" v-model="settings.autoExtendSession"
             name="checkbox-autoExtendSession" @change="onChange()" :disabled="!hasPlus">
             <div>Auto-extend Metrc session (T3+ only)</div>
-            <div class="text-xs text-gray-500 italic">Keeps you logged into Metrc indefinitely, even when Metrc tabs are closed.</div>
+            <div class="text-xs text-gray-500 italic">Keeps you logged into Metrc indefinitely while the browser is open, even when Metrc tabs are closed. (Browser must remain open and computer must remain awake)</div>
           </b-form-checkbox>
 
           <b-form-checkbox id="checkbox-autoDismissPopups" class="mb-2" v-model="settings.autoDismissPopups"
