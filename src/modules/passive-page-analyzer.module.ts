@@ -2,7 +2,7 @@ import { AnalyticsEvent } from "@/consts";
 import { IAtomicService } from "@/interfaces";
 import store from "@/store/page-overlay/index";
 import { debugLogFactory } from "@/utils/debug";
-import { activeMetrcModalOrNull, modalTitleOrError } from "@/utils/metrc-modal";
+import { activeMetrcModalOrNull, modalRepeaterDataOrNull, modalTitleOrError } from "@/utils/metrc-modal";
 import _ from "lodash-es";
 import { analyticsManager } from "./analytics-manager.module";
 import { authManager } from "./auth-manager.module";
@@ -14,7 +14,7 @@ class PassivePageAnalyzer implements IAtomicService {
   lastObservedActiveModalName: string | null = null;
 
   async init() {
-    const debouncedHandler = _.debounce(() => this.analyzePage(), 100);
+    const debouncedHandler = _.debounce(() => this.analyzePage(), 1000);
 
     const observer = new MutationObserver(() => debouncedHandler());
 
@@ -36,12 +36,6 @@ class PassivePageAnalyzer implements IAtomicService {
     }
 
     this.recordModalState(modal as HTMLElement);
-
-    try {
-      this.maybeRecordFieldNames(modal as HTMLElement);
-    } catch (e) {
-      console.error(e);
-    }
   }
 
   recordModalState(modalElement: HTMLElement) {
@@ -52,6 +46,8 @@ class PassivePageAnalyzer implements IAtomicService {
         modalName: activeModalName,
       });
     }
+
+    console.log(modalRepeaterDataOrNull(modalElement));
 
     this.lastObservedActiveModalName = activeModalName;
   }

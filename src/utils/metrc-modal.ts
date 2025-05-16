@@ -1,4 +1,5 @@
 import { IMetrcFacilityData } from "@/interfaces";
+import { extractRepeaterData } from "./html";
 
 export function activeMetrcModalOrNull(): HTMLElement | null {
   return document.querySelector(".k-widget.k-window");
@@ -30,4 +31,12 @@ export function metrcAddressToArray(addressData: IMetrcFacilityData["PhysicalAdd
 
 export function metrcAddressToString(addressData: IMetrcFacilityData["PhysicalAddress"]): string {
   return metrcAddressToArray(addressData).join(" ");
+}
+
+export function modalRepeaterDataOrNull(modalElement: HTMLElement): {[key: string]: any} | null {
+  try {
+    return extractRepeaterData(modalElement.innerHTML);
+  } catch {
+    return null;
+  }
 }

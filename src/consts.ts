@@ -585,6 +585,8 @@ export enum NativeMetrcGridId {
   ITEMS_ITEM_BRANDS = "itembrands-grid",
 
   STRAINS = "strains-grid",
+
+  EMPLOYEES = "employees-grid"
 }
 
 export enum UniqueMetrcGridId {
@@ -630,6 +632,8 @@ export enum UniqueMetrcGridId {
   ITEMS_ITEM_BRANDS = "ITEMS_ITEM_BRANDS",
 
   STRAINS = "STRAINS",
+
+  EMPLOYEES = "EMPLOYEES",
 }
 
 export enum MetrcPageId {
@@ -643,6 +647,7 @@ export enum MetrcPageId {
   LOCATIONS = "LOCATIONS",
   TAGS = "TAGS",
   TRANSFERS_TEMPLATES = "TRANSFERS_TEMPLATES",
+  EMPLOYEES = "EMPLOYEES",
 }
 
 export const METRC_PAGE_METADATA: {
@@ -679,6 +684,9 @@ export const METRC_PAGE_METADATA: {
   },
   [MetrcPageId.TAGS]: {
     pathPartial: "/admin/tags",
+  },
+  [MetrcPageId.EMPLOYEES]: {
+    pathPartial: "/admin/employees",
   },
 };
 
@@ -819,6 +827,10 @@ export const METRC_GRID_METADATA: {
   [UniqueMetrcGridId.PLANTS_ADDITIVES]: {
     nativeMetrcGridId: NativeMetrcGridId.PLANTS_ADDITIVES,
     metrcPageId: MetrcPageId.PLANTS,
+  },
+  [UniqueMetrcGridId.EMPLOYEES]: {
+    nativeMetrcGridId: NativeMetrcGridId.EMPLOYEES,
+    metrcPageId: MetrcPageId.EMPLOYEES,
   },
 };
 
