@@ -482,8 +482,14 @@ const COMMON_TAG_FIELD_DATA: IFieldData[] = [
     initiallyChecked: true,
   },
   {
-    value: "Used Datetime",
-    readableName: "UsedDateTime",
+    value: "UsedDatetime",
+    readableName: "Used DateTime",
+    required: false,
+    initiallyChecked: true,
+  },
+  {
+    value: "CommissionedDateTime",
+    readableName: "Commissioned Datetime",
     required: false,
     initiallyChecked: true,
   },
