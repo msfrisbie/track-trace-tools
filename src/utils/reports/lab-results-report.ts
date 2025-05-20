@@ -129,7 +129,7 @@ export async function maybeLoadLabResultsReportData({
     }
 
     packages = packages.filter((pkg) => {
-      if (pkg.LabTestingStateName !== "TestPassed") {
+      if (!["TestPassed", "RetestPassed"].includes(pkg.LabTestingStateName)) {
         return false;
       }
 

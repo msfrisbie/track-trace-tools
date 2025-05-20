@@ -585,7 +585,7 @@ export interface IPackageData extends ITaggedIResponseObjectData {
   FacilityLicenseNumber: string | null;
   FacilityName: string | null;
   FinishedDate: string | null;
-  InitialLabTestingState: "NotRequired" | "TestPassed" | "NotSubmitted";
+  InitialLabTestingState: "NotRequired" | "TestPassed" | "RetestPassed" | "NotSubmitted";
   IsArchived: boolean;
   IsDonation: boolean;
   IsDonationPersistent: boolean;
