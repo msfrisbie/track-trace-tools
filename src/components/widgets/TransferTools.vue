@@ -1,32 +1,54 @@
 <template>
-  <div class="m-2 grid grid-cols-4 gap-2" style="grid-template-columns: repeat(auto-fit, max-content)">
-    <b-button @click="fillGoogleMapsDirections()" size="sm" variant="outline-primary"
+  <div
+    class="m-2 grid grid-cols-4 gap-2"
+    style="grid-template-columns: repeat(auto-fit, max-content)"
+  >
+    <b-button
+      @click="fillGoogleMapsDirections()"
+      size="sm"
+      variant="outline-primary"
       title="Autofill directions from Google Maps into the 'Planned Route' input"
-      class="flex flex-row items-center justify-center gap-2">
+      class="flex flex-row items-center justify-center gap-2"
+    >
       <font-awesome-icon icon="directions"></font-awesome-icon>
       <span>AUTOFILL DIRECTIONS</span>
     </b-button>
-    <b-button @click="setSameSiteTransfer()" size="sm" variant="outline-primary"
+    <b-button
+      @click="setSameSiteTransfer()"
+      size="sm"
+      variant="outline-primary"
       title="Autofill default values for route, driver, and vehicle"
-      class="flex flex-row items-center justify-center gap-2">
+      class="flex flex-row items-center justify-center gap-2"
+    >
       <font-awesome-icon icon="sync"></font-awesome-icon>
       <span>AUTOFILL SAME-SITE TRANSFER</span>
     </b-button>
-    <b-button @click="autofillPackageWeight()" size="sm" variant="outline-primary"
+    <b-button
+      @click="autofillPackageWeight()"
+      size="sm"
+      variant="outline-primary"
       title="Autofill the same weight for package and unit of measure"
-      class="flex flex-row items-center justify-center gap-2">
+      class="flex flex-row items-center justify-center gap-2"
+    >
       <font-awesome-icon icon="weight"></font-awesome-icon>
       <span>AUTOFILL PACKAGE WEIGHTS</span>
     </b-button>
-    <b-button @click="toggleQuickTab()" size="sm" variant="outline-primary"
+    <b-button
+      @click="toggleQuickTab()"
+      size="sm"
+      variant="outline-primary"
       title="Hide extra buttons to allow for faster tabbing through the form"
-      class="flex flex-row items-center justify-center gap-2">
+      class="flex flex-row items-center justify-center gap-2"
+    >
       <font-awesome-icon icon="toggle-on"></font-awesome-icon>
       <span>TOGGLE BUTTONS FOR QUICK TABBING</span>
     </b-button>
 
     <div class="relative flex flex-col items-stretch">
-      <div v-if="!hasT3plus" class="absolute left-0 top-0 h-full flex flex-col items-center justify-center px-2">
+      <div
+        v-if="!hasT3plus"
+        class="absolute left-0 top-0 h-full flex flex-col items-center justify-center px-2"
+      >
         <b-badge variant="primary">T3+</b-badge>
       </div>
 
@@ -38,13 +60,19 @@
             <font-awesome-icon icon="caret-down"></font-awesome-icon>
           </div>
         </template>
-        <b-dropdown-item v-for="destination of transferToolsState.recentDestinationFacilities"
-          @click="fillDestination(destination)" v-bind:key="destination.Id">{{ destination.FacilityName }} | {{
-            destination.LicenseNumber }}</b-dropdown-item>
+        <b-dropdown-item
+          v-for="destination of transferToolsState.recentDestinationFacilities"
+          @click="fillDestination(destination)"
+          v-bind:key="destination.Id"
+          >{{ destination.FacilityName }} | {{ destination.LicenseNumber }}</b-dropdown-item
+        >
       </b-dropdown>
     </div>
     <div class="relative flex flex-col items-stretch">
-      <div v-if="!hasT3plus" class="absolute left-0 top-0 h-full flex flex-col items-center justify-center px-2">
+      <div
+        v-if="!hasT3plus"
+        class="absolute left-0 top-0 h-full flex flex-col items-center justify-center px-2"
+      >
         <b-badge variant="primary">T3+</b-badge>
       </div>
 
@@ -56,13 +84,19 @@
             <font-awesome-icon icon="caret-down"></font-awesome-icon>
           </div>
         </template>
-        <b-dropdown-item v-for="transporter of transferToolsState.recentTransporterFacilities"
-          @click="fillTransporter(transporter)" v-bind:key="transporter.Id">{{ transporter.FacilityName }} | {{
-            transporter.LicenseNumber }}</b-dropdown-item>
+        <b-dropdown-item
+          v-for="transporter of transferToolsState.recentTransporterFacilities"
+          @click="fillTransporter(transporter)"
+          v-bind:key="transporter.Id"
+          >{{ transporter.FacilityName }} | {{ transporter.LicenseNumber }}</b-dropdown-item
+        >
       </b-dropdown>
     </div>
     <div class="relative flex flex-col items-stretch">
-      <div v-if="!hasT3plus" class="absolute left-0 top-0 h-full flex flex-col items-center justify-center px-2">
+      <div
+        v-if="!hasT3plus"
+        class="absolute left-0 top-0 h-full flex flex-col items-center justify-center px-2"
+      >
         <b-badge variant="primary">T3+</b-badge>
       </div>
 
@@ -76,13 +110,25 @@
         <font-awesome-icon icon="file-csv"></font-awesome-icon>
         <span>CSV FILL</span>
       </b-button> -->
-      <div id="csv-popover-target" class="absolute right-0 top-0 h-full flex flex-col items-center justify-center px-2">
+      <div
+        id="csv-popover-target"
+        class="absolute right-0 top-0 h-full flex flex-col items-center justify-center px-2"
+      >
         <div id="csv-popover-container"></div>
 
-        <font-awesome-icon icon="question-circle" class="cursor-pointer ttt-purple"></font-awesome-icon>
+        <font-awesome-icon
+          icon="question-circle"
+          class="cursor-pointer ttt-purple"
+        ></font-awesome-icon>
 
-        <b-popover target="csv-popover-target" triggers="hover" placement="top" variant="light" ref="csv-popover"
-          container="csv-popover-container">
+        <b-popover
+          target="csv-popover-target"
+          triggers="hover"
+          placement="top"
+          variant="light"
+          ref="csv-popover"
+          container="csv-popover-container"
+        >
           <div class="flex flex-col space-y-2 text-base">
             <p class="font-bold ttt-purple">Upload a CSV to rapidly fill package data.</p>
             <p>
@@ -114,7 +160,11 @@
       </div>
     </div>
     <b-input-group>
-      <b-form-input placeholder="Weight, Unit, Price" v-model="autofillValue" size="sm"></b-form-input>
+      <b-form-input
+        placeholder="Weight, Unit, Price"
+        v-model="autofillValue"
+        size="sm"
+      ></b-form-input>
       <b-dropdown no-caret size="sm" variant="outline-primary">
         <template #button-content>
           <div class="flex flex-row items-center justify-center gap-2">
@@ -317,7 +367,10 @@ export default Vue.extend({
       const elementRefs = this.getElementRefs();
 
       if (elementRefs.routeInput) {
-        elementRefs.routeInput.value = data.directions;
+        elementRefs.routeInput.value = data.directions
+          .normalize("NFD") // Normalize accents
+          .replace(/[\u0300-\u036f]/g, "") // Remove diacritics
+          .replace(/[^a-zA-Z0-9 ,\/\-\.\&\'\#]/g, ""); // Allow safe characters;
       }
     },
     fillDestination(destinationFacility: IMetrcFacilityData) {
@@ -498,7 +551,7 @@ export default Vue.extend({
       (this.$data.modal as HTMLElement).classList.toggle("enable-form-quick-tab");
     },
   },
-  async created() { },
+  async created() {},
   async mounted() {
     const modal = activeMetrcModalOrNull();
 
@@ -523,7 +576,7 @@ export default Vue.extend({
   watch: {
     foobar: {
       immediate: true,
-      handler(newValue, oldValue) { },
+      handler(newValue, oldValue) {},
     },
   },
 });
