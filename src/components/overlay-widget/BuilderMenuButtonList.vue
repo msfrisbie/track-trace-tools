@@ -30,7 +30,7 @@
             <template v-else-if="option.enableNotificationBadge && notificationCount > 0">
               <!-- flex struggles to vertical align the badge for some reason -->
               <b-badge style="padding-top: 0.3rem; margin-top: 0.1rem; line-height: initial" variant="danger">{{
-                notificationCount }}</b-badge></template>
+                1 }}</b-badge></template>
 
             <template v-else-if="option.isNew">
               <!-- flex struggles to vertical align the badge for some reason -->
@@ -145,6 +145,17 @@ export default Vue.extend({
         },
         {
           backgroundColor: "#c14747",
+          text: "EXPORTS",
+          route: "/google-sheets-export",
+          icon: "file-export",
+          visible: true,
+          enabled: true,
+          isBeta: false,
+          isNew: false,
+          isPlus: true,
+        },
+        {
+          backgroundColor: "#c14747",
           text: "PRINT LABELS",
           route: "/tags/print-tags",
           icon: "print",
@@ -207,22 +218,11 @@ export default Vue.extend({
         },
         {
           backgroundColor: "#c14747",
-          text: "REPORTS",
-          route: "/google-sheets-export",
-          icon: "table",
-          visible: true,
-          enabled: true,
-          isBeta: false,
-          isNew: false,
-          isPlus: true,
-        },
-        {
-          backgroundColor: "#c14747",
           text: "EXPLORER",
           route: "/metrc-explorer",
           icon: "sitemap",
           visible: true,
-          enabled: store.state.client.values.ENABLE_T3PLUS || store.state.client.t3plus,
+          enabled: store.state.client.t3plus,
           isBeta: false,
           isNew: false,
           isPlus: true,
@@ -233,7 +233,7 @@ export default Vue.extend({
           route: "/graph",
           icon: "project-diagram",
           visible: true,
-          enabled: store.state.client.values.ENABLE_T3PLUS || store.state.client.t3plus,
+          enabled: store.state.client.t3plus,
           isBeta: false,
           isNew: false,
           isPlus: true,
@@ -243,7 +243,7 @@ export default Vue.extend({
           text: "TRANSFER BUILDER",
           route: "/transfer/transfer-builder",
           icon: "truck-loading",
-          enabled: store.state.client.values.ENABLE_T3PLUS || store.state.client.t3plus,
+          enabled: store.state.client.t3plus,
           visible: store.state.settings.enableLegacyTransferTools,
           isBeta: false,
           isNew: false,

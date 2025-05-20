@@ -5,20 +5,26 @@
       <div class="flex flex-col gap-2 items-stretch"
         v-bind:class="{ 'opacity-50': reportStatus !== ReportStatus.INITIAL }">
         <div class="text-start text-gray-600 pb-2" v-if="!hasT3plus">
-          Get access to advanced reports with
+          Get access to T3 exports with
           <a class="text-purple-500 underline" href="#" @click="$router.push('/plus')">T3+</a>
         </div>
 
         <b-form-group>
           <b-form-checkbox-group v-model="selectedReports" class="flex flex-col gap-1">
-            <report-checkbox-section title="CUSTOM"
-              :reportOptions="reportOptions.filter((x) => x.isCustom)"></report-checkbox-section>
-            <report-checkbox-section title="QUICKVIEW"
-              :reportOptions="reportOptions.filter((x) => x.isQuickview)"></report-checkbox-section>
-            <report-checkbox-section title="CATALOG"
-              :reportOptions="reportOptions.filter((x) => x.isCatalog)"></report-checkbox-section>
-            <report-checkbox-section title="ADVANCED"
-              :reportOptions="reportOptions.filter((x) => x.isSpecialty)"></report-checkbox-section>
+            <report-checkbox-section :icon="['fa','cog']" title="CUSTOM EXPORTS"
+              :reportOptions="reportOptions.filter((x) => x.reportCategory === ReportCategory.CUSTOM)"></report-checkbox-section>
+            <report-checkbox-section :icon="['fa','bolt']" title="QUICKVIEW EXPORTS"
+              :reportOptions="reportOptions.filter((x) => x.reportCategory === ReportCategory.QUICKVIEW)"></report-checkbox-section>
+            <report-checkbox-section :icon="['far','list-alt']" title="CATALOG EXPORTS"
+              :reportOptions="reportOptions.filter((x) => x.reportCategory === ReportCategory.CATALOG)"></report-checkbox-section>
+            <report-checkbox-section :icon="['fa','truck-loading']" title="TRANSFER EXPORTS"
+              :reportOptions="reportOptions.filter((x) => x.reportCategory === ReportCategory.TRANSFERS)"></report-checkbox-section>
+            <report-checkbox-section :icon="['fa','boxes']" title="PACKAGE EXPORTS"
+              :reportOptions="reportOptions.filter((x) => x.reportCategory === ReportCategory.PACKAGES)"></report-checkbox-section>
+            <report-checkbox-section :icon="['fa','users']" title="EMPLOYEE EXPORTS"
+              :reportOptions="reportOptions.filter((x) => x.reportCategory === ReportCategory.EMPLOYEES)"></report-checkbox-section>
+            <report-checkbox-section :icon="['fa','box-open']" title="ITEMS EXPORTS"
+              :reportOptions="reportOptions.filter((x) => x.reportCategory === ReportCategory.ITEMS)"></report-checkbox-section>
           </b-form-checkbox-group>
         </b-form-group>
       </div>
@@ -28,7 +34,7 @@
         class="flex flex-col items-stretch gap-4">
         <template v-if="selectedReports.length > 0">
           <div class="pb-2 flex flex-col items-stretch gap-2 text-xl font-semibold ttt-purple">
-            {{ selectedReports.length }} REPORT{{ selectedReports.length > 1 ? "S" : "" }}
+            {{ selectedReports.length }} EXPORT{{ selectedReports.length > 1 ? "S" : "" }}
             SELECTED:
           </div>
         </template>
@@ -40,9 +46,9 @@
 
             <a class="underline text-purple-600"
               href="https://docs.google.com/spreadsheets/d/1fxBfjBUhFt6Gj7PpbQO8DlT1e76DIDtTwiq_2A5tHCU/edit?usp=sharing"
-              target="_blank">Example report</a>
-            <a class="underline text-purple-600" href="https://youtu.be/JBR21XSKK3I" target="_blank">How do I make a
-              report?</a>
+              target="_blank">Example export</a>
+            <a class="underline text-purple-600" href="https://youtu.be/JBR21XSKK3I" target="_blank">How do I create an
+              export?</a>
           </div>
         </template>
 
@@ -229,6 +235,8 @@
 
         <scan-sheet-report></scan-sheet-report>
 
+        <invoice-report></invoice-report>
+
         <lab-results-report :labResultsReportFormFilters="labResultsReportFormFilters"></lab-results-report>
 
         <items-metadata-report :itemsMetadataReportFormFilters="itemsMetadataReportFormFilters"></items-metadata-report>
@@ -255,24 +263,6 @@
               <b-form-checkbox v-model="packagesFormFilters.includeIntransit">
                 <span class="leading-6">Include in-transit packages</span>
               </b-form-checkbox>
-
-              <!-- <b-form-checkbox v-model="packagesFormFilters.includeTransferHub">
-                    <span class="leading-6">Include transfer hub packages</span>
-                  </b-form-checkbox> -->
-
-              <!-- <b-form-checkbox :disabled="!clientValues['ENABLE_T3PLUS'] && !hasT3plus">
-                    <div class="flex flex-col items-start">
-                      <span class="leading-6"
-                        >Include packages transferred out of this facility</span
-                      >
-                      <span
-                        v-if="!clientValues['ENABLE_T3PLUS'] && !hasT3plus"
-                        class="text-xs text-gray-300"
-                        >Enable this with
-                        <a href="https://trackandtrace.tools/plus" target="_blank">T3+</a></span
-                      >
-                    </div>
-                  </b-form-checkbox> -->
 
               <div class="flex flex-col items-start gap-1">
                 <b-form-checkbox v-model="packagesFormFilters.shouldFilterPackagedDateGt">
@@ -847,7 +837,7 @@
             <b-button variant="success" size="sm" @click="generateReports('CSV', 'DOWNLOAD')"
               :disabled="!enableCsvGenerateButton">EXPORT TO CSV</b-button>
             <template v-if="!enableCsvGenerateButton && selectedReports.length > 0">
-              <div class="text-xs">The selected report(s) are not CSV compatible</div>
+              <div class="text-xs">The selected export(s) are not CSV compatible</div>
             </template>
           </div>
 
@@ -869,7 +859,7 @@
             </template>
 
             <template v-if="!enableXlsxGenerateButton && selectedReports.length > 0">
-              <div class="text-xs">The selected report(s) are not XLSX compatible</div>
+              <div class="text-xs">The selected export(s) are not XLSX compatible</div>
             </template>
           </div>
 
@@ -944,12 +934,13 @@ import { ClientGetters } from "@/store/page-overlay/modules/client/consts";
 import { OAuthState, PluginAuthActions } from "@/store/page-overlay/modules/plugin-auth/consts";
 import {
   ReportAuxTask,
+  ReportCategory,
   ReportStatus,
   ReportType,
   ReportsActions,
   ReportsGetters,
   ReportsMutations,
-  SHEET_FIELDS,
+  SHEET_FIELDS
 } from "@/store/page-overlay/modules/reports/consts";
 import { IReportConfig, IReportOption } from "@/store/page-overlay/modules/reports/interfaces";
 import { getIsoDateFromOffset } from "@/utils/date";
@@ -995,6 +986,7 @@ import {
   addIncomingTransfersReport,
   incomingTransfersFormFiltersFactory,
 } from "@/utils/reports/incoming-transfers-report";
+import { addInvoiceReport, invoiceFormFiltersFactory } from "@/utils/reports/invoice-report";
 import { addItemsMetadataReport, itemsMetadataReportFormFiltersFactory } from "@/utils/reports/items-metadata-report";
 import { addLabResultsReport, labResultsReportFormFiltersFactory } from "@/utils/reports/lab-results-report";
 import {
@@ -1041,6 +1033,7 @@ import SimpleDrawer from "../shared/SimpleDrawer.vue";
 import FieldSelect from "./reports/FieldSelect.vue";
 import ImmaturePlantsQuickviewReport from "./reports/ImmaturePlantsQuickviewReport.vue";
 import IncomingManifestInventoryReport from "./reports/IncomingManifestInventoryReport.vue";
+import InvoiceReport from "./reports/InvoiceReport.vue";
 import ItemsMetadataReport from "./reports/ItemsMetadataReport.vue";
 import LabResultsReport from "./reports/LabResultsReport.vue";
 import MaturePlantsQuickviewReport from "./reports/MaturePlantsQuickviewReport.vue";
@@ -1064,6 +1057,7 @@ export default Vue.extend({
     PointInTimeInventoryReport,
     IncomingManifestInventoryReport,
     ScanSheetReport,
+    InvoiceReport,
     LabResultsReport,
     ItemsMetadataReport,
     FieldSelect,
@@ -1141,6 +1135,7 @@ export default Vue.extend({
       OAuthState,
       ReportStatus,
       ReportType,
+      ReportCategory,
       SHEET_FIELDS,
       MATURE_PLANT_QUICKVIEW_DIMENSIONS,
       IMMATURE_PLANT_QUICKVIEW_DIMENSIONS,
@@ -1162,6 +1157,7 @@ export default Vue.extend({
       transferHubTransfersFormFilters: transferHubTransfersFormFiltersFactory(),
       incomingTransferManifestsFormFilters: incomingTransferManifestsFormFiltersFactory(),
       scanSheetFormFilters: scanSheetFormFiltersFactory(),
+      invoiceFormFilters: invoiceFormFiltersFactory(),
       labResultsReportFormFilters: labResultsReportFormFiltersFactory(),
       itemsMetadataReportFormFilters: itemsMetadataReportFormFiltersFactory(),
       outgoingTransferManifestsFormFilters: outgoingTransferManifestsFormFiltersFactory(),
@@ -1440,6 +1436,18 @@ export default Vue.extend({
         addScanSheetReport({
           reportConfig,
           scanSheetFormFilters: this.scanSheetFormFilters,
+          fields: []
+        });
+      }
+
+      if (
+        this.selectedReports.find(
+          (report: IReportOption) => report.value === ReportType.INVOICE
+        )
+      ) {
+        addInvoiceReport({
+          reportConfig,
+          invoiceFormFilters: this.invoiceFormFilters,
           fields: []
         });
       }

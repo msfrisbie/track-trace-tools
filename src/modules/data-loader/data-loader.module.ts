@@ -62,6 +62,7 @@ import {
   ITagData,
   ITagFilter,
   ITagOrderData,
+  ITestResultBatchData,
   ITestResultData,
   ITransferData,
   ITransferFilter,
@@ -3002,6 +3003,21 @@ export class DataLoader implements IAtomicService {
     }
 
     const responseData: ICollectionResponse<ITestResultData> = await response.data;
+
+    return responseData.Data;
+  }
+
+  async testResultBatchesByPackageId(packageId: number): Promise<ITestResultBatchData[]> {
+    const page = 0;
+    const body = buildBody({ page, pageSize: DATA_LOAD_PAGE_SIZE });
+
+    const response = await this.metrcRequestManagerOrError.getTestResultBatches(body, packageId);
+
+    if (response.status !== 200) {
+      throw new Error("Request failed");
+    }
+
+    const responseData: ICollectionResponse<ITestResultBatchData> = await response.data;
 
     return responseData.Data;
   }

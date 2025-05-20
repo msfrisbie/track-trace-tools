@@ -57,8 +57,18 @@
                                     placeholder="Select a label template" style="position:relative"
                                     :value="selectedLabelTemplateLayout ? selectedLabelTemplateLayout.description : ''"
                                     :showOnFocus="true" :data="labelPrintState.labelTemplateLayoutOptions"
-                                    :serializer="(labelTemplateLayout) => labelTemplateLayout.description"
+                                    :serializer="(labelTemplateLayout) => `${labelTemplateLayout.description} ${labelTemplateLayout.labelTemplateLayoutId} ${labelTemplateLayout.tags.join(' ')}`"
                                     @hit="onChange('selectedTemplateLayoutId', $event.labelTemplateLayoutId)">
+
+                                    <template slot="suggestion" slot-scope="{ htmlText, data }">
+                                        <div class="flex flex-col">
+                                            <div class="font-bold">{{ data.description }}</div>
+                                            <!-- <div class="text-gray-300">{{ data.labelTemplateLayoutId }}</div> -->
+                                            <div class="flex flex-row items-center gap-1">
+                                                <b-badge v-for="tag in data.tags" v-bind:key="tag">{{ tag }}</b-badge>
+                                            </div>
+                                        </div>
+                                    </template>
 
                                     <template slot="append" v-if="selectedLabelTemplateLayout">
                                         <b-button class="clear-button" variant="outline-dark"
@@ -76,8 +86,19 @@
                                     :value="selectedLabelContentLayout ? selectedLabelContentLayout.description : ''"
                                     style="position:relative" :showOnFocus="true"
                                     :data="labelPrintState.labelContentLayoutOptions"
-                                    :serializer="(labelContentLayout) => labelContentLayout.description"
+                                    :serializer="(labelContentLayout) => `${labelContentLayout.description} ${labelContentLayout.labelTemplateLayoutId} ${labelContentLayout.tags.join(' ')}`"
                                     @hit="onChange('selectedContentLayoutId', $event.labelContentLayoutId)">
+
+                                    <template slot="suggestion" slot-scope="{ htmlText, data }">
+                                        <div class="flex flex-col">
+                                            <div class="font-bold">{{ data.description }}</div>
+                                            <!-- <div class="text-gray-300">{{ data.labelContentLayoutId }}</div> -->
+                                            <div class="flex flex-row items-center gap-1">
+                                                <b-badge v-for="tag in data.tags" v-bind:key="tag">{{ tag }}</b-badge>
+                                            </div>
+                                        </div>
+                                    </template>
+
                                     <template slot="append" v-if="selectedLabelContentLayout">
                                         <b-button class="clear-button" variant="outline-dark"
                                             @click.stop.prevent="onChange('selectedContentLayoutId', null, 'labelContentLayoutTypeahead')">
@@ -91,6 +112,24 @@
                                 label-class="text-purple-600">
                                 <b-form-input type="number" step="1" min="1" :value="labelPrintState.labelsPerTag"
                                     @change="onChange('labelsPerTag', parseInt(($event || 1).toString(), 10))"></b-form-input>
+                            </b-form-group>
+
+                            <b-form-group
+                                    description="Thermal printers print labels sequentially, but the spooled order is reversed (last to first). Check this box to print labels in the same order as they appear in the PDF."
+                                label-size="lg" label-class="text-purple-600">
+                                <b-form-checkbox :checked="labelPrintState.reversePrintOrder"
+                                    @change="onChange('reversePrintOrder', $event)">
+                                    Reverse print order
+                                </b-form-checkbox>
+                            </b-form-group>
+
+                            <b-form-group
+                                description="Rotate template 90 degrees (print sideways)."
+                                label-size="lg" label-class="text-purple-600">
+                                <b-form-checkbox :checked="labelPrintState.rotate"
+                                    @change="onChange('rotate', $event)">
+                                    Rotate label sideways
+                                </b-form-checkbox>
                             </b-form-group>
                         </b-card>
 
@@ -254,12 +293,20 @@
 
                                 <template
                                     v-if="labelPrintState.selectedLabelEndpoint === LabelEndpoint.INTRANSIT_PACKAGES">
-                                    <b-form-group label="IN TRANSIT PACKAGE LABELS"
+                                    <b-form-group label="OUTGOING TRANSFER PACKAGE LABELS"
                                         label-class="text-purple-400 font-semibold"
                                         description="Enter tags separated by commas or newlines. Must match existing in-transit packages in Metrc">
                                         <b-textarea :value="labelPrintState.rawTagList" rows="8"
                                             @change="onChange('rawTagList', $event)"></b-textarea>
                                     </b-form-group>
+
+                                    <div class="pl-4" style="border-left: 2px solid #a858d0f0">
+                                        <b-form-group label-class="text-gray-500">
+                                            <transfer-picker class="-mb-4 w-full" inputLabel="" maxWidth="100vw"
+                                                inputDescription="Search for outgoing transfers by manifest # or facility name"
+                                                v-on:addTransfer="addTransferPackages({ transfer: $event })" :showSelection="false"></transfer-picker>
+                                        </b-form-group>
+                                    </div>
 
                                     <div class="pl-4" style="border-left: 2px solid #a858d0f0">
                                         <b-form-group label-class="text-gray-500">
@@ -315,18 +362,18 @@
                                 </b-form-group>
 
                                 <b-form-group
-                                    description="Thermal printers print labels sequentially, but the spooled order is reversed (last to first). Check this box to print labels in the same order as they appear in the PDF."
+                                    description="Extract lab test values from lab test PDFs. This will significantly slow down label generation."
                                     label-size="lg" label-class="text-purple-600">
-                                    <b-form-checkbox :checked="labelPrintState.reversePrintOrderdebug"
-                                        @change="onChange('reversePrintOrder', $event)">
-                                        Reverse print order
+                                    <b-form-checkbox :checked="labelPrintState.generateMetadata"
+                                        @change="onChange('generateMetadata', $event)">
+                                        Generate metadata from lab PDFs
                                     </b-form-checkbox>
                                 </b-form-group>
 
                                 <b-form-group description="Force enable promo banner on labels" label-size="lg"
                                     label-class="text-purple-600">
-                                    <b-form-checkbox :checked="labelPrintState.forcePromo"
-                                        @change="onChange('forcePromo', $event)">
+                                    <b-form-checkbox :checked="labelPrintState.enablePromo"
+                                        @change="onChange('enablePromo', $event)">
                                         Force promo
                                     </b-form-checkbox>
                                 </b-form-group>
@@ -394,17 +441,20 @@
 <script lang="ts">
 import SimpleDrawer from "@/components/shared/SimpleDrawer.vue";
 import { UniqueMetrcGridId } from "@/consts";
-import { IIndexedPackageData, IPluginState } from "@/interfaces";
+import { IIndexedPackageData, IIndexedRichOutgoingTransferData, IIndexedTransferData, IPluginState } from "@/interfaces";
+import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
 import router from "@/router/index";
 import store from "@/store/page-overlay/index";
 import { ClientGetters } from "@/store/page-overlay/modules/client/consts";
 import { LabelEndpoint, LabelPrintActions, LabelPrintGetters, LabelPrintMutations, LabelPrintStatus } from "@/store/page-overlay/modules/label-print/consts";
 import { ILabelEndpointConfig } from "@/store/page-overlay/modules/label-print/interfaces";
 import { PluginAuthActions, T3ApiAuthState } from "@/store/page-overlay/modules/plugin-auth/consts";
+import { data } from "@/test/fixtures/json/metrc-facility-data";
 import { hasPlusImpl } from "@/utils/plus";
 import Vue from "vue";
 import { mapActions, mapGetters, mapState } from "vuex";
 import SinglePackagePicker from "../shared/SinglePackagePicker.vue";
+import TransferPicker from "../shared/TransferPicker.vue";
 
 export default Vue.extend({
     name: "LabelGenerator",
@@ -413,7 +463,8 @@ export default Vue.extend({
     props: {},
     components: {
         SinglePackagePicker,
-        SimpleDrawer
+        SimpleDrawer,
+        TransferPicker
     },
     computed: {
         ...mapState<IPluginState>({
@@ -481,6 +532,57 @@ export default Vue.extend({
         },
         addPackage({ pkg }: { pkg: IIndexedPackageData }) {
             this.addLabels([pkg.Label]);
+        },
+        async addTransferPackages({ transfer }: { transfer: IIndexedTransferData }) {
+            const richOutgoingTransfers: IIndexedRichOutgoingTransferData[] = [transfer];
+
+            const promises: Promise<any>[] = [];
+
+            for (const transfer of richOutgoingTransfers) {
+                if (promises.length % 100 === 0) {
+                    await Promise.allSettled(promises);
+                }
+
+                promises.push(
+                    primaryDataLoader.transferDestinations(transfer.Id).then((outgoingDestinations) => {
+                    transfer.outgoingDestinations = outgoingDestinations;
+                    })
+                );
+
+                promises.push(
+                    primaryDataLoader.transferTransporterDetails(transfer.Id).then((transporterDetails) => {
+                    transfer.transporterDetails = transporterDetails;
+                    })
+                );
+            }
+
+            await Promise.allSettled(promises);
+
+            for (const transfer of richOutgoingTransfers) {
+                for (const destination of transfer.outgoingDestinations!) {
+                    if (promises.length % 100 === 0) {
+                    await Promise.allSettled(promises);
+                    }
+
+                    promises.push(
+                    primaryDataLoader.destinationPackages(destination.Id).then((packages) => {
+                        destination.packages = packages;
+                    })
+                    );
+                    promises.push(
+                    primaryDataLoader.destinationTransporters(destination.Id).then((transporters) => {
+                        destination.transporters = transporters;
+                    })
+                    );
+                }
+            }
+            await Promise.allSettled(promises);
+
+            for (const transfer of richOutgoingTransfers) {
+                for (const destination of transfer.outgoingDestinations!) {
+                    this.addLabels(destination.packages!.map((x) => x.PackageLabel));
+                }
+            }
         },
         addLabels(labels: string[]) {
             store.commit(`labelPrint/${LabelPrintMutations.LABEL_PRINT_MUTATION}`, {

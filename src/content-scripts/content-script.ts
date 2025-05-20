@@ -170,17 +170,17 @@ async function initializeToolkit() {
   // Facility Picker
   const navbarElement = document.querySelector(".navbar.navbar-fixed-top");
 
-  if (navbarElement) {
-    const facilityPickerComponent = document.createElement("div");
-    facilityPickerComponent.setAttribute("id", "ttt-facility-picker");
+  // if (navbarElement) {
+  //   const facilityPickerComponent = document.createElement("div");
+  //   facilityPickerComponent.setAttribute("id", "ttt-facility-picker");
 
-    navbarElement?.appendChild(facilityPickerComponent);
+  //   navbarElement?.appendChild(facilityPickerComponent);
 
-    new Vue({
-      el: "#ttt-facility-picker",
-      render: (h) => h(FloatingFacilityPicker),
-    });
-  }
+  //   new Vue({
+  //     el: "#ttt-facility-picker",
+  //     render: (h) => h(FloatingFacilityPicker),
+  //   });
+  // }
 }
 
 initializeToolkit();

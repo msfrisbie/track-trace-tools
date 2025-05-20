@@ -1,12 +1,11 @@
-import { AnalyticsEvent, MessageType } from "@/consts";
+import { AnalyticsEvent, ChromeStorageKeys, MessageType } from "@/consts";
 import { IAtomicService, IAuthState } from "@/interfaces";
 import { analyticsManager } from "@/modules/analytics-manager.module";
-import { customAxios } from "@/modules/fetch-manager.module";
 import store from "@/store/page-overlay";
 import { PluginAuthActions } from "@/store/page-overlay/modules/plugin-auth/consts";
 import { isIdentityAllowedToUseTtt } from "@/utils/access-control";
 import { debugLogFactory } from "@/utils/debug";
-import { extract, ExtractionType } from "@/utils/html";
+import { extract, extractAuthData, ExtractionType } from "@/utils/html";
 import { messageBus } from "./message-bus.module";
 
 // Plugin scripts are sandboxed from the window variables.
@@ -68,11 +67,11 @@ class AuthManager implements IAtomicService {
       debugLog(async () => ["Fetching remote auth data"]);
       // Data was not found in the page.
       // Piggyback on browser cookies/redirect and load the initial logged in page, which should have credentials
-      const loadedHTML = await customAxios(window.location.origin).then(
-        (response) => response.data
-      );
+      // const loadedHTML = await customAxios(window.location.origin).then(
+      //   (response) => response.data
+      // );
 
-      extractedAuthData = extract(ExtractionType.AUTH_DATA, loadedHTML);
+      extractedAuthData = await extractAuthData(document.body.innerHTML);
 
       if (extractedAuthData && extractedAuthData.authData) {
         ({ identity, license, apiVerificationToken } = extractedAuthData.authData);
@@ -109,6 +108,14 @@ class AuthManager implements IAtomicService {
         apiVerificationToken,
         hostname: window.location.hostname,
       });
+
+      if (store.state.settings?.autoExtendSession) {
+        const authState = await authManager.authStateOrError();
+        const result = await chrome.storage.local.get(ChromeStorageKeys.T3_METRC_AVT_ENTRIES);
+        const avtEntries: Record<string, string> = result[ChromeStorageKeys.T3_METRC_AVT_ENTRIES] ?? {};
+        avtEntries[window.location.hostname] = authState.apiVerificationToken;
+        await chrome.storage.local.set({ [ChromeStorageKeys.T3_METRC_AVT_ENTRIES]: avtEntries });
+      }
 
       return;
     }

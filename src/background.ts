@@ -418,3 +418,47 @@ chrome.action.onClicked.addListener(() => {
   // // Open the welcome page in a new tab .
   chrome.tabs.create({ url });
 });
+
+const SESSION_REFRESH_ALARM_ID = 'SESSION_REFRESH';
+
+chrome.runtime.onInstalled.addListener(() => {
+  chrome.alarms.create(SESSION_REFRESH_ALARM_ID, { periodInMinutes: 1 });
+});
+
+chrome.alarms.onAlarm.addListener(async (alarm) => {
+  if (alarm.name !== SESSION_REFRESH_ALARM_ID) {
+    return;
+  }
+
+  const { [ChromeStorageKeys.T3PLUS]: t3plusEntriesRaw } = await chrome.storage.local.get(ChromeStorageKeys.T3PLUS);
+  const t3plusEntries: Record<string, boolean> = t3plusEntriesRaw ?? {};
+
+  const { [ChromeStorageKeys.T3_METRC_AVT_ENTRIES]: avtEntriesRaw } = await chrome.storage.local.get(ChromeStorageKeys.T3_METRC_AVT_ENTRIES);
+  const avtEntries: Record<string, string> = avtEntriesRaw ?? {};
+
+  await Promise.all(
+    Object.entries(avtEntries).map(async ([hostname, avt]) => {
+      if (!t3plusEntries[hostname]) {
+        return;
+      }
+
+      try {
+        const response = await fetch(`https://${hostname}/api/system/noop`, {
+          headers: {
+            apiverificationtoken: avt,
+          },
+          method: "POST",
+          mode: "cors",
+          credentials: "include",
+        });
+        if (response.status !== 200) {
+          delete avtEntries[hostname];
+        }
+      } catch (e) {
+        delete avtEntries[hostname];
+      }
+    })
+  );
+
+  await chrome.storage.local.set({ [ChromeStorageKeys.T3_METRC_AVT_ENTRIES]: avtEntries });
+});

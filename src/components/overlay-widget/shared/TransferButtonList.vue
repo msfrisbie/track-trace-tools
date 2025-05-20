@@ -70,6 +70,20 @@
       </div>
     </b-button>
 
+    <b-button size="sm" variant="outline-primary"
+      v-if="transfer && [TransferState.OUTGOING, TransferState.OUTGOING_INACTIVE].includes(transfer.TransferState)"
+      @click.stop.prevent="addToInvoice()" :disabled="!hasPlus">
+      <div class="w-full grid grid-cols-3 gap-2" style="grid-template-columns: 2rem 1fr auto">
+        <div class="aspect-square grid place-items-center">
+          <font-awesome-icon icon="file-invoice-dollar" />
+        </div>
+        <span>GENERATE INVOICE</span>
+        <div>
+          <b-badge variant="primary">T3+</b-badge>
+        </div>
+      </div>
+    </b-button>
+
     <!-- V2 scan sheet, dumps to reports -->
     <b-button size="sm" variant="outline-primary"
       v-if="transfer && [TransferState.INCOMING, TransferState.OUTGOING, TransferState.REJECTED].includes(transfer.TransferState)"
@@ -378,6 +392,45 @@ export default Vue.extend({
         parseInt(this.$props.transfer.ManifestNumber!, 10),
         this.$props.transfer.ManifestNumber.padStart(10, "0")
       );
+
+      this.dismiss();
+    },
+    async addToInvoice() {
+      analyticsManager.track(AnalyticsEvent.CONTEXT_MENU_SELECT, { event: "addToInvoice" });
+
+      // Enable scan report if not already enabled
+      store.commit(`reports/${ReportsMutations.REPORTS_MUTATION}`, {
+        selectedReports: [store.getters[`reports/${ReportsGetters.REPORT_OPTIONS}`].find((x: IReportOption) => x.value === ReportType.INVOICE)]
+      });
+
+      // Load the transfers
+      await store.dispatch(`reports/${ReportsActions.UPDATE_DYNAMIC_REPORT_DATA}`, { reportType: ReportType.INVOICE });
+
+      // Select this transfer
+      const reportFormFilters = store.state.reports.reportFormFilters;
+
+      const transfer: IIndexedTransferData = this.$props.transfer;
+
+      switch (transfer.TransferState) {
+        case TransferState.OUTGOING:
+          const outgoingTransfer = reportFormFilters[ReportType.INVOICE]!.allOutgoingTransfers.find(
+            (x) => x.ManifestNumber === transfer.ManifestNumber
+          )!;
+
+          reportFormFilters[ReportType.INVOICE]!.selectedOutgoingTransfer = outgoingTransfer;
+          store.commit(`reports/${ReportsMutations.REPORTS_MUTATION}`, {
+            reportFormFilters
+          });
+          break;
+
+        default:
+          console.error(`Unexpected TransferState: ${transfer.TransferState}`);
+          break;
+      }
+
+      modalManager.dispatchModalEvent(ModalType.BUILDER, ModalAction.OPEN, {
+        initialRoute: "/google-sheets-export",
+      });
 
       this.dismiss();
     },

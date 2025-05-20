@@ -1,6 +1,5 @@
 <template>
   <div class="flex flex-col items-stretch w-full">
-    <!-- <template v-if="clientValues['ENABLE_T3PLUS'] || t3plus"> -->
     <template v-if="!sourcePackage">
       <single-package-picker
         class="mb-4"

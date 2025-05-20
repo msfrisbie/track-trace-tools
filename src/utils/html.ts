@@ -133,7 +133,7 @@ function decodeData(data: string): string {
 //             return extractApiKeyData(plaintext);
 
 //         case ExtractionType.AUTH_DATA:
-//             return extractAuthData(plaintext);
+//             return extractAuthDataDeprecated(plaintext);
 
 //         case ExtractionType.DATAIMPORT_API_VERIFICATION_TOKEN:
 //             return extractDataImportApiKey(plaintext);
@@ -145,7 +145,7 @@ function decodeData(data: string): string {
 //     return null;
 // }
 
-function extractAuthData(html: string) {
+function extractAuthDataDeprecated(html: string) {
   const container = document.createElement("div");
   container.innerHTML = html;
   const scripts = container.querySelectorAll("script") as any;
@@ -207,6 +207,109 @@ function extractAuthData(html: string) {
     } else {
       console.error("Could not match identity data regex");
     }
+  }
+
+  let authData: IExtractedAuthData | null = null;
+
+  if (!!extractedAuthDataDict && !!extractedIdentityArray) {
+    authData = {
+      license: extractedAuthDataDict.headers["X-Metrc-LicenseNumber"],
+      apiVerificationToken: extractedAuthDataDict.headers.ApiVerificationToken,
+      identity: extractedIdentityArray[0],
+    };
+
+    // Sanity check
+    if (extractedIdentityArray[1] !== authData.license) {
+      console.error(
+        "Unexpected license mismatch:",
+        extractedIdentityArray[1],
+        extractedAuthDataDict.license
+      );
+    }
+  }
+
+  if (!authData) {
+    return null;
+  }
+  return { authData };
+}
+
+export async function extractAuthData(html: string) {
+  const container = document.createElement("div");
+  container.innerHTML = html;
+  const scripts = container.querySelectorAll("script") as any;
+
+  let authDataScriptText: string | null = null;
+  let identityDataScriptText: string | null = null;
+
+  // Check all script tags separately for auth data and identity data
+  for (const script of scripts) {
+    if (!authDataScriptText) {
+      const authMatch = script.textContent.match(AJAX_SETUP_REGEX);
+      if (authMatch && authMatch[1]) {
+        authDataScriptText = script.textContent;
+      }
+    }
+
+    if (!identityDataScriptText) {
+      const identityMatch = script.textContent.match(INITIALIZE_DO_NOT_SHOW_REGEX);
+      if (identityMatch && identityMatch[1]) {
+        identityDataScriptText = script.textContent;
+      }
+    }
+
+    // Stop checking if both have been found
+    if (authDataScriptText && identityDataScriptText) {
+      break;
+    }
+  }
+
+  let extractedAuthDataDict: Record<string, any> | null = null;
+  let extractedIdentityArray: any[] | null = null;
+
+  // Process auth data if found
+  if (authDataScriptText) {
+    const authMatch = authDataScriptText.match(AJAX_SETUP_REGEX);
+    if (authMatch && authMatch[1]) {
+      try {
+        const authJson = authMatch[1].replaceAll("headers", '"headers"').replaceAll("'", '"');
+
+        extractedAuthDataDict = JSON.parse(authJson);
+      } catch (error) {
+        console.error("Failed to parse auth data JSON:", error);
+      }
+    } else {
+      console.error("Could not match auth data regex");
+    }
+  }
+
+  // Process identity data if found
+  if (identityDataScriptText) {
+    const identityMatch = identityDataScriptText.match(INITIALIZE_DO_NOT_SHOW_REGEX);
+    if (identityMatch && identityMatch[1]) {
+      try {
+        const identityJson = `[${identityMatch[1].replaceAll("'", '"')}]`;
+        extractedIdentityArray = JSON.parse(identityJson);
+      } catch (error) {
+        console.error("Failed to parse identity data JSON:", error);
+      }
+    } else {
+      console.error("Could not match identity data regex");
+    }
+  } else {
+    console.log("identity data NOT found");
+
+    const responseData = await fetch("/ui/user", {
+      method: "POST",
+      headers: {
+        hostname: window.location.hostname,
+        ...extractedAuthDataDict!.headers,
+      },
+    })
+      .then((response) => response.json())
+      .catch((error) => console.error("Error fetching /ui/user:", error));
+
+    extractedIdentityArray = [responseData.Children[0].Title];
   }
 
   let authData: IExtractedAuthData | null = null;
@@ -369,7 +472,7 @@ export function extract(extractionType: ExtractionType, plaintext: string): Extr
       break;
 
     case ExtractionType.AUTH_DATA:
-      data = extractAuthData(plaintext);
+      data = extractAuthDataDeprecated(plaintext);
       break;
 
     case ExtractionType.DATAIMPORT_API_VERIFICATION_TOKEN:

@@ -1,14 +1,14 @@
 <template>
   <fragment>
-    <b-button variant="primary" title="Announcements" class="relative" @click="openBuilder($event)" style="padding: 0">
+    <b-button :variant="notificationCount > 0 ? 'danger' : 'primary'" title="Announcements" class="relative" v-bind:class="{'shake-on-load': notificationCount > 0}" @click="openBuilder($event)" style="padding: 0">
       <div class="flex flex-col items-center justify-center" style="width: 52px; height: 52px">
         <font-awesome-icon icon="bell" style="height: 26px"></font-awesome-icon>
       </div>
     </b-button>
 
-    <b-badge v-if="notificationCount > 0" @click="openBuilder($event)" variant="danger" class="cursor-pointer absolute"
+    <!-- <b-badge v-if="notificationCount > 0" @click="openBuilder($event)" variant="light" class="cursor-pointer absolute"
       style="right: 0.1rem; bottom: 0.1rem">{{ "1"
-      }}</b-badge>
+      }}</b-badge> -->
   </fragment>
 </template>
 
@@ -115,7 +115,6 @@ export default Vue.extend({
 }
 
 @keyframes colorAndSizeChange {
-
   0%,
   100% {
     // background-color: rgb(255, 0, 0) !important;
@@ -132,4 +131,23 @@ export default Vue.extend({
   background-color: rgb(221, 46, 119) !important;
   animation: colorAndSizeChange 4s infinite;
 }
+
+/* CSS */
+@keyframes rotate-jump-shake {
+  0%   { transform: rotate(0deg) translateY(0); }
+  20%  { transform: rotate(-5deg) translateY(-20px); }
+  30%  { transform: rotate(5deg) translateY(-30px); }
+  40%  { transform: rotate(-5deg) translateY(-40px); }
+  40%  { transform: rotate(5deg) translateY(-30px); }
+  60%  { transform: rotate(-5deg) translateY(-20px); }
+  80%  { transform: rotate(5deg) translateY(0); }
+  100% { transform: rotate(0deg) translateY(0); }
+}
+
+.shake-on-load {
+  animation: rotate-jump-shake 0.7s ease;
+  animation-delay: 3s;
+  animation-fill-mode: backwards;
+}
+
 </style>

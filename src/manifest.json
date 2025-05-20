@@ -5,6 +5,7 @@
   "default_locale": "en",
   "host_permissions": ["https://*.metrc.com/*", "http://localhost:5000/*"],
   "permissions": [
+    "alarms",
     "identity",
     "storage",
     "unlimitedStorage",

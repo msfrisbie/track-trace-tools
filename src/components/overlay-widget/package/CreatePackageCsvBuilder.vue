@@ -268,6 +268,7 @@ import {
 } from "@/store/page-overlay/modules/create-package-csv/consts";
 import { cellColumnFromIndex } from "@/utils/csv";
 import { submitDateFromIsodate } from "@/utils/date";
+import { hasPlusImpl } from "@/utils/plus";
 import _ from "lodash-es";
 import Vue from "vue";
 import { mapActions, mapGetters, mapState } from "vuex";
@@ -290,7 +291,7 @@ export default Vue.extend({
       totalErrorCount: `createPackageCsv/${CreatePackageCsvGetters.TOTAL_ERROR_COUNT}`,
     }),
     submitEnabled(): boolean {
-      return store.state.client.values.ENABLE_T3PLUS || store.state.client.t3plus;
+      return hasPlusImpl();
     },
   },
   data() {

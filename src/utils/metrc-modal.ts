@@ -15,7 +15,7 @@ export function modalTitleOrError(modalElement: HTMLElement): string {
   return title;
 }
 
-export function metrcAddressToString(addressData: IMetrcFacilityData["PhysicalAddress"]): string {
+export function metrcAddressToArray(addressData: IMetrcFacilityData["PhysicalAddress"]): string[] {
   return [
     addressData.Street1,
     addressData.Street2,
@@ -25,6 +25,9 @@ export function metrcAddressToString(addressData: IMetrcFacilityData["PhysicalAd
     addressData.State,
     addressData.PostalCode,
   ]
-    .filter((x) => !!x)
-    .join(" ");
+    .filter((x) => !!x);
+}
+
+export function metrcAddressToString(addressData: IMetrcFacilityData["PhysicalAddress"]): string {
+  return metrcAddressToArray(addressData).join(" ");
 }

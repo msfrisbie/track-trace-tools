@@ -146,6 +146,7 @@ enum UrlType {
   DESTROY_PLANT_BATCHES_MODAL,
   USER_PROFILE,
   LAB_RESULTS_BY_PACKAGE_ID,
+  LAB_RESULT_BATCHES_BY_PACKAGE_ID,
   TRANSFER_HISTORY_BY_TRANSFER_ID,
   PACKAGE_HARVEST_HISTORY_BY_PACKAGE_ID,
   PACKAGE_HISTORY_BY_PACKAGE_ID,
@@ -260,6 +261,13 @@ async function buildDynamicUrl(
         throw new Error("Missing required URL options");
       }
       return `${origin({ divertToNullOrigin: false })}/api/packages/labresults/byid?id=${
+        options.packageId
+      }`;
+    case UrlType.LAB_RESULT_BATCHES_BY_PACKAGE_ID:
+      if (!options?.packageId) {
+        throw new Error("Missing required URL options");
+      }
+      return `${origin({ divertToNullOrigin: false })}/api/packages/labbatchresults/byid?id=${
         options.packageId
       }`;
     case UrlType.PACKAGE_HISTORY_BY_PACKAGE_ID:
@@ -788,6 +796,22 @@ export class MetrcRequestManager implements IAtomicService {
   async getTestResults(body: string, packageId: number) {
     return customAxios(
       await buildDynamicUrl(this.authStateOrError, UrlType.LAB_RESULTS_BY_PACKAGE_ID, {
+        packageId,
+      }),
+      {
+        ...DEFAULT_FETCH_POST_READ_OPTIONS,
+        headers: {
+          ...(await buildAuthenticationHeaders(this.authStateOrError)),
+          ...JSON_HEADERS,
+        },
+        body,
+      }
+    );
+  }
+
+  async getTestResultBatches(body: string, packageId: number) {
+    return customAxios(
+      await buildDynamicUrl(this.authStateOrError, UrlType.LAB_RESULT_BATCHES_BY_PACKAGE_ID, {
         packageId,
       }),
       {

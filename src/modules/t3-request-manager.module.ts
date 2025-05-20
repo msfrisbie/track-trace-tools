@@ -23,6 +23,7 @@ const DOWNLOAD_REPORT_PATH = "reports/download";
 const EMAIL_REPORT_PATH = "reports/email";
 const SESSION_AUTH_PATH = "v2/auth/session";
 const AUTH_CHECK_PATH = "v2/auth/check";
+const LAB_RESULT_METADATA_PATH = "/v2/packages/labresults-metadata";
 // const TOKEN_REFRESH_PATH = "v2/auth/refresh";
 const LABEL_TEMPLATE_LAYOUTS_PATH = "v2/files/labels/label-template-layouts";
 const LABEL_CONTENT_LAYOUTS_PATH = "v2/files/labels/label-content-layouts";
@@ -388,6 +389,18 @@ class T3RequestManager implements IAtomicService {
   //   });
   // }
 
+  async t3LabResultMetadata(packageId: number, labTestResultDocumentFileId: number) {
+    return customAxios(`${BASE_URL}${LAB_RESULT_METADATA_PATH}?licenseNumber=${
+        (await authManager.authStateOrError()).license
+      }&packageId=${packageId}&labTestResultDocumentFileId=${labTestResultDocumentFileId}`, {
+      method: "POST",
+      headers: {
+        ...DEFAULT_POST_HEADERS,
+        Authorization: `Bearer ${this._t3AccessToken}`,
+      },
+    });
+  }
+
   async t3AuthCheck() {
     return customAxios(BASE_URL + AUTH_CHECK_PATH, {
       method: "POST",
@@ -423,8 +436,6 @@ class T3RequestManager implements IAtomicService {
     labelContentLayoutId: string;
     labelContentData: { [key: string]: string }[];
     renderingOptions: { [key: string]: any };
-    debug: boolean;
-    forcePromo: boolean;
   }) {
     return customAxios(
       `${BASE_URL}${GENERATE_LABELS_PATH}?licenseNumber=${
@@ -445,31 +456,31 @@ class T3RequestManager implements IAtomicService {
     );
   }
 
-  async generateActivePackageLabelPdf(data: {
-    labelTemplateLayoutId: string;
-    labelContentLayoutId: string;
-    data: string[];
-    renderingOptions: { [key: string]: any };
-    debug: boolean;
-  }) {
-    return customAxios(
-      `${BASE_URL}${GENERATE_ACTIVE_PACKAGE_LABELS_PATH}?licenseNumber=${
-        (await authManager.authStateOrError()).license
-      }`,
-      {
-        method: "POST",
-        headers: {
-          ...DEFAULT_POST_HEADERS,
-          Authorization: `Bearer ${this._t3AccessToken}`,
-        },
-        axiosRetry: {
-          retries: 0,
-        },
-        body: JSON.stringify(data),
-        responseType: "blob",
-      }
-    );
-  }
+  // async generateActivePackageLabelPdf(data: {
+  //   labelTemplateLayoutId: string;
+  //   labelContentLayoutId: string;
+  //   data: string[];
+  //   renderingOptions: { [key: string]: any };
+  //   debug: boolean;
+  // }) {
+  //   return customAxios(
+  //     `${BASE_URL}${GENERATE_ACTIVE_PACKAGE_LABELS_PATH}?licenseNumber=${
+  //       (await authManager.authStateOrError()).license
+  //     }`,
+  //     {
+  //       method: "POST",
+  //       headers: {
+  //         ...DEFAULT_POST_HEADERS,
+  //         Authorization: `Bearer ${this._t3AccessToken}`,
+  //       },
+  //       axiosRetry: {
+  //         retries: 0,
+  //       },
+  //       body: JSON.stringify(data),
+  //       responseType: "blob",
+  //     }
+  //   );
+  // }
 
   async generateActivePackageLabelContentData(data: {
     labelTemplateLayoutId: string;
@@ -494,31 +505,31 @@ class T3RequestManager implements IAtomicService {
     );
   }
 
-  async generateInTransitPackageLabelPdf(data: {
-    labelTemplateLayoutId: string;
-    labelContentLayoutId: string;
-    data: string[];
-    renderingOptions: { [key: string]: any };
-    debug: boolean;
-  }) {
-    return customAxios(
-      `${BASE_URL}${GENERATE_IN_TRANSIT_PACKAGE_LABELS_PATH}?licenseNumber=${
-        (await authManager.authStateOrError()).license
-      }`,
-      {
-        method: "POST",
-        headers: {
-          ...DEFAULT_POST_HEADERS,
-          Authorization: `Bearer ${this._t3AccessToken}`,
-        },
-        axiosRetry: {
-          retries: 0,
-        },
-        body: JSON.stringify(data),
-        responseType: "blob",
-      }
-    );
-  }
+  // async generateInTransitPackageLabelPdf(data: {
+  //   labelTemplateLayoutId: string;
+  //   labelContentLayoutId: string;
+  //   data: string[];
+  //   renderingOptions: { [key: string]: any };
+  //   debug: boolean;
+  // }) {
+  //   return customAxios(
+  //     `${BASE_URL}${GENERATE_IN_TRANSIT_PACKAGE_LABELS_PATH}?licenseNumber=${
+  //       (await authManager.authStateOrError()).license
+  //     }`,
+  //     {
+  //       method: "POST",
+  //       headers: {
+  //         ...DEFAULT_POST_HEADERS,
+  //         Authorization: `Bearer ${this._t3AccessToken}`,
+  //       },
+  //       axiosRetry: {
+  //         retries: 0,
+  //       },
+  //       body: JSON.stringify(data),
+  //       responseType: "blob",
+  //     }
+  //   );
+  // }
 
   async generateInTransitPackageLabelContentData(data: {
     labelTemplateLayoutId: string;

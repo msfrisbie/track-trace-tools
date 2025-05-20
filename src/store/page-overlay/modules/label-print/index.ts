@@ -1,4 +1,7 @@
-import { ICsvFile, IPluginState } from "@/interfaces";
+import { AnalyticsEvent } from "@/consts";
+import { ICsvFile, IPluginState, ITestResultBatchData } from "@/interfaces";
+import { analyticsManager } from "@/modules/analytics-manager.module";
+import { primaryDataLoader } from "@/modules/data-loader/data-loader.module";
 import { t3RequestManager } from "@/modules/t3-request-manager.module";
 import { downloadCsvFile } from "@/utils/csv";
 import { readCsvFile } from "@/utils/file";
@@ -32,7 +35,9 @@ const persistedState = {
   labelMarginThickness: 1.0,
   debug: false,
   reversePrintOrder: false,
-  forcePromo: false,
+  generateMetadata: false,
+  enablePromo: false,
+  rotate: false,
   selectedLabelEndpoint: LabelEndpoint.ACTIVE_PACKAGES,
 };
 
@@ -105,11 +110,11 @@ export const labelPrintModule = {
       },
       {
         id: LabelEndpoint.ACTIVE_PACKAGES,
-        description: "Autogenerate labels from active packages",
+        description: "Autogenerate labels for active packages",
       },
       {
         id: LabelEndpoint.INTRANSIT_PACKAGES,
-        description: "Autogenerate labels from in transit packages",
+        description: "Autogenerate labels for outgoing transfer packages",
       },
       {
         id: LabelEndpoint.RAW_LABEL_GENERATOR,
@@ -264,6 +269,8 @@ export const labelPrintModule = {
       ctx: ActionContext<ILabelPrintState, IPluginState>,
       {}: {}
     ) => {
+      analyticsManager.track(AnalyticsEvent.LABEL_GENERATOR_DOWNLOAD_PDF);
+
       const link = document.createElement("a");
       link.href = ctx.state.labelPdfBlobUrl!;
       link.setAttribute("download", ctx.state.labelPdfFilename || "t3-labels.pdf");
@@ -275,6 +282,22 @@ export const labelPrintModule = {
       ctx: ActionContext<ILabelPrintState, IPluginState>,
       {}: {}
     ) => {
+      const renderingOptions = {
+        barcodeBarThickness: ctx.state.barcodeBarThickness,
+        labelMarginThickness: ctx.state.labelMarginThickness,
+        debug: ctx.state.debug,
+        enablePromo: ctx.state.enablePromo,
+        reversePrintOrder: ctx.state.reversePrintOrder,
+        rotationDegrees: ctx.state.rotate ? 90 : 0
+      };
+
+      analyticsManager.track(AnalyticsEvent.LABEL_GENERATOR_GENERATE_LABELS, {
+        selectedLabelEndpoint: ctx.state.selectedLabelEndpoint,
+        labelTemplateLayoutId: ctx.state.selectedTemplateLayoutId,
+        labelContentLayoutId: ctx.state.selectedContentLayoutId,
+        renderingOptions
+      });
+
       ctx.commit(LabelPrintMutations.LABEL_PRINT_MUTATION, {
         labelPdfBlobUrl: null,
         labelPdfFilename: null,
@@ -299,6 +322,52 @@ export const labelPrintModule = {
         } else {
           switch (ctx.state.selectedLabelEndpoint) {
             case LabelEndpoint.ACTIVE_PACKAGES:
+              if (ctx.state.generateMetadata) {
+                const packageIds = (await primaryDataLoader.activePackages()).filter((x) => labelData.includes(x.Label)).map((x) => x.Id);
+
+                const promises: Promise<any>[] = [];
+
+                const richBatches: {packageId: number, testResultBatch: ITestResultBatchData}[] = [];
+
+                for (const packageId of packageIds) {
+                  promises.push(
+                    primaryDataLoader.testResultBatchesByPackageId(packageId).then((testResultBatches) => {
+                      richBatches.push(...testResultBatches.map((testResultBatch) => ({ packageId, testResultBatch })));
+                    })
+                  );
+
+                  if (promises.length % 100) {
+                    await Promise.allSettled(promises);
+                  }
+                }
+
+                await Promise.allSettled(promises);
+
+                // file ID -> package ID
+                const labResultPairs:Map<number, number> = new Map();
+
+                for (const { packageId, testResultBatch } of richBatches) {
+                  for (const testResult of testResultBatch.Tests) {
+                    // If PDF is missing, nothing to be done
+                    if (!testResult.LabTestResultDocumentFileId) {
+                      continue;
+                    }
+
+                    if (!labResultPairs.has(testResult.LabTestResultDocumentFileId)) {
+                      labResultPairs.set(testResult.LabTestResultDocumentFileId, packageId);
+                    }
+                  }
+                }
+
+                const metadataPromises: Promise<any>[] = [];
+
+                for (const [labTestResultDocumentFileId, packageId] of labResultPairs) {
+                  metadataPromises.push(t3RequestManager.t3LabResultMetadata(packageId, labTestResultDocumentFileId));
+                }
+
+                await Promise.allSettled(metadataPromises);
+              }
+
               const activePackageLabelContentDataResponse =
                 await t3RequestManager.generateActivePackageLabelContentData({
                   labelTemplateLayoutId: ctx.state.selectedTemplateLayoutId!,
@@ -342,20 +411,15 @@ export const labelPrintModule = {
           throw new Error("Unable to assign labelContentData");
         }
 
-        if (ctx.state.reversePrintOrder) {
-          labelContentData.reverse();
-        }
+        // if (ctx.state.reversePrintOrder) {
+        //   labelContentData.reverse();
+        // }
 
         response = await t3RequestManager.generateLabelPdf({
           labelTemplateLayoutId: ctx.state.selectedTemplateLayoutId!,
           labelContentLayoutId: ctx.state.selectedContentLayoutId!,
           labelContentData,
-          renderingOptions: {
-            barcodeBarThickness: ctx.state.barcodeBarThickness,
-            labelMarginThickness: ctx.state.labelMarginThickness,
-          },
-          debug: ctx.state.debug,
-          forcePromo: ctx.state.forcePromo,
+          renderingOptions
         });
 
         labelPdfBlobUrl = URL.createObjectURL(response.data);

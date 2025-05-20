@@ -1,8 +1,8 @@
 import { IAtomicService, IPageMetrcFacilityData } from '@/interfaces';
 import { authManager } from '@/modules/auth-manager.module';
-import { customAxios } from '@/modules/fetch-manager.module';
 import store from '@/store/page-overlay/index';
 import { debugLogFactory } from '@/utils/debug';
+import { customAxios } from './fetch-manager.module';
 import { t3RequestManager } from './t3-request-manager.module';
 
 const debugLog = debugLogFactory('facility-manager.module.ts');

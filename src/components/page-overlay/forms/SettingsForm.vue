@@ -7,7 +7,14 @@
 
           <b-form-checkbox id="checkbox-preventLogout" class="mb-2" v-model="settings.preventLogout"
             name="checkbox-preventLogout" @change="onChange()">
-            Prevent Metrc from logging me out
+            <div>Auto-click "Keep me logged in" button</div>
+            <div class="text-xs text-gray-500 italic">Keeps you logged into Metrc while the tab is visible</div>
+          </b-form-checkbox>
+
+          <b-form-checkbox id="checkbox-autoExtendSession" class="mb-2" v-model="settings.autoExtendSession"
+            name="checkbox-autoExtendSession" @change="onChange()" :disabled="!hasPlus">
+            <div>Auto-extend Metrc session (T3+ only)</div>
+            <div class="text-xs text-gray-500 italic">Keeps you logged into Metrc indefinitely while the browser is open, even when Metrc tabs are closed. (Browser must remain open and computer must remain awake)</div>
           </b-form-checkbox>
 
           <b-form-checkbox id="checkbox-autoDismissPopups" class="mb-2" v-model="settings.autoDismissPopups"
@@ -431,6 +438,7 @@ import router from "@/router/index";
 import store from "@/store/page-overlay/index";
 import { SettingsActions } from "@/store/page-overlay/modules/settings/consts";
 import { generateThumbnail } from "@/utils/file";
+import { hasPlusImpl } from "@/utils/plus";
 import ExBoost from "exboost-js";
 import Vue from "vue";
 import { mapState } from "vuex";
@@ -571,6 +579,9 @@ export default Vue.extend({
 
       return test;
     },
+    hasPlus(): boolean {
+      return hasPlusImpl();
+    }
   },
   methods: {
     async toggleDebugMode() {

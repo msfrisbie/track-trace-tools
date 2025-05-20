@@ -29,6 +29,10 @@
         </div>
 
         <div class="relative">
+          <report-button></report-button>
+        </div>
+
+        <div class="relative">
           <print-button></print-button>
         </div>
       </div>
@@ -56,6 +60,7 @@ import DebugButton from "@/components/page-overlay/DebugButton.vue";
 import PlusButton from "@/components/page-overlay/PlusButton.vue";
 import PrintButton from "@/components/page-overlay/PrintButton.vue";
 import QuickScriptButton from "@/components/page-overlay/QuickScriptButton.vue";
+import ReportButton from "@/components/page-overlay/ReportButton.vue";
 import ScrollButton from "@/components/page-overlay/ScrollButton.vue";
 import SearchButton from "@/components/page-overlay/SearchButton.vue";
 import { IPluginState } from "@/interfaces";
@@ -78,6 +83,7 @@ export default Vue.extend({
     BugReportButton,
     FeedbackButton,
     PrintButton,
+    ReportButton,
     AnnouncementsButton,
   },
   async mounted() { },
